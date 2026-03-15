@@ -81,6 +81,10 @@ AutoContentPublisherSystem/
 - **SnsPostBatchStack**: SNS 投稿バッチ実行基盤
 - **MonitoringStack**: 監視・通知
 
+## Git 運用ルール
+
+- コミットメッセージは必ず**日本語**で記述する
+
 ## よく使うコマンド
 
 ```bash
