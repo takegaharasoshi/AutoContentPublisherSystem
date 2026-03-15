@@ -76,7 +76,7 @@ AutoContentPublisherSystem/
 
 デプロイ順序: FoundationStack → ImageBatchStack → SnsPostBatchStack → MonitoringStack
 
-- **FoundationStack**: 共通基盤（VPC、S3、Aurora、Secrets Manager、ECS Cluster）
+- **FoundationStack**: 共通基盤（VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR）
 - **ImageBatchStack**: 画像生成バッチ実行基盤
 - **SnsPostBatchStack**: SNS 投稿バッチ実行基盤
 - **MonitoringStack**: 監視・通知

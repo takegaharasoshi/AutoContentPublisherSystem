@@ -90,6 +90,13 @@ cdk deploy MonitoringStack
 | auto-content-publisher/image-batch | 画像生成バッチ |
 | auto-content-publisher/sns-post-batch | SNS 投稿バッチ |
 
+### ライフサイクルポリシー
+
+ECR リポジトリにはライフサイクルポリシーを設定し、古いイメージを自動削除する。
+
+- **保持ルール**: タグ付きイメージを最新 10 個まで保持し、それ以前は自動削除する
+- **設定箇所**: FoundationStack の ECR リポジトリ定義に含める
+
 ## 5. デプロイ方式
 
 - Blue/Green デプロイは採用しない
@@ -112,5 +119,28 @@ cdk deploy MonitoringStack
 | ブランチ | 用途 | デプロイ先 |
 |---|---|---|
 | main | 本番用 | 本番環境 |
-| develop | 開発用 | 開発環境（将来） |
+| develop | 開発用（将来拡張。現時点では未使用） | 開発環境（将来） |
 | feature/* | 機能開発 | - |
+
+## 7. 環境分離方針
+
+### 7.1 現在の運用
+
+現時点では本番環境（`main` ブランチ）のみを運用する。環境は 1 つだが、将来の複数環境対応に備えて環境名は `prod` として扱う。開発環境の分離は将来拡張とする。
+
+### 7.2 命名規約（将来の複数環境対応に備えた方針）
+
+将来的に開発環境を追加する際は、**同一 AWS アカウント内**で環境を分離する（アカウント分離は行わない）。以下の命名規約でリソースを区別する:
+
+| リソース | 命名規約 | 例（本番） | 例（開発） |
+|---|---|---|---|
+| CDK スタック | `{EnvName}-{StackName}` | `Prod-FoundationStack` | `Dev-FoundationStack` |
+| ECR リポジトリ | 環境共通（イメージタグで区別） | `auto-content-publisher/image-batch:abc123` | 同左 |
+| Secrets Manager | `acps/{env}/{set_code}/...` | `acps/prod/fashion-set-1/...` | `acps/dev/fashion-set-1/...` |
+| S3 バケット | CDK Context で環境ごとに別バケット | `acps-prod-images` | `acps-dev-images` |
+
+- CDK Context パラメータ（`-c env=prod`）で環境名を渡し、リソース名に反映する
+- 現時点の単一環境でも `env=prod` を付与して運用し、Secret 名・IAM スコープ・スタック名に反映する
+- ECS Task Definition には `ENV_NAME` を環境変数として注入し、アプリケーションが Secret 名を導出できるようにする
+
+> **注記**: 初期開発では単一環境で運用するが、命名規約だけは `prod` を前提に先行導入しておく。

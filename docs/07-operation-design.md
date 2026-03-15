@@ -35,6 +35,13 @@
 - プロンプトの追加・変更は DB 操作で行う（将来的には管理画面から操作）
 - `is_active` フラグにより、使用するプロンプトを制御する
 
+### 1.4 実行ログ管理
+
+- 各バッチは開始時に `batch_execution_logs` へ `running` レコードを登録し、終了時に `succeeded` または `failed` に更新する
+- `execution_arn` には Step Functions 実行 ARN を保存し、CloudWatch Logs と突合できるようにする
+- 手動 RunTask で起動した場合は `execution_arn` を `NULL` として扱ってよい
+- `running` のまま残ったレコードは stale とみなし、Step Functions 実行履歴と CloudWatch Logs を確認して `failed` へ補正する
+
 ## 2. データベース運用
 
 ### 2.1 Aurora Serverless v2 の自動一時停止
@@ -107,6 +114,8 @@
 ## 6. セキュリティ運用
 
 - API キー・DB 認証情報は Secrets Manager で管理し、定期的なローテーションを検討する
+- SNS 認証情報の Secret 名は `acps/{env}/{set_code}/sns/{platform}/{account_code}` の規約で管理する（現時点の `env` は `prod`）
+- ECS タスクロールの Secrets Manager 権限は `acps/{env}/*` プレフィックスに制限し、環境を跨いだ参照を避ける
 - ECS タスクには最小権限の IAM ロールを付与する
 - VPC 内のプライベートサブネットで DB・タスクを実行する
 - セキュリティグループで不要な通信を遮断する

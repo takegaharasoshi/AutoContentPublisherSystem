@@ -27,7 +27,7 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 ### VPC 設計
 
 - **VPC**: 1 つの VPC を全サービスで共有
-- **Public Subnet**: NAT Gateway 配置用（外部 API 通信のため）
+- **Public Subnet**: NAT Gateway 配置用（外部 API 通信のため）。NAT Gateway はコスト最適化のためシングル AZ（1 個）とする
 - **Private Subnet**: ECS Fargate タスク、Aurora Serverless v2 を配置
 - **Security Group**: サービスごとにアクセスを制御
 
@@ -39,6 +39,7 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
   - SNS 投稿バッチでは S3 Presigned URL を発行し、Instagram API に渡す
   - Presigned URL は S3 の標準エンドポイント URL で生成されるため、Instagram 側からインターネット経由でアクセス可能（VPC Endpoint の有無に影響されない）
 - ECS Fargate → Secrets Manager: VPC Endpoint（Interface 型）を利用
+- ECS Fargate → CloudWatch Logs: NAT Gateway 経由（ログ量が増加した場合は Interface 型 VPC Endpoint の追加を検討）
 
 ## 3. コンピューティング
 
@@ -49,18 +50,20 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 - **Task Definition**: サービスごとに作成
   - `image-batch-task`: 画像生成バッチ用
   - `sns-post-batch-task`: SNS 投稿バッチ用
+  - 静的環境変数として `ENV_NAME`（例: `prod`）を設定し、Secrets Manager の Secret 名導出やログ出力に利用する
 
 ### Step Functions
 
 - **ステートマシン**: バッチ種別ごとに 1 つ（image-generation-sfn, sns-posting-sfn）
-- **入力パラメータ**: `set_id`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す
+- **入力パラメータ**: `set_code`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す
+- **実行コンテキスト**: `$$.Execution.Id` を `EXECUTION_ARN` として ECS タスクへ渡し、`batch_execution_logs` の関連付けに利用する
 - **実行モード**: Standard（長時間実行に対応）
 - **エラーハンドリング**: Retry / Catch を設定
 
 ### EventBridge Scheduler
 
 - **スケジュール**: セットごと・バッチ種別ごとに cron 式で定義
-- **ターゲット**: 対応する Step Functions ステートマシン（`set_id` と `scheduled_at` を入力に含める）
+- **ターゲット**: 対応する Step Functions ステートマシン（`set_code` と `scheduled_at` を入力に含める）
 - **スケジュール管理**: スケジュール定義のマスタは IaC（CDK）とする。DB の `batch_schedules` テーブルには運用参照・バッチ自己診断用にスケジュール情報のコピーを保持する
 
 ## 4. データストア
@@ -87,11 +90,11 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 
 - Aurora DB の認証情報（ホスト、ポート、ユーザー名、パスワード、DB 名）
 - 画像生成 API のキー
-- SNS 認証情報: Secret 名は `acps/{set_id}/sns/{platform}/{account_code}` の規約に従う
+- SNS 認証情報: Secret 名は `acps/{env}/{set_code}/sns/{platform}/{account_code}` の規約に従う（`env` は `ENV_NAME`、現時点では `prod` 固定）
 
 ### IAM
 
-- ECS タスクロール: S3、Secrets Manager（プレフィックス `acps/*` で制限）、CloudWatch Logs へのアクセス権限
+- ECS タスクロール: S3、Secrets Manager（プレフィックス `acps/{env}/*` で制限）、CloudWatch Logs へのアクセス権限
 - Step Functions 実行ロール: ECS RunTask の実行権限
 - EventBridge Scheduler ロール: Step Functions の起動権限
 

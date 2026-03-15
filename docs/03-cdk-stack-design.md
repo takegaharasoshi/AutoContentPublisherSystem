@@ -35,6 +35,7 @@
 | Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効） |
 | Secrets Manager | DB 認証情報、API キー |
 | ECS Cluster | 全バッチ共通の実行基盤 |
+| ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch） |
 | VPC Endpoint | S3（Gateway）、Secrets Manager（Interface） |
 
 **出力値（他スタックへの共有）**:
@@ -45,6 +46,7 @@
 - Aurora Cluster Endpoint / ARN
 - Secrets Manager Secret ARN（DB 認証情報・API キー用。SNS 認証情報は Secret 名規約によりアプリ側で導出するため出力不要）
 - ECS Cluster 名 / ARN
+- ECR Repository URI（サービスごと）
 
 **注意事項**:
 
@@ -60,9 +62,9 @@
 | リソース | 説明 |
 |---|---|
 | ECS Task Definition | 画像生成バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
-| Container Definition | ECR イメージ、環境変数、ログ設定 |
+| Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
 | Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる） |
-| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_id` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
+| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
 | IAM Role | タスクロール、実行ロール |
 | CloudWatch Log Group | タスクログ出力先 |
 
@@ -85,9 +87,9 @@
 | リソース | 説明 |
 |---|---|
 | ECS Task Definition | SNS 投稿バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
-| Container Definition | ECR イメージ、環境変数、ログ設定 |
+| Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
 | Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる） |
-| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_id` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
+| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
 | IAM Role | タスクロール、実行ロール |
 | CloudWatch Log Group | タスクログ出力先 |
 
@@ -105,7 +107,7 @@
 
 - 重複投稿防止の仕組みを考慮する
 - 投稿結果の履歴管理を行う
-- SNS API の認証情報は Secret 名規約 `acps/{set_id}/sns/{platform}/{account_code}` に基づきアプリ側で導出し、Secrets Manager から取得する。ECS タスクロールには `arn:aws:secretsmanager:*:*:secret:acps/*` のプレフィックスベースで Secrets Manager の読み取り権限を付与する
+- SNS API の認証情報は Secret 名規約 `acps/{env}/{set_code}/sns/{platform}/{account_code}` に基づきアプリ側で導出し、Secrets Manager から取得する。`env` は CDK Context から設定される `ENV_NAME`（現時点では `prod`）とする。ECS タスクロールには `arn:aws:secretsmanager:*:*:secret:acps/{env}/*` のプレフィックスベースで Secrets Manager の読み取り権限を付与する
 
 ### 3.4 MonitoringStack
 
@@ -162,11 +164,11 @@
     │
     ├── 3. SnsPostBatchStack  ← 共通基盤を利用
     │
-    └── 4. MonitoringStack    ← 各スタックのメトリクスを監視
-              │
-              ├── 5. AdminApiStack    （将来）
-              │
-              └── 6. AdminWebStack    （将来）
+    ├── 4. MonitoringStack    ← 各スタックのメトリクスを監視
+    │
+    ├── 5. AdminApiStack      （将来）← 共通基盤を利用
+    │
+    └── 6. AdminWebStack      （将来）← AdminApiStack と連携
 ```
 
 > **デプロイ方法**: 上記 1〜4 のスタックは開発者が `cdk diff` で差分確認後、`cdk deploy` で手動デプロイする。インフラパイプラインは構築しない（Aurora・VPC 等の破壊的変更リスクを考慮）。詳細は CI/CD 設計書（`docs/06-cicd-design.md`）を参照。

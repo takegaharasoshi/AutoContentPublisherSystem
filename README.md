@@ -5,7 +5,7 @@ AWS 上で動作する画像生成・SNS 自動投稿バッチシステム。
 ## 概要
 
 - **画像生成バッチ**: Nano Banana Pro（Gemini 3 Pro 画像 API）で画像を生成し、S3 に保存、DB にメタ情報を登録
-- **SNS 投稿バッチ**: S3 上の画像を Instagram Graph API / Content Posting API を用いて SNS に投稿
+- **SNS 投稿バッチ**: S3 上の画像を Instagram Graph API を用いて SNS に投稿
 
 ## アーキテクチャ
 
@@ -16,7 +16,7 @@ AWS 上で動作する画像生成・SNS 自動投稿バッチシステム。
 | バッチ実行 | EventBridge Scheduler → Step Functions → ECS Fargate RunTask |
 | コンテナ管理 | ECR / ECS Fargate |
 | インフラ定義 | AWS CDK（TypeScript） |
-| CI/CD | GitHub → CodePipeline → CodeBuild → ECR → CDK Deploy |
+| CI/CD | GitHub → CodePipeline → CodeBuild → ECR push → ECS Task Definition 更新（インフラは手動 cdk deploy） |
 | 秘密情報管理 | Secrets Manager |
 | ログ・監視 | CloudWatch Logs / CloudWatch Alarm |
 
