@@ -3,23 +3,30 @@
 ## 1. 全体フロー
 
 ```
+【サービスパイプライン（image-batch / sns-post-batch）】
+
 GitHub (push)
     │
     ▼
-CodePipeline（サービスごと）
+CodePipeline
     │
     ├── Source Stage
     │     └── GitHub リポジトリからソース取得
     │
-    ├── Build Stage
-    │     └── CodeBuild
-    │           ├── Docker イメージのビルド
-    │           ├── ECR へ push
-    │           └── 新しい ECS タスク定義リビジョンの登録
-    │
-    └── Deploy Stage
-          └── CDK Deploy（対象スタック）
+    └── Build Stage
+          └── CodeBuild
+                ├── Docker イメージのビルド
+                ├── ECR へ push
+                └── 新しい ECS タスク定義リビジョンの登録
+
+【インフラデプロイ（手動）】
+
+開発者がローカルから実行:
+    1. cdk diff <StackName>    ← 差分を目視確認
+    2. cdk deploy <StackName>  ← 確認後にデプロイ
 ```
+
+> **インフラパイプラインは構築しない**: FoundationStack に Aurora・VPC など破壊的変更のリスクが高いリソースが含まれるため、インフラ変更は `cdk diff` で差分を確認した上で手動デプロイとする。個人開発でインフラ変更頻度は低く、手動運用のコストも小さい。
 
 ## 2. パイプライン分割
 
@@ -27,10 +34,12 @@ CodePipeline（サービスごと）
 
 | パイプライン | 対象サービス | トリガー条件 |
 |---|---|---|
-| image-batch-pipeline | 画像生成バッチ | `services/image-batch/**` の変更 |
-| sns-post-batch-pipeline | SNS 投稿バッチ | `services/sns-post-batch/**` の変更 |
-| foundation-pipeline | 共通基盤 | `infra/foundation/**` の変更 |
-| monitoring-pipeline | 監視 | `infra/monitoring/**` の変更 |
+| image-batch-pipeline | 画像生成バッチ | `services/image-batch/**` OR `shared/**` の変更 |
+| sns-post-batch-pipeline | SNS 投稿バッチ | `services/sns-post-batch/**` OR `shared/**` の変更 |
+
+> **トリガー条件の補足**:
+> - `shared/**` の変更は全サービスパイプラインをトリガーする（共通ライブラリの変更が各サービスに影響するため）
+> - `infra/**` の変更に対する自動パイプラインは設けない。インフラ変更時は開発者が `cdk diff` → `cdk deploy` を手動で実行する。CDK Deploy によりタスク定義の revision が更新された場合は、サービスパイプラインを手動で起動して最新イメージで revision を再登録すること
 
 ## 3. CodeBuild 設定
 
@@ -50,22 +59,26 @@ phases:
       - ECR へ push
   post_build:
     commands:
-      - 新しい ECS タスク定義リビジョンの登録
-      - Step Functions の定義更新（必要に応じて）
+      - 新しい ECS タスク定義リビジョンの登録（aws ecs register-task-definition）
+      # Step Functions の更新は不要（タスク定義をリビジョンなし ARN で参照するため）
+      # CDK Deploy も不要（Task Definition の更新は本ステージで完結する）
 ```
 
-### 3.2 インフラ用（CDK Deploy）
+### 3.2 インフラデプロイ（手動）
 
-```yaml
-# buildspec.yml の概要
-version: 0.2
-phases:
-  install:
-    commands:
-      - npm install（CDK 依存パッケージ）
-  build:
-    commands:
-      - cdk deploy <StackName> --require-approval never
+インフラ変更は CI/CD パイプラインを経由せず、開発者がローカルから手動で実行する。
+
+```bash
+# 手動デプロイ手順
+cd infra
+cdk diff <StackName>            # 差分を確認
+cdk deploy <StackName>          # 確認後にデプロイ
+
+# 全スタックを依存順にデプロイする場合
+cdk deploy FoundationStack
+cdk deploy ImageBatchStack
+cdk deploy SnsPostBatchStack
+cdk deploy MonitoringStack
 ```
 
 ## 4. ECR リポジトリ
@@ -82,7 +95,17 @@ phases:
 - Blue/Green デプロイは採用しない
 - ECS Service は使用しない
 - Docker イメージを ECR に push し、新しい ECS タスク定義リビジョンを登録する
-- Step Functions は最新のタスク定義を参照して Fargate タスクを起動する
+- **タスク定義の参照方式**: Step Functions はタスク定義をリビジョンなし ARN（family のみ）で参照し、常に最新リビジョンを使用する
+
+### Task Definition の管理責任
+
+| 操作 | 担当 | 説明 |
+|---|---|---|
+| 初期作成 | CDK（ImageBatchStack / SnsPostBatchStack） | Task Definition、IAM Role、Log Group 等を一括作成 |
+| イメージ更新時の revision 登録 | CodeBuild（post_build） | `aws ecs register-task-definition` で新 revision を登録 |
+| インフラ変更（ロール、環境変数等） | CDK（手動デプロイ） | 開発者が `cdk diff` で差分確認後、`cdk deploy` を手動実行。CDK が管理する revision と CodeBuild が登録した最新 revision が乖離する可能性があるため、インフラ変更後はサービスパイプラインを手動実行して最新イメージで revision を再登録すること |
+
+> **注意**: サービスパイプライン（image-batch-pipeline / sns-post-batch-pipeline）に Deploy Stage（CDK Deploy）は含めない。Task Definition の更新は CodeBuild の post_build で完結する。CDK Deploy はパイプラインに含めず、開発者が手動で実行する。
 
 ## 6. ブランチ戦略
 

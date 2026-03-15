@@ -33,6 +33,8 @@ AWS 上で動作する画像生成・SNS 自動投稿バッチシステム。
 
 ## リポジトリ構成
 
+> **注意**: 以下は予定構成です。各ディレクトリは段階的に作成します。
+
 ```
 AutoContentPublisherSystem/
 ├── docs/                    # 設計書
@@ -53,6 +55,8 @@ AutoContentPublisherSystem/
 
 ## セットアップ
 
+> **注意**: 以下は予定構成です。実装完了後に手順を確定します。
+
 ```bash
 # リポジトリをクローン
 git clone <repository-url>
@@ -66,6 +70,8 @@ pip install -r requirements.txt
 ```
 
 ## デプロイ
+
+> **注意**: 以下は予定構成です。実装完了後に手順を確定します。
 
 ```bash
 # CDK デプロイ（スタック順序に従う）

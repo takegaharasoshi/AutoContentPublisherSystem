@@ -36,6 +36,8 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 - ECS Fargate → 外部 API: NAT Gateway 経由でインターネットアクセス
 - ECS Fargate → Aurora: Private Subnet 内の VPC 内通信
 - ECS Fargate → S3: VPC Endpoint（Gateway 型）を利用
+  - SNS 投稿バッチでは S3 Presigned URL を発行し、Instagram API に渡す
+  - Presigned URL は S3 の標準エンドポイント URL で生成されるため、Instagram 側からインターネット経由でアクセス可能（VPC Endpoint の有無に影響されない）
 - ECS Fargate → Secrets Manager: VPC Endpoint（Interface 型）を利用
 
 ## 3. コンピューティング
@@ -50,14 +52,16 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 
 ### Step Functions
 
-- **ステートマシン**: サービスごとに作成
+- **ステートマシン**: バッチ種別ごとに 1 つ（image-generation-sfn, sns-posting-sfn）
+- **入力パラメータ**: `set_id`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す
 - **実行モード**: Standard（長時間実行に対応）
 - **エラーハンドリング**: Retry / Catch を設定
 
 ### EventBridge Scheduler
 
-- **スケジュール**: サービスごとに cron 式で定義
-- **ターゲット**: 対応する Step Functions ステートマシン
+- **スケジュール**: セットごと・バッチ種別ごとに cron 式で定義
+- **ターゲット**: 対応する Step Functions ステートマシン（`set_id` と `scheduled_at` を入力に含める）
+- **スケジュール管理**: スケジュール定義のマスタは IaC（CDK）とする。DB の `batch_schedules` テーブルには運用参照・バッチ自己診断用にスケジュール情報のコピーを保持する
 
 ## 4. データストア
 
@@ -83,11 +87,11 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 
 - Aurora DB の認証情報（ホスト、ポート、ユーザー名、パスワード、DB 名）
 - 画像生成 API のキー
-- Instagram Graph API / Content Posting API の認証情報
+- SNS 認証情報: Secret 名は `acps/{set_id}/sns/{platform}/{account_code}` の規約に従う
 
 ### IAM
 
-- ECS タスクロール: S3、Secrets Manager、CloudWatch Logs へのアクセス権限
+- ECS タスクロール: S3、Secrets Manager（プレフィックス `acps/*` で制限）、CloudWatch Logs へのアクセス権限
 - Step Functions 実行ロール: ECS RunTask の実行権限
 - EventBridge Scheduler ロール: Step Functions の起動権限
 
@@ -100,9 +104,13 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 
 ### CloudWatch Alarm
 
-- Step Functions の実行失敗を検知
-- ECS タスクの異常終了を検知
-- Aurora の異常を検知
+- Step Functions ExecutionsFailed メトリクスで実行失敗を検知
+- Aurora CPUUtilization / FreeableMemory メトリクスで異常を検知
+
+### EventBridge Rule
+
+- ECS Task State Change イベントでタスクの異常終了（exitCode != 0）を検知し、SNS Topic に通知する
+- ECS タスク終了コードは CloudWatch 標準メトリクスに含まれないため、EventBridge で捕捉する
 
 ### SNS Topic
 
@@ -112,9 +120,11 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 
 1. GitHub へのプッシュにより CodePipeline が起動
 2. CodeBuild で Docker イメージをビルド、ECR へ push
-3. 新しい ECS タスク定義リビジョンを登録
-4. Step Functions は最新のタスク定義で Fargate タスクを起動
+3. CodeBuild の post_build で新しい ECS タスク定義リビジョンを登録（`aws ecs register-task-definition`）
+4. Step Functions はタスク定義をリビジョンなし ARN で参照しているため、自動的に最新リビジョンで Fargate タスクを起動する
 
 - Blue/Green デプロイは採用しない
 - ECS Service は使用しない
 - バッチ用途に適したシンプルな構成とする
+
+> **Task Definition の管理責任**: 初期版は CDK（ImageBatchStack / SnsPostBatchStack）で作成する。以降のイメージ更新時は CodeBuild が新 revision を登録する。CDK deploy でサービススタックを更新する場合はロール・環境変数等のインフラ変更に限定し、Task Definition の revision 管理は CI に一本化する。

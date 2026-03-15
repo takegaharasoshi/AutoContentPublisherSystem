@@ -43,7 +43,7 @@
 - Security Group ID
 - S3 Bucket 名 / ARN
 - Aurora Cluster Endpoint / ARN
-- Secrets Manager Secret ARN
+- Secrets Manager Secret ARN（DB 認証情報・API キー用。SNS 認証情報は Secret 名規約によりアプリ側で導出するため出力不要）
 - ECS Cluster 名 / ARN
 
 **注意事項**:
@@ -59,10 +59,10 @@
 
 | リソース | 説明 |
 |---|---|
-| ECS Task Definition | 画像生成バッチ用コンテナ定義 |
+| ECS Task Definition | 画像生成バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数、ログ設定 |
-| Step Functions | ワークフロー定義（Retry/Catch 付き） |
-| EventBridge Scheduler | 定期実行スケジュール |
+| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる） |
+| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_id` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
 | IAM Role | タスクロール、実行ロール |
 | CloudWatch Log Group | タスクログ出力先 |
 
@@ -73,7 +73,7 @@
 1. DB 接続確認（リトライ付き）
 2. DB からプロンプト情報を取得
 3. 画像生成 API を呼び出し
-4. 生成画像を S3 に保存
+4. 生成画像を S3 に JPEG 形式で保存
 5. メタ情報を DB に登録
 
 ### 3.3 SnsPostBatchStack
@@ -84,10 +84,10 @@
 
 | リソース | 説明 |
 |---|---|
-| ECS Task Definition | SNS 投稿バッチ用コンテナ定義 |
+| ECS Task Definition | SNS 投稿バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数、ログ設定 |
-| Step Functions | ワークフロー定義（Retry/Catch 付き） |
-| EventBridge Scheduler | 定期実行スケジュール |
+| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる） |
+| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_id` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
 | IAM Role | タスクロール、実行ロール |
 | CloudWatch Log Group | タスクログ出力先 |
 
@@ -97,14 +97,15 @@
 
 1. DB 接続確認（リトライ付き）
 2. DB から投稿対象を取得
-3. S3 から画像を取得
-4. SNS API（Instagram Graph API / Content Posting API）で投稿
+3. S3 Presigned URL を発行
+4. Instagram Graph API に Presigned URL を渡して投稿
 5. 投稿結果を DB に記録
 
 **注意事項**:
 
 - 重複投稿防止の仕組みを考慮する
 - 投稿結果の履歴管理を行う
+- SNS API の認証情報は Secret 名規約 `acps/{set_id}/sns/{platform}/{account_code}` に基づきアプリ側で導出し、Secrets Manager から取得する。ECS タスクロールには `arn:aws:secretsmanager:*:*:secret:acps/*` のプレフィックスベースで Secrets Manager の読み取り権限を付与する
 
 ### 3.4 MonitoringStack
 
@@ -114,9 +115,12 @@
 
 | リソース | 説明 |
 |---|---|
-| CloudWatch Alarm | Step Functions 失敗、ECS 異常終了、Aurora 異常 |
-| SNS Topic | アラーム通知先 |
+| CloudWatch Alarm | Step Functions ExecutionsFailed、Aurora CPUUtilization / FreeableMemory |
+| EventBridge Rule | ECS Task State Change（異常終了検知）→ SNS Topic に通知 |
+| SNS Topic | アラーム・イベント通知先 |
 | CloudWatch Dashboard | 運用可視化（必要に応じて） |
+
+> **注記**: ECS 異常終了の検知は CloudWatch Alarm ではなく EventBridge Rule で実装する。ECS タスク終了コードは CloudWatch 標準メトリクスに含まれないため。
 
 **依存スタック**: FoundationStack、ImageBatchStack、SnsPostBatchStack
 
@@ -164,6 +168,8 @@
               │
               └── 6. AdminWebStack    （将来）
 ```
+
+> **デプロイ方法**: 上記 1〜4 のスタックは開発者が `cdk diff` で差分確認後、`cdk deploy` で手動デプロイする。インフラパイプラインは構築しない（Aurora・VPC 等の破壊的変更リスクを考慮）。詳細は CI/CD 設計書（`docs/06-cicd-design.md`）を参照。
 
 ## 5. スタック間のデータ受け渡し
 
