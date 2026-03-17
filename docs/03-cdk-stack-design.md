@@ -36,10 +36,12 @@
 | Secrets Manager | DB 認証情報、API キー |
 | ECS Cluster | 全バッチ共通の実行基盤 |
 | ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch） |
-| VPC Endpoint | S3（Gateway）のみ。Secrets Manager へは ECS Fargate / Lambda のパブリック IP 経由でアクセス |
-| Lambda Function | DB 準備確認用（db-readiness-check）。VPC 内（Public Subnet）に配置し、Aurora への接続確認を行う。Python ランタイム。両バッチスタックの Step Functions から共有される |
-| IAM Role (Lambda) | Lambda 実行ロール: VPC アクセス（AWSLambdaVPCAccessExecutionRole 相当）、Secrets Manager 読み取り（DB 認証情報）、CloudWatch Logs |
-| Security Group (Lambda) | DB 準備確認 Lambda 用。Aurora SG へのインバウンドを許可するための送信元として使用 |
+| VPC Endpoint | S3（Gateway）のみ。Secrets Manager へは ECS Fargate のパブリック IP 経由でアクセス |
+| ECR Repository (DB 準備確認) | DB 準備確認用コンテナイメージリポジトリ（db-readiness-check） |
+| ECS Task Definition (DB 準備確認) | DB 準備確認用（db-readiness-check）。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し（パブリック IP 付与）、Aurora への接続確認を行う。両バッチスタックの Step Functions から共有される |
+| IAM Role (DB 準備確認タスク) | タスクロール: Secrets Manager 読み取り（DB 認証情報）、CloudWatch Logs 出力権限。タスク実行ロール: ECR イメージ pull、CloudWatch Logs |
+| Security Group (DB 準備確認) | DB 準備確認 ECS タスク用。Aurora SG へのインバウンドを許可するための送信元として使用 |
+| CloudWatch Log Group (DB 準備確認) | DB 準備確認タスクのログ出力先 |
 
 **出力値（他スタックへの共有）**:
 
@@ -49,12 +51,14 @@
 - Aurora Cluster Endpoint / ARN
 - Secrets Manager Secret ARN（DB 認証情報・API キー用。SNS 認証情報は Secret 名規約によりアプリ側で導出するため出力不要）
 - ECS Cluster 名 / ARN
-- ECR Repository URI（サービスごと）
-- DB 準備確認 Lambda 関数 ARN（両バッチスタックの Step Functions から参照）
+- ECR Repository URI（サービスごと + DB 準備確認用）
+- DB 準備確認 ECS Task Definition ARN（両バッチスタックの Step Functions から参照）
+- DB 準備確認用 Security Group ID、Subnet ID（Step Functions の RunTask パラメータに必要）
 
 **注意事項**:
 
-- Aurora Serverless v2 の自動再開待ちに対応するため、FoundationStack に DB 準備確認 Lambda を配置する。各 Step Functions ワークフローはこの Lambda をワークフローの最初のステートで実行し、DB 準備完了を確認してから ECS タスクを起動する。Lambda 内部で最大 5 回のリトライ（指数バックオフ: 2, 4, 8, 16, 32 秒）を行う
+- Aurora Serverless v2 の自動再開待ちに対応するため、FoundationStack に DB 準備確認 ECS タスクを配置する。各 Step Functions ワークフローはこのタスクをワークフローの最初のステートで実行し、DB 準備完了を確認してからバッチ ECS タスクを起動する。コンテナ内部で最大 5 回のリトライ（指数バックオフ: 2, 4, 8, 16, 32 秒）を行う
+- DB 準備確認を Lambda ではなく ECS Fargate タスクで実装する理由: VPC 内の Lambda はパブリック IP が付与されないため、NAT Gateway または VPC Endpoint（Interface 型）なしでは Secrets Manager にアクセスできない。ECS Fargate は `assignPublicIp=ENABLED` でパブリック IP を取得可能なため、追加のネットワークリソースなしで Secrets Manager にアクセスできる。起動レイテンシ（30〜60 秒）の増加はバッチ用途では許容範囲内
 - 将来の AdminApiStack、AdminWebStack からも参照される
 
 ### 3.2 ImageBatchStack
@@ -67,16 +71,16 @@
 |---|---|
 | ECS Task Definition | 画像生成バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
-| Step Functions | ワークフロー定義（**最初のステートとして DB 準備確認 Lambda（WaitForDbReady）を実行し**、その後 ECS RunTask を実行。Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**。画像生成 ECS タスク成功後に SNS 投稿 Step Functions を `StartExecution` で起動する） |
+| Step Functions | ワークフロー定義（**最初のステートとして DB 準備確認 ECS タスク（WaitForDbReady）を実行し**、その後バッチ ECS RunTask を実行。Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**。画像生成 ECS タスク成功後に SNS 投稿 Step Functions を `StartExecution` で起動する） |
 | EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す）。SNS 投稿は画像生成完了後に自動起動されるため、本スケジューラのみで両バッチを順次実行する |
-| IAM Role | タスクロール、実行ロール。Step Functions 実行ロールには SNS 投稿 Step Functions の `StartExecution` 権限および DB 準備確認 Lambda の Invoke 権限を追加する |
+| IAM Role | タスクロール、実行ロール。Step Functions 実行ロールには DB 準備確認 ECS タスクの RunTask 権限、SNS 投稿 Step Functions の `StartExecution` 権限を追加する |
 | CloudWatch Log Group | タスクログ出力先 |
 
 **依存スタック**: FoundationStack、SnsPostBatchStack（SNS 投稿 Step Functions の ARN を参照するため）
 
 **処理フロー**:
 
-> ※ DB 準備確認は Step Functions の WaitForDbReady ステート（Lambda）で完了済み。バッチ開始時点で DB は利用可能。
+> ※ DB 準備確認は Step Functions の WaitForDbReady ステート（ECS タスク）で完了済み。バッチ開始時点で DB は利用可能。
 
 1. DB からプロンプト情報を取得
 2. 画像生成 API を呼び出し
@@ -94,8 +98,8 @@
 |---|---|
 | ECS Task Definition | SNS 投稿バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
-| Step Functions | ワークフロー定義（**最初のステートとして DB 準備確認 Lambda（WaitForDbReady）を実行し**、その後 ECS RunTask を実行。Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**）。画像生成 Step Functions から呼び出されるほか、手動での単独実行も可能 |
-| IAM Role | タスクロール、実行ロール。Step Functions 実行ロールには DB 準備確認 Lambda の Invoke 権限を追加する |
+| Step Functions | ワークフロー定義（**最初のステートとして DB 準備確認 ECS タスク（WaitForDbReady）を実行し**、その後バッチ ECS RunTask を実行。Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**）。画像生成 Step Functions から呼び出されるほか、手動での単独実行も可能 |
+| IAM Role | タスクロール、実行ロール。Step Functions 実行ロールには DB 準備確認 ECS タスクの RunTask 権限を追加する |
 | CloudWatch Log Group | タスクログ出力先 |
 
 > **注記**: SnsPostBatchStack には EventBridge Scheduler を含めない。SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動される。手動での再投稿が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する。
@@ -104,7 +108,7 @@
 
 **処理フロー**:
 
-> ※ DB 準備確認は Step Functions の WaitForDbReady ステート（Lambda）で完了済み。バッチ開始時点で DB は利用可能。
+> ※ DB 準備確認は Step Functions の WaitForDbReady ステート（ECS タスク）で完了済み。バッチ開始時点で DB は利用可能。
 
 1. DB から投稿対象を取得
 2. S3 Presigned URL を発行
@@ -193,7 +197,7 @@ FoundationStack
   ├── auroraCluster    → ImageBatchStack, SnsPostBatchStack
   ├── secretsArn       → ImageBatchStack, SnsPostBatchStack
   ├── ecsCluster       → ImageBatchStack, SnsPostBatchStack
-  └── dbReadinessCheckLambdaArn → ImageBatchStack, SnsPostBatchStack
+  └── dbReadinessCheckTaskDefArn → ImageBatchStack, SnsPostBatchStack
 
 SnsPostBatchStack
   └── snsPostingSfnArn → ImageBatchStack（画像生成完了後の SNS 投稿 Step Functions 起動用）
