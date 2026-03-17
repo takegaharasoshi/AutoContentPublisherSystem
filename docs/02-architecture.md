@@ -59,6 +59,7 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 - **入力パラメータ**: `set_code`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す
 - **実行コンテキスト**: `$$.Execution.Id` を `EXECUTION_ARN` として ECS タスクへ渡し、`batch_execution_logs` の関連付けに利用する
 - **実行モード**: Standard（長時間実行に対応）
+- **同時実行数制限**: ステートマシンごとに同時実行数を 1 に制限する（`maxConcurrency: 1` 相当）。同一セットの手動実行とスケジュール実行が重なった場合の二重投稿リスクを防止する。同時実行数の上限に達した場合、後続の実行はキューイングされる
 - **エラーハンドリング**: Retry / Catch を設定
 
 ### EventBridge Scheduler
@@ -80,7 +81,7 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 ### S3
 
 - **バケット**: 画像保存用に 1 つ作成
-- **ライフサイクル**: 必要に応じて設定
+- **ライフサイクル**: 全オブジェクトを作成から 30 日で自動削除する Lifecycle Policy を設定する。SNS 投稿は通常数日以内に完了するため、30 日あれば十分なバッファとなる。これにより、DB 登録に失敗した S3 孤立ファイルも自動的にクリーンアップされる
 - **アクセス**: VPC Endpoint（Gateway 型）経由（無料のため維持）
 
 ## 5. セキュリティ

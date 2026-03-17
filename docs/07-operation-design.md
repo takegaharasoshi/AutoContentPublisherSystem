@@ -42,6 +42,35 @@
 - 手動 RunTask で起動した場合は `execution_arn` を `NULL` として扱ってよい
 - `running` のまま残ったレコードは stale とみなし、Step Functions 実行履歴と CloudWatch Logs を確認して `failed` へ補正する
 
+### 1.5 CDK デプロイ後チェックリスト
+
+CDK デプロイ実行後は、以下のチェックリストを確認する。
+
+- [ ] **スケジュール変更があった場合**: DB の `batch_schedules` テーブルの `schedule_expression` を手動更新する
+- [ ] **ImageBatchStack に変更があった場合**: `image-batch-pipeline` を手動実行する（タスク定義の revision 整合性維持のため。詳細は `docs/06-cicd-design.md` セクション 6 を参照）
+- [ ] **SnsPostBatchStack に変更があった場合**: `sns-post-batch-pipeline` を手動実行する（同上）
+- [ ] **新規セット追加の場合**: DB に `batch_sets`、`batch_schedules` レコードを追加する
+- [ ] **デプロイ結果の確認**: AWS Console で各リソースの状態が正常であることを確認する
+
+### 1.6 SNS アカウント追加手順
+
+SNS アカウントを追加する際は、Secrets Manager のシークレット作成を DB レコード追加より先に行うこと。シークレットが存在しない状態で DB にレコードを追加すると、バッチ実行時にランタイムエラーとなる。
+
+#### 手順
+
+1. **Secrets Manager にシークレットを作成する**
+   - Secret 名: `acps/{env}/{set_code}/sns/{platform}/{account_code}`
+   - 例: `acps/prod/fashion-set-1/sns/instagram/main-account`
+   - シークレット値には各プラットフォームの API 認証情報を格納する
+2. **DB の `sns_accounts` テーブルにレコードを追加する**
+   - `set_id`: 対象バッチセットの ID
+   - `platform`: プラットフォーム名（例: `instagram`）
+   - `account_code`: シークレット名と一致するコード（**作成後の変更不可**）
+   - `is_active`: 1（有効）
+3. **動作確認**: バッチを手動実行し、シークレット取得が成功することを確認する
+
+> **注意**: `account_code` はシークレット名の導出に使用するため、作成後に変更してはならない。変更が必要な場合は、新しいシークレットとレコードを作成し、旧レコードを `is_active=0` に設定する。
+
 ## 2. データベース運用
 
 ### 2.1 Aurora Serverless v2 の自動一時停止
@@ -109,7 +138,7 @@
 | ECS Fargate | バッチ実行時のみ起動、タスク完了後に自動停止 |
 | Aurora Serverless v2 | 自動一時停止を有効化、最小 ACU を低く設定 |
 | ネットワーク | NAT Gateway は使用しない。ECS Fargate にパブリック IP を付与して直接インターネットアクセスする構成とし、固定費を削減 |
-| S3 | ライフサイクルルールで古いデータを整理（必要に応じて） |
+| S3 | Lifecycle Policy で全オブジェクトを作成から 30 日で自動削除。孤立ファイルのクリーンアップも兼ねる |
 
 ## 6. セキュリティ運用
 

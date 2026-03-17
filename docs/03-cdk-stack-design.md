@@ -31,7 +31,7 @@
 |---|---|
 | VPC | Public Subnet（ECS Fargate 用）、Isolated Subnet（Aurora 用）。NAT Gateway なし |
 | Security Group | サービスごとのアクセス制御 |
-| S3 Bucket | 画像保存用 |
+| S3 Bucket | 画像保存用（Lifecycle Policy: 30 日で自動削除） |
 | Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効） |
 | Secrets Manager | DB 認証情報、API キー |
 | ECS Cluster | 全バッチ共通の実行基盤 |
@@ -63,7 +63,7 @@
 |---|---|
 | ECS Task Definition | 画像生成バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
-| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる） |
+| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**） |
 | EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
 | IAM Role | タスクロール、実行ロール |
 | CloudWatch Log Group | タスクログ出力先 |
@@ -88,7 +88,7 @@
 |---|---|
 | ECS Task Definition | SNS 投稿バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
-| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる） |
+| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**） |
 | EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
 | IAM Role | タスクロール、実行ロール |
 | CloudWatch Log Group | タスクログ出力先 |
