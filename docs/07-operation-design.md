@@ -26,11 +26,13 @@
 ### 1.2 バッチ実行時の動作
 
 1. EventBridge Scheduler が画像生成 Step Functions（image-generation-sfn）を起動
-2. Step Functions が画像生成 ECS Fargate RunTask を実行
-3. 画像生成タスク成功後、Step Functions が SNS 投稿 Step Functions（sns-posting-sfn）を `StartExecution` で起動
-4. SNS 投稿 Step Functions が SNS 投稿 ECS Fargate RunTask を実行
-5. 各タスク完了後、Fargate タスクは自動的に停止（課金終了）
-6. ECS Service は使用しないため、常駐プロセスは存在しない
+2. Step Functions が DB 準備確認 Lambda を実行（WaitForDbReady ステート）
+3. DB 準備完了後、Step Functions が画像生成 ECS Fargate RunTask を実行
+4. 画像生成タスク成功後、Step Functions が SNS 投稿 Step Functions（sns-posting-sfn）を `StartExecution` で起動
+5. SNS 投稿 Step Functions が DB 準備確認 Lambda を実行（WaitForDbReady ステート）
+6. DB 準備完了後、SNS 投稿 Step Functions が SNS 投稿 ECS Fargate RunTask を実行
+7. 各タスク完了後、Fargate タスクは自動的に停止（課金終了）
+8. ECS Service は使用しないため、常駐プロセスは存在しない
 
 > **手動での SNS 投稿実行**: SNS 投稿の再実行や単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（`set_code` を入力パラメータとして渡す）。
 
@@ -84,11 +86,14 @@ SNS アカウントを追加する際は、Secrets Manager のシークレット
 - 一時停止中にアクセスがあると自動的に再開する
 - 再開には数十秒〜数分かかる場合がある
 
-### 2.2 DB 接続リトライ
+### 2.2 DB 準備確認
 
-- バッチ開始時に DB 接続を試行する
-- 接続失敗時は指数バックオフでリトライする（最大 5 回、2〜32 秒間隔）
-- リトライ超過時はタスク失敗とし、Step Functions の Catch で処理する
+- 各 Step Functions ワークフローの最初のステートとして DB 準備確認 Lambda を実行する
+- Lambda 内で DB 接続を試行し、接続失敗時は指数バックオフでリトライする（最大 5 回、2〜32 秒間隔）
+- Lambda のリトライ超過時は例外を送出し、Step Functions の Retry/Catch でハンドリングする
+- バッチアプリケーション（ECS タスク）は DB が利用可能な状態を前提とする（アプリケーション内の DB 接続リトライは不要）
+
+> **設計変更理由**: DB 準備確認の責務をバッチアプリケーションから Step Functions ワークフロー（Lambda）に移動した。これによりバッチアプリケーションがシンプルになり、DB 準備確認ロジックの共通化が実現される。
 
 ### 2.3 バックアップ
 
@@ -109,7 +114,7 @@ SNS アカウントを追加する際は、Secrets Manager のシークレット
 
 | エラー種別 | 対応 |
 |---|---|
-| DB 接続失敗 | 指数バックオフリトライ |
+| DB 接続失敗 | Step Functions の WaitForDbReady ステート（Lambda）で事前確認済み。ECS タスク実行中に DB 接続が切れた場合はログ出力後、終了コード 1 で終了 → Step Functions Retry |
 | 外部 API 失敗（画像生成） | ログ出力後、終了コード 1 で終了 → Step Functions Retry。再実行時は DB レコード有無で冪等性を確保 |
 | 外部 API 失敗（SNS 投稿） | pending レコードの status を failed に更新、処理続行（画像単位で個別ハンドリング）。全件失敗時は終了コード 1。次回バッチ実行で再試行される（`batch_sets.max_post_retries` の上限まで）。上限超過した組はスキップされログに警告を出力する。手動で再試行する場合は新しい `pending` レコード（`attempt_number` インクリメント）を挿入する |
 | S3 操作失敗 | ログ出力後、終了コード 1 で終了 → Step Functions Retry |
