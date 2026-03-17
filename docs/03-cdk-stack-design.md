@@ -57,7 +57,7 @@
 
 **注意事項**:
 
-- Aurora Serverless v2 の自動再開待ちに対応するため、FoundationStack に DB 準備確認 ECS タスクを配置する。各 Step Functions ワークフローはこのタスクをワークフローの最初のステートで実行し、DB 準備完了を確認してからバッチ ECS タスクを起動する。コンテナ内部で最大 5 回のリトライ（指数バックオフ: 2, 4, 8, 16, 32 秒）を行う
+- Aurora Serverless v2 の自動再開待ちに対応するため、FoundationStack に DB 準備確認 ECS タスクを配置する。各 Step Functions ワークフローはこのタスクをワークフローの最初のステートで実行し、DB 準備完了を確認してからバッチ ECS タスクを起動する。コンテナ内部で最大 8 回のリトライ（指数バックオフ: 2, 4, 8, 16, 32, 64, 128, 256 秒）を行う。Aurora Serverless v2 のコールドスタートは数分かかる場合があるため、最大約 510 秒の待機時間を確保する
 - DB 準備確認を Lambda ではなく ECS Fargate タスクで実装する理由: VPC 内の Lambda はパブリック IP が付与されないため、NAT Gateway または VPC Endpoint（Interface 型）なしでは Secrets Manager にアクセスできない。ECS Fargate は `assignPublicIp=ENABLED` でパブリック IP を取得可能なため、追加のネットワークリソースなしで Secrets Manager にアクセスできる。起動レイテンシ（30〜60 秒）の増加はバッチ用途では許容範囲内
 - 将来の AdminApiStack、AdminWebStack からも参照される
 
@@ -71,9 +71,9 @@
 |---|---|
 | ECS Task Definition | 画像生成バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
-| Step Functions | ワークフロー定義（**最初のステートとして DB 準備確認 ECS タスク（WaitForDbReady）を実行し**、その後バッチ ECS RunTask を実行。Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**。画像生成 ECS タスク成功後に SNS 投稿 Step Functions を `StartExecution` で起動する） |
+| Step Functions | ワークフロー定義（**最初のステートとして DB 準備確認 ECS タスク（WaitForDbReady）を実行し**、その後バッチ ECS RunTask を実行。Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。画像生成 ECS タスク成功後に SNS 投稿 Step Functions を `StartExecution` で起動する。SNS 投稿起動失敗時はカスタムメトリクスを発行して画像生成ワークフローは成功終了する） |
 | EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す）。SNS 投稿は画像生成完了後に自動起動されるため、本スケジューラのみで両バッチを順次実行する |
-| IAM Role | タスクロール、実行ロール。Step Functions 実行ロールには DB 準備確認 ECS タスクの RunTask 権限、SNS 投稿 Step Functions の `StartExecution` 権限を追加する |
+| IAM Role | タスクロール、実行ロール。Step Functions 実行ロールには DB 準備確認 ECS タスクの RunTask 権限、SNS 投稿 Step Functions の `StartExecution` 権限、CloudWatch `PutMetricData` 権限（SNS 投稿起動失敗時のカスタムメトリクス発行用）を追加する |
 | CloudWatch Log Group | タスクログ出力先 |
 
 **依存スタック**: FoundationStack、SnsPostBatchStack（SNS 投稿 Step Functions の ARN を参照するため）
@@ -98,7 +98,7 @@
 |---|---|
 | ECS Task Definition | SNS 投稿バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
-| Step Functions | ワークフロー定義（**最初のステートとして DB 準備確認 ECS タスク（WaitForDbReady）を実行し**、その後バッチ ECS RunTask を実行。Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**）。画像生成 Step Functions から呼び出されるほか、手動での単独実行も可能 |
+| Step Functions | ワークフロー定義（**最初のステートとして DB 準備確認 ECS タスク（WaitForDbReady）を実行し**、その後バッチ ECS RunTask を実行。Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる）。画像生成 Step Functions から呼び出されるほか、手動での単独実行も可能 |
 | IAM Role | タスクロール、実行ロール。Step Functions 実行ロールには DB 準備確認 ECS タスクの RunTask 権限を追加する |
 | CloudWatch Log Group | タスクログ出力先 |
 
@@ -129,7 +129,7 @@
 
 | リソース | 説明 |
 |---|---|
-| CloudWatch Alarm | Step Functions ExecutionsFailed、Aurora CPUUtilization / FreeableMemory |
+| CloudWatch Alarm | Step Functions ExecutionsFailed、Aurora CPUUtilization / FreeableMemory、カスタムメトリクス `ACPS/SnsPostStartFailureCount`（SNS 投稿 Step Functions の起動失敗検知） |
 | EventBridge Rule | ECS Task State Change（異常終了検知）→ SNS Topic に通知 |
 | SNS Topic | アラーム・イベント通知先 |
 | CloudWatch Dashboard | 運用可視化（必要に応じて） |

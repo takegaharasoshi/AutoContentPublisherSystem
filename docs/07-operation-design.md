@@ -8,20 +8,11 @@
 - SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動されるため、SNS 投稿用の EventBridge Scheduler は不要
 - スケジュールはバッチセットごとに個別設定可能とする
 - スケジュール定義のマスタは IaC（CDK）とする。EventBridge Scheduler の cron 式は CDK コードで定義し、`cdk deploy` で反映する
-- DB の `batch_schedules` テーブルには運用参照用にスケジュール情報のコピーを保持する
-  - バッチ自己診断（「自分は何時に実行されるはずか」の確認）に利用
-  - `schedule_expression`: cron 式または rate 式
-  - `timezone`: タイムゾーン（デフォルト: Asia/Tokyo）
-  - `is_enabled`: 有効/無効フラグ
-  - DB のみ変更してもスケジュールは変更されない。必ず CDK デプロイが必要
 
 #### スケジュール変更手順
 
 1. CDK コードの EventBridge Scheduler の cron 式を変更する
 2. `cdk deploy` で EventBridge Scheduler を更新する
-3. DB の `batch_schedules` テーブルの `schedule_expression` を手動で更新する（運用参照の整合性維持）
-
-> **注意**: DB の `batch_schedules` を変更しても実際のスケジュールは変わらない。CDK デプロイが必須。
 
 ### 1.2 バッチ実行時の動作
 
@@ -53,10 +44,9 @@
 
 CDK デプロイ実行後は、以下のチェックリストを確認する。
 
-- [ ] **スケジュール変更があった場合**: DB の `batch_schedules` テーブルの `schedule_expression` を手動更新する
 - [ ] **ImageBatchStack に変更があった場合**: `image-batch-pipeline` を手動実行する（タスク定義の revision 整合性維持のため。詳細は `docs/06-cicd-design.md` セクション 6 を参照）
 - [ ] **SnsPostBatchStack に変更があった場合**: `sns-post-batch-pipeline` を手動実行する（同上）
-- [ ] **新規セット追加の場合**: DB に `batch_sets`、`batch_schedules` レコードを追加する
+- [ ] **新規セット追加の場合**: DB に `batch_sets` レコードを追加する
 - [ ] **デプロイ結果の確認**: AWS Console で各リソースの状態が正常であることを確認する
 
 ### 1.6 SNS アカウント追加手順
@@ -89,13 +79,18 @@ SNS アカウントを追加する際は、Secrets Manager のシークレット
 ### 2.2 DB 準備確認
 
 - 各 Step Functions ワークフローの最初のステートとして DB 準備確認 ECS タスク（db-readiness-check）を実行する
-- ECS タスク内で DB 接続を試行し、接続失敗時は指数バックオフでリトライする（最大 5 回、2〜32 秒間隔）
+- ECS タスク内で DB 接続を試行し、接続失敗時は指数バックオフでリトライする（最大 8 回、2〜256 秒間隔。Aurora コールドスタート対応のため最大約 510 秒の待機時間を確保）
 - リトライ超過時は終了コード 1 で終了し、Step Functions の Retry/Catch でハンドリングする
 - バッチアプリケーション（ECS タスク）は DB が利用可能な状態を前提とする（アプリケーション内の DB 接続リトライは不要）
 
 > **設計変更理由**: DB 準備確認の責務をバッチアプリケーションから Step Functions ワークフロー（ECS タスク）に移動した。これによりバッチアプリケーションがシンプルになり、DB 準備確認ロジックの共通化が実現される。ECS Fargate を採用する理由は、VPC 内の Lambda はパブリック IP が付与されず Secrets Manager にアクセスできないため。ECS Fargate は `assignPublicIp=ENABLED` で追加のネットワークリソースなしに Secrets Manager へアクセス可能。
 
-### 2.3 バックアップ
+### 2.3 テーブル肥大化の監視
+
+- `post_records` テーブルは再試行のたびにレコードが追加される設計のため、長期運用でレコード数が増加する
+- 現時点では対策不要。パフォーマンスへの影響（クエリ遅延等）が観測された場合に、アーカイブテーブルへの移行やパーティショニングを検討する
+
+### 2.4 バックアップ
 
 - Aurora のスナップショットによるバックアップ（自動バックアップ有効）
 - 保持期間は要件に応じて設定
@@ -127,6 +122,7 @@ SNS アカウントを追加する際は、Secrets Manager のシークレット
 | 監視対象 | 実装方式 | 条件 |
 |---|---|---|
 | Step Functions 失敗 | CloudWatch Alarm（標準メトリクス `ExecutionsFailed`） | >= 1 |
+| SNS 投稿起動失敗 | CloudWatch Alarm（カスタムメトリクス `ACPS/SnsPostStartFailureCount`） | >= 1 |
 | ECS タスク異常終了 | EventBridge Rule（ECS Task State Change イベント）→ SNS Topic | `exitCode != 0` または異常停止 |
 | Aurora 異常 | CloudWatch Alarm（標準メトリクス `CPUUtilization` / `FreeableMemory`） | 閾値超過 |
 

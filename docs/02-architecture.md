@@ -52,7 +52,9 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 - **Public Subnet**: ECS Fargate タスクを配置（`assignPublicIp=ENABLED` でパブリック IP を自動付与し、Internet Gateway 経由で外部 API にアクセス）
 - **Isolated Subnet**: Aurora Serverless v2 を配置（インターネットアクセス不要）
 - **NAT Gateway**: 使用しない（コスト削減のため。ECS Fargate はパブリック IP で直接インターネットにアクセスする）
-- **Security Group**: サービスごとにアクセスを制御
+- **Security Group**: サービスごとにアクセスを制御。ECS Fargate タスク用の Security Group はインバウンドルールを全ポート拒否とする（バッチ処理であり外部からの着信接続は不要）。アウトバウンドはインターネットアクセス（外部 API、Secrets Manager、CloudWatch Logs）と VPC 内通信（Aurora）を許可する
+
+> **NAT Gateway への移行パス**: 将来的にセキュリティ要件の強化やトラフィック増加に伴い、ECS Fargate を Private Subnet に移動し NAT Gateway 経由でインターネットにアクセスする構成に変更することも可能。現時点ではコスト優先でパブリック IP 方式を採用する。
 
 ### 通信フロー
 
@@ -61,7 +63,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 - ECS Fargate → S3: VPC Endpoint（Gateway 型）を利用（無料のため維持）
   - SNS 投稿バッチでは S3 Presigned URL を発行し、Instagram API に渡す
   - Presigned URL は S3 の標準エンドポイント URL で生成されるため、Instagram 側からインターネット経由でアクセス可能（VPC Endpoint の有無に影響されない）
-- ECS Fargate → Secrets Manager: パブリック IP 経由でインターネットアクセス（コスト削減のため Interface 型 VPC Endpoint は使用しない）
+- ECS Fargate → Secrets Manager: パブリック IP 経由でインターネットアクセス（コスト削減のため Interface 型 VPC Endpoint は使用しない）。通信は TLS で暗号化されるため、パブリックインターネット経由でもトランスポートレベルのセキュリティは確保される。より厳格なネットワーク分離が必要な場合は、Interface VPC Endpoint（約 $14/月）を導入できる
 - ECS Fargate → CloudWatch Logs: パブリック IP 経由でインターネットアクセス
 
 ## 3. コンピューティング
@@ -84,7 +86,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 - **入力パラメータ**: `set_code`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す。SNS 投稿 Step Functions には画像生成 Step Functions から `set_code` を引き継ぐ
 - **実行コンテキスト**: `$$.Execution.Id` を `EXECUTION_ARN` として ECS タスクへ渡し、`batch_execution_logs` の関連付けに利用する
 - **実行モード**: Standard（長時間実行に対応）
-- **同時実行数制限**: ステートマシンごとに同時実行数を 1 に制限する（`maxConcurrency: 1` 相当）。同一セットの手動実行とスケジュール実行が重なった場合の二重投稿リスクを防止する。同時実行数の上限に達した場合、後続の実行はキューイングされる
+- **同時実行に関する制約**: Step Functions Standard にはステートマシン自体の同時実行数を制限するネイティブ機能がない。EventBridge Scheduler の実行間隔をバッチの想定実行時間より十分長く設定することで、通常運用では同時実行を回避する。万一同時実行が発生した場合は、DB の UNIQUE 制約と親行ロック（`SELECT ... FOR UPDATE`）により、データの整合性を保証する（詳細は `docs/04-batch-design.md` セクション 1.6 を参照）
 - **エラーハンドリング**: Retry / Catch を設定
 - **SNS 投稿の単独実行**: sns-posting-sfn は独立したステートマシンとして存在するため、手動での再投稿や投稿のみの実行も可能（AWS Console や CLI から直接起動）
 
@@ -92,7 +94,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 
 - **スケジュール**: セットごとに cron 式で定義（画像生成 Step Functions のみをターゲットとする）
 - **ターゲット**: 画像生成 Step Functions ステートマシン（`set_code` と `scheduled_at` を入力に含める）。SNS 投稿は画像生成の完了後に自動起動されるため、SNS 投稿用の EventBridge Scheduler は不要
-- **スケジュール管理**: スケジュール定義のマスタは IaC（CDK）とする。DB の `batch_schedules` テーブルには運用参照・バッチ自己診断用にスケジュール情報のコピーを保持する
+- **スケジュール管理**: スケジュール定義のマスタは IaC（CDK）とする
 
 ## 4. データストア
 
@@ -124,7 +126,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 
 - ECS タスクロール（バッチ）: S3、Secrets Manager（プレフィックス `acps/{env}/*` で制限）、CloudWatch Logs へのアクセス権限
 - ECS タスクロール（DB 準備確認）: Secrets Manager 読み取り（DB 認証情報）、CloudWatch Logs 出力権限
-- Step Functions 実行ロール: ECS RunTask の実行権限（DB 準備確認タスク + バッチタスク）。画像生成 Step Functions には追加で SNS 投稿 Step Functions の `StartExecution` 権限を付与する
+- Step Functions 実行ロール: ECS RunTask の実行権限（DB 準備確認タスク + バッチタスク）。画像生成 Step Functions には追加で SNS 投稿 Step Functions の `StartExecution` 権限および CloudWatch `PutMetricData` 権限（SNS 投稿起動失敗時のカスタムメトリクス発行用）を付与する
 - EventBridge Scheduler ロール: 画像生成 Step Functions の起動権限
 
 ## 6. ログ・監視
@@ -138,6 +140,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 
 - Step Functions ExecutionsFailed メトリクスで実行失敗を検知
 - Aurora CPUUtilization / FreeableMemory メトリクスで異常を検知
+- カスタムメトリクス `ACPS/SnsPostStartFailureCount` で SNS 投稿 Step Functions の起動失敗を検知
 
 ### EventBridge Rule
 
