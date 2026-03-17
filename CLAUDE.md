@@ -22,7 +22,7 @@ AutoContentPublisherSystem/
 ## 技術スタック
 
 - **言語**: Python（バッチ処理）
-- **インフラ定義**: AWS CDK
+- **インフラ定義**: AWS CDK（TypeScript）
 - **DB**: Aurora Serverless v2（MySQL 互換）
 - **実行基盤**: ECS Fargate RunTask（ECS Service は使用しない）
 - **ワークフロー**: Step Functions Standard
