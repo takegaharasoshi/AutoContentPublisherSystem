@@ -58,7 +58,7 @@
   - 備考:
 
 - [ ] **1-4** AWS コンソールで VPC を確認
-  - 確認: VPC、Subnet、NAT Gateway が作成されている
+  - 確認: VPC、Public Subnet、Isolated Subnet が作成されている（NAT Gateway がないことを確認）
   - 備考:
 
 - [ ] **1-5** 削除して再作成できることを確認
@@ -91,9 +91,9 @@
   - 確認: コンソールで DB クラスターが見える、自動一時停止が設定されている
   - 備考: コストに注意。不安なら Phase 3 の後に回してもよい
 
-- [ ] **2-6** VPC Endpoint（S3 Gateway, Secrets Manager Interface）を追加
-  - 確認: コンソールで VPC Endpoint が作成されている
-  - 備考:
+- [ ] **2-6** VPC Endpoint（S3 Gateway のみ）を追加
+  - 確認: コンソールで S3 Gateway VPC Endpoint が作成されている（Secrets Manager Interface Endpoint は不要）
+  - 備考: Secrets Manager へのアクセスは ECS Fargate のパブリック IP 経由で行う
 
 ---
 

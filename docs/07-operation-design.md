@@ -108,7 +108,7 @@
 |---|---|
 | ECS Fargate | バッチ実行時のみ起動、タスク完了後に自動停止 |
 | Aurora Serverless v2 | 自動一時停止を有効化、最小 ACU を低く設定 |
-| NAT Gateway | 利用量に応じてコストを監視 |
+| ネットワーク | NAT Gateway は使用しない。ECS Fargate にパブリック IP を付与して直接インターネットアクセスする構成とし、固定費を削減 |
 | S3 | ライフサイクルルールで古いデータを整理（必要に応じて） |
 
 ## 6. セキュリティ運用
@@ -117,5 +117,5 @@
 - SNS 認証情報の Secret 名は `acps/{env}/{set_code}/sns/{platform}/{account_code}` の規約で管理する（現時点の `env` は `prod`）
 - ECS タスクロールの Secrets Manager 権限は `acps/{env}/*` プレフィックスに制限し、環境を跨いだ参照を避ける
 - ECS タスクには最小権限の IAM ロールを付与する
-- VPC 内のプライベートサブネットで DB・タスクを実行する
+- Aurora は Isolated Subnet に配置しインターネットからの直接アクセスを遮断する。ECS Fargate は Public Subnet に配置し、Security Group でアウトバウンドを制御する
 - セキュリティグループで不要な通信を遮断する
