@@ -77,7 +77,7 @@ pip install -r requirements.txt
 # CDK デプロイ（スタック順序に従う）
 cd infra
 cdk deploy FoundationStack
-cdk deploy ImageBatchStack
 cdk deploy SnsPostBatchStack
+cdk deploy ImageBatchStack
 cdk deploy MonitoringStack
 ```
