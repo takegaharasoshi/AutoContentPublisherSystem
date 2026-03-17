@@ -29,14 +29,14 @@
 
 | リソース | 説明 |
 |---|---|
-| VPC | Private/Public Subnet、NAT Gateway |
+| VPC | Public Subnet（ECS Fargate 用）、Isolated Subnet（Aurora 用）。NAT Gateway なし |
 | Security Group | サービスごとのアクセス制御 |
 | S3 Bucket | 画像保存用 |
 | Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効） |
 | Secrets Manager | DB 認証情報、API キー |
 | ECS Cluster | 全バッチ共通の実行基盤 |
 | ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch） |
-| VPC Endpoint | S3（Gateway）、Secrets Manager（Interface） |
+| VPC Endpoint | S3（Gateway）のみ。Secrets Manager へは ECS Fargate のパブリック IP 経由でアクセス |
 
 **出力値（他スタックへの共有）**:
 

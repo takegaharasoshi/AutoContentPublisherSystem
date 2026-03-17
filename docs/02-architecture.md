@@ -27,19 +27,20 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 ### VPC 設計
 
 - **VPC**: 1 つの VPC を全サービスで共有
-- **Public Subnet**: NAT Gateway 配置用（外部 API 通信のため）。NAT Gateway はコスト最適化のためシングル AZ（1 個）とする
-- **Private Subnet**: ECS Fargate タスク、Aurora Serverless v2 を配置
+- **Public Subnet**: ECS Fargate タスクを配置（`assignPublicIp=ENABLED` でパブリック IP を自動付与し、Internet Gateway 経由で外部 API にアクセス）
+- **Isolated Subnet**: Aurora Serverless v2 を配置（インターネットアクセス不要）
+- **NAT Gateway**: 使用しない（コスト削減のため。ECS Fargate はパブリック IP で直接インターネットにアクセスする）
 - **Security Group**: サービスごとにアクセスを制御
 
 ### 通信フロー
 
-- ECS Fargate → 外部 API: NAT Gateway 経由でインターネットアクセス
-- ECS Fargate → Aurora: Private Subnet 内の VPC 内通信
-- ECS Fargate → S3: VPC Endpoint（Gateway 型）を利用
+- ECS Fargate → 外部 API: パブリック IP + Internet Gateway 経由でインターネットアクセス
+- ECS Fargate → Aurora: VPC 内部ルーティングによる通信（Public Subnet と Isolated Subnet 間は VPC 内で直接通信可能。Security Group で制御）
+- ECS Fargate → S3: VPC Endpoint（Gateway 型）を利用（無料のため維持）
   - SNS 投稿バッチでは S3 Presigned URL を発行し、Instagram API に渡す
   - Presigned URL は S3 の標準エンドポイント URL で生成されるため、Instagram 側からインターネット経由でアクセス可能（VPC Endpoint の有無に影響されない）
-- ECS Fargate → Secrets Manager: VPC Endpoint（Interface 型）を利用
-- ECS Fargate → CloudWatch Logs: NAT Gateway 経由（ログ量が増加した場合は Interface 型 VPC Endpoint の追加を検討）
+- ECS Fargate → Secrets Manager: パブリック IP 経由でインターネットアクセス（コスト削減のため Interface 型 VPC Endpoint は使用しない）
+- ECS Fargate → CloudWatch Logs: パブリック IP 経由でインターネットアクセス
 
 ## 3. コンピューティング
 
@@ -73,14 +74,14 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 - **自動一時停止**: コスト最適化のため有効化
 - **最小 ACU**: 0.5（一時停止時は 0）
 - **最大 ACU**: 要件に応じて設定
-- **接続**: Private Subnet 内からのみアクセス可能
+- **接続**: Isolated Subnet に配置。VPC 内部ルーティングにより、同一 VPC 内の Public Subnet（ECS Fargate）からアクセス可能。インターネットからの直接アクセスは不可
 - **認証情報**: Secrets Manager で管理
 
 ### S3
 
 - **バケット**: 画像保存用に 1 つ作成
 - **ライフサイクル**: 必要に応じて設定
-- **アクセス**: VPC Endpoint 経由
+- **アクセス**: VPC Endpoint（Gateway 型）経由（無料のため維持）
 
 ## 5. セキュリティ
 
