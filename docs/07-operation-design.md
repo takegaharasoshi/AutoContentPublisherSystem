@@ -4,7 +4,8 @@
 
 ### 1.1 スケジュール管理
 
-- EventBridge Scheduler で cron 式により定期実行する
+- EventBridge Scheduler で cron 式により画像生成 Step Functions を定期実行する
+- SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動されるため、SNS 投稿用の EventBridge Scheduler は不要
 - スケジュールはバッチセットごとに個別設定可能とする
 - スケジュール定義のマスタは IaC（CDK）とする。EventBridge Scheduler の cron 式は CDK コードで定義し、`cdk deploy` で反映する
 - DB の `batch_schedules` テーブルには運用参照用にスケジュール情報のコピーを保持する
@@ -24,10 +25,14 @@
 
 ### 1.2 バッチ実行時の動作
 
-1. EventBridge Scheduler が Step Functions を起動
-2. Step Functions が ECS Fargate RunTask を実行
-3. タスク完了後、Fargate タスクは自動的に停止（課金終了）
-4. ECS Service は使用しないため、常駐プロセスは存在しない
+1. EventBridge Scheduler が画像生成 Step Functions（image-generation-sfn）を起動
+2. Step Functions が画像生成 ECS Fargate RunTask を実行
+3. 画像生成タスク成功後、Step Functions が SNS 投稿 Step Functions（sns-posting-sfn）を `StartExecution` で起動
+4. SNS 投稿 Step Functions が SNS 投稿 ECS Fargate RunTask を実行
+5. 各タスク完了後、Fargate タスクは自動的に停止（課金終了）
+6. ECS Service は使用しないため、常駐プロセスは存在しない
+
+> **手動での SNS 投稿実行**: SNS 投稿の再実行や単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（`set_code` を入力パラメータとして渡す）。
 
 ### 1.3 プロンプト管理
 

@@ -63,12 +63,12 @@
 |---|---|
 | ECS Task Definition | 画像生成バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
-| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**） |
-| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
-| IAM Role | タスクロール、実行ロール |
+| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**。画像生成 ECS タスク成功後に SNS 投稿 Step Functions を `StartExecution` で起動する） |
+| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す）。SNS 投稿は画像生成完了後に自動起動されるため、本スケジューラのみで両バッチを順次実行する |
+| IAM Role | タスクロール、実行ロール。Step Functions 実行ロールには SNS 投稿 Step Functions の `StartExecution` 権限を追加する |
 | CloudWatch Log Group | タスクログ出力先 |
 
-**依存スタック**: FoundationStack
+**依存スタック**: FoundationStack、SnsPostBatchStack（SNS 投稿 Step Functions の ARN を参照するため）
 
 **処理フロー**:
 
@@ -77,6 +77,7 @@
 3. 画像生成 API を呼び出し
 4. 生成画像を S3 に JPEG 形式で保存
 5. メタ情報を DB に登録
+6. 成功時: SNS 投稿 Step Functions を起動（`set_code` を引き継ぐ）
 
 ### 3.3 SnsPostBatchStack
 
@@ -88,10 +89,11 @@
 |---|---|
 | ECS Task Definition | SNS 投稿バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD パイプラインの CodeBuild が行う） |
 | Container Definition | ECR イメージ、環境変数（`ENV_NAME=prod` など）、ログ設定 |
-| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**） |
-| EventBridge Scheduler | セットごとの定期実行スケジュール（`set_code` と `scheduled_at`（`<aws.scheduler.scheduled-time>` から取得）を入力パラメータとして渡す） |
+| Step Functions | ワークフロー定義（Retry/Catch 付き、タスク定義はリビジョンなし ARN で参照。CodeBuild が新 revision を登録すれば自動的に最新が使われる。**同時実行数制限: 1**）。画像生成 Step Functions から呼び出されるほか、手動での単独実行も可能 |
 | IAM Role | タスクロール、実行ロール |
 | CloudWatch Log Group | タスクログ出力先 |
+
+> **注記**: SnsPostBatchStack には EventBridge Scheduler を含めない。SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動される。手動での再投稿が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する。
 
 **依存スタック**: FoundationStack
 
@@ -160,9 +162,9 @@
 ```
 1. FoundationStack        ← 共通基盤を先に作成
     │
-    ├── 2. ImageBatchStack    ← 共通基盤を利用
+    ├── 2. SnsPostBatchStack  ← 共通基盤を利用（ImageBatchStack より先にデプロイ）
     │
-    ├── 3. SnsPostBatchStack  ← 共通基盤を利用
+    ├── 3. ImageBatchStack    ← 共通基盤 + SnsPostBatchStack の Step Functions ARN を参照
     │
     ├── 4. MonitoringStack    ← 各スタックのメトリクスを監視
     │
@@ -185,4 +187,7 @@ FoundationStack
   ├── auroraCluster    → ImageBatchStack, SnsPostBatchStack
   ├── secretsArn       → ImageBatchStack, SnsPostBatchStack
   └── ecsCluster       → ImageBatchStack, SnsPostBatchStack
+
+SnsPostBatchStack
+  └── snsPostingSfnArn → ImageBatchStack（画像生成完了後の SNS 投稿 Step Functions 起動用）
 ```

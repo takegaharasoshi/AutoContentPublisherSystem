@@ -11,12 +11,24 @@ GitHub ──▶ CodePipeline ──▶ CodeBuild ──▶ ECR (Docker push)
                                     ECS Task Definition (新リビジョン登録)
                                               │
                                               ▼
-EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
-                                              │
-                              ┌───────────────┼───────────────┐
-                              ▼               ▼               ▼
-                         External API       S3 Bucket    Aurora Serverless v2
-                                                         (Secrets Manager)
+EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
+                              │
+                              ▼
+                         ECS Fargate RunTask (画像生成バッチ)
+                              │
+                              ├──▶ External API (画像生成)
+                              ├──▶ S3 Bucket (画像保存)
+                              └──▶ Aurora Serverless v2
+                              │
+                              ▼  成功時
+                         Step Functions (sns-posting-sfn)
+                              │
+                              ▼
+                         ECS Fargate RunTask (SNS 投稿バッチ)
+                              │
+                              ├──▶ S3 Bucket (Presigned URL)
+                              ├──▶ External API (Instagram)
+                              └──▶ Aurora Serverless v2
                               │
                               ▼
                         CloudWatch Logs ──▶ CloudWatch Alarm ──▶ SNS Topic
@@ -56,16 +68,18 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 ### Step Functions
 
 - **ステートマシン**: バッチ種別ごとに 1 つ（image-generation-sfn, sns-posting-sfn）
-- **入力パラメータ**: `set_code`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す
+- **順次実行**: 画像生成 Step Functions（image-generation-sfn）の成功後に、SNS 投稿 Step Functions（sns-posting-sfn）を起動する。画像生成バッチの Step Functions ワークフロー内で、ECS タスク成功後に sns-posting-sfn を `StartExecution` で呼び出す
+- **入力パラメータ**: `set_code`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す。SNS 投稿 Step Functions には画像生成 Step Functions から `set_code` を引き継ぐ
 - **実行コンテキスト**: `$$.Execution.Id` を `EXECUTION_ARN` として ECS タスクへ渡し、`batch_execution_logs` の関連付けに利用する
 - **実行モード**: Standard（長時間実行に対応）
 - **同時実行数制限**: ステートマシンごとに同時実行数を 1 に制限する（`maxConcurrency: 1` 相当）。同一セットの手動実行とスケジュール実行が重なった場合の二重投稿リスクを防止する。同時実行数の上限に達した場合、後続の実行はキューイングされる
 - **エラーハンドリング**: Retry / Catch を設定
+- **SNS 投稿の単独実行**: sns-posting-sfn は独立したステートマシンとして存在するため、手動での再投稿や投稿のみの実行も可能（AWS Console や CLI から直接起動）
 
 ### EventBridge Scheduler
 
-- **スケジュール**: セットごと・バッチ種別ごとに cron 式で定義
-- **ターゲット**: 対応する Step Functions ステートマシン（`set_code` と `scheduled_at` を入力に含める）
+- **スケジュール**: セットごとに cron 式で定義（画像生成 Step Functions のみをターゲットとする）
+- **ターゲット**: 画像生成 Step Functions ステートマシン（`set_code` と `scheduled_at` を入力に含める）。SNS 投稿は画像生成の完了後に自動起動されるため、SNS 投稿用の EventBridge Scheduler は不要
 - **スケジュール管理**: スケジュール定義のマスタは IaC（CDK）とする。DB の `batch_schedules` テーブルには運用参照・バッチ自己診断用にスケジュール情報のコピーを保持する
 
 ## 4. データストア
@@ -97,8 +111,8 @@ EventBridge Scheduler ──▶ Step Functions ──▶ ECS Fargate RunTask
 ### IAM
 
 - ECS タスクロール: S3、Secrets Manager（プレフィックス `acps/{env}/*` で制限）、CloudWatch Logs へのアクセス権限
-- Step Functions 実行ロール: ECS RunTask の実行権限
-- EventBridge Scheduler ロール: Step Functions の起動権限
+- Step Functions 実行ロール: ECS RunTask の実行権限。画像生成 Step Functions には追加で SNS 投稿 Step Functions の `StartExecution` 権限を付与する
+- EventBridge Scheduler ロール: 画像生成 Step Functions の起動権限
 
 ## 6. ログ・監視
 

@@ -74,7 +74,7 @@ AutoContentPublisherSystem/
 
 ## CDK スタック
 
-デプロイ順序: FoundationStack → ImageBatchStack → SnsPostBatchStack → MonitoringStack
+デプロイ順序: FoundationStack → SnsPostBatchStack → ImageBatchStack → MonitoringStack
 
 - **FoundationStack**: 共通基盤（VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR）
 - **ImageBatchStack**: 画像生成バッチ実行基盤
