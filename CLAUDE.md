@@ -67,16 +67,16 @@ AutoContentPublisherSystem/
 
 ## 開発上の注意事項
 
-- Aurora Serverless v2 の自動一時停止を利用するため、バッチ開始時に DB 接続確認とリトライを実装する
+- Aurora Serverless v2 の自動一時停止を利用するため、Step Functions ワークフローの最初のステートとして DB 準備確認 Lambda を実行する（FoundationStack で定義）。バッチアプリケーション（ECS タスク）は DB が利用可能な状態を前提とする
 - 外部 API 呼び出し失敗時は Step Functions の Retry / Catch でハンドリングする
 - デプロイは Blue/Green なし、ECS Service なし。Docker イメージを ECR に push し、新しいタスク定義リビジョンを登録する方式
 - 将来の複数セット運用を前提とした DB 設計（設定値・プロンプト・投稿先・実行履歴を識別可能にする）
 
 ## CDK スタック
 
-デプロイ順序: FoundationStack → ImageBatchStack → SnsPostBatchStack → MonitoringStack
+デプロイ順序: FoundationStack → SnsPostBatchStack → ImageBatchStack → MonitoringStack
 
-- **FoundationStack**: 共通基盤（VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR）
+- **FoundationStack**: 共通基盤（VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR、DB 準備確認 Lambda）
 - **ImageBatchStack**: 画像生成バッチ実行基盤
 - **SnsPostBatchStack**: SNS 投稿バッチ実行基盤
 - **MonitoringStack**: 監視・通知
