@@ -47,6 +47,11 @@ AutoContentPublisherSystem/
 └── README.md
 ```
 
+## ドキュメント
+
+設計書は `docs/` 配下に L0（概要）→ L1（論理設計）→ L2（実装仕様）の 3 層構造で管理している。
+体系の全体像は [docs/document-guide.md](docs/document-guide.md) を参照。
+
 ## 開発環境
 
 - OS: Windows + WSL2（Ubuntu）
