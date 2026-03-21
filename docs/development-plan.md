@@ -58,7 +58,7 @@
   - 備考:
 
 - [ ] **1-4** AWS コンソールで VPC を確認
-  - 確認: VPC、Public Subnet、Isolated Subnet が作成されている（NAT Gateway がないことを確認）
+  - 確認: VPC、Public Subnet x2（各 AZ）、Isolated Subnet x2（各 AZ）が作成されている（NAT Gateway がないことを確認）
   - 備考:
 
 - [ ] **1-5** 削除して再作成できることを確認

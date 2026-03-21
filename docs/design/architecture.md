@@ -48,9 +48,9 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 
 ### VPC 設計
 
-- **VPC**: 1 つの VPC を全サービスで共有
-- **Public Subnet**: ECS Fargate タスクを配置（`assignPublicIp=ENABLED` でパブリック IP を自動付与し、Internet Gateway 経由で外部 API にアクセス）
-- **Isolated Subnet**: Aurora Serverless v2 を配置（インターネットアクセス不要）
+- **VPC**: 1 つの VPC を全サービスで共有（CDK デフォルトの 2 AZ 構成）
+- **Public Subnet（各 AZ に 1 つ、計 2 つ）**: ECS Fargate タスクを配置（`assignPublicIp=ENABLED` でパブリック IP を自動付与し、Internet Gateway 経由で外部 API にアクセス）
+- **Isolated Subnet（各 AZ に 1 つ、計 2 つ）**: Aurora Serverless v2 を配置（インターネットアクセス不要）
 - **NAT Gateway**: 使用しない（コスト削減のため。ECS Fargate はパブリック IP で直接インターネットにアクセスする）
 
 > **NAT Gateway への移行パス**: 将来的にセキュリティ要件の強化やトラフィック増加に伴い、ECS Fargate を Private Subnet に移動し NAT Gateway 経由の構成に変更可能。現時点ではコスト優先でパブリック IP 方式を採用する。

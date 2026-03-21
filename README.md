@@ -40,6 +40,7 @@ AutoContentPublisherSystem/
 ├── docs/                    # 設計書
 ├── infra/                   # AWS CDK（インフラ定義）
 ├── services/
+│   ├── db-readiness-check/  # DB 準備確認（Python）
 │   ├── image-batch/         # 画像生成バッチ（Python）
 │   └── sns-post-batch/      # SNS 投稿バッチ（Python）
 ├── shared/                  # サービス間共通ライブラリ

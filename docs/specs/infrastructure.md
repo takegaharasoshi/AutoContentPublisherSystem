@@ -29,7 +29,7 @@
 
 | リソース | 説明 |
 |---|---|
-| VPC | Public Subnet（ECS Fargate 用）、Isolated Subnet（Aurora 用）。NAT Gateway なし |
+| VPC | 2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし |
 | Security Group | サービスごとのアクセス制御 |
 | S3 Bucket | 画像保存用（Lifecycle Policy: 30 日で自動削除） |
 | Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効） |
@@ -45,15 +45,15 @@
 
 **出力値（他スタックへの共有）**:
 
-- VPC ID、Subnet ID
+- VPC ID、Public Subnet ID x2、Isolated Subnet ID x2
 - Security Group ID
 - S3 Bucket 名 / ARN
 - Aurora Cluster Endpoint / ARN
-- Secrets Manager Secret ARN（DB 認証情報・API キー用。SNS 認証情報は Secret 名規約によりアプリ側で導出するため出力不要。規約は [design/security.md](../design/security.md) を参照）
+- Secrets Manager Secret ARN（DB 認証情報用 `acps/{env}/db/*`、画像 API キー用 `acps/{env}/image/*`。SNS 認証情報は Secret 名規約によりアプリ側で導出するため出力不要。規約は [design/security.md](../design/security.md) を参照）
 - ECS Cluster 名 / ARN
 - ECR Repository URI（サービスごと + DB 準備確認用）
-- DB 準備確認 ECS Task Definition ARN
-- DB 準備確認用 Security Group ID、Subnet ID
+- DB 準備確認 ECS Task Definition family 名（リビジョンなし。Step Functions が常に最新リビジョンを使用するため）
+- DB 準備確認用 Security Group ID
 
 **注意事項**:
 
@@ -160,7 +160,7 @@ FoundationStack
   ├── auroraCluster    → ImageBatchStack, SnsPostBatchStack
   ├── secretsArn       → ImageBatchStack, SnsPostBatchStack
   ├── ecsCluster       → ImageBatchStack, SnsPostBatchStack
-  └── dbReadinessCheckTaskDefArn → ImageBatchStack, SnsPostBatchStack
+  └── dbReadinessCheckTaskDefFamily → ImageBatchStack, SnsPostBatchStack
 
 SnsPostBatchStack
   └── snsPostingSfnArn → ImageBatchStack（画像生成完了後の SNS 投稿 Step Functions 起動用）

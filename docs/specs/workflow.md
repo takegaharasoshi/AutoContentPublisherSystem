@@ -4,6 +4,8 @@
 
 ## 1. 画像生成 Step Functions ASL 定義
 
+> **TaskDefinition の指定方式**: ASL 内の `${...TaskDefFamily}` プレースホルダには、CDK が ECS Task Definition の family 名（例: `acps-prod-image-batch`）を渡す。ECS RunTask API は family 名指定で常に ACTIVE な最新リビジョンを使用するため、デプロイ時に ASL の更新は不要。
+
 ```json
 {
   "StartAt": "WaitForDbReady",
@@ -14,10 +16,10 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${EcsClusterArn}",
-        "TaskDefinition": "${DbReadinessCheckTaskDefArn}",
+        "TaskDefinition": "${DbReadinessCheckTaskDefFamily}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
-            "Subnets": ["${PublicSubnetId}"],
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
             "SecurityGroups": ["${DbReadinessCheckSgId}"],
             "AssignPublicIp": "ENABLED"
           }
@@ -45,10 +47,10 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${EcsClusterArn}",
-        "TaskDefinition": "${ImageBatchTaskDefArn}",
+        "TaskDefinition": "${ImageBatchTaskDefFamily}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
-            "Subnets": ["${PublicSubnetId}"],
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
             "SecurityGroups": ["${ImageBatchSgId}"],
             "AssignPublicIp": "ENABLED"
           }
@@ -152,10 +154,10 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${EcsClusterArn}",
-        "TaskDefinition": "${DbReadinessCheckTaskDefArn}",
+        "TaskDefinition": "${DbReadinessCheckTaskDefFamily}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
-            "Subnets": ["${PublicSubnetId}"],
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
             "SecurityGroups": ["${DbReadinessCheckSgId}"],
             "AssignPublicIp": "ENABLED"
           }
@@ -183,10 +185,10 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${EcsClusterArn}",
-        "TaskDefinition": "${SnsPostBatchTaskDefArn}",
+        "TaskDefinition": "${SnsPostBatchTaskDefFamily}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
-            "Subnets": ["${PublicSubnetId}"],
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
             "SecurityGroups": ["${SnsPostBatchSgId}"],
             "AssignPublicIp": "ENABLED"
           }

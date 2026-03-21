@@ -12,7 +12,15 @@
 
 ### 1.2 Secret 名規約
 
-SNS 認証情報の Secret 名は以下の規約に従う:
+すべての Secret は `acps/{env}/` プレフィックスで始まる。種別ごとの命名規約:
+
+| 種別 | Secret 名パターン | 例 |
+|---|---|---|
+| DB 認証情報 | `acps/{env}/db/credentials` | `acps/prod/db/credentials` |
+| 画像生成 API キー | `acps/{env}/image/api-key` | `acps/prod/image/api-key` |
+| SNS 認証情報 | `acps/{env}/{set_code}/sns/{platform}/{account_code}` | `acps/prod/fashion-set-1/sns/instagram/main-account` |
+
+SNS 認証情報の Secret 名の詳細規約:
 
 ```
 acps/{env}/{set_code}/sns/{platform}/{account_code}
@@ -37,7 +45,7 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 
 | リソース | 命名規約 | 例（本番） | 例（開発） |
 |---|---|---|---|
-| Secrets Manager | `acps/{env}/{set_code}/...` | `acps/prod/fashion-set-1/...` | `acps/dev/fashion-set-1/...` |
+| Secrets Manager | `acps/{env}/...` | `acps/prod/db/credentials` | `acps/dev/db/credentials` |
 
 - 現時点の単一環境でも `env=prod` を付与して運用する
 - ECS Task Definition には `ENV_NAME` を環境変数として注入し、アプリケーションが Secret 名を導出できるようにする
@@ -48,10 +56,11 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 
 | ロール | 権限 |
 |---|---|
-| バッチタスクロール（画像生成・SNS 投稿） | S3 読み書き、Secrets Manager 読み取り（プレフィックス `acps/{env}/*` で制限）、CloudWatch Logs 出力 |
-| DB 準備確認タスクロール | Secrets Manager 読み取り（DB 認証情報）、CloudWatch Logs 出力 |
+| DB 準備確認タスクロール | Secrets Manager 読み取り（`acps/{env}/db/*`）、CloudWatch Logs 出力 |
+| 画像生成バッチタスクロール | S3 読み書き、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/image/*`）、CloudWatch Logs 出力 |
+| SNS 投稿バッチタスクロール | S3 読み取り、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/*/sns/*`）、CloudWatch Logs 出力 |
 
-- Secrets Manager 権限は `arn:aws:secretsmanager:*:*:secret:acps/{env}/*` のプレフィックスベースで付与する
+- Secrets Manager 権限はサービスごとに必要最小限のプレフィックスで制限する。DB 認証情報（`acps/{env}/db/*`）は全サービス共通、それ以外は各サービスが必要とする種別のみ付与する
 - DB にアカウントを追加するだけで、IAM ポリシーの変更なしに新しい Secret へのアクセスが可能になる
 
 ### 2.2 ECS タスク実行ロール
@@ -85,5 +94,5 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 
 - API キー・DB 認証情報は定期的なローテーションを検討する
 - ECS タスクには最小権限の IAM ロールを付与する
-- Secrets Manager 権限は `acps/{env}/*` プレフィックスに制限し、環境を跨いだ参照を避ける
+- Secrets Manager 権限はサービスごとに最小プレフィックスで制限し、環境およびサービスを跨いだ参照を避ける
 - Security Group で不要な通信を遮断する

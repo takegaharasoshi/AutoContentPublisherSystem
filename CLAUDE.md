@@ -19,6 +19,7 @@ AutoContentPublisherSystem/
 │   └── development-plan.md          #   開発計画・進捗管理
 ├── infra/                           # AWS CDK プロジェクト（TypeScript）※未作成
 ├── services/
+│   ├── db-readiness-check/          # DB 準備確認（Python）※未作成
 │   ├── image-batch/                 # 画像生成バッチ（Python）※未作成
 │   └── sns-post-batch/              # SNS 投稿バッチ（Python）※未作成
 ├── shared/                          # サービス間共通ライブラリ（Python）※未作成
