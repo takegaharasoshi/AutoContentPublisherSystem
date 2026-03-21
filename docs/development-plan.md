@@ -129,9 +129,9 @@
   - 確認: コンソールから手動実行 → ECS タスク起動 → 成功
   - 備考:
 
-- [ ] **3-6** EventBridge Scheduler を追加
-  - 確認: スケジュール実行を確認
-  - 備考:
+- [ ] **3-6** 手動で SNS 投稿 Step Functions を実行して E2E 確認
+  - 確認: コンソールから手動実行 → ECS タスク起動 → 成功
+  - 備考: Phase 4 で ImageBatchStack に EventBridge Scheduler を追加し、SNS 投稿は画像生成成功後に自動起動される
 
 ---
 

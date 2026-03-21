@@ -69,7 +69,7 @@ specs/                                                  │
 ```
 
 - 上位層（overview/）は下位層（design/, specs/）を参照しない
-- design/ は specs/ を参照しない（design/batch.md → specs/database.md のテーブル参照を除く）
+- design/ から specs/ への参照は、SSOT 配置ルールに基づく参照リンク（「詳細は specs/xxx.md を参照」形式）に限定する。design/ 側に specs/ の内容を複写しない
 
 ## SSOT 配置ルール（主要な情報の配置先）
 
