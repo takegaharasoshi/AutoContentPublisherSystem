@@ -38,7 +38,7 @@
 | ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch） |
 | VPC Endpoint | S3（Gateway）のみ |
 | ECR Repository (DB 準備確認) | DB 準備確認用コンテナイメージリポジトリ（db-readiness-check） |
-| ECS Task Definition (DB 準備確認) | DB 準備確認用（db-readiness-check）。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される |
+| ECS Task Definition (DB 準備確認) | DB 準備確認用（db-readiness-check）。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される。コンテナイメージは CDK Context `dbReadinessCheckImageTag` で指定された不変タグを参照する |
 | IAM Role (DB 準備確認タスク) | 権限詳細は [design/security.md](../design/security.md) を参照 |
 | Security Group (DB 準備確認) | DB 準備確認 ECS タスク用 |
 | CloudWatch Log Group (DB 準備確認) | DB 準備確認タスクのログ出力先 |
@@ -58,6 +58,7 @@
 **注意事項**:
 
 - DB 準備確認の仕様詳細は [design/batch.md](../design/batch.md) セクション 1.2 を参照
+- db-readiness-check の更新時は `cdk deploy FoundationStack -c dbReadinessCheckImageTag=<tag>` で新しいイメージタグを明示的に渡す
 - 将来の AdminApiStack、AdminWebStack からも参照される
 
 ### 3.2 ImageBatchStack

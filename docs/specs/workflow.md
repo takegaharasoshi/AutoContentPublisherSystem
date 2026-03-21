@@ -6,6 +6,8 @@
 
 > **TaskDefinition の指定方式**: ASL 内の `${...TaskDefFamily}` プレースホルダには、CDK が ECS Task Definition の family 名（例: `acps-prod-image-batch`）を渡す。ECS RunTask API は family 名指定で常に ACTIVE な最新リビジョンを使用するため、デプロイ時に ASL の更新は不要。
 
+> **WaitForDbReady の retry 方針**: DB 準備確認の再試行は db-readiness-check コンテナ内部で完結させる。`WaitForDbReady` ステート自体には Step Functions Retry を設定せず、総待機時間を ECS タスク内部の約 510 秒に固定する。
+
 ```json
 {
   "StartAt": "WaitForDbReady",
@@ -25,14 +27,6 @@
           }
         }
       },
-      "Retry": [
-        {
-          "ErrorEquals": ["States.TaskFailed"],
-          "IntervalSeconds": 30,
-          "MaxAttempts": 2,
-          "BackoffRate": 2.0
-        }
-      ],
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
@@ -117,6 +111,12 @@
         "MetricData": [
           {
             "MetricName": "SnsPostStartFailureCount",
+            "Dimensions": [
+              {
+                "Name": "StateMachineName",
+                "Value": "${ImageGenerationSfnName}"
+              }
+            ],
             "Value": 1,
             "Unit": "Count"
           }
@@ -163,14 +163,6 @@
           }
         }
       },
-      "Retry": [
-        {
-          "ErrorEquals": ["States.TaskFailed"],
-          "IntervalSeconds": 30,
-          "MaxAttempts": 2,
-          "BackoffRate": 2.0
-        }
-      ],
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
@@ -261,25 +253,27 @@
 
 | エラー種別 | 対応 |
 |---|---|
-| ECS タスク起動失敗 | Retry（最大 2 回、30 秒間隔） |
-| ECS タスク異常終了 | Retry → Catch → Fail ステートへ遷移 |
+| DB 準備確認失敗 | db-readiness-check コンテナ内部で最大 8 回 retry 後、Catch → Fail ステートへ遷移 |
+| 画像生成 / SNS 投稿 ECS タスク起動失敗 | Retry（最大 2 回、30 秒間隔） |
+| 画像生成 / SNS 投稿 ECS タスク異常終了 | Retry → Catch → Fail ステートへ遷移 |
 | タイムアウト | Catch → Fail ステートへ遷移 |
 | SNS 投稿 SFN 起動失敗 | Retry → Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了 |
 
 ## 5. カスタムメトリクス定義
 
-| メトリクス名 | Namespace | 発行元 | 用途 |
-|---|---|---|---|
-| `SnsPostStartFailureCount` | `ACPS` | image-generation-sfn（`NotifySnsPostStartFailure` ステート） | SNS 投稿 Step Functions の起動失敗を検知 |
+| メトリクス名 | Namespace | Dimensions | 発行元 | 用途 |
+|---|---|---|---|---|
+| `SnsPostStartFailureCount` | `ACPS` | `StateMachineName=${ImageGenerationSfnName}` | image-generation-sfn（`NotifySnsPostStartFailure` ステート） | SNS 投稿 Step Functions の起動失敗を検知 |
 
 ## 6. CloudWatch Alarm 定義
 
-| 監視対象 | メトリクス | 条件 | Period | EvaluationPeriods | DatapointsToAlarm | TreatMissingData | 通知先 |
-|---|---|---|---|---|---|---|---|
-| Step Functions 失敗 | 標準メトリクス `ExecutionsFailed` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| SNS 投稿起動失敗 | カスタムメトリクス `ACPS/SnsPostStartFailureCount` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| Aurora CPU | 標準メトリクス `CPUUtilization` | >= 80% | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
-| Aurora メモリ | 標準メトリクス `FreeableMemory` | <= 268435456（256 MB） | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
+| 監視対象 | Namespace | メトリクス | Dimensions | 条件 | Period | EvaluationPeriods | DatapointsToAlarm | TreatMissingData | 通知先 |
+|---|---|---|---|---|---|---|---|---|---|
+| image-generation-sfn 失敗 | `AWS/States` | `ExecutionsFailed` | `StateMachineArn=${ImageGenerationSfnArn}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| sns-posting-sfn 失敗 | `AWS/States` | `ExecutionsFailed` | `StateMachineArn=${SnsPostingSfnArn}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| SNS 投稿起動失敗 | `ACPS` | `SnsPostStartFailureCount` | `StateMachineName=${ImageGenerationSfnName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| Aurora CPU | `AWS/RDS` | `CPUUtilization` | `DBClusterIdentifier=${AuroraClusterIdentifier}` | >= 80% | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
+| Aurora メモリ | `AWS/RDS` | `FreeableMemory` | `DBClusterIdentifier=${AuroraClusterIdentifier}` | <= 268435456（256 MB） | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
 
 > **閾値の設計方針**: Aurora のアラームは `notBreaching`（データ欠損時はアラームを発報しない）を使用する。Aurora Serverless v2 の自動一時停止中はメトリクスが発行されないため、`missing` や `breaching` にすると一時停止のたびにアラームが発報される。Step Functions とカスタムメトリクスのアラームも同様に `notBreaching` とする。閾値は初期値であり、実運用の負荷状況に応じて調整する。
 
@@ -287,6 +281,24 @@
 
 | ルール | イベントソース | フィルタ条件 | アクション |
 |---|---|---|---|
-| ECS タスク異常終了検知 | ECS Task State Change | `exitCode != 0` または異常停止 | SNS Topic に通知 |
+| ECS タスク異常終了検知 | ECS Task State Change | `lastStatus=STOPPED` かつ `clusterArn=${EcsClusterArn}` かつ `containers[].exitCode != 0` | SNS Topic に通知 |
 
-> **ECS タスク異常終了の監視**: ECS タスクの終了コードは CloudWatch の標準メトリクスとして提供されないため、CloudWatch Alarm では直接監視できない。代わりに EventBridge Rule で ECS Task State Change イベント（`detail.stoppedReason` / `detail.containers[].exitCode` でフィルタ）を捕捉し、SNS Topic に通知する。
+```json
+{
+  "source": ["aws.ecs"],
+  "detail-type": ["ECS Task State Change"],
+  "detail": {
+    "lastStatus": ["STOPPED"],
+    "clusterArn": ["${EcsClusterArn}"],
+    "containers": {
+      "exitCode": [
+        {
+          "anything-but": 0
+        }
+      ]
+    }
+  }
+}
+```
+
+> **ECS タスク異常終了の監視**: ECS タスクの終了コードは CloudWatch の標準メトリクスとして提供されないため、CloudWatch Alarm では直接監視できない。代わりに EventBridge Rule で ECS Task State Change イベントを捕捉し、SNS Topic に通知する。コンテナ起動前に ECS API レベルで失敗したケースは Step Functions 側の `ExecutionsFailed` アラームで補完する。

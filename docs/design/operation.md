@@ -31,6 +31,7 @@
 - 画像生成に使用するプロンプトは DB（`prompt_configs` テーブル）で管理する
 - プロンプトの追加・変更は DB 操作で行う（将来的には管理画面から操作）
 - `is_active` フラグにより、使用するプロンプトを制御する
+- 同一セットで `is_active=1` の `prompt_configs` は、1 回の画像生成バッチ実行で全件を順次処理する
 
 ### 1.4 実行ログ管理
 
@@ -44,6 +45,7 @@ CDK デプロイ実行後は、以下のチェックリストを確認する。
 
 - [ ] **ImageBatchStack に変更があった場合**: `image-batch-pipeline` を手動実行する（タスク定義の revision 整合性維持のため。詳細は [design/cicd.md](cicd.md) セクション 6 を参照）
 - [ ] **SnsPostBatchStack に変更があった場合**: `sns-post-batch-pipeline` を手動実行する（同上）
+- [ ] **db-readiness-check を更新した場合**: `cdk deploy FoundationStack -c dbReadinessCheckImageTag=<tag>` を使用し、最新の Task Definition revision が該当タグを参照していることを確認する
 - [ ] **新規セット追加の場合**: DB に `batch_sets` レコードを追加する
 - [ ] **デプロイ結果の確認**: AWS Console で各リソースの状態が正常であることを確認する
 
