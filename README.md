@@ -24,7 +24,7 @@ AWS 上で動作する画像生成・SNS 自動投稿バッチシステム。
 
 | スタック | 責務 |
 |---|---|
-| FoundationStack | VPC、S3、Aurora、Secrets Manager、ECS Cluster 等の共通基盤 |
+| FoundationStack | VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR、DB 準備確認 ECS タスク等の共通基盤 |
 | ImageBatchStack | 画像生成バッチの実行基盤（Task Definition、Step Functions、Scheduler） |
 | SnsPostBatchStack | SNS 投稿バッチの実行基盤 |
 | MonitoringStack | CloudWatch Alarm、SNS Topic による監視・通知 |

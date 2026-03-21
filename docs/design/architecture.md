@@ -71,7 +71,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 - **ECS Cluster**: 1 つ作成し全バッチで共有
 - **ECS Service**: 使用しない（バッチ用途のため RunTask のみ）
 - **Task Definition**: サービスごとに作成（`db-readiness-check-task`, `image-batch-task`, `sns-post-batch-task`）
-- **DB 準備確認**: Aurora Serverless v2 の自動一時停止からの再開に対応するため、ECS タスクで実装する（Lambda だと VPC 内で Secrets Manager にアクセスできないため）。詳細な仕様は [design/batch.md](batch.md) を参照
+- **DB 準備確認**: Aurora Serverless v2 の自動一時停止からの再開に対応するため、ECS タスクで実装する（Lambda は VPC 内からパブリック IP が付与されず、NAT Gateway または VPC Endpoint（Interface 型）なしでは Secrets Manager にアクセスできないため）。詳細な仕様は [design/batch.md](batch.md) を参照
 
 ### Step Functions
 

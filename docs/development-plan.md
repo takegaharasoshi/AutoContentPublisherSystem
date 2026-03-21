@@ -87,19 +87,23 @@
   - 確認: コンソールでクラスターが見える
   - 備考:
 
-- [ ] **2-5** Aurora Serverless v2 を追加
+- [ ] **2-5** ECR リポジトリを追加（image-batch、sns-post-batch、db-readiness-check の 3 つ）
+  - 確認: コンソールで 3 つの ECR リポジトリが見える
+  - 備考: ECR リポジトリは FoundationStack で一元管理する（specs/infrastructure.md 参照）
+
+- [ ] **2-6** Aurora Serverless v2 を追加
   - 確認: コンソールで DB クラスターが見える、自動一時停止が設定されている
   - 備考: コストに注意。不安なら Phase 3 の後に回してもよい
 
-- [ ] **2-6** VPC Endpoint（S3 Gateway のみ）を追加
+- [ ] **2-7** VPC Endpoint（S3 Gateway のみ）を追加
   - 確認: コンソールで S3 Gateway VPC Endpoint が作成されている（Secrets Manager Interface Endpoint は不要）
   - 備考: Secrets Manager へのアクセスは ECS Fargate のパブリック IP 経由で行う
 
-- [ ] **2-7** `services/db-readiness-check/` に DB 準備確認用の Python + Dockerfile を作成し、ECR に push
+- [ ] **2-8** `services/db-readiness-check/` に DB 準備確認用の Python + Dockerfile を作成し、ECR に push
   - 確認: ECR コンソールでイメージが見える
   - 備考: DB 接続リトライ（指数バックオフ、最大 8 回）を実装する。詳細は design/batch.md セクション 1.2 参照
 
-- [ ] **2-8** DB 準備確認 ECS タスク定義を FoundationStack に追加し、手動 RunTask で疎通確認
+- [ ] **2-9** DB 準備確認 ECS タスク定義を FoundationStack に追加し、手動 RunTask で疎通確認
   - 確認: Aurora が起動状態のとき: CloudWatch Logs に接続成功ログが出力され、終了コード 0 で終了する
   - 備考: Aurora が一時停止状態からのリトライ確認は Phase 5-6 で実施する
 
@@ -113,7 +117,7 @@
   - 確認: `docker build` & `docker run` でローカル動作確認
   - 備考:
 
-- [ ] **3-2** ECR リポジトリを作成し、手動で Docker イメージを push
+- [ ] **3-2** ECR リポジトリ（Phase 2-5 で作成済み）に手動で Docker イメージを push
   - 確認: ECR コンソールでイメージが見える
   - 備考:
 
@@ -143,7 +147,7 @@
   - 確認: `docker build` & `docker run` でローカル動作確認
   - 備考:
 
-- [ ] **4-2** ECR リポジトリを作成し、手動で Docker イメージを push
+- [ ] **4-2** ECR リポジトリ（Phase 2-5 で作成済み）に手動で Docker イメージを push
   - 確認: ECR コンソールでイメージが見える
   - 備考:
 
