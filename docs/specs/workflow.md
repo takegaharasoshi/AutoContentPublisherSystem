@@ -42,6 +42,30 @@
     "RunImageBatchTask": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${ImageBatchTaskDefArn}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId}"],
+            "SecurityGroups": ["${ImageBatchSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "image-batch",
+              "Environment": [
+                { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" },
+                { "Name": "SCHEDULED_AT", "Value.$": "$.scheduled_at" }
+              ]
+            }
+          ]
+        }
+      },
       "Retry": [
         {
           "ErrorEquals": ["States.TaskFailed"],
@@ -156,6 +180,29 @@
     "RunSnsPostBatchTask": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${SnsPostBatchTaskDefArn}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId}"],
+            "SecurityGroups": ["${SnsPostBatchSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "sns-post-batch",
+              "Environment": [
+                { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" }
+              ]
+            }
+          ]
+        }
+      },
       "Retry": [
         {
           "ErrorEquals": ["States.TaskFailed"],
@@ -225,12 +272,14 @@
 
 ## 6. CloudWatch Alarm 定義
 
-| 監視対象 | メトリクス | 条件 | 通知先 |
-|---|---|---|---|
-| Step Functions 失敗 | 標準メトリクス `ExecutionsFailed` | >= 1 | SNS Topic |
-| SNS 投稿起動失敗 | カスタムメトリクス `ACPS/SnsPostStartFailureCount` | >= 1 | SNS Topic |
-| Aurora CPU | 標準メトリクス `CPUUtilization` | 閾値超過 | SNS Topic |
-| Aurora メモリ | 標準メトリクス `FreeableMemory` | 閾値超過 | SNS Topic |
+| 監視対象 | メトリクス | 条件 | Period | EvaluationPeriods | DatapointsToAlarm | TreatMissingData | 通知先 |
+|---|---|---|---|---|---|---|---|
+| Step Functions 失敗 | 標準メトリクス `ExecutionsFailed` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| SNS 投稿起動失敗 | カスタムメトリクス `ACPS/SnsPostStartFailureCount` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| Aurora CPU | 標準メトリクス `CPUUtilization` | >= 80% | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
+| Aurora メモリ | 標準メトリクス `FreeableMemory` | <= 268435456（256 MB） | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
+
+> **閾値の設計方針**: Aurora のアラームは `notBreaching`（データ欠損時はアラームを発報しない）を使用する。Aurora Serverless v2 の自動一時停止中はメトリクスが発行されないため、`missing` や `breaching` にすると一時停止のたびにアラームが発報される。Step Functions とカスタムメトリクスのアラームも同様に `notBreaching` とする。閾値は初期値であり、実運用の負荷状況に応じて調整する。
 
 ## 7. EventBridge Rule 定義
 

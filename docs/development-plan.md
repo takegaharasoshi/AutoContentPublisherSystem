@@ -95,13 +95,21 @@
   - 確認: コンソールで S3 Gateway VPC Endpoint が作成されている（Secrets Manager Interface Endpoint は不要）
   - 備考: Secrets Manager へのアクセスは ECS Fargate のパブリック IP 経由で行う
 
+- [ ] **2-7** `services/db-readiness-check/` に DB 準備確認用の Python + Dockerfile を作成し、ECR に push
+  - 確認: ECR コンソールでイメージが見える
+  - 備考: DB 接続リトライ（指数バックオフ、最大 8 回）を実装する。詳細は design/batch.md セクション 1.2 参照
+
+- [ ] **2-8** DB 準備確認 ECS タスク定義を FoundationStack に追加し、手動 RunTask で疎通確認
+  - 確認: Aurora が起動状態のとき: CloudWatch Logs に接続成功ログが出力され、終了コード 0 で終了する
+  - 備考: Aurora が一時停止状態からのリトライ確認は Phase 5-6 で実施する
+
 ---
 
-## Phase 3: 画像生成バッチの空回し
+## Phase 3: SNS 投稿バッチの空回し
 
-**ゴール**: EventBridge → Step Functions → ECS Fargate のパイプラインが動くことを確認する（業務ロジックなし）
+**ゴール**: SnsPostBatchStack でパイプラインが動くことを確認する（業務ロジックなし）
 
-- [ ] **3-1** `services/image-batch/` に Hello World の Python + Dockerfile を作成
+- [ ] **3-1** `services/sns-post-batch/` に Hello World の Python + Dockerfile を作成
   - 確認: `docker build` & `docker run` でローカル動作確認
   - 備考:
 
@@ -109,8 +117,8 @@
   - 確認: ECR コンソールでイメージが見える
   - 備考:
 
-- [ ] **3-3** ImageBatchStack に ECS Task Definition を定義してデプロイ
-  - 確認: `cdk deploy ImageBatchStack` 成功
+- [ ] **3-3** SnsPostBatchStack に ECS Task Definition を定義してデプロイ
+  - 確認: `cdk deploy SnsPostBatchStack` 成功
   - 備考:
 
 - [ ] **3-4** 手動で ECS RunTask を実行
@@ -122,25 +130,37 @@
   - 備考:
 
 - [ ] **3-6** EventBridge Scheduler を追加
-  - 確認: スケジュール時刻に自動で Step Functions が起動される
+  - 確認: スケジュール実行を確認
   - 備考:
 
 ---
 
-## Phase 4: SNS 投稿バッチの空回し
+## Phase 4: 画像生成バッチの空回し
 
-**ゴール**: SnsPostBatchStack でも同じパイプラインが動くことを確認する
+**ゴール**: EventBridge → Step Functions → ECS Fargate のパイプラインが動くことを確認する（業務ロジックなし）
 
-- [ ] **4-1** `services/sns-post-batch/` に Hello World を作成
-  - 確認: ローカル Docker で動作確認
+- [ ] **4-1** `services/image-batch/` に Hello World の Python + Dockerfile を作成
+  - 確認: `docker build` & `docker run` でローカル動作確認
   - 備考:
 
-- [ ] **4-2** ECR push + SnsPostBatchStack デプロイ + 手動 RunTask
+- [ ] **4-2** ECR リポジトリを作成し、手動で Docker イメージを push
+  - 確認: ECR コンソールでイメージが見える
+  - 備考:
+
+- [ ] **4-3** ImageBatchStack に ECS Task Definition を定義してデプロイ
+  - 確認: `cdk deploy ImageBatchStack` 成功
+  - 備考:
+
+- [ ] **4-4** 手動で ECS RunTask を実行
   - 確認: CloudWatch Logs に「Hello World」が出る
-  - 備考:
+  - 備考: ここが最重要確認ポイント
 
-- [ ] **4-3** Step Functions + EventBridge Scheduler を追加
-  - 確認: スケジュール実行を確認
+- [ ] **4-5** Step Functions ステートマシンを追加
+  - 確認: コンソールから手動実行 → ECS タスク起動 → 成功
+  - 備考: ImageBatchStack の Step Functions は SnsPostBatchStack の Step Functions ARN を参照するため、Phase 3 完了が前提
+
+- [ ] **4-6** EventBridge Scheduler を追加
+  - 確認: スケジュール時刻に自動で Step Functions が起動される
   - 備考:
 
 ---
