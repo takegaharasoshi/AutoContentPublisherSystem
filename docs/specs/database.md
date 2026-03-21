@@ -119,9 +119,7 @@ SNS 投稿先のアカウント情報を管理する。
 - **INDEX**: `idx_sns_accounts_set_id` (`set_id`)
 - **UNIQUE**: `uq_sns_accounts_set_platform_code` (`set_id`, `platform`, `account_code`)
 
-> **認証情報の管理方針**: SNS 認証情報の Secret 名はテーブルに保持せず、アプリケーション側で `acps/{env}/{set_code}/sns/{platform}/{account_code}` の規約に基づき導出する。`set_code` は `batch_sets` テーブルから取得し、`env` は ECS タスクの `ENV_NAME`（現時点では `prod`）を使用する。これにより IAM ポリシーでプレフィックス `acps/{env}/*` ベースの最小権限を維持しつつ、DB へのアカウント追加だけで新しい Secret へのアクセスが可能になる。
-
-> **設計変更理由（Secret 名規約）**: 従来の `credentials_secret_arn` カラム（任意の ARN を格納）では、DB にアカウントを追加しても ECS タスクロールの IAM ポリシーが追随せず、wildcard 権限か個別 ARN の手動追加が必要だった。Secret 名規約に統一することで、プレフィックスベースの IAM ポリシー（`arn:aws:secretsmanager:*:*:secret:acps/{env}/*`）で最小権限と運用の簡便さを両立する。
+> **認証情報の管理方針**: SNS 認証情報の Secret 名はテーブルに保持せず、アプリケーション側で Secret 名規約に基づき導出する（規約の詳細は [design/security.md](../design/security.md) を参照）。`set_code` は `batch_sets` テーブルから取得し、`env` は ECS タスクの `ENV_NAME`（現時点では `prod`）を使用する。これにより IAM ポリシーでプレフィックスベースの最小権限を維持しつつ、DB へのアカウント追加だけで新しい Secret へのアクセスが可能になる。
 
 > **設計変更理由（account_code）**: Secret 名の導出に `account_name`（表示名）を使用すると、表示名の変更時に Secrets Manager の Secret 名と不整合が生じる。不変の `account_code` を導入し Secret 名導出に使用することで、`account_name` を安全に変更可能にする。`account_code` は作成時に設定し変更不可とする。
 

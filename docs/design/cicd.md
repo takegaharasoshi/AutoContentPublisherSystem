@@ -136,7 +136,7 @@ CDK Deploy でタスク定義に影響する変更（ロール、環境変数、
 | SnsPostBatchStack（ロール、環境変数等） | **sns-post-batch-pipeline を手動実行** |
 | MonitoringStack のみ | 不要 |
 
-> **注意**: パイプラインの手動実行を忘れた場合、CDK が登録した revision（古いイメージ）が使用される可能性がある。運用設計書（`docs/07-operation-design.md`）の CDK デプロイ後チェックリストも併せて参照すること。
+> **注意**: パイプラインの手動実行を忘れた場合、CDK が登録した revision（古いイメージ）が使用される可能性がある。運用設計書（[design/operation.md](operation.md)）の CDK デプロイ後チェックリストも併せて参照すること。
 
 ## 7. ブランチ戦略
 
