@@ -14,6 +14,8 @@
 
 > **StartSnsPostBatch の冪等性**: `StartExecution.Name` には親ワークフローの `$$.Execution.Name` を渡す。これにより Retry 時も同一要求として扱われ、SNS 投稿 Step Functions の二重起動リスクを抑制できる。
 
+> **実行名の文字数制限**: Step Functions の実行名（`Name`）は最大 80 文字に制限されている。本システムでは `$$.Execution.Name` を子実行の Name として使用する。EventBridge Scheduler がデフォルトで生成する実行名は UUID ベース（36 文字）のため通常は問題ないが、カスタム名を使用する場合は 80 文字制限に注意すること。
+
 > **ResultPath の設定**: `WaitForDbReady` と `RunImageBatchTask` には `"ResultPath": null` を設定し、ECS RunTask.sync の出力（DescribeTasks レスポンス）で入力パラメータ（`$.set_code` 等）が上書きされるのを防ぐ。
 
 > **EventBridge Scheduler の Input テンプレート**: Scheduler は以下の形式で画像生成 Step Functions を起動する。`<aws.scheduler.scheduled-time>` は EventBridge Scheduler が実行時刻（UTC、ISO 8601）に自動置換する。
@@ -275,6 +277,15 @@
 | BATCH_SIZE_LIMIT | 1 回のバッチ実行で処理する最大投稿件数（デフォルト: 50） | CDK で設定 |
 
 > **SNS 認証情報**: 環境変数ではなく Secrets Manager からアカウントごとに取得する。Secret 名規約は [design/security.md](../design/security.md) を参照。
+
+### 3.3 DB 準備確認タスク
+
+| 変数名 | 説明 | 取得元 |
+|---|---|---|
+| DB_SECRET_ARN | DB 接続情報の Secret ARN | CDK で設定 |
+| ENV_NAME | 環境識別子（現時点では `prod`） | CDK で設定 |
+
+> **注記**: DB 準備確認タスクの環境変数はすべて CDK で Task Definition に静的設定する。Step Functions からのコンテナオーバーライドはない。
 
 ## 4. Step Functions エラーハンドリング
 

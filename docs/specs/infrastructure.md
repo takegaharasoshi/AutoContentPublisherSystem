@@ -35,10 +35,9 @@
 | Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効、最小 ACU は 0。Aurora MySQL 3.08.0 以降など対応バージョンを採用） |
 | Secrets Manager | DB 認証情報（CDK の Aurora コンストラクトで自動生成）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（手順は [design/operation.md](../design/operation.md) セクション 1.6 参照） |
 | ECS Cluster | 全バッチ共通の実行基盤 |
-| ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch） |
+| ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、db-readiness-check の 3 つ） |
 | VPC Endpoint | S3（Gateway）のみ |
-| ECR Repository (DB 準備確認) | DB 準備確認用コンテナイメージリポジトリ（db-readiness-check） |
-| ECS Task Definition (DB 準備確認) | DB 準備確認用（db-readiness-check）。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される。コンテナイメージは CDK Context `dbReadinessCheckImageTag` で指定された不変タグを参照する |
+| ECS Task Definition (DB 準備確認) | DB 準備確認用（db-readiness-check）。コンテナ名: `db-readiness-check`。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される。コンテナイメージは CDK Context `dbReadinessCheckImageTag` で指定された不変タグを参照する |
 | IAM Role (DB 準備確認タスク) | 権限詳細は [design/security.md](../design/security.md) を参照 |
 | Security Group (DB 準備確認) | DB 準備確認 ECS タスク用 |
 | CloudWatch Log Group (DB 準備確認) | DB 準備確認タスクのログ出力先 |
@@ -87,7 +86,7 @@
 | リソース | 説明 |
 |---|---|
 | ECS Task Definition | 画像生成バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する（詳細は [design/cicd.md](../design/cicd.md) を参照） |
-| Container Definition | ECR イメージ、環境変数、ログ設定 |
+| Container Definition | コンテナ名: `image-batch`。ECR イメージ、環境変数、ログ設定 |
 | Step Functions | ワークフロー定義（ASL は [specs/workflow.md](workflow.md) を参照） |
 | EventBridge Scheduler | セットごとの定期実行スケジュール |
 | CodePipeline | image-batch 用 CI/CD パイプライン（詳細は [design/cicd.md](../design/cicd.md) を参照） |
@@ -106,7 +105,7 @@
 | リソース | 説明 |
 |---|---|
 | ECS Task Definition | SNS 投稿バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する |
-| Container Definition | ECR イメージ、環境変数、ログ設定 |
+| Container Definition | コンテナ名: `sns-post-batch`。ECR イメージ、環境変数、ログ設定 |
 | Step Functions | ワークフロー定義（ASL は [specs/workflow.md](workflow.md) を参照） |
 | CodePipeline | sns-post-batch 用 CI/CD パイプライン（詳細は [design/cicd.md](../design/cicd.md) を参照） |
 | CodeBuild | Docker ビルド・ECR push・タスク定義更新 |

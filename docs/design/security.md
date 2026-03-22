@@ -56,9 +56,9 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 
 | ロール | 権限 |
 |---|---|
-| DB 準備確認タスクロール | Secrets Manager 読み取り（`acps/{env}/db/*`）、CloudWatch Logs 出力 |
-| 画像生成バッチタスクロール | S3 読み書き、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/image/*`）、CloudWatch Logs 出力 |
-| SNS 投稿バッチタスクロール | S3 読み取り、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/*/sns/*`）、CloudWatch Logs 出力 |
+| DB 準備確認タスクロール | Secrets Manager 読み取り（`acps/{env}/db/*`） |
+| 画像生成バッチタスクロール | S3 読み書き、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/image/*`） |
+| SNS 投稿バッチタスクロール | S3 読み取り、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/*/sns/*`） |
 
 - Secrets Manager 権限はサービスごとに必要最小限のプレフィックスで制限する。DB 認証情報（`acps/{env}/db/*`）は全サービス共通、それ以外は各サービスが必要とする種別のみ付与する
 - DB にアカウントを追加するだけで、IAM ポリシーの変更なしに新しい Secret へのアクセスが可能になる
@@ -68,18 +68,22 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 - ECR イメージの pull 権限
 - CloudWatch Logs への書き込み権限
 
+> **注記**: CloudWatch Logs への書き込みは ECS Fargate の awslogs ドライバがタスク実行ロールの権限で行う。タスクロール（セクション 2.1）には CloudWatch Logs 権限を含めない。
+
 ### 2.3 Step Functions 実行ロール
 
 | ステートマシン | 権限 |
 |---|---|
-| image-generation-sfn | ECS RunTask（DB 準備確認タスク + 画像生成バッチタスク）、SNS 投稿 Step Functions の `StartExecution`、CloudWatch `PutMetricData`（カスタムメトリクス発行用） |
-| sns-posting-sfn | ECS RunTask（DB 準備確認タスク + SNS 投稿バッチタスク） |
+| image-generation-sfn | ECS RunTask（DB 準備確認タスク + 画像生成バッチタスク）、`iam:PassRole`（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため）、SNS 投稿 Step Functions の `StartExecution`、CloudWatch `PutMetricData`（カスタムメトリクス発行用） |
+| sns-posting-sfn | ECS RunTask（DB 準備確認タスク + SNS 投稿バッチタスク）、`iam:PassRole`（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため） |
 
 ### 2.4 EventBridge Scheduler ロール
 
 - 画像生成 Step Functions の起動権限（`states:StartExecution`）
 
-### 2.5 CodeBuild サービスロール
+### 2.5 CI/CD サービスロール
+
+#### CodeBuild サービスロール
 
 | パイプライン | 権限 |
 |---|---|
@@ -87,6 +91,15 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 
 - 各パイプラインの CodeBuild プロジェクトに対し、操作対象のリソース（ECR リポジトリ、ECS タスク定義 family、IAM ロール）を最小限にスコープする
 - `iam:PassRole` は、CodeBuild が `ecs:RegisterTaskDefinition` で新リビジョンを登録する際にタスクロールとタスク実行ロールを指定するために必要
+
+#### CodePipeline サービスロール
+
+| パイプライン | 権限 |
+|---|---|
+| image-batch-pipeline / sns-post-batch-pipeline | CodeStar Connections の使用（`codestar-connections:UseConnection`）、CodeBuild プロジェクトの起動（`codebuild:StartBuild`、`codebuild:BatchGetBuilds` 等）、S3 アーティファクトバケットの読み書き（`s3:GetObject`、`s3:PutObject` 等） |
+
+- CodePipeline が Source Stage で GitHub からソースを取得し、Build Stage で CodeBuild を起動するために必要な最小権限
+- S3 アーティファクトバケットは CodePipeline が使用する中間ストレージ（CDK がデフォルトで作成）
 
 ## 3. ネットワークセキュリティ
 
