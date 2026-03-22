@@ -79,9 +79,18 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 
 - 画像生成 Step Functions の起動権限（`states:StartExecution`）
 
+### 2.5 CodeBuild サービスロール
+
+| パイプライン | 権限 |
+|---|---|
+| image-batch-pipeline / sns-post-batch-pipeline | ECR 認証トークン取得（`ecr:GetAuthorizationToken`）、対象 ECR リポジトリへのイメージ push（`ecr:PutImage` 等）、ECS タスク定義の読み取り・登録（`ecs:DescribeTaskDefinition`、`ecs:RegisterTaskDefinition`）、ECS タスク実行ロールおよびタスクロールの `iam:PassRole`、CloudWatch Logs 書き込み（ビルドログ出力用） |
+
+- 各パイプラインの CodeBuild プロジェクトに対し、操作対象のリソース（ECR リポジトリ、ECS タスク定義 family、IAM ロール）を最小限にスコープする
+- `iam:PassRole` は、CodeBuild が `ecs:RegisterTaskDefinition` で新リビジョンを登録する際にタスクロールとタスク実行ロールを指定するために必要
+
 ## 3. ネットワークセキュリティ
 
-- **Aurora**: Isolated Subnet に配置し、インターネットからの直接アクセスを遮断する
+- **Aurora**: Isolated Subnet に配置し、インターネットからの直接アクセスを遮断する。Security Group はアウトバウンド通信を完全に遮断する（CDK で `allowAllOutbound: false` を明示指定）
 - **ECS Fargate**: Public Subnet に配置し、Security Group でアクセスを制御する
   - インバウンド: 全ポート拒否（バッチ処理であり外部からの着信接続は不要）
   - アウトバウンド: インターネットアクセス（外部 API、Secrets Manager、CloudWatch Logs）と VPC 内通信（Aurora）を許可

@@ -166,6 +166,7 @@ Step Functions の Retry/Catch 設定の詳細は [specs/workflow.md](../specs/w
 | Aurora Serverless v2 | 自動一時停止を有効化、最小 ACU を低く設定 |
 | ネットワーク | NAT Gateway は使用しない。ECS Fargate にパブリック IP を付与して直接インターネットアクセス |
 | S3 | Lifecycle Policy で全オブジェクトを 30 日で自動削除 |
+| CloudWatch Logs | リテンション期間を設定し、不要なログの蓄積を防止する（初期開発では未設定。運用開始後にコスト状況を見て設定を検討する） |
 
 ## 6. セキュリティ運用
 

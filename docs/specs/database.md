@@ -67,6 +67,7 @@
 | set_id | BIGINT UNSIGNED | NO | | バッチセット ID（FK） |
 | prompt_config_id | BIGINT UNSIGNED | NO | | 使用プロンプト設定 ID（FK） |
 | prompt_text_snapshot | TEXT | NO | | 画像生成時に使用したプロンプト本文のスナップショット |
+| negative_prompt_snapshot | TEXT | YES | NULL | 画像生成時に使用したネガティブプロンプトのスナップショット |
 | parameters_snapshot | JSON | YES | NULL | 画像生成時に使用したパラメータのスナップショット |
 | scheduled_at | DATETIME | NO | | スケジュール実行日時（UTC、冪等性キー） |
 | s3_key | VARCHAR(500) | NO | | S3 オブジェクトキー |
@@ -91,7 +92,7 @@
 
 > **S3 キーの命名規約**: `s3_key` に格納するオブジェクトキーは `images/{set_code}/{YYYYMMDD}/{uuid}.jpg` の形式とする。`set_code` はバッチ起動時の環境変数 `SET_CODE` から取得する。
 
-> **設計変更理由（プロンプトスナップショット）**: `prompt_configs` は運用中に内容が更新される可能性がある。`generated_images` に生成時点のプロンプト本文とパラメータのスナップショットを保持することで、過去の生成結果がどのプロンプトで作られたかを正確に追跡できる。`prompt_config_id` は FK として保持し、設定の系譜を辿れるようにする。
+> **設計変更理由（プロンプトスナップショット）**: `prompt_configs` は運用中に内容が更新される可能性がある。`generated_images` に生成時点のプロンプト本文・ネガティブプロンプト・パラメータのスナップショットを保持することで、過去の生成結果がどのプロンプトで作られたかを正確に追跡できる。`prompt_config_id` は FK として保持し、設定の系譜を辿れるようにする。
 
 > **設計変更理由（複合 FK）**: `prompt_config_id → prompt_configs.id` の単純 FK では、異なるセットの `prompt_configs` を参照可能だった。`(set_id, prompt_config_id) → prompt_configs(set_id, id)` の複合 FK に変更し、同一セット内のプロンプト設定のみ参照できるよう DB レベルで保証する。
 

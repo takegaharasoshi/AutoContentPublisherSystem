@@ -157,6 +157,7 @@ SNS 投稿バッチには 2 種類のリカバリが存在する:
 - 異常終了時は例外ハンドラで `status='failed'`、`finished_at`、`error_message` を更新する
 - `batch_execution_logs` の INSERT/UPDATE が失敗した場合は、バッチ全体を失敗（終了コード 1）とする。ログ記録はバッチ実行の追跡に不可欠であり、記録なしでの続行は運用上のリスクが高いため
 - プロセス強制終了などで `running` のまま残ったレコードは、Step Functions 実行履歴と CloudWatch Logs を正とし、運用で stale レコードとして補正する
+- `batch_execution_logs` にはテーブルレベルの一意性制約を設けない（`execution_arn` が NULL 許容のため単純な UNIQUE 制約は不適合）。同一実行での二重 INSERT はアプリケーション側で防御する（開始時に 1 回だけ INSERT し、以降は UPDATE のみ）
 
 ## 2. 画像生成バッチ
 
