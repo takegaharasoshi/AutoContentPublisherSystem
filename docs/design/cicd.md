@@ -32,10 +32,10 @@ CodePipeline
 
 サービスごとにパイプラインを分割する。
 
-| パイプライン | 対象サービス | トリガー条件 |
-|---|---|---|
-| image-batch-pipeline | 画像生成バッチ | `services/image-batch/**` OR `shared/**` の変更 |
-| sns-post-batch-pipeline | SNS 投稿バッチ | `services/sns-post-batch/**` OR `shared/**` の変更 |
+| パイプライン | 対象サービス | CDK スタック | トリガー条件 |
+|---|---|---|---|
+| image-batch-pipeline | 画像生成バッチ | ImageBatchStack | `services/image-batch/**` OR `shared/**` の変更 |
+| sns-post-batch-pipeline | SNS 投稿バッチ | SnsPostBatchStack | `services/sns-post-batch/**` OR `shared/**` の変更 |
 
 > **db-readiness-check について**: db-readiness-check は FoundationStack で管理する共通ユーティリティであり、CI/CD パイプラインの対象外とする。更新時は開発者が不変タグ（例: Git コミットハッシュ）で Docker イメージを ECR へ push し、`dbReadinessCheckImageTag` の CDK Context にそのタグを渡して `cdk deploy -c env=prod -c dbReadinessCheckImageTag=<tag> FoundationStack` を実行する。FoundationStack はこのタグを使って新しい ECS Task Definition revision を登録する。
 

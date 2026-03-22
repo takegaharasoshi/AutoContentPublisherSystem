@@ -61,7 +61,7 @@
 **出力値（他スタックへの共有）**:
 
 - VPC ID、Public Subnet ID x2、Isolated Subnet ID x2
-- Security Group ID
+- バッチ共通 Security Group ID
 - S3 Bucket 名 / ARN
 - Aurora Cluster Endpoint / ARN
 - Secrets Manager Secret ARN（DB 認証情報用 `acps/{env}/db/*`、画像 API キー用 `acps/{env}/image/*`。SNS 認証情報は Secret 名規約によりアプリ側で導出するため出力不要。規約は [design/security.md](../design/security.md) を参照）
@@ -84,10 +84,12 @@
 
 | リソース | 説明 |
 |---|---|
-| ECS Task Definition | 画像生成バッチ用コンテナ定義。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する（詳細は [design/cicd.md](../design/cicd.md) を参照） |
+| ECS Task Definition | 画像生成バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する（詳細は [design/cicd.md](../design/cicd.md) を参照） |
 | Container Definition | ECR イメージ、環境変数、ログ設定 |
 | Step Functions | ワークフロー定義（ASL は [specs/workflow.md](workflow.md) を参照） |
 | EventBridge Scheduler | セットごとの定期実行スケジュール |
+| CodePipeline | image-batch 用 CI/CD パイプライン（詳細は [design/cicd.md](../design/cicd.md) を参照） |
+| CodeBuild | Docker ビルド・ECR push・タスク定義更新 |
 | IAM Role | 権限詳細は [design/security.md](../design/security.md) を参照 |
 | CloudWatch Log Group | タスクログ出力先 |
 
@@ -101,9 +103,11 @@
 
 | リソース | 説明 |
 |---|---|
-| ECS Task Definition | SNS 投稿バッチ用コンテナ定義。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する |
+| ECS Task Definition | SNS 投稿バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する |
 | Container Definition | ECR イメージ、環境変数、ログ設定 |
 | Step Functions | ワークフロー定義（ASL は [specs/workflow.md](workflow.md) を参照） |
+| CodePipeline | sns-post-batch 用 CI/CD パイプライン（詳細は [design/cicd.md](../design/cicd.md) を参照） |
+| CodeBuild | Docker ビルド・ECR push・タスク定義更新 |
 | IAM Role | 権限詳細は [design/security.md](../design/security.md) を参照 |
 | CloudWatch Log Group | タスクログ出力先 |
 

@@ -82,7 +82,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 - **入力パラメータ**: `set_code`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す
 - **実行コンテキスト**: `$$.Execution.Id` を `EXECUTION_ARN` として ECS タスクへ渡す
 - **実行モード**: Standard（長時間実行に対応）
-- **タイムアウト**: 各 Task ステートに明示タイムアウトを設定する（`WaitForDbReady=900` 秒、画像生成 ECS 実行=3600 秒、SNS 投稿起動=60 秒、SNS 投稿 ECS 実行=3600 秒。詳細は [specs/workflow.md](../specs/workflow.md) を参照）
+- **タイムアウト**: 各 Task ステートに明示タイムアウトを設定し、ハング時にワークフローが長時間ぶら下がらないようにする（具体値は [specs/workflow.md](../specs/workflow.md) を参照）
 - **同時実行に関する制約**: EventBridge Scheduler の実行間隔で回避し、万一の同時実行は DB の排他制御で整合性を保証する（詳細は [design/batch.md](batch.md) セクション 1.6 を参照）
 - **エラーハンドリング**: Retry / Catch を設定（ASL 定義は [specs/workflow.md](../specs/workflow.md) を参照）
 - **SNS 投稿の単独実行**: sns-posting-sfn は独立したステートマシンのため、手動での再投稿や投稿のみの実行も可能

@@ -130,13 +130,13 @@
   - 確認: CloudWatch Logs に「Hello World」が出る
   - 備考: ここが最重要確認ポイント
 
-- [ ] **3-5** Step Functions ステートマシンを追加
-  - 確認: コンソールから手動実行 → ECS タスク起動 → 成功
+- [ ] **3-5** Step Functions ステートマシンを追加してデプロイ
+  - 確認: `cdk deploy -c env=prod SnsPostBatchStack` 成功、コンソールでステートマシンが見える
   - 備考:
 
-- [ ] **3-6** 手動で SNS 投稿 Step Functions を実行して E2E 確認
-  - 確認: コンソールから手動実行 → ECS タスク起動 → 成功
-  - 備考: Phase 4 で ImageBatchStack に EventBridge Scheduler を追加し、SNS 投稿は画像生成成功後に自動起動される
+- [ ] **3-6** Step Functions 手動実行による E2E 確認（WaitForDbReady → ECS タスク実行の一連フロー）
+  - 確認: コンソールから手動実行 → DB 準備確認 → SNS 投稿 ECS タスク起動 → 成功（全ステートが正常遷移）
+  - 備考: Phase 3-5 は Step Functions の追加デプロイのみ。3-6 は WaitForDbReady を含む一連フローの動作確認。Phase 4 で ImageBatchStack に EventBridge Scheduler を追加し、SNS 投稿は画像生成成功後に自動起動される
 
 ---
 
@@ -270,11 +270,11 @@
 
 **ゴール**: GitHub push で自動的にビルド・デプロイされる
 
-- [ ] **9-1** CodePipeline + CodeBuild の定義（image-batch 用）
+- [ ] **9-1** CodePipeline + CodeBuild の定義（image-batch 用、ImageBatchStack に追加）
   - 確認: push → ECR イメージ更新 → タスク定義更新
   - 備考:
 
-- [ ] **9-2** sns-post-batch 用パイプラインの追加
+- [ ] **9-2** sns-post-batch 用パイプラインの追加（SnsPostBatchStack に追加）
   - 確認: 同上
   - 備考:
 
