@@ -12,7 +12,7 @@
 #### スケジュール変更手順
 
 1. CDK コードの EventBridge Scheduler の cron 式を変更する
-2. `cdk deploy` で EventBridge Scheduler を更新する
+2. `cdk deploy -c env=prod ImageBatchStack` で EventBridge Scheduler を更新する
 
 ### 1.2 バッチ実行時の動作
 
@@ -43,9 +43,9 @@
 
 CDK デプロイ実行後は、以下のチェックリストを確認する。
 
-- [ ] **ImageBatchStack に変更があった場合**: `image-batch-pipeline` を手動実行する（タスク定義の revision 整合性維持のため。詳細は [design/cicd.md](cicd.md) セクション 6 を参照）
-- [ ] **SnsPostBatchStack に変更があった場合**: `sns-post-batch-pipeline` を手動実行する（同上）
-- [ ] **db-readiness-check を更新した場合**: `cdk deploy FoundationStack -c dbReadinessCheckImageTag=<tag>` を使用し、最新の Task Definition revision が該当タグを参照していることを確認する
+- [ ] **ImageBatchStack に変更があった場合**: latest ACTIVE revision に期待するロール、環境変数、ログ設定が反映されていることを確認する
+- [ ] **SnsPostBatchStack に変更があった場合**: latest ACTIVE revision に期待するロール、環境変数、ログ設定が反映されていることを確認する
+- [ ] **db-readiness-check を更新した場合**: `cdk deploy -c env=prod -c dbReadinessCheckImageTag=<tag> FoundationStack` を使用し、latest ACTIVE revision が該当タグを参照していることを確認する
 - [ ] **新規セット追加の場合**: DB に `batch_sets` レコードを追加する
 - [ ] **デプロイ結果の確認**: AWS Console で各リソースの状態が正常であることを確認する
 
@@ -72,6 +72,7 @@ SNS アカウントを追加する際は、Secrets Manager のシークレット
 ### 2.1 Aurora Serverless v2 の自動一時停止
 
 - コスト最適化のため、自動一時停止を有効にする
+- 最小 ACU は 0 とし、0 ACU の自動一時停止をサポートする Aurora MySQL バージョンを採用する
 - 一時停止中にアクセスがあると自動的に再開する（再開には数十秒〜数分）
 
 ### 2.2 DB 準備確認

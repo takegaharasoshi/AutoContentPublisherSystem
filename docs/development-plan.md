@@ -6,6 +6,7 @@
 - 各ステップで実際に AWS 上で稼働確認を行い、動作を確認してから次に進む
 - 1 ステップ = 1 プロンプトを基本とし、「作る → 確認 → 次へ」のリズムで進める
 - 各ステップの完了後、ユーザーが確認方法に従って動作確認を行い、チェックを入れる
+- CDK コマンド例では app 内の論理スタック ID（`FoundationStack` など）を指定する。`-c env=prod` により、CloudFormation 上の実スタック名は `Prod-FoundationStack` のように環境名付きで作成される
 
 ## 凡例
 
@@ -46,15 +47,15 @@
 **ゴール**: CDK で最小のリソース（VPC）を AWS に作れることを確認する
 
 - [ ] **1-1** `infra/` に CDK プロジェクトを初期化（TypeScript）
-  - 確認: `cdk synth` でテンプレートが出力される
+  - 確認: `cdk synth -c env=prod` でテンプレートが出力される
   - 備考:
 
 - [ ] **1-2** FoundationStack に VPC だけ定義
-  - 確認: `cdk diff FoundationStack` で差分が見える
+  - 確認: `cdk diff -c env=prod FoundationStack` で差分が見える
   - 備考:
 
 - [ ] **1-3** VPC をデプロイ
-  - 確認: `cdk deploy FoundationStack` 成功
+  - 確認: `cdk deploy -c env=prod FoundationStack` 成功
   - 備考:
 
 - [ ] **1-4** AWS コンソールで VPC を確認
@@ -62,7 +63,7 @@
   - 備考:
 
 - [ ] **1-5** 削除して再作成できることを確認
-  - 確認: `cdk destroy` → `cdk deploy` が通る
+  - 確認: `cdk destroy -c env=prod FoundationStack` → `cdk deploy -c env=prod FoundationStack` が通る
   - 備考:
 
 ---
@@ -92,8 +93,8 @@
   - 備考: ECR リポジトリは FoundationStack で一元管理する（specs/infrastructure.md 参照）
 
 - [ ] **2-6** Aurora Serverless v2 を追加
-  - 確認: コンソールで DB クラスターが見える、自動一時停止が設定されている
-  - 備考: コストに注意。不安なら Phase 3 の後に回してもよい
+  - 確認: コンソールで DB クラスターが見える、自動一時停止が設定されている、最小 ACU が 0 になっている
+  - 備考: Aurora MySQL 3.08.0 以降など、自動一時停止対応バージョンを採用する。コストに注意。不安なら Phase 3 の後に回してもよい
 
 - [ ] **2-7** VPC Endpoint（S3 Gateway のみ）を追加
   - 確認: コンソールで S3 Gateway VPC Endpoint が作成されている（Secrets Manager Interface Endpoint は不要）
@@ -122,7 +123,7 @@
   - 備考:
 
 - [ ] **3-3** SnsPostBatchStack に ECS Task Definition を定義してデプロイ
-  - 確認: `cdk deploy SnsPostBatchStack` 成功
+  - 確認: `cdk deploy -c env=prod SnsPostBatchStack` 成功
   - 備考:
 
 - [ ] **3-4** 手動で ECS RunTask を実行
@@ -152,7 +153,7 @@
   - 備考:
 
 - [ ] **4-3** ImageBatchStack に ECS Task Definition を定義してデプロイ
-  - 確認: `cdk deploy ImageBatchStack` 成功
+  - 確認: `cdk deploy -c env=prod ImageBatchStack` 成功
   - 備考:
 
 - [ ] **4-4** 手動で ECS RunTask を実行
@@ -248,7 +249,7 @@
 **ゴール**: バッチ失敗時にアラーム通知が届く
 
 - [ ] **8-1** MonitoringStack に SNS Topic + CloudWatch Alarm を定義
-  - 確認: `cdk deploy MonitoringStack` 成功
+  - 確認: `cdk deploy -c env=prod MonitoringStack` 成功
   - 備考:
 
 - [ ] **8-2** 意図的にバッチを失敗させてアラーム通知を確認
@@ -270,7 +271,7 @@
   - 備考:
 
 - [ ] **9-3** インフラは手動デプロイであることをチーム内で確認
-  - 確認: `cdk diff` → `cdk deploy` の手動運用が問題なく行えることを確認
+  - 確認: `cdk diff -c env=prod <StackName>` → `cdk deploy -c env=prod <StackName>` の手動運用が問題なく行えることを確認
   - 備考: インフラパイプラインは構築しない（破壊的変更リスク回避のため）
 
 ---

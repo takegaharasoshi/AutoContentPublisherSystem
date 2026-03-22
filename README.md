@@ -82,8 +82,10 @@ pip install -r requirements.txt
 ```bash
 # CDK デプロイ（スタック順序に従う）
 cd infra
-cdk deploy FoundationStack
-cdk deploy SnsPostBatchStack
-cdk deploy ImageBatchStack
-cdk deploy MonitoringStack
+cdk deploy -c env=prod FoundationStack
+cdk deploy -c env=prod SnsPostBatchStack
+cdk deploy -c env=prod ImageBatchStack
+cdk deploy -c env=prod MonitoringStack
 ```
+
+CDK コマンド例では app 内の論理スタック ID（`FoundationStack` など）を指定する。`-c env=prod` により、CloudFormation 上の実スタック名は `Prod-FoundationStack` のように環境名付きで作成される。

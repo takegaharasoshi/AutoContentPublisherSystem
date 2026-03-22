@@ -32,7 +32,7 @@
 | VPC | 2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし |
 | Security Group | サービスごとのアクセス制御 |
 | S3 Bucket | 画像保存用（Lifecycle Policy: 30 日で自動削除） |
-| Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効） |
+| Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効、最小 ACU は 0。Aurora MySQL 3.08.0 以降など対応バージョンを採用） |
 | Secrets Manager | DB 認証情報、API キー |
 | ECS Cluster | 全バッチ共通の実行基盤 |
 | ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch） |
@@ -58,7 +58,7 @@
 **注意事項**:
 
 - DB 準備確認の仕様詳細は [design/batch.md](../design/batch.md) セクション 1.2 を参照
-- db-readiness-check の更新時は `cdk deploy FoundationStack -c dbReadinessCheckImageTag=<tag>` で新しいイメージタグを明示的に渡す
+- db-readiness-check の更新時は `cdk deploy -c env=prod -c dbReadinessCheckImageTag=<tag> FoundationStack` で新しいイメージタグを明示的に渡す
 - 将来の AdminApiStack、AdminWebStack からも参照される
 
 ### 3.2 ImageBatchStack
@@ -69,7 +69,7 @@
 
 | リソース | 説明 |
 |---|---|
-| ECS Task Definition | 画像生成バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD。詳細は [design/cicd.md](../design/cicd.md) を参照） |
+| ECS Task Definition | 画像生成バッチ用コンテナ定義。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する（詳細は [design/cicd.md](../design/cicd.md) を参照） |
 | Container Definition | ECR イメージ、環境変数、ログ設定 |
 | Step Functions | ワークフロー定義（ASL は [specs/workflow.md](workflow.md) を参照） |
 | EventBridge Scheduler | セットごとの定期実行スケジュール |
@@ -86,7 +86,7 @@
 
 | リソース | 説明 |
 |---|---|
-| ECS Task Definition | SNS 投稿バッチ用コンテナ定義（初期版の作成のみ。以降の revision 更新は CI/CD） |
+| ECS Task Definition | SNS 投稿バッチ用コンテナ定義。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する |
 | Container Definition | ECR イメージ、環境変数、ログ設定 |
 | Step Functions | ワークフロー定義（ASL は [specs/workflow.md](workflow.md) を参照） |
 | IAM Role | 権限詳細は [design/security.md](../design/security.md) を参照 |

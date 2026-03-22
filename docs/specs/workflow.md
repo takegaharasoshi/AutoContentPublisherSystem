@@ -8,6 +8,10 @@
 
 > **WaitForDbReady の retry 方針**: DB 準備確認の再試行は db-readiness-check コンテナ内部で完結させる。`WaitForDbReady` ステート自体には Step Functions Retry を設定せず、総待機時間を ECS タスク内部の約 510 秒に固定する。
 
+> **Task ステートのタイムアウト**: ハング時にワークフローが長時間ぶら下がらないよう、`WaitForDbReady=900` 秒、`RunImageBatchTask=3600` 秒、`StartSnsPostBatch=60` 秒、`RunSnsPostBatchTask=3600` 秒の明示タイムアウトを設定する。
+
+> **StartSnsPostBatch の冪等性**: `StartExecution.Name` には親ワークフローの `$$.Execution.Name` を渡す。これにより Retry 時も同一要求として扱われ、SNS 投稿 Step Functions の二重起動リスクを抑制できる。
+
 ```json
 {
   "StartAt": "WaitForDbReady",
@@ -15,6 +19,7 @@
     "WaitForDbReady": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 900,
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${EcsClusterArn}",
@@ -38,6 +43,7 @@
     "RunImageBatchTask": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 3600,
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${EcsClusterArn}",
@@ -81,8 +87,10 @@
     "StartSnsPostBatch": {
       "Type": "Task",
       "Resource": "arn:aws:states:::states:startExecution",
+      "TimeoutSeconds": 60,
       "Parameters": {
         "StateMachineArn": "${SnsPostingSfnArn}",
+        "Name.$": "$$.Execution.Name",
         "Input": {
           "set_code.$": "$.set_code"
         }
@@ -151,6 +159,7 @@
     "WaitForDbReady": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 900,
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${EcsClusterArn}",
@@ -174,6 +183,7 @@
     "RunSnsPostBatchTask": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 3600,
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${EcsClusterArn}",
@@ -256,8 +266,8 @@
 | DB 準備確認失敗 | db-readiness-check コンテナ内部で最大 8 回 retry 後、Catch → Fail ステートへ遷移 |
 | 画像生成 / SNS 投稿 ECS タスク起動失敗 | Retry（最大 2 回、30 秒間隔） |
 | 画像生成 / SNS 投稿 ECS タスク異常終了 | Retry → Catch → Fail ステートへ遷移 |
-| タイムアウト | Catch → Fail ステートへ遷移 |
-| SNS 投稿 SFN 起動失敗 | Retry → Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了 |
+| タイムアウト | 各 Task ステートの `TimeoutSeconds` 到達時に Catch → Fail ステートへ遷移 |
+| SNS 投稿 SFN 起動失敗 | `Name=$$.Execution.Name` で冪等化した上で Retry（最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了 |
 
 ## 5. カスタムメトリクス定義
 
