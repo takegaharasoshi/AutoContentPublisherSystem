@@ -28,6 +28,13 @@ CodePipeline
 
 > **インフラパイプラインは構築しない**: FoundationStack に Aurora・VPC など破壊的変更のリスクが高いリソースが含まれるため、インフラ変更は `cdk diff -c env=prod` で差分を確認した上で手動デプロイとする。個人開発でインフラ変更頻度は低く、手動運用のコストも小さい。
 
+### 1.1 GitHub 接続方式
+
+- **CodePipeline V2** + **CodeStar Connections（GitHub App）** を使用する
+- CodeStar Connections は AWS コンソールで事前に作成し、GitHub リポジトリとの接続を承認する
+- パイプラインの Source Stage で CodeStar Connections をソースプロバイダーとして指定する
+- トリガーフィルタ: CodePipeline V2 のトリガー設定でファイルパスフィルタ（`services/image-batch/**`、`shared/**` 等）を指定し、関連ファイルの変更時のみパイプラインを起動する
+
 ## 2. パイプライン分割
 
 サービスごとにパイプラインを分割する。
@@ -46,6 +53,9 @@ CodePipeline
 ## 3. CodeBuild 設定
 
 ### 3.1 バッチサービス用（image-batch / sns-post-batch）
+
+- **buildspec.yml の配置**: サービスごとに `services/{service-name}/buildspec.yml` に配置する（例: `services/image-batch/buildspec.yml`）
+- **Docker ビルドコンテキスト**: リポジトリルートをビルドコンテキストとし、サービスごとの Dockerfile を `-f` オプションで指定する（例: `docker build -f services/image-batch/Dockerfile .`）。これにより `shared/` ディレクトリを `COPY` でコンテナに含めることができる
 
 ```yaml
 # buildspec.yml の概要
