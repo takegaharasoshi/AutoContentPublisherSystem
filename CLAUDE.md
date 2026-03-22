@@ -104,6 +104,8 @@ AutoContentPublisherSystem/
 - **ImageBatchStack**: 画像生成バッチ実行基盤
 - **SnsPostBatchStack**: SNS 投稿バッチ実行基盤
 - **MonitoringStack**: 監視・通知
+- **AdminApiStack**（将来拡張）: 管理画面バックエンド API
+- **AdminWebStack**（将来拡張）: 管理画面フロントエンド
 
 ## Git 運用ルール
 

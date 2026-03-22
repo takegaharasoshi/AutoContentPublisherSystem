@@ -86,6 +86,7 @@
 - **FK**: `(set_id, prompt_config_id)` → `prompt_configs(set_id, id)` — セット境界の整合性を保証する複合 FK
 - **UNIQUE**: `uq_generated_images_set_id` (`set_id`, `id`) — 複合 FK の参照先として使用
 - **INDEX**: `idx_generated_images_set_id` (`set_id`)
+- **INDEX**: `idx_generated_images_set_generated_at` (`set_id`, `generated_at`) — SNS 投稿バッチの投稿対象取得クエリ（`WHERE set_id = ? ORDER BY generated_at`）向け
 - **UNIQUE**: `uq_generated_images_idempotency` (`set_id`, `prompt_config_id`, `scheduled_at`)
 
 > **注記**: 投稿ステータスは `post_records` テーブルから導出する。`generated_images` テーブルには投稿状態を持たない。

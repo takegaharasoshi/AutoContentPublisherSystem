@@ -6,6 +6,8 @@
 
 > **TaskDefinition の指定方式**: ASL 内の `${...TaskDefFamily}` プレースホルダには、CDK が ECS Task Definition の family 名（例: `acps-prod-image-batch`）を渡す。ECS RunTask API は family 名指定で常に ACTIVE な最新リビジョンを使用するため、デプロイ時に ASL の更新は不要。
 
+> **SecurityGroup の指定方式**: `${BatchSgId}` は FoundationStack で定義される「ECS Fargate 用（バッチ共通）」Security Group を指す。画像生成バッチと SNS 投稿バッチは同一の Security Group を共有する。DB 準備確認タスクには専用の `${DbReadinessCheckSgId}` を使用する。
+
 > **WaitForDbReady の retry 方針**: DB 準備確認の再試行は db-readiness-check コンテナ内部で完結させる。`WaitForDbReady` ステート自体には Step Functions Retry を設定せず、総待機時間を ECS タスク内部の約 510 秒に固定する。
 
 > **Task ステートのタイムアウト**: ハング時にワークフローが長時間ぶら下がらないよう、`WaitForDbReady=900` 秒、`RunImageBatchTask=3600` 秒、`StartSnsPostBatch=60` 秒、`RunSnsPostBatchTask=3600` 秒の明示タイムアウトを設定する。`WaitForDbReady` の 900 秒は、ECS Fargate 起動（約 60 秒）+ DB 接続リトライ（最大約 510 秒）+ バッファ（約 330 秒）を考慮した値である。
@@ -63,7 +65,7 @@
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
             "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
-            "SecurityGroups": ["${ImageBatchSgId}"],
+            "SecurityGroups": ["${BatchSgId}"],
             "AssignPublicIp": "ENABLED"
           }
         },
@@ -205,7 +207,7 @@
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
             "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
-            "SecurityGroups": ["${SnsPostBatchSgId}"],
+            "SecurityGroups": ["${BatchSgId}"],
             "AssignPublicIp": "ENABLED"
           }
         },

@@ -194,15 +194,19 @@
   - 確認: CloudWatch Logs に「DB 接続成功」が出る
   - 備考:
 
-- [ ] **5-6** Aurora 一時停止状態からの再開リトライを確認
-  - 確認: 一時停止後にタスク実行 → リトライ後に接続成功のログ
-  - 備考:
+- [ ] **5-6** Aurora 一時停止状態からの再開リトライを確認（db-readiness-check タスクを使用）
+  - 確認: Aurora を一時停止させた後、db-readiness-check タスクを手動 RunTask で実行 → リトライ後に接続成功のログが出力される
+  - 備考: Phase 2-9 で動作確認済みの db-readiness-check タスクを使用する。バッチアプリケーション自体には DB 接続リトライを持たせない
 
 ---
 
 ## Phase 6: 画像生成バッチの業務ロジック実装
 
 **ゴール**: 実際に画像を生成して S3 に保存、DB にメタ情報を登録する
+
+- [ ] **6-0** テストデータと Secret の準備
+  - 確認: (1) `batch_sets` にテスト用セットのレコードが存在する (2) `prompt_configs` にテスト用プロンプトのレコードが存在する (3) Secrets Manager の `acps/prod/image/api-key` に実際の API キー値が格納されている
+  - 備考: DB テーブルへの INSERT は Query Editor 等で手動実行する。Secret 値は AWS Console から手動設定する
 
 - [ ] **6-1** 画像生成 API との疎通（ローカル Python スクリプト）
   - 確認: API を叩いて画像が返る
@@ -229,6 +233,10 @@
 ## Phase 7: SNS 投稿バッチの業務ロジック実装
 
 **ゴール**: DB の未投稿画像を取得し、SNS に投稿して結果を記録する
+
+- [ ] **7-0** テストデータと Secret の準備
+  - 確認: (1) `sns_accounts` にテスト用アカウントのレコードが存在する (2) Secrets Manager に SNS 認証情報 Secret（`acps/prod/{set_code}/sns/instagram/{account_code}`）が作成・値が格納されている (3) Phase 6 で生成済みの画像データが `generated_images` に存在する
+  - 備考: SNS アカウント追加手順は design/operation.md セクション 1.6 を参照
 
 - [ ] **7-1** Instagram API との疎通（ローカル）
   - 確認: API でテスト投稿できる

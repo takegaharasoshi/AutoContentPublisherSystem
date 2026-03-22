@@ -168,6 +168,7 @@ SNS 投稿バッチには 2 種類のリカバリが存在する:
   │
   ├── 1. set_code から内部 set_id を取得
   │       - 環境変数 SET_CODE を使って batch_sets テーブルから set_id（内部 PK）を取得する
+  │       - 該当する set_code が存在しない場合はエラーログを出力し、終了コード 1 で終了する
   │       - 以降の DB 操作には取得した set_id を使用する
   │
   ├── 2. DB から生成対象のプロンプト一覧を取得
@@ -208,6 +209,7 @@ Step Functions ASL 定義と環境変数一覧は [specs/workflow.md](../specs/w
   │
   ├── 1. set_code から内部 set_id を取得
   │       - 環境変数 SET_CODE を使って batch_sets テーブルから set_id（内部 PK）を取得する
+  │       - 該当する set_code が存在しない場合はエラーログを出力し、終了コード 1 で終了する
   │       - 以降の DB 操作には取得した set_id を使用する
   │
   ├── 2. DB から投稿対象を取得
