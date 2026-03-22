@@ -12,6 +12,8 @@
 
 > **Task ステートのタイムアウト**: ハング時にワークフローが長時間ぶら下がらないよう、`WaitForDbReady=900` 秒、`RunImageBatchTask=3600` 秒、`StartSnsPostBatch=60` 秒、`RunSnsPostBatchTask=3600` 秒の明示タイムアウトを設定する。`WaitForDbReady` の 900 秒は、ECS Fargate 起動（約 60 秒）+ DB 接続リトライ（最大約 510 秒）+ バッファ（約 330 秒）を考慮した値である。
 
+> **StartSnsPostBatch の呼び出し方式**: `StartSnsPostBatch` で使用する `arn:aws:states:::states:startExecution`（`.sync` サフィックスなし）は非同期呼び出しであり、子実行（sns-posting-sfn）の完了を待たずに即座に成功を返す。画像生成ワークフローは SNS 投稿の起動のみを行い、投稿処理の完了は待機しない。
+
 > **StartSnsPostBatch の冪等性**: `StartExecution.Name` には親ワークフローの `$$.Execution.Name` を渡す。これにより Retry 時も同一要求として扱われ、SNS 投稿 Step Functions の二重起動リスクを抑制できる。
 
 > **実行名の文字数制限**: Step Functions の実行名（`Name`）は最大 80 文字に制限されている。本システムでは `$$.Execution.Name` を子実行の Name として使用する。EventBridge Scheduler がデフォルトで生成する実行名は UUID ベース（36 文字）のため通常は問題ないが、カスタム名を使用する場合は 80 文字制限に注意すること。

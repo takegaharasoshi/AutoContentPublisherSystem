@@ -24,7 +24,7 @@
 6. DB 準備完了後、SNS 投稿 Step Functions が SNS 投稿 ECS Fargate RunTask を実行
 7. 各タスク完了後、Fargate タスクは自動的に停止（課金終了）
 
-> **手動での SNS 投稿実行**: SNS 投稿の再実行や単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（`set_code` を入力パラメータとして渡す）。
+> **手動での SNS 投稿実行**: SNS 投稿の再実行や単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（`set_code` を入力パラメータとして渡す）。`EXECUTION_ARN` は Step Functions が `$$.Execution.Id` から自動設定するため、手動指定は不要。手動 RunTask で直接 ECS タスクを実行する場合は `EXECUTION_ARN` が設定されず、`batch_execution_logs.execution_arn` は NULL となる。
 >
 > ```bash
 > # CLI での手動実行例
@@ -90,7 +90,7 @@ SNS アカウントを追加する際は、Secrets Manager のシークレット
 ### 2.3 DDL マイグレーション方針
 
 - 初期構築時および運用中のスキーマ変更は、手動で DDL を実行する（AWS Console の Query Editor または MySQL CLI を使用）
-- DDL ファイルはリポジトリ内で管理する（`services/db-readiness-check/sql/` 等に配置し、バージョン番号付きで命名。例: `V001__create_tables.sql`）
+- DDL ファイルはリポジトリ内で管理する（`database/` に配置し、バージョン番号付きで命名。例: `V001__create_tables.sql`）
 - 変更時は新しい DDL ファイルを追加し、適用済みバージョンを把握できるようにする
 - 将来的に管理画面の導入やスキーマ変更頻度の増加に伴い、Alembic 等のマイグレーションツールの採用を検討する
 
@@ -166,7 +166,7 @@ Step Functions の Retry/Catch 設定の詳細は [specs/workflow.md](../specs/w
 | Aurora Serverless v2 | 自動一時停止を有効化、最小 ACU を低く設定 |
 | ネットワーク | NAT Gateway は使用しない。ECS Fargate にパブリック IP を付与して直接インターネットアクセス |
 | S3 | Lifecycle Policy で全オブジェクトを 30 日で自動削除 |
-| CloudWatch Logs | リテンション期間を設定し、不要なログの蓄積を防止する（初期開発では未設定。運用開始後にコスト状況を見て設定を検討する） |
+| CloudWatch Logs | リテンション期間を 90 日に設定し、不要なログの蓄積を防止する |
 
 ## 6. セキュリティ運用
 

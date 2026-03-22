@@ -40,7 +40,7 @@
 | ECS Task Definition (DB 準備確認) | DB 準備確認用（db-readiness-check）。コンテナ名: `db-readiness-check`。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される。コンテナイメージは CDK Context `dbReadinessCheckImageTag` で指定された不変タグを参照する |
 | IAM Role (DB 準備確認タスク) | 権限詳細は [design/security.md](../design/security.md) を参照 |
 | Security Group (DB 準備確認) | DB 準備確認 ECS タスク用 |
-| CloudWatch Log Group (DB 準備確認) | DB 準備確認タスクのログ出力先 |
+| CloudWatch Log Group (DB 準備確認) | DB 準備確認タスクのログ出力先（リテンション: 90 日） |
 
 **Security Group ルール詳細**:
 
@@ -92,7 +92,7 @@
 | CodePipeline | image-batch 用 CI/CD パイプライン（詳細は [design/cicd.md](../design/cicd.md) を参照） |
 | CodeBuild | Docker ビルド・ECR push・タスク定義更新 |
 | IAM Role | 権限詳細は [design/security.md](../design/security.md) を参照 |
-| CloudWatch Log Group | タスクログ出力先 |
+| CloudWatch Log Group | タスクログ出力先（リテンション: 90 日） |
 
 **依存スタック**: FoundationStack、SnsPostBatchStack（SNS 投稿 Step Functions の ARN を参照するため）
 
@@ -110,7 +110,7 @@
 | CodePipeline | sns-post-batch 用 CI/CD パイプライン（詳細は [design/cicd.md](../design/cicd.md) を参照） |
 | CodeBuild | Docker ビルド・ECR push・タスク定義更新 |
 | IAM Role | 権限詳細は [design/security.md](../design/security.md) を参照 |
-| CloudWatch Log Group | タスクログ出力先 |
+| CloudWatch Log Group | タスクログ出力先（リテンション: 90 日） |
 
 > **注記**: SnsPostBatchStack には EventBridge Scheduler を含めない。SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動される。
 

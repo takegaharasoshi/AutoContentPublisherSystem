@@ -22,6 +22,7 @@ AutoContentPublisherSystem/
 │   ├── db-readiness-check/          # DB 準備確認（Python）※未作成
 │   ├── image-batch/                 # 画像生成バッチ（Python）※未作成
 │   └── sns-post-batch/              # SNS 投稿バッチ（Python）※未作成
+├── database/                        # DDL ファイル（スキーマ管理）※未作成
 ├── shared/                          # サービス間共通ライブラリ（Python）※未作成
 ├── CLAUDE.md
 └── README.md
@@ -70,7 +71,7 @@ AutoContentPublisherSystem/
 ## 開発計画
 
 - 開発計画と進捗は `docs/development-plan.md` で管理する
-- Phase 0〜9 の段階的アプローチで、インフラ構築 → 空回し確認 → 業務ロジック実装の順に進める
+- Phase 0〜10 の段階的アプローチで、インフラ構築 → 空回し確認 → 業務ロジック実装の順に進める
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
 - 作業開始時は `docs/development-plan.md` を読み、現在の Phase・ステップを確認してから着手する
 

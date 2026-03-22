@@ -108,7 +108,7 @@
 
 - [ ] **3-2** `services/db-readiness-check/` に DB 準備確認用の Python + Dockerfile を作成し、ECR に push
   - 確認: ECR コンソールでイメージが見える
-  - 備考: DB 接続リトライ（指数バックオフ、最大 8 回）を実装する。詳細は design/batch.md セクション 1.2 参照。ECR push 時は不変タグ（例: Git コミットハッシュ）を使用する
+  - 備考: DB 接続リトライ（指数バックオフ、最大 8 回）を実装する。詳細は design/batch.md セクション 1.2 参照。ECR push 時は不変タグ（例: Git コミットハッシュ）を使用する。以降の db-readiness-check 更新時は design/cicd.md セクション 2 の手順を参照
 
 - [ ] **3-3** DB 準備確認 ECS タスク定義を FoundationStack に追加し、手動 RunTask で疎通確認
   - 確認: Aurora が起動状態のとき: CloudWatch Logs に接続成功ログが出力され、終了コード 0 で終了する

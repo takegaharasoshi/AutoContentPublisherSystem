@@ -43,6 +43,7 @@ AutoContentPublisherSystem/
 │   ├── db-readiness-check/  # DB 準備確認（Python）
 │   ├── image-batch/         # 画像生成バッチ（Python）
 │   └── sns-post-batch/      # SNS 投稿バッチ（Python）
+├── database/                # DDL ファイル（スキーマ管理）
 ├── shared/                  # サービス間共通ライブラリ
 ├── CLAUDE.md
 └── README.md

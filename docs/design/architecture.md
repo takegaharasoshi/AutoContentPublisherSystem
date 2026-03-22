@@ -55,6 +55,8 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 
 > **NAT Gateway への移行パス**: 将来的にセキュリティ要件の強化やトラフィック増加に伴い、ECS Fargate を Private Subnet に移動し NAT Gateway 経由の構成に変更可能。現時点ではコスト優先でパブリック IP 方式を採用する。
 
+> **Security Group 運用上の注意**: ECS Fargate タスクが Public Subnet でパブリック IP を持つため、Security Group のインバウンドルールを全ポート拒否に維持することが不可欠である。Security Group の変更時は、意図しないインバウンド許可が追加されていないことを必ず確認すること。CDK でのリソース追加時にも、バッチ共通 Security Group のインバウンドルールが変更されないよう注意する。
+
 ### 通信フロー
 
 - ECS Fargate → 外部 API: パブリック IP + Internet Gateway 経由でインターネットアクセス
