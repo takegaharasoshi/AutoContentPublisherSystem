@@ -25,6 +25,13 @@
 7. 各タスク完了後、Fargate タスクは自動的に停止（課金終了）
 
 > **手動での SNS 投稿実行**: SNS 投稿の再実行や単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（`set_code` を入力パラメータとして渡す）。
+>
+> ```bash
+> # CLI での手動実行例
+> aws stepfunctions start-execution \
+>   --state-machine-arn arn:aws:states:ap-northeast-1:123456789012:stateMachine:acps-prod-sns-posting-sfn \
+>   --input '{"set_code": "fashion-set-1"}'
+> ```
 
 ### 1.3 プロンプト管理
 
@@ -80,12 +87,19 @@ SNS アカウントを追加する際は、Secrets Manager のシークレット
 - 各 Step Functions ワークフローの最初のステートとして DB 準備確認 ECS タスクを実行する
 - 仕様の詳細は [design/batch.md](batch.md) セクション 1.2 を参照
 
-### 2.3 テーブル肥大化の監視
+### 2.3 DDL マイグレーション方針
+
+- 初期構築時および運用中のスキーマ変更は、手動で DDL を実行する（AWS Console の Query Editor または MySQL CLI を使用）
+- DDL ファイルはリポジトリ内で管理する（`services/db-readiness-check/sql/` 等に配置し、バージョン番号付きで命名。例: `V001__create_tables.sql`）
+- 変更時は新しい DDL ファイルを追加し、適用済みバージョンを把握できるようにする
+- 将来的に管理画面の導入やスキーマ変更頻度の増加に伴い、Alembic 等のマイグレーションツールの採用を検討する
+
+### 2.4 テーブル肥大化の監視
 
 - `post_records` テーブルは再試行のたびにレコードが追加される設計のため、長期運用でレコード数が増加する
 - 現時点では対策不要。パフォーマンスへの影響が観測された場合に、アーカイブテーブルへの移行やパーティショニングを検討する
 
-### 2.4 バックアップ
+### 2.5 バックアップ
 
 - Aurora のスナップショットによるバックアップ（自動バックアップ有効）
 - 保持期間: 7 日間（Aurora のデフォルト値。運用状況に応じて調整する）
@@ -130,6 +144,15 @@ Step Functions の Retry/Catch 設定の詳細は [specs/workflow.md](../specs/w
 
 - SNS Topic 経由でメール通知
 - 将来的には Slack 連携等も検討
+
+#### SNS Topic サブスクリプション設定手順
+
+1. MonitoringStack のデプロイ後、AWS Console で SNS Topic を開く
+2. 「サブスクリプションの作成」からプロトコル「Email」を選択し、通知先メールアドレスを入力する
+3. 入力したメールアドレスに確認メールが届くので、メール内のリンクをクリックして承認する
+4. サブスクリプションのステータスが「確認済み」になったことを確認する
+
+> **注意**: サブスクリプションの承認を行わないと通知が届かない。MonitoringStack デプロイ後は必ず承認を完了すること。
 
 ### 4.3 ダッシュボード
 

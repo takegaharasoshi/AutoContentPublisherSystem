@@ -84,7 +84,7 @@
       },
       "Retry": [
         {
-          "ErrorEquals": ["States.TaskFailed"],
+          "ErrorEquals": ["States.TaskFailed", "States.Timeout"],
           "IntervalSeconds": 30,
           "MaxAttempts": 2,
           "BackoffRate": 2.0
@@ -225,7 +225,7 @@
       },
       "Retry": [
         {
-          "ErrorEquals": ["States.TaskFailed"],
+          "ErrorEquals": ["States.TaskFailed", "States.Timeout"],
           "IntervalSeconds": 30,
           "MaxAttempts": 2,
           "BackoffRate": 2.0
@@ -260,7 +260,7 @@
 | S3_BUCKET_NAME | 画像保存先 S3 バケット名 | CDK で設定 |
 | ENV_NAME | 環境識別子（現時点では `prod`） | CDK で設定 |
 | SET_CODE | バッチセット識別コード（batch_sets.set_code に対応） | Step Functions 入力パラメータ |
-| EXECUTION_ARN | Step Functions 実行 ARN（手動 RunTask 時は空） | Step Functions コンテナオーバーライド（`$$.Execution.Id`） |
+| EXECUTION_ARN | Step Functions 実行 ARN（手動 RunTask 時は空）。`$$.Execution.Id` は名前に反して実行 ARN（`arn:aws:states:...` 形式）を返す | Step Functions コンテナオーバーライド（`$$.Execution.Id`） |
 | SCHEDULED_AT | スケジュール実行日時（ISO 8601、例: 2024-01-15T00:00:00Z）。DB には UTC の DATETIME として保存する（`Z` 接尾辞を除いた値） | Step Functions 入力パラメータ（EventBridge Scheduler の `<aws.scheduler.scheduled-time>` から取得） |
 
 ### 3.2 SNS 投稿バッチ
@@ -271,7 +271,7 @@
 | S3_BUCKET_NAME | 画像保存元 S3 バケット名 | CDK で設定 |
 | ENV_NAME | 環境識別子（現時点では `prod`） | CDK で設定 |
 | SET_CODE | バッチセット識別コード（batch_sets.set_code に対応） | Step Functions 入力パラメータ |
-| EXECUTION_ARN | Step Functions 実行 ARN（手動 RunTask 時は空） | Step Functions コンテナオーバーライド（`$$.Execution.Id`） |
+| EXECUTION_ARN | Step Functions 実行 ARN（手動 RunTask 時は空）。`$$.Execution.Id` は名前に反して実行 ARN（`arn:aws:states:...` 形式）を返す | Step Functions コンテナオーバーライド（`$$.Execution.Id`） |
 | BATCH_SIZE_LIMIT | 1 回のバッチ実行で処理する最大投稿件数（デフォルト: 50） | CDK で設定 |
 
 > **SNS 認証情報**: 環境変数ではなく Secrets Manager からアカウントごとに取得する。Secret 名規約は [design/security.md](../design/security.md) を参照。
@@ -283,7 +283,7 @@
 | DB 準備確認失敗 | db-readiness-check コンテナ内部で最大 8 回 retry 後、Catch → Fail ステートへ遷移 |
 | 画像生成 / SNS 投稿 ECS タスク起動失敗 | Retry（最大 2 回、30 秒間隔） |
 | 画像生成 / SNS 投稿 ECS タスク異常終了 | Retry → Catch → Fail ステートへ遷移 |
-| タイムアウト | 各 Task ステートの `TimeoutSeconds` 到達時に Catch → Fail ステートへ遷移 |
+| タイムアウト | Retry（`States.Timeout` を Retry 対象に含む。一時的なネットワーク遅延等を考慮）→ Catch → Fail ステートへ遷移 |
 | SNS 投稿 SFN 起動失敗 | `Name=$$.Execution.Name` で冪等化した上で Retry（`States.ALL`、最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了 |
 
 ## 5. カスタムメトリクス定義

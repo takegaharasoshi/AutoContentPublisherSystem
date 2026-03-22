@@ -102,11 +102,11 @@
 
 - [ ] **2-8** `services/db-readiness-check/` に DB 準備確認用の Python + Dockerfile を作成し、ECR に push
   - 確認: ECR コンソールでイメージが見える
-  - 備考: DB 接続リトライ（指数バックオフ、最大 8 回）を実装する。詳細は design/batch.md セクション 1.2 参照
+  - 備考: DB 接続リトライ（指数バックオフ、最大 8 回）を実装する。詳細は design/batch.md セクション 1.2 参照。ECR push 時は不変タグ（例: Git コミットハッシュ）を使用する
 
 - [ ] **2-9** DB 準備確認 ECS タスク定義を FoundationStack に追加し、手動 RunTask で疎通確認
   - 確認: Aurora が起動状態のとき: CloudWatch Logs に接続成功ログが出力され、終了コード 0 で終了する
-  - 備考: Aurora が一時停止状態からのリトライ確認は Phase 5-6 で実施する
+  - 備考: `cdk deploy -c env=prod -c dbReadinessCheckImageTag=<tag> FoundationStack` でタスク定義を作成する（`<tag>` は Phase 2-8 で ECR push した不変タグ）。Aurora が一時停止状態からのリトライ確認は Phase 5-6 で実施する
 
 ---
 
@@ -161,7 +161,7 @@
   - 備考: ここが最重要確認ポイント
 
 - [ ] **4-5** Step Functions ステートマシンを追加
-  - 確認: コンソールから手動実行 → ECS タスク起動 → 成功
+  - 確認: コンソールから手動実行 → WaitForDbReady（DB 準備確認）→ ECS タスク起動 → 成功（全ステートが正常遷移）
   - 備考: ImageBatchStack の Step Functions は SnsPostBatchStack の Step Functions ARN を参照するため、Phase 3 完了が前提
 
 - [ ] **4-6** EventBridge Scheduler を追加
