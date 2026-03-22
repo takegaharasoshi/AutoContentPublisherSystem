@@ -30,7 +30,7 @@
 | リソース | 説明 |
 |---|---|
 | VPC | 2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし |
-| Security Group | サービスごとのアクセス制御 |
+| Security Group | サービスごとのアクセス制御（詳細は下表） |
 | S3 Bucket | 画像保存用（Lifecycle Policy: 30 日で自動削除） |
 | Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効、最小 ACU は 0。Aurora MySQL 3.08.0 以降など対応バージョンを採用） |
 | Secrets Manager | DB 認証情報、API キー |
@@ -42,6 +42,21 @@
 | IAM Role (DB 準備確認タスク) | 権限詳細は [design/security.md](../design/security.md) を参照 |
 | Security Group (DB 準備確認) | DB 準備確認 ECS タスク用 |
 | CloudWatch Log Group (DB 準備確認) | DB 準備確認タスクのログ出力先 |
+
+**Security Group ルール詳細**:
+
+| Security Group | 方向 | プロトコル | ポート | ソース/宛先 | 用途 |
+|---|---|---|---|---|---|
+| ECS Fargate 用（バッチ共通） | Inbound | - | - | 全拒否 | バッチ処理のため着信不要 |
+| 同上 | Outbound | TCP | 443 | 0.0.0.0/0 | 外部 API、Secrets Manager、CloudWatch Logs |
+| 同上 | Outbound | TCP | 3306 | Aurora SG | Aurora への DB 接続 |
+| DB 準備確認用 | Inbound | - | - | 全拒否 | バッチ処理のため着信不要 |
+| 同上 | Outbound | TCP | 443 | 0.0.0.0/0 | Secrets Manager、CloudWatch Logs |
+| 同上 | Outbound | TCP | 3306 | Aurora SG | Aurora への DB 接続確認 |
+| Aurora 用 | Inbound | TCP | 3306 | ECS Fargate SG, DB 準備確認 SG | ECS タスクからの DB 接続を許可 |
+| 同上 | Outbound | - | - | なし | アウトバウンド通信なし |
+
+> **設計方針**: ネットワークセキュリティの方針は [design/architecture.md](../design/architecture.md) セクション 2 および [design/security.md](../design/security.md) セクション 3 を参照。
 
 **出力値（他スタックへの共有）**:
 
