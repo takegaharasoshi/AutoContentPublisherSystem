@@ -44,6 +44,7 @@
 
 - 各バッチは開始時に `batch_execution_logs` へ `running` レコードを登録し、終了時に `succeeded` または `failed` に更新する
 - `execution_arn` には Step Functions 実行 ARN を保存し、CloudWatch Logs と突合できるようにする
+- Step Functions 経由の同一実行・同一バッチ種別は `UNIQUE (execution_arn, batch_type)` で重複登録を防ぐ
 - `running` のまま残ったレコードは stale とみなし、Step Functions 実行履歴と CloudWatch Logs を確認して `failed` へ補正する
 
 ### 1.5 CDK デプロイ後チェックリスト
@@ -125,17 +126,19 @@ Step Functions の Retry/Catch 設定の詳細は [specs/workflow.md](../specs/w
 | DB 接続失敗（WaitForDbReady 後） | Aurora の状態を確認。長時間の DB 停止の場合は AWS Console で手動再開 |
 | 外部 API 失敗（画像生成） | API サービスの障害状況を確認。復旧後に手動再実行 |
 | 外部 API 失敗（SNS 投稿） | `post_records` の `status='failed'` を確認。次回バッチ実行で自動再試行される（上限まで）。上限超過の場合は原因調査の上、手動で再試行 |
+| SNS 投稿結果不明 | `post_records` の `status='published_unconfirmed'` を確認。Instagram 側で投稿有無を確認し、投稿済みなら `platform_post_id`、`posted_at`、`status='success'` を補正する。未投稿の場合は原因調査後に手動再実行を判断する |
 | S3 操作失敗 | S3 バケットの状態と IAM 権限を確認 |
 
 ## 4. 監視・通知
 
 ### 4.1 監視方式
 
-監視リソースの具体的なメトリクス名・しきい値は [specs/workflow.md](../specs/workflow.md) セクション 6〜7 を参照。
+監視リソースの具体的なメトリクス名・しきい値と Scheduler DLQ は [specs/workflow.md](../specs/workflow.md) セクション 6〜8 を参照。
 
 | 監視対象 | 通知が来たらやること |
 |---|---|
 | Step Functions 失敗 | CloudWatch Logs で失敗原因を確認。一時的なエラーであれば手動再実行 |
+| Scheduler 起動失敗 | Scheduler DLQ のメッセージを確認し、対象 `set_code` と `scheduled_at` で画像生成 Step Functions を手動実行する |
 | SNS 投稿起動失敗 | カスタムメトリクスで検知。手動で sns-posting-sfn を起動する |
 | ECS タスク異常終了 | CloudWatch Logs でエラー内容を確認。アプリケーションのバグの場合は修正してデプロイ |
 | Aurora 異常 | Aurora の状態を AWS Console で確認。ACU 設定の見直しを検討 |

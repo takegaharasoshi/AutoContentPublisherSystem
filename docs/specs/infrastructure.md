@@ -32,8 +32,8 @@
 | VPC | 2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし。CDK 引数指定: `maxAzs: 2`、`natGateways: 0`、`subnetConfiguration` に `PUBLIC` と `PRIVATE_ISOLATED` の 2 種類のみ定義する |
 | Security Group | サービスごとのアクセス制御（詳細は下表） |
 | S3 Bucket | 画像保存用（Lifecycle Policy: 30 日で自動削除） |
-| Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。Aurora MySQL 3.08.0 以降など対応バージョンを採用）。CDK 引数指定: `serverlessV2MinCapacity: 0`、`serverlessV2MaxCapacity: 1.0`、`enableDataApi: true`（Query Editor / Data API 利用のため必須） |
-| Secrets Manager | DB 認証情報（CDK の Aurora コンストラクトで自動生成）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（手順は [design/operation.md](../design/operation.md) セクション 1.6 参照） |
+| Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。Aurora MySQL 3.08.0 以降など対応バージョンを採用）。CDK 引数指定: `serverlessV2MinCapacity: 0`、`serverlessV2MaxCapacity: 1.0`、`defaultDatabaseName: "acps"`、`enableDataApi: true`（Query Editor / Data API 利用のため必須） |
+| Secrets Manager | DB 認証情報（Aurora 作成時に CDK / RDS で生成し、Secret 名を `acps/{env}/db/credentials` に合わせる）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（手順は [design/operation.md](../design/operation.md) セクション 1.6 参照） |
 | ECS Cluster | 全バッチ共通の実行基盤 |
 | ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、db-readiness-check の 3 つ） |
 | VPC Endpoint | S3（Gateway）のみ |
@@ -92,7 +92,8 @@
 | ECS Task Definition | 画像生成バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する（詳細は [design/cicd.md](../design/cicd.md) を参照） |
 | Container Definition | コンテナ名: `image-batch`。ECR イメージ、環境変数、ログ設定 |
 | Step Functions | ワークフロー定義（ASL は [specs/workflow.md](workflow.md) を参照） |
-| EventBridge Scheduler | セットごとの定期実行スケジュール |
+| EventBridge Scheduler | セットごとの定期実行スケジュール。RetryPolicy と Scheduler DLQ を設定する |
+| SQS Queue (Scheduler DLQ) | EventBridge Scheduler が画像生成 Step Functions を起動できなかったイベントの退避先。詳細は [specs/workflow.md](workflow.md) セクション 8 を参照 |
 | CodePipeline | image-batch 用 CI/CD パイプライン（詳細は [design/cicd.md](../design/cicd.md) を参照） |
 | CodeBuild | Docker ビルド・ECR push・タスク定義更新 |
 | IAM Role | 権限詳細は [design/security.md](../design/security.md) を参照 |
@@ -138,6 +139,7 @@
 **注意事項**:
 
 - 過剰通知を避けるため、必要なアラームから段階的に設定する
+- Scheduler の起動失敗は Step Functions の `ExecutionsFailed` には現れないため、`AWS/Scheduler` メトリクス（`TargetErrorCount`、`TargetErrorThrottledCount`、`InvocationThrottleCount`、`InvocationDroppedCount`、`InvocationsSentToDeadLetterCount`、`InvocationsFailedToBeSentToDeadLetterCount`）を必ず監視対象に含める
 
 ### 3.5 AdminApiStack（将来拡張）
 
@@ -189,4 +191,9 @@ FoundationStack
 
 SnsPostBatchStack
   └── snsPostingSfnArn → ImageBatchStack（画像生成完了後の SNS 投稿 Step Functions 起動用）
+
+ImageBatchStack
+  ├── imageGenerationSfnArn → MonitoringStack
+  ├── imageScheduleGroupName → MonitoringStack（Scheduler 失敗メトリクスの Dimension）
+  └── imageSchedulerDlqArn → 運用確認用
 ```

@@ -80,9 +80,9 @@
   - 確認: コンソールで SG が見える
   - 備考:
 
-- [ ] **2-3** Secrets Manager（DB 接続情報のダミー値 + 画像生成 API キーの箱）を追加
-  - 確認: コンソールでシークレットが 2 つ見える（DB 接続情報用、画像生成 API キー用）
-  - 備考: 画像 API キー用 Secret は CDK で「箱」のみ作成する。実際の API キー値は Phase 7-0 で手動設定する
+- [ ] **2-3** Secrets Manager（画像生成 API キーの箱）を追加
+  - 確認: コンソールで `acps/prod/image/api-key` のシークレットが見える
+  - 備考: 画像 API キー用 Secret は CDK で「箱」のみ作成する。実際の API キー値は Phase 7-0 で手動設定する。DB 接続情報の Secret は Aurora 作成時（Phase 3-1）に `acps/prod/db/credentials` として作成する
 
 - [ ] **2-4** ECS Cluster を追加
   - 確認: コンソールでクラスターが見える
@@ -103,8 +103,8 @@
 **ゴール**: Aurora と DB 準備確認タスクを構築する
 
 - [ ] **3-1** Aurora Serverless v2 を追加
-  - 確認: コンソールで DB クラスターが見える、自動一時停止が設定されている、最小 ACU が 0 になっている
-  - 備考: Aurora MySQL 3.08.0 以降など、自動一時停止対応バージョンを採用する。コストに注意。不安なら Phase 4 の後に回してもよい
+  - 確認: コンソールで DB クラスターが見える、自動一時停止が設定されている、最小 ACU が 0 になっている。Secrets Manager に `acps/prod/db/credentials` が作成されている
+  - 備考: Aurora MySQL 3.08.0 以降など、自動一時停止対応バージョンを採用する。Phase 4 以降の Step Functions 空回しは DB 準備確認タスクに依存するため、Aurora は Phase 4 より前に作成する
 
 - [ ] **3-2** `services/db-readiness-check/` に DB 準備確認用の Python + Dockerfile を作成し、ECR に push
   - 確認: ECR コンソールでイメージが見える
@@ -171,8 +171,8 @@
   - 備考: ImageBatchStack の Step Functions は SnsPostBatchStack の Step Functions ARN を参照するため、Phase 4 完了が前提
 
 - [ ] **5-6** EventBridge Scheduler を追加
-  - 確認: スケジュール時刻に自動で Step Functions が起動される
-  - 備考:
+  - 確認: スケジュール時刻に自動で Step Functions が起動される。Scheduler に RetryPolicy と DLQ が設定されている
+  - 備考: Scheduler 起動失敗は Step Functions の失敗メトリクスには出ないため、DLQ と `AWS/Scheduler` メトリクスで検知する。アラーム設定は Phase 9 で行う
 
 ---
 
@@ -190,7 +190,7 @@
 
 - [ ] **6-3** DDL（テーブル作成 SQL）を作成
   - 確認: ローカル MySQL でテーブルが作れる
-  - 備考: DDL ファイルは `database/` 配下に `V001__create_tables.sql` 形式で配置する。運用方針と命名規約の詳細は [docs/design/operation.md](design/operation.md) セクション 2.3 を参照
+  - 備考: DDL ファイルは `database/` 配下に `V001__create_tables.sql` 形式で配置する。`post_records.status` の `published_unconfirmed`、`batch_execution_logs` の `UNIQUE (execution_arn, batch_type)` を含める。運用方針と命名規約の詳細は [docs/design/operation.md](design/operation.md) セクション 2.3 を参照
 
 - [ ] **6-4** Aurora に DDL を実行
   - 確認: コンソールの Query Editor 等でテーブル確認
@@ -211,8 +211,8 @@
 **ゴール**: 実際に画像を生成して S3 に保存、DB にメタ情報を登録する
 
 - [ ] **7-0** テストデータと Secret の準備
-  - 確認: (1) `batch_sets` にテスト用セットのレコードが存在する (2) `prompt_configs` にテスト用プロンプトのレコードが存在する (3) Secrets Manager の `acps/prod/image/api-key` に実際の API キー値が格納されている
-  - 備考: DB テーブルへの INSERT は Query Editor 等で手動実行する。Secret 値は AWS Console から手動設定する
+  - 確認: (1) `batch_sets` に `is_active=1` のテスト用セットのレコードが存在する (2) `prompt_configs` にテスト用プロンプトのレコードが存在する (3) Secrets Manager の `acps/prod/image/api-key` に実際の API キー値が格納されている
+  - 備考: DB テーブルへの INSERT は Query Editor 等で手動実行する。Secret 値は AWS Console から手動設定する。`prompt_configs.parameters` の JSON スキーマは specs/database.md セクション 7 を参照
 
 - [ ] **7-1** 画像生成 API との疎通（ローカル Python スクリプト）
   - 確認: API を叩いて画像が返る
@@ -253,8 +253,8 @@
   - 備考:
 
 - [ ] **8-3** 投稿結果の DB 記録・重複投稿防止の確認
-  - 確認: 同じ画像が二重投稿されない
-  - 備考:
+  - 確認: 同じ画像が二重投稿されない。publish 後の DB 更新失敗や重複 publish 応答時に `published_unconfirmed` として自動再投稿が止まる
+  - 備考: `published_unconfirmed` は運用確認が必要な終端状態。投稿済み確認後は DB を補正する
 
 ---
 
@@ -263,8 +263,8 @@
 **ゴール**: バッチ失敗時にアラーム通知が届く
 
 - [ ] **9-1** MonitoringStack に SNS Topic + CloudWatch Alarm を定義
-  - 確認: `cdk deploy -c env=prod MonitoringStack` 成功
-  - 備考:
+  - 確認: `cdk deploy -c env=prod MonitoringStack` 成功。Step Functions 失敗、SNS 投稿起動失敗、Scheduler 起動失敗、Aurora 異常のアラームが作成されている
+  - 備考: Scheduler 起動失敗は `AWS/Scheduler` の `TargetErrorCount`、`TargetErrorThrottledCount`、`InvocationThrottleCount`、`InvocationDroppedCount`、`InvocationsSentToDeadLetterCount`、`InvocationsFailedToBeSentToDeadLetterCount` で検知する
 
 - [ ] **9-2** SNS Topic サブスクリプションの設定・確認
   - 確認: (1) SNS Topic にメールサブスクリプションが作成されている (2) 確認メールのリンクをクリックし、ステータスが「確認済み」になっている
