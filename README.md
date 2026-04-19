@@ -4,7 +4,7 @@ AWS 上で動作する画像生成・SNS 自動投稿バッチシステム。
 
 ## 概要
 
-- **画像生成バッチ**: Nano Banana Pro（Gemini 3 Pro 画像 API）で画像を生成し、S3 に保存、DB にメタ情報を登録
+- **画像生成バッチ**: Nano Banana Pro（Gemini 3 Pro 画像 API）（https://ai.google.dev/gemini-api/docs/image-generation?hl=ja）で画像を生成し、S3 に保存、DB にメタ情報を登録
 - **SNS 投稿バッチ**: S3 上の画像を Instagram Graph API を用いて SNS に投稿
 
 ## アーキテクチャ
