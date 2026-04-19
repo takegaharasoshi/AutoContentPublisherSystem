@@ -22,14 +22,14 @@ AWS 上で動作する画像生成・SNS 自動投稿バッチシステム。
 
 ## CDK スタック構成
 
-| スタック | 責務 |
-|---|---|
-| FoundationStack | VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR、DB 準備確認 ECS タスク等の共通基盤 |
-| ImageBatchStack | 画像生成バッチの実行基盤（Task Definition、Step Functions、Scheduler） |
-| SnsPostBatchStack | SNS 投稿バッチの実行基盤 |
-| MonitoringStack | CloudWatch Alarm、SNS Topic による監視・通知 |
-| AdminApiStack | 管理画面バックエンド API（将来拡張） |
-| AdminWebStack | 管理画面フロントエンド（将来拡張） |
+| スタック | フェーズ | 責務 |
+|---|---|---|
+| FoundationStack | 初期 | VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR、DB 準備確認 ECS タスク等の共通基盤 |
+| ImageBatchStack | 初期 | 画像生成バッチの実行基盤（Task Definition、Step Functions、Scheduler） |
+| SnsPostBatchStack | 初期 | SNS 投稿バッチの実行基盤 |
+| MonitoringStack | 初期 | CloudWatch Alarm、SNS Topic による監視・通知 |
+| AdminApiStack | 将来拡張 | 管理画面バックエンド API |
+| AdminWebStack | 将来拡張 | 管理画面フロントエンド |
 
 ## リポジトリ構成
 

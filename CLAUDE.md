@@ -62,6 +62,7 @@ AutoContentPublisherSystem/
 | CI/CD パイプラインを構築する | L1 `docs/design/cicd.md` |
 | 監視・運用手順を設定する | L1 `docs/design/operation.md` + L2 `docs/specs/workflow.md`（監視リソース定義） |
 | 認証・秘密情報の設定を変更する | L1 `docs/design/security.md` |
+| SNS アカウントを追加する | L1 `docs/design/operation.md` セクション 1.6 + L1 `docs/design/security.md`（Secret 名規約） |
 | 開発の次ステップを確認する | `docs/development-plan.md` |
 
 ### SSOT 原則

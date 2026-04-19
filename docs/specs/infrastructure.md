@@ -29,10 +29,10 @@
 
 | リソース | 説明 |
 |---|---|
-| VPC | 2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし |
+| VPC | 2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし。CDK 引数指定: `maxAzs: 2`、`natGateways: 0`、`subnetConfiguration` に `PUBLIC` と `PRIVATE_ISOLATED` の 2 種類のみ定義する |
 | Security Group | サービスごとのアクセス制御（詳細は下表） |
 | S3 Bucket | 画像保存用（Lifecycle Policy: 30 日で自動削除） |
-| Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効、最小 ACU は 0。Aurora MySQL 3.08.0 以降など対応バージョンを採用） |
+| Aurora Serverless v2 | MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。Aurora MySQL 3.08.0 以降など対応バージョンを採用）。CDK 引数指定: `serverlessV2MinCapacity: 0`、`serverlessV2MaxCapacity: 1.0`、`enableDataApi: true`（Query Editor / Data API 利用のため必須） |
 | Secrets Manager | DB 認証情報（CDK の Aurora コンストラクトで自動生成）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（手順は [design/operation.md](../design/operation.md) セクション 1.6 参照） |
 | ECS Cluster | 全バッチ共通の実行基盤 |
 | ECR Repository | サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、db-readiness-check の 3 つ） |
@@ -55,7 +55,11 @@
 | Aurora 用 | Inbound | TCP | 3306 | ECS Fargate SG, DB 準備確認 SG | ECS タスクからの DB 接続を許可 |
 | 同上 | Outbound | - | - | なし | アウトバウンド通信なし |
 
-> **CDK 実装時の注意**: CDK はデフォルトで全アウトバウンドを許可する Security Group を作成する。Aurora 用 SG では `allowAllOutbound: false` を明示的に指定してアウトバウンドルールを削除すること。
+> **CDK 実装時の注意**:
+> - CDK はデフォルトで全アウトバウンドを許可する Security Group を作成する。Aurora 用 SG では `allowAllOutbound: false` を明示的に指定してアウトバウンドルールを削除すること
+> - `ec2.Vpc` のデフォルト構成は Private Subnet + NAT Gateway を含むため、`natGateways: 0` と `subnetConfiguration`（`PUBLIC` と `PRIVATE_ISOLATED` のみ）を明示しないと意図しない NAT Gateway が作成され課金が発生する
+> - Aurora Serverless v2 の `enableDataApi: true` を有効化していない場合、AWS Console の Query Editor からの DDL 実行・データ確認ができない（Phase 6-4 等の検証ステップで使用するため有効化必須）
+> - Aurora の `serverlessV2MaxCapacity` を未指定にするとデフォルト値（リージョンによる）まで自動スケールしてコスト事故の要因となるため、必ず上限値を指定する
 
 > **設計方針**: ネットワークセキュリティの方針は [design/architecture.md](../design/architecture.md) セクション 2 および [design/security.md](../design/security.md) セクション 3 を参照。
 

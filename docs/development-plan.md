@@ -34,7 +34,7 @@
 
 - [ ] **0-4** Python / Docker の動作確認
   - 確認: `python --version`, `docker run hello-world` が通る
-  - 備考:
+  - 備考: 本プロジェクトは WSL2 + Docker Desktop の WSL integration を有効化する前提。Docker Desktop を使わず WSL 内に直接 Docker Engine を導入する場合は、systemd 有効化やユーザーグループ設定などの手動セットアップが別途必要
 
 - [ ] **0-5** リポジトリのディレクトリ構成を作成
   - 確認: `services/`, `shared/`, `infra/` ディレクトリが存在する
@@ -190,11 +190,11 @@
 
 - [ ] **6-3** DDL（テーブル作成 SQL）を作成
   - 確認: ローカル MySQL でテーブルが作れる
-  - 備考:
+  - 備考: DDL ファイルは `database/` 配下に `V001__create_tables.sql` 形式で配置する。運用方針と命名規約の詳細は [docs/design/operation.md](design/operation.md) セクション 2.3 を参照
 
 - [ ] **6-4** Aurora に DDL を実行
   - 確認: コンソールの Query Editor 等でテーブル確認
-  - 備考:
+  - 備考: Query Editor の利用には Aurora Serverless v2 の Data API 有効化（`enableDataApi: true`）が必要。CDK 設定の詳細は [docs/specs/infrastructure.md](specs/infrastructure.md) セクション 3.1 を参照
 
 - [ ] **6-5** ECR に push して ECS RunTask
   - 確認: CloudWatch Logs に「DB 接続成功」が出る

@@ -74,8 +74,21 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 
 | ステートマシン | 権限 |
 |---|---|
-| image-generation-sfn | ECS RunTask（DB 準備確認タスク + 画像生成バッチタスク）、`iam:PassRole`（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため）、SNS 投稿 Step Functions の `StartExecution`、CloudWatch `PutMetricData`（カスタムメトリクス発行用） |
+| image-generation-sfn | ECS RunTask（DB 準備確認タスク + 画像生成バッチタスク）、`iam:PassRole`（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため）、SNS 投稿 Step Functions の `StartExecution`、CloudWatch `PutMetricData`（カスタムメトリクス発行用。詳細は下記注記を参照） |
 | sns-posting-sfn | ECS RunTask（DB 準備確認タスク + SNS 投稿バッチタスク）、`iam:PassRole`（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため） |
+
+> **`cloudwatch:PutMetricData` の IAM 条件**: `PutMetricData` API はリソース ARN をサポートしていないため、ステートメントの `Resource` は `"*"` にせざるを得ない。過剰権限化を避けるため、条件キー `cloudwatch:namespace` で発行可能な Namespace を `ACPS`（本システムのカスタムメトリクス Namespace）に制限する。例:
+>
+> ```json
+> {
+>   "Effect": "Allow",
+>   "Action": "cloudwatch:PutMetricData",
+>   "Resource": "*",
+>   "Condition": {
+>     "StringEquals": { "cloudwatch:namespace": "ACPS" }
+>   }
+> }
+> ```
 
 ### 2.4 EventBridge Scheduler ロール
 

@@ -118,8 +118,9 @@ cdk deploy -c env=prod MonitoringStack
 
 ECR リポジトリにはライフサイクルポリシーを設定し、古いイメージを自動削除する。
 
-- **保持ルール**: タグ付きイメージを最新 10 個まで保持し、それ以前は自動削除する
-- **設定箇所**: FoundationStack の ECR リポジトリ定義に含める
+- **保持ルール（サービス用）**: `auto-content-publisher/image-batch` および `auto-content-publisher/sns-post-batch` はタグ付きイメージを最新 10 個まで保持し、それ以前は自動削除する
+- **保持ルール（db-readiness-check）**: `auto-content-publisher/db-readiness-check` は CDK Context `dbReadinessCheckImageTag` で不変タグを参照する運用のため、ロールバック余地を確保するため**保持数を多めに設定する**（例: 30 個）。古いタグが残っていても Task Definition が参照中でなければ削除されないが、Lifecycle Policy による意図しない削除でロールバック不能化することを避ける目的
+- **設定箇所**: FoundationStack の ECR リポジトリ定義に含める（リポジトリごとに `LifecyclePolicy` を個別指定する）
 
 ## 5. デプロイ方式
 
