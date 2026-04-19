@@ -33,6 +33,14 @@
 >   --input '{"set_code": "fashion-set-1"}'
 > ```
 
+> **手動での画像生成実行**: Scheduler DLQ からの復旧や検証で画像生成 Step Functions を直接起動する場合は、`set_code` と `scheduled_at` を入力パラメータとして渡す。`scheduled_at` は冪等性キーであるため、Scheduler DLQ のメッセージに含まれる値を使用する。検証目的で新規実行する場合は UTC の ISO 8601 形式で明示する。
+>
+> ```bash
+> aws stepfunctions start-execution \
+>   --state-machine-arn arn:aws:states:ap-northeast-1:123456789012:stateMachine:acps-prod-image-generation-sfn \
+>   --input '{"set_code": "fashion-set-1", "scheduled_at": "2026-04-19T00:00:00Z"}'
+> ```
+
 ### 1.3 プロンプト管理
 
 - 画像生成に使用するプロンプトは DB（`prompt_configs` テーブル）で管理する
@@ -44,6 +52,7 @@
 
 - 各バッチは開始時に `batch_execution_logs` へ `running` レコードを登録し、終了時に `succeeded` または `failed` に更新する
 - `execution_arn` には Step Functions 実行 ARN を保存し、CloudWatch Logs と突合できるようにする
+- Step Functions 経由の同一実行・同一バッチ種別は `UNIQUE (execution_arn, batch_type)` で重複登録を防ぐ
 - `running` のまま残ったレコードは stale とみなし、Step Functions 実行履歴と CloudWatch Logs を確認して `failed` へ補正する
 
 ### 1.5 CDK デプロイ後チェックリスト
@@ -125,18 +134,77 @@ Step Functions の Retry/Catch 設定の詳細は [specs/workflow.md](../specs/w
 | DB 接続失敗（WaitForDbReady 後） | Aurora の状態を確認。長時間の DB 停止の場合は AWS Console で手動再開 |
 | 外部 API 失敗（画像生成） | API サービスの障害状況を確認。復旧後に手動再実行 |
 | 外部 API 失敗（SNS 投稿） | `post_records` の `status='failed'` を確認。次回バッチ実行で自動再試行される（上限まで）。上限超過の場合は原因調査の上、手動で再試行 |
+| SNS 投稿結果不明 | `post_records` の `status='published_unconfirmed'` を確認。Instagram 側で投稿有無を確認し、投稿済みなら `platform_post_id`、`posted_at`、`status='success'` を補正する。未投稿の場合は原因調査後に手動再実行を判断する |
 | S3 操作失敗 | S3 バケットの状態と IAM 権限を確認 |
+
+### 3.3 手動補正手順
+
+DB を手動補正する場合は、対象の `set_code`、`generated_image_id`、`sns_account_id`、`post_records.id` を確認してから更新する。更新前後の値はトラブルシューティングログに記録する。
+
+#### published_unconfirmed を投稿済みに補正
+
+Instagram 側で投稿済みを確認できた場合のみ実行する。
+
+```sql
+SELECT pr.*
+FROM post_records pr
+JOIN batch_sets bs ON bs.id = pr.set_id
+WHERE bs.set_code = '<set_code>'
+  AND pr.status = 'published_unconfirmed'
+  AND pr.id = <post_record_id>;
+
+UPDATE post_records
+SET status = 'success',
+    platform_post_id = '<instagram_media_id>',
+    posted_at = '<posted_at_utc>',
+    error_message = NULL
+WHERE id = <post_record_id>
+  AND status = 'published_unconfirmed';
+```
+
+#### published_unconfirmed を未投稿として再試行可能にする
+
+Instagram 側で未投稿を確認し、原因調査後に自動再試行へ戻す場合のみ実行する。更新後、次回 SNS 投稿バッチで新しい attempt が作成される。
+
+```sql
+UPDATE post_records
+SET status = 'failed',
+    error_message = 'manually marked failed after confirming not published'
+WHERE id = <post_record_id>
+  AND status = 'published_unconfirmed';
+```
+
+#### retry 上限超過の確認
+
+上限超過でスキップされている対象は、最大 `attempt_number` と `batch_sets.max_post_retries` を比較して確認する。再試行が必要な場合は、失敗原因を解消した上で `batch_sets.max_post_retries` を一時的に引き上げるか、対象画像を再生成する。
+
+```sql
+SELECT bs.set_code,
+       gi.id AS generated_image_id,
+       sa.id AS sns_account_id,
+       MAX(pr.attempt_number) AS max_attempt_number,
+       bs.max_post_retries
+FROM post_records pr
+JOIN batch_sets bs ON bs.id = pr.set_id
+JOIN generated_images gi ON gi.id = pr.generated_image_id
+JOIN sns_accounts sa ON sa.id = pr.sns_account_id
+WHERE bs.set_code = '<set_code>'
+GROUP BY bs.set_code, gi.id, sa.id, bs.max_post_retries
+HAVING max_attempt_number >= bs.max_post_retries;
+```
 
 ## 4. 監視・通知
 
 ### 4.1 監視方式
 
-監視リソースの具体的なメトリクス名・しきい値は [specs/workflow.md](../specs/workflow.md) セクション 6〜7 を参照。
+監視リソースの具体的なメトリクス名・しきい値と Scheduler DLQ は [specs/workflow.md](../specs/workflow.md) セクション 6〜8 を参照。
 
 | 監視対象 | 通知が来たらやること |
 |---|---|
 | Step Functions 失敗 | CloudWatch Logs で失敗原因を確認。一時的なエラーであれば手動再実行 |
+| Scheduler 起動失敗 | Scheduler DLQ のメッセージを確認し、対象 `set_code` と `scheduled_at` で画像生成 Step Functions を手動実行する |
 | SNS 投稿起動失敗 | カスタムメトリクスで検知。手動で sns-posting-sfn を起動する |
+| SNS 投稿 retry 上限超過 | CloudWatch Logs と `post_records` を確認し、原因解消後に手動補正または画像再生成を行う |
 | ECS タスク異常終了 | CloudWatch Logs でエラー内容を確認。アプリケーションのバグの場合は修正してデプロイ |
 | Aurora 異常 | Aurora の状態を AWS Console で確認。ACU 設定の見直しを検討 |
 

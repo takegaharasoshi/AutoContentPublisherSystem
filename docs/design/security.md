@@ -41,7 +41,51 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 
 > **設計理由**: 従来の `credentials_secret_arn` カラム方式では、DB にアカウントを追加するたびに IAM ポリシーの個別 ARN 追加が必要だった。Secret 名規約に統一することで、プレフィックスベースの IAM ポリシーで最小権限と運用の簡便さを両立する。
 
-### 1.3 将来の複数環境対応
+### 1.3 Secret 値スキーマ
+
+Secret の値は JSON 文字列で管理する。アプリケーションは以下のキーを前提に読み取る。
+
+#### DB 認証情報
+
+Aurora 作成時に CDK / RDS が生成する Secret を使用する。アプリケーションは以下のキーを参照する。
+
+| キー | 必須 | 説明 |
+|---|---|---|
+| username | YES | DB ユーザー名 |
+| password | YES | DB パスワード |
+| host | YES | Aurora writer endpoint |
+| port | YES | MySQL ポート（通常 3306） |
+| dbname | YES | 接続先 DB 名 |
+
+#### 画像生成 API キー
+
+Secret 名: `acps/{env}/image/api-key`
+
+```json
+{
+  "api_key": "..."
+}
+```
+
+#### SNS 認証情報（Instagram）
+
+Secret 名: `acps/{env}/{set_code}/sns/instagram/{account_code}`
+
+```json
+{
+  "access_token": "...",
+  "ig_user_id": "...",
+  "token_expires_at": "2026-01-31T00:00:00Z"
+}
+```
+
+| キー | 必須 | 説明 |
+|---|---|---|
+| access_token | YES | Instagram Graph API のアクセストークン |
+| ig_user_id | YES | 投稿先 Instagram Business Account / Creator Account の ID |
+| token_expires_at | NO | トークン失効日時の運用メモ。アプリケーションの認証には使用しない |
+
+### 1.4 将来の複数環境対応
 
 | リソース | 命名規約 | 例（本番） | 例（開発） |
 |---|---|---|---|
@@ -58,10 +102,11 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 |---|---|
 | DB 準備確認タスクロール | Secrets Manager 読み取り（`acps/{env}/db/*`） |
 | 画像生成バッチタスクロール | S3 読み書き、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/image/*`） |
-| SNS 投稿バッチタスクロール | S3 読み取り、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/*/sns/*`） |
+| SNS 投稿バッチタスクロール | S3 読み取り、Secrets Manager 読み取り（`acps/{env}/db/*` + `acps/{env}/*/sns/*`）、CloudWatch `PutMetricData`（retry 上限超過メトリクス発行用） |
 
 - Secrets Manager 権限はサービスごとに必要最小限のプレフィックスで制限する。DB 認証情報（`acps/{env}/db/*`）は全サービス共通、それ以外は各サービスが必要とする種別のみ付与する
 - DB にアカウントを追加するだけで、IAM ポリシーの変更なしに新しい Secret へのアクセスが可能になる
+- SNS 投稿バッチタスクロールの `cloudwatch:PutMetricData` は、条件キー `cloudwatch:namespace` で `ACPS` のみに制限する
 
 ### 2.2 ECS タスク実行ロール
 
@@ -76,6 +121,12 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 |---|---|
 | image-generation-sfn | ECS RunTask（DB 準備確認タスク + 画像生成バッチタスク）、`iam:PassRole`（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため）、SNS 投稿 Step Functions の `StartExecution`、CloudWatch `PutMetricData`（カスタムメトリクス発行用。詳細は下記注記を参照） |
 | sns-posting-sfn | ECS RunTask（DB 準備確認タスク + SNS 投稿バッチタスク）、`iam:PassRole`（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため） |
+
+> **ECS RunTask の Resource 指定**: Step Functions ASL は Task Definition を family 名（revision なし）で指定し、ECS RunTask が最新 ACTIVE revision を解決する。Step Functions 実行ロールの `ecs:RunTask` は `arn:aws:ecs:{region}:{account}:task-definition/{family}:*` のように family 配下の全 revision を許可する。revision 固定 ARN のみを許可すると、CodeBuild が新 revision を登録した後に実行できなくなる。
+>
+> **Run a Job (`.sync`) に必要な補助権限**: `ecs:StopTask` と `ecs:DescribeTasks` は Step Functions が起動したタスクを待機・停止するために必要で、対象 task ARN は実行時まで確定しないため `Resource: "*"` を許容する。EventBridge 連携用の `events:PutTargets`、`events:PutRule`、`events:DescribeRule` は `StepFunctionsGetEventsForECSTaskRule` に限定する。
+>
+> **iam:PassRole の条件**: `iam:PassRole` は各タスクの task role / execution role の ARN に限定し、`iam:PassedToService = ecs-tasks.amazonaws.com` 条件を付与する。
 
 > **`cloudwatch:PutMetricData` の IAM 条件**: `PutMetricData` API はリソース ARN をサポートしていないため、ステートメントの `Resource` は `"*"` にせざるを得ない。過剰権限化を避けるため、条件キー `cloudwatch:namespace` で発行可能な Namespace を `ACPS`（本システムのカスタムメトリクス Namespace）に制限する。例:
 >
@@ -93,6 +144,7 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 ### 2.4 EventBridge Scheduler ロール
 
 - 画像生成 Step Functions の起動権限（`states:StartExecution`）
+- Scheduler DLQ（SQS）への送信権限（`sqs:SendMessage`）。対象は ImageBatchStack で作成する Scheduler 専用 DLQ に限定する
 
 ### 2.5 CI/CD サービスロール
 
@@ -117,6 +169,7 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 ## 3. ネットワークセキュリティ
 
 - **Aurora**: Isolated Subnet に配置し、インターネットからの直接アクセスを遮断する。Security Group はアウトバウンド通信を完全に遮断する（CDK で `allowAllOutbound: false` を明示指定）
+- **S3**: 画像保存バケットは Block Public Access を有効化し、サーバーサイド暗号化と SSL 強制を設定する。Instagram への画像連携は Presigned URL のみで行い、バケットやオブジェクトを public にはしない
 - **ECS Fargate**: Public Subnet に配置し、Security Group でアクセスを制御する
   - インバウンド: 全ポート拒否（バッチ処理であり外部からの着信接続は不要）
   - アウトバウンド: インターネットアクセス（外部 API、Secrets Manager、CloudWatch Logs）と VPC 内通信（Aurora）を許可
@@ -131,3 +184,4 @@ acps/{env}/{set_code}/sns/{platform}/{account_code}
 - ECS タスクには最小権限の IAM ロールを付与する
 - Secrets Manager 権限はサービスごとに最小プレフィックスで制限し、環境およびサービスを跨いだ参照を避ける
 - Security Group で不要な通信を遮断する
+- CloudWatch Logs と DB の API レスポンス保存欄には、API キー、アクセストークン、Authorization ヘッダー、Presigned URL、Secret 値を出力・保存しない。外部 API レスポンスを保存する場合はマスキング済みの値のみを保存する

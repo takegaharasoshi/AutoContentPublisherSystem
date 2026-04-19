@@ -59,17 +59,22 @@ CodeBuild サービスロールの権限詳細は [design/security.md](security.
 - **buildspec.yml の配置**: サービスごとに `services/{service-name}/buildspec.yml` に配置する（例: `services/image-batch/buildspec.yml`）
 - **Docker ビルドコンテキスト**: リポジトリルートをビルドコンテキストとし、サービスごとの Dockerfile を `-f` オプションで指定する（例: `docker build -f services/image-batch/Dockerfile .`）。これにより `shared/` ディレクトリを `COPY` でコンテナに含めることができる
 - **`.dockerignore`**: リポジトリルートに `.dockerignore` を配置し、ビルドに不要なファイル（`docs/`, `.git/`, `infra/`, `plans/`, ルート直下の `*.md`）を除外する。ビルドコンテキストの肥大化を防ぎ、ビルド時間を短縮する
+- **テスト実行**: Docker イメージを push する前に対象サービスの `pytest` を実行し、失敗時はパイプラインを停止する
 
 ```yaml
 # buildspec.yml の概要
 version: 0.2
 phases:
+  install:
+    commands:
+      - Python 依存関係のインストール
   pre_build:
     commands:
       - ECR ログイン
       - イメージタグの設定（コミットハッシュ）
   build:
     commands:
+      - pytest によるユニットテスト実行
       - Docker イメージのビルド
       - ECR へ push
   post_build:
@@ -118,8 +123,9 @@ cdk deploy -c env=prod MonitoringStack
 
 ECR リポジトリにはライフサイクルポリシーを設定し、古いイメージを自動削除する。
 
-- **保持ルール（サービス用）**: `auto-content-publisher/image-batch` および `auto-content-publisher/sns-post-batch` はタグ付きイメージを最新 10 個まで保持し、それ以前は自動削除する
-- **保持ルール（db-readiness-check）**: `auto-content-publisher/db-readiness-check` は CDK Context `dbReadinessCheckImageTag` で不変タグを参照する運用のため、ロールバック余地を確保するため**保持数を多めに設定する**（例: 30 個）。古いタグが残っていても Task Definition が参照中でなければ削除されないが、Lifecycle Policy による意図しない削除でロールバック不能化することを避ける目的
+- **保持ルール（サービス用）**: `auto-content-publisher/image-batch` および `auto-content-publisher/sns-post-batch` は通常ビルドタグ（Git コミットハッシュ等）を最新 10 個まで保持し、それ以前は自動削除する
+- **保持ルール（ロールバック保護用）**: 長めに残したいイメージには `release-*` などの保護用タグを追加し、通常ビルドタグとは別ルールで最新 30 個程度を保持する。保持対象外のタグは Task Definition が参照中でも Lifecycle Policy により削除され得るため、ロールバック前に ECR 上のイメージ存在を確認する
+- **保持ルール（db-readiness-check）**: `auto-content-publisher/db-readiness-check` は CDK Context `dbReadinessCheckImageTag` で不変タグを参照する運用のため、ロールバック余地を確保するため**保持数を多めに設定する**（例: 30 個）。Task Definition が参照中のタグも Lifecycle Policy の保護対象にはならないため、保持数を超えた古いタグへロールバックする場合は、同等内容のイメージを新しい不変タグで再 push してから CDK Context を更新する
 - **設定箇所**: FoundationStack の ECR リポジトリ定義に含める（リポジトリごとに `LifecyclePolicy` を個別指定する）
 
 ## 5. デプロイ方式

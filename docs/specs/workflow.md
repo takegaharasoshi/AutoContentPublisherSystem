@@ -14,7 +14,7 @@
 
 > **StartSnsPostBatch の呼び出し方式**: `StartSnsPostBatch` で使用する `arn:aws:states:::states:startExecution`（`.sync` サフィックスなし）は非同期呼び出しであり、子実行（sns-posting-sfn）の完了を待たずに即座に成功を返す。画像生成ワークフローは SNS 投稿の起動のみを行い、投稿処理の完了は待機しない。
 
-> **StartSnsPostBatch の冪等性**: `StartExecution.Name` には親ワークフローの `$$.Execution.Name` を渡す。これにより Retry 時も同一要求として扱われ、SNS 投稿 Step Functions の二重起動リスクを抑制できる。
+> **StartSnsPostBatch の冪等性**: `StartExecution.Name` には親ワークフローの `$$.Execution.Name` を渡す。Step Functions Standard の `StartExecution` は同一 `Name` / 同一 `Input` の実行が実行中であれば冪等に同じ応答を返す。一方、同名実行が既に終了済みの場合は `ExecutionAlreadyExists` となるため、このエラーは「子実行は既に作成済み」とみなし成功扱いにする。
 
 > **実行名の文字数制限**: Step Functions の実行名（`Name`）は最大 80 文字に制限されている。本システムでは `$$.Execution.Name` を子実行の Name として使用する。EventBridge Scheduler がデフォルトで生成する実行名は UUID ベース（36 文字）のため通常は問題ないが、カスタム名を使用する場合は 80 文字制限に注意すること。
 
@@ -28,6 +28,8 @@
 >   "scheduled_at": "<aws.scheduler.scheduled-time>"
 > }
 > ```
+
+> **EventBridge Scheduler の Retry / DLQ**: Scheduler には RetryPolicy と SQS DLQ を設定する。RetryPolicy は `MaximumRetryAttempts=3`、`MaximumEventAgeInSeconds=3600` を初期値とする。リトライを使い切っても画像生成 Step Functions を起動できない場合は、失敗イベントを Scheduler DLQ に送信し、MonitoringStack の CloudWatch Alarm で検知する。
 
 ```json
 {
@@ -116,6 +118,10 @@
       },
       "Retry": [
         {
+          "ErrorEquals": ["StepFunctions.ExecutionAlreadyExistsException"],
+          "MaxAttempts": 0
+        },
+        {
           "ErrorEquals": ["States.ALL"],
           "IntervalSeconds": 10,
           "MaxAttempts": 2,
@@ -124,11 +130,19 @@
       ],
       "Catch": [
         {
+          "ErrorEquals": ["StepFunctions.ExecutionAlreadyExistsException"],
+          "Next": "SnsPostAlreadyStarted"
+        },
+        {
           "ErrorEquals": ["States.ALL"],
           "Next": "NotifySnsPostStartFailure"
         }
       ],
       "End": true
+    },
+    "SnsPostAlreadyStarted": {
+      "Type": "Succeed",
+      "Comment": "同じ実行名の SNS 投稿 SFN は既に作成済みのため、二重起動せず成功扱いとする"
     },
     "NotifySnsPostStartFailure": {
       "Type": "Task",
@@ -165,7 +179,7 @@
 }
 ```
 
-> **StartSnsPostBatch のエラーハンドリング**: Retry 後も起動に失敗した場合は `NotifySnsPostStartFailure` でカスタムメトリクスを発行し、`ImageBatchSucceeded` で成功終了する。画像生成 ECS タスクは既に成功しているため、SNS 投稿の起動失敗のみでワークフロー全体を失敗にはしない。
+> **StartSnsPostBatch のエラーハンドリング**: `ExecutionAlreadyExists` は子実行作成済みとして成功扱いにする。それ以外のエラーで Retry 後も起動に失敗した場合は `NotifySnsPostStartFailure` でカスタムメトリクスを発行し、`ImageBatchSucceeded` で成功終了する。画像生成 ECS タスクは既に成功しているため、SNS 投稿の起動失敗のみでワークフロー全体を失敗にはしない。
 
 ## 2. SNS 投稿 Step Functions ASL 定義
 
@@ -297,13 +311,15 @@
 | 画像生成 / SNS 投稿 ECS タスク起動失敗 | Retry（最大 2 回、30 秒間隔） |
 | 画像生成 / SNS 投稿 ECS タスク異常終了 | Retry → Catch → Fail ステートへ遷移 |
 | タイムアウト | Retry（`States.Timeout` を Retry 対象に含む。一時的なネットワーク遅延等を考慮）→ Catch → Fail ステートへ遷移 |
-| SNS 投稿 SFN 起動失敗 | `Name=$$.Execution.Name` で冪等化した上で Retry（`States.ALL`、最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了 |
+| SNS 投稿 SFN 起動失敗 | `Name=$$.Execution.Name` で冪等化する。`ExecutionAlreadyExists` は子実行作成済みとして成功扱い。それ以外は Retry（最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了 |
+| EventBridge Scheduler の画像生成 SFN 起動失敗 | Scheduler Retry（最大 3 回、イベント有効期間 3600 秒）→ Scheduler DLQ 送信 → CloudWatch Alarm で通知 |
 
 ## 5. カスタムメトリクス定義
 
 | メトリクス名 | Namespace | Dimensions | 発行元 | 用途 |
 |---|---|---|---|---|
 | `SnsPostStartFailureCount` | `ACPS` | `StateMachineName=${ImageGenerationSfnName}` | image-generation-sfn（`NotifySnsPostStartFailure` ステート） | SNS 投稿 Step Functions の起動失敗を検知 |
+| `PostRetryExceededCount` | `ACPS` | なし | sns-post-batch アプリケーション | `batch_sets.max_post_retries` 超過により自動投稿対象から外れた画像を検知。対象の `set_code`、`platform`、`account_code`、`generated_image_id` はログに出力する |
 
 ## 6. CloudWatch Alarm 定義
 
@@ -312,6 +328,13 @@
 | image-generation-sfn 失敗 | `AWS/States` | `ExecutionsFailed` | `StateMachineArn=${ImageGenerationSfnArn}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
 | sns-posting-sfn 失敗 | `AWS/States` | `ExecutionsFailed` | `StateMachineArn=${SnsPostingSfnArn}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
 | SNS 投稿起動失敗 | `ACPS` | `SnsPostStartFailureCount` | `StateMachineName=${ImageGenerationSfnName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| SNS 投稿 retry 上限超過 | `ACPS` | `PostRetryExceededCount` | なし | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| Scheduler ターゲット起動失敗 | `AWS/Scheduler` | `TargetErrorCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| Scheduler ターゲット API スロットル | `AWS/Scheduler` | `TargetErrorThrottledCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| Scheduler 呼び出しスロットル | `AWS/Scheduler` | `InvocationThrottleCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| Scheduler リトライ枯渇 | `AWS/Scheduler` | `InvocationDroppedCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| Scheduler DLQ 送信 | `AWS/Scheduler` | `InvocationsSentToDeadLetterCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
+| Scheduler DLQ 送信失敗 | `AWS/Scheduler` | `InvocationsFailedToBeSentToDeadLetterCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
 | Aurora CPU | `AWS/RDS` | `CPUUtilization` | `DBClusterIdentifier=${AuroraClusterIdentifier}` | >= 80% | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
 | Aurora メモリ | `AWS/RDS` | `FreeableMemory` | `DBClusterIdentifier=${AuroraClusterIdentifier}` | <= 268435456（256 MB） | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
 
@@ -342,3 +365,16 @@
 ```
 
 > **ECS タスク異常終了の監視**: ECS タスクの終了コードは CloudWatch の標準メトリクスとして提供されないため、CloudWatch Alarm では直接監視できない。代わりに EventBridge Rule で ECS Task State Change イベントを捕捉し、SNS Topic に通知する。コンテナ起動前に ECS API レベルで失敗したケースは Step Functions 側の `ExecutionsFailed` アラームで補完する。
+
+## 8. Scheduler DLQ 定義
+
+ImageBatchStack で EventBridge Scheduler 専用の SQS DLQ を作成し、画像生成スケジュールの DeadLetterConfig に設定する。
+
+| 項目 | 値 |
+|---|---|
+| Queue 名 | `acps-prod-image-scheduler-dlq` |
+| 用途 | Scheduler が画像生成 Step Functions を起動できなかったイベントの退避 |
+| Message retention | 14 日 |
+| 監視 | `AWS/Scheduler` の `InvocationDroppedCount`、`InvocationsSentToDeadLetterCount`、`InvocationsFailedToBeSentToDeadLetterCount` を MonitoringStack で監視 |
+
+DLQ にメッセージが入った場合は、対象 `set_code` と `scheduled_at` を確認し、必要に応じて画像生成 Step Functions を手動実行する。

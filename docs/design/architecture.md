@@ -80,7 +80,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 - **ステートマシン**: バッチ種別ごとに 1 つ（image-generation-sfn, sns-posting-sfn）
 - **DB 準備確認**: 各ワークフローの最初のステートとして実行
 - **順次実行**: 画像生成 Step Functions の成功後に SNS 投稿 Step Functions を `StartExecution` で起動
-- **子実行名**: image-generation-sfn から sns-posting-sfn を起動する際は、親の `$$.Execution.Name` を `StartExecution.Name` に渡し、同一要求の retry を冪等化する
+- **子実行名**: image-generation-sfn から sns-posting-sfn を起動する際は、親の `$$.Execution.Name` を `StartExecution.Name` に渡し、同一要求の retry を冪等化する。既に同名の子実行が作成済みの場合は二重起動せず成功扱いとする
 - **入力パラメータ**: `set_code`, `scheduled_at` をスケジューラから受け取り、ECS タスクの環境変数として渡す
 - **実行コンテキスト**: `$$.Execution.Id` を `EXECUTION_ARN` として ECS タスクへ渡す
 - **実行モード**: Standard（長時間実行に対応）
@@ -94,6 +94,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 - **スケジュール**: セットごとに cron 式で定義（画像生成 Step Functions のみをターゲット）
 - **ターゲット**: 画像生成 Step Functions ステートマシン（`set_code` と `scheduled_at` を入力に含める）
 - **スケジュール管理**: マスタは IaC（CDK）とする
+- **起動失敗対策**: Scheduler RetryPolicy と SQS DLQ を設定し、起動失敗は `AWS/Scheduler` メトリクスで監視する
 
 ## 4. データストア
 
@@ -118,7 +119,7 @@ EventBridge Scheduler ──▶ Step Functions (image-generation-sfn)
 ## 6. ログ・監視
 
 - ECS タスクのログを CloudWatch Logs に出力（ロググループはサービスごとに分離）
-- Step Functions 失敗、ECS タスク異常終了、Aurora 異常を監視し SNS Topic で通知
+- Step Functions 失敗、EventBridge Scheduler 起動失敗、ECS タスク異常終了、Aurora 異常を監視し SNS Topic で通知
 - 監視リソースの具体的なメトリクス名・しきい値は [specs/workflow.md](../specs/workflow.md) を参照
 
 ## 7. デプロイ方式
