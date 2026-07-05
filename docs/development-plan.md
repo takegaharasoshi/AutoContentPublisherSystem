@@ -30,13 +30,13 @@
 
 **ゴール**: インフラ設計書（docs/infra/）を一時 Fix し、Phase 0〜8 に着手できる状態にする
 
-- [ ] **D-1** 設計書体系の再編とインフラ設計書の HTML 化
+- [x] **D-1** 設計書体系の再編とインフラ設計書の HTML 化
   - 確認: [docs/index.html](index.html) から各設計書が辿れる。インフラ設計書 6 本（architecture / stacks / workflow / security / cicd / operation）が HTML で存在する
-  - 備考: 2026-07-06 実施済み（ユーザー確認待ち）。アプリ設計（旧 batch.md / database.md 等）は docs/_archive/ に退避し、Phase 9 の参考資料とする
+  - 備考: 2026-07-06 実施・ユーザー確認済み。アプリ設計（旧 batch.md / database.md 等）は docs/_archive/ に退避し、Phase 9 の参考資料とする
 
 - [ ] **D-2** 生成 AI レビュー（観点限定・最大 2 巡）
   - 確認: blocker 指摘がゼロ、または修正済みである。改善提案は設計課題リストに記録されている
-  - 備考: レビュー依頼時は以下のテンプレートを使用する
+  - 備考: 2026-07-06 に 2 巡実施（上限到達）。1 巡目: blocker 2 件（Aurora Secret 名の明示指定漏れ / dbReadinessCheckImageTag 未指定時の運用未定義）を修正。2 巡目: 1 巡目修正が生んだ blocker 2 件（synth エラー方式が他スタックデプロイを巻き込む矛盾 / Secret 名変更時の影響の誤記）を修正。改善提案 1 件は設計課題リストに記録。レビュー依頼時は以下のテンプレートを使用する
 
     > docs/infra/ のインフラ設計書をレビューしてください。
     > 指摘してよいのは「開発計画 Phase 0〜8 の作業を妨げる誤り・矛盾・欠落」（blocker）のみです。
@@ -332,4 +332,4 @@
 
 | 日付 | 対象ドキュメント | 課題 | 対応方針 | 対応時期 |
 |---|---|---|---|---|
-| | | | | |
+| 2026-07-06 | docs/infra/stacks.html | セクション 5「スタック間のデータ受け渡し」のツリー図に MonitoringStack への入力（SnsPostingSfnArn・AuroraClusterIdentifier・EcsClusterArn・ImageGenerationSfnName）と DbReadinessCheckSgId の記載がない。3.1 出力一覧・3.4 依存スタックには記載済みのため実装は可能 | Phase 7 実装時に実態へ合わせて追記 | Phase 7 |

@@ -138,12 +138,13 @@ cd infra
 cdk diff -c env=prod &lt;StackName&gt;            # 差分を確認
 cdk deploy -c env=prod &lt;StackName&gt;          # 確認後にデプロイ
 
-# db-readiness-check イメージ更新時
+# FoundationStack は DB 準備確認タスク定義の追加（開発計画 Phase 3-3）以降、
+# db-readiness-check に変更がない場合も常に現行の不変タグを指定する（未指定時は synth エラー）
 cdk diff -c env=prod -c dbReadinessCheckImageTag=&lt;immutable-tag&gt; FoundationStack
 cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;immutable-tag&gt; FoundationStack
 
 # 全スタックを依存順にデプロイする場合
-cdk deploy -c env=prod FoundationStack
+cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;immutable-tag&gt; FoundationStack
 cdk deploy -c env=prod SnsPostBatchStack
 cdk deploy -c env=prod ImageBatchStack
 cdk deploy -c env=prod MonitoringStack</code></pre>
@@ -211,7 +212,10 @@ cdk deploy -c env=prod MonitoringStack</code></pre>
   <li><code>cdk diff -c env=prod &lt;StackName&gt;</code> で差分を確認する</li>
   <li><strong>db-readiness-check のイメージ更新を伴う場合</strong>、手動で Docker イメージをビルドし、不変タグで ECR に push する</li>
   <li><code>cdk deploy -c env=prod &lt;StackName&gt;</code> でインフラを更新する
-    <ul><li>db-readiness-check の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を使用する</li></ul>
+    <ul>
+      <li>db-readiness-check の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を使用する</li>
+      <li>FoundationStack のデプロイでは、db-readiness-check に変更がない場合も現行の <code>dbReadinessCheckImageTag</code> を指定する（Phase 3-3 以降。未指定時は synth エラーとなる）</li>
+    </ul>
   </li>
   <li><strong>ImageBatchStack または SnsPostBatchStack に変更が含まれる場合</strong>、latest ACTIVE revision を確認する
     <ul><li>期待するロール、環境変数、ログ設定、リソース参照が反映されていることを AWS Console または CLI で確認する</li></ul>
@@ -224,7 +228,7 @@ cdk deploy -c env=prod MonitoringStack</code></pre>
 <table>
   <thead><tr><th>変更内容</th><th>パイプライン手動実行</th></tr></thead>
   <tbody>
-    <tr><td>FoundationStack のみ（VPC、S3、Aurora 等。db-readiness-check を除く）</td><td>不要（タスク定義に影響しない）</td></tr>
+    <tr><td>FoundationStack のみ（VPC、S3、Aurora 等。db-readiness-check を除く）</td><td>不要（タスク定義に影響しない）。ただしデプロイ時は現行の <code>dbReadinessCheckImageTag</code> の指定が必要</td></tr>
     <tr><td>FoundationStack + db-readiness-check イメージ更新</td><td>サービスパイプライン不要。手動で Docker ビルド・ECR push 後、<code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を実行</td></tr>
     <tr><td>ImageBatchStack（ロール、環境変数等）</td><td>不要（CDK が latest ACTIVE revision を更新する）</td></tr>
     <tr><td>SnsPostBatchStack（ロール、環境変数等）</td><td>不要（同上）</td></tr>

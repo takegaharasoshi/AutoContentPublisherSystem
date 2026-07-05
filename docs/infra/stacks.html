@@ -53,7 +53,7 @@
     <tr><td>Security Group</td><td>サービスごとのアクセス制御（詳細は下表）</td></tr>
     <tr><td>S3 Bucket</td><td>画像保存用（Lifecycle Policy: 30 日で自動削除）</td></tr>
     <tr><td>Aurora Serverless v2</td><td>MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。Aurora MySQL 3.08.0 以降など対応バージョンを採用）。CDK 引数指定: <code>serverlessV2MinCapacity: 0</code>、<code>serverlessV2MaxCapacity: 1.0</code>、<code>enableDataApi: true</code>（Query Editor / Data API 利用のため必須）</td></tr>
-    <tr><td>Secrets Manager</td><td>DB 認証情報（CDK の Aurora コンストラクトで自動生成）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（Secret 名規約は <a href="security.html">security.html</a> を参照。作成手順はアプリ設計（Phase 9）で定義する）</td></tr>
+    <tr><td>Secrets Manager</td><td>DB 認証情報（CDK の Aurora コンストラクトで自動生成。Secret 名は <code>acps/{env}/db/credentials</code> を明示指定する）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（Secret 名規約は <a href="security.html">security.html</a> を参照。作成手順はアプリ設計（Phase 9）で定義する）</td></tr>
     <tr><td>ECS Cluster</td><td>全バッチ共通の実行基盤</td></tr>
     <tr><td>ECR Repository</td><td>サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、db-readiness-check の 3 つ）</td></tr>
     <tr><td>VPC Endpoint</td><td>S3（Gateway）のみ</td></tr>
@@ -89,6 +89,7 @@
     <li><code>ec2.Vpc</code> のデフォルト構成は Private Subnet + NAT Gateway を含むため、<code>natGateways: 0</code> と <code>subnetConfiguration</code>（<code>PUBLIC</code> と <code>PRIVATE_ISOLATED</code> のみ）を明示しないと意図しない NAT Gateway が作成され課金が発生する</li>
     <li>Aurora Serverless v2 の <code>enableDataApi: true</code> を有効化していない場合、AWS Console の Query Editor からの DDL 実行・データ確認ができない（開発計画 Phase 6 の検証ステップで使用するため有効化必須）</li>
     <li>Aurora の <code>serverlessV2MaxCapacity</code> を未指定にするとデフォルト値（リージョンによる）まで自動スケールしてコスト事故の要因となるため、必ず上限値を指定する</li>
+    <li>Aurora の DB 認証情報 Secret はデフォルトではランダムな名前で生成される。<code>Credentials.fromGeneratedSecret</code> の <code>secretName</code> に <code>acps/{env}/db/credentials</code> を明示指定しないと、Secret 名規約（<a href="security.html#secret-naming">security.html セクション 1.2</a>）および IAM のプレフィックスベース制御（<code>acps/{env}/db/*</code>）と不整合になり、ECS タスクからの Secret 読み取りが権限エラーになる。Secret 名を後から変更すると Secret リソースの置換（マスターパスワードの再生成）が発生し手戻りが大きいため、Phase 3-1 の初回デプロイ時に必ず指定する</li>
   </ul>
 </div>
 
@@ -114,6 +115,7 @@
 <ul>
   <li>DB 準備確認タスクの仕様詳細は <a href="workflow.html#db-readiness">workflow.html セクション 2</a> を参照</li>
   <li>db-readiness-check の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> で新しいイメージタグを明示的に渡す</li>
+  <li>DB 準備確認タスク定義を追加した以降（開発計画 Phase 3-3 以降）は、db-readiness-check に変更がないデプロイでも <code>dbReadinessCheckImageTag</code> の指定が必須である。CDK コードは Context 未指定時にデフォルト値へフォールバックせず、明確なエラーで失敗させる。ただし実装は throw ではなく <code>Annotations.of(stack).addError()</code> を用い、FoundationStack を対象に含むコマンドのみを失敗させること（CDK は選択外のスタックも synth するため、コンストラクタで throw すると他スタックの通常デプロイコマンドまで失敗する）。現行タグは <code>aws ecs describe-task-definition --task-definition &lt;family&gt;</code> の image URI で確認できる</li>
   <li>将来の AdminApiStack、AdminWebStack からも参照される</li>
 </ul>
 
