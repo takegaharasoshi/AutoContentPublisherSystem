@@ -311,8 +311,7 @@
 | 画像生成 / SNS 投稿 ECS タスク起動失敗 | Retry（最大 2 回、30 秒間隔） |
 | 画像生成 / SNS 投稿 ECS タスク異常終了 | Retry → Catch → Fail ステートへ遷移 |
 | タイムアウト | Retry（`States.Timeout` を Retry 対象に含む。一時的なネットワーク遅延等を考慮）→ Catch → Fail ステートへ遷移 |
-| SNS 投稿 SFN 起動失敗 | `Name=$$.Execution.Name` で冪等化する。`ExecutionAlreadyExists` は子実行作成済みとして成功扱い。それ以外は Retry（最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了 |
-| EventBridge Scheduler の画像生成 SFN 起動失敗 | Scheduler Retry（最大 3 回、イベント有効期間 3600 秒）→ Scheduler DLQ 送信 → CloudWatch Alarm で通知 |
+| SNS 投稿 SFN 起動失敗 | `Name=$$.Execution.Name` で冪等化した上で Retry（`States.ALL`、最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了 |
 
 ## 5. カスタムメトリクス定義
 
@@ -328,13 +327,6 @@
 | image-generation-sfn 失敗 | `AWS/States` | `ExecutionsFailed` | `StateMachineArn=${ImageGenerationSfnArn}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
 | sns-posting-sfn 失敗 | `AWS/States` | `ExecutionsFailed` | `StateMachineArn=${SnsPostingSfnArn}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
 | SNS 投稿起動失敗 | `ACPS` | `SnsPostStartFailureCount` | `StateMachineName=${ImageGenerationSfnName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| SNS 投稿 retry 上限超過 | `ACPS` | `PostRetryExceededCount` | なし | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| Scheduler ターゲット起動失敗 | `AWS/Scheduler` | `TargetErrorCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| Scheduler ターゲット API スロットル | `AWS/Scheduler` | `TargetErrorThrottledCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| Scheduler 呼び出しスロットル | `AWS/Scheduler` | `InvocationThrottleCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| Scheduler リトライ枯渇 | `AWS/Scheduler` | `InvocationDroppedCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| Scheduler DLQ 送信 | `AWS/Scheduler` | `InvocationsSentToDeadLetterCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
-| Scheduler DLQ 送信失敗 | `AWS/Scheduler` | `InvocationsFailedToBeSentToDeadLetterCount` | `ScheduleGroup=${ImageScheduleGroupName}` | >= 1 | 300 秒 | 1 | 1 | notBreaching | SNS Topic |
 | Aurora CPU | `AWS/RDS` | `CPUUtilization` | `DBClusterIdentifier=${AuroraClusterIdentifier}` | >= 80% | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
 | Aurora メモリ | `AWS/RDS` | `FreeableMemory` | `DBClusterIdentifier=${AuroraClusterIdentifier}` | <= 268435456（256 MB） | 300 秒 | 3 | 2 | notBreaching | SNS Topic |
 

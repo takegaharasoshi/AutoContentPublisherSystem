@@ -190,7 +190,7 @@
 
 - [ ] **6-3** DDL（テーブル作成 SQL）を作成
   - 確認: ローカル MySQL でテーブルが作れる
-  - 備考: DDL ファイルは `database/` 配下に `V001__create_tables.sql` 形式で配置する。`post_records.status` の `published_unconfirmed`、`batch_execution_logs` の `attempt_count` と `UNIQUE (execution_arn, batch_type)` を含める。運用方針と命名規約の詳細は [docs/design/operation.md](design/operation.md) セクション 2.3 を参照
+  - 備考: DDL ファイルは `database/` 配下に `V001__create_tables.sql` 形式で配置する。運用方針と命名規約の詳細は [docs/design/operation.md](design/operation.md) セクション 2.3 を参照
 
 - [ ] **6-4** Aurora に DDL を実行
   - 確認: コンソールの Query Editor 等でテーブル確認
@@ -263,8 +263,8 @@
 **ゴール**: バッチ失敗時にアラーム通知が届く
 
 - [ ] **9-1** MonitoringStack に SNS Topic + CloudWatch Alarm を定義
-  - 確認: `cdk deploy -c env=prod MonitoringStack` 成功。Step Functions 失敗、SNS 投稿起動失敗、SNS 投稿 retry 上限超過、Scheduler 起動失敗、Aurora 異常のアラームが作成されている
-  - 備考: Scheduler 起動失敗は `AWS/Scheduler` の `TargetErrorCount`、`TargetErrorThrottledCount`、`InvocationThrottleCount`、`InvocationDroppedCount`、`InvocationsSentToDeadLetterCount`、`InvocationsFailedToBeSentToDeadLetterCount` で検知する
+  - 確認: `cdk deploy -c env=prod MonitoringStack` 成功
+  - 備考:
 
 - [ ] **9-2** SNS Topic サブスクリプションの設定・確認
   - 確認: (1) SNS Topic にメールサブスクリプションが作成されている (2) 確認メールのリンクをクリックし、ステータスが「確認済み」になっている

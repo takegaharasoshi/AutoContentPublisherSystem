@@ -160,9 +160,7 @@ SNS 投稿バッチには 2 種類のリカバリが存在する:
 - 異常終了時は例外ハンドラで `status='failed'`、`finished_at`、`error_message` を更新する
 - `batch_execution_logs` の INSERT/UPDATE が失敗した場合は、バッチ全体を失敗（終了コード 1）とする。ログ記録はバッチ実行の追跡に不可欠であり、記録なしでの続行は運用上のリスクが高いため
 - プロセス強制終了などで `running` のまま残ったレコードは、Step Functions 実行履歴と CloudWatch Logs を正とし、運用で stale レコードとして補正する
-- `batch_execution_logs` は `execution_arn` がある Step Functions 実行について `UNIQUE (execution_arn, batch_type)` で二重 INSERT を防ぐ。MySQL の UNIQUE は NULL を複数許容するため、手動 RunTask など `execution_arn` が NULL の実行は複数記録できる
-- 同一実行で UNIQUE 制約に衝突した場合は Step Functions Retry による再起動とみなし、既存レコードを `status='running'`、`finished_at=NULL` に戻し、`attempt_count=attempt_count+1` として以降はそのレコードを UPDATE する
-- 既存レコードが `status='succeeded'` の場合は同一実行が既に正常完了しているため、再処理せず WARNING ログを出力して終了コード 0 で終了する
+- `batch_execution_logs` にはテーブルレベルの一意性制約を設けない（`execution_arn` が NULL 許容のため単純な UNIQUE 制約は不適合）。同一実行での二重 INSERT はアプリケーション側で防御する（開始時に 1 回だけ INSERT し、以降は UPDATE のみ）
 
 ## 2. 画像生成バッチ
 
@@ -250,10 +248,6 @@ Step Functions ASL 定義と環境変数一覧は [specs/workflow.md](../specs/w
   │         - platform_container_id が NOT NULL、platform_post_id が NULL → ステップ 5 へ（パブリッシュから再開）
   │         - platform_container_id が NULL → ステップ 4 へ（コンテナ作成から開始）
   │       - pending レコードが存在しない場合（初回、または前回 failed で完了している場合）:
-  │         - 新規 attempt 作成前に retry 上限チェックを行う。該当 (image, account) の最大 attempt_number が
-  │           max_post_retries（デフォルト 3）以上の場合はスキップし、ログに警告を出力する
-  │           併せて CloudWatch カスタムメトリクス `PostRetryExceededCount` を発行する
-  │           （初回は attempt_number=1、再試行ごとに +1。max_post_retries=3 なら最大 3 回試行）
   │         - 新規に status='pending' のレコードを挿入（attempt_number インクリメント）してステップ 4 へ
   │
   ├── 4. Presigned URL 発行 + コンテナ作成
