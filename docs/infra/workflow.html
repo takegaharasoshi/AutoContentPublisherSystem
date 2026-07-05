@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ワークフロー実装仕様 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / インフラ設計 / ワークフロー実装仕様</nav>
+<h1>ワークフロー実装仕様</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">一時 Fix</span>
+  <span>最終更新: 2026-07-06</span>
+</div>
+
+<p>Step Functions・EventBridge Scheduler・DB 準備確認タスク・監視リソースの実装仕様を定義する。アーキテクチャ上の位置付けは <a href="architecture.html">architecture.html</a>、CDK リソース定義は <a href="stacks.html">stacks.html</a>、運用時の対応手順は <a href="operation.html">operation.html</a> を参照。</p>
+
+<div class="note">
+  <span class="callout-title">アプリ仕様は未確定</span>
+  本ドキュメントの ASL・環境変数はワークフローの「器」の定義であり、業務ロジックに依存しない。ECS タスク内部の処理内容（画像生成・SNS 投稿のロジック）はアプリ設計（<a href="../app/index.html">docs/app/</a>、Phase 9）で定義する。
+</div>
+
+<h2 id="overview">1. ワークフロー構成</h2>
+
+<h3>1.1 順次実行</h3>
+<p>画像生成バッチと SNS 投稿バッチは順次実行される（全体像は <a href="architecture.html#overall">architecture.html セクション 1</a> の図を参照）。</p>
+<ol>
+  <li>EventBridge Scheduler が cron 式で image-generation-sfn を起動する</li>
+  <li>image-generation-sfn: <code>WaitForDbReady</code>（DB 準備確認）→ <code>RunImageBatchTask</code>（画像生成バッチ）→ 成功時に <code>StartSnsPostBatch</code> で sns-posting-sfn を非同期起動する</li>
+  <li>sns-posting-sfn: <code>WaitForDbReady</code>（DB 準備確認）→ <code>RunSnsPostBatchTask</code>（SNS 投稿バッチ）</li>
+</ol>
+<ul>
+  <li>SNS 投稿 Step Functions（sns-posting-sfn）は独立したステートマシンのため、手動での再投稿や投稿のみの単独実行も可能</li>
+  <li>EventBridge Scheduler は画像生成 Step Functions のみに設定し、SNS 投稿用のスケジューラは不要</li>
+</ul>
+
+<h3>1.2 共通の実装方針</h3>
+<ul>
+  <li><strong>TaskDefinition の指定方式</strong>: ASL 内の <code>${...TaskDefFamily}</code> プレースホルダには、CDK が ECS Task Definition の family 名（例: <code>acps-prod-image-batch</code>）を渡す。ECS RunTask API は family 名指定で常に ACTIVE な最新リビジョンを使用するため、デプロイ時に ASL の更新は不要</li>
+  <li><strong>SecurityGroup の指定方式</strong>: <code>${BatchSgId}</code> は FoundationStack で定義される「ECS Fargate 用（バッチ共通）」Security Group を指す。画像生成バッチと SNS 投稿バッチは同一の Security Group を共有する。DB 準備確認タスクには専用の <code>${DbReadinessCheckSgId}</code> を使用する</li>
+  <li><strong>Task ステートのタイムアウト</strong>: ハング時にワークフローが長時間ぶら下がらないよう、<code>WaitForDbReady=900</code> 秒、<code>RunImageBatchTask=3600</code> 秒、<code>StartSnsPostBatch=60</code> 秒、<code>RunSnsPostBatchTask=3600</code> 秒の明示タイムアウトを設定する。<code>WaitForDbReady</code> の 900 秒は、ECS Fargate 起動（約 60 秒）+ DB 接続リトライ（最大約 510 秒）+ バッファ（約 330 秒）を考慮した値である</li>
+  <li><strong>StartSnsPostBatch の呼び出し方式</strong>: <code>arn:aws:states:::states:startExecution</code>（<code>.sync</code> サフィックスなし）は非同期呼び出しであり、子実行（sns-posting-sfn）の完了を待たずに即座に成功を返す。画像生成ワークフローは SNS 投稿の起動のみを行い、投稿処理の完了は待機しない</li>
+  <li><strong>StartSnsPostBatch の冪等性</strong>: <code>StartExecution.Name</code> には親ワークフローの <code>$$.Execution.Name</code> を渡す。Step Functions Standard の <code>StartExecution</code> は同一 <code>Name</code> / 同一 <code>Input</code> の実行が実行中であれば冪等に同じ応答を返す。一方、同名実行が既に終了済みの場合は <code>ExecutionAlreadyExists</code> となるため、このエラーは「子実行は既に作成済み」とみなし成功扱いにする</li>
+  <li><strong>実行名の文字数制限</strong>: Step Functions の実行名（<code>Name</code>）は最大 80 文字に制限されている。本システムでは <code>$$.Execution.Name</code> を子実行の Name として使用する。EventBridge Scheduler がデフォルトで生成する実行名は UUID ベース（36 文字）のため通常は問題ないが、カスタム名を使用する場合は 80 文字制限に注意すること</li>
+  <li><strong>ResultPath の設定</strong>: <code>WaitForDbReady</code> と <code>RunImageBatchTask</code> には <code>"ResultPath": null</code> を設定し、ECS RunTask.sync の出力（DescribeTasks レスポンス）で入力パラメータ（<code>$.set_code</code> 等）が上書きされるのを防ぐ</li>
+</ul>
+
+<h3>1.3 EventBridge Scheduler の Input テンプレート</h3>
+<p>Scheduler は以下の形式で画像生成 Step Functions を起動する。<code>&lt;aws.scheduler.scheduled-time&gt;</code> は EventBridge Scheduler が実行時刻（UTC、ISO 8601）に自動置換する。</p>
+<pre><code>{
+  "set_code": "fashion-set-1",
+  "scheduled_at": "&lt;aws.scheduler.scheduled-time&gt;"
+}</code></pre>
+
+<h3>1.4 EventBridge Scheduler の Retry / DLQ</h3>
+<p>Scheduler には RetryPolicy と SQS DLQ を設定する。RetryPolicy は <code>MaximumRetryAttempts=3</code>、<code>MaximumEventAgeInSeconds=3600</code> を初期値とする。リトライを使い切っても画像生成 Step Functions を起動できない場合は、失敗イベントを Scheduler DLQ（セクション 10）に送信し、MonitoringStack の CloudWatch Alarm で検知する。</p>
+
+<h2 id="db-readiness">2. DB 準備確認タスク（db-readiness-check）仕様</h2>
+
+<p>Aurora Serverless v2 の自動一時停止からの再開に対応するため、各 Step Functions ワークフローの最初のステートとして DB 準備確認 ECS タスクを実行する。バッチアプリケーション（後続の ECS タスク）は DB が利用可能な状態を前提とする。</p>
+
+<ul>
+  <li><strong>ECS Task Definition</strong>: FoundationStack で定義（db-readiness-check）。両ワークフローで共有する</li>
+  <li><strong>リソース</strong>: 最小構成（0.25 vCPU / 0.5 GB）</li>
+  <li><strong>配置</strong>: Public Subnet（<code>assignPublicIp=ENABLED</code>）。Aurora（Isolated Subnet）へ VPC 内部ルーティングで接続する</li>
+  <li><strong>リトライ設計</strong>:
+    <pre><code>最大リトライ回数: 8
+リトライ間隔: 指数バックオフ（2, 4, 8, 16, 32, 64, 128, 256 秒）
+対象例外: OperationalError, InterfaceError</code></pre>
+    Aurora Serverless v2 のコールドスタート（自動一時停止からの再開）は通常 15〜30 秒程度だが、リージョン状況や負荷によっては数分かかる場合があるため、安全側に倒して最大約 510 秒の待機時間を確保する
+  </li>
+  <li><strong>Step Functions との責務分担</strong>: <code>WaitForDbReady</code> ステートには Step Functions の Retry を設定しない。待機・再試行は db-readiness-check コンテナ内部で完結させ、総待機時間を上記の約 510 秒に固定する</li>
+  <li><strong>認証情報</strong>: Secrets Manager（DB 認証情報）から取得</li>
+  <li><strong>成功時</strong>: 終了コード 0 で終了し、Step Functions が次のステートへ遷移する</li>
+  <li><strong>失敗時</strong>: 終了コード 1 で終了し、Step Functions の Catch でハンドリングする</li>
+</ul>
+
+<div class="decision">
+  <span class="callout-title">設計変更理由</span>
+  DB 接続リトライをバッチアプリケーションコードから分離し、Step Functions ワークフローの責務とした。これにより、バッチアプリケーションは DB が利用可能な状態を前提として実装できる。
+</div>
+
+<div class="decision">
+  <span class="callout-title">ECS Fargate 採用理由</span>
+  VPC 内の Lambda はパブリック IP が付与されないため、NAT Gateway または VPC Endpoint（Interface 型）なしでは Secrets Manager にアクセスできない。ECS Fargate は <code>assignPublicIp=ENABLED</code> でパブリック IP を取得可能なため、追加のネットワークリソースなしで Secrets Manager にアクセスできる。起動レイテンシ（30〜60 秒）の増加はバッチ用途では許容範囲内であり、月額コストも $0.01 未満と無視できる水準。
+</div>
+
+<h2 id="image-asl">3. 画像生成 Step Functions ASL 定義</h2>
+
+<pre><code>{
+  "StartAt": "WaitForDbReady",
+  "States": {
+    "WaitForDbReady": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 900,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${DbReadinessCheckTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${DbReadinessCheckSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "Next": "RunImageBatchTask"
+    },
+    "RunImageBatchTask": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 3600,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${ImageBatchTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${BatchSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "image-batch",
+              "Environment": [
+                { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" },
+                { "Name": "SCHEDULED_AT", "Value.$": "$.scheduled_at" }
+              ]
+            }
+          ]
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "States.Timeout"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "Next": "StartSnsPostBatch"
+    },
+    "StartSnsPostBatch": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::states:startExecution",
+      "TimeoutSeconds": 60,
+      "Parameters": {
+        "StateMachineArn": "${SnsPostingSfnArn}",
+        "Name.$": "$$.Execution.Name",
+        "Input": {
+          "set_code.$": "$.set_code"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["StepFunctions.ExecutionAlreadyExistsException"],
+          "MaxAttempts": 0
+        },
+        {
+          "ErrorEquals": ["States.ALL"],
+          "IntervalSeconds": 10,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["StepFunctions.ExecutionAlreadyExistsException"],
+          "Next": "SnsPostAlreadyStarted"
+        },
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "NotifySnsPostStartFailure"
+        }
+      ],
+      "End": true
+    },
+    "SnsPostAlreadyStarted": {
+      "Type": "Succeed",
+      "Comment": "同じ実行名の SNS 投稿 SFN は既に作成済みのため、二重起動せず成功扱いとする"
+    },
+    "NotifySnsPostStartFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:cloudwatch:putMetricData",
+      "Parameters": {
+        "Namespace": "ACPS",
+        "MetricData": [
+          {
+            "MetricName": "SnsPostStartFailureCount",
+            "Dimensions": [
+              {
+                "Name": "StateMachineName",
+                "Value": "${ImageGenerationSfnName}"
+              }
+            ],
+            "Value": 1,
+            "Unit": "Count"
+          }
+        ]
+      },
+      "Comment": "SNS 投稿 SFN の起動失敗を CloudWatch カスタムメトリクスとして発行し、MonitoringStack のアラームで検知する",
+      "Next": "ImageBatchSucceeded"
+    },
+    "ImageBatchSucceeded": {
+      "Type": "Succeed",
+      "Comment": "画像生成は成功済みのため、SNS 投稿 SFN の起動失敗時もワークフローは成功終了とする。SNS 投稿が起動されなかったことはカスタムメトリクスのアラームで検知し、手動で sns-posting-sfn を起動する"
+    },
+    "HandleError": {
+      "Type": "Fail",
+      "Error": "ImageBatchFailed",
+      "Cause": "Image batch task failed after retries"
+    }
+  }
+}</code></pre>
+
+<div class="note">
+  <span class="callout-title">StartSnsPostBatch のエラーハンドリング</span>
+  <code>ExecutionAlreadyExists</code> は子実行作成済みとして成功扱いにする。それ以外のエラーで Retry 後も起動に失敗した場合は <code>NotifySnsPostStartFailure</code> でカスタムメトリクスを発行し、<code>ImageBatchSucceeded</code> で成功終了する。画像生成 ECS タスクは既に成功しているため、SNS 投稿の起動失敗のみでワークフロー全体を失敗にはしない。
+</div>
+
+<h2 id="sns-asl">4. SNS 投稿 Step Functions ASL 定義</h2>
+
+<p>画像生成 Step Functions から <code>startExecution</code>（非同期）で起動される。画像生成 Step Functions は SNS 投稿の完了を待たずに終了する。手動での単独起動も可能。</p>
+
+<pre><code>{
+  "StartAt": "WaitForDbReady",
+  "States": {
+    "WaitForDbReady": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 900,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${DbReadinessCheckTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${DbReadinessCheckSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "Next": "RunSnsPostBatchTask"
+    },
+    "RunSnsPostBatchTask": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 3600,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${SnsPostBatchTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${BatchSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "sns-post-batch",
+              "Environment": [
+                { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" }
+              ]
+            }
+          ]
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "States.Timeout"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "End": true
+    },
+    "HandleError": {
+      "Type": "Fail",
+      "Error": "SnsPostBatchFailed",
+      "Cause": "SNS post batch task failed after retries"
+    }
+  }
+}</code></pre>
+
+<h2 id="env-vars">5. 環境変数一覧</h2>
+
+<div class="note">
+  <span class="callout-title">環境変数は「受け渡し契約」として定義</span>
+  <code>SET_CODE</code> / <code>SCHEDULED_AT</code> の業務上の意味付け（DB のどの値と対応するか等）はアプリ設計（Phase 9）で確定する。空回し段階（Phase 4〜5）では <code>fashion-set-1</code> 等のダミー値を渡し、コンテナ側では使用しない。
+</div>
+
+<h3>5.1 画像生成バッチ</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>変数名</th><th>説明</th><th>取得元</th></tr></thead>
+  <tbody>
+    <tr><td><code>DB_SECRET_ARN</code></td><td>DB 接続情報の Secret ARN</td><td>CDK で設定</td></tr>
+    <tr><td><code>API_SECRET_ARN</code></td><td>画像生成 API キーの Secret ARN</td><td>CDK で設定</td></tr>
+    <tr><td><code>S3_BUCKET_NAME</code></td><td>画像保存先 S3 バケット名</td><td>CDK で設定</td></tr>
+    <tr><td><code>ENV_NAME</code></td><td>環境識別子（現時点では <code>prod</code>）</td><td>CDK で設定</td></tr>
+    <tr><td><code>SET_CODE</code></td><td>バッチセット識別コード</td><td>Step Functions 入力パラメータ</td></tr>
+    <tr><td><code>EXECUTION_ARN</code></td><td>Step Functions 実行 ARN（手動 RunTask 時は空）。<code>$$.Execution.Id</code> は名前に反して実行 ARN（<code>arn:aws:states:...</code> 形式）を返す</td><td>Step Functions コンテナオーバーライド（<code>$$.Execution.Id</code>）</td></tr>
+    <tr><td><code>SCHEDULED_AT</code></td><td>スケジュール実行日時（ISO 8601、例: 2026-04-19T00:00:00Z）</td><td>Step Functions 入力パラメータ（EventBridge Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> から取得）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>5.2 SNS 投稿バッチ</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>変数名</th><th>説明</th><th>取得元</th></tr></thead>
+  <tbody>
+    <tr><td><code>DB_SECRET_ARN</code></td><td>DB 接続情報の Secret ARN</td><td>CDK で設定</td></tr>
+    <tr><td><code>S3_BUCKET_NAME</code></td><td>画像保存元 S3 バケット名</td><td>CDK で設定</td></tr>
+    <tr><td><code>ENV_NAME</code></td><td>環境識別子（現時点では <code>prod</code>）</td><td>CDK で設定</td></tr>
+    <tr><td><code>SET_CODE</code></td><td>バッチセット識別コード</td><td>Step Functions 入力パラメータ</td></tr>
+    <tr><td><code>EXECUTION_ARN</code></td><td>Step Functions 実行 ARN（手動 RunTask 時は空）</td><td>Step Functions コンテナオーバーライド（<code>$$.Execution.Id</code>）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">SNS 認証情報</span>
+  環境変数ではなく Secrets Manager からアカウントごとに取得する。Secret 名規約は <a href="security.html">security.html</a> を参照。バッチ処理件数の制御用環境変数（<code>BATCH_SIZE_LIMIT</code> 等）はアプリ設計（Phase 9）で定義する。
+</div>
+
+<h3>5.3 DB 準備確認タスク</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>変数名</th><th>説明</th><th>取得元</th></tr></thead>
+  <tbody>
+    <tr><td><code>DB_SECRET_ARN</code></td><td>DB 接続情報の Secret ARN</td><td>CDK で設定</td></tr>
+    <tr><td><code>ENV_NAME</code></td><td>環境識別子（現時点では <code>prod</code>）</td><td>CDK で設定</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">注記</span>
+  DB 準備確認タスクの環境変数はすべて CDK で Task Definition に静的設定する。Step Functions からのコンテナオーバーライドはない。
+</div>
+
+<h2 id="error-handling">6. Step Functions エラーハンドリング</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>エラー種別</th><th>対応</th></tr></thead>
+  <tbody>
+    <tr><td>DB 準備確認失敗</td><td>db-readiness-check コンテナ内部で最大 8 回 retry 後、Catch → Fail ステートへ遷移</td></tr>
+    <tr><td>画像生成 / SNS 投稿 ECS タスク起動失敗</td><td>Retry（最大 2 回、30 秒間隔）</td></tr>
+    <tr><td>画像生成 / SNS 投稿 ECS タスク異常終了</td><td>Retry → Catch → Fail ステートへ遷移</td></tr>
+    <tr><td>タイムアウト</td><td>Retry（<code>States.Timeout</code> を Retry 対象に含む。一時的なネットワーク遅延等を考慮）→ Catch → Fail ステートへ遷移</td></tr>
+    <tr><td>SNS 投稿 SFN 起動失敗</td><td><code>Name=$$.Execution.Name</code> で冪等化した上で Retry（<code>States.ALL</code>、最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="custom-metrics">7. カスタムメトリクス定義</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>メトリクス名</th><th>Namespace</th><th>Dimensions</th><th>発行元</th><th>用途</th></tr></thead>
+  <tbody>
+    <tr><td><code>SnsPostStartFailureCount</code></td><td><code>ACPS</code></td><td><code>StateMachineName=${ImageGenerationSfnName}</code></td><td>image-generation-sfn（<code>NotifySnsPostStartFailure</code> ステート）</td><td>SNS 投稿 Step Functions の起動失敗を検知</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">アプリケーション発行のカスタムメトリクス</span>
+  バッチアプリケーション側が発行するカスタムメトリクス（投稿再試行の上限超過検知等）はアプリ設計（Phase 9）で定義する。SNS 投稿バッチタスクロールには <code>cloudwatch:PutMetricData</code>（Namespace を <code>ACPS</code> に制限）を先行して付与している（<a href="security.html">security.html</a> を参照）。
+</div>
+
+<h2 id="alarms">8. CloudWatch Alarm 定義</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>監視対象</th><th>Namespace</th><th>メトリクス</th><th>Dimensions</th><th>条件</th><th>Period</th><th>EvaluationPeriods</th><th>DatapointsToAlarm</th><th>TreatMissingData</th><th>通知先</th></tr></thead>
+  <tbody>
+    <tr><td>image-generation-sfn 失敗</td><td><code>AWS/States</code></td><td><code>ExecutionsFailed</code></td><td><code>StateMachineArn=${ImageGenerationSfnArn}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>sns-posting-sfn 失敗</td><td><code>AWS/States</code></td><td><code>ExecutionsFailed</code></td><td><code>StateMachineArn=${SnsPostingSfnArn}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>SNS 投稿起動失敗</td><td><code>ACPS</code></td><td><code>SnsPostStartFailureCount</code></td><td><code>StateMachineName=${ImageGenerationSfnName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>Aurora CPU</td><td><code>AWS/RDS</code></td><td><code>CPUUtilization</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&gt;= 80%</td><td>300 秒</td><td>3</td><td>2</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>Aurora メモリ</td><td><code>AWS/RDS</code></td><td><code>FreeableMemory</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&lt;= 268435456（256 MB）</td><td>300 秒</td><td>3</td><td>2</td><td>notBreaching</td><td>SNS Topic</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">閾値の設計方針</span>
+  Aurora のアラームは <code>notBreaching</code>（データ欠損時はアラームを発報しない）を使用する。Aurora Serverless v2 の自動一時停止中はメトリクスが発行されないため、<code>missing</code> や <code>breaching</code> にすると一時停止のたびにアラームが発報される。Step Functions とカスタムメトリクスのアラームも同様に <code>notBreaching</code> とする。閾値は初期値であり、実運用の負荷状況に応じて調整する。
+</div>
+
+<h2 id="eventbridge-rule">9. EventBridge Rule 定義</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ルール</th><th>イベントソース</th><th>フィルタ条件</th><th>アクション</th></tr></thead>
+  <tbody>
+    <tr><td>ECS タスク異常終了検知</td><td>ECS Task State Change</td><td><code>lastStatus=STOPPED</code> かつ <code>clusterArn=${EcsClusterArn}</code> かつ <code>containers[].exitCode != 0</code></td><td>SNS Topic に通知</td></tr>
+  </tbody>
+</table>
+</div>
+
+<pre><code>{
+  "source": ["aws.ecs"],
+  "detail-type": ["ECS Task State Change"],
+  "detail": {
+    "lastStatus": ["STOPPED"],
+    "clusterArn": ["${EcsClusterArn}"],
+    "containers": {
+      "exitCode": [
+        {
+          "anything-but": 0
+        }
+      ]
+    }
+  }
+}</code></pre>
+
+<div class="note">
+  <span class="callout-title">ECS タスク異常終了の監視</span>
+  ECS タスクの終了コードは CloudWatch の標準メトリクスとして提供されないため、CloudWatch Alarm では直接監視できない。代わりに EventBridge Rule で ECS Task State Change イベントを捕捉し、SNS Topic に通知する。コンテナ起動前に ECS API レベルで失敗したケースは Step Functions 側の <code>ExecutionsFailed</code> アラームで補完する。
+</div>
+
+<h2 id="scheduler-dlq">10. Scheduler DLQ 定義</h2>
+<p>ImageBatchStack で EventBridge Scheduler 専用の SQS DLQ を作成し、画像生成スケジュールの DeadLetterConfig に設定する。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>値</th></tr></thead>
+  <tbody>
+    <tr><td>Queue 名</td><td><code>acps-prod-image-scheduler-dlq</code></td></tr>
+    <tr><td>用途</td><td>Scheduler が画像生成 Step Functions を起動できなかったイベントの退避</td></tr>
+    <tr><td>Message retention</td><td>14 日</td></tr>
+    <tr><td>監視</td><td><code>AWS/Scheduler</code> の <code>InvocationDroppedCount</code>、<code>InvocationsSentToDeadLetterCount</code>、<code>InvocationsFailedToBeSentToDeadLetterCount</code> を MonitoringStack で監視</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>DLQ にメッセージが入った場合は、対象 <code>set_code</code> と <code>scheduled_at</code> を確認し、必要に応じて画像生成 Step Functions を手動実行する（手順は <a href="operation.html">operation.html</a> を参照）。</p>
+
+</div>
+</body>
+</html>

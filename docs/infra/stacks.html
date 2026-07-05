@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CDK スタック実装仕様 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / インフラ設計 / CDK スタック実装仕様</nav>
+<h1>CDK スタック実装仕様</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">一時 Fix</span>
+  <span>最終更新: 2026-07-06</span>
+</div>
+
+<h2 id="policy">1. スタック分割方針</h2>
+<p>責務ごとに AWS CDK のスタックを分割する。</p>
+<ul>
+  <li><strong>共通基盤</strong>は FoundationStack で一元管理し、各バッチスタックから参照する</li>
+  <li><strong>業務機能</strong>はサービスごとにスタックを分離し、独立したデプロイ・保守を可能にする</li>
+  <li><strong>監視・通知</strong>は MonitoringStack として業務スタックから分離する</li>
+</ul>
+
+<h2 id="list">2. スタック一覧</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>スタック</th><th>フェーズ</th><th>責務</th></tr></thead>
+  <tbody>
+    <tr><td>FoundationStack</td><td>初期</td><td>共通基盤リソース</td></tr>
+    <tr><td>ImageBatchStack</td><td>初期</td><td>画像生成バッチ実行基盤</td></tr>
+    <tr><td>SnsPostBatchStack</td><td>初期</td><td>SNS 投稿バッチ実行基盤</td></tr>
+    <tr><td>MonitoringStack</td><td>初期</td><td>監視・通知</td></tr>
+    <tr><td>AdminApiStack</td><td>将来</td><td>管理画面バックエンド API</td></tr>
+    <tr><td>AdminWebStack</td><td>将来</td><td>管理画面フロントエンド</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="details">3. スタック詳細</h2>
+
+<h3 id="foundation">3.1 FoundationStack</h3>
+<p><strong>目的</strong>: システム全体で共通利用する基盤リソースをまとめて管理する</p>
+
+<h4>リソース一覧</h4>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>リソース</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td>VPC</td><td>2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし。CDK 引数指定: <code>maxAzs: 2</code>、<code>natGateways: 0</code>、<code>subnetConfiguration</code> に <code>PUBLIC</code> と <code>PRIVATE_ISOLATED</code> の 2 種類のみ定義する</td></tr>
+    <tr><td>Security Group</td><td>サービスごとのアクセス制御（詳細は下表）</td></tr>
+    <tr><td>S3 Bucket</td><td>画像保存用（Lifecycle Policy: 30 日で自動削除）</td></tr>
+    <tr><td>Aurora Serverless v2</td><td>MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。Aurora MySQL 3.08.0 以降など対応バージョンを採用）。CDK 引数指定: <code>serverlessV2MinCapacity: 0</code>、<code>serverlessV2MaxCapacity: 1.0</code>、<code>enableDataApi: true</code>（Query Editor / Data API 利用のため必須）</td></tr>
+    <tr><td>Secrets Manager</td><td>DB 認証情報（CDK の Aurora コンストラクトで自動生成）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（Secret 名規約は <a href="security.html">security.html</a> を参照。作成手順はアプリ設計（Phase 9）で定義する）</td></tr>
+    <tr><td>ECS Cluster</td><td>全バッチ共通の実行基盤</td></tr>
+    <tr><td>ECR Repository</td><td>サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、db-readiness-check の 3 つ）</td></tr>
+    <tr><td>VPC Endpoint</td><td>S3（Gateway）のみ</td></tr>
+    <tr><td>ECS Task Definition（DB 準備確認）</td><td>DB 準備確認用（db-readiness-check）。コンテナ名: <code>db-readiness-check</code>。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される。コンテナイメージは CDK Context <code>dbReadinessCheckImageTag</code> で指定された不変タグを参照する</td></tr>
+    <tr><td>IAM Role（DB 準備確認タスク）</td><td>権限詳細は <a href="security.html">security.html</a> を参照</td></tr>
+    <tr><td>Security Group（DB 準備確認）</td><td>DB 準備確認 ECS タスク用</td></tr>
+    <tr><td>CloudWatch Log Group（DB 準備確認）</td><td>DB 準備確認タスクのログ出力先（リテンション: 90 日）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h4>Security Group ルール詳細</h4>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Security Group</th><th>方向</th><th>プロトコル</th><th>ポート</th><th>ソース/宛先</th><th>用途</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="3">ECS Fargate 用（バッチ共通）</td><td>Inbound</td><td>-</td><td>-</td><td>全拒否</td><td>バッチ処理のため着信不要</td></tr>
+    <tr><td>Outbound</td><td>TCP</td><td>443</td><td>0.0.0.0/0</td><td>外部 API、Secrets Manager、CloudWatch Logs</td></tr>
+    <tr><td>Outbound</td><td>TCP</td><td>3306</td><td>Aurora SG</td><td>Aurora への DB 接続</td></tr>
+    <tr><td rowspan="3">DB 準備確認用</td><td>Inbound</td><td>-</td><td>-</td><td>全拒否</td><td>バッチ処理のため着信不要</td></tr>
+    <tr><td>Outbound</td><td>TCP</td><td>443</td><td>0.0.0.0/0</td><td>Secrets Manager、CloudWatch Logs</td></tr>
+    <tr><td>Outbound</td><td>TCP</td><td>3306</td><td>Aurora SG</td><td>Aurora への DB 接続確認</td></tr>
+    <tr><td rowspan="2">Aurora 用</td><td>Inbound</td><td>TCP</td><td>3306</td><td>ECS Fargate SG, DB 準備確認 SG</td><td>ECS タスクからの DB 接続を許可</td></tr>
+    <tr><td>Outbound</td><td>-</td><td>-</td><td>なし</td><td>アウトバウンド通信なし</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="warn">
+  <span class="callout-title">CDK 実装時の注意</span>
+  <ul>
+    <li>CDK はデフォルトで全アウトバウンドを許可する Security Group を作成する。Aurora 用 SG では <code>allowAllOutbound: false</code> を明示的に指定してアウトバウンドルールを削除すること</li>
+    <li><code>ec2.Vpc</code> のデフォルト構成は Private Subnet + NAT Gateway を含むため、<code>natGateways: 0</code> と <code>subnetConfiguration</code>（<code>PUBLIC</code> と <code>PRIVATE_ISOLATED</code> のみ）を明示しないと意図しない NAT Gateway が作成され課金が発生する</li>
+    <li>Aurora Serverless v2 の <code>enableDataApi: true</code> を有効化していない場合、AWS Console の Query Editor からの DDL 実行・データ確認ができない（開発計画 Phase 6 の検証ステップで使用するため有効化必須）</li>
+    <li>Aurora の <code>serverlessV2MaxCapacity</code> を未指定にするとデフォルト値（リージョンによる）まで自動スケールしてコスト事故の要因となるため、必ず上限値を指定する</li>
+  </ul>
+</div>
+
+<div class="note">
+  <span class="callout-title">設計方針</span>
+  ネットワークセキュリティの方針は <a href="architecture.html#network">architecture.html セクション 2</a> および <a href="security.html#network">security.html セクション 3</a> を参照。
+</div>
+
+<h4>出力値（他スタックへの共有）</h4>
+<ul>
+  <li>VPC ID、Public Subnet ID x2、Isolated Subnet ID x2</li>
+  <li>バッチ共通 Security Group ID</li>
+  <li>S3 Bucket 名 / ARN</li>
+  <li>Aurora Cluster Endpoint / ARN</li>
+  <li>Secrets Manager Secret ARN（DB 認証情報用 <code>acps/{env}/db/*</code>、画像 API キー用 <code>acps/{env}/image/*</code>。SNS 認証情報は Secret 名規約によりアプリ側で導出するため出力不要。規約は <a href="security.html">security.html</a> を参照）</li>
+  <li>ECS Cluster 名 / ARN</li>
+  <li>ECR Repository URI（サービスごと + DB 準備確認用）</li>
+  <li>DB 準備確認 ECS Task Definition family 名（リビジョンなし。Step Functions が常に最新リビジョンを使用するため）</li>
+  <li>DB 準備確認用 Security Group ID</li>
+</ul>
+
+<h4>注意事項</h4>
+<ul>
+  <li>DB 準備確認タスクの仕様詳細は <a href="workflow.html#db-readiness">workflow.html セクション 2</a> を参照</li>
+  <li>db-readiness-check の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> で新しいイメージタグを明示的に渡す</li>
+  <li>将来の AdminApiStack、AdminWebStack からも参照される</li>
+</ul>
+
+<h3 id="image-batch">3.2 ImageBatchStack</h3>
+<p><strong>目的</strong>: 画像生成バッチの実行基盤を構築する</p>
+
+<div class="note">
+  <span class="callout-title">注記</span>
+  以下は ImageBatchStack の最終形である。Phase 5 の空回し段階では ECS Task Definition / Step Functions / EventBridge Scheduler を先に作成し、CodePipeline / CodeBuild は Phase 8 で追加する。
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>リソース</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td>ECS Task Definition</td><td>画像生成バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する（詳細は <a href="cicd.html">cicd.html</a> を参照）</td></tr>
+    <tr><td>Container Definition</td><td>コンテナ名: <code>image-batch</code>。ECR イメージ、環境変数、ログ設定</td></tr>
+    <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html">workflow.html</a> を参照）</td></tr>
+    <tr><td>EventBridge Scheduler</td><td>セットごとの定期実行スケジュール。RetryPolicy と Scheduler DLQ を設定する</td></tr>
+    <tr><td>SQS Queue（Scheduler DLQ）</td><td>EventBridge Scheduler が画像生成 Step Functions を起動できなかったイベントの退避先。詳細は <a href="workflow.html#scheduler-dlq">workflow.html セクション 10</a> を参照</td></tr>
+    <tr><td>CodePipeline</td><td>image-batch 用 CI/CD パイプライン（詳細は <a href="cicd.html">cicd.html</a> を参照）</td></tr>
+    <tr><td>CodeBuild</td><td>Docker ビルド・ECR push・タスク定義更新</td></tr>
+    <tr><td>IAM Role</td><td>権限詳細は <a href="security.html">security.html</a> を参照</td></tr>
+    <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>依存スタック</strong>: FoundationStack、SnsPostBatchStack（SNS 投稿 Step Functions の ARN を参照するため）</p>
+
+<h3 id="sns-post-batch">3.3 SnsPostBatchStack</h3>
+<p><strong>目的</strong>: SNS 投稿バッチの実行基盤を構築する</p>
+
+<div class="note">
+  <span class="callout-title">注記</span>
+  以下は SnsPostBatchStack の最終形である。Phase 4 の空回し段階では ECS Task Definition / Step Functions を先に作成し、CodePipeline / CodeBuild は Phase 8 で追加する。
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>リソース</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td>ECS Task Definition</td><td>SNS 投稿バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する</td></tr>
+    <tr><td>Container Definition</td><td>コンテナ名: <code>sns-post-batch</code>。ECR イメージ、環境変数、ログ設定</td></tr>
+    <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html">workflow.html</a> を参照）</td></tr>
+    <tr><td>CodePipeline</td><td>sns-post-batch 用 CI/CD パイプライン（詳細は <a href="cicd.html">cicd.html</a> を参照）</td></tr>
+    <tr><td>CodeBuild</td><td>Docker ビルド・ECR push・タスク定義更新</td></tr>
+    <tr><td>IAM Role</td><td>権限詳細は <a href="security.html">security.html</a> を参照</td></tr>
+    <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">注記</span>
+  SnsPostBatchStack には EventBridge Scheduler を含めない。SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動される。
+</div>
+
+<p><strong>依存スタック</strong>: FoundationStack</p>
+
+<h3 id="monitoring">3.4 MonitoringStack</h3>
+<p><strong>目的</strong>: バッチ全体の監視と通知をまとめて管理する</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>リソース</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td>CloudWatch Alarm</td><td>監視リソースの詳細は <a href="workflow.html#alarms">workflow.html セクション 8</a> を参照</td></tr>
+    <tr><td>EventBridge Rule</td><td>ECS Task State Change 検知。詳細は <a href="workflow.html#eventbridge-rule">workflow.html セクション 9</a> を参照</td></tr>
+    <tr><td>SNS Topic</td><td>アラーム・イベント通知先</td></tr>
+    <tr><td>CloudWatch Dashboard</td><td>運用可視化（必要に応じて）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>依存スタック</strong>: FoundationStack、ImageBatchStack、SnsPostBatchStack</p>
+
+<h4>注意事項</h4>
+<ul>
+  <li>過剰通知を避けるため、必要なアラームから段階的に設定する</li>
+  <li>Scheduler の起動失敗は Step Functions の <code>ExecutionsFailed</code> には現れないため、<code>AWS/Scheduler</code> メトリクス（<code>TargetErrorCount</code>、<code>TargetErrorThrottledCount</code>、<code>InvocationThrottleCount</code>、<code>InvocationDroppedCount</code>、<code>InvocationsSentToDeadLetterCount</code>、<code>InvocationsFailedToBeSentToDeadLetterCount</code>）を必ず監視対象に含める</li>
+</ul>
+
+<h3 id="admin-api">3.5 AdminApiStack（将来拡張）</h3>
+<p><strong>目的</strong>: 管理画面から利用するバックエンド API を提供する</p>
+<p><strong>想定リソース</strong>: ECS Service または Lambda、ALB または API Gateway、IAM Role</p>
+<p><strong>依存スタック</strong>: FoundationStack</p>
+
+<h3 id="admin-web">3.6 AdminWebStack（将来拡張）</h3>
+<p><strong>目的</strong>: 管理画面のフロントエンドを提供する</p>
+<p><strong>想定リソース</strong>: S3（静的ファイル配信）、CloudFront、Route 53、ACM</p>
+<p><strong>連携先</strong>: AdminApiStack</p>
+
+<h2 id="deploy-order">4. デプロイ順序</h2>
+
+<figure class="diagram">
+<svg viewBox="0 0 860 300" role="img" aria-label="デプロイ順序図">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--diag-line)"/>
+    </marker>
+  </defs>
+
+  <rect x="30" y="110" width="220" height="60" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="140" y="136" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">1. FoundationStack</text>
+  <text x="140" y="156" text-anchor="middle" font-size="11" fill="var(--diag-text)">共通基盤を先に作成</text>
+
+  <rect x="330" y="30" width="220" height="60" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="440" y="56" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">2. SnsPostBatchStack</text>
+  <text x="440" y="76" text-anchor="middle" font-size="11" fill="var(--diag-text)">ImageBatchStack より先</text>
+
+  <rect x="330" y="110" width="220" height="60" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="440" y="136" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">3. ImageBatchStack</text>
+  <text x="440" y="156" text-anchor="middle" font-size="11" fill="var(--diag-text)">SNS 投稿 SFN の ARN を参照</text>
+
+  <rect x="330" y="190" width="220" height="60" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="440" y="216" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">4. MonitoringStack</text>
+  <text x="440" y="236" text-anchor="middle" font-size="11" fill="var(--diag-text)">各スタックのメトリクスを監視</text>
+
+  <rect x="630" y="70" width="200" height="50" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)" stroke-dasharray="5 4"/>
+  <text x="730" y="91" text-anchor="middle" font-size="12" fill="var(--diag-text)">5. AdminApiStack</text>
+  <text x="730" y="108" text-anchor="middle" font-size="11" fill="var(--diag-text)">（将来）</text>
+
+  <rect x="630" y="160" width="200" height="50" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)" stroke-dasharray="5 4"/>
+  <text x="730" y="181" text-anchor="middle" font-size="12" fill="var(--diag-text)">6. AdminWebStack</text>
+  <text x="730" y="198" text-anchor="middle" font-size="11" fill="var(--diag-text)">（将来）</text>
+
+  <line x1="250" y1="125" x2="326" y2="66" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="250" y1="140" x2="326" y2="140" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="250" y1="155" x2="326" y2="214" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="550" y1="60" x2="626" y2="88" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <line x1="730" y1="120" x2="730" y2="156" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+</svg>
+<figcaption>デプロイ順序。SnsPostBatchStack → ImageBatchStack の順は、ImageBatchStack が SNS 投稿 Step Functions の ARN を参照するため。</figcaption>
+</figure>
+
+<div class="note">
+  <span class="callout-title">デプロイ方法</span>
+  上記 1〜4 のスタックは開発者が <code>cdk diff</code> で差分確認後、<code>cdk deploy</code> で手動デプロイする。インフラパイプラインは構築しない（詳細は <a href="cicd.html">cicd.html</a> を参照）。
+</div>
+
+<h2 id="data-passing">5. スタック間のデータ受け渡し</h2>
+<p>CDK の <code>CfnOutput</code> / <code>Fn.importValue</code> またはコンストラクタ引数を用いて、スタック間でリソース情報を受け渡す。</p>
+
+<pre><code>FoundationStack
+  ├── vpc              → ImageBatchStack, SnsPostBatchStack
+  ├── securityGroup    → ImageBatchStack, SnsPostBatchStack
+  ├── s3Bucket         → ImageBatchStack, SnsPostBatchStack
+  ├── auroraCluster    → ImageBatchStack, SnsPostBatchStack
+  ├── secretsArn       → ImageBatchStack, SnsPostBatchStack
+  ├── ecsCluster       → ImageBatchStack, SnsPostBatchStack
+  └── dbReadinessCheckTaskDefFamily → ImageBatchStack, SnsPostBatchStack
+
+SnsPostBatchStack
+  └── snsPostingSfnArn → ImageBatchStack（画像生成完了後の SNS 投稿 Step Functions 起動用）
+
+ImageBatchStack
+  ├── imageGenerationSfnArn  → MonitoringStack
+  ├── imageScheduleGroupName → MonitoringStack（Scheduler 失敗メトリクスの Dimension）
+  └── imageSchedulerDlqArn   → 運用確認用</code></pre>
+
+</div>
+</body>
+</html>

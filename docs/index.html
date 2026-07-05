@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>設計書体系ガイド | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb">docs / 設計書体系ガイド</nav>
+<h1>設計書体系ガイド</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-07-06</span>
+  <span>本ドキュメントは設計書体系のエントリポイント</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">閲覧方法</span>
+  設計書は HTML で記述している。GitHub 上ではソース表示になるため、<strong>ローカルでブラウザから開く</strong>か、VS Code の拡張機能（Live Preview 等）で閲覧すること。開発計画（<a href="development-plan.md">development-plan.md</a>）のみ、進捗チェックリストとして頻繁に編集するため Markdown を維持している。
+</div>
+
+<h2 id="principles">1. 設計原則</h2>
+<ol>
+  <li><strong>インフラとアプリの関心の分離</strong>: インフラ設計（<code>docs/infra/</code>）とアプリ設計（<code>docs/app/</code>）を明確に分ける。インフラを先に構築・Fix し、アプリ設計は仕様イメージが固まってから着手する（Phase 9）</li>
+  <li><strong>完璧より前進（一時 Fix 運用）</strong>: 設計書は「次フェーズの作業に着手できる」水準で一時 Fix とし、先に進む。詳細はセクション 4 の Fix 基準を参照</li>
+  <li><strong>実装を正とする</strong>: 設計と異なる実装をした場合は、実装に合わせて設計書を修正する（変更理由は備考に残す）</li>
+  <li><strong>同じ情報を 2 箇所に書かない</strong>: 詳細の「正」は 1 つのドキュメントに置き、他からは参照リンクで辿る</li>
+</ol>
+
+<h2 id="structure">2. ドキュメント構成</h2>
+
+<pre><code>docs/
+├── index.html                     # 本ファイル（設計書体系ガイド）
+├── assets/style.css               # 設計書共通スタイル
+├── overview/
+│   └── system-overview.html       # システム概要（目的・技術選定・開発方針）
+├── infra/                         # インフラ設計書（一時 Fix 対象）
+│   ├── architecture.html          # アーキテクチャ（ネットワーク・コンピューティング・データストア）
+│   ├── stacks.html                # CDK スタック実装仕様
+│   ├── workflow.html              # Step Functions・Scheduler・DB 準備確認・監視リソース定義
+│   ├── security.html              # IAM・Secrets Manager・ネットワークセキュリティ
+│   ├── cicd.html                  # CI/CD パイプライン
+│   └── operation.html             # インフラ運用
+├── app/
+│   └── index.html                 # アプリ設計（Phase 9 で着手。現在は検討メモ置き場）
+├── _archive/                      # 旧 Markdown 設計書（参考資料。現役の設計書ではない）
+└── development-plan.md            # 開発計画・進捗管理（Markdown）</code></pre>
+
+<h3>概要</h3>
+<div class="card-grid">
+  <div class="card">
+    <div class="card-title"><a href="overview/system-overview.html">system-overview.html</a></div>
+    <p>システムの目的・スコープ・技術選定・開発方針。全ドキュメントの前提知識。</p>
+  </div>
+</div>
+
+<h3>インフラ設計（docs/infra/）</h3>
+<div class="card-grid">
+  <div class="card">
+    <div class="card-title"><a href="infra/architecture.html">architecture.html</a></div>
+    <p>AWS サービス構成と設計判断。ネットワーク、コンピューティング、データストア、監視方針。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="infra/stacks.html">stacks.html</a></div>
+    <p>CDK スタック構成・リソース定義・デプロイ順序・スタック間のデータ受け渡し。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="infra/workflow.html">workflow.html</a></div>
+    <p>Step Functions ASL、DB 準備確認タスク仕様、EventBridge Scheduler、環境変数、監視リソース定義。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="infra/security.html">security.html</a></div>
+    <p>Secret 名規約、IAM ロール設計、ネットワークセキュリティ。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="infra/cicd.html">cicd.html</a></div>
+    <p>CodePipeline / CodeBuild によるサービス CI/CD とインフラ手動デプロイ運用。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="infra/operation.html">operation.html</a></div>
+    <p>スケジュール管理、Aurora 一時停止、デプロイ後チェックリスト、監視・通知、コスト最適化。</p>
+  </div>
+</div>
+
+<h3>アプリ設計（docs/app/）</h3>
+<div class="card-grid">
+  <div class="card">
+    <div class="card-title"><a href="app/index.html">app/index.html</a> <span class="badge badge-wip">Phase 9 で着手</span></div>
+    <p>バッチ処理フロー・DB スキーマ・アプリ運用の設計書を作成予定。現在は設計対象一覧と検討メモ。</p>
+  </div>
+</div>
+
+<h2 id="scope">3. スコープ境界: インフラ設計とアプリ設計</h2>
+
+<p>設計肥大化の再発を防ぐため、<strong>インフラ設計書にはアプリ仕様を書かない</strong>。境界は以下の通り。</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>分類</th><th>インフラ設計（docs/infra/）に書くこと</th><th>アプリ設計（docs/app/）に書くこと ※Phase 9 まで書かない</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>実行基盤</td>
+      <td>VPC / ECS / Aurora / S3 / Step Functions / Scheduler の構成と CDK 定義</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>ワークフロー</td>
+      <td>ASL 定義、タイムアウト、Retry/Catch、環境変数の受け渡し契約（キー名のみ）</td>
+      <td>環境変数の値の意味付け・業務上の使い方</td>
+    </tr>
+    <tr>
+      <td>バッチ処理</td>
+      <td>DB 準備確認タスク（db-readiness-check）の仕様（インフラの一部）</td>
+      <td>画像生成・SNS 投稿の処理フロー、冪等性・再試行設計、投稿ステータス遷移</td>
+    </tr>
+    <tr>
+      <td>データ</td>
+      <td>Aurora / S3 というデータストアの構成・設定値</td>
+      <td>テーブル定義・ER 図・DDL、S3 キー設計の詳細</td>
+    </tr>
+    <tr>
+      <td>セキュリティ</td>
+      <td>Secret 名規約、IAM ロール、ネットワークセキュリティ</td>
+      <td>SNS 認証情報の運用（アカウント追加手順・トークン更新）</td>
+    </tr>
+    <tr>
+      <td>運用</td>
+      <td>デプロイ手順、Aurora 一時停止、監視・通知、コスト</td>
+      <td>プロンプト管理、投稿失敗時の手動補正、DDL マイグレーション</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="warn">
+  <span class="callout-title">スコープガード</span>
+  設計作業やレビューの中でアプリ仕様の論点（テーブル設計、投稿の再試行ルール等）が出てきた場合、インフラ設計書には書かず、<a href="app/index.html">docs/app/index.html</a> の検討メモに記録して Phase 9 で扱う。
+</div>
+
+<h2 id="fix-rules">4. 設計 Fix 基準とレビュー運用ルール</h2>
+
+<p>「生成 AI レビューの指摘が尽きず設計が Fix しない」問題の再発防止ルール。設計書の作成・レビュー時は必ずこのルールに従う。</p>
+
+<h3>4.1 Fix 基準（Definition of Done）</h3>
+<ul>
+  <li>設計書は<strong>「次フェーズの作業に着手できる」水準で一時 Fix</strong> とする</li>
+  <li>インフラ設計の Fix 基準: <strong>開発計画 Phase 0〜8 の各ステップが着手できる程度に、CDK リソース・設定値・手順が決まっていること</strong></li>
+  <li><strong>「生成 AI の指摘ゼロ」を Fix 条件にしない</strong>。AI は何度でも改善提案を出せるため、指摘ゼロを目指すと原理的に終わらない</li>
+  <li>実装中に判明した設計の誤りは、実装に合わせて設計書を修正すればよい（設計原則 3）。だからこそ一時 Fix で先に進んでよい</li>
+</ul>
+
+<h3>4.2 レビュー運用ルール</h3>
+<ol>
+  <li><strong>観点を限定する</strong>: 生成 AI にレビューさせる際は、必ず観点を明示指定する（レビュープロンプトのテンプレートは <a href="development-plan.md">development-plan.md</a> の Phase D 備考を参照）。観点を指定しないフリーレビューは行わない</li>
+  <li><strong>指摘を分類する</strong>: 指摘は「<strong>blocker</strong>（誤り・矛盾・欠落で、次フェーズの作業を妨げるもの）」と「<strong>改善提案</strong>（あった方が良いが、なくても作業は進められるもの）」に分類する</li>
+  <li><strong>blocker のみ修正する</strong>: 改善提案は修正せず、development-plan.md の「設計課題リスト」に記録して Fix を妨げない</li>
+  <li><strong>レビューは最大 2 巡まで</strong>: 3 巡目以降の指摘はすべて設計課題リスト行きとし、レビューを打ち切って Fix を宣言する</li>
+  <li><strong>YAGNI</strong>: 将来拡張（AdminApiStack 等）は「拡張ポイントがある」ことの記載まで。詳細設計はしない</li>
+</ol>
+
+<h2 id="update-rules">5. 更新ルール</h2>
+<ul>
+  <li>コードやインフラに変更を加えた際は、対応する設計書も同時に更新する</li>
+  <li>設計と異なる実装をした場合は、実装に合わせて設計書を修正し、変更理由を備考（<code>decision</code> コールアウト）に残す</li>
+  <li>同じ情報を複数ドキュメントに書かない。詳細は 1 箇所に書き、他からは参照リンクを張る</li>
+  <li>設計書は HTML（本体系）で記述する。開発計画のみ Markdown</li>
+</ul>
+
+<h2 id="archive">6. 旧設計書（_archive）について</h2>
+<p><code>docs/_archive/</code> には旧 Markdown 設計書を保管している。これらは<strong>現役の設計書ではない</strong>。特にアプリ設計（バッチ処理フロー・DB スキーマ・冪等性設計）はよく検討された内容を含むため、Phase 9 のアプリ設計で参考資料として活用する。</p>
+
+</div>
+</body>
+</html>

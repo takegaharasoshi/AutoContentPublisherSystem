@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セキュリティ設計 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / インフラ設計 / セキュリティ設計</nav>
+<h1>セキュリティ設計</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">一時 Fix</span>
+  <span>最終更新: 2026-07-06</span>
+</div>
+
+<h2 id="secrets">1. Secrets Manager 管理方針</h2>
+
+<h3>1.1 管理対象</h3>
+<p>以下の秘密情報を Secrets Manager で管理する:</p>
+<ul>
+  <li>Aurora DB の認証情報（ホスト、ポート、ユーザー名、パスワード、DB 名）</li>
+  <li>画像生成 API のキー</li>
+  <li>SNS 認証情報（プラットフォームごとの API 認証情報）</li>
+</ul>
+
+<h3 id="secret-naming">1.2 Secret 名規約</h3>
+<p>すべての Secret は <code>acps/{env}/</code> プレフィックスで始まる。種別ごとの命名規約:</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>種別</th><th>Secret 名パターン</th><th>例</th></tr></thead>
+  <tbody>
+    <tr><td>DB 認証情報</td><td><code>acps/{env}/db/credentials</code></td><td><code>acps/prod/db/credentials</code></td></tr>
+    <tr><td>画像生成 API キー</td><td><code>acps/{env}/image/api-key</code></td><td><code>acps/prod/image/api-key</code></td></tr>
+    <tr><td>SNS 認証情報</td><td><code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code></td><td><code>acps/prod/fashion-set-1/sns/instagram/main-account</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>SNS 認証情報の Secret 名の構成要素:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>要素</th><th>説明</th><th>例</th></tr></thead>
+  <tbody>
+    <tr><td><code>env</code></td><td>環境識別子（ECS タスクの <code>ENV_NAME</code> 環境変数）</td><td><code>prod</code></td></tr>
+    <tr><td><code>set_code</code></td><td>バッチセット識別コード</td><td><code>fashion-set-1</code></td></tr>
+    <tr><td><code>platform</code></td><td>SNS プラットフォーム名</td><td><code>instagram</code></td></tr>
+    <tr><td><code>account_code</code></td><td>アカウント識別コード（不変）</td><td><code>main-account</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<ul>
+  <li>Secret 名はアプリケーション側で上記規約に基づき導出する（DB に Secret 名・ARN は保持しない）</li>
+  <li><code>account_code</code> は Secret 名の導出に使用するため、作成後に変更してはならない</li>
+  <li>環境分離は <code>env</code> 部分で行い、IAM ポリシーのプレフィックスベース制御と整合する</li>
+</ul>
+
+<div class="decision">
+  <span class="callout-title">設計理由</span>
+  Secret の ARN を DB カラムで管理する方式では、アカウントを追加するたびに IAM ポリシーの個別 ARN 追加が必要になる。Secret 名規約に統一することで、プレフィックスベースの IAM ポリシーで最小権限と運用の簡便さを両立する。
+</div>
+
+<div class="note">
+  <span class="callout-title">アプリ設計での最終確認</span>
+  SNS 認証情報の規約に含まれる <code>set_code</code> / <code>account_code</code> はアプリ設計（Phase 9）で確定する概念のため、規約の詳細（構成要素の定義・アカウント追加手順）はアプリ設計時に最終確認する。<code>acps/{env}/</code> プレフィックスと IAM のプレフィックスベース制御という骨格はインフラ設計として Fix とする。
+</div>
+
+<h3>1.3 Secret 値スキーマ</h3>
+<p>Secret の値は JSON 文字列で管理する。アプリケーションは以下のキーを前提に読み取る。</p>
+
+<h4>DB 認証情報</h4>
+<p>Aurora 作成時に CDK / RDS が生成する Secret を使用する。アプリケーションは以下のキーを参照する。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>キー</th><th>必須</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td><code>username</code></td><td>YES</td><td>DB ユーザー名</td></tr>
+    <tr><td><code>password</code></td><td>YES</td><td>DB パスワード</td></tr>
+    <tr><td><code>host</code></td><td>YES</td><td>Aurora writer endpoint</td></tr>
+    <tr><td><code>port</code></td><td>YES</td><td>MySQL ポート（通常 3306）</td></tr>
+    <tr><td><code>dbname</code></td><td>YES</td><td>接続先 DB 名</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h4>画像生成 API キー</h4>
+<p>Secret 名: <code>acps/{env}/image/api-key</code></p>
+<pre><code>{
+  "api_key": "..."
+}</code></pre>
+
+<h4>SNS 認証情報（Instagram）</h4>
+<p>Secret 名: <code>acps/{env}/{set_code}/sns/instagram/{account_code}</code></p>
+<pre><code>{
+  "access_token": "...",
+  "ig_user_id": "...",
+  "token_expires_at": "2026-01-31T00:00:00Z"
+}</code></pre>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>キー</th><th>必須</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td><code>access_token</code></td><td>YES</td><td>Instagram Graph API のアクセストークン</td></tr>
+    <tr><td><code>ig_user_id</code></td><td>YES</td><td>投稿先 Instagram Business Account / Creator Account の ID</td></tr>
+    <tr><td><code>token_expires_at</code></td><td>NO</td><td>トークン失効日時の運用メモ。アプリケーションの認証には使用しない</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>1.4 将来の複数環境対応</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>リソース</th><th>命名規約</th><th>例（本番）</th><th>例（開発）</th></tr></thead>
+  <tbody>
+    <tr><td>Secrets Manager</td><td><code>acps/{env}/...</code></td><td><code>acps/prod/db/credentials</code></td><td><code>acps/dev/db/credentials</code></td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li>現時点の単一環境でも <code>env=prod</code> を付与して運用する</li>
+  <li>ECS Task Definition には <code>ENV_NAME</code> を環境変数として注入し、アプリケーションが Secret 名を導出できるようにする</li>
+</ul>
+
+<h2 id="iam">2. IAM ロール設計</h2>
+
+<h3>2.1 ECS タスクロール</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ロール</th><th>権限</th></tr></thead>
+  <tbody>
+    <tr><td>DB 準備確認タスクロール</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code>）</td></tr>
+    <tr><td>画像生成バッチタスクロール</td><td>S3 読み書き、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/image/*</code>）</td></tr>
+    <tr><td>SNS 投稿バッチタスクロール</td><td>S3 読み取り、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>）、CloudWatch <code>PutMetricData</code>（アプリ発行カスタムメトリクス用）</td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li>Secrets Manager 権限はサービスごとに必要最小限のプレフィックスで制限する。DB 認証情報（<code>acps/{env}/db/*</code>）は全サービス共通、それ以外は各サービスが必要とする種別のみ付与する</li>
+  <li>DB にアカウントを追加するだけで、IAM ポリシーの変更なしに新しい Secret へのアクセスが可能になる</li>
+  <li>SNS 投稿バッチタスクロールの <code>cloudwatch:PutMetricData</code> は、条件キー <code>cloudwatch:namespace</code> で <code>ACPS</code> のみに制限する</li>
+</ul>
+
+<h3>2.2 ECS タスク実行ロール</h3>
+<ul>
+  <li>ECR イメージの pull 権限</li>
+  <li>CloudWatch Logs への書き込み権限</li>
+</ul>
+<div class="note">
+  <span class="callout-title">注記</span>
+  CloudWatch Logs への書き込みは ECS Fargate の awslogs ドライバがタスク実行ロールの権限で行う。タスクロール（セクション 2.1）には CloudWatch Logs 権限を含めない。
+</div>
+
+<h3>2.3 Step Functions 実行ロール</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ステートマシン</th><th>権限</th></tr></thead>
+  <tbody>
+    <tr><td>image-generation-sfn</td><td>ECS RunTask（DB 準備確認タスク + 画像生成バッチタスク）、<code>iam:PassRole</code>（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため）、SNS 投稿 Step Functions の <code>StartExecution</code>、CloudWatch <code>PutMetricData</code>（カスタムメトリクス発行用。詳細は下記注記を参照）</td></tr>
+    <tr><td>sns-posting-sfn</td><td>ECS RunTask（DB 準備確認タスク + SNS 投稿バッチタスク）、<code>iam:PassRole</code>（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">ECS RunTask の Resource 指定</span>
+  Step Functions ASL は Task Definition を family 名（revision なし）で指定し、ECS RunTask が最新 ACTIVE revision を解決する。Step Functions 実行ロールの <code>ecs:RunTask</code> は <code>arn:aws:ecs:{region}:{account}:task-definition/{family}:*</code> のように family 配下の全 revision を許可する。revision 固定 ARN のみを許可すると、CodeBuild が新 revision を登録した後に実行できなくなる。
+</div>
+
+<div class="note">
+  <span class="callout-title">Run a Job（.sync）に必要な補助権限</span>
+  <code>ecs:StopTask</code> と <code>ecs:DescribeTasks</code> は Step Functions が起動したタスクを待機・停止するために必要で、対象 task ARN は実行時まで確定しないため <code>Resource: "*"</code> を許容する。EventBridge 連携用の <code>events:PutTargets</code>、<code>events:PutRule</code>、<code>events:DescribeRule</code> は <code>StepFunctionsGetEventsForECSTaskRule</code> に限定する。
+</div>
+
+<div class="note">
+  <span class="callout-title">iam:PassRole の条件</span>
+  <code>iam:PassRole</code> は各タスクの task role / execution role の ARN に限定し、<code>iam:PassedToService = ecs-tasks.amazonaws.com</code> 条件を付与する。
+</div>
+
+<div class="note">
+  <span class="callout-title">cloudwatch:PutMetricData の IAM 条件</span>
+  <code>PutMetricData</code> API はリソース ARN をサポートしていないため、ステートメントの <code>Resource</code> は <code>"*"</code> にせざるを得ない。過剰権限化を避けるため、条件キー <code>cloudwatch:namespace</code> で発行可能な Namespace を <code>ACPS</code>（本システムのカスタムメトリクス Namespace）に制限する。例:
+  <pre><code>{
+  "Effect": "Allow",
+  "Action": "cloudwatch:PutMetricData",
+  "Resource": "*",
+  "Condition": {
+    "StringEquals": { "cloudwatch:namespace": "ACPS" }
+  }
+}</code></pre>
+</div>
+
+<h3>2.4 EventBridge Scheduler ロール</h3>
+<ul>
+  <li>画像生成 Step Functions の起動権限（<code>states:StartExecution</code>）</li>
+  <li>Scheduler DLQ（SQS）への送信権限（<code>sqs:SendMessage</code>）。対象は ImageBatchStack で作成する Scheduler 専用 DLQ に限定する</li>
+</ul>
+
+<h3>2.5 CI/CD サービスロール</h3>
+
+<h4>CodeBuild サービスロール</h4>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>パイプライン</th><th>権限</th></tr></thead>
+  <tbody>
+    <tr><td>image-batch-pipeline / sns-post-batch-pipeline</td><td>ECR 認証トークン取得（<code>ecr:GetAuthorizationToken</code>）、対象 ECR リポジトリへのイメージ push（<code>ecr:PutImage</code> 等）、ECS タスク定義の読み取り・登録（<code>ecs:DescribeTaskDefinition</code>、<code>ecs:RegisterTaskDefinition</code>）、ECS タスク実行ロールおよびタスクロールの <code>iam:PassRole</code>、CloudWatch Logs 書き込み（ビルドログ出力用）</td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li>各パイプラインの CodeBuild プロジェクトに対し、操作対象のリソース（ECR リポジトリ、ECS タスク定義 family、IAM ロール）を最小限にスコープする</li>
+  <li><code>iam:PassRole</code> は、CodeBuild が <code>ecs:RegisterTaskDefinition</code> で新リビジョンを登録する際にタスクロールとタスク実行ロールを指定するために必要</li>
+</ul>
+
+<h4>CodePipeline サービスロール</h4>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>パイプライン</th><th>権限</th></tr></thead>
+  <tbody>
+    <tr><td>image-batch-pipeline / sns-post-batch-pipeline</td><td>CodeStar Connections の使用（<code>codestar-connections:UseConnection</code>）、CodeBuild プロジェクトの起動（<code>codebuild:StartBuild</code>、<code>codebuild:BatchGetBuilds</code> 等）、S3 アーティファクトバケットの読み書き（<code>s3:GetObject</code>、<code>s3:PutObject</code> 等）</td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li>CodePipeline が Source Stage で GitHub からソースを取得し、Build Stage で CodeBuild を起動するために必要な最小権限</li>
+  <li>S3 アーティファクトバケットは CodePipeline が使用する中間ストレージ（CDK がデフォルトで作成）</li>
+</ul>
+
+<h2 id="network">3. ネットワークセキュリティ</h2>
+<ul>
+  <li><strong>Aurora</strong>: Isolated Subnet に配置し、インターネットからの直接アクセスを遮断する。Security Group はアウトバウンド通信を完全に遮断する（CDK で <code>allowAllOutbound: false</code> を明示指定）</li>
+  <li><strong>S3</strong>: 画像保存バケットは Block Public Access を有効化し、サーバーサイド暗号化と SSL 強制を設定する。Instagram への画像連携は Presigned URL のみで行い、バケットやオブジェクトを public にはしない</li>
+  <li><strong>ECS Fargate</strong>: Public Subnet に配置し、Security Group でアクセスを制御する
+    <ul>
+      <li>インバウンド: 全ポート拒否（バッチ処理であり外部からの着信接続は不要）</li>
+      <li>アウトバウンド: インターネットアクセス（外部 API、Secrets Manager、CloudWatch Logs）と VPC 内通信（Aurora）を許可</li>
+    </ul>
+  </li>
+  <li><strong>Secrets Manager</strong>: ECS Fargate のパブリック IP 経由でアクセス（通信は TLS で暗号化）
+    <ul>
+      <li>Interface VPC Endpoint は使用しない（コスト削減のため。より厳格なネットワーク分離が必要な場合は導入を検討）</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="note">
+  <span class="callout-title">NAT Gateway への移行パス</span>
+  セキュリティ要件の強化やトラフィック増加時には、ECS Fargate を Private Subnet に移動し NAT Gateway 経由の構成に変更可能。
+</div>
+
+<h2 id="operation">4. セキュリティ運用</h2>
+<ul>
+  <li>API キー・DB 認証情報は定期的なローテーションを検討する</li>
+  <li>ECS タスクには最小権限の IAM ロールを付与する</li>
+  <li>Secrets Manager 権限はサービスごとに最小プレフィックスで制限し、環境およびサービスを跨いだ参照を避ける</li>
+  <li>Security Group で不要な通信を遮断する</li>
+  <li>CloudWatch Logs と DB の API レスポンス保存欄には、API キー、アクセストークン、Authorization ヘッダー、Presigned URL、Secret 値を出力・保存しない。外部 API レスポンスを保存する場合はマスキング済みの値のみを保存する（アプリ実装時のログ出力方針はアプリ設計で具体化する）</li>
+</ul>
+
+</div>
+</body>
+</html>

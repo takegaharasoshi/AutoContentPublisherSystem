@@ -51,8 +51,11 @@ AutoContentPublisherSystem/
 
 ## ドキュメント
 
-設計書は `docs/` 配下に L0（概要）→ L1（論理設計）→ L2（実装仕様）の 3 層構造で管理している。
-体系の全体像は [docs/document-guide.md](docs/document-guide.md) を参照。
+設計書は `docs/` 配下で管理し、**インフラ設計（`docs/infra/`）とアプリ設計（`docs/app/`）を分離**している。
+体系の全体像は [docs/index.html](docs/index.html) を参照。開発計画・進捗は [docs/development-plan.md](docs/development-plan.md) で管理する。
+
+- 設計書は HTML で記述している（開発計画のみ Markdown）。GitHub 上ではソース表示になるため、ローカルのブラウザまたは VS Code の Live Preview で閲覧すること
+- `docs/_archive/` は旧 Markdown 設計書のアーカイブ（現役の設計書ではない）
 
 ## 開発環境
 

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>システム概要 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / 概要 / システム概要</nav>
+<h1>システム概要</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">一時 Fix</span>
+  <span>最終更新: 2026-07-06</span>
+</div>
+
+<h2 id="purpose">1. システムの目的</h2>
+<p>AWS 上のマネージドサービスを活用し、画像生成から SNS 投稿までを自動化するバッチシステムを構築する。</p>
+
+<h2 id="overview">2. システム構成（概要）</h2>
+
+<figure class="diagram">
+<svg viewBox="0 0 880 410" role="img" aria-label="システム構成の概要図">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--diag-line)"/>
+    </marker>
+  </defs>
+
+  <!-- Scheduler -->
+  <rect x="30" y="20" width="250" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
+  <text x="155" y="49" text-anchor="middle" font-size="14" fill="var(--diag-text)">EventBridge Scheduler</text>
+
+  <!-- 画像生成バッチ -->
+  <rect x="30" y="118" width="250" height="70" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="155" y="147" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--diag-text)">画像生成バッチ</text>
+  <text x="155" y="170" text-anchor="middle" font-size="11" fill="var(--diag-text)">Step Functions + ECS Fargate</text>
+
+  <!-- SNS 投稿バッチ -->
+  <rect x="30" y="300" width="250" height="70" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="155" y="329" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--diag-text)">SNS 投稿バッチ</text>
+  <text x="155" y="352" text-anchor="middle" font-size="11" fill="var(--diag-text)">Step Functions + ECS Fargate</text>
+
+  <!-- ストレージ -->
+  <rect x="380" y="160" width="200" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
+  <text x="480" y="189" text-anchor="middle" font-size="13" fill="var(--diag-text)">S3（生成画像）</text>
+
+  <rect x="380" y="228" width="200" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
+  <text x="480" y="251" text-anchor="middle" font-size="13" fill="var(--diag-text)">Aurora Serverless v2</text>
+  <text x="480" y="268" text-anchor="middle" font-size="11" fill="var(--diag-text)">（メタ情報・投稿結果）</text>
+
+  <!-- 外部 API -->
+  <rect x="640" y="118" width="220" height="70" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="750" y="147" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">Nano Banana Pro</text>
+  <text x="750" y="170" text-anchor="middle" font-size="11" fill="var(--diag-text)">（Gemini 3 Pro 画像 API）</text>
+
+  <rect x="640" y="300" width="220" height="70" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="750" y="329" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">Instagram Graph API</text>
+  <text x="750" y="352" text-anchor="middle" font-size="11" fill="var(--diag-text)">（SNS 投稿先）</text>
+
+  <!-- 矢印 -->
+  <line x1="155" y1="68" x2="155" y2="114" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="168" y="97" font-size="11" fill="var(--diag-text)">定期起動</text>
+
+  <line x1="155" y1="188" x2="155" y2="296" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="168" y="245" font-size="11" fill="var(--diag-text)">成功後に自動起動</text>
+
+  <line x1="280" y1="140" x2="636" y2="145" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="440" y="132" font-size="11" fill="var(--diag-text)">画像生成 API 呼び出し</text>
+
+  <line x1="280" y1="172" x2="376" y2="180" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="280" y1="185" x2="376" y2="243" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <line x1="280" y1="320" x2="376" y2="200" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="280" y1="335" x2="376" y2="260" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <line x1="280" y1="352" x2="636" y2="343" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="450" y="368" font-size="11" fill="var(--diag-text)">Presigned URL で投稿</text>
+</svg>
+<figcaption>システム構成の概要。詳細なアーキテクチャは <a href="../infra/architecture.html">infra/architecture.html</a> を参照。</figcaption>
+</figure>
+
+<h3>2.1 画像生成バッチ</h3>
+<ol>
+  <li>EventBridge Scheduler が定期的に画像生成ワークフロー（Step Functions）を起動する</li>
+  <li>DB 準備確認（Aurora の利用可能確認）の後、画像生成 ECS Fargate タスクが Nano Banana Pro（<a href="https://ai.google.dev/gemini-api/docs/image-generation?hl=ja">Gemini 3 Pro 画像 API</a>）で画像を生成する</li>
+  <li>生成した画像を S3 に保存し、メタ情報を Aurora Serverless v2 に登録する</li>
+</ol>
+
+<h3>2.2 SNS 投稿バッチ</h3>
+<ol>
+  <li>画像生成ワークフローの成功後に SNS 投稿ワークフロー（Step Functions）が自動起動する（手動での単独実行も可能）</li>
+  <li>DB 準備確認の後、SNS 投稿 ECS Fargate タスクが DB から投稿対象を取得する</li>
+  <li>S3 の画像に対して Presigned URL を発行し、Instagram Graph API に渡して投稿する</li>
+  <li>投稿結果を DB に記録する</li>
+</ol>
+
+<div class="note">
+  <span class="callout-title">アプリ仕様は未確定</span>
+  投稿対象の決め方・冪等性・再試行などの処理ロジックはアプリ設計（<a href="../app/index.html">docs/app/</a>、Phase 9）で定義する。本ドキュメントおよびインフラ設計書では実行基盤のみを扱う。
+</div>
+
+<h2 id="tech">3. 技術選定</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>要素</th><th>技術</th><th>選定理由</th></tr></thead>
+  <tbody>
+    <tr><td>開発言語</td><td>Python</td><td>AI/ML ライブラリの充実、API 連携の容易さ</td></tr>
+    <tr><td>DB</td><td>Aurora Serverless v2（MySQL 互換）</td><td>自動一時停止によるコスト最適化、サーバーレス運用</td></tr>
+    <tr><td>バッチ実行</td><td>ECS Fargate RunTask</td><td>サーバー管理不要、タスク単位の課金</td></tr>
+    <tr><td>ワークフロー</td><td>Step Functions Standard</td><td>エラーハンドリング（Retry/Catch）、可視化</td></tr>
+    <tr><td>スケジューラ</td><td>EventBridge Scheduler</td><td>cron 式による柔軟なスケジュール設定</td></tr>
+    <tr><td>インフラ定義</td><td>AWS CDK</td><td>TypeScript による型安全なインフラ定義</td></tr>
+    <tr><td>CI/CD</td><td>CodePipeline + CodeBuild</td><td>AWS ネイティブ、ECR 連携の容易さ</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="env">4. 開発環境</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>詳細</th></tr></thead>
+  <tbody>
+    <tr><td>開発端末</td><td>Windows</td></tr>
+    <tr><td>エディタ</td><td>VS Code ベースのエディタ</td></tr>
+    <tr><td>開発環境</td><td>WSL2（Ubuntu）</td></tr>
+    <tr><td>コンテナ</td><td>Docker Desktop</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="policy">5. 開発方針</h2>
+<ul>
+  <li><strong>モノリポジトリ</strong>を採用し、全サービスを単一リポジトリで管理する</li>
+  <li><strong>機能単位（サービス単位）</strong>でコンテナイメージを分割する</li>
+  <li>CodePipeline / CodeBuild はサービスごとに分ける</li>
+  <li>CDK Deploy はサービスごとに分ける</li>
+  <li>共通インフラと各サービスは CDK スタックを分離する</li>
+  <li><strong>インフラを先に構築し、業務ロジック（アプリ）は後から設計・実装する</strong>（進め方は <a href="../development-plan.md">development-plan.md</a> を参照）</li>
+</ul>
+
+<h2 id="future">6. 拡張計画</h2>
+<ul>
+  <li>画像生成バッチと SNS 投稿バッチを 1 セットとし、将来的に複数セットを運用する
+    <ul>
+      <li>複数セット運用時は、Step Functions ステートマシンを共有し、EventBridge Scheduler をセットごとに追加する方式を採る</li>
+      <li>スケジュール定義のマスタは IaC（CDK）とする</li>
+    </ul>
+  </li>
+  <li>管理画面（オンラインシステム）を追加し、設定・履歴・バッチ管理を GUI で行えるようにする</li>
+</ul>
+
+</div>
+</body>
+</html>

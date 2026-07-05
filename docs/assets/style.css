@@ -1,0 +1,206 @@
+/* ============================================================
+   AutoContentPublisherSystem 設計書 共通スタイル
+   - 外部依存なし（Web フォント・CDN 不使用）
+   - ライト / ダークテーマ対応（prefers-color-scheme）
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --bg-subtle: #f6f8fa;
+  --text: #1f2328;
+  --text-muted: #59636e;
+  --border: #d1d9e0;
+  --border-strong: #b7c0c9;
+  --link: #0a69da;
+
+  --note-border: #0a69da;
+  --note-bg: #f0f7ff;
+  --warn-border: #b98900;
+  --warn-bg: #fff8e1;
+  --decision-border: #7a52c7;
+  --decision-bg: #f7f2fd;
+
+  --badge-fixed-bg: #dcf5e3;
+  --badge-fixed-text: #116329;
+  --badge-wip-bg: #fff1cc;
+  --badge-wip-text: #7a5901;
+  --badge-future-bg: #e8ebee;
+  --badge-future-text: #59636e;
+
+  --code-bg: #f0f2f5;
+
+  /* SVG 図表用 */
+  --diag-box: #f0f7ff;
+  --diag-box-border: #6ea4de;
+  --diag-box-alt: #ffffff;
+  --diag-box-alt-border: #b7c0c9;
+  --diag-emph: #fff1cc;
+  --diag-emph-border: #d4a72c;
+  --diag-text: #1f2328;
+  --diag-line: #59636e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10141a;
+    --bg-subtle: #1a2028;
+    --text: #e6e8eb;
+    --text-muted: #9aa4b0;
+    --border: #333c47;
+    --border-strong: #46515e;
+    --link: #6cb0ff;
+
+    --note-border: #3d81d6;
+    --note-bg: #14212f;
+    --warn-border: #c69026;
+    --warn-bg: #2a2211;
+    --decision-border: #9d7fe0;
+    --decision-bg: #221a33;
+
+    --badge-fixed-bg: #12351d;
+    --badge-fixed-text: #6ed58a;
+    --badge-wip-bg: #38300f;
+    --badge-wip-text: #e3c35b;
+    --badge-future-bg: #262d35;
+    --badge-future-text: #9aa4b0;
+
+    --code-bg: #1c232c;
+
+    --diag-box: #17273a;
+    --diag-box-border: #4a7cb8;
+    --diag-box-alt: #1a2028;
+    --diag-box-alt-border: #46515e;
+    --diag-emph: #33290e;
+    --diag-emph-border: #a8862a;
+    --diag-text: #e6e8eb;
+    --diag-line: #9aa4b0;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: 16px; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+    Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  line-height: 1.75;
+  -webkit-text-size-adjust: 100%;
+}
+
+.container {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+}
+
+/* ---- ページヘッダ ---- */
+.breadcrumb { font-size: .85rem; color: var(--text-muted); margin-bottom: .25rem; }
+.breadcrumb a { color: var(--text-muted); }
+
+.page-meta {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: .85rem;
+  color: var(--text-muted);
+  margin-top: .6rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: .05rem .6rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-fixed  { background: var(--badge-fixed-bg);  color: var(--badge-fixed-text); }
+.badge-wip    { background: var(--badge-wip-bg);    color: var(--badge-wip-text); }
+.badge-future { background: var(--badge-future-bg); color: var(--badge-future-text); }
+
+/* ---- 見出し ---- */
+h1 { font-size: 1.7rem; line-height: 1.3; margin: .25rem 0 0; padding-bottom: .5rem; border-bottom: 2px solid var(--border); }
+h2 { font-size: 1.3rem; margin-top: 2.5rem; padding-bottom: .3rem; border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.1rem; margin-top: 1.75rem; }
+h4 { font-size: 1rem;  margin-top: 1.5rem; }
+
+a { color: var(--link); }
+
+ul, ol { padding-left: 1.6rem; }
+li { margin: .2rem 0; }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+/* ---- 表 ---- */
+.table-wrap { overflow-x: auto; margin: 1rem 0; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; line-height: 1.6; }
+th, td { border: 1px solid var(--border); padding: .45rem .7rem; text-align: left; vertical-align: top; }
+th { background: var(--bg-subtle); }
+tbody tr:nth-child(even) { background: color-mix(in srgb, var(--bg-subtle) 55%, var(--bg)); }
+
+/* ---- コード ---- */
+code {
+  font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, Menlo, monospace;
+  font-size: .85em;
+  background: var(--code-bg);
+  padding: .1em .35em;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .9rem 1.1rem;
+  overflow-x: auto;
+  line-height: 1.55;
+}
+pre code { background: none; padding: 0; font-size: .82rem; overflow-wrap: normal; }
+
+/* ---- コールアウト ---- */
+.note, .warn, .decision {
+  border-left: 4px solid;
+  border-radius: 0 8px 8px 0;
+  padding: .7rem 1rem;
+  margin: 1rem 0;
+  font-size: .92rem;
+}
+.note     { border-color: var(--note-border);     background: var(--note-bg); }
+.warn     { border-color: var(--warn-border);     background: var(--warn-bg); }
+.decision { border-color: var(--decision-border); background: var(--decision-bg); }
+.callout-title { font-weight: 700; display: block; margin-bottom: .15rem; }
+
+/* ---- 図表 ---- */
+figure.diagram {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-subtle);
+  overflow-x: auto;
+  text-align: center;
+}
+figure.diagram svg { max-width: 100%; height: auto; font-family: inherit; }
+figure.diagram figcaption { font-size: .85rem; color: var(--text-muted); margin-top: .5rem; }
+
+/* ---- ドキュメントカード（index 用） ---- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: .9rem;
+  margin: 1rem 0;
+}
+.card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .9rem 1.1rem;
+  background: var(--bg);
+}
+.card .card-title { font-weight: 700; margin-bottom: .2rem; }
+.card p { margin: .3rem 0 0; font-size: .88rem; color: var(--text-muted); }

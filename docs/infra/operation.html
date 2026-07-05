@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インフラ運用設計 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / インフラ設計 / インフラ運用設計</nav>
+<h1>インフラ運用設計</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">一時 Fix</span>
+  <span>最終更新: 2026-07-06</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本ドキュメントの範囲</span>
+  インフラ（実行基盤）の運用のみを扱う。アプリ運用（プロンプト管理、投稿失敗時の手動補正、SNS アカウント追加手順、DDL マイグレーション方針等）はアプリ設計（<a href="../app/index.html">docs/app/</a>、Phase 9）で定義する。
+</div>
+
+<h2 id="batch-ops">1. バッチ運用</h2>
+
+<h3>1.1 スケジュール管理</h3>
+<ul>
+  <li>EventBridge Scheduler で cron 式により画像生成 Step Functions を定期実行する</li>
+  <li>SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動されるため、SNS 投稿用の EventBridge Scheduler は不要</li>
+  <li>スケジュールはバッチセットごとに個別設定可能とする</li>
+  <li>スケジュール定義のマスタは IaC（CDK）とする</li>
+</ul>
+
+<h4>スケジュール変更手順</h4>
+<ol>
+  <li>CDK コードの EventBridge Scheduler の cron 式を変更する</li>
+  <li><code>cdk deploy -c env=prod ImageBatchStack</code> で EventBridge Scheduler を更新する</li>
+</ol>
+
+<h3>1.2 バッチ実行時の動作</h3>
+<ol>
+  <li>EventBridge Scheduler が画像生成 Step Functions（image-generation-sfn）を起動</li>
+  <li>Step Functions が DB 準備確認 ECS タスクを実行（WaitForDbReady ステート）</li>
+  <li>DB 準備完了後、Step Functions が画像生成 ECS Fargate RunTask を実行</li>
+  <li>画像生成タスク成功後、Step Functions が SNS 投稿 Step Functions（sns-posting-sfn）を <code>StartExecution</code> で起動</li>
+  <li>SNS 投稿 Step Functions が DB 準備確認 ECS タスクを実行</li>
+  <li>DB 準備完了後、SNS 投稿 Step Functions が SNS 投稿 ECS Fargate RunTask を実行</li>
+  <li>各タスク完了後、Fargate タスクは自動的に停止（課金終了）</li>
+</ol>
+
+<h4>手動での SNS 投稿実行</h4>
+<p>SNS 投稿の再実行や単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（<code>set_code</code> を入力パラメータとして渡す）。<code>EXECUTION_ARN</code> は Step Functions が <code>$$.Execution.Id</code> から自動設定するため、手動指定は不要。</p>
+<pre><code># CLI での手動実行例
+aws stepfunctions start-execution \
+  --state-machine-arn arn:aws:states:ap-northeast-1:123456789012:stateMachine:acps-prod-sns-posting-sfn \
+  --input '{"set_code": "fashion-set-1"}'</code></pre>
+
+<h4>手動での画像生成実行</h4>
+<p>Scheduler DLQ からの復旧や検証で画像生成 Step Functions を直接起動する場合は、<code>set_code</code> と <code>scheduled_at</code> を入力パラメータとして渡す。Scheduler DLQ からの復旧時は、DLQ のメッセージに含まれる <code>scheduled_at</code> の値を使用する。検証目的で新規実行する場合は UTC の ISO 8601 形式で明示する。</p>
+<pre><code>aws stepfunctions start-execution \
+  --state-machine-arn arn:aws:states:ap-northeast-1:123456789012:stateMachine:acps-prod-image-generation-sfn \
+  --input '{"set_code": "fashion-set-1", "scheduled_at": "2026-04-19T00:00:00Z"}'</code></pre>
+
+<h3>1.3 CDK デプロイ後チェックリスト</h3>
+<p>CDK デプロイ実行後は、以下のチェックリストを確認する。</p>
+<ul>
+  <li><strong>ImageBatchStack に変更があった場合</strong>: latest ACTIVE revision に期待するロール、環境変数、ログ設定が反映されていることを確認する</li>
+  <li><strong>SnsPostBatchStack に変更があった場合</strong>: latest ACTIVE revision に期待するロール、環境変数、ログ設定が反映されていることを確認する</li>
+  <li><strong>db-readiness-check を更新した場合</strong>: <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を使用し、latest ACTIVE revision が該当タグを参照していることを確認する</li>
+  <li><strong>デプロイ結果の確認</strong>: AWS Console で各リソースの状態が正常であることを確認する</li>
+</ul>
+
+<h2 id="db-ops">2. データベース運用</h2>
+
+<h3>2.1 Aurora Serverless v2 の自動一時停止</h3>
+<ul>
+  <li>コスト最適化のため、自動一時停止を有効にする</li>
+  <li>最小 ACU は 0 とし、0 ACU の自動一時停止をサポートする Aurora MySQL バージョンを採用する</li>
+  <li>一時停止中にアクセスがあると自動的に再開する（再開には数十秒〜数分）</li>
+</ul>
+
+<h3>2.2 DB 準備確認</h3>
+<ul>
+  <li>各 Step Functions ワークフローの最初のステートとして DB 準備確認 ECS タスクを実行する</li>
+  <li>仕様の詳細は <a href="workflow.html#db-readiness">workflow.html セクション 2</a> を参照</li>
+</ul>
+
+<h3>2.3 バックアップ</h3>
+<ul>
+  <li>Aurora のスナップショットによるバックアップ（自動バックアップ有効）</li>
+  <li>保持期間: 7 日間（CDK で明示的に設定。運用状況に応じて調整する）</li>
+</ul>
+
+<div class="note">
+  <span class="callout-title">DDL マイグレーション方針について</span>
+  テーブル設計・DDL のバージョン管理・マイグレーション方針はアプリ設計（Phase 9）で定義する。Phase 6 の疎通確認では接続テスト用の最小 DDL のみを使用する（<a href="../development-plan.md">development-plan.md</a> Phase 6 を参照）。
+</div>
+
+<h2 id="error-ops">3. エラーハンドリング（運用対応）</h2>
+
+<p>Step Functions の Retry/Catch 設定の詳細は <a href="workflow.html#error-handling">workflow.html セクション 6</a> を参照。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>エラー種別</th><th>運用対応</th></tr></thead>
+  <tbody>
+    <tr><td>ECS タスク起動失敗（Retry 超過）</td><td>CloudWatch Logs を確認し原因を調査。必要に応じて手動再実行</td></tr>
+    <tr><td>ECS タスク異常終了（Retry 超過）</td><td>CloudWatch Logs でエラー内容を確認。アプリケーションのバグの場合は修正してデプロイ</td></tr>
+    <tr><td>タイムアウト</td><td>バッチ処理の処理時間を確認し、タイムアウト値の調整を検討</td></tr>
+    <tr><td>DB 接続失敗（WaitForDbReady 後）</td><td>Aurora の状態を確認。長時間の DB 停止の場合は AWS Console で手動再開</td></tr>
+    <tr><td>S3 操作失敗</td><td>S3 バケットの状態と IAM 権限を確認</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">アプリレベルのエラー対応</span>
+  外部 API 失敗時の再試行・投稿結果の手動補正など、業務データに関わる運用対応はアプリ設計（Phase 9）で定義する。
+</div>
+
+<h2 id="monitoring">4. 監視・通知</h2>
+
+<h3>4.1 監視方式</h3>
+<p>監視リソースの具体的なメトリクス名・しきい値と Scheduler DLQ は <a href="workflow.html#custom-metrics">workflow.html セクション 7〜10</a> を参照。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>監視対象</th><th>通知が来たらやること</th></tr></thead>
+  <tbody>
+    <tr><td>Step Functions 失敗</td><td>CloudWatch Logs で失敗原因を確認。一時的なエラーであれば手動再実行</td></tr>
+    <tr><td>Scheduler 起動失敗</td><td>Scheduler DLQ のメッセージを確認し、対象 <code>set_code</code> と <code>scheduled_at</code> で画像生成 Step Functions を手動実行する（セクション 1.2 の手順）</td></tr>
+    <tr><td>SNS 投稿起動失敗</td><td>カスタムメトリクス（<code>SnsPostStartFailureCount</code>）で検知。手動で sns-posting-sfn を起動する</td></tr>
+    <tr><td>ECS タスク異常終了</td><td>CloudWatch Logs でエラー内容を確認。アプリケーションのバグの場合は修正してデプロイ</td></tr>
+    <tr><td>Aurora 異常</td><td>Aurora の状態を AWS Console で確認。ACU 設定の見直しを検討</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>4.2 通知先</h3>
+<ul>
+  <li>SNS Topic 経由でメール通知</li>
+  <li>将来的には Slack 連携等も検討</li>
+</ul>
+
+<h4>SNS Topic サブスクリプション設定手順</h4>
+<ol>
+  <li>MonitoringStack のデプロイ後、AWS Console で SNS Topic を開く</li>
+  <li>「サブスクリプションの作成」からプロトコル「Email」を選択し、通知先メールアドレスを入力する</li>
+  <li>入力したメールアドレスに確認メールが届くので、メール内のリンクをクリックして承認する</li>
+  <li>サブスクリプションのステータスが「確認済み」になったことを確認する</li>
+</ol>
+
+<div class="warn">
+  <span class="callout-title">注意</span>
+  サブスクリプションの承認を行わないと通知が届かない。MonitoringStack デプロイ後は必ず承認を完了すること。
+</div>
+
+<h3>4.3 ダッシュボード</h3>
+<ul>
+  <li>CloudWatch Dashboard でバッチ実行状況を可視化（必要に応じて段階的に構築）</li>
+</ul>
+
+<h2 id="cost">5. コスト最適化</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>リソース</th><th>最適化方針</th></tr></thead>
+  <tbody>
+    <tr><td>ECS Fargate</td><td>バッチ実行時のみ起動、タスク完了後に自動停止</td></tr>
+    <tr><td>Aurora Serverless v2</td><td>自動一時停止を有効化、最小 ACU を低く設定</td></tr>
+    <tr><td>ネットワーク</td><td>NAT Gateway は使用しない。ECS Fargate にパブリック IP を付与して直接インターネットアクセス</td></tr>
+    <tr><td>S3</td><td>Lifecycle Policy で全オブジェクトを 30 日で自動削除</td></tr>
+    <tr><td>CloudWatch Logs</td><td>リテンション期間を 90 日に設定し、不要なログの蓄積を防止する</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="security">6. セキュリティ運用</h2>
+<p>セキュリティ設計の詳細は <a href="security.html">security.html</a> を参照。</p>
+
+</div>
+</body>
+</html>
