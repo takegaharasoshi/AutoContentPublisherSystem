@@ -34,7 +34,7 @@
   - 確認: [docs/index.html](index.html) から各設計書が辿れる。インフラ設計書 6 本（architecture / stacks / workflow / security / cicd / operation）が HTML で存在する
   - 備考: 2026-07-06 実施・ユーザー確認済み。アプリ設計（旧 batch.md / database.md 等）は docs/_archive/ に退避し、Phase 9 の参考資料とする
 
-- [ ] **D-2** 生成 AI レビュー（観点限定・最大 2 巡）
+- [x] **D-2** 生成 AI レビュー（観点限定・最大 2 巡）
   - 確認: blocker 指摘がゼロ、または修正済みである。改善提案は設計課題リストに記録されている
   - 備考: 2026-07-06 に 2 巡実施（上限到達）。1 巡目: blocker 2 件（Aurora Secret 名の明示指定漏れ / dbReadinessCheckImageTag 未指定時の運用未定義）を修正。2 巡目: 1 巡目修正が生んだ blocker 2 件（synth エラー方式が他スタックデプロイを巻き込む矛盾 / Secret 名変更時の影響の誤記）を修正。改善提案 1 件は設計課題リストに記録。レビュー依頼時は以下のテンプレートを使用する
 
