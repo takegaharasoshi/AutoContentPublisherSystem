@@ -174,7 +174,7 @@
   <li><strong>タイムアウト</strong>: 各 Task ステートに明示タイムアウトを設定し、ハング時にワークフローが長時間ぶら下がらないようにする（具体値は <a href="workflow.html">workflow.html</a> を参照）</li>
   <li><strong>同時実行に関する制約</strong>: Step Functions Standard にはステートマシンの同時実行数を制限するネイティブ機能がないため、EventBridge Scheduler の実行間隔をバッチの想定実行時間より十分長く設定して回避する。同時実行時のデータ整合性の担保（DB レベルの排他制御）はアプリ設計（<a href="../app/index.html">docs/app/</a>）で扱う</li>
   <li><strong>エラーハンドリング</strong>: Retry / Catch を設定（ASL 定義は <a href="workflow.html">workflow.html</a> を参照）</li>
-  <li><strong>SNS 投稿の単独実行</strong>: sns-posting-sfn は独立したステートマシンのため、手動での再投稿や投稿のみの実行も可能</li>
+  <li><strong>SNS 投稿の単独実行</strong>: sns-posting-sfn は独立したステートマシンのため、手動での単独実行も可能。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/design-outline.html#flow-sns">アプリ設計大枠 セクション 2.2</a>）で定義する</li>
 </ul>
 
 <h3>3.3 EventBridge Scheduler</h3>

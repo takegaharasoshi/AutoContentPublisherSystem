@@ -66,9 +66,9 @@
   - 確認: docs/app/ の設計書構成（ドキュメント一覧と各スコープ）と、主要設計方針の骨子（処理フロー概要・データモデル概要・運用方針）が決まっている
   - 備考: A-1 の壁打ち結果をもとに決める。どこまでを大枠とし、何を Phase 9 に持ち越すかもここで線引きする。2026-07-06 実施。決定内容は [docs/app/design-outline.html](app/design-outline.html) に記録（設計書構成は batch-flow / data-model / operation の 3 分冊で Phase 9-2〜9-4 と 1:1 対応。ユーザーレビューを受け「1 生成実行（1 起動）= 1 投稿（アカウントごと）」を不変条件とし、generation_runs を投稿単位の中心に据えるデータモデル概要（generation_runs / posts / post_images / caption_templates 新設）と「投稿試行のない最古の生成実行を対象とする」投稿フローを定義）
 
-- [ ] **A-3** 大枠を踏まえた既存設計の見直し
+- [x] **A-3** 大枠を踏まえた既存設計の見直し
   - 確認: インフラ設計書 6 本と開発計画を大枠と突き合わせ、矛盾・欠落（blocker）が修正されている。改善提案は設計課題リストに記録されている
-  - 備考: 見直し観点の例: `set_code` / `scheduled_at` の意味付け、SNS Secret 規約（`set_code` / `account_code` の定義）、環境変数の受け渡し契約。修正は blocker のみ（設計 Fix の運用ルールに従う）
+  - 備考: 見直し観点の例: `set_code` / `scheduled_at` の意味付け、SNS Secret 規約（`set_code` / `account_code` の定義）、環境変数の受け渡し契約。修正は blocker のみ（設計 Fix の運用ルールに従う）。2026-07-06 実施。blocker 修正 3 分類: (1) workflow.html セクション 5 / security.html セクション 1.2 の「Phase 9 で確定」を design-outline.html セクション 5 の確定済み参照へ更新 (2)「手動での再投稿」表現 3 箇所（workflow / architecture / operation）をインフラの能力（単独実行可能）とアプリ仕様（投稿対象の決定）に分離 (3) 開発計画の文言更新（4-6 備考・9-2〜9-4 確認欄）。Scheduler Input・SNS 投稿 SFN 入力（`set_code` のみ）・Secret 規約の多プラットフォーム整合・1 日複数回実行・IAM 権限は矛盾なしを確認。改善提案 1 件（S3 30 日ライフサイクルと「生成画像は残す」の整理）を設計課題リストに記録
 
 - [ ] **A-4** アプリ設計大枠の設計書記載
   - 確認: A-2 で決めた構成に従い、docs/app/ に大枠設計書（HTML、共通スタイル使用）が作成されている
@@ -202,7 +202,7 @@
 
 - [ ] **4-6** Step Functions 手動実行による E2E 確認（WaitForDbReady → ECS タスク実行の一連フロー）
   - 確認: コンソールから手動実行 → DB 準備確認 → SNS 投稿 ECS タスク起動 → 成功（全ステートが正常遷移）
-  - 備考: Phase 4-5 は Step Functions の追加デプロイのみ。4-6 は WaitForDbReady を含む一連フローの動作確認。手動実行 input は `{"set_code":"test-set-1"}` のように `set_code` を必ず渡す（空回し段階ではダミー値でよい。意味付けはアプリ設計で確定する）。Phase 5 で ImageBatchStack に EventBridge Scheduler を追加し、SNS 投稿は画像生成成功後に自動起動される
+  - 備考: Phase 4-5 は Step Functions の追加デプロイのみ。4-6 は WaitForDbReady を含む一連フローの動作確認。手動実行 input は `{"set_code":"test-set-1"}` のように `set_code` を必ず渡す（空回し段階ではダミー値でよい。意味付けは [docs/app/design-outline.html](app/design-outline.html) セクション 5 で確定済み）。Phase 5 で ImageBatchStack に EventBridge Scheduler を追加し、SNS 投稿は画像生成成功後に自動起動される
 
 ---
 
@@ -313,15 +313,15 @@
   - 備考: 大枠に変更が必要なら先に更新してから詳細設計（9-2 以降）に入る
 
 - [ ] **9-2** バッチ処理フロー設計
-  - 確認: docs/app/ に処理フロー設計書（HTML）が作成されている
+  - 確認: Phase A の骨子版（docs/app/batch-flow.html）が詳細化されている
   - 備考: Phase A の大枠設計書（処理フロー概要）を詳細化する。冪等性・再試行・投稿ステータス管理・二重投稿防止・バッチサイズ制限を扱う。docs/_archive/batch.md を参考資料とする
 
 - [ ] **9-3** DB スキーマ設計 + 本スキーマ DDL 作成
-  - 確認: docs/app/ に DB 設計書（HTML）が、`database/` に本スキーマの DDL がある
+  - 確認: Phase A の骨子版（docs/app/data-model.html）が詳細化され、`database/` に本スキーマの DDL がある
   - 備考: Phase A の大枠設計書（データモデル概要）を詳細化する。docs/_archive/database.md を参考資料とする。DDL のバージョン管理・マイグレーション方針もここで定義する
 
 - [ ] **9-4** アプリ運用・セキュリティ（アプリ部分）の設計
-  - 確認: docs/app/ にアプリ運用設計書（HTML）が作成されている
+  - 確認: Phase A の骨子版（docs/app/operation.html）が詳細化されている
   - 備考: Phase A の大枠設計書（運用方針）を詳細化する。プロンプト管理、SNS アカウント追加手順、投稿失敗時の手動補正、SNS Secret 規約の最終確認（[docs/infra/security.html](infra/security.html) セクション 1.2 の注記）。docs/_archive/operation.md を参考資料とする
 
 - [ ] **9-5** 生成 AI レビュー → 一時 Fix
@@ -360,3 +360,4 @@
 | 日付 | 対象ドキュメント | 課題 | 対応方針 | 対応時期 |
 |---|---|---|---|---|
 | 2026-07-06 | docs/infra/stacks.html | セクション 5「スタック間のデータ受け渡し」のツリー図に MonitoringStack への入力（SnsPostingSfnArn・AuroraClusterIdentifier・EcsClusterArn・ImageGenerationSfnName）と DbReadinessCheckSgId の記載がない。3.1 出力一覧・3.4 依存スタックには記載済みのため実装は可能 | Phase 7 実装時に実態へ合わせて追記 | Phase 7 |
+| 2026-07-06 | docs/app/design-outline.html | セット廃止時「データ（生成画像・投稿履歴）は残す」とあるが、S3 実体はインフラ設計の 30 日ライフサイクルで自動削除される。「残す」対象が DB レコード（メタ情報・投稿履歴）であることの明確化と S3 実体の保持要否の確認が必要 | Phase 9-3（データモデル詳細・S3 キー設計）で明確化 | Phase 9 |

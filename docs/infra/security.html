@@ -66,7 +66,7 @@
 
 <div class="note">
   <span class="callout-title">アプリ設計での最終確認</span>
-  SNS 認証情報の規約に含まれる <code>set_code</code> / <code>account_code</code> はアプリ設計（Phase 9）で確定する概念のため、規約の詳細（構成要素の定義・アカウント追加手順）はアプリ設計時に最終確認する。<code>acps/{env}/</code> プレフィックスと IAM のプレフィックスベース制御という骨格はインフラ設計として Fix とする。
+  構成要素の定義は<a href="../app/design-outline.html#contract">アプリ設計大枠 セクション 5</a> で確定した（<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>）。アカウント追加手順の具体化と、インフラ構築の実態を踏まえた規約の最終確認はアプリ設計（Phase 9-4）で行う。<code>acps/{env}/</code> プレフィックスと IAM のプレフィックスベース制御という骨格はインフラ設計として Fix とする。
 </div>
 
 <h3>1.3 Secret 値スキーマ</h3>

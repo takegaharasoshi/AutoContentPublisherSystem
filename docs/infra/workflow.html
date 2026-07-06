@@ -33,7 +33,7 @@
   <li>sns-posting-sfn: <code>WaitForDbReady</code>（DB 準備確認）→ <code>RunSnsPostBatchTask</code>（SNS 投稿バッチ）</li>
 </ol>
 <ul>
-  <li>SNS 投稿 Step Functions（sns-posting-sfn）は独立したステートマシンのため、手動での再投稿や投稿のみの単独実行も可能</li>
+  <li>SNS 投稿 Step Functions（sns-posting-sfn）は独立したステートマシンのため、手動での単独実行も可能。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/design-outline.html#flow-sns">アプリ設計大枠 セクション 2.2</a>）で定義する</li>
   <li>EventBridge Scheduler は画像生成 Step Functions のみに設定し、SNS 投稿用のスケジューラは不要</li>
 </ul>
 
@@ -329,7 +329,7 @@
 
 <div class="note">
   <span class="callout-title">環境変数は「受け渡し契約」として定義</span>
-  <code>SET_CODE</code> / <code>SCHEDULED_AT</code> の業務上の意味付け（DB のどの値と対応するか等）はアプリ設計（Phase 9）で確定する。空回し段階（Phase 4〜5）では <code>fashion-set-1</code> 等のダミー値を渡し、コンテナ側では使用しない。
+  <code>SET_CODE</code> / <code>SCHEDULED_AT</code> の業務上の意味付け（DB のどの値と対応するか等）は<a href="../app/design-outline.html#contract">アプリ設計大枠 セクション 5</a> で確定済み（Phase 9 で見直す前提の一時 Fix）。空回し段階（Phase 4〜5）では <code>fashion-set-1</code> 等のダミー値を渡し、コンテナ側では使用しない。
 </div>
 
 <h3>5.1 画像生成バッチ</h3>
