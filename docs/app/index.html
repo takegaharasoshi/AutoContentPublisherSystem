@@ -12,15 +12,15 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / アプリ設計</nav>
 <h1>アプリ設計</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">大枠: 骨子版作成済み（Phase A）/ 詳細: Phase 9</span>
-  <span>最終更新: 2026-07-06</span>
+  <span class="badge badge-fixed">大枠: Phase A 完了 / 詳細: Phase 9 完了（一時 Fix）</span>
+  <span>最終更新: 2026-07-07</span>
 </div>
 
 <div class="warn">
   <span class="callout-title">アプリ設計は 2 段階（大枠 → 詳細）で行う</span>
   アプリ設計は、<strong>大枠（Phase A）</strong>と<strong>詳細（Phase 9）</strong>の 2 段階で行う。Phase A では仕様の壁打ち・設計書構成の決定・主要方針の骨子を固め、大枠設計書（骨子版）を作成した。
-  テーブル定義・処理フローの詳細・DDL などの詳細設計は Phase 9 で行う（2026-07-06、上流工程に適した生成 AI モデルの利用期限を機に、インフラ構築＝開発計画 Phase 0〜8 より前へ前倒し。インフラ構築で得た知見の反映は Phase 10 冒頭の最終 Fix（10-1）で行う）。
-  Phase A の成果物は Phase 9 で見直す前提の一時 Fix とする。進め方は <a href="../development-plan.md">development-plan.md</a> の Phase A・Phase 9 を参照。
+  テーブル定義・処理フローの詳細・DDL などの詳細設計は Phase 9 で行った（2026-07-06、上流工程に適した生成 AI モデルの利用期限を機に、インフラ構築＝開発計画 Phase 0〜8 より前へ前倒し。インフラ構築で得た知見の反映は Phase 10 冒頭の最終 Fix（10-1）で行う）。
+  Phase 9-5（生成 AI レビュー）まで完了し、<strong>Phase 9 の成果物は一時 Fix</strong>とする。進め方は <a href="../development-plan.md">development-plan.md</a> の Phase A・Phase 9 を参照。
 </div>
 
 <div class="note">
@@ -29,6 +29,17 @@
     <li><strong>A-1 壁打ち記録</strong>（2026-07-06 実施）: <a href="requirements-notes.html">アプリ要件メモ</a> — ユースケース・セットの考え方・投稿運用のイメージ・失敗時の方針・初期/将来スコープ・旧設計との差分</li>
     <li><strong>A-2 大枠決め</strong>（2026-07-06 実施）: <a href="design-outline.html">アプリ設計大枠</a> — 設計書構成、処理フロー・データモデル・運用方針の骨子、Phase 9 への線引き</li>
     <li><strong>A-4 設計書記載</strong>（2026-07-06 実施）: 大枠設計書 3 分冊（骨子版）の作成と本ページの目次化。あわせて複数セット前提の<strong>セット別設計書ルール</strong>を新設（下記）</li>
+  </ul>
+</div>
+
+<div class="note">
+  <span class="callout-title">Phase 9 の成果物（詳細設計・一時 Fix）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>9-1 棚卸し</strong>（2026-07-06 実施）: Phase A 大枠と検討メモの棚卸し。漏れなし</li>
+    <li><strong>9-2 バッチ処理フロー詳細</strong>（2026-07-06 実施）: <a href="batch-flow.html">batch-flow.html</a></li>
+    <li><strong>9-3 DB スキーマ詳細 + 本スキーマ DDL</strong>（2026-07-07 実施）: <a href="data-model.html">data-model.html</a>、<a href="../../database/V001__initial_schema.sql">database/V001__initial_schema.sql</a></li>
+    <li><strong>9-4 アプリ運用詳細</strong>（2026-07-07 実施）: <a href="operation.html">operation.html</a></li>
+    <li><strong>9-5 生成 AI レビュー</strong>（2026-07-07 実施）: blocker 1 件（<code>batch_execution_logs</code> の Step Functions Retry 時の一意制約違反）を発見・修正。改善提案 3 件は設計課題リストに記録。詳細は <a href="../development-plan.md">development-plan.md</a> の 9-5 備考を参照</li>
   </ul>
 </div>
 

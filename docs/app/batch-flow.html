@@ -12,8 +12,8 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / バッチ処理フロー設計</nav>
 <h1>バッチ処理フロー設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Phase 9-2 で詳細化済み（一時 Fix）</span>
-  <span>最終更新: 2026-07-06</span>
+  <span class="badge badge-fixed">Phase 9-2 で詳細化済み・9-5 レビュー反映済み（一時 Fix）</span>
+  <span>最終更新: 2026-07-07</span>
 </div>
 
 <div class="note">
@@ -29,8 +29,17 @@
 <ul>
   <li><strong>1 回の画像生成バッチ起動 = 1 投稿（アカウントごと）</strong>を不変条件とする（定義の正は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。1 回の生成実行を <code>generation_runs</code> エンティティとして永続化し、SNS 投稿バッチは生成実行を処理対象の単位とする</li>
   <li>本書の処理手順（骨格）は<strong>全セット共通</strong>とする。セットごとに変わりうる箇所は本文中に<strong>「セット別拡張ポイント」</strong>と明示し、各セットでどの方式を使うかはセット別設計書に記録する（<a href="design-outline.html#set-docs">セット別設計書のルール</a>）</li>
-  <li><strong>実行ログ記録（共通）</strong>: 両バッチとも、処理開始直後に <code>batch_execution_logs</code> へ <code>status='running'</code> のレコードを INSERT する。<code>attempt_count</code> は同一 <code>EXECUTION_ARN</code> 内で ECS タスクが起動された回数（Step Functions Retry による再起動のたびに +1）。正常終了時は <code>status='succeeded'</code>、異常終了時は <code>status='failed'</code> に更新する。このログ記録自体の INSERT/UPDATE が失敗した場合はバッチ全体を終了コード 1 とする（記録なしでの続行は運用上のリスクが高いため）</li>
+  <li><strong>実行ログ記録（共通）</strong>: 両バッチとも、<code>SET_CODE</code> から <code>batch_sets</code> を解決した直後（<code>set_id</code> が確定した時点。生成実行の解決や投稿対象の決定より前）に <code>batch_execution_logs</code> へ実行ログを記録する（記録手順は<a href="#exec-log">下記</a>を参照）。<code>SET_CODE</code> の解決に失敗した場合（<code>batch_sets</code> が存在しない）は <code>set_id</code> が確定できないため記録は行わず、既存の Step Functions 失敗アラームで検知する。正常終了時は <code>status='succeeded'</code>、異常終了時は <code>status='failed'</code> に更新する。このログ記録自体の INSERT/UPDATE が失敗した場合はバッチ全体を終了コード 1 とする（記録なしでの続行は運用上のリスクが高いため）</li>
 </ul>
+
+<div class="decision" id="exec-log">
+  <span class="callout-title">Phase 9-5 レビューでの確定: batch_execution_logs の INSERT/UPDATE 手順（Step Functions Retry 対応）</span>
+  <code>batch_execution_logs</code> は <code>UNIQUE (execution_arn, batch_type)</code> を持つため、Step Functions Retry で同一実行内に ECS タスクが再起動された場合、素朴な INSERT は一意制約違反になる。<code>generation_runs</code>（セクション 2 手順 2）と同じ INSERT-or-fetch パターンを適用する。
+  <ul style="margin:.3rem 0 0;">
+    <li>INSERT 成功 → 新規の実行ログ（<code>attempt_count=1</code>、<code>status='running'</code>）</li>
+    <li>UNIQUE 制約違反 → 既存行を <code>(execution_arn, batch_type)</code> で取得し、<code>attempt_count</code> をインクリメントして <code>status='running'</code> に UPDATE する（前回試行時点の <code>error_message</code> 等は上書きされる。試行ごとの履歴は保持せず、直近の試行状態のみを保持する設計とする）</li>
+  </ul>
+</div>
 
 <h2 id="flow-image">2. 画像生成バッチ処理フロー</h2>
 

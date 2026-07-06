@@ -12,7 +12,7 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / データモデル設計</nav>
 <h1>データモデル設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Phase 9-3 で詳細化済み（一時 Fix）</span>
+  <span class="badge badge-fixed">Phase 9-3 で詳細化済み・9-5 レビュー反映済み（一時 Fix）</span>
   <span>最終更新: 2026-07-07</span>
 </div>
 
@@ -279,6 +279,7 @@ LIMIT 1;</code></pre>
   <code>batch_execution_logs</code> は <code>generation_run</code> の有無に関わらず必ず 1 件記録される必要があるため、独立させる方が実装が単純になる。
   どの実行がどの <code>generation_run</code> を作ったかを調べたい場合は、<code>started_at</code> と <code>generation_runs.created_at</code> の近接時刻で運用者が突き合わせる（通常は 1 実行 : 1 生成実行の関係になるため実務上問題ない）。
 </div>
+<p><code>status</code> / <code>attempt_count</code> の INSERT/UPDATE 手順（Step Functions Retry による再起動時に <code>UNIQUE (execution_arn, batch_type)</code> と衝突しないための INSERT-or-fetch パターン）は <a href="batch-flow.html#exec-log">batch-flow.html セクション 1</a> を参照（Phase 9-5 レビューで確定）。</p>
 
 <h2 id="s3-key">5. S3 キー設計</h2>
 <div class="decision">
