@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>バッチ処理フロー設計（骨子） | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / バッチ処理フロー設計（骨子）</nav>
+<h1>バッチ処理フロー設計（骨子）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">Phase A-4 骨子版（Phase 9-2 で詳細化）</span>
+  <span>最終更新: 2026-07-06</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  画像生成・SNS 投稿バッチの<strong>アプリケーション内部の処理手順</strong>を定める設計書。Phase A-4 時点は骨子版であり、
+  冪等性・二重投稿防止・投稿ステータス管理などの詳細は <strong>Phase 9-2 で詳細化</strong>する（セクション 5）。
+  全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a>、データモデルは <a href="data-model.html">データモデル設計</a> を参照。
+  実行基盤（EventBridge Scheduler → 画像生成 Step Functions → 成功時に SNS 投稿 Step Functions を自動起動）は
+  インフラ設計（<a href="../infra/workflow.html">infra/workflow.html</a>）のとおりで、本書はその器の中で動くアプリの処理を扱う。
+</div>
+
+<h2 id="premise">1. 前提・不変条件</h2>
+<ul>
+  <li><strong>1 回の画像生成バッチ起動 = 1 投稿（アカウントごと）</strong>を不変条件とする（定義の正は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。1 回の生成実行を <code>generation_runs</code> エンティティとして永続化し、SNS 投稿バッチは生成実行を処理対象の単位とする</li>
+  <li>本書の処理手順（骨格）は<strong>全セット共通</strong>とする。セットごとに変わりうる箇所は本文中に<strong>「セット別拡張ポイント」</strong>と明示し、各セットでどの方式を使うかはセット別設計書に記録する（<a href="design-outline.html#set-docs">セット別設計書のルール</a>）</li>
+</ul>
+
+<h2 id="flow-image">2. 画像生成バッチ処理フロー</h2>
+<ol>
+  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（存在しなければ異常終了、<code>is_active=0</code> ならスキップして正常終了）</li>
+  <li><strong>生成実行（<code>generation_runs</code>）レコードを作成する</strong>（セット × <code>SCHEDULED_AT</code> で一意 = 冪等性のアンカー。既存レコードがあれば再実行と判断し、未完了分のみ処理する）</li>
+  <li>画像を生成する:
+    <ol>
+      <li>初期実装は <strong>1 起動 = 1 枚生成</strong>（投稿用プロンプトは実質 1 件で運用する）</li>
+      <li>画像生成 API（Nano Banana Pro）を呼び出し、画像を S3 に保存し、<code>generated_images</code> を生成実行にぶら下げて登録する（プロンプトスナップショット含む）</li>
+    </ol>
+  </li>
+  <li>正常終了する（成功により SNS 投稿ワークフローが自動起動される）</li>
+</ol>
+
+<div class="note">
+  <span class="callout-title">「既存レコードがあれば再実行と判断し、未完了分のみ処理する」の意味</span>
+  Step Functions の Retry 等で同一入力（同じ <code>SET_CODE</code>・<code>SCHEDULED_AT</code>）のタスクが再起動された場合、
+  <code>generation_runs</code> の INSERT が UNIQUE 制約に当たることで「着手済みのスロットの再実行」と検知できる（UNIQUE 制約は二重生成のガードであると同時に再実行検知のセンサーとして働く）。
+  このときは新しい生成実行を作らず、既存実行にぶら下がる完了済み画像を確認して足りない分だけ生成する
+  （初期実装の 1 枚生成では「画像がなければ生成、あれば何もせず正常終了」の二択。将来の複数枚生成では部分再開として効く）。
+  画像 1 枚の完了判定基準（DB 登録済み = 完了、S3 orphan 許容、の旧設計基準を踏襲するか）は Phase 9-2 で定義する。
+</div>
+
+<div class="decision">
+  <span class="callout-title">セット別拡張ポイント: プロンプトの決め方・生成枚数</span>
+  初期実装は <code>prompt_configs</code> の固定プロンプト（実質 1 件）で 1 枚生成する。将来は、
+  <strong>生成 AI にプロンプト自体を考えさせてから画像を生成する方式</strong>、複数プロンプトのローテーション選択・カルーセル素材化、
+  セット別の生成枚数設定などを<strong>セットごとに選択可能</strong>にする（2026-07-06 ユーザー要望。どの方式を使うかはセット別設計書に記録する）。
+  方式が増えても、手順 2 の生成実行の枠組み（1 起動 = 1 生成実行 = 1 投稿分のコンテンツ）は変えない。方式の詳細設計は Phase 9 以降で行う。
+</div>
+
+<h2 id="flow-sns">3. SNS 投稿バッチ処理フロー</h2>
+<p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（画像単位ではない）。</p>
+<ol>
+  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（画像生成バッチと同じ扱い）</li>
+  <li>投稿対象を決定する: <strong>「投稿試行が一度もない生成実行」のうち最も古い 1 件</strong>を対象とする
+    <ul>
+      <li>投稿済みかどうかは、生成実行に紐づく投稿レコード（<code>posts</code>）の有無から<strong>アカウントごとに導出</strong>する（生成実行テーブル自体に投稿済みフラグは持たない。将来の複数アカウントでアカウントごとに状態が異なるため）</li>
+      <li>一度でも試行（失敗含む）した生成実行は自動では再対象にしない = <strong>再試行なし・欠番許容</strong>（初期実装の方針）</li>
+      <li>通常運用では直前の画像生成バッチの当回分がそのまま対象になる（未試行の生成実行が複数残っている場合の処理件数は Phase 9-2 で定義する）</li>
+      <li><code>SCHEDULED_AT</code> に依存しないため、インフラの連携契約（SNS 投稿 Step Functions への入力は <code>set_code</code> のみ）を変更せずに済み、手動での単独実行も同じロジックで動く</li>
+    </ul>
+  </li>
+  <li>対象の生成実行 × セットの有効な投稿先アカウントごとに順次処理する:
+    <ol>
+      <li>投稿レコード（<code>posts</code>）を作成する（投稿前の事前記録により二重投稿を防止する。旧設計の考え方を踏襲）</li>
+      <li>投稿に載せる画像を <code>post_images</code> で紐づける（当面は 1 枚。将来のカルーセルでは生成実行内の複数画像を並び順付きで束ねる）</li>
+      <li>キャプションテンプレートを適用して投稿本文を組み立てる</li>
+      <li>S3 Presigned URL を発行し、Instagram Graph API の 2 段階フロー（コンテナ作成 → publish）で投稿する</li>
+      <li>結果（成功 / 失敗、プラットフォーム投稿 ID）を投稿レコードに記録する</li>
+    </ol>
+  </li>
+  <li>投稿失敗は記録・通知に反映して終了する（「失敗」の定義・通知粒度・終了コード方針は Phase 9-2。運用側の対応手順は<a href="operation.html#failure">アプリ運用設計 セクション 4</a>）</li>
+</ol>
+
+<div class="decision">
+  <span class="callout-title">セット別拡張ポイント: キャプションの作り方</span>
+  初期実装は <code>caption_templates</code> の固定文テンプレートを適用する（手順 3-3）。将来は、
+  <strong>画像内容に合わせて生成 AI がキャプションを作る方式</strong>などを<strong>セットごとに選択可能</strong>にする
+  （2026-07-06 ユーザー要望。どの方式を使うかはセット別設計書に記録する）。
+</div>
+
+<div class="note">
+  <span class="callout-title">将来のセット別失敗時ポリシー（追いつく / 捨てる）</span>
+  投稿対象の決定（手順 2）の検索条件を切り替えることで、セット別の失敗時ポリシーを実現する想定:
+  <strong>追いつくモード</strong> = 失敗した生成実行も再対象に含める / <strong>捨てるモード</strong> = 一定より古い未試行分を対象外にする。
+  詳細は Phase 9 以降（処理単位を「生成実行」とした経緯は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。
+</div>
+
+<h2 id="contract-usage">4. ワークフロー連携（環境変数の使い方）</h2>
+<p>環境変数の受け渡し契約（キー名）は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 5、業務上の意味付けの定義は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a> で確定済み。本書のフローでの使い方は以下のとおり。</p>
+<ul>
+  <li><code>SET_CODE</code> — 両バッチが受け取り、<code>batch_sets</code> の解決に使用する（各フローの手順 1）</li>
+  <li><code>SCHEDULED_AT</code> — 画像生成バッチのみが受け取り、生成実行の冪等性キーに使用する（セクション 2 の手順 2）。SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</li>
+  <li><code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数 — 要否含め Phase 9-2 で定義する</li>
+</ul>
+
+<h2 id="phase9">5. Phase 9-2 で詳細化する項目</h2>
+<ul>
+  <li>冪等性・二重投稿防止の具体設計（投稿ステータス遷移、<code>published_unconfirmed</code> 相当の要否）</li>
+  <li>未完了の生成実行の再開処理（画像 1 枚の完了判定基準を含む）</li>
+  <li>未試行の生成実行が複数残っている場合の処理件数</li>
+  <li>画像生成 API が複数画像を返却した場合の処理</li>
+  <li>「失敗」の定義・通知粒度・終了コード方針</li>
+  <li><code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数の要否</li>
+</ul>
+
+<p>参考資料: <a href="../_archive/batch.md">_archive/batch.md</a>（冪等性・再試行・投稿ステータス管理の旧設計。現役の設計書ではない）</p>
+
+</div>
+</body>
+</html>

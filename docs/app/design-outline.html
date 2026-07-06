@@ -3,25 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>アプリ設計大枠（A-2） | AutoContentPublisherSystem</title>
+<title>アプリ設計大枠 | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / アプリ設計大枠（A-2）</nav>
-<h1>アプリ設計大枠（A-2）</h1>
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / アプリ設計大枠</nav>
+<h1>アプリ設計大枠</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">Phase A-2 成果物（Phase 9 で見直す前提の一時 Fix）</span>
+  <span class="badge badge-wip">Phase A 成果物（Phase 9 で見直す前提の一時 Fix）</span>
   <span>最終更新: 2026-07-06</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  Phase A-2「アプリ設計の大枠決め」の成果物。<a href="requirements-notes.html">A-1 壁打ち記録</a>を入力として、
-  docs/app/ の<strong>設計書構成</strong>と<strong>主要設計方針の骨子</strong>（処理フロー概要・データモデル概要・運用方針）を定める。
-  詳細設計（テーブル定義・処理フローの詳細・DDL 等)には踏み込まず、何を Phase 9 に持ち越すかの線引きも本書で行う。
-  A-4 で本書の構成に従って大枠設計書を作成し、Phase 9 で詳細化する。
+  Phase A-2「アプリ設計の大枠決め」で決定した大枠方針の全体像（<a href="requirements-notes.html">A-1 壁打ち記録</a>が入力）。
+  A-4 で本書の構成に従い分冊（<a href="batch-flow.html">batch-flow</a> / <a href="data-model.html">data-model</a> / <a href="operation.html">operation</a>）を作成済みであり、
+  分冊作成後の本書は<strong>全体方針と、分冊間・インフラ設計との整合</strong>を担う親ページとする。
+  ドメイン別の骨子（処理手順・エンティティ定義・運用方針の中身）は<strong>各分冊が正</strong>。
+  詳細設計（テーブル定義・処理フローの詳細・DDL 等）には踏み込まず、Phase 9 への線引きはセクション 6 に定める。
 </div>
 
 <h2 id="doc-structure">1. 設計書構成（docs/app/ のドキュメント一覧とスコープ)</h2>
@@ -30,45 +31,67 @@
 
 <div class="table-wrap">
 <table>
-  <thead><tr><th>ドキュメント</th><th>スコープ</th><th>作成タイミング</th></tr></thead>
+  <thead><tr><th>ドキュメント</th><th>スコープ</th><th>状態</th></tr></thead>
   <tbody>
     <tr>
       <td><code>index.html</code></td>
-      <td>アプリ設計の目次・検討メモ（既存）</td>
-      <td>A-4 で目次ページとして更新</td>
+      <td>アプリ設計の目次・検討メモ</td>
+      <td>A-4 で目次ページ化済み</td>
     </tr>
     <tr>
       <td><code>requirements-notes.html</code></td>
       <td>要件・運用イメージの記録（A-1 壁打ち記録。要件の参照元として維持）</td>
-      <td>作成済み</td>
+      <td>作成済み（A-1）</td>
     </tr>
     <tr>
       <td><code>design-outline.html</code>（本書）</td>
-      <td>大枠方針の全体像。分冊作成後は「全体方針・分冊間の整合」を担う親ページとする</td>
-      <td>作成済み（A-2）</td>
+      <td>全体方針・分冊間の整合を担う親ページ</td>
+      <td>作成済み（A-2、A-4 で親ページ化）</td>
     </tr>
     <tr>
       <td><code>batch-flow.html</code></td>
-      <td>バッチ処理フロー設計 — 画像生成・SNS 投稿の処理手順、冪等性・二重投稿防止、投稿ステータス管理、ワークフロー連携（環境変数契約）</td>
-      <td>A-4 で骨子版作成 → <strong>Phase 9-2 で詳細化</strong></td>
+      <td>バッチ処理フロー設計 — 画像生成・SNS 投稿の処理手順、冪等性・二重投稿防止、投稿ステータス管理、ワークフロー連携（環境変数の使い方）、セット別拡張ポイント</td>
+      <td>骨子版作成済み（A-4）→ <strong>Phase 9-2 で詳細化</strong></td>
     </tr>
     <tr>
       <td><code>data-model.html</code></td>
-      <td>データモデル / DB スキーマ設計 — テーブル定義・ER 図・制約、DDL、時刻の取り扱い、マイグレーション方針</td>
-      <td>A-4 で骨子版作成 → <strong>Phase 9-3 で詳細化</strong></td>
+      <td>データモデル / DB スキーマ設計 — ER 図・エンティティ一覧・キー方針、DDL、S3 キー設計、時刻の取り扱い、マイグレーション方針</td>
+      <td>骨子版作成済み（A-4）→ <strong>Phase 9-3 で詳細化</strong></td>
     </tr>
     <tr>
       <td><code>operation.html</code></td>
       <td>アプリ運用設計 — セット追加・廃止、プロンプト / キャプション管理、失敗時対応、トークン更新、SNS Secret 規約の運用</td>
-      <td>A-4 で骨子版作成 → <strong>Phase 9-4 で詳細化</strong></td>
+      <td>骨子版作成済み（A-4）→ <strong>Phase 9-4 で詳細化</strong></td>
+    </tr>
+    <tr>
+      <td><code>sets/&lt;set_code&gt;.html</code></td>
+      <td>セット別設計書（1 セット 1 本。ルールはセクション 1.1）</td>
+      <td>初セット追加時に作成（セット追加のたびに 1 本増える）</td>
     </tr>
   </tbody>
 </table>
 </div>
 
-<h2 id="flow">2. 処理フロー概要</h2>
+<h3 id="set-docs">1.1 セット別設計書のルール（複数セット前提の 2 層構造）</h3>
 
-<p>実行基盤（EventBridge Scheduler → 画像生成 Step Functions → 成功時に SNS 投稿 Step Functions を自動起動）はインフラ設計（<a href="../infra/workflow.html">infra/workflow.html</a>）のとおり。ここではバッチアプリケーション内部の処理手順の骨子を定める。</p>
+<div class="decision">
+  <span class="callout-title">経緯（2026-07-06）</span>
+  A-4 計画レビューで「スクラップ&amp;ビルドでセットが増えていく前提で、共通・上位の設計は変更せず、
+  セットが増えるたびに設計書が 1 本増えるような管理しやすい体系にしたい」というユーザー要望を受け、
+  <strong>共通設計書とセット別設計書の 2 層構造</strong>を定めた（要望の記録は <a href="requirements-notes.html">A-1 壁打ち記録</a>の追記を参照）。
+</div>
+
+<ul>
+  <li><strong>2 層構造</strong>: 共通設計書（本書 + 3 分冊）は全セット共通の骨格を定め、<strong>セット追加では変更しない</strong>。セット追加で増える設計書は <code>docs/app/sets/&lt;set_code&gt;.html</code> の 1 本のみ</li>
+  <li><strong>セット別設計書の標準記載項目</strong>: テーマ、投稿先アカウント構成、スケジュール（投稿頻度）、プロンプトの作り方（固定 / AI 生成等）、キャプションの作り方（テンプレート / AI 生成等）、失敗時ポリシー、共通フローからの差分・特記事項</li>
+  <li><strong>拡張ポイント方式</strong>: セットごとに変わりうる箇所は、共通分冊側に「セット別拡張ポイント」として明示する（<a href="batch-flow.html">batch-flow.html</a> セクション 2・3）。新しい方式が共通の骨格に影響する場合は、共通分冊に拡張ポイントを追記した上で、セット別設計書には<strong>選択と差分のみ</strong>を書く（同じ情報を 2 箇所に書かない）</li>
+  <li><strong>実データとの役割分担</strong>: プロンプト文言・スケジュール時刻等の実データの正は DB / CDK コード。セット別設計書には意図・方針・方式の選択を書く</li>
+  <li><strong>廃止時の扱い</strong>: セット廃止（スクラップ&amp;ビルド）では設計書を削除せず、廃止の旨を付けて履歴として残す（手順は <a href="operation.html#set-retire">operation.html セクション 2.2</a>）</li>
+  <li><strong>インフラは増えない</strong>: インフラ設計書・CDK スタックはセット追加で増えない・変わらない。スタックは機能単位であり、セットは「既存 ImageBatchStack 内の Scheduler 1 件 + Secrets Manager の Secret + DB レコード」として表現される（<a href="operation.html#set-add">operation.html セクション 2.1</a>）</li>
+  <li><strong>作成タイミング</strong>: セット別設計書の実ファイル・雛形は初セット追加時に作成する（A-4 時点ではルールのみ定義）</li>
+</ul>
+
+<h2 id="invariant">2. 全体方針: 処理単位の不変条件</h2>
 
 <div class="decision">
   <span class="callout-title">不変条件: 1 回の画像生成バッチ起動 = 1 投稿（アカウントごと）</span>
@@ -77,250 +100,35 @@
   将来の多プラットフォーム展開時は、同一の生成実行がアカウント数分の投稿レコードになる（内容は 1 つ）。
 </div>
 
-<h3 id="flow-image">2.1 画像生成バッチ</h3>
-<ol>
-  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（存在しなければ異常終了、<code>is_active=0</code> ならスキップして正常終了）</li>
-  <li><strong>生成実行（<code>generation_runs</code>）レコードを作成する</strong>（セット × <code>SCHEDULED_AT</code> で一意 = 冪等性のアンカー。既存レコードがあれば再実行と判断し、未完了分のみ処理する）</li>
-  <li>画像を生成する:
-    <ol>
-      <li>初期実装は <strong>1 起動 = 1 枚生成</strong>（投稿用プロンプトは実質 1 件で運用する。複数プロンプトの活用 — カルーセル素材・ローテーション選択等 — は将来拡張）</li>
-      <li>画像生成 API（Nano Banana Pro）を呼び出し、画像を S3 に保存し、<code>generated_images</code> を生成実行にぶら下げて登録する（プロンプトスナップショット含む）</li>
-    </ol>
-  </li>
-  <li>正常終了する（成功により SNS 投稿ワークフローが自動起動される）</li>
-</ol>
-
-<div class="note">
-  <span class="callout-title">「既存レコードがあれば再実行と判断し、未完了分のみ処理する」の意味</span>
-  Step Functions の Retry 等で同一入力（同じ <code>SET_CODE</code>・<code>SCHEDULED_AT</code>）のタスクが再起動された場合、
-  <code>generation_runs</code> の INSERT が UNIQUE 制約に当たることで「着手済みのスロットの再実行」と検知できる（UNIQUE 制約は二重生成のガードであると同時に再実行検知のセンサーとして働く）。
-  このときは新しい生成実行を作らず、既存実行にぶら下がる完了済み画像を確認して足りない分だけ生成する
-  （初期実装の 1 枚生成では「画像がなければ生成、あれば何もせず正常終了」の二択。将来の複数枚生成では部分再開として効く）。
-  画像 1 枚の完了判定基準（DB 登録済み = 完了、S3 orphan 許容、の旧設計基準を踏襲するか）は Phase 9-2 で定義する。
-</div>
-
-<h3 id="flow-sns">2.2 SNS 投稿バッチ</h3>
-<p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（画像単位ではない）。</p>
-<ol>
-  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（画像生成バッチと同じ扱い）</li>
-  <li>投稿対象を決定する: <strong>「投稿試行が一度もない生成実行」のうち最も古い 1 件</strong>を対象とする
-    <ul>
-      <li>投稿済みかどうかは、生成実行に紐づく投稿レコード（<code>posts</code>）の有無から<strong>アカウントごとに導出</strong>する（生成実行テーブル自体に投稿済みフラグは持たない。将来の複数アカウントでアカウントごとに状態が異なるため）</li>
-      <li>一度でも試行（失敗含む）した生成実行は自動では再対象にしない = <strong>再試行なし・欠番許容</strong>（A-1 の初期方針）</li>
-      <li>通常運用では直前の画像生成バッチの当回分がそのまま対象になる（未試行の生成実行が複数残っている場合の処理件数は Phase 9 で定義する）</li>
-      <li><code>SCHEDULED_AT</code> に依存しないため、インフラの連携契約（SNS 投稿 Step Functions への入力は <code>set_code</code> のみ）を変更せずに済み、手動での単独実行も同じロジックで動く</li>
-    </ul>
-  </li>
-  <li>対象の生成実行 × セットの有効な投稿先アカウントごとに順次処理する:
-    <ol>
-      <li>投稿レコード（<code>posts</code>）を作成する（投稿前の事前記録により二重投稿を防止する。旧設計の考え方を踏襲）</li>
-      <li>投稿に載せる画像を <code>post_images</code> で紐づける（当面は 1 枚。将来のカルーセルでは生成実行内の複数画像を並び順付きで束ねる）</li>
-      <li>キャプションテンプレートを適用して投稿本文を組み立てる</li>
-      <li>S3 Presigned URL を発行し、Instagram Graph API の 2 段階フロー（コンテナ作成 → publish）で投稿する</li>
-      <li>結果（成功 / 失敗、プラットフォーム投稿 ID）を投稿レコードに記録する</li>
-    </ol>
-  </li>
-  <li>投稿失敗は記録・通知に反映して終了する（「失敗」の定義・通知粒度・終了コード方針は Phase 9）</li>
-</ol>
-
 <div class="decision">
   <span class="callout-title">処理単位を「生成実行」とした経緯（旧設計・A-2 初版からの変更）</span>
   旧設計および A-2 初版は「画像」単位で投稿対象を検索していたが、A-2 レビューでのユーザー指摘
   （投稿バッチの処理単位は「投稿」であるべき。画像単位では将来のカルーセルで画像の束ね方が定まらない）を受け、
   「1 生成実行 = 1 投稿（アカウントごと）」を不変条件とし、投稿対象の単位を生成実行に変更した（2026-07-06）。
-  将来のセット別ポリシーは、この検索条件の切り替えで実現する想定
-  （<strong>追いつくモード</strong> = 失敗した生成実行も再対象に含める / <strong>捨てるモード</strong> = 一定より古い未試行分を対象外にする）。詳細は Phase 9。
+  将来のセット別失敗時ポリシー（追いつく / 捨てる）は投稿対象の検索条件の切り替えで実現する想定（<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3</a>）。
 </div>
+
+<p>この不変条件のもとでの処理手順の骨子（画像生成: セット解決 → 生成実行の作成 = 冪等性のアンカー → 生成・S3 保存・DB 登録 / SNS 投稿: 最古の未試行生成実行を対象にアカウントごとに投稿）は、分冊 <a href="batch-flow.html">バッチ処理フロー設計</a> に定める。</p>
 
 <h2 id="data-model">3. データモデル概要</h2>
 
-<p>主要エンティティと関係を以下に定める。カラム定義・制約・インデックス・DDL は Phase 9-3 で設計する。</p>
-
-<figure class="diagram">
-<svg viewBox="0 0 880 380" role="img" aria-label="データモデル概要の ER 図">
-  <!-- batch_sets -->
-  <rect x="340" y="16" width="200" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="440" y="43" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">batch_sets（セット）</text>
-
-  <!-- row1: children of batch_sets -->
-  <rect x="20" y="110" width="160" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="100" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">prompt_configs</text>
-
-  <rect x="192" y="110" width="160" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="272" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">caption_templates</text>
-  <text x="272" y="146" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規）</text>
-
-  <rect x="364" y="110" width="152" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="440" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">generation_runs</text>
-  <text x="440" y="146" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・投稿の単位）</text>
-
-  <rect x="530" y="110" width="150" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="605" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">sns_accounts</text>
-
-  <rect x="692" y="110" width="170" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="777" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">batch_execution_logs</text>
-
-  <!-- row2 -->
-  <rect x="180" y="215" width="180" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="270" y="242" text-anchor="middle" font-size="11" fill="var(--diag-text)">generated_images</text>
-
-  <rect x="530" y="215" width="150" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="605" y="235" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">posts（投稿）</text>
-  <text x="605" y="251" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・生成実行 × アカウント）</text>
-
-  <!-- row3 -->
-  <rect x="330" y="312" width="150" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="405" y="332" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">post_images</text>
-  <text x="405" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・中間）</text>
-
-  <rect x="530" y="312" width="150" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)" stroke-dasharray="5 4"/>
-  <text x="605" y="332" text-anchor="middle" font-size="11" fill="var(--diag-text)">post_insights</text>
-  <text x="605" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（将来: 効果測定）</text>
-
-  <!-- batch_sets → row1 children -->
-  <line x1="395" y1="60" x2="110" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <line x1="420" y1="60" x2="275" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <line x1="440" y1="60" x2="440" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <line x1="460" y1="60" x2="600" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <line x1="485" y1="60" x2="770" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
-
-  <!-- generation_runs → generated_images -->
-  <line x1="410" y1="158" x2="290" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <text x="322" y="185" font-size="10" fill="var(--diag-text)">1 : N（画像）</text>
-
-  <!-- prompt_configs → generated_images (使用プロンプト参照) -->
-  <line x1="100" y1="158" x2="230" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <text x="90" y="195" font-size="10" fill="var(--diag-text)">使用プロンプト参照</text>
-
-  <!-- generation_runs → posts -->
-  <line x1="470" y1="158" x2="580" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <text x="425" y="192" font-size="10" fill="var(--diag-text)">1 : N（アカウントごとに 1 投稿）</text>
-
-  <!-- sns_accounts → posts -->
-  <line x1="620" y1="158" x2="620" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <text x="628" y="192" font-size="10" fill="var(--diag-text)">1 : N</text>
-
-  <!-- caption_templates → posts (dashed) -->
-  <line x1="300" y1="158" x2="560" y2="214" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
-  <text x="215" y="180" font-size="10" fill="var(--diag-text)">適用（紐づけ単位は Phase 9）</text>
-
-  <!-- generated_images → post_images / posts → post_images -->
-  <line x1="300" y1="259" x2="380" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <text x="300" y="290" font-size="10" fill="var(--diag-text)">1 : N</text>
-  <line x1="570" y1="263" x2="450" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
-  <text x="510" y="290" font-size="10" fill="var(--diag-text)">1 : N</text>
-
-  <!-- posts → post_insights (dashed) -->
-  <line x1="605" y1="263" x2="605" y2="310" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
-</svg>
-<figcaption>データモデル概要。強調（黄色）は新規エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_images</code> は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。破線は将来拡張・Phase 9 決定事項。</figcaption>
-</figure>
-
-<div class="table-wrap">
-<table>
-  <thead><tr><th>エンティティ</th><th>役割</th><th>旧設計からの変更点・備考</th></tr></thead>
-  <tbody>
-    <tr>
-      <td><code>batch_sets</code></td>
-      <td>セット定義（1 セット = 1 テーマ）。外部識別子は <code>set_code</code></td>
-      <td>将来のセット別設定（失敗時ポリシー・生成枚数等）のカラム拡張余地を持たせる。<code>max_post_retries</code> は初期スコープ外（再試行なし）</td>
-    </tr>
-    <tr>
-      <td><code>prompt_configs</code></td>
-      <td>画像生成プロンプト設定（セット : 設定 = 1 : N）</td>
-      <td>旧設計を踏襲（スナップショット方式含む）。初期は投稿用プロンプト実質 1 件で運用</td>
-    </tr>
-    <tr>
-      <td><code>generation_runs</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
-      <td>生成実行（1 回の画像生成バッチ起動で 1 レコード）。<strong>投稿の単位</strong>であり、冪等性のアンカー（セット × <code>SCHEDULED_AT</code> で一意）</td>
-      <td>A-2 レビューで新設。「1 生成実行 = 1 投稿（アカウントごと）」を構造で保証し、将来のカルーセルの「画像の束」もこの単位で定まる</td>
-    </tr>
-    <tr>
-      <td><code>caption_templates</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
-      <td>投稿キャプション・ハッシュタグの固定文テンプレート</td>
-      <td>A-1 で新規に必要と判明。紐づけ単位（セット / プロンプト設定 / アカウント）は Phase 9 で決定。AI 生成キャプションは将来拡張</td>
-    </tr>
-    <tr>
-      <td><code>generated_images</code></td>
-      <td>生成画像のメタ情報（S3 キー・プロンプトスナップショット等）。<code>generation_runs</code> の子（1 実行 : N 画像）</td>
-      <td>生成実行にぶら下げる構造へ変更。複数画像の保存を許容（旧設計の「2 枚目以降破棄」を廃止。具体構造は Phase 9）</td>
-    </tr>
-    <tr>
-      <td><code>sns_accounts</code></td>
-      <td>投稿先アカウント（セット : アカウント = 1 : N を維持）</td>
-      <td>旧設計を踏襲。当面は Instagram 1 アカウントだが、将来の他プラットフォーム展開のため 1 : N 構造を残す</td>
-    </tr>
-    <tr>
-      <td><code>posts</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
-      <td>投稿 1 件（<strong>生成実行 × アカウント</strong>。キャプション・投稿ステータス・プラットフォーム投稿 ID を持つ）</td>
-      <td>旧 <code>post_records</code>（画像 × アカウント × 試行）を「投稿」単位に再編。生成実行が「投稿されたか」は本テーブルの有無からアカウントごとに導出する（<code>generation_runs</code> にフラグは持たない）</td>
-    </tr>
-    <tr>
-      <td><code>post_images</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
-      <td>投稿と画像の中間テーブル（投稿に載せる画像の選択と表示順）</td>
-      <td>1 投稿 : N 画像（将来のカルーセル）に対応。当面の運用は 1 投稿 1 画像</td>
-    </tr>
-    <tr>
-      <td><code>batch_execution_logs</code></td>
-      <td>バッチ実行ログ（運用ログ）</td>
-      <td>旧設計を踏襲。業務データである <code>generation_runs</code> とは役割を分ける（役割分担の整理は Phase 9）</td>
-    </tr>
-    <tr>
-      <td><code>post_insights</code><span class="badge badge-future" style="margin-left:.4rem">将来</span></td>
-      <td>投稿の効果測定データ（いいね数・リーチ等）</td>
-      <td>将来のインサイト収集バッチ（第 3 のバッチ）用。<code>posts</code> に紐づける前提で拡張余地のみ確保</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-<div class="note">
-  <span class="callout-title">主キーと冪等性キーの分離</span>
-  各テーブルの主キーは AUTO_INCREMENT の <code>id</code> とし、他テーブルからの FK 参照はすべて <code>id</code> に対して行う（旧設計の方針を踏襲）。
-  <code>generation_runs</code> の「セット × <code>SCHEDULED_AT</code>」は FK の参照先ではなく、<strong>冪等性を保証する UNIQUE 制約としてのみ</strong>使用する
-  （DATETIME 型が他テーブルのキーに伝播することはない）。
-  <code>SCHEDULED_AT</code> に入る値は EventBridge Scheduler が渡すスケジュール上の実行予定時刻（UTC）であり、
-  リトライ・再実行でも同じスロットなら同じ値になるため、スロットの安定した識別子として機能する。
-  ISO 8601 文字列から DATETIME への正規化ルール（UTC 固定・秒精度等）は Phase 9-3 で定義する。
-</div>
+<p>「1 生成実行 = 1 投稿」を構造で保証するため、<code>generation_runs</code>（生成実行）を中心に、
+<code>posts</code>（投稿 = 生成実行 × アカウント）・<code>post_images</code>（1 投稿 : N 画像の中間テーブル）・<code>caption_templates</code>（キャプションテンプレート）を新設し、
+<code>batch_sets</code> / <code>prompt_configs</code> / <code>generated_images</code> / <code>sns_accounts</code> / <code>batch_execution_logs</code> は旧設計の構造を踏襲・再編する。
+<code>post_insights</code>（効果測定）は将来拡張の余地のみ確保する。
+ER 図・エンティティ一覧・主キーと冪等性キーの分離方針は、分冊 <a href="data-model.html">データモデル設計</a> に定める。
+データモデルは全セット共通であり、セット間の違いはレコード・設定カラムで表現する。</p>
 
 <h2 id="operation">4. 運用方針の骨子</h2>
 
-<div class="table-wrap">
-<table>
-  <thead><tr><th>運用</th><th>方針（初期実装）</th></tr></thead>
-  <tbody>
-    <tr>
-      <td>セット追加</td>
-      <td>(1) Secrets Manager に SNS 認証 Secret 作成 → (2) DB に <code>batch_sets</code> / <code>prompt_configs</code> / <code>caption_templates</code> / <code>sns_accounts</code> を登録 → (3) CDK に EventBridge Scheduler を追加して deploy</td>
-    </tr>
-    <tr>
-      <td>セット廃止・入れ替え（スクラップ&amp;ビルド）</td>
-      <td><code>is_active=0</code> 化 + Scheduler 削除。データ（生成画像・投稿履歴）は残す</td>
-    </tr>
-    <tr>
-      <td>プロンプト・キャプション変更</td>
-      <td>DB 直接操作（Query Editor 等）。管理画面は将来拡張</td>
-    </tr>
-    <tr>
-      <td>投稿失敗時</td>
-      <td>メール通知を受けて Step Functions 実行履歴・CloudWatch Logs・DB を確認する。自動再試行はしない（欠番許容）。必要な場合のみ SNS 投稿ワークフローを手動起動する（未試行分が投稿される）</td>
-    </tr>
-    <tr>
-      <td>Instagram トークン更新</td>
-      <td>60 日失効前に手動リフレッシュ（旧設計の運用を踏襲。手順詳細は Phase 9-4）</td>
-    </tr>
-    <tr>
-      <td>効果測定</td>
-      <td>Instagram アプリ・インサイト画面で手動確認。自動収集は将来拡張</td>
-    </tr>
-  </tbody>
-</table>
-</div>
+<p>セット追加（セット別設計書の作成 → Secret 作成 → DB 登録 → Scheduler 追加 deploy）、セット廃止（<code>is_active=0</code> + Scheduler 削除。データと設計書は残す）、
+プロンプト / キャプションの DB 直接運用、投稿失敗時の対応（自動再試行なし・通知のみ・必要時のみ手動起動）、
+Instagram トークンの手動更新、効果測定（当面は手動確認）の各方針は、分冊 <a href="operation.html">アプリ運用設計</a> に定める。</p>
 
 <h2 id="contract">5. ワークフロー連携・Secret 規約の意味付け（Phase A スコープ分の確定）</h2>
 
-<p>インフラ設計で「アプリ設計で確定する」とされていた項目のうち、大枠レベルで確定できるものを以下に定める。</p>
+<p>インフラ設計で「アプリ設計で確定する」とされていた項目のうち、大枠レベルで確定できるものを以下に定める。
+フロー上の使い方は <a href="batch-flow.html#contract-usage">batch-flow.html セクション 4</a>、Secret の運用は <a href="operation.html#secret-ops">operation.html セクション 5</a> を参照。</p>
 
 <div class="table-wrap">
 <table>
@@ -332,7 +140,7 @@
     </tr>
     <tr>
       <td><code>SCHEDULED_AT</code></td>
-      <td>スケジュール実行時刻（UTC、Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> 由来）。<strong>生成実行（<code>generation_runs</code>）の冪等性キー</strong>（セット × <code>SCHEDULED_AT</code> で一意）であり、1 日複数回実行は DATETIME 粒度で区別される。<strong>SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</strong>（セクション 2.2 の検索方式のため。現行の連携契約の変更は不要）</td>
+      <td>スケジュール実行時刻（UTC、Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> 由来）。<strong>生成実行（<code>generation_runs</code>）の冪等性キー</strong>（セット × <code>SCHEDULED_AT</code> で一意）であり、1 日複数回実行は DATETIME 粒度で区別される。<strong>SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</strong>（<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3</a> の検索方式のため。現行の連携契約の変更は不要）</td>
     </tr>
     <tr>
       <td>SNS Secret 規約の構成要素</td>
@@ -348,20 +156,20 @@
 
 <h2 id="phase9">6. Phase 9 への持ち越し（大枠と詳細の線引き）</h2>
 
-<p>本書（および A-4 の大枠設計書）で扱うのはここまでとし、以下は Phase 9 で設計する。</p>
+<p>大枠（本書と分冊の骨子版）で扱うのはここまでとし、詳細は Phase 9 で設計する。ドメイン別の持ち越し項目は各分冊の末尾に定める。</p>
 
 <ul>
-  <li><strong>9-2 バッチ処理フロー詳細</strong>: 冪等性・二重投稿防止の具体設計（投稿ステータス遷移、<code>published_unconfirmed</code> 相当の要否）、未完了の生成実行の再開処理、未試行の生成実行が複数残っている場合の処理件数、複数画像返却時の処理、「失敗」の定義・通知粒度・終了コード方針、<code>BATCH_SIZE_LIMIT</code> 等の要否</li>
-  <li><strong>9-3 データモデル詳細</strong>: 全テーブルのカラム定義・制約・インデックス・DDL（<code>generation_runs</code> と <code>batch_execution_logs</code> の役割分担の確認を含む）、S3 キー設計（複数画像対応）、キャプションテンプレートの紐づけ単位と変数展開の要否、時刻の取り扱い、マイグレーション方針</li>
-  <li><strong>9-4 アプリ運用詳細</strong>: セット追加・トークン更新の具体手順、失敗時の確認・手動補正手順、stale データの扱い</li>
-  <li><strong>将来拡張の具体化（実装時期は未定）</strong>: 失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（複数プロンプトのカルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、インサイト収集バッチ、リール・動画、承認フロー、管理画面</li>
+  <li><strong>9-2 バッチ処理フロー詳細</strong>: <a href="batch-flow.html#phase9">batch-flow.html セクション 5</a></li>
+  <li><strong>9-3 データモデル詳細</strong>: <a href="data-model.html#phase9">data-model.html セクション 4</a></li>
+  <li><strong>9-4 アプリ運用詳細</strong>: <a href="operation.html#phase9">operation.html セクション 6</a></li>
 </ul>
 
+<p><strong>分冊横断の将来拡張（実装時期は未定）</strong>: 失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（AI によるプロンプト生成・カルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、インサイト収集バッチ、リール・動画、承認フロー、管理画面。</p>
+
 <div class="warn">
-  <span class="callout-title">A-3 で確認すること（インフラ設計との突き合わせ）</span>
+  <span class="callout-title">A-3 で確認したこと（インフラ設計との突き合わせ）</span>
   本書の帰結として、SNS 投稿 Step Functions への <code>scheduled_at</code> 追加は<strong>不要</strong>（現行の連携契約のままでよい）。
-  A-3 では、インフラ設計書 6 本と本書・A-1 記録を突き合わせ、矛盾・欠落（blocker）のみ修正する。
-  セクション 5 の意味付け確定を受けて <a href="../infra/workflow.html">infra/workflow.html</a> セクション 5 の「Phase 9 で確定する」という記述を更新するかは A-3 で判断する。
+  A-3 では、インフラ設計書 6 本と本書・A-1 記録を突き合わせ、矛盾・欠落（blocker）のみ修正した。
   <strong>2026-07-06 A-3 実施済み</strong>（修正内容は <a href="../development-plan.md">development-plan.md</a> の A-3 備考を参照）。
 </div>
 

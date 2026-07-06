@@ -70,9 +70,9 @@
   - 確認: インフラ設計書 6 本と開発計画を大枠と突き合わせ、矛盾・欠落（blocker）が修正されている。改善提案は設計課題リストに記録されている
   - 備考: 見直し観点の例: `set_code` / `scheduled_at` の意味付け、SNS Secret 規約（`set_code` / `account_code` の定義）、環境変数の受け渡し契約。修正は blocker のみ（設計 Fix の運用ルールに従う）。2026-07-06 実施。blocker 修正 3 分類: (1) workflow.html セクション 5 / security.html セクション 1.2 の「Phase 9 で確定」を design-outline.html セクション 5 の確定済み参照へ更新 (2)「手動での再投稿」表現 3 箇所（workflow / architecture / operation）をインフラの能力（単独実行可能）とアプリ仕様（投稿対象の決定）に分離 (3) 開発計画の文言更新（4-6 備考・9-2〜9-4 確認欄）。Scheduler Input・SNS 投稿 SFN 入力（`set_code` のみ）・Secret 規約の多プラットフォーム整合・1 日複数回実行・IAM 権限は矛盾なしを確認。改善提案 1 件（S3 30 日ライフサイクルと「生成画像は残す」の整理）を設計課題リストに記録
 
-- [ ] **A-4** アプリ設計大枠の設計書記載
+- [x] **A-4** アプリ設計大枠の設計書記載
   - 確認: A-2 で決めた構成に従い、docs/app/ に大枠設計書（HTML、共通スタイル使用）が作成されている
-  - 備考: 詳細未定の節は「Phase 9 で詳細化」と明記する。[docs/app/index.html](app/index.html) はアプリ設計の目次ページとして更新する
+  - 備考: 詳細未定の節は「Phase 9 で詳細化」と明記する。[docs/app/index.html](app/index.html) はアプリ設計の目次ページとして更新する。2026-07-06 実施。骨子版 3 分冊（batch-flow / data-model / operation）を作成し、design-outline.html を親ページ（全体方針・分冊間の整合）へ再編、index.html を目次化。計画レビューでのユーザー要望により**複数セット前提の 2 層構造**（セット追加で増えるのは docs/app/sets/ のセット別設計書 1 本のみ。共通設計書・インフラ設計書・CDK スタックは変更しない）を design-outline セクション 1.1 にルール化し、AI プロンプト生成・AI キャプション等のセット別方式は分冊内の「セット別拡張ポイント」として明示（requirements-notes に追記）。あわせてインフラ設計書 3 箇所（architecture / workflow / operation）の投稿対象決定リンクを batch-flow.html#flow-sns へ更新
 
 ---
 

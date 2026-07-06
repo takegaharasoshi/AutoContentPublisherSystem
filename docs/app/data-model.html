@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>データモデル設計（骨子） | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / データモデル設計（骨子）</nav>
+<h1>データモデル設計（骨子）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">Phase A-4 骨子版（Phase 9-3 で詳細化）</span>
+  <span>最終更新: 2026-07-06</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  アプリの主要エンティティと関係（データモデル）を定める設計書。Phase A-4 時点は骨子版であり、
+  カラム定義・制約・インデックス・DDL は <strong>Phase 9-3 で詳細化</strong>する（セクション 4）。
+  全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a>、各テーブルを使う処理手順は <a href="batch-flow.html">バッチ処理フロー設計</a> を参照。
+  <strong>データモデル（テーブル構造）は全セット共通</strong>であり、セット間の違いはレコードと設定カラムで表現する。テーブル構造はセット追加では変更しない
+  （<a href="design-outline.html#set-docs">セット別設計書のルール</a>）。
+</div>
+
+<h2 id="er">1. ER 図（概要）</h2>
+
+<figure class="diagram">
+<svg viewBox="0 0 880 380" role="img" aria-label="データモデル概要の ER 図">
+  <!-- batch_sets -->
+  <rect x="340" y="16" width="200" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="440" y="43" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">batch_sets（セット）</text>
+
+  <!-- row1: children of batch_sets -->
+  <rect x="20" y="110" width="160" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="100" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">prompt_configs</text>
+
+  <rect x="192" y="110" width="160" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="272" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">caption_templates</text>
+  <text x="272" y="146" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規）</text>
+
+  <rect x="364" y="110" width="152" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="440" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">generation_runs</text>
+  <text x="440" y="146" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・投稿の単位）</text>
+
+  <rect x="530" y="110" width="150" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="605" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">sns_accounts</text>
+
+  <rect x="692" y="110" width="170" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="777" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">batch_execution_logs</text>
+
+  <!-- row2 -->
+  <rect x="180" y="215" width="180" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="270" y="242" text-anchor="middle" font-size="11" fill="var(--diag-text)">generated_images</text>
+
+  <rect x="530" y="215" width="150" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="605" y="235" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">posts（投稿）</text>
+  <text x="605" y="251" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・生成実行 × アカウント）</text>
+
+  <!-- row3 -->
+  <rect x="330" y="312" width="150" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="405" y="332" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">post_images</text>
+  <text x="405" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・中間）</text>
+
+  <rect x="530" y="312" width="150" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)" stroke-dasharray="5 4"/>
+  <text x="605" y="332" text-anchor="middle" font-size="11" fill="var(--diag-text)">post_insights</text>
+  <text x="605" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（将来: 効果測定）</text>
+
+  <!-- batch_sets → row1 children -->
+  <line x1="395" y1="60" x2="110" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <line x1="420" y1="60" x2="275" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <line x1="440" y1="60" x2="440" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <line x1="460" y1="60" x2="600" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <line x1="485" y1="60" x2="770" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
+
+  <!-- generation_runs → generated_images -->
+  <line x1="410" y1="158" x2="290" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <text x="322" y="185" font-size="10" fill="var(--diag-text)">1 : N（画像）</text>
+
+  <!-- prompt_configs → generated_images (使用プロンプト参照) -->
+  <line x1="100" y1="158" x2="230" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <text x="90" y="195" font-size="10" fill="var(--diag-text)">使用プロンプト参照</text>
+
+  <!-- generation_runs → posts -->
+  <line x1="470" y1="158" x2="580" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <text x="425" y="192" font-size="10" fill="var(--diag-text)">1 : N（アカウントごとに 1 投稿）</text>
+
+  <!-- sns_accounts → posts -->
+  <line x1="620" y1="158" x2="620" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <text x="628" y="192" font-size="10" fill="var(--diag-text)">1 : N</text>
+
+  <!-- caption_templates → posts (dashed) -->
+  <line x1="300" y1="158" x2="560" y2="214" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="215" y="180" font-size="10" fill="var(--diag-text)">適用（紐づけ単位は Phase 9）</text>
+
+  <!-- generated_images → post_images / posts → post_images -->
+  <line x1="300" y1="259" x2="380" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <text x="300" y="290" font-size="10" fill="var(--diag-text)">1 : N</text>
+  <line x1="570" y1="263" x2="450" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <text x="510" y="290" font-size="10" fill="var(--diag-text)">1 : N</text>
+
+  <!-- posts → post_insights (dashed) -->
+  <line x1="605" y1="263" x2="605" y2="310" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
+</svg>
+<figcaption>データモデル概要。強調（黄色）は新規エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_images</code> は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。破線は将来拡張・Phase 9 決定事項。</figcaption>
+</figure>
+
+<h2 id="entities">2. エンティティ一覧</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>エンティティ</th><th>役割</th><th>旧設計からの変更点・備考</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>batch_sets</code></td>
+      <td>セット定義（1 セット = 1 テーマ）。外部識別子は <code>set_code</code></td>
+      <td>将来のセット別設定（失敗時ポリシー・生成枚数・プロンプト / キャプションの生成方式等）のカラム拡張余地を持たせる。<code>max_post_retries</code> は初期スコープ外（再試行なし）</td>
+    </tr>
+    <tr>
+      <td><code>prompt_configs</code></td>
+      <td>画像生成プロンプト設定（セット : 設定 = 1 : N）</td>
+      <td>旧設計を踏襲（スナップショット方式含む）。初期は投稿用プロンプト実質 1 件で運用。将来の「AI にプロンプトを考えさせる方式」では、固定プロンプトの代わりにメタプロンプト等を保持する拡張を想定（<a href="batch-flow.html#flow-image">セット別拡張ポイント</a>。詳細は Phase 9 以降）</td>
+    </tr>
+    <tr>
+      <td><code>generation_runs</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
+      <td>生成実行（1 回の画像生成バッチ起動で 1 レコード）。<strong>投稿の単位</strong>であり、冪等性のアンカー（セット × <code>SCHEDULED_AT</code> で一意）</td>
+      <td>A-2 レビューで新設。「1 生成実行 = 1 投稿（アカウントごと）」を構造で保証し、将来のカルーセルの「画像の束」もこの単位で定まる</td>
+    </tr>
+    <tr>
+      <td><code>caption_templates</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
+      <td>投稿キャプション・ハッシュタグの固定文テンプレート</td>
+      <td>A-1 で新規に必要と判明。紐づけ単位（セット / プロンプト設定 / アカウント）は Phase 9 で決定。AI 生成キャプションは将来のセット別方式（<a href="batch-flow.html#flow-sns">セット別拡張ポイント</a>）</td>
+    </tr>
+    <tr>
+      <td><code>generated_images</code></td>
+      <td>生成画像のメタ情報（S3 キー・プロンプトスナップショット等）。<code>generation_runs</code> の子（1 実行 : N 画像）</td>
+      <td>生成実行にぶら下げる構造へ変更。複数画像の保存を許容（旧設計の「2 枚目以降破棄」を廃止。具体構造は Phase 9）</td>
+    </tr>
+    <tr>
+      <td><code>sns_accounts</code></td>
+      <td>投稿先アカウント（セット : アカウント = 1 : N を維持）</td>
+      <td>旧設計を踏襲。当面は Instagram 1 アカウントだが、将来の他プラットフォーム展開のため 1 : N 構造を残す</td>
+    </tr>
+    <tr>
+      <td><code>posts</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
+      <td>投稿 1 件（<strong>生成実行 × アカウント</strong>。キャプション・投稿ステータス・プラットフォーム投稿 ID を持つ）</td>
+      <td>旧 <code>post_records</code>（画像 × アカウント × 試行）を「投稿」単位に再編。生成実行が「投稿されたか」は本テーブルの有無からアカウントごとに導出する（<code>generation_runs</code> にフラグは持たない）</td>
+    </tr>
+    <tr>
+      <td><code>post_images</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
+      <td>投稿と画像の中間テーブル（投稿に載せる画像の選択と表示順）</td>
+      <td>1 投稿 : N 画像（将来のカルーセル）に対応。当面の運用は 1 投稿 1 画像</td>
+    </tr>
+    <tr>
+      <td><code>batch_execution_logs</code></td>
+      <td>バッチ実行ログ（運用ログ）</td>
+      <td>旧設計を踏襲。業務データである <code>generation_runs</code> とは役割を分ける（役割分担の整理は Phase 9）</td>
+    </tr>
+    <tr>
+      <td><code>post_insights</code><span class="badge badge-future" style="margin-left:.4rem">将来</span></td>
+      <td>投稿の効果測定データ（いいね数・リーチ等）</td>
+      <td>将来のインサイト収集バッチ（第 3 のバッチ）用。<code>posts</code> に紐づける前提で拡張余地のみ確保</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="keys">3. 主キーと冪等性キーの分離</h2>
+
+<div class="note">
+  <span class="callout-title">方針（旧設計を踏襲）</span>
+  各テーブルの主キーは AUTO_INCREMENT の <code>id</code> とし、他テーブルからの FK 参照はすべて <code>id</code> に対して行う。
+  <code>generation_runs</code> の「セット × <code>SCHEDULED_AT</code>」は FK の参照先ではなく、<strong>冪等性を保証する UNIQUE 制約としてのみ</strong>使用する
+  （DATETIME 型が他テーブルのキーに伝播することはない）。
+  <code>SCHEDULED_AT</code> に入る値は EventBridge Scheduler が渡すスケジュール上の実行予定時刻（UTC）であり、
+  リトライ・再実行でも同じスロットなら同じ値になるため、スロットの安定した識別子として機能する。
+</div>
+
+<h2 id="phase9">4. Phase 9-3 で詳細化する項目</h2>
+
+<h3 id="ddl">4.1 テーブル定義・DDL・マイグレーション方針 <span class="badge badge-wip">Phase 9 で詳細化</span></h3>
+<p>全テーブルのカラム定義・制約・インデックスを設計し、<code>database/</code> に本スキーマの DDL を作成する。DDL のバージョン管理・マイグレーション方針もあわせて定義する。<code>generation_runs</code> と <code>batch_execution_logs</code> の役割分担、キャプションテンプレートの紐づけ単位と変数展開の要否もここで確定する。</p>
+
+<h3 id="s3-key">4.2 S3 キー設計 <span class="badge badge-wip">Phase 9 で詳細化</span></h3>
+<p>複数画像（1 生成実行 : N 画像）に対応した S3 キー体系を設計する。あわせて、インフラ設計の S3 30 日ライフサイクルと「セット廃止時もデータは残す」方針の整理（「残す」対象が DB レコードか S3 実体も含むか）を確定する（<a href="../development-plan.md">development-plan.md</a> 設計課題リストに記録済み）。</p>
+
+<h3 id="time">4.3 時刻の取り扱い <span class="badge badge-wip">Phase 9 で詳細化</span></h3>
+<p><code>SCHEDULED_AT</code> の ISO 8601 文字列から DATETIME への正規化ルール（UTC 固定・秒精度等）、およびテーブル全般のタイムゾーン方針を定義する。</p>
+
+<p>参考資料: <a href="../_archive/database.md">_archive/database.md</a>（旧テーブル定義。現役の設計書ではない）</p>
+
+</div>
+</body>
+</html>

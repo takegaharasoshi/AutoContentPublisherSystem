@@ -33,7 +33,7 @@
   <li>sns-posting-sfn: <code>WaitForDbReady</code>（DB 準備確認）→ <code>RunSnsPostBatchTask</code>（SNS 投稿バッチ）</li>
 </ol>
 <ul>
-  <li>SNS 投稿 Step Functions（sns-posting-sfn）は独立したステートマシンのため、手動での単独実行も可能。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/design-outline.html#flow-sns">アプリ設計大枠 セクション 2.2</a>）で定義する</li>
+  <li>SNS 投稿 Step Functions（sns-posting-sfn）は独立したステートマシンのため、手動での単独実行も可能。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する</li>
   <li>EventBridge Scheduler は画像生成 Step Functions のみに設定し、SNS 投稿用のスケジューラは不要</li>
 </ul>
 

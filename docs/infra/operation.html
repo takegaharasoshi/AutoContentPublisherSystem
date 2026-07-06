@@ -49,7 +49,7 @@
 </ol>
 
 <h4>手動での SNS 投稿実行</h4>
-<p>SNS 投稿の単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（<code>set_code</code> を入力パラメータとして渡す）。<code>EXECUTION_ARN</code> は Step Functions が <code>$$.Execution.Id</code> から自動設定するため、手動指定は不要。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/design-outline.html#flow-sns">アプリ設計大枠 セクション 2.2</a>）で定義する。</p>
+<p>SNS 投稿の単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（<code>set_code</code> を入力パラメータとして渡す）。<code>EXECUTION_ARN</code> は Step Functions が <code>$$.Execution.Id</code> から自動設定するため、手動指定は不要。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する。</p>
 <pre><code># CLI での手動実行例
 aws stepfunctions start-execution \
   --state-machine-arn arn:aws:states:ap-northeast-1:123456789012:stateMachine:acps-prod-sns-posting-sfn \

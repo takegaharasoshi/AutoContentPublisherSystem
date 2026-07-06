@@ -16,7 +16,7 @@ AutoContentPublisherSystem/
 │   ├── assets/style.css             #   設計書共通スタイル
 │   ├── overview/                    #   システム概要
 │   ├── infra/                       #   インフラ設計書（HTML）
-│   ├── app/                         #   アプリ設計書（大枠: Phase A / 詳細: Phase 9。現在は検討メモのみ）
+│   ├── app/                         #   アプリ設計書（大枠は骨子版作成済み・Phase 9 で詳細化。セット別設計書は app/sets/ に初セット追加時に作成）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
 │   └── development-plan.md          #   開発計画・進捗管理
 ├── infra/                           # AWS CDK プロジェクト（TypeScript）※未作成
@@ -52,7 +52,7 @@ AutoContentPublisherSystem/
 |---|---|---|
 | `docs/overview/` | システムの目的・スコープ・技術選定 | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
-| `docs/app/` | アプリ設計（大枠: Phase A / 詳細: Phase 9） | `index.html`（検討メモ） |
+| `docs/app/` | アプリ設計（大枠は骨子版作成済み / 詳細は Phase 9。セット追加で増えるのは `sets/` のセット別設計書 1 本のみ） | `index.html`（目次・検討メモ）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`, `data-model.html`, `operation.html`, `requirements-notes.html` |
 | `docs/_archive/` | 旧 Markdown 設計書（アプリ設計の参考資料。現役ではない） | 参照は Phase A・Phase 9 のアプリ設計時のみ |
 
 ### ドキュメント参照ガイド（タスク別）
@@ -68,8 +68,9 @@ AutoContentPublisherSystem/
 | CI/CD パイプラインを構築する | `docs/infra/cicd.html` |
 | 監視・通知を設定する | `docs/infra/workflow.html` セクション 7〜10 + `docs/infra/operation.html` |
 | 認証・秘密情報の設定を変更する | `docs/infra/security.html` |
-| アプリ設計の大枠（壁打ち・設計書構成・方針の骨子） | Phase A。`docs/app/index.html` + `docs/development-plan.md` の Phase A |
-| アプリ（業務ロジック）の詳細設計・実装 | Phase 9 以降。Phase A の大枠設計書を詳細化してから着手する |
+| アプリ設計の大枠（全体方針・骨子）を確認する | `docs/app/design-outline.html`（親ページ）+ 分冊 `batch-flow.html` / `data-model.html` / `operation.html` |
+| セットを追加・廃止する | `docs/app/operation.html` セクション 2 + `docs/app/design-outline.html` セクション 1.1（セット別設計書ルール） |
+| アプリ（業務ロジック）の詳細設計・実装 | Phase 9 以降。Phase A の大枠設計書（骨子版）を詳細化してから着手する |
 | 開発の次ステップを確認する | `docs/development-plan.md` |
 
 ### 設計 Fix・レビューの運用ルール

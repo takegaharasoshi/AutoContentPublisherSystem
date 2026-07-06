@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アプリ運用設計（骨子） | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / アプリ運用設計（骨子）</nav>
+<h1>アプリ運用設計（骨子）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">Phase A-4 骨子版（Phase 9-4 で詳細化）</span>
+  <span>最終更新: 2026-07-06</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  セット追加・廃止、プロンプト / キャプション管理、投稿失敗時対応など<strong>アプリ（業務）の運用</strong>を定める設計書。Phase A-4 時点は骨子版であり、
+  具体手順は <strong>Phase 9-4 で詳細化</strong>する（セクション 6）。
+  インフラの運用（デプロイ、Aurora 一時停止、監視・通知の仕組み、コスト）は <a href="../infra/operation.html">infra/operation.html</a> を参照。
+  全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a> を参照。
+</div>
+
+<h2 id="policies">1. 運用方針一覧（初期実装）</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>運用</th><th>方針（初期実装）</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>セット追加</td>
+      <td>セクション 2.1 の 4 ステップ（セット別設計書の作成 → Secret 作成 → DB 登録 → Scheduler 追加 deploy）</td>
+    </tr>
+    <tr>
+      <td>セット廃止・入れ替え（スクラップ&amp;ビルド）</td>
+      <td><code>is_active=0</code> 化 + Scheduler 削除。データ（DB レコード）は残す。セット別設計書は廃止の旨を付けて履歴として残す（セクション 2.2）</td>
+    </tr>
+    <tr>
+      <td>プロンプト・キャプション変更</td>
+      <td>DB 直接操作（Query Editor 等）。管理画面は将来拡張（セクション 3）</td>
+    </tr>
+    <tr>
+      <td>投稿失敗時</td>
+      <td>自動再試行なし・通知のみ（欠番許容）。必要な場合のみ手動起動（セクション 4）</td>
+    </tr>
+    <tr>
+      <td>Instagram トークン更新</td>
+      <td>60 日失効前に手動リフレッシュ（セクション 5）</td>
+    </tr>
+    <tr>
+      <td>効果測定</td>
+      <td>Instagram アプリ・インサイト画面で手動確認。自動収集（インサイト収集バッチ）は将来拡張</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="set-lifecycle">2. セット追加・廃止</h2>
+
+<h3 id="set-add">2.1 セット追加手順（骨子）</h3>
+<ol>
+  <li><strong>セット別設計書を作成する</strong> — <code>docs/app/sets/&lt;set_code&gt;.html</code> に、テーマ・アカウント構成・スケジュール・プロンプト / キャプションの方式選択・失敗時ポリシー等を記録する（ルールと標準記載項目は<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）</li>
+  <li><strong>Secrets Manager に SNS 認証 Secret を作成する</strong> — 名前規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html">infra/security.html</a>）</li>
+  <li><strong>DB にセットのレコードを登録する</strong> — <code>batch_sets</code> / <code>prompt_configs</code> / <code>caption_templates</code> / <code>sns_accounts</code>（Query Editor 等で直接操作）</li>
+  <li><strong>CDK の ImageBatchStack に EventBridge Scheduler を追加して deploy する</strong> — 入力に <code>set_code</code> を指定したスケジュールを 1 件追加する（1 日複数回投稿する場合は複数時刻分）</li>
+</ol>
+
+<div class="note">
+  <span class="callout-title">セット追加で CDK スタックは増えない</span>
+  スタック（FoundationStack / ImageBatchStack / SnsPostBatchStack / MonitoringStack）は<strong>機能単位</strong>であり、セット単位ではない。
+  セットを追加しても新しいスタックは作られず、増えるのは<strong>既存 ImageBatchStack 内の Scheduler 定義 1 件 + Secrets Manager の Secret + DB レコード</strong>のみ。
+  Step Functions・ECS タスク定義・コンテナイメージは全セット共有で、Scheduler が渡す <code>set_code</code> によってどのセットの処理を行うかが決まる。
+  したがって、インフラ設計書もセット追加では変更不要（2026-07-06 ユーザー質問を受けて明記）。
+</div>
+
+<h3 id="set-retire">2.2 セット廃止・入れ替え（スクラップ&amp;ビルド）</h3>
+<ul>
+  <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）</li>
+  <li>CDK から該当セットの Scheduler 定義を削除して deploy する</li>
+  <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体の保持要否は Phase 9-3 で確定する（<a href="data-model.html#s3-key">データモデル設計 セクション 4.2</a>）</li>
+  <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す</li>
+</ul>
+
+<h2 id="content-mgmt">3. プロンプト・キャプション管理</h2>
+<ul>
+  <li>プロンプト（<code>prompt_configs</code>）・キャプションテンプレート（<code>caption_templates</code>）は DB 直接操作（Query Editor 等）で登録・変更する。管理画面は将来拡張</li>
+  <li>生成時にはプロンプトのスナップショットが <code>generated_images</code> に記録されるため、変更しても過去の生成記録は影響を受けない</li>
+  <li>プロンプト / キャプションを AI で生成する方式は将来のセット別拡張ポイント（<a href="batch-flow.html">バッチ処理フロー設計</a> セクション 2・3）。どのセットがどの方式かはセット別設計書に記録する</li>
+</ul>
+
+<h2 id="failure">4. 投稿失敗時の対応</h2>
+<p>初期実装は<strong>自動再試行なし・通知のみ（欠番許容）</strong>。1 日複数回投稿するため、1 回の欠番は致命的でないという判断（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）。</p>
+<ol>
+  <li>失敗時はメール通知（MonitoringStack のアラーム / EventBridge Rule。仕組みは <a href="../infra/workflow.html">infra/workflow.html</a> セクション 7〜10）を受ける</li>
+  <li>Step Functions 実行履歴・CloudWatch Logs・DB（<code>posts</code> / <code>generation_runs</code>）で失敗箇所と原因を確認する</li>
+  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する — 投稿対象の決定ロジックは自動実行と同じため、<strong>未試行の生成実行</strong>が投稿される（<a href="batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）。一度試行して失敗した分は自動では再対象にならない（手動補正の具体手順は Phase 9-4）</li>
+</ol>
+
+<h2 id="secret-ops">5. SNS Secret 規約の運用・トークン更新</h2>
+<ul>
+  <li>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> の定義は <a href="../infra/security.html">infra/security.html</a>、構成要素の意味付けは<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a> で確定済み</li>
+  <li><code>account_code</code>（<code>sns_accounts.account_code</code>）は<strong>作成後変更不可</strong>（Secret 名導出専用）。変更が必要な場合は新アカウントとして追加する</li>
+  <li>Instagram のアクセストークンは 60 日で失効するため、失効前に手動でリフレッシュし Secret を更新する（旧設計の運用を踏襲。手順詳細・リマインド方法は Phase 9-4）</li>
+</ul>
+
+<h2 id="phase9">6. Phase 9-4 で詳細化する項目</h2>
+<ul>
+  <li>セット追加の具体手順（セット別設計書の雛形作成を含む）・チェックリスト化</li>
+  <li>Instagram トークン更新の具体手順とリマインド運用</li>
+  <li>投稿失敗時の確認手順・手動補正手順（失敗した投稿を意図的に再投稿したい場合の操作を含む）</li>
+  <li>stale データ（未完了の生成実行・古い未試行分等）の扱い</li>
+  <li>SNS Secret 規約の最終確認（インフラ構築の実態を踏まえて確定）</li>
+</ul>
+
+<p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。現役の設計書ではない）</p>
+
+</div>
+</body>
+</html>

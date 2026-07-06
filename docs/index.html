@@ -44,8 +44,14 @@
 │   ├── security.html              # IAM・Secrets Manager・ネットワークセキュリティ
 │   ├── cicd.html                  # CI/CD パイプライン
 │   └── operation.html             # インフラ運用
-├── app/
-│   └── index.html                 # アプリ設計（大枠: Phase A / 詳細: Phase 9。現在は検討メモ置き場）
+├── app/                           # アプリ設計書（大枠は骨子版を作成済み。Phase 9 で詳細化）
+│   ├── index.html                 #   アプリ設計の目次・検討メモ
+│   ├── requirements-notes.html    #   アプリ要件メモ（A-1 壁打ち記録）
+│   ├── design-outline.html        #   アプリ設計大枠（全体方針・親ページ）
+│   ├── batch-flow.html            #   バッチ処理フロー設計（骨子版）
+│   ├── data-model.html            #   データモデル設計（骨子版）
+│   ├── operation.html             #   アプリ運用設計（骨子版）
+│   └── sets/                      #   セット別設計書（1 セット 1 本。初セット追加時に作成）
 ├── _archive/                      # 旧 Markdown 設計書（参考資料。現役の設計書ではない）
 └── development-plan.md            # 開発計画・進捗管理（Markdown）</code></pre>
 
@@ -88,10 +94,28 @@
 <h3>アプリ設計（docs/app/）</h3>
 <div class="card-grid">
   <div class="card">
-    <div class="card-title"><a href="app/index.html">app/index.html</a> <span class="badge badge-wip">大枠: Phase A / 詳細: Phase 9</span></div>
-    <p>バッチ処理フロー・DB スキーマ・アプリ運用の設計書を作成予定。大枠設計書は Phase A で、詳細設計書は Phase 9 で作成する。現在は設計対象一覧と検討メモ。</p>
+    <div class="card-title"><a href="app/index.html">index.html</a></div>
+    <p>アプリ設計の目次・検討メモ。アプリ設計書の入口。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="app/design-outline.html">design-outline.html</a></div>
+    <p>アプリ設計大枠（全体方針・親ページ）。処理単位の不変条件、セット別設計書ルール、ワークフロー連携の意味付け。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="app/batch-flow.html">batch-flow.html</a> <span class="badge badge-wip">骨子版 → 9-2</span></div>
+    <p>バッチ処理フロー設計。画像生成・SNS 投稿の処理手順、投稿対象の決定、セット別拡張ポイント。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="app/data-model.html">data-model.html</a> <span class="badge badge-wip">骨子版 → 9-3</span></div>
+    <p>データモデル設計。ER 図・エンティティ一覧、主キーと冪等性キーの分離。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="app/operation.html">operation.html</a> <span class="badge badge-wip">骨子版 → 9-4</span></div>
+    <p>アプリ運用設計。セット追加・廃止、プロンプト / キャプション管理、投稿失敗時対応、トークン更新。</p>
   </div>
 </div>
+
+<p>セット（テーマ）が増えても、追加される設計書は <code>docs/app/sets/</code> のセット別設計書 1 本のみで、<strong>インフラ設計書・共通アプリ設計書は変更しない</strong>（ルールは <a href="app/design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a> を参照）。</p>
 
 <h2 id="scope">3. スコープ境界: インフラ設計とアプリ設計</h2>
 
