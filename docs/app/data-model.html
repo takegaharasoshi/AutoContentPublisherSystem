@@ -245,7 +245,7 @@ WHERE gr.set_id = :set_id
   )
 ORDER BY gr.scheduled_at ASC, gr.id ASC
 LIMIT 1;</code></pre>
-  <p>この定義により: (1) 新規の <code>generation_run</code>（<code>posts</code> なし）は当然対象になる (2) Step Functions Retry による同一実行内のタスク再起動時も<strong>同じ生成実行が再選択</strong>され、<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2 の復旧ロジック</a>（<code>pending</code> / <code>container_created</code> からの再開）が機能する (3) 異常終了（Step Functions のリトライ上限到達等）で <code>pending</code> / <code>container_created</code> のまま残った <code>generation_run</code> は、後続の別実行でも自動的に再選択され続ける（stale データとして残り続ける問題は運用課題であり、扱いは <a href="operation.html#phase9">operation.html セクション 6</a>（Phase 9-4）の持ち越し事項とする）。
+  <p>この定義により: (1) 新規の <code>generation_run</code>（<code>posts</code> なし）は当然対象になる (2) Step Functions Retry による同一実行内のタスク再起動時も<strong>同じ生成実行が再選択</strong>され、<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2 の復旧ロジック</a>（<code>pending</code> / <code>container_created</code> からの再開）が機能する (3) 異常終了（Step Functions のリトライ上限到達等）で <code>pending</code> / <code>container_created</code> のまま残った <code>generation_run</code> は、後続の別実行でも自動的に再選択され続ける（stale データとして後続投稿をブロックし得る問題の検知・補正手順は <a href="operation.html#stale-data">operation.html セクション 4.3</a> で確定した）。
   「一度でも試行（失敗含む）した生成実行は自動では再対象にしない」（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>）は、「有効な全アカウントが終端状態に達した」場合を指すと解釈する。</p>
   <p>インデックスは <code>generation_runs.uq_generation_runs_set_id (set_id, id)</code>（<code>scheduled_at</code> 順スキャン）と <code>posts.uq_posts_generation_run_account (generation_run_id, sns_account_id)</code>（<code>NOT EXISTS</code> 部分検索）の左端プレフィックスで十分であり、追加インデックスは設けない。</p>
 </div>

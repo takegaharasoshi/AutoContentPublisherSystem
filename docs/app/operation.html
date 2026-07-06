@@ -3,23 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>アプリ運用設計（骨子） | AutoContentPublisherSystem</title>
+<title>アプリ運用設計 | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / アプリ運用設計（骨子）</nav>
-<h1>アプリ運用設計（骨子）</h1>
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / アプリ運用設計</nav>
+<h1>アプリ運用設計</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">Phase A-4 骨子版（Phase 9-4 で詳細化）</span>
-  <span>最終更新: 2026-07-06</span>
+  <span class="badge badge-fixed">Phase 9-4 で詳細化済み（一時 Fix）</span>
+  <span>最終更新: 2026-07-07</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  セット追加・廃止、プロンプト / キャプション管理、投稿失敗時対応など<strong>アプリ（業務）の運用</strong>を定める設計書。Phase A-4 時点は骨子版であり、
-  具体手順は <strong>Phase 9-4 で詳細化</strong>する（セクション 6）。
+  セット追加・廃止、プロンプト / キャプション管理、投稿失敗時対応、SNS Secret 規約の運用など<strong>アプリ（業務）の運用</strong>を定める設計書。Phase A-4 の骨子版を Phase 9-4 で詳細化した（具体手順・SQL 例・チェックリストを確定）。
   インフラの運用（デプロイ、Aurora 一時停止、監視・通知の仕組み、コスト）は <a href="../infra/operation.html">infra/operation.html</a> を参照。
   全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a> を参照。
 </div>
@@ -32,7 +31,7 @@
   <tbody>
     <tr>
       <td>セット追加</td>
-      <td>セクション 2.1 の 4 ステップ（セット別設計書の作成 → Secret 作成 → DB 登録 → Scheduler 追加 deploy）</td>
+      <td>セクション 2.1 の手順（セット別設計書の作成 → Secret 作成 → DB 登録 → Scheduler 追加 deploy → 動作確認）</td>
     </tr>
     <tr>
       <td>セット廃止・入れ替え（スクラップ&amp;ビルド）</td>
@@ -40,15 +39,19 @@
     </tr>
     <tr>
       <td>プロンプト・キャプション変更</td>
-      <td>DB 直接操作（Query Editor 等）。管理画面は将来拡張（セクション 3）</td>
+      <td>DB 直接操作（Query Editor 等）。具体手順はセクション 3。管理画面は将来拡張</td>
     </tr>
     <tr>
       <td>投稿失敗時</td>
-      <td>自動再試行なし・通知のみ（欠番許容）。必要な場合のみ手動起動（セクション 4）</td>
+      <td>自動再試行なし・通知のみ（欠番許容）。確認・手動補正手順はセクション 4</td>
     </tr>
     <tr>
-      <td>Instagram トークン更新</td>
-      <td>60 日失効前に手動リフレッシュ（セクション 5）</td>
+      <td>stale データ（未完了のまま残った生成実行）</td>
+      <td>自動検知は行わず、失敗通知を起点に定期確認する運用（セクション 4.3）</td>
+    </tr>
+    <tr>
+      <td>SNS アカウント追加・Instagram トークン更新</td>
+      <td>Secret 作成 → DB 登録の順で追加。トークンは 60 日失効前に手動リフレッシュ（セクション 5）</td>
     </tr>
     <tr>
       <td>効果測定</td>
@@ -60,13 +63,78 @@
 
 <h2 id="set-lifecycle">2. セット追加・廃止</h2>
 
-<h3 id="set-add">2.1 セット追加手順（骨子）</h3>
-<ol>
-  <li><strong>セット別設計書を作成する</strong> — <code>docs/app/sets/&lt;set_code&gt;.html</code> に、テーマ・アカウント構成・スケジュール・プロンプト / キャプションの方式選択・失敗時ポリシー等を記録する（ルールと標準記載項目は<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）</li>
-  <li><strong>Secrets Manager に SNS 認証 Secret を作成する</strong> — 名前規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html">infra/security.html</a>）</li>
-  <li><strong>DB にセットのレコードを登録する</strong> — <code>batch_sets</code> / <code>prompt_configs</code> / <code>caption_templates</code> / <code>sns_accounts</code>（Query Editor 等で直接操作）</li>
-  <li><strong>CDK の ImageBatchStack に EventBridge Scheduler を追加して deploy する</strong> — 入力に <code>set_code</code> を指定したスケジュールを 1 件追加する（1 日複数回投稿する場合は複数時刻分）</li>
-</ol>
+<h3 id="set-add">2.1 セット追加手順</h3>
+
+<p>新しいセット（テーマ）を追加する手順を以下の順序で行う。順序を守る理由: Secret を先に作らないと DB に <code>sns_accounts</code> を登録しても投稿バッチが認証情報を取得できず即失敗するため（セクション 5.2 と同じ理由）。</p>
+
+<h4>手順 0: セット別設計書を作成する</h4>
+<p><code>docs/app/sets/&lt;set_code&gt;.html</code> に、標準記載項目（テーマ、投稿先アカウント構成、スケジュール、プロンプト / キャプションの方式選択、失敗時ポリシー、共通フローからの差分）を記録する（ルールは<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。雛形は以下を複製して使う。</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;セット別設計書: {set_code} | AutoContentPublisherSystem&lt;/title&gt;
+&lt;link rel="stylesheet" href="../../assets/style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class="container"&gt;
+&lt;nav class="breadcrumb"&gt;&lt;a href="../../index.html"&gt;設計書体系ガイド&lt;/a&gt; / &lt;a href="../index.html"&gt;アプリ設計&lt;/a&gt; / {テーマ名}&lt;/nav&gt;
+&lt;h1&gt;セット別設計書: {テーマ名}&lt;/h1&gt;
+&lt;div class="page-meta"&gt;&lt;span class="badge badge-wip"&gt;運用中&lt;/span&gt;&lt;span&gt;set_code: {set_code}&lt;/span&gt;&lt;/div&gt;
+
+&lt;h2&gt;1. テーマ&lt;/h2&gt;
+&lt;h2&gt;2. 投稿先アカウント構成&lt;/h2&gt;
+&lt;h2&gt;3. スケジュール（投稿頻度）&lt;/h2&gt;
+&lt;h2&gt;4. プロンプトの作り方&lt;/h2&gt;
+&lt;h2&gt;5. キャプションの作り方&lt;/h2&gt;
+&lt;h2&gt;6. 失敗時ポリシー&lt;/h2&gt;
+&lt;h2&gt;7. 共通フローからの差分・特記事項&lt;/h2&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<h4>手順 1: Secrets Manager に SNS 認証 Secret を作成する</h4>
+<p>名前規約・値のスキーマは <a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2〜1.3</a>（構成要素の意味付けはセクション 5.1 で最終確認済み）。</p>
+<pre><code>aws secretsmanager create-secret \
+  --name acps/prod/fashion-set-2/sns/instagram/main-account \
+  --secret-string '{"access_token":"...","ig_user_id":"...","token_expires_at":"2026-09-05T00:00:00Z"}'</code></pre>
+
+<h4>手順 2: DB にセットのレコードを登録する</h4>
+<p>Query Editor で以下の順に INSERT する（後続テーブルが <code>set_id</code> を参照するため、この順序を守る）。</p>
+<pre><code>-- (1) batch_sets
+INSERT INTO batch_sets (set_code, name, description, is_active)
+VALUES ('fashion-set-2', 'ファッション系セット2', 'セット2の説明', 1);
+-- 発行された id を以降の set_id として使う
+
+-- (2) prompt_configs（初期運用は is_active=1 を 1 件のみ）
+INSERT INTO prompt_configs (set_id, prompt_text, negative_prompt, parameters, is_active)
+VALUES (:set_id, '(プロンプト本文。1 枚だけ生成されるよう文言で制御)', NULL, NULL, 1);
+
+-- (3) caption_templates（0 件でも投稿は継続できるが、通常は 1 件登録する）
+INSERT INTO caption_templates (set_id, template_text, is_active)
+VALUES (:set_id, '(キャプション本文 + ハッシュタグ)', 1);
+
+-- (4) sns_accounts（手順 1 で作成した Secret の account_code と一致させる）
+INSERT INTO sns_accounts (set_id, platform, account_code, account_name, is_active)
+VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);</code></pre>
+
+<h4>手順 3: CDK の ImageBatchStack に EventBridge Scheduler を追加して deploy する</h4>
+<p>入力に <code>set_code</code> を指定したスケジュールを 1 件追加する（1 日複数回投稿する場合は複数時刻分）。cron 式・Scheduler 定義の書き方は <a href="../infra/workflow.html">infra/workflow.html</a>、変更後のデプロイは <code>cdk deploy -c env=prod ImageBatchStack</code>。</p>
+
+<h4>手順 4: 動作確認</h4>
+<p>画像生成 Step Functions を手動実行し（<a href="../infra/operation.html">infra/operation.html セクション 1.2</a> の「手動での画像生成実行」）、CloudWatch Logs で当該 <code>set_code</code> の生成・投稿が成功することを確認する。</p>
+
+<div class="note">
+  <span class="callout-title">セット追加チェックリスト</span>
+  <ul style="margin:.3rem 0 0;">
+    <li>セット別設計書（<code>docs/app/sets/&lt;set_code&gt;.html</code>）を作成した</li>
+    <li>Secrets Manager に <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> を作成した（DB 登録より先）</li>
+    <li><code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code> の順に DB へ登録した</li>
+    <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した</li>
+    <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
+  </ul>
+</div>
 
 <div class="note">
   <span class="callout-title">セット追加で CDK スタックは増えない</span>
@@ -77,45 +145,182 @@
 </div>
 
 <h3 id="set-retire">2.2 セット廃止・入れ替え（スクラップ&amp;ビルド）</h3>
-<ul>
-  <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）</li>
+<ol>
+  <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）。この時点でスケジュールが残っていても実害はないため、順序を厳密に守る必要はないが、次のステップより先に行うことを推奨する</li>
   <li>CDK から該当セットの Scheduler 定義を削除して deploy する</li>
   <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体（画像ファイル）はインフラの 30 日ライフサイクルで自動削除される対象であり「残す」対象に含まない（Phase 9-3 で確定。<a href="data-model.html#s3-key">データモデル設計 セクション 5</a>）</li>
   <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す</li>
-</ul>
+</ol>
 
 <h2 id="content-mgmt">3. プロンプト・キャプション管理</h2>
-<ul>
-  <li>プロンプト（<code>prompt_configs</code>）・キャプションテンプレート（<code>caption_templates</code>）は DB 直接操作（Query Editor 等）で登録・変更する。管理画面は将来拡張</li>
-  <li>生成時にはプロンプトのスナップショットが <code>generated_images</code> に記録されるため、変更しても過去の生成記録は影響を受けない</li>
-  <li>プロンプト / キャプションを AI で生成する方式は将来のセット別拡張ポイント（<a href="batch-flow.html">バッチ処理フロー設計</a> セクション 2・3）。どのセットがどの方式かはセット別設計書に記録する</li>
-</ul>
+
+<p><code>prompt_configs</code>・<code>caption_templates</code> は DB 直接操作（Query Editor 等）で登録・変更する。管理画面は将来拡張。生成時にはプロンプトのスナップショットが <code>generated_images</code> に、キャプションのスナップショットが <code>posts</code> に記録されるため、変更しても過去の生成・投稿記録は影響を受けない。</p>
+
+<h4>軽微な文言修正（履歴を残さない場合）</h4>
+<p>既存の有効行を直接 UPDATE する。過去の生成実行への影響はスナップショットにより発生しない。</p>
+<pre><code>UPDATE prompt_configs SET prompt_text = '(新しいプロンプト本文)' WHERE id = :prompt_config_id;
+UPDATE caption_templates SET template_text = '(新しいキャプション本文)' WHERE id = :caption_template_id;</code></pre>
+
+<h4>差し替え（旧設定を無効化して残す場合）</h4>
+<p>新しいレコードを追加し、旧レコードを <code>is_active=0</code> にする。<code>prompt_configs</code> は<strong>「<code>is_active=1</code> が 0 件」だと画像生成バッチが異常終了する</strong>（<a href="batch-flow.html#flow-image">batch-flow.html セクション 2</a>）ため、必ず 1 トランザクションで実行し、0 件になる瞬間を作らない。</p>
+<pre><code>START TRANSACTION;
+INSERT INTO prompt_configs (set_id, prompt_text, negative_prompt, parameters, is_active)
+VALUES (:set_id, '(新しいプロンプト本文)', NULL, NULL, 1);
+UPDATE prompt_configs SET is_active = 0 WHERE id = :old_prompt_config_id;
+COMMIT;</code></pre>
+<p><code>caption_templates</code> は <code>is_active=1</code> が 0 件でも投稿処理は継続する（キャプションなしで投稿。<a href="data-model.html#detail-caption-templates">data-model.html セクション 4.3</a>）ため、トランザクションは必須ではないが同様の手順で問題ない。</p>
+
+<div class="decision">
+  <span class="callout-title">セット別拡張ポイント（再掲）</span>
+  AI によるプロンプト生成・AI キャプション生成は将来のセット別拡張ポイント（<a href="batch-flow.html">バッチ処理フロー設計</a> セクション 2・3）。どのセットがどの方式かはセット別設計書に記録する。本セクションの手順は「固定文を DB で管理する」初期実装に対するものであり、AI 生成方式導入時は別途手順を定める。
+</div>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>
 <p>初期実装は<strong>自動再試行なし・通知のみ（欠番許容）</strong>。1 日複数回投稿するため、1 回の欠番は致命的でないという判断（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）。</p>
+
+<h3 id="failure-check">4.1 確認手順</h3>
 <ol>
   <li>失敗時はメール通知（MonitoringStack のアラーム / EventBridge Rule。仕組みは <a href="../infra/workflow.html">infra/workflow.html</a> セクション 7〜10）を受ける</li>
-  <li>Step Functions 実行履歴・CloudWatch Logs・DB（<code>posts</code> / <code>generation_runs</code>）で失敗箇所と原因を確認する</li>
-  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する — 投稿対象の決定ロジックは自動実行と同じため、<strong>未試行の生成実行</strong>が投稿される（<a href="batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）。一度試行して失敗した分は自動では再対象にならない（手動補正の具体手順は Phase 9-4）</li>
+  <li>Step Functions 実行履歴・CloudWatch Logs で、どのステートで・どのアカウントで失敗したかを確認する</li>
+  <li><code>posts</code> テーブルで失敗の詳細（<code>status</code> / <code>error_message</code> / <code>api_response</code>）を確認する:
+    <pre><code>SELECT p.id, p.status, p.error_message, p.api_response, p.updated_at,
+       sa.account_code, gr.scheduled_at
+FROM posts p
+JOIN sns_accounts sa ON sa.id = p.sns_account_id
+JOIN generation_runs gr ON gr.id = p.generation_run_id
+JOIN batch_sets bs ON bs.id = gr.set_id
+WHERE bs.set_code = 'fashion-set-1'
+ORDER BY p.updated_at DESC
+LIMIT 20;</code></pre>
+  </li>
+  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する（<a href="../infra/operation.html">infra/operation.html</a> セクション 1.2）。投稿対象の決定ロジックは自動実行と同じため、<strong>その時点で最古の actionable な生成実行</strong>（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）が処理される。一度試行して失敗した分は自動では再対象にならない（意図的に再対象にしたい場合は 4.2 を参照）</li>
 </ol>
 
+<h3 id="failure-correction">4.2 手動補正手順</h3>
+<p>DB を手動補正する前に、対象の <code>set_code</code>・<code>post_id</code>・現在の値を development-plan.md の「トラブルシューティングログ」に記録してから更新する。</p>
+
+<h4>published_unconfirmed を投稿済みに補正する</h4>
+<p>Instagram 側で投稿済みを確認できた場合のみ実行する。</p>
+<pre><code>UPDATE posts
+SET status = 'success',
+    platform_post_id = '(確認できた Instagram media ID)',
+    posted_at = '(確認できた投稿日時 UTC)',
+    error_message = NULL
+WHERE id = :post_id
+  AND status = 'published_unconfirmed';</code></pre>
+
+<h4>failed / published_unconfirmed を未投稿として再試行可能にする</h4>
+<p>Instagram 側で未投稿を確認し、原因を解消した上で実行する。<code>posts</code> は <code>UNIQUE (generation_run_id, sns_account_id)</code> のため新規行は作れず、既存行を <code>pending</code> に戻して「最初から実行」扱いにする（<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a> の復旧ロジック）。Instagram のメディアコンテナは時間経過で無効になり得るため、<code>platform_container_id</code> を含めてクリアし常にコンテナ作成からやり直す。</p>
+<pre><code>UPDATE posts
+SET status = 'pending',
+    platform_container_id = NULL,
+    platform_post_id = NULL,
+    caption_template_id = NULL,
+    caption_text_snapshot = NULL,
+    error_message = NULL,
+    api_response = NULL
+WHERE id = :post_id
+  AND status IN ('failed', 'published_unconfirmed');</code></pre>
+
+<div class="warn">
+  <span class="callout-title">注意: 補正しても即座には処理されない場合がある</span>
+  SNS 投稿バッチは<strong>常にその時点で最古の actionable な生成実行 1 件のみ</strong>を処理する（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>）。補正対象より古い actionable な生成実行が他に残っている場合、次回実行（自動 / 手動を問わず）はそちらが先に処理される。補正対象を優先させたい場合は、以下のクエリ（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>のクエリを転用）で、補正対象の <code>generation_run_id</code> がその時点で最古の actionable であることを確認してから手動実行する。
+  <pre><code>SELECT gr.id
+FROM generation_runs gr
+WHERE gr.set_id = :set_id
+  AND EXISTS (
+    SELECT 1 FROM sns_accounts sa
+    WHERE sa.set_id = gr.set_id AND sa.is_active = 1
+      AND NOT EXISTS (
+        SELECT 1 FROM posts p
+        WHERE p.generation_run_id = gr.id
+          AND p.sns_account_id = sa.id
+          AND p.status IN ('success','failed','published_unconfirmed')
+      )
+  )
+ORDER BY gr.scheduled_at ASC, gr.id ASC
+LIMIT 1;</code></pre>
+  古い actionable な生成実行が他にもある場合は、4.3 の stale データの扱いを先に検討する。
+</div>
+
+<h3 id="stale-data">4.3 stale データ（未完了のまま残った生成実行）の扱い</h3>
+
+<p><a href="data-model.html#target-selection">data-model.html セクション 4.4</a> で確認したとおり、<code>pending</code> / <code>container_created</code> のまま終端状態に達しない <code>posts</code> 行が残ると、その生成実行は<strong>後続の実行でも自動的に再選択され続ける</strong>。これは主に、ECS タスクの異常終了（OOM Kill・Fargate 基盤障害等）でアプリケーションが例外を捕捉して <code>failed</code> に更新する前に強制終了した場合に起こる。投稿対象決定は「最古の actionable」を選ぶ方式のため、この状態の生成実行が残り続けると<strong>同一セットの後続投稿がブロックされる</strong>点が運用上の注意点である。</p>
+
+<div class="note">
+  <span class="callout-title">決定: 自動検知の仕組みは追加しない（既存アラーム 1 本に一本化する方針を維持）</span>
+  stale 専用の CloudWatch アラームやカスタムメトリクスは追加しない（<a href="batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a> の「通知は既存の Step Functions 失敗アラーム 1 本に一本化」という決定と整合させる）。運用者は既存の失敗通知を起点に、以下のクエリで stale な行の有無を確認する運用とする。
+  <pre><code>-- 各セットの actionable な (generation_run, account) を一覧表示（古い順）
+SELECT bs.set_code, gr.id AS generation_run_id, gr.scheduled_at,
+       sa.account_code, p.status, p.updated_at
+FROM generation_runs gr
+JOIN batch_sets bs ON bs.id = gr.set_id
+JOIN sns_accounts sa ON sa.set_id = gr.set_id AND sa.is_active = 1
+LEFT JOIN posts p ON p.generation_run_id = gr.id AND p.sns_account_id = sa.id
+WHERE bs.is_active = 1
+  AND (p.id IS NULL OR p.status NOT IN ('success', 'failed', 'published_unconfirmed'))
+ORDER BY gr.scheduled_at ASC;</code></pre>
+</div>
+
+<ul>
+  <li><strong>判定の目安</strong>: 1 日複数回実行する運用のため、<code>status</code> が <code>pending</code> / <code>container_created</code> のまま <code>updated_at</code> から半日以上経過している行は stale の疑いが強い（対応する Step Functions 実行がすでに終了しているにもかかわらず DB が更新されていない状態）。行が存在しない（<code>p.id IS NULL</code>）だけの場合は、直近の生成実行がまだ処理待ちなだけの通常状態であり stale ではない</li>
+  <li><strong>対応</strong>: 対象の Step Functions 実行履歴・CloudWatch Logs で実際の投稿有無を確認し、4.2 の手順で <code>success</code>（実際は投稿済みだった場合）または <code>failed</code>（実際は未投稿だった場合）の終端状態に補正する。終端状態に補正することで、後続の投稿対象決定が次の生成実行へ進めるようになる</li>
+  <li>将来的にセット別失敗時ポリシー（追いつく / 捨てる。<a href="batch-flow.html#future-failure-policy">batch-flow.html</a>）を導入する際は、stale データの扱いも合わせて再設計する</li>
+</ul>
+
 <h2 id="secret-ops">5. SNS Secret 規約の運用・トークン更新</h2>
+
+<h3 id="secret-final">5.1 Secret 名規約の最終確認</h3>
+<p>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2</a>）と、構成要素の意味付け（<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>）は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a>で確定済みであり、本規約に変更はない。<code>account_code</code> は Secret 名導出専用のため<strong>作成後変更不可</strong>。変更が必要な場合は新アカウント（新しい <code>account_code</code>）として追加し、旧アカウントは <code>is_active=0</code> にする。</p>
+<div class="note">
+  <span class="callout-title">Phase 10-1 での再確認</span>
+  本規約は Phase 0〜8（インフラ構築）を経ずに Phase 9 として前倒しで確定したものである。インフラ構築で IAM ポリシーや Secret 運用の実態に矛盾が見つかった場合は、Phase 10-1（アプリ設計の最終 Fix）で見直す。
+</div>
+
+<h3 id="account-add">5.2 既存セットへの SNS アカウント追加手順</h3>
+<p>新規セット追加（セクション 2.1）とは異なり、既存セットに投稿先アカウントを追加する場合（将来の多プラットフォーム展開等）の手順。</p>
+<ol>
+  <li><strong>Secrets Manager にシークレットを作成する</strong>（DB 登録より先に行う）。値のスキーマは <a href="../infra/security.html">infra/security.html セクション 1.3</a> を参照
+    <pre><code>aws secretsmanager create-secret \
+  --name acps/prod/fashion-set-1/sns/instagram/sub-account \
+  --secret-string '{"access_token":"...","ig_user_id":"...","token_expires_at":"2026-09-05T00:00:00Z"}'</code></pre>
+  </li>
+  <li><strong><code>sns_accounts</code> にレコードを追加する</strong>。<code>account_code</code> はシークレット名と一致させ、作成後は変更しない
+    <pre><code>INSERT INTO sns_accounts (set_id, platform, account_code, account_name, is_active)
+VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1);</code></pre>
+  </li>
+  <li><strong>動作確認</strong>: SNS 投稿ワークフローを手動実行し、追加したアカウントへの投稿（またはシークレット取得）が成功することを確認する</li>
+</ol>
+
+<h3 id="token-refresh">5.3 Instagram アクセストークン更新の具体手順とリマインド運用</h3>
+<ol>
+  <li>Instagram Graph API の長期アクセストークンは発行から<strong>60 日で失効</strong>する。失効前（目安: 失効の 7 日前まで）に Meta の長期トークン更新エンドポイントを呼び出し、新しいトークンと新しい失効日時を取得する</li>
+  <li>取得した新トークンで Secrets Manager の値を更新する（<code>access_token</code> と <code>token_expires_at</code> の両方を更新する）
+    <pre><code>aws secretsmanager put-secret-value \
+  --secret-id acps/prod/fashion-set-1/sns/instagram/main-account \
+  --secret-string '{"access_token":"(新トークン)","ig_user_id":"...","token_expires_at":"2026-11-04T00:00:00Z"}'</code></pre>
+  </li>
+  <li>更新後、SNS 投稿ワークフローを手動実行するか次回の自動実行を待って、新トークンで認証が成功することを確認する</li>
+</ol>
+
+<div class="decision">
+  <span class="callout-title">決定: リマインド運用はアカウントごとの手動管理とする（自動リマインドは導入しない）</span>
+  <code>token_expires_at</code> は Secret 内の運用メモであり、アプリケーションはこの値を認証には使用しない（<a href="../infra/security.html">infra/security.html セクション 1.3</a>）。管理画面（将来拡張）がない現時点では、Secrets Manager から失効日時を横断的に一覧する仕組みも持たない。
+  そのため初期運用では、<strong>アカウント作成・トークン更新のたびに、失効日の 7 日前を目安に運用者自身がカレンダー等の外部ツールにリマインダーを設定する</strong>運用とする（セット数が少ない初期スコープでは許容範囲と判断）。
+  セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（設計課題リストに記録）。
+</div>
+
+<h2 id="phase9">6. Phase 9-4 の決定事項まとめ</h2>
 <ul>
-  <li>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> の定義は <a href="../infra/security.html">infra/security.html</a>、構成要素の意味付けは<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a> で確定済み</li>
-  <li><code>account_code</code>（<code>sns_accounts.account_code</code>）は<strong>作成後変更不可</strong>（Secret 名導出専用）。変更が必要な場合は新アカウントとして追加する</li>
-  <li>Instagram のアクセストークンは 60 日で失効するため、失効前に手動でリフレッシュし Secret を更新する（旧設計の運用を踏襲。手順詳細・リマインド方法は Phase 9-4）</li>
+  <li>セット追加手順を 5 ステップ（設計書雛形 → Secret 作成 → DB 登録（<code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code> の順）→ Scheduler 追加 deploy → 動作確認）に具体化し、チェックリスト化した（2.1）</li>
+  <li>プロンプト・キャプションの変更は「直接 UPDATE（履歴を残さない）」と「新規 INSERT + 旧行 <code>is_active=0</code>（履歴を残す）」の 2 方式を定義し、<code>prompt_configs</code> は 0 件化を避けるためトランザクションで実行することを確定した（3）</li>
+  <li>投稿失敗時の手動補正は、旧設計の <code>attempt_number</code> ベースの再試行を採用せず、<code>posts</code> 行を <code>pending</code> に戻して「最初から実行」扱いにする方式で再投稿可能にすると確定した。あわせて、補正しても投稿対象決定が「最古の actionable」を優先するため即座に処理されるとは限らない点を明記した（4.2）</li>
+  <li>stale データ（<code>pending</code> / <code>container_created</code> のまま残った生成実行が後続投稿をブロックする問題）について、専用の自動検知は追加せず、既存の失敗アラームを起点に定期確認クエリで検出し 4.2 の手順で終端状態に補正する運用と確定した（4.3）</li>
+  <li>SNS Secret 規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> は変更なしで最終確認とし、既存セットへのアカウント追加手順（Secret 作成 → DB 登録の順）を新規セット追加手順と分けて明文化した（5.1〜5.2）</li>
+  <li>Instagram トークン更新のリマインドは、管理画面がない初期スコープでは運用者による手動リマインダー設定とし、自動化は将来課題として設計課題リストに記録した（5.3）</li>
 </ul>
 
-<h2 id="phase9">6. Phase 9-4 で詳細化する項目</h2>
-<ul>
-  <li>セット追加の具体手順（セット別設計書の雛形作成を含む）・チェックリスト化</li>
-  <li>Instagram トークン更新の具体手順とリマインド運用</li>
-  <li>投稿失敗時の確認手順・手動補正手順（失敗した投稿を意図的に再投稿したい場合の操作を含む）</li>
-  <li>stale データ（未完了の生成実行・古い未試行分等）の扱い</li>
-  <li>SNS Secret 規約の最終確認（インフラ構築の実態を踏まえて確定）</li>
-</ul>
-
-<p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。現役の設計書ではない）</p>
+<p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。<code>post_records.attempt_number</code> / <code>max_post_retries</code> に基づく再試行上限確認は、自動再試行を行わない方針への変更に伴い不採用。SNS アカウント追加手順・手動補正の記録ルール・トークン更新の考え方は本書に引き継いだ。現役の設計書ではない）</p>
 
 </div>
 </body>
