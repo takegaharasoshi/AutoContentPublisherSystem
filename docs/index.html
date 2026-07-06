@@ -48,8 +48,8 @@
 │   ├── index.html                 #   アプリ設計の目次・検討メモ
 │   ├── requirements-notes.html    #   アプリ要件メモ（A-1 壁打ち記録）
 │   ├── design-outline.html        #   アプリ設計大枠（全体方針・親ページ）
-│   ├── batch-flow.html            #   バッチ処理フロー設計（骨子版）
-│   ├── data-model.html            #   データモデル設計（骨子版）
+│   ├── batch-flow.html            #   バッチ処理フロー設計（Phase 9-2 詳細化済み）
+│   ├── data-model.html            #   データモデル設計（Phase 9-3 詳細化済み）
 │   ├── operation.html             #   アプリ運用設計（骨子版）
 │   └── sets/                      #   セット別設計書（1 セット 1 本。初セット追加時に作成）
 ├── _archive/                      # 旧 Markdown 設計書（参考資料。現役の設計書ではない）
@@ -102,12 +102,12 @@
     <p>アプリ設計大枠（全体方針・親ページ）。処理単位の不変条件、セット別設計書ルール、ワークフロー連携の意味付け。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="app/batch-flow.html">batch-flow.html</a> <span class="badge badge-wip">骨子版 → 9-2</span></div>
+    <div class="card-title"><a href="app/batch-flow.html">batch-flow.html</a> <span class="badge badge-fixed">9-2 詳細化済み</span></div>
     <p>バッチ処理フロー設計。画像生成・SNS 投稿の処理手順、投稿対象の決定、セット別拡張ポイント。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="app/data-model.html">data-model.html</a> <span class="badge badge-wip">骨子版 → 9-3</span></div>
-    <p>データモデル設計。ER 図・エンティティ一覧、主キーと冪等性キーの分離。</p>
+    <div class="card-title"><a href="app/data-model.html">data-model.html</a> <span class="badge badge-fixed">9-3 詳細化済み</span></div>
+    <p>データモデル設計。ER 図・エンティティ一覧、主キーと冪等性キーの分離、DDL（<a href="../database/V001__initial_schema.sql">database/V001__initial_schema.sql</a>）。</p>
   </div>
   <div class="card">
     <div class="card-title"><a href="app/operation.html">operation.html</a> <span class="badge badge-wip">骨子版 → 9-4</span></div>

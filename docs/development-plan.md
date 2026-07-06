@@ -89,13 +89,13 @@
   - 確認: Phase A の大枠設計書と [docs/app/index.html](app/index.html) の検討メモを棚卸しし、詳細化の作業リスト（各分冊末尾の「詳細化する項目」）に漏れがないことが確認されている
   - 備考: 旧 9-1 の主目的だった「インフラ構築中に得た知見の反映」は前倒しに伴い Phase 10-1 へ移動した。2026-07-06 実施。想定どおり検討メモは空（インフラ構築前のため）で大枠に変更なし。[requirements-notes.html](app/requirements-notes.html) セクション 7・8（旧設計との差分・持ち越し論点）を各分冊末尾の詳細化項目と突き合わせ、漏れがないことを確認した。プロンプト選択方式・失敗時ポリシーのセット別設定は [design-outline.html](app/design-outline.html) セクション 6「分冊横断の将来拡張」に実装時期未定として整理済みで、9-2〜9-4 側での追加対応は不要と判断。blocker なし。9-2 へ進む
 
-- [ ] **9-2** バッチ処理フロー設計
+- [x] **9-2** バッチ処理フロー設計
   - 確認: Phase A の骨子版（docs/app/batch-flow.html）が詳細化されている
-  - 備考: Phase A の大枠設計書（処理フロー概要）を詳細化する。冪等性・再試行・投稿ステータス管理・二重投稿防止・バッチサイズ制限を扱う。docs/_archive/batch.md を参考資料とする
+  - 備考: 2026-07-06 実施。主な決定事項: (1) `posts` の状態を `pending/container_created/success/failed/published_unconfirmed` の 5 状態とし、`attempt_number` 相当は持たず `(generation_run_id, sns_account_id)` の 1 行の状態遷移で表現（自動再試行なし方針と整合） (2) SNS 投稿バッチの処理件数は常に最古の未試行生成実行 1 件のみとし、`BATCH_SIZE_LIMIT` は不要と判断 (3) 失敗定義は「対象アカウントのうち 1 つでも success 以外」、終了コードは 0/1 の二値、通知は既存の CloudWatch Alarm（ExecutionsFailed）1 本に一本化 (4) 画像生成はシステムとして「1 prompt_config から複数画像保存」「1 セット複数 prompt_config」の両方に対応させ、初期運用は 1 セット 1 prompt_config（プロンプト文言で 1 枚に制御）という設定値・運用ルールで実現する（ユーザー指摘により、当初案の「複数件はエラー・2 枚目以降は破棄」から修正）。`is_active=1` の prompt_config が 0 件の場合のみ設定ミスとしてエラー終了、1 件以上はすべてループ処理する (5) SNS 投稿バッチは初期構築の仕様として生成実行内の先頭画像 1 枚のみを `post_images` に登録する（投稿は常に 1 枚。カルーセルは将来対応）。データモデルへの申し送り事項（`generated_images.output_index` の追加等）は batch-flow.html セクション 5 に整理し Phase 9-3 の入力とする。docs/_archive/batch.md を参考資料とした（post_records の attempt 方式・BATCH_SIZE_LIMIT は不採用）。design-outline.html・index.html のステータス表記も更新済み
 
-- [ ] **9-3** DB スキーマ設計 + 本スキーマ DDL 作成
+- [x] **9-3** DB スキーマ設計 + 本スキーマ DDL 作成
   - 確認: Phase A の骨子版（docs/app/data-model.html）が詳細化され、`database/` に本スキーマの DDL がある
-  - 備考: Phase A の大枠設計書（データモデル概要）を詳細化する。docs/_archive/database.md を参考資料とする。DDL のバージョン管理・マイグレーション方針もここで定義する。DDL は `database/` へのファイル作成までとし、Aurora への適用は Phase 10 で行う
+  - 備考: 2026-07-07 実施。主な決定事項: (1) `generation_runs` を新設し「投稿済みフラグ・生成完了フラグは持たず実体（`posts` / `generated_images`）の存在で導出する」を徹底 (2) SNS 投稿バッチの投稿対象決定クエリを厳密化: 「有効アカウントのうち 1 つでも終端状態（`success`/`failed`/`published_unconfirmed`）に未到達」な生成実行を対象とする定義とし、Step Functions Retry での同一生成実行の再選択（復旧ロジック）と、異常終了時の stale データ挙動（Phase 9-4 持ち越し）を両立させた（`data-model.html` セクション 4.4、`batch-flow.html` セクション 3.1 に反映） (3) `caption_templates` の紐づけ単位をセットに確定し、選定ルール（`is_active=1` を `id` 昇順で 1 件、0 件ならキャプションなしで続行）を定義 (4) `generated_images` に `output_index` を追加し `(generation_run_id, prompt_config_id, output_index)` で一意性・完了判定・S3 キーの整合を取る (5) `posts` は旧 `post_records` を生成実行×アカウント単位に再編し `attempt_number` を廃止、`caption_template_id`/`caption_text_snapshot` 等の中間状態カラムを追加 (6) S3 キー命名規約 `images/{set_code}/{YYYYMMDD}/{generation_run_id}/{prompt_config_id}_{output_index}.jpg` を確定し、セット廃止時に「残す」対象は DB レコードのみで S3 実体は 30 日ライフサイクルで自動削除される旨を明確化（下記設計課題リストの該当項目を解消） (7) セット境界の整合性は複合 FK（`set_id` 非正規化 + `(set_id, id)` UNIQUE）で `generated_images`/`posts` に適用し、`post_images.generated_image_id` の生成実行境界チェックはアプリ層に委ねる既知の割り切りとして明記。DDL は `database/V001__initial_schema.sql` に作成（Aurora への適用は Phase 10）。`data-model.html`・`batch-flow.html`（軽微な厳密化追記）・`design-outline.html`・`index.html`・`operation.html`（S3 実体の記述更新）のステータス表記も更新済み
 
 - [ ] **9-4** アプリ運用・セキュリティ（アプリ部分）の設計
   - 確認: Phase A の骨子版（docs/app/operation.html）が詳細化されている
@@ -371,4 +371,4 @@
 | 日付 | 対象ドキュメント | 課題 | 対応方針 | 対応時期 |
 |---|---|---|---|---|
 | 2026-07-06 | docs/infra/stacks.html | セクション 5「スタック間のデータ受け渡し」のツリー図に MonitoringStack への入力（SnsPostingSfnArn・AuroraClusterIdentifier・EcsClusterArn・ImageGenerationSfnName）と DbReadinessCheckSgId の記載がない。3.1 出力一覧・3.4 依存スタックには記載済みのため実装は可能 | Phase 7 実装時に実態へ合わせて追記 | Phase 7 |
-| 2026-07-06 | docs/app/design-outline.html | セット廃止時「データ（生成画像・投稿履歴）は残す」とあるが、S3 実体はインフラ設計の 30 日ライフサイクルで自動削除される。「残す」対象が DB レコード（メタ情報・投稿履歴）であることの明確化と S3 実体の保持要否の確認が必要 | Phase 9-3（データモデル詳細・S3 キー設計）で明確化 | Phase 9 |
+| 2026-07-06 | docs/app/design-outline.html | セット廃止時「データ（生成画像・投稿履歴）は残す」とあるが、S3 実体はインフラ設計の 30 日ライフサイクルで自動削除される。「残す」対象が DB レコード（メタ情報・投稿履歴）であることの明確化と S3 実体の保持要否の確認が必要 | **解消済み（2026-07-07）**: 「残す」対象は DB レコードのみと確定。S3 実体は 30 日ライフサイクルで自動削除される前提を明記した（[docs/app/data-model.html](app/data-model.html#s3-key) セクション 5、[docs/app/operation.html](app/operation.html#set-retire) セクション 2.2） | Phase 9-3 |

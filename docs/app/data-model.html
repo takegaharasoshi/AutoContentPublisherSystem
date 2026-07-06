@@ -3,23 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>データモデル設計（骨子） | AutoContentPublisherSystem</title>
+<title>データモデル設計 | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / データモデル設計（骨子）</nav>
-<h1>データモデル設計（骨子）</h1>
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / データモデル設計</nav>
+<h1>データモデル設計</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">Phase A-4 骨子版（Phase 9-3 で詳細化）</span>
-  <span>最終更新: 2026-07-06</span>
+  <span class="badge badge-fixed">Phase 9-3 で詳細化済み（一時 Fix）</span>
+  <span>最終更新: 2026-07-07</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  アプリの主要エンティティと関係（データモデル）を定める設計書。Phase A-4 時点は骨子版であり、
-  カラム定義・制約・インデックス・DDL は <strong>Phase 9-3 で詳細化</strong>する（セクション 4）。
+  アプリの主要エンティティと関係（データモデル）を定める設計書。Phase A-4 の骨子版を Phase 9-3 で詳細化し、
+  全テーブルのカラム定義・制約・インデックスを確定した。本スキーマの DDL は
+  <a href="../../database/V001__initial_schema.sql">database/V001__initial_schema.sql</a> にある（Aurora への適用は Phase 10）。
+  本書は DDL の設計意図・決定理由を記し、正確な型・制約は DDL を正とする。
   全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a>、各テーブルを使う処理手順は <a href="batch-flow.html">バッチ処理フロー設計</a> を参照。
   <strong>データモデル（テーブル構造）は全セット共通</strong>であり、セット間の違いはレコードと設定カラムで表現する。テーブル構造はセット追加では変更しない
   （<a href="design-outline.html#set-docs">セット別設計書のルール</a>）。
@@ -37,13 +39,12 @@
   <rect x="20" y="110" width="160" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
   <text x="100" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">prompt_configs</text>
 
-  <rect x="192" y="110" width="160" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="272" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">caption_templates</text>
-  <text x="272" y="146" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規）</text>
+  <rect x="192" y="110" width="160" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="272" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">caption_templates</text>
 
   <rect x="364" y="110" width="152" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
   <text x="440" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">generation_runs</text>
-  <text x="440" y="146" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・投稿の単位）</text>
+  <text x="440" y="146" text-anchor="middle" font-size="10" fill="var(--diag-text)">（投稿の単位）</text>
 
   <rect x="530" y="110" width="150" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
   <text x="605" y="138" text-anchor="middle" font-size="11" fill="var(--diag-text)">sns_accounts</text>
@@ -57,16 +58,16 @@
 
   <rect x="530" y="215" width="150" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
   <text x="605" y="235" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">posts（投稿）</text>
-  <text x="605" y="251" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・生成実行 × アカウント）</text>
+  <text x="605" y="251" text-anchor="middle" font-size="10" fill="var(--diag-text)">（生成実行 × アカウント）</text>
 
   <!-- row3 -->
   <rect x="330" y="312" width="150" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
   <text x="405" y="332" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">post_images</text>
-  <text x="405" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（新規・中間）</text>
+  <text x="405" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（中間テーブル）</text>
 
   <rect x="530" y="312" width="150" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)" stroke-dasharray="5 4"/>
   <text x="605" y="332" text-anchor="middle" font-size="11" fill="var(--diag-text)">post_insights</text>
-  <text x="605" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（将来: 効果測定）</text>
+  <text x="605" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（将来: 効果測定。未実装）</text>
 
   <!-- batch_sets → row1 children -->
   <line x1="395" y1="60" x2="110" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
@@ -93,7 +94,7 @@
 
   <!-- caption_templates → posts (dashed) -->
   <line x1="300" y1="158" x2="560" y2="214" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
-  <text x="215" y="180" font-size="10" fill="var(--diag-text)">適用（紐づけ単位は Phase 9）</text>
+  <text x="225" y="180" font-size="10" fill="var(--diag-text)">適用（紐づけ単位: セット）</text>
 
   <!-- generated_images → post_images / posts → post_images -->
   <line x1="300" y1="259" x2="380" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
@@ -104,39 +105,39 @@
   <!-- posts → post_insights (dashed) -->
   <line x1="605" y1="263" x2="605" y2="310" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
 </svg>
-<figcaption>データモデル概要。強調（黄色）は新規エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_images</code> は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。破線は将来拡張・Phase 9 決定事項。</figcaption>
+<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_images</code> は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。破線は将来拡張（<code>post_insights</code> はテーブル未作成、拡張余地の記録のみ）。</figcaption>
 </figure>
 
 <h2 id="entities">2. エンティティ一覧</h2>
 
 <div class="table-wrap">
 <table>
-  <thead><tr><th>エンティティ</th><th>役割</th><th>旧設計からの変更点・備考</th></tr></thead>
+  <thead><tr><th>エンティティ</th><th>役割</th><th>備考</th></tr></thead>
   <tbody>
     <tr>
       <td><code>batch_sets</code></td>
       <td>セット定義（1 セット = 1 テーマ）。外部識別子は <code>set_code</code></td>
-      <td>将来のセット別設定（失敗時ポリシー・生成枚数・プロンプト / キャプションの生成方式等）のカラム拡張余地を持たせる。<code>max_post_retries</code> は初期スコープ外（再試行なし）</td>
+      <td>旧設計の <code>max_post_retries</code> は削除（自動再試行を行わない方針のため不要）。将来のセット別設定拡張はカラム追加ではなくセット別設計書（<a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>）で表現する</td>
     </tr>
     <tr>
       <td><code>prompt_configs</code></td>
       <td>画像生成プロンプト設定（セット : 設定 = 1 : N）</td>
-      <td>旧設計を踏襲（スナップショット方式含む）。初期は投稿用プロンプト実質 1 件で運用。将来の「AI にプロンプトを考えさせる方式」では、固定プロンプトの代わりにメタプロンプト等を保持する拡張を想定（<a href="batch-flow.html#flow-image">セット別拡張ポイント</a>。詳細は Phase 9 以降）</td>
+      <td>旧設計を踏襲（スナップショット方式含む）。<code>is_active=1</code> の全件をループ処理する（0 件は設定ミスとしてエラー。<a href="batch-flow.html#flow-image">batch-flow.html セクション 2</a>）</td>
     </tr>
     <tr>
-      <td><code>generation_runs</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
-      <td>生成実行（1 回の画像生成バッチ起動で 1 レコード）。<strong>投稿の単位</strong>であり、冪等性のアンカー（セット × <code>SCHEDULED_AT</code> で一意）</td>
-      <td>A-2 レビューで新設。「1 生成実行 = 1 投稿（アカウントごと）」を構造で保証し、将来のカルーセルの「画像の束」もこの単位で定まる</td>
+      <td><code>generation_runs</code></td>
+      <td>生成実行（1 回の画像生成バッチ起動で 1 レコード）。<strong>投稿の単位</strong>であり、冪等性のアンカー（<code>set_id</code> × <code>scheduled_at</code> で一意）</td>
+      <td>「1 生成実行 = 1 投稿（アカウントごと）」を構造で保証する中心テーブル。投稿済みかどうかのフラグは持たず、<code>posts</code> の有無から導出する（セクション 4.6）</td>
     </tr>
     <tr>
-      <td><code>caption_templates</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
+      <td><code>caption_templates</code></td>
       <td>投稿キャプション・ハッシュタグの固定文テンプレート</td>
-      <td>A-1 で新規に必要と判明。紐づけ単位（セット / プロンプト設定 / アカウント）は Phase 9 で決定。AI 生成キャプションは将来のセット別方式（<a href="batch-flow.html#flow-sns">セット別拡張ポイント</a>）</td>
+      <td>紐づけ単位は<strong>セット</strong>に確定（セクション 4.3）。AI 生成キャプションは将来のセット別方式（<a href="batch-flow.html#flow-sns">セット別拡張ポイント</a>）</td>
     </tr>
     <tr>
       <td><code>generated_images</code></td>
       <td>生成画像のメタ情報（S3 キー・プロンプトスナップショット等）。<code>generation_runs</code> の子（1 実行 : N 画像）</td>
-      <td>生成実行にぶら下げる構造へ変更。複数画像の保存を許容（旧設計の「2 枚目以降破棄」を廃止。具体構造は Phase 9）</td>
+      <td><code>output_index</code> を追加し複数画像の保存に対応（旧設計の「2 枚目以降破棄」を廃止。セクション 4.4）</td>
     </tr>
     <tr>
       <td><code>sns_accounts</code></td>
@@ -144,52 +145,187 @@
       <td>旧設計を踏襲。当面は Instagram 1 アカウントだが、将来の他プラットフォーム展開のため 1 : N 構造を残す</td>
     </tr>
     <tr>
-      <td><code>posts</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
+      <td><code>posts</code></td>
       <td>投稿 1 件（<strong>生成実行 × アカウント</strong>。キャプション・投稿ステータス・プラットフォーム投稿 ID を持つ）</td>
-      <td>旧 <code>post_records</code>（画像 × アカウント × 試行）を「投稿」単位に再編。生成実行が「投稿されたか」は本テーブルの有無からアカウントごとに導出する（<code>generation_runs</code> にフラグは持たない）</td>
+      <td>旧 <code>post_records</code>（画像 × アカウント × 試行）を「投稿」単位に再編。<code>attempt_number</code> 相当のカラムは持たない（セクション 4.5）</td>
     </tr>
     <tr>
-      <td><code>post_images</code><span class="badge badge-wip" style="margin-left:.4rem">新規</span></td>
+      <td><code>post_images</code></td>
       <td>投稿と画像の中間テーブル（投稿に載せる画像の選択と表示順）</td>
-      <td>1 投稿 : N 画像（将来のカルーセル）に対応。当面の運用は 1 投稿 1 画像</td>
+      <td>1 投稿 : N 画像（将来のカルーセル）に対応。当面の運用は 1 投稿 1 画像（セクション 4.6）</td>
     </tr>
     <tr>
       <td><code>batch_execution_logs</code></td>
-      <td>バッチ実行ログ（運用ログ）</td>
-      <td>旧設計を踏襲。業務データである <code>generation_runs</code> とは役割を分ける（役割分担の整理は Phase 9）</td>
+      <td>バッチ実行（Step Functions / ECS タスク起動単位）の運用ログ</td>
+      <td>旧設計を踏襲。<code>generation_runs</code> とは役割が異なり相互に FK を持たない（セクション 4.7 で役割分担を確定）</td>
     </tr>
     <tr>
       <td><code>post_insights</code><span class="badge badge-future" style="margin-left:.4rem">将来</span></td>
       <td>投稿の効果測定データ（いいね数・リーチ等）</td>
-      <td>将来のインサイト収集バッチ（第 3 のバッチ）用。<code>posts</code> に紐づける前提で拡張余地のみ確保</td>
+      <td>将来のインサイト収集バッチ（第 3 のバッチ）用。<strong>Phase 9-3 時点でテーブルは作成しない</strong>。導入時は <code>posts.id</code> を FK にした新規テーブルを追加する想定（初期スキーマへの影響なし）</td>
     </tr>
   </tbody>
 </table>
 </div>
 
-<h2 id="keys">3. 主キーと冪等性キーの分離</h2>
+<h2 id="keys">3. 主キーと冪等性キー・セット境界の整合性</h2>
 
 <div class="note">
-  <span class="callout-title">方針（旧設計を踏襲）</span>
-  各テーブルの主キーは AUTO_INCREMENT の <code>id</code> とし、他テーブルからの FK 参照はすべて <code>id</code> に対して行う。
-  <code>generation_runs</code> の「セット × <code>SCHEDULED_AT</code>」は FK の参照先ではなく、<strong>冪等性を保証する UNIQUE 制約としてのみ</strong>使用する
-  （DATETIME 型が他テーブルのキーに伝播することはない）。
-  <code>SCHEDULED_AT</code> に入る値は EventBridge Scheduler が渡すスケジュール上の実行予定時刻（UTC）であり、
+  <span class="callout-title">主キーと FK 参照の方針（旧設計を踏襲）</span>
+  各テーブルの主キーは <code>AUTO_INCREMENT</code> の <code>id</code> とし、他テーブルからの FK 参照は基本的に <code>id</code> に対して行う。
+  <code>generation_runs</code> の「<code>set_id</code> × <code>scheduled_at</code>」は FK の参照先ではなく、<strong>冪等性を保証する UNIQUE 制約としてのみ</strong>使用する。
+  <code>scheduled_at</code> に入る値は EventBridge Scheduler が渡すスケジュール上の実行予定時刻（UTC）であり、
   リトライ・再実行でも同じスロットなら同じ値になるため、スロットの安定した識別子として機能する。
 </div>
 
-<h2 id="phase9">4. Phase 9-3 で詳細化する項目</h2>
+<div class="decision">
+  <span class="callout-title">セット境界の整合性を保証する複合 FK（旧設計のパターンを踏襲・拡張）</span>
+  <code>generated_images</code>・<code>posts</code> は、参照先テーブルの主キー <code>id</code> に加えて <code>set_id</code> を非正規化して保持し、
+  <code>(set_id, 対象カラム) → 参照先テーブル(set_id, id)</code> の複合 FK を張る（参照先テーブル側は <code>UNIQUE (set_id, id)</code> を持つ）。
+  これにより、異なるセットに属する <code>generation_runs</code> / <code>prompt_configs</code> / <code>sns_accounts</code> / <code>caption_templates</code> を
+  誤って組み合わせて参照することを DB レベルで防止する。この保証は<strong>セット境界まで</strong>とし、
+  「<code>post_images.generated_image_id</code> が同一 <code>generation_run</code> に属すること」のような、より粒度の細かい整合性はアプリ層の責務とする
+  （複合 FK をここまで深くすると <code>generation_run_id</code> の非正規化が連鎖し複雑さに見合わないと判断。セクション 4.6 に既知の割り切りとして明記）。
+</div>
 
-<h3 id="ddl">4.1 テーブル定義・DDL・マイグレーション方針 <span class="badge badge-wip">Phase 9 で詳細化</span></h3>
-<p>全テーブルのカラム定義・制約・インデックスを設計し、<code>database/</code> に本スキーマの DDL を作成する。DDL のバージョン管理・マイグレーション方針もあわせて定義する。<code>generation_runs</code> と <code>batch_execution_logs</code> の役割分担、キャプションテンプレートの紐づけ単位と変数展開の要否もここで確定する。</p>
+<h2 id="detail">4. テーブル定義（詳細）</h2>
+<p>全テーブルの正確な型・制約・インデックスは <a href="../../database/V001__initial_schema.sql">database/V001__initial_schema.sql</a> を正とする。以下は各テーブルの設計意図。</p>
 
-<h3 id="s3-key">4.2 S3 キー設計 <span class="badge badge-wip">Phase 9 で詳細化</span></h3>
-<p>複数画像（1 生成実行 : N 画像）に対応した S3 キー体系を設計する。あわせて、インフラ設計の S3 30 日ライフサイクルと「セット廃止時もデータは残す」方針の整理（「残す」対象が DB レコードか S3 実体も含むか）を確定する（<a href="../development-plan.md">development-plan.md</a> 設計課題リストに記録済み）。</p>
+<h3 id="detail-batch-sets">4.1 batch_sets</h3>
+<ul>
+  <li><code>set_code</code>（UNIQUE）が S3 キー・Secret 名・EventBridge Scheduler 入力・環境変数 <code>SET_CODE</code> に使われる外部識別子。DB 内部の FK 参照はすべて <code>id</code> で行う</li>
+  <li><code>is_active=0</code> でセット廃止を表現する（レコードは削除しない。<a href="operation.html#set-retire">operation.html セクション 2.2</a>）</li>
+</ul>
 
-<h3 id="time">4.3 時刻の取り扱い <span class="badge badge-wip">Phase 9 で詳細化</span></h3>
-<p><code>SCHEDULED_AT</code> の ISO 8601 文字列から DATETIME への正規化ルール（UTC 固定・秒精度等）、およびテーブル全般のタイムゾーン方針を定義する。</p>
+<h3 id="detail-prompt-configs">4.2 prompt_configs</h3>
+<ul>
+  <li><code>is_active=1</code> の全件が画像生成バッチのループ対象（<a href="batch-flow.html#flow-image">batch-flow.html セクション 2</a>）。初期運用は 1 セット 1 件のみ有効化する運用ルールで「1 起動 1 枚生成」を実現する</li>
+  <li><code>UNIQUE (set_id, id)</code> は <code>generated_images</code> からの複合 FK の参照先として使用する</li>
+</ul>
 
-<p>参考資料: <a href="../_archive/database.md">_archive/database.md</a>（旧テーブル定義。現役の設計書ではない）</p>
+<h3 id="detail-caption-templates">4.3 caption_templates</h3>
+<div class="decision">
+  <span class="callout-title">決定: 紐づけ単位はセット、選定ルールは id 昇順の 1 件</span>
+  キャプションテンプレートの紐づけ単位は<strong>セット</strong>とする（プロンプト設定単位にはしない。画像の内容とキャプションは独立に差し替えたいケースが多いため）。
+  SNS 投稿バッチは投稿本文の組み立て時（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3 手順 3</a>）に、対象セットの <code>caption_templates</code> から
+  <strong><code>is_active=1</code> のうち <code>id</code> 昇順で先頭の 1 件</strong>を選択して適用する。
+  複数の <code>is_active=1</code> レコードを持つこと自体はテーブル制約上許容する（将来のローテーション・バリエーション拡張の余地）が、
+  初期運用では 1 セットにつき <code>is_active=1</code> は 1 件のみ設定する運用ルールとする（<code>prompt_configs</code> の運用方針と対称）。
+  <strong><code>is_active=1</code> が 0 件の場合はキャプションなし（空文字）で投稿処理を継続する</strong>（画像投稿の続行を優先し、キャプション欠落は投稿失敗の理由にしない）。
+</div>
+<ul>
+  <li><code>template_text</code> はキャプション本文とハッシュタグを含む 1 本の固定文（Instagram の投稿本文はキャプション欄 1 つのため分割しない）</li>
+  <li><code>posts.caption_template_id</code> + <code>posts.caption_text_snapshot</code> で「どのテンプレートを」「どんな本文で」投稿したかを追跡する（<code>generated_images</code> のプロンプトスナップショットと同じ設計思想）</li>
+</ul>
+
+<h3 id="detail-generation-runs">4.4 generation_runs</h3>
+<ul>
+  <li><code>UNIQUE (set_id, scheduled_at)</code> が冪等性キー。画像生成バッチはこの制約への INSERT 成否で「新規スロット」か「同一スロットへの再実行（Step Functions Retry・重複トリガー）」かを判定する（<a href="batch-flow.html#flow-image">batch-flow.html セクション 2 手順 2</a>）</li>
+  <li>投稿済みかどうかのフラグ・生成完了かどうかのフラグは<strong>どちらも持たない</strong>。前者は <code>posts</code> の有無、後者は <code>generated_images</code> の有無から導出する（状態を単一のテーブルに集約せず、実体（画像・投稿）の存在自体を正とする設計）</li>
+</ul>
+
+<div class="decision" id="target-selection">
+  <span class="callout-title">決定: SNS 投稿バッチの投稿対象決定クエリの正確な定義</span>
+  <p><a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a> の「投稿試行が一度もない生成実行」は、データモデルとしては以下のとおり厳密化する。
+  ある <code>generation_run</code> が投稿対象の候補（<strong>actionable</strong>）となるのは、
+  <strong>有効な（<code>is_active=1</code>）投稿先アカウントのうち少なくとも 1 つについて、<code>posts</code> 行が存在しないか、終端状態（<code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）に達していない</strong>場合である。
+  対象は actionable な <code>generation_run</code> のうち <code>scheduled_at</code> が最も古い 1 件。</p>
+  <pre><code>SELECT gr.id
+FROM generation_runs gr
+WHERE gr.set_id = :set_id
+  AND EXISTS (
+    SELECT 1 FROM sns_accounts sa
+    WHERE sa.set_id = gr.set_id AND sa.is_active = 1
+      AND NOT EXISTS (
+        SELECT 1 FROM posts p
+        WHERE p.generation_run_id = gr.id
+          AND p.sns_account_id = sa.id
+          AND p.status IN ('success','failed','published_unconfirmed')
+      )
+  )
+ORDER BY gr.scheduled_at ASC, gr.id ASC
+LIMIT 1;</code></pre>
+  <p>この定義により: (1) 新規の <code>generation_run</code>（<code>posts</code> なし）は当然対象になる (2) Step Functions Retry による同一実行内のタスク再起動時も<strong>同じ生成実行が再選択</strong>され、<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2 の復旧ロジック</a>（<code>pending</code> / <code>container_created</code> からの再開）が機能する (3) 異常終了（Step Functions のリトライ上限到達等）で <code>pending</code> / <code>container_created</code> のまま残った <code>generation_run</code> は、後続の別実行でも自動的に再選択され続ける（stale データとして残り続ける問題は運用課題であり、扱いは <a href="operation.html#phase9">operation.html セクション 6</a>（Phase 9-4）の持ち越し事項とする）。
+  「一度でも試行（失敗含む）した生成実行は自動では再対象にしない」（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>）は、「有効な全アカウントが終端状態に達した」場合を指すと解釈する。</p>
+  <p>インデックスは <code>generation_runs.uq_generation_runs_set_id (set_id, id)</code>（<code>scheduled_at</code> 順スキャン）と <code>posts.uq_posts_generation_run_account (generation_run_id, sns_account_id)</code>（<code>NOT EXISTS</code> 部分検索）の左端プレフィックスで十分であり、追加インデックスは設けない。</p>
+</div>
+
+<h3 id="detail-generated-images">4.5 generated_images</h3>
+<ul>
+  <li><code>output_index</code>（NEW）: 同一 <code>(generation_run_id, prompt_config_id)</code> 内での並び順。画像生成 API が返す image part をすべて保存する方針（旧設計の「2 枚目以降は破棄」は不採用）に対応する</li>
+  <li>完了判定は <code>UNIQUE (generation_run_id, prompt_config_id, output_index)</code> の左端プレフィックス <code>(generation_run_id, prompt_config_id)</code> の存在確認で行う。専用の完了フラグは持たない（<a href="batch-flow.html#flow-image">batch-flow.html セクション 2 手順 4.1</a>）</li>
+  <li><code>set_id</code> は非正規化カラム（セクション 3 の複合 FK 用）。<code>generation_run_id</code> と <code>prompt_config_id</code> はそれぞれ <code>(set_id, ...)</code> の複合 FK で参照する</li>
+</ul>
+
+<h3 id="detail-posts">4.6 posts / post_images</h3>
+<ul>
+  <li><code>posts</code> の <code>UNIQUE (generation_run_id, sns_account_id)</code> により 1 投稿対象につき常に 1 行。状態遷移は <a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a> の 5 状態（<code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）をそのまま <code>status</code> ENUM に反映する</li>
+  <li><code>caption_template_id</code>（nullable FK）+ <code>caption_text_snapshot</code>: <code>posts</code> 行は本文組み立て前（<code>pending</code> 作成時）に INSERT されるため、当初は両方 NULL。本文組み立て時（<a href="batch-flow.html#sns-steps">セクション 3.3 手順 3</a>）に UPDATE で設定する</li>
+  <li><code>post_images</code> は 1 投稿 : N 画像（将来のカルーセル）に対応する中間テーブル。初期構築では生成実行内の先頭画像（<code>generated_images.id</code> 昇順で最初の 1 枚）のみを <code>display_order=0</code> で 1 行登録する（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3 手順 2</a>）</li>
+</ul>
+<div class="note">
+  <span class="callout-title">既知の割り切り: post_images.generated_image_id の生成実行境界チェックはアプリ層</span>
+  <code>post_images.generated_image_id</code> が「投稿対象の <code>generation_run</code> に属する画像であること」は DB の FK では強制しない（セクション 3 の複合 FK 方針の対象外）。
+  アプリケーションは常に対象 <code>generation_run_id</code> に紐づく <code>generated_images</code> からのみ選択するため実害は小さいと判断し、
+  <code>generation_run_id</code> をさらに非正規化して複合 FK を重ねる複雑さは避けた。
+</div>
+
+<h3 id="detail-execution-logs">4.7 batch_execution_logs との役割分担</h3>
+<div class="decision">
+  <span class="callout-title">決定: generation_runs と batch_execution_logs は独立（相互 FK なし）</span>
+  <code>batch_execution_logs</code> は「バッチプログラムの 1 回の起動（Step Functions 実行 / ECS タスク）」を記録する<strong>運用ログ</strong>であり、
+  <code>generation_runs</code> は「1 回の起動が作った投稿単位のコンテンツ」を表す<strong>業務データ</strong>である。
+  両者は目的が異なるため FK で結合しない。画像生成バッチは <code>SET_CODE</code> 解決前や <code>generation_run</code> 確定前に失敗する場合もあり、
+  <code>batch_execution_logs</code> は <code>generation_run</code> の有無に関わらず必ず 1 件記録される必要があるため、独立させる方が実装が単純になる。
+  どの実行がどの <code>generation_run</code> を作ったかを調べたい場合は、<code>started_at</code> と <code>generation_runs.created_at</code> の近接時刻で運用者が突き合わせる（通常は 1 実行 : 1 生成実行の関係になるため実務上問題ない）。
+</div>
+
+<h2 id="s3-key">5. S3 キー設計</h2>
+<div class="decision">
+  <span class="callout-title">決定: S3 キー命名規約</span>
+  <pre><code>images/{set_code}/{YYYYMMDD}/{generation_run_id}/{prompt_config_id}_{output_index}.jpg</code></pre>
+  <ul style="margin:.3rem 0 0;">
+    <li><code>{set_code}</code> は <code>SET_CODE</code> 環境変数（<code>batch_sets.set_code</code>）</li>
+    <li><code>{YYYYMMDD}</code> は <code>generation_runs.scheduled_at</code>（UTC）の日付部分。日付プレフィックスにより S3 コンソール・CLI での目視確認や範囲指定操作がしやすくなる</li>
+    <li><code>{generation_run_id}</code> / <code>{prompt_config_id}</code> / <code>{output_index}</code> は <code>generated_images</code> の該当カラムそのもの。この 3 つの組み合わせは <code>UNIQUE (generation_run_id, prompt_config_id, output_index)</code> と一致するため、S3 キーの一意性は DB の一意性制約と対応する</li>
+    <li>拡張子は常に <code>.jpg</code>（<code>generated_images.file_format</code> は将来の形式追加に備えた記録用カラムであり、初期運用は JPEG 固定）</li>
+  </ul>
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定: セット廃止時に「残す」データの範囲（設計課題リストの解消）</span>
+  <a href="../development-plan.md">development-plan.md</a> 設計課題リストで持ち越していた「セット廃止時に残す対象が DB レコードか S3 実体も含むか」を以下のとおり確定する。
+  <strong>「残す」の対象は DB レコード（<code>generated_images</code> のメタ情報・<code>posts</code> の投稿履歴等）のみ</strong>であり、S3 実体（画像ファイル）はインフラ設計の
+  30 日ライフサイクルポリシー（<a href="../infra/stacks.html#foundation">infra/stacks.html セクション 3.1</a>）により作成から 30 日で自動削除される。
+  セット廃止後もメタ情報・投稿履歴は DB に残るため、「いつ・どんなプロンプトで・どのアカウントに投稿したか」という記録は失われないが、
+  画像ファイル自体の永続保存が必要になった場合（収益化後の資産化等）は、S3 ライフサイクル対象外の別バケット・別プレフィックスへの複製を将来検討する（初期実装では対応しない）。
+</div>
+
+<h2 id="time">6. 時刻の取り扱い</h2>
+<ul>
+  <li>DB の全 <code>DATETIME</code> カラムは<strong>UTC で保存する</strong>。MySQL の <code>DATETIME</code> 型はタイムゾーン情報を持たないため、アプリケーション側で UTC に変換してから格納する</li>
+  <li><code>generation_runs.scheduled_at</code> の正規化: EventBridge Scheduler が渡す環境変数 <code>SCHEDULED_AT</code> は ISO 8601（<code>YYYY-MM-DDTHH:MM:SSZ</code>、秒精度、<code>Z</code> 接尾辞で UTC を示す）。アプリケーションは末尾の <code>Z</code> を除去し <code>YYYY-MM-DD HH:MM:SS</code> 形式にして <code>DATETIME</code> カラムへ格納する（タイムゾーン変換は不要。すでに UTC のため）</li>
+  <li><code>CURRENT_TIMESTAMP</code> は DB セッションのタイムゾーンに依存するため、アプリケーションは DB 接続直後に <code>SET time_zone = '+00:00'</code> を実行する</li>
+  <li>Aurora 側でも可能な限り Parameter Group で <code>time_zone='UTC'</code> を設定し、手動 DDL / Query Editor 実行時も UTC 前提を維持する</li>
+  <li>冪等性キー（<code>generation_runs</code> の UNIQUE 制約）の比較・判定もすべて UTC ベースで行う。1 日複数回実行は <code>scheduled_at</code> の時刻部分で区別される</li>
+  <li>表示時のタイムゾーン変換（UTC → Asia/Tokyo 等）はアプリケーション層の責務とする（初期実装では管理画面がないため当面発生しない）</li>
+</ul>
+
+<h2 id="charset">7. 文字コード・照合順序</h2>
+<ul>
+  <li>文字コード: <code>utf8mb4</code></li>
+  <li>照合順序: <code>utf8mb4_unicode_ci</code>（旧設計の決定を踏襲。絵文字を含むキャプション本文・プロンプト本文を正しく扱える）</li>
+</ul>
+
+<h2 id="ddl">8. DDL・マイグレーション方針</h2>
+<ul>
+  <li>DDL ファイルは <code>database/</code> 配下に Flyway 風の命名規則 <code>V&lt;連番&gt;__&lt;説明&gt;.sql</code> で管理する（Phase 6-3 の接続確認用 <code>V000__connection_test.sql</code> と連番を共有する）</li>
+  <li>本スキーマの初期構築は <a href="../../database/V001__initial_schema.sql">V001__initial_schema.sql</a> の 1 ファイルにまとめる（まだ本番データが存在しないため、初期構築を複数ファイルに分割するメリットがない）</li>
+  <li>今後のスキーマ変更は <code>V002__</code> 以降の新規ファイルとして追加する（既存ファイルの書き換えはしない）。マイグレーション自動適用ツール（Flyway 等）の導入は Phase 10 以降の運用実態を見て判断し、当面は SQL ファイルをレビュー後に AWS Console の Query Editor で手動適用する</li>
+  <li>本スキーマの Aurora への適用自体は <strong>Phase 10 で実施</strong>する（Phase 9 は DDL ファイル作成まで）</li>
+</ul>
+
+<p>参考資料: <a href="../_archive/database.md">_archive/database.md</a>（旧テーブル定義。<code>post_records</code> の attempt 方式・複合 FK パターン・時刻/文字コード方針は本書に引き継いだ箇所と、生成実行単位への再編に伴い不採用とした箇所がある。現役の設計書ではない）</p>
 
 </div>
 </body>

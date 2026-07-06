@@ -3,98 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>バッチ処理フロー設計（骨子） | AutoContentPublisherSystem</title>
+<title>バッチ処理フロー設計 | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / バッチ処理フロー設計（骨子）</nav>
-<h1>バッチ処理フロー設計（骨子）</h1>
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / バッチ処理フロー設計</nav>
+<h1>バッチ処理フロー設計</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">Phase A-4 骨子版（Phase 9-2 で詳細化）</span>
+  <span class="badge badge-fixed">Phase 9-2 で詳細化済み（一時 Fix）</span>
   <span>最終更新: 2026-07-06</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  画像生成・SNS 投稿バッチの<strong>アプリケーション内部の処理手順</strong>を定める設計書。Phase A-4 時点は骨子版であり、
-  冪等性・二重投稿防止・投稿ステータス管理などの詳細は <strong>Phase 9-2 で詳細化</strong>する（セクション 5）。
+  画像生成・SNS 投稿バッチの<strong>アプリケーション内部の処理手順</strong>を定める設計書。Phase A-4 の骨子版を Phase 9-2 で詳細化した（冪等性・二重投稿防止・投稿ステータス管理・失敗時の終了コード方針を確定）。
   全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a>、データモデルは <a href="data-model.html">データモデル設計</a> を参照。
   実行基盤（EventBridge Scheduler → 画像生成 Step Functions → 成功時に SNS 投稿 Step Functions を自動起動）は
   インフラ設計（<a href="../infra/workflow.html">infra/workflow.html</a>）のとおりで、本書はその器の中で動くアプリの処理を扱う。
+  本書で確定した内容のデータモデルへの反映は <a href="#phase9">セクション 5</a> に整理する（Phase 9-3 の入力とする）。
 </div>
 
 <h2 id="premise">1. 前提・不変条件</h2>
 <ul>
   <li><strong>1 回の画像生成バッチ起動 = 1 投稿（アカウントごと）</strong>を不変条件とする（定義の正は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。1 回の生成実行を <code>generation_runs</code> エンティティとして永続化し、SNS 投稿バッチは生成実行を処理対象の単位とする</li>
   <li>本書の処理手順（骨格）は<strong>全セット共通</strong>とする。セットごとに変わりうる箇所は本文中に<strong>「セット別拡張ポイント」</strong>と明示し、各セットでどの方式を使うかはセット別設計書に記録する（<a href="design-outline.html#set-docs">セット別設計書のルール</a>）</li>
+  <li><strong>実行ログ記録（共通）</strong>: 両バッチとも、処理開始直後に <code>batch_execution_logs</code> へ <code>status='running'</code> のレコードを INSERT する。<code>attempt_count</code> は同一 <code>EXECUTION_ARN</code> 内で ECS タスクが起動された回数（Step Functions Retry による再起動のたびに +1）。正常終了時は <code>status='succeeded'</code>、異常終了時は <code>status='failed'</code> に更新する。このログ記録自体の INSERT/UPDATE が失敗した場合はバッチ全体を終了コード 1 とする（記録なしでの続行は運用上のリスクが高いため）</li>
 </ul>
 
 <h2 id="flow-image">2. 画像生成バッチ処理フロー</h2>
+
+<div class="note">
+  <span class="callout-title">システムとしての対応範囲と初期運用の切り分け</span>
+  システムは<strong>1 つの <code>prompt_config</code> から複数画像を保存すること</strong>と<strong>1 セットに複数 <code>prompt_config</code> を持たせること</strong>の両方を処理できるようにする（初期実装からこの前提で作る。旧設計の「2 枚目以降は破棄」は採用しない）。
+  一方、<strong>初期運用</strong>は 1 セットにつき有効な <code>prompt_config</code> を 1 件のみ設定し、そのプロンプト文言自体を「1 枚だけ生成される」よう作り込む運用ルールとする（セット追加手順は <a href="operation.html#set-add">アプリ運用設計 セクション 2.1</a>）。
+  「1 起動 = 1 プロンプト = 生成画像 1 枚 = 1 投稿 = 投稿画像 1 枚」は<strong>設定値・運用ルールで実現する結果</strong>であり、システムの実装上の制約ではない。
+</div>
+
 <ol>
-  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（存在しなければ異常終了、<code>is_active=0</code> ならスキップして正常終了）</li>
-  <li><strong>生成実行（<code>generation_runs</code>）レコードを作成する</strong>（セット × <code>SCHEDULED_AT</code> で一意 = 冪等性のアンカー。既存レコードがあれば再実行と判断し、未完了分のみ処理する）</li>
-  <li>画像を生成する:
+  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する。存在しなければ異常終了（終了コード 1）。<code>is_active=0</code> ならスキップして正常終了（終了コード 0）</li>
+  <li><strong>生成実行（<code>generation_runs</code>）を解決する</strong>（<code>set_id</code> × <code>SCHEDULED_AT</code> の UNIQUE 制約に対する INSERT を試みる）
+    <ul>
+      <li>INSERT 成功 → 新規の生成実行（今回のスケジュール枠の初回実行）</li>
+      <li>UNIQUE 制約違反 → 既存の生成実行を取得する（Step Functions Retry によるタスク再起動、または重複トリガーと判断）。手順 4 で未完了分のみ処理する</li>
+    </ul>
+  </li>
+  <li>対象の <code>prompt_configs</code>（<code>is_active=1</code>）を全件取得する。<strong>0 件なら設定ミスとして異常終了（終了コード 1）</strong>（投稿すべき画像を 1 つも作れないため）。1 件以上ある場合はすべてを手順 4 で処理する（初期運用は 1 件を想定するが、複数件でも正しく処理できる）</li>
+  <li>各 <code>prompt_config</code> ごとに<strong>順次</strong>処理する。1 件の失敗は他の <code>prompt_config</code> の処理をブロックしない（例外を捕捉し次の <code>prompt_config</code> へ進む。全体の成否は手順 5 で判定する）
     <ol>
-      <li>初期実装は <strong>1 起動 = 1 枚生成</strong>（投稿用プロンプトは実質 1 件で運用する）</li>
-      <li>画像生成 API（Nano Banana Pro）を呼び出し、画像を S3 に保存し、<code>generated_images</code> を生成実行にぶら下げて登録する（プロンプトスナップショット含む）</li>
+      <li><strong>完了判定</strong>: <code>(generation_run_id, prompt_config_id)</code> の組み合わせで <code>generated_images</code> レコードの有無を確認する。存在すれば当該 <code>prompt_config</code> は完了済みとしてスキップする（Step Functions Retry によるタスク再起動時に、画像生成 API を再度呼び出さないため）</li>
+      <li>未完了の場合、画像生成 API（Nano Banana Pro）を呼び出し、レスポンスから image part を<strong>すべて</strong>抽出する。0 件ならこの <code>prompt_config</code> の生成失敗としてログ出力し、次の <code>prompt_config</code> へ進む（API 呼び出し自体の一時的失敗は Step Functions Retry に委ねる）</li>
+      <li><strong>抽出した image part はすべて保存する</strong>（1 件でも複数件でも同じ経路で処理する。旧設計の「2 枚目以降は破棄」は採用しない）</li>
+      <li>各画像を JPEG に変換し（Instagram 投稿要件に合わせるため。生成 API が PNG を返す場合は変換する）、S3 に保存する</li>
+      <li>画像ごとに <code>generated_images</code> にレコードを登録する（S3 キー、<code>prompt_config_id</code>、同一 <code>(generation_run_id, prompt_config_id)</code> 内での並び順を表す <code>output_index</code>、プロンプト本文・パラメータのスナップショットを含む）。<strong>1 枚ごとの DB 登録が成功した時点でその画像を完了とする</strong>。S3 保存後に DB 登録が失敗した場合は S3 に orphan が残るが許容する</li>
     </ol>
   </li>
-  <li>正常終了する（成功により SNS 投稿ワークフローが自動起動される）</li>
+  <li>全 <code>prompt_config</code> の処理後、終了コードを決定して終了する: <strong>すべての <code>prompt_config</code> が完了すれば終了コード 0</strong>（成功により SNS 投稿ワークフローが自動起動される）。<strong>1 つでも未完了が残れば終了コード 1</strong>（Step Functions Retry / Catch に委ねる。SNS 投稿バッチの失敗判定方針（3.4）と同じパターン）</li>
 </ol>
 
 <div class="note">
-  <span class="callout-title">「既存レコードがあれば再実行と判断し、未完了分のみ処理する」の意味</span>
-  Step Functions の Retry 等で同一入力（同じ <code>SET_CODE</code>・<code>SCHEDULED_AT</code>）のタスクが再起動された場合、
-  <code>generation_runs</code> の INSERT が UNIQUE 制約に当たることで「着手済みのスロットの再実行」と検知できる（UNIQUE 制約は二重生成のガードであると同時に再実行検知のセンサーとして働く）。
-  このときは新しい生成実行を作らず、既存実行にぶら下がる完了済み画像を確認して足りない分だけ生成する
-  （初期実装の 1 枚生成では「画像がなければ生成、あれば何もせず正常終了」の二択。将来の複数枚生成では部分再開として効く）。
-  画像 1 枚の完了判定基準（DB 登録済み = 完了、S3 orphan 許容、の旧設計基準を踏襲するか）は Phase 9-2 で定義する。
+  <span class="callout-title">再開処理の簡略化に関する既知の割り切り</span>
+  完了判定は「<code>(generation_run_id, prompt_config_id)</code> に 1 件でも <code>generated_images</code> が存在するか」で行う。API 呼び出しが複数画像のうち一部だけ DB 登録できず失敗した場合でも、再実行時は「1 件存在する = このプロンプトは完了済み」としてスキップし、残りの画像は生成し直さない。厳密な過不足チェックより再開処理の単純さを優先した割り切りであり、問題が顕在化した場合に見直す。
 </div>
 
 <div class="decision">
-  <span class="callout-title">セット別拡張ポイント: プロンプトの決め方・生成枚数</span>
-  初期実装は <code>prompt_configs</code> の固定プロンプト（実質 1 件）で 1 枚生成する。将来は、
-  <strong>生成 AI にプロンプト自体を考えさせてから画像を生成する方式</strong>、複数プロンプトのローテーション選択・カルーセル素材化、
-  セット別の生成枚数設定などを<strong>セットごとに選択可能</strong>にする（2026-07-06 ユーザー要望。どの方式を使うかはセット別設計書に記録する）。
-  方式が増えても、手順 2 の生成実行の枠組み（1 起動 = 1 生成実行 = 1 投稿分のコンテンツ）は変えない。方式の詳細設計は Phase 9 以降で行う。
+  <span class="callout-title">セット別拡張ポイント: プロンプトの決め方</span>
+  初期運用は 1 セット 1 <code>prompt_config</code>（固定プロンプト、1 枚生成となるようプロンプト文言で制御）とする。将来は、
+  <strong>生成 AI にプロンプト自体を考えさせてから画像を生成する方式</strong>や、1 セットに複数 <code>prompt_config</code> を有効化してのローテーション選択・カルーセル素材化などを<strong>セットごとに選択可能</strong>にする
+  （2026-07-06 ユーザー要望。どの方式を使うかはセット別設計書に記録する）。システムは複数 <code>prompt_config</code>・複数画像の保存に既に対応しているため、これらの方式追加は運用ルールの変更（有効化する <code>prompt_config</code> 件数・プロンプト文言）で実現でき、手順 2 の生成実行の枠組み（1 起動 = 1 生成実行 = 1 投稿分のコンテンツ）は変えない。
 </div>
 
 <h2 id="flow-sns">3. SNS 投稿バッチ処理フロー</h2>
 <p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（画像単位ではない）。</p>
+
+<h3 id="sns-target">3.1 投稿対象の決定</h3>
 <ol>
   <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（画像生成バッチと同じ扱い）</li>
   <li>投稿対象を決定する: <strong>「投稿試行が一度もない生成実行」のうち最も古い 1 件</strong>を対象とする
     <ul>
       <li>投稿済みかどうかは、生成実行に紐づく投稿レコード（<code>posts</code>）の有無から<strong>アカウントごとに導出</strong>する（生成実行テーブル自体に投稿済みフラグは持たない。将来の複数アカウントでアカウントごとに状態が異なるため）</li>
       <li>一度でも試行（失敗含む）した生成実行は自動では再対象にしない = <strong>再試行なし・欠番許容</strong>（初期実装の方針）</li>
-      <li>通常運用では直前の画像生成バッチの当回分がそのまま対象になる（未試行の生成実行が複数残っている場合の処理件数は Phase 9-2 で定義する）</li>
       <li><code>SCHEDULED_AT</code> に依存しないため、インフラの連携契約（SNS 投稿 Step Functions への入力は <code>set_code</code> のみ）を変更せずに済み、手動での単独実行も同じロジックで動く</li>
     </ul>
   </li>
-  <li>対象の生成実行 × セットの有効な投稿先アカウントごとに順次処理する:
+</ol>
+
+<div class="note">
+  <span class="callout-title">Phase 9-3 での厳密化: 「投稿試行が一度もない」の DB クエリ定義</span>
+  上記の判定条件は、Step Functions Retry によるタスク再起動時に同じ生成実行を再選択して 3.2 の復旧ロジックへつなげる必要があるため、
+  「<code>posts</code> 行が 1 つもない」ではなく「<strong>有効なアカウントのうち少なくとも 1 つが終端状態（<code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）に達していない</strong>」を正確な条件とする。
+  SQL・インデックス設計は <a href="data-model.html#target-selection">data-model.html セクション 4.4</a> を参照。
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定: 未試行の生成実行が複数残っている場合の処理件数</span>
+  1 回の実行では<strong>常に最古の 1 件のみ</strong>処理し、<code>BATCH_SIZE_LIMIT</code> のような処理件数の上限設定は設けない。
+  通常運用では直前の画像生成バッチの当回分がそのまま対象になるため 1 件で足り、SNS 投稿が連続して失敗しバックログが積み上がった場合も、
+  「1 回の欠番は致命的でない」という初期方針（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）のもと、複数件をまとめて追いつかせる複雑な制御はあえて持たない。
+  未処理のまま残った古い生成実行は、将来のセット別失敗時ポリシー（<a href="#future-failure-policy">追いつくモード</a>）導入時に扱う。
+</div>
+
+<h3 id="posts-state">3.2 posts の状態遷移（冪等性・二重投稿防止）</h3>
+<p><code>posts</code> は生成実行 × アカウントで一意（UNIQUE 制約 <code>(generation_run_id, sns_account_id)</code>）とし、<strong><code>attempt_number</code> 相当のカラムは持たない</strong>。自動再試行を行わない初期方針のため、1 つの投稿対象について作られる行は常に 1 行であり、その行の状態遷移だけで進行状況を表現する。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>状態</th><th>意味</th><th>遷移条件</th></tr></thead>
+  <tbody>
+    <tr><td><code>pending</code></td><td>投稿処理に着手した（予約）</td><td>投稿対象と決定した直後、API 呼び出し前に INSERT する</td></tr>
+    <tr><td><code>container_created</code></td><td>コンテナ作成 API まで成功（<code>platform_container_id</code> 設定済み）</td><td>コンテナ作成 API 成功時に更新</td></tr>
+    <tr><td><code>success</code></td><td>投稿完了（<code>platform_post_id</code> 設定済み）</td><td>パブリッシュ API が成功時に更新</td></tr>
+    <tr><td><code>failed</code></td><td>投稿未完了で終了。自動では再対象にしない終端状態</td><td>API が明確に失敗を返した場合に更新</td></tr>
+    <tr><td><code>published_unconfirmed</code></td><td>投稿済みの可能性を否定できない終端状態。要手動確認</td><td>重複 publish 応答、またはパブリッシュ要求送信後のタイムアウト・接続断</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">Step Functions Task Retry（同一実行内の再起動）での復旧</span>
+  SNS 投稿 ECS タスクが異常終了し Step Functions の Retry（最大 2 回、30 秒間隔。<a href="../infra/workflow.html#error-handling">infra/workflow.html セクション 6</a>）でタスク全体が再起動された場合、対象生成実行に紐づく有効アカウントごとに <code>posts</code> の状態を確認し、以下のとおり分岐する。
+  <ul style="margin:.3rem 0 0;">
+    <li>行が存在しない、または <code>pending</code>（<code>platform_container_id</code> 未設定）→ 最初から実行（コンテナ作成 → パブリッシュ）</li>
+    <li><code>container_created</code>（<code>platform_container_id</code> 設定済み、<code>platform_post_id</code> 未設定）→ パブリッシュから再開（同じ <code>container_id</code> を使い、新しいコンテナは作らない）</li>
+    <li><code>success</code> → スキップ（このアカウントへの投稿は完了済み）</li>
+    <li><code>failed</code> / <code>published_unconfirmed</code> → スキップ（同一実行内の Step Functions Retry でも自動では再試行しない。終端状態の扱いは全実行を通じて一貫させる）</li>
+  </ul>
+  この分岐により、Step Functions Retry が働いても既に成功・終端状態のアカウントへの無駄な API 呼び出しは発生しない。
+</div>
+
+<h3 id="sns-steps">3.3 処理手順</h3>
+<ol>
+  <li>対象の生成実行に対し、セットの有効な投稿先アカウント（<code>sns_accounts</code>）ごとに<strong>順次</strong>処理する。1 アカウントの失敗は他アカウントの処理をブロックしない（例外を捕捉し次のアカウントへ進む）</li>
+  <li><code>posts</code> の状態（3.2）に基づき、未完了のアカウントについて処理を進める:
     <ol>
-      <li>投稿レコード（<code>posts</code>）を作成する（投稿前の事前記録により二重投稿を防止する。旧設計の考え方を踏襲）</li>
-      <li>投稿に載せる画像を <code>post_images</code> で紐づける（当面は 1 枚。将来のカルーセルでは生成実行内の複数画像を並び順付きで束ねる）</li>
+      <li><code>posts</code> レコードを <code>pending</code> で作成する（投稿前の事前記録により二重投稿を防止する）</li>
+      <li><strong>初期構築の仕様: 生成実行に紐づく画像のうち最初の 1 枚のみ</strong>を <code>post_images</code> で紐づける（選択順序は <code>generated_images.id</code> 昇順 = 最も早く生成された 1 枚。1 セット複数 <code>prompt_config</code> や 1 プロンプト複数画像により生成実行が複数の画像を保存していても、投稿するのは常に 1 枚とする）。将来のカルーセル対応では、生成実行内の複数画像を並び順付きで束ねる処理に拡張する</li>
       <li>キャプションテンプレートを適用して投稿本文を組み立てる</li>
-      <li>S3 Presigned URL を発行し、Instagram Graph API の 2 段階フロー（コンテナ作成 → publish）で投稿する</li>
-      <li>結果（成功 / 失敗、プラットフォーム投稿 ID）を投稿レコードに記録する</li>
+      <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する</li>
+      <li>パブリッシュ API（<code>POST /{ig-user-id}/media_publish</code>）を呼び出す
+        <ul>
+          <li>成功 → <code>platform_post_id</code> を保存し <code>status='success'</code> に更新</li>
+          <li>明確な失敗（投稿未完了と判定できる応答）→ <code>status='failed'</code> に更新</li>
+          <li>重複 publish 応答、またはタイムアウト・接続断で結果不明 → <code>status='published_unconfirmed'</code> に更新</li>
+        </ul>
+      </li>
     </ol>
   </li>
-  <li>投稿失敗は記録・通知に反映して終了する（「失敗」の定義・通知粒度・終了コード方針は Phase 9-2。運用側の対応手順は<a href="operation.html#failure">アプリ運用設計 セクション 4</a>）</li>
+  <li>全アカウントの処理後、3.4 の方針に基づき終了コードを決定して終了する</li>
 </ol>
+
+<h3 id="failure-policy">3.4 「失敗」の定義・通知粒度・終了コード方針</h3>
+<ul>
+  <li><strong>失敗の定義</strong>: 対象の生成実行に対し、有効な投稿先アカウントのうち<strong>1 つでも <code>success</code> にならなかった</strong>場合（<code>failed</code> または <code>published_unconfirmed</code> で終わったアカウントが 1 つでもある場合）を失敗とする</li>
+  <li><strong>終了コード</strong>: 全アカウントが <code>success</code> なら 0。1 つでも非 <code>success</code> が残るなら 1</li>
+  <li>終了コード 1 により Step Functions の既存 Retry（最大 2 回）が働くが、3.2 の状態遷移によって <code>success</code> / 終端状態のアカウントはスキップされるため、Retry によって無駄な API 呼び出しが増えることはない。Retry を使い切ってもなお非 <code>success</code> が残る場合は Catch → Fail 状態に遷移し、既存の CloudWatch Alarm（<code>ExecutionsFailed</code>）で通知される</li>
+  <li><strong>通知粒度</strong>: 初期スコープでは個別アカウント・個別失敗理由ごとのカスタムメトリクスは持たない。既存の Step Functions 失敗アラーム 1 本のみで通知し、詳細な原因（どのアカウント・どの段階で失敗したか）は CloudWatch Logs と <code>posts</code> テーブル（<code>status</code> / <code>api_response</code>）で確認する運用とする（確認手順は Phase 9-4）</li>
+  <li><code>published_unconfirmed</code> も「対応が必要な状態」として終了コード 1 の対象に含める（<code>success</code> と明確に区別し、運用者に手動確認を促すため）</li>
+</ul>
 
 <div class="decision">
   <span class="callout-title">セット別拡張ポイント: キャプションの作り方</span>
-  初期実装は <code>caption_templates</code> の固定文テンプレートを適用する（手順 3-3）。将来は、
+  初期実装は <code>caption_templates</code> の固定文テンプレートを適用する（3.3 の手順 3）。将来は、
   <strong>画像内容に合わせて生成 AI がキャプションを作る方式</strong>などを<strong>セットごとに選択可能</strong>にする
   （2026-07-06 ユーザー要望。どの方式を使うかはセット別設計書に記録する）。
 </div>
 
-<div class="note">
+<div class="note" id="future-failure-policy">
   <span class="callout-title">将来のセット別失敗時ポリシー（追いつく / 捨てる）</span>
-  投稿対象の決定（手順 2）の検索条件を切り替えることで、セット別の失敗時ポリシーを実現する想定:
+  投稿対象の決定（3.1）の検索条件を切り替えることで、セット別の失敗時ポリシーを実現する想定:
   <strong>追いつくモード</strong> = 失敗した生成実行も再対象に含める / <strong>捨てるモード</strong> = 一定より古い未試行分を対象外にする。
   詳細は Phase 9 以降（処理単位を「生成実行」とした経緯は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。
 </div>
@@ -104,20 +181,23 @@
 <ul>
   <li><code>SET_CODE</code> — 両バッチが受け取り、<code>batch_sets</code> の解決に使用する（各フローの手順 1）</li>
   <li><code>SCHEDULED_AT</code> — 画像生成バッチのみが受け取り、生成実行の冪等性キーに使用する（セクション 2 の手順 2）。SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</li>
-  <li><code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数 — 要否含め Phase 9-2 で定義する</li>
+  <li><strong><code>BATCH_SIZE_LIMIT</code> 等のバッチ件数制御用環境変数は追加しない</strong>（確定）。SNS 投稿バッチは常に生成実行 1 件のみを処理する方針（3.1）のため件数上限の概念が不要であり、画像生成バッチも有効プロンプト 1 件・1 枚生成の初期スコープでは総量制御が不要と判断した。将来、生成実行のバックログが恒常的に蓄積する場合や画像生成 API のクォータ制約が顕在化した場合に導入を再検討する</li>
 </ul>
 
-<h2 id="phase9">5. Phase 9-2 で詳細化する項目</h2>
+<h2 id="phase9">5. Phase 9-2 の決定事項と Phase 9-3 への申し送り</h2>
+<p>本書の詳細化に伴いデータモデル（<a href="data-model.html">data-model.html</a>）側で確定・反映が必要な事項を以下に整理する。</p>
 <ul>
-  <li>冪等性・二重投稿防止の具体設計（投稿ステータス遷移、<code>published_unconfirmed</code> 相当の要否）</li>
-  <li>未完了の生成実行の再開処理（画像 1 枚の完了判定基準を含む）</li>
-  <li>未試行の生成実行が複数残っている場合の処理件数</li>
-  <li>画像生成 API が複数画像を返却した場合の処理</li>
-  <li>「失敗」の定義・通知粒度・終了コード方針</li>
-  <li><code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数の要否</li>
+  <li><code>posts.status</code> の値集合: <code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>（3.2）</li>
+  <li><code>posts</code> の UNIQUE 制約は <code>(generation_run_id, sns_account_id)</code> のみ。旧設計にあった <code>attempt_number</code> 相当のカラムは不要（自動再試行を行わない方針のため。3.2）</li>
+  <li><code>posts</code> に <code>platform_container_id</code> / <code>platform_post_id</code> / <code>api_response</code> 等、2 段階フローの中間状態を保持するカラムが必要（3.3）</li>
+  <li><code>generated_images</code> の完了判定は <code>(generation_run_id, prompt_config_id)</code> の組み合わせでの存在確認により行う。完了状態を表す専用カラムは不要（2）</li>
+  <li><code>generated_images</code> に <code>output_index</code>（同一 <code>generation_run_id</code> × <code>prompt_config_id</code> 内での並び順）カラムが必要。画像生成 API が返す image part はすべて保存する方針のため（旧設計の「2 枚目以降は破棄」は不採用。2）</li>
+  <li><code>post_images</code> は初期構築では生成実行内の先頭画像（<code>generated_images.id</code> 昇順で最初の 1 枚）のみを登録する。生成実行が保存する画像枚数によらず、投稿は常に 1 枚（3.3）</li>
+  <li><code>prompt_configs</code> の <code>is_active=1</code> 件数は 0 件をエラー、1 件以上はすべてループ処理する方針を確定（DB 制約の変更は不要。処理ロジックの決定事項として記録。2）</li>
+  <li><code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数は追加しない（4）</li>
 </ul>
 
-<p>参考資料: <a href="../_archive/batch.md">_archive/batch.md</a>（冪等性・再試行・投稿ステータス管理の旧設計。現役の設計書ではない）</p>
+<p>参考資料: <a href="../_archive/batch.md">_archive/batch.md</a>（冪等性・再試行・投稿ステータス管理の旧設計。<code>post_records</code> の attempt 方式や <code>BATCH_SIZE_LIMIT</code> によるバックログ処理は、自動再試行なし・生成実行単位への簡素化に伴い初期スコープでは採用しない。現役の設計書ではない）</p>
 
 </div>
 </body>

@@ -80,7 +80,7 @@
 <ul>
   <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）</li>
   <li>CDK から該当セットの Scheduler 定義を削除して deploy する</li>
-  <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体の保持要否は Phase 9-3 で確定する（<a href="data-model.html#s3-key">データモデル設計 セクション 4.2</a>）</li>
+  <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体（画像ファイル）はインフラの 30 日ライフサイクルで自動削除される対象であり「残す」対象に含まない（Phase 9-3 で確定。<a href="data-model.html#s3-key">データモデル設計 セクション 5</a>）</li>
   <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す</li>
 </ul>
 
