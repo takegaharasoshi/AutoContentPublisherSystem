@@ -16,7 +16,7 @@ AutoContentPublisherSystem/
 │   ├── assets/style.css             #   設計書共通スタイル
 │   ├── overview/                    #   システム概要
 │   ├── infra/                       #   インフラ設計書（HTML）
-│   ├── app/                         #   アプリ設計書（Phase 9 で作成。現在は検討メモのみ）
+│   ├── app/                         #   アプリ設計書（大枠: Phase A / 詳細: Phase 9。現在は検討メモのみ）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
 │   └── development-plan.md          #   開発計画・進捗管理
 ├── infra/                           # AWS CDK プロジェクト（TypeScript）※未作成
@@ -44,7 +44,7 @@ AutoContentPublisherSystem/
 
 設計書は **HTML** で記述する（開発計画 `docs/development-plan.md` のみ Markdown）。体系の全体像・スコープ境界・設計 Fix 基準は `docs/index.html` を参照。
 
-- **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（Phase 9 で着手）
+- **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（大枠は Phase A、詳細は Phase 9 で作成する 2 段階方針）
 - **インフラ設計書にアプリ仕様を書かない**。作業中にアプリの論点（処理ロジック・テーブル設計等）が出たら `docs/app/index.html` の検討メモに記録する
 - HTML 設計書は外部 CDN に依存せず、`docs/assets/style.css` を共通スタイルとして使用する。閲覧はローカルブラウザまたは VS Code の Live Preview で行う（GitHub 上ではソース表示になる）
 
@@ -52,8 +52,8 @@ AutoContentPublisherSystem/
 |---|---|---|
 | `docs/overview/` | システムの目的・スコープ・技術選定 | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
-| `docs/app/` | アプリ設計（Phase 9 で作成） | `index.html`（検討メモ） |
-| `docs/_archive/` | 旧 Markdown 設計書（Phase 9 の参考資料。現役ではない） | 参照は Phase 9 のアプリ設計時のみ |
+| `docs/app/` | アプリ設計（大枠: Phase A / 詳細: Phase 9） | `index.html`（検討メモ） |
+| `docs/_archive/` | 旧 Markdown 設計書（アプリ設計の参考資料。現役ではない） | 参照は Phase A・Phase 9 のアプリ設計時のみ |
 
 ### ドキュメント参照ガイド（タスク別）
 
@@ -68,7 +68,8 @@ AutoContentPublisherSystem/
 | CI/CD パイプラインを構築する | `docs/infra/cicd.html` |
 | 監視・通知を設定する | `docs/infra/workflow.html` セクション 7〜10 + `docs/infra/operation.html` |
 | 認証・秘密情報の設定を変更する | `docs/infra/security.html` |
-| アプリ（業務ロジック）の設計・実装 | Phase 9 以降。`docs/app/` に設計書を作成してから着手する |
+| アプリ設計の大枠（壁打ち・設計書構成・方針の骨子） | Phase A。`docs/app/index.html` + `docs/development-plan.md` の Phase A |
+| アプリ（業務ロジック）の詳細設計・実装 | Phase 9 以降。Phase A の大枠設計書を詳細化してから着手する |
 | 開発の次ステップを確認する | `docs/development-plan.md` |
 
 ### 設計 Fix・レビューの運用ルール
@@ -82,7 +83,7 @@ AutoContentPublisherSystem/
 ## 開発計画
 
 - 開発計画と進捗は `docs/development-plan.md` で管理する
-- **Phase D（インフラ設計の一時 Fix）→ Phase 0〜8（インフラ構築: 空回し確認・監視・CI/CD まで）→ Phase 9（アプリ設計）→ Phase 10 以降（アプリ実装）** の順に進める
+- **Phase D（インフラ設計の一時 Fix）→ Phase A（アプリ設計の大枠）→ Phase 0〜8（インフラ構築: 空回し確認・監視・CI/CD まで）→ Phase 9（アプリ設計の詳細）→ Phase 10 以降（アプリ実装）** の順に進める
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
 - 作業開始時は `docs/development-plan.md` を読み、現在の Phase・ステップを確認してから着手する
 

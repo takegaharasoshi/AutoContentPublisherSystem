@@ -24,7 +24,7 @@
 
 <h2 id="principles">1. 設計原則</h2>
 <ol>
-  <li><strong>インフラとアプリの関心の分離</strong>: インフラ設計（<code>docs/infra/</code>）とアプリ設計（<code>docs/app/</code>）を明確に分ける。インフラを先に構築・Fix し、アプリ設計は仕様イメージが固まってから着手する（Phase 9）</li>
+  <li><strong>インフラとアプリの関心の分離</strong>: インフラ設計（<code>docs/infra/</code>）とアプリ設計（<code>docs/app/</code>）を明確に分ける。インフラを先に構築・Fix する。アプリ設計は 2 段階で行い、大枠（設計書構成・主要方針の骨子）は Phase A で、詳細はインフラ完成後の Phase 9 で作成する</li>
   <li><strong>完璧より前進（一時 Fix 運用）</strong>: 設計書は「次フェーズの作業に着手できる」水準で一時 Fix とし、先に進む。詳細はセクション 4 の Fix 基準を参照</li>
   <li><strong>実装を正とする</strong>: 設計と異なる実装をした場合は、実装に合わせて設計書を修正する（変更理由は備考に残す）</li>
   <li><strong>同じ情報を 2 箇所に書かない</strong>: 詳細の「正」は 1 つのドキュメントに置き、他からは参照リンクで辿る</li>
@@ -45,7 +45,7 @@
 │   ├── cicd.html                  # CI/CD パイプライン
 │   └── operation.html             # インフラ運用
 ├── app/
-│   └── index.html                 # アプリ設計（Phase 9 で着手。現在は検討メモ置き場）
+│   └── index.html                 # アプリ設計（大枠: Phase A / 詳細: Phase 9。現在は検討メモ置き場）
 ├── _archive/                      # 旧 Markdown 設計書（参考資料。現役の設計書ではない）
 └── development-plan.md            # 開発計画・進捗管理（Markdown）</code></pre>
 
@@ -88,8 +88,8 @@
 <h3>アプリ設計（docs/app/）</h3>
 <div class="card-grid">
   <div class="card">
-    <div class="card-title"><a href="app/index.html">app/index.html</a> <span class="badge badge-wip">Phase 9 で着手</span></div>
-    <p>バッチ処理フロー・DB スキーマ・アプリ運用の設計書を作成予定。現在は設計対象一覧と検討メモ。</p>
+    <div class="card-title"><a href="app/index.html">app/index.html</a> <span class="badge badge-wip">大枠: Phase A / 詳細: Phase 9</span></div>
+    <p>バッチ処理フロー・DB スキーマ・アプリ運用の設計書を作成予定。大枠設計書は Phase A で、詳細設計書は Phase 9 で作成する。現在は設計対象一覧と検討メモ。</p>
   </div>
 </div>
 
@@ -100,7 +100,7 @@
 <div class="table-wrap">
 <table>
   <thead>
-    <tr><th>分類</th><th>インフラ設計（docs/infra/）に書くこと</th><th>アプリ設計（docs/app/）に書くこと ※Phase 9 まで書かない</th></tr>
+    <tr><th>分類</th><th>インフラ設計（docs/infra/）に書くこと</th><th>アプリ設計（docs/app/）に書くこと ※大枠は Phase A、詳細は Phase 9</th></tr>
   </thead>
   <tbody>
     <tr>
@@ -139,7 +139,7 @@
 
 <div class="warn">
   <span class="callout-title">スコープガード</span>
-  設計作業やレビューの中でアプリ仕様の論点（テーブル設計、投稿の再試行ルール等）が出てきた場合、インフラ設計書には書かず、<a href="app/index.html">docs/app/index.html</a> の検討メモに記録して Phase 9 で扱う。
+  設計作業やレビューの中でアプリ仕様の論点（テーブル設計、投稿の再試行ルール等）が出てきた場合、インフラ設計書には書かず、<a href="app/index.html">docs/app/index.html</a> の検討メモに記録してアプリ設計（大枠は Phase A、詳細は Phase 9）で扱う。
 </div>
 
 <h2 id="fix-rules">4. 設計 Fix 基準とレビュー運用ルール</h2>

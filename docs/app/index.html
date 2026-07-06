@@ -12,45 +12,50 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / アプリ設計</nav>
 <h1>アプリ設計</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">Phase 9 で着手</span>
+  <span class="badge badge-wip">大枠: Phase A / 詳細: Phase 9</span>
   <span>最終更新: 2026-07-06</span>
 </div>
 
 <div class="warn">
-  <span class="callout-title">アプリ設計はまだ書かない</span>
-  アプリ設計は、インフラ構築（開発計画 Phase 0〜8）が完了し、システムの動作イメージが固まってから Phase 9 で着手する。それまでは本ページの「検討メモ」に論点を記録するだけにとどめ、設計書は作成しない。進め方は <a href="../development-plan.md">development-plan.md</a> の Phase 9 を参照。
+  <span class="callout-title">アプリ設計は 2 段階（大枠 → 詳細）で行う</span>
+  アプリ設計は、<strong>大枠（Phase A）</strong>と<strong>詳細（Phase 9）</strong>の 2 段階で行う。Phase A では仕様の壁打ち・設計書構成の決定・主要方針の骨子（処理フロー概要・データモデル概要・運用方針）までを固め、大枠設計書を作成する。テーブル定義・処理フローの詳細・DDL などの詳細設計は、インフラ構築（開発計画 Phase 0〜8）が完了しシステムの動作イメージが固まってから Phase 9 で行う。Phase A の成果物は Phase 9 で見直す前提の一時 Fix とする。進め方は <a href="../development-plan.md">development-plan.md</a> の Phase A・Phase 9 を参照。
 </div>
 
-<h2 id="targets">1. Phase 9 で設計する対象</h2>
-<p>以下はアプリ設計で扱う予定のテーマ一覧（Phase 9 開始時に見直す）。</p>
+<h2 id="targets">1. アプリ設計で扱う対象</h2>
+<p>以下はアプリ設計で扱う予定のテーマ一覧。各テーマとも、大枠（方針の骨子）は Phase A で、詳細は Phase 9 で扱う。設計書構成（ドキュメントの分け方）は Phase A-2 で決定し、本ページをアプリ設計の目次ページとして更新する。</p>
 
 <div class="table-wrap">
 <table>
-  <thead><tr><th>テーマ</th><th>主な論点</th><th>参考資料（旧設計）</th></tr></thead>
+  <thead><tr><th>テーマ</th><th>大枠（Phase A）で決めること</th><th>詳細（Phase 9）で決めること</th><th>参考資料（旧設計）</th></tr></thead>
   <tbody>
     <tr>
       <td>バッチ処理フロー</td>
-      <td>画像生成・SNS 投稿の処理手順、冪等性・再試行設計、投稿ステータス管理、二重投稿防止、バッチサイズ制限・レート制御</td>
+      <td>画像生成・SNS 投稿の処理手順の概要</td>
+      <td>冪等性・再試行設計、投稿ステータス管理、二重投稿防止、バッチサイズ制限・レート制御</td>
       <td><a href="../_archive/batch.md">_archive/batch.md</a></td>
     </tr>
     <tr>
       <td>DB スキーマ</td>
+      <td>データモデル概要（主要エンティティと関係）</td>
       <td>テーブル定義・ER 図・制約、DDL、時刻の取り扱い、DDL マイグレーション方針</td>
       <td><a href="../_archive/database.md">_archive/database.md</a></td>
     </tr>
     <tr>
       <td>アプリ運用</td>
+      <td>運用方針の骨子</td>
       <td>プロンプト管理、SNS アカウント追加手順、投稿失敗時の手動補正、実行ログ管理、トークン更新運用</td>
       <td><a href="../_archive/operation.md">_archive/operation.md</a></td>
     </tr>
     <tr>
       <td>ワークフロー連携の確定</td>
-      <td>環境変数（<code>SET_CODE</code> / <code>SCHEDULED_AT</code>）の意味付け、<code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数、アプリ発行カスタムメトリクス</td>
+      <td>環境変数（<code>SET_CODE</code> / <code>SCHEDULED_AT</code>）の意味付け</td>
+      <td><code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数、アプリ発行カスタムメトリクス</td>
       <td><a href="../_archive/workflow.md">_archive/workflow.md</a></td>
     </tr>
     <tr>
       <td>SNS Secret 規約の最終確認</td>
-      <td><code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> の構成要素（<code>set_code</code> / <code>account_code</code>）の定義確定</td>
+      <td><code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> の構成要素（<code>set_code</code> / <code>account_code</code>）の定義</td>
+      <td>定義の最終確認（インフラ構築の実態を踏まえて確定）</td>
       <td><a href="../infra/security.html#secret-naming">infra/security.html</a></td>
     </tr>
   </tbody>
@@ -58,7 +63,7 @@
 </div>
 
 <h2 id="memo">2. 検討メモ</h2>
-<p>インフラ設計・構築中に出てきたアプリ関連の論点はここに記録する（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。Phase 9 開始時にこのメモを棚卸しする。</p>
+<p>インフラ設計・構築中に出てきたアプリ関連の論点はここに記録する（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。Phase A 開始時と Phase 9 開始時（9-1）にこのメモを棚卸しする。</p>
 
 <div class="table-wrap">
 <table>
@@ -70,7 +75,7 @@
 </div>
 
 <h2 id="references">3. 参考資料</h2>
-<p><a href="../_archive/">docs/_archive/</a> の旧 Markdown 設計書には、過去に検討したアプリ設計（冪等性設計・テーブル定義・運用手順等）が含まれている。<strong>現役の設計書ではない</strong>が、Phase 9 の設計時に参考にすること。</p>
+<p><a href="../_archive/">docs/_archive/</a> の旧 Markdown 設計書には、過去に検討したアプリ設計（冪等性設計・テーブル定義・運用手順等）が含まれている。<strong>現役の設計書ではない</strong>が、Phase A・Phase 9 の設計時に参考にすること。</p>
 
 </div>
 </body>
