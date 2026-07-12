@@ -185,9 +185,9 @@
   - 確認: VPC、Public Subnet x2（各 AZ）、Isolated Subnet x2（各 AZ）が作成されている（NAT Gateway がないことを確認）
   - 備考: スタックに VPC 関連以外の Lambda 関数が 1 つ含まれるのは想定どおり（デフォルト SG のルール除去用カスタムリソース。1-2 の備考を参照）。2026-07-13 ユーザーがコンソールで確認完了
 
-- [ ] **1-5** 削除して再作成できることを確認
+- [x] **1-5** 削除して再作成できることを確認
   - 確認: `cdk destroy -c env=prod FoundationStack` → `cdk deploy -c env=prod FoundationStack` が通る
-  - 備考:
+  - 備考: 2026-07-13 実施。事前確認（`npm run build` / `npm test` 成功、`cdk diff` 差分なし）のうえ `cdk destroy --force` を実行し削除完了（スタック不存在・非 default VPC ゼロを AWS CLI で確認）。**残骸**: デフォルト SG ルール除去用カスタムリソース Lambda のロググループ `/aws/lambda/Prod-FoundationStack-CustomVpcRestrictDefaultSGCus-*` は CFN 管理外のため destroy 後も残存 → 手動削除した。destroy するたびに残る点は今後も留意（Lambda 関数名にランダムサフィックスが付くため、再デプロイ後の destroy でも別名で残る）。その後 `cdk deploy --require-approval never` で再作成し約 62 秒で `CREATE_COMPLETE`。再作成後の検証（1-3 と同じ観点）: 新 VPC `vpc-00b1327fb58e687a0`（10.0.0.0/16・available）、Public Subnet ×2（10.0.0.0/18@1a・10.0.64.0/18@1c＝パブリック IP 自動割当あり）、Isolated Subnet ×2（10.0.128.0/18@1a・10.0.192.0/18@1c）、IGW `igw-09a0e50d3ec962d56` アタッチ済み、**NAT Gateway ゼロ**、デフォルト SG はインバウンド・アウトバウンドとも空。構成は 1-3 と同一（リソース ID のみ新規）で「壊して作り直せる」ことを確認
 
 ---
 
