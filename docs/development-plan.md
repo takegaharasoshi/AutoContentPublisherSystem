@@ -113,9 +113,9 @@
 
 **ゴール**: CDK と Docker がローカルで動く状態にする
 
-- [ ] **0-1** AWS CLI のインストール・認証設定
+- [x] **0-1** AWS CLI のインストール・認証設定
   - 確認: `aws sts get-caller-identity` で自分のアカウントが表示される
-  - 備考:
+  - 備考: 2026-07-12 実施。AWS CLI v2.32.14 が既にインストール済み（`~/.aws/` の認証設定も設定済み）だったため新規作業なし。`aws sts get-caller-identity` でアカウント `516964473143`（IAM ユーザー `takegaharawork`）の表示を確認。デフォルトリージョンは `ap-northeast-1`
 
 - [ ] **0-2** AWS CDK CLI のインストール
   - 確認: `cdk --version` でバージョンが表示される
