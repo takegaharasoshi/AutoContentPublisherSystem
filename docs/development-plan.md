@@ -129,9 +129,9 @@
   - 確認: `python --version`, `docker run hello-world` が通る
   - 備考: 本プロジェクトは WSL2 + Docker Desktop の WSL integration を有効化する前提。Docker Desktop を使わず WSL 内に直接 Docker Engine を導入する場合は、systemd 有効化やユーザーグループ設定などの手動セットアップが別途必要。2026-07-12 実施。Docker: Docker Desktop（Windows 側インストール済み・未起動）を起動したところ WSL integration 有効で `docker run hello-world` 成功（Docker version 29.1.2）。Python: `python` コマンドは存在せず `python3` で Python 3.8.10（Ubuntu 20.04 標準）を確認。**3.8 は 2024-10 に EOL 済み**のため、ローカルで Python 開発を始める Phase 3-2（db-readiness-check 実装）までに新しいバージョン（3.12 等）の導入を検討する（バッチ本体はコンテナ内の Python を使うため本番影響はなし）
 
-- [ ] **0-5** リポジトリのディレクトリ構成を作成
+- [x] **0-5** リポジトリのディレクトリ構成を作成
   - 確認: `services/`, `shared/`, `infra/` ディレクトリが存在する
-  - 備考:
+  - 備考: 2026-07-12 実施。`infra/`, `services/db-readiness-check/`, `services/image-batch/`, `services/sns-post-batch/`, `shared/` を作成（Git は空ディレクトリを追跡しないため各ディレクトリに `.gitkeep` を配置）。`database/` は Phase 9 で作成済み。**注意**: 1-1 の `cdk init` は空ディレクトリでないと失敗するため、実施時に `infra/.gitkeep` を削除してから `cdk init` すること。CLAUDE.md / README.md のリポジトリ構成の「未作成」注記も更新済み
 
 ---
 
