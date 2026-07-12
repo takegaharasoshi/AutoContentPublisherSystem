@@ -169,9 +169,9 @@
 
 **ゴール**: CDK で最小のリソース（VPC）を AWS に作れることを確認する
 
-- [ ] **1-1** `infra/` に CDK プロジェクトを初期化（TypeScript）
+- [x] **1-1** `infra/` に CDK プロジェクトを初期化（TypeScript）
   - 確認: `cdk synth -c env=prod` でテンプレートが出力される
-  - 備考:
+  - 備考: 2026-07-12 実施。`infra/.gitkeep` を削除後、`cdk init app --language typescript` で初期化（aws-cdk-lib 2.232.1 / aws-cdk CLI 2.1034.0 / TypeScript ~5.9.3 / Jest。`package-lock.json` はコミット対象）。生成物のデフォルトスタック（InfraStack）は使い捨てになるため、本ステップでリソースなしの空の **FoundationStack**（`lib/foundation-stack.ts`）に置換した（1-2 は VPC を足すだけになる）。エントリポイント `bin/infra.ts` は Context `env` を必須化し（未指定・`prod` 以外は明確なエラーで失敗。対応環境は現時点で prod のみ）、実スタック名は README の規約どおり環境名プレフィックス付き（`Prod-FoundationStack`）、リージョンは `ap-northeast-1` 固定、アカウントは CLI 認証情報（`CDK_DEFAULT_ACCOUNT`）から解決する。検証: `npm run build` / `npm test`（空スタック synth テスト 1 件）成功、`cdk ls -c env=prod` → `FoundationStack (Prod-FoundationStack)`、`cdk synth -c env=prod` でテンプレート出力、env 未指定・`env=dev` がエラーになることを確認。CLAUDE.md / README.md の「ディレクトリのみ作成済み」注記から `infra/` を除外済み
 
 - [ ] **1-2** FoundationStack に VPC だけ定義
   - 確認: `cdk diff -c env=prod FoundationStack` で差分が見える
