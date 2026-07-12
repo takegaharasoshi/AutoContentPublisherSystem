@@ -121,9 +121,9 @@
   - 確認: `cdk --version` でバージョンが表示される
   - 備考: 2026-07-12 実施。AWS CDK CLI v2.1034.0 が既にグローバルインストール済み（`/usr/bin/cdk`、Node.js v22.22.1 / npm 10.9.4）だったため新規作業なし。`cdk --version` でバージョン表示を確認
 
-- [ ] **0-3** CDK Bootstrap（初回のみ）
+- [x] **0-3** CDK Bootstrap（初回のみ）
   - 確認: `cdk bootstrap aws://ACCOUNT/REGION` が成功する
-  - 備考:
+  - 備考: 2026-07-12 実施。CDKToolkit スタックが 2025-12-13 に作成済み（テンプレートバージョン 30、状態 `CREATE_COMPLETE`）だったため、`cdk bootstrap aws://516964473143/ap-northeast-1` の再実行は「no changes」で正常終了（冪等）。新規リソース作成なし
 
 - [ ] **0-4** Python / Docker の動作確認
   - 確認: `python --version`, `docker run hello-world` が通る
