@@ -125,9 +125,9 @@
   - 確認: `cdk bootstrap aws://ACCOUNT/REGION` が成功する
   - 備考: 2026-07-12 実施。CDKToolkit スタックが 2025-12-13 に作成済み（テンプレートバージョン 30、状態 `CREATE_COMPLETE`）だったため、`cdk bootstrap aws://516964473143/ap-northeast-1` の再実行は「no changes」で正常終了（冪等）。新規リソース作成なし
 
-- [ ] **0-4** Python / Docker の動作確認
+- [x] **0-4** Python / Docker の動作確認
   - 確認: `python --version`, `docker run hello-world` が通る
-  - 備考: 本プロジェクトは WSL2 + Docker Desktop の WSL integration を有効化する前提。Docker Desktop を使わず WSL 内に直接 Docker Engine を導入する場合は、systemd 有効化やユーザーグループ設定などの手動セットアップが別途必要
+  - 備考: 本プロジェクトは WSL2 + Docker Desktop の WSL integration を有効化する前提。Docker Desktop を使わず WSL 内に直接 Docker Engine を導入する場合は、systemd 有効化やユーザーグループ設定などの手動セットアップが別途必要。2026-07-12 実施。Docker: Docker Desktop（Windows 側インストール済み・未起動）を起動したところ WSL integration 有効で `docker run hello-world` 成功（Docker version 29.1.2）。Python: `python` コマンドは存在せず `python3` で Python 3.8.10（Ubuntu 20.04 標準）を確認。**3.8 は 2024-10 に EOL 済み**のため、ローカルで Python 開発を始める Phase 3-2（db-readiness-check 実装）までに新しいバージョン（3.12 等）の導入を検討する（バッチ本体はコンテナ内の Python を使うため本番影響はなし）
 
 - [ ] **0-5** リポジトリのディレクトリ構成を作成
   - 確認: `services/`, `shared/`, `infra/` ディレクトリが存在する
