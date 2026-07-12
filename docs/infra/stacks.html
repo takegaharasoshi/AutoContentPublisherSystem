@@ -70,6 +70,11 @@
   画像保存用バケットは <code>RemovalPolicy.DESTROY</code> + <code>autoDeleteObjects: true</code> とし、スタック削除時に中身ごと削除する。生成画像は 30 日ライフサイクルで自動削除される使い捨てデータであり、正式な記録は DB レコードが担うため（<a href="../app/data-model.html#s3-key">app/data-model.html セクション 5</a>）、バケット保持による保護よりも「スタックを壊して作り直せる」性質を優先する。この設定によりオブジェクト自動削除用の Lambda カスタムリソースがスタックに 1 つ追加される。
 </div>
 
+<div class="decision">
+  <span class="callout-title">画像 API キー Secret の初期値と RemovalPolicy（2026-07-13 決定）</span>
+  画像生成 API キー用 Secret の「箱」は、初期値を <code>generateSecretString</code>（<code>secretStringTemplate: '{}'</code> + <code>generateStringKey: 'api_key'</code>）で <code>{"api_key": "&lt;ランダムプレースホルダ&gt;"}</code> の JSON 形状にする。値スキーマ（<a href="security.html">security.html セクション 1.3</a>）と同じ形になり、Console のキー・値エディタで <code>api_key</code> の値を差し替えるだけで手動設定が完了する。RemovalPolicy は明示指定せず CFN デフォルトの Delete（復旧期間なしの即時削除）とし、「スタックを壊して作り直せる」性質を優先する（RETAIN では destroy 後に同名 Secret が残り再作成時に名前衝突する）。<strong>手動設定した API キー値は destroy で失われるため、スタック再作成後は Console から再設定が必要</strong>。
+</div>
+
 <h4>Security Group ルール詳細</h4>
 <div class="table-wrap">
 <table>

@@ -203,9 +203,9 @@
   - 確認: コンソールで SG が見える
   - 備考: 2026-07-13 実施。FoundationStack に SG 3 つ（バッチ共通・DB 準備確認用・Aurora 用）を stacks.html 3.1 のルール表どおり追加。Aurora 本体は Phase 3-1 作成だが、SG ルールが相互参照（バッチ側 Egress 3306 → Aurora SG / Aurora 側 Ingress 3306 ← バッチ SG ×2）のため 3 つ同時に作成した。3 つとも `allowAllOutbound: false` を指定（ルール表を満たすには Aurora 用以外も必須のため、stacks.html の warn の文言を「3 つとも指定」に修正）。後続スタック参照用に `batchSecurityGroup` / `dbReadinessCheckSecurityGroup`、Phase 3-1 の Aurora 用に `auroraSecurityGroup` を `public readonly` で公開。SG 名は命名規約表（cicd.html 9.2）の対象外のため明示指定せず CFN 自動命名、用途は英語 description で識別（SG の description は ASCII のみ許可）。実装は Codex に委譲し Claude がレビュー（JSDoc の参照元記載とテストの冗長箇所を小修正）。検証: `npm run build` / `npm test`（SG テスト 3 件追加、計 13 件）成功、`cdk diff` が SG 3 + Egress 2 + Ingress 2 の追加のみ（既存リソース変更なし）を確認のうえデプロイ。AWS CLI で 3 SG のルールが設計表と一致することを確認済み（バッチ共通・DB 準備確認用: Inbound なし / Outbound 443 → 0.0.0.0/0 と 3306 → Aurora SG のみ。Aurora 用: Inbound 3306 ← 両 SG / Outbound は CDK 仕様のダミー拒否ルール `255.255.255.255/32` ICMP のみ＝実質通信なし。コンソールでもこのダミールールが見えるが問題ない）。コンソールでの目視確認はユーザーが実施
 
-- [ ] **2-3** Secrets Manager（画像生成 API キーの箱）を追加
+- [x] **2-3** Secrets Manager（画像生成 API キーの箱）を追加
   - 確認: コンソールで `acps/prod/image/api-key` のシークレットが見える
-  - 備考: 画像 API キー用 Secret は CDK で「箱」のみ作成する。実際の API キー値の設定はアプリ実装フェーズ（Phase 10 以降）で行う。DB 接続情報の Secret は Aurora 作成時（Phase 3-1）に `acps/prod/db/credentials` として作成される
+  - 備考: 画像 API キー用 Secret は CDK で「箱」のみ作成する。実際の API キー値の設定はアプリ実装フェーズ（Phase 10 以降）で行う。DB 接続情報の Secret は Aurora 作成時（Phase 3-1）に `acps/prod/db/credentials` として作成される。2026-07-13 実施: FoundationStack に Secret `acps/prod/image/api-key`（Secret 名明示指定）を追加し、後続の ImageBatchStack 参照用に `public readonly imageApiKeySecret` として公開。初期値は `generateSecretString`（`secretStringTemplate: '{}'` + `generateStringKey: 'api_key'`）で `{"api_key": "<ランダムプレースホルダ>"}` の JSON 形状（security.html 1.3 の値スキーマと同形。Console で `api_key` の値を差し替えるだけで手動設定できる）。description にプレースホルダである旨を英語で明記。RemovalPolicy は未指定＝CFN デフォルトの Delete（即時削除・同名再作成可能。**手動設定した API キー値は destroy で失われるため再作成後は Console から再設定が必要**）。決定事項は stacks.html 3.1 の decision コールアウトに記録。実装は Codex に委譲し Claude がレビュー。検証: `npm run build` / `npm test`（Secret テスト 3 件追加、計 16 件）成功、`cdk diff` が Secret 1 つの追加のみ（既存リソース変更なし）を確認のうえデプロイ（`UPDATE_COMPLETE`）。AWS CLI で Name / ARN / Description と値が `{"api_key": "<32 文字ランダム>"}` 形状であることを確認済み。コンソールでの目視確認はユーザーが実施
 
 - [ ] **2-4** ECS Cluster を追加
   - 確認: コンソールでクラスターが見える

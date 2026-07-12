@@ -237,3 +237,28 @@ describe('FoundationStack の Security Group', () => {
     }
   });
 });
+
+describe('FoundationStack の画像生成 API キー用 Secret', () => {
+  const app = new cdk.App();
+  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const template = Template.fromStack(stack);
+
+  test('Secrets Manager Secret が 1 つ作成される', () => {
+    template.resourceCountIs('AWS::SecretsManager::Secret', 1);
+  });
+
+  test('Secret 名が設定される', () => {
+    template.hasResourceProperties('AWS::SecretsManager::Secret', {
+      Name: 'acps/prod/image/api-key',
+    });
+  });
+
+  test('生成する値の形式が設定される', () => {
+    template.hasResourceProperties('AWS::SecretsManager::Secret', {
+      GenerateSecretString: {
+        SecretStringTemplate: '{}',
+        GenerateStringKey: 'api_key',
+      },
+    });
+  });
+});

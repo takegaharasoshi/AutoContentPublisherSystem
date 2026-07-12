@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib/core';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
 export interface FoundationStackProps extends cdk.StackProps {
@@ -23,6 +24,8 @@ export class FoundationStack extends cdk.Stack {
   public readonly dbReadinessCheckSecurityGroup: ec2.SecurityGroup;
   /** Aurora Serverless v2 用の Security Group。Phase 3-1 の Aurora 作成時に同一スタック内で参照される */
   public readonly auroraSecurityGroup: ec2.SecurityGroup;
+  /** 画像生成 API キー用の Secret。後続の ImageBatchStack から参照される */
+  public readonly imageApiKeySecret: secretsmanager.Secret;
 
   constructor(scope: Construct, id: string, props: FoundationStackProps) {
     super(scope, id, props);
@@ -96,5 +99,15 @@ export class FoundationStack extends cdk.Stack {
         'Allow MySQL access from ECS tasks',
       );
     }
+
+    this.imageApiKeySecret = new secretsmanager.Secret(this, 'ImageApiKeySecret', {
+      secretName: `acps/${props.envName}/image/api-key`,
+      description:
+        'API key for the image generation service (placeholder; set the actual value manually via AWS Console)',
+      generateSecretString: {
+        secretStringTemplate: '{}',
+        generateStringKey: 'api_key',
+      },
+    });
   }
 }
