@@ -117,9 +117,9 @@
   - 確認: `aws sts get-caller-identity` で自分のアカウントが表示される
   - 備考: 2026-07-12 実施。AWS CLI v2.32.14 が既にインストール済み（`~/.aws/` の認証設定も設定済み）だったため新規作業なし。`aws sts get-caller-identity` でアカウント `516964473143`（IAM ユーザー `takegaharawork`）の表示を確認。デフォルトリージョンは `ap-northeast-1`
 
-- [ ] **0-2** AWS CDK CLI のインストール
+- [x] **0-2** AWS CDK CLI のインストール
   - 確認: `cdk --version` でバージョンが表示される
-  - 備考:
+  - 備考: 2026-07-12 実施。AWS CDK CLI v2.1034.0 が既にグローバルインストール済み（`/usr/bin/cdk`、Node.js v22.22.1 / npm 10.9.4）だったため新規作業なし。`cdk --version` でバージョン表示を確認
 
 - [ ] **0-3** CDK Bootstrap（初回のみ）
   - 確認: `cdk bootstrap aws://ACCOUNT/REGION` が成功する
