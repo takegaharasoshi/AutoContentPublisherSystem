@@ -102,6 +102,16 @@ AutoContentPublisherSystem/
 - 型ヒントを使用する
 - docstring は Google スタイルを使用する
 
+## Codex 連携（実装ワーカー）
+
+Claude のトークン消費を抑えるため、まとまったコード生成は Codex CLI に委譲する（MCP サーバー `codex` として `.mcp.json` に登録済み）。
+
+- **委譲する**: 仕様が確定していて自己完結した実装タスク（新規モジュール・関数の実装、テスト雛形、定型的なボイラープレート。Python / CDK TypeScript とも）。`mcp__codex__codex` ツールで実行し、Claude 自身はコードを書かない
+- **Claude が行う**: タスク分解と指示書作成、設計判断、設計書（`docs/`）の作成・更新、成果物のレビュー、数行で済む小修正（委譲のオーバーヘッドの方が大きいもの）、git コミット
+- 委譲時のパラメータ: `sandbox: workspace-write`、`cwd` はリポジトリルート。同じタスクへの追加指示は `codex-reply`（threadId 指定）で同一セッションに出す
+- プロジェクト規約は `AGENTS.md` に記載済みで Codex が自動で読む。指示文には規約を重複記載せず、タスク固有の要件（対象ファイル・仕様・完了条件）のみ書く
+- Codex の成果物は Claude がレビューし、設計書との整合・規約準拠を確認してから完了とする
+
 ## 開発上の注意事項
 
 - Aurora Serverless v2 の自動一時停止を利用するため、Step Functions ワークフローの最初のステートとして DB 準備確認 ECS タスクを実行する（FoundationStack で定義）。バッチアプリケーション（ECS タスク）は DB が利用可能な状態を前提とする

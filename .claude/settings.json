@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:zenn.dev)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:developers.openai.com)",
+      "WebFetch(domain:learn.chatgpt.com)",
+      "WebFetch(domain:codex.danielvaughan.com)",
+      "Bash(codex --version)",
+      "Read(//home/takegaharawork/.codex/**)",
+      "mcp__codex"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "codex"
+  ],
+  "env": {
+    "MCP_TOOL_TIMEOUT": "1200000"
+  }
+}

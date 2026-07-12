@@ -1,25 +1,39 @@
-# Repository Guidelines
+# AGENTS.md
 
-## Project Structure & Module Organization
-現時点の SSOT は `docs/` です。`docs/overview/` は概要、`docs/design/` は論理設計、`docs/specs/` は実装仕様を扱います。作業前に `docs/document-guide.md` で参照先を確認し、進行状況は `docs/development-plan.md` を見ます。`plans/` は作業メモ用です。`infra/`、`services/image-batch/`、`services/sns-post-batch/`、`shared/` は今後追加される前提です。
+Codex（実装ワーカー）向けのプロジェクト規約。全体像は `CLAUDE.md` と `docs/` の設計書を参照。
 
-## Build, Test, and Development Commands
-このリポジトリは現在ドキュメント中心です。コード追加後は以下を基本コマンドとします。
+## プロジェクト概要
 
-- `git diff -- docs/`: 設計書の差分確認
-- `cd infra && cdk diff <StackName>`: インフラ差分の確認
-- `cd infra && cdk deploy <StackName>`: 手動デプロイ
-- `cd services/<service> && pytest`: Python テスト実行
-- `docker build -t <service-name> services/<service>`: バッチのローカル確認
+AutoContentPublisherSystem — AWS 上で動作する画像生成・SNS 自動投稿バッチシステム。
+モノリポジトリ構成。サービスごとにコンテナイメージ・CDK スタック・CI/CD を分離する。
 
-## Coding Style & Naming Conventions
-ドキュメント、コミットメッセージ、PR 説明は日本語で統一します。見出しは短くし、重複説明より参照リンクを優先してください。Python は PEP 8、型ヒント、Google スタイル docstring を採用します。CDK の命名は設計書に合わせ、`FoundationStack`、`ImageBatchStack`、`SnsPostBatchStack` のように役割が分かる名前にします。
+## リポジトリ構成
 
-## Testing Guidelines
-現時点でカバレッジ基準は未設定です。ドキュメント変更では、関連する L0/L1/L2 の整合性と SSOT の更新漏れを確認してください。コード追加時は `services/<service>/tests/` に `pytest` ベースのテストを置き、共通処理から先に検証します。インフラ変更では `cdk diff`、Docker 動作確認、必要に応じて AWS Console での確認を実施します。
+- `infra/` — AWS CDK プロジェクト（TypeScript）
+- `services/db-readiness-check/` — DB 準備確認バッチ（Python）
+- `services/image-batch/` — 画像生成バッチ（Python）
+- `services/sns-post-batch/` — SNS 投稿バッチ（Python）
+- `shared/` — サービス間共通ライブラリ（Python）
+- `database/` — DDL ファイル（スキーマ管理）
+- `docs/` — 設計書（HTML）。**編集禁止**（Claude / ユーザーが管理する。旧 Markdown 設計書は `docs/_archive/` にあり現役ではない）
 
-## Commit & Pull Request Guidelines
-コミットメッセージは履歴に合わせて簡潔な日本語で記述します。例: `設計書の参照先を整理`。通常の作業ブランチは `feature/*` を使用してください。PR には対象範囲、影響するドキュメントやスタック、実施した確認内容を記載し、Step Functions や Scheduler に影響する変更ではログや画面確認結果も添えてください。
+## 技術スタック
 
-## Security & Configuration Tips
-シークレットや環境固有値はコミットしません。認証情報は `docs/design/security.md` の規約に従い、Secrets Manager に `acps/{env}/{set_code}/...` 形式で管理します。現在の既定環境名は `prod` です。
+- 言語: Python（バッチ処理）、AWS CDK は TypeScript
+- DB: Aurora Serverless v2（MySQL 互換）
+- 実行基盤: ECS Fargate RunTask（ECS Service は使用しない）
+- ワークフロー: Step Functions Standard、スケジューラ: EventBridge Scheduler
+- 既定の環境名は `prod`（CDK コマンドは `-c env=prod` を付ける）
+
+## コーディング規約
+
+- Python コードは PEP 8 に準拠し、型ヒントを使用する。docstring は Google スタイル
+- CDK の命名は設計書（`docs/infra/stacks.html`）に合わせる（例: `FoundationStack`, `ImageBatchStack`, `SnsPostBatchStack`）
+- テストは `services/<service>/tests/` に置き、`pytest` で実行する
+
+## 作業ルール
+
+- 指示されたタスクの範囲だけを実装する。関係ないファイルは変更しない
+- `docs/` 配下・`CLAUDE.md`・`.claude/` は変更しない
+- git commit は指示された場合のみ行い、コミットメッセージは簡潔な日本語で書く（例: `設計書の参照先を整理`）
+- シークレットや環境固有値はコミットしない。認証・秘密情報の規約は `docs/infra/security.html` に従う（Secrets Manager で管理）
