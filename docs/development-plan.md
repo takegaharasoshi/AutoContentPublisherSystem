@@ -143,9 +143,10 @@
 >
 > **保持必須資材（誤削除禁止）**: `CDKToolkit` スタック、`cdk-hnb659fds-*` の S3 バケット / ECR リポジトリ（CDK Bootstrap 一式。0-3 で確認済み）、IAM ユーザー `takegaharawork` と認証情報、デフォルト VPC、アカウント既定のリソース
 
-- [ ] **0.5-1** 残存資材の棚卸し（全リージョン + グローバル）
+- [x] **0.5-1** 残存資材の棚卸し（全リージョン + グローバル）
   - 確認: 全リージョンのスキャン結果が「保持 / 削除候補 / 要判断」に分類された棚卸しリストとして提示されている
   - 備考: Resource Groups Tagging API による全リージョン横断スキャン + 主要サービスの個別列挙（CloudFormation / S3 / Lambda / ECR / ECS / RDS / DynamoDB / EC2(インスタンス・EIP・EBS・非デフォルト VPC・SG) / API Gateway / CloudWatch Logs / EventBridge / Step Functions / SNS / SQS / Secrets Manager / Cloud9 / CodePipeline / CodeBuild）、グローバルサービス（IAM ロール・ポリシー・ユーザー / CloudFront / Route 53 / ACM）も確認する。Lambda に紐づく IAM ロール・CloudWatch Logs ロググループ・API Gateway などの付随資材も洗い出す。棚卸しリスト・スキャンスクリプトは作業ファイルとして扱いリポジトリにはコミットしない（記録は本ファイルの備考に残す）
+  - 実施記録: 2026-07-12 実施。全 17 リージョン + グローバル（IAM / S3 / CloudFront / Route 53）をスキャンし、**資材が存在するのは ap-northeast-1 のみ**（他 16 リージョンは空。us-east-1 の payment-instrument は支払い手段でリソースではない）。分類結果 — **保持**: CDK Bootstrap 一式（CDKToolkit スタック・S3・ECR・IAM ロール ×5・SSM パラメータ）、IAM ユーザー、デフォルト VPC、サービスリンクロール ×7。**削除候補**: (A) Cloud9 実験一式（スタック `aws-cloud9-test-8401aa...` ※配下 EC2 は終了済みで SG のみ残存・環境・IAM ロール/インスタンスプロファイル）、(B) 2024-07 の Lambda 実験一式（関数 ×4: HelloWorldFunction / gptTest / CustomRuntimes / bash-runtime、ロググループ ×4、IAM ロール ×10、ポリシー ×8）、(C) CI/CD 実験 MyLambdaPipeline 一式（CodePipeline / CodeBuild / EventBridge ルール / ロググループ / IAM ロール ×3・ポリシー ×3）、(D) 旧バッチシステム残骸（空の S3 `pipelinestack-batchsystempipeline...`、ComputeStack 系ロググループ ×5、SFN 自動作成ルール `StepFunctionsGetEventsForECSTaskRule`）、(E) SG `launch-wizard-1`。**要判断**: 旧 graphicanews / Meta アプリ関連一式（S3 `graphica-news-privacy-policy`（privacy.htm 1 件）、Secret `/graphicanews/facebook/credentials`、Lambda + API Gateway `instagram-oauth-callback`（エンドポイント `https://0bd2at3gal.execute-api.ap-northeast-1.amazonaws.com`）、付随ロググループ・IAM ロール・ポリシー `SecretsManagerGetSecretValue`）
 
 - [ ] **0.5-2** ユーザー確認・削除対象の確定
   - 確認: 棚卸しリストの全項目について「残す / 消す」をユーザーが判定し、削除対象が確定している
