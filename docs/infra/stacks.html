@@ -90,7 +90,7 @@
 <div class="warn">
   <span class="callout-title">CDK 実装時の注意</span>
   <ul>
-    <li>CDK はデフォルトで全アウトバウンドを許可する Security Group を作成する。Aurora 用 SG では <code>allowAllOutbound: false</code> を明示的に指定してアウトバウンドルールを削除すること</li>
+    <li>CDK はデフォルトで全アウトバウンドを許可する Security Group を作成する。上表の 3 つの SG はいずれもアウトバウンドを限定するため、<strong>3 つとも</strong> <code>allowAllOutbound: false</code> を明示的に指定し、必要な Egress ルールのみを個別に追加すること（Aurora 用 SG は Egress ルールを追加しない。この場合 CDK が <code>255.255.255.255/32</code> 宛 ICMP の「Disallow all traffic」ダミー拒否ルールを挿入するが、実質アウトバウンド通信なしを意味する仕様であり問題ない）</li>
     <li><code>ec2.Vpc</code> のデフォルト構成は Private Subnet + NAT Gateway を含むため、<code>natGateways: 0</code> と <code>subnetConfiguration</code>（<code>PUBLIC</code> と <code>PRIVATE_ISOLATED</code> のみ）を明示しないと意図しない NAT Gateway が作成され課金が発生する</li>
     <li>Aurora Serverless v2 の <code>enableDataApi: true</code> を有効化していない場合、AWS Console の Query Editor からの DDL 実行・データ確認ができない（開発計画 Phase 6 の検証ステップで使用するため有効化必須）</li>
     <li>Aurora の <code>serverlessV2MaxCapacity</code> を未指定にするとデフォルト値（リージョンによる）まで自動スケールしてコスト事故の要因となるため、必ず上限値を指定する</li>

@@ -17,6 +17,12 @@ export class FoundationStack extends cdk.Stack {
   public readonly vpc: ec2.Vpc;
   /** 生成画像を保存する共有 S3 バケット。後続の ImageBatchStack / SnsPostBatchStack から参照される */
   public readonly imagesBucket: s3.Bucket;
+  /** ECS Fargate バッチ共通の Security Group。後続の ImageBatchStack / SnsPostBatchStack から参照される */
+  public readonly batchSecurityGroup: ec2.SecurityGroup;
+  /** DB 準備確認 ECS タスク用の Security Group。後続の ImageBatchStack / SnsPostBatchStack から参照される */
+  public readonly dbReadinessCheckSecurityGroup: ec2.SecurityGroup;
+  /** Aurora Serverless v2 用の Security Group。Phase 3-1 の Aurora 作成時に同一スタック内で参照される */
+  public readonly auroraSecurityGroup: ec2.SecurityGroup;
 
   constructor(scope: Construct, id: string, props: FoundationStackProps) {
     super(scope, id, props);
@@ -45,5 +51,50 @@ export class FoundationStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
+
+    this.batchSecurityGroup = new ec2.SecurityGroup(this, 'BatchSecurityGroup', {
+      vpc: this.vpc,
+      description: 'Security group for ECS Fargate batch tasks',
+      allowAllOutbound: false,
+    });
+
+    this.dbReadinessCheckSecurityGroup = new ec2.SecurityGroup(
+      this,
+      'DbReadinessCheckSecurityGroup',
+      {
+        vpc: this.vpc,
+        description: 'Security group for DB readiness check ECS tasks',
+        allowAllOutbound: false,
+      },
+    );
+
+    this.auroraSecurityGroup = new ec2.SecurityGroup(this, 'AuroraSecurityGroup', {
+      vpc: this.vpc,
+      description: 'Security group for Aurora Serverless v2',
+      allowAllOutbound: false,
+    });
+
+    const batchSecurityGroups = [
+      this.batchSecurityGroup,
+      this.dbReadinessCheckSecurityGroup,
+    ];
+
+    for (const securityGroup of batchSecurityGroups) {
+      securityGroup.addEgressRule(
+        ec2.Peer.anyIpv4(),
+        ec2.Port.tcp(443),
+        'Allow HTTPS access to external services',
+      );
+      securityGroup.addEgressRule(
+        this.auroraSecurityGroup,
+        ec2.Port.tcp(3306),
+        'Allow MySQL access to Aurora',
+      );
+      this.auroraSecurityGroup.addIngressRule(
+        securityGroup,
+        ec2.Port.tcp(3306),
+        'Allow MySQL access from ECS tasks',
+      );
+    }
   }
 }

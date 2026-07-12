@@ -108,3 +108,132 @@ describe('FoundationStack の画像保存用 S3 バケット', () => {
     });
   });
 });
+
+describe('FoundationStack の Security Group', () => {
+  const app = new cdk.App();
+  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const template = Template.fromStack(stack);
+
+  test('Security Group が 3 つ作成される', () => {
+    template.resourceCountIs('AWS::EC2::SecurityGroup', 3);
+  });
+
+  test('バッチ共通 SG・DB 準備確認 SG は Ingress なしで必要な Egress のみを持つ', () => {
+    const securityGroups = template.findResources('AWS::EC2::SecurityGroup');
+    const findSecurityGroup = (description: string): [string, any] => {
+      const securityGroup = Object.entries(securityGroups).find(
+        ([, resource]) => resource.Properties.GroupDescription === description,
+      );
+
+      if (!securityGroup) {
+        throw new Error(`Security Group not found: ${description}`);
+      }
+
+      return securityGroup;
+    };
+    const [batchSecurityGroupId, batchSecurityGroup] = findSecurityGroup(
+      'Security group for ECS Fargate batch tasks',
+    );
+    const [dbReadinessCheckSecurityGroupId, dbReadinessCheckSecurityGroup] =
+      findSecurityGroup('Security group for DB readiness check ECS tasks');
+    const [auroraSecurityGroupId] = findSecurityGroup(
+      'Security group for Aurora Serverless v2',
+    );
+    const httpsEgressRule = {
+      CidrIp: '0.0.0.0/0',
+      Description: 'Allow HTTPS access to external services',
+      FromPort: 443,
+      IpProtocol: 'tcp',
+      ToPort: 443,
+    };
+
+    expect(batchSecurityGroup.Properties.SecurityGroupIngress).toBeUndefined();
+    expect(batchSecurityGroup.Properties.SecurityGroupEgress).toEqual([httpsEgressRule]);
+    expect(dbReadinessCheckSecurityGroup.Properties.SecurityGroupIngress).toBeUndefined();
+    expect(dbReadinessCheckSecurityGroup.Properties.SecurityGroupEgress).toEqual([
+      httpsEgressRule,
+    ]);
+
+    template.resourceCountIs('AWS::EC2::SecurityGroupEgress', 2);
+    const egressRules = Object.values(
+      template.findResources('AWS::EC2::SecurityGroupEgress'),
+    );
+    for (const sourceSecurityGroupId of [
+      batchSecurityGroupId,
+      dbReadinessCheckSecurityGroupId,
+    ]) {
+      expect(egressRules).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            Properties: expect.objectContaining({
+              DestinationSecurityGroupId: {
+                'Fn::GetAtt': [auroraSecurityGroupId, 'GroupId'],
+              },
+              FromPort: 3306,
+              GroupId: { 'Fn::GetAtt': [sourceSecurityGroupId, 'GroupId'] },
+              IpProtocol: 'tcp',
+              ToPort: 3306,
+            }),
+          }),
+        ]),
+      );
+    }
+  });
+
+  test('Aurora SG はバッチ SG 2 つからの MySQL Ingress とダミー Egress のみを持つ', () => {
+    const securityGroups = template.findResources('AWS::EC2::SecurityGroup');
+    const findSecurityGroup = (description: string): [string, any] => {
+      const securityGroup = Object.entries(securityGroups).find(
+        ([, resource]) => resource.Properties.GroupDescription === description,
+      );
+
+      if (!securityGroup) {
+        throw new Error(`Security Group not found: ${description}`);
+      }
+
+      return securityGroup;
+    };
+    const [batchSecurityGroupId] = findSecurityGroup(
+      'Security group for ECS Fargate batch tasks',
+    );
+    const [dbReadinessCheckSecurityGroupId] = findSecurityGroup(
+      'Security group for DB readiness check ECS tasks',
+    );
+    const [auroraSecurityGroupId, auroraSecurityGroup] = findSecurityGroup(
+      'Security group for Aurora Serverless v2',
+    );
+
+    expect(auroraSecurityGroup.Properties.SecurityGroupIngress).toBeUndefined();
+    expect(auroraSecurityGroup.Properties.SecurityGroupEgress).toEqual([
+      expect.objectContaining({
+        CidrIp: '255.255.255.255/32',
+        Description: 'Disallow all traffic',
+      }),
+    ]);
+
+    template.resourceCountIs('AWS::EC2::SecurityGroupIngress', 2);
+    const ingressRules = Object.values(
+      template.findResources('AWS::EC2::SecurityGroupIngress'),
+    );
+    for (const sourceSecurityGroupId of [
+      batchSecurityGroupId,
+      dbReadinessCheckSecurityGroupId,
+    ]) {
+      expect(ingressRules).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            Properties: expect.objectContaining({
+              FromPort: 3306,
+              GroupId: { 'Fn::GetAtt': [auroraSecurityGroupId, 'GroupId'] },
+              IpProtocol: 'tcp',
+              SourceSecurityGroupId: {
+                'Fn::GetAtt': [sourceSecurityGroupId, 'GroupId'],
+              },
+              ToPort: 3306,
+            }),
+          }),
+        ]),
+      );
+    }
+  });
+});

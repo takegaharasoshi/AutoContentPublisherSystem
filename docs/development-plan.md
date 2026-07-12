@@ -199,9 +199,9 @@
   - 確認: コンソールでバケットが見える、`aws s3 cp` でファイルアップロードできる
   - 備考: 2026-07-13 実施。FoundationStack に画像保存用バケット `acps-prod-images-516964473143`（`acps-{env}-images-{アカウントID}` を明示指定）を追加。設定は設計書どおり: ライフサイクル 30 日で全オブジェクト自動削除（stacks.html 3.1）、Block Public Access 全項目有効・SSE-S3 暗号化・SSL 強制ポリシー（security.html 3）。後続スタック参照用に `public readonly imagesBucket` として公開し、`FoundationStackProps.envName` を新設（bin/infra.ts から Context `env` を受け渡し）。**設計書に記載がなかった RemovalPolicy はユーザー判断で DESTROY + `autoDeleteObjects: true`（destroy 時に中身ごと削除）に確定**し、stacks.html 3.1 に decision コールアウトで記録（画像は 30 日で自動削除される使い捨てデータ・正式記録は DB のため）。これによりオブジェクト自動削除用 Lambda カスタムリソースが 1 つ増える（デフォルト SG 用と同様、destroy 後にロググループが残る点も同じ。1-5 の備考を参照）。cicd.html 5 のバケット名サフィックスの文言も実装（アカウント ID 明示指定）に合わせて修正。実装は Codex に委譲し Claude がレビュー（Codex 連携の初適用）。検証: `npm run build` / `npm test`（S3 テスト 6 件追加、計 10 件）成功、`cdk diff` で追加差分が S3 関連のみ（VPC 変更なし）を確認のうえデプロイ（約 50 秒で `UPDATE_COMPLETE`）。AWS CLI でライフサイクル・公開ブロック・暗号化・SSL 強制ポリシーの全設定を確認し、`aws s3 cp` でアップロード → ダウンロード → 内容一致 → 削除の疎通確認済み（バケットは空に戻した）。コンソールでの目視確認はユーザーが実施
 
-- [ ] **2-2** Security Group を追加
+- [x] **2-2** Security Group を追加
   - 確認: コンソールで SG が見える
-  - 備考: ルール詳細は [docs/infra/stacks.html](infra/stacks.html) セクション 3.1 を参照
+  - 備考: 2026-07-13 実施。FoundationStack に SG 3 つ（バッチ共通・DB 準備確認用・Aurora 用）を stacks.html 3.1 のルール表どおり追加。Aurora 本体は Phase 3-1 作成だが、SG ルールが相互参照（バッチ側 Egress 3306 → Aurora SG / Aurora 側 Ingress 3306 ← バッチ SG ×2）のため 3 つ同時に作成した。3 つとも `allowAllOutbound: false` を指定（ルール表を満たすには Aurora 用以外も必須のため、stacks.html の warn の文言を「3 つとも指定」に修正）。後続スタック参照用に `batchSecurityGroup` / `dbReadinessCheckSecurityGroup`、Phase 3-1 の Aurora 用に `auroraSecurityGroup` を `public readonly` で公開。SG 名は命名規約表（cicd.html 9.2）の対象外のため明示指定せず CFN 自動命名、用途は英語 description で識別（SG の description は ASCII のみ許可）。実装は Codex に委譲し Claude がレビュー（JSDoc の参照元記載とテストの冗長箇所を小修正）。検証: `npm run build` / `npm test`（SG テスト 3 件追加、計 13 件）成功、`cdk diff` が SG 3 + Egress 2 + Ingress 2 の追加のみ（既存リソース変更なし）を確認のうえデプロイ。AWS CLI で 3 SG のルールが設計表と一致することを確認済み（バッチ共通・DB 準備確認用: Inbound なし / Outbound 443 → 0.0.0.0/0 と 3306 → Aurora SG のみ。Aurora 用: Inbound 3306 ← 両 SG / Outbound は CDK 仕様のダミー拒否ルール `255.255.255.255/32` ICMP のみ＝実質通信なし。コンソールでもこのダミールールが見えるが問題ない）。コンソールでの目視確認はユーザーが実施
 
 - [ ] **2-3** Secrets Manager（画像生成 API キーの箱）を追加
   - 確認: コンソールで `acps/prod/image/api-key` のシークレットが見える
