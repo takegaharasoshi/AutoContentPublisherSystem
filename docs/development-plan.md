@@ -195,9 +195,9 @@
 
 **ゴール**: Aurora・DB 準備確認以外の共通基盤リソースを構築する
 
-- [ ] **2-1** S3 バケットを追加
+- [x] **2-1** S3 バケットを追加
   - 確認: コンソールでバケットが見える、`aws s3 cp` でファイルアップロードできる
-  - 備考:
+  - 備考: 2026-07-13 実施。FoundationStack に画像保存用バケット `acps-prod-images-516964473143`（`acps-{env}-images-{アカウントID}` を明示指定）を追加。設定は設計書どおり: ライフサイクル 30 日で全オブジェクト自動削除（stacks.html 3.1）、Block Public Access 全項目有効・SSE-S3 暗号化・SSL 強制ポリシー（security.html 3）。後続スタック参照用に `public readonly imagesBucket` として公開し、`FoundationStackProps.envName` を新設（bin/infra.ts から Context `env` を受け渡し）。**設計書に記載がなかった RemovalPolicy はユーザー判断で DESTROY + `autoDeleteObjects: true`（destroy 時に中身ごと削除）に確定**し、stacks.html 3.1 に decision コールアウトで記録（画像は 30 日で自動削除される使い捨てデータ・正式記録は DB のため）。これによりオブジェクト自動削除用 Lambda カスタムリソースが 1 つ増える（デフォルト SG 用と同様、destroy 後にロググループが残る点も同じ。1-5 の備考を参照）。cicd.html 5 のバケット名サフィックスの文言も実装（アカウント ID 明示指定）に合わせて修正。実装は Codex に委譲し Claude がレビュー（Codex 連携の初適用）。検証: `npm run build` / `npm test`（S3 テスト 6 件追加、計 10 件）成功、`cdk diff` で追加差分が S3 関連のみ（VPC 変更なし）を確認のうえデプロイ（約 50 秒で `UPDATE_COMPLETE`）。AWS CLI でライフサイクル・公開ブロック・暗号化・SSL 強制ポリシーの全設定を確認し、`aws s3 cp` でアップロード → ダウンロード → 内容一致 → 削除の疎通確認済み（バケットは空に戻した）。コンソールでの目視確認はユーザーが実施
 
 - [ ] **2-2** Security Group を追加
   - 確認: コンソールで SG が見える

@@ -19,6 +19,7 @@ if (typeof envName !== 'string' || !SUPPORTED_ENVS.includes(envName)) {
 const stackNamePrefix = envName.charAt(0).toUpperCase() + envName.slice(1);
 
 new FoundationStack(app, 'FoundationStack', {
+  envName,
   stackName: `${stackNamePrefix}-FoundationStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });

@@ -285,7 +285,7 @@ cdk deploy -c env=prod MonitoringStack</code></pre>
   <li>CDK Context パラメータ（<code>-c env=prod</code>）で環境名を渡し、リソース名に反映する</li>
   <li>現時点の単一環境でも <code>env=prod</code> を付与して運用し、Secret 名・IAM スコープ・スタック名に反映する</li>
   <li>ECS Task Definition には <code>ENV_NAME</code> を環境変数として注入し、アプリケーションが Secret 名を導出できるようにする</li>
-  <li>S3 バケット名はグローバルに一意である必要がある。CDK がバケット名に一意のサフィックスを自動付与するため、上表の例（<code>acps-prod-images</code>）は論理名であり、実際のバケット名は <code>acps-prod-images-xxxxxxxxxxxx</code> のような形式になる</li>
+  <li>S3 バケット名はグローバルに一意である必要がある。グローバル一意化のため CDK でアカウント ID をサフィックスとして明示指定しており、上表の例（<code>acps-prod-images</code>）は論理名で、実際のバケット名は <code>acps-{env}-images-{アカウント ID}</code>（例: <code>acps-prod-images-123456789012</code>）の形式になる</li>
 </ul>
 
 <div class="note">
