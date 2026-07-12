@@ -135,6 +135,32 @@
 
 ---
 
+## Phase 0.5: AWS アカウントのクリーンアップ
+
+**ゴール**: 過去の実験・旧プロジェクトの残存資材を棚卸しし、ユーザー確認のうえ AWS アカウントから完全に削除して、Phase 1 以降の構築をきれいな状態から始める
+
+> 2026-07-12、Phase 1 着手前に AWS アカウント上のごみ資材（過去の実験・旧プロジェクトの残存物）を整理する方針とし、本フェーズを追加した。事前スキャン（ap-northeast-1 のみの簡易確認）で、古い Cloud9 スタック・オーファン S3 バケット 2 つ・Lambda 関数 5 つ・旧 graphicanews プロジェクトの Secret などの削除候補を確認済み。
+>
+> **保持必須資材（誤削除禁止）**: `CDKToolkit` スタック、`cdk-hnb659fds-*` の S3 バケット / ECR リポジトリ（CDK Bootstrap 一式。0-3 で確認済み）、IAM ユーザー `takegaharawork` と認証情報、デフォルト VPC、アカウント既定のリソース
+
+- [ ] **0.5-1** 残存資材の棚卸し（全リージョン + グローバル）
+  - 確認: 全リージョンのスキャン結果が「保持 / 削除候補 / 要判断」に分類された棚卸しリストとして提示されている
+  - 備考: Resource Groups Tagging API による全リージョン横断スキャン + 主要サービスの個別列挙（CloudFormation / S3 / Lambda / ECR / ECS / RDS / DynamoDB / EC2(インスタンス・EIP・EBS・非デフォルト VPC・SG) / API Gateway / CloudWatch Logs / EventBridge / Step Functions / SNS / SQS / Secrets Manager / Cloud9 / CodePipeline / CodeBuild）、グローバルサービス（IAM ロール・ポリシー・ユーザー / CloudFront / Route 53 / ACM）も確認する。Lambda に紐づく IAM ロール・CloudWatch Logs ロググループ・API Gateway などの付随資材も洗い出す。棚卸しリスト・スキャンスクリプトは作業ファイルとして扱いリポジトリにはコミットしない（記録は本ファイルの備考に残す）
+
+- [ ] **0.5-2** ユーザー確認・削除対象の確定
+  - 確認: 棚卸しリストの全項目について「残す / 消す」をユーザーが判定し、削除対象が確定している
+  - 備考: 特に旧 graphicanews 関連（S3 `graphica-news-privacy-policy` / Secret `/graphicanews/facebook/credentials` / Lambda `instagram-oauth-callback`）は、Meta アプリ登録（プライバシーポリシー URL 等）から参照されている可能性があるため要判断。本プロジェクトで同じ Meta アプリを再利用する場合は影響を確認してから判断する
+
+- [ ] **0.5-3** 削除の実行（Claude Code が AWS CLI で実行）
+  - 確認: 承認済みの削除対象がすべて削除されている（各削除コマンドの成功を確認）
+  - 備考: 削除順序: (1) CloudFormation スタック（スタック管理下の資材はスタック削除に任せる） (2) オーファン資材の個別削除。S3 はバージョン・削除マーカー含め空にしてからバケット削除、Secret は `--force-delete-without-recovery` で即時完全削除、Lambda は付随する IAM ロール・ロググループも削除。実行した削除の記録（対象と結果）を本備考に残す
+
+- [ ] **0.5-4** 削除後の確認（再スキャン）
+  - 確認: 0.5-1 と同じスキャンを再実行し、保持対象以外が残っていないこと。ユーザーがコンソール・請求画面でも最終確認
+  - 備考: DELETE_FAILED やライフサイクル待ちなど削除しきれないものがあれば原因と対応を記録する
+
+---
+
 ## Phase 1: CDK プロジェクト初期化 + VPC デプロイ
 
 **ゴール**: CDK で最小のリソース（VPC）を AWS に作れることを確認する
