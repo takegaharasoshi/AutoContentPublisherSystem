@@ -181,9 +181,9 @@
   - 確認: `cdk deploy -c env=prod FoundationStack` 成功
   - 備考: 2026-07-13 実施。デプロイ前確認（`npm run build` / `npm test` / `cdk diff` が全リソース追加のみ・NAT Gateway なし）のうえ `cdk deploy -c env=prod FoundationStack --require-approval never` を実行し、約 65 秒で `CREATE_COMPLETE`。AWS CLI 検証: VPC `vpc-008cb8f0be9c708dc`（10.0.0.0/16・available）、サブネット 4 つ（Public ×2: 10.0.0.0/18@1a・10.0.64.0/18@1c＝パブリック IP 自動割当あり / Isolated ×2: 10.0.128.0/18@1a・10.0.192.0/18@1c）、IGW `igw-060cc53f7b862cb66` アタッチ済み、**NAT Gateway ゼロ**、デフォルト SG はカスタムリソースによりインバウンド・アウトバウンドとも空を確認。コンソールでの目視確認は 1-4 で実施
 
-- [ ] **1-4** AWS コンソールで VPC を確認
+- [x] **1-4** AWS コンソールで VPC を確認
   - 確認: VPC、Public Subnet x2（各 AZ）、Isolated Subnet x2（各 AZ）が作成されている（NAT Gateway がないことを確認）
-  - 備考: スタックに VPC 関連以外の Lambda 関数が 1 つ含まれるのは想定どおり（デフォルト SG のルール除去用カスタムリソース。1-2 の備考を参照）
+  - 備考: スタックに VPC 関連以外の Lambda 関数が 1 つ含まれるのは想定どおり（デフォルト SG のルール除去用カスタムリソース。1-2 の備考を参照）。2026-07-13 ユーザーがコンソールで確認完了
 
 - [ ] **1-5** 削除して再作成できることを確認
   - 確認: `cdk destroy -c env=prod FoundationStack` → `cdk deploy -c env=prod FoundationStack` が通る
