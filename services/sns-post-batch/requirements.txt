@@ -1,0 +1,1 @@
+# 現時点で実行時依存なし（Phase 4 空回し用 Hello World）

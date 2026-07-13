@@ -243,9 +243,9 @@
 
 **ゴール**: SnsPostBatchStack でパイプラインが動くことを確認する（業務ロジックなし）
 
-- [ ] **4-1** `services/sns-post-batch/` に Hello World の Python + Dockerfile を作成
+- [x] **4-1** `services/sns-post-batch/` に Hello World の Python + Dockerfile を作成
   - 確認: `docker build` & `docker run` でローカル動作確認
-  - 備考:
+  - 備考: 2026-07-13 実施: 3-2 で確立した db-readiness-check の雛形（`app/` パッケージ / `tests/` / requirements・requirements-dev 分離 / `python -m app` 起動 / python:3.12-slim・非 root uid 1001 の Dockerfile）をそのまま踏襲し、`main()` が「Hello World from sns-post-batch」を INFO ログ出力して 0 を返すだけの空回し用一式を作成。**環境変数は一切読まない**（workflow.html 5.2 の契約変数は「空回し段階ではコンテナ側で使用しない」と明記済みのため、必須チェックも置かず未設定でも成功する）。requirements.txt は実行時依存なし（コメントのみの空ファイル。pip は空ファイルを許容するため Dockerfile 構造は雛形どおり維持）。実装は Codex に委譲し Claude がレビュー（`.dockerignore` に Dockerfile / .dockerignore 自身の除外行を追記する小修正のみ。Codex サンドボックスのネットワーク制限で pytest 未実行だったため Claude 側で実行）。検証: pytest 2 件成功（exit code 0 / ログに Hello World）、`docker build` 成功、`docker run` で「Hello World from sns-post-batch」ログ + exit code 0 + `uid=1001(appuser)` の非 root 実行を確認。ECR push は 4-2 で実施（README に手順追記予定）
 
 - [ ] **4-2** ECR リポジトリ（Phase 2-5 で作成済み）に手動で Docker イメージを push
   - 確認: ECR コンソールでイメージが見える
