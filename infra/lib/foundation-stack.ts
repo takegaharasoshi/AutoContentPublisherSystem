@@ -2,6 +2,8 @@ import * as cdk from 'aws-cdk-lib/core';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
@@ -39,9 +41,24 @@ export class FoundationStack extends cdk.Stack {
   public readonly snsPostBatchRepository: ecr.Repository;
   /** DB 準備確認バッチのコンテナイメージ用 ECR リポジトリ。Phase 3-3 で同一スタック内から参照される */
   public readonly dbReadinessCheckRepository: ecr.Repository;
+  /** DB 準備確認タスク定義。Phase 5・6 で ImageBatchStack / SnsPostBatchStack の Step Functions から family 名で参照される */
+  public readonly dbReadinessCheckTaskDefinition: ecs.FargateTaskDefinition;
 
   constructor(scope: Construct, id: string, props: FoundationStackProps) {
     super(scope, id, props);
+
+    const contextImageTag = this.node.tryGetContext('dbReadinessCheckImageTag');
+    const hasDbReadinessCheckImageTag =
+      typeof contextImageTag === 'string' && contextImageTag.trim().length > 0;
+    const dbReadinessCheckImageTag =
+      hasDbReadinessCheckImageTag ? contextImageTag.trim() : 'MISSING';
+
+    if (!hasDbReadinessCheckImageTag) {
+      // CDK はデプロイ対象外のスタックも synth するため、throw すると他スタックのデプロイも失敗する。
+      cdk.Annotations.of(this).addError(
+        '-c dbReadinessCheckImageTag=<tag> の指定が必要です。',
+      );
+    }
 
     // NAT Gateway は使用しない（ECS Fargate はパブリック IP で外部 API にアクセスする。
     // docs/infra/architecture.html セクション 2.1）
@@ -198,6 +215,63 @@ export class FoundationStack extends cdk.Stack {
     this.vpc.addGatewayEndpoint('S3GatewayEndpoint', {
       service: ec2.GatewayVpcEndpointAwsService.S3,
       subnets: [{ subnetType: ec2.SubnetType.PUBLIC }],
+    });
+
+    const dbReadinessCheckTaskRole = new iam.Role(this, 'DbReadinessCheckTaskRole', {
+      assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+      inlinePolicies: {
+        ReadDbSecret: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              actions: ['secretsmanager:GetSecretValue'],
+              resources: [
+                `arn:aws:secretsmanager:${this.region}:${this.account}:secret:acps/${props.envName}/db/*`,
+              ],
+            }),
+          ],
+        }),
+      },
+    });
+
+    const dbReadinessCheckLogGroup = new logs.LogGroup(
+      this,
+      'DbReadinessCheckLogGroup',
+      {
+        retention: logs.RetentionDays.THREE_MONTHS,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      },
+    );
+
+    const dbSecretArn = this.auroraCluster.secret?.secretArn;
+    if (!dbSecretArn) {
+      throw new Error('Aurora クラスターの認証情報 Secret が見つかりません。');
+    }
+
+    this.dbReadinessCheckTaskDefinition = new ecs.FargateTaskDefinition(
+      this,
+      'DbReadinessCheckTaskDefinition',
+      {
+        family: `acps-${props.envName}-db-readiness-check`,
+        cpu: 256,
+        memoryLimitMiB: 512,
+        taskRole: dbReadinessCheckTaskRole,
+      },
+    );
+
+    this.dbReadinessCheckTaskDefinition.addContainer('DbReadinessCheckContainer', {
+      containerName: 'db-readiness-check',
+      image: ecs.ContainerImage.fromEcrRepository(
+        this.dbReadinessCheckRepository,
+        dbReadinessCheckImageTag,
+      ),
+      environment: {
+        DB_SECRET_ARN: dbSecretArn,
+        ENV_NAME: props.envName,
+      },
+      logging: ecs.LogDrivers.awsLogs({
+        logGroup: dbReadinessCheckLogGroup,
+        streamPrefix: 'db-readiness-check',
+      }),
     });
   }
 }

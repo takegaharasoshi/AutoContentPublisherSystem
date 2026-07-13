@@ -1,10 +1,17 @@
 import * as cdk from 'aws-cdk-lib/core';
-import { Match, Template } from 'aws-cdk-lib/assertions';
+import { Annotations, Match, Template } from 'aws-cdk-lib/assertions';
 import { FoundationStack } from '../lib/foundation-stack';
 
+const createFoundationStack = (): FoundationStack => {
+  const app = new cdk.App({
+    context: { dbReadinessCheckImageTag: 'test-tag' },
+  });
+
+  return new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+};
+
 describe('FoundationStack の VPC', () => {
-  const app = new cdk.App();
-  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const stack = createFoundationStack();
   const template = Template.fromStack(stack);
 
   test('VPC が 1 つ作成される', () => {
@@ -33,8 +40,7 @@ describe('FoundationStack の VPC', () => {
 });
 
 describe('FoundationStack の画像保存用 S3 バケット', () => {
-  const app = new cdk.App();
-  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const stack = createFoundationStack();
   const template = Template.fromStack(stack);
 
   test('S3 バケットが 1 つ作成される', () => {
@@ -110,8 +116,7 @@ describe('FoundationStack の画像保存用 S3 バケット', () => {
 });
 
 describe('FoundationStack の Security Group', () => {
-  const app = new cdk.App();
-  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const stack = createFoundationStack();
   const template = Template.fromStack(stack);
 
   test('Security Group が 3 つ作成される', () => {
@@ -239,8 +244,7 @@ describe('FoundationStack の Security Group', () => {
 });
 
 describe('FoundationStack の画像生成 API キー用 Secret', () => {
-  const app = new cdk.App();
-  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const stack = createFoundationStack();
   const template = Template.fromStack(stack);
 
   test('Secrets Manager Secret が 2 つ作成される', () => {
@@ -264,8 +268,7 @@ describe('FoundationStack の画像生成 API キー用 Secret', () => {
 });
 
 describe('FoundationStack の Aurora Serverless v2', () => {
-  const app = new cdk.App();
-  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const stack = createFoundationStack();
   const template = Template.fromStack(stack);
 
   test('Aurora MySQL クラスターが必要な設定で作成される', () => {
@@ -331,8 +334,7 @@ describe('FoundationStack の Aurora Serverless v2', () => {
 });
 
 describe('FoundationStack の ECS Cluster', () => {
-  const app = new cdk.App();
-  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const stack = createFoundationStack();
   const template = Template.fromStack(stack);
 
   test('ECS Cluster が 1 つ作成される', () => {
@@ -340,9 +342,92 @@ describe('FoundationStack の ECS Cluster', () => {
   });
 });
 
+describe('FoundationStack の DB 準備確認タスク定義', () => {
+  const stack = createFoundationStack();
+  const template = Template.fromStack(stack);
+
+  test('Fargate の family・CPU・メモリが設定される', () => {
+    template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+      Family: 'acps-prod-db-readiness-check',
+      Cpu: '256',
+      Memory: '512',
+      RequiresCompatibilities: ['FARGATE'],
+    });
+  });
+
+  test('DB Secret を渡すコンテナと awslogs 設定が作成される', () => {
+    template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+      ContainerDefinitions: [
+        Match.objectLike({
+          Name: 'db-readiness-check',
+          Environment: Match.arrayWith([
+            Match.objectLike({ Name: 'DB_SECRET_ARN' }),
+            { Name: 'ENV_NAME', Value: 'prod' },
+          ]),
+          Image: {
+            'Fn::Join': ['', Match.arrayWith([':test-tag'])],
+          },
+          LogConfiguration: {
+            LogDriver: 'awslogs',
+            Options: Match.objectLike({
+              'awslogs-stream-prefix': 'db-readiness-check',
+            }),
+          },
+        }),
+      ],
+    });
+  });
+
+  test('タスクロールは DB Secret の読み取りだけを許可する', () => {
+    template.hasResourceProperties('AWS::IAM::Role', {
+      AssumeRolePolicyDocument: Match.objectLike({
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Principal: { Service: 'ecs-tasks.amazonaws.com' },
+          }),
+        ]),
+      }),
+      Policies: Match.arrayWith([
+        Match.objectLike({
+          PolicyDocument: Match.objectLike({
+            Statement: Match.arrayWith([
+              Match.objectLike({
+                Action: 'secretsmanager:GetSecretValue',
+                Resource: {
+                  'Fn::Join': ['', Match.arrayWith([':secret:acps/prod/db/*'])],
+                },
+              }),
+            ]),
+          }),
+        }),
+      ]),
+    });
+  });
+
+  test('ロググループは 90 日で削除される', () => {
+    template.hasResource('AWS::Logs::LogGroup', {
+      Properties: {
+        RetentionInDays: 90,
+      },
+      DeletionPolicy: 'Delete',
+    });
+  });
+});
+
+describe('FoundationStack の DB 準備確認イメージタグ Context', () => {
+  test('未指定時はエラーアノテーションを追加する', () => {
+    const app = new cdk.App();
+    const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+
+    Annotations.fromStack(stack).hasError(
+      '*',
+      Match.stringLikeRegexp('.*-c dbReadinessCheckImageTag=<tag> の指定が必要.*'),
+    );
+  });
+});
+
 describe('FoundationStack の ECR リポジトリ', () => {
-  const app = new cdk.App();
-  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const stack = createFoundationStack();
   const template = Template.fromStack(stack);
   const repositories = template.findResources('AWS::ECR::Repository');
 
@@ -446,8 +531,7 @@ describe('FoundationStack の ECR リポジトリ', () => {
 });
 
 describe('FoundationStack の VPC Endpoint', () => {
-  const app = new cdk.App();
-  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const stack = createFoundationStack();
   const template = Template.fromStack(stack);
 
   test('S3 Gateway VPC Endpoint が 1 つ作成される', () => {
