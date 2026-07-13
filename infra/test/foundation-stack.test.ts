@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib/core';
-import { Template } from 'aws-cdk-lib/assertions';
+import { Match, Template } from 'aws-cdk-lib/assertions';
 import { FoundationStack } from '../lib/foundation-stack';
 
 describe('FoundationStack の VPC', () => {
@@ -375,5 +375,33 @@ describe('FoundationStack の ECR リポジトリ', () => {
       expect(repository.DeletionPolicy).toBe('Delete');
       expect(repository.UpdateReplacePolicy).toBe('Delete');
     }
+  });
+});
+
+describe('FoundationStack の VPC Endpoint', () => {
+  const app = new cdk.App();
+  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const template = Template.fromStack(stack);
+
+  test('S3 Gateway VPC Endpoint が 1 つ作成される', () => {
+    template.resourceCountIs('AWS::EC2::VPCEndpoint', 1);
+  });
+
+  test('Gateway 型で S3 サービスを参照する', () => {
+    template.hasResourceProperties('AWS::EC2::VPCEndpoint', {
+      VpcEndpointType: 'Gateway',
+      ServiceName: Match.objectLike({
+        'Fn::Join': [
+          '',
+          Match.arrayWith(['com.amazonaws.', '.s3']),
+        ],
+      }),
+    });
+  });
+
+  test('Public Subnet のルートテーブル 2 つだけに関連付けられる', () => {
+    const endpoints = Object.values(template.findResources('AWS::EC2::VPCEndpoint'));
+
+    expect(endpoints[0].Properties.RouteTableIds).toHaveLength(2);
   });
 });

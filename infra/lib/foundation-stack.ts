@@ -170,5 +170,12 @@ export class FoundationStack extends cdk.Stack {
         emptyOnDelete: true,
       },
     );
+
+    // ECS Fargate から S3 への通信を AWS 網内に閉じる（Gateway 型は無料。
+    // docs/infra/architecture.html セクション 2.1）
+    this.vpc.addGatewayEndpoint('S3GatewayEndpoint', {
+      service: ec2.GatewayVpcEndpointAwsService.S3,
+      subnets: [{ subnetType: ec2.SubnetType.PUBLIC }],
+    });
   }
 }
