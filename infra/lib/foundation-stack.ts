@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib/core';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
@@ -29,6 +30,12 @@ export class FoundationStack extends cdk.Stack {
   public readonly imageApiKeySecret: secretsmanager.Secret;
   /** 全バッチ共通の ECS Cluster。後続の ImageBatchStack / SnsPostBatchStack から参照される */
   public readonly ecsCluster: ecs.Cluster;
+  /** 画像生成バッチのコンテナイメージ用 ECR リポジトリ。後続の ImageBatchStack から参照される */
+  public readonly imageBatchRepository: ecr.Repository;
+  /** SNS 投稿バッチのコンテナイメージ用 ECR リポジトリ。後続の SnsPostBatchStack から参照される */
+  public readonly snsPostBatchRepository: ecr.Repository;
+  /** DB 準備確認バッチのコンテナイメージ用 ECR リポジトリ。Phase 3-3 で同一スタック内から参照される */
+  public readonly dbReadinessCheckRepository: ecr.Repository;
 
   constructor(scope: Construct, id: string, props: FoundationStackProps) {
     super(scope, id, props);
@@ -117,5 +124,51 @@ export class FoundationStack extends cdk.Stack {
     this.ecsCluster = new ecs.Cluster(this, 'EcsCluster', {
       vpc: this.vpc,
     });
+
+    const batchRepositoryProps = {
+      lifecycleRules: [
+        {
+          rulePriority: 1,
+          description: 'Retain the latest 30 release images',
+          tagPrefixList: ['release-'],
+          maxImageCount: 30,
+        },
+        {
+          rulePriority: 2,
+          description: 'Retain the latest 10 images',
+          tagStatus: ecr.TagStatus.ANY,
+          maxImageCount: 10,
+        },
+      ],
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      emptyOnDelete: true,
+    };
+
+    this.imageBatchRepository = new ecr.Repository(this, 'ImageBatchRepository', {
+      repositoryName: 'auto-content-publisher/image-batch',
+      ...batchRepositoryProps,
+    });
+
+    this.snsPostBatchRepository = new ecr.Repository(this, 'SnsPostBatchRepository', {
+      repositoryName: 'auto-content-publisher/sns-post-batch',
+      ...batchRepositoryProps,
+    });
+
+    this.dbReadinessCheckRepository = new ecr.Repository(
+      this,
+      'DbReadinessCheckRepository',
+      {
+        repositoryName: 'auto-content-publisher/db-readiness-check',
+        lifecycleRules: [
+          {
+            description: 'Retain the latest 30 images',
+            tagStatus: ecr.TagStatus.ANY,
+            maxImageCount: 30,
+          },
+        ],
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+        emptyOnDelete: true,
+      },
+    );
   }
 }

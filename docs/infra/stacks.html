@@ -55,7 +55,7 @@
     <tr><td>Aurora Serverless v2</td><td>MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。Aurora MySQL 3.08.0 以降など対応バージョンを採用）。CDK 引数指定: <code>serverlessV2MinCapacity: 0</code>、<code>serverlessV2MaxCapacity: 1.0</code>、<code>enableDataApi: true</code>（Query Editor / Data API 利用のため必須）</td></tr>
     <tr><td>Secrets Manager</td><td>DB 認証情報（CDK の Aurora コンストラクトで自動生成。Secret 名は <code>acps/{env}/db/credentials</code> を明示指定する）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（Secret 名規約は <a href="security.html">security.html</a> を参照。作成手順はアプリ設計（Phase 9）で定義する）</td></tr>
     <tr><td>ECS Cluster</td><td>全バッチ共通の実行基盤。CDK 引数指定: <code>vpc</code> に FoundationStack の VPC を明示指定する（下記の注意を参照）。クラスター名は明示指定せず CFN 自動命名（命名規約表 <a href="cicd.html">cicd.html セクション 9.2</a> の対象外。後続スタックへは CDK オブジェクト参照で渡すため名前固定は不要）。Container Insights はデフォルト無効のまま（CloudWatch カスタムメトリクス課金を避ける。監視は MonitoringStack の方針に従う）。Capacity Provider の登録も不要（Step Functions の RunTask で <code>launchType: FARGATE</code> を直接指定する方式のため）</td></tr>
-    <tr><td>ECR Repository</td><td>サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、db-readiness-check の 3 つ）</td></tr>
+    <tr><td>ECR Repository</td><td>サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、db-readiness-check の 3 つ）。リポジトリ名は <code>auto-content-publisher/{サービス名}</code> を明示指定する（環境共通。命名・ライフサイクルポリシーの詳細は <a href="cicd.html#ecr">cicd.html セクション 4</a> を参照）。CDK 引数指定: <code>lifecycleRules</code>（cicd.html セクション 4 の保持ルール）、<code>removalPolicy: DESTROY</code>、<code>emptyOnDelete: true</code>（下記の設計理由を参照）。<code>imageTagMutability</code> / <code>imageScanOnPush</code> は指定せず CDK デフォルトのまま</td></tr>
     <tr><td>VPC Endpoint</td><td>S3（Gateway）のみ</td></tr>
     <tr><td>ECS Task Definition（DB 準備確認）</td><td>DB 準備確認用（db-readiness-check）。コンテナ名: <code>db-readiness-check</code>。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される。コンテナイメージは CDK Context <code>dbReadinessCheckImageTag</code> で指定された不変タグを参照する</td></tr>
     <tr><td>IAM Role（DB 準備確認タスク）</td><td>権限詳細は <a href="security.html">security.html</a> を参照</td></tr>
@@ -68,6 +68,11 @@
 <div class="decision">
   <span class="callout-title">S3 バケットの RemovalPolicy（2026-07-13 決定）</span>
   画像保存用バケットは <code>RemovalPolicy.DESTROY</code> + <code>autoDeleteObjects: true</code> とし、スタック削除時に中身ごと削除する。生成画像は 30 日ライフサイクルで自動削除される使い捨てデータであり、正式な記録は DB レコードが担うため（<a href="../app/data-model.html#s3-key">app/data-model.html セクション 5</a>）、バケット保持による保護よりも「スタックを壊して作り直せる」性質を優先する。この設定によりオブジェクト自動削除用の Lambda カスタムリソースがスタックに 1 つ追加される。
+</div>
+
+<div class="decision">
+  <span class="callout-title">ECR リポジトリの RemovalPolicy（2026-07-13 決定）</span>
+  ECR リポジトリ 3 つは <code>RemovalPolicy.DESTROY</code> + <code>emptyOnDelete: true</code> とし、スタック削除時にイメージごと削除する。リポジトリ名を明示指定しているため、CDK デフォルトの RETAIN では destroy 後に同名リポジトリが残り再作成時に名前衝突する。コンテナイメージはソースから再ビルド・再 push できる複製可能データであり、「スタックを壊して作り直せる」性質を優先する。<code>emptyOnDelete</code> は CloudFormation ネイティブの <code>EmptyOnDelete</code> プロパティに対応するため、S3 の <code>autoDeleteObjects</code> と異なり Lambda カスタムリソースは追加されない。<strong>destroy でイメージは全て失われるため、スタック再作成後はイメージの再 push が必要</strong>（db-readiness-check は再 push した不変タグを CDK Context で渡して Task Definition を再登録する。<a href="cicd.html#ecr">cicd.html セクション 4・6</a> を参照）。
 </div>
 
 <div class="decision">

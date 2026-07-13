@@ -272,3 +272,108 @@ describe('FoundationStack の ECS Cluster', () => {
     template.resourceCountIs('AWS::ECS::Cluster', 1);
   });
 });
+
+describe('FoundationStack の ECR リポジトリ', () => {
+  const app = new cdk.App();
+  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const template = Template.fromStack(stack);
+  const repositories = template.findResources('AWS::ECR::Repository');
+
+  const findRepository = (repositoryName: string): any => {
+    const repository = Object.values(repositories).find(
+      (resource: any) => resource.Properties.RepositoryName === repositoryName,
+    );
+
+    if (!repository) {
+      throw new Error(`ECR repository not found: ${repositoryName}`);
+    }
+
+    return repository;
+  };
+
+  const lifecyclePolicy = (repositoryName: string): object =>
+    JSON.parse(
+      findRepository(repositoryName).Properties.LifecyclePolicy.LifecyclePolicyText,
+    );
+
+  test('3 つのリポジトリが正しい名前で作成される', () => {
+    expect(Object.keys(repositories)).toHaveLength(3);
+    expect(Object.values(repositories)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          Properties: expect.objectContaining({
+            RepositoryName: 'auto-content-publisher/image-batch',
+          }),
+        }),
+        expect.objectContaining({
+          Properties: expect.objectContaining({
+            RepositoryName: 'auto-content-publisher/sns-post-batch',
+          }),
+        }),
+        expect.objectContaining({
+          Properties: expect.objectContaining({
+            RepositoryName: 'auto-content-publisher/db-readiness-check',
+          }),
+        }),
+      ]),
+    );
+  });
+
+  test.each([
+    'auto-content-publisher/image-batch',
+    'auto-content-publisher/sns-post-batch',
+  ])('%s はリリース用と通常用のライフサイクルルールを持つ', (repositoryName) => {
+    expect(lifecyclePolicy(repositoryName)).toEqual({
+      rules: [
+        {
+          rulePriority: 1,
+          description: 'Retain the latest 30 release images',
+          selection: {
+            tagStatus: 'tagged',
+            tagPrefixList: ['release-'],
+            countType: 'imageCountMoreThan',
+            countNumber: 30,
+          },
+          action: { type: 'expire' },
+        },
+        {
+          rulePriority: 2,
+          description: 'Retain the latest 10 images',
+          selection: {
+            tagStatus: 'any',
+            countType: 'imageCountMoreThan',
+            countNumber: 10,
+          },
+          action: { type: 'expire' },
+        },
+      ],
+    });
+  });
+
+  test('DB 準備確認リポジトリは最新 30 個を保持するライフサイクルルールを持つ', () => {
+    expect(
+      lifecyclePolicy('auto-content-publisher/db-readiness-check'),
+    ).toEqual({
+      rules: [
+        {
+          rulePriority: 1,
+          description: 'Retain the latest 30 images',
+          selection: {
+            tagStatus: 'any',
+            countType: 'imageCountMoreThan',
+            countNumber: 30,
+          },
+          action: { type: 'expire' },
+        },
+      ],
+    });
+  });
+
+  test('スタック削除時にリポジトリとイメージが削除される', () => {
+    for (const repository of Object.values(repositories) as any[]) {
+      expect(repository.Properties.EmptyOnDelete).toBe(true);
+      expect(repository.DeletionPolicy).toBe('Delete');
+      expect(repository.UpdateReplacePolicy).toBe('Delete');
+    }
+  });
+});
