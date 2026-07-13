@@ -54,7 +54,7 @@
     <tr><td>S3 Bucket</td><td>画像保存用（Lifecycle Policy: 30 日で自動削除）。バケット名は <code>acps-{env}-images-{アカウント ID}</code> を明示指定する（命名規約は <a href="cicd.html">cicd.html セクション 5</a> を参照）。公開ブロック・暗号化・SSL 強制の設定は <a href="security.html">security.html セクション 3</a> を参照。CDK 引数指定: <code>removalPolicy: DESTROY</code>、<code>autoDeleteObjects: true</code>（下記の設計理由を参照）</td></tr>
     <tr><td>Aurora Serverless v2</td><td>MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。Aurora MySQL 3.08.0 以降など対応バージョンを採用）。CDK 引数指定: <code>serverlessV2MinCapacity: 0</code>、<code>serverlessV2MaxCapacity: 1.0</code>、<code>enableDataApi: true</code>（Query Editor / Data API 利用のため必須）</td></tr>
     <tr><td>Secrets Manager</td><td>DB 認証情報（CDK の Aurora コンストラクトで自動生成。Secret 名は <code>acps/{env}/db/credentials</code> を明示指定する）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（Secret 名規約は <a href="security.html">security.html</a> を参照。作成手順はアプリ設計（Phase 9）で定義する）</td></tr>
-    <tr><td>ECS Cluster</td><td>全バッチ共通の実行基盤</td></tr>
+    <tr><td>ECS Cluster</td><td>全バッチ共通の実行基盤。CDK 引数指定: <code>vpc</code> に FoundationStack の VPC を明示指定する（下記の注意を参照）。クラスター名は明示指定せず CFN 自動命名（命名規約表 <a href="cicd.html">cicd.html セクション 9.2</a> の対象外。後続スタックへは CDK オブジェクト参照で渡すため名前固定は不要）。Container Insights はデフォルト無効のまま（CloudWatch カスタムメトリクス課金を避ける。監視は MonitoringStack の方針に従う）。Capacity Provider の登録も不要（Step Functions の RunTask で <code>launchType: FARGATE</code> を直接指定する方式のため）</td></tr>
     <tr><td>ECR Repository</td><td>サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、db-readiness-check の 3 つ）</td></tr>
     <tr><td>VPC Endpoint</td><td>S3（Gateway）のみ</td></tr>
     <tr><td>ECS Task Definition（DB 準備確認）</td><td>DB 準備確認用（db-readiness-check）。コンテナ名: <code>db-readiness-check</code>。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される。コンテナイメージは CDK Context <code>dbReadinessCheckImageTag</code> で指定された不変タグを参照する</td></tr>
@@ -97,6 +97,7 @@
   <ul>
     <li>CDK はデフォルトで全アウトバウンドを許可する Security Group を作成する。上表の 3 つの SG はいずれもアウトバウンドを限定するため、<strong>3 つとも</strong> <code>allowAllOutbound: false</code> を明示的に指定し、必要な Egress ルールのみを個別に追加すること（Aurora 用 SG は Egress ルールを追加しない。この場合 CDK が <code>255.255.255.255/32</code> 宛 ICMP の「Disallow all traffic」ダミー拒否ルールを挿入するが、実質アウトバウンド通信なしを意味する仕様であり問題ない）</li>
     <li><code>ec2.Vpc</code> のデフォルト構成は Private Subnet + NAT Gateway を含むため、<code>natGateways: 0</code> と <code>subnetConfiguration</code>（<code>PUBLIC</code> と <code>PRIVATE_ISOLATED</code> のみ）を明示しないと意図しない NAT Gateway が作成され課金が発生する</li>
+    <li><code>ecs.Cluster</code> は <code>vpc</code> 未指定だとデフォルト構成の新規 VPC（NAT Gateway 付き）を自動作成するため、必ず FoundationStack の既存 VPC を渡すこと</li>
     <li>Aurora Serverless v2 の <code>enableDataApi: true</code> を有効化していない場合、AWS Console の Query Editor からの DDL 実行・データ確認ができない（開発計画 Phase 6 の検証ステップで使用するため有効化必須）</li>
     <li>Aurora の <code>serverlessV2MaxCapacity</code> を未指定にするとデフォルト値（リージョンによる）まで自動スケールしてコスト事故の要因となるため、必ず上限値を指定する</li>
     <li>Aurora の DB 認証情報 Secret はデフォルトではランダムな名前で生成される。<code>Credentials.fromGeneratedSecret</code> の <code>secretName</code> に <code>acps/{env}/db/credentials</code> を明示指定しないと、Secret 名規約（<a href="security.html#secret-naming">security.html セクション 1.2</a>）および IAM のプレフィックスベース制御（<code>acps/{env}/db/*</code>）と不整合になり、ECS タスクからの Secret 読み取りが権限エラーになる。Secret 名を後から変更すると Secret リソースの置換（マスターパスワードの再生成）が発生し手戻りが大きいため、Phase 3-1 の初回デプロイ時に必ず指定する</li>

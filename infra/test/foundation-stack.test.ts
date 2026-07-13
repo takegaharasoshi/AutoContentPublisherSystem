@@ -262,3 +262,13 @@ describe('FoundationStack の画像生成 API キー用 Secret', () => {
     });
   });
 });
+
+describe('FoundationStack の ECS Cluster', () => {
+  const app = new cdk.App();
+  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const template = Template.fromStack(stack);
+
+  test('ECS Cluster が 1 つ作成される', () => {
+    template.resourceCountIs('AWS::ECS::Cluster', 1);
+  });
+});

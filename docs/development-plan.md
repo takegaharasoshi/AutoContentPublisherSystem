@@ -207,9 +207,9 @@
   - 確認: コンソールで `acps/prod/image/api-key` のシークレットが見える
   - 備考: 画像 API キー用 Secret は CDK で「箱」のみ作成する。実際の API キー値の設定はアプリ実装フェーズ（Phase 10 以降）で行う。DB 接続情報の Secret は Aurora 作成時（Phase 3-1）に `acps/prod/db/credentials` として作成される。2026-07-13 実施: FoundationStack に Secret `acps/prod/image/api-key`（Secret 名明示指定）を追加し、後続の ImageBatchStack 参照用に `public readonly imageApiKeySecret` として公開。初期値は `generateSecretString`（`secretStringTemplate: '{}'` + `generateStringKey: 'api_key'`）で `{"api_key": "<ランダムプレースホルダ>"}` の JSON 形状（security.html 1.3 の値スキーマと同形。Console で `api_key` の値を差し替えるだけで手動設定できる）。description にプレースホルダである旨を英語で明記。RemovalPolicy は未指定＝CFN デフォルトの Delete（即時削除・同名再作成可能。**手動設定した API キー値は destroy で失われるため再作成後は Console から再設定が必要**）。決定事項は stacks.html 3.1 の decision コールアウトに記録。実装は Codex に委譲し Claude がレビュー。検証: `npm run build` / `npm test`（Secret テスト 3 件追加、計 16 件）成功、`cdk diff` が Secret 1 つの追加のみ（既存リソース変更なし）を確認のうえデプロイ（`UPDATE_COMPLETE`）。AWS CLI で Name / ARN / Description と値が `{"api_key": "<32 文字ランダム>"}` 形状であることを確認済み。コンソールでの目視確認はユーザーが実施
 
-- [ ] **2-4** ECS Cluster を追加
+- [x] **2-4** ECS Cluster を追加
   - 確認: コンソールでクラスターが見える
-  - 備考:
+  - 備考: 2026-07-13 実施。FoundationStack に全バッチ共通の ECS Cluster を追加し、後続の ImageBatchStack / SnsPostBatchStack 参照用に `public readonly ecsCluster` として公開。`vpc` は既存 VPC を明示指定（`ecs.Cluster` は vpc 未指定だと NAT Gateway 付きの新規 VPC を自動作成してしまうため。stacks.html 3.1 の warn に追記）。クラスター名は命名規約表（cicd.html 9.2）の対象外のため明示指定せず CFN 自動命名（2-2 の SG と同じ整理）。Container Insights はデフォルト無効のまま（CloudWatch カスタムメトリクス課金を避ける。監視は Phase 7 の MonitoringStack 方針に従う）、Capacity Provider の登録もなし（Step Functions の RunTask で `launchType: FARGATE` を直接指定する方式のため）。これらの CDK 引数方針は stacks.html 3.1 のリソース一覧表に追記。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（Cluster テスト 1 件追加、計 17 件）成功、`cdk diff` が `AWS::ECS::Cluster` 1 つの追加のみ（既存リソース変更なし）を確認のうえデプロイ（`UPDATE_COMPLETE`。なお本番デプロイのため Claude の自動実行が一度権限拒否され、ユーザー承認のうえ再試行した）。AWS CLI 検証: クラスター `Prod-FoundationStack-EcsCluster97242B84-LxglUTFIqriH` が `ACTIVE`、EC2 コンテナインスタンス 0（Fargate のみ）、Capacity Provider なし、settings 空（Container Insights 無効）を確認。コンソールでの目視確認はユーザーが実施
 
 - [ ] **2-5** ECR リポジトリを追加（image-batch、sns-post-batch、db-readiness-check の 3 つ）
   - 確認: コンソールで 3 つの ECR リポジトリが見える

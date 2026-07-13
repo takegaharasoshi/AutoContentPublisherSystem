@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib/core';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
@@ -26,6 +27,8 @@ export class FoundationStack extends cdk.Stack {
   public readonly auroraSecurityGroup: ec2.SecurityGroup;
   /** 画像生成 API キー用の Secret。後続の ImageBatchStack から参照される */
   public readonly imageApiKeySecret: secretsmanager.Secret;
+  /** 全バッチ共通の ECS Cluster。後続の ImageBatchStack / SnsPostBatchStack から参照される */
+  public readonly ecsCluster: ecs.Cluster;
 
   constructor(scope: Construct, id: string, props: FoundationStackProps) {
     super(scope, id, props);
@@ -108,6 +111,11 @@ export class FoundationStack extends cdk.Stack {
         secretStringTemplate: '{}',
         generateStringKey: 'api_key',
       },
+    });
+
+    // 既存 VPC を使用し、Cluster 作成時の VPC 自動作成を防ぐ
+    this.ecsCluster = new ecs.Cluster(this, 'EcsCluster', {
+      vpc: this.vpc,
     });
   }
 }
