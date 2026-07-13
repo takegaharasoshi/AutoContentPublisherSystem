@@ -186,13 +186,23 @@
   <tbody>
     <tr><td>ECS Task Definition</td><td>SNS 投稿バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する。コンテナイメージは CDK Context <code>snsPostBatchImageTag</code> で指定された不変タグを参照する。CDK 引数指定: <code>family</code> に <code>acps-{env}-sns-post-batch</code> を明示指定する（Step Functions の ASL と <code>aws ecs describe-task-definition</code> が family 名で参照するため固定必須。<a href="cicd.html#deploy">cicd.html セクション 5</a> の family 命名例に合わせる）、<code>cpu: 256</code> / <code>memoryLimitMiB: 512</code>。タスク実行ロールは明示作成せず CDK 自動生成に任せる（ECR pull + awslogs 書き込みが自動で最小権限付与される）</td></tr>
     <tr><td>Container Definition</td><td>コンテナ名: <code>sns-post-batch</code>。環境変数（<code>DB_SECRET_ARN</code> / <code>S3_BUCKET_NAME</code> / <code>ENV_NAME</code>）は Task Definition に静的設定する（<a href="workflow.html#env-vars">workflow.html セクション 5.2</a>。<code>SET_CODE</code> / <code>EXECUTION_ARN</code> は Step Functions のコンテナオーバーライドで渡すため静的設定しない）。ログは awslogs ドライバで下記 CloudWatch Log Group に出力する</td></tr>
-    <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html">workflow.html</a> を参照）</td></tr>
+    <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html#sns-asl">workflow.html セクション 4</a> を参照）。ASL は設計書の JSON をそのまま <code>infra/lib/asl/sns-posting.asl.json</code> に保存し、<code>DefinitionBody.fromString</code>（<code>fs.readFileSync</code>）+ <code>definitionSubstitutions</code> でプレースホルダに実値を渡す（下記の設計理由を参照）。CDK 引数指定: <code>stateMachineName</code> に <code>acps-{env}-sns-posting-sfn</code> を明示指定する（下記の decision を参照）。type は Standard（デフォルト）、ロギング・トレーシング・ステートマシンレベルの timeout は未設定（設計書に規定なし。実行履歴は SFN コンソールで確認でき、失敗監視は MonitoringStack の <code>ExecutionsFailed</code> アラームで行う）。実行ロールは StateMachine コンストラクトの自動生成ロールに <code>addToRolePolicy</code> で <a href="security.html#iam">security.html セクション 2.3</a> の 4 ステートメント（<code>ecs:RunTask</code> は family 配下全 revision、<code>ecs:StopTask</code> / <code>ecs:DescribeTasks</code>、<code>events:*</code> は <code>StepFunctionsGetEventsForECSTaskRule</code> に限定、<code>iam:PassRole</code> はタスクロール・タスク実行ロール ×4 + <code>iam:PassedToService</code> 条件）を追加する。後続の ImageBatchStack（ARN 参照）・MonitoringStack 用に <code>stateMachine</code> をプロパティ公開する</td></tr>
     <tr><td>CodePipeline</td><td>sns-post-batch 用 CI/CD パイプライン（詳細は <a href="cicd.html">cicd.html</a> を参照）</td></tr>
     <tr><td>CodeBuild</td><td>Docker ビルド・ECR push・タスク定義更新</td></tr>
     <tr><td>IAM Role</td><td>権限詳細は <a href="security.html">security.html</a> を参照。タスクロールのインラインポリシーは <code>secretsmanager:GetSecretValue</code> をプレフィックス <code>acps/{env}/db/*</code> と <code>acps/{env}/*/sns/*</code> に許可し（プレフィックスベース制御。security.html セクション 2.1）、S3 バケット読み取りと <code>cloudwatch:PutMetricData</code>（条件キー <code>cloudwatch:namespace</code> で <code>ACPS</code> のみに制限）を付与する</td></tr>
     <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）。CDK 引数指定: ロググループ名は明示指定せず CFN 自動命名、<code>removalPolicy: DESTROY</code>（<a href="#foundation">セクション 3.1</a> の設計理由「DB 準備確認タスクの CloudWatch Log Group」と同方針）</td></tr>
   </tbody>
 </table>
+</div>
+
+<div class="decision">
+  <span class="callout-title">ステートマシン名の明示指定（2026-07-13 決定）</span>
+  SNS 投稿 Step Functions のステートマシン名は <code>acps-{env}-sns-posting-sfn</code> を明示指定する。ステートマシンは命名規約表（<a href="cicd.html#env-separation">cicd.html セクション 9.2</a>）の対象外だが、手動での単独実行が運用ユースケースとして定義されており（<a href="workflow.html#sns-asl">workflow.html セクション 4</a>）、運用者がコンソールから直接触るリソースのため発見性を優先した（Scheduler DLQ <code>acps-prod-image-scheduler-dlq</code> の明示命名と同じ整理。命名規約表にも追記済み）。ImageBatchStack からの参照は CDK オブジェクト参照（ARN）のため名前固定は必須ではない。
+</div>
+
+<div class="decision">
+  <span class="callout-title">ASL の実装方式: 生 JSON + definitionSubstitutions（2026-07-13 決定）</span>
+  ステートマシン定義は CDK の L2 コンストラクト（<code>tasks.EcsRunTask</code> 等）を使わず、<a href="workflow.html#sns-asl">workflow.html セクション 4</a> の ASL JSON をそのまま <code>infra/lib/asl/</code> 配下にファイルとして保持し、<code>definitionSubstitutions</code> で <code>${...}</code> プレースホルダに実値（ECS クラスター ARN・タスク定義 family 名・サブネット ID・SG ID）を渡す。理由: 本システムは Task Definition を family 名（revision なし）で指定し RunTask に最新 ACTIVE revision を解決させる方式（<a href="workflow.html#overview">workflow.html セクション 1.2</a>）だが、L2 の <code>EcsRunTask</code> は revision 固定 ARN を ASL に埋め込むためこの方式を表現できない。生 ASL 方式により設計書の ASL と実装が 1:1 で対応し、レビューも容易になる。<code>DefinitionBody.fromFile</code> は S3 アセット化されるため使わず、<code>fs.readFileSync</code> + <code>fromString</code> でテンプレートにインライン展開する（<code>cdk diff</code> で ASL の差分が見える）。
 </div>
 
 <div class="note">

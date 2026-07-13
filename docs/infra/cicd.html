@@ -277,6 +277,7 @@ cdk deploy -c env=prod MonitoringStack</code></pre>
     <tr><td>ECR リポジトリ</td><td>環境共通（イメージタグで区別）</td><td><code>auto-content-publisher/image-batch:abc123</code></td><td>同左</td></tr>
     <tr><td>Secrets Manager</td><td><code>acps/{env}/...</code></td><td><code>acps/prod/db/credentials</code></td><td><code>acps/dev/db/credentials</code></td></tr>
     <tr><td>S3 バケット</td><td>CDK Context で環境ごとに別バケット</td><td><code>acps-prod-images</code></td><td><code>acps-dev-images</code></td></tr>
+    <tr><td>Step Functions ステートマシン</td><td><code>acps-{env}-{ワークフロー名}-sfn</code>（運用者がコンソールから手動実行するため明示命名。<a href="stacks.html#sns-post-batch">stacks.html セクション 3.3</a> の decision を参照）</td><td><code>acps-prod-sns-posting-sfn</code></td><td><code>acps-dev-sns-posting-sfn</code></td></tr>
   </tbody>
 </table>
 </div>

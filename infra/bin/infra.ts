@@ -30,6 +30,11 @@ new SnsPostBatchStack(app, 'SnsPostBatchStack', {
   snsPostBatchRepository: foundationStack.snsPostBatchRepository,
   imagesBucket: foundationStack.imagesBucket,
   auroraCluster: foundationStack.auroraCluster,
+  vpc: foundationStack.vpc,
+  ecsCluster: foundationStack.ecsCluster,
+  batchSecurityGroup: foundationStack.batchSecurityGroup,
+  dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
+  dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
   stackName: `${stackNamePrefix}-SnsPostBatchStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });

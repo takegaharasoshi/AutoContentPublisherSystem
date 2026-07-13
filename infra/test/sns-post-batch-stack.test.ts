@@ -19,6 +19,11 @@ const createSnsPostBatchStack = (): SnsPostBatchStack => {
     snsPostBatchRepository: foundationStack.snsPostBatchRepository,
     imagesBucket: foundationStack.imagesBucket,
     auroraCluster: foundationStack.auroraCluster,
+    vpc: foundationStack.vpc,
+    ecsCluster: foundationStack.ecsCluster,
+    batchSecurityGroup: foundationStack.batchSecurityGroup,
+    dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
+    dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
   });
 };
 
@@ -159,6 +164,131 @@ describe('SnsPostBatchStack のロググループ', () => {
   });
 });
 
+describe('SnsPostBatchStack の SNS 投稿ワークフロー', () => {
+  const stack = createSnsPostBatchStack();
+  const template = Template.fromStack(stack);
+  const stateMachines = Object.values(
+    template.findResources('AWS::StepFunctions::StateMachine'),
+  ) as any[];
+  const stateMachine = stateMachines[0];
+
+  test('明示した名前の Standard ステートマシンを作成する', () => {
+    expect(stateMachines).toHaveLength(1);
+    expect(stateMachine).toEqual(
+      expect.objectContaining({
+        Properties: expect.objectContaining({
+          StateMachineName: 'acps-prod-sns-posting-sfn',
+        }),
+      }),
+    );
+  });
+
+  test('ASL の置換値をすべて設定する', () => {
+    expect(stateMachine.Properties.DefinitionSubstitutions).toEqual(
+      expect.objectContaining({
+        EcsClusterArn: expect.anything(),
+        DbReadinessCheckTaskDefFamily: expect.anything(),
+        SnsPostBatchTaskDefFamily: expect.anything(),
+        PublicSubnetId1: expect.anything(),
+        PublicSubnetId2: expect.anything(),
+        DbReadinessCheckSgId: expect.anything(),
+        BatchSgId: expect.anything(),
+      }),
+    );
+  });
+
+  test('DB 準備確認と SNS 投稿タスクを実行する ASL をインラインで保持する', () => {
+    const definitionString = stateMachine.Properties.DefinitionString as string;
+
+    expect(definitionString).toContain('WaitForDbReady');
+    expect(definitionString).toContain('RunSnsPostBatchTask');
+    expect(definitionString).toContain('HandleError');
+    expect(definitionString).toContain('ecs:runTask.sync');
+    expect(definitionString).toContain('ContainerOverrides');
+    expect(definitionString).toContain('SET_CODE');
+    expect(definitionString).toContain('EXECUTION_ARN');
+  });
+
+  test('ECS 同期実行に必要な最小権限をステートマシンロールに付与する', () => {
+    const policies = Object.values(
+      template.findResources('AWS::IAM::Policy'),
+    ) as any[];
+    const stateMachinePolicy = policies.find((policy) =>
+      policy.Properties.PolicyDocument.Statement.some((statement: any) =>
+        statement.Action?.includes('ecs:RunTask'),
+      ),
+    );
+    const statements = stateMachinePolicy.Properties.PolicyDocument.Statement;
+
+    expect(statements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          Action: 'ecs:RunTask',
+          Resource: expect.arrayContaining([
+            expect.objectContaining({
+              'Fn::Join': [
+                '',
+                expect.arrayContaining([
+                  ':task-definition/acps-prod-db-readiness-check:*',
+                ]),
+              ],
+            }),
+            expect.objectContaining({
+              'Fn::Join': [
+                '',
+                expect.arrayContaining([
+                  ':task-definition/acps-prod-sns-post-batch:*',
+                ]),
+              ],
+            }),
+          ]),
+        }),
+        expect.objectContaining({
+          Action: expect.arrayContaining([
+            'ecs:StopTask',
+            'ecs:DescribeTasks',
+          ]),
+          Resource: '*',
+        }),
+        expect.objectContaining({
+          Action: expect.arrayContaining([
+            'events:DescribeRule',
+            'events:PutRule',
+            'events:PutTargets',
+          ]),
+          Resource: expect.objectContaining({
+            'Fn::Join': [
+              '',
+              expect.arrayContaining([
+                ':rule/StepFunctionsGetEventsForECSTaskRule',
+              ]),
+            ],
+          }),
+        }),
+        expect.objectContaining({
+          Action: 'iam:PassRole',
+          Resource: expect.arrayContaining([
+            expect.anything(),
+            expect.anything(),
+            expect.anything(),
+            expect.anything(),
+          ]),
+          Condition: {
+            StringEquals: {
+              'iam:PassedToService': 'ecs-tasks.amazonaws.com',
+            },
+          },
+        }),
+      ]),
+    );
+
+    const passRoleStatement = statements.find(
+      (statement: any) => statement.Action === 'iam:PassRole',
+    );
+    expect(passRoleStatement.Resource).toHaveLength(4);
+  });
+});
+
 describe('SnsPostBatchStack の SNS 投稿バッチイメージタグ Context', () => {
   test('未指定時はエラーアノテーションを追加する', () => {
     const app = new cdk.App({
@@ -172,6 +302,11 @@ describe('SnsPostBatchStack の SNS 投稿バッチイメージタグ Context', 
       snsPostBatchRepository: foundationStack.snsPostBatchRepository,
       imagesBucket: foundationStack.imagesBucket,
       auroraCluster: foundationStack.auroraCluster,
+      vpc: foundationStack.vpc,
+      ecsCluster: foundationStack.ecsCluster,
+      batchSecurityGroup: foundationStack.batchSecurityGroup,
+      dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
+      dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
     });
 
     Annotations.fromStack(stack).hasError(
