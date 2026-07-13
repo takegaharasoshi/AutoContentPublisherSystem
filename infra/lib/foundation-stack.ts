@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib/core';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
+import * as rds from 'aws-cdk-lib/aws-rds';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
@@ -26,6 +27,8 @@ export class FoundationStack extends cdk.Stack {
   public readonly dbReadinessCheckSecurityGroup: ec2.SecurityGroup;
   /** Aurora Serverless v2 用の Security Group。Phase 3-1 の Aurora 作成時に同一スタック内で参照される */
   public readonly auroraSecurityGroup: ec2.SecurityGroup;
+  /** Aurora Serverless v2 クラスター。後続の ImageBatchStack / SnsPostBatchStack から参照される */
+  public readonly auroraCluster: rds.DatabaseCluster;
   /** 画像生成 API キー用の Secret。後続の ImageBatchStack から参照される */
   public readonly imageApiKeySecret: secretsmanager.Secret;
   /** 全バッチ共通の ECS Cluster。後続の ImageBatchStack / SnsPostBatchStack から参照される */
@@ -109,6 +112,25 @@ export class FoundationStack extends cdk.Stack {
         'Allow MySQL access from ECS tasks',
       );
     }
+
+    // DB は正式な記録を担うため、RemovalPolicy はデフォルトの SNAPSHOT を使用する。
+    this.auroraCluster = new rds.DatabaseCluster(this, 'AuroraCluster', {
+      engine: rds.DatabaseClusterEngine.auroraMysql({
+        version: rds.AuroraMysqlEngineVersion.VER_3_08_2,
+      }),
+      vpc: this.vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+      securityGroups: [this.auroraSecurityGroup],
+      writer: rds.ClusterInstance.serverlessV2('Writer'),
+      serverlessV2MinCapacity: 0,
+      serverlessV2MaxCapacity: 1.0,
+      credentials: rds.Credentials.fromGeneratedSecret('admin', {
+        secretName: `acps/${props.envName}/db/credentials`,
+      }),
+      defaultDatabaseName: 'acps',
+      enableDataApi: true,
+      storageEncrypted: true,
+    });
 
     this.imageApiKeySecret = new secretsmanager.Secret(this, 'ImageApiKeySecret', {
       secretName: `acps/${props.envName}/image/api-key`,

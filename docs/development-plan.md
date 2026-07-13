@@ -225,9 +225,9 @@
 
 **ゴール**: Aurora と DB 準備確認タスクを構築する
 
-- [ ] **3-1** Aurora Serverless v2 を追加
+- [x] **3-1** Aurora Serverless v2 を追加
   - 確認: コンソールで DB クラスターが見える、自動一時停止が設定されている、最小 ACU が 0 になっている。Secrets Manager に `acps/prod/db/credentials` が作成されている
-  - 備考: Aurora MySQL 3.08.0 以降など、自動一時停止対応バージョンを採用する。Phase 4 以降の Step Functions 空回しは DB 準備確認タスクに依存するため、Aurora は Phase 4 より前に作成する。CDK 引数は [docs/infra/stacks.html](infra/stacks.html) セクション 3.1 を参照
+  - 備考: Aurora MySQL 3.08.0 以降など、自動一時停止対応バージョンを採用する。Phase 4 以降の Step Functions 空回しは DB 準備確認タスクに依存するため、Aurora は Phase 4 より前に作成する。CDK 引数は [docs/infra/stacks.html](infra/stacks.html) セクション 3.1 を参照。2026-07-13 実施: FoundationStack に `rds.DatabaseCluster`（エンジン **Aurora MySQL 3.08.2＝LTS 最新パッチ**）を追加し、後続スタック参照用に `auroraCluster` を `public readonly` で公開。Isolated Subnet 配置 + Aurora 用 SG（2-2 作成済み）を関連付け、インスタンスは Serverless v2 の writer 1 つのみ。`serverlessV2MinCapacity: 0` / `serverlessV2MaxCapacity: 1.0` / `enableDataApi: true` は stacks.html 3.1 どおり。自動一時停止までの時間は未指定＝デフォルト 5 分（`SecondsUntilAutoPause: 300`）。**`defaultDatabaseName: 'acps'` を指定**（Secret 値スキーマ security.html 1.3 の `dbname` キー必須のため。未指定だと自動生成 Secret に `dbname` が含まれない）。**`storageEncrypted: true` を明示指定**（CDK デフォルトは false。デフォルト KMS キー・追加コストなし）。認証情報は `Credentials.fromGeneratedSecret('admin')` + Secret 名 `acps/prod/db/credentials` 明示指定。**RemovalPolicy は未指定＝CDK デフォルトの SNAPSHOT**（DB は正式な記録を担うため S3/ECR の DESTROY と方針を変えた。クラスター識別子は CFN 自動命名のため再作成で名前衝突しない）→ stacks.html 3.1 の decision コールアウトに記録。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（Aurora テスト 5 件追加、計 30 件）成功、`cdk diff` が Aurora 関連 5 リソース（DBCluster / DBInstance / DBSubnetGroup / Secret + Attachment）の追加のみ（既存リソース変更なし）を確認のうえデプロイ（約 8 分で `UPDATE_COMPLETE`。本番デプロイのため Claude の自動実行が権限拒否され、ユーザー承認のうえ再試行した）。AWS CLI 検証: クラスターが `available` / EngineVersion 3.08.2 / ScalingConfig（Min 0・Max 1・SecondsUntilAutoPause 300）/ `HttpEndpointEnabled: true` / `StorageEncrypted: true` / DatabaseName `acps` / Aurora SG 関連付け、インスタンスが `db.serverless` で `available`、Secret 値に `username`（admin）/ `password` / `host` / `port`（3306）/ `dbname`（acps）が揃っていること（security.html 1.3 のスキーマ充足）、DBSubnetGroup が Isolated Subnet 2 つのみ、デプロイ済みテンプレートで DeletionPolicy / UpdateReplacePolicy が `Snapshot` であることを確認。コンソールでの目視確認はユーザーが実施
 
 - [ ] **3-2** `services/db-readiness-check/` に DB 準備確認用の Python + Dockerfile を作成し、ECR に push
   - 確認: ECR コンソールでイメージが見える

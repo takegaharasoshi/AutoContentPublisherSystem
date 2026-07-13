@@ -243,8 +243,8 @@ describe('FoundationStack の画像生成 API キー用 Secret', () => {
   const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
   const template = Template.fromStack(stack);
 
-  test('Secrets Manager Secret が 1 つ作成される', () => {
-    template.resourceCountIs('AWS::SecretsManager::Secret', 1);
+  test('Secrets Manager Secret が 2 つ作成される', () => {
+    template.resourceCountIs('AWS::SecretsManager::Secret', 2);
   });
 
   test('Secret 名が設定される', () => {
@@ -260,6 +260,73 @@ describe('FoundationStack の画像生成 API キー用 Secret', () => {
         GenerateStringKey: 'api_key',
       },
     });
+  });
+});
+
+describe('FoundationStack の Aurora Serverless v2', () => {
+  const app = new cdk.App();
+  const stack = new FoundationStack(app, 'FoundationStack', { envName: 'prod' });
+  const template = Template.fromStack(stack);
+
+  test('Aurora MySQL クラスターが必要な設定で作成される', () => {
+    const securityGroups = template.findResources('AWS::EC2::SecurityGroup', {
+      Properties: {
+        GroupDescription: 'Security group for Aurora Serverless v2',
+      },
+    });
+    const auroraSecurityGroupId = Object.keys(securityGroups)[0];
+
+    template.resourceCountIs('AWS::RDS::DBCluster', 1);
+    template.hasResourceProperties('AWS::RDS::DBCluster', {
+      EngineVersion: '8.0.mysql_aurora.3.08.2',
+      ServerlessV2ScalingConfiguration: {
+        MinCapacity: 0,
+        MaxCapacity: 1,
+      },
+      EnableHttpEndpoint: true,
+      DatabaseName: 'acps',
+      StorageEncrypted: true,
+      VpcSecurityGroupIds: [
+        {
+          'Fn::GetAtt': [auroraSecurityGroupId, 'GroupId'],
+        },
+      ],
+    });
+  });
+
+  test('クラスターの削除・置換時にはスナップショットを保持する', () => {
+    template.hasResource('AWS::RDS::DBCluster', {
+      DeletionPolicy: 'Snapshot',
+      UpdateReplacePolicy: 'Snapshot',
+    });
+  });
+
+  test('Serverless v2 Writer インスタンスが 1 つ作成される', () => {
+    template.resourceCountIs('AWS::RDS::DBInstance', 1);
+    template.hasResourceProperties('AWS::RDS::DBInstance', {
+      DBInstanceClass: 'db.serverless',
+    });
+  });
+
+  test('DB 認証情報 Secret 名が設定される', () => {
+    template.hasResourceProperties('AWS::SecretsManager::Secret', {
+      Name: 'acps/prod/db/credentials',
+    });
+  });
+
+  test('DB Subnet Group が Isolated Subnet 2 つを参照する', () => {
+    const subnetGroups = template.findResources('AWS::RDS::DBSubnetGroup');
+    const isolatedSubnets = template.findResources('AWS::EC2::Subnet', {
+      Properties: { MapPublicIpOnLaunch: false },
+    });
+
+    expect(Object.keys(subnetGroups)).toHaveLength(1);
+    expect(Object.values(subnetGroups)[0].Properties.SubnetIds).toEqual(
+      expect.arrayContaining(
+        Object.keys(isolatedSubnets).map((subnetId) => ({ Ref: subnetId })),
+      ),
+    );
+    expect(Object.values(subnetGroups)[0].Properties.SubnetIds).toHaveLength(2);
   });
 });
 
