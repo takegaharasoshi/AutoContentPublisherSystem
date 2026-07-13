@@ -38,14 +38,14 @@ uv run pytest
 
 ## Docker ビルドと ECR push
 
-不変タグには Git コミットハッシュを使用します。
+不変タグには Git コミットハッシュを使用します。push 前に作業ツリーがクリーン（コミット済み）であることを確認してください。`--provenance=false` は必須です（省略すると buildx が attestation 用のタグなしイメージを ECR に登録し、ECR ライフサイクルルールの「1 push = 1 イメージ」の前提が崩れるため）。
 
 ```bash
 cd services/db-readiness-check
 IMAGE=516964473143.dkr.ecr.ap-northeast-1.amazonaws.com/auto-content-publisher/db-readiness-check
-TAG=$(git rev-parse --short HEAD)
+TAG=$(git rev-parse --short=12 HEAD)
 
-docker build -t "${IMAGE}:${TAG}" .
+docker build --platform linux/amd64 --provenance=false -t "${IMAGE}:${TAG}" .
 aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 516964473143.dkr.ecr.ap-northeast-1.amazonaws.com
 docker push "${IMAGE}:${TAG}"
 ```
