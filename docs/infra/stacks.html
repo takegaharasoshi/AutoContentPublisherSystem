@@ -184,13 +184,13 @@
 <table>
   <thead><tr><th>リソース</th><th>説明</th></tr></thead>
   <tbody>
-    <tr><td>ECS Task Definition</td><td>SNS 投稿バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する</td></tr>
-    <tr><td>Container Definition</td><td>コンテナ名: <code>sns-post-batch</code>。ECR イメージ、環境変数、ログ設定</td></tr>
+    <tr><td>ECS Task Definition</td><td>SNS 投稿バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する。コンテナイメージは CDK Context <code>snsPostBatchImageTag</code> で指定された不変タグを参照する。CDK 引数指定: <code>family</code> に <code>acps-{env}-sns-post-batch</code> を明示指定する（Step Functions の ASL と <code>aws ecs describe-task-definition</code> が family 名で参照するため固定必須。<a href="cicd.html#deploy">cicd.html セクション 5</a> の family 命名例に合わせる）、<code>cpu: 256</code> / <code>memoryLimitMiB: 512</code>。タスク実行ロールは明示作成せず CDK 自動生成に任せる（ECR pull + awslogs 書き込みが自動で最小権限付与される）</td></tr>
+    <tr><td>Container Definition</td><td>コンテナ名: <code>sns-post-batch</code>。環境変数（<code>DB_SECRET_ARN</code> / <code>S3_BUCKET_NAME</code> / <code>ENV_NAME</code>）は Task Definition に静的設定する（<a href="workflow.html#env-vars">workflow.html セクション 5.2</a>。<code>SET_CODE</code> / <code>EXECUTION_ARN</code> は Step Functions のコンテナオーバーライドで渡すため静的設定しない）。ログは awslogs ドライバで下記 CloudWatch Log Group に出力する</td></tr>
     <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html">workflow.html</a> を参照）</td></tr>
     <tr><td>CodePipeline</td><td>sns-post-batch 用 CI/CD パイプライン（詳細は <a href="cicd.html">cicd.html</a> を参照）</td></tr>
     <tr><td>CodeBuild</td><td>Docker ビルド・ECR push・タスク定義更新</td></tr>
-    <tr><td>IAM Role</td><td>権限詳細は <a href="security.html">security.html</a> を参照</td></tr>
-    <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）</td></tr>
+    <tr><td>IAM Role</td><td>権限詳細は <a href="security.html">security.html</a> を参照。タスクロールのインラインポリシーは <code>secretsmanager:GetSecretValue</code> をプレフィックス <code>acps/{env}/db/*</code> と <code>acps/{env}/*/sns/*</code> に許可し（プレフィックスベース制御。security.html セクション 2.1）、S3 バケット読み取りと <code>cloudwatch:PutMetricData</code>（条件キー <code>cloudwatch:namespace</code> で <code>ACPS</code> のみに制限）を付与する</td></tr>
+    <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）。CDK 引数指定: ロググループ名は明示指定せず CFN 自動命名、<code>removalPolicy: DESTROY</code>（<a href="#foundation">セクション 3.1</a> の設計理由「DB 準備確認タスクの CloudWatch Log Group」と同方針）</td></tr>
   </tbody>
 </table>
 </div>
@@ -199,6 +199,12 @@
   <span class="callout-title">注記</span>
   SnsPostBatchStack には EventBridge Scheduler を含めない。SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動される。
 </div>
+
+<h4>注意事項</h4>
+<ul>
+  <li>sns-post-batch の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; -c snsPostBatchImageTag=&lt;tag&gt; SnsPostBatchStack</code> で新しいイメージタグを明示的に渡す。SnsPostBatchStack は FoundationStack の cross-stack 参照（ECR リポジトリ・S3 バケット・Aurora Secret）に依存し、FoundationStack もデプロイ対象に含まれるため、<code>dbReadinessCheckImageTag</code>（現行タグのまま）の同時指定が必要</li>
+  <li>ECS Task Definition を追加した以降（開発計画 Phase 4-3 以降）は、sns-post-batch に変更がないデプロイでも <code>snsPostBatchImageTag</code> の指定が必須である。Context 未指定時の扱い（<code>Annotations.of(stack).addError()</code> 方式とその理由）は <a href="#foundation">セクション 3.1</a> の注意事項と同じ。現行タグは <code>aws ecs describe-task-definition --task-definition acps-{env}-sns-post-batch</code> の image URI で確認できる</li>
+</ul>
 
 <p><strong>依存スタック</strong>: FoundationStack</p>
 

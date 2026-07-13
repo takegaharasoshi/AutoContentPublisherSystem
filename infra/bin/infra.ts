@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib/core';
 import { FoundationStack } from '../lib/foundation-stack';
+import { SnsPostBatchStack } from '../lib/sns-post-batch-stack';
 
 // 環境識別子は現時点で prod のみ（docs/infra/security.html を参照）
 const SUPPORTED_ENVS = ['prod'];
@@ -18,8 +19,17 @@ if (typeof envName !== 'string' || !SUPPORTED_ENVS.includes(envName)) {
 // CDK コマンドでは論理スタック ID（FoundationStack など）を指定する
 const stackNamePrefix = envName.charAt(0).toUpperCase() + envName.slice(1);
 
-new FoundationStack(app, 'FoundationStack', {
+const foundationStack = new FoundationStack(app, 'FoundationStack', {
   envName,
   stackName: `${stackNamePrefix}-FoundationStack`,
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
+});
+
+new SnsPostBatchStack(app, 'SnsPostBatchStack', {
+  envName,
+  snsPostBatchRepository: foundationStack.snsPostBatchRepository,
+  imagesBucket: foundationStack.imagesBucket,
+  auroraCluster: foundationStack.auroraCluster,
+  stackName: `${stackNamePrefix}-SnsPostBatchStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
