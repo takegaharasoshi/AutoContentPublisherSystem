@@ -1,4 +1,5 @@
 import * as cdk from 'aws-cdk-lib/core';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -6,6 +7,9 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Construct } from 'constructs';
 
 export interface ImageBatchStackProps extends cdk.StackProps {
@@ -19,6 +23,18 @@ export interface ImageBatchStackProps extends cdk.StackProps {
   auroraCluster: rds.DatabaseCluster;
   /** 画像生成 API キー用の Secret */
   imageApiKeySecret: secretsmanager.Secret;
+  /** Public Subnet ID を参照するための VPC */
+  vpc: ec2.Vpc;
+  /** 画像生成バッチを実行する ECS クラスター */
+  ecsCluster: ecs.Cluster;
+  /** 画像生成バッチ ECS タスク用の Security Group */
+  batchSecurityGroup: ec2.SecurityGroup;
+  /** DB 準備確認 ECS タスク用の Security Group */
+  dbReadinessCheckSecurityGroup: ec2.SecurityGroup;
+  /** DB 準備確認タスク定義 */
+  dbReadinessCheckTaskDefinition: ecs.FargateTaskDefinition;
+  /** SNS 投稿ワークフロー。ARN を非同期起動先として参照する */
+  snsPostingStateMachine: sfn.StateMachine;
 }
 
 /**
@@ -28,6 +44,8 @@ export interface ImageBatchStackProps extends cdk.StackProps {
 export class ImageBatchStack extends cdk.Stack {
   /** 画像生成バッチのタスク定義。Step Functions から family 名で参照される */
   public readonly taskDefinition: ecs.FargateTaskDefinition;
+  /** 画像生成ワークフロー。Phase 5-6 の EventBridge Scheduler と Phase 7 の MonitoringStack が参照する */
+  public readonly stateMachine: sfn.StateMachine;
 
   constructor(scope: Construct, id: string, props: ImageBatchStackProps) {
     super(scope, id, props);
@@ -102,5 +120,92 @@ export class ImageBatchStack extends cdk.Stack {
         streamPrefix: 'image-batch',
       }),
     });
+
+    // ECR イメージ + awslogs を使う両タスク定義には CDK がタスク実行ロールを自動生成している前提
+    const dbReadinessCheckExecutionRole =
+      props.dbReadinessCheckTaskDefinition.executionRole;
+    const imageBatchExecutionRole = this.taskDefinition.executionRole;
+    if (!dbReadinessCheckExecutionRole || !imageBatchExecutionRole) {
+      throw new Error('ECS タスク定義のタスク実行ロールが見つかりません。');
+    }
+
+    const stateMachineName = `acps-${props.envName}-image-generation-sfn`;
+    this.stateMachine = new sfn.StateMachine(this, 'ImageGenerationStateMachine', {
+      stateMachineName,
+      definitionBody: sfn.DefinitionBody.fromString(
+        fs.readFileSync(
+          path.join(__dirname, 'asl', 'image-generation.asl.json'),
+          'utf-8',
+        ),
+      ),
+      definitionSubstitutions: {
+        EcsClusterArn: props.ecsCluster.clusterArn,
+        DbReadinessCheckTaskDefFamily:
+          props.dbReadinessCheckTaskDefinition.family,
+        ImageBatchTaskDefFamily: this.taskDefinition.family,
+        PublicSubnetId1: props.vpc.publicSubnets[0].subnetId,
+        PublicSubnetId2: props.vpc.publicSubnets[1].subnetId,
+        DbReadinessCheckSgId:
+          props.dbReadinessCheckSecurityGroup.securityGroupId,
+        BatchSgId: props.batchSecurityGroup.securityGroupId,
+        SnsPostingSfnArn: props.snsPostingStateMachine.stateMachineArn,
+        ImageGenerationSfnName: stateMachineName,
+      },
+    });
+
+    this.stateMachine.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['ecs:RunTask'],
+        resources: [
+          `arn:aws:ecs:${this.region}:${this.account}:task-definition/${props.dbReadinessCheckTaskDefinition.family}:*`,
+          `arn:aws:ecs:${this.region}:${this.account}:task-definition/${this.taskDefinition.family}:*`,
+        ],
+      }),
+    );
+    this.stateMachine.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['ecs:StopTask', 'ecs:DescribeTasks'],
+        resources: ['*'],
+      }),
+    );
+    this.stateMachine.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['events:PutTargets', 'events:PutRule', 'events:DescribeRule'],
+        resources: [
+          `arn:aws:events:${this.region}:${this.account}:rule/StepFunctionsGetEventsForECSTaskRule`,
+        ],
+      }),
+    );
+    this.stateMachine.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['iam:PassRole'],
+        resources: [
+          props.dbReadinessCheckTaskDefinition.taskRole.roleArn,
+          dbReadinessCheckExecutionRole.roleArn,
+          this.taskDefinition.taskRole.roleArn,
+          imageBatchExecutionRole.roleArn,
+        ],
+        conditions: {
+          StringEquals: {
+            'iam:PassedToService': 'ecs-tasks.amazonaws.com',
+          },
+        },
+      }),
+    );
+    this.stateMachine.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['states:StartExecution'],
+        resources: [props.snsPostingStateMachine.stateMachineArn],
+      }),
+    );
+    this.stateMachine.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['cloudwatch:PutMetricData'],
+        resources: ['*'],
+        conditions: {
+          StringEquals: { 'cloudwatch:namespace': 'ACPS' },
+        },
+      }),
+    );
   }
 }

@@ -26,7 +26,7 @@ const foundationStack = new FoundationStack(app, 'FoundationStack', {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
 
-new SnsPostBatchStack(app, 'SnsPostBatchStack', {
+const snsPostBatchStack = new SnsPostBatchStack(app, 'SnsPostBatchStack', {
   envName,
   snsPostBatchRepository: foundationStack.snsPostBatchRepository,
   imagesBucket: foundationStack.imagesBucket,
@@ -46,6 +46,12 @@ new ImageBatchStack(app, 'ImageBatchStack', {
   imagesBucket: foundationStack.imagesBucket,
   auroraCluster: foundationStack.auroraCluster,
   imageApiKeySecret: foundationStack.imageApiKeySecret,
+  vpc: foundationStack.vpc,
+  ecsCluster: foundationStack.ecsCluster,
+  batchSecurityGroup: foundationStack.batchSecurityGroup,
+  dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
+  dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
+  snsPostingStateMachine: snsPostBatchStack.stateMachine,
   stackName: `${stackNamePrefix}-ImageBatchStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });

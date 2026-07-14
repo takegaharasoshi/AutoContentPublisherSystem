@@ -1,0 +1,145 @@
+{
+  "StartAt": "WaitForDbReady",
+  "States": {
+    "WaitForDbReady": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 900,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${DbReadinessCheckTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${DbReadinessCheckSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "Next": "RunImageBatchTask"
+    },
+    "RunImageBatchTask": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 3600,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${ImageBatchTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${BatchSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "image-batch",
+              "Environment": [
+                { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" },
+                { "Name": "SCHEDULED_AT", "Value.$": "$.scheduled_at" }
+              ]
+            }
+          ]
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "States.Timeout"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "Next": "StartSnsPostBatch"
+    },
+    "StartSnsPostBatch": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::states:startExecution",
+      "TimeoutSeconds": 60,
+      "Parameters": {
+        "StateMachineArn": "${SnsPostingSfnArn}",
+        "Name.$": "$$.Execution.Name",
+        "Input": {
+          "set_code.$": "$.set_code"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["StepFunctions.ExecutionAlreadyExistsException"],
+          "MaxAttempts": 0
+        },
+        {
+          "ErrorEquals": ["States.ALL"],
+          "IntervalSeconds": 10,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["StepFunctions.ExecutionAlreadyExistsException"],
+          "Next": "SnsPostAlreadyStarted"
+        },
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "NotifySnsPostStartFailure"
+        }
+      ],
+      "End": true
+    },
+    "SnsPostAlreadyStarted": {
+      "Type": "Succeed",
+      "Comment": "同じ実行名の SNS 投稿 SFN は既に作成済みのため、二重起動せず成功扱いとする"
+    },
+    "NotifySnsPostStartFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:cloudwatch:putMetricData",
+      "Parameters": {
+        "Namespace": "ACPS",
+        "MetricData": [
+          {
+            "MetricName": "SnsPostStartFailureCount",
+            "Dimensions": [
+              {
+                "Name": "StateMachineName",
+                "Value": "${ImageGenerationSfnName}"
+              }
+            ],
+            "Value": 1,
+            "Unit": "Count"
+          }
+        ]
+      },
+      "Comment": "SNS 投稿 SFN の起動失敗を CloudWatch カスタムメトリクスとして発行し、MonitoringStack のアラームで検知する",
+      "Next": "ImageBatchSucceeded"
+    },
+    "ImageBatchSucceeded": {
+      "Type": "Succeed",
+      "Comment": "画像生成は成功済みのため、SNS 投稿 SFN の起動失敗時もワークフローは成功終了とする。SNS 投稿が起動されなかったことはカスタムメトリクスのアラームで検知し、手動で sns-posting-sfn を起動する"
+    },
+    "HandleError": {
+      "Type": "Fail",
+      "Error": "ImageBatchFailed",
+      "Cause": "Image batch task failed after retries"
+    }
+  }
+}
