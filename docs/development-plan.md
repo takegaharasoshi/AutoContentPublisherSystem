@@ -273,9 +273,9 @@
 
 **ゴール**: EventBridge → Step Functions → ECS Fargate のパイプラインが動くことを確認する（業務ロジックなし）
 
-- [ ] **5-1** `services/image-batch/` に Hello World の Python + Dockerfile を作成
+- [x] **5-1** `services/image-batch/` に Hello World の Python + Dockerfile を作成
   - 確認: `docker build` & `docker run` でローカル動作確認
-  - 備考:
+  - 備考: 2026-07-14 実施: sns-post-batch（4-1）の完全ミラーとして作成（サービス名と Phase 表記の置換のみ。雛形: `app/` パッケージ / `tests/` / requirements・requirements-dev 分離 / `python -m app` 起動 / python:3.12-slim・非 root uid 1001 の Dockerfile）。`main()` が「Hello World from image-batch」を INFO ログ出力して 0 を返すのみで、環境変数は一切読まない。README には ECR push 手順（`auto-content-publisher/image-batch`）も最初から記載済み（5-2 での追記不要）。実装は Codex に委譲し Claude がレビュー（置換版 sns-post-batch との機械的 diff で全 10 ファイル一致を確認、指摘なし）。検証: pytest 2 件成功、`docker build` 成功、`docker run` で「Hello World from image-batch」ログ + exit code 0 + `uid=1001(appuser)` の非 root 実行を確認。ECR push は 5-2 で実施
 
 - [ ] **5-2** ECR リポジトリ（Phase 2-5 で作成済み）に手動で Docker イメージを push
   - 確認: ECR コンソールでイメージが見える
