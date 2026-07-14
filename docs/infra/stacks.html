@@ -231,10 +231,10 @@
 <table>
   <thead><tr><th>リソース</th><th>説明</th></tr></thead>
   <tbody>
-    <tr><td>CloudWatch Alarm</td><td>監視リソースの詳細は <a href="workflow.html#alarms">workflow.html セクション 8</a> を参照</td></tr>
-    <tr><td>EventBridge Rule</td><td>ECS Task State Change 検知。詳細は <a href="workflow.html#eventbridge-rule">workflow.html セクション 9</a> を参照</td></tr>
-    <tr><td>SNS Topic</td><td>アラーム・イベント通知先</td></tr>
-    <tr><td>CloudWatch Dashboard</td><td>運用可視化（必要に応じて）</td></tr>
+    <tr><td>CloudWatch Alarm</td><td>監視リソースの詳細は <a href="workflow.html#alarms">workflow.html セクション 8</a> を参照。アラーム名は <code>acps-{env}-&lt;監視対象&gt;</code>（例: <code>acps-prod-image-generation-sfn-failed</code>）で明示命名する（通知メール・コンソールでの識別のため）</td></tr>
+    <tr><td>EventBridge Rule</td><td>ECS Task State Change 検知。Rule 名 <code>acps-{env}-ecs-task-abnormal-exit</code>。詳細は <a href="workflow.html#eventbridge-rule">workflow.html セクション 9</a> を参照</td></tr>
+    <tr><td>SNS Topic</td><td>アラーム・イベント通知先。Topic 名 <code>acps-{env}-alarm-topic</code>。メールサブスクリプションは CDK 管理外とし、AWS Console から手動作成する（手順は <a href="operation.html">operation.html セクション 4.2</a>）</td></tr>
+    <tr><td>CloudWatch Dashboard</td><td>運用可視化（必要に応じて。Phase 7-1 時点では未作成）</td></tr>
   </tbody>
 </table>
 </div>

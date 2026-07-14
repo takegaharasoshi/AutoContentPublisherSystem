@@ -447,6 +447,7 @@
     <tr><td>SNS 投稿起動失敗</td><td><code>ACPS</code></td><td><code>SnsPostStartFailureCount</code></td><td><code>StateMachineName=${ImageGenerationSfnName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>Aurora CPU</td><td><code>AWS/RDS</code></td><td><code>CPUUtilization</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&gt;= 80%</td><td>300 秒</td><td>3</td><td>2</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>Aurora メモリ</td><td><code>AWS/RDS</code></td><td><code>FreeableMemory</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&lt;= 268435456（256 MB）</td><td>300 秒</td><td>3</td><td>2</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>Scheduler 起動失敗</td><td><code>AWS/Scheduler</code></td><td><code>TargetErrorCount</code>、<code>TargetErrorThrottledCount</code>、<code>InvocationThrottleCount</code>、<code>InvocationDroppedCount</code>、<code>InvocationsSentToDeadLetterCount</code>、<code>InvocationsFailedToBeSentToDeadLetterCount</code>（メトリクスごとに個別アラーム、計 6 個）</td><td><code>ScheduleGroup=${ImageScheduleGroupName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
   </tbody>
 </table>
 </div>
@@ -454,6 +455,11 @@
 <div class="note">
   <span class="callout-title">閾値の設計方針</span>
   Aurora のアラームは <code>notBreaching</code>（データ欠損時はアラームを発報しない）を使用する。Aurora Serverless v2 の自動一時停止中はメトリクスが発行されないため、<code>missing</code> や <code>breaching</code> にすると一時停止のたびにアラームが発報される。Step Functions とカスタムメトリクスのアラームも同様に <code>notBreaching</code> とする。閾値は初期値であり、実運用の負荷状況に応じて調整する。
+</div>
+
+<div class="decision">
+  <span class="callout-title">Scheduler アラーム行の追加（Phase 7-1 実装時）</span>
+  当初の本表には AWS/Scheduler のアラームが未記載だったが、<a href="stacks.html#monitoring">stacks.html セクション 3.4</a>（必須監視対象）とセクション 10（Scheduler DLQ の監視）の要求に合わせて、実装時に 6 メトリクスの個別アラームとして追加した。設定値は Step Functions 失敗アラームと同一とする。
 </div>
 
 <h2 id="eventbridge-rule">9. EventBridge Rule 定義</h2>

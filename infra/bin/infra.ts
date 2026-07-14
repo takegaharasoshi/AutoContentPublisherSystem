@@ -3,6 +3,7 @@ import * as cdk from 'aws-cdk-lib/core';
 import { FoundationStack } from '../lib/foundation-stack';
 import { SnsPostBatchStack } from '../lib/sns-post-batch-stack';
 import { ImageBatchStack } from '../lib/image-batch-stack';
+import { MonitoringStack } from '../lib/monitoring-stack';
 
 // 環境識別子は現時点で prod のみ（docs/infra/security.html を参照）
 const SUPPORTED_ENVS = ['prod'];
@@ -40,7 +41,7 @@ const snsPostBatchStack = new SnsPostBatchStack(app, 'SnsPostBatchStack', {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
 
-new ImageBatchStack(app, 'ImageBatchStack', {
+const imageBatchStack = new ImageBatchStack(app, 'ImageBatchStack', {
   envName,
   imageBatchRepository: foundationStack.imageBatchRepository,
   imagesBucket: foundationStack.imagesBucket,
@@ -53,5 +54,16 @@ new ImageBatchStack(app, 'ImageBatchStack', {
   dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
   snsPostingStateMachine: snsPostBatchStack.stateMachine,
   stackName: `${stackNamePrefix}-ImageBatchStack`,
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
+});
+
+new MonitoringStack(app, 'MonitoringStack', {
+  envName,
+  auroraCluster: foundationStack.auroraCluster,
+  ecsCluster: foundationStack.ecsCluster,
+  imageGenerationStateMachine: imageBatchStack.stateMachine,
+  snsPostingStateMachine: snsPostBatchStack.stateMachine,
+  imageScheduleGroup: imageBatchStack.scheduleGroup,
+  stackName: `${stackNamePrefix}-MonitoringStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
