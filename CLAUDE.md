@@ -160,6 +160,7 @@ cd infra && cdk diff -c env=prod <StackName>
 # CDK デプロイ
 cd infra && cdk deploy -c env=prod <StackName>
 
-# Docker ビルド（各サービスディレクトリ内で）
-docker build -t <service-name> .
+# Docker ビルド（リポジトリルートから。shared/ を COPY するためルートをビルドコンテキストにする）
+docker build -f services/<service-name>/Dockerfile -t <service-name> .
+# ※ db-readiness-check のみ従来方式（サービスディレクトリ内で docker build -t db-readiness-check .）
 ```

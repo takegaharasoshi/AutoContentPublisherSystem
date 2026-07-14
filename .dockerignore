@@ -1,0 +1,17 @@
+.git/
+.claude/
+.codex/
+.mcp.json
+*.md
+*.code-workspace
+docs/
+infra/
+plans/
+database/
+**/__pycache__/
+**/.pytest_cache/
+**/.venv/
+**/tests/
+**/uv.lock
+**/requirements-dev.txt
+**/README.md

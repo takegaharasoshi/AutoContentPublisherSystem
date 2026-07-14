@@ -4,7 +4,7 @@
 -- 設計の詳細（ER図、各カラムの意図、S3キー設計、時刻の取り扱い、マイグレーション方針）は
 -- docs/app/data-model.html を参照。DDL のバージョン管理は Flyway 風の命名規則
 -- （V<連番>__<説明>.sql）に従い、本ファイルが最初の本スキーマ定義（V001）である。
--- database/V000__connection_test.sql（Phase 6-3 で作成する接続確認用テーブル）とは独立している。
+-- database/V000__connection_test.sql（Phase 6-2 で作成した接続確認用テーブル）とは独立している。
 --
 -- 前提: 文字コード utf8mb4 / 照合順序 utf8mb4_unicode_ci。
 -- 全 DATETIME カラムは UTC で保存する（アプリケーション側で変換してから格納する）。

@@ -1,26 +1,27 @@
 # SNS 投稿バッチ
 
-SNS 投稿を行う ECS Fargate RunTask 用バッチです。現状は Phase 4 空回し用の Hello World であり、業務ロジックは実装していません。
+SNS 投稿を行う ECS Fargate RunTask 用バッチです。Phase 6 では Aurora（MySQL）への接続確認として、`connection_test` テーブルへの INSERT / SELECT を実行します。
 
 ## 環境変数
 
-現段階では環境変数を使用しません。将来の受け渡し契約は `docs/infra/workflow.html` のセクション 5.2 を参照してください。
+`ENV_NAME` は必須です。通常は `DB_SECRET_ARN` に Secrets Manager の ARN を渡します。ローカル開発では `DB_SECRET_JSON` に Secret JSON を直接渡せますが、この方法はローカル開発専用です。
 
 ## ローカルテスト
 
 ```bash
-cd services/sns-post-batch
-uv venv --python 3.12
-uv pip install -r requirements-dev.txt
-uv run pytest
+cd services/sns-post-batch && uv run pytest
 ```
 
 ## Docker ビルドとローカル動作確認
 
+リポジトリルートから実行します。
+
 ```bash
-cd services/sns-post-batch
-docker build -t sns-post-batch .
-docker run --rm sns-post-batch
+docker build -f services/sns-post-batch/Dockerfile -t sns-post-batch .
+
+export ENV_NAME=local
+export DB_SECRET_JSON='{"username":"user","password":"password","host":"host.docker.internal","port":3306,"dbname":"appdb"}'
+docker run --rm -e ENV_NAME -e DB_SECRET_JSON sns-post-batch
 ```
 
 ## Docker ビルドと ECR push
@@ -28,11 +29,10 @@ docker run --rm sns-post-batch
 不変タグには Git コミットハッシュを使用します。push 前に作業ツリーがクリーン（コミット済み）であることを確認してください。`--provenance=false` は必須です（省略すると buildx が attestation 用のタグなしイメージを ECR に登録し、ECR ライフサイクルルールの「1 push = 1 イメージ」の前提が崩れるため）。
 
 ```bash
-cd services/sns-post-batch
 IMAGE=516964473143.dkr.ecr.ap-northeast-1.amazonaws.com/auto-content-publisher/sns-post-batch
 TAG=$(git rev-parse --short=12 HEAD)
 
-docker build --platform linux/amd64 --provenance=false -t "${IMAGE}:${TAG}" .
+docker build --platform linux/amd64 --provenance=false -f services/sns-post-batch/Dockerfile -t "${IMAGE}:${TAG}" .
 aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 516964473143.dkr.ecr.ap-northeast-1.amazonaws.com
 docker push "${IMAGE}:${TAG}"
 ```

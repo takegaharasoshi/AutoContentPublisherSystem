@@ -1,1 +1,2 @@
-# 現時点で実行時依存なし（Phase 5 空回し用 Hello World）
+boto3==1.43.46
+PyMySQL==1.2.0

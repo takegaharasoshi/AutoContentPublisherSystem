@@ -320,7 +320,7 @@ LIMIT 1;</code></pre>
 
 <h2 id="ddl">8. DDL・マイグレーション方針</h2>
 <ul>
-  <li>DDL ファイルは <code>database/</code> 配下に Flyway 風の命名規則 <code>V&lt;連番&gt;__&lt;説明&gt;.sql</code> で管理する（Phase 6-3 の接続確認用 <code>V000__connection_test.sql</code> と連番を共有する）</li>
+  <li>DDL ファイルは <code>database/</code> 配下に Flyway 風の命名規則 <code>V&lt;連番&gt;__&lt;説明&gt;.sql</code> で管理する（Phase 6-2 で作成した接続確認用 <code>V000__connection_test.sql</code> と連番を共有する）</li>
   <li>本スキーマの初期構築は <a href="../../database/V001__initial_schema.sql">V001__initial_schema.sql</a> の 1 ファイルにまとめる（まだ本番データが存在しないため、初期構築を複数ファイルに分割するメリットがない）</li>
   <li>今後のスキーマ変更は <code>V002__</code> 以降の新規ファイルとして追加する（既存ファイルの書き換えはしない）。マイグレーション自動適用ツール（Flyway 等）の導入は Phase 10 以降の運用実態を見て判断し、当面は SQL ファイルをレビュー後に AWS Console の Query Editor で手動適用する</li>
   <li>本スキーマの Aurora への適用自体は <strong>Phase 10 で実施</strong>する（Phase 9 は DDL ファイル作成まで）</li>
