@@ -2,6 +2,7 @@
 import * as cdk from 'aws-cdk-lib/core';
 import { FoundationStack } from '../lib/foundation-stack';
 import { SnsPostBatchStack } from '../lib/sns-post-batch-stack';
+import { ImageBatchStack } from '../lib/image-batch-stack';
 
 // 環境識別子は現時点で prod のみ（docs/infra/security.html を参照）
 const SUPPORTED_ENVS = ['prod'];
@@ -36,5 +37,15 @@ new SnsPostBatchStack(app, 'SnsPostBatchStack', {
   dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
   dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
   stackName: `${stackNamePrefix}-SnsPostBatchStack`,
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
+});
+
+new ImageBatchStack(app, 'ImageBatchStack', {
+  envName,
+  imageBatchRepository: foundationStack.imageBatchRepository,
+  imagesBucket: foundationStack.imagesBucket,
+  auroraCluster: foundationStack.auroraCluster,
+  imageApiKeySecret: foundationStack.imageApiKeySecret,
+  stackName: `${stackNamePrefix}-ImageBatchStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
