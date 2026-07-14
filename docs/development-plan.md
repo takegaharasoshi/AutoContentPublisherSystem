@@ -303,9 +303,9 @@
 
 **ゴール**: ECS タスクから Aurora に接続できることを確認する（本スキーマの DDL はアプリ設計後に作成する）
 
-- [ ] **6-1** `shared/` に DB 接続共通モジュールを作成（DB が利用可能な前提。リトライなし）
+- [x] **6-1** `shared/` に DB 接続共通モジュールを作成（DB が利用可能な前提。リトライなし）
   - 確認: ユニットテストが通る
-  - 備考: DB 接続リトライは DB 準備確認 ECS タスク（FoundationStack）の責務。バッチアプリケーションの DB 接続モジュールにはリトライを持たせない（[docs/infra/workflow.html](infra/workflow.html) セクション 2）
+  - 備考: DB 接続リトライは DB 準備確認 ECS タスク（FoundationStack）の責務。バッチアプリケーションの DB 接続モジュールにはリトライを持たせない（[docs/infra/workflow.html](infra/workflow.html) セクション 2）。2026-07-14 実施: パッケージ名は `acps_shared`（`shared/acps_shared/`。Secret 名 `acps/...`・DB 名 `acps` と同一プレフィックス）。`secrets.py`（`DbSecret`/`parse_db_secret`/`get_db_secret`）は db-readiness-check の実装をそのまま移植し、`db.py` に `connect()`（リトライなし・例外そのまま送出）と `open_connection()`（終了時 close するコンテキストマネージャ）を新設。実装裁量で決めた既定値: `charset="utf8mb4"`（DDL の文字コードに合わせる）/ `connect_timeout=10`（db-readiness-check と同値）/ autocommit は pymysql デフォルト（無効）のまま commit は呼び出し側の責務。依存は boto3==1.43.46 / PyMySQL==1.2.0（db-readiness-check と同一固定）。テスト・pyproject 構成は services と同じ流儀（`cd shared && pytest`）。実装は Codex に委譲し Claude がレビュー（デフォルトタイムアウト値のテスト 1 件を追加）。検証: pytest 11 件全パス。コンテナへの組み込み（Dockerfile ルートコンテキスト化・`COPY shared/`）は 6-2 で実施
 
 - [ ] **6-2** Hello World コンテナを DB 接続テスト版に差し替え
   - 確認: ローカル Docker + ローカル MySQL で接続テスト
@@ -408,3 +408,4 @@
 | 2026-07-07 | docs/app/batch-flow.html | posts の作成（3.3 手順 1）が Step Functions Retry での再実行時にも毎回 INSERT を試みる記述に読めるが、3.2 の復旧ロジックは既存 pending 行への分岐を前提としており、両者を combine して初めて「行が存在する場合は INSERT をスキップする」という意図が読み取れる。明文化されていないため誤読の余地がある | Phase 10 実装時に 3.3 手順 1 を「存在しなければ INSERT」と明記する形で軽微修正を検討する（blocker ではないため 9-5 では見送り） | Phase 10-1 |
 | 2026-07-12 | docs/app/batch-flow.html, docs/app/design-outline.html | D-3 通読時の議論で、セット別生成ロジックの隔離方針（image-batch 内の strategy モジュール構造。方式の割当は DB のセット設定で行う）と、生成方式の設計書分冊ルール（batch-flow.html には契約 + 方式カタログのみ、方式本体は `docs/app/generators/` に 1 方式 1 本の 3 層構造）を合意した。現行のアプリ設計書には未反映 | Phase 10-1 の最終 Fix で design-outline.html セクション 1.1 と batch-flow.html のセット別拡張ポイントに反映する。詳細は [docs/app/index.html](app/index.html#memo) の検討メモ（2026-07-12 の 2 件）を参照 | Phase 10-1 |
 | 2026-07-12 | docs/infra/workflow.html | 将来セット間のデプロイ分離（セットごとに使うタスク定義リビジョンを Scheduler payload で固定し、新セットの開発中も既存セットは検証済みイメージで動かし続ける方式）が必要になった場合、Step Functions の RunTask がタスク定義を入力から受け取れる形になっていれば、Scheduler の設定値追加だけで移行できる | Phase 10 のワークフロー実装時に「入力未指定なら family 最新リビジョン、指定があればそれを使う」形の継ぎ目を設けるか検討する（デプロイ分離自体は現時点で導入しないと決定済み） | Phase 10-1（検討） |
+| 2026-07-14 | services/db-readiness-check | 6-1 で `shared/acps_shared` に DB 接続共通モジュールを作成したが、db-readiness-check は移植元の `app/secrets.py` / `app/db.py` を持ったままで、Secret パース処理が二重管理になっている。統合には db-readiness-check の Dockerfile をルートコンテキスト方式（`COPY shared/`）に変更してイメージを再ビルド・再 push する必要があるため 6-1 では見送った | 6-2 で image-batch / sns-post-batch の Dockerfile をルートコンテキスト方式に変える際、db-readiness-check も同方式に揃えて acps_shared 利用へリファクタするか判断する | Phase 6-2（検討） |
