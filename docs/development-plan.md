@@ -333,9 +333,9 @@
   - 確認: `cdk deploy -c env=prod MonitoringStack` 成功
   - 備考: アラーム・EventBridge Rule の定義は [docs/infra/workflow.html](infra/workflow.html) セクション 8〜10 を参照。2026-07-14 実施。**実装**（Codex 委譲 + Claude レビュー）: `infra/lib/monitoring-stack.ts` に SNS Topic `acps-prod-alarm-topic`（サブスクリプションは 7-2 で手動作成）、CloudWatch Alarm 11 個（SFN 失敗 ×2 / SNS 投稿起動失敗 / Aurora CPU・メモリ / AWS/Scheduler 6 メトリクス。全て notBreaching・`acps-{env}-` で明示命名）、EventBridge Rule `acps-prod-ecs-task-abnormal-exit`（exitCode != 0 の Task State Change → SNS Topic）を定義。レビューで blocker 1 件修正: Codex 実装が `exitCode: [Match.anythingBut(0)]` と配列で包んでおり不正なネスト配列 `[[{"anything-but":[0]}]]` になっていた（deploy 時 InvalidEventPatternException で失敗する）→ 配列包みを除去。**設計書更新**: workflow.html セクション 8 のアラーム表に未記載だった Scheduler 6 メトリクスを stacks.html 3.4 の必須監視要求に合わせ個別アラームとして追記（decision コールアウトで経緯記録）、stacks.html 3.4 に確定した命名を記録。**検証**: jest 63 件全パス。deploy はユーザー承認のうえ実行し成功（77 秒。依存スタックはクロススタック参照の Outputs 追加のみで既存リソース変更なしを cdk diff で事前確認）。CLI 裏取りでアラーム 11 個・Topic・Rule（ENABLED・パターン一致）・4 スタック正常を確認。コンソールでの目視確認はユーザーが実施
 
-- [ ] **7-2** SNS Topic サブスクリプションの設定・確認
+- [x] **7-2** SNS Topic サブスクリプションの設定・確認
   - 確認: (1) SNS Topic にメールサブスクリプションが作成されている (2) 確認メールのリンクをクリックし、ステータスが「確認済み」になっている
-  - 備考: 手順の詳細は [docs/infra/operation.html](infra/operation.html) セクション 4.2 を参照。サブスクリプションの承認を行わないと通知が届かない
+  - 備考: 手順の詳細は [docs/infra/operation.html](infra/operation.html) セクション 4.2 を参照。サブスクリプションの承認を行わないと通知が届かない。2026-07-15 実施。ユーザーが AWS Console から `acps-prod-alarm-topic` に Email サブスクリプション（takegaharawork@gmail.com）を作成し承認。**つまずき**: 確認メール（差出人 no-reply@sns.amazonaws.com）が Gmail の迷惑メールフォルダに振り分けられ、届いていないように見えた → 迷惑メールフォルダから発見しリンクを承認して解消。再発防止として operation.html 4.2 の注意書きに迷惑メール確認・再送手順を追記。裏取り: CLI（`list-subscriptions-by-topic`）で SubscriptionArn が PendingConfirmation → 実 ARN（確認済み）に遷移したことを確認
 
 - [ ] **7-3** 意図的にバッチを失敗させてアラーム通知を確認
   - 確認: メール通知が届く
