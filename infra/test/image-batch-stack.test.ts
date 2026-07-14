@@ -340,6 +340,69 @@ describe('ImageBatchStack の画像生成ワークフロー', () => {
   });
 });
 
+describe('ImageBatchStack の EventBridge Scheduler', () => {
+  const stack = createImageBatchStack();
+  const template = Template.fromStack(stack);
+
+  test('Scheduler DLQ は 14 日間メッセージを保持する', () => {
+    template.hasResourceProperties('AWS::SQS::Queue', {
+      QueueName: 'acps-prod-image-scheduler-dlq',
+      MessageRetentionPeriod: 1209600,
+    });
+  });
+
+  test('画像生成用の ScheduleGroup を作成する', () => {
+    template.hasResourceProperties('AWS::Scheduler::ScheduleGroup', {
+      Name: 'acps-prod-image-schedule-group',
+    });
+  });
+
+  test('無効化した画像生成スケジュールを Step Functions 起動先として設定する', () => {
+    const scheduleGroups = Object.values(
+      template.findResources('AWS::Scheduler::ScheduleGroup'),
+    ) as any[];
+    const schedules = Object.values(
+      template.findResources('AWS::Scheduler::Schedule'),
+    ) as any[];
+
+    expect(scheduleGroups).toHaveLength(1);
+    expect(schedules).toHaveLength(1);
+    expect(schedules[0].Properties.GroupName).toBe(
+      scheduleGroups[0].Properties.Name,
+    );
+    template.hasResourceProperties('AWS::Scheduler::Schedule', {
+      Name: 'acps-prod-image-generation-schedule',
+      GroupName: 'acps-prod-image-schedule-group',
+      State: 'DISABLED',
+      ScheduleExpression: 'cron(0 9 * * ? *)',
+      ScheduleExpressionTimezone: 'Asia/Tokyo',
+      FlexibleTimeWindow: {
+        Mode: 'OFF',
+      },
+      Target: Match.objectLike({
+        Arn: {
+          Ref: Match.stringLikeRegexp('^ImageGenerationStateMachine'),
+        },
+        Input: Match.stringLikeRegexp(
+          '.*"set_code":"fashion-set-1".*"scheduled_at":"<aws\\.scheduler\\.scheduled-time>".*',
+        ),
+        RetryPolicy: {
+          MaximumRetryAttempts: 3,
+          MaximumEventAgeInSeconds: 3600,
+        },
+        DeadLetterConfig: {
+          Arn: {
+            'Fn::GetAtt': [
+              Match.stringLikeRegexp('^ImageSchedulerDlq'),
+              'Arn',
+            ],
+          },
+        },
+      }),
+    });
+  });
+});
+
 describe('ImageBatchStack の画像生成バッチイメージタグ Context', () => {
   test('未指定時はエラーアノテーションを追加する', () => {
     const app = new cdk.App({

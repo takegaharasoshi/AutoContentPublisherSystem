@@ -58,6 +58,26 @@
 <h3>1.4 EventBridge Scheduler の Retry / DLQ</h3>
 <p>Scheduler には RetryPolicy と SQS DLQ を設定する。RetryPolicy は <code>MaximumRetryAttempts=3</code>、<code>MaximumEventAgeInSeconds=3600</code> を初期値とする。リトライを使い切っても画像生成 Step Functions を起動できない場合は、失敗イベントを Scheduler DLQ（セクション 10）に送信し、MonitoringStack の CloudWatch Alarm で検知する。</p>
 
+<h3>1.5 EventBridge Scheduler のスケジュール設定</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>値</th></tr></thead>
+  <tbody>
+    <tr><td>Schedule 名</td><td><code>acps-prod-image-generation-schedule</code></td></tr>
+    <tr><td>ScheduleGroup 名</td><td><code>acps-prod-image-schedule-group</code>（MonitoringStack の <code>AWS/Scheduler</code> メトリクス Dimension で使用）</td></tr>
+    <tr><td>cron 式</td><td><code>cron(0 9 * * ? *)</code>（毎日 09:00、プレースホルダ。本番の投稿時刻は Phase 10 のセット設計で確定する）</td></tr>
+    <tr><td>タイムゾーン</td><td><code>Asia/Tokyo</code></td></tr>
+    <tr><td>FlexibleTimeWindow</td><td><code>OFF</code>（時刻どおりに起動する）</td></tr>
+    <tr><td>State</td><td><code>DISABLED</code>（当面。下記 decision を参照）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="decision">
+  <span class="callout-title">当面は DISABLED で運用（2026-07-14）</span>
+  Phase 5-6 でスケジュール時刻の自動起動（Scheduler → 画像生成 SFN → SNS 投稿 SFN の連鎖）を確認済み。有効のままだと Phase 6〜9 の間も毎日チェーン全体が空回しし、Aurora の起動コストと実行履歴のノイズが発生するため、検証後に <code>DISABLED</code> へ変更した。Phase 10 のアプリ実装開始時に本番 cron 式を設定して有効化する。
+</div>
+
 <h2 id="db-readiness">2. DB 準備確認タスク（db-readiness-check）仕様</h2>
 
 <p>Aurora Serverless v2 の自動一時停止からの再開に対応するため、各 Step Functions ワークフローの最初のステートとして DB 準備確認 ECS タスクを実行する。バッチアプリケーション（後続の ECS タスク）は DB が利用可能な状態を前提とする。</p>

@@ -6,8 +6,11 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as scheduler from 'aws-cdk-lib/aws-scheduler';
+import * as schedulerTargets from 'aws-cdk-lib/aws-scheduler-targets';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Construct } from 'constructs';
@@ -46,6 +49,10 @@ export class ImageBatchStack extends cdk.Stack {
   public readonly taskDefinition: ecs.FargateTaskDefinition;
   /** 画像生成ワークフロー。Phase 5-6 の EventBridge Scheduler と Phase 7 の MonitoringStack が参照する */
   public readonly stateMachine: sfn.StateMachine;
+  /** Phase 7 の MonitoringStack が参照する Scheduler 用 DLQ */
+  public readonly schedulerDlq: sqs.Queue;
+  /** Phase 7 の AWS/Scheduler メトリクス Dimension で参照する ScheduleGroup */
+  public readonly scheduleGroup: scheduler.ScheduleGroup;
 
   constructor(scope: Construct, id: string, props: ImageBatchStackProps) {
     super(scope, id, props);
@@ -91,6 +98,19 @@ export class ImageBatchStack extends cdk.Stack {
     if (!dbSecretArn) {
       throw new Error('Aurora クラスターの認証情報 Secret が見つかりません。');
     }
+
+    this.schedulerDlq = new sqs.Queue(this, 'ImageSchedulerDlq', {
+      queueName: `acps-${props.envName}-image-scheduler-dlq`,
+      retentionPeriod: cdk.Duration.days(14),
+    });
+
+    this.scheduleGroup = new scheduler.ScheduleGroup(
+      this,
+      'ImageScheduleGroup',
+      {
+        scheduleGroupName: `acps-${props.envName}-image-schedule-group`,
+      },
+    );
 
     this.taskDefinition = new ecs.FargateTaskDefinition(
       this,
@@ -151,6 +171,28 @@ export class ImageBatchStack extends cdk.Stack {
         SnsPostingSfnArn: props.snsPostingStateMachine.stateMachineArn,
         ImageGenerationSfnName: stateMachineName,
       },
+    });
+
+    // cron はプレースホルダ（毎日 09:00 JST）。当面 DISABLED で運用し、Phase 10 の
+    // アプリ実装開始時に本番 cron 式を設定して有効化する（workflow.html セクション 1.5）。
+    new scheduler.Schedule(this, 'ImageGenerationSchedule', {
+      scheduleName: `acps-${props.envName}-image-generation-schedule`,
+      scheduleGroup: this.scheduleGroup,
+      schedule: scheduler.ScheduleExpression.cron({
+        minute: '0',
+        hour: '9',
+        timeZone: cdk.TimeZone.ASIA_TOKYO,
+      }),
+      enabled: false,
+      target: new schedulerTargets.StepFunctionsStartExecution(this.stateMachine, {
+        input: scheduler.ScheduleTargetInput.fromObject({
+          set_code: 'fashion-set-1',
+          scheduled_at: scheduler.ContextAttribute.scheduledTime,
+        }),
+        deadLetterQueue: this.schedulerDlq,
+        retryAttempts: 3,
+        maxEventAge: cdk.Duration.hours(1),
+      }),
     });
 
     this.stateMachine.addToRolePolicy(
