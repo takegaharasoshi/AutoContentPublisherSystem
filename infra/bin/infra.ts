@@ -36,6 +36,10 @@ const foundationStack = new FoundationStack(app, 'FoundationStack', {
 
 const snsPostBatchStack = new SnsPostBatchStack(app, 'SnsPostBatchStack', {
   envName,
+  githubConnectionArn: GITHUB_CONNECTION_ARN,
+  githubOwner: GITHUB_OWNER,
+  githubRepo: GITHUB_REPO,
+  githubBranch: GITHUB_BRANCH,
   snsPostBatchRepository: foundationStack.snsPostBatchRepository,
   imagesBucket: foundationStack.imagesBucket,
   auroraCluster: foundationStack.auroraCluster,

@@ -18,6 +18,11 @@ const createImageBatchStack = (): ImageBatchStack => {
 
   const snsPostBatchStack = new SnsPostBatchStack(app, 'SnsPostBatchStack', {
     envName: 'prod',
+    githubConnectionArn:
+      'arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7',
+    githubOwner: 'takegaharasoshi',
+    githubRepo: 'AutoContentPublisherSystem',
+    githubBranch: 'main',
     snsPostBatchRepository: foundationStack.snsPostBatchRepository,
     imagesBucket: foundationStack.imagesBucket,
     auroraCluster: foundationStack.auroraCluster,
@@ -509,6 +514,11 @@ describe('ImageBatchStack の画像生成バッチイメージタグ Context', (
     });
     const snsPostBatchStack = new SnsPostBatchStack(app, 'SnsPostBatchStack', {
       envName: 'prod',
+      githubConnectionArn:
+        'arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7',
+      githubOwner: 'takegaharasoshi',
+      githubRepo: 'AutoContentPublisherSystem',
+      githubBranch: 'main',
       snsPostBatchRepository: foundationStack.snsPostBatchRepository,
       imagesBucket: foundationStack.imagesBucket,
       auroraCluster: foundationStack.auroraCluster,

@@ -1,4 +1,7 @@
 import * as cdk from 'aws-cdk-lib/core';
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
+import * as codepipelineActions from 'aws-cdk-lib/aws-codepipeline-actions';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
@@ -14,6 +17,14 @@ import { Construct } from 'constructs';
 export interface SnsPostBatchStackProps extends cdk.StackProps {
   /** 環境識別子（例: prod） */
   envName: string;
+  /** GitHub 接続の CodeConnections ARN */
+  githubConnectionArn: string;
+  /** GitHub リポジトリのオーナー */
+  githubOwner: string;
+  /** GitHub リポジトリ名 */
+  githubRepo: string;
+  /** CI/CD の対象 GitHub ブランチ */
+  githubBranch: string;
   /** SNS 投稿バッチのコンテナイメージ用 ECR リポジトリ */
   snsPostBatchRepository: ecr.Repository;
   /** 生成画像を保存する共有 S3 バケット */
@@ -133,6 +144,113 @@ export class SnsPostBatchStack extends cdk.Stack {
     if (!dbReadinessCheckExecutionRole || !snsPostBatchExecutionRole) {
       throw new Error('ECS タスク定義のタスク実行ロールが見つかりません。');
     }
+
+    const buildLogGroup = new logs.LogGroup(this, 'SnsPostBatchBuildLogGroup', {
+      retention: logs.RetentionDays.THREE_MONTHS,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const buildProject = new codebuild.PipelineProject(this, 'SnsPostBatchBuild', {
+      projectName: `acps-${props.envName}-sns-post-batch-build`,
+      buildSpec: codebuild.BuildSpec.fromSourceFilename(
+        'services/sns-post-batch/buildspec.yml',
+      ),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
+        privileged: true,
+        computeType: codebuild.ComputeType.SMALL,
+      },
+      environmentVariables: {
+        ECR_REPO_URI: { value: props.snsPostBatchRepository.repositoryUri },
+        TASK_DEF_FAMILY: { value: this.taskDefinition.family },
+        CONTAINER_NAME: { value: 'sns-post-batch' },
+      },
+      logging: {
+        cloudWatch: { logGroup: buildLogGroup },
+      },
+    });
+
+    props.snsPostBatchRepository.grantPullPush(buildProject);
+    buildProject.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['ecs:DescribeTaskDefinition', 'ecs:RegisterTaskDefinition'],
+        resources: ['*'],
+      }),
+    );
+    buildProject.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['iam:PassRole'],
+        resources: [
+          this.taskDefinition.taskRole.roleArn,
+          snsPostBatchExecutionRole.roleArn,
+        ],
+        conditions: {
+          StringEquals: {
+            'iam:PassedToService': 'ecs-tasks.amazonaws.com',
+          },
+        },
+      }),
+    );
+
+    // アクションロールはサービスではなくパイプラインロールが sts:AssumeRole するため、
+    // アカウント root を信頼する（CDK 自動生成のアクションロールと同じ構造）
+    const sourceActionRole = new iam.Role(this, 'SnsPostBatchSourceActionRole', {
+      assumedBy: new iam.AccountRootPrincipal(),
+    });
+    sourceActionRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['codeconnections:UseConnection'],
+        resources: [props.githubConnectionArn],
+      }),
+    );
+
+    const sourceOutput = new codepipeline.Artifact();
+    const sourceAction = new codepipelineActions.CodeStarConnectionsSourceAction({
+      actionName: 'Source',
+      connectionArn: props.githubConnectionArn,
+      owner: props.githubOwner,
+      repo: props.githubRepo,
+      branch: props.githubBranch,
+      output: sourceOutput,
+      role: sourceActionRole,
+      triggerOnPush: false,
+    });
+
+    new codepipeline.Pipeline(this, 'SnsPostBatchPipeline', {
+      pipelineName: `acps-${props.envName}-sns-post-batch-pipeline`,
+      pipelineType: codepipeline.PipelineType.V2,
+      crossAccountKeys: false,
+      stages: [
+        {
+          stageName: 'Source',
+          actions: [sourceAction],
+        },
+        {
+          stageName: 'Build',
+          actions: [
+            new codepipelineActions.CodeBuildAction({
+              actionName: 'Build',
+              project: buildProject,
+              input: sourceOutput,
+            }),
+          ],
+        },
+      ],
+      triggers: [
+        {
+          providerType: codepipeline.ProviderType.CODE_STAR_SOURCE_CONNECTION,
+          gitConfiguration: {
+            sourceAction,
+            pushFilter: [
+              {
+                branchesIncludes: [props.githubBranch],
+                filePathsIncludes: ['services/sns-post-batch/**', 'shared/**'],
+              },
+            ],
+          },
+        },
+      ],
+    });
 
     this.stateMachine = new sfn.StateMachine(this, 'SnsPostingStateMachine', {
       stateMachineName: `acps-${props.envName}-sns-posting-sfn`,

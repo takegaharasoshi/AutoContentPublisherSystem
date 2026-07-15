@@ -16,6 +16,11 @@ const createSnsPostBatchStack = (): SnsPostBatchStack => {
 
   return new SnsPostBatchStack(app, 'SnsPostBatchStack', {
     envName: 'prod',
+    githubConnectionArn:
+      'arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7',
+    githubOwner: 'takegaharasoshi',
+    githubRepo: 'AutoContentPublisherSystem',
+    githubBranch: 'main',
     snsPostBatchRepository: foundationStack.snsPostBatchRepository,
     imagesBucket: foundationStack.imagesBucket,
     auroraCluster: foundationStack.auroraCluster,
@@ -164,6 +169,94 @@ describe('SnsPostBatchStack のロググループ', () => {
   });
 });
 
+describe('SnsPostBatchStack の CI/CD パイプライン', () => {
+  const stack = createSnsPostBatchStack();
+  const template = Template.fromStack(stack);
+
+  test('V2 パイプラインに対象ブランチとファイルパスのトリガーを設定する', () => {
+    template.hasResourceProperties('AWS::CodePipeline::Pipeline', {
+      Name: 'acps-prod-sns-post-batch-pipeline',
+      PipelineType: 'V2',
+      Triggers: [
+        {
+          ProviderType: 'CodeStarSourceConnection',
+          GitConfiguration: {
+            Push: [
+              {
+                Branches: { Includes: ['main'] },
+                FilePaths: {
+                  Includes: ['services/sns-post-batch/**', 'shared/**'],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
+  });
+
+  test('Docker ビルド可能な CodeBuild プロジェクトで buildspec を参照する', () => {
+    template.hasResourceProperties('AWS::CodeBuild::Project', {
+      Name: 'acps-prod-sns-post-batch-build',
+      Source: {
+        BuildSpec: 'services/sns-post-batch/buildspec.yml',
+      },
+      Environment: Match.objectLike({
+        PrivilegedMode: true,
+        ComputeType: 'BUILD_GENERAL1_SMALL',
+      }),
+    });
+  });
+
+  test('CodeBuild ロールにタスク定義登録と ECS タスクロールの PassRole を許可する', () => {
+    const policies = Object.values(template.findResources('AWS::IAM::Policy')) as any[];
+    const buildPolicy = policies.find((policy) =>
+      policy.Properties.PolicyDocument.Statement.some((statement: any) =>
+        statement.Action?.includes('ecs:RegisterTaskDefinition'),
+      ),
+    );
+
+    expect(buildPolicy.Properties.PolicyDocument.Statement).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          Action: expect.arrayContaining(['ecs:RegisterTaskDefinition']),
+          Resource: '*',
+        }),
+        expect.objectContaining({
+          Action: 'iam:PassRole',
+          Condition: {
+            StringEquals: {
+              'iam:PassedToService': 'ecs-tasks.amazonaws.com',
+            },
+          },
+        }),
+      ]),
+    );
+  });
+
+  test('新形式 CodeConnections ARN の UseConnection をソースアクションロールに許可する', () => {
+    const policies = Object.values(template.findResources('AWS::IAM::Policy')) as any[];
+
+    expect(policies).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          Properties: expect.objectContaining({
+            PolicyDocument: expect.objectContaining({
+              Statement: expect.arrayContaining([
+                expect.objectContaining({
+                  Action: 'codeconnections:UseConnection',
+                  Resource:
+                    'arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7',
+                }),
+              ]),
+            }),
+          }),
+        }),
+      ]),
+    );
+  });
+});
+
 describe('SnsPostBatchStack の SNS 投稿ワークフロー', () => {
   const stack = createSnsPostBatchStack();
   const template = Template.fromStack(stack);
@@ -299,6 +392,11 @@ describe('SnsPostBatchStack の SNS 投稿バッチイメージタグ Context', 
     });
     const stack = new SnsPostBatchStack(app, 'SnsPostBatchStack', {
       envName: 'prod',
+      githubConnectionArn:
+        'arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7',
+      githubOwner: 'takegaharasoshi',
+      githubRepo: 'AutoContentPublisherSystem',
+      githubBranch: 'main',
       snsPostBatchRepository: foundationStack.snsPostBatchRepository,
       imagesBucket: foundationStack.imagesBucket,
       auroraCluster: foundationStack.auroraCluster,
