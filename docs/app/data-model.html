@@ -12,8 +12,8 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / データモデル設計</nav>
 <h1>データモデル設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Phase 9-3 で詳細化済み・9-5 レビュー反映済み（一時 Fix）</span>
-  <span>最終更新: 2026-07-07</span>
+  <span class="badge badge-fixed">Phase 9-3 で詳細化済み・Phase 10-1 で最終 Fix</span>
+  <span>最終更新: 2026-07-15</span>
 </div>
 
 <div class="note">
@@ -280,6 +280,7 @@ LIMIT 1;</code></pre>
   どの実行がどの <code>generation_run</code> を作ったかを調べたい場合は、<code>started_at</code> と <code>generation_runs.created_at</code> の近接時刻で運用者が突き合わせる（通常は 1 実行 : 1 生成実行の関係になるため実務上問題ない）。
 </div>
 <p><code>status</code> / <code>attempt_count</code> の INSERT/UPDATE 手順（Step Functions Retry による再起動時に <code>UNIQUE (execution_arn, batch_type)</code> と衝突しないための INSERT-or-fetch パターン）は <a href="batch-flow.html#exec-log">batch-flow.html セクション 1</a> を参照（Phase 9-5 レビューで確定）。</p>
+<p>なお、画像生成と SNS 投稿は別ステートマシンのため、1 つの論理実行（画像生成 → 連鎖起動された SNS 投稿）に対応する 2 行は <code>execution_arn</code> が<strong>異なる</strong>。子ワークフローは親と<strong>同一の実行名</strong>で起動される（<a href="../infra/workflow.html">infra/workflow.html</a> セクション 3）ため、両バッチの実行ログを突き合わせる場合は <code>execution_arn</code> 末尾の実行名部分で相関を取る（Phase 10-1 でインフラ構築の知見を反映）。</p>
 
 <h2 id="s3-key">5. S3 キー設計</h2>
 <div class="decision">

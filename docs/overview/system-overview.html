@@ -12,8 +12,8 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / 概要 / システム概要</nav>
 <h1>システム概要</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-07-06</span>
+  <span class="badge badge-fixed">Fix（Phase 10-1 で見直し済み）</span>
+  <span>最終更新: 2026-07-15</span>
 </div>
 
 <h2 id="purpose">1. システムの目的</h2>
@@ -53,12 +53,12 @@
 
   <!-- 外部 API -->
   <rect x="640" y="118" width="220" height="70" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="750" y="147" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">Nano Banana Pro</text>
-  <text x="750" y="170" text-anchor="middle" font-size="11" fill="var(--diag-text)">（Gemini 3 Pro 画像 API）</text>
+  <text x="750" y="147" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">画像生成 API</text>
+  <text x="750" y="170" text-anchor="middle" font-size="11" fill="var(--diag-text)">（生成方式として差し替え可能）</text>
 
   <rect x="640" y="300" width="220" height="70" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="750" y="329" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">Instagram Graph API</text>
-  <text x="750" y="352" text-anchor="middle" font-size="11" fill="var(--diag-text)">（SNS 投稿先）</text>
+  <text x="750" y="329" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">SNS プラットフォーム API</text>
+  <text x="750" y="352" text-anchor="middle" font-size="11" fill="var(--diag-text)">（投稿先。複数プラットフォーム前提）</text>
 
   <!-- 矢印 -->
   <line x1="155" y1="68" x2="155" y2="114" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -85,7 +85,7 @@
 <h3>2.1 画像生成バッチ</h3>
 <ol>
   <li>EventBridge Scheduler が定期的に画像生成ワークフロー（Step Functions）を起動する</li>
-  <li>DB 準備確認（Aurora の利用可能確認）の後、画像生成 ECS Fargate タスクが Nano Banana Pro（<a href="https://ai.google.dev/gemini-api/docs/image-generation?hl=ja">Gemini 3 Pro 画像 API</a>）で画像を生成する</li>
+  <li>DB 準備確認（Aurora の利用可能確認）の後、画像生成 ECS Fargate タスクが画像生成 API で画像を生成する。利用する API・生成方式はセットごとに選択・差し替え可能とし、特定のサービス名に固定しない（方式カタログは <a href="../app/batch-flow.html#generator-catalog">app/batch-flow.html セクション 2.1</a> を参照）</li>
   <li>生成した画像を S3 に保存し、メタ情報を Aurora Serverless v2 に登録する</li>
 </ol>
 
@@ -93,13 +93,13 @@
 <ol>
   <li>画像生成ワークフローの成功後に SNS 投稿ワークフロー（Step Functions）が自動起動する（手動での単独実行も可能）</li>
   <li>DB 準備確認の後、SNS 投稿 ECS Fargate タスクが DB から投稿対象を取得する</li>
-  <li>S3 の画像に対して Presigned URL を発行し、Instagram Graph API に渡して投稿する</li>
+  <li>S3 の画像に対して Presigned URL を発行し、投稿先プラットフォームの API に渡して投稿する。将来的に複数種類の SNS 媒体へ投稿する前提とし、特定のプラットフォームに固定しない（対応プラットフォーム・投稿フローの詳細は <a href="../app/batch-flow.html#flow-sns">app/batch-flow.html セクション 3</a> を参照）</li>
   <li>投稿結果を DB に記録する</li>
 </ol>
 
 <div class="note">
-  <span class="callout-title">アプリ仕様は未確定</span>
-  投稿対象の決め方・冪等性・再試行などの処理ロジックはアプリ設計（<a href="../app/index.html">docs/app/</a>）で定義する。本ドキュメントおよびインフラ設計書では実行基盤のみを扱う。
+  <span class="callout-title">アプリ仕様の定義場所</span>
+  投稿対象の決め方・冪等性・再試行などの処理ロジックはアプリ設計（<a href="../app/index.html">docs/app/</a>）で定義済み（Phase 9 で詳細化・Phase 10-1 で最終 Fix）。本ドキュメントおよびインフラ設計書では実行基盤のみを扱う。
 </div>
 
 <h2 id="tech">3. 技術選定</h2>
@@ -147,6 +147,7 @@
     <ul>
       <li>複数セット運用時は、Step Functions ステートマシンを共有し、EventBridge Scheduler をセットごとに追加する方式を採る</li>
       <li>スケジュール定義のマスタは IaC（CDK）とする</li>
+      <li>セット間の差分は DB のセット設定と生成方式 strategy モジュール（差し替え可能）で表現し、投稿先 SNS も複数プラットフォーム対応を前提とする（設計書は <a href="../app/design-outline.html#set-docs">app/design-outline.html セクション 1.1</a> の 3 層構造〔契約 / 方式 / セット〕で管理する）</li>
     </ul>
   </li>
   <li>管理画面（オンラインシステム）を追加し、設定・履歴・バッチ管理を GUI で行えるようにする</li>

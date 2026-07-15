@@ -12,8 +12,8 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / アプリ運用設計</nav>
 <h1>アプリ運用設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Phase 9-4 で詳細化済み（一時 Fix）</span>
-  <span>最終更新: 2026-07-07</span>
+  <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
+  <span>最終更新: 2026-07-15</span>
 </div>
 
 <div class="note">
@@ -102,6 +102,15 @@
 
 <h4>手順 2: DB にセットのレコードを登録する</h4>
 <p>Query Editor で以下の順に INSERT する（後続テーブルが <code>set_id</code> を参照するため、この順序を守る）。</p>
+
+<div class="note" id="query-editor-notes">
+  <span class="callout-title">DB 直接操作の共通注意（Phase 6 の実機確認より。本書のすべての SQL 操作に共通）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li>Query Editor の接続時は「データベースを変更する」で DB 名 <code>acps</code> を必ず指定する。未指定のまま実行すると <code>No database selected (1046)</code> で失敗する</li>
+    <li>Aurora が自動一時停止中に Query Editor / Data API を実行すると <code>DatabaseResumingException</code> が返る。アクセス自体が再開のトリガーになるため、数十秒待って再試行する</li>
+    <li>Query Editor の「最近」タブでは SQL 中の日本語が文字化けして表示されるが、表示上の問題のみで保存データは正しい（utf8mb4）</li>
+  </ul>
+</div>
 <pre><code>-- (1) batch_sets
 INSERT INTO batch_sets (set_code, name, description, is_active)
 VALUES ('fashion-set-2', 'ファッション系セット2', 'セット2の説明', 1);
@@ -120,7 +129,13 @@ INSERT INTO sns_accounts (set_id, platform, account_code, account_name, is_activ
 VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);</code></pre>
 
 <h4>手順 3: CDK の ImageBatchStack に EventBridge Scheduler を追加して deploy する</h4>
-<p>入力に <code>set_code</code> を指定したスケジュールを 1 件追加する（1 日複数回投稿する場合は複数時刻分）。cron 式・Scheduler 定義の書き方は <a href="../infra/workflow.html">infra/workflow.html</a>、変更後のデプロイは <code>cdk deploy -c env=prod ImageBatchStack</code>。</p>
+<p>入力に <code>set_code</code> を指定したスケジュールを 1 件追加する（1 日複数回投稿する場合は複数時刻分）。cron 式・Scheduler 定義の書き方は <a href="../infra/workflow.html">infra/workflow.html</a>、変更後のデプロイは <code>cdk deploy -c env=prod ImageBatchStack</code>（<strong>イメージタグ 3 つの Context 指定が必須</strong>。指定ルール・現行タグの確認方法は <a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。</p>
+
+<div class="note">
+  <span class="callout-title">初セットは既存プレースホルダ Scheduler を転用する（Phase 10-1 でインフラ実態を反映）</span>
+  ImageBatchStack には Phase 5 で作成した Scheduler <code>acps-prod-image-generation-schedule</code>（State=DISABLED・プレースホルダ cron・入力 <code>set_code=fashion-set-1</code>）が既に存在する（<a href="../infra/workflow.html">infra/workflow.html セクション 1.5</a> の decision）。
+  <strong>初セットの追加では新規 Scheduler を追加せず、このプレースホルダの cron 式を本番の投稿時刻に書き換え、State を ENABLED にして deploy する</strong>。2 セット目以降が本手順どおりの「Scheduler 1 件追加」となる。
+</div>
 
 <h4>手順 4: 動作確認</h4>
 <p>画像生成 Step Functions を手動実行し（<a href="../infra/operation.html">infra/operation.html セクション 1.2</a> の「手動での画像生成実行」）、CloudWatch Logs で当該 <code>set_code</code> の生成・投稿が成功することを確認する。</p>
@@ -131,7 +146,7 @@ VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);</c
     <li>セット別設計書（<code>docs/app/sets/&lt;set_code&gt;.html</code>）を作成した</li>
     <li>Secrets Manager に <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> を作成した（DB 登録より先）</li>
     <li><code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code> の順に DB へ登録した</li>
-    <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した</li>
+    <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
   </ul>
 </div>
@@ -147,7 +162,7 @@ VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);</c
 <h3 id="set-retire">2.2 セット廃止・入れ替え（スクラップ&amp;ビルド）</h3>
 <ol>
   <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）。この時点でスケジュールが残っていても実害はないため、順序を厳密に守る必要はないが、次のステップより先に行うことを推奨する</li>
-  <li>CDK から該当セットの Scheduler 定義を削除して deploy する</li>
+  <li>CDK から該当セットの Scheduler 定義を削除して deploy する（イメージタグ 3 つの Context 指定が必須。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
   <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体（画像ファイル）はインフラの 30 日ライフサイクルで自動削除される対象であり「残す」対象に含まない（Phase 9-3 で確定。<a href="data-model.html#s3-key">データモデル設計 セクション 5</a>）</li>
   <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す</li>
 </ol>
@@ -193,7 +208,7 @@ WHERE bs.set_code = 'fashion-set-1'
 ORDER BY p.updated_at DESC
 LIMIT 20;</code></pre>
   </li>
-  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する（<a href="../infra/operation.html">infra/operation.html</a> セクション 1.2）。投稿対象の決定ロジックは自動実行と同じため、<strong>その時点で最古の actionable な生成実行</strong>（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）が処理される。一度試行して失敗した分は自動では再対象にならない（意図的に再対象にしたい場合は 4.2 を参照）</li>
+  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する（<a href="../infra/operation.html">infra/operation.html</a> セクション 1.2）。<strong>再実行は必ず Step Functions 経由で行い、ECS RunTask の直接実行は使わない</strong>（バッチは DB 接続リトライを持たず、Aurora 自動一時停止中の直接起動は失敗するため。<a href="batch-flow.html#premise">batch-flow.html セクション 1</a> の前提）。投稿対象の決定ロジックは自動実行と同じため、<strong>その時点で最古の actionable な生成実行</strong>（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）が処理される。一度試行して失敗した分は自動では再対象にならない（意図的に再対象にしたい場合は 4.2 を参照）</li>
 </ol>
 
 <h3 id="failure-correction">4.2 手動補正手順</h3>
@@ -268,13 +283,14 @@ ORDER BY gr.scheduled_at ASC;</code></pre>
   <li>将来的にセット別失敗時ポリシー（追いつく / 捨てる。<a href="batch-flow.html#future-failure-policy">batch-flow.html</a>）を導入する際は、stale データの扱いも合わせて再設計する</li>
 </ul>
 
-<h2 id="secret-ops">5. SNS Secret 規約の運用・トークン更新</h2>
+<h2 id="secret-ops">5. Secret 運用（SNS 認証・画像生成 API キー）・トークン更新</h2>
 
 <h3 id="secret-final">5.1 Secret 名規約の最終確認</h3>
 <p>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2</a>）と、構成要素の意味付け（<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>）は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a>で確定済みであり、本規約に変更はない。<code>account_code</code> は Secret 名導出専用のため<strong>作成後変更不可</strong>。変更が必要な場合は新アカウント（新しい <code>account_code</code>）として追加し、旧アカウントは <code>is_active=0</code> にする。</p>
 <div class="note">
-  <span class="callout-title">Phase 10-1 での再確認</span>
-  本規約は Phase 0〜8（インフラ構築）を経ずに Phase 9 として前倒しで確定したものである。インフラ構築で IAM ポリシーや Secret 運用の実態に矛盾が見つかった場合は、Phase 10-1（アプリ設計の最終 Fix）で見直す。
+  <span class="callout-title">Phase 10-1 での再確認（2026-07-15 実施済み）</span>
+  本規約は Phase 0〜8（インフラ構築）を経ずに Phase 9 として前倒しで確定したものであるため、Phase 10-1（アプリ設計の最終 Fix）でインフラ実態と突き合わせて再確認した。
+  IAM ポリシー（プレフィックスベースの Secret 読み取り権限。<a href="../infra/security.html">infra/security.html セクション 2.1</a>）・Secret 運用の実態と矛盾はなく、<strong>規約は変更なしで最終確認</strong>とする。
 </div>
 
 <h3 id="account-add">5.2 既存セットへの SNS アカウント追加手順</h3>
@@ -308,6 +324,17 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
   <code>token_expires_at</code> は Secret 内の運用メモであり、アプリケーションはこの値を認証には使用しない（<a href="../infra/security.html">infra/security.html セクション 1.3</a>）。管理画面（将来拡張）がない現時点では、Secrets Manager から失効日時を横断的に一覧する仕組みも持たない。
   そのため初期運用では、<strong>アカウント作成・トークン更新のたびに、失効日の 7 日前を目安に運用者自身がカレンダー等の外部ツールにリマインダーを設定する</strong>運用とする（セット数が少ない初期スコープでは許容範囲と判断）。
   セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（設計課題リストに記録）。
+</div>
+
+<h3 id="image-api-key">5.4 画像生成 API キーの設定（Phase 10 開始時に必須）</h3>
+<p>画像生成 API キー用 Secret <code>acps/prod/image/api-key</code> は、インフラ構築（Phase 5-3）で「箱」のみ作成済みで、<strong>値はランダムなプレースホルダのまま</strong>である（<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a> の decision）。アプリ実装（Phase 10）で画像生成 API を呼び出す前に、実際の API キーへ差し替える。</p>
+<ol>
+  <li>マネジメントコンソールの Secrets Manager で <code>acps/prod/image/api-key</code> を開き、「シークレットの値を取得」→「編集」で <code>api_key</code> キーの値を、利用する画像生成 API（初期方式が使う API。方式カタログは <a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）の API キーに差し替える。値スキーマ <code>{"api_key": "..."}</code> は <a href="../infra/security.html">infra/security.html セクション 1.3</a> を参照</li>
+  <li>差し替え後、画像生成ワークフローの実行で認証が成功することを確認する</li>
+</ol>
+<div class="warn">
+  <span class="callout-title">注意: スタック再作成で値が失われる</span>
+  この Secret の RemovalPolicy は Delete のため、FoundationStack を destroy → 再作成すると手動設定した API キー値は失われる。再作成後はコンソールから再設定が必要（<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。
 </div>
 
 <h2 id="phase9">6. Phase 9-4 の決定事項まとめ</h2>

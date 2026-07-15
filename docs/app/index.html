@@ -12,15 +12,16 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / アプリ設計</nav>
 <h1>アプリ設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">大枠: Phase A 完了 / 詳細: Phase 9 完了（一時 Fix）</span>
-  <span>最終更新: 2026-07-07</span>
+  <span class="badge badge-fixed">大枠: Phase A / 詳細: Phase 9 / 最終 Fix: Phase 10-1 完了</span>
+  <span>最終更新: 2026-07-15</span>
 </div>
 
 <div class="warn">
   <span class="callout-title">アプリ設計は 2 段階（大枠 → 詳細）で行う</span>
   アプリ設計は、<strong>大枠（Phase A）</strong>と<strong>詳細（Phase 9）</strong>の 2 段階で行う。Phase A では仕様の壁打ち・設計書構成の決定・主要方針の骨子を固め、大枠設計書（骨子版）を作成した。
   テーブル定義・処理フローの詳細・DDL などの詳細設計は Phase 9 で行った（2026-07-06、上流工程に適した生成 AI モデルの利用期限を機に、インフラ構築＝開発計画 Phase 0〜8 より前へ前倒し。インフラ構築で得た知見の反映は Phase 10 冒頭の最終 Fix（10-1）で行う）。
-  Phase 9-5（生成 AI レビュー）まで完了し、<strong>Phase 9 の成果物は一時 Fix</strong>とする。進め方は <a href="../development-plan.md">development-plan.md</a> の Phase A・Phase 9 を参照。
+  Phase 9-5（生成 AI レビュー）まで完了し、Phase 9 の成果物は一時 Fix とした。
+  その後、インフラ構築（Phase 0〜8）完了を受けた <strong>Phase 10-1（2026-07-15）で知見の反映と検討メモの棚卸しを行い、最終 Fix</strong> とした（詳細は <a href="../development-plan.md">development-plan.md</a> の 10-1 備考を参照）。
 </div>
 
 <div class="note">
@@ -53,15 +54,15 @@
     <p>アプリ設計大枠（親ページ）。設計書構成とセット別設計書ルール、処理単位の不変条件、ワークフロー連携・Secret 規約の意味付け、Phase 9 への線引き。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="batch-flow.html">batch-flow.html</a> <span class="badge badge-fixed">9-2 詳細化済み</span></div>
+    <div class="card-title"><a href="batch-flow.html">batch-flow.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
     <p>バッチ処理フロー設計。画像生成・SNS 投稿の処理手順、投稿対象の決定、セット別拡張ポイント、環境変数の使い方。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="data-model.html">data-model.html</a> <span class="badge badge-fixed">9-3 詳細化済み</span></div>
+    <div class="card-title"><a href="data-model.html">data-model.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
     <p>データモデル設計。ER 図・エンティティ一覧、主キーと冪等性キーの分離、S3 キー・時刻・DDL（<a href="../../database/V001__initial_schema.sql">database/V001__initial_schema.sql</a>）。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="operation.html">operation.html</a> <span class="badge badge-fixed">9-4 詳細化済み</span></div>
+    <div class="card-title"><a href="operation.html">operation.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
     <p>アプリ運用設計。セット追加・廃止手順、プロンプト / キャプション管理、投稿失敗時対応、Secret 運用・トークン更新。</p>
   </div>
   <div class="card">
@@ -70,12 +71,12 @@
   </div>
 </div>
 
-<h3 id="set-docs">セット別設計書（sets/）</h3>
-<p>セット（テーマ）が増えるたびに <code>docs/app/sets/&lt;set_code&gt;.html</code> が 1 本増える。<strong>共通設計書（上記の親ページ + 3 分冊）はセット追加では変更しない</strong>。
-ルール・標準記載項目は<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a> を参照。実ファイルは初セット追加時に作成する（現時点では未作成）。</p>
+<h3 id="set-docs">セット別・生成方式別設計書（sets/ / generators/）</h3>
+<p>セット（テーマ）が増えるたびに <code>docs/app/sets/&lt;set_code&gt;.html</code> が、生成方式が本採用されるたびに <code>docs/app/generators/&lt;方式名&gt;.html</code> が 1 本ずつ増える（<strong>3 層構造: 契約 / 方式 / セット</strong>。Phase 10-1 で 2 層から拡張）。<strong>共通設計書（上記の親ページ + 3 分冊）はセット追加・方式追加では変更しない</strong>（方式カタログへの 1 行追加を除く）。
+ルール・標準記載項目は<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a> を参照。実ファイルは初セット追加時・方式の本採用時に作成する（現時点では未作成）。</p>
 
 <h2 id="memo">2. 検討メモ</h2>
-<p>インフラ設計・構築中に出てきたアプリ関連の論点はここに記録する（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。Phase 9 開始時（9-1）と、インフラ構築後の最終 Fix（Phase 10-1）でこのメモを棚卸しする。</p>
+<p>インフラ設計・構築中に出てきたアプリ関連の論点はここに記録する（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。Phase 9 開始時（9-1）と、インフラ構築後の最終 Fix（Phase 10-1）でこのメモを棚卸しする（<strong>10-1 棚卸し実施済み: 2026-07-15、全 2 件反映</strong>）。</p>
 
 <div class="table-wrap">
 <table>
@@ -84,12 +85,12 @@
     <tr>
       <td>2026-07-12</td>
       <td>セット別生成ロジックの隔離方針（アプリ資材の共有と拡張性の両立）</td>
-      <td>D-3 通読時の議論で合意。将来の多段生成 AI チェーン（プロンプト生成 AI → 画像生成 AI → 品質向上 AI 等）でセットごとに生成ロジックが複雑化する懸念に対し、アプリ資材（コンテナ・パイプライン）はサービス単位の共有を維持しつつ、image-batch 内部を<strong>「共通骨格（冪等性アンカー・S3 保存・DB 登録）+ 生成方式 strategy モジュール（<code>generators/&lt;方式名&gt;.py</code>）+ 方式名レジストリ」</strong>で構成する。方式の割当は DB のセット設定（方式名の設定値）で行い、コードに <code>set_code</code> の分岐は書かない。新方式の追加は「新規ファイル + レジストリ 1 行」に閉じ、既存方式のファイルには触れない。共有部品（core / API クライアント）の変更はパイプラインの pytest ゲートで守る。段階的エスカレーション（デプロイ分離 = Scheduler payload でセットごとにタスク定義リビジョンを固定 → 資材分離 = サービス切り出し）も整理したが、現時点では採用しない（デプロイ分離を導入する場合、結合点は DB スキーマの後方互換性に移る点に注意）。</td>
+      <td>D-3 通読時の議論で合意。将来の多段生成 AI チェーン（プロンプト生成 AI → 画像生成 AI → 品質向上 AI 等）でセットごとに生成ロジックが複雑化する懸念に対し、アプリ資材（コンテナ・パイプライン）はサービス単位の共有を維持しつつ、image-batch 内部を<strong>「共通骨格（冪等性アンカー・S3 保存・DB 登録）+ 生成方式 strategy モジュール（<code>generators/&lt;方式名&gt;.py</code>）+ 方式名レジストリ」</strong>で構成する。方式の割当は DB のセット設定（方式名の設定値）で行い、コードに <code>set_code</code> の分岐は書かない。新方式の追加は「新規ファイル + レジストリ 1 行」に閉じ、既存方式のファイルには触れない。共有部品（core / API クライアント）の変更はパイプラインの pytest ゲートで守る。段階的エスカレーション（デプロイ分離 = Scheduler payload でセットごとにタスク定義リビジョンを固定 → 資材分離 = サービス切り出し）も整理したが、現時点では採用しない（デプロイ分離を導入する場合、結合点は DB スキーマの後方互換性に移る点に注意）。<br><strong>→ 反映済み（2026-07-15、Phase 10-1）</strong>: <a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>（strategy 構造の decision）と <a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>（採用しない選択肢の整理）に反映。</td>
     </tr>
     <tr>
       <td>2026-07-12</td>
       <td>生成方式の設計書による batch-flow.html の肥大化防止（3 層分冊）</td>
-      <td>生成方式はスクラップ&ビルドで多数試作する想定のため、方式の設計を batch-flow.html に直接書き足さない。batch-flow.html には<strong>契約</strong>（方式インターフェース: セット設定を受け取り最終画像を返す。冪等性・S3・DB 登録は共通骨格の責務で方式は関与しない）と<strong>方式カタログ</strong>（1 方式 1 行: 方式名・概要・ステータス〔試行中 / 稼働中 / 廃止〕・設計書リンク）のみを置き、方式本体の設計は <code>docs/app/generators/&lt;方式名&gt;.html</code> に 1 方式 1 本で分冊する。試行段階では設計書を書かず、セットが本採用した時点で作成する。廃止方式は削除せず廃止マークで履歴として残す（セット別設計書と同じ扱い）。<a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a> の 2 層構造（共通 / セット別）に方式層を加えた <strong>3 層（契約 / 方式 / セット）</strong>として反映する。</td>
+      <td>生成方式はスクラップ&ビルドで多数試作する想定のため、方式の設計を batch-flow.html に直接書き足さない。batch-flow.html には<strong>契約</strong>（方式インターフェース: セット設定を受け取り最終画像を返す。冪等性・S3・DB 登録は共通骨格の責務で方式は関与しない）と<strong>方式カタログ</strong>（1 方式 1 行: 方式名・概要・ステータス〔試行中 / 稼働中 / 廃止〕・設計書リンク）のみを置き、方式本体の設計は <code>docs/app/generators/&lt;方式名&gt;.html</code> に 1 方式 1 本で分冊する。試行段階では設計書を書かず、セットが本採用した時点で作成する。廃止方式は削除せず廃止マークで履歴として残す（セット別設計書と同じ扱い）。<a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a> の 2 層構造（共通 / セット別）に方式層を加えた <strong>3 層（契約 / 方式 / セット）</strong>として反映する。<br><strong>→ 反映済み（2026-07-15、Phase 10-1）</strong>: design-outline.html セクション 1.1 の 3 層化と、<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a> の契約・方式カタログ新設で反映。</td>
     </tr>
   </tbody>
 </table>

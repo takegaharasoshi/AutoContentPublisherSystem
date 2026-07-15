@@ -97,7 +97,7 @@
 
   <rect x="590" y="388" width="280" height="56" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
   <text x="730" y="411" text-anchor="middle" font-size="13" fill="var(--diag-text)">外部 API</text>
-  <text x="730" y="430" text-anchor="middle" font-size="11" fill="var(--diag-text)">（Nano Banana Pro / Instagram Graph API）</text>
+  <text x="730" y="430" text-anchor="middle" font-size="11" fill="var(--diag-text)">（画像生成 API / SNS プラットフォーム API）</text>
 
   <rect x="590" y="500" width="280" height="70" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
   <text x="730" y="528" text-anchor="middle" font-size="13" fill="var(--diag-text)">CloudWatch Logs / Alarm</text>
@@ -146,7 +146,7 @@
   <li>ECS Fargate → 外部 API: パブリック IP + Internet Gateway 経由でインターネットアクセス</li>
   <li>ECS Fargate → Aurora: VPC 内部ルーティングによる通信（Security Group で制御）</li>
   <li>ECS Fargate → S3: VPC Endpoint（Gateway 型）を利用（無料のため維持）
-    <ul><li>Presigned URL は S3 の標準エンドポイント URL で生成されるため、Instagram 側からインターネット経由でアクセス可能</li></ul>
+    <ul><li>Presigned URL は S3 の標準エンドポイント URL で生成されるため、投稿先 SNS プラットフォーム側からインターネット経由でアクセス可能</li></ul>
   </li>
   <li>ECS Fargate → Secrets Manager: パブリック IP 経由（TLS 暗号化。詳細は <a href="security.html">security.html</a> を参照）</li>
   <li>ECS Fargate → CloudWatch Logs: パブリック IP 経由でインターネットアクセス</li>

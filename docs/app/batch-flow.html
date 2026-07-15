@@ -12,8 +12,8 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / バッチ処理フロー設計</nav>
 <h1>バッチ処理フロー設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Phase 9-2 で詳細化済み・9-5 レビュー反映済み（一時 Fix）</span>
-  <span>最終更新: 2026-07-07</span>
+  <span class="badge badge-fixed">Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</span>
+  <span>最終更新: 2026-07-15</span>
 </div>
 
 <div class="note">
@@ -30,6 +30,8 @@
   <li><strong>1 回の画像生成バッチ起動 = 1 投稿（アカウントごと）</strong>を不変条件とする（定義の正は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。1 回の生成実行を <code>generation_runs</code> エンティティとして永続化し、SNS 投稿バッチは生成実行を処理対象の単位とする</li>
   <li>本書の処理手順（骨格）は<strong>全セット共通</strong>とする。セットごとに変わりうる箇所は本文中に<strong>「セット別拡張ポイント」</strong>と明示し、各セットでどの方式を使うかはセット別設計書に記録する（<a href="design-outline.html#set-docs">セット別設計書のルール</a>）</li>
   <li><strong>実行ログ記録（共通）</strong>: 両バッチとも、<code>SET_CODE</code> から <code>batch_sets</code> を解決した直後（<code>set_id</code> が確定した時点。生成実行の解決や投稿対象の決定より前）に <code>batch_execution_logs</code> へ実行ログを記録する（記録手順は<a href="#exec-log">下記</a>を参照）。<code>SET_CODE</code> の解決に失敗した場合（<code>batch_sets</code> が存在しない）は <code>set_id</code> が確定できないため記録は行わず、既存の Step Functions 失敗アラームで検知する。正常終了時は <code>status='succeeded'</code>、異常終了時は <code>status='failed'</code> に更新する。このログ記録自体の INSERT/UPDATE が失敗した場合はバッチ全体を終了コード 1 とする（記録なしでの続行は運用上のリスクが高いため）</li>
+  <li><strong>起動経路は Step Functions 経由に限る</strong>（Phase 10-1 でインフラ構築の知見を反映）: 手動での再実行を含め、バッチは必ず Step Functions（先頭ステートの DB 準備確認 <code>WaitForDbReady</code> 経由）で起動する。バッチアプリ自身は DB 接続リトライを持たない設計（<a href="../infra/workflow.html">infra/workflow.html</a> セクション 2）のため、ECS RunTask の直接実行は Aurora 自動一時停止中に失敗しうる。この前提により <code>EXECUTION_ARN</code> は常に設定される（手動 RunTask 時の空値は考慮しない）</li>
+  <li><strong>DB アクセスの共通部品</strong>: DB 接続には共通ライブラリ <code>shared/acps_shared</code> を使用する（<code>connect()</code> はリトライなし・autocommit OFF。<strong>commit は呼び出し側の責務</strong>）。本書の INSERT-or-fetch 等の手順は明示的な commit を前提とする</li>
 </ul>
 
 <div class="decision" id="exec-log">
@@ -62,8 +64,8 @@
   <li>各 <code>prompt_config</code> ごとに<strong>順次</strong>処理する。1 件の失敗は他の <code>prompt_config</code> の処理をブロックしない（例外を捕捉し次の <code>prompt_config</code> へ進む。全体の成否は手順 5 で判定する）
     <ol>
       <li><strong>完了判定</strong>: <code>(generation_run_id, prompt_config_id)</code> の組み合わせで <code>generated_images</code> レコードの有無を確認する。存在すれば当該 <code>prompt_config</code> は完了済みとしてスキップする（Step Functions Retry によるタスク再起動時に、画像生成 API を再度呼び出さないため）</li>
-      <li>未完了の場合、画像生成 API（Nano Banana Pro）を呼び出し、レスポンスから image part を<strong>すべて</strong>抽出する。0 件ならこの <code>prompt_config</code> の生成失敗としてログ出力し、次の <code>prompt_config</code> へ進む（API 呼び出し自体の一時的失敗は Step Functions Retry に委ねる）</li>
-      <li><strong>抽出した image part はすべて保存する</strong>（1 件でも複数件でも同じ経路で処理する。旧設計の「2 枚目以降は破棄」は採用しない）</li>
+      <li>未完了の場合、セットに割り当てられた生成方式（<a href="#generator-strategy">セクション 2.1</a> の契約に従う strategy モジュール）を実行し、生成された画像を<strong>すべて</strong>受け取る。0 件ならこの <code>prompt_config</code> の生成失敗としてログ出力し、次の <code>prompt_config</code> へ進む（画像生成 API 呼び出し自体の一時的失敗は Step Functions Retry に委ねる）</li>
+      <li><strong>受け取った画像はすべて保存する</strong>（1 件でも複数件でも同じ経路で処理する。旧設計の「2 枚目以降は破棄」は採用しない）</li>
       <li>各画像を JPEG に変換し（Instagram 投稿要件に合わせるため。生成 API が PNG を返す場合は変換する）、S3 に保存する</li>
       <li>画像ごとに <code>generated_images</code> にレコードを登録する（S3 キー、<code>prompt_config_id</code>、同一 <code>(generation_run_id, prompt_config_id)</code> 内での並び順を表す <code>output_index</code>、プロンプト本文・パラメータのスナップショットを含む）。<strong>1 枚ごとの DB 登録が成功した時点でその画像を完了とする</strong>。S3 保存後に DB 登録が失敗した場合は S3 に orphan が残るが許容する</li>
     </ol>
@@ -76,11 +78,51 @@
   完了判定は「<code>(generation_run_id, prompt_config_id)</code> に 1 件でも <code>generated_images</code> が存在するか」で行う。API 呼び出しが複数画像のうち一部だけ DB 登録できず失敗した場合でも、再実行時は「1 件存在する = このプロンプトは完了済み」としてスキップし、残りの画像は生成し直さない。厳密な過不足チェックより再開処理の単純さを優先した割り切りであり、問題が顕在化した場合に見直す。
 </div>
 
+<h3 id="generator-strategy">2.1 セット別拡張ポイント: 生成方式（strategy モジュール構造）</h3>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-07-12 合意・Phase 10-1 反映）: 生成ロジックの隔離方針</span>
+  将来の多段生成 AI チェーン（プロンプト生成 AI → 画像生成 AI → 品質向上 AI 等）でセットごとに生成ロジックが複雑化しても、
+  アプリ資材（コンテナ・CI/CD パイプライン）はサービス単位の共有を維持する。そのために image-batch 内部を次の 3 要素で構成する。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>共通骨格</strong>: セクション 2 の手順 1〜3・5 と手順 4 の枠組み（完了判定 = 冪等性のアンカー、S3 保存、DB 登録）。方式によらず共通</li>
+    <li><strong>生成方式 strategy モジュール</strong>: <code>generators/&lt;方式名&gt;.py</code>（1 方式 1 ファイル）</li>
+    <li><strong>方式名レジストリ</strong>: 方式名 → モジュールの対応表。新方式の追加は<strong>「新規ファイル + レジストリ 1 行」に閉じ</strong>、既存方式のファイルには触れない</li>
+  </ul>
+  方式の割当は DB のセット設定（方式名の設定値）で行い、<strong>コードに <code>set_code</code> の分岐は書かない</strong>。
+  共有部品（共通骨格・API クライアント）の変更は CI/CD パイプラインの pytest ゲート（<a href="../infra/cicd.html">infra/cicd.html</a>）で守る。
+</div>
+
+<h4 id="generator-contract">生成方式の契約（方式インターフェース）</h4>
+<ul>
+  <li>方式は<strong>セット設定（プロンプト設定等）を受け取り、最終的な生成画像（1 枚以上）を返す</strong></li>
+  <li>冪等性（完了判定）・S3 保存・DB 登録は共通骨格の責務であり、<strong>方式は関与しない</strong></li>
+  <li>特定の画像生成 API に固有のリクエスト・レスポンス処理やパラメータは方式側（<code>generators/&lt;方式名&gt;.py</code> と方式別設計書）に閉じる。<strong>共通設計書・共通骨格には特定 API 名を書かない</strong></li>
+</ul>
+
+<h4 id="generator-catalog">方式カタログ</h4>
+<p>生成方式の設計は本書に書き足さず、<code>docs/app/generators/&lt;方式名&gt;.html</code> に 1 方式 1 本で分冊する（<strong>セットが本採用した時点で作成</strong>。試行段階では書かない。ルールは <a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。本書には以下のカタログのみを置き、方式の追加・廃止はこの表の行の追加・更新で管理する。廃止した方式は行を削除せず、ステータスを「廃止」にして履歴として残す。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>方式名</th><th>概要</th><th>ステータス</th><th>設計書</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>gpt-image-single</code>（仮称・実装時に確定）</td>
+      <td>固定プロンプトを ChatGPT Images 2.0（OpenAI、API モデル名 <code>gpt-image-2</code>）に渡す単発生成。初期スコープの方式</td>
+      <td>計画中（Phase 10 で実装）</td>
+      <td>本採用時に作成</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 <div class="decision">
   <span class="callout-title">セット別拡張ポイント: プロンプトの決め方</span>
-  初期運用は 1 セット 1 <code>prompt_config</code>（固定プロンプト、1 枚生成となるようプロンプト文言で制御）とする。将来は、
-  <strong>生成 AI にプロンプト自体を考えさせてから画像を生成する方式</strong>や、1 セットに複数 <code>prompt_config</code> を有効化してのローテーション選択・カルーセル素材化などを<strong>セットごとに選択可能</strong>にする
-  （2026-07-06 ユーザー要望。どの方式を使うかはセット別設計書に記録する）。システムは複数 <code>prompt_config</code>・複数画像の保存に既に対応しているため、これらの方式追加は運用ルールの変更（有効化する <code>prompt_config</code> 件数・プロンプト文言）で実現でき、手順 2 の生成実行の枠組み（1 起動 = 1 生成実行 = 1 投稿分のコンテンツ）は変えない。
+  初期運用は 1 セット 1 <code>prompt_config</code>（固定プロンプト、1 枚生成となるようプロンプト文言で制御）とする。将来の
+  <strong>生成 AI にプロンプト自体を考えさせてから画像を生成する方式</strong>などは、新しい生成方式（<code>generators/</code> の strategy モジュール）として追加し方式カタログに登録する（2026-07-06 ユーザー要望を 2026-07-12 の strategy 構造合意で整理）。
+  1 セットに複数 <code>prompt_config</code> を有効化してのローテーション選択・カルーセル素材化などは、運用ルールの変更（有効化する <code>prompt_config</code> 件数・プロンプト文言）で実現できる。
+  いずれの場合も手順 2 の生成実行の枠組み（1 起動 = 1 生成実行 = 1 投稿分のコンテンツ）は変えない。どのセットがどの方式を使うかはセット別設計書に記録する。
 </div>
 
 <h2 id="flow-sns">3. SNS 投稿バッチ処理フロー</h2>
@@ -146,7 +188,7 @@
   <li>対象の生成実行に対し、セットの有効な投稿先アカウント（<code>sns_accounts</code>）ごとに<strong>順次</strong>処理する。1 アカウントの失敗は他アカウントの処理をブロックしない（例外を捕捉し次のアカウントへ進む）</li>
   <li><code>posts</code> の状態（3.2）に基づき、未完了のアカウントについて処理を進める:
     <ol>
-      <li><code>posts</code> レコードを <code>pending</code> で作成する（投稿前の事前記録により二重投稿を防止する）</li>
+      <li><code>posts</code> レコードが<strong>存在しなければ</strong> <code>pending</code> で作成する（INSERT-or-skip。3.2 の復旧分岐により、既存行がある場合は作成せずその状態から再開する。投稿前の事前記録により二重投稿を防止する）</li>
       <li><strong>初期構築の仕様: 生成実行に紐づく画像のうち最初の 1 枚のみ</strong>を <code>post_images</code> で紐づける（選択順序は <code>generated_images.id</code> 昇順 = 最も早く生成された 1 枚。1 セット複数 <code>prompt_config</code> や 1 プロンプト複数画像により生成実行が複数の画像を保存していても、投稿するのは常に 1 枚とする）。将来のカルーセル対応では、生成実行内の複数画像を並び順付きで束ねる処理に拡張する</li>
       <li>キャプションテンプレートを適用して投稿本文を組み立てる</li>
       <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する</li>
@@ -161,6 +203,12 @@
   </li>
   <li>全アカウントの処理後、3.4 の方針に基づき終了コードを決定して終了する</li>
 </ol>
+
+<div class="note">
+  <span class="callout-title">送信元 IP に関する制約（Phase 10-1 でインフラ構築の知見を反映）</span>
+  Fargate タスクは固定 IP を持たない（NAT なし・タスクごとにパブリック IP が変わる構成。<a href="../infra/workflow.html">infra/workflow.html</a> セクション 3）。
+  送信元 IP の許可リスト登録を必要とする API・プラットフォームとは、現行構成のままでは組み合わせられない。
+</div>
 
 <h3 id="failure-policy">3.4 「失敗」の定義・通知粒度・終了コード方針</h3>
 <ul>
