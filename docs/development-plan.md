@@ -337,9 +337,9 @@
   - 確認: (1) SNS Topic にメールサブスクリプションが作成されている (2) 確認メールのリンクをクリックし、ステータスが「確認済み」になっている
   - 備考: 手順の詳細は [docs/infra/operation.html](infra/operation.html) セクション 4.2 を参照。サブスクリプションの承認を行わないと通知が届かない。2026-07-15 実施。ユーザーが AWS Console から `acps-prod-alarm-topic` に Email サブスクリプション（takegaharawork@gmail.com）を作成し承認。**つまずき**: 確認メール（差出人 no-reply@sns.amazonaws.com）が Gmail の迷惑メールフォルダに振り分けられ、届いていないように見えた → 迷惑メールフォルダから発見しリンクを承認して解消。再発防止として operation.html 4.2 の注意書きに迷惑メール確認・再送手順を追記。裏取り: CLI（`list-subscriptions-by-topic`）で SubscriptionArn が PendingConfirmation → 実 ARN（確認済み）に遷移したことを確認
 
-- [ ] **7-3** 意図的にバッチを失敗させてアラーム通知を確認
+- [x] **7-3** 意図的にバッチを失敗させてアラーム通知を確認
   - 確認: メール通知が届く
-  - 備考: 空回しバッチ（Hello World / DB 接続テスト版）を意図的に失敗させて確認する（例: 終了コード 1 で終了させたイメージを一時的に push）
+  - 備考: 空回しバッチ（Hello World / DB 接続テスト版）を意図的に失敗させて確認する（例: 終了コード 1 で終了させたイメージを一時的に push）。2026-07-15 実施。**方式**: 現行イメージ `5d299755d7e8` を FROM に ENTRYPOINT を `sys.exit(1)` へ上書きした一時イメージ（タグ `fail-test-7-3`、リポジトリのコード変更なし）を ECR へ push し、ImageBatchStack を一時デプロイ（タスク定義 revision 3）→ 画像生成 SFN を手動実行して失敗させた。**1 回目（00:33〜00:39 JST）で blocker を検出**: WaitForDbReady 成功 → RunImageBatchTask が exit 1 ×3 回（リトライ 30 秒/60 秒）→ ExecutionFailed となり、ECS 異常終了 Rule 経由の 3 通は配信されたが、アラーム `acps-prod-image-generation-sfn-failed` は ALARM 遷移（00:39:29）したのに通知アクションが `Failed to execute action` で失敗（SNS への発行自体が拒否され `NumberOfMessagesPublished` に現れない）。**原因**: EventBridge Rule のターゲット設定で CDK が明示的 TopicPolicy を作成すると SNS デフォルトポリシー（同一アカウント許可）が置換され、Topic ポリシーが `events.amazonaws.com` の Publish 許可のみになっていた（KMS は未設定で無関係）。**修正**: `monitoring-stack.ts` に `cloudwatch.amazonaws.com` の Publish 許可（`aws:SourceAccount` / `aws:SourceArn` 条件付き、Sid `AllowCloudWatchAlarmsPublish`）を追加し MonitoringStack をデプロイ（jest 63 件パス、diff は TopicPolicy のみ。[stacks.html](infra/stacks.html) 3.4 の SNS Topic 行に注記を追記）。**2 回目（09:58〜10:04 JST）で確認条件達成**: SFN FAILED → ALARM 遷移（10:04:29）→ `Successfully executed action`、SNS 配信メトリクスで 4 通（Rule ×3 + アラーム ×1）配信成功・失敗 0 を裏取り。ユーザーが Gmail で計 7 通（1 回目 Rule ×3 + 2 回目 Rule ×3 + アラーム ×1）の受信を確認した。**復旧**: 元タグ `5d299755d7e8` で ImageBatchStack を再デプロイ（revision 4）→ SFN 手動実行で親子とも SUCCEEDED（10:33 / 10:35）・アラーム OK 自動復帰を確認し、ECR の一時タグを削除（正規タグのみ残存）。prod への各 deploy は 6-4 と同様 Claude の自動実行が権限拒否され、ユーザー承認のうえ再実行した。これで Phase 7 の全ステップが完了。コンソールでの目視確認はユーザーが実施
 
 ---
 

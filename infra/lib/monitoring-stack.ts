@@ -4,6 +4,7 @@ import * as cloudwatchActions from 'aws-cdk-lib/aws-cloudwatch-actions';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as eventsTargets from 'aws-cdk-lib/aws-events-targets';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as scheduler from 'aws-cdk-lib/aws-scheduler';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
@@ -39,6 +40,24 @@ export class MonitoringStack extends cdk.Stack {
     this.alarmTopic = new sns.Topic(this, 'AlarmTopic', {
       topicName: `acps-${props.envName}-alarm-topic`,
     });
+
+    // EventBridge Rule のターゲット設定が明示的な TopicPolicy を作成すると SNS の
+    // デフォルトポリシー（同一アカウント許可）が置き換えられ、CloudWatch Alarm からの
+    // Publish が拒否される（7-3 の通知テストで検出）。Alarm 用の許可を明示的に追加する
+    this.alarmTopic.addToResourcePolicy(
+      new iam.PolicyStatement({
+        sid: 'AllowCloudWatchAlarmsPublish',
+        principals: [new iam.ServicePrincipal('cloudwatch.amazonaws.com')],
+        actions: ['sns:Publish'],
+        resources: [this.alarmTopic.topicArn],
+        conditions: {
+          StringEquals: { 'aws:SourceAccount': this.account },
+          ArnLike: {
+            'aws:SourceArn': `arn:aws:cloudwatch:${this.region}:${this.account}:alarm:*`,
+          },
+        },
+      }),
+    );
 
     const createAlarm = (
       id: string,
