@@ -70,6 +70,14 @@
   <li>トリガーフィルタ: CodePipeline V2 のトリガー設定でファイルパスフィルタ（<code>services/image-batch/**</code>、<code>shared/**</code> 等）を指定し、関連ファイルの変更時のみパイプラインを起動する</li>
 </ul>
 
+<div class="decision">
+  <span class="callout-title">実装メモ（Phase 8-1）</span>
+  <ul>
+    <li>トリガーフィルタを使う構成では、Source アクションの <code>DetectChanges</code> は <code>false</code> が正しい設定（AWS 公式のトリガー設定表のとおり。パイプラインの起動判定はトリガー設定側が担う）。CDK では <code>CodeStarConnectionsSourceAction</code> の <code>triggerOnPush: false</code> で表現しており、バグではない</li>
+    <li>接続 ARN が新形式（サービス名 <code>codeconnections</code>）のため、CDK が自動付与する <code>codestar-connections:UseConnection</code> に加えて <code>codeconnections:UseConnection</code> を Source アクションロールに明示付与している（<a href="security.html#iam">security.html セクション 2.5</a>）</li>
+  </ul>
+</div>
+
 <h2 id="split">2. パイプライン分割</h2>
 <p>サービスごとにパイプラインを分割する。</p>
 
@@ -77,8 +85,8 @@
 <table>
   <thead><tr><th>パイプライン</th><th>対象サービス</th><th>CDK スタック</th><th>トリガー条件</th></tr></thead>
   <tbody>
-    <tr><td>image-batch-pipeline</td><td>画像生成バッチ</td><td>ImageBatchStack</td><td><code>services/image-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
-    <tr><td>sns-post-batch-pipeline</td><td>SNS 投稿バッチ</td><td>SnsPostBatchStack</td><td><code>services/sns-post-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
+    <tr><td><code>acps-{env}-image-batch-pipeline</code></td><td>画像生成バッチ</td><td>ImageBatchStack</td><td><code>services/image-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
+    <tr><td><code>acps-{env}-sns-post-batch-pipeline</code></td><td>SNS 投稿バッチ</td><td>SnsPostBatchStack</td><td><code>services/sns-post-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
   </tbody>
 </table>
 </div>

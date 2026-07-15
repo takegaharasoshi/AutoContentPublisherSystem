@@ -8,6 +8,13 @@ import { MonitoringStack } from '../lib/monitoring-stack';
 // 環境識別子は現時点で prod のみ（docs/infra/security.html を参照）
 const SUPPORTED_ENVS = ['prod'];
 
+// Phase 8-2 の SNS 投稿バッチ CI/CD でも同じ GitHub 接続情報を使用する。
+const GITHUB_CONNECTION_ARN =
+  'arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7';
+const GITHUB_OWNER = 'takegaharasoshi';
+const GITHUB_REPO = 'AutoContentPublisherSystem';
+const GITHUB_BRANCH = 'main';
+
 const app = new cdk.App();
 
 const envName: unknown = app.node.tryGetContext('env');
@@ -43,6 +50,10 @@ const snsPostBatchStack = new SnsPostBatchStack(app, 'SnsPostBatchStack', {
 
 const imageBatchStack = new ImageBatchStack(app, 'ImageBatchStack', {
   envName,
+  githubConnectionArn: GITHUB_CONNECTION_ARN,
+  githubOwner: GITHUB_OWNER,
+  githubRepo: GITHUB_REPO,
+  githubBranch: GITHUB_BRANCH,
   imageBatchRepository: foundationStack.imageBatchRepository,
   imagesBucket: foundationStack.imagesBucket,
   auroraCluster: foundationStack.auroraCluster,

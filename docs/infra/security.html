@@ -227,6 +227,8 @@
 <ul>
   <li>CodePipeline が Source Stage で GitHub からソースを取得し、Build Stage で CodeBuild を起動するために必要な最小権限</li>
   <li>S3 アーティファクトバケットは CodePipeline が使用する中間ストレージ（CDK がデフォルトで作成）</li>
+  <li>接続 ARN が新形式（サービス名 <code>codeconnections</code>）のため、Source アクションロールには <code>codestar-connections:UseConnection</code>（CDK 自動付与）に加えて <code>codeconnections:UseConnection</code> を明示付与する（ARN のサービス名とアクション名前空間が一致しないと実行時に権限エラーになる）</li>
+  <li>アクションロール（Source / Build）はサービスプリンシパルではなくパイプラインロールが <code>sts:AssumeRole</code> する連鎖構造のため、信頼ポリシーはアカウント root（またはパイプラインロール）を許可する</li>
 </ul>
 
 <h2 id="network">3. ネットワークセキュリティ</h2>

@@ -29,6 +29,11 @@ const createMonitoringStack = (): MonitoringStack => {
   });
   const imageBatchStack = new ImageBatchStack(app, 'ImageBatchStack', {
     envName: 'prod',
+    githubConnectionArn:
+      'arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7',
+    githubOwner: 'takegaharasoshi',
+    githubRepo: 'AutoContentPublisherSystem',
+    githubBranch: 'main',
     imageBatchRepository: foundationStack.imageBatchRepository,
     imagesBucket: foundationStack.imagesBucket,
     auroraCluster: foundationStack.auroraCluster,
