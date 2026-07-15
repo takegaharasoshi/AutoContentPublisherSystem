@@ -347,9 +347,9 @@
 
 **ゴール**: GitHub push で自動的にビルド・デプロイされる（イメージは空回し版のままでよい）
 
-- [ ] **8-0** CodeStar Connections の事前作成（AWS コンソール）
+- [x] **8-0** CodeStar Connections の事前作成（AWS コンソール）
   - 確認: AWS コンソールの CodePipeline > 設定 > 接続で、GitHub との接続が「利用可能」ステータスになっている
-  - 備考: CodeStar Connections は CDK 管理外。AWS コンソールで作成し、GitHub リポジトリとの接続を承認する。詳細は [docs/infra/cicd.html](infra/cicd.html) セクション 1.1 を参照
+  - 備考: CodeStar Connections は CDK 管理外。AWS コンソールで作成し、GitHub リポジトリとの接続を承認する。詳細は [docs/infra/cicd.html](infra/cicd.html) セクション 1.1 を参照。2026-07-15 実施。接続名 `AutoContentPublisherSystem`（Provider: GitHub）を作成し、CLI で `ConnectionStatus: AVAILABLE` を確認した。ARN: `arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7`（8-1 のパイプライン定義で Source Stage に指定する）
 
 - [ ] **8-1** CodePipeline + CodeBuild の定義（image-batch 用、ImageBatchStack に追加）
   - 確認: push → ECR イメージ更新 → タスク定義更新
