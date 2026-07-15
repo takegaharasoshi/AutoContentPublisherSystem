@@ -361,7 +361,7 @@
 
 - [ ] **8-3** インフラの手動デプロイ運用手順を確認
   - 確認: `cdk diff -c env=prod <StackName>` → `cdk deploy -c env=prod <StackName>` の手動運用が問題なく行えることを確認
-  - 備考: インフラパイプラインは構築しない（破壊的変更リスク回避のため。[docs/infra/cicd.html](infra/cicd.html) 参照）
+  - 備考: インフラパイプラインは構築しない（破壊的変更リスク回避のため。[docs/infra/cicd.html](infra/cicd.html) 参照）。2026-07-15 diff 確認まで実施。**diff 確認（4 スタック）**: 現行タグ 3 つ（`dbReadinessCheckImageTag=27d0ab20a77e` / `imageBatchImageTag=6faa9486d8e4` / `snsPostBatchImageTag=91006575046a`）を指定して全スタックの `cdk diff` が成功。FoundationStack / MonitoringStack は差分なし。ImageBatchStack / SnsPostBatchStack はタスク定義のイメージタグ変更（CFn 保持の旧タグ `5d299755d7e8` → パイプライン登録済みの現行タグ）のみで、これはパイプラインが CFn 外で revision を登録する設計どおりの乖離。**手順書の乖離を 2 点検出し修正**: (1) cicd.html 3.2 の手順例が 8-1/8-2 で必須化した `imageBatchImageTag` / `snsPostBatchImageTag` 未反映で、記載どおりでは synth エラーになる、(2) 1 スタックのみの diff / deploy でも CDK が上流依存スタックを選択に含めて synth 検証するため、対象外スタックのタグも必要（`ImageBatchStack` 単独指定で FoundationStack / SnsPostBatchStack のタグ未指定エラーを実測）→「常に 3 タグ指定」をルール化し cicd.html 3.2 に指定ルール・現行タグの確認方法・パイプライン実行後に diff へタグ変更が現れるのは想定内である旨を追記（6.1・operation.html 1.1 は 3.2 への参照に変更）。**残作業**: `cdk deploy`（同一イメージの新 revision 登録で CFn のタグ乖離も解消される）。prod deploy は例によって Claude の自動実行が権限拒否のため、ユーザー実行後に完了化する
 
 ---
 

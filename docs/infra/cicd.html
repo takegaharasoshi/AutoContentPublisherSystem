@@ -138,24 +138,34 @@ phases:
       # Task Definition 全体の SSOT は CDK。CodeBuild は image URI の差し替えだけを担う
       # Step Functions の更新は不要（タスク定義を family 名で参照し、常に最新リビジョンを使用するため）</code></pre>
 
-<h3>3.2 インフラデプロイ（手動）</h3>
+<h3 id="manual-deploy">3.2 インフラデプロイ（手動）</h3>
 <p>インフラ変更は CI/CD パイプラインを経由せず、開発者がローカルから手動で実行する。</p>
 
-<pre><code># 手動デプロイ手順
+<pre><code># 手動デプロイ手順（イメージタグ Context は常に 3 つとも指定する。下記の注記を参照）
 cd infra
-cdk diff -c env=prod &lt;StackName&gt;            # 差分を確認
-cdk deploy -c env=prod &lt;StackName&gt;          # 確認後にデプロイ
+cdk diff -c env=prod \
+  -c dbReadinessCheckImageTag=&lt;tag&gt; \
+  -c imageBatchImageTag=&lt;tag&gt; \
+  -c snsPostBatchImageTag=&lt;tag&gt; \
+  &lt;StackName&gt;                               # 差分を確認
+cdk deploy -c env=prod \
+  -c dbReadinessCheckImageTag=&lt;tag&gt; \
+  -c imageBatchImageTag=&lt;tag&gt; \
+  -c snsPostBatchImageTag=&lt;tag&gt; \
+  &lt;StackName&gt;                               # 確認後にデプロイ
 
-# FoundationStack は DB 準備確認タスク定義の追加（開発計画 Phase 3-3）以降、
-# db-readiness-check に変更がない場合も常に現行の不変タグを指定する（未指定時は synth エラー）
-cdk diff -c env=prod -c dbReadinessCheckImageTag=&lt;immutable-tag&gt; FoundationStack
-cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;immutable-tag&gt; FoundationStack
+# 全スタックを依存順にデプロイする場合も同じ Context 指定で StackName だけ変える
+# （FoundationStack → SnsPostBatchStack → ImageBatchStack → MonitoringStack の順）</code></pre>
 
-# 全スタックを依存順にデプロイする場合
-cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;immutable-tag&gt; FoundationStack
-cdk deploy -c env=prod SnsPostBatchStack
-cdk deploy -c env=prod ImageBatchStack
-cdk deploy -c env=prod MonitoringStack</code></pre>
+<div class="note">
+  <span class="callout-title">イメージタグ Context の指定ルール（開発計画 Phase 8-3 で確認）</span>
+  <ul>
+    <li>各スタックは現行イメージの不変タグを CDK Context で受け取る。未指定のスタックは synth エラーとなる: <code>dbReadinessCheckImageTag</code>（FoundationStack、Phase 3-3 以降）/ <code>imageBatchImageTag</code>（ImageBatchStack、Phase 8-1 以降）/ <code>snsPostBatchImageTag</code>（SnsPostBatchStack、Phase 8-2 以降）</li>
+    <li>1 スタックだけを diff / deploy する場合でも、CDK は上流の依存スタック（例: ImageBatchStack なら FoundationStack と SnsPostBatchStack）を選択に含めて synth 検証するため、<strong>対象スタック以外のタグも必要になる。常に 3 つとも指定するのが確実</strong></li>
+    <li>現行タグの確認方法: 各サービスの latest ACTIVE タスク定義のイメージ URI（<code>aws ecs describe-task-definition --task-definition acps-prod-&lt;service&gt; --query 'taskDefinition.containerDefinitions[0].image'</code>）。image-batch / sns-post-batch はパイプラインが push した Git コミットハッシュ先頭 12 文字が現行タグとなる</li>
+    <li>サービスパイプラインの実行後は、CloudFormation 側のテンプレートが前回 CDK デプロイ時点のタグを保持しているため、<code>cdk diff</code> にタスク定義のイメージタグ変更（旧タグ → 指定した現行タグ）が現れる。これは設計どおりの挙動であり、現行タグを指定してデプロイすれば同一イメージの新 revision が登録されるだけでロールバックは起きない</li>
+  </ul>
+</div>
 
 <div class="note">
   <span class="callout-title">注記</span>
@@ -217,12 +227,11 @@ cdk deploy -c env=prod MonitoringStack</code></pre>
 
 <h3>6.1 手順</h3>
 <ol>
-  <li><code>cdk diff -c env=prod &lt;StackName&gt;</code> で差分を確認する</li>
+  <li><code>cdk diff -c env=prod &lt;StackName&gt;</code> で差分を確認する（イメージタグ Context 3 つの指定が必要。<a href="#manual-deploy">セクション 3.2</a> の指定ルールを参照）</li>
   <li><strong>db-readiness-check のイメージ更新を伴う場合</strong>、手動で Docker イメージをビルドし、不変タグで ECR に push する</li>
   <li><code>cdk deploy -c env=prod &lt;StackName&gt;</code> でインフラを更新する
     <ul>
-      <li>db-readiness-check の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を使用する</li>
-      <li>FoundationStack のデプロイでは、db-readiness-check に変更がない場合も現行の <code>dbReadinessCheckImageTag</code> を指定する（Phase 3-3 以降。未指定時は synth エラーとなる）</li>
+      <li>イメージに変更がない場合も、各タグ Context には現行の不変タグを指定する（db-readiness-check の更新時のみ <code>dbReadinessCheckImageTag</code> に新タグを指定する）</li>
     </ul>
   </li>
   <li><strong>ImageBatchStack または SnsPostBatchStack に変更が含まれる場合</strong>、latest ACTIVE revision を確認する

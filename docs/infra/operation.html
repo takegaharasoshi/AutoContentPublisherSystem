@@ -34,7 +34,7 @@
 <h4>スケジュール変更手順</h4>
 <ol>
   <li>CDK コードの EventBridge Scheduler の cron 式を変更する</li>
-  <li><code>cdk deploy -c env=prod ImageBatchStack</code> で EventBridge Scheduler を更新する</li>
+  <li><code>cdk deploy -c env=prod ImageBatchStack</code> で EventBridge Scheduler を更新する（イメージタグ Context 3 つの指定が必要。<a href="cicd.html#manual-deploy">cicd.html セクション 3.2</a> の指定ルールを参照）</li>
 </ol>
 
 <h3>1.2 バッチ実行時の動作</h3>
