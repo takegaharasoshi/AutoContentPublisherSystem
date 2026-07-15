@@ -434,7 +434,8 @@
 
 <div class="note">
   <span class="callout-title">アプリケーション発行のカスタムメトリクス</span>
-  バッチアプリケーション側が発行するカスタムメトリクス（投稿再試行の上限超過検知等）はアプリ設計（Phase 9）で定義する。SNS 投稿バッチタスクロールには <code>cloudwatch:PutMetricData</code>（Namespace を <code>ACPS</code> に制限）を先行して付与している（<a href="security.html">security.html</a> を参照）。
+  バッチアプリケーション側は個別のカスタムメトリクスを発行しない（Phase 9-2 のアプリ設計で「既存の Step Functions 失敗アラーム 1 本に一本化」を確定。<a href="../app/batch-flow.html#failure-policy">app/batch-flow.html セクション 3.4</a>）。
+  これに伴い、先行付与していた SNS 投稿バッチタスクロールの <code>cloudwatch:PutMetricData</code> は Phase 10-1 で削除した（<a href="security.html">security.html</a> セクション 2.1 の decision を参照）。上記 <code>SnsPostStartFailureCount</code> は Step Functions 実行ロールが発行するものであり、影響しない。
 </div>
 
 <h2 id="alarms">8. CloudWatch Alarm 定義</h2>

@@ -74,7 +74,7 @@ describe('SnsPostBatchStack のタスクロール', () => {
   const stack = createSnsPostBatchStack();
   const template = Template.fromStack(stack);
 
-  test('DB と SNS の Secret 読み取り、S3 読み取り、カスタムメトリクス発行を許可する', () => {
+  test('DB と SNS の Secret 読み取り、S3 読み取りを許可する', () => {
     const roles = Object.values(template.findResources('AWS::IAM::Role')) as any[];
     const taskRole = roles.find((role) =>
       role.Properties.Policies?.some(
@@ -117,23 +117,15 @@ describe('SnsPostBatchStack のタスクロール', () => {
                 ]),
               }),
             }),
-            expect.objectContaining({
-              PolicyName: 'PutAcpsMetrics',
-              PolicyDocument: expect.objectContaining({
-                Statement: expect.arrayContaining([
-                  expect.objectContaining({
-                    Action: 'cloudwatch:PutMetricData',
-                    Resource: '*',
-                    Condition: {
-                      StringEquals: { 'cloudwatch:namespace': 'ACPS' },
-                    },
-                  }),
-                ]),
-              }),
-            }),
           ]),
         }),
       }),
+    );
+
+    // アプリ側は個別カスタムメトリクスを持たない方針（Phase 9-2 確定）のため、
+    // タスクロールに cloudwatch:PutMetricData を付与しない（Phase 10-1 で削除）。
+    expect(JSON.stringify(template.toJSON())).not.toContain(
+      'cloudwatch:PutMetricData',
     );
 
     const policies = Object.values(template.findResources('AWS::IAM::Policy')) as any[];

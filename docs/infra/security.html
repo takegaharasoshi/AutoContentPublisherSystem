@@ -134,15 +134,23 @@
   <tbody>
     <tr><td>DB 準備確認タスクロール</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code>）</td></tr>
     <tr><td>画像生成バッチタスクロール</td><td>S3 読み書き、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/image/*</code>）</td></tr>
-    <tr><td>SNS 投稿バッチタスクロール</td><td>S3 読み取り、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>）、CloudWatch <code>PutMetricData</code>（アプリ発行カスタムメトリクス用）</td></tr>
+    <tr><td>SNS 投稿バッチタスクロール</td><td>S3 読み取り、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>）</td></tr>
   </tbody>
 </table>
 </div>
 <ul>
   <li>Secrets Manager 権限はサービスごとに必要最小限のプレフィックスで制限する。DB 認証情報（<code>acps/{env}/db/*</code>）は全サービス共通、それ以外は各サービスが必要とする種別のみ付与する</li>
   <li>DB にアカウントを追加するだけで、IAM ポリシーの変更なしに新しい Secret へのアクセスが可能になる</li>
-  <li>SNS 投稿バッチタスクロールの <code>cloudwatch:PutMetricData</code> は、条件キー <code>cloudwatch:namespace</code> で <code>ACPS</code> のみに制限する</li>
 </ul>
+
+<div class="decision">
+  <span class="callout-title">SNS 投稿バッチタスクロールの cloudwatch:PutMetricData を削除（2026-07-15、Phase 10-1）</span>
+  当初はアプリ発行カスタムメトリクス用に <code>cloudwatch:PutMetricData</code>（Namespace を <code>ACPS</code> に制限）を先行付与していたが、
+  Phase 9-2 のアプリ設計で「アプリ側は個別カスタムメトリクスを持たず、通知は既存の Step Functions 失敗アラーム 1 本に一本化する」方針が確定し、使用しない権限として残っていたため、
+  最小権限の原則に従い Phase 10-1 で削除した（設計課題リスト 2026-07-07 の項目を解消）。
+  将来アプリ発行カスタムメトリクスを導入する際は、下記「cloudwatch:PutMetricData の IAM 条件」の Namespace 制限方式で再付与する。
+  なお、<strong>Step Functions 実行ロール（image-generation-sfn）の <code>PutMetricData</code> は <code>SnsPostStartFailureCount</code> の発行に使用中のため残している</strong>（セクション 2.3）。
+</div>
 
 <h3>2.2 ECS タスク実行ロール</h3>
 <ul>

@@ -83,17 +83,6 @@ export class SnsPostBatchStack extends cdk.Stack {
             }),
           ],
         }),
-        PutAcpsMetrics: new iam.PolicyDocument({
-          statements: [
-            new iam.PolicyStatement({
-              actions: ['cloudwatch:PutMetricData'],
-              resources: ['*'],
-              conditions: {
-                StringEquals: { 'cloudwatch:namespace': 'ACPS' },
-              },
-            }),
-          ],
-        }),
       },
     });
 
