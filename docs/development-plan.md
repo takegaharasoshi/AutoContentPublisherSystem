@@ -351,9 +351,9 @@
   - 確認: AWS コンソールの CodePipeline > 設定 > 接続で、GitHub との接続が「利用可能」ステータスになっている
   - 備考: CodeStar Connections は CDK 管理外。AWS コンソールで作成し、GitHub リポジトリとの接続を承認する。詳細は [docs/infra/cicd.html](infra/cicd.html) セクション 1.1 を参照。2026-07-15 実施。接続名 `AutoContentPublisherSystem`（Provider: GitHub）を作成し、CLI で `ConnectionStatus: AVAILABLE` を確認した。ARN: `arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7`（8-1 のパイプライン定義で Source Stage に指定する）
 
-- [ ] **8-1** CodePipeline + CodeBuild の定義（image-batch 用、ImageBatchStack に追加）
+- [x] **8-1** CodePipeline + CodeBuild の定義（image-batch 用、ImageBatchStack に追加）
   - 確認: push → ECR イメージ更新 → タスク定義更新
-  - 備考: buildspec の構成は [docs/infra/cicd.html](infra/cicd.html) セクション 3.1 を参照
+  - 備考: buildspec の構成は [docs/infra/cicd.html](infra/cicd.html) セクション 3.1 を参照。2026-07-15 実施。実装は Codex に委譲し、CodePipeline V2（`acps-prod-image-batch-pipeline`、main × `services/image-batch/**` OR `shared/**` のパスフィルタトリガー、`crossAccountKeys: false`）+ CodeBuild（standard:7.0 / privileged / SMALL、`services/image-batch/buildspec.yml` 新規作成）を ImageBatchStack に追加（コミット 6faa948、jest 67 件パス）。**レビューで blocker 1 件を修正**: Source アクションロールの信頼ポリシーがサービスプリンシパル（codepipeline.amazonaws.com）になっており、実際はパイプラインロールが `sts:AssumeRole` する連鎖構造のため実行時に必ず失敗する構成だった → アカウント root 信頼へ修正。トリガーフィルタ使用時は Source アクションの `DetectChanges: false`（CDK の `triggerOnPush: false`）が正しい設定であることを AWS 公式ドキュメントで裏取りした。新形式 `codeconnections` ARN 向けの `codeconnections:UseConnection` 明示付与とあわせて [cicd.html](infra/cicd.html) セクション 1.1 実装メモ・[security.html](infra/security.html) セクション 2.5 に記録。**確認**: buildspec を main へ push 後に ImageBatchStack をデプロイ（13 リソース追加のみ。prod deploy は例によって Claude の自動実行が権限拒否され、ユーザーが実行）。パイプライン作成時の初回自動実行（trigger: CreatePipeline）が Succeeded となり、pytest → ECR push（タグ `6faa9486d8e4` = コミットハッシュ先頭 12 文字）→ タスク定義 revision 5 の登録を CLI で裏取りした。**残確認**: push イベントによるトリガー起動は未検証（初回実行は CreatePipeline 起因のため）。次に `services/image-batch/**` か `shared/**` を変更する push で確認する。8-2 の sns-post-batch のみの変更で image-batch パイプラインが起動しないことがパスフィルタの負のテストになる。**運用注意**: 以後の CDK デプロイでは `-c imageBatchImageTag=6faa9486d8e4`（現行タグ）を指定する
 
 - [ ] **8-2** sns-post-batch 用パイプラインの追加（SnsPostBatchStack に追加）
   - 確認: 同上
