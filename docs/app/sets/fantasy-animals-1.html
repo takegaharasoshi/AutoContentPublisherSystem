@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セット別設計書: 架空のかわいい動物図鑑 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 架空のかわいい動物図鑑</nav>
+<h1>セット別設計書: 架空のかわいい動物図鑑</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">作成中（12-1 で投稿先アカウント・キャプションを確定）</span>
+  <span>set_code: fantasy-animals-1</span>
+  <span>最終更新: 2026-07-18</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  本セット固有の設定・運用情報を記録する（11-1 で作成）。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> を参照し、本書には差分のみ書く（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）。
+</div>
+
+<h2>1. テーマ</h2>
+<p>現実に存在していそうで実在しない、架空のかわいい動物を紹介する画像を生成する。野生の姿を偶然写真に収めたかのような自然な写真風の構図とし、画像内に架空の動物の名前とその特徴（外見・生態など）の説明文を記載する。</p>
+
+<h2>2. 投稿先アカウント構成</h2>
+<p>未定（<strong>12-1</strong> で <code>sns_accounts</code> と SNS 認証 Secret を登録して確定する）。プラットフォームは Instagram を想定（初期スコープ）。</p>
+
+<h2>3. スケジュール（投稿頻度）</h2>
+<p>未定。初セットは既存プレースホルダ Scheduler（<code>acps-prod-image-generation-schedule</code>）を転用する方針（<a href="../operation.html">operation.html セクション 2.1 手順 3</a> の decision）。cron 式の確定・有効化のタイミングは別途判断する（11-1 の完了条件には含まれない）。</p>
+
+<h2>4. プロンプトの作り方</h2>
+<p>固定文言方式。<code>prompt_configs.prompt_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>prompt_config</code>。1 枚だけ生成されるよう文言で制御する。<a href="../batch-flow.html">batch-flow.html</a> の decision）。11-1 時点の登録文言は以下（ユーザー決定）。</p>
+<pre><code>現実に存在していそうで、実在はしていないかわいい動物の画像を作ってください。画像には、野生の状態を偶然写真に撮れたかのような架空の動物と、その動物の名前、そして特徴の説明を記載するようにしてください。Instagram に投稿するため、Instagram に合わせたサイズにしてください。生成する画像は1枚のみとしてください。</code></pre>
+<p>生成パラメータ（モデル・サイズ・品質等の <code>parameters</code> カラム）は 11-2（画像生成 API の疎通確認）で当たりを付けてから設定する。11-1 時点では NULL。</p>
+
+<h2>5. キャプションの作り方</h2>
+<p>未定（<strong>12-1</strong> で <code>caption_templates</code> を登録して確定する）。画像内に動物名・特徴の説明を焼き込む仕様のため、キャプション本文は補足的な固定文 + ハッシュタグを想定。</p>
+
+<h2>6. 失敗時ポリシー</h2>
+<p>共通の失敗時ポリシー（<a href="../operation.html">operation.html セクション 4</a>）に準拠。セット固有の追加ポリシーはなし。</p>
+
+<h2>7. 共通フローからの差分・特記事項</h2>
+<p>共通フロー（<a href="../batch-flow.html">batch-flow.html</a>）どおりで差分なし。名前・特徴のテキストを画像に合成する処理はプロンプト側で完結させ、共通骨格・DB スキーマの変更は不要。初期方式（<code>gpt-image-single</code>）の方式別設計書は本採用後に <code>docs/app/generators/gpt-image-single.html</code> として作成する（<strong>11-4</strong>）。</p>
+
+</div>
+</body>
+</html>

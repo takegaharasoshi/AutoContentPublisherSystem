@@ -85,9 +85,9 @@
 
 > 実装の大きいステップ（11-3・11-4）は Codex に委譲し、完了条件に pytest 全パスを含める。設計判断・レビュー・ドキュメント更新は Claude が行う（CLAUDE.md の Codex 連携ルール）。
 
-- [ ] **11-1** 初セットの登録と Secret 実値投入
+- [x] **11-1** 初セットの登録と Secret 実値投入
   - 確認: Aurora に `is_active=1` の初セット（`batch_sets` + `prompt_configs`）が登録され、`acps/prod/image/api-key` が実 API キーになっている
-  - 備考: セットのテーマ・`set_code` はユーザーが決定 → セット別設計書 `docs/app/sets/<set_code>.html` を作成（[docs/app/operation.html](app/operation.html) セクション 2.1 手順 0。sets/ の初作成）→ `batch_sets`（生成方式名 = 初期方式）・`prompt_configs` をローカル & Aurora に登録 → 画像 API キーを投入（operation.html セクション 5.4。OpenAI の API キーはユーザーが用意）。**業務データ投入ポイント①**: 実際に使う<strong>プロンプト文言</strong>をここで `prompt_configs.prompt_text` に INSERT する（1 枚だけ生成されるよう文言で制御。文言はユーザー決定、Claude が草案作成可。以後の調整は operation.html セクション 3 の手順で随時）
+  - 備考: 2026-07-19 完了。初セット `fantasy-animals-1`（架空のかわいい動物図鑑）を決定し、セット別設計書 [docs/app/sets/fantasy-animals-1.html](app/sets/fantasy-animals-1.html) を作成（sets/ の初作成。docs/app/index.html にセット一覧を追加）。`batch_sets`（`generator_name='gpt-image-single'`）・`prompt_configs`（プロンプト文言はユーザー決定、1 枚だけ生成されるよう文言で制御）をローカル（`id=1`）& Aurora（`id=1`）に登録。Aurora への書き込みは Phase 10-4 の役割分担（Query Editor 操作はユーザー、CLI 裏取りは Claude）を踏襲し `aws rds-data execute-statement` で裏取り。画像生成 API キー（`acps/prod/image/api-key`）はユーザーがマネジメントコンソールで実値に差し替え、`LastChangedDate` の更新を CLI で確認（値自体は非取得）。詳細は [development-log.md](development-log.md) の 11-1 を参照
 
 - [ ] **11-2** 画像生成 API の疎通確認
   - 確認: 初期方式が使う API（`gpt-image-2`）をローカル小スクリプトで呼び出し、画像が返る

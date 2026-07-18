@@ -73,7 +73,20 @@
 
 <h3 id="set-docs">セット別・生成方式別設計書（sets/ / generators/）</h3>
 <p>セット（テーマ）が増えるたびに <code>docs/app/sets/&lt;set_code&gt;.html</code> が、生成方式が本採用されるたびに <code>docs/app/generators/&lt;方式名&gt;.html</code> が 1 本ずつ増える（<strong>3 層構造: 契約 / 方式 / セット</strong>。Phase 10-1 で 2 層から拡張）。<strong>共通設計書（上記の親ページ + 3 分冊）はセット追加・方式追加では変更しない</strong>（方式カタログへの 1 行追加を除く）。
-ルール・標準記載項目は<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a> を参照。実ファイルは初セット追加時・方式の本採用時に作成する（現時点では未作成）。</p>
+ルール・標準記載項目は<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a> を参照。実ファイルは初セット追加時・方式の本採用時に作成する。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>set_code</th><th>テーマ</th><th>設計書</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>fantasy-animals-1</td>
+      <td>架空のかわいい動物図鑑</td>
+      <td><a href="sets/fantasy-animals-1.html">sets/fantasy-animals-1.html</a></td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 <h2 id="memo">2. 検討メモ</h2>
 <p>インフラ設計・構築中に出てきたアプリ関連の論点はここに記録する（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。Phase 9 開始時（9-1）と、インフラ構築後の最終 Fix（Phase 10-1）でこのメモを棚卸しする（<strong>10-1 棚卸し実施済み: 2026-07-15、全 2 件反映</strong>）。</p>
