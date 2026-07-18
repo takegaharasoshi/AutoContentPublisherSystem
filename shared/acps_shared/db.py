@@ -26,7 +26,7 @@ def connect(
     Raises:
         pymysql.MySQLError: If the connection fails.
     """
-    return pymysql.connect(
+    connection = pymysql.connect(
         host=secret.host,
         port=secret.port,
         user=secret.username,
@@ -35,6 +35,9 @@ def connect(
         connect_timeout=connect_timeout,
         charset="utf8mb4",
     )
+    with connection.cursor() as cursor:
+        cursor.execute("SET time_zone = '+00:00'")
+    return connection
 
 
 @contextmanager

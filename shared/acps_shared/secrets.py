@@ -1,5 +1,7 @@
 """Secrets Manager integration for database connection credentials."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 import json
 from typing import Any
@@ -90,3 +92,18 @@ def get_db_secret(secret_arn: str, client: Any | None = None) -> DbSecret:
     secrets_client = client if client is not None else boto3.client("secretsmanager")
     response = secrets_client.get_secret_value(SecretId=secret_arn)
     return parse_db_secret(response["SecretString"])
+
+
+def get_secret_string(secret_arn: str, client: Any | None = None) -> str:
+    """Return a raw SecretString from Secrets Manager without schema parsing.
+
+    Args:
+        secret_arn: ARN of the secret.
+        client: Optional Secrets Manager client, for dependency injection.
+
+    Returns:
+        The raw SecretString returned by Secrets Manager.
+    """
+    secrets_client = client if client is not None else boto3.client("secretsmanager")
+    response = secrets_client.get_secret_value(SecretId=secret_arn)
+    return response["SecretString"]

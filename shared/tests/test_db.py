@@ -38,6 +38,9 @@ def test_connect_uses_expected_connect_arguments(
         charset="utf8mb4",
     )
     connection.close.assert_not_called()
+    connection.cursor.return_value.__enter__.return_value.execute.assert_called_once_with(
+        "SET time_zone = '+00:00'"
+    )
 
 
 def test_connect_defaults_connect_timeout_to_10(secret: DbSecret) -> None:

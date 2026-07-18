@@ -93,9 +93,9 @@
   - 確認: 初期方式が使う API（`gpt-image-2`）をローカル小スクリプトで呼び出し、画像が返る
   - 備考: 2026-07-19 完了。実プロンプトで `size=1024x1024, quality=high, n=1` の画像を確認し、`prompt_configs.parameters`（ローカル `id=1`・Aurora `id=2`）に反映。詳細は [development-log.md](development-log.md) の 11-2 を参照
 
-- [ ] **11-3** image-batch 共通骨格の実装（Codex 委譲）
+- [x] **11-3** image-batch 共通骨格の実装（Codex 委譲）
   - 確認: pytest 全パス + ローカル MySQL E2E（テスト用フェイク方式）で `generation_runs`・`generated_images`・`batch_execution_logs` に行が入る
-  - 備考: [docs/app/batch-flow.html](app/batch-flow.html) セクション 1・2 のとおり実装する: config 拡張（`SET_CODE` / `SCHEDULED_AT` / `EXECUTION_ARN` / `API_SECRET_ARN` / `S3_BUCKET_NAME`）、実行ログ INSERT-or-fetch、`generation_runs` 解決、`prompt_configs` ループ + 完了判定、S3 保存、`generated_images` 登録、方式レジストリ（この段階はフェイク方式のみ）。`shared/acps_shared` に汎用 Secret 取得・S3 ヘルパーを追加する
+  - 備考: 2026-07-19 完了。`services/image-batch` を空回し版から共通骨格（実行ログ INSERT-or-fetch・`generation_runs` 冪等解決・`prompt_configs` ループ + 完了判定・S3 保存・`generated_images` 登録・方式レジストリ〔`fake` のみ〕）に全面書き換え。`shared/acps_shared` に `get_secret_string`・`s3.put_object`・DB セッション UTC 固定を追加。レビューで E2E テストの接続バグ（`pymysql.connect()` 引数名の不一致で常に自己スキップしていた）を検出し Codex に再委譲して修正、ローカル MySQL 起動状態で E2E が実際に実行され green になることを確認済み。詳細は [development-log.md](development-log.md) の 11-3 を参照
 
 - [ ] **11-4** 初期方式 gpt-image-single の実装（Codex 委譲）
   - 確認: ローカル E2E で実画像が生成され、S3 保存 + DB 登録まで通る

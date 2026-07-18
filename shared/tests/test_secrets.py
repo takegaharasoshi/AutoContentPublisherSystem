@@ -5,7 +5,13 @@ from unittest.mock import Mock
 
 import pytest
 
-from acps_shared import DbSecret, SecretFormatError, get_db_secret, parse_db_secret
+from acps_shared import (
+    DbSecret,
+    SecretFormatError,
+    get_db_secret,
+    get_secret_string,
+    parse_db_secret,
+)
 
 
 def _secret_json(**overrides: object) -> str:
@@ -69,6 +75,18 @@ def test_get_db_secret_uses_injected_client_and_arn() -> None:
         SecretId="arn:aws:secretsmanager:example"
     )
     assert secret.port == 3306
+
+
+def test_get_secret_string_uses_injected_client_without_parsing() -> None:
+    client = Mock()
+    client.get_secret_value.return_value = {"SecretString": "not-json"}
+
+    value = get_secret_string("arn:aws:secretsmanager:example", client=client)
+
+    assert value == "not-json"
+    client.get_secret_value.assert_called_once_with(
+        SecretId="arn:aws:secretsmanager:example"
+    )
 
 
 def test_db_secret_repr_masks_all_values() -> None:
