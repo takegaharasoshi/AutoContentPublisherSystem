@@ -69,9 +69,9 @@
   - 確認: `database/V001__initial_schema.sql` の `batch_sets` に生成方式名カラムがあり、[docs/app/data-model.html](app/data-model.html) セクション 4.1・ER 図と一致している
   - 備考: 2026-07-18 完了。`batch_sets` に `generator_name VARCHAR(50) NOT NULL` を追加（V002 なしの V001 直接修正）し、data-model.html 4.1 の decision にカラム仕様・理由を記録（関連 3 設計書の記述も整合）。あわせて構文検証で検出した複合 FK 5 本の COMMENT 句（MySQL 構文違反。10-4 適用を阻む blocker）を行コメント化で修正。詳細は [development-log.md](development-log.md) の 10-3 を参照
 
-- [ ] **10-4** 本スキーマ DDL（V001）の Aurora 適用
+- [x] **10-4** 本スキーマ DDL（V001）の Aurora 適用
   - 確認: Query Editor で V001 を適用し、`SHOW TABLES` で 9 テーブル + CLI（`SHOW CREATE TABLE`）で定義一致を裏取りできている
-  - 備考: DB 直接操作の注意（DB 名 `acps` の指定・`DatabaseResumingException` 時は待って再試行・文字化けは表示のみ）は [docs/app/operation.html](app/operation.html) セクション 2 の共通注記を参照。V000 の `connection_test` は当面残置してよい
+  - 備考: 2026-07-18 完了。Query Editor で V001 の 9 テーブルを prod Aurora（DB `acps`）へ適用し、Data API CLI で `SHOW TABLES`（9 テーブル + 残置の `connection_test`）と全 9 テーブルの `SHOW CREATE TABLE` の定義一致（複合 FK 5 本含む）を裏取りした。初回実行は接続設定の DB 名の末尾空白（`acps `）で全文エラーになった（トラブルシューティングログ参照）。詳細は [development-log.md](development-log.md) の 10-4 を参照
 
 - [ ] **10-5** ローカル開発環境の整備（MySQL compose）
   - 確認: docker-compose 起動（mysql:8.0 + V000/V001 を docker-entrypoint-initdb.d で初期化）→ 両サービス（現行の疎通版）のローカル Docker 実行が V001 スキーマの DB に対して成功する
@@ -158,6 +158,7 @@
 | 日付 | Phase-Step | 問題 | 解決策 |
 |---|---|---|---|
 | 2026-07-18 | 10-3 | V001 の複合 FK 5 本（`generated_images` 2 本・`posts` 3 本）に付けていた `COMMENT` 句が MySQL 構文違反（FOREIGN KEY 制約は COMMENT をサポートしない）。V001 は実 MySQL で未実行のため潜伏しており、10-4 の適用時に ERROR 1064 で失敗するところだった | 10-3 の構文検証（sqlfluff・MySQL 方言）で検出。COMMENT の記載内容を FK 直前の行コメントへ移動して解消（`UNIQUE KEY`・`KEY` の COMMENT は正当な構文のため残置）。全 9 テーブルのパース成功を再検証済み |
+| 2026-07-18 | 10-4 | Query Editor での V001 初回実行が全 9 文 `Incorrect database name 'acps '; Error code: 1102` で失敗。接続ダイアログのデータベース名に末尾空白が入っていた（コピペ起因）。テーブルは 1 つも作られない | データベース名を空白なしの `acps` で入力し直して再実行 → 全文成功。Query Editor の接続ダイアログは入力値の前後空白をトリムしないため、DB 名はコピペ後に空白を確認する |
 
 ## 設計課題リスト
 
