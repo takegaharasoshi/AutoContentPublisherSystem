@@ -1,0 +1,37 @@
+# ローカル開発用 MySQL（Aurora MySQL 3.x = MySQL 8.0 互換の代替）
+#
+# 使い方はルート README.md の「ローカル開発環境」を参照。
+# 初回起動時（データボリュームが空のとき）のみ database/ 配下の DDL が
+# ファイル名順（V000 → V001 → ...）に自動適用される。
+# スキーマを再初期化する場合は `docker compose down -v` でボリュームごと破棄する。
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: acps-mysql
+    # Aurora MySQL 3 のデフォルトに合わせる:
+    # - 認証プラグイン mysql_native_password（PyMySQL が追加依存 cryptography なしで接続できる）
+    # - 文字コード utf8mb4 / 照合順序 utf8mb4_unicode_ci
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: acps
+      MYSQL_USER: app
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d:ro
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      # TCP(127.0.0.1) 指定必須: 初期化中の一時サーバーは skip-networking で起動するため、
+      # ソケット経由の ping では初期化完了前に healthy と誤判定される
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uapp", "-ppassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+
+volumes:
+  mysql-data:

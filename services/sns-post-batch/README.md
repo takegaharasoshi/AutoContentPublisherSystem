@@ -14,13 +14,13 @@ cd services/sns-post-batch && uv run pytest
 
 ## Docker ビルドとローカル動作確認
 
-リポジトリルートから実行します。
+リポジトリルートから実行します。接続先のローカル MySQL は `docker compose up -d` で起動しておきます（接続情報はルート README の「ローカル開発環境」を参照）。
 
 ```bash
 docker build -f services/sns-post-batch/Dockerfile -t sns-post-batch .
 
 export ENV_NAME=local
-export DB_SECRET_JSON='{"username":"user","password":"password","host":"host.docker.internal","port":3306,"dbname":"appdb"}'
+export DB_SECRET_JSON='{"username":"app","password":"password","host":"host.docker.internal","port":3306,"dbname":"acps"}'
 docker run --rm -e ENV_NAME -e DB_SECRET_JSON sns-post-batch
 ```
 

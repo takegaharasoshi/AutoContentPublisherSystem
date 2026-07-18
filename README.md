@@ -63,21 +63,43 @@ AutoContentPublisherSystem/
 - エディタ: VS Code ベースのエディタ
 - コンテナ: Docker Desktop
 
-## セットアップ
+## ローカル開発環境
 
-> **注意**: 以下は予定構成です。実装完了後に手順を確定します。
+### ローカル MySQL（docker compose）
+
+Aurora（MySQL 8.0 互換）の代替としてローカル MySQL を docker compose で起動する。初回起動時に `database/` 配下の DDL（V000 → V001 → …）がファイル名順に自動適用される。
 
 ```bash
-# リポジトリをクローン
-git clone <repository-url>
-cd AutoContentPublisherSystem
+# 起動（リポジトリルートから）
+docker compose up -d
 
-# Python 仮想環境のセットアップ（各サービスごと）
-cd services/image-batch
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# 初期化完了（healthy）を待って確認
+docker compose ps
+
+# スキーマを再初期化したいとき（データボリュームごと破棄）
+docker compose down -v
 ```
+
+接続情報（[docker-compose.yml](docker-compose.yml) で定義）:
+
+| 項目 | 値 |
+|---|---|
+| ホスト | `127.0.0.1`（ホストから） / `host.docker.internal`（コンテナから） |
+| ポート | `3306` |
+| データベース | `acps`（Aurora と同名） |
+| ユーザー / パスワード | `app` / `password`（root は `root` / `root`） |
+
+### テスト実行
+
+Python は uv で管理する（`uv run` が `uv.lock` どおりの環境を自動構築する）。
+
+```bash
+cd services/image-batch && uv run pytest   # 各サービス・shared で同様
+```
+
+### バッチのローカル Docker 実行
+
+ローカル MySQL に対して各バッチを実行する手順は各サービスの README（例: [services/image-batch/README.md](services/image-batch/README.md)）を参照。
 
 ## デプロイ
 

@@ -73,9 +73,9 @@
   - 確認: Query Editor で V001 を適用し、`SHOW TABLES` で 9 テーブル + CLI（`SHOW CREATE TABLE`）で定義一致を裏取りできている
   - 備考: 2026-07-18 完了。Query Editor で V001 の 9 テーブルを prod Aurora（DB `acps`）へ適用し、Data API CLI で `SHOW TABLES`（9 テーブル + 残置の `connection_test`）と全 9 テーブルの `SHOW CREATE TABLE` の定義一致（複合 FK 5 本含む）を裏取りした。初回実行は接続設定の DB 名の末尾空白（`acps `）で全文エラーになった（トラブルシューティングログ参照）。詳細は [development-log.md](development-log.md) の 10-4 を参照
 
-- [ ] **10-5** ローカル開発環境の整備（MySQL compose）
+- [x] **10-5** ローカル開発環境の整備（MySQL compose）
   - 確認: docker-compose 起動（mysql:8.0 + V000/V001 を docker-entrypoint-initdb.d で初期化）→ 両サービス（現行の疎通版）のローカル Docker 実行が V001 スキーマの DB に対して成功する
-  - 備考: これまでアドホックに起動していたローカル MySQL をリポジトリにコミットする（compose ファイル + README 手順化）。Phase 11 以降のローカル E2E の土台
+  - 備考: 2026-07-18 完了。ルートに `docker-compose.yml` を新設（mysql:8.0、`database/` を initdb マウントしファイル名順に自動適用、DB 名は Aurora と同じ `acps`、認証プラグイン・文字コードも Aurora MySQL 3 デフォルトに合わせた）。README を手順化（ルート「ローカル開発環境」新設 + 両サービス README の接続例を実値へ更新）。検証: 初回起動で全 10 テーブル作成 → 両サービスの docker run が exit 0・「DB 接続成功」ログ。詳細は [development-log.md](development-log.md) の 10-5 を参照
 
 ---
 
