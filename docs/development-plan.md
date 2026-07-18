@@ -3,7 +3,7 @@
 ## 進め方の方針
 
 - **設計（インフラ → アプリ）を先に固め、構築はインフラ → アプリ実装の順に進める**
-  - Phase D: インフラ設計の一時 Fix → Phase A: アプリ設計の大枠（上流設計）→ Phase 9: アプリ設計（詳細・前倒し）→ Phase 0〜8: インフラ構築（空回し確認・監視・CI/CD まで）→ Phase 10 以降: アプリ実装（冒頭でアプリ設計の最終 Fix）
+  - Phase D: インフラ設計の一時 Fix → Phase A: アプリ設計の大枠（上流設計）→ Phase 9: アプリ設計（詳細・前倒し）→ Phase 0〜8: インフラ構築（空回し確認・監視・CI/CD まで）→ Phase 10〜13: アプリ実装（10: 実装準備〔冒頭でアプリ設計の最終 Fix〕→ 11: 画像生成バッチ → 12: SNS 投稿バッチ → 13: 定常運用開始。10-2 で展開）
 - **アプリ設計は 2 段階で行う**: 大枠（Phase A）と詳細（Phase 9）に分ける
   - Phase A では仕様の壁打ち・設計書構成の決定・主要方針の骨子までを固め、Phase 9 で詳細化する
   - 経緯 1: 2026-07-06、上流工程に適した生成 AI モデル（Claude Fable 5）の利用期限を機に、Phase 9 の上流部分を Phase A として前倒しした
@@ -53,24 +53,101 @@
 
 ---
 
-## Phase 10 以降: アプリ実装
+## Phase 10: 実装準備
 
-**ゴール**: アプリ設計に基づき業務ロジックを実装し、E2E で動作させる
+**ゴール**: DB スキーマ・ローカル環境が業務ロジック実装に耐える状態になっている
 
 - [x] **10-1** アプリ設計の最終 Fix（インフラ構築の知見反映）
   - 確認: [docs/app/index.html](app/index.html) の検討メモとインフラ構築（Phase 0〜8）で得た知見を棚卸しし、アプリ設計書に反映されている。blocker のみ修正し、改善提案は設計課題リストに記録されている
   - 備考: 2026-07-15 完了。検討メモ 2 件の反映（設計書の 3 層構造化・生成方式 strategy 構造）、外部 API 名の非固定化（画像生成 API は ChatGPT Images 2.0 へ変更予定。上位ドキュメントから特定 API 名を排除）、運用手順の実態合わせ、未使用 IAM 権限の削除を実施。詳細は [development-log.md](development-log.md) の 10-1 を参照
 
-- [ ] **10-2** 実装計画の詳細化
+- [x] **10-2** 実装計画の詳細化 + 開発計画の整理
   - 確認: 本ファイルの「Phase 10 以降」が具体的なステップに展開されている
-  - 備考: 旧 9-6。旧計画の Phase 7〜8（業務ロジック実装）相当。旧計画の内容は git 履歴（2026-07-06 以前の development-plan.md）を参照できる
+  - 備考: 2026-07-18 完了。アプリ実装を Phase 10〜13 の 14 ステップへ展開し、あわせて完了フェーズの実施記録を [development-log.md](development-log.md) へ移管（計画書 414 行 → 約 100 行）。詳細は development-log.md の 10-2 を参照
 
-以降は 10-2 で具体的なステップへ展開する。想定する内容:
+- [ ] **10-3** 生成方式カラムの反映（V001 直接修正）
+  - 確認: `database/V001__initial_schema.sql` の `batch_sets` に生成方式名カラムがあり、[docs/app/data-model.html](app/data-model.html) セクション 4.1・ER 図と一致している
+  - 備考: 「方式の割当は DB のセット設定で行う」（[docs/app/batch-flow.html](app/batch-flow.html) セクション 2.1）に対し、合意（2026-07-12）より前に作成した V001 に方式名カラムがない設計ギャップの決着。V001 は Aurora 未適用のため直接修正する（ユーザー確定。V002 は作らない）。カラム名（例 `generator_name`）・制約は実装時に確定し、「実装を正とする」ルールで data-model.html に decision を記録する
 
-- 本スキーマ DDL（Phase 9-3 で作成済み）の Aurora への適用
-- テストデータと Secret 値（画像生成 API キー・SNS 認証情報）の準備
-- 画像生成バッチの業務ロジック実装（API 疎通 → S3 保存 → DB 登録 → E2E）
-- SNS 投稿バッチの業務ロジック実装（Instagram API 疎通 → 投稿フロー → 重複投稿防止の確認）
+- [ ] **10-4** 本スキーマ DDL（V001）の Aurora 適用
+  - 確認: Query Editor で V001 を適用し、`SHOW TABLES` で 9 テーブル + CLI（`SHOW CREATE TABLE`）で定義一致を裏取りできている
+  - 備考: DB 直接操作の注意（DB 名 `acps` の指定・`DatabaseResumingException` 時は待って再試行・文字化けは表示のみ）は [docs/app/operation.html](app/operation.html) セクション 2 の共通注記を参照。V000 の `connection_test` は当面残置してよい
+
+- [ ] **10-5** ローカル開発環境の整備（MySQL compose）
+  - 確認: docker-compose 起動（mysql:8.0 + V000/V001 を docker-entrypoint-initdb.d で初期化）→ 両サービス（現行の疎通版）のローカル Docker 実行が V001 スキーマの DB に対して成功する
+  - 備考: これまでアドホックに起動していたローカル MySQL をリポジトリにコミットする（compose ファイル + README 手順化）。Phase 11 以降のローカル E2E の土台
+
+---
+
+## Phase 11: 画像生成バッチの業務ロジック実装
+
+**ゴール**: Step Functions 経由で実画像が生成され、S3 + DB に記録される
+
+> 実装の大きいステップ（11-3・11-4）は Codex に委譲し、完了条件に pytest 全パスを含める。設計判断・レビュー・ドキュメント更新は Claude が行う（CLAUDE.md の Codex 連携ルール）。
+
+- [ ] **11-1** 初セットの登録と Secret 実値投入
+  - 確認: Aurora に `is_active=1` の初セット（`batch_sets` + `prompt_configs`）が登録され、`acps/prod/image/api-key` が実 API キーになっている
+  - 備考: セットのテーマ・`set_code` はユーザーが決定 → セット別設計書 `docs/app/sets/<set_code>.html` を作成（[docs/app/operation.html](app/operation.html) セクション 2.1 手順 0。sets/ の初作成）→ `batch_sets`（生成方式名 = 初期方式）・`prompt_configs` をローカル & Aurora に登録 → 画像 API キーを投入（operation.html セクション 5.4。OpenAI の API キーはユーザーが用意）。**業務データ投入ポイント①**: 実際に使う<strong>プロンプト文言</strong>をここで `prompt_configs.prompt_text` に INSERT する（1 枚だけ生成されるよう文言で制御。文言はユーザー決定、Claude が草案作成可。以後の調整は operation.html セクション 3 の手順で随時）
+
+- [ ] **11-2** 画像生成 API の疎通確認
+  - 確認: 初期方式が使う API（`gpt-image-2`）をローカル小スクリプトで呼び出し、画像が返る
+  - 備考: 従量課金が発生する点に注意。生成パラメータ（サイズ・品質等）の当たりもここで付ける
+
+- [ ] **11-3** image-batch 共通骨格の実装（Codex 委譲）
+  - 確認: pytest 全パス + ローカル MySQL E2E（テスト用フェイク方式）で `generation_runs`・`generated_images`・`batch_execution_logs` に行が入る
+  - 備考: [docs/app/batch-flow.html](app/batch-flow.html) セクション 1・2 のとおり実装する: config 拡張（`SET_CODE` / `SCHEDULED_AT` / `EXECUTION_ARN` / `API_SECRET_ARN` / `S3_BUCKET_NAME`）、実行ログ INSERT-or-fetch、`generation_runs` 解決、`prompt_configs` ループ + 完了判定、S3 保存、`generated_images` 登録、方式レジストリ（この段階はフェイク方式のみ）。`shared/acps_shared` に汎用 Secret 取得・S3 ヘルパーを追加する
+
+- [ ] **11-4** 初期方式 gpt-image-single の実装（Codex 委譲）
+  - 確認: ローカル E2E で実画像が生成され、S3 保存 + DB 登録まで通る
+  - 備考: `generators/` に方式モジュール（API クライアント + JPEG 変換）を追加し方式レジストリに登録。requirements に依存（openai・Pillow 等）を追加。方式名スラッグはここで確定し方式カタログ（batch-flow.html セクション 2.1）を更新する
+
+- [ ] **11-5** AWS E2E（パイプライン経由デプロイ + SFN 実行）
+  - 確認: 画像生成 SFN の手動実行が SUCCEEDED し、S3 に実画像・`generated_images` / `batch_execution_logs` に行が入る。連鎖起動された sns-posting-sfn（現行疎通版のまま）も成功終了する
+  - 備考: push で両パイプラインが起動する（shared/ 変更のため）。イメージ更新はパイプラインがタスク定義を登録するため CDK デプロイ不要
+
+---
+
+## Phase 12: SNS 投稿バッチの業務ロジック実装
+
+**ゴール**: 生成済みの実行が投稿先プラットフォーム（初期スコープ: Instagram）に自動投稿され、重複しない
+
+> 12-3 は Codex に委譲し、完了条件に pytest 全パスを含める。12-1 の Instagram 側準備は外部作業でリードタイムがあるため、Phase 11 と並行して早めに着手してよい。
+
+- [ ] **12-1** 投稿先プラットフォームの準備と登録
+  - 確認: SNS 認証 Secret（`acps/prod/<set_code>/sns/instagram/<account_code>`）が実値で存在し、`caption_templates`・`sns_accounts` が登録されている
+  - 備考: ユーザーが Instagram ビジネスアカウント・Meta アプリ・長期アクセストークンを用意（外部作業）→ Secret 作成（[docs/app/operation.html](app/operation.html) セクション 2.1 手順 1）→ DB 登録（同手順 2）。**業務データ投入ポイント②**: 実際に使う<strong>キャプション本文 + ハッシュタグ</strong>をここで `caption_templates.template_text` に INSERT する（文言はユーザー決定、Claude が草案作成可）。プロンプト（11-1）と登録タイミングを分けるのは各バッチの直前に必要データを揃えるため（`caption_templates` 0 件でも投稿処理は継続できる設計のため、Phase 11 の E2E はキャプション未登録で成立する）
+
+- [ ] **12-2** Instagram Graph API の疎通確認
+  - 確認: ローカルからコンテナ作成（`POST /{ig-user-id}/media`）→ パブリッシュ（`POST /{ig-user-id}/media_publish`）のテスト投稿が成功する
+  - 備考: テスト投稿は削除前提で行う。トークン失効日のリマインダー登録（operation.html セクション 5.3）も忘れずに行う
+
+- [ ] **12-3** sns-post-batch 業務ロジックの実装（Codex 委譲）
+  - 確認: pytest 全パス + ローカル E2E（API モック）で `posts` が success まで遷移する
+  - 備考: [docs/app/batch-flow.html](app/batch-flow.html) セクション 1・3 のとおり実装する: 投稿対象決定クエリ（[docs/app/data-model.html](app/data-model.html) セクション 4.4）、posts 状態機械 + INSERT-or-skip + Retry 復旧分岐、`post_images` 先頭 1 枚、キャプション適用、S3 Presigned URL（有効期限 1 時間）、Secret 規約からの認証情報導出、実行ログ
+
+- [ ] **12-4** AWS E2E（全チェーン実行）
+  - 確認: 画像生成 SFN からの全チェーン実行で実投稿がフィードに載り、`posts` が success・`posted_at` 記録
+  - 備考: パイプライン push → 画像生成 SFN 手動実行で確認する
+
+- [ ] **12-5** 重複投稿防止・復旧分岐の確認
+  - 確認: 同一実行の SFN 再実行等で二重投稿が発生しない。終端状態のスキップ・`published_unconfirmed` の扱いが設計どおり
+  - 備考: 旧計画の 8-3 に相当。batch-flow.html セクション 3.2 の復旧分岐を実機で検証する
+
+---
+
+## Phase 13: 定常運用の開始
+
+**ゴール**: EventBridge Scheduler による全自動運用が回っている
+
+- [ ] **13-1** Scheduler 本番化
+  - 確認: 本番 cron 式で ENABLED 化され、スケジュール時刻に全チェーンが自動実行・投稿まで成功する
+  - 備考: cron 式（投稿時刻・回数）はユーザーが決定。既存プレースホルダ Scheduler を書き換える（[docs/app/operation.html](app/operation.html) セクション 2.1 の注記）。[docs/infra/workflow.html](infra/workflow.html) セクション 1.5 の decision を更新し、3 タグ指定で deploy（[docs/infra/cicd.html](infra/cicd.html) セクション 3.2）
+
+- [ ] **13-2** 本採用に伴う設計書整備と締め
+  - 確認: 3 層構造の設計書一式（`docs/app/generators/` の方式設計書新設 + 方式カタログ更新 + `docs/app/sets/<set_code>.html` 最終化）が実態と一致し、設計課題リストの残項目が棚卸しされている
+  - 備考: 「方式設計書はセットが本採用した時点で作成」ルールの初適用。実装中に生じた設計乖離も「実装を正とする」ルールで反映する。残課題の例: stacks.html セクション 5 ツリー図の追記（設計課題リスト 2026-07-06）
+
+> 課題「db-readiness-check の Secret パース二重管理」（設計課題リスト 2026-07-14）は本計画のステップに含めない（db-readiness-check に機能変更で手を入れるタイミングで再検討する）。
 
 ---
 

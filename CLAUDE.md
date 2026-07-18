@@ -86,7 +86,7 @@ AutoContentPublisherSystem/
 ## 開発計画
 
 - 開発計画と進捗は `docs/development-plan.md` で管理する。ステップ完了時、計画書にはチェック + 完了日 + 要点のみを記録し、詳細な実施記録は `docs/development-log.md` に追記する（計画書の肥大化防止）
-- **Phase D（インフラ設計の一時 Fix）→ Phase A（アプリ設計の大枠）→ Phase 9（アプリ設計の詳細・前倒し）→ Phase 0〜8（インフラ構築: 空回し確認・監視・CI/CD まで）→ Phase 10 以降（アプリ実装。冒頭 10-1 でアプリ設計の最終 Fix）** の順に進める
+- **Phase D（インフラ設計の一時 Fix）→ Phase A（アプリ設計の大枠）→ Phase 9（アプリ設計の詳細・前倒し）→ Phase 0〜8（インフラ構築: 空回し確認・監視・CI/CD まで）→ Phase 10〜13（アプリ実装: 実装準備 → 画像生成バッチ → SNS 投稿バッチ → 定常運用開始）** の順に進める
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
 - 作業開始時は `docs/development-plan.md` を読み、現在の Phase・ステップを確認してから着手する
 
