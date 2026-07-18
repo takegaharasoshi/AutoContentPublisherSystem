@@ -1,0 +1,350 @@
+# 開発記録（完了ステップの実施記録）
+
+完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは [development-plan.md](development-plan.md) を参照。
+
+- 各ステップの完了時、詳細な実施記録は本ファイルに追記する（development-plan.md 側はチェック + 完了日 + 要点のみ）
+- 記録は Phase 順に並べる（Phase D → A → 9 → 0〜8 → 10 以降）
+- 2026-07-18 に development-plan.md の肥大化対策として、完了フェーズ（Phase D〜8 と 10-1）の記録を本ファイルへ移管した
+
+---
+
+## Phase D: インフラ設計の一時 Fix
+
+**ゴール**: インフラ設計書（docs/infra/）を一時 Fix し、Phase 0〜8 に着手できる状態にする
+
+- [x] **D-1** 設計書体系の再編とインフラ設計書の HTML 化
+  - 確認: [docs/index.html](index.html) から各設計書が辿れる。インフラ設計書 6 本（architecture / stacks / workflow / security / cicd / operation）が HTML で存在する
+  - 備考: 2026-07-06 実施・ユーザー確認済み。アプリ設計（旧 batch.md / database.md 等）は docs/_archive/ に退避し、Phase 9 の参考資料とする
+
+- [x] **D-2** 生成 AI レビュー（観点限定・最大 2 巡）
+  - 確認: blocker 指摘がゼロ、または修正済みである。改善提案は設計課題リストに記録されている
+  - 備考: 2026-07-06 に 2 巡実施（上限到達）。1 巡目: blocker 2 件（Aurora Secret 名の明示指定漏れ / dbReadinessCheckImageTag 未指定時の運用未定義）を修正。2 巡目: 1 巡目修正が生んだ blocker 2 件（synth エラー方式が他スタックデプロイを巻き込む矛盾 / Secret 名変更時の影響の誤記）を修正。改善提案 1 件は設計課題リストに記録。レビュー依頼時は以下のテンプレートを使用する
+
+    > docs/infra/ のインフラ設計書をレビューしてください。
+    > 指摘してよいのは「開発計画 Phase 0〜8 の作業を妨げる誤り・矛盾・欠落」（blocker）のみです。
+    > 改善提案・ベストプラクティス・将来拡張・アプリ仕様（処理ロジック・テーブル設計）への言及は不要です。
+    > 各指摘には、blocker である理由（どのフェーズのどの作業が妨げられるか）を必ず添えてください。
+
+- [x] **D-3** ユーザー通読と一時 Fix 宣言
+  - 確認: ユーザーが全インフラ設計書を通読し、疑問点が解消されている
+  - 備考: 残った指摘・懸念は設計課題リストに記録して終了する。以降の設計変更は「実装を正とする」ルールで随時反映する。2026-07-12 実施。通読中に cicd.html セクション 2「パイプライン分割」を起点に、複数セット運用時のアプリ資材の持ち方を議論。「セットごとにアプリ資材（コンテナ・パイプライン）を分けるべきか」の疑問に対し、アプリ資材はサービス単位で共有し、セット差分は DB 設定 + image-batch 内の生成方式 strategy モジュールで表現する現行方針を確認。将来の多段生成 AI チェーンによる複雑化・肥大化への対応（生成方式の 3 層分冊、デプロイ分離・資材分離の段階的エスカレーション）を整理し、Phase 10-1 で拾えるよう検討メモ・設計課題リストに記録済み。疑問点は解消し、インフラ設計を一時 Fix とする
+
+---
+
+## Phase A: アプリ設計の大枠（上流設計）
+
+**ゴール**: アプリ仕様の壁打ちを行い、アプリ設計の大枠（設計書構成・主要方針の骨子）を決めて docs/app/ に記載する
+
+> Phase A は D-3 の完了を前提としない（D-3 はユーザー作業のため並行してよい）。成果物は **Phase 9 で見直す前提の一時 Fix** とし、生成 AI レビュー（観点限定・最大 2 巡）は Phase 9-5 でまとめて実施する。詳細設計（テーブル定義・処理フローの詳細・DDL 等）には踏み込まない。
+
+- [x] **A-1** アプリ仕様の壁打ち
+  - 確認: ユースケース・投稿運用のイメージ・セットの考え方・失敗時にどうしたいか等が言語化され、docs/app/ 配下に記録されている
+  - 備考: 生成 AI と対話しながら要件を言語化する。**設計書はまだ書かない**。[docs/_archive/](_archive/) の旧設計を参考資料としてよい。2026-07-06 実施。壁打ち結果は [docs/app/requirements-notes.html](app/requirements-notes.html) に記録（目的・セットの考え方・投稿運用・失敗時方針・初期/将来スコープ・旧設計との差分・持ち越し論点）
+
+- [x] **A-2** アプリ設計の大枠決め
+  - 確認: docs/app/ の設計書構成（ドキュメント一覧と各スコープ）と、主要設計方針の骨子（処理フロー概要・データモデル概要・運用方針）が決まっている
+  - 備考: A-1 の壁打ち結果をもとに決める。どこまでを大枠とし、何を Phase 9 に持ち越すかもここで線引きする。2026-07-06 実施。決定内容は [docs/app/design-outline.html](app/design-outline.html) に記録（設計書構成は batch-flow / data-model / operation の 3 分冊で Phase 9-2〜9-4 と 1:1 対応。ユーザーレビューを受け「1 生成実行（1 起動）= 1 投稿（アカウントごと）」を不変条件とし、generation_runs を投稿単位の中心に据えるデータモデル概要（generation_runs / posts / post_images / caption_templates 新設）と「投稿試行のない最古の生成実行を対象とする」投稿フローを定義）
+
+- [x] **A-3** 大枠を踏まえた既存設計の見直し
+  - 確認: インフラ設計書 6 本と開発計画を大枠と突き合わせ、矛盾・欠落（blocker）が修正されている。改善提案は設計課題リストに記録されている
+  - 備考: 見直し観点の例: `set_code` / `scheduled_at` の意味付け、SNS Secret 規約（`set_code` / `account_code` の定義）、環境変数の受け渡し契約。修正は blocker のみ（設計 Fix の運用ルールに従う）。2026-07-06 実施。blocker 修正 3 分類: (1) workflow.html セクション 5 / security.html セクション 1.2 の「Phase 9 で確定」を design-outline.html セクション 5 の確定済み参照へ更新 (2)「手動での再投稿」表現 3 箇所（workflow / architecture / operation）をインフラの能力（単独実行可能）とアプリ仕様（投稿対象の決定）に分離 (3) 開発計画の文言更新（4-6 備考・9-2〜9-4 確認欄）。Scheduler Input・SNS 投稿 SFN 入力（`set_code` のみ）・Secret 規約の多プラットフォーム整合・1 日複数回実行・IAM 権限は矛盾なしを確認。改善提案 1 件（S3 30 日ライフサイクルと「生成画像は残す」の整理）を設計課題リストに記録
+
+- [x] **A-4** アプリ設計大枠の設計書記載
+  - 確認: A-2 で決めた構成に従い、docs/app/ に大枠設計書（HTML、共通スタイル使用）が作成されている
+  - 備考: 詳細未定の節は「Phase 9 で詳細化」と明記する。[docs/app/index.html](app/index.html) はアプリ設計の目次ページとして更新する。2026-07-06 実施。骨子版 3 分冊（batch-flow / data-model / operation）を作成し、design-outline.html を親ページ（全体方針・分冊間の整合）へ再編、index.html を目次化。計画レビューでのユーザー要望により**複数セット前提の 2 層構造**（セット追加で増えるのは docs/app/sets/ のセット別設計書 1 本のみ。共通設計書・インフラ設計書・CDK スタックは変更しない）を design-outline セクション 1.1 にルール化し、AI プロンプト生成・AI キャプション等のセット別方式は分冊内の「セット別拡張ポイント」として明示（requirements-notes に追記）。あわせてインフラ設計書 3 箇所（architecture / workflow / operation）の投稿対象決定リンクを batch-flow.html#flow-sns へ更新
+
+---
+
+## Phase 9: アプリ設計（詳細）※Phase 0 より前に前倒しで実施
+
+**ゴール**: Phase A の大枠設計を詳細化してアプリ設計書（docs/app/）を完成させ、一時 Fix する
+
+> 当初はインフラ構築（Phase 0〜8）の完了後に実施する計画だったが、2026-07-06、Phase A が想定より早く完了したため、上流工程に適した生成 AI モデル（Claude Fable 5）の利用期限内に前倒しで実施する。詳細設計に必要なインプット（Phase A の骨子版 3 分冊・一時 Fix 済みインフラ設計・A-3 で整合確認済みの入出力契約）は揃っており、AWS 環境は不要。[docs/_archive/](_archive/) の旧設計（batch.md / database.md / operation.md）を参考資料として活用する。
+>
+> **前倒しに伴う制約**: (1) スコープは初期構築版（[requirements-notes.html](app/requirements-notes.html) の初期スコープ）に限定し、セット別拡張ポイントは骨子のままとする (2) AWS 作業（本スキーマ DDL の Aurora への適用等）は行わない（Phase 10 で実施） (3) 成果物は一時 Fix とし、インフラ構築で得た知見の反映は Phase 10 冒頭の最終 Fix（10-1）で行う。なお 9-2 と 9-3 は相互依存のため、データモデル（9-3）を軸に往復しながら進めてよい
+
+- [x] **9-1** Phase A 大枠の棚卸し
+  - 確認: Phase A の大枠設計書と [docs/app/index.html](app/index.html) の検討メモを棚卸しし、詳細化の作業リスト（各分冊末尾の「詳細化する項目」）に漏れがないことが確認されている
+  - 備考: 旧 9-1 の主目的だった「インフラ構築中に得た知見の反映」は前倒しに伴い Phase 10-1 へ移動した。2026-07-06 実施。想定どおり検討メモは空（インフラ構築前のため）で大枠に変更なし。[requirements-notes.html](app/requirements-notes.html) セクション 7・8（旧設計との差分・持ち越し論点）を各分冊末尾の詳細化項目と突き合わせ、漏れがないことを確認した。プロンプト選択方式・失敗時ポリシーのセット別設定は [design-outline.html](app/design-outline.html) セクション 6「分冊横断の将来拡張」に実装時期未定として整理済みで、9-2〜9-4 側での追加対応は不要と判断。blocker なし。9-2 へ進む
+
+- [x] **9-2** バッチ処理フロー設計
+  - 確認: Phase A の骨子版（docs/app/batch-flow.html）が詳細化されている
+  - 備考: 2026-07-06 実施。主な決定事項: (1) `posts` の状態を `pending/container_created/success/failed/published_unconfirmed` の 5 状態とし、`attempt_number` 相当は持たず `(generation_run_id, sns_account_id)` の 1 行の状態遷移で表現（自動再試行なし方針と整合） (2) SNS 投稿バッチの処理件数は常に最古の未試行生成実行 1 件のみとし、`BATCH_SIZE_LIMIT` は不要と判断 (3) 失敗定義は「対象アカウントのうち 1 つでも success 以外」、終了コードは 0/1 の二値、通知は既存の CloudWatch Alarm（ExecutionsFailed）1 本に一本化 (4) 画像生成はシステムとして「1 prompt_config から複数画像保存」「1 セット複数 prompt_config」の両方に対応させ、初期運用は 1 セット 1 prompt_config（プロンプト文言で 1 枚に制御）という設定値・運用ルールで実現する（ユーザー指摘により、当初案の「複数件はエラー・2 枚目以降は破棄」から修正）。`is_active=1` の prompt_config が 0 件の場合のみ設定ミスとしてエラー終了、1 件以上はすべてループ処理する (5) SNS 投稿バッチは初期構築の仕様として生成実行内の先頭画像 1 枚のみを `post_images` に登録する（投稿は常に 1 枚。カルーセルは将来対応）。データモデルへの申し送り事項（`generated_images.output_index` の追加等）は batch-flow.html セクション 5 に整理し Phase 9-3 の入力とする。docs/_archive/batch.md を参考資料とした（post_records の attempt 方式・BATCH_SIZE_LIMIT は不採用）。design-outline.html・index.html のステータス表記も更新済み
+
+- [x] **9-3** DB スキーマ設計 + 本スキーマ DDL 作成
+  - 確認: Phase A の骨子版（docs/app/data-model.html）が詳細化され、`database/` に本スキーマの DDL がある
+  - 備考: 2026-07-07 実施。主な決定事項: (1) `generation_runs` を新設し「投稿済みフラグ・生成完了フラグは持たず実体（`posts` / `generated_images`）の存在で導出する」を徹底 (2) SNS 投稿バッチの投稿対象決定クエリを厳密化: 「有効アカウントのうち 1 つでも終端状態（`success`/`failed`/`published_unconfirmed`）に未到達」な生成実行を対象とする定義とし、Step Functions Retry での同一生成実行の再選択（復旧ロジック）と、異常終了時の stale データ挙動（Phase 9-4 持ち越し）を両立させた（`data-model.html` セクション 4.4、`batch-flow.html` セクション 3.1 に反映） (3) `caption_templates` の紐づけ単位をセットに確定し、選定ルール（`is_active=1` を `id` 昇順で 1 件、0 件ならキャプションなしで続行）を定義 (4) `generated_images` に `output_index` を追加し `(generation_run_id, prompt_config_id, output_index)` で一意性・完了判定・S3 キーの整合を取る (5) `posts` は旧 `post_records` を生成実行×アカウント単位に再編し `attempt_number` を廃止、`caption_template_id`/`caption_text_snapshot` 等の中間状態カラムを追加 (6) S3 キー命名規約 `images/{set_code}/{YYYYMMDD}/{generation_run_id}/{prompt_config_id}_{output_index}.jpg` を確定し、セット廃止時に「残す」対象は DB レコードのみで S3 実体は 30 日ライフサイクルで自動削除される旨を明確化（下記設計課題リストの該当項目を解消） (7) セット境界の整合性は複合 FK（`set_id` 非正規化 + `(set_id, id)` UNIQUE）で `generated_images`/`posts` に適用し、`post_images.generated_image_id` の生成実行境界チェックはアプリ層に委ねる既知の割り切りとして明記。DDL は `database/V001__initial_schema.sql` に作成（Aurora への適用は Phase 10）。`data-model.html`・`batch-flow.html`（軽微な厳密化追記）・`design-outline.html`・`index.html`・`operation.html`（S3 実体の記述更新）のステータス表記も更新済み
+
+- [x] **9-4** アプリ運用・セキュリティ（アプリ部分）の設計
+  - 確認: Phase A の骨子版（docs/app/operation.html）が詳細化されている
+  - 備考: 2026-07-07 実施。主な決定事項: (1) セット追加手順を「設計書雛形 → Secret 作成 → DB 登録（`batch_sets`→`prompt_configs`→`caption_templates`→`sns_accounts`の順）→ Scheduler 追加 deploy → 動作確認」の 5 ステップに具体化しチェックリスト化 (2) プロンプト・キャプション変更を「直接 UPDATE（履歴を残さない）」と「新規 INSERT + 旧行 `is_active=0`（履歴を残す）」の 2 方式で定義し、`prompt_configs` は 0 件化を避けるためトランザクション実行を必須化 (3) 投稿失敗時の手動補正は `attempt_number` 方式を採用せず、`posts` 行を `pending` に戻し `platform_container_id` 等をクリアして「最初から実行」扱いにする方式に確定。あわせて、投稿対象決定が「最古の actionable」優先のため補正しても即座には処理されない場合がある点を明記 (4) stale データ（`pending`/`container_created` のまま残り後続投稿をブロックする生成実行）は専用の自動検知を追加せず、既存の失敗アラームを起点に定期確認クエリで検出し手動補正する運用と確定（自動化は改善提案として設計課題リストへ） (5) SNS Secret 規約 `acps/{env}/{set_code}/sns/{platform}/{account_code}` は変更なしで最終確認とし、既存セットへのアカウント追加手順（Secret 作成 → DB 登録の順）を新規セット追加と分けて明文化 (6) Instagram トークン更新のリマインドは管理画面のない初期スコープでは運用者の手動カレンダー管理とし、自動化は将来課題として記録。docs/_archive/operation.md の `attempt_number`/`max_post_retries` に基づく再試行上限確認は不採用（自動再試行なし方針のため）、SNS アカウント追加手順・手動補正の記録ルール・トークン更新の考え方は引き継いだ。data-model.html・batch-flow.html の relevant クロスリンクも更新済み
+
+- [x] **9-5** 生成 AI レビュー → 一時 Fix
+  - 確認: blocker 指摘がゼロ、または修正済み。改善提案は設計課題リストに記録されている
+  - 備考: 2026-07-07 実施。Phase D と同じレビュー運用ルール（観点限定・blocker のみ修正）で、docs/app/ 配下 6 本（design-outline / batch-flow / data-model / operation / index / requirements-notes）と database/V001__initial_schema.sql、および参照先のインフラ設計書（workflow.html / security.html / stacks.html / operation.html）との突き合わせを 1 巡実施。全内部リンク（アンカー）の到達性も確認し、欠落なし。**blocker 1 件を発見・修正**: `batch_execution_logs` の `UNIQUE (execution_arn, batch_type)` 制約に対し、実行ログ記録の手順が単純な INSERT のみを想定しており、Step Functions Retry による同一実行内の ECS タスク再起動時（`attempt_count` を +1 する想定のケース）に一意制約違反が起きる矛盾があった。`generation_runs`（batch-flow.html セクション 2）と同じ INSERT-or-fetch パターンを適用する手順を batch-flow.html セクション 1（`#exec-log`）に追記し、data-model.html セクション 4.7 から参照リンクを追加して解消した。2 巡目相当の再確認も実施し、追加の blocker なしを確認。改善提案 3 件（SNS 投稿バッチタスクロールの未使用 `cloudwatch:PutMetricData` 権限、posts 作成手順の INSERT-or-skip の明文化不足、stale データ検知の将来拡張）を設計課題リストに記録（前 2 件は本レビューで新規発見）。これで Phase 9（アプリ設計詳細）は一時 Fix 完了。Phase 10-1 でインフラ構築の知見を踏まえた最終 Fix を行う
+
+> 旧 **9-6**（Phase 10 以降の実装計画の詳細化）は、インフラ構築の知見を踏まえて行うため **10-2** へ移動した（Phase 9 時点でのドラフト作成は可）
+
+---
+
+## Phase 0: ローカル開発基盤の整備
+
+**ゴール**: CDK と Docker がローカルで動く状態にする
+
+- [x] **0-1** AWS CLI のインストール・認証設定
+  - 確認: `aws sts get-caller-identity` で自分のアカウントが表示される
+  - 備考: 2026-07-12 実施。AWS CLI v2.32.14 が既にインストール済み（`~/.aws/` の認証設定も設定済み）だったため新規作業なし。`aws sts get-caller-identity` でアカウント `516964473143`（IAM ユーザー `takegaharawork`）の表示を確認。デフォルトリージョンは `ap-northeast-1`
+
+- [x] **0-2** AWS CDK CLI のインストール
+  - 確認: `cdk --version` でバージョンが表示される
+  - 備考: 2026-07-12 実施。AWS CDK CLI v2.1034.0 が既にグローバルインストール済み（`/usr/bin/cdk`、Node.js v22.22.1 / npm 10.9.4）だったため新規作業なし。`cdk --version` でバージョン表示を確認
+
+- [x] **0-3** CDK Bootstrap（初回のみ）
+  - 確認: `cdk bootstrap aws://ACCOUNT/REGION` が成功する
+  - 備考: 2026-07-12 実施。CDKToolkit スタックが 2025-12-13 に作成済み（テンプレートバージョン 30、状態 `CREATE_COMPLETE`）だったため、`cdk bootstrap aws://516964473143/ap-northeast-1` の再実行は「no changes」で正常終了（冪等）。新規リソース作成なし
+
+- [x] **0-4** Python / Docker の動作確認
+  - 確認: `python --version`, `docker run hello-world` が通る
+  - 備考: 本プロジェクトは WSL2 + Docker Desktop の WSL integration を有効化する前提。Docker Desktop を使わず WSL 内に直接 Docker Engine を導入する場合は、systemd 有効化やユーザーグループ設定などの手動セットアップが別途必要。2026-07-12 実施。Docker: Docker Desktop（Windows 側インストール済み・未起動）を起動したところ WSL integration 有効で `docker run hello-world` 成功（Docker version 29.1.2）。Python: `python` コマンドは存在せず `python3` で Python 3.8.10（Ubuntu 20.04 標準）を確認。**3.8 は 2024-10 に EOL 済み**のため、ローカルで Python 開発を始める Phase 3-2（db-readiness-check 実装）までに新しいバージョン（3.12 等）の導入を検討する（バッチ本体はコンテナ内の Python を使うため本番影響はなし）
+
+- [x] **0-5** リポジトリのディレクトリ構成を作成
+  - 確認: `services/`, `shared/`, `infra/` ディレクトリが存在する
+  - 備考: 2026-07-12 実施。`infra/`, `services/db-readiness-check/`, `services/image-batch/`, `services/sns-post-batch/`, `shared/` を作成（Git は空ディレクトリを追跡しないため各ディレクトリに `.gitkeep` を配置）。`database/` は Phase 9 で作成済み。**注意**: 1-1 の `cdk init` は空ディレクトリでないと失敗するため、実施時に `infra/.gitkeep` を削除してから `cdk init` すること。CLAUDE.md / README.md のリポジトリ構成の「未作成」注記も更新済み
+
+---
+
+## Phase 0.5: AWS アカウントのクリーンアップ
+
+**ゴール**: 過去の実験・旧プロジェクトの残存資材を棚卸しし、ユーザー確認のうえ AWS アカウントから完全に削除して、Phase 1 以降の構築をきれいな状態から始める
+
+> 2026-07-12、Phase 1 着手前に AWS アカウント上のごみ資材（過去の実験・旧プロジェクトの残存物）を整理する方針とし、本フェーズを追加した。事前スキャン（ap-northeast-1 のみの簡易確認）で、古い Cloud9 スタック・オーファン S3 バケット 2 つ・Lambda 関数 5 つ・旧 graphicanews プロジェクトの Secret などの削除候補を確認済み。
+>
+> **保持必須資材（誤削除禁止）**: `CDKToolkit` スタック、`cdk-hnb659fds-*` の S3 バケット / ECR リポジトリ（CDK Bootstrap 一式。0-3 で確認済み）、IAM ユーザー `takegaharawork` と認証情報、デフォルト VPC、アカウント既定のリソース
+
+- [x] **0.5-1** 残存資材の棚卸し（全リージョン + グローバル）
+  - 確認: 全リージョンのスキャン結果が「保持 / 削除候補 / 要判断」に分類された棚卸しリストとして提示されている
+  - 備考: Resource Groups Tagging API による全リージョン横断スキャン + 主要サービスの個別列挙（CloudFormation / S3 / Lambda / ECR / ECS / RDS / DynamoDB / EC2(インスタンス・EIP・EBS・非デフォルト VPC・SG) / API Gateway / CloudWatch Logs / EventBridge / Step Functions / SNS / SQS / Secrets Manager / Cloud9 / CodePipeline / CodeBuild）、グローバルサービス（IAM ロール・ポリシー・ユーザー / CloudFront / Route 53 / ACM）も確認する。Lambda に紐づく IAM ロール・CloudWatch Logs ロググループ・API Gateway などの付随資材も洗い出す。棚卸しリスト・スキャンスクリプトは作業ファイルとして扱いリポジトリにはコミットしない（記録は本ファイルの備考に残す）
+  - 実施記録: 2026-07-12 実施。全 17 リージョン + グローバル（IAM / S3 / CloudFront / Route 53）をスキャンし、**資材が存在するのは ap-northeast-1 のみ**（他 16 リージョンは空。us-east-1 の payment-instrument は支払い手段でリソースではない）。分類結果 — **保持**: CDK Bootstrap 一式（CDKToolkit スタック・S3・ECR・IAM ロール ×5・SSM パラメータ）、IAM ユーザー、デフォルト VPC、サービスリンクロール ×7。**削除候補**: (A) Cloud9 実験一式（スタック `aws-cloud9-test-8401aa...` ※配下 EC2 は終了済みで SG のみ残存・環境・IAM ロール/インスタンスプロファイル）、(B) 2024-07 の Lambda 実験一式（関数 ×4: HelloWorldFunction / gptTest / CustomRuntimes / bash-runtime、ロググループ ×4、IAM ロール ×10、ポリシー ×8）、(C) CI/CD 実験 MyLambdaPipeline 一式（CodePipeline / CodeBuild / EventBridge ルール / ロググループ / IAM ロール ×3・ポリシー ×3）、(D) 旧バッチシステム残骸（空の S3 `pipelinestack-batchsystempipeline...`、ComputeStack 系ロググループ ×5、SFN 自動作成ルール `StepFunctionsGetEventsForECSTaskRule`）、(E) SG `launch-wizard-1`。**要判断**: 旧 graphicanews / Meta アプリ関連一式（S3 `graphica-news-privacy-policy`（privacy.htm 1 件）、Secret `/graphicanews/facebook/credentials`、Lambda + API Gateway `instagram-oauth-callback`（エンドポイント `https://0bd2at3gal.execute-api.ap-northeast-1.amazonaws.com`）、付随ロググループ・IAM ロール・ポリシー `SecretsManagerGetSecretValue`）
+
+- [x] **0.5-2** ユーザー確認・削除対象の確定
+  - 確認: 棚卸しリストの全項目について「残す / 消す」をユーザーが判定し、削除対象が確定している
+  - 備考: 特に旧 graphicanews 関連（S3 `graphica-news-privacy-policy` / Secret `/graphicanews/facebook/credentials` / Lambda `instagram-oauth-callback`）は、Meta アプリ登録（プライバシーポリシー URL 等）から参照されている可能性があるため要判断。本プロジェクトで同じ Meta アプリを再利用する場合は影響を確認してから判断する
+  - 実施記録: 2026-07-12 実施。要判断だった graphicanews 関連の利用状況を追加確認したうえで、ユーザーが全項目を判定した。**追加確認の結果**: S3 `graphica-news-privacy-policy` は静的ウェブサイトとして一般公開中（PublicReadGetObject ポリシー + website hosting 有効。`privacy.htm` 1 件のみ。Meta アプリのプライバシーポリシー URL として登録されている可能性が高い）、Secret `/graphicanews/facebook/credentials` は 2025-12-29 作成で最終アクセスも同日（以降アクセスなし）、Lambda `instagram-oauth-callback` + API Gateway はロググループにイベント 0 件で一度も実行された形跡なし。**ユーザー判定**: 削除候補 (A) Cloud9 実験一式 (B) 2024-07 の Lambda 実験一式 (C) CI/CD 実験 MyLambdaPipeline 一式 (D) 旧バッチシステム残骸 (E) SG `launch-wizard-1` は**すべて削除で確定**（付随する IAM ロール・ポリシー・ロググループ含む）。graphicanews 関連（S3・Secret・Lambda + API Gateway・付随の IAM ロール `instagram-oauth-callback-Role`・ロググループ・ポリシー `SecretsManagerGetSecretValue`）は**全保持**（当初 Secret のみ削除の判定だったが、Lambda が当該 Secret を参照しているため一体で保持に変更）。**0.5-3 の削除対象は 0.5-1 実施記録の (A)〜(E) のみ**
+
+- [x] **0.5-3** 削除の実行（Claude Code が AWS CLI で実行）
+  - 確認: 承認済みの削除対象がすべて削除されている（各削除コマンドの成功を確認）
+  - 備考: 削除順序: (1) CloudFormation スタック（スタック管理下の資材はスタック削除に任せる） (2) オーファン資材の個別削除。S3 はバージョン・削除マーカー含め空にしてからバケット削除、Secret は `--force-delete-without-recovery` で即時完全削除、Lambda は付随する IAM ロール・ロググループも削除。実行した削除の記録（対象と結果）を本備考に残す
+  - 実施記録: 2026-07-12 実施。0.5-2 で確定した (A)〜(E) を AWS CLI で削除、全コマンド成功。**手順1（CFN スタック）**: Cloud9 スタック `aws-cloud9-test-8401aa...` を delete-stack → 削除完了（配下の EC2 `i-0c71d78a983202fea`・InstanceSecurityGroup `sg-004bac3f...` も消滅を確認）。スタック外の Cloud9 環境 `8401aa...` は別リソースのため `cloud9 delete-environment` で個別削除（非同期反映、最終検証で消滅確認）。**手順2**: Lambda ×4（HelloWorldFunction / gptTest / CustomRuntimes / bash-runtime）、CodePipeline `MyLambdaPipeline`、CodeBuild `MyLambdaBuild`、EventBridge ルール `codepipeline-MyLamb-main-707241-rule`（remove-targets 後 delete）、`StepFunctionsGetEventsForECSTaskRule`（マネージドルールのため `--force` で remove-targets/delete）、S3 `pipelinestack-batchsystempipeline...`（空だったため直接 delete-bucket）を削除。**手順3**: ロググループ ×10（Lambda 実験 ×4・codebuild/MyLambdaBuild・ComputeStack 系 ×5）削除。**手順4**: SG `launch-wizard-1`（sg-0aa2697ad7ae73e00）削除。**手順5（IAM）**: インスタンスプロファイル `AWSCloud9SSMInstanceProfile`（role 除去後削除）、ロール ×14（A:AWSCloud9SSMAccessRole / B:bash-runtime・CustomRuntimes・gptTest ×4・HelloWorldFunction ×2・LambdaExecutionRole・CodeDeployServiceRole / C:AWSCodePipelineServiceRole-…・codebuild-MyLambdaBuild-service-role・cwe-role-…）、customer-managed ポリシー ×11（AWSLambdaBasicExecutionRole-* ×8・start-pipeline-execution-…・AWSCodePipelineServiceRole-…・CodeBuildBasePolicy-…）を削除。各ロールにアタッチされていた AWS マネージドポリシー（AWSCloud9SSMInstanceProfile / AWSLambdaBasicExecutionRole / AWSCodeDeployRoleForLambda / AmazonS3FullAccess）は detach のみ（AWS 管理のため非削除）、削除対象ロールにインラインポリシーは無し。**最終検証（当該リージョン）**: CFN=`CDKToolkit` のみ / Cloud9 環境=0 / Lambda=`instagram-oauth-callback` のみ / ロググループ=`/aws/lambda/instagram-oauth-callback` のみ / CodePipeline・CodeBuild・EventBridge=空 / S3=`cdk-hnb659fds-assets…`+`graphica-news-privacy-policy` / 非default SG=0 / IAM ロール=`cdk-hnb659fds-*`5本+`instagram-oauth-callback-Role` / local ポリシー=`SecretsManagerGetSecretValue` のみ / インスタンスプロファイル=0。保持対象（CDK Bootstrap 一式・graphicanews 関連一式）はすべて残存を確認。DELETE_FAILED なし。全リージョン横断の再スキャンとコンソール/請求画面確認は 0.5-4 で実施
+
+- [x] **0.5-4** 削除後の確認（再スキャン）
+  - 確認: 0.5-1 と同じスキャンを再実行し、保持対象以外が残っていないこと。ユーザーがコンソール・請求画面でも最終確認
+  - 備考: DELETE_FAILED やライフサイクル待ちなど削除しきれないものがあれば原因と対応を記録する
+  - 実施記録: 2026-07-12 実施。0.5-1 と同じ範囲（全リージョン横断の Resource Groups Tagging API + ap-northeast-1 の主要サービス個別列挙 + グローバルサービス）を再スキャンし、**保持対象以外は残存ゼロ**を確認。**全リージョン横断（Tagging API・全17リージョン）**: 資材があるのは ap-northeast-1 のみ（CDKToolkit スタック・CDK S3・CDK SSM パラメータ・graphicanews Secret＝すべて保持対象）、us-east-1 の payment-instrument ×2 は支払い手段でリソースではない、他は空。**ap-northeast-1 個別列挙**: CFN=`CDKToolkit` のみ / Lambda=`instagram-oauth-callback` のみ / ECR=`cdk-hnb659fds-container-assets…` のみ / ECS・RDS・DynamoDB・EIP・EBS・非default VPC・非default SG・REST API Gateway・EventBridge ルール・Step Functions・SNS・SQS・Cloud9 環境・CodePipeline・CodeBuild=すべて空 / EC2 インスタンス=0 / HTTP API Gateway=`instagram-oauth-callback`(0bd2at3gal) のみ / ロググループ=`/aws/lambda/instagram-oauth-callback` のみ / Secret=`/graphicanews/facebook/credentials` のみ / S3=`cdk-hnb659fds-assets…`＋`graphica-news-privacy-policy` のみ。**グローバル**: IAM ロール=`cdk-hnb659fds-*` ×5＋`instagram-oauth-callback-Role`（0.5-3 で削除した Cloud9/Lambda 実験/CI-CD 実験系ロールは全消滅、`aws-service-role` パスのサービスリンクロールは除外表示）/ ローカル管理ポリシー=`SecretsManagerGetSecretValue` のみ / インスタンスプロファイル=0（`AWSCloud9SSMInstanceProfile` 消滅）/ IAM ユーザー=`takegaharawork` のみ / CloudFront・Route 53・ACM(ap-northeast-1/us-east-1)=なし。**削除対象 (A)〜(E) の残存はすべてゼロ**、**DELETE_FAILED・ライフサイクル待ちなし**。AWS アカウントは CDK Bootstrap 一式＋graphicanews 関連一式（保持確定）＋アカウント既定リソースのみのクリーンな状態。**ユーザーへのお願い**: 念のため AWS マネジメントコンソールと Billing/Cost Explorer（請求画面）でも最終確認をお願いします
+
+---
+
+## Phase 1: CDK プロジェクト初期化 + VPC デプロイ
+
+**ゴール**: CDK で最小のリソース（VPC）を AWS に作れることを確認する
+
+- [x] **1-1** `infra/` に CDK プロジェクトを初期化（TypeScript）
+  - 確認: `cdk synth -c env=prod` でテンプレートが出力される
+  - 備考: 2026-07-12 実施。`infra/.gitkeep` を削除後、`cdk init app --language typescript` で初期化（aws-cdk-lib 2.232.1 / aws-cdk CLI 2.1034.0 / TypeScript ~5.9.3 / Jest。`package-lock.json` はコミット対象）。生成物のデフォルトスタック（InfraStack）は使い捨てになるため、本ステップでリソースなしの空の **FoundationStack**（`lib/foundation-stack.ts`）に置換した（1-2 は VPC を足すだけになる）。エントリポイント `bin/infra.ts` は Context `env` を必須化し（未指定・`prod` 以外は明確なエラーで失敗。対応環境は現時点で prod のみ）、実スタック名は README の規約どおり環境名プレフィックス付き（`Prod-FoundationStack`）、リージョンは `ap-northeast-1` 固定、アカウントは CLI 認証情報（`CDK_DEFAULT_ACCOUNT`）から解決する。検証: `npm run build` / `npm test`（空スタック synth テスト 1 件）成功、`cdk ls -c env=prod` → `FoundationStack (Prod-FoundationStack)`、`cdk synth -c env=prod` でテンプレート出力、env 未指定・`env=dev` がエラーになることを確認。CLAUDE.md / README.md の「ディレクトリのみ作成済み」注記から `infra/` を除外済み
+
+- [x] **1-2** FoundationStack に VPC だけ定義
+  - 確認: `cdk diff -c env=prod FoundationStack` で差分が見える
+  - 備考: VPC の CDK 引数は [docs/infra/stacks.html](infra/stacks.html) セクション 3.1 を参照。2026-07-13 実施。`lib/foundation-stack.ts` に設計書どおりの引数（`maxAzs: 2` / `natGateways: 0` / `subnetConfiguration` は PUBLIC + PRIVATE_ISOLATED の 2 種のみ）で VPC を定義し、後続スタックからの参照用に `public readonly vpc` として公開。CIDR は設計書に指定がないため CDK デフォルト（10.0.0.0/16、サブネットは自動分割）。**留意点**: cdk.json のフィーチャーフラグ `@aws-cdk/aws-ec2:restrictDefaultSecurityGroup: true`（1-1 の cdk init 既定）により、デフォルト SG のルールを全除去するカスタムリソース（Lambda 関数 + IAM ロール各 1）がスタックに含まれる。インバウンド全拒否の維持方針（architecture.html セクション 2.1）と整合するため採用。1-4 のコンソール確認時に VPC 関連以外に Lambda が 1 つ見えるのはこのため。検証: `npm run build` / `npm test`（VPC x1・Public/Isolated Subnet 各 x2・NAT Gateway ゼロ・IGW x1 のアサーション 4 件）成功、`cdk synth -c env=prod` で NAT Gateway を含まないテンプレート出力を確認、`cdk diff -c env=prod FoundationStack` で全リソースが追加差分として表示（スタック未デプロイのため）
+
+- [x] **1-3** VPC をデプロイ
+  - 確認: `cdk deploy -c env=prod FoundationStack` 成功
+  - 備考: 2026-07-13 実施。デプロイ前確認（`npm run build` / `npm test` / `cdk diff` が全リソース追加のみ・NAT Gateway なし）のうえ `cdk deploy -c env=prod FoundationStack --require-approval never` を実行し、約 65 秒で `CREATE_COMPLETE`。AWS CLI 検証: VPC `vpc-008cb8f0be9c708dc`（10.0.0.0/16・available）、サブネット 4 つ（Public ×2: 10.0.0.0/18@1a・10.0.64.0/18@1c＝パブリック IP 自動割当あり / Isolated ×2: 10.0.128.0/18@1a・10.0.192.0/18@1c）、IGW `igw-060cc53f7b862cb66` アタッチ済み、**NAT Gateway ゼロ**、デフォルト SG はカスタムリソースによりインバウンド・アウトバウンドとも空を確認。コンソールでの目視確認は 1-4 で実施
+
+- [x] **1-4** AWS コンソールで VPC を確認
+  - 確認: VPC、Public Subnet x2（各 AZ）、Isolated Subnet x2（各 AZ）が作成されている（NAT Gateway がないことを確認）
+  - 備考: スタックに VPC 関連以外の Lambda 関数が 1 つ含まれるのは想定どおり（デフォルト SG のルール除去用カスタムリソース。1-2 の備考を参照）。2026-07-13 ユーザーがコンソールで確認完了
+
+- [x] **1-5** 削除して再作成できることを確認
+  - 確認: `cdk destroy -c env=prod FoundationStack` → `cdk deploy -c env=prod FoundationStack` が通る
+  - 備考: 2026-07-13 実施。事前確認（`npm run build` / `npm test` 成功、`cdk diff` 差分なし）のうえ `cdk destroy --force` を実行し削除完了（スタック不存在・非 default VPC ゼロを AWS CLI で確認）。**残骸**: デフォルト SG ルール除去用カスタムリソース Lambda のロググループ `/aws/lambda/Prod-FoundationStack-CustomVpcRestrictDefaultSGCus-*` は CFN 管理外のため destroy 後も残存 → 手動削除した。destroy するたびに残る点は今後も留意（Lambda 関数名にランダムサフィックスが付くため、再デプロイ後の destroy でも別名で残る）。その後 `cdk deploy --require-approval never` で再作成し約 62 秒で `CREATE_COMPLETE`。再作成後の検証（1-3 と同じ観点）: 新 VPC `vpc-00b1327fb58e687a0`（10.0.0.0/16・available）、Public Subnet ×2（10.0.0.0/18@1a・10.0.64.0/18@1c＝パブリック IP 自動割当あり）、Isolated Subnet ×2（10.0.128.0/18@1a・10.0.192.0/18@1c）、IGW `igw-09a0e50d3ec962d56` アタッチ済み、**NAT Gateway ゼロ**、デフォルト SG はインバウンド・アウトバウンドとも空。構成は 1-3 と同一（リソース ID のみ新規）で「壊して作り直せる」ことを確認
+
+---
+
+## Phase 2: FoundationStack の段階的構築（低リスクリソース）
+
+**ゴール**: Aurora・DB 準備確認以外の共通基盤リソースを構築する
+
+- [x] **2-1** S3 バケットを追加
+  - 確認: コンソールでバケットが見える、`aws s3 cp` でファイルアップロードできる
+  - 備考: 2026-07-13 実施。FoundationStack に画像保存用バケット `acps-prod-images-516964473143`（`acps-{env}-images-{アカウントID}` を明示指定）を追加。設定は設計書どおり: ライフサイクル 30 日で全オブジェクト自動削除（stacks.html 3.1）、Block Public Access 全項目有効・SSE-S3 暗号化・SSL 強制ポリシー（security.html 3）。後続スタック参照用に `public readonly imagesBucket` として公開し、`FoundationStackProps.envName` を新設（bin/infra.ts から Context `env` を受け渡し）。**設計書に記載がなかった RemovalPolicy はユーザー判断で DESTROY + `autoDeleteObjects: true`（destroy 時に中身ごと削除）に確定**し、stacks.html 3.1 に decision コールアウトで記録（画像は 30 日で自動削除される使い捨てデータ・正式記録は DB のため）。これによりオブジェクト自動削除用 Lambda カスタムリソースが 1 つ増える（デフォルト SG 用と同様、destroy 後にロググループが残る点も同じ。1-5 の備考を参照）。cicd.html 5 のバケット名サフィックスの文言も実装（アカウント ID 明示指定）に合わせて修正。実装は Codex に委譲し Claude がレビュー（Codex 連携の初適用）。検証: `npm run build` / `npm test`（S3 テスト 6 件追加、計 10 件）成功、`cdk diff` で追加差分が S3 関連のみ（VPC 変更なし）を確認のうえデプロイ（約 50 秒で `UPDATE_COMPLETE`）。AWS CLI でライフサイクル・公開ブロック・暗号化・SSL 強制ポリシーの全設定を確認し、`aws s3 cp` でアップロード → ダウンロード → 内容一致 → 削除の疎通確認済み（バケットは空に戻した）。コンソールでの目視確認はユーザーが実施
+
+- [x] **2-2** Security Group を追加
+  - 確認: コンソールで SG が見える
+  - 備考: 2026-07-13 実施。FoundationStack に SG 3 つ（バッチ共通・DB 準備確認用・Aurora 用）を stacks.html 3.1 のルール表どおり追加。Aurora 本体は Phase 3-1 作成だが、SG ルールが相互参照（バッチ側 Egress 3306 → Aurora SG / Aurora 側 Ingress 3306 ← バッチ SG ×2）のため 3 つ同時に作成した。3 つとも `allowAllOutbound: false` を指定（ルール表を満たすには Aurora 用以外も必須のため、stacks.html の warn の文言を「3 つとも指定」に修正）。後続スタック参照用に `batchSecurityGroup` / `dbReadinessCheckSecurityGroup`、Phase 3-1 の Aurora 用に `auroraSecurityGroup` を `public readonly` で公開。SG 名は命名規約表（cicd.html 9.2）の対象外のため明示指定せず CFN 自動命名、用途は英語 description で識別（SG の description は ASCII のみ許可）。実装は Codex に委譲し Claude がレビュー（JSDoc の参照元記載とテストの冗長箇所を小修正）。検証: `npm run build` / `npm test`（SG テスト 3 件追加、計 13 件）成功、`cdk diff` が SG 3 + Egress 2 + Ingress 2 の追加のみ（既存リソース変更なし）を確認のうえデプロイ。AWS CLI で 3 SG のルールが設計表と一致することを確認済み（バッチ共通・DB 準備確認用: Inbound なし / Outbound 443 → 0.0.0.0/0 と 3306 → Aurora SG のみ。Aurora 用: Inbound 3306 ← 両 SG / Outbound は CDK 仕様のダミー拒否ルール `255.255.255.255/32` ICMP のみ＝実質通信なし。コンソールでもこのダミールールが見えるが問題ない）。コンソールでの目視確認はユーザーが実施
+
+- [x] **2-3** Secrets Manager（画像生成 API キーの箱）を追加
+  - 確認: コンソールで `acps/prod/image/api-key` のシークレットが見える
+  - 備考: 画像 API キー用 Secret は CDK で「箱」のみ作成する。実際の API キー値の設定はアプリ実装フェーズ（Phase 10 以降）で行う。DB 接続情報の Secret は Aurora 作成時（Phase 3-1）に `acps/prod/db/credentials` として作成される。2026-07-13 実施: FoundationStack に Secret `acps/prod/image/api-key`（Secret 名明示指定）を追加し、後続の ImageBatchStack 参照用に `public readonly imageApiKeySecret` として公開。初期値は `generateSecretString`（`secretStringTemplate: '{}'` + `generateStringKey: 'api_key'`）で `{"api_key": "<ランダムプレースホルダ>"}` の JSON 形状（security.html 1.3 の値スキーマと同形。Console で `api_key` の値を差し替えるだけで手動設定できる）。description にプレースホルダである旨を英語で明記。RemovalPolicy は未指定＝CFN デフォルトの Delete（即時削除・同名再作成可能。**手動設定した API キー値は destroy で失われるため再作成後は Console から再設定が必要**）。決定事項は stacks.html 3.1 の decision コールアウトに記録。実装は Codex に委譲し Claude がレビュー。検証: `npm run build` / `npm test`（Secret テスト 3 件追加、計 16 件）成功、`cdk diff` が Secret 1 つの追加のみ（既存リソース変更なし）を確認のうえデプロイ（`UPDATE_COMPLETE`）。AWS CLI で Name / ARN / Description と値が `{"api_key": "<32 文字ランダム>"}` 形状であることを確認済み。コンソールでの目視確認はユーザーが実施
+
+- [x] **2-4** ECS Cluster を追加
+  - 確認: コンソールでクラスターが見える
+  - 備考: 2026-07-13 実施。FoundationStack に全バッチ共通の ECS Cluster を追加し、後続の ImageBatchStack / SnsPostBatchStack 参照用に `public readonly ecsCluster` として公開。`vpc` は既存 VPC を明示指定（`ecs.Cluster` は vpc 未指定だと NAT Gateway 付きの新規 VPC を自動作成してしまうため。stacks.html 3.1 の warn に追記）。クラスター名は命名規約表（cicd.html 9.2）の対象外のため明示指定せず CFN 自動命名（2-2 の SG と同じ整理）。Container Insights はデフォルト無効のまま（CloudWatch カスタムメトリクス課金を避ける。監視は Phase 7 の MonitoringStack 方針に従う）、Capacity Provider の登録もなし（Step Functions の RunTask で `launchType: FARGATE` を直接指定する方式のため）。これらの CDK 引数方針は stacks.html 3.1 のリソース一覧表に追記。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（Cluster テスト 1 件追加、計 17 件）成功、`cdk diff` が `AWS::ECS::Cluster` 1 つの追加のみ（既存リソース変更なし）を確認のうえデプロイ（`UPDATE_COMPLETE`。なお本番デプロイのため Claude の自動実行が一度権限拒否され、ユーザー承認のうえ再試行した）。AWS CLI 検証: クラスター `Prod-FoundationStack-EcsCluster97242B84-LxglUTFIqriH` が `ACTIVE`、EC2 コンテナインスタンス 0（Fargate のみ）、Capacity Provider なし、settings 空（Container Insights 無効）を確認。コンソールでの目視確認はユーザーが実施
+
+- [x] **2-5** ECR リポジトリを追加（image-batch、sns-post-batch、db-readiness-check の 3 つ）
+  - 確認: コンソールで 3 つの ECR リポジトリが見える
+  - 備考: ECR リポジトリは FoundationStack で一元管理する（[docs/infra/stacks.html](infra/stacks.html) 参照）。2026-07-13 実施: FoundationStack に ECR リポジトリ 3 つ（`auto-content-publisher/image-batch` / `sns-post-batch` / `db-readiness-check`。リポジトリ名明示指定・環境共通）を追加し、後続スタック参照用に `imageBatchRepository` / `snsPostBatchRepository` / `dbReadinessCheckRepository` を `public readonly` で公開。ライフサイクルポリシーは cicd.html セクション 4 どおり（image-batch / sns-post-batch: `release-*` タグ最新 30 個 + 全体最新 10 個の 2 ルール、db-readiness-check: 全体最新 30 個の単一ルール）。**RemovalPolicy は DESTROY + `emptyOnDelete: true`**（リポジトリ名明示指定のため CDK デフォルトの RETAIN では destroy 後の再作成時に名前衝突する。イメージはソースから再ビルド・再 push できる複製可能データのため「壊して作り直せる」を優先。CFN ネイティブの EmptyOnDelete のため S3 の autoDeleteObjects と異なり Lambda カスタムリソースは増えない。destroy でイメージは全て失われるため再作成後は再 push が必要）→ stacks.html 3.1 に decision コールアウトで記録。`imageTagMutability` / `imageScanOnPush` は未指定＝CDK デフォルト（MUTABLE / スキャン無効）。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（ECR テスト 5 件追加、計 22 件）成功、`cdk diff` が `AWS::ECR::Repository` 3 つの追加のみ（既存リソース変更なし）を確認のうえデプロイ（約 26 秒で `UPDATE_COMPLETE`。本番デプロイのため Claude の自動実行が一度権限拒否され、ユーザー承認のうえ再試行した）。AWS CLI 検証: 3 リポジトリの名前・URI・ライフサイクルポリシー JSON が設計どおりであること、デプロイ済みテンプレートで 3 つとも `EmptyOnDelete: true` / `DeletionPolicy: Delete` であることを確認。コンソールでの目視確認はユーザーが実施
+
+- [x] **2-6** VPC Endpoint（S3 Gateway のみ）を追加
+  - 確認: コンソールで S3 Gateway VPC Endpoint が作成されている（Secrets Manager Interface Endpoint は不要）
+  - 備考: Secrets Manager へのアクセスは ECS Fargate のパブリック IP 経由で行う。2026-07-13 実施: FoundationStack に S3 Gateway VPC Endpoint（`vpc.addGatewayEndpoint`）を追加。**`subnets` は Public Subnet のみ明示指定**（CDK デフォルトは Isolated 含む全サブネットのルートテーブルに関連付けるが、S3 にアクセスするのは Public 配置の ECS タスク（両バッチ + DB 準備確認）のみで、Isolated は Aurora 専用のため最小構成にした）→ stacks.html 3.1 の VPC Endpoint 行に CDK 引数方針として記録。ルーティングは透過的に効き後続スタックから参照する必要がないため `public readonly` プロパティは追加していない。SG 変更なし（バッチ共通・DB 準備確認 SG の Egress 443 → 0.0.0.0/0 が S3 プレフィックスリスト宛の通信もカバーする）。Endpoint ポリシーは未指定＝デフォルトのフルアクセス（アクセス制御は IAM タスクロール側で行う方針のため）。実装は Codex に委譲し Claude がレビュー（テストの `as any[]` キャスト除去のみ小修正）。検証: `npm run build` / `npm test`（VPC Endpoint テスト 3 件追加、計 25 件）成功、`cdk diff` が `AWS::EC2::VPCEndpoint` 1 つの追加のみ（既存リソース変更なし）を確認のうえデプロイ（`UPDATE_COMPLETE`。本番デプロイのため Claude の自動実行が権限拒否され、ユーザー承認のうえ再試行した）。AWS CLI 検証: `vpce-044fd13500fcf19ee` が Gateway 型 / `com.amazonaws.ap-northeast-1.s3` / `available` で、関連付けルートテーブルが Public Subnet の 2 つのみ（`PublicSubnet1` / `PublicSubnet2`、ともに IGW ルートあり。Isolated は非関連付け）であることを確認。コンソールでの目視確認はユーザーが実施
+
+---
+
+## Phase 3: FoundationStack の段階的構築（Aurora + DB 準備確認）
+
+**ゴール**: Aurora と DB 準備確認タスクを構築する
+
+- [x] **3-1** Aurora Serverless v2 を追加
+  - 確認: コンソールで DB クラスターが見える、自動一時停止が設定されている、最小 ACU が 0 になっている。Secrets Manager に `acps/prod/db/credentials` が作成されている
+  - 備考: Aurora MySQL 3.08.0 以降など、自動一時停止対応バージョンを採用する。Phase 4 以降の Step Functions 空回しは DB 準備確認タスクに依存するため、Aurora は Phase 4 より前に作成する。CDK 引数は [docs/infra/stacks.html](infra/stacks.html) セクション 3.1 を参照。2026-07-13 実施: FoundationStack に `rds.DatabaseCluster`（エンジン **Aurora MySQL 3.08.2＝LTS 最新パッチ**）を追加し、後続スタック参照用に `auroraCluster` を `public readonly` で公開。Isolated Subnet 配置 + Aurora 用 SG（2-2 作成済み）を関連付け、インスタンスは Serverless v2 の writer 1 つのみ。`serverlessV2MinCapacity: 0` / `serverlessV2MaxCapacity: 1.0` / `enableDataApi: true` は stacks.html 3.1 どおり。自動一時停止までの時間は未指定＝デフォルト 5 分（`SecondsUntilAutoPause: 300`）。**`defaultDatabaseName: 'acps'` を指定**（Secret 値スキーマ security.html 1.3 の `dbname` キー必須のため。未指定だと自動生成 Secret に `dbname` が含まれない）。**`storageEncrypted: true` を明示指定**（CDK デフォルトは false。デフォルト KMS キー・追加コストなし）。認証情報は `Credentials.fromGeneratedSecret('admin')` + Secret 名 `acps/prod/db/credentials` 明示指定。**RemovalPolicy は未指定＝CDK デフォルトの SNAPSHOT**（DB は正式な記録を担うため S3/ECR の DESTROY と方針を変えた。クラスター識別子は CFN 自動命名のため再作成で名前衝突しない）→ stacks.html 3.1 の decision コールアウトに記録。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（Aurora テスト 5 件追加、計 30 件）成功、`cdk diff` が Aurora 関連 5 リソース（DBCluster / DBInstance / DBSubnetGroup / Secret + Attachment）の追加のみ（既存リソース変更なし）を確認のうえデプロイ（約 8 分で `UPDATE_COMPLETE`。本番デプロイのため Claude の自動実行が権限拒否され、ユーザー承認のうえ再試行した）。AWS CLI 検証: クラスターが `available` / EngineVersion 3.08.2 / ScalingConfig（Min 0・Max 1・SecondsUntilAutoPause 300）/ `HttpEndpointEnabled: true` / `StorageEncrypted: true` / DatabaseName `acps` / Aurora SG 関連付け、インスタンスが `db.serverless` で `available`、Secret 値に `username`（admin）/ `password` / `host` / `port`（3306）/ `dbname`（acps）が揃っていること（security.html 1.3 のスキーマ充足）、DBSubnetGroup が Isolated Subnet 2 つのみ、デプロイ済みテンプレートで DeletionPolicy / UpdateReplacePolicy が `Snapshot` であることを確認。コンソールでの目視確認はユーザーが実施
+
+- [x] **3-2** `services/db-readiness-check/` に DB 準備確認用の Python + Dockerfile を作成し、ECR に push
+  - 確認: ECR コンソールでイメージが見える
+  - 備考: DB 接続リトライ（指数バックオフ、最大 8 回）を実装する。詳細は [docs/infra/workflow.html](infra/workflow.html) セクション 2 を参照。ECR push 時は不変タグ（例: Git コミットハッシュ）を使用する。以降の db-readiness-check 更新時は [docs/infra/cicd.html](infra/cicd.html) セクション 2 の手順を参照。2026-07-13 実施: `services/db-readiness-check/` に本リポジトリ初の Python サービス一式（`app/` パッケージ 7 ファイル + pytest 23 件 + Dockerfile + requirements 完全固定 + README）を作成。この構成（`app/` パッケージ / `tests/` / requirements・requirements-dev 分離 / `python -m app` 起動）が Phase 4・5 の image-batch / sns-post-batch の雛形になる。**実装判断**: ①「最大リトライ 8 回」はバックオフ列（2〜256 秒）が 8 個であることから**初回試行 + 8 リトライ = 計 9 試行**と解釈 ②確認 SQL は `SELECT 1`（workflow.html 未規定・実装裁量）、`connect_timeout=10 秒`（最悪 9 試行 × 10 秒 + 待機 510 秒 ≈ 600 秒 < SFN タイムアウト 900 秒）③PyMySQL の例外メッセージには host 等の Secret 値が含まれ得るため、**リトライログには例外クラス名 + errno のみ出力**（security.html「Secret 値をログに出さない」の厳格運用。調査性とのトレードオフは README に注記）。`DbSecret` は repr マスクで誤ログを構造的に防止 ④Secret 取得は boto3（環境変数 `DB_SECRET_ARN` の ARN から取得。リトライ対象外・1 回のみ）。環境変数契約は workflow.html 5.3 どおり `DB_SECRET_ARN` / `ENV_NAME` ⑤Aurora の認証プラグインが `caching_sha2_password` の場合 PyMySQL が `cryptography` を要求する既知リスクあり（Aurora MySQL 3 デフォルトは `mysql_native_password` のため未追加。3-3 の疎通確認でエラーになった場合に追加）。Dockerfile は python:3.12-slim 単一ステージ・非 root（uid 1001）・`PYTHONUNBUFFERED=1`・exec 形式 ENTRYPOINT。**0-4 申し送りのローカル Python は uv を導入して解消**（ユーザーローカル・sudo 不要。uv 管理の Python 3.12.13 で pytest を実行。`uv.lock` / `.pytest_cache/` は .gitignore に追加）。実装は Codex に委譲し Claude がレビュー（ConfigError ログに環境変数名を出す小修正のみ）。検証: pytest 23 件成功（リトライ回数・バックオフ列・Secret 非漏洩の回帰テスト含む）、Docker スモークで環境変数欠落 → exit 1 / ダミー ARN → `NoCredentialsError` クラス名のみログして exit 1 / 非 root 実行（uid=1001）を確認。**ECR push 済み: 不変タグ `27d0ab20a77e`**（コミットハッシュ。3-3 の `-c dbReadinessCheckImageTag=27d0ab20a77e` で使用する）。push は `--provenance=false` 必須（buildx デフォルトの attestation がタグなしイメージを ECR に登録し、ライフサイクルルールの「1 push = 1 イメージ」前提が崩れるため。初回 push で登録されたタグなし 2 件は削除済み。手順は README に記録）。`aws ecr describe-images` でタグ付きイメージ 1 件（約 60MB）を確認。コンソールでの目視確認はユーザーが実施
+
+- [x] **3-3** DB 準備確認 ECS タスク定義を FoundationStack に追加し、手動 RunTask で疎通確認
+  - 確認: Aurora が起動状態のとき: CloudWatch Logs に接続成功ログが出力され、終了コード 0 で終了する
+  - 備考: `cdk deploy -c env=prod -c dbReadinessCheckImageTag=<tag> FoundationStack` でタスク定義を作成する（`<tag>` は Phase 3-2 で ECR push した不変タグ）。Aurora が一時停止状態からのリトライ確認は Phase 6-5 で実施する。2026-07-13 実施: FoundationStack にタスクロール・ロググループ・`FargateTaskDefinition` を追加し、後続の両バッチスタック（Step Functions の family 名参照）用に `public readonly dbReadinessCheckTaskDefinition` として公開。**実装内容**: ①family は `acps-{env}-db-readiness-check` を明示指定（cicd.html セクション 5 の family 命名例に倣う。SFN の ASL と `aws ecs describe-task-definition` が family 名参照のため固定必須）、`cpu: 256` / `memoryLimitMiB: 512`（workflow.html 2 の最小構成） ②コンテナ名 `db-readiness-check`、環境変数 `DB_SECRET_ARN` / `ENV_NAME` は workflow.html 5.3 どおり Task Definition に静的設定（オーバーライドなし） ③タスクロールは `secretsmanager:GetSecretValue` をプレフィックス `acps/{env}/db/*` に許可するインラインポリシーのみ（security.html 2.1 のプレフィックスベース制御。CloudWatch Logs 権限は含めない）。タスク実行ロールは明示作成せず CDK 自動生成（ECR pull + awslogs 書き込みの最小権限） ④**ロググループはユーザー判断で自動命名 + `RemovalPolicy.DESTROY` に確定**（診断用の使い捨てログ・90 日保持のため「壊して作り直せる」方針。stacks.html 3.1 に decision コールアウトで記録） ⑤Context `dbReadinessCheckImageTag` の必須化は stacks.html 3.1 の指定どおり `Annotations.of(this).addError()` 方式（throw だと選択外スタックの synth まで巻き込むため）。未指定で synth すると exit 1 + 日本語エラーになることを確認。既存テストは全 describe が素の `new cdk.App()` だとこのエラーで落ちるため、Context 付きで Stack を作る共通ヘルパーに置き換えた。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（タスク定義・IAM・ロググループ・Context エラーのテスト 5 件追加、計 35 件）成功、`cdk diff` が追加 5 リソース（TaskDefinition / タスクロール / 実行ロール + ポリシー / LogGroup）のみで既存リソース変更なしを確認のうえデプロイ（`UPDATE_COMPLETE`。本番デプロイのため Claude の自動実行が権限拒否され、ユーザー指示のうえ再実行した）。**疎通確認**: タスク定義 revision 1 が ACTIVE でイメージ URI にタグ `27d0ab20a77e` を確認 → Data API の `SELECT 1` で Aurora を起こし（1 回目 `DatabaseResumingException` → 10 秒後の 2 回目で成功＝一時停止からの再開を確認）→ 手動 RunTask（Public Subnet ×2 + DB 準備確認 SG + `assignPublicIp=ENABLED`、workflow.html 2 どおり）→ `exitCode: 0` で STOPPED、CloudWatch Logs に「DB connection check succeeded on attempt 1/9」「Database is ready」を確認（リトライなしの初回接続成功）。3-2 で懸念した `caching_sha2_password` → `cryptography` 要求問題は発生せず（`cryptography` 追加は不要だった）。コンソールでの目視確認はユーザーが実施
+
+---
+
+## Phase 4: SNS 投稿バッチの空回し
+
+**ゴール**: SnsPostBatchStack でパイプラインが動くことを確認する（業務ロジックなし）
+
+- [x] **4-1** `services/sns-post-batch/` に Hello World の Python + Dockerfile を作成
+  - 確認: `docker build` & `docker run` でローカル動作確認
+  - 備考: 2026-07-13 実施: 3-2 で確立した db-readiness-check の雛形（`app/` パッケージ / `tests/` / requirements・requirements-dev 分離 / `python -m app` 起動 / python:3.12-slim・非 root uid 1001 の Dockerfile）をそのまま踏襲し、`main()` が「Hello World from sns-post-batch」を INFO ログ出力して 0 を返すだけの空回し用一式を作成。**環境変数は一切読まない**（workflow.html 5.2 の契約変数は「空回し段階ではコンテナ側で使用しない」と明記済みのため、必須チェックも置かず未設定でも成功する）。requirements.txt は実行時依存なし（コメントのみの空ファイル。pip は空ファイルを許容するため Dockerfile 構造は雛形どおり維持）。実装は Codex に委譲し Claude がレビュー（`.dockerignore` に Dockerfile / .dockerignore 自身の除外行を追記する小修正のみ。Codex サンドボックスのネットワーク制限で pytest 未実行だったため Claude 側で実行）。検証: pytest 2 件成功（exit code 0 / ログに Hello World）、`docker build` 成功、`docker run` で「Hello World from sns-post-batch」ログ + exit code 0 + `uid=1001(appuser)` の非 root 実行を確認。ECR push は 4-2 で実施（README に手順追記予定）
+
+- [x] **4-2** ECR リポジトリ（Phase 2-5 で作成済み）に手動で Docker イメージを push
+  - 確認: ECR コンソールでイメージが見える
+  - 備考: 2026-07-13 実施: 3-2 で確立した手順（不変タグ = コミットハッシュ 12 桁、`--platform linux/amd64 --provenance=false` でビルド）どおりに `auto-content-publisher/sns-post-batch` へ push。**不変タグ `a586e44aa945`**（4-1 完了コミット。4-3 の SnsPostBatchStack タスク定義デプロイで使用する）。`aws ecr describe-images` でタグ付きイメージ 1 件（約 43MB）のみ・タグなしイメージなしを確認。push 手順は `services/sns-post-batch/README.md` に追記。コンソールでの目視確認はユーザーが実施
+
+- [x] **4-3** SnsPostBatchStack に ECS Task Definition を定義してデプロイ
+  - 確認: `cdk deploy -c env=prod SnsPostBatchStack` 成功
+  - 備考: 2026-07-13 実施: `infra/lib/sns-post-batch-stack.ts` を新規作成し、3-3 で確立した db-readiness-check タスク定義パターン（Context 必須化の `Annotations.addError()` / family 明示指定 / タスク実行ロールは CDK 自動生成 / ロググループは自動命名 + `RemovalPolicy.DESTROY`）をそのまま踏襲。**実装内容**: ①family `acps-{env}-sns-post-batch`、`cpu: 256` / `memoryLimitMiB: 512`、コンテナ名 `sns-post-batch`（stacks.html 3.3 どおり） ②イメージタグは CDK Context `snsPostBatchImageTag` で必須指定（4-2 の不変タグ `a586e44aa945` を使用） ③環境変数は workflow.html 5.2 の契約どおり `DB_SECRET_ARN` / `S3_BUCKET_NAME` / `ENV_NAME` を Task Definition に静的設定（`SET_CODE` / `EXECUTION_ARN` は 4-5 の Step Functions コンテナオーバーライドで渡すため設定しない。コンテナは空回し段階で環境変数を読まないが契約どおり先行設定） ④タスクロールは security.html 2.1 の最終形をこの段階で付与（S3 読み取り `grantRead` + `secretsmanager:GetSecretValue` をプレフィックス `acps/{env}/db/*`・`acps/{env}/*/sns/*` に許可 + `cloudwatch:PutMetricData` を条件キー `cloudwatch:namespace=ACPS` で制限） ⑤FoundationStack の `snsPostBatchRepository` / `imagesBucket` / `auroraCluster` を props で受け取る cross-stack 参照（FoundationStack に Exports 5 件が自動追加される） ⑥`bin/infra.ts` に論理 ID `SnsPostBatchStack` / 実スタック名 `Prod-SnsPostBatchStack` で登録。4-5 の Step Functions から参照するためタスク定義は `public readonly taskDefinition` で公開。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（タスク定義・IAM・ロググループ・Context エラーの新規テスト 5 件追加、計 40 件）成功、`cdk diff` で FoundationStack が Outputs 追加のみ（既存リソース変更なし）・SnsPostBatchStack が新規 6 リソースであることを確認のうえ、`cdk deploy -c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e -c snsPostBatchImageTag=a586e44aa945 SnsPostBatchStack` でデプロイ（`Prod-SnsPostBatchStack` は `CREATE_COMPLETE`、依存の FoundationStack は `UPDATE_COMPLETE`）。**デプロイ後確認**: `aws ecs describe-task-definition` でタスク定義 `acps-prod-sns-post-batch` revision 1 が ACTIVE、イメージ URI にタグ `a586e44aa945`、環境変数 3 件・awslogs 設定を確認。**運用注意**: SnsPostBatchStack のデプロイには `dbReadinessCheckImageTag` の同時指定が必須（FoundationStack が依存としてデプロイ対象に含まれるため。stacks.html 3.3 の注意事項に記録）。RunTask での動作確認は 4-4 で実施。コンソールでの目視確認はユーザーが実施
+
+- [x] **4-4** 手動で ECS RunTask を実行
+  - 確認: CloudWatch Logs に「Hello World」が出る
+  - 備考: ここが最重要確認ポイント。2026-07-13 実施: 3-3 と同じ手順で `aws ecs run-task` を実行（起動タイプ FARGATE、タスク定義は family 名 `acps-prod-sns-post-batch` 指定 → revision 1 が使用された）。ネットワーク設定は workflow.html 3 章 / 5.2 どおり **Public Subnet ×2 + バッチ共通 SG（BatchSecurityGroup）+ `assignPublicIp=ENABLED`**（DB 準備確認 SG を使った 3-3 との相違点は SG のみ。もう 1 つの相違点として、コンテナが環境変数も DB も読まない空回しのため Aurora の事前起動は不要で、実施していない）。環境変数オーバーライドなし。結果: タスク ID `429204062239466ba7b1b21fb09ea749` が `STOPPED` / `stopCode: EssentialContainerExited` / コンテナ `sns-post-batch` の `exitCode: 0` で終了し、CloudWatch Logs（ロググループ `Prod-SnsPostBatchStack-SnsPostBatchLogGroup80185C7A-LswqXDZ1Cy0o`、ストリーム `sns-post-batch/sns-post-batch/<taskId>`）に「Hello World from sns-post-batch」を確認。これで「ECR イメージ → ECS Fargate → CloudWatch Logs」のパイプライン疎通を確認できた。コンソールでの目視確認はユーザーが実施
+
+- [x] **4-5** Step Functions ステートマシンを追加してデプロイ
+  - 確認: `cdk deploy -c env=prod SnsPostBatchStack` 成功、コンソールでステートマシンが見える
+  - 備考: ASL 定義は [docs/infra/workflow.html](infra/workflow.html) セクション 4 を参照。2026-07-13 実施: SnsPostBatchStack に SNS 投稿ワークフロー（sns-posting-sfn）のステートマシンを追加。**実装方式**: workflow.html セクション 4 の ASL JSON を `infra/lib/asl/sns-posting.asl.json` に逐語ファイル化し、`DefinitionBody.fromString`（`fs.readFileSync`）+ `definitionSubstitutions` でプレースホルダ 7 種（クラスター ARN / タスク定義 family ×2 / Public Subnet ID ×2 / SG ID ×2）に実値を注入する生 ASL 方式を採用（L2 の `tasks.EcsRunTask` は revision 固定 ARN を埋め込むため「family 名参照 = RunTask が最新 ACTIVE revision を解決」の設計を表現できない。`DefinitionBody.fromFile` は S3 アセット化されるため不採用）→ stacks.html 3.3 の decision コールアウトに記録。**ステートマシン名はユーザー判断で `acps-{env}-sns-posting-sfn` の明示指定に確定**（手動単独実行が運用ユースケースのためコンソール発見性を優先。Scheduler DLQ の明示命名と同じ整理）→ stacks.html 3.3 の decision + cicd.html 9.2 の命名規約表に行を追加。type は Standard、ロギング・トレーシング・ステートマシンレベル timeout は未設定（設計書に規定なし。失敗監視は Phase 7 の ExecutionsFailed アラーム）。**SFN 実行ロール**は自動生成ロール + `addToRolePolicy` で security.html 2.3 の 4 ステートメント（`ecs:RunTask` は両 family の `:*`、`ecs:StopTask`/`DescribeTasks` は `*`、events 3 アクションは `StepFunctionsGetEventsForECSTaskRule` 限定、`iam:PassRole` はタスクロール + タスク実行ロール ×4 に `iam:PassedToService=ecs-tasks.amazonaws.com` 条件付き）。Props 5 件（vpc / ecsCluster / batchSecurityGroup / dbReadinessCheckSecurityGroup / dbReadinessCheckTaskDefinition）を FoundationStack から cross-stack 参照で追加（FoundationStack に Exports 7 件が自動追加）。Phase 5 の ImageBatchStack（ARN 参照）・Phase 7 の MonitoringStack 用に `public readonly stateMachine` を公開。実装は Codex に委譲し Claude がレビュー（`executionRole!` の非 null アサーションを既存の明示チェック + 日本語エラーのパターンに合わせる小修正のみ）。検証: `npm run build` / `npm test`（SFN テスト 4 件追加、計 44 件）成功、`cdk diff` が新規 3 リソース（StateMachine / ロール / ポリシー）のみで既存リソース変更なし・FoundationStack は Exports 追加のみを確認のうえデプロイ（約 71 秒で `UPDATE_COMPLETE`。本番デプロイのため Claude の自動実行が権限拒否され、ユーザー承認のうえ再試行した）。**デプロイ後確認**: `acps-prod-sns-posting-sfn` が ACTIVE / STANDARD、定義にプレースホルダ残存なし（WaitForDbReady=DB 準備確認 SG・`acps-prod-db-readiness-check`、RunSnsPostBatchTask=バッチ共通 SG・`acps-prod-sns-post-batch`、Public Subnet ×2、ContainerOverrides に SET_CODE / EXECUTION_ARN）、ロールの 4 ステートメントが設計どおりであることを AWS CLI で確認。実行テスト（E2E）は 4-6 で実施。コンソールでの目視確認はユーザーが実施
+
+- [x] **4-6** Step Functions 手動実行による E2E 確認（WaitForDbReady → ECS タスク実行の一連フロー）
+  - 確認: コンソールから手動実行 → DB 準備確認 → SNS 投稿 ECS タスク起動 → 成功（全ステートが正常遷移）
+  - 備考: Phase 4-5 は Step Functions の追加デプロイのみ。4-6 は WaitForDbReady を含む一連フローの動作確認。手動実行 input は `{"set_code":"test-set-1"}` のように `set_code` を必ず渡す（空回し段階ではダミー値でよい。意味付けは [docs/app/design-outline.html](app/design-outline.html) セクション 5 で確定済み）。Phase 5 で ImageBatchStack に EventBridge Scheduler を追加し、SNS 投稿は画像生成成功後に自動起動される。2026-07-14 実施: operation.html 1.2 の手順どおり AWS CLI（`aws stepfunctions start-execution`、input `{"set_code": "test-set-1"}`）で実行（実行名 `ea66d09c-0566-47b4-b651-1a101dd38068`）。結果 **SUCCEEDED、所要 1 分 44 秒**（08:52:45〜08:54:29 JST）。`get-execution-history` で **WaitForDbReady（約 57 秒）→ RunSnsPostBatchTask（約 46 秒）→ ExecutionSucceeded の全ステート正常遷移・Retry / Catch（HandleError）発生なし**を確認。**今回が WaitForDbReady による実 Aurora 接続の初確認**: 実行前 30 分以上 Aurora は 0 ACU（自動一時停止中）で、db-readiness-check は接続試行 1/9 回目で成功（接続確立に約 10 秒。コールドスタートは初回試行の接続待ちで吸収され、コンテナ内リトライ発動なし）→ ログに「Database is ready」。ServerlessDatabaseCapacity は実行を境に 0 → 1.0 ACU に遷移し、本実行が自動一時停止からの再開をトリガーしたことをメトリクスでも確認。sns-post-batch 側は CloudWatch Logs に「Hello World from sns-post-batch」を確認。実行 output は input の `{"set_code": "test-set-1"}` がそのまま保持され、`ResultPath: null` の設計（入力の `$.set_code` を上書きしない）どおり動作。これで Phase 4 のゴール「SnsPostBatchStack でパイプラインが動く」を達成（EventBridge Scheduler からの自動起動は Phase 5）。コンソールでの目視確認はユーザーが実施
+
+---
+
+## Phase 5: 画像生成バッチの空回し
+
+**ゴール**: EventBridge → Step Functions → ECS Fargate のパイプラインが動くことを確認する（業務ロジックなし）
+
+- [x] **5-1** `services/image-batch/` に Hello World の Python + Dockerfile を作成
+  - 確認: `docker build` & `docker run` でローカル動作確認
+  - 備考: 2026-07-14 実施: sns-post-batch（4-1）の完全ミラーとして作成（サービス名と Phase 表記の置換のみ。雛形: `app/` パッケージ / `tests/` / requirements・requirements-dev 分離 / `python -m app` 起動 / python:3.12-slim・非 root uid 1001 の Dockerfile）。`main()` が「Hello World from image-batch」を INFO ログ出力して 0 を返すのみで、環境変数は一切読まない。README には ECR push 手順（`auto-content-publisher/image-batch`）も最初から記載済み（5-2 での追記不要）。実装は Codex に委譲し Claude がレビュー（置換版 sns-post-batch との機械的 diff で全 10 ファイル一致を確認、指摘なし）。検証: pytest 2 件成功、`docker build` 成功、`docker run` で「Hello World from image-batch」ログ + exit code 0 + `uid=1001(appuser)` の非 root 実行を確認。ECR push は 5-2 で実施
+
+- [x] **5-2** ECR リポジトリ（Phase 2-5 で作成済み）に手動で Docker イメージを push
+  - 確認: ECR コンソールでイメージが見える
+  - 備考: 2026-07-14 実施: 3-2 で確立した手順（不変タグ = コミットハッシュ 12 桁、`--platform linux/amd64 --provenance=false` でビルド）どおりに `auto-content-publisher/image-batch` へ push。**不変タグ `34c1c2163f34`**（5-1 完了コミット。5-3 の ImageBatchStack タスク定義デプロイで使用する）。`aws ecr describe-images` でタグ付きイメージ 1 件（約 43MB）のみ・タグなしイメージなしを確認。push 手順は `services/image-batch/README.md` に 5-1 時点で記載済み（追記なし）。コンソールでの目視確認はユーザーが実施
+
+- [x] **5-3** ImageBatchStack に ECS Task Definition を定義してデプロイ
+  - 確認: `cdk deploy -c env=prod ImageBatchStack` 成功
+  - 備考: 2026-07-14 実施: `infra/lib/image-batch-stack.ts` を新規作成し、4-3 の SnsPostBatchStack タスク定義パターン（Context 必須化の `Annotations.addError()` / family 明示指定 / タスク実行ロールは CDK 自動生成 / ロググループは自動命名 + `RemovalPolicy.DESTROY`）をそのまま踏襲。**実装内容**: ①family `acps-{env}-image-batch`、`cpu: 256` / `memoryLimitMiB: 512`、コンテナ名 `image-batch`（stacks.html 3.2 どおり） ②イメージタグは CDK Context `imageBatchImageTag` で必須指定（5-2 の不変タグ `34c1c2163f34` を使用） ③環境変数は workflow.html 5.1 の契約どおり `DB_SECRET_ARN` / `API_SECRET_ARN` / `S3_BUCKET_NAME` / `ENV_NAME` の 4 件を Task Definition に静的設定（`API_SECRET_ARN` は FoundationStack の `imageApiKeySecret` を props 参照。`SET_CODE` / `EXECUTION_ARN` / `SCHEDULED_AT` は 5-5 の Step Functions コンテナオーバーライドで渡すため設定しない） ④タスクロールは security.html 2.1 の最終形をこの段階で付与（S3 読み**書き** `grantReadWrite` + `secretsmanager:GetSecretValue` をプレフィックス `acps/{env}/db/*`・`acps/{env}/image/*` に許可。`cloudwatch:PutMetricData` は付与しない = SNS 投稿バッチタスクロールとの相違点） ⑤FoundationStack の `imageBatchRepository` / `imagesBucket` / `auroraCluster` / `imageApiKeySecret` を props で受け取る cross-stack 参照（FoundationStack に Exports 3 件が自動追加） ⑥`bin/infra.ts` に論理 ID `ImageBatchStack` / 実スタック名 `Prod-ImageBatchStack` で登録。5-5 の Step Functions から参照するためタスク定義は `public readonly taskDefinition` で公開。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（タスク定義・IAM・ロググループ・Context エラーの新規テスト 5 件追加、計 50 件）成功、`cdk diff` で FoundationStack が Exports 3 件追加のみ（既存リソース変更なし）・ImageBatchStack が新規 6 リソースであることを確認のうえ、`cdk deploy -c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e -c imageBatchImageTag=34c1c2163f34 ImageBatchStack` でデプロイ（`Prod-ImageBatchStack` は `CREATE_COMPLETE`、依存の FoundationStack は `UPDATE_COMPLETE`）。**デプロイ後確認**: `aws ecs describe-task-definition` でタスク定義 `acps-prod-image-batch` revision 1 が ACTIVE、イメージ URI にタグ `34c1c2163f34`、環境変数 4 件・awslogs 設定を確認。**運用注意**: ImageBatchStack のデプロイには `dbReadinessCheckImageTag` の同時指定が必須（FoundationStack が依存としてデプロイ対象に含まれるため。この段階では SnsPostBatchStack に依存しないため `snsPostBatchImageTag` は不要。stacks.html 3.2 の注意事項に記録）。RunTask での動作確認は 5-4 で実施。コンソールでの目視確認はユーザーが実施
+
+- [x] **5-4** 手動で ECS RunTask を実行
+  - 確認: CloudWatch Logs に「Hello World」が出る
+  - 備考: ここが最重要確認ポイント。2026-07-14 実施: 4-4 と同じ手順で `aws ecs run-task` を実行（起動タイプ FARGATE、タスク定義は family 名 `acps-prod-image-batch` 指定 → revision 1 が使用された）。ネットワーク設定は 4-4 と完全に同一で **Public Subnet ×2 + バッチ共通 SG（BatchSecurityGroup）+ `assignPublicIp=ENABLED`**（実値は sns-posting-sfn の RunSnsPostBatchTask ステート定義から抽出して流用）。コンテナが環境変数も DB も読まない空回しのため Aurora の事前起動は不要で、実施していない。環境変数オーバーライドなし。結果: タスク ID `5656c0342bd649b19fa3b97ab8e6cfea` が `STOPPED` / `stopCode: EssentialContainerExited` / コンテナ `image-batch` の `exitCode: 0` で終了し、CloudWatch Logs（ロググループ `Prod-ImageBatchStack-ImageBatchLogGroupB45A8DE3-3fGUCYtloQri`、ストリーム `image-batch/image-batch/<taskId>`）に「Hello World from image-batch」を確認。これで image-batch 側も「ECR イメージ → ECS Fargate → CloudWatch Logs」のパイプライン疎通を確認できた。コンソールでの目視確認はユーザーが実施
+
+- [x] **5-5** Step Functions ステートマシンを追加
+  - 確認: コンソールから手動実行 → WaitForDbReady（DB 準備確認）→ ECS タスク起動 → 成功（全ステートが正常遷移）
+  - 備考: ImageBatchStack の Step Functions は SnsPostBatchStack の Step Functions ARN を参照するため、Phase 4 完了が前提。手動実行 input は `{"set_code":"test-set-1","scheduled_at":"2026-04-19T00:00:00Z"}` のように `set_code` と `scheduled_at` を必ず渡す（ダミー値でよい）。ASL 定義は [docs/infra/workflow.html](infra/workflow.html) セクション 3 を参照。2026-07-14 実施: 4-5 で確立した方式（生 ASL JSON + `DefinitionBody.fromString` + `definitionSubstitutions`、ステートマシン名明示指定、実行ロールは自動生成 + `addToRolePolicy`）をそのまま踏襲。**実装内容**: ①workflow.html セクション 3 の ASL を `infra/lib/asl/image-generation.asl.json` に逐語ファイル化（7 ステート: WaitForDbReady → RunImageBatchTask → StartSnsPostBatch（非同期 `states:startExecution`）+ SnsPostAlreadyStarted / NotifySnsPostStartFailure / ImageBatchSucceeded / HandleError。設計書との逐語一致をレビューで機械検証） ②ステートマシン名 `acps-{env}-image-generation-sfn` を明示指定（4-5 の decision 踏襲に加え、ASL の `${ImageGenerationSfnName}`（カスタムメトリクス Dimension）に自ステートマシン名を生成前に渡す必要があるため実質必須） ③`definitionSubstitutions` は sns-posting の 7 種に対し 9 種（`SnsPostBatchTaskDefFamily` → `ImageBatchTaskDefFamily`、追加 2 種: `SnsPostingSfnArn` = SnsPostBatchStack の `stateMachine` props 参照 / `ImageGenerationSfnName`） ④実行ロールは security.html 2.3 どおり 6 ステートメント（sns-posting の 4 つ + `states:StartExecution`（SNS 投稿 SFN の ARN 限定）+ `cloudwatch:PutMetricData`（`cloudwatch:namespace=ACPS` 条件）） ⑤`bin/infra.ts` で SnsPostBatchStack を変数化し `snsPostingStateMachine` として受け渡し（ImageBatchStack が SnsPostBatchStack に依存開始。**以降 ImageBatchStack のデプロイには 3 つのイメージタグ Context がすべて必須**。stacks.html 3.2 の注意事項に記録） ⑥Phase 5-6 の Scheduler / Phase 7 の MonitoringStack 用に `public readonly stateMachine` を公開。実装は Codex に委譲し Claude がレビュー（修正指摘なし。テストのテンプレート全体走査の `PutMetricData` 不在アサーションは SFN ロールが正当に持つため taskRole 限定の検証に変更）。検証: `npm run build` / `npm test`（SFN の新規テスト 4 件追加、計 54 件）成功、`cdk diff` で ImageBatchStack が SFN + ロール/ポリシーの新規 3 リソースのみ・SnsPostBatchStack が SFN ARN の Exports 1 件追加のみ・FoundationStack 差分なしを確認のうえデプロイ（ユーザー承認済み。`Prod-ImageBatchStack` / `Prod-SnsPostBatchStack` とも成功）。**デプロイ後確認**: `describe-state-machine` で ACTIVE・プレースホルダ 9 種すべて実値解決・ロール 6 ステートメントを確認。**E2E**: input `{"set_code":"test-set-1","scheduled_at":"2026-04-19T00:00:00Z"}` で手動実行（実行名 `1257e87c-3b59-4a28-88b8-7a30aa4e79aa`）→ WaitForDbReady → RunImageBatchTask → StartSnsPostBatch → ExecutionSucceeded を Retry / Catch 非経由で確認（12:52:46 開始、所要 1 分 46 秒。Aurora は available 状態だったためコールドスタート吸収は非発生）。image-batch ログに「Hello World from image-batch」。**子の sns-posting-sfn も親と同じ実行名・input `{"set_code":"test-set-1"}` で自動起動され SUCCEEDED**（所要 1 分 38 秒、sns-post-batch ログに「Hello World from sns-post-batch」）。EventBridge を除く全体チェーン（画像生成 → SNS 投稿の連鎖起動）の疎通を確認できた。コンソールでの目視確認はユーザーが実施
+
+- [x] **5-6** EventBridge Scheduler を追加
+  - 確認: スケジュール時刻に自動で Step Functions が起動される。Scheduler に RetryPolicy と DLQ が設定されている
+  - 備考: Scheduler 起動失敗は Step Functions の失敗メトリクスには出ないため、DLQ と `AWS/Scheduler` メトリクスで検知する。アラーム設定は Phase 7 で行う。2026-07-14 実施: ImageBatchStack に EventBridge Scheduler 一式を追加（aws-cdk-lib 2.232.1 の stable L2 `aws-scheduler` / `aws-scheduler-targets` を使用）。**実装内容**: ①Schedule 名 `acps-prod-image-generation-schedule`、ScheduleGroup `acps-prod-image-schedule-group` 所属（Phase 7 の `AWS/Scheduler` メトリクス Dimension 用に `scheduleGroup` をプロパティ公開） ②DLQ は SQS `acps-prod-image-scheduler-dlq`（保持 14 日。`schedulerDlq` をプロパティ公開） ③Input テンプレートは [workflow.html](infra/workflow.html) セクション 1.3 どおり `{"set_code":"fashion-set-1","scheduled_at":"<aws.scheduler.scheduled-time>"}`（`set_code` は Phase 10 までのプレースホルダ） ④RetryPolicy は `MaximumRetryAttempts=3` / `MaximumEventAgeInSeconds=3600`、FlexibleTimeWindow は `OFF`（設計書未記載だった具体値を workflow.html セクション 1.5 に新設して記録） ⑤ターゲット用 IAM ロールは L2 `StepFunctionsStartExecution` の自動生成（`states:StartExecution` + DLQ への `sqs:SendMessage`）で security.html 2.4 を充足。実装は Codex に委譲し Claude がレビュー（修正指摘なし）。検証: `npm run build` / `npm test`（Scheduler の新規テスト 3 件追加、計 57 件）成功、`cdk diff` で ImageBatchStack の新規 5 リソースのみ（既存リソース変更なし）を確認のうえデプロイ。**自動起動の検証**: 検証用の一回限り cron `cron(50 13 14 7 ? 2026)`（Asia/Tokyo）+ ENABLED でデプロイし、13:50:32 JST に実行名 UUID `0d6a55bf-f8a0-4f23-9be4-66e13ed26b96` の実行が自動作成 → input の `scheduled_at` が `2026-07-14T04:50:00Z`（スケジュール時刻の UTC）に自動展開 → 画像生成 SFN SUCCEEDED → 子の sns-posting-sfn も同一実行名で連鎖起動され SUCCEEDED。Scheduler → 画像生成 → SNS 投稿の全チェーン自動疎通を確認し、Phase 5 ゴール（EventBridge → Step Functions → ECS Fargate）達成。`get-schedule` で RetryPolicy / DeadLetterConfig / FlexibleTimeWindow OFF を確認、DLQ は 0 件 → 確認条件 2 件とも達成。**検証後の運用判断（ユーザー確定）**: 有効のままだと Phase 6〜9 の間も毎日チェーン全体が空回しして Aurora が毎日起動するため、検証後に State: DISABLED + プレースホルダ cron `cron(0 9 * * ? *)`（毎日 09:00 JST）へ変更して再デプロイ（`get-schedule` で DISABLED を確認済み）。Phase 10 のアプリ実装開始時に本番 cron 式を設定して有効化する（workflow.html セクション 1.5 の decision に記録）
+
+---
+
+## Phase 6: DB 接続の疎通（最小）
+
+**ゴール**: ECS タスクから Aurora に接続できることを確認する（本スキーマの DDL はアプリ設計後に作成する）
+
+- [x] **6-1** `shared/` に DB 接続共通モジュールを作成（DB が利用可能な前提。リトライなし）
+  - 確認: ユニットテストが通る
+  - 備考: DB 接続リトライは DB 準備確認 ECS タスク（FoundationStack）の責務。バッチアプリケーションの DB 接続モジュールにはリトライを持たせない（[docs/infra/workflow.html](infra/workflow.html) セクション 2）。2026-07-14 実施: パッケージ名は `acps_shared`（`shared/acps_shared/`。Secret 名 `acps/...`・DB 名 `acps` と同一プレフィックス）。`secrets.py`（`DbSecret`/`parse_db_secret`/`get_db_secret`）は db-readiness-check の実装をそのまま移植し、`db.py` に `connect()`（リトライなし・例外そのまま送出）と `open_connection()`（終了時 close するコンテキストマネージャ）を新設。実装裁量で決めた既定値: `charset="utf8mb4"`（DDL の文字コードに合わせる）/ `connect_timeout=10`（db-readiness-check と同値）/ autocommit は pymysql デフォルト（無効）のまま commit は呼び出し側の責務。依存は boto3==1.43.46 / PyMySQL==1.2.0（db-readiness-check と同一固定）。テスト・pyproject 構成は services と同じ流儀（`cd shared && pytest`）。実装は Codex に委譲し Claude がレビュー（デフォルトタイムアウト値のテスト 1 件を追加）。検証: pytest 11 件全パス。コンテナへの組み込み（Dockerfile ルートコンテキスト化・`COPY shared/`）は 6-2 で実施
+
+- [x] **6-2** Hello World コンテナを DB 接続テスト版に差し替え
+  - 確認: ローカル Docker + ローカル MySQL で接続テスト
+  - 備考: 2026-07-14 実施: image-batch / sns-post-batch の main を `shared/acps_shared` を使った DB 接続テスト（`connection_test` へ INSERT → commit → SELECT COUNT(*)、成功ログに「DB 接続成功」を含める = 6-4 の CloudWatch Logs 確認条件）に差し替え。**実装内容**: ①両 Dockerfile を [cicd.html](infra/cicd.html) で Fix 済みのルートコンテキスト方式（`docker build -f services/<name>/Dockerfile .`、`COPY shared/acps_shared/`）へ変更し、ルート `.dockerignore` を新設（両サービス内の `.dockerignore` は削除。db-readiness-check は従来どおりサービスディレクトリコンテキストのまま） ②ローカル検証用に環境変数 `DB_SECRET_JSON`（Secret JSON を直接渡すローカル開発専用経路。未設定時は従来どおり `DB_SECRET_ARN` → Secrets Manager。どちらも無ければ ConfigError）を追加 ③6-3 予定だった `database/V000__connection_test.sql` はローカル MySQL の初期化に必要なため本ステップで前倒し作成（6-3 は Aurora への適用のみに） ④依存は boto3==1.43.46 / PyMySQL==1.2.0（shared と同一固定）。実装は Codex に委譲し Claude がレビュー（修正 1 件: ConfigError ログを型名のみ → メッセージ出力へ。欠落した環境変数名が CloudWatch で分かるようにするため。Secret 値は含まれない）。検証: pytest 全パス（各サービス 13 件 + shared 11 件）。**ローカル E2E**: mysql:8.0（Aurora MySQL 3.08 互換、V000 を docker-entrypoint-initdb.d で適用）+ 両イメージをルートコンテキストでビルドし `DB_SECRET_JSON` 経由で実行 → 両方 exit 0・「DB 接続成功」ログ・`connection_test` に 2 行（image-batch / sns-post-batch 各 1 行）を確認。異常系（Secret 環境変数なし → exit 1 + 欠落変数名のログ）も確認。ECR push・ECS 上での確認は 6-4 で実施
+
+- [x] **6-3** 接続確認用の最小 DDL を作成し、Aurora に適用
+  - 確認: `database/V000__connection_test.sql`（接続確認用の `connection_test` テーブル 1 つ）を AWS Console の Query Editor で適用でき、テーブルが確認できる
+  - 備考: Query Editor の利用には Aurora Serverless v2 の Data API 有効化（`enableDataApi: true`）が必要。CDK 設定は [docs/infra/stacks.html](infra/stacks.html) セクション 3.1 を参照。**本スキーマのテーブル設計・DDL・マイグレーション方針は Phase 9（前倒しで定義済み）を参照する。本スキーマの Aurora への適用は Phase 10 で行う**。V000 ファイル自体は 6-2 で作成済み（ローカル MySQL 初期化に使用）のため、本ステップは Aurora への適用（+ 必要なら Data API 有効化の CDK 変更）のみ。2026-07-14 実施: Data API は FoundationStack で設定済み・実機でも有効（`HttpEndpointEnabled: True`）を事前確認し、**CDK 変更は不要**だった。Query Editor（Secrets Manager ARN で接続、DB 名 `acps`）から V000 を適用。**つまずき 2 点**: ①接続ダイアログの「データベース名」欄を空のまま接続すると CREATE TABLE が `No database selected (1046)` で失敗する → 「データベースを変更する」から `acps` を指定して再接続で解消 ②Query Editor「最近」タブでは SQL 中の日本語が文字化け表示されるが表示上の問題のみで、保存されたテーブル定義は CLI の `SHOW CREATE TABLE` で日本語 COMMENT が V000 どおり正しく保存されていることを確認（utf8mb4）。裏取りは CLI（`aws rds-data execute-statement`）で `SHOW TABLES` / `DESCRIBE` / `SHOW CREATE TABLE` を実行し、`connection_test` の 3 カラム（id / service_name / executed_at）と定義一致を確認。なお Aurora 自動一時停止中に Data API を叩くと `DatabaseResumingException` が返り、再開まで数十秒待って再試行が必要（6-5 の db-readiness-check の挙動確認とも関連）
+
+- [x] **6-4** ECR に push して ECS RunTask
+  - 確認: CloudWatch Logs に「DB 接続成功」が出る（`connection_test` テーブルへの SELECT / INSERT の成功を含む）
+  - 備考: 2026-07-14 実施。**ビルド & push**: タグは不変タグ方式で現 HEAD `5d299755d7e8`（6-3 完了コミット。アプリコードは 6-2 と同一）を両サービス共通で使用。README 手順どおりルートコンテキスト（`docker build -f services/<name>/Dockerfile .`）+ `--platform linux/amd64 --provenance=false` でビルドし ECR push（`describe-images` でタグ存在を確認、タグなし attestation イメージの混入なし）。**デプロイ**: `cdk diff` で両スタックともタスク定義の新リビジョン（イメージ URI 変更）のみ・既存リソース変更なしを確認のうえ deploy（`dbReadinessCheckImageTag=27d0ab20a77e` は継続指定）。両タスク定義 revision 2 が新タグを参照することを `describe-task-definition` で確認。3-3 と同様、本番 deploy は Claude の自動実行が権限拒否され、ユーザー指示のうえ再実行した。**RunTask は SFN 経由（ユーザー確定）**: バッチアプリは DB 接続リトライを持たないため、WaitForDbReady が Aurora 自動一時停止からの再開を吸収する画像生成 SFN の手動実行（input `{"set_code":"test-set-1","scheduled_at":"2026-07-14T11:20:00Z"}`、実行名 `a837b218-def5-4fcf-9894-5d388fdd6286`）で両バッチを 1 実行で確認。親 SFN **SUCCEEDED、所要 1 分 47 秒**（20:20:14〜20:22:01 JST）→ 子 sns-posting-sfn が同一実行名で連鎖起動され **SUCCEEDED、所要 1 分 35 秒**（〜20:23:36 JST）。全ステート正常遷移（WaitForDbReady → RunImageBatchTask → StartSnsPostBatch / WaitForDbReady → RunSnsPostBatchTask）・Retry / Catch 発生なし。**確認条件達成**: CloudWatch Logs に「DB 接続成功: connection_test への INSERT/SELECT を確認しました」— image-batch（inserted_id=1, row_count=1）・sns-post-batch（inserted_id=2, row_count=2）、いずれも `secret_source=secrets-manager`（ECS では `DB_SECRET_ARN` 経由の取得経路が機能）。裏取りとして Data API の SELECT で `connection_test` に 2 行（id=1 `image-batch` 11:21:36 UTC / id=2 `sns-post-batch` 11:23:10 UTC）を確認。これで Phase 6 ゴール「ECS タスクから Aurora に接続できる」を両バッチで達成。コンソールでの目視確認はユーザーが実施
+
+- [x] **6-5** Aurora 一時停止状態からの再開リトライを確認（db-readiness-check タスクを使用）
+  - 確認: Aurora を一時停止させた後、db-readiness-check タスクを手動 RunTask で実行 → リトライ後に接続成功のログが出力される
+  - 備考: Phase 3-3 で動作確認済みの db-readiness-check タスクを使用する。バッチアプリケーション自体には DB 接続リトライを持たせない。2026-07-14 実施。**事前確認**: CloudWatch の `ServerlessDatabaseCapacity` で 0 ACU（6-4 の最終アクセス 20:23 JST 以降、約 90 分一時停止が継続）を確認。Data API / Query Editor は再開をトリガーしてしまうため使用せず、メトリクス参照のみで判定した。**手動 RunTask**: 3-3 と同一手順（family `acps-prod-db-readiness-check` 指定 → revision 1・タグ `27d0ab20a77e` が使用された。Public Subnet ×2 + DB 準備確認 SG + `assignPublicIp=ENABLED`。実値は sns-posting-sfn の WaitForDbReady ステート定義から抽出して流用）。環境変数オーバーライドなし。**結果**: タスク ID `98d12cb7dbc6444ebef689b8141bdd3f` が `STOPPED` / `stopCode: EssentialContainerExited` / `exitCode: 0`（21:56:54 起動 → 21:57:57 終了）。CloudWatch Logs: 「DB connection check attempt 1/9」（21:57:20.8）→ 約 12 秒の接続待ち → 「DB connection check succeeded on attempt 1/9」「Database is ready」（21:57:32.8）。`ServerlessDatabaseCapacity` は 21:56 の 0.0 → 21:57 に 1.0 へ遷移し、本 RunTask の初回接続試行が再開トリガーであることをメトリクスでも確認。**完了条件の文言との差（実態を記録）**: コンテナ内リトライは発動せず、「リトライ後に接続成功」ではなく「**初回試行（1/9）の接続待ち約 12 秒で再開を吸収して成功**」だった（4-6 の SFN 経由実行と同一挙動。PyMySQL の接続確立が Aurora の再開完了までブロックされるため、再開待ちは初回試行内で吸収される）。完了条件の意図＝一時停止からの再開を db-readiness-check が吸収して成功する、は達成。リトライ経路自体は 3-2 の pytest 23 件で検証済みで、接続が即時エラーで失敗するケース（再開の長期化・一時的な障害など）への保険として維持する。ユーザーと事前合意のうえ実態記録で完了扱いとし、workflow.html セクション 2 に実測メモ（note コールアウト）を追記した。これで Phase 6 の全ステップが完了。コンソールでの目視確認はユーザーが実施
+
+---
+
+## Phase 7: MonitoringStack
+
+**ゴール**: バッチ失敗時にアラーム通知が届く（空回しバッチのまま確認できる）
+
+- [x] **7-1** MonitoringStack に SNS Topic + CloudWatch Alarm を定義
+  - 確認: `cdk deploy -c env=prod MonitoringStack` 成功
+  - 備考: アラーム・EventBridge Rule の定義は [docs/infra/workflow.html](infra/workflow.html) セクション 8〜10 を参照。2026-07-14 実施。**実装**（Codex 委譲 + Claude レビュー）: `infra/lib/monitoring-stack.ts` に SNS Topic `acps-prod-alarm-topic`（サブスクリプションは 7-2 で手動作成）、CloudWatch Alarm 11 個（SFN 失敗 ×2 / SNS 投稿起動失敗 / Aurora CPU・メモリ / AWS/Scheduler 6 メトリクス。全て notBreaching・`acps-{env}-` で明示命名）、EventBridge Rule `acps-prod-ecs-task-abnormal-exit`（exitCode != 0 の Task State Change → SNS Topic）を定義。レビューで blocker 1 件修正: Codex 実装が `exitCode: [Match.anythingBut(0)]` と配列で包んでおり不正なネスト配列 `[[{"anything-but":[0]}]]` になっていた（deploy 時 InvalidEventPatternException で失敗する）→ 配列包みを除去。**設計書更新**: workflow.html セクション 8 のアラーム表に未記載だった Scheduler 6 メトリクスを stacks.html 3.4 の必須監視要求に合わせ個別アラームとして追記（decision コールアウトで経緯記録）、stacks.html 3.4 に確定した命名を記録。**検証**: jest 63 件全パス。deploy はユーザー承認のうえ実行し成功（77 秒。依存スタックはクロススタック参照の Outputs 追加のみで既存リソース変更なしを cdk diff で事前確認）。CLI 裏取りでアラーム 11 個・Topic・Rule（ENABLED・パターン一致）・4 スタック正常を確認。コンソールでの目視確認はユーザーが実施
+
+- [x] **7-2** SNS Topic サブスクリプションの設定・確認
+  - 確認: (1) SNS Topic にメールサブスクリプションが作成されている (2) 確認メールのリンクをクリックし、ステータスが「確認済み」になっている
+  - 備考: 手順の詳細は [docs/infra/operation.html](infra/operation.html) セクション 4.2 を参照。サブスクリプションの承認を行わないと通知が届かない。2026-07-15 実施。ユーザーが AWS Console から `acps-prod-alarm-topic` に Email サブスクリプション（takegaharawork@gmail.com）を作成し承認。**つまずき**: 確認メール（差出人 no-reply@sns.amazonaws.com）が Gmail の迷惑メールフォルダに振り分けられ、届いていないように見えた → 迷惑メールフォルダから発見しリンクを承認して解消。再発防止として operation.html 4.2 の注意書きに迷惑メール確認・再送手順を追記。裏取り: CLI（`list-subscriptions-by-topic`）で SubscriptionArn が PendingConfirmation → 実 ARN（確認済み）に遷移したことを確認
+
+- [x] **7-3** 意図的にバッチを失敗させてアラーム通知を確認
+  - 確認: メール通知が届く
+  - 備考: 空回しバッチ（Hello World / DB 接続テスト版）を意図的に失敗させて確認する（例: 終了コード 1 で終了させたイメージを一時的に push）。2026-07-15 実施。**方式**: 現行イメージ `5d299755d7e8` を FROM に ENTRYPOINT を `sys.exit(1)` へ上書きした一時イメージ（タグ `fail-test-7-3`、リポジトリのコード変更なし）を ECR へ push し、ImageBatchStack を一時デプロイ（タスク定義 revision 3）→ 画像生成 SFN を手動実行して失敗させた。**1 回目（00:33〜00:39 JST）で blocker を検出**: WaitForDbReady 成功 → RunImageBatchTask が exit 1 ×3 回（リトライ 30 秒/60 秒）→ ExecutionFailed となり、ECS 異常終了 Rule 経由の 3 通は配信されたが、アラーム `acps-prod-image-generation-sfn-failed` は ALARM 遷移（00:39:29）したのに通知アクションが `Failed to execute action` で失敗（SNS への発行自体が拒否され `NumberOfMessagesPublished` に現れない）。**原因**: EventBridge Rule のターゲット設定で CDK が明示的 TopicPolicy を作成すると SNS デフォルトポリシー（同一アカウント許可）が置換され、Topic ポリシーが `events.amazonaws.com` の Publish 許可のみになっていた（KMS は未設定で無関係）。**修正**: `monitoring-stack.ts` に `cloudwatch.amazonaws.com` の Publish 許可（`aws:SourceAccount` / `aws:SourceArn` 条件付き、Sid `AllowCloudWatchAlarmsPublish`）を追加し MonitoringStack をデプロイ（jest 63 件パス、diff は TopicPolicy のみ。[stacks.html](infra/stacks.html) 3.4 の SNS Topic 行に注記を追記）。**2 回目（09:58〜10:04 JST）で確認条件達成**: SFN FAILED → ALARM 遷移（10:04:29）→ `Successfully executed action`、SNS 配信メトリクスで 4 通（Rule ×3 + アラーム ×1）配信成功・失敗 0 を裏取り。ユーザーが Gmail で計 7 通（1 回目 Rule ×3 + 2 回目 Rule ×3 + アラーム ×1）の受信を確認した。**復旧**: 元タグ `5d299755d7e8` で ImageBatchStack を再デプロイ（revision 4）→ SFN 手動実行で親子とも SUCCEEDED（10:33 / 10:35）・アラーム OK 自動復帰を確認し、ECR の一時タグを削除（正規タグのみ残存）。prod への各 deploy は 6-4 と同様 Claude の自動実行が権限拒否され、ユーザー承認のうえ再実行した。これで Phase 7 の全ステップが完了。コンソールでの目視確認はユーザーが実施
+
+---
+
+## Phase 8: CI/CD パイプライン構築
+
+**ゴール**: GitHub push で自動的にビルド・デプロイされる（イメージは空回し版のままでよい）
+
+- [x] **8-0** CodeStar Connections の事前作成（AWS コンソール）
+  - 確認: AWS コンソールの CodePipeline > 設定 > 接続で、GitHub との接続が「利用可能」ステータスになっている
+  - 備考: CodeStar Connections は CDK 管理外。AWS コンソールで作成し、GitHub リポジトリとの接続を承認する。詳細は [docs/infra/cicd.html](infra/cicd.html) セクション 1.1 を参照。2026-07-15 実施。接続名 `AutoContentPublisherSystem`（Provider: GitHub）を作成し、CLI で `ConnectionStatus: AVAILABLE` を確認した。ARN: `arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7`（8-1 のパイプライン定義で Source Stage に指定する）
+
+- [x] **8-1** CodePipeline + CodeBuild の定義（image-batch 用、ImageBatchStack に追加）
+  - 確認: push → ECR イメージ更新 → タスク定義更新
+  - 備考: buildspec の構成は [docs/infra/cicd.html](infra/cicd.html) セクション 3.1 を参照。2026-07-15 実施。実装は Codex に委譲し、CodePipeline V2（`acps-prod-image-batch-pipeline`、main × `services/image-batch/**` OR `shared/**` のパスフィルタトリガー、`crossAccountKeys: false`）+ CodeBuild（standard:7.0 / privileged / SMALL、`services/image-batch/buildspec.yml` 新規作成）を ImageBatchStack に追加（コミット 6faa948、jest 67 件パス）。**レビューで blocker 1 件を修正**: Source アクションロールの信頼ポリシーがサービスプリンシパル（codepipeline.amazonaws.com）になっており、実際はパイプラインロールが `sts:AssumeRole` する連鎖構造のため実行時に必ず失敗する構成だった → アカウント root 信頼へ修正。トリガーフィルタ使用時は Source アクションの `DetectChanges: false`（CDK の `triggerOnPush: false`）が正しい設定であることを AWS 公式ドキュメントで裏取りした。新形式 `codeconnections` ARN 向けの `codeconnections:UseConnection` 明示付与とあわせて [cicd.html](infra/cicd.html) セクション 1.1 実装メモ・[security.html](infra/security.html) セクション 2.5 に記録。**確認**: buildspec を main へ push 後に ImageBatchStack をデプロイ（13 リソース追加のみ。prod deploy は例によって Claude の自動実行が権限拒否され、ユーザーが実行）。パイプライン作成時の初回自動実行（trigger: CreatePipeline）が Succeeded となり、pytest → ECR push（タグ `6faa9486d8e4` = コミットハッシュ先頭 12 文字）→ タスク定義 revision 5 の登録を CLI で裏取りした。**残確認**: push イベントによるトリガー起動は未検証（初回実行は CreatePipeline 起因のため）。次に `services/image-batch/**` か `shared/**` を変更する push で確認する。8-2 の sns-post-batch のみの変更で image-batch パイプラインが起動しないことがパスフィルタの負のテストになる → 8-2 の push で起動しないことを確認済み。**運用注意**: 以後の CDK デプロイでは `-c imageBatchImageTag=6faa9486d8e4`（現行タグ）を指定する
+
+- [x] **8-2** sns-post-batch 用パイプラインの追加（SnsPostBatchStack に追加）
+  - 確認: 同上
+  - 備考: 2026-07-15 実施。実装は Codex に委譲し、8-1 の完全対称形として CodePipeline V2（`acps-prod-sns-post-batch-pipeline`、main × `services/sns-post-batch/**` OR `shared/**` のパスフィルタトリガー、`crossAccountKeys: false`）+ CodeBuild（standard:7.0 / privileged / SMALL、`services/sns-post-batch/buildspec.yml` 新規作成）を SnsPostBatchStack に追加（コミット 9100657、jest 71 件パス）。レビューは blocker なし（8-1 の blocker 修正ポイント＝Source アクションロールのアカウント root 信頼・`triggerOnPush: false`・`codeconnections:UseConnection` 明示付与・PassRole 条件、の踏襲を確認）。付随変更として、infra/lib に残る古いコンパイル済み .js を jest が誤って解決しないよう jest.config.js に `.ts` 優先の `moduleFileExtensions` を追加。**確認**: SnsPostBatchStack デプロイ（13 リソース追加のみ、ユーザー実行）後、パイプライン作成時の初回自動実行（trigger: CreatePipeline）が Succeeded となり、pytest → ECR push（タグ `91006575046a` = コミットハッシュ先頭 12 文字）→ タスク定義 revision 3 の登録を CLI で裏取りした。**パスフィルタの負のテスト（8-1 の残確認）**: 8-2 の push（`services/sns-post-batch/**` + `infra/**` のみの変更）で image-batch パイプラインが起動しないことを CLI で確認した。**残確認**: sns-post-batch 側の push イベントトリガー起動は未検証（初回実行は CreatePipeline 起因のため）。次に `services/sns-post-batch/**` か `shared/**` を変更する push で確認する。**運用注意**: 以後の CDK デプロイでは `-c snsPostBatchImageTag=91006575046a`（現行タグ）を指定する
+
+- [x] **8-3** インフラの手動デプロイ運用手順を確認
+  - 確認: `cdk diff -c env=prod <StackName>` → `cdk deploy -c env=prod <StackName>` の手動運用が問題なく行えることを確認
+  - 備考: インフラパイプラインは構築しない（破壊的変更リスク回避のため。[docs/infra/cicd.html](infra/cicd.html) 参照）。2026-07-15 実施。**diff 確認（4 スタック）**: 現行タグ 3 つ（`dbReadinessCheckImageTag=27d0ab20a77e` / `imageBatchImageTag=6faa9486d8e4` / `snsPostBatchImageTag=91006575046a`）を指定して全スタックの `cdk diff` が成功。FoundationStack / MonitoringStack は差分なし。ImageBatchStack / SnsPostBatchStack はタスク定義のイメージタグ変更（CFn 保持の旧タグ `5d299755d7e8` → パイプライン登録済みの現行タグ）のみで、これはパイプラインが CFn 外で revision を登録する設計どおりの乖離。**手順書の乖離を 2 点検出し修正**: (1) cicd.html 3.2 の手順例が 8-1/8-2 で必須化した `imageBatchImageTag` / `snsPostBatchImageTag` 未反映で、記載どおりでは synth エラーになる、(2) 1 スタックのみの diff / deploy でも CDK が上流依存スタックを選択に含めて synth 検証するため、対象外スタックのタグも必要（`ImageBatchStack` 単独指定で FoundationStack / SnsPostBatchStack のタグ未指定エラーを実測）→「常に 3 タグ指定」をルール化し cicd.html 3.2 に指定ルール・現行タグの確認方法・パイプライン実行後に diff へタグ変更が現れるのは想定内である旨を追記（6.1・operation.html 1.1 は 3.2 への参照に変更）。**deploy 確認**: prod deploy は例によって Claude の自動実行が権限拒否され、ユーザーが 3 タグ指定で SnsPostBatchStack + ImageBatchStack をデプロイ（両スタック UPDATE_COMPLETE、14:42〜14:43 JST）。タスク定義は image-batch revision 6（タグ `6faa9486d8e4`）/ sns-post-batch revision 4（タグ `91006575046a`）が ACTIVE となり、パイプラインが登録した現行イメージと同一であることを `describe-task-definition` で裏取り。デプロイ後の再 diff で 4 スタックとも差分ゼロ（CFn のタグ乖離解消）を確認し、diff → deploy の手動運用一巡が問題なく行えることを確認した。これで Phase 8 の全ステップが完了（インフラ構築 Phase 0〜8 完了。次は Phase 10-1 アプリ設計の最終 Fix）
+
+---
+
+## Phase 10: 実装準備
+
+- [x] **10-1** アプリ設計の最終 Fix（インフラ構築の知見反映）
+  - 確認: [docs/app/index.html](app/index.html) の検討メモとインフラ構築（Phase 0〜8）で得た知見を棚卸しし、アプリ設計書に反映されている。blocker のみ修正し、改善提案は設計課題リストに記録されている
+  - 備考: 前倒しで作成した Phase 9 の成果物（一時 Fix）をここで最終 Fix する（旧 9-1 の「インフラ構築の知見反映」に相当）。2026-07-15 実施。検討メモ 2 件・Phase 0〜8 の知見・設計課題リストの 10-1 割当 4 件を棚卸しして反映した。**(1) 検討メモ反映**: design-outline.html 1.1 を 3 層構造（契約 / 方式 / セット）へ拡張し、batch-flow.html 2.1 に生成方式の strategy 構造（共通骨格 / `generators/<方式名>.py` / レジストリ。`set_code` 分岐禁止）・方式の契約・方式カタログを新設（課題 409 解消。`docs/app/generators/` の実ファイルは方式の本採用時に作成） **(2) 外部 API 名の非固定化（ユーザー決定）**: 画像生成 API を Nano Banana Pro（Gemini）から ChatGPT Images 2.0（OpenAI、API モデル名 `gpt-image-2`）へ変更予定とし、あわせて「特定 API 名は方式カタログ・方式設計書・セット別設計書にのみ書く」原則を確立。上位層（README / overview/system-overview.html / infra/architecture.html）から画像生成 API・SNS プラットフォーム（Instagram）の固定表現を排除（複数 SNS 媒体前提もユーザー決定）。初期方式はカタログに「`gpt-image-single`（仮称）・計画中」で登録。Secret `acps/prod/image/api-key`（`{"api_key"}` 形状）は API 中立のためインフラ変更不要 **(3) system-overview.html 見直し**: 構成図・本文の API 名中立化、Google Gemini への誤リンク削除、「アプリ仕様は未確定」note を確定済み参照へ更新、§6 拡張計画に 3 層構造・複数プラットフォーム前提を追記 **(4) operation.html の実態合わせ（blocker 5 件）**: ①`cdk deploy` の 3 タグ指定必須化（cicd.html 3.2 参照方式） ②初セットは既存プレースホルダ Scheduler（DISABLED・`fashion-set-1`）を本番 cron へ書き換えて ENABLED 化する旨を明記 ③Query Editor の注意 3 点（DB 名 `acps` 指定・`DatabaseResumingException`・文字化けは表示のみ）を共通注記化 ④手動再実行は SFN 経由必須（直接 RunTask 禁止）を明記 ⑤画像 API キーの実値投入手順を 5.4 に新設。5.1 の Secret 規約は再確認済み（矛盾なし）に更新 **(5) 小反映**: batch-flow.html §1 に前提 2 点（起動は SFN 経由限定 = `EXECUTION_ARN` 常設 / DB アクセスは `acps_shared`・明示 commit）、§3.3 に INSERT-or-skip 明文化（課題 408 解消）と固定 IP なしの制約注記、data-model.html 4.7 に「画像と SNS は別 execution_arn・同一実行名で相関」を追記 **(6) IAM 削除（課題 407 解消・ユーザー決定）**: SNS 投稿バッチタスクロールの未使用 `cloudwatch:PutMetricData` を SnsPostBatchStack から削除（SFN 実行ロール側の `SnsPostStartFailureCount` 発行用は残置）。`npm test` 全 71 件パス、`cdk diff`（3 タグ）で当該ポリシー削除のみを確認し、ユーザーが SnsPostBatchStack をデプロイ（UPDATE_COMPLETE）。security.html 2.1 の decision に経緯を記録 **(7) 締め**: 設計課題リストは解消 4 件（407/408/409 + 410 は「継ぎ目は設けない」で結論）・新規 3 件（Scheduler セット別命名 / 複数プロバイダ時の Secret 命名 / 2 つ目の SNS プラットフォーム追加時の分冊ルール）。アプリ設計書 4 分冊のバッジを「Phase 10-1 で最終 Fix」に更新し、docs 全 HTML の内部リンク到達性と Nano Banana 残存ゼロ・上位層の Instagram 直書きゼロを確認した

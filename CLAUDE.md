@@ -18,7 +18,8 @@ AutoContentPublisherSystem/
 │   ├── infra/                       #   インフラ設計書（HTML）
 │   ├── app/                         #   アプリ設計書（大枠は骨子版作成済み・Phase 9 で詳細化。セット別設計書は app/sets/ に初セット追加時に作成）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
-│   └── development-plan.md          #   開発計画・進捗管理
+│   ├── development-plan.md          #   開発計画・進捗管理（現役の計画・設計課題リスト）
+│   └── development-log.md           #   開発記録（完了ステップの実施記録）
 ├── infra/                           # AWS CDK プロジェクト（TypeScript）
 ├── services/
 │   ├── db-readiness-check/          # DB 準備確認（Python）
@@ -42,7 +43,7 @@ AutoContentPublisherSystem/
 
 ## 設計書体系
 
-設計書は **HTML** で記述する（開発計画 `docs/development-plan.md` のみ Markdown）。体系の全体像・スコープ境界・設計 Fix 基準は `docs/index.html` を参照。
+設計書は **HTML** で記述する（開発計画 `docs/development-plan.md` と開発記録 `docs/development-log.md` のみ Markdown）。体系の全体像・スコープ境界・設計 Fix 基準は `docs/index.html` を参照。
 
 - **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（大枠は Phase A、詳細は Phase 9 で作成する 2 段階方針）
 - **インフラ設計書にアプリ仕様を書かない**。作業中にアプリの論点（処理ロジック・テーブル設計等）が出たら `docs/app/index.html` の検討メモに記録する
@@ -72,6 +73,7 @@ AutoContentPublisherSystem/
 | セットを追加・廃止する | `docs/app/operation.html` セクション 2 + `docs/app/design-outline.html` セクション 1.1（セット別設計書ルール） |
 | アプリ（業務ロジック）の詳細設計・実装 | Phase 9 以降。Phase A の大枠設計書（骨子版）を詳細化してから着手する |
 | 開発の次ステップを確認する | `docs/development-plan.md` |
+| 過去の実施記録・経緯を確認する | `docs/development-log.md`（完了ステップの確認・備考の全文） |
 
 ### 設計 Fix・レビューの運用ルール
 
@@ -83,7 +85,7 @@ AutoContentPublisherSystem/
 
 ## 開発計画
 
-- 開発計画と進捗は `docs/development-plan.md` で管理する
+- 開発計画と進捗は `docs/development-plan.md` で管理する。ステップ完了時、計画書にはチェック + 完了日 + 要点のみを記録し、詳細な実施記録は `docs/development-log.md` に追記する（計画書の肥大化防止）
 - **Phase D（インフラ設計の一時 Fix）→ Phase A（アプリ設計の大枠）→ Phase 9（アプリ設計の詳細・前倒し）→ Phase 0〜8（インフラ構築: 空回し確認・監視・CI/CD まで）→ Phase 10 以降（アプリ実装。冒頭 10-1 でアプリ設計の最終 Fix）** の順に進める
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
 - 作業開始時は `docs/development-plan.md` を読み、現在の Phase・ステップを確認してから着手する

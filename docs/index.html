@@ -19,7 +19,7 @@
 
 <div class="note">
   <span class="callout-title">閲覧方法</span>
-  設計書は HTML で記述している。GitHub 上ではソース表示になるため、<strong>ローカルでブラウザから開く</strong>か、VS Code の拡張機能（Live Preview 等）で閲覧すること。開発計画（<a href="development-plan.md">development-plan.md</a>）のみ、進捗チェックリストとして頻繁に編集するため Markdown を維持している。
+  設計書は HTML で記述している。GitHub 上ではソース表示になるため、<strong>ローカルでブラウザから開く</strong>か、VS Code の拡張機能（Live Preview 等）で閲覧すること。開発計画（<a href="development-plan.md">development-plan.md</a>）と開発記録（<a href="development-log.md">development-log.md</a>）のみ、進捗チェックリスト・追記型の記録として頻繁に編集するため Markdown を維持している。
 </div>
 
 <h2 id="principles">1. 設計原則</h2>
@@ -53,7 +53,8 @@
 │   ├── operation.html             #   アプリ運用設計（Phase 9-4 詳細化済み）
 │   └── sets/                      #   セット別設計書（1 セット 1 本。初セット追加時に作成）
 ├── _archive/                      # 旧 Markdown 設計書（参考資料。現役の設計書ではない）
-└── development-plan.md            # 開発計画・進捗管理（Markdown）</code></pre>
+├── development-plan.md            # 開発計画・進捗管理（Markdown。現役の計画・設計課題リスト）
+└── development-log.md             # 開発記録（Markdown。完了ステップの実施記録）</code></pre>
 
 <h3>概要</h3>
 <div class="card-grid">
@@ -180,7 +181,7 @@
 
 <h3>4.2 レビュー運用ルール</h3>
 <ol>
-  <li><strong>観点を限定する</strong>: 生成 AI にレビューさせる際は、必ず観点を明示指定する（レビュープロンプトのテンプレートは <a href="development-plan.md">development-plan.md</a> の Phase D 備考を参照）。観点を指定しないフリーレビューは行わない</li>
+  <li><strong>観点を限定する</strong>: 生成 AI にレビューさせる際は、必ず観点を明示指定する（レビュープロンプトのテンプレートは <a href="development-log.md">development-log.md</a> の Phase D（D-2 備考）を参照）。観点を指定しないフリーレビューは行わない</li>
   <li><strong>指摘を分類する</strong>: 指摘は「<strong>blocker</strong>（誤り・矛盾・欠落で、次フェーズの作業を妨げるもの）」と「<strong>改善提案</strong>（あった方が良いが、なくても作業は進められるもの）」に分類する</li>
   <li><strong>blocker のみ修正する</strong>: 改善提案は修正せず、development-plan.md の「設計課題リスト」に記録して Fix を妨げない</li>
   <li><strong>レビューは最大 2 巡まで</strong>: 3 巡目以降の指摘はすべて設計課題リスト行きとし、レビューを打ち切って Fix を宣言する</li>
