@@ -13,7 +13,7 @@
 <h1>バッチ処理フロー設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</span>
-  <span>最終更新: 2026-07-15</span>
+  <span>最終更新: 2026-07-18</span>
 </div>
 
 <div class="note">
@@ -89,7 +89,7 @@
     <li><strong>生成方式 strategy モジュール</strong>: <code>generators/&lt;方式名&gt;.py</code>（1 方式 1 ファイル）</li>
     <li><strong>方式名レジストリ</strong>: 方式名 → モジュールの対応表。新方式の追加は<strong>「新規ファイル + レジストリ 1 行」に閉じ</strong>、既存方式のファイルには触れない</li>
   </ul>
-  方式の割当は DB のセット設定（方式名の設定値）で行い、<strong>コードに <code>set_code</code> の分岐は書かない</strong>。
+  方式の割当は DB のセット設定（<code>batch_sets.generator_name</code>。<a href="data-model.html#detail-batch-sets">data-model.html セクション 4.1</a>）で行い、<strong>コードに <code>set_code</code> の分岐は書かない</strong>。
   共有部品（共通骨格・API クライアント）の変更は CI/CD パイプラインの pytest ゲート（<a href="../infra/cicd.html">infra/cicd.html</a>）で守る。
 </div>
 

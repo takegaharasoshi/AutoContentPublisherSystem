@@ -13,7 +13,7 @@
 <h1>データモデル設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-3 で詳細化済み・Phase 10-1 で最終 Fix</span>
-  <span>最終更新: 2026-07-15</span>
+  <span>最終更新: 2026-07-18</span>
 </div>
 
 <div class="note">
@@ -117,7 +117,7 @@
     <tr>
       <td><code>batch_sets</code></td>
       <td>セット定義（1 セット = 1 テーマ）。外部識別子は <code>set_code</code></td>
-      <td>旧設計の <code>max_post_retries</code> は削除（自動再試行を行わない方針のため不要）。将来のセット別設定拡張はカラム追加ではなくセット別設計書（<a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>）で表現する</td>
+      <td>旧設計の <code>max_post_retries</code> は削除（自動再試行を行わない方針のため不要）。生成方式の割当カラム <code>generator_name</code> を持つ（セクション 4.1）。それ以外の将来のセット別設定拡張はカラム追加ではなくセット別設計書（<a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>）で表現する</td>
     </tr>
     <tr>
       <td><code>prompt_configs</code></td>
@@ -194,8 +194,20 @@
 <h3 id="detail-batch-sets">4.1 batch_sets</h3>
 <ul>
   <li><code>set_code</code>（UNIQUE）が S3 キー・Secret 名・EventBridge Scheduler 入力・環境変数 <code>SET_CODE</code> に使われる外部識別子。DB 内部の FK 参照はすべて <code>id</code> で行う</li>
+  <li><code>generator_name</code> がセットに割り当てる生成方式（image-batch の strategy モジュール）を決める。値は方式名レジストリのキーであり、方式カタログ（<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）に載っている方式名を設定する</li>
   <li><code>is_active=0</code> でセット廃止を表現する（レコードは削除しない。<a href="operation.html#set-retire">operation.html セクション 2.2</a>）</li>
 </ul>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-07-18、Phase 10-3）: 生成方式カラム generator_name の追加（V001 直接修正）</span>
+  「方式の割当は DB のセット設定で行う」（<a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、2026-07-12 合意）に対し、合意より前に作成した V001 に方式名カラムがなかった設計ギャップを、<code>generator_name</code> カラムの追加で決着した。
+  V001 は Aurora 未適用（適用は Phase 10-4）のため、<strong>マイグレーション（V002）は作らず V001 を直接修正</strong>した（ユーザー確定）。カラム仕様と理由:
+  <ul style="margin:.3rem 0 0;">
+    <li><code>generator_name VARCHAR(50) NOT NULL</code>（デフォルトなし）: 方式未割当のセットは画像生成バッチを実行できないため、セット登録時に明示的な割当を強制する</li>
+    <li><strong>ENUM にしない</strong>: 方式の追加を「新規ファイル + レジストリ 1 行」に閉じる原則（batch-flow.html セクション 2.1）を守るため、方式追加に DDL 変更を伴わせない</li>
+    <li><strong>FK・UNIQUE・専用インデックスなし</strong>: 方式はコード側レジストリの概念であり DB エンティティではない。未知の方式名の検証はアプリ層の責務（バッチ起動時のレジストリ解決で設定ミスとしてエラー）。複数セットが同一方式を共有できる</li>
+  </ul>
+</div>
 
 <h3 id="detail-prompt-configs">4.2 prompt_configs</h3>
 <ul>
@@ -323,7 +335,7 @@ LIMIT 1;</code></pre>
 <ul>
   <li>DDL ファイルは <code>database/</code> 配下に Flyway 風の命名規則 <code>V&lt;連番&gt;__&lt;説明&gt;.sql</code> で管理する（Phase 6-2 で作成した接続確認用 <code>V000__connection_test.sql</code> と連番を共有する）</li>
   <li>本スキーマの初期構築は <a href="../../database/V001__initial_schema.sql">V001__initial_schema.sql</a> の 1 ファイルにまとめる（まだ本番データが存在しないため、初期構築を複数ファイルに分割するメリットがない）</li>
-  <li>今後のスキーマ変更は <code>V002__</code> 以降の新規ファイルとして追加する（既存ファイルの書き換えはしない）。マイグレーション自動適用ツール（Flyway 等）の導入は Phase 10 以降の運用実態を見て判断し、当面は SQL ファイルをレビュー後に AWS Console の Query Editor で手動適用する</li>
+  <li>今後のスキーマ変更は <code>V002__</code> 以降の新規ファイルとして追加する（<strong>適用済みファイルの書き換えはしない</strong>。Aurora 適用前の V001 は Phase 10-3 で直接修正した — セクション 4.1 の decision を参照）。マイグレーション自動適用ツール（Flyway 等）の導入は Phase 10 以降の運用実態を見て判断し、当面は SQL ファイルをレビュー後に AWS Console の Query Editor で手動適用する</li>
   <li>本スキーマの Aurora への適用自体は <strong>Phase 10 で実施</strong>する（Phase 9 は DDL ファイル作成まで）</li>
 </ul>
 

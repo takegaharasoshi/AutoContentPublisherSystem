@@ -65,9 +65,9 @@
   - 確認: 本ファイルの「Phase 10 以降」が具体的なステップに展開されている
   - 備考: 2026-07-18 完了。アプリ実装を Phase 10〜13 の 14 ステップへ展開し、あわせて完了フェーズの実施記録を [development-log.md](development-log.md) へ移管（計画書 414 行 → 約 100 行）。詳細は development-log.md の 10-2 を参照
 
-- [ ] **10-3** 生成方式カラムの反映（V001 直接修正）
+- [x] **10-3** 生成方式カラムの反映（V001 直接修正）
   - 確認: `database/V001__initial_schema.sql` の `batch_sets` に生成方式名カラムがあり、[docs/app/data-model.html](app/data-model.html) セクション 4.1・ER 図と一致している
-  - 備考: 「方式の割当は DB のセット設定で行う」（[docs/app/batch-flow.html](app/batch-flow.html) セクション 2.1）に対し、合意（2026-07-12）より前に作成した V001 に方式名カラムがない設計ギャップの決着。V001 は Aurora 未適用のため直接修正する（ユーザー確定。V002 は作らない）。カラム名（例 `generator_name`）・制約は実装時に確定し、「実装を正とする」ルールで data-model.html に decision を記録する
+  - 備考: 2026-07-18 完了。`batch_sets` に `generator_name VARCHAR(50) NOT NULL` を追加（V002 なしの V001 直接修正）し、data-model.html 4.1 の decision にカラム仕様・理由を記録（関連 3 設計書の記述も整合）。あわせて構文検証で検出した複合 FK 5 本の COMMENT 句（MySQL 構文違反。10-4 適用を阻む blocker）を行コメント化で修正。詳細は [development-log.md](development-log.md) の 10-3 を参照
 
 - [ ] **10-4** 本スキーマ DDL（V001）の Aurora 適用
   - 確認: Query Editor で V001 を適用し、`SHOW TABLES` で 9 テーブル + CLI（`SHOW CREATE TABLE`）で定義一致を裏取りできている
@@ -157,7 +157,7 @@
 
 | 日付 | Phase-Step | 問題 | 解決策 |
 |---|---|---|---|
-| | | | |
+| 2026-07-18 | 10-3 | V001 の複合 FK 5 本（`generated_images` 2 本・`posts` 3 本）に付けていた `COMMENT` 句が MySQL 構文違反（FOREIGN KEY 制約は COMMENT をサポートしない）。V001 は実 MySQL で未実行のため潜伏しており、10-4 の適用時に ERROR 1064 で失敗するところだった | 10-3 の構文検証（sqlfluff・MySQL 方言）で検出。COMMENT の記載内容を FK 直前の行コメントへ移動して解消（`UNIQUE KEY`・`KEY` の COMMENT は正当な構文のため残置）。全 9 テーブルのパース成功を再検証済み |
 
 ## 設計課題リスト
 

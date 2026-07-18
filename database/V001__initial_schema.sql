@@ -19,6 +19,7 @@ CREATE TABLE batch_sets (
     set_code VARCHAR(50) NOT NULL COMMENT 'セット識別コード（外部識別子。S3キー・Secret名・Scheduler入力・環境変数 SET_CODE に使用）',
     name VARCHAR(200) NOT NULL COMMENT 'セット名称',
     description TEXT NULL COMMENT '説明',
+    generator_name VARCHAR(50) NOT NULL COMMENT '生成方式名（image-batch の方式名レジストリのキー。未知の方式名はレジストリ解決時に設定ミスとしてエラー。方式の契約・カタログは docs/app/batch-flow.html セクション 2.1）',
     is_active TINYINT(1) NOT NULL DEFAULT 1 COMMENT '有効フラグ（0 でセット廃止。両バッチはスキップして正常終了する）',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '作成日時（UTC）',
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日時（UTC）',
@@ -106,8 +107,9 @@ CREATE TABLE generated_images (
     KEY idx_generated_images_set_run (set_id, generation_run_id) COMMENT '複合 FK (set_id, generation_run_id) 用インデックス',
     KEY idx_generated_images_set_prompt (set_id, prompt_config_id) COMMENT '複合 FK (set_id, prompt_config_id) 用インデックス。左端プレフィックス (set_id) は単純 FK にも使用する',
     CONSTRAINT fk_generated_images_set FOREIGN KEY (set_id) REFERENCES batch_sets (id),
-    CONSTRAINT fk_generated_images_generation_run FOREIGN KEY (set_id, generation_run_id) REFERENCES generation_runs (set_id, id) COMMENT 'セット境界の整合性を保証する複合 FK',
-    CONSTRAINT fk_generated_images_prompt_config FOREIGN KEY (set_id, prompt_config_id) REFERENCES prompt_configs (set_id, id) COMMENT 'セット境界の整合性を保証する複合 FK'
+    -- 以下 2 本はセット境界の整合性を保証する複合 FK（FK 制約に COMMENT 句は使えないため行コメントで記載）
+    CONSTRAINT fk_generated_images_generation_run FOREIGN KEY (set_id, generation_run_id) REFERENCES generation_runs (set_id, id),
+    CONSTRAINT fk_generated_images_prompt_config FOREIGN KEY (set_id, prompt_config_id) REFERENCES prompt_configs (set_id, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='生成画像のメタ情報。generation_runs の子（1 実行 : N 画像）。投稿ステータスは持たない（posts / post_images から導出）';
 
@@ -154,9 +156,11 @@ CREATE TABLE posts (
     KEY idx_posts_set_sns_account (set_id, sns_account_id) COMMENT '複合 FK (set_id, sns_account_id) 用インデックス',
     KEY idx_posts_set_caption_template (set_id, caption_template_id) COMMENT '複合 FK (set_id, caption_template_id) 用インデックス',
     CONSTRAINT fk_posts_set FOREIGN KEY (set_id) REFERENCES batch_sets (id),
-    CONSTRAINT fk_posts_generation_run FOREIGN KEY (set_id, generation_run_id) REFERENCES generation_runs (set_id, id) COMMENT 'セット境界の整合性を保証する複合 FK',
-    CONSTRAINT fk_posts_sns_account FOREIGN KEY (set_id, sns_account_id) REFERENCES sns_accounts (set_id, id) COMMENT 'セット境界の整合性を保証する複合 FK',
-    CONSTRAINT fk_posts_caption_template FOREIGN KEY (set_id, caption_template_id) REFERENCES caption_templates (set_id, id) COMMENT 'セット境界の整合性を保証する複合 FK。caption_template_id が NULL の間は制約評価対象外'
+    -- 以下 3 本はセット境界の整合性を保証する複合 FK（FK 制約に COMMENT 句は使えないため行コメントで記載。
+    -- fk_posts_caption_template は caption_template_id が NULL の間は制約評価対象外）
+    CONSTRAINT fk_posts_generation_run FOREIGN KEY (set_id, generation_run_id) REFERENCES generation_runs (set_id, id),
+    CONSTRAINT fk_posts_sns_account FOREIGN KEY (set_id, sns_account_id) REFERENCES sns_accounts (set_id, id),
+    CONSTRAINT fk_posts_caption_template FOREIGN KEY (set_id, caption_template_id) REFERENCES caption_templates (set_id, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='投稿 1 件（生成実行 × アカウント）。旧 post_records（画像 × アカウント × 試行）を「投稿」単位に再編したもの';
 

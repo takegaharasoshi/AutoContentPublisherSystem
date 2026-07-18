@@ -13,7 +13,7 @@
 <h1>アプリ運用設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
-  <span>最終更新: 2026-07-15</span>
+  <span>最終更新: 2026-07-18</span>
 </div>
 
 <div class="note">
@@ -111,9 +111,9 @@
     <li>Query Editor の「最近」タブでは SQL 中の日本語が文字化けして表示されるが、表示上の問題のみで保存データは正しい（utf8mb4）</li>
   </ul>
 </div>
-<pre><code>-- (1) batch_sets
-INSERT INTO batch_sets (set_code, name, description, is_active)
-VALUES ('fashion-set-2', 'ファッション系セット2', 'セット2の説明', 1);
+<pre><code>-- (1) batch_sets（generator_name は方式カタログ〔batch-flow.html セクション 2.1〕の方式名を設定する）
+INSERT INTO batch_sets (set_code, name, description, generator_name, is_active)
+VALUES ('fashion-set-2', 'ファッション系セット2', 'セット2の説明', '(方式名)', 1);
 -- 発行された id を以降の set_id として使う
 
 -- (2) prompt_configs（初期運用は is_active=1 を 1 件のみ）
