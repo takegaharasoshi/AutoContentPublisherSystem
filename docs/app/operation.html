@@ -13,7 +13,7 @@
 <h1>アプリ運用設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
-  <span>最終更新: 2026-07-18</span>
+  <span>最終更新: 2026-07-19</span>
 </div>
 
 <div class="note">
@@ -65,7 +65,7 @@
 
 <h3 id="set-add">2.1 セット追加手順</h3>
 
-<p>新しいセット（テーマ）を追加する手順を以下の順序で行う。順序を守る理由: Secret を先に作らないと DB に <code>sns_accounts</code> を登録しても投稿バッチが認証情報を取得できず即失敗するため（セクション 5.2 と同じ理由）。</p>
+<p>新しいセット（テーマ）を追加する手順を以下の順序で行う。順序を守る理由: Secret を先に作らないと DB に <code>sns_accounts</code> を登録しても投稿バッチが認証情報を取得できず即失敗するため（セクション 5.3 と同じ理由）。</p>
 
 <h4>手順 0: セット別設計書を作成する</h4>
 <p><code>docs/app/sets/&lt;set_code&gt;.html</code> に、標準記載項目（テーマ、投稿先アカウント構成、スケジュール、プロンプト / キャプションの方式選択、失敗時ポリシー、共通フローからの差分）を記録する（ルールは<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。雛形は以下を複製して使う。</p>
@@ -95,7 +95,7 @@
 &lt;/html&gt;</code></pre>
 
 <h4>手順 1: Secrets Manager に SNS 認証 Secret を作成する</h4>
-<p>名前規約・値のスキーマは <a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2〜1.3</a>（構成要素の意味付けはセクション 5.1 で最終確認済み）。</p>
+<p>名前規約・値のスキーマは <a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2〜1.3</a>（構成要素の意味付けはセクション 5.2 で最終確認済み）。</p>
 <pre><code>aws secretsmanager create-secret \
   --name acps/prod/fashion-set-2/sns/instagram/main-account \
   --secret-string '{"access_token":"...","ig_user_id":"...","token_expires_at":"2026-09-05T00:00:00Z"}'</code></pre>
@@ -285,7 +285,65 @@ ORDER BY gr.scheduled_at ASC;</code></pre>
 
 <h2 id="secret-ops">5. Secret 運用（SNS 認証・画像生成 API キー）・トークン更新</h2>
 
-<h3 id="secret-final">5.1 Secret 名規約の最終確認</h3>
+<h3 id="instagram-account-setup">5.1 Instagram アカウント準備（プロアカウント化 〜 長期アクセストークン取得）</h3>
+<p>新しいセットで Instagram 投稿を行う場合、Secret 作成（<a href="#set-add">2.1 手順 1</a>・<a href="#account-add">5.3 手順 1</a>）の前提として毎回必要になる外部準備。Meta 側の UI・仕様は変更されうるため、詰まった場合は Meta 公式ドキュメント（<a href="https://developers.facebook.com/docs/instagram-platform/">Instagram Platform documentation</a>）を最新の一次情報として確認する。12-1（<code>fantasy-animals-1</code>・<code>main-account</code>）で実際に踏んだ手順を元に記載する。</p>
+
+<h4>手順 1: Instagram プロアカウント化</h4>
+<p>投稿に使う Instagram アカウントをプロアカウント（ビジネス or クリエイター）に変更する。個人アカウントのままでは投稿 API を利用できない。</p>
+
+<h4>手順 2: Facebook ページとの連携</h4>
+<p>Instagram Graph API（投稿権限を含むフル機能版）は Facebook ページ経由の権限フローが必要で、Instagram プロアカウント 1 件につき Facebook ページが 1 件必要。</p>
+<div class="note">
+  <span class="callout-title">実施メモ（2026-07-19）</span>
+  Instagram アプリ側の連携メニューからはうまく連携できなかったため、<strong>Facebook ページ側から</strong>以下の手順で連携した。
+  <ol style="margin:.3rem 0 0;">
+    <li>Facebook で対象ページに切り替える</li>
+    <li>ページの「設定」を開く</li>
+    <li>「リンクするアカウント」を開く</li>
+    <li>「Instagram」を選択</li>
+    <li>「アカウントをリンク」を押す</li>
+    <li>Instagram のユーザー名とパスワードでログイン</li>
+    <li>確認画面を進めて接続する</li>
+  </ol>
+</div>
+
+<h4>手順 3: Meta Developer アカウント + アプリ作成</h4>
+<p><a href="https://developers.facebook.com/">developers.facebook.com</a> で Meta Developer アカウントを作成（要 Facebook アカウント）→ 新規アプリ作成 → ユースケースは「Business」を選択する。App ID / App Secret が発行される（App Secret はトークン交換〔手順 5〕で使用する）。</p>
+
+<h4>手順 4: アプリへの権限付与（App Review を回避する 2 つのロール）</h4>
+<p>本システムはユーザー自身のアカウントにのみ投稿するため、Meta の<strong>アプリレビューは不要</strong>（他者のアカウントに投稿する場合のみ必須）。代わりに以下 2 つのロールを設定する。</p>
+<ol>
+  <li><strong>アプリの管理者ロール</strong>: アプリの「アプリの役割」→「役割」で、Facebook アカウント（既存 ID の使い回しでよい）が「管理者」または「開発者」になっていることを確認する（アプリ作成者は通常自動で管理者になる）</li>
+  <li><strong>Instagram テスターロール（投稿権限に必須）</strong>: 同じ「アプリの役割」画面の「Instagram テスター」タブで「メンバーを追加」→ 投稿に使う Instagram プロアカウントのユーザー名を入力して招待する。
+    続けて <strong>Instagram 側（PC ブラウザ。スマホアプリには「テスターへのご招待」メニューがない）</strong>でログインし、「設定」パネル右上の検索ボックスに「テスター」と入力して「テスターへのご招待」を開き、招待を承認する（通知欄に届く場合もある）
+  </li>
+</ol>
+<div class="note">
+  <span class="callout-title">2 つのロールの違い</span>
+  「管理者」ロールはアプリ全体（Facebook 側）の管理権限であり、Instagram Graph API の権限付与とは別軸。<strong>投稿権限のトークンを発行するには、Instagram テスターロールの承認が別途必須</strong>（管理者ロールだけでは不足する）。
+</div>
+
+<h4>手順 5: 権限付与とトークン取得</h4>
+<ol>
+  <li><strong>短期アクセストークンの取得</strong>: <a href="https://developers.facebook.com/tools/explorer">Graph API Explorer</a> を開く → 右上の「Meta App」で対象アプリを選択 → 「User or Page」→「Get User Access Token」→ 権限（<code>instagram_basic</code> / <code>instagram_content_publish</code> / <code>pages_show_list</code> / <code>pages_read_engagement</code> / <code>business_management</code>）を選択 → 「Generate Access Token」→ Facebook ログインのポップアップで許可する。「Access Token」欄の文字列が短期トークン（有効期限 1 時間）</li>
+  <li><strong>長期アクセストークンへの交換</strong>: ブラウザで以下の URL を値を埋めて開く（GET リクエストのため URL を開くだけでよい）
+    <pre><code>https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&amp;client_id=&lt;APP_ID&gt;&amp;client_secret=&lt;APP_SECRET&gt;&amp;fb_exchange_token=&lt;SHORT_LIVED_TOKEN&gt;</code></pre>
+    <code>APP_ID</code> / <code>APP_SECRET</code> はアプリの「アプリの設定」→「基本設定」で確認できる。レスポンスの <code>access_token</code> が長期トークン、<code>expires_in</code>（秒。約 60 日）から失効日時を算出し <code>token_expires_at</code> として控える
+  </li>
+  <li><strong><code>ig_user_id</code> の取得</strong>: Facebook ページ ID を用いて以下を開く
+    <pre><code>https://graph.facebook.com/v21.0/&lt;PAGE_ID&gt;?fields=instagram_business_account&amp;access_token=&lt;LONG_LIVED_TOKEN&gt;</code></pre>
+    返り値の <code>instagram_business_account.id</code> が <code>ig_user_id</code>。
+    <code>PAGE_ID</code> はページ「基本データ」画面の URL に出る数字で見つからない場合がある（Business Suite 上の別 ID を指している可能性がある）。その場合は以下で確認する
+    <pre><code>https://graph.facebook.com/v21.0/me/accounts?access_token=&lt;LONG_LIVED_TOKEN&gt;</code></pre>
+    管理者権限を持つページ一覧が返るので、その中の正しい <code>id</code> を使う
+  </li>
+</ol>
+<div class="note">
+  <span class="callout-title">実値をこの手順の外に出さない</span>
+  App Secret・アクセストークン・<code>ig_user_id</code> はすべてブラウザ操作で完結させ、会話ログ・コマンド履歴・チャットには残さない。取得した 3 値（<code>access_token</code> / <code>ig_user_id</code> / <code>token_expires_at</code>）はメモに控え、Secret 作成（<a href="#set-add">2.1 手順 1</a>・<a href="#account-add">5.3 手順 1</a>）ではマネジメントコンソールから直接入力する（<a href="#image-api-key">5.5</a> の画像生成 API キーと同じ理由。実 API キー・トークンはコンソール手動設定とし CLI・会話に残さない方針）。
+</div>
+
+<h3 id="secret-final">5.2 Secret 名規約の最終確認</h3>
 <p>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2</a>）と、構成要素の意味付け（<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>）は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a>で確定済みであり、本規約に変更はない。<code>account_code</code> は Secret 名導出専用のため<strong>作成後変更不可</strong>。変更が必要な場合は新アカウント（新しい <code>account_code</code>）として追加し、旧アカウントは <code>is_active=0</code> にする。</p>
 <div class="note">
   <span class="callout-title">Phase 10-1 での再確認（2026-07-15 実施済み）</span>
@@ -293,7 +351,7 @@ ORDER BY gr.scheduled_at ASC;</code></pre>
   IAM ポリシー（プレフィックスベースの Secret 読み取り権限。<a href="../infra/security.html">infra/security.html セクション 2.1</a>）・Secret 運用の実態と矛盾はなく、<strong>規約は変更なしで最終確認</strong>とする。
 </div>
 
-<h3 id="account-add">5.2 既存セットへの SNS アカウント追加手順</h3>
+<h3 id="account-add">5.3 既存セットへの SNS アカウント追加手順</h3>
 <p>新規セット追加（セクション 2.1）とは異なり、既存セットに投稿先アカウントを追加する場合（将来の多プラットフォーム展開等）の手順。</p>
 <ol>
   <li><strong>Secrets Manager にシークレットを作成する</strong>（DB 登録より先に行う）。値のスキーマは <a href="../infra/security.html">infra/security.html セクション 1.3</a> を参照
@@ -308,7 +366,7 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
   <li><strong>動作確認</strong>: SNS 投稿ワークフローを手動実行し、追加したアカウントへの投稿（またはシークレット取得）が成功することを確認する</li>
 </ol>
 
-<h3 id="token-refresh">5.3 Instagram アクセストークン更新の具体手順とリマインド運用</h3>
+<h3 id="token-refresh">5.4 Instagram アクセストークン更新の具体手順とリマインド運用</h3>
 <ol>
   <li>Instagram Graph API の長期アクセストークンは発行から<strong>60 日で失効</strong>する。失効前（目安: 失効の 7 日前まで）に Meta の長期トークン更新エンドポイントを呼び出し、新しいトークンと新しい失効日時を取得する</li>
   <li>取得した新トークンで Secrets Manager の値を更新する（<code>access_token</code> と <code>token_expires_at</code> の両方を更新する）
@@ -326,7 +384,7 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
   セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（設計課題リストに記録）。
 </div>
 
-<h3 id="image-api-key">5.4 画像生成 API キーの設定（Phase 10 開始時に必須）</h3>
+<h3 id="image-api-key">5.5 画像生成 API キーの設定（Phase 10 開始時に必須）</h3>
 <p>画像生成 API キー用 Secret <code>acps/prod/image/api-key</code> は、インフラ構築（Phase 5-3）で「箱」のみ作成済みで、<strong>値はランダムなプレースホルダのまま</strong>である（<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a> の decision）。アプリ実装（Phase 10）で画像生成 API を呼び出す前に、実際の API キーへ差し替える。</p>
 <ol>
   <li>マネジメントコンソールの Secrets Manager で <code>acps/prod/image/api-key</code> を開き、「シークレットの値を取得」→「編集」で <code>api_key</code> キーの値を、利用する画像生成 API（初期方式が使う API。方式カタログは <a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）の API キーに差し替える。値スキーマ <code>{"api_key": "..."}</code> は <a href="../infra/security.html">infra/security.html セクション 1.3</a> を参照</li>
@@ -343,8 +401,8 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
   <li>プロンプト・キャプションの変更は「直接 UPDATE（履歴を残さない）」と「新規 INSERT + 旧行 <code>is_active=0</code>（履歴を残す）」の 2 方式を定義し、<code>prompt_configs</code> は 0 件化を避けるためトランザクションで実行することを確定した（3）</li>
   <li>投稿失敗時の手動補正は、旧設計の <code>attempt_number</code> ベースの再試行を採用せず、<code>posts</code> 行を <code>pending</code> に戻して「最初から実行」扱いにする方式で再投稿可能にすると確定した。あわせて、補正しても投稿対象決定が「最古の actionable」を優先するため即座に処理されるとは限らない点を明記した（4.2）</li>
   <li>stale データ（<code>pending</code> / <code>container_created</code> のまま残った生成実行が後続投稿をブロックする問題）について、専用の自動検知は追加せず、既存の失敗アラームを起点に定期確認クエリで検出し 4.2 の手順で終端状態に補正する運用と確定した（4.3）</li>
-  <li>SNS Secret 規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> は変更なしで最終確認とし、既存セットへのアカウント追加手順（Secret 作成 → DB 登録の順）を新規セット追加手順と分けて明文化した（5.1〜5.2）</li>
-  <li>Instagram トークン更新のリマインドは、管理画面がない初期スコープでは運用者による手動リマインダー設定とし、自動化は将来課題として設計課題リストに記録した（5.3）</li>
+  <li>SNS Secret 規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> は変更なしで最終確認とし、既存セットへのアカウント追加手順（Secret 作成 → DB 登録の順）を新規セット追加手順と分けて明文化した（5.2〜5.3）</li>
+  <li>Instagram トークン更新のリマインドは、管理画面がない初期スコープでは運用者による手動リマインダー設定とし、自動化は将来課題として設計課題リストに記録した（5.4）</li>
 </ul>
 
 <p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。<code>post_records.attempt_number</code> / <code>max_post_retries</code> に基づく再試行上限確認は、自動再試行を行わない方針への変更に伴い不採用。SNS アカウント追加手順・手動補正の記録ルール・トークン更新の考え方は本書に引き継いだ。現役の設計書ではない）</p>

@@ -113,13 +113,13 @@
 
 > 12-3 は Codex に委譲し、完了条件に pytest 全パスを含める。12-1 の Instagram 側準備は外部作業でリードタイムがあるため、Phase 11 と並行して早めに着手してよい。
 
-- [ ] **12-1** 投稿先プラットフォームの準備と登録
+- [x] **12-1** 投稿先プラットフォームの準備と登録
   - 確認: SNS 認証 Secret（`acps/prod/<set_code>/sns/instagram/<account_code>`）が実値で存在し、`caption_templates`・`sns_accounts` が登録されている
-  - 備考: ユーザーが Instagram ビジネスアカウント・Meta アプリ・長期アクセストークンを用意（外部作業）→ Secret 作成（[docs/app/operation.html](app/operation.html) セクション 2.1 手順 1）→ DB 登録（同手順 2）。**業務データ投入ポイント②**: 実際に使う<strong>キャプション本文 + ハッシュタグ</strong>をここで `caption_templates.template_text` に INSERT する（文言はユーザー決定、Claude が草案作成可）。プロンプト（11-1）と登録タイミングを分けるのは各バッチの直前に必要データを揃えるため（`caption_templates` 0 件でも投稿処理は継続できる設計のため、Phase 11 の E2E はキャプション未登録で成立する）
+  - 備考: 2026-07-19 完了。ユーザーが Instagram プロアカウント化・Facebook ページ連携・Meta アプリ作成・長期アクセストークン取得（外部作業）を実施し、`acps/prod/fantasy-animals-1/sns/instagram/main-account` を作成（`account_code=main-account`、Instagram ユーザーネーム `dokonimo_inai_zukan`）。`caption_templates`（キャプション文言はユーザー選定・Claude 草案作成）・`sns_accounts` をローカル・Aurora 双方に `id=1` で登録。外部準備の具体手順は今回初めて実施したため、恒久ドキュメントとして [docs/app/operation.html](app/operation.html) セクション 5.1（新設）に一般化して記録し、既存セクション 5.1〜5.4 を 5.2〜5.5 へ繰り下げた。[docs/app/sets/fantasy-animals-1.html](app/sets/fantasy-animals-1.html) セクション 2 も確定内容で更新。詳細は [development-log.md](development-log.md) の 12-1 を参照
 
 - [ ] **12-2** Instagram Graph API の疎通確認
   - 確認: ローカルからコンテナ作成（`POST /{ig-user-id}/media`）→ パブリッシュ（`POST /{ig-user-id}/media_publish`）のテスト投稿が成功する
-  - 備考: テスト投稿は削除前提で行う。トークン失効日のリマインダー登録（operation.html セクション 5.3）も忘れずに行う
+  - 備考: テスト投稿は削除前提で行う。トークン失効日のリマインダー登録（operation.html セクション 5.4）も忘れずに行う
 
 - [ ] **12-3** sns-post-batch 業務ロジックの実装（Codex 委譲）
   - 確認: pytest 全パス + ローカル E2E（API モック）で `posts` が success まで遷移する
