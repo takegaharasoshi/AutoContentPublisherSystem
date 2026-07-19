@@ -101,9 +101,9 @@
   - 確認: ローカル E2E で実画像が生成され、S3 保存 + DB 登録まで通る
   - 備考: 2026-07-19 完了。`generators/gpt_image_single.py` を追加（OpenAI Images API・モデル `gpt-image-2`・Pillow で PNG→JPEG 変換）しレジストリに登録。API シークレットは方式モジュールが自分で取得する設計とし、共通骨格（`main.py`/`processing.py`/レジストリ型）は無変更。requirements に `openai`・`Pillow` を追加。実 API を使うローカル E2E（`RUN_REAL_IMAGE_API_E2E=1` でのみ実行、デフォルトは自己スキップ）で実際に実画像を生成し S3（フェイク）保存・DB 登録まで確認済み。`docs/app/batch-flow.html` の方式カタログを更新（仮称表記の解消・ステータス更新）。詳細は [development-log.md](development-log.md) の 11-4 を参照
 
-- [ ] **11-5** AWS E2E（パイプライン経由デプロイ + SFN 実行）
+- [x] **11-5** AWS E2E（パイプライン経由デプロイ + SFN 実行）
   - 確認: 画像生成 SFN の手動実行が SUCCEEDED し、S3 に実画像・`generated_images` / `batch_execution_logs` に行が入る。連鎖起動された sns-posting-sfn（現行疎通版のまま）も成功終了する
-  - 備考: push で両パイプラインが起動する（shared/ 変更のため）。イメージ更新はパイプラインがタスク定義を登録するため CDK デプロイ不要
+  - 備考: 2026-07-19 完了。push（`3e83d62`）で image-batch-pipeline のみ起動（sns-post-batch-pipeline は 11-3 の push で既に更新済みだったため今回は不起動。両タスク定義とも最新化済み）。画像生成 SFN 手動実行（`set_code=fantasy-animals-1`）が SUCCEEDED（所要4分51秒、実画像生成約3分46秒）、連鎖起動された sns-posting-sfn も SUCCEEDED（所要1分46秒、疎通版のまま）。S3 に実画像1枚・`generation_runs`/`generated_images`/`batch_execution_logs`（image_generation, succeeded）にDBレコードを確認。詳細は [development-log.md](development-log.md) の 11-5 を参照
 
 ---
 
