@@ -3,7 +3,7 @@
 from collections.abc import Callable
 
 from ..models import PromptConfig
-from . import fake
+from . import fake, gpt_image_single
 
 
 GeneratorFn = Callable[[PromptConfig], list[bytes]]
@@ -13,7 +13,10 @@ class GeneratorNotFoundError(Exception):
     """Raised when a batch set references an unknown generator."""
 
 
-REGISTRY: dict[str, GeneratorFn] = {"fake": fake.generate}
+REGISTRY: dict[str, GeneratorFn] = {
+    "fake": fake.generate,
+    "gpt-image-single": gpt_image_single.generate,
+}
 
 
 def resolve_generator(generator_name: str) -> GeneratorFn:

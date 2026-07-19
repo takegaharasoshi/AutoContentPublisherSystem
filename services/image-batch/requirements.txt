@@ -1,2 +1,4 @@
 boto3==1.43.46
 PyMySQL==1.2.0
+openai==2.21.0
+Pillow==12.1.0

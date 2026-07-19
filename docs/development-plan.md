@@ -97,9 +97,9 @@
   - 確認: pytest 全パス + ローカル MySQL E2E（テスト用フェイク方式）で `generation_runs`・`generated_images`・`batch_execution_logs` に行が入る
   - 備考: 2026-07-19 完了。`services/image-batch` を空回し版から共通骨格（実行ログ INSERT-or-fetch・`generation_runs` 冪等解決・`prompt_configs` ループ + 完了判定・S3 保存・`generated_images` 登録・方式レジストリ〔`fake` のみ〕）に全面書き換え。`shared/acps_shared` に `get_secret_string`・`s3.put_object`・DB セッション UTC 固定を追加。レビューで E2E テストの接続バグ（`pymysql.connect()` 引数名の不一致で常に自己スキップしていた）を検出し Codex に再委譲して修正、ローカル MySQL 起動状態で E2E が実際に実行され green になることを確認済み。詳細は [development-log.md](development-log.md) の 11-3 を参照
 
-- [ ] **11-4** 初期方式 gpt-image-single の実装（Codex 委譲）
+- [x] **11-4** 初期方式 gpt-image-single の実装（Codex 委譲）
   - 確認: ローカル E2E で実画像が生成され、S3 保存 + DB 登録まで通る
-  - 備考: `generators/` に方式モジュール（API クライアント + JPEG 変換）を追加し方式レジストリに登録。requirements に依存（openai・Pillow 等）を追加。方式名スラッグはここで確定し方式カタログ（batch-flow.html セクション 2.1）を更新する
+  - 備考: 2026-07-19 完了。`generators/gpt_image_single.py` を追加（OpenAI Images API・モデル `gpt-image-2`・Pillow で PNG→JPEG 変換）しレジストリに登録。API シークレットは方式モジュールが自分で取得する設計とし、共通骨格（`main.py`/`processing.py`/レジストリ型）は無変更。requirements に `openai`・`Pillow` を追加。実 API を使うローカル E2E（`RUN_REAL_IMAGE_API_E2E=1` でのみ実行、デフォルトは自己スキップ）で実際に実画像を生成し S3（フェイク）保存・DB 登録まで確認済み。`docs/app/batch-flow.html` の方式カタログを更新（仮称表記の解消・ステータス更新）。詳細は [development-log.md](development-log.md) の 11-4 を参照
 
 - [ ] **11-5** AWS E2E（パイプライン経由デプロイ + SFN 実行）
   - 確認: 画像生成 SFN の手動実行が SUCCEEDED し、S3 に実画像・`generated_images` / `batch_execution_logs` に行が入る。連鎖起動された sns-posting-sfn（現行疎通版のまま）も成功終了する
