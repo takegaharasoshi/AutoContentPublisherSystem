@@ -125,9 +125,9 @@
   - 確認: pytest 全パス + ローカル E2E（API モック）で `posts` が success まで遷移する
   - 備考: 2026-07-19 完了。`services/sns-post-batch` を空回し版から業務ロジック（投稿対象決定、posts 状態機械 + INSERT-or-skip + Retry 復旧分岐、post_images、キャプション適用、S3 Presigned URL、Secret 規約からの認証情報導出、実行ログ）に全面書き換え。実装前に batch-flow.html へ「コンテナステータスのポーリング」手順を追記（12-2 で確認済みの実際の Graph API 挙動が未反映だったため）。`shared/acps_shared` に `generate_presigned_url` を追加。詳細は [development-log.md](development-log.md) の 12-3 を参照
 
-- [ ] **12-4** AWS E2E（全チェーン実行）
+- [x] **12-4** AWS E2E（全チェーン実行）
   - 確認: 画像生成 SFN からの全チェーン実行で実投稿がフィードに載り、`posts` が success・`posted_at` 記録
-  - 備考: パイプライン push → 画像生成 SFN 手動実行で確認する
+  - 備考: 2026-07-20 完了。push（`9172596`）で両パイプライン（image-batch・sns-post-batch）が起動し、両タスク定義とも最新化（image-batch rev 10 / sns-post-batch rev 6、イメージタグ `9172596f1f2d`）。画像生成 SFN 手動実行 → 連鎖起動された sns-posting-sfn とも SUCCEEDED。投稿対象決定ロジック（最古の未試行生成実行を優先）どおり、今日新規生成した画像（`generation_runs.id=2`）ではなく 11-5 で生成済みだった 2026-07-19 の画像（`generation_runs.id=1`）が実際に投稿された（今日の新規画像は次回実行で投稿対象になる）。`posts`（`id=1, status='success', platform_post_id=18115758976922783, posted_at='2026-07-20 14:09:30'`）・`post_images`・`batch_execution_logs`（`image_generation`/`sns_posting` とも succeeded）を確認。ユーザーが Instagram フィードへの実投稿を目視確認済み。詳細は [development-log.md](development-log.md) の 12-4 を参照
 
 - [ ] **12-5** 重複投稿防止・復旧分岐の確認
   - 確認: 同一実行の SFN 再実行等で二重投稿が発生しない。終端状態のスキップ・`published_unconfirmed` の扱いが設計どおり
