@@ -1,7 +1,7 @@
 """Shared utilities for AutoContentPublisherSystem services."""
 
 from .db import connect, open_connection
-from .s3 import put_object
+from .s3 import generate_presigned_url, put_object
 from .secrets import (
     DbSecret,
     SecretFormatError,
@@ -19,4 +19,5 @@ __all__ = [
     "connect",
     "open_connection",
     "put_object",
+    "generate_presigned_url",
 ]

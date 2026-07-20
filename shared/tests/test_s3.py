@@ -2,7 +2,7 @@
 
 from unittest.mock import Mock
 
-from acps_shared import put_object
+from acps_shared import generate_presigned_url, put_object
 
 
 def test_put_object_uses_injected_client() -> None:
@@ -22,4 +22,24 @@ def test_put_object_uses_injected_client() -> None:
         Key="images/test.jpg",
         Body=b"image-data",
         ContentType="image/jpeg",
+    )
+
+
+def test_generate_presigned_url_uses_injected_client() -> None:
+    """The helper forwards bucket, key, and expiry to the S3 client."""
+    client = Mock()
+    client.generate_presigned_url.return_value = "https://example.com/signed"
+
+    url = generate_presigned_url(
+        "example-bucket",
+        "images/test.jpg",
+        expires_in=3600,
+        client=client,
+    )
+
+    assert url == "https://example.com/signed"
+    client.generate_presigned_url.assert_called_once_with(
+        "get_object",
+        Params={"Bucket": "example-bucket", "Key": "images/test.jpg"},
+        ExpiresIn=3600,
     )

@@ -192,6 +192,7 @@
       <li><strong>初期構築の仕様: 生成実行に紐づく画像のうち最初の 1 枚のみ</strong>を <code>post_images</code> で紐づける（選択順序は <code>generated_images.id</code> 昇順 = 最も早く生成された 1 枚。1 セット複数 <code>prompt_config</code> や 1 プロンプト複数画像により生成実行が複数の画像を保存していても、投稿するのは常に 1 枚とする）。将来のカルーセル対応では、生成実行内の複数画像を並び順付きで束ねる処理に拡張する</li>
       <li>キャプションテンプレートを適用して投稿本文を組み立てる</li>
       <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する</li>
+      <li>コンテナのステータス（<code>GET /{container-id}?fields=status_code</code>）を <code>FINISHED</code> になるまで有限回数・タイムアウト付きでポーリングする（Meta 側のメディア処理が非同期のため。手順 5 のパブリッシュ API は <code>FINISHED</code> 到達前に呼び出すと失敗しうる）。<code>ERROR</code> を受け取った場合、またはポーリングが上限に達し <code>FINISHED</code> に到達しなかった場合は、パブリッシュ API を呼び出さずに <code>status='failed'</code> に更新する（パブリッシュ要求を送信していないため <code>published_unconfirmed</code> の対象外）</li>
       <li>パブリッシュ API（<code>POST /{ig-user-id}/media_publish</code>）を呼び出す
         <ul>
           <li>成功 → <code>platform_post_id</code> を保存し <code>status='success'</code> に更新</li>
@@ -203,6 +204,11 @@
   </li>
   <li>全アカウントの処理後、3.4 の方針に基づき終了コードを決定して終了する</li>
 </ol>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-07-19、12-3 実装時に反映）: コンテナステータスのポーリングを手順に追加</span>
+  12-2 の疎通確認で、コンテナ作成 API 成功後にステータスが <code>FINISHED</code> になるまで待たずにパブリッシュ API を呼ぶと失敗しうる実際の Graph API の挙動を確認した。本書の初版手順にはこのポーリングが明記されていなかったため、上記手順 4 として追加した。<code>posts</code> の状態遷移（3.2）は変更しない — ポーリングは <code>container_created</code> 到達後・パブリッシュ呼び出し前のアプリ内処理として扱う。Step Functions Retry でタスクが再起動された場合も、<code>container_created</code> からの再開（3.2）でこのポーリングからやり直す。
+</div>
 
 <div class="note">
   <span class="callout-title">送信元 IP に関する制約（Phase 10-1 でインフラ構築の知見を反映）</span>

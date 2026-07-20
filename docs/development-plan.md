@@ -117,13 +117,13 @@
   - 確認: SNS 認証 Secret（`acps/prod/<set_code>/sns/instagram/<account_code>`）が実値で存在し、`caption_templates`・`sns_accounts` が登録されている
   - 備考: 2026-07-19 完了。ユーザーが Instagram プロアカウント化・Facebook ページ連携・Meta アプリ作成・長期アクセストークン取得（外部作業）を実施し、`acps/prod/fantasy-animals-1/sns/instagram/main-account` を作成（`account_code=main-account`、Instagram ユーザーネーム `dokonimo_inai_zukan`）。`caption_templates`（キャプション文言はユーザー選定・Claude 草案作成）・`sns_accounts` をローカル・Aurora 双方に `id=1` で登録。外部準備の具体手順は今回初めて実施したため、恒久ドキュメントとして [docs/app/operation.html](app/operation.html) セクション 5.1（新設）に一般化して記録し、既存セクション 5.1〜5.4 を 5.2〜5.5 へ繰り下げた。[docs/app/sets/fantasy-animals-1.html](app/sets/fantasy-animals-1.html) セクション 2 も確定内容で更新。詳細は [development-log.md](development-log.md) の 12-1 を参照
 
-- [ ] **12-2** Instagram Graph API の疎通確認
+- [x] **12-2** Instagram Graph API の疎通確認
   - 確認: ローカルからコンテナ作成（`POST /{ig-user-id}/media`）→ パブリッシュ（`POST /{ig-user-id}/media_publish`）のテスト投稿が成功する
-  - 備考: テスト投稿は削除前提で行う。トークン失効日のリマインダー登録（operation.html セクション 5.4）も忘れずに行う
+  - 備考: 2026-07-19 完了。11-5 で生成済みの実画像（S3 Presigned URL）でテスト投稿し成功（`platform_post_id=18118130536780845`）。詳細は [development-log.md](development-log.md) の 12-2 を参照。トークン失効日のリマインダー登録（operation.html セクション 5.4）は未実施（別途対応）
 
-- [ ] **12-3** sns-post-batch 業務ロジックの実装（Codex 委譲）
+- [x] **12-3** sns-post-batch 業務ロジックの実装（Codex 委譲）
   - 確認: pytest 全パス + ローカル E2E（API モック）で `posts` が success まで遷移する
-  - 備考: [docs/app/batch-flow.html](app/batch-flow.html) セクション 1・3 のとおり実装する: 投稿対象決定クエリ（[docs/app/data-model.html](app/data-model.html) セクション 4.4）、posts 状態機械 + INSERT-or-skip + Retry 復旧分岐、`post_images` 先頭 1 枚、キャプション適用、S3 Presigned URL（有効期限 1 時間）、Secret 規約からの認証情報導出、実行ログ
+  - 備考: 2026-07-19 完了。`services/sns-post-batch` を空回し版から業務ロジック（投稿対象決定、posts 状態機械 + INSERT-or-skip + Retry 復旧分岐、post_images、キャプション適用、S3 Presigned URL、Secret 規約からの認証情報導出、実行ログ）に全面書き換え。実装前に batch-flow.html へ「コンテナステータスのポーリング」手順を追記（12-2 で確認済みの実際の Graph API 挙動が未反映だったため）。`shared/acps_shared` に `generate_presigned_url` を追加。詳細は [development-log.md](development-log.md) の 12-3 を参照
 
 - [ ] **12-4** AWS E2E（全チェーン実行）
   - 確認: 画像生成 SFN からの全チェーン実行で実投稿がフィードに載り、`posts` が success・`posted_at` 記録
