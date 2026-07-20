@@ -79,8 +79,14 @@ def _request_json(
     urlopen: Any,
     operation: str,
     duplicate_is_unknown: bool = False,
+    transport_failure_is_unknown: bool = False,
 ) -> dict[str, Any]:
-    """Send one request and classify transport and HTTP failures."""
+    """Send one request and classify transport and HTTP failures.
+
+    ``transport_failure_is_unknown`` must only be set for the publish call:
+    a network failure before a publish request is ever sent cannot have
+    posted anything, so it is a clear failure, not an unconfirmed result.
+    """
     try:
         response = urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS)
     except urllib.error.HTTPError as exc:
@@ -90,7 +96,9 @@ def _request_json(
             raise InstagramResultUnknown(message, response=response_json) from exc
         raise InstagramRequestFailed(message, response=response_json) from exc
     except (urllib.error.URLError, TimeoutError, socket.timeout) as exc:
-        raise InstagramResultUnknown(str(exc)) from exc
+        if transport_failure_is_unknown:
+            raise InstagramResultUnknown(str(exc)) from exc
+        raise InstagramRequestFailed(str(exc)) from exc
 
     try:
         response_json = _decode_response(response)
@@ -101,7 +109,9 @@ def _request_json(
         socket.timeout,
         urllib.error.URLError,
     ) as exc:
-        raise InstagramResultUnknown(str(exc)) from exc
+        if transport_failure_is_unknown:
+            raise InstagramResultUnknown(str(exc)) from exc
+        raise InstagramRequestFailed(str(exc)) from exc
     except (TypeError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
         raise InstagramRequestFailed(
             f"Instagram API returned invalid JSON for {operation}",
@@ -234,6 +244,7 @@ def publish_container(
         urlopen=urlopen,
         operation="publish_container",
         duplicate_is_unknown=True,
+        transport_failure_is_unknown=True,
     )
     response_message = _response_message(response)
     if _is_duplicate_publish_message(response_message):

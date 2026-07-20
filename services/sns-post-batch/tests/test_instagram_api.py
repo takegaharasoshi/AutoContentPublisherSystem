@@ -127,13 +127,30 @@ def test_duplicate_publish_http_error_is_result_unknown() -> None:
 
 
 @pytest.mark.parametrize("transport_error", [urllib.error.URLError("offline"), TimeoutError()])
-def test_transport_error_is_result_unknown(transport_error: BaseException) -> None:
-    """No HTTP response means the publish result cannot be known."""
+def test_create_container_transport_error_is_a_clear_failure(
+    transport_error: BaseException,
+) -> None:
+    """A network failure before any publish request is a clear failure."""
+    urlopen = _recording_urlopen([transport_error])
+
+    with pytest.raises(instagram_api.InstagramRequestFailed) as raised:
+        instagram_api.create_container(
+            "token", "ig-user", "https://image", "caption", urlopen=urlopen
+        )
+
+    assert raised.value.response is None
+
+
+@pytest.mark.parametrize("transport_error", [urllib.error.URLError("offline"), TimeoutError()])
+def test_publish_container_transport_error_is_result_unknown(
+    transport_error: BaseException,
+) -> None:
+    """No HTTP response after sending a publish request means the result is unknown."""
     urlopen = _recording_urlopen([transport_error])
 
     with pytest.raises(instagram_api.InstagramResultUnknown) as raised:
-        instagram_api.create_container(
-            "token", "ig-user", "https://image", "caption", urlopen=urlopen
+        instagram_api.publish_container(
+            "token", "ig-user", "container", urlopen=urlopen
         )
 
     assert raised.value.response is None
@@ -193,3 +210,15 @@ def test_poll_container_status_limit_is_clear_failure(monkeypatch) -> None:
 
     assert raised.value.response == {"status_code": "IN_PROGRESS"}
     assert len(urlopen.calls) == 3
+
+
+def test_poll_container_status_transport_error_is_a_clear_failure() -> None:
+    """A network failure while polling is a clear failure, not unconfirmed."""
+    urlopen = _recording_urlopen([urllib.error.URLError("offline")])
+
+    with pytest.raises(instagram_api.InstagramRequestFailed) as raised:
+        instagram_api.poll_container_status(
+            "token", "container", urlopen=urlopen, max_attempts=3
+        )
+
+    assert raised.value.response is None

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import io
 import json
+import urllib.error
+import urllib.parse
 from typing import Any
 from uuid import uuid4
 
@@ -247,3 +250,178 @@ def test_main_persists_successful_post_to_local_mysql(
     assert post_image_count == 1
     assert execution_log == ("succeeded", 1, 1)
     assert len(fake_s3.calls) == 1
+
+
+def test_main_resumes_container_created_post_without_creating_a_duplicate(
+    local_batch_set: tuple[dict[str, Any], str, int, int, int],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A retry resumes a saved container without creating another one."""
+    secret, set_code, _, generation_run_id, _ = local_batch_set
+    execution_arn = f"arn:aws:states:local:e2e:{uuid4().hex}"
+    monkeypatch.setenv("ENV_NAME", "local")
+    monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
+    monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv("EXECUTION_ARN", execution_arn)
+    monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
+    monkeypatch.setattr(
+        processing_module,
+        "get_secret_string",
+        lambda name: '{"access_token":"test-token","ig_user_id":"test-ig"}',
+    )
+
+    first_requests: list[str] = []
+
+    def first_fake_urlopen(request: Any, *, timeout: int) -> FakeResponse:
+        """Create a container and then simulate an ECS task crash."""
+        assert timeout == 30
+        first_requests.append(request.full_url)
+        if len(first_requests) == 1:
+            return FakeResponse({"id": "container-e2e-retry"})
+        if len(first_requests) == 2:
+            raise RuntimeError("simulated task crash")
+        pytest.fail("Unexpected Instagram API call during initial execution")
+
+    assert main(s3_client=FakeS3Client(), urlopen=first_fake_urlopen) == 1
+    assert len(first_requests) == 2
+
+    connection = _connect_local_mysql(secret)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT sns_account_id, status, platform_container_id, "
+                "platform_post_id FROM posts WHERE generation_run_id = %s",
+                (generation_run_id,),
+            )
+            first_post = cursor.fetchone()
+    finally:
+        connection.close()
+
+    assert first_post is not None
+    sns_account_id = first_post[0]
+    assert first_post[1:] == ("container_created", "container-e2e-retry", None)
+
+    retry_responses = iter(
+        [
+            FakeResponse({"status_code": "FINISHED"}),
+            FakeResponse({"id": "post-e2e-retry"}),
+        ]
+    )
+    retry_requests: list[str] = []
+
+    def retry_fake_urlopen(request: Any, *, timeout: int) -> FakeResponse:
+        """Return retry responses while rejecting a duplicate container request."""
+        assert timeout == 30
+        retry_requests.append(request.full_url)
+        request_path = urllib.parse.urlparse(request.full_url).path
+        request_data = request.data or b""
+        assert not (
+            request_path.endswith("/media") and b"image_url=" in request_data
+        )
+        try:
+            return next(retry_responses)
+        except StopIteration:
+            pytest.fail("Unexpected extra Instagram API call during retry")
+
+    assert main(s3_client=FakeS3Client(), urlopen=retry_fake_urlopen) == 0
+    assert len(retry_requests) == 2
+
+    connection = _connect_local_mysql(secret)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT COUNT(*), MAX(status), MAX(platform_container_id), "
+                "MAX(platform_post_id) FROM posts "
+                "WHERE generation_run_id = %s AND sns_account_id = %s",
+                (generation_run_id, sns_account_id),
+            )
+            retry_post = cursor.fetchone()
+    finally:
+        connection.close()
+
+    assert retry_post == (1, "success", "container-e2e-retry", "post-e2e-retry")
+
+
+def test_main_skips_published_unconfirmed_post_on_retry(
+    local_batch_set: tuple[dict[str, Any], str, int, int, int],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A retry leaves a published-unconfirmed post untouched."""
+    secret, set_code, _, generation_run_id, _ = local_batch_set
+    execution_arn = f"arn:aws:states:local:e2e:{uuid4().hex}"
+    monkeypatch.setenv("ENV_NAME", "local")
+    monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
+    monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv("EXECUTION_ARN", execution_arn)
+    monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
+    monkeypatch.setattr(
+        processing_module,
+        "get_secret_string",
+        lambda name: '{"access_token":"test-token","ig_user_id":"test-ig"}',
+    )
+
+    first_call_count = 0
+
+    def first_fake_urlopen(request: Any, *, timeout: int) -> FakeResponse:
+        """Return a duplicate-publish error after creating a ready container."""
+        nonlocal first_call_count
+        assert timeout == 30
+        first_call_count += 1
+        if first_call_count == 1:
+            return FakeResponse({"id": "container-e2e-unconfirmed"})
+        if first_call_count == 2:
+            return FakeResponse({"status_code": "FINISHED"})
+        if first_call_count == 3:
+            raise urllib.error.HTTPError(
+                request.full_url,
+                400,
+                "Bad Request",
+                None,
+                io.BytesIO(
+                    b'{"error":{"message":"Media has already been published"}}'
+                ),
+            )
+        pytest.fail("Unexpected extra Instagram API call during initial execution")
+
+    assert main(s3_client=FakeS3Client(), urlopen=first_fake_urlopen) == 1
+    assert first_call_count == 3
+
+    connection = _connect_local_mysql(secret)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT sns_account_id, status, platform_post_id FROM posts "
+                "WHERE generation_run_id = %s",
+                (generation_run_id,),
+            )
+            first_post = cursor.fetchone()
+    finally:
+        connection.close()
+
+    assert first_post is not None
+    sns_account_id = first_post[0]
+    assert first_post[1:] == ("published_unconfirmed", None)
+
+    def terminal_fake_urlopen(request: Any, *, timeout: int) -> FakeResponse:
+        """Fail if a terminal post retry reaches the Instagram API."""
+        pytest.fail("Instagram API should not be called for a terminal post state")
+
+    # The only sns_account is now terminal, so resolve_target_generation_run
+    # (app/target_selection.py) excludes this generation run from selection
+    # entirely: main() exits via the "no target" path (0 accounts processed)
+    # without ever reaching process_target_generation_run/urlopen.
+    assert main(s3_client=FakeS3Client(), urlopen=terminal_fake_urlopen) == 0
+
+    connection = _connect_local_mysql(secret)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT COUNT(*), MAX(status), MAX(platform_post_id) FROM posts "
+                "WHERE generation_run_id = %s AND sns_account_id = %s",
+                (generation_run_id, sns_account_id),
+            )
+            retry_post = cursor.fetchone()
+    finally:
+        connection.close()
+
+    assert retry_post == (1, "published_unconfirmed", None)

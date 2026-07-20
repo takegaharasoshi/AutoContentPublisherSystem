@@ -129,9 +129,9 @@
   - 確認: 画像生成 SFN からの全チェーン実行で実投稿がフィードに載り、`posts` が success・`posted_at` 記録
   - 備考: 2026-07-20 完了。push（`9172596`）で両パイプライン（image-batch・sns-post-batch）が起動し、両タスク定義とも最新化（image-batch rev 10 / sns-post-batch rev 6、イメージタグ `9172596f1f2d`）。画像生成 SFN 手動実行 → 連鎖起動された sns-posting-sfn とも SUCCEEDED。投稿対象決定ロジック（最古の未試行生成実行を優先）どおり、今日新規生成した画像（`generation_runs.id=2`）ではなく 11-5 で生成済みだった 2026-07-19 の画像（`generation_runs.id=1`）が実際に投稿された（今日の新規画像は次回実行で投稿対象になる）。`posts`（`id=1, status='success', platform_post_id=18115758976922783, posted_at='2026-07-20 14:09:30'`）・`post_images`・`batch_execution_logs`（`image_generation`/`sns_posting` とも succeeded）を確認。ユーザーが Instagram フィードへの実投稿を目視確認済み。詳細は [development-log.md](development-log.md) の 12-4 を参照
 
-- [ ] **12-5** 重複投稿防止・復旧分岐の確認
+- [x] **12-5** 重複投稿防止・復旧分岐の確認
   - 確認: 同一実行の SFN 再実行等で二重投稿が発生しない。終端状態のスキップ・`published_unconfirmed` の扱いが設計どおり
-  - 備考: 旧計画の 8-3 に相当。batch-flow.html セクション 3.2 の復旧分岐を実機で検証する
+  - 備考: 2026-07-20 完了。旧計画の 8-3 に相当。本番 Instagram アカウントへの実投稿リスクを避けるため、ユーザー判断でローカル pytest（実 DB + フェイク Graph API）による検証を採用（AWS 上の実 SFN Retry 検証は実施しない）。コードレビューで `instagram_api.py` の分類バグ（`create_container`/`poll_container_status` の通信失敗を `published_unconfirmed` 扱いにしていた。設計は「パブリッシュ要求送信後」のみ対象）を検出・修正。Codex 委譲で `test_e2e_local_mysql.py` に `main()` を同一 `execution_arn` で 2 回連続実行し SFN Retry を模擬するテストを 2 件追加（`container_created` からの再開でコンテナ重複作成・`posts` 重複行なし／終端状態 `published_unconfirmed` はリトライで API 呼び出し自体が発生しない）。詳細は [development-log.md](development-log.md) の 12-5 を参照
 
 ---
 
