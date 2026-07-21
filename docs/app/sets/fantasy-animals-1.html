@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 架空のかわいい動物図鑑</nav>
 <h1>セット別設計書: 架空のかわいい動物図鑑</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">作成中（12-2 以降で投稿確認、13-1 でスケジュールを確定）</span>
+  <span class="badge badge-wip">作成中（13-1 でスケジュール確定済み。13-2 で最終化）</span>
   <span>set_code: fantasy-animals-1</span>
-  <span>最終更新: 2026-07-19</span>
+  <span>最終更新: 2026-07-22</span>
 </div>
 
 <div class="note">
@@ -40,7 +40,7 @@
 <p>アカウント準備（Instagram プロアカウント化・Facebook ページ連携・Meta アプリ作成・長期アクセストークン取得）の具体手順は <a href="../operation.html#instagram-account-setup">operation.html セクション 5.1</a> に一般化して記録した。</p>
 
 <h2>3. スケジュール（投稿頻度）</h2>
-<p>未定。初セットは既存プレースホルダ Scheduler（<code>acps-prod-image-generation-schedule</code>）を転用する方針（<a href="../operation.html">operation.html セクション 2.1 手順 3</a> の decision）。cron 式の確定・有効化のタイミングは別途判断する（11-1 の完了条件には含まれない）。</p>
+<p><strong>1 日 3 回（7:00 / 12:00 / 21:00 JST）</strong>。Phase 13-1（2026-07-22、ユーザー決定）で確定し、既存プレースホルダ Scheduler（<code>acps-prod-image-generation-schedule</code>）を転用して cron 式 <code>cron(0 7,12,21 * * ? *)</code>（Asia/Tokyo）+ ENABLED で本番化した（<a href="../operation.html">operation.html セクション 2.1 手順 3</a> の decision、現行値は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a>）。画像生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
 
 <h2>4. プロンプトの作り方</h2>
 <p>固定文言方式。<code>prompt_configs.prompt_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>prompt_config</code>。1 枚だけ生成されるよう文言で制御する。<a href="../batch-flow.html">batch-flow.html</a> の decision）。11-1 時点の登録文言は以下（ユーザー決定）。</p>

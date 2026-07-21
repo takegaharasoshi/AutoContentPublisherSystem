@@ -51,7 +51,7 @@
 <h3>1.3 EventBridge Scheduler の Input テンプレート</h3>
 <p>Scheduler は以下の形式で画像生成 Step Functions を起動する。<code>&lt;aws.scheduler.scheduled-time&gt;</code> は EventBridge Scheduler が実行時刻（UTC、ISO 8601）に自動置換する。</p>
 <pre><code>{
-  "set_code": "fashion-set-1",
+  "set_code": "fantasy-animals-1",
   "scheduled_at": "&lt;aws.scheduler.scheduled-time&gt;"
 }</code></pre>
 
@@ -65,17 +65,17 @@
   <tbody>
     <tr><td>Schedule 名</td><td><code>acps-prod-image-generation-schedule</code></td></tr>
     <tr><td>ScheduleGroup 名</td><td><code>acps-prod-image-schedule-group</code>（MonitoringStack の <code>AWS/Scheduler</code> メトリクス Dimension で使用）</td></tr>
-    <tr><td>cron 式</td><td><code>cron(0 9 * * ? *)</code>（毎日 09:00、プレースホルダ。本番の投稿時刻は Phase 10 のセット設計で確定する）</td></tr>
+    <tr><td>cron 式</td><td><code>cron(0 7,12,21 * * ? *)</code>（毎日 7:00 / 12:00 / 21:00 の 1 日 3 回）</td></tr>
     <tr><td>タイムゾーン</td><td><code>Asia/Tokyo</code></td></tr>
     <tr><td>FlexibleTimeWindow</td><td><code>OFF</code>（時刻どおりに起動する）</td></tr>
-    <tr><td>State</td><td><code>DISABLED</code>（当面。下記 decision を参照）</td></tr>
+    <tr><td>State</td><td><code>ENABLED</code>（Phase 13-1 で本番化。下記 decision を参照）</td></tr>
   </tbody>
 </table>
 </div>
 
 <div class="decision">
-  <span class="callout-title">当面は DISABLED で運用（2026-07-14）</span>
-  Phase 5-6 でスケジュール時刻の自動起動（Scheduler → 画像生成 SFN → SNS 投稿 SFN の連鎖）を確認済み。有効のままだと Phase 6〜9 の間も毎日チェーン全体が空回しし、Aurora の起動コストと実行履歴のノイズが発生するため、検証後に <code>DISABLED</code> へ変更した。Phase 10 のアプリ実装開始時に本番 cron 式を設定して有効化する。
+  <span class="callout-title">当面は DISABLED で運用（2026-07-14）→ Phase 13-1 で本番化（2026-07-22）</span>
+  Phase 5-6 でスケジュール時刻の自動起動（Scheduler → 画像生成 SFN → SNS 投稿 SFN の連鎖）を確認済み。有効のままだとアプリ実装期間中も毎日チェーン全体が空回しし、Aurora の起動コストと実行履歴のノイズが発生するため、検証後に <code>DISABLED</code> へ変更していた。アプリ実装完了後の Phase 13-1（2026-07-22）で本番化: cron 式を 1 日 3 回（7:00 / 12:00 / 21:00 JST、投稿時刻・回数はユーザー決定）に書き換え、Input の <code>set_code</code> を初セット <code>fantasy-animals-1</code> に変更して <code>ENABLED</code> 化した。
 </div>
 
 <h2 id="db-readiness">2. DB 準備確認タスク（db-readiness-check）仕様</h2>

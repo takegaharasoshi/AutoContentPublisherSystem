@@ -291,20 +291,20 @@ export class ImageBatchStack extends cdk.Stack {
       },
     });
 
-    // cron はプレースホルダ（毎日 09:00 JST）。当面 DISABLED で運用し、Phase 10 の
-    // アプリ実装開始時に本番 cron 式を設定して有効化する（workflow.html セクション 1.5）。
+    // 本番スケジュール: 1 日 3 回（7:00 / 12:00 / 21:00 JST）で全チェーンを起動する
+    // （Phase 13-1 で本番化。workflow.html セクション 1.5）。
     new scheduler.Schedule(this, 'ImageGenerationSchedule', {
       scheduleName: `acps-${props.envName}-image-generation-schedule`,
       scheduleGroup: this.scheduleGroup,
       schedule: scheduler.ScheduleExpression.cron({
         minute: '0',
-        hour: '9',
+        hour: '7,12,21',
         timeZone: cdk.TimeZone.ASIA_TOKYO,
       }),
-      enabled: false,
+      enabled: true,
       target: new schedulerTargets.StepFunctionsStartExecution(this.stateMachine, {
         input: scheduler.ScheduleTargetInput.fromObject({
-          set_code: 'fashion-set-1',
+          set_code: 'fantasy-animals-1',
           scheduled_at: scheduler.ContextAttribute.scheduledTime,
         }),
         deadLetterQueue: this.schedulerDlq,

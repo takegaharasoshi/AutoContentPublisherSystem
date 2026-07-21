@@ -471,8 +471,8 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     template.hasResourceProperties('AWS::Scheduler::Schedule', {
       Name: 'acps-prod-image-generation-schedule',
       GroupName: 'acps-prod-image-schedule-group',
-      State: 'DISABLED',
-      ScheduleExpression: 'cron(0 9 * * ? *)',
+      State: 'ENABLED',
+      ScheduleExpression: 'cron(0 7,12,21 * * ? *)',
       ScheduleExpressionTimezone: 'Asia/Tokyo',
       FlexibleTimeWindow: {
         Mode: 'OFF',
@@ -482,7 +482,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
           Ref: Match.stringLikeRegexp('^ImageGenerationStateMachine'),
         },
         Input: Match.stringLikeRegexp(
-          '.*"set_code":"fashion-set-1".*"scheduled_at":"<aws\\.scheduler\\.scheduled-time>".*',
+          '.*"set_code":"fantasy-animals-1".*"scheduled_at":"<aws\\.scheduler\\.scheduled-time>".*',
         ),
         RetryPolicy: {
           MaximumRetryAttempts: 3,

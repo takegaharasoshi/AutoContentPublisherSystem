@@ -135,6 +135,7 @@ VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);</c
   <span class="callout-title">初セットは既存プレースホルダ Scheduler を転用する（Phase 10-1 でインフラ実態を反映）</span>
   ImageBatchStack には Phase 5 で作成した Scheduler <code>acps-prod-image-generation-schedule</code>（State=DISABLED・プレースホルダ cron・入力 <code>set_code=fashion-set-1</code>）が既に存在する（<a href="../infra/workflow.html">infra/workflow.html セクション 1.5</a> の decision）。
   <strong>初セットの追加では新規 Scheduler を追加せず、このプレースホルダの cron 式を本番の投稿時刻に書き換え、State を ENABLED にして deploy する</strong>。2 セット目以降が本手順どおりの「Scheduler 1 件追加」となる。
+  この転用は Phase 13-1（2026-07-22）で実施済み: 初セット <code>fantasy-animals-1</code> の本番スケジュール（1 日 3 回 7:00 / 12:00 / 21:00 JST）で ENABLED 化した（現行値は <a href="../infra/workflow.html">infra/workflow.html セクション 1.5</a>）。
 </div>
 
 <h4>手順 4: 動作確認</h4>
