@@ -139,9 +139,9 @@
 
 **ゴール**: EventBridge Scheduler による全自動運用が回っている
 
-- [ ] **13-1** Scheduler 本番化
+- [x] **13-1** Scheduler 本番化
   - 確認: 本番 cron 式で ENABLED 化され、スケジュール時刻に全チェーンが自動実行・投稿まで成功する
-  - 備考: cron 式（投稿時刻・回数）はユーザーが決定。既存プレースホルダ Scheduler を書き換える（[docs/app/operation.html](app/operation.html) セクション 2.1 の注記）。[docs/infra/workflow.html](infra/workflow.html) セクション 1.5 の decision を更新し、3 タグ指定で deploy（[docs/infra/cicd.html](infra/cicd.html) セクション 3.2）
+  - 備考: 2026-07-22 完了。既存プレースホルダ Scheduler を 1 日 3 回（7:00 / 12:00 / 21:00 JST、ユーザー決定）・`set_code=fantasy-animals-1` で ENABLED 化し、3 タグ指定 + `--exclusively` で ImageBatchStack のみ deploy。初回の自動実行（12:00 JST）で全チェーン SUCCEEDED・実投稿成功（`posts.id=2`）をユーザーが目視確認。詳細は [development-log.md](development-log.md) の 13-1 を参照
 
 - [ ] **13-2** 本採用に伴う設計書整備と締め
   - 確認: 3 層構造の設計書一式（`docs/app/generators/` の方式設計書新設 + 方式カタログ更新 + `docs/app/sets/<set_code>.html` 最終化）が実態と一致し、設計課題リストの残項目が棚卸しされている
