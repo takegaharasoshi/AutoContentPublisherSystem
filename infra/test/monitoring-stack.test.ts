@@ -90,12 +90,13 @@ describe('MonitoringStack', () => {
     template.hasResourceProperties('AWS::CloudWatch::Alarm', {
       AlarmName: 'acps-prod-aurora-cpu-high',
       EvaluationPeriods: 3,
-      DatapointsToAlarm: 2,
+      DatapointsToAlarm: 3,
       Threshold: 80,
     });
     template.hasResourceProperties('AWS::CloudWatch::Alarm', {
       AlarmName: 'acps-prod-aurora-memory-low',
       ComparisonOperator: 'LessThanOrEqualToThreshold',
+      DatapointsToAlarm: 3,
     });
   });
 

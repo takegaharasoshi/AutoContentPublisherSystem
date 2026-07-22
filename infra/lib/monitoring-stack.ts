@@ -140,7 +140,9 @@ export class MonitoringStack extends cdk.Stack {
       80,
       cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
       3,
-      2,
+      // min ACU 0 からの再開直後は低容量で 1〜2 データポイント分だけ構造的に閾値を超えるため、
+      // 3/3（15 分継続）でのみ発報させる（2026-07-22、Phase 13-2）
+      3,
       'Aurora の CPU 使用率高騰を検知。Performance Insights と CloudWatch Logs で負荷要因を確認する',
     );
 
@@ -154,7 +156,8 @@ export class MonitoringStack extends cdk.Stack {
       268435456,
       cloudwatch.ComparisonOperator.LESS_THAN_OR_EQUAL_TO_THRESHOLD,
       3,
-      2,
+      // 上の CPU アラームと同じ理由で 3/3（2026-07-22、Phase 13-2）
+      3,
       'Aurora の空きメモリ不足を検知。Performance Insights で負荷要因を確認し、必要に応じて容量を見直す',
     );
 

@@ -446,8 +446,8 @@
     <tr><td>image-generation-sfn 失敗</td><td><code>AWS/States</code></td><td><code>ExecutionsFailed</code></td><td><code>StateMachineArn=${ImageGenerationSfnArn}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>sns-posting-sfn 失敗</td><td><code>AWS/States</code></td><td><code>ExecutionsFailed</code></td><td><code>StateMachineArn=${SnsPostingSfnArn}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>SNS 投稿起動失敗</td><td><code>ACPS</code></td><td><code>SnsPostStartFailureCount</code></td><td><code>StateMachineName=${ImageGenerationSfnName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
-    <tr><td>Aurora CPU</td><td><code>AWS/RDS</code></td><td><code>CPUUtilization</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&gt;= 80%</td><td>300 秒</td><td>3</td><td>2</td><td>notBreaching</td><td>SNS Topic</td></tr>
-    <tr><td>Aurora メモリ</td><td><code>AWS/RDS</code></td><td><code>FreeableMemory</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&lt;= 268435456（256 MB）</td><td>300 秒</td><td>3</td><td>2</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>Aurora CPU</td><td><code>AWS/RDS</code></td><td><code>CPUUtilization</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&gt;= 80%</td><td>300 秒</td><td>3</td><td>3</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>Aurora メモリ</td><td><code>AWS/RDS</code></td><td><code>FreeableMemory</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&lt;= 268435456（256 MB）</td><td>300 秒</td><td>3</td><td>3</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>Scheduler 起動失敗</td><td><code>AWS/Scheduler</code></td><td><code>TargetErrorCount</code>、<code>TargetErrorThrottledCount</code>、<code>InvocationThrottleCount</code>、<code>InvocationDroppedCount</code>、<code>InvocationsSentToDeadLetterCount</code>、<code>InvocationsFailedToBeSentToDeadLetterCount</code>（メトリクスごとに個別アラーム、計 6 個）</td><td><code>ScheduleGroup=${ImageScheduleGroupName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
   </tbody>
 </table>
@@ -461,6 +461,12 @@
 <div class="decision">
   <span class="callout-title">Scheduler アラーム行の追加（Phase 7-1 実装時）</span>
   当初の本表には AWS/Scheduler のアラームが未記載だったが、<a href="stacks.html#monitoring">stacks.html セクション 3.4</a>（必須監視対象）とセクション 10（Scheduler DLQ の監視）の要求に合わせて、実装時に 6 メトリクスの個別アラームとして追加した。設定値は Step Functions 失敗アラームと同一とする。
+</div>
+
+<div class="decision">
+  <span class="callout-title">Aurora アラームの DatapointsToAlarm を 2 → 3 に延長（2026-07-22、Phase 13-2）</span>
+  Aurora の CPU / メモリアラームは当初 3 データポイント中 2 で発報としていたが、min ACU 0 からの再開直後の低容量状態（0.5〜1 ACU）で構造的に閾値を超え、バッチ起動のたびに ALARM → 数分で OK 復帰する誤報が発生した（10-4 の DDL 適用時に初観測。定常運用初日の 2026-07-22 12:00 JST の定時実行でもメモリアラームが発報し、1 日 3 回の通知ノイズになることを確認）。
+  実績上の一時的発報は 1〜6 分で収束するため、3/3（15 分継続）でのみ発報するよう変更した。持続的な高負荷は引き続き検知できる（検知は最大 5〜10 分遅くなるが、本システムはバッチのみで即時対応を要しない）。経緯は設計課題リスト 2026-07-18 の項を参照。
 </div>
 
 <h2 id="eventbridge-rule">9. EventBridge Rule 定義</h2>
