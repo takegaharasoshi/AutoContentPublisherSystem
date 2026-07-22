@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>事業戦略書 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / 事業戦略 / 事業戦略書</nav>
+<h1>事業戦略書</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-07-23</span>
+  <span>初版は 2026-07-23 の壁打ち（Phase 14-1）に基づく</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  収益化戦略・予算・KPI・プラットフォーム展開方針など、<strong>システム設計より上位の事業意思決定の「正」</strong>。
+  システム設計書（<code>docs/infra/</code>・<code>docs/app/</code>）には事業論点を書かず、本書から参照する（<a href="../index.html#scope">体系ガイドのスコープガード</a>）。
+  開発の進捗管理は従来どおり <a href="../development-plan.md">development-plan.md</a> が担う。
+</div>
+
+<h2 id="goal">1. 最終目標と基本戦略</h2>
+<ul>
+  <li><strong>最終目標は収益化を狙った SNS 運用</strong>（<a href="../app/requirements-notes.html#purpose">A-1 壁打ち記録</a>から継承）。いきなりの収益化は難しいため、段階を踏む</li>
+  <li>基本戦略: <strong>全自動運用の仕組みを土台に、セット（テーマ）のスクラップ&amp;ビルドで当たりコンテンツを探索し、当たりを増幅する</strong></li>
+  <li>段階の整理:
+    <ol>
+      <li><strong>仕組みの確立</strong> — 完了（2026-07-22 に 1 日 3 回の全自動投稿の定常運用を開始）</li>
+      <li><strong>リーチ獲得能力の構築</strong> — 動画（リール）対応。収益化経路（セクション 2）の必要条件（Phase 14）</li>
+      <li><strong>勝負セットの投入と探索</strong> — リーチを狙うテーマで試行錯誤（Phase 15〜16）</li>
+      <li><strong>収益化・増幅</strong> — 当たりの兆しが出たらプラットフォーム展開等で増幅（Phase 17）</li>
+    </ol>
+  </li>
+</ul>
+
+<div class="decision">
+  <span class="callout-title">優先順位の考え方（2026-07-23 壁打ち）</span>
+  収益化のボトルネックは配信面の数ではなく<strong>「当たりコンテンツの発見」と「リーチ資産」</strong>。
+  プラットフォーム展開は増幅器であり、当たりがない状態で配信面を増やしても運用負荷だけが増える。
+  したがって「1 つのプラットフォーム（Instagram）で当たりの兆しを掴む → 横展開で増幅」の順とする。
+</div>
+
+<h2 id="monetization">2. 収益化経路</h2>
+<ul>
+  <li><strong>本命: Meta 公式ボーナスプログラム</strong>（リール再生数等に応じた報酬）</li>
+  <li>2026-07 時点の調査による特性（着手時に最新条件を再確認すること）:
+    <ul>
+      <li><strong>招待制</strong>（Meta 側から招待されるのを待つ形式。基準は非公開）・期間限定開催</li>
+      <li>報酬水準の目安は 1 リール再生あたり約 0.03〜0.08 円。<strong>月数万円の収益にも 100 万再生規模が必要</strong></li>
+    </ul>
+  </li>
+  <li>含意: この路線は「リールで大きなリーチを取れるアカウントを作る」こととほぼ同義であり、<strong>動画（リール）対応が最重要機能</strong>となる</li>
+</ul>
+
+<div class="warn">
+  <span class="callout-title">リスク: 非オリジナルコンテンツ対策の強化</span>
+  Meta は転載や「変換の少ない低労力 AI コンテンツ」をリーチ抑制・収益化プログラム除外の対象にする方針を強化している（2026-07 時点の調査）。
+  全自動 AI 投稿はこの対象に近い領域であるため、以下を必須要件とする:
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>独自の世界観・スタイルの統一</strong> — 一目でそのアカウントと分かる独自性を勝負セットのテーマ選定要件に含める（Phase 15）</li>
+    <li><strong>AI 利用の開示</strong> — キャプション等での開示方針を動画対応の設計（Phase 14）で具体化する</li>
+    <li>他者コンテンツの転載・再利用型のコンテンツは扱わない</li>
+  </ul>
+</div>
+
+<div class="decision">
+  <span class="callout-title">ボーナス一本足にしない構え</span>
+  KPI は<strong>アカウント資産（フォロワー・再生数）</strong>に置く。資産があれば現金化手段はボーナス以外（アフィリエイト・グッズ販売等）にも転用できるため、
+  ボーナスプログラムの制度変更リスクに事業全体が引きずられない。
+</div>
+
+<h2 id="budget">3. 予算</h2>
+<ul>
+  <li><strong>月額上限 2 万円</strong>（AWS 利用料 + 生成 AI API 利用料 + その他固定費の合計）</li>
+  <li>探索期（収益ゼロの期間）は<strong>月額固定費（サブスク・有料 API プラン）を原則積まない</strong>。従量課金を基本とする（X API を当面見送る根拠。セクション 5）</li>
+</ul>
+
+<h3 id="cost-model">3.1 コストモデル（2026-07 時点の目安）</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>費目</th><th>目安</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>AWS 基盤（Aurora・Fargate・S3 等）</td>
+      <td>月数千円規模</td>
+      <td>実績は Cost Explorer で月次確認</td>
+    </tr>
+    <tr>
+      <td>画像生成 API</td>
+      <td>1 日 3 枚で月 1,000〜3,000 円規模</td>
+      <td>現行 fantasy-animals-1 の運用</td>
+    </tr>
+    <tr>
+      <td>動画生成 API（生成 AI 動画方式の場合）</td>
+      <td>例: Sora 2 $0.10/秒 → 10 秒 1 本 75〜150 円 → 1 日 1 本で月 2,300〜4,500 円</td>
+      <td>初期は「静止画 + 音楽」の簡易動画方式（ffmpeg 等のローカル合成）で開始し、この費目をほぼゼロに抑える。生成 AI 動画方式は generator strategy の差し替えで後から導入する</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">予算の主ダイヤル</span>
+  コストを支配するのは<strong>動画の「本数 × 長さ × 画質」と生成方式の選択</strong>。
+  初期値は「1 日 1 本・10 秒前後・標準画質」とし（2026-07-23 壁打ちで合意）、KPI とコスト実績を見て調整する。
+  動画生成 API は移り変わりが激しいため、特定サービスに固定せず方式差し替え可能な構造（generator strategy）を維持する。
+</div>
+
+<h2 id="kpi">4. KPI マイルストーン</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>#</th><th>マイルストーン</th><th>目安</th><th>対応フェーズ</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>M1</td>
+      <td>リール自動投稿の定常運用</td>
+      <td>検証用セットで動画（リール）の全自動投稿が回っている</td>
+      <td>Phase 14</td>
+    </tr>
+    <tr>
+      <td>M2</td>
+      <td>勝負セットの成長開始</td>
+      <td>フォロワー 1,000・リール平均再生数の安定計測</td>
+      <td>Phase 15〜16</td>
+    </tr>
+    <tr>
+      <td>M3</td>
+      <td>ボーナス招待の現実圏</td>
+      <td>フォロワー 1 万規模 or 継続的な万単位再生（招待基準が非公開のため代理指標）</td>
+      <td>Phase 16 以降</td>
+    </tr>
+    <tr>
+      <td>M4</td>
+      <td>初収益の発生</td>
+      <td>金額を問わず収益が発生する</td>
+      <td>—</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="kpi-actual">4.1 KPI 実績</h3>
+<p>当面は月次の手動更新。インサイト収集バッチ（Phase 16）の実装後に自動集計へ移行を検討する。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>年月</th><th>セット</th><th>フォロワー</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>2026-07</td>
+      <td>fantasy-animals-1</td>
+      <td>0</td>
+      <td>検証用セットのため成長施策なし（セクション 6）</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="platform">5. プラットフォーム展開方針</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>プラットフォーム</th><th>位置づけ</th><th>判断根拠</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Instagram</td>
+      <td><strong>主戦場</strong>（現行）</td>
+      <td>収益化経路（Meta ボーナス）の本命。リール対応で発見面を狙う</td>
+    </tr>
+    <tr>
+      <td>TikTok</td>
+      <td>展開の第一候補（動画資産の獲得後）</td>
+      <td>動画コンテンツをそのまま転用できる。Content Posting API のアプリ審査等の要件は着手時に調査する</td>
+    </tr>
+    <tr>
+      <td>X</td>
+      <td>当面見送り</td>
+      <td>API の有料化により月額固定費が予算方針（セクション 3）と整合しない。静止画中心で単価も低い</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<ul>
+  <li><strong>展開の判断基準</strong>: 勝負セットで当たりの兆し（M2 到達が目安）が見えてから着手する（セクション 1 の優先順位の考え方）</li>
+  <li>同一セットの投稿を複数プラットフォームへ展開する構造（セット : アカウント = 1 : N）は設計済み（<a href="../app/requirements-notes.html#set">A-1 壁打ち記録 セクション 2</a>）</li>
+</ul>
+
+<h2 id="portfolio">6. セットポートフォリオ</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>セット</th><th>位置づけ</th><th>方針</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><a href="../app/sets/fantasy-animals-1.html">fantasy-animals-1</a></td>
+      <td><strong>検証用セット</strong>（2026-07-23 壁打ちで確定）</td>
+      <td>収益化・フォロワー成長は狙わない。パイプラインの定常稼働の確認と、<strong>新機能（リール投稿等）を本番 API で試す実験台</strong>として運用する。
+      実行頻度（現行 1 日 3 回）は動画対応の実装時に予算配分の観点で見直す（Phase 14）</td>
+    </tr>
+    <tr>
+      <td>勝負セット（テーマ未定）</td>
+      <td>リーチ獲得を狙う本命セット</td>
+      <td>Phase 15 で投入。テーマ選定は「リーチを狙える × 独自の世界観（セクション 2 のリスク対策）」を要件に壁打ちで決定する</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="callout-title">スクラップ&amp;ビルドとの関係</span>
+  セット廃止運用（<a href="../app/operation.html#set-retire">アプリ運用設計 セクション 2.2</a>）の初回実地検証は、fantasy-animals-1 を将来廃止する際に行う。
+</div>
+
+<h2 id="update">7. 更新ルール</h2>
+<ul>
+  <li>事業判断（収益化経路・予算・展開方針）を変更したときに更新し、経緯は <code>decision</code> コールアウトに残す</li>
+  <li>KPI 実績（セクション 4.1）は月次で手動更新する</li>
+  <li>フェーズ完了時（development-plan.md のフェーズ単位）に本書の前提が変わっていないかを見直す</li>
+  <li>外部プラットフォームの条件（ボーナス制度・API 料金・審査要件）は変わりやすいため、本書の記載は「調査時点の目安」とし、<strong>該当フェーズの着手時に必ず再調査する</strong></li>
+</ul>
+
+</div>
+</body>
+</html>

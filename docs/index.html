@@ -13,7 +13,7 @@
 <h1>設計書体系ガイド</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-07-06</span>
+  <span>最終更新: 2026-07-23</span>
   <span>本ドキュメントは設計書体系のエントリポイント</span>
 </div>
 
@@ -28,6 +28,7 @@
   <li><strong>完璧より前進（一時 Fix 運用）</strong>: 設計書は「次フェーズの作業に着手できる」水準で一時 Fix とし、先に進む。詳細はセクション 4 の Fix 基準を参照</li>
   <li><strong>実装を正とする</strong>: 設計と異なる実装をした場合は、実装に合わせて設計書を修正する（変更理由は備考に残す）</li>
   <li><strong>同じ情報を 2 箇所に書かない</strong>: 詳細の「正」は 1 つのドキュメントに置き、他からは参照リンクで辿る</li>
+  <li><strong>事業とシステムの分離</strong>: 事業の意思決定（収益化戦略・予算・KPI・プラットフォーム展開方針）は事業戦略（<code>docs/strategy/</code>）に書き、システム設計書（<code>docs/infra/</code>・<code>docs/app/</code>）には書かない（2026-07-23 に層を新設。Phase 14-1）</li>
 </ol>
 
 <h2 id="structure">2. ドキュメント構成</h2>
@@ -35,6 +36,8 @@
 <pre><code>docs/
 ├── index.html                     # 本ファイル（設計書体系ガイド）
 ├── assets/style.css               # 設計書共通スタイル
+├── strategy/
+│   └── business-strategy.html     # 事業戦略書（収益化戦略・予算・KPI・展開方針・セットポートフォリオ）
 ├── overview/
 │   └── system-overview.html       # システム概要（目的・技術選定・開発方針）
 ├── infra/                         # インフラ設計書（一時 Fix 対象）
@@ -55,6 +58,14 @@
 ├── _archive/                      # 旧 Markdown 設計書（参考資料。現役の設計書ではない）
 ├── development-plan.md            # 開発計画・進捗管理（Markdown。現役の計画・設計課題リスト）
 └── development-log.md             # 開発記録（Markdown。完了ステップの実施記録）</code></pre>
+
+<h3>事業戦略（docs/strategy/）</h3>
+<div class="card-grid">
+  <div class="card">
+    <div class="card-title"><a href="strategy/business-strategy.html">business-strategy.html</a></div>
+    <p>事業戦略書。収益化戦略・予算・KPI マイルストーン・プラットフォーム展開方針・セットポートフォリオ。システム設計より上位の事業意思決定の「正」。</p>
+  </div>
+</div>
 
 <h3>概要</h3>
 <div class="card-grid">
@@ -165,6 +176,7 @@
 <div class="warn">
   <span class="callout-title">スコープガード</span>
   設計作業やレビューの中でアプリ仕様の論点（テーブル設計、投稿の再試行ルール等）が出てきた場合、インフラ設計書には書かず、<a href="app/index.html">docs/app/index.html</a> の検討メモに記録してアプリ設計（大枠は Phase A、詳細は Phase 9）で扱う。
+  同様に、<strong>事業の論点（収益化・KPI・予算・プラットフォーム展開の判断）はインフラ/アプリ設計書には書かず、<a href="strategy/business-strategy.html">事業戦略書</a>で扱う</strong>。
 </div>
 
 <h2 id="fix-rules">4. 設計 Fix 基準とレビュー運用ルール</h2>

@@ -14,6 +14,7 @@ AutoContentPublisherSystem/
 ├── docs/                            # 設計書（下記「設計書体系」参照）
 │   ├── index.html                   #   設計書体系ガイド（エントリポイント）
 │   ├── assets/style.css             #   設計書共通スタイル
+│   ├── strategy/                    #   事業戦略書（収益化戦略・予算・KPI・展開方針）
 │   ├── overview/                    #   システム概要
 │   ├── infra/                       #   インフラ設計書（HTML）
 │   ├── app/                         #   アプリ設計書（大枠は骨子版作成済み・Phase 9 で詳細化。セット別設計書は app/sets/ に初セット追加時に作成）
@@ -46,11 +47,13 @@ AutoContentPublisherSystem/
 設計書は **HTML** で記述する（開発計画 `docs/development-plan.md` と開発記録 `docs/development-log.md` のみ Markdown）。体系の全体像・スコープ境界・設計 Fix 基準は `docs/index.html` を参照。
 
 - **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（大枠は Phase A、詳細は Phase 9 で作成する 2 段階方針）
+- **事業とシステムを分離する**。事業の意思決定（収益化戦略・予算・KPI・プラットフォーム展開方針）は `docs/strategy/business-strategy.html` に書き、システム設計書には書かない
 - **インフラ設計書にアプリ仕様を書かない**。作業中にアプリの論点（処理ロジック・テーブル設計等）が出たら `docs/app/index.html` の検討メモに記録する
 - HTML 設計書は外部 CDN に依存せず、`docs/assets/style.css` を共通スタイルとして使用する。閲覧はローカルブラウザまたは VS Code の Live Preview で行う（GitHub 上ではソース表示になる）
 
 | ディレクトリ | 目的 | ドキュメント |
 |---|---|---|
+| `docs/strategy/` | 事業戦略（収益化戦略・予算・KPI・展開方針・セットポートフォリオ） | `business-strategy.html` |
 | `docs/overview/` | システムの目的・スコープ・技術選定 | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
 | `docs/app/` | アプリ設計（大枠は骨子版作成済み / 詳細は Phase 9。セット追加で増えるのは `sets/` のセット別設計書 1 本のみ） | `index.html`（目次・検討メモ）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`, `data-model.html`, `operation.html`, `requirements-notes.html` |
@@ -63,6 +66,7 @@ AutoContentPublisherSystem/
 | タスク | 読むべきドキュメント |
 |---|---|
 | プロジェクトの全体像を把握 | `docs/overview/system-overview.html` |
+| 収益化戦略・予算・KPI・プラットフォーム展開方針を確認する | `docs/strategy/business-strategy.html` |
 | CDK コードを書く・修正する | `docs/infra/stacks.html`（前提知識が必要なら `docs/infra/architecture.html`） |
 | Step Functions 定義を書く・修正する | `docs/infra/workflow.html` |
 | DB 準備確認タスクを実装・修正する | `docs/infra/workflow.html` セクション 2 |
