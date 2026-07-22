@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 架空のかわいい動物図鑑</nav>
 <h1>セット別設計書: 架空のかわいい動物図鑑</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">作成中（13-1 でスケジュール確定済み。13-2 で最終化）</span>
+  <span class="badge badge-fixed">Fix（13-2 で最終化。定常運用中）</span>
   <span>set_code: fantasy-animals-1</span>
-  <span>最終更新: 2026-07-22</span>
+  <span>最終更新: 2026-07-23</span>
 </div>
 
 <div class="note">
@@ -45,7 +45,8 @@
 <h2>4. プロンプトの作り方</h2>
 <p>固定文言方式。<code>prompt_configs.prompt_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>prompt_config</code>。1 枚だけ生成されるよう文言で制御する。<a href="../batch-flow.html">batch-flow.html</a> の decision）。11-1 時点の登録文言は以下（ユーザー決定）。</p>
 <pre><code>現実に存在していそうで、実在はしていないかわいい動物の画像を作ってください。画像には、野生の状態を偶然写真に撮れたかのような架空の動物と、その動物の名前、そして特徴の説明を記載するようにしてください。Instagram に投稿するため、Instagram に合わせたサイズにしてください。生成する画像は1枚のみとしてください。</code></pre>
-<p>生成パラメータ（モデル・サイズ・品質等の <code>parameters</code> カラム）は 11-2（画像生成 API の疎通確認）で当たりを付けてから設定する。11-1 時点では NULL。</p>
+<p>生成パラメータ（<code>parameters</code> カラム）は 11-2（画像生成 API の疎通確認）の実プロンプト検証で以下に確定した（キー仕様は <a href="../generators/gpt-image-single.html">方式設計書</a> セクション 3）。</p>
+<pre><code>{"model": "gpt-image-2", "size": "1024x1024", "quality": "high", "n": 1}</code></pre>
 
 <h2>5. キャプションの作り方</h2>
 <p>固定文言方式。<code>caption_templates.template_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>caption_template</code>）。画像内に動物名・特徴の説明を焼き込む仕様のため、キャプション本文は補足的な固定文 + ハッシュタグとした。12-1 時点の登録文言は以下（ユーザー決定。ローカル・Aurora とも <code>id=1</code>）。</p>
@@ -58,7 +59,7 @@
 <p>共通の失敗時ポリシー（<a href="../operation.html">operation.html セクション 4</a>）に準拠。セット固有の追加ポリシーはなし。</p>
 
 <h2>7. 共通フローからの差分・特記事項</h2>
-<p>共通フロー（<a href="../batch-flow.html">batch-flow.html</a>）どおりで差分なし。名前・特徴のテキストを画像に合成する処理はプロンプト側で完結させ、共通骨格・DB スキーマの変更は不要。初期方式（<code>gpt-image-single</code>）は <strong>11-4</strong> で実装済み。方式別設計書 <code>docs/app/generators/gpt-image-single.html</code> は「方式設計書はセットが本採用した時点で作成」ルール（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）に従い、本採用に伴う設計書整備を行う <strong>13-2</strong> で作成する。</p>
+<p>共通フロー（<a href="../batch-flow.html">batch-flow.html</a>）どおりで差分なし。名前・特徴のテキストを画像に合成する処理はプロンプト側で完結させ、共通骨格・DB スキーマの変更は不要。使用方式は <code>gpt-image-single</code>（<strong>11-4</strong> で実装、<strong>13-1</strong> で定常運用開始 = 本採用）。方式別設計書は「方式設計書はセットが本採用した時点で作成」ルール（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）に従い <strong>13-2</strong> で作成した: <a href="../generators/gpt-image-single.html">generators/gpt-image-single.html</a>。</p>
 
 </div>
 </body>

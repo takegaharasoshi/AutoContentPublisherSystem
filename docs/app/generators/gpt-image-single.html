@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方式設計書: gpt-image-single | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / gpt-image-single</nav>
+<h1>方式設計書: gpt-image-single</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Fix（13-2 で作成）</span>
+  <span>方式名（レジストリキー）: gpt-image-single</span>
+  <span>最終更新: 2026-07-23</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  生成方式 <code>gpt-image-single</code> の方式固有仕様（使用 API・パラメータ・画像変換）を記録する。全方式共通の契約（方式インターフェース）と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、分冊ルール（1 方式 1 本・本採用時に作成）は <a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a> を参照。本書は実装（<code>services/image-batch/app/generators/gpt_image_single.py</code>）を正として記述している。
+</div>
+
+<h2>1. 方式概要</h2>
+<p>固定プロンプトを OpenAI Images API（ChatGPT Images 2.0、API モデル名 <code>gpt-image-2</code>）に渡し、1 回の API 呼び出しで画像を生成する単発生成方式。初期スコープの方式であり、初セット <code>fantasy-animals-1</code> が使用する（Phase 11-4 で実装、13-1 で定常運用開始 = 本採用）。</p>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>方式名（レジストリキー = <code>batch_sets.generator_name</code> の値）</td><td><code>gpt-image-single</code></td></tr>
+<tr><td>実装ファイル</td><td><code>services/image-batch/app/generators/gpt_image_single.py</code></td></tr>
+<tr><td>レジストリ登録</td><td><code>services/image-batch/app/generators/__init__.py</code> の <code>REGISTRY</code>（dict へ手動で 1 行登録）</td></tr>
+<tr><td>使用 API</td><td>OpenAI Images API（<code>client.images.generate</code>）</td></tr>
+<tr><td>出力形式</td><td>JPEG バイト列のリスト（<code>list[bytes]</code>）</td></tr>
+</table>
+</div>
+
+<h2>2. 契約の実装</h2>
+<p>共通の契約（<a href="../batch-flow.html#generator-contract">batch-flow.html「生成方式の契約」</a>）を次のシグネチャで実装する。</p>
+<pre><code>generate(prompt_config: PromptConfig) -> list[bytes]</code></pre>
+<p>処理順序: ① API キーを Secret から取得 → ② OpenAI クライアント生成 → ③ Images API 呼び出しで PNG を取得 → ④ 各 PNG を JPEG に変換 → ⑤ JPEG バイト列のリストを返す。冪等性（完了判定）・S3 保存・DB 登録は契約どおり共通骨格の責務であり、本方式は関与しない。</p>
+
+<h2>3. 入力</h2>
+<p>入力は <code>PromptConfig</code>（<code>prompt_configs</code> テーブルの 1 行。<a href="../data-model.html">data-model.html</a>）のみ。使用するフィールドは以下。</p>
+<div class="table-wrap">
+<table>
+<tr><th>フィールド</th><th>使い方</th></tr>
+<tr><td><code>prompt_text</code></td><td>API の <code>prompt</code> にそのまま渡す</td></tr>
+<tr><td><code>parameters</code>（JSON 文字列）</td><td>API パラメータ。下表の 4 キーすべて必須</td></tr>
+<tr><td><code>negative_prompt</code></td><td><strong>本方式では未使用</strong>（共通骨格が <code>generated_images</code> のスナップショットに記録するのみ）</td></tr>
+</table>
+</div>
+<p><code>parameters</code> の JSON キー仕様:</p>
+<div class="table-wrap">
+<table>
+<tr><th>キー</th><th>型</th><th>渡し先</th><th>例（fantasy-animals-1 の実値）</th></tr>
+<tr><td><code>model</code></td><td>文字列</td><td><code>images.generate(model=...)</code></td><td><code>gpt-image-2</code></td></tr>
+<tr><td><code>size</code></td><td>文字列</td><td><code>images.generate(size=...)</code></td><td><code>1024x1024</code></td></tr>
+<tr><td><code>quality</code></td><td>文字列</td><td><code>images.generate(quality=...)</code></td><td><code>high</code></td></tr>
+<tr><td><code>n</code></td><td>整数</td><td><code>images.generate(n=...)</code>（生成枚数）</td><td><code>1</code></td></tr>
+</table>
+</div>
+<div class="warn">
+  <span class="callout-title">パラメータのバリデーションは行わない</span>
+  4 キーはデフォルト値なしの必須参照であり、キー欠落・<code>parameters</code> が NULL・不正 JSON の場合は例外（<code>KeyError</code> / <code>TypeError</code> / <code>JSONDecodeError</code>）がそのまま送出される。例外は共通骨格が捕捉し、その <code>prompt_config</code> をスキップしてバッチ全体は失敗終了（フェイルラウド）となる（セクション 6）。各セットの実値はセット別設計書と DB（<code>prompt_configs.parameters</code>）で管理する。
+</div>
+
+<h2>4. 認証情報（API キー）</h2>
+<p>環境変数 <code>API_SECRET_ARN</code>（<a href="../../infra/workflow.html">infra/workflow.html セクション 5.1</a> の Task Definition 静的設定。実体は <code>acps/{env}/image/api-key</code>）を方式モジュールが直接読み、<code>acps_shared.get_secret_string</code> で取得した SecretString（JSON <code>{"api_key": "..."}</code>）をパースして API キーを得る。取得は <code>generate()</code> 呼び出しごとに行う（キャッシュなし。初期運用は 1 実行 1 <code>prompt_config</code> のため実害なし）。</p>
+<div class="decision">
+  <span class="callout-title">決定（Phase 11-4）: Secret は方式モジュールが自分で取得する</span>
+  API Secret は共通骨格から引数で渡さず、方式モジュールが環境変数から自分で取得する。共通骨格（<code>main.py</code> / <code>processing.py</code> / レジストリ型 <code>GeneratorFn = Callable[[PromptConfig], list[bytes]]</code>）に特定 API の認証都合を持ち込まないための設計であり、契約「特定 API 固有の処理は方式側に閉じる」に沿う。将来プロバイダごとの Secret 分離が必要になった場合の扱いは設計課題リスト（2026-07-15、2 プロバイダ併用時）を参照。
+</div>
+
+<h2>5. API 呼び出し</h2>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>クライアント</td><td><code>openai.OpenAI(api_key=..., timeout=300.0)</code>（タイムアウト 300 秒固定。画像生成は数分かかるため）</td></tr>
+<tr><td>呼び出し</td><td><code>client.images.generate(model, prompt, size, quality, n)</code></td></tr>
+<tr><td>レスポンス処理</td><td><code>response.data[].b64_json</code> を base64 デコードして PNG バイト列を取得（<code>n</code> に応じて複数枚）</td></tr>
+<tr><td>リトライ</td><td>方式側では行わない（openai SDK のデフォルト挙動に依存。明示指定なし）</td></tr>
+</table>
+</div>
+
+<h2>6. 画像処理（PNG → JPEG 変換）</h2>
+<p>API が返す PNG を Pillow で JPEG に変換して返す（Instagram 投稿に適した形式。共通骨格は <code>Content-Type: image/jpeg</code>・拡張子 <code>.jpg</code>・<code>file_format='jpg'</code> 固定で S3 保存・DB 登録するため、実運用方式は JPEG を返す前提）。</p>
+<ul>
+  <li>モードが RGB でない場合（アルファチャンネル付き等）は <code>convert("RGB")</code> で RGB 化する</li>
+  <li>JPEG 品質は <code>quality=90</code> 固定（<code>prompt_configs.parameters</code> の <code>quality</code> は API の生成品質であり、JPEG エンコード品質とは別物）</li>
+</ul>
+
+<h2>7. エラーハンドリング</h2>
+<p>方式内に try/except・リトライは持たない。Secret 取得失敗・パラメータ不正・API 例外・画像変換失敗はすべてそのまま送出し、共通骨格（<code>processing.py</code>）が <code>prompt_config</code> 単位で捕捉してスキップする。未完了の <code>prompt_config</code> が残るとバッチは失敗終了し、Step Functions の Retry → 失敗アラーム通知につながる（<a href="../batch-flow.html">batch-flow.html セクション 2 の完了判定・失敗時ポリシー</a>）。再実行時は共通骨格の完了判定により生成済み分がスキップされるため、方式は冪等性を意識しなくてよい。</p>
+
+<h2>8. 依存ライブラリ</h2>
+<div class="table-wrap">
+<table>
+<tr><th>ライブラリ</th><th>バージョン（<code>services/image-batch/requirements.txt</code>）</th><th>用途</th></tr>
+<tr><td><code>openai</code></td><td>2.21.0</td><td>Images API 呼び出し</td></tr>
+<tr><td><code>Pillow</code></td><td>12.1.0</td><td>PNG → JPEG 変換</td></tr>
+</table>
+</div>
+<p>Secret 取得は共通ライブラリ <code>shared/acps_shared</code>（<code>get_secret_string</code>）を使用する。</p>
+
+</div>
+</body>
+</html>

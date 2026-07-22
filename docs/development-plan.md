@@ -143,9 +143,9 @@
   - 確認: 本番 cron 式で ENABLED 化され、スケジュール時刻に全チェーンが自動実行・投稿まで成功する
   - 備考: 2026-07-22 完了。既存プレースホルダ Scheduler を 1 日 3 回（7:00 / 12:00 / 21:00 JST、ユーザー決定）・`set_code=fantasy-animals-1` で ENABLED 化し、3 タグ指定 + `--exclusively` で ImageBatchStack のみ deploy。初回の自動実行（12:00 JST）で全チェーン SUCCEEDED・実投稿成功（`posts.id=2`）をユーザーが目視確認。詳細は [development-log.md](development-log.md) の 13-1 を参照
 
-- [ ] **13-2** 本採用に伴う設計書整備と締め
+- [x] **13-2** 本採用に伴う設計書整備と締め
   - 確認: 3 層構造の設計書一式（`docs/app/generators/` の方式設計書新設 + 方式カタログ更新 + `docs/app/sets/<set_code>.html` 最終化）が実態と一致し、設計課題リストの残項目が棚卸しされている
-  - 備考: 「方式設計書はセットが本採用した時点で作成」ルールの初適用。実装中に生じた設計乖離も「実装を正とする」ルールで反映する。残課題の例: stacks.html セクション 5 ツリー図の追記（設計課題リスト 2026-07-06）
+  - 備考: 2026-07-23 完了。方式設計書 [docs/app/generators/gpt-image-single.html](app/generators/gpt-image-single.html) を新設（「本採用時に作成」ルールの初適用。実装を正として記述）し、方式カタログ・[sets/fantasy-animals-1.html](app/sets/fantasy-animals-1.html)（Fix 化・パラメータ確定値反映）・stacks.html セクション 5 ツリー図を実態に合わせて更新。あわせて Aurora アラームを 3/3 データポイントへ延長し MonitoringStack をデプロイ（設計課題リストの 2026-07-06・2026-07-18 を解消、残項目を棚卸し）。詳細は [development-log.md](development-log.md) の 13-2 を参照
 
 > 課題「db-readiness-check の Secret パース二重管理」（設計課題リスト 2026-07-14）は本計画のステップに含めない（db-readiness-check に機能変更で手を入れるタイミングで再検討する）。
 
@@ -166,7 +166,7 @@
 
 | 日付 | 対象ドキュメント | 課題 | 対応方針 | 対応時期 |
 |---|---|---|---|---|
-| 2026-07-06 | docs/infra/stacks.html | セクション 5「スタック間のデータ受け渡し」のツリー図に MonitoringStack への入力（SnsPostingSfnArn・AuroraClusterIdentifier・EcsClusterArn・ImageGenerationSfnName）と DbReadinessCheckSgId の記載がない。3.1 出力一覧・3.4 依存スタックには記載済みのため実装は可能 | Phase 7 実装時に実態へ合わせて追記 | Phase 7 |
+| 2026-07-06 | docs/infra/stacks.html | セクション 5「スタック間のデータ受け渡し」のツリー図に MonitoringStack への入力（SnsPostingSfnArn・AuroraClusterIdentifier・EcsClusterArn・ImageGenerationSfnName）と DbReadinessCheckSgId の記載がない。3.1 出力一覧・3.4 依存スタックには記載済みのため実装は可能 | **解消済み（2026-07-23、Phase 13-2）**: ツリー図に MonitoringStack へのエッジ 3 本（auroraCluster・ecsCluster・snsPostingSfnArn）と dbReadinessCheckSg → 両バッチスタックのエッジを実装（各スタックの props）どおり追記した（stacks.html セクション 5 の decision に記録） | Phase 13-2 |
 | 2026-07-06 | docs/app/design-outline.html | セット廃止時「データ（生成画像・投稿履歴）は残す」とあるが、S3 実体はインフラ設計の 30 日ライフサイクルで自動削除される。「残す」対象が DB レコード（メタ情報・投稿履歴）であることの明確化と S3 実体の保持要否の確認が必要 | **解消済み（2026-07-07）**: 「残す」対象は DB レコードのみと確定。S3 実体は 30 日ライフサイクルで自動削除される前提を明記した（[docs/app/data-model.html](app/data-model.html#s3-key) セクション 5、[docs/app/operation.html](app/operation.html#set-retire) セクション 2.2） | Phase 9-3 |
 | 2026-07-07 | docs/app/operation.html | Instagram トークン失効日（`token_expires_at`）のリマインドは運用者の手動カレンダー管理としたが、セット数が増えると手運用が破綻する | Secrets Manager を横断的に読み取り失効間近のものを通知する仕組み（Lambda + EventBridge 等）の導入を、管理画面（将来拡張）と合わせて検討する | 未定（将来拡張） |
 | 2026-07-07 | docs/app/operation.html | stale データ（`pending`/`container_created` のまま残った生成実行）の検知は専用アラームを持たず、既存の失敗通知を起点にした手動クエリ確認に依存する | セット数・投稿頻度が増えて見落としリスクが高まった場合、stale 行数を CloudWatch カスタムメトリクスとして発行する仕組みの導入を検討する | 未定（将来拡張） |
@@ -178,5 +178,5 @@
 | 2026-07-15 | docs/infra/workflow.html, docs/app/operation.html | Scheduler は現在、機能名の 1 件（`acps-prod-image-generation-schedule`）のみで、セット別の命名規約が未定義。セット 2 追加時に「セットごとに Scheduler 1 件追加」する際の名前の付け方が決まっていない | セット 2 追加時に命名規約を確定する（既存 1 件のリネーム要否も含めて判断） | セット 2 追加時 |
 | 2026-07-15 | docs/infra/security.html | 画像生成 API の複数プロバイダを併用する場合、単一 Secret `acps/{env}/image/api-key` では足りない（生成方式は差し替え可能な strategy 構造のため、将来プロバイダが並存しうる） | provider 軸の Secret 命名拡張（例 `acps/{env}/image/<provider>/api-key`）を security.html の規約改定・IAM プレフィックス確認とセットで、2 プロバイダ併用が現実になった時点で検討する | 2 プロバイダ併用時 |
 | 2026-07-15 | docs/app/batch-flow.html | 2 つ目の SNS プラットフォーム追加時、batch-flow.html セクション 3 の Instagram 固有部分（コンテナ作成 → パブリッシュの 2 段階フロー、`published_unconfirmed` の判定条件等）をどう分冊・共通化するかの設計書構造が未定義 | 生成方式の 3 層分冊と同様の考え方（共通フロー + プラットフォーム別分冊）を軸に、追加が現実になった時点で確定する | 2 つ目のプラットフォーム追加時 |
-| 2026-07-18 | docs/infra/workflow.html（MonitoringStack の Aurora アラーム） | Aurora の `acps-prod-aurora-cpu-high`（CPU ≥ 80%）と `acps-prod-aurora-memory-low`（FreeableMemory ≤ 256 MB）は、min ACU 0 からの再開直後の低容量状態（0.5〜1 ACU ≒ メモリ 1〜2 GiB）で構造的に鳴りやすい。10-4 の DDL 適用時、再開 + 軽微なアクセスのみで両方が ALARM → 数分で OK 復帰した実績あり（実負荷なし）。定常運用でバッチ起動のたびに同じ通知が届くノイズになる可能性がある | Phase 13 の定常運用開始時に実際の発報状況を見て、しきい値・評価期間（データポイント数）の調整、または再開直後の一時的な高負荷を許容する設計（評価期間の延長等）を見直す | Phase 13 |
+| 2026-07-18 | docs/infra/workflow.html（MonitoringStack の Aurora アラーム） | Aurora の `acps-prod-aurora-cpu-high`（CPU ≥ 80%）と `acps-prod-aurora-memory-low`（FreeableMemory ≤ 256 MB）は、min ACU 0 からの再開直後の低容量状態（0.5〜1 ACU ≒ メモリ 1〜2 GiB）で構造的に鳴りやすい。10-4 の DDL 適用時、再開 + 軽微なアクセスのみで両方が ALARM → 数分で OK 復帰した実績あり（実負荷なし）。定常運用でバッチ起動のたびに同じ通知が届くノイズになる可能性がある | **解消済み（2026-07-23、Phase 13-2）**: 定常運用初日の定時実行（2026-07-22 12:00 JST）でも memory-low が発報（1〜6 分で OK 復帰。21:00 の回は非発報 = 毎回ではないが繰り返し発生）しノイズを確認したため、両アラームの DatapointsToAlarm を 2 → 3（5 分 × 3/3 = 15 分継続）へ延長し MonitoringStack をデプロイした（workflow.html セクション 8 の decision に記録）。以後の定時実行で非発報を観察する | Phase 13-2 |
 | 2026-07-22 | docs/app/batch-flow.html セクション 3.1, services/sns-post-batch/app/target_selection.py | 投稿対象の選定条件は「有効アカウントに終端状態の posts がない最古の generation_run」のみで、生成画像の存在を条件にしていない。画像生成が全滅して `generated_images` 0 件のまま終わった generation_run が残ると、以後の投稿バッチはその実行を選び続けて RuntimeError（No generated image was found）で失敗し、手動クリーンアップまで新しい生成実行の投稿がブロックされる。フェイルラウド方針（失敗アラーム → stale データ運用による手動復旧）とは整合しており blocker ではない（12-4/12-5 後の Sonnet 作業チェックのコードレビューで検出） | 発生した場合は stale データ運用（[docs/app/operation.html](app/operation.html) セクション 4）で該当 generation_run を手動クリーンアップする。発生が繰り返して運用負荷になる場合は、選定条件に「`generated_images` が 1 件以上存在する」を加える改修（batch-flow.html 3.1 の更新とセット）を検討する | Phase 13 以降（発生実績を見て判断） |

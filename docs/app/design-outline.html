@@ -66,12 +66,12 @@
     <tr>
       <td><code>generators/&lt;方式名&gt;.html</code></td>
       <td>生成方式別設計書（1 方式 1 本。ルールはセクション 1.1、契約・カタログは <a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）</td>
-      <td>方式の本採用時に作成（試行段階では書かない）</td>
+      <td>方式の本採用時に作成（試行段階では書かない）。初適用: 13-2 で <a href="generators/gpt-image-single.html">gpt-image-single</a> を作成済み</td>
     </tr>
     <tr>
       <td><code>sets/&lt;set_code&gt;.html</code></td>
       <td>セット別設計書（1 セット 1 本。ルールはセクション 1.1）</td>
-      <td>初セット追加時に作成（セット追加のたびに 1 本増える）</td>
+      <td>初セット追加時に作成（セット追加のたびに 1 本増える）。初適用: 11-1 で <a href="sets/fantasy-animals-1.html">fantasy-animals-1</a> を作成済み</td>
     </tr>
   </tbody>
 </table>
@@ -97,7 +97,7 @@
   <li><strong>実データとの役割分担</strong>: プロンプト文言・スケジュール時刻等の実データの正は DB / CDK コード。セット別設計書には意図・方針・方式の選択を書く</li>
   <li><strong>廃止時の扱い</strong>: セット廃止（スクラップ&amp;ビルド）では設計書を削除せず、廃止の旨を付けて履歴として残す（手順は <a href="operation.html#set-retire">operation.html セクション 2.2</a>）。<strong>廃止した生成方式も同じ扱い</strong>とする（設計書を残し、方式カタログのステータスを「廃止」にする）</li>
   <li><strong>インフラは増えない</strong>: インフラ設計書・CDK スタックはセット追加で増えない・変わらない。スタックは機能単位であり、セットは「既存 ImageBatchStack 内の Scheduler 1 件 + Secrets Manager の Secret + DB レコード」として表現される（<a href="operation.html#set-add">operation.html セクション 2.1</a>）</li>
-  <li><strong>作成タイミング</strong>: 実ファイル・雛形は必要になった時点で作成する（<code>sets/</code> は初セット追加時、<code>generators/</code> は方式の本採用時。Phase 10-1 時点ではルールのみ定義）</li>
+  <li><strong>作成タイミング</strong>: 実ファイル・雛形は必要になった時点で作成する（<code>sets/</code> は初セット追加時、<code>generators/</code> は方式の本採用時。11-1 の <code>sets/</code> 初作成・13-2 の <code>generators/</code> 初作成で両ルールとも初適用済み）</li>
 </ul>
 
 <div class="note">

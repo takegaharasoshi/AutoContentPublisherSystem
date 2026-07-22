@@ -312,18 +312,24 @@
   ├── vpc              → ImageBatchStack, SnsPostBatchStack
   ├── securityGroup    → ImageBatchStack, SnsPostBatchStack
   ├── s3Bucket         → ImageBatchStack, SnsPostBatchStack
-  ├── auroraCluster    → ImageBatchStack, SnsPostBatchStack
+  ├── auroraCluster    → ImageBatchStack, SnsPostBatchStack, MonitoringStack（Aurora アラームの Dimension）
   ├── secretsArn       → ImageBatchStack, SnsPostBatchStack
-  ├── ecsCluster       → ImageBatchStack, SnsPostBatchStack
-  └── dbReadinessCheckTaskDefFamily → ImageBatchStack, SnsPostBatchStack
+  ├── ecsCluster       → ImageBatchStack, SnsPostBatchStack, MonitoringStack（ECS タスク異常終了イベントの clusterArn フィルタ）
+  ├── dbReadinessCheckTaskDefFamily → ImageBatchStack, SnsPostBatchStack
+  └── dbReadinessCheckSg → ImageBatchStack, SnsPostBatchStack（DB 準備確認タスクの RunTask 用）
 
 SnsPostBatchStack
-  └── snsPostingSfnArn → ImageBatchStack（画像生成完了後の SNS 投稿 Step Functions 起動用）
+  └── snsPostingSfnArn → ImageBatchStack（画像生成完了後の SNS 投稿 Step Functions 起動用）, MonitoringStack（失敗アラーム）
 
 ImageBatchStack
   ├── imageGenerationSfnArn  → MonitoringStack
   ├── imageScheduleGroupName → MonitoringStack（Scheduler 失敗メトリクスの Dimension）
   └── imageSchedulerDlqArn   → 運用確認用</code></pre>
+
+<div class="decision">
+  <span class="callout-title">MonitoringStack への入力と DB 準備確認 SG のエッジを追記（2026-07-23、Phase 13-2）</span>
+  当初のツリー図には MonitoringStack への入力（<code>auroraCluster</code>・<code>ecsCluster</code>・<code>snsPostingSfnArn</code>）と <code>dbReadinessCheckSg</code> のエッジが欠落していた（セクション 3.1 出力一覧・3.4 依存スタックには記載済み。設計課題リスト 2026-07-06）。実装（各スタックの props）に合わせて追記した。
+</div>
 
 </div>
 </body>
