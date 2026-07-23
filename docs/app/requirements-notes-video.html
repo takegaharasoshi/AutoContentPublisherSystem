@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動画（リール）対応 要件メモ（14-2 壁打ち記録） | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / 動画（リール）対応 要件メモ（14-2 壁打ち記録）</nav>
+<h1>動画（リール）対応 要件メモ（14-2 壁打ち記録）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">Phase 14-2 成果物（14-3 以降の設計で見直す前提）</span>
+  <span>最終更新: 2026-07-23</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  Phase 14-2「コンテンツ生成（動画）対応の要件壁打ち」（2026-07-23 実施）の記録であり、設計書ではない。
+  Phase 14-3 以降（設計大枠 → 詳細設計 → 実装）の入力として使用する。
+  壁打ち記録は 1 回 1 本のパターン（14-1 で決定）に基づく新規ノート。A-1 の壁打ち記録は <a href="requirements-notes.html">requirements-notes.html</a> を参照。
+  上位の事業判断（収益化経路・予算・KPI）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする。
+</div>
+
+<h2 id="background">1. 背景と目的</h2>
+<ul>
+  <li>動画（リール）対応は収益化経路（Meta ボーナス = リール再生数ベース）の必要条件であり、Phase 14 の最重要機能（<a href="../strategy/business-strategy.html#monetization">事業戦略書 セクション 2</a>）。KPI マイルストーン M1「リール自動投稿の定常運用」に対応する</li>
+  <li>初期スコープは<strong>「静止画 + 音楽」の簡易動画方式</strong>（ffmpeg 等のローカル合成。生成 API 費ほぼゼロ）から開始し、生成 AI 動画方式は generator strategy の差し替えで後から導入する — 14-1 の壁打ちで合意済み。本壁打ちはこの方式の要件を具体化する</li>
+  <li>初期パラメータ感「1 日 1 本・10 秒前後・標準画質」（<a href="../strategy/business-strategy.html#cost-model">事業戦略書 セクション 3.1</a>）を出発点とする</li>
+</ul>
+
+<h2 id="research">2. 調査結果（決定の前提となる事実。2026-07-23 時点）</h2>
+
+<h3 id="api-constraint">2.1 API 経由のリール投稿と音源の制約</h3>
+<div class="warn">
+  <span class="callout-title">確定事実: API 投稿では Instagram の音楽ライブラリは使えない</span>
+  <ul style="margin:.3rem 0 0;">
+    <li>Instagram の音楽ライブラリ・トレンド音源の付与は<strong>ネイティブアプリ限定機能</strong>であり、Graph API 経由のリール投稿では利用できない。<strong>音声は動画ファイルに埋め込んで渡すしかない</strong></li>
+    <li>そもそも Instagram の音楽ライブラリは個人・非商用利用向けライセンスであり、ビジネスアカウント・商用利用には権利が付与されない</li>
+    <li>権利処理されていない音源を埋め込むと、公開後に自動ミュート・削除の対象となり得る</li>
+  </ul>
+  したがって<strong>自前で権利クリアした音源を調達し、合成時に埋め込む方式が必須</strong>となる（開発計画の事前調査どおり）。
+</div>
+
+<h3 id="audio-options">2.2 自前音源の調達選択肢の比較</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>選択肢</th><th>費用</th><th>商用利用</th><th>プラットフォーム制限</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>CC0・フリーライセンス音源<br>（Pixabay License 等）</td>
+      <td>無料</td>
+      <td>可</td>
+      <td>なし（TikTok 転用可）</td>
+      <td>CC0 は著作権放棄（クレジット不要）。CC-BY は要クレジット、CC-BY-NC（非商用）は収益化コンテンツに使用不可のため除外。難点は他アカウントとの音源被りと、世界観との合致が選曲頼みになる点</td>
+    </tr>
+    <tr>
+      <td>Meta Sound Collection<br>（Meta 公式の無料音源ライブラリ）</td>
+      <td>無料</td>
+      <td>可</td>
+      <td><strong>Facebook / Instagram 限定</strong></td>
+      <td>ライセンス規約上、Meta 製品外での利用・配布は不可。<strong>TikTok 展開（Phase 17 第一候補）で音源差し替えが必要になるため不採用</strong></td>
+    </tr>
+    <tr>
+      <td>AI 音楽生成<br>（Suno 等）</td>
+      <td>有料プラン $10/月〜</td>
+      <td>有料プラン中の生成曲のみ可<br>（無料プラン生成曲は不可）</td>
+      <td>なし</td>
+      <td>契約中に生成した曲の商用ライセンスは<strong>解約後も持続</strong>するため、「1 か月だけ契約してストック生成」の単発費用パターンが可能（固定費を積まない予算方針と整合）。独自世界観に合う音源を作れ、非オリジナルコンテンツ対策にも寄与</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="reel-spec">2.3 リール投稿の技術仕様の概略</h3>
+<ul>
+  <li>推奨フォーマット: <strong>9:16 縦長（1080x1920）</strong>・MP4（H.264 + AAC）。現行の生成画像は 1024x1024 正方形のためギャップがある</li>
+  <li>Graph API のリール投稿はコンテナ作成時に <code>media_type=REELS</code> と <code>video_url</code>（公開アクセス可能な URL）を渡す方式。<strong>現行の S3 presigned URL 方式（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）は動画でも流用できる見込み</strong></li>
+  <li>動画はサーバ側の処理（コンテナが FINISHED になるまで）が画像より長く、分オーダーになり得る → ポーリング設計・タイムアウトの見直しが必要（セクション 6）</li>
+  <li><code>share_to_feed</code> パラメータでプロフィールのフィード面（グリッド）への表示可否を制御できる</li>
+</ul>
+
+<h2 id="decisions">3. 決定事項（壁打ち結果）</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>#</th><th>論点</th><th>決定</th><th>理由</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>音源の調達方針</td>
+      <td><strong>段階方式</strong>。検証用セット（fantasy-animals-1）は CC0・フリーライセンス音源で開始し、勝負セット投入（Phase 15）時に AI 音楽生成（Suno 等）への格上げを検討する</td>
+      <td>無料・固定費ゼロで開始でき、プラットフォーム制限がなく TikTok 転用も可。AI 生成は単発費用パターン（2.2 参照）で導入でき、独自性が要る勝負セットで効果が大きい。Meta Sound Collection は Meta 限定ライセンスのため不採用</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>動画の画角</td>
+      <td><strong>縦長画像（1024x1536、2:3）を生成</strong>し、ffmpeg 合成時に 9:16 へ微調整（軽いクロップまたはパディング）</td>
+      <td>リールで全画面表示され見栄えが最良。変更は <code>prompt_configs</code> の params（size）のみで生成コストもほぼ同等</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>動画演出（簡易動画方式の中身）</td>
+      <td><strong>静止画 1 枚 + ゆっくりズーム/パン（Ken Burns 効果）+ 音楽</strong>。長さ 10 秒前後・標準画質</td>
+      <td>ffmpeg のみで実装でき、「1 起動 = 1 枚生成」の現行不変条件を維持できる。完全静止よりリールらしい動きが出る。複数枚スライドショーは生成費・改修規模が増えるため将来拡張</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>fantasy-animals-1 の実行配分</td>
+      <td><strong>全て動画（リール）に置換し、実行回数を 1 日 3 回 → 1 日 1 回に削減</strong>（時刻は実装時に決定）</td>
+      <td>セットの <code>generator_name</code> を動画方式へ差し替えるだけで構造変更が最小。1 セット内で静止画・動画を併用する場合は方式割当をセット単位からスロット/設定単位へ拡張する必要があり、検証用セットには過剰。回数削減で API 費約 1/3 とし勝負セットへ予算温存（初期パラメータ感「1 日 1 本」とも一致）</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>静止画方式の扱い</td>
+      <td><strong>gpt-image-single 方式は廃止しない</strong>。コード（strategy モジュール）・方式設計書・方式カタログ掲載はそのまま残す</td>
+      <td>ユーザー要件「将来的に画像だけの投稿も行う可能性があるため、生成方式は消さない」。方式はセットへの<strong>割当</strong>を差し替えるだけであり、割当を戻す（または画像方式の別セットを作る）ことでいつでも再利用できる</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>音源の運用</td>
+      <td><strong>セットごとに複数曲（3〜5 曲目安）を S3 にストックし、投稿ごとにローテーション</strong>。全曲について出典 URL・ライセンス種別・取得日の証跡を残す</td>
+      <td>毎回同じ曲による飽き・量産感を軽減（非オリジナルコンテンツ対策の観点でも有利）。<code>prompt_configs</code> / <code>caption_templates</code> と同じ「セット配下の有効レコード」パターンで設計できる</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>AI 利用の開示（事業戦略書セクション 2 の必須要件）</td>
+      <td><strong>ハッシュタグで開示する</strong>（#AIart 等。具体タグは設計時に選定）。キャプションテンプレートに含める運用ルールとして義務化</td>
+      <td>テーブル構造の変更が不要で、テンプレート経由により全投稿へ確実に付与される。開示文言の追加は必要になれば運用（テンプレート更新）で対応できる</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>リールのフィード面表示</td>
+      <td><strong>表示する</strong>（<code>share_to_feed=true</code>）</td>
+      <td>リール面とフィード/グリッドの両方に露出しリーチ最大化。フォロワー資産を KPI に置く方針と整合</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="scope">4. 初期スコープ（簡易動画方式の要件まとめ）</h2>
+<ul>
+  <li><strong>生成</strong>: 縦長静止画 1024x1536 を 1 枚生成（1 起動 = 1 枚生成 = 1 投稿の不変条件は維持）→ ffmpeg で 9:16・10 秒前後・ズーム/パン・音源合成・標準画質の MP4（H.264 + AAC）を作成</li>
+  <li><strong>音源</strong>: CC0・フリーライセンス音源をセットごとに 3〜5 曲ストックしローテーション。ライセンス証跡（出典 URL・ライセンス種別・取得日）を保持</li>
+  <li><strong>投稿</strong>: リール（<code>media_type=REELS</code>）として投稿。<code>share_to_feed=true</code>。キャプションは既存テンプレート方式 + AI 開示ハッシュタグ</li>
+  <li><strong>実行</strong>: fantasy-animals-1 を 1 日 1 回・全て動画に置換（Scheduler 3 件 → 1 件。時刻は実装時に決定）</li>
+</ul>
+
+<h3 id="future">4.1 将来拡張（今回のスコープ外）</h3>
+<ul>
+  <li><strong>生成 AI 動画方式</strong>（Sora 等）: generator strategy の追加で導入。特定サービスに固定しない（<a href="../strategy/business-strategy.html#cost-model">事業戦略書 セクション 3.1</a>）</li>
+  <li><strong>AI 音楽生成音源への格上げ</strong>: 勝負セット投入（Phase 15）時に判断</li>
+  <li><strong>複数枚スライドショー演出</strong>: 1 起動複数枚生成が必要になった時点で「1 起動 = 1 枚」運用ルールとあわせて見直す</li>
+  <li><strong>静止画投稿の再開</strong>: 方式割当を戻すか、画像方式の別セットを作ることで対応（方式は残置。決定事項 #5）</li>
+</ul>
+
+<h2 id="data-model">5. データモデルへの影響整理</h2>
+<p>詳細設計（テーブル定義の確定）は 14-3 以降で行う。ここでは影響箇所の洗い出しと方向性のみ記録する。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>対象</th><th>影響</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>batch_sets</code></td>
+      <td>変更なし</td>
+      <td>新方式名を <code>generator_name</code> に設定するだけ（レコード運用）。方式割当はセット単位のままでよい（決定事項 #4 により 1 セット内の方式混在は不要）</td>
+    </tr>
+    <tr>
+      <td><code>prompt_configs</code></td>
+      <td>変更なし</td>
+      <td>params の size を 1024x1536 に変えるのはレコード運用（スナップショット方式で追跡可能）</td>
+    </tr>
+    <tr>
+      <td><code>generation_runs</code></td>
+      <td>変更なし</td>
+      <td>「1 起動 = 1 投稿」の単位・冪等性キー（<code>set_id</code> × <code>scheduled_at</code>）は動画でも不変</td>
+    </tr>
+    <tr>
+      <td><code>generated_images</code></td>
+      <td><strong>要検討</strong></td>
+      <td>中間生成物（静止画）は従来どおり記録する前提。<strong>最終成果物が動画になるため、動画ファイルのメタ情報の置き場が論点</strong>。候補: (a) <code>generated_images</code> を「生成メディア」に一般化（<code>file_format</code> カラムを活用）、(b) 動画専用テーブルの新設、(c) 1 実行 1 動画の前提で <code>generation_runs</code> に直接持たせる — 14-3 以降で決定</td>
+    </tr>
+    <tr>
+      <td>S3 キー規約</td>
+      <td><strong>拡張必要</strong></td>
+      <td>現行規約（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）は <code>images/</code> プレフィックス・拡張子 <code>.jpg</code> 固定。動画（<code>.mp4</code>）と音源ストックの置き場の規約追加が必要</td>
+    </tr>
+    <tr>
+      <td><code>posts</code></td>
+      <td><strong>要検討</strong></td>
+      <td>投稿のメディア種別（フィード画像 / リール）の表現方法（カラムで持つか、セット・方式から導出するか）。状態遷移 5 状態（<code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）と投稿対象決定クエリは<strong>流用できる見込み</strong></td>
+    </tr>
+    <tr>
+      <td><code>post_images</code></td>
+      <td><strong>要検討</strong></td>
+      <td>「投稿に載せるメディア」の参照が画像前提。動画参照への対応方法（テーブルの一般化 or 動画メタ情報の設計とセットで決定）</td>
+    </tr>
+    <tr>
+      <td>音源管理</td>
+      <td><strong>新設</strong></td>
+      <td>セット配下の音源ストックを表すテーブル（仮称 <code>audio_assets</code>）の新設案。S3 キー・有効フラグ・ライセンス証跡（出典 URL・ライセンス種別・取得日）・ローテーション用の情報を持つ。<code>prompt_configs</code> / <code>caption_templates</code> と同じ「セット配下の有効レコード」パターン + セット境界の複合 FK パターンを踏襲する想定</td>
+    </tr>
+    <tr>
+      <td><code>caption_templates</code></td>
+      <td>変更なし</td>
+      <td>AI 開示ハッシュタグはテンプレート本文に含める運用ルール（<a href="operation.html">operation.html</a> に運用ルールの追記は必要）</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="impact">6. インフラ・実装への影響メモ（参考）</h2>
+<p>設計は 14-3 以降で行う。壁打ちで見えた影響範囲のみ記録する。</p>
+<ul>
+  <li><strong>image-batch</strong>: コンテナへの ffmpeg 追加、動画方式の strategy モジュール新設（方式カタログへ 1 行追加）、Fargate タスクの CPU / メモリ / 一時ストレージの見直し。方式契約（「セット設定を受け取り最終画像を返す」<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）が「最終メディアを返す」への一般化を要する可能性</li>
+  <li><strong>sns-post-batch</strong>: <code>instagram_api.py</code> のリール対応（<code>media_type=REELS</code> / <code>video_url</code> / <code>share_to_feed</code>）。動画のコンテナ処理は分オーダーになり得るため、ポーリング回数・間隔と Step Functions タイムアウトの見直し。presigned URL 方式は流用可</li>
+  <li><strong>Scheduler / 監視</strong>: Scheduler 3 件 → 1 件への削減（実装時）。実行時間が延びる場合のアラーム閾値・タイムアウト見直しの要否確認</li>
+</ul>
+
+<h2 id="carryover">7. 持ち越し論点（14-3 以降で決める）</h2>
+<ul>
+  <li>動画メタ情報のテーブル設計の確定（セクション 5 の候補 a / b / c）と <code>post_images</code> の扱い</li>
+  <li>音源テーブルの具体設計と選曲アルゴリズム（順繰り / ランダム）</li>
+  <li>音源ファイルの前処理（10 秒前後への切り出し・フェード・音量正規化）を事前手動とするかバッチ内処理とするか</li>
+  <li>ffmpeg 合成パラメータ（出力解像度 1080x1920・フレームレート・ビットレート =「標準画質」の定義、ズームの方向・速度・フェード）</li>
+  <li>方式名（レジストリキー）の命名と方式契約の一般化の要否</li>
+  <li>AI 開示ハッシュタグの具体選定とキャプションテンプレートの更新</li>
+  <li>1 日 1 回の実行時刻（現行 7:00 / 12:00 / 21:00 JST のどれを残すか等）</li>
+  <li>リールのカバー画像（サムネイル）の扱い（デフォルトのままか、<code>thumb_offset</code> 等を指定するか）</li>
+  <li>フリー音源でも著作権検知の誤検知（自動ミュート）があり得る点の運用監視（投稿後のミュート検知は当面手動確認）</li>
+</ul>
+
+<h2 id="references">8. 参考リンク（調査ソース。2026-07-23 時点）</h2>
+<ul>
+  <li><a href="https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media/">Instagram Platform: Media リファレンス（Meta for Developers）</a> — リール投稿 API の仕様</li>
+  <li><a href="https://help.instagram.com/402084904469945/">Instagram ヘルプ: 音楽ライブラリへのアクセス</a> — 音楽ライブラリの商用利用制限</li>
+  <li><a href="https://www.facebook.com/sound/collection/terms">Meta Sound Collection 利用規約</a> — Meta 製品内限定ライセンスの根拠</li>
+  <li><a href="https://statusbrew.com/insights/adding-trending-audio-to-scheduled-content">API 経由投稿とトレンド音源の制約（Statusbrew）</a></li>
+  <li><a href="https://terms.law/ai-output-rights/suno/">Suno の商用利用ライセンス解説（Terms.Law）</a> — 有料プラン生成曲の商用可・解約後の扱い</li>
+  <li><a href="https://howworks.ai/blog/what-is-cc0-music-license-creators">CC0 ライセンス解説（HowWorks）</a></li>
+</ul>
+
+</div>
+</body>
+</html>

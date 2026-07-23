@@ -100,6 +100,11 @@
       <td>例: Sora 2 $0.10/秒 → 10 秒 1 本 75〜150 円 → 1 日 1 本で月 2,300〜4,500 円</td>
       <td>初期は「静止画 + 音楽」の簡易動画方式（ffmpeg 等のローカル合成）で開始し、この費目をほぼゼロに抑える。生成 AI 動画方式は generator strategy の差し替えで後から導入する</td>
     </tr>
+    <tr>
+      <td>音源（リール用 BGM）</td>
+      <td>初期 0 円（CC0・フリーライセンス音源）</td>
+      <td>段階方式（2026-07-23 の 14-2 壁打ちで決定）: 検証用セットは CC0/フリー音源、勝負セット投入時に AI 音楽生成（Suno 等・$10/月程度を 1 か月だけ契約しストック生成 = 単発費用）への格上げを検討。詳細は <a href="../app/requirements-notes-video.html">14-2 壁打ち記録</a></td>
+    </tr>
   </tbody>
 </table>
 </div>
@@ -201,7 +206,7 @@
       <td><a href="../app/sets/fantasy-animals-1.html">fantasy-animals-1</a></td>
       <td><strong>検証用セット</strong>（2026-07-23 壁打ちで確定）</td>
       <td>収益化・フォロワー成長は狙わない。パイプラインの定常稼働の確認と、<strong>新機能（リール投稿等）を本番 API で試す実験台</strong>として運用する。
-      実行頻度（現行 1 日 3 回）は動画対応の実装時に予算配分の観点で見直す（Phase 14）</td>
+      実行頻度・方式は 14-2 壁打ち（2026-07-23）で<strong>「全て動画（リール）に置換・1 日 1 回」に決定</strong>（適用は Phase 14 実装時。<a href="../app/requirements-notes-video.html">壁打ち記録</a>）</td>
     </tr>
     <tr>
       <td>勝負セット（テーマ未定）</td>

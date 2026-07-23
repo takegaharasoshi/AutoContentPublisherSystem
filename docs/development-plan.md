@@ -165,11 +165,12 @@
   - 確認: [docs/strategy/business-strategy.html](strategy/business-strategy.html) が新設され、体系ガイド・システム概要・CLAUDE.md が整合している。Phase 14〜17 の骨子が本ファイルに展開されている
   - 備考: 2026-07-23 完了。事業戦略層（docs/strategy/）を新設し、2026-07-23 の壁打ち結果（収益化経路 = Meta ボーナス本命・予算月 2 万円上限・KPI M1〜M4・fantasy-animals-1 の検証用位置づけ）を初版として記載。詳細は [development-log.md](development-log.md) の 14-1 を参照
 
-- [ ] **14-2** コンテンツ生成（動画）対応の要件壁打ち（A-1 相当）
+- [x] **14-2** コンテンツ生成（動画）対応の要件壁打ち（A-1 相当）
   - 確認: 壁打ち記録（docs/app/ に新規ノート 1 本。壁打ち記録は 1 回 1 本のパターン）に、要件・初期スコープ（簡易動画方式）・音源ライセンスの調査結果（API 経由のリール投稿では Meta 音楽ライブラリ不可のため自前音源の調達方針が必要）・データモデルへの影響整理が記録されている
+  - 備考: 2026-07-23 完了。壁打ち記録は [docs/app/requirements-notes-video.html](app/requirements-notes-video.html)。主な決定: 音源は段階方式（検証用セットは CC0/フリー音源 → 勝負セットで AI 音楽生成を検討。Meta Sound Collection は Meta 限定ライセンスのため不採用）、縦長 1024x1536 生成 + ズーム/パン 10 秒前後の簡易動画、fantasy-animals-1 は全て動画に置換・1 日 1 回へ削減（gpt-image-single 方式は残置）、音源は複数曲ストック + ローテーション（ライセンス証跡必須）、AI 開示はハッシュタグ、share_to_feed=true。データモデル影響（動画メタ情報の置き場・音源テーブル新設・S3 キー規約拡張・posts のメディア種別）を整理。詳細は [development-log.md](development-log.md) の 14-2 を参照
 
 - [ ] **14-3 以降** 壁打ち結果を受けてステップ展開
-  - 設計大枠 → 詳細設計 → 実装 → AWS E2E の流れを 14-2 完了時に具体化する。fantasy-animals-1 の実行頻度見直し（現行 1 日 3 回。予算配分の観点）を含める
+  - 設計大枠 → 詳細設計 → 実装 → AWS E2E の流れを 14-2 完了を受けて具体化する（次プロンプトで展開）。fantasy-animals-1 の実行頻度見直しは 14-2 で「1 日 1 回・全て動画に置換」と決定済み（適用は実装時）
 
 ---
 
