@@ -20,7 +20,7 @@ def test_has_generated_image_returns_database_existence() -> None:
 
     assert has_generated_image(cursor, 8, 3)
     cursor.execute.assert_called_once_with(
-        "SELECT 1 FROM generated_images WHERE generation_run_id = %s "
+        "SELECT 1 FROM generated_media WHERE generation_run_id = %s "
         "AND prompt_config_id = %s LIMIT 1",
         (8, 3),
     )

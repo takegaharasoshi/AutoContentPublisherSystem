@@ -15,7 +15,7 @@ def test_fetch_first_generated_image_returns_smallest_id_row() -> None:
         7, "images", "images/set/a.jpg"
     )
     cursor.execute.assert_called_once_with(
-        "SELECT id, s3_bucket, s3_key FROM generated_images "
+        "SELECT id, s3_bucket, s3_key FROM generated_media "
         "WHERE generation_run_id = %s ORDER BY id LIMIT 1",
         (12,),
     )

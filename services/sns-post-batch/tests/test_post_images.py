@@ -15,7 +15,7 @@ def test_ensure_post_image_inserts_display_order_zero() -> None:
     ensure_post_image(cursor, post_id=4, generated_image_id=8)
 
     cursor.execute.assert_called_once_with(
-        "INSERT INTO post_images (post_id, generated_image_id, display_order) "
+        "INSERT INTO post_media (post_id, generated_media_id, display_order) "
         "VALUES (%s, %s, 0)",
         (4, 8),
     )

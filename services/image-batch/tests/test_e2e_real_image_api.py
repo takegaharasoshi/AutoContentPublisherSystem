@@ -105,7 +105,7 @@ def real_api_batch_set() -> tuple[str, int, int]:
         if set_id is not None:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "DELETE FROM generated_images WHERE set_id = %s", (set_id,)
+                    "DELETE FROM generated_media WHERE set_id = %s", (set_id,)
                 )
                 cursor.execute("DELETE FROM generation_runs WHERE set_id = %s", (set_id,))
                 cursor.execute("DELETE FROM prompt_configs WHERE set_id = %s", (set_id,))
@@ -148,7 +148,7 @@ def test_main_generates_real_image_via_gpt_image_single(
             generation_run = cursor.fetchone()
             cursor.execute(
                 "SELECT file_size_bytes, s3_key, s3_bucket, file_format "
-                "FROM generated_images WHERE set_id = %s",
+                "FROM generated_media WHERE set_id = %s",
                 (set_id,),
             )
             image_rows = cursor.fetchall()

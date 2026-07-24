@@ -21,7 +21,7 @@ def fetch_first_generated_image(
         The image with the smallest ID, or ``None`` when no image exists.
     """
     cursor.execute(
-        "SELECT id, s3_bucket, s3_key FROM generated_images "
+        "SELECT id, s3_bucket, s3_key FROM generated_media "
         "WHERE generation_run_id = %s ORDER BY id LIMIT 1",
         (generation_run_id,),
     )

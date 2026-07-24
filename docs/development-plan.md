@@ -197,9 +197,9 @@
   - 確認: 壁打ちの持ち越し論点（[requirements-notes-video.html](app/requirements-notes-video.html) セクション 7）が決定され、data-model.html・batch-flow.html・operation.html が動画対応を含む形で一時 Fix されている（blocker のみ修正、改善提案は設計課題リストへ）
   - 備考: 2026-07-24 完了。主な決定: `generated_images`/`post_images` を `generated_media`/`post_media` にリネームし「生成メディア」に一般化（候補 (a) の発展形。中間静止画は DB 記録なし・S3 のみ）、`posts.media_type ENUM('feed_image','reel')` 追加、`audio_assets` 新設（証跡カラム一元管理・順繰り選曲・0 件はフェイルラウド）、S3 キーに `videos/`・`audio/` を追加、方式契約を「最終メディアを返す」に一般化・方式名 `gpt-image-kenburns`、音源前処理は事前手動（AAC 化まで）、「標準画質」= 1080x1920・30fps・CRF 20 目安・AAC 128kbps・10 秒・ズームイン 1.0→1.08、AI 開示は `#AIart` のみ、カバー画像はデフォルト（先頭フレーム。14-8 実機確認）、ミュート誤検知は週次手動確認。**S3 の 30 日ライフサイクルがバケット全体に掛かっており音源ストックが消える問題を発見** → プレフィックス限定への変更を 14-6 前の必須作業として計画に反映。詳細は [development-log.md](development-log.md) の 14-4 を参照
 
-- [ ] **14-5** V002 マイグレーションの作成と適用
+- [ ] **14-5** V002 マイグレーションの作成と適用（ローカル適用・検証済み / Aurora 適用はユーザー作業待ち）
   - 確認: V002 DDL がローカル MySQL・Aurora 双方に適用され、`SHOW CREATE TABLE` で定義一致（data-model.html との一致）を裏取りできている
-  - 備考: 14-4 で確定したデータモデル（音源テーブル新設 + 既存テーブルの変更）を DDL 化する。V001 は Aurora 適用済みのため直接修正せず V002 を新設する（10-3 の V001 直接修正が許されたのは未適用だったため）。Aurora への適用は 10-4 の役割分担（Query Editor 操作はユーザー、CLI 裏取りは Claude）を踏襲する
+  - 備考: 14-4 で確定したデータモデル（音源テーブル新設 + 既存テーブルの変更）を DDL 化する。V001 は Aurora 適用済みのため直接修正せず V002 を新設する（10-3 の V001 直接修正が許されたのは未適用だったため）。Aurora への適用は 10-4 の役割分担（Query Editor 操作はユーザー、CLI 裏取りは Claude）を踏襲する。**2026-07-25 時点**: `database/V002__video_support.sql` 作成、ローカル MySQL 8.0 へ V001→V002 を適用し `SHOW CREATE TABLE` 一致 + 音源複合 FK の動作（画像=NULL 許容 / 動画=同一セット音源で成立 / 別セット・不存在は REJECT）を検証済み。稼働継続のため既存アプリ（image-batch / sns-post-batch）の SQL を新テーブル名へ機械的にリネーム済み（pytest 全パス）。設計書（data-model.html セクション 8）同期済み。**残作業**: ①保守ウィンドウ（定時実行の合間、必要なら Scheduler 一時停止）で Aurora へ V002 を適用（ユーザー・Query Editor）→ ②Claude が CLI で `SHOW CREATE TABLE` 裏取り → ③新テーブル名アプリを再デプロイ（新タスク定義リビジョン登録・ユーザー）→ ④Scheduler 再開。詳細は [development-log.md](development-log.md) の 14-5 を参照
 
 - [ ] **14-6** 音源の調達と登録（外部作業含む）
   - 確認: CC0・フリーライセンス音源 3〜5 曲が前処理済みで S3 に配置され、音源テーブルにローカル & Aurora とも登録されている。全曲のライセンス証跡（出典 URL・ライセンス種別・取得日）が記録済み

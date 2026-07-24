@@ -114,7 +114,7 @@ def local_batch_set() -> tuple[dict[str, Any], str, int, int, int]:
             )
             generation_run_id = cursor.lastrowid
             cursor.execute(
-                "INSERT INTO generated_images "
+                "INSERT INTO generated_media "
                 "(set_id, generation_run_id, prompt_config_id, output_index, "
                 "prompt_text_snapshot, s3_key, s3_bucket, file_format, "
                 "file_size_bytes, generated_at) "
@@ -161,7 +161,7 @@ def local_batch_set() -> tuple[dict[str, Any], str, int, int, int]:
         if set_id is not None:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "DELETE FROM post_images WHERE post_id IN "
+                    "DELETE FROM post_media WHERE post_id IN "
                     "(SELECT id FROM posts WHERE set_id = %s)",
                     (set_id,),
                 )
@@ -170,7 +170,7 @@ def local_batch_set() -> tuple[dict[str, Any], str, int, int, int]:
                     "DELETE FROM batch_execution_logs WHERE set_id = %s", (set_id,)
                 )
                 cursor.execute(
-                    "DELETE FROM generated_images WHERE set_id = %s", (set_id,)
+                    "DELETE FROM generated_media WHERE set_id = %s", (set_id,)
                 )
                 cursor.execute(
                     "DELETE FROM generation_runs WHERE set_id = %s", (set_id,)
@@ -232,7 +232,7 @@ def test_main_persists_successful_post_to_local_mysql(
             )
             post = cursor.fetchone()
             cursor.execute(
-                "SELECT COUNT(*) FROM post_images WHERE generated_image_id = %s",
+                "SELECT COUNT(*) FROM post_media WHERE generated_media_id = %s",
                 (generated_image_id,),
             )
             post_image_count = cursor.fetchone()[0]

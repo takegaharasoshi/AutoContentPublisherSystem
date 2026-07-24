@@ -436,11 +436,11 @@ audio/{set_code}/{ファイル名}.m4a                                          
   <li>本スキーマの Aurora への適用自体は <strong>Phase 10 で実施</strong>する（Phase 9 は DDL ファイル作成まで）</li>
   <li><strong>V002（動画対応差分。Phase 14-5 で作成・適用）</strong>の内容は本書の Phase 14-4 決定を正とする:
     <ul style="margin:.2rem 0 0;">
-      <li><code>RENAME TABLE generated_images TO generated_media</code> / <code>post_images TO post_media</code>、<code>post_media.generated_image_id</code> → <code>generated_media_id</code> のカラムリネーム（セクション 4.5・4.6。FK・インデックス名の追随リネームは V002 作成時に確定）</li>
-      <li><code>generated_media</code> へ <code>duration_seconds</code>・<code>audio_asset_id</code>（複合 FK）を追加（セクション 4.5）</li>
+      <li><code>RENAME TABLE generated_images TO generated_media</code> / <code>post_images TO post_media</code>、<code>post_media.generated_image_id</code> → <code>generated_media_id</code> のカラムリネーム（セクション 4.5・4.6）。<strong>FK・インデックス名の追随リネーム（14-5 で確定）</strong>: 旧テーブル名を含む識別子は新テーブル名に合わせて全て改名する（<code>uq_/idx_/fk_generated_media_*</code>・<code>uq_/idx_/fk_post_media_*</code>）。<code>RENAME TABLE</code> は索引/FK の名前を変えないため <code>ALTER TABLE ... RENAME INDEX</code> と FK の DROP→ADD で明示改名する。<code>RENAME TABLE</code> が引き継ぐ旧名参照のテーブル COMMENT も新名へ更新する</li>
+      <li><code>generated_media</code> へ <code>duration_seconds</code>（<code>INT UNSIGNED NULL</code>）・<code>audio_asset_id</code>（<code>BIGINT UNSIGNED NULL</code>、複合 FK）を追加（セクション 4.5）</li>
       <li><code>posts</code> へ <code>media_type ENUM('feed_image','reel') NOT NULL DEFAULT 'feed_image'</code> を追加（セクション 4.6）</li>
-      <li><code>audio_assets</code> の新設（セクション 4.8）</li>
-      <li>適用先は<strong>稼働中の DB</strong>のため、定時実行（EventBridge Scheduler）と重ならない適用タイミング・旧テーブル名のコードが動いている間の適用順序（アプリのデプロイとの前後関係）を 14-5 で確定する</li>
+      <li><code>audio_assets</code> の新設（セクション 4.8。<code>acquired_at DATETIME NOT NULL</code>・<code>source_url</code>/<code>title</code>/<code>license_type</code> は <code>NOT NULL</code>、<code>license_note</code>/<code>last_used_at</code>/<code>duration_seconds</code> は NULL 可）</li>
+      <li><strong>稼働中 DB への適用順序（14-5 で確定）</strong>: ECS は RunTask（常駐サービスなし）で定時実行の瞬間しか DB に触れないため、<strong>投稿を止めない無停止コーディネート方式</strong>を採る。既存アプリ（<code>image-batch</code> / <code>sns-post-batch</code>）の SQL を新テーブル名へ機械的に書き換える対応を 14-5 に含め、V002 適用（Aurora / Query Editor）と新テーブル名アプリの再デプロイ（新タスク定義リビジョン登録）を<strong>定時実行（EventBridge Scheduler）の合間</strong>にまとめて実施し、次回スケジュール実行前に両方を終える（念のため Scheduler の一時停止も可）。新カラムは全て NULL/DEFAULT ありのため既存 INSERT 列の変更は不要で、<code>media_type</code> は <code>DEFAULT 'feed_image'</code> により既存投稿・当面の画像投稿とも整合する</li>
     </ul>
   </li>
 </ul>

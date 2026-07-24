@@ -84,7 +84,7 @@ def local_batch_set() -> tuple[dict[str, Any], str, int]:
         if set_id is not None:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "DELETE FROM generated_images WHERE set_id = %s", (set_id,)
+                    "DELETE FROM generated_media WHERE set_id = %s", (set_id,)
                 )
                 cursor.execute("DELETE FROM generation_runs WHERE set_id = %s", (set_id,))
                 cursor.execute("DELETE FROM prompt_configs WHERE set_id = %s", (set_id,))
@@ -124,7 +124,7 @@ def test_main_persists_fake_generated_image_to_local_mysql(
             )
             generation_run = cursor.fetchone()
             cursor.execute(
-                "SELECT COUNT(*) FROM generated_images WHERE set_id = %s", (set_id,)
+                "SELECT COUNT(*) FROM generated_media WHERE set_id = %s", (set_id,)
             )
             image_count = cursor.fetchone()[0]
             cursor.execute(

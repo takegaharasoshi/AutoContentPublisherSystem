@@ -16,7 +16,7 @@ def ensure_post_image(
     """Insert the first image association, ignoring a duplicate association."""
     try:
         cursor.execute(
-            "INSERT INTO post_images (post_id, generated_image_id, display_order) "
+            "INSERT INTO post_media (post_id, generated_media_id, display_order) "
             "VALUES (%s, %s, 0)",
             (post_id, generated_image_id),
         )

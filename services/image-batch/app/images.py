@@ -47,7 +47,7 @@ def has_generated_image(
         ``True`` if at least one image row exists.
     """
     cursor.execute(
-        "SELECT 1 FROM generated_images WHERE generation_run_id = %s "
+        "SELECT 1 FROM generated_media WHERE generation_run_id = %s "
         "AND prompt_config_id = %s LIMIT 1",
         (generation_run_id, prompt_config_id),
     )
@@ -89,7 +89,7 @@ def insert_generated_image(
         Newly inserted generated-image ID.
     """
     cursor.execute(
-        "INSERT INTO generated_images "
+        "INSERT INTO generated_media "
         "(set_id, generation_run_id, prompt_config_id, output_index, "
         "prompt_text_snapshot, negative_prompt_snapshot, parameters_snapshot, "
         "s3_key, s3_bucket, file_format, file_size_bytes, generated_at) "
