@@ -13,7 +13,7 @@
 <h1>動画（リール）対応 要件メモ（14-2 壁打ち記録）</h1>
 <div class="page-meta">
   <span class="badge badge-wip">Phase 14-2 成果物（14-3 以降の設計で見直す前提）</span>
-  <span>最終更新: 2026-07-23</span>
+  <span>最終更新: 2026-07-24（セクション 7 に 14-4 の決着を追記。本文は壁打ち時点のまま）</span>
 </div>
 
 <div class="note">
@@ -232,6 +232,24 @@
   <li>リールのカバー画像（サムネイル）の扱い（デフォルトのままか、<code>thumb_offset</code> 等を指定するか）</li>
   <li>フリー音源でも著作権検知の誤検知（自動ミュート）があり得る点の運用監視（投稿後のミュート検知は当面手動確認）</li>
 </ul>
+
+<div class="note">
+  <span class="callout-title">14-4 での決着（2026-07-24 追記。上記の本文は壁打ち時点の記録のまま）</span>
+  上記の持ち越し論点は Phase 14-4 の設計 Fix で以下のとおり決定した（実行時刻のみ 14-11 へ持ち越し）。決定内容の正は各反映先を参照。
+  <ul style="margin:.3rem 0 0;">
+    <li>動画メタ情報: 候補 (a) の発展形。<code>generated_images</code> を <code>generated_media</code> にリネームして「生成メディア」に一般化（<code>post_images</code> → <code>post_media</code> も同様）。<strong>中間静止画は DB 記録なし（セクション 5 の「従来どおり記録する前提」から変更）</strong>、S3 保存のみ → <a href="data-model.html#detail-generated-images">data-model.html セクション 4.5</a></li>
+    <li><code>posts</code> のメディア種別: <code>media_type ENUM('feed_image','reel')</code> カラムを追加 → <a href="data-model.html#detail-posts">data-model.html セクション 4.6</a></li>
+    <li>音源テーブル: <code>audio_assets</code> 新設。選曲は<strong>順繰り</strong>（<code>last_used_at</code> 最古・未使用優先）。証跡は DB カラムで一元管理 → <a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a></li>
+    <li>S3 キー規約: <code>videos/</code>（動画 + 中間静止画）・<code>audio/</code>（音源ストック）を追加。ライフサイクルのプレフィックス限定というインフラ側変更が必要と判明 → <a href="data-model.html#s3-key">data-model.html セクション 5</a></li>
+    <li>音源前処理: <strong>事前手動</strong>（S3 登録前に切り出し・ラウドネス正規化・フェード・AAC 化を 1 回だけ）→ <a href="operation.html#audio-mgmt">operation.html セクション 3</a></li>
+    <li>ffmpeg 合成パラメータ =「標準画質」の定義: 1080x1920・H.264（libx264・yuv420p・faststart）・30fps・CRF 20 目安・AAC 128kbps 48kHz・尺 10 秒・ズームイン 1.0 → 約 1.08（中央基準・等速）→ 決定値の記録は <a href="../development-log.md">development-log.md</a> の 14-4（方式設計書は 14-11 で作成）</li>
+    <li>方式名: <code>gpt-image-kenburns</code>。方式契約は「最終メディアを返す」に一般化 → <a href="batch-flow.html#generator-contract">batch-flow.html セクション 2.1</a></li>
+    <li>AI 開示ハッシュタグ: <code>#AIart</code> のみ → <a href="operation.html#ai-disclosure">operation.html セクション 3</a></li>
+    <li>1 日 1 回の実行時刻: 14-11 で決定（持ち越し）</li>
+    <li>カバー画像: 指定せずデフォルト（先頭フレーム）で開始し、14-8 で実機確認 → <a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a></li>
+    <li>ミュート誤検知の運用監視: <strong>週次手動確認</strong>。検知時は音源を無効化・差し替え（投稿は削除しない）→ <a href="operation.html#mute-check">operation.html セクション 4.4</a></li>
+  </ul>
+</div>
 
 <h2 id="references">8. 参考リンク（調査ソース。2026-07-23 時点）</h2>
 <ul>

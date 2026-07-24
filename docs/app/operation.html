@@ -13,7 +13,8 @@
 <h1>アプリ運用設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
-  <span>最終更新: 2026-07-19</span>
+  <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
+  <span>最終更新: 2026-07-24</span>
 </div>
 
 <div class="note">
@@ -48,6 +49,18 @@
     <tr>
       <td>stale データ（未完了のまま残った生成実行）</td>
       <td>自動検知は行わず、失敗通知を起点に定期確認する運用（セクション 4.3）</td>
+    </tr>
+    <tr>
+      <td>音源管理（リール用 BGM。動画方式のセットのみ）</td>
+      <td>セットごとに 3〜5 曲を<strong>事前手動で前処理</strong>（切り出し・音量正規化・フェード）して S3 にストックし、順繰りローテーション。ライセンス証跡は <code>audio_assets</code> のカラムで一元管理（セクション 3）</td>
+    </tr>
+    <tr>
+      <td>AI 利用の開示</td>
+      <td>全セットのキャプションテンプレートに AI 開示ハッシュタグ <code>#AIart</code> を必ず含める（セクション 3）</td>
+    </tr>
+    <tr>
+      <td>リール音源のミュート検知（著作権誤検知）</td>
+      <td>自動検知なし。週 1 回、Instagram アプリで直近リール投稿の音出しを手動確認。検知時は音源を無効化・差し替え（セクション 4.4）</td>
     </tr>
     <tr>
       <td>SNS アカウント追加・Instagram トークン更新</td>
@@ -89,7 +102,8 @@
 &lt;h2&gt;4. プロンプトの作り方&lt;/h2&gt;
 &lt;h2&gt;5. キャプションの作り方&lt;/h2&gt;
 &lt;h2&gt;6. 失敗時ポリシー&lt;/h2&gt;
-&lt;h2&gt;7. 共通フローからの差分・特記事項&lt;/h2&gt;
+&lt;h2&gt;7. 音源の構成（動画方式のセットのみ）&lt;/h2&gt;
+&lt;h2&gt;8. 共通フローからの差分・特記事項&lt;/h2&gt;
 &lt;/div&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
@@ -120,13 +134,19 @@ VALUES ('fashion-set-2', 'ファッション系セット2', 'セット2の説明
 INSERT INTO prompt_configs (set_id, prompt_text, negative_prompt, parameters, is_active)
 VALUES (:set_id, '(プロンプト本文。1 枚だけ生成されるよう文言で制御)', NULL, NULL, 1);
 
--- (3) caption_templates（0 件でも投稿は継続できるが、通常は 1 件登録する）
+-- (3) caption_templates（0 件でも投稿は継続できるが、通常は 1 件登録する。
+--     AI 開示ハッシュタグ #AIart を必ず含める〔セクション 3 の運用ルール〕）
 INSERT INTO caption_templates (set_id, template_text, is_active)
-VALUES (:set_id, '(キャプション本文 + ハッシュタグ)', 1);
+VALUES (:set_id, '(キャプション本文 + ハッシュタグ。#AIart を含める)', 1);
 
 -- (4) sns_accounts（手順 1 で作成した Secret の account_code と一致させる）
 INSERT INTO sns_accounts (set_id, platform, account_code, account_name, is_active)
-VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);</code></pre>
+VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);
+
+-- (5) audio_assets（動画方式のセットのみ。前処理済み音源を S3 に配置してから登録する。
+--     調達・前処理・証跡の詳細はセクション 3）
+INSERT INTO audio_assets (set_id, s3_key, title, source_url, license_type, license_note, acquired_at, duration_seconds, is_active)
+VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', '(曲名)', '(出典 URL)', 'CC0', NULL, '2026-07-24', 10, 1);</code></pre>
 
 <h4>手順 3: CDK の ImageBatchStack に EventBridge Scheduler を追加して deploy する</h4>
 <p>入力に <code>set_code</code> を指定したスケジュールを 1 件追加する（1 日複数回投稿する場合は複数時刻分）。cron 式・Scheduler 定義の書き方は <a href="../infra/workflow.html">infra/workflow.html</a>、変更後のデプロイは <code>cdk deploy -c env=prod ImageBatchStack</code>（<strong>イメージタグ 3 つの Context 指定が必須</strong>。指定ルール・現行タグの確認方法は <a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。</p>
@@ -146,7 +166,9 @@ VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);</c
   <ul style="margin:.3rem 0 0;">
     <li>セット別設計書（<code>docs/app/sets/&lt;set_code&gt;.html</code>）を作成した</li>
     <li>Secrets Manager に <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> を作成した（DB 登録より先）</li>
-    <li><code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code> の順に DB へ登録した</li>
+    <li><code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code>（→ 動画方式のセットは <code>audio_assets</code>）の順に DB へ登録した</li>
+    <li>キャプションテンプレートに AI 開示ハッシュタグ <code>#AIart</code> を含めた（セクション 3）</li>
+    <li>動画方式のセットは、前処理済み音源（3〜5 曲）を S3 の <code>audio/{set_code}/</code> に配置し、証跡（出典 URL・ライセンス種別・取得日）込みで <code>audio_assets</code> に登録した（セクション 3）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
   </ul>
@@ -164,13 +186,13 @@ VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);</c
 <ol>
   <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）。この時点でスケジュールが残っていても実害はないため、順序を厳密に守る必要はないが、次のステップより先に行うことを推奨する</li>
   <li>CDK から該当セットの Scheduler 定義を削除して deploy する（イメージタグ 3 つの Context 指定が必須。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
-  <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体（画像ファイル）はインフラの 30 日ライフサイクルで自動削除される対象であり「残す」対象に含まない（Phase 9-3 で確定。<a href="data-model.html#s3-key">データモデル設計 セクション 5</a>）</li>
+  <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体（画像・動画ファイル）はインフラの 30 日ライフサイクルで自動削除される対象であり「残す」対象に含まない（Phase 9-3 で確定。<a href="data-model.html#s3-key">データモデル設計 セクション 5</a>）。<strong>音源ストック（<code>audio/{set_code}/</code>）はライフサイクル対象外のため自動削除されない</strong>が、廃止時もレコード・ファイルとも削除せず残す（容量は僅少で、セット復活・類似セットでの再利用可能性があるため。Phase 14-4 で確定）</li>
   <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す</li>
 </ol>
 
-<h2 id="content-mgmt">3. プロンプト・キャプション管理</h2>
+<h2 id="content-mgmt">3. プロンプト・キャプション・音源管理</h2>
 
-<p><code>prompt_configs</code>・<code>caption_templates</code> は DB 直接操作（Query Editor 等）で登録・変更する。管理画面は将来拡張。生成時にはプロンプトのスナップショットが <code>generated_images</code> に、キャプションのスナップショットが <code>posts</code> に記録されるため、変更しても過去の生成・投稿記録は影響を受けない。</p>
+<p><code>prompt_configs</code>・<code>caption_templates</code>・<code>audio_assets</code> は DB 直接操作（Query Editor 等）で登録・変更する。管理画面は将来拡張。生成時にはプロンプトのスナップショットが <code>generated_media</code> に、キャプションのスナップショットが <code>posts</code> に記録されるため、変更しても過去の生成・投稿記録は影響を受けない。</p>
 
 <h4>軽微な文言修正（履歴を残さない場合）</h4>
 <p>既存の有効行を直接 UPDATE する。過去の生成実行への影響はスナップショットにより発生しない。</p>
@@ -190,6 +212,53 @@ COMMIT;</code></pre>
   <span class="callout-title">セット別拡張ポイント（再掲）</span>
   AI によるプロンプト生成・AI キャプション生成は将来のセット別拡張ポイント（<a href="batch-flow.html">バッチ処理フロー設計</a> セクション 2・3）。どのセットがどの方式かはセット別設計書に記録する。本セクションの手順は「固定文を DB で管理する」初期実装に対するものであり、AI 生成方式導入時は別途手順を定める。
 </div>
+
+<h3 id="ai-disclosure">AI 利用の開示（ハッシュタグ）の運用ルール</h3>
+<div class="decision">
+  <span class="callout-title">決定（2026-07-24、Phase 14-4）: AI 開示ハッシュタグは #AIart とする</span>
+  事業戦略書の必須要件「AI 利用の開示」（<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #7</a>: ハッシュタグ方式）の具体タグを <strong><code>#AIart</code></strong> に確定する。
+  AI 生成コンテンツの開示タグとして最も一般的で、海外リーチ前提のセット・国内向けセットのどちらでも通用するため 1 タグに絞る（タグ枠の節約）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>全セットのキャプションテンプレート（<code>caption_templates.template_text</code>）に <code>#AIart</code> を必ず含める</strong>。テンプレートの新規登録・差し替え時のチェック項目とする（セクション 2.1 のチェックリスト・INSERT 例にも反映済み）</li>
+    <li>テンプレート経由で全投稿に確実に付与される（投稿処理側の実装は不要。キャプション 0 件時の投稿は従来どおり継続されるため、テンプレート登録漏れは週次のミュート確認〔セクション 4.4〕等の目視で拾う）</li>
+    <li>プラットフォームが公式の AI ラベル指定手段（API パラメータ）を提供した場合は、その時点で移行を検討する</li>
+  </ul>
+</div>
+
+<h3 id="audio-mgmt">音源の調達・前処理・登録（動画方式のセットのみ）</h3>
+<p>リール用 BGM は<strong>権利クリア済み音源をセットごとに 3〜5 曲、前処理済みの完成形で S3 にストック</strong>し、投稿ごとに順繰りローテーションする（<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。前処理は<strong>事前手動</strong>（S3 登録前に 1 回だけ）で行い、バッチは合成時にそのまま多重化する（Phase 14-4 決定。バッチ内前処理を持たないことで動画方式の処理・失敗パターンを増やさない）。</p>
+
+<h4>手順 1: 調達（ライセンス確認と証跡の控え）</h4>
+<ul>
+  <li>CC0・フリーライセンス音源（Pixabay License 等）を優先する。<strong>CC-BY はクレジット表記の運用が必要になるため避け、CC-BY-NC（非商用）は使用不可</strong>（収益化コンテンツのため。<a href="requirements-notes-video.html#audio-options">14-2 壁打ち記録 セクション 2.2</a>）</li>
+  <li>ダウンロード時に証跡 3 点（<strong>出典 URL・ライセンス種別・取得日</strong>）を控える（手順 4 で <code>audio_assets</code> のカラムに記録する。別ドキュメントでの管理はしない）</li>
+</ul>
+
+<h4>手順 2: 前処理（ffmpeg。ローカルで 1 回だけ）</h4>
+<p>動画の尺（10 秒。<a href="batch-flow.html#generator-catalog">gpt-image-kenburns 方式</a>）に合わせて切り出し、音量正規化（ラウドネス）とフェードを掛け、AAC（<code>.m4a</code>）で書き出す。AAC に統一するのは、合成時に MP4 コンテナへ再エンコードなしで多重化できるため。</p>
+<pre><code># 例: 原曲の 12 秒地点から 10 秒を切り出し、ラウドネス正規化 + フェードを掛けて AAC 化する
+ffmpeg -ss 12 -i source.mp3 -t 10 \
+  -af "loudnorm=I=-14:TP=-1.5:LRA=11,afade=t=in:st=0:d=0.5,afade=t=out:st=9:d=1" \
+  -c:a aac -b:a 128k -ar 48000 -ac 2 track01.m4a</code></pre>
+<ul>
+  <li>切り出し位置（<code>-ss</code>）は曲のサビ・盛り上がりに合わせて試聴しながら決める</li>
+  <li>ラウドネス正規化は <code>I=-14</code>（ストリーミング標準の -14 LUFS）を目安とし、曲間の音量差をなくす</li>
+  <li>書き出し後に必ず試聴確認する（頭切れ・フェードの不自然さ・ノイズ）</li>
+</ul>
+
+<h4>手順 3: S3 への配置</h4>
+<pre><code>aws s3 cp track01.m4a s3://acps-prod-images-{アカウントID}/audio/{set_code}/track01.m4a</code></pre>
+<p><code>audio/</code> プレフィックスは 30 日ライフサイクルの対象外とする（インフラ側の変更が前提。<a href="data-model.html#s3-key">data-model.html セクション 5</a> の warn を参照）。</p>
+
+<h4>手順 4: audio_assets への登録</h4>
+<p>セクション 2.1 手順 2 の (5) の INSERT を使う（証跡 3 点 + <code>duration_seconds</code> を必ず入れる）。</p>
+
+<h4>ローテーションと曲の入れ替え</h4>
+<ul>
+  <li>選曲は<strong>順繰り</strong>（<code>last_used_at</code> が最古の有効レコード。未使用曲が最優先）。曲の追加はいつでも INSERT のみでよい（追加曲は未使用のため次回に使われる）</li>
+  <li>曲を外す場合は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す）</li>
+  <li><strong>動画方式のセットで有効音源が 0 件になると画像生成バッチが異常終了する</strong>（設定ミス扱い。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。<code>prompt_configs</code> の差し替えと同様、無効化する場合は先に代替曲を登録してから行い、0 件になる瞬間を作らない</li>
+</ul>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>
 <p>初期実装は<strong>自動再試行なし・通知のみ（欠番許容）</strong>。1 日複数回投稿するため、1 回の欠番は致命的でないという判断（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）。</p>
@@ -283,6 +352,29 @@ ORDER BY gr.scheduled_at ASC;</code></pre>
   <li><strong>対応</strong>: 対象の Step Functions 実行履歴・CloudWatch Logs で実際の投稿有無を確認し、4.2 の手順で <code>success</code>（実際は投稿済みだった場合）または <code>failed</code>（実際は未投稿だった場合）の終端状態に補正する。終端状態に補正することで、後続の投稿対象決定が次の生成実行へ進めるようになる</li>
   <li>将来的にセット別失敗時ポリシー（追いつく / 捨てる。<a href="batch-flow.html#future-failure-policy">batch-flow.html</a>）を導入する際は、stale データの扱いも合わせて再設計する</li>
 </ul>
+
+<h3 id="mute-check">4.4 リール音源のミュート検知（著作権誤検知）の週次確認</h3>
+
+<p>権利クリア済みのフリー音源でも、プラットフォームの著作権検知（Content ID 型の照合）が<strong>誤検知して公開後に自動ミュート</strong>する可能性がある（<a href="requirements-notes-video.html#carryover">14-2 壁打ち記録 セクション 7</a>）。ミュートは投稿失敗ではないため既存のアラームでは検知できず、当面は手動確認の運用とする（Phase 14-4 決定。stale データ確認〔4.3〕と同様、専用の自動検知は追加しない方針と整合）。</p>
+
+<ol>
+  <li><strong>週 1 回</strong>、Instagram アプリで直近 1 週間のリール投稿（1 日 1 本運用で 7 件目安）を再生し、音が出ること・ミュート警告が表示されていないことを確認する</li>
+  <li>ミュート・警告を検知した場合:
+    <ol>
+      <li>該当投稿に使われた音源を特定する:
+        <pre><code>SELECT aa.id, aa.title, aa.s3_key, aa.source_url
+FROM posts p
+JOIN post_media pm ON pm.post_id = p.id
+JOIN generated_media gm ON gm.id = pm.generated_media_id
+JOIN audio_assets aa ON aa.id = gm.audio_asset_id
+WHERE p.platform_post_id = '(Instagram media ID)';</code></pre>
+      </li>
+      <li>先に代替曲を登録してから、該当 <code>audio_assets</code> を <code>is_active=0</code> に更新する（0 件になる瞬間を作らない。セクション 3）</li>
+      <li><strong>投稿自体は削除しない</strong>（表示・再生数・フォロワー接点は残す。ミュートのままでも Ken Burns の映像は成立する）</li>
+      <li>development-plan.md の「トラブルシューティングログ」に、対象投稿・曲・検知日を記録する（同一曲の再発防止）</li>
+    </ol>
+  </li>
+</ol>
 
 <h2 id="secret-ops">5. Secret 運用（SNS 認証・画像生成 API キー）・トークン更新</h2>
 

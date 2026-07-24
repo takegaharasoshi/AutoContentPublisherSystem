@@ -13,7 +13,8 @@
 <h1>バッチ処理フロー設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</span>
-  <span>最終更新: 2026-07-18</span>
+  <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
+  <span>最終更新: 2026-07-24</span>
 </div>
 
 <div class="note">
@@ -46,6 +47,12 @@
 <h2 id="flow-image">2. 画像生成バッチ処理フロー</h2>
 
 <div class="note">
+  <span class="callout-title">名称と対象範囲（Phase 14-4 の動画対応を反映）</span>
+  「画像生成バッチ」（image-batch）の名称は歴史的経緯であり、本フローの成果物は方式が返す<strong>最終メディア（画像または動画）</strong>である。
+  動画（リール）対応でもフローの骨格（手順 1〜5）は変わらず、違いは方式（セクション 2.1）の中に閉じる。バッチ名・サービス名・ステートマシン名はリネームしない。
+</div>
+
+<div class="note">
   <span class="callout-title">システムとしての対応範囲と初期運用の切り分け</span>
   システムは<strong>1 つの <code>prompt_config</code> から複数画像を保存すること</strong>と<strong>1 セットに複数 <code>prompt_config</code> を持たせること</strong>の両方を処理できるようにする（初期実装からこの前提で作る。旧設計の「2 枚目以降は破棄」は採用しない）。
   一方、<strong>初期運用</strong>は 1 セットにつき有効な <code>prompt_config</code> を 1 件のみ設定し、そのプロンプト文言自体を「1 枚だけ生成される」よう作り込む運用ルールとする（セット追加手順は <a href="operation.html#set-add">アプリ運用設計 セクション 2.1</a>）。
@@ -63,11 +70,11 @@
   <li>対象の <code>prompt_configs</code>（<code>is_active=1</code>）を全件取得する。<strong>0 件なら設定ミスとして異常終了（終了コード 1）</strong>（投稿すべき画像を 1 つも作れないため）。1 件以上ある場合はすべてを手順 4 で処理する（初期運用は 1 件を想定するが、複数件でも正しく処理できる）</li>
   <li>各 <code>prompt_config</code> ごとに<strong>順次</strong>処理する。1 件の失敗は他の <code>prompt_config</code> の処理をブロックしない（例外を捕捉し次の <code>prompt_config</code> へ進む。全体の成否は手順 5 で判定する）
     <ol>
-      <li><strong>完了判定</strong>: <code>(generation_run_id, prompt_config_id)</code> の組み合わせで <code>generated_images</code> レコードの有無を確認する。存在すれば当該 <code>prompt_config</code> は完了済みとしてスキップする（Step Functions Retry によるタスク再起動時に、画像生成 API を再度呼び出さないため）</li>
-      <li>未完了の場合、セットに割り当てられた生成方式（<a href="#generator-strategy">セクション 2.1</a> の契約に従う strategy モジュール）を実行し、生成された画像を<strong>すべて</strong>受け取る。0 件ならこの <code>prompt_config</code> の生成失敗としてログ出力し、次の <code>prompt_config</code> へ進む（画像生成 API 呼び出し自体の一時的失敗は Step Functions Retry に委ねる）</li>
-      <li><strong>受け取った画像はすべて保存する</strong>（1 件でも複数件でも同じ経路で処理する。旧設計の「2 枚目以降は破棄」は採用しない）</li>
-      <li>各画像を JPEG に変換し（Instagram 投稿要件に合わせるため。生成 API が PNG を返す場合は変換する）、S3 に保存する</li>
-      <li>画像ごとに <code>generated_images</code> にレコードを登録する（S3 キー、<code>prompt_config_id</code>、同一 <code>(generation_run_id, prompt_config_id)</code> 内での並び順を表す <code>output_index</code>、プロンプト本文・パラメータのスナップショットを含む）。<strong>1 枚ごとの DB 登録が成功した時点でその画像を完了とする</strong>。S3 保存後に DB 登録が失敗した場合は S3 に orphan が残るが許容する</li>
+      <li><strong>完了判定</strong>: <code>(generation_run_id, prompt_config_id)</code> の組み合わせで <code>generated_media</code> レコードの有無を確認する。存在すれば当該 <code>prompt_config</code> は完了済みとしてスキップする（Step Functions Retry によるタスク再起動時に、生成 API を再度呼び出さないため）</li>
+      <li>未完了の場合、セットに割り当てられた生成方式（<a href="#generator-strategy">セクション 2.1</a> の契約に従う strategy モジュール）を実行し、生成された最終メディアを<strong>すべて</strong>受け取る。0 件ならこの <code>prompt_config</code> の生成失敗としてログ出力し、次の <code>prompt_config</code> へ進む（生成 API 呼び出し自体の一時的失敗は Step Functions Retry に委ねる）</li>
+      <li><strong>受け取った最終メディアはすべて保存する</strong>（1 件でも複数件でも同じ経路で処理する。旧設計の「2 枚目以降は破棄」は採用しない）</li>
+      <li>各メディアを S3 に保存する（キー規約は <a href="data-model.html#s3-key">data-model.html セクション 5</a>。<strong>投稿可能な最終形式への変換は方式側の責務</strong>であり、共通骨格は方式が返した形式〔<code>file_format</code>〕に従いプレフィックス・拡張子・Content-Type を決めてそのまま保存する。方式が中間生成物〔例: 動画の元静止画〕を返した場合は S3 保存のみ行い、DB には記録しない）</li>
+      <li>メディアごとに <code>generated_media</code> にレコードを登録する（S3 キー、<code>prompt_config_id</code>、同一 <code>(generation_run_id, prompt_config_id)</code> 内での並び順を表す <code>output_index</code>、フォーマット・寸法・尺・使用音源〔動画のみ〕、プロンプト本文・パラメータのスナップショットを含む）。<strong>1 件ごとの DB 登録が成功した時点でそのメディアを完了とする</strong>。S3 保存後に DB 登録が失敗した場合は S3 に orphan が残るが許容する</li>
     </ol>
   </li>
   <li>全 <code>prompt_config</code> の処理後、終了コードを決定して終了する: <strong>すべての <code>prompt_config</code> が完了すれば終了コード 0</strong>（成功により SNS 投稿ワークフローが自動起動される）。<strong>1 つでも未完了が残れば終了コード 1</strong>（Step Functions Retry / Catch に委ねる。SNS 投稿バッチの失敗判定方針（3.4）と同じパターン）</li>
@@ -75,7 +82,7 @@
 
 <div class="note">
   <span class="callout-title">再開処理の簡略化に関する既知の割り切り</span>
-  完了判定は「<code>(generation_run_id, prompt_config_id)</code> に 1 件でも <code>generated_images</code> が存在するか」で行う。API 呼び出しが複数画像のうち一部だけ DB 登録できず失敗した場合でも、再実行時は「1 件存在する = このプロンプトは完了済み」としてスキップし、残りの画像は生成し直さない。厳密な過不足チェックより再開処理の単純さを優先した割り切りであり、問題が顕在化した場合に見直す。
+  完了判定は「<code>(generation_run_id, prompt_config_id)</code> に 1 件でも <code>generated_media</code> が存在するか」で行う。生成が複数メディアのうち一部だけ DB 登録できず失敗した場合でも、再実行時は「1 件存在する = このプロンプトは完了済み」としてスキップし、残りのメディアは生成し直さない。厳密な過不足チェックより再開処理の単純さを優先した割り切りであり、問題が顕在化した場合に見直す。
 </div>
 
 <h3 id="generator-strategy">2.1 セット別拡張ポイント: 生成方式（strategy モジュール構造）</h3>
@@ -94,10 +101,18 @@
 </div>
 
 <h4 id="generator-contract">生成方式の契約（方式インターフェース）</h4>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-07-24、Phase 14-4）: 契約を「最終メディアを返す」に一般化</span>
+  動画（リール）対応に伴い、契約の成果物を「生成画像」から<strong>「投稿可能な最終形式の最終メディア（画像・動画）」</strong>に一般化する。
+  gpt-image-single（画像方式）は従来どおり JPEG を返せばよく、既存方式の変更は戻り値へのメタ情報付与のみ（共通骨格・レジストリ型の変更を含む実装は 14-7）。
+</div>
+
 <ul>
-  <li>方式は<strong>セット設定（プロンプト設定等）を受け取り、最終的な生成画像（1 枚以上）を返す</strong></li>
-  <li>冪等性（完了判定）・S3 保存・DB 登録は共通骨格の責務であり、<strong>方式は関与しない</strong></li>
-  <li>特定の画像生成 API に固有のリクエスト・レスポンス処理やパラメータは方式側（<code>generators/&lt;方式名&gt;.py</code> と方式別設計書）に閉じる。<strong>共通設計書・共通骨格には特定 API 名を書かない</strong></li>
+  <li>方式は<strong>セット設定（プロンプト設定等）を受け取り、投稿可能な最終形式の最終メディア（1 件以上。本体 + メタ情報〔<code>file_format</code>・寸法・尺・使用音源等〕）を返す</strong>。投稿要件に合わせた形式変換（例: PNG → JPEG 変換、ffmpeg 合成）は方式側の責務</li>
+  <li>方式は最終メディアに加えて<strong>中間生成物（例: 動画の元になる静止画）を返してよい</strong>。共通骨格は中間生成物を S3 に保存するのみで、DB には記録しない（<a href="data-model.html#detail-generated-images">data-model.html セクション 4.5</a>・<a href="data-model.html#s3-key">セクション 5</a>）</li>
+  <li>冪等性（完了判定）・S3 保存・DB 登録は共通骨格の責務であり、<strong>方式は関与しない</strong>。方式が補助テーブル（例: 音源ストック <code>audio_assets</code> の選曲と <code>last_used_at</code> 更新。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）を読み書きすることは許容するが、<strong>commit は共通骨格に委ね</strong>、生成メディアの DB 登録と同一トランザクションで確定させる（登録に失敗した場合にローテーション等の副作用だけが進むことを防ぐ）</li>
+  <li>特定の生成 API・変換ツールに固有のリクエスト・レスポンス処理やパラメータは方式側（<code>generators/&lt;方式名&gt;.py</code> と方式別設計書）に閉じる。<strong>共通設計書・共通骨格には特定 API 名を書かない</strong></li>
 </ul>
 
 <h4 id="generator-catalog">方式カタログ</h4>
@@ -113,6 +128,12 @@
       <td>採用中（Phase 11-4 で実装、13-1 で定常運用開始）</td>
       <td><a href="generators/gpt-image-single.html">generators/gpt-image-single.html</a>（13-2 で作成）</td>
     </tr>
+    <tr>
+      <td><code>gpt-image-kenburns</code></td>
+      <td>縦長静止画 1 枚を生成し、ffmpeg でズーム/パン（Ken Burns 効果）+ 音源ストック（<code>audio_assets</code>）の合成により 9:16・10 秒・1080x1920 の MP4（リール用動画）を返す簡易動画方式。プラットフォーム非依存の命名（TikTok 展開でも同一方式を使う想定）</td>
+      <td>採用決定（Phase 14-4。実装は 14-7、fantasy-animals-1 の切替は 14-10）</td>
+      <td>14-11 で作成予定（本採用時に作成するルール。それまでの合成パラメータ等の決定値は <a href="../development-log.md">development-log.md</a> の 14-4 を参照）</td>
+    </tr>
   </tbody>
 </table>
 </div>
@@ -126,7 +147,7 @@
 </div>
 
 <h2 id="flow-sns">3. SNS 投稿バッチ処理フロー</h2>
-<p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（画像単位ではない）。</p>
+<p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（メディア単位ではない）。フィード画像投稿とリール投稿の違いは手順内の分岐（<code>posts.media_type</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）に閉じ、投稿対象の決定・状態遷移・失敗方針は共通。</p>
 
 <h3 id="sns-target">3.1 投稿対象の決定</h3>
 <ol>
@@ -188,11 +209,16 @@
   <li>対象の生成実行に対し、セットの有効な投稿先アカウント（<code>sns_accounts</code>）ごとに<strong>順次</strong>処理する。1 アカウントの失敗は他アカウントの処理をブロックしない（例外を捕捉し次のアカウントへ進む）</li>
   <li><code>posts</code> の状態（3.2）に基づき、未完了のアカウントについて処理を進める:
     <ol>
-      <li><code>posts</code> レコードが<strong>存在しなければ</strong> <code>pending</code> で作成する（INSERT-or-skip。3.2 の復旧分岐により、既存行がある場合は作成せずその状態から再開する。投稿前の事前記録により二重投稿を防止する）</li>
-      <li><strong>初期構築の仕様: 生成実行に紐づく画像のうち最初の 1 枚のみ</strong>を <code>post_images</code> で紐づける（選択順序は <code>generated_images.id</code> 昇順 = 最も早く生成された 1 枚。1 セット複数 <code>prompt_config</code> や 1 プロンプト複数画像により生成実行が複数の画像を保存していても、投稿するのは常に 1 枚とする）。将来のカルーセル対応では、生成実行内の複数画像を並び順付きで束ねる処理に拡張する</li>
-      <li>キャプションテンプレートを適用して投稿本文を組み立てる</li>
-      <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する</li>
-      <li>コンテナのステータス（<code>GET /{container-id}?fields=status_code</code>）を <code>FINISHED</code> になるまで有限回数・タイムアウト付きでポーリングする（Meta 側のメディア処理が非同期のため。手順 5 のパブリッシュ API は <code>FINISHED</code> 到達前に呼び出すと失敗しうる）。<code>ERROR</code> を受け取った場合、またはポーリングが上限に達し <code>FINISHED</code> に到達しなかった場合は、パブリッシュ API を呼び出さずに <code>status='failed'</code> に更新する（パブリッシュ要求を送信していないため <code>published_unconfirmed</code> の対象外）</li>
+      <li><code>posts</code> レコードが<strong>存在しなければ</strong> <code>pending</code> で作成する（INSERT-or-skip。3.2 の復旧分岐により、既存行がある場合は作成せずその状態から再開する。投稿前の事前記録により二重投稿を防止する）。作成時に <code>media_type</code> を投稿対象の先頭メディアの <code>file_format</code> から導出して設定する（<code>'mp4'</code> → <code>'reel'</code>、それ以外 → <code>'feed_image'</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）</li>
+      <li><strong>初期構築の仕様: 生成実行に紐づくメディアのうち最初の 1 件のみ</strong>を <code>post_media</code> で紐づける（選択順序は <code>generated_media.id</code> 昇順 = 最も早く生成された 1 件。1 セット複数 <code>prompt_config</code> や 1 プロンプト複数メディアにより生成実行が複数のメディアを保存していても、投稿するのは常に 1 件とする）。将来のカルーセル対応では、生成実行内の複数メディアを並び順付きで束ねる処理に拡張する</li>
+      <li>キャプションテンプレートを適用して投稿本文を組み立てる（テンプレートには AI 開示ハッシュタグを必ず含める運用ルール。<a href="operation.html#ai-disclosure">operation.html セクション 3</a>）</li>
+      <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。パラメータは <code>media_type</code> で分岐する:
+        <ul>
+          <li><code>feed_image</code> → <code>image_url</code>（presigned URL）を渡す（従来どおり）</li>
+          <li><code>reel</code> → <code>media_type=REELS</code> + <code>video_url</code>（presigned URL）+ <code>share_to_feed=true</code>（プロフィールのフィード面にも表示する。<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #8</a>）を渡す。<strong>カバー画像は指定せずデフォルト（動画の先頭フレーム）とする</strong>（Phase 14-4 決定。先頭フレームは Ken Burns 元の静止画とほぼ同じ絵になるため。14-8 の実機確認で問題があれば <code>cover_url</code> / <code>thumb_offset</code> の指定を再検討する）</li>
+        </ul>
+        取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する</li>
+      <li>コンテナのステータス（<code>GET /{container-id}?fields=status_code</code>）を <code>FINISHED</code> になるまで有限回数・タイムアウト付きでポーリングする（Meta 側のメディア処理が非同期のため。手順 5 のパブリッシュ API は <code>FINISHED</code> 到達前に呼び出すと失敗しうる）。<strong>リール（動画）はメディア処理が分オーダーになり得るため、ポーリング間隔・上限は画像より長くメディア種別ごとに設定する</strong>（設計目安: 画像は現行の間隔 3 秒 × 最大 10 回を維持、動画は間隔 15 秒・上限 10 分。実装値は 14-8 の実測を入力に 14-9 で確定する）。<code>ERROR</code> を受け取った場合、またはポーリングが上限に達し <code>FINISHED</code> に到達しなかった場合は、パブリッシュ API を呼び出さずに <code>status='failed'</code> に更新する（パブリッシュ要求を送信していないため <code>published_unconfirmed</code> の対象外）</li>
       <li>パブリッシュ API（<code>POST /{ig-user-id}/media_publish</code>）を呼び出す
         <ul>
           <li>成功 → <code>platform_post_id</code> を保存し <code>status='success'</code> に更新</li>
@@ -248,14 +274,14 @@
 </ul>
 
 <h2 id="phase9">5. Phase 9-2 の決定事項と Phase 9-3 への申し送り</h2>
-<p>本書の詳細化に伴いデータモデル（<a href="data-model.html">data-model.html</a>）側で確定・反映が必要な事項を以下に整理する。</p>
+<p>本書の詳細化に伴いデータモデル（<a href="data-model.html">data-model.html</a>）側で確定・反映が必要な事項を以下に整理する（テーブル名は Phase 14-4 のリネーム後の名称で表記。決定内容自体は Phase 9-2 時点のもの）。</p>
 <ul>
   <li><code>posts.status</code> の値集合: <code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>（3.2）</li>
   <li><code>posts</code> の UNIQUE 制約は <code>(generation_run_id, sns_account_id)</code> のみ。旧設計にあった <code>attempt_number</code> 相当のカラムは不要（自動再試行を行わない方針のため。3.2）</li>
   <li><code>posts</code> に <code>platform_container_id</code> / <code>platform_post_id</code> / <code>api_response</code> 等、2 段階フローの中間状態を保持するカラムが必要（3.3）</li>
-  <li><code>generated_images</code> の完了判定は <code>(generation_run_id, prompt_config_id)</code> の組み合わせでの存在確認により行う。完了状態を表す専用カラムは不要（2）</li>
-  <li><code>generated_images</code> に <code>output_index</code>（同一 <code>generation_run_id</code> × <code>prompt_config_id</code> 内での並び順）カラムが必要。画像生成 API が返す image part はすべて保存する方針のため（旧設計の「2 枚目以降は破棄」は不採用。2）</li>
-  <li><code>post_images</code> は初期構築では生成実行内の先頭画像（<code>generated_images.id</code> 昇順で最初の 1 枚）のみを登録する。生成実行が保存する画像枚数によらず、投稿は常に 1 枚（3.3）</li>
+  <li><code>generated_media</code> の完了判定は <code>(generation_run_id, prompt_config_id)</code> の組み合わせでの存在確認により行う。完了状態を表す専用カラムは不要（2）</li>
+  <li><code>generated_media</code> に <code>output_index</code>（同一 <code>generation_run_id</code> × <code>prompt_config_id</code> 内での並び順）カラムが必要。生成 API が返すメディアはすべて保存する方針のため（旧設計の「2 枚目以降は破棄」は不採用。2）</li>
+  <li><code>post_media</code> は初期構築では生成実行内の先頭メディア（<code>generated_media.id</code> 昇順で最初の 1 件）のみを登録する。生成実行が保存するメディア件数によらず、投稿は常に 1 件（3.3）</li>
   <li><code>prompt_configs</code> の <code>is_active=1</code> 件数は 0 件をエラー、1 件以上はすべてループ処理する方針を確定（DB 制約の変更は不要。処理ロジックの決定事項として記録。2）</li>
   <li><code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数は追加しない（4）</li>
 </ul>

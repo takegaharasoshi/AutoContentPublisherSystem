@@ -36,6 +36,11 @@
 </div>
 
 <h2>2. 契約の実装</h2>
+<div class="note">
+  <span class="callout-title">Phase 14-4 の契約一般化に伴う予定変更</span>
+  方式契約は Phase 14-4 で「投稿可能な最終形式の<strong>最終メディア</strong>（本体 + メタ情報）を返す」に一般化された（<a href="../batch-flow.html#generator-contract">batch-flow.html セクション 2.1</a>）。
+  本方式のシグネチャ・戻り値型はこの一般化に合わせて 14-7 で更新予定（JPEG を返す処理内容は変わらず、戻り値へのメタ情報付与のみ）。以下は現行実装（更新前）を正とした記載。
+</div>
 <p>共通の契約（<a href="../batch-flow.html#generator-contract">batch-flow.html「生成方式の契約」</a>）を次のシグネチャで実装する。</p>
 <pre><code>generate(prompt_config: PromptConfig) -> list[bytes]</code></pre>
 <p>処理順序: ① API キーを Secret から取得 → ② OpenAI クライアント生成 → ③ Images API 呼び出しで PNG を取得 → ④ 各 PNG を JPEG に変換 → ⑤ JPEG バイト列のリストを返す。冪等性（完了判定）・S3 保存・DB 登録は契約どおり共通骨格の責務であり、本方式は関与しない。</p>
@@ -47,7 +52,7 @@
 <tr><th>フィールド</th><th>使い方</th></tr>
 <tr><td><code>prompt_text</code></td><td>API の <code>prompt</code> にそのまま渡す</td></tr>
 <tr><td><code>parameters</code>（JSON 文字列）</td><td>API パラメータ。下表の 4 キーすべて必須</td></tr>
-<tr><td><code>negative_prompt</code></td><td><strong>本方式では未使用</strong>（共通骨格が <code>generated_images</code> のスナップショットに記録するのみ）</td></tr>
+<tr><td><code>negative_prompt</code></td><td><strong>本方式では未使用</strong>（共通骨格が <code>generated_media</code>〔14-5 のリネーム前は <code>generated_images</code>〕のスナップショットに記録するのみ）</td></tr>
 </table>
 </div>
 <p><code>parameters</code> の JSON キー仕様:</p>
@@ -84,7 +89,7 @@
 </div>
 
 <h2>6. 画像処理（PNG → JPEG 変換）</h2>
-<p>API が返す PNG を Pillow で JPEG に変換して返す（Instagram 投稿に適した形式。共通骨格は <code>Content-Type: image/jpeg</code>・拡張子 <code>.jpg</code>・<code>file_format='jpg'</code> 固定で S3 保存・DB 登録するため、実運用方式は JPEG を返す前提）。</p>
+<p>API が返す PNG を Pillow で JPEG に変換して返す（Instagram 投稿に適した形式。共通骨格は <code>Content-Type: image/jpeg</code>・拡張子 <code>.jpg</code>・<code>file_format='jpg'</code> 固定で S3 保存・DB 登録するため、実運用方式は JPEG を返す前提。この固定は Phase 14-4 の契約一般化に伴い、14-7 で方式が返す <code>file_format</code> ベースの保存に変わる予定）。</p>
 <ul>
   <li>モードが RGB でない場合（アルファチャンネル付き等）は <code>convert("RGB")</code> で RGB 化する</li>
   <li>JPEG 品質は <code>quality=90</code> 固定（<code>prompt_configs.parameters</code> の <code>quality</code> は API の生成品質であり、JPEG エンコード品質とは別物）</li>
