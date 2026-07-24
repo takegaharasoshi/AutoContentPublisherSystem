@@ -123,7 +123,10 @@ Claude のトークン消費を抑えるため、以下のタスクは Codex CLI
 ### 委譲時のパラメータ・運用
 
 - `sandbox: workspace-write`（読み取り専用タスクは `read-only`）、`cwd` はリポジトリルート。同じタスクへの追加指示は `codex-reply`（threadId 指定）で同一セッションに出す
-- モデルは委譲時（MCP 経由）のみ `gpt-5.6-luna` / reasoning effort `max`（`.mcp.json` の起動引数で設定）。`codex` を直接使うときは `~/.codex/config.toml` のデフォルト（`gpt-5.6-terra` / `high`）が適用される。難しめの実装は委譲時に `model: "gpt-5.6-terra"` を per-call 指定して上げてよい
+- モデルは委譲時（MCP 経由）・直接実行とも既定は `gpt-5.6-terra` / reasoning effort `high`（MCP は `.mcp.json` の起動引数、直接実行は `~/.codex/config.toml` で設定）。per-call の使い分け（GPT-5.6 の序列は sol > terra > luna）:
+  - **機械的な横展開・書式統一**（判断を伴わない修正）: `model: "gpt-5.6-luna"` に下げてよい
+  - **14-7 級の大型・新規性の高い実装**（新モジュール新設・依存追加・複数コンポーネント横断）: `model: "gpt-5.6-sol"` に上げる
+  - エフォートは「確実にこなせる最低レベル」を選ぶ（通常 `high`。sol 委譲で詰まった場合のみ `xhigh`）
 - プロジェクト規約は `AGENTS.md` に記載済みで Codex が自動で読む。指示文には規約を重複記載せず、タスク固有の要件（対象ファイル・仕様・完了条件）のみ書く
 
 ### トークン節約の作業ルール
