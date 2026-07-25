@@ -14,15 +14,17 @@ from .instagram_api import (
     create_container,
     poll_container_status,
     publish_container,
+    resolve_poll_settings,
 )
-from .models import CaptionTemplate, GeneratedImageRef, SnsAccount
-from .post_images import ensure_post_image
+from .media_types import derive_media_type
+from .models import CaptionTemplate, GeneratedMediaRef, SnsAccount
+from .post_media import ensure_post_media
 from .posts import (
     create_pending_post,
     get_post,
-    update_post_caption,
     update_post_container_created,
     update_post_failed,
+    update_post_snapshot,
     update_post_success,
     update_post_unconfirmed,
 )
@@ -87,20 +89,21 @@ def process_target_generation_run(
     generation_run_id: int,
     sns_accounts: list[SnsAccount],
     caption_template: CaptionTemplate | None,
-    generated_image: GeneratedImageRef,
+    generated_media: GeneratedMediaRef,
     env_name: str,
     set_code: str,
     s3_bucket: str,
     s3_client: Any,
     urlopen: Any,
 ) -> ProcessingResult:
-    """Process one generated image for each active SNS account.
+    """Process one generated media item for each active SNS account.
 
     Terminal post states are skipped. Each non-terminal account is attempted
     independently, and a final database recheck determines overall success.
     """
     accounts_processed = 0
     caption_text = caption_template.template_text if caption_template else ""
+    media_type = derive_media_type(generated_media.file_format)
 
     for account in sns_accounts:
         try:
@@ -120,6 +123,11 @@ def process_target_generation_run(
             continue
 
         accounts_processed += 1
+        logger.info(
+            "投稿処理を開始: sns_account_id=%s media_type=%s",
+            account.id,
+            media_type,
+        )
         post_id: int | None = post.id if post is not None else None
         try:
             if post is None:
@@ -128,18 +136,20 @@ def process_target_generation_run(
                     set_id=set_id,
                     generation_run_id=generation_run_id,
                     sns_account_id=account.id,
+                    media_type=media_type,
                 )
-                ensure_post_image(
+                ensure_post_media(
                     cursor,
                     post_id=post_id,
-                    generated_image_id=generated_image.id,
+                    generated_media_id=generated_media.id,
                 )
 
-            update_post_caption(
+            update_post_snapshot(
                 cursor,
                 post_id,
                 caption_template_id=caption_template.id if caption_template else None,
                 caption_text=caption_text,
+                media_type=media_type,
             )
             connection.commit()
 
@@ -167,17 +177,18 @@ def process_target_generation_run(
             ):
                 container_id = post.platform_container_id
             else:
-                image_url = generate_presigned_url(
+                media_url = generate_presigned_url(
                     s3_bucket,
-                    generated_image.s3_key,
+                    generated_media.s3_key,
                     expires_in=3600,
                     client=s3_client,
                 )
                 container_id, _ = create_container(
                     credentials.access_token,
                     credentials.ig_user_id,
-                    image_url,
+                    media_url,
                     caption_text,
+                    media_type=media_type,
                     urlopen=urlopen,
                 )
                 update_post_container_created(
@@ -187,10 +198,13 @@ def process_target_generation_run(
                 )
                 connection.commit()
 
+            poll_settings = resolve_poll_settings(media_type)
             poll_container_status(
                 credentials.access_token,
                 container_id,
                 urlopen=urlopen,
+                max_attempts=poll_settings.max_attempts,
+                poll_interval_seconds=poll_settings.interval_seconds,
             )
             platform_post_id, api_response = publish_container(
                 credentials.access_token,

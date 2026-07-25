@@ -8,11 +8,37 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from typing import Any
+
+from .media_types import MEDIA_TYPE_FEED_IMAGE, MEDIA_TYPE_REEL
 
 
 GRAPH_API_BASE_URL = "https://graph.facebook.com/v21.0"
 REQUEST_TIMEOUT_SECONDS = 30
+FEED_IMAGE_POLL_MAX_ATTEMPTS = 10
+FEED_IMAGE_POLL_INTERVAL_SECONDS = 3.0
+# Reel processing measured 33.5 seconds in 14-8; allow up to 10 minutes.
+REEL_POLL_MAX_ATTEMPTS = 60
+REEL_POLL_INTERVAL_SECONDS = 10.0
+
+
+@dataclass(frozen=True)
+class PollSettings:
+    """Polling limits appropriate for an Instagram media type."""
+
+    max_attempts: int
+    interval_seconds: float
+
+
+def resolve_poll_settings(media_type: str) -> PollSettings:
+    """Return the polling settings for a post media type."""
+    if media_type == MEDIA_TYPE_REEL:
+        return PollSettings(REEL_POLL_MAX_ATTEMPTS, REEL_POLL_INTERVAL_SECONDS)
+    return PollSettings(
+        FEED_IMAGE_POLL_MAX_ATTEMPTS,
+        FEED_IMAGE_POLL_INTERVAL_SECONDS,
+    )
 
 
 class InstagramRequestFailed(Exception):
@@ -158,19 +184,34 @@ def _post_request(path: str, values: dict[str, str]) -> urllib.request.Request:
 def create_container(
     access_token: str,
     ig_user_id: str,
-    image_url: str,
+    media_url: str,
     caption: str,
     *,
+    media_type: str = MEDIA_TYPE_FEED_IMAGE,
     urlopen: Any = urllib.request.urlopen,
 ) -> tuple[str, dict[str, Any]]:
     """Create an Instagram media container."""
-    request = _post_request(
-        f"/{ig_user_id}/media",
-        {
-            "image_url": image_url,
+    if media_type == MEDIA_TYPE_FEED_IMAGE:
+        values = {
+            "image_url": media_url,
             "caption": caption,
             "access_token": access_token,
-        },
+        }
+    elif media_type == MEDIA_TYPE_REEL:
+        # Use Instagram's default first-frame cover for generated reels.
+        values = {
+            "media_type": "REELS",
+            "video_url": media_url,
+            "share_to_feed": "true",
+            "caption": caption,
+            "access_token": access_token,
+        }
+    else:
+        raise ValueError(f"Unsupported Instagram media type: {media_type}")
+
+    request = _post_request(
+        f"/{ig_user_id}/media",
+        values,
     )
     response = _request_json(
         request,
@@ -191,8 +232,8 @@ def poll_container_status(
     container_id: str,
     *,
     urlopen: Any = urllib.request.urlopen,
-    max_attempts: int = 10,
-    poll_interval_seconds: float = 3,
+    max_attempts: int = FEED_IMAGE_POLL_MAX_ATTEMPTS,
+    poll_interval_seconds: float = FEED_IMAGE_POLL_INTERVAL_SECONDS,
 ) -> dict[str, Any]:
     """Poll a media container until it is ready for publishing."""
     last_response: dict[str, Any] | None = None

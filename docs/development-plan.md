@@ -213,9 +213,9 @@
   - 確認: 14-7 で生成した実 MP4 を使い、ローカルからリール投稿（`media_type=REELS` のコンテナ作成 → FINISHED までポーリング → パブリッシュ）のテスト投稿が成功する
   - 備考: 2026-07-25 完了。12-2 と同じ使い捨てスクリプト方式（scratchpad・非コミット、`boto3` + 標準ライブラリ `urllib`）で実 API へ疎通。14-7 のローカル E2E 成果物 MP4（1080x1920 / 30fps / 10.0 秒 / H.264 + AAC 128kbps / 4.2 MB）を S3 へ配置 → presigned URL（1 時間）→ `media_type=REELS` + `share_to_feed=true`・カバー未指定でコンテナ作成 → FINISHED までポーリング → パブリッシュまで成功（`platform_post_id=18363360217208949`、permalink `/reel/DbNiRIcggGq/`）。**実測（14-9 の入力）**: コンテナ作成応答 1.2 秒 / **FINISHED まで 33.5 秒**（間隔 5 秒で 7 回目）/ パブリッシュ応答 10.2 秒 → 動画のポーリングは**間隔 10 秒・上限 10 分**を推奨値として batch-flow.html に反映（SFN タイムアウト・HTTP タイムアウト 30 秒とも見直し不要）。**実機確認 2 件は設計どおり**: カバー画像 = デフォルトで先頭フレーム（公開後の `thumbnail_url` を取得して照合）、`share_to_feed=true` = リールタブとプロフィールのフィード両方に表示（目視）。テスト投稿はユーザーが手動削除。詳細は [development-log.md](development-log.md) の 14-8 を参照
 
-- [ ] **14-9** sns-post-batch のリール対応（Codex 委譲）
+- [x] **14-9** sns-post-batch のリール対応（Codex 委譲）
   - 確認: pytest 全パス + ローカル E2E（API モック）でリール投稿の `posts` が success まで遷移する。既存の画像投稿経路も回帰テストで green
-  - 備考: `instagram_api.py` の REELS 対応（`media_type` / `video_url` / `share_to_feed`）、メディア種別による投稿分岐（表現方法は 14-4 の決定に従う）、ポーリング間隔・回数の調整（14-8 の計測値を反映）。presigned URL 方式は流用。SFN タイムアウト・アラーム閾値の見直しが必要なら CDK 変更（SnsPostBatchStack / MonitoringStack）と workflow.html の同期もここで行う
+  - 備考: 2026-07-25 完了。Codex（terra/high）へ委譲し 1 巡で Fix。`app/media_types.py` を新設し `file_format='mp4'` → `posts.media_type='reel'` の導出を一元化、`create_container` をメディア種別で分岐（リールは `media_type=REELS` + `video_url` + `share_to_feed=true`、カバーは未指定でデフォルト）、ポーリングを `resolve_poll_settings` でメディア種別ごとに解決（画像 3 秒 × 10 回を維持、**動画 10 秒 × 60 回 = 上限約 10 分**を確定）。14-5 で SQL のみ追随していたモジュール・モデル名を DB 名に合わせてリネーム（`generated_media.py` / `post_media.py` / `GeneratedMediaRef` / `update_post_snapshot`）。**pytest 88 件全パス（ローカル MySQL 起動状態で E2E 4 件も実行、リールシナリオを 1 本追加）**。**CDK 変更は不要と判断**（動画の最大待ち 10 分は `RunSnsPostBatchTask` タイムアウト 3600 秒に収まり、監視アラームは失敗回数ベースで所要時間に依存しないため）。詳細は [development-log.md](development-log.md) の 14-9 を参照
 
 - [ ] **14-10** AWS E2E（セット切替 + 全チェーンでリール実投稿）
   - 確認: fantasy-animals-1 の動画方式への切替後、画像生成 SFN からの全チェーン実行でリールが Instagram に実投稿され、`posts` が success・動画メタ情報・実行ログに行が入る

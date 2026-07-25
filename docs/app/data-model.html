@@ -313,6 +313,7 @@ LIMIT 1;</code></pre>
     <li><code>DEFAULT 'feed_image'</code> は V002 適用時の既存行の埋め戻しを兼ねる（既存投稿はすべてフィード画像のため正しい）</li>
     <li>ENUM とする理由: 値は投稿 API の分岐に直結する閉じた集合であり、値の追加（カルーセル等）は投稿処理の実装追加を必ず伴うため、DDL 変更を伴う ENUM で不整合を防ぐ（<code>generator_name</code> を ENUM にしない判断〔セクション 4.1〕とは逆の性質）</li>
     <li>5 状態遷移・<code>UNIQUE (generation_run_id, sns_account_id)</code>・投稿対象決定クエリ（セクション 4.4）は<strong>変更しない</strong></li>
+    <li><strong>14-9 実装時の補足</strong>: 値は <code>pending</code> INSERT 時に設定するのに加え、投稿試行のたびに実行するキャプションスナップショット更新でも同じ導出値を書き込む（同一生成実行のメディアは不変のため導出値は常に一致し、V002 適用前に作られた既存行〔<code>DEFAULT 'feed_image'</code>〕が残っていた場合の自己修復を兼ねる）</li>
   </ul>
 </div>
 

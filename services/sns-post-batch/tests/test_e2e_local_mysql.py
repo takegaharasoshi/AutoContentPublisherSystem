@@ -6,7 +6,8 @@ import io
 import json
 import urllib.error
 import urllib.parse
-from typing import Any
+from contextlib import contextmanager
+from typing import Any, Iterator
 from uuid import uuid4
 
 import pymysql
@@ -39,7 +40,7 @@ class FakeS3Client:
         Params: dict[str, str],
         ExpiresIn: int,
     ) -> str:
-        """Return a stable URL for the fake image object."""
+        """Return a stable URL for the fake media object."""
         self.calls.append(
             {
                 "operation": operation,
@@ -47,7 +48,7 @@ class FakeS3Client:
                 "ExpiresIn": ExpiresIn,
             }
         )
-        return "https://signed.example/image.jpg"
+        return f"https://signed.example/{Params['Key']}"
 
 
 class FakeResponse:
@@ -78,8 +79,13 @@ def _connect_local_mysql(secret: dict[str, Any]) -> pymysql.connections.Connecti
     )
 
 
-@pytest.fixture
-def local_batch_set() -> tuple[dict[str, Any], str, int, int, int]:
+@contextmanager
+def _local_batch_set(
+    *,
+    file_format: str,
+    s3_key: str,
+    duration_seconds: int | None = None,
+) -> Iterator[tuple[dict[str, Any], str, int, int, int]]:
     """Create local E2E rows and always remove them in FK-safe order."""
     try:
         connection = _connect_local_mysql(LOCAL_DB_SECRET)
@@ -117,22 +123,24 @@ def local_batch_set() -> tuple[dict[str, Any], str, int, int, int]:
                 "INSERT INTO generated_media "
                 "(set_id, generation_run_id, prompt_config_id, output_index, "
                 "prompt_text_snapshot, s3_key, s3_bucket, file_format, "
-                "file_size_bytes, generated_at) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                "duration_seconds, audio_asset_id, file_size_bytes, generated_at) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (
                     set_id,
                     generation_run_id,
                     prompt_config_id,
                     0,
                     "local test prompt",
-                    "images/e2e.jpg",
+                    s3_key,
                     "local-test-bucket",
-                    "jpg",
+                    file_format,
+                    duration_seconds,
+                    None,
                     10,
                     "2026-07-19 00:00:00",
                 ),
             )
-            generated_image_id = cursor.lastrowid
+            generated_media_id = cursor.lastrowid
             cursor.execute(
                 "INSERT INTO sns_accounts "
                 "(set_id, platform, account_code, account_name, is_active) "
@@ -152,7 +160,7 @@ def local_batch_set() -> tuple[dict[str, Any], str, int, int, int]:
             set_code,
             set_id,
             generation_run_id,
-            generated_image_id,
+            generated_media_id,
         )
     except Exception:
         connection.rollback()
@@ -188,12 +196,30 @@ def local_batch_set() -> tuple[dict[str, Any], str, int, int, int]:
         connection.close()
 
 
+@pytest.fixture
+def local_batch_set() -> Iterator[tuple[dict[str, Any], str, int, int, int]]:
+    """Create a local E2E batch set containing generated feed media."""
+    with _local_batch_set(file_format="jpg", s3_key="images/e2e.jpg") as batch_set:
+        yield batch_set
+
+
+@pytest.fixture
+def local_reel_batch_set() -> Iterator[tuple[dict[str, Any], str, int, int, int]]:
+    """Create a local E2E batch set containing a generated reel video."""
+    with _local_batch_set(
+        file_format="mp4",
+        s3_key="videos/e2e.mp4",
+        duration_seconds=10,
+    ) as batch_set:
+        yield batch_set
+
+
 def test_main_persists_successful_post_to_local_mysql(
     local_batch_set: tuple[dict[str, Any], str, int, int, int],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The fake Graph flow reaches success and records all post relations."""
-    secret, set_code, set_id, generation_run_id, generated_image_id = local_batch_set
+    secret, set_code, set_id, generation_run_id, generated_media_id = local_batch_set
     execution_arn = f"arn:aws:states:local:e2e:{uuid4().hex}"
     monkeypatch.setenv("ENV_NAME", "local")
     monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
@@ -233,9 +259,9 @@ def test_main_persists_successful_post_to_local_mysql(
             post = cursor.fetchone()
             cursor.execute(
                 "SELECT COUNT(*) FROM post_media WHERE generated_media_id = %s",
-                (generated_image_id,),
+                (generated_media_id,),
             )
-            post_image_count = cursor.fetchone()[0]
+            post_media_count = cursor.fetchone()[0]
             cursor.execute(
                 "SELECT status, attempt_count, records_processed "
                 "FROM batch_execution_logs "
@@ -247,9 +273,67 @@ def test_main_persists_successful_post_to_local_mysql(
         connection.close()
 
     assert post == ("success", "post-e2e", "E2E caption")
-    assert post_image_count == 1
+    assert post_media_count == 1
     assert execution_log == ("succeeded", 1, 1)
     assert len(fake_s3.calls) == 1
+
+
+def test_main_persists_successful_reel_post_to_local_mysql(
+    local_reel_batch_set: tuple[dict[str, Any], str, int, int, int],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An MP4 generated media item is published as a successful reel."""
+    secret, set_code, _, generation_run_id, generated_media_id = local_reel_batch_set
+    monkeypatch.setenv("ENV_NAME", "local")
+    monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
+    monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv("EXECUTION_ARN", f"arn:aws:states:local:e2e:{uuid4().hex}")
+    monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
+    monkeypatch.setattr(
+        processing_module,
+        "get_secret_string",
+        lambda name: '{"access_token":"test-token","ig_user_id":"test-ig"}',
+    )
+
+    responses = iter(
+        [
+            FakeResponse({"id": "container-e2e-reel"}),
+            FakeResponse({"status_code": "FINISHED"}),
+            FakeResponse({"id": "post-e2e-reel"}),
+        ]
+    )
+    requests: list[Any] = []
+
+    def fake_urlopen(request: Any, *, timeout: int) -> FakeResponse:
+        """Record each Graph request and return the next fake response."""
+        assert timeout == 30
+        requests.append(request)
+        return next(responses)
+
+    assert main(s3_client=FakeS3Client(), urlopen=fake_urlopen) == 0
+
+    connection = _connect_local_mysql(secret)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT status, media_type FROM posts WHERE generation_run_id = %s",
+                (generation_run_id,),
+            )
+            post = cursor.fetchone()
+            cursor.execute(
+                "SELECT COUNT(*) FROM post_media WHERE generated_media_id = %s",
+                (generated_media_id,),
+            )
+            post_media_count = cursor.fetchone()[0]
+    finally:
+        connection.close()
+
+    reel_values = urllib.parse.parse_qs((requests[0].data or b"").decode())
+    assert post == ("success", "reel")
+    assert post_media_count == 1
+    assert reel_values["media_type"] == ["REELS"]
+    assert reel_values["video_url"] == ["https://signed.example/videos/e2e.mp4"]
+    assert reel_values["share_to_feed"] == ["true"]
 
 
 def test_main_resumes_container_created_post_without_creating_a_duplicate(

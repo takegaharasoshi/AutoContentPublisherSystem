@@ -17,7 +17,7 @@ from .caption_templates import fetch_active_caption_template
 from .clock import now_utc
 from .config import ConfigError, load_config
 from .execution_log import finalize_execution_log, start_or_resume_execution_log
-from .generated_images import fetch_first_generated_image
+from .generated_media import fetch_first_generated_media
 from .processing import process_target_generation_run
 from .sns_accounts import fetch_active_sns_accounts
 from .target_selection import resolve_target_generation_run
@@ -125,12 +125,12 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                     caption_template = fetch_active_caption_template(
                         cursor, batch_set.id
                     )
-                    generated_image = fetch_first_generated_image(
+                    generated_media = fetch_first_generated_media(
                         cursor, generation_run_id
                     )
-                    if generated_image is None:
+                    if generated_media is None:
                         raise RuntimeError(
-                            "No generated image was found for the target generation run"
+                            "No generated media was found for the target generation run"
                         )
 
                     resolved_s3_client = (
@@ -146,7 +146,7 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                         generation_run_id=generation_run_id,
                         sns_accounts=sns_accounts,
                         caption_template=caption_template,
-                        generated_image=generated_image,
+                        generated_media=generated_media,
                         env_name=config.env_name,
                         set_code=batch_set.set_code,
                         s3_bucket=config.s3_bucket_name,

@@ -66,6 +66,55 @@ def test_create_container_posts_expected_graph_parameters() -> None:
     }
 
 
+def test_create_container_posts_reel_graph_parameters() -> None:
+    """Reel creation sends the required video fields without cover overrides."""
+    urlopen = _recording_urlopen([FakeResponse({"id": "container"})])
+
+    assert instagram_api.create_container(
+        "token",
+        "ig-user",
+        "https://s3.example/video.mp4",
+        "caption #tag",
+        media_type="reel",
+        urlopen=urlopen,
+    ) == ("container", {"id": "container"})
+
+    request, _ = urlopen.calls[0]
+    values = urllib.parse.parse_qs(request.data.decode())
+    assert values == {
+        "access_token": ["token"],
+        "media_type": ["REELS"],
+        "video_url": ["https://s3.example/video.mp4"],
+        "share_to_feed": ["true"],
+        "caption": ["caption #tag"],
+    }
+    assert "image_url" not in values
+    assert "cover_url" not in values
+    assert "thumb_offset" not in values
+
+
+def test_create_container_rejects_unknown_media_type() -> None:
+    """Unsupported media types are rejected before an API request is sent."""
+    with pytest.raises(ValueError, match="Unsupported Instagram media type"):
+        instagram_api.create_container(
+            "token",
+            "ig-user",
+            "https://s3.example/media",
+            "caption",
+            media_type="story",
+        )
+
+
+def test_resolve_poll_settings_uses_reel_and_image_defaults() -> None:
+    """Reels receive the longer processing polling window."""
+    assert instagram_api.resolve_poll_settings("reel") == instagram_api.PollSettings(
+        60, 10.0
+    )
+    assert instagram_api.resolve_poll_settings(
+        "feed_image"
+    ) == instagram_api.PollSettings(10, 3.0)
+
+
 def test_publish_container_posts_expected_graph_parameters() -> None:
     """Publishing uses media_publish and returns the platform post ID."""
     urlopen = _recording_urlopen([FakeResponse({"id": "post"})])
@@ -177,6 +226,25 @@ def test_poll_container_status_retries_until_finished(monkeypatch) -> None:
     assert timeout == 30
     query = urllib.parse.parse_qs(urllib.parse.urlsplit(request.full_url).query)
     assert query == {"fields": ["status_code"], "access_token": ["token"]}
+
+
+def test_poll_container_status_uses_reel_interval(monkeypatch) -> None:
+    """The resolved reel settings wait ten seconds between checks."""
+    urlopen = _recording_urlopen(
+        [FakeResponse({"status_code": "IN_PROGRESS"}), FakeResponse({"status_code": "FINISHED"})]
+    )
+    sleep = []
+    monkeypatch.setattr(instagram_api.time, "sleep", sleep.append)
+    settings = instagram_api.resolve_poll_settings("reel")
+
+    assert instagram_api.poll_container_status(
+        "token",
+        "container",
+        urlopen=urlopen,
+        max_attempts=settings.max_attempts,
+        poll_interval_seconds=settings.interval_seconds,
+    ) == {"status_code": "FINISHED"}
+    assert sleep == [10.0]
 
 
 def test_poll_container_status_error_is_clear_failure() -> None:

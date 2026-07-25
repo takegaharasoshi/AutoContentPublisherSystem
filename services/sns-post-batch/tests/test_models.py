@@ -7,7 +7,7 @@ import pytest
 from app.models import (
     BatchSet,
     CaptionTemplate,
-    GeneratedImageRef,
+    GeneratedMediaRef,
     Post,
     SnsAccount,
 )
@@ -19,7 +19,7 @@ from app.models import (
         BatchSet(1, "set", True),
         SnsAccount(2, "instagram", "main", "Main"),
         CaptionTemplate(3, "caption"),
-        GeneratedImageRef(4, "bucket", "key"),
+        GeneratedMediaRef(4, "bucket", "key", "jpg"),
         Post(5, "pending", None, None),
     ],
 )

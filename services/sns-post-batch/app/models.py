@@ -33,12 +33,13 @@ class CaptionTemplate:
 
 
 @dataclass(frozen=True)
-class GeneratedImageRef:
-    """Storage reference for a generated image."""
+class GeneratedMediaRef:
+    """Storage reference for generated media."""
 
     id: int
     s3_bucket: str
     s3_key: str
+    file_format: str
 
 
 @dataclass(frozen=True)

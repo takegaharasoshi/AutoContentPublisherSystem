@@ -1,10 +1,10 @@
 """Tests for SNS posting processing behavior."""
 
-from unittest.mock import Mock
+from unittest.mock import ANY, Mock
 
 import app.processing as processing
 from app.instagram_api import InstagramRequestFailed, InstagramResultUnknown
-from app.models import CaptionTemplate, GeneratedImageRef, Post, SnsAccount
+from app.models import CaptionTemplate, GeneratedMediaRef, Post, SnsAccount
 
 
 def _account(account_id: int = 1, platform: str = "instagram") -> SnsAccount:
@@ -12,19 +12,21 @@ def _account(account_id: int = 1, platform: str = "instagram") -> SnsAccount:
     return SnsAccount(account_id, platform, f"account-{account_id}", "Account")
 
 
-def _image() -> GeneratedImageRef:
-    """Build a generated image reference."""
-    return GeneratedImageRef(20, "image-bucket", "images/test.jpg")
+def _media(file_format: str = "jpg") -> GeneratedMediaRef:
+    """Build a generated media reference."""
+    s3_key = "videos/test.mp4" if file_format == "mp4" else "images/test.jpg"
+    return GeneratedMediaRef(20, "media-bucket", s3_key, file_format)
 
 
 def _run(monkeypatch, accounts, get_post, **overrides):
     """Run processing with common API and persistence fakes."""
     cursor = Mock()
     connection = Mock()
+    generated_media = overrides.pop("generated_media", _media())
     monkeypatch.setattr(processing, "get_post", get_post)
     monkeypatch.setattr(processing, "create_pending_post", Mock(return_value=101))
-    monkeypatch.setattr(processing, "ensure_post_image", Mock())
-    monkeypatch.setattr(processing, "update_post_caption", Mock())
+    monkeypatch.setattr(processing, "ensure_post_media", Mock())
+    monkeypatch.setattr(processing, "update_post_snapshot", Mock())
     monkeypatch.setattr(processing, "update_post_container_created", Mock())
     monkeypatch.setattr(processing, "update_post_failed", Mock())
     monkeypatch.setattr(processing, "update_post_unconfirmed", Mock())
@@ -44,7 +46,7 @@ def _run(monkeypatch, accounts, get_post, **overrides):
         generation_run_id=2,
         sns_accounts=accounts,
         caption_template=CaptionTemplate(3, "caption"),
-        generated_image=_image(),
+        generated_media=generated_media,
         env_name="prod",
         set_code="set-a",
         s3_bucket="configured-bucket",
@@ -55,7 +57,7 @@ def _run(monkeypatch, accounts, get_post, **overrides):
 
 
 def test_processing_creates_and_publishes_new_post(monkeypatch) -> None:
-    """A new account is linked to the image and reaches success."""
+    """A new account is linked to the media and reaches success."""
     states = iter([None, Post(101, "success", "container", "post")])
     result, cursor, connection = _run(
         monkeypatch, [_account()], lambda *args: next(states)
@@ -68,19 +70,60 @@ def test_processing_creates_and_publishes_new_post(monkeypatch) -> None:
         set_id=1,
         generation_run_id=2,
         sns_account_id=1,
+        media_type="feed_image",
     )
-    processing.ensure_post_image.assert_called_once_with(
+    processing.ensure_post_media.assert_called_once_with(
         cursor,
         post_id=101,
-        generated_image_id=20,
+        generated_media_id=20,
     )
-    processing.update_post_caption.assert_called_once_with(
+    processing.update_post_snapshot.assert_called_once_with(
         cursor,
         101,
         caption_template_id=3,
         caption_text="caption",
+        media_type="feed_image",
     )
     assert connection.commit.call_count == 3
+
+
+def test_processing_creates_and_publishes_reel(monkeypatch) -> None:
+    """MP4 media uses the reel container and longer polling settings."""
+    states = iter([None, Post(101, "success", "container", "post")])
+    create_container = Mock(return_value=("container", {"id": "container"}))
+    poll_container_status = Mock(return_value={"status_code": "FINISHED"})
+    result, cursor, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args: next(states),
+        generated_media=_media("mp4"),
+        create_container=create_container,
+        poll_container_status=poll_container_status,
+    )
+
+    assert result == processing.ProcessingResult(1, True)
+    processing.create_pending_post.assert_called_once_with(
+        cursor,
+        set_id=1,
+        generation_run_id=2,
+        sns_account_id=1,
+        media_type="reel",
+    )
+    create_container.assert_called_once_with(
+        "token",
+        "ig",
+        "https://signed",
+        "caption",
+        media_type="reel",
+        urlopen=ANY,
+    )
+    poll_container_status.assert_called_once_with(
+        "token",
+        "container",
+        urlopen=ANY,
+        max_attempts=60,
+        poll_interval_seconds=10.0,
+    )
 
 
 def test_processing_skips_terminal_post(monkeypatch) -> None:

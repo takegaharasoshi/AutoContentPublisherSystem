@@ -43,12 +43,13 @@ def test_create_pending_post_inserts_and_returns_id() -> None:
         set_id=1,
         generation_run_id=2,
         sns_account_id=3,
+        media_type="feed_image",
     ) == 11
     cursor.execute.assert_called_once_with(
         "INSERT INTO posts "
-        "(set_id, generation_run_id, sns_account_id, status) "
-        "VALUES (%s, %s, %s, 'pending')",
-        (1, 2, 3),
+        "(set_id, generation_run_id, sns_account_id, status, media_type) "
+        "VALUES (%s, %s, %s, 'pending', %s)",
+        (1, 2, 3, "feed_image"),
     )
 
 
@@ -66,6 +67,7 @@ def test_create_pending_post_fetches_duplicate_id() -> None:
         set_id=1,
         generation_run_id=2,
         sns_account_id=3,
+        media_type="feed_image",
     ) == 12
     assert cursor.execute.call_args_list[-1].args == (
         "SELECT id FROM posts "
@@ -85,24 +87,26 @@ def test_create_pending_post_reraises_non_duplicate_integrity_error() -> None:
             set_id=1,
             generation_run_id=2,
             sns_account_id=3,
+            media_type="feed_image",
         )
 
 
-def test_update_post_caption_allows_null_template() -> None:
-    """A caption without a configured template is persisted as empty text."""
+def test_update_post_snapshot_allows_null_template() -> None:
+    """A caption without a template is persisted with its media type."""
     cursor = Mock()
 
-    posts.update_post_caption(
+    posts.update_post_snapshot(
         cursor,
         5,
         caption_template_id=None,
         caption_text="",
+        media_type="reel",
     )
 
     cursor.execute.assert_called_once_with(
         "UPDATE posts SET caption_template_id = %s, "
-        "caption_text_snapshot = %s WHERE id = %s",
-        (None, "", 5),
+        "caption_text_snapshot = %s, media_type = %s WHERE id = %s",
+        (None, "", "reel", 5),
     )
 
 

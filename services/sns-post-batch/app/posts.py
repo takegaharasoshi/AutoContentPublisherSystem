@@ -39,6 +39,7 @@ def create_pending_post(
     set_id: int,
     generation_run_id: int,
     sns_account_id: int,
+    media_type: str,
 ) -> int:
     """Create a pending post or return the existing post ID.
 
@@ -47,6 +48,7 @@ def create_pending_post(
         set_id: Batch set ID.
         generation_run_id: Generation run ID.
         sns_account_id: SNS account ID.
+        media_type: Media type snapshot for the post.
 
     Returns:
         The new or existing post ID.
@@ -54,9 +56,9 @@ def create_pending_post(
     try:
         cursor.execute(
             "INSERT INTO posts "
-            "(set_id, generation_run_id, sns_account_id, status) "
-            "VALUES (%s, %s, %s, 'pending')",
-            (set_id, generation_run_id, sns_account_id),
+            "(set_id, generation_run_id, sns_account_id, status, media_type) "
+            "VALUES (%s, %s, %s, 'pending', %s)",
+            (set_id, generation_run_id, sns_account_id, media_type),
         )
         return cursor.lastrowid
     except pymysql.err.IntegrityError as exc:
@@ -74,18 +76,30 @@ def create_pending_post(
     return row[0]
 
 
-def update_post_caption(
+def update_post_snapshot(
     cursor: Any,
     post_id: int,
     *,
     caption_template_id: int | None,
     caption_text: str,
+    media_type: str,
 ) -> None:
-    """Persist the caption template reference and text snapshot."""
+    """Update posting-time snapshot fields for caption and media type.
+
+    Existing rows created before V002 also have ``media_type`` self-repaired
+    to match the actual generated media used for this posting attempt.
+
+    Args:
+        cursor: Database cursor.
+        post_id: Post ID.
+        caption_template_id: Caption template ID at posting time.
+        caption_text: Caption text at posting time.
+        media_type: Media type derived from the generated media.
+    """
     cursor.execute(
         "UPDATE posts SET caption_template_id = %s, "
-        "caption_text_snapshot = %s WHERE id = %s",
-        (caption_template_id, caption_text, post_id),
+        "caption_text_snapshot = %s, media_type = %s WHERE id = %s",
+        (caption_template_id, caption_text, media_type, post_id),
     )
 
 

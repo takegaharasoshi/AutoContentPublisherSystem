@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import app.main as main_module
 
 from app.config import AppConfig, ConfigError
-from app.models import BatchSet, CaptionTemplate, GeneratedImageRef, SnsAccount
+from app.models import BatchSet, CaptionTemplate, GeneratedMediaRef, SnsAccount
 from app.processing import ProcessingResult
 
 
@@ -77,7 +77,7 @@ def _patch_started_log(monkeypatch) -> Mock:
     return finalizer
 
 
-def _patch_target_dependencies(monkeypatch, *, image=True) -> None:
+def _patch_target_dependencies(monkeypatch, *, media=True) -> None:
     """Patch repositories needed after a target is selected."""
     monkeypatch.setattr(
         main_module,
@@ -91,9 +91,9 @@ def _patch_target_dependencies(monkeypatch, *, image=True) -> None:
     )
     monkeypatch.setattr(
         main_module,
-        "fetch_first_generated_image",
-        lambda cursor, run_id: GeneratedImageRef(4, "bucket", "images/a.jpg")
-        if image
+        "fetch_first_generated_media",
+        lambda cursor, run_id: GeneratedMediaRef(4, "bucket", "images/a.jpg", "jpg")
+        if media
         else None,
     )
 
@@ -164,8 +164,8 @@ def test_main_succeeds_when_no_posting_target_exists(monkeypatch) -> None:
     }
 
 
-def test_main_fails_when_target_has_no_generated_image(monkeypatch) -> None:
-    """Missing target image is a data inconsistency recorded as failed."""
+def test_main_fails_when_target_has_no_generated_media(monkeypatch) -> None:
+    """Missing target media is a data inconsistency recorded as failed."""
     connection = FakeConnection()
     _patch_base(monkeypatch, connection)
     finalizer = _patch_started_log(monkeypatch)
@@ -175,7 +175,7 @@ def test_main_fails_when_target_has_no_generated_image(monkeypatch) -> None:
         lambda cursor, code: BatchSet(1, "set-a", True),
     )
     monkeypatch.setattr(main_module, "resolve_target_generation_run", lambda *args: 8)
-    _patch_target_dependencies(monkeypatch, image=False)
+    _patch_target_dependencies(monkeypatch, media=False)
 
     assert main_module.main(s3_client=Mock(), urlopen=Mock()) == 1
     assert finalizer.call_args.kwargs["status"] == "failed"
