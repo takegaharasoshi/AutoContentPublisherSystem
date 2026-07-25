@@ -215,10 +215,10 @@
       <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。パラメータは <code>media_type</code> で分岐する:
         <ul>
           <li><code>feed_image</code> → <code>image_url</code>（presigned URL）を渡す（従来どおり）</li>
-          <li><code>reel</code> → <code>media_type=REELS</code> + <code>video_url</code>（presigned URL）+ <code>share_to_feed=true</code>（プロフィールのフィード面にも表示する。<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #8</a>）を渡す。<strong>カバー画像は指定せずデフォルト（動画の先頭フレーム）とする</strong>（Phase 14-4 決定。先頭フレームは Ken Burns 元の静止画とほぼ同じ絵になるため。14-8 の実機確認で問題があれば <code>cover_url</code> / <code>thumb_offset</code> の指定を再検討する）</li>
+          <li><code>reel</code> → <code>media_type=REELS</code> + <code>video_url</code>（presigned URL）+ <code>share_to_feed=true</code>（プロフィールのフィード面にも表示する。<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #8</a>）を渡す。<strong>カバー画像は指定せずデフォルト（動画の先頭フレーム）とする</strong>（Phase 14-4 決定。先頭フレームは Ken Burns 元の静止画とほぼ同じ絵になるため。14-8 の実機確認で妥当性を確認済み。<code>cover_url</code> / <code>thumb_offset</code> は指定しない）</li>
         </ul>
         取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する</li>
-      <li>コンテナのステータス（<code>GET /{container-id}?fields=status_code</code>）を <code>FINISHED</code> になるまで有限回数・タイムアウト付きでポーリングする（Meta 側のメディア処理が非同期のため。手順 5 のパブリッシュ API は <code>FINISHED</code> 到達前に呼び出すと失敗しうる）。<strong>リール（動画）はメディア処理が分オーダーになり得るため、ポーリング間隔・上限は画像より長くメディア種別ごとに設定する</strong>（設計目安: 画像は現行の間隔 3 秒 × 最大 10 回を維持、動画は間隔 15 秒・上限 10 分。実装値は 14-8 の実測を入力に 14-9 で確定する）。<code>ERROR</code> を受け取った場合、またはポーリングが上限に達し <code>FINISHED</code> に到達しなかった場合は、パブリッシュ API を呼び出さずに <code>status='failed'</code> に更新する（パブリッシュ要求を送信していないため <code>published_unconfirmed</code> の対象外）</li>
+      <li>コンテナのステータス（<code>GET /{container-id}?fields=status_code</code>）を <code>FINISHED</code> になるまで有限回数・タイムアウト付きでポーリングする（Meta 側のメディア処理が非同期のため。手順 5 のパブリッシュ API は <code>FINISHED</code> 到達前に呼び出すと失敗しうる）。<strong>リール（動画）はメディア処理が分オーダーになり得るため、ポーリング間隔・上限は画像より長くメディア種別ごとに設定する</strong>（画像は現行の間隔 3 秒 × 最大 10 回を維持、動画は<strong>間隔 10 秒・上限 10 分</strong>。14-8 の実測〔10 秒動画で FINISHED まで 33.5 秒〕を入力に 14-9 で確定する）。<code>ERROR</code> を受け取った場合、またはポーリングが上限に達し <code>FINISHED</code> に到達しなかった場合は、パブリッシュ API を呼び出さずに <code>status='failed'</code> に更新する（パブリッシュ要求を送信していないため <code>published_unconfirmed</code> の対象外）</li>
       <li>パブリッシュ API（<code>POST /{ig-user-id}/media_publish</code>）を呼び出す
         <ul>
           <li>成功 → <code>platform_post_id</code> を保存し <code>status='success'</code> に更新</li>
@@ -234,6 +234,17 @@
 <div class="decision">
   <span class="callout-title">決定（2026-07-19、12-3 実装時に反映）: コンテナステータスのポーリングを手順に追加</span>
   12-2 の疎通確認で、コンテナ作成 API 成功後にステータスが <code>FINISHED</code> になるまで待たずにパブリッシュ API を呼ぶと失敗しうる実際の Graph API の挙動を確認した。本書の初版手順にはこのポーリングが明記されていなかったため、上記手順 4 として追加した。<code>posts</code> の状態遷移（3.2）は変更しない — ポーリングは <code>container_created</code> 到達後・パブリッシュ呼び出し前のアプリ内処理として扱う。Step Functions Retry でタスクが再起動された場合も、<code>container_created</code> からの再開（3.2）でこのポーリングからやり直す。
+</div>
+
+<div class="decision">
+  <span class="callout-title">実機確認の結果（2026-07-25、14-8 リール投稿の疎通確認）</span>
+  14-7 で生成した実 MP4（1080x1920 / 30fps / 10.0 秒 / H.264 + AAC 128kbps / 4.2 MB）で、上記手順 4〜5 のリール経路を実 API に対して通した結果は以下。<strong>設計の変更は不要</strong>だった。
+  <ul>
+    <li><strong>所要時間</strong>: コンテナ作成の応答 1.2 秒 → <code>status_code=FINISHED</code> 到達まで <strong>33.5 秒</strong>（<code>IN_PROGRESS</code> が 6 回続いた後 7 回目で FINISHED。間隔 5 秒で計測）→ パブリッシュの応答 <strong>10.2 秒</strong>。分オーダーは想定に留めつつ、実測は 1 分未満。ポーリング上限 10 分は十分なマージンで、既存の HTTP タイムアウト 30 秒もパブリッシュの 10 秒応答に対して足りている</li>
+    <li><strong>カバー画像</strong>: <code>cover_url</code> / <code>thumb_offset</code> を指定しない場合のカバーは、公開後の <code>thumbnail_url</code> を実際に取得して確認したところ<strong>動画の先頭フレーム（= Ken Burns 元の静止画を 9:16 中央クロップした絵）</strong>であり、14-4 の想定どおりだった</li>
+    <li><strong><code>share_to_feed=true</code></strong>: リールタブとプロフィールのフィード（グリッド）の<strong>両方に表示</strong>されることを目視で確認した（Graph API に読み取り用フィールドがないため目視確認）</li>
+    <li><strong>公開後のメディア属性</strong>: <code>media_type=VIDEO</code> / <code>media_product_type=REELS</code>。<code>permalink</code> は <code>/reel/{shortcode}/</code> 形式で払い出される</li>
+  </ul>
 </div>
 
 <div class="note">

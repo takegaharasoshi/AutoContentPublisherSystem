@@ -209,9 +209,9 @@
   - 確認: pytest 全パス + ローカル E2E（実 API）で縦長静止画（1024x1536）→ ffmpeg 合成の MP4（9:16・10 秒前後・ズーム/パン・音源入り・H.264 + AAC）が生成され、S3 保存 + DB 登録まで通る
   - 備考: 2026-07-25 完了。Codex（sol/high）へ委譲し 2 巡で Fix。方式契約を「最終メディアを返す」へ一般化（`generators/contracts.py` に `MediaOutput` / `IntermediateOutput` / `GeneratorResult` / `GeneratorContext` を新設）、`gpt_image_kenburns` を追加・レジストリ登録（gpt-image-single / fake は新契約へ追随、OpenAI 呼び出しは `openai_image.py` に共通化）。共通骨格は S3 キーのプレフィックス・拡張子・Content-Type を `file_format` 駆動に変更し、中間静止画は S3 のみ保存・メタ情報（寸法・尺・`audio_asset_id`）を DB 登録、失敗時 `rollback` でローテーション副作用を残さない。Dockerfile に ffmpeg 追加、ImageBatchStack を 1 vCPU / 2 GB へ引き上げ。**ローカル E2E（実 API + 実 ffmpeg + 実 S3 音源）で 1080x1920・10.0 秒・h264 + aac・4.2 MB の MP4 生成 → DB 登録 → `last_used_at` 更新まで確認**。14-6 の S3 ライフサイクル変更に未追随だった FoundationStack のテストも修正。詳細は [development-log.md](development-log.md) の 14-7 を参照
 
-- [ ] **14-8** リール投稿の疎通確認（実 API）
+- [x] **14-8** リール投稿の疎通確認（実 API）
   - 確認: 14-7 で生成した実 MP4 を使い、ローカルからリール投稿（`media_type=REELS` のコンテナ作成 → FINISHED までポーリング → パブリッシュ）のテスト投稿が成功する
-  - 備考: 12-2 と同じ役割の疎通ステップ（テスト投稿は削除前提）。動画のコンテナ処理は分オーダーになり得るため、実所要時間を計測して 14-9 のポーリング間隔・回数と SFN タイムアウト見直しの入力にする。`share_to_feed=true` の挙動・カバー画像のデフォルトもここで実機確認する
+  - 備考: 2026-07-25 完了。12-2 と同じ使い捨てスクリプト方式（scratchpad・非コミット、`boto3` + 標準ライブラリ `urllib`）で実 API へ疎通。14-7 のローカル E2E 成果物 MP4（1080x1920 / 30fps / 10.0 秒 / H.264 + AAC 128kbps / 4.2 MB）を S3 へ配置 → presigned URL（1 時間）→ `media_type=REELS` + `share_to_feed=true`・カバー未指定でコンテナ作成 → FINISHED までポーリング → パブリッシュまで成功（`platform_post_id=18363360217208949`、permalink `/reel/DbNiRIcggGq/`）。**実測（14-9 の入力）**: コンテナ作成応答 1.2 秒 / **FINISHED まで 33.5 秒**（間隔 5 秒で 7 回目）/ パブリッシュ応答 10.2 秒 → 動画のポーリングは**間隔 10 秒・上限 10 分**を推奨値として batch-flow.html に反映（SFN タイムアウト・HTTP タイムアウト 30 秒とも見直し不要）。**実機確認 2 件は設計どおり**: カバー画像 = デフォルトで先頭フレーム（公開後の `thumbnail_url` を取得して照合）、`share_to_feed=true` = リールタブとプロフィールのフィード両方に表示（目視）。テスト投稿はユーザーが手動削除。詳細は [development-log.md](development-log.md) の 14-8 を参照
 
 - [ ] **14-9** sns-post-batch のリール対応（Codex 委譲）
   - 確認: pytest 全パス + ローカル E2E（API モック）でリール投稿の `posts` が success まで遷移する。既存の画像投稿経路も回帰テストで green
