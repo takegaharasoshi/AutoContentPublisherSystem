@@ -167,7 +167,8 @@
 | 14-8 | Opus 4.8 / high | なし（実 API・対話的のため委譲不向き） |
 | 14-9 | Opus 4.8 / high（指示書・diff レビュー） | terra / high（既存パターンの拡張。不安があれば sol） |
 | 14-10 | Opus 4.8 / high（トラブル発生時のみ Fable 5 へ切替） | なし |
-| 14-11 | Opus 4.8 / high（設計課題リストの棚卸しのみ Fable 5 でも可） | なし（docs は Codex 編集禁止） |
+| 14-11 | Opus 5 / high（原因分析・幾何設計・プロンプト改訂の判断） | terra / high（`_compose_canvas` 実装 + テスト） |
+| 14-12 | Opus 4.8 / high（設計課題リストの棚卸しのみ Fable 5 でも可） | なし（docs は Codex 編集禁止） |
 | Phase 15 冒頭（テーマ選定・壁打ち・ステップ展開） | **Fable 5** / デフォルト | — |
 | Phase 15 実装系ステップ | Phase 14 と同じパターンを適用 | 同左 |
 | Phase 16 設計（壁打ち・設計 Fix） | **Fable 5** / デフォルト | 実装ステップは展開時に割当 |
@@ -191,7 +192,7 @@
   - 確認: 本ファイルの Phase 14 が具体的なステップ（14-4〜14-11）に展開されている
   - 備考: 2026-07-23 完了。壁打ち記録（[requirements-notes-video.html](app/requirements-notes-video.html)）の決定事項・持ち越し論点を、Phase 11〜13 で実績のある進行パターン（設計 Fix → DDL → データ準備 → 疎通 → Codex 委譲実装 → AWS E2E → 定常運用切替・締め）に沿って 8 ステップへ展開。詳細は [development-log.md](development-log.md) の 14-3 を参照
 
-> 実装の大きいステップ（14-7・14-9）は Codex に委譲し、完了条件に pytest 全パスを含める（CLAUDE.md の Codex 連携ルール）。14-6 の選曲はユーザーの外部作業を含むため、14-4 完了後であれば後続ステップと並行して進めてよい。14-10 のセット切替後は 14-11 完了まで定時実行が旧頻度（1 日 3 回）のまま動画で走るため、14-10 と 14-11 は近接して実施する（間隔が空く場合の扱いは 14-10 で判断）。
+> 実装の大きいステップ（14-7・14-9）は Codex に委譲し、完了条件に pytest 全パスを含める（CLAUDE.md の Codex 連携ルール）。14-6 の選曲はユーザーの外部作業を含むため、14-4 完了後であれば後続ステップと並行して進めてよい。14-10 のセット切替後は締めのステップ完了まで定時実行が旧頻度（1 日 3 回）のまま動画で走るため、両者は近接して実施する（間隔が空く場合の扱いは 14-10 で判断）。実際には 14-10 で見切れが判明したため、締めの前に 14-11（見切れ対策とプロンプト改訂）を割り込ませ、締めを 14-12 へ繰り下げた。
 
 - [x] **14-4** 動画対応の設計 Fix（データモデル・方式契約・投稿フロー・運用ルール）
   - 確認: 壁打ちの持ち越し論点（[requirements-notes-video.html](app/requirements-notes-video.html) セクション 7）が決定され、data-model.html・batch-flow.html・operation.html が動画対応を含む形で一時 Fix されている（blocker のみ修正、改善提案は設計課題リストへ）
@@ -219,11 +220,15 @@
 
 - [x] **14-10** AWS E2E（セット切替 + 全チェーンでリール実投稿）
   - 確認: fantasy-animals-1 の動画方式への切替後、画像生成 SFN からの全チェーン実行でリールが Instagram に実投稿され、`posts` が success・動画メタ情報・実行ログに行が入る
-  - 備考: 2026-07-25 完了。**デプロイ**: 未 push の 3 コミット（`aea9224`）を push → 両パイプライン Succeeded（image-batch rev 13 / sns-post-batch rev 9）→ 14-7 の CDK 変更を反映するため `cdk deploy --exclusively ImageBatchStack`（rev 14 = 1 vCPU / 2 GB）。**順序の要点**: CDK はイメージタグを Context 必須のためパイプライン完了後にデプロイし、Scheduler の DISABLE は CDK が `enabled: true` を持つため cdk deploy の後に行う。**切替**: Aurora の 3 レコード（`generator_name` → `gpt-image-kenburns`、`prompt_configs.size` → `1024x1536`、キャプションの `#AIアート` → `#AIart`）を Data API で更新（ローカル MySQL も同期）。**全チェーン実行**: image-batch 3 分 41 秒（うち生成 143 秒）で `generated_media` id=14（mp4 / 1080x1920 / 10 秒 / `audio_asset_id=1`・S3 に MP4 3.8 MiB + 中間静止画）を登録。**判明した挙動**: 投稿対象は「終端状態の posts を持たない最古の generation_run」のため、以前から滞留していた未投稿 run 1 件により**生成と投稿が 1 実行分ずれており**、チェーンからの投稿は 1 本前の静止画になった（自然解消しない）。**リール実投稿**: ユーザー判断で SNS 投稿 SFN を単体実行し `posts` id=14（`media_type='reel'` / success / `platform_post_id=18613826326051098` / permalink `/reel/DbOEiPujvkK/` / 所要 48 秒）を確認。バックログは 0 件になり、14-11 の初回定時実行は自分の生成分を投稿する状態に揃った。**Scheduler は DISABLED のまま 14-11 へ引き継ぐ**。詳細は [development-log.md](development-log.md) の 14-10 を参照
+  - 備考: 2026-07-25 完了。**デプロイ**: 未 push の 3 コミット（`aea9224`）を push → 両パイプライン Succeeded（image-batch rev 13 / sns-post-batch rev 9）→ 14-7 の CDK 変更を反映するため `cdk deploy --exclusively ImageBatchStack`（rev 14 = 1 vCPU / 2 GB）。**順序の要点**: CDK はイメージタグを Context 必須のためパイプライン完了後にデプロイし、Scheduler の DISABLE は CDK が `enabled: true` を持つため cdk deploy の後に行う。**切替**: Aurora の 3 レコード（`generator_name` → `gpt-image-kenburns`、`prompt_configs.size` → `1024x1536`、キャプションの `#AIアート` → `#AIart`）を Data API で更新（ローカル MySQL も同期）。**全チェーン実行**: image-batch 3 分 41 秒（うち生成 143 秒）で `generated_media` id=14（mp4 / 1080x1920 / 10 秒 / `audio_asset_id=1`・S3 に MP4 3.8 MiB + 中間静止画）を登録。**判明した挙動**: 投稿対象は「終端状態の posts を持たない最古の generation_run」のため、以前から滞留していた未投稿 run 1 件により**生成と投稿が 1 実行分ずれており**、チェーンからの投稿は 1 本前の静止画になった（自然解消しない）。**リール実投稿**: ユーザー判断で SNS 投稿 SFN を単体実行し `posts` id=14（`media_type='reel'` / success / `platform_post_id=18613826326051098` / permalink `/reel/DbOEiPujvkK/` / 所要 48 秒）を確認。バックログは 0 件になり、初回定時実行は自分の生成分を投稿する状態に揃った。**Scheduler は DISABLED のまま後続ステップへ引き継ぐ**（14-11 を挟んだため ENABLED 化は 14-12）。詳細は [development-log.md](development-log.md) の 14-10 を参照
 
-- [ ] **14-11** 定常運用切替と締め（Scheduler 1 日 1 回化・設計書整備）
+- [x] **14-11** リール画角の見切れ対策とプロンプト改訂
+  - 確認: 動画化で生成画像の全ピクセルが常に可視になり（ズーム終端でも切れない）、新プロンプトで図鑑フォーマットの構成・文字量・トーンが安定して再現される
+  - 備考: 2026-07-26 完了。14-10 の実投稿で**画像内の文字が左右で見切れている**ことが判明したため、14-12（定常運用切替）の前に割り込みで実施。**原因**: `scale=-2:1920,crop=1080:1920`（中央クロップで幅の 15.6% 喪失）+ zoompan 1.0→1.08（終盤にさらに各 3.7%）の 2 段階クロップで、最終フレームには元画像の横幅の 78% しか映っていなかった。**対策 (1) 合成方式の変更**: ffmpeg の中央クロップを廃止し、Pillow で「セーフボックスに contain した前景 + 同じ画像をぼかし減光した背景」の 1080x1920 キャンバスを組んでから zoompan に渡す方式へ変更（`_compose_canvas`）。セーフボックスは `出力寸法 / ZOOM_END - SAFE_BOX_MARGIN` として定数から導出するため、**ズーム終端でも元画像の 100% が可視**であることが構造的に保証される。**対策 (2) プロンプト全面改訂**: 1:1 時代の 4 文から、構成（リード文 2 行 / 名前 / ローマ字 / 基本情報 4 項目 / 特徴 3 項目）・文字量・写真トーン・Instagram UI セーフエリア（右端 12%・下端 15%）を明示した文言へ差し替え、Aurora + ローカル MySQL の `prompt_configs.prompt_text` を更新。**検証**: pytest 72 件全パス、実 ffmpeg でズーム終端フレームの切れゼロを確認、実 Images API の試し打ち 3 巡 6 枚で構成の安定を確認。詳細は [development-log.md](development-log.md) の 14-11 を参照
+
+- [ ] **14-12** 定常運用切替と締め（Scheduler 1 日 1 回化・設計書整備）
   - 確認: Scheduler が 1 日 1 回（時刻はユーザー決定）で ENABLED になり、スケジュール時刻の自動実行でリール投稿まで成功している（KPI マイルストーン M1 達成）。設計書一式が実態と一致している
-  - 備考: **前提: 14-10 で Scheduler を DISABLED にしてあるため、本ステップで cron 変更（3 回 → 1 回）と ENABLED 化をセットで行う**（CDK の `enabled: true` によりデプロイで ENABLED に戻るため、cron 変更を CDK で行えば State も揃う）。Scheduler の cron 変更（3 回 → 1 回）+ ImageBatchStack デプロイ。初回の定時実行では「1 回のチェーンで生成したリールがそのまま投稿される」ことを事後確認する（14-10 で未投稿 run のバックログを解消済み）。13-2 と同じ締めの位置づけ: 動画方式の方式設計書を `docs/app/generators/` に新設（「本採用時に作成」ルール。実装を正として記述）、方式カタログのステータス更新、[sets/fantasy-animals-1.html](app/sets/fantasy-animals-1.html) の更新（方式・頻度・音源・キャプション）、事業戦略書の KPI 実績表更新（M1）、設計課題リストの棚卸し。Phase 15 のステップ展開は本ステップ完了後に行う
+  - 備考: **前提: 14-10 で Scheduler を DISABLED にしてあるため、本ステップで cron 変更（3 回 → 1 回）と ENABLED 化をセットで行う**（CDK の `enabled: true` によりデプロイで ENABLED に戻るため、cron 変更を CDK で行えば State も揃う）。Scheduler の cron 変更（3 回 → 1 回）+ ImageBatchStack デプロイ。初回の定時実行では「1 回のチェーンで生成したリールがそのまま投稿される」ことを事後確認する（14-10 で未投稿 run のバックログを解消済み）。13-2 と同じ締めの位置づけ: 動画方式の方式設計書を `docs/app/generators/` に新設（「本採用時に作成」ルール。実装を正として記述）、方式カタログのステータス更新、[sets/fantasy-animals-1.html](app/sets/fantasy-animals-1.html) の更新（方式・頻度・音源・キャプション。プロンプトと生成サイズは 14-11 で更新済み）、事業戦略書の KPI 実績表更新（M1）、設計課題リストの棚卸し。方式設計書には 14-11 の合成仕様（フィット + ぼかし背景 + ズーム余地）も含める。Phase 15 のステップ展開は本ステップ完了後に行う
 
 ---
 

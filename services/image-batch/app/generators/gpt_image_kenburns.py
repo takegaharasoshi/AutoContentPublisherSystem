@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import logging
+from io import BytesIO
 from pathlib import Path
 import subprocess
 import tempfile
 from typing import Any
+
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
 from acps_shared.s3 import get_object
 
@@ -32,6 +35,53 @@ FFMPEG_TIMEOUT_SECONDS = 600
 ZOOM_START = 1.0
 ZOOM_END = 1.08
 SUPERSAMPLE_FACTOR = 2
+BACKGROUND_BLUR_RADIUS = 48
+BACKGROUND_BRIGHTNESS = 0.72
+BACKGROUND_BLUR_DOWNSCALE = 4
+CANVAS_JPEG_QUALITY = 90
+SAFE_BOX_MARGIN = 8
+
+
+def _compose_canvas(jpeg: bytes) -> bytes:
+    """Place the full source image over a blurred vertical background."""
+    # zoompan は終端 ZOOM_END 倍まで中央にズームするため、常時可視な領域は
+    # 出力寸法を ZOOM_END で割ったサイズになる。zoompan が整数ピクセルで
+    # 丸める分を SAFE_BOX_MARGIN で吸収し、前景が端で削れないようにする。
+    safe_box = (
+        int(OUTPUT_WIDTH / ZOOM_END) - SAFE_BOX_MARGIN,
+        int(OUTPUT_HEIGHT / ZOOM_END) - SAFE_BOX_MARGIN,
+    )
+    background_size = (OUTPUT_WIDTH, OUTPUT_HEIGHT)
+    downscaled_size = (
+        OUTPUT_WIDTH // BACKGROUND_BLUR_DOWNSCALE,
+        OUTPUT_HEIGHT // BACKGROUND_BLUR_DOWNSCALE,
+    )
+    with Image.open(BytesIO(jpeg)) as image:
+        source = image.convert("RGB")
+        foreground = ImageOps.contain(source, safe_box, Image.LANCZOS)
+        background = ImageOps.fit(source, background_size, Image.LANCZOS)
+        downscaled_background = background.resize(
+            downscaled_size, Image.LANCZOS
+        )
+        blurred_background = downscaled_background.filter(
+            ImageFilter.GaussianBlur(
+                BACKGROUND_BLUR_RADIUS / BACKGROUND_BLUR_DOWNSCALE
+            )
+        )
+        expanded_background = blurred_background.resize(
+            background_size, Image.LANCZOS
+        )
+        canvas = ImageEnhance.Brightness(expanded_background).enhance(
+            BACKGROUND_BRIGHTNESS
+        )
+        offset = (
+            (OUTPUT_WIDTH - foreground.width) // 2,
+            (OUTPUT_HEIGHT - foreground.height) // 2,
+        )
+        canvas.paste(foreground, offset)
+        output = BytesIO()
+        canvas.save(output, format="JPEG", quality=CANVAS_JPEG_QUALITY)
+    return output.getvalue()
 
 
 def _build_zoompan_filter() -> str:
@@ -42,9 +92,7 @@ def _build_zoompan_filter() -> str:
     supersample_width = OUTPUT_WIDTH * SUPERSAMPLE_FACTOR
     supersample_height = OUTPUT_HEIGHT * SUPERSAMPLE_FACTOR
     return (
-        f"[0:v]scale=-2:{OUTPUT_HEIGHT},"
-        f"crop={OUTPUT_WIDTH}:{OUTPUT_HEIGHT},"
-        f"scale={supersample_width}:{supersample_height},"
+        f"[0:v]scale={supersample_width}:{supersample_height},"
         f"zoompan=z='{ZOOM_START:.1f}+{zoom_delta:.2f}*on/"
         f"{zoom_denominator}':x='iw/2-(iw/zoom/2)':"
         f"y='ih/2-(ih/zoom/2)':d=1:"
@@ -162,7 +210,7 @@ def generate(context: GeneratorContext) -> GeneratorResult:
         audio_s3_key,
         client=context.s3_client,
     )
-    video = _build_video(jpeg, audio)
+    video = _build_video(_compose_canvas(jpeg), audio)
     context.cursor.execute(
         "UPDATE audio_assets SET last_used_at = %s WHERE id = %s",
         (now_utc(), audio_asset_id),
