@@ -73,8 +73,18 @@ export class FoundationStack extends cdk.Stack {
 
     this.imagesBucket = new s3.Bucket(this, 'ImagesBucket', {
       bucketName: `acps-${props.envName}-images-${this.account}`,
+      // ライフサイクルは生成物プレフィックス（images/・videos/）限定にし、
+      // 長期保持する音源ストック（audio/）を自動削除の対象外にする（Phase 14-4 で発見・14-6 前に実施）。
+      // docs/app/data-model.html セクション 5 の warn / infra/stacks.html セクション 3.1 を参照。
       lifecycleRules: [
         {
+          id: 'expire-generated-images',
+          prefix: 'images/',
+          expiration: cdk.Duration.days(30),
+        },
+        {
+          id: 'expire-generated-videos',
+          prefix: 'videos/',
           expiration: cdk.Duration.days(30),
         },
       ],

@@ -246,9 +246,20 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li>書き出し後に必ず試聴確認する（頭切れ・フェードの不自然さ・ノイズ）</li>
 </ul>
 
+<div class="decision">
+  <span class="callout-title">決定: ラウドネス正規化は 2 パス方式を用いる（Phase 14-6 の実作業で確定）</span>
+  上記の 1 コマンド版（単一パス <code>loudnorm</code>）は動的正規化のため精度が粗く、14-6 で 4 曲を処理したところ実測 Integrated が -12.5〜-15.3 LUFS と<strong>約 2.8 dB ばらついた</strong>（曲間の音量差をなくすという目的に対して不十分）。
+  そこで<strong>パス 1 で対象 10 秒区間を解析（<code>print_format=json</code>）し、得た <code>measured_*</code> 値と <code>linear=true</code> を指定してパス 2 で線形適用する</strong>方式に変更した。同じ 4 曲でばらつきは <strong>1.1 dB（-13.8〜-14.9 LUFS）</strong>に収まった。
+  <ul style="margin:.3rem 0 0;">
+    <li>解析は<strong>切り出し後の 10 秒区間に対して行う</strong>（原曲全体ではない。実際に使う区間の音量に合わせるため）</li>
+    <li>フェードは正規化の<strong>後段</strong>に置く（フェード込みで解析すると測定値が下振れするため）。フェードアウトの分だけ最終実測値は目標 -14 をわずかに下回るが、全曲一律のため曲間差は生じない</li>
+    <li>実装スクリプトは 14-6 で使用した 2 パス処理（<code>process()</code> 関数で 1 曲ずつ解析 → 適用）を踏襲する</li>
+  </ul>
+</div>
+
 <h4>手順 3: S3 への配置</h4>
 <pre><code>aws s3 cp track01.m4a s3://acps-prod-images-{アカウントID}/audio/{set_code}/track01.m4a</code></pre>
-<p><code>audio/</code> プレフィックスは 30 日ライフサイクルの対象外とする（インフラ側の変更が前提。<a href="data-model.html#s3-key">data-model.html セクション 5</a> の warn を参照）。</p>
+<p><code>audio/</code> プレフィックスは 30 日ライフサイクルの対象外（Phase 14-6 で <code>images/</code>・<code>videos/</code> のプレフィックス限定へ変更済み。<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。</p>
 
 <h4>手順 4: audio_assets への登録</h4>
 <p>セクション 2.1 手順 2 の (5) の INSERT を使う（証跡 3 点 + <code>duration_seconds</code> を必ず入れる）。</p>

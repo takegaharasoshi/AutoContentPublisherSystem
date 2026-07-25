@@ -394,11 +394,10 @@ audio/{set_code}/{ファイル名}.m4a                                          
   </ul>
 </div>
 
-<div class="warn">
-  <span class="callout-title">インフラ側の必要変更（14-6 より前に実施）: 30 日ライフサイクルのプレフィックス限定</span>
-  現行の S3 バケットは<strong>バケット全体</strong>に「作成から 30 日で自動削除」のライフサイクルポリシーが掛かっている（<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。
-  音源ストック（<code>audio/</code>）は使い捨ての生成物ではなく長期保持する資産のため、このままでは 30 日で自動削除されてしまう。
-  <strong>ライフサイクルルールを <code>images/</code>・<code>videos/</code> のプレフィックス限定に変更し、<code>audio/</code> を対象外とする FoundationStack の変更が必要</strong>（音源アップロード〔14-6〕より前に実施し、<code>stacks.html</code> も同期する）。
+<div class="decision">
+  <span class="callout-title">決定・対応済み（Phase 14-6 で実施）: 30 日ライフサイクルのプレフィックス限定</span>
+  当初の S3 バケットは<strong>バケット全体</strong>に「作成から 30 日で自動削除」のライフサイクルポリシーが掛かっており、長期保持資産である音源ストック（<code>audio/</code>）まで自動削除されてしまう問題があった（14-4 で発見）。
+  <strong>14-6 の音源アップロードに先立ち、ライフサイクルルールを <code>images/</code>・<code>videos/</code> のプレフィックス限定（各 30 日）に変更し、<code>audio/</code> を対象外とした</strong>（FoundationStack をデプロイ済み。<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。
   なお、バケット名 <code>acps-{env}-images-{アカウント ID}</code> は動画・音源の同居後も歴史的経緯として据え置く（リネームはバケット再作成とオブジェクト移行を伴い見合わない）。
 </div>
 

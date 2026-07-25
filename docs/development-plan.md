@@ -201,9 +201,9 @@
   - 確認: V002 DDL がローカル MySQL・Aurora 双方に適用され、`SHOW CREATE TABLE` で定義一致（data-model.html との一致）を裏取りできている
   - 備考: 2026-07-25 完了。14-4 で確定したデータモデル（音源テーブル新設 + 既存テーブルの変更）を `database/V002__video_support.sql` として DDL 化。V001 は Aurora 適用済みのため直接修正せず V002 を新設。ローカル MySQL 8.0 へ V001→V002 を適用し `SHOW CREATE TABLE` 一致 + 音源複合 FK の動作（画像=NULL 許容 / 動画=同一セット音源で成立 / 別セット・不存在は REJECT）を検証。稼働継続のため既存アプリ（image-batch / sns-post-batch）の SQL を新テーブル名へ機械的にリネーム（pytest 全パス）。**Aurora 適用**: 今回は 10-4 の役割分担ではなく、ユーザーの依頼で Claude が Data API 経由で直接適用（9 文全成功）→ Claude が CLI で `SHOW CREATE TABLE` 裏取り（定義一致）。**無停止移行**: push（`fb1d15e`）で両 CodePipeline が走り新タスク定義（image-batch rev 12 / sns-post-batch rev 8、いずれもイメージ `fb1d15e9f436`）を登録、次回 RunTask から新アプリ×新スキーマで稼働。Scheduler 一時停止は classifier にブロックされ未実施だが、次回実行（07:00 JST）前に再デプロイ完了のためミスマッチ窓は解消。初回の実スケジュール実行成功の確認は 07:00 JST 実行時に事後確認。詳細は [development-log.md](development-log.md) の 14-5 を参照
 
-- [ ] **14-6** 音源の調達と登録（外部作業含む）
+- [x] **14-6** 音源の調達と登録（外部作業含む）
   - 確認: CC0・フリーライセンス音源 3〜5 曲が前処理済みで S3 に配置され、音源テーブルにローカル & Aurora とも登録されている。全曲のライセンス証跡（出典 URL・ライセンス種別・取得日）が記録済み
-  - 備考: **業務データ投入ポイント③**: 実際に使う<strong>音源ファイル</strong>をここで投入する（選曲はユーザー決定、Claude が候補サイト・候補曲の提示可。CC-BY はクレジット運用が要るため CC0 優先）。前処理の内容・証跡の記録先は 14-4 の決定に従う（事前手動で 10 秒切り出し・ラウドネス正規化・フェード・AAC 化。[operation.html セクション 3](app/operation.html#audio-mgmt)）。選曲（外部作業）は 14-4 完了後に先行着手してよい（登録は 14-5 のテーブル作成後）。**前提作業（音源アップロードより先）**: FoundationStack の S3 ライフサイクルルールをバケット全体から `images/`・`videos/` のプレフィックス限定に変更し `audio/` を対象外にする（cdk deploy + stacks.html の同期。14-4 で発見した必須変更。[data-model.html セクション 5](app/data-model.html#s3-key) の warn を参照）
+  - 備考: 2026-07-25 完了。前提作業の **S3 ライフサイクルのプレフィックス限定化**（バケット全体 → `images/`・`videos/` 各 30 日、`audio/` 対象外）を FoundationStack へ実装・デプロイし裏取り済み。音源は Pixabay の 4 曲（Pixabay Content License = 商用可・クレジット不要）をユーザーが選曲・ダウンロード（Pixabay は Cloudflare の bot challenge により自動取得不可のため、ダウンロードはユーザー作業に確定）、Claude が前処理（切り出し 10 秒・ラウドネス正規化・フェード・AAC 化）〜 S3 配置 〜 ローカル & Aurora への `audio_assets` 登録（id=1〜4・`last_used_at` NULL の未使用状態）を実施。**設計書のレシピを実測に基づき改訂**: 単一パス `loudnorm` は実測 2.8 dB のばらつきが出たため **2 パス方式**（解析 → `measured_*` + `linear=true` で適用）に変更し 1.1 dB に収斂 → operation.html に decision として記録。詳細は [development-log.md](development-log.md) の 14-6 を参照
 
 - [ ] **14-7** 動画方式 strategy の実装（Codex 委譲）
   - 確認: pytest 全パス + ローカル E2E（実 API）で縦長静止画（1024x1536）→ ffmpeg 合成の MP4（9:16・10 秒前後・ズーム/パン・音源入り・H.264 + AAC）が生成され、S3 保存 + DB 登録まで通る

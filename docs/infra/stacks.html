@@ -51,7 +51,7 @@
   <tbody>
     <tr><td>VPC</td><td>2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし。CDK 引数指定: <code>maxAzs: 2</code>、<code>natGateways: 0</code>、<code>subnetConfiguration</code> に <code>PUBLIC</code> と <code>PRIVATE_ISOLATED</code> の 2 種類のみ定義する</td></tr>
     <tr><td>Security Group</td><td>サービスごとのアクセス制御（詳細は下表）</td></tr>
-    <tr><td>S3 Bucket</td><td>画像保存用（Lifecycle Policy: 30 日で自動削除）。バケット名は <code>acps-{env}-images-{アカウント ID}</code> を明示指定する（命名規約は <a href="cicd.html">cicd.html セクション 5</a> を参照）。公開ブロック・暗号化・SSL 強制の設定は <a href="security.html">security.html セクション 3</a> を参照。CDK 引数指定: <code>removalPolicy: DESTROY</code>、<code>autoDeleteObjects: true</code>（下記の設計理由を参照）</td></tr>
+    <tr><td>S3 Bucket</td><td>画像・動画・音源保存用（Lifecycle Policy: <code>images/</code>・<code>videos/</code> プレフィックス限定で 30 日自動削除。音源ストック <code>audio/</code> は長期保持資産のため対象外。Phase 14-4 で発見・14-6 で変更）。バケット名は <code>acps-{env}-images-{アカウント ID}</code> を明示指定する（歴史的経緯で <code>images</code> 名のまま。命名規約は <a href="cicd.html">cicd.html セクション 5</a> を参照）。公開ブロック・暗号化・SSL 強制の設定は <a href="security.html">security.html セクション 3</a> を参照。CDK 引数指定: <code>removalPolicy: DESTROY</code>、<code>autoDeleteObjects: true</code>（下記の設計理由を参照）</td></tr>
     <tr><td>Aurora Serverless v2</td><td>MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。エンジンは Aurora MySQL 3.08.2＝LTS 最新パッチを採用）。Isolated Subnet に配置し、インスタンスは Serverless v2 の writer 1 つのみ（リーダーなし）。CDK 引数指定: <code>serverlessV2MinCapacity: 0</code>、<code>serverlessV2MaxCapacity: 1.0</code>、<code>enableDataApi: true</code>（Query Editor / Data API 利用のため必須）、<code>defaultDatabaseName: 'acps'</code>（下記の設計理由を参照）、<code>storageEncrypted: true</code>（CDK デフォルトは false のため明示指定。デフォルト KMS キーで暗号化、追加コストなし）。自動一時停止までの時間は <code>serverlessV2AutoPauseDuration</code> 未指定＝デフォルト 5 分、バックアップ保持は未指定＝デフォルト 1 日。クラスター識別子は明示指定せず CFN 自動命名（命名規約表 <a href="cicd.html">cicd.html セクション 9.2</a> の対象外）。RemovalPolicy は未指定＝CDK デフォルトの SNAPSHOT（下記の設計理由を参照）</td></tr>
     <tr><td>Secrets Manager</td><td>DB 認証情報（CDK の Aurora コンストラクトで自動生成。Secret 名は <code>acps/{env}/db/credentials</code> を明示指定する）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（Secret 名規約は <a href="security.html">security.html</a> を参照。作成手順はアプリ設計（Phase 9）で定義する）</td></tr>
     <tr><td>ECS Cluster</td><td>全バッチ共通の実行基盤。CDK 引数指定: <code>vpc</code> に FoundationStack の VPC を明示指定する（下記の注意を参照）。クラスター名は明示指定せず CFN 自動命名（命名規約表 <a href="cicd.html">cicd.html セクション 9.2</a> の対象外。後続スタックへは CDK オブジェクト参照で渡すため名前固定は不要）。Container Insights はデフォルト無効のまま（CloudWatch カスタムメトリクス課金を避ける。監視は MonitoringStack の方針に従う）。Capacity Provider の登録も不要（Step Functions の RunTask で <code>launchType: FARGATE</code> を直接指定する方式のため）</td></tr>
@@ -67,7 +67,7 @@
 
 <div class="decision">
   <span class="callout-title">S3 バケットの RemovalPolicy（2026-07-13 決定）</span>
-  画像保存用バケットは <code>RemovalPolicy.DESTROY</code> + <code>autoDeleteObjects: true</code> とし、スタック削除時に中身ごと削除する。生成画像は 30 日ライフサイクルで自動削除される使い捨てデータであり、正式な記録は DB レコードが担うため（<a href="../app/data-model.html#s3-key">app/data-model.html セクション 5</a>）、バケット保持による保護よりも「スタックを壊して作り直せる」性質を優先する。この設定によりオブジェクト自動削除用の Lambda カスタムリソースがスタックに 1 つ追加される。
+  画像保存用バケットは <code>RemovalPolicy.DESTROY</code> + <code>autoDeleteObjects: true</code> とし、スタック削除時に中身ごと削除する。生成画像・生成動画は 30 日ライフサイクル（<code>images/</code>・<code>videos/</code> プレフィックス限定）で自動削除される使い捨てデータであり、正式な記録は DB レコードが担うため（<a href="../app/data-model.html#s3-key">app/data-model.html セクション 5</a>。音源ストック <code>audio/</code> は自動削除の対象外）、バケット保持による保護よりも「スタックを壊して作り直せる」性質を優先する。この設定によりオブジェクト自動削除用の Lambda カスタムリソースがスタックに 1 つ追加される。
 </div>
 
 <div class="decision">
