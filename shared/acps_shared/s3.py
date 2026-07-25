@@ -7,6 +7,27 @@ from typing import Any
 import boto3
 
 
+def get_object(
+    bucket: str,
+    key: str,
+    *,
+    client: Any | None = None,
+) -> bytes:
+    """Download an S3 object as bytes.
+
+    Args:
+        bucket: Source S3 bucket name.
+        key: Source object key.
+        client: Optional S3 client, for dependency injection.
+
+    Returns:
+        Complete object payload.
+    """
+    s3_client = client if client is not None else boto3.client("s3")
+    response = s3_client.get_object(Bucket=bucket, Key=key)
+    return response["Body"].read()
+
+
 def put_object(
     bucket: str,
     key: str,

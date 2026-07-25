@@ -1,16 +1,16 @@
 """Local-only fake image generator."""
 
-from ..models import PromptConfig
+from .contracts import GeneratorContext, GeneratorResult, MediaOutput
 
 
-def generate(prompt_config: PromptConfig) -> list[bytes]:
-    """Return one fixed fake image payload for local and E2E tests.
-
-    Args:
-        prompt_config: Prompt configuration to generate from.
-
-    Returns:
-        A single non-image byte payload. No real image generation occurs.
-    """
-    del prompt_config
-    return [b"fake-image-bytes-for-local-e2e-testing"]
+def generate(context: GeneratorContext) -> GeneratorResult:
+    """Return one fixed fake final image for local and E2E tests."""
+    del context
+    return GeneratorResult(
+        media=[
+            MediaOutput(
+                content=b"fake-image-bytes-for-local-e2e-testing",
+                file_format="jpg",
+            )
+        ]
+    )

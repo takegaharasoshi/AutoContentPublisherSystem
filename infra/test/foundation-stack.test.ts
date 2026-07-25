@@ -47,17 +47,26 @@ describe('FoundationStack の画像保存用 S3 バケット', () => {
     template.resourceCountIs('AWS::S3::Bucket', 1);
   });
 
-  test('30 日で自動削除するライフサイクルルールが設定される', () => {
-    template.hasResourceProperties('AWS::S3::Bucket', {
-      LifecycleConfiguration: {
-        Rules: [
-          {
-            ExpirationInDays: 30,
-            Status: 'Enabled',
-          },
-        ],
+  test('images・videos のみ30日で削除し、audio は対象外になる', () => {
+    const buckets = template.findResources('AWS::S3::Bucket');
+    const rules =
+      Object.values(buckets)[0].Properties.LifecycleConfiguration.Rules;
+
+    expect(rules).toEqual([
+      {
+        ExpirationInDays: 30,
+        Id: 'expire-generated-images',
+        Prefix: 'images/',
+        Status: 'Enabled',
       },
-    });
+      {
+        ExpirationInDays: 30,
+        Id: 'expire-generated-videos',
+        Prefix: 'videos/',
+        Status: 'Enabled',
+      },
+    ]);
+    expect(rules.map((rule: any) => rule.Prefix)).not.toContain('audio/');
   });
 
   test('Block Public Access がすべて有効になる', () => {

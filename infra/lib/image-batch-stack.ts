@@ -128,8 +128,8 @@ export class ImageBatchStack extends cdk.Stack {
       'ImageBatchTaskDefinition',
       {
         family: `acps-${props.envName}-image-batch`,
-        cpu: 256,
-        memoryLimitMiB: 512,
+        cpu: 1024,
+        memoryLimitMiB: 2048,
         taskRole,
       },
     );

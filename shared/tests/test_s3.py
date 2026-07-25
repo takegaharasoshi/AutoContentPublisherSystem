@@ -2,7 +2,19 @@
 
 from unittest.mock import Mock
 
-from acps_shared import generate_presigned_url, put_object
+from acps_shared import generate_presigned_url, get_object, put_object
+
+
+def test_get_object_reads_injected_client_body() -> None:
+    """The helper downloads and reads the complete response body."""
+    client = Mock()
+    client.get_object.return_value = {"Body": Mock(read=Mock(return_value=b"audio"))}
+
+    assert get_object("bucket", "audio/track.m4a", client=client) == b"audio"
+    client.get_object.assert_called_once_with(
+        Bucket="bucket",
+        Key="audio/track.m4a",
+    )
 
 
 def test_put_object_uses_injected_client() -> None:

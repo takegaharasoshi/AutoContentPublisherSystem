@@ -1,9 +1,14 @@
-"""Tests for prompt processing behavior."""
+"""Tests for final-media processing behavior."""
 
 import datetime
 from unittest.mock import Mock
 
 import app.processing as processing
+from app.generators import (
+    GeneratorResult,
+    IntermediateOutput,
+    MediaOutput,
+)
 from app.models import PromptConfig
 
 
@@ -12,18 +17,24 @@ def _prompt(prompt_id: int) -> PromptConfig:
     return PromptConfig(prompt_id, 1, f"prompt {prompt_id}", None, None)
 
 
-def _run(
+def _process(
     monkeypatch,
-    prompt_configs: list[PromptConfig],
+    *,
     generator,
-    has_image,
-) -> tuple[processing.ProcessingResult, Mock, Mock]:
-    """Run processing with injectable image existence behavior."""
+    prompt_configs: list[PromptConfig] | None = None,
+    has_media=None,
+    put_object=None,
+    insert_media=None,
+) -> tuple[processing.ProcessingResult, Mock, Mock, Mock]:
+    """Run processing with injectable persistence behavior."""
     cursor = Mock()
     connection = Mock()
-    monkeypatch.setattr(processing, "has_generated_image", has_image)
-    monkeypatch.setattr(processing, "put_object", Mock())
-    monkeypatch.setattr(processing, "insert_generated_image", Mock(return_value=1))
+    has_media = has_media or (lambda *args: False)
+    put_object = put_object or Mock()
+    insert_media = insert_media or Mock(return_value=1)
+    monkeypatch.setattr(processing, "has_generated_media", has_media)
+    monkeypatch.setattr(processing, "put_object", put_object)
+    monkeypatch.setattr(processing, "insert_generated_media", insert_media)
     result = processing.process_prompt_configs(
         cursor,
         connection,
@@ -31,133 +42,179 @@ def _run(
         set_code="set-a",
         scheduled_at=datetime.datetime(2026, 7, 19),
         generation_run_id=2,
-        prompt_configs=prompt_configs,
+        prompt_configs=prompt_configs or [_prompt(1)],
         generator=generator,
         s3_bucket="bucket",
         s3_client=Mock(),
     )
-    return result, connection, processing.put_object
+    return result, connection, put_object, insert_media
 
 
-def test_processing_skips_existing_prompt_and_counts_only_new_images(monkeypatch) -> None:
-    """Already completed prompts are neither generated nor uploaded."""
-    calls: list[int] = []
+def test_processing_skips_existing_prompt_and_counts_new_media(monkeypatch) -> None:
+    """Completed prompts are neither generated nor uploaded."""
+    generated_ids: list[int] = []
+    calls: dict[int, int] = {}
 
-    def generator(prompt_config: PromptConfig) -> list[bytes]:
-        calls.append(prompt_config.id)
-        return [b"new"]
-
-    def has_image(cursor, run_id, prompt_id) -> bool:
+    def has_media(cursor, run_id, prompt_id) -> bool:
         del cursor, run_id
-        call_counts[prompt_id] = call_counts.get(prompt_id, 0) + 1
-        return prompt_id == 1 or call_counts[prompt_id] > 1
+        calls[prompt_id] = calls.get(prompt_id, 0) + 1
+        return prompt_id == 1 or calls[prompt_id] > 1
 
-    call_counts: dict[int, int] = {}
-    result, connection, put_object = _run(
-        monkeypatch, [_prompt(1), _prompt(2)], generator, has_image
+    def generator(context):
+        generated_ids.append(context.prompt_config.id)
+        return GeneratorResult([MediaOutput(b"new", "jpg")])
+
+    result, connection, put_object, _ = _process(
+        monkeypatch,
+        generator=generator,
+        prompt_configs=[_prompt(1), _prompt(2)],
+        has_media=has_media,
     )
 
     assert result == processing.ProcessingResult(1, True)
-    assert calls == [2]
-    assert put_object.call_count == 1
+    assert generated_ids == [2]
+    put_object.assert_called_once()
+    connection.commit.assert_called_once()
+    connection.rollback.assert_not_called()
+
+
+def test_processing_passes_final_media_metadata_to_insert(monkeypatch) -> None:
+    """All final-media metadata is persisted and controls S3 storage."""
+    media = MediaOutput(
+        b"video",
+        "mp4",
+        width=1080,
+        height=1920,
+        duration_seconds=10,
+        audio_asset_id=7,
+    )
+    result, connection, put_object, insert_media = _process(
+        monkeypatch,
+        generator=lambda context: GeneratorResult([media]),
+    )
+
+    assert result.new_media_inserted == 1
+    put_object.assert_called_once()
+    assert put_object.call_args.args[:3] == (
+        "bucket",
+        "videos/set-a/20260719/2/1_0.mp4",
+        b"video",
+    )
+    assert put_object.call_args.kwargs["content_type"] == "video/mp4"
+    inserted = insert_media.call_args.kwargs
+    assert inserted["file_format"] == "mp4"
+    assert inserted["width"] == 1080
+    assert inserted["height"] == 1920
+    assert inserted["duration_seconds"] == 10
+    assert inserted["audio_asset_id"] == 7
     connection.commit.assert_called_once()
 
 
-def test_processing_continues_after_generator_error_and_empty_result(monkeypatch) -> None:
-    """Per-prompt generator failures do not stop following prompt configs."""
-    def generator(prompt_config: PromptConfig) -> list[bytes]:
-        if prompt_config.id == 1:
-            raise RuntimeError("secret-like detail")
-        if prompt_config.id == 2:
-            return []
-        return [b"ok"]
-
-    call_counts: dict[int, int] = {}
-
-    def has_image(cursor, run_id, prompt_id) -> bool:
-        del cursor, run_id
-        call_counts[prompt_id] = call_counts.get(prompt_id, 0) + 1
-        return prompt_id == 3 and call_counts[prompt_id] > 1
-
-    result, _, put_object = _run(
+def test_processing_stores_intermediate_without_database_insert(monkeypatch) -> None:
+    """A source JPEG is uploaded under videos but never inserted."""
+    generated = GeneratorResult(
+        [MediaOutput(b"video", "mp4", 1080, 1920, 10, 4)],
+        [IntermediateOutput(b"source", "jpg", "_source", 0)],
+    )
+    _, _, put_object, insert_media = _process(
         monkeypatch,
-        [_prompt(1), _prompt(2), _prompt(3)],
-        generator,
-        has_image,
+        generator=lambda context: generated,
     )
 
-    assert result == processing.ProcessingResult(1, False)
-    put_object.assert_called_once()
-
-
-def test_processing_allows_s3_orphan_and_continues_other_outputs(monkeypatch) -> None:
-    """A DB failure after upload leaves an allowed orphan and processing continues."""
-    cursor = Mock()
-    connection = Mock()
-    uploaded: list[str] = []
-    inserted_ids: list[int] = []
-    first_insert = True
-
-    monkeypatch.setattr(processing, "has_generated_image", lambda *args: False)
-
-    def upload(bucket, key, body, **kwargs) -> None:
-        del bucket, body, kwargs
-        uploaded.append(key)
-
-    def insert(cursor_arg, **kwargs) -> int:
-        nonlocal first_insert
-        del cursor_arg
-        inserted_ids.append(kwargs["output_index"])
-        if first_insert:
-            first_insert = False
-            raise RuntimeError("db failure")
-        return 1
-
-    monkeypatch.setattr(processing, "put_object", upload)
-    monkeypatch.setattr(processing, "insert_generated_image", insert)
-
-    result = processing.process_prompt_configs(
-        cursor,
-        connection,
-        set_id=1,
-        set_code="set-a",
-        scheduled_at=datetime.datetime(2026, 7, 19),
-        generation_run_id=2,
-        prompt_configs=[_prompt(1), _prompt(2)],
-        generator=lambda prompt_config: (
-            [b"first", b"second"]
-            if prompt_config.id == 1
-            else [b"third"]
-        ),
-        s3_bucket="bucket",
-        s3_client=Mock(),
-    )
-
-    assert uploaded == [
-        "images/set-a/20260719/2/1_0.jpg",
-        "images/set-a/20260719/2/1_1.jpg",
-        "images/set-a/20260719/2/2_0.jpg",
+    assert [call.args[1] for call in put_object.call_args_list] == [
+        "videos/set-a/20260719/2/1_0_source.jpg",
+        "videos/set-a/20260719/2/1_0.mp4",
     ]
-    assert inserted_ids == [0, 1, 0]
-    assert result == processing.ProcessingResult(2, False)
-    assert connection.commit.call_count == 2
+    assert [call.kwargs["content_type"] for call in put_object.call_args_list] == [
+        "image/jpeg",
+        "video/mp4",
+    ]
+    insert_media.assert_called_once()
 
 
-def test_processing_uses_final_database_recheck_for_completion(monkeypatch) -> None:
-    """A skipped prompt is complete when the final DB recheck confirms it."""
-    calls: list[int] = []
-
-    def has_image(cursor, run_id, prompt_id) -> bool:
-        del cursor, run_id
-        calls.append(prompt_id)
-        return prompt_id == 1 or calls.count(prompt_id) > 1
-
-    result, _, _ = _run(
-        monkeypatch,
-        [_prompt(1), _prompt(2)],
-        lambda prompt_config: [b"image"],
-        has_image,
+def test_intermediate_upload_failure_does_not_stop_final_media(monkeypatch) -> None:
+    """Debug artifact failures do not affect final upload or registration."""
+    put_object = Mock(side_effect=[RuntimeError("source failed"), None])
+    generated = GeneratorResult(
+        [MediaOutput(b"video", "mp4")],
+        [IntermediateOutput(b"source", "jpg", "_source", 0)],
     )
 
-    assert result.all_prompt_configs_complete
-    assert calls == [1, 2, 1, 2]
+    result, connection, _, insert_media = _process(
+        monkeypatch,
+        generator=lambda context: generated,
+        put_object=put_object,
+    )
+
+    assert result.new_media_inserted == 1
+    assert put_object.call_count == 2
+    insert_media.assert_called_once()
+    connection.commit.assert_called_once()
+    connection.rollback.assert_not_called()
+
+
+def test_generator_failure_rolls_back_and_continues(monkeypatch) -> None:
+    """Generator-side auxiliary updates are rolled back on failure."""
+    def generator(context):
+        if context.prompt_config.id == 1:
+            raise RuntimeError("generation failed")
+        return GeneratorResult([MediaOutput(b"ok", "jpg")])
+
+    result, connection, _, _ = _process(
+        monkeypatch,
+        generator=generator,
+        prompt_configs=[_prompt(1), _prompt(2)],
+    )
+
+    assert result.new_media_inserted == 1
+    assert connection.rollback.call_count == 1
+    assert connection.commit.call_count == 1
+
+
+def test_insert_failure_rolls_back_and_continues_outputs(monkeypatch) -> None:
+    """An INSERT failure rolls back before a later output is attempted."""
+    insert_media = Mock(side_effect=[RuntimeError("db failed"), 2])
+    generated = GeneratorResult(
+        [MediaOutput(b"one", "jpg"), MediaOutput(b"two", "jpg")]
+    )
+
+    result, connection, put_object, _ = _process(
+        monkeypatch,
+        generator=lambda context: generated,
+        insert_media=insert_media,
+    )
+
+    assert result.new_media_inserted == 1
+    assert put_object.call_count == 2
+    connection.rollback.assert_called_once()
+    connection.commit.assert_called_once()
+
+
+def test_final_media_upload_failure_rolls_back(monkeypatch) -> None:
+    """An S3 failure rolls back generator-side auxiliary table updates."""
+    put_object = Mock(side_effect=RuntimeError("s3 failed"))
+
+    result, connection, _, insert_media = _process(
+        monkeypatch,
+        generator=lambda context: GeneratorResult(
+            [MediaOutput(b"video", "mp4")]
+        ),
+        put_object=put_object,
+    )
+
+    assert result.new_media_inserted == 0
+    connection.rollback.assert_called_once()
+    connection.commit.assert_not_called()
+    insert_media.assert_not_called()
+
+
+def test_empty_result_rolls_back_and_is_incomplete(monkeypatch) -> None:
+    """An empty result cannot leave generator-side DB changes pending."""
+    result, connection, put_object, _ = _process(
+        monkeypatch,
+        generator=lambda context: GeneratorResult([]),
+    )
+
+    assert result == processing.ProcessingResult(0, False)
+    connection.rollback.assert_called_once()
+    put_object.assert_not_called()

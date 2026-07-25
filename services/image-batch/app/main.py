@@ -164,7 +164,7 @@ def main(*, s3_client: Any | None = None) -> int:
                         log_id=log_id,
                         status=status,
                         finished_at=now_utc(),
-                        records_processed=result.new_images_inserted,
+                        records_processed=result.new_media_inserted,
                         error_message=error_message,
                     )
                     connection.commit()

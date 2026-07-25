@@ -1,20 +1,31 @@
-"""Image generator registry."""
+"""Final-media generator contracts and registry."""
 
-from collections.abc import Callable
+from .contracts import (
+    GeneratorContext,
+    GeneratorFn,
+    GeneratorNotFoundError,
+    GeneratorResult,
+    IntermediateOutput,
+    MediaOutput,
+)
+from . import fake, gpt_image_kenburns, gpt_image_single
 
-from ..models import PromptConfig
-from . import fake, gpt_image_single
 
-
-GeneratorFn = Callable[[PromptConfig], list[bytes]]
-
-
-class GeneratorNotFoundError(Exception):
-    """Raised when a batch set references an unknown generator."""
+__all__ = [
+    "GeneratorContext",
+    "GeneratorFn",
+    "GeneratorNotFoundError",
+    "GeneratorResult",
+    "IntermediateOutput",
+    "MediaOutput",
+    "REGISTRY",
+    "resolve_generator",
+]
 
 
 REGISTRY: dict[str, GeneratorFn] = {
     "fake": fake.generate,
+    "gpt-image-kenburns": gpt_image_kenburns.generate,
     "gpt-image-single": gpt_image_single.generate,
 }
 

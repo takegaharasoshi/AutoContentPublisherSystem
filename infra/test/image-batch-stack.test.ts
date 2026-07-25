@@ -60,8 +60,8 @@ describe('ImageBatchStack の ECS タスク定義', () => {
   test('Fargate の family・CPU・メモリが設定される', () => {
     template.hasResourceProperties('AWS::ECS::TaskDefinition', {
       Family: 'acps-prod-image-batch',
-      Cpu: '256',
-      Memory: '512',
+      Cpu: '1024',
+      Memory: '2048',
       RequiresCompatibilities: ['FARGATE'],
     });
   });
