@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>勝負セット（セット 2）壁打ち記録（15-1〜15-4） | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / 勝負セット（セット 2）壁打ち記録（15-1〜15-4）</nav>
+<h1>勝負セット（セット 2）壁打ち記録（15-1〜15-4）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">Phase 15 意思決定ブロックの記録（15-4 まで段階更新）</span>
+  <span>最終更新: 2026-07-26（15-1 テーマ候補の発散と絞り込みを記録）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  Phase 15 意思決定ブロック（15-1 テーマ発散 → 15-2 テーマ確定 → 15-3 フォーマット・生成方式選定 → 15-4 音源・運用パラメータ）の壁打ち記録であり、設計書ではない。
+  1 本のノートを 15-1 で新設し 15-4 まで段階更新する（開発計画 Phase 15 注記のパターン）。15-5（設計 Fix）以降の入力として使用する。
+  上位の事業判断（収益化経路・予算・KPI・セットポートフォリオ）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする。
+</div>
+
+<h2 id="axes">1. 評価軸（15-1 で確定）</h2>
+<p>開発計画 15-1 で指定済みの 4 軸に、壁打ちで運用系 3 軸を追加し <strong>7 軸で確定</strong>した（2026-07-26 ユーザー承認）。15-2 以降の判断もこの軸で行う。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>軸</th><th>判定の中身</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A. リーチを狙える</strong></td><td>広い層に刺さり、保存・シェア・ループ再生・コメントを誘発する構造がある。Meta ボーナスは 100 万再生規模が必要（<a href="../strategy/business-strategy.html#monetization">事業戦略書 2</a>）なので天井の高さを重視</td></tr>
+    <tr><td><strong>B. 独自の世界観</strong></td><td>一目で「あのアカウント」と分かる統一スタイル。テンプレ的な「低労力 AI コンテンツ」に見えないこと（Meta のリーチ抑制・収益化除外対策。事業戦略書 2 の必須要件）</td></tr>
+    <tr><td><strong>C. 生成 AI での再現安定性</strong></td><td>構図・スタイルが毎日ブレずに全自動で量産できる。キャラクター同一性維持・正確なテキスト描画など生成 AI の苦手領域を構造的に踏まない</td></tr>
+    <tr><td><strong>D. 既存セットとの差別化</strong></td><td>fantasy-animals-1（写真風のかわいい架空動物 + 図鑑テキスト + Ken Burns）とテーマ・見た目・生成方式のいずれでも被らない</td></tr>
+    <tr><td><strong>E. ネタ枯渇耐性</strong>（追加）</td><td>全自動で毎日生成し続けるため、プロンプト設定から半永久的にバリエーションが湧く構造が必要。数十本で打ち止めになるテーマは不可</td></tr>
+    <tr><td><strong>F. 新生成方式との相性</strong>（追加）</td><td>15-3 で決める「静止画合成の高度化」（複数カット構成・多段生成チェーン等）が見せ場として活きるテーマか。カット間に物語的なつながり（ズーム・変化・展開）があるほど良い</td></tr>
+    <tr><td><strong>G. 権利・炎上リスクの低さ</strong>（追加）</td><td>実在人物・実在ランドマーク・誤情報に見える合成・音源権利などの地雷をテーマ側で構造的に回避できる（全自動運用では投稿前の人間チェックが薄いため）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="premise">2. 前提決定: 言語戦略（15-1）</h2>
+<div class="decision">
+  <span class="callout-title">decision: 勝負セットは日本語コンテンツとする（2026-07-26 ユーザー決定）</span>
+  Claude は「言語非依存ビジュアル型（グローバルリーチで天井最大化）」を推奨したが、ユーザー判断で<strong>日本語コンテンツ（国内向け）</strong>に決定。
+  リーチ天井はグローバル比で下がるが、国内層に深く刺さり濃い反応（コメント・保存）を取りやすい路線を選ぶ。
+  この決定が後続のテーマ絞り込み（日本語テキスト主体のテーマが許容される）の前提となった。
+</div>
+
+<h2 id="divergence">3. 候補の発散（15-1 第 1 巡）</h2>
+
+<h3 id="research">3.1 リーチ動向の調査所見（2026-07-26 時点）</h3>
+<ul>
+  <li>フェイスレス / AI 活用リールは 2026 年時点で定着し、心理学・雑学 facts・satisfying・自己啓発系が定番の高エンゲージメントジャンル。新規クリエイターアカウントの過半がフェイスレス設計との推計もある</li>
+  <li>AI 生成コンテンツはラベル（開示）付きでも到達率の大きなペナルティはないとされる。ただし Meta の「変換の少ない低労力 AI コンテンツ」抑制は別軸で強化されており、独自世界観の要件（B 軸）は引き続き必須</li>
+  <li>伸びるリールの構造条件: 短尺（8 秒前後〜）・冒頭フック・最後まで見る理由（payoff）・ループ構造。ジャンルを 1〜2 に絞った一貫運用が発見タブ掲載に有利</li>
+</ul>
+
+<h3 id="candidates">3.2 発散した 10 案と評価</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>#</th><th>テーマ案</th><th>どんなリールか</th><th>評価（7 軸ベースの要点）</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>ミニチュア世界の無限ズーム</td><td>日常風景から多段ズームで小人の世界へ潜る</td><td>Claude の第 1 推し。言語非依存・ループ構造・多段生成チェーンとの相性（F）最強。ズーム各段の整合が課題</td></tr>
+    <tr><td>2</td><td>定点タイムトラベル</td><td>同じ場所の時代・季節 before/after</td><td>視聴維持の構造が最強。同一構図維持（C）が鍵</td></tr>
+    <tr><td>3</td><td>架空世界の断面図鑑</td><td>建物・生き物の中身をスタイライズド断面で</td><td>スタイル安定・保存誘発が強いが「図鑑」看板が既存セットと類似（D 弱）</td></tr>
+    <tr><td>4</td><td>アイソメトリックな理想のこもり部屋</td><td>職業・趣味別の秘密基地ツアー</td><td>cozy 系の保存率と再現安定性が強み。海外競合多数</td></tr>
+    <tr><td>5</td><td>存在しない絶景・宿の内見</td><td>架空トラベル</td><td>AI 風景は最飽和ジャンル + 実在誤認リスク（G 弱）で見送り</td></tr>
+    <tr><td>6</td><td>擬人化図鑑（元素・国・天気）</td><td>概念擬人化キャラ紹介</td><td>キャラ同一性維持が gpt-image の弱点ど真ん中（C 弱）で見送り</td></tr>
+    <tr><td>7</td><td>架空レシピ・料理工程</td><td>存在しない料理の調理工程</td><td>工程 = 複数カットに合うが「AI 飯」への嫌悪反応リスクで見送り</td></tr>
+    <tr><td>8</td><td>リミナルスペース・架空都市伝説</td><td>不気味系ビジュアルホラー</td><td>伸びやすいがアカウント資産の収益転用性・通報リスク（G）が弱く見送り</td></tr>
+    <tr><td>9</td><td>雑学・心理学ビジュアル解説</td><td>facts 系 + 生成画像</td><td>ジャンル実績は大きいが視覚的独自性が出にくい（B 弱）。※ロジトレ方向（セクション 4）の近縁</td></tr>
+    <tr><td>10</td><td>「もしも」合成写真</td><td>「もし東京に恐竜がいたら」風実写合成</td><td>実在地 + フォトリアルは誤情報リスク最大（G 最弱）で見送り</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="direction">4. 方向転換: 「社会人向けロジカルトレーニング」（15-1 第 2 巡）</h2>
+<p>第 1 巡の絞り込み（Claude 暫定推し: #1 &gt; #2 &gt; #3）に対し、ユーザーから<strong>「1 日 3 回 社会人のためのロジカルトレーニング」のイメージ</strong>が提示され、方向転換した。クイズ形式として捉え直すと 7 軸評価は以下のとおりで、有望方向として妥当と判断した。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>軸</th><th>評価</th><th>根拠</th></tr></thead>
+  <tbody>
+    <tr><td>A. リーチ</td><td>○</td><td>「問題 →（考える間）→ 答え」は答えを見るまで離脱しない構造。視聴維持・再視聴・コメント（回答宣言）を構造的に誘発。自己啓発・スキル系は保存率が高い定番ジャンル。日本語圏の天井はセクション 2 の決定どおり受容</td></tr>
+    <tr><td>B. 独自世界観</td><td>△</td><td><strong>最大の設計課題</strong>。文字カード型クイズは「テンプレ量産 AI」に最も見えやすい。世界観の被せ方はキャラクター主軸で対策（セクション 5）</td></tr>
+    <tr><td>C. 再現安定性</td><td>◎</td><td>問題文・選択肢は<strong>プログラム側で組版（Pillow テキスト合成）</strong>すれば文字化けリスクゼロ。gpt-image に文字を描かせる既存セット方式より安定</td></tr>
+    <tr><td>D. 差別化</td><td>◎</td><td>図鑑（癒し・眺める）と完全に別ジャンル（実用・参加する）。生成方式も変わる</td></tr>
+    <tr><td>E. ネタ枯渇耐性</td><td>◎</td><td>問題は LLM で無限生成可能。ただし出題履歴の重複管理が必要（持ち越し論点）</td></tr>
+    <tr><td>F. 新方式相性</td><td>◎</td><td>「問題カット → ヒントカット → 答え・解説カット」の複数カット構成そのもの。多段生成チェーン（LLM 問題生成 → 背景生成 → 組版合成 → カット連結）と完全に一致</td></tr>
+    <tr><td>G. リスク</td><td>○</td><td>実在物・音源・誤情報系の地雷なし。唯一の急所は<strong>誤答リスク</strong>（下記 warn）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="warn">
+  <span class="callout-title">急所: 答えの正しさの担保（15-3 / 15-4 へ持ち越し）</span>
+  全自動運用で論理問題の誤答を投稿すると、コメント欄で即座に指摘されアカウントの信頼が一撃で毀損する。
+  gpt-image に問題テキストを作らせるのは論外で、LLM の問題生成にも対策設計が必須:
+  <ul style="margin:.3rem 0 0;">
+    <li>候補 1: 生成した問題を別プロンプトで解かせて一致確認する自己検証（全自動を維持）</li>
+    <li>候補 2: 事前生成ストック + 定期的な人間レビューからの配信（全自動性を一部緩める）</li>
+    <li>フェルミ推定（L3）は答えが幅で許されるため誤答リスクが構造的に低い、という編成上のヘッジも効く</li>
+  </ul>
+</div>
+
+<h2 id="decisions">5. 15-1 の決定事項（絞り込み結果）</h2>
+<div class="decision">
+  <span class="callout-title">decision: 有望案と世界観の主軸（2026-07-26 ユーザー決定）</span>
+  <ol style="margin:.3rem 0 0;">
+    <li><strong>テーマ方向 = 社会人向けロジカルトレーニング</strong>（クイズ・出題形式のリール）に絞る。視覚系候補（#1 ミニチュア無限ズーム等）は保険として残さず一本化。15-2 の試し生成で詰まった場合は 15-1 に戻って再発散する</li>
+    <li><strong>有望案 = L1（論理パズル・謎解き）+ L3（フェルミ推定・数字感覚）のミックス編成</strong>。時間帯・曜日で型を回す（例: 朝 = 軽い L1、昼 = L3、夜 = じっくり）。型の比率・実在性は 15-2 の試し生成で検証する。L2（仕事の思考法ミニケース）は 1 問の情報量がリール尺に対して過大なため見送り</li>
+    <li><strong>独自世界観（B 軸）はキャラクターを立てる方式を主軸</strong>とする。出題者ペルソナを固定し、キャラ画像は少数を作り込んで<strong>固定アセット化し合成で使い回す</strong>（毎回 gpt-image に描かせるとブレるため。C 軸対策と両立）。キャラ設定・デザインは 15-2 で試し生成する</li>
+    <li>「1 日 3 回」（朝・昼・夜）は習慣化ブランディングとして有力。テキスト組版主体なら画像生成 API 費がほぼ掛からず、1 日 3 回でも現行セットよりコストが下がる見込み。<strong>頻度の確定は 15-4</strong></li>
+  </ol>
+</div>
+
+<h2 id="carryover">6. 持ち越し論点（15-2〜15-4 で決める）</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>論点</th><th>行き先</th></tr></thead>
+  <tbody>
+    <tr><td>キャラクター設定・デザインの確定（固定アセットの試し生成込み）と L1 / L3 の出題サンプル検証、<code>set_code</code>・アカウント名</td><td>15-2</td></tr>
+    <tr><td>誤答リスク対策の方式（LLM 自己検証 vs 人間レビュー付きストック配信）。LLM テキスト生成ステップの追加はテキスト API（外部 API）利用の可能性があり、採用時は疎通確認ステップの挿入を 15-4 で判断</td><td>15-3 / 15-4</td></tr>
+    <tr><td>複数カット構成の具体設計（問題 → ヒント → 答えのカット割り・尺・考える間の演出）と方式名・コスト試算</td><td>15-3</td></tr>
+    <tr><td>出題履歴の重複管理（同じ古典パズルの繰り返し防止。データモデル影響の可能性）</td><td>15-3（設計 Fix は 15-5）</td></tr>
+    <tr><td>投稿頻度（1 日 3 回案）・音源方針（クイズ形式に合う BGM。AI 音楽生成への格上げ要否）・アカウント構成</td><td>15-4</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="references">7. 参考リンク（調査ソース。2026-07-26 時点）</h2>
+<ul>
+  <li><a href="https://blog.edugate.jp/instagram-algorithm-2026/">2026年のInstagramアルゴリズム攻略法（eduGate）</a> — AI リールのラベルと到達率・ジャンル一貫性</li>
+  <li><a href="https://tatap.jp/knowledge/instagram-reel-185/">Instagramリール徹底攻略 2026（tatap）</a> — 伸びるリールの構造条件</li>
+  <li><a href="https://easyviral.ai/blog/faceless-content-taking-over-social-media">Faceless Content Is Taking Over Social Media in 2026（EasyViral）</a> — フェイスレス運用の普及状況</li>
+  <li><a href="https://fluxnote.io/guides/faceless-instagram-reels-ideas-2026">27 Faceless Instagram Reels Ideas 2026（fluxnote）</a> — フェイスレス定番ジャンル</li>
+  <li><a href="https://korpi.ai/blog/faceless-instagram-reels-guide">Faceless Instagram Reels Guide 2026（Korpi）</a> — psychology / facts 系のエンゲージメント傾向</li>
+</ul>
+
+</div>
+</body>
+</html>
