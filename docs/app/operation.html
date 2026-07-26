@@ -144,7 +144,8 @@ INSERT INTO sns_accounts (set_id, platform, account_code, account_name, is_activ
 VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);
 
 -- (5) audio_assets（動画方式のセットのみ。前処理済み音源を S3 に配置してから登録する。
---     調達・前処理・証跡の詳細はセクション 3）
+--     調達・前処理・証跡の詳細はセクション 3。asset_type 省略時は DEFAULT 'bgm'。
+--     gpt-quiz-multicut 方式の SE 2 種は asset_type='se' + 固定ファイル名で登録する〔セクション 3〕）
 INSERT INTO audio_assets (set_id, s3_key, title, source_url, license_type, license_note, acquired_at, duration_seconds, is_active)
 VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', '(曲名)', '(出典 URL)', 'CC0', NULL, '2026-07-24', 10, 1);</code></pre>
 
@@ -169,6 +170,7 @@ VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', '(曲名)', '(出典 URL)', 
     <li><code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code>（→ 動画方式のセットは <code>audio_assets</code>）の順に DB へ登録した</li>
     <li>キャプションテンプレートに AI 開示ハッシュタグ <code>#AIart</code> を含めた（セクション 3）</li>
     <li>動画方式のセットは、前処理済み音源（3〜5 曲）を S3 の <code>audio/{set_code}/</code> に配置し、証跡（出典 URL・ライセンス種別・取得日）込みで <code>audio_assets</code> に登録した（セクション 3）</li>
+    <li>gpt-quiz-multicut 方式のセットは、SE 2 種（カウントダウンティック・正解チャイム）を <code>audio/{set_code}/se/</code> の固定ファイル名で配置し、<code>asset_type='se'</code> + 証跡込みで <code>audio_assets</code> に登録した（セクション 3）。固定アセット（キャラポーズ画像等）を <code>assets/{set_code}/</code> に配置した（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
   </ul>
@@ -235,13 +237,14 @@ COMMIT;</code></pre>
 </ul>
 
 <h4>手順 2: 前処理（ffmpeg。ローカルで 1 回だけ）</h4>
-<p>動画の尺（10 秒。<a href="batch-flow.html#generator-catalog">gpt-image-kenburns 方式</a>）に合わせて切り出し、音量正規化（ラウドネス）とフェードを掛け、AAC（<code>.m4a</code>）で書き出す。AAC に統一するのは、合成時に MP4 コンテナへ再エンコードなしで多重化できるため。</p>
+<p><strong>動画の尺は方式カタログ（<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）の該当方式に合わせる</strong>（<code>gpt-image-kenburns</code> = 10 秒、<code>gpt-quiz-multicut</code> = 20 秒。15-5 で尺可変に一般化）。尺に合わせて切り出し、音量正規化（ラウドネス）とフェードを掛け、AAC（<code>.m4a</code>）で書き出す。AAC に統一するのは、合成時に MP4 コンテナへ再エンコードなしで多重化できるため。</p>
 <pre><code># 例: 原曲の 12 秒地点から 10 秒を切り出し、ラウドネス正規化 + フェードを掛けて AAC 化する
+# （20 秒尺の方式では -t 20・afade=t=out:st=19 に読み替える。フェード長は尺によらず in 0.5 秒 / out 1 秒）
 ffmpeg -ss 12 -i source.mp3 -t 10 \
   -af "loudnorm=I=-14:TP=-1.5:LRA=11,afade=t=in:st=0:d=0.5,afade=t=out:st=9:d=1" \
   -c:a aac -b:a 128k -ar 48000 -ac 2 track01.m4a</code></pre>
 <ul>
-  <li>切り出し位置（<code>-ss</code>）は曲のサビ・盛り上がりに合わせて試聴しながら決める</li>
+  <li>切り出し位置（<code>-ss</code>）は曲のサビ・盛り上がりに合わせて試聴しながら決める。20 秒尺ではループ耐性（切り出し末尾から先頭に戻っても違和感がないか）も確認する</li>
   <li>ラウドネス正規化は <code>I=-14</code>（ストリーミング標準の -14 LUFS）を目安とし、曲間の音量差をなくす</li>
   <li>書き出し後に必ず試聴確認する（頭切れ・フェードの不自然さ・ノイズ）</li>
 </ul>
@@ -264,9 +267,18 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 <h4>手順 4: audio_assets への登録</h4>
 <p>セクション 2.1 手順 2 の (5) の INSERT を使う（証跡 3 点 + <code>duration_seconds</code> を必ず入れる）。</p>
 
+<h4>効果音（SE）の調達・登録（gpt-quiz-multicut 方式のセットのみ。Phase 15-5 新設）</h4>
+<p>クイズ方式はカウントダウンティック・正解チャイムの SE 2 種（15-4 ユーザー決定）を使う。SE は <strong>BGM ローテーション外・カットタイミング固定の固定アセット</strong>だが、証跡一元管理の原則を保つため <code>audio_assets</code> に <code>asset_type='se'</code> で登録する（<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。</p>
+<ul>
+  <li><strong>調達</strong>: BGM と同じ基準（CC0 / Pixabay License 等。手順 1 の証跡 3 点を控える）</li>
+  <li><strong>前処理</strong>: ラウドネス正規化（2 パス loudnorm）は掛けない（短尺 SE には不適切）。ピークを <code>-1.5 dBTP</code> 目安に整え、AAC（<code>.m4a</code>）化のみ行う。ティックは 1 秒間隔 × 5 打の 5 秒連続ファイル、チャイムは 1〜2 秒に整える（配置タイミング・音量バランスの設計は方式側。15-6 実装）</li>
+  <li><strong>配置と登録</strong>: S3 キーは<strong>固定ファイル名規約</strong> <code>audio/{set_code}/se/countdown_tick.m4a</code> / <code>audio/{set_code}/se/answer_chime.m4a</code>。<code>audio_assets</code> へ <code>asset_type='se'</code> で INSERT する（セクション 2.1 手順 2 の (5) と同型 + <code>asset_type</code> 指定）。方式は起動時にこの 2 キーの有効レコード存在を検査し、欠品は設定ミスとして異常終了する</li>
+  <li><strong>差し替え</strong>: BGM と同様に <code>is_active=0</code> + 代替の登録で行う（固定ファイル名のため S3 オブジェクトの置き換えでもよいが、証跡を更新するため原則レコードを追加し旧レコードを無効化する）</li>
+</ul>
+
 <h4>ローテーションと曲の入れ替え</h4>
 <ul>
-  <li>選曲は<strong>順繰り</strong>（<code>last_used_at</code> が最古の有効レコード。未使用曲が最優先）。曲の追加はいつでも INSERT のみでよい（追加曲は未使用のため次回に使われる）</li>
+  <li>選曲は<strong>順繰り</strong>（<code>asset_type='bgm'</code> のうち <code>last_used_at</code> が最古の有効レコード。未使用曲が最優先。SE は対象外）。曲の追加はいつでも INSERT のみでよい（追加曲は未使用のため次回に使われる）</li>
   <li>曲を外す場合は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す）</li>
   <li><strong>動画方式のセットで有効音源が 0 件になると画像生成バッチが異常終了する</strong>（設定ミス扱い。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。<code>prompt_configs</code> の差し替えと同様、無効化する場合は先に代替曲を登録してから行い、0 件になる瞬間を作らない</li>
 </ul>

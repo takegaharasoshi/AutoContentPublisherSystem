@@ -109,11 +109,19 @@
 </div>
 
 <ul>
-  <li>方式は<strong>セット設定（プロンプト設定等）を受け取り、投稿可能な最終形式の最終メディア（1 件以上。本体 + メタ情報〔<code>file_format</code>・寸法・尺・使用音源等〕）を返す</strong>。投稿要件に合わせた形式変換（例: PNG → JPEG 変換、ffmpeg 合成）は方式側の責務</li>
+  <li>方式は<strong>セット設定（プロンプト設定等）と実行コンテキスト（生成実行の <code>scheduled_at</code> 等）を受け取り、投稿可能な最終形式の最終メディア（1 件以上。本体 + メタ情報〔<code>file_format</code>・寸法・尺・使用音源等〕）を返す</strong>。投稿要件に合わせた形式変換（例: PNG → JPEG 変換、ffmpeg 合成）は方式側の責務</li>
   <li>方式は最終メディアに加えて<strong>中間生成物（例: 動画の元になる静止画）を返してよい</strong>。共通骨格は中間生成物を S3 に保存するのみで、DB には記録しない（<a href="data-model.html#detail-generated-images">data-model.html セクション 4.5</a>・<a href="data-model.html#s3-key">セクション 5</a>）</li>
-  <li>冪等性（完了判定）・S3 保存・DB 登録は共通骨格の責務であり、<strong>方式は関与しない</strong>。方式が補助テーブル（例: 音源ストック <code>audio_assets</code> の選曲と <code>last_used_at</code> 更新。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）を読み書きすることは許容するが、<strong>commit は共通骨格に委ね</strong>、生成メディアの DB 登録と同一トランザクションで確定させる（登録に失敗した場合にローテーション等の副作用だけが進むことを防ぐ）</li>
+  <li>冪等性（完了判定）・S3 保存・DB 登録は共通骨格の責務であり、<strong>方式は関与しない</strong>。方式が補助テーブル（例: 音源ストック <code>audio_assets</code> の選曲と <code>last_used_at</code> 更新〔<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>〕、出題履歴 <code>quiz_items</code> の INSERT〔<a href="data-model.html#detail-quiz-items">同セクション 4.9</a>〕）を読み書きすることは許容するが、<strong>commit は共通骨格に委ね</strong>、生成メディアの DB 登録と同一トランザクションで確定させる（登録に失敗した場合にローテーション等の副作用だけが進むことを防ぐ）</li>
   <li>特定の生成 API・変換ツールに固有のリクエスト・レスポンス処理やパラメータは方式側（<code>generators/&lt;方式名&gt;.py</code> と方式別設計書）に閉じる。<strong>共通設計書・共通骨格には特定 API 名を書かない</strong></li>
 </ul>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-07-27、Phase 15-5）: 実行コンテキストに生成実行の scheduled_at を追加</span>
+  方式が受け取る実行コンテキスト（実装上は <code>GeneratorContext</code>）に、生成実行の <code>scheduled_at</code>（UTC）を追加する（実装は 15-6）。
+  時間帯によって出題の型を切り替える方式（<code>gpt-quiz-multicut</code>: 朝 = 軽い L1、昼 = L3、夜 = じっくり。15-4 決定）が実行予定時刻を必要とするため。
+  値は共通骨格が確定済みの <code>generation_runs.scheduled_at</code> を渡す（方式が環境変数 <code>SCHEDULED_AT</code> を直接読むことはしない。正規化の一元化を維持）。
+  既存方式は使用しないだけで影響はない（後方互換の追加）。
+</div>
 
 <h4 id="generator-catalog">方式カタログ</h4>
 <p>生成方式の設計は本書に書き足さず、<code>docs/app/generators/&lt;方式名&gt;.html</code> に 1 方式 1 本で分冊する（<strong>セットが本採用した時点で作成</strong>。試行段階では書かない。ルールは <a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。本書には以下のカタログのみを置き、方式の追加・廃止はこの表の行の追加・更新で管理する。廃止した方式は行を削除せず、ステータスを「廃止」にして履歴として残す。</p>
@@ -133,6 +141,12 @@
       <td>縦長静止画 1 枚を生成し、ぼかし背景付きの 9:16 キャンバスへ合成したうえで ffmpeg の中央ズーム（Ken Burns 効果）+ 音源ストック（<code>audio_assets</code>）を重ね、10 秒・1080x1920 の MP4（リール用動画）を返す簡易動画方式。プラットフォーム非依存の命名（TikTok 展開でも同一方式を使う想定）</td>
       <td>採用中（Phase 14-7 で実装、14-10 で fantasy-animals-1 が切替、14-12 で定常運用開始）</td>
       <td><a href="generators/gpt-image-kenburns.html">generators/gpt-image-kenburns.html</a>（14-12 で作成）</td>
+    </tr>
+    <tr>
+      <td><code>gpt-quiz-multicut</code></td>
+      <td>LLM テキスト API による問題生成（構造化フィールド方式）→ 自己検証（LLM 独立解答 + L1 は全列挙の機械検証）→ 重複検査（出題履歴 <code>quiz_items</code>）→ Pillow 完全プログラム組版（画像生成 API 不使用。固定キャラアセット + 日本語フォントを合成しカット画像 4 種を生成）→ ffmpeg 多カット連結（BGM + 効果音 SE）の 6 段チェーンで、20 秒・4 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式。出題の型（L1/L3）は <code>parameters</code> の時間帯スロットで切り替える</td>
+      <td>設計 Fix 済み・実装前（Phase 15-3 で選定、15-5 で設計 Fix。実装は 15-6、logic-training-1 が採用予定）</td>
+      <td>15-12 で作成予定（「本採用時に作成」ルール。それまでの設計の正は 15-5 の設計 Fix〔data-model.html セクション 4.8/4.9/5・<a href="../development-log.md">development-log.md</a> 15-5〕）</td>
     </tr>
   </tbody>
 </table>

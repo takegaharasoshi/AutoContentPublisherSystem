@@ -123,7 +123,7 @@
     <tr><td>キャラクター設定・デザインの確定（固定アセットの試し生成込み）と L1 / L3 の出題サンプル検証、<code>set_code</code>・アカウント名</td><td><del>15-2</del> → 解決済み（セクション 7）</td></tr>
     <tr><td>誤答リスク対策の方式（LLM 自己検証 vs 人間レビュー付きストック配信）。LLM テキスト生成ステップの追加はテキスト API（外部 API）利用の可能性があり、採用時は疎通確認ステップの挿入を 15-4 で判断</td><td><del>15-3 / 15-4</del> → 方式は解決済み（セクション 8.3）。疎通確認ステップは挿入しないことを決定（セクション 9.4）</td></tr>
     <tr><td>複数カット構成の具体設計（問題 → ヒント → 答えのカット割り・尺・考える間の演出）と方式名・コスト試算</td><td><del>15-3</del> → 解決済み（セクション 8.1・8.2・8.4）</td></tr>
-    <tr><td>出題履歴の重複管理（同じ古典パズルの繰り返し防止。データモデル影響の可能性）</td><td><del>15-3（設計 Fix は 15-5）</del> → 方針決定（<code>quiz_items</code>〔仮名〕新設。セクション 8.2・8.5）。テーブル設計は 15-5</td></tr>
+    <tr><td>出題履歴の重複管理（同じ古典パズルの繰り返し防止。データモデル影響の可能性）</td><td><del>15-3（設計 Fix は 15-5）</del> → 解決済み。<code>quiz_items</code> のテーブル設計・重複検査方式は 15-5 で確定（<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>・V003）</td></tr>
     <tr><td>投稿頻度（1 日 3 回案）・音源方針（クイズ形式に合う BGM。AI 音楽生成への格上げ要否）・アカウント構成の詳細（名前・ハンドル。方向性は 15-2 で決定済み）</td><td><del>15-4</del> → 解決済み（セクション 9。アカウント名の最終確定のみ 15-7 まで）</td></tr>
   </tbody>
 </table>
@@ -245,6 +245,7 @@
 </div>
 
 <h3 id="handover-15-5">8.6 15-5（設計 Fix）への引き継ぎ論点</h3>
+<p><strong>→ 15-5（2026-07-27）で全項目確定済み</strong>。構造の Fix は <a href="data-model.html">data-model.html</a>（4.8 / 4.9 / 5）・<a href="batch-flow.html#generator-strategy">batch-flow.html 2.1</a>・<a href="operation.html#audio-mgmt">operation.html 3</a>・V003、方式内部の決定（検証チェーン・レイアウト・ffmpeg / SE 合成の初期値）は <a href="../development-log.md">development-log.md</a> の 15-5 を参照。</p>
 <ul>
   <li><code>quiz_items</code> のテーブル設計（カラム・重複検査〔類似度〕の実装方式・L1/L3 ローテーションの参照方法）と V003 の DDL（V001 COMMENT 解消込み）</li>
   <li>検証設計の詳細: 検証プロンプト・L1 機械検証の型定義・再生成上限 N とフェイルラウド条件</li>
@@ -306,6 +307,7 @@
 </ul>
 
 <h3 id="handover-15-5-add">9.6 15-5（設計 Fix）への引き継ぎ論点の追加（8.6 への追加分）</h3>
+<p><strong>→ 15-5（2026-07-27）で全項目確定済み</strong>（8.6 の注記を参照）。</p>
 <ul>
   <li>SE の合成設計・置き場・証跡管理（9.2）</li>
   <li>重複検査・<code>quiz_items</code> 設計は 1 日 3 回前提（9.3）</li>
