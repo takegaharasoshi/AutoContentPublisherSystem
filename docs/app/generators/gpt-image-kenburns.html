@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方式設計書: gpt-image-kenburns | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / gpt-image-kenburns</nav>
+<h1>方式設計書: gpt-image-kenburns</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Fix（14-12 で作成）</span>
+  <span>方式名（レジストリキー）: gpt-image-kenburns</span>
+  <span>最終更新: 2026-07-26</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  生成方式 <code>gpt-image-kenburns</code> の方式固有仕様（使用 API・合成仕様・ffmpeg エンコード・選曲）を記録する。全方式共通の契約（方式インターフェース）と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、分冊ルール（1 方式 1 本・本採用時に作成）は <a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a> を参照。本書は実装（<code>services/image-batch/app/generators/gpt_image_kenburns.py</code>）を正として記述している。
+</div>
+
+<h2>1. 方式概要</h2>
+<p>縦長の静止画を OpenAI Images API で 1 枚生成し、ぼかし背景付きの 9:16 キャンバスに合成したうえで、ffmpeg のゆっくりしたズーム（Ken Burns 効果）と登録済み音源を重ねて 10 秒の MP4（リール）を生成する簡易動画方式。生成 AI 動画 API を使わないため生成コストは静止画 1 枚分に収まる（Phase 14-2 の壁打ちで採用した初期スコープ）。Phase 14-7 で実装し、14-10 でセット <code>fantasy-animals-1</code> が採用、14-12 で定常運用に入った（= 本採用）。</p>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>方式名（レジストリキー = <code>batch_sets.generator_name</code> の値）</td><td><code>gpt-image-kenburns</code></td></tr>
+<tr><td>実装ファイル</td><td><code>services/image-batch/app/generators/gpt_image_kenburns.py</code></td></tr>
+<tr><td>レジストリ登録</td><td><code>services/image-batch/app/generators/__init__.py</code> の <code>REGISTRY</code></td></tr>
+<tr><td>使用 API・ツール</td><td>OpenAI Images API（<code>client.images.generate</code>）+ Pillow（キャンバス合成）+ ffmpeg（エンコード）</td></tr>
+<tr><td>最終メディア</td><td>MP4 1 本（<code>file_format='mp4'</code>。1080x1920 / 30fps / 10 秒 / H.264 + AAC）</td></tr>
+<tr><td>中間生成物</td><td>生成した縦長静止画 JPEG 1 枚（S3 のみ保存・DB 記録なし）</td></tr>
+</table>
+</div>
+
+<h2>2. 契約の実装</h2>
+<p>共通の契約（<a href="../batch-flow.html#generator-contract">batch-flow.html「生成方式の契約」</a>。Phase 14-4 で「最終メディアを返す」に一般化）を次のシグネチャで実装する。</p>
+<pre><code>generate(context: GeneratorContext) -&gt; GeneratorResult</code></pre>
+<p>本方式は契約のうち以下を使う。冪等性（完了判定）・S3 保存・DB 登録・トランザクション制御は共通骨格（<code>processing.py</code>）の責務であり、本方式は関与しない。</p>
+<div class="table-wrap">
+<table>
+<tr><th>要素</th><th>使い方</th></tr>
+<tr><td><code>context.prompt_config</code></td><td>プロンプト・API パラメータ・<code>set_id</code>（選曲のキー）</td></tr>
+<tr><td><code>context.cursor</code></td><td><code>audio_assets</code> の選曲 SELECT と <code>last_used_at</code> の UPDATE</td></tr>
+<tr><td><code>context.s3_client</code> / <code>context.s3_bucket</code></td><td>音源ファイルの取得（<code>acps_shared.s3.get_object</code>）</td></tr>
+<tr><td>戻り値 <code>GeneratorResult.media</code></td><td><code>MediaOutput</code> 1 件（<code>content</code>=MP4、<code>file_format='mp4'</code>、<code>width</code> / <code>height</code> / <code>duration_seconds</code> / <code>audio_asset_id</code>）</td></tr>
+<tr><td>戻り値 <code>GeneratorResult.intermediates</code></td><td><code>IntermediateOutput</code> 1 件（生成静止画 JPEG、<code>suffix='_source'</code>、<code>output_index=0</code>）</td></tr>
+</table>
+</div>
+<p>処理順序: ① API キー取得 → ② Images API で PNG 生成 → ③ JPEG 変換 → ④ 選曲（<code>audio_assets</code>）→ ⑤ 音源を S3 から取得 → ⑥ キャンバス合成（Pillow）→ ⑦ ffmpeg でエンコード → ⑧ <code>last_used_at</code> 更新 → ⑨ <code>GeneratorResult</code> を返す。</p>
+
+<h2>3. 入力</h2>
+<p>入力は <code>PromptConfig</code>（<a href="../data-model.html">data-model.html</a>）と、<code>set_id</code> に紐づく <code>audio_assets</code> の行。<code>prompt_text</code> / <code>parameters</code> の使い方は <a href="gpt-image-single.html">gpt-image-single</a> と同一で、OpenAI 呼び出しは共通ヘルパ <code>generators/openai_image.py</code>（<code>load_api_key</code> / <code>build_client</code> / <code>request_images</code> / <code>convert_png_to_jpeg</code>）に集約している。<code>negative_prompt</code> は本方式でも未使用。</p>
+<div class="table-wrap">
+<table>
+<tr><th>キー（<code>parameters</code>）</th><th>渡し先</th><th>fantasy-animals-1 の実値</th></tr>
+<tr><td><code>model</code></td><td><code>images.generate(model=...)</code></td><td><code>gpt-image-2</code></td></tr>
+<tr><td><code>size</code></td><td><code>images.generate(size=...)</code></td><td><code>1024x1536</code>（縦長。9:16 キャンバスへの拡大率を抑えるため）</td></tr>
+<tr><td><code>quality</code></td><td><code>images.generate(quality=...)</code></td><td><code>high</code></td></tr>
+<tr><td><code>n</code></td><td><code>images.generate(n=...)</code></td><td><code>1</code></td></tr>
+</table>
+</div>
+<div class="warn">
+  <span class="callout-title">複数枚返却時は先頭のみ使用</span>
+  <code>n</code> が 2 以上で複数枚返った場合、本方式は WARNING ログを出して<strong>先頭 1 枚のみ</strong>を動画化する（1 実行 1 本の運用前提）。0 枚の場合は <code>RuntimeError</code> を送出する。パラメータのバリデーションを行わない点は gpt-image-single と同じ（フェイルラウド）。
+</div>
+
+<h2>4. 認証情報（API キー）</h2>
+<p>環境変数 <code>API_SECRET_ARN</code> から <code>acps_shared.get_secret_string</code> 経由で取得する（<a href="gpt-image-single.html">gpt-image-single セクション 4</a> と同一。「Secret は方式モジュールが自分で取得する」決定を踏襲し、実処理は <code>openai_image.load_api_key()</code> に共通化）。</p>
+
+<h2>5. 選曲（audio_assets）</h2>
+<p>動画には音源が必須のため、方式内で <code>audio_assets</code> から 1 曲を選ぶ。</p>
+<pre><code>SELECT id, s3_key FROM audio_assets
+ WHERE set_id = %s AND is_active = 1
+ ORDER BY last_used_at ASC, id ASC LIMIT 1</code></pre>
+<ul>
+  <li><strong>順繰り選曲</strong>: 最も長く使っていない曲を選ぶ。未使用（<code>last_used_at IS NULL</code>）が最優先（MySQL の ASC で NULL が先頭）、同着は <code>id</code> 昇順</li>
+  <li><strong>使用マーク</strong>: 動画のエンコード成功後に <code>last_used_at</code> を現在 UTC で UPDATE する。コミットは共通骨格が行うため、<strong>後続の S3 保存・DB 登録が失敗すればロールバックされ、選曲の副作用は残らない</strong></li>
+  <li><strong>0 件はフェイルラウド</strong>: 有効な音源が 1 件もなければ <code>RuntimeError</code> を送出する（無音動画を作らない。14-4 の決定）</li>
+</ul>
+<p>音源の前処理レシピ（切り出し 10 秒・2 パスラウドネス正規化・フェード・AAC 化）と登録手順、ライセンス証跡の管理は <a href="../operation.html">operation.html</a> を参照。音源は<strong>前処理済み AAC</strong>である前提で、本方式は再エンコードせず <code>-c:a copy</code> でそのまま多重化する。</p>
+
+<h2 id="canvas">6. キャンバス合成（Pillow）</h2>
+<p>生成画像（縦長だが 9:16 ではない）を 1080x1920 に載せる工程。<strong>ズーム終端でも元画像の 100% が可視である</strong>ことを構造的に保証する。</p>
+<div class="table-wrap">
+<table>
+<tr><th>定数（実装）</th><th>値</th><th>意味</th></tr>
+<tr><td><code>OUTPUT_WIDTH</code> / <code>OUTPUT_HEIGHT</code></td><td>1080 / 1920</td><td>出力寸法（9:16）</td></tr>
+<tr><td><code>ZOOM_END</code></td><td>1.08</td><td>ズーム終端倍率</td></tr>
+<tr><td><code>SAFE_BOX_MARGIN</code></td><td>8</td><td>zoompan の整数丸め吸収</td></tr>
+<tr><td><code>BACKGROUND_BLUR_RADIUS</code></td><td>48</td><td>背景のガウシアンぼかし半径（1080x1920 換算）</td></tr>
+<tr><td><code>BACKGROUND_BLUR_DOWNSCALE</code></td><td>4</td><td>ぼかしを 1/4 縮小画像に掛けて拡大（処理時間短縮）</td></tr>
+<tr><td><code>BACKGROUND_BRIGHTNESS</code></td><td>0.72</td><td>背景の減光率（前景とのコントラスト確保）</td></tr>
+<tr><td><code>CANVAS_JPEG_QUALITY</code></td><td>90</td><td>合成キャンバスの JPEG 品質</td></tr>
+</table>
+</div>
+<p>合成手順:</p>
+<ol>
+  <li><strong>セーフボックスの導出</strong>: <code>(int(1080 / ZOOM_END) - 8, int(1920 / ZOOM_END) - 8)</code> = <strong>992 x 1769</strong>。ズームで中央に寄っても常に画面内に残る領域</li>
+  <li><strong>前景</strong>: <code>ImageOps.contain</code> でセーフボックスに<strong>フィット</strong>（切らずに全体を収める）。1024x1536 の入力なら 992x1488 になる</li>
+  <li><strong>背景</strong>: 同じ画像を <code>ImageOps.fit</code> で 1080x1920 に埋め（ここは切れてよい）、1/4 に縮小 → ガウシアンぼかし → 1080x1920 に再拡大 → 明度 0.72 に減光</li>
+  <li><strong>合成</strong>: 背景の中央に前景を貼り付け、JPEG（品質 90）として返す</li>
+</ol>
+<div class="decision">
+  <span class="callout-title">決定（Phase 14-11）: 中央クロップを廃止しフィット + ぼかし背景に変更</span>
+  14-10 の実投稿で<strong>画像内の文字が左右で見切れている</strong>ことが判明した。原因は ffmpeg 側の <code>scale=-2:1920,crop=1080:1920</code>（中央クロップで幅の 15.6% 喪失）と zoompan 1.0→1.08（終盤にさらに各 3.7%）の<strong>2 段階クロップ</strong>で、最終フレームには元画像の横幅の 78% しか映っていなかった。
+  対策として ffmpeg の中央クロップを廃止し、Pillow の <code>_compose_canvas</code> で「セーフボックスに contain した前景 + ぼかし減光した同一画像の背景」を組んでから zoompan に渡す方式へ変更した。セーフボックスを <strong>出力寸法 / <code>ZOOM_END</code> - マージン</strong> として定数から導出しているため、ズーム倍率を変えてもクロップが再発しない。合わせてプロンプト側にも Instagram UI のセーフエリア（右端 12%・下端 15%）を明記した（<a href="../sets/fantasy-animals-1.html">sets/fantasy-animals-1.html</a>）。
+</div>
+
+<h2>7. ffmpeg エンコード</h2>
+<p>合成済み JPEG 1 枚と前処理済み AAC を一時ディレクトリに書き出し、<code>ffmpeg</code> を <code>subprocess.run</code> で 1 回呼ぶ。</p>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値（実装定数）</th></tr>
+<tr><td>入力</td><td><code>-loop 1 -framerate 30 -t 10</code> の静止画 + 音源ファイル</td></tr>
+<tr><td>映像フィルタ</td><td><code>scale=2160:3840</code>（<code>SUPERSAMPLE_FACTOR=2</code> でスーパーサンプリング）→ <code>zoompan</code>（<code>z=1.0+0.08*on/299</code>・中央固定・<code>d=1</code>・<code>s=1080x1920</code>・<code>fps=30</code>）→ <code>format=yuv420p</code></td></tr>
+<tr><td>映像コーデック</td><td><code>libx264</code> / <code>-crf 20</code> / <code>-preset medium</code> / <code>+faststart</code></td></tr>
+<tr><td>音声コーデック</td><td><code>-c:a copy</code>（前処理済み AAC をそのまま多重化）</td></tr>
+<tr><td>尺</td><td><code>-shortest -t 10</code>（10 秒）</td></tr>
+<tr><td>タイムアウト</td><td><code>FFMPEG_TIMEOUT_SECONDS = 600</code></td></tr>
+</table>
+</div>
+<div class="note">
+  <span class="callout-title">スーパーサンプリングの理由</span>
+  <code>zoompan</code> はズーム倍率を整数ピクセルに丸めるため、等倍のまま掛けると拡大中にカクつき（ジッタ）が出る。出力の 2 倍解像度へ拡大してから <code>s=1080x1920</code> で縮小することで、丸め粒度が実質半分になり滑らかなズームになる。
+</div>
+<p>ffmpeg が非ゼロ終了・タイムアウト・空ファイル出力のいずれかになった場合は、stderr の末尾 500 文字を ERROR ログに出したうえで例外を送出する。</p>
+
+<h2>8. 出力とストレージ</h2>
+<div class="table-wrap">
+<table>
+<tr><th>成果物</th><th>S3</th><th>DB</th></tr>
+<tr><td>最終 MP4</td><td><code>videos/</code> プレフィックス・拡張子 <code>.mp4</code>・<code>Content-Type: video/mp4</code>（共通骨格が <code>file_format</code> から解決）。ライフサイクル 30 日</td><td><code>generated_media</code> に 1 行（<code>file_format='mp4'</code>・<code>width</code>=1080・<code>height</code>=1920・<code>duration_seconds</code>=10・<code>audio_asset_id</code>）</td></tr>
+<tr><td>中間静止画 JPEG</td><td>最終メディアと同じキーに <code>_source</code> を付けたキー。ライフサイクル 30 日</td><td><strong>記録しない</strong>（14-4 の決定。S3 のみ）</td></tr>
+</table>
+</div>
+<p>この <code>generated_media</code> の <code>file_format='mp4'</code> が sns-post-batch 側で <code>posts.media_type='reel'</code> に導出され、リール投稿（<code>media_type=REELS</code>）に分岐する（<a href="../batch-flow.html">batch-flow.html セクション 3</a>）。</p>
+
+<h2>9. エラーハンドリング</h2>
+<p>方式内に try/except によるリカバリ・リトライは持たない（ffmpeg 失敗時のログ出力後の再送出を除く）。Secret 取得失敗・API 例外・音源 0 件・S3 取得失敗・合成失敗・ffmpeg 失敗はすべて送出し、共通骨格が <code>prompt_config</code> 単位で捕捉 → <strong><code>connection.rollback()</code> でトランザクションを戻して</strong>スキップする。これにより <code>last_used_at</code> の更新だけが残る中途半端な状態は発生しない。未完了の <code>prompt_config</code> が残ればバッチは失敗終了し、Step Functions の Retry → 失敗アラーム通知につながる。</p>
+
+<h2>10. 依存ライブラリ・実行環境</h2>
+<div class="table-wrap">
+<table>
+<tr><th>依存</th><th>バージョン・設定</th><th>用途</th></tr>
+<tr><td><code>openai</code></td><td>2.21.0（<code>services/image-batch/requirements.txt</code>）</td><td>Images API 呼び出し</td></tr>
+<tr><td><code>Pillow</code></td><td>12.1.0（同上）</td><td>PNG → JPEG 変換・キャンバス合成</td></tr>
+<tr><td><code>ffmpeg</code></td><td>Dockerfile で <code>apt-get install ffmpeg</code>（コンテナ同梱）</td><td>Ken Burns 合成・H.264 エンコード</td></tr>
+<tr><td>Fargate タスクサイズ</td><td><strong>1 vCPU / 2 GB</strong>（<code>ImageBatchStack</code>。14-7 で引き上げ）</td><td>ffmpeg エンコードの所要時間・メモリ確保</td></tr>
+</table>
+</div>
+<p>S3 取得は共通ライブラリ <code>shared/acps_shared</code>（<code>get_object</code> / <code>get_secret_string</code>）を使用する。</p>
+
+<h2>11. 実測値</h2>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>実測</th><th>出典</th></tr>
+<tr><td>生成〜MP4 完成</td><td>約 143 秒（うち大半が Images API の応答待ち）</td><td>14-10 の AWS 全チェーン実行（image-batch 全体 3 分 41 秒）</td></tr>
+<tr><td>MP4 サイズ</td><td>3.8〜4.2 MB</td><td>14-7 ローカル E2E / 14-10 AWS 実行</td></tr>
+<tr><td>リール投稿の所要</td><td>コンテナ FINISHED まで約 33.5 秒 + パブリッシュ約 10 秒</td><td>14-8 の実 API 疎通（ポーリング設定の根拠。<a href="../batch-flow.html">batch-flow.html セクション 3</a>）</td></tr>
+</table>
+</div>
+
+</div>
+</body>
+</html>

@@ -472,7 +472,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
       Name: 'acps-prod-image-generation-schedule',
       GroupName: 'acps-prod-image-schedule-group',
       State: 'ENABLED',
-      ScheduleExpression: 'cron(0 7,12,21 * * ? *)',
+      ScheduleExpression: 'cron(0 21 * * ? *)',
       ScheduleExpressionTimezone: 'Asia/Tokyo',
       FlexibleTimeWindow: {
         Mode: 'OFF',

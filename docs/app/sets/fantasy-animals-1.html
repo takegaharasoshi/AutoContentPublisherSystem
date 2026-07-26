@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 架空のかわいい動物図鑑</nav>
 <h1>セット別設計書: 架空のかわいい動物図鑑</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（13-2 で最終化。定常運用中）</span>
+  <span class="badge badge-fixed">Fix（14-12 で動画運用へ更新。定常運用中）</span>
   <span>set_code: fantasy-animals-1</span>
-  <span>最終更新: 2026-07-23</span>
+  <span>最終更新: 2026-07-26</span>
 </div>
 
 <div class="note">
@@ -40,7 +40,11 @@
 <p>アカウント準備（Instagram プロアカウント化・Facebook ページ連携・Meta アプリ作成・長期アクセストークン取得）の具体手順は <a href="../operation.html#instagram-account-setup">operation.html セクション 5.1</a> に一般化して記録した。</p>
 
 <h2>3. スケジュール（投稿頻度）</h2>
-<p><strong>1 日 3 回（7:00 / 12:00 / 21:00 JST）</strong>。Phase 13-1（2026-07-22、ユーザー決定）で確定し、既存プレースホルダ Scheduler（<code>acps-prod-image-generation-schedule</code>）を転用して cron 式 <code>cron(0 7,12,21 * * ? *)</code>（Asia/Tokyo）+ ENABLED で本番化した（<a href="../operation.html">operation.html セクション 2.1 手順 3</a> の decision、現行値は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a>）。画像生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
+<p><strong>1 日 1 回（21:00 JST）</strong>。cron 式 <code>cron(0 21 * * ? *)</code>（Asia/Tokyo）+ ENABLED（Scheduler <code>acps-prod-image-generation-schedule</code>。現行値は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a>）。コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
+<div class="decision">
+  <span class="callout-title">decision: 14-12 で 1 日 3 回 → 1 日 1 回に削減（2026-07-26）</span>
+  13-1（2026-07-22）では静止画方式で 1 日 3 回（7:00 / 12:00 / 21:00 JST）としていたが、14-2 の壁打ちで決めた動画運用の初期パラメータ（1 日 1 本・10 秒前後）に合わせて 1 日 1 回へ削減した。時刻はユーザー決定で <strong>21:00 JST</strong>（夜のリーチが期待できる枠）。cron の変更は CDK（<code>ImageBatchStack</code>）で行い、14-10 で手動 DISABLED にしていた State も同デプロイで <code>ENABLED</code> に戻している。
+</div>
 
 <h2>4. プロンプトの作り方</h2>
 <p>固定文言方式。<code>prompt_configs.prompt_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>prompt_config</code>。1 枚だけ生成されるよう文言で制御する。<a href="../batch-flow.html">batch-flow.html</a> の decision）。14-11 時点の登録文言は以下（ユーザー決定）。</p>
@@ -76,7 +80,7 @@
 ・枠線・額縁・複数コマ・コラージュにしない。
 ・意味の通らない文字や誤字を出さない。日本語は自然な表記にする。
 ・生成する画像は1枚のみ。</code></pre>
-<p>生成パラメータ（<code>parameters</code> カラム）は 11-2（画像生成 API の疎通確認）の実プロンプト検証で確定し、14-10 の動画方式への切替で <code>size</code> を 2:3 の縦長へ変更した（キー仕様は <a href="../generators/gpt-image-single.html">方式設計書</a> セクション 3）。</p>
+<p>生成パラメータ（<code>parameters</code> カラム）は 11-2（画像生成 API の疎通確認）の実プロンプト検証で確定し、14-10 の動画方式への切替で <code>size</code> を 2:3 の縦長へ変更した（キー仕様は <a href="../generators/gpt-image-kenburns.html">方式設計書</a> セクション 3）。</p>
 <pre><code>{"model": "gpt-image-2", "size": "1024x1536", "quality": "high", "n": 1}</code></pre>
 
 <div class="note">
@@ -86,17 +90,32 @@
 </div>
 
 <h2>5. キャプションの作り方</h2>
-<p>固定文言方式。<code>caption_templates.template_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>caption_template</code>）。画像内に動物名・特徴の説明を焼き込む仕様のため、キャプション本文は補足的な固定文 + ハッシュタグとした。12-1 時点の登録文言は以下（ユーザー決定。ローカル・Aurora とも <code>id=1</code>）。</p>
+<p>固定文言方式。<code>caption_templates.template_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>caption_template</code>）。画像内に動物名・特徴の説明を焼き込む仕様のため、キャプション本文は補足的な固定文 + ハッシュタグとした。現行の登録文言は以下（ユーザー決定。ローカル・Aurora とも <code>id=1</code>）。</p>
 <pre><code>どこかにいそうで、どこにもいない動物たち。
 今日も新しい一匹に出会いました🐾
 
-#架空動物図鑑 #ふしぎな生き物 #もしも動物園 #AIアート #ファンタジー動物 #かわいい動物</code></pre>
+#架空動物図鑑 #ふしぎな生き物 #もしも動物園 #AIart #ファンタジー動物 #かわいい動物</code></pre>
+<p>AI 開示は<strong>ハッシュタグ <code>#AIart</code></strong> で行う（14-4 の決定）。12-1 の初版は <code>#AIアート</code> だったが、英語圏でも通用する表記に統一するため 14-10 で差し替えた。</p>
 
-<h2>6. 失敗時ポリシー</h2>
+<h2 id="audio">6. 音源（動画方式用）</h2>
+<p>動画（リール）には音源が必須のため、<code>audio_assets</code> に前処理済みの曲をストックし、方式が順繰りに選曲する（仕組みは <a href="../generators/gpt-image-kenburns.html">方式設計書 セクション 5</a>、前処理レシピと登録手順は <a href="../operation.html">operation.html</a>）。14-6 でユーザーが選曲・取得した 4 曲を登録済み。</p>
+<div class="table-wrap">
+<table>
+<tr><th>id</th><th>タイトル</th><th>ライセンス</th><th>S3 キー</th></tr>
+<tr><td>1</td><td>Sneaky Whimsical Acoustic</td><td>Pixabay Content License</td><td><code>audio/fantasy-animals-1/track01.m4a</code></td></tr>
+<tr><td>2</td><td>Fantasy Dreamy Childrens Magical Storytime</td><td>Pixabay Content License</td><td><code>audio/fantasy-animals-1/track02.m4a</code></td></tr>
+<tr><td>3</td><td>Main Title Fairy Tale Ballet</td><td>Pixabay Content License</td><td><code>audio/fantasy-animals-1/track03.m4a</code></td></tr>
+<tr><td>4</td><td>Warm Acoustic Guitar and Piano Layers</td><td>Pixabay Content License</td><td><code>audio/fantasy-animals-1/track04.m4a</code></td></tr>
+</table>
+</div>
+<p>Pixabay Content License は商用利用可・クレジット表記不要。出典 URL・取得日を含むライセンス証跡は <code>audio_assets</code> の証跡カラムに記録している（DB を正とする。14-4 の決定）。Meta Sound Collection は Meta 限定ライセンスのため<strong>不採用</strong>（14-2）。S3 の <code>audio/</code> プレフィックスは 30 日ライフサイクルの対象外（14-6 で FoundationStack を修正）。</p>
+
+<h2>7. 失敗時ポリシー</h2>
 <p>共通の失敗時ポリシー（<a href="../operation.html">operation.html セクション 4</a>）に準拠。セット固有の追加ポリシーはなし。</p>
 
-<h2>7. 共通フローからの差分・特記事項</h2>
-<p>共通フロー（<a href="../batch-flow.html">batch-flow.html</a>）どおりで差分なし。名前・特徴のテキストを画像に合成する処理はプロンプト側で完結させ、共通骨格・DB スキーマの変更は不要。使用方式は <code>gpt-image-single</code>（<strong>11-4</strong> で実装、<strong>13-1</strong> で定常運用開始 = 本採用）。方式別設計書は「方式設計書はセットが本採用した時点で作成」ルール（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）に従い <strong>13-2</strong> で作成した: <a href="../generators/gpt-image-single.html">generators/gpt-image-single.html</a>。</p>
+<h2>8. 共通フローからの差分・特記事項</h2>
+<p>共通フロー（<a href="../batch-flow.html">batch-flow.html</a>）どおりで差分なし。名前・特徴のテキストを画像に合成する処理はプロンプト側で完結させ、共通骨格・DB スキーマの変更は不要。</p>
+<p><strong>使用方式は <code>gpt-image-kenburns</code>（動画 / リール）</strong>。11-4〜14-10 は <code>gpt-image-single</code>（静止画）を使用していたが、14-10 で <code>batch_sets.generator_name</code> を切り替え、14-12 で定常運用に入った。方式別設計書は「セットが本採用した時点で作成」ルール（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）に従い作成済み: <a href="../generators/gpt-image-kenburns.html">generators/gpt-image-kenburns.html</a>（14-12）/ <a href="../generators/gpt-image-single.html">generators/gpt-image-single.html</a>（13-2、本セットでは現在未使用）。投稿は <code>posts.media_type='reel'</code> として <code>share_to_feed=true</code> で公開され、リールタブとプロフィールのフィード両方に表示される（14-8 実機確認）。</p>
 
 </div>
 </body>

@@ -65,10 +65,10 @@
   <tbody>
     <tr><td>Schedule 名</td><td><code>acps-prod-image-generation-schedule</code></td></tr>
     <tr><td>ScheduleGroup 名</td><td><code>acps-prod-image-schedule-group</code>（MonitoringStack の <code>AWS/Scheduler</code> メトリクス Dimension で使用）</td></tr>
-    <tr><td>cron 式</td><td><code>cron(0 7,12,21 * * ? *)</code>（毎日 7:00 / 12:00 / 21:00 の 1 日 3 回）</td></tr>
+    <tr><td>cron 式</td><td><code>cron(0 21 * * ? *)</code>（毎日 21:00 の 1 日 1 回）</td></tr>
     <tr><td>タイムゾーン</td><td><code>Asia/Tokyo</code></td></tr>
     <tr><td>FlexibleTimeWindow</td><td><code>OFF</code>（時刻どおりに起動する）</td></tr>
-    <tr><td>State</td><td><code>ENABLED</code>（Phase 13-1 で本番化。下記 decision を参照）</td></tr>
+    <tr><td>State</td><td><code>ENABLED</code>（Phase 13-1 で本番化、14-12 で動画運用として再開。下記 decision を参照）</td></tr>
   </tbody>
 </table>
 </div>
@@ -76,6 +76,11 @@
 <div class="decision">
   <span class="callout-title">当面は DISABLED で運用（2026-07-14）→ Phase 13-1 で本番化（2026-07-22）</span>
   Phase 5-6 でスケジュール時刻の自動起動（Scheduler → 画像生成 SFN → SNS 投稿 SFN の連鎖）を確認済み。有効のままだとアプリ実装期間中も毎日チェーン全体が空回しし、Aurora の起動コストと実行履歴のノイズが発生するため、検証後に <code>DISABLED</code> へ変更していた。アプリ実装完了後の Phase 13-1（2026-07-22）で本番化: cron 式を 1 日 3 回（7:00 / 12:00 / 21:00 JST、投稿時刻・回数はユーザー決定）に書き換え、Input の <code>set_code</code> を初セット <code>fantasy-animals-1</code> に変更して <code>ENABLED</code> 化した。
+</div>
+
+<div class="decision">
+  <span class="callout-title">Phase 14-12 で 1 日 1 回（21:00 JST）へ変更（2026-07-26）</span>
+  動画（リール）運用への切替に伴い、cron 式を <code>cron(0 21 * * ? *)</code>（1 日 1 回・時刻はユーザー決定）に変更した。14-10 の AWS E2E 中は投稿内容のレビューのため Scheduler を<strong>手動で <code>DISABLED</code></strong> にしていたが、CDK テンプレートは <code>enabled: true</code> を保持しているため、本ステップの cron 変更を含む <code>cdk deploy</code> によって State も <code>ENABLED</code> に戻る（Scheduler の更新 API が全プロパティを送るため）。<strong>Scheduler の設定は CDK を単一の正とし、コンソール・CLI での手動変更は一時的な検証時のみとする</strong>。
 </div>
 
 <h2 id="db-readiness">2. DB 準備確認タスク（db-readiness-check）仕様</h2>
