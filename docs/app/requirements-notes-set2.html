@@ -13,7 +13,7 @@
 <h1>勝負セット（セット 2）壁打ち記録（15-1〜15-4）</h1>
 <div class="page-meta">
   <span class="badge badge-wip">Phase 15 意思決定ブロックの記録（15-4 まで段階更新）</span>
-  <span>最終更新: 2026-07-26（15-2 テーマ・世界観の確定を記録）</span>
+  <span>最終更新: 2026-07-26（15-3 フォーマット・生成方式の確定を記録）</span>
 </div>
 
 <div class="note">
@@ -121,9 +121,9 @@
   <thead><tr><th>論点</th><th>行き先</th></tr></thead>
   <tbody>
     <tr><td>キャラクター設定・デザインの確定（固定アセットの試し生成込み）と L1 / L3 の出題サンプル検証、<code>set_code</code>・アカウント名</td><td><del>15-2</del> → 解決済み（セクション 7）</td></tr>
-    <tr><td>誤答リスク対策の方式（LLM 自己検証 vs 人間レビュー付きストック配信）。LLM テキスト生成ステップの追加はテキスト API（外部 API）利用の可能性があり、採用時は疎通確認ステップの挿入を 15-4 で判断</td><td>15-3 / 15-4</td></tr>
-    <tr><td>複数カット構成の具体設計（問題 → ヒント → 答えのカット割り・尺・考える間の演出）と方式名・コスト試算</td><td>15-3</td></tr>
-    <tr><td>出題履歴の重複管理（同じ古典パズルの繰り返し防止。データモデル影響の可能性）</td><td>15-3（設計 Fix は 15-5）</td></tr>
+    <tr><td>誤答リスク対策の方式（LLM 自己検証 vs 人間レビュー付きストック配信）。LLM テキスト生成ステップの追加はテキスト API（外部 API）利用の可能性があり、採用時は疎通確認ステップの挿入を 15-4 で判断</td><td><del>15-3 / 15-4</del> → 方式は解決済み（セクション 8.3）。疎通確認ステップの挿入要否のみ 15-4</td></tr>
+    <tr><td>複数カット構成の具体設計（問題 → ヒント → 答えのカット割り・尺・考える間の演出）と方式名・コスト試算</td><td><del>15-3</del> → 解決済み（セクション 8.1・8.2・8.4）</td></tr>
+    <tr><td>出題履歴の重複管理（同じ古典パズルの繰り返し防止。データモデル影響の可能性）</td><td><del>15-3（設計 Fix は 15-5）</del> → 方針決定（<code>quiz_items</code>〔仮名〕新設。セクション 8.2・8.5）。テーブル設計は 15-5</td></tr>
     <tr><td>投稿頻度（1 日 3 回案）・音源方針（クイズ形式に合う BGM。AI 音楽生成への格上げ要否）・アカウント構成の詳細（名前・ハンドル。方向性は 15-2 で決定済み）</td><td>15-4（アカウント名の最終確定は 15-7 まで）</td></tr>
   </tbody>
 </table>
@@ -166,13 +166,103 @@
   </ol>
 </div>
 
-<h2 id="references">8. 参考リンク（調査ソース。2026-07-26 時点）</h2>
+<h2 id="format-fix">8. 15-3 コンテンツフォーマットと新生成方式の選定（壁打ち 2 巡）</h2>
+
+<h3 id="format">8.1 決定: コンテンツフォーマット = 20 秒・4 カット</h3>
+<div class="decision">
+  <span class="callout-title">decision: 尺・カット構成（2026-07-26 ユーザー決定）</span>
+  基本形は <strong>約 20 秒・4 カット</strong>。15-1 の調査所見（成果が出やすい尺 15〜30 秒・冒頭 3 秒が勝負・ループ構造が完視聴率に効く）を 15-3 時点の再調査でも裏付けたうえで、「考える時間を確保しつつ完視聴率を守る」バランスとして選定した。各カットの秒数は 15-9 の試し打ちで微調整する。
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>カット</th><th>尺（目安）</th><th>内容</th><th>コーチのポーズ</th></tr></thead>
+  <tbody>
+    <tr><td>1. フック</td><td>0〜3 秒</td><td>タイトルカード（「今日の脳トレ」+ 型ラベル・難易度）</td><td>フック用（構え）</td></tr>
+    <tr><td>2. 問題</td><td>3〜10 秒</td><td>問題カード全文</td><td>出題</td></tr>
+    <tr><td>3. 考える</td><td>10〜15 秒</td><td>カウントダウン 5 秒（1 秒刻みのカード差し替えで演出）+「⏸ 止めてじっくり考えても OK」</td><td>考え中</td></tr>
+    <tr><td>4. 答え</td><td>15〜20 秒</td><td>正解 + 一言解説 + 締めカード（フックと同型にして<strong>ループを閉じる</strong>）</td><td>正解</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="method">8.2 決定: 生成方式 = <code>gpt-quiz-multicut</code>（多段生成チェーン）</h3>
+<div class="decision">
+  <span class="callout-title">decision: 方式名と方式の骨格（2026-07-26 ユーザー決定）</span>
+  方式名（レジストリキー）= <strong><code>gpt-quiz-multicut</code></strong>（既存規約〔プロバイダ + 技法〕に整合。クイズ検証などテーマ固有ロジックを含む実態に対して正直な命名）。骨格は以下の 6 段チェーン。
+</div>
+<ol>
+  <li><strong>型選択</strong> — L1（論理パズル）/ L3（フェルミ推定）のローテーションを方式内で決定（<code>quiz_items</code> 履歴から least-recently-used）</li>
+  <li><strong>問題生成（LLM）</strong> — <strong>構造化フィールド方式</strong>: レイアウトは固定テンプレートとし、LLM は最大字数付きのフィールド（フック文・問題文・答え・解説・コーチの一言・タグ）だけを JSON で書く（組版崩れを構造的に防ぎつつ言い回しは毎回変わる = B 軸対策）</li>
+  <li><strong>自己検証（LLM + プログラム）</strong> — 別呼び出しの LLM に答えを見せずに解かせて一致確認。L1 は可能な限り機械検証（場合分け全列挙をコードで確認）を併用。字数制約・必須フィールドはプログラム検査。NG は再生成（上限 N 回、尽きたらフェイルラウド）</li>
+  <li><strong>重複検査</strong> — <code>quiz_items</code> の直近履歴をプロンプトに除外指定 + 生成後の類似度検査（実装方式は 15-5）</li>
+  <li><strong>組版（Pillow）</strong> — <strong>完全プログラム組版（画像生成 API 不使用）</strong>。背景もフラットデザインを Pillow で描画（ネイビー×アンバー + 幾何学装飾）。脳みそコーチ固定アセット + 日本語フォント（Noto Sans JP 想定）を合成しカット 4 種を生成</li>
+  <li><strong>動画化（ffmpeg）</strong> — カットごとの微ズーム（gpt-image-kenburns のスーパーサンプリング/zoompan 資産を再利用）→ トランジション連結 → BGM 多重化（<code>audio_assets</code> 順繰り選曲を踏襲）→ 1080x1920 MP4</li>
+</ol>
+<ul>
+  <li><strong>構造判断</strong>: 稼働 <code>prompt_config</code> は 1 セット 1 件を維持し、L1/L3 の出し分けは方式内ローテーションとする（複数 prompt_config 有効化は 1 実行複数メディアとなり「1 実行 1 投稿」前提と衝突するため。型構成・比率は <code>parameters</code> JSON で持つ）</li>
+  <li><strong>LLM は OpenAI テキスト API・既存キー共用</strong>（<code>acps/{env}/image/api-key</code>）。モデル名は <code>parameters</code> で差し替え可能とし、具体名・単価は 15-5 で最新確認</li>
+  <li><strong>中間生成物 = カット画像 4 枚</strong>を S3 に保存（既存 <code>IntermediateOutput</code> の仕組み）。15-10 の投稿前レビューを「動画を見ずにカード画像で確認」できる</li>
+</ul>
+
+<h3 id="answer-risk">8.3 決定: 誤答リスク対策 = 完全自動（LLM 自己検証のみ）</h3>
+<div class="decision">
+  <span class="callout-title">decision: 全自動を維持し、慣らし目視期間は置かない（2026-07-26 ユーザー決定）</span>
+  15-1 の候補 1（その場生成 + LLM 自己検証）を採用し、候補 2（人間レビュー付きストック配信）と Claude 提案の折衷案（投入直後 2〜4 週の投稿前レビュー継続）は不採用。検証プロンプトの穴を本番で踏むリスクは許容する。
+  残存リスクへの<strong>構造ヘッジ 2 点を設計原則として 15-5 へ引き継ぐ</strong>:
+  <ol style="margin:.3rem 0 0;">
+    <li>L1 は<strong>機械検証可能な型</strong>（場合分け全列挙で一意解を確認できる論理パズル）に出題ドメイン自体を寄せる</li>
+    <li>L3 の実数アンカーは<strong>「約◯◯（目安）+ 推定ルート」の幅表現に統一し断定しない</strong>（唯一残る誤情報経路をテーマ側で潰す G 軸対策）</li>
+  </ol>
+</div>
+
+<h3 id="cost">8.4 コスト試算（予算適合）</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>費目</th><th>試算</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>LLM テキスト</td><td>1 本 数千〜1 万トークン → 1 円未満/本のオーダー、<strong>月 数十円以下</strong>（1 日 3 回でも）</td><td>モデル名・単価は 15-5 で最新確認</td></tr>
+    <tr><td>画像生成 API</td><td><strong>定常ゼロ</strong>。アセット制作（15-9）の単発 数百円のみ</td><td>完全プログラム組版 + 固定アセットの帰結</td></tr>
+    <tr><td>AWS 増分</td><td>実行時間は現行同等以下の見込みで誤差レベル</td><td>タスクサイズ 1 vCPU / 2 GB 据え置き想定。15-6 のローカル E2E で実測</td></tr>
+  </tbody>
+</table>
+</div>
+<p>既存セット（画像 API 月 1,000 円前後）より安く、月 2 万円予算（<a href="../strategy/business-strategy.html#budget">事業戦略書 3</a>）に対し余裕。<strong>1 日 3 回でも予算論点にならない</strong>ため、15-4 の頻度議論はリーチ・ブランディング観点に純化できる。</p>
+
+<h3 id="impact">8.5 影響範囲の確認（15-3 時点）</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>対象</th><th>影響</th></tr></thead>
+  <tbody>
+    <tr><td>データモデル</td><td><strong>V003 で <code>quiz_items</code>（仮名）新設</strong>（出題履歴・重複管理。Phase 16 のインサイト突合にも利用余地）。V001 の <code>file_format</code> COMMENT 課題（設計課題リスト 2026-07-25）を V003 で同時解消。テーブル設計は 15-5</td></tr>
+    <tr><td>S3 キー規約</td><td>新プレフィックス <code>assets/{set_code}/</code>（キャラ・カード素材の固定アセット）。ライフサイクルは <code>images/</code>・<code>videos/</code> 限定のため<strong>対象外となり変更不要</strong>（<code>audio/</code> と同じ扱い）</td></tr>
+    <tr><td>Secret</td><td><strong>変更なし</strong>（OpenAI テキスト API は既存キー共用）。provider 軸拡張の設計課題（2026-07-15）は発火しない。Secret 名 <code>image/api-key</code> と用途のずれは注記で許容（15-5 でドキュメント整理）</td></tr>
+    <tr><td>CDK</td><td><strong>変更なし見込み</strong>（Scheduler 追加は 15-11 の別件）</td></tr>
+    <tr><td>Dockerfile（image-batch）</td><td>日本語フォント（Noto Sans JP・SIL OFL 想定）の追加のみ</td></tr>
+    <tr><td>sns-post-batch</td><td><strong>改修不要</strong>（<code>file_format='mp4'</code> → <code>media_type='reel'</code> 導出済み。尺 20 秒もリール制限・ポーリング上限 10 分に余裕）</td></tr>
+    <tr><td>疎通確認</td><td>OpenAI テキスト API は新しい API サーフェス → <strong>疎通確認ステップの挿入要否は 15-4 で判断</strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="handover-15-5">8.6 15-5（設計 Fix）への引き継ぎ論点</h3>
+<ul>
+  <li><code>quiz_items</code> のテーブル設計（カラム・重複検査〔類似度〕の実装方式・L1/L3 ローテーションの参照方法）と V003 の DDL（V001 COMMENT 解消込み）</li>
+  <li>検証設計の詳細: 検証プロンプト・L1 機械検証の型定義・再生成上限 N とフェイルラウド条件</li>
+  <li>カードレイアウト仕様: フィールドごとの最大字数・フォントサイズ・Instagram UI セーフエリア（右 12%・下 15% = 14-11 の知見流用）</li>
+  <li>LLM モデル名・単価の最新確認（<code>parameters</code> の既定値）と Dockerfile のフォント選定確定</li>
+  <li>固定アセット参照の持ち方（<code>parameters</code> JSON の S3 キー列挙 vs テーブル管理）</li>
+  <li>カット割り・トランジション・微ズームの ffmpeg パラメータ（kenburns の定数駆動パターンを踏襲）</li>
+</ul>
+
+<h2 id="references">9. 参考リンク（調査ソース。2026-07-26 時点）</h2>
 <ul>
   <li><a href="https://blog.edugate.jp/instagram-algorithm-2026/">2026年のInstagramアルゴリズム攻略法（eduGate）</a> — AI リールのラベルと到達率・ジャンル一貫性</li>
   <li><a href="https://tatap.jp/knowledge/instagram-reel-185/">Instagramリール徹底攻略 2026（tatap）</a> — 伸びるリールの構造条件</li>
   <li><a href="https://easyviral.ai/blog/faceless-content-taking-over-social-media">Faceless Content Is Taking Over Social Media in 2026（EasyViral）</a> — フェイスレス運用の普及状況</li>
   <li><a href="https://fluxnote.io/guides/faceless-instagram-reels-ideas-2026">27 Faceless Instagram Reels Ideas 2026（fluxnote）</a> — フェイスレス定番ジャンル</li>
   <li><a href="https://korpi.ai/blog/faceless-instagram-reels-guide">Faceless Instagram Reels Guide 2026（Korpi）</a> — psychology / facts 系のエンゲージメント傾向</li>
+  <li><a href="https://tatap.jp/knowledge/reels-production/">リール制作完全ガイド 2026（tatap）</a> — 15-3 で追加確認。成果が出やすい尺 15〜30 秒・冒頭 3 秒・完視聴率の重み</li>
+  <li><a href="https://rakko.tools/workshop/1121">リール動画収益化のやり方 2026（ラッコツールズ工房）</a> — 15-3 で追加確認。ループ構造と完視聴率の関係</li>
 </ul>
 
 </div>
