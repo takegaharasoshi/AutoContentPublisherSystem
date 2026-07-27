@@ -265,8 +265,9 @@
   - 確認: [batch-flow.html](app/batch-flow.html) 2.1 の方式カタログに新方式の行が追加され、データモデル・S3 キー規約への影響が Fix されている（DDL 変更があれば V003 として作成・適用、なければ不要と明記。V001 の `file_format` COMMENT 課題〔設計課題リスト 2026-07-25〕は V003 を起こす場合に合わせて解消する）。14-4 パターン（blocker のみ修正、持ち越しは設計課題リストへ）
   - 備考: 2026-07-27 完了（Fable 5）。引き継ぎ論点 10 項目（壁打ち記録 8.6 + 9.6）を全決定 — `quiz_items` 新設 + `audio_assets.asset_type`（SE を証跡一元管理へ統合）+ `file_format` COMMENT 解消を **V003** として作成し、ローカル MySQL・Aurora 双方へ適用・検証済み（複合 FK / UNIQUE の動作確認・`SHOW CREATE TABLE` の定義一致込み。Aurora は当日中のユーザー依頼で Data API 適用）。S3 規約に `assets/{set_code}/`（固定アセット・DB 管理なし・固定ファイル名規約）と `audio/{set_code}/se/` を追加。型選択は LRU に代えて**時間帯スロット**（`parameters.slots`・`GeneratorContext` に `scheduled_at` 追加）。LLM 既定 = `gpt-5.6-terra`。検証チェーン 4 段（プログラム検査 → L1 全列挙機械検証 → LLM 独立解答 → 類似度検査〔bigram Jaccard〕）・再生成上限 3 でフェイルラウド。詳細は [development-log.md](development-log.md) の 15-5 を参照
 
-- [ ] **15-6** 新方式 strategy の実装（Codex 委譲）
+- [x] **15-6** 新方式 strategy の実装（Codex 委譲）
   - 確認: `generators/<方式名>.py` 新規 + レジストリ 1 行 + テストで pytest 全パス、ローカル E2E（実 API）で最終メディア（リール用 MP4）の生成 → S3 保存 → DB 登録まで通る。ローカル E2E の最初に OpenAI テキスト API の最小疎通を確認する（15-4 決定: 既存キー共用のため独立疎通ステップは置かない）。CDK リソース（vCPU / メモリ）の見直し要否を判断済み（14-7 で 1 vCPU / 2 GB へ引き上げた経緯あり）。15-5 決定の共通部変更 2 点を含む: `GeneratorContext` へ `scheduled_at` 追加（[batch-flow.html](app/batch-flow.html) 2.1）・既存 kenburns の選曲クエリへ `asset_type='bgm'` 条件の追随（[data-model.html](app/data-model.html) 4.8）
+  - 備考: 2026-07-27 完了（Codex sol / high 委譲・レビューは Fable 5）。`gpt_quiz_multicut.py`（約 1,350 行）+ ユニット/E2E テストを実装し pytest 98 件全パス、実 API ローカル E2E（疎通 → 生成 → 検証 → MP4 → DB 登録）成功。レビューで blocker 3 件を検出・解消 — ①E2E 疎通の `max_output_tokens=4`（Responses API 下限 16 未満）②**ffmpeg 8 入力同時 zoompan のピーク 2.56 GB 実測 → OOM リスクのためセグメント逐次エンコード + concat 連結の 2 パス構成へ再構成（実測 1.13 GB）**③「⏸」が Noto Sans JP 未収録で豆腐 → 矩形描画へ置換。**CDK リソースは 1 vCPU / 2 GB 据え置きと判断**（②の再構成により kenburns と同水準に収まる）。`GeneratorContext` へは `scheduled_at` に加え `quiz_items` INSERT に必要な `generation_run_id` も追加（batch-flow.html 2.1 に追記）。詳細は [development-log.md](development-log.md) の 15-6 を参照
 
 **投入ブロック（セット追加運用手順〔operation.html 2.1〕の初回実地検証）**
 

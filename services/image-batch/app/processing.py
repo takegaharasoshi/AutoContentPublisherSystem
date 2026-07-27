@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 FILE_FORMATS: dict[str, tuple[str, str]] = {
     "jpg": ("images", "image/jpeg"),
+    "png": ("images", "image/png"),
     "mp4": ("videos", "video/mp4"),
 }
 
@@ -81,6 +82,8 @@ def process_prompt_configs(
                     cursor=cursor,
                     s3_client=s3_client,
                     s3_bucket=s3_bucket,
+                    scheduled_at=scheduled_at,
+                    generation_run_id=generation_run_id,
                 )
             )
         except Exception as exc:

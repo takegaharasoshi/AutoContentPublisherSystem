@@ -1,5 +1,6 @@
 """Tests for the OpenAI GPT Image final-image generator."""
 
+import datetime
 from io import BytesIO
 import json
 from unittest.mock import Mock
@@ -44,7 +45,14 @@ def test_generate_returns_jpeg_dimensions(
     client = object()
     jpeg = _jpeg_bytes(6, 10)
     prompt_config = _prompt_config()
-    context = GeneratorContext(prompt_config, Mock(), Mock(), "bucket")
+    context = GeneratorContext(
+        prompt_config,
+        Mock(),
+        Mock(),
+        "bucket",
+        datetime.datetime(2026, 7, 27, tzinfo=datetime.timezone.utc),
+        1,
+    )
 
     monkeypatch.setattr(
         gpt_image_single.openai_image,

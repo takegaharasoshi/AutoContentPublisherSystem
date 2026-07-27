@@ -8,7 +8,7 @@ from .contracts import (
     IntermediateOutput,
     MediaOutput,
 )
-from . import fake, gpt_image_kenburns, gpt_image_single
+from . import fake, gpt_image_kenburns, gpt_image_single, gpt_quiz_multicut
 
 
 __all__ = [
@@ -27,6 +27,7 @@ REGISTRY: dict[str, GeneratorFn] = {
     "fake": fake.generate,
     "gpt-image-kenburns": gpt_image_kenburns.generate,
     "gpt-image-single": gpt_image_single.generate,
+    "gpt-quiz-multicut": gpt_quiz_multicut.generate,
 }
 
 

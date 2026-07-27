@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
+import datetime
 from typing import Any
 
 from ..models import PromptConfig
@@ -45,6 +46,8 @@ class GeneratorContext:
     cursor: Any
     s3_client: Any
     s3_bucket: str
+    scheduled_at: datetime.datetime
+    generation_run_id: int
 
 
 GeneratorFn = Callable[[GeneratorContext], GeneratorResult]

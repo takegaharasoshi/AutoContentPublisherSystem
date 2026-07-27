@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY shared/acps_shared/ ./acps_shared/
 COPY services/image-batch/app/ ./app/
+COPY services/image-batch/fonts/ ./fonts/
 
 RUN useradd --system --no-create-home --uid 1001 appuser
 USER appuser

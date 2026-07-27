@@ -46,6 +46,8 @@ def _context(cursor: FakeCursor) -> GeneratorContext:
         cursor,
         Mock(),
         "bucket",
+        datetime.datetime(2026, 7, 27, tzinfo=datetime.timezone.utc),
+        1,
     )
 
 
@@ -95,7 +97,10 @@ def test_generate_rotates_audio_and_returns_audio_asset_id(
         result = gpt_image_kenburns.generate(_context(cursor))
 
     select_sql, select_params = cursor.calls[0]
-    assert "WHERE set_id = %s AND is_active = 1" in select_sql
+    assert (
+        "WHERE set_id = %s AND asset_type = 'bgm' AND is_active = 1"
+        in select_sql
+    )
     assert "ORDER BY last_used_at ASC, id ASC LIMIT 1" in select_sql
     assert select_params == (11,)
     update_sql, update_params = cursor.calls[1]

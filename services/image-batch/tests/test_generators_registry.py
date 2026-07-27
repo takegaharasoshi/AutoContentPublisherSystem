@@ -3,7 +3,11 @@
 import pytest
 
 from app.generators import GeneratorNotFoundError, REGISTRY, resolve_generator
-from app.generators import gpt_image_kenburns, gpt_image_single
+from app.generators import (
+    gpt_image_kenburns,
+    gpt_image_single,
+    gpt_quiz_multicut,
+)
 
 
 def test_resolve_generator_returns_registered_generator() -> None:
@@ -21,6 +25,14 @@ def test_resolve_generator_returns_gpt_image_kenburns_generator() -> None:
     assert (
         resolve_generator("gpt-image-kenburns")
         is gpt_image_kenburns.generate
+    )
+
+
+def test_resolve_generator_returns_gpt_quiz_multicut_generator() -> None:
+    """The quiz multi-cut video generator is registered."""
+    assert (
+        resolve_generator("gpt-quiz-multicut")
+        is gpt_quiz_multicut.generate
     )
 
 

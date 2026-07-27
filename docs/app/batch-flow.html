@@ -121,6 +121,8 @@
   時間帯によって出題の型を切り替える方式（<code>gpt-quiz-multicut</code>: 朝 = 軽い L1、昼 = L3、夜 = じっくり。15-4 決定）が実行予定時刻を必要とするため。
   値は共通骨格が確定済みの <code>generation_runs.scheduled_at</code> を渡す（方式が環境変数 <code>SCHEDULED_AT</code> を直接読むことはしない。正規化の一元化を維持）。
   既存方式は使用しないだけで影響はない（後方互換の追加）。
+  15-6 の実装時追記: 方式責務の <code>quiz_items</code> INSERT（<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）に必要な
+  <code>generation_run_id</code> も同時に実行コンテキストへ追加した（同じく共通骨格が確定済みの値を渡す後方互換の追加）。
 </div>
 
 <h4 id="generator-catalog">方式カタログ</h4>

@@ -78,6 +78,23 @@ def test_processing_skips_existing_prompt_and_counts_new_media(monkeypatch) -> N
     connection.rollback.assert_not_called()
 
 
+def test_processing_passes_schedule_and_run_id_to_generator(monkeypatch) -> None:
+    """Normalized execution identity is supplied through GeneratorContext."""
+    observed = {}
+
+    def generator(context):
+        observed["scheduled_at"] = context.scheduled_at
+        observed["generation_run_id"] = context.generation_run_id
+        return GeneratorResult([MediaOutput(b"image", "jpg")])
+
+    _process(monkeypatch, generator=generator)
+
+    assert observed == {
+        "scheduled_at": datetime.datetime(2026, 7, 19),
+        "generation_run_id": 2,
+    }
+
+
 def test_processing_passes_final_media_metadata_to_insert(monkeypatch) -> None:
     """All final-media metadata is persisted and controls S3 storage."""
     media = MediaOutput(
@@ -130,6 +147,22 @@ def test_processing_stores_intermediate_without_database_insert(monkeypatch) -> 
         "video/mp4",
     ]
     insert_media.assert_called_once()
+
+
+def test_processing_resolves_png_intermediate_content_type(monkeypatch) -> None:
+    """PNG intermediates use image/png while sharing the video prefix."""
+    generated = GeneratorResult(
+        [MediaOutput(b"video", "mp4")],
+        [IntermediateOutput(b"cut", "png", "_cut1", 0)],
+    )
+    _, _, put_object, _ = _process(
+        monkeypatch,
+        generator=lambda context: generated,
+    )
+
+    intermediate_call = put_object.call_args_list[0]
+    assert intermediate_call.args[1].endswith("_cut1.png")
+    assert intermediate_call.kwargs["content_type"] == "image/png"
 
 
 def test_intermediate_upload_failure_does_not_stop_final_media(monkeypatch) -> None:
