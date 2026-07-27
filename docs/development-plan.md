@@ -271,8 +271,9 @@
 
 **投入ブロック（セット追加運用手順〔operation.html 2.1〕の初回実地検証）**
 
-- [ ] **15-7** Instagram アカウントの開設と Secret 登録（外部作業含む。15-2 完了後に並行可）
+- [x] **15-7** Instagram アカウントの開設と Secret 登録（外部作業含む。15-2 完了後に並行可）
   - 確認: 勝負セット用の Instagram プロアカウントが開設され、アクセストークンが Secret 規約（`acps/prod/<set_code>/sns/instagram/<account_code>`）で Secrets Manager に登録済み。トークン失効日の手動リマインダーが登録されている（12-2 で未実施のままの fantasy-animals-1 分もここで合わせて登録する）
+  - 備考: 2026-07-27 完了。アカウント確定（**表示名「脳みそコーチのロジトレ」/ ユーザーネーム `nomiso_coach`** = 15-2 の「ロジトレ」系方針どおり・`account_code` = `main-account`）、Meta アプリは**既存流用**（ユーザー決定）。Secret `acps/prod/logic-training-1/sns/instagram/main-account` を作成し、Claude が読み取り専用の Graph API 呼び出しで**トークン実働（`username=nomiso_coach`・権限 5 種すべて付与）を裏取り**（実投稿は 15-10）。**設計書と実態のズレを 1 件発見**: `debug_token` の実測で両セットのトークンとも `expires_at=0`（無期限）であり operation.html 5.4 の「60 日失効」前提が成立していなかった。実効期限は `data_access_expires_at`（90 日・2026-10-25）で、**同一アプリ×同一ユーザーのため 1 回の再認可で全セットが同時延長される**（15-7 の再認可で `fantasy-animals-1` 分も延長されたことを実測確認）→ リマインダーを**アカウントごと → 全セット 1 件（2026-10-18）に集約**する方針へ改訂（ユーザー決定）し、両 Secret の `token_expires_at` メモを実測値へ更新。operation.html 5.1 / 5.4 を実態へ改訂（既存 FB ページ流用不可・アカウントセンターのクロスポスト確認・既存アプリ再認可時のページ選択注意・`/me/accounts` は Page ID であって `ig_user_id` ではない点・CloudShell での Secret 作成方式）。詳細は [development-log.md](development-log.md) の 15-7 を参照
 
 - [ ] **15-8** 音源の調達と登録（外部作業含む。15-4 完了後に並行可）
   - 確認: 15-4 の音源方針（CC0/フリー音源の継続）に沿った BGM 3〜5 曲が前処理（14-6 で確立した 2 パス loudnorm レシピを 20 秒尺に調整）済みで S3 `audio/<set_code>/` に配置され、ライセンス証跡込みで `audio_assets` にローカル & Aurora とも登録されている。SE 2 種（カウントダウンティック・正解チャイム）も CC0 で調達し、15-5 で確定した置き場・証跡方式で登録されている（15-4 決定）

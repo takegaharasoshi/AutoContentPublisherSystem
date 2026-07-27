@@ -64,7 +64,7 @@
     </tr>
     <tr>
       <td>SNS アカウント追加・Instagram トークン更新</td>
-      <td>Secret 作成 → DB 登録の順で追加。トークンは 60 日失効前に手動リフレッシュ（セクション 5）</td>
+      <td>Secret 作成 → DB 登録の順で追加。トークンはデータアクセス期限（<code>debug_token</code> の実測値）前に手動リフレッシュ（セクション 5）</td>
     </tr>
     <tr>
       <td>効果測定</td>
@@ -402,13 +402,25 @@ WHERE p.platform_post_id = '(Instagram media ID)';</code></pre>
 <h2 id="secret-ops">5. Secret 運用（SNS 認証・画像生成 API キー）・トークン更新</h2>
 
 <h3 id="instagram-account-setup">5.1 Instagram アカウント準備（プロアカウント化 〜 長期アクセストークン取得）</h3>
-<p>新しいセットで Instagram 投稿を行う場合、Secret 作成（<a href="#set-add">2.1 手順 1</a>・<a href="#account-add">5.3 手順 1</a>）の前提として毎回必要になる外部準備。Meta 側の UI・仕様は変更されうるため、詰まった場合は Meta 公式ドキュメント（<a href="https://developers.facebook.com/docs/instagram-platform/">Instagram Platform documentation</a>）を最新の一次情報として確認する。12-1（<code>fantasy-animals-1</code>・<code>main-account</code>）で実際に踏んだ手順を元に記載する。</p>
+<p>新しいセットで Instagram 投稿を行う場合、Secret 作成（<a href="#set-add">2.1 手順 1</a>・<a href="#account-add">5.3 手順 1</a>）の前提として毎回必要になる外部準備。Meta 側の UI・仕様は変更されうるため、詰まった場合は Meta 公式ドキュメント（<a href="https://developers.facebook.com/docs/instagram-platform/">Instagram Platform documentation</a>）を最新の一次情報として確認する。12-1（<code>fantasy-animals-1</code>・<code>main-account</code>）で実際に踏んだ手順を元に記載し、15-7（<code>logic-training-1</code>・<code>main-account</code>）の 2 セット目で判明した論点を追記した。</p>
 
 <h4>手順 1: Instagram プロアカウント化</h4>
 <p>投稿に使う Instagram アカウントをプロアカウント（ビジネス or クリエイター）に変更する。個人アカウントのままでは投稿 API を利用できない。</p>
+<div class="note">
+  <span class="callout-title">2 セット目以降: アカウントセンターへの追加とクロスポストの確認（2026-07-27）</span>
+  新規 Instagram アカウントの作成時に「このアカウントセンターで新しい Instagram アカウントを作成しますか？」と尋ねられる。<strong>既存アカウントセンターに追加してよい</strong>（アカウント切替が楽になり、後続手順の権限付与も同一 Facebook 個人アカウントで完結する。別アカウントセンターに分けても、どのみち同じ Facebook 個人アカウントからページを管理するため Meta 側では紐付き、分離の実効性は乏しい）。
+  ただし追加後は<strong>アカウントセンター →「コネクテッドエクスペリエンス」→「プロフィール間のシェア」がオフであることを確認する</strong>。オンだとセット間で投稿が相互転載され、セットごとの世界観が壊れる。
+  <br>15-7 時点では、当該機能は Facebook 個人アカウントまたは Threads をアカウントセンターに追加しないと有効化されない仕様であり（Instagram プロフィール同士だけでは選択肢が出ない）、確認のみで対応不要だった。
+</div>
 
 <h4>手順 2: Facebook ページとの連携</h4>
 <p>Instagram Graph API（投稿権限を含むフル機能版）は Facebook ページ経由の権限フローが必要で、Instagram プロアカウント 1 件につき Facebook ページが 1 件必要。</p>
+<div class="warn">
+  <span class="callout-title">2 セット目以降: 既存 Facebook ページは流用できない（2026-07-27）</span>
+  Facebook ページ 1 件にリンクできる Instagram プロフィールは 1 件のみで、逆も同様。既存セットのページに新しい Instagram アカウントをリンクしようとすると「Instagram プロフィールはすでにリンク済みです」で弾かれる。
+  <strong>セットを追加するたびに Facebook ページも新規作成する</strong>（ページ名は Instagram の表示名と揃えるとよい。カテゴリは API 動作に影響しない）。作成した新ページに切り替えてから、下記の連携手順を実行する。
+  <br>連携の途中でビジネスポートフォリオの選択を求められた場合は、既存の命名に揃えて <code>{set_code}</code> 名のポートフォリオを新規作成する。制限で作成できない場合は既存ポートフォリオへ追加しても差し支えない（トークン取得は <code>/me/accounts</code> でページ一覧を引くため、ポートフォリオの分け方に依存しない）。
+</div>
 <div class="note">
   <span class="callout-title">実施メモ（2026-07-19）</span>
   Instagram アプリ側の連携メニューからはうまく連携できなかったため、<strong>Facebook ページ側から</strong>以下の手順で連携した。
@@ -425,6 +437,11 @@ WHERE p.platform_post_id = '(Instagram media ID)';</code></pre>
 
 <h4>手順 3: Meta Developer アカウント + アプリ作成</h4>
 <p><a href="https://developers.facebook.com/">developers.facebook.com</a> で Meta Developer アカウントを作成（要 Facebook アカウント）→ 新規アプリ作成 → ユースケースは「Business」を選択する。App ID / App Secret が発行される（App Secret はトークン交換〔手順 5〕で使用する）。</p>
+<div class="decision">
+  <span class="callout-title">決定: 2 セット目以降は既存 Meta アプリを流用する（2026-07-27・15-7 のユーザー決定）</span>
+  1 つの Meta アプリで複数の Facebook ページ・複数の Instagram アカウントを扱えるため、<strong>セットごとに新規アプリを作らず既存アプリを流用する</strong>。本手順 3 をスキップでき、App ID / App Secret も再利用できる。手順 4 の Instagram テスター招待のみセットごとに実施する。
+  セットごとにアプリを分ければ障害・凍結の影響を切り離せるが、手順 3〜4 を一から実施する手間とレビュー基準の再確認が必要になるため、初期スコープでは流用を採る。
+</div>
 
 <h4>手順 4: アプリへの権限付与（App Review を回避する 2 つのロール）</h4>
 <p>本システムはユーザー自身のアカウントにのみ投稿するため、Meta の<strong>アプリレビューは不要</strong>（他者のアカウントに投稿する場合のみ必須）。代わりに以下 2 つのロールを設定する。</p>
@@ -441,23 +458,48 @@ WHERE p.platform_post_id = '(Instagram media ID)';</code></pre>
 
 <h4>手順 5: 権限付与とトークン取得</h4>
 <ol>
-  <li><strong>短期アクセストークンの取得</strong>: <a href="https://developers.facebook.com/tools/explorer">Graph API Explorer</a> を開く → 右上の「Meta App」で対象アプリを選択 → 「User or Page」→「Get User Access Token」→ 権限（<code>instagram_basic</code> / <code>instagram_content_publish</code> / <code>pages_show_list</code> / <code>pages_read_engagement</code> / <code>business_management</code>）を選択 → 「Generate Access Token」→ Facebook ログインのポップアップで許可する。「Access Token」欄の文字列が短期トークン（有効期限 1 時間）</li>
+  <li><strong>短期アクセストークンの取得</strong>: <a href="https://developers.facebook.com/tools/explorer">Graph API Explorer</a> を開く → 右上の「Meta App」で対象アプリを選択 → 「User or Page」→「Get User Access Token」→ 権限（<code>instagram_basic</code> / <code>instagram_content_publish</code> / <code>pages_show_list</code> / <code>pages_read_engagement</code> / <code>business_management</code>）を選択 → 「Generate Access Token」→ Facebook ログインのポップアップで許可する。「Access Token」欄の文字列が短期トークン（有効期限 1 時間）
+    <div class="warn" style="margin:.4rem 0 0;">
+      <span class="callout-title">既存アプリ流用時、権限付与ポップアップでのページ選択に注意（2026-07-27）</span>
+      再認可のポップアップでは管理対象ページのチェックリストが出る。<strong>今回追加するページにチェックを入れる</strong>（漏れると次の <code>/me/accounts</code> に新ページが出てこない）と同時に、<strong>運用中の既存セットのページのチェックを外さない</strong>。外すとそのページへのアクセスが取り消され、稼働中セットの投稿が停止する。
+      なお新しいトークンを発行しても既存の長期トークン文字列自体は失効しないため、既存セットの Secret を更新する必要はない。
+    </div>
+  </li>
   <li><strong>長期アクセストークンへの交換</strong>: ブラウザで以下の URL を値を埋めて開く（GET リクエストのため URL を開くだけでよい）
     <pre><code>https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&amp;client_id=&lt;APP_ID&gt;&amp;client_secret=&lt;APP_SECRET&gt;&amp;fb_exchange_token=&lt;SHORT_LIVED_TOKEN&gt;</code></pre>
-    <code>APP_ID</code> / <code>APP_SECRET</code> はアプリの「アプリの設定」→「基本設定」で確認できる。レスポンスの <code>access_token</code> が長期トークン、<code>expires_in</code>（秒。約 60 日）から失効日時を算出し <code>token_expires_at</code> として控える
+    <code>APP_ID</code> / <code>APP_SECRET</code> はアプリの「アプリの設定」→「基本設定」で確認できる。レスポンスの <code>access_token</code> が長期トークン。<code>token_expires_at</code> に控える値は <code>expires_in</code> ではなく <code>debug_token</code> の実測値を使う（算出方法は <a href="#token-refresh">5.4</a>）
   </li>
-  <li><strong><code>ig_user_id</code> の取得</strong>: Facebook ページ ID を用いて以下を開く
-    <pre><code>https://graph.facebook.com/v21.0/&lt;PAGE_ID&gt;?fields=instagram_business_account&amp;access_token=&lt;LONG_LIVED_TOKEN&gt;</code></pre>
-    返り値の <code>instagram_business_account.id</code> が <code>ig_user_id</code>。
-    <code>PAGE_ID</code> はページ「基本データ」画面の URL に出る数字で見つからない場合がある（Business Suite 上の別 ID を指している可能性がある）。その場合は以下で確認する
+  <li><strong><code>ig_user_id</code> の取得</strong>: 2 段階で引く。まず管理対象の Facebook ページ一覧から対象ページの <code>id</code>（= <code>PAGE_ID</code>）を確認する
     <pre><code>https://graph.facebook.com/v21.0/me/accounts?access_token=&lt;LONG_LIVED_TOKEN&gt;</code></pre>
-    管理者権限を持つページ一覧が返るので、その中の正しい <code>id</code> を使う
+    次にその <code>PAGE_ID</code> で Instagram 側の ID を引く
+    <pre><code>https://graph.facebook.com/v21.0/&lt;PAGE_ID&gt;?fields=instagram_business_account&amp;access_token=&lt;LONG_LIVED_TOKEN&gt;</code></pre>
+    返り値の <code>instagram_business_account.id</code> が <code>ig_user_id</code>（<code>17841</code> で始まる 17 桁前後の数字）。
+    <strong><code>/me/accounts</code> が返すのは Facebook ページ ID であり <code>ig_user_id</code> ではない</strong>点に注意する（15-7 で取り違えが発生した）。
+    ページ「基本データ」画面の URL に出る数字を <code>PAGE_ID</code> として使うと失敗する場合がある（Business Suite 上の別 ID を指している可能性があるため）ので、必ず <code>/me/accounts</code> の値を使う。
+    <br><code>instagram_business_account</code> フィールド自体が返らない場合は、ページと Instagram の連携が未完了か <code>instagram_basic</code> 権限が付いていない
   </li>
 </ol>
 <div class="note">
   <span class="callout-title">実値をこの手順の外に出さない</span>
   App Secret・アクセストークン・<code>ig_user_id</code> はすべてブラウザ操作で完結させ、会話ログ・コマンド履歴・チャットには残さない。取得した 3 値（<code>access_token</code> / <code>ig_user_id</code> / <code>token_expires_at</code>）はメモに控え、Secret 作成（<a href="#set-add">2.1 手順 1</a>・<a href="#account-add">5.3 手順 1</a>）ではマネジメントコンソールから直接入力する（<a href="#image-api-key">5.5</a> の画像生成 API キーと同じ理由。実 API キー・トークンはコンソール手動設定とし CLI・会話に残さない方針）。
 </div>
+
+<h4>手順 6: Secret を作成する（コンソールで入力できない場合の CloudShell 方式）</h4>
+<p>通常はマネジメントコンソールの Secrets Manager 画面から直接入力する（<a href="#set-add">2.1 手順 1</a>）。スマホの AWS コンソールアプリなど<strong>シークレット値の入力欄に貼り付けができない環境</strong>では、CloudShell から以下の 2 段階で作成する（15-7 で実施）。トークンをコマンドライン・シェル履歴に残さないことが要件。</p>
+<ol>
+  <li>トークンを環境変数へ読み込む。<strong>この 1 行だけを単独で貼り付けて実行する</strong>（複数行をまとめて貼ると続きの行が <code>read</code> の入力として消費されてしまう）。実行後の入力待ちでトークンを貼り付ける（画面には表示されない）
+    <pre><code>umask 077; read -rsp "token: " TOKEN; echo; echo "len=${#TOKEN}"</code></pre>
+    表示される <code>len</code> で貼り付け欠けを検知する（長期ユーザートークンは <code>EAA</code> 始まりの 190〜200 文字程度）
+  </li>
+  <li>一時ファイル経由で Secret を作成する。このコマンド自体にトークンは含まれないため履歴に残ってよい
+    <pre><code>printf '{"access_token":"%s","ig_user_id":"&lt;IG_USER_ID&gt;","token_expires_at":"&lt;EXPIRES_AT&gt;"}' "$TOKEN" &gt; ~/sec.json \
+  &amp;&amp; aws secretsmanager create-secret --region ap-northeast-1 \
+       --name acps/prod/&lt;set_code&gt;/sns/instagram/&lt;account_code&gt; \
+       --secret-string file://$HOME/sec.json; rm -f ~/sec.json; unset TOKEN</code></pre>
+    CloudShell の <code>$HOME</code> は永続化されるため、一時ファイルは <code>umask 077</code> で作成し実行後に必ず削除する
+  </li>
+</ol>
+<p>作り直す場合は <code>aws secretsmanager delete-secret --region ap-northeast-1 --secret-id &lt;名前&gt; --force-delete-without-recovery</code> で即時削除してからやり直す。</p>
 
 <h3 id="secret-final">5.2 Secret 名規約の最終確認</h3>
 <p>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2</a>）と、構成要素の意味付け（<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>）は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a>で確定済みであり、本規約に変更はない。<code>account_code</code> は Secret 名導出専用のため<strong>作成後変更不可</strong>。変更が必要な場合は新アカウント（新しい <code>account_code</code>）として追加し、旧アカウントは <code>is_active=0</code> にする。</p>
@@ -483,8 +525,29 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
 </ol>
 
 <h3 id="token-refresh">5.4 Instagram アクセストークン更新の具体手順とリマインド運用</h3>
+
+<div class="decision">
+  <span class="callout-title">決定: 期限は「60 日」ではなく <code>debug_token</code> の実測値で管理する（2026-07-27・15-7 の実測に基づく改訂）</span>
+  15-7 で 2 アカウント分のトークンを <code>debug_token</code> で確認したところ、<strong>いずれも <code>expires_at = 0</code>（無期限）</strong>であり、当初記載の「60 日で失効」は現構成では発生していなかった。実際に効く期限は<strong><code>data_access_expires_at</code>（データアクセス期限。再認可から 90 日）</strong>で、これを過ぎると再認可までデータアクセスが失われる。
+  <ul style="margin:.3rem 0 0;">
+    <li>無期限トークンが発行されるのは<strong>アプリが開発モードかつ当該ユーザーがアプリの管理者/開発者である</strong>現在の構成に依存する挙動。将来アプリを Live モードへ移行した場合は 60 日失効に戻る可能性があるため、移行時に本節を再確認する</li>
+    <li>複数セットのトークンが<strong>同一アプリ・同一 Facebook ユーザー</strong>で発行されている場合、<code>data_access_expires_at</code> はセットごとではなくユーザー×アプリの組で 1 つ。<strong>いずれか 1 セットの再認可で全セット分が同時に延長される</strong>（15-7 の再認可で既存 <code>fantasy-animals-1</code> の期限も 2026-10-25 へ延びたことを実測で確認）。したがってリマインダーは<strong>アカウントごとではなく 1 件に集約する</strong></li>
+    <li>期限の確認コマンド（トークン値を出力しない形で実行する）
+      <pre><code>aws secretsmanager get-secret-value --region ap-northeast-1 --secret-id &lt;Secret 名&gt; \
+  --query SecretString --output text | python3 -c "
+import sys, json, urllib.request, datetime
+d = json.load(sys.stdin); t = d['access_token']
+u = 'https://graph.facebook.com/v21.0/debug_token?input_token=%s&amp;access_token=%s' % (t, t)
+b = json.load(urllib.request.urlopen(u))['data']
+f = lambda x: datetime.datetime.fromtimestamp(x, datetime.timezone.utc).isoformat() if x else 'never'
+print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_access_expires_at')))"</code></pre>
+    </li>
+    <li><code>token_expires_at</code>（Secret 内の運用メモ）には <code>data_access_expires_at</code> の実測値を <code>YYYY-MM-DDTHH:MM:SSZ</code> で記録する</li>
+  </ul>
+</div>
+
 <ol>
-  <li>Instagram Graph API の長期アクセストークンは発行から<strong>60 日で失効</strong>する。失効前（目安: 失効の 7 日前まで）に Meta の長期トークン更新エンドポイントを呼び出し、新しいトークンと新しい失効日時を取得する</li>
+  <li>上記の実測値（<code>data_access_expires_at</code>）の<strong>7 日前を目安</strong>に、Meta の長期トークン更新フロー（<a href="#instagram-account-setup">5.1 手順 5</a> の再実行）でトークンを再発行し、新しい期限を取得する</li>
   <li>取得した新トークンで Secrets Manager の値を更新する（<code>access_token</code> と <code>token_expires_at</code> の両方を更新する）
     <pre><code>aws secretsmanager put-secret-value \
   --secret-id acps/prod/fashion-set-1/sns/instagram/main-account \
@@ -494,10 +557,12 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
 </ol>
 
 <div class="decision">
-  <span class="callout-title">決定: リマインド運用はアカウントごとの手動管理とする（自動リマインドは導入しない）</span>
+  <span class="callout-title">決定: リマインドは手動管理・全セットで 1 件に集約する（自動リマインドは導入しない）</span>
   <code>token_expires_at</code> は Secret 内の運用メモであり、アプリケーションはこの値を認証には使用しない（<a href="../infra/security.html">infra/security.html セクション 1.3</a>）。管理画面（将来拡張）がない現時点では、Secrets Manager から失効日時を横断的に一覧する仕組みも持たない。
-  そのため初期運用では、<strong>アカウント作成・トークン更新のたびに、失効日の 7 日前を目安に運用者自身がカレンダー等の外部ツールにリマインダーを設定する</strong>運用とする（セット数が少ない初期スコープでは許容範囲と判断）。
-  セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（設計課題リストに記録）。
+  そのため初期運用では、<strong>期限の 7 日前を目安に運用者自身がカレンダー等の外部ツールにリマインダーを設定する</strong>運用とする（セット数が少ない初期スコープでは許容範囲と判断）。
+  当初は「アカウントごとに登録」としていたが、上記のとおり <code>data_access_expires_at</code> がユーザー×アプリの組で共通であり 1 回の再認可で全セットが延長されるため、<strong>2026-07-27 以降はリマインダーを 1 件に集約する</strong>（セットごとにアプリを分けた場合はアプリごとに 1 件）。
+  <br><strong>現在の登録内容: 2026-10-18</strong>（期限 2026-10-25 の 7 日前。<code>fantasy-animals-1</code> / <code>logic-training-1</code> の両方をカバー）
+  <br>セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（設計課題リストに記録）。
 </div>
 
 <h3 id="image-api-key">5.5 画像生成 API キーの設定（Phase 10 開始時に必須）</h3>
