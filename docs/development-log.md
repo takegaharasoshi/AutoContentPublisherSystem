@@ -616,3 +616,25 @@
     **(6) ドキュメント更新**: [operation.html](app/operation.html) セクション 5.1 に (2) の 3 件と (3) の CloudShell 方式（手順 6 として新設）・既存アプリ流用の decision（手順 3）・既存アプリ再認可時のページ選択注意（手順 5-1。**運用中セットのページのチェックを外すと投稿が停止する**旨）を追記し、`ig_user_id` 取得手順を 2 段階へ書き直した。セクション 5.4 は (5) の実測に基づき全面改訂（decision 追加・`debug_token` での期限確認コマンド掲載・リマインド運用を 1 件集約へ）。セクション 1 の運用方針一覧の「60 日失効」表記も追随。
 
     **(7) スコープ外の明確化**: `sns_accounts` への DB 登録は [operation.html](app/operation.html) 2.1 の登録順序（`batch_sets` → `prompt_configs` → `caption_templates` → `sns_accounts`）に従い **15-10 の担当**のため本ステップでは実施していない。セット別設計書 `docs/app/sets/logic-training-1.html`（手順 0）は 15-9 の担当。確定したアカウント情報（表示名・ユーザーネーム・`account_code`・Secret 名）は 15-9 でセット別設計書セクション 2 に記載する。次は 15-8（音源・SE の調達と登録。外部作業）または 15-9。
+
+- [x] **15-8** 音源の調達と登録（外部作業含む）
+  - 確認: 15-4 の音源方針（CC0/フリー音源の継続）に沿った BGM が前処理（14-6 の 2 パス loudnorm レシピを 20 秒尺に調整）済みで S3 に配置され、ライセンス証跡込みで `audio_assets` にローカル & Aurora とも登録されている。SE 2 種（カウントダウンティック・正解チャイム）も同様に登録されている
+  - 備考: 2026-07-27 実施。
+
+    **(1) 途中で入った追加要件と構成の変更**: 作業開始後にユーザーから「1 日 3 回投稿の前提で **BGM を朝・昼・夜で出し分けたい**」という要件が出た（さらに問題プロンプト・動画デザインのだし分け、ストーリーズ投稿、問題の図示画像を含む計 4 要件。**15-8 完了後に壁打ちステップを挿入して展開する**方針をユーザーと合意し、[development-plan.md](development-plan.md) の Phase 15 に注記済み）。これを受けて本ステップは**「BGM 3〜5 曲」→「各時間帯 1 曲・計 3 曲」**の構成で実施した。S3 キーは将来のスロット別選曲を見越して <code>audio/logic-training-1/{morning,noon,night}/track01.m4a</code> に配置したが、**現行実装（`_select_audio_asset`）はプレフィックスを見ず `asset_type='bgm'` 全体を順繰りする**ため、この配置のままで既存実装と互換に動作する（スロット別に選ぶロジックは追加要件ブロックで実装。ファイルの置き直しは不要）。
+
+    **(2) 選曲（ユーザー外部作業・Claude が候補提示）**: 14-6 と同じく Pixabay は Cloudflare チャレンジで自動取得不可（トラックページも WebFetch が 403）だったため、Claude は**時間帯ごとの方向性 + 絞り込み検索リンク + 具体的な候補トラック URL**（WebSearch で収集）を提示し、ダウンロードはユーザーがブラウザで実施する 14-6 の役割分担を踏襲した。方向性は 15-5 のスロット設計（朝 = 軽い L1 / 昼 = L3 フェルミ推定 / 夜 = じっくり L1）に合わせ、朝 = 明るく軽快、昼 = クイズ番組風の軽い緊張感、夜 = 落ち着いた集中（ローファイ）とした。ユーザー選定は **朝 = Morning Coffee（Grand_Project・3:09）/ 昼 = Thinking Time（Music_For_Videos・0:53）/ 夜 = Study Lofi Music（alex-morgan・2:54）/ ティック = Clock Ticking SFX（Dragon-Studio・7.7 秒）/ チャイム = Correct（Dragon-Studio・1.32 秒）**、いずれも Pixabay Content License、切り出しは全曲 0 秒から（ユーザー指定）。
+
+    **(3) 前処理（Claude 実施）**: ffmpeg は WSL に無いため、**14-7 以降と同じく image-batch の Docker イメージ（`image-batch:ffmpeg-check`）を `--entrypoint ffmpeg` で使用**（14-6 の静的ビルド展開は不要になった）。BGM は 14-6 の 2 パス loudnorm レシピを 20 秒尺へ調整（パス 1 で**切り出し後の 20 秒区間**を解析 → `measured_*` + `offset` + `linear=true` をパス 2 で線形適用 → フェード in 0.5s / out 1.0s → AAC 128kbps 48kHz stereo）。実測 Integrated は **-14.5 / -13.8 / -14.1 LUFS（ばらつき 0.7 dB）**で 14-6（1.1 dB）より収斂した。SE は operation.html セクション 3 の決定どおり**ラウドネス正規化を掛けず**、ピーク -1.5 dBTP 調整 + 極短フェード（in 0.01s / out 0.03s）+ AAC 化のみ。**ティックは `silencedetect` で立ち上がりを解析し、1 秒周期であることを確認したうえで 0.445 秒から 5.0 秒（= 5 打）を切り出した**（方式は 10.0 秒地点に配置するため、先頭に約 30ms のプリロールを残してカット冒頭のクリックを回避し、1 打目が 10.03 秒 ≒ カウントダウン開始カードと揃う）。チャイムは 0 秒から 1.1 秒（原音は先頭無音なし・0.97 秒で減衰）。全 5 ファイルが AAC / 48kHz / stereo / 約 130〜140kbps・尺 20.000 / 5.000 / 1.100 秒であることを ffprobe で検証。**方式と同じミックス条件（BGM 等倍・ティック -6dB@10 秒・チャイム -3dB@15 秒）で 20 秒プレビューを 3 本生成しユーザーが試聴確認**した（実装前に SE の音量バランスを確認する目的。プレビューはスクラッチパッドのみ・S3 には置かない）。
+
+    **(4) S3 配置**: 5 ファイルを `s3://acps-prod-images-516964473143/audio/logic-training-1/` 配下（BGM 3 = スロット別サブプレフィックス、SE 2 = `se/` 直下の固定ファイル名）へ `--content-type audio/mp4` でアップロード。`audio/` は 30 日ライフサイクル対象外（14-6）。
+
+    **(5) `batch_sets` 行の前倒し作成（順序の判断）**: `audio_assets` は `set_id` の FK で `batch_sets` を参照するが、`logic-training-1` の `batch_sets` 行は計画上 15-10 で作成する想定だった。**Claude の判断で `batch_sets` 1 行のみ 15-8 へ前倒し**（バッチは `SET_CODE` 指定でのみセットを引き〔`find_batch_set_by_code`〕、Scheduler 追加は 15-11 のため、行の追加だけでは何も自動実行されない。15-9 の試し打ちでも使う）。登録値: `set_code='logic-training-1'` / `name='社会人のロジカルトレーニング（脳みそコーチ）'` / `generator_name='gpt-quiz-multicut'` / `is_active=1`。**採番はローカル id=44・Aurora id=2 とズレた**（ローカルはテスト実行で AUTO_INCREMENT が進んでいるため。アプリは `set_code` で引くため実害なし）。
+
+    **(6) `audio_assets` 登録（ローカル & Aurora）**: 5 行を証跡込みで登録（`title` / `source_url` / `license_type='Pixabay Content License'` / `acquired_at='2026-07-27'` / `duration_seconds` / `is_active=1` / `last_used_at` NULL、`license_note` に利用条件・スロット・切り出し位置と前処理内容・DL ファイル名）。**Aurora へは Claude が Data API で直接適用**（15-5 と同じ。auto-pause からの `DatabaseResumingException` はリトライで解消）。
+
+    **(7) 裏取り**: ①Aurora の 5 行を全カラム `SELECT` で確認 ②S3 の 5 オブジェクトを `head-object` で実在・`ContentType: audio/mp4` を確認 ③**BGM 順繰りクエリ**（`WHERE set_id=? AND asset_type='bgm' AND is_active=1 ORDER BY last_used_at ASC, id ASC LIMIT 1`）が未使用の朝トラックを返すこと ④**SE 存在検査クエリ**（`asset_type='se' AND is_active=1`）が固定ファイル名 2 キーを返すこと（方式は欠品時フェイルラウド）を、ローカル・Aurora の双方で確認。
+
+    **(8) 設計書更新**: [data-model.html](app/data-model.html) セクション 5 の S3 キー規約にスロット別 BGM の行と注記（現行実装と互換である旨・選曲ロジックは追加要件ブロックで実装）を追加、[operation.html](app/operation.html) セクション 3 手順 3 にスロット別プレフィックスの注記を追加。
+
+    **(9) 残課題・次ステップ**: `source_url` は WebSearch で URL を確認できた 2 件（昼 Thinking Time・チャイム Correct）以外の 3 件は**ダウンロードファイル名の Pixabay ID からの推定 URL**（ページが 403 で検証不可）。ID とファイル名は `license_note` に記録済みのため証跡としては追跡可能だが、正確な URL が判明した時点で UPDATE する。次は**追加要件 4 点の壁打ち**（朝昼夜のだし分け〔BGM 選曲ロジック・問題プロンプト・動画デザイン〕/ ストーリーズ投稿 / 問題の図示画像。Fable 5）→ その結論でステップを再展開してから 15-9 以降。

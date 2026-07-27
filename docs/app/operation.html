@@ -262,7 +262,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 
 <h4>手順 3: S3 への配置</h4>
 <pre><code>aws s3 cp track01.m4a s3://acps-prod-images-{アカウントID}/audio/{set_code}/track01.m4a</code></pre>
-<p><code>audio/</code> プレフィックスは 30 日ライフサイクルの対象外（Phase 14-6 で <code>images/</code>・<code>videos/</code> のプレフィックス限定へ変更済み。<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。</p>
+<p><code>audio/</code> プレフィックスは 30 日ライフサイクルの対象外（Phase 14-6 で <code>images/</code>・<code>videos/</code> のプレフィックス限定へ変更済み。<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。時間帯で BGM を出し分けるセット（<code>logic-training-1</code>）は <code>audio/{set_code}/{morning|noon|night}/track01.m4a</code> のスロット別プレフィックスに置く（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）。</p>
 
 <h4>手順 4: audio_assets への登録</h4>
 <p>セクション 2.1 手順 2 の (5) の INSERT を使う（証跡 3 点 + <code>duration_seconds</code> を必ず入れる）。</p>

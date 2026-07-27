@@ -442,6 +442,7 @@ LIMIT 1;</code></pre>
 videos/{set_code}/{YYYYMMDD}/{generation_run_id}/{prompt_config_id}_{output_index}.mp4          … 生成動画（動画方式の最終メディア）
 videos/{set_code}/{YYYYMMDD}/{generation_run_id}/{prompt_config_id}_{output_index}{接尾辞}.{拡張子} … 中間生成物（接尾辞は方式が定める。DB 記録なし）
 audio/{set_code}/{ファイル名}.m4a                                                                … 音源ストック BGM（audio_assets.s3_key、asset_type='bgm'）
+audio/{set_code}/{morning|noon|night}/{ファイル名}.m4a                                            … 時間帯スロット別 BGM（同上。15-8 追加。下記注記）
 audio/{set_code}/se/{固定ファイル名}.m4a                                                         … 効果音 SE（audio_assets.s3_key、asset_type='se'。15-5 追加）
 assets/{set_code}/{固定ファイル名}.png                                                           … 固定アセット（キャラポーズ画像等。DB 管理なし。15-5 追加）</code></pre>
   <ul style="margin:.3rem 0 0;">
@@ -450,6 +451,7 @@ assets/{set_code}/{固定ファイル名}.png                                   
     <li><code>{generation_run_id}</code> / <code>{prompt_config_id}</code> / <code>{output_index}</code> は <code>generated_media</code> の該当カラムそのもの。この 3 つの組み合わせは <code>UNIQUE (generation_run_id, prompt_config_id, output_index)</code> と一致するため、S3 キーの一意性は DB の一意性制約と対応する</li>
     <li>最終メディアの先頭プレフィックス（<code>images/</code> / <code>videos/</code>）と拡張子は <code>generated_media.file_format</code>（<code>'jpg'</code> → <code>images/…​.jpg</code>、<code>'mp4'</code> → <code>videos/…​.mp4</code>）に一致させる（Phase 14-4 で「拡張子は常に <code>.jpg</code>」の固定を廃止）</li>
     <li>中間生成物（動画方式のみ）は最終動画と同じ実行プレフィックス配下に方式が定める接尾辞で保存する。<strong>DB には記録しない</strong>（セクション 4.5。デバッグ・投稿前レビュー・将来のカバー画像指定用の参考ファイル）。接尾辞の実例: <code>gpt-image-kenburns</code> = <code>_source.jpg</code>（Ken Burns 元静止画）、<code>gpt-quiz-multicut</code> = <code>_cut1.png</code>〜<code>_cut4.png</code>（カット画像 4 枚。15-10 の投稿前レビューを動画を見ずにカード画像で行うため）</li>
+    <li><strong>時間帯スロット別 BGM（15-8 追加・実態の先行記録）</strong>: <code>logic-training-1</code> は朝・昼・夜で BGM を出し分ける要件（2026-07-27 追加要件）のため、BGM を <code>audio/{set_code}/{morning|noon|night}/</code> のスロット別プレフィックス配下に配置した。<strong>現行の選曲実装はプレフィックスを見ず <code>asset_type='bgm'</code> 全体を順繰りする</strong>ため、この配置は登録・再生とも既存実装と互換である（スロット別に選ぶロジックは追加要件の壁打ち後に実装する。<a href="../development-plan.md">development-plan.md</a> の Phase 15 注記）。SE はスロット共通のため <code>se/</code> 直下のまま</li>
     <li>音源ストックは生成物ではない長期資産のため<strong>日付プレフィックスを持たない</strong>。ファイル形式は前処理（<a href="operation.html#audio-mgmt">operation.html セクション 3</a>）で AAC（<code>.m4a</code>）に統一する（MP4 コンテナへ再エンコードなしで多重化できる形式）</li>
     <li><strong>固定アセット <code>assets/{set_code}/</code>（15-5 追加）</strong>: クイズ方式のキャラポーズ画像等、方式が組版に使う長期資産。日付プレフィックスなし。30 日ライフサイクルは <code>images/</code>・<code>videos/</code> プレフィックス限定のため<strong>対象外（CDK 変更不要）</strong>。<strong>DB 管理はせず、方式実装が期待する固定ファイル名規約で参照する</strong>（アセットは方式実装と密結合の閉じた集合で、参照を可変にする実益がないため。<code>parameters</code> JSON でのキー列挙・テーブル管理とも不採用〔15-5 決定〕）。方式は起動時に存在チェックを行い、欠品は設定ミスとして異常終了する（フェイルラウド）。自前制作物（生成 AI で制作した自作アセット）のためライセンス証跡は不要（音源との違い）</li>
   </ul>
