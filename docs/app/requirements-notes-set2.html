@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>勝負セット（セット 2）壁打ち記録（15-1〜15-4） | AutoContentPublisherSystem</title>
+<title>勝負セット（セット 2）壁打ち記録（15-1〜15-4・15-9） | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / 勝負セット（セット 2）壁打ち記録（15-1〜15-4）</nav>
-<h1>勝負セット（セット 2）壁打ち記録（15-1〜15-4）</h1>
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / 勝負セット（セット 2）壁打ち記録（15-1〜15-4・15-9）</nav>
+<h1>勝負セット（セット 2）壁打ち記録（15-1〜15-4・15-9）</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">Phase 15 意思決定ブロックの記録（15-4 まで段階更新）</span>
-  <span>最終更新: 2026-07-26（15-4 音源・運用パラメータの確定を記録。意思決定ブロック完了）</span>
+  <span class="badge badge-wip">Phase 15 意思決定ブロック + 15-9 追加壁打ちの記録</span>
+  <span>最終更新: 2026-07-28（15-9 生活溶け込み 4 要件の壁打ちを追記）</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
   Phase 15 意思決定ブロック（15-1 テーマ発散 → 15-2 テーマ確定 → 15-3 フォーマット・生成方式選定 → 15-4 音源・運用パラメータ）の壁打ち記録であり、設計書ではない。
-  1 本のノートを 15-1 で新設し 15-4 まで段階更新する（開発計画 Phase 15 注記のパターン）。15-5（設計 Fix）以降の入力として使用する。
+  1 本のノートを 15-1 で新設し 15-4 まで段階更新した（開発計画 Phase 15 注記のパターン）。2026-07-27 の要件追加を受けた 15-9（生活溶け込み 4 要件）の壁打ちもセクション 11 として本書に追記した。15-5 / 15-10（設計 Fix）以降の入力として使用する。
   上位の事業判断（収益化経路・予算・KPI・セットポートフォリオ）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする。
 </div>
 
@@ -324,6 +324,68 @@
   <li><a href="https://korpi.ai/blog/faceless-instagram-reels-guide">Faceless Instagram Reels Guide 2026（Korpi）</a> — psychology / facts 系のエンゲージメント傾向</li>
   <li><a href="https://tatap.jp/knowledge/reels-production/">リール制作完全ガイド 2026（tatap）</a> — 15-3 で追加確認。成果が出やすい尺 15〜30 秒・冒頭 3 秒・完視聴率の重み</li>
   <li><a href="https://rakko.tools/workshop/1121">リール動画収益化のやり方 2026（ラッコツールズ工房）</a> — 15-3 で追加確認。ループ構造と完視聴率の関係</li>
+</ul>
+
+<h2 id="tokekomi">11. 15-9 生活溶け込み 4 要件の壁打ち（2026-07-27 要件追加 → 2026-07-28 実施・4 巡 + 実測検証）</h2>
+
+<p>
+2026-07-27 のユーザー要件追加「勝負セットの投稿をフォロワーの生活への溶け込み方向へ拡張する 4 要件」—
+(1) BGM の朝昼夜だし分け (2) 問題（生成プロンプト）のだし分け (3) 動画デザインのだし分け (4) ストーリーズ投稿 + 問題を図示した画像 — を受けて 15-8 完了後に挿入した壁打ち。
+本壁打ちの結論で開発計画へ 15-10〜15-12 を挿入し、<strong>旧 15-9〜15-12 は 15-13〜15-16 へ再番号付けした</strong>（本ノートの 1〜10 章にある旧ステップ番号は読み替え。例: 9.3 の「15-11（Scheduler 実装）」= 現 15-15）。
+</p>
+
+<h3 id="tokekomi-slots">11.1 決定: だし分け 3 要件（BGM・問題・デザイン）</h3>
+<div class="decision">
+  <span class="callout-title">decision: スロット対応は slot_code を共通キーに 3 層で実装する（2026-07-28 ユーザー決定）</span>
+  <code>parameters.slots</code> の各エントリへ <strong><code>slot_code</code>（morning/noon/night）と <code>tone_hint</code>（自由文）を追加</strong>し、
+  <strong>BGM</strong> = <code>audio_assets.time_slot</code> カラム追加（V004。NULL = スロット無関係で既存セットは無影響）+ 選曲クエリへの条件追加（LRU はスロット内で維持）、
+  <strong>問題</strong> = <code>tone_hint</code> を LLM プロンプトへ差し込み（朝 = 出勤前のウォームアップ / 昼 = 昼休みの気分転換 / 夜 = 締めのじっくり。hook・coach_comment の口調に反映）、
+  <strong>デザイン</strong> = スロット別パレット（朝 = ライト / 昼 = 標準 / 夜 = ダーク）+ 時間帯ラベル帯（組版ロジックは共通・パレット注入のみ）で実現する。
+  s3_key の LIKE 前置一致で選曲を絞る案はキー規約への暗黙依存のため不採用。
+</div>
+
+<h3 id="tokekomi-stories">11.2 決定: ストーリーズ = リールと同一 MP4 の連続投稿</h3>
+<div class="decision">
+  <span class="callout-title">decision: 同一実行内でリール → ストーリーズを連続投稿する（2026-07-28 ユーザー決定）</span>
+  リールと同じ MP4 を Graph API <code>media_type=STORIES</code> でそのまま再掲する（キャプション不可・Scheduler / SFN 定義の変更なし）。
+  <code>posts</code> は <strong>media_type 別 2 行で独立記録</strong>するため UNIQUE (generation_run_id, sns_account_id) へ media_type を加える（V004）。
+  <strong>ストーリーズ失敗はリールの success を巻き戻さず、アラームのみ</strong>（自動再試行なしの現行方針踏襲）。
+  時差型（ストーリーズで出題 → 後でリールで答え）は動線として強いが SFN 分割かスケジュール倍増が必要なため初期は見送り。
+  ストーリーズの有効化はセット単位とし（fantasy-animals-1 は無効のまま）、方法は 15-10 で確定する。
+</div>
+
+<h3 id="tokekomi-figure">11.3 決定: 図示 = 全カット常駐の情景イラスト + コーチ表情切替（3 方式の実測比較）</h3>
+<p>
+当初の「ストーリーズ用の図示画像」はユーザー方向修正で「<strong>リール動画そのものへのインフォグラフィック挿入</strong>」へ変わり（1 run 1 メディアが維持され、生成メディアの追加は不要になった）、
+生成方式 3 案を固定 2 問（L1 順序当て・L3 フェルミ推定)の実 API 試し打ちで比較した（使い捨てスクリプト・非コミット。15-2 と同じ扱い）。
+</p>
+<table>
+  <tr><th>案</th><th>方式</th><th>実測結果</th><th>判定</th></tr>
+  <tr><td>A</td><td>LLM が閉じた figure_spec DSL（slots/steps）を出力 → Pillow 描画</td><td>gpt-5.6-terra が両問とも 1 発で適切な構造を出力（答えの漏出なし）。文字鮮明・機械検証可能</td><td>成立したが最終構成で不要化し不採用</td></tr>
+  <tr><td>B</td><td>問題文込みのインフォグラフィック全体を gpt-image-1 で直接生成（high・1024x1536）</td><td><strong>4/4 枚で欠陥</strong>: 誤字（ゴール→コール）・見切れ・順位当て問題で表彰台に人物を配置（答えの示唆/誤誘導）・推定フローの構造崩壊。どれが起きたか機械検証できない</td><td><strong>不採用</strong>（完全自動運用と両立せず。コストも月 ¥3,000 超）</td></tr>
+  <tr><td>C</td><td>テキストは現行どおりプログラム描画。画像生成 AI は<strong>文字なしの情景イラストのみ</strong>（medium・1024x1024）</td><td><strong>4/4 枚成立</strong>: 文字混入ゼロ（ゼッケンも無地)・「4 人並走・順位を示唆しない」の指示遵守・ブランド配色維持</td><td><strong>採用</strong>（ユーザー案）</td></tr>
+</table>
+<div class="decision">
+  <span class="callout-title">decision: 全カット常駐イラスト + コーチ表情切替の最終構成（2026-07-28 ユーザー決定）</span>
+  全 4 カット共通で「<strong>1 run 1 枚の情景イラスト + 脳みそコーチ + プログラム描画テキスト</strong>」を表示し、カット間は<strong>テキストとコーチの表情だけが変わる</strong>（答えカットはイラスト減光）。
+  イラストは LLM がクイズ生成時に <code>illustration_scene</code> フィールドを出力 → gpt-image-1（medium・文字/答え示唆の描画禁止指示）で生成し、シーン指示に時間帯ムードを織り込む。
+  現行 15-6 実装は既にカット別コーチポーズ 4 種（<code>COACH_FILENAMES</code>: hook/question/think/answer）を持つため表情切替は現行構造の延長で済み、<strong>A 案の figure_spec DSL・描画エンジンは丸ごと不要</strong>になる。
+  1 本の動画が「コーチと一緒に 1 問解く」体験として繋がり、アカウント名と一致するキャラが毎回全カットに映る。
+</div>
+<div class="decision">
+  <span class="callout-title">decision: 「画像 API 定常ゼロ」（8.4）を改訂し月 ¥600 前後を許容（2026-07-28 ユーザー決定）</span>
+  イラスト生成の定常コスト（medium 1024x1024 × 3 回/日）を許容する。イラスト内容の機械検証は不可のままだが、正確性（問題・ヒント・答え）はテキスト側の検証チェーンが担うため、<strong>イラストのズレは「品質の傷」であって「誤答」にはならない</strong>と整理。
+  生成は既存 kenburns セットが毎日実運用している images API パターン（リトライ・フェイルラウド）に乗せる。事業戦略書セクション 3 のコスト表更新は 15-10。
+</div>
+
+<h3 id="tokekomi-handover">11.4 15-10（設計 Fix）への引き継ぎ論点</h3>
+<ul>
+  <li>V004 の詳細設計: <code>time_slot</code> の値域（<code>slot_code</code> と一致させる方式）/ <code>posts</code> UNIQUE 拡張と既存行の扱い</li>
+  <li><code>illustration_scene</code> の検証仕様（文字数上限・禁止事項の列挙・検証チェーンへの組み込み方）</li>
+  <li>イラスト生成失敗時の扱い（フェイルラウドか「イラストなしで続行」の縮退か）</li>
+  <li>ストーリーズのセット単位有効化方法（fantasy-animals-1 は無効のまま）</li>
+  <li>スロットラベルの文言（「朝の頭の体操」等）とスロット別パレットの具体色</li>
+  <li>コーチをイラスト内へ登場させる方式（15-2 実証済みの参照画像方式）の採否</li>
 </ul>
 
 </div>
