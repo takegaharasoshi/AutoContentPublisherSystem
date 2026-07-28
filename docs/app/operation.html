@@ -125,9 +125,11 @@
     <li>Query Editor の「最近」タブでは SQL 中の日本語が文字化けして表示されるが、表示上の問題のみで保存データは正しい（utf8mb4）</li>
   </ul>
 </div>
-<pre><code>-- (1) batch_sets（generator_name は方式カタログ〔batch-flow.html セクション 2.1〕の方式名を設定する）
-INSERT INTO batch_sets (set_code, name, description, generator_name, is_active)
-VALUES ('fashion-set-2', 'ファッション系セット2', 'セット2の説明', '(方式名)', 1);
+<pre><code>-- (1) batch_sets（generator_name は方式カタログ〔batch-flow.html セクション 2.1〕の方式名を設定する。
+--     リール成功後にストーリーズへ再掲するセットは stories_enabled=1 を指定する〔省略時 0 = 無効。
+--     batch-flow.html セクション 3.3〕）
+INSERT INTO batch_sets (set_code, name, description, generator_name, stories_enabled, is_active)
+VALUES ('fashion-set-2', 'ファッション系セット2', 'セット2の説明', '(方式名)', 0, 1);
 -- 発行された id を以降の set_id として使う
 
 -- (2) prompt_configs（初期運用は is_active=1 を 1 件のみ）
@@ -145,9 +147,11 @@ VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);
 
 -- (5) audio_assets（動画方式のセットのみ。前処理済み音源を S3 に配置してから登録する。
 --     調達・前処理・証跡の詳細はセクション 3。asset_type 省略時は DEFAULT 'bgm'。
---     gpt-quiz-multicut 方式の SE 2 種は asset_type='se' + 固定ファイル名で登録する〔セクション 3〕）
-INSERT INTO audio_assets (set_id, s3_key, title, source_url, license_type, license_note, acquired_at, duration_seconds, is_active)
-VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', '(曲名)', '(出典 URL)', 'CC0', NULL, '2026-07-24', 10, 1);</code></pre>
+--     gpt-quiz-multicut 方式の SE 2 種は asset_type='se' + 固定ファイル名で登録する〔セクション 3〕。
+--     時間帯で BGM を出し分けるセットは time_slot に parameters.slots の slot_code
+--     〔morning / noon / night 等〕を指定する〔省略時 NULL = スロット無関係。data-model.html セクション 4.8〕）
+INSERT INTO audio_assets (set_id, s3_key, time_slot, title, source_url, license_type, license_note, acquired_at, duration_seconds, is_active)
+VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', NULL, '(曲名)', '(出典 URL)', 'CC0', NULL, '2026-07-24', 10, 1);</code></pre>
 
 <h4>手順 3: CDK の ImageBatchStack に EventBridge Scheduler を追加して deploy する</h4>
 <p>入力に <code>set_code</code> を指定したスケジュールを 1 件追加する（1 日複数回投稿する場合は複数時刻分）。cron 式・Scheduler 定義の書き方は <a href="../infra/workflow.html">infra/workflow.html</a>、変更後のデプロイは <code>cdk deploy -c env=prod ImageBatchStack</code>（<strong>イメージタグ 3 つの Context 指定が必須</strong>。指定ルール・現行タグの確認方法は <a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。</p>
@@ -171,6 +175,8 @@ VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', '(曲名)', '(出典 URL)', 
     <li>キャプションテンプレートに AI 開示ハッシュタグ <code>#AIart</code> を含めた（セクション 3）</li>
     <li>動画方式のセットは、前処理済み音源（3〜5 曲）を S3 の <code>audio/{set_code}/</code> に配置し、証跡（出典 URL・ライセンス種別・取得日）込みで <code>audio_assets</code> に登録した（セクション 3）</li>
     <li>gpt-quiz-multicut 方式のセットは、SE 2 種（カウントダウンティック・正解チャイム）を <code>audio/{set_code}/se/</code> の固定ファイル名で配置し、<code>asset_type='se'</code> + 証跡込みで <code>audio_assets</code> に登録した（セクション 3）。固定アセット（キャラポーズ画像等）を <code>assets/{set_code}/</code> に配置した（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）</li>
+    <li>時間帯で BGM を出し分けるセットは、<code>parameters.slots</code> の全 <code>slot_code</code> について <code>time_slot</code> 一致（または NULL）の有効 BGM が 1 曲以上あることを確認した（0 件のスロットがあると当該スロットの実行が異常終了する。セクション 3）</li>
+    <li>ストーリーズ再掲するセットは <code>batch_sets.stories_enabled=1</code> を設定した（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
   </ul>
@@ -265,7 +271,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 <p><code>audio/</code> プレフィックスは 30 日ライフサイクルの対象外（Phase 14-6 で <code>images/</code>・<code>videos/</code> のプレフィックス限定へ変更済み。<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。時間帯で BGM を出し分けるセット（<code>logic-training-1</code>）は <code>audio/{set_code}/{morning|noon|night}/track01.m4a</code> のスロット別プレフィックスに置く（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）。</p>
 
 <h4>手順 4: audio_assets への登録</h4>
-<p>セクション 2.1 手順 2 の (5) の INSERT を使う（証跡 3 点 + <code>duration_seconds</code> を必ず入れる）。</p>
+<p>セクション 2.1 手順 2 の (5) の INSERT を使う（証跡 3 点 + <code>duration_seconds</code> を必ず入れる）。時間帯で BGM を出し分けるセットは <code>time_slot</code> に S3 のスロットプレフィックスと同じ <code>slot_code</code>（<code>morning</code> / <code>noon</code> / <code>night</code> 等）を指定する（選曲のスロット判定はこのカラムで行い、S3 プレフィックスは配置規約に留める。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。</p>
 
 <h4>効果音（SE）の調達・登録（gpt-quiz-multicut 方式のセットのみ。Phase 15-5 新設）</h4>
 <p>クイズ方式はカウントダウンティック・正解チャイムの SE 2 種（15-4 ユーザー決定）を使う。SE は <strong>BGM ローテーション外・カットタイミング固定の固定アセット</strong>だが、証跡一元管理の原則を保つため <code>audio_assets</code> に <code>asset_type='se'</code> で登録する（<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。</p>
@@ -281,6 +287,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li>選曲は<strong>順繰り</strong>（<code>asset_type='bgm'</code> のうち <code>last_used_at</code> が最古の有効レコード。未使用曲が最優先。SE は対象外）。曲の追加はいつでも INSERT のみでよい（追加曲は未使用のため次回に使われる）</li>
   <li>曲を外す場合は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す）</li>
   <li><strong>動画方式のセットで有効音源が 0 件になると画像生成バッチが異常終了する</strong>（設定ミス扱い。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。<code>prompt_configs</code> の差し替えと同様、無効化する場合は先に代替曲を登録してから行い、0 件になる瞬間を作らない</li>
+  <li><strong>時間帯スロット対応のセット（<code>gpt-quiz-multicut</code>）の 0 件判定はスロットごと</strong>: あるスロットで「<code>time_slot</code> 一致 + NULL（共通曲）」の有効 BGM が 0 件になると、当該スロットの実行だけが異常終了する（他スロットは動き続けるため気づきにくい）。スロット別曲の差し替え時も「先に代替を登録してから無効化」を守り、スロット単位で 0 件の瞬間を作らない（15-10。順繰り〔<code>last_used_at</code> 最古〕はスロット絞り込み内で維持される）</li>
 </ul>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>
@@ -291,7 +298,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li>失敗時はメール通知（MonitoringStack のアラーム / EventBridge Rule。仕組みは <a href="../infra/workflow.html">infra/workflow.html</a> セクション 7〜10）を受ける</li>
   <li>Step Functions 実行履歴・CloudWatch Logs で、どのステートで・どのアカウントで失敗したかを確認する</li>
   <li><code>posts</code> テーブルで失敗の詳細（<code>status</code> / <code>error_message</code> / <code>api_response</code>）を確認する:
-    <pre><code>SELECT p.id, p.status, p.error_message, p.api_response, p.updated_at,
+    <pre><code>SELECT p.id, p.media_type, p.status, p.error_message, p.api_response, p.updated_at,
        sa.account_code, gr.scheduled_at
 FROM posts p
 JOIN sns_accounts sa ON sa.id = p.sns_account_id
@@ -318,7 +325,12 @@ WHERE id = :post_id
   AND status = 'published_unconfirmed';</code></pre>
 
 <h4>failed / published_unconfirmed を未投稿として再試行可能にする</h4>
-<p>Instagram 側で未投稿を確認し、原因を解消した上で実行する。<code>posts</code> は <code>UNIQUE (generation_run_id, sns_account_id)</code> のため新規行は作れず、既存行を <code>pending</code> に戻して「最初から実行」扱いにする（<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a> の復旧ロジック）。Instagram のメディアコンテナは時間経過で無効になり得るため、<code>platform_container_id</code> を含めてクリアし常にコンテナ作成からやり直す。</p>
+<p>Instagram 側で未投稿を確認し、原因を解消した上で実行する。<code>posts</code> は <code>UNIQUE (generation_run_id, sns_account_id, media_type)</code> のため新規行は作れず、既存行を <code>pending</code> に戻して「最初から実行」扱いにする（<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a> の復旧ロジック）。Instagram のメディアコンテナは時間経過で無効になり得るため、<code>platform_container_id</code> を含めてクリアし常にコンテナ作成からやり直す。</p>
+<div class="warn">
+  <span class="callout-title">注意: ストーリーズ行（media_type='story'）にはこの補正は効かない</span>
+  投稿対象の決定はリール行の終端状態で決まるため（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）、ストーリーズ行を <code>pending</code> に戻しても後続実行では再選択・再処理されない。
+  ストーリーズは 24 時間で消える再掲コンテンツであり遅延再投稿の価値が低いため、<strong>失敗したストーリーズ行は <code>failed</code> のまま欠番として許容する</strong>（15-10。リール本体の投稿は成立している）。どうしても再掲したい場合のみ、Graph API を手動で呼び出す（バッチの再実行では行わない）。
+</div>
 <pre><code>UPDATE posts
 SET status = 'pending',
     platform_container_id = NULL,
@@ -360,7 +372,7 @@ LIMIT 1;</code></pre>
   stale 専用の CloudWatch アラームやカスタムメトリクスは追加しない（<a href="batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a> の「通知は既存の Step Functions 失敗アラーム 1 本に一本化」という決定と整合させる）。運用者は既存の失敗通知を起点に、以下のクエリで stale な行の有無を確認する運用とする。
   <pre><code>-- 各セットの actionable な (generation_run, account) を一覧表示（古い順）
 SELECT bs.set_code, gr.id AS generation_run_id, gr.scheduled_at,
-       sa.account_code, p.status, p.updated_at
+       sa.account_code, p.media_type, p.status, p.updated_at
 FROM generation_runs gr
 JOIN batch_sets bs ON bs.id = gr.set_id
 JOIN sns_accounts sa ON sa.set_id = gr.set_id AND sa.is_active = 1
@@ -372,6 +384,7 @@ ORDER BY gr.scheduled_at ASC;</code></pre>
 
 <ul>
   <li><strong>判定の目安</strong>: 1 日複数回実行する運用のため、<code>status</code> が <code>pending</code> / <code>container_created</code> のまま <code>updated_at</code> から半日以上経過している行は stale の疑いが強い（対応する Step Functions 実行がすでに終了しているにもかかわらず DB が更新されていない状態）。行が存在しない（<code>p.id IS NULL</code>）だけの場合は、直近の生成実行がまだ処理待ちなだけの通常状態であり stale ではない</li>
+  <li><strong>ストーリーズ行（<code>media_type='story'</code>。V004）の stale は後続投稿をブロックしない</strong>: 投稿対象の決定はリール行の終端状態で決まるため（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）、ストーリーズ行が途中状態のまま残っても次の生成実行の投稿は進む。補正は同じく 4.2 の手順で終端状態（実際の投稿有無に応じて <code>success</code> / <code>failed</code>）へ更新して記録を確定させるのみでよい（<code>pending</code> へ戻す補正は効かない — 4.2 の注意を参照）</li>
   <li><strong>対応</strong>: 対象の Step Functions 実行履歴・CloudWatch Logs で実際の投稿有無を確認し、4.2 の手順で <code>success</code>（実際は投稿済みだった場合）または <code>failed</code>（実際は未投稿だった場合）の終端状態に補正する。終端状態に補正することで、後続の投稿対象決定が次の生成実行へ進めるようになる</li>
   <li>将来的にセット別失敗時ポリシー（追いつく / 捨てる。<a href="batch-flow.html#future-failure-policy">batch-flow.html</a>）を導入する際は、stale データの扱いも合わせて再設計する</li>
 </ul>

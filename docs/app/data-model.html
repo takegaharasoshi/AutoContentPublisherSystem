@@ -136,7 +136,7 @@
     <tr>
       <td><code>batch_sets</code></td>
       <td>セット定義（1 セット = 1 テーマ）。外部識別子は <code>set_code</code></td>
-      <td>旧設計の <code>max_post_retries</code> は削除（自動再試行を行わない方針のため不要）。生成方式の割当カラム <code>generator_name</code> を持つ（セクション 4.1）。それ以外の将来のセット別設定拡張はカラム追加ではなくセット別設計書（<a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>）で表現する</td>
+      <td>旧設計の <code>max_post_retries</code> は削除（自動再試行を行わない方針のため不要）。バッチが実行時に参照する挙動スイッチとして、生成方式の割当カラム <code>generator_name</code> とストーリーズ有効化フラグ <code>stories_enabled</code>（V004。セクション 4.1）を持つ。それ以外の将来のセット別設定拡張（挙動を切り替えないもの）はカラム追加ではなくセット別設計書（<a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>）で表現する</td>
     </tr>
     <tr>
       <td><code>prompt_configs</code></td>
@@ -175,8 +175,8 @@
     </tr>
     <tr>
       <td><code>posts</code></td>
-      <td>投稿 1 件（<strong>生成実行 × アカウント</strong>。キャプション・投稿ステータス・メディア種別・プラットフォーム投稿 ID を持つ）</td>
-      <td>旧 <code>post_records</code>（画像 × アカウント × 試行）を「投稿」単位に再編。<code>attempt_number</code> 相当のカラムは持たない。Phase 14-4 で <code>media_type</code>（フィード画像 / リール）を追加（セクション 4.6）</td>
+      <td>投稿 1 件（<strong>生成実行 × アカウント × メディア種別</strong>。キャプション・投稿ステータス・メディア種別・プラットフォーム投稿 ID を持つ）</td>
+      <td>旧 <code>post_records</code>（画像 × アカウント × 試行）を「投稿」単位に再編。<code>attempt_number</code> 相当のカラムは持たない。Phase 14-4 で <code>media_type</code>（フィード画像 / リール）を追加、Phase 15-10（V004）で <code>'story'</code> を加え UNIQUE を media_type 別へ拡張（セクション 4.6）</td>
     </tr>
     <tr>
       <td><code>post_media</code><br><span style="font-size:.85em">（旧 <code>post_images</code>）</span></td>
@@ -238,6 +238,16 @@
   </ul>
 </div>
 
+<div class="decision">
+  <span class="callout-title">決定（2026-07-29、Phase 15-10）: ストーリーズ連続投稿の有効化フラグ stories_enabled の追加（V004）</span>
+  <code>stories_enabled TINYINT(1) NOT NULL DEFAULT 0</code> を追加する。<code>1</code> のセットは SNS 投稿バッチがリール投稿成功後に同一動画をストーリーズへ再掲する（15-9 ユーザー決定。フローは <a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>セット単位のカラムで持つ理由</strong>: ストーリーズ再掲は「セットの投稿演出」の選択であり（15-9 でセット単位の有効化を決定）、バッチが実行時に参照する挙動スイッチのため設計書では表現できない（<code>generator_name</code> と同じ性質）。<code>sns_accounts</code> に持つと複数アカウント時に設定が分散し、生成方式（<code>generator_name</code>）に絡めると投稿側の関心が生成側へ漏れる</li>
+    <li><code>DEFAULT 0</code> により既存セット（fantasy-animals-1）の挙動は不変。<code>logic-training-1</code> の有効化は 15-14 のセット登録時に UPDATE で行う</li>
+    <li><code>TINYINT(1)</code> は <code>is_active</code> と同型（真偽フラグの既存慣行）</li>
+  </ul>
+</div>
+
 <h3 id="detail-prompt-configs">4.2 prompt_configs</h3>
 <ul>
   <li><code>is_active=1</code> の全件が画像生成バッチのループ対象（<a href="batch-flow.html#flow-image">batch-flow.html セクション 2</a>）。初期運用は 1 セット 1 件のみ有効化する運用ルールで「1 起動 1 枚生成」を実現する</li>
@@ -288,7 +298,8 @@ ORDER BY gr.scheduled_at ASC, gr.id ASC
 LIMIT 1;</code></pre>
   <p>この定義により: (1) 新規の <code>generation_run</code>（<code>posts</code> なし）は当然対象になる (2) Step Functions Retry による同一実行内のタスク再起動時も<strong>同じ生成実行が再選択</strong>され、<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2 の復旧ロジック</a>（<code>pending</code> / <code>container_created</code> からの再開）が機能する (3) 異常終了（Step Functions のリトライ上限到達等）で <code>pending</code> / <code>container_created</code> のまま残った <code>generation_run</code> は、後続の別実行でも自動的に再選択され続ける（stale データとして後続投稿をブロックし得る問題の検知・補正手順は <a href="operation.html#stale-data">operation.html セクション 4.3</a> で確定した）。
   「一度でも試行（失敗含む）した生成実行は自動では再対象にしない」（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>）は、「有効な全アカウントが終端状態に達した」場合を指すと解釈する。</p>
-  <p>インデックスは <code>generation_runs.uq_generation_runs_set_id (set_id, id)</code>（<code>scheduled_at</code> 順スキャン）と <code>posts.uq_posts_generation_run_account (generation_run_id, sns_account_id)</code>（<code>NOT EXISTS</code> 部分検索）の左端プレフィックスで十分であり、追加インデックスは設けない。</p>
+  <p>インデックスは <code>generation_runs.uq_generation_runs_set_id (set_id, id)</code>（<code>scheduled_at</code> 順スキャン）と <code>posts.uq_posts_generation_run_account_media (generation_run_id, sns_account_id, media_type)</code>（<code>NOT EXISTS</code> 部分検索。V004 拡張後も左端プレフィックスで使用できる）の左端プレフィックスで十分であり、追加インデックスは設けない。</p>
+  <p><strong>ストーリーズ行（<code>media_type='story'</code>。V004）は本クエリの判定に影響しない</strong>: ストーリーズ行はリール行が <code>success</code> に達した後にのみ作成される（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）ため、「終端状態の <code>posts</code> が存在するか」の判定は常に先行するリール（またはフィード画像）行で決まり、クエリ自体は V004 後も変更しない。この不変条件により、ストーリーズが未投稿・失敗のまま残っても後続の生成実行の投稿はブロックされない（リールの success を巻き戻さない 15-9 決定と整合）。</p>
 </div>
 
 <h3 id="detail-generated-images">4.5 generated_media（旧 generated_images）</h3>
@@ -324,13 +335,24 @@ LIMIT 1;</code></pre>
     <li><strong>カラムで持つ理由</strong>（方式・セット設定からの都度導出にしない）: 投稿履歴の照会（どの投稿がリールか）が JOIN なしで行え、投稿時点の事実がスナップショットとして残る（<code>batch_sets.generator_name</code> の割当変更に影響されない。キャプションスナップショットと同じ設計思想）</li>
     <li><code>DEFAULT 'feed_image'</code> は V002 適用時の既存行の埋め戻しを兼ねる（既存投稿はすべてフィード画像のため正しい）</li>
     <li>ENUM とする理由: 値は投稿 API の分岐に直結する閉じた集合であり、値の追加（カルーセル等）は投稿処理の実装追加を必ず伴うため、DDL 変更を伴う ENUM で不整合を防ぐ（<code>generator_name</code> を ENUM にしない判断〔セクション 4.1〕とは逆の性質）</li>
-    <li>5 状態遷移・<code>UNIQUE (generation_run_id, sns_account_id)</code>・投稿対象決定クエリ（セクション 4.4）は<strong>変更しない</strong></li>
+    <li>5 状態遷移・<code>UNIQUE (generation_run_id, sns_account_id)</code>・投稿対象決定クエリ（セクション 4.4）は<strong>変更しない</strong>（V002 時点。UNIQUE はその後 V004 で <code>media_type</code> を加えて拡張した — 下記 decision）</li>
     <li><strong>14-9 実装時の補足</strong>: 値は <code>pending</code> INSERT 時に設定するのに加え、投稿試行のたびに実行するキャプションスナップショット更新でも同じ導出値を書き込む（同一生成実行のメディアは不変のため導出値は常に一致し、V002 適用前に作られた既存行〔<code>DEFAULT 'feed_image'</code>〕が残っていた場合の自己修復を兼ねる）</li>
   </ul>
 </div>
 
+<div class="decision">
+  <span class="callout-title">決定（2026-07-29、Phase 15-10）: ストーリーズ連続投稿を media_type 別の独立行で記録する（V004）</span>
+  リールと同一 MP4 を同一実行内で連続投稿する 15-9 ユーザー決定（<a href="requirements-notes-set2.html#tokekomi-stories">15-9 壁打ち記録 11.2</a>）を受け、V004 で以下を変更する。
+  <ul style="margin:.3rem 0 0;">
+    <li><code>media_type</code> ENUM へ <code>'story'</code> を末尾追加。<code>feed_image</code> / <code>reel</code> は従来どおり先頭メディアの <code>file_format</code> から導出するのに対し、<strong><code>story</code> はリール行 <code>success</code> 後の連続投稿行としてアプリが明示設定する</strong>（導出ではない。ストーリーズ行の作成条件は <a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
+    <li><code>UNIQUE (generation_run_id, sns_account_id)</code> → <code>(generation_run_id, sns_account_id, media_type)</code> へ拡張（インデックス名 <code>uq_posts_generation_run_account_media</code>）。リール行とストーリーズ行を独立記録し、<strong>ストーリーズの失敗がリール行の <code>success</code> を巻き戻さない</strong>ことを構造で保証する。既存行は (generation_run_id, sns_account_id) で一意のため拡張後の制約を自明に満たし、既存データの埋め戻しは不要</li>
+    <li>ストーリーズ行も 5 状態遷移（<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a>）をそのまま使う。ストーリーズはキャプション非対応のため <code>caption_template_id</code> / <code>caption_text_snapshot</code> は NULL のまま</li>
+    <li>有効化はセット単位の <code>batch_sets.stories_enabled</code>（セクション 4.1）。失敗の定義・検知経路は <a href="batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a></li>
+  </ul>
+</div>
+
 <ul>
-  <li><code>posts</code> の <code>UNIQUE (generation_run_id, sns_account_id)</code> により 1 投稿対象につき常に 1 行。状態遷移は <a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a> の 5 状態（<code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）をそのまま <code>status</code> ENUM に反映する</li>
+  <li><code>posts</code> の <code>UNIQUE (generation_run_id, sns_account_id, media_type)</code>（V004 拡張）により 1 投稿対象 × 1 メディア種別につき常に 1 行。ストーリーズを有効化しないセットでは従来どおり 1 投稿対象 1 行、有効化したセットではリール行 + ストーリーズ行の最大 2 行になる。状態遷移は <a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a> の 5 状態（<code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）をそのまま <code>status</code> ENUM に反映する</li>
   <li><code>caption_template_id</code>（nullable FK）+ <code>caption_text_snapshot</code>: <code>posts</code> 行は本文組み立て前（<code>pending</code> 作成時）に INSERT されるため、当初は両方 NULL。本文組み立て時（<a href="batch-flow.html#sns-steps">セクション 3.3 手順 3</a>）に UPDATE で設定する</li>
   <li><code>post_media</code> は 1 投稿 : N メディア（将来のカルーセル）に対応する中間テーブル。初期構築では生成実行内の先頭メディア（<code>generated_media.id</code> 昇順で最初の 1 件）のみを <code>display_order=0</code> で 1 行登録する（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3 手順 2</a>）。参照カラムは V002 で <code>generated_image_id</code> → <code>generated_media_id</code> にリネームする</li>
 </ul>
@@ -367,6 +389,7 @@ LIMIT 1;</code></pre>
       <tr><td><code>set_id</code></td><td><code>batch_sets.id</code> への FK。音源はセット専属（世界観に合わせた選曲のため、セット間で共有しない）</td></tr>
       <tr><td><code>s3_key</code></td><td>前処理済み完成音源の S3 キー（<code>audio/{set_code}/...</code>。セクション 5）。<strong>前処理済み（動画方式の尺に合わせた切り出し・音量正規化・フェード適用・AAC）のファイルのみを登録する</strong>（前処理は事前手動。<a href="operation.html#audio-mgmt">operation.html セクション 3</a>）</td></tr>
       <tr><td><code>asset_type</code><span class="badge badge-fixed" style="margin-left:.4rem">15-5 追加</span></td><td>音源種別（<code>ENUM('bgm','se') NOT NULL DEFAULT 'bgm'</code>。V003）。<code>'bgm'</code> = 順繰り選曲の対象、<code>'se'</code> = カットタイミング固定の効果音（下記 decision）</td></tr>
+      <tr><td><code>time_slot</code><span class="badge badge-fixed" style="margin-left:.4rem">15-10 追加</span></td><td>時間帯スロット（<code>VARCHAR(20) NULL</code>。V004）。値域は <code>parameters.slots</code> の <code>slot_code</code> と同一の文字列（<code>morning</code> / <code>noon</code> / <code>night</code> 等）。NULL = スロット無関係（下記 decision）</td></tr>
       <tr><td><code>title</code></td><td>曲名（管理用の表示名）</td></tr>
       <tr><td><code>source_url</code></td><td>出典 URL（ライセンス証跡）</td></tr>
       <tr><td><code>license_type</code></td><td>ライセンス種別（<code>'CC0'</code> / <code>'Pixabay License'</code> 等の文字列。調達先の追加で DDL 変更を伴わせないため ENUM にしない）</td></tr>
@@ -382,6 +405,7 @@ LIMIT 1;</code></pre>
   <p style="margin:.4rem 0 0;"><strong>選曲アルゴリズムは順繰り</strong>とする: 有効レコードのうち <code>last_used_at</code> が最も古い 1 件（未使用 = NULL を最優先、同値は <code>id</code> 昇順）を選ぶ。均等ローテーションで連続同曲がなく、挙動が決定的で追いやすい。</p>
   <pre><code>SELECT id, s3_key FROM audio_assets
 WHERE set_id = :set_id AND asset_type = 'bgm' AND is_active = 1  -- asset_type 条件は 15-5（V003）で追加
+  AND (time_slot = :slot_code OR time_slot IS NULL)  -- スロット対応方式のみ（15-10・V004）。スロット非対応方式は AND time_slot IS NULL
 ORDER BY last_used_at ASC, id ASC  -- MySQL は ASC で NULL（未使用）が先頭に来る
 LIMIT 1;</code></pre>
   <ul style="margin:.3rem 0 0;">
@@ -401,6 +425,19 @@ LIMIT 1;</code></pre>
     <li><strong>SE の参照は固定ファイル名規約</strong>で行う（<code>countdown_tick.m4a</code> / <code>answer_chime.m4a</code>）。方式は起動時に該当 <code>s3_key</code> の有効レコード（<code>asset_type='se'</code>・<code>is_active=1</code>）の存在を検査し、欠品は設定ミスとして異常終了する（BGM 0 件と同じフェイルラウド方針）。<code>last_used_at</code> は SE では使用しない（NULL のまま）</li>
     <li><strong>既定値 <code>'bgm'</code></strong> は V002 で登録済みの既存 4 曲（fantasy-animals-1）の埋め戻しを兼ねる（既存曲はすべて BGM のため正しい）</li>
     <li><strong>既存方式（gpt-image-kenburns）の選曲クエリへの <code>asset_type='bgm'</code> 条件追加は 15-6 で追随する</strong>（fantasy-animals-1 に SE レコードは存在しないため、追随までの実挙動は現行と同値）</li>
+  </ul>
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-07-29、Phase 15-10）: BGM の時間帯スロット対応 time_slot の追加（V004）</span>
+  朝・昼・夜で BGM を出し分ける要件（<a href="requirements-notes-set2.html#tokekomi-slots">15-9 壁打ち記録 11.1</a>）のため <code>time_slot VARCHAR(20) NULL</code> を追加する。
+  値域は <code>prompt_configs.parameters</code> の <code>slots</code> 各エントリの <code>slot_code</code> と同一の文字列（<code>morning</code> / <code>noon</code> / <code>night</code> 等）とし、
+  <strong>選曲・S3 プレフィックス・デザイン切替が同じキー（<code>slot_code</code>）を参照する</strong>（<code>s3_key</code> の LIKE 前置一致で選曲を絞る案はキー規約への暗黙依存のため不採用 = 15-9）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>VARCHAR にする理由</strong>: スロット構成はセット設定（<code>parameters.slots</code>）で可変であり、スロットの追加で DDL 変更を伴わせない（<code>quiz_type</code> / <code>generator_name</code> と同じ判断。<code>asset_type</code> / <code>media_type</code> のような「値の追加が実装追加を必ず伴う閉じた集合」ではない）</li>
+    <li><strong>NULL = スロット無関係</strong>。スロット対応方式（<code>gpt-quiz-multicut</code>）は <code>(time_slot = :slot_code OR time_slot IS NULL)</code> で全スロット共通曲も対象に含め、順繰り（<code>last_used_at</code> 最古）はその絞り込み内で維持する。該当 0 件は設定ミスとして異常終了する（BGM 0 件と同じフェイルラウド方針）</li>
+    <li><strong>スロット非対応方式（<code>gpt-image-kenburns</code>）は <code>AND time_slot IS NULL</code> を追随</strong>し、スロット専用曲を誤って使わない（fantasy-animals-1 は全行 NULL のため実挙動は現行と同値。実装は 15-11）</li>
+    <li>SE はスロット共通のため NULL のまま。<code>logic-training-1</code> の既存 BGM 3 行（15-8 登録）は V004 適用後に <code>s3_key</code> のスロットプレフィックスどおり <code>morning</code> / <code>noon</code> / <code>night</code> を埋め戻した</li>
   </ul>
 </div>
 
@@ -450,8 +487,8 @@ assets/{set_code}/{固定ファイル名}.png                                   
     <li><code>{YYYYMMDD}</code> は <code>generation_runs.scheduled_at</code>（UTC）の日付部分。日付プレフィックスにより S3 コンソール・CLI での目視確認や範囲指定操作がしやすくなる</li>
     <li><code>{generation_run_id}</code> / <code>{prompt_config_id}</code> / <code>{output_index}</code> は <code>generated_media</code> の該当カラムそのもの。この 3 つの組み合わせは <code>UNIQUE (generation_run_id, prompt_config_id, output_index)</code> と一致するため、S3 キーの一意性は DB の一意性制約と対応する</li>
     <li>最終メディアの先頭プレフィックス（<code>images/</code> / <code>videos/</code>）と拡張子は <code>generated_media.file_format</code>（<code>'jpg'</code> → <code>images/…​.jpg</code>、<code>'mp4'</code> → <code>videos/…​.mp4</code>）に一致させる（Phase 14-4 で「拡張子は常に <code>.jpg</code>」の固定を廃止）</li>
-    <li>中間生成物（動画方式のみ）は最終動画と同じ実行プレフィックス配下に方式が定める接尾辞で保存する。<strong>DB には記録しない</strong>（セクション 4.5。デバッグ・投稿前レビュー・将来のカバー画像指定用の参考ファイル）。接尾辞の実例: <code>gpt-image-kenburns</code> = <code>_source.jpg</code>（Ken Burns 元静止画）、<code>gpt-quiz-multicut</code> = <code>_cut1.png</code>〜<code>_cut4.png</code>（カット画像 4 枚。15-10 の投稿前レビューを動画を見ずにカード画像で行うため）</li>
-    <li><strong>時間帯スロット別 BGM（15-8 追加・実態の先行記録）</strong>: <code>logic-training-1</code> は朝・昼・夜で BGM を出し分ける要件（2026-07-27 追加要件）のため、BGM を <code>audio/{set_code}/{morning|noon|night}/</code> のスロット別プレフィックス配下に配置した。<strong>現行の選曲実装はプレフィックスを見ず <code>asset_type='bgm'</code> 全体を順繰りする</strong>ため、この配置は登録・再生とも既存実装と互換である（スロット別に選ぶロジックは追加要件の壁打ち後に実装する。<a href="../development-plan.md">development-plan.md</a> の Phase 15 注記）。SE はスロット共通のため <code>se/</code> 直下のまま</li>
+    <li>中間生成物（動画方式のみ）は最終動画と同じ実行プレフィックス配下に方式が定める接尾辞で保存する。<strong>DB には記録しない</strong>（セクション 4.5。デバッグ・投稿前レビュー・将来のカバー画像指定用の参考ファイル）。接尾辞の実例: <code>gpt-image-kenburns</code> = <code>_source.jpg</code>（Ken Burns 元静止画）、<code>gpt-quiz-multicut</code> = <code>_cut1.png</code>〜<code>_cut4.png</code>（カット画像 4 枚。15-14 の投稿前レビューを動画を見ずにカード画像で行うため）+ <code>_illustration.png</code>（情景イラスト原画。15-10 追加。イラスト単体の品質確認・デバッグ用）</li>
+    <li><strong>時間帯スロット別 BGM（15-8 追加・15-10 で設計 Fix）</strong>: <code>logic-training-1</code> は朝・昼・夜で BGM を出し分ける要件（2026-07-27 追加要件）のため、BGM を <code>audio/{set_code}/{morning|noon|night}/</code> のスロット別プレフィックス配下に配置する。<strong>選曲のスロット判定は <code>audio_assets.time_slot</code> カラム（V004。セクション 4.8）で行い、S3 プレフィックスはキーの見通しのための配置規約に留める</strong>（プレフィックスをロジックが解釈することはしない。実装は 15-11 — それまでの現行実装は <code>time_slot</code> を見ずに全体を順繰りするが、fantasy-animals-1 は全行 NULL・logic-training-1 は未稼働のため実害なし）。SE はスロット共通のため <code>se/</code> 直下のまま</li>
     <li>音源ストックは生成物ではない長期資産のため<strong>日付プレフィックスを持たない</strong>。ファイル形式は前処理（<a href="operation.html#audio-mgmt">operation.html セクション 3</a>）で AAC（<code>.m4a</code>）に統一する（MP4 コンテナへ再エンコードなしで多重化できる形式）</li>
     <li><strong>固定アセット <code>assets/{set_code}/</code>（15-5 追加）</strong>: クイズ方式のキャラポーズ画像等、方式が組版に使う長期資産。日付プレフィックスなし。30 日ライフサイクルは <code>images/</code>・<code>videos/</code> プレフィックス限定のため<strong>対象外（CDK 変更不要）</strong>。<strong>DB 管理はせず、方式実装が期待する固定ファイル名規約で参照する</strong>（アセットは方式実装と密結合の閉じた集合で、参照を可変にする実益がないため。<code>parameters</code> JSON でのキー列挙・テーブル管理とも不採用〔15-5 決定〕）。方式は起動時に存在チェックを行い、欠品は設定ミスとして異常終了する（フェイルラウド）。自前制作物（生成 AI で制作した自作アセット）のためライセンス証跡は不要（音源との違い）</li>
   </ul>
@@ -511,6 +548,14 @@ assets/{set_code}/{固定ファイル名}.png                                   
       <li><code>audio_assets</code> へ <code>asset_type ENUM('bgm','se') NOT NULL DEFAULT 'bgm'</code> を追加（セクション 4.8）</li>
       <li><code>generated_media.file_format</code> の COMMENT を実態（<code>jpg</code> / <code>mp4</code> 等・<code>media_type</code> 導出の入力）へ更新（設計課題リスト 2026-07-25 の解消）</li>
       <li><strong>適用順序</strong>: 全変更が追加的（新テーブル・DEFAULT 付きカラム追加・COMMENT 修正のみ）で既存アプリの参照と互換のため、アプリのデプロイとの順序調整は不要（V002 のような無停止コーディネートは行わない）</li>
+    </ul>
+  </li>
+  <li><strong>V004（生活溶け込み拡張差分。Phase 15-10 で作成・適用）</strong>の内容は本書の Phase 15-10 決定を正とする:
+    <ul style="margin:.2rem 0 0;">
+      <li><code>audio_assets</code> へ <code>time_slot VARCHAR(20) NULL</code> を追加（セクション 4.8）</li>
+      <li><code>posts.media_type</code> ENUM へ <code>'story'</code> を末尾追加し、UNIQUE を <code>(generation_run_id, sns_account_id, media_type)</code> へ拡張（セクション 4.6）</li>
+      <li><code>batch_sets</code> へ <code>stories_enabled TINYINT(1) NOT NULL DEFAULT 0</code> を追加（セクション 4.1）</li>
+      <li><strong>適用順序</strong>: 全変更が追加的（NULL/DEFAULT 付きカラム追加・ENUM 値の末尾追加・UNIQUE の緩和方向の拡張のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。既存 <code>posts</code> 行は (generation_run_id, sns_account_id) で一意のため拡張後の UNIQUE を自明に満たし、データの埋め戻しは不要。適用後に <code>logic-training-1</code> の BGM 3 行へ <code>time_slot</code> を埋め戻す（DDL ファイルにはデータ更新を含めない — 15-8 の登録と同じく運用データ操作として実施）</li>
     </ul>
   </li>
 </ul>

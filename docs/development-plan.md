@@ -292,6 +292,7 @@
 
 - [ ] **15-10** 生活溶け込み拡張の設計 Fix + V004
   - 確認: V004（`audio_assets.time_slot`・`posts` の UNIQUE への media_type 追加）が作成されローカル & Aurora へ適用済み。方式仕様（`illustration_scene` の検証仕様・イラスト生成失敗時の扱い・全カット合成・コーチ 4 表情・スロット別パレット）・選曲のスロット対応・ストーリーズ投稿フロー（セット単位の有効化方法を含む）が batch-flow.html / data-model.html / operation.html へ反映され、事業戦略書セクション 3 のコスト表（画像 API 定常費の復活）が更新されている。14-4 パターン（blocker のみ修正、持ち越しは設計課題リストへ）
+  - 備考: 2026-07-29 実施（Fable 5）。**Aurora への V004 適用のみ未実施**（権限クラシファイアのブロック。15-5 と同じ事象。ユーザー依頼による Data API 実行または Query Editor で V004 全文 → `logic-training-1` の BGM 3 行へ `time_slot` 埋め戻し UPDATE → `SHOW CREATE TABLE` 裏取り、の順で完了させる）。それ以外は完了 — 引き継ぎ論点 6 項目を全決定し `database/V004__life_fit_extension.sql`（`audio_assets.time_slot` / `posts.media_type` へ `'story'` 追加 + UNIQUE の media_type 拡張 / `batch_sets.stories_enabled`）を作成、ローカル MySQL へ適用・検証済み（SHOW CREATE 確認 + 機能検証: リール行 + ストーリーズ行の 2 行併存 OK・同種別 2 行目は ERROR 1062 で拒否・埋め戻し 3 行済み）。方式仕様 = `illustration_scene` はプログラム検査のみ（必須・最大 200 字。禁止事項・時間帯ムードはコード側固定プロンプトで担保）・イラスト生成失敗はフェイルラウド（縮退なし）・パレットはコード側定数 + `parameters.slots` へ `slot_label` 追加・コーチのイラスト内登場は不採用。**検知経路の正確化 1 件**: 終端状態で確定した投稿失敗は SFN Retry の再実行が成功終了するため `ExecutionsFailed` に現れず、検知は ECS タスク異常終了通知が担う（ストーリーズ失敗も同経路。batch-flow.html 3.4 に明記）。batch-flow.html（方式カタログ・3.1〜3.4）/ data-model.html（4.1 / 4.4 / 4.6 / 4.8 / 5 / 8）/ operation.html（2.1 / 3 / 4）/ 事業戦略書セクション 3（画像 API 定常費の復活 + LLM テキスト API 費目の追加）を更新。詳細は [development-log.md](development-log.md) の 15-10 を参照
 
 - [ ] **15-11** image-batch 拡張実装（Codex 委譲）
   - 確認: gpt-quiz-multicut にスロット選曲（`time_slot`）・`tone_hint` 差し込み・スロット別パレット/ラベル・情景イラスト生成（images API・リトライ）と全カット合成が実装され、pytest 全パス、ローカル E2E（実 API）で 3 スロットぶんの MP4 生成まで通る。kenburns の選曲クエリの `time_slot` 追随（NULL 許容）を含む
@@ -337,6 +338,7 @@
 |---|---|---|---|
 | 2026-07-18 | 10-3 | V001 の複合 FK 5 本（`generated_images` 2 本・`posts` 3 本）に付けていた `COMMENT` 句が MySQL 構文違反（FOREIGN KEY 制約は COMMENT をサポートしない）。V001 は実 MySQL で未実行のため潜伏しており、10-4 の適用時に ERROR 1064 で失敗するところだった | 10-3 の構文検証（sqlfluff・MySQL 方言）で検出。COMMENT の記載内容を FK 直前の行コメントへ移動して解消（`UNIQUE KEY`・`KEY` の COMMENT は正当な構文のため残置）。全 9 テーブルのパース成功を再検証済み |
 | 2026-07-18 | 10-4 | Query Editor での V001 初回実行が全 9 文 `Incorrect database name 'acps '; Error code: 1102` で失敗。接続ダイアログのデータベース名に末尾空白が入っていた（コピペ起因）。テーブルは 1 つも作られない | データベース名を空白なしの `acps` で入力し直して再実行 → 全文成功。Query Editor の接続ダイアログは入力値の前後空白をトリムしないため、DB 名はコピペ後に空白を確認する |
+| 2026-07-29 | 15-10 | `docker exec -i acps-mysql mysql ... < V004.sql` で DDL を適用すると、mysql クライアントの既定文字コードが latin1 のため日本語 COMMENT が二重エンコードで保存される（utf8mb4 クライアントで読むと文字化け。latin1 クライアントで読むと一見正常に見えるため気づきにくい） | カラム・インデックスを一度戻してから `--default-character-set=utf8mb4` を付けて再適用し解消。ローカル MySQL への SQL ファイル適用・日本語を含む SQL 実行では同オプションを必須とする（初回起動時の自動適用〔docker-entrypoint-initdb.d〕はサーバー設定で utf8mb4 になるため影響なし） |
 
 ## 設計課題リスト
 

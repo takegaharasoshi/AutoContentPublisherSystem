@@ -146,9 +146,9 @@
     </tr>
     <tr>
       <td><code>gpt-quiz-multicut</code></td>
-      <td>LLM テキスト API による問題生成（構造化フィールド方式）→ 自己検証（LLM 独立解答 + L1 は全列挙の機械検証）→ 重複検査（出題履歴 <code>quiz_items</code>）→ Pillow 完全プログラム組版（画像生成 API 不使用。固定キャラアセット + 日本語フォントを合成しカット画像 4 種を生成）→ ffmpeg 多カット連結（BGM + 効果音 SE）の 6 段チェーンで、20 秒・4 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式。出題の型（L1/L3）は <code>parameters</code> の時間帯スロットで切り替える</td>
-      <td>設計 Fix 済み・実装前（Phase 15-3 で選定、15-5 で設計 Fix。実装は 15-6、logic-training-1 が採用予定）</td>
-      <td>15-12 で作成予定（「本採用時に作成」ルール。それまでの設計の正は 15-5 の設計 Fix〔data-model.html セクション 4.8/4.9/5・<a href="../development-log.md">development-log.md</a> 15-5〕）</td>
+      <td>LLM テキスト API による問題生成（構造化フィールド方式）→ 自己検証（LLM 独立解答 + L1 は全列挙の機械検証）→ 重複検査（出題履歴 <code>quiz_items</code>）→ 情景イラスト生成（LLM が出力する <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚。15-10 追加）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔カット別 4 表情〕+ 日本語フォントを時間帯スロット別パレットで合成しカット画像 4 種を生成）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、20 秒・4 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式。出題の型（L1/L3）・口調・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える</td>
+      <td>実装済み・拡張実装中（Phase 15-3 で選定、15-5 で設計 Fix、15-6 で実装。15-9〜15-10 の生活溶け込み拡張〔イラスト常駐・スロットだし分け〕の実装は 15-11、logic-training-1 が採用予定）</td>
+      <td>15-16 で作成予定（「本採用時に作成」ルール。それまでの設計の正は 15-5 / 15-10 の設計 Fix〔data-model.html セクション 4.8/4.9/5・<a href="../development-log.md">development-log.md</a> 15-5 / 15-10〕）</td>
     </tr>
   </tbody>
 </table>
@@ -163,7 +163,7 @@
 </div>
 
 <h2 id="flow-sns">3. SNS 投稿バッチ処理フロー</h2>
-<p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（メディア単位ではない）。フィード画像投稿とリール投稿の違いは手順内の分岐（<code>posts.media_type</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）に閉じ、投稿対象の決定・状態遷移・失敗方針は共通。</p>
+<p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（メディア単位ではない）。フィード画像投稿とリール投稿の違いは手順内の分岐（<code>posts.media_type</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）に閉じ、投稿対象の決定・状態遷移・失敗方針は共通。ストーリーズ再掲（<code>batch_sets.stories_enabled</code> のセットのみ。V004・15-10）もこの単位の内側で「リール成功後の追加投稿行（<code>media_type='story'</code>）」として扱い、投稿対象の決定は変えない（3.3 手順 2 の 7）。</p>
 
 <h3 id="sns-target">3.1 投稿対象の決定</h3>
 <ol>
@@ -193,7 +193,7 @@
 </div>
 
 <h3 id="posts-state">3.2 posts の状態遷移（冪等性・二重投稿防止）</h3>
-<p><code>posts</code> は生成実行 × アカウントで一意（UNIQUE 制約 <code>(generation_run_id, sns_account_id)</code>）とし、<strong><code>attempt_number</code> 相当のカラムは持たない</strong>。自動再試行を行わない初期方針のため、1 つの投稿対象について作られる行は常に 1 行であり、その行の状態遷移だけで進行状況を表現する。</p>
+<p><code>posts</code> は生成実行 × アカウント × メディア種別で一意（UNIQUE 制約 <code>(generation_run_id, sns_account_id, media_type)</code>。V004 で <code>media_type</code> を追加）とし、<strong><code>attempt_number</code> 相当のカラムは持たない</strong>。自動再試行を行わない初期方針のため、1 つの投稿対象・1 メディア種別について作られる行は常に 1 行であり、その行の状態遷移だけで進行状況を表現する（ストーリーズを有効化したセットではリール行 + ストーリーズ行の最大 2 行。ストーリーズ行も同じ 5 状態を使う）。</p>
 
 <div class="table-wrap">
 <table>
@@ -218,6 +218,7 @@
     <li><code>failed</code> / <code>published_unconfirmed</code> → スキップ（同一実行内の Step Functions Retry でも自動では再試行しない。終端状態の扱いは全実行を通じて一貫させる）</li>
   </ul>
   この分岐により、Step Functions Retry が働いても既に成功・終端状態のアカウントへの無駄な API 呼び出しは発生しない。
+  なお<strong>ストーリーズ行（<code>media_type='story'</code>）はこの復旧分岐の対象外</strong>: 投稿対象の決定が先行するリール行で決まるため、リール行が終端状態に達した実行は Retry で再選択されない（ストーリーズ行が途中状態のまま残った場合の扱いは 3.3 の decision を参照）。
 </div>
 
 <h3 id="sns-steps">3.3 処理手順</h3>
@@ -242,10 +243,21 @@
           <li>重複 publish 応答、またはタイムアウト・接続断で結果不明 → <code>status='published_unconfirmed'</code> に更新</li>
         </ul>
       </li>
+      <li><strong>ストーリーズ再掲（<code>batch_sets.stories_enabled=1</code> のセットのみ。Phase 15-10 追加）</strong>: リール行が <code>success</code> に達した場合のみ、同一動画をストーリーズへ再掲する。<code>posts</code> へ <code>media_type='story'</code> の行を <code>pending</code> で INSERT-or-skip（既存ストーリーズ行があればその状態から 3.2 と同型の分岐で再開・終端ならスキップ）→ 同一 MP4 の Presigned URL でコンテナ作成（<code>media_type=STORIES</code> + <code>video_url</code>。<strong>キャプション・<code>share_to_feed</code>・カバーは指定しない</strong>〔ストーリーズはキャプション非対応〕）→ ステータスポーリング（動画の間隔 10 秒 × 最大 60 回を流用）→ パブリッシュ（結果の反映は手順 6 と同じ）。リール行が <code>success</code> 以外で終わったアカウントではストーリーズ行を作成しない</li>
     </ol>
   </li>
   <li>全アカウントの処理後、3.4 の方針に基づき終了コードを決定して終了する</li>
 </ol>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-07-29、Phase 15-10）: ストーリーズ再掲の投稿フロー（15-9 ユーザー決定の具体化）</span>
+  リールと同一 MP4 を同一実行内で連続投稿する（<a href="requirements-notes-set2.html#tokekomi-stories">15-9 壁打ち記録 11.2</a>。Scheduler・SFN 定義・投稿対象の決定は変更しない）。<code>posts</code> の記録は media_type 別 2 行（<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a> の V004）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>ストーリーズ失敗はリール行の <code>success</code> を巻き戻さない</strong>。終了コードは 1 とし（3.4）、検知は ECS タスク異常終了通知（<a href="../infra/workflow.html">infra/workflow.html セクション 9</a>）。ストーリーズ行の <code>failed</code> / <code>published_unconfirmed</code> は終端状態のため、Step Functions Retry の再実行では投稿対象の決定（リール行基準。<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）により同じ生成実行は再選択されず、自動では再試行しない（現行方針の踏襲）</li>
+    <li><strong>タスク中断でストーリーズ行が <code>pending</code> / <code>container_created</code> のまま残った場合、同一実行内の Retry では再開されない</strong>（対象選定が終端状態のリール行で決まるため）。この stale 行は後続の投稿をブロックしないため（セクション 4.4 の不変条件）、検知（タスク異常終了通知）後に stale データ運用（<a href="operation.html#stale-data">operation.html セクション 4.3</a>）で手動補正する（発生はタスク中断時のみで稀という割り切り）</li>
+    <li>時差型（ストーリーズで出題 → 後でリールで答え）は SFN 分割かスケジュール倍増が必要なため初期は見送り（15-9）</li>
+  </ul>
+</div>
 
 <div class="decision">
   <span class="callout-title">決定（2026-07-19、12-3 実装時に反映）: コンテナステータスのポーリングを手順に追加</span>
@@ -271,9 +283,10 @@
 
 <h3 id="failure-policy">3.4 「失敗」の定義・通知粒度・終了コード方針</h3>
 <ul>
-  <li><strong>失敗の定義</strong>: 対象の生成実行に対し、有効な投稿先アカウントのうち<strong>1 つでも <code>success</code> にならなかった</strong>場合（<code>failed</code> または <code>published_unconfirmed</code> で終わったアカウントが 1 つでもある場合）を失敗とする</li>
-  <li><strong>終了コード</strong>: 全アカウントが <code>success</code> なら 0。1 つでも非 <code>success</code> が残るなら 1</li>
+  <li><strong>失敗の定義</strong>: 対象の生成実行に対し、有効な投稿先アカウントのうち<strong>1 つでも <code>success</code> にならなかった</strong>場合（<code>failed</code> または <code>published_unconfirmed</code> で終わったアカウントが 1 つでもある場合）を失敗とする。<strong>ストーリーズを有効化したセット（<code>stories_enabled=1</code>）では、リール行とストーリーズ行の両方が <code>success</code> であることを当該アカウントの成功条件とする</strong>（ストーリーズ失敗もリール行の <code>success</code> は保持したまま失敗として扱う。15-10）</li>
+  <li><strong>終了コード</strong>: 全アカウントが成功条件を満たすなら 0。1 つでも満たさないなら 1</li>
   <li>終了コード 1 により Step Functions の既存 Retry（最大 2 回）が働くが、3.2 の状態遷移によって <code>success</code> / 終端状態のアカウントはスキップされるため、Retry によって無駄な API 呼び出しが増えることはない。Retry を使い切ってもなお非 <code>success</code> が残る場合は Catch → Fail 状態に遷移し、既存の CloudWatch Alarm（<code>ExecutionsFailed</code>）で通知される</li>
+  <li><strong>検知経路の正確化（2026-07-29、Phase 15-10 で確認）</strong>: 投稿が終端状態（<code>failed</code> / <code>published_unconfirmed</code>）で確定した失敗は、Retry の再実行時に投稿対象の決定（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）から外れて再実行が成功終了するため、<strong><code>ExecutionsFailed</code> アラームには現れない</strong>。この場合の検知は 1 回目の終了コード 1 を捕捉する <strong>ECS タスク異常終了通知（EventBridge Rule。<a href="../infra/workflow.html">infra/workflow.html セクション 9</a>）</strong>が担う。<code>ExecutionsFailed</code> が発報するのは、非終端状態のまま失敗が続く場合（stale・インフラ障害・タスク起動失敗等）である。ストーリーズ失敗の検知（3.3 の decision）もこの ECS タスク異常終了通知の経路に乗る</li>
   <li><strong>通知粒度</strong>: 初期スコープでは個別アカウント・個別失敗理由ごとのカスタムメトリクスは持たない。既存の Step Functions 失敗アラーム 1 本のみで通知し、詳細な原因（どのアカウント・どの段階で失敗したか）は CloudWatch Logs と <code>posts</code> テーブル（<code>status</code> / <code>api_response</code>）で確認する運用とする（確認手順は <a href="operation.html#failure-check">アプリ運用設計 セクション 4.1</a>）</li>
   <li><code>published_unconfirmed</code> も「対応が必要な状態」として終了コード 1 の対象に含める（<code>success</code> と明確に区別し、運用者に手動確認を促すため）</li>
 </ul>
