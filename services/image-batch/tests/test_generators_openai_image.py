@@ -102,6 +102,49 @@ def test_request_images_rejects_missing_parameter() -> None:
         )
 
 
+def test_request_illustration_uses_fixed_parameters_and_decodes() -> None:
+    """Quiz illustrations use the fixed model contract and return PNG bytes."""
+    expected = _png_bytes()
+    response = SimpleNamespace(
+        data=[
+            SimpleNamespace(
+                b64_json=base64.b64encode(expected).decode()
+            )
+        ]
+    )
+    observed: dict[str, Any] = {}
+    client = SimpleNamespace(
+        images=SimpleNamespace(
+            generate=lambda **kwargs: observed.update(kwargs) or response
+        )
+    )
+
+    assert openai_image.request_illustration(client, "scene") == expected
+    assert observed == {
+        "model": "gpt-image-1",
+        "prompt": "scene",
+        "size": "1024x1024",
+        "quality": "medium",
+        "n": 1,
+    }
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        SimpleNamespace(data=[]),
+        SimpleNamespace(data=[SimpleNamespace(b64_json=None)]),
+    ],
+)
+def test_request_illustration_rejects_missing_png(response) -> None:
+    """A successful SDK response without image data fails loudly."""
+    client = SimpleNamespace(
+        images=SimpleNamespace(generate=lambda **kwargs: response)
+    )
+    with pytest.raises(RuntimeError, match="illustration"):
+        openai_image.request_illustration(client, "scene")
+
+
 @pytest.mark.parametrize("mode", ["RGB", "RGBA"])
 def test_convert_png_to_jpeg(mode: str) -> None:
     """RGB and transparent PNGs become valid RGB JPEGs."""

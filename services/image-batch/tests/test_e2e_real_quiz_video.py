@@ -30,7 +30,7 @@ LOCAL_DB_SECRET = {
 
 
 def _connect() -> pymysql.connections.Connection:
-    """Connect to the local V003 MySQL database."""
+    """Connect to the local V004 MySQL database."""
     return pymysql.connect(
         host=LOCAL_DB_SECRET["host"],
         port=LOCAL_DB_SECRET["port"],
@@ -150,10 +150,29 @@ def real_quiz_rows() -> tuple[str, int, int, int, str]:
             "llm_model": model,
             "slots": [
                 {
-                    "from_jst_hour": 0,
+                    "from_jst_hour": 4,
+                    "quiz_type": "L1",
+                    "difficulty": "light",
+                    "slot_code": "morning",
+                    "tone_hint": "出勤前のウォームアップ",
+                    "slot_label": "朝のロジトレ",
+                },
+                {
+                    "from_jst_hour": 11,
                     "quiz_type": "L3",
                     "difficulty": "standard",
-                }
+                    "slot_code": "noon",
+                    "tone_hint": "昼休みの気分転換",
+                    "slot_label": "昼の推定トレ",
+                },
+                {
+                    "from_jst_hour": 17,
+                    "quiz_type": "L1",
+                    "difficulty": "deep",
+                    "slot_code": "night",
+                    "tone_hint": "一日の締めくくり",
+                    "slot_label": "夜のロジトレ",
+                },
             ],
             "max_regenerations": 3,
         }
@@ -275,11 +294,22 @@ def _check_minimal_llm_connectivity(model: str) -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "scheduled_at, expected_quiz_type",
+    [
+        ("2026-07-26T19:00:00Z", "L1"),
+        ("2026-07-27T02:00:00Z", "L3"),
+        ("2026-07-27T08:00:00Z", "L1"),
+    ],
+    ids=["morning", "noon", "night"],
+)
 def test_main_generates_real_quiz_video(
     real_quiz_rows: tuple[str, int, int, int, str],
     monkeypatch: pytest.MonkeyPatch,
+    scheduled_at: str,
+    expected_quiz_type: str,
 ) -> None:
-    """The complete quiz path produces media and transactional history."""
+    """Each slot produces media and transactional history."""
     set_code, set_id, prompt_id, bgm_id, model = real_quiz_rows
     env_name = os.environ.get("ENV_NAME", "prod")
     monkeypatch.setenv("API_SECRET_ARN", f"acps/{env_name}/image/api-key")
@@ -305,7 +335,7 @@ def test_main_generates_real_quiz_video(
     monkeypatch.setenv("DB_SECRET_JSON", json.dumps(LOCAL_DB_SECRET))
     monkeypatch.setenv("SET_CODE", set_code)
     monkeypatch.setenv("EXECUTION_ARN", execution_arn)
-    monkeypatch.setenv("SCHEDULED_AT", "2026-07-27T02:00:00Z")
+    monkeypatch.setenv("SCHEDULED_AT", scheduled_at)
     monkeypatch.setenv("S3_BUCKET_NAME", "local-quiz-test-bucket")
 
     assert main(s3_client=memory_s3) == 0
@@ -321,12 +351,17 @@ def test_main_generates_real_quiz_video(
         if item["ContentType"] == "image/png"
     ]
     assert len(video_uploads) == 1
-    assert len(cut_uploads) == 4
-    assert [Path(item["Key"]).stem[-5:] for item in cut_uploads] == [
+    assert len(cut_uploads) == 5
+    suffixes = [
+        Path(item["Key"]).stem.split(f"{prompt_id}_0", 1)[1]
+        for item in cut_uploads
+    ]
+    assert suffixes == [
         "_cut1",
         "_cut2",
         "_cut3",
         "_cut4",
+        "_illustration",
     ]
     _write_e2e_artifacts(memory_s3.put_calls)
 
@@ -385,7 +420,7 @@ def test_main_generates_real_quiz_video(
         connection.close()
     assert media_rows == (("mp4", 20, bgm_id),)
     assert len(quiz_rows) == 1
-    assert quiz_rows[0][1] == "L3"
+    assert quiz_rows[0][1] == expected_quiz_type
     assert quiz_rows[0][2]
     assert audio_rows[0][0] == "bgm" and audio_rows[0][1] is not None
     assert all(

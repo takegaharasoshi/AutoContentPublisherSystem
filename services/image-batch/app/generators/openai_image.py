@@ -41,6 +41,26 @@ def request_images(client: Any, prompt_config: PromptConfig) -> list[bytes]:
     return [base64.b64decode(image.b64_json) for image in response.data]
 
 
+def request_illustration(client: Any, prompt: str) -> bytes:
+    """Generate and decode one medium-quality square PNG illustration."""
+    response = client.images.generate(
+        model="gpt-image-1",
+        prompt=prompt,
+        size="1024x1024",
+        quality="medium",
+        n=1,
+    )
+    data = getattr(response, "data", None)
+    if not data:
+        raise RuntimeError("OpenAI Images API returned no illustration")
+    encoded = getattr(data[0], "b64_json", None)
+    if not isinstance(encoded, str) or not encoded:
+        raise RuntimeError(
+            "OpenAI Images API illustration did not contain PNG data"
+        )
+    return base64.b64decode(encoded)
+
+
 def convert_png_to_jpeg(png_bytes: bytes, *, quality: int = 90) -> bytes:
     """Convert PNG bytes to RGB JPEG bytes."""
     with Image.open(BytesIO(png_bytes)) as image:

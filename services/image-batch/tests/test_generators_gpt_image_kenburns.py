@@ -101,6 +101,7 @@ def test_generate_rotates_audio_and_returns_audio_asset_id(
         "WHERE set_id = %s AND asset_type = 'bgm' AND is_active = 1"
         in select_sql
     )
+    assert "AND time_slot IS NULL" in select_sql
     assert "ORDER BY last_used_at ASC, id ASC LIMIT 1" in select_sql
     assert select_params == (11,)
     update_sql, update_params = cursor.calls[1]

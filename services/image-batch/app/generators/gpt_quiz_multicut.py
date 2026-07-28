@@ -48,7 +48,6 @@ from .contracts import (
     IntermediateOutput,
     MediaOutput,
 )
-from .gpt_image_kenburns import _select_audio_asset
 
 
 logger = logging.getLogger(__name__)
@@ -65,6 +64,7 @@ FIELD_LIMITS = {
     "explanation": 80,
     "coach_comment": 30,
     "summary": 100,
+    "illustration_scene": 200,
 }
 TAG_COUNT = 3
 TAG_MAX_LENGTH = 10
@@ -111,12 +111,38 @@ CHIME_VOLUME = 10 ** (-3 / 20)
 TICK_DELAY_MILLISECONDS = 10_000
 CHIME_DELAY_MILLISECONDS = 15_000
 
-BACKGROUND_COLOR = "#101B36"
-CARD_COLOR = "#182746"
-ACCENT_COLOR = "#F4B942"
-TEXT_COLOR = "#F7F7F2"
-MUTED_TEXT_COLOR = "#B9C4D8"
-DECORATION_COLOR = "#24385E"
+SLOT_PALETTES = {
+    "morning": {
+        "background": "#F3EEE3",
+        "card": "#FBF8F1",
+        "text": "#1B2A4A",
+        "muted_text": "#56688A",
+        "accent": "#F4B942",
+        "decoration": "#E4DCC9",
+    },
+    "noon": {
+        "background": "#101B36",
+        "card": "#182746",
+        "text": "#F7F7F2",
+        "muted_text": "#B9C4D8",
+        "accent": "#F4B942",
+        "decoration": "#24385E",
+    },
+    "night": {
+        "background": "#0A1226",
+        "card": "#111E3C",
+        "text": "#F7F7F2",
+        "muted_text": "#9FB0CC",
+        "accent": "#F4B942",
+        "decoration": "#1B2C50",
+    },
+}
+SLOT_TIME_MOODS = {
+    "morning": "朝の柔らかい光",
+    "noon": "昼の明るい光",
+    "night": "夜の落ち着いた照明",
+}
+ANSWER_ILLUSTRATION_OVERLAY_OPACITY = 0.55
 HEADING_FONT_SIZE = 88
 QUESTION_FONT_SIZE = 56
 SUPPLEMENT_FONT_SIZE = 40
@@ -146,10 +172,21 @@ GENERATION_INSTRUCTIONS = """
 - coach_comment: 30文字以内
 - tags: 10文字以内をちょうど3個
 - summary: 100文字以内
+- illustration_scene: 200文字以内。動画背景用の情景描写とし、文字・数字・
+  記号・答えの内容は含めない
 型は {quiz_type}、難度は {difficulty}。
+口調の方向性は「{tone_hint}」。hook と coach_comment の口調へ反映する。
 L1 の場合は machine_spec と machine_answer も必須。machine_spec は指定された
 閉じた DSL の truth_tellers / ordering / matching のいずれかだけを使い、
 全列挙で唯一解になる問題を作る。machine_answer は DSL の正準形にする。
+machine_spec はトップレベルに "kind" フィールド（truth_tellers / ordering /
+matching のいずれか）を持つ 1 個のフラットなオブジェクトにする。
+例: {{"kind": "matching", "items": [...], "values": [...],
+"constraints": [...]}}。kind 名をキーにした入れ子（{{"matching": ...}} 等）
+は不可。machine_answer の正準形は、truth_tellers なら人物名から
+"honest"/"liar" への辞書、ordering なら並び順どおりの配列そのもの
+（"order" 等のキーで包まない）、matching なら item から value への辞書
+（ペアの配列にしない）。
 truth_tellers は people と statements を持ち、statement は speaker と
 predicate を持つ。predicate は is_honest/is_liar（subject を指定）または
 same_type/different_type（left/right を指定）だけを使う。
@@ -199,17 +236,41 @@ def _parse_parameters(raw: str | None) -> tuple[str, list[dict[str, Any]], int]:
     for slot in slots:
         if not isinstance(slot, dict):
             raise RuntimeError("each slots entry must be an object")
+        required_fields = {
+            "from_jst_hour",
+            "quiz_type",
+            "difficulty",
+            "slot_code",
+            "tone_hint",
+            "slot_label",
+        }
+        missing = required_fields - set(slot)
+        if missing:
+            raise RuntimeError(
+                "slots entry is missing required fields: "
+                + ", ".join(sorted(missing))
+            )
         hour = slot.get("from_jst_hour")
         quiz_type = slot.get("quiz_type")
         if isinstance(hour, bool) or not isinstance(hour, int) or not 0 <= hour <= 23:
             raise RuntimeError("from_jst_hour must be an integer from 0 to 23")
+        for field in required_fields - {"from_jst_hour"}:
+            value = slot.get(field)
+            if not isinstance(value, str) or not value.strip():
+                raise RuntimeError(f"{field} must be a non-empty string")
         if quiz_type not in QUIZ_TYPES:
             raise RuntimeError("quiz_type must be L1 or L3")
+        slot_code = slot["slot_code"].strip()
+        if slot_code not in SLOT_PALETTES:
+            raise RuntimeError(f"unknown slot_code: {slot_code}")
         validated_slots.append(
             {
                 "from_jst_hour": hour,
-                "quiz_type": quiz_type,
-                "difficulty": str(slot.get("difficulty", "")),
+                "quiz_type": quiz_type.strip(),
+                "difficulty": slot["difficulty"].strip(),
+                "slot_code": slot_code,
+                "tone_hint": slot["tone_hint"].strip(),
+                "slot_label": slot["slot_label"].strip(),
             }
         )
 
@@ -310,6 +371,7 @@ def _load_coach_assets(
 def _load_audio_assets(
     context: GeneratorContext,
     set_code: str,
+    slot_code: str,
 ) -> tuple[int, bytes, bytes, bytes]:
     """Load mandatory SE assets and the least-recently-used BGM."""
     context.cursor.execute(
@@ -339,9 +401,20 @@ def _load_audio_assets(
         client=context.s3_client,
     )
 
-    bgm_id, bgm_key = _select_audio_asset(
-        context.cursor, context.prompt_config.set_id
+    context.cursor.execute(
+        "SELECT id, s3_key FROM audio_assets "
+        "WHERE set_id = %s AND asset_type = 'bgm' AND is_active = 1 "
+        "AND (time_slot = %s OR time_slot IS NULL) "
+        "ORDER BY last_used_at ASC, id ASC LIMIT 1",
+        (context.prompt_config.set_id, slot_code),
     )
+    bgm_row = context.cursor.fetchone()
+    if bgm_row is None:
+        raise RuntimeError(
+            "No active quiz BGM for "
+            f"set_id={context.prompt_config.set_id} slot_code={slot_code}"
+        )
+    bgm_id, bgm_key = int(bgm_row[0]), str(bgm_row[1])
     bgm = get_object(
         context.s3_bucket,
         bgm_key,
@@ -377,6 +450,7 @@ def _build_generation_prompt(
     base_prompt: str,
     quiz_type: str,
     difficulty: str,
+    tone_hint: str,
     excluded_summaries: list[str],
     attempt: int,
 ) -> str:
@@ -391,6 +465,7 @@ def _build_generation_prompt(
         + GENERATION_INSTRUCTIONS.format(
             quiz_type=quiz_type,
             difficulty=difficulty,
+            tone_hint=tone_hint,
         )
         + "\nL1 DSL はこのモジュール仕様どおりのキー名を使う。"
         + f"\n直近要旨（重複禁止）:\n{exclusions}"
@@ -666,6 +741,11 @@ def validate_content_fields(fields: Any, quiz_type: str) -> Any | None:
         value = fields.get(name)
         if not isinstance(value, str) or not value:
             raise QuizValidationError(f"{name} is required")
+        if name == "illustration_scene":
+            value = value.strip()
+            if not value:
+                raise QuizValidationError(f"{name} is required")
+            fields[name] = value
         if len(value) > limit:
             raise QuizValidationError(f"{name} exceeds {limit} characters")
     tags = fields.get("tags")
@@ -790,6 +870,32 @@ def _independent_validation(
     )
 
 
+def _build_illustration_prompt(
+    illustration_scene: str,
+    slot_code: str,
+) -> str:
+    """Build the code-owned illustration prompt for one deterministic slot."""
+    palette = SLOT_PALETTES[slot_code]
+    mood = SLOT_TIME_MOODS[slot_code]
+    brand_colors = "、".join(
+        (
+            palette["background"],
+            palette["card"],
+            palette["accent"],
+            palette["decoration"],
+        )
+    )
+    return (
+        "縦型ショート動画の背景用イラストを作成する。\n"
+        f"情景: {illustration_scene}\n"
+        f"時間帯ムード: {mood}\n"
+        f"ブランド配色（調和させる）: {brand_colors}\n"
+        "文字・数字・記号は一切描画しない。クイズの答えや、答えを示唆する"
+        "構図・物体・ジェスチャーも描画しない。人物や主要物は中央を避け、"
+        "上に情報カードを重ねても自然な背景構成にする。"
+    )
+
+
 def _safe_area() -> tuple[int, int, int, int]:
     """Intersect zoompan and Instagram UI safe areas."""
     zoom_width = int(OUTPUT_WIDTH / ZOOM_END) - SAFE_BOX_MARGIN
@@ -865,7 +971,7 @@ def _draw_wrapped(
     max_width: int,
     max_height: int,
     *,
-    fill: str = TEXT_COLOR,
+    fill: str,
 ) -> int:
     """Draw fitted wrapped text and return the final y coordinate."""
     font, lines, line_height = _fit_wrapped_text(
@@ -883,24 +989,81 @@ def _draw_wrapped(
     return y
 
 
-def _base_card() -> tuple[Image.Image, ImageDraw.ImageDraw, tuple[int, int, int, int]]:
-    """Create the shared flat-design card background."""
-    image = Image.new("RGB", (OUTPUT_WIDTH, OUTPUT_HEIGHT), BACKGROUND_COLOR)
+def _cover_illustration(png: bytes) -> Image.Image:
+    """Decode a generated PNG and cover the vertical output canvas."""
+    try:
+        with Image.open(BytesIO(png)) as source:
+            source.load()
+            if source.format != "PNG":
+                raise RuntimeError("Quiz illustration must be a PNG")
+            return ImageOps.fit(
+                source.convert("RGB"),
+                (OUTPUT_WIDTH, OUTPUT_HEIGHT),
+                method=Image.Resampling.LANCZOS,
+                centering=(0.5, 0.5),
+            )
+    except RuntimeError:
+        raise
+    except Exception as exc:
+        raise RuntimeError("Invalid quiz illustration PNG") from exc
+
+
+def _base_card(
+    illustration: Image.Image,
+    palette: dict[str, str],
+    slot_label: str,
+    fonts: dict[str, Path],
+    *,
+    dim_illustration: bool = False,
+) -> tuple[Image.Image, ImageDraw.ImageDraw, tuple[int, int, int, int]]:
+    """Create the shared illustrated flat-design card background."""
+    image = illustration.copy()
+    if dim_illustration:
+        overlay = Image.new("RGB", image.size, palette["background"])
+        image = Image.blend(
+            image,
+            overlay,
+            ANSWER_ILLUSTRATION_OVERLAY_OPACITY,
+        )
     draw = ImageDraw.Draw(image)
     safe = _safe_area()
     left, top, right, bottom = safe
     draw.rounded_rectangle(
         (left, top, right, bottom),
         radius=42,
-        fill=CARD_COLOR,
+        fill=palette["card"],
     )
     draw.ellipse(
         (left + 28, top + 26, left + 150, top + 148),
-        fill=DECORATION_COLOR,
+        fill=palette["decoration"],
     )
     draw.ellipse(
         (right - 105, bottom - 105, right - 25, bottom - 25),
-        fill=ACCENT_COLOR,
+        fill=palette["accent"],
+    )
+    label_box = (left + 180, top + 28, right - 180, top + 94)
+    draw.rounded_rectangle(
+        label_box,
+        radius=30,
+        fill=palette["decoration"],
+    )
+    label_font, label_lines, _ = _fit_wrapped_text(
+        draw,
+        slot_label,
+        fonts["bold"],
+        34,
+        label_box[2] - label_box[0] - 40,
+        label_box[3] - label_box[1] - 16,
+    )
+    draw.text(
+        (
+            (label_box[0] + label_box[2]) // 2,
+            (label_box[1] + label_box[3]) // 2,
+        ),
+        label_lines[0],
+        font=label_font,
+        fill=palette["text"],
+        anchor="mm",
     )
     return image, draw, safe
 
@@ -931,25 +1094,32 @@ def _render_hook_card(
     difficulty: str,
     coach: Image.Image,
     fonts: dict[str, Path],
+    illustration: Image.Image,
+    palette: dict[str, str],
+    slot_label: str,
 ) -> bytes:
     """Render cut 1."""
-    image, draw, safe = _base_card()
+    image, draw, safe = _base_card(
+        illustration, palette, slot_label, fonts
+    )
     left, top, right, bottom = safe
-    x, y = left + CARD_PADDING, top + CARD_PADDING
+    x, y = left + CARD_PADDING, top + 130
     draw.text(
         (x, y),
         "今日の脳トレ",
         font=_font(fonts["bold"], HEADING_FONT_SIZE),
-        fill=ACCENT_COLOR,
+        fill=palette["accent"],
     )
     y += 140
     label = "論理パズル" if quiz_type == "L1" else "フェルミ推定"
-    draw.rounded_rectangle((x, y, x + 480, y + 74), 30, fill=ACCENT_COLOR)
+    draw.rounded_rectangle(
+        (x, y, x + 480, y + 74), 30, fill=palette["accent"]
+    )
     draw.text(
         (x + 24, y + 8),
         f"{label}  {difficulty}",
         font=_font(fonts["bold"], SUPPLEMENT_FONT_SIZE),
-        fill=BACKGROUND_COLOR,
+        fill=palette["background"],
     )
     _draw_wrapped(
         draw,
@@ -959,6 +1129,7 @@ def _render_hook_card(
         HEADING_FONT_SIZE,
         right - x - CARD_PADDING,
         520,
+        fill=palette["text"],
     )
     _paste_coach(image, coach, safe)
     return _encode_png(image)
@@ -968,16 +1139,21 @@ def _render_question_card(
     fields: dict[str, Any],
     coach: Image.Image,
     fonts: dict[str, Path],
+    illustration: Image.Image,
+    palette: dict[str, str],
+    slot_label: str,
 ) -> bytes:
     """Render cut 2."""
-    image, draw, safe = _base_card()
+    image, draw, safe = _base_card(
+        illustration, palette, slot_label, fonts
+    )
     left, top, right, _ = safe
-    x, y = left + CARD_PADDING, top + CARD_PADDING
+    x, y = left + CARD_PADDING, top + 130
     draw.text(
         (x, y),
         "問題",
         font=_font(fonts["bold"], HEADING_FONT_SIZE),
-        fill=ACCENT_COLOR,
+        fill=palette["accent"],
     )
     _draw_wrapped(
         draw,
@@ -987,6 +1163,7 @@ def _render_question_card(
         QUESTION_FONT_SIZE,
         right - x - CARD_PADDING,
         850,
+        fill=palette["text"],
     )
     _paste_coach(image, coach, safe)
     return _encode_png(image)
@@ -996,9 +1173,14 @@ def _render_think_card(
     count: int,
     coach: Image.Image,
     fonts: dict[str, Path],
+    illustration: Image.Image,
+    palette: dict[str, str],
+    slot_label: str,
 ) -> bytes:
     """Render one countdown sub-card."""
-    image, draw, safe = _base_card()
+    image, draw, safe = _base_card(
+        illustration, palette, slot_label, fonts
+    )
     left, top, right, bottom = safe
     count_font = _font(fonts["bold"], 360)
     text = str(count)
@@ -1008,7 +1190,7 @@ def _render_think_card(
         ((left + right - text_width) // 2, top + 210),
         text,
         font=count_font,
-        fill=ACCENT_COLOR,
+        fill=palette["accent"],
     )
     # ポーズ記号 U+23F8 は Noto Sans JP に無いグリフのため矩形 2 本で描く
     hint_x = left + CARD_PADDING
@@ -1017,7 +1199,7 @@ def _render_think_card(
         draw.rounded_rectangle(
             (hint_x + offset, hint_y + 6, hint_x + offset + 14, hint_y + 52),
             radius=6,
-            fill=MUTED_TEXT_COLOR,
+            fill=palette["muted_text"],
         )
     _draw_wrapped(
         draw,
@@ -1027,7 +1209,7 @@ def _render_think_card(
         SUPPLEMENT_FONT_SIZE,
         right - hint_x - 72 - CARD_PADDING,
         180,
-        fill=MUTED_TEXT_COLOR,
+        fill=palette["muted_text"],
     )
     _paste_coach(image, coach, (left, top, right, bottom))
     return _encode_png(image)
@@ -1038,17 +1220,26 @@ def _render_answer_card(
     quiz_type: str,
     coach: Image.Image,
     fonts: dict[str, Path],
+    illustration: Image.Image,
+    palette: dict[str, str],
+    slot_label: str,
 ) -> bytes:
     """Render cut 4 with a visual loop-closing title."""
-    image, draw, safe = _base_card()
+    image, draw, safe = _base_card(
+        illustration,
+        palette,
+        slot_label,
+        fonts,
+        dim_illustration=True,
+    )
     left, top, right, _ = safe
-    x, y = left + CARD_PADDING, top + CARD_PADDING
+    x, y = left + CARD_PADDING, top + 130
     label = "論理パズル" if quiz_type == "L1" else "フェルミ推定"
     draw.text(
         (x, y),
         f"答え｜{label}",
         font=_font(fonts["bold"], 66),
-        fill=ACCENT_COLOR,
+        fill=palette["accent"],
     )
     y = _draw_wrapped(
         draw,
@@ -1058,6 +1249,7 @@ def _render_answer_card(
         QUESTION_FONT_SIZE,
         right - x - CARD_PADDING,
         230,
+        fill=palette["text"],
     )
     y = _draw_wrapped(
         draw,
@@ -1067,7 +1259,7 @@ def _render_answer_card(
         SUPPLEMENT_FONT_SIZE,
         right - x - CARD_PADDING,
         430,
-        fill=TEXT_COLOR,
+        fill=palette["text"],
     )
     _draw_wrapped(
         draw,
@@ -1077,7 +1269,7 @@ def _render_answer_card(
         SUPPLEMENT_FONT_SIZE,
         right - x - CARD_PADDING,
         160,
-        fill=ACCENT_COLOR,
+        fill=palette["accent"],
     )
     _paste_coach(image, coach, safe)
     return _encode_png(image)
@@ -1087,20 +1279,52 @@ def _render_cards(
     fields: dict[str, Any],
     quiz_type: str,
     difficulty: str,
+    slot_code: str,
+    slot_label: str,
+    illustration_png: bytes,
     coaches: dict[str, Image.Image],
     fonts: dict[str, Path],
 ) -> tuple[list[bytes], list[bytes]]:
     """Render eight timeline cards and four representative cut cards."""
+    palette = SLOT_PALETTES[slot_code]
+    illustration = _cover_illustration(illustration_png)
     cut1 = _render_hook_card(
-        fields, quiz_type, difficulty, coaches["hook"], fonts
+        fields,
+        quiz_type,
+        difficulty,
+        coaches["hook"],
+        fonts,
+        illustration,
+        palette,
+        slot_label,
     )
-    cut2 = _render_question_card(fields, coaches["question"], fonts)
+    cut2 = _render_question_card(
+        fields,
+        coaches["question"],
+        fonts,
+        illustration,
+        palette,
+        slot_label,
+    )
     think_cards = [
-        _render_think_card(count, coaches["think"], fonts)
+        _render_think_card(
+            count,
+            coaches["think"],
+            fonts,
+            illustration,
+            palette,
+            slot_label,
+        )
         for count in range(5, 0, -1)
     ]
     cut4 = _render_answer_card(
-        fields, quiz_type, coaches["answer"], fonts
+        fields,
+        quiz_type,
+        coaches["answer"],
+        fonts,
+        illustration,
+        palette,
+        slot_label,
     )
     timeline = [cut1, cut2, *think_cards, cut4]
     return timeline, [cut1, cut2, think_cards[0], cut4]
@@ -1293,12 +1517,17 @@ def generate(context: GeneratorContext) -> GeneratorResult:
     slot = resolve_slot(context.scheduled_at, slots)
     quiz_type = slot["quiz_type"]
     difficulty = slot["difficulty"]
+    slot_code = slot["slot_code"]
+    tone_hint = slot["tone_hint"]
+    slot_label = slot["slot_label"]
 
     # All fixed assets are checked before the first LLM call.
     fonts = _load_fonts()
     set_code = _fetch_set_code(context)
     coaches = _load_coach_assets(context, set_code)
-    bgm_id, bgm, tick, chime = _load_audio_assets(context, set_code)
+    bgm_id, bgm, tick, chime = _load_audio_assets(
+        context, set_code, slot_code
+    )
     summaries, recent_questions = _fetch_history(context, quiz_type)
 
     api_key = openai_image.load_api_key()
@@ -1310,6 +1539,7 @@ def generate(context: GeneratorContext) -> GeneratorResult:
             context.prompt_config.prompt_text,
             quiz_type,
             difficulty,
+            tone_hint,
             summaries,
             attempt,
         )
@@ -1338,10 +1568,21 @@ def generate(context: GeneratorContext) -> GeneratorResult:
             "Quiz generation exhausted regeneration limit: " + last_reason
         )
 
+    illustration_prompt = _build_illustration_prompt(
+        selected_fields["illustration_scene"],
+        slot_code,
+    )
+    illustration_png = openai_image.request_illustration(
+        client,
+        illustration_prompt,
+    )
     timeline_cards, cut_cards = _render_cards(
         selected_fields,
         quiz_type,
         difficulty,
+        slot_code,
+        slot_label,
+        illustration_png,
         coaches,
         fonts,
     )
@@ -1366,12 +1607,20 @@ def generate(context: GeneratorContext) -> GeneratorResult:
             )
         ],
         intermediates=[
+            *[
+                IntermediateOutput(
+                    content=content,
+                    file_format="png",
+                    suffix=f"_cut{index}",
+                    output_index=0,
+                )
+                for index, content in enumerate(cut_cards, start=1)
+            ],
             IntermediateOutput(
-                content=content,
+                content=illustration_png,
                 file_format="png",
-                suffix=f"_cut{index}",
+                suffix="_illustration",
                 output_index=0,
-            )
-            for index, content in enumerate(cut_cards, start=1)
+            ),
         ],
     )

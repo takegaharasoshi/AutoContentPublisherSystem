@@ -106,6 +106,7 @@ def _select_audio_asset(cursor: Any, set_id: int) -> tuple[int, str]:
     cursor.execute(
         "SELECT id, s3_key FROM audio_assets "
         "WHERE set_id = %s AND asset_type = 'bgm' AND is_active = 1 "
+        "AND time_slot IS NULL "
         "ORDER BY last_used_at ASC, id ASC LIMIT 1",
         (set_id,),
     )

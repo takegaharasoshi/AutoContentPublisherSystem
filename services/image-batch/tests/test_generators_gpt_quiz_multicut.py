@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import datetime
 import json
+from io import BytesIO
 from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+from PIL import Image
 
 from app.generators import GeneratorContext
 from app.generators import gpt_quiz_multicut as quiz
@@ -25,25 +27,31 @@ def _parameters(
             "llm_model": "test-model",
             "slots": slots
             or [
-                {
-                    "from_jst_hour": 4,
-                    "quiz_type": "L1",
-                    "difficulty": "light",
-                },
-                {
-                    "from_jst_hour": 11,
-                    "quiz_type": "L3",
-                    "difficulty": "standard",
-                },
-                {
-                    "from_jst_hour": 17,
-                    "quiz_type": "L1",
-                    "difficulty": "deep",
-                },
+                _slot(4, "L1", "light", "morning", "朝のロジトレ"),
+                _slot(11, "L3", "standard", "noon", "昼の推定"),
+                _slot(17, "L1", "deep", "night", "夜のロジトレ"),
             ],
             "max_regenerations": max_regenerations,
         }
     )
+
+
+def _slot(
+    hour: int,
+    quiz_type: str,
+    difficulty: str,
+    slot_code: str,
+    slot_label: str,
+) -> dict:
+    """Build one complete slot parameter."""
+    return {
+        "from_jst_hour": hour,
+        "quiz_type": quiz_type,
+        "difficulty": difficulty,
+        "slot_code": slot_code,
+        "tone_hint": f"{slot_label}らしい口調",
+        "slot_label": slot_label,
+    }
 
 
 def _base_fields(**updates) -> dict:
@@ -56,6 +64,7 @@ def _base_fields(**updates) -> dict:
         "coach_comment": "推定ルートが大切！",
         "tags": ["脳トレ", "推定", "クイズ"],
         "summary": "日本の信号機の数を人口から推定",
+        "illustration_scene": "街角を行き交う人々と木漏れ日のある風景",
     }
     fields.update(updates)
     return fields
@@ -101,6 +110,9 @@ def test_resolve_slot_uses_jst_boundaries_and_wraps_early_hours() -> None:
         slots,
     )
     assert selected["quiz_type"] == "L3"
+    assert selected["slot_code"] == "noon"
+    assert selected["tone_hint"] == "昼の推定らしい口調"
+    assert selected["slot_label"] == "昼の推定"
 
     # 18:00 UTC is 03:00 JST on the next day, before the first 04:00 slot.
     wrapped = quiz.resolve_slot(
@@ -108,6 +120,7 @@ def test_resolve_slot_uses_jst_boundaries_and_wraps_early_hours() -> None:
         slots,
     )
     assert wrapped["difficulty"] == "deep"
+    assert wrapped["slot_code"] == "night"
 
 
 @pytest.mark.parametrize(
@@ -118,7 +131,7 @@ def test_resolve_slot_uses_jst_boundaries_and_wraps_early_hours() -> None:
         (
             {
                 "slots": [
-                    {"from_jst_hour": 24, "quiz_type": "L1"}
+                    _slot(24, "L1", "light", "morning", "朝")
                 ]
             },
             "from_jst_hour",
@@ -126,10 +139,18 @@ def test_resolve_slot_uses_jst_boundaries_and_wraps_early_hours() -> None:
         (
             {
                 "slots": [
-                    {"from_jst_hour": 4, "quiz_type": "L2"}
+                    _slot(4, "L2", "light", "morning", "朝")
                 ]
             },
             "quiz_type",
+        ),
+        (
+            {
+                "slots": [
+                    _slot(4, "L1", "light", "unknown", "不明")
+                ]
+            },
+            "unknown slot_code",
         ),
     ],
 )
@@ -146,6 +167,8 @@ def test_invalid_slots_fail_loudly(parameters: dict, message: str) -> None:
         ({"question": "問" * 91}, "question"),
         ({"tags": ["a", "b"]}, "tags"),
         ({"answer": "20万基です"}, "L3 answer"),
+        ({"illustration_scene": "   "}, "illustration_scene"),
+        ({"illustration_scene": "情" * 201}, "illustration_scene"),
     ],
 )
 def test_programmatic_field_validation_rejects_invalid_content(
@@ -155,6 +178,73 @@ def test_programmatic_field_validation_rejects_invalid_content(
     """Required fields, length limits, tags, and L3 format are enforced."""
     with pytest.raises(quiz.QuizValidationError, match=message):
         quiz.validate_content_fields(_base_fields(**updates), "L3")
+
+
+@pytest.mark.parametrize(
+    "missing",
+    [
+        "from_jst_hour",
+        "quiz_type",
+        "difficulty",
+        "slot_code",
+        "tone_hint",
+        "slot_label",
+    ],
+)
+def test_slot_required_fields_fail_loudly(missing: str) -> None:
+    """Every slot field is mandatory."""
+    slot = _slot(4, "L1", "light", "morning", "朝")
+    del slot[missing]
+    with pytest.raises(RuntimeError, match=missing):
+        quiz._parse_parameters(json.dumps({"slots": [slot]}))
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["quiz_type", "difficulty", "slot_code", "tone_hint", "slot_label"],
+)
+def test_slot_empty_strings_fail_loudly(field: str) -> None:
+    """Whitespace-only slot strings are configuration errors."""
+    slot = _slot(4, "L1", "light", "morning", "朝")
+    slot[field] = " "
+    with pytest.raises(RuntimeError, match=field):
+        quiz._parse_parameters(json.dumps({"slots": [slot]}))
+
+
+def test_generation_prompt_includes_db_tone_hint() -> None:
+    """The selected DB tone hint is applied to both conversational fields."""
+    prompt = quiz._build_generation_prompt(
+        "日常",
+        "L3",
+        "standard",
+        "出勤前のウォームアップ",
+        [],
+        0,
+    )
+    assert "出勤前のウォームアップ" in prompt
+    assert "hook と coach_comment の口調へ反映" in prompt
+
+
+def test_illustration_scene_is_trimmed_but_not_independently_validated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The scene receives only programmatic required/length validation."""
+    fields = _base_fields(illustration_scene="  検証に渡さない情景  ")
+    quiz.validate_content_fields(fields, "L3")
+    assert fields["illustration_scene"] == "検証に渡さない情景"
+
+    prompts: list[str] = []
+
+    def request_json(client, model, prompt):
+        del client, model
+        prompts.append(prompt)
+        return {"estimated_value": 200_000, "route_valid": True}
+
+    monkeypatch.setattr(quiz, "_request_json", request_json)
+    assert quiz._independent_validation(
+        object(), "model", fields, "L3", None
+    )
+    assert all(fields["illustration_scene"] not in prompt for prompt in prompts)
 
 
 def test_truth_teller_unique_solution_passes() -> None:
@@ -277,8 +367,15 @@ def test_duplicate_normalization_and_jaccard_threshold() -> None:
 class GenerateCursor:
     """Route generator SQL to deterministic fake rows."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        bgm_row: tuple[int, str] | None = (
+            77,
+            "audio/quiz-set/bgm/track.m4a",
+        ),
+    ) -> None:
         """Initialize SQL history and active result set."""
+        self.bgm_row = bgm_row
         self.calls: list[tuple[str, tuple]] = []
         self.current = ""
 
@@ -292,7 +389,7 @@ class GenerateCursor:
         if "SELECT set_code" in self.current:
             return ("quiz-set",)
         if "asset_type = 'bgm'" in self.current:
-            return (77, "audio/quiz-set/bgm/track.m4a")
+            return self.bgm_row
         raise AssertionError(f"Unexpected fetchone for {self.current}")
 
     def fetchall(self):
@@ -356,6 +453,11 @@ def _patch_generate_dependencies(
         quiz.openai_image, "build_client", lambda key: object()
     )
     monkeypatch.setattr(
+        quiz.openai_image,
+        "request_illustration",
+        lambda client, prompt: b"illustration",
+    )
+    monkeypatch.setattr(
         quiz, "_request_quiz_fields", lambda *args: fields.copy()
     )
     monkeypatch.setattr(
@@ -404,6 +506,12 @@ def test_generate_happy_path_stages_history_and_rotates_only_bgm(
 
     result = quiz.generate(_context(cursor))
 
+    bgm_call = next(
+        call for call in cursor.calls if "asset_type = 'bgm'" in call[0]
+    )
+    assert "AND (time_slot = %s OR time_slot IS NULL)" in bgm_call[0]
+    assert "ORDER BY last_used_at ASC, id ASC" in bgm_call[0]
+    assert bgm_call[1] == (9, "noon")
     insert_call = next(
         call for call in cursor.calls if call[0].startswith("INSERT INTO quiz_items")
     )
@@ -434,8 +542,106 @@ def test_generate_happy_path_stages_history_and_rotates_only_bgm(
         "_cut2",
         "_cut3",
         "_cut4",
+        "_illustration",
     ]
     assert all(item.file_format == "png" for item in result.intermediates)
+    assert result.intermediates[-1].content == b"illustration"
+
+
+def test_generate_fails_when_slot_has_no_matching_bgm(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A slot without dedicated or common BGM is a configuration error."""
+    cursor = GenerateCursor(bgm_row=None)
+    monkeypatch.setattr(
+        quiz,
+        "_load_fonts",
+        lambda: {"regular": Path("regular"), "bold": Path("bold")},
+    )
+    monkeypatch.setattr(
+        quiz,
+        "_load_coach_assets",
+        lambda context, set_code: {
+            name: Mock() for name in quiz.COACH_FILENAMES
+        },
+    )
+    monkeypatch.setattr(quiz, "get_object", lambda *args, **kwargs: b"audio")
+
+    with pytest.raises(RuntimeError, match="No active quiz BGM"):
+        quiz.generate(_context(cursor))
+
+    bgm_call = next(
+        call for call in cursor.calls if "asset_type = 'bgm'" in call[0]
+    )
+    assert bgm_call[1] == (9, "noon")
+
+
+def test_generate_requests_one_illustration_after_quiz_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A confirmed quiz produces exactly one slot-specific illustration."""
+    cursor = GenerateCursor()
+    fields = _base_fields()
+    _patch_generate_dependencies(monkeypatch, fields)
+    events: list[str] = []
+    request_quiz = Mock(
+        side_effect=[
+            _base_fields(question="問" * 91),
+            fields.copy(),
+        ]
+    )
+    request_illustration = Mock(
+        side_effect=lambda client, prompt: events.append(prompt)
+        or b"illustration"
+    )
+    monkeypatch.setattr(quiz, "_request_quiz_fields", request_quiz)
+    monkeypatch.setattr(
+        quiz.openai_image,
+        "request_illustration",
+        request_illustration,
+    )
+
+    quiz.generate(_context(cursor))
+
+    assert request_quiz.call_count == 2
+    request_illustration.assert_called_once()
+    assert fields["illustration_scene"] in events[0]
+    assert quiz.SLOT_TIME_MOODS["noon"] in events[0]
+    assert "文字・数字・記号は一切描画しない" in events[0]
+    assert "答えを示唆する" in events[0]
+
+
+def test_illustration_scene_is_not_used_for_duplicate_rejection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Only question text participates in the Jaccard duplicate check."""
+    cursor = GenerateCursor()
+    fields = _base_fields(illustration_scene="別の問題です")
+    _patch_generate_dependencies(monkeypatch, fields)
+
+    result = quiz.generate(_context(cursor))
+
+    assert result.media[0].content == b"video"
+
+
+def test_generate_propagates_illustration_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Image API exhaustion fails the batch without a no-image fallback."""
+    cursor = GenerateCursor()
+    _patch_generate_dependencies(monkeypatch, _base_fields())
+    monkeypatch.setattr(
+        quiz.openai_image,
+        "request_illustration",
+        Mock(side_effect=RuntimeError("image retries exhausted")),
+    )
+
+    with pytest.raises(RuntimeError, match="image retries exhausted"):
+        quiz.generate(_context(cursor))
+
+    assert not any(
+        sql.startswith("INSERT INTO quiz_items") for sql, _ in cursor.calls
+    )
 
 
 def test_generate_exhausts_regeneration_limit(
@@ -457,6 +663,71 @@ def test_generate_exhausts_regeneration_limit(
     assert not any(
         sql.startswith("INSERT INTO quiz_items") for sql, _ in cursor.calls
     )
+
+
+def _solid_png(color: tuple[int, int, int]) -> bytes:
+    """Create a square illustration fixture."""
+    image = Image.new("RGB", (1024, 1024), color)
+    output = BytesIO()
+    image.save(output, format="PNG")
+    return output.getvalue()
+
+
+@pytest.mark.parametrize(
+    "slot_code, slot_label",
+    [
+        ("morning", "朝のロジトレ"),
+        ("noon", "昼のロジトレ"),
+        ("night", "夜のロジトレ"),
+    ],
+)
+def test_render_cards_uses_slot_palette_label_and_answer_dimming(
+    slot_code: str,
+    slot_label: str,
+) -> None:
+    """All palettes render eight cards with a label and answer-only dimming."""
+    source_color = (200, 100, 40)
+    transparent_coach = Image.new("RGBA", (10, 10), (0, 0, 0, 0))
+    coaches = {
+        pose: transparent_coach for pose in quiz.COACH_FILENAMES
+    }
+    fonts = quiz._load_fonts()
+
+    timeline, cuts = quiz._render_cards(
+        _base_fields(),
+        "L3",
+        "standard",
+        slot_code,
+        slot_label,
+        _solid_png(source_color),
+        coaches,
+        fonts,
+    )
+
+    assert len(timeline) == 8
+    assert len(cuts) == 4
+    palette = quiz.SLOT_PALETTES[slot_code]
+    safe = quiz._safe_area()
+    with Image.open(BytesIO(cuts[0])) as hook:
+        assert hook.getpixel((0, 0)) == source_color
+        assert hook.getpixel((safe[0] + 200, safe[1] + 40)) == tuple(
+            bytes.fromhex(palette["decoration"][1:])
+        )
+        assert hook.getpixel((safe[2] - 50, safe[1] + 200)) == tuple(
+            bytes.fromhex(palette["card"][1:])
+        )
+    expected_dimmed = tuple(
+        int(
+            source * (1 - quiz.ANSWER_ILLUSTRATION_OVERLAY_OPACITY)
+            + overlay * quiz.ANSWER_ILLUSTRATION_OVERLAY_OPACITY
+        )
+        for source, overlay in zip(
+            source_color,
+            bytes.fromhex(palette["background"][1:]),
+        )
+    )
+    with Image.open(BytesIO(cuts[-1])) as answer:
+        assert answer.getpixel((0, 0)) == expected_dimmed
 
 
 def test_build_video_uses_hard_cuts_and_timed_normalization_free_mix(
