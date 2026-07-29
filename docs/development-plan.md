@@ -304,6 +304,7 @@
 
 - [ ] **15-13**（旧 15-9）セット別設計書の作成とプロンプト・キャプション設計
   - 確認: `docs/app/sets/<set_code>.html` が作成され（operation.html 2.1 手順 0 の雛形）、**コーチの表情別固定アセット 4 種（hook / question / think / answer。15-2 決定のリファレンスシート方式）が作成され S3 `assets/logic-training-1/` へ配置済み**。15-6 のローカル E2E 基盤を流用した試し打ちで、新方式での最終形（MP4。イラスト常駐 + 表情切替込み）までテーマの構成・世界観が安定して再現される（14-11 のプロンプト設計の知見〔構成の明示・Instagram UI セーフエリア〕を流用）。キャプションテンプレート案に `#AIart` が含まれている
+  - 備考: 2026-07-29 **実施中（未完了）**。セット別設計書 [sets/logic-training-1.html](app/sets/logic-training-1.html)・コーチ 4 表情アセット（S3 `assets/logic-training-1/` へ配置済み）・プロンプト / パラメータ / キャプション案まで完了。**残りは実 API のローカル試し打ちのみで、OpenAI アカウントのクレジット切れ（`insufficient_quota`）でブロック中**（残高補充後に再開。同事象で fantasy-animals-1 の定時実行も失敗する状態）。詳細は [development-log.md](development-log.md) の 15-13 を参照
 
 - [ ] **15-14**（旧 15-10）セット登録と投稿前レビュー（試し生成・実投稿）
   - 確認: DB 登録（`batch_sets`〔15-8 で作成済み〕→ `prompt_configs` → `caption_templates` → `sns_accounts` → `audio_assets`〔15-8 で登録済み〕の順。ローカル & Aurora）後、image-batch の直接 RunTask で生成物を目視レビューし（朝昼夜スロットの BGM・パレット・tone_hint の切替確認を含む）、SNS 投稿 SFN の単体実行で新アカウントへの**リール + ストーリーズ**実投稿が success になる（14-11 で実績のある投稿前レビュー方式）
