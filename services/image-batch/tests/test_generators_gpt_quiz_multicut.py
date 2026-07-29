@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from app.generators import GeneratorContext
 from app.generators import gpt_quiz_multicut as quiz
@@ -818,3 +818,43 @@ def test_build_video_uses_hard_cuts_and_timed_normalization_free_mix(
         "capture_output": True,
         "timeout": 600,
     }
+
+
+def test_wrapped_lines_avoids_line_start_punctuation() -> None:
+    """行頭禁則: 句読点や閉じ括弧を次の行の先頭に置かない。"""
+    image = Image.new("RGB", (600, 200), "white")
+    draw = ImageDraw.Draw(image)
+    font = quiz._font(
+        Path("fonts") / quiz.FONT_FILENAMES["regular"],
+        40,
+    )
+    text = "朝会でA、B、Cが順に話します。Cは最初に話し、AはBより先です。"
+
+    lines = quiz._wrapped_lines(draw, text, font, 400)
+
+    assert len(lines) > 1
+    assert all(line[0] not in quiz.LINE_START_PROHIBITED for line in lines)
+    assert "".join(lines) == text
+
+
+def test_wrapped_lines_avoids_line_end_opening_bracket() -> None:
+    """行末禁則: 開き括弧を行末に残さない。"""
+    image = Image.new("RGB", (600, 200), "white")
+    draw = ImageDraw.Draw(image)
+    font = quiz._font(
+        Path("fonts") / quiz.FONT_FILENAMES["regular"],
+        40,
+    )
+    text = "AとBとCのうち正直者は一人「Bは嘘つき」と言った"
+
+    lines = quiz._wrapped_lines(draw, text, font, 380)
+
+    assert len(lines) > 1
+    assert all(line[-1] not in quiz.LINE_END_PROHIBITED for line in lines)
+    assert "".join(lines) == text
+
+
+def test_validate_object_keys_rejects_non_object_node() -> None:
+    """入れ子のリストは TypeError ではなく検証エラーとして扱う。"""
+    with pytest.raises(quiz.QuizValidationError):
+        quiz._validate_object_keys([{"op": "match"}], {"op"}, {"op"})

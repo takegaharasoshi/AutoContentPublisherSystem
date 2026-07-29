@@ -121,12 +121,12 @@ SLOT_PALETTES = {
         "decoration": "#E4DCC9",
     },
     "noon": {
-        "background": "#101B36",
-        "card": "#182746",
-        "text": "#F7F7F2",
-        "muted_text": "#B9C4D8",
-        "accent": "#F4B942",
-        "decoration": "#24385E",
+        "background": "#E9F1F8",
+        "card": "#FBFDFF",
+        "text": "#1B2A4A",
+        "muted_text": "#56688A",
+        "accent": "#E39B0C",
+        "decoration": "#D3E2EF",
     },
     "night": {
         "background": "#0A1226",
@@ -148,6 +148,8 @@ THINK_COUNT_FONT_SIZE = 140
 QUESTION_FONT_SIZE = 56
 SUPPLEMENT_FONT_SIZE = 40
 MIN_BODY_FONT_SIZE = 30
+LINE_START_PROHIBITED = "、。，．,.)）]］｝」』】〉》!！?？:：;；ー〜…‥・%％℃"
+LINE_END_PROHIBITED = "（(「『【〈《[［｛"
 CARD_PADDING = 64
 COACH_BOX = (300, 430)
 
@@ -513,6 +515,10 @@ def _validate_object_keys(
     allowed: set[str],
 ) -> None:
     """Reject missing and unknown DSL keys."""
+    if not isinstance(value, dict):
+        # LLM が入れ子のリストを返すことがある。ここで弾かないと set() が
+        # TypeError（unhashable type）を投げ、再生成理由が読み取りにくくなる。
+        raise QuizValidationError("DSL node must be an object")
     if set(value) - allowed:
         raise QuizValidationError("unknown DSL vocabulary")
     if not required <= set(value):
@@ -920,6 +926,23 @@ def _font(path: Path, size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(path), size=size)
 
 
+def _break_with_kinsoku(current: str, char: str) -> tuple[str, str]:
+    """Split one overflowing line at a position allowed by Japanese kinsoku.
+
+    行頭禁則（句読点・閉じ括弧が行頭に来る）と行末禁則（開き括弧が行末に
+    残る）を避けるため、分割位置を 1 文字ずつ手前へ追い出す。行が空になる
+    まで戻すことはしない（極端に狭い幅では禁則より収まりを優先する）。
+    """
+    text = current + char
+    index = len(current)
+    while index > 1 and (
+        text[index] in LINE_START_PROHIBITED
+        or text[index - 1] in LINE_END_PROHIBITED
+    ):
+        index -= 1
+    return text[:index], text[index:]
+
+
 def _wrapped_lines(
     draw: ImageDraw.ImageDraw,
     text: str,
@@ -936,8 +959,9 @@ def _wrapped_lines(
             continue
         candidate = current + char
         if current and draw.textlength(candidate, font=font) > max_width:
-            lines.append(current)
-            current = char
+            head, carry = _break_with_kinsoku(current, char)
+            lines.append(head)
+            current = carry
         else:
             current = candidate
     if current or not lines:
