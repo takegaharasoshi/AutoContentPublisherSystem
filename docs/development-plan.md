@@ -298,8 +298,9 @@
   - 確認: gpt-quiz-multicut にスロット選曲（`time_slot`）・`tone_hint` 差し込み・スロット別パレット/ラベル・情景イラスト生成（images API・リトライ）と全カット合成が実装され、pytest 全パス、ローカル E2E（実 API）で 3 スロットぶんの MP4 生成まで通る。kenburns の選曲クエリの `time_slot` 追随（NULL 許容）を含む
   - 備考: 2026-07-29 完了（実装 = Codex `gpt-5.6-sol` / high・レビュー + blocker 修正 = Fable 5）。仕様（15-10 の方式仕様・スロットだし分け）どおり実装され pytest 124 件全パス。実 API E2E で **L1 の潜在問題 1 件が顕在化**（15-6 以来 L1 は実 API 未検証で、LLM が `machine_spec` を kind 入れ子・`machine_answer` を非正準形で返し全滅）→ 生成プロンプトに正準形を明示する修正（Claude 直接）で 3 スロット全て MP4 生成まで成功。**同日追記**: ユーザーレビュー指摘（考えるカットで問題文が消える）を受け、問題文をカット 2 と同位置に据え置きカウントダウンをヘッダ行 140px へ縮小する再レイアウトを実施（Claude 直接修正・pytest 125 件全パス）。詳細は [development-log.md](development-log.md) の 15-11 を参照
 
-- [ ] **15-12** sns-post-batch ストーリーズ対応（Codex 委譲）
+- [x] **15-12** sns-post-batch ストーリーズ対応（Codex 委譲）
   - 確認: リール投稿成功後に同一 MP4 を `media_type=STORIES` で連続投稿し、`posts` に media_type 別 2 行が独立記録される（ストーリーズ失敗時もリールの success は保持し、失敗はアラームで検知）。pytest 全パスし、ストーリーズを有効化しない既存セット（fantasy-animals-1）の動作が変わらないことをテストで確認済み
+  - 備考: 2026-07-29 完了（実装 = Codex `gpt-5.6-terra` / high 委譲・指示書作成 + レビュー = Opus 5）。指示書の入力は 15-10 記録の (5)。仕様どおり実装され **pytest 98 件全パス**（ローカル MySQL 起動状態で E2E 5 件も skip せず実行）。**V004 追随が必須修正として含まれる**: `posts` の UNIQUE が 3 カラムへ拡張済みなのに `get_post` / `create_pending_post` の重複時 SELECT が `(generation_run_id, sns_account_id)` のみで絞っており、リール行とストーリーズ行を取り違える状態だった。`processing.py` はアカウントループを「1 アカウント × 1 メディア種別」の内部ヘルパーへ切り出してリール行・ストーリーズ行で状態機械と例外分類を共有する構成に変更。レビューで blocker はゼロ。`batch-flow.html` 3.3 手順 7 へ実装の事実 2 点（ストーリーズ行にも `post_media` を紐づける / キャプション系カラムは NULL のまま）を補記した。**AWS へのデプロイは未実施**（実投稿確認は 15-14）。詳細は [development-log.md](development-log.md) の 15-12 を参照
 
 - [ ] **15-13**（旧 15-9）セット別設計書の作成とプロンプト・キャプション設計
   - 確認: `docs/app/sets/<set_code>.html` が作成され（operation.html 2.1 手順 0 の雛形）、**コーチの表情別固定アセット 4 種（hook / question / think / answer。15-2 決定のリファレンスシート方式）が作成され S3 `assets/logic-training-1/` へ配置済み**。15-6 のローカル E2E 基盤を流用した試し打ちで、新方式での最終形（MP4。イラスト常駐 + 表情切替込み）までテーマの構成・世界観が安定して再現される（14-11 のプロンプト設計の知見〔構成の明示・Instagram UI セーフエリア〕を流用）。キャプションテンプレート案に `#AIart` が含まれている
