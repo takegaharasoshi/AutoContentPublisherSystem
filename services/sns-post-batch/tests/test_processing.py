@@ -23,6 +23,7 @@ def _run(monkeypatch, accounts, get_post, **overrides):
     cursor = Mock()
     connection = Mock()
     generated_media = overrides.pop("generated_media", _media())
+    stories_enabled = overrides.pop("stories_enabled", False)
     monkeypatch.setattr(processing, "get_post", get_post)
     monkeypatch.setattr(processing, "create_pending_post", Mock(return_value=101))
     monkeypatch.setattr(processing, "ensure_post_media", Mock())
@@ -47,6 +48,7 @@ def _run(monkeypatch, accounts, get_post, **overrides):
         sns_accounts=accounts,
         caption_template=CaptionTemplate(3, "caption"),
         generated_media=generated_media,
+        stories_enabled=stories_enabled,
         env_name="prod",
         set_code="set-a",
         s3_bucket="configured-bucket",
@@ -60,7 +62,7 @@ def test_processing_creates_and_publishes_new_post(monkeypatch) -> None:
     """A new account is linked to the media and reaches success."""
     states = iter([None, Post(101, "success", "container", "post")])
     result, cursor, connection = _run(
-        monkeypatch, [_account()], lambda *args: next(states)
+        monkeypatch, [_account()], lambda *args, **kwargs: next(states)
     )
 
     assert result.accounts_processed == 1
@@ -95,7 +97,7 @@ def test_processing_creates_and_publishes_reel(monkeypatch) -> None:
     result, cursor, _ = _run(
         monkeypatch,
         [_account()],
-        lambda *args: next(states),
+        lambda *args, **kwargs: next(states),
         generated_media=_media("mp4"),
         create_container=create_container,
         poll_container_status=poll_container_status,
@@ -130,7 +132,9 @@ def test_processing_skips_terminal_post(monkeypatch) -> None:
     """Success, failed, and unknown terminal states make no API attempt."""
     terminal = Post(101, "failed", None, None)
     states = iter([terminal, terminal])
-    result, _, connection = _run(monkeypatch, [_account()], lambda *args: next(states))
+    result, _, connection = _run(
+        monkeypatch, [_account()], lambda *args, **kwargs: next(states)
+    )
 
     assert result == processing.ProcessingResult(0, False)
     connection.commit.assert_not_called()
@@ -151,7 +155,7 @@ def test_processing_resumes_container_created_post_without_new_container(
     result, _, _ = _run(
         monkeypatch,
         [_account()],
-        lambda *args: next(states),
+        lambda *args, **kwargs: next(states),
         create_container=create_container,
         generate_presigned_url=presign,
     )
@@ -180,7 +184,7 @@ def test_processing_marks_clear_failure_and_continues_to_next_account(monkeypatc
     result, _, _ = _run(
         monkeypatch,
         [_account(1), _account(2)],
-        lambda *args: next(states),
+        lambda *args, **kwargs: next(states),
         create_container=create_container,
     )
 
@@ -199,7 +203,7 @@ def test_processing_marks_unknown_result_as_unconfirmed(monkeypatch) -> None:
     result, _, _ = _run(
         monkeypatch,
         [_account()],
-        lambda *args: next(states),
+        lambda *args, **kwargs: next(states),
         publish_container=lambda *args, **kwargs: (_ for _ in ()).throw(
             InstagramResultUnknown("timed out", {"error": "unknown"})
         ),
@@ -215,7 +219,7 @@ def test_processing_leaves_post_pending_when_secret_lookup_fails(monkeypatch) ->
     result, _, _ = _run(
         monkeypatch,
         [_account()],
-        lambda *args: next(states),
+        lambda *args, **kwargs: next(states),
         get_secret_string=lambda name: (_ for _ in ()).throw(RuntimeError("secret")),
     )
 
@@ -234,10 +238,190 @@ def test_processing_counts_unsupported_platform_but_leaves_state_nonterminal(
     result, _, _ = _run(
         monkeypatch,
         [_account(platform="threads")],
-        lambda *args: next(states),
+        lambda *args, **kwargs: next(states),
         get_secret_string=get_secret,
     )
 
     assert result == processing.ProcessingResult(1, False)
     get_secret.assert_not_called()
     processing.update_post_success.assert_not_called()
+
+
+def test_processing_does_not_create_story_when_disabled(monkeypatch) -> None:
+    """An MP4 retains the single-reel API flow when stories are disabled."""
+    states = iter([None, Post(101, "success", "container", "post")])
+    create_container = Mock(return_value=("reel-container", {"id": "reel-container"}))
+
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        create_container=create_container,
+        stories_enabled=False,
+    )
+
+    assert result == processing.ProcessingResult(1, True)
+    assert create_container.call_count == 1
+    assert processing.create_pending_post.call_args_list[0].kwargs["media_type"] == "reel"
+
+
+def test_processing_posts_story_after_successful_reel(monkeypatch) -> None:
+    """An enabled reel publishes its story only after the reel reaches success."""
+    states = iter(
+        [
+            None,
+            None,
+            Post(101, "success", "reel-container", "reel-post"),
+            Post(102, "success", "story-container", "story-post"),
+        ]
+    )
+    create_container = Mock(
+        side_effect=[
+            ("reel-container", {"id": "reel-container"}),
+            ("story-container", {"id": "story-container"}),
+        ]
+    )
+    publish_container = Mock(
+        side_effect=[
+            ("reel-post", {"id": "reel-post"}),
+            ("story-post", {"id": "story-post"}),
+        ]
+    )
+
+    result, cursor, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        stories_enabled=True,
+        create_pending_post=Mock(side_effect=[101, 102]),
+        create_container=create_container,
+        publish_container=publish_container,
+    )
+
+    assert result == processing.ProcessingResult(1, True)
+    assert [call.kwargs["media_type"] for call in processing.create_pending_post.call_args_list] == [
+        "reel",
+        "story",
+    ]
+    assert processing.ensure_post_media.call_count == 2
+    processing.update_post_snapshot.assert_called_once_with(
+        cursor,
+        101,
+        caption_template_id=3,
+        caption_text="caption",
+        media_type="reel",
+    )
+    assert create_container.call_args_list[0].args == (
+        "token",
+        "ig",
+        "https://signed",
+        "caption",
+    )
+    assert create_container.call_args_list[1].args == (
+        "token",
+        "ig",
+        "https://signed",
+    )
+    assert create_container.call_args_list[1].kwargs["media_type"] == "story"
+
+
+def test_processing_posts_story_after_previously_successful_reel(monkeypatch) -> None:
+    """A terminal successful reel still triggers its missing enabled story."""
+    states = iter(
+        [
+            Post(101, "success", "reel-container", "reel-post"),
+            None,
+            Post(101, "success", "reel-container", "reel-post"),
+            Post(102, "success", "story-container", "story-post"),
+        ]
+    )
+    create_container = Mock(return_value=("story-container", {"id": "story-container"}))
+
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        stories_enabled=True,
+        create_pending_post=Mock(return_value=102),
+        create_container=create_container,
+    )
+
+    assert result == processing.ProcessingResult(1, True)
+    processing.create_pending_post.assert_called_once()
+    assert processing.create_pending_post.call_args.kwargs["media_type"] == "story"
+    processing.update_post_snapshot.assert_not_called()
+    assert create_container.call_args.args == ("token", "ig", "https://signed")
+
+
+def test_processing_does_not_create_story_when_reel_fails(monkeypatch) -> None:
+    """A failed reel leaves no pending story row behind."""
+    states = iter([None, Post(101, "failed", None, None)])
+    create_container = Mock(
+        side_effect=InstagramRequestFailed("invalid video", {"error": "bad"})
+    )
+
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        stories_enabled=True,
+        create_container=create_container,
+    )
+
+    assert result == processing.ProcessingResult(1, False)
+    processing.create_pending_post.assert_called_once()
+    assert processing.create_pending_post.call_args.kwargs["media_type"] == "reel"
+
+
+def test_processing_keeps_reel_success_when_story_fails(monkeypatch) -> None:
+    """A story failure is isolated but makes the account result unsuccessful."""
+    states = iter(
+        [
+            None,
+            None,
+            Post(101, "success", "reel-container", "reel-post"),
+            Post(102, "failed", None, None),
+        ]
+    )
+    create_container = Mock(
+        side_effect=[
+            ("reel-container", {"id": "reel-container"}),
+            InstagramRequestFailed("invalid story", {"error": "bad"}),
+        ]
+    )
+
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        stories_enabled=True,
+        create_pending_post=Mock(side_effect=[101, 102]),
+        create_container=create_container,
+    )
+
+    assert result == processing.ProcessingResult(1, False)
+    assert processing.update_post_success.call_count == 1
+    assert processing.update_post_success.call_args.args[1] == 101
+    assert processing.update_post_failed.call_count == 1
+    assert processing.update_post_failed.call_args.args[1] == 102
+
+
+def test_processing_does_not_create_story_for_feed_image(monkeypatch) -> None:
+    """The stories switch applies only to reels, never image feed posts."""
+    states = iter([None, Post(101, "success", "container", "post")])
+
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        stories_enabled=True,
+    )
+
+    assert result == processing.ProcessingResult(1, True)
+    processing.create_pending_post.assert_called_once()
+    assert processing.create_pending_post.call_args.kwargs["media_type"] == "feed_image"

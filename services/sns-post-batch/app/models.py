@@ -12,6 +12,7 @@ class BatchSet:
     id: int
     set_code: str
     is_active: bool
+    stories_enabled: bool = False
 
 
 @dataclass(frozen=True)

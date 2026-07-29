@@ -243,7 +243,7 @@
           <li>重複 publish 応答、またはタイムアウト・接続断で結果不明 → <code>status='published_unconfirmed'</code> に更新</li>
         </ul>
       </li>
-      <li><strong>ストーリーズ再掲（<code>batch_sets.stories_enabled=1</code> のセットのみ。Phase 15-10 追加）</strong>: リール行が <code>success</code> に達した場合のみ、同一動画をストーリーズへ再掲する。<code>posts</code> へ <code>media_type='story'</code> の行を <code>pending</code> で INSERT-or-skip（既存ストーリーズ行があればその状態から 3.2 と同型の分岐で再開・終端ならスキップ）→ 同一 MP4 の Presigned URL でコンテナ作成（<code>media_type=STORIES</code> + <code>video_url</code>。<strong>キャプション・<code>share_to_feed</code>・カバーは指定しない</strong>〔ストーリーズはキャプション非対応〕）→ ステータスポーリング（動画の間隔 10 秒 × 最大 60 回を流用）→ パブリッシュ（結果の反映は手順 6 と同じ）。リール行が <code>success</code> 以外で終わったアカウントではストーリーズ行を作成しない</li>
+      <li><strong>ストーリーズ再掲（<code>batch_sets.stories_enabled=1</code> のセットのみ。Phase 15-10 追加）</strong>: リール行が <code>success</code> に達した場合のみ、同一動画をストーリーズへ再掲する。<code>posts</code> へ <code>media_type='story'</code> の行を <code>pending</code> で INSERT-or-skip（既存ストーリーズ行があればその状態から 3.2 と同型の分岐で再開・終端ならスキップ。<code>post_media</code> は手順 2 と同様にストーリーズ行にも同一メディアを <code>display_order=0</code> で 1 行紐づける〔15-12 実装〕。キャプションは非対応のため <code>caption_template_id</code> / <code>caption_text_snapshot</code> は NULL のまま）→ 同一 MP4 の Presigned URL でコンテナ作成（<code>media_type=STORIES</code> + <code>video_url</code>。<strong>キャプション・<code>share_to_feed</code>・カバーは指定しない</strong>〔ストーリーズはキャプション非対応〕）→ ステータスポーリング（動画の間隔 10 秒 × 最大 60 回を流用）→ パブリッシュ（結果の反映は手順 6 と同じ）。リール行が <code>success</code> 以外で終わったアカウントではストーリーズ行を作成しない</li>
     </ol>
   </li>
   <li>全アカウントの処理後、3.4 の方針に基づき終了コードを決定して終了する</li>

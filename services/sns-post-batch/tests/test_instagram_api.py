@@ -93,6 +93,31 @@ def test_create_container_posts_reel_graph_parameters() -> None:
     assert "thumb_offset" not in values
 
 
+def test_create_container_posts_story_without_caption_or_feed_options() -> None:
+    """Story creation sends only the Graph API fields supported for stories."""
+    urlopen = _recording_urlopen([FakeResponse({"id": "story-container"})])
+
+    assert instagram_api.create_container(
+        "token",
+        "ig-user",
+        "https://s3.example/video.mp4",
+        media_type="story",
+        urlopen=urlopen,
+    ) == ("story-container", {"id": "story-container"})
+
+    request, _ = urlopen.calls[0]
+    values = urllib.parse.parse_qs(request.data.decode())
+    assert values == {
+        "access_token": ["token"],
+        "media_type": ["STORIES"],
+        "video_url": ["https://s3.example/video.mp4"],
+    }
+    assert "caption" not in values
+    assert "share_to_feed" not in values
+    assert "cover_url" not in values
+    assert "thumb_offset" not in values
+
+
 def test_create_container_rejects_unknown_media_type() -> None:
     """Unsupported media types are rejected before an API request is sent."""
     with pytest.raises(ValueError, match="Unsupported Instagram media type"):
@@ -101,7 +126,7 @@ def test_create_container_rejects_unknown_media_type() -> None:
             "ig-user",
             "https://s3.example/media",
             "caption",
-            media_type="story",
+            media_type="unknown",
         )
 
 
@@ -113,6 +138,9 @@ def test_resolve_poll_settings_uses_reel_and_image_defaults() -> None:
     assert instagram_api.resolve_poll_settings(
         "feed_image"
     ) == instagram_api.PollSettings(10, 3.0)
+    assert instagram_api.resolve_poll_settings("story") == instagram_api.PollSettings(
+        60, 10.0
+    )
 
 
 def test_publish_container_posts_expected_graph_parameters() -> None:

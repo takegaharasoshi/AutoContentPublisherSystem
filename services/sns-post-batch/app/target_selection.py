@@ -15,6 +15,7 @@ def resolve_target_generation_run(cursor: Any, set_id: int) -> int | None:
     Returns:
         The selected generation run ID, or ``None`` when no target exists.
     """
+    # Story rows are only created after their preceding reel row reaches success.
     cursor.execute(
         "SELECT gr.id FROM generation_runs gr "
         "WHERE gr.set_id = %s "

@@ -15,12 +15,15 @@ def get_post(
     cursor: Any,
     generation_run_id: int,
     sns_account_id: int,
+    *,
+    media_type: str,
 ) -> Post | None:
-    """Fetch one post state for a generation run and SNS account."""
+    """Fetch one post state for a generation run, account, and media type."""
     cursor.execute(
         "SELECT id, status, platform_container_id, platform_post_id FROM posts "
-        "WHERE generation_run_id = %s AND sns_account_id = %s",
-        (generation_run_id, sns_account_id),
+        "WHERE generation_run_id = %s AND sns_account_id = %s "
+        "AND media_type = %s",
+        (generation_run_id, sns_account_id, media_type),
     )
     row = cursor.fetchone()
     if row is None:
@@ -67,8 +70,9 @@ def create_pending_post(
 
     cursor.execute(
         "SELECT id FROM posts "
-        "WHERE generation_run_id = %s AND sns_account_id = %s",
-        (generation_run_id, sns_account_id),
+        "WHERE generation_run_id = %s AND sns_account_id = %s "
+        "AND media_type = %s",
+        (generation_run_id, sns_account_id, media_type),
     )
     row = cursor.fetchone()
     if row is None:

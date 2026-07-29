@@ -85,6 +85,7 @@ def _local_batch_set(
     file_format: str,
     s3_key: str,
     duration_seconds: int | None = None,
+    stories_enabled: int = 0,
 ) -> Iterator[tuple[dict[str, Any], str, int, int, int]]:
     """Create local E2E rows and always remove them in FK-safe order."""
     try:
@@ -101,9 +102,16 @@ def _local_batch_set(
         with connection.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO batch_sets "
-                "(set_code, name, description, generator_name, is_active) "
-                "VALUES (%s, %s, %s, %s, %s)",
-                (set_code, "SNS local E2E", "pytest temporary row", "fake", 1),
+                "(set_code, name, description, generator_name, is_active, "
+                "stories_enabled) VALUES (%s, %s, %s, %s, %s, %s)",
+                (
+                    set_code,
+                    "SNS local E2E",
+                    "pytest temporary row",
+                    "fake",
+                    1,
+                    stories_enabled,
+                ),
             )
             set_id = cursor.lastrowid
             cursor.execute(
@@ -210,6 +218,18 @@ def local_reel_batch_set() -> Iterator[tuple[dict[str, Any], str, int, int, int]
         file_format="mp4",
         s3_key="videos/e2e.mp4",
         duration_seconds=10,
+    ) as batch_set:
+        yield batch_set
+
+
+@pytest.fixture
+def local_stories_batch_set() -> Iterator[tuple[dict[str, Any], str, int, int, int]]:
+    """Create a local E2E batch set with reels and stories enabled."""
+    with _local_batch_set(
+        file_format="mp4",
+        s3_key="videos/e2e-story.mp4",
+        duration_seconds=10,
+        stories_enabled=1,
     ) as batch_set:
         yield batch_set
 
@@ -334,6 +354,79 @@ def test_main_persists_successful_reel_post_to_local_mysql(
     assert reel_values["media_type"] == ["REELS"]
     assert reel_values["video_url"] == ["https://signed.example/videos/e2e.mp4"]
     assert reel_values["share_to_feed"] == ["true"]
+
+
+def test_main_persists_successful_reel_and_story_to_local_mysql(
+    local_stories_batch_set: tuple[dict[str, Any], str, int, int, int],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An enabled reel stores independent successful reel and story posts."""
+    secret, set_code, _, generation_run_id, generated_media_id = local_stories_batch_set
+    monkeypatch.setenv("ENV_NAME", "local")
+    monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
+    monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv("EXECUTION_ARN", f"arn:aws:states:local:e2e:{uuid4().hex}")
+    monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
+    monkeypatch.setattr(
+        processing_module,
+        "get_secret_string",
+        lambda name: '{"access_token":"test-token","ig_user_id":"test-ig"}',
+    )
+
+    responses = iter(
+        [
+            FakeResponse({"id": "container-e2e-reel"}),
+            FakeResponse({"status_code": "FINISHED"}),
+            FakeResponse({"id": "post-e2e-reel"}),
+            FakeResponse({"id": "container-e2e-story"}),
+            FakeResponse({"status_code": "FINISHED"}),
+            FakeResponse({"id": "post-e2e-story"}),
+        ]
+    )
+    requests: list[Any] = []
+
+    def fake_urlopen(request: Any, *, timeout: int) -> FakeResponse:
+        """Record the Graph requests for the consecutive publications."""
+        assert timeout == 30
+        requests.append(request)
+        return next(responses)
+
+    fake_s3 = FakeS3Client()
+    assert main(s3_client=fake_s3, urlopen=fake_urlopen) == 0
+
+    connection = _connect_local_mysql(secret)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT id, media_type, status, caption_template_id, "
+                "caption_text_snapshot, platform_post_id FROM posts "
+                "WHERE generation_run_id = %s ORDER BY media_type",
+                (generation_run_id,),
+            )
+            posts = cursor.fetchall()
+            cursor.execute(
+                "SELECT post_id, COUNT(*) FROM post_media "
+                "WHERE generated_media_id = %s GROUP BY post_id",
+                (generated_media_id,),
+            )
+            post_media_counts = cursor.fetchall()
+    finally:
+        connection.close()
+
+    assert len(posts) == 2
+    reel, story = posts
+    assert reel[1:] == ("reel", "success", reel[3], "E2E caption", "post-e2e-reel")
+    assert story[1:] == ("story", "success", None, None, "post-e2e-story")
+    assert reel[5] != story[5]
+    assert {post_id for post_id, _ in post_media_counts} == {reel[0], story[0]}
+    assert all(count == 1 for _, count in post_media_counts)
+    story_values = urllib.parse.parse_qs((requests[3].data or b"").decode())
+    assert story_values == {
+        "access_token": ["test-token"],
+        "media_type": ["STORIES"],
+        "video_url": ["https://signed.example/videos/e2e-story.mp4"],
+    }
+    assert len(fake_s3.calls) == 2
 
 
 def test_main_resumes_container_created_post_without_creating_a_duplicate(

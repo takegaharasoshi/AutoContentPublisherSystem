@@ -16,7 +16,7 @@ from app.models import (
 @pytest.mark.parametrize(
     "model",
     [
-        BatchSet(1, "set", True),
+        BatchSet(1, "set", True, False),
         SnsAccount(2, "instagram", "main", "Main"),
         CaptionTemplate(3, "caption"),
         GeneratedMediaRef(4, "bucket", "key", "jpg"),

@@ -147,6 +147,7 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                         sns_accounts=sns_accounts,
                         caption_template=caption_template,
                         generated_media=generated_media,
+                        stories_enabled=batch_set.stories_enabled,
                         env_name=config.env_name,
                         set_code=batch_set.set_code,
                         s3_bucket=config.s3_bucket_name,

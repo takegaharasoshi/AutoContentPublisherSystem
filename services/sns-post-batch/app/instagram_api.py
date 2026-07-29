@@ -11,7 +11,7 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any
 
-from .media_types import MEDIA_TYPE_FEED_IMAGE, MEDIA_TYPE_REEL
+from .media_types import MEDIA_TYPE_FEED_IMAGE, MEDIA_TYPE_REEL, MEDIA_TYPE_STORY
 
 
 GRAPH_API_BASE_URL = "https://graph.facebook.com/v21.0"
@@ -33,7 +33,7 @@ class PollSettings:
 
 def resolve_poll_settings(media_type: str) -> PollSettings:
     """Return the polling settings for a post media type."""
-    if media_type == MEDIA_TYPE_REEL:
+    if media_type in {MEDIA_TYPE_REEL, MEDIA_TYPE_STORY}:
         return PollSettings(REEL_POLL_MAX_ATTEMPTS, REEL_POLL_INTERVAL_SECONDS)
     return PollSettings(
         FEED_IMAGE_POLL_MAX_ATTEMPTS,
@@ -185,7 +185,7 @@ def create_container(
     access_token: str,
     ig_user_id: str,
     media_url: str,
-    caption: str,
+    caption: str | None = None,
     *,
     media_type: str = MEDIA_TYPE_FEED_IMAGE,
     urlopen: Any = urllib.request.urlopen,
@@ -204,6 +204,12 @@ def create_container(
             "video_url": media_url,
             "share_to_feed": "true",
             "caption": caption,
+            "access_token": access_token,
+        }
+    elif media_type == MEDIA_TYPE_STORY:
+        values = {
+            "media_type": "STORIES",
+            "video_url": media_url,
             "access_token": access_token,
         }
     else:

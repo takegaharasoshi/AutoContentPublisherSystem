@@ -16,13 +16,14 @@ def test_get_post_maps_row() -> None:
     cursor = Mock()
     cursor.fetchone.return_value = (4, "container_created", "container", None)
 
-    assert posts.get_post(cursor, 2, 3) == Post(
+    assert posts.get_post(cursor, 2, 3, media_type="reel") == Post(
         4, "container_created", "container", None
     )
     cursor.execute.assert_called_once_with(
         "SELECT id, status, platform_container_id, platform_post_id FROM posts "
-        "WHERE generation_run_id = %s AND sns_account_id = %s",
-        (2, 3),
+        "WHERE generation_run_id = %s AND sns_account_id = %s "
+        "AND media_type = %s",
+        (2, 3, "reel"),
     )
 
 
@@ -31,7 +32,43 @@ def test_get_post_returns_none_when_missing() -> None:
     cursor = Mock()
     cursor.fetchone.return_value = None
 
-    assert posts.get_post(cursor, 2, 3) is None
+    assert posts.get_post(cursor, 2, 3, media_type="story") is None
+
+
+def test_get_post_selects_the_requested_media_type() -> None:
+    """Reel and story rows with one account are never interchanged."""
+    cursor = Mock()
+    rows = {
+        "reel": (4, "success", "reel-container", "reel-post"),
+        "story": (5, "pending", None, None),
+    }
+    cursor.fetchone.side_effect = lambda: rows[cursor.execute.call_args.args[1][2]]
+
+    assert posts.get_post(cursor, 2, 3, media_type="reel") == Post(
+        4, "success", "reel-container", "reel-post"
+    )
+    assert posts.get_post(cursor, 2, 3, media_type="story") == Post(
+        5, "pending", None, None
+    )
+
+
+def test_create_pending_post_duplicate_selects_the_requested_media_type() -> None:
+    """The duplicate fallback fetches the matching story row, not its reel."""
+    cursor = Mock()
+    cursor.execute.side_effect = [
+        pymysql.err.IntegrityError(1062, "duplicate"),
+        None,
+    ]
+    cursor.fetchone.return_value = (13,)
+
+    assert posts.create_pending_post(
+        cursor,
+        set_id=1,
+        generation_run_id=2,
+        sns_account_id=3,
+        media_type="story",
+    ) == 13
+    assert cursor.execute.call_args.args[1] == (2, 3, "story")
 
 
 def test_create_pending_post_inserts_and_returns_id() -> None:
@@ -71,8 +108,9 @@ def test_create_pending_post_fetches_duplicate_id() -> None:
     ) == 12
     assert cursor.execute.call_args_list[-1].args == (
         "SELECT id FROM posts "
-        "WHERE generation_run_id = %s AND sns_account_id = %s",
-        (2, 3),
+        "WHERE generation_run_id = %s AND sns_account_id = %s "
+        "AND media_type = %s",
+        (2, 3, "feed_image"),
     )
 
 

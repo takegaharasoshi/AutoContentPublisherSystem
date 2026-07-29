@@ -18,10 +18,16 @@ def find_batch_set_by_code(cursor: Any, set_code: str) -> BatchSet | None:
         The batch set, or ``None`` when it is not found.
     """
     cursor.execute(
-        "SELECT id, set_code, is_active FROM batch_sets WHERE set_code = %s",
+        "SELECT id, set_code, is_active, stories_enabled FROM batch_sets "
+        "WHERE set_code = %s",
         (set_code,),
     )
     row = cursor.fetchone()
     if row is None:
         return None
-    return BatchSet(id=row[0], set_code=row[1], is_active=bool(row[2]))
+    return BatchSet(
+        id=row[0],
+        set_code=row[1],
+        is_active=bool(row[2]),
+        stories_enabled=bool(row[3]),
+    )

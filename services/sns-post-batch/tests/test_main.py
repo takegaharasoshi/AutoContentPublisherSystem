@@ -201,6 +201,7 @@ def test_main_finalizes_success_with_processed_account_count(monkeypatch) -> Non
     assert finalizer.call_args.kwargs["status"] == "succeeded"
     assert finalizer.call_args.kwargs["records_processed"] == 1
     processor.assert_called_once()
+    assert processor.call_args.kwargs["stories_enabled"] is False
 
 
 def test_main_finalizes_failed_when_an_account_does_not_succeed(monkeypatch) -> None:

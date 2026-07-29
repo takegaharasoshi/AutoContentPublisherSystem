@@ -13,7 +13,8 @@ def test_find_batch_set_returns_none_when_not_found() -> None:
 
     assert find_batch_set_by_code(cursor, "missing") is None
     cursor.execute.assert_called_once_with(
-        "SELECT id, set_code, is_active FROM batch_sets WHERE set_code = %s",
+        "SELECT id, set_code, is_active, stories_enabled FROM batch_sets "
+        "WHERE set_code = %s",
         ("missing",),
     )
 
@@ -21,6 +22,6 @@ def test_find_batch_set_returns_none_when_not_found() -> None:
 def test_find_batch_set_normalizes_active_flag() -> None:
     """The database integer active flag is returned as bool."""
     cursor = Mock()
-    cursor.fetchone.return_value = (3, "set-a", 0)
+    cursor.fetchone.return_value = (3, "set-a", 0, 1)
 
-    assert find_batch_set_by_code(cursor, "set-a") == BatchSet(3, "set-a", False)
+    assert find_batch_set_by_code(cursor, "set-a") == BatchSet(3, "set-a", False, True)

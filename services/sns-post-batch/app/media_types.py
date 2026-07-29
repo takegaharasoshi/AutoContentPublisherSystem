@@ -5,6 +5,7 @@ from __future__ import annotations
 
 MEDIA_TYPE_FEED_IMAGE = "feed_image"
 MEDIA_TYPE_REEL = "reel"
+MEDIA_TYPE_STORY = "story"
 
 
 def derive_media_type(file_format: str) -> str:
