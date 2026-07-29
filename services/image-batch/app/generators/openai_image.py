@@ -42,11 +42,11 @@ def request_images(client: Any, prompt_config: PromptConfig) -> list[bytes]:
 
 
 def request_illustration(client: Any, prompt: str) -> bytes:
-    """Generate and decode one medium-quality square PNG illustration."""
+    """Generate and decode one medium-quality landscape PNG illustration."""
     response = client.images.generate(
         model="gpt-image-1",
         prompt=prompt,
-        size="1024x1024",
+        size="1536x1024",
         quality="medium",
         n=1,
     )

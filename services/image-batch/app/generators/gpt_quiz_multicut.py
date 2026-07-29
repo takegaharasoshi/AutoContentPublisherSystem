@@ -142,16 +142,51 @@ SLOT_TIME_MOODS = {
     "noon": "昼の明るい光",
     "night": "夜の落ち着いた照明",
 }
-ANSWER_ILLUSTRATION_OVERLAY_OPACITY = 0.55
 HEADING_FONT_SIZE = 88
-THINK_COUNT_FONT_SIZE = 140
+# カウントダウン数字は円バッジ（COUNT_BADGE_DIAMETER）に収まる大きさにする
+THINK_COUNT_FONT_SIZE = 90
 QUESTION_FONT_SIZE = 56
+# 問題文とヒントの高さ上限は、テキストが最大まで伸びても
+# カード内に MIN_ILLUSTRATION_HEIGHT のイラスト領域が残る値にする
+QUESTION_MAX_HEIGHT = 420
+ANSWER_MAX_HEIGHT = 140
+EXPLANATION_MAX_HEIGHT = 240
+# コーチのセリフ（固定文はコード側で持つ。答えカットのみ LLM の coach_comment）
+HOOK_BUBBLE_TEXT = "今日も一緒に鍛えよう！"
+QUESTION_BUBBLE_TEXT = "頭の中だけで解けるぞ！"
+THINK_HINT_TEXT = "止めてじっくり考えても OK"
 SUPPLEMENT_FONT_SIZE = 40
 MIN_BODY_FONT_SIZE = 30
 LINE_START_PROHIBITED = "、。，．,.)）]］｝」』】〉》!！?？:：;；ー〜…‥・%％℃"
 LINE_END_PROHIBITED = "（(「『【〈《[［｛"
 CARD_PADDING = 64
 COACH_BOX = (300, 430)
+# コーチはカード下端から一定距離に立たせる（本文ではなく装飾のため、
+# Instagram UI 予約域に足元が掛かることは許容し、上に空いた分をイラストへ回す）
+COACH_BOTTOM_MARGIN = 140
+# 情景イラストはカード内の横長ブロックとして、テキストの下・コーチの真上に常駐させる
+# （コーチとは重ねない）。ブロックの上端は 1 実行の 4 カット種別で最も低いテキスト下端に
+# 合わせて共通化し、カット間でイラストが動かないようにする（テキストとコーチだけが変わる）。
+CARD_CONTENT_GAP = 48
+ILLUSTRATION_RADIUS = 28
+MIN_ILLUSTRATION_HEIGHT = 200
+# イラストの下端はコーチのすぐ上まで伸ばす
+ILLUSTRATION_COACH_GAP = 16
+# コーチのセリフ（考えるカットのヒント・答えカットのひとこと）は
+# コーチの左隣に吹き出しで置く
+BUBBLE_PADDING = 28
+BUBBLE_TAIL_WIDTH = 28
+BUBBLE_TOP_OFFSET = 60
+BUBBLE_MAX_TEXT_HEIGHT = 200
+# 時間帯ラベルのピル（テキスト幅 + アクセントドット）
+LABEL_FONT_SIZE = 34
+LABEL_PILL_HEIGHT = 66
+LABEL_PILL_PADDING_X = 34
+LABEL_DOT_DIAMETER = 16
+# 見出し（今日の脳トレ / 問題 / 答え）の左に添えるアクセントバー
+HEADING_BAR_WIDTH = 14
+# カウントダウンはアクセント色の円バッジに白抜きで表示する
+COUNT_BADGE_DIAMETER = 150
 
 FONT_FILENAMES = {
     "regular": "NotoSansJP-Regular.otf",
@@ -903,14 +938,18 @@ def _build_illustration_prompt(
     )
 
 
-def _safe_area() -> tuple[int, int, int, int]:
-    """Intersect zoompan and Instagram UI safe areas."""
+def _card_area() -> tuple[int, int, int, int]:
+    """Card rectangle: the zoompan-safe box (content stays in _safe_area())."""
     zoom_width = int(OUTPUT_WIDTH / ZOOM_END) - SAFE_BOX_MARGIN
     zoom_height = int(OUTPUT_HEIGHT / ZOOM_END) - SAFE_BOX_MARGIN
     zoom_left = (OUTPUT_WIDTH - zoom_width) // 2
     zoom_top = (OUTPUT_HEIGHT - zoom_height) // 2
-    zoom_right = zoom_left + zoom_width
-    zoom_bottom = zoom_top + zoom_height
+    return (zoom_left, zoom_top, zoom_left + zoom_width, zoom_top + zoom_height)
+
+
+def _safe_area() -> tuple[int, int, int, int]:
+    """Intersect zoompan and Instagram UI safe areas."""
+    zoom_left, zoom_top, zoom_right, zoom_bottom = _card_area()
     instagram_right = int(OUTPUT_WIDTH * (1 - INSTAGRAM_RIGHT_RESERVED_RATIO))
     instagram_bottom = int(OUTPUT_HEIGHT * (1 - INSTAGRAM_BOTTOM_RESERVED_RATIO))
     return (
@@ -1014,83 +1053,129 @@ def _draw_wrapped(
     return y
 
 
-def _cover_illustration(png: bytes) -> Image.Image:
-    """Decode a generated PNG and cover the vertical output canvas."""
+def _decode_illustration(png: bytes) -> Image.Image:
+    """Decode one generated scene illustration."""
     try:
         with Image.open(BytesIO(png)) as source:
             source.load()
             if source.format != "PNG":
                 raise RuntimeError("Quiz illustration must be a PNG")
-            return ImageOps.fit(
-                source.convert("RGB"),
-                (OUTPUT_WIDTH, OUTPUT_HEIGHT),
-                method=Image.Resampling.LANCZOS,
-                centering=(0.5, 0.5),
-            )
+            return source.convert("RGB")
     except RuntimeError:
         raise
     except Exception as exc:
         raise RuntimeError("Invalid quiz illustration PNG") from exc
 
 
-def _base_card(
+def _paste_illustration(
+    canvas: Image.Image,
     illustration: Image.Image,
+    box: tuple[int, int, int, int],
+    border_color: str,
+) -> None:
+    """Paste the scene illustration as a rounded block inside the card."""
+    left, top, right, bottom = box
+    width, height = right - left, bottom - top
+    fitted = ImageOps.fit(
+        illustration,
+        (width, height),
+        method=Image.Resampling.LANCZOS,
+        centering=(0.5, 0.5),
+    )
+    mask = Image.new("L", (width, height), 0)
+    ImageDraw.Draw(mask).rounded_rectangle(
+        (0, 0, width - 1, height - 1),
+        radius=ILLUSTRATION_RADIUS,
+        fill=255,
+    )
+    canvas.paste(fitted, (left, top), mask)
+    # 細い縁取りでカードと写真調ブロックの境界を整える
+    ImageDraw.Draw(canvas).rounded_rectangle(
+        (left, top, right - 1, bottom - 1),
+        radius=ILLUSTRATION_RADIUS,
+        outline=border_color,
+        width=2,
+    )
+
+
+def _base_card(
     palette: dict[str, str],
     slot_label: str,
     fonts: dict[str, Path],
-    *,
-    dim_illustration: bool = False,
 ) -> tuple[Image.Image, ImageDraw.ImageDraw, tuple[int, int, int, int]]:
-    """Create the shared illustrated flat-design card background."""
-    image = illustration.copy()
-    if dim_illustration:
-        overlay = Image.new("RGB", image.size, palette["background"])
-        image = Image.blend(
-            image,
-            overlay,
-            ANSWER_ILLUSTRATION_OVERLAY_OPACITY,
-        )
+    """Create the shared flat-design card background."""
+    image = Image.new("RGB", (OUTPUT_WIDTH, OUTPUT_HEIGHT), palette["background"])
     draw = ImageDraw.Draw(image)
     safe = _safe_area()
     left, top, right, bottom = safe
+    # カードはズームセーフ枠いっぱい、本文はセーフエリア内（Instagram UI 予約域を避ける）
     draw.rounded_rectangle(
-        (left, top, right, bottom),
+        _card_area(),
         radius=42,
         fill=palette["card"],
     )
-    draw.ellipse(
-        (left + 28, top + 26, left + 150, top + 148),
-        fill=palette["decoration"],
-    )
-    draw.ellipse(
-        (right - 105, bottom - 105, right - 25, bottom - 25),
-        fill=palette["accent"],
-    )
-    label_box = (left + 180, top + 28, right - 180, top + 94)
+    # 時間帯ラベルはテキスト幅に合わせたピルを上部中央に置き、
+    # 左にアクセント色のドットを添える（空の飾り円は置かない）
+    label_font = _font(fonts["bold"], LABEL_FONT_SIZE)
+    label_width = int(draw.textlength(slot_label, font=label_font))
+    dot = LABEL_DOT_DIAMETER
+    inner_width = dot + 20 + label_width
+    pill_left = (left + right - inner_width) // 2 - LABEL_PILL_PADDING_X
+    pill_right = pill_left + inner_width + 2 * LABEL_PILL_PADDING_X
+    pill_top = top + 30
+    pill_bottom = pill_top + LABEL_PILL_HEIGHT
     draw.rounded_rectangle(
-        label_box,
-        radius=30,
+        (pill_left, pill_top, pill_right, pill_bottom),
+        radius=LABEL_PILL_HEIGHT // 2,
         fill=palette["decoration"],
     )
-    label_font, label_lines, _ = _fit_wrapped_text(
-        draw,
-        slot_label,
-        fonts["bold"],
-        34,
-        label_box[2] - label_box[0] - 40,
-        label_box[3] - label_box[1] - 16,
+    dot_top = (pill_top + pill_bottom - dot) // 2
+    draw.ellipse(
+        (
+            pill_left + LABEL_PILL_PADDING_X,
+            dot_top,
+            pill_left + LABEL_PILL_PADDING_X + dot,
+            dot_top + dot,
+        ),
+        fill=palette["accent"],
     )
     draw.text(
         (
-            (label_box[0] + label_box[2]) // 2,
-            (label_box[1] + label_box[3]) // 2,
+            pill_left + LABEL_PILL_PADDING_X + dot + 20,
+            (pill_top + pill_bottom) // 2,
         ),
-        label_lines[0],
+        slot_label,
         font=label_font,
         fill=palette["text"],
-        anchor="mm",
+        anchor="lm",
     )
     return image, draw, safe
+
+
+def _draw_heading(
+    draw: ImageDraw.ImageDraw,
+    position: tuple[int, int],
+    text: str,
+    palette: dict[str, str],
+    fonts: dict[str, Path],
+    *,
+    size: int = HEADING_FONT_SIZE,
+) -> None:
+    """Draw one section heading with the shared accent bar on its left."""
+    x, y = position
+    bar_height = int(size * 0.82)
+    bar_top = y + (int(size * 1.18) - bar_height) // 2
+    draw.rounded_rectangle(
+        (x, bar_top, x + HEADING_BAR_WIDTH, bar_top + bar_height),
+        radius=HEADING_BAR_WIDTH // 2,
+        fill=palette["accent"],
+    )
+    draw.text(
+        (x + HEADING_BAR_WIDTH + 28, y),
+        text,
+        font=_font(fonts["bold"], size),
+        fill=palette["text"],
+    )
 
 
 def _paste_coach(
@@ -1098,12 +1183,89 @@ def _paste_coach(
     coach: Image.Image,
     safe: tuple[int, int, int, int],
 ) -> None:
-    """Fit and paste a transparent coach pose inside the safe area."""
+    """Fit and paste a transparent coach pose at the bottom of the safe area."""
     _, _, right, bottom = safe
+    # アセットは 4 表情共通のキャンバス（下端中央そろえ）のため、
+    # トリミングせずそのまま収めてカット間で大きさ・立ち位置を動かさない
     fitted = ImageOps.contain(coach, COACH_BOX, Image.Resampling.LANCZOS)
     x = right - fitted.width - CARD_PADDING
-    y = bottom - fitted.height - CARD_PADDING
+    y = _coach_top(bottom) + (COACH_BOX[1] - fitted.height)
     canvas.paste(fitted, (x, y), fitted)
+
+
+def _coach_top(safe_bottom: int) -> int:
+    """Top of the coach band (the illustration block ends above it)."""
+    del safe_bottom  # コーチはカード下端を基準に立たせる
+    return _card_area()[3] - COACH_BOTTOM_MARGIN - COACH_BOX[1]
+
+
+def _trim_coaches(coaches: dict[str, Image.Image]) -> dict[str, Image.Image]:
+    """Crop the shared empty margin of the four coach assets.
+
+    アセットは 4 表情共通のキャンバス（下端中央そろえ）で作られているため、
+    4 枚の不透明領域の和で同じ矩形を切り出せば、カット間の相対サイズ・
+    立ち位置を保ったまま余白だけを取り除ける。
+    """
+    boxes = [image.getbbox() for image in coaches.values()]
+    if any(box is None for box in boxes):
+        return coaches
+    left = min(box[0] for box in boxes)
+    top = min(box[1] for box in boxes)
+    right = max(box[2] for box in boxes)
+    bottom = max(box[3] for box in boxes)
+    return {
+        pose: image.crop((left, top, right, bottom))
+        for pose, image in coaches.items()
+    }
+
+
+def _draw_speech_bubble(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    fonts: dict[str, Path],
+    palette: dict[str, str],
+    safe: tuple[int, int, int, int],
+) -> None:
+    """Draw one coach line as a speech bubble to the left of the coach."""
+    left, _, right, bottom = safe
+    bubble_right = right - CARD_PADDING - COACH_BOX[0] - BUBBLE_TAIL_WIDTH
+    bubble_left = left + CARD_PADDING
+    inner_width = bubble_right - bubble_left - 2 * BUBBLE_PADDING
+    font, lines, line_height = _fit_wrapped_text(
+        draw,
+        text,
+        fonts["bold"],
+        SUPPLEMENT_FONT_SIZE,
+        inner_width,
+        BUBBLE_MAX_TEXT_HEIGHT,
+    )
+    text_height = len(lines) * line_height
+    bubble_top = _coach_top(bottom) + BUBBLE_TOP_OFFSET
+    bubble_bottom = bubble_top + text_height + 2 * BUBBLE_PADDING
+    draw.rounded_rectangle(
+        (bubble_left, bubble_top, bubble_right, bubble_bottom),
+        radius=32,
+        fill=palette["decoration"],
+    )
+    # コーチへ向かうしっぽ
+    tail_y = (bubble_top + bubble_bottom) // 2
+    draw.polygon(
+        [
+            (bubble_right - 4, tail_y - 26),
+            (bubble_right - 4, tail_y + 26),
+            (bubble_right + BUBBLE_TAIL_WIDTH, tail_y),
+        ],
+        fill=palette["decoration"],
+    )
+    y = bubble_top + BUBBLE_PADDING
+    for line in lines:
+        draw.text(
+            (bubble_left + BUBBLE_PADDING, y),
+            line,
+            font=font,
+            fill=palette["text"],
+        )
+        y += line_height
 
 
 def _encode_png(image: Image.Image) -> bytes:
@@ -1122,31 +1284,30 @@ def _render_hook_card(
     illustration: Image.Image,
     palette: dict[str, str],
     slot_label: str,
-) -> bytes:
+    illustration_box: tuple[int, int, int, int] | None,
+) -> tuple[bytes, int]:
     """Render cut 1."""
-    image, draw, safe = _base_card(
-        illustration, palette, slot_label, fonts
-    )
+    image, draw, safe = _base_card(palette, slot_label, fonts)
     left, top, right, bottom = safe
     x, y = left + CARD_PADDING, top + 130
-    draw.text(
-        (x, y),
-        "今日の脳トレ",
-        font=_font(fonts["bold"], HEADING_FONT_SIZE),
-        fill=palette["accent"],
-    )
+    _draw_heading(draw, (x, y), "今日の脳トレ", palette, fonts)
     y += 140
+    # 型・難度のピルはテキスト幅に合わせる
     label = "論理パズル" if quiz_type == "L1" else "フェルミ推定"
+    pill_text = f"{label}  {difficulty}"
+    pill_font = _font(fonts["bold"], SUPPLEMENT_FONT_SIZE)
+    pill_width = int(draw.textlength(pill_text, font=pill_font)) + 2 * 32
     draw.rounded_rectangle(
-        (x, y, x + 480, y + 74), 30, fill=palette["accent"]
+        (x, y, x + pill_width, y + 74), 37, fill=palette["accent"]
     )
     draw.text(
-        (x + 24, y + 8),
-        f"{label}  {difficulty}",
-        font=_font(fonts["bold"], SUPPLEMENT_FONT_SIZE),
-        fill=palette["background"],
+        (x + pill_width // 2, y + 37),
+        pill_text,
+        font=pill_font,
+        fill=palette["card"],
+        anchor="mm",
     )
-    _draw_wrapped(
+    content_bottom = _draw_wrapped(
         draw,
         (x, y + 130),
         fields["hook"],
@@ -1156,8 +1317,13 @@ def _render_hook_card(
         520,
         fill=palette["text"],
     )
+    _draw_speech_bubble(draw, HOOK_BUBBLE_TEXT, fonts, palette, safe)
+    if illustration_box is not None:
+        _paste_illustration(
+            image, illustration, illustration_box, palette["decoration"]
+        )
     _paste_coach(image, coach, safe)
-    return _encode_png(image)
+    return _encode_png(image), content_bottom
 
 
 def _render_question_card(
@@ -1167,31 +1333,30 @@ def _render_question_card(
     illustration: Image.Image,
     palette: dict[str, str],
     slot_label: str,
-) -> bytes:
+    illustration_box: tuple[int, int, int, int] | None,
+) -> tuple[bytes, int]:
     """Render cut 2."""
-    image, draw, safe = _base_card(
-        illustration, palette, slot_label, fonts
-    )
+    image, draw, safe = _base_card(palette, slot_label, fonts)
     left, top, right, _ = safe
     x, y = left + CARD_PADDING, top + 130
-    draw.text(
-        (x, y),
-        "問題",
-        font=_font(fonts["bold"], HEADING_FONT_SIZE),
-        fill=palette["accent"],
-    )
-    _draw_wrapped(
+    _draw_heading(draw, (x, y), "問題", palette, fonts)
+    content_bottom = _draw_wrapped(
         draw,
         (x, y + 145),
         fields["question"],
         fonts["regular"],
         QUESTION_FONT_SIZE,
         right - x - CARD_PADDING,
-        850,
+        QUESTION_MAX_HEIGHT,
         fill=palette["text"],
     )
+    _draw_speech_bubble(draw, QUESTION_BUBBLE_TEXT, fonts, palette, safe)
+    if illustration_box is not None:
+        _paste_illustration(
+            image, illustration, illustration_box, palette["decoration"]
+        )
     _paste_coach(image, coach, safe)
-    return _encode_png(image)
+    return _encode_png(image), content_bottom
 
 
 def _render_think_card(
@@ -1202,55 +1367,46 @@ def _render_think_card(
     illustration: Image.Image,
     palette: dict[str, str],
     slot_label: str,
-) -> bytes:
+    illustration_box: tuple[int, int, int, int] | None,
+) -> tuple[bytes, int]:
     """Render one countdown sub-card that keeps the question readable."""
-    image, draw, safe = _base_card(
-        illustration, palette, slot_label, fonts
-    )
+    image, draw, safe = _base_card(palette, slot_label, fonts)
     left, top, right, bottom = safe
     x, y = left + CARD_PADDING, top + 130
-    draw.text(
-        (x, y),
-        str(count),
-        font=_font(fonts["bold"], THINK_COUNT_FONT_SIZE),
+    # カウントダウンはアクセント色の円バッジに白抜きで表示する
+    badge = COUNT_BADGE_DIAMETER
+    badge_top = y - (badge - 104) // 2
+    draw.ellipse(
+        (x, badge_top, x + badge, badge_top + badge),
         fill=palette["accent"],
     )
+    draw.text(
+        (x + badge // 2, badge_top + badge // 2),
+        str(count),
+        font=_font(fonts["bold"], THINK_COUNT_FONT_SIZE),
+        fill=palette["card"],
+        anchor="mm",
+    )
     # 問題文はカット 2 と同座標・同サイズに据え置き、カット間で動かさない
-    _draw_wrapped(
+    question_bottom = _draw_wrapped(
         draw,
         (x, y + 145),
         fields["question"],
         fonts["regular"],
         QUESTION_FONT_SIZE,
         right - x - CARD_PADDING,
-        850,
+        QUESTION_MAX_HEIGHT,
         fill=palette["text"],
     )
-    # ポーズ記号 U+23F8 は Noto Sans JP に無いグリフのため矩形 2 本で描く
-    hint_x = left + CARD_PADDING
-    hint_y = top + 1150
-    for offset in (0, 26):
-        draw.rounded_rectangle(
-            (hint_x + offset, hint_y + 6, hint_x + offset + 14, hint_y + 52),
-            radius=6,
-            fill=palette["muted_text"],
+    # ヒントはコーチのセリフとして、コーチの左隣に吹き出しで置く
+    _draw_speech_bubble(draw, THINK_HINT_TEXT, fonts, palette, safe)
+    content_bottom = question_bottom
+    if illustration_box is not None:
+        _paste_illustration(
+            image, illustration, illustration_box, palette["decoration"]
         )
-    # ヒントはコーチ画像（右下・COACH_BOX 幅）の左隣に収める
-    hint_max_width = (
-        right - COACH_BOX[0] - CARD_PADDING - (hint_x + 72) - 24
-    )
-    _draw_wrapped(
-        draw,
-        (hint_x + 72, hint_y),
-        "止めてじっくり考えても OK",
-        fonts["bold"],
-        SUPPLEMENT_FONT_SIZE,
-        hint_max_width,
-        180,
-        fill=palette["muted_text"],
-    )
     _paste_coach(image, coach, (left, top, right, bottom))
-    return _encode_png(image)
+    return _encode_png(image), content_bottom
 
 
 def _render_answer_card(
@@ -1261,24 +1417,14 @@ def _render_answer_card(
     illustration: Image.Image,
     palette: dict[str, str],
     slot_label: str,
-) -> bytes:
+    illustration_box: tuple[int, int, int, int] | None,
+) -> tuple[bytes, int]:
     """Render cut 4 with a visual loop-closing title."""
-    image, draw, safe = _base_card(
-        illustration,
-        palette,
-        slot_label,
-        fonts,
-        dim_illustration=True,
-    )
+    image, draw, safe = _base_card(palette, slot_label, fonts)
     left, top, right, _ = safe
     x, y = left + CARD_PADDING, top + 130
     label = "論理パズル" if quiz_type == "L1" else "フェルミ推定"
-    draw.text(
-        (x, y),
-        f"答え｜{label}",
-        font=_font(fonts["bold"], 66),
-        fill=palette["accent"],
-    )
+    _draw_heading(draw, (x, y), f"答え｜{label}", palette, fonts, size=66)
     y = _draw_wrapped(
         draw,
         (x, y + 115),
@@ -1286,31 +1432,27 @@ def _render_answer_card(
         fonts["bold"],
         QUESTION_FONT_SIZE,
         right - x - CARD_PADDING,
-        230,
+        ANSWER_MAX_HEIGHT,
         fill=palette["text"],
     )
-    y = _draw_wrapped(
+    content_bottom = _draw_wrapped(
         draw,
         (x, y + 38),
         fields["explanation"],
         fonts["regular"],
         SUPPLEMENT_FONT_SIZE,
         right - x - CARD_PADDING,
-        430,
+        EXPLANATION_MAX_HEIGHT,
         fill=palette["text"],
     )
-    _draw_wrapped(
-        draw,
-        (x, y + 40),
-        fields["coach_comment"],
-        fonts["bold"],
-        SUPPLEMENT_FONT_SIZE,
-        right - x - CARD_PADDING,
-        160,
-        fill=palette["accent"],
-    )
+    # コーチのひとことは吹き出しでコーチの左隣に置く
+    _draw_speech_bubble(draw, fields["coach_comment"], fonts, palette, safe)
+    if illustration_box is not None:
+        _paste_illustration(
+            image, illustration, illustration_box, palette["decoration"]
+        )
     _paste_coach(image, coach, safe)
-    return _encode_png(image)
+    return _encode_png(image), content_bottom
 
 
 def _render_cards(
@@ -1325,48 +1467,80 @@ def _render_cards(
 ) -> tuple[list[bytes], list[bytes]]:
     """Render eight timeline cards and four representative cut cards."""
     palette = SLOT_PALETTES[slot_code]
-    illustration = _cover_illustration(illustration_png)
-    cut1 = _render_hook_card(
-        fields,
-        quiz_type,
-        difficulty,
-        coaches["hook"],
-        fonts,
-        illustration,
-        palette,
-        slot_label,
-    )
-    cut2 = _render_question_card(
-        fields,
-        coaches["question"],
-        fonts,
-        illustration,
-        palette,
-        slot_label,
-    )
-    think_cards = [
-        _render_think_card(
-            count,
+    illustration = _decode_illustration(illustration_png)
+    coaches = _trim_coaches(coaches)
+
+    def render_all(
+        illustration_box: tuple[int, int, int, int] | None,
+    ) -> tuple[list[bytes], list[bytes], int]:
+        """Render every card and report the lowest text bottom across cuts."""
+        cut1, hook_bottom = _render_hook_card(
             fields,
-            coaches["think"],
+            quiz_type,
+            difficulty,
+            coaches["hook"],
             fonts,
             illustration,
             palette,
             slot_label,
+            illustration_box,
         )
-        for count in range(5, 0, -1)
-    ]
-    cut4 = _render_answer_card(
-        fields,
-        quiz_type,
-        coaches["answer"],
-        fonts,
-        illustration,
-        palette,
-        slot_label,
+        cut2, question_bottom = _render_question_card(
+            fields,
+            coaches["question"],
+            fonts,
+            illustration,
+            palette,
+            slot_label,
+            illustration_box,
+        )
+        think_cards: list[bytes] = []
+        think_bottom = 0
+        for count in range(5, 0, -1):
+            card, think_bottom = _render_think_card(
+                count,
+                fields,
+                coaches["think"],
+                fonts,
+                illustration,
+                palette,
+                slot_label,
+                illustration_box,
+            )
+            think_cards.append(card)
+        cut4, answer_bottom = _render_answer_card(
+            fields,
+            quiz_type,
+            coaches["answer"],
+            fonts,
+            illustration,
+            palette,
+            slot_label,
+            illustration_box,
+        )
+        timeline = [cut1, cut2, *think_cards, cut4]
+        content_bottom = max(
+            hook_bottom, question_bottom, think_bottom, answer_bottom
+        )
+        return timeline, [cut1, cut2, think_cards[0], cut4], content_bottom
+
+    # 1 巡目はイラストなしで描いて 4 カット中で最も低いテキスト下端を測り、
+    # 2 巡目でテキストとコーチの間に共通のイラストブロックを敷いて本描画する
+    # （コーチの上端との間隔を空け、コーチとイラストを重ねない）。
+    left, _, right, bottom = _safe_area()
+    _, _, content_bottom = render_all(None)
+    box_top = content_bottom + CARD_CONTENT_GAP
+    box_bottom = _coach_top(bottom) - ILLUSTRATION_COACH_GAP
+    if box_bottom - box_top < MIN_ILLUSTRATION_HEIGHT:
+        raise RuntimeError("Quiz text leaves no room for the scene illustration")
+    illustration_box = (
+        left + CARD_PADDING,
+        box_top,
+        right - CARD_PADDING,
+        box_bottom,
     )
-    timeline = [cut1, cut2, *think_cards, cut4]
-    return timeline, [cut1, cut2, think_cards[0], cut4]
+    timeline, cuts, _ = render_all(illustration_box)
+    return timeline, cuts
 
 
 def _zoompan_filter(input_index: int, duration: int, output: str) -> str:

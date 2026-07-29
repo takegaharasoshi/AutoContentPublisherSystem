@@ -681,11 +681,11 @@ def _solid_png(color: tuple[int, int, int]) -> bytes:
         ("night", "夜のロジトレ"),
     ],
 )
-def test_render_cards_uses_slot_palette_label_and_answer_dimming(
+def test_render_cards_uses_slot_palette_and_in_card_illustration(
     slot_code: str,
     slot_label: str,
 ) -> None:
-    """All palettes render eight cards with a label and answer-only dimming."""
+    """All palettes render eight cards with the scene block inside the card."""
     source_color = (200, 100, 40)
     transparent_coach = Image.new("RGBA", (10, 10), (0, 0, 0, 0))
     coaches = {
@@ -707,27 +707,62 @@ def test_render_cards_uses_slot_palette_label_and_answer_dimming(
     assert len(timeline) == 8
     assert len(cuts) == 4
     palette = quiz.SLOT_PALETTES[slot_code]
-    safe = quiz._safe_area()
-    with Image.open(BytesIO(cuts[0])) as hook:
-        assert hook.getpixel((0, 0)) == source_color
-        assert hook.getpixel((safe[0] + 200, safe[1] + 40)) == tuple(
-            bytes.fromhex(palette["decoration"][1:])
-        )
-        assert hook.getpixel((safe[2] - 50, safe[1] + 200)) == tuple(
-            bytes.fromhex(palette["card"][1:])
-        )
-    expected_dimmed = tuple(
-        int(
-            source * (1 - quiz.ANSWER_ILLUSTRATION_OVERLAY_OPACITY)
-            + overlay * quiz.ANSWER_ILLUSTRATION_OVERLAY_OPACITY
-        )
-        for source, overlay in zip(
-            source_color,
-            bytes.fromhex(palette["background"][1:]),
-        )
+    left, top, right, bottom = quiz._safe_area()
+    # イラストブロックはテキストとコーチの間に敷かれ、コーチの帯には掛からない。
+    # カード外（セーフエリアの外側）はスロットのパレット色のままになる
+    coach_top = quiz._coach_top(bottom)
+    scene_point = (
+        left + quiz.CARD_PADDING + 40,
+        coach_top - quiz.CARD_CONTENT_GAP - 40,
     )
-    with Image.open(BytesIO(cuts[-1])) as answer:
-        assert answer.getpixel((0, 0)) == expected_dimmed
+    coach_row_point = (
+        left + quiz.CARD_PADDING + 40,
+        coach_top + quiz.COACH_BOX[1] - 10,
+    )
+    for card in cuts:
+        with Image.open(BytesIO(card)) as image:
+            assert image.getpixel((0, 0)) == tuple(
+                bytes.fromhex(palette["background"][1:])
+            )
+            # 時間帯ラベルのピル（上部中央）は decoration 色
+            assert image.getpixel(((left + right) // 2, top + 60)) == tuple(
+                bytes.fromhex(palette["decoration"][1:])
+            )
+            assert image.getpixel((right - 50, top + 200)) == tuple(
+                bytes.fromhex(palette["card"][1:])
+            )
+            assert image.getpixel(scene_point) == source_color
+            assert image.getpixel(coach_row_point) == tuple(
+                bytes.fromhex(palette["card"][1:])
+            )
+
+
+def test_every_cut_has_a_coach_speech_bubble() -> None:
+    """All four cuts draw a coach line as a bubble beside the coach."""
+    transparent_coach = Image.new("RGBA", (10, 10), (0, 0, 0, 0))
+    coaches = {pose: transparent_coach for pose in quiz.COACH_FILENAMES}
+
+    _, cuts = quiz._render_cards(
+        _base_fields(),
+        "L3",
+        "standard",
+        "noon",
+        "昼のロジトレ",
+        _solid_png((200, 100, 40)),
+        coaches,
+        quiz._load_fonts(),
+    )
+
+    left, _, _, bottom = quiz._safe_area()
+    palette = quiz.SLOT_PALETTES["noon"]
+    bubble_point = (
+        left + quiz.CARD_PADDING + 40,
+        quiz._coach_top(bottom) + quiz.BUBBLE_TOP_OFFSET + 40,
+    )
+    decoration = tuple(bytes.fromhex(palette["decoration"][1:]))
+    for card_bytes in cuts:
+        with Image.open(BytesIO(card_bytes)) as image:
+            assert image.getpixel(bubble_point) == decoration
 
 
 def test_think_cards_render_the_question_text() -> None:

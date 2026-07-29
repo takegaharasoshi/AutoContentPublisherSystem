@@ -123,7 +123,7 @@ def test_request_illustration_uses_fixed_parameters_and_decodes() -> None:
     assert observed == {
         "model": "gpt-image-1",
         "prompt": "scene",
-        "size": "1024x1024",
+        "size": "1536x1024",
         "quality": "medium",
         "n": 1,
     }
