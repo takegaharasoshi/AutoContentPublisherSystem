@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方式設計書: gpt-quiz-multicut | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / gpt-quiz-multicut</nav>
+<h1>方式設計書: gpt-quiz-multicut</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Fix（15-16 で作成）</span>
+  <span>方式名（レジストリキー）: gpt-quiz-multicut</span>
+  <span>最終更新: 2026-07-29</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  生成方式 <code>gpt-quiz-multicut</code> の方式固有仕様（LLM 生成・検証チェーン・スロットだし分け・組版・ffmpeg 合成）を記録する。全方式共通の契約（方式インターフェース）と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、分冊ルール（1 方式 1 本・本採用時に作成）は <a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a> を参照。本書は実装（<code>services/image-batch/app/generators/gpt_quiz_multicut.py</code>）を正として記述している。設計の経緯は 15-5 / 15-9 / 15-10 の設計 Fix（<a href="../requirements-notes-set2.html">壁打ち記録</a>・<a href="../../development-log.md">development-log.md</a>）にある。
+</div>
+
+<h2>1. 方式概要</h2>
+<p>LLM テキスト API でクイズ（問題・答え・解説等の構造化フィールド）を生成し、決定的検証 + 独立 LLM 検証 + 重複検査に通った出題だけを採用したうえで、情景イラスト 1 枚（画像生成 API）・固定キャラアセット（4 表情）・日本語フォントを Pillow のプログラム組版で時間帯スロット別のカード画像に合成し、ffmpeg の多カット連結 + BGM/SE ミックスで <strong>20 秒・4 カット構成・1080x1920 の MP4（リール用動画）</strong>を返すクイズ方式。出題の型（L1 論理パズル / L3 フェルミ推定）・口調・BGM・配色・時間帯ラベルは、実行予定時刻から決定的に解決するスロット（朝 / 昼 / 夜）で切り替える（生活溶け込み拡張。15-9 / 15-10 決定）。Phase 15-6 で実装、15-11 でスロットだし分け + イラスト常駐へ拡張、15-14 で <code>logic-training-1</code> が実投稿に成功し本採用となった。</p>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>方式名（レジストリキー = <code>batch_sets.generator_name</code> の値）</td><td><code>gpt-quiz-multicut</code></td></tr>
+<tr><td>実装ファイル</td><td><code>services/image-batch/app/generators/gpt_quiz_multicut.py</code>（1 ファイルに完結）</td></tr>
+<tr><td>レジストリ登録</td><td><code>services/image-batch/app/generators/__init__.py</code> の <code>REGISTRY</code></td></tr>
+<tr><td>使用 API・ツール</td><td>OpenAI Responses API（テキスト生成・検証）+ OpenAI Images API（情景イラスト）+ Pillow（カード組版）+ ffmpeg（連結・音声ミックス・エンコード）</td></tr>
+<tr><td>最終メディア</td><td>MP4 1 本（<code>file_format='mp4'</code>。1080x1920 / 30fps / 20 秒 / H.264 + AAC）</td></tr>
+<tr><td>中間生成物</td><td>カット代表画像 PNG 4 枚（<code>_cut1</code>〜<code>_cut4</code>）+ 情景イラスト PNG 1 枚（<code>_illustration</code>）。S3 のみ保存・DB 記録なし</td></tr>
+<tr><td>補助テーブル</td><td><code>audio_assets</code>（スロット別 LRU 選曲 + SE 存在検査）・<code>quiz_items</code>（出題履歴の INSERT と重複検査。本方式のみが使用）</td></tr>
+</table>
+</div>
+
+<h2>2. 契約の実装</h2>
+<p>共通の契約（<a href="../batch-flow.html#generator-contract">batch-flow.html「生成方式の契約」</a>）を <code>generate(context: GeneratorContext) -&gt; GeneratorResult</code> で実装する。冪等性（完了判定）・S3 保存・DB 登録・トランザクション制御は共通骨格（<code>processing.py</code>）の責務であり、本方式は関与しない。</p>
+<div class="table-wrap">
+<table>
+<tr><th>要素</th><th>使い方</th></tr>
+<tr><td><code>context.prompt_config</code></td><td>テーマ・世界観プロンプト（<code>prompt_text</code>）・<code>parameters</code>（セクション 3）・<code>set_id</code></td></tr>
+<tr><td><code>context.scheduled_at</code></td><td>スロット解決の入力（15-5 で契約に追加。共通骨格が <code>generation_runs.scheduled_at</code> の確定値を渡す）</td></tr>
+<tr><td><code>context.generation_run_id</code></td><td><code>quiz_items</code> INSERT の紐づけ（15-6 で契約に追加）</td></tr>
+<tr><td><code>context.cursor</code></td><td><code>batch_sets</code>（set_code 解決）・<code>audio_assets</code>（SE 検査・選曲・<code>last_used_at</code> 更新）・<code>quiz_items</code>（履歴取得・INSERT）</td></tr>
+<tr><td><code>context.s3_client</code> / <code>context.s3_bucket</code></td><td>コーチアセット・BGM・SE の取得（<code>acps_shared.s3.get_object</code>）</td></tr>
+<tr><td>戻り値 <code>GeneratorResult.media</code></td><td><code>MediaOutput</code> 1 件（MP4、<code>width</code>=1080 / <code>height</code>=1920 / <code>duration_seconds</code>=20 / <code>audio_asset_id</code>=選曲した BGM）</td></tr>
+<tr><td>戻り値 <code>GeneratorResult.intermediates</code></td><td><code>IntermediateOutput</code> 5 件（カット代表 PNG ×4 + 情景イラスト PNG ×1、いずれも <code>output_index=0</code>）</td></tr>
+</table>
+</div>
+<p>処理順序: ① <code>parameters</code> 検証 → ② スロット解決 → ③ <strong>固定アセットの事前検査</strong>（フォント → <code>set_code</code> → コーチ 4 枚 → SE 2 種 + BGM 選曲。LLM を呼ぶ前に欠落をフェイルラウドさせ、API 費を無駄にしない）→ ④ 出題履歴取得 → ⑤ 生成・検証ループ（セクション 5）→ ⑥ 情景イラスト生成（セクション 6）→ ⑦ Pillow 組版（セクション 8)→ ⑧ ffmpeg 合成（セクション 9）→ ⑨ <code>quiz_items</code> INSERT + <code>last_used_at</code> 更新 → ⑩ <code>GeneratorResult</code> を返す。</p>
+
+<h2 id="parameters">3. 入力（parameters とスロット解決）</h2>
+<p><code>prompt_configs.prompt_text</code> には<strong>セットのテーマ・世界観と題材の条件だけ</strong>を書く。出力フィールドの必須・文字数・L1 DSL の書式・禁止事項・イラスト生成プロンプトは<strong>コード側が固定で持ち</strong>、DB 側と二重に書かない（15-5 決定）。<code>parameters</code> のキーは以下の 3 つで、検証に通らない値は起動直後に <code>RuntimeError</code> となる。</p>
+<div class="table-wrap">
+<table>
+<tr><th>キー</th><th>必須</th><th>内容</th></tr>
+<tr><td><code>slots</code></td><td>必須（1 件以上）</td><td>時間帯スロットの配列。各要素は <code>from_jst_hour</code>（0〜23 の整数）・<code>quiz_type</code>（<code>L1</code> / <code>L3</code>）・<code>difficulty</code>・<code>slot_code</code>（<code>morning</code> / <code>noon</code> / <code>night</code> = コード側パレット定義に存在すること）・<code>tone_hint</code>（口調の方向性。生成プロンプトへ差し込む）・<code>slot_label</code>（時間帯ラベルピルの表示文言）の <strong>6 フィールドすべて必須</strong>（欠落・空文字・未知の <code>slot_code</code> は異常終了）</td></tr>
+<tr><td><code>max_regenerations</code></td><td>任意（既定 3）</td><td>再生成の上限回数（試行回数は +1 回。<code>logic-training-1</code> は 15-13 の実測を受け 5）</td></tr>
+<tr><td><code>llm_model</code></td><td>任意（既定 <code>gpt-5.6-terra</code>）</td><td>テキスト生成・検証に使う OpenAI モデル名（生成と検証で同一モデル）</td></tr>
+</table>
+</div>
+<p><strong>スロット解決</strong>は <code>context.scheduled_at</code> の <strong>JST 時</strong>から決定的に行う: <code>slots</code> を <code>from_jst_hour</code> 昇順に並べ、「JST 時以下で最大の <code>from_jst_hour</code>」のスロットを選ぶ。どの境界にも達しない早朝（例: 境界 4/11/17 に対する 0〜3 時）は<strong>最後のスロットへ巻き戻す</strong>（夜スロットが翌 3:59 まで続く扱い）。Scheduler の Input にスロットは持たせず時刻だけがスロットの指定になるため、<strong>スケジュール時刻の変更はスロット変更になりうる</strong>（<a href="../operation.html">operation.html セクション 2.1 手順 3</a> の warn）。</p>
+
+<h2>4. 認証情報（API キー）</h2>
+<p>環境変数 <code>API_SECRET_ARN</code> から <code>openai_image.load_api_key()</code> で取得する（他方式と同一の Secret <code>acps/{env}/image/api-key</code>）。<strong>テキスト生成・独立検証・イラスト生成のすべてを同じ OpenAI クライアント（タイムアウト 300 秒）で呼ぶ</strong>ため、Secret は 1 件で足りる。</p>
+
+<h2 id="validation">5. 問題生成と検証チェーン</h2>
+<p>LLM の誤答をそのまま投稿しないことが本方式の急所（15-1 の評価軸 G）。生成のたびに以下を全通過した出題だけを採用し、不合格は理由をログに出して再生成する。</p>
+<h3>5.1 生成（構造化フィールド方式）</h3>
+<p>生成プロンプトは「<code>prompt_text</code>（テーマ・世界観）+ コード側固定の生成指示（フィールド仕様・L1 DSL の正準形・L3 の書式・禁止事項）+ スロットの型/難度/<code>tone_hint</code> + 直近要旨（重複禁止リスト）+ 試行番号」を結合して組み立て、Responses API に <code>json_object</code> 形式で 1 オブジェクトを要求する。必須フィールドと文字数上限:</p>
+<div class="table-wrap">
+<table>
+<tr><th>フィールド</th><th>上限</th><th>用途</th></tr>
+<tr><td><code>hook</code></td><td>20 字</td><td>カット 1 の呼びかけ（<code>tone_hint</code> を反映）</td></tr>
+<tr><td><code>question</code></td><td>90 字</td><td>問題文（カット 2・3）</td></tr>
+<tr><td><code>answer</code></td><td>30 字</td><td>答え（カット 4）</td></tr>
+<tr><td><code>explanation</code></td><td>80 字</td><td>解説（カット 4）</td></tr>
+<tr><td><code>coach_comment</code></td><td>30 字</td><td>答えカットのコーチ吹き出し（<code>tone_hint</code> を反映）</td></tr>
+<tr><td><code>tags</code></td><td>10 字 × ちょうど 3 個</td><td>記録用（キャプションは固定テンプレートのため未使用）</td></tr>
+<tr><td><code>summary</code></td><td>100 字</td><td>出題要旨（重複禁止リストの単位）</td></tr>
+<tr><td><code>illustration_scene</code></td><td>200 字</td><td>情景イラストの描写（セクション 6）</td></tr>
+<tr><td><code>machine_spec</code> / <code>machine_answer</code></td><td>—</td><td>L1 のみ必須（5.2）</td></tr>
+</table>
+</div>
+<h3>5.2 決定的検証（プログラム検査）</h3>
+<ul>
+  <li><strong>フィールド検査</strong>: 必須・型・文字数上限・<code>tags</code> の個数（<code>illustration_scene</code> は strip 後に空なら不合格）</li>
+  <li><strong>L1 = 閉じた DSL の全列挙検証</strong>: <code>machine_spec</code> は <code>truth_tellers</code>（正直者・嘘つき）/ <code>ordering</code>（順序）/ <code>matching</code>（対応づけ）の 3 種だけを受け付ける閉じた JSON DSL（ソースコードの評価はしない）。要素は最大 5 件で、全割当・全順列を全列挙し、<strong>唯一解であること</strong>と <strong><code>machine_answer</code>（正準形）が唯一解と一致すること</strong>を検査する。未知の語彙・不正参照・解なし・複数解はすべて不合格</li>
+  <li><strong>L3 = 書式検査</strong>: <code>answer</code> は正規表現で「約&lt;数値と単位&gt;（目安）」の形を強制する（断定表現の禁止はプロンプト側）</li>
+</ul>
+<h3>5.3 独立 LLM 検証（答えを伏せた別解答）</h3>
+<ul>
+  <li><strong>L1</strong>: 生成側の答えを見せず問題文だけを独立の LLM に解かせ、返ってきた <code>machine_answer</code> が全列挙で得た唯一解と一致するかを見る（問題文だけで解けること = 文章化の欠落検知を兼ねる）</li>
+  <li><strong>L3</strong>: 問題文 + 推定ルート（<code>explanation</code>。最終回答値は非表示）を渡して独立に推定させ、①<code>route_valid</code> が true ②推定値が正の有限値 ③生成側 <code>answer</code> の数値（万・億・兆の単位換算込み）と<strong>桁オーダー（log10 の床）が一致</strong>、の 3 点で判定する</li>
+</ul>
+<h3>5.4 重複検査</h3>
+<p>二段構え。①生成プロンプトに<strong>直近の <code>summary</code> 30 件</strong>を重複禁止リストとして差し込む（予防）②生成後に<strong>直近の <code>question_text</code> 120 件</strong>と文字バイグラムの Jaccard 類似度を取り、<strong>0.55 以上で不合格</strong>にする（検知。比較前に NFKC 正規化 + 空白・約物除去）。履歴はどちらも <code>set_id × quiz_type</code> スコープで <code>quiz_items</code> から取得する。</p>
+<h3>5.5 再生成とフェイルラウド</h3>
+<p>不合格（検証 NG・JSON パース不能）は WARNING ログ（試行番号 + 理由）を出して再生成する。<strong><code>max_regenerations</code> を使い切ったら <code>RuntimeError</code> で異常終了</strong>し、その回は投稿しない（誤答を出すより落とす。15-5 決定）。再生成回数・NG 理由は DB に記録せず CloudWatch Logs のみで観測する（設計課題リスト 2026-07-27）。</p>
+
+<h2 id="illustration">6. 情景イラスト生成</h2>
+<p>採用した出題の <code>illustration_scene</code> をコード側固定のイラストプロンプト（情景 + スロット別の時間帯ムード + パレット由来のブランド配色 + 禁止事項〔文字・数字・記号、答えを示唆する構図、中央への主要物配置〕）に組み込み、<strong>gpt-image-1 / 1536x1024（横長）/ medium / 1 枚</strong>で生成する。1 実行 1 枚で、全 4 カットのカード内ブロックに常駐させる（15-9 決定 → 15-14 で全面背景からカード内ブロックへ変更・横長化）。</p>
+<div class="decision">
+  <span class="callout-title">決定（15-9 / 15-10）: 方式 C（文字なし情景イラスト + プログラム文字描画）の採用と失敗時の扱い</span>
+  図示 3 方式の実 API 比較で、インフォグラフィック全体の画像生成（方式 B）は 4/4 枚で誤字・見切れ・答え示唆・構造崩壊のいずれかが発生し不採用。<strong>文字は 100% プログラム描画（Pillow）、イラストは文字を禁止した情景描写のみ</strong>という分業に落とした。イラストのズレは「品質の傷」であって誤答ではないと整理（ユーザー決定）。<code>illustration_scene</code> の検証はプログラム検査（必須・最大 200 字）のみで、禁止事項・時間帯ムードはコード側固定プロンプトで担保する。<strong>イラスト生成の失敗は縮退せず異常終了</strong>（フェイルラウド。イラスト常駐の構成では欠けた状態で成立しないため）。
+</div>
+
+<h2 id="assets">7. 固定アセットと選曲</h2>
+<p>いずれも<strong>最初の LLM 呼び出しの前に</strong>取得・検査する（欠落の早期フェイルラウド）。</p>
+<div class="table-wrap">
+<table>
+<tr><th>アセット</th><th>取得元</th><th>検査</th></tr>
+<tr><td>日本語フォント（Noto Sans JP Regular / Bold）</td><td>コンテナ内 <code>services/image-batch/fonts/</code>（OFL ライセンス・イメージ同梱）</td><td>ファイル存在（欠落は <code>RuntimeError</code>）</td></tr>
+<tr><td>コーチ 4 表情（<code>coach_hook/question/think/answer.png</code>）</td><td>S3 <code>assets/&lt;set_code&gt;/</code>（ファイル名はコード側固定）</td><td>RGBA の PNG であること（他モード・非 PNG は異常終了）。アセットの制作・受け入れ検査はセット別設計書（<a href="../sets/logic-training-1.html#coach-assets">sets/logic-training-1.html セクション 7</a>）</td></tr>
+<tr><td>SE 2 種（<code>countdown_tick.m4a</code> / <code>answer_chime.m4a</code>）</td><td>S3 <code>audio/&lt;set_code&gt;/se/</code>（ファイル名はコード側固定）</td><td><code>audio_assets</code>（<code>asset_type='se'</code>・有効）に規約どおりの S3 キーで登録されていること（欠落は異常終了）</td></tr>
+<tr><td>BGM 1 曲</td><td>S3（<code>audio_assets</code> の選曲行の <code>s3_key</code>）</td><td>下記の選曲クエリで 0 件なら異常終了（無音動画を作らない）</td></tr>
+</table>
+</div>
+<p><strong>スロット別 LRU 選曲</strong>（V004 の <code>audio_assets.time_slot</code>。15-10 決定）: 当該スロット一致または <code>time_slot IS NULL</code>（スロット非対応の既存登録との後方互換）の有効 BGM から、最も長く使っていない 1 曲を選ぶ。</p>
+<pre><code>SELECT id, s3_key FROM audio_assets
+ WHERE set_id = %s AND asset_type = 'bgm' AND is_active = 1
+   AND (time_slot = %s OR time_slot IS NULL)
+ ORDER BY last_used_at ASC, id ASC LIMIT 1</code></pre>
+<p><code>last_used_at</code> の UPDATE は動画完成後に行い、commit は共通骨格に委ねる（失敗時は選曲の副作用ごとロールバック）。音源の前処理レシピ（20 秒尺の 2 パス loudnorm・SE はピーク調整のみ）と証跡管理は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a>。</p>
+
+<h2 id="composition">8. 組版（Pillow）</h2>
+<h3>8.1 カット構成（20 秒・タイムラインカード 8 枚）</h3>
+<div class="table-wrap">
+<table>
+<tr><th>カット</th><th>尺</th><th>カード</th><th>内容</th></tr>
+<tr><td>1 つかみ</td><td>3 秒</td><td>1 枚</td><td>見出し「今日の脳トレ」+ 型・難度ピル + <code>hook</code> + 固定吹き出し「今日も一緒に鍛えよう！」+ コーチ hook</td></tr>
+<tr><td>2 問題</td><td>7 秒</td><td>1 枚</td><td>見出し「問題」+ <code>question</code> + 固定吹き出し「頭の中だけで解けるぞ！」+ コーチ question</td></tr>
+<tr><td>3 考える</td><td>5 秒</td><td>5 枚（1 秒 × 5）</td><td>カウントダウン円バッジ（5→1）+ <code>question</code>（カット 2 と同座標・同サイズに据え置き = 15-11 のユーザーレビュー反映）+ 固定吹き出し「止めてじっくり考えても OK」+ コーチ think</td></tr>
+<tr><td>4 答え</td><td>5 秒</td><td>1 枚</td><td>見出し「答え｜型名」+ <code>answer</code>（太字）+ <code>explanation</code> + <code>coach_comment</code> の吹き出し + コーチ answer</td></tr>
+</table>
+</div>
+<h3>8.2 レイアウトの構造保証</h3>
+<ul>
+  <li><strong>カード = ズームセーフ枠</strong>: カード矩形を kenburns と同じ導出（出力寸法 / <code>ZOOM_END</code> − マージン 8）で <code>ZOOM_END=1.04</code> から計算し、ズーム終端でもカード全体が可視であることを構造的に保証する（1030 × 1838 中央配置）。ズームは文字の可読性優先で kenburns（1.08）より弱い</li>
+  <li><strong>本文セーフエリア</strong>: カード領域と Instagram UI 予約域（右 12% / 下 15%）の交差に文字とコーチを収める。イラストは全面背景ではなくカード内ブロックのため、文字の見切れは構造的に発生しない（プロンプト側のセーフエリア指定は不要）</li>
+  <li><strong>スロット別パレット</strong>: 背景 / カード / 本文 / 補助文字 / アクセント / 装飾の 6 色をコード側定数 <code>SLOT_PALETTES</code> で持つ。朝 = クリーム、昼 = ライトブルー（15-13 でユーザー決定により夜と差別化）、夜 = ダークネイビー。アクセントはアンバー系で統一</li>
+  <li><strong>共通デザイン要素</strong>（15-14 の投稿前レビューで確定）: 時間帯ラベル = テキスト幅ピル + アクセントドット（上部中央）・見出し = 左アクセントバー・カウントダウン = アクセント色の円バッジ（直径 150）に白抜き・イラスト = 角丸 + 装飾色の縁取り・コーチのセリフ = 全カットで吹き出しに統一（固定文 3 + LLM の <code>coach_comment</code>）</li>
+  <li><strong>コーチ配置</strong>: 4 枚の不透明領域の和で共通矩形をトリミングし（相対サイズ・立ち位置を保存）、300 × 430 の枠へ contain してカード下端基準（下端から 140px）の右下に置く。カット間で大きさ・立ち位置が動かない</li>
+  <li><strong>イラストブロックの 2 パス描画</strong>: 1 巡目はイラストなしで全カットを描いて<strong>最も低いテキスト下端を測り</strong>、2 巡目でテキスト下端 + 48px からコーチ上端 − 16px までの横長ブロックを全カット共通の位置に敷いて本描画する（カット間でイラストが動かず、テキストとコーチだけが変わる）。ブロック高が 200px 未満になる場合は異常終了（テキスト過多の検知）</li>
+  <li><strong>テキストフィッティング</strong>: 実測幅による 1 文字ずつの折り返し + <strong>禁則処理</strong>（行頭の句読点・閉じ括弧、行末の開き括弧を分割位置の追い出しで回避。15-13 追加）。割当高さに収まるまでフォントを 2pt 刻みで縮小し、下限 30pt でも収まらなければ異常終了（フェイルラウド）</li>
+</ul>
+
+<h2 id="encode">9. ffmpeg 合成</h2>
+<p>2 段構成。①カード 8 枚を<strong>1 枚ずつ</strong>ズーム付きセグメント MP4 にエンコードし、②concat demuxer で無劣化連結（<code>-c:v copy</code>）しながら音声 3 系統をミックスする。</p>
+<div class="table-wrap">
+<table>
+<tr><th>工程</th><th>値（実装定数）</th></tr>
+<tr><td>セグメント（8 本）</td><td>静止画入力（<code>-loop 1 -framerate 30 -t 尺</code>）→ 2 倍スーパーサンプリング → <code>zoompan</code>（1.0 → 1.04・中央固定・<code>s=1080x1920</code>・<code>fps=30</code>）→ <code>libx264</code> / <code>-crf 20</code> / <code>-preset medium</code>・映像のみ</td></tr>
+<tr><td>連結</td><td>concat demuxer + <code>-c:v copy</code>（再エンコードなし）+ <code>+faststart</code>・全体 <code>-t 20</code></td></tr>
+<tr><td>BGM</td><td><code>-stream_loop -1</code> でループ入力し 20 秒でトリム。音量 1.0（前処理済み・-14 LUFS 前後）</td></tr>
+<tr><td>SE: カウントダウンティック</td><td><code>adelay=10000</code>（考えるカット開始 = 10 秒地点から 5 打）・音量 −6 dB</td></tr>
+<tr><td>SE: 正解チャイム</td><td><code>adelay=15000</code>（答えカット開始 = 15 秒地点）・音量 −3 dB</td></tr>
+<tr><td>ミックス</td><td><code>amix=inputs=3:normalize=0</code>（自動正規化を切り、前処理済みラウドネスを保つ）→ 20 秒トリム → <strong>AAC 再エンコード</strong>（ミックスするため kenburns の <code>-c:a copy</code> は使えない）</td></tr>
+<tr><td>タイムアウト・検査</td><td>各 ffmpeg 呼び出し 600 秒。非ゼロ終了・タイムアウトは stderr 末尾 500 字を ERROR ログに出して送出。空ファイル出力も異常終了</td></tr>
+</table>
+</div>
+
+<h2>10. 出力とストレージ</h2>
+<div class="table-wrap">
+<table>
+<tr><th>成果物</th><th>S3</th><th>DB</th></tr>
+<tr><td>最終 MP4</td><td><code>videos/</code> プレフィックス・ライフサイクル 30 日</td><td><code>generated_media</code> に 1 行（<code>file_format='mp4'</code>・1080x1920・20 秒・<code>audio_asset_id</code>）</td></tr>
+<tr><td>カット代表 PNG 4 枚 + イラスト PNG</td><td>最終メディアと同キー + <code>_cut1</code>〜<code>_cut4</code> / <code>_illustration</code>。ライフサイクル 30 日</td><td><strong>記録しない</strong>（中間生成物の扱い。投稿前レビュー・目視確認用）</td></tr>
+<tr><td>出題履歴</td><td>—</td><td><code>quiz_items</code> に 1 行（型・難度・<code>summary</code>・問題文・答え + 全フィールドの JSON。<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）。<strong>共通骨格の同一トランザクションで確定</strong>させ、メディア登録に失敗した場合は履歴だけが残らない</td></tr>
+</table>
+</div>
+<p><code>file_format='mp4'</code> が sns-post-batch 側で <code>posts.media_type='reel'</code> に導出される。<code>stories_enabled=1</code> のセットではリール成功後に同一 MP4 がストーリーズへ連続投稿されるが、これは投稿バッチ側の仕様であり本方式は関与しない（<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。</p>
+
+<h2>11. エラーハンドリング</h2>
+<p>方式内のリカバリは<strong>生成・検証ループの再生成のみ</strong>で、それ以外（parameters 不正・アセット欠落・BGM 0 件・イラスト生成失敗・組版の収まり不足・ffmpeg 失敗）はすべて例外を送出し、共通骨格が <code>prompt_config</code> 単位で捕捉 → <code>connection.rollback()</code> でトランザクションを戻してスキップする。<code>quiz_items</code> INSERT・<code>last_used_at</code> 更新はロールバックで消えるため中途半端な状態は残らない。未完了の <code>prompt_config</code> が残ればバッチは失敗終了し、Step Functions の Retry → 失敗アラーム通知につながる。</p>
+
+<h2>12. 依存ライブラリ・実行環境</h2>
+<div class="table-wrap">
+<table>
+<tr><th>依存</th><th>バージョン・設定</th><th>用途</th></tr>
+<tr><td><code>openai</code></td><td>2.21.0（<code>services/image-batch/requirements.txt</code>）</td><td>Responses API（生成・検証）+ Images API（イラスト）</td></tr>
+<tr><td><code>Pillow</code></td><td>12.1.0（同上）</td><td>カード組版・アセット検査</td></tr>
+<tr><td><code>ffmpeg</code></td><td>Dockerfile で <code>apt-get install ffmpeg</code>（コンテナ同梱）</td><td>セグメントエンコード・連結・音声ミックス</td></tr>
+<tr><td>Noto Sans JP（Regular / Bold）</td><td><code>services/image-batch/fonts/</code>（OFL。イメージ同梱）</td><td>日本語組版</td></tr>
+<tr><td>Fargate タスクサイズ</td><td>1 vCPU / 2 GB（<code>ImageBatchStack</code>。kenburns と共通）</td><td>8 セグメントの ffmpeg エンコード</td></tr>
+</table>
+</div>
+
+<h2>13. 実測値・運用ノート</h2>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>実測</th><th>出典</th></tr>
+<tr><td>生成〜MP4 完成（AWS RunTask）</td><td>約 3〜4.5 分（LLM 生成・検証 + イラスト生成が大半。再生成回数で変動）</td><td>15-14 の試し生成（noon 3 分 2 秒 / night 4 分 23 秒）</td></tr>
+<tr><td>再生成の実態</td><td>夜（L1 / deep）の 5 要素順序パズルで独立 LLM 検証の誤答による再生成消費が発生 → 上限 5 に改訂（<code>logic-training-1</code>）</td><td>15-13 の試し打ち（<a href="../sets/logic-training-1.html">セット別設計書 セクション 4 の decision</a>）</td></tr>
+<tr><td>API コスト</td><td>1 本あたり十数円（LLM テキスト + イラスト medium 1536x1024）</td><td>15-5 / 15-9 試算 + 15-14 横長化（<a href="../../strategy/business-strategy.html#cost-model">事業戦略書 セクション 3.1</a>）</td></tr>
+<tr><td>リール + ストーリーズ投稿の所要</td><td>SNS 投稿 SFN 単体実行で 3 分 54 秒（DB 準備確認込み）</td><td>15-14 の実投稿</td></tr>
+</table>
+</div>
+
+</div>
+</body>
+</html>

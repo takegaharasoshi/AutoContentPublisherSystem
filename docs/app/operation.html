@@ -583,6 +583,7 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   当初は「アカウントごとに登録」としていたが、上記のとおり <code>data_access_expires_at</code> がユーザー×アプリの組で共通であり 1 回の再認可で全セットが延長されるため、<strong>2026-07-27 以降はリマインダーを 1 件に集約する</strong>（セットごとにアプリを分けた場合はアプリごとに 1 件）。
   <br><strong>現在の登録内容: 2026-10-18</strong>（期限 2026-10-25 の 7 日前。<code>fantasy-animals-1</code> / <code>logic-training-1</code> の両方をカバー）
   <br>セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（設計課題リストに記録）。
+  <br><strong>15-16（2026-07-29）の要否判断で本方針を確定</strong>: 自動化は導入しない。リマインダーがセット数に比例しない構造（Meta アプリ 1 つにつき 1 件）になったため、2026-07-07 の設計課題「セット数増で手運用が破綻」の前提が崩れた。再検討トリガーは ①Meta アプリを複数に分けた場合 ②Live モード移行で 60 日失効に戻った場合 ③管理画面（将来拡張）の導入時、の 3 点。
 </div>
 
 <h3 id="image-api-key">5.5 画像生成 API キーの設定（Phase 10 開始時に必須）</h3>

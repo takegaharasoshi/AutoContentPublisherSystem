@@ -13,7 +13,7 @@
 <h1>事業戦略書</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-07-23</span>
+  <span>最終更新: 2026-07-29</span>
   <span>初版は 2026-07-23 の壁打ち（Phase 14-1）に基づく</span>
 </div>
 
@@ -32,7 +32,7 @@
     <ol>
       <li><strong>仕組みの確立</strong> — 完了（2026-07-22 に静止画で 1 日 3 回の全自動投稿の定常運用を開始）</li>
       <li><strong>リーチ獲得能力の構築</strong> — 完了（2026-07-26 に動画（リール）へ全面切替し 1 日 1 回の定常運用を開始。KPI M1）。収益化経路（セクション 2）の必要条件（Phase 14）</li>
-      <li><strong>勝負セットの投入と探索</strong> — リーチを狙うテーマで試行錯誤（Phase 15〜16）</li>
+      <li><strong>勝負セットの投入と探索</strong> — 投入完了（2026-07-29 に logic-training-1 のリール + ストーリーズ実投稿が成功し、1 日 3 回の自動スケジュールを有効化）。リーチを狙う探索はここから（Phase 15〜16）</li>
       <li><strong>収益化・増幅</strong> — 当たりの兆しが出たらプラットフォーム展開等で増幅（Phase 17）</li>
     </ol>
   </li>
@@ -92,8 +92,8 @@
     </tr>
     <tr>
       <td>画像生成 API</td>
-      <td>fantasy-animals-1（リール元画像 1 日 1 枚・high）で月 1,000 円前後 + logic-training-1（情景イラスト 1 日 3 枚・medium 1024x1024）で月 600 円前後</td>
-      <td><strong>2026-07-28（15-9 壁打ち）で「勝負セットは画像 API 定常ゼロ」（15-3 試算）を改訂</strong>: 全カット常駐の情景イラスト採用（ユーザー決定）により logic-training-1 にも定常費が復活。月 600 円前後を許容（<a href="../app/requirements-notes-set2.html#tokekomi-figure">15-9 壁打ち記録 11.3</a>）</td>
+      <td>fantasy-animals-1（リール元画像 1 日 1 枚・high）で月 1,000 円前後 + logic-training-1（情景イラスト 1 日 3 枚・medium 1536x1024）で月 900 円前後</td>
+      <td><strong>2026-07-28（15-9 壁打ち）で「勝負セットは画像 API 定常ゼロ」（15-3 試算）を改訂</strong>: 全カット常駐の情景イラスト採用（ユーザー決定）により logic-training-1 にも定常費が復活。月 600 円前後（medium 1024x1024）を許容（<a href="../app/requirements-notes-set2.html#tokekomi-figure">15-9 壁打ち記録 11.3</a>）。<strong>15-14 の組版再設計でイラストを横長 1536x1024 へ変更</strong>（カード内横長ブロックとの縦横比一致）したため、単価が上がり月 900 円前後へ改訂（15-16 記録）</td>
     </tr>
     <tr>
       <td>LLM テキスト API（クイズ方式）</td>
@@ -141,7 +141,7 @@
       <td>勝負セットの成長開始</td>
       <td>フォロワー 1,000・リール平均再生数の安定計測</td>
       <td>Phase 15〜16</td>
-      <td>未着手</td>
+      <td><strong>挑戦開始（2026-07-29、Phase 15）</strong>。logic-training-1 の投入が完了（15-14 でリール + ストーリーズの実投稿成功・15-15 で 1 日 3 回〔7:30 / 12:30 / 21:00 JST〕の Scheduler ENABLED）。再生数の安定計測は Phase 16 のインサイト収集バッチで実現する</td>
     </tr>
     <tr>
       <td>M3</td>
@@ -172,6 +172,12 @@
       <td>fantasy-animals-1</td>
       <td>0</td>
       <td>検証用セットのため成長施策なし（セクション 6）。07-22 に静止画 1 日 3 回で運用開始 → 07-26 にリール 1 日 1 回へ切替（M1 達成）。再生数は Phase 16 のインサイト収集バッチ実装後に計測開始</td>
+    </tr>
+    <tr>
+      <td>2026-07</td>
+      <td>logic-training-1</td>
+      <td>0</td>
+      <td>07-29 に投入（実投稿成功・1 日 3 回の自動スケジュール有効化）。計測はここから</td>
     </tr>
   </tbody>
 </table>
@@ -220,12 +226,12 @@
       実行頻度・方式は 14-2 壁打ち（2026-07-23）で<strong>「全て動画（リール）に置換・1 日 1 回」に決定</strong>（適用は Phase 14 実装時。<a href="../app/requirements-notes-video.html">壁打ち記録</a>）</td>
     </tr>
     <tr>
-      <td>logic-training-1（勝負セット）</td>
+      <td><a href="../app/sets/logic-training-1.html">logic-training-1</a>（勝負セット）</td>
       <td>リーチ獲得を狙う本命セット</td>
       <td>テーマ = <strong>「社会人向けロジカルトレーニング」</strong>（L1 論理パズル + L3 フェルミ推定のクイズ形式リール・日本語）。
-      出題者キャラ「脳みそコーチ」（固定アセット方式）とネイビー×アンバーの統一パレットを世界観の主軸とし、専用 Instagram プロアカウントを新規開設する。
-      投稿頻度は <strong>1 日 3 回</strong>（朝・昼・夜の習慣化ブランディング。2026-07-26 の 15-4 壁打ちで決定）。
-      Phase 15 で投入（経緯は <a href="../app/requirements-notes-set2.html">壁打ち記録</a>）</td>
+      出題者キャラ「脳みそコーチ」（固定アセット方式）とネイビー×アンバーの統一パレットを世界観の主軸とし、専用 Instagram プロアカウント（<code>nomiso_coach</code>）を運用する。
+      投稿頻度は <strong>1 日 3 回</strong>（朝・昼・夜の習慣化ブランディング。2026-07-26 の 15-4 壁打ちで決定。時刻は 15-15 で 7:30 / 12:30 / 21:00 JST に確定）。
+      <strong>2026-07-29 に投入完了</strong>（15-14 でリール + ストーリーズ実投稿成功・15-15 で Scheduler ENABLED。経緯は <a href="../app/requirements-notes-set2.html">壁打ち記録</a>）</td>
     </tr>
   </tbody>
 </table>

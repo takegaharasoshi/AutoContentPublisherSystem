@@ -147,8 +147,8 @@
     <tr>
       <td><code>gpt-quiz-multicut</code></td>
       <td>LLM テキスト API による問題生成（構造化フィールド方式）→ 自己検証（LLM 独立解答 + L1 は全列挙の機械検証）→ 重複検査（出題履歴 <code>quiz_items</code>）→ 情景イラスト生成（LLM が出力する <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚。15-10 追加）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔カット別 4 表情〕+ 日本語フォントを時間帯スロット別パレットで合成しカット画像 4 種を生成）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、20 秒・4 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式。出題の型（L1/L3）・口調・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える</td>
-      <td>実装済み・拡張実装中（Phase 15-3 で選定、15-5 で設計 Fix、15-6 で実装。15-9〜15-10 の生活溶け込み拡張〔イラスト常駐・スロットだし分け〕の実装は 15-11、logic-training-1 が採用予定）</td>
-      <td>15-16 で作成予定（「本採用時に作成」ルール。それまでの設計の正は 15-5 / 15-10 の設計 Fix〔data-model.html セクション 4.8/4.9/5・<a href="../development-log.md">development-log.md</a> 15-5 / 15-10〕）</td>
+      <td>採用中（Phase 15-3 で選定、15-5 で設計 Fix、15-6 で実装、15-11 で生活溶け込み拡張〔イラスト常駐・スロットだし分け〕、15-14 で logic-training-1 が実投稿成功 = 本採用、15-15 で 1 日 3 回の Scheduler ENABLED）</td>
+      <td><a href="generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>（15-16 で作成）</td>
     </tr>
   </tbody>
 </table>

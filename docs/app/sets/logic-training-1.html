@@ -12,7 +12,7 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 脳みそコーチのロジトレ</nav>
 <h1>セット別設計書: 脳みそコーチのロジトレ</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">作成中（15-13 で作成。15-16 で Fix）</span>
+  <span class="badge badge-fixed">Fix（15-13 で作成・15-16 で Fix）</span>
   <span>set_code: logic-training-1</span>
   <span>最終更新: 2026-07-29</span>
 </div>
@@ -32,7 +32,7 @@
 <tr><td><code>L3</code></td><td>フェルミ推定（答えは「約〇〇（目安）」の幅で示す）</td><td>独立 LLM 推定とのオーダー一致検証。断定表現を禁止</td></tr>
 </table>
 </div>
-<p>動画構成は <strong>20 秒・4 カット</strong>（つかみ 3 秒 → 問題 7 秒 → 考える 5 秒〔1 秒 × 5 枚のカウントダウン〕→ 答え 5 秒）。詳細は方式側の仕様（<a href="../batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）を参照。</p>
+<p>動画構成は <strong>20 秒・4 カット</strong>（つかみ 3 秒 → 問題 7 秒 → 考える 5 秒〔1 秒 × 5 枚のカウントダウン〕→ 答え 5 秒）。詳細は方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。</p>
 
 <h2>2. 投稿先アカウント構成</h2>
 <p>Instagram プロアカウント 1 件（1 セット 1 アカウント）。<strong>15-7</strong> で新規開設し、Secret 登録とトークン実働確認まで済んでいる。</p>
@@ -69,7 +69,7 @@
 
 <h2>4. プロンプトの作り方</h2>
 <p>固定文言方式。<code>prompt_configs.prompt_text</code> にはこのセットの<strong>テーマ・世界観と題材の条件だけ</strong>を書き、出力フィールドの必須・文字数・L1 DSL の書式・禁止事項・イラスト生成プロンプトは<strong>コード側（方式）が固定で持つ</strong>（<a href="../batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）。DB 側とコード側で同じことを二重に書かない。</p>
-<p>15-13 で設計した登録予定の文言（登録は 15-14）。</p>
+<p>登録済みの文言（15-13 で設計・15-14 でローカル &amp; Aurora へ登録済み）。</p>
 <pre><code>社会人向けロジカルトレーニング「脳みそコーチのロジトレ」。世界観は「毎日3分の頭の体操ジム」。
 ヘッドバンドとホイッスルを着けた脳のマスコット「脳みそコーチ」が進行役として出題する。
 
@@ -137,7 +137,7 @@
 </div>
 
 <h2>5. キャプションの作り方</h2>
-<p>固定文言方式。<code>caption_templates.template_text</code> に 1 件登録する。動画内に問題・答え・解説を焼き込む仕様のため、キャプションは<strong>視聴を促す固定文 + ハッシュタグ</strong>とする（fantasy-animals-1 と同じ考え方）。15-13 で設計した登録予定の文言（登録は 15-14）。</p>
+<p>固定文言方式。<code>caption_templates.template_text</code> に 1 件登録する。動画内に問題・答え・解説を焼き込む仕様のため、キャプションは<strong>視聴を促す固定文 + ハッシュタグ</strong>とする（fantasy-animals-1 と同じ考え方）。登録済みの文言（15-13 で設計・15-14 でローカル &amp; Aurora へ登録済み）。</p>
 <pre><code>毎日3分、頭の体操。
 今日のロジトレ、何秒で解けた？
 答えは動画の最後にあります💡
@@ -188,7 +188,7 @@
 </ul>
 
 <h2>9. 共通フローからの差分・特記事項</h2>
-<p><strong>使用方式は <code>gpt-quiz-multicut</code></strong>（多段生成チェーン: テキスト生成 → 検証 → 情景イラスト生成 → Pillow 組版 → ffmpeg 合成）。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通で、SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>のみ（15-12 で実装）。方式設計書 <code>docs/app/generators/gpt-quiz-multicut.html</code> は「本採用時に作成」ルールに従い <strong>15-16</strong> で作成する。</p>
+<p><strong>使用方式は <code>gpt-quiz-multicut</code></strong>（多段生成チェーン: テキスト生成 → 検証 → 情景イラスト生成 → Pillow 組版 → ffmpeg 合成。方式設計書 <a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a> = 15-16 で作成）。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通で、SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>のみ（15-12 で実装）。</p>
 <p>本セットは共通テーブルのうち <code>quiz_items</code>（出題の重複検査用の履歴）を使う唯一のセットである（<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4</a>）。重複検査は直近の要旨 30 件をプロンプトで除外指示し、生成後に直近 120 問との bigram Jaccard 類似度で判定する。</p>
 
 </div>
