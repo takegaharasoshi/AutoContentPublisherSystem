@@ -730,6 +730,32 @@ def test_render_cards_uses_slot_palette_label_and_answer_dimming(
         assert answer.getpixel((0, 0)) == expected_dimmed
 
 
+def test_think_cards_render_the_question_text() -> None:
+    """Countdown sub-cards keep the question visible while thinking."""
+    transparent_coach = Image.new("RGBA", (10, 10), (0, 0, 0, 0))
+    coaches = {
+        pose: transparent_coach for pose in quiz.COACH_FILENAMES
+    }
+    fonts = quiz._load_fonts()
+
+    def render(question: str) -> list[bytes]:
+        timeline, _ = quiz._render_cards(
+            _base_fields(question=question),
+            "L3",
+            "standard",
+            "noon",
+            "昼のロジトレ",
+            _solid_png((200, 100, 40)),
+            coaches,
+            fonts,
+        )
+        return timeline[2:7]
+
+    first = render("日本にある信号機の数はおよそ何基？")
+    second = render("日本にあるコンビニの数はおよそ何店？")
+    assert all(a != b for a, b in zip(first, second))
+
+
 def test_build_video_uses_hard_cuts_and_timed_normalization_free_mix(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

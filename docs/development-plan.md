@@ -296,7 +296,7 @@
 
 - [x] **15-11** image-batch 拡張実装（Codex 委譲）
   - 確認: gpt-quiz-multicut にスロット選曲（`time_slot`）・`tone_hint` 差し込み・スロット別パレット/ラベル・情景イラスト生成（images API・リトライ）と全カット合成が実装され、pytest 全パス、ローカル E2E（実 API）で 3 スロットぶんの MP4 生成まで通る。kenburns の選曲クエリの `time_slot` 追随（NULL 許容）を含む
-  - 備考: 2026-07-29 完了（実装 = Codex `gpt-5.6-sol` / high・レビュー + blocker 修正 = Fable 5）。仕様（15-10 の方式仕様・スロットだし分け）どおり実装され pytest 124 件全パス。実 API E2E で **L1 の潜在問題 1 件が顕在化**（15-6 以来 L1 は実 API 未検証で、LLM が `machine_spec` を kind 入れ子・`machine_answer` を非正準形で返し全滅）→ 生成プロンプトに正準形を明示する修正（Claude 直接）で 3 スロット全て MP4 生成まで成功。詳細は [development-log.md](development-log.md) の 15-11 を参照
+  - 備考: 2026-07-29 完了（実装 = Codex `gpt-5.6-sol` / high・レビュー + blocker 修正 = Fable 5）。仕様（15-10 の方式仕様・スロットだし分け）どおり実装され pytest 124 件全パス。実 API E2E で **L1 の潜在問題 1 件が顕在化**（15-6 以来 L1 は実 API 未検証で、LLM が `machine_spec` を kind 入れ子・`machine_answer` を非正準形で返し全滅）→ 生成プロンプトに正準形を明示する修正（Claude 直接）で 3 スロット全て MP4 生成まで成功。**同日追記**: ユーザーレビュー指摘（考えるカットで問題文が消える）を受け、問題文をカット 2 と同位置に据え置きカウントダウンをヘッダ行 140px へ縮小する再レイアウトを実施（Claude 直接修正・pytest 125 件全パス）。詳細は [development-log.md](development-log.md) の 15-11 を参照
 
 - [ ] **15-12** sns-post-batch ストーリーズ対応（Codex 委譲）
   - 確認: リール投稿成功後に同一 MP4 を `media_type=STORIES` で連続投稿し、`posts` に media_type 別 2 行が独立記録される（ストーリーズ失敗時もリールの success は保持し、失敗はアラームで検知）。pytest 全パスし、ストーリーズを有効化しない既存セット（fantasy-animals-1）の動作が変わらないことをテストで確認済み

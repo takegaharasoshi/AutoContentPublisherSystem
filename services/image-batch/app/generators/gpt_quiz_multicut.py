@@ -144,6 +144,7 @@ SLOT_TIME_MOODS = {
 }
 ANSWER_ILLUSTRATION_OVERLAY_OPACITY = 0.55
 HEADING_FONT_SIZE = 88
+THINK_COUNT_FONT_SIZE = 140
 QUESTION_FONT_SIZE = 56
 SUPPLEMENT_FONT_SIZE = 40
 MIN_BODY_FONT_SIZE = 30
@@ -1171,43 +1172,56 @@ def _render_question_card(
 
 def _render_think_card(
     count: int,
+    fields: dict[str, Any],
     coach: Image.Image,
     fonts: dict[str, Path],
     illustration: Image.Image,
     palette: dict[str, str],
     slot_label: str,
 ) -> bytes:
-    """Render one countdown sub-card."""
+    """Render one countdown sub-card that keeps the question readable."""
     image, draw, safe = _base_card(
         illustration, palette, slot_label, fonts
     )
     left, top, right, bottom = safe
-    count_font = _font(fonts["bold"], 360)
-    text = str(count)
-    bounds = draw.textbbox((0, 0), text, font=count_font)
-    text_width = bounds[2] - bounds[0]
+    x, y = left + CARD_PADDING, top + 130
     draw.text(
-        ((left + right - text_width) // 2, top + 210),
-        text,
-        font=count_font,
+        (x, y),
+        str(count),
+        font=_font(fonts["bold"], THINK_COUNT_FONT_SIZE),
         fill=palette["accent"],
+    )
+    # 問題文はカット 2 と同座標・同サイズに据え置き、カット間で動かさない
+    _draw_wrapped(
+        draw,
+        (x, y + 145),
+        fields["question"],
+        fonts["regular"],
+        QUESTION_FONT_SIZE,
+        right - x - CARD_PADDING,
+        850,
+        fill=palette["text"],
     )
     # ポーズ記号 U+23F8 は Noto Sans JP に無いグリフのため矩形 2 本で描く
     hint_x = left + CARD_PADDING
-    hint_y = top + 690
+    hint_y = top + 1150
     for offset in (0, 26):
         draw.rounded_rectangle(
             (hint_x + offset, hint_y + 6, hint_x + offset + 14, hint_y + 52),
             radius=6,
             fill=palette["muted_text"],
         )
+    # ヒントはコーチ画像（右下・COACH_BOX 幅）の左隣に収める
+    hint_max_width = (
+        right - COACH_BOX[0] - CARD_PADDING - (hint_x + 72) - 24
+    )
     _draw_wrapped(
         draw,
         (hint_x + 72, hint_y),
         "止めてじっくり考えても OK",
         fonts["bold"],
         SUPPLEMENT_FONT_SIZE,
-        right - hint_x - 72 - CARD_PADDING,
+        hint_max_width,
         180,
         fill=palette["muted_text"],
     )
@@ -1309,6 +1323,7 @@ def _render_cards(
     think_cards = [
         _render_think_card(
             count,
+            fields,
             coaches["think"],
             fonts,
             illustration,
