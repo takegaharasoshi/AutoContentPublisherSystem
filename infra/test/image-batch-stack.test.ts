@@ -455,7 +455,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     });
   });
 
-  test('無効化した画像生成スケジュールを Step Functions 起動先として設定する', () => {
+  test('画像生成スケジュールをセット別命名規約で作成し ScheduleGroup に所属させる', () => {
     const scheduleGroups = Object.values(
       template.findResources('AWS::Scheduler::ScheduleGroup'),
     ) as any[];
@@ -464,41 +464,63 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     ) as any[];
 
     expect(scheduleGroups).toHaveLength(1);
-    expect(schedules).toHaveLength(1);
-    expect(schedules[0].Properties.GroupName).toBe(
-      scheduleGroups[0].Properties.Name,
+    expect(schedules).toHaveLength(4);
+    for (const schedule of schedules) {
+      expect(schedule.Properties.GroupName).toBe(
+        scheduleGroups[0].Properties.Name,
+      );
+    }
+    // 命名規約: acps-{env}-image-generation-{set_code}[-{slot_code}]
+    expect(schedules.map((schedule) => schedule.Properties.Name).sort()).toEqual(
+      [
+        'acps-prod-image-generation-fantasy-animals-1',
+        'acps-prod-image-generation-logic-training-1-morning',
+        'acps-prod-image-generation-logic-training-1-night',
+        'acps-prod-image-generation-logic-training-1-noon',
+      ],
     );
-    template.hasResourceProperties('AWS::Scheduler::Schedule', {
-      Name: 'acps-prod-image-generation-schedule',
-      GroupName: 'acps-prod-image-schedule-group',
-      State: 'ENABLED',
-      ScheduleExpression: 'cron(0 21 * * ? *)',
-      ScheduleExpressionTimezone: 'Asia/Tokyo',
-      FlexibleTimeWindow: {
-        Mode: 'OFF',
-      },
-      Target: Match.objectLike({
-        Arn: {
-          Ref: Match.stringLikeRegexp('^ImageGenerationStateMachine'),
-        },
-        Input: Match.stringLikeRegexp(
-          '.*"set_code":"fantasy-animals-1".*"scheduled_at":"<aws\\.scheduler\\.scheduled-time>".*',
-        ),
-        RetryPolicy: {
-          MaximumRetryAttempts: 3,
-          MaximumEventAgeInSeconds: 3600,
-        },
-        DeadLetterConfig: {
-          Arn: {
-            'Fn::GetAtt': [
-              Match.stringLikeRegexp('^ImageSchedulerDlq'),
-              'Arn',
-            ],
-          },
-        },
-      }),
-    });
   });
+
+  test.each([
+    ['acps-prod-image-generation-fantasy-animals-1', 'cron(0 21 * * ? *)', 'fantasy-animals-1'],
+    ['acps-prod-image-generation-logic-training-1-morning', 'cron(30 7 * * ? *)', 'logic-training-1'],
+    ['acps-prod-image-generation-logic-training-1-noon', 'cron(30 12 * * ? *)', 'logic-training-1'],
+    ['acps-prod-image-generation-logic-training-1-night', 'cron(0 21 * * ? *)', 'logic-training-1'],
+  ])(
+    'スケジュール %s を cron %s / set_code %s で Step Functions 起動先に設定する',
+    (scheduleName, cronExpression, setCode) => {
+      template.hasResourceProperties('AWS::Scheduler::Schedule', {
+        Name: scheduleName,
+        GroupName: 'acps-prod-image-schedule-group',
+        State: 'ENABLED',
+        ScheduleExpression: cronExpression,
+        ScheduleExpressionTimezone: 'Asia/Tokyo',
+        FlexibleTimeWindow: {
+          Mode: 'OFF',
+        },
+        Target: Match.objectLike({
+          Arn: {
+            Ref: Match.stringLikeRegexp('^ImageGenerationStateMachine'),
+          },
+          Input: Match.stringLikeRegexp(
+            `.*"set_code":"${setCode}".*"scheduled_at":"<aws\\.scheduler\\.scheduled-time>".*`,
+          ),
+          RetryPolicy: {
+            MaximumRetryAttempts: 3,
+            MaximumEventAgeInSeconds: 3600,
+          },
+          DeadLetterConfig: {
+            Arn: {
+              'Fn::GetAtt': [
+                Match.stringLikeRegexp('^ImageSchedulerDlq'),
+                'Arn',
+              ],
+            },
+          },
+        }),
+      });
+    },
+  );
 });
 
 describe('ImageBatchStack の画像生成バッチイメージタグ Context', () => {

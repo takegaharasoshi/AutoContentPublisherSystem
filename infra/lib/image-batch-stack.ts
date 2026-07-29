@@ -291,28 +291,56 @@ export class ImageBatchStack extends cdk.Stack {
       },
     });
 
-    // 本番スケジュール: 1 日 1 回（21:00 JST）で全チェーンを起動する
-    // （Phase 13-1 で 1 日 3 回として本番化 → Phase 14-12 で動画方式への切替に伴い
-    //  1 日 1 回へ削減。workflow.html セクション 1.5）。
-    new scheduler.Schedule(this, 'ImageGenerationSchedule', {
-      scheduleName: `acps-${props.envName}-image-generation-schedule`,
-      scheduleGroup: this.scheduleGroup,
-      schedule: scheduler.ScheduleExpression.cron({
-        minute: '0',
-        hour: '21',
-        timeZone: cdk.TimeZone.ASIA_TOKYO,
-      }),
-      enabled: true,
-      target: new schedulerTargets.StepFunctionsStartExecution(this.stateMachine, {
-        input: scheduler.ScheduleTargetInput.fromObject({
-          set_code: 'fantasy-animals-1',
-          scheduled_at: scheduler.ContextAttribute.scheduledTime,
+    // 本番スケジュール（Phase 15-15 でセット別命名規約を確定。workflow.html セクション 1.5）。
+    // 命名規約: acps-{env}-image-generation-{set_code}[-{slot_code}]
+    //   - スロット非対応方式のセット: 1 セット 1 件（スロットサフィックスなし）
+    //   - スロット対応方式のセット: parameters.slots のスロットごとに 1 件（slot_code を付与）
+    // 時刻はどのスロットとして生成するかを決める入力でもあるため
+    // （方式側が SCHEDULED_AT の JST 時から決定的に解決する）、
+    // slot_code とスケジュール時刻の対応はセット別設計書と一致させること。
+    const imageGenerationSchedules: {
+      setCode: string;
+      slotCode?: string;
+      minute: string;
+      hour: string;
+    }[] = [
+      // fantasy-animals-1: 1 日 1 回（21:00 JST）。gpt-image-kenburns はスロット非対応
+      { setCode: 'fantasy-animals-1', minute: '0', hour: '21' },
+      // logic-training-1: 1 日 3 回（7:30 / 12:30 / 21:00 JST）。
+      // gpt-quiz-multicut のスロット境界（morning=4 時〜 / noon=11 時〜 / night=17 時〜）に収まる
+      { setCode: 'logic-training-1', slotCode: 'morning', minute: '30', hour: '7' },
+      { setCode: 'logic-training-1', slotCode: 'noon', minute: '30', hour: '12' },
+      { setCode: 'logic-training-1', slotCode: 'night', minute: '0', hour: '21' },
+    ];
+
+    for (const entry of imageGenerationSchedules) {
+      const suffix = entry.slotCode
+        ? `${entry.setCode}-${entry.slotCode}`
+        : entry.setCode;
+      const constructId = `ImageGenerationSchedule-${suffix}`;
+      new scheduler.Schedule(this, constructId, {
+        scheduleName: `acps-${props.envName}-image-generation-${suffix}`,
+        scheduleGroup: this.scheduleGroup,
+        schedule: scheduler.ScheduleExpression.cron({
+          minute: entry.minute,
+          hour: entry.hour,
+          timeZone: cdk.TimeZone.ASIA_TOKYO,
         }),
-        deadLetterQueue: this.schedulerDlq,
-        retryAttempts: 3,
-        maxEventAge: cdk.Duration.hours(1),
-      }),
-    });
+        enabled: true,
+        target: new schedulerTargets.StepFunctionsStartExecution(
+          this.stateMachine,
+          {
+            input: scheduler.ScheduleTargetInput.fromObject({
+              set_code: entry.setCode,
+              scheduled_at: scheduler.ContextAttribute.scheduledTime,
+            }),
+            deadLetterQueue: this.schedulerDlq,
+            retryAttempts: 3,
+            maxEventAge: cdk.Duration.hours(1),
+          },
+        ),
+      });
+    }
 
     this.stateMachine.addToRolePolicy(
       new iam.PolicyStatement({

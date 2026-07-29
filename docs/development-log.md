@@ -748,3 +748,23 @@
     **(5) ドキュメント同期**: [sets/logic-training-1.html](app/sets/logic-training-1.html) の失敗時ポリシー 2 点を実態へ追随（`max_regenerations` 3 → 5〔15-13 改訂の反映漏れ〕・「全カットの背景に常駐」→「カード内ブロックに常駐（15-14 変更）」）。組版の詳細仕様は方式設計書（15-16 で新設）に記載する。pytest 128 件全パス（吹き出し全カット検査・カード内イラスト検査へ更新）。
 
     **(6) 次ステップ**: 15-15（Scheduler 追加と命名規約の確定）。朝 7:30 / 昼 12:30 / 夜 21:00 JST の時刻確定と CDK 追加・deploy・ENABLED 化。
+
+- [x] **15-15**（旧 15-11）Scheduler 追加と命名規約の確定
+  - 確認: セット別 Scheduler の命名規約が確定し、勝負セットの Scheduler 3 件が CDK で追加・deploy・ENABLED 化されている
+  - 備考: 2026-07-29 完了（Opus 5 が直接実施。`cdk deploy` は auto mode classifier にブロックされたが、ユーザーが権限を許可して以降は Claude が直接実行）。
+
+    **(1) 命名規約の確定（設計課題リスト 2026-07-15 の宿題）**: `acps-{env}-image-generation-{set_code}[-{slot_code}]`。①スロット非対応方式のセットは 1 セット 1 件（サフィックスなし）②**スロット対応方式**（`prompt_configs.parameters.slots` を持つ方式。gpt-quiz-multicut 等）**のセットはスロットごとに 1 件**で `slot_code` をサフィックスにする ③1 セットで 1 日複数回投稿する場合も **1 スケジュール 1 時刻**を原則とする。③の理由は 2 つで、cron 式は時・分を配列で持てるが**分が異なる時刻（7:30 / 12:30 / 21:00）を 1 本にまとめられない**こと、まとめられる場合でも Scheduler 名から実行時刻が読めなくなること。②の理由は、スロットの決定が**方式側による `SCHEDULED_AT` の JST 時からの解決**であって Scheduler の Input には現れないため、名前にスロットを入れておかないと「どの時刻がどのスロットか」が Scheduler 一覧から追えないこと。Schedule 名の上限 64 文字に対し接頭辞 `acps-prod-image-generation-` が 27 文字のため、`{set_code}-{slot_code}` の予算は 37 文字（最長の `logic-training-1-morning` で 24 文字）。
+
+    **(2) 既存 1 件のリネーム（同じく設計課題の判断事項）**: 機能名 `acps-prod-image-generation-schedule` を **`acps-prod-image-generation-fantasy-animals-1` へリネームする**判断とした。Schedule 名の変更は CloudFormation では置換（新規作成 → 旧削除）になるが、①MonitoringStack の 6 本のアラームは Dimension に **ScheduleGroup 名のみ**を使っており Schedule 名に依存しない（`monitoring-stack.ts` で確認）②Scheduler はステートを持たず、置換で失われる実行履歴・キューもない ③2 セット目以降だけが規約に沿うと「機能名 = 初セット」という暗黙知が残り続ける、の 3 点からリネームの副作用はないと判断した。
+
+    **(3) 時刻の最終確定（ユーザー決定）**: 15-4 で「朝 7:30 / 昼 12:30 / 夜 21:00 JST 目安」としていたものを**この時刻のまま最終確定**。3 時刻がスロット境界（`from_jst_hour` = morning 4 / noon 11 / night 17）の内側に収まることを確認済み（7 時 → morning・12 時 → noon・21 時 → night）。**21:00 は `fantasy-animals-1` と同時刻になるが時刻はずらさない**: 両チェーンは `set_code` で完全に分離されており（投稿対象の決定 `resolve_target_generation_run` は `set_id` スコープ、アカウント・Secret・音源・キャプションもすべて `set_id` スコープ）、ECS Fargate / Aurora の同時実行にも余裕があるため。
+
+    **(4) CDK 変更**: [image-batch-stack.ts](../infra/lib/image-batch-stack.ts) の Scheduler 定義を単一の `new scheduler.Schedule(...)` から **`imageGenerationSchedules` 配列 + ループ**へ変更した（セット追加時は配列に 1 エントリ追加するだけで済む形。ScheduleGroup・Retry・DLQ・FlexibleTimeWindow・`enabled: true` は全件共通）。登録は 4 件 — `fantasy-animals-1`（`cron(0 21 * * ? *)`）/ `logic-training-1-morning`（`cron(30 7 * * ? *)`）/ `-noon`（`cron(30 12 * * ? *)`）/ `-night`（`cron(0 21 * * ? *)`）。CDK テストは命名規約の一覧検査 1 件 + `test.each` による 4 件の実値検査へ書き換え、**75 件全パス**（旧 71 件 → +4）。
+
+    **(5) 事前チェックとデプロイ**: デプロイ前に**未投稿バックログをアプリの実クエリ（`resolve_target_generation_run` と同一 SQL）で 0 件**と確認（14-10 の「生成と投稿が 1 実行分ずれる」事象の予防。初回定時実行が自分の生成分を投稿する状態）。本日 21:00 の `fantasy-animals-1` 定時実行も正常完了済み（`generation_runs` id=21 → media 1 / posts 1）を確認。`cdk diff` は**旧 Schedule 1 件 destroy + 新 4 件 create のみ**（加えてタスク定義のイメージタグ整合 = CFN 保存値 `6ba8045ac890` を稼働中の `fcadec4e7747` に合わせるだけで機能変更なし。13-1 / 14-12 と同種）。`npx cdk deploy -c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e -c imageBatchImageTag=fcadec4e7747 -c snsPostBatchImageTag=e2f198059913 --exclusively ImageBatchStack` を 21:5x JST（スケジュール境界から十分離れた時刻）に実行し UPDATE_COMPLETE（31.9 秒）。image-batch タスク定義は rev 20 が登録されたが**イメージは rev 19 と同一**。
+
+    **(6) 裏取り**: `aws scheduler list-schedules` で **4 件すべて ENABLED**、各件の `get-schedule` で cron 式・`Asia/Tokyo`・`FlexibleTimeWindow=OFF`・Input の `set_code`・`MaximumRetryAttempts=3`・DLQ ARN を確認。旧名 `acps-prod-image-generation-schedule` は `ResourceNotFoundException`（削除済み）。
+
+    **(7) 設計書更新**: [infra/workflow.html](infra/workflow.html) 1.3（Input にスロットを持たせない旨を追記）・**1.5 を全面改訂**（命名規約 + 全件共通設定の表 + 現行スケジュール 4 件の一覧表 + 15-15 の decision〔規約・リネーム理由・21:00 同時起動の判断〕）、[infra/stacks.html](infra/stacks.html)（Schedule 名の書式）、[app/operation.html](app/operation.html) 2.1 手順 3（「1 時刻 1 件」「配列に 1 エントリ追加」の手順化 + **スロット対応方式では時刻変更がスロット変更になる**warn を新設 + プレースホルダ転用の note を「リネーム済み・現在は全件が規約どおり」へ改訂）、[sets/fantasy-animals-1.html](app/sets/fantasy-animals-1.html)（Scheduler 名）、[sets/logic-training-1.html](app/sets/logic-training-1.html) セクション 3（時刻の最終確定・スロット表へ Scheduler 名 / cron 列を追加・同時起動の判断）。
+
+    **(8) 次ステップ**: 15-16（定常運用切替と締め）。**明朝 7:30 JST が `logic-training-1` の初回定時実行**（morning / L1 light）で、以降 12:30・21:00 と続く。15-16 では 2 セット並行の定時実行成功の確認から入る。

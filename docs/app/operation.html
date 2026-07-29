@@ -154,13 +154,20 @@ INSERT INTO audio_assets (set_id, s3_key, time_slot, title, source_url, license_
 VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', NULL, '(曲名)', '(出典 URL)', 'CC0', NULL, '2026-07-24', 10, 1);</code></pre>
 
 <h4>手順 3: CDK の ImageBatchStack に EventBridge Scheduler を追加して deploy する</h4>
-<p>入力に <code>set_code</code> を指定したスケジュールを 1 件追加する（1 日複数回投稿する場合は複数時刻分）。cron 式・Scheduler 定義の書き方は <a href="../infra/workflow.html">infra/workflow.html</a>、変更後のデプロイは <code>cdk deploy -c env=prod ImageBatchStack</code>（<strong>イメージタグ 3 つの Context 指定が必須</strong>。指定ルール・現行タグの確認方法は <a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。</p>
+<p>入力に <code>set_code</code> を指定したスケジュールを、<strong>投稿時刻 1 つにつき 1 件</strong>追加する。Schedule 名は命名規約 <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code> に従う（スロット対応方式のセットはスロットごとに 1 件・<code>slot_code</code> をサフィックスに付ける）。
+命名規約・cron 式・Scheduler 定義の書き方は <a href="../infra/workflow.html">infra/workflow.html セクション 1.5</a>、実装は <a href="../../infra/lib/image-batch-stack.ts">image-batch-stack.ts</a> の <code>imageGenerationSchedules</code> 配列（ここに 1 エントリ追加するだけでよい）。
+変更後のデプロイは <code>cdk deploy -c env=prod --exclusively ImageBatchStack</code>（<strong>イメージタグ 3 つの Context 指定が必須</strong>。指定ルール・現行タグの確認方法は <a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。</p>
+
+<div class="warn">
+  <span class="callout-title">スロット対応方式のセットは、スケジュール時刻がそのままスロットの指定になる</span>
+  <code>parameters.slots</code> を持つ方式（gpt-quiz-multicut 等）では、どのスロットとして生成するかを方式側が <code>SCHEDULED_AT</code> の JST 時から決定的に解決する（Scheduler の Input にスロットは持たせない）。
+  スケジュール時刻を <code>from_jst_hour</code> の境界をまたいで変更すると<strong>生成されるスロットが変わる</strong>ため、時刻の変更時はセット別設計書のスロット表と必ず突き合わせること。
+</div>
 
 <div class="note">
-  <span class="callout-title">初セットは既存プレースホルダ Scheduler を転用する（Phase 10-1 でインフラ実態を反映）</span>
-  ImageBatchStack には Phase 5 で作成した Scheduler <code>acps-prod-image-generation-schedule</code>（State=DISABLED・プレースホルダ cron・入力 <code>set_code=fashion-set-1</code>）が既に存在する（<a href="../infra/workflow.html">infra/workflow.html セクション 1.5</a> の decision）。
-  <strong>初セットの追加では新規 Scheduler を追加せず、このプレースホルダの cron 式を本番の投稿時刻に書き換え、State を ENABLED にして deploy する</strong>。2 セット目以降が本手順どおりの「Scheduler 1 件追加」となる。
-  この転用は Phase 13-1（2026-07-22）で実施済み: 初セット <code>fantasy-animals-1</code> の本番スケジュール（当時 1 日 3 回）で ENABLED 化し、14-12（2026-07-26）で動画運用に合わせて 1 日 1 回（21:00 JST）へ変更した（現行値は <a href="../infra/workflow.html">infra/workflow.html セクション 1.5</a>）。
+  <span class="callout-title">初セットは既存プレースホルダ Scheduler を転用した（Phase 10-1〜13-1 の経緯。現在は解消済み）</span>
+  ImageBatchStack には Phase 5 で作成したプレースホルダ Scheduler <code>acps-prod-image-generation-schedule</code>（機能名。State=DISABLED・プレースホルダ cron・入力 <code>set_code=fashion-set-1</code>）が存在し、初セット <code>fantasy-animals-1</code> の追加ではこれを転用した（Phase 13-1・2026-07-22 に本番時刻で ENABLED 化 → 14-12 に 1 日 1 回へ変更）。
+  この機能名は 2 セット目の追加時（<strong>Phase 15-15・2026-07-29</strong>）に命名規約に沿って <code>acps-prod-image-generation-fantasy-animals-1</code> へリネーム済みで、<strong>現在は全スケジュールが本手順どおりの命名になっている</strong>（転用は初セット限りの経緯として記録）。
 </div>
 
 <h4>手順 4: 動作確認</h4>

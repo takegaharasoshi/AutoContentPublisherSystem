@@ -50,16 +50,21 @@
 <p><strong>投稿はリール + ストーリーズの 2 本立て</strong>（<code>batch_sets.stories_enabled=1</code>）。リール投稿が成功した後、同一 MP4 を同一実行内で <code>media_type=STORIES</code> として連続投稿する（キャプションなし。<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。</p>
 
 <h2>3. スケジュール（投稿頻度）</h2>
-<p><strong>1 日 3 回（朝 7:30 / 昼 12:30 / 夜 21:00 JST 目安）</strong>（15-4 決定）。Scheduler の追加と時刻の最終確定は <strong>15-15</strong> で行う。</p>
-<p>どのスロットとして生成するかは<strong>実行時刻（<code>SCHEDULED_AT</code> の JST 時）から決定的に解決</strong>する。<code>parameters.slots</code> の <code>from_jst_hour</code> の境界は以下（早朝の巻き戻しを含む解決規則は方式側の実装による）。</p>
+<p><strong>1 日 3 回（朝 7:30 / 昼 12:30 / 夜 21:00 JST）</strong>。15-4 の決定（目安）を <strong>15-15 でこの時刻に最終確定</strong>し、スロットごとに Scheduler を 1 件ずつ（計 3 件）追加して ENABLED 化した（ユーザー決定）。コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
+<p>どのスロットとして生成するかは<strong>実行時刻（<code>SCHEDULED_AT</code> の JST 時）から決定的に解決</strong>する。<code>parameters.slots</code> の <code>from_jst_hour</code> の境界と、対応する Scheduler は以下（早朝の巻き戻しを含む解決規則は方式側の実装による）。</p>
 <div class="table-wrap">
 <table>
-<tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻（目安）</th><th><code>quiz_type</code> / <code>difficulty</code></th><th><code>slot_label</code></th></tr>
-<tr><td><code>morning</code></td><td>4:00〜10:59</td><td>7:30</td><td>L1 / light</td><td>朝のロジトレ</td></tr>
-<tr><td><code>noon</code></td><td>11:00〜16:59</td><td>12:30</td><td>L3 / standard</td><td>昼の推定トレ</td></tr>
-<tr><td><code>night</code></td><td>17:00〜3:59</td><td>21:00</td><td>L1 / deep</td><td>夜のロジトレ</td></tr>
+<tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻</th><th>Scheduler 名 / cron 式</th><th><code>quiz_type</code> / <code>difficulty</code></th><th><code>slot_label</code></th></tr>
+<tr><td><code>morning</code></td><td>4:00〜10:59</td><td>7:30</td><td><code>acps-prod-image-generation-logic-training-1-morning</code><br><code>cron(30 7 * * ? *)</code></td><td>L1 / light</td><td>朝のロジトレ</td></tr>
+<tr><td><code>noon</code></td><td>11:00〜16:59</td><td>12:30</td><td><code>acps-prod-image-generation-logic-training-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td>L3 / standard</td><td>昼の推定トレ</td></tr>
+<tr><td><code>night</code></td><td>17:00〜3:59</td><td>21:00</td><td><code>acps-prod-image-generation-logic-training-1-night</code><br><code>cron(0 21 * * ? *)</code></td><td>L1 / deep</td><td>夜のロジトレ</td></tr>
 </table>
 </div>
+<div class="warn">
+  <span class="callout-title">スケジュール時刻を変えるときはスロット境界を必ず確認する</span>
+  Scheduler の Input にスロットは持たせていない（時刻だけがスロットの指定）。<code>from_jst_hour</code> の境界をまたいで時刻を変更すると生成されるスロットが変わる。命名規約と運用手順は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> / <a href="../operation.html">operation.html セクション 2.1 手順 3</a>。
+</div>
+<p><code>night</code> は <code>fantasy-animals-1</code>（21:00）と同時刻に起動するが、両チェーンは <code>set_code</code> で完全に分離されているため時刻はずらしていない（15-15 決定。<a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> の decision）。</p>
 <p>スロットは BGM の選曲（<code>audio_assets.time_slot</code>）・配色（コード側の <code>SLOT_PALETTES</code>）・問題の口調（<code>tone_hint</code>）・時間帯ラベル帯（<code>slot_label</code>）の 4 つを同時に切り替える（生活溶け込み拡張。15-9 / 15-10 決定）。</p>
 
 <h2>4. プロンプトの作り方</h2>

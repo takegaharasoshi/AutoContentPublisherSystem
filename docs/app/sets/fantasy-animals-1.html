@@ -40,7 +40,7 @@
 <p>アカウント準備（Instagram プロアカウント化・Facebook ページ連携・Meta アプリ作成・長期アクセストークン取得）の具体手順は <a href="../operation.html#instagram-account-setup">operation.html セクション 5.1</a> に一般化して記録した。</p>
 
 <h2>3. スケジュール（投稿頻度）</h2>
-<p><strong>1 日 1 回（21:00 JST）</strong>。cron 式 <code>cron(0 21 * * ? *)</code>（Asia/Tokyo）+ ENABLED（Scheduler <code>acps-prod-image-generation-schedule</code>。現行値は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a>）。コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
+<p><strong>1 日 1 回（21:00 JST）</strong>。cron 式 <code>cron(0 21 * * ? *)</code>（Asia/Tokyo）+ ENABLED（Scheduler <code>acps-prod-image-generation-fantasy-animals-1</code>。15-15 で機能名 <code>acps-prod-image-generation-schedule</code> から命名規約に沿ってリネーム。現行値は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a>）。コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
 <div class="decision">
   <span class="callout-title">decision: 14-12 で 1 日 3 回 → 1 日 1 回に削減（2026-07-26）</span>
   13-1（2026-07-22）では静止画方式で 1 日 3 回（7:00 / 12:00 / 21:00 JST）としていたが、14-2 の壁打ちで決めた動画運用の初期パラメータ（1 日 1 本・10 秒前後）に合わせて 1 日 1 回へ削減した。時刻はユーザー決定で <strong>21:00 JST</strong>（夜のリーチが期待できる枠）。cron の変更は CDK（<code>ImageBatchStack</code>）で行い、14-10 で手動 DISABLED にしていた State も同デプロイで <code>ENABLED</code> に戻している。

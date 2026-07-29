@@ -54,24 +54,48 @@
   "set_code": "fantasy-animals-1",
   "scheduled_at": "&lt;aws.scheduler.scheduled-time&gt;"
 }</code></pre>
+<p><code>set_code</code> はスケジュールごとの固定値（セクション 1.5 の一覧）。スロット対応方式のセットでも Input にスロットは持たせず、方式側が <code>scheduled_at</code> の JST 時から決定的に解決する。</p>
 
 <h3>1.4 EventBridge Scheduler の Retry / DLQ</h3>
 <p>Scheduler には RetryPolicy と SQS DLQ を設定する。RetryPolicy は <code>MaximumRetryAttempts=3</code>、<code>MaximumEventAgeInSeconds=3600</code> を初期値とする。リトライを使い切っても画像生成 Step Functions を起動できない場合は、失敗イベントを Scheduler DLQ（セクション 10）に送信し、MonitoringStack の CloudWatch Alarm で検知する。</p>
 
 <h3>1.5 EventBridge Scheduler のスケジュール設定</h3>
+
+<p><strong>命名規約</strong>（Phase 15-15 で確定）: <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code></p>
+<ul>
+  <li><strong>スロット非対応方式のセット</strong>: 1 セット 1 件。スロットサフィックスを付けない（例: <code>acps-prod-image-generation-fantasy-animals-1</code>）</li>
+  <li><strong>スロット対応方式のセット</strong>（<code>prompt_configs.parameters.slots</code> を持つ方式。例: gpt-quiz-multicut）: <strong>スロットごとに 1 件</strong>で <code>slot_code</code> をサフィックスにする（例: <code>acps-prod-image-generation-logic-training-1-morning</code>）。スロットは方式側が <code>SCHEDULED_AT</code> の JST 時から決定的に解決するため、スケジュール時刻がそのままスロットの指定になる。名前にスロットを入れておくことで、実行時刻とスロットの対応が Scheduler 一覧だけで追える</li>
+  <li>1 セットで 1 日複数回投稿する場合も <strong>1 スケジュール 1 時刻</strong>を原則とする（cron 式は時・分を配列で持てるが分が異なる時刻を 1 本にまとめられず、まとめると Scheduler 名から時刻が読めなくなるため）</li>
+  <li>Schedule 名の上限は 64 文字。<code>acps-prod-image-generation-</code>（27 文字）を差し引いた 37 文字が <code>{set_code}-{slot_code}</code> の予算になる</li>
+</ul>
+
+<p>全スケジュールに共通の設定:</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>項目</th><th>値</th></tr></thead>
   <tbody>
-    <tr><td>Schedule 名</td><td><code>acps-prod-image-generation-schedule</code></td></tr>
-    <tr><td>ScheduleGroup 名</td><td><code>acps-prod-image-schedule-group</code>（MonitoringStack の <code>AWS/Scheduler</code> メトリクス Dimension で使用）</td></tr>
-    <tr><td>cron 式</td><td><code>cron(0 21 * * ? *)</code>（毎日 21:00 の 1 日 1 回）</td></tr>
+    <tr><td>ScheduleGroup 名</td><td><code>acps-prod-image-schedule-group</code>（MonitoringStack の <code>AWS/Scheduler</code> メトリクス Dimension で使用。全スケジュールを 1 グループに所属させる）</td></tr>
     <tr><td>タイムゾーン</td><td><code>Asia/Tokyo</code></td></tr>
     <tr><td>FlexibleTimeWindow</td><td><code>OFF</code>（時刻どおりに起動する）</td></tr>
     <tr><td>State</td><td><code>ENABLED</code>（Phase 13-1 で本番化、14-12 で動画運用として再開。下記 decision を参照）</td></tr>
+    <tr><td>RetryPolicy / DLQ</td><td>セクション 1.4 のとおり（全スケジュール共通）</td></tr>
   </tbody>
 </table>
 </div>
+
+<p>現行のスケジュール一覧（実値。CDK <a href="../../infra/lib/image-batch-stack.ts">image-batch-stack.ts</a> が単一の正）:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Schedule 名</th><th>cron 式</th><th>JST 時刻</th><th>Input の <code>set_code</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>acps-prod-image-generation-fantasy-animals-1</code></td><td><code>cron(0 21 * * ? *)</code></td><td>21:00</td><td><code>fantasy-animals-1</code></td></tr>
+    <tr><td><code>acps-prod-image-generation-logic-training-1-morning</code></td><td><code>cron(30 7 * * ? *)</code></td><td>7:30</td><td><code>logic-training-1</code></td></tr>
+    <tr><td><code>acps-prod-image-generation-logic-training-1-noon</code></td><td><code>cron(30 12 * * ? *)</code></td><td>12:30</td><td><code>logic-training-1</code></td></tr>
+    <tr><td><code>acps-prod-image-generation-logic-training-1-night</code></td><td><code>cron(0 21 * * ? *)</code></td><td>21:00</td><td><code>logic-training-1</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
 
 <div class="decision">
   <span class="callout-title">当面は DISABLED で運用（2026-07-14）→ Phase 13-1 で本番化（2026-07-22）</span>
@@ -81,6 +105,16 @@
 <div class="decision">
   <span class="callout-title">Phase 14-12 で 1 日 1 回（21:00 JST）へ変更（2026-07-26）</span>
   動画（リール）運用への切替に伴い、cron 式を <code>cron(0 21 * * ? *)</code>（1 日 1 回・時刻はユーザー決定）に変更した。14-10 の AWS E2E 中は投稿内容のレビューのため Scheduler を<strong>手動で <code>DISABLED</code></strong> にしていたが、CDK テンプレートは <code>enabled: true</code> を保持しているため、本ステップの cron 変更を含む <code>cdk deploy</code> によって State も <code>ENABLED</code> に戻る（Scheduler の更新 API が全プロパティを送るため）。<strong>Scheduler の設定は CDK を単一の正とし、コンソール・CLI での手動変更は一時的な検証時のみとする</strong>。
+</div>
+
+<div class="decision">
+  <span class="callout-title">Phase 15-15 でセット別命名規約を確定し、既存 1 件をリネーム（2026-07-29）</span>
+  2 セット目（<code>logic-training-1</code>）の追加にあたり、上記の命名規約 <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code> を確定した。
+  <strong>既存の機能名 <code>acps-prod-image-generation-schedule</code> はリネームする</strong>（<code>acps-prod-image-generation-fantasy-animals-1</code>）。Schedule 名の変更は CloudFormation では置換（新規作成 → 旧削除）になるが、
+  ①MonitoringStack のアラームは Dimension に <strong>ScheduleGroup 名のみ</strong>を使っており Schedule 名に依存しない、②Scheduler はステートを持たず、置換で失われる実行履歴・キューもない、
+  ③2 セット目以降だけが規約に沿った名前になると「機能名 = 初セット」という暗黙知が残り続ける、の 3 点からリネームを選択した。
+  <strong>21:00 の同時起動について</strong>: <code>fantasy-animals-1</code>（21:00）と <code>logic-training-1</code> の night スロット（21:00）は同時刻に起動する。両チェーンは <code>set_code</code> で完全に分離されており（投稿対象の決定・アカウント・Secret・音源のいずれも <code>set_id</code> スコープ）、ECS / Aurora の同時実行にも余裕があるため時刻はずらさない。
+  投稿時刻はユーザー決定（15-4 で 1 日 3 回・朝昼夜の目安を決定し、15-15 で 7:30 / 12:30 / 21:00 に最終確定）。
 </div>
 
 <h2 id="db-readiness">2. DB 準備確認タスク（db-readiness-check）仕様</h2>
