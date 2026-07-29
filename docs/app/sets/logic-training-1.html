@@ -176,8 +176,8 @@
 <h2>8. 失敗時ポリシー</h2>
 <p>共通の失敗時ポリシー（<a href="../operation.html#failure">operation.html セクション 4</a>）に準拠する。本セット固有の注意点は以下。</p>
 <ul>
-  <li><strong>品質検証に通らない場合は再生成</strong>（<code>max_regenerations=3</code>）。3 回とも通らなければ異常終了させ、その回は投稿しない（誤答を出すより落とす）</li>
-  <li><strong>情景イラストの生成失敗は縮退せず異常終了</strong>（15-10 決定）。イラストが全カットの背景に常駐する構成のため、欠けた状態では成立しない</li>
+  <li><strong>品質検証に通らない場合は再生成</strong>（<code>max_regenerations=5</code>。15-13 で 3 → 5 に改訂 = セクション 4 の <code>parameters</code> が正）。上限まで通らなければ異常終了させ、その回は投稿しない（誤答を出すより落とす）</li>
+  <li><strong>情景イラストの生成失敗は縮退せず異常終了</strong>（15-10 決定）。イラストが全カットのカード内ブロックに常駐する構成（15-14 の投稿前レビューで全面背景から変更）のため、欠けた状態では成立しない</li>
   <li><strong>コーチアセット・SE の欠落、スロットに対応する BGM の 0 件もフェイルラウド</strong></li>
   <li><strong>ストーリーズ投稿の失敗はリールの success を巻き戻さない</strong>。終端状態で確定した投稿失敗は Step Functions の再実行では検知できないため、検知は ECS タスク異常終了通知が担う（<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.4</a>）</li>
 </ul>
