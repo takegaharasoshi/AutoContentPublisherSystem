@@ -146,9 +146,9 @@
     </tr>
     <tr>
       <td><code>gpt-quiz-multicut</code></td>
-      <td>LLM テキスト API による問題生成（構造化フィールド方式）→ 自己検証（LLM 独立解答 + L1 は全列挙の機械検証）→ 重複検査（出題履歴 <code>quiz_items</code>）→ 情景イラスト生成（LLM が出力する <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚。15-10 追加）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔カット別 4 表情〕+ 日本語フォントを時間帯スロット別パレットで合成しカット画像 4 種を生成）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、20 秒・4 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式。出題の型（L1/L3）・口調・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える</td>
-      <td>採用中（Phase 15-3 で選定、15-5 で設計 Fix、15-6 で実装、15-11 で生活溶け込み拡張〔イラスト常駐・スロットだし分け〕、15-14 で logic-training-1 が実投稿成功 = 本採用、15-15 で 1 日 3 回の Scheduler ENABLED）</td>
-      <td><a href="generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>（15-16 で作成）</td>
+      <td>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>）から LRU 順繰りで 1 問を取得 → 情景イラスト生成（ストックの <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔4 表情〕+ 日本語フォントを時間帯スロット別パレットで<strong>全カット共通の固定版面</strong>に合成。カット間の差分は吹き出し・カウントダウンのみ）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、16 秒・4 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式。答え・解説は動画に載せずキャプション側で開示する。出題の型・難度（ストック絞り込み）・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える。実行時の LLM 問題生成・検証チェーンは 16-1 で休止（方式設計書セクション 5 の decision）</td>
+      <td>採用中（Phase 15-3 で選定、15-5 で設計 Fix、15-6 で実装、15-11 で生活溶け込み拡張〔イラスト常駐・スロットだし分け〕、15-14 で logic-training-1 が実投稿成功 = 本採用、15-15 で 1 日 3 回の Scheduler ENABLED、<strong>16-1 でテコ入れ設計 Fix〔ストック方式転換・カット構成刷新。実装追随は 16-3〕</strong>）</td>
+      <td><a href="generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>（15-16 で作成・16-1 で全面改訂）</td>
     </tr>
   </tbody>
 </table>
@@ -228,11 +228,11 @@
     <ol>
       <li><code>posts</code> レコードが<strong>存在しなければ</strong> <code>pending</code> で作成する（INSERT-or-skip。3.2 の復旧分岐により、既存行がある場合は作成せずその状態から再開する。投稿前の事前記録により二重投稿を防止する）。作成時に <code>media_type</code> を投稿対象の先頭メディアの <code>file_format</code> から導出して設定する（<code>'mp4'</code> → <code>'reel'</code>、それ以外 → <code>'feed_image'</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）</li>
       <li><strong>初期構築の仕様: 生成実行に紐づくメディアのうち最初の 1 件のみ</strong>を <code>post_media</code> で紐づける（選択順序は <code>generated_media.id</code> 昇順 = 最も早く生成された 1 件。1 セット複数 <code>prompt_config</code> や 1 プロンプト複数メディアにより生成実行が複数のメディアを保存していても、投稿するのは常に 1 件とする）。将来のカルーセル対応では、生成実行内の複数メディアを並び順付きで束ねる処理に拡張する</li>
-      <li>キャプションテンプレートを適用して投稿本文を組み立てる（テンプレートには AI 開示ハッシュタグを必ず含める運用ルール。<a href="operation.html#ai-disclosure">operation.html セクション 3</a>）</li>
+      <li>キャプションテンプレートを適用して投稿本文を組み立てる（テンプレートには AI 開示ハッシュタグを必ず含める運用ルール。<a href="operation.html#ai-disclosure">operation.html セクション 3</a>）。テンプレートに<strong>プレースホルダ</strong>が含まれる場合は、当該生成実行の <code>quiz_items</code> から動的に展開する（16-1 決定。展開規則は下記「セット別拡張ポイント: キャプションの作り方」の decision）。展開後の最終文が <code>posts.caption_text_snapshot</code> に保存される点は従来どおり</li>
       <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。パラメータは <code>media_type</code> で分岐する:
         <ul>
           <li><code>feed_image</code> → <code>image_url</code>（presigned URL）を渡す（従来どおり）</li>
-          <li><code>reel</code> → <code>media_type=REELS</code> + <code>video_url</code>（presigned URL）+ <code>share_to_feed=true</code>（プロフィールのフィード面にも表示する。<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #8</a>）を渡す。<strong>カバー画像は指定せずデフォルト（動画の先頭フレーム）とする</strong>（Phase 14-4 決定。先頭フレームは Ken Burns 元の静止画とほぼ同じ絵になるため。14-8 の実機確認で妥当性を確認済み。<code>cover_url</code> / <code>thumb_offset</code> は指定しない）</li>
+          <li><code>reel</code> → <code>media_type=REELS</code> + <code>video_url</code>（presigned URL）+ <code>share_to_feed=true</code>（プロフィールのフィード面にも表示する。<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #8</a>）を渡す。<strong>カバー画像は指定せずデフォルト（動画の先頭フレーム）とする</strong>（Phase 14-4 決定・14-8 の実機確認で妥当性を確認済み。<code>cover_url</code> / <code>thumb_offset</code> は指定しない）。この仕様を前提に、各生成方式は<strong>先頭フレームがカバー・サムネイルとして成立するように 1 カット目を設計</strong>する（kenburns = 元静止画とほぼ同じ絵 / gpt-quiz-multicut = 問題提示の版面をカバー兼用にする 16-1 テコ入れ設計）</li>
         </ul>
         取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する</li>
       <li>コンテナのステータス（<code>GET /{container-id}?fields=status_code</code>）を <code>FINISHED</code> になるまで有限回数・タイムアウト付きでポーリングする（Meta 側のメディア処理が非同期のため。手順 5 のパブリッシュ API は <code>FINISHED</code> 到達前に呼び出すと失敗しうる）。<strong>リール（動画）はメディア処理が分オーダーになり得るため、ポーリング間隔・上限は画像より長くメディア種別ごとに設定する</strong>（14-9 で確定: 画像は現行の間隔 3 秒 × 最大 10 回を維持、動画は<strong>間隔 10 秒 × 最大 60 回 = 上限約 10 分</strong>。14-8 の実測〔10 秒動画で FINISHED まで 33.5 秒〕に対する十分なマージン。動画の最大待ち時間 10 分は Step Functions の <code>RunSnsPostBatchTask</code> タイムアウト 3600 秒〔<a href="../infra/workflow.html">infra/workflow.html セクション 4</a>〕に収まるため、インフラ側の変更は不要）。<code>ERROR</code> を受け取った場合、またはポーリングが上限に達し <code>FINISHED</code> に到達しなかった場合は、パブリッシュ API を呼び出さずに <code>status='failed'</code> に更新する（パブリッシュ要求を送信していないため <code>published_unconfirmed</code> の対象外）</li>
@@ -292,10 +292,15 @@
 </ul>
 
 <div class="decision">
-  <span class="callout-title">セット別拡張ポイント: キャプションの作り方</span>
-  初期実装は <code>caption_templates</code> の固定文テンプレートを適用する（3.3 の手順 3）。将来は、
-  <strong>画像内容に合わせて生成 AI がキャプションを作る方式</strong>などを<strong>セットごとに選択可能</strong>にする
-  （2026-07-06 ユーザー要望。どの方式を使うかはセット別設計書に記録する）。
+  <span class="callout-title">セット別拡張ポイント: キャプションの作り方（16-1 でプレースホルダ展開方式を導入）</span>
+  初期実装は <code>caption_templates</code> の固定文テンプレートの素通し適用（3.3 の手順 3）。<strong>16-1 で「テンプレート + 出題データの動的組み立て」へ拡張</strong>した（答え・解説を動画からキャプションへ移すテコ入れ方針の実現方式。設計 16-1・実装 16-3）。展開規則:
+  <ul style="margin:.3rem 0 0;">
+    <li>プレースホルダは <code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code> の 5 種。展開元は当該生成実行の <code>quiz_items</code> 1 行（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>。<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）</li>
+    <li><strong>プレースホルダを含むテンプレートは <code>quiz_items</code> 行を必須</strong>とし、行がなければ異常終了する（フェイルラウド。テンプレートとセットの設定ミス検知）</li>
+    <li><strong>プレースホルダを含まないテンプレートは従来どおり素通し</strong>（fantasy-animals-1 は無変更で共存。どちらの動きになるかはテンプレート文言そのもので決まり、セット別のフラグは持たない）</li>
+    <li>ストーリーズ行がキャプション非対応である点は変更なし（3.3 手順 2 の 7）</li>
+  </ul>
+  将来の<strong>画像内容に合わせて生成 AI がキャプションを作る方式</strong>など（2026-07-06 ユーザー要望）は引き続き拡張余地として残す。どのセットがどんなテンプレートを使うかはセット別設計書に記録する（logic-training-1 は <a href="sets/logic-training-1.html">セット別設計書セクション 5</a>）。
 </div>
 
 <div class="note" id="future-failure-policy">

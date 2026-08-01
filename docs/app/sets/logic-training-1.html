@@ -12,27 +12,31 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 脳みそコーチのロジトレ</nav>
 <h1>セット別設計書: 脳みそコーチのロジトレ</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（15-13 で作成・15-16 で Fix）</span>
+  <span class="badge badge-fixed">Fix（15-13 で作成・16-1 で改訂）</span>
   <span>set_code: logic-training-1</span>
-  <span>最終更新: 2026-07-29</span>
+  <span>最終更新: 2026-08-01</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  本セット固有の設定・運用情報を記録する（15-13 で作成）。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> を参照し、本書には差分のみ書く（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）。テーマ選定・生成方式選定の検討経緯は壁打ち記録 <a href="../requirements-notes-set2.html">requirements-notes-set2.html</a> にある。
+  本セット固有の設定・運用情報を記録する（15-13 で作成）。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> を参照し、本書には差分のみ書く（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）。テーマ選定・生成方式選定の検討経緯は壁打ち記録 <a href="../requirements-notes-set2.html">requirements-notes-set2.html</a> にある。</div>
+
+<div class="warn">
+  <span class="callout-title">16-1 改訂の適用状態</span>
+  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）の改訂を反映した<strong>目標設計</strong>を記述している。実装追随は 16-3、キャプションテンプレートの差し替えと切替は 16-4 で行うため、それまで実運用は旧仕様（20 秒・答え焼き込み・旧テンプレ）のまま動く。テコ入れの経緯と方針 4 点は <a href="../../development-plan.md">development-plan.md</a> Phase 16 冒頭を参照。
 </div>
 
 <h2>1. テーマ</h2>
 <p><strong>社会人向けロジカルトレーニング</strong>（15-2 決定）。日本の社会人の日常を題材にした<strong>クイズ形式の縦型ショート動画</strong>を 1 日 3 回投稿する。世界観は「毎日 3 分の頭の体操ジム」で、進行役として脳のマスコット<strong>「脳みそコーチ」</strong>（ヘッドバンド + ホイッスル + 力こぶ / フラットベクター・ネイビー × アンバー）が全カットに登場する。</p>
-<p>出題は 2 種類（<code>parameters.slots</code> の <code>quiz_type</code> で時間帯ごとに固定）。</p>
+<p>出題は 2 種類（<code>parameters.slots</code> の <code>quiz_type</code> で時間帯ごとに固定）。出題は<strong>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>）からの取得のみ</strong>で、誤答リスクは投入時のレビューで担保する（16-1 でストックのみ方式へ転換。調達・投入の運用は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）。</p>
 <div class="table-wrap">
 <table>
 <tr><th>タイプ</th><th>内容</th><th>誤答リスク対策</th></tr>
-<tr><td><code>L1</code></td><td>論理パズル（正直者・嘘つき / 順序 / 対応づけ）</td><td>閉じた DSL（<code>machine_spec</code>）で全列挙して唯一解を検証 + 答えを伏せた独立 LLM 解答との一致検証</td></tr>
-<tr><td><code>L3</code></td><td>フェルミ推定（答えは「約〇〇（目安）」の幅で示す）</td><td>独立 LLM 推定とのオーダー一致検証。断定表現を禁止</td></tr>
+<tr><td><code>L1</code></td><td>論理パズル（正直者・嘘つき / 順序 / 対応づけ）</td><td>投入時の人間レビュー（16-1〜。旧: DSL 全列挙 + 独立 LLM 検証 = 休止）</td></tr>
+<tr><td><code>L3</code></td><td>フェルミ推定（答えは「約〇〇（目安）」の幅で示す）</td><td>投入時の人間レビュー（16-1〜。旧: 独立 LLM 推定とのオーダー一致検証 = 休止）。断定表現の禁止は執筆ガイドとして維持</td></tr>
 </table>
 </div>
-<p>動画構成は <strong>20 秒・4 カット</strong>（つかみ 3 秒 → 問題 7 秒 → 考える 5 秒〔1 秒 × 5 枚のカウントダウン〕→ 答え 5 秒）。詳細は方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。</p>
+<p>動画構成は <strong>16 秒・4 カット</strong>（つかみ 4 秒 → 問題 4 秒 → 考える 5 秒〔1 秒 × 5 枚のカウントダウン〕→ 誘導 3 秒）。<strong>版面は全カット固定</strong>で問題文が 1 フレーム目から表示され、<strong>答え・解説は動画に載せずキャプションで開示</strong>する（16-1 テコ入れ）。詳細は方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。</p>
 
 <h2>2. 投稿先アカウント構成</h2>
 <p>Instagram プロアカウント 1 件（1 セット 1 アカウント）。<strong>15-7</strong> で新規開設し、Secret 登録とトークン実働確認まで済んでいる。</p>
@@ -48,6 +52,10 @@
 </table>
 </div>
 <p><strong>投稿はリール + ストーリーズの 2 本立て</strong>（<code>batch_sets.stories_enabled=1</code>）。リール投稿が成功した後、同一 MP4 を同一実行内で <code>media_type=STORIES</code> として連続投稿する（キャプションなし。<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。</p>
+<div class="decision">
+  <span class="callout-title">決定（16-1）: 答えのキャプション移動後もストーリーズ再掲を継続する</span>
+  16-1 で答え・解説をキャプションへ移すにあたり、キャプションを持てないストーリーズ（Graph API の <code>media_type=STORIES</code> は <code>caption</code> 非対応）は答えへの直接導線を失う。代替として検討した「タップでリールへ飛べるリールカード」「リンクスタンプ」は<strong>いずれも Content Publishing API 非対応</strong>（ストーリーズ API は素の画像/動画アップロードのみ・スタンプ非対応・既存投稿をストーリーズへシェアするエンドポイントなし = 2026-08-01 調査）。そのうえで<strong>素の動画再掲を継続</strong>とユーザー決定: フォロワーへの接触回数として維持し、誘導カットの吹き出しを「答えは<strong>投稿の</strong>キャプションへ」系の文言にして、ストーリーズ閲覧者はプロフィール → リール経由で答えに到達する前提とする。
+</div>
 
 <h2>3. スケジュール（投稿頻度）</h2>
 <p><strong>1 日 3 回（朝 7:30 / 昼 12:30 / 夜 21:00 JST）</strong>。15-4 の決定（目安）を <strong>15-15 でこの時刻に最終確定</strong>し、スロットごとに Scheduler を 1 件ずつ（計 3 件）追加して ENABLED 化した（ユーザー決定）。コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
@@ -65,11 +73,11 @@
   Scheduler の Input にスロットは持たせていない（時刻だけがスロットの指定）。<code>from_jst_hour</code> の境界をまたいで時刻を変更すると生成されるスロットが変わる。命名規約と運用手順は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> / <a href="../operation.html">operation.html セクション 2.1 手順 3</a>。
 </div>
 <p><code>night</code> は <code>fantasy-animals-1</code>（21:00）と同時刻に起動するが、両チェーンは <code>set_code</code> で完全に分離されているため時刻はずらしていない（15-15 決定。<a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> の decision）。</p>
-<p>スロットは BGM の選曲（<code>audio_assets.time_slot</code>）・配色（コード側の <code>SLOT_PALETTES</code>）・問題の口調（<code>tone_hint</code>）・時間帯ラベル帯（<code>slot_label</code>）の 4 つを同時に切り替える（生活溶け込み拡張。15-9 / 15-10 決定）。</p>
+<p>スロットは BGM の選曲（<code>audio_assets.time_slot</code>）・配色（コード側の <code>SLOT_PALETTES</code>）・出題の型と難度（<code>quiz_type</code> / <code>difficulty</code> = <strong>ストック取得の絞り込みキー</strong>）・時間帯ラベル帯（<code>slot_label</code>）の 4 つを同時に切り替える（生活溶け込み拡張。15-9 / 15-10 決定・16-1 でストック絞り込みへ改訂）。旧構成の「問題の口調（<code>tone_hint</code>）」は生成チェーン休止に伴い休止し、口調の作り分けはストック投入時の執筆（16-2）で担う。</p>
 
 <h2>4. プロンプトの作り方</h2>
-<p>固定文言方式。<code>prompt_configs.prompt_text</code> にはこのセットの<strong>テーマ・世界観と題材の条件だけ</strong>を書き、出力フィールドの必須・文字数・L1 DSL の書式・禁止事項・イラスト生成プロンプトは<strong>コード側（方式）が固定で持つ</strong>（<a href="../batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）。DB 側とコード側で同じことを二重に書かない。</p>
-<p>登録済みの文言（15-13 で設計・15-14 でローカル &amp; Aurora へ登録済み）。</p>
+<p><strong>16-1 の生成チェーン休止に伴い、<code>prompt_configs.prompt_text</code> は未使用（休止）</strong>。実行時に使われるのは <code>parameters</code>（スロット定義）のみで、出題内容は問題ストック（<a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）が担う。登録済みの文言・値は<strong>変更せず残置</strong>する（方式側が無視する。生成経路を再開する場合と、ストック執筆時の文体ガイド〔題材・question・L3・hook 等の条件は 16-2 の執筆ガイドラインとしてそのまま有効〕のため）。</p>
+<p>登録済みの文言（15-13 で設計・15-14 でローカル &amp; Aurora へ登録済み。<strong>16-2 のストック執筆ガイドを兼ねる</strong>）。</p>
 <pre><code>社会人向けロジカルトレーニング「脳みそコーチのロジトレ」。世界観は「毎日3分の頭の体操ジム」。
 ヘッドバンドとホイッスルを着けた脳のマスコット「脳みそコーチ」が進行役として出題する。
 
@@ -105,7 +113,7 @@
 ・問題の舞台になっている日本の日常風景を、簡潔な一文で描写する。
 ・人物を出す場合は後ろ姿か遠景までにし、顔を描き込まない。脳のマスコットは描かない。
 ・答えが分かってしまう物・数えられる並び・図表は描写しない。</code></pre>
-<p><code>prompt_configs.parameters</code>（キー仕様は方式側。<code>slots</code> は 6 フィールド必須で、欠落・空文字・未知の <code>slot_code</code> は異常終了する）。</p>
+<p><code>prompt_configs.parameters</code>（キー仕様は方式側 = <a href="../generators/gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a>。16-1 以降、<code>slots</code> の必須は 5 フィールド〔<code>from_jst_hour</code> / <code>quiz_type</code> / <code>difficulty</code> / <code>slot_code</code> / <code>slot_label</code>〕で、<code>tone_hint</code>・<code>max_regenerations</code>・<code>llm_model</code> は<strong>存在しても無視される</strong>。登録値は変更せず残置）。</p>
 <pre><code>{
   "llm_model": "gpt-5.6-terra",
   "slots": [
@@ -122,10 +130,10 @@
   "max_regenerations": 5
 }</code></pre>
 <div class="decision">
-  <span class="callout-title">decision: 15-13 の試し打ち（実 API・3 スロット）で確定した 4 点</span>
+  <span class="callout-title">decision: 15-13 の試し打ち（実 API・3 スロット）で確定した 4 点（1・2 は生成チェーン休止後は歴史的記録）</span>
   <ol style="margin:.3rem 0 0;">
-    <li><strong>L3 の出題方向を明文化</strong>: 初回の試し打ちで「水 500mL を 20℃ から 80℃ へ温める…何分？」のように<strong>定数を与える計算問題</strong>が出た（フェルミ推定ではない）。プロンプトへ「規模を推し量る問題にする / 公式・定数を与えて計算させない」を追記し、「日本全国で平日の昼休みにコンビニで買われるおにぎりは 1 日約何個？」型に矯正した</li>
-    <li><strong><code>max_regenerations</code> を 3 → 5</strong>: 夜（L1 / deep）の 5 要素の順序パズルは<strong>独立 LLM 検証（答えを伏せた別解答）が誤答して不合格になる</strong>ことがあり、4 回上限では 3 回に 1 回ほど再生成を使い切って異常終了した。上限を 6 回（初回 + 5）にすると 3 回連続で成功。上限に達した回はフェイルラウド（誤答を出すより落とす）という方針自体は維持する</li>
+    <li><strong>L3 の出題方向を明文化</strong>: 初回の試し打ちで「水 500mL を 20℃ から 80℃ へ温める…何分？」のように<strong>定数を与える計算問題</strong>が出た（フェルミ推定ではない）。プロンプトへ「規模を推し量る問題にする / 公式・定数を与えて計算させない」を追記し、「日本全国で平日の昼休みにコンビニで買われるおにぎりは 1 日約何個？」型に矯正した（<strong>この出題方向はストック執筆ガイドとして 16-2 でも有効</strong>）</li>
+    <li><strong><code>max_regenerations</code> を 3 → 5</strong>: 夜（L1 / deep）の 5 要素の順序パズルは<strong>独立 LLM 検証（答えを伏せた別解答）が誤答して不合格になる</strong>ことがあり、4 回上限では 3 回に 1 回ほど再生成を使い切って異常終了した。上限を 6 回（初回 + 5）にすると 3 回連続で成功（16-1 の生成チェーン休止によりこのパラメータ自体が休止）</li>
     <li><strong>昼のパレットをライトブルーへ変更</strong>（ユーザー決定）: 15-9 の初期値では昼＝ダークネイビーで<strong>夜とほぼ同じ見た目</strong>になっていた。朝＝クリーム / 昼＝ライトブルー / 夜＝ダークネイビーの 3 段構成にして時間帯のだし分けを視覚的に成立させた（コード側 <code>SLOT_PALETTES</code> の <code>noon</code> を差し替え）</li>
     <li><strong>禁則処理を組版へ追加</strong>: 句読点や閉じ括弧が行頭に落ちる（「話します<br>。C は…」）事象が全カットで出ていたため、行頭禁則・行末禁則を満たす位置まで分割を追い出す処理を <code>_wrapped_lines</code> に入れた（本セット固有ではなく方式共通の改善）</li>
   </ol>
@@ -133,20 +141,42 @@
 
 <div class="note">
   <span class="callout-title">14-11 の知見の流用</span>
-  fantasy-animals-1 のプロンプト設計で効いた「①構成の明示 ②毎回変える要素の明示 ③Instagram UI セーフエリア」のうち、①②は上記の題材・question 条件として文言に取り込んだ。③は<strong>本方式ではプロンプト側の指定が不要</strong>で、組版（Pillow）がセーフエリア（右 12% / 下 15%）を計算して文字とコーチを配置する。イラストは全面背景として敷かれるため、文字の見切れは構造的に発生しない。
+  fantasy-animals-1 のプロンプト設計で効いた「①構成の明示 ②毎回変える要素の明示 ③Instagram UI セーフエリア」のうち、①②は上記の題材・question 条件として文言に取り込んだ。③は<strong>本方式ではプロンプト側の指定が不要</strong>で、組版（Pillow）がセーフエリア（右 12% / 下 15%）を計算して文字とコーチを配置する。イラストは<strong>カード内の専用ブロック</strong>に敷かれる（15-14 で全面背景から変更）ため、文字の見切れは構造的に発生しない。
 </div>
 
 <h2>5. キャプションの作り方</h2>
-<p>固定文言方式。<code>caption_templates.template_text</code> に 1 件登録する。動画内に問題・答え・解説を焼き込む仕様のため、キャプションは<strong>視聴を促す固定文 + ハッシュタグ</strong>とする（fantasy-animals-1 と同じ考え方）。登録済みの文言（15-13 で設計・15-14 でローカル &amp; Aurora へ登録済み）。</p>
-<pre><code>毎日3分、頭の体操。
-今日のロジトレ、何秒で解けた？
-答えは動画の最後にあります💡
+<p><strong>テンプレート + 出題データの動的組み立て方式</strong>（16-1 でテコ入れ方針「動画内に答えを出さない」を受けて固定文言方式から転換）。<code>caption_templates.template_text</code> にプレースホルダ（<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>）を含むテンプレートを 1 件登録し、SNS 投稿バッチが投稿時に当該実行の <code>quiz_items</code> から展開する（仕組みは <a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>、テーブル仕様は <a href="../data-model.html#detail-caption-templates">data-model.html セクション 4.3</a>）。</p>
+<p>登録するテンプレート（16-1 で設計。<strong>ローカル &amp; Aurora への差し替えは 16-4 の切替時</strong> — 旧パイプラインが動いている間に差し替えると「答えは動画の最後にあります💡」の前提が壊れるため）。</p>
+<pre><code>{{hook}}
+答えはこの下👇（ネタバレ注意）
+・
+・
+・
+・
+・
+【問題】
+{{question}}
+・
+・
+・
+【答え】
+{{answer}}
+
+【解説】
+{{explanation}}
+
+コーチから💪 {{coach_comment}}
 
 #ロジトレ #論理クイズ #思考力トレーニング #フェルミ推定 #脳トレ #朝活 #スキマ時間 #AIart</code></pre>
-<p>AI 開示は<strong>ハッシュタグ <code>#AIart</code></strong> で行う（14-4 の決定）。<strong>ストーリーズ投稿にはキャプションを付けない</strong>（Graph API の <code>media_type=STORIES</code> が <code>caption</code> を受け付けないため。<code>posts</code> のストーリーズ行はキャプション系カラムが NULL のまま記録される）。</p>
+<ul>
+  <li><strong>冒頭 1〜2 行はフィード・リール面でプレビュー表示される</strong>ため、1 行目は <code>hook</code>（カット 1 の吹き出しと共用の動的つかみコピー）、2 行目はネタバレ注意の誘導とし、答えは「続きを読む」の折りたたみ以下（中黒スペーサーの下）に置く</li>
+  <li>問題文をキャプションにも再掲する（キャプション単体で問題→答え→解説が完結し、<strong>保存の価値</strong>を持たせる）</li>
+  <li>ハッシュタグは固定のまま（<code>tags</code> フィールドは記録用で使わない）。AI 開示は<strong>ハッシュタグ <code>#AIart</code></strong> で行う（14-4 の決定）</li>
+</ul>
+<p><strong>ストーリーズ投稿にはキャプションを付けない</strong>（Graph API の <code>media_type=STORIES</code> が <code>caption</code> を受け付けないため。<code>posts</code> のストーリーズ行はキャプション系カラムが NULL のまま記録される）。答えへの導線はセクション 2 の decision を参照。</p>
 
 <h2 id="audio">6. 音源の構成</h2>
-<p>BGM は<strong>時間帯ごとに 1 曲・計 3 曲</strong>（15-8 で調達・前処理・登録済み）。<code>audio_assets.time_slot</code> にスロットを持たせ、選曲は「当該スロット一致（または NULL）の中で最も古く使ったもの」を選ぶ。加えて<strong>SE 2 種</strong>（カウントダウンティック・正解チャイム）を固定ファイル名で配置し、<code>asset_type='se'</code> で登録している。</p>
+<p>BGM は<strong>時間帯ごとに 1 曲・計 3 曲</strong>（15-8 で調達・前処理・登録済み）。<code>audio_assets.time_slot</code> にスロットを持たせ、選曲は「当該スロット一致（または NULL）の中で最も古く使ったもの」を選ぶ。加えて<strong>SE 2 種</strong>（カウントダウンティック・誘導チャイム）を固定ファイル名で配置し、<code>asset_type='se'</code> で登録している。</p>
 <div class="table-wrap">
 <table>
 <tr><th>種別</th><th><code>time_slot</code></th><th>S3 キー</th><th>ライセンス</th></tr>
@@ -157,17 +187,17 @@
 <tr><td>SE</td><td>NULL</td><td><code>audio/logic-training-1/se/answer_chime.m4a</code></td><td>Pixabay Content License</td></tr>
 </table>
 </div>
-<p>前処理レシピ（20 秒尺の 2 パス loudnorm / SE はピーク -1.5 dBTP 調整のみ）と証跡の記録方法は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a>。各スロットに有効な BGM が 0 件になると当該スロットの実行が異常終了する（フェイルラウド）。</p>
+<p>前処理レシピ（20 秒尺の 2 パス loudnorm / SE はピーク -1.5 dBTP 調整のみ）と証跡の記録方法は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a>。<strong>16-1 の 16 秒化後も 20 秒尺の前処理済み素材をそのまま流用</strong>する（トリムと終端フェードは方式の ffmpeg 側で吸収 = <a href="../generators/gpt-quiz-multicut.html#encode">方式設計書セクション 9</a>。再前処理・再登録は不要）。各スロットに有効な BGM が 0 件になると当該スロットの実行が異常終了する（フェイルラウド）。</p>
 
 <h2 id="coach-assets">7. 固定アセット（脳みそコーチ 4 表情）</h2>
-<p>カットごとにコーチの表情・ポーズを切り替える。4 枚を<strong>固定アセットとして S3 に置き、方式が起動時に読み込む</strong>（LLM/画像 API は毎回呼ばない）。ファイル名はコード側で固定。</p>
+<p>カットごとにコーチの表情・ポーズを切り替える。4 枚を<strong>固定アセットとして S3 に置き、方式が起動時に読み込む</strong>（画像 API は毎回呼ばない）。ファイル名はコード側で固定。16-1 のカット構成刷新後も <strong>4 枚すべてを継続使用</strong>する（割当の変更のみ・アセットの作り直しは不要）。</p>
 <div class="table-wrap">
 <table>
-<tr><th>カット</th><th>S3 キー</th><th>ポーズ</th></tr>
-<tr><td>カット 1（つかみ）</td><td><code>assets/logic-training-1/coach_hook.png</code></td><td>力こぶを作って呼びかける</td></tr>
+<tr><th>カット（16-1 以降）</th><th>S3 キー</th><th>ポーズ</th></tr>
+<tr><td>カット 1（つかみ）</td><td><code>assets/logic-training-1/coach_hook.png</code></td><td>力こぶを作って呼びかける（吹き出し = 動的つかみコピー <code>hook</code>）</td></tr>
 <tr><td>カット 2（問題）</td><td><code>assets/logic-training-1/coach_question.png</code></td><td>手のひらを上に向けて問題を差し出す</td></tr>
 <tr><td>カット 3（考える）</td><td><code>assets/logic-training-1/coach_think.png</code></td><td>こぶしをあごに当てて考え込む</td></tr>
-<tr><td>カット 4（答え）</td><td><code>assets/logic-training-1/coach_answer.png</code></td><td>両腕を上げたガッツポーズ</td></tr>
+<tr><td>カット 4（誘導）</td><td><code>assets/logic-training-1/coach_answer.png</code></td><td>両腕を上げたガッツポーズ（吹き出し = キャプション誘導）</td></tr>
 </table>
 </div>
 <p><strong>ファイル仕様</strong>: RGBA の PNG（他モード・非 PNG は異常終了）。4 枚とも <strong>900 × 1290 px の共通キャンバス</strong>で、4 ポーズ共通の倍率で拡縮したうえで<strong>下端中央そろえ</strong>にしてある。組版側は <code>COACH_BOX</code>（300 × 430 px）へ縦横比を保って収め、セーフエリアの右下に配置する。共通キャンバス・共通倍率にしておくことで、カットが切り替わってもコーチの大きさと立ち位置が動かない。</p>
@@ -179,17 +209,18 @@
 </div>
 
 <h2>8. 失敗時ポリシー</h2>
-<p>共通の失敗時ポリシー（<a href="../operation.html#failure">operation.html セクション 4</a>）に準拠する。本セット固有の注意点は以下。</p>
+<p>共通の失敗時ポリシー（<a href="../operation.html#failure">operation.html セクション 4</a>）に準拠する。本セット固有の注意点は以下（16-1 のストックのみ方式への転換を反映）。</p>
 <ul>
-  <li><strong>品質検証に通らない場合は再生成</strong>（<code>max_regenerations=5</code>。15-13 で 3 → 5 に改訂 = セクション 4 の <code>parameters</code> が正）。上限まで通らなければ異常終了させ、その回は投稿しない（誤答を出すより落とす）</li>
+  <li><strong>ストック 0 件（スロットの型・難度に一致する有効行なし）は異常終了</strong>し、その回は投稿しない（未投入・全行無効化の検知。<a href="../generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）。取得した行のフィールド不備（必須欠落・文字数超過）も同様に異常終了（投入ミスの検知）</li>
+  <li><strong>未使用ストックが尽きた場合は利用済みストックを再利用</strong>する（LRU で最古使用分から。投稿は止まらない）。再利用時は WARNING ログが出るため、<strong>補充遅延のサイン</strong>として在庫確認 → 補充を行う（<a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）</li>
   <li><strong>情景イラストの生成失敗は縮退せず異常終了</strong>（15-10 決定）。イラストが全カットのカード内ブロックに常駐する構成（15-14 の投稿前レビューで全面背景から変更）のため、欠けた状態では成立しない</li>
   <li><strong>コーチアセット・SE の欠落、スロットに対応する BGM の 0 件もフェイルラウド</strong></li>
   <li><strong>ストーリーズ投稿の失敗はリールの success を巻き戻さない</strong>。終端状態で確定した投稿失敗は Step Functions の再実行では検知できないため、検知は ECS タスク異常終了通知が担う（<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.4</a>）</li>
 </ul>
 
 <h2>9. 共通フローからの差分・特記事項</h2>
-<p><strong>使用方式は <code>gpt-quiz-multicut</code></strong>（多段生成チェーン: テキスト生成 → 検証 → 情景イラスト生成 → Pillow 組版 → ffmpeg 合成。方式設計書 <a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a> = 15-16 で作成）。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通で、SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>のみ（15-12 で実装）。</p>
-<p>本セットは共通テーブルのうち <code>quiz_items</code>（出題の重複検査用の履歴）を使う唯一のセットである（<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4</a>）。重複検査は直近の要旨 30 件をプロンプトで除外指示し、生成後に直近 120 問との bigram Jaccard 類似度で判定する。</p>
+<p><strong>使用方式は <code>gpt-quiz-multicut</code></strong>（16-1 以降: ストック取得 → 情景イラスト生成 → Pillow 組版 → ffmpeg 合成。方式設計書 <a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a> = 15-16 で作成・16-1 で全面改訂）。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）。</p>
+<p>本セットは共通テーブルのうち <code>quiz_stock_items</code>（問題ストック）と <code>quiz_items</code>（出題履歴。16-1 で <code>stock_item_id</code> による突合を追加）を使う唯一のセットである（<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4.9 / 4.10</a>）。</p>
 
 </div>
 </body>

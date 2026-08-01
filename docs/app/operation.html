@@ -151,7 +151,14 @@ VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);
 --     時間帯で BGM を出し分けるセットは time_slot に parameters.slots の slot_code
 --     〔morning / noon / night 等〕を指定する〔省略時 NULL = スロット無関係。data-model.html セクション 4.8〕）
 INSERT INTO audio_assets (set_id, s3_key, time_slot, title, source_url, license_type, license_note, acquired_at, duration_seconds, is_active)
-VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', NULL, '(曲名)', '(出典 URL)', 'CC0', NULL, '2026-07-24', 10, 1);</code></pre>
+VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', NULL, '(曲名)', '(出典 URL)', 'CC0', NULL, '2026-07-24', 10, 1);
+
+-- (6) quiz_stock_items（gpt-quiz-multicut 方式のセットのみ。16-1 新設。
+--     リサーチ → 表現書き直し → レビューを経た問題を投入する〔手順・著作権ガイドラインはセクション 3〕。
+--     quiz_type / difficulty は parameters.slots の値と一致させる。content_fields は方式のフィールド仕様
+--     〔hook / explanation / coach_comment / tags / summary / illustration_scene〕を満たす JSON）
+INSERT INTO quiz_stock_items (set_id, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON)', '(出典と書き直しの証跡)', 1);</code></pre>
 
 <h4>手順 3: CDK の ImageBatchStack に EventBridge Scheduler を追加して deploy する</h4>
 <p>入力に <code>set_code</code> を指定したスケジュールを、<strong>投稿時刻 1 つにつき 1 件</strong>追加する。Schedule 名は命名規約 <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code> に従う（スロット対応方式のセットはスロットごとに 1 件・<code>slot_code</code> をサフィックスに付ける）。
@@ -181,8 +188,9 @@ VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', NULL, '(曲名)', '(出典 U
     <li><code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code>（→ 動画方式のセットは <code>audio_assets</code>）の順に DB へ登録した</li>
     <li>キャプションテンプレートに AI 開示ハッシュタグ <code>#AIart</code> を含めた（セクション 3）</li>
     <li>動画方式のセットは、前処理済み音源（3〜5 曲）を S3 の <code>audio/{set_code}/</code> に配置し、証跡（出典 URL・ライセンス種別・取得日）込みで <code>audio_assets</code> に登録した（セクション 3）</li>
-    <li>gpt-quiz-multicut 方式のセットは、SE 2 種（カウントダウンティック・正解チャイム）を <code>audio/{set_code}/se/</code> の固定ファイル名で配置し、<code>asset_type='se'</code> + 証跡込みで <code>audio_assets</code> に登録した（セクション 3）。固定アセット（キャラポーズ画像等）を <code>assets/{set_code}/</code> に配置した（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）</li>
+    <li>gpt-quiz-multicut 方式のセットは、SE 2 種（カウントダウンティック・誘導チャイム〔固定ファイル名は <code>answer_chime.m4a</code> のまま〕）を <code>audio/{set_code}/se/</code> の固定ファイル名で配置し、<code>asset_type='se'</code> + 証跡込みで <code>audio_assets</code> に登録した（セクション 3）。固定アセット（キャラポーズ画像等）を <code>assets/{set_code}/</code> に配置した（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）</li>
     <li>時間帯で BGM を出し分けるセットは、<code>parameters.slots</code> の全 <code>slot_code</code> について <code>time_slot</code> 一致（または NULL）の有効 BGM が 1 曲以上あることを確認した（0 件のスロットがあると当該スロットの実行が異常終了する。セクション 3）</li>
+    <li>gpt-quiz-multicut 方式のセットは、初期の問題ストックを <code>quiz_stock_items</code> へ投入し、<code>parameters.slots</code> の全「型 × 難度」の組について有効な在庫が 1 件以上あることを在庫確認クエリで確認した（0 件の組があると当該スロットの実行が異常終了する。セクション 3）</li>
     <li>ストーリーズ再掲するセットは <code>batch_sets.stories_enabled=1</code> を設定した（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
@@ -205,9 +213,9 @@ VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', NULL, '(曲名)', '(出典 U
   <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す</li>
 </ol>
 
-<h2 id="content-mgmt">3. プロンプト・キャプション・音源管理</h2>
+<h2 id="content-mgmt">3. プロンプト・キャプション・音源・問題ストック管理</h2>
 
-<p><code>prompt_configs</code>・<code>caption_templates</code>・<code>audio_assets</code> は DB 直接操作（Query Editor 等）で登録・変更する。管理画面は将来拡張。生成時にはプロンプトのスナップショットが <code>generated_media</code> に、キャプションのスナップショットが <code>posts</code> に記録されるため、変更しても過去の生成・投稿記録は影響を受けない。</p>
+<p><code>prompt_configs</code>・<code>caption_templates</code>・<code>audio_assets</code>・<code>quiz_stock_items</code>（16-1 新設）は DB 直接操作（Query Editor 等）で登録・変更する。管理画面は将来拡張。生成時にはプロンプトのスナップショットが <code>generated_media</code> に、出題のスナップショットが <code>quiz_items</code> に、キャプションのスナップショット（プレースホルダ展開後の最終文）が <code>posts</code> に記録されるため、変更しても過去の生成・投稿記録は影響を受けない。</p>
 
 <h4>軽微な文言修正（履歴を残さない場合）</h4>
 <p>既存の有効行を直接 UPDATE する。過去の生成実行への影響はスナップショットにより発生しない。</p>
@@ -224,8 +232,8 @@ COMMIT;</code></pre>
 <p><code>caption_templates</code> は <code>is_active=1</code> が 0 件でも投稿処理は継続する（キャプションなしで投稿。<a href="data-model.html#detail-caption-templates">data-model.html セクション 4.3</a>）ため、トランザクションは必須ではないが同様の手順で問題ない。</p>
 
 <div class="decision">
-  <span class="callout-title">セット別拡張ポイント（再掲）</span>
-  AI によるプロンプト生成・AI キャプション生成は将来のセット別拡張ポイント（<a href="batch-flow.html">バッチ処理フロー設計</a> セクション 2・3）。どのセットがどの方式かはセット別設計書に記録する。本セクションの手順は「固定文を DB で管理する」初期実装に対するものであり、AI 生成方式導入時は別途手順を定める。
+  <span class="callout-title">セット別拡張ポイント（再掲。16-1 更新）</span>
+  キャプションは 16-1 で<strong>プレースホルダ展開方式</strong>（テンプレート + <code>quiz_items</code> の動的組み立て。<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3.3 の decision</a>）を導入した。プレースホルダを含むテンプレートの文言修正・差し替えも本セクションの手順（UPDATE / INSERT + 無効化）のままでよいが、<strong>プレースホルダの綴り（<code>{{answer}}</code> 等 5 種）を崩さないこと</strong>と、<strong>プレースホルダ入りテンプレートは <code>quiz_items</code> を持つセット（クイズ方式）でのみ使うこと</strong>（行がないと投稿が異常終了する）に注意する。AI によるプロンプト生成・AI キャプション生成は引き続き将来のセット別拡張ポイント。どのセットがどの方式かはセット別設計書に記録する。
 </div>
 
 <h3 id="ai-disclosure">AI 利用の開示（ハッシュタグ）の運用ルール</h3>
@@ -250,7 +258,7 @@ COMMIT;</code></pre>
 </ul>
 
 <h4>手順 2: 前処理（ffmpeg。ローカルで 1 回だけ）</h4>
-<p><strong>動画の尺は方式カタログ（<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）の該当方式に合わせる</strong>（<code>gpt-image-kenburns</code> = 10 秒、<code>gpt-quiz-multicut</code> = 20 秒。15-5 で尺可変に一般化）。尺に合わせて切り出し、音量正規化（ラウドネス）とフェードを掛け、AAC（<code>.m4a</code>）で書き出す。AAC に統一するのは、合成時に MP4 コンテナへ再エンコードなしで多重化できるため。</p>
+<p><strong>動画の尺は方式カタログ（<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）の該当方式に合わせる</strong>（<code>gpt-image-kenburns</code> = 10 秒、<code>gpt-quiz-multicut</code> = 20 秒素材。15-5 で尺可変に一般化。<strong>クイズ方式は 16-1 の 16 秒化後も 20 秒素材のまま</strong> — トリムと終端フェードは方式の ffmpeg 側で吸収するため、既存素材の再前処理は不要で新規調達時も 20 秒で作る〔<a href="generators/gpt-quiz-multicut.html#encode">方式設計書セクション 9</a>〕）。尺に合わせて切り出し、音量正規化（ラウドネス）とフェードを掛け、AAC（<code>.m4a</code>）で書き出す。AAC に統一するのは、合成時に MP4 コンテナへ再エンコードなしで多重化できるため。</p>
 <pre><code># 例: 原曲の 12 秒地点から 10 秒を切り出し、ラウドネス正規化 + フェードを掛けて AAC 化する
 # （20 秒尺の方式では -t 20・afade=t=out:st=19 に読み替える。フェード長は尺によらず in 0.5 秒 / out 1 秒）
 ffmpeg -ss 12 -i source.mp3 -t 10 \
@@ -281,7 +289,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 <p>セクション 2.1 手順 2 の (5) の INSERT を使う（証跡 3 点 + <code>duration_seconds</code> を必ず入れる）。時間帯で BGM を出し分けるセットは <code>time_slot</code> に S3 のスロットプレフィックスと同じ <code>slot_code</code>（<code>morning</code> / <code>noon</code> / <code>night</code> 等）を指定する（選曲のスロット判定はこのカラムで行い、S3 プレフィックスは配置規約に留める。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。</p>
 
 <h4>効果音（SE）の調達・登録（gpt-quiz-multicut 方式のセットのみ。Phase 15-5 新設）</h4>
-<p>クイズ方式はカウントダウンティック・正解チャイムの SE 2 種（15-4 ユーザー決定）を使う。SE は <strong>BGM ローテーション外・カットタイミング固定の固定アセット</strong>だが、証跡一元管理の原則を保つため <code>audio_assets</code> に <code>asset_type='se'</code> で登録する（<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。</p>
+<p>クイズ方式はカウントダウンティック・誘導チャイム（15-4 ユーザー決定時の呼称は「正解チャイム」。16-1 でキャプション誘導の注意喚起へ用途変更、ファイル名 <code>answer_chime.m4a</code> は不変）の SE 2 種を使う。SE は <strong>BGM ローテーション外・カットタイミング固定の固定アセット</strong>だが、証跡一元管理の原則を保つため <code>audio_assets</code> に <code>asset_type='se'</code> で登録する（<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。</p>
 <ul>
   <li><strong>調達</strong>: BGM と同じ基準（CC0 / Pixabay License 等。手順 1 の証跡 3 点を控える）</li>
   <li><strong>前処理</strong>: ラウドネス正規化（2 パス loudnorm）は掛けない（短尺 SE には不適切）。ピークを <code>-1.5 dBTP</code> 目安に整え、AAC（<code>.m4a</code>）化のみ行う。ティックは 1 秒間隔 × 5 打の 5 秒連続ファイル、チャイムは 1〜2 秒に整える（配置タイミング・音量バランスの設計は方式側。15-6 実装）</li>
@@ -295,6 +303,47 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li>曲を外す場合は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す）</li>
   <li><strong>動画方式のセットで有効音源が 0 件になると画像生成バッチが異常終了する</strong>（設定ミス扱い。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。<code>prompt_configs</code> の差し替えと同様、無効化する場合は先に代替曲を登録してから行い、0 件になる瞬間を作らない</li>
   <li><strong>時間帯スロット対応のセット（<code>gpt-quiz-multicut</code>）の 0 件判定はスロットごと</strong>: あるスロットで「<code>time_slot</code> 一致 + NULL（共通曲）」の有効 BGM が 0 件になると、当該スロットの実行だけが異常終了する（他スロットは動き続けるため気づきにくい）。スロット別曲の差し替え時も「先に代替を登録してから無効化」を守り、スロット単位で 0 件の瞬間を作らない（15-10。順繰り〔<code>last_used_at</code> 最古〕はスロット絞り込み内で維持される）</li>
+</ul>
+
+<h3 id="quiz-stock-mgmt">問題ストックの調達・書き直し・投入（gpt-quiz-multicut 方式のセットのみ。Phase 16-1 新設）</h3>
+<p>クイズの出題は<strong>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>。<a href="data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）からの取得のみ</strong>で行う（16-1 のユーザー決定。実行時の LLM 問題生成は休止）。ストックは音源と同じ「調達 → 前処理（書き直し）→ 投入 → ローテーション」の型で運用する。取得は型・難度で絞った LRU 順繰りで、<strong>未使用を使い切ったら最古使用分を自動で再利用する</strong>ため在庫切れで投稿は止まらないが、再利用は WARNING ログが出る（補充遅延のサイン）。</p>
+
+<div class="decision">
+  <span class="callout-title">著作権ガイドライン（2026-08-01、Phase 16-1）: 定番・古典問題は「アイデアを借りて表現を書き直す」</span>
+  著作権はアイデアではなく<strong>表現</strong>を保護する。定番・古典問題（面接パズル・論理パズル・フェルミ推定の良問）の<strong>アイデア・解法構造を題材として使うことは可</strong>だが、<strong>問題文の文面は創作的表現として保護され得るため転載は不可</strong>（Phase 16 展開時の壁打ちで確定。既存問題の文面転載案はこの理由で不採用）。運用ルール:
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>書き直しの基準</strong>: 問題文・答え・解説のすべてを自分の言葉とセットのフォーマット（世界観・文体・文字数制限）で書き下ろす。登場人物・シチュエーション・数値は原型から変える（解法構造だけを残す）</li>
+    <li><strong>証跡</strong>: <code>source_note</code> に「元ネタの類型・参照元（URL 等）・表現は書き直し済みの旨」を記録する（音源のライセンス証跡 3 点と同じ位置づけ。別ドキュメントは持たない）</li>
+    <li><strong>避けるもの</strong>: 特定の書籍・サイト固有の独創的な問題（アイデア自体に強い独自性があり出所が特定できるもの）、実在の企業名を冠した出題（「○○社の入社試験」等の断定は事実確認できないため使わない）、パズル集からの数値・配役までそのままの流用</li>
+  </ul>
+</div>
+
+<h4>手順 1: リサーチ（Codex 委譲）</h4>
+<p>Web 検索で定番・古典問題（面接パズル・論理パズル・フェルミ推定）を収集する。<strong>Codex に委譲</strong>し（16-1 のユーザー決定。CLAUDE.md の Codex 連携ルール）、成果物は<strong>「出典 URL・問題の類型・解法構造の要約」まで</strong>とする — 文面の転載はさせない（上記ガイドライン）。収集時にセットのスロット構成（型 × 難度）に合わせた内訳を指定する。</p>
+
+<h4>手順 2: 表現書き直し・content_fields 案の作成（Claude Code）</h4>
+<p>リサーチ結果を元に、Claude Code が著作権ガイドラインに沿って全フィールドを執筆する。文体・題材の条件は <code>prompt_configs.prompt_text</code> の執筆ガイド（<a href="sets/logic-training-1.html">セット別設計書セクション 4</a>。生成チェーン休止後もストック執筆ガイドとして有効）に従い、文字数上限は方式のフィールド仕様（<a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）を守る。<code>hook</code> はカット 1 の吹き出しとキャプション冒頭を兼ねる<strong>つかみコピー</strong>として執筆する（固定文にしない）。</p>
+
+<h4>手順 3: 人間レビュー</h4>
+<p>投入前にユーザーがレビューする。観点: <strong>①誤答チェック（答え・解説の正しさ。実行時の検証チェーンはないため、ここが誤答リスク対策の唯一の砦）</strong> ②表現の独自性（書き直しが十分か・上記ガイドライン準拠）③既存ストック・出題履歴との重複（同じ解法構造の問題が近接しないか）④フォーマット適合（文字数・L3 の幅表現「約〇〇（目安）」・トーン）。</p>
+
+<h4>手順 4: INSERT 投入（Claude Code。ローカル MySQL + Aurora）</h4>
+<p>セクション 2.1 手順 2 の (6) の INSERT を使い、レビュー済みの問題をローカル MySQL と Aurora の両方へ投入する（<code>quiz_type</code> / <code>difficulty</code> は <code>parameters.slots</code> の値と一致させる。<code>source_note</code> 必須）。</p>
+
+<h4>初期ストック量・補充サイクル・在庫確認</h4>
+<ul>
+  <li><strong>初期ストック（16-2 で投入）: 42 問 = 2 週間分</strong>（消費は週 21 問。内訳はスロット構成に合わせ L1/light 14・L3/standard 14・L1/deep 14）</li>
+  <li><strong>補充: 週 1 回、各「型 × 難度」の未使用在庫が 7 問（1 週間分）以上</strong>を目安に手順 1〜4 を回す。再利用 WARNING が出た場合は補充が遅れているサインなので優先して補充する</li>
+  <li><strong>在庫確認クエリ</strong>（週次の補充判断と 16-2 の投入確認に使う）:
+<pre><code>SELECT quiz_type, difficulty,
+       SUM(last_used_at IS NULL)     AS unused,   -- 未使用在庫
+       SUM(last_used_at IS NOT NULL) AS used,     -- 使用済み（再利用候補）
+       SUM(use_count)                AS total_uses
+FROM quiz_stock_items
+WHERE set_id = :set_id AND is_active = 1
+GROUP BY quiz_type, difficulty;</code></pre></li>
+  <li><strong>取り下げ</strong>: 品質問題（誤答の発覚・表現の問題）が見つかった問題は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す — 音源と同じ）。<strong>ある「型 × 難度」の有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、取り下げで 0 件になる場合は先に代替を投入する</li>
+  <li>専用の在庫アラームは持たない（再利用 WARNING + 週次の在庫確認で運用。失敗通知起点の運用方針〔セクション 4〕と整合）</li>
 </ul>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>

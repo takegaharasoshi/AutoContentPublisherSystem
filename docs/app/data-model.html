@@ -37,6 +37,10 @@
   <line x1="360" y1="60" x2="85" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
   <!-- generation_runs → quiz_items（row2 の背面を通す） -->
   <line x1="400" y1="158" x2="185" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <!-- batch_sets → quiz_stock_items（row1 の背面を通す） -->
+  <line x1="500" y1="55" x2="770" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <!-- quiz_items → quiz_stock_items（row3 の背面を通す。stock_item_id 参照） -->
+  <line x1="262" y1="336" x2="777" y2="263" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
   <!-- batch_sets -->
   <rect x="340" y="16" width="200" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
   <text x="440" y="43" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">batch_sets（セット）</text>
@@ -70,6 +74,11 @@
   <rect x="530" y="215" width="150" height="48" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
   <text x="605" y="235" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">posts（投稿）</text>
   <text x="605" y="251" text-anchor="middle" font-size="10" fill="var(--diag-text)">（生成実行 × アカウント）</text>
+
+  <rect x="692" y="215" width="170" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="777" y="235" text-anchor="middle" font-size="11" fill="var(--diag-text)">quiz_stock_items</text>
+  <text x="777" y="251" text-anchor="middle" font-size="10" fill="var(--diag-text)">（問題ストック。16-1 新設）</text>
+  <text x="560" y="282" font-size="10" fill="var(--diag-text)">出題時に参照（stock_item_id）</text>
 
   <!-- row3 -->
   <rect x="100" y="312" width="160" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
@@ -124,7 +133,7 @@
   <!-- posts → post_insights (dashed) -->
   <line x1="605" y1="263" x2="605" y2="310" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
 </svg>
-<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_media</code>（生成メディア: 画像・動画。旧 <code>generated_images</code>）は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。<code>audio_assets</code>（音源ストック。Phase 14-4 新設）はセットの子であり、動画の <code>generated_media</code> から使用音源として参照される（破線）。<code>quiz_items</code>（出題履歴。Phase 15-5 新設）は生成実行と 1 : 1 で、クイズ方式のセットのみ行が作られる。<code>post_insights</code> の破線は将来拡張（テーブル未作成、拡張余地の記録のみ）。</figcaption>
+<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_media</code>（生成メディア: 画像・動画。旧 <code>generated_images</code>）は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。<code>audio_assets</code>（音源ストック。Phase 14-4 新設）はセットの子であり、動画の <code>generated_media</code> から使用音源として参照される（破線）。<code>quiz_items</code>（出題履歴。Phase 15-5 新設）は生成実行と 1 : 1 で、クイズ方式のセットのみ行が作られる。<code>quiz_stock_items</code>（問題ストック。Phase 16-1 新設）はセットの子で、出題時に消費（LRU 順繰り）され、<code>quiz_items.stock_item_id</code> から参照される（破線）。<code>post_insights</code> の破線は将来拡張（テーブル未作成、拡張余地の記録のみ）。</figcaption>
 </figure>
 
 <h2 id="entities">2. エンティティ一覧</h2>
@@ -150,8 +159,8 @@
     </tr>
     <tr>
       <td><code>caption_templates</code></td>
-      <td>投稿キャプション・ハッシュタグの固定文テンプレート</td>
-      <td>紐づけ単位は<strong>セット</strong>に確定（セクション 4.3）。AI 生成キャプションは将来のセット別方式（<a href="batch-flow.html#flow-sns">セット別拡張ポイント</a>）</td>
+      <td>投稿キャプション・ハッシュタグのテンプレート（固定文、または <code>quiz_items</code> から展開するプレースホルダ入り。16-1 拡張）</td>
+      <td>紐づけ単位は<strong>セット</strong>に確定（セクション 4.3）。プレースホルダ展開の規則は <a href="batch-flow.html#flow-sns">batch-flow.html セクション 3.3 の decision</a>。AI 生成キャプションは将来のセット別方式</td>
     </tr>
     <tr>
       <td><code>generated_media</code><br><span style="font-size:.85em">（旧 <code>generated_images</code>）</span></td>
@@ -165,8 +174,13 @@
     </tr>
     <tr>
       <td><code>quiz_items</code><span class="badge badge-fixed" style="margin-left:.4rem">15-5 新設</span></td>
-      <td>出題履歴（クイズ方式 <code>gpt-quiz-multicut</code> が生成した問題のスナップショット）。<code>generation_runs</code> と 1 : 1</td>
-      <td>重複検査（直近履歴のプロンプト除外 + 類似度検査）の参照元。行の作成は方式、commit は共通骨格（生成メディア登録と同一トランザクション）。Phase 16 のインサイト突合（問題別パフォーマンス）への拡張余地を持つ（セクション 4.9）</td>
+      <td>出題履歴（クイズ方式 <code>gpt-quiz-multicut</code> が出題した問題のスナップショット）。<code>generation_runs</code> と 1 : 1</td>
+      <td>キャプション動的組み立ての展開元（16-1）+ インサイト突合（問題別パフォーマンス）の起点。16-1 で <code>stock_item_id</code>（消費したストックへの参照）を追加。行の作成は方式、commit は共通骨格（生成メディア登録と同一トランザクション）。旧役割の重複検査参照は生成チェーン休止に伴い休止（セクション 4.9）</td>
+    </tr>
+    <tr>
+      <td><code>quiz_stock_items</code><span class="badge badge-fixed" style="margin-left:.4rem">16-1 新設</span></td>
+      <td>問題ストック（人間レビュー済みの出題プール）。セットの子で、クイズ方式が出題時に LRU 順繰りで消費する</td>
+      <td><code>audio_assets</code> と同じ「セット配下の有効レコード + LRU 順繰り + セット境界の複合 FK」パターン。出典・書き直しの証跡（<code>source_note</code>）を持つ。未使用が尽きたら最古使用分を再利用（セクション 4.10）</td>
     </tr>
     <tr>
       <td><code>sns_accounts</code></td>
@@ -211,7 +225,7 @@
   <span class="callout-title">セット境界の整合性を保証する複合 FK（旧設計のパターンを踏襲・拡張）</span>
   <code>generated_media</code>・<code>posts</code>・<code>quiz_items</code>（15-5 追加）は、参照先テーブルの主キー <code>id</code> に加えて <code>set_id</code> を非正規化して保持し、
   <code>(set_id, 対象カラム) → 参照先テーブル(set_id, id)</code> の複合 FK を張る（参照先テーブル側は <code>UNIQUE (set_id, id)</code> を持つ）。
-  これにより、異なるセットに属する <code>generation_runs</code> / <code>prompt_configs</code> / <code>sns_accounts</code> / <code>caption_templates</code> / <code>audio_assets</code>（14-4 追加。<code>generated_media.audio_asset_id</code> の参照先）を
+  これにより、異なるセットに属する <code>generation_runs</code> / <code>prompt_configs</code> / <code>sns_accounts</code> / <code>caption_templates</code> / <code>audio_assets</code>（14-4 追加。<code>generated_media.audio_asset_id</code> の参照先）/ <code>quiz_stock_items</code>（16-1 追加。<code>quiz_items.stock_item_id</code> の参照先）を
   誤って組み合わせて参照することを DB レベルで防止する。この保証は<strong>セット境界まで</strong>とし、
   「<code>post_media.generated_media_id</code> が同一 <code>generation_run</code> に属すること」のような、より粒度の細かい整合性はアプリ層の責務とする
   （複合 FK をここまで深くすると <code>generation_run_id</code> の非正規化が連鎖し複雑さに見合わないと判断。セクション 4.6 に既知の割り切りとして明記）。
@@ -264,9 +278,17 @@
   初期運用では 1 セットにつき <code>is_active=1</code> は 1 件のみ設定する運用ルールとする（<code>prompt_configs</code> の運用方針と対称）。
   <strong><code>is_active=1</code> が 0 件の場合はキャプションなし（空文字）で投稿処理を継続する</strong>（画像投稿の続行を優先し、キャプション欠落は投稿失敗の理由にしない）。
 </div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-01、Phase 16-1）: プレースホルダ展開方式の導入（テンプレート + quiz_items の動的組み立て）</span>
+  答え・解説を動画からキャプションへ移すテコ入れ（development-plan.md Phase 16 冒頭の方針 (3)）のため、<code>template_text</code> にプレースホルダ
+  （<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>）を書けるようにし、
+  SNS 投稿バッチが投稿時に当該生成実行の <code>quiz_items</code>（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>）から展開する。
+  <strong>スキーマ変更はなし</strong>（プレースホルダはテンプレート文言の規約であり、展開規則〔プレースホルダあり = <code>quiz_items</code> 行必須・なし = 従来どおり素通し〕は
+  <a href="batch-flow.html#flow-sns">batch-flow.html セクション 3.3 の decision</a> を正とする）。実装は 16-3、テンプレートの差し替えは 16-4。
+</div>
 <ul>
-  <li><code>template_text</code> はキャプション本文とハッシュタグを含む 1 本の固定文（Instagram の投稿本文はキャプション欄 1 つのため分割しない）</li>
-  <li><code>posts.caption_template_id</code> + <code>posts.caption_text_snapshot</code> で「どのテンプレートを」「どんな本文で」投稿したかを追跡する（<code>generated_media</code> のプロンプトスナップショットと同じ設計思想）</li>
+  <li><code>template_text</code> はキャプション本文とハッシュタグを含む 1 本のテキスト（Instagram の投稿本文はキャプション欄 1 つのため分割しない）。プレースホルダを含む場合は投稿時に展開される（上記 decision）</li>
+  <li><code>posts.caption_template_id</code> + <code>posts.caption_text_snapshot</code> で「どのテンプレートを」「どんな本文で」投稿したかを追跡する（<code>generated_media</code> のプロンプトスナップショットと同じ設計思想）。プレースホルダ展開の導入後は <code>caption_template_id</code> が指すのはテンプレート側のみで、<strong>展開後の最終文は <code>caption_text_snapshot</code> が唯一の記録</strong>になる（展開元の出題データは <code>quiz_items</code> を <code>generation_run_id</code> で辿って復元できる）</li>
 </ul>
 
 <h3 id="detail-generation-runs">4.4 generation_runs</h3>
@@ -441,13 +463,13 @@ LIMIT 1;</code></pre>
   </ul>
 </div>
 
-<h3 id="detail-quiz-items">4.9 quiz_items（出題履歴。Phase 15-5 新設）</h3>
+<h3 id="detail-quiz-items">4.9 quiz_items（出題履歴。Phase 15-5 新設・16-1 で stock_item_id 追加）</h3>
 
 <div class="decision">
   <span class="callout-title">決定（2026-07-27、Phase 15-5）: 出題履歴テーブル quiz_items の新設（V003）</span>
   クイズ方式 <code>gpt-quiz-multicut</code>（<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1 方式カタログ</a>）の出題履歴を表すテーブルを新設する。
-  役割は (1) <strong>重複検査の参照元</strong>（15-4 決定の 1 日 3 回 = 月約 90 問前提。直近履歴の要旨をプロンプトに除外指定 + 生成後の類似度検査）、
-  (2) 出題内容のスナップショット記録（Phase 16 のインサイト突合〔問題別パフォーマンス分析〕への拡張余地）。
+  役割は (1) <strong>重複検査の参照元</strong>（15-4 決定の 1 日 3 回 = 月約 90 問前提。直近履歴の要旨をプロンプトに除外指定 + 生成後の類似度検査。<strong>16-1 の生成チェーン休止に伴い休止</strong> — カラムは記録として維持）、
+  (2) 出題内容のスナップショット記録（<strong>16-1 でキャプション動的組み立ての展開元・インサイト突合の起点に格上げ</strong>）。
   <div class="table-wrap" style="margin:.4rem 0 0;">
   <table>
     <thead><tr><th>カラム</th><th>役割</th></tr></thead>
@@ -459,16 +481,57 @@ LIMIT 1;</code></pre>
       <tr><td><code>difficulty</code></td><td>NULL 可。難度ラベル（時間帯スロット設定 <code>parameters.slots</code> 由来のスナップショット）</td></tr>
       <tr><td><code>summary</code></td><td>問題の要旨（<code>VARCHAR(100)</code>。LLM が字数上限付きで生成）。重複検査で<strong>プロンプトの除外リスト</strong>に渡す短文（問題文全文を渡すとトークンが嵩むため要旨で渡す）</td></tr>
       <tr><td><code>question_text</code> / <code>answer_text</code></td><td>問題文・答えのスナップショット。<code>question_text</code> は生成後の<strong>類似度検査の比較対象</strong>。<code>answer_text</code> は L3 では「約◯◯（目安）」の幅表現に統一する（15-3 の構造ヘッジ）</td></tr>
-      <tr><td><code>content_fields</code></td><td>JSON。LLM が生成した構造化フィールド全体のスナップショット（フック文・解説・コーチの一言・タグ等。組版テンプレートへの入力）</td></tr>
+      <tr><td><code>content_fields</code></td><td>JSON。出題の構造化フィールド全体のスナップショット（フック文・解説・コーチの一言・タグ等。組版と<strong>キャプション展開〔16-1〕</strong>への入力）</td></tr>
+      <tr><td><code>stock_item_id</code><span class="badge badge-fixed" style="margin-left:.4rem">16-1 追加</span></td><td>NULL 可（V005）。消費した問題ストック（<code>quiz_stock_items</code>。セクション 4.10）への参照。セクション 3 のパターンに従い <code>(set_id, stock_item_id) → quiz_stock_items(set_id, id)</code> の複合 FK。生成チェーン由来の既存行は NULL のまま。<strong>再利用（同じストックの再出題）の履歴追跡と、問題別インサイト突合の JOIN キー</strong>になる</td></tr>
       <tr><td><code>created_at</code> / <code>updated_at</code></td><td>全テーブル共通</td></tr>
     </tbody>
   </table>
   </div>
   <ul style="margin:.3rem 0 0;">
     <li><strong>行の作成は方式・commit は共通骨格</strong>: INSERT は方式（<code>gpt_quiz_multicut</code>）が行い、commit は生成メディアの DB 登録と同一トランザクションで確定する（<code>audio_assets.last_used_at</code> と同じ契約。<a href="batch-flow.html#generator-contract">batch-flow.html セクション 2.1</a>）。生成が失敗した実行の出題履歴は残らない</li>
-    <li>直近履歴の取得は <code>KEY (set_id, quiz_type, created_at)</code> を使う（<code>WHERE set_id=? AND quiz_type=? ORDER BY created_at DESC LIMIT ?</code>）</li>
-    <li><code>UNIQUE (set_id, id)</code> は<strong>持たない</strong>: 本テーブルを複合 FK で参照するテーブルが存在しないため（<code>prompt_configs</code> 等が持つのは被参照側の要件）。参照される必要が生じた時点で追加する</li>
-    <li><strong>検証・再生成の過程メタ（再生成回数・検証結果・類似度スコア）は記録しない割り切り</strong>: 観測は CloudWatch Logs で行う。Phase 16 で問題別分析に必要になった場合の拡張は設計課題リストに記録済み</li>
+    <li><strong>キャプション動的組み立ての展開元（16-1）</strong>: SNS 投稿バッチが <code>generation_run_id</code> で 1 行を取得し、プレースホルダを展開する（セクション 4.3 の decision）。<strong>ストック方式でも本テーブルへの記録は維持が必須</strong>（キャプションの入力になるため）</li>
+    <li>直近履歴の取得（<code>KEY (set_id, quiz_type, created_at)</code>）は重複検査の休止に伴い休止（インデックスは残置）</li>
+    <li><code>UNIQUE (set_id, id)</code> は<strong>持たない</strong>: 本テーブルを複合 FK で参照するテーブルが存在しないため（<code>prompt_configs</code> 等が持つのは被参照側の要件）。参照される必要が生じた時点で追加する（16-1 時点も不変 — <code>stock_item_id</code> は本テーブルが<strong>参照する側</strong>で、被参照要件は <code>quiz_stock_items</code> 側に発生する）</li>
+    <li><strong>検証・再生成の過程メタ（再生成回数・検証結果・類似度スコア）は記録しない割り切り</strong>: 観測は CloudWatch Logs で行う。<strong>16-1 の生成チェーン休止により、この過程メタ自体が発生しなくなった</strong>（設計課題リスト 2026-07-27 の行に現状を追記）</li>
+  </ul>
+</div>
+
+<h3 id="detail-quiz-stock-items">4.10 quiz_stock_items（問題ストック。Phase 16-1 新設）</h3>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-08-01、Phase 16-1）: 問題ストックテーブル quiz_stock_items の新設（V005）</span>
+  スキップ率 95% テコ入れの問題ソーシング転換（development-plan.md Phase 16 冒頭の方針 (2) + 16-1 のユーザー決定「ストックのみ・在庫切れ時は利用済みを再利用」）を受け、
+  <strong>人間レビュー済みの出題プール</strong>を表すテーブルを新設する。ストックは実行前から存在し複数回使われうるため、<code>quiz_items</code>（1 実行 1 問の履歴スナップショット）とはライフサイクルが異なる別テーブルとする。
+  設計は <code>audio_assets</code> の「セット配下の有効レコード + LRU 順繰り + 証跡カラム一元管理 + セット境界の複合 FK」パターンを踏襲する。
+  <div class="table-wrap" style="margin:.4rem 0 0;">
+  <table>
+    <thead><tr><th>カラム</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>主キー（<code>AUTO_INCREMENT</code>。全テーブル共通方針）</td></tr>
+      <tr><td><code>set_id</code></td><td><code>batch_sets.id</code> への FK。ストックはセット専属（世界観・文体がセット固有のため共有しない）。<strong><code>UNIQUE (set_id, id)</code> を持つ</strong>（<code>quiz_items.stock_item_id</code> の複合 FK の参照先。セクション 3）</td></tr>
+      <tr><td><code>quiz_type</code></td><td>出題の型（<code>'L1'</code> / <code>'L3'</code>）。<code>VARCHAR(20)</code>（<code>quiz_items.quiz_type</code> と同じ判断で ENUM にしない）。スロット解決後の<strong>取得絞り込みキー</strong></td></tr>
+      <tr><td><code>difficulty</code></td><td>難度ラベル（<code>light</code> / <code>standard</code> / <code>deep</code> 等 = <code>parameters.slots</code> の <code>difficulty</code> と同一の文字列）。<code>VARCHAR(20) NOT NULL</code>。<strong>取得絞り込みキー</strong>（<code>quiz_items.difficulty</code> は NULL 可のスナップショットだが、本テーブルでは絞り込みに使うため必須）</td></tr>
+      <tr><td><code>question_text</code> / <code>answer_text</code></td><td>問題文・答え（書き直し済みの表現）。文字数上限は方式のフィールド仕様（<a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）に従う</td></tr>
+      <tr><td><code>content_fields</code></td><td>JSON。出題の構造化フィールド全体（<code>hook</code>・<code>explanation</code>・<code>coach_comment</code>・<code>tags</code>・<code>summary</code>・<code>illustration_scene</code>。<code>quiz_items.content_fields</code> と同スキーマ）。16-2 の書き直し・レビュー時に全フィールドを執筆する</td></tr>
+      <tr><td><code>source_note</code></td><td><code>TEXT NOT NULL</code>。出典と書き直しの証跡（元ネタの類型・参照 URL・「表現は書き直し済み」の旨。著作権ガイドライン = <a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a>。<code>audio_assets</code> のライセンス証跡と同じ位置づけ）</td></tr>
+      <tr><td><code>is_active</code></td><td>有効フラグ。品質問題が見つかった問題の取り下げ（<code>retire</code>）に使う</td></tr>
+      <tr><td><code>use_count</code></td><td><code>INT UNSIGNED NOT NULL DEFAULT 0</code>。出題回数（再利用の観測用）</td></tr>
+      <tr><td><code>last_used_at</code></td><td>NULL 可。最後に出題へ使用された日時（UTC）。<strong>NULL = 未使用</strong>。LRU 順繰りの状態</td></tr>
+      <tr><td><code>created_at</code> / <code>updated_at</code></td><td>全テーブル共通</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="margin:.4rem 0 0;"><strong>取得アルゴリズムは LRU 順繰り</strong>（<code>audio_assets</code> の選曲と同型）: スロットの型・難度に一致する有効レコードのうち <code>last_used_at</code> が最も古い 1 件（未使用 = NULL を最優先、同値は <code>id</code> 昇順）を選ぶ。MySQL は ASC で NULL が先頭に来るため、<strong>「未使用を使い切ったら最古使用分を再利用する」というユーザー決定がクエリ 1 本で成立</strong>する。</p>
+  <pre><code>SELECT id, question_text, answer_text, content_fields FROM quiz_stock_items
+WHERE set_id = :set_id AND quiz_type = :quiz_type AND difficulty = :difficulty AND is_active = 1
+ORDER BY last_used_at ASC, id ASC  -- NULL（未使用）が先頭
+LIMIT 1;</code></pre>
+  <ul style="margin:.3rem 0 0;">
+    <li>取得した行の <code>last_used_at</code> を現在時刻（UTC）へ、<code>use_count</code> を +1 に UPDATE する。<strong>commit は共通骨格の生成メディア DB 登録と同一トランザクション</strong>（<code>audio_assets.last_used_at</code> と同じ契約）。生成が失敗した場合は消費も進まない</li>
+    <li><strong>0 件（型・難度に一致する有効行なし）は設定ミス・未投入として異常終了</strong>（BGM 0 件と同じフェイルラウド方針）。<strong>再利用（<code>last_used_at IS NOT NULL</code> の行を選んだ場合）は WARNING ログ</strong>（補充遅延のサイン。専用アラームは持たない）</li>
+    <li>取得直後の<strong>防御的フィールド検査</strong>（必須・非空・文字数上限）で不備は異常終了（投入ミスの検知。<a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）</li>
+    <li>インデックスは取得絞り込み用に <code>KEY (set_id, quiz_type, difficulty, is_active, last_used_at)</code> を持つ（在庫確認クエリ〔<a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a>〕も同じ絞り込みで走る）</li>
+    <li>初期ストック量・補充サイクル・投入手順（リサーチ → 表現書き直し → レビュー → INSERT）と著作権ガイドラインは <a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a> を正とする</li>
   </ul>
 </div>
 
@@ -556,6 +619,13 @@ assets/{set_code}/{固定ファイル名}.png                                   
       <li><code>posts.media_type</code> ENUM へ <code>'story'</code> を末尾追加し、UNIQUE を <code>(generation_run_id, sns_account_id, media_type)</code> へ拡張（セクション 4.6）</li>
       <li><code>batch_sets</code> へ <code>stories_enabled TINYINT(1) NOT NULL DEFAULT 0</code> を追加（セクション 4.1）</li>
       <li><strong>適用順序</strong>: 全変更が追加的（NULL/DEFAULT 付きカラム追加・ENUM 値の末尾追加・UNIQUE の緩和方向の拡張のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。既存 <code>posts</code> 行は (generation_run_id, sns_account_id) で一意のため拡張後の UNIQUE を自明に満たし、データの埋め戻しは不要。適用後に <code>logic-training-1</code> の BGM 3 行へ <code>time_slot</code> を埋め戻す（DDL ファイルにはデータ更新を含めない — 15-8 の登録と同じく運用データ操作として実施）</li>
+    </ul>
+  </li>
+  <li><strong>V005（問題ストック差分。Phase 16-1 で設計・16-2 冒頭で作成・適用予定）</strong>の内容は本書の Phase 16-1 決定を正とする:
+    <ul style="margin:.2rem 0 0;">
+      <li><code>quiz_stock_items</code> の新設（セクション 4.10。<code>UNIQUE (set_id, id)</code>・<code>KEY (set_id, quiz_type, difficulty, is_active, last_used_at)</code> を含む）</li>
+      <li><code>quiz_items</code> へ <code>stock_item_id BIGINT UNSIGNED NULL</code> を追加し、<code>(set_id, stock_item_id) → quiz_stock_items(set_id, id)</code> の複合 FK を張る（セクション 4.9）</li>
+      <li><strong>適用順序</strong>: 全変更が追加的（新テーブル・NULL 可カラム追加のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。ただし<strong>新テーブルへの FK の向きにより <code>quiz_stock_items</code> の CREATE を <code>quiz_items</code> の ALTER より先に行う</strong>。初期ストックの INSERT は DDL に含めず、16-2 の投入作業（<a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）として実施する</li>
     </ul>
   </li>
 </ul>
