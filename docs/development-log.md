@@ -850,3 +850,18 @@
     **(3) 資材置き場の運用ルール化（operation.html セクション 3 に h4「資材置き場」新設）**: `content/quiz-stock/<set_code>/<バッチ名>/` で git 管理・バッチ単位に自己完結（`stock_items.py`・`validate.py` / `verify_logic.py`・`generate.py`・`research*.md`・`insert_quiz_stock.sql`）・投入完了時にディレクトリごとコミット・`review.md` は generate.py の派生物のため gitignore（コミットしない）・`plans/` は使い捨てスクラッチでストック資材を置かない、の 4 点を明文化（参照実装 = `content/quiz-stock/logic-training-1/2026-08-initial/`）
 
     **(4) 追随改訂**: セット別設計書 sets/logic-training-1.html（セクション 3 の動画構成・セクション 7 のコーチ表情割当表・バッジ / 最終更新）、data-model.html セクション 4.10（`content_fields` 列挙へ `hint` 追加 + 文字数上限の正 = 方式設計書セクション 5 へのリンク）、スキル `/quiz-stock-replenish`（「設計書反映待ち」の暫定注記 3 箇所を反映済みへ更新）。batch-flow.html は「カット間の差分は吹き出し・カウントダウンのみ」の抽象度のため矛盾なし・変更不要。次は **16-3（生成・投稿パイプラインの改修。本改訂後の方式設計書 + batch-flow.html を正とする）**
+
+- **16-3** 生成・投稿パイプラインの改修（実装）
+  - 備考: 2026-08-07 完了（実装 = Codex `gpt-5.6-sol` / high 委譲・指示書作成 + レビュー + blocker 修正 + 動画確認 = Fable 5）。16-2b 改訂後の方式設計書 + batch-flow.html セクション 3.3 を正として実装した。
+
+    **(1) image-batch（gpt_quiz_multicut.py。1839 → 1310 行）**: LLM 生成・検証チェーン（Responses API・DSL ソルバ・独立 LLM 検証・重複検査・再生成ループ）を削除し、`quiz_stock_items` の LRU 取得（0 件 RuntimeError・再利用 WARNING・防御的フィールド検査〔`hint` 追加・L3 `explanation` 240 字・tags ちょうど 3 個〕）へ置換。カット構成を 16 秒・4 カット・カード 8 枚の版面固定 + 吹き出し差し替え（動的 `hook` / `hint` + 固定文 2 種・コーチ表情は hook → think → question → answer）へ刷新し、旧 4 種の描画関数は共通版面 1 関数 + カット差分（吹き出し・表情・バッジ）に統合。連続ズーム（全編 1.0→1.04 の線形補間をセグメント区間で分担。境界のズームリセット解消）・SE ディレイ 8000 / 13000ms・BGM 16 秒トリム + `afade=t=out:st=15:d=1`・`amix normalize=0` を実装。`quiz_items` INSERT へ `stock_item_id` を追加し、動画完成後に `quiz_stock_items.last_used_at` / `use_count` を UPDATE（commit は共通骨格 = 失敗時はロールバックで巻き戻る）。parameters は slots 必須 5 フィールド + `(quiz_type, difficulty)` の既知組検証で、`tone_hint` / `max_regenerations` / `llm_model` は存在しても無視（設計どおり）
+
+    **(2) sns-post-batch（キャプションのプレースホルダ展開）**: 新モジュール `captions.py`（`build_caption`）+ `quiz_items.py`（generation_run の 1 行取得）。プレースホルダ 5 種を検出し、なければ素通し（quiz_items を読まない = fantasy-animals-1 無変更）/ あれば quiz_items 行必須のフェイルラウド・展開元フィールドの欠落 / 空も異常終了。展開は投稿対象 run の決定後・アカウントループ前に 1 回で、展開後の最終文が `posts.caption_text_snapshot` に保存される（ストーリーズ行のキャプションなしは不変）
+
+    **(3) 実装判断 2 点（設計書へ反映済み）**: ①**型・難度ピルの表示文言** — 設計書の例「論理パズル・じっくり」は 16-2 の出題路線改訂前のもので、L1 が light = なぞなぞ / deep = とんちに分かれ quiz_type 単独では表示を決められない。コード側定数 `PILL_LABELS`（`(quiz_type, difficulty)` → 型・難度ラベル =「なぞなぞ・サクッと」「フェルミ推定・じっくり」「とんち・ひらめき」）を新設し、未知の組は parameters 検証で異常終了（slot_code と同型のフェイルラウド）。文言の妥当性は 16-4 の投稿前レビューで確認（方式設計書 8.2 に記載）②**未知プレースホルダの検知** — 5 種以外の `{{英小文字とアンダースコア}}` 形式トークンは異常終了（タイポで壊れたキャプションの公開を防ぐ。batch-flow.html の decision に追記）
+
+    **(4) レビュー（Fable 5。blocker 1 件を修正）**: カウントダウン円バッジがカード右端（`_card_area()`）基準で置かれ、Instagram UI 予約域（右 12% = x 950 以降）へ約 40px 逸脱していた（8.2「文字とコーチはセーフエリア内」の構造保証違反。リール UI の右上アイコンと重なりうる）→ セーフエリア右端基準へ修正。他は仕様一致・テストの実質性とも問題なし。旧チェーン専用シンボルの残参照ゼロも確認
+
+    **(5) テスト**: image-batch 99 件 + sns-post-batch 108 件全パス（ローカル MySQL E2E 込み。旧チェーンのテスト削除で image-batch は 129 → 99 件）。sns 側にプレースホルダ展開の実 MySQL E2E を追加。実 API E2E（test_e2e_real_quiz_video.py）はストックシード方式へ改修済みだが実行せず、実 API の確認は 16-4 の AWS 試し生成に委ねる
+
+    **(6) ローカル ffmpeg 動画確認**: ホストに ffmpeg がないため既存の `image-batch:ffmpeg-check` Docker イメージにリポジトリをマウントして実行（使い捨てスクリプト `plans/16-3-trial/render_video_offline.py`）。実ストック（A01 / B01 / C01）+ 15-13 の実イラスト流用 + 実音源で 3 スロット分の MP4 を API 費ゼロで生成し、ffprobe（16.00 秒・1080x1920・H.264 + AAC）と目視（版面固定・スロット別パレット・型難度ピル・バッジ位置・表情と吹き出しの差し替え）で確認した。次は **16-4（投稿前レビューと切替: デプロイ → 手動生成のユーザーレビュー → `caption_templates` 差し替え → 実投稿確認 → 生成スケジュール再開・切替日の記録）**

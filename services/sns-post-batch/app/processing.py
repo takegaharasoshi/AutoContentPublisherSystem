@@ -308,6 +308,7 @@ def process_target_generation_run(
     s3_bucket: str,
     s3_client: Any,
     urlopen: Any,
+    caption_text: str | None = None,
 ) -> ProcessingResult:
     """Process one generated media item for each active SNS account.
 
@@ -315,7 +316,8 @@ def process_target_generation_run(
     independently, and a final database recheck determines overall success.
     """
     attempted_account_ids: set[int] = set()
-    caption_text = caption_template.template_text if caption_template else ""
+    if caption_text is None:
+        caption_text = caption_template.template_text if caption_template else ""
     media_type = derive_media_type(generated_media.file_format)
 
     for account in sns_accounts:

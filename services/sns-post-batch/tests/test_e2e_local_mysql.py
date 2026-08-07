@@ -86,6 +86,8 @@ def _local_batch_set(
     s3_key: str,
     duration_seconds: int | None = None,
     stories_enabled: int = 0,
+    caption_text: str = "E2E caption",
+    seed_quiz_item: bool = False,
 ) -> Iterator[tuple[dict[str, Any], str, int, int, int]]:
     """Create local E2E rows and always remove them in FK-safe order."""
     try:
@@ -159,9 +161,31 @@ def _local_batch_set(
             cursor.execute(
                 "INSERT INTO caption_templates "
                 "(set_id, template_text, is_active) VALUES (%s, %s, %s)",
-                (set_id, "E2E caption", 1),
+                (set_id, caption_text, 1),
             )
             caption_template_id = cursor.lastrowid
+            if seed_quiz_item:
+                fields = {
+                    "hook": "この問題、解ける？",
+                    "explanation": "順番に整理すると解けます。",
+                    "coach_comment": "ひらめきが大切！",
+                }
+                cursor.execute(
+                    "INSERT INTO quiz_items "
+                    "(set_id, generation_run_id, quiz_type, difficulty, summary, "
+                    "question_text, answer_text, content_fields) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        set_id,
+                        generation_run_id,
+                        "L1",
+                        "light",
+                        "E2E quiz",
+                        "問題文です",
+                        "答えです",
+                        json.dumps(fields, ensure_ascii=False),
+                    ),
+                )
         connection.commit()
         yield (
             LOCAL_DB_SECRET,
@@ -189,16 +213,23 @@ def _local_batch_set(
                     "DELETE FROM generated_media WHERE set_id = %s", (set_id,)
                 )
                 cursor.execute(
+                    "DELETE FROM quiz_items WHERE set_id = %s", (set_id,)
+                )
+                cursor.execute(
                     "DELETE FROM generation_runs WHERE set_id = %s", (set_id,)
                 )
                 if account_id is not None:
-                    cursor.execute("DELETE FROM sns_accounts WHERE id = %s", (account_id,))
+                    cursor.execute(
+                        "DELETE FROM sns_accounts WHERE id = %s", (account_id,)
+                    )
                 if caption_template_id is not None:
                     cursor.execute(
                         "DELETE FROM caption_templates WHERE id = %s",
                         (caption_template_id,),
                     )
-                cursor.execute("DELETE FROM prompt_configs WHERE set_id = %s", (set_id,))
+                cursor.execute(
+                    "DELETE FROM prompt_configs WHERE set_id = %s", (set_id,)
+                )
                 cursor.execute("DELETE FROM batch_sets WHERE id = %s", (set_id,))
             connection.commit()
         connection.close()
@@ -230,6 +261,23 @@ def local_stories_batch_set() -> Iterator[tuple[dict[str, Any], str, int, int, i
         s3_key="videos/e2e-story.mp4",
         duration_seconds=10,
         stories_enabled=1,
+    ) as batch_set:
+        yield batch_set
+
+
+@pytest.fixture
+def local_placeholder_batch_set() -> Iterator[
+    tuple[dict[str, Any], str, int, int, int]
+]:
+    """Create a local E2E set with a dynamic quiz caption."""
+    with _local_batch_set(
+        file_format="jpg",
+        s3_key="images/e2e-placeholder.jpg",
+        caption_text=(
+            "{{hook}}\n{{question}}\n答え: {{answer}}\n"
+            "{{explanation}}\n{{coach_comment}}"
+        ),
+        seed_quiz_item=True,
     ) as batch_set:
         yield batch_set
 
@@ -296,6 +344,52 @@ def test_main_persists_successful_post_to_local_mysql(
     assert post_media_count == 1
     assert execution_log == ("succeeded", 1, 1)
     assert len(fake_s3.calls) == 1
+
+
+def test_main_expands_quiz_caption_in_local_mysql(
+    local_placeholder_batch_set: tuple[dict[str, Any], str, int, int, int],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Placeholder templates persist their fully expanded snapshot."""
+    secret, set_code, _, generation_run_id, _ = local_placeholder_batch_set
+    monkeypatch.setenv("ENV_NAME", "local")
+    monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
+    monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv("EXECUTION_ARN", f"arn:aws:states:local:e2e:{uuid4().hex}")
+    monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
+    monkeypatch.setattr(
+        processing_module,
+        "get_secret_string",
+        lambda name: '{"access_token":"test-token","ig_user_id":"test-ig"}',
+    )
+    responses = iter(
+        [
+            FakeResponse({"id": "container-caption"}),
+            FakeResponse({"status_code": "FINISHED"}),
+            FakeResponse({"id": "post-caption"}),
+        ]
+    )
+
+    assert main(
+        s3_client=FakeS3Client(),
+        urlopen=lambda request, timeout: next(responses),
+    ) == 0
+
+    connection = _connect_local_mysql(secret)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT caption_text_snapshot FROM posts "
+                "WHERE generation_run_id = %s",
+                (generation_run_id,),
+            )
+            snapshot = cursor.fetchone()[0]
+    finally:
+        connection.close()
+    assert snapshot == (
+        "この問題、解ける？\n問題文です\n答え: 答えです\n"
+        "順番に整理すると解けます。\nひらめきが大切！"
+    )
 
 
 def test_main_persists_successful_reel_post_to_local_mysql(

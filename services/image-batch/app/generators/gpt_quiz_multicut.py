@@ -1,39 +1,14 @@
-"""GPT quiz multi-cut video generator.
-
-The L1 machine specification is a closed JSON DSL.  It never evaluates source
-code and accepts only these forms:
-
-* ``{"kind": "truth_tellers", "people": [...], "statements": [...]}``
-  where every statement has ``speaker`` and one of the predicates
-  ``is_honest``, ``is_liar``, ``same_type``, or ``different_type``.
-  Unary predicates use ``subject``; binary predicates use ``left``/``right``.
-  The canonical answer is ``{person: "honest"|"liar"}``.
-* ``{"kind": "ordering", "items": [...], "constraints": [...]}`` with
-  ``position``, ``not_position``, ``before``, ``after``, ``adjacent``, or
-  ``not_adjacent`` constraints.  Positions are one-based.  The canonical
-  answer is the ordered item list.
-* ``{"kind": "matching", "items": [...], "values": [...],
-  "constraints": [...]}`` with ``match`` or ``not_match`` constraints.
-  The canonical answer is ``{item: value}``.
-
-All assignments/permutations are exhaustively enumerated.  Unknown fields in a
-constraint vocabulary, invalid references, more than five elements, no
-solution, and multiple solutions are validation failures.
-"""
+"""Stock-backed quiz multi-cut video generator."""
 
 from __future__ import annotations
 
 import datetime
 from io import BytesIO
-import itertools
 import json
 import logging
-import math
 from pathlib import Path
-import re
 import subprocess
 import tempfile
-import unicodedata
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -52,13 +27,11 @@ from .contracts import (
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_LLM_MODEL = "gpt-5.6-terra"
-DEFAULT_MAX_REGENERATIONS = 3
-QUIZ_TYPES = {"L1", "L3"}
 JST = datetime.timezone(datetime.timedelta(hours=9))
 
 FIELD_LIMITS = {
     "hook": 20,
+    "hint": 20,
     "question": 90,
     "answer": 30,
     "explanation": 80,
@@ -68,18 +41,11 @@ FIELD_LIMITS = {
 }
 TAG_COUNT = 3
 TAG_MAX_LENGTH = 10
-L3_ANSWER_PATTERN = re.compile(
-    r"^約\s*[0-9０-９][0-9０-９,，.．]*"
-    r"(?:[^\s（）0-9０-９]+)?\s*（目安）$"
-)
-SUMMARY_HISTORY_LIMIT = 30
-QUESTION_HISTORY_LIMIT = 120
-DUPLICATE_JACCARD_THRESHOLD = 0.55
 
 OUTPUT_WIDTH = 1080
 OUTPUT_HEIGHT = 1920
 OUTPUT_FPS = 30
-OUTPUT_DURATION_SECONDS = 20
+OUTPUT_DURATION_SECONDS = 16
 OUTPUT_CRF = 20
 FFMPEG_BINARY = "ffmpeg"
 FFMPEG_TIMEOUT_SECONDS = 600
@@ -90,26 +56,26 @@ SAFE_BOX_MARGIN = 8
 INSTAGRAM_RIGHT_RESERVED_RATIO = 0.12
 INSTAGRAM_BOTTOM_RESERVED_RATIO = 0.15
 
-HOOK_DURATION_SECONDS = 3
-QUESTION_DURATION_SECONDS = 7
-THINK_DURATION_SECONDS = 1
-ANSWER_DURATION_SECONDS = 5
+HOOK_DURATION_SECONDS = 4
+THINK_DURATION_SECONDS = 4
+COUNTDOWN_DURATION_SECONDS = 1
+GUIDANCE_DURATION_SECONDS = 3
 CUT_DURATIONS = (
     HOOK_DURATION_SECONDS,
-    QUESTION_DURATION_SECONDS,
     THINK_DURATION_SECONDS,
-    THINK_DURATION_SECONDS,
-    THINK_DURATION_SECONDS,
-    THINK_DURATION_SECONDS,
-    THINK_DURATION_SECONDS,
-    ANSWER_DURATION_SECONDS,
+    COUNTDOWN_DURATION_SECONDS,
+    COUNTDOWN_DURATION_SECONDS,
+    COUNTDOWN_DURATION_SECONDS,
+    COUNTDOWN_DURATION_SECONDS,
+    COUNTDOWN_DURATION_SECONDS,
+    GUIDANCE_DURATION_SECONDS,
 )
 
 BGM_VOLUME = 1.0
 TICK_VOLUME = 10 ** (-6 / 20)
 CHIME_VOLUME = 10 ** (-3 / 20)
-TICK_DELAY_MILLISECONDS = 10_000
-CHIME_DELAY_MILLISECONDS = 15_000
+TICK_DELAY_MILLISECONDS = 8_000
+CHIME_DELAY_MILLISECONDS = 13_000
 
 SLOT_PALETTES = {
     "morning": {
@@ -142,6 +108,11 @@ SLOT_TIME_MOODS = {
     "noon": "昼の明るい光",
     "night": "夜の落ち着いた照明",
 }
+PILL_LABELS = {
+    ("L1", "light"): ("なぞなぞ", "サクッと"),
+    ("L3", "standard"): ("フェルミ推定", "じっくり"),
+    ("L1", "deep"): ("とんち", "ひらめき"),
+}
 HEADING_FONT_SIZE = 88
 # カウントダウン数字は円バッジ（COUNT_BADGE_DIAMETER）に収まる大きさにする
 THINK_COUNT_FONT_SIZE = 90
@@ -149,12 +120,8 @@ QUESTION_FONT_SIZE = 56
 # 問題文とヒントの高さ上限は、テキストが最大まで伸びても
 # カード内に MIN_ILLUSTRATION_HEIGHT のイラスト領域が残る値にする
 QUESTION_MAX_HEIGHT = 420
-ANSWER_MAX_HEIGHT = 140
-EXPLANATION_MAX_HEIGHT = 240
-# コーチのセリフ（固定文はコード側で持つ。答えカットのみ LLM の coach_comment）
-HOOK_BUBBLE_TEXT = "今日も一緒に鍛えよう！"
-QUESTION_BUBBLE_TEXT = "頭の中だけで解けるぞ！"
-THINK_HINT_TEXT = "止めてじっくり考えても OK"
+THINK_BUBBLE_TEXT = "止めてじっくり考えても OK"
+GUIDANCE_BUBBLE_TEXT = "答えは投稿のキャプションへ！"
 SUPPLEMENT_FONT_SIZE = 40
 MIN_BODY_FONT_SIZE = 30
 LINE_START_PROHIBITED = "、。，．,.)）]］｝」』】〉》!！?？:：;；ー〜…‥・%％℃"
@@ -165,15 +132,14 @@ COACH_BOX = (300, 430)
 # Instagram UI 予約域に足元が掛かることは許容し、上に空いた分をイラストへ回す）
 COACH_BOTTOM_MARGIN = 140
 # 情景イラストはカード内の横長ブロックとして、テキストの下・コーチの真上に常駐させる
-# （コーチとは重ねない）。ブロックの上端は 1 実行の 4 カット種別で最も低いテキスト下端に
-# 合わせて共通化し、カット間でイラストが動かないようにする（テキストとコーチだけが変わる）。
+# （コーチとは重ねない）。ブロックの上端は共通の問題文の最下端に
+# 合わせ、カット間でイラストが動かないようにする。
 CARD_CONTENT_GAP = 48
 ILLUSTRATION_RADIUS = 28
 MIN_ILLUSTRATION_HEIGHT = 200
 # イラストの下端はコーチのすぐ上まで伸ばす
 ILLUSTRATION_COACH_GAP = 16
-# コーチのセリフ（考えるカットのヒント・答えカットのひとこと）は
-# コーチの左隣に吹き出しで置く
+# コーチのセリフは左隣の吹き出しに置く
 BUBBLE_PADDING = 28
 BUBBLE_TAIL_WIDTH = 28
 BUBBLE_TOP_OFFSET = 60
@@ -183,7 +149,7 @@ LABEL_FONT_SIZE = 34
 LABEL_PILL_HEIGHT = 66
 LABEL_PILL_PADDING_X = 34
 LABEL_DOT_DIAMETER = 16
-# 見出し（今日の脳トレ / 問題 / 答え）の左に添えるアクセントバー
+# 見出し「問題」の左に添えるアクセントバー
 HEADING_BAR_WIDTH = 14
 # カウントダウンはアクセント色の円バッジに白抜きで表示する
 COUNT_BADGE_DIAMETER = 150
@@ -200,66 +166,9 @@ COACH_FILENAMES = {
 }
 SE_FILENAMES = ("countdown_tick.m4a", "answer_chime.m4a")
 
-GENERATION_INSTRUCTIONS = """
-次の条件に従い、縦型ショート動画用のクイズを JSON オブジェクトだけで返す。
-必須フィールド:
-- hook: 20文字以内
-- question: 90文字以内
-- answer: 30文字以内
-- explanation: 80文字以内
-- coach_comment: 30文字以内
-- tags: 10文字以内をちょうど3個
-- summary: 100文字以内
-- illustration_scene: 200文字以内。動画背景用の情景描写とし、文字・数字・
-  記号・答えの内容は含めない
-型は {quiz_type}、難度は {difficulty}。
-口調の方向性は「{tone_hint}」。hook と coach_comment の口調へ反映する。
-L1 の場合は machine_spec と machine_answer も必須。machine_spec は指定された
-閉じた DSL の truth_tellers / ordering / matching のいずれかだけを使い、
-全列挙で唯一解になる問題を作る。machine_answer は DSL の正準形にする。
-machine_spec はトップレベルに "kind" フィールド（truth_tellers / ordering /
-matching のいずれか）を持つ 1 個のフラットなオブジェクトにする。
-例: {{"kind": "matching", "items": [...], "values": [...],
-"constraints": [...]}}。kind 名をキーにした入れ子（{{"matching": ...}} 等）
-は不可。machine_answer の正準形は、truth_tellers なら人物名から
-"honest"/"liar" への辞書、ordering なら並び順どおりの配列そのもの
-（"order" 等のキーで包まない）、matching なら item から value への辞書
-（ペアの配列にしない）。
-truth_tellers は people と statements を持ち、statement は speaker と
-predicate を持つ。predicate は is_honest/is_liar（subject を指定）または
-same_type/different_type（left/right を指定）だけを使う。
-ordering は items と constraints を持ち、constraint の op は
-position/not_position（item/position）または before/after/adjacent/
-not_adjacent（left/right）だけを使う。position は1始まり。
-matching は同数の items/values と constraints を持ち、constraint の op は
-match/not_match（item/value）だけを使う。要素・人物は最大5件。
-L3 の場合、answer は必ず「約<数値と単位>（目安）」とし、explanation に
-推定ルートを含め、断定表現を避ける。
-既存問題の言い換え、固有名詞への中傷、医療・法律・投資助言、差別、暴力、
-性的内容、政治的扇動、危険行為は除外する。
-"""
 
-L1_VALIDATION_INSTRUCTIONS = """
-あなたは独立した論理パズル解答者です。提示された問題文だけを解き、
-JSON で {"machine_answer": ...} を返してください。正準形は、正直者・
-嘘つきなら人物から honest/liar への辞書、順序なら配列、対応なら辞書です。
-生成側の答えは提示されていません。
-"""
-
-L3_VALIDATION_INSTRUCTIONS = """
-あなたは独立したフェルミ推定の検証者です。問題文を独立に推定し、JSON で
-{"estimated_value": 数値, "route_valid": true|false} を返してください。
-estimated_value は単位換算後の正の数値、route_valid は問題が妥当な推定
-ルートを持つ場合だけ true にしてください。生成側の答えは提示されていません。
-"""
-
-
-class QuizValidationError(ValueError):
-    """Raised when generated quiz content fails deterministic validation."""
-
-
-def _parse_parameters(raw: str | None) -> tuple[str, list[dict[str, Any]], int]:
-    """Parse and validate the three supported prompt parameters."""
+def _parse_parameters(raw: str | None) -> list[dict[str, Any]]:
+    """Parse and validate time-slot parameters."""
     try:
         parameters = json.loads(raw or "{}")
     except (TypeError, json.JSONDecodeError) as exc:
@@ -279,7 +188,6 @@ def _parse_parameters(raw: str | None) -> tuple[str, list[dict[str, Any]], int]:
             "quiz_type",
             "difficulty",
             "slot_code",
-            "tone_hint",
             "slot_label",
         }
         missing = required_fields - set(slot)
@@ -296,35 +204,26 @@ def _parse_parameters(raw: str | None) -> tuple[str, list[dict[str, Any]], int]:
             value = slot.get(field)
             if not isinstance(value, str) or not value.strip():
                 raise RuntimeError(f"{field} must be a non-empty string")
-        if quiz_type not in QUIZ_TYPES:
-            raise RuntimeError("quiz_type must be L1 or L3")
+        quiz_type = quiz_type.strip()
+        difficulty = slot["difficulty"].strip()
+        if (quiz_type, difficulty) not in PILL_LABELS:
+            raise RuntimeError(
+                "unknown quiz_type/difficulty: "
+                f"quiz_type={quiz_type} difficulty={difficulty}"
+            )
         slot_code = slot["slot_code"].strip()
         if slot_code not in SLOT_PALETTES:
             raise RuntimeError(f"unknown slot_code: {slot_code}")
         validated_slots.append(
             {
                 "from_jst_hour": hour,
-                "quiz_type": quiz_type.strip(),
-                "difficulty": slot["difficulty"].strip(),
+                "quiz_type": quiz_type,
+                "difficulty": difficulty,
                 "slot_code": slot_code,
-                "tone_hint": slot["tone_hint"].strip(),
                 "slot_label": slot["slot_label"].strip(),
             }
         )
-
-    max_regenerations = parameters.get(
-        "max_regenerations", DEFAULT_MAX_REGENERATIONS
-    )
-    if (
-        isinstance(max_regenerations, bool)
-        or not isinstance(max_regenerations, int)
-        or max_regenerations < 0
-    ):
-        raise RuntimeError("max_regenerations must be a non-negative integer")
-    llm_model = parameters.get("llm_model", DEFAULT_LLM_MODEL)
-    if not isinstance(llm_model, str) or not llm_model:
-        raise RuntimeError("llm_model must be a non-empty string")
-    return llm_model, validated_slots, max_regenerations
+    return validated_slots
 
 
 def resolve_slot(
@@ -350,7 +249,7 @@ def _font_directory() -> Path:
 
 
 def _load_fonts() -> dict[str, Path]:
-    """Fail loudly before LLM work when a required font is missing."""
+    """Fail loudly before stock and API work when a font is missing."""
     font_dir = _font_directory()
     paths = {
         name: font_dir / filename for name, filename in FONT_FILENAMES.items()
@@ -461,455 +360,96 @@ def _load_audio_assets(
     return bgm_id, bgm, tick, chime
 
 
-def _fetch_history(
-    context: GeneratorContext,
-    quiz_type: str,
-) -> tuple[list[str], list[str]]:
-    """Fetch summary exclusions and full questions for duplicate checks."""
-    params = (context.prompt_config.set_id, quiz_type)
-    context.cursor.execute(
-        "SELECT summary FROM quiz_items "
-        "WHERE set_id = %s AND quiz_type = %s "
-        "ORDER BY created_at DESC LIMIT 30",
-        params,
-    )
-    summaries = [str(row[0]) for row in context.cursor.fetchall()]
-    context.cursor.execute(
-        "SELECT question_text FROM quiz_items "
-        "WHERE set_id = %s AND quiz_type = %s "
-        "ORDER BY created_at DESC LIMIT 120",
-        params,
-    )
-    questions = [str(row[0]) for row in context.cursor.fetchall()]
-    return summaries, questions
-
-
-def _build_generation_prompt(
-    base_prompt: str,
-    quiz_type: str,
-    difficulty: str,
-    tone_hint: str,
-    excluded_summaries: list[str],
-    attempt: int,
-) -> str:
-    """Combine the DB theme with code-owned generation rules."""
-    exclusions = (
-        "\n".join(f"- {summary}" for summary in excluded_summaries)
-        if excluded_summaries
-        else "（なし）"
-    )
-    return (
-        f"テーマ・世界観:\n{base_prompt}\n\n"
-        + GENERATION_INSTRUCTIONS.format(
-            quiz_type=quiz_type,
-            difficulty=difficulty,
-            tone_hint=tone_hint,
-        )
-        + "\nL1 DSL はこのモジュール仕様どおりのキー名を使う。"
-        + f"\n直近要旨（重複禁止）:\n{exclusions}"
-        + f"\n生成試行番号: {attempt + 1}"
-    )
-
-
-def _response_text(response: Any) -> str:
-    """Extract text from an OpenAI Responses API result."""
-    output_text = getattr(response, "output_text", None)
-    if isinstance(output_text, str) and output_text:
-        return output_text
-    try:
-        return str(response.output[0].content[0].text)
-    except (AttributeError, IndexError, TypeError) as exc:
-        raise RuntimeError("OpenAI text response did not contain output text") from exc
-
-
-def _request_json(client: Any, model: str, prompt: str) -> dict[str, Any]:
-    """Request one JSON object from the OpenAI text API."""
-    response = client.responses.create(
-        model=model,
-        input=prompt,
-        text={"format": {"type": "json_object"}},
-    )
-    parsed = json.loads(_response_text(response))
-    if not isinstance(parsed, dict):
-        raise QuizValidationError("LLM response must be a JSON object")
-    return parsed
-
-
-def _request_quiz_fields(
-    client: Any,
-    model: str,
-    prompt: str,
-) -> dict[str, Any]:
-    """Generate structured quiz fields."""
-    return _request_json(client, model, prompt)
-
-
-def _validate_object_keys(
-    value: dict[str, Any],
-    required: set[str],
-    allowed: set[str],
-) -> None:
-    """Reject missing and unknown DSL keys."""
-    if not isinstance(value, dict):
-        # LLM が入れ子のリストを返すことがある。ここで弾かないと set() が
-        # TypeError（unhashable type）を投げ、再生成理由が読み取りにくくなる。
-        raise QuizValidationError("DSL node must be an object")
-    if set(value) - allowed:
-        raise QuizValidationError("unknown DSL vocabulary")
-    if not required <= set(value):
-        raise QuizValidationError("missing DSL field")
-
-
-def _validate_names(values: Any, label: str) -> list[str]:
-    """Validate a unique one-to-five element string list."""
-    if (
-        not isinstance(values, list)
-        or not 1 <= len(values) <= 5
-        or any(not isinstance(item, str) or not item for item in values)
-        or len(set(values)) != len(values)
-    ):
-        raise QuizValidationError(f"invalid {label}")
-    return values
-
-
-def _solve_truth_tellers(spec: dict[str, Any]) -> dict[str, str]:
-    """Exhaustively solve the truth-teller DSL."""
-    _validate_object_keys(
-        spec,
-        {"kind", "people", "statements"},
-        {"kind", "people", "statements"},
-    )
-    people = _validate_names(spec["people"], "people")
-    statements = spec["statements"]
-    if not isinstance(statements, list) or not statements:
-        raise QuizValidationError("statements must be a non-empty list")
-
-    def statement_value(statement: dict[str, Any], assignment: dict[str, bool]) -> bool:
-        predicate = statement.get("predicate")
-        speaker = statement.get("speaker")
-        if speaker not in people:
-            raise QuizValidationError("unknown speaker")
-        if predicate in {"is_honest", "is_liar"}:
-            _validate_object_keys(
-                statement,
-                {"speaker", "predicate", "subject"},
-                {"speaker", "predicate", "subject"},
-            )
-            subject = statement["subject"]
-            if subject not in people:
-                raise QuizValidationError("unknown statement subject")
-            return (
-                assignment[subject]
-                if predicate == "is_honest"
-                else not assignment[subject]
-            )
-        if predicate in {"same_type", "different_type"}:
-            _validate_object_keys(
-                statement,
-                {"speaker", "predicate", "left", "right"},
-                {"speaker", "predicate", "left", "right"},
-            )
-            left, right = statement["left"], statement["right"]
-            if left not in people or right not in people:
-                raise QuizValidationError("unknown statement subject")
-            same = assignment[left] == assignment[right]
-            return same if predicate == "same_type" else not same
-        raise QuizValidationError("unknown DSL vocabulary")
-
-    validation_assignment = {person: False for person in people}
-    for statement in statements:
-        if not isinstance(statement, dict):
-            raise QuizValidationError("statement must be an object")
-        statement_value(statement, validation_assignment)
-
-    solutions: list[dict[str, str]] = []
-    for values in itertools.product((False, True), repeat=len(people)):
-        assignment = dict(zip(people, values))
-        if all(
-            assignment[statement["speaker"]]
-            == statement_value(statement, assignment)
-            for statement in statements
-        ):
-            solutions.append(
-                {
-                    person: "honest" if assignment[person] else "liar"
-                    for person in people
-                }
-            )
-    return _require_unique_solution(solutions)
-
-
-def _constraint_matches_order(
-    constraint: dict[str, Any],
-    positions: dict[str, int],
-    items: list[str],
-) -> bool:
-    """Evaluate one closed-vocabulary ordering constraint."""
-    op = constraint.get("op")
-    if op in {"position", "not_position"}:
-        _validate_object_keys(
-            constraint,
-            {"op", "item", "position"},
-            {"op", "item", "position"},
-        )
-        item, position = constraint["item"], constraint["position"]
-        if (
-            item not in items
-            or isinstance(position, bool)
-            or not isinstance(position, int)
-        ):
-            raise QuizValidationError("invalid position constraint")
-        if not 1 <= position <= len(items):
-            raise QuizValidationError("position is outside the permutation")
-        matches = positions[item] == position
-        return matches if op == "position" else not matches
-    if op in {"before", "after", "adjacent", "not_adjacent"}:
-        _validate_object_keys(
-            constraint,
-            {"op", "left", "right"},
-            {"op", "left", "right"},
-        )
-        left, right = constraint["left"], constraint["right"]
-        if left not in items or right not in items or left == right:
-            raise QuizValidationError("invalid ordering reference")
-        if op == "before":
-            return positions[left] < positions[right]
-        if op == "after":
-            return positions[left] > positions[right]
-        adjacent = abs(positions[left] - positions[right]) == 1
-        return adjacent if op == "adjacent" else not adjacent
-    raise QuizValidationError("unknown DSL vocabulary")
-
-
-def _solve_ordering(spec: dict[str, Any]) -> list[str]:
-    """Exhaustively solve the ordering DSL."""
-    _validate_object_keys(
-        spec,
-        {"kind", "items", "constraints"},
-        {"kind", "items", "constraints"},
-    )
-    items = _validate_names(spec["items"], "items")
-    constraints = spec["constraints"]
-    if not isinstance(constraints, list) or not constraints:
-        raise QuizValidationError("constraints must be a non-empty list")
-    if any(not isinstance(item, dict) for item in constraints):
-        raise QuizValidationError("constraint must be an object")
-    solutions: list[list[str]] = []
-    for permutation in itertools.permutations(items):
-        positions = {
-            item: index + 1 for index, item in enumerate(permutation)
-        }
-        if all(
-            _constraint_matches_order(constraint, positions, items)
-            for constraint in constraints
-        ):
-            solutions.append(list(permutation))
-    return _require_unique_solution(solutions)
-
-
-def _solve_matching(spec: dict[str, Any]) -> dict[str, str]:
-    """Exhaustively solve the finite matching DSL."""
-    _validate_object_keys(
-        spec,
-        {"kind", "items", "values", "constraints"},
-        {"kind", "items", "values", "constraints"},
-    )
-    items = _validate_names(spec["items"], "items")
-    values = _validate_names(spec["values"], "values")
-    if len(items) != len(values):
-        raise QuizValidationError("items and values must have equal length")
-    constraints = spec["constraints"]
-    if not isinstance(constraints, list) or not constraints:
-        raise QuizValidationError("constraints must be a non-empty list")
-    for constraint in constraints:
-        if not isinstance(constraint, dict):
-            raise QuizValidationError("constraint must be an object")
-        _validate_object_keys(
-            constraint,
-            {"op", "item", "value"},
-            {"op", "item", "value"},
-        )
-        if constraint["op"] not in {"match", "not_match"}:
-            raise QuizValidationError("unknown DSL vocabulary")
-        if constraint["item"] not in items or constraint["value"] not in values:
-            raise QuizValidationError("invalid matching reference")
-    solutions: list[dict[str, str]] = []
-    for permutation in itertools.permutations(values):
-        assignment = dict(zip(items, permutation))
-        if all(
-            (assignment[item["item"]] == item["value"])
-            == (item["op"] == "match")
-            for item in constraints
-        ):
-            solutions.append(assignment)
-    return _require_unique_solution(solutions)
-
-
-def _require_unique_solution(solutions: list[Any]) -> Any:
-    """Return a unique solution or reject contradiction/ambiguity."""
-    if len(solutions) != 1:
-        raise QuizValidationError(
-            "machine_spec must have exactly one solution"
-        )
-    return solutions[0]
-
-
-def solve_machine_spec(spec: Any) -> Any:
-    """Validate and solve one closed L1 machine specification."""
-    if not isinstance(spec, dict):
-        raise QuizValidationError("machine_spec must be an object")
-    kind = spec.get("kind")
-    if kind == "truth_tellers":
-        return _solve_truth_tellers(spec)
-    if kind == "ordering":
-        return _solve_ordering(spec)
-    if kind == "matching":
-        return _solve_matching(spec)
-    raise QuizValidationError("unknown DSL vocabulary")
-
-
-def validate_content_fields(fields: Any, quiz_type: str) -> Any | None:
-    """Run deterministic field and L1 machine checks.
-
-    Returns:
-        The canonical L1 solution, or ``None`` for L3.
-
-    Raises:
-        QuizValidationError: If any deterministic requirement is violated.
-    """
+def validate_content_fields(fields: Any, quiz_type: str) -> dict[str, Any]:
+    """Validate one stock item's structured fields defensively."""
+    if isinstance(fields, (bytes, bytearray)):
+        fields = fields.decode("utf-8")
+    if isinstance(fields, str):
+        try:
+            fields = json.loads(fields)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("content_fields must be valid JSON") from exc
     if not isinstance(fields, dict):
-        raise QuizValidationError("quiz content must be an object")
-    for name, limit in FIELD_LIMITS.items():
+        raise RuntimeError("content_fields must be a JSON object")
+
+    for name, default_limit in FIELD_LIMITS.items():
         value = fields.get(name)
-        if not isinstance(value, str) or not value:
-            raise QuizValidationError(f"{name} is required")
-        if name == "illustration_scene":
-            value = value.strip()
-            if not value:
-                raise QuizValidationError(f"{name} is required")
-            fields[name] = value
+        if not isinstance(value, str) or not value.strip():
+            raise RuntimeError(f"content_fields.{name} is required")
+        limit = 240 if name == "explanation" and quiz_type == "L3" else default_limit
         if len(value) > limit:
-            raise QuizValidationError(f"{name} exceeds {limit} characters")
+            raise RuntimeError(
+                f"content_fields.{name} exceeds {limit} characters"
+            )
+
     tags = fields.get("tags")
     if (
         not isinstance(tags, list)
         or len(tags) != TAG_COUNT
         or any(
             not isinstance(tag, str)
-            or not tag
+            or not tag.strip()
             or len(tag) > TAG_MAX_LENGTH
             for tag in tags
         )
     ):
-        raise QuizValidationError("tags must contain three strings of <=10 chars")
-
-    if quiz_type == "L3":
-        if not L3_ANSWER_PATTERN.fullmatch(fields["answer"]):
-            raise QuizValidationError("L3 answer must use 約...（目安）")
-        return None
-    if quiz_type != "L1":
-        raise QuizValidationError("unsupported quiz type")
-    if "machine_spec" not in fields or "machine_answer" not in fields:
-        raise QuizValidationError("L1 machine fields are required")
-    solution = solve_machine_spec(fields["machine_spec"])
-    if solution != fields["machine_answer"]:
-        raise QuizValidationError("machine_answer does not match unique solution")
-    return solution
-
-
-def normalize_for_duplicate(value: str) -> str:
-    """NFKC-normalize and remove whitespace and Unicode punctuation."""
-    normalized = unicodedata.normalize("NFKC", value)
-    return "".join(
-        char
-        for char in normalized
-        if not char.isspace()
-        and not unicodedata.category(char).startswith("P")
-    )
-
-
-def bigram_jaccard(left: str, right: str) -> float:
-    """Calculate character-bigram Jaccard similarity."""
-    left_normalized = normalize_for_duplicate(left)
-    right_normalized = normalize_for_duplicate(right)
-    if left_normalized == right_normalized:
-        return 1.0
-    left_bigrams = {
-        left_normalized[index : index + 2]
-        for index in range(max(1, len(left_normalized) - 1))
-        if left_normalized
-    }
-    right_bigrams = {
-        right_normalized[index : index + 2]
-        for index in range(max(1, len(right_normalized) - 1))
-        if right_normalized
-    }
-    union = left_bigrams | right_bigrams
-    return len(left_bigrams & right_bigrams) / len(union) if union else 0.0
-
-
-def _is_duplicate(question: str, recent_questions: list[str]) -> bool:
-    """Return whether any recent question reaches the rejection threshold."""
-    return any(
-        bigram_jaccard(question, previous) >= DUPLICATE_JACCARD_THRESHOLD
-        for previous in recent_questions
-    )
-
-
-def _extract_l3_number(answer: str) -> float:
-    """Extract a comparable numeric magnitude from a Japanese range answer."""
-    normalized = unicodedata.normalize("NFKC", answer)
-    match = re.search(r"([0-9][0-9,.]*)\s*(万|億|兆)?", normalized)
-    if match is None:
-        raise QuizValidationError("L3 answer has no numeric value")
-    value = float(match.group(1).replace(",", ""))
-    multiplier = {"万": 1e4, "億": 1e8, "兆": 1e12}.get(
-        match.group(2), 1.0
-    )
-    value *= multiplier
-    if not math.isfinite(value) or value <= 0:
-        raise QuizValidationError("L3 answer must be positive")
-    return value
-
-
-def _independent_validation(
-    client: Any,
-    model: str,
-    fields: dict[str, Any],
-    quiz_type: str,
-    canonical_solution: Any | None,
-) -> bool:
-    """Run answer-blind independent LLM validation."""
-    if quiz_type == "L1":
-        validation = _request_json(
-            client,
-            model,
-            L1_VALIDATION_INSTRUCTIONS
-            + "\n問題文:\n"
-            + fields["question"],
+        raise RuntimeError(
+            "content_fields.tags must contain exactly three non-empty "
+            "strings of <=10 characters"
         )
-        return validation.get("machine_answer") == canonical_solution
+    return fields
 
-    validation = _request_json(
-        client,
-        model,
-        L3_VALIDATION_INSTRUCTIONS
-        + "\n問題文:\n"
-        + fields["question"]
-        + "\n生成側の推定ルート（最終回答値は非表示）:\n"
-        + fields["explanation"],
+
+def _fetch_stock_item(
+    cursor: Any,
+    set_id: int,
+    quiz_type: str,
+    difficulty: str,
+) -> dict[str, Any]:
+    """Fetch and validate the least-recently-used active stock item."""
+    cursor.execute(
+        "SELECT id, question_text, answer_text, content_fields, last_used_at "
+        "FROM quiz_stock_items WHERE set_id = %s AND quiz_type = %s "
+        "AND difficulty = %s AND is_active = 1 "
+        "ORDER BY last_used_at ASC, id ASC LIMIT 1",
+        (set_id, quiz_type, difficulty),
     )
-    if validation.get("route_valid") is not True:
-        return False
-    estimated = validation.get("estimated_value")
-    if isinstance(estimated, bool) or not isinstance(estimated, (int, float)):
-        return False
-    if not math.isfinite(float(estimated)) or float(estimated) <= 0:
-        return False
-    generated_value = _extract_l3_number(fields["answer"])
-    return math.floor(math.log10(generated_value)) == math.floor(
-        math.log10(float(estimated))
-    )
+    row = cursor.fetchone()
+    if row is None:
+        raise RuntimeError(
+            "No active quiz stock item for "
+            f"set_id={set_id} quiz_type={quiz_type} difficulty={difficulty}"
+        )
+
+    stock_id = int(row[0])
+    question_text = row[1]
+    answer_text = row[2]
+    for name, value, limit in (
+        ("question_text", question_text, 90),
+        ("answer_text", answer_text, 30),
+    ):
+        if not isinstance(value, str) or not value.strip():
+            raise RuntimeError(f"quiz_stock_items.{name} is required")
+        if len(value) > limit:
+            raise RuntimeError(
+                f"quiz_stock_items.{name} exceeds {limit} characters"
+            )
+
+    fields = validate_content_fields(row[3], quiz_type)
+    if row[4] is not None:
+        logger.warning(
+            "Quiz stock item is being reused: stock_id=%s quiz_type=%s "
+            "difficulty=%s",
+            stock_id,
+            quiz_type,
+            difficulty,
+        )
+    return {
+        "id": stock_id,
+        "question_text": question_text,
+        "answer_text": answer_text,
+        "content_fields": fields,
+    }
 
 
 def _build_illustration_prompt(
@@ -1275,71 +815,85 @@ def _encode_png(image: Image.Image) -> bytes:
     return output.getvalue()
 
 
-def _render_hook_card(
+def _draw_type_difficulty_pill(
+    draw: ImageDraw.ImageDraw,
+    position: tuple[int, int],
+    quiz_type: str,
+    difficulty: str,
+    fonts: dict[str, Path],
+    palette: dict[str, str],
+) -> None:
+    """Draw the code-owned quiz type and difficulty label."""
+    type_label, difficulty_label = PILL_LABELS[(quiz_type, difficulty)]
+    text = f"{type_label}・{difficulty_label}"
+    font = _font(fonts["bold"], 32)
+    width = int(draw.textlength(text, font=font)) + 40
+    x, y = position
+    draw.rounded_rectangle(
+        (x, y, x + width, y + 64),
+        radius=32,
+        fill=palette["accent"],
+    )
+    draw.text(
+        (x + width // 2, y + 32),
+        text,
+        font=font,
+        fill=palette["card"],
+        anchor="mm",
+    )
+
+
+def _render_card(
     fields: dict[str, Any],
     quiz_type: str,
     difficulty: str,
     coach: Image.Image,
+    bubble_text: str,
     fonts: dict[str, Path],
     illustration: Image.Image,
     palette: dict[str, str],
     slot_label: str,
     illustration_box: tuple[int, int, int, int] | None,
+    *,
+    countdown: int | None = None,
 ) -> tuple[bytes, int]:
-    """Render cut 1."""
-    image, draw, safe = _base_card(palette, slot_label, fonts)
-    left, top, right, bottom = safe
-    x, y = left + CARD_PADDING, top + 130
-    _draw_heading(draw, (x, y), "今日の脳トレ", palette, fonts)
-    y += 140
-    # 型・難度のピルはテキスト幅に合わせる
-    label = "論理パズル" if quiz_type == "L1" else "フェルミ推定"
-    pill_text = f"{label}  {difficulty}"
-    pill_font = _font(fonts["bold"], SUPPLEMENT_FONT_SIZE)
-    pill_width = int(draw.textlength(pill_text, font=pill_font)) + 2 * 32
-    draw.rounded_rectangle(
-        (x, y, x + pill_width, y + 74), 37, fill=palette["accent"]
-    )
-    draw.text(
-        (x + pill_width // 2, y + 37),
-        pill_text,
-        font=pill_font,
-        fill=palette["card"],
-        anchor="mm",
-    )
-    content_bottom = _draw_wrapped(
-        draw,
-        (x, y + 130),
-        fields["hook"],
-        fonts["bold"],
-        HEADING_FONT_SIZE,
-        right - x - CARD_PADDING,
-        520,
-        fill=palette["text"],
-    )
-    _draw_speech_bubble(draw, HOOK_BUBBLE_TEXT, fonts, palette, safe)
-    if illustration_box is not None:
-        _paste_illustration(
-            image, illustration, illustration_box, palette["decoration"]
-        )
-    _paste_coach(image, coach, safe)
-    return _encode_png(image), content_bottom
-
-
-def _render_question_card(
-    fields: dict[str, Any],
-    coach: Image.Image,
-    fonts: dict[str, Path],
-    illustration: Image.Image,
-    palette: dict[str, str],
-    slot_label: str,
-    illustration_box: tuple[int, int, int, int] | None,
-) -> tuple[bytes, int]:
-    """Render cut 2."""
+    """Render the shared layout with only cut-specific details changed."""
     image, draw, safe = _base_card(palette, slot_label, fonts)
     left, top, right, _ = safe
     x, y = left + CARD_PADDING, top + 130
     _draw_heading(draw, (x, y), "問題", palette, fonts)
+    _draw_type_difficulty_pill(
+        draw,
+        (x + 250, y + 18),
+        quiz_type,
+        difficulty,
+        fonts,
+        palette,
+    )
+
+    if countdown is not None:
+        badge = COUNT_BADGE_DIAMETER
+        # バッジの数字も文字のため、カード右端ではなくセーフエリア
+        # （Instagram UI 予約域を除いた領域）の右端に収める
+        badge_left = right - badge
+        badge_top = y - (badge - 104) // 2
+        draw.ellipse(
+            (
+                badge_left,
+                badge_top,
+                badge_left + badge,
+                badge_top + badge,
+            ),
+            fill=palette["accent"],
+        )
+        draw.text(
+            (badge_left + badge // 2, badge_top + badge // 2),
+            str(countdown),
+            font=_font(fonts["bold"], THINK_COUNT_FONT_SIZE),
+            fill=palette["card"],
+            anchor="mm",
+        )
+
     content_bottom = _draw_wrapped(
         draw,
         (x, y + 145),
@@ -1350,107 +904,11 @@ def _render_question_card(
         QUESTION_MAX_HEIGHT,
         fill=palette["text"],
     )
-    _draw_speech_bubble(draw, QUESTION_BUBBLE_TEXT, fonts, palette, safe)
     if illustration_box is not None:
         _paste_illustration(
             image, illustration, illustration_box, palette["decoration"]
         )
-    _paste_coach(image, coach, safe)
-    return _encode_png(image), content_bottom
-
-
-def _render_think_card(
-    count: int,
-    fields: dict[str, Any],
-    coach: Image.Image,
-    fonts: dict[str, Path],
-    illustration: Image.Image,
-    palette: dict[str, str],
-    slot_label: str,
-    illustration_box: tuple[int, int, int, int] | None,
-) -> tuple[bytes, int]:
-    """Render one countdown sub-card that keeps the question readable."""
-    image, draw, safe = _base_card(palette, slot_label, fonts)
-    left, top, right, bottom = safe
-    x, y = left + CARD_PADDING, top + 130
-    # カウントダウンはアクセント色の円バッジに白抜きで表示する
-    badge = COUNT_BADGE_DIAMETER
-    badge_top = y - (badge - 104) // 2
-    draw.ellipse(
-        (x, badge_top, x + badge, badge_top + badge),
-        fill=palette["accent"],
-    )
-    draw.text(
-        (x + badge // 2, badge_top + badge // 2),
-        str(count),
-        font=_font(fonts["bold"], THINK_COUNT_FONT_SIZE),
-        fill=palette["card"],
-        anchor="mm",
-    )
-    # 問題文はカット 2 と同座標・同サイズに据え置き、カット間で動かさない
-    question_bottom = _draw_wrapped(
-        draw,
-        (x, y + 145),
-        fields["question"],
-        fonts["regular"],
-        QUESTION_FONT_SIZE,
-        right - x - CARD_PADDING,
-        QUESTION_MAX_HEIGHT,
-        fill=palette["text"],
-    )
-    # ヒントはコーチのセリフとして、コーチの左隣に吹き出しで置く
-    _draw_speech_bubble(draw, THINK_HINT_TEXT, fonts, palette, safe)
-    content_bottom = question_bottom
-    if illustration_box is not None:
-        _paste_illustration(
-            image, illustration, illustration_box, palette["decoration"]
-        )
-    _paste_coach(image, coach, (left, top, right, bottom))
-    return _encode_png(image), content_bottom
-
-
-def _render_answer_card(
-    fields: dict[str, Any],
-    quiz_type: str,
-    coach: Image.Image,
-    fonts: dict[str, Path],
-    illustration: Image.Image,
-    palette: dict[str, str],
-    slot_label: str,
-    illustration_box: tuple[int, int, int, int] | None,
-) -> tuple[bytes, int]:
-    """Render cut 4 with a visual loop-closing title."""
-    image, draw, safe = _base_card(palette, slot_label, fonts)
-    left, top, right, _ = safe
-    x, y = left + CARD_PADDING, top + 130
-    label = "論理パズル" if quiz_type == "L1" else "フェルミ推定"
-    _draw_heading(draw, (x, y), f"答え｜{label}", palette, fonts, size=66)
-    y = _draw_wrapped(
-        draw,
-        (x, y + 115),
-        fields["answer"],
-        fonts["bold"],
-        QUESTION_FONT_SIZE,
-        right - x - CARD_PADDING,
-        ANSWER_MAX_HEIGHT,
-        fill=palette["text"],
-    )
-    content_bottom = _draw_wrapped(
-        draw,
-        (x, y + 38),
-        fields["explanation"],
-        fonts["regular"],
-        SUPPLEMENT_FONT_SIZE,
-        right - x - CARD_PADDING,
-        EXPLANATION_MAX_HEIGHT,
-        fill=palette["text"],
-    )
-    # コーチのひとことは吹き出しでコーチの左隣に置く
-    _draw_speech_bubble(draw, fields["coach_comment"], fonts, palette, safe)
-    if illustration_box is not None:
-        _paste_illustration(
-            image, illustration, illustration_box, palette["decoration"]
-        )
+    _draw_speech_bubble(draw, bubble_text, fonts, palette, safe)
     _paste_coach(image, coach, safe)
     return _encode_png(image), content_bottom
 
@@ -1465,70 +923,24 @@ def _render_cards(
     coaches: dict[str, Image.Image],
     fonts: dict[str, Path],
 ) -> tuple[list[bytes], list[bytes]]:
-    """Render eight timeline cards and four representative cut cards."""
+    """Render eight fixed-layout timeline cards and four cut leaders."""
     palette = SLOT_PALETTES[slot_code]
     illustration = _decode_illustration(illustration_png)
     coaches = _trim_coaches(coaches)
 
-    def render_all(
-        illustration_box: tuple[int, int, int, int] | None,
-    ) -> tuple[list[bytes], list[bytes], int]:
-        """Render every card and report the lowest text bottom across cuts."""
-        cut1, hook_bottom = _render_hook_card(
-            fields,
-            quiz_type,
-            difficulty,
-            coaches["hook"],
-            fonts,
-            illustration,
-            palette,
-            slot_label,
-            illustration_box,
-        )
-        cut2, question_bottom = _render_question_card(
-            fields,
-            coaches["question"],
-            fonts,
-            illustration,
-            palette,
-            slot_label,
-            illustration_box,
-        )
-        think_cards: list[bytes] = []
-        think_bottom = 0
-        for count in range(5, 0, -1):
-            card, think_bottom = _render_think_card(
-                count,
-                fields,
-                coaches["think"],
-                fonts,
-                illustration,
-                palette,
-                slot_label,
-                illustration_box,
-            )
-            think_cards.append(card)
-        cut4, answer_bottom = _render_answer_card(
-            fields,
-            quiz_type,
-            coaches["answer"],
-            fonts,
-            illustration,
-            palette,
-            slot_label,
-            illustration_box,
-        )
-        timeline = [cut1, cut2, *think_cards, cut4]
-        content_bottom = max(
-            hook_bottom, question_bottom, think_bottom, answer_bottom
-        )
-        return timeline, [cut1, cut2, think_cards[0], cut4], content_bottom
-
-    # 1 巡目はイラストなしで描いて 4 カット中で最も低いテキスト下端を測り、
-    # 2 巡目でテキストとコーチの間に共通のイラストブロックを敷いて本描画する
-    # （コーチの上端との間隔を空け、コーチとイラストを重ねない）。
+    _, content_bottom = _render_card(
+        fields,
+        quiz_type,
+        difficulty,
+        coaches["hook"],
+        fields["hook"],
+        fonts,
+        illustration,
+        palette,
+        slot_label,
+        None,
+    )
     left, _, right, bottom = _safe_area()
-    _, _, content_bottom = render_all(None)
     box_top = content_bottom + CARD_CONTENT_GAP
     box_bottom = _coach_top(bottom) - ILLUSTRATION_COACH_GAP
     if box_bottom - box_top < MIN_ILLUSTRATION_HEIGHT:
@@ -1539,20 +951,88 @@ def _render_cards(
         right - CARD_PADDING,
         box_bottom,
     )
-    timeline, cuts, _ = render_all(illustration_box)
-    return timeline, cuts
+
+    cut1, _ = _render_card(
+        fields,
+        quiz_type,
+        difficulty,
+        coaches["hook"],
+        fields["hook"],
+        fonts,
+        illustration,
+        palette,
+        slot_label,
+        illustration_box,
+    )
+    cut2, _ = _render_card(
+        fields,
+        quiz_type,
+        difficulty,
+        coaches["think"],
+        THINK_BUBBLE_TEXT,
+        fonts,
+        illustration,
+        palette,
+        slot_label,
+        illustration_box,
+    )
+    countdown_cards = [
+        _render_card(
+            fields,
+            quiz_type,
+            difficulty,
+            coaches["question"],
+            fields["hint"],
+            fonts,
+            illustration,
+            palette,
+            slot_label,
+            illustration_box,
+            countdown=count,
+        )[0]
+        for count in range(5, 0, -1)
+    ]
+    cut4, _ = _render_card(
+        fields,
+        quiz_type,
+        difficulty,
+        coaches["answer"],
+        GUIDANCE_BUBBLE_TEXT,
+        fonts,
+        illustration,
+        palette,
+        slot_label,
+        illustration_box,
+    )
+    return (
+        [cut1, cut2, *countdown_cards, cut4],
+        [cut1, cut2, countdown_cards[0], cut4],
+    )
 
 
-def _zoompan_filter(input_index: int, duration: int, output: str) -> str:
-    """Build one supersampled per-segment zoompan filter."""
+def _zoompan_filter(
+    input_index: int,
+    duration: int,
+    output: str,
+    start_seconds: int = 0,
+) -> str:
+    """Build one segment of the continuous full-video zoom."""
     total_frames = OUTPUT_FPS * duration
     denominator = total_frames - 1
-    delta = ZOOM_END - ZOOM_START
+    full_delta = ZOOM_END - ZOOM_START
+    segment_start = ZOOM_START + full_delta * (
+        start_seconds / OUTPUT_DURATION_SECONDS
+    )
+    segment_end = ZOOM_START + full_delta * (
+        (start_seconds + duration) / OUTPUT_DURATION_SECONDS
+    )
+    segment_delta = segment_end - segment_start
     return (
         f"[{input_index}:v]"
         f"scale={OUTPUT_WIDTH * SUPERSAMPLE_FACTOR}:"
         f"{OUTPUT_HEIGHT * SUPERSAMPLE_FACTOR},"
-        f"zoompan=z='{ZOOM_START:.1f}+{delta:.2f}*on/{denominator}':"
+        f"zoompan=z='{segment_start:.5f}+{segment_delta:.5f}*on/"
+        f"{denominator}':"
         "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:"
         f"s={OUTPUT_WIDTH}x{OUTPUT_HEIGHT}:fps={OUTPUT_FPS},"
         f"format=yuv420p,setpts=PTS-STARTPTS[{output}]"
@@ -1618,7 +1098,12 @@ def _build_video(
                 "-i",
                 str(card_path),
                 "-filter_complex",
-                _zoompan_filter(0, duration, "v"),
+                _zoompan_filter(
+                    0,
+                    duration,
+                    "v",
+                    start_seconds=sum(CUT_DURATIONS[:index]),
+                ),
                 "-map",
                 "[v]",
                 "-an",
@@ -1647,7 +1132,8 @@ def _build_video(
         output_path = temp_path / "quiz.mp4"
         audio_filters = [
             f"[1:a]volume={BGM_VOLUME:.6f},"
-            f"atrim=0:{OUTPUT_DURATION_SECONDS},asetpts=PTS-STARTPTS[bgm]",
+            f"atrim=0:{OUTPUT_DURATION_SECONDS},"
+            "afade=t=out:st=15:d=1,asetpts=PTS-STARTPTS[bgm]",
             f"[2:a]volume={TICK_VOLUME:.6f},"
             f"adelay={TICK_DELAY_MILLISECONDS}|{TICK_DELAY_MILLISECONDS}[tick]",
             f"[3:a]volume={CHIME_VOLUME:.6f},"
@@ -1699,98 +1185,71 @@ def _build_video(
 
 def _insert_quiz_item(
     context: GeneratorContext,
+    stock_item_id: int,
     quiz_type: str,
     difficulty: str,
+    question_text: str,
+    answer_text: str,
     fields: dict[str, Any],
 ) -> None:
     """Stage quiz history in the shared media transaction."""
     context.cursor.execute(
         "INSERT INTO quiz_items "
-        "(set_id, generation_run_id, quiz_type, difficulty, summary, "
+        "(set_id, generation_run_id, stock_item_id, quiz_type, difficulty, summary, "
         "question_text, answer_text, content_fields) "
-        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (
             context.prompt_config.set_id,
             context.generation_run_id,
+            stock_item_id,
             quiz_type,
             difficulty,
             fields["summary"],
-            fields["question"],
-            fields["answer"],
+            question_text,
+            answer_text,
             json.dumps(fields, ensure_ascii=False),
         ),
     )
 
 
 def generate(context: GeneratorContext) -> GeneratorResult:
-    """Generate a validated 20-second, eight-card quiz reel."""
-    llm_model, slots, max_regenerations = _parse_parameters(
-        context.prompt_config.parameters
-    )
+    """Generate a stock-backed 16-second, eight-card quiz reel."""
+    slots = _parse_parameters(context.prompt_config.parameters)
     slot = resolve_slot(context.scheduled_at, slots)
     quiz_type = slot["quiz_type"]
     difficulty = slot["difficulty"]
     slot_code = slot["slot_code"]
-    tone_hint = slot["tone_hint"]
     slot_label = slot["slot_label"]
 
-    # All fixed assets are checked before the first LLM call.
+    # Fixed assets are checked before stock selection and the Images API call.
     fonts = _load_fonts()
     set_code = _fetch_set_code(context)
     coaches = _load_coach_assets(context, set_code)
     bgm_id, bgm, tick, chime = _load_audio_assets(
         context, set_code, slot_code
     )
-    summaries, recent_questions = _fetch_history(context, quiz_type)
+    stock_item = _fetch_stock_item(
+        context.cursor,
+        context.prompt_config.set_id,
+        quiz_type,
+        difficulty,
+    )
+    fields = stock_item["content_fields"]
 
     api_key = openai_image.load_api_key()
     client = openai_image.build_client(api_key)
-    selected_fields: dict[str, Any] | None = None
-    last_reason = "unknown validation failure"
-    for attempt in range(max_regenerations + 1):
-        prompt = _build_generation_prompt(
-            context.prompt_config.prompt_text,
-            quiz_type,
-            difficulty,
-            tone_hint,
-            summaries,
-            attempt,
-        )
-        try:
-            fields = _request_quiz_fields(client, llm_model, prompt)
-            canonical = validate_content_fields(fields, quiz_type)
-            if not _independent_validation(
-                client, llm_model, fields, quiz_type, canonical
-            ):
-                raise QuizValidationError("independent LLM validation failed")
-            if _is_duplicate(fields["question"], recent_questions):
-                raise QuizValidationError("question duplicates recent history")
-        except (QuizValidationError, json.JSONDecodeError, TypeError) as exc:
-            last_reason = str(exc)
-            logger.warning(
-                "クイズ検証 NG、再生成: attempt=%s/%s reason=%s",
-                attempt + 1,
-                max_regenerations + 1,
-                last_reason,
-            )
-            continue
-        selected_fields = fields
-        break
-    if selected_fields is None:
-        raise RuntimeError(
-            "Quiz generation exhausted regeneration limit: " + last_reason
-        )
 
     illustration_prompt = _build_illustration_prompt(
-        selected_fields["illustration_scene"],
+        fields["illustration_scene"],
         slot_code,
     )
     illustration_png = openai_image.request_illustration(
         client,
         illustration_prompt,
     )
+    render_fields = {**fields, "question": stock_item["question_text"]}
     timeline_cards, cut_cards = _render_cards(
-        selected_fields,
+        render_fields,
         quiz_type,
         difficulty,
         slot_code,
@@ -1801,11 +1260,23 @@ def generate(context: GeneratorContext) -> GeneratorResult:
     )
     video = _build_video(timeline_cards, bgm, tick, chime)
     _insert_quiz_item(
-        context, quiz_type, difficulty, selected_fields
+        context,
+        stock_item["id"],
+        quiz_type,
+        difficulty,
+        stock_item["question_text"],
+        stock_item["answer_text"],
+        fields,
+    )
+    used_at = now_utc()
+    context.cursor.execute(
+        "UPDATE quiz_stock_items SET last_used_at = %s, "
+        "use_count = use_count + 1 WHERE id = %s",
+        (used_at, stock_item["id"]),
     )
     context.cursor.execute(
         "UPDATE audio_assets SET last_used_at = %s WHERE id = %s",
-        (now_utc(), bgm_id),
+        (used_at, bgm_id),
     )
 
     return GeneratorResult(

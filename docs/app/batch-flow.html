@@ -298,6 +298,7 @@
     <li>プレースホルダは <code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code> の 5 種。展開元は当該生成実行の <code>quiz_items</code> 1 行（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>。<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）</li>
     <li><strong>プレースホルダを含むテンプレートは <code>quiz_items</code> 行を必須</strong>とし、行がなければ異常終了する（フェイルラウド。テンプレートとセットの設定ミス検知）</li>
     <li><strong>プレースホルダを含まないテンプレートは従来どおり素通し</strong>（fantasy-animals-1 は無変更で共存。どちらの動きになるかはテンプレート文言そのもので決まり、セット別のフラグは持たない）</li>
+    <li>5 種以外の <code>{{英小文字とアンダースコア}}</code> 形式トークンがテンプレートにある場合も異常終了する（タイポで壊れたキャプションがそのまま公開されるのを防ぐ。16-3 実装時の決定）</li>
     <li>ストーリーズ行がキャプション非対応である点は変更なし（3.3 手順 2 の 7）</li>
   </ul>
   将来の<strong>画像内容に合わせて生成 AI がキャプションを作る方式</strong>など（2026-07-06 ユーザー要望）は引き続き拡張余地として残す。どのセットがどんなテンプレートを使うかはセット別設計書に記録する（logic-training-1 は <a href="sets/logic-training-1.html">セット別設計書セクション 5</a>）。

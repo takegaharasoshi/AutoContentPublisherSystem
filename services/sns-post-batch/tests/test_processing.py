@@ -24,6 +24,7 @@ def _run(monkeypatch, accounts, get_post, **overrides):
     connection = Mock()
     generated_media = overrides.pop("generated_media", _media())
     stories_enabled = overrides.pop("stories_enabled", False)
+    caption_text = overrides.pop("caption_text", None)
     monkeypatch.setattr(processing, "get_post", get_post)
     monkeypatch.setattr(processing, "create_pending_post", Mock(return_value=101))
     monkeypatch.setattr(processing, "ensure_post_media", Mock())
@@ -54,6 +55,7 @@ def _run(monkeypatch, accounts, get_post, **overrides):
         s3_bucket="configured-bucket",
         s3_client=Mock(),
         urlopen=Mock(),
+        caption_text=caption_text,
     )
     return result, cursor, connection
 
@@ -87,6 +89,27 @@ def test_processing_creates_and_publishes_new_post(monkeypatch) -> None:
         media_type="feed_image",
     )
     assert connection.commit.call_count == 3
+
+
+def test_processing_uses_preexpanded_caption_for_snapshot_and_api(monkeypatch) -> None:
+    """The caption built once by orchestration is reused unchanged."""
+    states = iter([None, Post(101, "success", "container", "post")])
+    create_container = Mock(return_value=("container", {"id": "container"}))
+    _, cursor, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        caption_text="展開後の答えです",
+        create_container=create_container,
+    )
+    processing.update_post_snapshot.assert_called_once_with(
+        cursor,
+        101,
+        caption_template_id=3,
+        caption_text="展開後の答えです",
+        media_type="feed_image",
+    )
+    assert create_container.call_args.args[3] == "展開後の答えです"
 
 
 def test_processing_creates_and_publishes_reel(monkeypatch) -> None:

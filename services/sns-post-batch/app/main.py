@@ -14,6 +14,7 @@ from acps_shared.secrets import get_db_secret, parse_db_secret
 
 from .batch_sets import find_batch_set_by_code
 from .caption_templates import fetch_active_caption_template
+from .captions import build_caption
 from .clock import now_utc
 from .config import ConfigError, load_config
 from .execution_log import finalize_execution_log, start_or_resume_execution_log
@@ -121,10 +122,17 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                         connection.commit()
                         return 0
 
-                    sns_accounts = fetch_active_sns_accounts(cursor, batch_set.id)
                     caption_template = fetch_active_caption_template(
                         cursor, batch_set.id
                     )
+                    caption_text = build_caption(
+                        cursor,
+                        generation_run_id,
+                        caption_template.template_text
+                        if caption_template is not None
+                        else "",
+                    )
+                    sns_accounts = fetch_active_sns_accounts(cursor, batch_set.id)
                     generated_media = fetch_first_generated_media(
                         cursor, generation_run_id
                     )
@@ -146,6 +154,7 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                         generation_run_id=generation_run_id,
                         sns_accounts=sns_accounts,
                         caption_template=caption_template,
+                        caption_text=caption_text,
                         generated_media=generated_media,
                         stories_enabled=batch_set.stories_enabled,
                         env_name=config.env_name,

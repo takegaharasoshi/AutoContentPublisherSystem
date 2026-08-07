@@ -1,4 +1,4 @@
-"""Opt-in real OpenAI text, local MySQL, and ffmpeg quiz E2E coverage."""
+"""Opt-in real Images API, local MySQL, and ffmpeg quiz E2E coverage."""
 
 from __future__ import annotations
 
@@ -16,7 +16,6 @@ import pymysql
 import pytest
 
 from app.generators import gpt_quiz_multicut as quiz
-from app.generators import openai_image
 from app.main import main
 
 
@@ -30,7 +29,7 @@ LOCAL_DB_SECRET = {
 
 
 def _connect() -> pymysql.connections.Connection:
-    """Connect to the local V004 MySQL database."""
+    """Connect to the local V005 MySQL database."""
     return pymysql.connect(
         host=LOCAL_DB_SECRET["host"],
         port=LOCAL_DB_SECRET["port"],
@@ -133,28 +132,25 @@ def test_write_quiz_e2e_artifacts_when_configured(
 
 
 @pytest.fixture
-def real_quiz_rows() -> tuple[str, int, int, int, str]:
-    """Insert temporary quiz configuration and audio metadata."""
+def real_quiz_rows() -> tuple[str, int, int, int]:
+    """Insert temporary quiz configuration, stock, and audio metadata."""
     if os.environ.get("RUN_REAL_QUIZ_E2E") != "1":
         pytest.skip("RUN_REAL_QUIZ_E2E is not set; skipping real quiz E2E")
     try:
         connection = _connect()
     except Exception:
-        pytest.skip("Local MySQL with V003 is not reachable")
+        pytest.skip("Local MySQL with V005 is not reachable")
 
-    model = os.environ.get("E2E_QUIZ_LLM_MODEL", quiz.DEFAULT_LLM_MODEL)
     set_code = f"e2e-quiz-{uuid4().hex[:8]}"
     set_id = prompt_id = bgm_id = None
     parameters = json.dumps(
         {
-            "llm_model": model,
             "slots": [
                 {
                     "from_jst_hour": 4,
                     "quiz_type": "L1",
                     "difficulty": "light",
                     "slot_code": "morning",
-                    "tone_hint": "出勤前のウォームアップ",
                     "slot_label": "朝のロジトレ",
                 },
                 {
@@ -162,7 +158,6 @@ def real_quiz_rows() -> tuple[str, int, int, int, str]:
                     "quiz_type": "L3",
                     "difficulty": "standard",
                     "slot_code": "noon",
-                    "tone_hint": "昼休みの気分転換",
                     "slot_label": "昼の推定トレ",
                 },
                 {
@@ -170,11 +165,9 @@ def real_quiz_rows() -> tuple[str, int, int, int, str]:
                     "quiz_type": "L1",
                     "difficulty": "deep",
                     "slot_code": "night",
-                    "tone_hint": "一日の締めくくり",
                     "slot_label": "夜のロジトレ",
                 },
             ],
-            "max_regenerations": 3,
         }
     )
     try:
@@ -205,6 +198,59 @@ def real_quiz_rows() -> tuple[str, int, int, int, str]:
                 ),
             )
             prompt_id = cursor.lastrowid
+            stock_rows = [
+                (
+                    "L1",
+                    "light",
+                    "朝のなぞなぞです。箱の中身を当ててください。",
+                    "りんご",
+                    "朝の一問！",
+                    "言葉をよく見よう",
+                ),
+                (
+                    "L3",
+                    "standard",
+                    "日本にある信号機の数を推定してください。",
+                    "約20万基（目安）",
+                    "推定できる？",
+                    "一人あたりから考えよう",
+                ),
+                (
+                    "L1",
+                    "deep",
+                    "夜にだけ開く不思議な扉の鍵は何でしょう？",
+                    "月明かり",
+                    "ひらめける？",
+                    "時間帯がヒント",
+                ),
+            ]
+            for quiz_type, difficulty, question, answer, hook, hint in stock_rows:
+                fields = {
+                    "hook": hook,
+                    "hint": hint,
+                    "question": question,
+                    "answer": answer,
+                    "explanation": "前提から順に考えると答えへたどり着きます。",
+                    "coach_comment": "考え方が大切！",
+                    "tags": ["脳トレ", "クイズ", "思考"],
+                    "summary": question[:100],
+                    "illustration_scene": "文字のない明るい街角の風景",
+                }
+                cursor.execute(
+                    "INSERT INTO quiz_stock_items "
+                    "(set_id, quiz_type, difficulty, question_text, "
+                    "answer_text, content_fields, source_note, is_active) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, 1)",
+                    (
+                        set_id,
+                        quiz_type,
+                        difficulty,
+                        question,
+                        answer,
+                        json.dumps(fields, ensure_ascii=False),
+                        "E2E fixture; original test content",
+                    ),
+                )
             rows = [
                 (
                     f"audio/{set_code}/bgm/track.m4a",
@@ -249,7 +295,7 @@ def real_quiz_rows() -> tuple[str, int, int, int, str]:
                 if asset_type == "bgm":
                     bgm_id = cursor.lastrowid
         connection.commit()
-        yield set_code, set_id, prompt_id, bgm_id, model
+        yield set_code, set_id, prompt_id, bgm_id
     finally:
         if set_id is not None:
             with connection.cursor() as cursor:
@@ -258,6 +304,9 @@ def real_quiz_rows() -> tuple[str, int, int, int, str]:
                 )
                 cursor.execute(
                     "DELETE FROM quiz_items WHERE set_id = %s", (set_id,)
+                )
+                cursor.execute(
+                    "DELETE FROM quiz_stock_items WHERE set_id = %s", (set_id,)
                 )
                 cursor.execute(
                     "DELETE FROM generation_runs WHERE set_id = %s", (set_id,)
@@ -277,23 +326,6 @@ def real_quiz_rows() -> tuple[str, int, int, int, str]:
         connection.close()
 
 
-def _check_minimal_llm_connectivity(model: str) -> None:
-    """Fail clearly if the configured text model cannot answer minimally."""
-    try:
-        client = openai_image.build_client(openai_image.load_api_key())
-        response = client.responses.create(
-            model=model,
-            input="Reply with OK.",
-        )
-        if not response.output_text:
-            raise RuntimeError("empty response")
-    except Exception as exc:
-        pytest.fail(
-            f"Minimal OpenAI text connectivity failed for llm_model={model}: "
-            f"{type(exc).__name__}: {exc}"
-        )
-
-
 @pytest.mark.parametrize(
     "scheduled_at, expected_quiz_type",
     [
@@ -304,17 +336,15 @@ def _check_minimal_llm_connectivity(model: str) -> None:
     ids=["morning", "noon", "night"],
 )
 def test_main_generates_real_quiz_video(
-    real_quiz_rows: tuple[str, int, int, int, str],
+    real_quiz_rows: tuple[str, int, int, int],
     monkeypatch: pytest.MonkeyPatch,
     scheduled_at: str,
     expected_quiz_type: str,
 ) -> None:
     """Each slot produces media and transactional history."""
-    set_code, set_id, prompt_id, bgm_id, model = real_quiz_rows
+    set_code, set_id, prompt_id, bgm_id = real_quiz_rows
     env_name = os.environ.get("ENV_NAME", "prod")
     monkeypatch.setenv("API_SECRET_ARN", f"acps/{env_name}/image/api-key")
-    _check_minimal_llm_connectivity(model)
-
     objects = {
         **{
             f"assets/{set_code}/{filename}": _coach_png(color)
@@ -393,7 +423,7 @@ def test_main_generates_real_quiz_video(
     assert video_stream["codec_name"] == "h264"
     assert (video_stream["width"], video_stream["height"]) == (1080, 1920)
     assert audio_stream["codec_name"] == "aac"
-    assert float(metadata["format"]["duration"]) == pytest.approx(20, abs=0.2)
+    assert float(metadata["format"]["duration"]) == pytest.approx(16, abs=0.2)
 
     connection = _connect()
     try:
@@ -405,7 +435,7 @@ def test_main_generates_real_quiz_video(
             )
             media_rows = cursor.fetchall()
             cursor.execute(
-                "SELECT generation_run_id, quiz_type, content_fields "
+                "SELECT generation_run_id, stock_item_id, quiz_type, content_fields "
                 "FROM quiz_items WHERE set_id = %s",
                 (set_id,),
             )
@@ -416,12 +446,22 @@ def test_main_generates_real_quiz_video(
                 (set_id,),
             )
             audio_rows = cursor.fetchall()
+            cursor.execute(
+                "SELECT quiz_type, use_count, last_used_at "
+                "FROM quiz_stock_items WHERE set_id = %s ORDER BY id",
+                (set_id,),
+            )
+            stock_rows = cursor.fetchall()
     finally:
         connection.close()
-    assert media_rows == (("mp4", 20, bgm_id),)
+    assert media_rows == (("mp4", 16, bgm_id),)
     assert len(quiz_rows) == 1
-    assert quiz_rows[0][1] == expected_quiz_type
-    assert quiz_rows[0][2]
+    assert quiz_rows[0][1] is not None
+    assert quiz_rows[0][2] == expected_quiz_type
+    assert quiz_rows[0][3]
+    used_stock = next(row for row in stock_rows if row[1] == 1)
+    assert used_stock[0] == expected_quiz_type
+    assert used_stock[2] is not None
     assert audio_rows[0][0] == "bgm" and audio_rows[0][1] is not None
     assert all(
         last_used_at is None

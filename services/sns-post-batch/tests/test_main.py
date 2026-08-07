@@ -204,6 +204,28 @@ def test_main_finalizes_success_with_processed_account_count(monkeypatch) -> Non
     assert processor.call_args.kwargs["stories_enabled"] is False
 
 
+def test_main_builds_caption_once_before_processing_accounts(monkeypatch) -> None:
+    """Caption expansion happens once for the selected generation run."""
+    connection = FakeConnection()
+    _patch_base(monkeypatch, connection)
+    _patch_started_log(monkeypatch)
+    monkeypatch.setattr(
+        main_module,
+        "find_batch_set_by_code",
+        lambda cursor, code: BatchSet(1, "set-a", True),
+    )
+    monkeypatch.setattr(main_module, "resolve_target_generation_run", lambda *args: 8)
+    _patch_target_dependencies(monkeypatch)
+    builder = Mock(return_value="展開後キャプション")
+    processor = Mock(return_value=ProcessingResult(1, True))
+    monkeypatch.setattr(main_module, "build_caption", builder)
+    monkeypatch.setattr(main_module, "process_target_generation_run", processor)
+
+    assert main_module.main(s3_client=Mock(), urlopen=Mock()) == 0
+    builder.assert_called_once_with(connection.cursor_value, 8, "caption")
+    assert processor.call_args.kwargs["caption_text"] == "展開後キャプション"
+
+
 def test_main_finalizes_failed_when_an_account_does_not_succeed(monkeypatch) -> None:
     """A non-success account produces the fixed failure message."""
     connection = FakeConnection()

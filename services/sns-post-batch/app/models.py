@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,15 @@ class GeneratedMediaRef:
     s3_bucket: str
     s3_key: str
     file_format: str
+
+
+@dataclass(frozen=True)
+class QuizItem:
+    """Caption expansion source for one generation run."""
+
+    question_text: str
+    answer_text: str
+    content_fields: dict[str, Any]
 
 
 @dataclass(frozen=True)
