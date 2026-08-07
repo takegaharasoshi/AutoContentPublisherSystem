@@ -166,18 +166,9 @@ def test_parameters_allow_missing_or_ignored_tone_and_llm_settings() -> None:
     assert slots == [_slot()]
 
 
-@pytest.mark.parametrize(
-    "slot",
-    [
-        _slot(quiz_type="L2"),
-        _slot(quiz_type="L3", difficulty="deep"),
-    ],
-)
-def test_parameters_reject_unknown_quiz_type_difficulty_pair(
-    slot: dict[str, object],
-) -> None:
-    with pytest.raises(RuntimeError, match="unknown quiz_type/difficulty"):
-        quiz._parse_parameters(_parameters([slot]))
+def test_parameters_reject_unknown_quiz_type() -> None:
+    with pytest.raises(RuntimeError, match="unknown quiz_type"):
+        quiz._parse_parameters(_parameters([_slot(quiz_type="L2")]))
 
 
 def test_parameters_reject_unknown_slot_palette() -> None:
@@ -274,8 +265,8 @@ def test_render_cards_assigns_coaches_and_bubble_text(
 
     def render(*args, countdown=None, **kwargs):
         del kwargs
-        coach = args[3]
-        bubble = args[4]
+        coach = args[1]
+        bubble = args[2]
         calls.append((coach, bubble, countdown))
         return f"{bubble}:{countdown}".encode(), 500
 
@@ -284,8 +275,6 @@ def test_render_cards_assigns_coaches_and_bubble_text(
     monkeypatch.setattr(quiz, "_render_card", render)
     timeline, cuts = quiz._render_cards(
         _fields(),
-        "L3",
-        "standard",
         "noon",
         "昼の推定",
         b"illustration",

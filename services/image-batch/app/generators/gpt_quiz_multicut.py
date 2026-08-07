@@ -108,11 +108,6 @@ SLOT_TIME_MOODS = {
     "noon": "昼の明るい光",
     "night": "夜の落ち着いた照明",
 }
-PILL_LABELS = {
-    ("L1", "light"): ("なぞなぞ", "サクッと"),
-    ("L3", "standard"): ("フェルミ推定", "じっくり"),
-    ("L1", "deep"): ("とんち", "ひらめき"),
-}
 HEADING_FONT_SIZE = 88
 # カウントダウン数字は円バッジ（COUNT_BADGE_DIAMETER）に収まる大きさにする
 THINK_COUNT_FONT_SIZE = 90
@@ -206,11 +201,8 @@ def _parse_parameters(raw: str | None) -> list[dict[str, Any]]:
                 raise RuntimeError(f"{field} must be a non-empty string")
         quiz_type = quiz_type.strip()
         difficulty = slot["difficulty"].strip()
-        if (quiz_type, difficulty) not in PILL_LABELS:
-            raise RuntimeError(
-                "unknown quiz_type/difficulty: "
-                f"quiz_type={quiz_type} difficulty={difficulty}"
-            )
+        if quiz_type not in {"L1", "L3"}:
+            raise RuntimeError(f"unknown quiz_type: {quiz_type}")
         slot_code = slot["slot_code"].strip()
         if slot_code not in SLOT_PALETTES:
             raise RuntimeError(f"unknown slot_code: {slot_code}")
@@ -815,38 +807,8 @@ def _encode_png(image: Image.Image) -> bytes:
     return output.getvalue()
 
 
-def _draw_type_difficulty_pill(
-    draw: ImageDraw.ImageDraw,
-    position: tuple[int, int],
-    quiz_type: str,
-    difficulty: str,
-    fonts: dict[str, Path],
-    palette: dict[str, str],
-) -> None:
-    """Draw the code-owned quiz type and difficulty label."""
-    type_label, difficulty_label = PILL_LABELS[(quiz_type, difficulty)]
-    text = f"{type_label}・{difficulty_label}"
-    font = _font(fonts["bold"], 32)
-    width = int(draw.textlength(text, font=font)) + 40
-    x, y = position
-    draw.rounded_rectangle(
-        (x, y, x + width, y + 64),
-        radius=32,
-        fill=palette["accent"],
-    )
-    draw.text(
-        (x + width // 2, y + 32),
-        text,
-        font=font,
-        fill=palette["card"],
-        anchor="mm",
-    )
-
-
 def _render_card(
     fields: dict[str, Any],
-    quiz_type: str,
-    difficulty: str,
     coach: Image.Image,
     bubble_text: str,
     fonts: dict[str, Path],
@@ -862,14 +824,6 @@ def _render_card(
     left, top, right, _ = safe
     x, y = left + CARD_PADDING, top + 130
     _draw_heading(draw, (x, y), "問題", palette, fonts)
-    _draw_type_difficulty_pill(
-        draw,
-        (x + 250, y + 18),
-        quiz_type,
-        difficulty,
-        fonts,
-        palette,
-    )
 
     if countdown is not None:
         badge = COUNT_BADGE_DIAMETER
@@ -915,8 +869,6 @@ def _render_card(
 
 def _render_cards(
     fields: dict[str, Any],
-    quiz_type: str,
-    difficulty: str,
     slot_code: str,
     slot_label: str,
     illustration_png: bytes,
@@ -930,8 +882,6 @@ def _render_cards(
 
     _, content_bottom = _render_card(
         fields,
-        quiz_type,
-        difficulty,
         coaches["hook"],
         fields["hook"],
         fonts,
@@ -954,8 +904,6 @@ def _render_cards(
 
     cut1, _ = _render_card(
         fields,
-        quiz_type,
-        difficulty,
         coaches["hook"],
         fields["hook"],
         fonts,
@@ -966,8 +914,6 @@ def _render_cards(
     )
     cut2, _ = _render_card(
         fields,
-        quiz_type,
-        difficulty,
         coaches["think"],
         THINK_BUBBLE_TEXT,
         fonts,
@@ -979,8 +925,6 @@ def _render_cards(
     countdown_cards = [
         _render_card(
             fields,
-            quiz_type,
-            difficulty,
             coaches["question"],
             fields["hint"],
             fonts,
@@ -994,8 +938,6 @@ def _render_cards(
     ]
     cut4, _ = _render_card(
         fields,
-        quiz_type,
-        difficulty,
         coaches["answer"],
         GUIDANCE_BUBBLE_TEXT,
         fonts,
@@ -1250,8 +1192,6 @@ def generate(context: GeneratorContext) -> GeneratorResult:
     render_fields = {**fields, "question": stock_item["question_text"]}
     timeline_cards, cut_cards = _render_cards(
         render_fields,
-        quiz_type,
-        difficulty,
         slot_code,
         slot_label,
         illustration_png,

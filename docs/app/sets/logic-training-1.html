@@ -63,9 +63,9 @@
 <div class="table-wrap">
 <table>
 <tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻</th><th>Scheduler 名 / cron 式</th><th><code>quiz_type</code> / <code>difficulty</code></th><th><code>slot_label</code></th></tr>
-<tr><td><code>morning</code></td><td>4:00〜10:59</td><td>7:30</td><td><code>acps-prod-image-generation-logic-training-1-morning</code><br><code>cron(30 7 * * ? *)</code></td><td>L1 / light</td><td>朝のロジトレ</td></tr>
-<tr><td><code>noon</code></td><td>11:00〜16:59</td><td>12:30</td><td><code>acps-prod-image-generation-logic-training-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td>L3 / standard</td><td>昼の推定トレ</td></tr>
-<tr><td><code>night</code></td><td>17:00〜3:59</td><td>21:00</td><td><code>acps-prod-image-generation-logic-training-1-night</code><br><code>cron(0 21 * * ? *)</code></td><td>L1 / deep</td><td>夜のロジトレ</td></tr>
+<tr><td><code>morning</code></td><td>4:00〜10:59</td><td>7:30</td><td><code>acps-prod-image-generation-logic-training-1-morning</code><br><code>cron(30 7 * * ? *)</code></td><td>L1 / light</td><td>朝の脳みそトレ</td></tr>
+<tr><td><code>noon</code></td><td>11:00〜16:59</td><td>12:30</td><td><code>acps-prod-image-generation-logic-training-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td>L3 / standard</td><td>昼の脳みそトレ</td></tr>
+<tr><td><code>night</code></td><td>17:00〜3:59</td><td>21:00</td><td><code>acps-prod-image-generation-logic-training-1-night</code><br><code>cron(0 21 * * ? *)</code></td><td>L1 / deep</td><td>夜の脳みそトレ</td></tr>
 </table>
 </div>
 <div class="warn">
@@ -113,19 +113,19 @@
 ・問題の舞台になっている日本の日常風景を、簡潔な一文で描写する。
 ・人物を出す場合は後ろ姿か遠景までにし、顔を描き込まない。脳のマスコットは描かない。
 ・答えが分かってしまう物・数えられる並び・図表は描写しない。</code></pre>
-<p><code>prompt_configs.parameters</code>（キー仕様は方式側 = <a href="../generators/gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a>。16-1 以降、<code>slots</code> の必須は 5 フィールド〔<code>from_jst_hour</code> / <code>quiz_type</code> / <code>difficulty</code> / <code>slot_code</code> / <code>slot_label</code>〕で、<code>tone_hint</code>・<code>max_regenerations</code>・<code>llm_model</code> は<strong>存在しても無視される</strong>。登録値は変更せず残置）。</p>
+<p><code>prompt_configs.parameters</code>（キー仕様は方式側 = <a href="../generators/gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a>。16-1 以降、<code>slots</code> の必須は 5 フィールド〔<code>from_jst_hour</code> / <code>quiz_type</code> / <code>difficulty</code> / <code>slot_code</code> / <code>slot_label</code>〕で、<code>tone_hint</code>・<code>max_regenerations</code>・<code>llm_model</code> は<strong>存在しても無視される</strong>。登録値は変更せず残置）。<code>slot_label</code> は 16-3 のユーザーレビューで「朝 / 昼 / 夜のロジトレ・推定トレ」から<strong>「朝 / 昼 / 夜の脳みそトレ」</strong>へ改名した（出題路線が論理パズル一本ではなくなったため。ローカル MySQL は適用済み・<strong>Aurora への反映は 16-4 の切替時</strong>にキャプションテンプレート差し替えとまとめて行う）。</p>
 <pre><code>{
   "llm_model": "gpt-5.6-terra",
   "slots": [
     {"from_jst_hour": 4,  "quiz_type": "L1", "difficulty": "light",
      "slot_code": "morning", "tone_hint": "出勤前のウォームアップ。短く元気に、テンポよく背中を押す",
-     "slot_label": "朝のロジトレ"},
+     "slot_label": "朝の脳みそトレ"},
     {"from_jst_hour": 11, "quiz_type": "L3", "difficulty": "standard",
      "slot_code": "noon",    "tone_hint": "昼休みの気分転換。肩の力を抜いた軽い語り口",
-     "slot_label": "昼の推定トレ"},
+     "slot_label": "昼の脳みそトレ"},
     {"from_jst_hour": 17, "quiz_type": "L1", "difficulty": "deep",
      "slot_code": "night",   "tone_hint": "一日の締めにじっくり考える時間。落ち着いた語り口",
-     "slot_label": "夜のロジトレ"}
+     "slot_label": "夜の脳みそトレ"}
   ],
   "max_regenerations": 5
 }</code></pre>
