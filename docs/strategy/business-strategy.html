@@ -92,13 +92,13 @@
     </tr>
     <tr>
       <td>画像生成 API</td>
-      <td>fantasy-animals-1（リール元画像 1 日 1 枚・high）で月 1,000 円前後 + logic-training-1（情景イラスト 1 日 3 枚・medium 1536x1024）で月 900 円前後</td>
-      <td><strong>2026-07-28（15-9 壁打ち）で「勝負セットは画像 API 定常ゼロ」（15-3 試算）を改訂</strong>: 全カット常駐の情景イラスト採用（ユーザー決定）により logic-training-1 にも定常費が復活。月 600 円前後（medium 1024x1024）を許容（<a href="../app/requirements-notes-set2.html#tokekomi-figure">15-9 壁打ち記録 11.3</a>）。<strong>15-14 の組版再設計でイラストを横長 1536x1024 へ変更</strong>（カード内横長ブロックとの縦横比一致）したため、単価が上がり月 900 円前後へ改訂（15-16 記録）</td>
+      <td>fantasy-animals-1（リール元画像 1 日 1 枚・high）で月 1,000 円前後。<strong>logic-training-1 は 0 円</strong>（2026-08-08 改訂）</td>
+      <td><strong>2026-07-28（15-9 壁打ち）で「勝負セットは画像 API 定常ゼロ」（15-3 試算）を改訂</strong>: 全カット常駐の情景イラスト採用（ユーザー決定）により logic-training-1 にも定常費が復活。月 600 円前後（medium 1024x1024）を許容（<a href="../app/requirements-notes-set2.html#tokekomi-figure">15-9 壁打ち記録 11.3</a>）。<strong>15-14 の組版再設計でイラストを横長 1536x1024 へ変更</strong>したため月 900 円前後へ改訂（15-16 記録）。<strong>→ 2026-08-08（16-3b）の動画事前生成方式への転換で再びゼロ化</strong>: イラストは Codex 組み込みの imagegen（サブスク内・API 課金なし）で事前一括生成し、全数人間レビューのうえ動画を S3 に作り置く（品質面でも gpt-image-1 の弱点〔情景起因の文字混入〕を解消 = 転換の decision は <a href="../app/generators/quiz-prebuilt.html">方式設計書 quiz-prebuilt</a>）</td>
     </tr>
     <tr>
       <td>LLM テキスト API（クイズ方式）</td>
-      <td>logic-training-1 の問題生成・検証で月 700〜900 円（再生成込みでも 1,000 円強）</td>
-      <td>既定モデル gpt-5.6-terra（15-5 試算）。品質が確認できれば下位モデル（月 300 円程度）への引き下げを評価する（<code>parameters</code> 変更のみで可逆）</td>
+      <td><strong>0 円</strong>（2026-08-01 改訂）</td>
+      <td>当初は logic-training-1 の問題生成・検証で月 700〜900 円（gpt-5.6-terra。15-5 試算）。<strong>16-1（2026-08-01）のストックのみ方式への転換で実行時の LLM 生成・検証チェーンを休止しゼロ化</strong>（出題は人間レビュー済みストックの LRU 再利用。生成経路を再開する場合の旧試算として記録を残す）</td>
     </tr>
     <tr>
       <td>動画生成 API（生成 AI 動画方式の場合）</td>
@@ -119,7 +119,7 @@
   <span class="callout-title">予算の主ダイヤル</span>
   コストを支配するのは<strong>動画の「本数 × 長さ × 画質」と生成方式の選択</strong>。
   初期値は「1 日 1 本・10 秒前後・標準画質」とし（2026-07-23 壁打ちで合意）、KPI とコスト実績を見て調整する。
-  勝負セット logic-training-1 の方式（<code>gpt-quiz-multicut</code>）は LLM テキスト + 情景イラスト 1 枚（medium）で 1 本あたり十数円と単価が低く、本数を増やしてもコストへの感度が小さいため、例外として「1 日 3 回・20 秒」で開始する（2026-07-26 の 15-4 壁打ちで決定。コスト内訳は上表 — 15-9 のイラスト採用で「LLM テキストのみで月数十円以下」の当初想定から改訂）。
+  勝負セット logic-training-1 の方式（<code>gpt-quiz-multicut</code>）は LLM テキスト + 情景イラスト 1 枚（medium）で 1 本あたり十数円と単価が低く、本数を増やしてもコストへの感度が小さいため、例外として「1 日 3 回・20 秒」で開始する（2026-07-26 の 15-4 壁打ちで決定。コスト内訳は上表 — 15-9 のイラスト採用で「LLM テキストのみで月数十円以下」の当初想定から改訂）。<strong>その後、16-1 の生成チェーン休止（2026-08-01）と 16-3b の動画事前生成転換（2026-08-08）により、logic-training-1 の生成 AI API 定常費は完全にゼロ</strong>となった（残る変動費は AWS 基盤のみ。事前生成のイラストは Codex サブスク内の imagegen で賄う）。
   動画生成 API は移り変わりが激しいため、特定サービスに固定せず方式差し替え可能な構造（generator strategy）を維持する。
 </div>
 

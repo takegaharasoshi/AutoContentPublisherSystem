@@ -305,8 +305,8 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li><strong>時間帯スロット対応のセット（<code>gpt-quiz-multicut</code>）の 0 件判定はスロットごと</strong>: あるスロットで「<code>time_slot</code> 一致 + NULL（共通曲）」の有効 BGM が 0 件になると、当該スロットの実行だけが異常終了する（他スロットは動き続けるため気づきにくい）。スロット別曲の差し替え時も「先に代替を登録してから無効化」を守り、スロット単位で 0 件の瞬間を作らない（15-10。順繰り〔<code>last_used_at</code> 最古〕はスロット絞り込み内で維持される）</li>
 </ul>
 
-<h3 id="quiz-stock-mgmt">問題ストックの調達・書き直し・投入（gpt-quiz-multicut 方式のセットのみ。Phase 16-1 新設）</h3>
-<p>クイズの出題は<strong>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>。<a href="data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）からの取得のみ</strong>で行う（16-1 のユーザー決定。実行時の LLM 問題生成は休止）。ストックは音源と同じ「調達 → 前処理（書き直し）→ 投入 → ローテーション」の型で運用する。16-2 の初期整備で確立した執筆・レビューの勘所（スロット別の題材選定・つかみ / イラストの NG 集・検証スクリプトの使い方）は Claude Code スキル <code>/quiz-stock-replenish</code>（<code>.claude/skills/quiz-stock-replenish/</code>）に集約済みで、週次補充はこのスキルを起点に下記手順 1〜4 を回す。取得は型・難度で絞った LRU 順繰りで、<strong>未使用を使い切ったら最古使用分を自動で再利用する</strong>ため在庫切れで投稿は止まらないが、再利用は WARNING ログが出る（補充遅延のサイン）。</p>
+<h3 id="quiz-stock-mgmt">問題ストックの調達・書き直し・投入・動画ビルド（クイズ方式のセットのみ。Phase 16-1 新設・16-3b で動画ビルドを追加）</h3>
+<p>クイズの出題は<strong>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>。<a href="data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）からの取得のみ</strong>で行う（16-1 のユーザー決定。実行時の LLM 問題生成は休止）。ストックは音源と同じ「調達 → 前処理（書き直し）→ 投入 → ローテーション」の型で運用する。16-2 の初期整備で確立した執筆・レビューの勘所（スロット別の題材選定・つかみ / イラストの NG 集・検証スクリプトの使い方）は Claude Code スキル <code>/quiz-stock-replenish</code>（<code>.claude/skills/quiz-stock-replenish/</code>）に集約済みで、週次補充はこのスキルを起点に下記手順 1〜5 を回す。取得は型・難度で絞った LRU 順繰りで、<strong>未使用を使い切ったら最古使用分を自動で再利用する</strong>ため在庫切れで投稿は止まらないが、再利用は WARNING ログが出る（補充遅延のサイン）。<strong>動画事前生成方式（<code>quiz-prebuilt</code>。16-3b 転換）のセットでは、投入（手順 4）に加えて動画ビルド・レビュー・配置（手順 5）まで済んだ行（<code>video_s3_key IS NOT NULL</code>）だけが出題候補になる</strong>。</p>
 
 <div class="decision">
   <span class="callout-title">著作権ガイドライン（2026-08-01、Phase 16-1）: 定番・古典問題は「アイデアを借りて表現を書き直す」</span>
@@ -339,19 +339,29 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 <h4>手順 4: INSERT 投入（Claude Code。ローカル MySQL + Aurora）</h4>
 <p>セクション 2.1 手順 2 の (6) の INSERT を使い、レビュー済みの問題をローカル MySQL と Aurora の両方へ投入する（<code>quiz_type</code> / <code>difficulty</code> は <code>parameters.slots</code> の値と一致させる。<code>source_note</code> 必須）。</p>
 
+<h4>手順 5: 動画ビルド・レビュー・配置（quiz-prebuilt 方式のセットのみ。16-3b 新設）</h4>
+<p>投入した行（<code>video_s3_key IS NULL</code>）に対して事前動画をビルドし、<strong>全数人間レビュー</strong>のうえ S3 へ配置して DB へ反映する。工程の技術設計（imagegen 委譲 + 画風行 → 3:2 センタークロップ → gpt-quiz-multicut のレンダラーによる組版 + ffmpeg ビルド〔image-batch の Docker イメージで実行〕→ レビューシート → S3 アップロード + <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> の UPDATE）は <a href="generators/quiz-prebuilt.html#build">方式設計書 quiz-prebuilt セクション 8</a> を正とする。運用上のルール:</p>
+<ul>
+  <li><strong>ツーリング置き場は <code>content/video-build/&lt;set_code&gt;/</code></strong>（git 管理）。ビルド生成物（イラスト・MP4・レビューシート）は配下の <code>work/</code> に置き gitignore する（S3 と DB が正。<code>content/quiz-stock/</code> の「派生物はコミットしない」ルールと同型）。ツール・プロンプト・ビルド台帳の変更はビルド完了時にコミットする</li>
+  <li><strong>レビュー観点（全数）</strong>: ①イラストの品質（文字・数字・記号の混入がないか / フラットイラスト調が保たれているか / 情景が問題と合っているか）②版面（文字の欠け・重なり・吹き出しとヒントの整合）③音（BGM・SE のタイミングと音量）。NG は<strong>イラスト再生成（imagegen 再試行）または <code>illustration_scene</code> の書き直し（DB 更新）→ 再ビルド</strong>で解消し、解消するまで S3 へ配置しない</li>
+  <li><strong>DB 反映はローカル MySQL と Aurora の両方</strong>へ行う（手順 4 と同じ両環境ルール。3 カラムを同時に UPDATE し、中途半端な行を作らない）</li>
+  <li>未ビルトのまま残っても投稿は止まらない（未ビルト行は出題候補から除外され、既存のビルド済み在庫で回る。ただし実行時 WARNING と下記の在庫確認で検知されるため、投入したら速やかにビルドまで終える）</li>
+</ul>
+
 <h4>初期ストック量・補充サイクル・在庫確認</h4>
 <ul>
   <li><strong>初期ストック（16-2 で投入）: 42 問 = 2 週間分</strong>（消費は週 21 問。内訳はスロット構成に合わせ L1/light 14・L3/standard 14・L1/deep 14）</li>
-  <li><strong>補充: 週 1 回、各「型 × 難度」の未使用在庫が 7 問（1 週間分）以上</strong>を目安に手順 1〜4 を回す。再利用 WARNING が出た場合は補充が遅れているサインなので優先して補充する</li>
-  <li><strong>在庫確認クエリ</strong>（週次の補充判断と 16-2 の投入確認に使う）:
+  <li><strong>補充: 週 1 回、各「型 × 難度」の未使用在庫が 7 問（1 週間分）以上</strong>を目安に手順 1〜5 を回す（quiz-prebuilt 方式のセットでは<strong>「未使用かつビルド済み」を在庫と数える</strong>）。再利用 WARNING が出た場合は補充が遅れているサインなので優先して補充する</li>
+  <li><strong>在庫確認クエリ（16-3b 拡張版）</strong>（週次の補充判断・投入確認・ビルド漏れ検出に使う。<code>unbuilt</code> 列は V006 適用後）:
 <pre><code>SELECT quiz_type, difficulty,
-       SUM(last_used_at IS NULL)     AS unused,   -- 未使用在庫
+       SUM(last_used_at IS NULL AND video_s3_key IS NOT NULL) AS unused_built, -- 出題可能な未使用在庫
+       SUM(video_s3_key IS NULL)     AS unbuilt,  -- 動画未ビルト（出題対象外。0 が正常）
        SUM(last_used_at IS NOT NULL) AS used,     -- 使用済み（再利用候補）
        SUM(use_count)                AS total_uses
 FROM quiz_stock_items
 WHERE set_id = :set_id AND is_active = 1
 GROUP BY quiz_type, difficulty;</code></pre></li>
-  <li><strong>取り下げ</strong>: 品質問題（誤答の発覚・表現の問題）が見つかった問題は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す — 音源と同じ）。<strong>ある「型 × 難度」の有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、取り下げで 0 件になる場合は先に代替を投入する</li>
+  <li><strong>取り下げ</strong>: 品質問題（誤答の発覚・表現の問題）が見つかった問題は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す — 音源と同じ）。<strong>ある「型 × 難度」の有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、取り下げで 0 件になる場合は先に代替を投入する。<strong>S3 の事前動画は削除しない</strong>（<code>is_active=0</code> で出題候補から外れるため。復帰時の再ビルドを不要にする）</li>
   <li>専用の在庫アラームは持たない（再利用 WARNING + 週次の在庫確認で運用。失敗通知起点の運用方針〔セクション 4〕と整合）</li>
 </ul>
 
@@ -471,6 +481,10 @@ JOIN audio_assets aa ON aa.id = gm.audio_asset_id
 WHERE p.platform_post_id = '(Instagram media ID)';</code></pre>
       </li>
       <li>先に代替曲を登録してから、該当 <code>audio_assets</code> を <code>is_active=0</code> に更新する（0 件になる瞬間を作らない。セクション 3）</li>
+      <li><strong>動画事前生成方式（<code>quiz-prebuilt</code>）のセットでは無効化だけでは止まらない</strong>（BGM は事前動画にベイク済みのため、既ビルド動画が該当曲のまま投稿され続ける）。該当曲を使う事前動画を以下で特定し、代替曲で<strong>再ビルド・差し替え</strong>する（手順はセクション 3 の手順 5）:
+        <pre><code>SELECT id FROM quiz_stock_items
+WHERE video_audio_asset_id = :audio_asset_id AND is_active = 1;</code></pre>
+      </li>
       <li><strong>投稿自体は削除しない</strong>（表示・再生数・フォロワー接点は残す。ミュートのままでも Ken Burns の映像は成立する）</li>
       <li>development-plan.md の「トラブルシューティングログ」に、対象投稿・曲・検知日を記録する（同一曲の再発防止）</li>
     </ol>

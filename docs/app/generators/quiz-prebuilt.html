@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方式設計書: quiz-prebuilt | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / quiz-prebuilt</nav>
+<h1>方式設計書: quiz-prebuilt</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Fix（16-3b で作成）</span>
+  <span>方式名（レジストリキー）: quiz-prebuilt</span>
+  <span>最終更新: 2026-08-08</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  生成方式 <code>quiz-prebuilt</code>（クイズ動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプラインの技術設計（セクション 8）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、ビルドの運用手順（いつ・どう回すか）は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a> を参照。分冊ルール上は「本採用時に作成」だが、16-1 と同様に実装（16-3c）の正とするため設計 Fix 時点で作成した。転換の経緯は <a href="../../development-plan.md">development-plan.md</a> Phase 16 冒頭（2026-08-08 展開注記）と <a href="../../development-log.md">development-log.md</a> の 16-3 (8) にある。
+</div>
+
+<div class="warn">
+  <span class="callout-title">適用状態</span>
+  本書は 16-3b（2026-08-08）の設計 Fix 時点の<strong>目標設計</strong>。実装は 16-3c、初期 42 問のビルド・S3 配置は 16-3d、<code>batch_sets.generator_name</code> の切替と生成スケジュール再開は 16-4 で行う。それまで <code>logic-training-1</code> の生成スケジュール 3 本は停止中（08-06 障害対応の DISABLED を維持）で、本方式は未稼働。
+</div>
+
+<h2>1. 方式概要</h2>
+<p><strong>イラスト〜動画を事前にローカルでビルドし、全数人間レビューのうえ S3 に作り置き</strong>しておき、実行時は問題ストック（<code>quiz_stock_items</code>）の LRU 順繰り選定と<strong>事前動画の取得・返却だけを行う</strong>軽量なクイズ方式。実行時に外部 API（画像生成・LLM）を一切呼ばず、Pillow 組版・ffmpeg 合成も行わない。動画の作り（16 秒・4 カット・版面固定・答えはキャプションへ）は <code>gpt-quiz-multicut</code> の 16-1 / 16-2b 設計をそのまま踏襲し、生成のタイミングを実行時からビルド時へ移しただけの関係にある。</p>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-08 ユーザー決定、16-3 完了後の仕様変更）: 動画の事前生成方式への転換</span>
+  16-3 の実 API 品質確認で、情景が意味的に文字を誘発するケース（動物園ゲートの「ZOO」看板・階数ボタンの数字）は<strong>プロンプトの禁止指定では抑えきれない</strong>ことが判明した。一方、Codex 組み込みの画像生成（imagegen。サブスク内・API 課金なし）に画風指定 1 行を足した再試行では、<strong>6 枚全てがブランドのフラットイラスト調に統一され禁止事項も全遵守</strong>となり品質面で最良だった（比較の詳細は <a href="../../development-log.md">development-log.md</a> の 16-3 (8)）。これを受け、実行時生成をやめ事前生成へ転換する。狙いは 3 点:
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>イラスト API 費のゼロ化</strong>: imagegen はサブスク内のため、logic-training-1 の生成 API 定常費が消える（<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>）</li>
+    <li><strong>品質担保の構造化</strong>: 投稿される完成形（動画そのもの）を事前に全数人間レビューできる。イラストの文字混入・画風ブレは「レビューで弾いて再生成」で確実に止まる（プロンプト禁止だけに頼らない）</li>
+    <li><strong>実行時の失敗面の縮小</strong>: 実行時の失敗要因が「ストック選定 + S3 取得 + 投稿」だけになり、生成起因の障害（8/4 型のイラスト生成失敗等）が構造的に消える</li>
+  </ul>
+  生成基盤インフラ（Step Functions・Scheduler・ECS・共通骨格）は fantasy-animals-1 が使い続けるため<strong>不変</strong>。切替は <code>batch_sets.generator_name</code> の UPDATE 1 本で行い、旧方式へも同じ操作で戻せる（<code>prompt_configs</code> は無変更で両方式に有効）。
+</div>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>方式名（レジストリキー = <code>batch_sets.generator_name</code> の値）</td><td><code>quiz-prebuilt</code></td></tr>
+<tr><td>実装ファイル</td><td><code>services/image-batch/app/generators/quiz_prebuilt.py</code>（1 ファイルに完結）</td></tr>
+<tr><td>レジストリ登録</td><td><code>services/image-batch/app/generators/__init__.py</code> の <code>REGISTRY</code></td></tr>
+<tr><td>使用 API・ツール</td><td><strong>実行時は外部 API・組版・動画合成を一切使わない</strong>（S3 GetObject と DB のみ）。ビルド時のツールはセクション 8</td></tr>
+<tr><td>最終メディア</td><td>MP4 1 本（<code>file_format='mp4'</code>。1080x1920 / 30fps / 16 秒 / H.264 + AAC = ビルド時に <code>gpt-quiz-multicut</code> のレンダラーが保証する仕様）</td></tr>
+<tr><td>中間生成物</td><td><strong>なし</strong>（動画は事前レビュー済みのため、投稿前レビュー用のカット PNG を実行時に作らない）</td></tr>
+<tr><td>補助テーブル</td><td><code>quiz_stock_items</code>（ストック LRU 取得 + 事前動画参照 <code>video_s3_key</code>）・<code>quiz_items</code>（出題履歴の INSERT）。<strong><code>audio_assets</code> は実行時には使わない</strong>（BGM・SE はベイク済み。セクション 6 の decision）</td></tr>
+</table>
+</div>
+
+<h2>2. 契約の実装</h2>
+<p>共通の契約（<a href="../batch-flow.html#generator-contract">batch-flow.html「生成方式の契約」</a>）を <code>generate(context: GeneratorContext) -&gt; GeneratorResult</code> で実装する。冪等性（完了判定）・S3 保存・DB 登録・トランザクション制御は共通骨格（<code>processing.py</code>）の責務であり、本方式は関与しない。<strong>共通骨格・SNS 投稿バッチ・キャプション展開（プレースホルダ 5 種）は一切変更しない</strong>。</p>
+<div class="table-wrap">
+<table>
+<tr><th>要素</th><th>使い方</th></tr>
+<tr><td><code>context.prompt_config</code></td><td><code>parameters</code>（スロット定義。セクション 3）・<code>set_id</code>。<code>prompt_text</code> は未使用（<code>gpt-quiz-multicut</code> の休止と同じ扱い）</td></tr>
+<tr><td><code>context.scheduled_at</code></td><td>スロット解決の入力（<code>gpt-quiz-multicut</code> と同一）</td></tr>
+<tr><td><code>context.generation_run_id</code></td><td><code>quiz_items</code> INSERT の紐づけ</td></tr>
+<tr><td><code>context.cursor</code></td><td><code>batch_sets</code>（set_code 解決）・<code>quiz_stock_items</code>（ストック取得・<code>last_used_at</code> / <code>use_count</code> 更新）・<code>quiz_items</code>（履歴 INSERT）</td></tr>
+<tr><td><code>context.s3_client</code> / <code>context.s3_bucket</code></td><td>事前動画の取得（<code>acps_shared.s3.get_object</code>。セクション 5）</td></tr>
+<tr><td>戻り値 <code>GeneratorResult.media</code></td><td><code>MediaOutput</code> 1 件（MP4、<code>width</code>=1080 / <code>height</code>=1920 / <code>duration_seconds</code>=16 / <code>audio_asset_id</code>=ストック行の <code>video_audio_asset_id</code> を転記）</td></tr>
+<tr><td>戻り値 <code>GeneratorResult.intermediates</code></td><td><strong>0 件</strong></td></tr>
+</table>
+</div>
+<p>処理順序: ① <code>parameters</code> 検証 → ② スロット解決 → ③ <strong>問題ストック取得（ビルド済み限定の LRU。セクション 4）</strong> → ④ <strong>S3 から事前動画を取得</strong>（欠落はフェイルラウド。セクション 5）→ ⑤ <code>quiz_items</code> INSERT + ストックの <code>last_used_at</code> / <code>use_count</code> 更新 → ⑥ <code>GeneratorResult</code> を返す。フォント・コーチアセット・SE・BGM の事前検査、API キー取得（<code>API_SECRET_ARN</code>）はいずれも<strong>不要</strong>（実行時に使わないため。所要は旧方式の数分から数十秒レベルへ短縮見込み）。</p>
+
+<h2 id="parameters">3. 入力（parameters とスロット解決）</h2>
+<p><code>parameters</code> のキー仕様・検証・スロット解決ロジックは <strong><code>gpt-quiz-multicut</code> と完全に同一</strong>（<a href="gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a> を正とする。<code>slots</code> の 5 フィールド必須・休止パラメータの無視・JST 時による決定的解決・早朝の巻き戻し）。これにより <code>logic-training-1</code> の登録済み <code>prompt_configs</code> は無変更で使え、<strong>切替（16-4）は <code>batch_sets.generator_name</code> の UPDATE のみ</strong>になる。スロットの <code>quiz_type</code> / <code>difficulty</code> はストック取得の絞り込みキー、<code>slot_code</code> / <code>slot_label</code> はビルド時の版面（パレット・時間帯ラベル）に対応する（セクション 8 の warn）。</p>
+
+<h2 id="stock">4. 問題ストックの取得（ビルド済み限定の LRU 順繰り）</h2>
+<p>出題は <code>quiz_stock_items</code>（<a href="../data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）から LRU 順繰りで取得する。<code>gpt-quiz-multicut</code> の選定クエリ（<a href="gpt-quiz-multicut.html#stock">同セクション 5</a>）に対する差分は、<strong>事前動画がビルド済みの行（<code>video_s3_key IS NOT NULL</code>）だけを候補にする</strong>絞り込みが加わる点のみ。</p>
+<pre><code>SELECT id, question_text, answer_text, content_fields, video_s3_key, video_audio_asset_id
+  FROM quiz_stock_items
+ WHERE set_id = %s AND quiz_type = %s AND difficulty = %s AND is_active = 1
+   AND video_s3_key IS NOT NULL
+ ORDER BY last_used_at ASC, id ASC LIMIT 1</code></pre>
+<ul>
+  <li><strong>0 件は <code>RuntimeError</code> で異常終了</strong>（ストック未投入・全行無効化に加え「投入済みだが全行未ビルド」も検知するフェイルラウド）</li>
+  <li><strong>再利用（<code>last_used_at IS NOT NULL</code> の行を選んだ場合）は WARNING ログ</strong>（補充遅延のサイン。従来どおり）</li>
+  <li><strong>未ビルトの有効在庫（<code>video_s3_key IS NULL</code>）が同じ型・難度に存在する場合も WARNING ログ</strong>を出す（COUNT 1 本。投入後のビルド漏れ・ビルド待ちのサイン。週次の在庫確認クエリ拡張版〔<a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>〕でも拾える）</li>
+  <li><strong>防御的フィールド検査は維持</strong>: <code>question_text</code> / <code>answer_text</code> / <code>content_fields</code> の必須・非空・文字数上限（<a href="gpt-quiz-multicut.html#stock">gpt-quiz-multicut セクション 5</a> のフィールド仕様を正とする）。動画には使わないが、<strong>キャプションのプレースホルダ展開（<code>quiz_items</code> 経由）の入力になる</strong>ため検査を残す。不備は異常終了</li>
+  <li><code>last_used_at</code> / <code>use_count</code> の UPDATE は事前動画の取得成功後に行い、commit は共通骨格に委ねる（失敗時はストック消費の副作用ごとロールバック。従来どおり）</li>
+</ul>
+<div class="decision">
+  <span class="callout-title">決定（16-3b）: 未ビルト行は「選ばれない」のであって「エラーにしない」</span>
+  未ビルト行を候補に含めてから <code>video_s3_key IS NULL</code> をエラーにする案は、<strong>他にビルド済み在庫があるのに 1 行の未ビルトでスロットが止まる</strong>ため不採用。絞り込みで除外すれば、週次補充の「投入 → ビルド」の間に実行が走っても投稿は止まらない（新規行は未使用でも候補外のまま）。未ビルトの滞留は上記 WARNING と在庫確認クエリ拡張版で検知する。
+</div>
+<div class="decision">
+  <span class="callout-title">決定（16-3b）: 再利用時の同一動画の再投稿を許容する</span>
+  旧方式（実行時生成）ではイラストを毎回新規生成するため、同じ問題の再出題でも見た目が変わった。本方式では再利用時に<strong>完全に同一の動画がもう一度投稿される</strong>。これを許容する（ユーザー決定の 16-3b 具体化）: 再利用は補充遅延時のフォールバックであり頻度が低く（在庫 2 週間分 + 週次補充の運用では発生しないのが正常）、発生しても同一動画の再登場は 2 週間以上空く。16-1 で「再利用は意図的な再出題として許容」と決定済みで、見た目の同一性はその延長にある。Instagram 側の同一動画再投稿の制限は現時点で確認されていない（問題が出た場合は再ビルドで対応する）。
+</div>
+
+<h2 id="fetch">5. 事前動画の取得</h2>
+<p>選定したストック行の <code>video_s3_key</code> から MP4 を取得する（<code>acps_shared.s3.get_object</code>）。キーの値はビルドツーリングが登録した <code>assets/{set_code}/prebuilt/{stock_item_id}.mp4</code>（命名規約は <a href="../data-model.html#s3-key">data-model.html セクション 5</a>。<strong>参照は常に DB カラム経由で行い、方式がキーを組み立てることはしない</strong> — <code>audio_assets.time_slot</code> と同じ「S3 プレフィックスは配置規約に留める」原則）。</p>
+<ul>
+  <li><strong>取得失敗（NoSuchKey・アクセスエラー）は異常終了</strong>（フェイルラウド。DB は「ビルド済み」なのに実体がない = DB と S3 の不整合であり、縮退して別の問題に差し替えることはしない）</li>
+  <li>取得したバイト列をそのまま <code>MediaOutput</code> として返す。<strong>再エンコード・検査変換は行わない</strong>（形式はビルド時にレンダラーが保証し、全数レビューで確認済み）。寸法・尺のメタ情報は方式定数（1080x1920 / 16 秒）を記録する</li>
+</ul>
+
+<h2>6. 出力とストレージ</h2>
+<div class="table-wrap">
+<table>
+<tr><th>成果物</th><th>S3</th><th>DB</th></tr>
+<tr><td>最終 MP4</td><td>共通骨格が通常キー（<code>videos/{set_code}/{YYYYMMDD}/...</code>・ライフサイクル 30 日）へ保存する。<strong>事前動画マスター（<code>assets/.../prebuilt/</code>・ライフサイクル対象外）の使い捨てコピー</strong>であり、マスターは消えない</td><td><code>generated_media</code> に 1 行（<code>file_format='mp4'</code>・1080x1920・16 秒・<code>audio_asset_id</code> = ストック行の <code>video_audio_asset_id</code> を転記）</td></tr>
+<tr><td>出題履歴</td><td>—</td><td><code>quiz_items</code> に 1 行（<code>gpt-quiz-multicut</code> と同一のカラム構成 + <code>stock_item_id</code>。<strong>キャプション展開の入力のため記録は必須</strong>。共通骨格の同一トランザクションで確定）</td></tr>
+</table>
+</div>
+<p><code>file_format='mp4'</code> → <code>posts.media_type='reel'</code> の導出、キャプションのプレースホルダ展開、ストーリーズ再掲（<code>stories_enabled=1</code>）はいずれも従来どおりで、<strong>SNS 投稿バッチに本方式起因の変更はない</strong>。</p>
+<div class="decision">
+  <span class="callout-title">決定（16-3b）: generated_media.audio_asset_id はビルド時の選曲をストック行から転記する（実行時の選曲ローテーション廃止）</span>
+  BGM・SE は事前動画にベイク済みのため、実行時の選曲（スロット別 LRU）と <code>audio_assets.last_used_at</code> の更新は<strong>廃止</strong>し、選曲はビルド時に移す（セクション 8。ビルドツーリングが同じ LRU クエリで選曲・更新するため、複数曲を登録した場合のローテーション性質はビルド側で保たれる。現構成はスロット 1 曲のため実質固定）。一方、<strong>「この投稿にどの曲が使われたか」の追跡（ミュート検知運用 <a href="../operation.html#mute-check">operation.html セクション 4.4</a> の特定クエリ）は <code>generated_media.audio_asset_id</code> に依存している</strong>ため、ビルド時に使った曲を <code>quiz_stock_items.video_audio_asset_id</code>（V006）に記録し、実行時にそのまま <code>generated_media.audio_asset_id</code> へ転記する。これにより投稿 → 曲の特定クエリは無変更で成立する。NULL（転記元が未記録）は許容しない（ビルドツーリングの登録漏れ検知として異常終了）。
+</div>
+
+<h2>7. エラーハンドリング</h2>
+<p>方式内のリカバリループはない。異常（<code>parameters</code> 不正・ビルド済みストック 0 件・ストック行のフィールド不備・<code>video_audio_asset_id</code> 未記録・事前動画の取得失敗）はすべて例外を送出し、共通骨格が捕捉 → ロールバック → Step Functions Retry → 失敗アラーム通知につながる（<code>gpt-quiz-multicut</code> セクション 11 と同型）。実行時の失敗要因が大きく減るため、残る主な失敗面は SNS 投稿側（Graph API）になる。</p>
+
+<h2 id="build">8. 事前ビルドパイプライン（供給側の設計）</h2>
+<p>事前動画の供給はローカルの<strong>事前ビルドツーリング</strong>が担う。ツーリングは <code>content/video-build/&lt;set_code&gt;/</code> に置いて git 管理し（置き場・運用ルールは <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）、週次補充（ストック投入）とセットで回す。工程は 5 段:</p>
+<ol>
+  <li><strong>対象抽出</strong>: <code>video_s3_key IS NULL</code> の有効ストック行を列挙する（初回 = 16-3d は 42 問全量、以後は補充分のみ）</li>
+  <li><strong>イラスト生成（imagegen 委譲 + 3:2 センタークロップ）</strong>: 行の <code>illustration_scene</code> からイラストプロンプトを組み立て（<code>gpt-quiz-multicut</code> のコード側固定プロンプト〔情景 + スロット別ムード + ブランド配色 + 禁止事項 = <a href="gpt-quiz-multicut.html#illustration">同セクション 6</a>〕を移植し、<strong>画風 1 行を恒久追加</strong> = 下記 decision）、Codex 組み込み画像生成（imagegen）で生成する。imagegen は 3:2 の直接指定ができない（生成元 1672x941 等）ため、<strong>3:2 センタークロップ → 1536x1024 リサイズ</strong>の後処理を掛けて組版入力の縦横比を旧方式と一致させる</li>
+  <li><strong>組版 + ffmpeg ビルド</strong>: <code>gpt_quiz_multicut.py</code> の<strong>レンダラー（Pillow 組版 + ffmpeg 合成。8 枚版面・連続ズーム・SE ディレイ・BGM トリム + afade）を import して流用</strong>する（作りは <a href="gpt-quiz-multicut.html#composition">同セクション 8〜9</a> を正とし、本書には重複記載しない）。BGM はスロット別 LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行う（セクション 6 の decision）。実行環境はホストに ffmpeg がないため <strong>image-batch の Docker イメージにリポジトリをマウントして実行</strong>する（16-3 のオフライン確認と同じ方法）</li>
+  <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（+ イラスト・カット代表画像）を一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>イラスト再生成（imagegen 再試行）または情景修正（<code>illustration_scene</code> の書き直し → DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は operation.html セクション 3 の手順 5）</li>
+  <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{stock_item_id}.mp4</code> へアップロードし（イラスト原画 <code>{stock_item_id}_illustration.png</code> も再ビルド資産として併置。DB 記録なし）、<code>quiz_stock_items</code> の <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>（V006）を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する</li>
+</ol>
+<div class="decision">
+  <span class="callout-title">決定（16-3b）: イラストは imagegen（Codex サブスク内）+ 画風指定行の恒久化</span>
+  16-3 (8) の比較（gpt-image-1 実 API vs imagegen vs imagegen + 画風行）で、<strong>imagegen + 画風 1 行（フラットデザイン・ベクター調・写実禁止・全枚統一）が禁止事項の全遵守と画風の一貫性を両立し品質面で最良</strong>だった。事前ビルドのイラスト生成はこの組み合わせを採用し、画風行をツーリングのプロンプトへ恒久化する。OpenAI Images API は使わない（イラスト API 費ゼロ化）。imagegen は Codex への委譲実行（MCP）であり自動化バッチには組み込めないが、事前ビルドは人間レビューを挟むローカル運用のため委譲ベースで成立する。
+</div>
+<div class="warn">
+  <span class="callout-title">版面・スロット構成・音源の変更は事前動画の再ビルドを伴う</span>
+  事前動画にはスロット別パレット・<code>slot_label</code>・BGM・SE・版面がベイクされている。以下の変更は<strong>該当する事前動画の全再ビルド + 差し替え</strong>が必要になる（実行時生成なら設定変更だけで済んだものが、ビルド資産の更新作業になるトレードオフ）:
+  <ul style="margin:.3rem 0 0;">
+    <li>版面・カット構成・尺の変更（レンダラー改修 → 全量再ビルド）</li>
+    <li><code>parameters.slots</code> の型・難度 ⇔ スロット対応やパレット・<code>slot_label</code> の変更（該当スロットの再ビルド。事前動画は行の型・難度から一意に決まるスロット向けにビルドされるため、対応を変えると版面とスロットが食い違う）</li>
+    <li>BGM の差し替え（ミュート検知時を含む。<code>is_active=0</code> にするだけでは既ビルド動画に古い曲が残る — <a href="../operation.html#mute-check">operation.html セクション 4.4</a> の追記を参照。対象は <code>video_audio_asset_id</code> で特定できる）</li>
+  </ul>
+</div>
+
+<h2>9. 依存ライブラリ・実行環境</h2>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>内容</th></tr>
+<tr><td>実行時の依存</td><td><code>acps_shared</code>（DB・S3）のみ。<strong>openai / Pillow / ffmpeg / フォントは実行時には使わない</strong>（コンテナイメージは image-batch 共通のため同梱のままだが、本方式のコードパスでは参照しない）</td></tr>
+<tr><td>Fargate タスクサイズ</td><td>1 vCPU / 2 GB のまま据え置き（<code>ImageBatchStack</code> は kenburns と共通のため変更しない。本方式単体では過剰だが、分離の実益がない）</td></tr>
+<tr><td>ビルド時の依存</td><td>imagegen（Codex 委譲）・image-batch Docker イメージ（Pillow / ffmpeg / フォント同梱）・ローカル MySQL / Aurora への接続。セクション 8</td></tr>
+</table>
+</div>
+
+</div>
+</body>
+</html>

@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 脳みそコーチのロジトレ</nav>
 <h1>セット別設計書: 脳みそコーチのロジトレ</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（15-13 で作成・16-1 / 16-2b で改訂）</span>
+  <span class="badge badge-fixed">Fix（15-13 で作成・16-1 / 16-2b / 16-3b で改訂）</span>
   <span>set_code: logic-training-1</span>
-  <span>最終更新: 2026-08-07</span>
+  <span>最終更新: 2026-08-08</span>
 </div>
 
 <div class="note">
@@ -22,8 +22,8 @@
   本セット固有の設定・運用情報を記録する（15-13 で作成）。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> を参照し、本書には差分のみ書く（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）。テーマ選定・生成方式選定の検討経緯は壁打ち記録 <a href="../requirements-notes-set2.html">requirements-notes-set2.html</a> にある。</div>
 
 <div class="warn">
-  <span class="callout-title">16-1 改訂の適用状態</span>
-  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）の改訂を反映した<strong>目標設計</strong>を記述している。実装追随は 16-3、キャプションテンプレートの差し替えと切替は 16-4 で行うため、それまで実運用は旧仕様（20 秒・答え焼き込み・旧テンプレ）のまま動く。テコ入れの経緯と方針 4 点は <a href="../../development-plan.md">development-plan.md</a> Phase 16 冒頭を参照。
+  <span class="callout-title">16-1 / 16-3b 改訂の適用状態</span>
+  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）と 16-3b（動画事前生成方式への転換設計 Fix。2026-08-08）を反映した<strong>目標設計</strong>を記述している。実装は 16-3c、初期 42 問の動画ビルド・S3 配置は 16-3d、キャプションテンプレート差し替え・<code>generator_name</code> 切替・生成スケジュール再開は 16-4 で行う。現在は 08-06 障害対応で生成スケジュール 3 本が DISABLED のまま（投稿休止中）。テコ入れの経緯と方針 4 点・転換の経緯は <a href="../../development-plan.md">development-plan.md</a> Phase 16 冒頭を参照。
 </div>
 
 <h2>1. テーマ</h2>
@@ -36,7 +36,7 @@
 <tr><td><code>L3</code></td><td>フェルミ推定（答えは「約〇〇（目安）」の幅で示す）</td><td>投入時の人間レビュー（16-1〜。旧: 独立 LLM 推定とのオーダー一致検証 = 休止）。断定表現の禁止は執筆ガイドとして維持</td></tr>
 </table>
 </div>
-<p>動画構成は <strong>16 秒・4 カット</strong>（つかみ 4 秒 → 考える 4 秒 → カウントダウン 5 秒〔1 秒 × 5 枚・吹き出しは動的ヒント <code>hint</code>〕→ 誘導 3 秒。16-2b でカット 2「問題」を「考える」へ・カット 3 の吹き出しを動的ヒントへ改訂）。<strong>版面は全カット固定</strong>で問題文が 1 フレーム目から表示され、<strong>答え・解説は動画に載せずキャプションで開示</strong>する（16-1 テコ入れ）。詳細は方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。</p>
+<p>動画構成は <strong>16 秒・4 カット</strong>（つかみ 4 秒 → 考える 4 秒 → カウントダウン 5 秒〔1 秒 × 5 枚・吹き出しは動的ヒント <code>hint</code>〕→ 誘導 3 秒。16-2b でカット 2「問題」を「考える」へ・カット 3 の吹き出しを動的ヒントへ改訂）。<strong>版面は全カット固定</strong>で問題文が 1 フレーム目から表示され、<strong>答え・解説は動画に載せずキャプションで開示</strong>する（16-1 テコ入れ）。動画の作りは方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。<strong>16-3b の転換により動画は実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く</strong>（実行時方式は <a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>。ビルド運用は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a>）。</p>
 
 <h2>2. 投稿先アカウント構成</h2>
 <p>Instagram プロアカウント 1 件（1 セット 1 アカウント）。<strong>15-7</strong> で新規開設し、Secret 登録とトークン実働確認まで済んでいる。</p>
@@ -187,10 +187,11 @@
 <tr><td>SE</td><td>NULL</td><td><code>audio/logic-training-1/se/answer_chime.m4a</code></td><td>Pixabay Content License</td></tr>
 </table>
 </div>
-<p>前処理レシピ（20 秒尺の 2 パス loudnorm / SE はピーク -1.5 dBTP 調整のみ）と証跡の記録方法は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a>。<strong>16-1 の 16 秒化後も 20 秒尺の前処理済み素材をそのまま流用</strong>する（トリムと終端フェードは方式の ffmpeg 側で吸収 = <a href="../generators/gpt-quiz-multicut.html#encode">方式設計書セクション 9</a>。再前処理・再登録は不要）。各スロットに有効な BGM が 0 件になると当該スロットの実行が異常終了する（フェイルラウド）。</p>
+<p>前処理レシピ（20 秒尺の 2 パス loudnorm / SE はピーク -1.5 dBTP 調整のみ）と証跡の記録方法は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a>。<strong>16-1 の 16 秒化後も 20 秒尺の前処理済み素材をそのまま流用</strong>する（トリムと終端フェードはレンダラーの ffmpeg 側で吸収 = <a href="../generators/gpt-quiz-multicut.html#encode">方式設計書セクション 9</a>。再前処理・再登録は不要）。</p>
+<p><strong>16-3b の転換により BGM・SE の使用はビルド時に移った</strong>: 選曲（スロット別 LRU）・<code>last_used_at</code> 更新・SE の存在検査・0 件フェイルラウドはいずれも事前ビルド時に行われ、<strong>実行時は <code>audio_assets</code> を使わない</strong>（使った曲はストック行の <code>video_audio_asset_id</code> 経由で <code>generated_media.audio_asset_id</code> に記録される = <a href="../generators/quiz-prebuilt.html">quiz-prebuilt セクション 6</a>）。<strong>曲を差し替えても既ビルドの事前動画には反映されない</strong>ため、ミュート検知時などの差し替えは該当動画の再ビルドまで行う（<a href="../operation.html#mute-check">operation.html セクション 4.4</a>）。</p>
 
 <h2 id="coach-assets">7. 固定アセット（脳みそコーチ 4 表情）</h2>
-<p>カットごとにコーチの表情・ポーズを切り替える。4 枚を<strong>固定アセットとして S3 に置き、方式が起動時に読み込む</strong>（画像 API は毎回呼ばない）。ファイル名はコード側で固定。16-1 のカット構成刷新後も <strong>4 枚すべてを継続使用</strong>する（割当の変更のみ・アセットの作り直しは不要）。</p>
+<p>カットごとにコーチの表情・ポーズを切り替える。4 枚を<strong>固定アセットとして S3 に置き、組版時に読み込む</strong>（画像 API は毎回呼ばない。16-3b の転換後、読み込むのは実行時の方式ではなく<strong>事前ビルドツーリングのレンダラー</strong>になった）。ファイル名はコード側で固定。16-1 のカット構成刷新後も <strong>4 枚すべてを継続使用</strong>する（割当の変更のみ・アセットの作り直しは不要）。</p>
 <div class="table-wrap">
 <table>
 <tr><th>カット（16-2b 以降）</th><th>S3 キー</th><th>ポーズ</th></tr>
@@ -209,17 +210,16 @@
 </div>
 
 <h2>8. 失敗時ポリシー</h2>
-<p>共通の失敗時ポリシー（<a href="../operation.html#failure">operation.html セクション 4</a>）に準拠する。本セット固有の注意点は以下（16-1 のストックのみ方式への転換を反映）。</p>
+<p>共通の失敗時ポリシー（<a href="../operation.html#failure">operation.html セクション 4</a>）に準拠する。本セット固有の注意点は以下（16-1 のストックのみ方式・16-3b の事前生成方式を反映）。<strong>実行時の失敗要因は「ストック選定 + 事前動画取得 + 投稿」だけになり、生成起因の障害（イラスト生成失敗・組版の収まり不足等）はビルド時のローカル作業へ移った</strong>。</p>
 <ul>
-  <li><strong>ストック 0 件（スロットの型・難度に一致する有効行なし）は異常終了</strong>し、その回は投稿しない（未投入・全行無効化の検知。<a href="../generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）。取得した行のフィールド不備（必須欠落・文字数超過）も同様に異常終了（投入ミスの検知）</li>
-  <li><strong>未使用ストックが尽きた場合は利用済みストックを再利用</strong>する（LRU で最古使用分から。投稿は止まらない）。再利用時は WARNING ログが出るため、<strong>補充遅延のサイン</strong>として在庫確認 → 補充を行う（<a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）</li>
-  <li><strong>情景イラストの生成失敗は縮退せず異常終了</strong>（15-10 決定）。イラストが全カットのカード内ブロックに常駐する構成（15-14 の投稿前レビューで全面背景から変更）のため、欠けた状態では成立しない</li>
-  <li><strong>コーチアセット・SE の欠落、スロットに対応する BGM の 0 件もフェイルラウド</strong></li>
+  <li><strong>ビルド済みストック 0 件（スロットの型・難度に一致する有効かつ <code>video_s3_key IS NOT NULL</code> の行なし）は異常終了</strong>し、その回は投稿しない（未投入・全行無効化・全行未ビルドの検知。<a href="../generators/quiz-prebuilt.html#stock">quiz-prebuilt セクション 4</a>）。取得した行のフィールド不備（必須欠落・文字数超過）も同様に異常終了（投入ミスの検知。キャプション展開の入力保護）</li>
+  <li><strong>未使用ストックが尽きた場合は利用済みストックを再利用</strong>する（LRU で最古使用分から。投稿は止まらない。<strong>同一動画の再投稿になる点は許容</strong> = <a href="../generators/quiz-prebuilt.html#stock">quiz-prebuilt セクション 4</a> の decision）。再利用時は WARNING ログが出るため、<strong>補充遅延のサイン</strong>として在庫確認 → 補充を行う（<a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）</li>
+  <li><strong>事前動画の S3 欠落（DB はビルド済みなのに実体なし）は縮退せず異常終了</strong>（DB と S3 の不整合の検知）</li>
   <li><strong>ストーリーズ投稿の失敗はリールの success を巻き戻さない</strong>。終端状態で確定した投稿失敗は Step Functions の再実行では検知できないため、検知は ECS タスク異常終了通知が担う（<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.4</a>）</li>
 </ul>
 
 <h2>9. 共通フローからの差分・特記事項</h2>
-<p><strong>使用方式は <code>gpt-quiz-multicut</code></strong>（16-1 以降: ストック取得 → 情景イラスト生成 → Pillow 組版 → ffmpeg 合成。方式設計書 <a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a> = 15-16 で作成・16-1 で全面改訂）。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）。</p>
+<p><strong>使用方式は <code>quiz-prebuilt</code></strong>（16-3b の転換。切替 = <code>batch_sets.generator_name</code> の UPDATE は 16-4。それまでの登録値は <code>gpt-quiz-multicut</code> のまま）: ストック LRU 選定 → S3 の事前動画取得 → 返却のみの軽量実行（<a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>）。動画の作り・組版は <code>gpt-quiz-multicut</code>（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>。実行時方式としては休止・事前ビルドのレンダラーへ転用）を正とする。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）で、いずれも 16-3b の転換による変更はない。</p>
 <p>本セットは共通テーブルのうち <code>quiz_stock_items</code>（問題ストック）と <code>quiz_items</code>（出題履歴。16-1 で <code>stock_item_id</code> による突合を追加）を使う唯一のセットである（<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4.9 / 4.10</a>）。</p>
 
 </div>

@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / gpt-quiz-multicut</nav>
 <h1>方式設計書: gpt-quiz-multicut</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（15-16 で作成・16-1 で全面改訂・16-2b でカット構成微改訂）</span>
+  <span class="badge badge-fixed">Fix（15-16 で作成・16-1 で全面改訂・16-2b でカット構成微改訂・16-3b で休止 = レンダラー転用）</span>
   <span>方式名（レジストリキー）: gpt-quiz-multicut</span>
-  <span>最終更新: 2026-08-07</span>
+  <span>最終更新: 2026-08-08</span>
 </div>
 
 <div class="note">
@@ -22,9 +22,14 @@
   生成方式 <code>gpt-quiz-multicut</code> の方式固有仕様（問題ストック取得・スロットだし分け・組版・ffmpeg 合成）を記録する。全方式共通の契約（方式インターフェース）と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、分冊ルール（1 方式 1 本・本採用時に作成）は <a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a> を参照。設計の経緯は 15-5 / 15-9 / 15-10 / 16-1 の設計 Fix（<a href="../requirements-notes-set2.html">壁打ち記録</a>・<a href="../../development-log.md">development-log.md</a>）にある。
 </div>
 
+<div class="warn">
+  <span class="callout-title">16-3b（2026-08-08）: 実行時方式としては休止 — 事前ビルドのレンダラーへ転用</span>
+  16-3 完了後の仕様変更（動画事前生成方式への転換。<a href="quiz-prebuilt.html">方式設計書 quiz-prebuilt</a> セクション 1 の decision）により、本方式は<strong>実行時方式としては本番投入せず休止</strong>とする（16-4 の切替は <code>quiz-prebuilt</code> へ行う。採用セットなし・レジストリ登録は残置し、実行時生成へ戻す場合は <code>batch_sets.generator_name</code> の UPDATE で再開できる）。ただし<strong>組版（セクション 8）と ffmpeg 合成（セクション 9）は事前ビルドツーリングのレンダラーとして継続使用</strong>し、動画の作り（16 秒・4 カット・版面固定）の正は引き続き本書が持つ。実行時にのみ意味を持つ節（ストック取得 = セクション 5・イラスト生成 = セクション 6・固定アセット検査 = セクション 7・エラーハンドリング = セクション 11）は、事前生成側では <a href="quiz-prebuilt.html">quiz-prebuilt</a> セクション 4〜8 が対応する。
+</div>
+
 <div class="note">
   <span class="callout-title">16-1 / 16-2b 改訂の適用状態</span>
-  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）で全面改訂し、16-2b（2026-08-07）でカット構成・フィールド仕様を微改訂した。<strong>16-3（2026-08-07）で実装（<code>services/image-batch/app/generators/gpt_quiz_multicut.py</code>）が本書へ追随済み</strong>で、以後は従来どおり実装を正とする。本番環境への切替（デプロイ・キャプションテンプレート差し替え・生成スケジュール再開）は 16-4 で行う。
+  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）で全面改訂し、16-2b（2026-08-07）でカット構成・フィールド仕様を微改訂した。<strong>16-3（2026-08-07）で実装（<code>services/image-batch/app/generators/gpt_quiz_multicut.py</code>）が本書へ追随済み</strong>で、以後は従来どおり実装を正とする。この 16-3 実装は本番未デプロイのまま上記の休止となったが、レンダラー部分は 16-3c の事前ビルドツーリングが import して使う。
 </div>
 
 <h2>1. 方式概要</h2>
@@ -114,6 +119,10 @@
 </div>
 
 <h2 id="illustration">6. 情景イラスト生成</h2>
+<div class="note">
+  <span class="callout-title">事前生成側での扱い（16-3b）</span>
+  事前ビルドツーリングは本節の固定プロンプト（情景 + スロット別ムード + ブランド配色 + 禁止事項）の組み立てを移植し、<strong>画風 1 行を恒久追加して imagegen（Codex サブスク内）で生成する</strong>（OpenAI Images API は使わない。<a href="quiz-prebuilt.html#build">quiz-prebuilt セクション 8</a>）。本節の記述は実行時生成（休止中）の仕様として維持する。
+</div>
 <p>取得したストック問題の <code>illustration_scene</code> をコード側固定のイラストプロンプト（情景 + スロット別の時間帯ムード + パレット由来のブランド配色 + 禁止事項）に組み込み、<strong>gpt-image-1 / 1536x1024（横長）/ medium / 1 枚</strong>で生成する。禁止事項は 16-3 の実 API 確認（イラスト内の「ZOO」看板文字・操作パネルの数字・額縁風の左右帯）を受けて調整済み: <strong>大きな「?」マークのみ可</strong>（情景の指定にある場合。16-2 の「主役 + 大きな ?」構図と固定プロンプトの記号禁止の矛盾を解消）・<strong>それ以外の文字・数字・記号は不可（看板・標識・ロゴ・ボタンや操作パネルの文字数字を含む）</strong>・答えを示唆する構図不可・<strong>額縁や左右の帯で画面を区切らず横長全体を情景で満たす</strong>。旧プロンプトの「背景用 / 情報カードを重ねる / 中央回避」の文言は全面背景時代（15-14 以前）の名残のためカード内ブロックの実態に合わせて廃止した。1 実行 1 枚で、全 4 カットのカード内ブロックに常駐させる（15-9 決定 → 15-14 で全面背景からカード内ブロックへ変更・横長化）。<strong>再利用時も毎回新規生成する</strong>ため、同じ問題の再出題でも見た目は変わる。</p>
 <div class="decision">
   <span class="callout-title">決定（15-9 / 15-10）: 方式 C（文字なし情景イラスト + プログラム文字描画）の採用と失敗時の扱い</span>
