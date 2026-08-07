@@ -8,7 +8,7 @@ description: logic-training-1 の問題ストック(quiz_stock_items)を補充�
 logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 初期整備(2026-08)で確立した品質・手順で補充するためのスキル。
 運用ルールの正は `docs/app/operation.html` セクション 3(在庫確認クエリ・補充閾値 = 未使用 7 問/組以上・著作権ガイドライン)、フィールド仕様の正は `docs/app/generators/gpt-quiz-multicut.html` セクション 5。本スキルはそれらに「同品質で量産するための勘所」を足すもので、矛盾したら設計書が勝つ。
 
-**参照実装**: `plans/16-2-stock/`(単一ソース `stock_items.py`・検証 `validate.py` / `verify_logic.py`・生成 `generate.py`・リサーチ `research*.md`)。補充時はこの一式をコピーして新しい作業ディレクトリ(`plans/<日付>-stock/` 等)を作り、同じ流れを回す。
+**資材の置き場**: `content/quiz-stock/<set_code>/<バッチ名>/`(git 管理)。バッチごとに自己完結の資材一式 — 単一ソース `stock_items.py`・検証 `validate.py` / `verify_logic.py`・生成 `generate.py`・リサーチ `research*.md`(source_note が参照する出典台帳)・投入した `insert_quiz_stock.sql` — を置く。参照実装は初期整備の `content/quiz-stock/logic-training-1/2026-08-initial/`。補充時は最新バッチの一式を新しいバッチディレクトリ(`2026-08-w3` 等)へコピーして同じ流れを回し、**投入完了時にディレクトリごとコミットする**(`review.md` は generate.py の派生物のため gitignore 済み・コミットしない)。plans/ は使い捨てスクラッチ用で、ストック資材は置かない。
 
 ## 0. 在庫確認(入口)
 

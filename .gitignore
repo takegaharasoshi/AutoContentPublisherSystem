@@ -6,3 +6,4 @@ uv.lock
 .vscode/
 plans/
 .claude/settings.local.json
+content/**/review.md

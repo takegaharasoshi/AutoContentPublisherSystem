@@ -27,6 +27,7 @@ AutoContentPublisherSystem/
 │   ├── image-batch/                 # 画像生成バッチ（Python）
 │   └── sns-post-batch/              # SNS 投稿バッチ（Python）
 ├── database/                        # DDL ファイル（スキーマ管理）
+├── content/                         # 事業コンテンツ資材（問題ストックのバッチ別ソース・検証ツール・リサーチ証跡。運用はスキル quiz-stock-replenish 参照）
 ├── shared/                          # サービス間共通ライブラリ（Python）
 ├── CLAUDE.md
 └── README.md
