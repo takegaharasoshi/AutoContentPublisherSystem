@@ -355,7 +355,10 @@ def test_generate_consumes_stock_and_stages_snapshot(
     )
     assert bgm_select_index < stock_select_index
     illustration.assert_called_once()
-    assert "文字・数字・記号は一切描画しない" in illustration.call_args.args[1]
+    assert (
+        "それ以外の文字・数字・記号は一切描画しない"
+        in illustration.call_args.args[1]
+    )
     assert "tone_hint" not in illustration.call_args.args[1]
 
     insert = next(
