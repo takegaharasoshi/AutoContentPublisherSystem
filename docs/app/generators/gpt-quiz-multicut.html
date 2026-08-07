@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / gpt-quiz-multicut</nav>
 <h1>方式設計書: gpt-quiz-multicut</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（15-16 で作成・16-1 で全面改訂）</span>
+  <span class="badge badge-fixed">Fix（15-16 で作成・16-1 で全面改訂・16-2b でカット構成微改訂）</span>
   <span>方式名（レジストリキー）: gpt-quiz-multicut</span>
-  <span>最終更新: 2026-08-01</span>
+  <span>最終更新: 2026-08-07</span>
 </div>
 
 <div class="note">
@@ -23,8 +23,8 @@
 </div>
 
 <div class="warn">
-  <span class="callout-title">16-1 改訂の適用状態</span>
-  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）で全面改訂した<strong>目標設計</strong>を記述している。実装（<code>services/image-batch/app/generators/gpt_quiz_multicut.py</code>）の追随は 16-3 で行うため、それまで実装は 15-16 時点の旧構成（20 秒・つかみ/答えカットあり・LLM 生成チェーン）のまま動作する。16-3 完了後は従来どおり実装を正とする。
+  <span class="callout-title">16-1 / 16-2b 改訂の適用状態</span>
+  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）で全面改訂し、16-2b（16-2 レビュー中のユーザー決定の正式反映。2026-08-07）でカット構成・フィールド仕様を微改訂した<strong>目標設計</strong>を記述している。実装（<code>services/image-batch/app/generators/gpt_quiz_multicut.py</code>）の追随は 16-3 で行うため、それまで実装は 15-16 時点の旧構成（20 秒・つかみ/答えカットあり・LLM 生成チェーン）のまま動作する。16-3 完了後は従来どおり実装を正とする。
 </div>
 
 <h2>1. 方式概要</h2>
@@ -94,9 +94,10 @@
 <table>
 <tr><th>フィールド</th><th>上限</th><th>用途</th></tr>
 <tr><td><code>hook</code></td><td>20 字</td><td>カット 1 の<strong>動的つかみコピー</strong>（吹き出し表示）+ キャプション冒頭のプレビュー行（<a href="../batch-flow.html#sns-steps">batch-flow.html 3.3</a>）</td></tr>
+<tr><td><code>hint</code></td><td>20 字</td><td>カット 3（カウントダウン）の<strong>動的ヒント</strong>（吹き出し表示。16-2b で追加 = セクション 8.1 の decision。キャプションでは使わない）</td></tr>
 <tr><td><code>question</code>（= <code>question_text</code> と同値）</td><td>90 字</td><td>問題文（全カットの版面に常時表示）</td></tr>
 <tr><td><code>answer</code>（= <code>answer_text</code> と同値）</td><td>30 字</td><td>答え（<strong>動画に載せずキャプションで開示</strong>。L3 は「約〈数値と単位〉（目安）」の幅表現）</td></tr>
-<tr><td><code>explanation</code></td><td>80 字</td><td>解説（キャプションで開示）</td></tr>
+<tr><td><code>explanation</code></td><td>80 字（<strong>L3 のみ 240 字</strong>）</td><td>解説（キャプションで開示。キャプション専用フィールドのため上限拡張の版面影響なし = 下記 decision）</td></tr>
 <tr><td><code>coach_comment</code></td><td>30 字</td><td>コーチの一言（キャプションで開示）</td></tr>
 <tr><td><code>tags</code></td><td>10 字 × ちょうど 3 個</td><td>記録用（キャプションは固定ハッシュタグのため未使用）</td></tr>
 <tr><td><code>summary</code></td><td>100 字</td><td>出題要旨（記録用。生成経路を再開する場合の重複禁止リスト単位）</td></tr>
@@ -106,6 +107,10 @@
 <div class="decision">
   <span class="callout-title">決定（16-1）: LLM 生成・検証チェーンの休止（ストックのみ方式への転換）</span>
   運用初週のスキップ率 95% を受けたテコ入れ（development-plan.md Phase 16 冒頭）で、問題ソーシングを<strong>ストックのみ・在庫切れ時は利用済みストックを再利用</strong>とユーザー決定（2026-08-01）。これに伴い、15-5〜15-13 で構築した実行時の LLM 問題生成・決定的検証（L1 DSL 全列挙 / L3 書式）・独立 LLM 検証・重複検査・再生成ループ（旧セクション 5.1〜5.5）は<strong>投稿パイプラインから外れる（休止）</strong>。誤答リスクは投入時の人間レビューで担保され（構造的解消）、実行時のテキスト LLM 費はゼロになる。ストックは投入時に型・難度・表現の独自性・既存ストックとの重複をレビューするため、実行時の重複検査も不要（再利用は意図的な再出題として許容）。旧チェーンの詳細仕様は本書の 15-16 版（git 履歴）と development-log.md の 15-5 / 15-13 に記録があり、生成経路を再開する場合の資産として参照する。<code>machine_spec</code> / <code>machine_answer</code>（旧 L1 検証用）はストックでは持たない。
+</div>
+<div class="decision">
+  <span class="callout-title">決定（16-2b = 2026-08-07 のユーザー決定）: L3 の次回補充方針と <code>explanation</code> 上限の L3 拡張</span>
+  16-2 の人間レビューで確定した次回補充からの L3（フェルミ推定）方針: <strong>捻った分解型（非直接的な仮定を最低 1 つ経由する問題）を標準</strong>とし、解説は <strong>5 ステップ構造（前提 → ベース → 分解 → 計算 → 実勢チェック）</strong>で書く（執筆の勘所はスキル <code>/quiz-stock-replenish</code> の昼 L3 節が詳しい。運用は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）。5 ステップは 80 字に収まらないため、<code>explanation</code> の上限を <strong>L3 のみ 240 字へ拡張</strong>する（DDL は JSON のため変更不要。動画に載らないキャプション専用フィールドのため版面への影響もない）。16-2 の初期 42 問（直接換算型・80 字解説が多い）は<strong>承認済みのため置き換えない</strong>。16-3 の防御的フィールド検査は本上限（L3 = 240 字 / それ以外 = 80 字）で実装し、補充資材の <code>validate.py</code> も次回補充時に同じ上限へ追随させる。
 </div>
 
 <h2 id="illustration">6. 情景イラスト生成</h2>
@@ -140,8 +145,8 @@
 <table>
 <tr><th>カット</th><th>尺</th><th>カード</th><th>カット間で変わる要素</th></tr>
 <tr><td>1 つかみ</td><td>4 秒</td><td>1 枚</td><td>吹き出し = <code>hook</code>（<strong>問題ごとの動的つかみコピー</strong>）+ コーチ hook（力こぶ）</td></tr>
-<tr><td>2 問題</td><td>4 秒</td><td>1 枚</td><td>固定吹き出し「頭の中だけで解いてみよう」+ コーチ question</td></tr>
-<tr><td>3 考える</td><td>5 秒</td><td>5 枚（1 秒 × 5）</td><td>カウントダウン円バッジ（5→1）+ 固定吹き出し「止めてじっくり考えても OK」+ コーチ think</td></tr>
+<tr><td>2 考える</td><td>4 秒</td><td>1 枚</td><td>固定吹き出し「止めてじっくり考えても OK」+ コーチ think（考え込む）</td></tr>
+<tr><td>3 カウントダウン</td><td>5 秒</td><td>5 枚（1 秒 × 5）</td><td>カウントダウン円バッジ（5→1）+ 吹き出し = <code>hint</code>（<strong>問題ごとの動的ヒント</strong>。5 枚とも同一文言）+ コーチ question（手のひらで差し出す）</td></tr>
 <tr><td>4 誘導</td><td>3 秒</td><td>1 枚</td><td>固定吹き出し「答えは投稿のキャプションへ！」+ コーチ answer（ガッツポーズ）</td></tr>
 </table>
 </div>
@@ -156,13 +161,23 @@
   </ul>
   吹き出しの固定文 3 種（カット 2〜4）はコード側定数。尺の合計 16 秒はユーザー決定（完走ハードルを下げつつ誘導が読み切れる配分）。
 </div>
+<div class="decision">
+  <span class="callout-title">決定（16-2b = 16-2 執筆中のユーザー決定〔2026-08-05 頃〕を正式反映）: 問題カットの「考える」化とカウントダウンの動的ヒント化</span>
+  版面固定により問題文は 1 フレーム目から常時表示されるため、固定吹き出しだけのカット 2「問題」は情報を足していなかった。16-2 の執筆・レビュー中のユーザー決定で上表のとおり変更した:
+  <ul>
+    <li><strong>カット 2 を「考える」へ</strong>: 旧カット 3 の固定文「止めてじっくり考えても OK」を前倒しし、考えるフェーズを 4 + 5 = 9 秒に拡大（旧「頭の中だけで解いてみよう」は廃止）</li>
+    <li><strong>カット 3（カウントダウン）の吹き出しをストックの <code>hint</code> へ</strong>: 問題ごとの動的ヒント（20 字・カウントダウン中の最後の後押し）を表示する。これに合わせ全問に <code>hint</code> フィールドを追加した（セクション 5。初期 42 問は 16-2 で追加・レビュー済み）</li>
+    <li>吹き出しは<strong>動的 2 種（<code>hook</code> / <code>hint</code>）+ 固定文 2 種（カット 2・4 = コード側定数）</strong>になる（16-1 時点の「固定文 3 種」を置き換え）</li>
+    <li><strong>コーチ表情は 4 枚継続使用のまま割当を入れ替える</strong>（16-2b の整理）: カット 2 = think（考え込む = 「考える」の意味に一致）・カット 3 = question（手のひらで差し出す = ヒントの差し出し）。アセットの作り直しは不要（<a href="../sets/logic-training-1.html#coach-assets">sets/logic-training-1.html セクション 7</a>）</li>
+  </ul>
+</div>
 <h3>8.2 レイアウトの構造保証</h3>
 <ul>
   <li><strong>カード = ズームセーフ枠</strong>: カード矩形を kenburns と同じ導出（出力寸法 / <code>ZOOM_END</code> − マージン 8）で <code>ZOOM_END=1.04</code> から計算し、ズーム終端でもカード全体が可視であることを構造的に保証する（1030 × 1838 中央配置）。ズームは文字の可読性優先で kenburns（1.08）より弱い</li>
   <li><strong>本文セーフエリア</strong>: カード領域と Instagram UI 予約域（右 12% / 下 15%）の交差に文字とコーチを収める。イラストは全面背景ではなくカード内ブロックのため、文字の見切れは構造的に発生しない（プロンプト側のセーフエリア指定は不要）</li>
   <li><strong>見出し行</strong>: 見出し「問題」（左アクセントバー）+ <strong>型・難度ピル</strong>（例: 論理パズル・じっくり）を全カット共通で常設する（旧構成ではつかみカットのみだったピルを版面へ昇格）</li>
   <li><strong>スロット別パレット</strong>: 背景 / カード / 本文 / 補助文字 / アクセント / 装飾の 6 色をコード側定数 <code>SLOT_PALETTES</code> で持つ。朝 = クリーム、昼 = ライトブルー（15-13 でユーザー決定により夜と差別化）、夜 = ダークネイビー。アクセントはアンバー系で統一</li>
-  <li><strong>共通デザイン要素</strong>（15-14 の投稿前レビューで確定）: 時間帯ラベル = テキスト幅ピル + アクセントドット（上部中央）・見出し = 左アクセントバー・カウントダウン = アクセント色の円バッジ（直径 150）に白抜き・イラスト = 角丸 + 装飾色の縁取り・コーチのセリフ = 全カットで吹き出しに統一（動的 <code>hook</code> 1 + 固定文 3）</li>
+  <li><strong>共通デザイン要素</strong>（15-14 の投稿前レビューで確定）: 時間帯ラベル = テキスト幅ピル + アクセントドット（上部中央）・見出し = 左アクセントバー・カウントダウン = アクセント色の円バッジ（直径 150）に白抜き・イラスト = 角丸 + 装飾色の縁取り・コーチのセリフ = 全カットで吹き出しに統一（動的 2〔<code>hook</code> / <code>hint</code>〕+ 固定文 2。16-2b で変更）</li>
   <li><strong>コーチ配置</strong>: 4 枚の不透明領域の和で共通矩形をトリミングし（相対サイズ・立ち位置を保存）、300 × 430 の枠へ contain してカード下端基準（下端から 140px）の右下に置く。カット間で大きさ・立ち位置が動かない</li>
   <li><strong>イラストブロックの 2 パス描画</strong>: 1 巡目はイラストなしで全カットを描いて<strong>最も低いテキスト下端を測り</strong>、2 巡目でテキスト下端 + 48px からコーチ上端 − 16px までの横長ブロックを全カット共通の位置に敷いて本描画する（カット間でイラストが動かず、吹き出しとカウントダウンだけが変わる）。ブロック高が 200px 未満になる場合は異常終了（テキスト過多の検知。版面から答え・解説が消えたため旧構成より発生しにくい）</li>
   <li><strong>テキストフィッティング</strong>: 実測幅による 1 文字ずつの折り返し + <strong>禁則処理</strong>（行頭の句読点・閉じ括弧、行末の開き括弧を分割位置の追い出しで回避。15-13 追加）。割当高さに収まるまでフォントを 2pt 刻みで縮小し、下限 30pt でも収まらなければ異常終了（フェイルラウド）</li>
@@ -176,7 +191,7 @@
 <tr><td>セグメント（8 本）</td><td>静止画入力（<code>-loop 1 -framerate 30 -t 尺</code>）→ 2 倍スーパーサンプリング → <code>zoompan</code>（<strong>全編通しの連続ズーム 1.0 → 1.04</strong>・中央固定・<code>s=1080x1920</code>・<code>fps=30</code>）→ <code>libx264</code> / <code>-crf 20</code> / <code>-preset medium</code>・映像のみ。<strong>連続ズーム</strong>: 版面固定によりセグメント境界のズームリセットが目に見えるため、各セグメントは全体 1.0→1.04 を経過時間で線形補間した区間（セグメント i の開始・終了倍率）を受け持つ（16-1 変更。旧実装は各セグメントが 1.0 始まり）</td></tr>
 <tr><td>連結</td><td>concat demuxer + <code>-c:v copy</code>（再エンコードなし）+ <code>+faststart</code>・全体 <code>-t 16</code></td></tr>
 <tr><td>BGM</td><td><code>-stream_loop -1</code> でループ入力し 16 秒でトリム。音量 1.0（前処理済み・-14 LUFS 前後）。<strong><code>afade=t=out</code>（st=15・d=1）を適用</strong>（素材は 20 秒尺のため前処理側の終端フェードがトリムで失われる。16-1 追加）</td></tr>
-<tr><td>SE: カウントダウンティック</td><td><code>adelay=8000</code>（考えるカット開始 = 8 秒地点から 5 打）・音量 −6 dB</td></tr>
+<tr><td>SE: カウントダウンティック</td><td><code>adelay=8000</code>（カウントダウンカット開始 = 8 秒地点から 5 打）・音量 −6 dB</td></tr>
 <tr><td>SE: 誘導チャイム</td><td><code>adelay=13000</code>（誘導カット開始 = 13 秒地点。「答えはキャプションへ」の注意喚起として <code>answer_chime.m4a</code> を再利用）・音量 −3 dB</td></tr>
 <tr><td>ミックス</td><td><code>amix=inputs=3:normalize=0</code>（自動正規化を切り、前処理済みラウドネスを保つ）→ 16 秒トリム → <strong>AAC 再エンコード</strong>（ミックスするため kenburns の <code>-c:a copy</code> は使えない）</td></tr>
 <tr><td>タイムアウト・検査</td><td>各 ffmpeg 呼び出し 600 秒。非ゼロ終了・タイムアウトは stderr 末尾 500 字を ERROR ログに出して送出。空ファイル出力も異常終了</td></tr>

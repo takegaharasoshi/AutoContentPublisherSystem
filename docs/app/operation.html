@@ -318,11 +318,20 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   </ul>
 </div>
 
+<h4>資材置き場: <code>content/quiz-stock/</code>（git 管理。16-2b で明文化）</h4>
+<p>執筆・検証・投入の資材は<strong>リポジトリの <code>content/quiz-stock/&lt;set_code&gt;/&lt;バッチ名&gt;/</code></strong>（例: <code>content/quiz-stock/logic-training-1/2026-08-initial/</code> = 16-2 初期整備の参照実装）に置き、git 管理する。ルール:</p>
+<ul>
+  <li><strong>バッチ単位に自己完結</strong>: 単一ソース <code>stock_items.py</code>・機械検証 <code>validate.py</code> / <code>verify_logic.py</code>・生成 <code>generate.py</code>・リサーチ証跡 <code>research*.md</code>（<code>source_note</code> が参照する出典台帳）・投入した <code>insert_quiz_stock.sql</code> の一式を 1 バッチディレクトリに収める。補充時は最新バッチの一式を新しいバッチディレクトリ（<code>2026-08-w3</code> 等）へコピーして同じ流れを回す</li>
+  <li><strong>投入完了時にディレクトリごとコミット</strong>する（手順 4 の完了とセット）</li>
+  <li><code>review.md</code> は <code>generate.py</code> の派生物のため <strong>gitignore 済み・コミットしない</strong>（<code>content/**/review.md</code>）</li>
+  <li><code>plans/</code> は使い捨てスクラッチ用であり、ストック資材は置かない（16-2 完了時のユーザー指示。作業ディレクトリ <code>plans/16-2-stock/</code> を <code>content/</code> へ移設して恒久化した経緯）</li>
+</ul>
+
 <h4>手順 1: リサーチ（Codex 委譲）</h4>
 <p>Web 検索で定番・古典問題（面接パズル・論理パズル・フェルミ推定）を収集する。<strong>Codex に委譲</strong>し（16-1 のユーザー決定。CLAUDE.md の Codex 連携ルール）、成果物は<strong>「出典 URL・問題の類型・解法構造の要約」まで</strong>とする — 文面の転載はさせない（上記ガイドライン）。収集時にセットのスロット構成（型 × 難度）に合わせた内訳を指定する。</p>
 
 <h4>手順 2: 表現書き直し・content_fields 案の作成（Claude Code）</h4>
-<p>リサーチ結果を元に、Claude Code が著作権ガイドラインに沿って全フィールドを執筆する。文体・題材の条件は <code>prompt_configs.prompt_text</code> の執筆ガイド（<a href="sets/logic-training-1.html">セット別設計書セクション 4</a>。生成チェーン休止後もストック執筆ガイドとして有効）に従い、文字数上限は方式のフィールド仕様（<a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）を守る。<code>hook</code> はカット 1 の吹き出しとキャプション冒頭を兼ねる<strong>つかみコピー</strong>として執筆する（固定文にしない）。</p>
+<p>リサーチ結果を元に、Claude Code が著作権ガイドラインに沿って全フィールドを執筆する。文体・題材の条件は <code>prompt_configs.prompt_text</code> の執筆ガイド（<a href="sets/logic-training-1.html">セット別設計書セクション 4</a>。生成チェーン休止後もストック執筆ガイドとして有効）に従い、文字数上限は方式のフィールド仕様（<a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）を守る。<code>hook</code> はカット 1 の吹き出しとキャプション冒頭を兼ねる<strong>つかみコピー</strong>として執筆する（固定文にしない）。L3（フェルミ推定）は<strong>捻った分解型を標準・解説は 5 ステップ構造・<code>explanation</code> は 240 字上限</strong>で書く（2026-08-07 決定 = <a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a> の decision。執筆の勘所はスキル <code>/quiz-stock-replenish</code> の昼 L3 節）。</p>
 
 <h4>手順 3: 人間レビュー</h4>
 <p>投入前にユーザーがレビューする。観点: <strong>①誤答チェック（答え・解説の正しさ。実行時の検証チェーンはないため、ここが誤答リスク対策の唯一の砦）</strong> ②表現の独自性（書き直しが十分か・上記ガイドライン準拠）③既存ストック・出題履歴との重複（同じ解法構造の問題が近接しないか）④フォーマット適合（文字数・L3 の幅表現「約〇〇（目安）」・トーン）。</p>
