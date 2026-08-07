@@ -306,7 +306,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 </ul>
 
 <h3 id="quiz-stock-mgmt">問題ストックの調達・書き直し・投入（gpt-quiz-multicut 方式のセットのみ。Phase 16-1 新設）</h3>
-<p>クイズの出題は<strong>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>。<a href="data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）からの取得のみ</strong>で行う（16-1 のユーザー決定。実行時の LLM 問題生成は休止）。ストックは音源と同じ「調達 → 前処理（書き直し）→ 投入 → ローテーション」の型で運用する。取得は型・難度で絞った LRU 順繰りで、<strong>未使用を使い切ったら最古使用分を自動で再利用する</strong>ため在庫切れで投稿は止まらないが、再利用は WARNING ログが出る（補充遅延のサイン）。</p>
+<p>クイズの出題は<strong>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>。<a href="data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）からの取得のみ</strong>で行う（16-1 のユーザー決定。実行時の LLM 問題生成は休止）。ストックは音源と同じ「調達 → 前処理（書き直し）→ 投入 → ローテーション」の型で運用する。16-2 の初期整備で確立した執筆・レビューの勘所（スロット別の題材選定・つかみ / イラストの NG 集・検証スクリプトの使い方）は Claude Code スキル <code>/quiz-stock-replenish</code>（<code>.claude/skills/quiz-stock-replenish/</code>）に集約済みで、週次補充はこのスキルを起点に下記手順 1〜4 を回す。取得は型・難度で絞った LRU 順繰りで、<strong>未使用を使い切ったら最古使用分を自動で再利用する</strong>ため在庫切れで投稿は止まらないが、再利用は WARNING ログが出る（補充遅延のサイン）。</p>
 
 <div class="decision">
   <span class="callout-title">著作権ガイドライン（2026-08-01、Phase 16-1）: 定番・古典問題は「アイデアを借りて表現を書き直す」</span>
