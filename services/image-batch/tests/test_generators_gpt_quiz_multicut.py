@@ -268,7 +268,8 @@ def test_render_cards_assigns_coaches_and_bubble_text(
         coach = args[1]
         bubble = args[2]
         calls.append((coach, bubble, countdown))
-        return f"{bubble}:{countdown}".encode(), 500
+        stamp = f"{bubble}:{countdown}".encode()
+        return quiz._CardLayers(b"base", b"layer", stamp), 500
 
     monkeypatch.setattr(quiz, "_decode_illustration", lambda content: object())
     monkeypatch.setattr(quiz, "_trim_coaches", lambda values: values)
@@ -297,14 +298,19 @@ def test_render_cards_assigns_coaches_and_bubble_text(
     ]
     assert [entry[2] for entry in actual[2:7]] == [5, 4, 3, 2, 1]
     assert len(timeline) == 8
-    assert cuts == [timeline[0], timeline[1], timeline[2], timeline[7]]
+    assert cuts == [
+        timeline[0].composite,
+        timeline[1].composite,
+        timeline[2].composite,
+        timeline[7].composite,
+    ]
 
 
 def test_zoompan_interpolates_continuous_segment_ranges() -> None:
-    first = quiz._zoompan_filter(0, 4, "v", start_seconds=0)
-    second = quiz._zoompan_filter(0, 4, "v", start_seconds=4)
-    countdown = quiz._zoompan_filter(0, 1, "v", start_seconds=8)
-    guidance = quiz._zoompan_filter(0, 3, "v", start_seconds=13)
+    first = quiz._zoompan_filter("comp", 4, "v", start_seconds=0)
+    second = quiz._zoompan_filter("comp", 4, "v", start_seconds=4)
+    countdown = quiz._zoompan_filter("comp", 1, "v", start_seconds=8)
+    guidance = quiz._zoompan_filter("comp", 3, "v", start_seconds=13)
     assert "1.00000+0.01000*on/119" in first
     assert "1.01000+0.01000*on/119" in second
     assert "1.02000+0.00250*on/29" in countdown
@@ -322,7 +328,8 @@ def test_build_video_uses_new_audio_timing_and_fade(
         Path(command[-1]).write_bytes(b"mp4")
 
     monkeypatch.setattr(quiz.subprocess, "run", run)
-    result = quiz._build_video([b"png"] * 8, b"bgm", b"tick", b"chime")
+    cards = [quiz._CardLayers(b"base", b"layer", b"comp")] * 8
+    result = quiz._build_video(cards, b"bgm", b"tick", b"chime")
     assert result == b"mp4"
     assert len(commands) == 9
     final = commands[-1]
@@ -334,6 +341,43 @@ def test_build_video_uses_new_audio_timing_and_fade(
     assert final[final.index("-t") + 1] == "16"
     assert final[final.index("-c:v") + 1] == "copy"
     assert final[final.index("-c:a") + 1] == "aac"
+
+
+def test_build_video_bounces_coach_layer_on_bubble_changes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    commands: list[list[str]] = []
+
+    def run(command: list[str], **kwargs: object) -> None:
+        del kwargs
+        commands.append(command)
+        Path(command[-1]).write_bytes(b"mp4")
+
+    monkeypatch.setattr(quiz.subprocess, "run", run)
+    cards = [quiz._CardLayers(b"base", b"layer", b"comp")] * 8
+    quiz._build_video(cards, b"bgm", b"tick", b"chime")
+    segment_filters = [
+        command[command.index("-filter_complex") + 1]
+        for command in commands[:8]
+    ]
+    for index, filters in enumerate(segment_filters):
+        amplitude = quiz.CUT_BOUNCE_AMPLITUDES[index]
+        assert "overlay=x=0" in filters
+        if amplitude:
+            assert f"y='-{amplitude}*exp(" in filters
+        else:
+            assert "y=0" in filters
+
+
+def test_large_bounces_align_with_existing_sound_effects() -> None:
+    large = [
+        index
+        for index, amplitude in enumerate(quiz.CUT_BOUNCE_AMPLITUDES)
+        if amplitude == quiz.BOUNCE_LARGE_AMPLITUDE_PIXELS
+    ]
+    assert large == [2, 7]
+    assert sum(quiz.CUT_DURATIONS[:2]) * 1000 == quiz.TICK_DELAY_MILLISECONDS
+    assert sum(quiz.CUT_DURATIONS[:7]) * 1000 == quiz.CHIME_DELAY_MILLISECONDS
 
 
 def test_generate_consumes_stock_and_stages_snapshot(

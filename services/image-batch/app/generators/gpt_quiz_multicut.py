@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 import subprocess
 import tempfile
-from typing import Any
+from typing import Any, NamedTuple
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
@@ -69,6 +69,25 @@ CUT_DURATIONS = (
     COUNTDOWN_DURATION_SECONDS,
     COUNTDOWN_DURATION_SECONDS,
     GUIDANCE_DURATION_SECONDS,
+)
+
+# コーチ + 吹き出しレイヤーのバウンド演出。吹き出しの内容が変わった直後に
+# 減衰ホップで視線を誘導する。大バウンドの 2 箇所（ヒント登場・答え誘導）は
+# 既存 SE（tick = 8 秒 / chime = 13 秒）とカット頭が一致し、音と同期する
+BOUNCE_LARGE_AMPLITUDE_PIXELS = 150
+BOUNCE_SMALL_AMPLITUDE_PIXELS = 34
+BOUNCE_DURATION_SECONDS = 1.0
+BOUNCE_FREQUENCY_HZ = 1.6
+BOUNCE_DECAY_PER_SECOND = 3.0
+CUT_BOUNCE_AMPLITUDES = (
+    0,  # フック: 冒頭は静止で始める
+    BOUNCE_SMALL_AMPLITUDE_PIXELS,  # 考える切替
+    BOUNCE_LARGE_AMPLITUDE_PIXELS,  # ヒント登場（カウントダウン開始）
+    0,
+    0,
+    0,
+    0,
+    BOUNCE_LARGE_AMPLITUDE_PIXELS,  # 答えへの誘導
 )
 
 BGM_VOLUME = 1.0
@@ -717,14 +736,14 @@ def _paste_coach(
     coach: Image.Image,
     safe: tuple[int, int, int, int],
 ) -> None:
-    """Fit and paste a transparent coach pose at the bottom of the safe area."""
+    """Fit and composite a coach pose onto the transparent overlay layer."""
     _, _, right, bottom = safe
     # アセットは 4 表情共通のキャンバス（下端中央そろえ）のため、
     # トリミングせずそのまま収めてカット間で大きさ・立ち位置を動かさない
     fitted = ImageOps.contain(coach, COACH_BOX, Image.Resampling.LANCZOS)
     x = right - fitted.width - CARD_PADDING
     y = _coach_top(bottom) + (COACH_BOX[1] - fitted.height)
-    canvas.paste(fitted, (x, y), fitted)
+    canvas.alpha_composite(fitted, (x, y))
 
 
 def _coach_top(safe_bottom: int) -> int:
@@ -803,10 +822,18 @@ def _draw_speech_bubble(
 
 
 def _encode_png(image: Image.Image) -> bytes:
-    """Encode one RGB card as PNG."""
+    """Encode one card layer as PNG."""
     output = BytesIO()
     image.save(output, format="PNG")
     return output.getvalue()
+
+
+class _CardLayers(NamedTuple):
+    """One timeline cut, split for the bounce overlay plus its composite."""
+
+    base: bytes
+    layer: bytes
+    composite: bytes
 
 
 def _render_card(
@@ -820,7 +847,7 @@ def _render_card(
     illustration_box: tuple[int, int, int, int] | None,
     *,
     countdown: int | None = None,
-) -> tuple[bytes, int]:
+) -> tuple[_CardLayers, int]:
     """Render the shared layout with only cut-specific details changed."""
     image, draw, safe = _base_card(palette, slot_label, fonts)
     left, top, right, _ = safe
@@ -864,9 +891,19 @@ def _render_card(
         _paste_illustration(
             image, illustration, illustration_box, palette["decoration"]
         )
-    _draw_speech_bubble(draw, bubble_text, fonts, palette, safe)
-    _paste_coach(image, coach, safe)
-    return _encode_png(image), content_bottom
+    # コーチ + 吹き出しは ffmpeg 側でバウンドさせるため透過レイヤーへ分離する
+    layer = Image.new("RGBA", (OUTPUT_WIDTH, OUTPUT_HEIGHT), (0, 0, 0, 0))
+    _draw_speech_bubble(
+        ImageDraw.Draw(layer), bubble_text, fonts, palette, safe
+    )
+    _paste_coach(layer, coach, safe)
+    composite = Image.alpha_composite(image.convert("RGBA"), layer)
+    card = _CardLayers(
+        base=_encode_png(image),
+        layer=_encode_png(layer),
+        composite=_encode_png(composite.convert("RGB")),
+    )
+    return card, content_bottom
 
 
 def _render_cards(
@@ -876,7 +913,7 @@ def _render_cards(
     illustration_png: bytes,
     coaches: dict[str, Image.Image],
     fonts: dict[str, Path],
-) -> tuple[list[bytes], list[bytes]]:
+) -> tuple[list[_CardLayers], list[bytes]]:
     """Render eight fixed-layout timeline cards and four cut leaders."""
     palette = SLOT_PALETTES[slot_code]
     illustration = _decode_illustration(illustration_png)
@@ -950,12 +987,34 @@ def _render_cards(
     )
     return (
         [cut1, cut2, *countdown_cards, cut4],
-        [cut1, cut2, countdown_cards[0], cut4],
+        [
+            cut1.composite,
+            cut2.composite,
+            countdown_cards[0].composite,
+            cut4.composite,
+        ],
+    )
+
+
+def _bounce_overlay_filter(amplitude: int, output: str) -> str:
+    """Composite the coach layer, hopping with decay right after the cut in.
+
+    y は「基準位置からの持ち上げ量」を減衰サインの絶対値で与える。exp 減衰
+    があるため見かけの最大ホップは amplitude より低く、初回ホップのピークは
+    amplitude * exp(-decay / (4 * frequency)) になる。
+    """
+    if amplitude <= 0:
+        return f"[0:v][1:v]overlay=x=0:y=0[{output}]"
+    return (
+        f"[0:v][1:v]overlay=x=0:"
+        f"y='-{amplitude}*exp(-{BOUNCE_DECAY_PER_SECOND}*t)*"
+        f"abs(sin(2*PI*{BOUNCE_FREQUENCY_HZ}*t))*"
+        f"between(t,0,{BOUNCE_DURATION_SECONDS})'[{output}]"
     )
 
 
 def _zoompan_filter(
-    input_index: int,
+    input_label: str,
     duration: int,
     output: str,
     start_seconds: int = 0,
@@ -972,7 +1031,7 @@ def _zoompan_filter(
     )
     segment_delta = segment_end - segment_start
     return (
-        f"[{input_index}:v]"
+        f"[{input_label}]"
         f"scale={OUTPUT_WIDTH * SUPERSAMPLE_FACTOR}:"
         f"{OUTPUT_HEIGHT * SUPERSAMPLE_FACTOR},"
         f"zoompan=z='{segment_start:.5f}+{segment_delta:.5f}*on/"
@@ -1001,7 +1060,7 @@ def _run_ffmpeg(command: list[str], phase: str) -> None:
 
 
 def _build_video(
-    cards: list[bytes],
+    cards: list[_CardLayers],
     bgm: bytes,
     tick: bytes,
     chime: bytes,
@@ -1011,11 +1070,13 @@ def _build_video(
         raise RuntimeError("Quiz video requires exactly eight cards")
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
-        card_paths: list[Path] = []
-        for index, content in enumerate(cards):
-            path = temp_path / f"card-{index}.png"
-            path.write_bytes(content)
-            card_paths.append(path)
+        card_paths: list[tuple[Path, Path]] = []
+        for index, card in enumerate(cards):
+            base_path = temp_path / f"card-{index}-base.png"
+            base_path.write_bytes(card.base)
+            layer_path = temp_path / f"card-{index}-layer.png"
+            layer_path.write_bytes(card.layer)
+            card_paths.append((base_path, layer_path))
         audio_paths = [
             temp_path / "bgm.m4a",
             temp_path / "tick.m4a",
@@ -1024,10 +1085,24 @@ def _build_video(
         for path, content in zip(audio_paths, (bgm, tick, chime)):
             path.write_bytes(content)
         segment_paths: list[Path] = []
-        for index, (card_path, duration) in enumerate(
+        for index, ((base_path, layer_path), duration) in enumerate(
             zip(card_paths, CUT_DURATIONS)
         ):
             segment_path = temp_path / f"segment-{index}.mp4"
+            # ズーム前に等倍座標で overlay し、バウンド量もズームに追従させる
+            segment_filters = ";".join(
+                (
+                    _bounce_overlay_filter(
+                        CUT_BOUNCE_AMPLITUDES[index], "comp"
+                    ),
+                    _zoompan_filter(
+                        "comp",
+                        duration,
+                        "v",
+                        start_seconds=sum(CUT_DURATIONS[:index]),
+                    ),
+                )
+            )
             segment_command = [
                 FFMPEG_BINARY,
                 "-y",
@@ -1040,14 +1115,17 @@ def _build_video(
                 "-t",
                 str(duration),
                 "-i",
-                str(card_path),
+                str(base_path),
+                "-loop",
+                "1",
+                "-framerate",
+                str(OUTPUT_FPS),
+                "-t",
+                str(duration),
+                "-i",
+                str(layer_path),
                 "-filter_complex",
-                _zoompan_filter(
-                    0,
-                    duration,
-                    "v",
-                    start_seconds=sum(CUT_DURATIONS[:index]),
-                ),
+                segment_filters,
                 "-map",
                 "[v]",
                 "-an",
