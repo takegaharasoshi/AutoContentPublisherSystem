@@ -56,7 +56,7 @@ def fetch_unbuilt_items(connection: pymysql.connections.Connection) -> list[dict
     """Return active stock rows whose prebuilt video has not been registered."""
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT q.id, q.quiz_type, q.difficulty, q.question_text, "
+            "SELECT q.id, q.content_key, q.quiz_type, q.difficulty, q.question_text, "
             "q.answer_text, q.content_fields FROM quiz_stock_items q "
             "JOIN batch_sets b ON b.id = q.set_id "
             "WHERE b.set_code = %s AND q.is_active = 1 "
@@ -67,11 +67,12 @@ def fetch_unbuilt_items(connection: pymysql.connections.Connection) -> list[dict
     return [
         {
             "id": int(row[0]),
-            "quiz_type": str(row[1]),
-            "difficulty": str(row[2]),
-            "question_text": str(row[3]),
-            "answer_text": str(row[4]),
-            "content_fields": json.loads(row[5]) if isinstance(row[5], str) else row[5],
+            "content_key": str(row[1]),
+            "quiz_type": str(row[2]),
+            "difficulty": str(row[3]),
+            "question_text": str(row[4]),
+            "answer_text": str(row[5]),
+            "content_fields": json.loads(row[6]) if isinstance(row[6], str) else row[6],
         }
         for row in rows
     ]

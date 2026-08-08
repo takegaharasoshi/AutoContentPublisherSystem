@@ -95,7 +95,7 @@
 </div>
 
 <h2 id="fetch">5. 事前動画の取得</h2>
-<p>選定したストック行の <code>video_s3_key</code> から MP4 を取得する（<code>acps_shared.s3.get_object</code>）。キーの値はビルドツーリングが登録した <code>assets/{set_code}/prebuilt/{stock_item_id}.mp4</code>（命名規約は <a href="../data-model.html#s3-key">data-model.html セクション 5</a>。<strong>参照は常に DB カラム経由で行い、方式がキーを組み立てることはしない</strong> — <code>audio_assets.time_slot</code> と同じ「S3 プレフィックスは配置規約に留める」原則）。</p>
+<p>選定したストック行の <code>video_s3_key</code> から MP4 を取得する（<code>acps_shared.s3.get_object</code>）。キーの値はビルドツーリングが登録した <code>assets/{set_code}/prebuilt/{content_key}.mp4</code>（命名規約は <a href="../data-model.html#s3-key">data-model.html セクション 5</a>。ファイル名は環境非依存の業務キー <code>content_key</code> で組む — 16-3d 決定。<strong>参照は常に DB カラム経由で行い、方式がキーを組み立てることはしない</strong> — <code>audio_assets.time_slot</code> と同じ「S3 プレフィックスは配置規約に留める」原則）。</p>
 <ul>
   <li><strong>取得失敗（NoSuchKey・アクセスエラー）は異常終了</strong>（フェイルラウド。DB は「ビルド済み」なのに実体がない = DB と S3 の不整合であり、縮退して別の問題に差し替えることはしない）</li>
   <li>取得したバイト列をそのまま <code>MediaOutput</code> として返す。<strong>再エンコード・検査変換は行わない</strong>（形式はビルド時にレンダラーが保証し、全数レビューで確認済み）。寸法・尺のメタ情報は方式定数（1080x1920 / 16 秒）を記録する</li>
@@ -125,7 +125,7 @@
   <li><strong>イラスト生成（imagegen 委譲 + 3:2 センタークロップ）</strong>: 行の <code>illustration_scene</code> からイラストプロンプトを組み立て（<code>gpt-quiz-multicut</code> のコード側固定プロンプト〔情景 + スロット別ムード + ブランド配色 + 禁止事項 = <a href="gpt-quiz-multicut.html#illustration">同セクション 6</a>〕を移植し、<strong>画風 1 行を恒久追加</strong> = 下記 decision）、Codex 組み込み画像生成（imagegen）で生成する。imagegen は 3:2 の直接指定ができない（生成元 1672x941 等）ため、<strong>3:2 センタークロップ → 1536x1024 リサイズ</strong>の後処理を掛けて組版入力の縦横比を旧方式と一致させる</li>
   <li><strong>組版 + ffmpeg ビルド</strong>: <code>gpt_quiz_multicut.py</code> の<strong>レンダラー（Pillow 組版 + ffmpeg 合成。8 枚版面・連続ズーム・SE ディレイ・BGM トリム + afade）を import して流用</strong>する（作りは <a href="gpt-quiz-multicut.html#composition">同セクション 8〜9</a> を正とし、本書には重複記載しない）。BGM はスロット別 LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行う（セクション 6 の decision）。実行環境はホストに ffmpeg がないため <strong>image-batch の Docker イメージにリポジトリをマウントして実行</strong>する（16-3 のオフライン確認と同じ方法）</li>
   <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（+ イラスト・カット代表画像）を一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>イラスト再生成（imagegen 再試行）または情景修正（<code>illustration_scene</code> の書き直し → DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は operation.html セクション 3 の手順 5）</li>
-  <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{stock_item_id}.mp4</code> へアップロードし（イラスト原画 <code>{stock_item_id}_illustration.png</code> も再ビルド資産として併置。DB 記録なし）、<code>quiz_stock_items</code> の <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>（V006）を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する</li>
+  <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> へアップロードし（イラスト原画 <code>{content_key}_illustration.png</code> も再ビルド資産として併置。DB 記録なし）、<code>quiz_stock_items</code> の <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>（V006）を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する。Aurora 反映 SQL と S3 ファイル名のどちらも環境ローカルな <code>id</code> を使わない（安定キー = <code>set_code</code> + <code>question_text</code> と <code>content_key</code> で解決。<a href="../data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a> の V007 コールアウト）</li>
 </ol>
 <div class="decision">
   <span class="callout-title">決定（16-3b）: イラストは imagegen（Codex サブスク内）+ 画風指定行の恒久化</span>

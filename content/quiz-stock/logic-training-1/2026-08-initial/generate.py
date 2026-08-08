@@ -13,6 +13,9 @@ GROUPS = [
     ("L1", "deep", "夜 21:00(night)L1 とんち・水平思考・ひっかけ / deep"),
 ]
 
+# content_key の採番用: quiz_type × difficulty → slot_code(V007 で導入。data-model.html セクション 4.10)
+SLOT_CODES = {("L1", "light"): "morning", ("L3", "standard"): "noon", ("L1", "deep"): "night"}
+
 # ---------- review.md ----------
 lines = [
     "# 16-2 問題ストック初期整備: 42 問レビューシート(v2: 面白なぞなぞ路線)",
@@ -74,10 +77,25 @@ def esc(s: str) -> str:
     return s.replace("\\", "\\\\").replace("'", "''")
 
 
+def next_content_key_expr(slot_code: str) -> str:
+    """スロット内の既存最大連番 + 1 を適用時に解決する SQL 式を返す。
+
+    両環境が同一の content_key 集合を持つ(投入運用の不変条件)前提で、
+    ローカル / Aurora のどちらで実行しても同じ値に解決される。
+    派生テーブルを挟むのは INSERT 対象と同じテーブルの参照(ERROR 1093)を避けるため。
+    """
+    return (
+        f"(SELECT CONCAT('{slot_code}-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0'))"
+        f" FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id"
+        f" WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE '{slot_code}-%') t)"
+    )
+
+
 sql = [
     "-- 16-2 問題ストック初期投入(42 問。レビュー承認後に実行)",
     "-- 生成元: plans/16-2-stock/stock_items.py(単一ソース)。適用先: ローカル MySQL / Aurora(acps)",
     "-- set_id は set_code から解決するため両環境共通で実行できる。",
+    "-- content_key はスロット内の既存最大連番 + 1 を適用時に解決する(V007。両環境で同一値になる)。",
     "",
 ]
 for it in ITEMS:
@@ -93,10 +111,13 @@ for it in ITEMS:
         "illustration_scene": it["illustration_scene"],
     }
     cf_json = json.dumps(cf, ensure_ascii=False, separators=(",", ":"))
+    slot_code = SLOT_CODES[(it["quiz_type"], it["difficulty"])]
     sql += [
         f"-- {it['no']}",
-        "INSERT INTO quiz_stock_items (set_id, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)",
-        f"VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'), '{it['quiz_type']}', '{it['difficulty']}',",
+        "INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)",
+        f"VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),",
+        f"        {next_content_key_expr(slot_code)},",
+        f"        '{it['quiz_type']}', '{it['difficulty']}',",
         f"        '{esc(it['question'])}',",
         f"        '{esc(it['answer'])}',",
         f"        '{esc(cf_json)}',",

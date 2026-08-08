@@ -107,6 +107,7 @@ operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「
 ## 6. 投入(レビュー全問承認後)
 
 - `generate.py` が出力する `insert_quiz_stock.sql` を使用(set_id は `set_code` サブクエリ解決でローカル/Aurora 共通)
+- **`content_key`(`{slot_code}-{3 桁連番}`。V007 = 16-3d 決定)は generate.py の SQL がスロット内の既存最大連番 + 1 を適用時に解決する**。手動採番しない・両環境へ同じ SQL を適用する(NOT NULL のため採番漏れは投入時に必ずエラー)
 - 事前に Aurora の `quiz_items.summary` 全件と突合し、既出題と解法構造・題材が重複しないことを最終確認
 - ローカル: `docker exec -i acps-mysql mysql --default-character-set=utf8mb4 ...`(utf8mb4 指定必須)。事前にトランザクション + ROLLBACK でドライランする
 - Aurora: Data API(`aws rds-data execute-statement`)。auto mode classifier にブロックされる場合はユーザーに許可を求める
@@ -120,5 +121,5 @@ operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「
 2. **イラスト生成(Codex imagegen 委譲)**: `work/prompts/<id>.txt` の全文を渡し、imagegen で生成して `work/illustrations_raw/<id>.png` へ保存させる。**「?」以外の文字・数字・記号の混入を Codex 自身に確認させ、混入時は再生成」を指示に含める**(1 問通し確認でも初回混入 → 再生成が実際に発生した)
 3. **取り込み → ビルド**: `intake.py` → `build.py`。build.py は Docker 実行(README の docker run 例が動作確認済みの形: `~/.aws` 読み取りマウント + `LOCAL_DB_HOST=host.docker.internal` + `--user $(id -u):$(id -g)`)。イラスト未配置の行は自動スキップされるので部分ビルドでよい
 4. **全数人間レビュー**: `review_sheet.py` → `work/review.html`。観点はイラスト(文字混入・画風・情景適合)・版面・音。NG は imagegen 再試行または `illustration_scene` 修正(DB 更新)→ 再ビルド
-5. **配置**: 承認 id を `approved.txt` に列挙 → `publish.py --dry-run` で `upload_prebuilt.sh` / `update_prebuilt.sql` を確認 → 本実行(S3 アップロード + ローカル MySQL 反映)→ Aurora へ `work/update_prebuilt.sql` を Data API で適用。**Aurora SQL は安定キー(set_code + question_text・BGM は s3_key)で解決する形式**(ローカルと Aurora で AUTO_INCREMENT id が一致しないため。id 直指定の SQL を作らない)。適用後は更新行数 = 承認件数を確認
+5. **配置**: 承認 id を `approved.txt` に列挙 → `publish.py --dry-run` で `upload_prebuilt.sh` / `update_prebuilt.sql` を確認 → 本実行(S3 アップロード + ローカル MySQL 反映)→ Aurora へ `work/update_prebuilt.sql` を Data API で適用。**Aurora SQL は安定キー(set_code + question_text・BGM は s3_key)で解決する形式・S3 ファイル名も id ではなく `content_key`**(ローカルと Aurora で AUTO_INCREMENT id が一致しないため。id 直指定の SQL・id 入りの S3 キーを作らない)。適用後は更新行数 = 承認件数を確認
 6. **締め**: 在庫確認クエリ拡張版で `unbuilt` = 0 を確認し、ツール・台帳の変更をコミット

@@ -542,7 +542,7 @@ LIMIT 1;</code></pre>
   <table>
     <thead><tr><th>カラム</th><th>役割</th></tr></thead>
     <tbody>
-      <tr><td><code>video_s3_key</code></td><td><code>VARCHAR(512) NULL</code>。事前動画マスターの S3 キー（<code>assets/{set_code}/prebuilt/{stock_item_id}.mp4</code>。セクション 5）。<strong>NULL = 未ビルト（実行時の出題候補から除外）</strong>。方式はキーを組み立てず常に本カラム経由で参照する（<code>audio_assets.time_slot</code> と同じ「S3 プレフィックスは配置規約に留める」原則）</td></tr>
+      <tr><td><code>video_s3_key</code></td><td><code>VARCHAR(512) NULL</code>。事前動画マスターの S3 キー（<code>assets/{set_code}/prebuilt/{content_key}.mp4</code>。セクション 5。キーの構成要素は 16-3d 決定の <code>content_key</code> — 下記 V007 コールアウト）。<strong>NULL = 未ビルト（実行時の出題候補から除外）</strong>。方式はキーを組み立てず常に本カラム経由で参照する（<code>audio_assets.time_slot</code> と同じ「S3 プレフィックスは配置規約に留める」原則）</td></tr>
       <tr><td><code>video_audio_asset_id</code></td><td><code>BIGINT UNSIGNED NULL</code>。ビルド時に選曲しベイクした BGM（<code>audio_assets</code>）への参照。セクション 3 のパターンに従い <code>(set_id, video_audio_asset_id) → audio_assets(set_id, id)</code> の複合 FK。実行時に <code>generated_media.audio_asset_id</code> へ転記され、投稿 → 曲の特定クエリ（ミュート検知 = <a href="operation.html#mute-check">operation.html セクション 4.4</a>）を無変更で成立させる</td></tr>
       <tr><td><code>video_built_at</code></td><td><code>DATETIME NULL</code>。ビルド日時（UTC）。版面・仕様改訂時に「改訂前ビルドの行」を特定して再ビルド対象を選ぶための識別（<code>updated_at</code> は他更新でも動くため専用に持つ）</td></tr>
     </tbody>
@@ -556,6 +556,28 @@ LIMIT 1;</code></pre>
   </ul>
 </div>
 
+<div class="decision">
+  <span class="callout-title">決定（2026-08-08、Phase 16-3d）: 環境非依存の業務キー content_key を追加し、事前動画の S3 キーをこれに揃える（V007 / V008）</span>
+  16-3d の 42 問配置直前に、事前動画の S3 キー旧規約 <code>assets/{set_code}/prebuilt/{stock_item_id}.mp4</code> の欠陥が判明した。
+  <code>quiz_stock_items.id</code> は <strong>AUTO_INCREMENT の環境ローカルな代理キー</strong>で、投入 SQL は id を明示しないため、同じ 42 問がローカル MySQL で 85〜126・Aurora で 1〜42 と食い違っており、
+  S3 のファイル名がローカル環境でしか通用しない番号を騙る（id を揃えても次回補充で再びズレるため同期は解決にならない）。
+  これを受け、<strong>人間可読の業務キー <code>content_key</code></strong> を新設し、S3 キーの構成要素とする。
+  <div class="table-wrap" style="margin:.4rem 0 0;">
+  <table>
+    <thead><tr><th>カラム</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>content_key</code></td><td><code>VARCHAR(64) NOT NULL</code>。環境非依存の業務キー。<strong><code>{slot_code}-{3 桁連番}</code></strong>（例: <code>morning-001</code>）。<code>UNIQUE (set_id, content_key)</code> でセット内一意。<strong>投入時に採番し、ローカル MySQL と Aurora へ同じ値を入れる</strong>（投入 SQL はスロット内の既存最大連番 + 1 を適用時に解決する形式 — 両環境が同一のキー集合を持つ限り同じ値になる）。連番は取り下げ（<code>is_active=0</code>）後も再利用しない</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul style="margin:.3rem 0 0;">
+    <li>S3 キーは <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> へ改訂（セクション 5）。スロット名が先頭に来るため 1 階層でも朝 / 昼 / 夜ごとに固まって整列する</li>
+    <li>セット接頭辞は付けない（S3 パスと <code>set_id</code> の両方に既にセット情報があるため冗長）。スロットのサブフォルダも作らない（名前で足りる）</li>
+    <li>適用は <strong>V007（NULL 可で追加 + UNIQUE）→ 既存行バックフィル（<code>content/quiz-stock/logic-training-1/2026-08-initial/backfill_content_key.sql</code>。安定キー = <code>set_code</code> + <code>question_text</code> で両環境へ同一ファイルを適用）→ V008（NOT NULL 化）</strong>の 3 段。NOT NULL 化により採番漏れの投入は ERROR 1364 で必ず失敗する（静かに進行しない）</li>
+    <li><code>id</code> は環境ローカルな代理キーのまま残す（再採番はしない。FK・LRU の同値順・ビルドツーリングの中間生成物のファイル名はローカル id のままでよい）</li>
+  </ul>
+</div>
+
 <h2 id="s3-key">5. S3 キー設計</h2>
 <div class="decision">
   <span class="callout-title">決定: S3 キー命名規約（Phase 14-4 で動画・音源、Phase 15-5 で SE・固定アセットを追加）</span>
@@ -566,8 +588,9 @@ audio/{set_code}/{ファイル名}.m4a                                          
 audio/{set_code}/{morning|noon|night}/{ファイル名}.m4a                                            … 時間帯スロット別 BGM（同上。15-8 追加。下記注記）
 audio/{set_code}/se/{固定ファイル名}.m4a                                                         … 効果音 SE（audio_assets.s3_key、asset_type='se'。15-5 追加）
 assets/{set_code}/{固定ファイル名}.png                                                           … 固定アセット（キャラポーズ画像等。DB 管理なし。15-5 追加）
-assets/{set_code}/prebuilt/{stock_item_id}.mp4                                                   … 事前ビルド済み動画マスター（quiz_stock_items.video_s3_key が参照。16-3b 追加）
-assets/{set_code}/prebuilt/{stock_item_id}_illustration.png                                      … 事前動画のイラスト原画（再ビルド資産。DB 記録なし。16-3b 追加）</code></pre>
+assets/{set_code}/prebuilt/{content_key}.mp4                                                     … 事前ビルド済み動画マスター（quiz_stock_items.video_s3_key が参照。16-3b 追加・16-3d でキーを content_key に改訂）
+assets/{set_code}/prebuilt/{content_key}_illustration.png                                        … 事前動画のイラスト原画（再ビルド資産。DB 記録なし。16-3b 追加）</code></pre>
+<p>事前動画のファイル名に <code>quiz_stock_items.id</code> は使わない（AUTO_INCREMENT はローカル MySQL と Aurora で値が一致しない環境ローカルなキーのため。<code>content_key</code> の設計はセクション 4.10 の V007 コールアウト）。</p>
   <ul style="margin:.3rem 0 0;">
     <li><code>{set_code}</code> は <code>SET_CODE</code> 環境変数（<code>batch_sets.set_code</code>）</li>
     <li><code>{YYYYMMDD}</code> は <code>generation_runs.scheduled_at</code>（UTC）の日付部分。日付プレフィックスにより S3 コンソール・CLI での目視確認や範囲指定操作がしやすくなる</li>

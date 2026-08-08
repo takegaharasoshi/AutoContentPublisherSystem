@@ -56,7 +56,7 @@ def _stock_row(
         "日本にある信号機の数を推定してください。",
         "約20万基（目安）",
         json.dumps(fields or _fields(), ensure_ascii=False),
-        "assets/logic-training-1/prebuilt/91.mp4",
+        "assets/logic-training-1/prebuilt/noon-007.mp4",
         audio_asset_id,
         last_used_at,
     )
@@ -119,7 +119,7 @@ def test_generate_fetches_prebuilt_video_and_stages_history_and_lru(
     assert result.media[0].audio_asset_id == 77
     assert result.intermediates == []
     get_object.assert_called_once_with(
-        "bucket", "assets/logic-training-1/prebuilt/91.mp4", client=context.s3_client
+        "bucket", "assets/logic-training-1/prebuilt/noon-007.mp4", client=context.s3_client
     )
     queries = [call[0] for call in cursor.calls]
     assert "video_s3_key IS NOT NULL" in queries[0]

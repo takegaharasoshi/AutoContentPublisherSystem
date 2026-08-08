@@ -138,6 +138,7 @@ def main() -> None:
             manifest[str(item["id"])] = {
                 "audio_asset_id": bgm_id,
                 "bgm_s3_key": bgm_s3_key,
+                "content_key": item["content_key"],
                 "question_text": item["question_text"],
                 "slot_code": slot["slot_code"],
             }

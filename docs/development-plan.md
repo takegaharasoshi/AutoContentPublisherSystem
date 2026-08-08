@@ -365,9 +365,10 @@
   - 内容: 16-3b の設計を実装する。新方式 generator + テスト・V006 の DDL 作成（採用時。適用は 16-3d 冒頭にローカル & Aurora）・事前ビルドツーリング（イラスト取り込み・一括ビルド・レビューシート生成・S3 アップロード・DB 反映）・週次補充スキルの手順拡張
   - 確認条件: pytest 全パス + ビルドツーリングの 1 問通し確認（imagegen イラスト → MP4 → S3 アップロード → 新方式のローカル動作）
   - 備考: 2026-08-08 完了（実装 = Codex `gpt-5.6-terra` / high・指示書 + レビュー + 通し確認 = Fable 5）。generator `quiz_prebuilt.py` + ユニットテスト 6 件・`V006__prebuilt_video.sql`・ビルドツーリング 5 本 + README（`content/video-build/logic-training-1/`）・スキル手順拡張を実装、pytest 全パス（image-batch 104 + sns-post-batch 108）。レビューで blocker 1 件（Aurora 反映 SQL の id 直指定 = 環境間で AUTO_INCREMENT 不一致）を安定キー方式（set_code + question_text・BGM は s3_key）へ修正。1 問通し確認（id=100・昼）を imagegen → Docker ビルド → S3 配置 → 実行時ローカル動作まで完走。**V006 はローカル MySQL へ前倒し適用済み**（通し確認に必要なため。Aurora は 16-3d 冒頭のまま）。詳細は [development-log.md](development-log.md) の 16-3c を参照
-- [ ] **16-3d** 初期 42 問の動画ビルドとレビュー・配置
+- [x] **16-3d** 初期 42 問の動画ビルドとレビュー・配置
   - 内容: ツーリングで 42 問分をビルドする。imagegen で 42 枚のイラスト生成 → 動画一括ビルド → 人間レビュー（全数。NG はイラスト再生成または情景修正で再ビルド）→ S3 配置 → DB 反映。V006 採用時は冒頭で両環境へ適用
   - 確認条件: 42 問すべての事前動画が S3 に配置され、在庫確認クエリ（拡張版）でビルド済み 42/42 を確認できる
+  - 備考: 2026-08-08 完了（進行 = Opus 5 / S3 キー規約改訂の設計 Fix 以降 = Fable 5・イラスト一括生成 = Codex imagegen 委譲）。V006 を Aurora へ適用（定義一致裏取り）→ イラスト 42 枚生成（id=87 の `illustration_scene` に文字描画指示の不備を発見し修正・再生成。禁止事項自体は 42 枚規模で有効）→ 42 問ビルド → **全数人間レビュー全問 OK** → S3 84 オブジェクト配置 + 両環境 DB 反映。**配置直前に S3 キー規約の欠陥（`{stock_item_id}` = 環境ローカルな AUTO_INCREMENT でローカル 85〜126 / Aurora 1〜42 と不一致）が判明し、業務キー `content_key`（`{slot_code}-{3 桁連番}`・`UNIQUE (set_id, content_key)`・V007 / V008 + 両環境バックフィル）を導入してキーを `assets/{set_code}/prebuilt/{content_key}.mp4` へ改訂**（16-3b 決定の改訂。投入 SQL は既存最大連番 + 1 の適用時解決へ拡張）。検証: 両環境 42 行の `content_key` / `video_s3_key` 完全一致・在庫クエリ拡張版 `unbuilt` 0 / `unused_built` 42・実行時パス（LRU → 新キー S3 取得 → `quiz_items` INSERT → ロールバック）・pytest 全パス（104 + 108）。詳細は [development-log.md](development-log.md) の 16-3d を参照
 - [ ] **16-4** 投稿前レビューと切替（15-14 パターン)
   - 内容: デプロイ後、手動実行で新フォーマットの動画 + キャプションを投稿前レビュー → 実投稿確認 → 3 スロットの定時実行確認。**切替日を記録し前後比較の基準点とする**。切替時の Aurora 反映: ①`caption_templates` のプレースホルダ版への差し替え（[セット別設計書セクション 5](app/sets/logic-training-1.html)）②`prompt_configs` の `slot_label` 改名（「朝 / 昼 / 夜の脳みそトレ」= 16-3 ユーザーレビュー決定。ローカルは適用済み）③**`batch_sets.generator_name` の新方式への切替**（2026-08-08 仕様変更。事前動画は 16-3d で配置済みが前提）④生成スケジュール 3 本の再有効化（08-06 障害対応で CDK `enabled: false` 中）
 - [ ] **16-5** 効果検証（手動インサイト前後比較）

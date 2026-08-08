@@ -337,7 +337,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 <p>投入前にユーザーがレビューする。観点: <strong>①誤答チェック（答え・解説の正しさ。実行時の検証チェーンはないため、ここが誤答リスク対策の唯一の砦）</strong> ②表現の独自性（書き直しが十分か・上記ガイドライン準拠）③既存ストック・出題履歴との重複（同じ解法構造の問題が近接しないか）④フォーマット適合（文字数・L3 の幅表現「約〇〇（目安）」・トーン）。</p>
 
 <h4>手順 4: INSERT 投入（Claude Code。ローカル MySQL + Aurora）</h4>
-<p>セクション 2.1 手順 2 の (6) の INSERT を使い、レビュー済みの問題をローカル MySQL と Aurora の両方へ投入する（<code>quiz_type</code> / <code>difficulty</code> は <code>parameters.slots</code> の値と一致させる。<code>source_note</code> 必須）。</p>
+<p>セクション 2.1 手順 2 の (6) の INSERT を使い、レビュー済みの問題をローカル MySQL と Aurora の両方へ投入する（<code>quiz_type</code> / <code>difficulty</code> は <code>parameters.slots</code> の値と一致させる。<code>source_note</code> 必須）。<strong><code>content_key</code>（<code>{slot_code}-{3 桁連番}</code>。V007 = 16-3d 決定）を採番し、両環境へ同じ値で投入する</strong> — 投入 SQL はスロット内の既存最大連番 + 1 を適用時に解決する形式にする（<code>generate.py</code> が生成する。手動採番の写し間違いを防ぐ）。<code>content_key</code> は NOT NULL のため採番漏れは投入時に必ずエラーになる。</p>
 
 <h4>手順 5: 動画ビルド・レビュー・配置（quiz-prebuilt 方式のセットのみ。16-3b 新設）</h4>
 <p>投入した行（<code>video_s3_key IS NULL</code>）に対して事前動画をビルドし、<strong>全数人間レビュー</strong>のうえ S3 へ配置して DB へ反映する。工程の技術設計（imagegen 委譲 + 画風行 → 3:2 センタークロップ → gpt-quiz-multicut のレンダラーによる組版 + ffmpeg ビルド〔image-batch の Docker イメージで実行〕→ レビューシート → S3 アップロード + <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> の UPDATE）は <a href="generators/quiz-prebuilt.html#build">方式設計書 quiz-prebuilt セクション 8</a> を正とする。運用上のルール:</p>

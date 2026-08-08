@@ -35,3 +35,5 @@ python publish.py --approved-file work/approved.txt --bucket your-bucket
 ```
 
 `publish.py` は S3 への MP4 とイラストのアップロード後、`video_s3_key` / `video_audio_asset_id` / `video_built_at` をローカル MySQL へ同時更新します。`work/update_prebuilt.sql` は Aurora へ運用者が適用するために残します。
+
+S3 のファイル名は `content_key`（`morning-001` など。V007 で導入）で組みます。ローカルの `quiz_stock_items.id` は環境ローカルな AUTO_INCREMENT で Aurora と一致しないため、S3 キーには使いません（`work/` 配下の中間生成物のファイル名だけがローカル id です）。

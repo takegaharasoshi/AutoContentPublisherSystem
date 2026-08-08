@@ -41,7 +41,12 @@ def main() -> None:
         illustration = WORK / "illustrations" / f"{stock_id}.png"
         if record is None or not video.is_file() or not illustration.is_file():
             raise RuntimeError(f"Approved stock item is not fully built: {stock_id}")
-        base_key = f"assets/{SET_CODE}/prebuilt/{stock_id}"
+        # S3 キーは環境非依存の content_key で組む(ローカル id は環境ローカルな
+        # AUTO_INCREMENT で Aurora と一致しないため。V007 / data-model.html セクション 5)
+        content_key = record.get("content_key")
+        if not isinstance(content_key, str) or not content_key:
+            raise RuntimeError(f"Build manifest has no content_key: {stock_id}")
+        base_key = f"assets/{SET_CODE}/prebuilt/{content_key}"
         commands.extend(
             [
                 ["aws", "s3", "cp", str(video), f"s3://{args.bucket}/{base_key}.mp4"],
