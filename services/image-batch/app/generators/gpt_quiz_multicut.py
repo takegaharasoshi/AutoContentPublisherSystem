@@ -626,15 +626,22 @@ def _paste_illustration(
     box: tuple[int, int, int, int],
     border_color: str,
 ) -> None:
-    """Paste the scene illustration as a rounded block inside the card."""
+    """Paste the scene illustration as a rounded block inside the card.
+
+    ブロック枠を「埋める」のではなく比率を保って内接させる。枠を埋めると
+    情景の左右が中央基準で捨てられ、問題文が長い（= 枠が浅い）ほど被写体が
+    見切れるため（16-5 のユーザー指摘）。余った高さは枠内で中央に寄せ、
+    角丸・縁取りは実際に置いた矩形へ合わせる。
+    """
     left, top, right, bottom = box
-    width, height = right - left, bottom - top
-    fitted = ImageOps.fit(
+    fitted = ImageOps.contain(
         illustration,
-        (width, height),
+        (right - left, bottom - top),
         method=Image.Resampling.LANCZOS,
-        centering=(0.5, 0.5),
     )
+    width, height = fitted.size
+    left += (right - left - width) // 2
+    top += (bottom - top - height) // 2
     mask = Image.new("L", (width, height), 0)
     ImageDraw.Draw(mask).rounded_rectangle(
         (0, 0, width - 1, height - 1),
@@ -644,7 +651,7 @@ def _paste_illustration(
     canvas.paste(fitted, (left, top), mask)
     # 細い縁取りでカードと写真調ブロックの境界を整える
     ImageDraw.Draw(canvas).rounded_rectangle(
-        (left, top, right - 1, bottom - 1),
+        (left, top, left + width - 1, top + height - 1),
         radius=ILLUSTRATION_RADIUS,
         outline=border_color,
         width=2,
