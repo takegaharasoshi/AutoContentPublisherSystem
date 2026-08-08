@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 from io import BytesIO
 import os
 from pathlib import Path
@@ -46,8 +47,13 @@ def _load_audio(
     bucket: str,
     client: Any,
     slot_code: str,
+    bgm_id: int | None = None,
 ) -> tuple[int, str, bytes, bytes, bytes]:
-    """Choose BGM by slot LRU and load the mandatory audio assets."""
+    """Choose BGM by slot LRU and load the mandatory audio assets.
+
+    ``bgm_id`` を渡した場合は LRU 選曲を行わずその音源を使う（再ビルドで
+    BGM を変えないため。``last_used_at`` の更新も呼び出し側で抑止する）。
+    """
     with connection.cursor() as cursor:
         cursor.execute("SELECT id FROM batch_sets WHERE set_code = %s", (SET_CODE,))
         set_row = cursor.fetchone()
@@ -64,13 +70,19 @@ def _load_audio(
         chime_key = f"audio/{SET_CODE}/se/answer_chime.m4a"
         if tick_key not in se_rows or chime_key not in se_rows:
             raise RuntimeError("Required quiz sound effects are not registered")
-        cursor.execute(
-            "SELECT id, s3_key FROM audio_assets WHERE set_id = %s "
-            "AND asset_type = 'bgm' AND is_active = 1 "
-            "AND (time_slot = %s OR time_slot IS NULL) "
-            "ORDER BY last_used_at ASC, id ASC LIMIT 1",
-            (set_id, slot_code),
-        )
+        if bgm_id is None:
+            cursor.execute(
+                "SELECT id, s3_key FROM audio_assets WHERE set_id = %s "
+                "AND asset_type = 'bgm' AND is_active = 1 "
+                "AND (time_slot = %s OR time_slot IS NULL) "
+                "ORDER BY last_used_at ASC, id ASC LIMIT 1",
+                (set_id, slot_code),
+            )
+        else:
+            cursor.execute(
+                "SELECT id, s3_key FROM audio_assets WHERE id = %s",
+                (bgm_id,),
+            )
         bgm_row = cursor.fetchone()
         if bgm_row is None:
             raise RuntimeError(f"No active BGM for slot {slot_code}")
@@ -96,12 +108,19 @@ def _record_bgm_use(connection: Any, bgm_id: int) -> None:
 
 def main() -> None:
     """Render all unbuilt items for which normalized illustrations are present."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="ビルド済み行を選曲・S3 キーを変えずに作り直す（レンダラー変更の反映）",
+    )
+    rebuild = parser.parse_args().rebuild
     bucket = _bucket()
     s3_client = boto3.client("s3")
     connection = local_connection()
     try:
         slots = resolve_slots(connection)
-        items = fetch_unbuilt_items(connection)
+        items = fetch_unbuilt_items(connection, rebuild=rebuild)
         coaches = _load_coaches(bucket, s3_client)
         fonts = quiz._load_fonts()
         manifest: dict[str, Any] = {}
@@ -114,7 +133,11 @@ def main() -> None:
             if slot is None:
                 raise RuntimeError(f"No unique slot for stock item {item['id']}")
             bgm_id, bgm_s3_key, bgm, tick, chime = _load_audio(
-                connection, bucket, s3_client, slot["slot_code"]
+                connection,
+                bucket,
+                s3_client,
+                slot["slot_code"],
+                item["video_audio_asset_id"] if rebuild else None,
             )
             fields = dict(item["content_fields"])
             fields["question"] = item["question_text"]
@@ -134,7 +157,8 @@ def main() -> None:
             cut_dir.mkdir(parents=True, exist_ok=True)
             for index, cut in enumerate(cuts, start=1):
                 (cut_dir / f"{item['id']}_cut{index}.png").write_bytes(cut)
-            _record_bgm_use(connection, bgm_id)
+            if not rebuild:
+                _record_bgm_use(connection, bgm_id)
             manifest[str(item["id"])] = {
                 "audio_asset_id": bgm_id,
                 "bgm_s3_key": bgm_s3_key,

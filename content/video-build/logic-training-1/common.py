@@ -52,15 +52,26 @@ def dump_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def fetch_unbuilt_items(connection: pymysql.connections.Connection) -> list[dict[str, Any]]:
-    """Return active stock rows whose prebuilt video has not been registered."""
+def fetch_unbuilt_items(
+    connection: pymysql.connections.Connection,
+    *,
+    rebuild: bool = False,
+) -> list[dict[str, Any]]:
+    """Return active stock rows to build.
+
+    既定は未ビルド行（``video_s3_key IS NULL``）。``rebuild`` ではレンダラー変更の
+    反映を目的にビルド済み行を対象とし、選曲済みの ``video_audio_asset_id`` を
+    そのまま使い回せるよう併せて返す（再ビルドで BGM を変えない）。
+    """
+    condition = "IS NOT NULL" if rebuild else "IS NULL"
     with connection.cursor() as cursor:
         cursor.execute(
             "SELECT q.id, q.content_key, q.quiz_type, q.difficulty, q.question_text, "
-            "q.answer_text, q.content_fields FROM quiz_stock_items q "
+            "q.answer_text, q.content_fields, q.video_audio_asset_id "
+            "FROM quiz_stock_items q "
             "JOIN batch_sets b ON b.id = q.set_id "
             "WHERE b.set_code = %s AND q.is_active = 1 "
-            "AND q.video_s3_key IS NULL ORDER BY q.id ASC",
+            f"AND q.video_s3_key {condition} ORDER BY q.id ASC",
             (SET_CODE,),
         )
         rows = cursor.fetchall()
@@ -73,6 +84,7 @@ def fetch_unbuilt_items(connection: pymysql.connections.Connection) -> list[dict
             "question_text": str(row[4]),
             "answer_text": str(row[5]),
             "content_fields": json.loads(row[6]) if isinstance(row[6], str) else row[6],
+            "video_audio_asset_id": None if row[7] is None else int(row[7]),
         }
         for row in rows
     ]
