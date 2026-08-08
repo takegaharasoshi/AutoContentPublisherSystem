@@ -1,6 +1,6 @@
 ---
 name: quiz-stock-replenish
-description: logic-training-1 の問題ストック(quiz_stock_items)を補充する。リサーチ→書き直し→機械検証→1問ずつ人間レビュー→投入の共通パイプラインと、朝(なぞなぞ)/昼(フェルミ推定)/夜(とんち・水平思考)のスロット別執筆勘所。週次補充・初期整備のどちらにも使う。
+description: logic-training-1 の問題ストック(quiz_stock_items)を補充する。リサーチ→書き直し→機械検証→1問ずつ人間レビュー→投入→動画ビルド(quiz-prebuilt)の共通パイプラインと、朝(なぞなぞ)/昼(フェルミ推定)/夜(とんち・水平思考)のスロット別執筆勘所。週次補充・初期整備のどちらにも使う。
 ---
 
 # 問題ストック補充スキル(quiz-stock-replenish)
@@ -12,7 +12,7 @@ logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 �
 
 ## 0. 在庫確認(入口)
 
-operation.html セクション 3 の在庫確認クエリで「型 × 難度」ごとの未使用在庫を確認し、7 問を下回る組を補充対象にする。再利用 WARNING がログに出ていたら優先補充。
+operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「型 × 難度」ごとの在庫を確認し、7 問を下回る組を補充対象にする。quiz-prebuilt 方式では**「未使用かつビルド済み」(`unused_built`)を在庫と数える**。`unbuilt` 列が 0 以外なら投入済みのビルド漏れなので、補充より先にセクション 7 のビルドを終わらせる。再利用 WARNING・未ビルト WARNING がログに出ていたら優先対応。
 
 ## 1. リサーチ(Codex 委譲)
 
@@ -111,3 +111,14 @@ operation.html セクション 3 の在庫確認クエリで「型 × 難度」�
 - ローカル: `docker exec -i acps-mysql mysql --default-character-set=utf8mb4 ...`(utf8mb4 指定必須)。事前にトランザクション + ROLLBACK でドライランする
 - Aurora: Data API(`aws rds-data execute-statement`)。auto mode classifier にブロックされる場合はユーザーに許可を求める
 - 投入後: 在庫確認クエリで件数・内訳を確認し、`docs/development-log.md` に補充記録を残す
+
+## 7. 動画ビルド・レビュー・配置(quiz-prebuilt。投入後に必ず)
+
+投入しただけの行(`video_s3_key IS NULL`)は出題候補にならない。技術設計の正は `docs/app/generators/quiz-prebuilt.html` セクション 8、運用ルールの正は operation.html セクション 3 手順 5。ツーリングは `content/video-build/logic-training-1/`(使い方は同ディレクトリの README.md。生成物は `work/` で gitignore)。
+
+1. **プロンプト書き出し**: `export_prompts.py`(実行は `cd services/image-batch && uv run python ../../content/video-build/logic-training-1/export_prompts.py`。以下の Python 実行も同じ uv 環境)
+2. **イラスト生成(Codex imagegen 委譲)**: `work/prompts/<id>.txt` の全文を渡し、imagegen で生成して `work/illustrations_raw/<id>.png` へ保存させる。**「?」以外の文字・数字・記号の混入を Codex 自身に確認させ、混入時は再生成」を指示に含める**(1 問通し確認でも初回混入 → 再生成が実際に発生した)
+3. **取り込み → ビルド**: `intake.py` → `build.py`。build.py は Docker 実行(README の docker run 例が動作確認済みの形: `~/.aws` 読み取りマウント + `LOCAL_DB_HOST=host.docker.internal` + `--user $(id -u):$(id -g)`)。イラスト未配置の行は自動スキップされるので部分ビルドでよい
+4. **全数人間レビュー**: `review_sheet.py` → `work/review.html`。観点はイラスト(文字混入・画風・情景適合)・版面・音。NG は imagegen 再試行または `illustration_scene` 修正(DB 更新)→ 再ビルド
+5. **配置**: 承認 id を `approved.txt` に列挙 → `publish.py --dry-run` で `upload_prebuilt.sh` / `update_prebuilt.sql` を確認 → 本実行(S3 アップロード + ローカル MySQL 反映)→ Aurora へ `work/update_prebuilt.sql` を Data API で適用。**Aurora SQL は安定キー(set_code + question_text・BGM は s3_key)で解決する形式**(ローカルと Aurora で AUTO_INCREMENT id が一致しないため。id 直指定の SQL を作らない)。適用後は更新行数 = 承認件数を確認
+6. **締め**: 在庫確認クエリ拡張版で `unbuilt` = 0 を確認し、ツール・台帳の変更をコミット
