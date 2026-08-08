@@ -914,3 +914,21 @@
     **(5) 配置**: 全 42 問を content_key 付き manifest で再ビルド（16-3c 配置分 id=100 も新キーへ移行するため 3 カラムを一旦 NULL に戻して含めた）→ `publish.py --dry-run` で `upload_prebuilt.sh`（84 コマンド・数字 id の混入なし）と `update_prebuilt.sql`（42 文・安定キー方式）を確認 → 本実行で **S3 84 オブジェクト**（42 MP4 + 42 イラスト原画。`morning-001`〜`night-014`）配置 + ローカル DB 反映 → 旧 `100.mp4` / `100_illustration.png` を削除 → Aurora へ `update_prebuilt.sql` を Data API で 1 文ずつ適用（**42 文すべて更新行数 1**）。publish.py は Docker 内でなくホスト（`services/image-batch` の uv 環境）で実行する設計だった点に注意（aws CLI が必要なため）
 
     **(6) 検証**: ①**両環境一致（今回の本丸）**: `content_key` / `video_s3_key` / 動画カラムの非 NULL 状態の 42 行が diff で完全一致 ②在庫確認クエリ拡張版が両環境とも 3 組 × `unused_built` 14 / `unbuilt` 0 ③実行時パス: ローカル MySQL + 実 S3 で `quiz_prebuilt.generate()` を直接実行 — noon スロット解決 → LRU が `noon-001` を選定 → 新キーで S3 取得（バイト数がオブジェクトと一致）→ `quiz_items` INSERT + 消費ステージ → 全ロールバック。未ビルト WARNING は消滅（0 件）④pytest: image-batch 104 passed / sns-post-batch 108 passed。次は **16-4（投稿前レビューと切替。デプロイ + Aurora 反映 4 点 + スケジュール再有効化）**
+
+- [x] **16-4** 投稿前レビューと切替（15-14 パターン）
+  - 確認: デプロイ → Aurora 反映 4 点 → 手動実行の投稿前レビュー → リール + ストーリーズ実投稿 success → 生成スケジュール 3 本 ENABLED
+  - 備考: 2026-08-08 完了（Fable 5 が直接実施。Aurora 書き込み・ECS RunTask・SFN 実行・cdk deploy は 15-14 と同様にユーザーが「直接実行を許可」を選択のうえ Claude が実行）。**切替日 = 2026-08-08（テコ入れ前後比較の基準点。16-5 のインサイト比較はこの日を境に行う）**。
+
+    **(1) デプロイ**: 16-3〜16-3d の未 push 差分 14 コミット（`2793afc`〜`6ce3f82`）を push → 両パイプラインの初回 Build が **Docker Hub レート制限（`python:3.12-slim` の pull で 429 Too Many Requests）** で同時失敗。両パイプラインが同時刻に base image を pull したことが要因のため、時間差でリトライ（image-batch 成功後に sns-post-batch）し両方 Succeeded。タスク定義 image-batch **rev 21** / sns-post-batch **rev 11**（タグ `6ce3f82d034b`）。infra 差分はスケジュール再有効化のみのため cdk deploy は (5) で実施。
+
+    **(2) Aurora 反映 4 点**（Data API・トランザクション 1 本で①〜③、④は CDK）: ①`caption_templates` 差し替え — 旧固定文 id=2 を `is_active=0` で残置し、プレースホルダ版（[sets/logic-training-1.html](app/sets/logic-training-1.html) セクション 5 の全文・178 字）を id=3 で INSERT。パラメータ化クエリで登録し `= :t` 比較で本文の完全一致を裏取り ②`prompt_configs` (id=3) の `slot_label` を JSON_SET で「朝 / 昼 / 夜の脳みそトレ」へ改名 ③`batch_sets.generator_name` を `quiz-prebuilt` へ UPDATE ④は (5)。ローカル MySQL も同内容を適用（旧テンプレ id=43 → 新 id=79。slot_label は 16-3 適用済み）。
+
+    **(3) 手動実行と投稿前レビュー**: 直接 RunTask（rev 21・noon 相当の SCHEDULED_AT）で **run 59 が exit 0・実行 26 秒**（旧方式 3〜4 分 → 生成 AI API 呼び出しゼロの軽量実行を本番で初実証）。LRU が未使用先頭のストック id=15（`noon-001`・フェルミ「一生の睡眠時間」）を選定し、`videos/logic-training-1/20260808/59/3_0.mp4` は **事前動画 `prebuilt/noon-001.mp4` と ETag・サイズ完全一致**（バイト同一コピー = 16-3d の人間レビュー済み品がそのまま投稿される構造の実証）。`generated_media.audio_asset_id=6`（noon BGM）のストック行転記も設計どおり。キャプションは実装同等ロジックでローカル展開し 5 種プレースホルダ全展開・242 字・未展開トークンなしを確認 → 動画 + キャプションをユーザーレビューへ提示し **GO**。
+
+    **(4) 実投稿**: SNS 投稿 SFN 単体実行 → **SUCCEEDED（3 分 18 秒）**。`posts` はリール行（id=69・platform_post_id 18098150156458329・`caption_text_snapshot` 242 字 = 事前プレビューと一致・`caption_template_id=3`）+ ストーリーズ行（id=70・キャプション系 NULL = 設計どおり）の 2 行とも success・`post_media` 各 1 件。**プレースホルダ展開キャプションの本番投稿はこれが初**。
+
+    **(5) スケジュール再有効化**: [image-batch-stack.ts](../infra/lib/image-batch-stack.ts) の logic-training-1 3 エントリから `enabled: false` を撤去（コメントも 16-4 再有効化へ改訂）→ CDK テスト 21 件パス → `cdk diff` は **3 Schedule の DISABLED→ENABLED + CFN 保存イメージタグの整合（`fcadec4e7747`→`6ce3f82d034b` = 稼働中 rev 21 と同一イメージ）のみ** → deploy UPDATE_COMPLETE → `list-schedules` で **全 4 件 ENABLED** を裏取り。デプロイ前に未投稿バックログ 0 件を確認（15-15 の事前チェック踏襲。run 59 は投稿済みのため初回定時実行は自分の生成分を投稿する状態）。
+
+    **(6) ドキュメント同期**: [quiz-prebuilt.html](app/generators/quiz-prebuilt.html)（適用状態 warn を「本番稼働開始」へ）、[gpt-quiz-multicut.html](app/generators/gpt-quiz-multicut.html)（切替済みへ）、[data-model.html](app/data-model.html) 4.3（差し替え適用済み）、[sets/logic-training-1.html](app/sets/logic-training-1.html)（冒頭 warn = 定常運用中・slot_label / テンプレート / 使用方式の実態化）、[infra/workflow.html](infra/workflow.html) 1.5（State 表 ENABLED + 08-06 decision に再有効化を追記）。
+
+    **(7) 残作業と次ステップ**: 3 スロットの定時実行確認は翌日以降（初回 = **本日 21:00 JST の night**。以降 7:30 / 12:30）。確認後に 16-5（効果検証。切替日 2026-08-08 を基準点とした前後比較）へ。

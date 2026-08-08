@@ -23,7 +23,7 @@
 
 <div class="warn">
   <span class="callout-title">16-1 / 16-3b 改訂の適用状態</span>
-  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）と 16-3b（動画事前生成方式への転換設計 Fix。2026-08-08）を反映した<strong>目標設計</strong>を記述している。実装は 16-3c、初期 42 問の動画ビルド・S3 配置は 16-3d、キャプションテンプレート差し替え・<code>generator_name</code> 切替・生成スケジュール再開は 16-4 で行う。現在は 08-06 障害対応で生成スケジュール 3 本が DISABLED のまま（投稿休止中）。テコ入れの経緯と方針 4 点・転換の経緯は <a href="../../development-plan.md">development-plan.md</a> Phase 16 冒頭を参照。
+  本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）と 16-3b（動画事前生成方式への転換設計 Fix。2026-08-08）を反映した<strong>目標設計</strong>を記述している。実装は 16-3c、初期 42 問の動画ビルド・S3 配置は 16-3d、キャプションテンプレート差し替え・<code>generator_name</code> 切替・生成スケジュール再開は <strong>16-4（2026-08-08）で完了し、本設計での定常運用中</strong>（切替日 = 前後比較の基準点）。テコ入れの経緯と方針 4 点・転換の経緯は <a href="../../development-plan.md">development-plan.md</a> Phase 16 冒頭を参照。
 </div>
 
 <h2>1. テーマ</h2>
@@ -113,7 +113,7 @@
 ・問題の舞台になっている日本の日常風景を、簡潔な一文で描写する。
 ・人物を出す場合は後ろ姿か遠景までにし、顔を描き込まない。脳のマスコットは描かない。
 ・答えが分かってしまう物・数えられる並び・図表は描写しない。</code></pre>
-<p><code>prompt_configs.parameters</code>（キー仕様は方式側 = <a href="../generators/gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a>。16-1 以降、<code>slots</code> の必須は 5 フィールド〔<code>from_jst_hour</code> / <code>quiz_type</code> / <code>difficulty</code> / <code>slot_code</code> / <code>slot_label</code>〕で、<code>tone_hint</code>・<code>max_regenerations</code>・<code>llm_model</code> は<strong>存在しても無視される</strong>。登録値は変更せず残置）。<code>slot_label</code> は 16-3 のユーザーレビューで「朝 / 昼 / 夜のロジトレ・推定トレ」から<strong>「朝 / 昼 / 夜の脳みそトレ」</strong>へ改名した（出題路線が論理パズル一本ではなくなったため。ローカル MySQL は適用済み・<strong>Aurora への反映は 16-4 の切替時</strong>にキャプションテンプレート差し替えとまとめて行う）。</p>
+<p><code>prompt_configs.parameters</code>（キー仕様は方式側 = <a href="../generators/gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a>。16-1 以降、<code>slots</code> の必須は 5 フィールド〔<code>from_jst_hour</code> / <code>quiz_type</code> / <code>difficulty</code> / <code>slot_code</code> / <code>slot_label</code>〕で、<code>tone_hint</code>・<code>max_regenerations</code>・<code>llm_model</code> は<strong>存在しても無視される</strong>。登録値は変更せず残置）。<code>slot_label</code> は 16-3 のユーザーレビューで「朝 / 昼 / 夜のロジトレ・推定トレ」から<strong>「朝 / 昼 / 夜の脳みそトレ」</strong>へ改名した（出題路線が論理パズル一本ではなくなったため。ローカル MySQL は 16-3 で、<strong>Aurora は 16-4〔2026-08-08〕で適用済み</strong>）。</p>
 <pre><code>{
   "llm_model": "gpt-5.6-terra",
   "slots": [
@@ -146,7 +146,7 @@
 
 <h2>5. キャプションの作り方</h2>
 <p><strong>テンプレート + 出題データの動的組み立て方式</strong>（16-1 でテコ入れ方針「動画内に答えを出さない」を受けて固定文言方式から転換）。<code>caption_templates.template_text</code> にプレースホルダ（<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>）を含むテンプレートを 1 件登録し、SNS 投稿バッチが投稿時に当該実行の <code>quiz_items</code> から展開する（仕組みは <a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>、テーブル仕様は <a href="../data-model.html#detail-caption-templates">data-model.html セクション 4.3</a>）。</p>
-<p>登録するテンプレート（16-1 で設計。<strong>ローカル &amp; Aurora への差し替えは 16-4 の切替時</strong> — 旧パイプラインが動いている間に差し替えると「答えは動画の最後にあります💡」の前提が壊れるため）。</p>
+<p>登録するテンプレート（16-1 で設計。<strong>ローカル &amp; Aurora とも 16-4〔2026-08-08〕で差し替え済み</strong> — 旧固定文テンプレートは <code>is_active=0</code> で残置）。</p>
 <pre><code>{{hook}}
 答えはこの下👇（ネタバレ注意）
 ・
@@ -219,7 +219,7 @@
 </ul>
 
 <h2>9. 共通フローからの差分・特記事項</h2>
-<p><strong>使用方式は <code>quiz-prebuilt</code></strong>（16-3b の転換。切替 = <code>batch_sets.generator_name</code> の UPDATE は 16-4。それまでの登録値は <code>gpt-quiz-multicut</code> のまま）: ストック LRU 選定 → S3 の事前動画取得 → 返却のみの軽量実行（<a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>）。動画の作り・組版は <code>gpt-quiz-multicut</code>（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>。実行時方式としては休止・事前ビルドのレンダラーへ転用）を正とする。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）で、いずれも 16-3b の転換による変更はない。</p>
+<p><strong>使用方式は <code>quiz-prebuilt</code></strong>（16-3b の転換。<code>batch_sets.generator_name</code> は 16-4〔2026-08-08〕で切替済み）: ストック LRU 選定 → S3 の事前動画取得 → 返却のみの軽量実行（<a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>）。動画の作り・組版は <code>gpt-quiz-multicut</code>（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>。実行時方式としては休止・事前ビルドのレンダラーへ転用）を正とする。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）で、いずれも 16-3b の転換による変更はない。</p>
 <p>本セットは共通テーブルのうち <code>quiz_stock_items</code>（問題ストック）と <code>quiz_items</code>（出題履歴。16-1 で <code>stock_item_id</code> による突合を追加）を使う唯一のセットである（<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4.9 / 4.10</a>）。</p>
 
 </div>

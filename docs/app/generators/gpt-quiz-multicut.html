@@ -24,7 +24,7 @@
 
 <div class="warn">
   <span class="callout-title">16-3b（2026-08-08）: 実行時方式としては休止 — 事前ビルドのレンダラーへ転用</span>
-  16-3 完了後の仕様変更（動画事前生成方式への転換。<a href="quiz-prebuilt.html">方式設計書 quiz-prebuilt</a> セクション 1 の decision）により、本方式は<strong>実行時方式としては本番投入せず休止</strong>とする（16-4 の切替は <code>quiz-prebuilt</code> へ行う。採用セットなし・レジストリ登録は残置し、実行時生成へ戻す場合は <code>batch_sets.generator_name</code> の UPDATE で再開できる）。ただし<strong>組版（セクション 8）と ffmpeg 合成（セクション 9）は事前ビルドツーリングのレンダラーとして継続使用</strong>し、動画の作り（16 秒・4 カット・版面固定）の正は引き続き本書が持つ。実行時にのみ意味を持つ節（ストック取得 = セクション 5・イラスト生成 = セクション 6・固定アセット検査 = セクション 7・エラーハンドリング = セクション 11）は、事前生成側では <a href="quiz-prebuilt.html">quiz-prebuilt</a> セクション 4〜8 が対応する。
+  16-3 完了後の仕様変更（動画事前生成方式への転換。<a href="quiz-prebuilt.html">方式設計書 quiz-prebuilt</a> セクション 1 の decision）により、本方式は<strong>実行時方式としては本番投入せず休止</strong>とする（16-4〔2026-08-08〕で <code>quiz-prebuilt</code> へ切替済み。採用セットなし・レジストリ登録は残置し、実行時生成へ戻す場合は <code>batch_sets.generator_name</code> の UPDATE で再開できる）。ただし<strong>組版（セクション 8）と ffmpeg 合成（セクション 9）は事前ビルドツーリングのレンダラーとして継続使用</strong>し、動画の作り（16 秒・4 カット・版面固定）の正は引き続き本書が持つ。実行時にのみ意味を持つ節（ストック取得 = セクション 5・イラスト生成 = セクション 6・固定アセット検査 = セクション 7・エラーハンドリング = セクション 11）は、事前生成側では <a href="quiz-prebuilt.html">quiz-prebuilt</a> セクション 4〜8 が対応する。
 </div>
 
 <div class="note">

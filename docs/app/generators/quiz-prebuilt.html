@@ -24,7 +24,7 @@
 
 <div class="warn">
   <span class="callout-title">適用状態</span>
-  本書は 16-3b（2026-08-08）の設計 Fix 時点の<strong>目標設計</strong>。実装は 16-3c、初期 42 問のビルド・S3 配置は 16-3d、<code>batch_sets.generator_name</code> の切替と生成スケジュール再開は 16-4 で行う。それまで <code>logic-training-1</code> の生成スケジュール 3 本は停止中（08-06 障害対応の DISABLED を維持）で、本方式は未稼働。
+  16-3b（2026-08-08）の設計 Fix → 16-3c 実装 → 16-3d 初期 42 問ビルド・S3 配置を経て、<strong>16-4（2026-08-08）で本番稼働開始</strong>（<code>batch_sets.generator_name</code> を <code>quiz-prebuilt</code> へ切替・生成スケジュール 3 本を再有効化。投稿前レビュー + リール / ストーリーズ実投稿 success を確認済み）。
 </div>
 
 <h2>1. 方式概要</h2>

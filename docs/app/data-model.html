@@ -284,7 +284,7 @@
   （<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>）を書けるようにし、
   SNS 投稿バッチが投稿時に当該生成実行の <code>quiz_items</code>（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>）から展開する。
   <strong>スキーマ変更はなし</strong>（プレースホルダはテンプレート文言の規約であり、展開規則〔プレースホルダあり = <code>quiz_items</code> 行必須・なし = 従来どおり素通し〕は
-  <a href="batch-flow.html#flow-sns">batch-flow.html セクション 3.3 の decision</a> を正とする）。実装は 16-3、テンプレートの差し替えは 16-4。
+  <a href="batch-flow.html#flow-sns">batch-flow.html セクション 3.3 の decision</a> を正とする）。実装は 16-3、テンプレートの差し替えは 16-4（2026-08-08 適用済み）。
 </div>
 <ul>
   <li><code>template_text</code> はキャプション本文とハッシュタグを含む 1 本のテキスト（Instagram の投稿本文はキャプション欄 1 つのため分割しない）。プレースホルダを含む場合は投稿時に展開される（上記 decision）</li>
