@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-07-24</span>
+  <span>最終更新: 2026-08-09</span>
 </div>
 
 <div class="note">
@@ -23,7 +23,6 @@
   全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a>、データモデルは <a href="data-model.html">データモデル設計</a> を参照。
   実行基盤（EventBridge Scheduler → 画像生成 Step Functions → 成功時に SNS 投稿 Step Functions を自動起動）は
   インフラ設計（<a href="../infra/workflow.html">infra/workflow.html</a>）のとおりで、本書はその器の中で動くアプリの処理を扱う。
-  本書で確定した内容のデータモデルへの反映は <a href="#phase9">セクション 5</a> に整理する（Phase 9-3 の入力とする）。
 </div>
 
 <h2 id="premise">1. 前提・不変条件</h2>
@@ -118,7 +117,7 @@
 <div class="decision">
   <span class="callout-title">決定（2026-07-27、Phase 15-5）: 実行コンテキストに生成実行の scheduled_at を追加</span>
   方式が受け取る実行コンテキスト（実装上は <code>GeneratorContext</code>）に、生成実行の <code>scheduled_at</code>（UTC）を追加する（実装は 15-6）。
-  時間帯によって出題の型を切り替える方式（<code>gpt-quiz-multicut</code>: 朝 = 軽い L1、昼 = L3、夜 = じっくり。15-4 決定）が実行予定時刻を必要とするため。
+  時間帯によって出題の型を切り替えるクイズ方式（<code>gpt-quiz-multicut</code> / <code>quiz-prebuilt</code>: 朝 = 軽い L1、昼 = L3、夜 = じっくり。15-4 決定）が実行予定時刻を必要とするため。
   値は共通骨格が確定済みの <code>generation_runs.scheduled_at</code> を渡す（方式が環境変数 <code>SCHEDULED_AT</code> を直接読むことはしない。正規化の一元化を維持）。
   既存方式は使用しないだけで影響はない（後方互換の追加）。
   15-6 の実装時追記: 方式責務の <code>quiz_items</code> INSERT（<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）に必要な
@@ -153,7 +152,7 @@
     <tr>
       <td><code>quiz-prebuilt</code></td>
       <td>クイズ動画の<strong>事前生成方式</strong>。イラスト（imagegen）〜動画（gpt-quiz-multicut のレンダラー流用）を事前にローカルでビルドし、全数人間レビューのうえ S3（ライフサイクル対象外の <code>assets/.../prebuilt/</code>）に作り置く。実行時は問題ストック（<code>quiz_stock_items</code>）のビルド済み行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・組版・動画合成を実行時に使わない</strong>）。<code>quiz_items</code> 記録・キャプション展開・ストーリーズ再掲は gpt-quiz-multicut と同一。<code>parameters</code> 互換のため切替は <code>batch_sets.generator_name</code> の UPDATE のみ</td>
-      <td>設計 Fix（<strong>16-3b で設計 Fix</strong>〔2026-08-08 の仕様変更 = development-plan.md Phase 16 冒頭〕。実装 16-3c・初期 42 問ビルド 16-3d・logic-training-1 の切替 16-4 予定）</td>
+      <td>採用中（<strong>16-3b で設計 Fix</strong>〔2026-08-08 の仕様変更 = development-plan.md Phase 16 冒頭〕→ 16-3c 実装 → 16-3d 初期 42 問ビルド → <strong>16-4（2026-08-08）で logic-training-1 が切替・定常運用中</strong>。16-4b でバウンド演出・見切れ解消を反映し 42 本を再ビルド）</td>
       <td><a href="generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>（16-3b で作成）</td>
     </tr>
   </tbody>
@@ -323,19 +322,6 @@
   <li><code>SET_CODE</code> — 両バッチが受け取り、<code>batch_sets</code> の解決に使用する（各フローの手順 1）</li>
   <li><code>SCHEDULED_AT</code> — 画像生成バッチのみが受け取り、生成実行の冪等性キーに使用する（セクション 2 の手順 2）。SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</li>
   <li><strong><code>BATCH_SIZE_LIMIT</code> 等のバッチ件数制御用環境変数は追加しない</strong>（確定）。SNS 投稿バッチは常に生成実行 1 件のみを処理する方針（3.1）のため件数上限の概念が不要であり、画像生成バッチも有効プロンプト 1 件・1 枚生成の初期スコープでは総量制御が不要と判断した。将来、生成実行のバックログが恒常的に蓄積する場合や画像生成 API のクォータ制約が顕在化した場合に導入を再検討する</li>
-</ul>
-
-<h2 id="phase9">5. Phase 9-2 の決定事項と Phase 9-3 への申し送り</h2>
-<p>本書の詳細化に伴いデータモデル（<a href="data-model.html">data-model.html</a>）側で確定・反映が必要な事項を以下に整理する（テーブル名は Phase 14-4 のリネーム後の名称で表記。決定内容自体は Phase 9-2 時点のもの）。</p>
-<ul>
-  <li><code>posts.status</code> の値集合: <code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>（3.2）</li>
-  <li><code>posts</code> の UNIQUE 制約は <code>(generation_run_id, sns_account_id)</code> のみ。旧設計にあった <code>attempt_number</code> 相当のカラムは不要（自動再試行を行わない方針のため。3.2）</li>
-  <li><code>posts</code> に <code>platform_container_id</code> / <code>platform_post_id</code> / <code>api_response</code> 等、2 段階フローの中間状態を保持するカラムが必要（3.3）</li>
-  <li><code>generated_media</code> の完了判定は <code>(generation_run_id, prompt_config_id)</code> の組み合わせでの存在確認により行う。完了状態を表す専用カラムは不要（2）</li>
-  <li><code>generated_media</code> に <code>output_index</code>（同一 <code>generation_run_id</code> × <code>prompt_config_id</code> 内での並び順）カラムが必要。生成 API が返すメディアはすべて保存する方針のため（旧設計の「2 枚目以降は破棄」は不採用。2）</li>
-  <li><code>post_media</code> は初期構築では生成実行内の先頭メディア（<code>generated_media.id</code> 昇順で最初の 1 件）のみを登録する。生成実行が保存するメディア件数によらず、投稿は常に 1 件（3.3）</li>
-  <li><code>prompt_configs</code> の <code>is_active=1</code> 件数は 0 件をエラー、1 件以上はすべてループ処理する方針を確定（DB 制約の変更は不要。処理ロジックの決定事項として記録。2）</li>
-  <li><code>BATCH_SIZE_LIMIT</code> 等のアプリ用環境変数は追加しない（4）</li>
 </ul>
 
 <p>参考資料: <a href="../_archive/batch.md">_archive/batch.md</a>（冪等性・再試行・投稿ステータス管理の旧設計。<code>post_records</code> の attempt 方式や <code>BATCH_SIZE_LIMIT</code> によるバックログ処理は、自動再試行なし・生成実行単位への簡素化に伴い初期スコープでは採用しない。現役の設計書ではない）</p>

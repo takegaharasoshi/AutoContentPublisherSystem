@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase A 成果物（Phase 10-1 で最終 Fix）</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-07-24</span>
+  <span>最終更新: 2026-08-09</span>
 </div>
 
 <div class="note">
@@ -23,12 +23,12 @@
   A-4 で本書の構成に従い分冊（<a href="batch-flow.html">batch-flow</a> / <a href="data-model.html">data-model</a> / <a href="operation.html">operation</a>）を作成済みであり、
   分冊作成後の本書は<strong>全体方針と、分冊間・インフラ設計との整合</strong>を担う親ページとする。
   ドメイン別の骨子（処理手順・エンティティ定義・運用方針の中身）は<strong>各分冊が正</strong>。
-  詳細設計（テーブル定義・処理フローの詳細・DDL 等）には踏み込まず、Phase 9 への線引きはセクション 6 に定める。
+  詳細設計（テーブル定義・処理フローの詳細・DDL 等）には踏み込まない（詳細は Phase 9 で各分冊に定め済み）。
 </div>
 
 <h2 id="doc-structure">1. 設計書構成（docs/app/ のドキュメント一覧とスコープ)</h2>
 
-<p>アプリ設計書は以下の構成とする。分冊は開発計画 Phase 9 のステップ（9-2 / 9-3 / 9-4）と 1 : 1 に対応させる。</p>
+<p>アプリ設計書は以下の構成とする。分冊は開発計画 Phase 9 のステップ（9-2 / 9-3 / 9-4）で詳細化済み。</p>
 
 <div class="table-wrap">
 <table>
@@ -67,12 +67,12 @@
     <tr>
       <td><code>generators/&lt;方式名&gt;.html</code></td>
       <td>生成方式別設計書（1 方式 1 本。ルールはセクション 1.1、契約・カタログは <a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）</td>
-      <td>方式の本採用時に作成（試行段階では書かない）。初適用: 13-2 で <a href="generators/gpt-image-single.html">gpt-image-single</a> を作成済み</td>
+      <td>方式の本採用時に作成（試行段階では書かない）。現行の方式一覧は<a href="batch-flow.html#generator-catalog">方式カタログ</a>を参照</td>
     </tr>
     <tr>
       <td><code>sets/&lt;set_code&gt;.html</code></td>
       <td>セット別設計書（1 セット 1 本。ルールはセクション 1.1）</td>
-      <td>初セット追加時に作成（セット追加のたびに 1 本増える）。初適用: 11-1 で <a href="sets/fantasy-animals-1.html">fantasy-animals-1</a> を作成済み</td>
+      <td>セット追加のたびに 1 本増える。現行のセット一覧は <a href="index.html#set-docs">index.html のセット一覧</a>を参照</td>
     </tr>
   </tbody>
 </table>
@@ -87,7 +87,7 @@
   <strong>共通設計書とセット別設計書の 2 層構造</strong>を定めた（要望の記録は <a href="requirements-notes.html">A-1 壁打ち記録</a>の追記を参照）。
   その後 2026-07-12 の D-3 通読時の議論で、生成方式もスクラップ&amp;ビルドで多数試作する想定であることから
   <strong>方式層を加えた 3 層構造（契約 / 方式 / セット）</strong>への拡張を合意し、Phase 10-1 で反映した（2026-07-15。
-  経緯の記録は <a href="index.html#memo">index.html の検討メモ</a>を参照）。
+  経緯の記録は <a href="../development-log.md">development-log.md</a> の 10-1 を参照）。
 </div>
 
 <ul>
@@ -98,7 +98,7 @@
   <li><strong>実データとの役割分担</strong>: プロンプト文言・スケジュール時刻等の実データの正は DB / CDK コード。セット別設計書には意図・方針・方式の選択を書く</li>
   <li><strong>廃止時の扱い</strong>: セット廃止（スクラップ&amp;ビルド）では設計書を削除せず、廃止の旨を付けて履歴として残す（手順は <a href="operation.html#set-retire">operation.html セクション 2.2</a>）。<strong>廃止した生成方式も同じ扱い</strong>とする（設計書を残し、方式カタログのステータスを「廃止」にする）</li>
   <li><strong>インフラは増えない</strong>: インフラ設計書・CDK スタックはセット追加で増えない・変わらない。スタックは機能単位であり、セットは「既存 ImageBatchStack 内の Scheduler 1 件 + Secrets Manager の Secret + DB レコード」として表現される（<a href="operation.html#set-add">operation.html セクション 2.1</a>）</li>
-  <li><strong>作成タイミング</strong>: 実ファイル・雛形は必要になった時点で作成する（<code>sets/</code> は初セット追加時、<code>generators/</code> は方式の本採用時。11-1 の <code>sets/</code> 初作成・13-2 の <code>generators/</code> 初作成で両ルールとも初適用済み）</li>
+  <li><strong>作成タイミング</strong>: 実ファイル・雛形は必要になった時点で作成する（<code>sets/</code> はセット追加時、<code>generators/</code> は方式の本採用時。両ルールとも適用済みで運用中）</li>
 </ul>
 
 <div class="note">
@@ -171,25 +171,17 @@ Instagram トークンの手動更新、効果測定（当面は手動確認）�
     </tr>
     <tr>
       <td>アプリ用環境変数（<code>BATCH_SIZE_LIMIT</code> 等）</td>
-      <td>要否含め Phase 9 で定義する（投稿対象が「最古の未試行生成実行 1 件」となるため、旧設計ほどの総量制御が必要か再検討する）</td>
+      <td><strong>追加しない（Phase 9 で確定）</strong>。投稿対象が「最古の未試行生成実行 1 件」のため旧設計のような総量制御は不要（<a href="batch-flow.html#contract-usage">batch-flow.html セクション 4</a>）</td>
     </tr>
   </tbody>
 </table>
 </div>
 
-<h2 id="phase9">6. Phase 9 への持ち越し（大枠と詳細の線引き）</h2>
+<h2 id="phase9">6. 将来拡張（実装時期は未定）</h2>
 
-<p>大枠（本書と分冊の骨子版）で扱うのはここまでとし、詳細は Phase 9 で設計する。ドメイン別の持ち越し項目は各分冊の末尾に定める。</p>
+<p><strong>分冊横断の将来拡張</strong>: 失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（AI によるプロンプト生成・カルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、インサイト収集バッチ（Phase 16 後段で展開予定）、生成 AI 動画方式（簡易動画方式〔静止画 + 音楽のリール〕は Phase 14 で対応済み）、承認フロー、管理画面。</p>
 
-<ul>
-  <li><strong>9-2 バッチ処理フロー詳細</strong>（2026-07-06 完了）: <a href="batch-flow.html#phase9">batch-flow.html セクション 5</a>（決定事項と Phase 9-3 への申し送り）</li>
-  <li><strong>9-3 データモデル詳細</strong>（2026-07-07 完了）: <a href="data-model.html#detail">data-model.html セクション 4</a>（テーブル定義詳細）・<a href="data-model.html#target-selection">セクション 4.4</a>（投稿対象決定クエリの厳密化）</li>
-  <li><strong>9-4 アプリ運用詳細</strong>（2026-07-07 完了）: <a href="operation.html#phase9">operation.html セクション 6</a>（決定事項まとめ）</li>
-  <li><strong>9-5 生成 AI レビュー</strong>（2026-07-07 完了）: blocker 1 件（<code>batch_execution_logs</code> の Step Functions Retry 時の一意制約違反）を <a href="batch-flow.html#exec-log">batch-flow.html セクション 1</a> で修正。Phase 9 はこれで一時 Fix 完了。詳細は <a href="../development-log.md">development-log.md</a> の 9-5 備考を参照</li>
-  <li><strong>10-1 最終 Fix</strong>（2026-07-15 完了）: インフラ構築（Phase 0〜8）の知見反映（運用手順の実態合わせ・起動経路等の前提追記）と、検討メモ 2 件（セクション 1.1 の 3 層化・生成方式 strategy 構造）の反映。あわせて上位ドキュメントの外部 API 名を非固定化した（画像生成 API・SNS プラットフォームとも特定サービス名を共通設計に書かない）。詳細は <a href="../development-log.md">development-log.md</a> の 10-1 備考を参照</li>
-</ul>
-
-<p><strong>分冊横断の将来拡張（実装時期は未定）</strong>: 失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（AI によるプロンプト生成・カルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、インサイト収集バッチ、生成 AI 動画方式（簡易動画方式〔静止画 + 音楽のリール〕は Phase 14 で対応済み）、承認フロー、管理画面。</p>
+<p class="note" style="margin-top:.5rem;">大枠 → 詳細（Phase 9）→ 最終 Fix（Phase 10-1）の線引き・持ち越しの経緯は <a href="../development-log.md">development-log.md</a> の 9-1〜9-5・10-1 を参照。</p>
 
 <div class="warn">
   <span class="callout-title">A-3 で確認したこと（インフラ設計との突き合わせ）</span>

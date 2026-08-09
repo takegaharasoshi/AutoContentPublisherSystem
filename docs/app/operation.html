@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-07-24</span>
+  <span>最終更新: 2026-08-09</span>
 </div>
 
 <div class="note">
@@ -147,13 +147,13 @@ VALUES (:set_id, 'instagram', 'main-account', 'アカウント表示名', 1);
 
 -- (5) audio_assets（動画方式のセットのみ。前処理済み音源を S3 に配置してから登録する。
 --     調達・前処理・証跡の詳細はセクション 3。asset_type 省略時は DEFAULT 'bgm'。
---     gpt-quiz-multicut 方式の SE 2 種は asset_type='se' + 固定ファイル名で登録する〔セクション 3〕。
+--     クイズ方式の SE 2 種は asset_type='se' + 固定ファイル名で登録する〔セクション 3〕。
 --     時間帯で BGM を出し分けるセットは time_slot に parameters.slots の slot_code
 --     〔morning / noon / night 等〕を指定する〔省略時 NULL = スロット無関係。data-model.html セクション 4.8〕）
 INSERT INTO audio_assets (set_id, s3_key, time_slot, title, source_url, license_type, license_note, acquired_at, duration_seconds, is_active)
 VALUES (:set_id, 'audio/fashion-set-2/track01.m4a', NULL, '(曲名)', '(出典 URL)', 'CC0', NULL, '2026-07-24', 10, 1);
 
--- (6) quiz_stock_items（gpt-quiz-multicut 方式のセットのみ。16-1 新設。
+-- (6) quiz_stock_items（クイズ方式のセットのみ。16-1 新設。
 --     リサーチ → 表現書き直し → レビューを経た問題を投入する〔手順・著作権ガイドラインはセクション 3〕。
 --     quiz_type / difficulty は parameters.slots の値と一致させる。content_fields は方式のフィールド仕様
 --     〔hook / explanation / coach_comment / tags / summary / illustration_scene〕を満たす JSON）
@@ -167,14 +167,8 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
 
 <div class="warn">
   <span class="callout-title">スロット対応方式のセットは、スケジュール時刻がそのままスロットの指定になる</span>
-  <code>parameters.slots</code> を持つ方式（gpt-quiz-multicut 等）では、どのスロットとして生成するかを方式側が <code>SCHEDULED_AT</code> の JST 時から決定的に解決する（Scheduler の Input にスロットは持たせない）。
+  <code>parameters.slots</code> を持つクイズ方式（<code>quiz-prebuilt</code> 等）では、どのスロットとして生成するかを方式側が <code>SCHEDULED_AT</code> の JST 時から決定的に解決する（Scheduler の Input にスロットは持たせない）。
   スケジュール時刻を <code>from_jst_hour</code> の境界をまたいで変更すると<strong>生成されるスロットが変わる</strong>ため、時刻の変更時はセット別設計書のスロット表と必ず突き合わせること。
-</div>
-
-<div class="note">
-  <span class="callout-title">初セットは既存プレースホルダ Scheduler を転用した（Phase 10-1〜13-1 の経緯。現在は解消済み）</span>
-  ImageBatchStack には Phase 5 で作成したプレースホルダ Scheduler <code>acps-prod-image-generation-schedule</code>（機能名。State=DISABLED・プレースホルダ cron・入力 <code>set_code=fashion-set-1</code>）が存在し、初セット <code>fantasy-animals-1</code> の追加ではこれを転用した（Phase 13-1・2026-07-22 に本番時刻で ENABLED 化 → 14-12 に 1 日 1 回へ変更）。
-  この機能名は 2 セット目の追加時（<strong>Phase 15-15・2026-07-29</strong>）に命名規約に沿って <code>acps-prod-image-generation-fantasy-animals-1</code> へリネーム済みで、<strong>現在は全スケジュールが本手順どおりの命名になっている</strong>（転用は初セット限りの経緯として記録）。
 </div>
 
 <h4>手順 4: 動作確認</h4>
@@ -188,9 +182,9 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
     <li><code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code>（→ 動画方式のセットは <code>audio_assets</code>）の順に DB へ登録した</li>
     <li>キャプションテンプレートに AI 開示ハッシュタグ <code>#AIart</code> を含めた（セクション 3）</li>
     <li>動画方式のセットは、前処理済み音源（3〜5 曲）を S3 の <code>audio/{set_code}/</code> に配置し、証跡（出典 URL・ライセンス種別・取得日）込みで <code>audio_assets</code> に登録した（セクション 3）</li>
-    <li>gpt-quiz-multicut 方式のセットは、SE 2 種（カウントダウンティック・誘導チャイム〔固定ファイル名は <code>answer_chime.m4a</code> のまま〕）を <code>audio/{set_code}/se/</code> の固定ファイル名で配置し、<code>asset_type='se'</code> + 証跡込みで <code>audio_assets</code> に登録した（セクション 3）。固定アセット（キャラポーズ画像等）を <code>assets/{set_code}/</code> に配置した（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）</li>
-    <li>時間帯で BGM を出し分けるセットは、<code>parameters.slots</code> の全 <code>slot_code</code> について <code>time_slot</code> 一致（または NULL）の有効 BGM が 1 曲以上あることを確認した（0 件のスロットがあると当該スロットの実行が異常終了する。セクション 3）</li>
-    <li>gpt-quiz-multicut 方式のセットは、初期の問題ストックを <code>quiz_stock_items</code> へ投入し、<code>parameters.slots</code> の全「型 × 難度」の組について有効な在庫が 1 件以上あることを在庫確認クエリで確認した（0 件の組があると当該スロットの実行が異常終了する。セクション 3）</li>
+    <li>クイズ方式のセットは、SE 2 種（カウントダウンティック・誘導チャイム〔固定ファイル名は <code>answer_chime.m4a</code> のまま〕）を <code>audio/{set_code}/se/</code> の固定ファイル名で配置し、<code>asset_type='se'</code> + 証跡込みで <code>audio_assets</code> に登録した（セクション 3）。固定アセット（キャラポーズ画像等）を <code>assets/{set_code}/</code> に配置した（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）</li>
+    <li>時間帯で BGM を出し分けるセットは、<code>parameters.slots</code> の全 <code>slot_code</code> について <code>time_slot</code> 一致（または NULL）の有効 BGM が 1 曲以上あることを確認した（0 件のスロットがあると、当該スロットの処理〔<code>quiz-prebuilt</code> では動画ビルド、実行時合成方式では実行〕が異常終了する。セクション 3）</li>
+    <li>クイズ方式のセットは、初期の問題ストックを <code>quiz_stock_items</code> へ投入し、<code>parameters.slots</code> の全「型 × 難度」の組について有効な在庫が 1 件以上あることを在庫確認クエリで確認した（0 件の組があると当該スロットの実行が異常終了する。セクション 3）。<code>quiz-prebuilt</code> 方式のセットは、さらに全問の動画ビルド・配置（セクション 3 手順 5）まで完了していること（<code>unbuilt</code> = 0）を確認した</li>
     <li>ストーリーズ再掲するセットは <code>batch_sets.stories_enabled=1</code> を設定した（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
@@ -258,7 +252,7 @@ COMMIT;</code></pre>
 </ul>
 
 <h4>手順 2: 前処理（ffmpeg。ローカルで 1 回だけ）</h4>
-<p><strong>動画の尺は方式カタログ（<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）の該当方式に合わせる</strong>（<code>gpt-image-kenburns</code> = 10 秒、<code>gpt-quiz-multicut</code> = 20 秒素材。15-5 で尺可変に一般化。<strong>クイズ方式は 16-1 の 16 秒化後も 20 秒素材のまま</strong> — トリムと終端フェードは方式の ffmpeg 側で吸収するため、既存素材の再前処理は不要で新規調達時も 20 秒で作る〔<a href="generators/gpt-quiz-multicut.html#encode">方式設計書セクション 9</a>〕）。尺に合わせて切り出し、音量正規化（ラウドネス）とフェードを掛け、AAC（<code>.m4a</code>）で書き出す。AAC に統一するのは、合成時に MP4 コンテナへ再エンコードなしで多重化できるため。</p>
+<p><strong>動画の尺は方式カタログ（<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）の該当方式に合わせる</strong>（<code>gpt-image-kenburns</code> = 10 秒、クイズ方式 = 20 秒素材。15-5 で尺可変に一般化。<strong>クイズ方式は 16-1 の 16 秒化後も 20 秒素材のまま</strong> — トリムと終端フェードはレンダラー（<code>gpt-quiz-multicut</code>）の ffmpeg 側で吸収するため、既存素材の再前処理は不要で新規調達時も 20 秒で作る〔<a href="generators/gpt-quiz-multicut.html#encode">方式設計書セクション 9</a>〕）。尺に合わせて切り出し、音量正規化（ラウドネス）とフェードを掛け、AAC（<code>.m4a</code>）で書き出す。AAC に統一するのは、合成時に MP4 コンテナへ再エンコードなしで多重化できるため。</p>
 <pre><code># 例: 原曲の 12 秒地点から 10 秒を切り出し、ラウドネス正規化 + フェードを掛けて AAC 化する
 # （20 秒尺の方式では -t 20・afade=t=out:st=19 に読み替える。フェード長は尺によらず in 0.5 秒 / out 1 秒）
 ffmpeg -ss 12 -i source.mp3 -t 10 \
@@ -288,12 +282,12 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 <h4>手順 4: audio_assets への登録</h4>
 <p>セクション 2.1 手順 2 の (5) の INSERT を使う（証跡 3 点 + <code>duration_seconds</code> を必ず入れる）。時間帯で BGM を出し分けるセットは <code>time_slot</code> に S3 のスロットプレフィックスと同じ <code>slot_code</code>（<code>morning</code> / <code>noon</code> / <code>night</code> 等）を指定する（選曲のスロット判定はこのカラムで行い、S3 プレフィックスは配置規約に留める。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。</p>
 
-<h4>効果音（SE）の調達・登録（gpt-quiz-multicut 方式のセットのみ。Phase 15-5 新設）</h4>
+<h4>効果音（SE）の調達・登録（クイズ方式のセットのみ。Phase 15-5 新設）</h4>
 <p>クイズ方式はカウントダウンティック・誘導チャイム（15-4 ユーザー決定時の呼称は「正解チャイム」。16-1 でキャプション誘導の注意喚起へ用途変更、ファイル名 <code>answer_chime.m4a</code> は不変）の SE 2 種を使う。SE は <strong>BGM ローテーション外・カットタイミング固定の固定アセット</strong>だが、証跡一元管理の原則を保つため <code>audio_assets</code> に <code>asset_type='se'</code> で登録する（<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。</p>
 <ul>
   <li><strong>調達</strong>: BGM と同じ基準（CC0 / Pixabay License 等。手順 1 の証跡 3 点を控える）</li>
   <li><strong>前処理</strong>: ラウドネス正規化（2 パス loudnorm）は掛けない（短尺 SE には不適切）。ピークを <code>-1.5 dBTP</code> 目安に整え、AAC（<code>.m4a</code>）化のみ行う。ティックは 1 秒間隔 × 5 打の 5 秒連続ファイル、チャイムは 1〜2 秒に整える（配置タイミング・音量バランスの設計は方式側。15-6 実装）</li>
-  <li><strong>配置と登録</strong>: S3 キーは<strong>固定ファイル名規約</strong> <code>audio/{set_code}/se/countdown_tick.m4a</code> / <code>audio/{set_code}/se/answer_chime.m4a</code>。<code>audio_assets</code> へ <code>asset_type='se'</code> で INSERT する（セクション 2.1 手順 2 の (5) と同型 + <code>asset_type</code> 指定）。方式は起動時にこの 2 キーの有効レコード存在を検査し、欠品は設定ミスとして異常終了する</li>
+  <li><strong>配置と登録</strong>: S3 キーは<strong>固定ファイル名規約</strong> <code>audio/{set_code}/se/countdown_tick.m4a</code> / <code>audio/{set_code}/se/answer_chime.m4a</code>。<code>audio_assets</code> へ <code>asset_type='se'</code> で INSERT する（セクション 2.1 手順 2 の (5) と同型 + <code>asset_type</code> 指定）。レンダラー（<code>gpt-quiz-multicut</code>）は起動時にこの 2 キーの有効レコード存在を検査し、欠品は設定ミスとして異常終了する（<code>quiz-prebuilt</code> では事前ビルド時に検査される）</li>
   <li><strong>差し替え</strong>: BGM と同様に <code>is_active=0</code> + 代替の登録で行う（固定ファイル名のため S3 オブジェクトの置き換えでもよいが、証跡を更新するため原則レコードを追加し旧レコードを無効化する）</li>
 </ul>
 
@@ -302,7 +296,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li>選曲は<strong>順繰り</strong>（<code>asset_type='bgm'</code> のうち <code>last_used_at</code> が最古の有効レコード。未使用曲が最優先。SE は対象外）。曲の追加はいつでも INSERT のみでよい（追加曲は未使用のため次回に使われる）</li>
   <li>曲を外す場合は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す）</li>
   <li><strong>動画方式のセットで有効音源が 0 件になると画像生成バッチが異常終了する</strong>（設定ミス扱い。<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。<code>prompt_configs</code> の差し替えと同様、無効化する場合は先に代替曲を登録してから行い、0 件になる瞬間を作らない</li>
-  <li><strong>時間帯スロット対応のセット（<code>gpt-quiz-multicut</code>）の 0 件判定はスロットごと</strong>: あるスロットで「<code>time_slot</code> 一致 + NULL（共通曲）」の有効 BGM が 0 件になると、当該スロットの実行だけが異常終了する（他スロットは動き続けるため気づきにくい）。スロット別曲の差し替え時も「先に代替を登録してから無効化」を守り、スロット単位で 0 件の瞬間を作らない（15-10。順繰り〔<code>last_used_at</code> 最古〕はスロット絞り込み内で維持される）</li>
+  <li><strong>時間帯スロット対応のセット（クイズ方式）の 0 件判定はスロットごと</strong>: あるスロットで「<code>time_slot</code> 一致 + NULL（共通曲）」の有効 BGM が 0 件になると、当該スロットの処理（<code>quiz-prebuilt</code> では動画ビルド、実行時合成方式では当該スロットの実行）だけが異常終了する（他スロットは動き続けるため気づきにくい）。スロット別曲の差し替え時も「先に代替を登録してから無効化」を守り、スロット単位で 0 件の瞬間を作らない（15-10。順繰り〔<code>last_used_at</code> 最古〕はスロット絞り込み内で維持される）</li>
 </ul>
 
 <h3 id="quiz-stock-mgmt">問題ストックの調達・書き直し・投入・動画ビルド（クイズ方式のセットのみ。Phase 16-1 新設・16-3b で動画ビルドを追加）</h3>
@@ -346,6 +340,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li><strong>レビュー観点（全数）</strong>: ①イラストの品質（文字・数字・記号の混入がないか / フラットイラスト調が保たれているか / 情景が問題と合っているか）②版面（文字の欠け・重なり・吹き出しとヒントの整合）③音（BGM・SE のタイミングと音量）。NG は<strong>イラスト再生成（imagegen 再試行）または <code>illustration_scene</code> の書き直し（DB 更新）→ 再ビルド</strong>で解消し、解消するまで S3 へ配置しない</li>
   <li><strong>DB 反映はローカル MySQL と Aurora の両方</strong>へ行う（手順 4 と同じ両環境ルール。3 カラムを同時に UPDATE し、中途半端な行を作らない）</li>
   <li>未ビルトのまま残っても投稿は止まらない（未ビルト行は出題候補から除外され、既存のビルド済み在庫で回る。ただし実行時 WARNING と下記の在庫確認で検知されるため、投入したら速やかにビルドまで終える）</li>
+  <li><strong>ビルド済み行の一括再ビルド（フォーマット改善時）</strong>: 版面・演出・素材の変更を既存の事前動画へ波及させる場合は <code>build.py --rebuild</code> を使う（<code>video_s3_key IS NOT NULL</code> の行を対象に、BGM を <code>video_audio_asset_id</code> から引き継いで再ビルドする = 選曲の LRU を消費しない）。再ビルド後も全数レビュー → S3 上書き → 両環境 DB 反映の流れは新規ビルドと同じ。<code>last_used_at</code>（出題キュー）と選曲は変わらないため、同一問題の再投稿は発生しない（16-4b で初適用）</li>
 </ul>
 
 <h4>初期ストック量・補充サイクル・在庫確認</h4>
@@ -668,16 +663,6 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   <span class="callout-title">注意: スタック再作成で値が失われる</span>
   この Secret の RemovalPolicy は Delete のため、FoundationStack を destroy → 再作成すると手動設定した API キー値は失われる。再作成後はコンソールから再設定が必要（<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。
 </div>
-
-<h2 id="phase9">6. Phase 9-4 の決定事項まとめ</h2>
-<ul>
-  <li>セット追加手順を 5 ステップ（設計書雛形 → Secret 作成 → DB 登録（<code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code> の順）→ Scheduler 追加 deploy → 動作確認）に具体化し、チェックリスト化した（2.1）</li>
-  <li>プロンプト・キャプションの変更は「直接 UPDATE（履歴を残さない）」と「新規 INSERT + 旧行 <code>is_active=0</code>（履歴を残す）」の 2 方式を定義し、<code>prompt_configs</code> は 0 件化を避けるためトランザクションで実行することを確定した（3）</li>
-  <li>投稿失敗時の手動補正は、旧設計の <code>attempt_number</code> ベースの再試行を採用せず、<code>posts</code> 行を <code>pending</code> に戻して「最初から実行」扱いにする方式で再投稿可能にすると確定した。あわせて、補正しても投稿対象決定が「最古の actionable」を優先するため即座に処理されるとは限らない点を明記した（4.2）</li>
-  <li>stale データ（<code>pending</code> / <code>container_created</code> のまま残った生成実行が後続投稿をブロックする問題）について、専用の自動検知は追加せず、既存の失敗アラームを起点に定期確認クエリで検出し 4.2 の手順で終端状態に補正する運用と確定した（4.3）</li>
-  <li>SNS Secret 規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> は変更なしで最終確認とし、既存セットへのアカウント追加手順（Secret 作成 → DB 登録の順）を新規セット追加手順と分けて明文化した（5.2〜5.3）</li>
-  <li>Instagram トークン更新のリマインドは、管理画面がない初期スコープでは運用者による手動リマインダー設定とし、自動化は将来課題として設計課題リストに記録した（5.4）</li>
-</ul>
 
 <p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。<code>post_records.attempt_number</code> / <code>max_post_retries</code> に基づく再試行上限確認は、自動再試行を行わない方針への変更に伴い不採用。SNS アカウント追加手順・手動補正の記録ルール・トークン更新の考え方は本書に引き継いだ。現役の設計書ではない）</p>
 
