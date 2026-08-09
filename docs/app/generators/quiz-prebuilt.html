@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（16-3b で作成）</span>
   <span>方式名（レジストリキー）: quiz-prebuilt</span>
-  <span>最終更新: 2026-08-08</span>
+  <span>最終更新: 2026-08-09</span>
 </div>
 
 <div class="note">
@@ -24,7 +24,7 @@
 
 <div class="warn">
   <span class="callout-title">適用状態</span>
-  16-3b（2026-08-08）の設計 Fix → 16-3c 実装 → 16-3d 初期 42 問ビルド・S3 配置を経て、<strong>16-4（2026-08-08）で本番稼働開始</strong>（<code>batch_sets.generator_name</code> を <code>quiz-prebuilt</code> へ切替・生成スケジュール 3 本を再有効化。投稿前レビュー + リール / ストーリーズ実投稿 success を確認済み）。
+  16-3b（2026-08-08）の設計 Fix → 16-3c 実装 → 16-3d 初期 42 問ビルド・S3 配置を経て、<strong>16-4（2026-08-08）で本番稼働開始</strong>（<code>batch_sets.generator_name</code> を <code>quiz-prebuilt</code> へ切替・生成スケジュール 3 本を再有効化。投稿前レビュー + リール / ストーリーズ実投稿 success を確認済み）。16-4b（2026-08-09）でフォーマット改善（バウンド演出・見切れ解消・イラスト 3:2 明示）を反映し、42 本を再ビルド・差し替え済み。
 </div>
 
 <h2>1. 方式概要</h2>
@@ -122,7 +122,7 @@
 <p>事前動画の供給はローカルの<strong>事前ビルドツーリング</strong>が担う。ツーリングは <code>content/video-build/&lt;set_code&gt;/</code> に置いて git 管理し（置き場・運用ルールは <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）、週次補充（ストック投入）とセットで回す。工程は 5 段:</p>
 <ol>
   <li><strong>対象抽出</strong>: <code>video_s3_key IS NULL</code> の有効ストック行を列挙する（初回 = 16-3d は 42 問全量、以後は補充分のみ）</li>
-  <li><strong>イラスト生成（imagegen 委譲 + 3:2 センタークロップ）</strong>: 行の <code>illustration_scene</code> からイラストプロンプトを組み立て（<code>gpt-quiz-multicut</code> のコード側固定プロンプト〔情景 + スロット別ムード + ブランド配色 + 禁止事項 = <a href="gpt-quiz-multicut.html#illustration">同セクション 6</a>〕を移植し、<strong>画風 1 行を恒久追加</strong> = 下記 decision）、Codex 組み込み画像生成（imagegen）で生成する。プロンプト末尾に<strong>画像サイズ 3:2（1536x1024）の明示行</strong>を付ける（16-5 追加 = 下記 decision）。<code>intake.py</code> は 3:2 センタークロップ → 1536x1024 リサイズで組版入力の縦横比を旧方式と一致させ、<strong>3:2 でなかった素材は WARNING + 切り捨て率を報告</strong>する（見切れたら該当問題だけ再生成する運用）</li>
+  <li><strong>イラスト生成（imagegen 委譲 + 3:2 センタークロップ）</strong>: 行の <code>illustration_scene</code> からイラストプロンプトを組み立て（<code>gpt-quiz-multicut</code> のコード側固定プロンプト〔情景 + スロット別ムード + ブランド配色 + 禁止事項 = <a href="gpt-quiz-multicut.html#illustration">同セクション 6</a>〕を移植し、<strong>画風 1 行を恒久追加</strong> = 下記 decision）、Codex 組み込み画像生成（imagegen）で生成する。プロンプト末尾に<strong>画像サイズ 3:2（1536x1024）の明示行</strong>を付ける（16-4b 追加 = 下記 decision）。<code>intake.py</code> は 3:2 センタークロップ → 1536x1024 リサイズで組版入力の縦横比を旧方式と一致させ、<strong>3:2 でなかった素材は WARNING + 切り捨て率を報告</strong>する（見切れたら該当問題だけ再生成する運用）</li>
   <li><strong>組版 + ffmpeg ビルド</strong>: <code>gpt_quiz_multicut.py</code> の<strong>レンダラー（Pillow 組版 + ffmpeg 合成。8 枚版面・連続ズーム・SE ディレイ・BGM トリム + afade）を import して流用</strong>する（作りは <a href="gpt-quiz-multicut.html#composition">同セクション 8〜9</a> を正とし、本書には重複記載しない）。BGM はスロット別 LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行う（セクション 6 の decision）。実行環境はホストに ffmpeg がないため <strong>image-batch の Docker イメージにリポジトリをマウントして実行</strong>する（16-3 のオフライン確認と同じ方法）</li>
   <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（+ イラスト・カット代表画像）を一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>イラスト再生成（imagegen 再試行）または情景修正（<code>illustration_scene</code> の書き直し → DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は operation.html セクション 3 の手順 5）</li>
   <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> へアップロードし（イラスト原画 <code>{content_key}_illustration.png</code> も再ビルド資産として併置。DB 記録なし）、<code>quiz_stock_items</code> の <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>（V006）を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する。Aurora 反映 SQL と S3 ファイル名のどちらも環境ローカルな <code>id</code> を使わない（安定キー = <code>set_code</code> + <code>question_text</code> と <code>content_key</code> で解決。<a href="../data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a> の V007 コールアウト）</li>
@@ -132,12 +132,12 @@
   16-3 (8) の比較（gpt-image-1 実 API vs imagegen vs imagegen + 画風行）で、<strong>imagegen + 画風 1 行（フラットデザイン・ベクター調・写実禁止・全枚統一）が禁止事項の全遵守と画風の一貫性を両立し品質面で最良</strong>だった。事前ビルドのイラスト生成はこの組み合わせを採用し、画風行をツーリングのプロンプトへ恒久化する。OpenAI Images API は使わない（イラスト API 費ゼロ化）。imagegen は Codex への委譲実行（MCP）であり自動化バッチには組み込めないが、事前ビルドは人間レビューを挟むローカル運用のため委譲ベースで成立する。
 </div>
 <div class="decision">
-  <span class="callout-title">決定（16-5 = 2026-08-09 のユーザー決定）: プロンプトで 3:2（1536x1024）を明示する</span>
-  16-3c 時点では「imagegen は 3:2 の直接指定ができない」と記録していたが、16-5 の見切れ調査で<strong>誤りと判明</strong>した。初期 42 問の生成元を実測すると、<strong>同一セッション内でも出力比率がばらついており（1672x941 / 1693x929 / 1774x887 …）、42 問中 3 問はちょうど 1536x1024 = 3:2 で出力されていた</strong>。出力できないのではなく、指定しないと 16:9 前後に揺れるだけだった。
+  <span class="callout-title">決定（16-4b = 2026-08-09 のユーザー決定）: プロンプトで 3:2（1536x1024）を明示する</span>
+  16-3c 時点では「imagegen は 3:2 の直接指定ができない」と記録していたが、16-4b の見切れ調査で<strong>誤りと判明</strong>した。初期 42 問の生成元を実測すると、<strong>同一セッション内でも出力比率がばらついており（1672x941 / 1693x929 / 1774x887 …）、42 問中 3 問はちょうど 1536x1024 = 3:2 で出力されていた</strong>。出力できないのではなく、指定しないと 16:9 前後に揺れるだけだった。
   <ul>
     <li>プロンプト末尾に<strong>サイズ明示行</strong>（<code>export_prompts.py</code> の <code>SIZE_LINE</code>）を恒久追加し、3:2 で出力させる。3:2 で来れば <code>intake.py</code> のセンタークロップは何も捨てない（無害な恒等変換になる）</li>
     <li>指定が守られない場合に備え、<strong>スキル側で保存ファイルのサイズ確認 → 違えば再生成</strong>（<code>/quiz-stock-replenish</code> セクション 7 手順 2）と、<strong><code>intake.py</code> の WARNING + 切り捨て率レポート</strong>の二重で検知する。プロンプトへのセーフエリア指示（主要素を中央 3:2 に収める）は情景の構図に影響するため今回は入れず、必要になれば追加を検討する</li>
-    <li>組版側の枠埋め廃止（<a href="gpt-quiz-multicut.html#composition">gpt-quiz-multicut セクション 8.2</a> の 16-5 decision）と合わせて、<strong>3:2 で生成された素材は切り捨てゼロで動画に載る</strong></li>
+    <li>組版側の枠埋め廃止（<a href="gpt-quiz-multicut.html#composition">gpt-quiz-multicut セクション 8.2</a> の 16-4b decision）と合わせて、<strong>3:2 で生成された素材は切り捨てゼロで動画に載る</strong></li>
   </ul>
 </div>
 <div class="warn">
@@ -148,6 +148,7 @@
     <li><code>parameters.slots</code> の型・難度 ⇔ スロット対応やパレット・<code>slot_label</code> の変更（該当スロットの再ビルド。事前動画は行の型・難度から一意に決まるスロット向けにビルドされるため、対応を変えると版面とスロットが食い違う）</li>
     <li>BGM の差し替え（ミュート検知時を含む。<code>is_active=0</code> にするだけでは既ビルド動画に古い曲が残る — <a href="../operation.html#mute-check">operation.html セクション 4.4</a> の追記を参照。対象は <code>video_audio_asset_id</code> で特定できる）</li>
   </ul>
+  一括再ビルドは <code>build.py --rebuild</code> で行う（16-4b で追加。<code>video_s3_key IS NOT NULL</code> のビルド済み行を対象に、BGM を <code>video_audio_asset_id</code> から引き継いで再ビルドする = 選曲 LRU を消費せず、<code>last_used_at</code>〔出題キュー〕も変えないため差し替えで再投稿は発生しない）。再ビルド後の全数レビュー → S3 上書き → 両環境 DB 反映の運用手順は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a> を参照。
 </div>
 
 <h2>9. 依存ライブラリ・実行環境</h2>

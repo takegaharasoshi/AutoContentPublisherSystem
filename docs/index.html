@@ -47,14 +47,15 @@
 │   ├── security.html              # IAM・Secrets Manager・ネットワークセキュリティ
 │   ├── cicd.html                  # CI/CD パイプライン
 │   └── operation.html             # インフラ運用
-├── app/                           # アプリ設計書（大枠は骨子版を作成済み。Phase 9 で詳細化）
-│   ├── index.html                 #   アプリ設計の目次・検討メモ
-│   ├── requirements-notes.html    #   アプリ要件メモ（A-1 壁打ち記録）
+├── app/                           # アプリ設計書（Phase 9 詳細化・Phase 10-1 最終 Fix 済み）
+│   ├── index.html                 #   アプリ設計の目次・検討メモ・セット一覧
+│   ├── requirements-notes*.html   #   要件メモ（A-1 / 14-2 / 15 壁打ち記録。設計書ではない）
 │   ├── design-outline.html        #   アプリ設計大枠（全体方針・親ページ）
-│   ├── batch-flow.html            #   バッチ処理フロー設計（Phase 9-2 詳細化済み）
-│   ├── data-model.html            #   データモデル設計（Phase 9-3 詳細化済み）
-│   ├── operation.html             #   アプリ運用設計（Phase 9-4 詳細化済み）
-│   └── sets/                      #   セット別設計書（1 セット 1 本。初セット追加時に作成）
+│   ├── batch-flow.html            #   バッチ処理フロー設計（方式の契約・方式カタログを含む）
+│   ├── data-model.html            #   データモデル設計
+│   ├── operation.html             #   アプリ運用設計
+│   ├── generators/                #   生成方式別設計書（1 方式 1 本。本採用時に作成）
+│   └── sets/                      #   セット別設計書（1 セット 1 本。セット追加時に作成）
 ├── _archive/                      # 旧 Markdown 設計書（参考資料。現役の設計書ではない）
 ├── development-plan.md            # 開発計画・進捗管理（Markdown。現役の計画・設計課題リスト）
 └── development-log.md             # 開発記録（Markdown。完了ステップの実施記録）</code></pre>
@@ -114,20 +115,24 @@
     <p>アプリ設計大枠（全体方針・親ページ）。処理単位の不変条件、セット別設計書ルール、ワークフロー連携の意味付け。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="app/batch-flow.html">batch-flow.html</a> <span class="badge badge-fixed">9-2 詳細化済み</span></div>
-    <p>バッチ処理フロー設計。画像生成・SNS 投稿の処理手順、投稿対象の決定、セット別拡張ポイント。</p>
+    <div class="card-title"><a href="app/batch-flow.html">batch-flow.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
+    <p>バッチ処理フロー設計。画像生成・SNS 投稿の処理手順、投稿対象の決定、生成方式の契約・方式カタログ、セット別拡張ポイント。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="app/data-model.html">data-model.html</a> <span class="badge badge-fixed">9-3 詳細化済み</span></div>
+    <div class="card-title"><a href="app/data-model.html">data-model.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
     <p>データモデル設計。ER 図・エンティティ一覧、主キーと冪等性キーの分離、DDL（<a href="../database/V001__initial_schema.sql">database/V001__initial_schema.sql</a>）。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="app/operation.html">operation.html</a> <span class="badge badge-fixed">9-4 詳細化済み</span></div>
-    <p>アプリ運用設計。セット追加・廃止、プロンプト / キャプション / 音源管理、投稿失敗時対応、トークン更新。</p>
+    <div class="card-title"><a href="app/operation.html">operation.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
+    <p>アプリ運用設計。セット追加・廃止、プロンプト / キャプション / 音源 / 問題ストック管理、投稿失敗時対応、トークン更新。</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><a href="app/index.html#set-docs">generators/ ・ sets/</a></div>
+    <p>生成方式別設計書（1 方式 1 本。一覧は <a href="app/batch-flow.html#generator-catalog">方式カタログ</a>）とセット別設計書（1 セット 1 本。一覧は <a href="app/index.html#set-docs">app/index.html</a>）。</p>
   </div>
 </div>
 
-<p>セット（テーマ）が増えても、追加される設計書は <code>docs/app/sets/</code> のセット別設計書 1 本のみで、<strong>インフラ設計書・共通アプリ設計書は変更しない</strong>（ルールは <a href="app/design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a> を参照）。</p>
+<p>設計書は <strong>3 層構造（契約 / 方式 / セット）</strong>で増える: セット追加で <code>docs/app/sets/</code> に 1 本、生成方式の本採用で <code>docs/app/generators/</code> に 1 本が増え、<strong>インフラ設計書・共通アプリ設計書は変更しない</strong>（方式カタログへの 1 行追加を除く。ルールは <a href="app/design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a> を参照）。</p>
 
 <h2 id="scope">3. スコープ境界: インフラ設計とアプリ設計</h2>
 
@@ -136,7 +141,7 @@
 <div class="table-wrap">
 <table>
   <thead>
-    <tr><th>分類</th><th>インフラ設計（docs/infra/）に書くこと</th><th>アプリ設計（docs/app/）に書くこと ※大枠は Phase A、詳細は Phase 9</th></tr>
+    <tr><th>分類</th><th>インフラ設計（docs/infra/）に書くこと</th><th>アプリ設計（docs/app/）に書くこと</th></tr>
   </thead>
   <tbody>
     <tr>
@@ -175,7 +180,7 @@
 
 <div class="warn">
   <span class="callout-title">スコープガード</span>
-  設計作業やレビューの中でアプリ仕様の論点（テーブル設計、投稿の再試行ルール等）が出てきた場合、インフラ設計書には書かず、<a href="app/index.html">docs/app/index.html</a> の検討メモに記録してアプリ設計（大枠は Phase A、詳細は Phase 9）で扱う。
+  設計作業やレビューの中でアプリ仕様の論点（テーブル設計、投稿の再試行ルール等）が出てきた場合、インフラ設計書には書かず、<a href="app/index.html">docs/app/index.html</a> の検討メモに記録してアプリ設計で扱う。
   同様に、<strong>事業の論点（収益化・KPI・予算・プラットフォーム展開の判断）はインフラ/アプリ設計書には書かず、<a href="strategy/business-strategy.html">事業戦略書</a>で扱う</strong>。
 </div>
 

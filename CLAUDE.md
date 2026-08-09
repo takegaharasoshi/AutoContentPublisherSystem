@@ -2,12 +2,10 @@
 
 ## プロジェクト概要
 
-AutoContentPublisherSystem — AWS 上で動作する画像生成・SNS 自動投稿バッチシステム。
+AutoContentPublisherSystem — AWS 上で動作するコンテンツ生成（画像・動画）・SNS 自動投稿バッチシステム。
 モノリポジトリ構成で、サービスごとにコンテナイメージ・CDK スタック・CI/CD パイプラインを分離する。
 
 ## リポジトリ構成
-
-> **注意**: `services/`, `shared/` はディレクトリのみ作成済み（中身は開発計画に沿って段階的に実装する）。
 
 ```
 AutoContentPublisherSystem/
@@ -17,7 +15,7 @@ AutoContentPublisherSystem/
 │   ├── strategy/                    #   事業戦略書（収益化戦略・予算・KPI・展開方針）
 │   ├── overview/                    #   システム概要
 │   ├── infra/                       #   インフラ設計書（HTML）
-│   ├── app/                         #   アプリ設計書（大枠は骨子版作成済み・Phase 9 で詳細化。セット別設計書は app/sets/ に初セット追加時に作成）
+│   ├── app/                         #   アプリ設計書（共通設計書 + generators/ 方式別 + sets/ セット別の 3 層構造）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
 │   ├── development-plan.md          #   開発計画・進捗管理（現役の計画・設計課題リスト）
 │   └── development-log.md           #   開発記録（完了ステップの実施記録）
@@ -47,7 +45,7 @@ AutoContentPublisherSystem/
 
 設計書は **HTML** で記述する（開発計画 `docs/development-plan.md` と開発記録 `docs/development-log.md` のみ Markdown）。体系の全体像・スコープ境界・設計 Fix 基準は `docs/index.html` を参照。
 
-- **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（大枠は Phase A、詳細は Phase 9 で作成する 2 段階方針）
+- **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（Phase 9 で詳細化・Phase 10-1 で最終 Fix 済み）
 - **事業とシステムを分離する**。事業の意思決定（収益化戦略・予算・KPI・プラットフォーム展開方針）は `docs/strategy/business-strategy.html` に書き、システム設計書には書かない
 - **インフラ設計書にアプリ仕様を書かない**。作業中にアプリの論点（処理ロジック・テーブル設計等）が出たら `docs/app/index.html` の検討メモに記録する
 - HTML 設計書は外部 CDN に依存せず、`docs/assets/style.css` を共通スタイルとして使用する。閲覧はローカルブラウザまたは VS Code の Live Preview で行う（GitHub 上ではソース表示になる）
@@ -57,8 +55,8 @@ AutoContentPublisherSystem/
 | `docs/strategy/` | 事業戦略（収益化戦略・予算・KPI・展開方針・セットポートフォリオ） | `business-strategy.html` |
 | `docs/overview/` | システムの目的・スコープ・技術選定 | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
-| `docs/app/` | アプリ設計（大枠は骨子版作成済み / 詳細は Phase 9。セット追加で増えるのは `sets/` のセット別設計書 1 本のみ） | `index.html`（目次・検討メモ）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`, `data-model.html`, `operation.html`, `requirements-notes.html` |
-| `docs/_archive/` | 旧 Markdown 設計書（アプリ設計の参考資料。現役ではない） | 参照は Phase A・Phase 9 のアプリ設計時のみ |
+| `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
+| `docs/_archive/` | 旧 Markdown 設計書（アプリ設計の参考資料。現役ではない） | 過去の検討経緯の参照用 |
 
 ### ドキュメント参照ガイド（タスク別）
 
@@ -76,7 +74,7 @@ AutoContentPublisherSystem/
 | 認証・秘密情報の設定を変更する | `docs/infra/security.html` |
 | アプリ設計の大枠（全体方針・骨子）を確認する | `docs/app/design-outline.html`（親ページ）+ 分冊 `batch-flow.html` / `data-model.html` / `operation.html` |
 | セットを追加・廃止する | `docs/app/operation.html` セクション 2 + `docs/app/design-outline.html` セクション 1.1（セット別設計書ルール） |
-| アプリ（業務ロジック）の詳細設計・実装 | Phase 9 以降。Phase A の大枠設計書（骨子版）を詳細化してから着手する |
+| 生成方式を追加・変更する | `docs/app/batch-flow.html` セクション 2.1（契約・方式カタログ）+ `docs/app/generators/` の該当方式設計書 |
 | 開発の次ステップを確認する | `docs/development-plan.md` |
 | 過去の実施記録・経緯を確認する | `docs/development-log.md`（完了ステップの確認・備考の全文） |
 
@@ -91,7 +89,7 @@ AutoContentPublisherSystem/
 ## 開発計画
 
 - 開発計画と進捗は `docs/development-plan.md` で管理する。ステップ完了時、計画書にはチェック + 完了日 + 要点のみを記録し、詳細な実施記録は `docs/development-log.md` に追記する（計画書の肥大化防止）
-- **Phase D（インフラ設計の一時 Fix）→ Phase A（アプリ設計の大枠）→ Phase 9（アプリ設計の詳細・前倒し）→ Phase 0〜8（インフラ構築: 空回し確認・監視・CI/CD まで）→ Phase 10〜13（アプリ実装: 実装準備 → 画像生成バッチ → SNS 投稿バッチ → 定常運用開始）** の順に進める
+- **Phase D（インフラ設計）→ Phase A・9（アプリ設計）→ Phase 0〜8（インフラ構築）→ Phase 10〜13（アプリ実装・定常運用開始）は完了済み**。現在は **Phase 14〜17（収益化に向けた機能拡充: 動画対応 → 勝負セット → インサイト → プラットフォーム展開）** を進行中（現況は計画書を参照）
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
 - 作業開始時は `docs/development-plan.md` を読み、現在の Phase・ステップを確認してから着手する
 

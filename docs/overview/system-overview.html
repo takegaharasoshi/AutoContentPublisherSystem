@@ -12,13 +12,13 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / 概要 / システム概要</nav>
 <h1>システム概要</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（Phase 10-1 で見直し済み）</span>
-  <span>最終更新: 2026-07-23</span>
+  <span class="badge badge-fixed">Fix（Phase 10-1 で見直し済み・Phase 14 の動画対応を 2026-08-09 に反映）</span>
+  <span>最終更新: 2026-08-09</span>
 </div>
 
 <h2 id="purpose">1. システムの目的</h2>
 <p>最終目標は<strong>収益化を狙った SNS 運用</strong>である。収益化経路・予算・KPI 等の事業方針は<a href="../strategy/business-strategy.html">事業戦略書</a>で管理する（2026-07-23 に事業戦略層を新設）。</p>
-<p>本システムはその手段として、AWS 上のマネージドサービスを活用し、画像生成から SNS 投稿までを自動化するバッチシステムを提供する。セット（テーマ）の追加・廃止・入れ替えを低コストで繰り返し、試行錯誤で当たりコンテンツを探索するための基盤である。</p>
+<p>本システムはその手段として、AWS 上のマネージドサービスを活用し、コンテンツ生成（画像・動画）から SNS 投稿までを自動化するバッチシステムを提供する（Phase 14 で動画〔リール〕へ一般化）。セット（テーマ）の追加・廃止・入れ替えを低コストで繰り返し、試行錯誤で当たりコンテンツを探索するための基盤である。</p>
 
 <h2 id="overview">2. システム構成（概要）</h2>
 
@@ -86,15 +86,15 @@
 <h3>2.1 画像生成バッチ</h3>
 <ol>
   <li>EventBridge Scheduler が定期的に画像生成ワークフロー（Step Functions）を起動する</li>
-  <li>DB 準備確認（Aurora の利用可能確認）の後、画像生成 ECS Fargate タスクが画像生成 API で画像を生成する。利用する API・生成方式はセットごとに選択・差し替え可能とし、特定のサービス名に固定しない（方式カタログは <a href="../app/batch-flow.html#generator-catalog">app/batch-flow.html セクション 2.1</a> を参照）</li>
-  <li>生成した画像を S3 に保存し、メタ情報を Aurora Serverless v2 に登録する</li>
+  <li>DB 準備確認（Aurora の利用可能確認）の後、画像生成 ECS Fargate タスクがコンテンツ（画像または動画）を生成する。生成方式（利用する API・合成処理の有無・事前生成かの別）はセットごとに選択・差し替え可能とし、特定のサービス名に固定しない（方式カタログは <a href="../app/batch-flow.html#generator-catalog">app/batch-flow.html セクション 2.1</a> を参照）</li>
+  <li>生成したメディアを S3 に保存し、メタ情報を Aurora Serverless v2 に登録する</li>
 </ol>
 
 <h3>2.2 SNS 投稿バッチ</h3>
 <ol>
   <li>画像生成ワークフローの成功後に SNS 投稿ワークフロー（Step Functions）が自動起動する（手動での単独実行も可能）</li>
   <li>DB 準備確認の後、SNS 投稿 ECS Fargate タスクが DB から投稿対象を取得する</li>
-  <li>S3 の画像に対して Presigned URL を発行し、投稿先プラットフォームの API に渡して投稿する。将来的に複数種類の SNS 媒体へ投稿する前提とし、特定のプラットフォームに固定しない（対応プラットフォーム・投稿フローの詳細は <a href="../app/batch-flow.html#flow-sns">app/batch-flow.html セクション 3</a> を参照）</li>
+  <li>S3 のメディア（画像・動画）に対して Presigned URL を発行し、投稿先プラットフォームの API に渡して投稿する。将来的に複数種類の SNS 媒体へ投稿する前提とし、特定のプラットフォームに固定しない（対応プラットフォーム・投稿フローの詳細は <a href="../app/batch-flow.html#flow-sns">app/batch-flow.html セクション 3</a> を参照）</li>
   <li>投稿結果を DB に記録する</li>
 </ol>
 

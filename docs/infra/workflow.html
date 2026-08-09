@@ -64,7 +64,7 @@
 <p><strong>命名規約</strong>（Phase 15-15 で確定）: <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code></p>
 <ul>
   <li><strong>スロット非対応方式のセット</strong>: 1 セット 1 件。スロットサフィックスを付けない（例: <code>acps-prod-image-generation-fantasy-animals-1</code>）</li>
-  <li><strong>スロット対応方式のセット</strong>（<code>prompt_configs.parameters.slots</code> を持つ方式。例: gpt-quiz-multicut）: <strong>スロットごとに 1 件</strong>で <code>slot_code</code> をサフィックスにする（例: <code>acps-prod-image-generation-logic-training-1-morning</code>）。スロットは方式側が <code>SCHEDULED_AT</code> の JST 時から決定的に解決するため、スケジュール時刻がそのままスロットの指定になる。名前にスロットを入れておくことで、実行時刻とスロットの対応が Scheduler 一覧だけで追える</li>
+  <li><strong>スロット対応方式のセット</strong>（<code>prompt_configs.parameters.slots</code> を持つ方式。例: quiz-prebuilt）: <strong>スロットごとに 1 件</strong>で <code>slot_code</code> をサフィックスにする（例: <code>acps-prod-image-generation-logic-training-1-morning</code>）。スロットは方式側が <code>SCHEDULED_AT</code> の JST 時から決定的に解決するため、スケジュール時刻がそのままスロットの指定になる。名前にスロットを入れておくことで、実行時刻とスロットの対応が Scheduler 一覧だけで追える</li>
   <li>1 セットで 1 日複数回投稿する場合も <strong>1 スケジュール 1 時刻</strong>を原則とする（cron 式は時・分を配列で持てるが分が異なる時刻を 1 本にまとめられず、まとめると Scheduler 名から時刻が読めなくなるため）</li>
   <li>Schedule 名の上限は 64 文字。<code>acps-prod-image-generation-</code>（27 文字）を差し引いた 37 文字が <code>{set_code}-{slot_code}</code> の予算になる</li>
 </ul>
