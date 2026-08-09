@@ -806,7 +806,7 @@
 
     **(4) モデル割当**: 16-1 = Fable 5、16-2 = Opus 5（質の判断で詰まったら Fable 5。Web リサーチ + 日本語の質の判断のため委譲不向き）、16-3 = Fable 5 レビュー + Codex sol / high、16-4〜16-5 = Opus 5、16-6 以降 = 展開時に割当。次は 16-1（テコ入れの設計 Fix。Fable 5）
 
-- **16-1** テコ入れの設計 Fix（カット構成・キャプション・問題ストック）
+- [x] **16-1** テコ入れの設計 Fix（カット構成・キャプション・問題ストック）
   - 備考: 2026-08-01 完了（Fable 5）。壁打ち方針 4 点を詳細設計へ落とし、設計書 5 本（方式設計書・セット別・batch-flow・data-model・operation）+ 計画書を改訂した。着手時にユーザー決定 3 点 + 計画レビューでの追加指示 2 点を確定し、その一部は展開時方針の更新を伴う。
 
     **(1) ユーザー決定（計画段階の質疑で確定）**: ①**問題ソーシングはストックのみ**とし、在庫切れ時は**利用済みストックを再利用**する（展開時方針 (2) のハイブリッド〔ストック + 生成品質の底上げ並走〕から変更。LLM 生成へのフォールバックなし）②**ストーリーズ再掲は素の動画再掲のまま継続** — 当初「停止」を選択したが、ユーザーの発案で「タップでリールへ飛べるカード」の可否を調査した結果、**リールカード・リンクスタンプとも Content Publishing API 非対応**（ストーリーズ API は素の画像/動画アップロードのみ・既存投稿のシェアエンドポイントなし）と判明し、接触回数としての継続 + 誘導文言「答えは**投稿の**キャプションへ」での対応に再決定 ③**合計尺は 16 秒に短縮** ④（計画レビュー）**カットは 4 つとし、つかみは吹き出しで行う** — 3 カット案（つかみカット完全廃止）に対し「固定文の吹き出しではつかみとして弱い」との指摘で、カット 1 の吹き出しを**問題ごとの動的つかみコピー（ストックの `hook`）**にする 4 カット構成へ改訂 ⑤（計画レビュー）**16-2 の運用は「リサーチ = Codex 委譲 → 書き直し案 = Claude → レビュー = 人間 → 投入 = Claude」**の役割分担とする（モデル割当表の「委譲不向き」を訂正）
@@ -821,7 +821,7 @@
 
     **(6) 設計課題リストへの影響**: 2026-07-27 の「quiz_items 検証メタ未記録」は生成チェーン休止により過程メタ自体が発生しなくなり対象縮小（突合キーは `stock_item_id` が担う）。方式設計書・セット別設計書には「16-3 実装・16-4 切替までは実運用が旧仕様のまま動く」旨の適用状態 warn を明記した。次は **16-2（問題ストックの初期整備。V005 適用 + 42 問投入）** — 16-1 完了により 16-3 と並行可
 
-- **16-2** 問題ストックの初期整備（リサーチ・書き直し・投入）
+- [x] **16-2** 問題ストックの初期整備（リサーチ・書き直し・投入）
   - 備考: 2026-08-07 完了（作業は 08-01〜08-07。執筆・レビュー対応 = Fable 5 / リサーチ = Codex terra）。作業ディレクトリは `plans/16-2-stock/`（単一ソース `stock_items.py`・検証 `validate.py` / `verify_logic.py`・生成 `generate.py`・リサーチ 3 本・引き継ぎ `STATUS.md`）。
 
     **(1) 出題路線の確定（2 度の方針転換）**: 初版はセット本来の路線どおり古典論理パズル 42 問を執筆したが、ユーザーレビューで「面白みに欠ける」→ 面白クイズ路線へ書き直し → さらに「数字系に寄りすぎ」を経て、**朝 = 定番なぞなぞ・言葉あそび / 昼 = フェルミ推定（身近で意外な題材。施設数系より生活実感系）/ 夜 = とんち・水平思考・ひっかけの古典**で確定（初版はソースごと `stock_items_v1_logic.py` に退避）。これに伴いセット別設計書の L1 定義を「論理パズル」から「なぞなぞ・とんち」へ改訂した
@@ -840,7 +840,7 @@
 
     **(8) 恒久化と後続**: 執筆・レビューの勘所をスキル `/quiz-stock-replenish`（`.claude/skills/quiz-stock-replenish/SKILL.md`）へ集約（週次補充・初期整備の両用）。operation.html セクション 3 冒頭にスキル参照を追記、セット別設計書の L1 定義を改訂。**16-2b（方式設計書の改訂: カット構成の考える + 動的ヒント化・L3 次回補充方針の正式反映）を計画書へ新設**した。**資材の恒久置き場（完了直後のユーザー指示）**: 作業ディレクトリ `plans/16-2-stock/` のうちスキルが参照する資材一式（単一ソース・検証 / 生成ツール・リサーチ証跡・投入 SQL・STATUS）を **`content/quiz-stock/logic-training-1/2026-08-initial/` へ移設して git 管理化**（plans/ は gitignore の使い捨てスクラッチという規約のため。トップレベル `content/` を事業コンテンツ資材の置き場として新設・CLAUDE.md の構成図へ追記。`review.md` は generate.py の派生物のため `content/**/review.md` を gitignore に追加。以後の補充バッチは `content/quiz-stock/<set_code>/<バッチ名>/` を切ってコミットする = SKILL.md に運用を記載）。次は 16-2b または 16-3（並行可。16-3 のカット構成実装は 16-2b 改訂後の設計書を正とする）
 
-- **16-2b** 方式設計書の改訂（16-2 レビュー中のユーザー決定の正式反映）
+- [x] **16-2b** 方式設計書の改訂（16-2 レビュー中のユーザー決定の正式反映）
   - 備考: 2026-08-07 完了（Fable 5）。16-2 の執筆・レビュー過程で確定していたユーザー決定 3 点を設計書へ正式反映した。16-3 の実装は本改訂後の設計書を正とする。
 
     **(1) カット構成の改訂（方式設計書セクション 8.1）**: カット 2「問題」（固定吹き出し「頭の中だけで解いてみよう」= 廃止）を<strong>「考える」</strong>へ変更し、旧カット 3 の固定文「止めてじっくり考えても OK」を前倒し（考えるフェーズが 4 + 5 = 9 秒に拡大）。カット 3（カウントダウン）の吹き出しは<strong>ストックの `hint`（20 字・問題ごとの動的ヒント。5 枚とも同一文言）</strong>へ差し替え。吹き出しは動的 2 種（`hook` / `hint`）+ 固定文 2 種（カット 2・4）になり 16-1 時点の「固定文 3 種」を置き換え（旧 decision は履歴として残し、新 decision で明示的に上書き）。**コーチ表情は 4 枚継続使用のまま割当をカット 2 = think（考え込む）・カット 3 = question（手のひらで差し出す = ヒントの差し出し）へ入れ替え** — 表情割当はユーザー決定（カット名・吹き出しの変更）に含まれておらず、意味の一致から 16-2b で整理した設計判断として decision コールアウトに明記。フィールド仕様（セクション 5）へ `hint` 行を追加（キャプションでは使わない）し、SE ティックの記述を「カウントダウンカット開始 = 8 秒地点」へ追随（ディレイ値 8000ms 自体は不変）
@@ -851,7 +851,7 @@
 
     **(4) 追随改訂**: セット別設計書 sets/logic-training-1.html（セクション 3 の動画構成・セクション 7 のコーチ表情割当表・バッジ / 最終更新）、data-model.html セクション 4.10（`content_fields` 列挙へ `hint` 追加 + 文字数上限の正 = 方式設計書セクション 5 へのリンク）、スキル `/quiz-stock-replenish`（「設計書反映待ち」の暫定注記 3 箇所を反映済みへ更新）。batch-flow.html は「カット間の差分は吹き出し・カウントダウンのみ」の抽象度のため矛盾なし・変更不要。次は **16-3（生成・投稿パイプラインの改修。本改訂後の方式設計書 + batch-flow.html を正とする）**
 
-- **16-3** 生成・投稿パイプラインの改修（実装）
+- [x] **16-3** 生成・投稿パイプラインの改修（実装）
   - 備考: 2026-08-07 完了（実装 = Codex `gpt-5.6-sol` / high 委譲・指示書作成 + レビュー + blocker 修正 + 動画確認 = Fable 5）。16-2b 改訂後の方式設計書 + batch-flow.html セクション 3.3 を正として実装した。
 
     **(1) image-batch（gpt_quiz_multicut.py。1839 → 1310 行）**: LLM 生成・検証チェーン（Responses API・DSL ソルバ・独立 LLM 検証・重複検査・再生成ループ）を削除し、`quiz_stock_items` の LRU 取得（0 件 RuntimeError・再利用 WARNING・防御的フィールド検査〔`hint` 追加・L3 `explanation` 240 字・tags ちょうど 3 個〕）へ置換。カット構成を 16 秒・4 カット・カード 8 枚の版面固定 + 吹き出し差し替え（動的 `hook` / `hint` + 固定文 2 種・コーチ表情は hook → think → question → answer）へ刷新し、旧 4 種の描画関数は共通版面 1 関数 + カット差分（吹き出し・表情・バッジ）に統合。連続ズーム（全編 1.0→1.04 の線形補間をセグメント区間で分担。境界のズームリセット解消）・SE ディレイ 8000 / 13000ms・BGM 16 秒トリム + `afade=t=out:st=15:d=1`・`amix normalize=0` を実装。`quiz_items` INSERT へ `stock_item_id` を追加し、動画完成後に `quiz_stock_items.last_used_at` / `use_count` を UPDATE（commit は共通骨格 = 失敗時はロールバックで巻き戻る）。parameters は slots 必須 5 フィールド + `(quiz_type, difficulty)` の既知組検証で、`tone_hint` / `max_regenerations` / `llm_model` は存在しても無視（設計どおり）
@@ -870,7 +870,7 @@
 
     **(8) 追記 = 実 API 品質確認とイラストプロンプトの調整（2026-08-07）**: ユーザー依頼で実 API（gpt-image-1・実プロンプト）の 6 本（各スロット 2 問）をオフライン生成して品質確認したところ、①A02 で「ZOO」の看板文字 ②C01 でボタンパネルの数字 ③B02 で額縁風の左右帯、が発生。固定プロンプトを調整（**大きな「?」のみ可** = 16-2 の「主役 + 大きな ?」情景との矛盾解消・**看板 / パネル類の文字数字を明示的に禁止**・**額縁 / 帯の禁止と横長全面の指定**・全面背景時代の「背景用 / カード重ね / 中央回避」文言を廃止）し、方式設計書セクション 6 へ反映・pytest 全パス。調整後の再検証では **③は解消、①② は残存**（情景が意味的に文字を誘発するケース〔動物園ゲート・階数ボタン〕はプロンプト禁止だけでは抑えきれない。恒久対応は情景側の書き方〔「文字のないアーチ門」等〕か事前生成 + 人間レビューで弾く運用）。あわせて**ユーザー発案の「イラスト事前生成（42 問分作り置き）」仕様変更の模索**として、Codex の組み込み画像生成（`image_gen.imagegen`。サブスク内・API 課金なし）で同一プロンプト 6 枚を生成し、同じ組版で動画化して比較資材を作成（`plans/16-3-trial/output-real*` / `output-imagegen`）。比較所見: **禁止事項の遵守は imagegen が優位**（ZOO 文字なし・ボタン数字なし）・**画風の一貫性は gpt-image-1 が優位**（imagegen は 6 枚中 4 枚が写実調に振れブランドのフラットイラスト調から外れる = プロンプトに画風指定がないためで矯正余地あり）・imagegen は 3:2 直接指定不可（生成元 1672x941 等 → センタークロップ後処理が必要）。**画風指定を足した再試行（2026-08-08・ユーザー指示）**: プロンプトに画風 1 行（フラットデザイン・ベクター調・写実禁止・6 枚統一）を追加して imagegen で再生成（`output-imagegen-v2`）した結果、**6 枚全てがブランドのフラットイラスト調に統一され、禁止事項も全て遵守**（ZOO 文字なし・ボタンは無地・額縁なし）— gpt-image-1 の弱点（情景起因の文字混入）と初回 imagegen の弱点（写実調へのブレ）の両方が解消し、品質面で最良の組み合わせとなった。採用する場合は画風行を事前生成ツーリングのプロンプトへ恒久化する。採否・仕様変更の判断はユーザー待ち。次は **16-4（投稿前レビューと切替: デプロイ → 手動生成のユーザーレビュー → `caption_templates` 差し替え + `slot_label` 反映 → 実投稿確認 → 生成スケジュール再開・切替日の記録）**
 
-- **16-3b** 動画事前生成方式への転換設計（設計 Fix）
+- [x] **16-3b** 動画事前生成方式への転換設計（設計 Fix）
   - 備考: 2026-08-08 完了（Fable 5）。16-3 完了後の仕様変更（2026-08-08 ユーザー決定 = 計画書 Phase 16 冒頭の展開注記）を詳細設計へ落とし、設計書 7 本を改訂した。16-3c の実装は本改訂後の設計書（方式設計書 quiz-prebuilt を筆頭）を正とする。
 
     **(1) 新方式 `quiz-prebuilt` の方式設計書を新規作成（generators/quiz-prebuilt.html）**: 実行時は「ストック LRU 選定 → S3 の事前動画取得 → 返却」のみの軽量方式。外部 API・Pillow 組版・ffmpeg・フォント / コーチ / SE / BGM の検査をすべて実行時から排除（所要は数分 → 数十秒レベル見込み）。LRU 選定は既存クエリに **`AND video_s3_key IS NOT NULL`（ビルド済み限定）**を加えるだけで、0 件フェイルラウド・再利用 WARNING・防御的フィールド検査（キャプション展開の入力保護のため維持）は従来同型。追加の WARNING として「同じ型・難度に未ビルトの有効在庫あり」を出す（ビルド漏れ検知）。**未ビルト行は「選ばれない」のであって「エラーにしない」**（1 行の未ビルトでスロットが止まる案は不採用）と、**再利用時の同一動画再投稿の許容**（旧方式はイラスト毎回生成で見た目が変わっていた。再利用は頻度が低く間隔も 2 週間以上のため許容 = 16-1「意図的な再出題」の延長)を decision 化。S3 欠落（DB はビルド済みなのに実体なし）は不整合としてフェイルラウド。中間生成物なし（事前レビュー済みのため）。`parameters` 仕様・スロット解決は gpt-quiz-multicut と完全同一とし、**切替（16-4）は `batch_sets.generator_name` の UPDATE 1 本**で可逆にした
@@ -885,7 +885,7 @@
 
     **(6) 事業戦略書のコストモデル改訂（セクション 3.1）**: 画像生成 API の logic-training-1 分（月 900 円前後）を **0 円へ改訂**（imagegen サブスク内）。あわせて **16-1 で休止済みだった LLM テキスト API 行（月 700〜900 円）が未反映のまま残っていたため 0 円へ回収**（旧試算は生成経路再開時の参考として備考に残置）。logic-training-1 の生成 AI API 定常費は完全ゼロとなり、残る変動費は AWS 基盤のみ。改訂した設計書は 7 本: generators/quiz-prebuilt.html（新規）・generators/gpt-quiz-multicut.html・batch-flow.html・data-model.html・operation.html・sets/logic-training-1.html・strategy/business-strategy.html。次は **16-3c（事前生成方式の実装。Codex 委譲）**
 
-- **16-3c** 事前生成方式の実装（Codex 委譲）
+- [x] **16-3c** 事前生成方式の実装（Codex 委譲）
   - 備考: 2026-08-08 完了（実装 = Codex `gpt-5.6-terra` / high 委譲〔指示書 `plans/16-3c-prebuilt-brisk-otter.md`〕・指示書 + レビュー + blocker 修正指示 + 通し確認 = Fable 5）。方式設計書 quiz-prebuilt（16-3b Fix）どおりに実装され、pytest 全パス + 1 問通し確認まで完走した。
 
     **(1) 新方式 generator `quiz_prebuilt.py`（+ REGISTRY 登録 `quiz-prebuilt`）**: 処理順序は設計どおり「parameters 検証 → スロット解決 → ビルド済み限定 LRU（`AND video_s3_key IS NOT NULL`）→ S3 取得（`video_s3_key` カラム経由・欠落フェイルラウド）→ `quiz_items` INSERT + ストック消費 → `GeneratorResult`（MP4 / 1080x1920 / 16 秒 / `audio_asset_id` = `video_audio_asset_id` 転記・中間生成物なし）」。parameters 検証・スロット解決・フィールド検査は `gpt_quiz_multicut` から import 流用（重複実装なし・multicut 側は無変更）。WARNING 2 種（再利用・同型難度に未ビルト有効在庫あり）と `video_audio_asset_id` NULL のフェイルラウドを実装。ユニットテスト 6 件（正常系・ビルド済み 0 件・両 WARNING・audio NULL・S3 欠落伝播・フィールド不備）。**pytest: image-batch 104 passed / 5 skipped（実 API E2E のみ）+ sns-post-batch 108 passed**（共通骨格・SNS 投稿バッチは無変更）
@@ -900,7 +900,7 @@
 
     **(6) スキル `/quiz-stock-replenish` の手順拡張**: セクション 7「動画ビルド・レビュー・配置」を追加（imagegen 委譲時の自己検品指示・動作確認済み Docker コマンド・安定キー SQL の注意・`unbuilt` = 0 の締め確認）。在庫確認（セクション 0）を「未使用かつビルド済み = 在庫」の拡張版クエリ前提へ改訂。次は **16-3d（初期 42 問の動画ビルドとレビュー・配置。冒頭で V006 を Aurora へ適用）**
 
-- **16-3d** 初期 42 問の動画ビルドとレビュー・配置
+- [x] **16-3d** 初期 42 問の動画ビルドとレビュー・配置
   - 備考: 2026-08-08 完了（進行 + レビュー = Opus 5、S3 キー規約改訂の設計 Fix 以降 = Fable 5。イラスト一括生成のみ Codex imagegen 委譲）。42 問すべての事前動画を S3 へ配置し、在庫確認クエリ（拡張版）でビルド済み 42/42 を両環境で確認した。配置直前に S3 キー規約の欠陥が判明し、**業務キー `content_key` の導入（V007 / V008）で 16-3b 決定のキー規約を改訂**したうえで配置した。
 
     **(1) V006 の Aurora 適用（冒頭）**: `aws rds-data execute-statement`（Data API・DDL 1 文）で適用し、`SHOW CREATE TABLE` でローカルと定義完全一致（3 カラム・複合 FK・FK 用インデックス・日本語 COMMENT）を裏取り。差分は `AUTO_INCREMENT` 値のみ（既知の環境間 id 差異）
@@ -950,3 +950,20 @@
     **(6) 再投稿が起きないことの確認**（ユーザー質問への裏取り）: 出題選択は `last_used_at ASC, id ASC` の LRU で、`publish.py` が更新するのは `video_s3_key` / `video_audio_asset_id` / `video_built_at` のみ（`last_used_at` / `use_count` に触れない）。差し替え後の Aurora 実データで**未出題 39 問・BGM 3 種が不変**であることを確認し、差し替えによる再投稿は発生しないことを裏取りした（1 巡後の再出題は 16-1 決定「在庫切れ時は利用済みストックを再利用」による既存仕様で、各スロット 14 問 = 約 14 日周期）。
 
     **(7) ドキュメント同期**: [gpt-quiz-multicut.html](app/generators/gpt-quiz-multicut.html)（8.2 にレイヤー分離とイラスト内接を追記・**9.1 バウンド演出**を新設・16-5 の decision 2 本）、[quiz-prebuilt.html](app/generators/quiz-prebuilt.html)（工程 2 の 3:2 記述を実態へ訂正 + decision）、スキル [quiz-stock-replenish](../.claude/skills/quiz-stock-replenish/SKILL.md)（サイズ確認・警告時の対処・`--rebuild` の使いどころ）。pytest は image-batch 106 件パス。
+
+## 設計課題リスト（解消済み）
+
+[development-plan.md](development-plan.md) の設計課題リストのうち解消済みの課題をここへ移す（2026-08-09 の計画書整理で導入。解消の経緯は各設計書の decision コールアウトにも記録されている）。
+
+| 日付 | 対象ドキュメント | 課題 | 対応方針 | 対応時期 |
+|---|---|---|---|---|
+| 2026-07-06 | docs/infra/stacks.html | セクション 5「スタック間のデータ受け渡し」のツリー図に MonitoringStack への入力（SnsPostingSfnArn・AuroraClusterIdentifier・EcsClusterArn・ImageGenerationSfnName）と DbReadinessCheckSgId の記載がない。3.1 出力一覧・3.4 依存スタックには記載済みのため実装は可能 | **解消済み（2026-07-23、Phase 13-2）**: ツリー図に MonitoringStack へのエッジ 3 本（auroraCluster・ecsCluster・snsPostingSfnArn）と dbReadinessCheckSg → 両バッチスタックのエッジを実装（各スタックの props）どおり追記した（stacks.html セクション 5 の decision に記録） | Phase 13-2 |
+| 2026-07-06 | docs/app/design-outline.html | セット廃止時「データ（生成画像・投稿履歴）は残す」とあるが、S3 実体はインフラ設計の 30 日ライフサイクルで自動削除される。「残す」対象が DB レコード（メタ情報・投稿履歴）であることの明確化と S3 実体の保持要否の確認が必要 | **解消済み（2026-07-07）**: 「残す」対象は DB レコードのみと確定。S3 実体は 30 日ライフサイクルで自動削除される前提を明記した（[docs/app/data-model.html](app/data-model.html#s3-key) セクション 5、[docs/app/operation.html](app/operation.html#set-retire) セクション 2.2） | Phase 9-3 |
+| 2026-07-07 | docs/app/operation.html | Instagram トークン失効日（`token_expires_at`）のリマインドは運用者の手動カレンダー管理としたが、セット数が増えると手運用が破綻する | **解消済み（2026-07-29、15-16 の要否判断）**: 自動化は導入しない。15-7 の実測で実効期限（`data_access_expires_at`）はユーザー × アプリの組で 1 つ・1 回の再認可で全セット同時延長と判明し、リマインダーは全セット 1 件に集約済み（operation.html 5.4）。リマインダー数がセット数に比例しない構造になったため「手運用が破綻する」前提が崩れた。再検討トリガーは ①Meta アプリの複数化 ②Live モード移行（60 日失効に戻る）③管理画面導入時（operation.html 5.4 の decision に記録） | 15-16 |
+| 2026-07-07 | docs/infra/security.html, docs/infra/workflow.html | SNS 投稿バッチタスクロールに付与済みの `cloudwatch:PutMetricData`（Namespace=`ACPS`）は、Phase 9-2 でアプリ側は個別カスタムメトリクスを持たず既存の Step Functions 失敗アラーム 1 本に一本化する方針が確定したため、実装しても使用しない権限として残る | **解消済み（2026-07-15、Phase 10-1）**: 使用しないことが確定しているため SnsPostBatchStack のタスクロールから削除した（Step Functions 実行ロール側の `PutMetricData` は `SnsPostStartFailureCount` 発行に使用中のため残置）。経緯は security.html セクション 2.1 の decision に記録 | Phase 10-1 |
+| 2026-07-07 | docs/app/batch-flow.html | posts の作成（3.3 手順 1）が Step Functions Retry での再実行時にも毎回 INSERT を試みる記述に読めるが、3.2 の復旧ロジックは既存 pending 行への分岐を前提としており、両者を combine して初めて「行が存在する場合は INSERT をスキップする」という意図が読み取れる。明文化されていないため誤読の余地がある | **解消済み（2026-07-15、Phase 10-1）**: batch-flow.html 3.3 手順 1 を「存在しなければ INSERT（INSERT-or-skip。既存行がある場合は 3.2 の復旧分岐で再開）」と明文化した | Phase 10-1 |
+| 2026-07-12 | docs/app/batch-flow.html, docs/app/design-outline.html | D-3 通読時の議論で、セット別生成ロジックの隔離方針（image-batch 内の strategy モジュール構造。方式の割当は DB のセット設定で行う）と、生成方式の設計書分冊ルール（batch-flow.html には契約 + 方式カタログのみ、方式本体は `docs/app/generators/` に 1 方式 1 本の 3 層構造）を合意した。現行のアプリ設計書には未反映 | **解消済み（2026-07-15、Phase 10-1）**: design-outline.html セクション 1.1 を 3 層構造（契約 / 方式 / セット）へ拡張し、batch-flow.html セクション 2.1 に strategy 構造・方式の契約・方式カタログを新設した。検討メモ側にも反映済みを記録 | Phase 10-1 |
+| 2026-07-15 | docs/infra/workflow.html, docs/app/operation.html | Scheduler は現在、機能名の 1 件（`acps-prod-image-generation-schedule`）のみで、セット別の命名規約が未定義。セット 2 追加時に「セットごとに Scheduler 1 件追加」する際の名前の付け方が決まっていない | **完了（2026-07-29、15-15）**: 命名規約を `acps-{env}-image-generation-{set_code}[-{slot_code}]` に確定（スロット対応方式のセットはスロットごとに 1 件・1 スケジュール 1 時刻が原則）。既存 1 件は `acps-prod-image-generation-fantasy-animals-1` へリネーム済みで、全 4 件が規約どおりの名前になっている。workflow.html 1.5 に規約と現行一覧を記載 | 対応済み |
+| 2026-07-18 | docs/infra/workflow.html（MonitoringStack の Aurora アラーム） | Aurora の `acps-prod-aurora-cpu-high`（CPU ≥ 80%）と `acps-prod-aurora-memory-low`（FreeableMemory ≤ 256 MB）は、min ACU 0 からの再開直後の低容量状態（0.5〜1 ACU ≒ メモリ 1〜2 GiB）で構造的に鳴りやすい。10-4 の DDL 適用時、再開 + 軽微なアクセスのみで両方が ALARM → 数分で OK 復帰した実績あり（実負荷なし）。定常運用でバッチ起動のたびに同じ通知が届くノイズになる可能性がある | **解消済み（2026-07-23、Phase 13-2）**: 定常運用初日の定時実行（2026-07-22 12:00 JST）でも memory-low が発報（1〜6 分で OK 復帰。21:00 の回は非発報 = 毎回ではないが繰り返し発生）しノイズを確認したため、両アラームの DatapointsToAlarm を 2 → 3（5 分 × 3/3 = 15 分継続）へ延長し MonitoringStack をデプロイした（workflow.html セクション 8 の decision に記録）。以後の定時実行で非発報を観察する | Phase 13-2 |
+| 2026-07-25 | database/V001__initial_schema.sql（`generated_media.file_format`） | カラム COMMENT が「ファイル形式（Instagram 要件により jpg に変換して保存する）」のままで、動画（`mp4`）を含む 14-4 以降の実態とずれている。型は `VARCHAR(20)` のため動作影響はない | **解消済み（2026-07-27、Phase 15-5）**: クイズ方式対応の `V003__quiz_support.sql` で COMMENT を実態（`jpg` / `mp4` 等・S3 キーと `posts.media_type` 導出の入力）へ更新した | Phase 15-5 |
+| 2026-07-26 | infra/lib/image-batch-stack.ts | Scheduler の State は CDK テンプレートで `enabled: true` 固定のため、検証のためコンソール・CLI で `DISABLED` にしても次の `cdk deploy`（当該リソースに変更がある場合）で ENABLED に戻る。14-10〜14-12 は意図どおりだったが、**「手動 DISABLE が deploy で無言のうちに解除される」性質は事故につながりうる** | 14-12 で workflow.html セクション 1.5 に「Scheduler の設定は CDK を単一の正とし、手動変更は一時的な検証時のみ」と decision として明記した。長期の停止が必要になった場合は CDK 側で `enabled: false` にして deploy する運用とする（対応不要・注意喚起として記録） | 対応不要（記録のみ） |
