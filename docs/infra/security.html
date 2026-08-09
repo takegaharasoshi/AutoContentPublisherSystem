@@ -13,7 +13,7 @@
 <h1>セキュリティ設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-07-06</span>
+  <span>最終更新: 2026-08-10</span>
 </div>
 
 <h2 id="secrets">1. Secrets Manager 管理方針</h2>
@@ -217,7 +217,7 @@
 <table>
   <thead><tr><th>パイプライン</th><th>権限</th></tr></thead>
   <tbody>
-    <tr><td>image-batch-pipeline / sns-post-batch-pipeline</td><td>ECR 認証トークン取得（<code>ecr:GetAuthorizationToken</code>）、対象 ECR リポジトリへのイメージ push（<code>ecr:PutImage</code> 等）、ECS タスク定義の読み取り・登録（<code>ecs:DescribeTaskDefinition</code>、<code>ecs:RegisterTaskDefinition</code>）、ECS タスク実行ロールおよびタスクロールの <code>iam:PassRole</code>、CloudWatch Logs 書き込み（ビルドログ出力用）</td></tr>
+    <tr><td>image-batch-pipeline / sns-post-batch-pipeline / insights-batch-pipeline</td><td>ECR 認証トークン取得（<code>ecr:GetAuthorizationToken</code>）、対象 ECR リポジトリへのイメージ push（<code>ecr:PutImage</code> 等）、ECS タスク定義の読み取り・登録（<code>ecs:DescribeTaskDefinition</code>、<code>ecs:RegisterTaskDefinition</code>）、ECS タスク実行ロールおよびタスクロールの <code>iam:PassRole</code>、CloudWatch Logs 書き込み（ビルドログ出力用）</td></tr>
   </tbody>
 </table>
 </div>
@@ -231,7 +231,7 @@
 <table>
   <thead><tr><th>パイプライン</th><th>権限</th></tr></thead>
   <tbody>
-    <tr><td>image-batch-pipeline / sns-post-batch-pipeline</td><td>CodeStar Connections の使用（<code>codestar-connections:UseConnection</code>）、CodeBuild プロジェクトの起動（<code>codebuild:StartBuild</code>、<code>codebuild:BatchGetBuilds</code> 等）、S3 アーティファクトバケットの読み書き（<code>s3:GetObject</code>、<code>s3:PutObject</code> 等）</td></tr>
+    <tr><td>image-batch-pipeline / sns-post-batch-pipeline / insights-batch-pipeline</td><td>CodeStar Connections の使用（<code>codestar-connections:UseConnection</code>）、CodeBuild プロジェクトの起動（<code>codebuild:StartBuild</code>、<code>codebuild:BatchGetBuilds</code> 等）、S3 アーティファクトバケットの読み書き（<code>s3:GetObject</code>、<code>s3:PutObject</code> 等）</td></tr>
   </tbody>
 </table>
 </div>

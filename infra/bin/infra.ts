@@ -3,6 +3,7 @@ import * as cdk from 'aws-cdk-lib/core';
 import { FoundationStack } from '../lib/foundation-stack';
 import { SnsPostBatchStack } from '../lib/sns-post-batch-stack';
 import { ImageBatchStack } from '../lib/image-batch-stack';
+import { InsightsBatchStack } from '../lib/insights-batch-stack';
 import { MonitoringStack } from '../lib/monitoring-stack';
 
 // 環境識別子は現時点で prod のみ（docs/infra/security.html を参照）
@@ -72,6 +73,23 @@ const imageBatchStack = new ImageBatchStack(app, 'ImageBatchStack', {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
 
+const insightsBatchStack = new InsightsBatchStack(app, 'InsightsBatchStack', {
+  envName,
+  githubConnectionArn: GITHUB_CONNECTION_ARN,
+  githubOwner: GITHUB_OWNER,
+  githubRepo: GITHUB_REPO,
+  githubBranch: GITHUB_BRANCH,
+  insightsBatchRepository: foundationStack.insightsBatchRepository,
+  auroraCluster: foundationStack.auroraCluster,
+  vpc: foundationStack.vpc,
+  ecsCluster: foundationStack.ecsCluster,
+  batchSecurityGroup: foundationStack.batchSecurityGroup,
+  dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
+  dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
+  stackName: `${stackNamePrefix}-InsightsBatchStack`,
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
+});
+
 new MonitoringStack(app, 'MonitoringStack', {
   envName,
   auroraCluster: foundationStack.auroraCluster,
@@ -79,6 +97,8 @@ new MonitoringStack(app, 'MonitoringStack', {
   imageGenerationStateMachine: imageBatchStack.stateMachine,
   snsPostingStateMachine: snsPostBatchStack.stateMachine,
   imageScheduleGroup: imageBatchStack.scheduleGroup,
+  insightsCollectionStateMachine: insightsBatchStack.stateMachine,
+  insightsScheduleGroup: insightsBatchStack.scheduleGroup,
   stackName: `${stackNamePrefix}-MonitoringStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });

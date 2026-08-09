@@ -457,8 +457,8 @@ describe('FoundationStack の ECR リポジトリ', () => {
       findRepository(repositoryName).Properties.LifecyclePolicy.LifecyclePolicyText,
     );
 
-  test('3 つのリポジトリが正しい名前で作成される', () => {
-    expect(Object.keys(repositories)).toHaveLength(3);
+  test('4 つのリポジトリが正しい名前で作成される', () => {
+    expect(Object.keys(repositories)).toHaveLength(4);
     expect(Object.values(repositories)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -473,6 +473,11 @@ describe('FoundationStack の ECR リポジトリ', () => {
         }),
         expect.objectContaining({
           Properties: expect.objectContaining({
+            RepositoryName: 'auto-content-publisher/insights-batch',
+          }),
+        }),
+        expect.objectContaining({
+          Properties: expect.objectContaining({
             RepositoryName: 'auto-content-publisher/db-readiness-check',
           }),
         }),
@@ -483,6 +488,7 @@ describe('FoundationStack の ECR リポジトリ', () => {
   test.each([
     'auto-content-publisher/image-batch',
     'auto-content-publisher/sns-post-batch',
+    'auto-content-publisher/insights-batch',
   ])('%s はリリース用と通常用のライフサイクルルールを持つ', (repositoryName) => {
     expect(lifecyclePolicy(repositoryName)).toEqual({
       rules: [

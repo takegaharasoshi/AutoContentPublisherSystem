@@ -13,7 +13,7 @@
 <h1>CI/CD 設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-07-06</span>
+  <span>最終更新: 2026-08-10</span>
   <span>開発計画 Phase 8 で構築</span>
 </div>
 
@@ -87,7 +87,7 @@
   <tbody>
     <tr><td><code>acps-{env}-image-batch-pipeline</code></td><td>画像生成バッチ</td><td>ImageBatchStack</td><td><code>services/image-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
     <tr><td><code>acps-{env}-sns-post-batch-pipeline</code></td><td>SNS 投稿バッチ</td><td>SnsPostBatchStack</td><td><code>services/sns-post-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
-    <tr><td><code>acps-{env}-insights-batch-pipeline</code>（16-7 設計・16-10 実装）</td><td>インサイト収集バッチ</td><td>InsightsBatchStack</td><td><code>services/insights-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
+    <tr><td><code>acps-{env}-insights-batch-pipeline</code></td><td>インサイト収集バッチ</td><td>InsightsBatchStack</td><td><code>services/insights-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
   </tbody>
 </table>
 </div>
@@ -108,7 +108,7 @@
 <h2 id="codebuild">3. CodeBuild 設定</h2>
 <p>CodeBuild サービスロールの権限詳細は <a href="security.html#iam">security.html セクション 2.5</a> を参照。</p>
 
-<h3>3.1 バッチサービス用（image-batch / sns-post-batch / insights-batch〔16-10 実装〕）</h3>
+<h3>3.1 バッチサービス用（image-batch / sns-post-batch / insights-batch）</h3>
 <ul>
   <li><strong>buildspec.yml の配置</strong>: サービスごとに <code>services/{service-name}/buildspec.yml</code> に配置する（例: <code>services/image-batch/buildspec.yml</code>）</li>
   <li><strong>Docker ビルドコンテキスト</strong>: リポジトリルートをビルドコンテキストとし、サービスごとの Dockerfile を <code>-f</code> オプションで指定する（例: <code>docker build -f services/image-batch/Dockerfile .</code>）。これにより <code>shared/</code> ディレクトリを <code>COPY</code> でコンテナに含めることができる</li>
@@ -142,27 +142,29 @@ phases:
 <h3 id="manual-deploy">3.2 インフラデプロイ（手動）</h3>
 <p>インフラ変更は CI/CD パイプラインを経由せず、開発者がローカルから手動で実行する。</p>
 
-<pre><code># 手動デプロイ手順（イメージタグ Context は常に 3 つとも指定する。下記の注記を参照）
+<pre><code># 手動デプロイ手順（イメージタグ Context は常に 4 つとも指定する。下記の注記を参照）
 cd infra
 cdk diff -c env=prod \
   -c dbReadinessCheckImageTag=&lt;tag&gt; \
   -c imageBatchImageTag=&lt;tag&gt; \
   -c snsPostBatchImageTag=&lt;tag&gt; \
+  -c insightsBatchImageTag=&lt;tag&gt; \
   &lt;StackName&gt;                               # 差分を確認
 cdk deploy -c env=prod \
   -c dbReadinessCheckImageTag=&lt;tag&gt; \
   -c imageBatchImageTag=&lt;tag&gt; \
   -c snsPostBatchImageTag=&lt;tag&gt; \
+  -c insightsBatchImageTag=&lt;tag&gt; \
   &lt;StackName&gt;                               # 確認後にデプロイ
 
 # 全スタックを依存順にデプロイする場合も同じ Context 指定で StackName だけ変える
-# （FoundationStack → SnsPostBatchStack → ImageBatchStack → MonitoringStack の順）</code></pre>
+# （FoundationStack → SnsPostBatchStack → ImageBatchStack → InsightsBatchStack → MonitoringStack の順）</code></pre>
 
 <div class="note">
   <span class="callout-title">イメージタグ Context の指定ルール（開発計画 Phase 8-3 で確認）</span>
   <ul>
-    <li>各スタックは現行イメージの不変タグを CDK Context で受け取る。未指定のスタックは synth エラーとなる: <code>dbReadinessCheckImageTag</code>（FoundationStack、Phase 3-3 以降）/ <code>imageBatchImageTag</code>（ImageBatchStack、Phase 8-1 以降）/ <code>snsPostBatchImageTag</code>（SnsPostBatchStack、Phase 8-2 以降）</li>
-    <li>1 スタックだけを diff / deploy する場合でも、CDK は上流の依存スタック（例: ImageBatchStack なら FoundationStack と SnsPostBatchStack）を選択に含めて synth 検証するため、<strong>対象スタック以外のタグも必要になる。常に 3 つとも指定するのが確実</strong></li>
+    <li>各スタックは現行イメージの不変タグを CDK Context で受け取る。未指定のスタックは synth エラーとなる: <code>dbReadinessCheckImageTag</code>（FoundationStack、Phase 3-3 以降）/ <code>imageBatchImageTag</code>（ImageBatchStack、Phase 8-1 以降）/ <code>snsPostBatchImageTag</code>（SnsPostBatchStack、Phase 8-2 以降）/ <code>insightsBatchImageTag</code>（InsightsBatchStack、Phase 16-10 以降）</li>
+    <li>1 スタックだけを diff / deploy する場合でも、CDK は上流の依存スタック（例: ImageBatchStack なら FoundationStack と SnsPostBatchStack）を選択に含めて synth 検証するため、<strong>対象スタック以外のタグも必要になる。常に 4 つとも指定するのが確実</strong></li>
     <li>現行タグの確認方法: 各サービスの latest ACTIVE タスク定義のイメージ URI（<code>aws ecs describe-task-definition --task-definition acps-prod-&lt;service&gt; --query 'taskDefinition.containerDefinitions[0].image'</code>）。image-batch / sns-post-batch はパイプラインが push した Git コミットハッシュ先頭 12 文字が現行タグとなる</li>
     <li>サービスパイプラインの実行後は、CloudFormation 側のテンプレートが前回 CDK デプロイ時点のタグを保持しているため、<code>cdk diff</code> にタスク定義のイメージタグ変更（旧タグ → 指定した現行タグ）が現れる。これは設計どおりの挙動であり、現行タグを指定してデプロイすれば同一イメージの新 revision が登録されるだけでロールバックは起きない</li>
   </ul>
@@ -182,7 +184,7 @@ cdk deploy -c env=prod \
   <tbody>
     <tr><td><code>auto-content-publisher/image-batch</code></td><td>画像生成バッチ</td></tr>
     <tr><td><code>auto-content-publisher/sns-post-batch</code></td><td>SNS 投稿バッチ</td></tr>
-    <tr><td><code>auto-content-publisher/insights-batch</code>（16-7 設計・16-10 実装）</td><td>インサイト収集バッチ（保持ルールはサービス用と同じ）</td></tr>
+    <tr><td><code>auto-content-publisher/insights-batch</code></td><td>インサイト収集バッチ（保持ルールはサービス用と同じ）</td></tr>
     <tr><td><code>auto-content-publisher/db-readiness-check</code></td><td>DB 準備確認（パイプライン対象外・手動更新）</td></tr>
   </tbody>
 </table>
@@ -191,7 +193,7 @@ cdk deploy -c env=prod \
 <h3>ライフサイクルポリシー</h3>
 <p>ECR リポジトリにはライフサイクルポリシーを設定し、古いイメージを自動削除する。</p>
 <ul>
-  <li><strong>保持ルール（サービス用）</strong>: <code>auto-content-publisher/image-batch</code> および <code>auto-content-publisher/sns-post-batch</code> は通常ビルドタグ（Git コミットハッシュ等）を最新 10 個まで保持し、それ以前は自動削除する</li>
+  <li><strong>保持ルール（サービス用）</strong>: <code>auto-content-publisher/image-batch</code> / <code>auto-content-publisher/sns-post-batch</code> / <code>auto-content-publisher/insights-batch</code> は通常ビルドタグ（Git コミットハッシュ等）を最新 10 個まで保持し、それ以前は自動削除する</li>
   <li><strong>保持ルール（ロールバック保護用）</strong>: 長めに残したいイメージには <code>release-*</code> などの保護用タグを追加し、通常ビルドタグとは別ルールで最新 30 個程度を保持する。保持対象外のタグは Task Definition が参照中でも Lifecycle Policy により削除され得るため、ロールバック前に ECR 上のイメージ存在を確認する</li>
   <li><strong>保持ルール（db-readiness-check）</strong>: <code>auto-content-publisher/db-readiness-check</code> は CDK Context <code>dbReadinessCheckImageTag</code> で不変タグを参照する運用のため、ロールバック余地を確保するため保持数を多めに設定する（例: 30 個）。Task Definition が参照中のタグも Lifecycle Policy の保護対象にはならないため、保持数を超えた古いタグへロールバックする場合は、同等内容のイメージを新しい不変タグで再 push してから CDK Context を更新する</li>
   <li><strong>設定箇所</strong>: FoundationStack の ECR リポジトリ定義に含める（リポジトリごとに <code>LifecyclePolicy</code> を個別指定する）</li>
@@ -221,7 +223,7 @@ cdk deploy -c env=prod \
 
 <div class="warn">
   <span class="callout-title">注意</span>
-  サービスパイプライン（image-batch-pipeline / sns-post-batch-pipeline）に Deploy Stage（CDK Deploy）は含めない。インフラ変更は必ず CDK の手動デプロイで反映し、アプリ更新時の Task Definition revision 登録は CodeBuild が担う。
+  サービスパイプライン（image-batch-pipeline / sns-post-batch-pipeline / insights-batch-pipeline）に Deploy Stage（CDK Deploy）は含めない。インフラ変更は必ず CDK の手動デプロイで反映し、アプリ更新時の Task Definition revision 登録は CodeBuild が担う。
 </div>
 
 <h2 id="infra-change">6. インフラ変更時の運用手順</h2>

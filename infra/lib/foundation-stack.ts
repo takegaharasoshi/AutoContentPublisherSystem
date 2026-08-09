@@ -39,6 +39,8 @@ export class FoundationStack extends cdk.Stack {
   public readonly imageBatchRepository: ecr.Repository;
   /** SNS 投稿バッチのコンテナイメージ用 ECR リポジトリ。後続の SnsPostBatchStack から参照される */
   public readonly snsPostBatchRepository: ecr.Repository;
+  /** インサイト収集バッチのコンテナイメージ用 ECR リポジトリ。後続の InsightsBatchStack から参照される */
+  public readonly insightsBatchRepository: ecr.Repository;
   /** DB 準備確認バッチのコンテナイメージ用 ECR リポジトリ。Phase 3-3 で同一スタック内から参照される */
   public readonly dbReadinessCheckRepository: ecr.Repository;
   /** DB 準備確認タスク定義。Phase 5・6 で ImageBatchStack / SnsPostBatchStack の Step Functions から family 名で参照される */
@@ -200,6 +202,11 @@ export class FoundationStack extends cdk.Stack {
 
     this.snsPostBatchRepository = new ecr.Repository(this, 'SnsPostBatchRepository', {
       repositoryName: 'auto-content-publisher/sns-post-batch',
+      ...batchRepositoryProps,
+    });
+
+    this.insightsBatchRepository = new ecr.Repository(this, 'InsightsBatchRepository', {
+      repositoryName: 'auto-content-publisher/insights-batch',
       ...batchRepositoryProps,
     });
 

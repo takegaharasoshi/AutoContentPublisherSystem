@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib/core';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { FoundationStack } from '../lib/foundation-stack';
 import { ImageBatchStack } from '../lib/image-batch-stack';
+import { InsightsBatchStack } from '../lib/insights-batch-stack';
 import { MonitoringStack } from '../lib/monitoring-stack';
 import { SnsPostBatchStack } from '../lib/sns-post-batch-stack';
 
@@ -11,6 +12,7 @@ const createMonitoringStack = (): MonitoringStack => {
       dbReadinessCheckImageTag: 'test-tag',
       imageBatchImageTag: 'test-image-tag',
       snsPostBatchImageTag: 'test-sns-tag',
+      insightsBatchImageTag: 'test-insights-tag',
     },
   });
   const foundationStack = new FoundationStack(app, 'FoundationStack', {
@@ -50,6 +52,21 @@ const createMonitoringStack = (): MonitoringStack => {
     dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
     snsPostingStateMachine: snsPostBatchStack.stateMachine,
   });
+  const insightsBatchStack = new InsightsBatchStack(app, 'InsightsBatchStack', {
+    envName: 'prod',
+    githubConnectionArn:
+      'arn:aws:codeconnections:ap-northeast-1:516964473143:connection/b671e788-6378-4296-89d9-bfe3a55e4be7',
+    githubOwner: 'takegaharasoshi',
+    githubRepo: 'AutoContentPublisherSystem',
+    githubBranch: 'main',
+    insightsBatchRepository: foundationStack.insightsBatchRepository,
+    auroraCluster: foundationStack.auroraCluster,
+    vpc: foundationStack.vpc,
+    ecsCluster: foundationStack.ecsCluster,
+    batchSecurityGroup: foundationStack.batchSecurityGroup,
+    dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
+    dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
+  });
 
   return new MonitoringStack(app, 'MonitoringStack', {
     envName: 'prod',
@@ -58,6 +75,8 @@ const createMonitoringStack = (): MonitoringStack => {
     imageGenerationStateMachine: imageBatchStack.stateMachine,
     snsPostingStateMachine: snsPostBatchStack.stateMachine,
     imageScheduleGroup: imageBatchStack.scheduleGroup,
+    insightsCollectionStateMachine: insightsBatchStack.stateMachine,
+    insightsScheduleGroup: insightsBatchStack.scheduleGroup,
   });
 };
 
@@ -71,8 +90,8 @@ describe('MonitoringStack', () => {
     });
   });
 
-  test('CloudWatch Alarm を 11 個作成する', () => {
-    template.resourceCountIs('AWS::CloudWatch::Alarm', 11);
+  test('CloudWatch Alarm を 18 個作成する', () => {
+    template.resourceCountIs('AWS::CloudWatch::Alarm', 18);
   });
 
   test('画像生成 Step Functions の失敗を監視する', () => {
@@ -114,6 +133,19 @@ describe('MonitoringStack', () => {
         MetricName: metricName,
       });
     }
+  });
+
+  test('インサイト収集 Step Functions と Scheduler の異常を監視する', () => {
+    template.hasResourceProperties('AWS::CloudWatch::Alarm', {
+      AlarmName: 'acps-prod-insights-collection-sfn-failed',
+      Namespace: 'AWS/States',
+      MetricName: 'ExecutionsFailed',
+    });
+    template.hasResourceProperties('AWS::CloudWatch::Alarm', {
+      AlarmName: 'acps-prod-insights-scheduler-target-error',
+      Namespace: 'AWS/Scheduler',
+      MetricName: 'TargetErrorCount',
+    });
   });
 
   test('異常終了した ECS タスクを SNS Topic に通知する', () => {

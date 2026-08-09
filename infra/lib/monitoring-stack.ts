@@ -22,8 +22,12 @@ export interface MonitoringStackProps extends cdk.StackProps {
   imageGenerationStateMachine: sfn.StateMachine;
   /** SNS 投稿ワークフロー */
   snsPostingStateMachine: sfn.StateMachine;
+  /** インサイト収集ワークフロー */
+  insightsCollectionStateMachine: sfn.StateMachine;
   /** AWS/Scheduler メトリクスの Dimension に使用する ScheduleGroup */
   imageScheduleGroup: scheduler.ScheduleGroup;
+  /** AWS/Scheduler メトリクスの Dimension に使用するインサイト収集 ScheduleGroup */
+  insightsScheduleGroup: scheduler.ScheduleGroup;
 }
 
 /**
@@ -112,6 +116,20 @@ export class MonitoringStack extends cdk.Stack {
     );
 
     createAlarm(
+      'InsightsCollectionSfnFailedAlarm',
+      `acps-${props.envName}-insights-collection-sfn-failed`,
+      props.insightsCollectionStateMachine.metricFailed({
+        statistic: 'Sum',
+        period: cdk.Duration.minutes(5),
+      }),
+      1,
+      cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+      1,
+      1,
+      'インサイト収集 Step Functions の実行失敗を検知。CloudWatch Logs で原因を確認し、必要に応じて手動再実行する',
+    );
+
+    createAlarm(
       'SnsPostStartFailureAlarm',
       `acps-${props.envName}-sns-post-start-failure`,
       new cloudwatch.Metric({
@@ -191,6 +209,27 @@ export class MonitoringStack extends cdk.Stack {
         1,
         1,
         'Scheduler の異常を検知。Scheduler DLQ のメッセージを確認し、対象 set_code と scheduled_at で画像生成 Step Functions を手動実行する',
+      );
+    }
+
+    for (const [metricName, alarmNameSuffix] of schedulerAlarms) {
+      createAlarm(
+        `Insights${metricName}Alarm`,
+        `acps-${props.envName}-${alarmNameSuffix.replace('image-', 'insights-')}`,
+        new cloudwatch.Metric({
+          namespace: 'AWS/Scheduler',
+          metricName,
+          dimensionsMap: {
+            ScheduleGroup: props.insightsScheduleGroup.scheduleGroupName,
+          },
+          statistic: 'Sum',
+          period: cdk.Duration.minutes(5),
+        }),
+        1,
+        cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+        1,
+        1,
+        'インサイト収集 Scheduler の異常を検知。Scheduler DLQ のメッセージを確認し、対象 set_code / scheduled_at / media_lookback_days でインサイト収集 Step Functions を手動実行する',
       );
     }
 

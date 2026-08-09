@@ -1,0 +1,81 @@
+{
+  "StartAt": "WaitForDbReady",
+  "States": {
+    "WaitForDbReady": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 900,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${DbReadinessCheckTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${DbReadinessCheckSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "Next": "RunInsightsBatchTask"
+    },
+    "RunInsightsBatchTask": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 3600,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${InsightsBatchTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${BatchSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "insights-batch",
+              "Environment": [
+                { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "SCHEDULED_AT", "Value.$": "$.scheduled_at" },
+                { "Name": "MEDIA_LOOKBACK_DAYS", "Value.$": "$.media_lookback_days" },
+                { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" }
+              ]
+            }
+          ]
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "States.Timeout"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "End": true
+    },
+    "HandleError": {
+      "Type": "Fail",
+      "Error": "InsightsBatchFailed",
+      "Cause": "Insights batch task failed after retries"
+    }
+  }
+}
