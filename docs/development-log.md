@@ -985,6 +985,19 @@
 
     **(6) ドキュメント改訂**: アプリ側 = [batch-flow.html](app/batch-flow.html)（セクション 4 新設・旧 4 は 5 へ）・[data-model.html](app/data-model.html)（4.11 新設・ER 図・複合 FK）・[operation.html](app/operation.html)（セクション 6 新設・5.4 改訂）・[design-outline.html](app/design-outline.html)。インフラ側 = [stacks.html](infra/stacks.html)（3.5 新設・Admin は 3.6 / 3.7 へ）・[workflow.html](infra/workflow.html)（1.6・5.4・11 新設、アラーム表・DLQ 追記）・[cicd.html](infra/cicd.html)・[security.html](infra/security.html)。CLAUDE.md のスタック一覧・デプロイ順序も更新。持ち越し課題（sns-post-batch の shared 載せ替え・API バージョン v21 → v25 系）は設計課題リストに記録。16-8〜16-12 のステップ展開と Codex 割当は計画書を参照。次は **16-8（V009）から 16-10 まで開発を進め、16-11 で稼働開始**（16-12 のみ 16-5 完了待ち）。
 
+- [x] **16-8** データモデル拡張（V009）
+  - 備考: 2026-08-10 実施（DDL 生成 = Codex `gpt-5.6-terra` / high 委譲・レビューと両環境への適用・検証 = Opus 5）。設計（[data-model.html](app/data-model.html) セクション 4.11）どおりの `database/V009__insights_support.sql` を作成し、**ローカル MySQL と Aurora の両方へ適用完了**。
+
+    **(1) 設計書に無かった変更を 1 つ追加**: `batch_execution_logs.batch_type` は `ENUM('image_generation', 'sns_posting')` のため、[batch-flow.html](app/batch-flow.html) セクション 4.2 が要求する「本バッチ用の値」の追加は DDL 変更を伴う。計画書の 16-8 の記述（新テーブル 2 本 + `posts` の UNIQUE）には含まれていなかったが、16-9 の実装で必ず必要になり ENUM 末尾追加は完全に追加的（既存行の値・アプリの参照に影響なし）なため V009 に含めた。値は既存の命名（`image_generation` / `sns_posting`）と SFN 名 `insights-collection-sfn` に揃えて **`insights_collection`**。data-model.html セクション 4.7 に「ENUM を踏襲する理由」つきで反映した。
+
+    **(2) V009 の内容（適用順）**: ①`posts` へ `UNIQUE KEY uq_posts_set_id (set_id, id)`（`post_insights` の複合 FK 参照先）②`batch_execution_logs.batch_type` の ENUM 拡張 ③`post_insights` CREATE（`UNIQUE (post_id, scheduled_at)` = 冪等性キー・`KEY (set_id, post_id)` = 複合 FK 用・`metrics` JSON NOT NULL・`api_version`）④`account_insights_daily` CREATE（`UNIQUE (sns_account_id, metric_date)`・`followers_count` NULL 可）。FK の向きにより ① を ③ より先に置く。様式・日本語 COMMENT・ヘッダーコメントは V005 を踏襲。
+
+    **(3) ローカル MySQL での実挙動検証**（`acps-mysql` へ適用後、フィクスチャを張ってトランザクション内で検証しロールバック）: ①**冪等性** — 同一 `(post_id, scheduled_at)` の 2 回目 INSERT IGNORE で行が増えず初回値が保持される ②**追記型** — `scheduled_at` が異なれば 2 行目として追記される ③**セット境界の複合 FK** — セット 44 の `post_id` をセット 1 の `set_id` で参照する INSERT が ERROR 1452 で拒否される ④**JSON パス抽出** — `metrics->>'$.reels_skip_rate'` / `metrics->>'$.navigation.swipe_forward'` が引ける（16-12 の生成カラム / ビュー昇格の前提が成立） ⑤**upsert-once** — `account_insights_daily` の同一 `(sns_account_id, metric_date)` 2 回目が無視され初回の `metrics` / `followers_count` が残る ⑥差分取得の起点 `MAX(metric_date)` が引ける。
+
+    **(4) 回帰確認**: V009 適用後の DB に対し `services/sns-post-batch` **108 件全パス**（ローカル MySQL E2E 5 件が skip されず実行）・`services/image-batch` 106 件パス・5 skip（既存の opt-in 実 API E2E のみ）で回帰なし。
+
+    **(5) Aurora への適用**: ユーザー明示許可のうえ Claude が `aws rds-data execute-statement`（Data API）で 4 文を実行（V005・V006 と同じ役割分担）。Aurora Serverless v2 が auto-pause 状態だったため `DatabaseResumingException` をリトライするループで適用した。`SHOW CREATE TABLE` をローカルと `diff` して**両環境の定義完全一致**を裏取り（差分は既知の環境ローカルな `AUTO_INCREMENT` 値のみ）。`batch_type` の ENUM 値 3 種と `uq_posts_set_id (set_id, id)` も information_schema で確認済み。次は **16-9（insights-batch アプリ実装。Codex sol 委譲）**。
+
 ## 設計課題リスト（解消済み）
 
 [development-plan.md](development-plan.md) の設計課題リストのうち解消済みの課題をここへ移す（2026-08-09 の計画書整理で導入。解消の経緯は各設計書の decision コールアウトにも記録されている）。

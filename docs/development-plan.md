@@ -116,8 +116,8 @@
   - 備考: 2026-08-09 完了（リサーチ = `codex --search exec` 委譲・再検証 + 整理 = Fable 5）。調査基準 v25.0。**スキップ率は `reels_skip_rate`（2025-12 追加）として API 取得可**・視聴維持カーブと View Rate はアプリ画面のみ（= 16-5 手動比較の記録分担が確定）。設計上の主要制約は ①ストーリーズは投稿後 24 時間の取得期限 ②アカウント指標は保持 90 日 = 日次の自前保存が必須 ③追加権限 `instagram_manage_insights` は既存トークンへの再認可 + 新トークン発行が必要。詳細は [development-log.md](development-log.md) の 16-6 を参照
 - [x] **16-7** インサイト収集バッチの壁打ち・設計 Fix
   - 備考: 2026-08-10 完了（Fable 5）。壁打ちのユーザー決定 4 点: **①実行は 1 日 2 回（06:00・18:00 JST）** ②メディア追跡は投稿後 14 日（`MEDIA_LOOKBACK_DAYS`） ③格納は **JSON 全量 + 16-5 後に生成カラム / ビューへ昇格**（2 段階 Fix の実現方式） ④初回バックフィルを実施（アカウント日次 90 日 + 既存全投稿 = 8/8 切替の前後比較を自動収集データでも可能に）。既定採用: InsightsBatchStack 新設（既存パターン踏襲・セット別実行）・`post_insights`（UNIQUE (post_id, scheduled_at) で冪等）+ `account_insights_daily`（UTC 日 upsert-once）・`posts` へ UNIQUE (set_id, id) 追加（V009）・`instagram_manage_insights` 再認可を 16-11 に組み込み。設計書 9 本 + CLAUDE.md を改訂。詳細は [development-log.md](development-log.md) の 16-7 を参照
-- [ ] **16-8** データモデル拡張（V009）
-  - 内容: `post_insights` / `account_insights_daily` 新設 + `posts` への `UNIQUE (set_id, id)` 追加の DDL（`V009__insights_support.sql`）を作成・レビューし、ローカル MySQL と Aurora の両方へ適用する。設計の正は [data-model.html](app/data-model.html) セクション 4.11（全変更が追加的でアプリのデプロイ順序調整は不要）
+- [x] **16-8** データモデル拡張（V009）
+  - 備考: 2026-08-10 完了（DDL 生成 = Codex terra 委譲・レビューと適用 = Opus 5）。`V009__insights_support.sql` を作成し**ローカル MySQL と Aurora の両環境へ適用済み**（`SHOW CREATE TABLE` の差分は環境ローカルな `AUTO_INCREMENT` 値のみ）。設計書に無かった変更を 1 つ追加: `batch_execution_logs.batch_type` ENUM へ `insights_collection` を追加（ENUM 末尾追加。batch-flow.html セクション 4.2 が要求。data-model.html セクション 4.7 に反映）。ローカルで冪等性キー・セット境界の複合 FK・JSON パス抽出（16-12 の昇格の前提）を実挙動で検証し、既存 2 サービスの pytest 214 件で回帰なしを確認。詳細は [development-log.md](development-log.md) の 16-8 を参照
 - [ ] **16-9** insights-batch アプリ実装
   - 内容: `services/insights-batch/` を新設（アカウント日次 + メディアレベルの収集ロジック・INSERT-or-skip の冪等性・部分失敗続行と終了コード・`X-App-Usage` 監視 + バックオフ・pytest）。Instagram クライアントの汎用層（HTTP / エラー処理）と SNS Secret 名規約を `shared/acps_shared` へ昇格して利用する（sns-post-batch の載せ替えは行わない — 設計課題リストに記録）。API バージョンは v25.0 系でピン留めし、メトリクス名を現行リファレンスで再確認する。処理仕様の正は [batch-flow.html](app/batch-flow.html) セクション 4
 - [ ] **16-10** インフラ実装・デプロイ

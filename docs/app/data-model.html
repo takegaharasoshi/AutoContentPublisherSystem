@@ -141,7 +141,7 @@
   <line x1="605" y1="263" x2="605" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
   <text x="612" y="290" font-size="10" fill="var(--diag-text)">1 : N（収集ラン）</text>
 </svg>
-<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_media</code>（生成メディア: 画像・動画。旧 <code>generated_images</code>）は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。<code>audio_assets</code>（音源ストック。Phase 14-4 新設）はセットの子であり、動画の <code>generated_media</code> から使用音源として参照される（破線）。<code>quiz_items</code>（出題履歴。Phase 15-5 新設）は生成実行と 1 : 1 で、クイズ方式のセットのみ行が作られる。<code>quiz_stock_items</code>（問題ストック。Phase 16-1 新設）はセットの子で、出題時に消費（LRU 順繰り）され、<code>quiz_items.stock_item_id</code> から参照される（破線）。<code>post_insights</code>（投稿別インサイトのスナップショット）と <code>account_insights_daily</code>（アカウント日次インサイト）は Phase 16-7 で設計 Fix したインサイト収集バッチ（第 3 のバッチ）用のテーブル（セクション 4.11。テーブル作成は 16-8 の V009）。</figcaption>
+<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_media</code>（生成メディア: 画像・動画。旧 <code>generated_images</code>）は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。<code>audio_assets</code>（音源ストック。Phase 14-4 新設）はセットの子であり、動画の <code>generated_media</code> から使用音源として参照される（破線）。<code>quiz_items</code>（出題履歴。Phase 15-5 新設）は生成実行と 1 : 1 で、クイズ方式のセットのみ行が作られる。<code>quiz_stock_items</code>（問題ストック。Phase 16-1 新設）はセットの子で、出題時に消費（LRU 順繰り）され、<code>quiz_items.stock_item_id</code> から参照される（破線）。<code>post_insights</code>（投稿別インサイトのスナップショット）と <code>account_insights_daily</code>（アカウント日次インサイト）は Phase 16-7 で設計 Fix したインサイト収集バッチ（第 3 のバッチ）用のテーブル（セクション 4.11。テーブルは 16-8 の V009 で作成済み）。</figcaption>
 </figure>
 
 <h2 id="entities">2. エンティティ一覧</h2>
@@ -211,12 +211,12 @@
       <td>旧設計を踏襲。<code>generation_runs</code> とは役割が異なり相互に FK を持たない（セクション 4.7 で役割分担を確定）</td>
     </tr>
     <tr>
-      <td><code>post_insights</code><span class="badge badge-fixed" style="margin-left:.4rem">16-7 設計</span></td>
+      <td><code>post_insights</code><span class="badge badge-fixed" style="margin-left:.4rem">16-8 作成済み</span></td>
       <td>投稿別インサイトのスナップショット（メディアレベル Insights の生メトリクス全量。収集ランごとに追記）</td>
-      <td>インサイト収集バッチ（第 3 のバッチ。<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）が書き込む。<code>posts</code> の子（複合 FK。突合キーは <code>posts.platform_post_id</code> = IG メディア ID）。メトリクスは JSON 全量保存とし、継続的に見る指標の昇格は 16-5 完了後に確定する（セクション 4.11。テーブル作成は 16-8 の V009）</td>
+      <td>インサイト収集バッチ（第 3 のバッチ。<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）が書き込む。<code>posts</code> の子（複合 FK。突合キーは <code>posts.platform_post_id</code> = IG メディア ID）。メトリクスは JSON 全量保存とし、継続的に見る指標の昇格は 16-5 完了後に確定する（セクション 4.11。テーブルは 16-8 の V009 で作成済み）</td>
     </tr>
     <tr>
-      <td><code>account_insights_daily</code><span class="badge badge-fixed" style="margin-left:.4rem">16-7 設計</span></td>
+      <td><code>account_insights_daily</code><span class="badge badge-fixed" style="margin-left:.4rem">16-8 作成済み</span></td>
       <td>アカウント日次インサイト（UTC 日で確定したアカウントレベル指標 + フォロワー数スナップショット）</td>
       <td>API 保持 90 日の制約に対する自前の長期時系列。<code>sns_accounts</code> の子（複合 FK）。UTC 日 × アカウントで 1 行の確定値（upsert-once。セクション 4.11）</td>
     </tr>
@@ -390,7 +390,7 @@ LIMIT 1;</code></pre>
   <li><code>posts</code> の <code>UNIQUE (generation_run_id, sns_account_id, media_type)</code>（V004 拡張）により 1 投稿対象 × 1 メディア種別につき常に 1 行。ストーリーズを有効化しないセットでは従来どおり 1 投稿対象 1 行、有効化したセットではリール行 + ストーリーズ行の最大 2 行になる。状態遷移は <a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a> の 5 状態（<code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）をそのまま <code>status</code> ENUM に反映する</li>
   <li><code>caption_template_id</code>（nullable FK）+ <code>caption_text_snapshot</code>: <code>posts</code> 行は本文組み立て前（<code>pending</code> 作成時）に INSERT されるため、当初は両方 NULL。本文組み立て時（<a href="batch-flow.html#sns-steps">セクション 3.3 手順 3</a>）に UPDATE で設定する</li>
   <li><code>post_media</code> は 1 投稿 : N メディア（将来のカルーセル）に対応する中間テーブル。初期構築では生成実行内の先頭メディア（<code>generated_media.id</code> 昇順で最初の 1 件）のみを <code>display_order=0</code> で 1 行登録する（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3 手順 2</a>）。参照カラムは V002 で <code>generated_image_id</code> → <code>generated_media_id</code> にリネームする</li>
-  <li><strong>16-7 追加</strong>: <code>post_insights</code> の複合 FK の参照先とするため、V009 で <code>UNIQUE (set_id, id)</code>（<code>uq_posts_set_id</code>）を追加する（セクション 3 のパターン。既存行は <code>id</code> が主キーのため自明に満たし、埋め戻し不要）</li>
+  <li><strong>16-7 追加</strong>: <code>post_insights</code> の複合 FK の参照先とするため、V009 で <code>UNIQUE (set_id, id)</code>（<code>uq_posts_set_id</code>）を追加した（セクション 3 のパターン。既存行は <code>id</code> が主キーのため自明に満たし、埋め戻し不要。16-8 で両環境へ適用済み）</li>
 </ul>
 <div class="note">
   <span class="callout-title">既知の割り切り: post_media.generated_media_id の生成実行境界チェックはアプリ層</span>
@@ -409,6 +409,7 @@ LIMIT 1;</code></pre>
   どの実行がどの <code>generation_run</code> を作ったかを調べたい場合は、<code>started_at</code> と <code>generation_runs.created_at</code> の近接時刻で運用者が突き合わせる（通常は 1 実行 : 1 生成実行の関係になるため実務上問題ない）。
 </div>
 <p><code>status</code> / <code>attempt_count</code> の INSERT/UPDATE 手順（Step Functions Retry による再起動時に <code>UNIQUE (execution_arn, batch_type)</code> と衝突しないための INSERT-or-fetch パターン）は <a href="batch-flow.html#exec-log">batch-flow.html セクション 1</a> を参照（Phase 9-5 レビューで確定）。</p>
+<p><strong>16-8 追加</strong>: <code>batch_type</code> ENUM に第 3 のバッチの値 <code>insights_collection</code> を V009 で追加した（<code>ENUM('image_generation', 'sns_posting', 'insights_collection')</code>）。ENUM の末尾追加のため既存行の値・アプリの参照は影響を受けない。バッチ種別を増やすたびに DDL 変更が要る形式だが、種別は「バッチの本数」であり増減が稀・値の一覧が固定されている方が運用ログの集計で扱いやすいため、ENUM のまま踏襲する。</p>
 <p>なお、画像生成と SNS 投稿は別ステートマシンのため、1 つの論理実行（画像生成 → 連鎖起動された SNS 投稿）に対応する 2 行は <code>execution_arn</code> が<strong>異なる</strong>。子ワークフローは親と<strong>同一の実行名</strong>で起動される（<a href="../infra/workflow.html">infra/workflow.html</a> セクション 3）ため、両バッチの実行ログを突き合わせる場合は <code>execution_arn</code> 末尾の実行名部分で相関を取る（Phase 10-1 でインフラ構築の知見を反映）。</p>
 
 <h3 id="detail-audio-assets">4.8 audio_assets（音源ストック。Phase 14-4 新設）</h3>
@@ -592,7 +593,7 @@ LIMIT 1;</code></pre>
   </ul>
 </div>
 
-<h3 id="detail-insights">4.11 post_insights / account_insights_daily（インサイト収集。Phase 16-7 設計・16-8 で作成）</h3>
+<h3 id="detail-insights">4.11 post_insights / account_insights_daily（インサイト収集。Phase 16-7 設計・16-8 で作成済み）</h3>
 
 <div class="decision">
   <span class="callout-title">決定（2026-08-10、Phase 16-7）: インサイト 2 テーブルの新設（V009）と「JSON 全量 + 後から昇格」方式</span>
@@ -636,7 +637,7 @@ LIMIT 1;</code></pre>
     <li><strong>追記型でスナップショットを残す理由</strong>: メディア指標は投稿後も伸び続けるため、収集のたびに上書きすると伸び曲線（Views Over Time 相当。API では取得不可）が失われる。1 日 2 回 × 追跡 14 日で 1 投稿あたり最大 28 行・現行規模で 1 日約 200 行と僅少のため、保持期限は設けない</li>
     <li><strong>ストーリーズの最終値</strong>: ストーリーズは投稿後 24 時間で API から取得不可になるため、期限内の最後のスナップショットを最終値として扱う（1 日 2 回実行で各ストーリーズは寿命の 17〜22 時間時点まで計測される。収集タイミングの設計は <a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）</li>
     <li><strong>問題別パフォーマンスの突合経路</strong>: <code>post_insights → posts（generation_run_id）→ quiz_items → stock_item_id → quiz_stock_items</code>。<code>posts</code> と <code>quiz_items</code> はともに <code>generation_runs</code> の子であり、この JOIN で「どの問題のリールがどう伸びたか」を引ける</li>
-    <li><strong>V009 の適用順序</strong>: 全変更が追加的（新テーブル 2 本 + <code>posts</code> への UNIQUE 追加のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。FK の向きにより <code>posts</code> の ALTER（UNIQUE 追加）を <code>post_insights</code> の CREATE より先に行う</li>
+    <li><strong>V009 の適用順序</strong>: 全変更が追加的（新テーブル 2 本 + <code>posts</code> への UNIQUE 追加 + <code>batch_execution_logs.batch_type</code> ENUM の末尾追加）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。FK の向きにより <code>posts</code> の ALTER（UNIQUE 追加）を <code>post_insights</code> の CREATE より先に行う。<strong>2026-08-10（16-8）にローカル MySQL と Aurora の両環境へ適用済み</strong>（<code>database/V009__insights_support.sql</code>）</li>
   </ul>
 </div>
 
