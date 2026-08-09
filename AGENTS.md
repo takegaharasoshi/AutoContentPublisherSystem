@@ -13,6 +13,7 @@ AutoContentPublisherSystem — AWS 上で動作する画像生成・SNS 自動�
 - `services/db-readiness-check/` — DB 準備確認バッチ（Python）
 - `services/image-batch/` — 画像生成バッチ（Python）
 - `services/sns-post-batch/` — SNS 投稿バッチ（Python）
+- `services/insights-batch/` — インサイト収集バッチ（Python）
 - `shared/` — サービス間共通ライブラリ（Python）
 - `database/` — DDL ファイル（スキーマ管理）
 - `docs/` — 設計書（HTML）。**編集禁止**（Claude / ユーザーが管理する。旧 Markdown 設計書は `docs/_archive/` にあり現役ではない）

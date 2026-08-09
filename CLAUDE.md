@@ -23,7 +23,8 @@ AutoContentPublisherSystem/
 ├── services/
 │   ├── db-readiness-check/          # DB 準備確認（Python）
 │   ├── image-batch/                 # 画像生成バッチ（Python）
-│   └── sns-post-batch/              # SNS 投稿バッチ（Python）
+│   ├── sns-post-batch/              # SNS 投稿バッチ（Python）
+│   └── insights-batch/              # インサイト収集バッチ（Python）
 ├── database/                        # DDL ファイル（スキーマ管理）
 ├── content/                         # 事業コンテンツ資材（問題ストックのバッチ別ソース・検証ツール・リサーチ証跡。運用はスキル quiz-stock-replenish 参照）
 ├── shared/                          # サービス間共通ライブラリ（Python）
@@ -148,7 +149,7 @@ Claude のトークン消費を抑えるため、以下のタスクは Codex CLI
 - **FoundationStack**: 共通基盤（VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR、DB 準備確認 ECS タスク）
 - **ImageBatchStack**: 画像生成バッチ実行基盤
 - **SnsPostBatchStack**: SNS 投稿バッチ実行基盤
-- **InsightsBatchStack**: インサイト収集バッチ実行基盤（Phase 16-7 設計・16-10 実装予定）
+- **InsightsBatchStack**: インサイト収集バッチ実行基盤（Phase 16-7 設計・16-10 実装予定。アプリ本体 `services/insights-batch/` は 16-9 で実装済み）
 - **MonitoringStack**: 監視・通知
 - **AdminApiStack**（将来拡張）: 管理画面バックエンド API
 - **AdminWebStack**（将来拡張）: 管理画面フロントエンド

@@ -683,7 +683,11 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   --state-machine-arn arn:aws:states:ap-northeast-1:&lt;アカウント ID&gt;:stateMachine:acps-prod-insights-collection-sfn \
   --input '{"set_code": "logic-training-1", "scheduled_at": "&lt;現在時刻の ISO 8601 UTC&gt;", "media_lookback_days": "14"}'</code></pre>
     <code>scheduled_at</code> は冪等性キーになるため、手動実行では現在時刻など既存スナップショットと重複しない値を渡す</li>
-  <li><strong>初回バックフィル（2026-08-10 ユーザー決定: やる）</strong>: <code>media_lookback_days</code> を大きくした手動実行を各セット 1 回行い、既存全投稿の現在累計値を取り込む（例: <code>"media_lookback_days": "90"</code>）。アカウント日次はテーブルが空のため通常ロジックで自動的に API 保持上限の 90 日分が入る。2026-08-08 のフォーマット切替前後のリール比較（<code>reels_skip_rate</code> 等）に使う。失効済みストーリーズは取得不可のため対象外（「対象不存在」の WARNING スキップとして流れる）</li>
+  <li><strong>初回バックフィル（2026-08-10 ユーザー決定: やる）</strong>: <code>media_lookback_days</code> を大きくした手動実行を各セット 1 回行い、既存全投稿の現在累計値を取り込む（例: <code>"media_lookback_days": "90"</code>）。アカウント日次はテーブルが空のため通常ロジックで自動的に API 保持上限の 90 日分が入る。2026-08-08 のフォーマット切替前後のリール比較（<code>reels_skip_rate</code> 等）に使う。失効済みストーリーズは取得不可のため対象外（「対象不存在」の WARNING スキップとして流れる）
+    <ul>
+      <li><strong>1 回で終わらない場合がある</strong>（16-9 実装の注記）: バックフィルは通常ランよりコール数が桁違いに多く（アカウント日次 90 日 × 2 コール + 既存全投稿分）、200 コール/時の制限に当たって待機・失敗（終了コード 1）で終わることがある。その場合は<strong>同じ <code>scheduled_at</code> で手動実行を繰り返す</strong>: メディア指標は収集済み <code>post_id</code> を API 呼び出し前にスキップし、アカウント日次は <code>MAX(metric_date) + 1 日</code>から再開するため、実行のたびに未収集分だけが埋まって収束する</li>
+    </ul>
+  </li>
   <li><strong>スケジュール有効化</strong>: Scheduler（セット × 2 回/日。<a href="../infra/workflow.html">infra/workflow.html セクション 1.6</a>）が ENABLED であることを確認する</li>
 </ol>
 

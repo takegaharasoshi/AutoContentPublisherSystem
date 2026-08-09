@@ -8,6 +8,8 @@ AutoContentPublisherSystem のバッチサービスで共通利用する DB 接�
 - `parse_db_secret`: SecretString の JSON を `DbSecret` に変換します。
 - `connect`: PyMySQL 接続を作成します。
 - `open_connection`: 接続をコンテキストマネージャーとして提供し、終了時に close します。
+- `instagram`: Instagram Graph API の GET・エラー分類・レート制御を提供します。
+- `sns_secrets`: SNS 認証 Secret の名前生成と JSON 解析を提供します。
 
 ## 使用例
 

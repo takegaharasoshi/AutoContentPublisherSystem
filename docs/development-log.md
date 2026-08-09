@@ -998,6 +998,21 @@
 
     **(5) Aurora への適用**: ユーザー明示許可のうえ Claude が `aws rds-data execute-statement`（Data API）で 4 文を実行（V005・V006 と同じ役割分担）。Aurora Serverless v2 が auto-pause 状態だったため `DatabaseResumingException` をリトライするループで適用した。`SHOW CREATE TABLE` をローカルと `diff` して**両環境の定義完全一致**を裏取り（差分は既知の環境ローカルな `AUTO_INCREMENT` 値のみ）。`batch_type` の ENUM 値 3 種と `uq_posts_set_id (set_id, id)` も information_schema で確認済み。次は **16-9（insights-batch アプリ実装。Codex sol 委譲）**。
 
+- [x] **16-9** insights-batch アプリ実装
+  - 備考: 2026-08-10 実施（メトリクス名の再ピン留めリサーチ = `codex --search exec`〔terra / high〕・指示書作成とレビュー = Opus 5・実装 = Codex `gpt-5.6-sol` / high 委譲）。第 3 のバッチのアプリ本体を新設し、設計（[batch-flow.html](app/batch-flow.html) セクション 4）どおりの収集ロジックを実装した。
+
+    **(1) 実装直前の API 再ピン留めで判明した 2 制約**（計画書 16-9 の「メトリクス名を現行リファレンスで再確認する」の実施結果）: ①**`metric_type`（`total_value` の要否）と `breakdown` はリクエスト全体に掛かる単一パラメータ**で、要件の異なるメトリクスを 1 リクエストに混在できない → 設計の「1 メディア = 1 リクエスト」を **`MetricRequest`（メトリクス群 + `metric_type` + `breakdown`）単位で束ねる**に具体化（リール 1 回 / フィード画像・ストーリーズ 2 回 / アカウント日次 1 日あたり 2 回） ②**未対応メトリクスを 1 つ含めるとリクエスト全体が HTTP 400（`code:100`）**になり部分成功しない。加えて 2025-12 追加分（`reels_skip_rate` / `reposts` 等）は一次リファレンス本文が取得制限で読めず対応表を確定できなかったため、**未対応メトリクスの自動縮退**（400 なら 1 個ずつ呼び直して成功分を採用 → 無効な名前をラン内キャッシュに記録 → 以降は最初から除外 + WARNING ログ）を実装した。縮退コストは 1 ラン × 1 `media_type` につき 1 回のみ。無効だったメトリクス名はログから確認して定数を確定する（設計課題リストに 16-11 の宿題として記録）。③ アカウント日次は `metric_type=total_value` が範囲指定でも集計値 1 個しか返さないため、**`since` / `until` を UTC 1 日ずつ**指定するループとして実装した。
+
+    **(2) shared 昇格**: `shared/acps_shared/instagram.py`（v25.0 ピン留め・`get_json`・エラー分類 `classify_graph_error`〔レート制限 / 対象不存在 / メトリクス不正 / transport〕・`RateLimitGuard`〔`x-app-usage` の 2 形式に対応した閾値待機 + 指数バックオフ + `estimated_time_to_regain_access` 優先〕・トークンのマスキング）と `sns_secrets.py`（Secret 名規約）を新設。**sns-post-batch は設計方針どおり未変更**（二重管理は設計課題リストに記録済み）。
+
+    **(3) サービス構成**: `services/insights-batch/`（`config` / `clock` / `models` / `batch_sets` / `sns_accounts` / `execution_log` / `metrics_catalog` / `insights_api` / `posts` / `post_insights` / `account_insights` / `processing` / `main`）+ パッケージング一式（Dockerfile・buildspec・pyproject）。sns-post-batch と同型。`batch_type='insights_collection'`、`records_processed` は 2 テーブルへの実挿入行数。再実行時は**当該ラン（同一 `SCHEDULED_AT`）で収集済みの `post_id` を API 呼び出し前にスキップ**するため、失敗ランの Retry・バックフィルの再実行が安価に収束する。
+
+    **(4) レビューで検出・修正した blocker 2 件**（Codex 成果物のレビューは Claude が担当）: ①**空メトリクスのサイレント成功** — 全メトリクスグループが 400 で落ちた場合に `{}` を「成功」として INSERT し終了コード 0 になる実装だった。Meta は権限不足を `code:100` で返しうるため、**16-11 の稼働開始時に「全件空メトリクスで正常終了」というサイレント失敗**になる。「API が正常応答して `data` が空」（正常系）と区別するため `MetricsRequestUnsupported` を新設し、1 グループも成立しなかった場合のみ失敗計上に変更 ②**アカウント日次の対象不存在を無失敗スキップにしていた** — 設計 4.3 の「対象不存在は失敗に数えない」は削除済み投稿・期限切れストーリーズ（メディアレベル）限定の例外であり、アカウントオブジェクトの参照不可は設定不備・権限不足のためフェイルラウドすべき。メディアレベル限定に修正した。あわせて**「対象が 1 件以上あり・成功 0 件・全件が対象不存在スキップ」ならアカウント単位の失敗として計上**するガード（権限未付与の検知）と、**レート制限起因の失敗 3 連続で当該アカウントの残作業を打ち切る**制御を入れてある。
+
+    **(5) 検証**: `services/insights-batch` 52 件（ローカル MySQL 到達時は E2E 冪等性テスト = 同一 `SCHEDULED_AT` の 2 回目で行が増えないことを含めて実行）・`shared` 30 件・`services/sns-post-batch` 108 件・`services/db-readiness-check` 23 件がパス（`services/image-batch` 105 件は Codex 環境でパス。Claude 側シェルは Pillow 未導入のため未実行 — 本ステップで image-batch は未変更）。
+
+    **(6) 設計書への反映**: batch-flow.html セクション 4（グループ単位の束ね・自動縮退・日単位ループの decision 追加、4.3 のサイレント失敗防止ガードと打ち切り、4.4 の v25.0 ピン留め済み・レート制限の具体化）、operation.html 6.1（バックフィルが 1 回で終わらない場合は同じ `scheduled_at` で再実行すれば未収集分だけ埋まる旨）。次は **16-10（インフラ実装・デプロイ。Codex terra 委譲 + ユーザーの `cdk deploy`）**。
+
 ## 設計課題リスト（解消済み）
 
 [development-plan.md](development-plan.md) の設計課題リストのうち解消済みの課題をここへ移す（2026-08-09 の計画書整理で導入。解消の経緯は各設計書の decision コールアウトにも記録されている）。
