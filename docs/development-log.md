@@ -931,4 +931,4 @@
 
     **(6) ドキュメント同期**: [quiz-prebuilt.html](app/generators/quiz-prebuilt.html)（適用状態 warn を「本番稼働開始」へ）、[gpt-quiz-multicut.html](app/generators/gpt-quiz-multicut.html)（切替済みへ）、[data-model.html](app/data-model.html) 4.3（差し替え適用済み）、[sets/logic-training-1.html](app/sets/logic-training-1.html)（冒頭 warn = 定常運用中・slot_label / テンプレート / 使用方式の実態化）、[infra/workflow.html](infra/workflow.html) 1.5（State 表 ENABLED + 08-06 decision に再有効化を追記）。
 
-    **(7) 残作業と次ステップ**: 3 スロットの定時実行確認は翌日以降（初回 = **本日 21:00 JST の night**。以降 7:30 / 12:30）。確認後に 16-5（効果検証。切替日 2026-08-08 を基準点とした前後比較）へ。
+    **(7) 定時実行確認（2026-08-09 事後確認・16-4 の確認条件を充足）**: 3 スロットとも定時実行が成功 — ①08-08 21:00 night = run 60・`night-001`（とんち「雨の日のエレベーター」）。fantasy-animals-1 と同時起動で相互干渉なし ②08-09 7:30 morning = run 62・`morning-001`（なぞなぞ）③08-09 12:30 noon = run 63・`noon-002`（フェルミ「一生分の歩行距離」。noon-001 は 16-4 手動実行で消費済みのため **LRU が正しく 2 番目を選定**）。3 実行とも生成 SFN・投稿 SFN 成功、リール + ストーリーズ計 6 行すべて success、キャプション展開（247〜253 字）とストック消費（use_count / last_used_at）を裏取り。**Scheduler → スロット解決 → ビルド済み限定 LRU → S3 事前動画 → プレースホルダ投稿の全チェーンが定時実行で設計どおり動作**。次は 16-5（効果検証。切替日 2026-08-08 を基準点とした前後比較）へ。
