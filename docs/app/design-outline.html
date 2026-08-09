@@ -14,7 +14,8 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase A 成果物（Phase 10-1 で最終 Fix）</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-08-09</span>
+  <span class="badge badge-fixed">Phase 16-7 でインサイト収集バッチを反映</span>
+  <span>最終更新: 2026-08-10</span>
 </div>
 
 <div class="note">
@@ -51,8 +52,8 @@
     </tr>
     <tr>
       <td><code>batch-flow.html</code></td>
-      <td>バッチ処理フロー設計 — 画像生成・SNS 投稿の処理手順、冪等性・二重投稿防止、投稿ステータス管理、ワークフロー連携（環境変数の使い方）、セット別拡張ポイント</td>
-      <td><strong>Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</strong></td>
+      <td>バッチ処理フロー設計 — 画像生成・SNS 投稿・インサイト収集（16-7 追加）の処理手順、冪等性・二重投稿防止、投稿ステータス管理、ワークフロー連携（環境変数の使い方）、セット別拡張ポイント</td>
+      <td><strong>Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix・Phase 16-7 でインサイト収集を追加</strong></td>
     </tr>
     <tr>
       <td><code>data-model.html</code></td>
@@ -138,7 +139,7 @@
 <code>batch_sets</code> / <code>prompt_configs</code> / <code>generated_media</code>（生成メディア）/ <code>sns_accounts</code> / <code>batch_execution_logs</code> は旧設計の構造を踏襲・再編する。
 動画（リール）対応（Phase 14-4）で、生成物の一般化に伴い <code>generated_images</code> / <code>post_images</code> を <code>generated_media</code> / <code>post_media</code> にリネームし、
 音源ストックの <code>audio_assets</code> を新設した（<code>posts</code> にはメディア種別 <code>media_type</code> を追加）。
-<code>post_insights</code>（効果測定）は将来拡張の余地のみ確保する。
+効果測定はインサイト収集バッチ（第 3 のバッチ。Phase 16-7 設計 Fix）が <code>post_insights</code>（投稿別スナップショット）・<code>account_insights_daily</code>（アカウント日次）へ蓄積する。
 ER 図・エンティティ一覧・主キーと冪等性キーの分離方針は、分冊 <a href="data-model.html">データモデル設計</a> に定める。
 データモデルは全セット共通であり、セット間の違いはレコード・設定カラムで表現する。</p>
 
@@ -146,12 +147,12 @@ ER 図・エンティティ一覧・主キーと冪等性キーの分離方針�
 
 <p>セット追加（セット別設計書の作成 → Secret 作成 → DB 登録 → Scheduler 追加 deploy）、セット廃止（<code>is_active=0</code> + Scheduler 削除。データと設計書は残す）、
 プロンプト / キャプションの DB 直接運用、投稿失敗時の対応（自動再試行なし・通知のみ・必要時のみ手動起動）、
-Instagram トークンの手動更新、効果測定（当面は手動確認）の各方針は、分冊 <a href="operation.html">アプリ運用設計</a> に定める。</p>
+Instagram トークンの手動更新、効果測定（インサイト収集バッチによる自動収集 + API 外指標の手動確認。16-7 更新）の各方針は、分冊 <a href="operation.html">アプリ運用設計</a> に定める。</p>
 
 <h2 id="contract">5. ワークフロー連携・Secret 規約の意味付け（Phase A スコープ分の確定）</h2>
 
 <p>インフラ設計で「アプリ設計で確定する」とされていた項目のうち、大枠レベルで確定できるものを以下に定める。
-フロー上の使い方は <a href="batch-flow.html#contract-usage">batch-flow.html セクション 4</a>、Secret の運用は <a href="operation.html#secret-ops">operation.html セクション 5</a> を参照。</p>
+フロー上の使い方は <a href="batch-flow.html#contract-usage">batch-flow.html セクション 5</a>、Secret の運用は <a href="operation.html#secret-ops">operation.html セクション 5</a> を参照。</p>
 
 <div class="table-wrap">
 <table>
@@ -159,11 +160,11 @@ Instagram トークンの手動更新、効果測定（当面は手動確認）�
   <tbody>
     <tr>
       <td><code>SET_CODE</code></td>
-      <td><code>batch_sets.set_code</code>（人が定義する安定した外部識別子）。EventBridge Scheduler の入力で指定し、両バッチが受け取って内部 ID に解決する</td>
+      <td><code>batch_sets.set_code</code>（人が定義する安定した外部識別子）。EventBridge Scheduler の入力で指定し、各バッチが受け取って内部 ID に解決する</td>
     </tr>
     <tr>
       <td><code>SCHEDULED_AT</code></td>
-      <td>スケジュール実行時刻（UTC、Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> 由来）。<strong>生成実行（<code>generation_runs</code>）の冪等性キー</strong>（セット × <code>SCHEDULED_AT</code> で一意）であり、1 日複数回実行は DATETIME 粒度で区別される。<strong>SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</strong>（<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3</a> の検索方式のため。現行の連携契約の変更は不要）</td>
+      <td>スケジュール実行時刻（UTC、Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> 由来）。<strong>生成実行（<code>generation_runs</code>）の冪等性キー</strong>（セット × <code>SCHEDULED_AT</code> で一意）であり、1 日複数回実行は DATETIME 粒度で区別される。インサイト収集バッチ（16-7 追加）も受け取り、<code>post_insights</code> の冪等性キーに使用する。<strong>SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</strong>（<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3</a> の検索方式のため。現行の連携契約の変更は不要）</td>
     </tr>
     <tr>
       <td>SNS Secret 規約の構成要素</td>
@@ -171,7 +172,7 @@ Instagram トークンの手動更新、効果測定（当面は手動確認）�
     </tr>
     <tr>
       <td>アプリ用環境変数（<code>BATCH_SIZE_LIMIT</code> 等）</td>
-      <td><strong>追加しない（Phase 9 で確定）</strong>。投稿対象が「最古の未試行生成実行 1 件」のため旧設計のような総量制御は不要（<a href="batch-flow.html#contract-usage">batch-flow.html セクション 4</a>）</td>
+      <td><strong>件数の総量制御用は追加しない（Phase 9 で確定）</strong>。投稿対象が「最古の未試行生成実行 1 件」のため旧設計のような総量制御は不要（<a href="batch-flow.html#contract-usage">batch-flow.html セクション 5</a>）。16-7 でインサイト収集バッチの収集ウィンドウ <code>MEDIA_LOOKBACK_DAYS</code> を追加した（総量制御ではなく対象期間の指定。<a href="batch-flow.html#insights-schedule">batch-flow.html セクション 4.1</a>）</td>
     </tr>
   </tbody>
 </table>
@@ -179,7 +180,7 @@ Instagram トークンの手動更新、効果測定（当面は手動確認）�
 
 <h2 id="phase9">6. 将来拡張（実装時期は未定）</h2>
 
-<p><strong>分冊横断の将来拡張</strong>: 失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（AI によるプロンプト生成・カルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、インサイト収集バッチ（Phase 16 後段で展開予定）、生成 AI 動画方式（簡易動画方式〔静止画 + 音楽のリール〕は Phase 14 で対応済み）、承認フロー、管理画面。</p>
+<p><strong>分冊横断の将来拡張</strong>: 失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（AI によるプロンプト生成・カルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、生成 AI 動画方式（簡易動画方式〔静止画 + 音楽のリール〕は Phase 14 で対応済み）、承認フロー、管理画面。インサイト収集バッチは Phase 16-7 で設計 Fix し将来拡張から外れた（<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）。</p>
 
 <p class="note" style="margin-top:.5rem;">大枠 → 詳細（Phase 9）→ 最終 Fix（Phase 10-1）の線引き・持ち越しの経緯は <a href="../development-log.md">development-log.md</a> の 9-1〜9-5・10-1 を参照。</p>
 

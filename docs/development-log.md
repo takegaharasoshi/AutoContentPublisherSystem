@@ -970,6 +970,21 @@
 
     **(8) API では取れない指標 = 手動確認に残るもの（境界の確定）**: 秒単位の視聴維持カーブ・View Rate・Views Over Time（類似リール比較）は**アプリのインサイト画面のみ**。したがって 16-5 の手動比較では「維持カーブ・View Rate はスクショで記録」「スキップ率・視聴時間・保存・フォロワー等は将来自動収集される指標として数値を記録」という分担になる（16-5 の記録項目への入力）。次は **16-7（インサイト収集バッチの壁打ち・設計 Fix。指標セットの確定のみ 16-5 完了後に反映する 2 段階 Fix）**
 
+- [x] **16-7** インサイト収集バッチの壁打ち・設計 Fix
+  - 備考: 2026-08-10 完了（Fable 5。前提調査は Explore 委譲）。16-6 の調査結果と既存 2 バッチのパターンを入力に、第 3 バッチの実行基盤・データモデル・収集方式を壁打ちして設計 Fix した。「継続的に見る指標セット」の確定のみ 16-5 完了後（16-12）に持ち越す 2 段階 Fix。
+
+    **(1) 壁打ちのユーザー決定 4 点**（いずれも推奨案を採択）: ①**実行スケジュールは 1 日 2 回（06:00・18:00 JST）** — ストーリーズの 24 時間取得期限に対し 3 スロット（7:35 / 12:35 / 21:05 頃投稿）を寿命の 17〜22 時間時点で最終計測でき、片方失敗時も期限内にもう 1 回の機会が残る。18:00 の回で前日 UTC 日（09:00 JST 締め）のアカウント日次を確定取得。②**メディア追跡は投稿後 14 日**（`MEDIA_LOOKBACK_DAYS`、既定 14。分析値は初週で安定・1 ラン約 50 コール/アカウントでレート制限 200/時に余裕）。③**格納は「JSON 全量 + 後から昇格」** — スナップショット行に API 生レスポンスを JSON カラムで全量保存し、16-5 後に確定した指標のみ生成カラム（MySQL 8 の JSON 抽出）/ ビューへ昇格（再収集不要・Meta のメトリクス改廃に DDL 追随不要。ワイドカラム・EAV は不採用）。④**初回バックフィルを実施** — アカウント日次は API 保持 90 日分（テーブル空の初回ランで自動）、メディアは手動実行の `media_lookback_days` 拡大で既存全投稿の現在累計値を 1 回取得。**8/8 フォーマット切替の前後比較（`reels_skip_rate` 等）が自動収集データでも可能になる**。
+
+    **(2) 実行基盤（既定 = 既存パターン踏襲で確定）**: `InsightsBatchStack` 新設（SnsPostBatchStack と同型: TaskDef cpu 256 / mem 512・生 ASL + `definitionSubstitutions`・専用 CodePipeline）。SFN は `acps-{env}-insights-collection-sfn`（`WaitForDbReady` → `RunInsightsBatchTask` の同型 2 ステート）。Scheduler はセット × 2 件（`acps-{env}-insights-collection-{set_code}-{morning|evening}`）+ 専用 ScheduleGroup / DLQ。実行単位はセット別（SET_CODE 契約の継承・トークン障害の分離）。FoundationStack に ECR `insights-batch` 追加・MonitoringStack に SFN 失敗アラーム + Scheduler 6 メトリクスを追加。デプロイ順は Image の後・Monitoring の前。
+
+    **(3) データモデル（V009。作成は 16-8）**: `post_insights`（投稿別スナップショット追記型。**`UNIQUE (post_id, scheduled_at)` が冪等性キー** = SFN Retry は欠測分のみ埋める。`metrics` JSON + `api_version`）と `account_insights_daily`（UTC 日 × アカウントで upsert-once。`followers_count` は収集時点スナップショット・バックフィル過去日は NULL）。セット境界の複合 FK パターンに従い **`posts` へ `UNIQUE (set_id, id)` を追加**。突合キーは投稿成功時に保存済みの `posts.platform_post_id`（IG メディア ID）をそのまま使える（ストーリーズ行にも保存済みであることを実装調査で確認）。
+
+    **(4) 収集方式**: 全メトリクスを 1 メディア 1 リクエストに束ねて全量収集（対象リストは media_type ごとに定数管理・16-9 実装時に現行リファレンスで名称を再ピン留め）。部分失敗は WARNING 続行 + 最終終了コード 1（フェイルラウド）。**投稿の手動削除・ストーリーズ期限切れ等の「対象不存在」は失敗に数えない**（ウィンドウ内で毎回失敗して恒常アラーム化するのを防ぐ）。`X-App-Usage` 監視 + バックオフ。本バッチは `posts` を読むのみで投稿フローへ影響しない。
+
+    **(5) 運用・認可**: `instagram_manage_insights` の再認可 → 新トークン → Secrets 更新を 16-11 の稼働開始チェックリストに組み込み（operation.html 5.4 の定期更新手順にもスコープを恒久追加。再認可で `data_access_expires_at` も延びるためリマインダー日付更新とセット）。稼働開始手順・欠測の考え方（ストーリーズは期限内 2 回とも失敗すると永久欠測 = 許容）を operation.html セクション 6 に新設。
+
+    **(6) ドキュメント改訂**: アプリ側 = [batch-flow.html](app/batch-flow.html)（セクション 4 新設・旧 4 は 5 へ）・[data-model.html](app/data-model.html)（4.11 新設・ER 図・複合 FK）・[operation.html](app/operation.html)（セクション 6 新設・5.4 改訂）・[design-outline.html](app/design-outline.html)。インフラ側 = [stacks.html](infra/stacks.html)（3.5 新設・Admin は 3.6 / 3.7 へ）・[workflow.html](infra/workflow.html)（1.6・5.4・11 新設、アラーム表・DLQ 追記）・[cicd.html](infra/cicd.html)・[security.html](infra/security.html)。CLAUDE.md のスタック一覧・デプロイ順序も更新。持ち越し課題（sns-post-batch の shared 載せ替え・API バージョン v21 → v25 系）は設計課題リストに記録。16-8〜16-12 のステップ展開と Codex 割当は計画書を参照。次は **16-8（V009）から 16-10 まで開発を進め、16-11 で稼働開始**（16-12 のみ 16-5 完了待ち）。
+
 ## 設計課題リスト（解消済み）
 
 [development-plan.md](development-plan.md) の設計課題リストのうち解消済みの課題をここへ移す（2026-08-09 の計画書整理で導入。解消の経緯は各設計書の decision コールアウトにも記録されている）。

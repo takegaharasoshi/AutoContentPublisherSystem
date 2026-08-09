@@ -14,14 +14,15 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-08-09</span>
+  <span class="badge badge-fixed">Phase 16-7 でインサイト収集バッチ（セクション 4）を追加</span>
+  <span>最終更新: 2026-08-10</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  画像生成・SNS 投稿バッチの<strong>アプリケーション内部の処理手順</strong>を定める設計書。Phase A-4 の骨子版を Phase 9-2 で詳細化した（冪等性・二重投稿防止・投稿ステータス管理・失敗時の終了コード方針を確定）。
+  画像生成・SNS 投稿・インサイト収集バッチの<strong>アプリケーション内部の処理手順</strong>を定める設計書。Phase A-4 の骨子版を Phase 9-2 で詳細化した（冪等性・二重投稿防止・投稿ステータス管理・失敗時の終了コード方針を確定）。Phase 16-7 で第 3 のバッチ（インサイト収集）を追加した。
   全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a>、データモデルは <a href="data-model.html">データモデル設計</a> を参照。
-  実行基盤（EventBridge Scheduler → 画像生成 Step Functions → 成功時に SNS 投稿 Step Functions を自動起動）は
+  実行基盤（EventBridge Scheduler → 画像生成 Step Functions → 成功時に SNS 投稿 Step Functions を自動起動。インサイト収集は独立したスケジュール起動）は
   インフラ設計（<a href="../infra/workflow.html">infra/workflow.html</a>）のとおりで、本書はその器の中で動くアプリの処理を扱う。
 </div>
 
@@ -316,11 +317,72 @@
   詳細は Phase 9 以降（処理単位を「生成実行」とした経緯は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。
 </div>
 
-<h2 id="contract-usage">4. ワークフロー連携（環境変数の使い方）</h2>
+<h2 id="flow-insights">4. インサイト収集バッチ処理フロー（Phase 16-7 設計 Fix）</h2>
+
+<p>第 3 のバッチ。Instagram Graph API の Insights から投稿別・アカウント別の生メトリクスを自動収集し、<a href="data-model.html#detail-insights">post_insights / account_insights_daily</a>（data-model.html セクション 4.11）へ蓄積する。
+16-6 の API 調査（development-log.md 16-6。調査基準 v25.0）を入力として 2026-08-10 の 16-7 壁打ちで設計 Fix した。
+実行基盤（スタック・Step Functions・Scheduler）は <a href="../infra/stacks.html#insights-batch">infra/stacks.html セクション 3.5</a> と <a href="../infra/workflow.html">infra/workflow.html</a> セクション 1.6・11 を参照。</p>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、Phase 16-7）: 生メトリクスの全量収集とし、指標選定を収集側から切り離す</span>
+  <ul style="margin:.3rem 0 0;">
+    <li>API で取得可能な<strong>全メトリクスを毎回取得し、JSON 全量で保存</strong>する（格納方式は <a href="data-model.html#detail-insights">data-model.html セクション 4.11</a>）。「継続的に見る指標セット」（可視化・KPI 転記の対象）の確定は 16-5 完了後に行い、収集の実装・スキーマには影響させない（<strong>2 段階 Fix</strong>）</li>
+    <li>取得メトリクスのリストは <code>media_type</code> ごとにアプリ内の定数で管理する（リール = 16-6 調査 (2) の全メトリクス、ストーリーズ = 同 (3)、フィード画像 = リール固有の視聴時間・スキップ率系を除いた集合、アカウント日次 = 同 (4)）。<strong>メトリクス名の最終確定は実装時（16-9）に現行 API リファレンスで再ピン留めする</strong>（16-6 (7) の廃止名 <code>impressions</code> / <code>plays</code> / <code>video_views</code> 等は使わない）</li>
+    <li>1 メディアの全メトリクスは <strong>1 リクエストに束ねて取得</strong>する（レート制限対策の既定。下記 4.4）</li>
+  </ul>
+</div>
+
+<h3 id="insights-schedule">4.1 実行スケジュールと収集ウィンドウ</h3>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、Phase 16-7 壁打ち）: 1 日 2 回（06:00・18:00 JST）・メディア追跡は投稿後 14 日</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>1 日 2 回、06:00・18:00 JST にセットごとに実行</strong>する（Scheduler 定義は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 1.6）。時刻の根拠はストーリーズの 24 時間取得期限: 現行の投稿時刻（7:35 / 12:35 / 21:05 JST 頃）に対し、各ストーリーズを寿命の 17〜22 時間時点（朝 22.4h・昼 17.4h・夜 20.9h）で最終計測でき、片方の実行が失敗しても期限内にもう 1 回の機会が残る。1 日 1 回 06:00 案は夜ストーリーズが 9 時間時点の値で打ち切りになるため不採用</li>
+    <li><strong>アカウント日次指標は UTC 日締め</strong>（09:00 JST）のため、18:00 JST の回で前日 UTC 日の確定値を約 9 時間遅れで取得できる</li>
+    <li><strong>収集ウィンドウ</strong>: <code>feed_image</code> / <code>reel</code> は<strong>投稿後 14 日間</strong>（環境変数 <code>MEDIA_LOOKBACK_DAYS</code>、既定 14。後から変更可能だが過去分の欠測は埋まらない）、<code>story</code> は<strong>投稿後 24 時間</strong>（API 期限そのもの）。スキップ率・保存率などの分析値は初週でほぼ安定するため 14 日で十分と判断し、30 日案（コール数約 2 倍）は不採用</li>
+    <li><strong>呼び出し量の概算</strong>（現行規模: リール 4 + ストーリーズ 3/日）: 1 ランあたり最大でも約 50 コール/アカウントで、200 コール/時（app-user あたり）の制限に大きな余裕がある。セット・スロット増にも耐える</li>
+  </ul>
+</div>
+
+<h3 id="insights-steps">4.2 処理手順</h3>
+<ol>
+  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決し、<code>batch_execution_logs</code> へ実行ログを記録する（<a href="#exec-log">セクション 1 の INSERT-or-fetch パターン</a>。<code>batch_type</code> は本バッチ用の値を追加する）</li>
+  <li>セット配下の有効な投稿先アカウント（<code>sns_accounts.is_active=1</code>、<code>platform='instagram'</code>）ごとに順次処理する:
+    <ol>
+      <li><strong>認証情報の取得</strong>: Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（SNS 投稿バッチと同一規約）で <code>access_token</code> / <code>ig_user_id</code> を取得する</li>
+      <li><strong>アカウント日次の収集</strong>: DB の <code>MAX(metric_date) + 1 日</code>から直近の閉じた UTC 日までを範囲取得し、<code>account_insights_daily</code> へ INSERT IGNORE（upsert-once）する。範囲は API 保持上限の <strong>90 日でキャップ</strong>する。<strong>テーブルが空の初回実行は自動的に 90 日分のバックフィルになる</strong>。直近の閉じた UTC 日の行には IG User の <code>followers_count</code>（ユーザーフィールド）も記録する</li>
+      <li><strong>メディアレベルの収集</strong>: 対象 = 当該アカウントの <code>posts</code> のうち <code>status='success'</code> かつ <code>platform_post_id IS NOT NULL</code> で、<code>feed_image</code> / <code>reel</code> は <code>posted_at</code> が <code>MEDIA_LOOKBACK_DAYS</code> 以内、<code>story</code> は <code>posted_at</code> が 24 時間以内のもの（<code>posted_at</code> 昇順）。各行について全メトリクスを 1 リクエストで取得し、<code>post_insights</code> へ INSERT-or-skip（<code>UNIQUE (post_id, scheduled_at)</code>）で追記する</li>
+    </ol>
+  </li>
+  <li>実行ログを <code>succeeded</code> / <code>failed</code> に更新して終了する（終了コードは 4.3）</li>
+</ol>
+
+<h3 id="insights-failure">4.3 冪等性・部分失敗・終了コード</h3>
+<ul>
+  <li><strong>冪等性</strong>: <code>post_insights</code> は <code>UNIQUE (post_id, scheduled_at)</code>（<code>scheduled_at</code> = Scheduler の実行予定時刻）、<code>account_insights_daily</code> は <code>UNIQUE (sns_account_id, metric_date)</code> への INSERT-or-skip / INSERT IGNORE。Step Functions Retry による再実行は<strong>欠測分だけを埋める</strong>（取得済みスナップショットの重複・上書きは起きない）</li>
+  <li><strong>部分失敗は続行</strong>: メディア 1 件・日次 1 日単位の取得失敗は WARNING ログを残して次へ進む。全対象の処理後、失敗が 1 件でも残っていれば<strong>終了コード 1</strong>（SNS 投稿バッチと同じフェイルラウド方針。SFN Retry → Catch → 既存の <code>ExecutionsFailed</code> アラームで通知）。成功分は commit 済みのため失いはしない</li>
+    <li><strong>対象不存在は失敗に数えない</strong>: 投稿が Instagram 上で手動削除された場合やストーリーズが取得期限を過ぎていた場合の「対象が存在しない」系エラーは、WARNING スキップとして失敗件数に含めない（ウィンドウ内の残り期間、毎回失敗して恒常アラームになるのを防ぐ。認可エラー・レート制限エラー等は通常の失敗として扱う）</li>
+  <li><strong>投稿バッチとの独立性</strong>: 本バッチは <code>posts</code> を読み取るのみで書き換えない。収集失敗が投稿フロー（セクション 3）へ影響することはない</li>
+</ul>
+
+<h3 id="insights-api">4.4 レート制限・API バージョン・権限</h3>
+<ul>
+  <li><strong>レート制限</strong>: <code>X-App-Usage</code> ヘッダを監視し、使用率が閾値を超えたら待機、HTTP 429 / エラーコード 4 は指数バックオフで再試行する（16-6 (6) の実装既定）</li>
+  <li><strong>API バージョン</strong>: 実装時（16-9）に v25.0 系でピン留めする。SNS 投稿バッチの現行クライアント（v21.0）とのバージョン差は設計課題リストに記録し、本バッチの実装では引き上げ済みの共通部品を使う</li>
+  <li><strong>権限</strong>: 既存の投稿用トークンに加えて <code>instagram_manage_insights</code> スコープが必要。既存の長期トークンには自動付与されないため、<strong>再認可 → 新トークン発行 → Secrets 更新</strong>を稼働開始前に行う（手順・リマインダー運用への影響は <a href="operation.html#token-refresh">operation.html セクション 5.4</a>）</li>
+</ul>
+
+<div class="note">
+  <span class="callout-title">初回バックフィル（2026-08-10 ユーザー決定: やる）</span>
+  稼働開始時に手動実行 1 回で過去分を取り込む: アカウント日次はテーブルが空のため自動で 90 日分、メディア指標は手動実行の入力で <code>MEDIA_LOOKBACK_DAYS</code> を大きく渡し（例 90）、既存全投稿の現在累計値を 1 スナップショット取得する。
+  これにより 2026-08-08 のフォーマット切替（quiz-prebuilt 転換）前後のリールを <code>reels_skip_rate</code> 等の自動収集データでも比較できる（16-5 の手動比較の裏付け）。失効済みストーリーズは取得不可のため対象外。手順は <a href="operation.html#insights-ops">operation.html セクション 6.1</a>。
+</div>
+
+<h2 id="contract-usage">5. ワークフロー連携（環境変数の使い方）</h2>
 <p>環境変数の受け渡し契約（キー名）は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 5、業務上の意味付けの定義は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a> で確定済み。本書のフローでの使い方は以下のとおり。</p>
 <ul>
-  <li><code>SET_CODE</code> — 両バッチが受け取り、<code>batch_sets</code> の解決に使用する（各フローの手順 1）</li>
-  <li><code>SCHEDULED_AT</code> — 画像生成バッチのみが受け取り、生成実行の冪等性キーに使用する（セクション 2 の手順 2）。SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</li>
+  <li><code>SET_CODE</code> — 全バッチが受け取り、<code>batch_sets</code> の解決に使用する（各フローの手順 1）</li>
+  <li><code>SCHEDULED_AT</code> — 画像生成バッチとインサイト収集バッチが受け取り、冪等性キーに使用する（セクション 2 の手順 2・セクション 4.3）。SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</li>
+  <li><code>MEDIA_LOOKBACK_DAYS</code> — インサイト収集バッチのみが受け取る収集ウィンドウ日数（既定 14。セクション 4.1。手動実行時のバックフィルで大きな値を渡す）</li>
   <li><strong><code>BATCH_SIZE_LIMIT</code> 等のバッチ件数制御用環境変数は追加しない</strong>（確定）。SNS 投稿バッチは常に生成実行 1 件のみを処理する方針（3.1）のため件数上限の概念が不要であり、画像生成バッチも有効プロンプト 1 件・1 枚生成の初期スコープでは総量制御が不要と判断した。将来、生成実行のバックログが恒常的に蓄積する場合や画像生成 API のクォータ制約が顕在化した場合に導入を再検討する</li>
 </ul>
 

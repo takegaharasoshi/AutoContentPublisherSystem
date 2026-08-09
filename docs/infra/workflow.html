@@ -13,7 +13,8 @@
 <h1>ワークフロー実装仕様</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-07-06</span>
+  <span class="badge badge-fixed">Phase 16-7 でインサイト収集ワークフロー（1.6・5.4・11）を追加</span>
+  <span>最終更新: 2026-08-10</span>
 </div>
 
 <p>Step Functions・EventBridge Scheduler・DB 準備確認タスク・監視リソースの実装仕様を定義する。アーキテクチャ上の位置付けは <a href="architecture.html">architecture.html</a>、CDK リソース定義は <a href="stacks.html">stacks.html</a>、運用時の対応手順は <a href="operation.html">operation.html</a> を参照。</p>
@@ -35,6 +36,7 @@
 <ul>
   <li>SNS 投稿 Step Functions（sns-posting-sfn）は独立したステートマシンのため、手動での単独実行も可能。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する</li>
   <li>EventBridge Scheduler は画像生成 Step Functions のみに設定し、SNS 投稿用のスケジューラは不要</li>
+  <li><strong>インサイト収集ワークフロー（16-7 追加）</strong>: insights-collection-sfn は上記チェーンから独立し、専用の Scheduler（セクション 1.6）で 1 日 2 回起動される。構成は <code>WaitForDbReady</code> → <code>RunInsightsBatchTask</code> の同型 2 ステート（ASL はセクション 11）。手動での単独実行（疎通確認・バックフィル）も運用ユースケース（<a href="../app/operation.html#insights-ops">app/operation.html セクション 6</a>）</li>
 </ul>
 
 <h3>1.2 共通の実装方針</h3>
@@ -54,7 +56,7 @@
   "set_code": "fantasy-animals-1",
   "scheduled_at": "&lt;aws.scheduler.scheduled-time&gt;"
 }</code></pre>
-<p><code>set_code</code> はスケジュールごとの固定値（セクション 1.5 の一覧）。スロット対応方式のセットでも Input にスロットは持たせず、方式側が <code>scheduled_at</code> の JST 時から決定的に解決する。</p>
+<p><code>set_code</code> はスケジュールごとの固定値（セクション 1.5 の一覧）。スロット対応方式のセットでも Input にスロットは持たせず、方式側が <code>scheduled_at</code> の JST 時から決定的に解決する。インサイト収集 Step Functions の Input テンプレートはセクション 1.6 を参照。</p>
 
 <h3>1.4 EventBridge Scheduler の Retry / DLQ</h3>
 <p>Scheduler には RetryPolicy と SQS DLQ を設定する。RetryPolicy は <code>MaximumRetryAttempts=3</code>、<code>MaximumEventAgeInSeconds=3600</code> を初期値とする。リトライを使い切っても画像生成 Step Functions を起動できない場合は、失敗イベントを Scheduler DLQ（セクション 10）に送信し、MonitoringStack の CloudWatch Alarm で検知する。</p>
@@ -120,6 +122,36 @@
   <strong>21:00 の同時起動について</strong>: <code>fantasy-animals-1</code>（21:00）と <code>logic-training-1</code> の night スロット（21:00）は同時刻に起動する。両チェーンは <code>set_code</code> で完全に分離されており（投稿対象の決定・アカウント・Secret・音源のいずれも <code>set_id</code> スコープ）、ECS / Aurora の同時実行にも余裕があるため時刻はずらさない。
   投稿時刻はユーザー決定（15-4 で 1 日 3 回・朝昼夜の目安を決定し、15-15 で 7:30 / 12:30 / 21:00 に最終確定）。
 </div>
+
+<h3 id="schedule">1.6 インサイト収集の Scheduler（Phase 16-7 設計・16-10 実装）</h3>
+
+<p>インサイト収集 Step Functions（insights-collection-sfn）用の Scheduler は InsightsBatchStack（<a href="stacks.html#insights-batch">stacks.html セクション 3.5</a>）に定義する。</p>
+<ul>
+  <li><strong>命名規約</strong>: <code>acps-{env}-insights-collection-{set_code}-{morning|evening}</code>（1 スケジュール 1 時刻の原則は 1.5 と同じ。プレフィックス <code>acps-prod-insights-collection-</code> は 29 文字で、64 文字上限に対する <code>{set_code}-{slot}</code> の予算は 35 文字）</li>
+  <li><strong>1 セットにつき 2 件（06:00・18:00 JST）</strong>。時刻はセット・スロットに依存しない全セット共通値（時刻の根拠 = ストーリーズの 24 時間取得期限・アカウント日次の UTC 日締めは <a href="../app/batch-flow.html#insights-schedule">app/batch-flow.html セクション 4.1</a>）</li>
+  <li><strong>共通設定は 1.5 と同じ</strong>（タイムゾーン <code>Asia/Tokyo</code>・FlexibleTimeWindow <code>OFF</code>・State <code>ENABLED</code>・RetryPolicy / DLQ はセクション 1.4 と同値）。ただし ScheduleGroup は専用の <code>acps-{env}-insights-schedule-group</code>、DLQ は <code>acps-{env}-insights-scheduler-dlq</code>（セクション 10）</li>
+</ul>
+
+<p>Input テンプレート（<code>media_lookback_days</code> は収集ウィンドウ日数の固定値。手動実行時に大きな値を渡すとバックフィルになる）:</p>
+<pre><code>{
+  "set_code": "logic-training-1",
+  "scheduled_at": "&lt;aws.scheduler.scheduled-time&gt;",
+  "media_lookback_days": "14"
+}</code></pre>
+
+<p>スケジュール一覧（16-10 実装時に作成。CDK が単一の正）:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Schedule 名</th><th>cron 式</th><th>JST 時刻</th><th>Input の <code>set_code</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>acps-prod-insights-collection-fantasy-animals-1-morning</code></td><td><code>cron(0 6 * * ? *)</code></td><td>6:00</td><td><code>fantasy-animals-1</code></td></tr>
+    <tr><td><code>acps-prod-insights-collection-fantasy-animals-1-evening</code></td><td><code>cron(0 18 * * ? *)</code></td><td>18:00</td><td><code>fantasy-animals-1</code></td></tr>
+    <tr><td><code>acps-prod-insights-collection-logic-training-1-morning</code></td><td><code>cron(0 6 * * ? *)</code></td><td>6:00</td><td><code>logic-training-1</code></td></tr>
+    <tr><td><code>acps-prod-insights-collection-logic-training-1-evening</code></td><td><code>cron(0 18 * * ? *)</code></td><td>18:00</td><td><code>logic-training-1</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>同時刻の複数セット起動は 21:00 の画像生成と同じ整理（<code>set_code</code> で完全分離のため時刻をずらさない）。セット追加時はセットごとに 2 件を追加する（<a href="../app/operation.html#set-add">app/operation.html セクション 2.1</a> のセット追加手順に含める）。</p>
 
 <h2 id="db-readiness">2. DB 準備確認タスク（db-readiness-check）仕様</h2>
 
@@ -451,14 +483,30 @@
   DB 準備確認タスクの環境変数はすべて CDK で Task Definition に静的設定する。Step Functions からのコンテナオーバーライドはない。
 </div>
 
+<h3>5.4 インサイト収集バッチ（Phase 16-7 設計）</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>変数名</th><th>説明</th><th>取得元</th></tr></thead>
+  <tbody>
+    <tr><td><code>DB_SECRET_ARN</code></td><td>DB 接続情報の Secret ARN</td><td>CDK で設定</td></tr>
+    <tr><td><code>ENV_NAME</code></td><td>環境識別子（現時点では <code>prod</code>）</td><td>CDK で設定</td></tr>
+    <tr><td><code>SET_CODE</code></td><td>バッチセット識別コード</td><td>Step Functions 入力パラメータ</td></tr>
+    <tr><td><code>SCHEDULED_AT</code></td><td>スケジュール実行日時（ISO 8601）。<code>post_insights</code> の冪等性キーに使用（<a href="../app/batch-flow.html#insights-failure">app/batch-flow.html セクション 4.3</a>）</td><td>Step Functions 入力パラメータ（Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> から取得）</td></tr>
+    <tr><td><code>MEDIA_LOOKBACK_DAYS</code></td><td>メディア指標の収集ウィンドウ日数（Scheduler Input の固定値は 14。手動実行時に大きな値を渡すとバックフィル）</td><td>Step Functions 入力パラメータ</td></tr>
+    <tr><td><code>EXECUTION_ARN</code></td><td>Step Functions 実行 ARN</td><td>Step Functions コンテナオーバーライド（<code>$$.Execution.Id</code>）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>S3 を使用しないため <code>S3_BUCKET_NAME</code> は持たない。SNS 認証情報は 5.2 の注記と同じく Secrets Manager からアカウントごとに取得する。</p>
+
 <h2 id="error-handling">6. Step Functions エラーハンドリング</h2>
 <div class="table-wrap">
 <table>
   <thead><tr><th>エラー種別</th><th>対応</th></tr></thead>
   <tbody>
     <tr><td>DB 準備確認失敗</td><td>db-readiness-check コンテナ内部で最大 8 回 retry 後、Catch → Fail ステートへ遷移</td></tr>
-    <tr><td>画像生成 / SNS 投稿 ECS タスク起動失敗</td><td>Retry（最大 2 回、30 秒間隔）</td></tr>
-    <tr><td>画像生成 / SNS 投稿 ECS タスク異常終了</td><td>Retry → Catch → Fail ステートへ遷移</td></tr>
+    <tr><td>画像生成 / SNS 投稿 / インサイト収集 ECS タスク起動失敗</td><td>Retry（最大 2 回、30 秒間隔）</td></tr>
+    <tr><td>画像生成 / SNS 投稿 / インサイト収集 ECS タスク異常終了</td><td>Retry → Catch → Fail ステートへ遷移</td></tr>
     <tr><td>タイムアウト</td><td>Retry（<code>States.Timeout</code> を Retry 対象に含む。一時的なネットワーク遅延等を考慮）→ Catch → Fail ステートへ遷移</td></tr>
     <tr><td>SNS 投稿 SFN 起動失敗</td><td><code>Name=$$.Execution.Name</code> で冪等化した上で Retry（<code>States.ALL</code>、最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了</td></tr>
   </tbody>
@@ -488,10 +536,12 @@
   <tbody>
     <tr><td>image-generation-sfn 失敗</td><td><code>AWS/States</code></td><td><code>ExecutionsFailed</code></td><td><code>StateMachineArn=${ImageGenerationSfnArn}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>sns-posting-sfn 失敗</td><td><code>AWS/States</code></td><td><code>ExecutionsFailed</code></td><td><code>StateMachineArn=${SnsPostingSfnArn}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>insights-collection-sfn 失敗（16-7 追加・16-10 実装）</td><td><code>AWS/States</code></td><td><code>ExecutionsFailed</code></td><td><code>StateMachineArn=${InsightsCollectionSfnArn}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>SNS 投稿起動失敗</td><td><code>ACPS</code></td><td><code>SnsPostStartFailureCount</code></td><td><code>StateMachineName=${ImageGenerationSfnName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>Aurora CPU</td><td><code>AWS/RDS</code></td><td><code>CPUUtilization</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&gt;= 80%</td><td>300 秒</td><td>3</td><td>3</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>Aurora メモリ</td><td><code>AWS/RDS</code></td><td><code>FreeableMemory</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&lt;= 268435456（256 MB）</td><td>300 秒</td><td>3</td><td>3</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>Scheduler 起動失敗</td><td><code>AWS/Scheduler</code></td><td><code>TargetErrorCount</code>、<code>TargetErrorThrottledCount</code>、<code>InvocationThrottleCount</code>、<code>InvocationDroppedCount</code>、<code>InvocationsSentToDeadLetterCount</code>、<code>InvocationsFailedToBeSentToDeadLetterCount</code>（メトリクスごとに個別アラーム、計 6 個）</td><td><code>ScheduleGroup=${ImageScheduleGroupName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>インサイト Scheduler 起動失敗（16-7 追加・16-10 実装）</td><td><code>AWS/Scheduler</code></td><td>上と同じ 6 メトリクス（個別アラーム、計 6 個）</td><td><code>ScheduleGroup=${InsightsScheduleGroupName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
   </tbody>
 </table>
 </div>
@@ -544,7 +594,7 @@
 </div>
 
 <h2 id="scheduler-dlq">10. Scheduler DLQ 定義</h2>
-<p>ImageBatchStack で EventBridge Scheduler 専用の SQS DLQ を作成し、画像生成スケジュールの DeadLetterConfig に設定する。</p>
+<p>ImageBatchStack で EventBridge Scheduler 専用の SQS DLQ を作成し、画像生成スケジュールの DeadLetterConfig に設定する。インサイト収集用には InsightsBatchStack が同型の DLQ <code>acps-{env}-insights-scheduler-dlq</code> を持つ（16-7 追加・16-10 実装。下表の Queue 名・退避対象以外は同じ設定。監視 Dimension は <code>ScheduleGroup=${InsightsScheduleGroupName}</code>）。</p>
 
 <div class="table-wrap">
 <table>
@@ -559,6 +609,97 @@
 </div>
 
 <p>DLQ にメッセージが入った場合は、対象 <code>set_code</code> と <code>scheduled_at</code> を確認し、必要に応じて画像生成 Step Functions を手動実行する（手順は <a href="operation.html">operation.html</a> を参照）。</p>
+
+<h2 id="insights-asl">11. インサイト収集 Step Functions ASL 定義（Phase 16-7 設計・16-10 実装）</h2>
+
+<p>EventBridge Scheduler（セクション 1.6）から起動される。SNS 投稿 ASL（セクション 4）と同型の 2 ステート構成で、差分はタスク定義 family・コンテナ名・コンテナオーバーライド（<code>SCHEDULED_AT</code> / <code>MEDIA_LOOKBACK_DAYS</code> を追加）のみ。実装方式（生 JSON + <code>definitionSubstitutions</code>、ファイルは <code>infra/lib/asl/insights-collection.asl.json</code>）は <a href="stacks.html#insights-batch">stacks.html セクション 3.5</a> を参照。</p>
+
+<pre><code>{
+  "StartAt": "WaitForDbReady",
+  "States": {
+    "WaitForDbReady": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 900,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${DbReadinessCheckTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${DbReadinessCheckSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "Next": "RunInsightsBatchTask"
+    },
+    "RunInsightsBatchTask": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "TimeoutSeconds": 3600,
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "${EcsClusterArn}",
+        "TaskDefinition": "${InsightsBatchTaskDefFamily}",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["${PublicSubnetId1}", "${PublicSubnetId2}"],
+            "SecurityGroups": ["${BatchSgId}"],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "insights-batch",
+              "Environment": [
+                { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "SCHEDULED_AT", "Value.$": "$.scheduled_at" },
+                { "Name": "MEDIA_LOOKBACK_DAYS", "Value.$": "$.media_lookback_days" },
+                { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" }
+              ]
+            }
+          ]
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "States.Timeout"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError"
+        }
+      ],
+      "End": true
+    },
+    "HandleError": {
+      "Type": "Fail",
+      "Error": "InsightsBatchFailed",
+      "Cause": "Insights batch task failed after retries"
+    }
+  }
+}</code></pre>
+
+<div class="note">
+  <span class="callout-title">Input 契約の注意</span>
+  ASL が <code>$.scheduled_at</code> / <code>$.media_lookback_days</code> を無条件でマップするため、<strong>手動実行時も 3 キーすべてを Input に含める必要がある</strong>（例は <a href="../app/operation.html#insights-ops">app/operation.html セクション 6.1</a>）。<code>scheduled_at</code> は <code>post_insights</code> の冪等性キーであり、同一 Input での Retry・再実行は欠測分のみを埋める（<a href="../app/batch-flow.html#insights-failure">app/batch-flow.html セクション 4.3</a>）。
+</div>
 
 </div>
 </body>

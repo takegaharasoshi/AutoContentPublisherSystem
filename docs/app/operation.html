@@ -14,7 +14,8 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-08-09</span>
+  <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
+  <span>最終更新: 2026-08-10</span>
 </div>
 
 <div class="note">
@@ -67,8 +68,8 @@
       <td>Secret 作成 → DB 登録の順で追加。トークンはデータアクセス期限（<code>debug_token</code> の実測値）前に手動リフレッシュ（セクション 5）</td>
     </tr>
     <tr>
-      <td>効果測定</td>
-      <td>Instagram アプリ・インサイト画面で手動確認。自動収集（インサイト収集バッチ）は将来拡張</td>
+      <td>効果測定（16-7 更新）</td>
+      <td>インサイト収集バッチ（第 3 のバッチ。<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）が生メトリクスを自動収集する（16-7 設計 Fix・16-8 以降で実装）。API で取れない指標（視聴維持カーブ・View Rate）のみ Instagram アプリのインサイト画面で手動確認。運用手順はセクション 6</td>
     </tr>
   </tbody>
 </table>
@@ -633,8 +634,14 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   </ul>
 </div>
 
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、Phase 16-7）: インサイト収集の導入で再認可スコープに instagram_manage_insights を追加する</span>
+  インサイト収集バッチは既存の投稿用権限に加えて <strong><code>instagram_manage_insights</code></strong> スコープを必要とする（16-6 調査 (5)）。既存の長期トークンに新スコープは自動付与されないため、<strong>16-11（稼働確認）の冒頭で 5.1 手順 5 を <code>instagram_manage_insights</code> を含めて再実行し、新トークンで Secret を更新する</strong>。以後の定期更新（下記手順）でも同スコープを含めて再認可する。
+  この再認可により <code>data_access_expires_at</code> も延長されるため、実施後は下記リマインダーの日付を新期限の 7 日前へ更新する。自社管理アカウントのみの利用のため Standard Access の範囲でアプリレビューは不要の見込み。
+</div>
+
 <ol>
-  <li>上記の実測値（<code>data_access_expires_at</code>）の<strong>7 日前を目安</strong>に、Meta の長期トークン更新フロー（<a href="#instagram-account-setup">5.1 手順 5</a> の再実行）でトークンを再発行し、新しい期限を取得する</li>
+  <li>上記の実測値（<code>data_access_expires_at</code>）の<strong>7 日前を目安</strong>に、Meta の長期トークン更新フロー（<a href="#instagram-account-setup">5.1 手順 5</a> の再実行。スコープに <code>instagram_manage_insights</code> を含める — 上記 decision）でトークンを再発行し、新しい期限を取得する</li>
   <li>取得した新トークンで Secrets Manager の値を更新する（<code>access_token</code> と <code>token_expires_at</code> の両方を更新する）
     <pre><code>aws secretsmanager put-secret-value \
   --secret-id acps/prod/fashion-set-1/sns/instagram/main-account \
@@ -662,6 +669,35 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
 <div class="warn">
   <span class="callout-title">注意: スタック再作成で値が失われる</span>
   この Secret の RemovalPolicy は Delete のため、FoundationStack を destroy → 再作成すると手動設定した API キー値は失われる。再作成後はコンソールから再設定が必要（<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。
+</div>
+
+<h2 id="insights-ops">6. インサイト収集の運用（Phase 16-7 設計 Fix）</h2>
+
+<p>インサイト収集バッチ（処理フローは <a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>、実行基盤は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 1.6・11）の運用手順。</p>
+
+<h3 id="insights-onboarding">6.1 稼働開始チェックリスト（16-11 で実施）</h3>
+<ol>
+  <li><strong>再認可・トークン更新</strong>: 5.1 手順 5 を <code>instagram_manage_insights</code> スコープ込みで再実行し、全アカウントの Secret を新トークンで更新する（5.4 の decision。リマインダー日付の更新まで）</li>
+  <li><strong>手動実行で疎通確認</strong>: セットごとに Step Functions を手動実行し、<code>post_insights</code> / <code>account_insights_daily</code> に行が入ることを確認する
+    <pre><code>aws stepfunctions start-execution \
+  --state-machine-arn arn:aws:states:ap-northeast-1:&lt;アカウント ID&gt;:stateMachine:acps-prod-insights-collection-sfn \
+  --input '{"set_code": "logic-training-1", "scheduled_at": "&lt;現在時刻の ISO 8601 UTC&gt;", "media_lookback_days": "14"}'</code></pre>
+    <code>scheduled_at</code> は冪等性キーになるため、手動実行では現在時刻など既存スナップショットと重複しない値を渡す</li>
+  <li><strong>初回バックフィル（2026-08-10 ユーザー決定: やる）</strong>: <code>media_lookback_days</code> を大きくした手動実行を各セット 1 回行い、既存全投稿の現在累計値を取り込む（例: <code>"media_lookback_days": "90"</code>）。アカウント日次はテーブルが空のため通常ロジックで自動的に API 保持上限の 90 日分が入る。2026-08-08 のフォーマット切替前後のリール比較（<code>reels_skip_rate</code> 等）に使う。失効済みストーリーズは取得不可のため対象外（「対象不存在」の WARNING スキップとして流れる）</li>
+  <li><strong>スケジュール有効化</strong>: Scheduler（セット × 2 回/日。<a href="../infra/workflow.html">infra/workflow.html セクション 1.6</a>）が ENABLED であることを確認する</li>
+</ol>
+
+<h3 id="insights-failure-ops">6.2 収集失敗時の対応・欠測の考え方</h3>
+<ul>
+  <li><strong>検知</strong>: 既存パターンと同じく Step Functions 失敗アラーム（<code>ExecutionsFailed</code>）+ ECS タスク異常終了通知。詳細な原因は CloudWatch Logs（どのメディア・どの日次で失敗したか WARNING/ERROR ログ）で確認する</li>
+  <li><strong>復旧は自動</strong>: 冪等性キー（<a href="batch-flow.html#insights-failure">batch-flow.html セクション 4.3</a>）により、失敗ランの Retry・次回ランは欠測分だけを埋める。手動補正は原則不要</li>
+  <li><strong>欠測の考え方</strong>: <code>feed_image</code> / <code>reel</code> はウィンドウ内の次ランで最新累計値が取れるため実害は小さい（失敗ラン時点のスナップショット 1 点が欠けるのみ）。<strong><code>story</code> は 24 時間期限があるため、期限内の 2 回（06:00・18:00 JST）が両方失敗するとそのストーリーズの計測値は永久欠測になる</strong>（許容する。分析時は期限内最後のスナップショットを最終値として扱う）。<code>account_insights_daily</code> は 90 日以内なら後追いで埋まる</li>
+  <li><strong>投稿の手動削除</strong>: Instagram 上で投稿を削除した場合、以後の収集は「対象不存在」の WARNING スキップになる（失敗扱いにはならない。<a href="batch-flow.html#insights-failure">batch-flow.html セクション 4.3</a>）</li>
+</ul>
+
+<div class="note">
+  <span class="callout-title">継続的に見る指標セット・KPI 転記の運用は 16-5 完了後に確定（2 段階 Fix の後段）</span>
+  収集した生メトリクスのうち「継続的に見る指標セット」（生成カラム / ビューへの昇格・事業戦略書 KPI 実績表への転記手順・確認頻度）は、16-5 の手動前後比較の結論を受けて 16-12 で本セクションに追記する。それまでの分析は <code>metrics</code> JSON への直接クエリで行う。
 </div>
 
 <p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。<code>post_records.attempt_number</code> / <code>max_post_retries</code> に基づく再試行上限確認は、自動再試行を行わない方針への変更に伴い不採用。SNS アカウント追加手順・手動補正の記録ルール・トークン更新の考え方は本書に引き継いだ。現役の設計書ではない）</p>

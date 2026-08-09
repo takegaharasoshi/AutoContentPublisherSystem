@@ -89,7 +89,7 @@ AutoContentPublisherSystem/
 ## 開発計画
 
 - 開発計画と進捗は `docs/development-plan.md` で管理する。ステップ完了時、計画書にはチェック + 完了日 + 要点のみを記録し、詳細な実施記録は `docs/development-log.md` に追記する（計画書の肥大化防止）
-- **Phase D（インフラ設計）→ Phase A・9（アプリ設計）→ Phase 0〜8（インフラ構築）→ Phase 10〜13（アプリ実装・定常運用開始）は完了済み**。現在は **Phase 14〜17（収益化に向けた機能拡充: 動画対応 → 勝負セット → インサイト → プラットフォーム展開）** を進行中（現況は計画書を参照）
+- **Phase D（インフラ設計）→ Phase A・9（アプリ設計）→ Phase 0〜8（インフラ構築）→ Phase 10〜13（アプリ実装・定常運用開始）は完了済み**。現在は **Phase 14〜17（収益化に向けた機能拡充: 動画対応 → 勝負セット → インサイト → 都道府県ランキングセット）** を進行中。プラットフォーム展開は Phase XX として着手判断待ち（現況は計画書を参照）
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
 - 作業開始時は `docs/development-plan.md` を読み、現在の Phase・ステップを確認してから着手する
 
@@ -143,11 +143,12 @@ Claude のトークン消費を抑えるため、以下のタスクは Codex CLI
 
 ## CDK スタック
 
-デプロイ順序: FoundationStack → SnsPostBatchStack → ImageBatchStack → MonitoringStack
+デプロイ順序: FoundationStack → SnsPostBatchStack → ImageBatchStack → InsightsBatchStack → MonitoringStack
 
 - **FoundationStack**: 共通基盤（VPC、S3、Aurora、Secrets Manager、ECS Cluster、ECR、DB 準備確認 ECS タスク）
 - **ImageBatchStack**: 画像生成バッチ実行基盤
 - **SnsPostBatchStack**: SNS 投稿バッチ実行基盤
+- **InsightsBatchStack**: インサイト収集バッチ実行基盤（Phase 16-7 設計・16-10 実装予定）
 - **MonitoringStack**: 監視・通知
 - **AdminApiStack**（将来拡張）: 管理画面バックエンド API
 - **AdminWebStack**（将来拡張）: 管理画面フロントエンド

@@ -135,6 +135,7 @@
     <tr><td>DB 準備確認タスクロール</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code>）</td></tr>
     <tr><td>画像生成バッチタスクロール</td><td>S3 読み書き、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/image/*</code>）</td></tr>
     <tr><td>SNS 投稿バッチタスクロール</td><td>S3 読み取り、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>）</td></tr>
+    <tr><td>インサイト収集バッチタスクロール（16-7 設計・16-10 実装）</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>。SNS 投稿バッチと同じ Instagram トークンを読む）。<strong>S3 権限は付与しない</strong>（S3 不使用）</td></tr>
   </tbody>
 </table>
 </div>
@@ -169,6 +170,7 @@
   <tbody>
     <tr><td>image-generation-sfn</td><td>ECS RunTask（DB 準備確認タスク + 画像生成バッチタスク）、<code>iam:PassRole</code>（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため）、SNS 投稿 Step Functions の <code>StartExecution</code>、CloudWatch <code>PutMetricData</code>（カスタムメトリクス発行用。詳細は下記注記を参照）</td></tr>
     <tr><td>sns-posting-sfn</td><td>ECS RunTask（DB 準備確認タスク + SNS 投稿バッチタスク）、<code>iam:PassRole</code>（ECS RunTask 時にタスクロール・タスク実行ロールを渡すため）</td></tr>
+    <tr><td>insights-collection-sfn（16-7 設計・16-10 実装）</td><td>ECS RunTask（DB 準備確認タスク + インサイト収集バッチタスク）、<code>iam:PassRole</code>（同上）。sns-posting-sfn と同構成</td></tr>
   </tbody>
 </table>
 </div>
@@ -205,6 +207,7 @@
 <ul>
   <li>画像生成 Step Functions の起動権限（<code>states:StartExecution</code>）</li>
   <li>Scheduler DLQ（SQS）への送信権限（<code>sqs:SendMessage</code>）。対象は ImageBatchStack で作成する Scheduler 専用 DLQ に限定する</li>
+  <li><strong>インサイト収集用（16-7 設計・16-10 実装）</strong>: InsightsBatchStack に同構成の専用ロールを作成する（insights-collection-sfn の <code>states:StartExecution</code> + <code>acps-{env}-insights-scheduler-dlq</code> への <code>sqs:SendMessage</code>）</li>
 </ul>
 
 <h3>2.5 CI/CD サービスロール</h3>

@@ -27,7 +27,7 @@
     </marker>
   </defs>
 
-  <text x="30" y="34" font-size="13" font-weight="bold" fill="var(--diag-text)">サービスパイプライン（image-batch / sns-post-batch）</text>
+  <text x="30" y="34" font-size="13" font-weight="bold" fill="var(--diag-text)">サービスパイプライン（image-batch / sns-post-batch / insights-batch）</text>
 
   <rect x="30" y="50" width="130" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
   <text x="95" y="79" text-anchor="middle" font-size="13" fill="var(--diag-text)">GitHub（push）</text>
@@ -87,6 +87,7 @@
   <tbody>
     <tr><td><code>acps-{env}-image-batch-pipeline</code></td><td>画像生成バッチ</td><td>ImageBatchStack</td><td><code>services/image-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
     <tr><td><code>acps-{env}-sns-post-batch-pipeline</code></td><td>SNS 投稿バッチ</td><td>SnsPostBatchStack</td><td><code>services/sns-post-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
+    <tr><td><code>acps-{env}-insights-batch-pipeline</code>（16-7 設計・16-10 実装）</td><td>インサイト収集バッチ</td><td>InsightsBatchStack</td><td><code>services/insights-batch/**</code> OR <code>shared/**</code> の変更</td></tr>
   </tbody>
 </table>
 </div>
@@ -107,7 +108,7 @@
 <h2 id="codebuild">3. CodeBuild 設定</h2>
 <p>CodeBuild サービスロールの権限詳細は <a href="security.html#iam">security.html セクション 2.5</a> を参照。</p>
 
-<h3>3.1 バッチサービス用（image-batch / sns-post-batch）</h3>
+<h3>3.1 バッチサービス用（image-batch / sns-post-batch / insights-batch〔16-10 実装〕）</h3>
 <ul>
   <li><strong>buildspec.yml の配置</strong>: サービスごとに <code>services/{service-name}/buildspec.yml</code> に配置する（例: <code>services/image-batch/buildspec.yml</code>）</li>
   <li><strong>Docker ビルドコンテキスト</strong>: リポジトリルートをビルドコンテキストとし、サービスごとの Dockerfile を <code>-f</code> オプションで指定する（例: <code>docker build -f services/image-batch/Dockerfile .</code>）。これにより <code>shared/</code> ディレクトリを <code>COPY</code> でコンテナに含めることができる</li>
@@ -181,6 +182,7 @@ cdk deploy -c env=prod \
   <tbody>
     <tr><td><code>auto-content-publisher/image-batch</code></td><td>画像生成バッチ</td></tr>
     <tr><td><code>auto-content-publisher/sns-post-batch</code></td><td>SNS 投稿バッチ</td></tr>
+    <tr><td><code>auto-content-publisher/insights-batch</code>（16-7 設計・16-10 実装）</td><td>インサイト収集バッチ（保持ルールはサービス用と同じ）</td></tr>
     <tr><td><code>auto-content-publisher/db-readiness-check</code></td><td>DB 準備確認（パイプライン対象外・手動更新）</td></tr>
   </tbody>
 </table>

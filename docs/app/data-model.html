@@ -41,6 +41,8 @@
   <line x1="500" y1="55" x2="770" y2="213" stroke="var(--diag-line)" stroke-width="1.5"/>
   <!-- quiz_items → quiz_stock_items（row3 の背面を通す。stock_item_id 参照） -->
   <line x1="262" y1="336" x2="777" y2="263" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <!-- sns_accounts → account_insights_daily（row2 の背面を通す） -->
+  <line x1="670" y1="158" x2="777" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
   <!-- batch_sets -->
   <rect x="340" y="16" width="200" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
   <text x="440" y="43" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">batch_sets（セット）</text>
@@ -90,9 +92,14 @@
   <text x="405" y="332" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--diag-text)">post_media</text>
   <text x="405" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（中間テーブル）</text>
 
-  <rect x="530" y="312" width="150" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)" stroke-dasharray="5 4"/>
+  <rect x="530" y="312" width="150" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
   <text x="605" y="332" text-anchor="middle" font-size="11" fill="var(--diag-text)">post_insights</text>
-  <text x="605" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（将来: 効果測定。未実装）</text>
+  <text x="605" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（投稿別インサイト。16-7 設計）</text>
+
+  <rect x="692" y="312" width="170" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="777" y="332" text-anchor="middle" font-size="11" fill="var(--diag-text)">account_insights_daily</text>
+  <text x="777" y="348" text-anchor="middle" font-size="10" fill="var(--diag-text)">（アカウント日次。16-7 設計）</text>
+  <text x="688" y="300" font-size="10" fill="var(--diag-text)">1 : N（UTC 日次）</text>
 
   <!-- batch_sets → row1 children -->
   <line x1="395" y1="60" x2="110" y2="108" stroke="var(--diag-line)" stroke-width="1.5"/>
@@ -130,10 +137,11 @@
   <line x1="570" y1="263" x2="450" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
   <text x="510" y="290" font-size="10" fill="var(--diag-text)">1 : N</text>
 
-  <!-- posts → post_insights (dashed) -->
-  <line x1="605" y1="263" x2="605" y2="310" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <!-- posts → post_insights -->
+  <line x1="605" y1="263" x2="605" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
+  <text x="612" y="290" font-size="10" fill="var(--diag-text)">1 : N（収集ラン）</text>
 </svg>
-<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_media</code>（生成メディア: 画像・動画。旧 <code>generated_images</code>）は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。<code>audio_assets</code>（音源ストック。Phase 14-4 新設）はセットの子であり、動画の <code>generated_media</code> から使用音源として参照される（破線）。<code>quiz_items</code>（出題履歴。Phase 15-5 新設）は生成実行と 1 : 1 で、クイズ方式のセットのみ行が作られる。<code>quiz_stock_items</code>（問題ストック。Phase 16-1 新設）はセットの子で、出題時に消費（LRU 順繰り）され、<code>quiz_items.stock_item_id</code> から参照される（破線）。<code>post_insights</code> の破線は将来拡張（テーブル未作成、拡張余地の記録のみ）。</figcaption>
+<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_media</code>（生成メディア: 画像・動画。旧 <code>generated_images</code>）は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。<code>audio_assets</code>（音源ストック。Phase 14-4 新設）はセットの子であり、動画の <code>generated_media</code> から使用音源として参照される（破線）。<code>quiz_items</code>（出題履歴。Phase 15-5 新設）は生成実行と 1 : 1 で、クイズ方式のセットのみ行が作られる。<code>quiz_stock_items</code>（問題ストック。Phase 16-1 新設）はセットの子で、出題時に消費（LRU 順繰り）され、<code>quiz_items.stock_item_id</code> から参照される（破線）。<code>post_insights</code>（投稿別インサイトのスナップショット）と <code>account_insights_daily</code>（アカウント日次インサイト）は Phase 16-7 で設計 Fix したインサイト収集バッチ（第 3 のバッチ）用のテーブル（セクション 4.11。テーブル作成は 16-8 の V009）。</figcaption>
 </figure>
 
 <h2 id="entities">2. エンティティ一覧</h2>
@@ -203,9 +211,14 @@
       <td>旧設計を踏襲。<code>generation_runs</code> とは役割が異なり相互に FK を持たない（セクション 4.7 で役割分担を確定）</td>
     </tr>
     <tr>
-      <td><code>post_insights</code><span class="badge badge-future" style="margin-left:.4rem">将来</span></td>
-      <td>投稿の効果測定データ（いいね数・リーチ等）</td>
-      <td>将来のインサイト収集バッチ（第 3 のバッチ）用。<strong>Phase 9-3 時点でテーブルは作成しない</strong>。導入時は <code>posts.id</code> を FK にした新規テーブルを追加する想定（初期スキーマへの影響なし）</td>
+      <td><code>post_insights</code><span class="badge badge-fixed" style="margin-left:.4rem">16-7 設計</span></td>
+      <td>投稿別インサイトのスナップショット（メディアレベル Insights の生メトリクス全量。収集ランごとに追記）</td>
+      <td>インサイト収集バッチ（第 3 のバッチ。<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）が書き込む。<code>posts</code> の子（複合 FK。突合キーは <code>posts.platform_post_id</code> = IG メディア ID）。メトリクスは JSON 全量保存とし、継続的に見る指標の昇格は 16-5 完了後に確定する（セクション 4.11。テーブル作成は 16-8 の V009）</td>
+    </tr>
+    <tr>
+      <td><code>account_insights_daily</code><span class="badge badge-fixed" style="margin-left:.4rem">16-7 設計</span></td>
+      <td>アカウント日次インサイト（UTC 日で確定したアカウントレベル指標 + フォロワー数スナップショット）</td>
+      <td>API 保持 90 日の制約に対する自前の長期時系列。<code>sns_accounts</code> の子（複合 FK）。UTC 日 × アカウントで 1 行の確定値（upsert-once。セクション 4.11）</td>
     </tr>
   </tbody>
 </table>
@@ -223,9 +236,9 @@
 
 <div class="decision">
   <span class="callout-title">セット境界の整合性を保証する複合 FK（旧設計のパターンを踏襲・拡張）</span>
-  <code>generated_media</code>・<code>posts</code>・<code>quiz_items</code>（15-5 追加）は、参照先テーブルの主キー <code>id</code> に加えて <code>set_id</code> を非正規化して保持し、
+  <code>generated_media</code>・<code>posts</code>・<code>quiz_items</code>（15-5 追加）・<code>post_insights</code> / <code>account_insights_daily</code>（16-7 追加）は、参照先テーブルの主キー <code>id</code> に加えて <code>set_id</code> を非正規化して保持し、
   <code>(set_id, 対象カラム) → 参照先テーブル(set_id, id)</code> の複合 FK を張る（参照先テーブル側は <code>UNIQUE (set_id, id)</code> を持つ）。
-  これにより、異なるセットに属する <code>generation_runs</code> / <code>prompt_configs</code> / <code>sns_accounts</code> / <code>caption_templates</code> / <code>audio_assets</code>（14-4 追加。<code>generated_media.audio_asset_id</code> の参照先）/ <code>quiz_stock_items</code>（16-1 追加。<code>quiz_items.stock_item_id</code> の参照先）を
+  これにより、異なるセットに属する <code>generation_runs</code> / <code>prompt_configs</code> / <code>sns_accounts</code> / <code>caption_templates</code> / <code>audio_assets</code>（14-4 追加。<code>generated_media.audio_asset_id</code> の参照先）/ <code>quiz_stock_items</code>（16-1 追加。<code>quiz_items.stock_item_id</code> の参照先）/ <code>posts</code>（16-7 追加。<code>post_insights.post_id</code> の参照先として V009 で <code>UNIQUE (set_id, id)</code> を追加）を
   誤って組み合わせて参照することを DB レベルで防止する。この保証は<strong>セット境界まで</strong>とし、
   「<code>post_media.generated_media_id</code> が同一 <code>generation_run</code> に属すること」のような、より粒度の細かい整合性はアプリ層の責務とする
   （複合 FK をここまで深くすると <code>generation_run_id</code> の非正規化が連鎖し複雑さに見合わないと判断。セクション 4.6 に既知の割り切りとして明記）。
@@ -377,6 +390,7 @@ LIMIT 1;</code></pre>
   <li><code>posts</code> の <code>UNIQUE (generation_run_id, sns_account_id, media_type)</code>（V004 拡張）により 1 投稿対象 × 1 メディア種別につき常に 1 行。ストーリーズを有効化しないセットでは従来どおり 1 投稿対象 1 行、有効化したセットではリール行 + ストーリーズ行の最大 2 行になる。状態遷移は <a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2</a> の 5 状態（<code>pending</code> / <code>container_created</code> / <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）をそのまま <code>status</code> ENUM に反映する</li>
   <li><code>caption_template_id</code>（nullable FK）+ <code>caption_text_snapshot</code>: <code>posts</code> 行は本文組み立て前（<code>pending</code> 作成時）に INSERT されるため、当初は両方 NULL。本文組み立て時（<a href="batch-flow.html#sns-steps">セクション 3.3 手順 3</a>）に UPDATE で設定する</li>
   <li><code>post_media</code> は 1 投稿 : N メディア（将来のカルーセル）に対応する中間テーブル。初期構築では生成実行内の先頭メディア（<code>generated_media.id</code> 昇順で最初の 1 件）のみを <code>display_order=0</code> で 1 行登録する（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3 手順 2</a>）。参照カラムは V002 で <code>generated_image_id</code> → <code>generated_media_id</code> にリネームする</li>
+  <li><strong>16-7 追加</strong>: <code>post_insights</code> の複合 FK の参照先とするため、V009 で <code>UNIQUE (set_id, id)</code>（<code>uq_posts_set_id</code>）を追加する（セクション 3 のパターン。既存行は <code>id</code> が主キーのため自明に満たし、埋め戻し不要）</li>
 </ul>
 <div class="note">
   <span class="callout-title">既知の割り切り: post_media.generated_media_id の生成実行境界チェックはアプリ層</span>
@@ -575,6 +589,54 @@ LIMIT 1;</code></pre>
     <li>セット接頭辞は付けない（S3 パスと <code>set_id</code> の両方に既にセット情報があるため冗長）。スロットのサブフォルダも作らない（名前で足りる）</li>
     <li>適用は <strong>V007（NULL 可で追加 + UNIQUE）→ 既存行バックフィル（<code>content/quiz-stock/logic-training-1/2026-08-initial/backfill_content_key.sql</code>。安定キー = <code>set_code</code> + <code>question_text</code> で両環境へ同一ファイルを適用）→ V008（NOT NULL 化）</strong>の 3 段。NOT NULL 化により採番漏れの投入は ERROR 1364 で必ず失敗する（静かに進行しない）</li>
     <li><code>id</code> は環境ローカルな代理キーのまま残す（再採番はしない。FK・LRU の同値順・ビルドツーリングの中間生成物のファイル名はローカル id のままでよい）</li>
+  </ul>
+</div>
+
+<h3 id="detail-insights">4.11 post_insights / account_insights_daily（インサイト収集。Phase 16-7 設計・16-8 で作成）</h3>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、Phase 16-7）: インサイト 2 テーブルの新設（V009）と「JSON 全量 + 後から昇格」方式</span>
+  インサイト収集バッチ（第 3 のバッチ。処理フローは <a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）の書き込み先として 2 テーブルを新設する。
+  収集は「API で取得可能な生メトリクスの全量収集」であり、<strong>メトリクスは API レスポンスを整形した JSON カラムで全量保存する</strong>。
+  「継続的に見る指標セット」（可視化・KPI 転記の対象）は 16-5 完了後に確定し、確定した指標のみを<strong>生成カラム（MySQL 8 の JSON 抽出）またはビューとして後から昇格</strong>させる（2 段階 Fix。再収集は不要で、Meta のメトリクス改廃にも DDL 追随が不要）。
+  ワイドカラム方式（収集対象を今決め打ち・改廃のたびに DDL 変更）と EAV 方式（数値のみで breakdown 構造が持てない・分析クエリが毎回ピボット）は不採用。
+  <p style="margin:.6rem 0 .2rem;"><strong>post_insights（投稿別インサイトのスナップショット。追記型）</strong></p>
+  <div class="table-wrap" style="margin:.2rem 0 0;">
+  <table>
+    <thead><tr><th>カラム</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>主キー（<code>AUTO_INCREMENT</code>。全テーブル共通方針）</td></tr>
+      <tr><td><code>set_id</code></td><td>セット境界の複合 FK 用の非正規化（<code>(set_id, post_id) → posts(set_id, id)</code>。セクション 3。参照先の <code>UNIQUE (set_id, id)</code> は V009 で <code>posts</code> へ追加）</td></tr>
+      <tr><td><code>post_id</code></td><td><code>posts.id</code> への参照。対象メディアの IG メディア ID は <code>posts.platform_post_id</code> を使う（投稿成功時に保存済み。本テーブルには重複して持たない）</td></tr>
+      <tr><td><code>scheduled_at</code></td><td><code>DATETIME NOT NULL</code>。収集ランの識別子（EventBridge Scheduler が渡す実行予定時刻・UTC。<code>generation_runs.scheduled_at</code> と同じ正規化）。<strong><code>UNIQUE (post_id, scheduled_at)</code> が冪等性キー</strong>: Step Functions Retry による再実行では INSERT-or-skip となり、途中失敗ランの再実行は欠測分だけを埋める。手動実行時は入力で任意の一意値を渡す</td></tr>
+      <tr><td><code>collected_at</code></td><td><code>DATETIME NOT NULL</code>。実際に API を呼んだ時刻（UTC）。<code>posted_at</code> との差分が「投稿後何時間時点の値か」を表す</td></tr>
+      <tr><td><code>metrics</code></td><td><code>JSON NOT NULL</code>。メディアレベル Insights 全メトリクスの生値マップ（<code>{"views": 123, "reels_skip_rate": 0.95, "navigation": {...}, ...}</code>。breakdown 付きメトリクスは構造ごと保存）。メトリクス名は取得時の API 名をそのまま使う</td></tr>
+      <tr><td><code>api_version</code></td><td><code>VARCHAR(20) NOT NULL</code>。取得時の Graph API バージョン（例 <code>v25.0</code>）。メトリクス改廃の解釈に使う</td></tr>
+      <tr><td><code>created_at</code> / <code>updated_at</code></td><td>全テーブル共通</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="margin:.6rem 0 .2rem;"><strong>account_insights_daily（アカウント日次インサイト。UTC 日で確定・upsert-once）</strong></p>
+  <div class="table-wrap" style="margin:.2rem 0 0;">
+  <table>
+    <thead><tr><th>カラム</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>主キー</td></tr>
+      <tr><td><code>set_id</code></td><td>複合 FK 用の非正規化（<code>(set_id, sns_account_id) → sns_accounts(set_id, id)</code>。参照先の <code>UNIQUE (set_id, id)</code> は V001 から存在）</td></tr>
+      <tr><td><code>sns_account_id</code></td><td><code>sns_accounts.id</code> への参照</td></tr>
+      <tr><td><code>metric_date</code></td><td><code>DATE NOT NULL</code>。<strong>UTC 日</strong>（アカウントレベル Insights の <code>period=day</code> は UTC 区切りのため。JST 表示への変換は分析側の責務）。<strong><code>UNIQUE (sns_account_id, metric_date)</code></strong> で 1 日 1 行。<strong>UTC 日が閉じてから取得した確定値のみを書き、以後更新しない</strong>（INSERT IGNORE の upsert-once）</td></tr>
+      <tr><td><code>metrics</code></td><td><code>JSON NOT NULL</code>。アカウントレベル Insights 全メトリクスの生値マップ（<code>follows_and_unfollows</code> の breakdown 等も構造ごと保存）</td></tr>
+      <tr><td><code>followers_count</code></td><td><code>INT UNSIGNED NULL</code>。行作成時点の IG User <code>followers_count</code> スナップショット（Insights ではなくユーザーフィールド。<strong>日締値ではなく収集時点の残高</strong>である点に注意）。過去日の残高は API から復元不可のため、バックフィルで作られた過去日行は NULL</td></tr>
+      <tr><td><code>collected_at</code> / <code>api_version</code></td><td><code>post_insights</code> と同じ</td></tr>
+      <tr><td><code>created_at</code> / <code>updated_at</code></td><td>全テーブル共通</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul style="margin:.4rem 0 0;">
+    <li><strong>追記型でスナップショットを残す理由</strong>: メディア指標は投稿後も伸び続けるため、収集のたびに上書きすると伸び曲線（Views Over Time 相当。API では取得不可）が失われる。1 日 2 回 × 追跡 14 日で 1 投稿あたり最大 28 行・現行規模で 1 日約 200 行と僅少のため、保持期限は設けない</li>
+    <li><strong>ストーリーズの最終値</strong>: ストーリーズは投稿後 24 時間で API から取得不可になるため、期限内の最後のスナップショットを最終値として扱う（1 日 2 回実行で各ストーリーズは寿命の 17〜22 時間時点まで計測される。収集タイミングの設計は <a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）</li>
+    <li><strong>問題別パフォーマンスの突合経路</strong>: <code>post_insights → posts（generation_run_id）→ quiz_items → stock_item_id → quiz_stock_items</code>。<code>posts</code> と <code>quiz_items</code> はともに <code>generation_runs</code> の子であり、この JOIN で「どの問題のリールがどう伸びたか」を引ける</li>
+    <li><strong>V009 の適用順序</strong>: 全変更が追加的（新テーブル 2 本 + <code>posts</code> への UNIQUE 追加のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。FK の向きにより <code>posts</code> の ALTER（UNIQUE 追加）を <code>post_insights</code> の CREATE より先に行う</li>
   </ul>
 </div>
 
