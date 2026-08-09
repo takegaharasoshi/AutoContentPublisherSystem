@@ -951,6 +951,25 @@
 
     **(7) ドキュメント同期**: [gpt-quiz-multicut.html](app/generators/gpt-quiz-multicut.html)（8.2 にレイヤー分離とイラスト内接を追記・**9.1 バウンド演出**を新設・16-5 の decision 2 本）、[quiz-prebuilt.html](app/generators/quiz-prebuilt.html)（工程 2 の 3:2 記述を実態へ訂正 + decision）、スキル [quiz-stock-replenish](../.claude/skills/quiz-stock-replenish/SKILL.md)（サイズ確認・警告時の対処・`--rebuild` の使いどころ）。pytest は image-batch 106 件パス。
 
+- [x] **16-6** Instagram Graph API インサイト機能の調査（後段ブロック先行着手の 1 本目）
+  - 備考: 2026-08-09 完了（Web リサーチ = `codex --search exec` 委譲〔terra / high〕・再検証 + 整理 = Fable 5）。調査基準は Graph API **v25.0**・Instagram API with Facebook Login（既存構成）。学習カットオフ後の主要情報（2025-12 の新メトリクス群）は Meta 公式ブログ（2025-12-03）+ 複数二次ソースで再検証済み。ステップの目的だった「自動収集できる指標 / 手動でしか見えない指標」の境界を確定した。なお 16-5 完了前の先行着手は 2026-08-09 のユーザー決定（理由は計画書 Phase 16 冒頭の備考）。
+
+    **(1) 前段テコ入れの主要指標「スキップ率」が API で取得可能**: 2025-12-03 の Meta 公式発表で **`reels_skip_rate`**（冒頭 3 秒以内にスキップされた views の割合）がメディアレベル Insights へ追加済み。前段ブロックの起点だった「スキップ率 95%」に相当する定量指標を第 3 バッチで自動収集できる。同発表で再投稿数（メディア / アカウント両レベル）・`crossposted_views` / `facebook_views`（FB クロスポスト時）も追加
+
+    **(2) リールのメディアレベル**（`GET /{ig-media-id}/insights?metric=...`）: `views`（再視聴含む）/ `reach`（ユニーク）/ `ig_reels_video_view_total_time`（合計視聴時間）/ `ig_reels_avg_watch_time`（平均視聴時間）/ `reels_skip_rate` / `likes` `comments` `saved` `shares` / `follows`（投稿起点フォロー）/ `total_interactions` / `profile_visits` 等。広告起因は含まれない
+
+    **(3) ストーリーズのメディアレベル**: `views` / `reach` / `replies` / `shares` / `follows` / `navigation`（前進・戻る・離脱の breakdown。旧 `taps_forward` / `taps_back` / `exits` は統合済みで新規実装に使わない）。リール系の視聴時間・スキップ率メトリクスはストーリーズに無い。**取得期限は投稿後 24 時間**（アーカイブ・ハイライト化しても API 延長の保証なし）のため、収集バッチはストーリーズのみ期限内取得が必須（**収集スケジュール設計上の最重要制約**）
+
+    **(4) アカウントレベル**（`GET /{ig-user-id}/insights?metric=...&period=day`・UTC）: `views` / `reach` / `accounts_engaged` / `total_interactions` / `follows_and_unfollows`（`breakdown=follow_type` で純増減を算出）/ `profile_links_taps` 等。**保持期間は 90 日**のため長期時系列は自前保存が必須。現在フォロワー数は Insights ではなく IG User の **`followers_count` フィールドを日次スナップショット保存**する設計になる（過去日の残高は API から復元不可の前提）。日次時系列の取得形態はメトリクスにより異なる（time-series 型と total_value 型）ため、「毎日取得して自 DB に貯める」方式が安全
+
+    **(5) パーミッション**: 既存の投稿用権限に加えて **`instagram_manage_insights`** が必要（`instagram_basic` / `pages_read_engagement` は既存）。**既存の長期トークンに新 scope は自動付与されないため、再認可 → 新トークン発行 → Secrets 更新が必要**（operation.html 5.4 のトークン運用と接続する論点。16-7 で設計に織り込む）。自社管理アカウントのみの利用なら Standard Access の範囲でアプリレビュー不要の見込み
+
+    **(6) レート制限**: Insights 固有の公開上限なし。app-user あたり 200 calls / rolling 1 時間の一般制限 + Business Use Case 制限。当システムの規模（1 日 4 投稿 + アカウント日次）ではメトリクスを 1 リクエストに束ねれば設計上の制約にならない。`X-App-Usage` ヘッダ監視 + バックオフを実装既定とする
+
+    **(7) 廃止・改名動向（実装で使ってはいけない名前）**: 2025-04 の v22 以降、`impressions` / `plays` / `video_views` / `clips_replays_count` / `ig_reels_aggregated_all_plays_count` → **`views` へ統合**。`engagement` → 個別メトリクスの合算で代替。アカウントの `profile_views` / `website_clicks` → 廃止（`profile_links_taps` 等へ）。※最終的なメトリクス名の確定は 16-8 実装時に現行リファレンスで再ピン留めする（v25.0 時点の調査であり、名称は今後も変わりうる）
+
+    **(8) API では取れない指標 = 手動確認に残るもの（境界の確定）**: 秒単位の視聴維持カーブ・View Rate・Views Over Time（類似リール比較）は**アプリのインサイト画面のみ**。したがって 16-5 の手動比較では「維持カーブ・View Rate はスクショで記録」「スキップ率・視聴時間・保存・フォロワー等は将来自動収集される指標として数値を記録」という分担になる（16-5 の記録項目への入力）。次は **16-7（インサイト収集バッチの壁打ち・設計 Fix。指標セットの確定のみ 16-5 完了後に反映する 2 段階 Fix）**
+
 ## 設計課題リスト（解消済み）
 
 [development-plan.md](development-plan.md) の設計課題リストのうち解消済みの課題をここへ移す（2026-08-09 の計画書整理で導入。解消の経緯は各設計書の decision コールアウトにも記録されている）。
