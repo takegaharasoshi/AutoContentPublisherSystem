@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import json
 from pathlib import Path
 from typing import Any
@@ -12,6 +13,7 @@ from stock_items import ITEMS
 
 BASE_DIR = Path(__file__).resolve().parent
 REVIEW_PATH = BASE_DIR / "review.md"
+REVIEW_HTML_PATH = BASE_DIR / "review.html"
 SQL_PATH = BASE_DIR / "insert_ranking_stock.sql"
 
 
@@ -211,6 +213,263 @@ def build_review(items_and_data: list[tuple[dict[str, Any], dict[str, Any]]]) ->
     return header + "\n" + "\n".join(sections)
 
 
+def build_review_html(items_and_data: list[tuple[dict[str, Any], dict[str, Any]]]) -> str:
+    """Build a self-contained HTML review sheet.
+
+    Args:
+        items_and_data: Source items paired with their data JSON.
+
+    Returns:
+        Complete UTF-8 HTML document for local browser review.
+    """
+    toc_items = []
+    sections = []
+    for item, data in items_and_data:
+        entries = ranking_entries(data)
+        first_name = validate.PREFECTURE_BY_CODE[entries[0]["pref_code"]].name
+        item_id = f"item-{item['no']}"
+        toc_items.append(
+            f'<li><a href="#{html.escape(item_id, quote=True)}">'
+            f"{html.escape(item['no'])} {html.escape(item['title'])}"
+            f"（1位: {html.escape(first_name)}）</a></li>"
+        )
+        sections.append(review_html_item(item, data, item_id))
+
+    return f"""<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>都道府県ランキングストック 初期投入レビュー（第 1 バッチ 10 件）</title>
+<style>
+:root {{
+  --page: #f6f4ef;
+  --surface: #fffdf8;
+  --text: #292824;
+  --muted: #6b6861;
+  --line: #d9d4ca;
+  --accent: #315f58;
+  --accent-soft: #e4efeb;
+  --rank-one: #fff1c7;
+  --near-limit: #fff3e4;
+  --code: #f1eee7;
+}}
+@media (prefers-color-scheme: dark) {{
+  :root {{
+    --page: #1d201f;
+    --surface: #272a28;
+    --text: #eeeae1;
+    --muted: #c1bbb0;
+    --line: #4b504b;
+    --accent: #9bcdbf;
+    --accent-soft: #2e4840;
+    --rank-one: #4b4123;
+    --near-limit: #4c3928;
+    --code: #353834;
+  }}
+}}
+* {{ box-sizing: border-box; }}
+body {{
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+    "Yu Gothic", sans-serif;
+  line-height: 1.75;
+}}
+main {{ max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }}
+h1, h2, h3 {{ line-height: 1.35; }}
+h1 {{ font-size: clamp(1.55rem, 4vw, 2.1rem); margin: 0 0 1rem; }}
+h2 {{ margin: 0; font-size: 1.45rem; }}
+h3 {{ font-size: 1.08rem; margin: 1.5rem 0 .65rem; }}
+a {{ color: var(--accent); }}
+.lead, .toc, section {{ background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }}
+.lead {{ padding: 1.1rem 1.25rem; margin-bottom: 1rem; }}
+.lead ol {{ margin-bottom: 0; }}
+.toc {{ padding: 1rem 1.25rem; margin: 1rem 0 1.5rem; }}
+.toc h2 {{ font-size: 1.15rem; }}
+.toc ol {{ columns: 2; gap: 2rem; padding-left: 1.4rem; margin-bottom: 0; }}
+section {{ padding: 1.25rem; margin: 1.25rem 0; break-inside: avoid; }}
+.section-head {{ display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }}
+.content-key {{ color: var(--muted); font-size: .8rem; word-break: break-all; }}
+.check {{ margin-left: auto; white-space: nowrap; }}
+.back {{ font-size: .9rem; }}
+table {{ width: 100%; border-collapse: collapse; margin: .6rem 0; }}
+th, td {{ border-bottom: 1px solid var(--line); padding: .48rem .6rem; text-align: left; }}
+th {{ color: var(--muted); font-weight: 600; }}
+td:last-child, th:last-child {{ text-align: right; white-space: nowrap; }}
+tr.rank-one {{ background: var(--rank-one); font-weight: 700; }}
+.reference {{ color: var(--muted); font-size: .9rem; margin: .5rem 0 0; }}
+.source, .fields {{ background: var(--code); border-radius: 7px; padding: .8rem 1rem; }}
+dl {{ margin: 0; }}
+dt {{ color: var(--muted); font-weight: 700; margin-top: .55rem; }}
+dt:first-child {{ margin-top: 0; }}
+dd {{ margin: 0; overflow-wrap: anywhere; }}
+.narrations {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }}
+.narration {{ border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }}
+.narration h3 {{ margin: 0; padding: .6rem .8rem; background: var(--accent-soft); }}
+.cue {{ display: grid; grid-template-columns: 6.8rem 1fr auto; gap: .5rem; padding: .55rem .7rem; border-top: 1px solid var(--line); }}
+.cue.near-limit {{ background: var(--near-limit); }}
+.cue-name {{ font-family: ui-monospace, monospace; font-size: .82rem; color: var(--muted); }}
+.cue-budget {{ font-size: .82rem; white-space: nowrap; color: var(--muted); }}
+details {{ margin-top: 1.25rem; }}
+summary {{ cursor: pointer; color: var(--accent); font-weight: 700; }}
+pre {{ white-space: pre-wrap; overflow-wrap: anywhere; background: var(--code); padding: .9rem; border-radius: 7px; }}
+@media (max-width: 700px) {{
+  .toc ol {{ columns: 1; }}
+  .narrations {{ grid-template-columns: 1fr; }}
+  .cue {{ grid-template-columns: 5.8rem 1fr; }}
+  .cue-budget {{ grid-column: 2; }}
+}}
+@media print {{
+  body {{ background: #fff; color: #000; font-size: 10pt; }}
+  main {{ max-width: none; padding: 0; }}
+  .lead, .toc, section {{ border-color: #aaa; box-shadow: none; }}
+  a {{ color: #000; text-decoration: none; }}
+}}
+</style>
+</head>
+<body>
+<main>
+<header class="lead">
+<h1>都道府県ランキングストック 初期投入レビュー（第 1 バッチ 10 件）</h1>
+<p>承認後に Claude がローカル MySQL と Aurora へ INSERT します。</p>
+<h2>レビュー観点</h2>
+<ol>
+<li>データの正しさ（出典の実在・データ年・県換算の再計算・TOP5 の順位）</li>
+<li>表現（下位を晒していないか・煽りすぎていないか・出典表記とキャプション注記の妥当性）</li>
+<li>既存ストックとの重複（同一テーマ・同一出典の近接）</li>
+<li>フォーマット適合（文字数・cue 台本の長さ・bg_motif の妥当性）</li>
+</ol>
+</header>
+<nav class="toc" id="toc" aria-label="目次">
+<h2>目次</h2>
+<ol>{''.join(toc_items)}</ol>
+</nav>
+{''.join(sections)}
+</main>
+</body>
+</html>
+"""
+
+
+def review_html_item(item: dict[str, Any], data: dict[str, Any], item_id: str) -> str:
+    """Render one item section for the self-contained HTML review sheet.
+
+    Args:
+        item: Single-source display and narration fields.
+        data: Verified data fields for the item.
+        item_id: HTML fragment identifier for the item section.
+
+    Returns:
+        Escaped HTML section for one stock item.
+    """
+    meta = data["meta"]
+    entries = ranking_entries(data)
+    sixth = data["full_ranking"][5]
+    content_key = f"{item['no']}-{item['slug']}"
+    ranking_rows = []
+    for entry in entries:
+        name = validate.PREFECTURE_BY_CODE[entry["pref_code"]].name
+        row_class = ' class="rank-one"' if entry["rank"] == 1 else ""
+        ranking_rows.append(
+            f"<tr{row_class}><td>{entry['rank']}位</td><td>{html.escape(name)}</td>"
+            f"<td>{html.escape(format_value(entry['value']))}"
+            f"{html.escape(meta['suffix'])}</td></tr>"
+        )
+    fields = (
+        ("hook", item["hook"]),
+        ("trivia", item["trivia"]),
+        ("subtitle", item["subtitle"]),
+        ("bg_motif", item["bg_motif"]),
+        ("source_display", item["source_display"]),
+    )
+    field_html = "".join(
+        f"<dt>{html.escape(label)}</dt><dd>{html.escape(value)}</dd>"
+        for label, value in fields
+    )
+    url = str(meta["url"])
+    source_html = (
+        f"<dt>出典名</dt><dd>{html.escape(str(meta['source_name']))}</dd>"
+        f"<dt>データ年</dt><dd>{html.escape(str(meta['data_year_label']))}</dd>"
+        f"<dt>取得日</dt><dd>{html.escape(str(meta['retrieved_on']))}</dd>"
+        f"<dt>URL</dt><dd><a class=\"source-link\" href=\"{html.escape(url, quote=True)}\">"
+        f"{html.escape(url)}</a></dd>"
+        f"<dt>全国値</dt><dd>{html.escape(format_value(meta['nationwide']))}"
+        f"{html.escape(str(meta['suffix']))}</dd>"
+    )
+    narrations = "".join(
+        narration_html(
+            duration,
+            item["narration"][duration],
+            keys,
+            limits,
+        )
+        for duration, keys, limits in (
+            ("20s", validate.NARRATION_KEYS_20S, validate.LIMITS_20S),
+            ("30s", validate.NARRATION_KEYS_30S, validate.LIMITS_30S),
+        )
+    )
+    return f"""
+<section id="{html.escape(item_id, quote=True)}">
+<div class="section-head">
+<h2>{html.escape(item['no'])} {html.escape(item['title'])}</h2>
+<span class="content-key">{html.escape(content_key)}</span>
+<label class="check"><input type="checkbox"> 確認した</label>
+<a class="back" href="#toc">目次へ戻る</a>
+</div>
+<h3>TOP5</h3>
+<table>
+<thead><tr><th>順位</th><th>都道府県</th><th>値</th></tr></thead>
+<tbody>{''.join(ranking_rows)}</tbody>
+</table>
+<p class="reference">（参考）6位 {html.escape(str(sixth['pref_name']))} {html.escape(format_value(sixth['value']))}{html.escape(str(meta['suffix']))}</p>
+<h3>出典</h3>
+<div class="source"><dl>{source_html}</dl></div>
+<h3>表示文言</h3>
+<div class="fields"><dl>{field_html}</dl></div>
+<h3>ナレーション</h3>
+<div class="narrations">{narrations}</div>
+<details>
+<summary>source_note を表示</summary>
+<pre>{html.escape(source_note(data))}</pre>
+</details>
+</section>
+"""
+
+
+def narration_html(
+    duration: str,
+    cues: dict[str, str],
+    keys: tuple[str, ...],
+    limits: dict[str, int],
+) -> str:
+    """Render one duration's narration cues.
+
+    Args:
+        duration: Video duration key.
+        cues: Narration cue texts.
+        keys: Cue order.
+        limits: Mora limit by cue.
+
+    Returns:
+        Escaped HTML narration card.
+    """
+    rows = []
+    for cue in keys:
+        text = cues[cue]
+        mora = validate.estimate_mora(text)
+        limit = limits[cue]
+        near_limit = " near-limit" if mora * 10 >= limit * 9 else ""
+        rows.append(
+            f'<div class="cue{near_limit}"><span class="cue-name">'
+            f"{html.escape(cue)}</span><span>{html.escape(text)}</span>"
+            f'<span class="cue-budget">{mora}/{limit}</span></div>'
+        )
+    label = "20 秒版" if duration == "20s" else "30 秒版"
+    return f'<div class="narration"><h3>{label}</h3>{"".join(rows)}</div>'
+
+
 def sql_item(item: dict[str, Any], data: dict[str, Any]) -> str:
     """Build one INSERT statement.
 
@@ -268,7 +527,7 @@ def build_sql(items_and_data: list[tuple[dict[str, Any], dict[str, Any]]]) -> st
 
 
 def main() -> int:
-    """Validate the batch, then generate both derived files."""
+    """Validate the batch, then generate all derived files."""
     errors = validate.validate_items()
     if errors:
         for error in errors:
@@ -277,8 +536,9 @@ def main() -> int:
 
     items_and_data = [(item, validate.load_data(item["data"])) for item in ITEMS]
     REVIEW_PATH.write_text(build_review(items_and_data), encoding="utf-8")
+    REVIEW_HTML_PATH.write_text(build_review_html(items_and_data), encoding="utf-8")
     SQL_PATH.write_text(build_sql(items_and_data), encoding="utf-8")
-    print(f"Generated: {REVIEW_PATH.name}, {SQL_PATH.name}")
+    print(f"Generated: {REVIEW_PATH.name}, {REVIEW_HTML_PATH.name}, {SQL_PATH.name}")
     return 0
 
 

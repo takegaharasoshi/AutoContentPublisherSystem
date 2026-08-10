@@ -7,4 +7,5 @@ uv.lock
 plans/
 .claude/settings.local.json
 content/**/review.md
+content/**/review.html
 content/video-build/**/work/
