@@ -12,6 +12,7 @@ import urllib.request
 from acps_shared import get_secret_string
 from acps_shared.instagram import (
     GRAPH_API_VERSION,
+    InstagramInsightsUnavailable,
     InstagramObjectUnavailable,
     InstagramRateLimited,
     RateLimitGuard,
@@ -243,6 +244,18 @@ def process_accounts(
                     "Instagram media object unavailable; skipping: post_id=%s",
                     post.id,
                 )
+            except InstagramInsightsUnavailable:
+                # Meta withholds metrics below its viewer privacy threshold.
+                # Permanent for that media and unrelated to our configuration,
+                # so skipping keeps low-reach stories from alarming every run.
+                consecutive_rate_limits = 0
+                _rollback_safely(connection)
+                logger.warning(
+                    "Insights withheld below Instagram's viewer threshold; "
+                    "skipping: post_id=%s media_type=%s",
+                    post.id,
+                    post.media_type,
+                )
             except Exception as exc:
                 failure_count += 1
                 _rollback_safely(connection)
@@ -251,9 +264,13 @@ def process_accounts(
                 else:
                     consecutive_rate_limits = 0
                 logger.warning(
-                    "Post insights collection failed: post_id=%s error_type=%s",
+                    "Post insights collection failed: post_id=%s error_type=%s "
+                    "code=%s subcode=%s message=%s",
                     post.id,
                     type(exc).__name__,
+                    getattr(exc, "code", None),
+                    getattr(exc, "subcode", None),
+                    getattr(exc, "message", str(exc)),
                 )
                 if consecutive_rate_limits >= MAX_CONSECUTIVE_RATE_LIMIT_FAILURES:
                     stop_account = True

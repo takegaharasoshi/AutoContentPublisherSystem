@@ -25,8 +25,9 @@ MEDIA_METRIC_REQUESTS: dict[str, tuple[MetricRequest, ...]] = {
                 "saved",
                 "shares",
                 "total_interactions",
-                "follows",
-                "profile_visits",
+                # follows / profile_visits はリールでは非対応。16-11 の疎通確認
+                # （2026-08-10、v25.0）で実 API が 400 を返すことを確認したため
+                # 定数から外した（自動縮退のプローブ 1 往復を省く）。
                 "ig_reels_video_view_total_time",
                 "ig_reels_avg_watch_time",
                 "reels_skip_rate",

@@ -5,7 +5,11 @@ from __future__ import annotations
 import datetime
 from unittest.mock import Mock
 
-from acps_shared.instagram import InstagramObjectUnavailable, InstagramRateLimited
+from acps_shared.instagram import (
+    InstagramInsightsUnavailable,
+    InstagramObjectUnavailable,
+    InstagramRateLimited,
+)
 
 from app.models import Post, SnsAccount
 from app import processing
@@ -98,6 +102,50 @@ def test_object_unavailable_skip_is_not_failure_when_another_succeeds(monkeypatc
     monkeypatch.setattr(processing, "fetch_media_insights", fetch)
     result = _run(Connection())
     assert result.records_inserted == 1
+    assert result.failure_count == 0
+
+
+def test_insights_below_viewer_threshold_is_skipped_not_failed(monkeypatch) -> None:
+    """Meta's viewer-threshold refusal skips the media without a failure.
+
+    Low-reach stories hit this on every run, so counting it as a failure would
+    make the batch alarm twice a day indefinitely (16-11 の疎通確認で判明)。
+    """
+    posts = [Post(1, "story", "quiet", NOW), Post(2, "reel", "ok", NOW)]
+    _patch_base(monkeypatch, posts)
+
+    def fetch(media_id, *args, **kwargs):
+        if media_id == "quiet":
+            raise InstagramInsightsUnavailable(
+                "(#10) Not enough viewers for the media to show insights",
+                status=400,
+                code=10,
+            )
+        return {"views": 1}
+
+    monkeypatch.setattr(processing, "fetch_media_insights", fetch)
+    result = _run(Connection())
+    assert result.records_inserted == 1
+    assert result.failure_count == 0
+
+
+def test_all_insights_below_threshold_does_not_trip_permission_guard(
+    monkeypatch,
+) -> None:
+    """The all-unavailable permission guard ignores viewer-threshold skips.
+
+    The API answered with a media-specific refusal, which proves the token and
+    permission are fine — unlike an object that cannot be loaded at all.
+    """
+    _patch_base(monkeypatch, [Post(1, "story", "quiet", NOW)])
+    monkeypatch.setattr(
+        processing,
+        "fetch_media_insights",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            InstagramInsightsUnavailable("Not enough viewers", status=400, code=10)
+        ),
+    )
+    result = _run(Connection())
     assert result.failure_count == 0
 
 

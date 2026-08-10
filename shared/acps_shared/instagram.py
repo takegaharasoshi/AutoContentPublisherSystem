@@ -63,6 +63,16 @@ class InstagramObjectUnavailable(InstagramApiError):
     """Raised when a Graph API object does not exist or cannot be read."""
 
 
+class InstagramInsightsUnavailable(InstagramApiError):
+    """Raised when Meta withholds insights for a media below its privacy threshold.
+
+    Meta returns ``(#10) Not enough viewers for the media to show insights`` for
+    media whose audience is too small to disclose metrics. The media exists and
+    the token is valid, so this is a permanent property of that media rather
+    than a fault; callers skip it instead of counting a failure.
+    """
+
+
 class InstagramTransportError(InstagramApiError):
     """Raised for network failures and malformed successful responses."""
 
@@ -172,6 +182,10 @@ def classify_graph_error(
     error_type: type[InstagramApiError]
     if status == 429 or code in RATE_LIMIT_CODES:
         error_type = InstagramRateLimited
+    elif code == 10 and "not enough viewers" in lowered:
+        # Graph code 10 is the generic "permission denied", so match the message
+        # too: a genuine permission error must stay a failure, not a skip.
+        error_type = InstagramInsightsUnavailable
     elif (
         (status == 400 and code == 100 and subcode == 33)
         or "does not exist" in lowered

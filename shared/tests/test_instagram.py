@@ -74,6 +74,25 @@ def test_get_json_normalizes_headers_and_parses_both_usage_forms() -> None:
             {"error": {"code": 100, "message": "Invalid metric"}},
             instagram.InstagramInvalidMetric,
         ),
+        (
+            400,
+            {
+                "error": {
+                    "code": 10,
+                    "message": (
+                        "(#10) Not enough viewers for the media to show insights"
+                    ),
+                }
+            },
+            instagram.InstagramInsightsUnavailable,
+        ),
+        # code 10 は汎用の permission denied でもあるため、閾値メッセージを伴わない
+        # ものは失敗のまま（スキップに落として権限不備を隠さない）
+        (
+            400,
+            {"error": {"code": 10, "message": "(#10) Application does not have permission"}},
+            instagram.InstagramRequestFailed,
+        ),
     ],
 )
 def test_get_json_classifies_graph_errors(status, payload, expected) -> None:
