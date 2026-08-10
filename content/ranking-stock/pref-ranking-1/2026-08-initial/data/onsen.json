@@ -1,0 +1,328 @@
+{
+  "ranking_data": {
+    "entries": [
+      {
+        "rank": 1,
+        "pref_code": 44,
+        "value": 5094
+      },
+      {
+        "rank": 2,
+        "pref_code": 46,
+        "value": 2735
+      },
+      {
+        "rank": 3,
+        "pref_code": 1,
+        "value": 2249
+      },
+      {
+        "rank": 4,
+        "pref_code": 22,
+        "value": 2185
+      },
+      {
+        "rank": 5,
+        "pref_code": 43,
+        "value": 1339
+      }
+    ]
+  },
+  "source_note_text": "都道府県値をそのまま使用（市区町村統計ではないため県換算なし）。源泉総数 = 利用源泉数 A + 未利用源泉数 B。PDF の都道府県行を機械抽出して 47 件を降順に並べ替え、TOP6 に同値がないことを検査済み。",
+  "full_ranking": [
+    {
+      "rank": 1,
+      "pref_code": 44,
+      "pref_name": "大分県",
+      "value": 5094
+    },
+    {
+      "rank": 2,
+      "pref_code": 46,
+      "pref_name": "鹿児島県",
+      "value": 2735
+    },
+    {
+      "rank": 3,
+      "pref_code": 1,
+      "pref_name": "北海道",
+      "value": 2249
+    },
+    {
+      "rank": 4,
+      "pref_code": 22,
+      "pref_name": "静岡県",
+      "value": 2185
+    },
+    {
+      "rank": 5,
+      "pref_code": 43,
+      "pref_name": "熊本県",
+      "value": 1339
+    },
+    {
+      "rank": 6,
+      "pref_code": 2,
+      "pref_name": "青森県",
+      "value": 1089
+    },
+    {
+      "rank": 7,
+      "pref_code": 20,
+      "pref_name": "長野県",
+      "value": 955
+    },
+    {
+      "rank": 8,
+      "pref_code": 7,
+      "pref_name": "福島県",
+      "value": 799
+    },
+    {
+      "rank": 9,
+      "pref_code": 4,
+      "pref_name": "宮城県",
+      "value": 740
+    },
+    {
+      "rank": 10,
+      "pref_code": 9,
+      "pref_name": "栃木県",
+      "value": 633
+    },
+    {
+      "rank": 11,
+      "pref_code": 5,
+      "pref_name": "秋田県",
+      "value": 616
+    },
+    {
+      "rank": 12,
+      "pref_code": 14,
+      "pref_name": "神奈川県",
+      "value": 602
+    },
+    {
+      "rank": 13,
+      "pref_code": 15,
+      "pref_name": "新潟県",
+      "value": 536
+    },
+    {
+      "rank": 14,
+      "pref_code": 21,
+      "pref_name": "岐阜県",
+      "value": 506
+    },
+    {
+      "rank": 15,
+      "pref_code": 30,
+      "pref_name": "和歌山県",
+      "value": 506
+    },
+    {
+      "rank": 16,
+      "pref_code": 10,
+      "pref_name": "群馬県",
+      "value": 459
+    },
+    {
+      "rank": 17,
+      "pref_code": 28,
+      "pref_name": "兵庫県",
+      "value": 443
+    },
+    {
+      "rank": 18,
+      "pref_code": 40,
+      "pref_name": "福岡県",
+      "value": 422
+    },
+    {
+      "rank": 19,
+      "pref_code": 6,
+      "pref_name": "山形県",
+      "value": 412
+    },
+    {
+      "rank": 20,
+      "pref_code": 35,
+      "pref_name": "山口県",
+      "value": 404
+    },
+    {
+      "rank": 21,
+      "pref_code": 3,
+      "pref_name": "岩手県",
+      "value": 393
+    },
+    {
+      "rank": 22,
+      "pref_code": 34,
+      "pref_name": "広島県",
+      "value": 374
+    },
+    {
+      "rank": 23,
+      "pref_code": 31,
+      "pref_name": "鳥取県",
+      "value": 363
+    },
+    {
+      "rank": 24,
+      "pref_code": 17,
+      "pref_name": "石川県",
+      "value": 330
+    },
+    {
+      "rank": 25,
+      "pref_code": 19,
+      "pref_name": "山梨県",
+      "value": 304
+    },
+    {
+      "rank": 26,
+      "pref_code": 32,
+      "pref_name": "島根県",
+      "value": 267
+    },
+    {
+      "rank": 27,
+      "pref_code": 33,
+      "pref_name": "岡山県",
+      "value": 221
+    },
+    {
+      "rank": 28,
+      "pref_code": 24,
+      "pref_name": "三重県",
+      "value": 214
+    },
+    {
+      "rank": 29,
+      "pref_code": 42,
+      "pref_name": "長崎県",
+      "value": 203
+    },
+    {
+      "rank": 30,
+      "pref_code": 37,
+      "pref_name": "香川県",
+      "value": 200
+    },
+    {
+      "rank": 31,
+      "pref_code": 45,
+      "pref_name": "宮崎県",
+      "value": 199
+    },
+    {
+      "rank": 32,
+      "pref_code": 38,
+      "pref_name": "愛媛県",
+      "value": 192
+    },
+    {
+      "rank": 33,
+      "pref_code": 41,
+      "pref_name": "佐賀県",
+      "value": 187
+    },
+    {
+      "rank": 34,
+      "pref_code": 27,
+      "pref_name": "大阪府",
+      "value": 173
+    },
+    {
+      "rank": 35,
+      "pref_code": 16,
+      "pref_name": "富山県",
+      "value": 169
+    },
+    {
+      "rank": 36,
+      "pref_code": 13,
+      "pref_name": "東京都",
+      "value": 168
+    },
+    {
+      "rank": 37,
+      "pref_code": 18,
+      "pref_name": "福井県",
+      "value": 158
+    },
+    {
+      "rank": 38,
+      "pref_code": 8,
+      "pref_name": "茨城県",
+      "value": 157
+    },
+    {
+      "rank": 39,
+      "pref_code": 26,
+      "pref_name": "京都府",
+      "value": 146
+    },
+    {
+      "rank": 40,
+      "pref_code": 12,
+      "pref_name": "千葉県",
+      "value": 144
+    },
+    {
+      "rank": 41,
+      "pref_code": 23,
+      "pref_name": "愛知県",
+      "value": 133
+    },
+    {
+      "rank": 42,
+      "pref_code": 11,
+      "pref_name": "埼玉県",
+      "value": 117
+    },
+    {
+      "rank": 43,
+      "pref_code": 39,
+      "pref_name": "高知県",
+      "value": 96
+    },
+    {
+      "rank": 44,
+      "pref_code": 25,
+      "pref_name": "滋賀県",
+      "value": 86
+    },
+    {
+      "rank": 45,
+      "pref_code": 36,
+      "pref_name": "徳島県",
+      "value": 82
+    },
+    {
+      "rank": 46,
+      "pref_code": 29,
+      "pref_name": "奈良県",
+      "value": 77
+    },
+    {
+      "rank": 47,
+      "pref_code": 47,
+      "pref_name": "沖縄県",
+      "value": 22
+    }
+  ],
+  "meta": {
+    "item": "源泉総数",
+    "category": "温泉利用状況",
+    "measure": "本数",
+    "unit": "本",
+    "data_year_label": "令和6年度（令和7年3月末現在）",
+    "source_name": "環境省「令和6年度温泉利用状況」",
+    "retrieved_on": "2026-08-10",
+    "url": "https://www.env.go.jp/nature/onsen/pdf/6-7_p_1.pdf",
+    "suffix": "本",
+    "nationwide": 27899
+  }
+}

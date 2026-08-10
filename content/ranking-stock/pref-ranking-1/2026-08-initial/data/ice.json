@@ -1,0 +1,328 @@
+{
+  "ranking_data": {
+    "entries": [
+      {
+        "rank": 1,
+        "pref_code": 7,
+        "value": 14409
+      },
+      {
+        "rank": 2,
+        "pref_code": 6,
+        "value": 14068
+      },
+      {
+        "rank": 3,
+        "pref_code": 17,
+        "value": 13889
+      },
+      {
+        "rank": 4,
+        "pref_code": 11,
+        "value": 13886
+      },
+      {
+        "rank": 5,
+        "pref_code": 9,
+        "value": 13596
+      }
+    ]
+  },
+  "source_note_text": "都道府県換算（複数市は世帯数による加重平均）\n神奈川県: (横浜市 12260円 × 1045037世帯 + 川崎市 13716円 × 405273世帯 + 相模原市 12744円 × 199569世帯) ÷ 1649879世帯 = 12676.19円 → 12676円（四捨五入）\n静岡県: (静岡市 12789円 × 193014世帯 + 浜松市 13234円 × 217761世帯) ÷ 410775世帯 = 13024.90円 → 13025円（四捨五入）\n大阪府: (大阪市 12499円 × 679830世帯 + 堺市 12494円 × 230462世帯) ÷ 910292世帯 = 12497.73円 → 12498円（四捨五入）\n福岡県: (福岡市 12413円 × 398820世帯 + 北九州市 11141円 × 257406世帯) ÷ 656226世帯 = 11914.06円 → 11914円（四捨五入）",
+  "full_ranking": [
+    {
+      "rank": 1,
+      "pref_code": 7,
+      "pref_name": "福島県",
+      "value": 14409
+    },
+    {
+      "rank": 2,
+      "pref_code": 6,
+      "pref_name": "山形県",
+      "value": 14068
+    },
+    {
+      "rank": 3,
+      "pref_code": 17,
+      "pref_name": "石川県",
+      "value": 13889
+    },
+    {
+      "rank": 4,
+      "pref_code": 11,
+      "pref_name": "埼玉県",
+      "value": 13886
+    },
+    {
+      "rank": 5,
+      "pref_code": 9,
+      "pref_name": "栃木県",
+      "value": 13596
+    },
+    {
+      "rank": 6,
+      "pref_code": 3,
+      "pref_name": "岩手県",
+      "value": 13587
+    },
+    {
+      "rank": 7,
+      "pref_code": 46,
+      "pref_name": "鹿児島県",
+      "value": 13321
+    },
+    {
+      "rank": 8,
+      "pref_code": 31,
+      "pref_name": "鳥取県",
+      "value": 13193
+    },
+    {
+      "rank": 9,
+      "pref_code": 25,
+      "pref_name": "滋賀県",
+      "value": 13096
+    },
+    {
+      "rank": 10,
+      "pref_code": 35,
+      "pref_name": "山口県",
+      "value": 13079
+    },
+    {
+      "rank": 11,
+      "pref_code": 22,
+      "pref_name": "静岡県",
+      "value": 13025
+    },
+    {
+      "rank": 12,
+      "pref_code": 16,
+      "pref_name": "富山県",
+      "value": 13016
+    },
+    {
+      "rank": 13,
+      "pref_code": 15,
+      "pref_name": "新潟県",
+      "value": 12999
+    },
+    {
+      "rank": 14,
+      "pref_code": 13,
+      "pref_name": "東京都",
+      "value": 12995
+    },
+    {
+      "rank": 15,
+      "pref_code": 39,
+      "pref_name": "高知県",
+      "value": 12901
+    },
+    {
+      "rank": 16,
+      "pref_code": 1,
+      "pref_name": "北海道",
+      "value": 12827
+    },
+    {
+      "rank": 17,
+      "pref_code": 4,
+      "pref_name": "宮城県",
+      "value": 12744
+    },
+    {
+      "rank": 18,
+      "pref_code": 33,
+      "pref_name": "岡山県",
+      "value": 12687
+    },
+    {
+      "rank": 19,
+      "pref_code": 14,
+      "pref_name": "神奈川県",
+      "value": 12676
+    },
+    {
+      "rank": 20,
+      "pref_code": 20,
+      "pref_name": "長野県",
+      "value": 12617
+    },
+    {
+      "rank": 21,
+      "pref_code": 27,
+      "pref_name": "大阪府",
+      "value": 12498
+    },
+    {
+      "rank": 22,
+      "pref_code": 42,
+      "pref_name": "長崎県",
+      "value": 12463
+    },
+    {
+      "rank": 23,
+      "pref_code": 19,
+      "pref_name": "山梨県",
+      "value": 12462
+    },
+    {
+      "rank": 24,
+      "pref_code": 45,
+      "pref_name": "宮崎県",
+      "value": 12405
+    },
+    {
+      "rank": 25,
+      "pref_code": 41,
+      "pref_name": "佐賀県",
+      "value": 12395
+    },
+    {
+      "rank": 26,
+      "pref_code": 8,
+      "pref_name": "茨城県",
+      "value": 12383
+    },
+    {
+      "rank": 27,
+      "pref_code": 2,
+      "pref_name": "青森県",
+      "value": 12287
+    },
+    {
+      "rank": 28,
+      "pref_code": 12,
+      "pref_name": "千葉県",
+      "value": 12206
+    },
+    {
+      "rank": 29,
+      "pref_code": 43,
+      "pref_name": "熊本県",
+      "value": 12205
+    },
+    {
+      "rank": 30,
+      "pref_code": 36,
+      "pref_name": "徳島県",
+      "value": 12170
+    },
+    {
+      "rank": 31,
+      "pref_code": 37,
+      "pref_name": "香川県",
+      "value": 12115
+    },
+    {
+      "rank": 32,
+      "pref_code": 18,
+      "pref_name": "福井県",
+      "value": 12058
+    },
+    {
+      "rank": 33,
+      "pref_code": 40,
+      "pref_name": "福岡県",
+      "value": 11914
+    },
+    {
+      "rank": 34,
+      "pref_code": 10,
+      "pref_name": "群馬県",
+      "value": 11885
+    },
+    {
+      "rank": 35,
+      "pref_code": 26,
+      "pref_name": "京都府",
+      "value": 11867
+    },
+    {
+      "rank": 36,
+      "pref_code": 32,
+      "pref_name": "島根県",
+      "value": 11791
+    },
+    {
+      "rank": 37,
+      "pref_code": 29,
+      "pref_name": "奈良県",
+      "value": 11777
+    },
+    {
+      "rank": 38,
+      "pref_code": 34,
+      "pref_name": "広島県",
+      "value": 11760
+    },
+    {
+      "rank": 39,
+      "pref_code": 24,
+      "pref_name": "三重県",
+      "value": 11574
+    },
+    {
+      "rank": 40,
+      "pref_code": 30,
+      "pref_name": "和歌山県",
+      "value": 11498
+    },
+    {
+      "rank": 41,
+      "pref_code": 23,
+      "pref_name": "愛知県",
+      "value": 11406
+    },
+    {
+      "rank": 42,
+      "pref_code": 44,
+      "pref_name": "大分県",
+      "value": 11396
+    },
+    {
+      "rank": 43,
+      "pref_code": 38,
+      "pref_name": "愛媛県",
+      "value": 11377
+    },
+    {
+      "rank": 44,
+      "pref_code": 21,
+      "pref_name": "岐阜県",
+      "value": 11252
+    },
+    {
+      "rank": 45,
+      "pref_code": 5,
+      "pref_name": "秋田県",
+      "value": 11188
+    },
+    {
+      "rank": 46,
+      "pref_code": 28,
+      "pref_name": "兵庫県",
+      "value": 10820
+    },
+    {
+      "rank": 47,
+      "pref_code": 47,
+      "pref_name": "沖縄県",
+      "value": 9755
+    }
+  ],
+  "meta": {
+    "item": "ｱｲｽｸﾘｰﾑ･ｼｬｰﾍﾞｯﾄ",
+    "measure": "金額",
+    "unit": "円",
+    "category": "菓子類",
+    "data_year_label": "2023年（令和５年）～2025年（令和７年）平均",
+    "source_name": "総務省統計局「家計調査 品目別都道府県庁所在市及び政令指定都市ランキング」",
+    "retrieved_on": "2026-08-10",
+    "url": "https://www.stat.go.jp/data/kakei/zuhyou/rank09.xlsx",
+    "suffix": "円",
+    "nationwide": 12306
+  }
+}

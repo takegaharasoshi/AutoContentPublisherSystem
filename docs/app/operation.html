@@ -378,8 +378,14 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
 <h4>手順 1〜4: リサーチ → データ検証・県換算 → 文言執筆 → 人間レビュー</h4>
 <ul>
   <li><strong>手順 1（リサーチ）</strong>: 都道府県別の統計・調査データを一次情報（官公庁統計・業界団体調査等）から収集する（Codex 委譲可）。成果物は<strong>出典 URL・データ年・TOP5 の生値</strong>まで。ネタ選定基準は「下位の県の人が笑って自虐できるか」（<a href="../strategy/business-strategy.html">事業戦略書セクション 6</a>。下位を晒さない TOP5 版面が前提）</li>
-  <li><strong>手順 2（データ検証・県換算）</strong>: 一次データとの突合・順位と値の再計算・市区町村統計の県換算（<code>common/</code> のツール）を機械検証スクリプトで行い、<code>ranking_data</code>（数値 + 都道府県コードのみ）を生成する。出典・換算の計算過程は <code>source_note</code> へ記録する</li>
-  <li><strong>手順 3（文言執筆）</strong>: <code>title</code> / <code>content_fields</code>（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>value_suffix</code>〔数値の単位表示〕/ <code>subtitle</code> / <code>bg_motif</code>）/ <code>narration</code>（20 秒・30 秒の尺別 cue 台本 = <a href="generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3</a> の cue 体系）を執筆する。<strong><code>result_list</code> は手書きせず、ツーリングが <code>ranking_data</code> + <code>value_suffix</code> から機械整形して格納する</strong>（<a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）。ナレーションは cue ごとの時間予算（アンカー表由来）を意識して短く書く（超過はビルド時に検出される）</li>
+  <li><strong>手順 2（データ検証・県換算）</strong>: 一次データとの突合・順位と値の再計算・市区町村統計の県換算（<code>common/</code> のツール）を機械検証スクリプトで行い、<code>ranking_data</code>（数値 + 都道府県コードのみ）を生成する。出典・換算の計算過程は <code>source_note</code> へ記録する。<strong>数値は必ず一次情報のファイルを機械パースして得る</strong>（まとめ記事等の二次情報は使わない）。ネタ資材の <code>stock_items.py</code> に数値を手書きせず、検証済みデータ（<code>data/*.json</code>）を投入ツールが読む構成にする</li>
+  <li><strong>ネタの採否ルール（17-3 で確立）</strong>
+    <ul>
+      <li><strong>TOP6 に同値があるネタは不採用</strong>: TOP5 地図ルーレット型は 1〜5 位の一意な順位を前提とする（方式設計書 セクション 4 の防御的検査も rank 1〜5 の一意性を要求する）。5 位と 6 位が同値の場合も、5 位だけを載せると順位付けが恣意的になるため 6 位まで検査する（例: 睡眠時間 = 4 位が同率 2 県 / カレールウ = 5 位と 6 位が同額のため不採用）</li>
+      <li><strong>時刻・時分の指標は現行のデータモデルに載らない</strong>: 表示は <code>value</code> + <code>value_suffix</code> の組み立てのため、平均就寝時刻（23:39）のような時刻表記は表現できない。分へ換算すれば数値化できるが、表示と読み上げの自然さは別途の設計判断が必要（設計課題リストに記録）</li>
+    </ul>
+  </li>
+  <li><strong>手順 3（文言執筆）</strong>: <code>title</code> / <code>content_fields</code>（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>value_suffix</code>〔数値の単位表示〕/ <code>subtitle</code> / <code>bg_motif</code>）/ <code>narration</code>（20 秒・30 秒の尺別 cue 台本 = <a href="generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3</a> の cue 体系）を執筆する。<strong><code>result_list</code> は手書きせず、ツーリングが <code>ranking_data</code> + <code>value_suffix</code> から機械整形して格納する</strong>（<a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）。ナレーションは cue ごとの時間予算（アンカー表由来）を意識して短く書く（超過はビルド時に検出される）。<strong>長さは文字数ではなくモーラ数で見積もる</strong>（<code>12899円</code> は 6 文字だが読みは 19 モーラ相当。文字数では数値の読み上げを過小評価する）。<strong>金額・件数などの数値はナレーションで読み上げず版面表示に任せる</strong>（2 秒の cue に 5 桁の金額は入らない。17-3 でネタ資材の投入前検証スクリプトにモーラ推定の検査を実装した）</li>
   <li><strong>手順 4（人間レビュー）</strong>: 投入前にユーザーがレビューする。観点: <strong>①データの正しさ（出典の実在・データ年・県換算の再計算・TOP5 の順位。誤データ対策の唯一の砦）</strong>②表現（下位を晒していないか・煽りすぎていないか・出典表記とキャプション注記の妥当性）③既存ストックとの重複（同一テーマ・同一出典の近接）④フォーマット適合（文字数・cue 台本の長さ・<code>bg_motif</code> の妥当性）</li>
 </ul>
 

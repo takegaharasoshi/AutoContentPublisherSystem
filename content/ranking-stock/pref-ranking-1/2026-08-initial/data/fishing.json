@@ -1,0 +1,328 @@
+{
+  "ranking_data": {
+    "entries": [
+      {
+        "rank": 1,
+        "pref_code": 34,
+        "value": 12.2
+      },
+      {
+        "rank": 2,
+        "pref_code": 38,
+        "value": 11.9
+      },
+      {
+        "rank": 3,
+        "pref_code": 43,
+        "value": 11.8
+      },
+      {
+        "rank": 4,
+        "pref_code": 35,
+        "value": 11.2
+      },
+      {
+        "rank": 5,
+        "pref_code": 42,
+        "value": 10.9
+      }
+    ]
+  },
+  "source_note_text": "都道府県値をそのまま使用（市区町村統計ではないため県換算なし）。値は 10 歳以上の行動者率（過去 1 年間に「つり」を行った人の割合）。公表 Excel の 47 行を機械抽出し、TOP6 に同値がないことを検査済み。",
+  "full_ranking": [
+    {
+      "rank": 1,
+      "pref_code": 34,
+      "pref_name": "広島県",
+      "value": 12.2
+    },
+    {
+      "rank": 2,
+      "pref_code": 38,
+      "pref_name": "愛媛県",
+      "value": 11.9
+    },
+    {
+      "rank": 3,
+      "pref_code": 43,
+      "pref_name": "熊本県",
+      "value": 11.8
+    },
+    {
+      "rank": 4,
+      "pref_code": 35,
+      "pref_name": "山口県",
+      "value": 11.2
+    },
+    {
+      "rank": 5,
+      "pref_code": 42,
+      "pref_name": "長崎県",
+      "value": 10.9
+    },
+    {
+      "rank": 6,
+      "pref_code": 39,
+      "pref_name": "高知県",
+      "value": 10.8
+    },
+    {
+      "rank": 7,
+      "pref_code": 45,
+      "pref_name": "宮崎県",
+      "value": 10.5
+    },
+    {
+      "rank": 8,
+      "pref_code": 41,
+      "pref_name": "佐賀県",
+      "value": 10.4
+    },
+    {
+      "rank": 9,
+      "pref_code": 47,
+      "pref_name": "沖縄県",
+      "value": 10.4
+    },
+    {
+      "rank": 10,
+      "pref_code": 46,
+      "pref_name": "鹿児島県",
+      "value": 10.2
+    },
+    {
+      "rank": 11,
+      "pref_code": 32,
+      "pref_name": "島根県",
+      "value": 10.1
+    },
+    {
+      "rank": 12,
+      "pref_code": 31,
+      "pref_name": "鳥取県",
+      "value": 10.0
+    },
+    {
+      "rank": 13,
+      "pref_code": 37,
+      "pref_name": "香川県",
+      "value": 9.7
+    },
+    {
+      "rank": 14,
+      "pref_code": 23,
+      "pref_name": "愛知県",
+      "value": 9.5
+    },
+    {
+      "rank": 15,
+      "pref_code": 30,
+      "pref_name": "和歌山県",
+      "value": 9.5
+    },
+    {
+      "rank": 16,
+      "pref_code": 36,
+      "pref_name": "徳島県",
+      "value": 9.5
+    },
+    {
+      "rank": 17,
+      "pref_code": 2,
+      "pref_name": "青森県",
+      "value": 9.4
+    },
+    {
+      "rank": 18,
+      "pref_code": 3,
+      "pref_name": "岩手県",
+      "value": 9.4
+    },
+    {
+      "rank": 19,
+      "pref_code": 24,
+      "pref_name": "三重県",
+      "value": 9.3
+    },
+    {
+      "rank": 20,
+      "pref_code": 4,
+      "pref_name": "宮城県",
+      "value": 9.1
+    },
+    {
+      "rank": 21,
+      "pref_code": 33,
+      "pref_name": "岡山県",
+      "value": 9.1
+    },
+    {
+      "rank": 22,
+      "pref_code": 1,
+      "pref_name": "北海道",
+      "value": 8.8
+    },
+    {
+      "rank": 23,
+      "pref_code": 40,
+      "pref_name": "福岡県",
+      "value": 8.6
+    },
+    {
+      "rank": 24,
+      "pref_code": 15,
+      "pref_name": "新潟県",
+      "value": 8.5
+    },
+    {
+      "rank": 25,
+      "pref_code": 28,
+      "pref_name": "兵庫県",
+      "value": 8.4
+    },
+    {
+      "rank": 26,
+      "pref_code": 6,
+      "pref_name": "山形県",
+      "value": 8.3
+    },
+    {
+      "rank": 27,
+      "pref_code": 44,
+      "pref_name": "大分県",
+      "value": 8.1
+    },
+    {
+      "rank": 28,
+      "pref_code": 5,
+      "pref_name": "秋田県",
+      "value": 8.0
+    },
+    {
+      "rank": 29,
+      "pref_code": 21,
+      "pref_name": "岐阜県",
+      "value": 8.0
+    },
+    {
+      "rank": 30,
+      "pref_code": 22,
+      "pref_name": "静岡県",
+      "value": 8.0
+    },
+    {
+      "rank": 31,
+      "pref_code": 17,
+      "pref_name": "石川県",
+      "value": 7.9
+    },
+    {
+      "rank": 32,
+      "pref_code": 25,
+      "pref_name": "滋賀県",
+      "value": 7.7
+    },
+    {
+      "rank": 33,
+      "pref_code": 16,
+      "pref_name": "富山県",
+      "value": 7.6
+    },
+    {
+      "rank": 34,
+      "pref_code": 18,
+      "pref_name": "福井県",
+      "value": 7.3
+    },
+    {
+      "rank": 35,
+      "pref_code": 26,
+      "pref_name": "京都府",
+      "value": 7.1
+    },
+    {
+      "rank": 36,
+      "pref_code": 27,
+      "pref_name": "大阪府",
+      "value": 7.1
+    },
+    {
+      "rank": 37,
+      "pref_code": 7,
+      "pref_name": "福島県",
+      "value": 7.0
+    },
+    {
+      "rank": 38,
+      "pref_code": 20,
+      "pref_name": "長野県",
+      "value": 6.9
+    },
+    {
+      "rank": 39,
+      "pref_code": 14,
+      "pref_name": "神奈川県",
+      "value": 6.8
+    },
+    {
+      "rank": 40,
+      "pref_code": 8,
+      "pref_name": "茨城県",
+      "value": 6.6
+    },
+    {
+      "rank": 41,
+      "pref_code": 9,
+      "pref_name": "栃木県",
+      "value": 6.3
+    },
+    {
+      "rank": 42,
+      "pref_code": 29,
+      "pref_name": "奈良県",
+      "value": 6.2
+    },
+    {
+      "rank": 43,
+      "pref_code": 11,
+      "pref_name": "埼玉県",
+      "value": 6.1
+    },
+    {
+      "rank": 44,
+      "pref_code": 12,
+      "pref_name": "千葉県",
+      "value": 5.9
+    },
+    {
+      "rank": 45,
+      "pref_code": 19,
+      "pref_name": "山梨県",
+      "value": 5.9
+    },
+    {
+      "rank": 46,
+      "pref_code": 10,
+      "pref_name": "群馬県",
+      "value": 5.5
+    },
+    {
+      "rank": 47,
+      "pref_code": 13,
+      "pref_name": "東京都",
+      "value": 5.0
+    }
+  ],
+  "meta": {
+    "item": "釣りの行動者率",
+    "category": "スポーツ",
+    "measure": "行動者率",
+    "unit": "%",
+    "data_year_label": "令和3年（2021年）",
+    "source_name": "総務省統計局「令和3年社会生活基本調査 47都道府県ランキング（つり人が多い！？ランキング）」",
+    "retrieved_on": "2026-08-10",
+    "url": "https://www.stat.go.jp/data/shakai/2021/rank/zuhyou/rank/rank29.xlsx",
+    "suffix": "%",
+    "nationwide": 7.8
+  }
+}
