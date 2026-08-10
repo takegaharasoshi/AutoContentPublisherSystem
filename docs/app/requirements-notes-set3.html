@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>都道府県ランキングセット（セット 3）壁打ち記録（17-1） | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / 都道府県ランキングセット（セット 3）壁打ち記録（17-1）</nav>
+<h1>都道府県ランキングセット（セット 3）壁打ち記録（17-1）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">Phase 17-1 テーマ Fix 壁打ちの記録</span>
+  <span>最終更新: 2026-08-10（17-1 完了）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  Phase 17-1（テーマ Fix 壁打ち・15-2 相当）の記録であり、設計書ではない。17-2（セット別設計書・生成方式設計書の設計 Fix）以降の入力として使用する。
+  事前検証（2026-08-09〜08-10）で決定済みの方針 9 点は <a href="../development-plan.md">development-plan.md</a> Phase 17 前文を、検証成果物（ネタ帳 31 件・参照動画分析・Remotion プロトタイプ 2 種）はローカル <code>plans/ranking-set-research/</code>（gitignore 済み）を参照。
+  上位の事業判断（収益化経路・予算・KPI・セットポートフォリオ）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする。
+</div>
+
+<h2 id="round1">1. 巡 1: 構造の決定（フォーマット軸・キャラ役割・尺方針）</h2>
+<p>決定項目の依存関係（フォーマットと尺がキャラ・ナレーションの設計を拘束する）に従い、壁打ちを 3 巡（構造 → キャラ・ビジュアル → 名前・運用）に分けて実施した。巡 1 の判断材料は以下の 3 点。</p>
+<ul>
+  <li><strong>16 秒版面は既に窮屈</strong>: 地図ルーレット型プロトは 1 位確定が 13.5 秒で残り 2.5 秒しかなく、セリフ単位 TTS のフルナレーション（方針⑦）は 16 秒に載らない。参照動画分析でも「47 県全塗りは約 24 秒必要」との見立て</li>
+  <li><strong>TOP5 ルーレット型は参照動画の最強機構「地理順逐次開示 = 自分の県が必ず出る」を継承しない</strong>（画面に出るのは 5 県のみ）。一方で「下位を晒さない」標準版面のため △ 判定ネタ（上位のみ発表が条件の 8 件）にもそのまま使え、ネタ判定作業も軽くなる（ネタ帳 neta-30.md の結論と整合）</li>
+  <li><strong>現プロトの版面にキャラの置き場所がない</strong>（上: タイトル / 中: 地図 820px / 下: 行 5 段 + CTA + 出典で埋まっている）。キャラの役割の決め方でレイアウト再設計の要否が決まる</li>
+</ul>
+
+<div class="decision">
+  <span class="callout-title">decision: 巡 1 の 3 決定（2026-08-10 ユーザー決定）</span>
+  <ol style="margin:.3rem 0 0;">
+    <li><strong>演出フォーマットの軸 = TOP5 地図ルーレット型</strong>（唯一の本組みフォーマットとして 2 尺検証まで進める）。ランキング行型（プロト A）は単独フォーマットとしては採用せず、地図型下段の部品として吸収。<strong>全県塗り型（地理順逐次着色）は 17-2 で設計だけ起こし、定常運用後の第 2 フォーマット候補</strong>として追加判断する</li>
+    <li><strong>キャラクターの役割 = ナレーター専任 + 画面隅に小さめ立ち絵で常駐</strong>（2〜3 ポーズ差分の imagegen 静的アセット方式。logic-training-1 の固定アセット方式を転用）。版面の再設計は不要</li>
+    <li><strong>尺方針 = 短尺 20 秒 / 長尺 30 秒の 2 尺比較・両方フルナレーション</strong>（各順位に実況が付く）。<strong>事前検証の方針⑧「16 秒 / 20〜30 秒」を修正</strong>し、16 秒版面は廃止（ナレーション前提の方針⑦を最優先）</li>
+  </ol>
+</div>
+
+<h2 id="round2">2. 巡 2: キャラクター・ビジュアルの確定（試し生成 + 版面モック + 試聴）</h2>
+
+<h3 id="char-trial">2.1 キャラクター試し生成の経緯（Codex imagegen・plans/17-1-trial/ 非コミット）</h3>
+<p>15-2 と同型の「候補生成 → ユーザーフィードバック → 修正再生成」を 3 巡行った。生成は Codex 組み込みの imagegen（サブスク内・API 課金なし。16-3b と同方式）、画像はローカル <code>plans/17-1-trial/</code>（gitignore 済み）に保存しコミットしない。全候補を「無地濃紺背景・フラットベクター・太輪郭・2〜3 頭身・金アクセント」の統一条件で生成し、小サイズ常駐に耐えるシルエットの明快さを最重視で評価した。</p>
+<ul>
+  <li><strong>第 1 巡（3 案）</strong>: A 番付行司（軍配 + 裃の和風マスコット）/ B 旅する渡り鳥レポーター（帽子 + マイク + 旅かばん）/ E 表彰台の擬人化（<strong>ユーザー発案</strong>。金の 1 位表彰台に顔と手足 + マイク）。Claude は E を推奨（シルエット最強・金ボディが「1 位 = 金」のパレットに直結・テーマをキャラが体現・既存セットとの被りなし）</li>
+    <li><strong>第 2 巡（修正版 3 案）</strong>: A2 簡素化（紋様削除・3 色化 → 紺の裃が濃紺背景に溶ける新たな問題）/ B2 明色化（白ボディ + ツバメ尾羽でコントラスト解消）/ E2 和風化（赤ねじり鉢巻 + 紺法被）。ユーザーフィードバックで <strong>E 方針に確定</strong>。ただし<strong>「E2 の法被は表彰台の 2 位・3 位の段差を隠して表彰台感が失われる」</strong>との指摘を受け、段差シルエットを隠さない和風化を再検討</li>
+  <li><strong>第 3 巡（段差を隠さない和風化 3 パターン）</strong>: E3a ねじり鉢巻のみ / E3b 紅白市松トリム（段の縁に和柄帯）/ E3c 鉢巻 + 常時軍配持ち → <strong>E3a を基本形として確定し、軍配は「1 位発表ポーズ」の差分でのみ登場</strong>させる構成をユーザー決定（常駐時はクリーン、発表の瞬間に軍配が上がる = ポーズ差分が演出装置として機能）。軍配は E3c の造形が軍配らしくないとの指摘を受け、本物の行司の軍配らしい造形（瓢箪型の金団扇面 + 黒持ち手 + 朱房紐。第 1 巡 A 案の軍配が参考）に修正</li>
+  <li><strong>ポーズ差分 3 種（透過版）</strong>: 基本・実況（マイク + 人差し指）/ タメ・ドキドキ（手を口元・目を見開く）/ 1 位発表（軍配を高く掲げる）を透過 PNG で生成し確認済み（<code>e4a/e4b/e4c_*_transparent.png</code>）</li>
+</ul>
+
+<div class="note">
+  <span class="callout-title">試し生成で得た技術知見（17-4 のアセット制作への引き継ぎ）</span>
+  <ol style="margin:.3rem 0 0;">
+    <li>Codex imagegen の透過は<strong>クロマキー背景で生成 → アルファ化</strong>の後処理方式が確実（透過指定の確率的無視への対策。15-2 知見のアルファ検査 + リトライと同系）</li>
+    <li>ポーズ展開で細部（段の形状・鉢巻の結び等）が揺れる。本採用アセットは 15-9 と同様<strong>リファレンスシート化</strong>（確定デザイン 1 枚を常に参照 + 細部を文言で固定）で抑える</li>
+    <li>VOICEVOX Engine は公式 Docker イメージ（CPU 版）でローカル起動でき、<code>audio_query</code>（速度・抑揚等のパラメータ調整可）→ <code>synthesis</code> の 2 API で合成できる。音素長データが取れるため<strong>方針⑦のフレーム同期の実装基盤として成立</strong>することを確認済み</li>
+  </ol>
+</div>
+
+<h3 id="palette">2.2 パレット確定（2 案の版面モック比較）</h3>
+<p>Remotion プロトにパレット切替（<code>src/palette.ts</code> に共通化・inputProps で <code>navy</code> / <code>wamodern</code> を選択）とキャラオーバーレイを実装し、<strong>実レンダリングの静止画 4 枚</strong>（各パレット × ルーレット中 / 1 位発表）で比較した。</p>
+<div class="decision">
+  <span class="callout-title">decision: パレット = 和モダン系（2026-08-10 ユーザー決定）</span>
+  生成り × 藍 × 朱 × 金（bgTop <code>#F6F0E1</code> / bgBottom <code>#EFE4CC</code> / text <code>#24304E</code> / accent（1 位金）<code>#D9A62E</code> / keyword・CTA <code>#C73E3A</code> / barBase <code>#56679C</code> ほか。モック時点の暫定値 — 正式値の確定は 17-2）。
+  Claude は「1 位 = 金」の演出力が最大化する濃紺系を推奨したが、明るく親しみやすい雰囲気を優先するユーザー判断で和モダン系に決定。
+  <strong>弱点として金が生成り地に沈む</strong>（1 位行・県名バーストのコントラスト低下）ことをモックで確認済みのため、縁取り・影等の対策を 17-2 で設計する。
+  背景イラスト方針（方針⑤の具体化）もこれに合わせ<strong>「生成り地 × 和風モチーフを四隅寄りに淡く × 中央は無地の余白」+ 白系減光オーバーレイ</strong>で確定。
+</div>
+
+<h3 id="voice">2.3 声の確定（VOICEVOX・4 候補試聴）</h3>
+<div class="decision">
+  <span class="callout-title">decision: TTS = VOICEVOX・声 = 白上虎太郎（2026-08-10 ユーザー決定）</span>
+  <ol style="margin:.3rem 0 0;">
+    <li><strong>TTS エンジン = VOICEVOX</strong>（無料・商用可・Docker ローカル実行・音素長データでフレーム同期可）。有料サブスク型（ElevenLabs 等）は「探索期は月額固定費を積まない」原則（15-4 の Suno 見送りと同じ）により不採用。クレジット表記「VOICEVOX:白上虎太郎」をキャプションに常設する（表記位置の設計と音声ライブラリ個別規約の証跡確認は 17-2 / 17-3）</li>
+    <li><strong>声 = 白上虎太郎</strong>（わんぱく元気な少年声。かわいい祭りマスコットの見た目との一致で選定）。候補 4 ボイス（玄野武宏 / 白上虎太郎 / 春日部つむぎ / 四国めたん）を同一セリフ・速度 1.1・抑揚 1.2 で合成して試聴比較した。スタイル・速度・抑揚の最終調整は 17-4 の本組みで行う</li>
+  </ol>
+</div>
+
+<h2 id="round3">3. 巡 3: 名前・アカウント設計の確定</h2>
+<div class="decision">
+  <span class="callout-title">decision: キャラ名・set_code・アカウント設計（2026-08-10 ユーザー決定）</span>
+  <ol style="margin:.3rem 0 0;">
+    <li><strong>キャラクター名 = 「表彰台五郎」</strong>（ひょうしょうだいごろう。ユーザー発案 — 表彰「台五郎」）。キャラ設定: 金の 3 段表彰台ボディ（段差シルエットを隠す衣装は禁止）+ 赤ねじり鉢巻 + ハンドマイク。性格 = 元気なお祭り実況キャラ。1 位発表時のみ軍配（瓢箪型 + 朱房紐）を掲げる</li>
+    <li><strong><code>set_code</code> = <code>pref-ranking-1</code></strong>（既存の英小文字ケバブ + 連番規約に準拠）</li>
+    <li><strong>アカウント設計 = 新規専用の Instagram プロアカウント 1 つ</strong>（<code>account_code</code> = <code>main-account</code> の現行規約を踏襲）。アカウント名（表示名）= <strong>「表彰台五郎の都道府県ランキング」</strong>、ユーザーネーム第一候補 = <strong><code>daigoro_ranking</code></strong>（開設時に空きを確認し、取れなければ末尾に <code>47</code> 等を付加）。開設作業は 17-5</li>
+  </ol>
+</div>
+
+<h2 id="handover">4. 17-2（設計 Fix）への引き継ぎ論点</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>論点</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>タイムライン再設計</td><td>20 秒 / 30 秒 × フルナレーションの尺割り（現プロトは 16 秒設計）。セリフ単位 TTS のフレーム同期（方針⑦）の実装設計を含む</td></tr>
+    <tr><td>キャラ立ち位置</td><td>版面モックでキャラが 1 位行の左端に被り「1位」ラベルが隠れることを確認済み（発表ポーズ時が顕著）。キャラを地図の海域内へ上げる or 行の左端を右へ寄せる調整が必要</td></tr>
+    <tr><td>金の沈み対策</td><td>和モダン地では金（1 位行・県名バースト）のコントラストが落ちる。縁取り・影・グロー強化を設計</td></tr>
+    <tr><td>減光オーバーレイ・出典行の可読性</td><td>プロトの減光は中央 20% と弱く、サブタイトル・出典行が背景モチーフに埋もれる。オーバーレイ濃度の強化とテキスト帯の要否を設計。出典行は「※家計調査（県庁所在市・政令市の世帯数加重平均）」等の注記義務（ネタ帳の県換算ルール）を固定要素として載せる</td></tr>
+    <tr><td>全県塗り型の設計</td><td>第 2 フォーマット候補（◎ ネタ専用・地理順逐次着色・約 24 秒〜）。設計のみ 17-2 で起こし、実装は定常運用後に判断</td></tr>
+    <tr><td>パレット正式値</td><td>モックの wamodern 暫定値を正式採用するか微調整するか。パレット定数はプロトで <code>palette.ts</code> に共通化済み — 本組みでも共通モジュール化を維持</td></tr>
+    <tr><td>VOICEVOX 規約の証跡</td><td>白上虎太郎（音声ライブラリ）の利用規約確認と証跡保存（audio_assets のライセンス証跡カラムと同じ考え方）。クレジット表記のキャプション組み込み設計</td></tr>
+    <tr><td>地図 SVG の PD 差し替え</td><td>方針⑨（GFDL → Natural Earth 等）。実施は 17-4、設計書には要件として明記</td></tr>
+  </tbody>
+</table>
+</div>
+
+</div>
+</body>
+</html>
