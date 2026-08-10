@@ -1013,6 +1013,19 @@
 
     **(6) 設計書への反映**: batch-flow.html セクション 4（グループ単位の束ね・自動縮退・日単位ループの decision 追加、4.3 のサイレント失敗防止ガードと打ち切り、4.4 の v25.0 ピン留め済み・レート制限の具体化）、operation.html 6.1（バックフィルが 1 回で終わらない場合は同じ `scheduled_at` で再実行すれば未収集分だけ埋まる旨）。次は **16-10（インフラ実装・デプロイ。Codex terra 委譲 + ユーザーの `cdk deploy`）**。
 
+- [x] **16-10** インフラ実装・デプロイ
+  - 備考: 2026-08-10 実施（指示書作成とレビュー = Opus 5・CDK 実装 = Codex `gpt-5.6-terra` / high 委譲・デプロイ = ユーザー承認のうえ Claude が実行）。第 3 のバッチの AWS 実行基盤を構築し、**5 スタックすべてがデプロイ済みの状態**になった。設計（[stacks.html](infra/stacks.html) セクション 3.5・[workflow.html](infra/workflow.html) セクション 1.6 / 8 / 11）からの逸脱はない。
+
+    **(1) 実装**: FoundationStack へ ECR `auto-content-publisher/insights-batch`（既存 3 本と同じライフサイクル）を追加。[insights-batch-stack.ts](../infra/lib/insights-batch-stack.ts) を SnsPostBatchStack と同型で新設 — ECS TaskDef `acps-prod-insights-batch`（256 / 512・静的環境変数は `DB_SECRET_ARN` / `ENV_NAME` のみ = S3 不使用のため `S3_BUCKET_NAME` を持たない・タスクロールは Secrets の 2 プレフィックスのみで S3 権限なし）、Step Functions `acps-prod-insights-collection-sfn`（生 ASL [insights-collection.asl.json](../infra/lib/asl/insights-collection.asl.json) + `definitionSubstitutions`）、EventBridge Scheduler **セット × 2 件の計 4 件**（06:00 / 18:00 JST・`Asia/Tokyo`・FlexibleTimeWindow OFF・input に `media_lookback_days: "14"`）+ ScheduleGroup + DLQ、CodePipeline / CodeBuild（パスフィルタ `services/insights-batch/**` + `shared/**`）。MonitoringStack へ SFN 失敗アラーム 1 件 + インサイト Scheduler 6 メトリクスのアラームを追加（11 → 18 件）。
+
+    **(2) レビューでの確認点**: MonitoringStack の Scheduler アラームは ScheduleGroup ごとの 2 ループ構成にしたが、**既存 11 アラームの論理 ID・アラーム名・description は不変**（変更すると CFN 上で置換になるため）。`cdk synth` の出力で Scheduler 4 件の cron・タイムゾーン・input・DLQ / リトライ設定を実値で照合し、insights-batch アプリ側の環境変数契約（6 変数・S3 不使用）と TaskDef / ASL の一致も確認した。Codex が生成した ASL は設計書と同義だが整形が異なっていたため、設計書の JSON をそのまま採用する形に置き換えた（設計書との 1:1 対応を保つため）。`tsc --noEmit`・jest 82 件・`cdk synth`（4 タグ指定）がすべてパス。
+
+    **(3) デプロイ**（イメージタグ `ff08b7d471dc` = 実装コミット）: ①FoundationStack（ECR 追加のみ・既存リソース無変更）→ ②insights-batch イメージをローカルで `docker build`（linux/amd64）して ECR へ push（パイプラインは InsightsBatchStack と同時に作られるため初回だけ手動 push）→ ③InsightsBatchStack（新規 31 リソース・93 秒）→ ④MonitoringStack（アラーム 7 件追加）。④の実行時に依存スタック（ImageBatchStack / SnsPostBatchStack）も選択に含まれ、**両タスク定義の image URI が「CFN 記録タグ → 現行 ACTIVE タグ」へ更新される差分**が出たが、これは [cicd.html](infra/cicd.html) セクション 3.2 に記載済みの想定挙動（同一イメージの新リビジョン登録。sns-post-batch rev 12・image-batch rev 24 で稼働イメージは不変）。
+
+    **(4) デプロイ後の検証**: Scheduler 4 件すべて `ENABLED`、SFN `ACTIVE`（STANDARD）、TaskDef rev 1（256 / 512 / 正しい image URI）、`acps-prod-insights` プレフィックスのアラーム 7 件が存在（`acps-prod` 全体で 18 件）、DLQ・CodePipeline も作成済み。5 スタックすべて CREATE / UPDATE_COMPLETE。
+
+    **(5) 稼働開始の注意**: デプロイ完了時点で Scheduler が有効なため、**16-11 の `instagram_manage_insights` 再認可が未了のまま定時実行を迎えると権限エラーで失敗アラームが鳴る**（デプロイは 2026-08-10 09:11 JST 完了 = 次の定時実行は同日 18:00 JST）。16-11 を当日中に実施する前提で ENABLED のままとした。次は **16-11（再認可・稼働確認・バックフィル。ユーザー作業主体）**。
+
 ## 設計課題リスト（解消済み）
 
 [development-plan.md](development-plan.md) の設計課題リストのうち解消済みの課題をここへ移す（2026-08-09 の計画書整理で導入。解消の経緯は各設計書の decision コールアウトにも記録されている）。
