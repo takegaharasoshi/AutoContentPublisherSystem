@@ -296,13 +296,13 @@ export class InsightsBatchStack extends cdk.Stack {
     // 命名規約: acps-{env}-insights-collection-{set_code}-{morning|evening}。
     // 全セット共通で 1 日 2 回（06:00 / 18:00 JST）実行する。
     //
-    // 2026-08-10（16-10 デプロイ日）: 16-11 の instagram_manage_insights 再認可が
-    // 完了するまで全 4 件を DISABLED にしている。再認可前に定時実行を迎えると
-    // 権限エラーで失敗アラームが鳴り続けるため（ユーザー決定）。
-    // 16-11 の疎通確認が通ったら本フラグを true に戻して deploy する。
-    // 手動 DISABLE ではなく CDK 側で止めるのは、Scheduler の設定を CDK が単一の正と
-    // する運用ルール（docs/infra/workflow.html セクション 1.5 の decision）に従うため。
-    const insightsCollectionSchedulesEnabled = false;
+    // 16-10 のデプロイから 16-11 の instagram_manage_insights 再認可までは
+    // false にして停止していた（未再認可のまま定時実行すると権限エラーで
+    // 失敗アラームが鳴り続けるため）。2026-08-10 に再認可と両セットの疎通確認・
+    // バックフィルが完了したため true へ戻した。長期停止が必要になった場合も
+    // 手動 DISABLE ではなく本フラグで止める（Scheduler は CDK を単一の正とする。
+    // docs/infra/workflow.html セクション 1.5 の decision）。
+    const insightsCollectionSchedulesEnabled = true;
 
     const insightsCollectionSchedules = [
       { setCode: 'fantasy-animals-1', slot: 'morning', minute: '0', hour: '6' },

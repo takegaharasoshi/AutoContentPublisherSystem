@@ -103,11 +103,11 @@ describe('InsightsBatchStack', () => {
         ]),
       );
     }
-    // 16-11 の instagram_manage_insights 再認可が済むまでは全件 DISABLED
-    // （insights-batch-stack.ts の insightsCollectionSchedulesEnabled）。
-    // 再認可後にフラグを true へ戻す際は、この期待値も ENABLED に更新すること。
+    // 16-11 完了で定常運用へ復帰済み。長期停止する場合は
+    // insights-batch-stack.ts の insightsCollectionSchedulesEnabled を false にし、
+    // この期待値も DISABLED へ揃えること。
     for (const schedule of schedules) {
-      expect(schedule.Properties.State).toBe('DISABLED');
+      expect(schedule.Properties.State).toBe('ENABLED');
     }
     template.hasResourceProperties('AWS::Scheduler::ScheduleGroup', {
       Name: 'acps-prod-insights-schedule-group',
