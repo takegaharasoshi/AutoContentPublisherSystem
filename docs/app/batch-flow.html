@@ -156,6 +156,12 @@
       <td>採用中（<strong>16-3b で設計 Fix</strong>〔2026-08-08 の仕様変更 = development-plan.md Phase 16 冒頭〕→ 16-3c 実装 → 16-3d 初期 42 問ビルド → <strong>16-4（2026-08-08）で logic-training-1 が切替・定常運用中</strong>。16-4b でバウンド演出・見切れ解消を反映し 42 本を再ビルド）</td>
       <td><a href="generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>（16-3b で作成）</td>
     </tr>
+    <tr>
+      <td><code>ranking-prebuilt</code></td>
+      <td>都道府県ランキング動画の<strong>事前生成方式</strong>。背景イラスト（imagegen）+ ナレーション（VOICEVOX のセリフ単位 TTS をタイムライン定数へフレーム同期）+ Remotion レンダリングで TOP5 地図ルーレット型の動画を<strong>20 秒 / 30 秒の 2 尺</strong>事前にローカルでビルドし、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はランキングストック（<code>ranking_stock_items</code>）のうちスロットの尺（<code>parameters.slots[].duration_seconds</code>）がビルド済みの行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>ranking_items</code> 記録・キャプション展開（ランキング系プレースホルダ = 3.3 の decision）・ストーリーズ再掲は quiz 系と同じ構造</td>
+      <td>採用予定（<strong>17-2（2026-08-10）で設計 Fix</strong>。pref-ranking-1 が採用予定 = 実装 17-4・稼働開始 17-5 以降。development-plan.md Phase 17）</td>
+      <td><a href="generators/ranking-prebuilt.html">generators/ranking-prebuilt.html</a>（17-2 で作成）</td>
+    </tr>
   </tbody>
 </table>
 </div>
@@ -234,7 +240,7 @@
     <ol>
       <li><code>posts</code> レコードが<strong>存在しなければ</strong> <code>pending</code> で作成する（INSERT-or-skip。3.2 の復旧分岐により、既存行がある場合は作成せずその状態から再開する。投稿前の事前記録により二重投稿を防止する）。作成時に <code>media_type</code> を投稿対象の先頭メディアの <code>file_format</code> から導出して設定する（<code>'mp4'</code> → <code>'reel'</code>、それ以外 → <code>'feed_image'</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）</li>
       <li><strong>初期構築の仕様: 生成実行に紐づくメディアのうち最初の 1 件のみ</strong>を <code>post_media</code> で紐づける（選択順序は <code>generated_media.id</code> 昇順 = 最も早く生成された 1 件。1 セット複数 <code>prompt_config</code> や 1 プロンプト複数メディアにより生成実行が複数のメディアを保存していても、投稿するのは常に 1 件とする）。将来のカルーセル対応では、生成実行内の複数メディアを並び順付きで束ねる処理に拡張する</li>
-      <li>キャプションテンプレートを適用して投稿本文を組み立てる（テンプレートには AI 開示ハッシュタグを必ず含める運用ルール。<a href="operation.html#ai-disclosure">operation.html セクション 3</a>）。テンプレートに<strong>プレースホルダ</strong>が含まれる場合は、当該生成実行の <code>quiz_items</code> から動的に展開する（16-1 決定。展開規則は下記「セット別拡張ポイント: キャプションの作り方」の decision）。展開後の最終文が <code>posts.caption_text_snapshot</code> に保存される点は従来どおり</li>
+      <li>キャプションテンプレートを適用して投稿本文を組み立てる（テンプレートには AI 開示ハッシュタグを必ず含める運用ルール。<a href="operation.html#ai-disclosure">operation.html セクション 3</a>）。テンプレートに<strong>プレースホルダ</strong>が含まれる場合は、当該生成実行の出題・投稿履歴（<code>quiz_items</code> / <code>ranking_items</code>）から動的に展開する（16-1 決定・17-2 でランキング系を追加。展開規則は下記「セット別拡張ポイント: キャプションの作り方」の decision）。展開後の最終文が <code>posts.caption_text_snapshot</code> に保存される点は従来どおり</li>
       <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。パラメータは <code>media_type</code> で分岐する:
         <ul>
           <li><code>feed_image</code> → <code>image_url</code>（presigned URL）を渡す（従来どおり）</li>
@@ -297,17 +303,18 @@
   <li><code>published_unconfirmed</code> も「対応が必要な状態」として終了コード 1 の対象に含める（<code>success</code> と明確に区別し、運用者に手動確認を促すため）</li>
 </ul>
 
-<div class="decision">
-  <span class="callout-title">セット別拡張ポイント: キャプションの作り方（16-1 でプレースホルダ展開方式を導入）</span>
-  初期実装は <code>caption_templates</code> の固定文テンプレートの素通し適用（3.3 の手順 3）。<strong>16-1 で「テンプレート + 出題データの動的組み立て」へ拡張</strong>した（答え・解説を動画からキャプションへ移すテコ入れ方針の実現方式。設計 16-1・実装 16-3）。展開規則:
+<div class="decision" id="caption-extension">
+  <span class="callout-title">セット別拡張ポイント: キャプションの作り方（16-1 でプレースホルダ展開方式を導入・17-2 でランキング系を追加）</span>
+  初期実装は <code>caption_templates</code> の固定文テンプレートの素通し適用（3.3 の手順 3）。<strong>16-1 で「テンプレート + 出題データの動的組み立て」へ拡張</strong>した（答え・解説を動画からキャプションへ移すテコ入れ方針の実現方式。設計 16-1・実装 16-3）。<strong>17-2 でランキングセット用のプレースホルダ系統を追加</strong>した（設計 17-2・実装 17-4）。展開規則:
   <ul style="margin:.3rem 0 0;">
-    <li>プレースホルダは <code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code> の 5 種。展開元は当該生成実行の <code>quiz_items</code> 1 行（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>。<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）</li>
-    <li><strong>プレースホルダを含むテンプレートは <code>quiz_items</code> 行を必須</strong>とし、行がなければ異常終了する（フェイルラウド。テンプレートとセットの設定ミス検知）</li>
+    <li>プレースホルダは 2 系統。<strong>クイズ系 5 種</strong>（<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>。16-1）は当該生成実行の <code>quiz_items</code> 1 行（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>。<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）から、<strong>ランキング系 5 種</strong>（<code>{{hook}}</code> / <code>{{title}}</code> / <code>{{result_list}}</code> / <code>{{trivia}}</code> / <code>{{source_display}}</code>。17-2）は当該生成実行の <code>ranking_items</code> 1 行（<code>title</code> カラム + <code>content_fields</code> の各キー。<a href="data-model.html#detail-ranking-items">data-model.html セクション 4.12</a>）から展開する。いずれも<strong>文字列の単純参照</strong>であり、展開時の整形ロジックは持たない（<code>{{result_list}}</code> は整形済みテキストをストック側が持つ = <a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）</li>
+    <li><strong>どちらの系として展開するかは、当該実行に存在する行（<code>quiz_items</code> / <code>ranking_items</code>）で決まる</strong>（方式は 1 実行につきどちらか一方しか記録しないため、両方存在することはない）。<code>{{hook}}</code> は両系共通のトークンで、存在する行の <code>content_fields.hook</code> から展開する</li>
+    <li><strong>プレースホルダを含むテンプレートは展開元の行を必須</strong>とし、行がなければ異常終了する（フェイルラウド。テンプレートとセットの設定ミス検知。クイズ系トークンをランキングセットのテンプレートに書いた等の系の取り違えもこれで検知される）</li>
     <li><strong>プレースホルダを含まないテンプレートは従来どおり素通し</strong>（fantasy-animals-1 は無変更で共存。どちらの動きになるかはテンプレート文言そのもので決まり、セット別のフラグは持たない）</li>
-    <li>5 種以外の <code>{{英小文字とアンダースコア}}</code> 形式トークンがテンプレートにある場合も異常終了する（タイポで壊れたキャプションがそのまま公開されるのを防ぐ。16-3 実装時の決定）</li>
+    <li>既知トークン集合（<strong>両系の和集合 9 種</strong>）以外の <code>{{英小文字とアンダースコア}}</code> 形式トークンがテンプレートにある場合も異常終了する（タイポで壊れたキャプションがそのまま公開されるのを防ぐ。16-3 実装時の決定を 17-2 で和集合へ拡張）</li>
     <li>ストーリーズ行がキャプション非対応である点は変更なし（3.3 手順 2 の 7）</li>
   </ul>
-  将来の<strong>画像内容に合わせて生成 AI がキャプションを作る方式</strong>など（2026-07-06 ユーザー要望）は引き続き拡張余地として残す。どのセットがどんなテンプレートを使うかはセット別設計書に記録する（logic-training-1 は <a href="sets/logic-training-1.html">セット別設計書セクション 5</a>）。
+  将来の<strong>画像内容に合わせて生成 AI がキャプションを作る方式</strong>など（2026-07-06 ユーザー要望）は引き続き拡張余地として残す。どのセットがどんなテンプレートを使うかはセット別設計書に記録する（logic-training-1 は <a href="sets/logic-training-1.html">セット別設計書セクション 5</a>、pref-ranking-1 は <a href="sets/pref-ranking-1.html">同セクション 5</a>）。
 </div>
 
 <div class="note" id="future-failure-policy">

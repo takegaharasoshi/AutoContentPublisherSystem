@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方式設計書: ranking-prebuilt | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / ranking-prebuilt</nav>
+<h1>方式設計書: ranking-prebuilt</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Fix（17-2 で作成）</span>
+  <span>方式名（レジストリキー）: ranking-prebuilt</span>
+  <span>最終更新: 2026-08-10</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  生成方式 <code>ranking-prebuilt</code>（都道府県ランキング動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプラインの技術設計（セクション 8。Remotion コンポジション・TTS 同期を含む）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、ビルドの運用手順（いつ・どう回すか）は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>、採用セット固有の設定（アカウント・スケジュール・キャプション・デザイントークン・TTS 話者設定）は <a href="../sets/pref-ranking-1.html">sets/pref-ranking-1.html</a> を参照。分冊ルール上は「本採用時に作成」だが、<code>quiz-prebuilt</code>（16-3b）と同様に実装（17-4）の正とするため設計 Fix 時点で作成した。壁打ちの経緯は <a href="../requirements-notes-set3.html">requirements-notes-set3.html</a>。
+</div>
+
+<div class="warn">
+  <span class="callout-title">適用状態</span>
+  17-2（2026-08-10）で設計 Fix。実装は 17-4（ビルドツーリング + Remotion 本組み + 方式モジュール）、初期 30 ネタのビルド・S3 配置と稼働開始は 17-5 以降を予定（ステップ分割は <a href="../../development-plan.md">development-plan.md</a> Phase 17）。本書は目標設計であり、実装時の差分は decision コールアウトで追記する。
+</div>
+
+<h2>1. 方式概要</h2>
+<p><strong>背景イラスト〜ナレーション付きランキング動画を事前にローカルでビルドし、全数人間レビューのうえ S3 に作り置き</strong>しておき、実行時はランキングストック（<code>ranking_stock_items</code>）の LRU 順繰り選定と<strong>事前動画の取得・返却だけを行う</strong>軽量な方式。実行時に外部 API（画像生成・LLM・TTS）を一切呼ばない。「作り置き + 全数レビュー + 実行時は取得のみ」の構造は <code>quiz-prebuilt</code> と同型で、差分は以下の 3 点。</p>
+<ul>
+  <li><strong>レンダラーが Remotion</strong>（React ベースのプログラム動画生成。Pillow + ffmpeg の組版ではなくコンポーネントとフレーム補間で版面・アニメーションを記述する）。フォーマットは <strong>TOP5 地図ルーレット型</strong>（セクション 8.2）</li>
+  <li><strong>フルナレーション</strong>: セリフ単位の TTS（VOICEVOX）をタイムライン定数へフレーム同期させてベイクする（セクション 8.3）</li>
+  <li><strong>2 尺</strong>: 同一ネタから 20 秒版・30 秒版の 2 本をビルドし、スロット（<code>parameters.slots[].duration_seconds</code>）がどちらを投稿するかを決める（セクション 3。尺比較の検証設計は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>）</li>
+</ul>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、17-2 巡 2）: Remotion ローカル事前ビルド方式の採用と方式名</span>
+  Phase 17 の決定方針（<a href="../../development-plan.md">development-plan.md</a> Phase 17 冒頭の 9 点 = 17-1 で Fix）のうち「生成方式 = Remotion ローカル事前ビルド（quiz-prebuilt 同型の作り置き + 全数人間レビュー）」を方式として具体化する。狙いは <code>quiz-prebuilt</code> と同じ 3 点（生成 API 定常費ゼロ〔Remotion・VOICEVOX とも無料。<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>〕・投稿される完成形の全数人間レビュー・実行時の失敗面の縮小）。方式名は <code>quiz-prebuilt</code> の「コンテンツ種別 + prebuilt」の命名慣例に倣い <strong><code>ranking-prebuilt</code></strong> とした（代替案 <code>pref-ranking-prebuilt</code> はセットコードに寄り過ぎ〔方式は他セットでも再利用しうる〕、<code>remotion-prebuilt</code> は技術基盤名で既存カタログと命名粒度が揃わないため不採用）。
+</div>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>方式名（レジストリキー = <code>batch_sets.generator_name</code> の値）</td><td><code>ranking-prebuilt</code></td></tr>
+<tr><td>実装ファイル</td><td><code>services/image-batch/app/generators/ranking_prebuilt.py</code>（1 ファイルに完結）</td></tr>
+<tr><td>レジストリ登録</td><td><code>services/image-batch/app/generators/__init__.py</code> の <code>REGISTRY</code></td></tr>
+<tr><td>使用 API・ツール</td><td><strong>実行時は外部 API・組版・動画合成を一切使わない</strong>（S3 GetObject と DB のみ）。ビルド時のツールはセクション 8・9</td></tr>
+<tr><td>最終メディア</td><td>MP4 1 本（<code>file_format='mp4'</code>。1080x1920 / 30fps / <strong>20 秒または 30 秒（スロットの尺）</strong> / H.264 + AAC = ビルド時に Remotion レンダラーが保証する仕様）</td></tr>
+<tr><td>中間生成物</td><td><strong>なし</strong>（動画は事前レビュー済みのため、投稿前レビュー用の中間画像を実行時に作らない）</td></tr>
+<tr><td>補助テーブル</td><td><code>ranking_stock_items</code>（ストック LRU 取得 + 事前動画参照 <code>video_s3_key_20s</code> / <code>_30s</code>。<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）・<code>ranking_items</code>（投稿履歴の INSERT。<a href="../data-model.html#detail-ranking-items">同セクション 4.12</a>）。<strong><code>audio_assets</code> は実行時には使わない</strong>（BGM・ナレーションはベイク済み。セクション 6）</td></tr>
+</table>
+</div>
+
+<h2>2. 契約の実装</h2>
+<p>共通の契約（<a href="../batch-flow.html#generator-contract">batch-flow.html「生成方式の契約」</a>）を <code>generate(context: GeneratorContext) -&gt; GeneratorResult</code> で実装する。冪等性（完了判定）・S3 保存・DB 登録・トランザクション制御は共通骨格（<code>processing.py</code>）の責務であり、本方式は関与しない。<strong>共通骨格・SNS 投稿バッチの変更は、キャプション展開へのランキング系プレースホルダ追加（<a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>。実装 17-4）のみ</strong>。</p>
+<div class="table-wrap">
+<table>
+<tr><th>要素</th><th>使い方</th></tr>
+<tr><td><code>context.prompt_config</code></td><td><code>parameters</code>（スロット定義と尺。セクション 3）・<code>set_id</code>。<code>prompt_text</code> は未使用（ストック方式のため。<code>quiz-prebuilt</code> と同じ扱い）</td></tr>
+<tr><td><code>context.scheduled_at</code></td><td>スロット解決の入力（クイズ方式と同一の決定的解決）</td></tr>
+<tr><td><code>context.generation_run_id</code></td><td><code>ranking_items</code> INSERT の紐づけ</td></tr>
+<tr><td><code>context.cursor</code></td><td><code>batch_sets</code>（set_code 解決）・<code>ranking_stock_items</code>（ストック取得・<code>last_used_at</code> / <code>use_count</code> 更新）・<code>ranking_items</code>（履歴 INSERT）</td></tr>
+<tr><td><code>context.s3_client</code> / <code>context.s3_bucket</code></td><td>事前動画の取得（<code>acps_shared.s3.get_object</code>。セクション 5）</td></tr>
+<tr><td>戻り値 <code>GeneratorResult.media</code></td><td><code>MediaOutput</code> 1 件（MP4、<code>width</code>=1080 / <code>height</code>=1920 / <code>duration_seconds</code>=スロットの尺（20 または 30）/ <code>audio_asset_id</code>=ストック行の <code>video_audio_asset_id</code> を転記）</td></tr>
+<tr><td>戻り値 <code>GeneratorResult.intermediates</code></td><td><strong>0 件</strong></td></tr>
+</table>
+</div>
+<p>処理順序: ① <code>parameters</code> 検証 → ② スロット解決（尺の確定）→ ③ <strong>ランキングストック取得（当該尺ビルド済み限定の LRU。セクション 4）</strong> → ④ <strong>S3 から当該尺の事前動画を取得</strong>（欠落はフェイルラウド。セクション 5）→ ⑤ <code>ranking_items</code> INSERT + ストックの <code>last_used_at</code> / <code>use_count</code> 更新 → ⑥ <code>GeneratorResult</code> を返す。フォント・キャラアセット・BGM の事前検査、API キー取得はいずれも<strong>不要</strong>（実行時に使わないため）。</p>
+
+<h2 id="parameters">3. 入力（parameters とスロット解決・2 尺）</h2>
+<p><code>prompt_configs.parameters</code> の <code>slots</code> 配列でスロットを定義する。スロット解決ロジック（<code>SCHEDULED_AT</code> の JST 時による決定的解決・早朝の巻き戻し）は <code>gpt-quiz-multicut</code>（<a href="gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a>）と同一規則を本方式内に実装する。<strong>Scheduler の Input にスロット・尺は持たせない</strong>（時刻だけがスロットの指定。<a href="../operation.html#set-add">operation.html セクション 2.1 の warn</a>）。</p>
+<div class="table-wrap">
+<table>
+<tr><th><code>slots</code> のフィールド</th><th>必須</th><th>役割</th></tr>
+<tr><td><code>from_jst_hour</code></td><td>必須</td><td>スロットの適用開始時刻（JST 時）。クイズ方式と同じ境界規則</td></tr>
+<tr><td><code>slot_code</code></td><td>必須</td><td>スロット識別子（Scheduler 名のサフィックスと対応）</td></tr>
+<tr><td><code>duration_seconds</code></td><td>必須</td><td><strong>このスロットが投稿する尺（20 または 30 のみ許容。それ以外は parameters 不正として異常終了）</strong>。ストック取得の絞り込み（当該尺の事前動画がビルド済みの行のみ候補）と、S3 から取得するカラム（<code>video_s3_key_20s</code> / <code>_30s</code>）の選択に使う</td></tr>
+</table>
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、17-2 巡 2・巡 3）: 尺はスロット単位の固定値とする</span>
+  2 尺（20 秒 / 30 秒）のどちらを投稿するかは<strong>スロットの設定値 <code>duration_seconds</code> で固定</strong>する。日付・乱数による実行時の出し分けロジックは持たない（決定的解決の維持。同じスロットの再実行は必ず同じ尺になり、冪等性と検証の解釈が単純になる）。尺比較の検証（17-6）は「昼 = 20 秒 / 夜 = 30 秒」のスロット分離で行い、時間帯交絡の打ち消し（検証後半のスワップ）や尺確定後の一本化は <strong><code>parameters</code> の UPDATE だけで行える</strong>（両尺ビルド済みのため設定変更と資産が食い違わない。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>）。クイズ方式の <code>slot_label</code>（時間帯ラベル帯）・<code>quiz_type</code> / <code>difficulty</code>（型・難度絞り込み）に相当するフィールドは本方式にはない — ランキングのネタはスロット非依存で、版面にも時間帯要素を持たないため。
+</div>
+
+<h2 id="stock">4. ランキングストックの取得（当該尺ビルド済み限定の LRU 順繰り）</h2>
+<p>ネタは <code>ranking_stock_items</code>（<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）から LRU 順繰りで取得する。<code>quiz-prebuilt</code> の選定（<a href="quiz-prebuilt.html#stock">同セクション 4</a>）との差分は、絞り込みが型・難度ではなく<strong>「スロットの尺に対応する事前動画がビルド済み」</strong>である点のみ（<code>{尺カラム}</code> は <code>duration_seconds</code> から <code>video_s3_key_20s</code> / <code>video_s3_key_30s</code> のどちらかに解決する。20 / 30 以外は事前に検証済みのため SQL 組み立ては安全）。</p>
+<pre><code>SELECT id, title, content_fields, ranking_data, {尺カラム} AS video_s3_key, video_audio_asset_id
+  FROM ranking_stock_items
+ WHERE set_id = %s AND is_active = 1
+   AND {尺カラム} IS NOT NULL
+ ORDER BY last_used_at ASC, id ASC LIMIT 1</code></pre>
+<ul>
+  <li><strong>0 件は <code>RuntimeError</code> で異常終了</strong>（ストック未投入・全行無効化に加え「投入済みだが当該尺が全行未ビルド」も検知するフェイルラウド）</li>
+  <li><strong>再利用（<code>last_used_at IS NOT NULL</code> の行を選んだ場合）は WARNING ログ</strong>（補充遅延のサイン）</li>
+  <li><strong>当該尺が未ビルトの有効在庫が存在する場合も WARNING ログ</strong>を出す（COUNT 1 本。投入後のビルド漏れ・ビルド待ちのサイン。週次の在庫確認クエリ〔<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>〕でも拾える）</li>
+  <li><strong>防御的フィールド検査</strong>: <code>title</code> 非空、<code>content_fields</code> の必須キー（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>result_list</code>）の存在・非空、<code>ranking_data.entries</code> が 5 件で <code>rank</code> 1〜5 が一意であること、<code>video_audio_asset_id</code> 非 NULL。動画には使わないが<strong>キャプションのプレースホルダ展開（<code>ranking_items</code> 経由）の入力になる</strong>ため検査する。不備は異常終了（投入ミスの検知）</li>
+  <li><code>last_used_at</code> / <code>use_count</code> の UPDATE は事前動画の取得成功後に行い、commit は共通骨格に委ねる（失敗時はストック消費の副作用ごとロールバック）</li>
+</ul>
+<div class="decision">
+  <span class="callout-title">決定（17-2 巡 2）: <code>last_used_at</code> は 2 尺共通（尺別に持たない）</span>
+  同一ネタの 20 秒版と 30 秒版は<strong>同じ内容の別尺</strong>であり、片方を投稿した直後にもう片方が別スロットで選ばれると同一アカウントに実質同じ内容が近接して並ぶ。これを防ぐため LRU の状態（<code>last_used_at</code> / <code>use_count</code>）は尺別に分けず 1 組だけ持ち、<strong>どちらの尺で使ってもネタ全体が LRU キューの末尾に回る</strong>。どの尺で投稿したかの記録は履歴側（<code>ranking_items.duration_seconds</code>）が持ち、尺別の効果検証はそちらで行う（<a href="../data-model.html#detail-ranking-items">data-model.html セクション 4.12</a>）。
+</div>
+<div class="decision">
+  <span class="callout-title">決定（17-2 巡 2）: 未ビルト行・片尺のみビルド済みの行は「選ばれない」のであって「エラーにしない」</span>
+  <code>quiz-prebuilt</code> セクション 4 の decision を踏襲する。当該尺が未ビルトの行は絞り込みで候補から除外され、他のビルド済み在庫で投稿は止まらない（週次補充の「投入 → ビルド」の間に実行が走っても安全）。<strong>片尺のみビルド済みの行はその尺のスロットの候補にだけ入る</strong>（尺確定後は勝ち尺のみビルドする運用〔<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>〕になるため、これは正常な状態でもある）。未ビルトの滞留は WARNING と在庫確認クエリで検知する。
+</div>
+
+<h2 id="fetch">5. 事前動画の取得</h2>
+<p>選定したストック行の当該尺カラム（<code>video_s3_key_20s</code> / <code>_30s</code>）から MP4 を取得する（<code>acps_shared.s3.get_object</code>）。キーの値はビルドツーリングが登録した <code>assets/{set_code}/prebuilt/{content_key}_20s.mp4</code> / <code>_30s.mp4</code>（命名規約は <a href="../data-model.html#s3-key">data-model.html セクション 5</a>。環境非依存の業務キー <code>content_key</code> で組む — <code>quiz-prebuilt</code> の 16-3d 決定を最初から適用。<strong>参照は常に DB カラム経由で行い、方式がキーを組み立てることはしない</strong>）。</p>
+<ul>
+  <li><strong>取得失敗（NoSuchKey・アクセスエラー）は異常終了</strong>（フェイルラウド。DB は「ビルド済み」なのに実体がない = DB と S3 の不整合であり、縮退して別のネタ・別の尺に差し替えることはしない）</li>
+  <li>取得したバイト列をそのまま <code>MediaOutput</code> として返す。<strong>再エンコード・検査変換は行わない</strong>（形式はビルド時に Remotion レンダラーが保証し、全数レビューで確認済み）。寸法は方式定数（1080x1920）、尺はスロットの <code>duration_seconds</code> を記録する</li>
+</ul>
+
+<h2>6. 出力とストレージ</h2>
+<div class="table-wrap">
+<table>
+<tr><th>成果物</th><th>S3</th><th>DB</th></tr>
+<tr><td>最終 MP4</td><td>共通骨格が通常キー（<code>videos/{set_code}/{YYYYMMDD}/...</code>・ライフサイクル 30 日）へ保存する。<strong>事前動画マスター（<code>assets/.../prebuilt/</code>・ライフサイクル対象外）の使い捨てコピー</strong>であり、マスターは消えない</td><td><code>generated_media</code> に 1 行（<code>file_format='mp4'</code>・1080x1920・スロットの尺・<code>audio_asset_id</code> = ストック行の <code>video_audio_asset_id</code> を転記）</td></tr>
+<tr><td>投稿履歴</td><td>—</td><td><code>ranking_items</code> に 1 行（<code>format</code> / <code>title</code> / <code>content_fields</code> / <code>ranking_data</code> のスナップショット + <code>duration_seconds</code> + <code>stock_item_id</code>。<strong>キャプション展開の入力と尺別効果検証の記録のため必須</strong>。共通骨格の同一トランザクションで確定）</td></tr>
+</table>
+</div>
+<p><code>file_format='mp4'</code> → <code>posts.media_type='reel'</code> の導出、キャプションのプレースホルダ展開（ランキング系 5 種 = <a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>）、ストーリーズ再掲（<code>stories_enabled=1</code>）はいずれも共通側の既存機構で行われる。<code>generated_media.audio_asset_id</code> への転記は <code>quiz-prebuilt</code> セクション 6 の decision と同じ理由（ミュート検知運用の特定クエリを無変更で成立させる）で、BGM は 1 ネタ 1 曲を 2 尺共通でベイクする（セクション 8.1 工程 3）。NULL（転記元の未記録）は許容しない（ビルドツーリングの登録漏れ検知として異常終了）。</p>
+
+<h2>7. エラーハンドリング</h2>
+<p>方式内のリカバリループはない。異常（<code>parameters</code> 不正〔<code>duration_seconds</code> が 20 / 30 以外を含む〕・当該尺のビルド済みストック 0 件・ストック行のフィールド不備・<code>video_audio_asset_id</code> 未記録・事前動画の取得失敗）はすべて例外を送出し、共通骨格が捕捉 → ロールバック → Step Functions Retry → 失敗アラーム通知につながる（<code>quiz-prebuilt</code> セクション 7 と同型）。実行時の主な失敗面は SNS 投稿側（Graph API）になる。</p>
+
+<h2 id="build">8. 事前ビルドパイプライン（供給側の設計）</h2>
+
+<h3 id="build-steps">8.1 工程（5 段）</h3>
+<p>事前動画の供給はローカルの<strong>事前ビルドツーリング</strong>が担う。ツーリングは <code>content/video-build/&lt;set_code&gt;/</code> に置いて git 管理し（置き場・運用ルールは <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）、週次補充（ストック投入）とセットで回す。工程は 5 段:</p>
+<ol>
+  <li><strong>対象抽出</strong>: ビルド対象尺のカラム（検証期は <code>video_s3_key_20s</code> と <code>_30s</code> の両方、尺確定後は勝ち尺のみ）が NULL の有効ストック行を列挙する（初回 = 17-5 は 30 ネタ全量、以後は補充分のみ）</li>
+  <li><strong>背景イラスト生成（imagegen 委譲）</strong>: 行の <code>content_fields.bg_motif</code>（ネタのテーマに合わせた背景モチーフの指示文）からプロンプトを組み立て、Codex 組み込み画像生成（imagegen）で 9:16 の背景を 1 ネタ 1 枚生成する（<strong>2 尺で共用</strong>）。プロンプトには<strong>セットの画風固定行</strong>（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 4</a>）と<strong>サイズ明示行</strong>（<code>quiz-prebuilt</code> の 16-4b 決定と同じ手法）を付け、<strong>「文字・数字・記号を描かない」を必須指定</strong>とする（下記 decision の再利用要件①）。生成物は <code>assets/{set_code}/prebuilt/{content_key}_bg.png</code> として S3 に併置する（再ビルド資産。DB 記録なし）</li>
+  <li><strong>TTS 合成 + Remotion レンダリング（2 本）</strong>: 行の <code>narration</code>（尺別 cue 台本）を VOICEVOX（ローカル Docker）でセリフ単位に合成 → <strong>実測長の予算検査（セクション 8.3。超過はビルドエラー）</strong> → 音声ファイル群 + <code>ranking_data</code> + 版面文言 + 背景をコンポジションの props に渡し、Remotion で 20 秒版・30 秒版をレンダリングする。BGM は <code>audio_assets</code> の <code>time_slot IS NULL</code> の有効曲から LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行い（<code>quiz-prebuilt</code> セクション 6 の decision と同じ移管）、<strong>2 尺共通の 1 曲</strong>を <code>video_audio_asset_id</code> に記録する</li>
+  <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（2 尺）+ 背景イラストを一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>背景再生成（imagegen 再試行・<code>bg_motif</code> 書き直し）またはセリフ・版面文言の修正（DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
+  <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{content_key}_20s.mp4</code> / <code>_30s.mp4</code> へアップロードし、<code>ranking_stock_items</code> の <code>video_s3_key_20s</code> / <code>video_s3_key_30s</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する。Aurora 反映 SQL と S3 ファイル名のどちらも環境ローカルな <code>id</code> を使わない（<code>content_key</code> で解決。<code>quiz-prebuilt</code> の 16-3d 決定を最初から適用）</li>
+</ol>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、17-2 巡 2・巡 3）: 英語圏展開セットを見据えた再利用要件 4 点</span>
+  次セット候補として<strong>同内容を英語で発信する海外向けセット</strong>が計画されている（ユーザー方針。時期未定）。ネタ・素材・コンポジションを言語違いで再利用できるよう、本方式の実装は以下を必須要件とする:
+  <ol style="margin:.3rem 0 0;">
+    <li><strong>背景イラストに文字を焼き込まない</strong>（imagegen プロンプトで「文字・数字・記号を描かない」を必須指定。背景は言語非依存の共用素材になる）</li>
+    <li><strong>Remotion コンポジションの画面文言はすべて props 経由</strong>（コンポーネント内のハードコード禁止。文言の正はストック行の <code>content_fields</code> / <code>narration</code>）</li>
+    <li><strong>TTS はアダプタ層で分離</strong>（cue テキスト → 音声ファイル + 実測長のインターフェースを固定し、VOICEVOX 固有の呼び出しはアダプタ内に閉じる。英語セットでは別エンジンのアダプタに差し替える）</li>
+    <li><strong>ネタソース・県換算テーブルは言語非依存の形式で保持</strong>（<code>ranking_data</code> は数値・都道府県コードのみで言語を含まない。表示文言は <code>content_fields</code> / <code>narration</code> に分離済み = データモデル側の対応。<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）</li>
+  </ol>
+  ツーリングの共通 core 化（言語共通部の抽出）は英語セット追加時に行い、17-2 時点は <code>pref-ranking-1</code> 専用構成のままとする（YAGNI。ユーザー Fix）。
+</div>
+
+<h3 id="composition">8.2 動画の作り（TOP5 地図ルーレット型コンポジション）</h3>
+<p>版面は 1080x1920 / 30fps。構成要素は上から <strong>タイトル帯</strong>（ネタの <code>title</code>）・<strong>日本地図</strong>（ルーレット演出の主役）・<strong>順位行スタック</strong>（確定した順位を 5 位から積み上げ）・<strong>キャラ常駐枠 + 吹き出し</strong>（実況）・最下部の<strong>出典行帯</strong>。配色はパレットトークン（<code>Palette</code> 型）で駆動し、値はセットのデザイントークン（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 8</a>）を正とする。検証プロトタイプは <code>plans/ranking-set-research/remotion-proto/</code>（git 管理外。本組み実装 = 17-4 でコンポジションをリポジトリへ移した時点でコードが正となる）。</p>
+<p><strong>ルーレット演出</strong>: 各順位の発表は「地図上で候補県が高速に光る（スピン）→ 停止フラッシュで確定 → 確定県が順位色に塗られ、順位行に県名・数値が追記される」の繰り返し。確定済みの県は塗りが残るため、動画の進行とともに地図が塗り上がっていく。</p>
+<div class="table-wrap">
+<table>
+<caption style="text-align:left;font-weight:bold;margin-bottom:.3rem;">タイムライン（17-2 巡 1 で Fix。20 秒 = 600f / 30 秒 = 900f）</caption>
+<tr><th>尺</th><th>シーン構成（秒）</th></tr>
+<tr><td><strong>20 秒版</strong>（600f）</td><td>オープニング 2.5s → 5 位〜2 位 各 2.5s（スピン 1.5s + 停止フラッシュ・行追記 1.0s）→ 1 位 4.5s（タメ 2.5s + 発表 2.0s）→ 締め 3.0s</td></tr>
+<tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.5s（サブタイトル <code>content_fields.subtitle</code> を読む）→ 5 位〜2 位 各 4.0s（スピン + 停止 2.0s + 順位コメント 2.0s）→ 1 位 5.5s（タメ + 発表）→ <strong>結果総覧 3.0s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 2.0s</td></tr>
+</table>
+</div>
+<p>2 尺の検証仮説（17-2 巡 1 で Fix）: 20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>。</p>
+<ul>
+  <li><strong>1 位の強調（17-2 巡 1 Fix）</strong>: 1 位行は行高 96px（2〜5 位は 76px）+ 明るい金グラデ + グロー強化。1 位県名は発表時に 150px + 二重グローのバーストを 66f（2.2 秒）表示する。順位バッジ・パルスリング・「第1位」朱バッジは比較モックの結果<strong>不採用</strong>（過剰装飾）</li>
+  <li><strong>キャラ演出</strong>: 煽り・実況はキャラの吹き出しに表示する（<strong>ナレーション cue と同一テキスト</strong> = 音と字幕の二重化。スピン中は点滅）。ポーズは 3 種を切り替える（基本 → タメ〔1 位スピン中〕→ 軍配〔1 位発表後〕）。アセット・配置値はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a></li>
+  <li><strong>下位を晒さない</strong>: TOP5 のみを扱い、下位順位（ワースト表示）は版面に持たない（<a href="../../strategy/business-strategy.html">事業戦略書セクション 6</a> のネタ判定基準に対応する構造的ガード）</li>
+</ul>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、17-2 巡 1）: 明色背景での可読性規定（金の沈み対策・減光 3 層・出典行帯）</span>
+  生成り系の明色パレットでは金色（アクセント）が沈む。モック比較で確定した規定:
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>生成り地の上に金を単独で使うことを禁止</strong>する（規定として恒久化）。文字の金は<strong>藍（<code>ink</code>）の 8 方向縁取り（outlineShadow）+ グローを必須</strong>とする</li>
+    <li>面の金（1 位行の帯）は<strong>深金 → 金 → 明金のグラデーション + 藍の内側輪郭</strong>で構成する（単色の金面は使わない）</li>
+    <li>背景イラストの上の減光オーバーレイは<strong>3 層構造（全面ベース + 上帯 + 下帯）</strong>とし、中央部の減光は 46〜50% を目安とする（文字域の上下帯を濃くし、地図域の背景は活かす）</li>
+    <li>出典行は<strong>生成り 86% の角丸帯 + 28px</strong> で常設する。注記義務のあるネタ（家計調査系）は「※家計調査（県庁所在市・政令市の世帯数加重平均）」の類の注記を<strong>固定要素</strong>として帯に含める（文言はストック行の <code>content_fields.source_display</code> が正）</li>
+  </ul>
+  トークンの実値（<code>goldDeep</code> / <code>ink</code> / 帯色ほか）は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 8</a>。
+</div>
+<div class="warn">
+  <span class="callout-title">地図 SVG の素材要件（17-4 の PD 素材差し替え時に必ず満たすこと）</span>
+  現行プロトの日本地図 SVG は GFDL 由来のため、本組み（17-4）で<strong>パブリックドメイン素材（Natural Earth 等）へ差し替える</strong>（Phase 17 決定方針⑨）。差し替え素材は以下を満たすこと（17-2 巡 1 でモック確定した配置の再現要件）:
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>県単位のパス分割</strong>（47 都道府県を個別に塗り分け・点灯できること）。<strong>鹿児島の離島（奄美・トカラ）は飛び地サブパスとして分離</strong>されていること（インセット移設と「鹿児島 1 位時に本土 + 奄美が同時に金になる」挙動の両立に必要）</li>
+    <li><strong>南西諸島インセット</strong>: 沖縄と奄美・トカラを<strong>実際の相対配置・同一縮尺（0.75 倍）を維持したまま関東沖へ移設</strong>する。点線の L 字囲みは角が房総半島のすぐ東に来る配置。プロト実装値（viewBox 基準）: 沖縄 <code>translate(695,822) scale(0.75)</code> / 奄美・トカラ <code>translate(632,673) scale(0.75)</code> / 点線 <code>M686,960 L686,680 L1000,680</code>。素材の viewBox が変わる場合も<strong>この見た目（相対配置・縮尺・L 字の角の位置）を再現</strong>する</li>
+    <li>ライセンス証跡（出典・PD であることの確認記録）をツーリング内に残す（<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a> の証跡ルール）</li>
+  </ul>
+</div>
+
+<h3 id="tts-sync">8.3 ナレーションと TTS のフレーム同期（尺別固定アンカー + 予算検査）</h3>
+<p>ナレーションはセリフ（cue）単位で TTS 合成し、<strong>タイムライン定数に固定したアンカーフレーム</strong>へ配置する（Phase 17 決定方針⑦の具体化）。cue ID の体系（<code>narration</code> JSON のキー。<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）:</p>
+<div class="table-wrap">
+<table>
+<tr><th>cue ID</th><th>内容</th><th>尺</th><th>同期先</th></tr>
+<tr><td><code>intro</code></td><td>導入（タイトル読み。30 秒版はサブタイトルまで読む）</td><td>両尺（テキストは尺別）</td><td>オープニング / 導入シーンの先頭</td></tr>
+<tr><td><code>r5_call</code>〜<code>r1_call</code></td><td>各順位の煽り・呼び込み（1 位はタメの煽り）</td><td>両尺（テキストは尺別にしてよい）</td><td>各順位シーンのスピン開始</td></tr>
+<tr><td><code>r5_name</code>〜<code>r1_name</code></td><td>県名の読み上げ</td><td>両尺</td><td><strong>停止フラッシュに同期</strong>（発表の瞬間と一致させる）</td></tr>
+<tr><td><code>r5_comment</code>〜<code>r2_comment</code></td><td>順位ごとのひとことコメント</td><td><strong>30 秒版のみ</strong></td><td>各順位シーンのコメント区間（2.0s）</td></tr>
+<tr><td><code>recap</code></td><td>結果総覧の読み</td><td><strong>30 秒版のみ</strong></td><td>結果総覧シーン</td></tr>
+<tr><td><code>outro</code></td><td>締め（フォロー・保存の呼びかけ）</td><td>両尺（テキストは尺別にしてよい）</td><td>締めシーン</td></tr>
+</table>
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、17-2 巡 1）: 固定アンカー + 予算検査方式（可変尺方式は不採用）</span>
+  音声の実測長に合わせてアンカー・尺を動かす「可変尺方式」は、セリフを直すたびに版面演出（スピン・フラッシュ・行追記）との同期が崩れ、2 尺のタイムライン Fix が意味を失うため<strong>不採用</strong>。採用方式:
+  <ul style="margin:.3rem 0 0;">
+    <li>各 cue の開始フレームは<strong>尺別のタイムライン定数（アンカー表）に固定</strong>する。アンカー間隔から各 cue の<strong>時間予算</strong>が決まる</li>
+    <li>ビルド時、VOICEVOX の合成結果の<strong>実測長が予算を超過したらビルドエラー</strong>にする（静かに次の cue へ食い込ませない）。<strong>第一の対処はセリフの修正</strong>（短く書き直す）、第二の手段として話速 <code>speedScale</code> の引き上げ（上限 1.2。それ以上は聞き取りにくくなるため禁止）</li>
+    <li>予算内の余りは無音で吸収する（cue の頭をアンカーに揃える）</li>
+  </ul>
+  話者・既定の合成パラメータ（速度・抑揚）はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a>。
+</div>
+
+<h3 id="rebuild">8.4 再ビルドが必要になる変更</h3>
+<div class="warn">
+  <span class="callout-title">版面・タイムライン・素材の変更は事前動画の再ビルドを伴う</span>
+  事前動画には版面・パレット・背景・ナレーション・BGM がベイクされている。以下の変更は<strong>該当する事前動画の全再ビルド + 差し替え</strong>が必要になる:
+  <ul style="margin:.3rem 0 0;">
+    <li>版面・タイムライン・尺構成の変更（コンポジション改修 → 全量再ビルド）</li>
+    <li>パレット（デザイントークン）・キャラアセット・地図 SVG の変更（<strong>17-4 の PD 地図差し替えは全量再ビルドの契機</strong>。ただし 17-4 は初期ビルド前のため実質影響なし）</li>
+    <li>BGM の差し替え（ミュート検知時を含む。対象は <code>video_audio_asset_id</code> で特定できる）・VOICEVOX 話者やセリフの変更</li>
+  </ul>
+  一括再ビルドはツーリングの <code>--rebuild</code>（ビルド済み行を対象に、BGM を <code>video_audio_asset_id</code> から引き継いで再ビルド = 選曲 LRU を消費せず、<code>last_used_at</code>〔投稿キュー〕も変えない。<code>quiz-prebuilt</code> の 16-4b と同型）で行う。再ビルド後の全数レビュー → S3 上書き → 両環境 DB 反映は新規ビルドと同じ。
+</div>
+
+<h2>9. 依存ライブラリ・実行環境</h2>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>内容</th></tr>
+<tr><td>実行時の依存</td><td><code>acps_shared</code>（DB・S3）のみ。<strong>Node.js / Remotion / VOICEVOX / ffmpeg は実行時には一切使わない</strong>（<code>quiz-prebuilt</code> と同じ。コンテナイメージは image-batch 共通のまま変更しない）</td></tr>
+<tr><td>Fargate タスクサイズ</td><td>1 vCPU / 2 GB のまま据え置き（<code>ImageBatchStack</code> は共通のため変更しない）</td></tr>
+<tr><td>ビルド時の依存</td><td>Node.js + Remotion（ローカル実行。レンダリングと H.264 + AAC エンコードを担う）・VOICEVOX Engine（ローカル Docker。話者はセット別設計書）・imagegen（Codex 委譲。背景イラスト）・ローカル MySQL / Aurora への接続。バージョン固定は 17-4 のツーリング実装で行う（<code>package.json</code> / Docker イメージタグを git 管理）</td></tr>
+</table>
+</div>
+
+<h2 id="appendix-zenken">付録 A. 全県塗り型（第 2 フォーマット候補。設計骨子のみ）</h2>
+<div class="note">
+  <span class="callout-title">位置づけ（17-1 巡 1 決定・17-2 論点⑤）</span>
+  実装判断は <code>pref-ranking-1</code> の定常運用後に行う<strong>未採用の候補</strong>であり、本節は骨子の記録のみ（実装・詳細設計はしない）。採用時に本書へ正式セクションとして起こす。
+</div>
+<ul>
+  <li><strong>演出</strong>: TOP5 ではなく<strong>47 都道府県すべて</strong>を扱う。地理順（北から南へ）に県を逐次着色し、値の大きさを <strong>5 段階の色バンド</strong>で塗り分ける。ルーレット・順位行スタックは使わず、「自分の県は何色か」を探す視聴動機で完走させる</li>
+  <li><strong>尺</strong>: 約 24〜30 秒（47 県 × 約 0.4〜0.5s + 導入・締め）</li>
+  <li><strong>適用条件</strong>: ネタ判定◎（下位の県も笑える）かつ<strong>全 47 都道府県のデータが公開されているネタ専用</strong>（TOP5 型は上位 5 県分のデータで作れるが、本型は全県分が必須）</li>
+  <li><strong>データモデル</strong>: <code>ranking_stock_items.format</code> に新値（例 <code>all47-band</code>）を追加し、<code>ranking_data</code> に 47 県分の値を持たせる（スキーマ変更は不要 = <code>format</code> を VARCHAR にした理由。<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）</li>
+  <li><strong>ナレーション</strong>: 全県読み上げは尺に収まらないため、地方ブロック単位のコメント + 上位・特徴県のピックアップ実況を想定（cue 体系の拡張が必要）</li>
+</ul>
+
+</div>
+</body>
+</html>

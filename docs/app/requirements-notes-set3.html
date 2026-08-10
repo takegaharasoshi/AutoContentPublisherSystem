@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>都道府県ランキングセット（セット 3）壁打ち記録（17-1） | AutoContentPublisherSystem</title>
+<title>都道府県ランキングセット（セット 3）壁打ち記録（17-1・17-2） | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / 都道府県ランキングセット（セット 3）壁打ち記録（17-1）</nav>
-<h1>都道府県ランキングセット（セット 3）壁打ち記録（17-1）</h1>
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / 都道府県ランキングセット（セット 3）壁打ち記録（17-1・17-2）</nav>
+<h1>都道府県ランキングセット（セット 3）壁打ち記録（17-1・17-2）</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">Phase 17-1 テーマ Fix 壁打ちの記録</span>
-  <span>最終更新: 2026-08-10（17-1 完了）</span>
+  <span class="badge badge-wip">Phase 17-1 テーマ Fix・17-2 設計 Fix 壁打ちの記録</span>
+  <span>最終更新: 2026-08-10（17-2 完了）</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  Phase 17-1（テーマ Fix 壁打ち・15-2 相当）の記録であり、設計書ではない。17-2（セット別設計書・生成方式設計書の設計 Fix）以降の入力として使用する。
+  Phase 17-1（テーマ Fix 壁打ち・15-2 相当。セクション 1〜4）と Phase 17-2（設計 Fix 壁打ち。セクション 5）の記録であり、設計書ではない。17-2 の決定の反映先（正）は各設計書（セクション 5 冒頭の一覧）。
   事前検証（2026-08-09〜08-10）で決定済みの方針 9 点は <a href="../development-plan.md">development-plan.md</a> Phase 17 前文を、検証成果物（ネタ帳 31 件・参照動画分析・Remotion プロトタイプ 2 種）はローカル <code>plans/ranking-set-research/</code>（gitignore 済み）を参照。
   上位の事業判断（収益化経路・予算・KPI・セットポートフォリオ）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする。
 </div>
@@ -107,6 +107,45 @@
   </tbody>
 </table>
 </div>
+<p><strong>上記 8 論点は 17-2 で全件消化した</strong>（消化結果はセクション 5 と各設計書）。</p>
+
+<h2 id="round17-2">5. 17-2: 設計 Fix 壁打ちの記録（3 巡）</h2>
+<div class="note">
+  <span class="callout-title">決定の反映先（正）</span>
+  17-2 の決定はすべて設計書へ反映済みで、そちらが正: 方式設計書 <a href="generators/ranking-prebuilt.html">generators/ranking-prebuilt.html</a>（新規）・セット別設計書 <a href="sets/pref-ranking-1.html">sets/pref-ranking-1.html</a>（新規）・<a href="data-model.html#detail-ranking-items">data-model.html セクション 4.12 / 4.13・セクション 5</a>（+ <code>database/V010__pref_ranking_stock.sql</code>）・<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1 カタログ / 3.3 キャプション decision</a>・<a href="operation.html#ranking-stock-mgmt">operation.html セクション 2.1 チェックリスト / セクション 3</a>。本節は経緯（比較案・不採用案・ユーザー判断の理由）の記録のみ。
+</div>
+
+<h3 id="r2-1">5.1 巡 1: 動画設計（版面・タイムライン。論点①②③④⑥ + ⑤の骨子）</h3>
+<p>紙上案 + remotion-proto を仕様更新したモック比較（確認画像 <code>out/17-2/</code>）で以下をユーザー Fix した。</p>
+<ul>
+  <li><strong>タイムライン 2 尺</strong>: 20 秒 = 600f（オープニング 2.5s / 5〜2 位 各 2.5s / 1 位 4.5s / 締め 3.0s）、30 秒 = 900f（導入 3.5s / 各順位 4s〔コメント 2s〕/ 1 位 5.5s / 結果総覧 3s / 締め 2s）。検証仮説: 20 秒 = 完走率・リプレイ / 30 秒 = 保存・コメント</li>
+  <li><strong>TTS 同期 = 尺別固定アンカー + 予算検査</strong>（超過 = ビルドエラー → セリフ修正、第 2 手段 speedScale 上限 1.2）。音声実測でアンカーを動かす可変尺方式は不採用。県名 cue は停止フラッシュに同期</li>
+  <li><strong>パレット正式値 = 候補 A</strong>（17-1 暫定値維持 + 金の沈み対策トークン追加 = プロト <code>palette.ts</code> の <code>wamodernA</code>）。対策の規定: 生成り地上の金の単独使用禁止・文字金は藍 8 方向縁取り + グロー必須・面の金は深金→金→明金グラデ + 藍内側輪郭</li>
+  <li><strong>減光・出典行</strong>: 減光オーバーレイを 3 層構造（全面ベース + 上帯 + 下帯・中央 46〜50%）へ強化、出典行は生成り 86% 角丸帯 + 28px。家計調査ネタの県換算注記は固定要素化</li>
+  <li><strong>キャラ立ち位置 = 日本海側の海域常駐</strong>（論点②「1 位行に被る」の解消）。煽り・実況は五郎の吹き出し（ナレーション cue と同一テキスト・スピン中は点滅）+ ポーズ 3 種切替</li>
+  <li><strong>南西諸島インセットを関東沖へ移設</strong>（実際の相対配置・同一縮尺 0.75 倍を維持。鹿児島 1 位時に本土 + 奄美が同時点灯する挙動を確認済み）。この配置は 17-4 の PD 地図差し替えの素材要件として方式設計書に明記</li>
+  <li><strong>1 位の強調</strong>: 1 位行 96px 高 + 明るい金グラデ + グロー強化・県名バースト 150px + 二重グロー + 66f。順位バッジ・パルスリング・「第1位」朱バッジはモック比較の結果不採用（過剰装飾）</li>
+  <li><strong>全県塗り型（論点⑤）</strong>は方式設計書の付録に骨子のみ収録（実装は定常運用後判断）</li>
+</ul>
+
+<h3 id="r2-2">5.2 巡 2: データモデル・ビルドパイプライン（論点⑦⑧ + テーブル設計）</h3>
+<ul>
+  <li><strong>方式名 = <code>ranking-prebuilt</code></strong>（quiz-prebuilt の命名慣例。代替案 <code>pref-ranking-prebuilt</code> / <code>remotion-prebuilt</code> は不採用）</li>
+  <li><strong><code>ranking_stock_items</code> / <code>ranking_items</code>（V010）</strong>: quiz ペアのパターン踏襲 + 2 尺カラム（<code>video_s3_key_20s</code> / <code>_30s</code>）・<code>ranking_data</code>（言語非依存）・<code>narration</code>（尺別 cue 台本）・<code>content_key</code> = <code>{3 桁連番}-{slug}</code>。履歴側に <code>duration_seconds</code>（尺別効果検証キー）</li>
+  <li><strong>2 尺の持ち方</strong>: スロット固定の <code>parameters.slots[].duration_seconds</code>・LRU は 2 尺共通。<strong>壁打ち中にユーザーから「設計時にプロトを見て尺を決める想定だった」と認識確認があり</strong>、17-1 の記録（2 尺比較）と 17-6 の検証計画（尺仮説は実投稿インサイトでしか検証できない・確定後は勝ち尺のみビルド）を再説明のうえ、<strong>2 尺比較の継続を再確認</strong>した</li>
+  <li><strong>S3・ツーリング</strong>: <code>assets/pref-ranking-1/prebuilt/{content_key}_20s.mp4 / _30s.mp4 / _bg.png</code>・ツーリングは <code>content/video-build/pref-ranking-1/</code>・5 段工程（抽出 → 背景 imagegen → TTS + Remotion 2 本 → 全数レビュー → S3 + 両環境 DB）</li>
+  <li><strong>証跡要件</strong>: 県換算の世帯数静的テーブル（<code>content/ranking-stock/pref-ranking-1/common/</code>。検証 17-3）/ 地図 SVG の PD 差し替え + インセット配置要件（17-4）/ VOICEVOX 本体 + 白上虎太郎規約の証跡ファイル（17-3）</li>
+  <li><strong>英語圏展開の新情報（本巡で判明したユーザー方針）</strong>: 次セット候補として<strong>同内容を英語で発信する海外向けアカウント</strong>を計画中。素材再利用のため<strong>再利用要件 4 点</strong>（背景への文字焼き込み禁止 / 画面文言は props 経由 / TTS アダプタ層 / ネタソース・県換算テーブルの言語非依存保持）を方式設計書に明記した。ツーリングの共通 core 化は英語セット追加時（YAGNI）</li>
+</ul>
+
+<h3 id="r2-3">5.3 巡 3: 運用設計（スケジュール・キャプション・失敗時・補充）</h3>
+<ul>
+  <li><strong>スケジュール = 1 日 2 回（昼 12:30 / 夜 20:00 JST）</strong>。Claude は立ち上げ期の補充負荷（ネタ研究が quiz より重い）から 1 日 1 回・20:00 を推奨したが、<strong>勝負セットとしてペースを優先するユーザー判断で 1 日 2 回を選択</strong>（補充 14 ネタ/週・動画レビュー 28 本/週の負荷を了承のうえ）。夜 20:00 は既存 2 セットの 21:00 と 1 時間ずらす（失敗アラーム対応の重複回避）</li>
+  <li><strong>2 尺検証（17-6）= スロット分離（昼 20 秒 / 夜 30 秒）+ 検証後半のスワップ</strong>（時間帯交絡の打ち消し）。1 日 1 回案では週替わり切替を想定していたが、2 回化によりスロット分離が可能になった</li>
+  <li><strong>キャプション = A 案（結果再掲型）</strong>: quiz 前例のスペーサー構造で TOP5 を再掲し保存価値を作る（B 案 = 動画誘導型〔結果を書かない〕と比較のうえ採用）。ランキング系プレースホルダ 5 種（<code>{{hook}}</code> / <code>{{title}}</code> / <code>{{result_list}}</code> / <code>{{trivia}}</code> / <code>{{source_display}}</code>）を新設し、「VOICEVOX:白上虎太郎」クレジット + 出典注記 + <code>#AIart</code> を常設要素とする</li>
+  <li><strong>失敗時ポリシー = quiz-prebuilt の 3 点セット踏襲</strong> + 尺別在庫判定。設計課題リストの既存 2 件（未投稿 run 滞留・generated_media 0 件）への手当として「Scheduler 有効化前のバックログ 0 件確認」をセット追加チェックリストに明記</li>
+  <li><strong>ストック補充 = 初期 30 ネタ全数ビルド・水位 28 件（2 週間分）・週 1 回 14 ネタ</strong>（巡 3 の Fix 時点は 1 日 1 回前提の数値〔水位 14・週 7〕だったが、頻度確定に伴い同型スケール）。SE なし・BGM は <code>time_slot</code> NULL の汎用曲・<code>stories_enabled=1</code> は設計者判断として設計書に記載しユーザーレビューで確認</li>
+</ul>
 
 </div>
 </body>

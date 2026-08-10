@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セット別設計書: 表彰台五郎の都道府県ランキング | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 表彰台五郎の都道府県ランキング</nav>
+<h1>セット別設計書: 表彰台五郎の都道府県ランキング</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Fix（17-2 で作成）</span>
+  <span>set_code: pref-ranking-1</span>
+  <span>最終更新: 2026-08-10</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  本セット固有の設定・運用情報を記録する（17-2 で作成）。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> を参照し、本書には差分のみ書く（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）。動画フォーマット・事前ビルドの技術設計は方式設計書 <a href="../generators/ranking-prebuilt.html">generators/ranking-prebuilt.html</a> が正。テーマ選定・キャラ・パレット・尺方針の検討経緯は壁打ち記録 <a href="../requirements-notes-set3.html">requirements-notes-set3.html</a> にある。
+</div>
+
+<div class="warn">
+  <span class="callout-title">適用状態</span>
+  17-2（2026-08-10）で設計 Fix した<strong>目標設計</strong>を記述している。DDL 適用・データ整備・初期ストック投入は 17-3、ビルドツーリング + 方式実装は 17-4、アカウント開設・初期 30 ネタのビルド・稼働開始は 17-5、尺・フォーマットの効果検証は 17-6 を予定（<a href="../../development-plan.md">development-plan.md</a> Phase 17）。
+</div>
+
+<h2>1. テーマ</h2>
+<p><strong>都道府県ランキング</strong>（17-1 決定）。統計・調査データに基づく都道府県 TOP5 を、日本地図のルーレット演出で発表する<strong>フルナレーション付き縦型ショート動画</strong>を 1 日 2 回投稿する。進行役は金の 3 段表彰台がボディのお祭り実況キャラ<strong>「表彰台五郎」</strong>（ひょうしょうだいごろう。赤ねじり鉢巻 + ハンドマイク、1 位発表時のみ軍配を掲げる）。ビジュアルは<strong>和モダン</strong>（生成り地 × 藍 × 金。セクション 8）。</p>
+<ul>
+  <li><strong>フォーマットは TOP5 地図ルーレット型</strong>のみ（17-1 巡 1 決定。全県塗り型は第 2 候補として設計骨子のみ = <a href="../generators/ranking-prebuilt.html#appendix-zenken">方式設計書 付録 A</a>）。<strong>下位順位（ワースト）は扱わない</strong>。ネタ選定基準は「下位の県の人が笑って自虐できるか」（<a href="../../strategy/business-strategy.html">事業戦略書セクション 6</a>）</li>
+  <li><strong>尺は 20 秒 / 30 秒の 2 尺</strong>（両方フルナレーション）。各ネタを 2 尺でビルドし、17-6 の比較投稿で勝ち尺を確定する（セクション 3）</li>
+  <li>ネタは<strong>人間レビュー済みのランキングストック（<code>ranking_stock_items</code>）からの取得のみ</strong>。出典実在・県換算の検証は投入時のレビューで担保する（調達・検証・投入の運用は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）。市区町村単位の統計（家計調査等）は<strong>世帯数加重平均で県換算</strong>し、換算した旨を動画の出典行とキャプションに明記する（Phase 17 決定方針）</li>
+</ul>
+<p>動画の作り（タイムライン・版面・ルーレット演出・TTS 同期）は方式設計書（<a href="../generators/ranking-prebuilt.html#composition">generators/ranking-prebuilt.html セクション 8.2〜8.3</a>）を参照。動画は実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く。</p>
+
+<h2>2. 投稿先アカウント構成</h2>
+<p>Instagram プロアカウント 1 件（1 セット 1 アカウント）。<strong>新規開設（17-5 で実施）</strong>。開設手順は <a href="../operation.html#instagram-account-setup">operation.html セクション 5.1</a>。</p>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>プラットフォーム</td><td>Instagram</td></tr>
+<tr><td>Instagram ユーザーネーム</td><td><code>daigoro_ranking</code>（第一候補。空きがなければ末尾に 47 等を付加 = 17-1 巡 3 決定）</td></tr>
+<tr><td>アカウント表示名（<code>sns_accounts.account_name</code>）</td><td>表彰台五郎の都道府県ランキング</td></tr>
+<tr><td><code>account_code</code></td><td><code>main-account</code></td></tr>
+<tr><td>SNS 認証 Secret</td><td><code>acps/prod/pref-ranking-1/sns/instagram/main-account</code></td></tr>
+<tr><td>Meta アプリ</td><td>既存アプリを流用（15-7 の前例踏襲）。トークン実効期限は全セット共通で <code>data_access_expires_at</code>（<a href="../operation.html#token-refresh">operation.html セクション 5.4</a>）</td></tr>
+</table>
+</div>
+<p><strong>投稿はリール + ストーリーズの 2 本立て</strong>（<code>batch_sets.stories_enabled=1</code>。既存勝負セットの踏襲）。リール成功後に同一 MP4 をストーリーズへ再掲する（キャプションなし。<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。</p>
+
+<h2>3. スケジュール（投稿頻度）</h2>
+<p><strong>1 日 2 回（昼 12:30 / 夜 20:00 JST）</strong>（17-2 巡 3 のユーザー決定）。勝負セットとして投稿ペースを優先しつつ、ネタ供給（出典検証・県換算込みの週 14 ネタ補充 + 動画レビュー）が人間レビューの負荷上限に収まる頻度とした。生成費は 0 円のため頻度のコスト制約はない（<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>）。伸びた場合の増便は定常運用後に判断する。</p>
+<p>どのスロットとして実行するかは<strong>実行時刻（<code>SCHEDULED_AT</code> の JST 時）から決定的に解決</strong>する（<a href="../generators/ranking-prebuilt.html#parameters">方式設計書セクション 3</a>）。スロットは<strong>投稿する尺（<code>duration_seconds</code>）</strong>を切り替える（クイズ方式のような型・難度・BGM・配色の切替はない）。</p>
+<div class="table-wrap">
+<table>
+<tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻</th><th>Scheduler 名 / cron 式</th><th><code>duration_seconds</code>（検証期）</th></tr>
+<tr><td><code>noon</code></td><td>4:00〜16:59</td><td>12:30</td><td><code>acps-prod-image-generation-pref-ranking-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td><strong>20</strong>（完走率・リプレイ仮説）</td></tr>
+<tr><td><code>evening</code></td><td>17:00〜3:59</td><td>20:00</td><td><code>acps-prod-image-generation-pref-ranking-1-evening</code><br><code>cron(0 20 * * ? *)</code></td><td><strong>30</strong>（保存・コメント仮説）</td></tr>
+</table>
+</div>
+<div class="warn">
+  <span class="callout-title">スケジュール時刻を変えるときはスロット境界を必ず確認する</span>
+  Scheduler の Input にスロット・尺は持たせていない（時刻だけがスロットの指定）。<code>from_jst_hour</code> の境界（4 時 / 17 時）をまたいで時刻を変更すると<strong>実行されるスロット = 投稿される尺が変わる</strong>。命名規約と運用手順は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> / <a href="../operation.html#set-add">operation.html セクション 2.1 手順 3</a>。
+</div>
+<ul>
+  <li>夜を既存 2 セット（logic-training-1 / fantasy-animals-1 = ともに 21:00）と<strong>同時刻にせず 20:00 とした</strong>のは、失敗アラーム発生時の対応が 3 セット同時に重ならないようにする運用上の判断（技術上は同時刻でも <code>set_code</code> で分離される = 15-15 決定と同じ）。昼 12:30 は logic-training-1 の noon と同時刻だが、同様に問題ない</li>
+  <li><strong>インサイト収集 Scheduler</strong> はセット追加時に 2 件（<code>acps-prod-insights-collection-pref-ranking-1-{morning|evening}</code>。06:00 / 18:00 JST・全セット共通）を InsightsBatchStack へ追加する（<a href="../../infra/workflow.html">infra/workflow.html セクション 1.6</a>。17-5 のアカウント開設・稼働開始時に実施）</li>
+</ul>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-10、17-2 巡 3）: 2 尺検証（17-6）の回し方 = スロット分離 + 後半スワップ</span>
+  検証期（17-6）は上表のとおり<strong>昼 = 20 秒 / 夜 = 30 秒のスロット分離</strong>で比較する（各ネタはどちらか一方の尺・スロットで投稿され、LRU が 2 尺共通のため同一ネタの両尺が近接投稿されることはない = <a href="../generators/ranking-prebuilt.html#stock">方式設計書セクション 4</a>）。投稿時間帯の違いが尺の効果と交絡するため、<strong>検証の後半で尺の割当をスワップ（昼 = 30 / 夜 = 20）</strong>して打ち消す。切替は <code>prompt_configs.parameters</code> の UPDATE のみで行える。検証期間・判定指標（完走率・リプレイ・保存・コメントのどれを主指標にするか）の詳細は 17-6 で最終化する。<strong>尺確定後は両スロットを勝ち尺へ UPDATE し、以降のビルドは勝ち尺のみ</strong>とする（<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）。
+</div>
+
+<h2>4. プロンプトの作り方</h2>
+<p><strong>ストック方式のため <code>prompt_configs.prompt_text</code> は未使用</strong>（logic-training-1 の 16-1 以降と同じ扱い。NULL 相当の空文言で登録する）。実行時に使われるのは <code>parameters</code>（スロット定義と尺）のみで、コンテンツはランキングストック（<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）が担う。</p>
+<p>登録する <code>prompt_configs.parameters</code>（キー仕様は <a href="../generators/ranking-prebuilt.html#parameters">方式設計書セクション 3</a>）:</p>
+<pre><code>{
+  "slots": [
+    {"from_jst_hour": 4,  "slot_code": "noon",    "duration_seconds": 20},
+    {"from_jst_hour": 17, "slot_code": "evening", "duration_seconds": 30}
+  ]
+}</code></pre>
+<p><strong>背景イラストの imagegen プロンプト方針</strong>（ビルド時。<a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 工程 2</a>）: ネタごとの <code>content_fields.bg_motif</code>（テーマに沿った背景モチーフの指示文。例: 餃子と湯気の屋台風モチーフ）に、セット共通の<strong>画風固定行</strong>を付けて生成する。画風固定行の要件: ①和モダン（生成り地・藍・金の落ち着いた配色でセクション 8 のパレットと調和）②フラットイラスト調・写実禁止 ③版面の文字を邪魔しない低コントラストの装飾密度 ④<strong>文字・数字・記号を描かない</strong>（<a href="../generators/ranking-prebuilt.html#build-steps">再利用要件①</a>）⑤9:16 のサイズ明示。文言の確定は 17-4 のツーリング実装時に行い、ツーリング内のプロンプトテンプレートを正とする。背景モチーフは<strong>ネタのテーマ由来</strong>であり、固定の和風装飾を常設するものではない（17-1 決定の記録どおり）。</p>
+
+<h2>5. キャプションの作り方</h2>
+<p><strong>テンプレート + ランキングデータの動的組み立て方式</strong>。<code>caption_templates.template_text</code> にランキング系プレースホルダ（<code>{{hook}}</code> / <code>{{title}}</code> / <code>{{result_list}}</code> / <code>{{trivia}}</code> / <code>{{source_display}}</code>）を含むテンプレートを 1 件登録し、SNS 投稿バッチが投稿時に当該実行の <code>ranking_items</code> から展開する（展開規則は <a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>、テーブル仕様は <a href="../data-model.html#detail-ranking-items">data-model.html セクション 4.12</a>）。</p>
+<p>登録するテンプレート（17-2 巡 3 で構造 Fix〔A 案 = 結果再掲型〕。文言の最終調整は 17-5 の登録時に行ってよいが、以下の構成要素は必須）:</p>
+<pre><code>{{hook}}
+結果はこの下👇（ネタバレ注意）
+・
+・
+・
+・
+・
+【{{title}} TOP5】
+{{result_list}}
+
+{{trivia}}
+
+※出典:{{source_display}}
+
+VOICEVOX:白上虎太郎
+#都道府県ランキング #47都道府県 #雑学 #地理 #トリビア #AIart</code></pre>
+<ul>
+  <li><strong>冒頭 1〜2 行はフィード・リール面でプレビュー表示される</strong>ため、1 行目は <code>hook</code>（つかみコピー）、2 行目はネタバレ注意の誘導とし、結果は「続きを読む」の折りたたみ以下（中黒スペーサーの下）に置く（logic-training-1 の 16-1 設計と同じ構造）</li>
+  <li><strong>TOP5 の結果をキャプションにも再掲</strong>する（<code>{{result_list}}</code> = 順位・県名・数値 + 単位の 5 行。キャプション単体で結果が完結し、<strong>保存の価値</strong>を持たせる。17-2 巡 3 で「動画誘導型（結果を書かない）」と比較のうえ採用）</li>
+  <li><strong>必須の常設要素 3 点</strong>: ①<strong>「VOICEVOX:白上虎太郎」のクレジット</strong>（VOICEVOX・キャラクター利用規約のクレジット表記義務。17-1 巡 2.3 決定の具体化。セクション 7）②<strong>出典注記</strong>（<code>{{source_display}}</code> = 出典名・データ年 + 県換算したネタは「（県庁所在市・政令市の世帯数加重平均で県換算）」の類の注記を含む文字列。ストック投入時に執筆する）③AI 開示ハッシュタグ <strong><code>#AIart</code></strong>（14-4 決定の全セット共通ルール）</li>
+  <li>ハッシュタグは固定（動的タグは使わない。logic-training-1 と同じ判断）</li>
+  <li><strong>ストーリーズ投稿にはキャプションを付けない</strong>（Graph API の制約。<code>posts</code> のストーリーズ行はキャプション系カラム NULL のまま）。クレジット表記はリール本体のキャプションで担保される（ストーリーズは同一動画の再掲でありリールへの導線が残る）</li>
+</ul>
+
+<h2 id="audio">6. 音源の構成</h2>
+<p>BGM は<strong>スロット共通の汎用曲 3〜5 曲</strong>を <code>audio_assets</code>（<code>time_slot = NULL</code> / <code>asset_type='bgm'</code>）に登録する（調達・前処理・証跡は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a> の共通ルール。S3 キーは <code>audio/pref-ranking-1/{ファイル名}.m4a</code>。調達は 17-5）。選曲はビルド時の LRU ローテーション（1 ネタ 1 曲・2 尺共通・<code>video_audio_asset_id</code> に記録 = <a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 工程 3</a>）。<strong>実行時は <code>audio_assets</code> を使わない</strong>。</p>
+<div class="decision">
+  <span class="callout-title">決定（17-2 巡 3、設計者判断）: SE は初期構成では使わない</span>
+  クイズ方式の SE 2 種（カウントダウン・チャイム）に相当する効果音は初期構成に含めない。<strong>スピン停止・1 位発表の強調は映像演出（停止フラッシュ・バースト・キャラのポーズ切替）とナレーションの実況が担う</strong>ため。ナレーション + BGM + SE の 3 層は音のミキシング調整コストも上がる。17-4 の実装・レビューで「発表の瞬間に音の区切りが欲しい」と判明した場合は、quiz 前例の <code>asset_type='se'</code> + 固定ファイル名方式で追加する（構造は既存のまま使える）。
+</div>
+<p>BGM はナレーションを妨げない音量にビルド時のミキシングで調整する（ダッキングの要否・具体値は 17-4 で確定し、方式設計書に追記する）。曲の差し替えは既ビルド動画に反映されないため再ビルドが必要（<a href="../generators/ranking-prebuilt.html#rebuild">方式設計書セクション 8.4</a>）。</p>
+
+<h2 id="tts">7. ナレーション・TTS（VOICEVOX 白上虎太郎）</h2>
+<p>ナレーションは <strong>VOICEVOX（無料・商用利用可・ローカル Docker 実行）の話者「白上虎太郎」</strong>で合成する（17-1 巡 2.3 決定。元気なお祭り実況キャラ = 五郎の声として選定）。セリフは cue 単位でストック行の <code>narration</code> JSON に持ち、タイムライン定数への同期・予算検査の機構は <a href="../generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3</a> を正とする。</p>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th></tr>
+<tr><td>エンジン</td><td>VOICEVOX Engine（ローカル Docker。バージョン固定は 17-4 のツーリングで管理）</td></tr>
+<tr><td>話者</td><td>白上虎太郎（スタイルは 17-1 の音声サンプル確認どおり。スタイル ID の確定値は 17-4 のツーリング設定を正とする）</td></tr>
+<tr><td>既定パラメータ</td><td>話速 <code>speedScale = 1.1</code> / 抑揚 <code>intonationScale = 1.2</code>（17-2 巡 1 Fix）。予算超過時の話速引き上げは<strong>上限 1.2</strong>（第一の対処はセリフ修正 = 方式設計書セクション 8.3）</td></tr>
+<tr><td>クレジット表記</td><td><strong>「VOICEVOX:白上虎太郎」をキャプションに常設</strong>（セクション 5。VOICEVOX 利用規約が求める「VOICEVOX:キャラクター名」形式）</td></tr>
+</table>
+</div>
+<ul>
+  <li><strong>規約証跡（17-3 で整備）</strong>: VOICEVOX 本体の利用規約と白上虎太郎（キャラクター）の利用規約について、確認日・参照 URL・許諾範囲（商用可・クレジット形式）の記録を<strong>証跡ファイルとしてビルドツーリング内（<code>content/video-build/pref-ranking-1/</code>）に git 管理で残す</strong>（音源のライセンス証跡と同じ考え方。ただし合成音声は <code>audio_assets</code> のレコードにしないため、証跡の置き場をツーリング側とする）</li>
+  <li>合成したナレーション音声は動画にベイクされ、単体では保存・DB 管理しない（再ビルドで再合成できるため。ビルド中間物の扱い）</li>
+</ul>
+
+<h2 id="assets">8. 固定アセット・デザイントークン</h2>
+<p><strong>表彰台五郎のポーズ 3 種</strong>を固定アセットとして S3 に置き、ビルドツーリングのレンダラーが読み込む（<a href="../data-model.html#s3-key">data-model.html セクション 5</a> の固定アセット規約。ファイル名はツーリング側で固定）。17-1 で透過 PNG 3 種を試作済み（<code>plans/17-1-trial/</code>）。正式アセット化（共通キャンバス・共通倍率での正規化 = logic-training-1 の 15-13 と同じ手法）は 17-4 で行う。</p>
+<div class="table-wrap">
+<table>
+<tr><th>用途</th><th>S3 キー</th><th>ポーズ</th><th>表示区間</th></tr>
+<tr><td>基本（実況）</td><td><code>assets/pref-ranking-1/goro_basic.png</code></td><td>ハンドマイクで実況</td><td>常時（下記 2 区間以外）</td></tr>
+<tr><td>タメ</td><td><code>assets/pref-ranking-1/goro_tame.png</code></td><td>身をかがめて溜める</td><td>1 位のスピン（タメ）中</td></tr>
+<tr><td>軍配</td><td><code>assets/pref-ranking-1/goro_gunbai.png</code></td><td>軍配（瓢箪型 + 朱房紐）を掲げる</td><td>1 位発表後〜締め</td></tr>
+</table>
+</div>
+<ul>
+  <li><strong>配置（17-2 巡 1 Fix）</strong>: 五郎は<strong>日本海側の海域に常駐</strong>させる（地図と重ならない位置。コンポジション座標 <code>left:56 / top:392 / width:300</code>）。吹き出し（実況テキスト = ナレーション cue と同一。フォントサイズ 54px）を隣接表示し、スピン中は点滅させる</li>
+  <li><strong>キャラデザインの制約（17-1 巡 3 決定）</strong>: 3 段表彰台の段差シルエットがキャラの識別子のため、<strong>段差を隠す衣装・ポーズは禁止</strong>。軍配は 1 位発表時のみ</li>
+  <li><strong>地図 SVG</strong>: S3 の固定アセットではなく<strong>コンポジションのコード資材（パスデータ）として git 管理</strong>する。現行はプロトの GFDL 由来素材のため、<strong>17-4 で PD 素材へ差し替える</strong>（素材要件・インセット配置値は <a href="../generators/ranking-prebuilt.html#composition">方式設計書セクション 8.2 の warn</a> が正）</li>
+</ul>
+<p><strong>デザイントークン（パレット正式値）</strong>。17-2 巡 1 で候補 A（17-1 暫定値 + 金の沈み対策トークン）を正式値として Fix した。検証プロト <code>palette.ts</code> の <code>wamodernA</code> と同値であり、17-4 で本組みコードへ移植した時点でコードを正とする。</p>
+<div class="table-wrap">
+<table>
+<tr><th>トークン</th><th>値</th><th>用途</th></tr>
+<tr><td><code>bgTop</code> / <code>bgBottom</code></td><td><code>#F6F0E1</code> / <code>#EFE4CC</code></td><td>生成りの地色グラデーション</td></tr>
+<tr><td><code>text</code> / <code>sub</code></td><td><code>#24304E</code> / <code>#6E6656</code></td><td>本文（藍）/ 補助テキスト</td></tr>
+<tr><td><code>accent</code> / <code>goldDeep</code></td><td><code>#D9A62E</code> / <code>#C08618</code></td><td>金アクセント / 面の金グラデ深色側（沈み対策）</td></tr>
+<tr><td><code>ink</code></td><td><code>#24304E</code></td><td>縁取り・輪郭線（文字金の 8 方向縁取りに使用）</td></tr>
+<tr><td><code>keyword</code></td><td><code>#C73E3A</code></td><td>朱（強調語）</td></tr>
+<tr><td><code>rowBg</code> / <code>barBase</code></td><td><code>rgba(36,48,78,0.08)</code> / <code>#56679C</code></td><td>順位行の地 / バー基調</td></tr>
+<tr><td><code>bubbleBg</code> / <code>bubbleBorder</code> / <code>bubbleText</code></td><td><code>#FFFDF5</code> / <code>#24304E</code>（= ink） / <code>#C73E3A</code></td><td>吹き出し（地 / 枠 / 文字）</td></tr>
+<tr><td><code>sourceBandBg</code></td><td><code>rgba(246,240,225,0.86)</code></td><td>出典行の角丸帯（86% 生成り）</td></tr>
+<tr><td><code>backgroundOverlay</code></td><td>上帯 87% → 中央 46〜50% → 下帯 87% の 3 層減光（実値はプロトの linear-gradient）</td><td>背景イラストの減光（17-2 巡 1 Fix）</td></tr>
+<tr><td><code>map.revealedFill</code></td><td>1 位 <code>#D9A62E</code> / 2 位 <code>#6B81C4</code> / 3 位 <code>#5A70AB</code> / 4 位 <code>#52659D</code> / 5 位 <code>#46598F</code></td><td>確定県の塗り（1 位のみ金・2〜5 位は藍の階調）</td></tr>
+<tr><td><code>map.litFill</code> / <code>litStroke</code> / <code>litGlow</code></td><td><code>#D9A62E</code> / <code>#F4D77D</code> / <code>rgba(217,166,46,0.72)</code></td><td>スピン中の点灯県</td></tr>
+<tr><td><code>map.baseFill</code> / <code>baseStroke</code></td><td><code>rgba(36,48,78,0.06)</code> / <code>rgba(36,48,78,0.5)</code></td><td>未確定県の地図</td></tr>
+</table>
+</div>
+<p>金の使用規定（生成り地上の金の単独使用禁止・縁取り / グラデ必須）は<a href="../generators/ranking-prebuilt.html#composition">方式設計書セクション 8.2 の decision</a> を正とする。</p>
+
+<h2>9. 失敗時ポリシー</h2>
+<p>共通の失敗時ポリシー（<a href="../operation.html#failure">operation.html セクション 4</a>）に準拠する。本セット固有の注意点は以下（<code>quiz-prebuilt</code> 採用セットの 3 点セットを踏襲 + 尺別の在庫判定）。<strong>実行時の失敗要因は「ストック選定 + 事前動画取得 + 投稿」だけ</strong>で、生成起因の障害はビルド時のローカル作業へ移っている。</p>
+<ul>
+  <li><strong>当該尺のビルド済みストック 0 件（有効かつスロットの尺の <code>video_s3_key_20s</code> / <code>_30s</code> が非 NULL の行なし）は異常終了</strong>し、その回は投稿しない（フェイルラウド。<a href="../generators/ranking-prebuilt.html#stock">方式設計書セクション 4</a>）。取得した行のフィールド不備（必須欠落・<code>ranking_data</code> の構造不正）も同様に異常終了（キャプション展開の入力保護）</li>
+  <li><strong>未使用ストックが尽きた場合は利用済みストックを LRU で再利用</strong>する（投稿は止まらない。<strong>同一動画の再投稿になる点は許容</strong>・再利用時は WARNING ログ = 補充遅延のサイン。水位を守っていれば発生しない = <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
+  <li><strong>事前動画の S3 欠落（DB はビルド済みなのに実体なし）は縮退せず異常終了</strong>（DB と S3 の不整合の検知。別の尺・別のネタへの差し替えはしない）</li>
+  <li><strong>ストーリーズ投稿の失敗はリールの success を巻き戻さない</strong>。終端状態で確定した投稿失敗の検知は ECS タスク異常終了通知が担う（<a href="../batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a>）</li>
+  <li>1 日 2 回のため、1 回の失敗はその日の当該スロット分の欠落に留まる（もう 1 スロットは独立に動く）。当日リカバリの手順・判断基準は共通課題（<a href="../../development-plan.md">development-plan.md</a> 設計課題リスト 2026-07-26）に従う</li>
+</ul>
+
+<h2>10. 共通フローからの差分・特記事項</h2>
+<p><strong>使用方式は <code>ranking-prebuilt</code></strong>（<a href="../generators/ranking-prebuilt.html">generators/ranking-prebuilt.html</a>。Remotion ローカル事前ビルド + 実行時は取得のみ）。本セットは共通テーブルのうち <code>ranking_stock_items</code>（ランキングストック）と <code>ranking_items</code>（投稿履歴）を使う唯一のセットである（<a href="../data-model.html#detail-ranking-items">data-model.html セクション 4.12 / 4.13</a>）。SNS 投稿バッチ側の差分は<strong>ランキング系プレースホルダのキャプション動的組み立て</strong>（17-2 設計・17-4 実装。<a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>）と<strong>ストーリーズ連続投稿</strong>（既存機構）。</p>
+<ul>
+  <li><strong>2 尺運用</strong>: 検証期は各ネタを 20 秒 / 30 秒の 2 本ビルドし、スロットが尺を決める（セクション 3）。尺確定後は勝ち尺のみビルド</li>
+  <li><strong>英語圏展開の布石</strong>: 次セット候補として同内容の英語版アカウントが計画されているため、素材・データの言語分離（再利用要件 4 点）を方式実装の必須要件としている（<a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 の decision</a>）。本書の範囲では「<code>ranking_data</code>（言語非依存）と表示文言（<code>content_fields</code> / <code>narration</code> = 言語依存）の分離」がその土台になる</li>
+  <li><strong>17-4 での主な残作業（設計済み・実装待ち）</strong>: 地図 SVG の PD 差し替え（セクション 8）・五郎アセットの正式化・背景画風行と BGM ミキシングの確定・キャプションのランキング系プレースホルダ実装</li>
+</ul>
+
+</div>
+</body>
+</html>
