@@ -139,7 +139,13 @@
   "media_lookback_days": "14"
 }</code></pre>
 
-<p>スケジュール一覧（実値。CDK <a href="../../infra/lib/insights-batch-stack.ts">insights-batch-stack.ts</a> が単一の正。State はすべて <code>ENABLED</code>）:</p>
+<p>スケジュール一覧（実値。CDK <a href="../../infra/lib/insights-batch-stack.ts">insights-batch-stack.ts</a> が単一の正）:</p>
+
+<div class="decision">
+  <span class="callout-title">16-11 の再認可が済むまで全 4 件を DISABLED（2026-08-10）</span>
+  16-10 のデプロイ直後は <code>ENABLED</code> で作成したが、<strong>16-11 の <code>instagram_manage_insights</code> 再認可を当日中に実施できないことが確定したため、ユーザー決定で全 4 件を停止した</strong>（未再認可のまま定時実行を迎えると権限エラーで失敗アラームが鳴り続けるため）。
+  コンソール・CLI での手動 DISABLE ではなく <strong>CDK の <code>insightsCollectionSchedulesEnabled</code> フラグを <code>false</code> にして deploy</strong> している（セクション 1.5 の「Scheduler は CDK を単一の正とする」decision に従う。手動 DISABLE は次の <code>cdk deploy</code> で無言のうちに解除されるため）。<strong>16-11 の疎通確認が通った時点でフラグを <code>true</code> に戻して deploy する</strong>（あわせて <code>infra/test/insights-batch-stack.test.ts</code> の State 期待値も更新する）。
+</div>
 <div class="table-wrap">
 <table>
   <thead><tr><th>Schedule 名</th><th>cron 式</th><th>JST 時刻</th><th>Input の <code>set_code</code></th></tr></thead>

@@ -1024,7 +1024,7 @@
 
     **(4) デプロイ後の検証**: Scheduler 4 件すべて `ENABLED`、SFN `ACTIVE`（STANDARD）、TaskDef rev 1（256 / 512 / 正しい image URI）、`acps-prod-insights` プレフィックスのアラーム 7 件が存在（`acps-prod` 全体で 18 件）、DLQ・CodePipeline も作成済み。5 スタックすべて CREATE / UPDATE_COMPLETE。
 
-    **(5) 稼働開始の注意**: デプロイ完了時点で Scheduler が有効なため、**16-11 の `instagram_manage_insights` 再認可が未了のまま定時実行を迎えると権限エラーで失敗アラームが鳴る**（デプロイは 2026-08-10 09:11 JST 完了 = 次の定時実行は同日 18:00 JST）。16-11 を当日中に実施する前提で ENABLED のままとした。次は **16-11（再認可・稼働確認・バックフィル。ユーザー作業主体）**。
+    **(5) デプロイ後に Scheduler を全件 DISABLED へ変更**（同日 09:50 JST）: デプロイ完了時点では設計どおり `ENABLED` だったが、**16-11 の `instagram_manage_insights` 再認可を当日中（次の定時実行 = 18:00 JST まで）に実施できないことが確定したため、ユーザー決定で 4 件とも停止した**（未再認可のまま実行すると権限エラーで失敗アラームが鳴り続けるため）。停止は**コンソール・CLI の手動 DISABLE ではなく CDK 側**で行った — `insights-batch-stack.ts` に `insightsCollectionSchedulesEnabled` フラグを置いて `false` にし `cdk deploy`（差分は Scheduler 4 件の `State` のみ）。理由は [workflow.html](infra/workflow.html) セクション 1.5 の「Scheduler は CDK を単一の正とする」decision で、手動 DISABLE は次の `cdk deploy` で無言のうちに解除されるという既知の落とし穴（設計課題リスト 2026-07-26 の項）を避けるため。テスト側にも State = `DISABLED` の期待値を入れてあるので、**16-11 でフラグを `true` に戻す際はテストの期待値もセットで更新する**。次は **16-11（再認可・稼働確認・バックフィル。ユーザー作業主体）**。
 
 ## 設計課題リスト（解消済み）
 
