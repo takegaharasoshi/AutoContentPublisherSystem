@@ -118,6 +118,23 @@ def short_wav() -> bytes:
     return output.getvalue()
 
 
+def test_engine_id_covers_speaker_and_intonation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """抑揚を変えたら別の識別子になる（= 合成キャッシュが無効になる）。"""
+
+    def urlopen(request: object, timeout: float) -> StubResponse:
+        return StubResponse(b'"0.24.1"')
+
+    monkeypatch.setattr(tts.urllib.request, "urlopen", urlopen)
+    assert tts.VoicevoxEngine(intonation_scale=1.9).engine_id == (
+        "voicevox/0.24.1/speaker12/int1.9"
+    )
+    assert tts.VoicevoxEngine(intonation_scale=1.2).engine_id != (
+        tts.VoicevoxEngine(intonation_scale=1.9).engine_id
+    )
+
+
 def test_voicevox_engine_rejects_query_and_wav_duration_mismatch(
     queries: dict[str, dict[str, object]], monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:

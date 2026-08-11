@@ -120,4 +120,4 @@ WHERE b.set_code = 'pref-ranking-1' ORDER BY r.content_key;
 
 - **WSL には Chrome の共有ライブラリが無く、Remotion のレンダリングは Docker 経由が必須**
 - 背景画像が 2MB 級の PNG だとフォント読み込みが `delayRender` タイムアウトする。**JPEG 化 + `--concurrency=3` + `--timeout` 延長**で安定
-- VOICEVOX は `voicevox/voicevox_engine:cpu-ubuntu20.04-latest`・**話者 ID 12（白上虎太郎・ふつう）**・`speedScale=1.2`（17-4d 改定。17-3 時点は 1.1）/ `intonationScale=1.2`
+- VOICEVOX は `voicevox/voicevox_engine:cpu-ubuntu20.04-latest`・**話者 ID 12（白上虎太郎・ふつう）**・`speedScale=1.2` / `intonationScale=1.9`（いずれも 17-4d 改定。17-3 時点は 1.1 / 1.2）

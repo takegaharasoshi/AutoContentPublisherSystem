@@ -21,6 +21,13 @@ class TtsError(RuntimeError):
 # 疑問形 cue）だったため、実測の最大値に少し余裕を持たせた値にしている。
 LENGTH_TOLERANCE_SECONDS = 0.08
 
+DEFAULT_INTONATION_SCALE = 1.9
+"""抑揚。17-4d でユーザーが 6 案（抑揚 1.5〜1.9 × 音高 0 / +0.03）の実音声を比較して選定した値。
+
+既定の 1.2 は棒読みに聞こえるとの判断（セット別設計書 pref-ranking-1.html セクション 7）。
+話者・話速とあわせて ``engine_id`` に載せ、変えたら合成キャッシュが無効になるようにしている。
+"""
+
 
 @dataclass(frozen=True)
 class CueRequest:
@@ -131,7 +138,7 @@ class VoicevoxEngine:
         self,
         base_url: str = "http://127.0.0.1:50021",
         speaker: int = 12,
-        intonation_scale: float = 1.2,
+        intonation_scale: float = DEFAULT_INTONATION_SCALE,
         fps: int = 30,
         timeout: float = 60.0,
     ) -> None:
@@ -144,12 +151,15 @@ class VoicevoxEngine:
 
     @property
     def engine_id(self) -> str:
-        """VOICEVOX のバージョンを初回だけ取得して識別子を返す。"""
+        """VOICEVOX のバージョンを初回だけ取得して合成条件の識別子を返す。"""
         if self._engine_id is None:
             version = self._request_json("GET", "/version")
             if not isinstance(version, str):
                 raise TtsError("VOICEVOX Engine のバージョン応答が不正です。")
-            self._engine_id = f"voicevox/{version}/speaker{self.speaker}"
+            self._engine_id = (
+                f"voicevox/{version}/speaker{self.speaker}"
+                f"/int{self.intonation_scale:g}"
+            )
         return self._engine_id
 
     def synthesize(

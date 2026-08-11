@@ -9,7 +9,14 @@ import sys
 from typing import Any, Mapping, TextIO
 
 import build_timeline
-from tts import CueAudio, CueRequest, TtsEngine, TtsError, VoicevoxEngine
+from tts import (
+    DEFAULT_INTONATION_SCALE,
+    CueAudio,
+    CueRequest,
+    TtsEngine,
+    TtsError,
+    VoicevoxEngine,
+)
 
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
@@ -315,6 +322,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--speed", type=float, default=DEFAULT_SPEED_SCALE, help="既定話速")
     parser.add_argument("--engine", default="http://127.0.0.1:50021", help="VOICEVOX Engine URL")
     parser.add_argument("--speaker", type=int, default=12, help="VOICEVOX 話者 ID")
+    parser.add_argument(
+        "--intonation",
+        type=float,
+        default=DEFAULT_INTONATION_SCALE,
+        help="抑揚（変えると合成キャッシュは無効になる）",
+    )
     parser.add_argument("--out", type=Path, help="解決済み props の出力先")
     parser.add_argument("--name", help="public/narration/ 配下の出力名")
     parser.add_argument("--force", action="store_true", help="キャッシュを使わず全 cue を再合成")
@@ -328,7 +341,7 @@ def main(
     """CLI 引数を解釈し、利用者向けエラーを表示して終了コードを返す。"""
     args = _parser().parse_args(argv)
     selected_engine = engine or VoicevoxEngine(
-        base_url=args.engine, speaker=args.speaker
+        base_url=args.engine, speaker=args.speaker, intonation_scale=args.intonation
     )
     try:
         return build_narration(
