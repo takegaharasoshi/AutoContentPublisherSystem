@@ -148,26 +148,30 @@ VOICEVOX:白上虎太郎
 </table>
 </div>
 <ul>
-  <li><strong>配置（17-2 巡 1 Fix）</strong>: 五郎は<strong>日本海側の海域に常駐</strong>させる（地図と重ならない位置。コンポジション座標 <code>left:56 / top:392 / width:300</code>）。吹き出し（実況テキスト = ナレーション cue と同一。フォントサイズ 54px）を隣接表示し、スピン中は点滅させる</li>
+  <li><strong>配置（17-2 巡 1 Fix）</strong>: 五郎は<strong>日本海側の海域に常駐</strong>させる（地図と重ならない位置。コンポジション座標 <code>left:26 / top:424 / width:336</code>〔17-4a で更新〕）。吹き出し（実況テキスト。フォントサイズ 48px）を隣接表示し、スピン中は点滅させる</li>
   <li><strong>キャラデザインの制約（17-1 巡 3 決定）</strong>: 3 段表彰台の段差シルエットがキャラの識別子のため、<strong>段差を隠す衣装・ポーズは禁止</strong>。軍配は 1 位発表時のみ</li>
   <li><strong>地図 SVG</strong>: S3 の固定アセットではなく<strong>コンポジションのコード資材（パスデータ）として git 管理</strong>する。現行はプロトの GFDL 由来素材のため、<strong>17-4 で PD 素材へ差し替える</strong>（素材要件・インセット配置値は <a href="../generators/ranking-prebuilt.html#composition">方式設計書セクション 8.2 の warn</a> が正）</li>
 </ul>
-<p><strong>デザイントークン（パレット正式値）</strong>。17-2 巡 1 で候補 A（17-1 暫定値 + 金の沈み対策トークン）を正式値として Fix した。検証プロト <code>palette.ts</code> の <code>wamodernA</code> と同値であり、17-4 で本組みコードへ移植した時点でコードを正とする。</p>
+<p><strong>デザイントークン（パレット正式値）</strong>。17-4a の版面デザイン工程で <code>wamodernA</code>（生成り × <strong>藍</strong> × 朱 × 金）から<strong>もう一色を藍 → 淡墨茶へ差し替えて Fix</strong> した。生成り・金・朱は据え置き。実装は <code>content/video-build/pref-ranking-1/remotion/src/theme.ts</code> が正で、下表はその写し。</p>
+<div class="callout decision">
+  <strong>決定（2026-08-11、17-4a）: もう一色を藍 → 淡墨茶へ差し替える</strong>
+  <p>17-2 で Fix した藍（<code>#24304E</code>）は、実データ + 実背景で組んだ版面では生成り地に合わないというユーザー判断（17-4a 第 2 巡）。えんじ（深紅）・松葉（深緑）・墨茶の 3 案 → 墨茶の明度 3 段の比較を経て<strong>淡墨茶</strong>を採用した。香色（さらに 1 段明るい黄茶）まで明るくすると生成りと同系になり、帯・順位バッジの締まりと確定県の判別性が落ちる。</p>
+</div>
 <div class="table-wrap">
 <table>
 <tr><th>トークン</th><th>値</th><th>用途</th></tr>
-<tr><td><code>bgTop</code> / <code>bgBottom</code></td><td><code>#F6F0E1</code> / <code>#EFE4CC</code></td><td>生成りの地色グラデーション</td></tr>
-<tr><td><code>text</code> / <code>sub</code></td><td><code>#24304E</code> / <code>#6E6656</code></td><td>本文（藍）/ 補助テキスト</td></tr>
-<tr><td><code>accent</code> / <code>goldDeep</code></td><td><code>#D9A62E</code> / <code>#C08618</code></td><td>金アクセント / 面の金グラデ深色側（沈み対策）</td></tr>
-<tr><td><code>ink</code></td><td><code>#24304E</code></td><td>縁取り・輪郭線（文字金の 8 方向縁取りに使用）</td></tr>
-<tr><td><code>keyword</code></td><td><code>#C73E3A</code></td><td>朱（強調語）</td></tr>
-<tr><td><code>rowBg</code> / <code>barBase</code></td><td><code>rgba(36,48,78,0.08)</code> / <code>#56679C</code></td><td>順位行の地 / バー基調</td></tr>
-<tr><td><code>bubbleBg</code> / <code>bubbleBorder</code> / <code>bubbleText</code></td><td><code>#FFFDF5</code> / <code>#24304E</code>（= ink） / <code>#C73E3A</code></td><td>吹き出し（地 / 枠 / 文字）</td></tr>
-<tr><td><code>sourceBandBg</code></td><td><code>rgba(246,240,225,0.86)</code></td><td>出典行の角丸帯（86% 生成り）</td></tr>
-<tr><td><code>backgroundOverlay</code></td><td>上帯 87% → 中央 46〜50% → 下帯 87% の 3 層減光（実値はプロトの linear-gradient）</td><td>背景イラストの減光（17-2 巡 1 Fix）</td></tr>
-<tr><td><code>map.revealedFill</code></td><td>1 位 <code>#D9A62E</code> / 2 位 <code>#6B81C4</code> / 3 位 <code>#5A70AB</code> / 4 位 <code>#52659D</code> / 5 位 <code>#46598F</code></td><td>確定県の塗り（1 位のみ金・2〜5 位は藍の階調）</td></tr>
+<tr><td><code>cream</code> / <code>creamDeep</code></td><td><code>#F6F0E1</code> / <code>#EFE4CC</code></td><td>生成りの地色グラデーション</td></tr>
+<tr><td><code>sumiDeep</code> / <code>sumiBase</code></td><td><code>#544A3C</code> / <code>#63594A</code></td><td>淡墨茶。タイトル帯・順位バッジの地（deep）/ 本文・輪郭（base）</td></tr>
+<tr><td><code>gold</code> / <code>goldDeep</code> / <code>goldLight</code></td><td><code>#D9A62E</code> / <code>#C08618</code> / <code>#F4D77D</code></td><td>金アクセント / 面の金グラデ深色側（沈み対策）/ 同明色側・帯上段のラベル</td></tr>
+<tr><td><code>vermilion</code></td><td><code>#B23A31</code></td><td>朱（強調語・吹き出しの文字）</td></tr>
+<tr><td><code>bandBg</code></td><td><code>linear-gradient(180deg, sumiBase, sumiDeep)</code></td><td>タイトル帯の地。下辺のみ金のヘアライン 2px / 不透明度 50%（上下 4px の金縁は浮くため 17-4a で廃止）</td></tr>
+<tr><td><code>rowBg</code></td><td><code>linear-gradient(180deg, rgba(255,253,245,0.97), rgba(244,236,219,0.97))</code></td><td>順位行カードの地（2〜5 位。1 位は金グラデ）。<strong>バーは廃止</strong>（値の二重表現の解消 = 17-4a）</td></tr>
+<tr><td><code>bubbleBg</code> / <code>bubbleBorder</code> / <code>bubbleText</code></td><td><code>#FFFDF5</code> / <code>#544A3C</code>（= sumiDeep） / <code>#B23A31</code></td><td>吹き出し（地 / 枠 / 文字）</td></tr>
+<tr><td><code>sourceBg</code> / <code>sourceText</code></td><td><code>rgba(84,74,60,0.8)</code> / <code>rgba(246,240,225,0.94)</code></td><td>出典行帯（淡墨茶 80% の角丸帯に生成り文字）。<strong>必ず 1 行</strong>に収める（文字数から字送りを自動算出・下限 20px・36 文字以内推奨）</td></tr>
+<tr><td><code>bgOverlay</code></td><td>上帯 90% → 中央 <strong>30%</strong> → 下帯 92% の 3 層減光</td><td>背景イラストの減光。17-2 の中央 46〜50% では背景がほぼ無地に見えたため 30% へ戻した（17-4a）</td></tr>
+<tr><td><code>map.revealedFill</code></td><td>1 位 <code>#D9A62E</code> / 2 位 <code>#9C8F79</code> / 3 位 <code>#8C806C</code> / 4 位 <code>#7C7160</code> / 5 位 <code>#6C6254</code></td><td>確定県の塗り（1 位のみ金・2〜5 位は淡墨茶の階調）。確定県は縁 1.8px + <code>drop-shadow</code> で強調する</td></tr>
 <tr><td><code>map.litFill</code> / <code>litStroke</code> / <code>litGlow</code></td><td><code>#D9A62E</code> / <code>#F4D77D</code> / <code>rgba(217,166,46,0.72)</code></td><td>スピン中の点灯県</td></tr>
-<tr><td><code>map.baseFill</code> / <code>baseStroke</code></td><td><code>rgba(36,48,78,0.06)</code> / <code>rgba(36,48,78,0.5)</code></td><td>未確定県の地図</td></tr>
+<tr><td><code>map.baseFill</code> / <code>baseStroke</code></td><td><code>rgba(84,74,60,0.14)</code> / <code>rgba(84,74,60,0.72)</code></td><td>未確定県の地図（17-2 の 0.06 / 0.5 では県界が判別できず濃くした）</td></tr>
 </table>
 </div>
 <p>金の使用規定（生成り地上の金の単独使用禁止・縁取り / グラデ必須）は<a href="../generators/ranking-prebuilt.html#composition">方式設計書セクション 8.2 の decision</a> を正とする。</p>

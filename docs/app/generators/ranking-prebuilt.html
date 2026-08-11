@@ -161,8 +161,8 @@
 </div>
 <p>2 尺の検証仮説（17-2 巡 1 で Fix）: 20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>。</p>
 <ul>
-  <li><strong>1 位の強調（17-2 巡 1 Fix）</strong>: 1 位行は行高 96px（2〜5 位は 76px）+ 明るい金グラデ + グロー強化。1 位県名は発表時に 150px + 二重グローのバーストを 66f（2.2 秒）表示する。順位バッジ・パルスリング・「第1位」朱バッジは比較モックの結果<strong>不採用</strong>（過剰装飾）</li>
-  <li><strong>キャラ演出</strong>: 煽り・実況はキャラの吹き出しに表示する（<strong>ナレーション cue と同一テキスト</strong> = 音と字幕の二重化。スピン中は点滅）。ポーズは 3 種を切り替える（基本 → タメ〔1 位スピン中〕→ 軍配〔1 位発表後〕）。アセット・配置値はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a>。<strong>ただし 5〜2 位の順位 cue は県名を含む</strong>ため（下記 decision）、吹き出しへの表示は<strong>停止フラッシュ以降に限る</strong>（スピン中に表示すると結果が先にばれる）</li>
+  <li><strong>1 位の強調（17-2 巡 1 Fix・17-4a で寸法更新）</strong>: 1 位行は行高 104px（2〜5 位は 82px）+ 明るい金グラデ + グロー強化。1 位県名は発表時に 148px + 二重グローのバーストを表示し、余韻ののち順位行へ落とす（17-4a）。順位バッジ・パルスリング・「第1位」朱バッジは比較モックの結果<strong>不採用</strong>（過剰装飾）</li>
+  <li><strong>キャラ演出</strong>: 煽り・実況はキャラの吹き出しに表示する（<strong>ナレーション cue と同一テキスト</strong> = 音と字幕の二重化。スピン中は点滅。<strong>冒頭のみ例外</strong> = 下記 17-4a の decision）。ポーズは 3 種を切り替える（基本 → タメ〔1 位スピン中〕→ 軍配〔1 位発表後〕）。アセット・配置値はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a>。<strong>ただし 5〜2 位の順位 cue は県名を含む</strong>ため（下記 decision）、吹き出しへの表示は<strong>停止フラッシュ以降に限る</strong>（スピン中に表示すると結果が先にばれる）</li>
   <li><strong>下位を晒さない</strong>: TOP5 のみを扱い、下位順位（ワースト表示）は版面に持たない（<a href="../../strategy/business-strategy.html">事業戦略書セクション 6</a> のネタ判定基準に対応する構造的ガード）</li>
 </ul>
 <div class="decision">
@@ -175,6 +175,24 @@
     <li>出典行は<strong>生成り 86% の角丸帯 + 28px</strong> で常設する。注記義務のあるネタ（家計調査系）は「※家計調査（県庁所在市・政令市の世帯数加重平均）」の類の注記を<strong>固定要素</strong>として帯に含める（文言はストック行の <code>content_fields.source_display</code> が正）</li>
   </ul>
   トークンの実値（<code>goldDeep</code> / <code>ink</code> / 帯色ほか）は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 8</a>。
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-11、17-4a 版面デザイン工程）: 実データで組んだ版面の作り込み</span>
+  17-3 のプレビュー動画（実データ + 実背景）が「品位が低い」と評価されたため、実装着手の前に版面デザインを独立工程として置き、モック比較 3 巡で以下を Fix した。17-2 巡 1 の規定と食い違う箇所は<strong>本項が優先</strong>する。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>もう一色を藍 → 淡墨茶へ差し替え</strong>（トークン実値は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 8</a>）。金の単独使用禁止・縁取り / グラデ必須の規定は維持し、縁取り色を藍 → 淡墨茶（<code>sumiDeep</code>）に読み替える</li>
+    <li><strong>未発表の「？？？」枠を廃止</strong>。順位行スタックは<strong>下端固定</strong>とし、5 位から上へ 1 行ずつ生やす。空く序盤は <code>content_fields.subtitle</code> の<strong>全国平均プレート</strong>が受ける（20 秒版でも画面には出す。読み上げは 30 秒版のみで不変）</li>
+    <li><strong>順位行のバーを廃止</strong>し、順位バッジ + 県名 + 数値だけにする（バーの長さと数値の二重表現の解消）。数値は <code>content_fields.value_prefix</code>（「年間」等）を数字の前に置き、何の値かを行ごとに示す</li>
+    <li><strong>確定県は「地図 → 順位行へ県名が飛ぶ」</strong>モーションで対応づける（地図と順位行の視線の分断の解消）。<strong>地図上に順位ラベル（ピン）は置かない</strong>（ユーザー判断。代わりに確定県は塗り + 縁 1.8px + <code>drop-shadow</code> で強調する）。2〜5 位のラベルは<strong>県の重心の真上</strong>から飛ばす（重心に重ねると確定した県自体を隠す）。1 位のみ地図中央下に大きく据える</li>
+    <li><strong>地図は viewBox 全域（0 0 1000 1000）で描く</strong>。陸地の実バウンディングボックスは x 3.9〜996.7 / y 0.0〜1000.0 で余白がほぼ無く、切り詰めると<strong>九州南部（鹿児島の南端が y=1000）と南西諸島インセットが欠ける</strong>。地図ボックスは 890×866 でこの正方形が順位行スタックの上に収まる寸法とし、<strong>拡大率は 1.04 倍を上限</strong>とする（行が増えるほど縮めて序盤の空白を埋める演出。これ以上拡大すると九州南部が順位行のゾーンへ押し出される）</li>
+    <li><strong>タイトル帯は 2 段</strong>にする。上段に金でセット固定のラベル（「都道府県ランキング TOP5」= <code>labels.setLabel</code>）、下段にネタタイトル 56px・1 行。上段が無いと「何のランキングか」が伝わらない。上下 4px の金縁は浮くため<strong>下辺のみ 2px / 不透明度 50%</strong> に改める</li>
+    <li><strong>タイトル帯・地図・全国平均プレートは登場アニメを持たず 0 秒から出す</strong>。冒頭が空の版面はスキップされる</li>
+    <li><strong>冒頭だけは音と字幕を対応させない</strong>。ナレーションが <code>intro</code>（タイトル読み）を話している 0〜2.5 秒の間、吹き出しには <code>teaser</code> の問いかけを出しておく（<code>intro</code> はタイトル帯と重複して情報量が増えない一方、問いかけを早く出すほど「予想させてから見届けさせる」時間が伸びる）</li>
+    <li><strong>背景の中央減光を 46〜50% → 30% へ戻す</strong>（17-2 の値では背景イラストがほぼ無地に見えた）。あわせて和紙ノイズとヴィネットを重ねる</li>
+    <li><strong>出典行は必ず 1 行</strong>に収める。文字数から字送りを自動算出する（下限 20px。<code>source_display</code> は全角 36 文字以内が推奨）</li>
+    <li><strong>スピン中の吹き出し</strong>は <code>labels.searching</code>（「第{rank}位は…？」）を出す。結果を含まないため点滅表示と両立する</li>
+  </ul>
+  コンポジションの実装は <code>content/video-build/pref-ranking-1/remotion/</code>（<code>layout.ts</code> = ジオメトリ / <code>theme.ts</code> = トークン / <code>timeline.ts</code> = アンカー / <code>PrefRankingVideo.tsx</code> = 版面）が正。
 </div>
 <div class="warn">
   <span class="callout-title">地図 SVG の素材要件（17-4 の PD 素材差し替え時に必ず満たすこと）</span>

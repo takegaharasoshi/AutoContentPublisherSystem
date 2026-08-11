@@ -1,0 +1,4 @@
+node_modules/
+work/
+# 素材は S3（固定アセット・背景）とフォント配布元から取得する。README.md 参照
+public/
