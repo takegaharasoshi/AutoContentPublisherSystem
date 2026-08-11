@@ -1,6 +1,6 @@
 import React from "react";
-import { INSET_CONTENT_BOX, INSET_FRAME_PATH, PREFECTURES } from "./japanPaths";
-import { MAP_INSET_PANEL as FOCUS_PANEL } from "./layout";
+import { INSET_FRAME_PATH, PREFECTURES } from "./japanPaths";
+import { insetFocusTransform } from "./layout";
 import { MapPalette } from "./palette";
 
 /**
@@ -15,29 +15,8 @@ import { MapPalette } from "./palette";
 // 移設済み（本土と同一投影のまま群として相似変換）。ここでは区切りの点線と、
 // 1 位がインセットの県のときの一時的な拡大パネルを扱う。
 
-// 拡大パネルの位置は layout.ts の MAP_INSET_PANEL が正（1 位の県名ラベルの起点も
+// 拡大の基点・倍率は layout.ts の MAP_INSET_FOCUS が正（1 位の県名ラベルの起点も
 // そこから算出するため、ジオメトリ定数として一箇所に置く）。
-
-const focusTransform = (focus: number): string => {
-  const target = Math.min(
-    (FOCUS_PANEL.width - FOCUS_PANEL.padding * 2) / INSET_CONTENT_BOX.width,
-    (FOCUS_PANEL.height - FOCUS_PANEL.padding * 2) / INSET_CONTENT_BOX.height
-  );
-  const scale = 1 + (target - 1) * focus;
-  const from = {
-    x: INSET_CONTENT_BOX.x + INSET_CONTENT_BOX.width / 2,
-    y: INSET_CONTENT_BOX.y + INSET_CONTENT_BOX.height / 2,
-  };
-  const to = {
-    x: FOCUS_PANEL.x + FOCUS_PANEL.width / 2,
-    y: FOCUS_PANEL.y + FOCUS_PANEL.height / 2,
-  };
-  const center = {
-    x: from.x + (to.x - from.x) * focus,
-    y: from.y + (to.y - from.y) * focus,
-  };
-  return `translate(${center.x - from.x * scale} ${center.y - from.y * scale}) scale(${scale})`;
-};
 
 export const JapanMap: React.FC<{
   litCode: number | null;
@@ -106,22 +85,8 @@ export const JapanMap: React.FC<{
       />
       {PREFECTURES.map((p) => shape(p, "d"))}
 
-      {/* 南西諸島インセット。拡大時は地紙のパネルを敷いて本土に重ねる */}
-      {insetFocus > 0.01 ? (
-        <rect
-          x={FOCUS_PANEL.x}
-          y={FOCUS_PANEL.y}
-          width={FOCUS_PANEL.width}
-          height={FOCUS_PANEL.height}
-          rx={26}
-          fill={palette.focusPanelBg}
-          stroke={palette.focusPanelBorder}
-          strokeWidth={2}
-          strokeDasharray="7 7"
-          opacity={insetFocus}
-        />
-      ) : null}
-      <g transform={focusTransform(insetFocus)}>
+      {/* 南西諸島インセット。1 位が沖縄のときは島の群だけがその場で大きくなる */}
+      <g transform={insetFocusTransform(insetFocus)}>
         {PREFECTURES.map((p) => shape(p, "dInset"))}
       </g>
     </svg>

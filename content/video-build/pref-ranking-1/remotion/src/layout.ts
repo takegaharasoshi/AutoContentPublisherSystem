@@ -1,3 +1,5 @@
+import { INSET_CONTENT_BOX } from "./japanPaths";
+
 // 版面のジオメトリ（1080x1920 / 30fps）。
 // Instagram UI を避けるセーフボックスは前景基準で右 12% / 下 15%（project memory・15-x の運用と同じ）。
 
@@ -41,10 +43,28 @@ export const mapPoint = (x: number, y: number): { x: number; y: number } => ({
 });
 
 /**
- * 南西諸島インセットの拡大パネル（viewBox 座標）。1 位がインセットの県のときだけ出す。
- * 太平洋側の空き（四国・紀伊半島より東、順位行より上）に置く。
+ * 南西諸島インセットの拡大（1 位が沖縄のときだけ）。島が小さく、そのままでは
+ * 「1 位が金に光る」見せ場が成立しないため、島の群だけをその場で拡大する。
+ * 基点は島の群の右下（viewBox の右下隅の内側）で、そこを固定して**左上へ育つ**。
+ * こうすると拡大しても viewBox から食み出さず、太平洋の空きへ広がる。
  */
-export const MAP_INSET_PANEL = { x: 380, y: 470, width: 618, height: 526, padding: 28 } as const;
+export const MAP_INSET_FOCUS = { anchorX: 995, anchorY: 950, scale: 1.84 } as const;
+
+/** 拡大中（focus = 0〜1）のインセットに掛ける相似変換 */
+export const insetFocusTransform = (focus: number): string => {
+  const scale = 1 + (MAP_INSET_FOCUS.scale - 1) * focus;
+  const x = MAP_INSET_FOCUS.anchorX * (1 - scale);
+  const y = MAP_INSET_FOCUS.anchorY * (1 - scale);
+  return `translate(${x} ${y}) scale(${scale})`;
+};
+
+/** 拡大しきったときの島の群の外接矩形（1 位の県名ラベル・バーストの基準） */
+export const MAP_INSET_FOCUS_BOX = {
+  x: MAP_INSET_FOCUS.anchorX + (INSET_CONTENT_BOX.x - MAP_INSET_FOCUS.anchorX) * MAP_INSET_FOCUS.scale,
+  y: MAP_INSET_FOCUS.anchorY + (INSET_CONTENT_BOX.y - MAP_INSET_FOCUS.anchorY) * MAP_INSET_FOCUS.scale,
+  width: INSET_CONTENT_BOX.width * MAP_INSET_FOCUS.scale,
+  height: INSET_CONTENT_BOX.height * MAP_INSET_FOCUS.scale,
+} as const;
 
 /** 地図コンテナの拡大（transform-origin: center top）の基準点 */
 export const MAP_ZOOM_ORIGIN = {

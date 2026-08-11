@@ -11,7 +11,4 @@ export type MapPalette = {
   litGlow: string;
   flashStroke: string;
   flashGlow: string;
-  /** 南西諸島インセットの拡大パネル（1 位がインセットの県のときだけ出す） */
-  focusPanelBg: string;
-  focusPanelBorder: string;
 };

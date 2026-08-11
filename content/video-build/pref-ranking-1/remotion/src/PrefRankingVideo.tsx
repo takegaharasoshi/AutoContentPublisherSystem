@@ -23,7 +23,7 @@ import {
   LIST,
   LIST_TOP,
   MAP_BOX,
-  MAP_INSET_PANEL,
+  MAP_INSET_FOCUS_BOX,
   MAP_VIEWBOX,
   SAFE,
   SOURCE_BAND,
@@ -120,8 +120,6 @@ const mapPalette = (theme: Theme): MapPalette => ({
   litGlow: "rgba(217,166,46,0.72)",
   flashStroke: "#FFFFFF",
   flashGlow: "rgba(244,215,125,0.95)",
-  focusPanelBg: theme.focusPanelBg,
-  focusPanelBorder: theme.mapBaseStroke,
 });
 
 /** 減速するルーレットの点滅タイミング（ラウンド内ローカルフレーム） */
@@ -492,16 +490,16 @@ const FlyingName: React.FC<{
   const anchor = mapPointZoomed(centroid.x, centroid.y, zoom);
   // 1 位は地図中央下に大きく据えて見せ場にする。2〜5 位は該当県の真上に吹き出す
   // （重心に重ねると、塗られたばかりの県自体をラベルが隠してしまうため）。
-  // ただし 1 位がインセットの県のときは拡大パネルが地図中央下に出るため、
-  // ラベルはパネルの真上へ逃がす（せっかく拡大した島をラベルで隠さない）。
-  const panelTop = mapPointZoomed(
-    MAP_INSET_PANEL.x + MAP_INSET_PANEL.width / 2,
-    MAP_INSET_PANEL.y,
+  // ただし 1 位が沖縄のときはインセットの島が拡大するため、ラベルはその真上へ逃がす
+  // （既定位置のままだと、大きくなった島をラベルが覆ってしまう）。
+  const focusTop = mapPointZoomed(
+    MAP_INSET_FOCUS_BOX.x + MAP_INSET_FOCUS_BOX.width / 2,
+    MAP_INSET_FOCUS_BOX.y,
     zoom
   );
   const from = isFirst
     ? insetFocused
-      ? { x: panelTop.x, y: panelTop.y - startSize * 0.42 }
+      ? { x: focusTop.x, y: focusTop.y - startSize * 0.42 }
       : { x: (SAFE.left + SAFE.right) / 2, y: LIST_TOP - 190 }
     : { x: anchor.x, y: anchor.y - startSize * 0.72 };
   const to = { x: LIST.left + 300, y: rowTop(entry.rank) + rowHeight(entry.rank) / 2 };
@@ -807,8 +805,8 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
         origin={
           focusesInset
             ? mapPointZoomed(
-                MAP_INSET_PANEL.x + MAP_INSET_PANEL.width / 2,
-                MAP_INSET_PANEL.y + MAP_INSET_PANEL.height / 2,
+                MAP_INSET_FOCUS_BOX.x + MAP_INSET_FOCUS_BOX.width / 2,
+                MAP_INSET_FOCUS_BOX.y + MAP_INSET_FOCUS_BOX.height / 2,
                 mapZoom
               )
             : { x: 540, y: LIST_TOP - 190 }
