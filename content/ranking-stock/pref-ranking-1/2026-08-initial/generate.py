@@ -208,6 +208,32 @@ def build_review(items_and_data: list[tuple[dict[str, Any], dict[str, Any]]]) ->
 4. フォーマット適合（文字数・cue 台本の長さ・bg_motif の妥当性）
 
 承認後に Claude がローカル MySQL と Aurora へ INSERT します。
+
+## 前提: 表示文言フィールドの使われ方
+
+5 つのフィールドは**出る場所がそれぞれ違う**。どこに出るかでレビューの重みが変わるため、
+判断の前提として下表を確認すること（正は
+[ranking-prebuilt.html](../../../../docs/app/generators/ranking-prebuilt.html) セクション 8.2 と
+[pref-ranking-1.html](../../../../docs/app/sets/pref-ranking-1.html) セクション 5）。
+
+| フィールド | 動画の版面 | キャプション | 補足 |
+| --- | --- | --- | --- |
+| `title` | タイトル帯（**1 行に収める制約**あり） | 【〜 TOP5】の見出し | ナレーション `intro` でも読み上げる |
+| `hook` | 出ない | **1 行目** | フィード・リール面でプレビュー表示される唯一の行。ここで止まるか決まる |
+| `trivia` | 出ない | 結果一覧の下の本文 | 「続きを読む」を開いた読者だけが読む |
+| `subtitle` | **30 秒版の導入 3.5s のみ** | 出ない | 20 秒版には導入シーンが無く、表示されない |
+| `bg_motif` | 出ない（間接） | 出ない | ビルド時に imagegen へ渡す背景イラストの指示文。視聴者は完成した絵しか見ない |
+| `source_display` | **最下部の出典行帯に常設**（両尺・全編） | `※出典:` 行 | 画面とキャプションの両方に出る唯一のフィールド。単位の基準もここで示す |
+
+版面の順位行（県名・数値）とキャプションの `result_list` は `data/*.json` から機械整形するため
+手書きしない。レビュー対象は上表のテキストとナレーション台本。
+
+ナレーション cue の構成（17-3 で見直し）: `intro` の直後に視聴者へ予想を促す **`teaser`（煽り）**
+を全ネタ必須で置く。5〜2 位は呼び込みと県名を 1 本にまとめた `r5`〜`r2`（「まずは5位、埼玉県！」の形）、
+1 位のみタメ（`r1_call`）と発表（`r1_name`）を分ける。締めは 20 秒版が `outro`
+（「みんなはわかったかな？」= 全ネタ共通。`teaser` の答え合わせ）、30 秒版が **`closing`**
+（結果総覧 3.0s + 締め 2.0s をまたぐ 1 本。県名の羅列ではなくネタの含意を口語で言い切る）。
+モーラ数は暫定見積もりで、確定は 17-4 の VOICEVOX 実測による予算検査。
 """
     sections = [review_markdown_item(item, data) for item, data in items_and_data]
     return header + "\n" + "\n".join(sections)
@@ -296,6 +322,9 @@ section {{ padding: 1.25rem; margin: 1.25rem 0; break-inside: avoid; }}
 .back {{ font-size: .9rem; }}
 table {{ width: 100%; border-collapse: collapse; margin: .6rem 0; }}
 th, td {{ border-bottom: 1px solid var(--line); padding: .48rem .6rem; text-align: left; }}
+.table-wrap {{ overflow-x: auto; }}
+.field-usage {{ font-size: .92rem; }}
+.field-usage code {{ white-space: nowrap; }}
 th {{ color: var(--muted); font-weight: 600; }}
 td:last-child, th:last-child {{ text-align: right; white-space: nowrap; }}
 tr.rank-one {{ background: var(--rank-one); font-weight: 700; }}
@@ -341,6 +370,32 @@ pre {{ white-space: pre-wrap; overflow-wrap: anywhere; background: var(--code); 
 <li>既存ストックとの重複（同一テーマ・同一出典の近接）</li>
 <li>フォーマット適合（文字数・cue 台本の長さ・bg_motif の妥当性）</li>
 </ol>
+<h2>前提: 表示文言フィールドの使われ方</h2>
+<p>5 つのフィールドは<strong>出る場所がそれぞれ違う</strong>。どこに出るかでレビューの重みが変わるため、
+判断の前提として下表を確認すること（正は方式設計書 <code>ranking-prebuilt.html</code> セクション 8.2 と
+セット別設計書 <code>pref-ranking-1.html</code> セクション 5）。</p>
+<div class="table-wrap">
+<table class="field-usage">
+<thead><tr><th>フィールド</th><th>動画の版面</th><th>キャプション</th><th>補足</th></tr></thead>
+<tbody>
+<tr><td><code>title</code></td><td>タイトル帯（<strong>1 行に収める制約</strong>あり）</td><td>【〜 TOP5】の見出し</td><td>ナレーション <code>intro</code> でも読み上げる</td></tr>
+<tr><td><code>hook</code></td><td>出ない</td><td><strong>1 行目</strong></td><td>フィード・リール面でプレビュー表示される唯一の行。ここで止まるか決まる</td></tr>
+<tr><td><code>trivia</code></td><td>出ない</td><td>結果一覧の下の本文</td><td>「続きを読む」を開いた読者だけが読む</td></tr>
+<tr><td><code>subtitle</code></td><td><strong>30 秒版の導入 3.5s のみ</strong></td><td>出ない</td><td>20 秒版には導入シーンが無く、表示されない</td></tr>
+<tr><td><code>bg_motif</code></td><td>出ない（間接）</td><td>出ない</td><td>ビルド時に imagegen へ渡す背景イラストの指示文。視聴者は完成した絵しか見ない</td></tr>
+<tr><td><code>source_display</code></td><td><strong>最下部の出典行帯に常設</strong>（両尺・全編）</td><td><code>※出典:</code> 行</td><td>画面とキャプションの両方に出る唯一のフィールド。単位の基準もここで示す</td></tr>
+</tbody>
+</table>
+</div>
+<p>版面の順位行（県名・数値）とキャプションの <code>result_list</code> は <code>data/*.json</code> から
+機械整形するため手書きしない。レビュー対象は上表のテキストとナレーション台本。</p>
+<p>ナレーション cue の構成（17-3 で見直し）: <code>intro</code> の直後に視聴者へ予想を促す
+<strong><code>teaser</code>（煽り）</strong>を全ネタ必須で置く。5〜2 位は呼び込みと県名を 1 本にまとめた
+<code>r5</code>〜<code>r2</code>（「まずは5位、埼玉県！」の形）、1 位のみタメ（<code>r1_call</code>）と
+発表（<code>r1_name</code>）を分ける。締めは 20 秒版が <code>outro</code>（「みんなはわかったかな？」=
+全ネタ共通。<code>teaser</code> の答え合わせ）、30 秒版が <strong><code>closing</code></strong>
+（結果総覧 3.0s + 締め 2.0s をまたぐ 1 本。県名の羅列ではなくネタの含意を口語で言い切る）。
+モーラ数は暫定見積もりで、確定は 17-4 の VOICEVOX 実測による予算検査。</p>
 </header>
 <nav class="toc" id="toc" aria-label="目次">
 <h2>目次</h2>

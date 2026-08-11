@@ -39,14 +39,11 @@ REQUIRED_ITEM_KEYS = (
 
 NARRATION_KEYS_20S = (
     "intro",
-    "r5_call",
-    "r5_name",
-    "r4_call",
-    "r4_name",
-    "r3_call",
-    "r3_name",
-    "r2_call",
-    "r2_name",
+    "teaser",
+    "r5",
+    "r4",
+    "r3",
+    "r2",
     "r1_call",
     "r1_name",
     "outro",
@@ -54,34 +51,27 @@ NARRATION_KEYS_20S = (
 
 NARRATION_KEYS_30S = (
     "intro",
-    "r5_call",
-    "r5_name",
+    "teaser",
+    "r5",
     "r5_comment",
-    "r4_call",
-    "r4_name",
+    "r4",
     "r4_comment",
-    "r3_call",
-    "r3_name",
+    "r3",
     "r3_comment",
-    "r2_call",
-    "r2_name",
+    "r2",
     "r2_comment",
     "r1_call",
     "r1_name",
-    "recap",
-    "outro",
+    "closing",
 )
 
 LIMITS_20S = {
     "intro": 15,
-    "r5_call": 9,
-    "r5_name": 6,
-    "r4_call": 9,
-    "r4_name": 6,
-    "r3_call": 9,
-    "r3_name": 6,
-    "r2_call": 9,
-    "r2_name": 6,
+    "teaser": 12,
+    "r5": 12,
+    "r4": 12,
+    "r3": 12,
+    "r2": 12,
     "r1_call": 15,
     "r1_name": 12,
     "outro": 18,
@@ -89,25 +79,26 @@ LIMITS_20S = {
 
 LIMITS_30S = {
     "intro": 21,
-    "r5_call": 6,
-    "r5_name": 6,
-    "r5_comment": 12,
-    "r4_call": 6,
-    "r4_name": 6,
-    "r4_comment": 12,
-    "r3_call": 6,
-    "r3_name": 6,
-    "r3_comment": 12,
-    "r2_call": 6,
-    "r2_name": 6,
-    "r2_comment": 12,
+    "teaser": 12,
+    "r5": 12,
+    "r5_comment": 9,
+    "r4": 12,
+    "r4_comment": 9,
+    "r3": 12,
+    "r3_comment": 9,
+    "r2": 12,
+    "r2_comment": 9,
     "r1_call": 18,
     "r1_name": 15,
-    # recap のみ 3.0s × 7.0 モーラ/秒。県名の列挙は語間が短く他の cue より速く読めるため
-    # （他は 6.0 モーラ/秒で見積もる）。確定判定は 17-4 の TTS 実測による予算検査。
-    "recap": 21,
-    "outro": 12,
+    # closing は結果総覧シーン（3.0s）と締めシーン（2.0s）をまたぐ 1 本の cue。
+    # 予算は 5.0s × 6.0 モーラ/秒。県名の列挙をやめ、ネタの締めくくりを語る散文にしたため
+    # 旧 recap の 7.0 モーラ/秒（列挙は速く読める）は適用しない。
+    "closing": 30,
 }
+
+# 県名を含むべき cue（5〜2 位は呼び込みと県名を 1 本に統合した `r5`〜`r2`、
+# 1 位のみタメ〔r1_call〕と発表〔r1_name〕を分ける）。
+NAME_CUE_BY_RANK = {5: "r5", 4: "r4", 3: "r3", 2: "r2", 1: "r1_name"}
 
 FIELD_LIMITS = {
     "title": 30,
@@ -159,12 +150,25 @@ PREFECTURE_MORA_TOKENS: tuple[tuple[str, int], ...] = tuple(
 )
 
 
+# 定型句の実モーラ数。漢字は既定で 1 文字 2 モーラの安全側フォールバックで数えるが、
+# 全ネタの cue に必ず出る「書式の骨格」だけは過大評価が効きすぎるため実読みを与える
+# （「大好き」= だいすき 4 / 「都道府県」= とどうふけん 6 / 「第」= だい 2 / 「位」= い 1）。
+# 自由文の語は登録しない（安全側の見積もりを保つ）。
+PHRASE_MORAS: tuple[tuple[str, int], ...] = tuple(
+    sorted(
+        {"都道府県": 6, "大好き": 4, "第": 2, "位": 1}.items(),
+        key=lambda value: len(value[0]),
+        reverse=True,
+    )
+)
+
+
 def estimate_mora(text: str) -> int:
     """Estimate Japanese speech morae for a narration cue.
 
-    Prefecture names and ASCII number expressions are handled before the
-    remaining characters because their written length differs substantially
-    from their spoken length.
+    Fixed format phrases, prefecture names, and ASCII number expressions are
+    handled before the remaining characters because their written length
+    differs substantially from their spoken length.
 
     Args:
         text: Cue text to estimate.
@@ -175,6 +179,13 @@ def estimate_mora(text: str) -> int:
     mora = 0
     index = 0
     while index < len(text):
+        phrase = _matching_phrase_mora(text, index)
+        if phrase is not None:
+            token, token_mora = phrase
+            mora += token_mora
+            index += len(token)
+            continue
+
         prefecture = _matching_prefecture_mora(text, index)
         if prefecture is not None:
             token, token_mora = prefecture
@@ -191,6 +202,14 @@ def estimate_mora(text: str) -> int:
         mora += _character_mora(text[index])
         index += 1
     return mora
+
+
+def _matching_phrase_mora(text: str, index: int) -> tuple[str, int] | None:
+    """Return a fixed format phrase beginning at an index, if any."""
+    for token, mora in PHRASE_MORAS:
+        if text.startswith(token, index):
+            return token, mora
+    return None
 
 
 def _matching_prefecture_mora(text: str, index: int) -> tuple[str, int] | None:
@@ -499,7 +518,7 @@ def _validate_narration(
             by_rank = {entry["rank"]: entry for entry in entries}
             for rank in range(1, 6):
                 entry = by_rank.get(rank)
-                cue = f"r{rank}_name"
+                cue = NAME_CUE_BY_RANK[rank]
                 text = cues.get(cue)
                 if entry is None or not isinstance(text, str):
                     continue
@@ -509,33 +528,6 @@ def _validate_narration(
                         f"{identifier}: {duration}.{cue} does not match "
                         f"rank {rank} prefecture {expected[0]}"
                     )
-            if duration == "30s":
-                _validate_recap(identifier, cues.get("recap"), by_rank, errors)
-
-
-def _validate_recap(
-    identifier: str,
-    recap: Any,
-    by_rank: dict[int, dict[str, Any]],
-    errors: list[str],
-) -> None:
-    """Validate that recap names occur in first-to-fifth order."""
-    if not isinstance(recap, str) or set(by_rank) != {1, 2, 3, 4, 5}:
-        return
-    start = 0
-    for rank in range(1, 6):
-        names = prefecture_name_variants(by_rank[rank]["pref_code"])
-        positions = [recap.find(name, start) for name in names]
-        positions = [position for position in positions if position >= 0]
-        if not positions:
-            errors.append(
-                f"{identifier}: 30s.recap must include rank {rank} prefecture "
-                f"{names[0]} in rank order"
-            )
-            return
-        position = min(positions)
-        start = position + 1
-
 
 def print_mora_report() -> None:
     """Print each narration cue's estimated morae and its budget."""

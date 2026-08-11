@@ -153,16 +153,16 @@
 <p><strong>ルーレット演出</strong>: 各順位の発表は「地図上で候補県が高速に光る（スピン）→ 停止フラッシュで確定 → 確定県が順位色に塗られ、順位行に県名・数値が追記される」の繰り返し。確定済みの県は塗りが残るため、動画の進行とともに地図が塗り上がっていく。</p>
 <div class="table-wrap">
 <table>
-<caption style="text-align:left;font-weight:bold;margin-bottom:.3rem;">タイムライン（17-2 巡 1 で Fix。20 秒 = 600f / 30 秒 = 900f）</caption>
+<caption style="text-align:left;font-weight:bold;margin-bottom:.3rem;">タイムライン（17-2 巡 1 で Fix、17-3 で煽りシーンを追加。20 秒 = 600f / 30 秒 = 900f）</caption>
 <tr><th>尺</th><th>シーン構成（秒）</th></tr>
-<tr><td><strong>20 秒版</strong>（600f）</td><td>オープニング 2.5s → 5 位〜2 位 各 2.5s（スピン 1.5s + 停止フラッシュ・行追記 1.0s）→ 1 位 4.5s（タメ 2.5s + 発表 2.0s）→ 締め 3.0s</td></tr>
-<tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.5s（サブタイトル <code>content_fields.subtitle</code> を読む）→ 5 位〜2 位 各 4.0s（スピン + 停止 2.0s + 順位コメント 2.0s）→ 1 位 5.5s（タメ + 発表）→ <strong>結果総覧 3.0s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 2.0s</td></tr>
+<tr><td><strong>20 秒版</strong>（600f）</td><td>オープニング 2.5s → <strong>煽り 2.0s</strong>（視聴者に 1 位を予想させる）→ 5 位〜2 位 各 2.0s（スピン 1.0s + 停止フラッシュ・行追記 1.0s）→ 1 位 4.5s（タメ 2.5s + 発表 2.0s）→ 締め 3.0s</td></tr>
+<tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.5s（サブタイトル <code>content_fields.subtitle</code> を読む）→ <strong>煽り 2.0s</strong> → 5 位〜2 位 各 3.5s（スピン + 停止 2.0s + 順位コメント 1.5s）→ 1 位 5.5s（タメ + 発表）→ <strong>結果総覧 3.0s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 2.0s（結果総覧と締めの 5.0s は <code>closing</code> 1 本の cue でまたぐ）</td></tr>
 </table>
 </div>
 <p>2 尺の検証仮説（17-2 巡 1 で Fix）: 20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>。</p>
 <ul>
   <li><strong>1 位の強調（17-2 巡 1 Fix）</strong>: 1 位行は行高 96px（2〜5 位は 76px）+ 明るい金グラデ + グロー強化。1 位県名は発表時に 150px + 二重グローのバーストを 66f（2.2 秒）表示する。順位バッジ・パルスリング・「第1位」朱バッジは比較モックの結果<strong>不採用</strong>（過剰装飾）</li>
-  <li><strong>キャラ演出</strong>: 煽り・実況はキャラの吹き出しに表示する（<strong>ナレーション cue と同一テキスト</strong> = 音と字幕の二重化。スピン中は点滅）。ポーズは 3 種を切り替える（基本 → タメ〔1 位スピン中〕→ 軍配〔1 位発表後〕）。アセット・配置値はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a></li>
+  <li><strong>キャラ演出</strong>: 煽り・実況はキャラの吹き出しに表示する（<strong>ナレーション cue と同一テキスト</strong> = 音と字幕の二重化。スピン中は点滅）。ポーズは 3 種を切り替える（基本 → タメ〔1 位スピン中〕→ 軍配〔1 位発表後〕）。アセット・配置値はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a>。<strong>ただし 5〜2 位の順位 cue は県名を含む</strong>ため（下記 decision）、吹き出しへの表示は<strong>停止フラッシュ以降に限る</strong>（スピン中に表示すると結果が先にばれる）</li>
   <li><strong>下位を晒さない</strong>: TOP5 のみを扱い、下位順位（ワースト表示）は版面に持たない（<a href="../../strategy/business-strategy.html">事業戦略書セクション 6</a> のネタ判定基準に対応する構造的ガード）</li>
 </ul>
 <div class="decision">
@@ -192,11 +192,13 @@
 <table>
 <tr><th>cue ID</th><th>内容</th><th>尺</th><th>同期先</th></tr>
 <tr><td><code>intro</code></td><td>導入（タイトル読み。30 秒版はサブタイトルまで読む）</td><td>両尺（テキストは尺別）</td><td>オープニング / 導入シーンの先頭</td></tr>
-<tr><td><code>r5_call</code>〜<code>r1_call</code></td><td>各順位の煽り・呼び込み（1 位はタメの煽り）</td><td>両尺（テキストは尺別にしてよい）</td><td>各順位シーンのスピン開始</td></tr>
-<tr><td><code>r5_name</code>〜<code>r1_name</code></td><td>県名の読み上げ</td><td>両尺</td><td><strong>停止フラッシュに同期</strong>（発表の瞬間と一致させる）</td></tr>
-<tr><td><code>r5_comment</code>〜<code>r2_comment</code></td><td>順位ごとのひとことコメント</td><td><strong>30 秒版のみ</strong></td><td>各順位シーンのコメント区間（2.0s）</td></tr>
-<tr><td><code>recap</code></td><td>結果総覧の読み</td><td><strong>30 秒版のみ</strong></td><td>結果総覧シーン</td></tr>
-<tr><td><code>outro</code></td><td>締め（フォロー・保存の呼びかけ）</td><td>両尺（テキストは尺別にしてよい）</td><td>締めシーン</td></tr>
+<tr><td><code>teaser</code></td><td><strong>煽り</strong>（「みんなはどこだと思う？」の類。視聴者に 1 位を予想させ、離脱前に一度考えさせる）。<strong>全ネタ必須</strong></td><td>両尺（テキストは尺別にしてよい）</td><td>煽りシーンの先頭</td></tr>
+<tr><td><code>r5</code>〜<code>r2</code></td><td>各順位の呼び込み + 県名（「まずは5位、埼玉県！」の形。<strong>1 本に統合</strong>）</td><td>両尺（テキストは尺別にしてよい）</td><td>各順位シーンの先頭（<strong>県名部分が停止フラッシュに重なる</strong>ようアンカーを詰める。下記 decision）</td></tr>
+<tr><td><code>r1_call</code></td><td>1 位のタメの煽り</td><td>両尺（テキストは尺別にしてよい）</td><td>1 位シーンのスピン開始</td></tr>
+<tr><td><code>r1_name</code></td><td>1 位の県名の読み上げ</td><td>両尺</td><td><strong>停止フラッシュに同期</strong>（発表の瞬間と一致させる）</td></tr>
+<tr><td><code>r5_comment</code>〜<code>r2_comment</code></td><td>順位ごとのひとことコメント</td><td><strong>30 秒版のみ</strong></td><td>各順位シーンのコメント区間（1.5s）</td></tr>
+<tr><td><code>outro</code></td><td>締め（予想の答え合わせ。「みんなはわかったかな？」）</td><td><strong>20 秒版のみ</strong></td><td>締めシーン</td></tr>
+<tr><td><code>closing</code></td><td><strong>締めくくりの語り</strong>（ネタの含意を口語で言い切る。<code>content_fields.trivia</code> の核を 1 文に凝縮したもの）</td><td><strong>30 秒版のみ</strong></td><td>結果総覧シーンの先頭（<strong>結果総覧 3.0s + 締め 2.0s の 2 シーンをまたぐ 1 本の cue</strong>）</td></tr>
 </table>
 </div>
 <div class="decision">
@@ -208,6 +210,14 @@
     <li>予算内の余りは無音で吸収する（cue の頭をアンカーに揃える）</li>
   </ul>
   話者・既定の合成パラメータ（速度・抑揚）はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a>。
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-11、17-3 のストックレビュー）: 煽り cue の新設と 5〜2 位 cue の統合</span>
+  <p style="margin:.3rem 0;"><strong>変更 1: <code>teaser</code>（煽り）を <code>intro</code> の直後に必須で置く。</strong>導入でタイトルを言った直後に視聴者へ 1 位を予想させ、結果を見届ける動機を作る。冒頭で一度参加させることが完走率・コメントの両方に効くという想定で、<strong>全ネタ必須</strong>とする（<code>validate</code> 相当のフィールド検査で欠落を落とす）。</p>
+  <p style="margin:.3rem 0;"><strong>変更 2: 5〜2 位の <code>r*_call</code>（呼び込み）と <code>r*_name</code>（県名）を 1 本の cue <code>r5</code>〜<code>r2</code> に統合する。</strong>「まずは5位、埼玉県！」のように 1 息で言い切る形にする。<strong>1 位だけは <code>r1_call</code>（タメ）と <code>r1_name</code>（発表）を分けたまま</strong>にする（タメ → 発表の間が演出の核であり、ここを統合すると 1 位の見せ場が消えるため）。</p>
+  <p style="margin:.3rem 0;">この 2 点で捻出した尺が <code>teaser</code> の原資であり、<strong>20 秒 = 600f / 30 秒 = 900f の総尺と、1 位シーン・結果総覧・締めの配分は変えていない</strong>（20 秒版は順位シーンが 2.5s → 2.0s、30 秒版は順位コメントが 2.0s → 1.5s に縮む）。</p>
+  <p style="margin:.3rem 0;"><strong>変更 3: 締めのセリフを「呼びかけ」から「中身のある一言」に変える。</strong>20 秒版の <code>outro</code> は <strong>「みんなはわかったかな？」で全ネタ共通</strong>とし、冒頭の <code>teaser</code> で促した予想の答え合わせで閉じる。30 秒版は<strong>県名を並べるだけの <code>recap</code> を廃止</strong>し、<code>recap</code> + <code>outro</code> を <strong><code>closing</code> 1 本に統合</strong>して、そのネタの含意（<code>content_fields.trivia</code> の核）を口語で言い切る（例: 「納豆好きの地図は、きれいに北へ寄ってるな！」）。結果の一覧は結果総覧シーンの画面とキャプションの <code>result_list</code> で担保されており、読み上げで重ねる価値が低いという判断。<strong>保存の呼びかけはナレーションから外れる</strong>が、キャプションの TOP5 再掲（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 5</a>）が保存の動機を担う。</p>
+  <p style="margin:.3rem 0;">統合に伴う実装上の制約が 2 つある。<strong>①アンカーの後ろ合わせ</strong>: 統合 cue は「◯位は」の呼び込みで始まり県名で終わるため、頭合わせのままだと県名の発話が停止フラッシュより早く終わる。順位シーンに限り、<strong>県名部分の発話開始が停止フラッシュに重なるようアンカーを詰める</strong>（実測長からの逆算。17-4 で調整）。<strong>②吹き出しの表示開始</strong>: 統合 cue のテキストは県名を含むため、キャラの吹き出しに<strong>スピン中から出すと結果が先にばれる</strong>。順位シーンの吹き出しは<strong>停止フラッシュ以降に限る</strong>（セクション 8.2）。</p>
 </div>
 
 <h3 id="rebuild">8.4 再ビルドが必要になる変更</h3>
