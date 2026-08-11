@@ -26,7 +26,9 @@ AutoContentPublisherSystem/
 │   ├── sns-post-batch/              # SNS 投稿バッチ（Python）
 │   └── insights-batch/              # インサイト収集バッチ（Python）
 ├── database/                        # DDL ファイル（スキーマ管理）
-├── content/                         # 事業コンテンツ資材（問題ストックのバッチ別ソース・検証ツール・リサーチ証跡。運用はスキル quiz-stock-replenish 参照）
+├── content/                         # 事業コンテンツ資材（ストックのバッチ別ソース・検証ツール・リサーチ証跡）
+│   ├── quiz-stock/                  #   logic-training-1 の問題ストック（運用はスキル quiz-stock-replenish 参照）
+│   └── ranking-stock/               #   pref-ranking-1 のランキングストック（**執筆・レビュー・投入の勘所は pref-ranking-1/WRITING-NOTES.md。作業前に必読**。スキル化は 17-7）
 ├── shared/                          # サービス間共通ライブラリ（Python）
 ├── CLAUDE.md
 └── README.md
@@ -76,6 +78,7 @@ AutoContentPublisherSystem/
 | アプリ設計の大枠（全体方針・骨子）を確認する | `docs/app/design-outline.html`（親ページ）+ 分冊 `batch-flow.html` / `data-model.html` / `operation.html` |
 | セットを追加・廃止する | `docs/app/operation.html` セクション 2 + `docs/app/design-outline.html` セクション 1.1（セット別設計書ルール） |
 | 生成方式を追加・変更する | `docs/app/batch-flow.html` セクション 2.1（契約・方式カタログ）+ `docs/app/generators/` の該当方式設計書 |
+| ランキングストック（`pref-ranking-1`）を執筆・レビュー・投入する | `content/ranking-stock/pref-ranking-1/WRITING-NOTES.md`（実務の勘所）+ `docs/app/operation.html` セクション 3（手順の正） |
 | 開発の次ステップを確認する | `docs/development-plan.md` |
 | 過去の実施記録・経緯を確認する | `docs/development-log.md`（完了ステップの確認・備考の全文） |
 

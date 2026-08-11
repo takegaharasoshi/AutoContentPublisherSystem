@@ -416,7 +416,7 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
 FROM ranking_stock_items
 WHERE set_id = :set_id AND is_active = 1;</code></pre></li>
   <li><strong>取り下げ</strong>: 誤データ・出典問題が見つかったネタは <code>is_active=0</code>（削除しない。S3 の事前動画も削除しない）。<strong>有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、0 件になる場合は先に代替を投入する（quiz と同じ）</li>
-  <li>補充手順のスキル化（<code>/quiz-stock-replenish</code> の前例）は定常運用移行後に判断する（初期は本節の手順ベースで回す）</li>
+  <li><strong>補充手順のスキル化は 17-7 で実施する</strong>（<code>/quiz-stock-replenish</code> の前例。17-6 で勝ち尺が確定するとビルド対象と在庫の数え方が変わるため、尺が固まってから 1 回で書く）。それまでは本節の手順 + <strong><code>content/ranking-stock/pref-ranking-1/WRITING-NOTES.md</code></strong>（17-3 で確立した執筆・レビュー・投入の勘所。スキルの一次資料）で回す</li>
 </ul>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>
