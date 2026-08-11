@@ -221,7 +221,7 @@ def build_review(items_and_data: list[tuple[dict[str, Any], dict[str, Any]]]) ->
 | `title` | タイトル帯（**1 行に収める制約**あり） | 【〜 TOP5】の見出し | ナレーション `intro` でも読み上げる |
 | `hook` | 出ない | **1 行目** | フィード・リール面でプレビュー表示される唯一の行。ここで止まるか決まる |
 | `trivia` | 出ない | 結果一覧の下の本文 | 「続きを読む」を開いた読者だけが読む |
-| `subtitle` | **30 秒版の導入 3.5s のみ** | 出ない | 20 秒版には導入シーンが無く、表示されない |
+| `subtitle` | **両尺の序盤に常設**（全国平均プレート。5 位の行が出るまで） | 出ない | 固定ラベルは付かないため、それ自体で完結した 1 行にする。ナレーションでは読まない |
 | `bg_motif` | 出ない（間接） | 出ない | ビルド時に imagegen へ渡す背景イラストの指示文。視聴者は完成した絵しか見ない |
 | `source_display` | **最下部の出典行帯に常設**（両尺・全編） | `※出典:` 行 | 画面とキャプションの両方に出る唯一のフィールド。単位の基準もここで示す |
 
@@ -381,7 +381,7 @@ pre {{ white-space: pre-wrap; overflow-wrap: anywhere; background: var(--code); 
 <tr><td><code>title</code></td><td>タイトル帯（<strong>1 行に収める制約</strong>あり）</td><td>【〜 TOP5】の見出し</td><td>ナレーション <code>intro</code> でも読み上げる</td></tr>
 <tr><td><code>hook</code></td><td>出ない</td><td><strong>1 行目</strong></td><td>フィード・リール面でプレビュー表示される唯一の行。ここで止まるか決まる</td></tr>
 <tr><td><code>trivia</code></td><td>出ない</td><td>結果一覧の下の本文</td><td>「続きを読む」を開いた読者だけが読む</td></tr>
-<tr><td><code>subtitle</code></td><td><strong>30 秒版の導入 3.5s のみ</strong></td><td>出ない</td><td>20 秒版には導入シーンが無く、表示されない</td></tr>
+<tr><td><code>subtitle</code></td><td><strong>両尺の序盤に常設</strong>（全国平均プレート。5 位の行が出るまで）</td><td>出ない</td><td>固定ラベルは付かないため、それ自体で完結した 1 行にする。ナレーションでは読まない</td></tr>
 <tr><td><code>bg_motif</code></td><td>出ない（間接）</td><td>出ない</td><td>ビルド時に imagegen へ渡す背景イラストの指示文。視聴者は完成した絵しか見ない</td></tr>
 <tr><td><code>source_display</code></td><td><strong>最下部の出典行帯に常設</strong>（両尺・全編）</td><td><code>※出典:</code> 行</td><td>画面とキャプションの両方に出る唯一のフィールド。単位の基準もここで示す</td></tr>
 </tbody>

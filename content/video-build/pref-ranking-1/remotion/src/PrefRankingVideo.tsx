@@ -32,10 +32,10 @@ import {
   rowTop,
 } from "./layout";
 import { THEME, TOKENS, Theme } from "./theme";
-import { TIMELINE_20S, Timeline } from "./timeline";
+import { Duration, TIMELINES, Timeline } from "./timeline";
 
 /**
- * 都道府県ランキング TOP5 地図ルーレット型（20 秒版）。
+ * 都道府県ランキング TOP5 地図ルーレット型（20 秒版 / 30 秒版）。
  * `variant` は 17-4a の色比較用（Fix 後に 1 本へ畳む）。
  *
  * 画面に出る文言はすべて props（entries / labels / title / subtitle / sourceDisplay /
@@ -60,6 +60,8 @@ export type Cue = {
    * （順位シーンは後ろ合わせ = 方式設計書セクション 8.3 の decision ①）。
    */
   startFrame: number;
+  /** 合成音声の実測長。null / 未指定なら版面確認用の既定長を使う */
+  frames?: number | null;
 };
 
 export type Labels = {
@@ -69,18 +71,16 @@ export type Labels = {
   rankSuffix: string;
   /** スピン中の吹き出し。{rank} を順位で置換する */
   searching: string;
-  /** 全国平均プレートの見出し */
-  averageLabel: string;
 };
 
 export const DEFAULT_LABELS: Labels = {
   setLabel: "都道府県ランキング TOP5",
   rankSuffix: "位",
   searching: "第{rank}位は…？",
-  averageLabel: "全国平均",
 };
 
 export type PrefRankingProps = {
+  duration: Duration;
   title: string;
   /** 全国平均などの補足（表示文字列そのもの）。序盤のプレートに出す */
   subtitle: string | null;
@@ -90,7 +90,7 @@ export type PrefRankingProps = {
   valueSuffix: string;
   backgroundSrc: string | null;
   entries: Entry[];
-  /** cue ID → セリフ（intro / teaser / r5..r2 / r1_call / r1_name / outro） */
+  /** cue ID → 尺別セリフ（順位コメントと closing / outro を含む） */
   cues: Record<string, Cue>;
   labels: Labels;
 };
@@ -309,10 +309,9 @@ const TitleBand: React.FC<{ theme: Theme; title: string; setLabel: string }> = (
 
 // ---------------------------------------------------------------- 全国平均プレート（序盤の受け皿）
 
-const AveragePlate: React.FC<{ theme: Theme; subtitle: string; labels: Labels; tl: Timeline }> = ({
+const AveragePlate: React.FC<{ theme: Theme; subtitle: string; tl: Timeline }> = ({
   theme,
   subtitle,
-  labels,
   tl,
 }) => {
   const frame = useCurrentFrame();
@@ -323,6 +322,12 @@ const AveragePlate: React.FC<{ theme: Theme; subtitle: string; labels: Labels; t
     extrapolateRight: "clamp",
   });
   if (leave <= 0) return null;
+  const numberAt = subtitle.search(/\p{Nd}/u);
+  const labelPart = numberAt < 0 ? subtitle : subtitle.slice(0, numberAt);
+  const valuePart = numberAt < 0 ? null : subtitle.slice(numberAt);
+  const valueFontSize = valuePart
+    ? Math.min(76, Math.round(760 / Math.max(1, valuePart.length * 0.62)))
+    : null;
   return (
     <div
       style={{
@@ -331,8 +336,8 @@ const AveragePlate: React.FC<{ theme: Theme; subtitle: string; labels: Labels; t
         right: 1080 - LIST.right,
         top: 1180,
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+        alignItems: "baseline",
+        justifyContent: "center",
         gap: 6,
         padding: "30px 0 36px",
         borderRadius: 28,
@@ -342,12 +347,29 @@ const AveragePlate: React.FC<{ theme: Theme; subtitle: string; labels: Labels; t
         transform: `scale(${0.96 + 0.04 * leave})`,
       }}
     >
-      <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: 8, color: theme.plateLabel }}>
-        {labels.averageLabel}
+      <div
+        style={{
+          fontSize: valuePart ? 34 : 52,
+          fontWeight: 700,
+          letterSpacing: valuePart ? 2 : 1,
+          color: theme.plateLabel,
+          lineHeight: 1.1,
+        }}
+      >
+        {labelPart}
       </div>
-      <div style={{ fontSize: 76, fontWeight: 700, color: theme.plateValue, lineHeight: 1.1 }}>
-        {subtitle}
-      </div>
+      {valuePart ? (
+        <div
+          style={{
+            fontSize: valueFontSize ?? 76,
+            fontWeight: 700,
+            color: theme.plateValue,
+            lineHeight: 1.1,
+          }}
+        >
+          {valuePart}
+        </div>
+      ) : null}
     </div>
   );
 };
@@ -381,6 +403,10 @@ const RankRow: React.FC<{
     closeLocal > 0 && closeLocal < 40
       ? Math.sin(interpolate(closeLocal, [0, 40], [0, Math.PI])) * (isFirst ? 1 : 0.6)
       : 0;
+  const shimmer =
+    isFirst && frame >= tl.closingAt
+      ? (Math.sin((frame - tl.closingAt) / 14) * 0.5 + 0.5) * 0.35
+      : 0;
   const fg = isFirst ? theme.onGold : theme.rowText;
 
   return (
@@ -398,7 +424,7 @@ const RankRow: React.FC<{
           : theme.rowBg,
         border: `2px solid ${isFirst ? theme.mapRevealedStroke : theme.rowBorder}`,
         boxShadow: isFirst
-          ? `${theme.rowShadow}, 0 0 ${44 + closePulse * 26}px rgba(217,166,46,${0.45 + 0.3 * closePulse})`
+          ? `${theme.rowShadow}, 0 0 ${44 + (closePulse + shimmer) * 26}px rgba(217,166,46,${0.45 + 0.3 * (closePulse + shimmer)})`
           : theme.rowShadow,
         transform: `translateX(${(1 - enter) * 90}px) translateY(${-closePulse * 6}px) scale(${0.98 + 0.02 * enter})`,
         opacity: Math.min(1, enter * 1.6),
@@ -621,6 +647,7 @@ const SourceBand: React.FC<{ theme: Theme; text: string }> = ({ theme, text }) =
 // ---------------------------------------------------------------- 本体
 
 export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
+  duration,
   title,
   subtitle,
   sourceDisplay,
@@ -634,7 +661,7 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const theme = THEME;
-  const tl = TIMELINE_20S;
+  const tl = TIMELINES[duration];
 
   const stage = stageAt(frame, entries, tl, theme);
   const announceAt = tl.rounds[1].stop;
@@ -649,16 +676,23 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
     if (frame < tl.rounds[5].start) return cues.teaser?.text ?? null;
     for (const rank of [5, 4, 3, 2]) {
       const t = tl.rounds[rank];
-      const next = rank === 2 ? tl.rounds[1].start : tl.rounds[rank - 1].start;
       if (frame >= t.start && frame < t.stop) {
         return labels.searching.replace("{rank}", String(rank));
       }
-      if (frame >= t.stop && frame < next) return cues[`r${rank}`]?.text ?? null;
+      if (frame >= t.stop && frame < (t.commentAt ?? t.end)) {
+        return cues[`r${rank}`]?.text ?? null;
+      }
+      if (t.commentAt !== null && frame >= t.commentAt && frame < t.end) {
+        return cues[`r${rank}_comment`]?.text ?? cues[`r${rank}`]?.text ?? null;
+      }
     }
     const one = tl.rounds[1];
     if (frame >= one.start && frame < one.stop) return cues.r1_call?.text ?? null;
     if (frame >= one.stop && frame < tl.closingAt) return cues.r1_name?.text ?? null;
-    return cues.outro?.text ?? null;
+    if (frame >= tl.closingAt) {
+      return cues.closing?.text ?? cues.outro?.text ?? null;
+    }
+    return null;
   })();
 
   // ポーズ 3 種は共通キャンバス・共通倍率の正式アセット（17-4b。scripts/normalize_character.py）。
@@ -696,7 +730,12 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
       {Object.values(cues)
         .filter((cue) => cue.audioSrc)
         .map((cue) => (
-          <Sequence key={cue.id} from={cue.startFrame} durationInFrames={180} layout="none">
+          <Sequence
+            key={cue.id}
+            from={cue.startFrame}
+            durationInFrames={cue.frames ?? 300}
+            layout="none"
+          >
             <Audio src={staticFile(cue.audioSrc as string)} />
           </Sequence>
         ))}
@@ -761,7 +800,9 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
               borderRadius: 28,
               padding: "14px 28px",
               fontFamily: FONT_DISPLAY,
-              fontSize: 48,
+              // 長い cue（30 秒版の closing は最長 30 文字程度まで予算に収まる）で 3 行になると
+              // 吹き出しの尻尾がキャラの頭に重なるため、行数が 2 行に収まるところまで落とす
+              fontSize: bubbleText.length > 26 ? 40 : bubbleText.length > 20 ? 44 : 48,
               fontWeight: FONT_DISPLAY_WEIGHT,
               lineHeight: 1.28,
               color: theme.bubbleText,
@@ -787,7 +828,7 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
       ) : null}
 
       {/* 序盤の受け皿（全国平均） */}
-      {subtitle ? <AveragePlate theme={theme} subtitle={subtitle} labels={labels} tl={tl} /> : null}
+      {subtitle ? <AveragePlate theme={theme} subtitle={subtitle} tl={tl} /> : null}
 
       {/* 確定県が地図から順位行へ落ちる */}
       {entries.map((entry) => (

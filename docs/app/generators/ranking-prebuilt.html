@@ -156,7 +156,7 @@
 <caption style="text-align:left;font-weight:bold;margin-bottom:.3rem;">タイムライン（17-2 巡 1 で Fix、17-3 で煽りシーンを追加。20 秒 = 600f / 30 秒 = 900f）</caption>
 <tr><th>尺</th><th>シーン構成（秒）</th></tr>
 <tr><td><strong>20 秒版</strong>（600f）</td><td>オープニング 2.5s → <strong>煽り 2.0s</strong>（視聴者に 1 位を予想させる）→ 5 位〜2 位 各 2.0s（スピン 1.0s + 停止フラッシュ・行追記 1.0s）→ 1 位 4.5s（タメ 2.5s + 発表 2.0s）→ 締め 3.0s</td></tr>
-<tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.5s（サブタイトル <code>content_fields.subtitle</code> を読む）→ <strong>煽り 2.0s</strong> → 5 位〜2 位 各 3.5s（スピン + 停止 2.0s + 順位コメント 1.5s）→ 1 位 5.5s（タメ + 発表）→ <strong>結果総覧 3.0s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 2.0s（結果総覧と締めの 5.0s は <code>closing</code> 1 本の cue でまたぐ）</td></tr>
+<tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.5s → <strong>煽り 2.0s</strong> → 5 位〜2 位 各 3.5s（スピン 1.0s + 停止フラッシュ・行追記 1.0s + 順位コメント 1.5s）→ 1 位 5.5s（タメ 3.0s + 発表 2.5s）→ <strong>結果総覧 3.0s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 2.0s（結果総覧と締めの 5.0s は <code>closing</code> 1 本の cue でまたぐ）</td></tr>
 </table>
 </div>
 <p>2 尺の検証仮説（17-2 巡 1 で Fix）: 20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>。</p>
@@ -192,7 +192,7 @@
     <li><strong>出典行は必ず 1 行</strong>に収める。文字数から字送りを自動算出する（下限 20px。<code>source_display</code> は全角 36 文字以内が推奨）</li>
     <li><strong>スピン中の吹き出し</strong>は <code>labels.searching</code>（「第{rank}位は…？」）を出す。結果を含まないため点滅表示と両立する</li>
   </ul>
-  コンポジションの実装は <code>content/video-build/pref-ranking-1/remotion/</code>（<code>layout.ts</code> = ジオメトリ / <code>theme.ts</code> = トークン / <code>timeline.ts</code> = アンカー / <code>PrefRankingVideo.tsx</code> = 版面）が正。
+  コンポジションの実装は <code>content/video-build/pref-ranking-1/remotion/</code>（<code>layout.ts</code> = ジオメトリ / <code>theme.ts</code> = トークン / <code>scripts/build_timeline.py</code> = タイムライン定数〔<code>src/timeline.json</code> は生成物〕 / <code>PrefRankingVideo.tsx</code> = 版面）が正。
 </div>
 <div class="decision">
   <span class="callout-title">決定（2026-08-11、17-4b）: 地図の PD 差し替え・素材の正式化</span>
@@ -219,12 +219,25 @@
   </ul>
 </div>
 
+<div class="decision">
+  <span class="callout-title">決定（2026-08-11、17-4c）: コンポジション本組み（2 尺・タイムライン定数の単一ソース化）</span>
+  20 秒版だけだったコンポジションを 2 尺へ本組みした。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>30 秒版タイムラインの導出値</strong>（フレーム）: 導入 0–105 / 煽り 105–165 / 5 位 165〜（停止 195・コメント 225）〜270 / 4 位 270〜（300・330）〜375 / 3 位 375〜（405・435）〜480 / 2 位 480〜（510・540）〜585 / 1 位 585〜（停止 675）〜750 / 結果総覧 750–840 / 締め 840–900。順位シーンの前半 2.0s は<strong>20 秒版と同じ「スピン 1.0s + 停止フラッシュ・行追記 1.0s」に割り</strong>、増えた 1.5s をコメント区間に充てる（20 秒版の呼吸をそのまま保ち、2 尺で演出のテンポを揃えるため）</li>
+    <li><strong>タイムライン定数の単一ソースは Python 側</strong>（<code>remotion/scripts/build_timeline.py</code> の <code>DURATION_SPECS</code> = 尺ごとのシーン長のみを持つコンパクトな仕様）で、<code>src/timeline.json</code> は生成物・<code>src/timeline.ts</code> はそれを読んで型を付けるだけにした。理由: <strong>アンカー解決と予算検査を行うビルドツーリング（17-4d / 17-4e）が Python</strong> で、TS と同じ数値を二重に持つと尺の調整で必ずずれるため（<code>japanPaths.ts</code> と同じ生成物方式）。20 秒版の導出値が 17-4a / 17-4b の Fix 値と一致することは pytest で固定してある</li>
+    <li><strong>結果総覧と締めは版面上ひとつながりの区間として扱う</strong>（<code>recapAt === closingAt</code>）。TOP5 が出そろった画面をそのまま見せるのが結果総覧の役割で、シーン境界で版面を切り替えない。5.0s が単調にならないよう、17-4a の順送りの持ち上げに加えて<strong>1 位行だけ緩やかな明滅</strong>を重ねる</li>
+    <li><strong>props の最終形</strong>: <code>duration</code>（尺 = タイムラインの選択）を必須にし、コンポジション側の尺ハードコードを廃止した。Composition は <code>calculateMetadata</code> で <code>props.duration</code> から <code>durationInFrames</code> を導出するため、<strong>props と尺が食い違わない</strong>。cue には <code>frames</code>（合成音声の実測長）を追加し、音声 Sequence の長さに使う（従来は 180f 固定）</li>
+    <li><strong>全国平均プレートの固定ラベル「全国平均」を廃止</strong>し、<code>content_fields.subtitle</code> を 1 行でそのまま出す（最初の数字の位置で分け、前半を小さく・後半〔数値〕を大きく描く）。理由: <code>subtitle</code> は「全国平均は1,984円」のように<strong>自己完結した表示文字列</strong>で固定ラベルと二重になるうえ、平均でない指標（009 温泉 =「全国の源泉は27,899本」）では<strong>固定ラベルが内容の誤りになる</strong></li>
+    <li>吹き出しは文字数でフォントサイズを 48 → 44 → 40 に落とす（30 秒版の <code>closing</code> は予算上 30 文字程度まで伸びうる。3 行になると吹き出しの尻尾がキャラの頭に重なる）</li>
+  </ul>
+</div>
+
 <h3 id="tts-sync">8.3 ナレーションと TTS のフレーム同期（尺別固定アンカー + 予算検査）</h3>
 <p>ナレーションはセリフ（cue）単位で TTS 合成し、<strong>タイムライン定数に固定したアンカーフレーム</strong>へ配置する（Phase 17 決定方針⑦の具体化）。cue ID の体系（<code>narration</code> JSON のキー。<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）:</p>
 <div class="table-wrap">
 <table>
 <tr><th>cue ID</th><th>内容</th><th>尺</th><th>同期先</th></tr>
-<tr><td><code>intro</code></td><td>導入（タイトル読み。30 秒版はサブタイトルまで読む）</td><td>両尺（テキストは尺別）</td><td>オープニング / 導入シーンの先頭</td></tr>
+<tr><td><code>intro</code></td><td>導入（タイトル読み。30 秒版は「〜、トップ5！」まで）</td><td>両尺（テキストは尺別）</td><td>オープニング / 導入シーンの先頭</td></tr>
 <tr><td><code>teaser</code></td><td><strong>煽り</strong>（「みんなはどこだと思う？」の類。視聴者に 1 位を予想させ、離脱前に一度考えさせる）。<strong>全ネタ必須</strong></td><td>両尺（テキストは尺別にしてよい）</td><td>煽りシーンの先頭</td></tr>
 <tr><td><code>r5</code>〜<code>r2</code></td><td>各順位の呼び込み + 県名（「まずは5位、埼玉県！」の形。<strong>1 本に統合</strong>）</td><td>両尺（テキストは尺別にしてよい）</td><td>各順位シーンの先頭（<strong>県名部分が停止フラッシュに重なる</strong>ようアンカーを詰める。下記 decision）</td></tr>
 <tr><td><code>r1_call</code></td><td>1 位のタメの煽り</td><td>両尺（テキストは尺別にしてよい）</td><td>1 位シーンのスピン開始</td></tr>
@@ -251,6 +264,18 @@
   <p style="margin:.3rem 0;">この 2 点で捻出した尺が <code>teaser</code> の原資であり、<strong>20 秒 = 600f / 30 秒 = 900f の総尺と、1 位シーン・結果総覧・締めの配分は変えていない</strong>（20 秒版は順位シーンが 2.5s → 2.0s、30 秒版は順位コメントが 2.0s → 1.5s に縮む）。</p>
   <p style="margin:.3rem 0;"><strong>変更 3: 締めのセリフを「呼びかけ」から「中身のある一言」に変える。</strong>20 秒版の <code>outro</code> は <strong>「みんなはわかったかな？」で全ネタ共通</strong>とし、冒頭の <code>teaser</code> で促した予想の答え合わせで閉じる。30 秒版は<strong>県名を並べるだけの <code>recap</code> を廃止</strong>し、<code>recap</code> + <code>outro</code> を <strong><code>closing</code> 1 本に統合</strong>して、そのネタの含意（<code>content_fields.trivia</code> の核）を口語で言い切る（例: 「納豆好きの地図は、きれいに北へ寄ってるな！」）。結果の一覧は結果総覧シーンの画面とキャプションの <code>result_list</code> で担保されており、読み上げで重ねる価値が低いという判断。<strong>保存の呼びかけはナレーションから外れる</strong>が、キャプションの TOP5 再掲（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 5</a>）が保存の動機を担う。</p>
   <p style="margin:.3rem 0;">統合に伴う実装上の制約が 2 つある。<strong>①アンカーの後ろ合わせ</strong>: 統合 cue は「◯位は」の呼び込みで始まり県名で終わるため、頭合わせのままだと県名の発話が停止フラッシュより早く終わる。順位シーンに限り、<strong>県名部分の発話開始が停止フラッシュに重なるようアンカーを詰める</strong>（実測長からの逆算。17-4 で調整）。<strong>②吹き出しの表示開始</strong>: 統合 cue のテキストは県名を含むため、キャラの吹き出しに<strong>スピン中から出すと結果が先にばれる</strong>。順位シーンの吹き出しは<strong>停止フラッシュ以降に限る</strong>（セクション 8.2）。</p>
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-08-11、17-4c）: アンカー表・後ろ合わせ・予算検査の実装</span>
+  <p style="margin:.3rem 0;">アンカー表と解決ロジックの正は <code>remotion/scripts/build_timeline.py</code>（<code>cue_anchors()</code> / <code>resolve_cue_frames()</code>）。cue ごとに <strong>align</strong>（<code>head</code> = 頭合わせ / <code>name</code> = 後ろ合わせ）と<strong>予算区間 <code>[budget_start, budget_end)</code></strong> を持ち、TTS の実測値（<code>frames</code> と、後ろ合わせ cue は<strong>県名の発話開始オフセット</strong> <code>name_offset_frames</code>）を渡すと配置フレームと違反一覧を返す純関数にした。</p>
+  <ul style="margin:.3rem 0 0;">
+    <li><code>head</code>: <code>start_frame = anchor</code> / <code>name</code>（<code>r5</code>〜<code>r2</code>）: <code>start_frame = anchor（= 停止フラッシュ） - name_offset_frames</code></li>
+    <li>違反は <strong>2 方向</strong>で検出する。<code>head_overrun</code> = 呼び込み部分が長すぎて前のシーンへ食い込む / <code>tail_overrun</code> = cue の尻が次の cue のアンカーへ食い込む。ほかに <code>missing</code>（実測なし）・<code>unknown</code>（尺に無い cue ID）・<code>missing_name_offset</code>。<strong>例外は投げず全件返す</strong>（ビルドツーリングがまとめて提示し、対処はセリフの短縮 → 話速 ≤ 1.2 の順）</li>
+    <li><strong>順位 cue の予算（両尺共通）: 呼び込み部分 30f（1.0s）・県名部分 30f（1.0s）</strong>。ほかの cue の予算は 20 秒版が <code>intro</code> 75f / <code>teaser</code> 60f / <code>r1_call</code> 75f / <code>r1_name</code> 60f / <code>outro</code> 90f、30 秒版が <code>intro</code> 105f / <code>teaser</code> 60f / 各 <code>*_comment</code> 45f / <code>r1_call</code> 90f / <code>r1_name</code> 75f / <code>closing</code> 150f</li>
+    <li><code>name_offset_frames</code>（県名の発話開始）の実測方法は 17-4d で確定する（VOICEVOX の <code>audio_query</code> が返すモーラ長の積み上げで算出する見込み）</li>
+    <li><strong><code>intro</code> の「30 秒版はサブタイトルまで読む」は撤回する</strong>（実態に合わせた修正）。第 1 バッチ 10 件の 30 秒版 <code>intro</code> はタイトル + 「トップ5！」までで、<code>content_fields.subtitle</code> は 17-4a の決定により<strong>両尺とも 0 秒から全国平均プレートとして画面に出る</strong>。読み上げでの重複は不要と判断し、必須にしない</li>
+  </ul>
 </div>
 
 <h3 id="rebuild">8.4 再ビルドが必要になる変更</h3>

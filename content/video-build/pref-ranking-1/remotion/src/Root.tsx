@@ -1,8 +1,16 @@
 import React from "react";
-import { Composition } from "remotion";
-import { PrefRankingVideo } from "./PrefRankingVideo";
-import { MOCK_PROPS } from "./mockProps";
-import { TIMELINE_20S } from "./timeline";
+import { CalculateMetadataFunction, Composition } from "remotion";
+import { PrefRankingProps, PrefRankingVideo } from "./PrefRankingVideo";
+import { MOCK_PROPS_20S, MOCK_PROPS_30S } from "./mockProps";
+import { TIMELINES } from "./timeline";
+
+const calculateMetadata: CalculateMetadataFunction<PrefRankingProps> = ({ props }) => {
+  const timeline = TIMELINES[props.duration];
+  return {
+    durationInFrames: timeline.total,
+    fps: timeline.fps,
+  };
+};
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -10,11 +18,18 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="PrefRanking20s"
         component={PrefRankingVideo}
-        durationInFrames={TIMELINE_20S.total}
-        fps={TIMELINE_20S.fps}
         width={1080}
         height={1920}
-        defaultProps={MOCK_PROPS}
+        defaultProps={MOCK_PROPS_20S}
+        calculateMetadata={calculateMetadata}
+      />
+      <Composition
+        id="PrefRanking30s"
+        component={PrefRankingVideo}
+        width={1080}
+        height={1920}
+        defaultProps={MOCK_PROPS_30S}
+        calculateMetadata={calculateMetadata}
       />
     </>
   );

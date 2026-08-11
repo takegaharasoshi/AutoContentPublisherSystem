@@ -10,7 +10,9 @@
 |---|---|
 | `src/layout.ts` | 版面のジオメトリ（セーフ域・地図ボックス・順位行スタック・出典行帯・キャラ位置） |
 | `src/theme.ts` | カラートークン（生成り × 淡墨茶 × 金。17-4a で Fix） |
-| `src/timeline.ts` | 尺別のタイムライン定数（シーン境界・スピン・行の出現フレーム） |
+| `scripts/build_timeline.py` | 尺別タイムラインと cue アンカー・音声予算検査の単一ソース |
+| `src/timeline.json` | 上記スクリプトから生成するタイムライン（**自動生成物なので手で編集しない**） |
+| `src/timeline.ts` | timeline.json の型付けと Remotion 向け読み込み |
 | `src/PrefRankingVideo.tsx` | 版面本体。画面に出る文言はすべて props（英語圏展開の再利用要件②） |
 | `src/japanPaths.ts` | 日本地図のパスデータ（**Natural Earth = PD 由来。自動生成物なので手で編集しない**） |
 | `src/prefCentroids.ts` | 各県のラベル起点（確定県名の飛翔の起点）。japanPaths.ts と同時に自動生成 |
@@ -45,9 +47,28 @@ docker run --rm -v "$PWD:/work" -w /work -e HOME=/tmp --user $(id -u):$(id -g) r
 docker run --rm -v "$PWD:/work" -w /work -e HOME=/tmp --user $(id -u):$(id -g) remotion-render \
   npx remotion render src/index.ts PrefRanking20s work/out/main_20s.mp4 --props=work/props/main.json \
   --concurrency=3 --timeout=120000
+
+# 通し（30 秒）
+docker run --rm -v "$PWD:/work" -w /work -e HOME=/tmp --user $(id -u):$(id -g) remotion-render \
+  npx remotion render src/index.ts PrefRanking30s work/out/main_30s.mp4 --props=work/props/main.json \
+  --concurrency=3 --timeout=120000
 ```
 
+コンポジションは尺ごとに 2 本（`PrefRanking20s` / `PrefRanking30s`）。尺は props の `duration` が正で、
+`durationInFrames` は `calculateMetadata` がそこから導出します（`--props` の JSON にも `duration` を入れる。
+省略するとコンポジションの `defaultProps` の値が使われる）。
+
 版面レビュー用の HTML は `python scripts/design_review_sheet.py`（`work/design-review.html` を生成）。
+
+## タイムラインの再生成
+
+尺・シーン境界・cue アンカーの定数は `scripts/build_timeline.py` が正です。変更後は JSON を再生成し、
+CI などでは `--check` で生成物が最新かを検査します。
+
+```bash
+python scripts/build_timeline.py
+python scripts/build_timeline.py --check
+```
 
 ## フォント（17-4b で Fix）
 

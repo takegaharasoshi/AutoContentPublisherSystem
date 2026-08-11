@@ -1,0 +1,283 @@
+{
+  "_comment": "生成物。scripts/build_timeline.py が正。手で編集しない",
+  "durations": {
+    "20s": {
+      "duration": "20s",
+      "fps": 30,
+      "total": 600,
+      "teaserAt": 75,
+      "recapAt": null,
+      "closingAt": 510,
+      "rounds": {
+        "1": {
+          "start": 375,
+          "spin": 75,
+          "stop": 450,
+          "flyStart": 492,
+          "flyDur": 18,
+          "rowAt": 508,
+          "commentAt": null,
+          "end": 510
+        },
+        "2": {
+          "start": 315,
+          "spin": 30,
+          "stop": 345,
+          "flyStart": 353,
+          "flyDur": 16,
+          "rowAt": 367,
+          "commentAt": null,
+          "end": 375
+        },
+        "3": {
+          "start": 255,
+          "spin": 30,
+          "stop": 285,
+          "flyStart": 293,
+          "flyDur": 16,
+          "rowAt": 307,
+          "commentAt": null,
+          "end": 315
+        },
+        "4": {
+          "start": 195,
+          "spin": 30,
+          "stop": 225,
+          "flyStart": 233,
+          "flyDur": 16,
+          "rowAt": 247,
+          "commentAt": null,
+          "end": 255
+        },
+        "5": {
+          "start": 135,
+          "spin": 30,
+          "stop": 165,
+          "flyStart": 173,
+          "flyDur": 16,
+          "rowAt": 187,
+          "commentAt": null,
+          "end": 195
+        }
+      },
+      "cueAnchors": [
+        {
+          "id": "intro",
+          "align": "head",
+          "anchor": 0,
+          "budgetStart": 0,
+          "budgetEnd": 75
+        },
+        {
+          "id": "teaser",
+          "align": "head",
+          "anchor": 75,
+          "budgetStart": 75,
+          "budgetEnd": 135
+        },
+        {
+          "id": "r5",
+          "align": "name",
+          "anchor": 165,
+          "budgetStart": 135,
+          "budgetEnd": 195
+        },
+        {
+          "id": "r4",
+          "align": "name",
+          "anchor": 225,
+          "budgetStart": 195,
+          "budgetEnd": 255
+        },
+        {
+          "id": "r3",
+          "align": "name",
+          "anchor": 285,
+          "budgetStart": 255,
+          "budgetEnd": 315
+        },
+        {
+          "id": "r2",
+          "align": "name",
+          "anchor": 345,
+          "budgetStart": 315,
+          "budgetEnd": 375
+        },
+        {
+          "id": "r1_call",
+          "align": "head",
+          "anchor": 375,
+          "budgetStart": 375,
+          "budgetEnd": 450
+        },
+        {
+          "id": "r1_name",
+          "align": "head",
+          "anchor": 450,
+          "budgetStart": 450,
+          "budgetEnd": 510
+        },
+        {
+          "id": "outro",
+          "align": "head",
+          "anchor": 510,
+          "budgetStart": 510,
+          "budgetEnd": 600
+        }
+      ]
+    },
+    "30s": {
+      "duration": "30s",
+      "fps": 30,
+      "total": 900,
+      "teaserAt": 105,
+      "recapAt": 750,
+      "closingAt": 750,
+      "rounds": {
+        "1": {
+          "start": 585,
+          "spin": 90,
+          "stop": 675,
+          "flyStart": 717,
+          "flyDur": 18,
+          "rowAt": 733,
+          "commentAt": null,
+          "end": 750
+        },
+        "2": {
+          "start": 480,
+          "spin": 30,
+          "stop": 510,
+          "flyStart": 518,
+          "flyDur": 16,
+          "rowAt": 532,
+          "commentAt": 540,
+          "end": 585
+        },
+        "3": {
+          "start": 375,
+          "spin": 30,
+          "stop": 405,
+          "flyStart": 413,
+          "flyDur": 16,
+          "rowAt": 427,
+          "commentAt": 435,
+          "end": 480
+        },
+        "4": {
+          "start": 270,
+          "spin": 30,
+          "stop": 300,
+          "flyStart": 308,
+          "flyDur": 16,
+          "rowAt": 322,
+          "commentAt": 330,
+          "end": 375
+        },
+        "5": {
+          "start": 165,
+          "spin": 30,
+          "stop": 195,
+          "flyStart": 203,
+          "flyDur": 16,
+          "rowAt": 217,
+          "commentAt": 225,
+          "end": 270
+        }
+      },
+      "cueAnchors": [
+        {
+          "id": "intro",
+          "align": "head",
+          "anchor": 0,
+          "budgetStart": 0,
+          "budgetEnd": 105
+        },
+        {
+          "id": "teaser",
+          "align": "head",
+          "anchor": 105,
+          "budgetStart": 105,
+          "budgetEnd": 165
+        },
+        {
+          "id": "r5",
+          "align": "name",
+          "anchor": 195,
+          "budgetStart": 165,
+          "budgetEnd": 225
+        },
+        {
+          "id": "r5_comment",
+          "align": "head",
+          "anchor": 225,
+          "budgetStart": 225,
+          "budgetEnd": 270
+        },
+        {
+          "id": "r4",
+          "align": "name",
+          "anchor": 300,
+          "budgetStart": 270,
+          "budgetEnd": 330
+        },
+        {
+          "id": "r4_comment",
+          "align": "head",
+          "anchor": 330,
+          "budgetStart": 330,
+          "budgetEnd": 375
+        },
+        {
+          "id": "r3",
+          "align": "name",
+          "anchor": 405,
+          "budgetStart": 375,
+          "budgetEnd": 435
+        },
+        {
+          "id": "r3_comment",
+          "align": "head",
+          "anchor": 435,
+          "budgetStart": 435,
+          "budgetEnd": 480
+        },
+        {
+          "id": "r2",
+          "align": "name",
+          "anchor": 510,
+          "budgetStart": 480,
+          "budgetEnd": 540
+        },
+        {
+          "id": "r2_comment",
+          "align": "head",
+          "anchor": 540,
+          "budgetStart": 540,
+          "budgetEnd": 585
+        },
+        {
+          "id": "r1_call",
+          "align": "head",
+          "anchor": 585,
+          "budgetStart": 585,
+          "budgetEnd": 675
+        },
+        {
+          "id": "r1_name",
+          "align": "head",
+          "anchor": 675,
+          "budgetStart": 675,
+          "budgetEnd": 750
+        },
+        {
+          "id": "closing",
+          "align": "head",
+          "anchor": 750,
+          "budgetStart": 750,
+          "budgetEnd": 900
+        }
+      ]
+    }
+  }
+}
