@@ -74,8 +74,8 @@ def test_timelines_fill_each_duration_without_gaps_or_overlaps() -> None:
 def test_20s_keeps_the_fixed_17_4d_spacing_values() -> None:
     """17-4dで順位間の間を空けるため見直した20秒尺配分を固定する。"""
     timeline = build_timeline.build_timelines()["20s"]
-    assert timeline.teaser_at == 67
-    assert timeline.closing_at == 539
+    assert timeline.teaser_at == 70
+    assert timeline.closing_at == 542
     assert timeline.rounds[5].stop == 164
     assert timeline.rounds[5].row_at == 186
     assert timeline.rounds[1].start == 422

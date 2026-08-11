@@ -13,8 +13,7 @@ from tts import CueAudio, CueRequest, TtsEngine, TtsError, VoicevoxEngine
 
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_SPEED_SCALE = 1.1
-AUTO_SPEED_STEPS = (1.15, 1.2)
+DEFAULT_SPEED_SCALE = 1.2
 
 
 class NarrationBuildError(RuntimeError):
@@ -159,7 +158,7 @@ def _synthesize_requests(
     audio_dir: Path,
     manifest: dict[str, dict[str, Any]],
     engine: TtsEngine,
-    speeds: Mapping[str, float],
+    speed_scale: float,
     *,
     force_ids: set[str],
 ) -> dict[str, CueAudio]:
@@ -174,10 +173,10 @@ def _synthesize_requests(
                 cue_id,
                 out_path,
                 entry,
-                require_identity=(request.text, speeds[cue_id], engine_id),
+                require_identity=(request.text, speed_scale, engine_id),
             )
         audio = cached or engine.synthesize(
-            request, out_path, speed_scale=speeds[cue_id]
+            request, out_path, speed_scale=speed_scale
         )
         audios[cue_id] = audio
         manifest[cue_id] = _manifest_entry(audio, request.text)
@@ -218,15 +217,9 @@ def _resolve(
     return build_timeline.resolve_cue_frames(timeline, measures)
 
 
-def _next_speed(current: float) -> float | None:
-    return next((step for step in AUTO_SPEED_STEPS if step > current + 1e-9), None)
-
-
 def _print_report(
     timeline: build_timeline.Timeline,
     result: build_timeline.ResolvedCues,
-    speeds: Mapping[str, float],
-    initial_speed: float,
     stream: TextIO,
 ) -> None:
     print("cue ID | 開始 | 長さ | 終端 | 次 cue 間隔 | 県名遅れ | 判定", file=stream)
@@ -241,15 +234,10 @@ def _print_report(
             else timeline.total
         )
         lag = str(cue.name_lag_frames) if cue.align == "name" else "-"
-        statuses: list[str] = []
-        if speeds.get(anchor.id, initial_speed) > initial_speed + 1e-9:
-            statuses.append(
-                f"話速 {speeds[anchor.id]:g} へ引き上げ"
-            )
-        statuses.append("違反" if anchor.id in violation_ids else "OK")
+        status = "違反" if anchor.id in violation_ids else "OK"
         print(
             f"{anchor.id} | {cue.start_frame} | {cue.frames} | {end} | "
-            f"{next_start - end} | {lag} | {' / '.join(statuses)}",
+            f"{next_start - end} | {lag} | {status}",
             file=stream,
         )
     if result.violations:
@@ -268,7 +256,6 @@ def build_narration(
     out_path: Path | None = None,
     name: str | None = None,
     speed_scale: float = DEFAULT_SPEED_SCALE,
-    auto_speed: bool = False,
     force: bool = False,
     dry_run: bool = False,
     stdout: TextIO = sys.stdout,
@@ -276,8 +263,6 @@ def build_narration(
     """合成・配置検査を行い、成功時だけ解決済み props を書き出す。"""
     if speed_scale <= 0 or speed_scale > 1.2:
         raise NarrationBuildError("話速は 0 より大きく 1.2 以下にしてください。")
-    if dry_run and auto_speed:
-        raise NarrationBuildError("--dry-run と --auto-speed は同時に指定できません。")
 
     props_path = Path(props_path)
     props = _read_json(props_path)
@@ -292,51 +277,22 @@ def build_narration(
     audio_dir = PROJECT_DIR / "public" / "narration" / output_name
     manifest_path = audio_dir / "manifest.json"
     manifest = _read_manifest(manifest_path)
-    speeds = {cue_id: speed_scale for cue_id in requests}
 
     if dry_run:
         audios = _dry_run_audios(requests, audio_dir, manifest)
-        speeds = {cue_id: audio.speed_scale for cue_id, audio in audios.items()}
     else:
         audios = _synthesize_requests(
             requests,
             audio_dir,
             manifest,
             engine,
-            speeds,
+            speed_scale,
             force_ids=set(requests) if force else set(),
         )
         _write_json(manifest_path, manifest)
 
     result = _resolve(timeline, audios)
-    while auto_speed and not result.ok:
-        affected = {
-            item.id
-            for item in result.violations
-            if item.kind in {"head_overrun", "tail_overrun"}
-            and item.id in requests
-        }
-        raised: set[str] = set()
-        for cue_id in affected:
-            next_speed = _next_speed(speeds[cue_id])
-            if next_speed is not None:
-                speeds[cue_id] = next_speed
-                raised.add(cue_id)
-        if not raised:
-            break
-        refreshed = _synthesize_requests(
-            {cue_id: requests[cue_id] for cue_id in raised},
-            audio_dir,
-            manifest,
-            engine,
-            speeds,
-            force_ids=raised,
-        )
-        audios.update(refreshed)
-        _write_json(manifest_path, manifest)
-        result = _resolve(timeline, audios)
-
-    _print_report(timeline, result, speeds, speed_scale, stdout)
+    _print_report(timeline, result, stdout)
     if not result.ok:
         return 1
 
@@ -357,7 +313,6 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("props", type=Path, help="Remotion に渡す props JSON")
     parser.add_argument("--speed", type=float, default=DEFAULT_SPEED_SCALE, help="既定話速")
-    parser.add_argument("--auto-speed", action="store_true", help="違反 cue の話速を最大 1.2 まで上げる")
     parser.add_argument("--engine", default="http://127.0.0.1:50021", help="VOICEVOX Engine URL")
     parser.add_argument("--speaker", type=int, default=12, help="VOICEVOX 話者 ID")
     parser.add_argument("--out", type=Path, help="解決済み props の出力先")
@@ -382,7 +337,6 @@ def main(
             out_path=args.out,
             name=args.name,
             speed_scale=args.speed,
-            auto_speed=args.auto_speed,
             force=args.force,
             dry_run=args.dry_run,
         )

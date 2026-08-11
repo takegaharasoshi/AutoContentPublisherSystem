@@ -5,9 +5,9 @@
       "duration": "20s",
       "fps": 30,
       "total": 600,
-      "teaserAt": 67,
+      "teaserAt": 70,
       "recapAt": null,
-      "closingAt": 539,
+      "closingAt": 542,
       "rounds": {
         "1": {
           "start": 422,
@@ -17,7 +17,7 @@
           "flyDur": 18,
           "rowAt": 552,
           "commentAt": null,
-          "end": 539
+          "end": 542
         },
         "2": {
           "start": 350,
@@ -66,13 +66,13 @@
           "align": "head",
           "anchor": 0,
           "budgetStart": 0,
-          "budgetEnd": 67
+          "budgetEnd": 70
         },
         {
           "id": "teaser",
           "align": "head",
-          "anchor": 67,
-          "budgetStart": 67,
+          "anchor": 70,
+          "budgetStart": 70,
           "budgetEnd": 134
         },
         {
@@ -115,13 +115,13 @@
           "align": "head",
           "anchor": 494,
           "budgetStart": 494,
-          "budgetEnd": 539
+          "budgetEnd": 542
         },
         {
           "id": "outro",
           "align": "head",
-          "anchor": 539,
-          "budgetStart": 539,
+          "anchor": 542,
+          "budgetStart": 542,
           "budgetEnd": 600
         }
       ]
@@ -130,59 +130,59 @@
       "duration": "30s",
       "fps": 30,
       "total": 900,
-      "teaserAt": 91,
-      "recapAt": 782,
-      "closingAt": 782,
+      "teaserAt": 89,
+      "recapAt": 783,
+      "closingAt": 783,
       "rounds": {
         "1": {
-          "start": 632,
-          "spin": 90,
-          "stop": 722,
-          "flyStart": 764,
+          "start": 642,
+          "spin": 87,
+          "stop": 729,
+          "flyStart": 771,
           "flyDur": 18,
-          "rowAt": 780,
+          "rowAt": 787,
           "commentAt": null,
-          "end": 782
+          "end": 783
         },
         "2": {
-          "start": 512,
+          "start": 519,
           "spin": 30,
-          "stop": 542,
-          "flyStart": 550,
+          "stop": 549,
+          "flyStart": 557,
           "flyDur": 16,
-          "rowAt": 564,
-          "commentAt": 575,
-          "end": 632
+          "rowAt": 571,
+          "commentAt": 588,
+          "end": 642
         },
         "3": {
-          "start": 392,
+          "start": 396,
           "spin": 30,
-          "stop": 422,
-          "flyStart": 430,
+          "stop": 426,
+          "flyStart": 434,
           "flyDur": 16,
-          "rowAt": 444,
-          "commentAt": 455,
-          "end": 512
+          "rowAt": 448,
+          "commentAt": 465,
+          "end": 519
         },
         "4": {
-          "start": 272,
+          "start": 273,
           "spin": 30,
-          "stop": 302,
-          "flyStart": 310,
+          "stop": 303,
+          "flyStart": 311,
           "flyDur": 16,
-          "rowAt": 324,
-          "commentAt": 335,
-          "end": 392
+          "rowAt": 325,
+          "commentAt": 342,
+          "end": 396
         },
         "5": {
-          "start": 152,
+          "start": 150,
           "spin": 30,
-          "stop": 182,
-          "flyStart": 190,
+          "stop": 180,
+          "flyStart": 188,
           "flyDur": 16,
-          "rowAt": 204,
-          "commentAt": 215,
-          "end": 272
+          "rowAt": 202,
+          "commentAt": 219,
+          "end": 273
         }
       },
       "cueAnchors": [
@@ -191,90 +191,90 @@
           "align": "head",
           "anchor": 0,
           "budgetStart": 0,
-          "budgetEnd": 91
+          "budgetEnd": 89
         },
         {
           "id": "teaser",
           "align": "head",
-          "anchor": 91,
-          "budgetStart": 91,
-          "budgetEnd": 152
+          "anchor": 89,
+          "budgetStart": 89,
+          "budgetEnd": 150
         },
         {
           "id": "r5",
           "align": "name",
-          "anchor": 182,
-          "budgetStart": 152,
-          "budgetEnd": 215
+          "anchor": 180,
+          "budgetStart": 150,
+          "budgetEnd": 219
         },
         {
           "id": "r5_comment",
           "align": "head",
-          "anchor": 215,
-          "budgetStart": 215,
-          "budgetEnd": 272
+          "anchor": 219,
+          "budgetStart": 219,
+          "budgetEnd": 273
         },
         {
           "id": "r4",
           "align": "name",
-          "anchor": 302,
-          "budgetStart": 272,
-          "budgetEnd": 335
+          "anchor": 303,
+          "budgetStart": 273,
+          "budgetEnd": 342
         },
         {
           "id": "r4_comment",
           "align": "head",
-          "anchor": 335,
-          "budgetStart": 335,
-          "budgetEnd": 392
+          "anchor": 342,
+          "budgetStart": 342,
+          "budgetEnd": 396
         },
         {
           "id": "r3",
           "align": "name",
-          "anchor": 422,
-          "budgetStart": 392,
-          "budgetEnd": 455
+          "anchor": 426,
+          "budgetStart": 396,
+          "budgetEnd": 465
         },
         {
           "id": "r3_comment",
           "align": "head",
-          "anchor": 455,
-          "budgetStart": 455,
-          "budgetEnd": 512
+          "anchor": 465,
+          "budgetStart": 465,
+          "budgetEnd": 519
         },
         {
           "id": "r2",
           "align": "name",
-          "anchor": 542,
-          "budgetStart": 512,
-          "budgetEnd": 575
+          "anchor": 549,
+          "budgetStart": 519,
+          "budgetEnd": 588
         },
         {
           "id": "r2_comment",
           "align": "head",
-          "anchor": 575,
-          "budgetStart": 575,
-          "budgetEnd": 632
+          "anchor": 588,
+          "budgetStart": 588,
+          "budgetEnd": 642
         },
         {
           "id": "r1_call",
           "align": "head",
-          "anchor": 632,
-          "budgetStart": 632,
-          "budgetEnd": 722
+          "anchor": 642,
+          "budgetStart": 642,
+          "budgetEnd": 729
         },
         {
           "id": "r1_name",
           "align": "head",
-          "anchor": 722,
-          "budgetStart": 722,
-          "budgetEnd": 782
+          "anchor": 729,
+          "budgetStart": 729,
+          "budgetEnd": 783
         },
         {
           "id": "closing",
           "align": "head",
-          "anchor": 782,
-          "budgetStart": 782,
+          "anchor": 783,
+          "budgetStart": 783,
           "budgetEnd": 900
         }
       ]

@@ -53,8 +53,8 @@ python scripts/build_narration.py work/props/001-20s.json
 python scripts/build_narration.py work/props/001-20s.json --out work/props/001-20s-resolved.json
 ```
 
-合成物は `public/narration/<props の stem>/` に置かれます。原則はセリフを直して予算内に収め、
-どうしても必要な場合だけ `--auto-speed` で違反 cue の話速を 1.15、最大 1.2 まで段階的に上げます。
+合成物は `public/narration/<props の stem>/` に置かれます。話速の既定値 1.2 は設計上の上限であるため、
+予算超過時はセリフを短くして予算内に収めます。
 既存合成物を再検査するときは `--dry-run`、キャッシュを無視して再合成するときは `--force` を使います。
 
 **違反があるときは props を書き換えず終了コード 1 で終わります**（同期の崩れた動画をビルドさせないため）。
@@ -74,7 +74,8 @@ docker run --rm -u $(id -u):$(id -g) -v "$PWD:/work" -w /work \
   scripts/normalize_loudness.py work/out/main_20s.mp4 work/out/main_20s_norm.mp4
 ```
 
-目標は I = -14 LUFS / TP = -1.5 dBTP（linear モードのためピーク制約が効いて -15 LUFS 前後に着地します）。
+目標は I = -14 LUFS / TP = -2.0 dBTP（linear モードのためピーク制約が効いて -15 LUFS 前後に着地します。
+TP を -2 に取ってあるのは AAC 化でインターサンプルピークが 1 dB ほど上がる実測に合わせたものです）。
 `--measure-only` で計測だけもできます。WSL に ffmpeg は無いので image-batch のイメージ経由で実行します。
 
 ## レンダリング

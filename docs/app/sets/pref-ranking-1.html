@@ -132,7 +132,7 @@ VOICEVOX:白上虎太郎
 <tr><th>項目</th><th>値</th></tr>
 <tr><td>エンジン</td><td>VOICEVOX Engine（ローカル Docker。イメージは <code>voicevox/voicevox_engine:cpu-ubuntu20.04-latest</code>。合成時のエンジンバージョンは <code>public/narration/&lt;name&gt;/manifest.json</code> に記録され、変わると再合成される）</td></tr>
 <tr><td>話者</td><td>白上虎太郎「ふつう」= <strong>スタイル ID 12</strong>（17-4d 確定。ツーリングの既定値 = <code>remotion/scripts/tts.py</code> / <code>build_narration.py --speaker</code>）</td></tr>
-<tr><td>既定パラメータ</td><td>話速 <code>speedScale = 1.1</code> / 抑揚 <code>intonationScale = 1.2</code>（17-2 巡 1 Fix）。予算超過時の話速引き上げは<strong>上限 1.2</strong>（第一の対処はセリフ修正 = 方式設計書セクション 8.3）</td></tr>
+<tr><td>既定パラメータ</td><td>話速 <code>speedScale = 1.2</code> / 抑揚 <code>intonationScale = 1.2</code>（<strong>17-4d 改定</strong>。17-2 巡 1 は 1.1 だったが、順位間の間を作る原資として設計上の上限 1.2 を既定にした = ユーザー判断）。<strong>話速はこれ以上上げない</strong>ため、予算超過時の対処は<strong>セリフの短縮のみ</strong>（方式設計書セクション 8.3）</td></tr>
 <tr><td>クレジット表記</td><td><strong>「VOICEVOX:白上虎太郎」をキャプションに常設</strong>（セクション 5。VOICEVOX 利用規約が求める「VOICEVOX:キャラクター名」形式）</td></tr>
 </table>
 </div>
