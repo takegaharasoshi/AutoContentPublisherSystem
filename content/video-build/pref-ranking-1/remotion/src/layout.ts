@@ -40,6 +40,12 @@ export const mapPoint = (x: number, y: number): { x: number; y: number } => ({
   y: MAP_ORIGIN.y + (y - MAP_VIEWBOX.y) * MAP_SCALE,
 });
 
+/**
+ * 南西諸島インセットの拡大パネル（viewBox 座標）。1 位がインセットの県のときだけ出す。
+ * 太平洋側の空き（四国・紀伊半島より東、順位行より上）に置く。
+ */
+export const MAP_INSET_PANEL = { x: 380, y: 470, width: 618, height: 526, padding: 28 } as const;
+
 /** 地図コンテナの拡大（transform-origin: center top）の基準点 */
 export const MAP_ZOOM_ORIGIN = {
   x: MAP_BOX.left + MAP_BOX.width / 2,

@@ -54,6 +54,8 @@ export const THEME = {
   bubbleBorder: TOKENS.sumiDeep,
   bubbleText: TOKENS.vermilion,
   plateBg: "rgba(255,253,245,0.86)",
+  /** 南西諸島インセットの拡大パネル（1 位がインセットの県のときだけ出す。本土に重ねる） */
+  focusPanelBg: "rgba(252,247,235,0.97)",
   plateLabel: TOKENS.vermilion,
   plateValue: TOKENS.sumiDeep,
   mapBaseFill: rgba(0.14),

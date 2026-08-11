@@ -12,6 +12,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { FONT_DISPLAY, FONT_DISPLAY_WEIGHT, FONT_TEXT } from "./fonts";
+import { INSET_ONLY_PREF_CODES } from "./japanPaths";
 import { JapanMap } from "./JapanMap";
 import { MapPalette } from "./palette";
 import { PREF_CENTROIDS } from "./prefCentroids";
@@ -22,6 +23,7 @@ import {
   LIST,
   LIST_TOP,
   MAP_BOX,
+  MAP_INSET_PANEL,
   MAP_VIEWBOX,
   SAFE,
   SOURCE_BAND,
@@ -118,6 +120,8 @@ const mapPalette = (theme: Theme): MapPalette => ({
   litGlow: "rgba(217,166,46,0.72)",
   flashStroke: "#FFFFFF",
   flashGlow: "rgba(244,215,125,0.95)",
+  focusPanelBg: theme.focusPanelBg,
+  focusPanelBorder: theme.mapBaseStroke,
 });
 
 /** 減速するルーレットの点滅タイミング（ラウンド内ローカルフレーム） */
@@ -467,12 +471,14 @@ const RankRow: React.FC<{
 
 // ---------------------------------------------------------------- 地図 → 行へ飛ぶ県名
 
-const FlyingName: React.FC<{ entry: Entry; theme: Theme; tl: Timeline; zoom: number }> = ({
-  entry,
-  theme,
-  tl,
-  zoom,
-}) => {
+const FlyingName: React.FC<{
+  entry: Entry;
+  theme: Theme;
+  tl: Timeline;
+  zoom: number;
+  /** 1 位がインセットの県で、拡大パネルが出ているか */
+  insetFocused: boolean;
+}> = ({ entry, theme, tl, zoom, insetFocused }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = tl.rounds[entry.rank];
@@ -485,9 +491,18 @@ const FlyingName: React.FC<{ entry: Entry; theme: Theme; tl: Timeline; zoom: num
   const centroid = PREF_CENTROIDS[entry.prefCode] ?? { x: 500, y: 500 };
   const anchor = mapPointZoomed(centroid.x, centroid.y, zoom);
   // 1 位は地図中央下に大きく据えて見せ場にする。2〜5 位は該当県の真上に吹き出す
-  // （重心に重ねると、塗られたばかりの県自体をラベルが隠してしまうため）
+  // （重心に重ねると、塗られたばかりの県自体をラベルが隠してしまうため）。
+  // ただし 1 位がインセットの県のときは拡大パネルが地図中央下に出るため、
+  // ラベルはパネルの真上へ逃がす（せっかく拡大した島をラベルで隠さない）。
+  const panelTop = mapPointZoomed(
+    MAP_INSET_PANEL.x + MAP_INSET_PANEL.width / 2,
+    MAP_INSET_PANEL.y,
+    zoom
+  );
   const from = isFirst
-    ? { x: (SAFE.left + SAFE.right) / 2, y: LIST_TOP - 190 }
+    ? insetFocused
+      ? { x: panelTop.x, y: panelTop.y - startSize * 0.42 }
+      : { x: (SAFE.left + SAFE.right) / 2, y: LIST_TOP - 190 }
     : { x: anchor.x, y: anchor.y - startSize * 0.72 };
   const to = { x: LIST.left + 300, y: rowTop(entry.rank) + rowHeight(entry.rank) / 2 };
 
@@ -655,6 +670,19 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
     : frame >= tl.rounds[1].start
       ? "char/goro_suspense.png"
       : "char/goro_base.png";
+  // 1 位の確定がインセットの中だけで起きる県（= 沖縄）のときは、発表に合わせて
+  // インセットを拡大パネルへ引き出す。島が小さく、そのままでは「1 位が金に光る」
+  // 見せ場が成立しないため（17-4b のユーザー指摘）。鹿児島は本土側が主役なので出さない。
+  const firstEntry = entries.find((entry) => entry.rank === 1);
+  const focusesInset =
+    firstEntry !== undefined && INSET_ONLY_PREF_CODES.includes(firstEntry.prefCode);
+  const insetFocus = focusesInset
+    ? spring({
+        frame: frame - announceAt,
+        fps,
+        config: { damping: 20, stiffness: 120, mass: 0.8 },
+      })
+    : 0;
   const bob = Math.sin(frame / 9) * 5;
   const announcePop = isAnnounced
     ? spring({ frame: frame - announceAt, fps, config: { damping: 15, stiffness: 160, mass: 0.6 } })
@@ -696,6 +724,7 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
           revealed={stage.revealed}
           palette={mapPalette(theme)}
           viewBox={`${MAP_VIEWBOX.x} ${MAP_VIEWBOX.y} ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`}
+          insetFocus={insetFocus}
         />
       </div>
 
@@ -764,9 +793,28 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
 
       {/* 確定県が地図から順位行へ落ちる */}
       {entries.map((entry) => (
-        <FlyingName key={`fly-${entry.rank}`} entry={entry} theme={theme} tl={tl} zoom={mapZoom} />
+        <FlyingName
+          key={`fly-${entry.rank}`}
+          entry={entry}
+          theme={theme}
+          tl={tl}
+          zoom={mapZoom}
+          insetFocused={focusesInset}
+        />
       ))}
-      <Burst at={announceAt} origin={{ x: 540, y: LIST_TOP - 190 }} theme={theme} />
+      <Burst
+        at={announceAt}
+        origin={
+          focusesInset
+            ? mapPointZoomed(
+                MAP_INSET_PANEL.x + MAP_INSET_PANEL.width / 2,
+                MAP_INSET_PANEL.y + MAP_INSET_PANEL.height / 2,
+                mapZoom
+              )
+            : { x: 540, y: LIST_TOP - 190 }
+        }
+        theme={theme}
+      />
 
       {/* 順位行スタック（下端固定・5 位から上へ積み上がる） */}
       {entries.map((entry) => (

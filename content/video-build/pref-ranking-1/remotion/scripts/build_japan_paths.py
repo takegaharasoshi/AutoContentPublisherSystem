@@ -391,9 +391,9 @@ def build_geometry() -> tuple[dict[int, list[list[tuple[float, float]]]], dict[s
         - inset_min_y * INSET_SCALE
     )
 
-    final: dict[int, list[list[tuple[float, float]]]] = {}
+    final: dict[int, dict[str, list[list[tuple[float, float]]]]] = {}
     for code, entries in projected.items():
-        rings = []
+        rings: dict[str, list[list[tuple[float, float]]]] = {"main": [], "inset": []}
         for inset, ring in entries:
             points = [to_view(p) for p in ring]
             if inset:
@@ -409,7 +409,7 @@ def build_geometry() -> tuple[dict[int, list[list[tuple[float, float]]]], dict[s
                 snapped.pop()
             reduced = simplify(snapped)
             if len(reduced) >= 3:
-                rings.append(reduced)
+                rings["inset" if inset else "main"].append(reduced)
         final[code] = rings
 
     diagnostics = {
@@ -434,23 +434,19 @@ def path_data(rings: list[list[tuple[float, float]]]) -> str:
     return "".join(parts)
 
 
-def centroid(code: int, rings: list[list[tuple[float, float]]]) -> tuple[float, float]:
+def centroid(rings: dict[str, list[list[tuple[float, float]]]]) -> tuple[float, float]:
     """Return the label anchor for a prefecture.
 
-    Kagoshima uses its mainland part only (the inset islands would drag the anchor
-    into the Pacific); every other prefecture uses the bounding-box centre of the
-    rings as rendered.
+    本土部分があればそちらを使う（鹿児島でインセットの島に引かれて太平洋上が起点に
+    ならないように）。沖縄のように本土部分が無い県はインセットの位置が起点になる。
 
     Args:
-        code: JIS prefecture code.
-        rings: Final viewBox rings for the prefecture.
+        rings: Final viewBox rings of the prefecture ({"main": ..., "inset": ...}).
 
     Returns:
         Anchor point in viewBox coordinates.
     """
-    target = rings
-    if code == 46:
-        target = [ring for ring in rings if min(p[0] for p in ring) < INSET_BOX["left"]]
+    target = rings["main"] or rings["inset"]
     xs = [p[0] for ring in target for p in ring]
     ys = [p[1] for ring in target for p in ring]
     return (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
@@ -467,22 +463,36 @@ NAMES = {
 }
 
 
-def write_outputs(final: dict[int, list[list[tuple[float, float]]]]) -> None:
+def write_outputs(final: dict[int, dict[str, list[list[tuple[float, float]]]]]) -> None:
     """Write japanPaths.ts and prefCentroids.ts."""
+    inset_points = [p for rings in final.values() for ring in rings["inset"] for p in ring]
+    box = {
+        "x": min(p[0] for p in inset_points),
+        "y": min(p[1] for p in inset_points),
+        "width": max(p[0] for p in inset_points) - min(p[0] for p in inset_points),
+        "height": max(p[1] for p in inset_points) - min(p[1] for p in inset_points),
+    }
+    inset_codes = sorted(code for code, rings in final.items() if rings["inset"])
+    inset_only_codes = sorted(
+        code for code, rings in final.items() if rings["inset"] and not rings["main"]
+    )
     header = [
         "// 自動生成: scripts/build_japan_paths.py（手で編集しない）",
         "// 出典: Natural Earth 10m admin-1 states/provinces（**Public Domain**）",
         "//       https://www.naturalearthdata.com/downloads/10m-cultural-vectors/",
-        "//       ライセンス証跡は ../../LICENSES.md セクション 3",
-        "// 座標は viewBox 0 0 1000 1000 の最終座標。南西諸島は同一投影のまま群として",
-        "// 相似変換で関東沖へ移設済み（インセット。詳細は生成スクリプトの定数）。",
+        "//       ライセンス証跡は ../../LICENSES.md セクション 4",
+        "// 座標は viewBox 0 0 1000 1000 の最終座標。南西諸島（d の inset 側）は同一投影の",
+        "// まま群として相似変換で関東沖へ移設済み。レンダラーはインセットだけを別 <g> に",
+        "// 置いて拡大できるよう、本土（d）とインセット（dInset）を分けて持つ。",
         "",
         "export interface PrefPath {",
         "  code: number;",
         "  romaji: string;",
         "  name: string;",
-        "  /** viewBox 座標の path d（県内の飛び地は同一 path のサブパス） */",
+        "  /** 本土側の path d（県内の飛び地は同一 path のサブパス）。無い県は空文字 */",
         "  d: string;",
+        "  /** 南西諸島インセット側の path d。無い県は空文字 */",
+        "  dInset: string;",
         "}",
         "",
         'export const VIEW_BOX = "0 0 1000 1000";',
@@ -490,13 +500,30 @@ def write_outputs(final: dict[int, list[list[tuple[float, float]]]]) -> None:
         "/** 南西諸島インセットの区切り（点線 L 字。17-4a で Fix した見た目） */",
         f'export const INSET_FRAME_PATH = "{INSET_FRAME_PATH}";',
         "",
+        "/** インセットに描かれる島々の外接矩形（拡大演出の基準に使う） */",
+        "export const INSET_CONTENT_BOX = {",
+        f"  x: {box['x']:.1f}, y: {box['y']:.1f}, width: {box['width']:.1f}, height: {box['height']:.1f},",
+        "} as const;",
+        "",
+        "/** インセットに実体を持つ県（沖縄と、トカラ・奄美を持つ鹿児島） */",
+        f"export const INSET_PREF_CODES: number[] = {inset_codes};",
+        "",
+        "/** 本土側に実体が無く、確定がインセットの中だけで起きる県（= 沖縄） */",
+        f"export const INSET_ONLY_PREF_CODES: number[] = {inset_only_codes};",
+        "",
         "export const PREFECTURES: PrefPath[] = [",
     ]
     body = []
     for code in sorted(final):
         body.append(
-            "  { code: %d, romaji: %r, name: %r, d: %r },"
-            % (code, ROMAJI[code], NAMES[code], path_data(final[code]))
+            "  { code: %d, romaji: %r, name: %r, d: %r, dInset: %r },"
+            % (
+                code,
+                ROMAJI[code],
+                NAMES[code],
+                path_data(final[code]["main"]),
+                path_data(final[code]["inset"]),
+            )
         )
     body = [line.replace("'", '"') for line in body]
     lines = header + body + ["];", ""]
@@ -505,11 +532,11 @@ def write_outputs(final: dict[int, list[list[tuple[float, float]]]]) -> None:
     centroid_lines = [
         "// 自動生成: scripts/build_japan_paths.py（japanPaths.ts と同時生成）",
         "// 確定県のラベルを飛ばす起点。viewBox 0 0 1000 1000 の座標。",
-        "// 鹿児島は本土部分のみ、沖縄はインセットの位置で算出する。",
+        "// 本土部分がある県は本土から、沖縄はインセットの位置から算出する。",
         "export const PREF_CENTROIDS: Record<number, { x: number; y: number }> = {",
     ]
     for code in sorted(final):
-        x, y = centroid(code, final[code])
+        x, y = centroid(final[code])
         centroid_lines.append(f"  {code}: {{ x: {x:.1f}, y: {y:.1f} }}, // {NAMES[code]}")
     centroid_lines += ["};", ""]
     (PROJECT_DIR / "src" / "prefCentroids.ts").write_text(
@@ -517,13 +544,16 @@ def write_outputs(final: dict[int, list[list[tuple[float, float]]]]) -> None:
     )
 
 
-def report(final: dict[int, list[list[tuple[float, float]]]], diagnostics: dict[str, float]) -> None:
+def report(
+    final: dict[int, dict[str, list[list[tuple[float, float]]]]], diagnostics: dict[str, float]
+) -> None:
     """Print geometry diagnostics for a build."""
-    points = [p for rings in final.values() for ring in rings for p in ring]
+    points = [p for rings in final.values() for group in rings.values() for ring in group for p in ring]
     xs = [p[0] for p in points]
     ys = [p[1] for p in points]
+    ring_count = sum(len(group) for rings in final.values() for group in rings.values())
     print(
-        f"頂点 {len(points)} / リング {sum(len(r) for r in final.values())} / "
+        f"頂点 {len(points)} / リング {ring_count} / "
         f"陸地 bbox x {min(xs):.1f}..{max(xs):.1f} y {min(ys):.1f}..{max(ys):.1f}"
     )
     print(
@@ -531,8 +561,12 @@ def report(final: dict[int, list[list[tuple[float, float]]]], diagnostics: dict[
         f"(枠 {INSET_BOX['right'] - INSET_BOX['left']:.0f}x{INSET_BOX['bottom'] - INSET_BOX['top']:.0f})"
     )
     for code in (13, 46, 47):
-        x, y = centroid(code, final[code])
-        print(f"  {NAMES[code]}: ラベル起点 ({x:.1f}, {y:.1f}) / リング {len(final[code])}")
+        x, y = centroid(final[code])
+        rings = final[code]
+        print(
+            f"  {NAMES[code]}: ラベル起点 ({x:.1f}, {y:.1f}) / "
+            f"本土 {len(rings['main'])} リング・インセット {len(rings['inset'])} リング"
+        )
 
 
 def main() -> None:

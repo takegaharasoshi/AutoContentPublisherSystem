@@ -1,6 +1,6 @@
 // 自動生成: scripts/build_japan_paths.py（japanPaths.ts と同時生成）
 // 確定県のラベルを飛ばす起点。viewBox 0 0 1000 1000 の座標。
-// 鹿児島は本土部分のみ、沖縄はインセットの位置で算出する。
+// 本土部分がある県は本土から、沖縄はインセットの位置から算出する。
 export const PREF_CENTROIDS: Record<number, { x: number; y: number }> = {
   1: { x: 790.5, y: 139.0 }, // 北海道
   2: { x: 708.9, y: 308.9 }, // 青森
