@@ -5,8 +5,8 @@
 | 対象 | `pref-ranking-1` 初期ストック 第 1 バッチ 10 件（001〜010） |
 | データ検証 | 完了（2026-08-10）。証跡は [research.md](research.md) |
 | 文言・ナレーション執筆 | 完了。`validate.py` 全項目パス |
-| 人間レビュー | **1 巡目の指摘を反映済み・再確認待ち**（[review.html](review.html) / [review.md](review.md) をユーザーが確認する。反映内容は下記「1 巡目の反映」） |
-| DB 投入 | **未実施**（レビュー承認後に `insert_ranking_stock.sql` をローカル MySQL と Aurora へ適用） |
+| 人間レビュー | **完了（2026-08-11）— 全 10 件承認**。指摘の反映内容は下記「1 巡目の反映」 |
+| DB 投入 | **完了（2026-08-11）**。ローカル MySQL / Aurora の両環境へ 10 件。`(title, content_fields, ranking_data, narration, source_note)` の MD5 が全行一致することを確認済み |
 | 動画ビルド | 17-4 のツーリング完成後（17-5） |
 
 ## 構成
@@ -38,6 +38,17 @@
 タイムライン・cue 体系の変更は方式設計書
 （`docs/app/generators/ranking-prebuilt.html` セクション 8.2 / 8.3 の decision）に反映済み。
 17-4 への実装制約（アンカーの後ろ合わせ・吹き出しの表示開始）も同 decision に記載。
+
+## 投入時に見つかった不具合（2026-08-11・修正済み）
+
+先行登録した `batch_sets` の `pref-ranking-1` 行の `name` が、**ローカル MySQL 側だけ
+二重エンコードで文字化けしていた**（`CHAR_LENGTH` = 45 = 15 文字 × 3）。原因は
+`docker exec ... mysql` に `--default-character-set=utf8mb4` を付けずに INSERT したこと
+（`docs/development-plan.md` の 2026-07-29 / 15-10 に記録済みの既知の落とし穴）。
+正しい値で UPDATE して解消済み（Aurora 側は Data API 経由のため元から正常）。
+
+**同じ原因で `fantasy-animals-1` の `name` もローカルだけ文字化けしている**
+（`CHAR_LENGTH` = 33 = 11 文字 × 3）。旧セットのため本ステップでは触っていない。
 
 ## 投入前の前提（重要）
 
