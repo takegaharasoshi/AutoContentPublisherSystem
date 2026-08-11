@@ -5,59 +5,59 @@
       "duration": "20s",
       "fps": 30,
       "total": 600,
-      "teaserAt": 75,
+      "teaserAt": 67,
       "recapAt": null,
-      "closingAt": 510,
+      "closingAt": 539,
       "rounds": {
         "1": {
-          "start": 375,
-          "spin": 75,
-          "stop": 450,
-          "flyStart": 492,
+          "start": 422,
+          "spin": 72,
+          "stop": 494,
+          "flyStart": 536,
           "flyDur": 18,
-          "rowAt": 508,
+          "rowAt": 552,
           "commentAt": null,
-          "end": 510
+          "end": 539
         },
         "2": {
-          "start": 315,
+          "start": 350,
           "spin": 30,
-          "stop": 345,
-          "flyStart": 353,
+          "stop": 380,
+          "flyStart": 388,
           "flyDur": 16,
-          "rowAt": 367,
+          "rowAt": 402,
           "commentAt": null,
-          "end": 375
+          "end": 422
         },
         "3": {
-          "start": 255,
+          "start": 278,
           "spin": 30,
-          "stop": 285,
-          "flyStart": 293,
+          "stop": 308,
+          "flyStart": 316,
           "flyDur": 16,
-          "rowAt": 307,
+          "rowAt": 330,
           "commentAt": null,
-          "end": 315
+          "end": 350
         },
         "4": {
-          "start": 195,
+          "start": 206,
           "spin": 30,
-          "stop": 225,
-          "flyStart": 233,
+          "stop": 236,
+          "flyStart": 244,
           "flyDur": 16,
-          "rowAt": 247,
+          "rowAt": 258,
           "commentAt": null,
-          "end": 255
+          "end": 278
         },
         "5": {
-          "start": 135,
+          "start": 134,
           "spin": 30,
-          "stop": 165,
-          "flyStart": 173,
+          "stop": 164,
+          "flyStart": 172,
           "flyDur": 16,
-          "rowAt": 187,
+          "rowAt": 186,
           "commentAt": null,
-          "end": 195
+          "end": 206
         }
       },
       "cueAnchors": [
@@ -66,62 +66,62 @@
           "align": "head",
           "anchor": 0,
           "budgetStart": 0,
-          "budgetEnd": 75
+          "budgetEnd": 67
         },
         {
           "id": "teaser",
           "align": "head",
-          "anchor": 75,
-          "budgetStart": 75,
-          "budgetEnd": 135
+          "anchor": 67,
+          "budgetStart": 67,
+          "budgetEnd": 134
         },
         {
           "id": "r5",
           "align": "name",
-          "anchor": 165,
-          "budgetStart": 135,
-          "budgetEnd": 195
+          "anchor": 164,
+          "budgetStart": 134,
+          "budgetEnd": 206
         },
         {
           "id": "r4",
           "align": "name",
-          "anchor": 225,
-          "budgetStart": 195,
-          "budgetEnd": 255
+          "anchor": 236,
+          "budgetStart": 206,
+          "budgetEnd": 278
         },
         {
           "id": "r3",
           "align": "name",
-          "anchor": 285,
-          "budgetStart": 255,
-          "budgetEnd": 315
+          "anchor": 308,
+          "budgetStart": 278,
+          "budgetEnd": 350
         },
         {
           "id": "r2",
           "align": "name",
-          "anchor": 345,
-          "budgetStart": 315,
-          "budgetEnd": 375
+          "anchor": 380,
+          "budgetStart": 350,
+          "budgetEnd": 422
         },
         {
           "id": "r1_call",
           "align": "head",
-          "anchor": 375,
-          "budgetStart": 375,
-          "budgetEnd": 450
+          "anchor": 422,
+          "budgetStart": 422,
+          "budgetEnd": 494
         },
         {
           "id": "r1_name",
           "align": "head",
-          "anchor": 450,
-          "budgetStart": 450,
-          "budgetEnd": 510
+          "anchor": 494,
+          "budgetStart": 494,
+          "budgetEnd": 539
         },
         {
           "id": "outro",
           "align": "head",
-          "anchor": 510,
-          "budgetStart": 510,
+          "anchor": 539,
+          "budgetStart": 539,
           "budgetEnd": 600
         }
       ]
@@ -130,59 +130,59 @@
       "duration": "30s",
       "fps": 30,
       "total": 900,
-      "teaserAt": 105,
-      "recapAt": 750,
-      "closingAt": 750,
+      "teaserAt": 91,
+      "recapAt": 782,
+      "closingAt": 782,
       "rounds": {
         "1": {
-          "start": 585,
+          "start": 632,
           "spin": 90,
-          "stop": 675,
-          "flyStart": 717,
+          "stop": 722,
+          "flyStart": 764,
           "flyDur": 18,
-          "rowAt": 733,
+          "rowAt": 780,
           "commentAt": null,
-          "end": 750
+          "end": 782
         },
         "2": {
-          "start": 480,
+          "start": 512,
           "spin": 30,
-          "stop": 510,
-          "flyStart": 518,
+          "stop": 542,
+          "flyStart": 550,
           "flyDur": 16,
-          "rowAt": 532,
-          "commentAt": 540,
-          "end": 585
+          "rowAt": 564,
+          "commentAt": 575,
+          "end": 632
         },
         "3": {
-          "start": 375,
+          "start": 392,
           "spin": 30,
-          "stop": 405,
-          "flyStart": 413,
+          "stop": 422,
+          "flyStart": 430,
           "flyDur": 16,
-          "rowAt": 427,
-          "commentAt": 435,
-          "end": 480
+          "rowAt": 444,
+          "commentAt": 455,
+          "end": 512
         },
         "4": {
-          "start": 270,
+          "start": 272,
           "spin": 30,
-          "stop": 300,
-          "flyStart": 308,
+          "stop": 302,
+          "flyStart": 310,
           "flyDur": 16,
-          "rowAt": 322,
-          "commentAt": 330,
-          "end": 375
+          "rowAt": 324,
+          "commentAt": 335,
+          "end": 392
         },
         "5": {
-          "start": 165,
+          "start": 152,
           "spin": 30,
-          "stop": 195,
-          "flyStart": 203,
+          "stop": 182,
+          "flyStart": 190,
           "flyDur": 16,
-          "rowAt": 217,
-          "commentAt": 225,
-          "end": 270
+          "rowAt": 204,
+          "commentAt": 215,
+          "end": 272
         }
       },
       "cueAnchors": [
@@ -191,90 +191,90 @@
           "align": "head",
           "anchor": 0,
           "budgetStart": 0,
-          "budgetEnd": 105
+          "budgetEnd": 91
         },
         {
           "id": "teaser",
           "align": "head",
-          "anchor": 105,
-          "budgetStart": 105,
-          "budgetEnd": 165
+          "anchor": 91,
+          "budgetStart": 91,
+          "budgetEnd": 152
         },
         {
           "id": "r5",
           "align": "name",
-          "anchor": 195,
-          "budgetStart": 165,
-          "budgetEnd": 225
+          "anchor": 182,
+          "budgetStart": 152,
+          "budgetEnd": 215
         },
         {
           "id": "r5_comment",
           "align": "head",
-          "anchor": 225,
-          "budgetStart": 225,
-          "budgetEnd": 270
+          "anchor": 215,
+          "budgetStart": 215,
+          "budgetEnd": 272
         },
         {
           "id": "r4",
           "align": "name",
-          "anchor": 300,
-          "budgetStart": 270,
-          "budgetEnd": 330
+          "anchor": 302,
+          "budgetStart": 272,
+          "budgetEnd": 335
         },
         {
           "id": "r4_comment",
           "align": "head",
-          "anchor": 330,
-          "budgetStart": 330,
-          "budgetEnd": 375
+          "anchor": 335,
+          "budgetStart": 335,
+          "budgetEnd": 392
         },
         {
           "id": "r3",
           "align": "name",
-          "anchor": 405,
-          "budgetStart": 375,
-          "budgetEnd": 435
+          "anchor": 422,
+          "budgetStart": 392,
+          "budgetEnd": 455
         },
         {
           "id": "r3_comment",
           "align": "head",
-          "anchor": 435,
-          "budgetStart": 435,
-          "budgetEnd": 480
+          "anchor": 455,
+          "budgetStart": 455,
+          "budgetEnd": 512
         },
         {
           "id": "r2",
           "align": "name",
-          "anchor": 510,
-          "budgetStart": 480,
-          "budgetEnd": 540
+          "anchor": 542,
+          "budgetStart": 512,
+          "budgetEnd": 575
         },
         {
           "id": "r2_comment",
           "align": "head",
-          "anchor": 540,
-          "budgetStart": 540,
-          "budgetEnd": 585
+          "anchor": 575,
+          "budgetStart": 575,
+          "budgetEnd": 632
         },
         {
           "id": "r1_call",
           "align": "head",
-          "anchor": 585,
-          "budgetStart": 585,
-          "budgetEnd": 675
+          "anchor": 632,
+          "budgetStart": 632,
+          "budgetEnd": 722
         },
         {
           "id": "r1_name",
           "align": "head",
-          "anchor": 675,
-          "budgetStart": 675,
-          "budgetEnd": 750
+          "anchor": 722,
+          "budgetStart": 722,
+          "budgetEnd": 782
         },
         {
           "id": "closing",
           "align": "head",
-          "anchor": 750,
-          "budgetStart": 750,
+          "anchor": 782,
+          "budgetStart": 782,
           "budgetEnd": 900
         }
       ]

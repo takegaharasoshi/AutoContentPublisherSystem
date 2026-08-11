@@ -155,8 +155,8 @@
 <table>
 <caption style="text-align:left;font-weight:bold;margin-bottom:.3rem;">タイムライン（17-2 巡 1 で Fix、17-3 で煽りシーンを追加。20 秒 = 600f / 30 秒 = 900f）</caption>
 <tr><th>尺</th><th>シーン構成（秒）</th></tr>
-<tr><td><strong>20 秒版</strong>（600f）</td><td>オープニング 2.5s → <strong>煽り 2.0s</strong>（視聴者に 1 位を予想させる）→ 5 位〜2 位 各 2.0s（スピン 1.0s + 停止フラッシュ・行追記 1.0s）→ 1 位 4.5s（タメ 2.5s + 発表 2.0s）→ 締め 3.0s</td></tr>
-<tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.5s → <strong>煽り 2.0s</strong> → 5 位〜2 位 各 3.5s（スピン 1.0s + 停止フラッシュ・行追記 1.0s + 順位コメント 1.5s）→ 1 位 5.5s（タメ 3.0s + 発表 2.5s）→ <strong>結果総覧 3.0s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 2.0s（結果総覧と締めの 5.0s は <code>closing</code> 1 本の cue でまたぐ）</td></tr>
+<tr><td><strong>20 秒版</strong>（600f）</td><td>オープニング 2.2s → <strong>煽り 2.2s</strong>（視聴者に 1 位を予想させる）→ 5 位〜2 位 各 2.4s（スピン 1.0s + 停止フラッシュ・行追記 1.4s）→ 1 位 3.9s（タメ 2.4s + 発表 1.5s）→ 締め 2.0s<br><span class="muted">※ 配分は 17-4d で見直した（順位間の間を作るため）。定数の正は <code>scripts/build_timeline.py</code></span></td></tr>
+<tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.0s → <strong>煽り 2.0s</strong> → 5 位〜2 位 各 4.0s（スピン 1.0s + 停止フラッシュ・行追記 1.1s + 順位コメント 1.9s）→ 1 位 5.0s（タメ 3.0s + 発表 2.0s）→ <strong>結果総覧 2.5s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 1.4s（結果総覧と締めの 3.9s は <code>closing</code> 1 本の cue でまたぐ）<br><span class="muted">※ 配分は 17-4d で見直した（順位間の間を作るため）。定数の正は <code>scripts/build_timeline.py</code></span></td></tr>
 </table>
 </div>
 <p>2 尺の検証仮説（17-2 巡 1 で Fix）: 20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>。</p>
@@ -223,7 +223,7 @@
   <span class="callout-title">決定（2026-08-11、17-4c）: コンポジション本組み（2 尺・タイムライン定数の単一ソース化）</span>
   20 秒版だけだったコンポジションを 2 尺へ本組みした。
   <ul style="margin:.3rem 0 0;">
-    <li><strong>30 秒版タイムラインの導出値</strong>（フレーム）: 導入 0–105 / 煽り 105–165 / 5 位 165〜（停止 195・コメント 225）〜270 / 4 位 270〜（300・330）〜375 / 3 位 375〜（405・435）〜480 / 2 位 480〜（510・540）〜585 / 1 位 585〜（停止 675）〜750 / 結果総覧 750–840 / 締め 840–900。順位シーンの前半 2.0s は<strong>20 秒版と同じ「スピン 1.0s + 停止フラッシュ・行追記 1.0s」に割り</strong>、増えた 1.5s をコメント区間に充てる（20 秒版の呼吸をそのまま保ち、2 尺で演出のテンポを揃えるため）</li>
+    <li><strong>30 秒版タイムラインの導出値</strong>（17-4c 時点。<strong>17-4d で順位間の間を作るため配分を見直した</strong>ので、現行値は <code>scripts/build_timeline.py</code> の <code>DURATION_SPECS</code> が正）: 導入 0–105</li>
     <li><strong>タイムライン定数の単一ソースは Python 側</strong>（<code>remotion/scripts/build_timeline.py</code> の <code>DURATION_SPECS</code> = 尺ごとのシーン長のみを持つコンパクトな仕様）で、<code>src/timeline.json</code> は生成物・<code>src/timeline.ts</code> はそれを読んで型を付けるだけにした。理由: <strong>アンカー解決と予算検査を行うビルドツーリング（17-4d / 17-4e）が Python</strong> で、TS と同じ数値を二重に持つと尺の調整で必ずずれるため（<code>japanPaths.ts</code> と同じ生成物方式）。20 秒版の導出値が 17-4a / 17-4b の Fix 値と一致することは pytest で固定してある</li>
     <li><strong>結果総覧と締めは版面上ひとつながりの区間として扱う</strong>（<code>recapAt === closingAt</code>）。TOP5 が出そろった画面をそのまま見せるのが結果総覧の役割で、シーン境界で版面を切り替えない。5.0s が単調にならないよう、17-4a の順送りの持ち上げに加えて<strong>1 位行だけ緩やかな明滅</strong>を重ねる</li>
     <li><strong>props の最終形</strong>: <code>duration</code>（尺 = タイムラインの選択）を必須にし、コンポジション側の尺ハードコードを廃止した。Composition は <code>calculateMetadata</code> で <code>props.duration</code> から <code>durationInFrames</code> を導出するため、<strong>props と尺が食い違わない</strong>。cue には <code>frames</code>（合成音声の実測長）を追加し、音声 Sequence の長さに使う（従来は 180f 固定）</li>
@@ -291,6 +291,7 @@
         <li>頭合わせ cue はアンカー固定のまま（ずらさず <code>head_overrun</code>）。<code>tail_overrun</code> は「次 cue の開始 - 最小ギャップ」（最後の cue は総尺）で判定する</li>
       </ul>
       第 1 バッチ 10 件 × 2 尺（cue 220 本）を話速 1.1 で合成して<strong>違反 0 件</strong>。県名の遅れは 80 本中 65 本が 0f、最大 6f（上限 8f に対して余裕あり）</li>
+    <li><strong>順位間に「間」を作るため尺配分を見直した</strong>（2026-08-11、ユーザーの実物確認: 「順位間の間がなさすぎでメリハリがない」）。cue の配置は隣接検査に通っていても、<strong>実測の最小間隔が 2f（0.07 秒）</strong>しかなく発話が途切れずに続いていた。総尺は変えずにシーン配分を組み直し（20 秒版: 導入 75→67 / 煽り 60→67 / 順位 60→72 / 1 位のタメ 75→72・発表 60→45 / 締め 90→61、30 秒版: 導入 105→91 / 煽り 60→61 / 順位 105→120〔コメント 45→57〕/ 1 位発表 75→60 / 結果総覧 90→75 / 締め 60→43）、<strong>第 1 バッチ 10 件の最悪値で最小間隔 2f → 9f（20 秒版）/ 7f（30 秒版）、典型値は 0.4〜0.8 秒</strong>にした。<strong>ただし発話密度は 79%（20 秒版の発話合計 451〜474f / 600f）で、これ以上の間は尺配分では作れない</strong>。さらに広げるにはセリフを短くする（1 割短縮で最小 13f / 2 割短縮で 16f）か話速を上げる（1.2 で 12f）必要がある — 台本側の判断事項として <code>WRITING-NOTES.md</code> の文字数上限に反映する</li>
     <li><strong>音のミキシングは相対バランスだけをコンポジションで決め、配信レベルはレンダリング後に揃える</strong>。ナレーションのみの 20 秒版は -23.9 LUFS と静かで、Remotion にはラウドネス正規化の機能がないため。<code>remotion/src/audio.ts</code> が BGM をナレーションの <strong>18 LU 下</strong>（実測で無音区間の BGM ≒ -42 LUFS）に置き、<code>remotion/scripts/normalize_loudness.py</code>（ffmpeg <code>loudnorm</code> 2 パス・<strong>映像は再エンコードしない</strong>）が <strong>I = -14 LUFS / TP = -1.5 dBTP</strong> を目標に揃える（linear モードのためピーク制約が効き、実測は -15.0 / -14.8 LUFS に着地）。<strong>ダッキングは行わない</strong>（ナレーションがほぼ全編を占め、常時作動して定常減衰と変わらないため）。BGM は頭 0.5 秒フェードイン / 尻 1.5 秒フェードアウトで、曲が尺より短い場合に備えてループさせる</li>
   </ul>
 </div>

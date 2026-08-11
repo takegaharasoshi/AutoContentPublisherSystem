@@ -85,7 +85,9 @@ def test_build_resolves_props_and_reuses_manifest_cache(
     first_call_count = len(engine.calls)
     resolved = json.loads(props_path.read_text(encoding="utf-8"))
     assert resolved["cues"]["r5"]["audioSrc"] == "narration/001-20s/r5.wav"
-    assert resolved["cues"]["r5"]["startFrame"] == 155
+    assert resolved["cues"]["r5"]["startFrame"] == (
+        build_timeline.build_timelines()["20s"].rounds[5].stop - 10
+    )
     assert resolved["cues"]["r5"]["frames"] == 20
 
     assert build_narration.build_narration(props_path, engine=engine) == 0
@@ -104,7 +106,17 @@ def test_violation_returns_nonzero_without_updating_props(
     monkeypatch.setattr(build_narration, "PROJECT_DIR", tmp_path)
     props_path = tmp_path / "invalid.json"
     original = write_props(props_path)
-    engine = FakeEngine(lambda cue_id, speed: 100 if cue_id == "outro" else 20)
+    timeline = build_timeline.build_timelines()["20s"]
+    outro_anchor = next(
+        anchor for anchor in timeline.cue_anchors if anchor.id == "outro"
+    )
+    engine = FakeEngine(
+        lambda cue_id, speed: (
+            timeline.total - outro_anchor.anchor + 1
+            if cue_id == "outro"
+            else 20
+        )
+    )
 
     assert build_narration.build_narration(props_path, engine=engine) == 1
     assert props_path.read_bytes() == original
@@ -117,9 +129,16 @@ def test_auto_speed_raises_only_involved_cue_until_it_fits(
     monkeypatch.setattr(build_narration, "PROJECT_DIR", tmp_path)
     props_path = tmp_path / "auto.json"
     write_props(props_path)
+    timeline = build_timeline.build_timelines()["20s"]
+    outro_anchor = next(
+        anchor for anchor in timeline.cue_anchors if anchor.id == "outro"
+    )
+    outro_fitting_frames = timeline.total - outro_anchor.anchor
     engine = FakeEngine(
         lambda cue_id, speed: (
-            80 if cue_id == "outro" and speed >= 1.2 else 100
+            outro_fitting_frames
+            if cue_id == "outro" and speed >= 1.2
+            else outro_fitting_frames + 1
         )
         if cue_id == "outro"
         else 20
@@ -140,4 +159,4 @@ def test_auto_speed_raises_only_involved_cue_until_it_fits(
         speed == 1.1 for cue_id, speed in engine.calls if cue_id != "outro"
     )
     resolved = json.loads(props_path.read_text(encoding="utf-8"))
-    assert resolved["cues"]["outro"]["frames"] == 80
+    assert resolved["cues"]["outro"]["frames"] == outro_fitting_frames
