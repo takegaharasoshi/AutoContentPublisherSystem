@@ -1164,6 +1164,27 @@
 
     次は **17-4e（ビルドツーリング 5 段工程: レビューシート・`--rebuild`）**。
 
+- [x] **17-4e** ビルドツーリング 5 段工程（レビューシート・`--rebuild`。17-4 のサブステップ 5）
+  - 備考: 2026-08-12 実施（Opus 5 が仕様策定・レビュー・実機の通し確認、実装は Codex `gpt-5.6-sol` / high へ委譲）。決定は方式設計書 [ranking-prebuilt.html](app/generators/ranking-prebuilt.html) セクション 8.1 の decision（17-4e）が正。手順の実行例は `content/video-build/pref-ranking-1/README.md` を正とする。
+
+    **(1) 構成**: 5 段工程を `content/video-build/pref-ranking-1/` 直下のスクリプト群として実装した（`quiz-prebuilt` の `content/video-build/logic-training-1/` と同じ構成・同じ名前にそろえ、17-7 のスキル化で 2 セットを同じ型で説明できるようにした）。`build.py --list`（工程 1 = 対象抽出）→ `export_prompts.py` / `intake.py`（工程 2 = 背景）→ `build.py`（工程 3 = props + TTS + レンダリング + 正規化）→ `review_sheet.py`（工程 4）→ `publish.py`（工程 5 = S3 + 両環境 DB）。`remotion/scripts/` の既存スクリプト（`build_narration.py` / `normalize_loudness.py` / `build_timeline.py`）は呼ばれる側で、ツーリングは薄いオーケストレーションに徹する。
+
+    **(2) 実行境界**: ツーリング本体は WSL ホストの Python で動かし、**Docker が要る処理だけを外に出した**（Remotion レンダリング = `remotion-render`、ラウドネス正規化と背景の画像処理 = `image-batch`、TTS = VOICEVOX Engine の HTTP）。ホストに要る依存は `pymysql` / `boto3` だけになり、PIL を使う `intake.py` のみコンテナ内実行とした。ナレーション合成は `build_narration.build_narration()` を**ライブラリとして直接呼ぶ**（サブプロセスにせず、予算検査の失敗を戻り値で受けてレンダリングへ進ませない）。
+
+    **(3) props の組み立てと防御的検査**: ストック行 → `PrefRankingProps` の変換（`build_props()`）をツーリングが担い、組み立て前に **rank 1〜5 の一意性・`pref_code` の範囲・必須 `content_fields`・当該尺の cue ID 集合がタイムライン定数と過不足なく一致すること・背景 JPEG の存在**を検査する。1 件の不備で全体を止めず、**全件処理してから失敗一覧 + 終了コード 1**（予算検査と同じ「まとめて提示する」方針）。
+
+    **(4) レビューで見つけた実装バグ 2 件（どちらも Codex 実装を Claude がレビューして修正）**:
+    - **BGM の取り違え**: 通常ビルドが常に LRU 選曲していたため、「20 秒版を先に publish 済みの行の 30 秒版を後からビルドする」と別の曲が選ばれ、publish で `video_audio_asset_id` が後発の曲に上書きされる。**既存動画の実 BGM と DB 記録が食い違い**、2 尺共通 1 曲の設計（セクション 6）とミュート検知の運用が壊れる。→ **行に記録があれば `--rebuild` でなくても引き継ぐ**（`last_used_at` も更新しない）ようにした。
+    - **Aurora SQL の NULL 上書き**: `video_audio_asset_id` を `audio_assets.s3_key` のサブセレクトで解決していたが、Aurora 側に該当音源が無いと**静かに NULL を書く**（NULL は実行時に異常終了する値 = セクション 7）。→ WHERE に同じ音源の `EXISTS` を足し、**更新行数 0 として気づける**ようにした。
+
+    **(5) 設計書との突合で見つけた誤り 1 件**: 背景 imagegen の画風固定行が「生成り地・**藍**・金」だった（セット別設計書セクション 4 の 17-2 時点の記述をそのまま実装したもの）。**パレットは 17-4a で 藍 → 淡墨茶へ差し替え済み**（`remotion/src/theme.ts` が正）で、このままだと版面と調和しない背景を作り続けることになる。`export_prompts.py` と設計書セクション 4 の両方を「生成り地・淡墨茶・金」へ修正した。プロンプト文言の正は**ツーリング側（`STYLE_LINE` / `SIZE_LINE` / `NO_TEXT_LINE`）**とし、設計書は 5 要件の規定だけを持つ形に確定した。
+
+    **(6) 検証用の `--no-bgm`**: BGM は 17-5 で調達するため、未調達のままツーリングを通しで確認できる逃げ道を用意した。この動画は manifest の `audio_asset_id` が null で記録され、**`publish.py` が拒否する**（音源記録のない動画が本番へ出ない構造）。
+
+    **(7) 確認**: pytest 19 件（新規。対象抽出の分岐・props 組み立てと検査・BGM 引き継ぎ判定・Aurora SQL 生成・承認ファイル・manifest 検査・レビューシート）+ 既存 `remotion/tests` 26 件パス。**実機の通し確認**（Docker Desktop + ローカル MySQL + VOICEVOX 実機）: 工程 1 = 対象 10 件 × 2 尺の抽出、工程 2 = プロンプト書き出しとコンテナ内 `intake.py`（原本 PNG + 描画用 JPEG）、工程 3 = 001 ぎょうざの **2 尺通しビルド成功**（-15.1 / -15.0 LUFS・TP -1.8 dBFS。17-4d の実測と整合）、工程 4 = レビューシート生成（2 尺の動画・背景・文言・TOP5・cue 台本 22 本・実測ラウドネス）、工程 5 = `--dry-run` で**アップロード計画と Aurora SQL の生成を確認**し、`--no-bgm` 由来の manifest は**拒否されることも確認**した。レビューシートは値が生値のみだったため、**版面と同じ整形（`年間3,478円`）を併記**する小修正を入れた（レビューで「表示が正しいか」を判断できるようにするため）。
+
+    次は **17-4f（方式モジュール `ranking_prebuilt.py` + キャプションのランキング系プレースホルダ実装）**。BGM 込みの本番ビルドと全数レビューは 17-5（音源調達・初期 30 ネタのビルド）で行う。
+
 
 ## 設計課題リスト（解消済み）
 

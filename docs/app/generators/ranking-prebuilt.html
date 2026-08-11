@@ -148,6 +148,20 @@
   ツーリングの共通 core 化（言語共通部の抽出）は英語セット追加時に行い、17-2 時点は <code>pref-ranking-1</code> 専用構成のままとする（YAGNI。ユーザー Fix）。
 </div>
 
+<div class="decision">
+  <span class="callout-title">決定（2026-08-12、17-4e）: ビルドツーリングの構成と実行境界</span>
+  <p style="margin:.3rem 0;">5 段工程を <code>content/video-build/pref-ranking-1/</code> 直下のスクリプト群として実装した（<code>quiz-prebuilt</code> の <code>content/video-build/logic-training-1/</code> と同じ構成・同じ名前。手順の実行例は同ディレクトリの <strong><code>README.md</code> が正</strong>）。工程との対応は <code>build.py --list</code>（工程 1）→ <code>export_prompts.py</code> / <code>intake.py</code>（工程 2）→ <code>build.py</code>（工程 3）→ <code>review_sheet.py</code>（工程 4）→ <code>publish.py</code>（工程 5）。<code>remotion/</code> 側の既存スクリプト（<code>build_narration.py</code> / <code>normalize_loudness.py</code> / <code>build_timeline.py</code>）は<strong>呼ばれる側</strong>で、ツーリングは薄いオーケストレーションに徹する。</p>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>実行境界</strong>: ツーリング本体は WSL ホストの Python で動かし、<strong>Docker が要る処理だけを外に出す</strong>（Remotion レンダリング = <code>remotion-render</code> イメージ、ラウドネス正規化と背景の画像処理 = <code>image-batch</code> イメージ、TTS = VOICEVOX Engine の HTTP）。ホストに要る依存は <code>pymysql</code> / <code>boto3</code> のみ（<strong>PIL を使う <code>intake.py</code> だけはコンテナ内で実行する</strong>）。ナレーション合成は <code>build_narration.build_narration()</code> を<strong>ライブラリとして直接呼ぶ</strong>（サブプロセスにせず、予算検査の失敗を戻り値で受けてレンダリングへ進ませない）</li>
+    <li><strong>props はツーリングが組み立てる</strong>（<code>build_props()</code>。ストック行 → <code>PrefRankingProps</code>）。組み立て前に防御的検査を行い、<strong>rank 1〜5 の一意性・<code>pref_code</code> の範囲・必須 <code>content_fields</code>・当該尺の cue ID 集合がタイムライン定数と過不足なく一致すること・背景 JPEG の存在</strong>を確認する。1 件の不備で全体を止めず、<strong>全件処理してから失敗一覧を出して終了コード 1</strong> とする（quiz と同じ「まとめて提示する」方針）</li>
+    <li><strong>BGM は「行に記録があれば必ず引き継ぐ」</strong>: LRU 選曲を行うのは <code>video_audio_asset_id</code> が NULL の行に限り、記録がある行は <code>--rebuild</code> でなくても引き継ぐ（<code>last_used_at</code> も更新しない）。<strong>2 尺を別のタイミングでビルドしたときに 2 尺で別の曲がベイクされ、DB の記録が後からビルドした尺の曲で上書きされるのを防ぐ</strong>（BGM は 2 尺共通の 1 曲という設計 = セクション 6 / 8.1 工程 3。ミュート検知の運用が <code>video_audio_asset_id</code> を頼りにしている）</li>
+    <li><strong>両環境反映は <code>content_key</code> 一本</strong>: S3 キー・ローカル MySQL の UPDATE・Aurora 反映 SQL のいずれにも環境ローカルな <code>id</code> を使わない。Aurora 側の <code>video_audio_asset_id</code> は <code>audio_assets.s3_key</code> からのサブセレクトで解決し、<strong>WHERE に同じ音源の <code>EXISTS</code> を置く</strong>（Aurora に該当音源が無いときに NULL で静かに上書きせず、更新行数 0 として気づけるようにする。<code>video_audio_asset_id</code> の NULL は実行時に異常終了する = セクション 7）</li>
+    <li><strong>承認は <code>work/approved.txt</code> に <code>content_key</code> を 1 行ずつ</strong>。<code>publish.py</code> は S3・DB に触れる前に承認対象を全件検査する（manifest の存在・MP4 と背景 PNG の実在・<code>audio_asset_id</code> の記録）。1 件でも欠ければ中断し、部分 publish を作らない</li>
+    <li><strong>背景は 2 形式で持つ</strong>: S3 へ上げる再ビルド資産の原本 <code>{content_key}_bg.png</code>（1080x1920）と、レンダリング用の JPEG（<code>remotion/public/bg/</code>）。2MB 級 PNG のままだとフォント読み込みが <code>delayRender</code> タイムアウトするため（17-3 の知見）。背景プロンプトの<strong>画風固定行の文言は <code>export_prompts.py</code> が正</strong>（セット別設計書セクション 4 の 5 要件を満たす）</li>
+    <li><strong>検証用の <code>--no-bgm</code></strong>: BGM 未調達（17-5 で調達）の段階でもツーリングを通しで確認できるよう、BGM なしでビルドできる。この動画は <code>audio_asset_id</code> が null で記録され、<code>publish.py</code> が拒否する（本番へ出ない構造にしてある）</li>
+  </ul>
+</div>
+
 <h3 id="composition">8.2 動画の作り（TOP5 地図ルーレット型コンポジション）</h3>
 <p>版面は 1080x1920 / 30fps。構成要素は上から <strong>タイトル帯</strong>（ネタの <code>title</code>）・<strong>日本地図</strong>（ルーレット演出の主役）・<strong>順位行スタック</strong>（確定した順位を 5 位から積み上げ）・<strong>キャラ常駐枠 + 吹き出し</strong>（実況）・最下部の<strong>出典行帯</strong>。配色はパレットトークン（<code>Palette</code> 型）で駆動し、値はセットのデザイントークン（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 8</a>）を正とする。検証プロトタイプは <code>plans/ranking-set-research/remotion-proto/</code>（git 管理外。本組み実装 = 17-4 でコンポジションをリポジトリへ移した時点でコードが正となる）。</p>
 <p><strong>ルーレット演出</strong>: 各順位の発表は「地図上で候補県が高速に光る（スピン）→ 停止フラッシュで確定 → 確定県が順位色に塗られ、順位行に県名・数値が追記される」の繰り返し。確定済みの県は塗りが残るため、動画の進行とともに地図が塗り上がっていく。</p>
