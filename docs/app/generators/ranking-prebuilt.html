@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（17-2 で作成）</span>
   <span>方式名（レジストリキー）: ranking-prebuilt</span>
-  <span>最終更新: 2026-08-10</span>
+  <span>最終更新: 2026-08-11</span>
 </div>
 
 <div class="note">
@@ -132,7 +132,7 @@
 <ol>
   <li><strong>対象抽出</strong>: ビルド対象尺のカラム（検証期は <code>video_s3_key_20s</code> と <code>_30s</code> の両方、尺確定後は勝ち尺のみ）が NULL の有効ストック行を列挙する（初回 = 17-5 は 30 ネタ全量、以後は補充分のみ）</li>
   <li><strong>背景イラスト生成（imagegen 委譲）</strong>: 行の <code>content_fields.bg_motif</code>（ネタのテーマに合わせた背景モチーフの指示文）からプロンプトを組み立て、Codex 組み込み画像生成（imagegen）で 9:16 の背景を 1 ネタ 1 枚生成する（<strong>2 尺で共用</strong>）。プロンプトには<strong>セットの画風固定行</strong>（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 4</a>）と<strong>サイズ明示行</strong>（<code>quiz-prebuilt</code> の 16-4b 決定と同じ手法）を付け、<strong>「文字・数字・記号を描かない」を必須指定</strong>とする（下記 decision の再利用要件①）。生成物は <code>assets/{set_code}/prebuilt/{content_key}_bg.png</code> として S3 に併置する（再ビルド資産。DB 記録なし）</li>
-  <li><strong>TTS 合成 + Remotion レンダリング（2 本）</strong>: 行の <code>narration</code>（尺別 cue 台本）を VOICEVOX（ローカル Docker）でセリフ単位に合成 → <strong>実測長の予算検査（セクション 8.3。超過はビルドエラー）</strong> → 音声ファイル群 + <code>ranking_data</code> + 版面文言 + 背景をコンポジションの props に渡し、Remotion で 20 秒版・30 秒版をレンダリングする。BGM は <code>audio_assets</code> の <code>time_slot IS NULL</code> の有効曲から LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行い（<code>quiz-prebuilt</code> セクション 6 の decision と同じ移管）、<strong>2 尺共通の 1 曲</strong>を <code>video_audio_asset_id</code> に記録する</li>
+  <li><strong>TTS 合成 + Remotion レンダリング（2 本）</strong>: 行の <code>narration</code>（尺別 cue 台本）を VOICEVOX（ローカル Docker）でセリフ単位に合成 → <strong>実測長の予算検査（セクション 8.3。超過はビルドエラー）</strong> → 音声ファイル群 + <code>ranking_data</code> + 版面文言 + 背景をコンポジションの props に渡し、Remotion で 20 秒版・30 秒版をレンダリングし、<strong>配信ラウドネスへ正規化する</strong>（下記 17-4d の decision）。BGM は <code>audio_assets</code> の <code>time_slot IS NULL</code> の有効曲から LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行い（<code>quiz-prebuilt</code> セクション 6 の decision と同じ移管）、<strong>2 尺共通の 1 曲</strong>を <code>video_audio_asset_id</code> に記録する</li>
   <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（2 尺）+ 背景イラストを一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>背景再生成（imagegen 再試行・<code>bg_motif</code> 書き直し）またはセリフ・版面文言の修正（DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
   <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{content_key}_20s.mp4</code> / <code>_30s.mp4</code> へアップロードし、<code>ranking_stock_items</code> の <code>video_s3_key_20s</code> / <code>video_s3_key_30s</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する。Aurora 反映 SQL と S3 ファイル名のどちらも環境ローカルな <code>id</code> を使わない（<code>content_key</code> で解決。<code>quiz-prebuilt</code> の 16-3d 決定を最初から適用）</li>
 </ol>
@@ -273,8 +273,25 @@
     <li><code>head</code>: <code>start_frame = anchor</code> / <code>name</code>（<code>r5</code>〜<code>r2</code>）: <code>start_frame = anchor（= 停止フラッシュ） - name_offset_frames</code></li>
     <li>違反は <strong>2 方向</strong>で検出する。<code>head_overrun</code> = 呼び込み部分が長すぎて前のシーンへ食い込む / <code>tail_overrun</code> = cue の尻が次の cue のアンカーへ食い込む。ほかに <code>missing</code>（実測なし）・<code>unknown</code>（尺に無い cue ID）・<code>missing_name_offset</code>。<strong>例外は投げず全件返す</strong>（ビルドツーリングがまとめて提示し、対処はセリフの短縮 → 話速 ≤ 1.2 の順）</li>
     <li><strong>順位 cue の予算（両尺共通）: 呼び込み部分 30f（1.0s）・県名部分 30f（1.0s）</strong>。ほかの cue の予算は 20 秒版が <code>intro</code> 75f / <code>teaser</code> 60f / <code>r1_call</code> 75f / <code>r1_name</code> 60f / <code>outro</code> 90f、30 秒版が <code>intro</code> 105f / <code>teaser</code> 60f / 各 <code>*_comment</code> 45f / <code>r1_call</code> 90f / <code>r1_name</code> 75f / <code>closing</code> 150f</li>
-    <li><code>name_offset_frames</code>（県名の発話開始）の実測方法は 17-4d で確定する（VOICEVOX の <code>audio_query</code> が返すモーラ長の積み上げで算出する見込み）</li>
+    <li><code>name_offset_frames</code>（県名の発話開始）の実測方法は 17-4d で確定する（VOICEVOX の <code>audio_query</code> が返すモーラ長の積み上げで算出する見込み）<strong>→ 確定した（下記 17-4d の decision）。予算区間による頭側の判定も 17-4d で置き換えた</strong></li>
     <li><strong><code>intro</code> の「30 秒版はサブタイトルまで読む」は撤回する</strong>（実態に合わせた修正）。第 1 バッチ 10 件の 30 秒版 <code>intro</code> はタイトル + 「トップ5！」までで、<code>content_fields.subtitle</code> は 17-4a の決定により<strong>両尺とも 0 秒から全国平均プレートとして画面に出る</strong>。読み上げでの重複は不要と判断し、必須にしない</li>
+  </ul>
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-08-11、17-4d）: TTS アダプタ・県名開始位置の実測・予算検査の判定基準</span>
+  <p style="margin:.3rem 0;">TTS はアダプタ層 <code>remotion/scripts/tts.py</code> に閉じた（再利用要件③）。<code>CueRequest</code>（cue ID・テキスト・県名）→ <code>CueAudio</code>（WAV パス・実測秒・フレーム・<code>name_offset_frames</code>・話速・エンジン識別子）が固定のインターフェースで、VOICEVOX 固有の HTTP 呼び出しはこの中だけにある。合成・検査・props 解決を通す CLI は <code>remotion/scripts/build_narration.py</code>（違反があるときは props を書かずに終了コード 1）。</p>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong><code>name_offset_frames</code> の実測方法</strong>: cue の <code>audio_query</code> のモーラ長を積み上げる。県名は<strong>単体の <code>audio_query</code> でモーラ列を得て、cue のモーラ列に対し右端から一致検索</strong>する（「まずは5位、埼玉県！」の <code>サイタマケン</code>）。読点のポーズもモーラ列の要素として積むため、ポーズを挟んだ県名でも一致する。cue 全体の長さは <strong>WAV の実測</strong>から取り、モーラ積み上げの予測との差が 0.08 秒を超えたら異常終了する（エンジン更新で長さモデルが変わったことの検知）</li>
+    <li><strong>疑問形の語尾上げ（<code>enable_interrogative_upspeak</code> の既定 = 有効）は <code>audio_query</code> に現れない</strong>。合成時に末尾モーラの母音がもう 1 つ足されるため、モデル側で補う（補わないと <code>teaser</code> のような疑問形 cue が全件 0.15 秒ずれる）。第 1 バッチ 10 件 × 2 尺 × 話速 1.1 / 1.2 の全 cue で、補正後の予測と実測の差は中央値 0.01 秒・最大 0.06 秒</li>
+    <li><strong>頭側の判定を「シーン境界の予算」から「直前 cue との重なり」へ変える</strong>（17-4c の予算区間は<strong>参考値</strong>として残す）。実測すると 5〜2 位の統合 cue の呼び込み部分は 29〜38f あり、17-4c の予算 30f を<strong>第 1 バッチ全件が超過</strong>する。一方で後ろ合わせに配置した実音声どうしの重なりは最悪 3f しかなく、頭が 0.2 秒ほど前のシーンへ食い込むこと自体は視聴上の問題にならない（吹き出しの字幕は停止フラッシュ以降のままで、先出しにもならない）。判定基準:
+      <ul>
+        <li>cue 間には <code>MIN_GAP_FRAMES = 2</code>（0.07 秒）の無音を必ず空ける</li>
+        <li>後ろ合わせ cue は直前 cue と重なるときだけ後ろへずらす。ずらせる上限は <code>NAME_LAG_MAX_FRAMES = 8</code>（0.27 秒。県名の発話開始が停止フラッシュより遅れる量）。ここまで詰めても重なるなら <code>head_overrun</code></li>
+        <li>頭合わせ cue はアンカー固定のまま（ずらさず <code>head_overrun</code>）。<code>tail_overrun</code> は「次 cue の開始 - 最小ギャップ」（最後の cue は総尺）で判定する</li>
+      </ul>
+      第 1 バッチ 10 件 × 2 尺（cue 220 本）を話速 1.1 で合成して<strong>違反 0 件</strong>。県名の遅れは 80 本中 65 本が 0f、最大 6f（上限 8f に対して余裕あり）</li>
+    <li><strong>音のミキシングは相対バランスだけをコンポジションで決め、配信レベルはレンダリング後に揃える</strong>。ナレーションのみの 20 秒版は -23.9 LUFS と静かで、Remotion にはラウドネス正規化の機能がないため。<code>remotion/src/audio.ts</code> が BGM をナレーションの <strong>18 LU 下</strong>（実測で無音区間の BGM ≒ -42 LUFS）に置き、<code>remotion/scripts/normalize_loudness.py</code>（ffmpeg <code>loudnorm</code> 2 パス・<strong>映像は再エンコードしない</strong>）が <strong>I = -14 LUFS / TP = -1.5 dBTP</strong> を目標に揃える（linear モードのためピーク制約が効き、実測は -15.0 / -14.8 LUFS に着地）。<strong>ダッキングは行わない</strong>（ナレーションがほぼ全編を占め、常時作動して定常減衰と変わらないため）。BGM は頭 0.5 秒フェードイン / 尻 1.5 秒フェードアウトで、曲が尺より短い場合に備えてループさせる</li>
   </ul>
 </div>
 
@@ -296,7 +313,7 @@
 <tr><th>項目</th><th>内容</th></tr>
 <tr><td>実行時の依存</td><td><code>acps_shared</code>（DB・S3）のみ。<strong>Node.js / Remotion / VOICEVOX / ffmpeg は実行時には一切使わない</strong>（<code>quiz-prebuilt</code> と同じ。コンテナイメージは image-batch 共通のまま変更しない）</td></tr>
 <tr><td>Fargate タスクサイズ</td><td>1 vCPU / 2 GB のまま据え置き（<code>ImageBatchStack</code> は共通のため変更しない）</td></tr>
-<tr><td>ビルド時の依存</td><td>Node.js + Remotion（ローカル実行。レンダリングと H.264 + AAC エンコードを担う）・VOICEVOX Engine（ローカル Docker。話者はセット別設計書）・imagegen（Codex 委譲。背景イラスト）・ローカル MySQL / Aurora への接続。バージョン固定は 17-4 のツーリング実装で行う（<code>package.json</code> / Docker イメージタグを git 管理）</td></tr>
+<tr><td>ビルド時の依存</td><td>Node.js + Remotion（ローカル実行。レンダリングと H.264 + AAC エンコードを担う）・VOICEVOX Engine（ローカル Docker。話者はセット別設計書）・<strong>ffmpeg</strong>（配信ラウドネス正規化。WSL には無いため image-batch の Docker イメージ経由で実行する）・imagegen（Codex 委譲。背景イラスト）・ローカル MySQL / Aurora への接続。バージョン固定は 17-4 のツーリング実装で行う（<code>package.json</code> / Docker イメージタグを git 管理）</td></tr>
 </table>
 </div>
 

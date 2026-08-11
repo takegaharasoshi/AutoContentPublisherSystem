@@ -12,6 +12,7 @@ const COMMON_PROPS: Omit<PrefRankingProps, "duration" | "cues"> = {
   valuePrefix: "年間",
   valueSuffix: "円",
   backgroundSrc: "bg/001-gyoza-spend.jpg",
+  bgmSrc: null,
   entries: [
     { rank: 1, prefCode: 45, prefName: "宮崎県", value: 3478 },
     { rank: 2, prefCode: 9, prefName: "栃木県", value: 3192 },

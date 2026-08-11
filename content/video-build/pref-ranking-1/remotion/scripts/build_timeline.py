@@ -17,6 +17,8 @@ from typing import Literal, Mapping
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_PATH = PROJECT_DIR / "src" / "timeline.json"
+MIN_GAP_FRAMES = 2
+NAME_LAG_MAX_FRAMES = 8
 
 
 @dataclass(frozen=True)
@@ -91,7 +93,7 @@ class RoundTiming:
 
 @dataclass(frozen=True)
 class CueAnchor:
-    """音声 cue の配置アンカーと使用可能な予算区間。"""
+    """音声 cue の配置アンカーと参考用のシーン区間。"""
 
     id: str
     align: Literal["head", "name"]
@@ -134,11 +136,12 @@ class ResolvedCue:
     align: str
     head_slack: int
     tail_slack: int
+    name_lag_frames: int
 
 
 @dataclass(frozen=True)
 class CueViolation:
-    """cue の不足・未知 ID・予算超過。"""
+    """cue の不足・未知 ID・隣接 cue または尺との競合。"""
 
     id: str
     kind: str
@@ -268,19 +271,34 @@ def cue_anchors(timeline: Timeline) -> list[CueAnchor]:
     return anchors
 
 
-def _overrun_message(side: str, frames: int, fps: int) -> str:
+def _tail_overrun_message(frames: int, fps: int) -> str:
     seconds = frames / fps
     return (
-        f"cue が予算の{side}へ {frames} フレーム（{seconds:.2f} 秒）超過しています。"
+        f"cue の終端が次の cue に必要な無音区間を {frames} フレーム"
+        f"（{seconds:.2f} 秒）超過しています。"
         "セリフを短くするか、話速を上げてください。"
     )
 
 
+def _head_overrun_message(frames: int, fps: int) -> str:
+    seconds = frames / fps
+    return (
+        f"直前 cue と重なり、必要な間隔まで {frames} フレーム"
+        f"（{seconds:.2f} 秒）不足しています。"
+        "対処: 呼び込みを短くする / 話速を上げる。"
+    )
+
+
 def resolve_cue_frames(
-    timeline: Timeline, measures: Mapping[str, CueMeasure]
+    timeline: Timeline,
+    measures: Mapping[str, CueMeasure],
+    *,
+    min_gap_frames: int = MIN_GAP_FRAMES,
+    name_lag_max_frames: int = NAME_LAG_MAX_FRAMES,
 ) -> ResolvedCues:
-    """実測音声を尺別アンカーへ配置し、全違反を例外なしで返す。"""
-    anchors = {anchor.id: anchor for anchor in timeline.cue_anchors}
+    """実測音声を時系列に配置し、隣接 cue との全違反を返す。"""
+    ordered_anchors = sorted(timeline.cue_anchors, key=lambda item: item.anchor)
+    anchors = {anchor.id: anchor for anchor in ordered_anchors}
     violations: list[CueViolation] = []
     resolved: dict[str, ResolvedCue] = {}
 
@@ -293,7 +311,9 @@ def resolve_cue_frames(
             )
         )
 
-    for cue_id, anchor in anchors.items():
+    previous_end: int | None = None
+    for anchor in ordered_anchors:
+        cue_id = anchor.id
         measure = measures.get(cue_id)
         if measure is None:
             violations.append(
@@ -306,6 +326,7 @@ def resolve_cue_frames(
             # 全アンカーの解決結果を返すため、欠落 cue は長さ 0 で仮配置する。
             measure = CueMeasure(frames=0, name_offset_frames=0)
 
+        lower_bound = 0 if previous_end is None else previous_end + min_gap_frames
         if anchor.align == "name":
             if measure.name_offset_frames is None:
                 violations.append(
@@ -315,14 +336,39 @@ def resolve_cue_frames(
                         f"後ろ合わせ cue「{cue_id}」に県名開始位置がありません。音声を再計測してください。",
                     )
                 )
-                start_frame = anchor.anchor
+                name_offset = 0
             else:
-                start_frame = anchor.anchor - measure.name_offset_frames
+                name_offset = measure.name_offset_frames
+            desired_start = anchor.anchor - name_offset
+            latest_start = anchor.anchor + name_lag_max_frames - name_offset
+            if desired_start < lower_bound:
+                start_frame = min(lower_bound, latest_start)
+                if start_frame < lower_bound:
+                    violations.append(
+                        CueViolation(
+                            cue_id,
+                            "head_overrun",
+                            _head_overrun_message(
+                                lower_bound - start_frame, timeline.fps
+                            ),
+                        )
+                    )
+            else:
+                start_frame = desired_start
+            name_lag_frames = start_frame + name_offset - anchor.anchor
         else:
             start_frame = anchor.anchor
+            name_lag_frames = 0
+            if start_frame < lower_bound:
+                violations.append(
+                    CueViolation(
+                        cue_id,
+                        "head_overrun",
+                        _head_overrun_message(lower_bound - start_frame, timeline.fps),
+                    )
+                )
 
-        head_slack = start_frame - anchor.budget_start
-        tail_slack = anchor.budget_end - (start_frame + measure.frames)
+        head_slack = start_frame - lower_bound
         resolved[cue_id] = ResolvedCue(
             id=cue_id,
             start_frame=start_frame,
@@ -331,22 +377,25 @@ def resolve_cue_frames(
             budget_end=anchor.budget_end,
             align=anchor.align,
             head_slack=head_slack,
-            tail_slack=tail_slack,
+            tail_slack=0,
+            name_lag_frames=name_lag_frames,
         )
-        if head_slack < 0:
-            violations.append(
-                CueViolation(
-                    cue_id,
-                    "head_overrun",
-                    _overrun_message("前", -head_slack, timeline.fps),
-                )
-            )
+        previous_end = start_frame + measure.frames
+
+    for index, anchor in enumerate(ordered_anchors):
+        cue = resolved[anchor.id]
+        if index + 1 < len(ordered_anchors):
+            upper_bound = resolved[ordered_anchors[index + 1].id].start_frame - min_gap_frames
+        else:
+            upper_bound = timeline.total
+        tail_slack = upper_bound - (cue.start_frame + cue.frames)
+        resolved[anchor.id] = replace(cue, tail_slack=tail_slack)
         if tail_slack < 0:
             violations.append(
                 CueViolation(
-                    cue_id,
+                    anchor.id,
                     "tail_overrun",
-                    _overrun_message("後", -tail_slack, timeline.fps),
+                    _tail_overrun_message(-tail_slack, timeline.fps),
                 )
             )
 

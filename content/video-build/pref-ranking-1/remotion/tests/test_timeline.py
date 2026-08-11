@@ -97,34 +97,76 @@ def test_resolve_cues_fits_budget_and_aligns_name_to_stop() -> None:
     )
     assert result.ok
     assert result.cues["r5"].start_frame == timeline.rounds[5].stop - 10
-    assert result.cues["r5"].head_slack == 20
-    assert result.cues["r5"].tail_slack == 20
+    assert result.cues["r5"].head_slack == 58
+    assert result.cues["r5"].tail_slack == 38
+    assert result.cues["r5"].name_lag_frames == 0
 
 
-def test_resolve_cues_reports_head_overrun() -> None:
-    """An overlong call before a prefecture name is reported as a head overrun."""
+def test_name_aligned_cue_moves_later_within_name_lag_limit() -> None:
+    """A name cue moves after the preceding cue while keeping an allowed lag."""
     timeline = build_timeline.build_timelines()["20s"]
     measures = all_fitting_measures(timeline)
+    measures["teaser"] = build_timeline.CueMeasure(frames=63)
     measures["r5"] = build_timeline.CueMeasure(
-        frames=50, name_offset_frames=31
+        frames=20, name_offset_frames=30
     )
     result = build_timeline.resolve_cue_frames(timeline, measures)
-    assert "head_overrun" in violation_kinds(result, "r5")
-    assert "1 フレーム" in next(
-        item.message for item in result.violations if item.kind == "head_overrun"
-    )
+    assert result.ok
+    assert result.cues["r5"].start_frame == 140
+    assert result.cues["r5"].head_slack == 0
+    assert result.cues["r5"].name_lag_frames == 5
 
 
-def test_resolve_cues_reports_tail_overrun() -> None:
-    """Audio crossing its budget end is reported as a tail overrun."""
+def test_name_aligned_cue_reports_head_overrun_beyond_lag_limit() -> None:
+    """A name cue reports overlap when the allowed lag cannot reach the lower bound."""
     timeline = build_timeline.build_timelines()["20s"]
     measures = all_fitting_measures(timeline)
-    measures["teaser"] = build_timeline.CueMeasure(frames=61)
+    measures["teaser"] = build_timeline.CueMeasure(frames=68)
+    measures["r5"] = build_timeline.CueMeasure(frames=20, name_offset_frames=30)
     result = build_timeline.resolve_cue_frames(timeline, measures)
-    assert "tail_overrun" in violation_kinds(result, "teaser")
-    assert "1 フレーム" in next(
-        item.message for item in result.violations if item.kind == "tail_overrun"
+    assert result.cues["r5"].start_frame == 143
+    assert result.cues["r5"].name_lag_frames == 8
+    assert "head_overrun" in violation_kinds(result, "r5")
+    assert "2 フレーム" in next(
+        item.message
+        for item in result.violations
+        if item.id == "r5" and item.kind == "head_overrun"
     )
+
+
+def test_head_aligned_cue_stays_fixed_and_reports_head_overrun() -> None:
+    """A head cue never moves away from its fixed anchor."""
+    timeline = build_timeline.build_timelines()["20s"]
+    measures = all_fitting_measures(timeline)
+    measures["intro"] = build_timeline.CueMeasure(frames=75)
+    result = build_timeline.resolve_cue_frames(timeline, measures)
+    assert result.cues["teaser"].start_frame == timeline.teaser_at
+    assert result.cues["teaser"].head_slack == -2
+    assert "head_overrun" in violation_kinds(result, "teaser")
+
+
+def test_resolve_cues_reports_tail_overrun_at_timeline_end() -> None:
+    """Audio crossing the total duration is reported as a tail overrun."""
+    timeline = build_timeline.build_timelines()["20s"]
+    measures = all_fitting_measures(timeline)
+    measures["outro"] = build_timeline.CueMeasure(frames=91)
+    result = build_timeline.resolve_cue_frames(timeline, measures)
+    assert "tail_overrun" in violation_kinds(result, "outro")
+    assert result.cues["outro"].tail_slack == -1
+
+
+def test_resolve_cues_uses_each_resolved_end_for_the_next_lower_bound() -> None:
+    """Sequential name cues use the preceding cue's adjusted placement."""
+    timeline = build_timeline.build_timelines()["20s"]
+    measures = all_fitting_measures(timeline)
+    measures["teaser"] = build_timeline.CueMeasure(frames=63)
+    measures["r5"] = build_timeline.CueMeasure(frames=50, name_offset_frames=30)
+    measures["r4"] = build_timeline.CueMeasure(frames=20, name_offset_frames=35)
+    result = build_timeline.resolve_cue_frames(timeline, measures)
+    assert result.ok
+    assert result.cues["r5"].start_frame == 140
+    assert result.cues["r4"].start_frame == 192
+    assert result.cues["r4"].name_lag_frames == 2
 
 
 def test_resolve_cues_collects_missing_unknown_and_name_offset_errors() -> None:

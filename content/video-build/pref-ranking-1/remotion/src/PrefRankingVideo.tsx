@@ -12,6 +12,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { FONT_DISPLAY, FONT_DISPLAY_WEIGHT, FONT_TEXT } from "./fonts";
+import { bgmVolumeAt, NARRATION_GAIN } from "./audio";
 import { INSET_ONLY_PREF_CODES } from "./japanPaths";
 import { JapanMap } from "./JapanMap";
 import { MapPalette } from "./palette";
@@ -89,6 +90,8 @@ export type PrefRankingProps = {
   valuePrefix: string | null;
   valueSuffix: string;
   backgroundSrc: string | null;
+  /** public/ 配下の BGM 相対パス。null なら BGM なし */
+  bgmSrc: string | null;
   entries: Entry[];
   /** cue ID → 尺別セリフ（順位コメントと closing / outro を含む） */
   cues: Record<string, Cue>;
@@ -654,6 +657,7 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
   valuePrefix,
   valueSuffix,
   backgroundSrc,
+  bgmSrc,
   entries = [],
   cues = {},
   labels = DEFAULT_LABELS,
@@ -726,6 +730,15 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
 
   return (
     <AbsoluteFill style={{ fontFamily: FONT_TEXT, backgroundColor: theme.pageTop }}>
+      {/* BGM は全編に敷き、ナレーションとのダッキングは行わない */}
+      {bgmSrc ? (
+        <Audio
+          src={staticFile(bgmSrc)}
+          loop
+          volume={(audioFrame) => bgmVolumeAt(audioFrame, tl.total)}
+        />
+      ) : null}
+
       {/* ナレーション（ビルドツーリングが算出した startFrame へ配置する） */}
       {Object.values(cues)
         .filter((cue) => cue.audioSrc)
@@ -736,7 +749,7 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
             durationInFrames={cue.frames ?? 300}
             layout="none"
           >
-            <Audio src={staticFile(cue.audioSrc as string)} />
+            <Audio src={staticFile(cue.audioSrc as string)} volume={NARRATION_GAIN} />
           </Sequence>
         ))}
 
