@@ -138,7 +138,7 @@ VOICEVOX:白上虎太郎
 </ul>
 
 <h2 id="assets">8. 固定アセット・デザイントークン</h2>
-<p><strong>表彰台五郎のポーズ 3 種</strong>を固定アセットとして S3 に置き、ビルドツーリングのレンダラーが読み込む（<a href="../data-model.html#s3-key">data-model.html セクション 5</a> の固定アセット規約。ファイル名はツーリング側で固定）。17-1 で透過 PNG 3 種を試作済み（<code>plans/17-1-trial/</code>）。正式アセット化（共通キャンバス・共通倍率での正規化 = logic-training-1 の 15-13 と同じ手法）は 17-4 で行う。</p>
+<p><strong>表彰台五郎のポーズ 3 種</strong>を固定アセットとして S3 に置き、ビルドツーリングのレンダラーが読み込む（<a href="../data-model.html#s3-key">data-model.html セクション 5</a> の固定アセット規約。ファイル名はツーリング側で固定）。17-1 で透過 PNG 3 種を試作し、<strong>17-4b で正式アセット化した</strong>（共通キャンバス 1160x1220・共通倍率での正規化 = logic-training-1 の 15-13 と同じ手法。基準はボディ前面の「1」の高さと足元）。S3 <code>assets/pref-ranking-1/goro_{base,suspense,gunbai}.png</code>（元ポーズは同 <code>source/</code>）、生成は <code>remotion/scripts/normalize_character.py</code>。</p>
 <div class="table-wrap">
 <table>
 <tr><th>用途</th><th>S3 キー</th><th>ポーズ</th><th>表示区間</th></tr>
@@ -148,9 +148,10 @@ VOICEVOX:白上虎太郎
 </table>
 </div>
 <ul>
-  <li><strong>配置（17-2 巡 1 Fix）</strong>: 五郎は<strong>日本海側の海域に常駐</strong>させる（地図と重ならない位置。コンポジション座標 <code>left:26 / top:424 / width:336</code>〔17-4a で更新〕）。吹き出し（実況テキスト。フォントサイズ 48px）を隣接表示し、スピン中は点滅させる</li>
+  <li><strong>配置（17-2 巡 1 Fix）</strong>: 五郎は<strong>日本海側の海域に常駐</strong>させる（地図と重ならない位置。コンポジション座標 <code>left:-6 / top:331 / width:381</code>〔17-4b の正式アセット〔1160x1220 キャンバス〕に合わせた値。画面上の大きさ・立ち位置は 17-4a の Fix と同じ〕）。吹き出し（実況テキスト。フォントサイズ 48px）を隣接表示し、スピン中は点滅させる</li>
   <li><strong>キャラデザインの制約（17-1 巡 3 決定）</strong>: 3 段表彰台の段差シルエットがキャラの識別子のため、<strong>段差を隠す衣装・ポーズは禁止</strong>。軍配は 1 位発表時のみ</li>
-  <li><strong>地図 SVG</strong>: S3 の固定アセットではなく<strong>コンポジションのコード資材（パスデータ）として git 管理</strong>する。現行はプロトの GFDL 由来素材のため、<strong>17-4 で PD 素材へ差し替える</strong>（素材要件・インセット配置値は <a href="../generators/ranking-prebuilt.html#composition">方式設計書セクション 8.2 の warn</a> が正）</li>
+  <li><strong>地図 SVG</strong>: S3 の固定アセットではなく<strong>コンポジションのコード資材（パスデータ）として git 管理</strong>する。<strong>17-4b で Natural Earth 10m admin-1（Public Domain）由来へ差し替え済み</strong>で、パスデータは <code>remotion/scripts/build_japan_paths.py</code> の自動生成物（手で編集しない）。素材要件・インセット配置値・素材側の誤り（奄美群島の県割当）の補正は <a href="../generators/ranking-prebuilt.html#composition">方式設計書セクション 8.2 の decision / warn</a> が正</li>
+  <li><strong>フォント（17-4b Fix）</strong>: <strong>Zen Kaku Gothic New</strong>（SIL OFL 1.1）。見出し（タイトル帯・順位行の県名・吹き出し）= Black / 本文（数値・出典行・全国平均プレート）= Medium・Bold。4 案（Noto Sans JP / Zen 角ゴシック New / 見出し Dela Gothic One / 見出し Zen Old Mincho）の実データ比較を経てユーザー判断で決定。証跡は <code>content/video-build/pref-ranking-1/LICENSES.md</code> セクション 5</li>
 </ul>
 <p><strong>デザイントークン（パレット正式値）</strong>。17-4a の版面デザイン工程で <code>wamodernA</code>（生成り × <strong>藍</strong> × 朱 × 金）から<strong>もう一色を藍 → 淡墨茶へ差し替えて Fix</strong> した。生成り・金・朱は据え置き。実装は <code>content/video-build/pref-ranking-1/remotion/src/theme.ts</code> が正で、下表はその写し。</p>
 <div class="callout decision">
@@ -191,7 +192,7 @@ VOICEVOX:白上虎太郎
 <ul>
   <li><strong>2 尺運用</strong>: 検証期は各ネタを 20 秒 / 30 秒の 2 本ビルドし、スロットが尺を決める（セクション 3）。尺確定後は勝ち尺のみビルド</li>
   <li><strong>英語圏展開の布石</strong>: 次セット候補として同内容の英語版アカウントが計画されているため、素材・データの言語分離（再利用要件 4 点）を方式実装の必須要件としている（<a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 の decision</a>）。本書の範囲では「<code>ranking_data</code>（言語非依存）と表示文言（<code>content_fields</code> / <code>narration</code> = 言語依存）の分離」がその土台になる</li>
-  <li><strong>17-4 での主な残作業（設計済み・実装待ち）</strong>: 地図 SVG の PD 差し替え（セクション 8）・五郎アセットの正式化・背景画風行と BGM ミキシングの確定・キャプションのランキング系プレースホルダ実装</li>
+  <li><strong>17-4 での主な残作業（設計済み・実装待ち）</strong>: 背景画風行と BGM ミキシングの確定・キャプションのランキング系プレースホルダ実装（<strong>地図 SVG の PD 差し替え・五郎アセットの正式化・フォント選定は 17-4b で完了</strong>）</li>
 </ul>
 
 </div>

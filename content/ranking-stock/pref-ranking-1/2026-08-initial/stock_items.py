@@ -6,8 +6,10 @@
 #
 # フィールド仕様（docs/app/data-model.html セクション 4.13 /
 #                docs/app/generators/ranking-prebuilt.html セクション 8.3）:
-#   content_fields = hook / trivia / source_display / result_list / value_suffix / subtitle / bg_motif
-#     - result_list と value_suffix はツーリングが data/*.json から機械整形する（手書き禁止）
+#   content_fields = hook / trivia / source_display / result_list / value_prefix / value_suffix
+#                    / subtitle / bg_motif
+#     - result_list / value_prefix / value_suffix はツーリングが data/*.json から機械整形する
+#       （手書き禁止。value_prefix は家計調査のネタが「年間」、それ以外は null）
 #   narration = 尺別 cue 台本（"20s" / "30s"）
 #
 # ナレーション cue の暫定予算（アンカーの確定値は 17-4 のタイムライン定数が正。

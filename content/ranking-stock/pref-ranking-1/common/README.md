@@ -58,6 +58,11 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python convert.py convert --item "ぎょうざ" --json out.json  # ストック投入用の JSON
 ```
 
+出力 JSON の `meta.prefix` / `meta.suffix` は `content_fields.value_prefix` / `value_suffix`
+（版面の順位行の「**年間** 3,478 **円**」）になる。家計調査の値は 1 世帯当たり**年間**支出金額 /
+年間購入数量のため `prefix` の既定は `年間`。前置きが不要なネタ（一次情報から手で作る JSON を含む）は
+`--prefix ""` または `meta.prefix = null` にする。
+
 出力は 4 点:
 
 1. 47 都道府県の降順一覧（目視確認用）

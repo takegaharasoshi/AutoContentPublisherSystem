@@ -323,6 +323,7 @@
     "retrieved_on": "2026-08-10",
     "url": "https://www.stat.go.jp/data/shakai/2021/rank/zuhyou/rank/rank29.xlsx",
     "suffix": "%",
+    "prefix": null,
     "nationwide": 7.8
   }
 }

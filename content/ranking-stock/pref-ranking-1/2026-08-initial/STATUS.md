@@ -7,6 +7,7 @@
 | 文言・ナレーション執筆 | 完了。`validate.py` 全項目パス |
 | 人間レビュー | **完了（2026-08-11）— 全 10 件承認**。指摘の反映内容は下記「1 巡目の反映」 |
 | DB 投入 | **完了（2026-08-11）**。ローカル MySQL / Aurora の両環境へ 10 件。`(title, content_fields, ranking_data, narration, source_note)` の MD5 が全行一致することを確認済み |
+| 追補 | **`content_fields.value_prefix` を追記（2026-08-11 / 17-4b）**。下記「投入後の追補」 |
 | 動画ビルド | 17-4 のツーリング完成後（17-5） |
 
 ## 構成
@@ -19,6 +20,7 @@
 | `generate.py` | `review.md` と `insert_ranking_stock.sql` を生成（実行前に validate を通す） |
 | `review.md` | 人間レビュー用シート（生成物） |
 | `insert_ranking_stock.sql` | 両環境投入用 SQL（生成物） |
+| `update_value_prefix.sql` | 投入済み 10 件へ `value_prefix` を追記する適用済み SQL（17-4b。冪等） |
 | `research.md` | データ検証の証跡・採否の判断記録 |
 
 再生成: `python3 validate.py && python3 generate.py`
@@ -38,6 +40,21 @@
 タイムライン・cue 体系の変更は方式設計書
 （`docs/app/generators/ranking-prebuilt.html` セクション 8.2 / 8.3 の decision）に反映済み。
 17-4 への実装制約（アンカーの後ろ合わせ・吹き出しの表示開始）も同 decision に記載。
+
+## 投入後の追補: `value_prefix`（2026-08-11 / 17-4b）
+
+17-4a の版面 Fix で `content_fields.value_prefix`（順位行の数値の前置き。例「年間◯◯円」）を
+新設したが、第 1 バッチ 10 件は**このフィールドを持たない状態で投入済み**だったため、
+17-4b の頭で両環境へ追記した（17-4e のビルドツーリングが初期ビルドをかける前に済ませる必要があった）。
+
+- 値の決め方: **家計調査の 8 件が `"年間"`**（ランキング表の値が「1 世帯当たり年間支出金額」のため）。
+  **009 温泉（源泉総数）・010 釣り（社会生活基本調査の行動者率）は `null`**（前置きが要らない指標）
+- 単一ソース化: `common/convert.py` が `meta.prefix` を出力するようにし（家計調査は既定 `年間` /
+  `--prefix ""` で無効化）、`generate.py` が `data/*.json` の `meta.prefix` を
+  `content_fields.value_prefix` へ機械転記する。**手書きしない**（`result_list` / `value_suffix` と同じ扱い）
+- 適用: `update_value_prefix.sql`（`JSON_SET` で該当キーのみ更新。冪等）をローカル MySQL と
+  Aurora（`common/apply_aurora.py`）の両方へ適用。適用後、**10 行の MD5 が両環境で一致**し、
+  かつ**DB の `content_fields` が生成元（`generate.py` の出力）と完全一致**することを確認済み
 
 ## 投入時に見つかった不具合（2026-08-11・修正済み）
 

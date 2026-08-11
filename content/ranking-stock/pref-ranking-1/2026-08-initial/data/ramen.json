@@ -323,6 +323,7 @@
     "retrieved_on": "2026-08-10",
     "url": "https://www.stat.go.jp/data/kakei/zuhyou/rank13.xlsx",
     "suffix": "円",
+    "prefix": "年間",
     "nationwide": 8752
   }
 }

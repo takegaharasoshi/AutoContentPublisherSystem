@@ -11,7 +11,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { FONT_FAMILY } from "./fonts";
+import { FONT_DISPLAY, FONT_DISPLAY_WEIGHT, FONT_TEXT } from "./fonts";
 import { JapanMap } from "./JapanMap";
 import { MapPalette } from "./palette";
 import { PREF_CENTROIDS } from "./prefCentroids";
@@ -289,8 +289,9 @@ const TitleBand: React.FC<{ theme: Theme; title: string; setLabel: string }> = (
         </div>
         <div
           style={{
+            fontFamily: FONT_DISPLAY,
             fontSize: 56,
-            fontWeight: 700,
+            fontWeight: FONT_DISPLAY_WEIGHT,
             lineHeight: 1.06,
             letterSpacing: 1,
             whiteSpace: "nowrap",
@@ -429,7 +430,16 @@ const RankRow: React.FC<{
         <span style={{ fontSize: isFirst ? 20 : 17, fontWeight: 700 }}>{labels.rankSuffix}</span>
       </div>
 
-      <div style={{ flex: 1, fontSize: isFirst ? 58 : 48, fontWeight: 700, color: fg, letterSpacing: 1 }}>
+      <div
+        style={{
+          flex: 1,
+          fontFamily: FONT_DISPLAY,
+          fontSize: isFirst ? 58 : 48,
+          fontWeight: FONT_DISPLAY_WEIGHT,
+          color: fg,
+          letterSpacing: 1,
+        }}
+      >
         {entry.prefName}
       </div>
 
@@ -508,8 +518,9 @@ const FlyingName: React.FC<{ entry: Entry; theme: Theme; tl: Timeline; zoom: num
         left: x,
         top: y,
         transform: `translate(-50%, -50%) scale(${0.5 + 0.5 * Math.min(1, pop)})`,
+        fontFamily: FONT_DISPLAY,
         fontSize: size,
-        fontWeight: 700,
+        fontWeight: FONT_DISPLAY_WEIGHT,
         lineHeight: 1,
         whiteSpace: "nowrap",
         color: isFirst ? TOKENS.goldLight : theme.flyText,
@@ -637,11 +648,13 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
     return cues.outro?.text ?? null;
   })();
 
+  // ポーズ 3 種は共通キャンバス・共通倍率の正式アセット（17-4b。scripts/normalize_character.py）。
+  // 3 枚とも同じ寸法・同じ立ち位置のため、切り替えてもキャラが伸縮・跳躍しない。
   const characterSrc = isAnnounced
-    ? "char/e4c_announce_gunbai_transparent.png"
+    ? "char/goro_gunbai.png"
     : frame >= tl.rounds[1].start
-      ? "char/e4b_suspense_transparent.png"
-      : "char/e4a_base_transparent.png";
+      ? "char/goro_suspense.png"
+      : "char/goro_base.png";
   const bob = Math.sin(frame / 9) * 5;
   const announcePop = isAnnounced
     ? spring({ frame: frame - announceAt, fps, config: { damping: 15, stiffness: 160, mass: 0.6 } })
@@ -652,7 +665,7 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
   const mapZoom = mapZoomAt(frame, tl) * breathe;
 
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_FAMILY, backgroundColor: theme.pageTop }}>
+    <AbsoluteFill style={{ fontFamily: FONT_TEXT, backgroundColor: theme.pageTop }}>
       {/* ナレーション（ビルドツーリングが算出した startFrame へ配置する） */}
       {Object.values(cues)
         .filter((cue) => cue.audioSrc)
@@ -720,8 +733,9 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
               border: `5px solid ${theme.bubbleBorder}`,
               borderRadius: 28,
               padding: "14px 28px",
+              fontFamily: FONT_DISPLAY,
               fontSize: 48,
-              fontWeight: 700,
+              fontWeight: FONT_DISPLAY_WEIGHT,
               lineHeight: 1.28,
               color: theme.bubbleText,
               boxShadow: "0 12px 26px rgba(12,18,34,0.26)",

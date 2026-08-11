@@ -32,6 +32,9 @@ from prefectures import (
 COMMON_DIR = Path(__file__).resolve().parent
 CACHE_DIR = COMMON_DIR / ".cache"
 HOUSEHOLDS_CSV = COMMON_DIR / "households.csv"
+# 家計調査のランキング表は「1 世帯当たり年間支出金額 / 年間購入数量」のため、
+# 本ツールが換算したネタの value_prefix は既定で「年間」になる（--prefix "" で無効化）。
+DEFAULT_PREFIX = "年間"
 
 
 @dataclass(frozen=True)
@@ -161,6 +164,7 @@ def build_result(
     rank_no: int,
     weights: dict[str, HouseholdWeight],
     suffix: str | None,
+    prefix: str | None = DEFAULT_PREFIX,
     retrieved_on: date | None = None,
 ) -> dict[str, object]:
     """Build ranking and source-note output for one selected item."""
@@ -205,6 +209,9 @@ def build_result(
             "retrieved_on": source_date,
             "url": RANK_URL_TEMPLATE.format(rank_no=rank_no),
             "suffix": output_suffix,
+            # 数値の前置き（content_fields.value_prefix）。家計調査の値は「1 世帯当たり
+            # 年間支出金額 / 年間購入数量」のため既定は「年間」。不要なネタは null。
+            "prefix": prefix or None,
             # 全国値（順位 0 の行）。「全国平均の◯倍」のような小ネタの根拠に使う。
             "nationwide": _json_number(series.nationwide),
         },
@@ -314,6 +321,11 @@ def _make_parser() -> argparse.ArgumentParser:
     convert_parser.add_argument("--rank", type=int, choices=range(1, 15))
     convert_parser.add_argument("--measure", choices=("金額", "数量"), default="金額")
     convert_parser.add_argument("--suffix")
+    convert_parser.add_argument(
+        "--prefix",
+        default=DEFAULT_PREFIX,
+        help=f"数値の前置き（既定: {DEFAULT_PREFIX}）。空文字を渡すと null になる",
+    )
     convert_parser.add_argument("--json", type=Path, dest="json_path")
     return parser
 
@@ -345,6 +357,7 @@ def main(argv: list[str] | None = None) -> int:
             rank_no=rank_no,
             weights=weights,
             suffix=args.suffix,
+            prefix=args.prefix,
         )
     except (OSError, RuntimeError, ValueError) as exc:
         print(f"エラー: {exc}", file=sys.stderr)

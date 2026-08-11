@@ -194,9 +194,23 @@
   </ul>
   コンポジションの実装は <code>content/video-build/pref-ranking-1/remotion/</code>（<code>layout.ts</code> = ジオメトリ / <code>theme.ts</code> = トークン / <code>timeline.ts</code> = アンカー / <code>PrefRankingVideo.tsx</code> = 版面）が正。
 </div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-11、17-4b）: 地図の PD 差し替え・素材の正式化</span>
+  下記の素材要件を満たす形で、<strong>地図を Natural Earth 10m admin-1（Public Domain）由来へ差し替えた</strong>（GFDL 由来のプロト素材を廃止。Phase 17 決定方針⑨を完了）。生成は <code>content/video-build/pref-ranking-1/remotion/scripts/build_japan_paths.py</code>（素材の取得・投影・インセット移設・出力）で、<code>src/japanPaths.ts</code> / <code>src/prefCentroids.ts</code> は<strong>自動生成物</strong>になった。素材要件との差分・追加決定は以下:
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>素材側の誤りを補正している</strong>: Natural Earth は<strong>奄美群島を沖縄県に割り当てている</strong>（実際は鹿児島県）。生成スクリプトが緯度 27.0N 以北かつ経度 128.3E 以東のリングを鹿児島県へ付け替える。補正しないと「鹿児島 1 位で奄美が塗られない / 沖縄 1 位で奄美まで塗られる」という<strong>内容の誤り</strong>になる。退行検出のため<strong>目印の島 21 件の県割当を毎回検査</strong>し、不一致ならビルドを失敗させる</li>
+    <li><strong>インセットは 2 群を個別に置かず、南西諸島をひとまとまりで相似変換する</strong>（本土と同一投影のまま group 全体を縮小 + 平行移動）。実ジオメトリでは「実際の相対配置」が自動的に保たれるため、群ごとの <code>translate</code> は不要になった</li>
+    <li><strong>インセットの縮尺は 0.75 → 0.68</strong>。実ジオメトリの南西諸島は 0.75 倍では点線 L 字の枠（角 686,680）に収まらないため、<strong>見た目（L 字の角の位置・インセットが占める領域）を正として縮尺の方を実測で決め直した</strong>。点線 L 字の座標は 17-4a の Fix 値を維持</li>
+    <li><strong>版面に載せない離島</strong>: 伊豆諸島・小笠原諸島・硫黄島・南鳥島・大東諸島と、面積が約 12km² 未満の島（地図ボックスの外へ大きく外れる / 点にしかならないため。17-4a で Fix した版面の再現）</li>
+    <li><strong>確定県ラベルの起点は鹿児島だけ本土部分から取る</strong>（全リングの外接矩形中心だと、インセットの島に引かれて太平洋上が起点になる）。沖縄はインセットの位置が起点</li>
+    <li><strong>表彰台五郎のポーズ 3 種を正式アセット化</strong>: 1160x1220 の共通キャンバス・共通倍率へ正規化（基準はボディ前面の「1」の高さと足元。<code>scripts/normalize_character.py</code>）。元の試作は 1 枚ごとに寸法が最大 29% 違い、そのままではポーズ切替でキャラが伸縮していた。S3 <code>assets/pref-ranking-1/goro_{base,suspense,gunbai}.png</code>（元ポーズは同 <code>source/</code>）。<code>layout.ts</code> の <code>CHARACTER</code> は 17-4a の見た目（画面上の大きさ・立ち位置）を維持する値へ更新</li>
+    <li><strong>フォントは Zen Kaku Gothic New（SIL OFL 1.1）に決定</strong>（4 案の実データ比較 → ユーザー判断）。見出し（タイトル帯・順位行の県名・吹き出し）= Black / 本文（数値・出典行）= Medium・Bold の 2 役。<strong>見出しは 1 ファイルを専用 family 名で weight 400 として読み込み、常に 400 で描く</strong>（同一 family へ複数ウェイトを登録すると、太い字面を指定したつもりが細い方で描かれる事象が実際に起きたため）</li>
+    <li>ライセンス証跡は <code>content/video-build/pref-ranking-1/LICENSES.md</code> セクション 4（地図）・5（フォント）</li>
+  </ul>
+</div>
 <div class="warn">
-  <span class="callout-title">地図 SVG の素材要件（17-4 の PD 素材差し替え時に必ず満たすこと）</span>
-  現行プロトの日本地図 SVG は GFDL 由来のため、本組み（17-4）で<strong>パブリックドメイン素材（Natural Earth 等）へ差し替える</strong>（Phase 17 決定方針⑨）。差し替え素材は以下を満たすこと（17-2 巡 1 でモック確定した配置の再現要件）:
+  <span class="callout-title">地図 SVG の素材要件（差し替え時に必ず満たすこと。17-4b で適用済み）</span>
+  地図素材は<strong>パブリックドメイン素材（Natural Earth 等）</strong>を使う（Phase 17 決定方針⑨）。素材は以下を満たすこと（17-2 巡 1 でモック確定した配置の再現要件。<strong>実際の適用結果と差分は直上の decision が正</strong>）:
   <ul style="margin:.3rem 0 0;">
     <li><strong>県単位のパス分割</strong>（47 都道府県を個別に塗り分け・点灯できること）。<strong>鹿児島の離島（奄美・トカラ）は飛び地サブパスとして分離</strong>されていること（インセット移設と「鹿児島 1 位時に本土 + 奄美が同時に金になる」挙動の両立に必要）</li>
     <li><strong>南西諸島インセット</strong>: 沖縄と奄美・トカラを<strong>実際の相対配置・同一縮尺（0.75 倍）を維持したまま関東沖へ移設</strong>する。点線の L 字囲みは角が房総半島のすぐ東に来る配置。プロト実装値（viewBox 基準）: 沖縄 <code>translate(695,822) scale(0.75)</code> / 奄美・トカラ <code>translate(632,673) scale(0.75)</code> / 点線 <code>M686,960 L686,680 L1000,680</code>。素材の viewBox が変わる場合も<strong>この見た目（相対配置・縮尺・L 字の角の位置）を再現</strong>する</li>

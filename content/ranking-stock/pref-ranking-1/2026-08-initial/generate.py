@@ -540,6 +540,8 @@ def sql_item(item: dict[str, Any], data: dict[str, Any]) -> str:
         "trivia": item["trivia"],
         "source_display": item["source_display"],
         "result_list": result_list(data),
+        # value_prefix は「年間」の類の数値の前置き。不要なネタは null（17-4a 追加）
+        "value_prefix": data["meta"].get("prefix"),
         "value_suffix": data["meta"]["suffix"],
         "subtitle": item["subtitle"],
         "bg_motif": item["bg_motif"],

@@ -80,6 +80,12 @@ export const rowHeight = (rank: number): number =>
 /** 出典行帯 */
 export const SOURCE_BAND = { left: SAFE.left, right: SAFE.right, top: 1612, height: 50 } as const;
 
-/** 表彰台五郎の常駐位置（日本海側） */
-export const CHARACTER = { left: 26, top: 424, width: 336 } as const;
+/**
+ * 表彰台五郎の常駐位置（日本海側）。
+ * 値は正式アセット（1160x1220 の共通キャンバス。17-4b）に合わせたもので、
+ * 17-4a で Fix した画面上の大きさ・立ち位置（ボディの「1」の高さ 51px・
+ * 足元 y=718・「1」の中心 x=185）を維持する。キャンバスには軍配ポーズの
+ * 腕を収める余白があるため left は負の値になる（透過部分が画面外へ出るだけ）。
+ */
+export const CHARACTER = { left: -6, top: 331, width: 381 } as const;
 export const BUBBLE = { left: 40, top: 282, maxWidth: 620 } as const;
