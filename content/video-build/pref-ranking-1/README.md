@@ -108,7 +108,7 @@ python review_sheet.py
 
 `work/review.html` をブラウザで開き、ネタごとに 20 秒版・30 秒版、背景、版面文言、TOP5、cue 台本、BGM、実測ラウドネスを確認します。観点は ①背景イラストの品質（文字・数字・記号の混入、和モダン調、可読性）②版面（県名・数値・地図・見切れ）③音（同期・語尾切れ・BGM バランス）です。NG は背景・DB の文言・ナレーションを修正して再ビルドし、解消するまで承認しません。
 
-承認したネタの `content_key` を 1 行ずつ `work/approved.txt` に書きます。空行と `#` から始まる行は無視されます。
+承認したネタの `content_key` を 1 行ずつ `work/approved.txt` に書きます。空行と `#` から始まる行は無視されます。**承認はネタ単位（2 尺まとめて）** です（ユーザー Fix 2026-08-12。片方の尺だけ NG なら両尺とも保留し、直して再ビルドする）。
 
 ```text
 # 2026-08 第1回承認
@@ -127,10 +127,11 @@ python publish.py --bucket your-bucket
 
 MP4 は `assets/pref-ranking-1/prebuilt/<content_key>_20s.mp4` / `_30s.mp4`、背景原本は `assets/pref-ranking-1/prebuilt/<content_key>_bg.png` へアップロードされます。ローカル MySQL はビルドした尺の列だけを 1 トランザクションで更新します。
 
-Aurora 用 SQL は常に `work/update_prebuilt.sql` に生成されます。通常実行後の案内コマンドで手動適用するか、S3・ローカル DB に続けて適用する場合は `--aurora` を付けます。
+Aurora へは **既定で Data API 経由の自動適用**まで行います（S3 とローカル MySQL だけ更新されて Aurora が取り残される片肺状態を作らないため。ユーザー Fix 2026-08-12）。Aurora 用 SQL は常に `work/update_prebuilt.sql` に生成されるので、適用を分けたいときだけ `--no-aurora` を使い、後から手動で適用します。
 
 ```bash
-python publish.py --bucket your-bucket --aurora
+python publish.py --bucket your-bucket --no-aurora
+python ../../ranking-stock/pref-ranking-1/common/apply_aurora.py work/update_prebuilt.sql
 ```
 
 S3 キーと両環境の UPDATE は環境非依存の `content_key` を使います。ローカルの `ranking_stock_items.id` は AUTO_INCREMENT で Aurora と一致しないため、識別には使いません。

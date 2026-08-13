@@ -257,7 +257,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--bucket", required=True, help="アップロード先 S3 バケット")
     parser.add_argument("--dry-run", action="store_true", help="S3・DB を変更せず予定だけ表示する")
-    parser.add_argument("--aurora", action="store_true", help="生成 SQL を Aurora にも適用する")
+    # Aurora 反映は既定で行う（ユーザー Fix 2026-08-12）。S3 とローカル DB だけ更新されて
+    # Aurora が取り残される片肺状態を作らないため。SQL だけ欲しいときに --no-aurora を使う。
+    parser.add_argument(
+        "--no-aurora", dest="aurora", action="store_false",
+        help="Aurora へ適用せず SQL の生成だけ行う",
+    )
     return parser
 
 
@@ -311,7 +316,7 @@ def main(argv: list[str] | None = None) -> int:
             _apply_aurora(sql_path)
         else:
             print(
-                "Aurora へは未反映です。次を実行してください:\n"
+                "Aurora へは未反映です（--no-aurora）。次を実行してください:\n"
                 f"python content/ranking-stock/{SET_CODE}/common/"
                 f"apply_aurora.py {sql_path}"
             )

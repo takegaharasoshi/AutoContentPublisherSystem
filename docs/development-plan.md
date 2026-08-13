@@ -178,6 +178,7 @@
   - **17-3 で判明した実行環境の知見（ツーリング実装の前提）**: ①WSL には Chrome の共有ライブラリが無く、**Remotion のレンダリングは Docker 経由が必須**（`Dockerfile.render` を踏襲）②背景画像が 2MB 級の PNG だとフォント読み込みが `delayRender` タイムアウトする。**JPEG 化 + `--concurrency=3` + `--timeout` 延長**で安定した ③VOICEVOX は `voicevox/voicevox_engine:cpu-ubuntu20.04-latest`・**話者 ID 12（白上虎太郎・ふつう）**・`speedScale=1.1` / `intonationScale=1.2` で、17-3 の 20 秒版ナレーションは**全 cue が予算内**（実測）
   - 内容: 地図 SVG の PD 差し替え（素材要件は [ranking-prebuilt.html](app/generators/ranking-prebuilt.html) セクション 8.2 の warn）・コンポジション本組み（2 尺タイムライン・パレット・キャラ / インセット・画面文言の props 化）・TTS アダプタ + 予算検査・五郎アセット正式化（リファレンスシート方式）・背景画風行と BGM ミキシングの確定・ビルドツーリング 5 段工程（レビューシート・`--rebuild` 含む）・方式モジュール `ranking_prebuilt.py` + キャプションのランキング系プレースホルダ実装（sns-post-batch）。完了条件 = pytest 全パス + サンプルネタの 2 尺通しビルド成功
 - [ ] **17-5** セット追加・初期ビルド・稼働開始
+  - **17-4e で決めた前提（2026-08-12、ユーザー判断）**: ①**既存の背景 3 枚（001 / 002 / 009）も作り直す** — 17-3 / 17-4a で作った 3 枚は画風固定行が「藍」だった頃の生成物で、17-4e で「淡墨茶」へ修正済み（`export_prompts.py` が正）。30 枚の画風をそろえるため、初期ビルドでは 3 枚を含む**全 30 枚を新プロンプトで生成する** ②動画の承認はネタ単位（2 尺まとめて）③S3・ローカル MySQL・Aurora の反映は `publish.py` が一気に行う（Aurora 自動適用が既定）
   - 内容: アカウント開設（`daigoro_ranking`）・Secret 作成 → BGM 調達・登録 → DB セット登録（[operation.html](app/operation.html) セクション 2.1）→ 初期 30 ネタの 2 尺ビルド（背景 imagegen 30 枚）・全数人間レビュー・S3 配置 + 両環境 DB 反映 → Scheduler 追加（画像生成 2 件 + インサイト収集 2 件）・バックログ 0 件確認 → 手動実行確認・稼働開始
 - [ ] **17-6** テスト投稿・効果検証
   - 内容: 2 尺の比較投稿（昼 20 秒 / 夜 30 秒のスロット分離・検証後半で尺スワップ = [sets/pref-ranking-1.html](app/sets/pref-ranking-1.html) セクション 3）→ インサイト確認（Phase 16 後段のバッチ稼働後は自動収集）で尺・フォーマットを確定し、以降は勝ち尺のみビルドで定常運用へ移行する
