@@ -1187,6 +1187,17 @@
 
     次は **17-4f（方式モジュール `ranking_prebuilt.py` + キャプションのランキング系プレースホルダ実装）**。BGM 込みの本番ビルドと全数レビューは 17-5（音源調達・初期 30 ネタのビルド）で行う。
 
+- [x] **17-4f** 方式モジュール `ranking_prebuilt.py` + キャプションのランキング系プレースホルダ（17-4 のサブステップ 6・17-4 完了）
+  - 備考: 2026-08-13 実施（Opus 5 が仕様策定・レビュー、実装は Codex `gpt-5.6-terra` / high へ委譲）。設計は 17-2 で Fix 済みで、本ステップは**設計どおりの実装のみ**（新規の設計判断なし）。正は方式設計書 [ranking-prebuilt.html](app/generators/ranking-prebuilt.html) セクション 2〜7 と [batch-flow.html](app/batch-flow.html) セクション 3.3 の decision（キャプション拡張）。
+
+    **(1) 方式モジュール（image-batch）**: `services/image-batch/app/generators/ranking_prebuilt.py` を新設し、`REGISTRY` へ `ranking-prebuilt` を登録した。`quiz_prebuilt.py` と同型で、実行時は **S3 GetObject と DB のみ**（外部 API・組版・動画合成なし）。処理順序は parameters 検証 → スロット解決 → ストック取得 → S3 取得 → `ranking_items` INSERT + LRU 更新 → `GeneratorResult`。スロット解決（JST 時による決定的解決・早朝の巻き戻し）は `gpt_quiz_multicut.resolve_slot` を**そのまま再利用**し、`_parse_parameters` だけランキング用に別実装した（必須フィールドは `from_jst_hour` / `slot_code` / `duration_seconds` の 3 つで、`quiz_type` / `difficulty` / `slot_label` に相当するものは持たない）。`duration_seconds` は 20 / 30 以外を parameters 不正として弾き、**尺 → 尺カラム（`video_s3_key_20s` / `_30s`）の解決は許可リストの dict 経由**にした（SQL 組み立てに外部値を通さない）。
+
+    **(2) ストック取得と防御的検査**: LRU は `set_id` + `is_active=1` + **当該尺カラムが非 NULL** の 1 行（`ORDER BY last_used_at ASC, id ASC`）。0 件は異常終了、再利用（`last_used_at` 非 NULL）と**当該尺が未ビルドの有効在庫あり**は WARNING ログ。行の検査は `title`（非空・100 字以内）・`format`（非空・20 字以内）・`content_fields` の必須 4 キー（`hook` / `trivia` / `source_display` / `result_list`）・`ranking_data.entries` の 5 件と rank 1〜5 の一意性・`video_audio_asset_id` 非 NULL・`video_s3_key` 非空。`value_prefix` / `value_suffix` / `subtitle` / `bg_motif` は**検査せずそのまま保持する**（`value_prefix` は null を取り得る値であり、実行時に必要なのはキャプション展開の入力だけのため）。
+
+    **(3) キャプションのランキング系プレースホルダ（sns-post-batch）**: `app/ranking_items.py`（`fetch_ranking_item`）と `models.RankingItem` を新設し、`captions.py` を 2 系統へ拡張した。既知トークンは**両系の和集合 9 種**で、和集合外のトークンは**DB を読む前に**異常終了（既存挙動を維持）。**どちらの系で展開するかは当該実行に存在する行で決まる**（`quiz_items` を先に引き、無ければ `ranking_items`。どちらも無ければ異常終了）。決まった系に属さないトークンがテンプレートにあれば**系の取り違え**として異常終了する（ランキングセットのテンプレートに `{{answer}}` を書いた等を検知）。トークンを含まないテンプレートは素通しのままで、`fantasy-animals-1` は無変更で共存する。
+
+    **(4) 確認**: image-batch 122 passed / 6 skipped（外部依存 e2e）、sns-post-batch 112 passed / 6 skipped（DB e2e）。新規テストは方式モジュール（尺別カラムの選択・スロット解決・parameters 不正・ストック 0 件・WARNING 2 種・フィールド不備 5 系統）とキャプション（ランキング系フル展開・系の取り違え両方向・行なし・素通し）・`fetch_ranking_item`。**実 AWS での稼働確認は 17-5**（セット登録・初期ビルド・Scheduler 追加が揃ってから通しで確認する）。
+
 
 ## 設計課題リスト（解消済み）
 

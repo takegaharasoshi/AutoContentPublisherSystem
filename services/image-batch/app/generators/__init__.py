@@ -14,6 +14,7 @@ from . import (
     gpt_image_single,
     gpt_quiz_multicut,
     quiz_prebuilt,
+    ranking_prebuilt,
 )
 
 
@@ -35,6 +36,7 @@ REGISTRY: dict[str, GeneratorFn] = {
     "gpt-image-single": gpt_image_single.generate,
     "gpt-quiz-multicut": gpt_quiz_multicut.generate,
     "quiz-prebuilt": quiz_prebuilt.generate,
+    "ranking-prebuilt": ranking_prebuilt.generate,
 }
 
 

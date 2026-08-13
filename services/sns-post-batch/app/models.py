@@ -54,6 +54,14 @@ class QuizItem:
 
 
 @dataclass(frozen=True)
+class RankingItem:
+    """Caption expansion source for one ranking generation run."""
+
+    title: str
+    content_fields: dict[str, Any]
+
+
+@dataclass(frozen=True)
 class Post:
     """Current posting state for one generation run and SNS account."""
 

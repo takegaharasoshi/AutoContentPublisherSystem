@@ -9,6 +9,7 @@ from app.models import (
     CaptionTemplate,
     GeneratedMediaRef,
     Post,
+    RankingItem,
     SnsAccount,
 )
 
@@ -20,6 +21,7 @@ from app.models import (
         SnsAccount(2, "instagram", "main", "Main"),
         CaptionTemplate(3, "caption"),
         GeneratedMediaRef(4, "bucket", "key", "jpg"),
+        RankingItem("ランキング題", {"hook": "つかみ"}),
         Post(5, "pending", None, None),
     ],
 )
