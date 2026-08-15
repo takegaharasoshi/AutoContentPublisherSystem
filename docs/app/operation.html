@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
-  <span>最終更新: 2026-08-10</span>
+  <span>最終更新: 2026-08-13</span>
 </div>
 
 <div class="note">
@@ -403,7 +403,8 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
 
 <h4>初期ストック量・補充サイクル・在庫確認</h4>
 <ul>
-  <li><strong>初期ストック: 30 ネタ ≒ 約 2 週間分</strong>（消費は 1 日 2 投稿 × 7 日 = 週 14 ネタ。17-1 検証のネタ帳 30 件を全数ビルドして開始する）</li>
+  <li><strong>初期ストックの目標: 30 ネタ ≒ 約 2 週間分</strong>（消費は 1 日 2 投稿 × 7 日 = 週 14 ネタ。17-1 検証のネタ帳 30 件が供給元）</li>
+  <li><strong>ただし立ち上げは 10 件で開始する</strong>（ユーザー判断 2026-08-13。17-3 で投入済みの第 1 バッチ 10 件をビルドして稼働を始め、残り 20 件は稼働と並行で追いかける = 開発計画 17-5a / 17-5b）。<strong>在庫 10 件は 5 日で一周し、6 日目以降は同一動画が同じスロット・同じ尺で再投稿される</strong>（LRU は 2 尺共通で消費順が変わらないため）。この重複期間は承知のうえで受け入れ、追いかけ投入で短くする。<strong>下記の在庫水位 28 件は定常運用の目標であり、立ち上げ期は下回った状態で走る</strong></li>
   <li><strong>補充: 週 1 回、14 ネタ（1 週間分）を目安</strong>に手順 1〜6 を回し、<strong>未使用かつ必要尺ビルド済みの在庫 28 件（2 週間分）以上</strong>を保つ（quiz の「在庫 2 週間分 + 週次で 1 週間分補充」の型を 1 日 2 投稿へ換算。再利用 WARNING が出た場合は補充が遅れているサイン）。<strong>尺確定（17-6）後は勝ち尺のみをビルド・在庫として数える</strong></li>
   <li><strong>在庫確認クエリ（2 尺対応）</strong>（週次の補充判断・投入確認・ビルド漏れ検出に使う。検証期は <code>unbuilt_20s</code> / <code>unbuilt_30s</code> とも 0 が正常、尺確定後は勝ち尺の列のみ見る）:
 <pre><code>SELECT
@@ -416,7 +417,7 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
 FROM ranking_stock_items
 WHERE set_id = :set_id AND is_active = 1;</code></pre></li>
   <li><strong>取り下げ</strong>: 誤データ・出典問題が見つかったネタは <code>is_active=0</code>（削除しない。S3 の事前動画も削除しない）。<strong>有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、0 件になる場合は先に代替を投入する（quiz と同じ）</li>
-  <li><strong>補充手順のスキル化は 17-7 で実施する</strong>（<code>/quiz-stock-replenish</code> の前例。17-6 で勝ち尺が確定するとビルド対象と在庫の数え方が変わるため、尺が固まってから 1 回で書く）。それまでは本節の手順 + <strong><code>content/ranking-stock/pref-ranking-1/WRITING-NOTES.md</code></strong>（17-3 で確立した執筆・レビュー・投入の勘所。スキルの一次資料）で回す</li>
+  <li><strong>補充手順のスキル化は 17-7 で実施する</strong>（<code>/quiz-stock-replenish</code> の前例。17-6 で勝ち尺が確定するとビルド対象と在庫の数え方が変わるため、尺が固まってから 1 回で書く）。それまでは本節の手順 + <strong><code>content/ranking-stock/pref-ranking-1/WRITING-NOTES.md</code></strong>（17-3 で確立した執筆・レビュー・投入の勘所。スキルの一次資料）で回す。<strong>スキル化前に回すのは、17-5b の追いかけ投入（20 件）と 17-6 の検証期間中の週次補充</strong>（検証は 4 条件で 3〜4 週間規模になり、初期 30 件では足りないため補充が必須）</li>
 </ul>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>

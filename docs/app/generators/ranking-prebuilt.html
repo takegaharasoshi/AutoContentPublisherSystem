@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（17-2 で作成）</span>
   <span>方式名（レジストリキー）: ranking-prebuilt</span>
-  <span>最終更新: 2026-08-11</span>
+  <span>最終更新: 2026-08-13</span>
 </div>
 
 <div class="note">
@@ -24,7 +24,7 @@
 
 <div class="warn">
   <span class="callout-title">適用状態</span>
-  17-2（2026-08-10）で設計 Fix。実装は 17-4（ビルドツーリング + Remotion 本組み + 方式モジュール）、初期 30 ネタのビルド・S3 配置と稼働開始は 17-5 以降を予定（ステップ分割は <a href="../../development-plan.md">development-plan.md</a> Phase 17）。本書は目標設計であり、実装時の差分は decision コールアウトで追記する。
+  17-2（2026-08-10）で設計 Fix。実装は 17-4（ビルドツーリング + Remotion 本組み + 方式モジュール）、初期ビルド・S3 配置と稼働開始は 17-5 以降を予定（ステップ分割は <a href="../../development-plan.md">development-plan.md</a> Phase 17）。本書は目標設計であり、実装時の差分は decision コールアウトで追記する。
 </div>
 
 <h2>1. 方式概要</h2>
@@ -130,7 +130,7 @@
 <h3 id="build-steps">8.1 工程（5 段）</h3>
 <p>事前動画の供給はローカルの<strong>事前ビルドツーリング</strong>が担う。ツーリングは <code>content/video-build/&lt;set_code&gt;/</code> に置いて git 管理し（置き場・運用ルールは <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）、週次補充（ストック投入）とセットで回す。工程は 5 段:</p>
 <ol>
-  <li><strong>対象抽出</strong>: ビルド対象尺のカラム（検証期は <code>video_s3_key_20s</code> と <code>_30s</code> の両方、尺確定後は勝ち尺のみ）が NULL の有効ストック行を列挙する（初回 = 17-5 は 30 ネタ全量、以後は補充分のみ）</li>
+  <li><strong>対象抽出</strong>: ビルド対象尺のカラム（検証期は <code>video_s3_key_20s</code> と <code>_30s</code> の両方、尺確定後は勝ち尺のみ）が NULL の有効ストック行を列挙する（初回 = 17-5a は投入済み 10 ネタ、17-5b で残り 20 ネタ、以後は補充分のみ）</li>
   <li><strong>背景イラスト生成（imagegen 委譲）</strong>: 行の <code>content_fields.bg_motif</code>（ネタのテーマに合わせた背景モチーフの指示文）からプロンプトを組み立て、Codex 組み込み画像生成（imagegen）で 9:16 の背景を 1 ネタ 1 枚生成する（<strong>2 尺で共用</strong>）。プロンプトには<strong>セットの画風固定行</strong>（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 4</a>）と<strong>サイズ明示行</strong>（<code>quiz-prebuilt</code> の 16-4b 決定と同じ手法）を付け、<strong>「文字・数字・記号を描かない」を必須指定</strong>とする（下記 decision の再利用要件①）。生成物は <code>assets/{set_code}/prebuilt/{content_key}_bg.png</code> として S3 に併置する（再ビルド資産。DB 記録なし）</li>
   <li><strong>TTS 合成 + Remotion レンダリング（2 本）</strong>: 行の <code>narration</code>（尺別 cue 台本）を VOICEVOX（ローカル Docker）でセリフ単位に合成 → <strong>実測長の予算検査（セクション 8.3。超過はビルドエラー）</strong> → 音声ファイル群 + <code>ranking_data</code> + 版面文言 + 背景をコンポジションの props に渡し、Remotion で 20 秒版・30 秒版をレンダリングし、<strong>配信ラウドネスへ正規化する</strong>（下記 17-4d の decision）。BGM は <code>audio_assets</code> の <code>time_slot IS NULL</code> の有効曲から LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行い（<code>quiz-prebuilt</code> セクション 6 の decision と同じ移管）、<strong>2 尺共通の 1 曲</strong>を <code>video_audio_asset_id</code> に記録する</li>
   <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（2 尺）+ 背景イラストを一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>背景再生成（imagegen 再試行・<code>bg_motif</code> 書き直し）またはセリフ・版面文言の修正（DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
