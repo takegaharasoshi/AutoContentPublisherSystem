@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（17-2 で作成）</span>
   <span>set_code: pref-ranking-1</span>
-  <span>最終更新: 2026-08-13</span>
+  <span>最終更新: 2026-08-24</span>
 </div>
 
 <div class="note">
@@ -24,14 +24,14 @@
 
 <div class="warn">
   <span class="callout-title">適用状態</span>
-  17-2（2026-08-10）で設計 Fix した<strong>目標設計</strong>を記述している。DDL 適用・データ整備・初期ストック投入は 17-3、ビルドツーリング + 方式実装は 17-4、アカウント開設・初期ビルド・稼働開始は 17-5（投入済み 10 件で開始し、残り 20 件は稼働と並行で追いかける = 17-5a / 17-5b）、尺・フォーマットの効果検証は 17-6 を予定（<a href="../../development-plan.md">development-plan.md</a> Phase 17）。
+  17-2（2026-08-10）で設計 Fix した<strong>目標設計</strong>を記述している。DDL 適用・データ整備・初期ストック投入は 17-3、ビルドツーリング + 方式実装は 17-4、アカウント開設・初期整備（14 ネタ）・稼働開始は 17-5、初速の効果確認は 17-6、補充スキル化 + 残り 16 件の投入は 17-7 を予定（<strong>2026-08-24 見直し: 投稿は 1 日 1 回・尺は 30 秒で確定</strong> = セクション 3 の decision）（<a href="../../development-plan.md">development-plan.md</a> Phase 17）。
 </div>
 
 <h2>1. テーマ</h2>
-<p><strong>都道府県ランキング</strong>（17-1 決定）。統計・調査データに基づく都道府県 TOP5 を、日本地図のルーレット演出で発表する<strong>フルナレーション付き縦型ショート動画</strong>を 1 日 2 回投稿する。進行役は金の 3 段表彰台がボディのお祭り実況キャラ<strong>「表彰台五郎」</strong>（ひょうしょうだいごろう。赤ねじり鉢巻 + ハンドマイク、1 位発表時のみ軍配を掲げる）。ビジュアルは<strong>和モダン</strong>（生成り地 × 藍 × 金。セクション 8）。</p>
+<p><strong>都道府県ランキング</strong>（17-1 決定）。統計・調査データに基づく都道府県 TOP5 を、日本地図のルーレット演出で発表する<strong>フルナレーション付き縦型ショート動画</strong>を 1 日 1 回投稿する。進行役は金の 3 段表彰台がボディのお祭り実況キャラ<strong>「表彰台五郎」</strong>（ひょうしょうだいごろう。赤ねじり鉢巻 + ハンドマイク、1 位発表時のみ軍配を掲げる）。ビジュアルは<strong>和モダン</strong>（生成り地 × 藍 × 金。セクション 8）。</p>
 <ul>
   <li><strong>フォーマットは TOP5 地図ルーレット型</strong>のみ（17-1 巡 1 決定。全県塗り型は第 2 候補として設計骨子のみ = <a href="../generators/ranking-prebuilt.html#appendix-zenken">方式設計書 付録 A</a>）。<strong>下位順位（ワースト）は扱わない</strong>。ネタ選定基準は「下位の県の人が笑って自虐できるか」（<a href="../../strategy/business-strategy.html">事業戦略書セクション 6</a>）</li>
-  <li><strong>尺は 20 秒 / 30 秒の 2 尺</strong>（両方フルナレーション）。各ネタを 2 尺でビルドし、17-6 の比較投稿で勝ち尺を確定する（セクション 3）</li>
+  <li><strong>尺は 30 秒</strong>（フルナレーション。2026-08-24 ユーザー判断で確定 = セクション 3 の decision）。各ネタは 30 秒版 1 本のみビルドする。20 秒版のコンポジション・タイムラインは実装済みのまま<strong>休眠</strong>（増便・尺再検討時の保険として残す）</li>
   <li>ネタは<strong>人間レビュー済みのランキングストック（<code>ranking_stock_items</code>）からの取得のみ</strong>。出典実在・県換算の検証は投入時のレビューで担保する（調達・検証・投入の運用は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）。市区町村単位の統計（家計調査等）は<strong>世帯数加重平均で県換算</strong>し、換算した旨を動画の出典行とキャプションに明記する（Phase 17 決定方針）</li>
 </ul>
 <p>動画の作り（タイムライン・版面・ルーレット演出・TTS 同期）は方式設計書（<a href="../generators/ranking-prebuilt.html#composition">generators/ranking-prebuilt.html セクション 8.2〜8.3</a>）を参照。動画は実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く。</p>
@@ -52,26 +52,25 @@
 <p><strong>投稿はリール + ストーリーズの 2 本立て</strong>（<code>batch_sets.stories_enabled=1</code>。既存勝負セットの踏襲）。リール成功後に同一 MP4 をストーリーズへ再掲する（キャプションなし。<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。</p>
 
 <h2>3. スケジュール（投稿頻度）</h2>
-<p><strong>1 日 2 回（昼 12:30 / 夜 20:00 JST）</strong>（17-2 巡 3 のユーザー決定）。勝負セットとして投稿ペースを優先しつつ、ネタ供給（出典検証・県換算込みの週 14 ネタ補充 + 動画レビュー）が人間レビューの負荷上限に収まる頻度とした。生成費は 0 円のため頻度のコスト制約はない（<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>）。伸びた場合の増便は定常運用後に判断する。</p>
+<p><strong>1 日 1 回（夜 20:00 JST）</strong>（2026-08-24 のユーザー決定。17-2 巡 3 の「1 日 2 回〔昼 12:30 / 夜 20:00〕」から変更）。ネタ供給が週 7 ネタ + 動画レビューに半減し、人間レビューの負荷を抑えて立ち上げる。生成費は 0 円のため頻度のコスト制約はない（<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>）。増便（1 日 2 回へ）は初速を見て判断する。</p>
 <p>どのスロットとして実行するかは<strong>実行時刻（<code>SCHEDULED_AT</code> の JST 時）から決定的に解決</strong>する（<a href="../generators/ranking-prebuilt.html#parameters">方式設計書セクション 3</a>）。スロットは<strong>投稿する尺（<code>duration_seconds</code>）</strong>を切り替える（クイズ方式のような型・難度・BGM・配色の切替はない）。</p>
 <div class="table-wrap">
 <table>
-<tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻</th><th>Scheduler 名 / cron 式</th><th><code>duration_seconds</code>（検証期）</th></tr>
-<tr><td><code>noon</code></td><td>4:00〜16:59</td><td>12:30</td><td><code>acps-prod-image-generation-pref-ranking-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td><strong>20</strong>（完走率・リプレイ仮説）</td></tr>
-<tr><td><code>evening</code></td><td>17:00〜3:59</td><td>20:00</td><td><code>acps-prod-image-generation-pref-ranking-1-evening</code><br><code>cron(0 20 * * ? *)</code></td><td><strong>30</strong>（保存・コメント仮説）</td></tr>
+<tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻</th><th>Scheduler 名 / cron 式</th><th><code>duration_seconds</code></th></tr>
+<tr><td><code>evening</code></td><td>常時（単一スロット）</td><td>20:00</td><td><code>acps-prod-image-generation-pref-ranking-1-evening</code><br><code>cron(0 20 * * ? *)</code></td><td><strong>30</strong></td></tr>
 </table>
 </div>
 <div class="warn">
   <span class="callout-title">スケジュール時刻を変えるときはスロット境界を必ず確認する</span>
-  Scheduler の Input にスロット・尺は持たせていない（時刻だけがスロットの指定）。<code>from_jst_hour</code> の境界（4 時 / 17 時）をまたいで時刻を変更すると<strong>実行されるスロット = 投稿される尺が変わる</strong>。命名規約と運用手順は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> / <a href="../operation.html#set-add">operation.html セクション 2.1 手順 3</a>。
+  Scheduler の Input にスロット・尺は持たせていない（時刻だけがスロットの指定）。現在は単一スロットのため実行時刻によらず <code>evening</code>（30 秒）に解決されるが、増便でスロットを追加した場合は <code>from_jst_hour</code> の境界をまたぐ時刻変更で<strong>実行されるスロット = 投稿される尺が変わる</strong>。命名規約と運用手順は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> / <a href="../operation.html#set-add">operation.html セクション 2.1 手順 3</a>。
 </div>
 <ul>
-  <li>夜を既存 2 セット（logic-training-1 / fantasy-animals-1 = ともに 21:00）と<strong>同時刻にせず 20:00 とした</strong>のは、失敗アラーム発生時の対応が 3 セット同時に重ならないようにする運用上の判断（技術上は同時刻でも <code>set_code</code> で分離される = 15-15 決定と同じ）。昼 12:30 は logic-training-1 の noon と同時刻だが、同様に問題ない</li>
+  <li>夜を既存 2 セット（logic-training-1 / fantasy-animals-1 = ともに 21:00）と<strong>同時刻にせず 20:00 とした</strong>のは、失敗アラーム発生時の対応が 3 セット同時に重ならないようにする運用上の判断（技術上は同時刻でも <code>set_code</code> で分離される = 15-15 決定と同じ）</li>
   <li><strong>インサイト収集 Scheduler</strong> はセット追加時に 2 件（<code>acps-prod-insights-collection-pref-ranking-1-{morning|evening}</code>。06:00 / 18:00 JST・全セット共通）を InsightsBatchStack へ追加する（<a href="../../infra/workflow.html">infra/workflow.html セクション 1.6</a>。17-5 のアカウント開設・稼働開始時に実施）</li>
 </ul>
 <div class="decision">
-  <span class="callout-title">決定（2026-08-10、17-2 巡 3）: 2 尺検証（17-6）の回し方 = スロット分離 + 後半スワップ</span>
-  検証期（17-6）は上表のとおり<strong>昼 = 20 秒 / 夜 = 30 秒のスロット分離</strong>で比較する（各ネタはどちらか一方の尺・スロットで投稿され、LRU が 2 尺共通のため同一ネタの両尺が近接投稿されることはない = <a href="../generators/ranking-prebuilt.html#stock">方式設計書セクション 4</a>）。投稿時間帯の違いが尺の効果と交絡するため、<strong>検証の後半で尺の割当をスワップ（昼 = 30 / 夜 = 20）</strong>して打ち消す。切替は <code>prompt_configs.parameters</code> の UPDATE のみで行える。検証期間・判定指標（完走率・リプレイ・保存・コメントのどれを主指標にするか）の詳細は 17-6 で最終化する。<strong>尺確定後は両スロットを勝ち尺へ UPDATE し、以降のビルドは勝ち尺のみ</strong>とする（<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）。
+  <span class="callout-title">決定（2026-08-24、ユーザー判断）: 尺は 30 秒で確定・投稿は 1 日 1 回（2 尺検証は中止）</span>
+  17-2 巡 3 で設計した 2 尺検証（昼 = 20 秒 / 夜 = 30 秒のスロット分離 + 検証後半のスワップ）は<strong>実施せずに中止</strong>し、尺は <strong>30 秒で確定</strong>・投稿は<strong>夜 20:00 の 1 日 1 回</strong>とする。あわせて稼働開始の条件を「<strong>14 投稿分（14 ネタの 30 秒版）がビルド・全数レビュー済み</strong>」とした（約 2 週間分。開発計画 17-5）。ビルド・在庫の数え方は 30 秒版のみ（<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）。<strong>20 秒版（タイムライン・コンポジション・方式モジュールの 20 秒対応）は実装済みのまま休眠</strong>とし、増便・尺再検討の際は 20 秒版のビルドと <code>parameters</code> へのスロット追加だけで再開できる。17-6 は尺比較ではなく<strong>セットとしての初速確認</strong>に目的を変更した。
 </div>
 
 <h2>4. プロンプトの作り方</h2>
@@ -79,7 +78,6 @@
 <p>登録する <code>prompt_configs.parameters</code>（キー仕様は <a href="../generators/ranking-prebuilt.html#parameters">方式設計書セクション 3</a>）:</p>
 <pre><code>{
   "slots": [
-    {"from_jst_hour": 4,  "slot_code": "noon",    "duration_seconds": 20},
     {"from_jst_hour": 17, "slot_code": "evening", "duration_seconds": 30}
   ]
 }</code></pre>
@@ -114,7 +112,7 @@ VOICEVOX:白上虎太郎
 </ul>
 
 <h2 id="audio">6. 音源の構成</h2>
-<p>BGM は<strong>スロット共通の汎用曲 3〜5 曲</strong>を <code>audio_assets</code>（<code>time_slot = NULL</code> / <code>asset_type='bgm'</code>）に登録する（調達・前処理・証跡は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a> の共通ルール。S3 キーは <code>audio/pref-ranking-1/{ファイル名}.m4a</code>。調達は 17-5）。選曲はビルド時の LRU ローテーション（1 ネタ 1 曲・2 尺共通・<code>video_audio_asset_id</code> に記録 = <a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 工程 3</a>）。<strong>実行時は <code>audio_assets</code> を使わない</strong>。</p>
+<p>BGM は<strong>スロット共通の汎用曲 3〜5 曲</strong>を <code>audio_assets</code>（<code>time_slot = NULL</code> / <code>asset_type='bgm'</code>）に登録する（調達・前処理・証跡は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a> の共通ルール。S3 キーは <code>audio/pref-ranking-1/{ファイル名}.m4a</code>。調達は 17-5）。選曲はビルド時の LRU ローテーション（1 ネタ 1 曲〔尺を問わず共通〕・<code>video_audio_asset_id</code> に記録 = <a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 工程 3</a>）。<strong>実行時は <code>audio_assets</code> を使わない</strong>。</p>
 <div class="decision">
   <span class="callout-title">決定（17-2 巡 3、設計者判断）: SE は初期構成では使わない</span>
   クイズ方式の SE 2 種（カウントダウン・チャイム）に相当する効果音は初期構成に含めない。<strong>スピン停止・1 位発表の強調は映像演出（停止フラッシュ・バースト・キャラのポーズ切替）とナレーションの実況が担う</strong>ため。ナレーション + BGM + SE の 3 層は音のミキシング調整コストも上がる。17-4 の実装・レビューで「発表の瞬間に音の区切りが欲しい」と判明した場合は、quiz 前例の <code>asset_type='se'</code> + 固定ファイル名方式で追加する（構造は既存のまま使える）。
@@ -188,15 +186,15 @@ VOICEVOX:白上虎太郎
   <li><strong>未使用ストックが尽きた場合は利用済みストックを LRU で再利用</strong>する（投稿は止まらない。<strong>同一動画の再投稿になる点は許容</strong>・再利用時は WARNING ログ = 補充遅延のサイン。水位を守っていれば発生しない = <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
   <li><strong>事前動画の S3 欠落（DB はビルド済みなのに実体なし）は縮退せず異常終了</strong>（DB と S3 の不整合の検知。別の尺・別のネタへの差し替えはしない）</li>
   <li><strong>ストーリーズ投稿の失敗はリールの success を巻き戻さない</strong>。終端状態で確定した投稿失敗の検知は ECS タスク異常終了通知が担う（<a href="../batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a>）</li>
-  <li>1 日 2 回のため、1 回の失敗はその日の当該スロット分の欠落に留まる（もう 1 スロットは独立に動く）。当日リカバリの手順・判断基準は共通課題（<a href="../../development-plan.md">development-plan.md</a> 設計課題リスト 2026-07-26）に従う</li>
+  <li>1 日 1 回のため、1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの手順・判断基準は共通課題（<a href="../../development-plan.md">development-plan.md</a> 設計課題リスト 2026-07-26）に従う</li>
 </ul>
 
 <h2>10. 共通フローからの差分・特記事項</h2>
 <p><strong>使用方式は <code>ranking-prebuilt</code></strong>（<a href="../generators/ranking-prebuilt.html">generators/ranking-prebuilt.html</a>。Remotion ローカル事前ビルド + 実行時は取得のみ）。本セットは共通テーブルのうち <code>ranking_stock_items</code>（ランキングストック）と <code>ranking_items</code>（投稿履歴）を使う唯一のセットである（<a href="../data-model.html#detail-ranking-items">data-model.html セクション 4.12 / 4.13</a>）。SNS 投稿バッチ側の差分は<strong>ランキング系プレースホルダのキャプション動的組み立て</strong>（17-2 設計・17-4 実装。<a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>）と<strong>ストーリーズ連続投稿</strong>（既存機構）。</p>
 <ul>
-  <li><strong>2 尺運用</strong>: 検証期は各ネタを 20 秒 / 30 秒の 2 本ビルドし、スロットが尺を決める（セクション 3）。尺確定後は勝ち尺のみビルド</li>
+  <li><strong>単尺運用（30 秒）</strong>: 各ネタを 30 秒版 1 本ビルドする（2026-08-24 尺確定 = セクション 3 の decision）。20 秒版は実装のみ維持し、ビルドしない</li>
   <li><strong>英語圏展開の布石</strong>: 次セット候補として同内容の英語版アカウントが計画されているため、素材・データの言語分離（再利用要件 4 点）を方式実装の必須要件としている（<a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 の decision</a>）。本書の範囲では「<code>ranking_data</code>（言語非依存）と表示文言（<code>content_fields</code> / <code>narration</code> = 言語依存）の分離」がその土台になる</li>
-  <li><strong>17-4 は完了（2026-08-13）</strong>: 版面デザイン・素材正式化・2 尺コンポジション・TTS / 予算検査 / BGM ミキシング・ビルドツーリング 5 段工程・方式モジュール・キャプションのランキング系プレースホルダをすべて実装した。残るのは<strong>実 AWS での稼働に必要な作業（アカウント開設・BGM 調達・セット登録・初期ビルドと全数レビュー・Scheduler 追加）で、17-5 で行う。<strong>初期ビルドの対象は投入済み 10 件</strong>で、残り 20 件は稼働と並行で追いかける（17-5b）</strong></li>
+  <li><strong>17-4 は完了（2026-08-13）</strong>: 版面デザイン・素材正式化・2 尺コンポジション・TTS / 予算検査 / BGM ミキシング・ビルドツーリング 5 段工程・方式モジュール・キャプションのランキング系プレースホルダをすべて実装した。残るのは<strong>実 AWS での稼働に必要な作業（アカウント開設・BGM 調達・セット登録・初期ビルドと全数レビュー・Scheduler 追加）で、17-5 で行う</strong>。初期ビルドの対象は 14 ネタ（投入済み 10 + 追加 4）の 30 秒版（= 稼働開始の条件。2026-08-24 ユーザー判断）。残り 16 件は 17-7（スキル実地テスト）で投入する</li>
 </ul>
 
 </div>

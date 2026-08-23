@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（17-2 で作成）</span>
   <span>方式名（レジストリキー）: ranking-prebuilt</span>
-  <span>最終更新: 2026-08-13</span>
+  <span>最終更新: 2026-08-24</span>
 </div>
 
 <div class="note">
@@ -32,7 +32,7 @@
 <ul>
   <li><strong>レンダラーが Remotion</strong>（React ベースのプログラム動画生成。Pillow + ffmpeg の組版ではなくコンポーネントとフレーム補間で版面・アニメーションを記述する）。フォーマットは <strong>TOP5 地図ルーレット型</strong>（セクション 8.2）</li>
   <li><strong>フルナレーション</strong>: セリフ単位の TTS（VOICEVOX）をタイムライン定数へフレーム同期させてベイクする（セクション 8.3）</li>
-  <li><strong>2 尺</strong>: 同一ネタから 20 秒版・30 秒版の 2 本をビルドし、スロット（<code>parameters.slots[].duration_seconds</code>）がどちらを投稿するかを決める（セクション 3。尺比較の検証設計は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>）</li>
+  <li><strong>2 尺対応・運用は 30 秒のみ</strong>: 方式・コンポジションは 20 秒版・30 秒版の 2 尺に対応し、スロット（<code>parameters.slots[].duration_seconds</code>）が投稿する尺を決める。ただし<strong>運用の尺は 30 秒で確定</strong>（2026-08-24 ユーザー判断 = <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a> の decision）。ビルド・投稿とも 30 秒版のみで、20 秒版は実装のまま休眠</li>
 </ul>
 <div class="decision">
   <span class="callout-title">決定（2026-08-10、17-2 巡 2）: Remotion ローカル事前ビルド方式の採用と方式名</span>
@@ -79,7 +79,7 @@
 </div>
 <div class="decision">
   <span class="callout-title">決定（2026-08-10、17-2 巡 2・巡 3）: 尺はスロット単位の固定値とする</span>
-  2 尺（20 秒 / 30 秒）のどちらを投稿するかは<strong>スロットの設定値 <code>duration_seconds</code> で固定</strong>する。日付・乱数による実行時の出し分けロジックは持たない（決定的解決の維持。同じスロットの再実行は必ず同じ尺になり、冪等性と検証の解釈が単純になる）。尺比較の検証（17-6）は「昼 = 20 秒 / 夜 = 30 秒」のスロット分離で行い、時間帯交絡の打ち消し（検証後半のスワップ）や尺確定後の一本化は <strong><code>parameters</code> の UPDATE だけで行える</strong>（両尺ビルド済みのため設定変更と資産が食い違わない。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>）。クイズ方式の <code>slot_label</code>（時間帯ラベル帯）・<code>quiz_type</code> / <code>difficulty</code>（型・難度絞り込み）に相当するフィールドは本方式にはない — ランキングのネタはスロット非依存で、版面にも時間帯要素を持たないため。
+  2 尺（20 秒 / 30 秒）のどちらを投稿するかは<strong>スロットの設定値 <code>duration_seconds</code> で固定</strong>する。日付・乱数による実行時の出し分けロジックは持たない（決定的解決の維持。同じスロットの再実行は必ず同じ尺になり、冪等性と検証の解釈が単純になる）。尺比較の検証（17-6）は「昼 = 20 秒 / 夜 = 30 秒」のスロット分離で行い、時間帯交絡の打ち消し（検証後半のスワップ）や尺確定後の一本化は <strong><code>parameters</code> の UPDATE だけで行える</strong>（両尺ビルド済みのため設定変更と資産が食い違わない。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>）。クイズ方式の <code>slot_label</code>（時間帯ラベル帯）・<code>quiz_type</code> / <code>difficulty</code>（型・難度絞り込み）に相当するフィールドは本方式にはない — ランキングのネタはスロット非依存で、版面にも時間帯要素を持たないため。<br><strong>2026-08-24 追記</strong>: 尺は 30 秒で確定し（2 尺検証は中止 = セット別設計書セクション 3 の decision）、運用スロットは <code>evening</code>（30 秒）の 1 本になった。仕組みとしての 2 尺対応（20 / 30 の許容・スロット別 <code>duration_seconds</code>）は変更しない。
 </div>
 
 <h2 id="stock">4. ランキングストックの取得（当該尺ビルド済み限定の LRU 順繰り）</h2>
@@ -130,10 +130,10 @@
 <h3 id="build-steps">8.1 工程（5 段）</h3>
 <p>事前動画の供給はローカルの<strong>事前ビルドツーリング</strong>が担う。ツーリングは <code>content/video-build/&lt;set_code&gt;/</code> に置いて git 管理し（置き場・運用ルールは <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）、週次補充（ストック投入）とセットで回す。工程は 5 段:</p>
 <ol>
-  <li><strong>対象抽出</strong>: ビルド対象尺のカラム（検証期は <code>video_s3_key_20s</code> と <code>_30s</code> の両方、尺確定後は勝ち尺のみ）が NULL の有効ストック行を列挙する（初回 = 17-5a は投入済み 10 ネタ、17-5b で残り 20 ネタ、以後は補充分のみ）</li>
+  <li><strong>対象抽出</strong>: ビルド対象尺のカラム（尺確定〔2026-08-24〕により <code>video_s3_key_30s</code> のみ）が NULL の有効ストック行を列挙する（初回 = 17-5 は 14 ネタ、17-7 で残り 16 ネタ、以後は補充分のみ）</li>
   <li><strong>背景イラスト生成（imagegen 委譲）</strong>: 行の <code>content_fields.bg_motif</code>（ネタのテーマに合わせた背景モチーフの指示文）からプロンプトを組み立て、Codex 組み込み画像生成（imagegen）で 9:16 の背景を 1 ネタ 1 枚生成する（<strong>2 尺で共用</strong>）。プロンプトには<strong>セットの画風固定行</strong>（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 4</a>）と<strong>サイズ明示行</strong>（<code>quiz-prebuilt</code> の 16-4b 決定と同じ手法）を付け、<strong>「文字・数字・記号を描かない」を必須指定</strong>とする（下記 decision の再利用要件①）。生成物は <code>assets/{set_code}/prebuilt/{content_key}_bg.png</code> として S3 に併置する（再ビルド資産。DB 記録なし）</li>
-  <li><strong>TTS 合成 + Remotion レンダリング（2 本）</strong>: 行の <code>narration</code>（尺別 cue 台本）を VOICEVOX（ローカル Docker）でセリフ単位に合成 → <strong>実測長の予算検査（セクション 8.3。超過はビルドエラー）</strong> → 音声ファイル群 + <code>ranking_data</code> + 版面文言 + 背景をコンポジションの props に渡し、Remotion で 20 秒版・30 秒版をレンダリングし、<strong>配信ラウドネスへ正規化する</strong>（下記 17-4d の decision）。BGM は <code>audio_assets</code> の <code>time_slot IS NULL</code> の有効曲から LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行い（<code>quiz-prebuilt</code> セクション 6 の decision と同じ移管）、<strong>2 尺共通の 1 曲</strong>を <code>video_audio_asset_id</code> に記録する</li>
-  <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（2 尺）+ 背景イラストを一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>背景再生成（imagegen 再試行・<code>bg_motif</code> 書き直し）またはセリフ・版面文言の修正（DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
+  <li><strong>TTS 合成 + Remotion レンダリング（2 本）</strong>: 行の <code>narration</code>（尺別 cue 台本）を VOICEVOX（ローカル Docker）でセリフ単位に合成 → <strong>実測長の予算検査（セクション 8.3。超過はビルドエラー）</strong> → 音声ファイル群 + <code>ranking_data</code> + 版面文言 + 背景をコンポジションの props に渡し、Remotion で必要尺（現運用は 30 秒版のみ = 2026-08-24 尺確定）をレンダリングし、<strong>配信ラウドネスへ正規化する</strong>（下記 17-4d の decision）。BGM は <code>audio_assets</code> の <code>time_slot IS NULL</code> の有効曲から LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行い（<code>quiz-prebuilt</code> セクション 6 の decision と同じ移管）、<strong>2 尺共通の 1 曲</strong>を <code>video_audio_asset_id</code> に記録する</li>
+  <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（必要尺）+ 背景イラストを一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>背景再生成（imagegen 再試行・<code>bg_motif</code> 書き直し）またはセリフ・版面文言の修正（DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
   <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{content_key}_20s.mp4</code> / <code>_30s.mp4</code> へアップロードし、<code>ranking_stock_items</code> の <code>video_s3_key_20s</code> / <code>video_s3_key_30s</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する。Aurora 反映 SQL と S3 ファイル名のどちらも環境ローカルな <code>id</code> を使わない（<code>content_key</code> で解決。<code>quiz-prebuilt</code> の 16-3d 決定を最初から適用）</li>
 </ol>
 <div class="decision">
@@ -174,7 +174,7 @@
 <tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.0s → <strong>煽り 2.0s</strong> → 5 位〜2 位 各 4.0s（スピン 1.0s + 停止フラッシュ・行追記 1.1s + 順位コメント 1.9s）→ 1 位 5.0s（タメ 3.0s + 発表 2.0s）→ <strong>結果総覧 2.5s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 1.4s（結果総覧と締めの 3.9s は <code>closing</code> 1 本の cue でまたぐ）<br><span class="muted">※ 配分は 17-4d で見直した（順位間の間を作るため）。定数の正は <code>scripts/build_timeline.py</code></span></td></tr>
 </table>
 </div>
-<p>2 尺の検証仮説（17-2 巡 1 で Fix）: 20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>。</p>
+<p>2 尺の検証仮説（17-2 巡 1 で Fix）: 20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い。<strong>2026-08-24: 検証は実施せず中止し、尺は 30 秒で確定した</strong>（仮説は記録として残す。<a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a> の decision）。</p>
 <ul>
   <li><strong>1 位の強調（17-2 巡 1 Fix・17-4a で寸法更新）</strong>: 1 位行は行高 104px（2〜5 位は 82px）+ 明るい金グラデ + グロー強化。1 位県名は発表時に 148px + 二重グローのバーストを表示し、余韻ののち順位行へ落とす（17-4a）。順位バッジ・パルスリング・「第1位」朱バッジは比較モックの結果<strong>不採用</strong>（過剰装飾）</li>
   <li><strong>キャラ演出</strong>: 煽り・実況はキャラの吹き出しに表示する（<strong>ナレーション cue と同一テキスト</strong> = 音と字幕の二重化。スピン中は点滅。<strong>冒頭のみ例外</strong> = 下記 17-4a の decision）。ポーズは 3 種を切り替える（基本 → タメ〔1 位スピン中〕→ 軍配〔1 位発表後〕）。アセット・配置値はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a>。<strong>ただし 5〜2 位の順位 cue は県名を含む</strong>ため（下記 decision）、吹き出しへの表示は<strong>停止フラッシュ以降に限る</strong>（スピン中に表示すると結果が先にばれる）</li>

@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
-  <span>最終更新: 2026-08-13</span>
+  <span>最終更新: 2026-08-24</span>
 </div>
 
 <div class="note">
@@ -187,7 +187,7 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
     <li>クイズ方式のセットは、SE 2 種（カウントダウンティック・誘導チャイム〔固定ファイル名は <code>answer_chime.m4a</code> のまま〕）を <code>audio/{set_code}/se/</code> の固定ファイル名で配置し、<code>asset_type='se'</code> + 証跡込みで <code>audio_assets</code> に登録した（セクション 3）。固定アセット（キャラポーズ画像等）を <code>assets/{set_code}/</code> に配置した（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）</li>
     <li>時間帯で BGM を出し分けるセットは、<code>parameters.slots</code> の全 <code>slot_code</code> について <code>time_slot</code> 一致（または NULL）の有効 BGM が 1 曲以上あることを確認した（0 件のスロットがあると、当該スロットの処理〔<code>quiz-prebuilt</code> では動画ビルド、実行時合成方式では実行〕が異常終了する。セクション 3）</li>
     <li>クイズ方式のセットは、初期の問題ストックを <code>quiz_stock_items</code> へ投入し、<code>parameters.slots</code> の全「型 × 難度」の組について有効な在庫が 1 件以上あることを在庫確認クエリで確認した（0 件の組があると当該スロットの実行が異常終了する。セクション 3）。<code>quiz-prebuilt</code> 方式のセットは、さらに全問の動画ビルド・配置（セクション 3 手順 5）まで完了していること（<code>unbuilt</code> = 0）を確認した</li>
-    <li>ランキング方式（<code>ranking-prebuilt</code>）のセットは、初期のランキングストックを <code>ranking_stock_items</code> へ投入し、必要尺（2 尺検証期は両尺）の動画ビルド・配置（セクション 3）まで完了していること（<code>unbuilt</code> = 0）を在庫確認クエリで確認した。BGM は <code>time_slot</code> NULL の有効曲が 1 曲以上あることを確認した</li>
+    <li>ランキング方式（<code>ranking-prebuilt</code>）のセットは、初期のランキングストックを <code>ranking_stock_items</code> へ投入し、必要尺（<code>pref-ranking-1</code> は 30 秒のみ = 2026-08-24 尺確定）の動画ビルド・配置（セクション 3）まで完了していること（<code>unbuilt</code> = 0）を在庫確認クエリで確認した。BGM は <code>time_slot</code> NULL の有効曲が 1 曲以上あることを確認した</li>
     <li>ストーリーズ再掲するセットは <code>batch_sets.stories_enabled=1</code> を設定した（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>インサイト収集 Scheduler 2 件</strong>（morning / evening）も InsightsBatchStack へ追加して deploy した（手順 3。<a href="../infra/workflow.html">infra/workflow.html セクション 1.6</a>）</li>
     <li><strong>Scheduler の有効化前に、当該セットの SNS 投稿対象のバックログ（未投稿の生成実行）が 0 件であることを実クエリで確認した</strong>（未投稿 run の滞留は以後の投稿を恒常的に遅らせ、アラームでは気づけない。15-15 で確立した予防手順 = <a href="../development-plan.md">development-plan.md</a> 設計課題リスト 2026-07-25。17-2 で本チェックリストに明記）</li>
@@ -385,17 +385,17 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
       <li><strong>時刻・時分の指標は現行のデータモデルに載らない</strong>: 表示は <code>value</code> + <code>value_suffix</code> の組み立てのため、平均就寝時刻（23:39）のような時刻表記は表現できない。分へ換算すれば数値化できるが、表示と読み上げの自然さは別途の設計判断が必要（設計課題リストに記録）</li>
     </ul>
   </li>
-  <li><strong>手順 3（文言執筆）</strong>: <code>title</code> / <code>content_fields</code>（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>value_suffix</code>〔数値の単位表示〕/ <code>subtitle</code> / <code>bg_motif</code>）/ <code>narration</code>（20 秒・30 秒の尺別 cue 台本 = <a href="generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3</a> の cue 体系）を執筆する。<strong><code>result_list</code> は手書きせず、ツーリングが <code>ranking_data</code> + <code>value_suffix</code> から機械整形して格納する</strong>（<a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）。ナレーションは cue ごとの時間予算（アンカー表由来）を意識して短く書く（超過はビルド時に検出される）。<strong>長さは文字数ではなくモーラ数で見積もる</strong>（<code>12899円</code> は 6 文字だが読みは 19 モーラ相当。文字数では数値の読み上げを過小評価する）。<strong>金額・件数などの数値はナレーションで読み上げず版面表示に任せる</strong>（2 秒の cue に 5 桁の金額は入らない。17-3 でネタ資材の投入前検証スクリプトにモーラ推定の検査を実装した）</li>
+  <li><strong>手順 3（文言執筆）</strong>: <code>title</code> / <code>content_fields</code>（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>value_suffix</code>〔数値の単位表示〕/ <code>subtitle</code> / <code>bg_motif</code>）/ <code>narration</code>（30 秒版の cue 台本 = <a href="generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3</a> の cue 体系。<strong>尺確定〔2026-08-24〕後の新規執筆は 30 秒版のみ書く</strong>。既存行の 20 秒版台本は残置してよい）を執筆する。<strong><code>result_list</code> は手書きせず、ツーリングが <code>ranking_data</code> + <code>value_suffix</code> から機械整形して格納する</strong>（<a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）。ナレーションは cue ごとの時間予算（アンカー表由来）を意識して短く書く（超過はビルド時に検出される）。<strong>長さは文字数ではなくモーラ数で見積もる</strong>（<code>12899円</code> は 6 文字だが読みは 19 モーラ相当。文字数では数値の読み上げを過小評価する）。<strong>金額・件数などの数値はナレーションで読み上げず版面表示に任せる</strong>（2 秒の cue に 5 桁の金額は入らない。17-3 でネタ資材の投入前検証スクリプトにモーラ推定の検査を実装した）</li>
   <li><strong>手順 4（人間レビュー）</strong>: 投入前にユーザーがレビューする。観点: <strong>①データの正しさ（出典の実在・データ年・県換算の再計算・TOP5 の順位。誤データ対策の唯一の砦）</strong>②表現（下位を晒していないか・煽りすぎていないか・出典表記とキャプション注記の妥当性）③既存ストックとの重複（同一テーマ・同一出典の近接）④フォーマット適合（文字数・cue 台本の長さ・<code>bg_motif</code> の妥当性）</li>
 </ul>
 
 <h4>手順 5: INSERT 投入（ローカル MySQL + Aurora）</h4>
 <p>レビュー済みのネタを両環境へ投入する。<strong><code>content_key</code>（<code>{3 桁連番}-{slug}</code>。例: <code>001-gyoza-spend</code>）を採番し、両環境へ同じ値で投入する</strong> — 投入 SQL は既存最大連番 + 1 を適用時に解決する形式にする（quiz の <code>generate.py</code> と同じ手法。<code>content_key</code> は NOT NULL のため採番漏れは投入時に必ずエラーになる）。</p>
 
-<h4>手順 6: 動画ビルド・レビュー・配置（2 尺）</h4>
-<p>投入した行に対して必要尺（<strong>2 尺検証期は 20 秒版・30 秒版の両方、尺確定後は勝ち尺のみ</strong>）の事前動画をビルドし、<strong>全数人間レビュー</strong>のうえ S3 へ配置して DB へ反映する。工程の技術設計（背景 imagegen → VOICEVOX TTS + 予算検査 → Remotion レンダリング → レビューシート → S3 + <code>video_s3_key_20s</code> / <code>_30s</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> の両環境 UPDATE）は <a href="generators/ranking-prebuilt.html#build">方式設計書 ranking-prebuilt セクション 8</a> を正とする。<strong>実行コマンドの正は <code>content/video-build/pref-ranking-1/README.md</code></strong>（17-4e 実装。工程 1 = <code>build.py --list</code> → 工程 2 = <code>export_prompts.py</code> / <code>intake.py</code> → 工程 3 = <code>build.py</code> → 工程 4 = <code>review_sheet.py</code> → 工程 5 = <code>publish.py</code>）。運用上のルール:</p>
+<h4>手順 6: 動画ビルド・レビュー・配置（30 秒版）</h4>
+<p>投入した行に対して必要尺（<strong>30 秒版のみ。尺は 2026-08-24 に 30 秒で確定</strong>）の事前動画をビルドし、<strong>全数人間レビュー</strong>のうえ S3 へ配置して DB へ反映する。工程の技術設計（背景 imagegen → VOICEVOX TTS + 予算検査 → Remotion レンダリング → レビューシート → S3 + <code>video_s3_key_20s</code> / <code>_30s</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> の両環境 UPDATE）は <a href="generators/ranking-prebuilt.html#build">方式設計書 ranking-prebuilt セクション 8</a> を正とする。<strong>実行コマンドの正は <code>content/video-build/pref-ranking-1/README.md</code></strong>（17-4e 実装。工程 1 = <code>build.py --list</code> → 工程 2 = <code>export_prompts.py</code> / <code>intake.py</code> → 工程 3 = <code>build.py</code> → 工程 4 = <code>review_sheet.py</code> → 工程 5 = <code>publish.py</code>）。運用上のルール:</p>
 <ul>
-  <li><strong>レビュー観点（全数・尺ごとに両方見る）</strong>: ①背景イラストの品質（文字・数字・記号の混入がないか / 和モダン調が保たれているか / 版面の可読性を妨げないか）②版面（県名・数値の正確な表示 / 金の可読性〔沈み・にじみ〕/ 文字の欠け・見切れ / 地図の点灯と順位行の整合）③音（ナレーションの同期〔県名が停止フラッシュに合うか〕・語尾切れ・BGM とのバランス）。NG は<strong>背景再生成・<code>bg_motif</code> / セリフ / 文言の修正（DB 更新）→ 再ビルド</strong>で解消し、解消するまで S3 へ配置しない</li>
+  <li><strong>レビュー観点（全数）</strong>: ①背景イラストの品質（文字・数字・記号の混入がないか / 和モダン調が保たれているか / 版面の可読性を妨げないか）②版面（県名・数値の正確な表示 / 金の可読性〔沈み・にじみ〕/ 文字の欠け・見切れ / 地図の点灯と順位行の整合）③音（ナレーションの同期〔県名が停止フラッシュに合うか〕・語尾切れ・BGM とのバランス）。NG は<strong>背景再生成・<code>bg_motif</code> / セリフ / 文言の修正（DB 更新）→ 再ビルド</strong>で解消し、解消するまで S3 へ配置しない</li>
   <li>DB 反映は<strong>ローカル MySQL と Aurora の両方</strong>へ行う（カラムを同時に UPDATE し、中途半端な行を作らない = quiz と同じルール）</li>
   <li>未ビルトのまま残っても投稿は止まらない（当該尺の候補から除外されるだけ。ただし実行時 WARNING と在庫確認で検知されるため、投入したら速やかにビルドまで終える）</li>
   <li>一括再ビルド（フォーマット改善・地図素材差し替え時）はツーリングの <code>--rebuild</code> で行う（<a href="generators/ranking-prebuilt.html#rebuild">方式設計書セクション 8.4</a>）</li>
@@ -403,10 +403,9 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
 
 <h4>初期ストック量・補充サイクル・在庫確認</h4>
 <ul>
-  <li><strong>初期ストックの目標: 30 ネタ ≒ 約 2 週間分</strong>（消費は 1 日 2 投稿 × 7 日 = 週 14 ネタ。17-1 検証のネタ帳 30 件が供給元）</li>
-  <li><strong>ただし立ち上げは 10 件で開始する</strong>（ユーザー判断 2026-08-13。17-3 で投入済みの第 1 バッチ 10 件をビルドして稼働を始め、残り 20 件は稼働と並行で追いかける = 開発計画 17-5a / 17-5b）。<strong>在庫 10 件は 5 日で一周し、6 日目以降は同一動画が同じスロット・同じ尺で再投稿される</strong>（LRU は 2 尺共通で消費順が変わらないため）。この重複期間は承知のうえで受け入れ、追いかけ投入で短くする。<strong>下記の在庫水位 28 件は定常運用の目標であり、立ち上げ期は下回った状態で走る</strong></li>
-  <li><strong>補充: 週 1 回、14 ネタ（1 週間分）を目安</strong>に手順 1〜6 を回し、<strong>未使用かつ必要尺ビルド済みの在庫 28 件（2 週間分）以上</strong>を保つ（quiz の「在庫 2 週間分 + 週次で 1 週間分補充」の型を 1 日 2 投稿へ換算。再利用 WARNING が出た場合は補充が遅れているサイン）。<strong>尺確定（17-6）後は勝ち尺のみをビルド・在庫として数える</strong></li>
-  <li><strong>在庫確認クエリ（2 尺対応）</strong>（週次の補充判断・投入確認・ビルド漏れ検出に使う。検証期は <code>unbuilt_20s</code> / <code>unbuilt_30s</code> とも 0 が正常、尺確定後は勝ち尺の列のみ見る）:
+  <li><strong>稼働開始条件: 14 ネタ（約 2 週間分）の 30 秒版がビルド・全数レビュー済みであること</strong>（ユーザー判断 2026-08-24。消費は 1 日 1 投稿 × 7 日 = 週 7 ネタ。供給元は 17-1 検証のネタ帳 30 件で、残り 16 件は稼働開始から 2 週間以内に 17-7〔補充スキルの実地テスト〕で投入し、計 30 件 ≒ 約 1 か月分とする）</li>
+  <li><strong>補充: 週 1 回、7 ネタ（1 週間分）を目安</strong>に手順 1〜6 を回し、<strong>未使用かつ 30 秒版ビルド済みの在庫 14 件（2 週間分）以上</strong>を保つ（quiz の「在庫 2 週間分 + 週次で 1 週間分補充」の型を 1 日 1 投稿へ換算。再利用 WARNING が出た場合は補充が遅れているサイン）</li>
+  <li><strong>在庫確認クエリ（2 尺対応）</strong>（週次の補充判断・投入確認・ビルド漏れ検出に使う。尺は 30 秒で確定〔2026-08-24〕のため <code>*_30s</code> の列のみ見る。20 秒版はビルドしないため <code>unbuilt_20s</code> は在庫全数と一致するのが正常で、<code>*_20s</code> の列は監視対象外）:
 <pre><code>SELECT
        SUM(last_used_at IS NULL AND video_s3_key_20s IS NOT NULL) AS unused_built_20s, -- 20 秒スロットで投稿可能な未使用在庫
        SUM(last_used_at IS NULL AND video_s3_key_30s IS NOT NULL) AS unused_built_30s, -- 30 秒スロットで投稿可能な未使用在庫
@@ -417,7 +416,7 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
 FROM ranking_stock_items
 WHERE set_id = :set_id AND is_active = 1;</code></pre></li>
   <li><strong>取り下げ</strong>: 誤データ・出典問題が見つかったネタは <code>is_active=0</code>（削除しない。S3 の事前動画も削除しない）。<strong>有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、0 件になる場合は先に代替を投入する（quiz と同じ）</li>
-  <li><strong>補充手順のスキル化は 17-7 で実施する</strong>（<code>/quiz-stock-replenish</code> の前例。17-6 で勝ち尺が確定するとビルド対象と在庫の数え方が変わるため、尺が固まってから 1 回で書く）。それまでは本節の手順 + <strong><code>content/ranking-stock/pref-ranking-1/WRITING-NOTES.md</code></strong>（17-3 で確立した執筆・レビュー・投入の勘所。スキルの一次資料）で回す。<strong>スキル化前に回すのは、17-5b の追いかけ投入（20 件）と 17-6 の検証期間中の週次補充</strong>（検証は 4 条件で 3〜4 週間規模になり、初期 30 件では足りないため補充が必須）</li>
+  <li><strong>補充手順のスキル化は 17-7 で実施する</strong>（<code>/quiz-stock-replenish</code> の前例。尺が 30 秒で確定済み〔2026-08-24〕のため 17-6 を待つ必要はなく、<strong>17-5 完了後すぐ書ける</strong>。実地テストはネタ帳の残り 16 件の投入・ビルドで行い、在庫 14 件が一周する前 = 稼働開始から 2 週間以内に完了させる）。スキル化前に手動で回すのは 17-5a の追加 4 件のみで、手順は本節 + <strong><code>content/ranking-stock/pref-ranking-1/WRITING-NOTES.md</code></strong>（17-3 で確立した執筆・レビュー・投入の勘所。スキルの一次資料）</li>
 </ul>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>
