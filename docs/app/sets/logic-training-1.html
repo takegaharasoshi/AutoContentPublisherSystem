@@ -62,10 +62,10 @@
 <p>どのスロットとして生成するかは<strong>実行時刻（<code>SCHEDULED_AT</code> の JST 時）から決定的に解決</strong>する。<code>parameters.slots</code> の <code>from_jst_hour</code> の境界と、対応する Scheduler は以下（早朝の巻き戻しを含む解決規則は方式側の実装による）。</p>
 <div class="table-wrap">
 <table>
-<tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻</th><th>Scheduler 名 / cron 式</th><th><code>quiz_type</code> / <code>difficulty</code></th><th><code>slot_label</code></th></tr>
-<tr><td><code>morning</code></td><td>4:00〜10:59</td><td>7:30</td><td><code>acps-prod-image-generation-logic-training-1-morning</code><br><code>cron(30 7 * * ? *)</code></td><td>L1 / light</td><td>朝の脳みそトレ</td></tr>
-<tr><td><code>noon</code></td><td>11:00〜16:59</td><td>12:30</td><td><code>acps-prod-image-generation-logic-training-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td>L3 / standard</td><td>昼の脳みそトレ</td></tr>
-<tr><td><code>night</code></td><td>17:00〜3:59</td><td>21:00</td><td><code>acps-prod-image-generation-logic-training-1-night</code><br><code>cron(0 21 * * ? *)</code></td><td>L1 / deep</td><td>夜の脳みそトレ</td></tr>
+<tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻</th><th>Scheduler 名 / cron 式</th><th><code>quiz_type</code> / <code>difficulty</code></th><th><code>slot_label</code></th><th><code>slot_hook</code>（16-4c）</th></tr>
+<tr><td><code>morning</code></td><td>4:00〜10:59</td><td>7:30</td><td><code>acps-prod-image-generation-logic-training-1-morning</code><br><code>cron(30 7 * * ? *)</code></td><td>L1 / light</td><td>朝の脳みそトレ</td><td>30秒で解けたら天才</td></tr>
+<tr><td><code>noon</code></td><td>11:00〜16:59</td><td>12:30</td><td><code>acps-prod-image-generation-logic-training-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td>L3 / standard</td><td>昼の脳みそトレ</td><td>30秒で解けたら天才</td></tr>
+<tr><td><code>night</code></td><td>17:00〜3:59</td><td>21:00</td><td><code>acps-prod-image-generation-logic-training-1-night</code><br><code>cron(0 21 * * ? *)</code></td><td>L1 / deep</td><td>夜の脳みそトレ</td><td>1％の人だけが30秒で解ける</td></tr>
 </table>
 </div>
 <div class="warn">
@@ -73,7 +73,7 @@
   Scheduler の Input にスロットは持たせていない（時刻だけがスロットの指定）。<code>from_jst_hour</code> の境界をまたいで時刻を変更すると生成されるスロットが変わる。命名規約と運用手順は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> / <a href="../operation.html">operation.html セクション 2.1 手順 3</a>。
 </div>
 <p><code>night</code> は <code>fantasy-animals-1</code>（21:00）と同時刻に起動するが、両チェーンは <code>set_code</code> で完全に分離されているため時刻はずらしていない（15-15 決定。<a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a> の decision）。</p>
-<p>スロットは BGM の選曲（<code>audio_assets.time_slot</code>）・配色（コード側の <code>SLOT_PALETTES</code>）・出題の型と難度（<code>quiz_type</code> / <code>difficulty</code> = <strong>ストック取得の絞り込みキー</strong>）・時間帯ラベル帯（<code>slot_label</code>）の 4 つを同時に切り替える（生活溶け込み拡張。15-9 / 15-10 決定・16-1 でストック絞り込みへ改訂）。旧構成の「問題の口調（<code>tone_hint</code>）」は生成チェーン休止に伴い休止し、口調の作り分けはストック投入時の執筆（16-2）で担う。</p>
+<p>スロットは BGM の選曲（<code>audio_assets.time_slot</code>）・配色（コード側の <code>SLOT_PALETTES</code>）・出題の型と難度（<code>quiz_type</code> / <code>difficulty</code> = <strong>ストック取得の絞り込みキー</strong>）・時間帯ラベル帯（<code>slot_label</code>）・<strong>つかみ帯（<code>slot_hook</code>。16-4c 追加）</strong>の 5 つを同時に切り替える（生活溶け込み拡張。15-9 / 15-10 決定・16-1 でストック絞り込みへ改訂）。旧構成の「問題の口調（<code>tone_hint</code>）」は生成チェーン休止に伴い休止し、口調の作り分けはストック投入時の執筆（16-2）で担う。</p>
 
 <h2>4. プロンプトの作り方</h2>
 <p><strong>16-1 の生成チェーン休止に伴い、<code>prompt_configs.prompt_text</code> は未使用（休止）</strong>。実行時に使われるのは <code>parameters</code>（スロット定義）のみで、出題内容は問題ストック（<a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）が担う。登録済みの文言・値は<strong>変更せず残置</strong>する（方式側が無視する。生成経路を再開する場合と、ストック執筆時の文体ガイド〔題材・question・L3・hook 等の条件は 16-2 の執筆ガイドラインとしてそのまま有効〕のため）。</p>
@@ -113,19 +113,19 @@
 ・問題の舞台になっている日本の日常風景を、簡潔な一文で描写する。
 ・人物を出す場合は後ろ姿か遠景までにし、顔を描き込まない。脳のマスコットは描かない。
 ・答えが分かってしまう物・数えられる並び・図表は描写しない。</code></pre>
-<p><code>prompt_configs.parameters</code>（キー仕様は方式側 = <a href="../generators/gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a>。16-1 以降、<code>slots</code> の必須は 5 フィールド〔<code>from_jst_hour</code> / <code>quiz_type</code> / <code>difficulty</code> / <code>slot_code</code> / <code>slot_label</code>〕で、<code>tone_hint</code>・<code>max_regenerations</code>・<code>llm_model</code> は<strong>存在しても無視される</strong>。登録値は変更せず残置）。<code>slot_label</code> は 16-3 のユーザーレビューで「朝 / 昼 / 夜のロジトレ・推定トレ」から<strong>「朝 / 昼 / 夜の脳みそトレ」</strong>へ改名した（出題路線が論理パズル一本ではなくなったため。ローカル MySQL は 16-3 で、<strong>Aurora は 16-4〔2026-08-08〕で適用済み</strong>）。</p>
+<p><code>prompt_configs.parameters</code>（キー仕様は方式側 = <a href="../generators/gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a>。16-4c 以降、<code>slots</code> の必須は 6 フィールド〔<code>from_jst_hour</code> / <code>quiz_type</code> / <code>difficulty</code> / <code>slot_code</code> / <code>slot_label</code> / <code>slot_hook</code>〕で、<code>tone_hint</code>・<code>max_regenerations</code>・<code>llm_model</code> は<strong>存在しても無視される</strong>。登録値は変更せず残置）。<code>slot_label</code> は 16-3 のユーザーレビューで「朝 / 昼 / 夜のロジトレ・推定トレ」から<strong>「朝 / 昼 / 夜の脳みそトレ」</strong>へ改名した（出題路線が論理パズル一本ではなくなったため。ローカル MySQL は 16-3 で、<strong>Aurora は 16-4〔2026-08-08〕で適用済み</strong>）。</p>
 <pre><code>{
   "llm_model": "gpt-5.6-terra",
   "slots": [
     {"from_jst_hour": 4,  "quiz_type": "L1", "difficulty": "light",
      "slot_code": "morning", "tone_hint": "出勤前のウォームアップ。短く元気に、テンポよく背中を押す",
-     "slot_label": "朝の脳みそトレ"},
+     "slot_label": "朝の脳みそトレ", "slot_hook": "30秒で解けたら天才"},
     {"from_jst_hour": 11, "quiz_type": "L3", "difficulty": "standard",
      "slot_code": "noon",    "tone_hint": "昼休みの気分転換。肩の力を抜いた軽い語り口",
-     "slot_label": "昼の脳みそトレ"},
+     "slot_label": "昼の脳みそトレ", "slot_hook": "30秒で解けたら天才"},
     {"from_jst_hour": 17, "quiz_type": "L1", "difficulty": "deep",
      "slot_code": "night",   "tone_hint": "一日の締めにじっくり考える時間。落ち着いた語り口",
-     "slot_label": "夜の脳みそトレ"}
+     "slot_label": "夜の脳みそトレ", "slot_hook": "1％の人だけが30秒で解ける"}
   ],
   "max_regenerations": 5
 }</code></pre>
@@ -191,14 +191,14 @@
 <p><strong>16-3b の転換により BGM・SE の使用はビルド時に移った</strong>: 選曲（スロット別 LRU）・<code>last_used_at</code> 更新・SE の存在検査・0 件フェイルラウドはいずれも事前ビルド時に行われ、<strong>実行時は <code>audio_assets</code> を使わない</strong>（使った曲はストック行の <code>video_audio_asset_id</code> 経由で <code>generated_media.audio_asset_id</code> に記録される = <a href="../generators/quiz-prebuilt.html">quiz-prebuilt セクション 6</a>）。<strong>曲を差し替えても既ビルドの事前動画には反映されない</strong>ため、ミュート検知時などの差し替えは該当動画の再ビルドまで行う（<a href="../operation.html#mute-check">operation.html セクション 4.4</a>）。</p>
 
 <h2 id="coach-assets">7. 固定アセット（脳みそコーチ 4 表情）</h2>
-<p>カットごとにコーチの表情・ポーズを切り替える。4 枚を<strong>固定アセットとして S3 に置き、組版時に読み込む</strong>（画像 API は毎回呼ばない。16-3b の転換後、読み込むのは実行時の方式ではなく<strong>事前ビルドツーリングのレンダラー</strong>になった）。ファイル名はコード側で固定。16-1 のカット構成刷新後も <strong>4 枚すべてを継続使用</strong>する（割当の変更のみ・アセットの作り直しは不要）。</p>
+<p>カットごとにコーチの表情・ポーズを切り替える。4 枚を<strong>固定アセットとして S3 に置き、組版時に読み込む</strong>（画像 API は毎回呼ばない。16-3b の転換後、読み込むのは実行時の方式ではなく<strong>事前ビルドツーリングのレンダラー</strong>になった）。ファイル名はコード側で固定。<strong>16-4c の 3 カット化で <code>coach_think.png</code> はどのカットにも割り当たらなくなった</strong>が、4 枚を S3 に置く契約は維持する（起動時に 4 枚の存在を検査する。カットを増やす際にアセットの作り直しが要らないため）。</p>
 <div class="table-wrap">
 <table>
-<tr><th>カット（16-2b 以降）</th><th>S3 キー</th><th>ポーズ</th></tr>
+<tr><th>カット（16-4c 以降）</th><th>S3 キー</th><th>ポーズ</th></tr>
 <tr><td>カット 1（導入）</td><td><code>assets/logic-training-1/coach_hook.png</code></td><td>力こぶを作って呼びかける（吹き出し = 固定文「わかったらコメントしてくれ！」。16-4c で <code>hook</code> から変更）</td></tr>
-<tr><td>カット 2（考える）</td><td><code>assets/logic-training-1/coach_think.png</code></td><td>こぶしをあごに当てて考え込む（吹き出し = 固定文「止めてじっくり考えても OK」）</td></tr>
-<tr><td>カット 3（カウントダウン）</td><td><code>assets/logic-training-1/coach_question.png</code></td><td>手のひらを上に向けてヒントを差し出す（吹き出し = 動的ヒント <code>hint</code>。16-2b でカット 2 と表情を入れ替え）</td></tr>
-<tr><td>カット 4（誘導）</td><td><code>assets/logic-training-1/coach_answer.png</code></td><td>両腕を上げたガッツポーズ（吹き出し = キャプション誘導）</td></tr>
+<tr><td>カット 2（カウントダウン）</td><td><code>assets/logic-training-1/coach_question.png</code></td><td>手のひらを上に向けてヒントを差し出す（吹き出し = 動的ヒント <code>hint</code>）</td></tr>
+<tr><td>カット 3（誘導）</td><td><code>assets/logic-training-1/coach_answer.png</code></td><td>両腕を上げたガッツポーズ（吹き出し = キャプション誘導）</td></tr>
+<tr><td><strong>未使用</strong>（16-4c 以降）</td><td><code>assets/logic-training-1/coach_think.png</code></td><td>こぶしをあごに当てて考え込む。16-2b〜16-4b はカット 2「考える」で使用。カット統合により割当がなくなったが S3 には残置する</td></tr>
 </table>
 </div>
 <p><strong>ファイル仕様</strong>: RGBA の PNG（他モード・非 PNG は異常終了）。4 枚とも <strong>900 × 1290 px の共通キャンバス</strong>で、4 ポーズ共通の倍率で拡縮したうえで<strong>下端中央そろえ</strong>にしてある。組版側は <code>COACH_BOX</code>（300 × 430 px）へ縦横比を保って収め、セーフエリアの右下に配置する。共通キャンバス・共通倍率にしておくことで、カットが切り替わってもコーチの大きさと立ち位置が動かない。</p>

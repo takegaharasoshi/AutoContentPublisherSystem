@@ -69,7 +69,7 @@
 <p>処理順序: ① <code>parameters</code> 検証 → ② スロット解決 → ③ <strong>問題ストック取得（ビルド済み限定の LRU。セクション 4）</strong> → ④ <strong>S3 から事前動画を取得</strong>（欠落はフェイルラウド。セクション 5）→ ⑤ <code>quiz_items</code> INSERT + ストックの <code>last_used_at</code> / <code>use_count</code> 更新 → ⑥ <code>GeneratorResult</code> を返す。フォント・コーチアセット・SE・BGM の事前検査、API キー取得（<code>API_SECRET_ARN</code>）はいずれも<strong>不要</strong>（実行時に使わないため。所要は旧方式の数分から数十秒レベルへ短縮見込み）。</p>
 
 <h2 id="parameters">3. 入力（parameters とスロット解決）</h2>
-<p><code>parameters</code> のキー仕様・検証・スロット解決ロジックは <strong><code>gpt-quiz-multicut</code> と完全に同一</strong>（<a href="gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a> を正とする。<code>slots</code> の 5 フィールド必須・休止パラメータの無視・JST 時による決定的解決・早朝の巻き戻し）。これにより <code>logic-training-1</code> の登録済み <code>prompt_configs</code> は無変更で使え、<strong>切替（16-4）は <code>batch_sets.generator_name</code> の UPDATE のみ</strong>になる。スロットの <code>quiz_type</code> / <code>difficulty</code> はストック取得の絞り込みキー、<code>slot_code</code> / <code>slot_label</code> はビルド時の版面（パレット・時間帯ラベル）に対応する（セクション 8 の warn）。</p>
+<p><code>parameters</code> のキー仕様・検証・スロット解決ロジックは <strong><code>gpt-quiz-multicut</code> と完全に同一</strong>（<a href="gpt-quiz-multicut.html#parameters">方式設計書セクション 3</a> を正とする。<code>slots</code> の 6 フィールド必須・休止パラメータの無視・JST 時による決定的解決・早朝の巻き戻し）。必須フィールドのうち <code>slot_label</code> / <code>slot_hook</code> は<strong>版面の表示文言のため本方式の実行時には使わない</strong>（事前ビルド時にレンダラーが焼き込む）が、検証は共通のため登録は必須になる。これにより <code>logic-training-1</code> の登録済み <code>prompt_configs</code> は無変更で使え、<strong>切替（16-4）は <code>batch_sets.generator_name</code> の UPDATE のみ</strong>になる。スロットの <code>quiz_type</code> / <code>difficulty</code> はストック取得の絞り込みキー、<code>slot_code</code> / <code>slot_label</code> はビルド時の版面（パレット・時間帯ラベル）に対応する（セクション 8 の warn）。</p>
 
 <h2 id="stock">4. 問題ストックの取得（ビルド済み限定の LRU 順繰り）</h2>
 <p>出題は <code>quiz_stock_items</code>（<a href="../data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）から LRU 順繰りで取得する。<code>gpt-quiz-multicut</code> の選定クエリ（<a href="gpt-quiz-multicut.html#stock">同セクション 5</a>）に対する差分は、<strong>事前動画がビルド済みの行（<code>video_s3_key IS NOT NULL</code>）だけを候補にする</strong>絞り込みが加わる点のみ。</p>
@@ -142,10 +142,10 @@
 </div>
 <div class="warn">
   <span class="callout-title">版面・スロット構成・音源の変更は事前動画の再ビルドを伴う</span>
-  事前動画にはスロット別パレット・<code>slot_label</code>・BGM・SE・版面がベイクされている。以下の変更は<strong>該当する事前動画の全再ビルド + 差し替え</strong>が必要になる（実行時生成なら設定変更だけで済んだものが、ビルド資産の更新作業になるトレードオフ）:
+  事前動画にはスロット別パレット・<code>slot_label</code>・<code>slot_hook</code>・BGM・SE・版面がベイクされている。以下の変更は<strong>該当する事前動画の全再ビルド + 差し替え</strong>が必要になる（実行時生成なら設定変更だけで済んだものが、ビルド資産の更新作業になるトレードオフ）:
   <ul style="margin:.3rem 0 0;">
-    <li>版面・カット構成・尺の変更（レンダラー改修 → 全量再ビルド）</li>
-    <li><code>parameters.slots</code> の型・難度 ⇔ スロット対応やパレット・<code>slot_label</code> の変更（該当スロットの再ビルド。事前動画は行の型・難度から一意に決まるスロット向けにビルドされるため、対応を変えると版面とスロットが食い違う）</li>
+    <li>版面・カット構成・尺の変更（レンダラー改修 → 全量再ビルド）。<strong>16-4c（3 カット化・つかみ帯・ズーム廃止）がこの warn の初の実例</strong>で、全 63 本の再ビルド・再配置を伴った</li>
+    <li><code>parameters.slots</code> の型・難度 ⇔ スロット対応やパレット・<code>slot_label</code> / <code>slot_hook</code> の変更（該当スロットの再ビルド。事前動画は行の型・難度から一意に決まるスロット向けにビルドされるため、対応を変えると版面とスロットが食い違う）</li>
     <li>BGM の差し替え（ミュート検知時を含む。<code>is_active=0</code> にするだけでは既ビルド動画に古い曲が残る — <a href="../operation.html#mute-check">operation.html セクション 4.4</a> の追記を参照。対象は <code>video_audio_asset_id</code> で特定できる）</li>
   </ul>
   一括再ビルドは <code>build.py --rebuild</code> で行う（16-4b で追加。<code>video_s3_key IS NOT NULL</code> のビルド済み行を対象に、BGM を <code>video_audio_asset_id</code> から引き継いで再ビルドする = 選曲 LRU を消費せず、<code>last_used_at</code>〔出題キュー〕も変えないため差し替えで再投稿は発生しない）。再ビルド後の全数レビュー → S3 上書き → 両環境 DB 反映の運用手順は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a> を参照。

@@ -42,7 +42,7 @@
 <tr><td>レジストリ登録</td><td><code>services/image-batch/app/generators/__init__.py</code> の <code>REGISTRY</code></td></tr>
 <tr><td>使用 API・ツール</td><td>OpenAI Images API（情景イラスト）+ Pillow（カード組版）+ ffmpeg（連結・音声ミックス・エンコード）。<strong>テキスト LLM は使わない</strong>（生成・検証チェーンは 16-1 で休止。セクション 5 の decision）</td></tr>
 <tr><td>最終メディア</td><td>MP4 1 本（<code>file_format='mp4'</code>。1080x1920 / 30fps / 16 秒 / H.264 + AAC）</td></tr>
-<tr><td>中間生成物</td><td>カット代表画像 PNG 4 枚（<code>_cut1</code>〜<code>_cut4</code>）+ 情景イラスト PNG 1 枚（<code>_illustration</code>）。S3 のみ保存・DB 記録なし</td></tr>
+<tr><td>中間生成物</td><td>カット代表画像 PNG 3 枚（<code>_cut1</code>〜<code>_cut3</code>。16-4c の 3 カット化まで 4 枚）+ 情景イラスト PNG 1 枚（<code>_illustration</code>）。S3 のみ保存・DB 記録なし</td></tr>
 <tr><td>補助テーブル</td><td><code>quiz_stock_items</code>（問題ストックの LRU 取得。本方式のみが使用）・<code>audio_assets</code>（スロット別 LRU 選曲 + SE 存在検査）・<code>quiz_items</code>（出題履歴の INSERT。本方式のみが使用）</td></tr>
 </table>
 </div>
@@ -99,7 +99,7 @@
 <table>
 <tr><th>フィールド</th><th>上限</th><th>用途</th></tr>
 <tr><td><code>hook</code></td><td>20 字</td><td><strong>キャプション専用</strong>（冒頭のプレビュー行）。16-4c のカット構成見直しで<strong>動画には表示しなくなった</strong>（つかみはスロット別の <code>slot_hook</code> がカード上部の帯で担う）（<a href="../batch-flow.html#sns-steps">batch-flow.html 3.3</a>）</td></tr>
-<tr><td><code>hint</code></td><td>20 字</td><td>カット 3（カウントダウン）の<strong>動的ヒント</strong>（吹き出し表示。16-2b で追加 = セクション 8.1 の decision。キャプションでは使わない）</td></tr>
+<tr><td><code>hint</code></td><td>20 字</td><td>カット 2（カウントダウン。16-4c の 3 カット化までカット 3）の<strong>動的ヒント</strong>（吹き出し表示。16-2b で追加 = セクション 8.1 の decision。キャプションでは使わない）</td></tr>
 <tr><td><code>question</code>（= <code>question_text</code> と同値）</td><td>90 字</td><td>問題文（全カットの版面に常時表示）</td></tr>
 <tr><td><code>answer</code>（= <code>answer_text</code> と同値）</td><td>30 字</td><td>答え（<strong>動画に載せずキャプションで開示</strong>。L3 は「約〈数値と単位〉（目安）」の幅表現）</td></tr>
 <tr><td><code>explanation</code></td><td>80 字（<strong>L3 のみ 240 字</strong>）</td><td>解説（キャプションで開示。キャプション専用フィールドのため上限拡張の版面影響なし = 下記 decision）</td></tr>
@@ -135,7 +135,7 @@
 <table>
 <tr><th>アセット</th><th>取得元</th><th>検査</th></tr>
 <tr><td>日本語フォント（Noto Sans JP Regular / Bold）</td><td>コンテナ内 <code>services/image-batch/fonts/</code>（OFL ライセンス・イメージ同梱）</td><td>ファイル存在（欠落は <code>RuntimeError</code>）</td></tr>
-<tr><td>コーチ 4 表情（<code>coach_hook/question/think/answer.png</code>）</td><td>S3 <code>assets/&lt;set_code&gt;/</code>（ファイル名はコード側固定）</td><td>RGBA の PNG であること（他モード・非 PNG は異常終了）。カットへの割当はセクション 8.1、アセットの制作・受け入れ検査はセット別設計書（<a href="../sets/logic-training-1.html#coach-assets">sets/logic-training-1.html セクション 7</a>）</td></tr>
+<tr><td>コーチ 4 表情（<code>coach_hook/question/think/answer.png</code>）</td><td>S3 <code>assets/&lt;set_code&gt;/</code>（ファイル名はコード側固定）</td><td>RGBA の PNG であること（他モード・非 PNG は異常終了）。<strong>16-4c の 3 カット化で <code>coach_think.png</code> はどのカットにも割り当たらなくなった</strong>が、アセット契約は 4 枚のまま維持する（S3 の 4 枚が揃っていることを起動時に検査する。カットを増やす際に作り直しが要らないため）。カットへの割当はセクション 8.1、アセットの制作・受け入れ検査はセット別設計書（<a href="../sets/logic-training-1.html#coach-assets">sets/logic-training-1.html セクション 7</a>）</td></tr>
 <tr><td>SE 2 種（<code>countdown_tick.m4a</code> / <code>answer_chime.m4a</code>）</td><td>S3 <code>audio/&lt;set_code&gt;/se/</code>（ファイル名はコード側固定）</td><td><code>audio_assets</code>（<code>asset_type='se'</code>・有効）に規約どおりの S3 キーで登録されていること（欠落は異常終了）</td></tr>
 <tr><td>BGM 1 曲</td><td>S3（<code>audio_assets</code> の選曲行の <code>s3_key</code>）</td><td>下記の選曲クエリで 0 件なら異常終了（無音動画を作らない）</td></tr>
 </table>
@@ -259,7 +259,7 @@
 <table>
 <tr><th>成果物</th><th>S3</th><th>DB</th></tr>
 <tr><td>最終 MP4</td><td><code>videos/</code> プレフィックス・ライフサイクル 30 日</td><td><code>generated_media</code> に 1 行（<code>file_format='mp4'</code>・1080x1920・16 秒・<code>audio_asset_id</code>）</td></tr>
-<tr><td>カット代表 PNG 4 枚 + イラスト PNG</td><td>最終メディアと同キー + <code>_cut1</code>〜<code>_cut4</code> / <code>_illustration</code>。ライフサイクル 30 日</td><td><strong>記録しない</strong>（中間生成物の扱い。投稿前レビュー・目視確認用）</td></tr>
+<tr><td>カット代表 PNG 3 枚 + イラスト PNG</td><td>最終メディアと同キー + <code>_cut1</code>〜<code>_cut3</code> / <code>_illustration</code>。ライフサイクル 30 日</td><td><strong>記録しない</strong>（中間生成物の扱い。投稿前レビュー・目視確認用）</td></tr>
 <tr><td>出題履歴</td><td>—</td><td><code>quiz_items</code> に 1 行（型・難度・<code>summary</code>・問題文・答え + 全フィールドの JSON + <strong><code>stock_item_id</code></strong>（16-1 で追加。再利用履歴・問題別インサイト突合の起点）。<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）。<strong>共通骨格の同一トランザクションで確定</strong>させ、メディア登録に失敗した場合は履歴だけが残らない</td></tr>
 </table>
 </div>
