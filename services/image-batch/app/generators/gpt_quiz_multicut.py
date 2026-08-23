@@ -49,20 +49,20 @@ OUTPUT_DURATION_SECONDS = 16
 OUTPUT_CRF = 20
 FFMPEG_BINARY = "ffmpeg"
 FFMPEG_TIMEOUT_SECONDS = 600
-ZOOM_START = 1.0
-ZOOM_END = 1.04
-SUPERSAMPLE_FACTOR = 2
-SAFE_BOX_MARGIN = 8
+# カードは出力枠から一定量だけ内側に置く。全体ズームは廃止したため
+# （ユーザー決定・3 カット化と同時）、ズーム前提のセーフボックス導出はしない
+CARD_MARGIN_X = 25
+CARD_MARGIN_Y = 41
 INSTAGRAM_RIGHT_RESERVED_RATIO = 0.12
 INSTAGRAM_BOTTOM_RESERVED_RATIO = 0.15
 
-HOOK_DURATION_SECONDS = 4
-THINK_DURATION_SECONDS = 4
+# カット構成は 3 つ。導入（つかみを見せて考えさせる）→ カウントダウン → 答え誘導。
+# 旧構成のフック 4 秒 + 考える 4 秒は導入 8 秒へ統合した（ユーザー決定）
+INTRO_DURATION_SECONDS = 8
 COUNTDOWN_DURATION_SECONDS = 1
 GUIDANCE_DURATION_SECONDS = 3
 CUT_DURATIONS = (
-    HOOK_DURATION_SECONDS,
-    THINK_DURATION_SECONDS,
+    INTRO_DURATION_SECONDS,
     COUNTDOWN_DURATION_SECONDS,
     COUNTDOWN_DURATION_SECONDS,
     COUNTDOWN_DURATION_SECONDS,
@@ -73,15 +73,14 @@ CUT_DURATIONS = (
 
 # コーチ + 吹き出しレイヤーのバウンド演出。吹き出しの内容が変わった直後に
 # 減衰ホップで視線を誘導する。大バウンドの 2 箇所（ヒント登場・答え誘導）は
-# 既存 SE（tick = 8 秒 / chime = 13 秒）とカット頭が一致し、音と同期する
+# 既存 SE（tick = 8 秒 / chime = 13 秒）とカット頭が一致し、音と同期する。
+# 3 カット化で「考える切替」の小バウンドはカットごとなくなった
 BOUNCE_LARGE_AMPLITUDE_PIXELS = 150
-BOUNCE_SMALL_AMPLITUDE_PIXELS = 34
 BOUNCE_DURATION_SECONDS = 1.0
 BOUNCE_FREQUENCY_HZ = 1.6
 BOUNCE_DECAY_PER_SECOND = 3.0
 CUT_BOUNCE_AMPLITUDES = (
-    0,  # フック: 冒頭は静止で始める
-    BOUNCE_SMALL_AMPLITUDE_PIXELS,  # 考える切替
+    0,  # 導入: 冒頭は静止で始める
     BOUNCE_LARGE_AMPLITUDE_PIXELS,  # ヒント登場（カウントダウン開始）
     0,
     0,
@@ -134,7 +133,7 @@ QUESTION_FONT_SIZE = 56
 # 問題文とヒントの高さ上限は、テキストが最大まで伸びても
 # カード内に MIN_ILLUSTRATION_HEIGHT のイラスト領域が残る値にする
 QUESTION_MAX_HEIGHT = 420
-THINK_BUBBLE_TEXT = "止めてじっくり考えても OK"
+INTRO_BUBBLE_TEXT = "わかったらコメントしてくれ！"
 GUIDANCE_BUBBLE_TEXT = "答えは投稿のキャプションへ！"
 SUPPLEMENT_FONT_SIZE = 40
 MIN_BODY_FONT_SIZE = 30
@@ -158,6 +157,16 @@ BUBBLE_PADDING = 28
 BUBBLE_TAIL_WIDTH = 28
 BUBBLE_TOP_OFFSET = 60
 BUBBLE_MAX_TEXT_HEIGHT = 200
+# つかみ帯: スロットラベルの下・見出し「問題」の上に置くアクセント色の帯。
+# 文言は prompt_configs.parameters のスロット別 slot_hook から与える（可変）
+SLOT_HOOK_FONT_SIZE = 58
+SLOT_HOOK_MIN_FONT_SIZE = 40
+SLOT_HOOK_BAND_PADDING_X = 36
+SLOT_HOOK_BAND_PADDING_Y = 22
+SLOT_HOOK_BAND_RADIUS = 22
+SLOT_HOOK_BAND_MAX_TEXT_HEIGHT = 180
+SLOT_HOOK_GAP_ABOVE = 34
+SLOT_HOOK_GAP_BELOW = 40
 # 時間帯ラベルのピル（テキスト幅 + アクセントドット）
 LABEL_FONT_SIZE = 34
 LABEL_PILL_HEIGHT = 66
@@ -203,6 +212,7 @@ def _parse_parameters(raw: str | None) -> list[dict[str, Any]]:
             "difficulty",
             "slot_code",
             "slot_label",
+            "slot_hook",
         }
         missing = required_fields - set(slot)
         if missing:
@@ -232,6 +242,7 @@ def _parse_parameters(raw: str | None) -> list[dict[str, Any]]:
                 "difficulty": difficulty,
                 "slot_code": slot_code,
                 "slot_label": slot["slot_label"].strip(),
+                "slot_hook": slot["slot_hook"].strip(),
             }
         )
     return validated_slots
@@ -492,24 +503,25 @@ def _build_illustration_prompt(
 
 
 def _card_area() -> tuple[int, int, int, int]:
-    """Card rectangle: the zoompan-safe box (content stays in _safe_area())."""
-    zoom_width = int(OUTPUT_WIDTH / ZOOM_END) - SAFE_BOX_MARGIN
-    zoom_height = int(OUTPUT_HEIGHT / ZOOM_END) - SAFE_BOX_MARGIN
-    zoom_left = (OUTPUT_WIDTH - zoom_width) // 2
-    zoom_top = (OUTPUT_HEIGHT - zoom_height) // 2
-    return (zoom_left, zoom_top, zoom_left + zoom_width, zoom_top + zoom_height)
+    """Card rectangle: a fixed inset of the output frame (content in _safe_area())."""
+    return (
+        CARD_MARGIN_X,
+        CARD_MARGIN_Y,
+        OUTPUT_WIDTH - CARD_MARGIN_X,
+        OUTPUT_HEIGHT - CARD_MARGIN_Y,
+    )
 
 
 def _safe_area() -> tuple[int, int, int, int]:
-    """Intersect zoompan and Instagram UI safe areas."""
-    zoom_left, zoom_top, zoom_right, zoom_bottom = _card_area()
+    """Intersect the card rectangle and the Instagram UI safe area."""
+    card_left, card_top, card_right, card_bottom = _card_area()
     instagram_right = int(OUTPUT_WIDTH * (1 - INSTAGRAM_RIGHT_RESERVED_RATIO))
     instagram_bottom = int(OUTPUT_HEIGHT * (1 - INSTAGRAM_BOTTOM_RESERVED_RATIO))
     return (
-        zoom_left,
-        zoom_top,
-        min(zoom_right, instagram_right),
-        min(zoom_bottom, instagram_bottom),
+        card_left,
+        card_top,
+        min(card_right, instagram_right),
+        min(card_bottom, instagram_bottom),
     )
 
 
@@ -658,11 +670,64 @@ def _paste_illustration(
     )
 
 
+def _draw_slot_hook_band(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    palette: dict[str, str],
+    fonts: dict[str, Path],
+    safe: tuple[int, int, int, int],
+    band_top: int,
+) -> int:
+    """Draw the accent band carrying the slot hook and return its bottom y."""
+    left, _, right, _ = safe
+    band_left = left + CARD_PADDING
+    band_right = right - CARD_PADDING
+    max_width = band_right - band_left - 2 * SLOT_HOOK_BAND_PADDING_X
+    sizes = range(SLOT_HOOK_FONT_SIZE, SLOT_HOOK_MIN_FONT_SIZE - 1, -2)
+    # つかみは一続きの惹句なので、途中で折れるより字を詰めて 1 行に収める方を
+    # 優先する（「1％の人だけが30秒で解／ける」のような不自然な改行を避ける）
+    fitted: tuple[ImageFont.FreeTypeFont, list[str], int] | None = None
+    for size in sizes:
+        font = _font(fonts["bold"], size)
+        lines = _wrapped_lines(draw, text, font, max_width)
+        line_height = int(size * 1.32)
+        if len(lines) == 1:
+            fitted = (font, lines, line_height)
+            break
+        if fitted is None and (
+            len(lines) * line_height <= SLOT_HOOK_BAND_MAX_TEXT_HEIGHT
+        ):
+            fitted = (font, lines, line_height)
+    if fitted is None:
+        raise RuntimeError("Slot hook does not fit the accent band")
+    font, lines, line_height = fitted
+    text_height = len(lines) * line_height
+    band_bottom = band_top + text_height + 2 * SLOT_HOOK_BAND_PADDING_Y
+    draw.rounded_rectangle(
+        (band_left, band_top, band_right, band_bottom),
+        radius=SLOT_HOOK_BAND_RADIUS,
+        fill=palette["accent"],
+    )
+    center_x = (band_left + band_right) // 2
+    y = band_top + SLOT_HOOK_BAND_PADDING_Y
+    for line in lines:
+        draw.text(
+            (center_x, y + line_height // 2),
+            line,
+            font=font,
+            fill=palette["card"],
+            anchor="mm",
+        )
+        y += line_height
+    return band_bottom
+
+
 def _base_card(
     palette: dict[str, str],
     slot_label: str,
+    slot_hook: str,
     fonts: dict[str, Path],
-) -> tuple[Image.Image, ImageDraw.ImageDraw, tuple[int, int, int, int]]:
+) -> tuple[Image.Image, ImageDraw.ImageDraw, tuple[int, int, int, int], int]:
     """Create the shared flat-design card background."""
     image = Image.new("RGB", (OUTPUT_WIDTH, OUTPUT_HEIGHT), palette["background"])
     draw = ImageDraw.Draw(image)
@@ -709,7 +774,16 @@ def _base_card(
         fill=palette["text"],
         anchor="lm",
     )
-    return image, draw, safe
+    # つかみ帯はラベルピルの直下。以降の本文はこの帯の下から始める
+    band_bottom = _draw_slot_hook_band(
+        draw,
+        slot_hook,
+        palette,
+        fonts,
+        safe,
+        pill_bottom + SLOT_HOOK_GAP_ABOVE,
+    )
+    return image, draw, safe, band_bottom + SLOT_HOOK_GAP_BELOW
 
 
 def _draw_heading(
@@ -851,14 +925,17 @@ def _render_card(
     illustration: Image.Image,
     palette: dict[str, str],
     slot_label: str,
+    slot_hook: str,
     illustration_box: tuple[int, int, int, int] | None,
     *,
     countdown: int | None = None,
 ) -> tuple[_CardLayers, int]:
     """Render the shared layout with only cut-specific details changed."""
-    image, draw, safe = _base_card(palette, slot_label, fonts)
-    left, top, right, _ = safe
-    x, y = left + CARD_PADDING, top + 130
+    image, draw, safe, content_top = _base_card(
+        palette, slot_label, slot_hook, fonts
+    )
+    left, _, right, _ = safe
+    x, y = left + CARD_PADDING, content_top
     _draw_heading(draw, (x, y), "問題", palette, fonts)
 
     if countdown is not None:
@@ -917,11 +994,12 @@ def _render_cards(
     fields: dict[str, Any],
     slot_code: str,
     slot_label: str,
+    slot_hook: str,
     illustration_png: bytes,
     coaches: dict[str, Image.Image],
     fonts: dict[str, Path],
 ) -> tuple[list[_CardLayers], list[bytes]]:
-    """Render eight fixed-layout timeline cards and four cut leaders."""
+    """Render seven fixed-layout timeline cards and three cut leaders."""
     palette = SLOT_PALETTES[slot_code]
     illustration = _decode_illustration(illustration_png)
     coaches = _trim_coaches(coaches)
@@ -929,11 +1007,12 @@ def _render_cards(
     _, content_bottom = _render_card(
         fields,
         coaches["hook"],
-        fields["hook"],
+        INTRO_BUBBLE_TEXT,
         fonts,
         illustration,
         palette,
         slot_label,
+        slot_hook,
         None,
     )
     left, _, right, bottom = _safe_area()
@@ -951,21 +1030,12 @@ def _render_cards(
     cut1, _ = _render_card(
         fields,
         coaches["hook"],
-        fields["hook"],
+        INTRO_BUBBLE_TEXT,
         fonts,
         illustration,
         palette,
         slot_label,
-        illustration_box,
-    )
-    cut2, _ = _render_card(
-        fields,
-        coaches["think"],
-        THINK_BUBBLE_TEXT,
-        fonts,
-        illustration,
-        palette,
-        slot_label,
+        slot_hook,
         illustration_box,
     )
     countdown_cards = [
@@ -977,12 +1047,13 @@ def _render_cards(
             illustration,
             palette,
             slot_label,
+            slot_hook,
             illustration_box,
             countdown=count,
         )[0]
         for count in range(5, 0, -1)
     ]
-    cut4, _ = _render_card(
+    cut3, _ = _render_card(
         fields,
         coaches["answer"],
         GUIDANCE_BUBBLE_TEXT,
@@ -990,15 +1061,15 @@ def _render_cards(
         illustration,
         palette,
         slot_label,
+        slot_hook,
         illustration_box,
     )
     return (
-        [cut1, cut2, *countdown_cards, cut4],
+        [cut1, *countdown_cards, cut3],
         [
             cut1.composite,
-            cut2.composite,
             countdown_cards[0].composite,
-            cut4.composite,
+            cut3.composite,
         ],
     )
 
@@ -1020,32 +1091,10 @@ def _bounce_overlay_filter(amplitude: int, output: str) -> str:
     )
 
 
-def _zoompan_filter(
-    input_label: str,
-    duration: int,
-    output: str,
-    start_seconds: int = 0,
-) -> str:
-    """Build one segment of the continuous full-video zoom."""
-    total_frames = OUTPUT_FPS * duration
-    denominator = total_frames - 1
-    full_delta = ZOOM_END - ZOOM_START
-    segment_start = ZOOM_START + full_delta * (
-        start_seconds / OUTPUT_DURATION_SECONDS
-    )
-    segment_end = ZOOM_START + full_delta * (
-        (start_seconds + duration) / OUTPUT_DURATION_SECONDS
-    )
-    segment_delta = segment_end - segment_start
+def _segment_output_filter(input_label: str, output: str) -> str:
+    """Finish one segment at 1:1 scale (the full-video zoom was removed)."""
     return (
-        f"[{input_label}]"
-        f"scale={OUTPUT_WIDTH * SUPERSAMPLE_FACTOR}:"
-        f"{OUTPUT_HEIGHT * SUPERSAMPLE_FACTOR},"
-        f"zoompan=z='{segment_start:.5f}+{segment_delta:.5f}*on/"
-        f"{denominator}':"
-        "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:"
-        f"s={OUTPUT_WIDTH}x{OUTPUT_HEIGHT}:fps={OUTPUT_FPS},"
-        f"format=yuv420p,setpts=PTS-STARTPTS[{output}]"
+        f"[{input_label}]format=yuv420p,setpts=PTS-STARTPTS[{output}]"
     )
 
 
@@ -1074,7 +1123,7 @@ def _build_video(
 ) -> bytes:
     """Encode cards sequentially, then copy-concat and mix timed audio."""
     if len(cards) != len(CUT_DURATIONS):
-        raise RuntimeError("Quiz video requires exactly eight cards")
+        raise RuntimeError("Quiz video requires exactly seven cards")
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
         card_paths: list[tuple[Path, Path]] = []
@@ -1096,18 +1145,12 @@ def _build_video(
             zip(card_paths, CUT_DURATIONS)
         ):
             segment_path = temp_path / f"segment-{index}.mp4"
-            # ズーム前に等倍座標で overlay し、バウンド量もズームに追従させる
             segment_filters = ";".join(
                 (
                     _bounce_overlay_filter(
                         CUT_BOUNCE_AMPLITUDES[index], "comp"
                     ),
-                    _zoompan_filter(
-                        "comp",
-                        duration,
-                        "v",
-                        start_seconds=sum(CUT_DURATIONS[:index]),
-                    ),
+                    _segment_output_filter("comp", "v"),
                 )
             )
             segment_command = [
@@ -1242,13 +1285,14 @@ def _insert_quiz_item(
 
 
 def generate(context: GeneratorContext) -> GeneratorResult:
-    """Generate a stock-backed 16-second, eight-card quiz reel."""
+    """Generate a stock-backed 16-second, seven-card quiz reel."""
     slots = _parse_parameters(context.prompt_config.parameters)
     slot = resolve_slot(context.scheduled_at, slots)
     quiz_type = slot["quiz_type"]
     difficulty = slot["difficulty"]
     slot_code = slot["slot_code"]
     slot_label = slot["slot_label"]
+    slot_hook = slot["slot_hook"]
 
     # Fixed assets are checked before stock selection and the Images API call.
     fonts = _load_fonts()
@@ -1281,6 +1325,7 @@ def generate(context: GeneratorContext) -> GeneratorResult:
         render_fields,
         slot_code,
         slot_label,
+        slot_hook,
         illustration_png,
         coaches,
         fonts,

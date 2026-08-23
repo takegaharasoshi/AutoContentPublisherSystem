@@ -22,6 +22,7 @@ def _slot(
     difficulty: str = "standard",
     slot_code: str = "noon",
     slot_label: str = "昼の推定",
+    slot_hook: str = "30秒で解けたら天才",
     **extra: object,
 ) -> dict[str, object]:
     return {
@@ -30,6 +31,7 @@ def _slot(
         "difficulty": difficulty,
         "slot_code": slot_code,
         "slot_label": slot_label,
+        "slot_hook": slot_hook,
         **extra,
     }
 
@@ -150,7 +152,7 @@ def _patch_generate_dependencies(monkeypatch: pytest.MonkeyPatch) -> Mock:
     monkeypatch.setattr(
         quiz,
         "_render_cards",
-        lambda *args: ([b"card"] * 8, [b"cut1", b"cut2", b"cut3", b"cut4"]),
+        lambda *args: ([b"card"] * 7, [b"cut1", b"cut2", b"cut3"]),
     )
     monkeypatch.setattr(quiz, "_build_video", lambda *args: b"video")
     monkeypatch.setattr(
@@ -174,6 +176,16 @@ def test_parameters_reject_unknown_quiz_type() -> None:
 def test_parameters_reject_unknown_slot_palette() -> None:
     with pytest.raises(RuntimeError, match="unknown slot_code"):
         quiz._parse_parameters(_parameters([_slot(slot_code="dawn")]))
+
+
+def test_parameters_reject_missing_slot_hook() -> None:
+    slot = _slot()
+    del slot["slot_hook"]
+    with pytest.raises(
+        RuntimeError,
+        match="slots entry is missing required fields: slot_hook",
+    ):
+        quiz._parse_parameters(_parameters([slot]))
 
 
 def test_resolve_slot_keeps_jst_boundaries_and_early_wrap() -> None:
@@ -251,9 +263,9 @@ def test_stock_content_field_validation_fails_loudly(
         quiz.validate_content_fields(_fields(**updates), "L3")
 
 
-def test_timeline_has_eight_cards_and_sixteen_seconds() -> None:
-    assert quiz.CUT_DURATIONS == (4, 4, 1, 1, 1, 1, 1, 3)
-    assert len(quiz.CUT_DURATIONS) == 8
+def test_timeline_has_seven_cards_and_sixteen_seconds() -> None:
+    assert quiz.CUT_DURATIONS == (8, 1, 1, 1, 1, 1, 3)
+    assert len(quiz.CUT_DURATIONS) == 7
     assert sum(quiz.CUT_DURATIONS) == quiz.OUTPUT_DURATION_SECONDS == 16
 
 
@@ -278,6 +290,7 @@ def test_render_cards_assigns_coaches_and_bubble_text(
         _fields(),
         "noon",
         "昼の推定",
+        "30秒で解けたら天才",
         b"illustration",
         coaches,
         {"regular": Path("regular"), "bold": Path("bold")},
@@ -286,35 +299,27 @@ def test_render_cards_assigns_coaches_and_bubble_text(
     actual = calls[1:]
     assert [entry[0] for entry in actual] == [
         coaches["hook"],
-        coaches["think"],
         *([coaches["question"]] * 5),
         coaches["answer"],
     ]
     assert [entry[1] for entry in actual] == [
-        "推定できる？",
-        quiz.THINK_BUBBLE_TEXT,
+        quiz.INTRO_BUBBLE_TEXT,
         *(["一人あたりから考えよう"] * 5),
         quiz.GUIDANCE_BUBBLE_TEXT,
     ]
-    assert [entry[2] for entry in actual[2:7]] == [5, 4, 3, 2, 1]
-    assert len(timeline) == 8
+    assert [entry[2] for entry in actual[1:6]] == [5, 4, 3, 2, 1]
+    assert len(timeline) == 7
     assert cuts == [
         timeline[0].composite,
         timeline[1].composite,
-        timeline[2].composite,
-        timeline[7].composite,
+        timeline[6].composite,
     ]
 
 
-def test_zoompan_interpolates_continuous_segment_ranges() -> None:
-    first = quiz._zoompan_filter("comp", 4, "v", start_seconds=0)
-    second = quiz._zoompan_filter("comp", 4, "v", start_seconds=4)
-    countdown = quiz._zoompan_filter("comp", 1, "v", start_seconds=8)
-    guidance = quiz._zoompan_filter("comp", 3, "v", start_seconds=13)
-    assert "1.00000+0.01000*on/119" in first
-    assert "1.01000+0.01000*on/119" in second
-    assert "1.02000+0.00250*on/29" in countdown
-    assert "1.03250+0.00750*on/89" in guidance
+def test_segment_output_filter_resets_timestamp_without_zoom() -> None:
+    assert quiz._segment_output_filter("comp", "v") == (
+        "[comp]format=yuv420p,setpts=PTS-STARTPTS[v]"
+    )
 
 
 def test_build_video_uses_new_audio_timing_and_fade(
@@ -328,10 +333,10 @@ def test_build_video_uses_new_audio_timing_and_fade(
         Path(command[-1]).write_bytes(b"mp4")
 
     monkeypatch.setattr(quiz.subprocess, "run", run)
-    cards = [quiz._CardLayers(b"base", b"layer", b"comp")] * 8
+    cards = [quiz._CardLayers(b"base", b"layer", b"comp")] * 7
     result = quiz._build_video(cards, b"bgm", b"tick", b"chime")
     assert result == b"mp4"
-    assert len(commands) == 9
+    assert len(commands) == 8
     final = commands[-1]
     filters = final[final.index("-filter_complex") + 1]
     assert "afade=t=out:st=15:d=1" in filters
@@ -354,11 +359,11 @@ def test_build_video_bounces_coach_layer_on_bubble_changes(
         Path(command[-1]).write_bytes(b"mp4")
 
     monkeypatch.setattr(quiz.subprocess, "run", run)
-    cards = [quiz._CardLayers(b"base", b"layer", b"comp")] * 8
+    cards = [quiz._CardLayers(b"base", b"layer", b"comp")] * 7
     quiz._build_video(cards, b"bgm", b"tick", b"chime")
     segment_filters = [
         command[command.index("-filter_complex") + 1]
-        for command in commands[:8]
+        for command in commands[:7]
     ]
     for index, filters in enumerate(segment_filters):
         amplitude = quiz.CUT_BOUNCE_AMPLITUDES[index]
@@ -375,9 +380,9 @@ def test_large_bounces_align_with_existing_sound_effects() -> None:
         for index, amplitude in enumerate(quiz.CUT_BOUNCE_AMPLITUDES)
         if amplitude == quiz.BOUNCE_LARGE_AMPLITUDE_PIXELS
     ]
-    assert large == [2, 7]
-    assert sum(quiz.CUT_DURATIONS[:2]) * 1000 == quiz.TICK_DELAY_MILLISECONDS
-    assert sum(quiz.CUT_DURATIONS[:7]) * 1000 == quiz.CHIME_DELAY_MILLISECONDS
+    assert large == [1, 6]
+    assert sum(quiz.CUT_DURATIONS[:1]) * 1000 == quiz.TICK_DELAY_MILLISECONDS
+    assert sum(quiz.CUT_DURATIONS[:6]) * 1000 == quiz.CHIME_DELAY_MILLISECONDS
 
 
 def test_generate_consumes_stock_and_stages_snapshot(
@@ -429,7 +434,6 @@ def test_generate_consumes_stock_and_stages_snapshot(
         "_cut1",
         "_cut2",
         "_cut3",
-        "_cut4",
         "_illustration",
     ]
 

@@ -16,6 +16,7 @@ from common import (
     WORK,
     dump_json,
     fetch_unbuilt_items,
+    load_json,
     local_connection,
     resolve_slots,
     utc_now,
@@ -123,7 +124,9 @@ def main() -> None:
         items = fetch_unbuilt_items(connection, rebuild=rebuild)
         coaches = _load_coaches(bucket, s3_client)
         fonts = quiz._load_fonts()
-        manifest: dict[str, Any] = {}
+        # 台帳は実行をまたいで積み上げる。新規ビルドと --rebuild は別々の実行に
+        # なるため、上書きすると先に建てた分が review_sheet / publish から消える
+        manifest: dict[str, Any] = load_json(WORK / "build_manifest.json", {})
         for item in items:
             illustration_path = WORK / "illustrations" / f"{item['id']}.png"
             if not illustration_path.is_file():
@@ -145,6 +148,7 @@ def main() -> None:
                 fields,
                 slot["slot_code"],
                 slot["slot_label"],
+                slot["slot_hook"],
                 illustration_path.read_bytes(),
                 coaches,
                 fonts,

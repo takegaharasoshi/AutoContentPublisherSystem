@@ -152,6 +152,7 @@ def real_quiz_rows() -> tuple[str, int, int, int]:
                     "difficulty": "light",
                     "slot_code": "morning",
                     "slot_label": "朝の脳みそトレ",
+                    "slot_hook": "30秒で解けたら天才",
                 },
                 {
                     "from_jst_hour": 11,
@@ -159,6 +160,7 @@ def real_quiz_rows() -> tuple[str, int, int, int]:
                     "difficulty": "standard",
                     "slot_code": "noon",
                     "slot_label": "昼の脳みそトレ",
+                    "slot_hook": "30秒で解けたら天才",
                 },
                 {
                     "from_jst_hour": 17,
@@ -166,6 +168,7 @@ def real_quiz_rows() -> tuple[str, int, int, int]:
                     "difficulty": "deep",
                     "slot_code": "night",
                     "slot_label": "夜の脳みそトレ",
+                    "slot_hook": "1％の人だけが30秒で解ける",
                 },
             ],
         }

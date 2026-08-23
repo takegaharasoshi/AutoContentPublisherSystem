@@ -27,7 +27,7 @@ docker run --rm -v "$PWD:/repo" -v "$HOME/.aws:/aws-config:ro" -w /repo/content/
 python review_sheet.py
 ```
 
-`work/review.html` で動画・イラスト・4 カット代表を全数確認します。承認済み ID を 1 行ずつ `work/approved.txt` に記載してから、まず dry run を行います。
+`work/review.html` で動画・イラスト・3 カット代表を全数確認します。承認済み ID を 1 行ずつ `work/approved.txt` に記載してから、まず dry run を行います。
 
 ```bash
 python publish.py --approved-file work/approved.txt --bucket your-bucket --dry-run

@@ -13,9 +13,11 @@ def main() -> None:
     cards: list[str] = []
     for stock_id in sorted(manifest, key=int):
         record = manifest[stock_id]
+        # カット枚数はレンダラーの構成で変わるため、実ファイルから数える
+        cut_paths = sorted((WORK / "cuts").glob(f"{stock_id}_cut*.png"))
         cuts = "".join(
-            f'<img src="cuts/{stock_id}_cut{index}.png" alt="cut {index}">'
-            for index in range(1, 5)
+            f'<img src="cuts/{path.name}" alt="{escape(path.stem)}">'
+            for path in cut_paths
         )
         slot_code = escape(str(record.get("slot_code", "")))
         content_key = escape(str(record.get("content_key", "")))

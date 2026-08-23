@@ -146,7 +146,7 @@
     </tr>
     <tr>
       <td><code>gpt-quiz-multicut</code></td>
-      <td>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>）から LRU 順繰りで 1 問を取得 → 情景イラスト生成（ストックの <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔4 表情〕+ 日本語フォントを時間帯スロット別パレットで<strong>全カット共通の固定版面</strong>に合成。カット間の差分は吹き出し・カウントダウンのみ）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、16 秒・4 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式。答え・解説は動画に載せずキャプション側で開示する。出題の型・難度（ストック絞り込み）・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える。実行時の LLM 問題生成・検証チェーンは 16-1 で休止（方式設計書セクション 5 の decision）</td>
+      <td>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>）から LRU 順繰りで 1 問を取得 → 情景イラスト生成（ストックの <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔4 表情〕+ 日本語フォントを時間帯スロット別パレットで<strong>全カット共通の固定版面</strong>に合成。カット間の差分は吹き出し・カウントダウンのみ）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、16 秒・3 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式（16-4c で 4 カット → 3 カット）。答え・解説は動画に載せずキャプション側で開示する。出題の型・難度（ストック絞り込み）・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える。実行時の LLM 問題生成・検証チェーンは 16-1 で休止（方式設計書セクション 5 の decision）</td>
       <td>休止（Phase 15-3 で選定、15-5 で設計 Fix、15-6 で実装、15-11 で生活溶け込み拡張〔イラスト常駐・スロットだし分け〕、15-14 で logic-training-1 が実投稿成功 = 本採用、15-15 で 1 日 3 回の Scheduler ENABLED、16-1 でテコ入れ設計 Fix〔ストック方式転換・カット構成刷新〕、16-3 で実装追随。<strong>16-3b（2026-08-08 の事前生成転換）で実行時方式としては休止 = 採用セットなし</strong>。組版・ffmpeg 合成は <code>quiz-prebuilt</code> の事前ビルドのレンダラーとして継続使用。レジストリ登録は残置・廃止はしない）</td>
       <td><a href="generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>（15-16 で作成・16-1 で全面改訂）</td>
     </tr>

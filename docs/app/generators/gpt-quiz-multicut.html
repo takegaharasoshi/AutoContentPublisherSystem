@@ -24,7 +24,7 @@
 
 <div class="warn">
   <span class="callout-title">16-3b（2026-08-08）: 実行時方式としては休止 — 事前ビルドのレンダラーへ転用</span>
-  16-3 完了後の仕様変更（動画事前生成方式への転換。<a href="quiz-prebuilt.html">方式設計書 quiz-prebuilt</a> セクション 1 の decision）により、本方式は<strong>実行時方式としては本番投入せず休止</strong>とする（16-4〔2026-08-08〕で <code>quiz-prebuilt</code> へ切替済み。採用セットなし・レジストリ登録は残置し、実行時生成へ戻す場合は <code>batch_sets.generator_name</code> の UPDATE で再開できる）。ただし<strong>組版（セクション 8）と ffmpeg 合成（セクション 9）は事前ビルドツーリングのレンダラーとして継続使用</strong>し、動画の作り（16 秒・4 カット・版面固定）の正は引き続き本書が持つ。実行時にのみ意味を持つ節（ストック取得 = セクション 5・イラスト生成 = セクション 6・固定アセット検査 = セクション 7・エラーハンドリング = セクション 11）は、事前生成側では <a href="quiz-prebuilt.html">quiz-prebuilt</a> セクション 4〜8 が対応する。
+  16-3 完了後の仕様変更（動画事前生成方式への転換。<a href="quiz-prebuilt.html">方式設計書 quiz-prebuilt</a> セクション 1 の decision）により、本方式は<strong>実行時方式としては本番投入せず休止</strong>とする（16-4〔2026-08-08〕で <code>quiz-prebuilt</code> へ切替済み。採用セットなし・レジストリ登録は残置し、実行時生成へ戻す場合は <code>batch_sets.generator_name</code> の UPDATE で再開できる）。ただし<strong>組版（セクション 8）と ffmpeg 合成（セクション 9）は事前ビルドツーリングのレンダラーとして継続使用</strong>し、動画の作り（16 秒・3 カット・版面固定。16-4c で 4 カット → 3 カット）の正は引き続き本書が持つ。実行時にのみ意味を持つ節（ストック取得 = セクション 5・イラスト生成 = セクション 6・固定アセット検査 = セクション 7・エラーハンドリング = セクション 11）は、事前生成側では <a href="quiz-prebuilt.html">quiz-prebuilt</a> セクション 4〜8 が対応する。
 </div>
 
 <div class="note">
@@ -33,7 +33,7 @@
 </div>
 
 <h2>1. 方式概要</h2>
-<p>人間レビュー済みの<strong>問題ストック（<code>quiz_stock_items</code>）から LRU 順繰りで 1 問を取得</strong>し、情景イラスト 1 枚（画像生成 API）・固定キャラアセット（4 表情）・日本語フォントを Pillow のプログラム組版で時間帯スロット別のカード画像に合成し、ffmpeg の多カット連結 + BGM/SE ミックスで <strong>16 秒・4 カット構成・1080x1920 の MP4（リール用動画）</strong>を返すクイズ方式。答え・解説は動画に載せず、投稿キャプション側で開示する（<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。出題の型（L1 論理パズル / L3 フェルミ推定）・BGM・配色・時間帯ラベルは、実行予定時刻から決定的に解決するスロット（朝 / 昼 / 夜）で切り替える（生活溶け込み拡張。15-9 / 15-10 決定）。Phase 15-6 で実装・15-14 で <code>logic-training-1</code> が本採用となり、<strong>16-1 でスキップ率 95% を受けたテコ入れ（ストック方式への転換・カット構成刷新・答えのキャプション移動）を設計 Fix</strong> した。</p>
+<p>人間レビュー済みの<strong>問題ストック（<code>quiz_stock_items</code>）から LRU 順繰りで 1 問を取得</strong>し、情景イラスト 1 枚（画像生成 API）・固定キャラアセット（4 表情）・日本語フォントを Pillow のプログラム組版で時間帯スロット別のカード画像に合成し、ffmpeg の多カット連結 + BGM/SE ミックスで <strong>16 秒・3 カット構成・1080x1920 の MP4（リール用動画）</strong>を返すクイズ方式。答え・解説は動画に載せず、投稿キャプション側で開示する（<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。出題の型（L1 論理パズル / L3 フェルミ推定）・BGM・配色・時間帯ラベルは、実行予定時刻から決定的に解決するスロット（朝 / 昼 / 夜）で切り替える（生活溶け込み拡張。15-9 / 15-10 決定）。Phase 15-6 で実装・15-14 で <code>logic-training-1</code> が本採用となり、<strong>16-1 でスキップ率 95% を受けたテコ入れ（ストック方式への転換・カット構成刷新・答えのキャプション移動）を設計 Fix</strong> した。</p>
 <div class="table-wrap">
 <table>
 <tr><th>項目</th><th>値</th></tr>
@@ -68,7 +68,7 @@
 <div class="table-wrap">
 <table>
 <tr><th>キー</th><th>必須</th><th>内容</th></tr>
-<tr><td><code>slots</code></td><td>必須（1 件以上）</td><td>時間帯スロットの配列。各要素は <code>from_jst_hour</code>（0〜23 の整数）・<code>quiz_type</code>（<code>L1</code> / <code>L3</code>）・<code>difficulty</code>・<code>slot_code</code>（<code>morning</code> / <code>noon</code> / <code>night</code> = コード側パレット定義に存在すること）・<code>slot_label</code>（時間帯ラベルピルの表示文言）の <strong>5 フィールド必須</strong>（欠落・空文字・未知の <code>slot_code</code> は異常終了）。<code>quiz_type</code> / <code>difficulty</code> はストック取得の絞り込みキーを兼ねる。<code>tone_hint</code> は休止（存在しても無視。下記 decision）</td></tr>
+<tr><td><code>slots</code></td><td>必須（1 件以上）</td><td>時間帯スロットの配列。各要素は <code>from_jst_hour</code>（0〜23 の整数）・<code>quiz_type</code>（<code>L1</code> / <code>L3</code>）・<code>difficulty</code>・<code>slot_code</code>（<code>morning</code> / <code>noon</code> / <code>night</code> = コード側パレット定義に存在すること）・<code>slot_label</code>（時間帯ラベルピルの表示文言）・<code>slot_hook</code>（<strong>つかみ帯の表示文言</strong>。セクション 8.1）の <strong>6 フィールド必須</strong>（欠落・空文字・未知の <code>slot_code</code> は異常終了）。<code>quiz_type</code> / <code>difficulty</code> はストック取得の絞り込みキーを兼ねる。<code>tone_hint</code> は休止（存在しても無視。下記 decision）</td></tr>
 <tr><td><code>max_regenerations</code></td><td>任意</td><td><strong>休止</strong>（存在しても無視。再生成ループ自体が休止のため）</td></tr>
 <tr><td><code>llm_model</code></td><td>任意</td><td><strong>休止</strong>（存在しても無視。テキスト LLM を呼ばないため）</td></tr>
 </table>
@@ -98,7 +98,7 @@
 <div class="table-wrap">
 <table>
 <tr><th>フィールド</th><th>上限</th><th>用途</th></tr>
-<tr><td><code>hook</code></td><td>20 字</td><td>カット 1 の<strong>動的つかみコピー</strong>（吹き出し表示）+ キャプション冒頭のプレビュー行（<a href="../batch-flow.html#sns-steps">batch-flow.html 3.3</a>）</td></tr>
+<tr><td><code>hook</code></td><td>20 字</td><td><strong>キャプション専用</strong>（冒頭のプレビュー行）。16-4c のカット構成見直しで<strong>動画には表示しなくなった</strong>（つかみはスロット別の <code>slot_hook</code> がカード上部の帯で担う）（<a href="../batch-flow.html#sns-steps">batch-flow.html 3.3</a>）</td></tr>
 <tr><td><code>hint</code></td><td>20 字</td><td>カット 3（カウントダウン）の<strong>動的ヒント</strong>（吹き出し表示。16-2b で追加 = セクション 8.1 の decision。キャプションでは使わない）</td></tr>
 <tr><td><code>question</code>（= <code>question_text</code> と同値）</td><td>90 字</td><td>問題文（全カットの版面に常時表示）</td></tr>
 <tr><td><code>answer</code>（= <code>answer_text</code> と同値）</td><td>30 字</td><td>答え（<strong>動画に載せずキャプションで開示</strong>。L3 は「約〈数値と単位〉（目安）」の幅表現）</td></tr>
@@ -123,7 +123,7 @@
   <span class="callout-title">事前生成側での扱い（16-3b）</span>
   事前ビルドツーリングは本節の固定プロンプト（情景 + スロット別ムード + ブランド配色 + 禁止事項）の組み立てを移植し、<strong>画風 1 行を恒久追加して imagegen（Codex サブスク内）で生成する</strong>（OpenAI Images API は使わない。<a href="quiz-prebuilt.html#build">quiz-prebuilt セクション 8</a>）。本節の記述は実行時生成（休止中）の仕様として維持する。
 </div>
-<p>取得したストック問題の <code>illustration_scene</code> をコード側固定のイラストプロンプト（情景 + スロット別の時間帯ムード + パレット由来のブランド配色 + 禁止事項）に組み込み、<strong>gpt-image-1 / 1536x1024（横長）/ medium / 1 枚</strong>で生成する。禁止事項は 16-3 の実 API 確認（イラスト内の「ZOO」看板文字・操作パネルの数字・額縁風の左右帯）を受けて調整済み: <strong>大きな「?」マークのみ可</strong>（情景の指定にある場合。16-2 の「主役 + 大きな ?」構図と固定プロンプトの記号禁止の矛盾を解消）・<strong>それ以外の文字・数字・記号は不可（看板・標識・ロゴ・ボタンや操作パネルの文字数字を含む）</strong>・答えを示唆する構図不可・<strong>額縁や左右の帯で画面を区切らず横長全体を情景で満たす</strong>。旧プロンプトの「背景用 / 情報カードを重ねる / 中央回避」の文言は全面背景時代（15-14 以前）の名残のためカード内ブロックの実態に合わせて廃止した。1 実行 1 枚で、全 4 カットのカード内ブロックに常駐させる（15-9 決定 → 15-14 で全面背景からカード内ブロックへ変更・横長化）。<strong>再利用時も毎回新規生成する</strong>ため、同じ問題の再出題でも見た目は変わる。</p>
+<p>取得したストック問題の <code>illustration_scene</code> をコード側固定のイラストプロンプト（情景 + スロット別の時間帯ムード + パレット由来のブランド配色 + 禁止事項）に組み込み、<strong>gpt-image-1 / 1536x1024（横長）/ medium / 1 枚</strong>で生成する。禁止事項は 16-3 の実 API 確認（イラスト内の「ZOO」看板文字・操作パネルの数字・額縁風の左右帯）を受けて調整済み: <strong>大きな「?」マークのみ可</strong>（情景の指定にある場合。16-2 の「主役 + 大きな ?」構図と固定プロンプトの記号禁止の矛盾を解消）・<strong>それ以外の文字・数字・記号は不可（看板・標識・ロゴ・ボタンや操作パネルの文字数字を含む）</strong>・答えを示唆する構図不可・<strong>額縁や左右の帯で画面を区切らず横長全体を情景で満たす</strong>。旧プロンプトの「背景用 / 情報カードを重ねる / 中央回避」の文言は全面背景時代（15-14 以前）の名残のためカード内ブロックの実態に合わせて廃止した。1 実行 1 枚で、全 3 カットのカード内ブロックに常駐させる（15-9 決定 → 15-14 で全面背景からカード内ブロックへ変更・横長化）。<strong>再利用時も毎回新規生成する</strong>ため、同じ問題の再出題でも見た目は変わる。</p>
 <div class="decision">
   <span class="callout-title">決定（15-9 / 15-10）: 方式 C（文字なし情景イラスト + プログラム文字描画）の採用と失敗時の扱い</span>
   図示 3 方式の実 API 比較で、インフォグラフィック全体の画像生成（方式 B）は 4/4 枚で誤字・見切れ・答え示唆・構造崩壊のいずれかが発生し不採用。<strong>文字は 100% プログラム描画（Pillow）、イラストは文字を禁止した情景描写のみ</strong>という分業に落とした。イラストのズレは「品質の傷」であって誤答ではないと整理（ユーザー決定）。<code>illustration_scene</code> の検証はプログラム検査（必須・最大 200 字）のみで、禁止事項・時間帯ムードはコード側固定プロンプトで担保する。<strong>イラスト生成の失敗は縮退せず異常終了</strong>（フェイルラウド。イラスト常駐の構成では欠けた状態で成立しないため）。
@@ -148,16 +148,25 @@
 <p><code>last_used_at</code> の UPDATE は動画完成後に行い、commit は共通骨格に委ねる（失敗時は選曲の副作用ごとロールバック）。音源の前処理レシピ（20 秒尺の 2 パス loudnorm・SE はピーク調整のみ）と証跡管理は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a>。<strong>BGM 素材は 20 秒尺の前処理済みのまま流用</strong>し、16 秒への短縮はミックス時のトリム + フェードアウトで吸収する（セクション 9）。</p>
 
 <h2 id="composition">8. 組版（Pillow）</h2>
-<h3>8.1 カット構成（16 秒・タイムラインカード 8 枚・版面固定）</h3>
-<p><strong>全 8 枚のカードは同一版面</strong>（時間帯ラベルピル / 見出し「問題」/ 問題文 / 情景イラストブロック / コーチ + 吹き出し）で、カット間で変わるのは<strong>吹き出し文言・コーチ表情・カウントダウンバッジのみ</strong>。問題文は 1 フレーム目から最終フレームまで同座標・同サイズで表示され続ける。</p>
+<h3>8.1 カット構成（16 秒・タイムラインカード 7 枚・版面固定）</h3>
+<p><strong>全 7 枚のカードは同一版面</strong>（時間帯ラベルピル / <strong>つかみ帯</strong> / 見出し「問題」/ 問題文 / 情景イラストブロック / コーチ + 吹き出し）で、カット間で変わるのは<strong>吹き出し文言・コーチ表情・カウントダウンバッジのみ</strong>。問題文とつかみ帯は 1 フレーム目から最終フレームまで同座標・同サイズで表示され続ける。</p>
 <div class="table-wrap">
 <table>
 <tr><th>カット</th><th>尺</th><th>カード</th><th>カット間で変わる要素</th></tr>
-<tr><td>1 つかみ</td><td>4 秒</td><td>1 枚</td><td>吹き出し = <code>hook</code>（<strong>問題ごとの動的つかみコピー</strong>）+ コーチ hook（力こぶ）</td></tr>
-<tr><td>2 考える</td><td>4 秒</td><td>1 枚</td><td>固定吹き出し「止めてじっくり考えても OK」+ コーチ think（考え込む）</td></tr>
-<tr><td>3 カウントダウン</td><td>5 秒</td><td>5 枚（1 秒 × 5）</td><td>カウントダウン円バッジ（5→1）+ 吹き出し = <code>hint</code>（<strong>問題ごとの動的ヒント</strong>。5 枚とも同一文言）+ コーチ question（手のひらで差し出す）</td></tr>
-<tr><td>4 誘導</td><td>3 秒</td><td>1 枚</td><td>固定吹き出し「答えは投稿のキャプションへ！」+ コーチ answer（ガッツポーズ）</td></tr>
+<tr><td>1 導入</td><td>8 秒</td><td>1 枚</td><td>固定吹き出し「わかったらコメントしてくれ！」+ コーチ hook（力こぶ）</td></tr>
+<tr><td>2 カウントダウン</td><td>5 秒</td><td>5 枚（1 秒 × 5）</td><td>カウントダウン円バッジ（5→1）+ 吹き出し = <code>hint</code>（<strong>問題ごとの動的ヒント</strong>。5 枚とも同一文言）+ コーチ question（手のひらで差し出す）</td></tr>
+<tr><td>3 誘導</td><td>3 秒</td><td>1 枚</td><td>固定吹き出し「答えは投稿のキャプションへ！」+ コーチ answer（ガッツポーズ）</td></tr>
 </table>
+</div>
+<div class="decision">
+  <span class="callout-title">決定（16-4c = 2026-08-23 のユーザー指示）: 3 カット化・つかみ帯の新設・全体ズームの廃止</span>
+  16-2b 構成（4 カット）を実運用の動画で見直し、以下 3 点をユーザーが決定した。<strong>版面変更のため既存の事前ビルド動画 42 本を含む全 63 本を再ビルド・再配置した</strong>（<a href="quiz-prebuilt.html#build">quiz-prebuilt セクション 8</a> の warn どおり）。
+  <ul>
+    <li><strong>カット 1「つかみ」とカット 2「考える」を 1 つの導入カット（8 秒）へ統合</strong>し、4 カット → 3 カットにした。吹き出しは<strong>コメント誘発の固定文「わかったらコメントしてくれ！」</strong>。統合しても尺の合計 16 秒・SE のタイミング（tick 8 秒 / chime 13 秒）は変わらない</li>
+    <li><strong>つかみを最も目立つ位置（時間帯ラベルピルの下・見出し「問題」の上）のアクセント色の帯へ移した</strong>。文言は問題ごとの <code>hook</code> ではなく <strong>スロット別の可変値 <code>slot_hook</code></strong>（<code>prompt_configs.parameters</code>）とし、全カットで常時表示する。<code>hook</code> フィールドはキャプション専用として存続する（フィールド自体は廃止しない）</li>
+    <li><strong>全編通しの連続ズーム（1.0 → 1.04）を廃止</strong>した。これに伴いカード矩形はズーム由来の導出をやめ、出力枠からの固定インセット（左右 25px / 上下 41px = 従来と同一座標）で定義する</li>
+  </ul>
+  つかみ帯の文字は<strong>途中で折り返すより 1 行に収める方を優先</strong>する（58pt から 2pt 刻みで縮小し、1 行に収まる最大サイズを採る。下限 40pt。「1％の人だけが30秒で解／ける」のような不自然な改行を避けるため）。
 </div>
 <div class="decision">
   <span class="callout-title">決定（16-1）: カット構成の刷新（スキップ率 95% テコ入れ）</span>
@@ -186,11 +195,11 @@
 </div>
 <h3>8.2 レイアウトの構造保証</h3>
 <ul>
-  <li><strong>カード = ズームセーフ枠</strong>: カード矩形を kenburns と同じ導出（出力寸法 / <code>ZOOM_END</code> − マージン 8）で <code>ZOOM_END=1.04</code> から計算し、ズーム終端でもカード全体が可視であることを構造的に保証する（1030 × 1838 中央配置）。ズームは文字の可読性優先で kenburns（1.08）より弱い</li>
+  <li><strong>カード = 出力枠の固定インセット</strong>: カード矩形は <code>CARD_MARGIN_X=25</code> / <code>CARD_MARGIN_Y=41</code> のインセット（1030 × 1838 中央配置）。16-4c で全体ズームを廃止するまでは <code>ZOOM_END=1.04</code> からのズームセーフ枠導出だったが、同じ座標を定数で持つ形に置き換えた（版面は不変）</li>
   <li><strong>本文セーフエリア</strong>: カード領域と Instagram UI 予約域（右 12% / 下 15%）の交差に文字とコーチを収める。イラストは全面背景ではなくカード内ブロックのため、文字の見切れは構造的に発生しない（プロンプト側のセーフエリア指定は不要）</li>
   <li><strong>見出し行</strong>: 見出し「問題」（左アクセントバー）のみを全カット共通で常設する。<strong>型・難度ピルは置かない</strong>（16-1 で計画したが 16-3 のユーザーレビューで廃止 = 下記 decision）</li>
   <li><strong>スロット別パレット</strong>: 背景 / カード / 本文 / 補助文字 / アクセント / 装飾の 6 色をコード側定数 <code>SLOT_PALETTES</code> で持つ。朝 = クリーム、昼 = ライトブルー（15-13 でユーザー決定により夜と差別化）、夜 = ダークネイビー。アクセントはアンバー系で統一</li>
-  <li><strong>共通デザイン要素</strong>（15-14 の投稿前レビューで確定）: 時間帯ラベル = テキスト幅ピル + アクセントドット（上部中央）・見出し = 左アクセントバー・カウントダウン = アクセント色の円バッジ（直径 150）に白抜き（位置は見出し行の右端。バッジの数字も文字のためカード右端ではなくセーフエリア右端に合わせる = 16-3 レビューでの修正）・イラスト = 角丸 + 装飾色の縁取り・コーチのセリフ = 全カットで吹き出しに統一（動的 2〔<code>hook</code> / <code>hint</code>〕+ 固定文 2。16-2b で変更）</li>
+  <li><strong>共通デザイン要素</strong>（15-14 の投稿前レビューで確定）: 時間帯ラベル = テキスト幅ピル + アクセントドット（上部中央）・見出し = 左アクセントバー・カウントダウン = アクセント色の円バッジ（直径 150）に白抜き（位置は見出し行の右端。バッジの数字も文字のためカード右端ではなくセーフエリア右端に合わせる = 16-3 レビューでの修正）・<strong>つかみ帯 = アクセント色の角丸帯に白抜き中央そろえ</strong>（ラベルピルの直下・見出しの上。16-4c 追加）・イラスト = 角丸 + 装飾色の縁取り・コーチのセリフ = 全カットで吹き出しに統一（動的 1〔<code>hint</code>〕+ 固定文 2。16-4c で <code>hook</code> の吹き出しが固定文へ）</li>
   <li><strong>コーチ配置</strong>: 4 枚の不透明領域の和で共通矩形をトリミングし（相対サイズ・立ち位置を保存）、300 × 430 の枠へ contain してカード下端基準（下端から 140px）の右下に置く。カット間で大きさ・立ち位置が動かない</li>
   <li><strong>コーチ + 吹き出しのレイヤー分離</strong>（16-4b）: バウンド演出（セクション 9.1）のため、カード 1 枚につき<strong>ベース画（コーチ・吹き出しを除く全要素）</strong>と<strong>透過レイヤー（コーチ + 吹き出しのみ・出力寸法と同一キャンバス）</strong>を別々に PNG エンコードし、ffmpeg 側で重ねる。座標計算は分離前と同一のため版面は変わらない。カット代表 PNG（中間生成物）とレビューには 2 枚を合成した静止画を使う</li>
   <li><strong>イラストブロックの 2 パス描画</strong>: 1 巡目はイラストなしで全カットを描いて<strong>最も低いテキスト下端を測り</strong>、2 巡目でテキスト下端 + 48px からコーチ上端 − 16px までの横長ブロックを全カット共通の位置に敷いて本描画する（カット間でイラストが動かず、吹き出しとカウントダウンだけが変わる）。ブロック高が 200px 未満になる場合は異常終了（テキスト過多の検知。版面から答え・解説が消えたため旧構成より発生しにくい）</li>
@@ -209,11 +218,11 @@
 </div>
 
 <h2 id="encode">9. ffmpeg 合成</h2>
-<p>2 段構成。①カード 8 枚を<strong>1 枚ずつ</strong>ズーム付きセグメント MP4 にエンコードし、②concat demuxer で無劣化連結（<code>-c:v copy</code>）しながら音声 3 系統をミックスする。</p>
+<p>2 段構成。①カード 7 枚を<strong>1 枚ずつ</strong>セグメント MP4 にエンコードし、②concat demuxer で無劣化連結（<code>-c:v copy</code>）しながら音声 3 系統をミックスする。</p>
 <div class="table-wrap">
 <table>
 <tr><th>工程</th><th>値（実装定数）</th></tr>
-<tr><td>セグメント（8 本）</td><td>静止画 2 枚入力（ベース画 + コーチレイヤー。各 <code>-loop 1 -framerate 30 -t 尺</code>）→ <code>overlay</code>（<strong>バウンド演出</strong>。セクション 9.1）→ 2 倍スーパーサンプリング → <code>zoompan</code>（<strong>全編通しの連続ズーム 1.0 → 1.04</strong>・中央固定・<code>s=1080x1920</code>・<code>fps=30</code>）→ <code>libx264</code> / <code>-crf 20</code> / <code>-preset medium</code>・映像のみ。<strong>連続ズーム</strong>: 版面固定によりセグメント境界のズームリセットが目に見えるため、各セグメントは全体 1.0→1.04 を経過時間で線形補間した区間（セグメント i の開始・終了倍率）を受け持つ（16-1 変更。旧実装は各セグメントが 1.0 始まり）。<strong>overlay はズームの前段</strong>に置き、バウンド量もズーム倍率に追従させる</td></tr>
+<tr><td>セグメント（7 本）</td><td>静止画 2 枚入力（ベース画 + コーチレイヤー。各 <code>-loop 1 -framerate 30 -t 尺</code>）→ <code>overlay</code>（<strong>バウンド演出</strong>。セクション 9.1）→ <code>format=yuv420p,setpts=PTS-STARTPTS</code> → <code>libx264</code> / <code>-crf 20</code> / <code>-preset medium</code>・映像のみ。<strong>16-4c で全体ズームを廃止</strong>したため <code>zoompan</code> と 2 倍スーパーサンプリングはなくなり、等倍のまま書き出す（16-1 で導入した「セグメント間で連続する線形補間ズーム」も同時に不要になった）</td></tr>
 <tr><td>連結</td><td>concat demuxer + <code>-c:v copy</code>（再エンコードなし）+ <code>+faststart</code>・全体 <code>-t 16</code></td></tr>
 <tr><td>BGM</td><td><code>-stream_loop -1</code> でループ入力し 16 秒でトリム。音量 1.0（前処理済み・-14 LUFS 前後）。<strong><code>afade=t=out</code>（st=15・d=1）を適用</strong>（素材は 20 秒尺のため前処理側の終端フェードがトリムで失われる。16-1 追加）</td></tr>
 <tr><td>SE: カウントダウンティック</td><td><code>adelay=8000</code>（カウントダウンカット開始 = 8 秒地点から 5 打）・音量 −6 dB</td></tr>
@@ -231,7 +240,7 @@
 <tr><td>フィルタ式</td><td><code>overlay=x=0:y='-A*exp(-D*t)*abs(sin(2*PI*F*t))*between(t,0,1.0)'</code>（振幅 0 のカットは <code>y=0</code> の静的 overlay）</td></tr>
 <tr><td>振幅 A</td><td>大 = 150 / 小 = 34（px）。減衰があるため<strong>見かけの頂点は初回ホップの <code>A*exp(-D/(4F))</code></strong>（大 = 約 100px = コーチ丈の約 1/4）</td></tr>
 <tr><td>周波数 F・減衰 D・尺</td><td>F = 1.6 Hz（1 ホップ 0.31 秒）・D = 3.0 /秒・1.0 秒。1 回の演出で 3 回ほど弾む（頂点 100 → 39 → 14px）</td></tr>
-<tr><td>カット別の強弱</td><td>カット 1（つかみ）= なし / カット 2（考える）= 小 / <strong>カット 3 の 1 枚目（ヒント登場）= 大</strong> / カウントダウン 2〜5 枚目 = なし / <strong>カット 4（誘導）= 大</strong></td></tr>
+<tr><td>カット別の強弱</td><td>カット 1（導入）= なし / <strong>カット 2 の 1 枚目（ヒント登場）= 大</strong> / カウントダウン 2〜5 枚目 = なし / <strong>カット 3（誘導）= 大</strong>。16-4c の 3 カット化で「考える切替の小バウンド」はカットごと消えたため、小振幅は現在どのカットでも使っていない</td></tr>
 </table>
 </div>
 <div class="decision">

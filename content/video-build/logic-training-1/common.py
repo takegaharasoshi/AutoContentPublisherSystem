@@ -107,7 +107,7 @@ def resolve_slots(connection: pymysql.connections.Connection) -> dict[tuple[str,
         for slot in _parse_parameters(parameters):
             key = (slot["quiz_type"], slot["difficulty"])
             candidates.setdefault(key, set()).add(
-                (slot["slot_code"], slot["slot_label"])
+                (slot["slot_code"], slot["slot_label"], slot["slot_hook"])
             )
     resolved: dict[tuple[str, str], dict[str, str]] = {}
     for key, values in candidates.items():
@@ -116,6 +116,10 @@ def resolve_slots(connection: pymysql.connections.Connection) -> dict[tuple[str,
                 "prompt_configs slots do not uniquely resolve "
                 f"quiz_type/difficulty={key}"
             )
-        slot_code, slot_label = next(iter(values))
-        resolved[key] = {"slot_code": slot_code, "slot_label": slot_label}
+        slot_code, slot_label, slot_hook = next(iter(values))
+        resolved[key] = {
+            "slot_code": slot_code,
+            "slot_label": slot_label,
+            "slot_hook": slot_hook,
+        }
     return resolved

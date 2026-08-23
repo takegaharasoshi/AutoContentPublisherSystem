@@ -23,6 +23,7 @@ def _parameters() -> str:
                     "difficulty": "standard",
                     "slot_code": "noon",
                     "slot_label": "昼の脳みそトレ",
+                    "slot_hook": "30秒で解けたら天才",
                 }
             ]
         }

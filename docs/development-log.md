@@ -951,6 +951,25 @@
 
     **(7) ドキュメント同期**: [gpt-quiz-multicut.html](app/generators/gpt-quiz-multicut.html)（8.2 にレイヤー分離とイラスト内接を追記・**9.1 バウンド演出**を新設・16-5 の decision 2 本）、[quiz-prebuilt.html](app/generators/quiz-prebuilt.html)（工程 2 の 3:2 記述を実態へ訂正 + decision）、スキル [quiz-stock-replenish](../.claude/skills/quiz-stock-replenish/SKILL.md)（サイズ確認・警告時の対処・`--rebuild` の使いどころ）。pytest は image-batch 106 件パス。
 
+- [x] **16-4c** 動画構成の見直し（3 カット化・つかみ帯・ズーム廃止）
+  - 備考: 2026-08-23 完了（実施 = Opus 5・テストの仕様追随のみ Codex terra 委譲）。2026-08-w3 の問題ストック補充（21 問の投入 → 動画ビルド）の途中で、レビューシートを見たユーザーが動画構成の見直しを 3 点指示したため、補充作業に割り込む形で実施した。
+
+    **(1) 指示の内容と確認した論点**: ①4 カットを 3 カットへ（カット 1「つかみ」+ カット 2「考える」を統合し、コーチの吹き出しは「わかったらコメントしてくれ！」）②「つかみ」を最も目立つ位置（時間帯ラベルピルと見出し「問題」の間）へ移し、文言を可変にする（朝・昼 =「30秒で解けたら天才」/ 夜 =「1％の人だけが30秒で解ける」）③全体ズームの廃止。着手前に 3 点をユーザーへ確認 — **(a) 問題ごとの `hook` フィールドはキャプション専用として残す**（動画から外れるだけでフィールドは廃止しない。既存 63 問のデータと執筆フローを変えずに済む）**(b) つかみはアクセント色の帯に白抜き文字**（大きな太字テキスト案・ラベルピル 2 段案と比較してユーザーが選択）**(c) 既存 42 問を含む全 63 問を再ビルド・再配置**（版面変更は既存動画に自動反映されないため。`--rebuild` は BGM を引き継ぐので LRU は消費しない）。
+
+    **(2) 実装（`services/image-batch/app/generators/gpt_quiz_multicut.py`）**: ①`CUT_DURATIONS` を `(8, 1, 1, 1, 1, 1, 3)` の 7 枚へ（`HOOK_DURATION_SECONDS` + `THINK_DURATION_SECONDS` → `INTRO_DURATION_SECONDS = 8`）。**尺の合計 16 秒と SE のタイミング（tick 8 秒 / chime 13 秒）は不変**で、`CUT_BOUNCE_AMPLITUDES` は `(0, 大, 0, 0, 0, 0, 大)` に詰め直した（「考える切替」の小バウンドはカットごと消えたため小振幅は現在未使用）。`THINK_BUBBLE_TEXT` → `INTRO_BUBBLE_TEXT = "わかったらコメントしてくれ！"`。コーチ think は使わなくなったがアセット契約は 4 表情のまま残置 ②つかみ帯を `_base_card` に新設し、`_base_card` は本文の開始 y を返す形へ変更（帯の高さが文言で変わるため、見出し以降の座標を帯に追従させる）。文言は `prompt_configs.parameters` の各スロットに追加した **`slot_hook`（必須・非空）** から与える ③`_zoompan_filter` と `ZOOM_START` / `ZOOM_END` / `SUPERSAMPLE_FACTOR` / `SAFE_BOX_MARGIN` を削除し、セグメントは `format=yuv420p,setpts=PTS-STARTPTS` の等倍書き出しに。カード矩形はズーム由来の導出をやめ `CARD_MARGIN_X=25` / `CARD_MARGIN_Y=41` の固定インセット（**座標は従来と同一**）にした。ビルドツーリング側は `common.py` の `resolve_slots` と `build.py` に `slot_hook` を通した。
+
+    **(3) つかみ帯のフィッティング（初回ビルドで見つけた不具合）**: 帯の文字は当初「高さに収まれば採用」だったため、夜の文言が **「1％の人だけが30秒で解／ける」** と語中で折れた。**折り返すより 1 行に収める方を優先**するロジック（58pt から 2pt 刻みで縮小し 1 行に収まる最大サイズを採る。下限 40pt。1 行にできない場合のみ高さ基準の多行へフォールバック）へ変更し、横パディングも `CARD_PADDING`（64）から専用の 36 へ緩めて 1 行の余地を広げた。朝・昼は 58pt・夜は縮小して 1 行で収まることを実物で確認。
+
+    **(4) DB 更新の順序**: `_parse_parameters` で `slot_hook` を**必須**にしたため、コード投入前に `prompt_configs.parameters` を先に更新した（実行時方式 `quiz_prebuilt` も同じ検証を通るため、逆順だと稼働中のバッチが落ちる）。ローカル MySQL（pymysql）・Aurora（Data API）とも 1 行更新し、3 スロットの `slot_hook` を裏取りした。
+
+    **(5) テストの追随（Codex terra 委譲）**: 仕様差分を渡してテストのみ修正させた（`app/` は変更禁止と明示）。slots フィクスチャへの `slot_hook` 追加・7 枚 / 3 代表カットへの期待値更新・廃止した `_zoompan_filter` のテストを `_segment_output_filter` の検証へ置換・`slot_hook` 欠落を検出するテストの新設。**アサーションを消して通す形になっていないこと**を差分で確認済み。image-batch の pytest は **124 passed / 5 skipped**。
+
+    **(6) 全 63 本の再ビルドと、その過程で見つけたツーリングの不具合 2 件**: 新規 21 本を通常ビルド、既存 42 本を `build.py --rebuild`（BGM 引き継ぎ）で作り直した。旧構成の `*_cut4.png`（代表カット 4 枚目）は新構成では生成されないため、レビューシートに旧カットが混ざらないよう作業前に削除した。再ビルド中に `--rebuild` のコンテナが 2 本同時に走っていることに気づき、両方を停止して 1 本で流し直した（同一ファイルへの二重書き込みを避けるため）。ビルド後に判明した不具合 2 件を修正:
+    - **`build.py` が `work/build_manifest.json` を毎回上書きしていた**。16-3d までは全件を 1 回のビルドで作っていたため表面化しなかったが、今回のように「新規ビルド」と「`--rebuild`」を別々に実行すると、後の実行で前の実行分の台帳が消える。台帳は `review_sheet.py` と `publish.py` の両方が参照する（`publish.py` は `content_key` / `question_text` / `bgm_s3_key` を台帳から取るため、欠けると配置時に異常終了する）ので、**既存の台帳を読んでから更新する形（実行をまたいで積み上げる）**へ変更した
+    - **`review_sheet.py` がカット代表を `range(1, 5)` で決め打ちしていた**ため、3 カット構成では 4 枚目が壊れた画像として並ぶ。**実ファイル（`cuts/<id>_cut*.png`）を数える形**にして、今後カット枚数が変わっても追随するようにした
+
+    **(7) ドキュメント同期**: [gpt-quiz-multicut.html](app/generators/gpt-quiz-multicut.html)（セクション 3 の `parameters` に `slot_hook` を追加・セクション 5 の `hook` を「キャプション専用」へ・**8.1 カット構成を 3 カット表 + 16-4c decision** へ・8.2 のカード矩形と共通デザイン要素・9 の合成表からズームを削除・9.1 のカット別強弱）、[quiz-prebuilt.html](app/generators/quiz-prebuilt.html)、[batch-flow.html](app/batch-flow.html) の方式カタログ、[sets/logic-training-1.html](app/sets/logic-training-1.html)（動画構成・キャプション 1 行目・コーチアセット表）、[operation.html](app/operation.html) セクション 3（`hook` の執筆指示）、スキル [quiz-stock-replenish](../.claude/skills/quiz-stock-replenish/SKILL.md)（フィールド表の表示場所）、[content/video-build/logic-training-1/README.md](../content/video-build/logic-training-1/README.md)。
+
 - [x] **16-6** Instagram Graph API インサイト機能の調査（後段ブロック先行着手の 1 本目）
   - 備考: 2026-08-09 完了（Web リサーチ = `codex --search exec` 委譲〔terra / high〕・再検証 + 整理 = Fable 5）。調査基準は Graph API **v25.0**・Instagram API with Facebook Login（既存構成）。学習カットオフ後の主要情報（2025-12 の新メトリクス群）は Meta 公式ブログ（2025-12-03）+ 複数二次ソースで再検証済み。ステップの目的だった「自動収集できる指標 / 手動でしか見えない指標」の境界を確定した。なお 16-5 完了前の先行着手は 2026-08-09 のユーザー決定（理由は計画書 Phase 16 冒頭の備考）。
 
@@ -1205,6 +1224,19 @@
     - **17-7 はスキル化のみ**に変更し、**実地テストの対象を「スキル化後の最初の週次補充（14 件）」へ**（17-3 の「書いただけで検証しないスキルにしない」という趣旨は定常運用の実物で試すことで満たす）
     - 設計書側も実態に合わせた（operation.html セクション 3 の初期ストック量・スキル化前に回す補充の範囲、[pref-ranking-1.html](app/sets/pref-ranking-1.html) と [ranking-prebuilt.html](app/generators/ranking-prebuilt.html) の適用状態・工程 1 の初回対象）
 
+
+## 定常運用: 問題ストック補充の記録
+
+週次補充（スキル `/quiz-stock-replenish` + [operation.html](app/operation.html) セクション 3 の手順 1〜5）の実施記録。バッチ資材は `content/quiz-stock/<set_code>/<バッチ名>/` に自己完結で置き、各バッチの `STATUS.md` が一次記録・本節は要約。
+
+- **logic-training-1 / 2026-08-w3（21 問。2026-08-18 着手 〜 2026-08-24 完了）**
+  - 資材: [content/quiz-stock/logic-training-1/2026-08-w3/](../content/quiz-stock/logic-training-1/2026-08-w3/)。**初期整備（16-2）以来はじめての週次補充**で、各組 7 問 = 1 週間分（ユーザー決定 2026-08-18）。着手時の在庫は朝 5 / 昼 4 / 夜 4 = 13 問で 3 組とも補充閾値（7 問）割れ、新規ネタは 8/21 が最後という状況だった
+  - **今回から適用した執筆方針**: ①昼 L3 は**捻った分解型を標準**（直接換算型は不採用）+ **解説 5 ステップ構造**（2026-08-07 決定の初適用。`explanation` 240 字上限）②朝の「広く流布した定番のみ」という採用基準を撤廃（2026-08-19 ユーザー決定。リサーチで見つけた問題なら定番でなくてよい）。ツーリング側は `validate.py` の L3 解説上限と内訳期待値、`verify_logic.py` の検算対象（昼 7 問 + 朝の文字あそび 2 問 + 夜 5 問）を今回向けに拡張
+  - **レビューでの差し替えが多かった**: 朝 A15 は 4 回・夜は 7 問中 5 問を差し替えた。確立した基準はスキル `/quiz-stock-replenish` へ反映済み（夜 = 有名すぎる古典は不可 / **答えを聞いた瞬間に納得できるか**が採否の分かれ目 / 古語・死語を使わない / ヒントが仕掛けを渡していないか毎問確認。昼 = 「〇〇 ÷ 答え」で逆算しただけの仮定は不可だが**絵にできる密度仮定は通る**）
+  - **投入（2026-08-22）**: 既出題（`quiz_items` 65 件 + `quiz_stock_items` 42 件）と解法構造・題材を突合し重複なしを確認 → ローカル MySQL はトランザクション + ROLLBACK のドライラン後に本適用 → Aurora は Data API で 21 文適用。`content_key` は両環境とも `morning/noon/night-015`〜`021` で一致。**突合で「重複ではないが近い」2 件を記録**（morning-019 のアナグラムは既存 morning-001 の並べ替えと、morning-015 の「愚痴をこぼす」は既存 morning-010 の「年をとる」と、仕掛けが同型）
+  - **イラスト（Codex imagegen 委譲・スロット別 3 バッチ）**: 全 21 枚が **1536x1024（3:2）ちょうど**で出力され、`intake.py` の切り捨て WARNING 39 件はすべて旧 42 問（16-5 のサイズ明示行より前の生成物）。今回分は 0 件で、**サイズ明示行 + 保存後サイズ確認の二重の歯止めが効いた**ことを 21 枚規模で確認。ユーザー承認済みの例外 3 件（A17 = 顔とランドルト環を許可・数字は不可 / C18 = 人物 4 人が正 / C21 = ラベルの果物の絵は正・文字は不可）も指示どおり適用された
+  - **途中で動画構成の見直しが割り込んだ**: レビューシートを見たユーザーの指示で **16-4c**（3 カット化・つかみ帯・ズーム廃止）を実施し、既存 42 問を含む**全 63 問を再ビルド**してから全数レビュー → 配置した
+  - **配置（2026-08-24）**: 63 問を承認 → S3 へ 126 オブジェクト（mp4 + イラスト）→ ローカル MySQL 63 行 → Aurora へ `update_prebuilt.sql` を Data API で 63 文適用（**各 1 行更新・`video_audio_asset_id` の NULL 化なし**）。適用前に `question_text` が両環境とも 63 件すべて一意であることを確認した（安定キーで解決する SQL のため）。**両環境とも `unbuilt = 0`・各組 `unused_built = 7`** で在庫閾値を回復
 
 ## 設計課題リスト（解消済み）
 
