@@ -482,17 +482,18 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
   });
 
   test.each([
-    ['acps-prod-image-generation-fantasy-animals-1', 'cron(0 21 * * ? *)', 'fantasy-animals-1'],
-    ['acps-prod-image-generation-logic-training-1-morning', 'cron(30 7 * * ? *)', 'logic-training-1'],
-    ['acps-prod-image-generation-logic-training-1-noon', 'cron(30 12 * * ? *)', 'logic-training-1'],
-    ['acps-prod-image-generation-logic-training-1-night', 'cron(0 21 * * ? *)', 'logic-training-1'],
+    ['acps-prod-image-generation-fantasy-animals-1', 'cron(0 21 * * ? *)', 'fantasy-animals-1', 'ENABLED'],
+    ['acps-prod-image-generation-logic-training-1-morning', 'cron(30 7 * * ? *)', 'logic-training-1', 'ENABLED'],
+    // noon は 16-4d（2026-08-24）で当分停止中
+    ['acps-prod-image-generation-logic-training-1-noon', 'cron(30 12 * * ? *)', 'logic-training-1', 'DISABLED'],
+    ['acps-prod-image-generation-logic-training-1-night', 'cron(0 21 * * ? *)', 'logic-training-1', 'ENABLED'],
   ])(
     'スケジュール %s を cron %s / set_code %s で Step Functions 起動先に設定する',
-    (scheduleName, cronExpression, setCode) => {
+    (scheduleName, cronExpression, setCode, state) => {
       template.hasResourceProperties('AWS::Scheduler::Schedule', {
         Name: scheduleName,
         GroupName: 'acps-prod-image-schedule-group',
-        State: 'ENABLED',
+        State: state,
         ScheduleExpression: cronExpression,
         ScheduleExpressionTimezone: 'Asia/Tokyo',
         FlexibleTimeWindow: {

@@ -350,7 +350,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 <h4>初期ストック量・補充サイクル・在庫確認</h4>
 <ul>
   <li><strong>初期ストック（16-2 で投入）: 42 問 = 2 週間分</strong>（消費は週 21 問。内訳はスロット構成に合わせ L1/light 14・L3/standard 14・L1/deep 14）</li>
-  <li><strong>補充: 週 1 回、各「型 × 難度」の未使用在庫が 7 問（1 週間分）以上</strong>を目安に手順 1〜5 を回す（quiz-prebuilt 方式のセットでは<strong>「未使用かつビルド済み」を在庫と数える</strong>）。再利用 WARNING が出た場合は補充が遅れているサインなので優先して補充する</li>
+  <li><strong>補充: 週 1 回、各「型 × 難度」の未使用在庫が 7 問（1 週間分）以上</strong>を目安に手順 1〜5 を回す（quiz-prebuilt 方式のセットでは<strong>「未使用かつビルド済み」を在庫と数える</strong>）。再利用 WARNING が出た場合は補充が遅れているサインなので優先して補充する。<strong>停止中のスロットは補充対象外</strong>: 昼（L3 / standard）は 16-4d（2026-08-24）で当分停止中のため、<strong>補充せず既存在庫を凍結扱いにする</strong>（在庫確認クエリの L3 / standard 行は補充判断に使わない。経緯・凍結範囲は <a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</li>
   <li><strong>在庫確認クエリ（16-3b 拡張版）</strong>（週次の補充判断・投入確認・ビルド漏れ検出に使う。<code>unbuilt</code> 列は V006 適用後）:
 <pre><code>SELECT quiz_type, difficulty,
        SUM(last_used_at IS NULL AND video_s3_key IS NOT NULL) AS unused_built, -- 出題可能な未使用在庫

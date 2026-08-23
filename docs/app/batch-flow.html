@@ -153,7 +153,7 @@
     <tr>
       <td><code>quiz-prebuilt</code></td>
       <td>クイズ動画の<strong>事前生成方式</strong>。イラスト（imagegen）〜動画（gpt-quiz-multicut のレンダラー流用）を事前にローカルでビルドし、全数人間レビューのうえ S3（ライフサイクル対象外の <code>assets/.../prebuilt/</code>）に作り置く。実行時は問題ストック（<code>quiz_stock_items</code>）のビルド済み行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・組版・動画合成を実行時に使わない</strong>）。<code>quiz_items</code> 記録・キャプション展開・ストーリーズ再掲は gpt-quiz-multicut と同一。<code>parameters</code> 互換のため切替は <code>batch_sets.generator_name</code> の UPDATE のみ</td>
-      <td>採用中（<strong>16-3b で設計 Fix</strong>〔2026-08-08 の仕様変更 = development-plan.md Phase 16 冒頭〕→ 16-3c 実装 → 16-3d 初期 42 問ビルド → <strong>16-4（2026-08-08）で logic-training-1 が切替・定常運用中</strong>。16-4b でバウンド演出・見切れ解消を反映し 42 本を再ビルド）</td>
+      <td>採用中（<strong>16-3b で設計 Fix</strong>〔2026-08-08 の仕様変更 = development-plan.md Phase 16 冒頭〕→ 16-3c 実装 → 16-3d 初期 42 問ビルド → <strong>16-4（2026-08-08）で logic-training-1 が切替・定常運用中</strong>。16-4b でバウンド演出・見切れ解消を反映し 42 本を再ビルド。16-4d〔2026-08-24〕で昼スロットを当分停止 = 朝・夜の 1 日 2 回で運用中〔<a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>〕）</td>
       <td><a href="generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>（16-3b で作成）</td>
     </tr>
     <tr>

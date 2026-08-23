@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 脳みそコーチのロジトレ</nav>
 <h1>セット別設計書: 脳みそコーチのロジトレ</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（15-13 で作成・16-1 / 16-2b / 16-3b / 16-4b で改訂）</span>
+  <span class="badge badge-fixed">Fix（15-13 で作成・16-1 / 16-2b / 16-3b / 16-4b / 16-4d で改訂）</span>
   <span>set_code: logic-training-1</span>
-  <span>最終更新: 2026-08-09</span>
+  <span>最終更新: 2026-08-24</span>
 </div>
 
 <div class="note">
@@ -26,14 +26,19 @@
   本書は 16-1（スキップ率 95% テコ入れの設計 Fix。2026-08-01）と 16-3b（動画事前生成方式への転換設計 Fix。2026-08-08）を反映した<strong>目標設計</strong>を記述している。実装は 16-3c、初期 42 問の動画ビルド・S3 配置は 16-3d、キャプションテンプレート差し替え・<code>generator_name</code> 切替・生成スケジュール再開は <strong>16-4（2026-08-08）で完了し、本設計での定常運用中</strong>（切替日 = 前後比較の基準点）。16-4b（2026-08-09）でフォーマット改善（バウンド演出・イラスト見切れ解消）を反映し、42 本を再ビルド・差し替え済み。テコ入れの経緯と方針 4 点・転換の経緯は <a href="../../development-plan.md">development-plan.md</a> Phase 16 冒頭を参照。
 </div>
 
+<div class="warn" id="noon-suspended">
+  <span class="callout-title">昼スロット（noon = L3 フェルミ推定）は 16-4d（2026-08-24）で当分停止中</span>
+  ユーザー決定。理由: ①昼のスキップ率が高止まりで改善しない ②改めて問題を見ても魅力を感じない ③魅力を感じない投稿が定期的に混ざるとフォロワーが増えない。現在の投稿は<strong>朝・夜の 1 日 2 回</strong>。<strong>廃止ではなく当分停止</strong>で、止めたのは Scheduler <code>acps-prod-image-generation-logic-training-1-noon</code>（DISABLED。CDK の <code>enabled: false</code> も反映済みで deploy では戻らない）のみ。以下は<strong>残置・凍結</strong>する: noon のスロット定義（<code>prompt_configs.parameters.slots</code>）・問題ストック（L3 / standard の未使用在庫・ビルド済み動画・S3 実体）・BGM（<code>audio/logic-training-1/noon/track01.m4a</code>）・コード側の <code>SLOT_PALETTES</code> 等。<strong>停止中は補充も行わない</strong>（<a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a> / スキル <code>/quiz-stock-replenish</code> に反映済み）。再開時は Scheduler を ENABLED（CDK の <code>enabled</code> を戻して deploy）へ戻し、補充対象に復帰させる。
+</div>
+
 <h2>1. テーマ</h2>
-<p><strong>社会人向けロジカルトレーニング</strong>（15-2 決定）。日本の社会人の日常を題材にした<strong>クイズ形式の縦型ショート動画</strong>を 1 日 3 回投稿する。世界観は「毎日 3 分の頭の体操ジム」で、進行役として脳のマスコット<strong>「脳みそコーチ」</strong>（ヘッドバンド + ホイッスル + 力こぶ / フラットベクター・ネイビー × アンバー）が全カットに登場する。</p>
+<p><strong>社会人向けロジカルトレーニング</strong>（15-2 決定）。日本の社会人の日常を題材にした<strong>クイズ形式の縦型ショート動画</strong>を 1 日 3 回投稿する（<strong>16-4d で昼スロットを当分停止中のため、現在は朝・夜の 1 日 2 回</strong>。冒頭の注記を参照）。世界観は「毎日 3 分の頭の体操ジム」で、進行役として脳のマスコット<strong>「脳みそコーチ」</strong>（ヘッドバンド + ホイッスル + 力こぶ / フラットベクター・ネイビー × アンバー）が全カットに登場する。</p>
 <p>出題は 2 種類（<code>parameters.slots</code> の <code>quiz_type</code> で時間帯ごとに固定）。出題は<strong>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>）からの取得のみ</strong>で、誤答リスクは投入時のレビューで担保する（16-1 でストックのみ方式へ転換。調達・投入の運用は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）。</p>
 <div class="table-wrap">
 <table>
 <tr><th>タイプ</th><th>内容</th><th>誤答リスク対策</th></tr>
 <tr><td><code>L1</code></td><td>なぞなぞ・とんち（light = 定番なぞなぞ・言葉あそび / deep = とんち・水平思考・ひっかけの古典。16-2 の初期整備で「論理パズル」から改訂 — 広く流布した古典のみを扱い、コメント誘発と「そうきたか」の読後感を優先する）</td><td>投入時の人間レビュー（16-1〜。旧: DSL 全列挙 + 独立 LLM 検証 = 休止）</td></tr>
-<tr><td><code>L3</code></td><td>フェルミ推定（答えは「約〇〇（目安）」の幅で示す）</td><td>投入時の人間レビュー（16-1〜。旧: 独立 LLM 推定とのオーダー一致検証 = 休止）。断定表現の禁止は執筆ガイドとして維持</td></tr>
+<tr><td><code>L3</code></td><td>フェルミ推定（答えは「約〇〇（目安）」の幅で示す）。<strong>16-4d で昼スロットごと当分停止中</strong>（現在は出題されない。ストックは凍結・残置）</td><td>投入時の人間レビュー（16-1〜。旧: 独立 LLM 推定とのオーダー一致検証 = 休止）。断定表現の禁止は執筆ガイドとして維持</td></tr>
 </table>
 </div>
 <p>動画構成は <strong>16 秒・3 カット</strong>（導入 8 秒〔固定吹き出し「わかったらコメントしてくれ！」〕→ カウントダウン 5 秒〔1 秒 × 5 枚・吹き出しは動的ヒント <code>hint</code>〕→ 誘導 3 秒。16-4c でカット 1「つかみ」とカット 2「考える」を導入 8 秒へ統合し、全体ズームを廃止）。<strong>版面は全カット固定</strong>で問題文と<strong>つかみ帯</strong>（スロット別の <code>slot_hook</code>）が 1 フレーム目から表示され、<strong>答え・解説は動画に載せずキャプションで開示</strong>する（16-1 テコ入れ）。動画の作りは方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。<strong>16-3b の転換により動画は実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く</strong>（実行時方式は <a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>。ビルド運用は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a>）。16-4b（2026-08-09）で<strong>コーチ + 吹き出しのバウンド演出</strong>（ヒント登場・答え誘導の 2 箇所で大きく弾ませ既存 SE と同期。視線誘導の改善）と<strong>イラスト見切れの解消</strong>（比率を保った内接 + 3:2 生成のプロンプト明示）を追加し、既存 42 本を再ビルドで差し替えた（<a href="../generators/gpt-quiz-multicut.html#bounce">方式設計書セクション 9.1</a> と同 8.2 の 16-4b decision）。</p>
@@ -58,13 +63,13 @@
 </div>
 
 <h2>3. スケジュール（投稿頻度）</h2>
-<p><strong>1 日 3 回（朝 7:30 / 昼 12:30 / 夜 21:00 JST）</strong>。15-4 の決定（目安）を <strong>15-15 でこの時刻に最終確定</strong>し、スロットごとに Scheduler を 1 件ずつ（計 3 件）追加して ENABLED 化した（ユーザー決定）。コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
+<p><strong>1 日 3 回（朝 7:30 / 昼 12:30 / 夜 21:00 JST）</strong>。15-4 の決定（目安）を <strong>15-15 でこの時刻に最終確定</strong>し、スロットごとに Scheduler を 1 件ずつ（計 3 件）追加して ENABLED 化した（ユーザー決定）。<strong>16-4d（2026-08-24）で昼の Scheduler を DISABLED 化し、現在は朝・夜の 1 日 2 回</strong>（冒頭の注記を参照）。コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
 <p>どのスロットとして生成するかは<strong>実行時刻（<code>SCHEDULED_AT</code> の JST 時）から決定的に解決</strong>する。<code>parameters.slots</code> の <code>from_jst_hour</code> の境界と、対応する Scheduler は以下（早朝の巻き戻しを含む解決規則は方式側の実装による）。</p>
 <div class="table-wrap">
 <table>
 <tr><th><code>slot_code</code></th><th>適用時間帯（JST）</th><th>投稿時刻</th><th>Scheduler 名 / cron 式</th><th><code>quiz_type</code> / <code>difficulty</code></th><th><code>slot_label</code></th><th><code>slot_hook</code>（16-4c）</th></tr>
 <tr><td><code>morning</code></td><td>4:00〜10:59</td><td>7:30</td><td><code>acps-prod-image-generation-logic-training-1-morning</code><br><code>cron(30 7 * * ? *)</code></td><td>L1 / light</td><td>朝の脳みそトレ</td><td>30秒で解けたら天才</td></tr>
-<tr><td><code>noon</code></td><td>11:00〜16:59</td><td>12:30</td><td><code>acps-prod-image-generation-logic-training-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td>L3 / standard</td><td>昼の脳みそトレ</td><td>30秒で解けたら天才</td></tr>
+<tr><td><code>noon</code></td><td>11:00〜16:59</td><td>12:30（<strong>16-4d で当分停止中 = Scheduler DISABLED</strong>）</td><td><code>acps-prod-image-generation-logic-training-1-noon</code><br><code>cron(30 12 * * ? *)</code></td><td>L3 / standard</td><td>昼の脳みそトレ</td><td>30秒で解けたら天才</td></tr>
 <tr><td><code>night</code></td><td>17:00〜3:59</td><td>21:00</td><td><code>acps-prod-image-generation-logic-training-1-night</code><br><code>cron(0 21 * * ? *)</code></td><td>L1 / deep</td><td>夜の脳みそトレ</td><td>1％の人だけが30秒で解ける</td></tr>
 </table>
 </div>
