@@ -272,7 +272,7 @@ def build_review_html(items_and_data: list[tuple[dict[str, Any], dict[str, Any]]
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>都道府県ランキングストック 初期投入レビュー（第 1 バッチ 10 件）</title>
+<title>都道府県ランキングストック 初期投入レビュー（第 2 バッチ 4 件 / 17-5a）</title>
 <style>
 :root {{
   --page: #f6f4ef;
@@ -367,7 +367,7 @@ pre {{ white-space: pre-wrap; overflow-wrap: anywhere; background: var(--code); 
 <body>
 <main>
 <header class="lead">
-<h1>都道府県ランキングストック 初期投入レビュー（第 1 バッチ 10 件）</h1>
+<h1>都道府県ランキングストック 初期投入レビュー（第 2 バッチ 4 件 / 17-5a）</h1>
 <p>承認後に Claude がローカル MySQL と Aurora へ INSERT します。</p>
 <h2>レビュー観点</h2>
 <ol>
@@ -580,8 +580,8 @@ def build_sql(items_and_data: list[tuple[dict[str, Any], dict[str, Any]]]) -> st
     Returns:
         Complete SQL text.
     """
-    header = """-- 都道府県ランキングストック初期投入（10 件。レビュー承認後に実行）
--- 生成元: content/ranking-stock/pref-ranking-1/2026-08-initial/stock_items.py（単一ソース）
+    header = """-- 都道府県ランキングストック初期投入 第 2 バッチ（4 件。レビュー承認後に実行）
+-- 生成元: content/ranking-stock/pref-ranking-1/2026-08-initial-2/stock_items.py（単一ソース）
 -- 適用先: ローカル MySQL / Aurora(acps)
 -- set_id は set_code から解決するため両環境共通で実行できる。
 -- content_key はセット内一意のため、二重投入はユニークキー違反で落ちる（安全側）。

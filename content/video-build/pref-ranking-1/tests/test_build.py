@@ -6,6 +6,7 @@ import pytest
 
 from build import (
     PropsValidationError,
+    _parser,
     build_props,
     resolve_bgm_source,
     validate_props_input,
@@ -76,6 +77,13 @@ def test_resolve_bgm_source_keeps_rebuild_behavior() -> None:
     assert resolve_bgm_source({"video_audio_asset_id": 9}, rebuild=True) == 9
     with pytest.raises(ValueError, match="video_audio_asset_id が NULL"):
         resolve_bgm_source({"video_audio_asset_id": None}, rebuild=True)
+
+
+def test_duration_option_defaults_to_30s_and_keeps_20s_available() -> None:
+    parser = _parser()
+
+    assert parser.parse_args([]).durations == ("30s",)
+    assert parser.parse_args(["--durations", "20s"]).durations == ("20s",)
 
 
 def test_build_props_resolves_entries_cues_and_assets() -> None:

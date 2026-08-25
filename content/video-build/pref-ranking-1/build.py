@@ -352,8 +352,8 @@ def _parser() -> argparse.ArgumentParser:
         help="ビルド済み尺を既存 BGM のまま再ビルドする",
     )
     parser.add_argument(
-        "--durations", type=_parse_durations, default=DURATIONS,
-        help="対象尺（既定: 20s,30s）",
+        "--durations", type=_parse_durations, default=("30s",),
+        help="対象尺（既定: 30s）",
     )
     parser.add_argument(
         "--content-key", action="append", dest="content_keys",

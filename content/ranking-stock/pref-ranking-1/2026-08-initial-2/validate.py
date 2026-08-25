@@ -1,4 +1,4 @@
-"""Validate the initial prefecture-ranking stock batch.
+"""Validate the second prefecture-ranking stock batch (17-5a, 30s only).
 
 This module is intentionally dependency-free so it can be run before review
 and imported by ``generate.py``.
@@ -389,8 +389,11 @@ def validate_items(
         _validate_full_ranking(identifier, data, errors)
         _validate_narration(identifier, item.get("narration"), entries, errors)
 
-    if sorted(item_numbers) != list(range(1, len(items) + 1)):
-        errors.append("no values must be consecutive from 001")
+    # 第 2 バッチ以降はセット通し番号（011〜）のため、先頭番号からの連番を検査する
+    if item_numbers:
+        start = min(item_numbers)
+        if sorted(item_numbers) != list(range(start, start + len(items))):
+            errors.append("no values must be consecutive")
     return errors
 
 
