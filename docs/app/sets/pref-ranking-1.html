@@ -109,6 +109,7 @@ VOICEVOX:白上虎太郎
   <li><strong>文体は表彰台五郎の一人称（17-3 決定）</strong>: <code>hook</code> も <code>trivia</code> も、五郎が話しているタメ口の実況調で書く（「〜だぞ！」「〜なんだなあ！」）。アカウント表示名が「表彰台五郎の都道府県ランキング」であり、動画のナレーションも五郎の声であるため、キャプションだけ中立の解説調にすると書き手が入れ替わって見える。<strong>数値・出典は動かさない</strong>（口調を変えても数字と単位は原文どおり書く）。信頼性は直下の <code>{{source_display}}</code> 行が担保する。<strong>下位順位への言及は文体を問わず禁止</strong>（セクション 2 のネタ選定基準）</li>
   <li>ハッシュタグは固定（動的タグは使わない。logic-training-1 と同じ判断）</li>
   <li><strong>ストーリーズ投稿にはキャプションを付けない</strong>（Graph API の制約。<code>posts</code> のストーリーズ行はキャプション系カラム NULL のまま）。クレジット表記はリール本体のキャプションで担保される（ストーリーズは同一動画の再掲でありリールへの導線が残る）</li>
+  <li><strong>登録済み（2026-08-26、17-5b）</strong>: 上記の構成要素のまま、可読性のため <code>{{trivia}}</code>・出典行・クレジット行の前に空行を 1 行ずつ入れて登録した（logic-training-1 のテンプレートと同じ間の取り方）。実文言の正は DB の <code>caption_templates</code> で、投入 SQL は <code>content/ranking-stock/pref-ranking-1/set-registration/01_prompt_caption.sql</code></li>
 </ul>
 
 <h2 id="audio">6. 音源の構成</h2>
@@ -121,6 +122,10 @@ VOICEVOX:白上虎太郎
 <div class="decision">
   <span class="callout-title">決定（2026-08-11、17-4d）: ミキシングの値（実測校正）</span>
   <strong>BGM はナレーションの 18 LU 下・ダッキングなし</strong>（頭 0.5 秒フェードイン / 尻 1.5 秒フェードアウト、曲が尺より短いときはループ）。ナレーションがほぼ全編を占めるため、ダッキングを入れても常時作動して定常減衰と変わらないと判断した。ゲイン定数は <code>remotion/src/audio.ts</code> が正。<strong>配信レベル（絶対的なラウドネス）はコンポジションでは決めず、レンダリング後の ffmpeg <code>loudnorm</code>（<code>remotion/scripts/normalize_loudness.py</code>。目標 I = -14 LUFS / TP = -1.5 dBTP）で揃える</strong>。根拠と実測値は<a href="../generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3 の decision（17-4d）</a>。
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-26、17-5b）: BGM 素材の前処理仕様（共通ルールからの差分）</span>
+  本セットの BGM 素材は <strong>30 秒ちょうど（動画と同尺）に切り出し、フェードは焼き込まない</strong>。ラウドネスは共通ルールどおり 2 パス <code>loudnorm</code>（linear）で I = -14 LUFS / TP = -1.5 dBTP に揃える。理由: ①コンポジションは曲が尺より短いとループするため、30 秒未満の素材だと動画内でループの継ぎ目が鳴る ②フェードは上記 decision（17-4d）のとおりコンポジション側が頭 0.5 秒 / 尻 1.5 秒で掛けるため、素材にも焼くと二重に掛かる ③ミキシングゲイン <code>BGM_GAIN</code> は -13.8 LUFS の音源で校正した値で、素材のラウドネスがばらつくと曲ごとに BGM の音量が変わる。前処理・S3 キー・<code>audio_assets</code> 登録 SQL の生成は専用ツール <code>content/video-build/pref-ranking-1/prepare_bgm.py</code> が行う（<a href="../operation.html#audio-mgmt">operation.html セクション 3</a> の共通手順 2〜4 の本セット版）。
 </div>
 
 <h2 id="tts">7. ナレーション・TTS（VOICEVOX 白上虎太郎）</h2>

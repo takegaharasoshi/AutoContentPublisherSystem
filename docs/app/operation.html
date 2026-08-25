@@ -279,6 +279,11 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   </ul>
 </div>
 
+<div class="note">
+  <span class="callout-title">ランキング方式（<code>ranking-prebuilt</code> / <code>pref-ranking-1</code>）の前処理は上記と 2 点違う（17-5b）</span>
+  ①<strong>尺は 30 秒ちょうど</strong>（動画と同尺。コンポジションは曲が短いとループするため、30 秒未満だと動画内でループの継ぎ目が鳴る）②<strong>フェードは焼き込まない</strong>（頭 0.5 秒 / 尻 1.5 秒のフェードはコンポジション側が掛けるため、素材にも焼くと二重に掛かる）。ラウドネスの 2 パス方式（I = -14 LUFS）と AAC 化は共通ルールどおり。手順 2〜4（切り出し・正規化・S3 キーの決定・<code>audio_assets</code> 登録 SQL の生成）は専用ツール <code>content/video-build/pref-ranking-1/prepare_bgm.py</code> がまとめて行う（証跡 3 点は <code>work/bgm/tracks.json</code> に書けば SQL に転記される）。理由の詳細は<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6</a>。
+</div>
+
 <h4>手順 3: S3 への配置</h4>
 <pre><code>aws s3 cp track01.m4a s3://acps-prod-images-{アカウントID}/audio/{set_code}/track01.m4a</code></pre>
 <p><code>audio/</code> プレフィックスは 30 日ライフサイクルの対象外（Phase 14-6 で <code>images/</code>・<code>videos/</code> のプレフィックス限定へ変更済み。<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a>）。時間帯で BGM を出し分けるセット（<code>logic-training-1</code>）は <code>audio/{set_code}/{morning|noon|night}/track01.m4a</code> のスロット別プレフィックスに置く（<a href="data-model.html#s3-key">data-model.html セクション 5</a>）。</p>

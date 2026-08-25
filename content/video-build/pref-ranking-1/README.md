@@ -34,6 +34,19 @@ VOICEVOX Engine は別ターミナルで起動したままにします。既定�
 docker run --rm -p 50021:50021 voicevox/voicevox_engine:cpu-ubuntu20.04-latest
 ```
 
+## BGM の調達・前処理（セット立ち上げ時と曲の追加時だけ）
+
+`prepare_bgm.py` が「切り出し → 2 パス loudnorm → AAC 化 → 登録 SQL の生成」を行います。前処理の仕様（30 秒ちょうど・フェードは焼かない・I=-14 LUFS）とその理由はスクリプトの docstring、運用ルールは `docs/app/operation.html` セクション 3 を参照してください。
+
+```bash
+cd content/video-build/pref-ranking-1
+python prepare_bgm.py --init          # work/bgm/tracks.json の雛形
+# work/bgm/source/ に原曲を置き、tracks.json に file / start / 証跡 3 点を書く
+python prepare_bgm.py                 # work/bgm/out/trackNN.m4a + 登録 SQL
+```
+
+`start` は曲のサビ・盛り上がりの開始位置（秒）です。出力の実測ラウドネスと尺が 1 曲ずつ表示されるので、`I` が -14 LUFS 付近か、尺が 30.00s かを確認します。登録 SQL は `content/ranking-stock/pref-ranking-1/set-registration/03_audio_assets.sql` に書き出され、証跡 3 点（出典 URL・ライセンス種別・取得日）はこの SQL 経由で `audio_assets` に入ります。試聴後に S3 の `audio/pref-ranking-1/` へ配置し、SQL を両環境へ適用してください（コマンドは実行後に表示されます）。
+
 ## 工程 1: 対象抽出
 
 未ビルド尺を一覧します。`20s` / `30s` のうち DB の S3 キーが NULL の尺だけが表示されます。
