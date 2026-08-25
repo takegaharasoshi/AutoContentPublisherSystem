@@ -113,7 +113,7 @@ VOICEVOX:白上虎太郎
 </ul>
 
 <h2 id="audio">6. 音源の構成</h2>
-<p>BGM は<strong>スロット共通の汎用曲 3〜5 曲</strong>を <code>audio_assets</code>（<code>time_slot = NULL</code> / <code>asset_type='bgm'</code>）に登録する（調達・前処理・証跡は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a> の共通ルール。S3 キーは <code>audio/pref-ranking-1/{ファイル名}.m4a</code>。調達は 17-5）。選曲はビルド時の LRU ローテーション（1 ネタ 1 曲〔尺を問わず共通〕・<code>video_audio_asset_id</code> に記録 = <a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 工程 3</a>）。<strong>実行時は <code>audio_assets</code> を使わない</strong>。</p>
+<p>BGM は<strong>スロット共通の汎用曲</strong>を <code>audio_assets</code>（<code>time_slot = NULL</code> / <code>asset_type='bgm'</code>）に登録する（調達・前処理・証跡は <a href="../operation.html#audio-mgmt">operation.html セクション 3</a> の共通ルール。S3 キーは <code>audio/pref-ranking-1/{ファイル名}.m4a</code>。調達は 17-5b で実施 = 下記 decision）。選曲はビルド時の LRU ローテーション（1 ネタ 1 曲〔尺を問わず共通〕・<code>video_audio_asset_id</code> に記録 = <a href="../generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 工程 3</a>）。<strong>実行時は <code>audio_assets</code> を使わない</strong>。</p>
 <div class="decision">
   <span class="callout-title">決定（17-2 巡 3、設計者判断）: SE は初期構成では使わない</span>
   クイズ方式の SE 2 種（カウントダウン・チャイム）に相当する効果音は初期構成に含めない。<strong>スピン停止・1 位発表の強調は映像演出（停止フラッシュ・バースト・キャラのポーズ切替）とナレーションの実況が担う</strong>ため。ナレーション + BGM + SE の 3 層は音のミキシング調整コストも上がる。17-4 の実装・レビューで「発表の瞬間に音の区切りが欲しい」と判明した場合は、quiz 前例の <code>asset_type='se'</code> + 固定ファイル名方式で追加する（構造は既存のまま使える）。
@@ -125,7 +125,15 @@ VOICEVOX:白上虎太郎
 </div>
 <div class="decision">
   <span class="callout-title">決定（2026-08-26、17-5b）: BGM 素材の前処理仕様（共通ルールからの差分）</span>
-  本セットの BGM 素材は <strong>30 秒ちょうど（動画と同尺）に切り出し、フェードは焼き込まない</strong>。ラウドネスは共通ルールどおり 2 パス <code>loudnorm</code>（linear）で I = -14 LUFS / TP = -1.5 dBTP に揃える。理由: ①コンポジションは曲が尺より短いとループするため、30 秒未満の素材だと動画内でループの継ぎ目が鳴る ②フェードは上記 decision（17-4d）のとおりコンポジション側が頭 0.5 秒 / 尻 1.5 秒で掛けるため、素材にも焼くと二重に掛かる ③ミキシングゲイン <code>BGM_GAIN</code> は -13.8 LUFS の音源で校正した値で、素材のラウドネスがばらつくと曲ごとに BGM の音量が変わる。前処理・S3 キー・<code>audio_assets</code> 登録 SQL の生成は専用ツール <code>content/video-build/pref-ranking-1/prepare_bgm.py</code> が行う（<a href="../operation.html#audio-mgmt">operation.html セクション 3</a> の共通手順 2〜4 の本セット版）。
+  本セットの BGM 素材は <strong>30 秒ちょうど（動画と同尺）に切り出し、フェードは焼き込まない</strong>（曲数は下記 decision のとおり 1 曲）。ラウドネスは共通ルールどおり 2 パス <code>loudnorm</code>（linear）で I = -14 LUFS / TP = -1.5 dBTP に揃える。理由: ①コンポジションは曲が尺より短いとループするため、30 秒未満の素材だと動画内でループの継ぎ目が鳴る ②フェードは上記 decision（17-4d）のとおりコンポジション側が頭 0.5 秒 / 尻 1.5 秒で掛けるため、素材にも焼くと二重に掛かる ③ミキシングゲイン <code>BGM_GAIN</code> は -13.8 LUFS の音源で校正した値で、素材のラウドネスがばらつくと曲ごとに BGM の音量が変わる。前処理・S3 キー・<code>audio_assets</code> 登録 SQL の生成は専用ツール <code>content/video-build/pref-ranking-1/prepare_bgm.py</code> が行う（<a href="../operation.html#audio-mgmt">operation.html セクション 3</a> の共通手順 2〜4 の本セット版）。
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-26、17-5b、ユーザー判断）: BGM は 1 曲運用（共通ルールの 3〜5 曲に対する差分）</span>
+  <strong>全ネタで同じ 1 曲を使う</strong>。理由は<strong>セットとしての世界観をそろえる</strong>ため（毎日 1 投稿・同じキャラの実況という構成上、曲が入れ替わるとシリーズとしての手触りが散る）。登録曲は「Japan Instrumental Background Music」（Tunetank / Pixabay Content License・クレジット不要。証跡は <code>audio_assets</code> の各カラム）。LRU 選曲の機構はそのままで、常に同じ 1 曲が選ばれる。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>影響範囲の申し送り</strong>: BGM は動画にベイクされるため、この 1 曲がミュート検知（<a href="../operation.html#mute-check">operation.html セクション 4.4</a>）にかかった場合、<strong>在庫の全本が同時に影響を受け、差し替えには全本の再ビルドが要る</strong>（<code>--rebuild</code>。<a href="../generators/ranking-prebuilt.html#rebuild">方式設計書セクション 8.4</a>）。登録曲は Pixabay の配布ページに Content ID Registered の表示があるため、この確認は毎週きちんと回す</li>
+    <li>曲を増やす場合は <code>audio_assets</code> へ INSERT するだけでよい（未使用曲が LRU の先頭に来る）。ただし<strong>既ビルド分の BGM は変わらない</strong>ため、統一したい場合は再ビルドが必要</li>
+  </ul>
 </div>
 
 <h2 id="tts">7. ナレーション・TTS（VOICEVOX 白上虎太郎）</h2>

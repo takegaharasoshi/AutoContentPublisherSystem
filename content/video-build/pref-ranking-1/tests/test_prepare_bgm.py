@@ -40,24 +40,30 @@ def test_validate_manifest_fills_output_names() -> None:
     assert tracks[0]["license_note"] is None
 
 
-def test_validate_manifest_rejects_track_count_outside_three_to_five() -> None:
-    with pytest.raises(ManifestError, match="3〜5 曲"):
-        validate_manifest([_entry(), _entry()])
-    with pytest.raises(ManifestError, match="3〜5 曲"):
+def test_validate_manifest_accepts_a_single_track() -> None:
+    tracks = validate_manifest([_entry()])
+
+    assert [track["output"] for track in tracks] == ["track01.m4a"]
+
+
+def test_validate_manifest_rejects_empty_and_more_than_five_tracks() -> None:
+    with pytest.raises(ManifestError, match="1 件以上"):
+        validate_manifest([])
+    with pytest.raises(ManifestError, match="5 曲まで"):
         validate_manifest([_entry() for _ in range(6)])
 
 
 def test_validate_manifest_rejects_non_commercial_license() -> None:
     with pytest.raises(ManifestError, match="非商用"):
         validate_manifest(
-            [_entry(license_type="CC BY-NC 4.0"), _entry(), _entry()]
+            [_entry(license_type="CC BY-NC 4.0")]
         )
 
 
 def test_validate_manifest_warns_on_credit_required_license(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    validate_manifest([_entry(license_type="CC BY 4.0"), _entry(), _entry()])
+    validate_manifest([_entry(license_type="CC BY 4.0")])
 
     assert "クレジット表記" in capsys.readouterr().err
 

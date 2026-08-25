@@ -14,6 +14,8 @@ docs/app/sets/pref-ranking-1.html セクション 6 が正。
 * ラウドネスは共通ルールどおり 2 パス loudnorm（linear）で I=-14 LUFS に揃える。
   ミキシングゲイン ``BGM_GAIN`` は -13.8 LUFS の音源で校正した値のため、
   この基準から外れた素材を混ぜると曲ごとに BGM の音量が変わる。
+* **曲数は 1〜5 曲**（共通ルールの 3〜5 曲に対する差分）。本セットは世界観を
+  そろえるため 1 曲運用とした（17-5b のユーザー判断。セット別設計書セクション 6）。
 
 ffmpeg は WSL ホストに無いため、既定では image-batch イメージの中で実行する
 （build.py のラウドネス正規化と同じ方式）。
@@ -97,9 +99,9 @@ def validate_manifest(entries: object) -> list[dict[str, object]]:
     """
     if not isinstance(entries, list) or not entries:
         raise ManifestError("tracks.json は 1 件以上の配列である必要があります")
-    if not 3 <= len(entries) <= 5:
+    if len(entries) > 5:
         raise ManifestError(
-            f"BGM は 3〜5 曲で登録します（現在 {len(entries)} 件）。"
+            f"BGM は 5 曲までで登録します（現在 {len(entries)} 件）。"
             "docs/app/operation.html セクション 3"
         )
 

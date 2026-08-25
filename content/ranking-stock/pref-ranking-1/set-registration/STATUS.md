@@ -10,8 +10,8 @@
 | 1 | `prompt_configs` + `caption_templates` | [01_prompt_caption.sql](01_prompt_caption.sql) | **完了（2026-08-26）**。両環境へ適用済み。`caption_templates.template_text` の MD5 `d861cebf75c7ff0f49c89b83a321c9de` が両環境で一致 |
 | 2 | Instagram アカウント開設 + Secret 作成 | （ユーザー作業。operation.html セクション 5.1） | 未 |
 | 3 | `sns_accounts` | [02_sns_account.sql](02_sns_account.sql) | 未（**Secret 作成後に適用する**） |
-| 4 | BGM 調達・前処理・S3 配置 | `content/video-build/pref-ranking-1/prepare_bgm.py` | 未 |
-| 5 | `audio_assets` | `03_audio_assets.sql`（`prepare_bgm.py` が生成） | 未 |
+| 4 | BGM 調達・前処理・S3 配置 | `content/video-build/pref-ranking-1/prepare_bgm.py` | **完了（2026-08-26）**。1 曲運用（世界観の統一。設計書セクション 6 の decision）。`s3://acps-prod-images-516964473143/audio/pref-ranking-1/track01.m4a`（30.00s / I=-13.9 LUFS / TP=-0.9 dBFS） |
+| 5 | `audio_assets` | [03_audio_assets.sql](03_audio_assets.sql) | **完了（2026-08-26）**。両環境へ適用済み。証跡込みの MD5 `3d51f701d1d93b0c5aa413ade1f81391` が両環境で一致 |
 
 Scheduler 追加（画像生成 1 件 + インサイト収集 2 件）・バックログ 0 件確認・手動実行確認は 17-5c。
 
