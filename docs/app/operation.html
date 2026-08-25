@@ -180,7 +180,7 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
   <span class="callout-title">セット追加チェックリスト</span>
   <ul style="margin:.3rem 0 0;">
     <li>セット別設計書（<code>docs/app/sets/&lt;set_code&gt;.html</code>）を作成した</li>
-    <li>Secrets Manager に <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> を作成した（DB 登録より先）</li>
+    <li>Secrets Manager に <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> を作成し、<strong>セクション 5.1 手順 7 で検証した</strong>（DB 登録より先。<code>ig_user_id</code> が新セットのアカウントを指しているか・スコープに <code>instagram_manage_insights</code> があるか）</li>
     <li><code>batch_sets</code> → <code>prompt_configs</code> → <code>caption_templates</code> → <code>sns_accounts</code>（→ 動画方式のセットは <code>audio_assets</code>）の順に DB へ登録した</li>
     <li>キャプションテンプレートに AI 開示ハッシュタグ <code>#AIart</code> を含めた（セクション 3）</li>
     <li>動画方式のセットは、前処理済み音源（3〜5 曲）を S3 の <code>audio/{set_code}/</code> に配置し、証跡（出典 URL・ライセンス種別・取得日）込みで <code>audio_assets</code> に登録した（セクション 3）</li>
@@ -651,6 +651,28 @@ WHERE video_audio_asset_id = :audio_asset_id AND is_active = 1;</code></pre>
   </li>
 </ol>
 <p>作り直す場合は <code>aws secretsmanager delete-secret --region ap-northeast-1 --secret-id &lt;名前&gt; --force-delete-without-recovery</code> で即時削除してからやり直す。</p>
+
+<h4>手順 7: 作成した Secret を検証する（17-5b 新設。DB 登録より前に行う）</h4>
+<p>Secret の値は目視できないため、<strong>投稿バッチを動かす前に「トークンが有効か」「<code>ig_user_id</code> が本当に新アカウントを指しているか」を機械的に確認する</strong>。値を出力しない形で実行できる（下記は日付・ユーザーネームだけを表示する）。</p>
+<pre><code>aws secretsmanager get-secret-value --region ap-northeast-1 --secret-id &lt;Secret 名&gt; \
+  --query SecretString --output text | python3 -c "
+import sys, json, urllib.request, datetime
+d = json.load(sys.stdin); t = d['access_token']; ig = str(d['ig_user_id'])
+b = json.load(urllib.request.urlopen('https://graph.facebook.com/v21.0/debug_token?input_token=%s&amp;access_token=%s' % (t, t)))['data']
+f = lambda x: datetime.datetime.fromtimestamp(x, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ') if x else 'never'
+print('valid=%s expires_at=%s data_access=%s' % (b.get('is_valid'), f(b.get('expires_at')), f(b.get('data_access_expires_at'))))
+print('scopes =', ','.join(sorted(b.get('scopes', []))))
+a = json.load(urllib.request.urlopen('https://graph.facebook.com/v21.0/%s?fields=username,media_count&amp;access_token=%s' % (ig, t)))
+print('ig_user_id -&gt; username=%s media_count=%s' % (a.get('username'), a.get('media_count')))"</code></pre>
+<ul>
+  <li><code>username</code> が<strong>新セットのアカウント</strong>であること（新規開設直後なら <code>media_count=0</code>）。既存セットのユーザーネームが返ったら <code>ig_user_id</code> の取り違え</li>
+  <li><code>scopes</code> に <code>instagram_content_publish</code> と <code>instagram_manage_insights</code> の両方があること（後者が無いとインサイト収集が失敗する = セクション 5.4 の decision）</li>
+  <li><code>data_access</code> の値を <code>token_expires_at</code> に記録し、その 7 日前へリマインダーを更新する（セクション 5.4）</li>
+</ul>
+<div class="warn">
+  <span class="callout-title">再認可のページ選択漏れは「既存アカウントの ID が入る」形で表面化する（2026-08-26・17-5b の実例）</span>
+  17-5b では、手順 5 の再認可ポップアップで<strong>新しい Facebook ページにチェックを入れ忘れた</strong>ため <code>/me/accounts</code> に新ページが出ず、そこから引いた <code>ig_user_id</code> が<strong>既存セット（fantasy-animals-1）のアカウントを指したまま</strong> Secret に入っていた。形式（<code>17841</code> 始まりの 17 桁）は正しく、DB 登録も投稿バッチの起動も通ってしまうため、<strong>そのまま稼働すると別セットのアカウントへ投稿される</strong>。手順 7 の <code>username</code> 確認はこの取り違えを検出するためのもので、15-7 の「PAGE_ID を ig_user_id と取り違える」事象と同じ根（<code>/me/accounts</code> 周辺）から来ている。復旧は「新ページを含めて再認可 → <code>/me/accounts</code> が全ページを返すことを確認 → 対象ページの <code>instagram_business_account.id</code> で Secret を更新（<code>put-secret-value</code>。旧バージョンは残るため戻せる）」。
+</div>
 
 <h3 id="secret-final">5.2 Secret 名規約の最終確認</h3>
 <p>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2</a>）と、構成要素の意味付け（<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>）は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a>で確定済みであり、本規約に変更はない。<code>account_code</code> は Secret 名導出専用のため<strong>作成後変更不可</strong>。変更が必要な場合は新アカウント（新しい <code>account_code</code>）として追加し、旧アカウントは <code>is_active=0</code> にする。</p>

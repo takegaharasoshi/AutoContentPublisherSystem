@@ -1252,6 +1252,19 @@
 
     **(3) レビューと投入**: Claude の一次スクリーニング（011 の 2〜3 位 3 円差は trivia で「大接戦」としてネタ化・013 は 0.1pt 差 ×2・012 / 014 とも 1 位東京 + 014 は 002 / 008 と外食系出典が近接のため**投稿日を離す**申し送り）→ ユーザー全 4 件承認（指摘なし）→ ローカル MySQL（`START TRANSACTION`〜`ROLLBACK` のドライラン → 本適用）+ Aurora（Data API・resuming リトライ）へ投入し、**セット計 14 行の MD5 が両環境で全行一致**・`CHAR_LENGTH` 正常を確認。外出中レビューのため Windows 側 `tailscale serve` + WSL `http.server` で `review.html` をスマホ閲覧できるようにした（tailnet 内限定・レビュー後に閉鎖）。次は **17-5b（アカウント開設・BGM 調達・セット登録）**
 
+- [x] **17-5b** アカウント開設・BGM 調達・セット登録
+  - 備考: 2026-08-26 完了（設計判断・実装・DB 投入 = Opus 5 / BGM 候補の一次リサーチ = Codex `--search exec` 直接実行 / アカウント開設・トークン取得・音源ダウンロード = ユーザー）。要点:
+
+    **(1) DB セット登録（3 テーブル）**: `set_id` を `set_code` から解決する SQL を `content/ranking-stock/pref-ranking-1/set-registration/` に置き（環境で ID が違うため。ローカル 140 / Aurora 3）、ローカル MySQL のドライラン（`START TRANSACTION`〜`ROLLBACK`）→ 本適用 → Aurora（`common/apply_aurora.py`）の順で両環境へ投入した。`prompt_configs` は `prompt_text` 空文言 + `parameters` に単一スロット（`evening` / `from_jst_hour: 17` / `duration_seconds: 30`）、`caption_templates` はランキング系プレースホルダ 5 種 + VOICEVOX クレジット + 出典 + `#AIart`（設計の構成要素は不変。可読性のため空行を 3 か所追加）、`sns_accounts` は `main-account` / 表彰台五郎の都道府県ランキング。テキストは MD5 が両環境で一致することを確認（`d861cebf…` / `9eeb3459…`）
+
+    **(2) BGM は 1 曲運用に変更（ユーザー判断）**: 共通ルールの 3〜5 曲に対し、**セットの世界観をそろえるため全ネタで同じ 1 曲**とした。採用は「Japan Instrumental Background Music」（Tunetank / Pixabay Content License・クレジット不要）。**影響範囲の申し送り**: BGM は動画にベイクされるため、この 1 曲がミュート検知にかかると在庫全本の再ビルドが要る（配布ページに Content ID Registered 表示あり = 週次確認を確実に回す）。候補リサーチは Codex の Web 検索に委譲し、Claude が配布ページ・ライセンス条項を再検証（Codex 提案 10 件のうち OtoLogic 5 件は CC BY 4.0 = 要クレジットのため設計ルールに従い除外。DOVA-SYNDROME の規約〔商用可・クレジット不要・SNS 動画の背景利用可・音源単体配布と Content ID 登録は禁止〕も併せて確認し、次回の選択肢として記録）
+
+    **(3) BGM 前処理ツール `prepare_bgm.py` の新設**: 本セットの素材仕様は共通ルールと 2 点違う — ①**30 秒ちょうど**に切り出す（コンポジションは曲が短いとループするため、30 秒未満だと動画内で継ぎ目が鳴る）②**フェードを焼かない**（頭 0.5 秒 / 尻 1.5 秒はコンポジションが掛けるため二重になる）。ラウドネスは共通の 2 パス `loudnorm`（linear・I=-14 LUFS。`BGM_GAIN` が -13.8 LUFS の音源で校正済みのため基準を外せない）。`work/bgm/tracks.json`（証跡 3 点）→ 切り出し・正規化・AAC 化 → `03_audio_assets.sql` の生成までを 1 コマンドで行う（ffmpeg は `image-batch:ffmpeg-check` 経由）。実測 I=-13.9 LUFS / TP=-0.9 dBFS / 30.00s。pytest 13 件新規（既存 19 件と合わせて 33 件パス）
+
+    **(4) Secret の `ig_user_id` 取り違えを検出・修正 → 検証手順を新設**: 作成された Secret の `ig_user_id` が**既存セット（fantasy-animals-1）のアカウントを指していた**。原因は手順 5 の再認可ポップアップで新しい Facebook ページにチェックを入れ忘れたことで、`/me/accounts` に新ページが出ず既存アカウントの ID を拾っていた。形式（`17841` 始まり 17 桁）は正しく DB 登録も通るため、**そのまま稼働すると別セットのアカウントへ投稿される**。再認可のやり直し後、ページ ID から `instagram_business_account.id` を解決して `put-secret-value` で修正（値はチャット・シェル履歴に出さずプロセス内で完結。旧バージョンは残存）。再発防止として [operation.html](app/operation.html) セクション 5.1 に**手順 7「作成した Secret を検証する」**を新設（`debug_token` の有効性・スコープ・`ig_user_id → username` を値を出さずに確認する。セット追加チェックリストにも反映）。あわせて再認可で `data_access_expires_at` が 2026-11-08 → **2026-11-23T16:39:43Z** へ延びたため、トークン更新リマインダーを 2026-11-01 → **2026-11-16**（3 セット共通 1 件）へ更新した
+
+    次は **17-5c（背景 imagegen 14 枚 → 30 秒版 14 本のビルド → 全数レビュー → S3・DB 反映 → Scheduler 3 件追加 → 稼働開始）**
+
 
 ## 定常運用: 問題ストック補充の記録
 
