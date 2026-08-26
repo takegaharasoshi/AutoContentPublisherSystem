@@ -1265,6 +1265,23 @@
 
     次は **17-5c（背景 imagegen 14 枚 → 30 秒版 14 本のビルド → 全数レビュー → S3・DB 反映 → Scheduler 3 件追加 → 稼働開始）**
 
+- [x] **17-5c** 初期 14 ネタの 30 秒版ビルド・全数レビュー・稼働開始（17-5 完了・セット稼働開始）
+  - 備考: 2026-08-26 完了（伴走・スクリーニング・修正・稼働確認 = Opus 5 / 背景 imagegen 14 枚 = Codex 委譲 3 バッチ / 全数レビュー承認・cdk deploy = ユーザー）。要点:
+
+    **(1) 背景生成とビルド**: `export_prompts.py` で 14 件のプロンプト書き出し（既存 3 枚〔001 / 002 / 009〕も「藍」時代の生成物のため作り直し = 17-4e 決定どおり）→ Codex imagegen へ 3 バッチ委譲（941×1672。文字混入の自己確認込みで再生成計 5 回）→ Claude が 14 枚全数を目視（文字・数字の混入なし・和モダン画風・中央の版面域が空いていることを確認）→ `intake.py` 正規化（**切り捨て WARNING 0 件**）→ `build.py --dry-run` で 14 件全 cue 予算内を確認 → 本ビルド 14 本（1 本約 90 秒。BGM は全本 `audio_asset_id=74`〔ローカル〕・実測 **-15.2〜-15.8 LUFS / TP -1.5〜-1.9 dBTP**）
+
+    **(2) 一次スクリーニングで版面 blocker 2 件を発見・修正 → 14 本を同一版で再ビルド**（詳細は [ranking-prebuilt.html](app/generators/ranking-prebuilt.html) セクション 8.2 の decision〔17-5c〕）: ①**小数桁の食い違い** — `toLocaleString` が末尾 0 を落とし、013 の版面で「77.1%」と「75%」が並んだ。桁数を当該動画の 5 件から決める方式へ（円額ネタは 0 桁のまま）②**吹き出しの改行が禁則違反** — 003 で「し / っかり」と小書き仮名の前で折れた。`line-break: strict` を指定。tsc クリーン・ツーリング pytest 59 件パス。**禁則で直らない語中改行（013「日 / 本海側」）は文言側の課題**として `WRITING-NOTES.md` に執筆観点を追記し、ユーザー判断で今回は許容。010 の背景（釣り竿の斜線）もユーザー承認 → **全 14 ネタ承認**
+
+    **(3) 配置**: `publish.py`（dry-run → 本適用）で S3 へ 28 オブジェクト（mp4 14 + 背景 PNG 14）・ローカル MySQL 14 行・Aurora 14 行を反映。`video_audio_asset_id` は環境別 ID（ローカル 74 / Aurora 10）へ正しく解決されることを確認。両環境とも未ビルド 0 件
+
+    **(4) Scheduler 3 件と稼働切替**: CDK へ画像生成 `pref-ranking-1-evening`（20:00 JST）+ インサイト収集 morning / evening（06:00 / 18:00）を追加（jest 83 件パス。併せて出た差分 2 件は既知の追従 = イメージタグの CFn 整合・noon の DISABLED ドリフト吸収）→ ユーザーが deploy → `get-schedule` で 3 件の cron / State / Input を裏取り → `batch_sets.is_active = 1`（両環境）
+
+    **(5) 稼働確認の初回が失敗 — 未 push の発見**: 手動実行が `GeneratorNotFoundError: ranking-prebuilt` で失敗。原因は **origin/main が 17-2（`a449f22`）で止まっており、17-3 以降の 35 コミット（17-4f の方式モジュール実装を含む）が未 push** だったこと（稼働中イメージ = `a449f229e2a9` は 17-2 のビルド）。push 前検証: 4 スイート全パス（image-batch 124 / sns-post-batch 118 / insights-batch 54 / shared 32）・insights + shared の差分は稼働中タグ `135b5f3ef55d` と同一コミット内容（= 挙動不変）・`gpt_quiz_multicut.py` の 16-4c 変更は実行時経路で未使用（quiz-prebuilt 切替済み）・DDL 取り残しなし・秘密情報スキャン クリーン。17-5c 分を `7f03ccf` としてコミットのうえ push → **3 パイプラインすべて Succeeded** → 全サービスがタグ `7f03ccf52946` へ（image-batch rev 27 / sns-post-batch rev 13 / insights-batch rev 3。`cdk deploy` 不要 = パイプラインがタスク定義を登録する設計どおり）。失敗した実行は手動 stop（`batch_execution_logs` id=341 が failed で残る。posts 影響なし）
+
+    **(6) 再実行で全チェーン成功・稼働開始**: 23:17 JST 起動 → DB 準備確認 → image-batch（LRU が 001-gyoza-spend を選択・`generation_runs` id=131 / `generated_media` id=125 = mp4 / 1080x1920 / 30 秒 / `audio_asset_id=10`）→ SNS 投稿 SFN（**リール `posts.id=194` + ストーリーズ再掲 `posts.id=195` とも success**）。Graph API で裏取り: `daigoro_ranking` / REELS / permalink `https://www.instagram.com/reel/DcgaiAVlWI5/`・キャプションのランキング系プレースホルダ展開（フック + TOP5 再掲）・`#AIart`・VOICEVOX クレジットを確認。`ranking_items` 1 行記録・バックログ 0 件・CloudWatch アラームなし
+
+    **(7) 状態**: 在庫 14 本のうち 001 を消費（残 13 本 + 週次補充で回復）。**初回定時実行は 2026-08-27 20:00 JST**。17-7（残り 16 件の投入・ビルド + スキル化）は LRU 一周前（稼働開始から 2 週間以内）に完了させる。17-6（初速確認）は投稿・インサイト収集の実績が数日分たまってから
+
 
 ## 定常運用: 問題ストック補充の記録
 
