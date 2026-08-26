@@ -314,6 +314,9 @@ export class ImageBatchStack extends cdk.Stack {
       // noon は 16-4d（2026-08-24）で当分停止（スキップ率の高止まり。再開時は enabled を戻して deploy）
       { setCode: 'logic-training-1', slotCode: 'noon', minute: '30', hour: '12', enabled: false },
       { setCode: 'logic-training-1', slotCode: 'night', minute: '0', hour: '21' },
+      // pref-ranking-1: 1 日 1 回（20:00 JST）。ranking-prebuilt は単一スロット
+      // （evening = from_jst_hour 17〜）で 17-5（2026-08-24）に 30 秒単尺・1 日 1 回へ確定
+      { setCode: 'pref-ranking-1', slotCode: 'evening', minute: '0', hour: '20' },
     ];
 
     for (const entry of imageGenerationSchedules) {

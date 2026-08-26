@@ -309,6 +309,9 @@ export class InsightsBatchStack extends cdk.Stack {
       { setCode: 'fantasy-animals-1', slot: 'evening', minute: '0', hour: '18' },
       { setCode: 'logic-training-1', slot: 'morning', minute: '0', hour: '6' },
       { setCode: 'logic-training-1', slot: 'evening', minute: '0', hour: '18' },
+      // pref-ranking-1: 17-5c（2026-08-26）の稼働開始で追加
+      { setCode: 'pref-ranking-1', slot: 'morning', minute: '0', hour: '6' },
+      { setCode: 'pref-ranking-1', slot: 'evening', minute: '0', hour: '18' },
     ];
 
     for (const entry of insightsCollectionSchedules) {

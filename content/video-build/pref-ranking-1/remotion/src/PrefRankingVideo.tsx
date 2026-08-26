@@ -110,8 +110,26 @@ const outline = (color: string, width: number): string =>
     .map(([x, y]) => `${x}px ${y}px 0 ${color}`)
     .join(", ");
 
-const formatValue = (value: number): string =>
-  value.toLocaleString("ja-JP", { maximumFractionDigits: 2 });
+/**
+ * 1 本の動画の中で小数桁数を揃える。TOP5 に 75.0 のような値があると
+ * toLocaleString は末尾 0 を落とすため、同じ画面に「77.1%」と「75%」が並んで
+ * 精度が食い違って見える。桁数は当該動画の 5 件から決める（円額のように
+ * 全件が整数なら 0 桁のまま）。
+ */
+const fractionDigitsOf = (entries: readonly Entry[]): number =>
+  Math.min(
+    2,
+    entries.reduce((max, entry) => {
+      const decimals = String(entry.value).split(".")[1];
+      return Math.max(max, decimals ? decimals.length : 0);
+    }, 0)
+  );
+
+const formatValue = (value: number, fractionDigits: number): string =>
+  value.toLocaleString("ja-JP", {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  });
 
 const mapPalette = (theme: Theme): MapPalette => ({
   baseFill: theme.mapBaseFill,
@@ -384,9 +402,10 @@ const RankRow: React.FC<{
   theme: Theme;
   valuePrefix: string | null;
   valueSuffix: string;
+  fractionDigits: number;
   labels: Labels;
   tl: Timeline;
-}> = ({ entry, theme, valuePrefix, valueSuffix, labels, tl }) => {
+}> = ({ entry, theme, valuePrefix, valueSuffix, fractionDigits, labels, tl }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = tl.rounds[entry.rank];
@@ -489,7 +508,7 @@ const RankRow: React.FC<{
             {valuePrefix}
           </span>
         ) : null}
-        <span style={{ fontSize: isFirst ? 46 : 38, fontWeight: 700 }}>{formatValue(entry.value)}</span>
+        <span style={{ fontSize: isFirst ? 46 : 38, fontWeight: 700 }}>{formatValue(entry.value, fractionDigits)}</span>
         <span style={{ fontSize: isFirst ? 26 : 23, fontWeight: 700, opacity: 0.85 }}>{valueSuffix}</span>
       </div>
     </div>
@@ -818,6 +837,10 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
               fontSize: bubbleText.length > 26 ? 40 : bubbleText.length > 20 ? 44 : 48,
               fontWeight: FONT_DISPLAY_WEIGHT,
               lineHeight: 1.28,
+              // 既定の line-break: auto は小書き仮名の前で改行してしまう
+              // （「し / っかり」が実際に出た）。strict で禁則処理をかける。
+              // 改行位置が前へ動くだけなので行が伸びることはない
+              lineBreak: "strict",
               color: theme.bubbleText,
               boxShadow: "0 12px 26px rgba(12,18,34,0.26)",
               opacity: stage.spinningRank !== null ? 0.82 + 0.18 * Math.abs(Math.sin(frame / 6)) : 1,
@@ -876,6 +899,7 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
           theme={theme}
           valuePrefix={valuePrefix}
           valueSuffix={valueSuffix}
+          fractionDigits={fractionDigitsOf(entries)}
           labels={labels}
           tl={tl}
         />

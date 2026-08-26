@@ -210,6 +210,15 @@
   コンポジションの実装は <code>content/video-build/pref-ranking-1/remotion/</code>（<code>layout.ts</code> = ジオメトリ / <code>theme.ts</code> = トークン / <code>scripts/build_timeline.py</code> = タイムライン定数〔<code>src/timeline.json</code> は生成物〕 / <code>PrefRankingVideo.tsx</code> = 版面）が正。
 </div>
 <div class="decision">
+  <span class="callout-title">決定（2026-08-26、17-5c）: 初期 14 本の全数レビュー前スクリーニングで見つけた版面 2 件</span>
+  実データ 14 本を通しで組んで初めて出た不具合。いずれも <code>PrefRankingVideo.tsx</code> で修正し、<strong>コンポジション版の混在を避けるため 14 本すべてを同一版で再ビルド</strong>した。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>順位行の数値は 1 本の中で小数桁数を揃える</strong>。<code>toLocaleString</code> は末尾 0 を落とすため、<code>ranking_data</code> が <code>75.0</code> でも版面は「75%」になり、同じ画面の「77.1%」と精度が食い違って見えた（013-myhome-rate で実際に発生）。桁数は<strong>当該動画の 5 件の実値から決める</strong>（全件整数の円額ネタは 0 桁のままで表示は変わらない）。率のネタが増えるほど再発しやすいため、行単位ではなく動画単位で決める形にしてある</li>
+    <li><strong>吹き出しに <code>line-break: strict</code> を指定</strong>する。既定の <code>auto</code> は小書き仮名の前で改行し、「パン食は西日本の文化、し / っかり数字に出たな！」が出た（003-bread-spend）。禁則処理をかけると改行位置は前へ動くだけなので、行が伸びて 3 行になる方向の副作用はない</li>
+  </ul>
+  <strong>禁則処理では解消しない行またぎは文言側で直す</strong>（「マイホームの地図は、日 / 本海側にずらりだ！」のような語中改行。<code>content_fields.trivia</code> の書き直し → 再ビルド）。執筆時の観点として <code>WRITING-NOTES.md</code> にも記載がある。
+</div>
+<div class="decision">
   <span class="callout-title">決定（2026-08-11、17-4b）: 地図の PD 差し替え・素材の正式化</span>
   下記の素材要件を満たす形で、<strong>地図を Natural Earth 10m admin-1（Public Domain）由来へ差し替えた</strong>（GFDL 由来のプロト素材を廃止。Phase 17 決定方針⑨を完了）。生成は <code>content/video-build/pref-ranking-1/remotion/scripts/build_japan_paths.py</code>（素材の取得・投影・インセット移設・出力）で、<code>src/japanPaths.ts</code> / <code>src/prefCentroids.ts</code> は<strong>自動生成物</strong>になった。素材要件との差分・追加決定は以下:
   <ul style="margin:.3rem 0 0;">

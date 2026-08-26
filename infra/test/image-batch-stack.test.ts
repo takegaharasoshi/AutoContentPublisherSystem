@@ -464,7 +464,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     ) as any[];
 
     expect(scheduleGroups).toHaveLength(1);
-    expect(schedules).toHaveLength(4);
+    expect(schedules).toHaveLength(5);
     for (const schedule of schedules) {
       expect(schedule.Properties.GroupName).toBe(
         scheduleGroups[0].Properties.Name,
@@ -477,6 +477,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
         'acps-prod-image-generation-logic-training-1-morning',
         'acps-prod-image-generation-logic-training-1-night',
         'acps-prod-image-generation-logic-training-1-noon',
+        'acps-prod-image-generation-pref-ranking-1-evening',
       ],
     );
   });
@@ -487,6 +488,8 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     // noon は 16-4d（2026-08-24）で当分停止中
     ['acps-prod-image-generation-logic-training-1-noon', 'cron(30 12 * * ? *)', 'logic-training-1', 'DISABLED'],
     ['acps-prod-image-generation-logic-training-1-night', 'cron(0 21 * * ? *)', 'logic-training-1', 'ENABLED'],
+    // pref-ranking-1 は 17-5c（2026-08-26）の稼働開始で追加。1 日 1 回・20:00 JST
+    ['acps-prod-image-generation-pref-ranking-1-evening', 'cron(0 20 * * ? *)', 'pref-ranking-1', 'ENABLED'],
   ])(
     'スケジュール %s を cron %s / set_code %s で Step Functions 起動先に設定する',
     (scheduleName, cronExpression, setCode, state) => {
