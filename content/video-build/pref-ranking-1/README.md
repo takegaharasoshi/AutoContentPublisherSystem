@@ -148,3 +148,15 @@ python ../../ranking-stock/pref-ranking-1/common/apply_aurora.py work/update_pre
 ```
 
 S3 キーと両環境の UPDATE は環境非依存の `content_key` を使います。ローカルの `ranking_stock_items.id` は AUTO_INCREMENT で Aurora と一致しないため、識別には使いません。
+
+## アカウントのプロフィール画像（アカウント開設時と作り直しのときだけ）
+
+`account/build_profile_icon.py` が Instagram のプロフィール画像（1080x1080）を生成します。採用案・作画上の制約は `docs/app/sets/pref-ranking-1.html` セクション 2 の decision（2026-08-27）が正です。入力は `remotion/public/char/goro_base.png` なので、事前準備のキャラクター素材の配置が済んでいる必要があります。PIL が要るためコンテナで実行します（リポジトリルートから）。
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work --user "$(id -u)" \
+  --entrypoint python image-batch:ffmpeg-check \
+  content/video-build/pref-ranking-1/account/build_profile_icon.py
+```
+
+採用案が `account/profile_icon.png` に上書き出力されます。不採用案の再現は `--variant dark|gunbai`、円クロップ + 実表示サイズ（320 / 110 / 40px）の比較シートは `--compare`（出力先は `work/profile/`）です。

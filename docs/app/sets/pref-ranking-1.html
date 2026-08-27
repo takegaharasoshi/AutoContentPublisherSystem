@@ -47,7 +47,12 @@
 <tr><td><code>account_code</code></td><td><code>main-account</code></td></tr>
 <tr><td>SNS 認証 Secret</td><td><code>acps/prod/pref-ranking-1/sns/instagram/main-account</code></td></tr>
 <tr><td>Meta アプリ</td><td>既存アプリを流用（15-7 の前例踏襲）。トークン実効期限は全セット共通で <code>data_access_expires_at</code>（<a href="../operation.html#token-refresh">operation.html セクション 5.4</a>）</td></tr>
+<tr><td>プロフィール画像</td><td>表彰台五郎の基本ポーズ（マイク実況）のバスト構図を、生成り地 + 淡墨茶リングで囲んだ 1080x1080 のアイコン（2026-08-27 採用 = 下記 decision）。生成物と生成スクリプトは <code>content/video-build/pref-ranking-1/account/</code></td></tr>
 </table>
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-27、ユーザー判断）: プロフィール画像は「生成り地 + 淡墨茶リング + 基本ポーズ」</span>
+  3 案（①淡墨茶地 + 金リング ②生成り地 + 淡墨茶リング ③軍配ポーズ）の比較のうえ②を採用した。版面の地色（<code>cream</code>）と同じ地にすることで動画とアカウントの見た目がそろう。作画上の制約は 3 案共通で以下のとおり: <strong>①脚を落としたバスト構図</strong>（Instagram の円クロップで細い脚の途中が切れると欠損に見えるため、断ち切りを表彰台の胴体に置く）<strong>②顔・赤鉢巻・胴体の「1」を内接円の内側に収める</strong>（40px 表示でもこの 3 要素で識別できることを縮小プレビューで確認）<strong>③文字を入れない</strong>（小サイズで潰れるため。ワードは Instagram の名前欄が担う）<strong>④軍配ポーズは使わない</strong>（軍配は 1 位発表時のみというキャラ制約 = セクション 8 との整合）。色は <code>remotion/src/theme.ts</code> のパレットに準拠する。再生成は <code>account/build_profile_icon.py</code>（PIL が要るためコンテナで実行。不採用案は <code>--variant</code>、比較シートは <code>--compare</code> で再現できる）。入力は S3 の正式キャラクターアセット <code>goro_base.png</code> で、ビルドツーリングと同じ <code>remotion/public/char/</code> の配置を前提とする。
 </div>
 <p><strong>投稿はリール + ストーリーズの 2 本立て</strong>（<code>batch_sets.stories_enabled=1</code>。既存勝負セットの踏襲）。リール成功後に同一 MP4 をストーリーズへ再掲する（キャプションなし。<a href="../batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）。</p>
 
