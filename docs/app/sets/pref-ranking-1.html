@@ -48,7 +48,17 @@
 <tr><td>SNS 認証 Secret</td><td><code>acps/prod/pref-ranking-1/sns/instagram/main-account</code></td></tr>
 <tr><td>Meta アプリ</td><td>既存アプリを流用（15-7 の前例踏襲）。トークン実効期限は全セット共通で <code>data_access_expires_at</code>（<a href="../operation.html#token-refresh">operation.html セクション 5.4</a>）</td></tr>
 <tr><td>プロフィール画像</td><td>表彰台五郎の基本ポーズ（マイク実況）のバスト構図を、生成り地 + 淡墨茶リングで囲んだ 1080x1080 のアイコン（2026-08-27 採用 = 下記 decision）。生成物と生成スクリプトは <code>content/video-build/pref-ranking-1/account/</code></td></tr>
+<tr><td>プロフィール文（自己紹介）</td><td>下記 decision（2026-08-28 採用。97 文字 / 4 行）</td></tr>
 </table>
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-28、ユーザー判断）: プロフィール文（自己紹介）</span>
+  3 案（①キャラ主導 ②情報主導 ③つかみ重視）の比較のうえ①を採用し、末尾の AI 開示・クレジット行は<strong>入れない</strong>こととした（ユーザー判断）。実文言は以下（Instagram の自己紹介欄は 150 文字上限。採用文は改行込み 97 文字）。
+<pre><code>🏆毎晩20時、都道府県ランキングTOP5を発表するぞ！
+実況は表彰台五郎（ひょうしょうだいごろう）だ📣
+🗾日本地図のルーレットで1位を大発表
+📊統計・調査データが元ネタ／出典はキャプションに明記</code></pre>
+  1 行目を<strong>五郎のタメ口の実況調</strong>にしたのは、キャプションの文体（セクション 5 の 17-3 決定）と書き手をそろえるため。投稿時刻・フォーマット・出典明記の 3 点をプロフィールだけで伝える。<strong>AI 開示（14-4 の全セット共通ルール）と VOICEVOX のクレジット表記義務（セクション 7）は、いずれもリール本体のキャプション（<code>#AIart</code> と「VOICEVOX:白上虎太郎」の常設行 = セクション 5）で担保されており</strong>、プロフィール欄への重複掲載は必須ではない。プロフィール文の変更でこの 2 つの義務が外れることはないが、<strong>キャプションテンプレートから当該行を落とすと義務違反になる</strong>点は変わらない。
 </div>
 <div class="decision">
   <span class="callout-title">決定（2026-08-27、ユーザー判断）: プロフィール画像は「生成り地 + 淡墨茶リング + 基本ポーズ」</span>
