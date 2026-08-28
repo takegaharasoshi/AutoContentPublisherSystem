@@ -9,7 +9,7 @@ condition: ""            # 再醸成待ち・待機のとき必須（再検討�
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: "採用（2026-08-28・1 回の壁打ちで着地）。セットレーンで完結するため待機を挟まず、docs/plans/pref-ranking-1.html のバックログ（2026-08-28 の項）へ転記済み。実装時に docs/app/generators/ranking-prebuilt.html セクション 8.2 のタイムライン記述を更新する"
+disposition: "採用（2026-08-28・1 回の壁打ちで着地）。セットレーンで完結するため待機を挟まず、docs/plans/pref-ranking-1.html の進行中ステップ「改修 R-1: 冒頭フック改善」（R-1-1〜R-1-5）へ展開済み（2026-08-29）。実装時に docs/app/generators/ranking-prebuilt.html セクション 8.2 を更新する"
 ---
 
 ## 要旨

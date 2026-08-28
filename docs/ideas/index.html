@@ -68,7 +68,7 @@
 <tr>
   <td>pref-ranking-1 動画の冒頭フック改善（ミュート離脱対策）</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>0〜5.0 秒が実質静止画である実測 + 視聴維持カーブ（崖は 0〜2 秒・0:05 で 18% / 37%）を確認 → 予熱スピン（速度は 0 秒から最高速・発光強度でランプ）+ 煽り吹き出しの視覚化を同時投入し、在庫全 30 件を再ビルドすると決定。セットレーンで完結するため待機を挟まず <a href="../plans/pref-ranking-1.html">pref-ranking-1 セット計画書</a>のバックログへ転記</td>
+  <td>0〜5.0 秒が実質静止画である実測 + 視聴維持カーブ（崖は 0〜2 秒・0:05 で 18% / 37%）を確認 → 予熱スピン（速度は 0 秒から最高速・発光強度でランプ）+ 煽り吹き出しの視覚化を同時投入し、在庫全 30 件を再ビルドすると決定。セットレーンで完結するため待機を挟まず <a href="../plans/pref-ranking-1.html">pref-ranking-1 セット計画書</a>の進行中ステップ「改修 R-1」（R-1-1〜R-1-5）へ展開</td>
   <td><a href="ranking-opening-hook.md">MD</a></td>
   <td>2026-08-28</td>
 </tr>
@@ -93,7 +93,7 @@
 <tr><td>醸成中</td><td>前</td><td>○</td><td>—</td><td>壁打ちを進められる</td></tr>
 <tr><td>再醸成待ち</td><td>前</td><td>×</td><td><strong>必須</strong>（再検討トリガー）</td><td>今はこれ以上詰められない。条件が満たされたら<strong>壁打ちを再開</strong>する（実行の約束ではなく再判断の約束）</td></tr>
 <tr><td>待機</td><td><strong>済</strong></td><td>×</td><td><strong>必須</strong>（落とし込み条件）</td><td>やると決めた。条件が満たされたら<strong>計画・戦略書へ転記</strong>する（開発レーンの作業）</td></tr>
-<tr><td>採用</td><td>済</td><td>クローズ</td><td>—</td><td>計画・戦略書へ反映済み。昇格先リンクを disposition に残す</td></tr>
+<tr><td>採用</td><td>済</td><td>クローズ</td><td>—</td><td>計画・戦略書へ<strong>ステップとして展開済み</strong>（開発レーンならフェーズ内のステップ、セットレーンならセット計画書の<strong>進行中ステップ</strong>）。<strong>バックログへの課題行の追加は「展開」に当たらない</strong> — バックログは<strong>まだやると決まっていない</strong>課題の置き場であり、採用したもの（やると決めスコープも確定したもの）の置き場ではない。昇格先リンクを disposition に残す</td></tr>
 <tr><td>見送り</td><td>済</td><td>クローズ</td><td>—</td><td>理由付きで残す。再検討時の出発点になる資産</td></tr>
 </tbody>
 </table></div>
@@ -117,7 +117,7 @@
 <h3>4.5 レーンと昇格</h3>
 <ul>
 <li><code>docs/ideas/</code> 配下で閉じる作業は<strong>アイデアレーン</strong>: 宣言不要・常に並行可（<a href="../plans/index.html">計画体系</a>の判定表参照）</li>
-<li>「待機 → 採用」の転記は <code>development-plan.html</code> / 事業戦略書に触れるため<strong>開発レーンの作業</strong>。アイデアレーン内では転記下書きの用意まで</li>
+<li><strong>採用時の展開先はレーンで決まる</strong>。<strong>開発レーン</strong>行きのもの（<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>・共通設計書に触れる）は <code>development-plan.html</code> / 事業戦略書へのステップ展開が必要で、これは<strong>開発レーンの作業</strong> — アイデアレーン内では転記下書きの用意までとし、いったん<strong>待機</strong>で置く。<strong>セットレーン</strong>で完結するもの（<code>content/&lt;set&gt;/</code> + セット別・専用方式設計書 + セット計画書）は、セット計画書の<strong>進行中ステップ</strong>へその場で展開して<strong>採用</strong>まで進めてよい（セットレーンは常に並行可のため待機を挟む必要がない）。判定は<a href="../plans/index.html">計画体系</a>セクション 2 のパス基準表に従う</li>
 <li>壁打ちで踏み込んだ技術検討（構成図・コスト試算）は<strong>採用判断のための検討記録</strong>であり設計書ではない。採用後は <code>docs/app/</code> / <code>docs/infra/</code> の設計プロセスにインプットとして引き継ぎ、そこで改めて設計 Fix する</li>
 </ul>
 
