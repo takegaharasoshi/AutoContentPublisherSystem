@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>開発計画 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / 開発計画</nav>
+<h1>開発計画・進捗管理（開発レーン）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">開発レーン</span>
+  <span>最終更新: 2026-08-28（Phase 18 で HTML 化・整理。旧 docs/development-plan.md から移設）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ（Phase 18 で 2 レーン化）</span>
+  本書は<strong>開発レーン</strong>（フェーズ制の新規開発・基盤改修。<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>・共通設計書に触れる作業）の計画書。セット別の保守運用・セット内で閉じる改修は各<strong>セット計画書</strong>（<a href="index.html">計画体系の目次</a>参照）で管理する。レーンの判定ルール・並行作業ルールの正は <a href="index.html">index.html</a>。
+</div>
+
+<h2>進め方の方針</h2>
+<ul>
+<li><strong>設計（インフラ → アプリ）を先に固め、構築はインフラ → アプリ実装の順に進める</strong>
+  <ul><li>Phase D: インフラ設計の一時 Fix → Phase A: アプリ設計の大枠 → Phase 9: アプリ設計（詳細・前倒し）→ Phase 0〜8: インフラ構築 → Phase 10〜13: アプリ実装・定常運用開始 → Phase 14〜17: 収益化に向けた機能拡充（上位方針は <a href="../strategy/business-strategy.html">事業戦略書</a>）。前倒しの経緯は<a href="development-log.html">開発記録</a>の Phase A・9 を参照</li></ul></li>
+<li>各ステップで実際に AWS 上で稼働確認を行い、動作を確認してから次に進む</li>
+<li>1 ステップ = 1 プロンプトを基本とし、「作る → 確認 → 次へ」のリズムで進める。各ステップの完了後、ユーザーが確認方法に従って動作確認を行い、チェックを入れる</li>
+<li><strong>記録の運用</strong>: ステップ完了時、本書にはチェック + 完了日 + 要点（1〜2 行）のみを記録し、詳細な実施記録（検証内容・決定事項の全文）は <a href="development-log.html">開発記録</a>に追記する（計画書の肥大化防止。セット計画書 / セット記録も同じ作法）</li>
+<li>CDK コマンド例では app 内の論理スタック ID（<code>FoundationStack</code> など）を指定する。<code>-c env=prod</code> により、CloudFormation 上の実スタック名は <code>Prod-FoundationStack</code> のように環境名付きで作成される</li>
+</ul>
+
+<h3>設計 Fix の運用ルール</h3>
+<p>設計書が Fix しない問題の再発防止ルール（詳細は <a href="../index.html">docs/index.html</a> セクション 4 を参照）:</p>
+<ul>
+<li>設計書は「<strong>次フェーズの作業に着手できる</strong>」水準で一時 Fix とする。「生成 AI の指摘ゼロ」は Fix 条件にしない</li>
+<li>生成 AI レビューは<strong>観点を限定</strong>して依頼し、<strong>最大 2 巡</strong>まで</li>
+<li>指摘は <strong>blocker</strong>（誤り・矛盾・欠落）と<strong>改善提案</strong>に分類し、blocker のみ修正する。改善提案・3 巡目以降の指摘は「設計課題リスト」（本書末尾）に記録する</li>
+<li>インフラ設計書にアプリ仕様を書かない。アプリの論点は <a href="../app/index.html">docs/app/index.html</a> の検討メモへ</li>
+</ul>
+
+<h2>凡例</h2>
+<ul>
+<li>⬜ 未着手</li>
+<li>✅ 完了</li>
+<li>⚠️ 問題あり・要対応</li>
+</ul>
+
+<hr>
+
+<h2>完了フェーズのサマリ</h2>
+<p>設計（Phase D・A・9）・インフラ構築（Phase 0〜8）・アプリ実装と定常運用開始（Phase 10〜13）は 2026-07-06〜07-23 に、動画・リール対応（Phase 14）と勝負セットの投入（Phase 15）は 2026-07-23〜07-30 に、第 3 セット構築（Phase 17）は 2026-08-09〜08-28 に完了済み。各ステップの実施記録（確認・備考の全文）は<a href="development-log.html">開発記録</a>を参照。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Phase</th><th>ゴール（達成済み）</th></tr></thead>
+<tbody>
+<tr><td>Phase D: インフラ設計の一時 Fix</td><td>インフラ設計書（docs/infra/）を一時 Fix し、Phase 0〜8 に着手できる状態にする</td></tr>
+<tr><td>Phase A: アプリ設計の大枠（上流設計）</td><td>アプリ仕様の壁打ちを行い、設計書構成・主要方針の骨子を docs/app/ に記載する</td></tr>
+<tr><td>Phase 9: アプリ設計（詳細）※前倒し</td><td>Phase A の大枠を詳細化してアプリ設計書を完成させ、一時 Fix する（本スキーマ DDL 作成含む）</td></tr>
+<tr><td>Phase 0: ローカル開発基盤の整備</td><td>CDK と Docker がローカルで動く状態にする</td></tr>
+<tr><td>Phase 0.5: AWS アカウントのクリーンアップ</td><td>過去の残存資材を棚卸し・削除し、きれいな状態から構築を始める</td></tr>
+<tr><td>Phase 1: CDK プロジェクト初期化 + VPC デプロイ</td><td>CDK で最小のリソース（VPC）を AWS に作れることを確認する</td></tr>
+<tr><td>Phase 2: FoundationStack の段階的構築（低リスクリソース）</td><td>Aurora・DB 準備確認以外の共通基盤リソースを構築する</td></tr>
+<tr><td>Phase 3: FoundationStack の段階的構築（Aurora + DB 準備確認）</td><td>Aurora と DB 準備確認タスクを構築する</td></tr>
+<tr><td>Phase 4: SNS 投稿バッチの空回し</td><td>SnsPostBatchStack でパイプラインが動くことを確認する（業務ロジックなし）</td></tr>
+<tr><td>Phase 5: 画像生成バッチの空回し</td><td>EventBridge → Step Functions → ECS Fargate のパイプラインが動くことを確認する</td></tr>
+<tr><td>Phase 6: DB 接続の疎通（最小）</td><td>ECS タスクから Aurora に接続できることを確認する</td></tr>
+<tr><td>Phase 7: MonitoringStack</td><td>バッチ失敗時にアラーム通知が届く</td></tr>
+<tr><td>Phase 8: CI/CD パイプライン構築</td><td>GitHub push で自動的にビルド・デプロイされる（イメージは空回し版のまま）</td></tr>
+<tr><td>Phase 10: 実装準備</td><td>DB スキーマ・ローカル環境が業務ロジック実装に耐える状態になっている</td></tr>
+<tr><td>Phase 11: 画像生成バッチの業務ロジック実装</td><td>Step Functions 経由で実画像が生成され、S3 + DB に記録される</td></tr>
+<tr><td>Phase 12: SNS 投稿バッチの業務ロジック実装</td><td>生成済みの実行が投稿先プラットフォーム（初期スコープ: Instagram）に自動投稿され、重複しない</td></tr>
+<tr><td>Phase 13: 定常運用の開始</td><td>EventBridge Scheduler による全自動運用が回っている</td></tr>
+<tr><td>Phase 14: コンテンツ生成への一般化（動画・リール対応）</td><td>画像生成バッチが動画（リール）も生成・投稿できる「コンテンツ生成バッチ」に拡張され、リール 1 日 1 回の全自動投稿が定常運用に入っている（KPI M1 達成）</td></tr>
+<tr><td>Phase 15: 勝負セットの投入（セット 2）</td><td>勝負セット logic-training-1 が投入され、2 セット・1 日 4 チェーンの動画中心の自動運用が回っている（KPI M2 への挑戦開始）</td></tr>
+<tr><td>Phase 17: 都道府県ランキングセット（第 3 セット・Remotion 生成方式）</td><td>pref-ranking-1（表彰台五郎の都道府県ランキング）が Remotion 事前ビルド方式・30 秒単尺・1 日 1 回（20:00 JST）で 2026-08-27 に定常運用入り。ストック 30 件 + 補充スキル <code>/ranking-stock-replenish</code> 整備済み（完了 2026-08-28）。テスト投稿・初速確認（旧 17-6）はセットレーン（<a href="pref-ranking-1.html">pref-ranking-1 計画書</a>）へ移管</td></tr>
+</tbody>
+</table></div>
+
+<hr>
+
+<h2>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h2>
+<p>2026-07-23 の壁打ちで策定。<strong>上位方針（収益化経路・予算・KPI・プラットフォーム展開方針）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする</strong>。優先順位の考え方: 配信面の拡大より先に「リーチ獲得能力（動画・リール）」→「勝負セット投入」→「効果測定」→「当たりが出てからプラットフォーム展開」の順。</p>
+
+<h3>ステップ別の利用モデル・エフォートレベル</h3>
+<p>2026-07-24 のトークン最適化検討で策定。方針: <strong>壁打ち・設計 Fix・大型委譲成果物のレビューは Fable 5、それ以外の定型ステップは <code>/model</code> で最新の Opus に切り替える</strong>。Codex 委譲は terra / high を既定とし、機械的な横展開は luna、大型・新規性の高い実装は sol へ per-call で変更する（CLAUDE.md の Codex 連携ルールを参照）。エフォートは「確実にこなせる最低レベル」を選ぶ。完了ステップの割当実績は<a href="development-log.html">開発記録</a>（Phase 16・17 の計画書備考の移設ブロックに割当表の原文あり）と git 履歴を参照。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>残ステップ</th><th>Claude 側（モデル / エフォート）</th><th>Codex 委譲（モデル / エフォート）</th></tr></thead>
+<tbody>
+<tr><td>16-5 効果検証</td><td>Opus 5 / high（指標の解釈で詰まったら Fable 5 へ切替）</td><td>なし（インサイト画面の目視のため委譲不向き）</td></tr>
+<tr><td>16-12 指標セット確定の反映（16-5 完了後）</td><td>Opus 5 / high（指標選定の判断で詰まったら Fable 5）</td><td>terra / high（昇格 DDL・ビュー生成のみ）</td></tr>
+<tr><td>Phase XX（プラットフォーム展開）調査・着手判断</td><td><strong>Fable 5</strong> / デフォルト</td><td>—</td></tr>
+</tbody>
+</table></div>
+
+<h2>Phase 16: インサイト収集と KPI 運用</h2>
+<p><strong>ゴール</strong>: 投稿パフォーマンス（再生数・フォロワー等）が自動収集され、KPI 実績（事業戦略書セクション 4.1）が数字で追える</p>
+<blockquote>2026-07-31 にステップ展開。運用初週に勝負セットのスキップ率 95% が判明しテコ入れを前段ブロックとして前倒し。前段の進行中に「ストックのみ方式」（16-1）→「動画の事前生成方式 quiz-prebuilt への転換」（16-3b）と方針を 2 度更新した。後段（インサイト収集バッチ）は 2026-08-09 に 16-5 と並行しての先行着手をユーザー決定。<strong>16-5 は前後比較をやめ、切替後（2026-08-08 以降）の投稿だけを母集団とする水準評価へ方針変更（2026-08-10）</strong>。経緯の全文は<a href="development-log.html">開発記録</a>の Phase 16 冒頭と計画書備考の移設ブロックを参照。</blockquote>
+
+<h3>前段ブロック: 勝負セットのテコ入れ（スキップ率 95% 対応）</h3>
+<p>完了ステップの要点のみ記載。詳細と進行中備考の原文は<a href="development-log.html">開発記録</a>の Phase 16 を参照。</p>
+<ul>
+<li>✅ <strong>16-1</strong> テコ入れの設計 Fix — 2026-08-01。ストックのみ方式（生成チェーン休止）・16 秒 4 カット版面・<code>quiz_stock_items</code> 新設（V005）を決定</li>
+<li>✅ <strong>16-2</strong> 問題ストックの初期整備 — 2026-08-07。朝 / 昼 / 夜の 3 路線で 42 問を執筆・全問人間レビューのうえ両環境投入</li>
+<li>✅ <strong>16-2b</strong> 方式設計書の改訂 — 2026-08-07。カット構成改訂・L3 拡張・資材置き場 <code>content/quiz-stock/</code> の運用明文化</li>
+<li>✅ <strong>16-3</strong> 生成・投稿パイプラインの改修 — 2026-08-07。ストック LRU 取得・16 秒版面固定・キャプションのプレースホルダ展開を実装</li>
+<li>✅ <strong>16-3b</strong> 動画事前生成方式への転換設計 — 2026-08-08。<a href="../app/generators/quiz-prebuilt.html">quiz-prebuilt.html</a> 新設・V006 採用・コストモデル改訂</li>
+<li>✅ <strong>16-3c</strong> 事前生成方式の実装 — 2026-08-08。generator <code>quiz_prebuilt.py</code>・ビルドツーリング 5 本・週次補充スキル拡張</li>
+<li>✅ <strong>16-3d</strong> 初期 42 問の動画ビルドとレビュー・配置 — 2026-08-08。全数レビュー OK・S3 + 両環境反映。業務キー <code>content_key</code>（V007 / V008）を導入</li>
+<li>✅ <strong>16-4</strong> 投稿前レビューと切替 — 2026-08-08。<strong>切替日 = 2026-08-08（水準評価の起点）</strong>。quiz-prebuilt が定常運用入り</li>
+<li>✅ <strong>16-4b</strong> 切替後のフォーマット改善 — 2026-08-09。バウンド演出・イラスト見切れ解消・42 本再ビルド</li>
+<li>✅ <strong>16-4c</strong> 動画構成の見直し — 2026-08-23。4 カット → 3 カット・つかみ帯・ズーム廃止。全 63 本を再ビルド・再配置</li>
+<li>✅ <strong>16-4d</strong> 昼スロット（フェルミ推定）の当分停止 — 2026-08-24。noon Scheduler を CDK ごと DISABLED 化・資材は凍結残置・補充対象は朝・夜のみへ（廃止ではなく当分停止。再開判断は将来）</li>
+<li>⬜ <strong>16-5</strong> 効果検証（切替後データの水準評価）
+  <ul>
+  <li>内容: <strong>2026-08-10 のユーザー決定で「切替前との前後比較はしない」方針に変更</strong>（切替前の投稿がアーカイブ済みで Graph API から読めず、自動収集データでの比較が成立しないため。経緯は<a href="development-log.html">開発記録</a>の 16-11 (5) を参照）。<strong>2026-08-08 以降に投稿されたリールとそれ以降の投稿を母集団</strong>として、スキップ率・視聴維持・保存・フォロワーの水準と推移を評価し、事業戦略書の KPI 実績へ記録する。前後比較の代わりに「現行フォーマットの絶対水準が目標に届いているか」「投稿を重ねて改善傾向にあるか」を判断材料にする。視聴維持カーブと View Rate は API 非対応のためアプリ画面での目視（16-6 の分担）。ここで「継続的に見たい指標」を確定し、16-12 の入力とする</li>
+  <li>留意（2026-08-28 追記）: 16-4c（3 カット化・2026-08-23）と 16-4d（昼停止・2026-08-24）でフォーマットが直近に変わっているため、現行フォーマットの水準評価は 9 月上旬以降にデータが 1.5〜2 週間たまってからが筋が良い（Phase 18 の壁打ちでの整理）</li>
+  </ul></li>
+</ul>
+
+<h3>後段ブロック: インサイト収集バッチ</h3>
+<p>骨子: 第 3 のバッチ（インサイト収集）の設計・実装。16-7 の設計 Fix で <code>post_insights</code> / <code>account_insights_daily</code> の 2 テーブル構成を確定（<a href="../app/data-model.html">data-model.html</a> セクション 4.11）。2026-08-09 のユーザー決定で 16-5 完了を待たず先行着手。完了ステップの要点のみ記載、詳細は<a href="development-log.html">開発記録</a>の Phase 16 を参照。</p>
+<ul>
+<li>✅ <strong>16-6</strong> Instagram Graph API インサイト機能の調査 — 2026-08-09。スキップ率は <code>reels_skip_rate</code> で API 取得可・視聴維持カーブと View Rate はアプリ画面のみ、等の制約を確定（調査基準 v25.0）</li>
+<li>✅ <strong>16-7</strong> 収集バッチの壁打ち・設計 Fix — 2026-08-10。1 日 2 回（06:00・18:00 JST）・追跡 14 日・JSON 全量 + 16-5 後に生成カラム / ビュー昇格（2 段階 Fix）・初回バックフィルを決定</li>
+<li>✅ <strong>16-8</strong> データモデル拡張（V009） — 2026-08-10。両環境へ適用済み・既存 2 サービスの回帰なし</li>
+<li>✅ <strong>16-9</strong> insights-batch アプリ実装 — 2026-08-10。<code>services/insights-batch/</code> + shared 昇格 2 モジュールを新設（v25.0 ピン留め・メトリクス束ね + 自動縮退）</li>
+<li>✅ <strong>16-10</strong> インフラ実装・デプロイ — 2026-08-10。InsightsBatchStack 新設・本番デプロイ済み（TaskDef・SFN・Scheduler 4 件・CI/CD）</li>
+<li>✅ <strong>16-11</strong> 再認可・稼働確認・バックフィル — 2026-08-10。<code>instagram_manage_insights</code> 再認可・リール 25 投稿 + 日次 90 日 × 2 アカウントを収集し定常運用入り</li>
+<li>⬜ <strong>16-12</strong> 指標セット確定の反映（<strong>16-5 完了後</strong>）
+  <ul>
+  <li>内容: 16-5 の評価結果から「継続的に見る指標セット」を確定し、生成カラム / ビューへの昇格（DDL）と KPI 転記運用（<a href="../app/operation.html">operation.html</a> セクション 6 への追記・事業戦略書 KPI 実績表との接続）を確定する（2 段階 Fix の後段）。<strong>確定した指標で各セット計画書の KPI 欄を埋める（Phase 18 で枠のみ先行設置済み）</strong>。以後の日常の KPI 観察はセットレーンへ移る</li>
+  </ul></li>
+</ul>
+
+<hr>
+
+<h2>Phase 18: プロジェクト管理の 2 レーン化</h2>
+<p><strong>ゴール</strong>: 開発（フェーズもの）とセット別の保守運用・軽微改修を別レーンに分離し、複数セッションの並行作業を可能にする</p>
+<blockquote>2026-08-28 の壁打ちで方針決定（背景: 稼働 3 セット化で週次補充・トラブル対応・セット内改修が開発と同じ 1 本のレーンに載り直列化していた）。決定事項の全文は<a href="development-log.html">開発記録</a>の Phase 18 を参照。</blockquote>
+<ul>
+<li>✅ <strong>18-1</strong> <code>docs/plans/</code> の骨組み作成（index + レーン運用ルール） — 2026-08-28</li>
+<li>✅ <strong>18-2</strong> 開発計画・開発記録の移設・HTML 化・整理（完了ステップの備考原文は開発記録へ移設） — 2026-08-28</li>
+<li>✅ <strong>18-3</strong> セット別計画書・記録の作成（3 セット × plan / log）とセット固有内容の移管 — 2026-08-28</li>
+<li>✅ <strong>18-4</strong> 参照の全数張り替え（CLAUDE.md・設計書・スキル 2 本）+ 旧 <code>.md</code> 削除 — 2026-08-28</li>
+<li>✅ <strong>18-5</strong> 検証（旧パス参照ゼロ・リンク切れ機械チェック） — 2026-08-28。スマホ（docs-mobile-view）での表示確認はユーザー確認</li>
+</ul>
+
+<hr>
+
+<h2>Phase XX: プラットフォーム展開</h2>
+<p><strong>ゴール</strong>: 当たりの兆しが出たセットを他プラットフォームへ展開する</p>
+<blockquote>旧 Phase 17。2026-08-10 に第 3 セット構築を Phase 17 として優先するユーザー決定に伴い番号を退避（着手判断時に採番する）</blockquote>
+<ul>
+<li>骨子: TikTok を第一候補とする（動画資産の転用。Content Posting API のアプリ審査等の要件は着手時に調査）。X は当面見送り（判断根拠は事業戦略書セクション 5）。着手判断の基準は「勝負セットで M2 到達が目安」。ステップ展開は着手判断時に行う</li>
+</ul>
+
+<hr>
+
+<h2>トラブルシューティングログ</h2>
+<p>開発・基盤の横断的な問題と解決策を記録する。<strong>セット固有の稼働トラブル（事象の記録）は各セット記録（<code>docs/plans/&lt;set&gt;-log.html</code>）へ</strong>、恒久対策の課題は本書の設計課題リストへ記録する（Phase 18 で二分。logic-training-1 の 2026-08-06・2026-08-23 の事象は <a href="logic-training-1-log.html">logic-training-1 記録</a>へ移設済み）。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>日付</th><th>Phase-Step</th><th>問題</th><th>解決策</th></tr></thead>
+<tbody>
+<tr><td>2026-07-18</td><td>10-3</td><td>V001 の複合 FK 5 本（<code>generated_images</code> 2 本・<code>posts</code> 3 本）に付けていた <code>COMMENT</code> 句が MySQL 構文違反（FOREIGN KEY 制約は COMMENT をサポートしない）。V001 は実 MySQL で未実行のため潜伏しており、10-4 の適用時に ERROR 1064 で失敗するところだった</td><td>10-3 の構文検証（sqlfluff・MySQL 方言）で検出。COMMENT の記載内容を FK 直前の行コメントへ移動して解消（<code>UNIQUE KEY</code>・<code>KEY</code> の COMMENT は正当な構文のため残置）。全 9 テーブルのパース成功を再検証済み</td></tr>
+<tr><td>2026-07-18</td><td>10-4</td><td>Query Editor での V001 初回実行が全 9 文 <code>Incorrect database name 'acps '; Error code: 1102</code> で失敗。接続ダイアログのデータベース名に末尾空白が入っていた（コピペ起因）。テーブルは 1 つも作られない</td><td>データベース名を空白なしの <code>acps</code> で入力し直して再実行 → 全文成功。Query Editor の接続ダイアログは入力値の前後空白をトリムしないため、DB 名はコピペ後に空白を確認する</td></tr>
+<tr><td>2026-07-29</td><td>15-10</td><td><code>docker exec -i acps-mysql mysql ... &lt; V004.sql</code> で DDL を適用すると、mysql クライアントの既定文字コードが latin1 のため日本語 COMMENT が二重エンコードで保存される（utf8mb4 クライアントで読むと文字化け。latin1 クライアントで読むと一見正常に見えるため気づきにくい）</td><td>カラム・インデックスを一度戻してから <code>--default-character-set=utf8mb4</code> を付けて再適用し解消。ローカル MySQL への SQL ファイル適用・日本語を含む SQL 実行では同オプションを必須とする（初回起動時の自動適用〔docker-entrypoint-initdb.d〕はサーバー設定で utf8mb4 になるため影響なし）</td></tr>
+</tbody>
+</table></div>
+
+<h2>設計課題リスト</h2>
+<p>設計レビューで出た改善提案や、一時 Fix 時に持ち越した論点を記録する（運用ルールは <a href="../index.html">docs/index.html</a> セクション 4 を参照）。解消した課題は<a href="development-log.html">開発記録</a>末尾の「設計課題リスト（解消済み）」へ移す。<strong>セット固有の課題（コード・共通設計書に触れないもの）は各セット計画書のバックログへ</strong>（Phase 18 で二分。logic-training-1 のハッシュタグ残置の課題〔2026-08-24〕は <a href="logic-training-1.html">logic-training-1 計画書</a>へ移設済み）。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>日付</th><th>対象ドキュメント</th><th>課題</th><th>対応方針</th><th>対応時期</th></tr></thead>
+<tbody>
+<tr><td>2026-07-07</td><td>docs/app/operation.html</td><td>stale データ（<code>pending</code>/<code>container_created</code> のまま残った生成実行）の検知は専用アラームを持たず、既存の失敗通知を起点にした手動クエリ確認に依存する</td><td>セット数・投稿頻度が増えて見落としリスクが高まった場合、stale 行数を CloudWatch カスタムメトリクスとして発行する仕組みの導入を検討する。<strong>15-16 棚卸し（2026-07-29）: 据え置き</strong>（logic-training-1 投入で 1 日 4 実行へ増えたが発生実績なし。失敗通知起点の運用を継続）</td><td>未定（将来拡張）</td></tr>
+<tr><td>2026-07-12</td><td>docs/infra/workflow.html</td><td>将来セット間のデプロイ分離（セットごとに使うタスク定義リビジョンを Scheduler payload で固定し、新セットの開発中も既存セットは検証済みイメージで動かし続ける方式）が必要になった場合、Step Functions の RunTask がタスク定義を入力から受け取れる形になっていれば、Scheduler の設定値追加だけで移行できる</td><td><strong>結論（2026-07-15、Phase 10-1 で検討済み）</strong>: 継ぎ目は設けない。デプロイ分離自体を導入しないと決定済みであり、現行のシンプルな family 名参照を維持する。導入を判断する時点で、SFN 改修（タスク定義を入力から受け取る形）とセットで行う</td><td>デプロイ分離導入時</td></tr>
+<tr><td>2026-07-14</td><td>services/db-readiness-check</td><td>6-1 で <code>shared/acps_shared</code> に DB 接続共通モジュールを作成したが、db-readiness-check は移植元の <code>app/secrets.py</code> / <code>app/db.py</code> を持ったままで、Secret パース処理が二重管理になっている。統合には db-readiness-check の Dockerfile をルートコンテキスト方式（<code>COPY shared/</code>）に変更してイメージを再ビルド・再 push する必要があるため 6-1 では見送った</td><td><strong>6-2 で判断（2026-07-14）</strong>: 統合は見送り。db-readiness-check は Phase 3 で検証済み・全ワークフローの先頭ステートで稼働中の安定コンポーネントであり、二重管理の Secret パース処理は Phase 10 まで双方とも変更予定がない一方、統合にはイメージ再ビルド・再 push・AWS 上の再検証が必要でリスクに見合う実益がないため。db-readiness-check に次に機能変更で手を入れるタイミングで、ルートコンテキスト方式への変更と合わせて統合を再検討する</td><td>Phase 10 以降（再検討）</td></tr>
+<tr><td>2026-07-15</td><td>docs/infra/security.html</td><td>画像生成 API の複数プロバイダを併用する場合、単一 Secret <code>acps/{env}/image/api-key</code> では足りない（生成方式は差し替え可能な strategy 構造のため、将来プロバイダが並存しうる）</td><td>provider 軸の Secret 命名拡張（例 <code>acps/{env}/image/&lt;provider&gt;/api-key</code>）を security.html の規約改定・IAM プレフィックス確認とセットで、2 プロバイダ併用が現実になった時点で検討する。<strong>15-16 棚卸し（2026-07-29）で補記</strong>: gpt-quiz-multicut は LLM テキスト API（Responses）も同一 Secret の OpenAI キーを共用しており、名称は <code>image</code> だが実態は「OpenAI API キー」になっている。provider 拡張の検討時は名称の実態合わせも合わせて扱う</td><td>2 プロバイダ併用時</td></tr>
+<tr><td>2026-07-15</td><td>docs/app/batch-flow.html</td><td>2 つ目の SNS プラットフォーム追加時、batch-flow.html セクション 3 の Instagram 固有部分（コンテナ作成 → パブリッシュの 2 段階フロー、<code>published_unconfirmed</code> の判定条件等）をどう分冊・共通化するかの設計書構造が未定義</td><td>生成方式の 3 層分冊と同様の考え方（共通フロー + プラットフォーム別分冊）を軸に、追加が現実になった時点で確定する</td><td>2 つ目のプラットフォーム追加時</td></tr>
+<tr><td>2026-07-22</td><td>docs/app/batch-flow.html セクション 3.1, services/sns-post-batch/app/target_selection.py</td><td>投稿対象の選定条件は「有効アカウントに終端状態の posts がない最古の generation_run」のみで、生成画像の存在を条件にしていない。画像生成が全滅して <code>generated_media</code> 0 件のまま終わった generation_run が残ると、以後の投稿バッチはその実行を選び続けて RuntimeError で失敗し、手動クリーンアップまで新しい生成実行の投稿がブロックされる。フェイルラウド方針とは整合しており blocker ではない</td><td>発生した場合は stale データ運用（<a href="../app/operation.html">operation.html</a> セクション 4）で該当 generation_run を手動クリーンアップする。発生が繰り返して運用負荷になる場合は、選定条件に「<code>generated_media</code> が 1 件以上存在する」を加える改修（batch-flow.html 3.1 の更新とセット）を検討する。<strong>2026-08-06 に logic-training-1 で予見どおり発生</strong>（事象の記録は <a href="logic-training-1-log.html">logic-training-1 記録</a>）。恒久対策はストック方式への転換で経路が縮小したため引き続き発生実績を見て判断</td><td>発生実績を見て判断</td></tr>
+<tr><td>2026-07-24</td><td>docs/app/operation.html</td><td>AI 開示ハッシュタグ <code>#AIart</code> の付与はキャプションテンプレートに含める運用ルール（テンプレート登録時のチェックリスト）のみで担保しており、システム的な検証（テンプレートに含まれているかのチェックや投稿時の自動付与）はない。テンプレート差し替え時の付け忘れは目視でしか気づけない</td><td>セット数・テンプレート更新頻度が増えた場合、投稿バッチ側でのタグ存在チェック(警告ログ)または自動付与の導入を検討する（管理画面の将来拡張と合わせて判断）</td><td>未定（将来拡張）</td></tr>
+<tr><td>2026-07-25</td><td>services/sns-post-batch/app/target_selection.py, docs/app/batch-flow.html セクション 3.1</td><td>投稿対象は「終端状態の posts を持たない<strong>最も古い</strong> generation_run」のため、未投稿の run が 1 件でも滞留すると以後の投稿が恒常的に 1 実行分遅れ、<strong>自然解消しない</strong>。投稿自体は成功し続けるため、失敗アラームでは気づけない</td><td>SNS 投稿 SFN の単体実行でバックログを消化して解消できる（14-10 で実績）。定期的に「未投稿 run の件数」を確認する運用、または滞留件数の可視化を、頻発するようなら検討する。<strong>14-12 で 1 日 1 回に減らしたセットでは 1 件の滞留がそのまま「毎日 1 日遅れの投稿」になり気づきにくさが増す</strong>点に注意。予防手順（デプロイ・Scheduler 追加前にバックログ 0 件確認）は 15-15 で運用化済み</td><td>発生頻度を見て判断</td></tr>
+<tr><td>2026-07-26</td><td>docs/app/operation.html, docs/infra/workflow.html</td><td>14-12 で投稿頻度を 1 日 1 回に減らしたため、<strong>1 回の失敗がその日の投稿ゼロに直結する</strong>（1 日 3 回のときは残り 2 回で自然にカバーされていた）。失敗アラーム受信後に当日中へ復旧させる手順（画像生成 SFN の手動再実行の可否・締切時刻の目安）が運用ルールとして明文化されていない</td><td>失敗アラームが実際に鳴った際の対応で運用感を掴んでから、operation.html の失敗時ポリシー（セクション 4）に「当日リカバリの手順と判断基準」を追記する。頻度をさらに上げる場合は不要になる可能性がある。<strong>2026-08-28 時点の対象は 1 日 1 回運用の fantasy-animals-1・pref-ranking-1</strong></td><td>失敗実績を見て判断</td></tr>
+<tr><td>2026-07-27</td><td>docs/app/data-model.html セクション 4.9（<code>quiz_items</code>）</td><td>クイズ方式の検証・再生成の過程メタ（再生成回数・自己検証の結果・類似度スコア）は DB に記録しない割り切りとした（観測は CloudWatch Logs のみ）。検証チェーンの実際の NG 率・再生成頻度が運用開始まで見えない</td><td>Phase 16 のインサイト収集で問題別パフォーマンス分析を設計する際、必要になれば <code>quiz_items</code> へのカラム追加(または検証ログテーブル新設)を検討する。<strong>16-1（2026-08-01）: 生成チェーン休止により過程メタ自体が発生しなくなり、課題の対象は大幅に縮小</strong>（突合キーは <code>quiz_items.stock_item_id</code> が担う。生成経路を再開する場合のみ再燃）</td><td>生成経路の再開時（16-1 で対象縮小）</td></tr>
+<tr><td>2026-08-10</td><td>services/sns-post-batch/app/instagram_api.py, shared/acps_shared</td><td>16-7 の設計 Fix で、Instagram クライアントの汎用層（HTTP / エラー処理）と SNS Secret 名規約を <code>shared/acps_shared</code> へ昇格して insights-batch から使う方針とした（16-9 で実施）。sns-post-batch は当面ローカル実装のままのため、汎用層が一時的に二重管理になる。また sns-post-batch の Graph API バージョンは v21.0 のままで、insights-batch（v25.0 ピン留め）とバージョンが並存する</td><td>sns-post-batch に次に機能変更で手を入れるタイミングで、shared 昇格版への載せ替えと API バージョン引き上げ（v25.0 系。16-6 (7) の廃止メトリクス名は投稿系エンドポイントには影響しないため動作互換の見込み）をセットで実施する（db-readiness-check の二重管理〔2026-07-14 の項〕と同じ整理）</td><td>sns-post-batch の次回改修時</td></tr>
+<tr><td>2026-08-10</td><td>docs/app/data-model.html セクション 4.13, docs/app/generators/ranking-prebuilt.html</td><td>ランキングの値は <code>ranking_data.value</code>（数値）+ <code>content_fields.value_suffix</code>（単位）で表示・読み上げする構造のため、<strong>時刻や「時間.分」形式の指標が載らない</strong>。17-3 のネタ検証で、社会生活基本調査の「夜ふかし（平均就寝時刻 23:39）」「食事時間（1時間45分）」が採用できず候補から外れた。分へ換算すれば数値化できるが、版面表示（<code>105分</code>）と読み上げの自然さをどうするかの判断が必要</td><td>この系統のネタを採用したくなった時点で、①分換算 + <code>value_suffix="分"</code> で押し切る ②<code>content_fields</code> に表示用の整形文字列を持たせる（<code>ranking_data</code> は数値のまま = 言語非依存を維持）のどちらかを選ぶ。当面は数値指標（金額・件数・率）のネタで在庫を賄えるため据え置き。<strong>週次補充のネタ選定に影響するため、セット計画書のバックログからも本項を参照している</strong></td><td>必要になった時点</td></tr>
+<tr><td>2026-08-23</td><td>services/sns-post-batch/app/instagram_api.py</td><td>コンテナのポーリングが <code>fields=status_code</code> しか取得していないため、<code>status_code=ERROR</code> になった<strong>理由が一切残らない</strong>（<code>api_response</code> に保存されるのも <code>{"id":"...","status_code":"ERROR"}</code> のみ）。Graph API は <code>status</code> フィールドに理由文字列を返すが、これを取っていない。また、コンテナ ERROR はパブリッシュ前の段階（二重投稿リスクなし）にもかかわらずアプリ内リトライを持たず、1 回の ERROR でその生成実行が恒久的に欠番になる（事象の記録は <a href="logic-training-1-log.html">logic-training-1 記録</a> 2026-08-23）</td><td>①ポーリングの <code>fields</code> に <code>status</code> を追加し、ログと <code>api_response</code> に理由文字列を残す（数行の修正。次に同種の失敗が起きた際の切り分けに必須）。②コンテナ作成からやり直すアプリ内リトライ（1〜2 回）は、一過性エラーの再発頻度を見てから判断する。<strong>2026-08-10 の項（shared 昇格・v25.0 引き上げ）と同じ「sns-post-batch の次回改修時」にまとめて実施する</strong></td><td>sns-post-batch の次回改修時（① は先行実施も可）</td></tr>
+<tr><td>2026-08-23</td><td>docs/app/operation.html, docs/infra/workflow.html</td><td>投稿対象の決定が「終端状態の posts を持たない最古の generation_run」であるため、<strong>リールが <code>failed</code> になった直後の SFN Retry は「対象なし」と判定して 0 件処理で正常終了する</strong>。結果として Step Functions 実行は SUCCEEDED になり、SFN 失敗アラームでは投稿の欠番に気づけない（2026-08-23 の事象では ECS タスク異常終了通知だけが手がかりだった）。<code>batch_execution_logs</code> に <code>records_processed=0</code> は残るが、これを見る運用・アラームがない</td><td><code>batch_execution_logs</code> の <code>records_processed=0</code>（かつ当日の投稿 success が 0 件）を検知する仕組み（CloudWatch カスタムメトリクス、または ECS タスク異常終了通知の受信時チェック手順の明文化）を検討する。当面は <strong>ECS タスク異常終了通知を受けたら投稿の成否を必ず確認する</strong>運用で代替する（2026-07-07 の stale データ検知・2026-07-25 のバックログ滞留と同じ「可視化がない」系の課題であり、まとめて扱う）</td><td>未定（発生頻度を見て判断。可視化の枠組みは 2026-07-07 の項と合わせて検討）</td></tr>
+</tbody>
+</table></div>
+
+</div>
+</body>
+</html>

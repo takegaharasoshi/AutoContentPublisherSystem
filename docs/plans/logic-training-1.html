@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セット計画書: 脳みそトレーニング | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / logic-training-1</nav>
+<h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">セットレーン</span>
+  <span>最終更新: 2026-08-28（Phase 18 で新設）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  logic-training-1 の<strong>運用ステータス・バックログ・進行中ステップ</strong>を管理する（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="logic-training-1-log.html">セット記録</a>へ追記する。セットの仕様（スロット定義・キャプション・凍結範囲）の正は<a href="../app/sets/logic-training-1.html">セット別設計書</a>、補充手順の正は <a href="../app/operation.html">operation.html</a> セクション 3 + スキル <code>/quiz-stock-replenish</code>。
+</div>
+
+<h2>1. ステータス</h2>
+<div class="table-wrap"><table>
+<tbody>
+<tr><th>アカウント</th><td>@d_brain_coach「脳みそコーチのロジトレ」（Instagram）</td></tr>
+<tr><th>投稿スロット</th><td>朝 7:30（定番なぞなぞ）・夜 21:00（とんち・水平思考）の 1 日 2 回。<strong>昼 12:30（フェルミ推定）は 16-4d（2026-08-24）で当分停止中</strong>（noon Scheduler = DISABLED・資材は凍結残置。再開判断は将来。経緯は<a href="../app/sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</td></tr>
+<tr><th>生成方式</th><td>quiz-prebuilt（動画事前ビルド・作り置き。<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>）。16 秒・3 カット構成（16-4c）</td></tr>
+<tr><th>ストック運用</th><td>スキル <code>/quiz-stock-replenish</code> で週次補充。補充閾値 = 各組 7 問（朝・夜の 2 組のみ。昼は凍結）。直近: 2026-08-w3 補充で両環境とも各組 unused_built 7 に回復（2026-08-24）</td></tr>
+<tr><th>KPI</th><td>（枠のみ。<strong>継続的に見る指標セットは 16-12〔開発レーン〕で確定予定</strong> — 確定までは独自の指標記録を始めない。スキップ率改善の水準評価は 16-5〔開発レーン〕が担当）</td></tr>
+</tbody>
+</table></div>
+
+<h2>2. バックログ</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>日付</th><th>課題</th><th>対応方針</th><th>対応時期</th></tr></thead>
+<tbody>
+<tr><td>2026-08-24</td><td>16-4d の昼スロット停止後も、キャプションテンプレートの固定ハッシュタグに <code>#フェルミ推定</code> が残っており、朝・夜の投稿にも付き続ける（実害は軽微だが出題内容と合わない）。変更には <code>caption_templates</code> の DB 差し替え（旧テンプレート <code>is_active=0</code> 化）が必要（<a href="development-plan.html">開発レーン</a>の設計課題リストから 2026-08-28 に移設）</td><td>昼スロットの再開判断時、またはテンプレートを他の理由で差し替えるタイミングで合わせて見直す（単独での差し替えはしない）</td><td>昼スロット再開判断時</td></tr>
+</tbody>
+</table></div>
+
+<h2>3. 進行中ステップ</h2>
+<p>なし（週次補充の定常運用のみ）。</p>
+
+</div>
+</body>
+</html>

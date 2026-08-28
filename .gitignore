@@ -4,7 +4,7 @@ __pycache__/
 uv.lock
 .env
 .vscode/
-plans/
+/plans/
 .claude/settings.local.json
 content/**/review.md
 content/**/review.html

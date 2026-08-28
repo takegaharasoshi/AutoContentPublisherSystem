@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セット計画書: 表彰台五郎の都道府県ランキング | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / pref-ranking-1</nav>
+<h1>セット計画書: 表彰台五郎の都道府県ランキング（pref-ranking-1）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">セットレーン</span>
+  <span>最終更新: 2026-08-28（Phase 18 で新設）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  pref-ranking-1 の<strong>運用ステータス・バックログ・進行中ステップ</strong>を管理する（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="pref-ranking-1-log.html">セット記録</a>へ追記する。セットの仕様の正は<a href="../app/sets/pref-ranking-1.html">セット別設計書</a>、動画・ビルドの技術設計は<a href="../app/generators/ranking-prebuilt.html">方式設計書</a>、補充手順の正は <a href="../app/operation.html">operation.html</a> セクション 3 + スキル <code>/ranking-stock-replenish</code>、執筆・レビューの勘所は <a href="../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a>。
+</div>
+
+<h2>1. ステータス</h2>
+<div class="table-wrap"><table>
+<tbody>
+<tr><th>アカウント</th><td>@daigoro_ranking「表彰台五郎の都道府県ランキング」（Instagram）。稼働開始 2026-08-26・初回定時実行 2026-08-27 20:00 JST</td></tr>
+<tr><th>投稿スロット</th><td>夜 20:00 JST（evening）の 1 日 1 回</td></tr>
+<tr><th>生成方式</th><td>ranking-prebuilt（Remotion 事前ビルド・作り置き）。<strong>尺は 30 秒単尺で確定（2026-08-24）</strong>。20 秒版はタイムライン・コンポジション・方式モジュールとも実装済みのまま<strong>休眠</strong>（増便・尺再検討時の保険。削除しない）</td></tr>
+<tr><th>BGM</th><td><strong>1 曲運用</strong>（世界観の統一。17-5b のユーザー判断）。ミュート検知時は在庫全本の再ビルドが必要な点に注意（<a href="../app/sets/pref-ranking-1.html">セット別設計書</a>セクション 6 の decision）</td></tr>
+<tr><th>ストック運用</th><td>スキル <code>/ranking-stock-replenish</code> で週次補充（7 ネタ目安・在庫水位 14 件以上）。直近: 17-7（2026-08-28）でストック 30 件・30 秒版ビルド済みが両環境に揃った（未ビルド 0 件・Aurora 未使用在庫 28 件）。<strong>ネタ帳は使い切ったため以後の供給は家計調査の品目採掘が主軸</strong></td></tr>
+<tr><th>KPI</th><td>（枠のみ。<strong>継続的に見る指標セットは 16-12〔開発レーン〕で確定予定</strong> — 確定までは独自の指標記録を始めない）</td></tr>
+</tbody>
+</table></div>
+
+<h2>2. バックログ</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>日付</th><th>課題</th><th>対応方針</th><th>対応時期</th></tr></thead>
+<tbody>
+<tr><td>2026-08-24</td><td><strong>テスト投稿・初速確認</strong>（旧 17-6。Phase 18 で開発レーンから移管）: 自動投稿の安定稼働（欠番なし）・インサイト自動収集の確認・完走率 / 保存 / フォロワー初速の観測 → 定常運用への移行判断。尺 30 秒確定に伴い 2 尺比較（昼 20 秒 / 夜 30 秒のスロット分離・検証後半のスワップ）は中止済み</td><td>稼働開始（2026-08-27）から数週間の投稿実績とインサイトを観測する。増便（1 日 2 回へ）や 20 秒尺の再検討は初速を見てからの判断とし、必要になれば 20 秒版は実装済みのため、ビルドと <code>parameters</code> へのスロット追加だけで再開できる。指標の見方は 16-5・16-12（開発レーン）の確定を待って揃える</td><td>観測中（2026-08-27〜）</td></tr>
+<tr><td>2026-08-10</td><td>時刻・「時間.分」形式の指標がデータモデルに載らない制約（ネタ選定に影響。夜ふかし・食事時間などが不採用になった）</td><td>開発レーンの課題（<a href="development-plan.html">設計課題リスト</a> 2026-08-10 の項が正）。週次補充でこの系統を採用したくなったら開発レーンへ起票し直す</td><td>必要になった時点</td></tr>
+</tbody>
+</table></div>
+
+<h2>3. 進行中ステップ</h2>
+<p>なし（初速の観測と週次補充の定常運用のみ）。</p>
+
+</div>
+</body>
+</html>

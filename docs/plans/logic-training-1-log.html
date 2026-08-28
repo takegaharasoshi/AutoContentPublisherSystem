@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セット記録: 脳みそトレーニング | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / logic-training-1 記録</nav>
+<h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">セットレーン</span>
+  <span>最終更新: 2026-08-28（Phase 18 で新設）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  logic-training-1 の週次補充・セット内改修・トラブル対応の実施記録。<strong>2026-08-28（Phase 18）以前の整備記録（Phase 15〜16 の構築・テコ入れ）は<a href="development-log.html">開発記録</a>の Phase 15・16 を参照</strong>。以下の初期エントリは Phase 18 で開発レーンの計画書・記録から移設したもの。
+</div>
+
+<h2>1. 週次補充の記録</h2>
+<p>週次補充（スキル <code>/quiz-stock-replenish</code> + <a href="../app/operation.html">operation.html</a> セクション 3 の手順 1〜5）の実施記録。バッチ資材は <code>content/quiz-stock/&lt;set_code&gt;/&lt;バッチ名&gt;/</code> に自己完結で置き、各バッチの <code>STATUS.md</code> が一次記録・本節は要約。</p>
+<ul>
+<li><strong>logic-training-1 / 2026-08-w3（21 問。2026-08-18 着手 〜 2026-08-24 完了）</strong><ul>
+<li>資材: <a href="../../content/quiz-stock/logic-training-1/2026-08-w3/">content/quiz-stock/logic-training-1/2026-08-w3/</a>。<strong>初期整備（16-2）以来はじめての週次補充</strong>で、各組 7 問 = 1 週間分（ユーザー決定 2026-08-18）。着手時の在庫は朝 5 / 昼 4 / 夜 4 = 13 問で 3 組とも補充閾値（7 問）割れ、新規ネタは 8/21 が最後という状況だった</li>
+<li><strong>今回から適用した執筆方針</strong>: ①昼 L3 は<strong>捻った分解型を標準</strong>（直接換算型は不採用）+ <strong>解説 5 ステップ構造</strong>（2026-08-07 決定の初適用。<code>explanation</code> 240 字上限）②朝の「広く流布した定番のみ」という採用基準を撤廃（2026-08-19 ユーザー決定。リサーチで見つけた問題なら定番でなくてよい）。ツーリング側は <code>validate.py</code> の L3 解説上限と内訳期待値、<code>verify_logic.py</code> の検算対象（昼 7 問 + 朝の文字あそび 2 問 + 夜 5 問）を今回向けに拡張</li>
+<li><strong>レビューでの差し替えが多かった</strong>: 朝 A15 は 4 回・夜は 7 問中 5 問を差し替えた。確立した基準はスキル <code>/quiz-stock-replenish</code> へ反映済み（夜 = 有名すぎる古典は不可 / <strong>答えを聞いた瞬間に納得できるか</strong>が採否の分かれ目 / 古語・死語を使わない / ヒントが仕掛けを渡していないか毎問確認。昼 = 「〇〇 ÷ 答え」で逆算しただけの仮定は不可だが<strong>絵にできる密度仮定は通る</strong>）</li>
+<li><strong>投入（2026-08-22）</strong>: 既出題（<code>quiz_items</code> 65 件 + <code>quiz_stock_items</code> 42 件）と解法構造・題材を突合し重複なしを確認 → ローカル MySQL はトランザクション + ROLLBACK のドライラン後に本適用 → Aurora は Data API で 21 文適用。<code>content_key</code> は両環境とも <code>morning/noon/night-015</code>〜<code>021</code> で一致。<strong>突合で「重複ではないが近い」2 件を記録</strong>（morning-019 のアナグラムは既存 morning-001 の並べ替えと、morning-015 の「愚痴をこぼす」は既存 morning-010 の「年をとる」と、仕掛けが同型）</li>
+<li><strong>イラスト（Codex imagegen 委譲・スロット別 3 バッチ）</strong>: 全 21 枚が <strong>1536x1024（3:2）ちょうど</strong>で出力され、<code>intake.py</code> の切り捨て WARNING 39 件はすべて旧 42 問（16-5 のサイズ明示行より前の生成物）。今回分は 0 件で、<strong>サイズ明示行 + 保存後サイズ確認の二重の歯止めが効いた</strong>ことを 21 枚規模で確認。ユーザー承認済みの例外 3 件（A17 = 顔とランドルト環を許可・数字は不可 / C18 = 人物 4 人が正 / C21 = ラベルの果物の絵は正・文字は不可）も指示どおり適用された</li>
+<li><strong>途中で動画構成の見直しが割り込んだ</strong>: レビューシートを見たユーザーの指示で <strong>16-4c</strong>（3 カット化・つかみ帯・ズーム廃止）を実施し、既存 42 問を含む<strong>全 63 問を再ビルド</strong>してから全数レビュー → 配置した</li>
+<li><strong>配置（2026-08-24）</strong>: 63 問を承認 → S3 へ 126 オブジェクト（mp4 + イラスト）→ ローカル MySQL 63 行 → Aurora へ <code>update_prebuilt.sql</code> を Data API で 63 文適用（<strong>各 1 行更新・<code>video_audio_asset_id</code> の NULL 化なし</strong>）。適用前に <code>question_text</code> が両環境とも 63 件すべて一意であることを確認した（安定キーで解決する SQL のため）。<strong>両環境とも <code>unbuilt = 0</code>・各組 <code>unused_built = 7</code></strong> で在庫閾値を回復</li>
+</ul>
+</li>
+</ul>
+
+<h2>2. トラブル対応の記録</h2>
+<p>セット固有の稼働トラブルの事象と復旧の記録（Phase 18 で開発レーンのトラブルシューティングログから移設）。恒久対策の課題は<a href="development-plan.html">開発レーン計画書</a>の設計課題リストに残置し、相互参照する。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>日付</th><th>問題</th><th>解決策</th></tr></thead>
+<tbody>
+<tr><td>2026-08-06</td><td>8/4 07:30 JST の logic-training-1 画像生成が、クイズ検証の再生成上限到達で SFN 失敗（ECS 3 試行 × 各 6 回が全滅。NG 理由は independent LLM validation failed / unhashable type: 'dict' / machine_spec must have exactly one solution の混在）。<code>generated_media</code> 0 件の generation_run（id=44）が残り、投稿対象選定が「最古の actionable」優先のため以後の投稿バッチが run 44 を選び続けて RuntimeError（No generated media was found）で失敗。8/4 12:40〜8/6 に <code>acps-prod-sns-posting-sfn-failed</code> が定時実行のたびに発報し、logic-training-1 の投稿が 8/3 21:00 を最後に停止（設計課題リスト 2026-07-22 の予見どおりの事象。fantasy-animals-1 は影響なし）</td><td><a href="../app/operation.html">operation.html</a> 4.2/4.3 の stale データ手順で復旧。未投稿の generation_run 8 件（44, 47, 48, 51, 52, 53, 55, 56。44 のみメディア 0 件、他 7 件は未投稿リール各 1 件 = 鮮度切れのため破棄と判断）に posts 行（set_id=2・sns_account_id=2・media_type='reel'・status='failed'・error_message に手動対象外化の旨）を Data API で INSERT し投稿対象外化。あわせて logic-training-1 の生成スケジュール 3 本を Phase 16 リリースまで DISABLED 化（CLI 即時 + CDK <code>enabled: false</code> を反映し「手動 DISABLE が deploy で戻る」事故を防止）。恒久対策（選定条件へのメディア存在チェック追加）は Phase 16 でストック方式へ転換するため見送り</td></tr>
+<tr><td>2026-08-23</td><td>8/23 12:33 JST の昼スロットで、Instagram のメディアコンテナが処理中に <code>status_code=ERROR</code> を返し、リールが未投稿のまま <code>posts.id=174</code>（generation_run 119・<code>media_type='reel'</code>）が <code>failed</code> になった（コンテナ ID <code>18064413008566231</code>・<code>api_response</code> は <code>{"id":"...","status_code":"ERROR"}</code> のみで理由は不明）。ストーリーズ行はリール成功後にしか作られないため未作成。SFN の Retry 2 回目は投稿対象を「なし」と判定して 0 件で正常終了したため、<strong>Step Functions 実行は SUCCEEDED のまま昼の投稿だけが欠番</strong>になり、気づけたのは ECS タスク異常終了通知のみだった</td><td>動画は原因ではないことを確認（run 119 と前日成功の run 118 を ffprobe・フルデコードで比較 → H.264 High / yuv420p / 1080x1920 / 30fps / 16.00 秒 / AAC 48kHz stereo が完全一致、デコード警告の数も同一。音声ストリームの MD5 は 8/22 昼の run 115〔投稿成功〕と一致 = 同一 BGM）。過去 10 日で初発のため Instagram 側の一過性エラーと判断し、<a href="../app/operation.html">operation.html</a> セクション 4.2 の手順で <code>posts.id=174</code> を <code>pending</code> へ戻して（<code>platform_container_id</code> 等をクリア）SNS 投稿 SFN を手動実行して復旧（2026-08-23 15:51 JST 起動 → SUCCEEDED。リール <code>posts.id=174</code> / ストーリーズ <code>posts.id=175</code> とも <code>success</code>・バックログ 0 件に復帰）。失敗理由が記録されない点（ポーリングが <code>fields=status_code</code> のみ）と「SFN 成功・投稿 0 件」を検知できない点は<a href="development-plan.html">開発レーン計画書</a>の設計課題リスト 2026-08-23 の 2 件に記録</td></tr>
+</tbody>
+</table></div>
+
+<h2>3. セット内改修の記録</h2>
+<p>まだなし（過去のフォーマット改修 16-4b〜16-4d は開発レーンのフェーズ作業として<a href="development-log.html">開発記録</a> Phase 16 に記録済み）。</p>
+
+</div>
+</body>
+</html>
