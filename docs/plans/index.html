@@ -18,7 +18,7 @@
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  プロジェクト管理は<strong>開発レーン</strong>（フェーズ制の新規開発・基盤改修。常に 1 セッション）と<strong>セットレーン</strong>（セット別の保守運用・セット内で閉じる改修。セットごとに並行可）の 2 レーンで行う。本書はファイルの一覧と<strong>レーン振り分け・並行作業ルールの正</strong>。導入の経緯は<a href="development-log.html">開発記録</a>の Phase 18 を参照。
+  プロジェクト管理は<strong>開発レーン</strong>（フェーズ制の新規開発・基盤改修。常に 1 セッション）と<strong>セットレーン</strong>（セット別の保守運用・セット内で閉じる改修。セットごとに並行可）の 2 レーンで行う。本書はファイルの一覧と<strong>レーン振り分け・並行作業ルールの正</strong>。導入の経緯は<a href="development-log.html">開発記録</a>の Phase 18 を参照。意思決定前のアイデアは<a href="../ideas/index.html">アイデア体系</a>（アイデアレーン・常に並行可・2026-08-28 導入）で管理する。
 </div>
 
 <h2>1. ファイル一覧</h2>
@@ -38,6 +38,7 @@
 <div class="table-wrap"><table>
 <thead><tr><th>レーン</th><th>触ってよいパス</th><th>作業例</th><th>並行</th></tr></thead>
 <tbody>
+<tr><td><strong>アイデアレーン</strong></td><td><code>docs/ideas/</code> 配下のみ（アイデア MD・詳細 HTML・ダッシュボード）+ スキル <code>.claude/skills/idea/</code></td><td>アイデアの捕捉・壁打ち・棚卸し（<code>/idea</code> スキル。起動がレーン宣言を兼ねる）</td><td><strong>常に並行可</strong>（宣言不要）。ただし「待機 → 採用」の転記は development-plan / 事業戦略書に触れるため<strong>開発レーン</strong>で行う</td></tr>
 <tr><td><strong>セットレーン</strong></td><td><code>content/&lt;set&gt;/</code> 配下（ストック資材・ビルドツーリング・Remotion コンポジション）/ セット別設計書 <code>docs/app/sets/&lt;set&gt;.html</code> / そのセット専用の方式設計書 <code>docs/app/generators/*.html</code> / セット計画書・記録 <code>docs/plans/&lt;set&gt;*.html</code> / 補充スキル <code>.claude/skills/*-stock-replenish/</code></td><td>週次ストック補充 / 動画の演出・尺・構成のセット内改修（例: カット数変更 → 再ビルド → S3・DB 差し替え）/ キャプション・BGM の DB 差し替え / セット固有トラブルの事象記録</td><td><strong>セットごとに並行可</strong>（複数セッション同時 OK）</td></tr>
 <tr><td><strong>開発レーン</strong></td><td><code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>（DDL）/ 共通設計書（<code>docs/app/</code> の共通 4 本・<code>docs/infra/</code>・<code>docs/overview/</code>・<code>docs/index.html</code>）/ 事業戦略書 / CLAUDE.md / 本ディレクトリの development-plan / development-log</td><td>フェーズもの（16-5・16-12・Phase XX 等）/ バッチ・CDK の改修（デプロイ + パイプライン完走確認を伴う）/ スキーマ変更 / 横断の運用ルール改訂</td><td><strong>常に 1 セッションのみ</strong></td></tr>
 </tbody>

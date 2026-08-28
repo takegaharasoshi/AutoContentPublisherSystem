@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ウミガメのスープ参加型アカウント | アイデア詳細</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アイデア体系</a> / ウミガメのスープ参加型アカウント</nav>
+<h1>ウミガメのスープ参加型アカウント</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">醸成中</span>
+  <span>種別: 単発 / 作成 2026-08-28 / 更新 2026-08-28 / 記録層: <a href="umigame-soup-set.md">umigame-soup-set.md</a></span>
+</div>
+
+<div class="warn">
+  <span class="callout-title">本書の位置づけ（設計書に非ず）</span>
+  採用判断のための<strong>検討記録（フィージビリティスタディ）</strong>。ここに書かれた構成・コスト試算は暫定であり、設計書の正ではない。採用が決まったら <code>docs/app/</code> / <code>docs/infra/</code> の設計プロセスにインプットとして引き継ぎ、そこで改めて設計 Fix する。
+</div>
+
+<h2>1. 企画概要</h2>
+<p>Instagram で「ウミガメのスープ」（水平思考クイズ）を遊べるアカウントを運用する。</p>
+<ul>
+<li>1 日 1 本、リールでウミガメのスープの問題を投稿</li>
+<li>ユーザーはコメント欄で「はい / いいえ / 関係ありません」で答えられる質問をする（例:「男は店員ですか？」「その場所は重要ですか？」）</li>
+<li>AI が問題の真相を理解した上で出題者役として自動返信する。原則「はい・いいえ・関係ありません」中心、必要なら短い補足。<strong>正解そのものはネタバレしない</strong></li>
+</ul>
+
+<h2>2. ゲーム体験（コメント欄での推理）</h2>
+<pre>ユーザーA「男は以前この店に来たことがありますか？」
+AI      「はい。」
+ユーザーA「そのときの出来事が重要ですか？」
+AI      「はい。重要です。」</pre>
+<p>初期版はルールを最大限シンプルにする方針: 質問回数無制限・ユーザーごとの回数を DB 管理しない・除外キーワード管理もしない・コメントは基本すべて AI に判定させる。</p>
+
+<h2>3. AI 出題者の設計</h2>
+<p>コメント単体ではなく、そのリールに対応する問題情報を一緒に AI へ渡す。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>入力</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>問題</td><td>ある男がレストランでスープを飲んだ。その後、男は自殺した。なぜ？</td></tr>
+<tr><td>真相</td><td>男は過去に遭難しており……（正解全文）</td></tr>
+<tr><td>ルール</td><td>出題者として「はい・いいえ・関係ありません」で回答。必要なら短い補足。真相を直接教えない / 推理の余地を残す / 問題設定と矛盾する回答をしない</td></tr>
+<tr><td>ユーザーの質問</td><td>「男は以前にもこのスープを飲んだことがありますか？」→ AI「いいえ。」</td></tr>
+</tbody>
+</table></div>
+
+<h2>4. アーキテクチャ</h2>
+<div class="note">
+  <span class="callout-title">設計方針を一言で</span>
+  <strong>「投稿時」と「コメント時」を完全に分離する</strong>。投稿時は Aurora を使う（既存 ECS が投稿 + S3 スナップショット保存）。コメント時は Aurora を一切使わず、S3 を media_id キーの Read Only データストアとして使う。
+</div>
+
+<svg viewBox="0 0 940 600" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:sans-serif;">
+  <defs>
+    <marker id="arw" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#5b7a99"/>
+    </marker>
+  </defs>
+  <style>
+    .box { fill:#f2f6fa; stroke:#5b7a99; stroke-width:1.5; rx:6; }
+    .boxnew { fill:#fdf6ec; stroke:#c2914d; stroke-width:1.5; rx:6; }
+    .lbl { font-size:14px; fill:#223; text-anchor:middle; }
+    .sub { font-size:11px; fill:#667; text-anchor:middle; }
+    .edge { stroke:#5b7a99; stroke-width:1.5; fill:none; marker-end:url(#arw); }
+    .edgelbl { font-size:11px; fill:#446; }
+    .flowttl { font-size:13px; fill:#335; font-weight:bold; }
+  </style>
+
+  <text x="135" y="30" class="flowttl" text-anchor="middle">投稿時（朝・既存システム + S3 保存追加）</text>
+  <text x="795" y="30" class="flowttl" text-anchor="middle">コメント時（新規・Aurora 不使用）</text>
+
+  <rect class="box" x="40" y="50" width="190" height="54"/>
+  <text x="135" y="73" class="lbl">Aurora Serverless v2</text>
+  <text x="135" y="91" class="sub">Min 0 ACU（マスターデータ）</text>
+
+  <rect class="box" x="40" y="170" width="190" height="54"/>
+  <text x="135" y="193" class="lbl">ECS（既存投稿バッチ）</text>
+  <text x="135" y="211" class="sub">リール生成・投稿</text>
+
+  <rect class="box" x="40" y="290" width="190" height="54"/>
+  <text x="135" y="313" class="lbl">Instagram</text>
+  <text x="135" y="331" class="sub">リール投稿 → media_id 取得</text>
+
+  <rect class="boxnew" x="400" y="140" width="190" height="64"/>
+  <text x="495" y="164" class="lbl">S3 スナップショット</text>
+  <text x="495" y="182" class="sub">problems/{media_id}.json</text>
+  <text x="495" y="196" class="sub">問題・正解・AI ルール</text>
+
+  <rect class="boxnew" x="400" y="410" width="190" height="54"/>
+  <text x="495" y="433" class="lbl">OpenAI API</text>
+  <text x="495" y="451" class="sub">出題者ロール回答生成</text>
+
+  <rect class="box" x="700" y="50" width="200" height="46"/>
+  <text x="800" y="78" class="lbl">Meta Webhook</text>
+
+  <rect class="boxnew" x="700" y="140" width="200" height="46"/>
+  <text x="800" y="168" class="lbl">API Gateway</text>
+
+  <rect class="boxnew" x="700" y="230" width="200" height="46"/>
+  <text x="800" y="258" class="lbl">Webhook Lambda</text>
+
+  <rect class="boxnew" x="700" y="320" width="200" height="46"/>
+  <text x="800" y="348" class="lbl">SQS（+ DLQ）</text>
+
+  <rect class="boxnew" x="700" y="410" width="200" height="54"/>
+  <text x="800" y="433" class="lbl">Reply Lambda</text>
+  <text x="800" y="451" class="sub">VPC 外・NAT 不要</text>
+
+  <rect class="box" x="700" y="520" width="200" height="46"/>
+  <text x="800" y="548" class="lbl">Graph API でコメント返信</text>
+
+  <line class="edge" x1="135" y1="104" x2="135" y2="170"/>
+  <text x="145" y="142" class="edgelbl">Data API</text>
+  <line class="edge" x1="135" y1="224" x2="135" y2="290"/>
+  <text x="145" y="262" class="edgelbl">投稿</text>
+  <path class="edge" d="M230,197 L340,197 L340,172 L400,172"/>
+  <text x="250" y="188" class="edgelbl">問題・正解 + media_id 保存</text>
+
+  <path class="edge" d="M230,317 L645,317 L645,73 L700,73" stroke-dasharray="6 4"/>
+  <text x="290" y="308" class="edgelbl">ユーザーがコメント（検知）</text>
+
+  <line class="edge" x1="800" y1="96" x2="800" y2="140"/>
+  <line class="edge" x1="800" y1="186" x2="800" y2="230"/>
+  <line class="edge" x1="800" y1="276" x2="800" y2="320"/>
+  <text x="810" y="302" class="edgelbl">即時 200 応答・非同期化</text>
+  <line class="edge" x1="800" y1="366" x2="800" y2="410"/>
+  <line class="edge" x1="800" y1="464" x2="800" y2="520"/>
+
+  <path class="edge" d="M700,420 L645,420 L645,186 L590,186"/>
+  <text x="608" y="240" class="edgelbl">問題取得</text>
+  <line class="edge" x1="700" y1="437" x2="590" y2="437"/>
+  <text x="618" y="428" class="edgelbl">回答生成</text>
+</svg>
+
+<h3>4.1 Webhook Lambda と Reply Lambda を分ける理由</h3>
+<p>Webhook 受信処理の中で OpenAI まで同期実行する必要はない。Webhook Lambda は SQS へ入れて即時に正常応答し、AI 処理は Reply Lambda で非同期に行う。メリット: Webhook タイムアウトを気にしない / OpenAI の遅延が Webhook に波及しない / コメント急増を SQS で吸収 / リトライ容易 / DLQ で失敗イベントを保全。</p>
+
+<h2>5. データ設計（S3 スナップショット）</h2>
+<p>リール投稿時に既存 ECS が問題・正解を S3 へコピーする。Aurora = マスターデータ、S3 = 公開中問題のスナップショット（コメント処理専用の Read Only データストア）。コメントが何件来ても Aurora にはアクセスしない。</p>
+<pre>s3://instagram-umigame-production/problems/{media_id}.json
+
+{
+  "media_id": "123456789012345",
+  "question": "ある男がレストランでスープを飲んだ。その後、男は自殺した。なぜ？",
+  "answer": "男は過去に遭難しており……",
+  "instructions": { "response_style": "yes_no_irrelevant", "spoiler": false }
+}</pre>
+<ul>
+<li><strong>Aurora を切り離す理由</strong>: 現行は Min 0 ACU 運用で普段停止。コメントごとに Data API を叩くと 1 日 200 コメントの分散で Aurora が長時間起動し続けるおそれがあるため、コメント処理から完全に切り離す</li>
+<li><strong>Lambda メモリキャッシュは初期版では不要</strong>: 1 コメント = S3 GET 1 回で十分。月 6,000 GET はコスト極小。シンプル優先</li>
+</ul>
+
+<h2>6. 1 日の動き</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>時間帯</th><th>流れ</th><th>Aurora</th></tr></thead>
+<tbody>
+<tr><td>朝: リール投稿</td><td>ECS 起動 → Aurora から今日の問題取得（Data API）→ リール生成 → Instagram 投稿 → media_id 取得 → 問題・正解を S3 保存 → ECS 終了</td><td>起動（従来どおり）→ 0 ACU へ</td></tr>
+<tr><td>日中: コメント約 200 件</td><td>コメント → Webhook → API Gateway → Webhook Lambda → SQS → Reply Lambda → S3 GET → OpenAI → Graph API 返信</td><td><strong>一度も起動しない</strong></td></tr>
+</tbody>
+</table></div>
+
+<h2>7. MVP スコープ（あえて実装しないもの）</h2>
+<p>初期版は「コメント → 問題取得 → AI 判定 → 返信」の最小構成。以下は作らない。</p>
+<ul>
+<li>ユーザーごとの質問回数制限 / コメント回数の DB 管理 /「3 回以上コメントした人には返信しない」処理</li>
+<li>禁止ワード DB / 除外キーワード処理 / ルールベースの「はい・いいえ」判定</li>
+<li>コメント履歴を使った会話状態管理 / Lambda メモリキャッシュ / RDS Proxy / コメント処理からの Aurora アクセス</li>
+</ul>
+
+<h2>8. コスト観</h2>
+<ul>
+<li>前提: 1 日 1 投稿 × 約 200 コメント × 30 日 = <strong>約 6,000 AI 返信 / 月</strong></li>
+<li>追加コストは API Gateway・Lambda・SQS・S3・OpenAI API・CloudWatch。この規模なら AWS 側は極小で、<strong>実質的な変動費は OpenAI API 料金のみ</strong></li>
+<li>Reply Lambda は VPC 外で動かすため NAT Gateway 不要（Aurora と直接通信しないため成立）</li>
+</ul>
+
+<h2>9. 未検討の論点（次回壁打ちのアジェンダ）</h2>
+<div class="decision">
+  <span class="callout-title">2026-08-28 時点の積み残し</span>
+  技術構成は一通り筋が通っている。採用判断に足りないのは以下（主に事業面と Meta 側の前提）。
+</div>
+<ol>
+<li><strong>収益との接続</strong>: このセット単体の収益モデルは何か（リーチ拡大 → 広告収益? 別マネタイズ?）。事業戦略書のセットポートフォリオにどう位置づくか</li>
+<li><strong>既存セットとの関係</strong>: logic-training-1 の夜スロット（とんち・水平思考）とテーマが近接。カニバリか相乗か、別アカウントでやる意味の整理。リソース配分の優先度（開発レーンは 16-5 → 16-12 が先行中）</li>
+<li><strong>問題ストックの供給体制</strong>: ウミガメのスープ問題の執筆・検証パイプライン。品質基準、既出問題・著作権の扱い。quiz-stock-replenish の枠組みを流用できるか</li>
+<li><strong>Meta 側の前提条件（実現可否に直結）</strong>: コメント Webhook 購読と自動返信に必要な権限・App Review の要否、ビジネスアカウント要件、Graph API の返信制約（レート・時間制限）の確認</li>
+<li><strong>モデレーションリスク</strong>: MVP は除外処理なし。不適切コメント・正解ネタバレコメントへの無防備さをどこまで許容するか（返信しない条件の最低ライン）</li>
+<li><strong>AI 回答品質</strong>: 矛盾回答・ネタバレ事故の検知と検証方法。モデル選定（OpenAI 前提だが、既存で使っている生成系との統一・コスト比較）</li>
+<li><strong>運用監視</strong>: DLQ の監視・返信失敗時の扱い・返信レイテンシの目標。既存 MonitoringStack との関係</li>
+<li><strong>効果仮説</strong>: コメント参加型がリーチ・保存・フォローにどう効くという仮説か。16-5 で確定する指標セットとどう接続して検証するか</li>
+</ol>
+
+</div>
+</body>
+</html>

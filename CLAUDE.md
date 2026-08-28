@@ -17,6 +17,7 @@ AutoContentPublisherSystem/
 │   ├── infra/                       #   インフラ設計書（HTML）
 │   ├── app/                         #   アプリ設計書（共通設計書 + generators/ 方式別 + sets/ セット別の 3 層構造）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
+│   ├── ideas/                       #   アイデア体系（意思決定前のアイデアの捕捉・壁打ち・醸成。ルールの正は ideas/index.html。スキル /idea）
 │   └── plans/                       #   計画体系（開発レーン計画・記録 + セット別計画・記録。2 レーン運用ルールの正は plans/index.html）
 ├── infra/                           # AWS CDK プロジェクト（TypeScript）
 ├── services/
@@ -59,6 +60,7 @@ AutoContentPublisherSystem/
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
 | `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
 | `docs/plans/` | 計画体系（開発レーン + セット別の計画・記録。並行作業ルール） | `index.html`（レーン振り分け・並行作業ルールの正）, `development-plan.html` / `development-log.html`（開発レーン）, `<set_code>.html` / `<set_code>-log.html`（セットレーン × 3 セット） |
+| `docs/ideas/` | アイデア体系（意思決定前の事業アイデアの捕捉・壁打ち・醸成。6 ステータス管理） | `index.html`（ダッシュボード・運用ルールの正）, `<slug>.md`（記録層・正）, `<slug>.html`（深化したアイデアの詳細） |
 | `docs/_archive/` | 旧 Markdown 設計書（アプリ設計の参考資料。現役ではない） | 過去の検討経緯の参照用 |
 
 ### ドキュメント参照ガイド（タスク別）
@@ -82,6 +84,7 @@ AutoContentPublisherSystem/
 | 開発の次ステップを確認する（開発レーン） | `docs/plans/development-plan.html` |
 | セットの運用状況・バックログの確認、週次補充・セット内改修（セットレーン） | `docs/plans/<set_code>.html`（記録は `<set_code>-log.html`）+ レーン判定は `docs/plans/index.html` |
 | 過去の実施記録・経緯を確認する | `docs/plans/development-log.html`（完了ステップの確認・備考の全文）/ セット運用の記録は `docs/plans/<set_code>-log.html` |
+| アイデアを書き留める・壁打ちする・棚卸しする | `docs/ideas/index.html`（ダッシュボード + 運用ルールの正。作業はスキル `/idea` で行う） |
 
 ### 設計 Fix・レビューの運用ルール
 
@@ -102,6 +105,7 @@ AutoContentPublisherSystem/
 ## 並行作業ルール
 
 - セッション開始時にレーンを宣言する。**開発レーン（`services/` `shared/` `infra/` `database/`・共通設計書に触れる作業）は常に 1 セッションのみ**。セットレーン（`content/<set>/` + セット別・専用方式設計書 + セット計画書で閉じる作業）は**セットごとに並行可**。補充スキルの起動はセットレーン宣言を兼ねる
+- **アイデアレーン**（`docs/ideas/` 配下 + スキル `.claude/skills/idea/` で閉じる作業）は常に並行可・宣言不要（`/idea` スキル起動が宣言を兼ねる）。「待機 → 採用」の転記のみ開発レーンで行う
 - 判定は `docs/plans/index.html` セクション 2 のパス基準判定表に従う。開発レーン対象のパスが 1 つでも入る作業は開発レーン行き（軽微に見えても）
 - レーンをまたぐ気づきは自分で直さず、相手レーンの計画書（開発レーンの設計課題リスト / セット計画書のバックログ）に記録する
 - `docs/plans/` 自体の整理・ルール変更は、他セッションが動いていないフリーズ窓で単独実施する

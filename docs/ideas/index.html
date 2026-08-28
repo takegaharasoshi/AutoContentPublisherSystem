@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アイデア体系 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / アイデア体系</nav>
+<h1>アイデア体系（ダッシュボード）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">2026-08-28 導入</span>
+  <span>アイデア管理のルールの正</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  意思決定<strong>前</strong>の事業アイデアを捕捉・醸成する場所。決めたことは <a href="../strategy/business-strategy.html">事業戦略書</a>・<a href="../plans/development-plan.html">開発計画</a> へ昇格し、ここには決める前のものだけを置く。運用はスキル <code>/idea</code>（捕捉・壁打ち・棚卸し）で行う。記録層は Markdown（<code>docs/ideas/*.md</code>・唯一の正）、閲覧層は本ページ + 深化したアイデアの詳細 HTML。<strong>乖離したら MD が正</strong>。
+</div>
+
+<h2>1. 今動ける（inbox + 醸成中）</h2>
+<p>次の壁打ち候補。ここが空でなければ、いつでも <code>/idea</code> で壁打ちを始められる。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>タイトル</th><th>種別</th><th>ステータス</th><th>要旨</th><th>リンク</th><th>更新日</th></tr></thead>
+<tbody>
+<tr>
+  <td>ウミガメのスープ参加型アカウント</td>
+  <td>単発</td>
+  <td><span class="badge badge-wip">醸成中</span></td>
+  <td>Instagram リールで水平思考クイズを 1 日 1 問投稿し、コメント欄の質問に AI が出題者として自動返信する参加型セット。アーキテクチャ検討済み・事業面の論点が未検討</td>
+  <td><a href="umigame-soup-set.md">MD</a> / <a href="umigame-soup-set.html">詳細</a></td>
+  <td>2026-08-28</td>
+</tr>
+</tbody>
+</table></div>
+
+<h2>2. 条件待ち（再醸成待ち + 待機）</h2>
+<p>眠っているもの。棚卸し（フェーズ完了・効果検証などの節目）ではこの表の<strong>条件列だけ</strong>を順に確認する。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>タイトル</th><th>種別</th><th>ステータス</th><th>条件（満たされたら何をするか）</th><th>リンク</th><th>更新日</th></tr></thead>
+<tbody>
+<tr><td colspan="6">（なし）</td></tr>
+</tbody>
+</table></div>
+
+<h2>3. クローズ（採用 / 見送り）</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
+<tbody>
+<tr><td colspan="5">（なし）</td></tr>
+</tbody>
+</table></div>
+
+<h2>4. 運用ルール（正）</h2>
+
+<h3>4.1 アイデアの単位</h3>
+<ul>
+<li><strong>1 アイデア = 採用 / 見送りを 1 回で判断できる意思決定の単位</strong>。作業の単位ではない。リトマス試験:「このファイルにステータスを 1 つ付けられるか」</li>
+<li><strong>入口はゆるく</strong>: 捕捉時は単位が曖昧でもよい。単位の整形は醸成の仕事</li>
+<li><strong>分割は事後的に</strong>: 壁打ちの中で評価が割れたとき（一部は有望・一部は筋が悪い）、または前提が単独価値を持つと分かったときだけファイルを分ける。判定基準:「親アイデアを見送っても、これは単独でやる価値があるか」— Yes なら独立アイデア（相互リンク）、No なら親ファイル内の前提条件リストへ</li>
+<li><strong>構想（kind: 構想）</strong>: 段階ごとに判断時期が異なる大きなアイデア（例: セット新設 → 他媒体展開 → アプリ化）。別の型ではなく「子を持つに至ったアイデア」。今判断できる段階だけ子として切り出し、後続段階は親の中に<strong>再検討トリガー</strong>付きで書く。子が採用されても親はクローズしない</li>
+</ul>
+
+<h3>4.2 ステータス（6 つ）</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>ステータス</th><th>意思決定</th><th>今動けるか</th><th>条件の記載</th><th>意味</th></tr></thead>
+<tbody>
+<tr><td>inbox</td><td>前</td><td>○</td><td>—</td><td>書き留めただけ。壁打ち候補</td></tr>
+<tr><td>醸成中</td><td>前</td><td>○</td><td>—</td><td>壁打ちを進められる</td></tr>
+<tr><td>再醸成待ち</td><td>前</td><td>×</td><td><strong>必須</strong>（再検討トリガー）</td><td>今はこれ以上詰められない。条件が満たされたら<strong>壁打ちを再開</strong>する（実行の約束ではなく再判断の約束）</td></tr>
+<tr><td>待機</td><td><strong>済</strong></td><td>×</td><td><strong>必須</strong>（落とし込み条件）</td><td>やると決めた。条件が満たされたら<strong>計画・戦略書へ転記</strong>する（開発レーンの作業）</td></tr>
+<tr><td>採用</td><td>済</td><td>クローズ</td><td>—</td><td>計画・戦略書へ反映済み。昇格先リンクを disposition に残す</td></tr>
+<tr><td>見送り</td><td>済</td><td>クローズ</td><td>—</td><td>理由付きで残す。再検討時の出発点になる資産</td></tr>
+</tbody>
+</table></div>
+
+<h3>4.3 ファイルの 2 層構造</h3>
+<ul>
+<li><strong>記録層（MD・唯一の正）</strong>: 1 アイデア 1 ファイル。ユーザーは殴り書きのまま話し、整形は Claude の仕事。「要旨」は Claude が毎回書き直す生きた要約、「原文メモ」「壁打ち記録」は追記のみ（書き換え禁止）。壁打ち記録は会話ログの貼り付けではなく、論点・判断・積み残しの蒸留</li>
+<li><strong>閲覧層（HTML）</strong>: 本ページ（ダッシュボード）+ 深化したアイデアの詳細ページ <code>&lt;slug&gt;.html</code>。詳細ページを作ったら、<strong>整理された現在形（要旨・企画・構成図・スコープ等）はすべて HTML 側へ移し、MD の要旨はリンク 1 行に置き換える</strong>（同じ情報を 2 箇所に書かない）。MD に残るのは原文メモ・壁打ち記録・フロントマターのみ</li>
+<li>品質基準: 初見の人（数ヶ月後の自分・別セッション）が要旨（or 詳細 HTML）だけ読めば文脈を復元できること</li>
+</ul>
+
+<h3>4.4 壁打ちの終了規律</h3>
+<p>1 回の壁打ちは必ず次のいずれかに着地する。「なんとなく放置」を構造的に許さない。</p>
+<ul>
+<li>まだ詰められる → <strong>醸成中のまま</strong></li>
+<li>今は無理 → <strong>再醸成待ち</strong>（再検討トリガーを condition に記載）</li>
+<li>決めた → <strong>待機</strong>（落とし込み条件を記載）or <strong>採用</strong> or <strong>見送り</strong>（理由を記載）</li>
+</ul>
+<p>着地とセットで: 壁打ち記録に蒸留を追記 → 要旨（or 詳細 HTML）を最新化 → 本ページの表を更新。壁打ち中に出てきた新アイデアは<strong>その場で inbox 捕捉</strong>し（醸成はしない）、本筋に戻る。セッションの成果 = テーマの着地 1 件 + 副産物の inbox 0〜n 件。</p>
+
+<h3>4.5 レーンと昇格</h3>
+<ul>
+<li><code>docs/ideas/</code> 配下で閉じる作業は<strong>アイデアレーン</strong>: 宣言不要・常に並行可（<a href="../plans/index.html">計画体系</a>の判定表参照）</li>
+<li>「待機 → 採用」の転記は <code>development-plan.html</code> / 事業戦略書に触れるため<strong>開発レーンの作業</strong>。アイデアレーン内では転記下書きの用意まで</li>
+<li>壁打ちで踏み込んだ技術検討（構成図・コスト試算）は<strong>採用判断のための検討記録</strong>であり設計書ではない。採用後は <code>docs/app/</code> / <code>docs/infra/</code> の設計プロセスにインプットとして引き継ぎ、そこで改めて設計 Fix する</li>
+</ul>
+
+</div>
+</body>
+</html>
