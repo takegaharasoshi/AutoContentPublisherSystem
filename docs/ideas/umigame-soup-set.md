@@ -205,6 +205,14 @@ NAT Gateway も基本的には不要。Reply Lambda は VPC 外で動かし、S3
 ・AI返信処理を独立してスケールできる
 ・MVPとして実装が比較的シンプル
 
+## PoC 実施記録
+
+### 2026-08-28（PoC 資材の実装完了・AWS/Meta 側セットアップ待ち）
+
+- PoC 資材を実装しコミット済み: `poc/umigame-comment-webhook/`（Lambda 本体 + pytest + 手順書 README.md）+ `infra/lib/umigame-poc-stack.ts`（独立スタック `UmigamePocStack`。Function URL + Secrets Manager。デプロイチェーン外・手動 deploy）。設計課題リストの decision（2026-08-28）どおり、成功後もコメント経路専用ステージング面として恒久利用する前提の配置
+- PoC 用の簡略化: API Gateway / SQS / Lambda 分離は入れず単一 Lambda + Function URL。返信は OpenAI キー投入時のみ AI 出題者役（サンプル問題を Lambda に組み込み）、未投入時は固定文言。自己返信の無限ループ防止（`from.id == ig_user_id` スキップ）を実装
+- 次アクション（ユーザー作業）: `poc/umigame-comment-webhook/README.md` の手順で ① `cdk deploy UmigamePocStack` ② テスト用 Instagram アカウント作成 ③ テスト用 Meta アプリ作成 ④ シークレット投入 ⑤ Webhook 設定 → 実証テスト。成功判定チェックリストは README に記載
+
 ## 壁打ち記録
 
 ### 2026-08-28（初回捕捉）

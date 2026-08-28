@@ -29,6 +29,7 @@ AutoContentPublisherSystem/
 ├── content/                         # 事業コンテンツ資材（ストックのバッチ別ソース・検証ツール・リサーチ証跡）
 │   ├── quiz-stock/                  #   logic-training-1 の問題ストック（運用はスキル quiz-stock-replenish 参照）
 │   └── ranking-stock/               #   pref-ranking-1 のランキングストック（**執筆・レビュー・投入の勘所は pref-ranking-1/WRITING-NOTES.md。作業前に必読**。スキル化は 17-7）
+├── poc/                             # PoC 資材（umigame-comment-webhook: コメント自動返信経路の PoC 兼ステージング面。手順は各 README）
 ├── shared/                          # サービス間共通ライブラリ（Python）
 ├── CLAUDE.md
 └── README.md

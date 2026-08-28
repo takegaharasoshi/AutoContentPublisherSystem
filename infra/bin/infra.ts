@@ -5,6 +5,7 @@ import { SnsPostBatchStack } from '../lib/sns-post-batch-stack';
 import { ImageBatchStack } from '../lib/image-batch-stack';
 import { InsightsBatchStack } from '../lib/insights-batch-stack';
 import { MonitoringStack } from '../lib/monitoring-stack';
+import { UmigamePocStack } from '../lib/umigame-poc-stack';
 
 // 環境識別子は現時点で prod のみ（docs/infra/security.html を参照）
 const SUPPORTED_ENVS = ['prod'];
@@ -100,5 +101,11 @@ new MonitoringStack(app, 'MonitoringStack', {
   insightsCollectionStateMachine: insightsBatchStack.stateMachine,
   insightsScheduleGroup: insightsBatchStack.scheduleGroup,
   stackName: `${stackNamePrefix}-MonitoringStack`,
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
+});
+
+new UmigamePocStack(app, 'UmigamePocStack', {
+  envName,
+  stackName: `${stackNamePrefix}-UmigamePocStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
