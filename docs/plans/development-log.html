@@ -1711,6 +1711,17 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>レーン振り分けの個別判断</strong>: 17-6（初速確認）は純粋な運用観察のためセットレーン（pref-ranking-1）へ移管。<strong>16-5・16-12 は開発レーンに残置</strong>（16-5 は 2 段階 Fix の前段ゲートで、成果物が「継続的に見る指標セット」= DDL・共通設計書・事業戦略書に波及するため。指標確定後の日常の KPI 観察はセットレーンへ移る）</li>
 </ul>
 </details>
+<details class="phase"><summary>Phase 18 追補: アイデア体系（docs/ideas/）の導入</summary>
+<p>2026-08-28 完了（Fable 5 が直接実施。Phase 18 と同日のフリーズ窓で実施）。意思決定<strong>前</strong>の事業アイデアを捕捉・醸成する「アイデア体系」を新設し、第 3 のレーン（アイデアレーン）として計画体系に追加した。設計壁打ち（2026-08-28）での決定事項:</p>
+<ul>
+<li><strong>背景</strong>: 既存体系は「決まったもの」しか受け止められず（strategy = 決定済み方針・plans = 確定した作業・設計書 = Fix したもの）、思いついたが未決定のアイデアの置き場が無かった。頭の中だけにあるアイデアは消える・広がらないため、Claude Code との対話で壁打ち・記録・整理し、醸成後に計画へ落とし込む仕組みを導入</li>
+<li><strong>単位</strong>: 1 アイデア = 採用 / 見送りを 1 回で判断できる<strong>意思決定の単位</strong>（作業の単位ではない）。捕捉時は単位が曖昧でもよく、分割は事後的（評価が割れたとき・前提が単独価値を持つとき）。段階ごとに判断時期が異なる大型アイデアは「構想」= 子を持つに至ったアイデアとして同一形式で扱う（別の型は作らない）</li>
+<li><strong>6 ステータス</strong>: inbox / 醸成中 / 再醸成待ち（条件必須・「再判断の約束」）/ 待機（条件必須・決定済みで転記待ち）/ 採用 / 見送り。意思決定の前後それぞれに「条件付きで眠る」状態を 1 つずつ持つ対称構造。壁打ちは終了規律で必ずいずれかに着地させる（なんとなく放置の構造的排除）</li>
+<li><strong>2 層構造</strong>: 記録層 = Markdown <code>&lt;slug&gt;.md</code>（唯一の正。要旨 = Claude が書き直す / 原文メモ・壁打ち記録 = 追記のみ。ユーザーは殴り書きで話し整形は Claude の仕事）、閲覧層 = <code>index.html</code> ダッシュボード + 深化したアイデアの詳細 HTML。詳細 HTML 昇格後は整理された現在形をそちらへ移し二重書きしない。HTML 統一ルール（Phase 18）は閲覧層で維持し、MD は content/ の WRITING-NOTES と同じ作業ノート層の扱い</li>
+<li><strong>レーンと昇格</strong>: <code>docs/ideas/</code> 配下で閉じる作業はアイデアレーン（常に並行可・宣言不要。<code>/idea</code> スキル起動が宣言を兼ねる）。「待機 → 採用」の転記のみ開発レーン。壁打ちで踏み込んだ技術検討は<strong>採用判断のための検討記録であり設計書ではない</strong>（採用後に docs/app・docs/infra へインプットとして引き継ぎ設計 Fix）</li>
+<li><strong>実施内容</strong>: ①<code>docs/ideas/</code> 新設（index.html ダッシュボード = 運用ルールの正・_template.md） ②スキル <code>.claude/skills/idea/</code>（捕捉・壁打ち・棚卸しの 3 モード） ③<a href="index.html">plans/index.html</a> 判定表へアイデアレーン追加・docs/index.html と CLAUDE.md へ導線追加 ④初期アイデア 1 件登録: umigame-soup-set（ウミガメのスープ参加型アカウント・醸成中・詳細 HTML 付き。技術構成検討済み・事業面 8 論点が次回壁打ちアジェンダ） ⑤docs/index.html の <code>&lt;set_code&gt;</code> 未エスケープ表示バグ修正（ついで修正）</li>
+</ul>
+</details>
 <details class="phase"><summary>設計課題リスト（解消済み）</summary>
 <p><a href="development-plan.html">development-plan.html</a> の設計課題リストのうち解消済みの課題をここへ移す（2026-08-09 の計画書整理で導入。解消の経緯は各設計書の decision コールアウトにも記録されている）。</p>
 <div class="table-wrap"><table>
