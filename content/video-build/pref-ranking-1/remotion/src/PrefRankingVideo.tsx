@@ -180,6 +180,26 @@ const preheatCodeAt = (frame: number): number =>
 const FLASH_DUR = 14;
 
 /**
+ * 煽り吹き出しの登場モーション（R-1-2）。ミュート視聴者にも「予想しろ」という参加要求を
+ * 届けるため、離脱の崖（0〜2 秒）にモーションを集中させる。
+ *
+ * 0 秒時点で版面が空だとスキップされるという方針（タイトル帯・地図・全国平均プレートを
+ * フェードインさせていない理由）は崩さない。拡大は 0 ではなく {@link TEASER_POP_FROM} から
+ * 始め、フレーム 0 でも吹き出しは読める状態で出ている。
+ */
+const TEASER_POP_FROM = 0.62;
+/** ポップイン後の小刻みな揺れ（開始フレーム / 減衰しきるまでの長さ = 約 0.4〜1.1 秒） */
+const TEASER_NUDGE_AT = 13;
+const TEASER_NUDGE_DUR = 20;
+
+/** 0〜1 の揺れ量（減衰する正弦波。区間外は 0） */
+const teaserNudgeAt = (frame: number): number => {
+  const local = frame - TEASER_NUDGE_AT;
+  if (local < 0 || local > TEASER_NUDGE_DUR) return 0;
+  return Math.sin(local / 2.6) * (1 - local / TEASER_NUDGE_DUR);
+};
+
+/**
  * 地図の拡大率。順位行が積み上がるほど地図を少し縮め、序盤の空白を地図で埋める。
  * 上限 1.05 は「拡大しても日本全域がセーフ域と順位行スタックの外へ出ない」上限
  * （17-4a 第 2〜3 巡。1.15 では九州南部が順位行のゾーンへ押し出されていた）。
@@ -775,6 +795,19 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
   const breathe = 1 + Math.sin(frame / 46) * 0.006;
   const mapZoom = mapZoomAt(frame, tl) * breathe;
 
+  // 煽り吹き出しのモーション（R-1-2）。本番スピン開始前だけに効かせ、以降の吹き出し
+  // （順位コメント・締め）は現行どおり無変形で出す。
+  const isTeaserBubble = frame < tl.rounds[5].start;
+  const teaserPop = isTeaserBubble
+    ? spring({ frame, fps, config: { damping: 9, stiffness: 200, mass: 0.5 } })
+    : 1;
+  const teaserNudge = isTeaserBubble ? teaserNudgeAt(frame) : 0;
+  // 尻尾の付け根（left 78 / 下端）を基点にすることで、キャラの口元から吹き出しが
+  // 弾け出て見える。振れ幅は「拡大時に吹き出しの右上がタイトル帯へ触れない」範囲に抑える
+  const teaserScale =
+    TEASER_POP_FROM + (1 - TEASER_POP_FROM) * teaserPop + 0.04 * teaserNudge;
+  const teaserTilt = (1 - teaserPop) * -5 + teaserNudge * 1.8;
+
   return (
     <AbsoluteFill style={{ fontFamily: FONT_TEXT, backgroundColor: theme.pageTop }}>
       {/* BGM は全編に敷き、ナレーションとのダッキングは行わない */}
@@ -851,6 +884,10 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
             top: BUBBLE.top,
             zIndex: 6,
             maxWidth: BUBBLE.maxWidth,
+            // 変形は版面確定後（レイアウト後）に効くため、改行位置・フォントサイズ段階・
+            // 尻尾の相対位置は変わらない。teaser 以外の区間では恒等変換になる
+            transform: `scale(${teaserScale}) rotate(${teaserTilt}deg)`,
+            transformOrigin: "78px 100%",
           }}
         >
           <div
