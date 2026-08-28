@@ -6,6 +6,7 @@ import { MapPalette } from "./palette";
 /**
  * 白抜き日本地図。県ごとの塗り分けと発光を props で制御する。
  * - litCode: ルーレットで一時的に光っている県
+ * - litIntensity: その発光の強さ（0〜1。予熱スピンを淡く出すため。R-1-1）
  * - flash: 停止フラッシュ中の県とその強度（1→0 で減衰）
  * - revealed: 確定済みの県 → 塗り色
  * - insetFocus: 南西諸島インセットの拡大（0 = 通常 / 1 = 拡大パネル）
@@ -20,6 +21,12 @@ import { MapPalette } from "./palette";
 
 export const JapanMap: React.FC<{
   litCode: number | null;
+  /**
+   * ルーレットの発光強度（0〜1。既定 1 = 本番スピンの現行値）。
+   * 塗りの不透明度と光の滲みだけを弱め、点滅の速さとは独立に扱う
+   * （R-1-1「速さと眩しさの分離」。予熱区間は淡く出して 5.00 秒に変化点を残す）。
+   */
+  litIntensity?: number;
   flash: { code: number; intensity: number } | null;
   revealed: Record<number, string>;
   palette: MapPalette;
@@ -27,7 +34,7 @@ export const JapanMap: React.FC<{
   viewBox: string;
   /** 南西諸島インセットの拡大（0〜1） */
   insetFocus?: number;
-}> = ({ litCode, flash, revealed, palette, viewBox, insetFocus = 0 }) => {
+}> = ({ litCode, litIntensity = 1, flash, revealed, palette, viewBox, insetFocus = 0 }) => {
   const shape = (p: (typeof PREFECTURES)[number], part: "d" | "dInset") => {
     const data = p[part];
     if (!data) return null;
@@ -38,6 +45,7 @@ export const JapanMap: React.FC<{
 
     let fill = palette.baseFill;
     let stroke = palette.baseStroke;
+    let fillOpacity = 1;
     let filter: string | undefined;
 
     if (revealedFill) {
@@ -48,9 +56,14 @@ export const JapanMap: React.FC<{
       filter = "drop-shadow(0 0 7px rgba(0,0,0,0.35))";
     }
     if (isLit) {
+      // 強度 1 が本番スピンの現行値。予熱区間（強度 < 1）は塗りを透かし、光の滲みも
+      // 比例して縮めることで、点滅の速さは同じまま眩しさだけを落とす。
+      // 縁取りは強度に依らず残す（淡くしても「どの県が光ったか」が読めるようにするため）。
+      const lit = Math.min(1, Math.max(0, litIntensity));
       fill = palette.litFill;
       stroke = palette.litStroke;
-      filter = `drop-shadow(0 0 10px ${palette.litGlow})`;
+      fillOpacity = lit;
+      filter = `drop-shadow(0 0 ${10 * lit}px ${palette.litGlow})`;
     }
     if (isFlash && flash) {
       const t = flash.intensity;
@@ -64,6 +77,7 @@ export const JapanMap: React.FC<{
         key={`${p.code}-${part}`}
         d={data}
         fill={fill}
+        fillOpacity={fillOpacity}
         stroke={stroke}
         strokeWidth={isLit || isFlash ? 2 : revealedFill ? 1.8 : 1}
         strokeLinejoin="round"

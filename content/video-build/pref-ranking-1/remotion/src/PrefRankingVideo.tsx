@@ -163,6 +163,20 @@ const spinCodeAt = (rank: number, local: number, spinDur: number): number => {
   return 1 + Math.floor(random(`spin-${rank}-${idx}`) * 47);
 };
 
+/**
+ * 予熱スピン（R-1-1）。本番スピン開始前（30 秒版は 0.00〜5.00 秒）が実質静止画で、
+ * ミュート視聴者が 0〜2 秒で離脱していたため、フレーム 0 から県を点滅させる。
+ * 速さは本番スピンの最高速（= spinTicks の初期間隔 2 フレーム）と同じにし、
+ * 減速は行わない。5.00 秒の変化点は速さではなく発光強度で作る。
+ */
+const PREHEAT_TICK = 2;
+
+/** 予熱区間の発光強度（本番スピン = 1.0）。淡くして版面の可読性と変化点を確保する */
+const PREHEAT_LIT_INTENSITY = 0.42;
+
+const preheatCodeAt = (frame: number): number =>
+  1 + Math.floor(random(`preheat-${Math.floor(frame / PREHEAT_TICK)}`) * 47);
+
 const FLASH_DUR = 14;
 
 /**
@@ -190,12 +204,26 @@ const mapZoomAt = (frame: number, tl: Timeline): number =>
 
 type Stage = {
   lit: number | null;
+  /** lit の発光強度（本番スピン = 1.0 / 予熱スピンは淡く） */
+  litIntensity: number;
   flash: { code: number; intensity: number } | null;
   revealed: Record<number, string>;
   spinningRank: number | null;
 };
 
 const stageAt = (frame: number, entries: Entry[], tl: Timeline, theme: Theme): Stage => {
+  // 予熱区間: まだ確定した県も本番スピンもないため、点滅だけを返す。
+  // spinningRank は null のまま（= 煽り吹き出しを点滅させず、0 秒から読ませ続ける）。
+  if (frame < tl.rounds[5].start) {
+    return {
+      lit: preheatCodeAt(frame),
+      litIntensity: PREHEAT_LIT_INTENSITY,
+      flash: null,
+      revealed: {},
+      spinningRank: null,
+    };
+  }
+
   let lit: number | null = null;
   let flash: Stage["flash"] = null;
   const revealed: Record<number, string> = {};
@@ -214,7 +242,7 @@ const stageAt = (frame: number, entries: Entry[], tl: Timeline, theme: Theme): S
       lit = spinCodeAt(entry.rank, frame - t.start, t.spin);
     }
   }
-  return { lit, flash, revealed, spinningRank };
+  return { lit, litIntensity: 1, flash, revealed, spinningRank };
 };
 
 // ---------------------------------------------------------------- 背景
@@ -789,6 +817,7 @@ export const PrefRankingVideo: React.FC<PrefRankingProps> = ({
       >
         <JapanMap
           litCode={stage.lit}
+          litIntensity={stage.litIntensity}
           flash={stage.flash}
           revealed={stage.revealed}
           palette={mapPalette(theme)}

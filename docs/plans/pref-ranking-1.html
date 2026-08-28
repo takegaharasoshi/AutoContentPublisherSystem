@@ -13,7 +13,7 @@
 <h1>セット計画書: 表彰台五郎の都道府県ランキング（pref-ranking-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-08-28（Phase 18 で新設）</span>
+  <span>最終更新: 2026-08-29（R-1-1 完了）</span>
 </div>
 
 <div class="note">
@@ -58,7 +58,7 @@
   <td><strong>R-1-1</strong><br>予熱スピン（A）</td>
   <td><code>src/PrefRankingVideo.tsx</code> の <code>stageAt</code> に <code>frame &lt; tl.rounds[5].start</code> のアイドル分岐を足し（現在は <code>lit=null</code> を返す）、<code>spinCodeAt</code> 相当で<strong>フレーム 0 から本番と同等の最高速</strong>で県を点滅させる。<strong>可読性と 5.00 秒の変化点は発光強度で作る</strong>: <code>src/JapanMap.tsx</code> の <code>litCode</code> 描画（現行 <code>drop-shadow</code>）に強度パラメータを渡せるようにし、予熱区間は淡く、5.00 秒の本番スピンで現行値へ上げ、停止フラッシュで最大にする（<strong>速さと眩しさの分離</strong>）</td>
   <td>ビルドが通り、<code>pytest</code>（タイムライン導出値の固定テスト）が全パス。<code>DURATION_SPECS</code> に差分がない</td>
-  <td>未着手</td>
+  <td>✅ 2026-08-29<br>予熱スピン（2f 間隔・減速なし）+ <code>litIntensity</code>（予熱 0.42 / 本番 1.0）を実装。<code>tsc --noEmit</code>・<code>remotion bundle</code>・<code>pytest</code>（26 件）とも通過、タイムライン定数は無変更</td>
 </tr>
 <tr>
   <td><strong>R-1-2</strong><br>煽り吹き出しの視覚化（B）</td>
