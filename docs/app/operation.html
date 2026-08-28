@@ -421,7 +421,9 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
 FROM ranking_stock_items
 WHERE set_id = :set_id AND is_active = 1;</code></pre></li>
   <li><strong>取り下げ</strong>: 誤データ・出典問題が見つかったネタは <code>is_active=0</code>（削除しない。S3 の事前動画も削除しない）。<strong>有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、0 件になる場合は先に代替を投入する（quiz と同じ）</li>
-  <li><strong>補充手順のスキル化は 17-7 で実施する</strong>（<code>/quiz-stock-replenish</code> の前例。尺が 30 秒で確定済み〔2026-08-24〕のため 17-6 を待つ必要はなく、<strong>17-5 完了後すぐ書ける</strong>。実地テストはネタ帳の残り 16 件の投入・ビルドで行い、在庫 14 件が一周する前 = 稼働開始から 2 週間以内に完了させる）。スキル化前に手動で回すのは 17-5a の追加 4 件のみで、手順は本節 + <strong><code>content/ranking-stock/pref-ranking-1/WRITING-NOTES.md</code></strong>（17-3 で確立した執筆・レビュー・投入の勘所。スキルの一次資料）</li>
+  <li><strong>補充手順はスキル <code>/ranking-stock-replenish</code> に集約済み</strong>（17-7 で新設・2026-08-28。実地テストとして第 3 バッチ 16 件〔015〜030〕の投入・ビルド・配置を同スキルで実施し、ストック 30 件が両環境に揃った）。以後の週次補充はスキルを起点に回す。<strong>正の所在は本節（手順）+ <code>content/ranking-stock/pref-ranking-1/WRITING-NOTES.md</code>（執筆・レビュー・投入の実務の勘所。作業前に必読）</strong>で、スキルはその導線と迷いやすい分岐を持つ（矛盾したら設計書 &gt; WRITING-NOTES &gt; スキルの順）</li>
+  <li><strong>ネタの供給源（17-7 で更新）</strong>: 17-1 検証のネタ帳（<code>plans/ranking-set-research/neta-30.md</code>）は 17-7 で使い切った。以後は<strong>家計調査の品目別ランキング（rank01〜14 の約 240 品目。<code>common/convert.py</code> で TOP6 同値を即判定できる）</strong>と<strong>社会生活基本調査の公表ランキング系列</strong>が主軸になる</li>
+  <li><strong>配置時の注意（17-7 で判明）</strong>: <code>publish.py</code> は承認ファイル（<code>work/approved.txt</code>）に載っている全 <code>content_key</code> を対象にするため、既定のままだと<strong>過去に配置済みのネタも再アップロードし <code>video_built_at</code> を書き換える</strong>。補充のたびに<strong>そのバッチ分だけを列挙したファイルを作り <code>--approved-file</code> で渡す</strong>（累積の <code>approved.txt</code> は承認台帳として残す）</li>
 </ul>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>
