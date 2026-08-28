@@ -19,7 +19,7 @@
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  生成方式 <code>gpt-quiz-multicut</code> の方式固有仕様（問題ストック取得・スロットだし分け・組版・ffmpeg 合成）を記録する。全方式共通の契約（方式インターフェース）と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、分冊ルール（1 方式 1 本・本採用時に作成）は <a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a> を参照。設計の経緯は 15-5 / 15-9 / 15-10 / 16-1 の設計 Fix（<a href="../requirements-notes-set2.html">壁打ち記録</a>・<a href="../../development-log.md">development-log.md</a>）にある。
+  生成方式 <code>gpt-quiz-multicut</code> の方式固有仕様（問題ストック取得・スロットだし分け・組版・ffmpeg 合成）を記録する。全方式共通の契約（方式インターフェース）と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、分冊ルール（1 方式 1 本・本採用時に作成）は <a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a> を参照。設計の経緯は 15-5 / 15-9 / 15-10 / 16-1 の設計 Fix（<a href="../requirements-notes-set2.html">壁打ち記録</a>・<a href="../../plans/development-log.html">docs/plans/development-log.html</a>）にある。
 </div>
 
 <div class="warn">
@@ -111,7 +111,7 @@
 </div>
 <div class="decision">
   <span class="callout-title">決定（16-1）: LLM 生成・検証チェーンの休止（ストックのみ方式への転換）</span>
-  運用初週のスキップ率 95% を受けたテコ入れ（development-plan.md Phase 16 冒頭）で、問題ソーシングを<strong>ストックのみ・在庫切れ時は利用済みストックを再利用</strong>とユーザー決定（2026-08-01）。これに伴い、15-5〜15-13 で構築した実行時の LLM 問題生成・決定的検証（L1 DSL 全列挙 / L3 書式）・独立 LLM 検証・重複検査・再生成ループ（旧セクション 5.1〜5.5）は<strong>投稿パイプラインから外れる（休止）</strong>。誤答リスクは投入時の人間レビューで担保され（構造的解消）、実行時のテキスト LLM 費はゼロになる。ストックは投入時に型・難度・表現の独自性・既存ストックとの重複をレビューするため、実行時の重複検査も不要（再利用は意図的な再出題として許容）。旧チェーンの詳細仕様は本書の 15-16 版（git 履歴）と development-log.md の 15-5 / 15-13 に記録があり、生成経路を再開する場合の資産として参照する。<code>machine_spec</code> / <code>machine_answer</code>（旧 L1 検証用）はストックでは持たない。
+  運用初週のスキップ率 95% を受けたテコ入れ（docs/plans/development-plan.html Phase 16 冒頭）で、問題ソーシングを<strong>ストックのみ・在庫切れ時は利用済みストックを再利用</strong>とユーザー決定（2026-08-01）。これに伴い、15-5〜15-13 で構築した実行時の LLM 問題生成・決定的検証（L1 DSL 全列挙 / L3 書式）・独立 LLM 検証・重複検査・再生成ループ（旧セクション 5.1〜5.5）は<strong>投稿パイプラインから外れる（休止）</strong>。誤答リスクは投入時の人間レビューで担保され（構造的解消）、実行時のテキスト LLM 費はゼロになる。ストックは投入時に型・難度・表現の独自性・既存ストックとの重複をレビューするため、実行時の重複検査も不要（再利用は意図的な再出題として許容）。旧チェーンの詳細仕様は本書の 15-16 版（git 履歴）と docs/plans/development-log.html の 15-5 / 15-13 に記録があり、生成経路を再開する場合の資産として参照する。<code>machine_spec</code> / <code>machine_answer</code>（旧 L1 検証用）はストックでは持たない。
 </div>
 <div class="decision">
   <span class="callout-title">決定（16-2b = 2026-08-07 のユーザー決定）: L3 の次回補充方針と <code>explanation</code> 上限の L3 拡張</span>
@@ -170,7 +170,7 @@
 </div>
 <div class="decision">
   <span class="callout-title">決定（16-1）: カット構成の刷新（スキップ率 95% テコ入れ）</span>
-  旧構成（20 秒: つかみ 3 → 問題 7 → 考える 5 → 答え 5）はスキップ判定が起きる冒頭 1〜2 秒に問題が出ておらず、参考アカウント 4 例（すべて 1 カット目 = 問題見出し + 問題文）とも乖離していた。テコ入れ方針 4 点（development-plan.md Phase 16 冒頭）を以下のとおり落とし込んだ:
+  旧構成（20 秒: つかみ 3 → 問題 7 → 考える 5 → 答え 5）はスキップ判定が起きる冒頭 1〜2 秒に問題が出ておらず、参考アカウント 4 例（すべて 1 カット目 = 問題見出し + 問題文）とも乖離していた。テコ入れ方針 4 点（docs/plans/development-plan.html Phase 16 冒頭）を以下のとおり落とし込んだ:
   <ul>
     <li><strong>1 カット目から問題を出す</strong>: 版面固定により問題文・型・難度ピルが 1 フレーム目から表示される。1 フレーム目はカバー・サムネイル兼用（カバー未指定デフォルトの仕様を能動的に利用。<a href="../batch-flow.html#sns-steps">batch-flow.html 3.3 手順 4</a>）</li>
     <li><strong>つかみは吹き出しで行う</strong>: 独立したつかみカット（版面）は廃止するが、カット 1 の吹き出しを問題ごとの動的つかみコピー（<code>hook</code>）にする。固定文では「クイズでは問題そのものが最強のつかみ」を補強できないためのユーザー指示（16-1 計画レビュー）</li>

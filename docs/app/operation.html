@@ -190,7 +190,7 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
     <li>ランキング方式（<code>ranking-prebuilt</code>）のセットは、初期のランキングストックを <code>ranking_stock_items</code> へ投入し、必要尺（<code>pref-ranking-1</code> は 30 秒のみ = 2026-08-24 尺確定）の動画ビルド・配置（セクション 3）まで完了していること（<code>unbuilt</code> = 0）を在庫確認クエリで確認した。BGM は <code>time_slot</code> NULL の有効曲が 1 曲以上あることを確認した</li>
     <li>ストーリーズ再掲するセットは <code>batch_sets.stories_enabled=1</code> を設定した（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>インサイト収集 Scheduler 2 件</strong>（morning / evening）も InsightsBatchStack へ追加して deploy した（手順 3。<a href="../infra/workflow.html">infra/workflow.html セクション 1.6</a>）</li>
-    <li><strong>Scheduler の有効化前に、当該セットの SNS 投稿対象のバックログ（未投稿の生成実行）が 0 件であることを実クエリで確認した</strong>（未投稿 run の滞留は以後の投稿を恒常的に遅らせ、アラームでは気づけない。15-15 で確立した予防手順 = <a href="../development-plan.md">development-plan.md</a> 設計課題リスト 2026-07-25。17-2 で本チェックリストに明記）</li>
+    <li><strong>Scheduler の有効化前に、当該セットの SNS 投稿対象のバックログ（未投稿の生成実行）が 0 件であることを実クエリで確認した</strong>（未投稿 run の滞留は以後の投稿を恒常的に遅らせ、アラームでは気づけない。15-15 で確立した予防手順 = <a href="../plans/development-plan.html">docs/plans/development-plan.html</a> 設計課題リスト 2026-07-25。17-2 で本チェックリストに明記）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
   </ul>
 </div>
@@ -448,7 +448,7 @@ LIMIT 20;</code></pre>
 </ol>
 
 <h3 id="failure-correction">4.2 手動補正手順</h3>
-<p>DB を手動補正する前に、対象の <code>set_code</code>・<code>post_id</code>・現在の値を development-plan.md の「トラブルシューティングログ」に記録してから更新する。</p>
+<p>DB を手動補正する前に、対象の <code>set_code</code>・<code>post_id</code>・現在の値をセット記録（<code>docs/plans/&lt;set_code&gt;-log.html</code> の「トラブル対応の記録」）に記録してから更新する。横断・基盤起因の事象は <a href="../plans/development-plan.html">開発レーン計画書</a>のトラブルシューティングログへ（記録先の二分は Phase 18 で導入。恒久対策の課題は開発レーンの設計課題リストに起票する）。</p>
 
 <h4>published_unconfirmed を投稿済みに補正する</h4>
 <p>Instagram 側で投稿済みを確認できた場合のみ実行する。</p>
@@ -547,7 +547,7 @@ WHERE p.platform_post_id = '(Instagram media ID)';</code></pre>
 WHERE video_audio_asset_id = :audio_asset_id AND is_active = 1;</code></pre>
       </li>
       <li><strong>投稿自体は削除しない</strong>（表示・再生数・フォロワー接点は残す。ミュートのままでも Ken Burns の映像は成立する）</li>
-      <li>development-plan.md の「トラブルシューティングログ」に、対象投稿・曲・検知日を記録する（同一曲の再発防止）</li>
+      <li>セット記録（<code>docs/plans/&lt;set_code&gt;-log.html</code> の「トラブル対応の記録」）に、対象投稿・曲・検知日を記録する（同一曲の再発防止。記録先は Phase 18 で開発計画書から変更）</li>
     </ol>
   </li>
 </ol>

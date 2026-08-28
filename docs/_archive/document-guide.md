@@ -29,7 +29,7 @@ docs/
 │   ├── workflow.md                 #   Step Functions ASL・環境変数・監視リソース詳細
 │   └── database.md                 #   テーブル定義・ER 図・制約
 │
-└── development-plan.md             # 開発計画・進捗管理（横断的管理文書）
+└── docs/plans/development-plan.html             # 開発計画・進捗管理（横断的管理文書）
 ```
 
 ## 各ドキュメントの責務

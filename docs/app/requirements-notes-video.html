@@ -242,7 +242,7 @@
     <li>音源テーブル: <code>audio_assets</code> 新設。選曲は<strong>順繰り</strong>（<code>last_used_at</code> 最古・未使用優先）。証跡は DB カラムで一元管理 → <a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a></li>
     <li>S3 キー規約: <code>videos/</code>（動画 + 中間静止画）・<code>audio/</code>（音源ストック）を追加。ライフサイクルのプレフィックス限定というインフラ側変更が必要と判明 → <a href="data-model.html#s3-key">data-model.html セクション 5</a></li>
     <li>音源前処理: <strong>事前手動</strong>（S3 登録前に切り出し・ラウドネス正規化・フェード・AAC 化を 1 回だけ）→ <a href="operation.html#audio-mgmt">operation.html セクション 3</a></li>
-    <li>ffmpeg 合成パラメータ =「標準画質」の定義: 1080x1920・H.264（libx264・yuv420p・faststart）・30fps・CRF 20 目安・AAC 128kbps 48kHz・尺 10 秒・ズームイン 1.0 → 約 1.08（中央基準・等速）→ 決定値の記録は <a href="../development-log.md">development-log.md</a> の 14-4（方式設計書は 14-11 で作成）</li>
+    <li>ffmpeg 合成パラメータ =「標準画質」の定義: 1080x1920・H.264（libx264・yuv420p・faststart）・30fps・CRF 20 目安・AAC 128kbps 48kHz・尺 10 秒・ズームイン 1.0 → 約 1.08（中央基準・等速）→ 決定値の記録は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の 14-4（方式設計書は 14-11 で作成）</li>
     <li>方式名: <code>gpt-image-kenburns</code>。方式契約は「最終メディアを返す」に一般化 → <a href="batch-flow.html#generator-contract">batch-flow.html セクション 2.1</a></li>
     <li>AI 開示ハッシュタグ: <code>#AIart</code> のみ → <a href="operation.html#ai-disclosure">operation.html セクション 3</a></li>
     <li>1 日 1 回の実行時刻: 14-11 で決定（持ち越し）</li>

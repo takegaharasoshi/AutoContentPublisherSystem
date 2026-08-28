@@ -24,7 +24,7 @@
 
 <div class="warn">
   <span class="callout-title">適用状態</span>
-  17-2（2026-08-10）で設計 Fix した<strong>目標設計</strong>を記述している。DDL 適用・データ整備・初期ストック投入は 17-3、ビルドツーリング + 方式実装は 17-4、アカウント開設・初期整備（14 ネタ）・稼働開始は 17-5、初速の効果確認は 17-6、補充スキル化 + 残り 16 件の投入は 17-7 を予定（<strong>2026-08-24 見直し: 投稿は 1 日 1 回・尺は 30 秒で確定</strong> = セクション 3 の decision）（<a href="../../development-plan.md">development-plan.md</a> Phase 17）。
+  17-2（2026-08-10）で設計 Fix した<strong>目標設計</strong>を記述している。DDL 適用・データ整備・初期ストック投入は 17-3、ビルドツーリング + 方式実装は 17-4、アカウント開設・初期整備（14 ネタ）・稼働開始は 17-5、初速の効果確認は 17-6、補充スキル化 + 残り 16 件の投入は 17-7 を予定（<strong>2026-08-24 見直し: 投稿は 1 日 1 回・尺は 30 秒で確定</strong> = セクション 3 の decision）（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 17）。
 </div>
 
 <h2>1. テーマ</h2>
@@ -214,7 +214,7 @@ VOICEVOX:白上虎太郎
   <li><strong>未使用ストックが尽きた場合は利用済みストックを LRU で再利用</strong>する（投稿は止まらない。<strong>同一動画の再投稿になる点は許容</strong>・再利用時は WARNING ログ = 補充遅延のサイン。水位を守っていれば発生しない = <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
   <li><strong>事前動画の S3 欠落（DB はビルド済みなのに実体なし）は縮退せず異常終了</strong>（DB と S3 の不整合の検知。別の尺・別のネタへの差し替えはしない）</li>
   <li><strong>ストーリーズ投稿の失敗はリールの success を巻き戻さない</strong>。終端状態で確定した投稿失敗の検知は ECS タスク異常終了通知が担う（<a href="../batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a>）</li>
-  <li>1 日 1 回のため、1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの手順・判断基準は共通課題（<a href="../../development-plan.md">development-plan.md</a> 設計課題リスト 2026-07-26）に従う</li>
+  <li>1 日 1 回のため、1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの手順・判断基準は共通課題（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> 設計課題リスト 2026-07-26）に従う</li>
 </ul>
 
 <h2>10. 共通フローからの差分・特記事項</h2>

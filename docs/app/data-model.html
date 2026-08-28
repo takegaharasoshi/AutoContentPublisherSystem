@@ -321,7 +321,7 @@
 </div>
 <div class="decision">
   <span class="callout-title">決定（2026-08-01、Phase 16-1）: プレースホルダ展開方式の導入（テンプレート + quiz_items の動的組み立て）</span>
-  答え・解説を動画からキャプションへ移すテコ入れ（development-plan.md Phase 16 冒頭の方針 (3)）のため、<code>template_text</code> にプレースホルダ
+  答え・解説を動画からキャプションへ移すテコ入れ（docs/plans/development-plan.html Phase 16 冒頭の方針 (3)）のため、<code>template_text</code> にプレースホルダ
   （<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>）を書けるようにし、
   SNS 投稿バッチが投稿時に当該生成実行の <code>quiz_items</code>（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>）から展開する。
   <strong>スキーマ変更はなし</strong>（プレースホルダはテンプレート文言の規約であり、展開規則〔プレースホルダあり = <code>quiz_items</code> 行必須・なし = 従来どおり素通し〕は
@@ -543,7 +543,7 @@ LIMIT 1;</code></pre>
 
 <div class="decision">
   <span class="callout-title">決定（2026-08-01、Phase 16-1）: 問題ストックテーブル quiz_stock_items の新設（V005）</span>
-  スキップ率 95% テコ入れの問題ソーシング転換（development-plan.md Phase 16 冒頭の方針 (2) + 16-1 のユーザー決定「ストックのみ・在庫切れ時は利用済みを再利用」）を受け、
+  スキップ率 95% テコ入れの問題ソーシング転換（docs/plans/development-plan.html Phase 16 冒頭の方針 (2) + 16-1 のユーザー決定「ストックのみ・在庫切れ時は利用済みを再利用」）を受け、
   <strong>人間レビュー済みの出題プール</strong>を表すテーブルを新設する。ストックは実行前から存在し複数回使われうるため、<code>quiz_items</code>（1 実行 1 問の履歴スナップショット）とはライフサイクルが異なる別テーブルとする。
   設計は <code>audio_assets</code> の「セット配下の有効レコード + LRU 順繰り + 証跡カラム一元管理 + セット境界の複合 FK」パターンを踏襲する。
   <div class="table-wrap" style="margin:.4rem 0 0;">
@@ -580,7 +580,7 @@ LIMIT 1;</code></pre>
 
 <div class="decision">
   <span class="callout-title">決定（2026-08-08、Phase 16-3b）: 事前動画の紐づけカラムを追加する（V006）</span>
-  動画事前生成方式 <code>quiz-prebuilt</code> への転換（development-plan.md Phase 16 冒頭の 2026-08-08 展開注記。方式仕様は <a href="generators/quiz-prebuilt.html">方式設計書 quiz-prebuilt</a>）に伴い、ストック行と事前ビルド済み動画を紐づけるカラム 3 本を追加する。
+  動画事前生成方式 <code>quiz-prebuilt</code> への転換（docs/plans/development-plan.html Phase 16 冒頭の 2026-08-08 展開注記。方式仕様は <a href="generators/quiz-prebuilt.html">方式設計書 quiz-prebuilt</a>）に伴い、ストック行と事前ビルド済み動画を紐づけるカラム 3 本を追加する。
   <div class="table-wrap" style="margin:.4rem 0 0;">
   <table>
     <thead><tr><th>カラム</th><th>役割</th></tr></thead>
@@ -781,7 +781,7 @@ assets/{set_code}/prebuilt/{content_key}_bg.png                                 
 
 <div class="decision">
   <span class="callout-title">決定: セット廃止時に「残す」データの範囲（設計課題リストの解消）</span>
-  <a href="../development-plan.md">development-plan.md</a> 設計課題リストで持ち越していた「セット廃止時に残す対象が DB レコードか S3 実体も含むか」を以下のとおり確定する。
+  <a href="../plans/development-plan.html">docs/plans/development-plan.html</a> 設計課題リストで持ち越していた「セット廃止時に残す対象が DB レコードか S3 実体も含むか」を以下のとおり確定する。
   <strong>「残す」の対象は DB レコード（<code>generated_media</code> のメタ情報・<code>posts</code> の投稿履歴等）のみ</strong>であり、S3 実体（画像・動画ファイル）はインフラ設計の
   30 日ライフサイクルポリシー（<a href="../infra/stacks.html#foundation">infra/stacks.html セクション 3.1</a>。上記のとおり <code>images/</code>・<code>videos/</code> プレフィックス限定へ変更予定）により作成から 30 日で自動削除される。
   セット廃止後もメタ情報・投稿履歴は DB に残るため、「いつ・どんなプロンプトで・どのアカウントに投稿したか」という記録は失われないが、

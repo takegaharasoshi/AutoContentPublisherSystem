@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """docs/ を HTTP 配信する簡易サーバー（Tailscale 経由のスマホ閲覧用）。
 
-HTML 設計書はそのまま配信し、Markdown（開発計画・開発記録）はブラウザに
-ダウンロードさせず表示できるよう text/plain で返す。
+HTML 設計書・計画書はそのまま配信する。Markdown は text/plain で返す
+（Phase 18 で計画・記録も HTML 化済み。現役ドキュメントに .md は無く、_archive の旧設計書閲覧用に残置）。
 """
 
 from __future__ import annotations

@@ -153,13 +153,13 @@
     <tr>
       <td><code>quiz-prebuilt</code></td>
       <td>クイズ動画の<strong>事前生成方式</strong>。イラスト（imagegen）〜動画（gpt-quiz-multicut のレンダラー流用）を事前にローカルでビルドし、全数人間レビューのうえ S3（ライフサイクル対象外の <code>assets/.../prebuilt/</code>）に作り置く。実行時は問題ストック（<code>quiz_stock_items</code>）のビルド済み行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・組版・動画合成を実行時に使わない</strong>）。<code>quiz_items</code> 記録・キャプション展開・ストーリーズ再掲は gpt-quiz-multicut と同一。<code>parameters</code> 互換のため切替は <code>batch_sets.generator_name</code> の UPDATE のみ</td>
-      <td>採用中（<strong>16-3b で設計 Fix</strong>〔2026-08-08 の仕様変更 = development-plan.md Phase 16 冒頭〕→ 16-3c 実装 → 16-3d 初期 42 問ビルド → <strong>16-4（2026-08-08）で logic-training-1 が切替・定常運用中</strong>。16-4b でバウンド演出・見切れ解消を反映し 42 本を再ビルド。16-4d〔2026-08-24〕で昼スロットを当分停止 = 朝・夜の 1 日 2 回で運用中〔<a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>〕）</td>
+      <td>採用中（<strong>16-3b で設計 Fix</strong>〔2026-08-08 の仕様変更 = docs/plans/development-plan.html Phase 16 冒頭〕→ 16-3c 実装 → 16-3d 初期 42 問ビルド → <strong>16-4（2026-08-08）で logic-training-1 が切替・定常運用中</strong>。16-4b でバウンド演出・見切れ解消を反映し 42 本を再ビルド。16-4d〔2026-08-24〕で昼スロットを当分停止 = 朝・夜の 1 日 2 回で運用中〔<a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>〕）</td>
       <td><a href="generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>（16-3b で作成）</td>
     </tr>
     <tr>
       <td><code>ranking-prebuilt</code></td>
       <td>都道府県ランキング動画の<strong>事前生成方式</strong>。背景イラスト（imagegen）+ ナレーション（VOICEVOX のセリフ単位 TTS をタイムライン定数へフレーム同期）+ Remotion レンダリングで TOP5 地図ルーレット型の動画を<strong>20 秒 / 30 秒の 2 尺</strong>事前にローカルでビルドし、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はランキングストック（<code>ranking_stock_items</code>）のうちスロットの尺（<code>parameters.slots[].duration_seconds</code>）がビルド済みの行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>ranking_items</code> 記録・キャプション展開（ランキング系プレースホルダ = 3.3 の decision）・ストーリーズ再掲は quiz 系と同じ構造</td>
-      <td>採用予定（<strong>17-2（2026-08-10）で設計 Fix</strong>。pref-ranking-1 が採用予定 = 実装 17-4・稼働開始 17-5 以降。development-plan.md Phase 17）</td>
+      <td>採用予定（<strong>17-2（2026-08-10）で設計 Fix</strong>。pref-ranking-1 が採用予定 = 実装 17-4・稼働開始 17-5 以降。docs/plans/development-plan.html Phase 17）</td>
       <td><a href="generators/ranking-prebuilt.html">generators/ranking-prebuilt.html</a>（17-2 で作成）</td>
     </tr>
   </tbody>
@@ -327,7 +327,7 @@
 <h2 id="flow-insights">4. インサイト収集バッチ処理フロー（Phase 16-7 設計 Fix）</h2>
 
 <p>第 3 のバッチ。Instagram Graph API の Insights から投稿別・アカウント別の生メトリクスを自動収集し、<a href="data-model.html#detail-insights">post_insights / account_insights_daily</a>（data-model.html セクション 4.11）へ蓄積する。
-16-6 の API 調査（development-log.md 16-6。調査基準 v25.0）を入力として 2026-08-10 の 16-7 壁打ちで設計 Fix した。
+16-6 の API 調査（docs/plans/development-log.html 16-6。調査基準 v25.0）を入力として 2026-08-10 の 16-7 壁打ちで設計 Fix した。
 実行基盤（スタック・Step Functions・Scheduler）は <a href="../infra/stacks.html#insights-batch">infra/stacks.html セクション 3.5</a> と <a href="../infra/workflow.html">infra/workflow.html</a> セクション 1.6・11 を参照。</p>
 
 <div class="decision">

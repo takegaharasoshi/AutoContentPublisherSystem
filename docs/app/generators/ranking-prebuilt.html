@@ -24,7 +24,7 @@
 
 <div class="warn">
   <span class="callout-title">適用状態</span>
-  17-2（2026-08-10）で設計 Fix。実装は 17-4（ビルドツーリング + Remotion 本組み + 方式モジュール）、初期ビルド・S3 配置と稼働開始は 17-5 以降を予定（ステップ分割は <a href="../../development-plan.md">development-plan.md</a> Phase 17）。本書は目標設計であり、実装時の差分は decision コールアウトで追記する。
+  17-2（2026-08-10）で設計 Fix。実装は 17-4（ビルドツーリング + Remotion 本組み + 方式モジュール）、初期ビルド・S3 配置と稼働開始は 17-5 以降を予定（ステップ分割は <a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 17）。本書は目標設計であり、実装時の差分は decision コールアウトで追記する。
 </div>
 
 <h2>1. 方式概要</h2>
@@ -36,7 +36,7 @@
 </ul>
 <div class="decision">
   <span class="callout-title">決定（2026-08-10、17-2 巡 2）: Remotion ローカル事前ビルド方式の採用と方式名</span>
-  Phase 17 の決定方針（<a href="../../development-plan.md">development-plan.md</a> Phase 17 冒頭の 9 点 = 17-1 で Fix）のうち「生成方式 = Remotion ローカル事前ビルド（quiz-prebuilt 同型の作り置き + 全数人間レビュー）」を方式として具体化する。狙いは <code>quiz-prebuilt</code> と同じ 3 点（生成 API 定常費ゼロ〔Remotion・VOICEVOX とも無料。<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>〕・投稿される完成形の全数人間レビュー・実行時の失敗面の縮小）。方式名は <code>quiz-prebuilt</code> の「コンテンツ種別 + prebuilt」の命名慣例に倣い <strong><code>ranking-prebuilt</code></strong> とした（代替案 <code>pref-ranking-prebuilt</code> はセットコードに寄り過ぎ〔方式は他セットでも再利用しうる〕、<code>remotion-prebuilt</code> は技術基盤名で既存カタログと命名粒度が揃わないため不採用）。
+  Phase 17 の決定方針（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 17 冒頭の 9 点 = 17-1 で Fix）のうち「生成方式 = Remotion ローカル事前ビルド（quiz-prebuilt 同型の作り置き + 全数人間レビュー）」を方式として具体化する。狙いは <code>quiz-prebuilt</code> と同じ 3 点（生成 API 定常費ゼロ〔Remotion・VOICEVOX とも無料。<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>〕・投稿される完成形の全数人間レビュー・実行時の失敗面の縮小）。方式名は <code>quiz-prebuilt</code> の「コンテンツ種別 + prebuilt」の命名慣例に倣い <strong><code>ranking-prebuilt</code></strong> とした（代替案 <code>pref-ranking-prebuilt</code> はセットコードに寄り過ぎ〔方式は他セットでも再利用しうる〕、<code>remotion-prebuilt</code> は技術基盤名で既存カタログと命名粒度が揃わないため不採用）。
 </div>
 <div class="table-wrap">
 <table>

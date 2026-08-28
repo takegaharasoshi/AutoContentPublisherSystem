@@ -5,7 +5,7 @@
 共通資材のため `common/` に置く（置き場のルールは
 [docs/app/operation.html](../../../../docs/app/operation.html) セクション 3）。
 
-換算方針（Phase 17 決定）は `docs/development-plan.md` の Phase 17 冒頭②と
+換算方針（Phase 17 決定）は `docs/plans/development-plan.html` の Phase 17 冒頭②と
 [docs/app/sets/pref-ranking-1.html](../../../../docs/app/sets/pref-ranking-1.html) セクション 1 が正。
 
 ## 換算ルール

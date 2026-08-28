@@ -17,8 +17,7 @@ AutoContentPublisherSystem/
 │   ├── infra/                       #   インフラ設計書（HTML）
 │   ├── app/                         #   アプリ設計書（共通設計書 + generators/ 方式別 + sets/ セット別の 3 層構造）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
-│   ├── development-plan.md          #   開発計画・進捗管理（現役の計画・設計課題リスト）
-│   └── development-log.md           #   開発記録（完了ステップの実施記録）
+│   └── plans/                       #   計画体系（開発レーン計画・記録 + セット別計画・記録。2 レーン運用ルールの正は plans/index.html）
 ├── infra/                           # AWS CDK プロジェクト（TypeScript）
 ├── services/
 │   ├── db-readiness-check/          # DB 準備確認（Python）
@@ -46,7 +45,7 @@ AutoContentPublisherSystem/
 
 ## 設計書体系
 
-設計書は **HTML** で記述する（開発計画 `docs/development-plan.md` と開発記録 `docs/development-log.md` のみ Markdown）。体系の全体像・スコープ境界・設計 Fix 基準は `docs/index.html` を参照。
+設計書・計画書・記録はすべて **HTML** で記述する（Phase 18〔2026-08-28〕で計画・記録も Markdown から HTML 化）。体系の全体像・スコープ境界・設計 Fix 基準は `docs/index.html` を参照。
 
 - **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（Phase 9 で詳細化・Phase 10-1 で最終 Fix 済み）
 - **事業とシステムを分離する**。事業の意思決定（収益化戦略・予算・KPI・プラットフォーム展開方針）は `docs/strategy/business-strategy.html` に書き、システム設計書には書かない
@@ -59,6 +58,7 @@ AutoContentPublisherSystem/
 | `docs/overview/` | システムの目的・スコープ・技術選定 | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
 | `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
+| `docs/plans/` | 計画体系（開発レーン + セット別の計画・記録。並行作業ルール） | `index.html`（レーン振り分け・並行作業ルールの正）, `development-plan.html` / `development-log.html`（開発レーン）, `<set_code>.html` / `<set_code>-log.html`（セットレーン × 3 セット） |
 | `docs/_archive/` | 旧 Markdown 設計書（アプリ設計の参考資料。現役ではない） | 過去の検討経緯の参照用 |
 
 ### ドキュメント参照ガイド（タスク別）
@@ -79,8 +79,9 @@ AutoContentPublisherSystem/
 | セットを追加・廃止する | `docs/app/operation.html` セクション 2 + `docs/app/design-outline.html` セクション 1.1（セット別設計書ルール） |
 | 生成方式を追加・変更する | `docs/app/batch-flow.html` セクション 2.1（契約・方式カタログ）+ `docs/app/generators/` の該当方式設計書 |
 | ランキングストック（`pref-ranking-1`）を執筆・レビュー・投入する | `content/ranking-stock/pref-ranking-1/WRITING-NOTES.md`（実務の勘所）+ `docs/app/operation.html` セクション 3（手順の正） |
-| 開発の次ステップを確認する | `docs/development-plan.md` |
-| 過去の実施記録・経緯を確認する | `docs/development-log.md`（完了ステップの確認・備考の全文） |
+| 開発の次ステップを確認する（開発レーン） | `docs/plans/development-plan.html` |
+| セットの運用状況・バックログの確認、週次補充・セット内改修（セットレーン） | `docs/plans/<set_code>.html`（記録は `<set_code>-log.html`）+ レーン判定は `docs/plans/index.html` |
+| 過去の実施記録・経緯を確認する | `docs/plans/development-log.html`（完了ステップの確認・備考の全文）/ セット運用の記録は `docs/plans/<set_code>-log.html` |
 
 ### 設計 Fix・レビューの運用ルール
 
@@ -88,14 +89,22 @@ AutoContentPublisherSystem/
 
 - 設計書は「次フェーズの作業に着手できる」水準で一時 Fix とする。「生成 AI の指摘ゼロ」を目指さない
 - 設計レビューは観点を限定して行い、最大 2 巡まで。指摘は blocker（誤り・矛盾・欠落）と改善提案に分類し、**blocker のみ修正**する
-- 改善提案・持ち越し論点は `docs/development-plan.md` 末尾の「設計課題リスト」に記録する
+- 改善提案・持ち越し論点は `docs/plans/development-plan.html` 末尾の「設計課題リスト」に記録する
 
-## 開発計画
+## 開発計画（2 レーン体制）
 
-- 開発計画と進捗は `docs/development-plan.md` で管理する。ステップ完了時、計画書にはチェック + 完了日 + 要点のみを記録し、詳細な実施記録は `docs/development-log.md` に追記する（計画書の肥大化防止）
-- **Phase D（インフラ設計）→ Phase A・9（アプリ設計）→ Phase 0〜8（インフラ構築）→ Phase 10〜13（アプリ実装・定常運用開始）は完了済み**。現在は **Phase 14〜17（収益化に向けた機能拡充: 動画対応 → 勝負セット → インサイト → 都道府県ランキングセット）** を進行中。プラットフォーム展開は Phase XX として着手判断待ち（現況は計画書を参照）
+- **プロジェクト管理は 2 レーン体制**（Phase 18・2026-08-28 導入）: 開発レーン（フェーズ制の新規開発・基盤改修）は `docs/plans/development-plan.html`、セット別の保守運用・セット内で閉じる改修はセット計画書 `docs/plans/<set_code>.html` で管理する。**レーン振り分け（パス基準）・並行作業ルールの正は `docs/plans/index.html`**
+- ステップ・作業の完了時、計画書にはチェック + 完了日 + 要点のみを記録し、詳細な実施記録は対応する記録ファイル（`development-log.html` / `<set_code>-log.html`）に追記する（計画書の肥大化防止）
+- **Phase D〜15・17（設計 → インフラ構築 → アプリ実装 → 動画対応 → 勝負セット → 第 3 セット pref-ranking-1）は完了済み**。現在の開発レーンは **Phase 16 の残り（16-5 効果検証 → 16-12 指標セット確定）**。プラットフォーム展開は Phase XX として着手判断待ち（現況は計画書を参照）
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
-- 作業開始時は `docs/development-plan.md` を読み、現在の Phase・ステップを確認してから着手する
+- 作業開始時はレーンを確認し、開発レーンなら `docs/plans/development-plan.html`、セットレーンなら該当セット計画書を読んでから着手する
+
+## 並行作業ルール
+
+- セッション開始時にレーンを宣言する。**開発レーン（`services/` `shared/` `infra/` `database/`・共通設計書に触れる作業）は常に 1 セッションのみ**。セットレーン（`content/<set>/` + セット別・専用方式設計書 + セット計画書で閉じる作業）は**セットごとに並行可**。補充スキルの起動はセットレーン宣言を兼ねる
+- 判定は `docs/plans/index.html` セクション 2 のパス基準判定表に従う。開発レーン対象のパスが 1 つでも入る作業は開発レーン行き（軽微に見えても）
+- レーンをまたぐ気づきは自分で直さず、相手レーンの計画書（開発レーンの設計課題リスト / セット計画書のバックログ）に記録する
+- `docs/plans/` 自体の整理・ルール変更は、他セッションが動いていないフリーズ窓で単独実施する
 
 ## ドキュメント更新ルール
 
@@ -160,6 +169,7 @@ Claude のトークン消費を抑えるため、以下のタスクは Codex CLI
 ## Git 運用ルール
 
 - コミットメッセージは必ず**日本語**で記述する
+- **push の前に必ず `git pull --rebase origin main` を挟む**（複数セッションの並行運用のため。Phase 18 で導入）
 - **コミットしたら必ずその場で `git push origin main` まで行う**（すべての作業で。コミットだけで止めない）。push 忘れで本番イメージが古いまま稼働確認が失敗した事故（17-5c、2026-08-26。origin/main が 35 コミット遅れ）の再発防止
 - `services/` / `shared/` に触れた push の後は、CodePipeline の完走（3 本のうち該当分が Succeeded）とタスク定義の新リビジョン登録まで確認してからステップ完了とする
 

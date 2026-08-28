@@ -61,7 +61,7 @@
 先行登録した `batch_sets` の `pref-ranking-1` 行の `name` が、**ローカル MySQL 側だけ
 二重エンコードで文字化けしていた**（`CHAR_LENGTH` = 45 = 15 文字 × 3）。原因は
 `docker exec ... mysql` に `--default-character-set=utf8mb4` を付けずに INSERT したこと
-（`docs/development-plan.md` の 2026-07-29 / 15-10 に記録済みの既知の落とし穴）。
+（`docs/plans/development-plan.html` の 2026-07-29 / 15-10 に記録済みの既知の落とし穴）。
 正しい値で UPDATE して解消済み（Aurora 側は Data API 経由のため元から正常）。
 
 **同じ原因で `fantasy-animals-1` の `name` もローカルだけ文字化けしている**
@@ -87,7 +87,7 @@ NOT NULL 制約で落ちる）。セット登録は本来 17-5 の手順（opera
 
 **このプレビューは 17-3 のレビュー対象ではない**（17-3 のレビュー観点はデータの正しさ・表現・重複・
 フォーマット適合の 4 点で、対象は `review.html` のテキスト）。版面の品位は 17-4 の作り込みで扱う。
-プレビューから出た版面の課題と実行環境の知見は `docs/development-plan.md` の 17-4 に申し送り済み。
+プレビューから出た版面の課題と実行環境の知見は `docs/plans/development-plan.html` の 17-4 に申し送り済み。
 
 ## 残作業（第 2・第 3 バッチ）
 

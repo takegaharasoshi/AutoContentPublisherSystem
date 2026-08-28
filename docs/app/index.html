@@ -21,12 +21,12 @@
   アプリ設計は、<strong>大枠（Phase A）</strong>と<strong>詳細（Phase 9）</strong>の 2 段階で行う。Phase A では仕様の壁打ち・設計書構成の決定・主要方針の骨子を固め、大枠設計書（骨子版）を作成した。
   テーブル定義・処理フローの詳細・DDL などの詳細設計は Phase 9 で行った（2026-07-06、上流工程に適した生成 AI モデルの利用期限を機に、インフラ構築＝開発計画 Phase 0〜8 より前へ前倒し。インフラ構築で得た知見の反映は Phase 10 冒頭の最終 Fix（10-1）で行う）。
   Phase 9-5（生成 AI レビュー）まで完了し、Phase 9 の成果物は一時 Fix とした。
-  その後、インフラ構築（Phase 0〜8）完了を受けた <strong>Phase 10-1（2026-07-15）で知見の反映と検討メモの棚卸しを行い、最終 Fix</strong> とした（詳細は <a href="../development-log.md">development-log.md</a> の 10-1 備考を参照）。
+  その後、インフラ構築（Phase 0〜8）完了を受けた <strong>Phase 10-1（2026-07-15）で知見の反映と検討メモの棚卸しを行い、最終 Fix</strong> とした（詳細は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の 10-1 備考を参照）。
 </div>
 
 <div class="note">
   <span class="callout-title">設計の経緯</span>
-  大枠（Phase A: 2026-07-06）→ 詳細（Phase 9: 2026-07-06〜07）→ 最終 Fix（Phase 10-1: 2026-07-15）の各ステップの成果物・実施記録は <a href="../development-log.md">development-log.md</a> を参照。以後の改訂（動画対応 = Phase 14・勝負セット投入 = Phase 15・テコ入れと事前生成方式への転換 = Phase 16）は各設計書の decision コールアウトと development-log.md に記録している。
+  大枠（Phase A: 2026-07-06）→ 詳細（Phase 9: 2026-07-06〜07）→ 最終 Fix（Phase 10-1: 2026-07-15）の各ステップの成果物・実施記録は <a href="../plans/development-log.html">docs/plans/development-log.html</a> を参照。以後の改訂（動画対応 = Phase 14・勝負セット投入 = Phase 15・テコ入れと事前生成方式への転換 = Phase 16）は各設計書の decision コールアウトと docs/plans/development-log.html に記録している。
 </div>
 
 <h2 id="toc">1. ドキュメント構成（目次）</h2>
@@ -96,7 +96,7 @@
 </div>
 
 <h2 id="memo">2. 検討メモ</h2>
-<p>インフラ設計・構築中に出てきたアプリ関連の論点はここに記録する（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。<strong>現在、未消化の論点はない</strong>（Phase 10-1 の棚卸し〔2026-07-15〕で全件反映済み。反映済みの過去分の内容は <a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>・<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a> の decision と <a href="../development-log.md">development-log.md</a> を参照）。</p>
+<p>インフラ設計・構築中に出てきたアプリ関連の論点はここに記録する（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。<strong>現在、未消化の論点はない</strong>（Phase 10-1 の棚卸し〔2026-07-15〕で全件反映済み。反映済みの過去分の内容は <a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>・<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a> の decision と <a href="../plans/development-log.html">docs/plans/development-log.html</a> を参照）。</p>
 
 <h2 id="references">3. 参考資料</h2>
 <p><a href="../_archive/">docs/_archive/</a> の旧 Markdown 設計書には、過去に検討したアプリ設計（冪等性設計・テーブル定義・運用手順等）が含まれている。<strong>現役の設計書ではない</strong>。過去の検討経緯の参照用に残している。</p>

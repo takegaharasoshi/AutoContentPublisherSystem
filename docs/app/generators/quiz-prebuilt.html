@@ -19,7 +19,7 @@
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  生成方式 <code>quiz-prebuilt</code>（クイズ動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプラインの技術設計（セクション 8）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、ビルドの運用手順（いつ・どう回すか）は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a> を参照。分冊ルール上は「本採用時に作成」だが、16-1 と同様に実装（16-3c）の正とするため設計 Fix 時点で作成した。転換の経緯は <a href="../../development-plan.md">development-plan.md</a> Phase 16 冒頭（2026-08-08 展開注記）と <a href="../../development-log.md">development-log.md</a> の 16-3 (8) にある。
+  生成方式 <code>quiz-prebuilt</code>（クイズ動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプラインの技術設計（セクション 8）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、ビルドの運用手順（いつ・どう回すか）は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a> を参照。分冊ルール上は「本採用時に作成」だが、16-1 と同様に実装（16-3c）の正とするため設計 Fix 時点で作成した。転換の経緯は <a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 16 冒頭（2026-08-08 展開注記）と <a href="../../plans/development-log.html">docs/plans/development-log.html</a> の 16-3 (8) にある。
 </div>
 
 <div class="warn">
@@ -31,7 +31,7 @@
 <p><strong>イラスト〜動画を事前にローカルでビルドし、全数人間レビューのうえ S3 に作り置き</strong>しておき、実行時は問題ストック（<code>quiz_stock_items</code>）の LRU 順繰り選定と<strong>事前動画の取得・返却だけを行う</strong>軽量なクイズ方式。実行時に外部 API（画像生成・LLM）を一切呼ばず、Pillow 組版・ffmpeg 合成も行わない。動画の作り（16 秒・3 カット・版面固定・答えはキャプションへ）は <code>gpt-quiz-multicut</code> の 16-1 / 16-2b / 16-4c 設計をそのまま踏襲し、生成のタイミングを実行時からビルド時へ移しただけの関係にある。</p>
 <div class="decision">
   <span class="callout-title">決定（2026-08-08 ユーザー決定、16-3 完了後の仕様変更）: 動画の事前生成方式への転換</span>
-  16-3 の実 API 品質確認で、情景が意味的に文字を誘発するケース（動物園ゲートの「ZOO」看板・階数ボタンの数字）は<strong>プロンプトの禁止指定では抑えきれない</strong>ことが判明した。一方、Codex 組み込みの画像生成（imagegen。サブスク内・API 課金なし）に画風指定 1 行を足した再試行では、<strong>6 枚全てがブランドのフラットイラスト調に統一され禁止事項も全遵守</strong>となり品質面で最良だった（比較の詳細は <a href="../../development-log.md">development-log.md</a> の 16-3 (8)）。これを受け、実行時生成をやめ事前生成へ転換する。狙いは 3 点:
+  16-3 の実 API 品質確認で、情景が意味的に文字を誘発するケース（動物園ゲートの「ZOO」看板・階数ボタンの数字）は<strong>プロンプトの禁止指定では抑えきれない</strong>ことが判明した。一方、Codex 組み込みの画像生成（imagegen。サブスク内・API 課金なし）に画風指定 1 行を足した再試行では、<strong>6 枚全てがブランドのフラットイラスト調に統一され禁止事項も全遵守</strong>となり品質面で最良だった（比較の詳細は <a href="../../plans/development-log.html">docs/plans/development-log.html</a> の 16-3 (8)）。これを受け、実行時生成をやめ事前生成へ転換する。狙いは 3 点:
   <ul style="margin:.3rem 0 0;">
     <li><strong>イラスト API 費のゼロ化</strong>: imagegen はサブスク内のため、logic-training-1 の生成 API 定常費が消える（<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>）</li>
     <li><strong>品質担保の構造化</strong>: 投稿される完成形（動画そのもの）を事前に全数人間レビューできる。イラストの文字混入・画風ブレは「レビューで弾いて再生成」で確実に止まる（プロンプト禁止だけに頼らない）</li>

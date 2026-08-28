@@ -113,7 +113,7 @@ operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「
 - 事前に Aurora の `quiz_items.summary` 全件と突合し、既出題と解法構造・題材が重複しないことを最終確認
 - ローカル: `docker exec -i acps-mysql mysql --default-character-set=utf8mb4 ...`(utf8mb4 指定必須)。事前にトランザクション + ROLLBACK でドライランする
 - Aurora: Data API(`aws rds-data execute-statement`)。auto mode classifier にブロックされる場合はユーザーに許可を求める
-- 投入後: 在庫確認クエリで件数・内訳を確認し、`docs/development-log.md` に補充記録を残す
+- 投入後: 在庫確認クエリで件数・内訳を確認し、セット記録 `docs/plans/logic-training-1-log.html` の「週次補充の記録」へ要約を追記する（Phase 18 の 2 レーン化で記録先を変更。セット計画書 `docs/plans/logic-training-1.html` のステータス欄の在庫情報も更新する）
 
 ## 7. 動画ビルド・レビュー・配置(quiz-prebuilt。投入後に必ず)
 

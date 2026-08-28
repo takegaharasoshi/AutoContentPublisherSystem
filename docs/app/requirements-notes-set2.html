@@ -245,7 +245,7 @@
 </div>
 
 <h3 id="handover-15-5">8.6 15-5（設計 Fix）への引き継ぎ論点</h3>
-<p><strong>→ 15-5（2026-07-27）で全項目確定済み</strong>。構造の Fix は <a href="data-model.html">data-model.html</a>（4.8 / 4.9 / 5）・<a href="batch-flow.html#generator-strategy">batch-flow.html 2.1</a>・<a href="operation.html#audio-mgmt">operation.html 3</a>・V003、方式内部の決定（検証チェーン・レイアウト・ffmpeg / SE 合成の初期値）は <a href="../development-log.md">development-log.md</a> の 15-5 を参照。</p>
+<p><strong>→ 15-5（2026-07-27）で全項目確定済み</strong>。構造の Fix は <a href="data-model.html">data-model.html</a>（4.8 / 4.9 / 5）・<a href="batch-flow.html#generator-strategy">batch-flow.html 2.1</a>・<a href="operation.html#audio-mgmt">operation.html 3</a>・V003、方式内部の決定（検証チェーン・レイアウト・ffmpeg / SE 合成の初期値）は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の 15-5 を参照。</p>
 <ul>
   <li><code>quiz_items</code> のテーブル設計（カラム・重複検査〔類似度〕の実装方式・L1/L3 ローテーションの参照方法）と V003 の DDL（V001 COMMENT 解消込み）</li>
   <li>検証設計の詳細: 検証プロンプト・L1 機械検証の型定義・再生成上限 N とフェイルラウド条件</li>
@@ -395,7 +395,7 @@
     <li><strong><code>illustration_scene</code> 検証仕様</strong>: プログラム検査のみ（必須・最大 200 字）。検証チェーン（独立解答・類似度検査）の対象外 — 正確性はテキスト側が担い、禁止事項（文字・答え示唆の描画禁止）と時間帯ムードは LLM 出力に依存せずコード側の固定プロンプトで画像生成 API へ指示する</li>
     <li><strong>イラスト生成失敗時</strong>: フェイルラウド（「イラストなしで続行」の縮退はしない。デザイン崩れ動画の自動公開を許さない）</li>
     <li><strong>ストーリーズの有効化</strong>: <code>batch_sets.stories_enabled</code>（セット単位・DEFAULT 0。投稿フローは <a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
-    <li><strong>ラベル・パレット</strong>: <code>parameters.slots</code> へ <code>slot_label</code> を追加（文言初期値 = 朝/昼/夜のロジトレ）、パレットはコード側定数（<code>slot_code</code> キー。初期値は <a href="../development-log.md">development-log.md</a> 15-10）。試し打ちでの微調整は 15-13</li>
+    <li><strong>ラベル・パレット</strong>: <code>parameters.slots</code> へ <code>slot_label</code> を追加（文言初期値 = 朝/昼/夜のロジトレ）、パレットはコード側定数（<code>slot_code</code> キー。初期値は <a href="../plans/development-log.html">docs/plans/development-log.html</a> 15-10）。試し打ちでの微調整は 15-13</li>
     <li><strong>コーチのイラスト内登場</strong>: 不採用（前景の固定アセットと二重出演になり、生成の安定性リスクと検証不可領域を増やすだけのため。イラストは「情景」に徹する）</li>
   </ul>
 </div>

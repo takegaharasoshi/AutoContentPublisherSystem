@@ -88,7 +88,7 @@
   <strong>共通設計書とセット別設計書の 2 層構造</strong>を定めた（要望の記録は <a href="requirements-notes.html">A-1 壁打ち記録</a>の追記を参照）。
   その後 2026-07-12 の D-3 通読時の議論で、生成方式もスクラップ&amp;ビルドで多数試作する想定であることから
   <strong>方式層を加えた 3 層構造（契約 / 方式 / セット）</strong>への拡張を合意し、Phase 10-1 で反映した（2026-07-15。
-  経緯の記録は <a href="../development-log.md">development-log.md</a> の 10-1 を参照）。
+  経緯の記録は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の 10-1 を参照）。
 </div>
 
 <ul>
@@ -109,7 +109,7 @@
   アプリ資材（コンテナ・CI/CD パイプライン）はサービス単位の共有を維持し、セット差分は DB のセット設定と
   生成方式 strategy モジュール（<a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）で表現する。
   なお、将来デプロイ分離を導入する場合はセット間の結合点が DB スキーマの後方互換性に移る点に留意する
-  （関連論点は <a href="../development-plan.md">development-plan.md</a> の設計課題リストを参照）。
+  （関連論点は <a href="../plans/development-plan.html">docs/plans/development-plan.html</a> の設計課題リストを参照）。
 </div>
 
 <h2 id="invariant">2. 全体方針: 処理単位の不変条件</h2>
@@ -182,13 +182,13 @@ Instagram トークンの手動更新、効果測定（インサイト収集バ�
 
 <p><strong>分冊横断の将来拡張</strong>: 失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（AI によるプロンプト生成・カルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、生成 AI 動画方式（簡易動画方式〔静止画 + 音楽のリール〕は Phase 14 で対応済み）、承認フロー、管理画面。インサイト収集バッチは Phase 16-7 で設計 Fix し将来拡張から外れた（<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）。</p>
 
-<p class="note" style="margin-top:.5rem;">大枠 → 詳細（Phase 9）→ 最終 Fix（Phase 10-1）の線引き・持ち越しの経緯は <a href="../development-log.md">development-log.md</a> の 9-1〜9-5・10-1 を参照。</p>
+<p class="note" style="margin-top:.5rem;">大枠 → 詳細（Phase 9）→ 最終 Fix（Phase 10-1）の線引き・持ち越しの経緯は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の 9-1〜9-5・10-1 を参照。</p>
 
 <div class="warn">
   <span class="callout-title">A-3 で確認したこと（インフラ設計との突き合わせ）</span>
   本書の帰結として、SNS 投稿 Step Functions への <code>scheduled_at</code> 追加は<strong>不要</strong>（現行の連携契約のままでよい）。
   A-3 では、インフラ設計書 6 本と本書・A-1 記録を突き合わせ、矛盾・欠落（blocker）のみ修正した。
-  <strong>2026-07-06 A-3 実施済み</strong>（修正内容は <a href="../development-log.md">development-log.md</a> の A-3 備考を参照）。
+  <strong>2026-07-06 A-3 実施済み</strong>（修正内容は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の A-3 備考を参照）。
 </div>
 
 </div>
