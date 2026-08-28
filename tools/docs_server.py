@@ -48,11 +48,18 @@ def main() -> None:
         default="127.0.0.1",
         help="待ち受けアドレス（既定はループバックのみ）",
     )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=DOCS_DIR,
+        help="配信ルート（既定は docs/。レビュー HTML 等を見せるときだけ別ポートで指定する）",
+    )
     args = parser.parse_args()
 
-    handler = functools.partial(DocsRequestHandler, directory=str(DOCS_DIR))
+    root = args.root.resolve()
+    handler = functools.partial(DocsRequestHandler, directory=str(root))
     with http.server.ThreadingHTTPServer((args.bind, args.port), handler) as httpd:
-        print(f"serving {DOCS_DIR} on http://{args.bind}:{args.port}/", flush=True)
+        print(f"serving {root} on http://{args.bind}:{args.port}/", flush=True)
         httpd.serve_forever()
 
 

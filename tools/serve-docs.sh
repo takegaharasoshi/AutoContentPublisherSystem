@@ -11,6 +11,9 @@ set -euo pipefail
 
 PORT="${DOCS_PORT:-8765}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# 配信ルート。既定は docs/。レビュー HTML 等を見せるときだけ DOCS_ROOT + DOCS_PORT を
+# 変えて別インスタンスとして起動する（docs 配信は止めない）。
+DOCS_ROOT="${DOCS_ROOT:-${REPO_ROOT}/docs}"
 PID_FILE="/tmp/acps-docs-server-${PORT}.pid"
 LOG_FILE="/tmp/acps-docs-server-${PORT}.log"
 TAILSCALE="/mnt/c/Program Files/Tailscale/tailscale.exe"
@@ -46,7 +49,7 @@ start() {
     echo "HTTP サーバーは既に稼働中です (pid=$(cat "$PID_FILE"), port=${PORT})"
   else
     nohup python3 "${REPO_ROOT}/tools/docs_server.py" --port "$PORT" --bind 127.0.0.1 \
-      >"$LOG_FILE" 2>&1 &
+      --root "$DOCS_ROOT" >"$LOG_FILE" 2>&1 &
     echo $! >"$PID_FILE"
     sleep 1
     if ! is_running; then
@@ -54,7 +57,7 @@ start() {
       cat "$LOG_FILE" >&2
       exit 1
     fi
-    echo "HTTP サーバーを起動しました (pid=$(cat "$PID_FILE"), port=${PORT})"
+    echo "HTTP サーバーを起動しました (pid=$(cat "$PID_FILE"), port=${PORT}, root=${DOCS_ROOT})"
   fi
 
   # tailscale serve の設定は tailscaled 側に永続化されるため、再実行しても冪等。
