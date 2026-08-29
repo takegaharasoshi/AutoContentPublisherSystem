@@ -20,7 +20,8 @@ disposition: ""
 
 ## 前提条件・再検討トリガー
 
-（未整理。壁打ちで詰める）
+- 同系統（開発プロセス改善）のアイデア: [claude-code-loop-goal-skills](claude-code-loop-goal-skills.md)（Claude Code のループ / ゴール系スキルの活用）。まとめて壁打ちしてもよい
+- （未整理。壁打ちで詰める）
 
 ## 原文メモ
 
