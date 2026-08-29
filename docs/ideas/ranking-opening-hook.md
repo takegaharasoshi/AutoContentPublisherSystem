@@ -4,12 +4,12 @@ slug: ranking-opening-hook
 status: 採用            # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
 kind: 単発               # 単発 | 構想
 created: 2026-08-28
-updated: 2026-08-28
+updated: 2026-08-29
 condition: ""            # 再醸成待ち・待機のとき必須（再検討トリガー / 落とし込み条件）
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: "採用（2026-08-28・1 回の壁打ちで着地）。セットレーンで完結するため待機を挟まず、docs/plans/pref-ranking-1.html の進行中ステップ「改修 R-1: 冒頭フック改善」（R-1-1〜R-1-5）へ展開済み（2026-08-29）。実装時に docs/app/generators/ranking-prebuilt.html セクション 8.2 を更新する"
+disposition: "採用（2026-08-28・1 回の壁打ちで着地）。セットレーンで完結するため待機を挟まず、docs/plans/pref-ranking-1.html の進行中ステップ「改修 R-1: 冒頭フック改善」（R-1-1〜R-1-5）へ展開済み（2026-08-29）。実装時に docs/app/generators/ranking-prebuilt.html セクション 8.2 を更新する。実装完了 2026-08-29: R-1-1〜R-1-5 完了・在庫全 30 件を差し替え済み（記録は docs/plans/pref-ranking-1-log.html セクション 3）"
 ---
 
 ## 要旨

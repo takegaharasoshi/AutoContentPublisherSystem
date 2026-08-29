@@ -13,7 +13,7 @@
 <h1>セット記録: 表彰台五郎の都道府県ランキング（pref-ranking-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-08-28（Phase 18 で新設）</span>
+  <span>最終更新: 2026-08-29（改修 R-1 の記録を追記）</span>
 </div>
 
 <div class="note">
@@ -34,7 +34,26 @@
 <p>まだなし。</p>
 
 <h2>3. セット内改修の記録</h2>
-<p>まだなし。</p>
+
+<h3>改修 R-1: 冒頭フック改善（ミュート離脱対策） — 2026-08-29 完了</h3>
+<p>
+  起票から差し替えまで 1 日で完了（計画は<a href="pref-ranking-1.html">セット計画書</a>の R-1、経緯・棄却案は<a href="../ideas/ranking-opening-hook.md">アイデア記録</a>、仕様は<a href="../app/generators/ranking-prebuilt.html">方式設計書セクション 8.2</a> の decision〔2026-08-29、R-1〕が正）。
+  <strong>差し替え完了日: 2026-08-29</strong>（S3 10:06 JST / Aurora・ローカル MySQL とも <code>video_built_at</code> = 2026-08-29 01:06 UTC）。<strong>新版が表に出るのは 2026-08-29 20:00 JST の投稿から</strong>。16-5 の効果検証で推移を解釈するときの変更点はこの日付。
+</p>
+<div class="table-wrap"><table>
+<thead><tr><th>ステップ</th><th>実施内容</th><th>結果</th></tr></thead>
+<tbody>
+<tr><td>R-1-1 予熱スピン</td><td><code>stageAt</code> に予熱分岐（2 フレーム間隔・減速なし）、<code>JapanMap</code> に <code>litIntensity</code> を追加</td><td><code>tsc --noEmit</code> / <code>remotion bundle</code> / <code>pytest</code> 26 件パス。<code>DURATION_SPECS</code> は無変更</td></tr>
+<tr><td>R-1-2 煽り吹き出し</td><td>尻尾の付け根を基点にしたポップイン + 減衰する 2 度の揺れ（0〜1.1 秒に集中）</td><td>静止画 5 フレームで版面確認。改行・フォントサイズ段階・尻尾位置は不変</td></tr>
+<tr><td>R-1-3 プレビュー確認</td><td>001-gyoza-spend の 30 秒通し + 冒頭 0〜7 秒の改修前後の左右比較（無音 = ミュート再現）</td><td><strong>3 観点とも OK・調整なしで確定</strong>（予熱強度 0.42 / 点滅 2f / ポップイン 0.62 始まり）</td></tr>
+<tr><td>R-1-4 全 30 件の再ビルド・差し替え</td><td><code>build.py --rebuild --durations 30s</code>（09:18〜10:00・失敗 0 件）→ <code>publish.py</code> で S3 60 オブジェクト（動画 30 + 背景 30）を上書き・両環境の DB を更新</td><td>S3 30/30 更新、Aurora・ローカルとも 30 行更新。抜き取りで S3 上の 002-ramen-out（使用済み）が新版であることを確認</td></tr>
+</tbody>
+</table></div>
+<ul>
+  <li><strong>音声経路が無変更であることの確認</strong>: 001 のラウドネス実測が改修前と完全一致（I=-15.7 / TP=-1.7 dBTP）。全 30 件は I=-15.8〜-15.2 に収まった</li>
+  <li><strong>BGM は全件 <code>audio_asset_id=74</code>（track01）を引き継ぎ</strong>、LRU を消費していない（1 曲運用の維持）</li>
+  <li><strong><code>video_s3_key_30s</code> の値は変わらない</strong>（同一キーへの上書きのため）。DB 側の実質的な更新は <code>video_built_at</code></li>
+</ul>
 
 </div>
 </body>

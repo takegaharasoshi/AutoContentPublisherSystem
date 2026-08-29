@@ -13,7 +13,7 @@
 <h1>セット計画書: 表彰台五郎の都道府県ランキング（pref-ranking-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-08-29（R-1-3 完了）</span>
+  <span>最終更新: 2026-08-29（改修 R-1 完了）</span>
 </div>
 
 <div class="note">
@@ -28,7 +28,7 @@
 <tr><th>投稿スロット</th><td>夜 20:00 JST（evening）の 1 日 1 回</td></tr>
 <tr><th>生成方式</th><td>ranking-prebuilt（Remotion 事前ビルド・作り置き）。<strong>尺は 30 秒単尺で確定（2026-08-24）</strong>。20 秒版はタイムライン・コンポジション・方式モジュールとも実装済みのまま<strong>休眠</strong>（増便・尺再検討時の保険。削除しない）</td></tr>
 <tr><th>BGM</th><td><strong>1 曲運用</strong>（世界観の統一。17-5b のユーザー判断）。ミュート検知時は在庫全本の再ビルドが必要な点に注意（<a href="../app/sets/pref-ranking-1.html">セット別設計書</a>セクション 6 の decision）</td></tr>
-<tr><th>ストック運用</th><td>スキル <code>/ranking-stock-replenish</code> で週次補充（7 ネタ目安・在庫水位 14 件以上）。直近: 17-7（2026-08-28）でストック 30 件・30 秒版ビルド済みが両環境に揃った（未ビルド 0 件・Aurora 未使用在庫 28 件）。<strong>ネタ帳は使い切ったため以後の供給は家計調査の品目採掘が主軸</strong></td></tr>
+<tr><th>ストック運用</th><td>スキル <code>/ranking-stock-replenish</code> で週次補充（7 ネタ目安・在庫水位 14 件以上）。直近: 17-7（2026-08-28）でストック 30 件・30 秒版ビルド済みが両環境に揃った（未ビルド 0 件・Aurora 未使用在庫 28 件）。<strong>2026-08-29: 改修 R-1 で全 30 件を同一版へ再ビルド・差し替え済み</strong>。<strong>ネタ帳は使い切ったため以後の供給は家計調査の品目採掘が主軸</strong></td></tr>
 <tr><th>KPI</th><td>（枠のみ。<strong>継続的に見る指標セットは 16-12〔開発レーン〕で確定予定</strong> — 確定までは独自の指標記録を始めない）</td></tr>
 </tbody>
 </table></div>
@@ -43,46 +43,16 @@
 </table></div>
 
 <h2>3. 進行中ステップ</h2>
+<p>現在なし（直近の改修 R-1 は 2026-08-29 に完了）。</p>
 
-<h3>改修 R-1: 冒頭フック改善（ミュート離脱対策）</h3>
-<p>
-  起票 2026-08-29（アイデア体系の壁打ちを経て採用。経緯・棄却案は <a href="../ideas/ranking-opening-hook.md">ranking-opening-hook.md</a> が正）。
-  <strong>ねらい</strong>: 30 秒版の 0.00〜5.00 秒が実質完全な静止画（<code>intro</code> 89f + <code>teaser</code> 61f = 150f。この区間は <code>mapZoomAt</code> が 1.04 固定、<code>Backdrop</code> の ken-burns は 900f で 1.0→1.07 と知覚できない）である状態を解消し、ミュート視聴者の即スキップを減らす。
-  <strong>根拠</strong>: 視聴維持カーブ 2 本の目視（2026-08-28）で<strong>崖は 0〜2 秒</strong>、0:05 時点の維持率は 18%（ぎょうざ）/ 37%（ラーメン）、<strong>5 秒を越えた視聴者はほぼ最後まで見る</strong>（→13% / →28%）。勝負は冒頭 2 秒に集中している。
-  <strong>不変条件</strong>: タイムライン定数（<code>scripts/build_timeline.py</code> の <code>DURATION_SPECS</code>）は変更しない — 総尺・シーン配分・ナレーション予算検査には手を入れず、既存区間に動きを足すだけにする。
-</p>
+<h2>4. 完了した改修</h2>
 <div class="table-wrap"><table>
-<thead><tr><th>ステップ</th><th>内容</th><th>完了条件</th><th>状態</th></tr></thead>
+<thead><tr><th>改修</th><th>内容</th><th>完了日</th></tr></thead>
 <tbody>
 <tr>
-  <td><strong>R-1-1</strong><br>予熱スピン（A）</td>
-  <td><code>src/PrefRankingVideo.tsx</code> の <code>stageAt</code> に <code>frame &lt; tl.rounds[5].start</code> のアイドル分岐を足し（現在は <code>lit=null</code> を返す）、<code>spinCodeAt</code> 相当で<strong>フレーム 0 から本番と同等の最高速</strong>で県を点滅させる。<strong>可読性と 5.00 秒の変化点は発光強度で作る</strong>: <code>src/JapanMap.tsx</code> の <code>litCode</code> 描画（現行 <code>drop-shadow</code>）に強度パラメータを渡せるようにし、予熱区間は淡く、5.00 秒の本番スピンで現行値へ上げ、停止フラッシュで最大にする（<strong>速さと眩しさの分離</strong>）</td>
-  <td>ビルドが通り、<code>pytest</code>（タイムライン導出値の固定テスト）が全パス。<code>DURATION_SPECS</code> に差分がない</td>
-  <td>✅ 2026-08-29<br>予熱スピン（2f 間隔・減速なし）+ <code>litIntensity</code>（予熱 0.42 / 本番 1.0）を実装。<code>tsc --noEmit</code>・<code>remotion bundle</code>・<code>pytest</code>（26 件）とも通過、タイムライン定数は無変更</td>
-</tr>
-<tr>
-  <td><strong>R-1-2</strong><br>煽り吹き出しの視覚化（B）</td>
-  <td>煽り吹き出し（0 秒から <code>teaser</code> テキストを表示している要素）にモーションを与え、ミュートでも「予想しろ」という参加要求が届くようにする（ポップイン・「？」の脈動等）。<strong>モーションは 0〜1 秒に集中させる</strong>（崖より後に置いても届かない）。17-3 で <code>teaser</code> を全ネタ必須にした狙いを、ミュート視聴者にも通す</td>
-  <td>ビルドが通り、吹き出しの改行・フォントサイズ段階（48/44/40）と尻尾位置が現行どおり崩れない</td>
-  <td>✅ 2026-08-29<br>尻尾の付け根を基点にしたポップイン（0.62 → 1.0・約 0.4 秒）+ 減衰する 2 度の揺れ（0.43〜1.1 秒）。<strong>変形はレイアウト後に効くため改行・フォントサイズ段階・尻尾位置は不変</strong>。teaser 区間外は恒等変換。静止画（frame 0/6/16/22/150）で版面を確認済み</td>
-</tr>
-<tr>
-  <td><strong>R-1-3</strong><br>プレビュー確認（ユーザー判断）</td>
-  <td>1 ネタを試験レンダリングし、ユーザーが実物で確認する。確認観点は 3 つ: ① 冒頭 0〜2 秒に明確な動きが出ているか ② タイトル帯・全国平均プレート・煽り文が予熱区間でも読めるか ③ 5.00 秒（本番スピン）と 6.00 秒（停止フラッシュ）の変化点が残っているか。速度・発光強度の最終調整はここで行う</td>
-  <td>ユーザーが 3 観点すべてで OK と判断</td>
-  <td>✅ 2026-08-29<br>001 ぎょうざの 30 秒通し（本番 BGM・ラウドネス正規化 I=-15.7 LUFS / TP=-1.7 dBTP）と冒頭 0〜7 秒の改修前後の左右比較（無音＝ミュート再現）で確認 → <strong>3 観点とも OK 判断。調整なしで確定</strong>（予熱強度 0.42 / 点滅 2f / ポップイン 0.62 始まり）</td>
-</tr>
-<tr>
-  <td><strong>R-1-4</strong><br>在庫全 30 件の再ビルド・差し替え</td>
-  <td><strong>使用済みを含む在庫全 30 件</strong>の 30 秒版を再レンダリング（ラウドネス正規化まで通す）→ S3 差し替え → <code>ranking_stock_items.video_s3_key_30s</code> の更新要否を確認（同一キーへの上書きなら DB 更新は不要）。<strong>使用済みを対象に含める理由</strong>: 方式設計書セクション 4 の LRU 順繰りは在庫枯渇時に <code>last_used_at IS NOT NULL</code> の行を WARNING ログ付きで選び再投稿するため、旧版が再び表に出る</td>
-  <td>両環境で全 30 件がビルド済み・S3 に新版が揃い、抜き取りで再生確認できる</td>
-  <td>未着手</td>
-</tr>
-<tr>
-  <td><strong>R-1-5</strong><br>設計書・記録の更新</td>
-  <td><a href="../app/generators/ranking-prebuilt.html">方式設計書</a>セクション 8.2（コンポジション・タイムラインの記述）に予熱スピンと吹き出しモーションを追記。<a href="pref-ranking-1-log.html">セット記録</a>セクション 3 に実施記録を追記し、<strong>差し替え完了日を明記する</strong></td>
-  <td>差し替え完了日がセット記録に残っている（16-5 効果検証は絶対水準と改善傾向を見る設計〔16-11 で前後比較は放棄済み〕のため投入自体は矛盾しないが、変更日がないと推移を解釈できない）</td>
-  <td>未着手</td>
+  <td><strong>R-1</strong><br>冒頭フック改善<br>（ミュート離脱対策）</td>
+  <td>0.00〜5.00 秒の実質静止画を解消（<strong>予熱スピン</strong> = フレーム 0 から本番と同等の最高速で県を点滅・変化点は発光強度で作る / <strong>煽り吹き出しのポップイン + 揺れ</strong>を 0〜1 秒に集中）。タイムライン定数 <code>DURATION_SPECS</code> は無変更。<strong>使用済みを含む在庫全 30 件を再ビルドして S3・両環境 DB を差し替え</strong>。仕様は<a href="../app/generators/ranking-prebuilt.html">方式設計書セクション 8.2</a> の decision〔2026-08-29、R-1〕、実施記録は<a href="pref-ranking-1-log.html">セット記録セクション 3</a>、経緯は<a href="../ideas/ranking-opening-hook.md">アイデア記録</a>が正</td>
+  <td><strong>2026-08-29</strong><br><span class="muted">新版の初出は同日 20:00 JST の投稿</span></td>
 </tr>
 </tbody>
 </table></div>

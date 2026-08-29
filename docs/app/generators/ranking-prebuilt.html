@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（17-2 で作成）</span>
   <span>方式名（レジストリキー）: ranking-prebuilt</span>
-  <span>最終更新: 2026-08-24</span>
+  <span>最終更新: 2026-08-29（R-1 冒頭フック改善を追記）</span>
 </div>
 
 <div class="note">
@@ -217,6 +217,19 @@
     <li><strong>吹き出しに <code>line-break: strict</code> を指定</strong>する。既定の <code>auto</code> は小書き仮名の前で改行し、「パン食は西日本の文化、し / っかり数字に出たな！」が出た（003-bread-spend）。禁則処理をかけると改行位置は前へ動くだけなので、行が伸びて 3 行になる方向の副作用はない</li>
   </ul>
   <strong>禁則処理では解消しない行またぎは文言側で直す</strong>（「マイホームの地図は、日 / 本海側にずらりだ！」のような語中改行。<code>content_fields.trivia</code> の書き直し → 再ビルド）。執筆時の観点として <code>WRITING-NOTES.md</code> にも記載がある。
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-08-29、R-1）: 冒頭 5 秒の予熱スピンと煽り吹き出しのモーション（ミュート離脱対策）</span>
+  視聴維持カーブ 2 本の目視（2026-08-28）で<strong>離脱の崖は 0〜2 秒</strong>、0:05 を越えた視聴者はほぼ完走すると分かった。一方 30 秒版の 0.00〜5.00 秒（<code>intro</code> 89f + <code>teaser</code> 61f）は、地図の拡大率が 1.04 固定・背景の ken-burns も 900f で 1.0→1.07 と知覚できず、<strong>実質静止画</strong>だった。既存区間に動きを足す形で解消した（<strong>タイムライン定数 <code>DURATION_SPECS</code> は変更していない</strong> — 総尺・シーン配分・ナレーション予算検査に影響を出さないため）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>予熱スピン</strong>: 本番スピン開始前（<code>frame &lt; rounds[5].start</code>）も<strong>フレーム 0 から県を点滅させる</strong>。速さは本番スピンの最高速と同じ（<code>spinTicks</code> の初期間隔 = 2 フレーム固定・減速なし）</li>
+    <li><strong>速さと眩しさの分離</strong>: 5.00 秒の変化点は速さではなく<strong>発光強度</strong>で作る。<code>JapanMap</code> に <code>litIntensity</code>（既定 1 = 本番スピンの現行値）を持たせ、塗りの不透明度と <code>drop-shadow</code> の滲みだけを比例させる（縁取りは残して「どの県が光ったか」の可読性を確保）。<strong>予熱 0.42 → 本番スピン 1.0 → 停止フラッシュ最大</strong>の 2 段階で変化点が残る</li>
+    <li><strong>煽り吹き出しのモーション</strong>: 尻尾の付け根（<code>transformOrigin: 78px 100%</code>）を基点に、拡大 0.62 → 1.0 のポップイン（spring・約 0.4 秒）+ 減衰する 2 度の揺れ（0.43〜1.1 秒）。<strong>モーションは 0〜1 秒に集中させ</strong>、崖より後には置かない。ミュートでも「予想しろ」という参加要求が届くようにする狙い（17-3 で <code>teaser</code> を全ネタ必須にした意図をミュート視聴者へ通す）</li>
+    <li><strong>17-4a の「登場アニメを持たず 0 秒から出す」規定は維持</strong>する。吹き出しは不透明度をいじらず拡大 0.62 から始めるため、フレーム 0 でも読める状態で出ている。<strong>変形はレイアウト後に効く</strong>ので、改行位置・フォントサイズ段階（48/44/40）・尻尾の相対位置は不変。teaser 区間外（順位コメント・締め）は恒等変換で従来どおり</li>
+    <li><strong>予熱区間は <code>spinningRank</code> を <code>null</code> のままにする</strong>（吹き出しの点滅表示は本番スピン中だけ。煽り文は 0 秒から点滅させずに読ませ続ける）</li>
+    <li><strong>コンポジション版の混在を避けるため、使用済みを含む在庫全 30 件を同一版で再ビルドして差し替えた</strong>（2026-08-29。セクション 4 の LRU 順繰りは在庫枯渇時に使用済み行を再投稿するため、旧版が再び表に出る）</li>
+  </ul>
+  パラメータの正は <code>src/PrefRankingVideo.tsx</code>（<code>PREHEAT_TICK</code> / <code>PREHEAT_LIT_INTENSITY</code> / <code>TEASER_POP_FROM</code> / <code>TEASER_NUDGE_AT</code> / <code>TEASER_NUDGE_DUR</code>）。経緯・棄却案は <a href="../../ideas/ranking-opening-hook.md">アイデア記録 ranking-opening-hook.md</a>、実施記録は <a href="../../plans/pref-ranking-1-log.html">セット記録セクション 3</a>。
 </div>
 <div class="decision">
   <span class="callout-title">決定（2026-08-11、17-4b）: 地図の PD 差し替え・素材の正式化</span>
