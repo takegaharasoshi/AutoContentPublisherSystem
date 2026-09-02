@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-08-28（Phase 18 で新設）</span>
+  <span>最終更新: 2026-09-02（改修 R-1 の R-1-1 を記録）</span>
 </div>
 
 <div class="note">
@@ -57,7 +57,14 @@
 </table></div>
 
 <h2>3. セット内改修の記録</h2>
-<p>まだなし（過去のフォーマット改修 16-4b〜16-4d は開発レーンのフェーズ作業として<a href="development-log.html">開発記録</a> Phase 16 に記録済み）。</p>
+<p>セット内で閉じる改修の実施記録（過去のフォーマット改修 16-4b〜16-4d は開発レーンのフェーズ作業として<a href="development-log.html">開発記録</a> Phase 16 に記録済み）。計画は<a href="logic-training-1.html">セット計画書</a>セクション 3。</p>
+<ul>
+<li><strong>改修 R-1: 動画レンダラーの Remotion 載せ替え（2026-09-02 起票・進行中）</strong><ul>
+<li><strong>R-1-1 ループ仮説の確認（2026-09-02 完了）</strong>: Instagram アプリのリールインサイトをユーザーが目視。<strong>平均再生時間が 16 秒（動画尺）を超えている動画が多数</strong>あり、<strong>ループ視聴が常態であることが実証された</strong>。個別本数の秒数値は控えていないため、以後の定量比較（前後比較・水準評価）には使わず、設計判断の根拠としてのみ扱う。再生回数・replays 系の指標は Graph API から廃止済みで insights-batch では取得できず、アプリ目視が唯一の手段であることも変わらない</li>
+<li><strong>R-1-1 が R-1-2 以降に与えた影響</strong>: ①ループ先頭 0〜7 秒の完全静止の解消が最優先という<a href="../ideas/logic-training-remotion-rebuild.md">アイデア記録</a> 4 巡目の読みが裏付けられた（2 巡目の「動画内ペイオフの欠如が本質」読みは後退。ループするなら動画内で答えを開示する必要はない）②周期アニメーションの周期を<strong>すべて 480 フレーム（16 秒 × 30fps）の約数</strong>とし、16 秒末尾の状態が 0 秒の状態に一致することを R-1-2 の<strong>必須要件</strong>に格上げ（従来は「重み付けに使う」程度の位置づけだった）③R-1-3 のプレビュー確認で観点②（末尾 → 先頭の継ぎ目）を必須の go / no-go 条件とした</li>
+</ul>
+</li>
+</ul>
 
 </div>
 </body>
