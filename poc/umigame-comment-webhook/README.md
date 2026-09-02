@@ -27,7 +27,12 @@ Instagram コメント → Meta Webhook → Lambda Function URL（署名検証�
 cd infra && cdk deploy -c env=prod UmigamePocStack
 ```
 
-出力の `FunctionUrl`（Meta に設定する Webhook URL）を控える。シークレット `umigame-poc/credentials` が空値テンプレートで作成される（`verify_token` のみランダム自動生成済み）。
+出力の `FunctionUrl`（Meta に設定する Webhook URL）を控える。後から見るには:
+
+```bash
+aws cloudformation describe-stacks --stack-name Prod-UmigamePocStack --region ap-northeast-1 --query "Stacks[0].Outputs" --output table
+```
+シークレット `umigame-poc/credentials` が空値テンプレートで作成される（`verify_token` のみランダム自動生成済み）。
 
 ### 2. テスト用 Instagram アカウント（ステージング面）
 
@@ -60,7 +65,8 @@ Secrets Manager `umigame-poc/credentials` の JSON を AWS コンソールで編
 
 ### 5. Meta 側の Webhook 設定
 
-1. アプリの Instagram プロダクト内 Webhooks 設定で、Callback URL に手順 1 の Function URL、Verify token にシークレットの `verify_token` を入力して検証（Lambda の GET 検証が通れば成功）
+1. 「設定」タブの「3. Webhooks を設定する」で、コールバック URL に手順 1 の Function URL、「トークンを認証」にシークレットの `verify_token` を入力して「確認して保存」（Lambda の GET 検証が通れば成功。事前に `curl "<FunctionUrl>?hub.mode=subscribe&hub.verify_token=<verify_token>&hub.challenge=123"` で 123 が返ることを確認できる）
+   - ⚠️ 画面に「Webhooks を受信するには、アプリの状態が公開済みである必要があります」と表示される。開発モードのままで届かなければ、「アプリ設定 → ベーシック」にプライバシーポリシー URL（テスト用なので到達可能な URL なら何でもよい）を入れて**アプリを公開（ライブ）モードに切り替えて**再試行する。標準アクセスのままなので App Review は不要の想定（実測で確認）
 2. `comments` フィールドを購読（subscribe）する
 3. 「アクセストークンを生成する」セクションの表にある **Webhook サブスクリプションのトグルをオン**にする（アカウント単位の購読スイッチ。オフのままだとコメントイベントが届かない）
 
