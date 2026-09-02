@@ -13,7 +13,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-02（19-4 を起票: 計画のステップ単位・記載様式の改訂。19-1〜19-3 は初回試行待ち）</span>
+  <span>最終更新: 2026-09-02（19-4 完了: ステップ単位を「人間ゲート間の 1 ゴール」へ改訂・16-12 を 16-12a / b に分割。19-2 は 19-4 の実行で初回試行を完了。19-1・19-3 は初回試行待ち）</span>
 </div>
 
 <div class="note">
@@ -26,7 +26,7 @@
 <li><strong>設計（インフラ → アプリ）を先に固め、構築はインフラ → アプリ実装の順に進める</strong>
   <ul><li>Phase D: インフラ設計の一時 Fix → Phase A: アプリ設計の大枠 → Phase 9: アプリ設計（詳細・前倒し）→ Phase 0〜8: インフラ構築 → Phase 10〜13: アプリ実装・定常運用開始 → Phase 14〜17: 収益化に向けた機能拡充（上位方針は <a href="../strategy/business-strategy.html">事業戦略書</a>）。前倒しの経緯は<a href="development-log.html">開発記録</a>の Phase A・9 を参照</li></ul></li>
 <li>各ステップで実際に AWS 上で稼働確認を行い、動作を確認してから次に進む</li>
-<li>1 ステップ = 1 プロンプトを基本とし、「作る → 確認 → 次へ」のリズムで進める。各ステップの完了後、ユーザーが確認方法に従って動作確認を行い、チェックを入れる</li>
+<li><strong>1 ステップ = 人間ゲート間の 1 ゴール</strong>（Phase 19-4〔2026-09-02〕で改訂。旧「1 ステップ = 1 プロンプト + ユーザー確認」）: ステップ境界は<strong>人間ゲート</strong>（稼働確認・レビュー・go / no-go・設計判断）だけで決め、「Claude が 1 ターンでこなせる量」では区切らない（<code>/goal</code> が完了条件まで自走するため）。切り方の目安は 3 つ — (a) ゲートのない連続作業（実装 → テスト → 設計書 → コミット）は 1 ステップにまとめる / (b) 確認・判断で終わる地点は境界に残し、ユーザー作業のステップはゴールにしない（「ユーザー判断・ゴール対象外」と明記する）/ (c) 20〜30 ターンを超えそうなもの・2 レーンをまたぐものは機械検証できる中間点で割る。ステップの記載様式（内容 / 完了条件 / 人間ゲート / 停止点・上限）の正は<a href="index.html#step-format">計画体系セクション 5</a>。各ゴールの終了後、ユーザーが人間ゲートの確認を行い、チェックを入れる</li>
 <li><strong>記録の運用</strong>: ステップ完了時、本書にはチェック + 完了日 + 要点（1〜2 行）のみを記録し、詳細な実施記録（検証内容・決定事項の全文）は <a href="development-log.html">開発記録</a>に追記する（計画書の肥大化防止。セット計画書 / セット記録も同じ作法）</li>
 <li><strong>ステップ実行は <code>/goal</code> をラッパーにする</strong>（Phase 19 で導入）: 計画書のステップ着手は <code>/step</code> スキルから行い（起動がレーン宣言と完了条件の宣言を兼ねる。開発レーン・セットレーン共通）、<code>services/</code> <code>shared/</code> への push 後は <code>/goal</code> で CodePipeline 完走を確認する。手順の正は CLAUDE.md、検討経緯は<a href="../ideas/claude-code-loop-goal-skills.html">アイデア詳細</a></li>
 <li>CDK コマンド例では app 内の論理スタック ID（<code>FoundationStack</code> など）を指定する。<code>-c env=prod</code> により、CloudFormation 上の実スタック名は <code>Prod-FoundationStack</code> のように環境名付きで作成される</li>
@@ -89,7 +89,8 @@
 <thead><tr><th>残ステップ</th><th>Claude 側（モデル / エフォート）</th><th>Codex 委譲（モデル / エフォート）</th></tr></thead>
 <tbody>
 <tr><td>16-5 効果検証</td><td>Opus 5 / high（指標の解釈で詰まったら Fable 5 へ切替）</td><td>なし（インサイト画面の目視のため委譲不向き）</td></tr>
-<tr><td>16-12 指標セット確定の反映（16-5 完了後）</td><td>Opus 5 / high（指標選定の判断で詰まったら Fable 5）</td><td>terra / high（昇格 DDL・ビュー生成のみ）</td></tr>
+<tr><td>16-12a 指標セットの確定（16-5 完了後・ユーザー判断）</td><td><strong>Fable 5</strong> / デフォルト（候補整理の壁打ち）</td><td>なし</td></tr>
+<tr><td>16-12b 指標セット確定の反映（16-12a 完了後）</td><td>Opus 5 / high</td><td>terra / high（昇格 DDL・ビュー生成のみ）</td></tr>
 <tr><td>Phase XX（プラットフォーム展開）調査・着手判断</td><td><strong>Fable 5</strong> / デフォルト</td><td>—</td></tr>
 <tr><td>19-1 CodePipeline 完走待ちの <code>/goal</code> 化</td><td>Opus 5 / high（CLAUDE.md 1 行 + 初回試行）</td><td>なし</td></tr>
 <tr><td>19-2 <code>/step</code> スキル新設</td><td><strong>Fable 5</strong> / high（スキル本文の設計と実機確認）</td><td>なし（スキル本文は判断を伴うため）</td></tr>
@@ -117,7 +118,7 @@
 <li>✅ <strong>16-4c</strong> 動画構成の見直し — 2026-08-23。4 カット → 3 カット・つかみ帯・ズーム廃止。全 63 本を再ビルド・再配置</li>
 <li>✅ <strong>16-4d</strong> 昼スロット（フェルミ推定）の当分停止 — 2026-08-24。noon Scheduler を CDK ごと DISABLED 化・資材は凍結残置・補充対象は朝・夜のみへ（廃止ではなく当分停止。再開判断は将来）</li>
 <li>✅ <strong>16-4e</strong> イラストプロンプトの文字禁止の緩和（提示物問題への対応） — 2026-09-02。<code>_build_illustration_prompt</code> の定型文を「情景で明示的に指定された文字・数字は指定どおりの字形で正確に描く / 指定されていない文字・数字・記号は描かない」へ変更（<a href="../app/generators/gpt-quiz-multicut.html#illustration">gpt-quiz-multicut セクション 6</a> の decision）。プロンプトの手作業書き換えが不要になった。<strong>16-1 の実行時生成を休止解除する際は混入率を再評価</strong></li>
-<li>⬜ <strong>16-5</strong> 効果検証（切替後データの水準評価）
+<li>⬜ <strong>16-5</strong> 効果検証（切替後データの水準評価）— <strong>ユーザー判断・ゴール対象外</strong>（インサイト画面の目視と水準の解釈が本体のため <code>/step</code> でゴール化しない。Claude は集計クエリと壁打ちの補助のみ）
   <ul>
   <li>内容: <strong>2026-08-10 のユーザー決定で「切替前との前後比較はしない」方針に変更</strong>（切替前の投稿がアーカイブ済みで Graph API から読めず、自動収集データでの比較が成立しないため。経緯は<a href="development-log.html">開発記録</a>の 16-11 (5) を参照）。<strong>2026-08-08 以降に投稿されたリールとそれ以降の投稿を母集団</strong>として、スキップ率・視聴維持・保存・フォロワーの水準と推移を評価し、事業戦略書の KPI 実績へ記録する。前後比較の代わりに「現行フォーマットの絶対水準が目標に届いているか」「投稿を重ねて改善傾向にあるか」を判断材料にする。視聴維持カーブと View Rate は API 非対応のためアプリ画面での目視（16-6 の分担）。ここで「継続的に見たい指標」を確定し、16-12 の入力とする</li>
   <li>留意（2026-08-28 追記）: 16-4c（3 カット化・2026-08-23）と 16-4d（昼停止・2026-08-24）でフォーマットが直近に変わっているため、現行フォーマットの水準評価は 9 月上旬以降にデータが 1.5〜2 週間たまってからが筋が良い（Phase 18 の壁打ちでの整理）</li>
@@ -133,9 +134,19 @@
 <li>✅ <strong>16-9</strong> insights-batch アプリ実装 — 2026-08-10。<code>services/insights-batch/</code> + shared 昇格 2 モジュールを新設（v25.0 ピン留め・メトリクス束ね + 自動縮退）</li>
 <li>✅ <strong>16-10</strong> インフラ実装・デプロイ — 2026-08-10。InsightsBatchStack 新設・本番デプロイ済み（TaskDef・SFN・Scheduler 4 件・CI/CD）</li>
 <li>✅ <strong>16-11</strong> 再認可・稼働確認・バックフィル — 2026-08-10。<code>instagram_manage_insights</code> 再認可・リール 25 投稿 + 日次 90 日 × 2 アカウントを収集し定常運用入り</li>
-<li>⬜ <strong>16-12</strong> 指標セット確定の反映（<strong>16-5 完了後</strong>）
+<li>⬜ <strong>16-12a</strong> 指標セットの確定（<strong>16-5 完了後・ユーザー判断・ゴール対象外</strong>。19-4 で旧 16-12 を確定 / 反映に分割）
   <ul>
-  <li>内容: 16-5 の評価結果から「継続的に見る指標セット」を確定し、生成カラム / ビューへの昇格（DDL）と KPI 転記運用（<a href="../app/operation.html">operation.html</a> セクション 6 への追記・事業戦略書 KPI 実績表との接続）を確定する（2 段階 Fix の後段）。<strong>確定した指標で各セット計画書の KPI 欄を埋める（Phase 18 で枠のみ先行設置済み）</strong>。以後の日常の KPI 観察はセットレーンへ移る</li>
+  <li>内容: 16-5 の評価結果から「継続的に見る指標セット」（生成カラム / ビューへ昇格する指標・事業戦略書 KPI 実績表へ転記する指標・各セット計画書の KPI 欄に置く指標）をユーザーが確定する（2 段階 Fix の後段の判断部分）。Claude は <code>post_insights</code> / <code>account_insights_daily</code> の JSON キーから候補を整理し壁打ちに付き合うのみ</li>
+  <li>完了条件: 確定した指標セット（名称・算出式・参照元 JSON キー・転記先）を<a href="development-log.html">開発記録</a>に記録</li>
+  <li>人間ゲート: 本ステップ全体（設計判断）</li>
+  <li>停止点・上限: —（ゴールにしない）</li>
+  </ul></li>
+<li>⬜ <strong>16-12b</strong> 指標セット確定の反映（<strong>16-12a 完了後</strong>・1 ゴール）
+  <ul>
+  <li>内容: 16-12a で確定した指標の生成カラム / ビューへの昇格 DDL（<code>database/V011</code>）と <a href="../app/data-model.html">data-model.html</a> セクション 4.11 の更新、KPI 転記運用の追記（<a href="../app/operation.html">operation.html</a> セクション 6・事業戦略書 KPI 実績表との接続）、<strong>各セット計画書の KPI 欄を埋める（Phase 18 で枠のみ先行設置済み）</strong>。以後の日常の KPI 観察はセットレーンへ移る</li>
+  <li>完了条件: DDL がローカル MySQL（<code>acps-mysql</code>・<code>--default-character-set=utf8mb4</code>）で適用でき、適用結果とカラム / ビュー定義の出力を会話に貼る。設計書 3 本（data-model・operation・事業戦略書）とセット計画書 3 本の更新、変更 HTML のタグ対応・ローカルリンクの機械チェック通過、日本語メッセージでコミット</li>
+  <li>人間ゲート: ゴール終了後に差分確認 → push → 本番 DDL 適用（ユーザー）→ 翌日の収集後にビュー値の目視</li>
+  <li>停止点・上限: コミットまで（<code>database/</code> を触るため push は差分確認後）。stop after 20 turns</li>
   </ul></li>
 </ul>
 
@@ -165,27 +176,14 @@
   <li>完了条件: CLAUDE.md 追記 + 次に <code>services/</code> <code>shared/</code> を push する機会での初回試行（結果を開発記録へ）</li>
   <li>進捗: <strong>CLAUDE.md 追記は 2026-09-02 完了</strong>（Git 運用ルールの該当行に子項目 + 定型行のコードブロックを追加）。<strong>残りは初回試行のみ</strong> — 詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
   </ul></li>
-<li>⬜ <strong>19-2</strong> <code>/step</code> スキルの新設（両レーン対応）
-  <ul>
-  <li>内容: <code>.claude/skills/step/</code> を新設（<code>disable-model-invocation: true</code>）。識別子が <code>16-12</code> なら本計画書、<code>logic-training-1 R-1-2</code> のように set_code 付きならセット計画書を読み、触るパスをレーン判定表（<a href="index.html">計画体系</a>セクション 2）に当て、レーン別テンプレ A / A′（アイデア詳細 7.1）を埋めた <code>/goal</code> 行を展開文で起動する（展開文の <code>/goal</code> が効かない場合は行を提示し、ユーザーが <code>/goal</code> で設定を確認するまで着手しない）。「ユーザー判断」のステップは対象外として断る。コードを触るゴールはコミットまで（push は差分確認後）、docs / <code>content/</code> のみは push まで。S3・DB の配置はレビュー後の別ゴール。あわせて CLAUDE.md の「開発計画」「並行作業ルール」に「計画書のステップ着手は <code>/step</code> から（起動がレーン宣言を兼ねる）」、<a href="index.html">計画体系</a>セクション 3 に 1 行を追記する</li>
-  <li>完了条件: スキル新設 + CLAUDE.md / 計画体系の追記 + 初回試行（logic-training-1 R-1-2 か開発レーンの次ステップの早い方）で展開文起動の可否を実機確認し、結果を開発記録へ</li>
-  <li>進捗: <strong>スキル新設 + CLAUDE.md / 計画体系の追記は 2026-09-02 完了</strong>。<strong>残りは初回試行のみ</strong> — 詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
-  </ul></li>
+<li>✅ <strong>19-2</strong> <code>/step</code> スキルの新設（両レーン対応） — 2026-09-02。<code>.claude/skills/step/SKILL.md</code> 新設 + CLAUDE.md / 計画体系の追記。初回試行は <code>/step 19-4</code>（提示 → ユーザー起動 → 到達まで問題なし。展開文起動は構造上採らず提示方式を正規とする）。詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
 <li>⬜ <strong>19-3</strong> quiz 週次補充スキルへの <code>/goal</code> 組み込み
   <ul>
   <li>内容: <code>.claude/skills/quiz-stock-replenish/SKILL.md</code> に「起動時の <code>/goal</code>」節を追加し、G1（在庫確認 → リサーチ → 執筆 → 機械検証全問パス。投入禁止）/ G2（承認分の投入 → イラスト生成 → intake → build → review.html 生成。配置禁止）/ G3（publish → Aurora 適用の更新行数一致 → unbuilt=0 → コミット・push・記録更新）の 3 本を人間レビューの前後で切って置く（テンプレはアイデア詳細 7.1）。「goal が立つまで工程 1 に入らない」規律を本文に書く。触るパスはセットレーン（補充スキル）のみだが、Phase 19 で一括管理する（<a href="logic-training-1.html">logic-training-1 計画書</a>のバックログに導線あり）</li>
   <li>完了条件: SKILL.md 追記 + 次の週次補充での初回試行（結果は logic-training-1 記録へ、要点を開発記録へ）</li>
   <li>進捗: <strong>SKILL.md 追記は 2026-09-02 完了</strong>（「起動時の /goal」節 + G1/G2/G3 テンプレ + goal が立つまで工程 1 に入らない規律）。<strong>残りは次の週次補充での初回試行のみ</strong> — 詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
   </ul></li>
-<li>⬜ <strong>19-4</strong> 計画のステップ単位・記載様式の改訂（<code>/goal</code> 前提）
-  <ul>
-  <li>背景: これまでの「1 ステップ = 1 プロンプト + ユーザー確認」は、Claude が 1 ターンでこなせる量と、ユーザーが確認したい地点の 2 つで区切っていた。<code>/goal</code> は前者の制約を外す（完了条件まで何ターンでも自走する）ため、以後のステップ境界は<strong>人間ゲート（稼働確認・レビュー・go / no-go・設計判断）だけ</strong>で決める。2026-09-02 のユーザーの問いで判明した Phase 19 の抜け</li>
-  <li>内容: ① 本書「進め方の方針」の「1 ステップ = 1 プロンプト」の行を「1 ステップ = 人間ゲート間の 1 ゴール」に改め、切り方の目安 3 つ（ゲートのない連続作業〔実装 → テスト → 設計書 → コミット〕はまとめる / 確認・判断で終わる地点は境界に残す・ユーザー作業のステップはゴールにしない / 20〜30 ターン超や 2 レーンまたぎは機械検証できる中間点で割る）を書く ② <a href="index.html">計画体系</a>に「ステップの記載様式」節を追加し、<strong>内容 / 完了条件（機械検証できる形・証跡をコマンド出力で示せるもの）/ 人間ゲート（ゴール終了後にユーザーが行う確認）/ 停止点・上限（コミットまで or push まで・stop after N turns）</strong>の 4 項目を開発計画・セット計画書共通の様式と定める（本書からはリンクのみ） ③ <code>.claude/skills/step/SKILL.md</code> 手順 1 に旧形式フォールバック（完了条件のないステップは「内容」から案を作りユーザー確認後にゴール行へ埋める。分割が必要ならその場で提案する）を追記 ④ 16-12 を「指標セットの確定（ユーザー判断・ゴール対象外）」と「反映（DDL・ビュー・運用手順・計画書。1 ゴール）」に分割し 4 項目で書き直す（16-5 は目視ステップのためゴール対象外と明記するのみ。R-1 の分割〔R-1-5 をビルドまで / レビュー後の差し替え + R-1-6 吸収〕はセット計画書のため、次に <code>/step logic-training-1 R-1-5</code> を起動したときにフォールバックで扱いそのセッションで書き換える） ⑤ 開発記録に単位が変わる理由を残す</li>
-  <li>完了条件: ①〜⑤の変更が入り、変更した HTML のタグ対応・ローカルリンクの機械チェックが通り、日本語メッセージでコミットし pull --rebase → push まで完了（docs と <code>/step</code> の本文のみ・CodePipeline は起動しない）</li>
-  <li>人間ゲート: なし（push 後にユーザーが本書・計画体系の文面を一読する程度）</li>
-  <li>停止点・上限: push まで。stop after 20 turns</li>
-  <li>起動: <code>/step 19-4</code>。<strong>本ステップの実行を 19-2（<code>/step</code> スキル）の初回試行に充てる</strong>（新様式で書かれたステップを <code>/step</code> が読んでゴール行を組み立てられるかの実機確認。結果は開発記録の 19-2 の項へ）</li>
-  </ul></li>
+<li>✅ <strong>19-4</strong> 計画のステップ単位・記載様式の改訂（<code>/goal</code> 前提） — 2026-09-02。本書「進め方の方針」を「1 ステップ = 人間ゲート間の 1 ゴール」へ改訂（切り方の目安 3 つ）・<a href="index.html#step-format">計画体系セクション 5</a> に 4 項目の記載様式を新設・<code>/step</code> に旧形式フォールバックを追記・16-12 を 16-12a（確定・ユーザー判断）/ 16-12b（反映・1 ゴール）に分割。R-1 の分割は次回 <code>/step logic-training-1 R-1-5</code> のフォールバックで扱う。単位変更の理由は<a href="development-log.html">開発記録</a>の Phase 19</li>
 </ul>
 
 <hr>

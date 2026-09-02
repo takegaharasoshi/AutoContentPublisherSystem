@@ -14,6 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 18 で導入（2026-08-28）</span>
   <span>並行作業ルールの正</span>
+  <span>最終更新: 2026-09-02（19-4: セクション 5「ステップの記載様式」を追加）</span>
 </div>
 
 <div class="note">
@@ -69,6 +70,22 @@
 <li><strong>log(必要なときだけ読む)</strong>: 実施の詳細全文。週次補充は「1 回 = 表 1 行(日付・投入件数・在庫水位・特記)」の定型とし、特記事項があるときだけ本文を書く</li>
 <li><strong>トラブルの二分</strong>: セット固有の<strong>事象の記録</strong>はセット log へ、<strong>恒久対策の課題</strong>（コード・共通設計書に触れるもの）は開発レーンの設計課題リストへ（相互リンクを張る）</li>
 <li>同じ情報を複数ドキュメントに書かない原則は従来どおり。詳細は 1 箇所に書き、他からは参照リンクを張る</li>
+</ul>
+
+<h2 id="step-format">5. ステップの記載様式（<code>/goal</code> 前提・両レーン共通）</h2>
+<p>Phase 19-4（2026-09-02）で導入。計画書のステップは<strong>人間ゲート間の 1 ゴール</strong>を単位とし（切り方の目安は<a href="development-plan.html">開発計画</a>「進め方の方針」）、<code>/step</code> が読んでそのままゴール行に埋められるよう、開発計画・セット計画書とも次の 4 項目で書く。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>項目</th><th>書くこと</th><th>書き方の目安</th></tr></thead>
+<tbody>
+<tr><td><strong>内容</strong></td><td>成果物と触るパス（レーン判定に使う）</td><td>「何を作るか」を成果物で書く。前提ステップがあれば見出しに「（X 完了後）」</td></tr>
+<tr><td><strong>完了条件</strong></td><td><strong>機械検証できる形</strong>で、証跡をコマンド出力で示せるもの</td><td>pytest の要約行 / validate・build --dry-run の出力 / 件数クエリの結果 / cdk synth の成否 / HTML のタグ対応・リンクの機械チェック 等。「適切に」「きれいに」のような判定不能な条件を書かない（<code>/goal</code> の evaluator は会話ログしか見ない）</td></tr>
+<tr><td><strong>人間ゲート</strong></td><td>ゴール終了後にユーザーが行う確認</td><td>稼働確認 / レビュー / go・no-go / 本番 DDL 適用 等。なければ「なし」と書く。<strong>ゲートがステップの途中に入るなら、そこでステップを割る</strong></td></tr>
+<tr><td><strong>停止点・上限</strong></td><td>ゴールがどこで止まるかと <code>stop after N turns</code></td><td><code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> を触るなら「コミットまで」（push は差分確認後）、docs / <code>content/</code> のみなら「push まで」。N の既定は 20</td></tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>ユーザー判断のステップ</strong>（目視評価・設計判断・go / no-go）は見出しに「ユーザー判断・ゴール対象外」と明記し、停止点は「—（ゴールにしない）」とする。<code>/step</code> はこれを見て断る</li>
+<li><strong>旧形式のステップ</strong>（完了条件のないもの）は全面書き直しをせず、<code>/step</code> 起動時のフォールバック（<code>.claude/skills/step/SKILL.md</code> 手順 1）で「内容」から 4 項目を起こし、ユーザー確認のうえ計画書を書き換えてから着手する</li>
 </ul>
 
 </div>
