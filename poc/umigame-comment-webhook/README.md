@@ -36,12 +36,13 @@ cd infra && cdk deploy -c env=prod UmigamePocStack
 
 ### 3. テスト用 Meta アプリ
 
-1. [developers.facebook.com](https://developers.facebook.com) でアプリを新規作成。ユースケースは Instagram（**Instagram API with Instagram Login**。Facebook ページ不要の方式）を選ぶ
+1. [developers.facebook.com](https://developers.facebook.com) でアプリを新規作成。ユースケースは「**Instagram でメッセージとコンテンツを管理**」（Instagram API with Instagram Login。Facebook ページ不要の方式）を選ぶ。ビジネスポートフォリオは「**リンクしない**」（開発モードでは不要。既存セットの資産から切り離すため）
 2. **開発モードのまま**使う（App Review なしで動くかの実測が PoC の目的の一部）
-3. Instagram プロダクトの「API setup with Instagram login」でテスト用アカウントを接続し、アクセストークンを生成する。必要スコープ: `instagram_business_basic` + `instagram_business_manage_comments`（長期トークン・60 日有効）
-4. あわせて以下を控える:
-   - **Instagram app secret**（Instagram プロダクト設定内。Webhook 署名検証の鍵）
-   - **Instagram user ID**（トークン生成時に表示される。ループ防止用）
+3. **先にテスト用アカウントをアプリの「Instagram テスター」に追加する**（実測 2026-09-03: これをせずに接続すると `開発者の役割が不十分です` で拒否される）。ダッシュボード「アプリの役割」→「役割」→「人を追加」→ Instagram テスター → ユーザーネーム入力。次に **Instagram 側で承認**: テスト用アカウントで 設定 →「ウェブサイトのアクセス許可」→「テスター招待」タブ → 承認（Web: instagram.com/accounts/manage_access/）
+4. 「ユースケース」→「Instagram でメッセージとコンテンツを管理」の「カスタマイズ」→「設定」タブ（= API setup with Instagram login）で、「1. Instagram アカウントでアクセストークンを生成」→「アカウントを追加」→ テスト用アカウントでログイン・許可 → 「トークンを生成」で長期トークン（60 日有効）を取得。必要スコープ `instagram_business_basic` + `instagram_business_manage_comments` はユースケース選択時に付与済み
+5. あわせて以下を控える:
+   - **Instagram app secret**（上記「設定」タブ上部の「Instagram アプリシークレット」。Facebook 側「アプリ設定 → ベーシック」の app secret とは別物。Webhook 署名検証の鍵）
+   - **Instagram user ID**（トークン生成時に表示される。ループ防止用。出なければ `GET https://graph.instagram.com/v23.0/me?fields=id,username&access_token=<トークン>` で取得）
 
 ### 4. シークレットへの値投入
 
