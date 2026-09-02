@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-02（改修 R-1 の R-1-1 を記録）</span>
+  <span>最終更新: 2026-09-02（改修 R-1 の R-1-4 を記録）</span>
 </div>
 
 <div class="note">
@@ -77,6 +77,18 @@
 <li><strong>冒頭 0.0 秒にコーチのバウンドを追加した</strong>（指摘: 「一番最初にキャラクターをバウンドさせて」）。<code>HOP_FRAMES</code> を <code>[INTRO_END, COUNTDOWN_END]</code> → <code>[0, INTRO_END, COUNTDOWN_END]</code> に変更しただけで、諸元（振幅 150px・1.6Hz・減衰 3.0/s・1 秒で収束）は既存の 8 秒 / 13 秒のホップと同じ。<strong>持ち上げ量はフレーム 0 で 0 から立ち上がる</strong>（<code>sin(0) = 0</code>）ため、フレーム 480 = 0 の連続性は保たれる。SE は不変条件のため足していない（バウンドは無音）</li>
 <li><strong>検証</strong>: <code>tsc --noEmit</code> 通過 / <code>scripts/check_loop_periods.py</code> は 11 件中 違反 0 件 / 抜き取りフレーム目視で frame 0 に問題文全文・frame 8 でコーチと吹き出しが持ち上がり・<strong>frame 479 が frame 0 と一致</strong>することを確認</li>
 <li><strong>5 観点の判定</strong>: ①0〜7 秒が生きている ②末尾 → 先頭の継ぎ目が自然（必須要件クリア） ③可読性を邪魔していない ④上部余白の使い切りで文字が大きくなり Instagram UI と重ならない ⑤8 秒・13 秒のイベントが立っている — いずれも OK。<strong>R-1-4 以降へ進む</strong></li>
+</ul>
+</li>
+<li><strong>R-1-4 ビルドツーリングの切替（2026-09-02 完了）</strong>: プロトタイプの手順を <code>build.py</code> へ畳み込み、ローカルビルドの入口を 1 本に戻した。<code>scripts/prototype.py</code> と <code>scripts/build_props.py</code> は役割を <code>build.py</code> に移して削除。
+<ul>
+<li><strong>実行場所が変わった</strong>: 現行版の <code>build.py</code> は image-batch コンテナの中で動いていた（Pillow で組版するため）。新版は<strong>ホスト（WSL）で動き、Remotion レンダリングと ffmpeg 処理だけを Docker に投げる</strong>（pref-ranking-1 の <code>build.py</code> と同じ方式）。DB アクセス（スロット解決・対象抽出・BGM の LRU）はホスト側の pymysql、S3 アクセスはコンテナ内スクリプトに寄せたため、<strong>ホストに必要な依存は pymysql だけ</strong>になった</li>
+<li><strong><code>gpt_quiz_multicut</code> への import 依存を除去</strong>: <code>build.py</code> が使っていた <code>_render_cards</code> / <code>_build_video</code> / <code>_load_fonts</code> / <code>COACH_FILENAMES</code> は不要になり、<code>common.py</code> の <code>resolve_slots</code> が呼んでいた <code>_parse_parameters</code> は同ファイル内のローカル関数 <code>_parse_slots</code> へ置き換えた（<code>slot_code</code> のパレット名検査など image-batch 固有の検査は持ち込まない）。<code>common.py</code> にあった <code>services/image-batch</code> / <code>shared</code> の sys.path 挿入は <code>export_prompts.py</code> へ移動した — <strong>イラストプロンプト生成は引き続き <code>_build_illustration_prompt</code> を使う</strong>ため（プロンプトはレンダラーとは別の資産で、R-1 の対象外）。<code>services/</code> 側のコードは<strong>休止方式として残置</strong>し削除していない</li>
+<li><strong>CLI</strong>: <code>--item &lt;id&gt;</code>（複数可）・<code>--rebuild</code>（既存 BGM を引き継ぎ LRU を更新しない）・<code>--list</code>・<code>--dry-run</code>（props まで）・<code>--skip-assets</code>。BGM の LRU 消費は<strong>動画が完成した新規ビルドのときだけ</strong>記録する（現行の挙動を維持）。台帳 <code>work/build_manifest.json</code> は <code>publish.py</code> が読む 5 キー（<code>audio_asset_id</code> / <code>bgm_s3_key</code> / <code>content_key</code> / <code>question_text</code> / <code>slot_code</code>）を名前も意味も変えずに残し、<code>hint</code> / <code>renderer</code> / <code>props</code> / <code>video</code> / <code>stills</code> を足した</li>
+<li><strong>レビューシートの追随</strong>: 現行版はレンダラーが吐く 3 カットの PNG を並べていたが、Remotion 版は連続モーションで「カット画像」が存在しない。代わりに<strong>完成 MP4 から 5 フレームを ffmpeg で抜く</strong>（<code>scripts/mix_audio.py --stills-dir</code>）。<strong>先頭 0f と末尾 479f を隣り合わせに置き、ループ継ぎ目の一致を全数レビューで目視できるようにした</strong>（R-1-1 でループが常態と分かったため、継ぎ目は毎回見る対象になった）。<code>review_sheet.py</code> は <code>generate_review_html()</code> を純関数として切り出し、hint と content_key も表示する</li>
+<li><strong>Python 側の不変条件を 1 箇所に集約</strong>: 尺・SE 時刻・音量・スチル位置を <code>remotion/scripts/spec.py</code>（標準ライブラリのみ）へ集め、<code>mix_audio.py</code> と <code>build.py</code> が参照する。ffmpeg フィルタの意味は現行と同値のまま</li>
+<li><strong><code>tests/</code> の新設（pytest 28 件・DB / Docker / ネットワーク不要）</strong>: props 検査と組み立て・BGM の引き継ぎ判定・対象絞り込み・PNG 実寸読み・CLI 既定値（<code>test_build.py</code>）、スロット定義の検査と一意解決（<code>test_common.py</code>）、レビュー HTML のエスケープと並び順（<code>test_review_sheet.py</code>）。加えて <strong><code>test_timeline_sync.py</code> が <code>remotion/src/timeline.ts</code> をテキストで読み、<code>spec.py</code> と突き合わせる</strong> — FPS・尺・<code>LOOP_PERIODS</code> が 480 の約数であること（R-1-2 の <code>check_loop_periods.py</code> の pytest 化）・<code>INTRO_END</code> / <code>COUNTDOWN_END</code> が SE 時刻（8.0 / 13.0 秒）と一致すること・スチル位置が各カット内に収まること。<strong>TypeScript 側を触って不変条件を壊すと Python のテストが落ちる</strong>ようにするのが狙い</li>
+<li><strong>ビットレート方針（R-1-2 の持ち越し）</strong>: <strong>現行の <code>Config.setCrf(20)</code> のまま据え置く</strong>。16 秒で 4.4MB（約 2.3Mbps）は Instagram の投稿上限に対して十分小さく、全編モーションで画質を落とす理由がないため。画質パラメータを現行版と同値に保つことは R-1 の比較条件でもある</li>
+<li><strong>稼働確認</strong>: <code>S3_BUCKET_NAME=... python build.py --rebuild --item 85</code> が完走（Remotion 480 フレーム → ffmpeg ミックス → スチル 5 枚 → 台帳更新）。出力は <strong>16.000 秒 / 1080x1920 / 480 フレーム / h264 + aac</strong>。<code>--rebuild</code> のため BGM は <code>audio_asset_id=13</code> を引き継ぎ、<strong>S3 にも <code>quiz_stock_items</code> にも書き戻していない</strong>。<code>review_sheet.py</code> の再生成も確認済み</li>
 </ul>
 </li>
 </ul>

@@ -12,22 +12,27 @@ python export_prompts.py
 python intake.py
 ```
 
-ffmpeg を含む image-batch イメージ内で、リポジトリをマウントして組版・動画ビルドを実行します。リポジトリルートで次のイメージビルドを済ませておきます。
+ビルドツールはホスト（WSL）で実行し、Remotion レンダリングと ffmpeg 処理だけを
+Docker に委譲します。リポジトリルートで次のイメージビルドを済ませておきます。
 
 ```bash
+docker build -f content/video-build/logic-training-1/remotion/Dockerfile.render \
+  -t remotion-render content/video-build/logic-training-1/remotion
 docker build -f services/image-batch/Dockerfile -t image-batch:ffmpeg-check .
-docker run --rm -v "$PWD:/repo" -v "$HOME/.aws:/aws-config:ro" -w /repo/content/video-build/logic-training-1 \
-  -e PYTHONPATH=/repo/services/image-batch:/repo/shared \
-  -e S3_BUCKET_NAME=<bucket> \
-  -e LOCAL_DB_HOST=host.docker.internal \
-  -e AWS_SHARED_CREDENTIALS_FILE=/aws-config/credentials \
-  -e AWS_CONFIG_FILE=/aws-config/config \
-  -e AWS_DEFAULT_REGION=ap-northeast-1 \
-  --user $(id -u):$(id -g) --entrypoint python image-batch:ffmpeg-check build.py
+
+cd content/video-build/logic-training-1
+S3_BUCKET_NAME=<bucket> python build.py
 python review_sheet.py
 ```
 
-`work/review.html` で動画・イラスト・3 カット代表を全数確認します。承認済み ID を 1 行ずつ `work/approved.txt` に記載してから、まず dry run を行います。
+対象を限定する場合は `--item <id>`（複数指定可）、ビルド済み動画を既存 BGM のまま
+作り直す場合は `--rebuild` を付けます。`--list` は対象一覧だけを表示し、`--dry-run` は
+props 生成まで、`--skip-assets` はコーチ立ち絵の再取得を省略します。
+
+ビルドツールのテストは `python -m pytest` で実行します（DB・Docker・ネットワークは不要）。
+
+`work/review.html` で動画、ループ継ぎ目を含む 5 枚のスチル、イラストを全数確認します。
+承認済み ID を 1 行ずつ `work/approved.txt` に記載してから、まず dry run を行います。
 
 ```bash
 python publish.py --approved-file work/approved.txt --bucket your-bucket --dry-run

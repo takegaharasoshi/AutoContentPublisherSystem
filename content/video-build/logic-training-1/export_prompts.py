@@ -2,6 +2,14 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[3]
+for source_root in (ROOT / "services" / "image-batch", ROOT / "shared"):
+    if str(source_root) not in sys.path:
+        sys.path.insert(0, str(source_root))
+
 from common import WORK, fetch_unbuilt_items, local_connection, resolve_slots
 from app.generators.gpt_quiz_multicut import _build_illustration_prompt
 

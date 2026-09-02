@@ -6,19 +6,16 @@ import datetime
 import json
 import os
 from pathlib import Path
-import sys
 from typing import Any
 
 import pymysql
 
 
+BASE = Path(__file__).resolve().parent
 ROOT = Path(__file__).resolve().parents[3]
-WORK = Path(__file__).resolve().parent / "work"
+WORK = BASE / "work"
+REMOTION_DIR = BASE / "remotion"
 SET_CODE = "logic-training-1"
-
-for source_root in (ROOT / "services" / "image-batch", ROOT / "shared"):
-    if str(source_root) not in sys.path:
-        sys.path.insert(0, str(source_root))
 
 
 def local_connection() -> pymysql.connections.Connection:
@@ -90,10 +87,57 @@ def fetch_unbuilt_items(
     ]
 
 
-def resolve_slots(connection: pymysql.connections.Connection) -> dict[tuple[str, str], dict[str, str]]:
-    """Derive one deterministic palette slot for every type/difficulty pair."""
-    from app.generators.gpt_quiz_multicut import _parse_parameters
+def _parse_slots(raw: str | None) -> list[dict[str, Any]]:
+    """prompt_configs.parameters からスロット定義を検査して返す。"""
+    try:
+        parameters = json.loads(raw or "{}")
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise RuntimeError("parameters は JSON オブジェクトにしてください") from exc
+    if not isinstance(parameters, dict):
+        raise RuntimeError("parameters は JSON オブジェクトにしてください")
 
+    slots = parameters.get("slots")
+    if not isinstance(slots, list) or not slots:
+        raise RuntimeError("parameters.slots は空でない配列にしてください")
+    required = {
+        "from_jst_hour",
+        "quiz_type",
+        "difficulty",
+        "slot_code",
+        "slot_label",
+        "slot_hook",
+    }
+    validated: list[dict[str, Any]] = []
+    for index, slot in enumerate(slots):
+        if not isinstance(slot, dict):
+            raise RuntimeError(f"parameters.slots[{index}] はオブジェクトにしてください")
+        missing = required - set(slot)
+        if missing:
+            raise RuntimeError(
+                f"parameters.slots[{index}] の必須項目がありません: "
+                + ", ".join(sorted(missing))
+            )
+        hour = slot["from_jst_hour"]
+        if isinstance(hour, bool) or not isinstance(hour, int) or not 0 <= hour <= 23:
+            raise RuntimeError(
+                f"parameters.slots[{index}].from_jst_hour は 0〜23 の整数にしてください"
+            )
+        normalized: dict[str, Any] = {"from_jst_hour": hour}
+        for field in required - {"from_jst_hour"}:
+            value = slot[field]
+            if not isinstance(value, str) or not value.strip():
+                raise RuntimeError(
+                    f"parameters.slots[{index}].{field} は空でない文字列にしてください"
+                )
+            normalized[field] = value.strip()
+        validated.append(normalized)
+    return validated
+
+
+def resolve_slots(
+    connection: pymysql.connections.Connection,
+) -> dict[tuple[str, str], dict[str, str]]:
+    """Derive one deterministic palette slot for every type/difficulty pair."""
     with connection.cursor() as cursor:
         cursor.execute(
             "SELECT p.parameters FROM prompt_configs p "
@@ -104,7 +148,7 @@ def resolve_slots(connection: pymysql.connections.Connection) -> dict[tuple[str,
         parameter_rows = cursor.fetchall()
     candidates: dict[tuple[str, str], set[tuple[str, str]]] = {}
     for (parameters,) in parameter_rows:
-        for slot in _parse_parameters(parameters):
+        for slot in _parse_slots(parameters):
             key = (slot["quiz_type"], slot["difficulty"])
             candidates.setdefault(key, set()).add(
                 (slot["slot_code"], slot["slot_label"], slot["slot_hook"])
@@ -113,7 +157,7 @@ def resolve_slots(connection: pymysql.connections.Connection) -> dict[tuple[str,
     for key, values in candidates.items():
         if len(values) != 1:
             raise RuntimeError(
-                "prompt_configs slots do not uniquely resolve "
+                "prompt_configs の slots が一意に決まりません: "
                 f"quiz_type/difficulty={key}"
             )
         slot_code, slot_label, slot_hook = next(iter(values))
