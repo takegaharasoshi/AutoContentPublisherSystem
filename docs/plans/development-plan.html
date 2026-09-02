@@ -13,7 +13,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-02（19-1 の CLAUDE.md 追記を実施・初回試行待ち）</span>
+  <span>最終更新: 2026-09-02（19-1・19-2 の実装を実施・いずれも初回試行待ち）</span>
 </div>
 
 <div class="note">
@@ -168,6 +168,7 @@
   <ul>
   <li>内容: <code>.claude/skills/step/</code> を新設（<code>disable-model-invocation: true</code>）。識別子が <code>16-12</code> なら本計画書、<code>logic-training-1 R-1-2</code> のように set_code 付きならセット計画書を読み、触るパスをレーン判定表（<a href="index.html">計画体系</a>セクション 2）に当て、レーン別テンプレ A / A′（アイデア詳細 7.1）を埋めた <code>/goal</code> 行を展開文で起動する（展開文の <code>/goal</code> が効かない場合は行を提示し、ユーザーが <code>/goal</code> で設定を確認するまで着手しない）。「ユーザー判断」のステップは対象外として断る。コードを触るゴールはコミットまで（push は差分確認後）、docs / <code>content/</code> のみは push まで。S3・DB の配置はレビュー後の別ゴール。あわせて CLAUDE.md の「開発計画」「並行作業ルール」に「計画書のステップ着手は <code>/step</code> から（起動がレーン宣言を兼ねる）」、<a href="index.html">計画体系</a>セクション 3 に 1 行を追記する</li>
   <li>完了条件: スキル新設 + CLAUDE.md / 計画体系の追記 + 初回試行（logic-training-1 R-1-2 か開発レーンの次ステップの早い方）で展開文起動の可否を実機確認し、結果を開発記録へ</li>
+  <li>進捗: <strong>スキル新設 + CLAUDE.md / 計画体系の追記は 2026-09-02 完了</strong>。<strong>残りは初回試行のみ</strong> — 詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
   </ul></li>
 <li>⬜ <strong>19-3</strong> quiz 週次補充スキルへの <code>/goal</code> 組み込み
   <ul>

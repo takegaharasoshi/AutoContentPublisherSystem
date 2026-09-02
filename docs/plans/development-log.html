@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-02（19-1 の CLAUDE.md 追記の記録を追加）</span>
+  <span>最終更新: 2026-09-02（19-1・19-2 の実装記録を追加）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
@@ -1750,6 +1750,18 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li>確認: CLAUDE.md「Git 運用ルール」の <code>services/</code> / <code>shared/</code> の行に子項目を追加。<strong>push 直後に Claude が定型行（<code>&lt;sha&gt;</code> を実コミットハッシュに置換）を提示 → ユーザーが打つ</strong>という責務分担を明記し、定型行そのものをコードブロックで CLAUDE.md 本文に埋め込んだ（アイデア詳細 7.1 の D をそのまま採用。失敗時は「失敗ステージとログ要約を提示して停止・自分で修正や再 push はしない」、上限 <code>or stop after 15 turns</code> を含む）</li>
 <li>備考: <code>/goal</code> は Claude・スキル・フックからは起動できずユーザー入力でのみ起動するため、「Claude は提示までが責務」を CLAUDE.md に明示した。これがないと Claude が自分で起動しようとして失敗するか、提示自体を省く。ゴール到達（または停止）を待ってからステップ完了とする点も同じ行に含めた</li>
 <li>残: <strong>初回試行</strong>（次に <code>services/</code> / <code>shared/</code> を push する機会）。実際に定型行が提示されるか・<code>/goal</code> の evaluator が aws cli 出力から完走を判定できるかを実機確認し、結果を本項に追記して 19-1 を完了とする</li>
+</ul>
+</li>
+</ul>
+<h3>19-2 /step スキルの新設（両レーン対応）</h3>
+<ul>
+<li>
+<p>⬜ <strong>19-2</strong> スキル新設 + CLAUDE.md / 計画体系の追記 — 2026-09-02 実施（<strong>初回試行待ちのため 19-2 は未完了</strong>）</p>
+<ul>
+<li>確認: <code>.claude/skills/step/SKILL.md</code> を新設（<code>disable-model-invocation: true</code>）。内容は (0) <code>/goal</code> はユーザー入力でのみ起動する前提、(1) 引数の一次振り分け（番号のみ = 開発レーン / set_code 付き = セットレーン）、(2) 手順 5 段（計画書を読む → ユーザー判断ステップ・週次補充の対象外判定 → 触るパスのレーン判定〔セット計画書のステップでも開発レーンのパスが入れば開発レーン扱い + 1 セッション制約の確認〕→ レーン宣言 → <code>/goal</code> 行の提示と「goal が立つまで着手しない」規律）、(3) テンプレ A / A′ の全文（アイデア詳細 7.1 をそのまま採用。コードを触るゴールはコミットまで・docs / content のみは push まで・配置はレビュー後の別ゴール）、(4) ガードレール（denylist・証跡貼付・auto mode 禁止・push 後の D 定型行への接続）</li>
+<li>確認: CLAUDE.md「開発計画（2 レーン体制）」に「計画書のステップ着手は <code>/step</code> から」の行、「並行作業ルール」に「<code>/step</code> の起動がレーン宣言を兼ねる」を追記。<code>docs/plans/index.html</code> セクション 3 にも 1 行追記（手順・テンプレの正はスキル側とし、二重書きしない）</li>
+<li>備考: アイデア詳細 7 の「展開文で <code>/goal</code> を起動し、効かなければ提示にフォールバック」について、スキル本文は<strong>提示 → ユーザー起動を正規の流れ</strong>とした。スキル(SKILL.md)は指示文としてロードされるためカスタムコマンドの展開文と挙動が異なる可能性が高く、またテンプレは計画書を読んだ後に動的に埋めるため展開文への事前埋め込みが構造的にできないため。初回試行で展開文起動が効くと分かれば、そのときスキルを改訂する</li>
+<li>残: <strong>初回試行</strong>（logic-training-1 R-1-2 か開発レーンの次ステップの早い方）。引数の振り分け・レーン判定・<code>/goal</code> 行の提示 → 起動 → 到達までを実機確認し、結果を本項に追記して 19-2 を完了とする</li>
 </ul>
 </li>
 </ul>

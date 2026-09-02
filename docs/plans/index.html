@@ -56,6 +56,7 @@
 <h2>3. 並行作業ルール</h2>
 <ul>
 <li><strong>セッション起動時にレーンを宣言する</strong>: 「開発レーン: 16-5」「セットレーン: pref-ranking-1 の週次補充」のように、レーンと触るパスを冒頭で確認してから着手する。補充スキル（<code>/quiz-stock-replenish</code> / <code>/ranking-stock-replenish</code>）の起動はセットレーン宣言を兼ねる</li>
+<li><strong>計画書のステップ着手は <code>/step &lt;識別子&gt;</code> から</strong>（両レーン共通・Phase 19-2 で導入）: 起動がレーン宣言と <code>/goal</code> 完了条件の宣言を兼ねる。手順・テンプレの正は <code>.claude/skills/step/SKILL.md</code></li>
 <li><strong>git は trunk（main）直 push を継続</strong>し、<strong>push 前に <code>git pull --rebase origin main</code></strong> を必ず挟む。書き込みファイルがレーンで分離されているため、競合は原則発生しない</li>
 <li><strong>開発レーンは常に 1 本</strong>: <code>services/</code> / <code>shared/</code> に触れる push は CodePipeline 完走 + タスク定義新リビジョン確認まで見届ける必要があり、並行すると確認が混線するため</li>
 <li>レーンをまたぐ気づき（セット作業中に見つけた基盤の課題等）は、自分で直さず<strong>相手レーンの計画書に課題として記録</strong>する（セット → 開発: 設計課題リストへ / 開発 → セット: セット計画書のバックログへ）</li>
