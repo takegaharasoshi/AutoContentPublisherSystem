@@ -101,6 +101,7 @@
 <tr><td>実行環境</td><td>ローカル CLI（WSL）・端末常時起動。Routines は対象外</td><td>2026-09-02</td></tr>
 <tr><td>組み込み先</td><td>A・B・D 採用、C 見送り。B は quiz から</td><td>2026-09-02</td></tr>
 <tr><td>無人区間の push</td><td>コードを触るゴールはコミットまで、docs のみは push まで</td><td>2026-09-02</td></tr>
+<tr><td>A の適用範囲</td><td>開発レーンだけでなくセットレーンの計画ステップ（セット改修 R-x 等）にも適用。<code>/step</code> は識別子でレーンを判定し A / A′ のテンプレを使い分ける</td><td>2026-09-02</td></tr>
 <tr><td>「確実に実行される」仕組み</td><td>計画書ではなく<strong>起動点</strong>に埋め込む（セクション 7）。計画書を起こすスキルは作らない</td><td>2026-09-02</td></tr>
 </tbody>
 </table></div>
@@ -114,7 +115,7 @@
 <div class="table-wrap"><table>
 <thead><tr><th>案</th><th>唯一の起動点</th><th>/goal の埋め込み方</th><th>保険（規律・フック）</th></tr></thead>
 <tbody>
-<tr><td><strong>A</strong></td><td>新スキル <code>/step &lt;ステップ番号&gt;</code>（<code>disable-model-invocation: true</code> でユーザーのみ起動。起動 = 開発レーン宣言）</td><td>スキル本文が (1) 計画書の該当ステップを読み、(2) セクション 7.1 のテンプレを埋めた <code>/goal</code> 行を作り、(3) 展開文で起動する。展開文の <code>/goal</code> が効かない場合は「この行を打ってください」と提示し、ユーザーが <code>/goal</code>（引数なし）で設定を確認するまで実装に入らない</td><td>CLAUDE.md「開発レーンのステップ着手は <code>/step</code> から」。破られるようなら SessionStart フックでリマインダー注入（任意・第 2 段）</td></tr>
+<tr><td><strong>A</strong></td><td>新スキル <code>/step &lt;識別子&gt;</code>（<code>disable-model-invocation: true</code> でユーザーのみ起動）。<strong>両レーン対応</strong>: 識別子が <code>16-12</code> なら development-plan.html を読んで開発レーン宣言、<code>logic-training-1 R-1-2</code> のように set_code 付きならセット計画書を読んでそのセットのセットレーン宣言</td><td>スキル本文が (1) 該当計画書のステップを読み、(2) 触るパスをレーン判定表に当てて確認（セット改修のつもりでも開発レーンのパスが入るなら開発レーンとして扱う。「（ユーザー）」「ユーザー判断」のステップは goal 対象外として断る）、(3) レーン別テンプレ（7.1）を埋めた <code>/goal</code> 行を展開文で起動する。展開文の <code>/goal</code> が効かない場合は「この行を打ってください」と提示し、ユーザーが <code>/goal</code>（引数なし）で設定を確認するまで着手しない</td><td>CLAUDE.md「計画書のステップ着手は <code>/step</code> から（両レーン）」。破られるようなら SessionStart フックでリマインダー注入（任意・第 2 段）</td></tr>
 <tr><td><strong>B</strong></td><td>既存スキル <code>quiz-stock-replenish</code>（起動 = セットレーン宣言。すでに補充の唯一の入口）</td><td>SKILL.md に「起動時の <code>/goal</code>」節を追加し、G1（執筆・機械検証）・G2（投入・ビルド・レビューシート）・G3（配置・締め）の 3 本を人間レビューの前後で切って置く</td><td>スキル本文の「goal が立つまで工程 1 に入らない」規律</td></tr>
 <tr><td><strong>D</strong></td><td>CLAUDE.md の git 運用ルール（push の行）</td><td><code>services/ shared/</code> を触る push の直後に、Claude が 7.1 の D 定型行を提示する（ユーザーが打つ）</td><td>既定の permission mode では <code>git push</code> が許可プロンプトで止まる = 「差分確認後に push」のゲートを兼ねる。auto mode では効かないので、コードを触るゴールは auto mode で走らせない</td></tr>
 </tbody>
@@ -123,6 +124,9 @@
 <h3>7.1 ゴール文のテンプレ（暫定。採用時にスキル / CLAUDE.md へ落として確定）</h3>
 <p><strong>A: 開発レーンのステップ実行</strong></p>
 <pre>/goal 開発レーン・ステップ &lt;番号&gt; &lt;名称&gt;。完了条件: (1) 計画書の「内容」にある成果物が揃う、(2) 該当サービスの pytest が全パス（要約行を会話に貼る）、(3) infra/ を触った場合は cdk synth が成功、(4) 関連設計書と計画書（チェック・完了日・要点）を更新、(5) 日本語メッセージでコミット済み。services/ shared/ infra/ database/ を触った場合は push せず、差分を提示して確認待ちで終える。docs のみなら pull --rebase → push まで行う。cdk deploy・本番 DDL 適用・publish は行わない。or stop after 20 turns</pre>
+<p><strong>A′: セットレーンのステップ実行</strong>（セット計画書の進行中ステップ。例: logic-training-1 改修 R-1-2 / R-1-4）</p>
+<pre>/goal セットレーン &lt;set_code&gt;・ステップ &lt;番号&gt; &lt;名称&gt;。完了条件: (1) セット計画書の「内容」にある成果物が揃う、(2) ビルド・検証ツールの出力（build.py --dry-run / validate 等、該当するもの）を会話に貼る、(3) セット計画書（チェック・完了日・要点）とセット記録を更新、(4) 日本語メッセージでコミットし pull --rebase → push まで行う（content/ と docs/plans/&lt;set&gt; は CodePipeline を起動しないため push まで可）。S3 差し替え・Aurora / ローカル DB の更新・SNS 投稿設定の変更は行わず、レビュー用の成果物（プレビュー動画・review.html）を提示して終える。services/ shared/ infra/ database/ に触る必要が出たら手を止めて報告する（開発レーン行き）。or stop after 20 turns</pre>
+<p>セットレーンでは「配置（S3・DB 差し替え）」を人間レビュー後の別ゴールに切る（B の G3 と同じ考え方）。ユーザー判断のステップ（R-1-1 の目視・R-1-3 の go / no-go）は goal にしない。</p>
 <p><strong>B: quiz 週次補充（3 本。人間レビューの前後で切る）</strong></p>
 <pre>/goal セットレーン logic-training-1・週次補充 G1。完了条件: 朝・夜スロットの在庫確認クエリで不足数を確認し（出力を貼る）、不足分（各スロット最大 7 問）のリサーチ → 執筆 → スキル セクション 4 の機械検証が全問パス（出力を貼る）→ 1 問ずつ提示できる状態。投入・S3 配置・Aurora 更新は行わない。人間レビューは開始しない。or stop after 30 turns
 
@@ -136,7 +140,7 @@
 <p>CLAUDE.md と新スキルに触れるため開発レーンの作業。<code>development-plan.html</code> に <strong>Phase 19: 開発プロセスへの /goal 組み込み</strong> として起こす（番号は転記時に確定）。</p>
 <ul>
 <li>⬜ <strong>19-1</strong> D の導入 — CLAUDE.md の git 運用ルール（push の行）に D 定型行を追加。次に <code>services/</code> <code>shared/</code> を push する機会に初回試行し、結果を開発記録へ</li>
-<li>⬜ <strong>19-2</strong> A の導入 — スキル <code>/step</code> 新設（<code>disable-model-invocation: true</code>・計画書の該当ステップ読込・A 定型行の生成・展開文起動の実機確認）+ CLAUDE.md「開発計画」節に「ステップ着手は <code>/step</code> から」+ development-plan.html「進め方の方針」に 1 行。初回は次の開発レーンのステップ（16-12 など）で試行</li>
+<li>⬜ <strong>19-2</strong> A の導入 — スキル <code>/step</code> 新設（<code>disable-model-invocation: true</code>・<strong>両レーン対応</strong>: development-plan.html / セット計画書の該当ステップ読込・レーン判定・A / A′ 定型行の生成・展開文起動の実機確認）+ CLAUDE.md「開発計画」「並行作業ルール」節に「計画書のステップ着手は <code>/step</code> から（起動がレーン宣言を兼ねる）」+ development-plan.html と <code>docs/plans/index.html</code> に 1 行ずつ。初回はセットレーンの logic-training-1 R-1-2（プロトタイプ）か、開発レーンの次ステップのどちらか早い方で試行</li>
 <li>⬜ <strong>19-3</strong> B の導入 — <code>quiz-stock-replenish</code> SKILL.md に G1〜G3 を追加（セットレーンで完結するため logic-training-1 計画書の進行中ステップにも 1 行）。初回は次の週次補充で試行</li>
 <li>設計課題リストへ 1 行: 「D が確実に動くようになった後、開発レーン 1 セッション制約（パイプライン確認の混線防止が理由）の緩和を検討」</li>
 <li>本アイデアは 19-1〜19-3 の転記完了で「採用」に更新し、disposition に転記先を残す</li>
