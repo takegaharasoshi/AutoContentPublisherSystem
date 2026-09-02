@@ -13,7 +13,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-02（確認待ちリストを新設し 19-1・19-3 を作業完了で閉じる・19-5 起票。19-4 完了: ステップ単位を「人間ゲート間の 1 ゴール」へ改訂・16-12 を 16-12a / b に分割。19-2 は 19-4 の実行で初回試行を完了。19-1・19-3 は初回試行待ち）</span>
+  <span>最終更新: 2026-09-02（19-5 完了で Phase 19 完了: /step・補充スキル 2 本・/idea に確認待ちリストの照合と起票ルールを組み込み。確認待ちリストを新設し 19-1・19-3 を作業完了で閉じる。19-4 完了: ステップ単位を「人間ゲート間の 1 ゴール」へ改訂・16-12 を 16-12a / b に分割。19-2 は 19-4 の実行で初回試行を完了。19-1・19-3 は初回試行待ち）</span>
 </div>
 
 <div class="note">
@@ -175,14 +175,7 @@
 <li>✅ <strong>19-2</strong> <code>/step</code> スキルの新設（両レーン対応） — 2026-09-02。<code>.claude/skills/step/SKILL.md</code> 新設 + CLAUDE.md / 計画体系の追記。初回試行は <code>/step 19-4</code>（提示 → ユーザー起動 → 到達まで問題なし。展開文起動は構造上採らず提示方式を正規とする）。詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
 <li>✅ <strong>19-3</strong> quiz 週次補充スキルへの <code>/goal</code> 組み込み — 2026-09-02。<code>.claude/skills/quiz-stock-replenish/SKILL.md</code> に「起動時の <code>/goal</code>」節（G1 執筆・機械検証 / G2 投入・ビルド・レビューシート / G3 配置・締め。人間レビューの前後で切る）と「goal が立つまで工程 1 に入らない」規律を追記。<strong>初回試行は <a href="logic-training-1.html">logic-training-1 計画書</a>の確認待ちリスト</strong>（トリガー: 次の週次補充）。詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
 <li>✅ <strong>19-4</strong> 計画のステップ単位・記載様式の改訂（<code>/goal</code> 前提） — 2026-09-02。本書「進め方の方針」を「1 ステップ = 人間ゲート間の 1 ゴール」へ改訂（切り方の目安 3 つ）・<a href="index.html#step-format">計画体系セクション 5</a> に 4 項目の記載様式を新設・<code>/step</code> に旧形式フォールバックを追記・16-12 を 16-12a（確定・ユーザー判断）/ 16-12b（反映・1 ゴール）に分割。R-1 の分割は次回 <code>/step logic-training-1 R-1-5</code> のフォールバックで扱う。単位変更の理由は<a href="development-log.html">開発記録</a>の Phase 19</li>
-<li>⬜ <strong>19-5</strong> 入口スキルへの「確認待ちの参照」と起票ルールの組み込み
-  <ul>
-  <li>内容: ① <code>.claude/skills/step/SKILL.md</code> 手順に「起動時に開発計画（セットレーンなら当該セット計画書）の確認待ちリストを読み、触るパス・トリガーに該当する行があればゴールの完了条件に『その確認と結果の記入』を含める」を追記 ② <code>.claude/skills/quiz-stock-replenish/SKILL.md</code> と <code>ranking-stock-replenish/SKILL.md</code> の入口（起動時の節 / セクション 0）に「当該セット計画書の確認待ちリストを読み、トリガー『次の週次補充』の行があれば今回の補充で確認して結果を書く」を追記 ③ <code>.claude/skills/idea/SKILL.md</code> の「待機 → 採用の転記下書き」と壁打ちの終了規律に、<a href="index.html#step-format">計画体系 5</a>の記載様式と <a href="index.html#step-checklist">5.1 起票チェックリスト</a>への参照を追記（転記下書きは 4 項目で書き、自セッション外の確認は確認待ち項目に分ける） ④ CLAUDE.md「開発計画」節の Phase 19 の現況を更新。触るパスはスキル 4 本と CLAUDE.md のみ（コードなし）</li>
-  <li>完了条件: ①〜④の差分が入り、各 SKILL.md の frontmatter が壊れていないこと（<code>---</code> 区切りと name / description の存在を機械確認）、CLAUDE.md からのリンク先ファイルの存在確認、日本語メッセージでコミットし pull --rebase → push まで</li>
-  <li>人間ゲート: なし（push 後にユーザーが 3 スキルの追記文を一読）</li>
-  <li>停止点・上限: push まで。stop after 20 turns</li>
-  <li>起動: <code>/step 19-5</code>。<strong>19-5 完了で Phase 19 完了</strong>（初回試行は確認待ちリストで追う）</li>
-  </ul></li>
+<li>✅ <strong>19-5</strong> 入口スキルへの「確認待ちの参照」と起票ルールの組み込み — 2026-09-02。<code>/step</code> の手順に「確認待ちリストの照合」(手順 4。触るパス・出来事とトリガー列を照合し、該当行の確認と結果記入をゴールの完了条件に足す。該当なしも宣言)と結果記入・起票チェックリストのガードレールを追記。<code>quiz-stock-replenish</code>(起動時の /goal 節)・<code>ranking-stock-replenish</code>(セクション 0)に「当該セット計画書の確認待ちリストでトリガー『次の週次補充』の行を今回の補充で確認して結果を書く」を追記(pref-ranking-1 計画書はリスト未設置のため「未設置なら該当なし」を明記)。<code>/idea</code> の終了規律に「採用で着地するとき」(転記下書きは 4 項目様式 + 5.1 起票チェックリスト。自セッション外の確認は確認待ち項目へ分離)を追加し棚卸しモードから参照。CLAUDE.md の Phase 19 現況を「完了」に更新。<strong>Phase 19 完了</strong>(初回試行は確認待ちリストで追う)。詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
 </ul>
 
 <hr>
