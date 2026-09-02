@@ -13,7 +13,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-02（改修 R-1: R-1-1〜R-1-4 完了。次は R-1-5 在庫全数の再ビルド〔着手条件: 16-5 の水準評価〕）</span>
+  <span>最終更新: 2026-09-02（確認待ちリストを新設し Phase 19-3 の初回試行を移動。改修 R-1: R-1-1〜R-1-4 完了。次は R-1-5 在庫全数の再ビルド〔着手条件: 16-5 の水準評価〕）</span>
 </div>
 
 <div class="note">
@@ -42,9 +42,6 @@
 </table></div>
 
 <h2>3. 進行中ステップ</h2>
-
-<h3>週次補充への /goal 組み込みの初回試行（開発レーン Phase 19-3・バックログ 2026-09-02 から移動）</h3>
-<p>⬜ <code>quiz-stock-replenish</code> SKILL.md への「起動時の /goal」節（G1 執筆・機械検証 / G2 投入・ビルド・レビューシート / G3 配置・締め）の追記は <strong>2026-09-02 完了</strong>（管理は<a href="development-plan.html">開発レーン</a> Phase 19-3）。残りは<strong>次の週次補充での初回試行</strong> — G1 → G3 の 3 本を実際に立てて回し、結果を<a href="logic-training-1-log.html">セット記録</a>へ残す（要点は開発記録の 19-3 へ）。</p>
 
 <h3>改修 R-1: 動画レンダラーの Remotion 載せ替え（全編モーション + 上部余白の見直し）</h3>
 <p>
@@ -93,6 +90,15 @@
   <td>セット側の設計書・記録が実装に一致し、共通設計書の修正が設計課題リストに起票されている</td>
   <td>未着手</td>
 </tr>
+</tbody>
+</table></div>
+
+<h2 id="pending-checks">4. 確認待ちリスト（トリガー付き）</h2>
+<p>初回試行・効果観察など「次の機会に確かめる」項目を、ステップにせずここで追う（2026-09-02 導入。ルールと列の意味は<a href="index.html#pending-checks">計画体系 5.2</a>）。補充スキルが起動時にこの表を照合する（開発レーン Phase 19-5 で導入）。確認したら結果を書き、OK なら<a href="logic-training-1-log.html">セット記録</a>へ移す。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
+<tbody>
+<tr><td>2026-09-02 / <a href="development-plan.html">開発レーン</a> Phase 19-3 quiz 週次補充スキルへの <code>/goal</code> 組み込み（初回試行。進行中ステップから移動）</td><td>本セットの次の週次補充（<code>/quiz-stock-replenish</code> 起動時）</td><td>G1 → G2 → G3 の 3 本を実際に立てて回し、① 各ゴールの evaluator が貼られた証跡（機械検証の出力・更新行数 = 承認件数・unbuilt = 0）から到達を判定して止まるか ② 人間レビューの前後でゴールが正しく切れているか（レビュー中に自走しないか）③ 各ゴールが上限ターン内に収まるか</td><td>判定できない → SKILL.md のゴール文の証跡指定を具体化する。レビュー中に自走する → G1 の停止点を明確化する。いずれも開発レーン Phase 19 の追補ステップとして起こす（スキル本文はセットレーンで直せるが管理は Phase 19）</td><td>—（結果はセット記録へ、要点を開発記録の 19-3 へ）</td></tr>
 </tbody>
 </table></div>
 
