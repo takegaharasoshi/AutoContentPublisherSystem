@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アイデア体系</a> / Claude Code のループ / ゴール系スキルを開発プロセスに組み込む</nav>
 <h1>Claude Code のループ / ゴール系スキルを開発プロセスに組み込む</h1>
 <div class="page-meta">
-  <span class="badge badge-future">待機</span>
+  <span class="badge badge-fixed">採用</span>
   <span>種別: 単発 / 作成 2026-08-29 / 更新 2026-09-02 / 記録層: <a href="claude-code-loop-goal-skills.md">claude-code-loop-goal-skills.md</a></span>
-  <span>落とし込み条件: 開発レーンのセッションで development-plan.html に Phase 19 として転記（下書きはセクション 8）</span>
+  <span>採用（2026-09-02）: <a href="../plans/development-plan.html">開発計画</a> Phase 19（19-1〜19-3）へ展開済み。以後の進捗は計画書・開発記録が正</span>
 </div>
 
 <div class="warn">
@@ -136,7 +136,7 @@
 <p><strong>D: CodePipeline 完走待ち</strong></p>
 <pre>/goal push したコミット &lt;sha&gt; について、触ったサービスの CodePipeline が Succeeded になり、対応するタスク定義の新リビジョンが登録されたことを aws cli の出力を貼って確認する。失敗した場合は失敗ステージとログ要約を提示して停止する（自分で修正・再 push しない）。or stop after 15 turns</pre>
 
-<h2>8. 採用時の落とし込み（転記下書き）</h2>
+<h2>8. 採用時の落とし込み（転記下書き。2026-09-02 に転記済み・以後は計画書が正）</h2>
 <p>CLAUDE.md と新スキルに触れるため開発レーンの作業。<code>development-plan.html</code> に <strong>Phase 19: 開発プロセスへの /goal 組み込み</strong> として起こす（番号は転記時に確定）。</p>
 <ul>
 <li>⬜ <strong>19-1</strong> D の導入 — CLAUDE.md の git 運用ルール（push の行）に D 定型行を追加。次に <code>services/</code> <code>shared/</code> を push する機会に初回試行し、結果を開発記録へ</li>

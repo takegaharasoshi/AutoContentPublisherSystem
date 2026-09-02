@@ -13,7 +13,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-08-28（Phase 18 で HTML 化・整理。旧 docs/development-plan.md から移設）</span>
+  <span>最終更新: 2026-09-02（Phase 19 を起票: 開発プロセスへの /goal 組み込み）</span>
 </div>
 
 <div class="note">
@@ -28,6 +28,7 @@
 <li>各ステップで実際に AWS 上で稼働確認を行い、動作を確認してから次に進む</li>
 <li>1 ステップ = 1 プロンプトを基本とし、「作る → 確認 → 次へ」のリズムで進める。各ステップの完了後、ユーザーが確認方法に従って動作確認を行い、チェックを入れる</li>
 <li><strong>記録の運用</strong>: ステップ完了時、本書にはチェック + 完了日 + 要点（1〜2 行）のみを記録し、詳細な実施記録（検証内容・決定事項の全文）は <a href="development-log.html">開発記録</a>に追記する（計画書の肥大化防止。セット計画書 / セット記録も同じ作法）</li>
+<li><strong>ステップ実行は <code>/goal</code> をラッパーにする</strong>（Phase 19 で導入）: 計画書のステップ着手は <code>/step</code> スキルから行い（起動がレーン宣言と完了条件の宣言を兼ねる。開発レーン・セットレーン共通）、<code>services/</code> <code>shared/</code> への push 後は <code>/goal</code> で CodePipeline 完走を確認する。手順の正は CLAUDE.md、検討経緯は<a href="../ideas/claude-code-loop-goal-skills.html">アイデア詳細</a></li>
 <li>CDK コマンド例では app 内の論理スタック ID（<code>FoundationStack</code> など）を指定する。<code>-c env=prod</code> により、CloudFormation 上の実スタック名は <code>Prod-FoundationStack</code> のように環境名付きで作成される</li>
 </ul>
 
@@ -90,6 +91,9 @@
 <tr><td>16-5 効果検証</td><td>Opus 5 / high（指標の解釈で詰まったら Fable 5 へ切替）</td><td>なし（インサイト画面の目視のため委譲不向き）</td></tr>
 <tr><td>16-12 指標セット確定の反映（16-5 完了後）</td><td>Opus 5 / high（指標選定の判断で詰まったら Fable 5）</td><td>terra / high（昇格 DDL・ビュー生成のみ）</td></tr>
 <tr><td>Phase XX（プラットフォーム展開）調査・着手判断</td><td><strong>Fable 5</strong> / デフォルト</td><td>—</td></tr>
+<tr><td>19-1 CodePipeline 完走待ちの <code>/goal</code> 化</td><td>Opus 5 / high（CLAUDE.md 1 行 + 初回試行）</td><td>なし</td></tr>
+<tr><td>19-2 <code>/step</code> スキル新設</td><td><strong>Fable 5</strong> / high（スキル本文の設計と実機確認）</td><td>なし（スキル本文は判断を伴うため）</td></tr>
+<tr><td>19-3 quiz 補充スキルへの <code>/goal</code> 組み込み</td><td>Opus 5 / high</td><td>なし</td></tr>
 </tbody>
 </table></div>
 
@@ -150,6 +154,29 @@
 
 <hr>
 
+<h2>Phase 19: 開発プロセスへの /goal 組み込み</h2>
+<p><strong>ゴール</strong>: Claude Code の <code>/goal</code>（完了条件を宣言して到達まで自走）を「計画書のステップ実行」「quiz 週次補充」「CodePipeline 完走待ち」の入口に埋め込み、人間が張り付く時間を減らす</p>
+<blockquote>2026-09-02 のアイデア壁打ち（3 巡）で採用決定。検討記録・実践パターン・ゴール文テンプレ・ガードレールは<a href="../ideas/claude-code-loop-goal-skills.html">アイデア詳細</a>（設計書に非ず）を参照し、採用時にスキル / CLAUDE.md へ落として確定する。決定事項の要点は<a href="development-log.html">開発記録</a>の Phase 19 を参照。<strong>前提</strong>: <code>/goal</code> は Claude・スキル・フックからは起動できずユーザー入力（対話・<code>claude -p</code>・カスタムコマンド展開文）でのみ起動するため、「確実に実行」は作業の入口に定型行を埋め込むことで担保する。loop.md による常駐自走と Routines は対象外（見送り）。</blockquote>
+<ul>
+<li>⬜ <strong>19-1</strong> CodePipeline 完走待ちの <code>/goal</code> 化
+  <ul>
+  <li>内容: CLAUDE.md の git 運用ルール（<code>services/</code> <code>shared/</code> を触る push の行）に「push 直後に Claude が D 定型行（アイデア詳細 7.1）を提示し、ユーザーが <code>/goal</code> で完走・タスク定義の新リビジョン登録を確認する」を追記する。定型行は失敗時「失敗ステージとログ要約を提示して停止（自分で再 push しない）」を含める</li>
+  <li>完了条件: CLAUDE.md 追記 + 次に <code>services/</code> <code>shared/</code> を push する機会での初回試行（結果を開発記録へ）</li>
+  </ul></li>
+<li>⬜ <strong>19-2</strong> <code>/step</code> スキルの新設（両レーン対応）
+  <ul>
+  <li>内容: <code>.claude/skills/step/</code> を新設（<code>disable-model-invocation: true</code>）。識別子が <code>16-12</code> なら本計画書、<code>logic-training-1 R-1-2</code> のように set_code 付きならセット計画書を読み、触るパスをレーン判定表（<a href="index.html">計画体系</a>セクション 2）に当て、レーン別テンプレ A / A′（アイデア詳細 7.1）を埋めた <code>/goal</code> 行を展開文で起動する（展開文の <code>/goal</code> が効かない場合は行を提示し、ユーザーが <code>/goal</code> で設定を確認するまで着手しない）。「ユーザー判断」のステップは対象外として断る。コードを触るゴールはコミットまで（push は差分確認後）、docs / <code>content/</code> のみは push まで。S3・DB の配置はレビュー後の別ゴール。あわせて CLAUDE.md の「開発計画」「並行作業ルール」に「計画書のステップ着手は <code>/step</code> から（起動がレーン宣言を兼ねる）」、<a href="index.html">計画体系</a>セクション 3 に 1 行を追記する</li>
+  <li>完了条件: スキル新設 + CLAUDE.md / 計画体系の追記 + 初回試行（logic-training-1 R-1-2 か開発レーンの次ステップの早い方）で展開文起動の可否を実機確認し、結果を開発記録へ</li>
+  </ul></li>
+<li>⬜ <strong>19-3</strong> quiz 週次補充スキルへの <code>/goal</code> 組み込み
+  <ul>
+  <li>内容: <code>.claude/skills/quiz-stock-replenish/SKILL.md</code> に「起動時の <code>/goal</code>」節を追加し、G1（在庫確認 → リサーチ → 執筆 → 機械検証全問パス。投入禁止）/ G2（承認分の投入 → イラスト生成 → intake → build → review.html 生成。配置禁止）/ G3（publish → Aurora 適用の更新行数一致 → unbuilt=0 → コミット・push・記録更新）の 3 本を人間レビューの前後で切って置く（テンプレはアイデア詳細 7.1）。「goal が立つまで工程 1 に入らない」規律を本文に書く。触るパスはセットレーン（補充スキル）のみだが、Phase 19 で一括管理する（<a href="logic-training-1.html">logic-training-1 計画書</a>のバックログに導線あり）</li>
+  <li>完了条件: SKILL.md 追記 + 次の週次補充での初回試行（結果は logic-training-1 記録へ、要点を開発記録へ）</li>
+  </ul></li>
+</ul>
+
+<hr>
+
 <h2>Phase XX: プラットフォーム展開</h2>
 <p><strong>ゴール</strong>: 当たりの兆しが出たセットを他プラットフォームへ展開する</p>
 <blockquote>旧 Phase 17。2026-08-10 に第 3 セット構築を Phase 17 として優先するユーザー決定に伴い番号を退避（着手判断時に採番する）</blockquote>
@@ -190,6 +217,7 @@
 <tr><td>2026-08-23</td><td>services/sns-post-batch/app/instagram_api.py</td><td>コンテナのポーリングが <code>fields=status_code</code> しか取得していないため、<code>status_code=ERROR</code> になった<strong>理由が一切残らない</strong>（<code>api_response</code> に保存されるのも <code>{"id":"...","status_code":"ERROR"}</code> のみ）。Graph API は <code>status</code> フィールドに理由文字列を返すが、これを取っていない。また、コンテナ ERROR はパブリッシュ前の段階（二重投稿リスクなし）にもかかわらずアプリ内リトライを持たず、1 回の ERROR でその生成実行が恒久的に欠番になる（事象の記録は <a href="logic-training-1-log.html">logic-training-1 記録</a> 2026-08-23）</td><td>①ポーリングの <code>fields</code> に <code>status</code> を追加し、ログと <code>api_response</code> に理由文字列を残す（数行の修正。次に同種の失敗が起きた際の切り分けに必須）。②コンテナ作成からやり直すアプリ内リトライ（1〜2 回）は、一過性エラーの再発頻度を見てから判断する。<strong>2026-08-10 の項（shared 昇格・v25.0 引き上げ）と同じ「sns-post-batch の次回改修時」にまとめて実施する</strong></td><td>sns-post-batch の次回改修時（① は先行実施も可）</td></tr>
 <tr><td>2026-08-23</td><td>docs/app/operation.html, docs/infra/workflow.html</td><td>投稿対象の決定が「終端状態の posts を持たない最古の generation_run」であるため、<strong>リールが <code>failed</code> になった直後の SFN Retry は「対象なし」と判定して 0 件処理で正常終了する</strong>。結果として Step Functions 実行は SUCCEEDED になり、SFN 失敗アラームでは投稿の欠番に気づけない（2026-08-23 の事象では ECS タスク異常終了通知だけが手がかりだった）。<code>batch_execution_logs</code> に <code>records_processed=0</code> は残るが、これを見る運用・アラームがない</td><td><code>batch_execution_logs</code> の <code>records_processed=0</code>（かつ当日の投稿 success が 0 件）を検知する仕組み（CloudWatch カスタムメトリクス、または ECS タスク異常終了通知の受信時チェック手順の明文化）を検討する。当面は <strong>ECS タスク異常終了通知を受けたら投稿の成否を必ず確認する</strong>運用で代替する（2026-07-07 の stale データ検知・2026-07-25 のバックログ滞留と同じ「可視化がない」系の課題であり、まとめて扱う）</td><td>未定（発生頻度を見て判断。可視化の枠組みは 2026-07-07 の項と合わせて検討）</td></tr>
 <tr><td>2026-08-28</td><td>infra/（bin/infra.ts <code>SUPPORTED_ENVS</code>）, docs/infra/architecture.html</td><td>ステージング環境の要否を検討した（アイデア「ウミガメのスープ」の壁打ちに付随）。<strong>結論: フルのステージング環境（Aurora・ECS・SFN・パイプラインの 2 面化）は現時点では作らない</strong>。理由: ①日次バッチ構成のため障害の影響半径が小さく（最悪でも当日 1 投稿の欠落・翌日回復可）、最重要のコンテンツ品質リスクは事前ビルド + 全数人間レビューで別レイヤーで担保済み ②ソロ運用での 2 面同期・二重デプロイの維持コストと、月 2 万円予算・探索期に固定費を積まない方針に不釣り合い ③検証で最も不安な Instagram 境界は AWS 複製では再現できない</td><td>再検討トリガーは 3 点: ①収益発生により prod 停止が実害になったとき ②AdminApiStack 等の常時稼働・ユーザー向けコンポーネント導入時 ③複数プラットフォーム展開でリリース頻度が上がったとき。CDK は envName でパラメータ化済みのため、導入時は <code>SUPPORTED_ENVS</code> への追加で立ち上げる。<strong>例外</strong>: ウミガメのスープのコメント自動返信（外向き発信・イングレスを持つ初の機能）は、PoC 資材（テスト用 Meta アプリ + テスト用 Instagram アカウント + 最小 Lambda）を使い捨てにせず、採用後も当該経路専用のステージング面として恒久利用する（アイデア詳細: <a href="../ideas/umigame-soup-set.html">umigame-soup-set.html</a>）</td><td>トリガー 3 点のいずれか発生時に再検討</td></tr>
+<tr><td>2026-09-02</td><td>docs/plans/index.html（並行作業ルール）</td><td>開発レーンを常に 1 セッションに絞る理由の一つが「push 後の CodePipeline 完走確認の混線防止」だが、Phase 19-1 で完走確認が <code>/goal</code> により確実になれば、この制約を緩和できる可能性がある（アイデア壁打ち 2026-09-02 で指摘）</td><td>19-1 の初回試行が安定した後、開発レーンの並行可否（少なくとも docs のみの作業の並行）を再検討する。緩和する場合は index.html セクション 2・3 と CLAUDE.md の並行作業ルールを同時に改訂する</td><td>19-1 安定後</td></tr>
 </tbody>
 </table></div>
 

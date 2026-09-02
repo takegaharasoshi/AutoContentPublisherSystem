@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-08-28（Phase 18 で HTML 化・旧 docs/development-log.md から移設）</span>
+  <span>最終更新: 2026-09-02（Phase 19 起票の経緯を追記）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
@@ -1730,6 +1730,17 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>2 層構造</strong>: 記録層 = Markdown <code>&lt;slug&gt;.md</code>（唯一の正。要旨 = Claude が書き直す / 原文メモ・壁打ち記録 = 追記のみ。ユーザーは殴り書きで話し整形は Claude の仕事）、閲覧層 = <code>index.html</code> ダッシュボード + 深化したアイデアの詳細 HTML。詳細 HTML 昇格後は整理された現在形をそちらへ移し二重書きしない。HTML 統一ルール（Phase 18）は閲覧層で維持し、MD は content/ の WRITING-NOTES と同じ作業ノート層の扱い</li>
 <li><strong>レーンと昇格</strong>: <code>docs/ideas/</code> 配下で閉じる作業はアイデアレーン（常に並行可・宣言不要。<code>/idea</code> スキル起動が宣言を兼ねる）。「待機 → 採用」の転記のみ開発レーン。壁打ちで踏み込んだ技術検討は<strong>採用判断のための検討記録であり設計書ではない</strong>（採用後に docs/app・docs/infra へインプットとして引き継ぎ設計 Fix）</li>
 <li><strong>実施内容</strong>: ①<code>docs/ideas/</code> 新設（index.html ダッシュボード = 運用ルールの正・_template.md） ②スキル <code>.claude/skills/idea/</code>（捕捉・壁打ち・棚卸しの 3 モード） ③<a href="index.html">plans/index.html</a> 判定表へアイデアレーン追加・docs/index.html と CLAUDE.md へ導線追加 ④初期アイデア 1 件登録: umigame-soup-set（ウミガメのスープ参加型アカウント・醸成中・詳細 HTML 付き。技術構成検討済み・事業面 8 論点が次回壁打ちアジェンダ） ⑤docs/index.html の <code>&lt;set_code&gt;</code> 未エスケープ表示バグ修正（ついで修正）</li>
+</ul>
+</details>
+<details class="phase"><summary>Phase 19: 開発プロセスへの /goal 組み込み（起票）</summary>
+<p>2026-09-02 起票（Fable 5 がアイデアレーンの壁打ち 3 巡を経て開発レーンで転記）。アイデア「Claude Code のループ / ゴール系スキルを開発プロセスに組み込む」（2026-08-29 捕捉）を採用し Phase 19 として展開した。検討記録の全文は<a href="../ideas/claude-code-loop-goal-skills.html">アイデア詳細</a>。壁打ちでの決定事項:</p>
+<ul>
+<li><strong>対象の確定（第 1 巡）</strong>: 「ループ」= <code>/loop</code>（時間ベースの反復。引数なしなら <code>.claude/loop.md</code> を読んで自走）、「ゴール」= <code>/goal</code>（完了条件を宣言し、各ターン末に Haiku が会話ログだけを見て判定。v2.1.139〜）。セッションを跨ぐ無人実行は Routines の領分で、これはスコープ外（ユーザー決定）。実行環境はローカル CLI（WSL）・端末常時起動</li>
+<li><strong>実践パターンの取り込み（第 2 巡）</strong>: X・Zenn・GitHub の二次情報から「テストが通るまで /goal」「夜間の自走ビルド・QA」「loop.md を現場監督にする」「PR / CI の見守り」「大型リファクタ + サブエージェント」の 5 型と落とし穴（main で無人 /goal は危険・context rot・判定不能条件で永久ループ）を整理。組み込み案を A（ステップ実行の標準ラッパー）・B（夜間ストック整備）・C（loop.md 常駐見回り）・D（CodePipeline 完走待ち）に再編</li>
+<li><strong>採否と運用（第 3 巡・ユーザー決定）</strong>: A・B・D 採用、C 見送り（常駐自走は不要）。D は <code>/goal</code> で。無人区間の push は「コードを触るゴールはコミットまで（push は差分確認後）、docs / content のみは push まで」。試す順は D → A → B。B は quiz から。<strong>A は開発レーンだけでなくセットレーンの計画ステップ（セット改修 R-x 等）にも適用</strong>し、<code>/step</code> が識別子でレーンを判定してテンプレ A / A′ を使い分ける</li>
+<li><strong>「確実に実行される」仕組み</strong>: <code>/goal</code> は Claude・スキル・フックからは起動できない（公式ドキュメントで確認）。よって計画書に毎ステップ書くのではなく、作業の入口（<code>/step</code> スキル・補充スキル・CLAUDE.md の push ルール）に定型行を埋め込み、goal が立つまで着手しない規律で担保する。計画書を起こすスキルは作らない（必要なのは計画書を読む側の着手スキル）。フックによる強制は破られてからの第 2 段</li>
+<li><strong>ガードレール</strong>: denylist（<code>cdk deploy</code>・本番 DDL 適用・publish / apply の投入・SNS 投稿・Secrets・<code>docs/plans/</code> のルール変更）、証跡を会話に貼らせる、必ず <code>or stop after N turns</code>、ゴール文冒頭でレーン宣言、1 ステップ 1 ゴール、コードを触るゴールは auto mode で走らせない（push の許可プロンプトがゲートを兼ねるため）</li>
+<li><strong>設計課題リストへ</strong>: 19-1 で完走確認が確実になった後の「開発レーン 1 セッション制約」の緩和検討を記録</li>
 </ul>
 </details>
 <details class="phase"><summary>設計課題リスト（解消済み）</summary>

@@ -38,6 +38,7 @@
 <tbody>
 <tr><td>2026-08-24</td><td>16-4d の昼スロット停止後も、キャプションテンプレートの固定ハッシュタグに <code>#フェルミ推定</code> が残っており、朝・夜の投稿にも付き続ける（実害は軽微だが出題内容と合わない）。変更には <code>caption_templates</code> の DB 差し替え（旧テンプレート <code>is_active=0</code> 化）が必要（<a href="development-plan.html">開発レーン</a>の設計課題リストから 2026-08-28 に移設）</td><td>昼スロットの再開判断時、またはテンプレートを他の理由で差し替えるタイミングで合わせて見直す（単独での差し替えはしない）</td><td>昼スロット再開判断時</td></tr>
 <tr><td>2026-09-02</td><td><strong>イラストプロンプトの文字禁止の緩和（16-4e）の効果観察</strong>。コード側の定型文を「情景で指定された文字は指定どおりに描く / 指定されていない文字は描かない」へ緩めたため（<a href="development-log.html">開発記録</a> 16-4e）、答えバレ・看板文字の混入を抑える歯止めが弱まる方向の変更になっている</td><td>次の <strong>2 バッチ</strong>の補充で、<strong>非例外問題（情景文に文字を指定していない問題）へのイラスト文字混入の件数</strong>を各バッチの補充記録（<code>content/quiz-stock/logic-training-1/&lt;batch&gt;/STATUS.md</code>）に残す。<strong>戻し基準</strong>: 1 バッチで 3 件以上、または再生成 2 回で解消しない事例が出たら<a href="development-plan.html">開発レーン</a>の設計課題リストへ再起票する（プロンプト文言 1 箇所の変更で戻せる）</td><td>次の 2 バッチの週次補充</td></tr>
+<tr><td>2026-09-02</td><td><strong>quiz 週次補充スキルへの <code>/goal</code> 組み込み（導線）</strong>。<a href="development-plan.html">開発レーン</a> Phase 19-3 で <code>quiz-stock-replenish</code> SKILL.md に G1（執筆・機械検証）/ G2（投入・ビルド・レビューシート）/ G3（配置・締め）の 3 本のゴールを追加する。触るのは補充スキルのみだが管理は Phase 19 で行う</td><td>19-3 着手時に本計画書の進行中ステップへ 1 行起こし、初回試行の結果を本セットの記録へ残す</td><td>Phase 19-3 着手時（19-1・19-2 の後）</td></tr>
 </tbody>
 </table></div>
 

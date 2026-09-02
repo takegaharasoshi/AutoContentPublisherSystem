@@ -1,22 +1,22 @@
 ---
 title: Claude Code のループ / ゴール系スキルを開発プロセスに組み込む
 slug: claude-code-loop-goal-skills
-status: 待機
+status: 採用
 kind: 単発
 created: 2026-08-29
 updated: 2026-09-02
-condition: "開発レーンのセッションで development-plan.html に Phase 19（19-1 D → 19-2 A → 19-3 B）として転記する。下書きは詳細 HTML セクション 8"
+condition: ""
 parent: ""
 children: []
 detail: claude-code-loop-goal-skills.html
-disposition: "採用時: development-plan.html Phase 19 + CLAUDE.md（git 運用・開発計画）+ 新スキル /step + quiz-stock-replenish SKILL.md（19-3 は logic-training-1 計画書）"
+disposition: "採用（2026-09-02）: development-plan.html Phase 19（19-1 CodePipeline 待ちの /goal 化・19-2 /step スキル新設・19-3 quiz 補充スキルへの組み込み）へ展開。経緯は development-log.html Phase 19"
 ---
 
 ## 要旨
 
 整理された現在形は [claude-code-loop-goal-skills.html](claude-code-loop-goal-skills.html) を参照（機能の事実・実践者の使い方 5 パターン・組み込み案 A〜D・ガードレール・未決の論点）。
 
-一言で: `/goal` を「ステップ実行の標準ラッパー（A）」「quiz 週次補充の 3 区間（B）」「CodePipeline 完走待ち（D）」に組み込む。`/goal` は Claude・スキル・フックから起動できないため、「確実に実行」は計画書への記載ではなく**作業の入口（`/step` スキル・補充スキル・CLAUDE.md の push ルール）に定型行を埋め込む**ことで担保する。C（loop.md 常駐）と Routines は対象外。転記下書きまで用意済みで、開発レーンでの転記待ち。
+一言で: `/goal` を「ステップ実行の標準ラッパー（A）」「quiz 週次補充の 3 区間（B）」「CodePipeline 完走待ち（D）」に組み込む。`/goal` は Claude・スキル・フックから起動できないため、「確実に実行」は計画書への記載ではなく**作業の入口（`/step` スキル・補充スキル・CLAUDE.md の push ルール）に定型行を埋め込む**ことで担保する。C（loop.md 常駐）と Routines は対象外。2026-09-02 に開発レーンで development-plan.html Phase 19 として展開済み（採用）。
 
 ## 前提条件・再検討トリガー
 
@@ -100,3 +100,4 @@ disposition: "採用時: development-plan.html Phase 19 + CLAUDE.md（git 運用
 - **成果物**: ゴール文テンプレ 4 種（詳細 HTML 7.1）と Phase 19 の転記下書き（同 8）。見送り理由（C）と決着一覧を HTML に記録
 - **着地**: 待機（condition: 開発レーンで Phase 19 として転記。19-3 はセットレーン）
 - **追補（同日）: A の適用範囲** — ユーザーの問いで、下書きが開発レーン前提になっていた曖昧さが判明。セットレーンの計画ステップ（logic-training-1 改修 R-1 等）にも適用する。`/step` は識別子（`16-12` / `logic-training-1 R-1-2`）でレーンを判定し、セットレーン用テンプレ A′（push まで可・S3 / DB の配置はレビュー後の別ゴール・開発レーンのパスに触れたら停止・ユーザー判断ステップは対象外）を使い分ける。19-2 のスコープと初回試行候補（R-1-2）を更新
+- **採用（同日）**: 開発レーンが空いていることをユーザーが確認 → main を取り込み、development-plan.html に Phase 19（19-1〜19-3）を起票、進め方の方針・利用モデル表・設計課題リスト（開発レーン 1 セッション制約の緩和検討）を追記、開発記録に経緯、CLAUDE.md の現況、logic-training-1 計画書のバックログに 19-3 の導線を追加。ステータスを採用に更新
