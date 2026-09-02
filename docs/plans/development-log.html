@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-02（Phase 19 起票の経緯を追記）</span>
+  <span>最終更新: 2026-09-02（19-1 の CLAUDE.md 追記の記録を追加）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
@@ -1741,6 +1741,17 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>「確実に実行される」仕組み</strong>: <code>/goal</code> は Claude・スキル・フックからは起動できない（公式ドキュメントで確認）。よって計画書に毎ステップ書くのではなく、作業の入口（<code>/step</code> スキル・補充スキル・CLAUDE.md の push ルール）に定型行を埋め込み、goal が立つまで着手しない規律で担保する。計画書を起こすスキルは作らない（必要なのは計画書を読む側の着手スキル）。フックによる強制は破られてからの第 2 段</li>
 <li><strong>ガードレール</strong>: denylist（<code>cdk deploy</code>・本番 DDL 適用・publish / apply の投入・SNS 投稿・Secrets・<code>docs/plans/</code> のルール変更）、証跡を会話に貼らせる、必ず <code>or stop after N turns</code>、ゴール文冒頭でレーン宣言、1 ステップ 1 ゴール、コードを触るゴールは auto mode で走らせない（push の許可プロンプトがゲートを兼ねるため）</li>
 <li><strong>設計課題リストへ</strong>: 19-1 で完走確認が確実になった後の「開発レーン 1 セッション制約」の緩和検討を記録</li>
+</ul>
+<h3>19-1 CodePipeline 完走待ちの /goal 化</h3>
+<ul>
+<li>
+<p>⬜ <strong>19-1</strong> CLAUDE.md への D 定型行の追記 — 2026-09-02 実施（<strong>初回試行待ちのため 19-1 は未完了</strong>）</p>
+<ul>
+<li>確認: CLAUDE.md「Git 運用ルール」の <code>services/</code> / <code>shared/</code> の行に子項目を追加。<strong>push 直後に Claude が定型行（<code>&lt;sha&gt;</code> を実コミットハッシュに置換）を提示 → ユーザーが打つ</strong>という責務分担を明記し、定型行そのものをコードブロックで CLAUDE.md 本文に埋め込んだ（アイデア詳細 7.1 の D をそのまま採用。失敗時は「失敗ステージとログ要約を提示して停止・自分で修正や再 push はしない」、上限 <code>or stop after 15 turns</code> を含む）</li>
+<li>備考: <code>/goal</code> は Claude・スキル・フックからは起動できずユーザー入力でのみ起動するため、「Claude は提示までが責務」を CLAUDE.md に明示した。これがないと Claude が自分で起動しようとして失敗するか、提示自体を省く。ゴール到達（または停止）を待ってからステップ完了とする点も同じ行に含めた</li>
+<li>残: <strong>初回試行</strong>（次に <code>services/</code> / <code>shared/</code> を push する機会）。実際に定型行が提示されるか・<code>/goal</code> の evaluator が aws cli 出力から完走を判定できるかを実機確認し、結果を本項に追記して 19-1 を完了とする</li>
+</ul>
+</li>
 </ul>
 </details>
 <details class="phase"><summary>設計課題リスト（解消済み）</summary>
