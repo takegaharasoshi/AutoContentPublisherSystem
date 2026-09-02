@@ -1,0 +1,144 @@
+-- 2026-08-w5 問題ストック補充投入(14 問。レビュー承認後に実行)
+-- 生成元: content/quiz-stock/logic-training-1/2026-08-w5/stock_items.py(単一ソース)。適用先: ローカル MySQL / Aurora(acps)
+-- set_id は set_code から解決するため両環境共通で実行できる。
+-- content_key はスロット内の既存最大連番 + 1 を適用時に解決する(V007。両環境で同一値になる)。
+
+-- A22
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '「十」「月」「十」「日」。この4つを組み合わせると、漢字が1文字できる。毎日かならず一度はやってくる、その字はなんだ?',
+        '朝(左が十+日+十、右が月)',
+        '{"hook":"漢字は5万種類以上あるらしいぞ","hint":"数えるな、形を見ろ!","question":"「十」「月」「十」「日」。この4つを組み合わせると、漢字が1文字できる。毎日かならず一度はやってくる、その字はなんだ?","answer":"朝(左が十+日+十、右が月)","explanation":"朝の左側は十・日・十を縦に重ねた形で、右側は月。10月10日と日付で計算を始めると出てこない。字の形のパズルとして眺めると見えてくる。","coach_comment":"見方を変えた者の勝ちだ!","tags":["なぞなぞ","朝の一問","漢字あそび"],"summary":"「十月十日」の4字を組み合わせて漢字1文字「朝」を作る定番の合体漢字なぞなぞ。日付として計算するひっかけを字形の合成に切り替えて解く。別解「萌」は「毎日やってくる」の条件で封じた。","illustration_scene":"朝日がのぼり始めた静かな和室。障子ごしにやわらかい光が差し、文机の上の白い紙に「十月十日」と墨で大きく縦書きされている。そばに筆が置かれ、紙の上の宙に大きな「?」が浮かぶ。文字は「十月十日」の4字だけを例外的に描き、他の文字・数字・カレンダーは描かない。人物は描かない。"}',
+        '類型: 合体漢字(定番なぞなぞ・作者不詳の流布問題。別解「萌」の注記あり)。流布例: https://nazoq.com/hard/Q032676.html , https://quiz.community.fmworld.net/nazonazo/content/316/answer3.html , https://nazocchi.com/posts/2050 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A27
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '「あいうおお」。この5文字は、ある読み方ができる。さて、なんと読む?',
+        'えがお(「え」が「お」になっている)',
+        '{"hook":"へんてこな呪文に見えるか?","hint":"正しい並びとくらべろ!","question":"「あいうおお」。この5文字は、ある読み方ができる。さて、なんと読む?","answer":"えがお(「え」が「お」になっている)","explanation":"本来の並びは「あいうえお」。4文字目の「え」が「お」に変わっている。「え」が「お」になった、と口に出せば=えがお。声に出すと気づける仕掛けだ。","coach_comment":"今日も笑顔でいこうぜ!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"「あいうおお」を「えがお」と読み解く定番の文字置換なぞなぞ。五十音の「え」が「お」になっていることに気づき、その変化自体を読みにする。流布形(どんな顔になる?)より難しい「なんと読む?」形式で出題。","illustration_scene":"朝日が差し込む静かな教室。黒板に「あいうおお」とだけ大きく書かれている。黒板の右上の宙に大きな「?」が浮かぶ。窓の外に青空と朝日。文字は「あいうおお」の5字だけを例外的に描き、他の文字・数字は描かない。人物は描かない。"}',
+        '類型: 文字の置換(定番なぞなぞ・作者不詳の流布問題)。流布例: https://nazoq.com/easy/Q003406.html , https://nazonazonavi.net/mondai/02/029577.htm , https://nazomori.net/0107-365nichi/q04-15.html 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A25
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '帽子をかぶっている数字が1つだけある。帽子を脱がせると、なぜか2つも大きくなってしまう。どの数字だ?',
+        '六(帽子を脱ぐと八になる)',
+        '{"hook":"数字も帽子をかぶるのか!","hint":"そいつを漢字で書いてみろ!","question":"帽子をかぶっている数字が1つだけある。帽子を脱がせると、なぜか2つも大きくなってしまう。どの数字だ?","answer":"六(帽子を脱ぐと八になる)","explanation":"漢字の六の上にのっている「亠」が帽子。これを取ると八の形になり、6から8へ2つ増える。数の計算ではなく、字の形で解くなぞなぞだ。","coach_comment":"その柔らかい頭、いいぞ!","tags":["なぞなぞ","朝の一問","漢字あそび"],"summary":"漢字の六から上の「亠」(帽子)を取ると八になり、値が2増えるという定番の字形なぞなぞ。「ふたをとると2増える数字」としても流布。計算から字形へ発想を切り替えて解く。","illustration_scene":"朝日が差し込む玄関。壁ぎわに「0 1 2 3 4 5 6 7 8 9」の数字の積み木が横一列に並び、どれも帽子はかぶっていない。少し離れた木の帽子かけスタンドに、小さな帽子がひとつだけ掛かっている。帽子の上に大きな「?」が浮かぶ。数字は0〜9の10個だけを例外的に描き、漢数字や他の文字は描かない。人物は描かない。"}',
+        '類型: 字形の削除(定番なぞなぞ・作者不詳の流布問題)。流布例: https://www.nazo2.net/kanji/051.html , https://nazoq.com/hard/Q030753.html 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A26
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '森の病院に、虫歯を治す名医とうわさの動物がいる。さて、その動物はだれだ?',
+        'シカ(歯科)',
+        '{"hook":"野生動物は虫歯が少ないらしいぞ","hint":"なに科に行くか考えろ!","question":"森の病院に、虫歯を治す名医とうわさの動物がいる。さて、その動物はだれだ?","answer":"シカ(歯科)","explanation":"虫歯を治してくれるのは歯医者さん、つまり歯科。「しか」と読めば動物のシカだ。病院の科の名前を動物の名前に読み替える定番なぞなぞ。","coach_comment":"音で気づけたら一流だ!","tags":["なぞなぞ","朝の一問","ダジャレ"],"summary":"虫歯を治す動物=歯科(しか)=シカという、診療科名を動物名に読み替える定番のダジャレなぞなぞ。","illustration_scene":"朝の森の中に、丸太づくりの小さな診療所が建っている。入り口の前に、ウサギとクマが後ろ向きに行儀よく並んで順番を待っている。屋根の上に大きな「?」が浮かぶ。シカは描かない。文字や数字は描かない。人物は描かない。"}',
+        '類型: 診療科ダジャレ(定番なぞなぞ・作者不詳の流布問題)。流布例: https://nazoq.com/normal/Q000976.html , https://www.nazo2.net/doubutu/045.html , https://nihon5-bunka.net/riddle-musiba-doubutsu/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A31
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '「花〇」「起〇」「苦〇」「化〇」「呼〇」。5つの〇に入る漢字はぜんぶ別。でも読みはぜんぶ同じ。なんと読む?',
+        'しょう(椒・床・笑・粧・称)',
+        '{"hook":"今週いちばんの難問だ!","hint":"起〇は毎朝やってるぞ!","question":"「花〇」「起〇」「苦〇」「化〇」「呼〇」。5つの〇に入る漢字はぜんぶ別。でも読みはぜんぶ同じ。なんと読む?","answer":"しょう(椒・床・笑・粧・称)","explanation":"花椒・起床・苦笑・化粧・呼称。入る字は別でも読みは全部「しょう」。しかも頭をつなぐと、かしょう・きしょう・くしょう・けしょう・こしょう=か行の縦断だ。","coach_comment":"か行制覇、お見事だ!","tags":["なぞなぞ","朝の一問","同音異字"],"summary":"花〇・起〇・苦〇・化〇・呼〇に別々の漢字(椒・床・笑・粧・称)を入れると読みがすべて「しょう」になり、頭文字がか行を縦断する同音異字パズル。読みを当てる形式で出題。","illustration_scene":"朝日が差し込むリビングのテーブル。白いジグソーパズルのピースが5つ、一列に並べて置かれている。真ん中のピースの上に大きな「?」が浮かぶ。文字や数字は描かない。人物は描かない。"}',
+        '類型: 同音異字の穴埋め(作者不詳の流布問題。nazoq 最難級「おにころし」掲載・答え欄の「かきくけこ」の法則注記を今回直接確認)。流布例: https://nazoq.com/hardest/Q035142.html 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A32
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '「柿=傘」「星=端」「足=飯」。3つには同じ法則がある。では「西=〇」。〇に入る漢字はなんだ?',
+        '腰(にし→こし。かなを一画消す)',
+        '{"hook":"この式、計算しても解けない!","hint":"「かき」と「かさ」を見比べろ!","question":"「柿=傘」「星=端」「足=飯」。3つには同じ法則がある。では「西=〇」。〇に入る漢字はなんだ?","answer":"腰(にし→こし。かなを一画消す)","explanation":"左をひらがなにして一画消すと右になる。かき→かさ、ほし→はし、あし→めし。にしなら「に」を一画消して「こし」=腰だ。","coach_comment":"法則を見抜いたな、やるな!","tags":["なぞなぞ","朝の一問","法則発見"],"summary":"柿=傘・星=端・足=飯の3組から「ひらがなに直して一画消す」法則を見つけ、西=腰を導く法則発見型の難問なぞなぞ。4組目を答えさせる流布形を踏襲。","illustration_scene":"朝日が差し込む教室の黒板。白いチョークで「柿=傘」「星=端」「足=飯」「西=?」の4つの式が、縦に大きく揃えて書かれている。黒板のわきにチョークと黒板消しが置かれている。文字は式のこの8字と記号だけを例外的に描き、他の文字・数字は描かない。人物は描かない。"}',
+        '類型: 法則発見・かなの一画消し(作者不詳の流布問題。同一の 4 組が複数の独立ドメインに掲載されていることを今回直接確認)。流布例: https://www.nazo2.net/nanmon/005.html , http://www.quizn.jp/quiz.php?quiz_no=9779 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q14210803379 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A29
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '「〇楽」「〇秘」「〇棚」「〇隠」。4つの〇にはぜんぶ同じ漢字が入る。さて、なんの字だ?',
+        '神(神楽・神秘・神棚・神隠し)',
+        '{"hook":"全部埋まったら自慢していいぞ","hint":"お参りする場所を思い出せ!","question":"「〇楽」「〇秘」「〇棚」「〇隠」。4つの〇にはぜんぶ同じ漢字が入る。さて、なんの字だ?","answer":"神(神楽・神秘・神棚・神隠し)","explanation":"答えは神。神楽(かぐら)・神秘(しんぴ)・神棚(かみだな)・神隠し(かみかくし)と、同じ字なのに読み方が3通りも変わるのがこの字の面白さだ。","coach_comment":"その語彙力、鍛えてるな!","tags":["なぞなぞ","朝の一問","穴埋め"],"summary":"〇楽・〇秘・〇棚・〇隠の4つの空所すべてに入る共通の漢字「神」を探す穴埋めパズル。神楽の読み(かぐら)が最難関で、複数の熟語の突き合わせで絞り込む。","illustration_scene":"朝日が差し込む書斎の机。開いた国語辞典と鉛筆が置かれ、辞典の上の宙に大きな「?」が浮かぶ。ページの文字は描き込まない。神社や鳥居は描かない。人物は描かない。"}',
+        '類型: 共通漢字の穴埋め(作者不詳の流布問題。答え「神」の同構造問題を確認)。流布例: https://nazoq.com/normal/Q034990.html , https://www.sonoda-clinic.com/docs/pdf/enyu202305.pdf 。熟語の組は流布例の 4 語を採用(2026-09-01 ユーザー指定。「女神」のみ外した 4 語構成・「〇隠」は流布例と同じく送り仮名なし)。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C22
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        'スイッチ3つは1階、白熱電球3つは地下室。対応は不明で、互いに見えない。地下へ行けるのは一度きりで、もうスイッチは操作できない。どう見分ける?',
+        '1つを点けて消し、別の1つを点けて降りる',
+        '{"hook":"一度きりのチャンスだ","hint":"目だけで確かめるな!","question":"スイッチ3つは1階、白熱電球3つは地下室。対応は不明で、互いに見えない。地下へ行けるのは一度きりで、もうスイッチは操作できない。どう見分ける?","answer":"1つを点けて消し、別の1つを点けて降りる","explanation":"点いている電球が2番目のスイッチ。消えていて熱いのが最初のスイッチ、冷たいのが残り。光だけでなく熱も手がかりになる。","coach_comment":"五感を全部使え!","tags":["論理パズル","夜の一問","発想の転換"],"summary":"1階のスイッチと地下室の電球の対応を、地下へ一度しか行けない制約のもとで見分ける古典パズル。点灯だけでなく電球の熱を手がかりに使うのが鍵。","illustration_scene":"夜の家の断面図。1階の壁に古めかしいスイッチが3つ並び、地下室の天井からは3つの白熱電球が下がっている。電球はすべて消えていて同じ見た目。1階と地下をつなぐ階段の上に大きな「?」が浮かぶ。窓の外は星空。人物は描かない。"}',
+        '類型: 観察制約・状態利用(作者不詳の世界的な定番論理パズル)。流布例: https://www.nli-research.co.jp/report/detail/id=80908?site=nli , https://www.soranokillingtime.com/analytical-puzzle/incandescent-light-bulb/ , https://quiz-tairiku.com/q.cgi?mode=view&no=5751 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C29
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '見た目が同じ球が8個。1個だけ少し重い。天秤ばかりを使って重い球を必ず見つけたい。天秤を使う回数は最少で何回?',
+        '2回(まず3個対3個を量る)',
+        '{"hook":"天秤は5000年前からある","hint":"量らない球があってもいいぞ!","question":"見た目が同じ球が8個。1個だけ少し重い。天秤ばかりを使って重い球を必ず見つけたい。天秤を使う回数は最少で何回?","answer":"2回(まず3個対3個を量る)","explanation":"3個対3個を量り、2個は乗せない。つり合えば残り2個を1対1で。傾けば重い3個から1対1で量り、つり合えば残りが重い。","coach_comment":"全部を乗せなくていいんだ!","tags":["論理パズル","夜の一問","絞り込み"],"summary":"同じ見た目の球8個から重い1個を天秤2回で特定する古典パズル。4対4ではなく3対3にして2個を乗せないのが鍵。","illustration_scene":"夜の古い研究室。木の机の上に真ちゅうの天秤ばかりが置かれ、皿は両方とも空。机の上には同じ見た目の白い球が8個、まとまって転がっている。ランプの明かりが差し、天秤の上に大きな「?」が浮かぶ。人物は描かない。"}',
+        '類型: 天秤・絞り込み(偽コイン問題の基本形。作者不詳の国際的古典)。流布例: https://okwave.jp/qa/q7587018.html , https://www.kzsuzuki.com/entry/2021/08/12/120124 , https://en.wikipedia.org/wiki/Balance_puzzle 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C24
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '火をつけると1時間で燃え尽きるロープが2本ある。ただし燃える速さは場所によってばらばらだ。この2本だけで45分をはかるには?',
+        '1本目の両端と2本目の片端に同時点火。1本目が尽きたら2本目の残り端に点火',
+        '{"hook":"時計がなくても時間はわかる","hint":"火をつける場所は1つじゃない!","question":"火をつけると1時間で燃え尽きるロープが2本ある。ただし燃える速さは場所によってばらばらだ。この2本だけで45分をはかるには?","answer":"1本目の両端と2本目の片端に同時点火。1本目が尽きたら2本目の残り端に点火","explanation":"同時に1本目の両端と2本目の片端に点火。1本目が尽きる30分後に2本目のもう片端にも点火すれば、残り30分ぶんが15分で燃え、合計45分。","coach_comment":"両側から攻めるのもアリだ!","tags":["論理パズル","夜の一問","時間をはかる"],"summary":"燃える速さが不均一なロープ2本で45分をはかる古典パズル。両端点火で30分を作り、残り1本を両端にして15分を足す。","illustration_scene":"夜の作業小屋。机の上に、輪にまとめた2本のロープが置かれている。そばに火のついていないマッチ箱。壁には針のない時計がかかり、その上に大きな「?」が浮かぶ。炎や煙は描かない。人物は描かない。"}',
+        '類型: 時間測定・並列操作(作者不詳の定番論理パズル)。流布例: https://www.learnsteps.com/burning-ropes-puzzle/ , https://turtlenoir.com/blog/lateral-thinking-puzzles-with-answers 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C28
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        'グラスが6つ一列に並び、左の3つはジュースで満杯、右の3つは空だ。満杯と空が交互に並ぶようにしたい。動かしてよいグラスは1つだけ。どうする?',
+        '左から2番目の中身を5番目へ注ぐ',
+        '{"hook":"テーブルの上の小さな難問","hint":"グラスの中身に注目しろ!","question":"グラスが6つ一列に並び、左の3つはジュースで満杯、右の3つは空だ。満杯と空が交互に並ぶようにしたい。動かしてよいグラスは1つだけ。どうする?","answer":"左から2番目の中身を5番目へ注ぐ","explanation":"グラスの位置は入れ替えない。2番目のグラスを持ち上げ、中身を5番目に注いで元に戻すだけ。動かしたグラスは1つですむ。","coach_comment":"ルールの読み方が勝負だ!","tags":["発想の転換","夜の一問","ひっかけ"],"summary":"満杯3つと空3つが並ぶグラスを、1つだけ動かして交互にする古典パズル。位置を替えず中身を注ぐと気づけるかを問う。","illustration_scene":"夜のバーカウンター。背の高いグラスが6つ一列に並び、左の3つはオレンジ色のジュースで満杯、右の3つは空。間接照明がガラスを照らす。並びの上に大きな「?」が浮かぶ。注ぐ動作や手は描かない。人物は描かない。"}',
+        '類型: 状態変換・最小操作(作者不詳の定番パズル。Six Glasses)。流布例: https://www.puzzleprime.com/puzzles/brain-teasers/insight/six-glasses/ , https://www.braingle.com/brainteasers/521/empty-and-full-glasses.html , https://www.mycoted.com/Drinking_Glasses 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C25
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        'あなたはオオカミ・ヤギ・キャベツを川の向こうへ運んでいます。船に乗せられるのは1つだけ。目を離すとオオカミはヤギを、ヤギはキャベツを食べる。どう運ぶ?',
+        'ヤギ→戻る→オオカミ→ヤギを連れ帰る→キャベツ→戻る→ヤギ(全7航行)',
+        '{"hook":"1200年前からある問題だ","hint":"一度運んだものを戻してみろ!","question":"あなたはオオカミ・ヤギ・キャベツを川の向こうへ運んでいます。船に乗せられるのは1つだけ。目を離すとオオカミはヤギを、ヤギはキャベツを食べる。どう運ぶ?","answer":"ヤギ→戻る→オオカミ→ヤギを連れ帰る→キャベツ→戻る→ヤギ(全7航行)","explanation":"ヤギだけがオオカミともキャベツとも同居できない。だから先にヤギを渡し、次を運ぶときに一度ヤギを連れ帰るのが鍵。","coach_comment":"一歩下がるのも前進だ!","tags":["論理パズル","夜の一問","古典パズル"],"summary":"オオカミ・ヤギ・キャベツを1つずつしか運べない船で川を渡す9世紀由来の古典パズル。ヤギを一度連れ戻すのが鍵。","illustration_scene":"夜、月あかりの川辺。小さな手こぎ舟が岸につながれている。岸辺にはオオカミとヤギとキャベツのカゴが少し離れて置かれ、その上に大きな「?」が浮かぶ。向こう岸は暗い森。舟は空のまま描く。人物は描かない。"}',
+        '類型: 川渡り・制約充足(9世紀の写本にさかのぼる作者不詳の国際的古典)。流布例: https://en.wikipedia.org/wiki/Wolf%2C_goat_and_cabbage_problem , https://www.geeksforgeeks.org/aptitude/puzzle-farmer-goat-wolf-cabbage/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C31
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '7分計と11分計、2つの砂時計がある。この2つだけを使って、今からちょうど15分をはかりたい。どうすればいい?',
+        '同時に始め、7分計が落ちたら裏返す。11分計が落ちたら、もう一度7分計を裏返す',
+        '{"hook":"足しても引いても15は出ない","hint":"落ちた砂も、裏返せば使える!","question":"7分計と11分計、2つの砂時計がある。この2つだけを使って、今からちょうど15分をはかりたい。どうすればいい?","answer":"同時に始め、7分計が落ちたら裏返す。11分計が落ちたら、もう一度7分計を裏返す","explanation":"7分計は7分で裏返り、11分計が落ちる11分までに11-7=4分ぶん落ちている。ここで7分計を裏返すとその4分が戻って落ち、11+4=15分。","coach_comment":"砂の残りまで道具にしたな!","tags":["論理パズル","夜の一問","時間をはかる"],"summary":"7分と11分の砂時計2つでちょうど15分をはかる古典パズル。同時に始めて7分計を裏返し、11分計が落ちた時点で7分計を再度裏返すと11+4=15分。","illustration_scene":"夜のキッチンのテーブル。大きさの違う砂時計が2つ並んで置かれ、どちらも砂は上にたまったまま。そばで鍋から湯気が上がっている。砂時計の上に大きな「?」が浮かぶ。時計や数字は描かない。人物は描かない。"}',
+        '類型: 時間測定・砂時計(作者不詳の定番論理パズル)。流布例: https://fukuchi.org/works/puzzle/sandglass_answer.html , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1175523691 , https://magazine.mathchannel.jp/quiz/2475/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C34
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '金貨の袋が10個。本物は1枚10gだが、1つの袋だけ全部偽物で1枚11gある。見た目は同じ。重さが数字で出るはかりを1回だけ使い、偽物の袋を当てるには?',
+        '1番の袋から1枚、2番から2枚…10番から10枚取り、まとめて量る',
+        '{"hook":"使えるのはたった1回だ","hint":"同じ枚数ずつ取るな!","question":"金貨の袋が10個。本物は1枚10gだが、1つの袋だけ全部偽物で1枚11gある。見た目は同じ。重さが数字で出るはかりを1回だけ使い、偽物の袋を当てるには?","answer":"1番の袋から1枚、2番から2枚…10番から10枚取り、まとめて量る","explanation":"取り出した55枚が全部本物なら550g。偽物の袋の番号ぶんだけ枚数が混ざるので、その数だけ重くなる。553gなら3番の袋が偽物だ。","coach_comment":"枚数に番号を語らせたな!","tags":["論理パズル","夜の一問","発想の転換"],"summary":"10袋のうち1袋だけ全部偽物(1g重い)の金貨を、袋ごとに違う枚数を取り出して1回の計量で当てる古典。超過のグラム数が袋の番号になる。","illustration_scene":"夜の蔵の中。口を開けた小さな袋が10個、木の台に並び、どの袋にも金貨がぎっしり詰まって山盛りにあふれそうになっている。手前に何も乗っていないデジタルはかりが1台。ランタンの明かりが照らし、袋の上に大きな「?」が浮かぶ。数字や文字は描かない。人物は描かない。"}',
+        '類型: 計量・番号の符号化(ニセ金貨の袋。作者不詳の世界的な定番論理パズル)。流布例: https://mixi.jp/view_bbs.pl?comm_id=2676977&id=31399524 , http://bratra.com/brainnews/?p=799 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1143983131 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
