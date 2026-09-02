@@ -1178,6 +1178,16 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <strong>(4) 意図的に変えなかったもの（凍結・残置）</strong>: <code>prompt_configs.parameters</code> の noon スロット定義（時刻起動がないため実行時に選ばれない。再登録時の検証は 6 フィールド必須のため削ると落ちる）・<code>quiz_stock_items</code> の L3 / standard 在庫（未使用ビルド済みを含む）と S3 の事前動画・BGM <code>noon/track01.m4a</code>・コード側 <code>SLOT_PALETTES</code> 等。キャプションテンプレートの固定ハッシュタグ <code>#フェルミ推定</code> は朝・夜の投稿にも付き続けるが、DB 登録値の差し替えを要するため本ステップでは変更せず設計課題リストに記録した</p>
 </li>
 <li>
+<p>✅ <strong>16-4e</strong> イラストプロンプトの文字禁止の緩和（提示物問題への対応）</p>
+<ul>
+<li>備考: 2026-09-02 完了（Opus 5 / high が直接実施。Codex 委譲なし = 変更は文字列 1 箇所とその追随のため）。2026-08-w5 の補充で顕在化した設計課題（プロンプトの定型文と「提示物そのものを絵に出す問題」の矛盾。手当てを毎回 <code>work/prompts/&lt;id&gt;.txt</code> に手で入れており取りこぼしやすい）の恒久対応。</li>
+</ul>
+<p><strong>(1) 方針決定</strong>: 課題リストの当初方針は「緩めた場合の混入率を次回補充で観察してから本適用」だったが、<strong>観察待ちを置かず本適用</strong>とユーザーが決定。根拠は 3 点 — ①品質担保の主体は<strong>全数人間レビュー</strong>であり、プロンプトの禁止文はあくまで補助線（16-3 の decision・<a href="../app/generators/quiz-prebuilt.html">quiz-prebuilt</a>）②2026-08-w5 の手当てで例外 6 問とも意図どおり生成でき、非例外問題への文字混入は 1 件（再生成 1 回で解消）・答えバレ 0 の実績がある ③戻しコストが文字列 1 箇所で小さい
+<strong>(2) 変更内容</strong>: <a href="../../services/image-batch/app/generators/gpt_quiz_multicut.py">gpt_quiz_multicut.py</a> の <code>_build_illustration_prompt</code> に「文字・数字は情景で明示的に指定されたものだけを、指定どおりの字形で正確に描く。」を挿入し、後続を「情景で指定されていない文字・数字・記号は一切描画しない（看板・標識・ロゴ・ボタンや操作パネルの文字数字も不可）」へ変更（2026-08-w5 で実績のある暫定文言をそのまま採用）。呼び出しは事前生成の <code>export_prompts.py</code> と休止中の実行時生成の 2 経路があるが、<strong>経路別の分岐は作らず</strong>両方に同じ文言が反映される。テスト <code>test_generators_gpt_quiz_multicut.py</code> の固定文字列アサーションを新文言 2 本に更新（image-batch 124 件パス / 5 スキップ）
+<strong>(3) ドキュメント・スキル</strong>: <a href="../app/generators/gpt-quiz-multicut.html#illustration">gpt-quiz-multicut.html</a> セクション 6 の禁止事項の記述を更新し、decision コールアウト（経緯・w5 実績・注意）を追加。<code>quiz-prebuilt.html</code> は本節をリンク参照しているため変更なし。スキル <a href="../../.claude/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a> は 2 箇所 — Codex への混入確認指示を「情景で指定されていない文字…」に合わせ、提示物問題では逆に「指定した文字が字形どおり描かれているか」を確認させる旨を追記 / 執筆勘所に「提示物問題は描くべき文字を情景文に一字一句明示する」を 1 行追加
+<strong>(4) 残る注意と観察</strong>: 混入の歯止めが弱まる方向の変更のため、<strong>16-1 の実行時生成を休止解除する際は混入率を再評価する</strong>（人間レビューが介在しない経路になるため）。緩和後の観察は<a href="logic-training-1.html">セットレーンのバックログ</a>へ移管（次の 2 バッチで非例外問題への混入件数を補充記録に残す。戻し基準 = 1 バッチ 3 件以上、または再生成 2 回で解消しない事例）</p>
+</li>
+<li>
 <p>✅ <strong>16-6</strong> Instagram Graph API インサイト機能の調査（後段ブロック先行着手の 1 本目）</p>
 <ul>
 <li>備考: 2026-08-09 完了（Web リサーチ = <code>codex --search exec</code> 委譲〔terra / high〕・再検証 + 整理 = Fable 5）。調査基準は Graph API <strong>v25.0</strong>・Instagram API with Facebook Login（既存構成）。学習カットオフ後の主要情報（2025-12 の新メトリクス群）は Meta 公式ブログ（2025-12-03）+ 複数二次ソースで再検証済み。ステップの目的だった「自動収集できる指標 / 手動でしか見えない指標」の境界を確定した。なお 16-5 完了前の先行着手は 2026-08-09 のユーザー決定（理由は計画書 Phase 16 冒頭の備考）。</li>
@@ -1811,6 +1821,13 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <td>16-9 の実装直前リサーチで、developers.facebook.com の Insights リファレンス本文が取得制限で直接読めず、<strong>2025-12 追加分（<code>reels_skip_rate</code> / <code>reposts</code> / <code>crossposted_views</code> / <code>facebook_views</code>）の <code>metric_type</code>・breakdown 要否と、<code>follows</code> / <code>profile_visits</code> のリール対応可否が一次情報で確定できなかった</strong>。実装は「未対応メトリクスの自動縮退 + WARNING ログ」で吸収する設計にしてあるため稼働はできるが、定数リストが実際の API 対応表とずれている可能性が残る</td>
 <td><strong>解消済み（2026-08-10、16-11）</strong>: 疎通確認の CloudWatch Logs で <code>follows</code> / <code>profile_visits</code> がリールで未対応と実証されたため定数から削除した（自動縮退のプローブ 1 往復を省く）。<code>reels_skip_rate</code> / <code>reposts</code> は <code>post_insights.metrics</code> に実データで格納されていることを確認済み（リールで取得できたキー: views / reach / likes / comments / saved / shares / total_interactions / reels_skip_rate / reposts / ig_reels_avg_watch_time / ig_reels_video_view_total_time）。feed_image は現時点で収集対象の実投稿がなく未確認のため、対象が出た時点でログを再確認する</td>
 <td>16-11</td>
+</tr>
+<tr>
+<td>2026-09-02</td>
+<td>services/image-batch（<code>app/generators/gpt_quiz_multicut.py</code> の <code>_build_illustration_prompt</code>）, docs/app/generators/gpt-quiz-multicut.html</td>
+<td>イラスト生成プロンプトの定型文が「情景の指定に「?」がある場合のみ大きな「?」を描いてよい。<strong>それ以外の文字・数字・記号は一切描画しない</strong>」と断定しているため、<strong>問題の提示物そのものを絵に出す問題</strong>（黒板に書かれた式・紙に書かれた文字など）と矛盾する。logic-training-1 の 2026-08-w5 補充ではこの例外が 6 問あり（A22「十月十日」/ A27「あいうおお」/ A25「0〜9」/ A31「花?…呼?」/ A32「柿=傘…西=?」/ A29「?楽…?隠」）、<code>work/prompts/&lt;id&gt;.txt</code> を毎回<strong>手で書き換えて</strong>生成した。<code>export_prompts.py</code> を再実行すると手当てが消えるため、再実行のたびに直す必要があり<strong>取りこぼしやすい</strong>（記録は <a href="logic-training-1-log.html">logic-training-1 記録</a> 2026-08-w5）</td>
+<td><strong>解消済み（2026-09-02、16-4e）</strong>: 定型文を「文字・数字は情景で明示的に指定されたものだけを、指定どおりの字形で正確に描く。情景で指定されていない文字・数字・記号は一切描画しない」へ変更した（<a href="../app/generators/gpt-quiz-multicut.html#illustration">gpt-quiz-multicut セクション 6</a> の decision に経緯・実績・注意を記録）。当初方針の「次回補充で混入率を観察してから本適用」は<strong>観察待ちを置かず本適用</strong>に変更（ユーザー決定）— 品質担保の主体は全数人間レビューでプロンプトの禁止は補助線であること、2026-08-w5 の手当てで例外 6 問とも成立し非例外への混入は 1 件（再生成 1 回で解消）・答えバレ 0 だったこと、戻しコストが文字列 1 箇所であることが根拠。観察は logic-training-1 のバックログ（2 バッチ分の混入件数を補充記録に残す）へ移し、<strong>16-1 の実行時生成を休止解除する際は混入率を再評価</strong>する</td>
+<td>16-4e</td>
 </tr>
 </tbody>
 </table></div>

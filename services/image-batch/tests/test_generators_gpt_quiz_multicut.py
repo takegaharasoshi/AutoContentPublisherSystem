@@ -405,7 +405,11 @@ def test_generate_consumes_stock_and_stages_snapshot(
     assert bgm_select_index < stock_select_index
     illustration.assert_called_once()
     assert (
-        "それ以外の文字・数字・記号は一切描画しない"
+        "文字・数字は情景で明示的に指定されたものだけを、指定どおりの字形で正確に描く。"
+        in illustration.call_args.args[1]
+    )
+    assert (
+        "情景で指定されていない文字・数字・記号は一切描画しない"
         in illustration.call_args.args[1]
     )
     assert "tone_hint" not in illustration.call_args.args[1]
