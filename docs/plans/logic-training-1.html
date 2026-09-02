@@ -13,7 +13,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-02（改修 R-1 を起票・R-1-1 完了。19-3 の /goal 組み込みを進行中ステップへ）</span>
+  <span>最終更新: 2026-09-02（改修 R-1: R-1-1・R-1-2 完了。次は R-1-3 プレビュー確認〔ユーザー判断〕）</span>
 </div>
 
 <div class="note">
@@ -67,7 +67,7 @@
   <td><strong>R-1-2</strong><br>プロトタイプ（既存 1 問）</td>
   <td><code>content/video-build/logic-training-1/remotion/</code> に Remotion コンポジションを新設し、既存 1 問（ビルド済み・イラストあり）で 16 秒版を試作する。レンダリング環境は pref-ranking-1 の <code>Dockerfile.render</code> と <code>build.py</code> の <code>_render()</code>（Docker 経由 <code>npx remotion render</code>）を流用。<strong>動きの内容</strong>: ① コーチの常時浮遊（pref-ranking-1 型。<strong>周期は 480 フレームの約数</strong>にしてループ継ぎ目で位相が飛ばないようにする。<strong>R-1-1 でループが実証されたため、周期アニメーションはすべて 480 フレームの約数とし、16 秒末尾の状態が 0 秒の状態に一致することを必須要件とする</strong>）② つかみ帯の動き（目立たせる。可読性優先） ③ 問題文の読む速さに合わせた段階表示 ④ 3〜8 秒の「考える」ビート ⑤ 8〜13 秒のカウントダウン（数字のスケール・リング進行・tick 同期のパルス） ⑥ 13〜16 秒の誘導強調。<strong>版面</strong>: 上部（時間帯ピル・つかみ帯・見出し・問題文）は左右対称の余白で使い切り、Instagram UI の右 12% 予約は下部（イラスト・コーチ・吹き出し）だけに残す高さ依存のセーフエリアへ変える。<strong>音声</strong>は現行の ffmpeg ミックス（BGM LRU + SE 固定ディレイ）を維持し Remotion は映像のみ出力する（Remotion 側で鳴らすかは試作時に判断。SE タイミングは不変）</td>
   <td>1 問の MP4 が出力され、現行版と並べて再生できる。<code>tsc --noEmit</code> が通る。周期アニメーションの周期がすべて 480 フレームの約数であること（末尾 → 先頭の連続性）をコード上で確認済み</td>
-  <td>未着手</td>
+  <td><strong>完了</strong>（2026-09-02）<br><code>remotion/</code> 新設・<code>id=85</code> で 16 秒版を出力（<code>remotion/work/prototype/85.mp4</code>）。上部を 2 ゾーン化して本文幅 797 → 902px・問題文 56 → 68px。周期 11 件すべて 480 の約数（違反時はビルドが落ちる）。継ぎ目はクロスフェードを<strong>スナップに変更</strong>（二重露光のため）し、479 → 0 の差分は内部 1 フレーム送りと同等。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
 </tr>
 <tr>
   <td><strong>R-1-3</strong><br>プレビュー確認（ユーザー判断 = R-1-4 以降の go / no-go）</td>

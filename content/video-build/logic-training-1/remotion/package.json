@@ -1,0 +1,20 @@
+{
+  "name": "logic-training-1-remotion",
+  "private": true,
+  "description": "logic-training-1（脳みそトレーニング）の事前ビルド用 Remotion コンポジション",
+  "scripts": {
+    "studio": "remotion studio",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/fonts": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.5.0"
+  }
+}
