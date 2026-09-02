@@ -13,7 +13,7 @@
 <h1>事業戦略書</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-07-29</span>
+  <span>最終更新: 2026-09-02（KPI 実績に 2026-08 を追記・fantasy-animals-1 の停止決定・KPI 転記元を 16-12a の指標セットへ）</span>
   <span>初版は 2026-07-23 の壁打ち（Phase 14-1）に基づく</span>
 </div>
 
@@ -92,7 +92,7 @@
     </tr>
     <tr>
       <td>画像生成 API</td>
-      <td>fantasy-animals-1（リール元画像 1 日 1 枚・high）で月 1,000 円前後。<strong>logic-training-1 は 0 円</strong>（2026-08-08 改訂）</td>
+      <td>fantasy-animals-1（リール元画像 1 日 1 枚・high）で月 1,000 円前後（<strong>2026-09-02 に停止を決定</strong>。Phase 20-1 の適用後は 0 円）。<strong>logic-training-1 は 0 円</strong>（2026-08-08 改訂）</td>
       <td><strong>2026-07-28（15-9 壁打ち）で「勝負セットは画像 API 定常ゼロ」（15-3 試算）を改訂</strong>: 全カット常駐の情景イラスト採用（ユーザー決定）により logic-training-1 にも定常費が復活。月 600 円前後（medium 1024x1024）を許容（<a href="../app/requirements-notes-set2.html#tokekomi-figure">15-9 壁打ち記録 11.3</a>）。<strong>15-14 の組版再設計でイラストを横長 1536x1024 へ変更</strong>したため月 900 円前後へ改訂（15-16 記録）。<strong>→ 2026-08-08（16-3b）の動画事前生成方式への転換で再びゼロ化</strong>: イラストは Codex 組み込みの imagegen（サブスク内・API 課金なし）で事前一括生成し、全数人間レビューのうえ動画を S3 に作り置く（品質面でも gpt-image-1 の弱点〔情景起因の文字混入〕を解消 = 転換の decision は <a href="../app/generators/quiz-prebuilt.html">方式設計書 quiz-prebuilt</a>）</td>
     </tr>
     <tr>
@@ -167,7 +167,7 @@
 </div>
 
 <h3 id="kpi-actual">4.1 KPI 実績</h3>
-<p>当面は月次の手動更新。インサイト収集バッチ（Phase 16）の実装後に自動集計へ移行を検討する。</p>
+<p>月次の手動更新。2026-09 以降は 16-12a（2026-09-02）で確定した指標（月末の <code>followers_count</code>・月間 reach 合計）を <code>content/insights-analysis/run_queries.py account_daily</code> の出力から転記する（転記手順の正は 16-12b で <a href="../app/operation.html#insights-ops">運用設計 セクション 6</a> に置く）。投稿単位の水準（views・スキップ率・平均視聴秒・コメント・保存の 72 時間中央値）は各セット計画書の KPI 欄で追い、本表には載せない。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>年月</th><th>セット</th><th>フォロワー</th><th>備考</th></tr></thead>
@@ -186,9 +186,21 @@
     </tr>
     <tr>
       <td>2026-08</td>
+      <td>fantasy-animals-1</td>
+      <td>1</td>
+      <td>08-31 時点。16-5 効果検証（09-02）: 08-08 以降のリール 22 本の中央値は views 75.5・スキップ率 92.3%、改善傾向なし → <strong>停止を決定</strong>（セクション 6・開発レーン Phase 20-1）</td>
+    </tr>
+    <tr>
+      <td>2026-08</td>
+      <td>logic-training-1</td>
+      <td>18</td>
+      <td>08-31 時点（08-20 の 2 から 12 日で 18。月間 reach 合計は 16-12b 以降に転記）。16-5 効果検証（09-02）: 3 カット化（08-23）以降の朝・夜 15 本の中央値は views 1,731・スキップ率 50.6%・平均視聴 12.4 秒・コメント 10 件で改善傾向は明確。1 本が 33,463 views。次の改善対象（R-1 Remotion 載せ替え）</td>
+    </tr>
+    <tr>
+      <td>2026-08</td>
       <td>pref-ranking-1</td>
-      <td>0</td>
-      <td>08-10 に 17-1 テーマ Fix 完了 → 08-26 に <code>daigoro_ranking</code> を開設（17-5b）→ 同日 17-5c で在庫 14 本を配置し <strong>30 秒リール 1 日 1 回（20:00 JST）で運用開始</strong>。計測はここから</td>
+      <td>1</td>
+      <td>08-31 時点（16-5 効果検証〔09-02〕では 7 本で時期尚早。中央値 views 230・スキップ率 60.3%）。08-10 に 17-1 テーマ Fix 完了 → 08-26 に <code>daigoro_ranking</code> を開設（17-5b）→ 同日 17-5c で在庫 14 本を配置し <strong>30 秒リール 1 日 1 回（20:00 JST）で運用開始</strong>。計測はここから</td>
     </tr>
   </tbody>
 </table>
@@ -234,7 +246,7 @@
       <td><a href="../app/sets/fantasy-animals-1.html">fantasy-animals-1</a></td>
       <td><strong>検証用セット</strong>（2026-07-23 壁打ちで確定）</td>
       <td>収益化・フォロワー成長は狙わない。パイプラインの定常稼働の確認と、<strong>新機能（リール投稿等）を本番 API で試す実験台</strong>として運用する。
-      実行頻度・方式は 14-2 壁打ち（2026-07-23）で<strong>「全て動画（リール）に置換・1 日 1 回」に決定</strong>（適用は Phase 14 実装時。<a href="../app/requirements-notes-video.html">壁打ち記録</a>）</td>
+      実行頻度・方式は 14-2 壁打ち（2026-07-23）で<strong>「全て動画（リール）に置換・1 日 1 回」に決定</strong>（適用は Phase 14 実装時。<a href="../app/requirements-notes-video.html">壁打ち記録</a>）。<strong>2026-09-02 に停止を決定</strong>（下の decision。実施は開発レーン Phase 20-1）</td>
     </tr>
     <tr>
       <td><a href="../app/sets/logic-training-1.html">logic-training-1</a>（勝負セット）</td>
@@ -274,7 +286,14 @@
 
 <div class="note">
   <span class="callout-title">スクラップ&amp;ビルドとの関係</span>
-  セット廃止運用（<a href="../app/operation.html#set-retire">アプリ運用設計 セクション 2.2</a>）の初回実地検証は、fantasy-animals-1 を将来廃止する際に行う。
+  セット廃止運用（<a href="../app/operation.html#set-retire">アプリ運用設計 セクション 2.2</a>）の初回実地検証は、fantasy-animals-1 の停止（開発レーン Phase 20-1）で行う。
+</div>
+
+<div class="decision">
+  <span class="callout-title">decision: fantasy-animals-1 の停止（2026-09-02、Phase 16-5）</span>
+  16-5 効果検証（インサイト収集バッチの実データによる水準評価）で、2026-08-08 以降のリール 22 本（3 日以上経過分）の中央値が views 75.5・スキップ率 92.3%、フォロワー 1、週次でも改善傾向なしと確認されたため、ユーザーが停止を決定。
+  検証用セットとしての役目（パイプラインの定常稼働確認・リール投稿の実験台）は Phase 14 で終えており、生成 AI API の定常費がかかる唯一のセットでもあった。
+  停止は Scheduler の削除 + <code>batch_sets.is_active = 0</code> で行い、DB レコード・音源ストック・セット別設計書は残す（復活は定義の再追加で可能）。実施手順と完了条件は <a href="../plans/development-plan.html">開発レーン計画</a>の Phase 20-1、判断の元データは<a href="../plans/development-log.html">開発記録</a>の 16-5。
 </div>
 
 <h2 id="update">7. 更新ルール</h2>

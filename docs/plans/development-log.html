@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-02（確認待ちリストの導入・19-1 / 19-3 の閉じ・19-5 起票を追記）</span>
+  <span>最終更新: 2026-09-02（16-5 効果検証・16-12a 指標セット確定・fantasy-animals-1 停止決定〔Phase 20 起票〕を追記。確認待ちリストの導入・19-1 / 19-3 の閉じ・19-5 起票）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
@@ -1456,6 +1456,39 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <p><strong>(5) バックフィルの限界（16-5 への影響）</strong>: <code>media_lookback_days=90</code> で既存スナップショットと同じ <code>scheduled_at</code> を指定して実行し、未収集分のみを追加取得した。その結果、<strong>8/8 のフォーマット切替前にあたる logic-training-1 のリール 16 件（7/29〜8/03）は Instagram 上に存在せず</strong>（code 100 / subcode 33 = オブジェクト不存在。2 件を実 API で個別に確認）、自動収集できないことが判明した。fantasy-animals-1 の feed_image 13 件（7/20〜7/25）とリール 1 件も同様。<strong>原因はユーザーによるアーカイブ</strong>（削除ではない）と確認できた — アーカイブ済みメディアは Graph API から削除と同じく不存在として扱われる。この挙動は operation.html 6.2 に運用注意として明記した（収集済みスナップショットは DB に残るため、失われるのはアーカイブ以後の更新のみ）。<strong>16-7 で期待していた「自動収集データによる 8/8 前後比較」は成立しない</strong>。
 これを受けた<strong>ユーザー決定（2026-08-10）: 前後比較そのものを行わない</strong>。16-5 は「2026-08-08 以降に投稿されたリール（決定時点で 8 件）とそれ以降の投稿」を母集団とし、現行フォーマットの<strong>絶対水準と推移</strong>を評価する方針へ変更した（手動記録での前後比較にも寄せない）。理由: 切替前の数値は手動記録の断片しか残っておらず、母数も条件も揃わない比較に解釈コストを払うより、切替後のデータが自動で毎日 2 回蓄積される利点を活かすほうが速い。切替後のデータ収集には支障がないため、以後の施策評価に影響はない。計画書の 16-5 / 16-12 と operation.html 6.1 に反映済み。</p>
 <p><strong>(6) 定常運用への復帰</strong>: CDK の <code>insightsCollectionSchedulesEnabled</code> を <code>true</code> に戻して deploy し、Scheduler 4 件が <code>ENABLED</code> であることを確認した。次は <strong>16-5（効果検証。観察期間待ち）→ 16-12（指標セット確定の反映）</strong>。</p>
+</li>
+<li>
+<p>✅ <strong>16-5</strong> 効果検証（切替後データの水準評価）</p>
+<ul>
+<li>備考: 2026-09-02 実施（集計・壁打ち = Fable 5 / 判断 = ユーザー）。<code>/step 16-5</code> で着手したが、計画書どおり<strong>ユーザー判断・ゴール対象外</strong>としてゴールは立てず通常の対話で進めた（触るパスは docs のみ・確認待ちリストは該当なし）。要点:</li>
+</ul>
+<p><strong>(1) 方法</strong>: 読み取り専用の集計ランナー <code>content/insights-analysis/run_queries.py</code>（RDS Data API・<code>SELECT</code> のみ・6 クエリ）を新設し本番 Aurora を集計した。母集団は 2026-08-08 以降に success 投稿されたリール 101 本（logic-training-1 67 / fantasy-animals-1 26 / pref-ranking-1 8。各 1 本は 09-02 朝の投稿で未収集）。指標は 2 系統: <strong>最新スナップショット</strong>（投稿ごとの最終収集）と、投稿年齢をそろえる <strong>72 時間水準</strong>（<code>posted_at + 3 日</code>以降の最初のスナップショット）。成長カーブ（投稿年齢別の平均 views）で views は投稿 1〜2 日でほぼ頭打ちになることを確認し、72 時間水準を推移の比較点とした。平均は 1 本のバズ（08-16 夜の 33,463 views）で歪むため、判断は中央値で行った。出力全文は <code>content/insights-analysis/results/2026-09-02.txt</code>。<code>reels_skip_rate</code> は API 値そのままのパーセント</p>
+<p><strong>(2) logic-training-1 の水準</strong>: 3 カット化（16-4c・08-23）以降の朝・夜投稿で 3 日以上経った 15 本の中央値は <strong>views 1,731・スキップ率 50.6%・平均視聴 12.4 秒・コメント 10 件・保存 1 件・いいね 3 件</strong>。4 カット期（08-08〜08-22）の朝・夜 29 本の中央値は views 140・スキップ率 69.7%・平均視聴 5.4 秒・コメント 0 件・保存 0 件。週次の 72 時間水準ではスキップ率が 79.1% → 80.2% → 67.6% → 52.7%、平均視聴が 3.8 → 3.9 → 6.6 → 14.6 秒と単調に改善。ただし views の伸びは 08-16 の 1 本を起点にアカウントが配信に乗った効果と 3 カット化の効果が混ざっており切り分けはできない。昼スロット（フェルミ推定）は 4 カット期でスキップ率 87.6%・views 約 100 で 16-4d の停止判断を裏付けた。フォロワーは 08-20 の 2 → 09-01 の 19（M2 目安 1,000 には遠い）。特筆はコメント数で、直近の朝投稿で 39 / 28 / 24 件、アカウント日次でも 1 日 78〜89 件。クイズ形式が回答コメントを呼んでおり、保存・いいねより強いシグナル</p>
+<p><strong>(3) fantasy-animals-1 の水準</strong>: 3 日以上経った 22 本の中央値は <strong>views 75.5・スキップ率 92.3%</strong>・平均視聴 1.5 秒前後。保存・コメントはほぼゼロ、フォロワー 1。週次でも改善傾向はなく直近週はむしろ低下（72 時間水準の平均 views 36）。現行フォーマットは配信に乗っていない</p>
+<p><strong>(4) pref-ranking-1 の水準</strong>: 2 日以上経った 5 本の中央値は views 230・スキップ率 60.3%・平均視聴 8.4 秒（30 秒尺）。1 本が 3,457 views。母数が少なく時期尚早。09-01 投稿の平均視聴 110 秒は初日スナップショットの異常値として無視</p>
+<p><strong>(5) ユーザー決定（2026-09-02）</strong>: ① <strong>logic-training-1 は次の改善対象</strong>とする（上記 (2) の 3 カット期の中央値を R-1〔Remotion 載せ替え〕の効果判定ベースラインとしてセット計画書の KPI 欄に記入し、R-1-5 の着手条件〔16-5 の水準評価〕を満たした。効果確認はセット計画書の確認待ちリストへ）。② <strong>fantasy-animals-1 は停止</strong>する（検証用セットの役目は Phase 14 で終えており、定常費のかかる唯一のセット。Phase 20-1 として起票し、事業戦略書・セット計画書に決定を記録。実施は <code>infra/</code> を触るため開発レーン）。③ 「継続的に見る指標」は Claude の提案どおり確定（16-12a として記録）。④ 集計ランナーはリポジトリに置いて使い回す</p>
+<p><strong>(6) 気づき（開発レーン・設計課題リストへ）</strong>: <code>account_insights_daily.metrics</code> に <code>follows_and_unfollows</code> の内訳キーが 1 日も入っていない。16-12b の着手時に応答ログを確認する。また事業戦略書の KPI にはスキップ率・保存の数値目標が存在せず（マイルストーンのみ）、16-5 の「目標に届いているか」は絶対水準の解釈で判断した</p>
+<p><strong>(7) 反映</strong>: 計画書の 16-5 / 16-12a を完了に更新・Phase 20 起票・確認待ちリストに 20-1 の効果確認行を追加。事業戦略書 KPI 実績に 2026-08 の行（fantasy-animals-1 = 1 / logic-training-1 = 18〔08-31〕/ pref-ranking-1 = 1）を追記し fantasy-animals-1 の停止決定を decision に記録。operation.html セクション 6 に集計ランナーへの導線を追記。fantasy-animals-1 計画書は停止決定、logic-training-1 計画書は KPI 欄のベースラインと確認待ち行を追記</p>
+</li>
+<li>
+<p>✅ <strong>16-12a</strong> 指標セットの確定</p>
+<ul>
+<li>備考: 2026-09-02 実施（候補整理 = Fable 5 / 確定 = ユーザー）。16-5 の集計で実際に判断に使った指標をそのまま「継続的に見る指標セット」とした。生成カラム / ビューへの昇格・転記運用の明文化・セット計画書 KPI 欄の様式は 16-12b</li>
+</ul>
+<p><strong>確定した指標セット</strong>（参照元は <code>post_insights.metrics</code> / <code>account_insights_daily</code>）:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>区分</th><th>指標名</th><th>算出式</th><th>参照元 JSON キー / カラム</th><th>転記先</th></tr></thead>
+<tbody>
+<tr><td rowspan="5">投稿単位（リール）。基準スナップショット = <code>posted_at + 72 時間</code>以降で最初の <code>post_insights</code> 行（1 投稿 1 行）</td><td>views</td><td>そのまま（整数）</td><td><code>$.views</code></td><td rowspan="5">各セット計画書の KPI 欄に<strong>月次の本数と中央値</strong>（朝・夜などスロットが分かれるセットはスロット別も併記）。ビュー昇格は 16-12b（例: <code>v_post_kpi_72h</code>）</td></tr>
+<tr><td>スキップ率</td><td>そのまま（%。API 値がパーセント）</td><td><code>$.reels_skip_rate</code></td></tr>
+<tr><td>平均視聴秒</td><td>値 / 1000（ミリ秒 → 秒。小数 1 桁）</td><td><code>$.ig_reels_avg_watch_time</code></td></tr>
+<tr><td>コメント数</td><td>そのまま（整数）</td><td><code>$.comments</code></td></tr>
+<tr><td>保存数</td><td>そのまま（整数）</td><td><code>$.saved</code></td></tr>
+<tr><td rowspan="2">アカウント単位（日次）</td><td>フォロワー数</td><td>月末日の値（バックフィル行は NULL のため直近の非 NULL 値）</td><td><code>account_insights_daily.followers_count</code></td><td rowspan="2">事業戦略書 KPI 実績表（月次・セット別）。フォロワーは既存の列、月間 reach 合計は備考に記す（列追加は 16-12b で判断）。ビュー昇格は 16-12b（例: <code>v_account_kpi_daily</code>）</td></tr>
+<tr><td>リーチ</td><td>月間合計（日次 <code>reach</code> の和）</td><td><code>$.reach</code></td></tr>
+</tbody>
+</table></div>
+<p><strong>補助指標</strong>（集計ランナーでは出すが転記しない）: 投稿単位の reach・likes・shares、アカウント単位の views・accounts_engaged・comments・saves、成長カーブ（投稿年齢別の views）。<strong>採らない</strong>: total_interactions・reposts・ig_reels_video_view_total_time・replies・profile_links_taps（判断に使わなかった）。<strong>フォロー増減</strong>は <code>follows_and_unfollows</code> が格納されていないため（設計課題リスト 2026-09-02）、当面は followers_count の差分で見る。<strong>目標水準</strong>は置かない（事業戦略書の KPI はマイルストーン制）。各セットの改修の効果判定は「改修前の 72 時間中央値をベースラインに、悪化していないか」で行う（logic-training-1 の R-1 で初適用）</p>
 </li>
 <li>
 <p>✅ <strong>17-3</strong> データ整備・DDL 適用・初期ストック投入（第 1 バッチ 10 件）</p>

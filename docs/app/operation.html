@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
-  <span>最終更新: 2026-08-24</span>
+  <span>最終更新: 2026-09-02（セクション 6 に集計ランナーと 16-12a の指標セットへの導線を追記）</span>
 </div>
 
 <div class="note">
@@ -792,9 +792,16 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   <li><strong>閲覧者不足によるインサイト非開示（16-11 で判明）</strong>: 閲覧者が少ないメディアに対して Meta は全メトリクスを <code>(#10) Not enough viewers for the media to show insights</code> で拒否する（プライバシー閾値）。<strong>ストーリーズでは常態的に発生する</strong>ため、<code>InstagramInsightsUnavailable</code> として対象不存在と同じ WARNING スキップに分類しており失敗にはならない（ログは <code>Insights withheld below Instagram's viewer threshold</code>）。リーチが伸びれば自然に取得できるようになるため、運用上の対応は不要。<code>post_insights</code> に行が入らないことが該当メディアの記録になる</li>
 </ul>
 
+<h3 id="insights-analysis">6.3 集計ランナーと「継続的に見る指標セット」（16-5 / 16-12a・2026-09-02）</h3>
+<ul>
+  <li><strong>集計ランナー</strong>: <code>content/insights-analysis/run_queries.py</code>（読み取り専用。RDS Data API で本番 Aurora に <code>SELECT</code> のみ発行）。母集団・期間比較・週次の 72 時間水準・成長カーブ・アカウント日次の 6 クエリ。使い方・読み方の注意は同ディレクトリの README</li>
+  <li><strong>指標セット</strong>: 16-12a で確定（投稿単位 = views / reels_skip_rate / ig_reels_avg_watch_time / comments / saved の 72 時間水準、アカウント単位 = followers_count / reach の日次）。名称・算出式・参照元キー・転記先の一覧は<a href="../plans/development-log.html">開発記録</a>の 16-12a</li>
+  <li><strong>転記運用</strong>（暫定。16-12b で本節に確定版を置く）: 月初に <code>run_queries.py account_daily</code> で前月末の <code>followers_count</code> と月間 reach 合計を出し、事業戦略書 KPI 実績表へ。<code>per_post_latest</code> から前月投稿の 72 時間水準の中央値を出し、各セット計画書の KPI 欄へ。生成カラム / ビューへの昇格は 16-12b</li>
+</ul>
+
 <div class="note">
-  <span class="callout-title">継続的に見る指標セット・KPI 転記の運用は 16-5 完了後に確定（2 段階 Fix の後段）</span>
-  収集した生メトリクスのうち「継続的に見る指標セット」（生成カラム / ビューへの昇格・事業戦略書 KPI 実績表への転記手順・確認頻度）は、16-5 の手動前後比較の結論を受けて 16-12 で本セクションに追記する。それまでの分析は <code>metrics</code> JSON への直接クエリで行う。
+  <span class="callout-title">2 段階 Fix の後段（16-12b）で残っている作業</span>
+  上記指標のビュー昇格 DDL（<code>database/V011</code>）、<a href="data-model.html">data-model.html</a> セクション 4.11 の更新、本節の転記運用の確定、セット計画書 KPI 欄の様式統一。それまで本節の転記運用は暫定扱い。
 </div>
 
 <p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。<code>post_records.attempt_number</code> / <code>max_post_retries</code> に基づく再試行上限確認は、自動再試行を行わない方針への変更に伴い不採用。SNS アカウント追加手順・手動補正の記録ルール・トークン更新の考え方は本書に引き継いだ。現役の設計書ではない）</p>

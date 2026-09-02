@@ -1,0 +1,287 @@
+# 16-5 効果検証の集計出力（2026-09-02 実行。母集団 2026-08-08〜、境界 2026-08-23）
+
+
+## by_set_period_slot
+set_code           period                slot     n   avg_views  min_views  max_views  avg_skip  avg_watch_s  avg_saved  avg_likes  save_per_reach_pct
+-----------------  --------------------  -------  --  ---------  ---------  ---------  --------  -----------  ---------  ---------  ------------------
+fantasy-animals-1  a:08-08..08-22(4cut)  evening  15  84         25         122        91.047    1.8          0.07       1.00       0.08              
+fantasy-animals-1  b:08-23..(3cut)       evening  10  49         12         108        91.800    1.7          0.00       0.40       0.00              
+logic-training-1   a:08-08..08-22(4cut)  evening  15  2679       14         33463      63.433    8.4          0.47       0.80       0.03              
+logic-training-1   a:08-08..08-22(4cut)  morning  14  428        68         4322       72.929    4.8          0.07       0.57       0.02              
+logic-training-1   a:08-08..08-22(4cut)  noon     15  97         35         128        87.620    2.2          0.00       0.00       0.00              
+logic-training-1   b:08-23..(3cut)       evening  10  1845       177        4381       50.700    17.3         1.10       1.30       0.10              
+logic-training-1   b:08-23..(3cut)       morning  11  2471       124        11199      53.864    11.0         0.91       4.45       0.05              
+logic-training-1   b:08-23..(3cut)       noon     1   118        118        118        81.300    2.5          0.00       0.00       0.00              
+pref-ranking-1     b:08-23..(3cut)       evening  7   671        27         3457       63.514    24.3         0.71       2.00       0.13              
+(9 rows)
+
+## weekly_age_fixed
+set_code           week_from  n   avg_views_72h  avg_skip_72h  avg_watch_s_72h  avg_saved_72h  avg_reach_72h
+-----------------  ---------  --  -------------  ------------  ---------------  -------------  -------------
+fantasy-animals-1  08-03      2   47             86.450        2.0              0.00           44           
+fantasy-animals-1  08-10      7   89             91.871        1.6              0.00           84           
+fantasy-animals-1  08-17      7   92             92.671        2.0              0.14           86           
+fantasy-animals-1  08-24      6   36             95.083        1.2              0.00           34           
+logic-training-1   08-03      5   94             79.080        3.8              0.00           85           
+logic-training-1   08-10      21  558            80.233        3.9              0.14           349          
+logic-training-1   08-17      18  1246           67.617        6.6              0.28           902          
+logic-training-1   08-24      13  1952           52.654        14.6             1.23           1246         
+pref-ranking-1     08-24      4   1073           61.375        11.0             1.00           892          
+(9 rows)
+
+## growth_curve
+set_code           age_d  posts  avg_views  avg_skip
+-----------------  -----  -----  ---------  --------
+fantasy-animals-1  0      23     49         91.019  
+fantasy-animals-1  1      23     73         92.762  
+fantasy-animals-1  2      23     71         92.387  
+fantasy-animals-1  3      22     72         92.191  
+fantasy-animals-1  4      21     72         91.545  
+fantasy-animals-1  5      20     74         91.408  
+fantasy-animals-1  6      19     77         91.711  
+fantasy-animals-1  7      18     80         91.872  
+fantasy-animals-1  8      17     85         91.900  
+fantasy-animals-1  9      16     86         91.334  
+fantasy-animals-1  10     15     84         91.100  
+fantasy-animals-1  11     14     82         90.825  
+fantasy-animals-1  12     13     80         90.396  
+fantasy-animals-1  13     12     81         89.946  
+logic-training-1   0      61     642        68.671  
+logic-training-1   1      61     991        69.235  
+logic-training-1   2      60     1044       69.799  
+logic-training-1   3      57     1040       69.954  
+logic-training-1   4      54     1064       70.352  
+logic-training-1   5      51     1054       70.916  
+logic-training-1   6      48     993        71.424  
+logic-training-1   7      45     1068       71.630  
+logic-training-1   8      42     1053       71.924  
+logic-training-1   9      39     1148       71.829  
+logic-training-1   10     36     1116       72.477  
+logic-training-1   11     33     875        73.111  
+logic-training-1   12     30     968        73.103  
+logic-training-1   13     27     1362       72.140  
+pref-ranking-1     0      7      209        65.014  
+pref-ranking-1     1      6      719        64.842  
+pref-ranking-1     2      5      899        61.620  
+pref-ranking-1     3      4      1075       60.825  
+pref-ranking-1     4      3      289        59.183  
+pref-ranking-1     5      2      358        57.500  
+pref-ranking-1     6      1      156        60.300  
+(35 rows)
+
+## account_daily
+set_code           metric_date  followers_count  views  reach  engaged  saves  follows_json
+-----------------  -----------  ---------------  -----  -----  -------  -----  ------------
+fantasy-animals-1  2026-08-03                    29     27     1        0                  
+fantasy-animals-1  2026-08-04                    11     10     1        0                  
+fantasy-animals-1  2026-08-05                    61     59     2        0                  
+fantasy-animals-1  2026-08-06                    21     21     1        0                  
+fantasy-animals-1  2026-08-07                    33     11     1        0                  
+fantasy-animals-1  2026-08-08                    23     24     1        0                  
+fantasy-animals-1  2026-08-09   2                72     63     1        0                  
+fantasy-animals-1  2026-08-10   2                33     18     0        0                  
+fantasy-animals-1  2026-08-11   1                111    88     3        0                  
+fantasy-animals-1  2026-08-12   1                89     85     2        0                  
+fantasy-animals-1  2026-08-13   1                118    107    0        0                  
+fantasy-animals-1  2026-08-14   1                80     76     1        0                  
+fantasy-animals-1  2026-08-15   1                146    132    1        0                  
+fantasy-animals-1  2026-08-16   1                74     77     1        0                  
+fantasy-animals-1  2026-08-17   1                89     82     3        1                  
+fantasy-animals-1  2026-08-18   1                44     40     3        0                  
+fantasy-animals-1  2026-08-19   1                108    104    0        0                  
+fantasy-animals-1  2026-08-20   1                67     67     0        0                  
+fantasy-animals-1  2026-08-21   1                108    104    2        0                  
+fantasy-animals-1  2026-08-22   1                88     77     1        0                  
+fantasy-animals-1  2026-08-23   1                137    126    1        0                  
+fantasy-animals-1  2026-08-24   1                47     40     0        0                  
+fantasy-animals-1  2026-08-25   1                37     37     0        0                  
+fantasy-animals-1  2026-08-26   1                15     14     0        0                  
+fantasy-animals-1  2026-08-27   1                21     21     0        0                  
+fantasy-animals-1  2026-08-28   1                24     22     0        0                  
+fantasy-animals-1  2026-08-29   1                43     33     0        0                  
+fantasy-animals-1  2026-08-30   1                56     54     0        0                  
+fantasy-animals-1  2026-08-31   1                89     88     1        0                  
+fantasy-animals-1  2026-09-01   1                61     35     3        0                  
+logic-training-1   2026-08-03                    28     28     0        0                  
+logic-training-1   2026-08-04                    0      0      0        0                  
+logic-training-1   2026-08-05                    0      0      0        0                  
+logic-training-1   2026-08-06                    0      0      0        0                  
+logic-training-1   2026-08-07                    81     83     0        0                  
+logic-training-1   2026-08-08                    361    307    0        0                  
+logic-training-1   2026-08-09   0                151    147    0        0                  
+logic-training-1   2026-08-10   0                271    243    0        0                  
+logic-training-1   2026-08-11   0                281    256    0        0                  
+logic-training-1   2026-08-12   0                333    292    0        0                  
+logic-training-1   2026-08-13   0                285    272    0        0                  
+logic-training-1   2026-08-14   0                315    288    0        0                  
+logic-training-1   2026-08-15   0                353    316    0        0                  
+logic-training-1   2026-08-16   0                2805   1951   6        2                  
+logic-training-1   2026-08-17   0                4717   2792   7        1                  
+logic-training-1   2026-08-18   0                1739   1079   3        0                  
+logic-training-1   2026-08-19   0                1348   870    1        1                  
+logic-training-1   2026-08-20   2                1006   690    0        0                  
+logic-training-1   2026-08-21   4                2595   1885   7        2                  
+logic-training-1   2026-08-22   5                7853   5678   15       2                  
+logic-training-1   2026-08-23   8                12293  7908   33       3                  
+logic-training-1   2026-08-24   8                4163   2421   15       1                  
+logic-training-1   2026-08-25   8                6182   3714   28       9                  
+logic-training-1   2026-08-26   10               4671   2711   10       2                  
+logic-training-1   2026-08-27   14               6702   3968   25       3                  
+logic-training-1   2026-08-28   14               8060   4588   23       4                  
+logic-training-1   2026-08-29   16               11518  6376   35       2                  
+logic-training-1   2026-08-30   17               5477   3140   24       1                  
+logic-training-1   2026-08-31   18               3161   1679   17       0                  
+logic-training-1   2026-09-01   19               3017   1746   22       3                  
+pref-ranking-1     2026-08-03                    0      0      0        0                  
+pref-ranking-1     2026-08-04                    0      0      0        0                  
+pref-ranking-1     2026-08-05                    0      0      0        0                  
+pref-ranking-1     2026-08-06                    0      0      0        0                  
+pref-ranking-1     2026-08-07                    0      0      0        0                  
+pref-ranking-1     2026-08-08                    0      0      0        0                  
+pref-ranking-1     2026-08-09                    0      0      0        0                  
+pref-ranking-1     2026-08-10                    0      0      0        0                  
+pref-ranking-1     2026-08-11                    0      0      0        0                  
+pref-ranking-1     2026-08-12                    0      0      0        0                  
+pref-ranking-1     2026-08-13                    0      0      0        0                  
+pref-ranking-1     2026-08-14                    0      0      0        0                  
+pref-ranking-1     2026-08-15                    0      0      0        0                  
+pref-ranking-1     2026-08-16                    0      0      0        0                  
+pref-ranking-1     2026-08-17                    0      0      0        0                  
+pref-ranking-1     2026-08-18                    0      0      0        0                  
+pref-ranking-1     2026-08-19                    0      0      0        0                  
+pref-ranking-1     2026-08-20                    0      0      0        0                  
+pref-ranking-1     2026-08-21                    0      0      0        0                  
+pref-ranking-1     2026-08-22                    0      0      0        0                  
+pref-ranking-1     2026-08-23                    0      0      0        0                  
+pref-ranking-1     2026-08-24                    0      0      0        0                  
+pref-ranking-1     2026-08-25   0                0      0      0        0                  
+pref-ranking-1     2026-08-26   0                112    101    0        0                  
+pref-ranking-1     2026-08-27   0                291    240    1        1                  
+pref-ranking-1     2026-08-28   0                367    305    2        0                  
+pref-ranking-1     2026-08-29   1                639    524    4        1                  
+pref-ranking-1     2026-08-30   1                2879   2382   10       3                  
+pref-ranking-1     2026-08-31   1                337    263    0        0                  
+pref-ranking-1     2026-09-01   1                24     21     0        0                  
+(90 rows)
+
+## per_post_latest
+set_code           post_id  posted_jst   age_days  views  reach  skip_rate  avg_watch_s  likes  comments  saved  shares
+-----------------  -------  -----------  --------  -----  -----  ---------  -----------  -----  --------  -----  ------
+fantasy-animals-1  73       08-08 21:07  13.8      25     25     79.200     2.1          1      0         0      0     
+fantasy-animals-1  80       08-09 21:07  13.8      69     63     93.700     1.8          1      0         0      0     
+fantasy-animals-1  87       08-10 21:07  13.8      25     20     81.000     1.9          0      0         0      0     
+fantasy-animals-1  94       08-11 21:06  13.8      110    103    92.100     1.8          2      0         0      1     
+fantasy-animals-1  101      08-12 21:07  13.8      102    95     92.600     1.8          2      0         0      1     
+fantasy-animals-1  108      08-13 21:07  13.8      108    99     94.800     1.4          0      0         0      0     
+fantasy-animals-1  115      08-14 21:07  13.8      111    105    91.600     1.5          0      0         0      1     
+fantasy-animals-1  122      08-15 21:06  13.8      96     88     97.700     1.3          1      0         0      0     
+fantasy-animals-1  129      08-16 21:06  13.8      75     80     91.400     1.6          1      0         0      0     
+fantasy-animals-1  136      08-17 21:06  13.8      100    91     89.900     3.0          3      0         1      0     
+fantasy-animals-1  143      08-18 21:06  13.8      37     31     86.700     3.7          1      0         0      0     
+fantasy-animals-1  150      08-19 21:06  13.8      110    103    88.900     1.8          0      0         0      0     
+fantasy-animals-1  157      08-20 21:07  12.8      69     71     95.600     1.1          0      0         0      0     
+fantasy-animals-1  164      08-21 21:07  11.8      108    103    96.000     1.7          2      0         0      0     
+fantasy-animals-1  171      08-22 21:07  10.8      122    108    94.500     1.4          1      0         0      0     
+fantasy-animals-1  178      08-23 21:06  9.8       108    102    93.900     1.5          1      0         0      0     
+fantasy-animals-1  183      08-24 21:06  8.8       69     65     100.000    1.0          0      0         0      0     
+fantasy-animals-1  188      08-25 21:06  7.8       12     11     90.900     1.8          0      0         0      0     
+fantasy-animals-1  193      08-26 21:07  6.8       18     16     93.800     1.5          0      0         0      0     
+fantasy-animals-1  202      08-27 21:06  5.8       24     22     81.800     1.6          0      0         0      0     
+fantasy-animals-1  209      08-28 21:06  4.8       25     25     91.700     1.8          0      0         0      0     
+fantasy-animals-1  216      08-29 21:07  3.8       76     72     95.800     1.2          0      0         0      0     
+fantasy-animals-1  221      08-30 21:06  2.8       82     80     97.400     1.0          0      0         0      0     
+fantasy-animals-1  230      08-31 21:07  1.8       55     46     78.300     3.5          1      0         0      1     
+fantasy-animals-1  237      09-01 21:07  0.8       19     18     94.400     1.7          2      0         0      0     
+logic-training-1   69       08-08 13:20  13.7      99     100    93.700     2.4          0      0         0      0     
+logic-training-1   71       08-08 21:03  13.8      181    158    69.700     5.4          0      0         0      0     
+logic-training-1   74       08-09 07:34  13.9      154    131    68.700     5.6          0      0         0      0     
+logic-training-1   76       08-09 12:34  13.7      35     35     90.600     2.4          0      0         0      0     
+logic-training-1   78       08-09 21:03  13.8      14     12     54.500     6.2          0      0         0      0     
+logic-training-1   81       08-10 07:33  13.9      115    110    79.600     2.7          0      0         0      0     
+logic-training-1   83       08-10 12:33  13.2      62     64     95.000     1.4          0      0         0      0     
+logic-training-1   85       08-10 21:04  13.8      123    106    63.800     5.3          0      0         0      0     
+logic-training-1   88       08-11 07:33  13.9      107    104    81.200     2.4          0      0         0      0     
+logic-training-1   90       08-11 12:33  12.2      53     48     89.100     1.8          0      0         0      0     
+logic-training-1   92       08-11 21:04  13.8      119    105    86.700     3.2          0      0         0      0     
+logic-training-1   95       08-12 07:33  13.9      68     68     86.200     2.4          0      0         0      0     
+logic-training-1   97       08-12 12:33  11.2      104    104    91.300     1.6          0      0         0      0     
+logic-training-1   99       08-12 21:03  13.8      146    115    69.300     6.8          0      0         0      0     
+logic-training-1   102      08-13 07:33  13.9      77     70     72.500     4.0          0      0         0      0     
+logic-training-1   104      08-13 12:34  10.2      112    113    80.600     2.5          0      0         0      0     
+logic-training-1   106      08-13 21:04  13.8      110    110    68.300     3.7          0      0         0      0     
+logic-training-1   109      08-14 07:34  13.9      116    108    72.600     3.1          0      0         0      0     
+logic-training-1   111      08-14 12:33  9.2       114    107    84.000     2.5          0      0         0      0     
+logic-training-1   113      08-14 21:04  13.8      121    109    84.000     3.6          0      0         0      0     
+logic-training-1   116      08-15 07:33  13.9      125    114    73.900     3.5          0      0         0      0     
+logic-training-1   118      08-15 12:33  8.2       111    105    91.400     1.9          0      0         0      0     
+logic-training-1   120      08-15 21:04  13.8      141    117    76.700     4.8          0      0         0      0     
+logic-training-1   123      08-16 07:34  13.9      177    142    68.600     6.0          0      0         0      0     
+logic-training-1   125      08-16 12:33  7.2       93     105    94.400     1.4          0      0         0      0     
+logic-training-1   127      08-16 21:04  13.8      33463  17232  46.200     23.1         7      20        5      1     
+logic-training-1   130      08-17 07:33  13.9      123    116    81.700     3.2          0      0         0      0     
+logic-training-1   132      08-17 12:33  6.2       111    106    80.200     3.0          0      0         0      0     
+logic-training-1   134      08-17 21:03  13.8      67     48     60.000     7.9          0      2         0      0     
+logic-training-1   137      08-18 07:34  13.9      140    122    71.200     4.1          0      0         0      0     
+logic-training-1   139      08-18 12:33  5.2       106    106    89.100     2.6          0      0         0      0     
+logic-training-1   141      08-18 21:03  13.8      154    120    56.300     7.2          0      1         0      0     
+logic-training-1   144      08-19 07:34  13.9      138    135    71.300     4.6          0      2         0      0     
+logic-training-1   146      08-19 12:33  4.2       101    115    89.500     2.1          0      0         0      0     
+logic-training-1   148      08-19 21:03  13.8      644    428    43.100     12.6         0      4         0      0     
+logic-training-1   151      08-20 07:33  13.4      173    138    66.200     6.8          0      0         0      0     
+logic-training-1   153      08-20 12:33  3.2       118    111    73.800     3.2          0      0         0      0     
+logic-training-1   155      08-20 21:04  12.8      205    130    69.900     12.4         0      4         1      0     
+logic-training-1   158      08-21 07:33  12.4      158    127    72.800     9.0          0      5         0      0     
+logic-training-1   160      08-21 12:33  2.2       103    109    87.800     1.9          0      0         0      0     
+logic-training-1   162      08-21 21:04  11.8      280    217    53.400     8.6          0      2         0      0     
+logic-training-1   165      08-22 07:34  11.4      4322   3335   54.500     9.9          8      10        1      0     
+logic-training-1   167      08-22 12:34  1.2       128    114    83.800     2.2          0      0         0      0     
+logic-training-1   169      08-22 21:03  10.8      4415   2921   49.600     15.4         5      10        1      0     
+logic-training-1   172      08-23 07:33  10.4      11199  7697   55.200     11.5         16     29        3      0     
+logic-training-1   174      08-23 15:53  0.1       118    111    81.300     2.5          0      0         0      0     
+logic-training-1   176      08-23 21:03  9.8       1328   982    42.100     10.4         0      6         0      0     
+logic-training-1   179      08-24 07:33  9.4       134    122    68.300     4.0          0      2         0      0     
+logic-training-1   181      08-24 21:03  8.8       199    135    62.900     12.2         0      2         1      0     
+logic-training-1   184      08-25 07:33  8.4       3048   2314   52.800     15.3         3      20        2      0     
+logic-training-1   186      08-25 21:04  7.8       4381   2291   48.500     30.7         3      9         6      0     
+logic-training-1   189      08-26 07:33  7.4       579    438    54.400     9.1          3      12        0      0     
+logic-training-1   191      08-26 21:04  6.8       197    166    63.100     5.1          0      2         0      0     
+logic-training-1   196      08-27 07:33  6.4       1731   1161   46.900     12.5         7      10        2      0     
+logic-training-1   200      08-27 21:04  5.8       4191   2490   46.600     24.3         4      6         1      0     
+logic-training-1   203      08-28 07:33  5.4       4229   2707   46.600     14.7         6      22        1      0     
+logic-training-1   207      08-28 21:04  4.8       2211   1164   37.600     29.1         2      14        1      0     
+logic-training-1   210      08-29 07:34  4.4       852    593    49.800     15.7         3      16        1      0     
+logic-training-1   214      08-29 21:03  3.8       216    155    51.900     9.8          0      2         0      0     
+logic-training-1   217      08-30 07:34  3.4       3976   2741   50.600     12.4         6      24        1      0     
+logic-training-1   222      08-30 21:10  2.8       3453   1880   44.400     22.1         3      10        1      0     
+logic-training-1   224      08-31 07:34  2.4       929    661    47.700     12.2         2      39        0      0     
+logic-training-1   228      08-31 21:03  1.8       2095   1503   48.400     10.9         1      28        0      0     
+logic-training-1   231      09-01 07:33  1.4       375    290    57.600     8.6          3      14        0      0     
+logic-training-1   235      09-01 21:03  0.8       177    118    61.500     18.5         0      2         1      0     
+logic-training-1   238      09-02 07:34  0.4       124    109    62.600     4.8          0      0         0      0     
+pref-ranking-1     194      08-26 23:21  6.8       156    133    60.300     7.5          0      0         0      0     
+pref-ranking-1     198      08-27 20:04  5.9       560    457    54.700     19.5         3      0         1      0     
+pref-ranking-1     205      08-28 20:04  4.9       155    125    62.100     8.4          0      0         0      0     
+pref-ranking-1     212      08-29 20:03  3.9       3457   2880   60.300     9.9          9      0         3      0     
+pref-ranking-1     219      08-30 20:03  2.9       230    198    59.500     8.3          2      0         1      0     
+pref-ranking-1     226      08-31 20:03  1.9       109    99     72.700     5.4          0      0         0      0     
+pref-ranking-1     233      09-01 20:03  0.9       27     20     75.000     110.8        0      0         0      0     
+(98 rows)
+
+## 中央値（per_post_latest から算出）
+LT 4cut 朝夜 views                   n=29 median=   140.0 mean=  1592.3 min=   14.0 max= 33463.0
+LT 3cut 朝夜 age>=3d views           n=15 median=  1731.0 mean=  2564.7 min=  134.0 max= 11199.0
+LT 4cut 朝夜 skip_rate               n=29 median=    69.7 mean=    68.0 min=   43.1 max=    86.7
+LT 3cut 朝夜 age>=3d skip_rate       n=15 median=    50.6 mean=    51.8 min=   37.6 max=    68.3
+LT 4cut 朝夜 avg_watch_s             n=29 median=     5.4 mean=     6.7 min=    2.4 max=    23.1
+LT 3cut 朝夜 age>=3d avg_watch_s     n=15 median=    12.4 mean=    14.5 min=    4.0 max=    30.7
+LT 4cut 朝夜 comments                n=29 median=     0.0 mean=     2.1 min=    0.0 max=    20.0
+LT 3cut 朝夜 age>=3d comments        n=15 median=    10.0 mean=    11.7 min=    2.0 max=    29.0
+LT 4cut 朝夜 saved                   n=29 median=     0.0 mean=     0.3 min=    0.0 max=     5.0
+LT 3cut 朝夜 age>=3d saved           n=15 median=     1.0 mean=     1.3 min=    0.0 max=     6.0
+LT 4cut 朝夜 likes                   n=29 median=     0.0 mean=     0.7 min=    0.0 max=     8.0
+LT 3cut 朝夜 age>=3d likes           n=15 median=     3.0 mean=     3.5 min=    0.0 max=    16.0
+FA age>=3d views                   n=22 median=    75.5 mean=    72.7 min=   12.0 max=   122.0
+FA age>=3d skip_rate               n=22 median=    92.3 mean=    91.5 min=   79.2 max=   100.0
+PR age>=2d views                   n= 5 median=   230.0 mean=   911.6 min=  155.0 max=  3457.0
+PR age>=2d skip_rate               n= 5 median=    60.3 mean=    59.4 min=   54.7 max=    62.1
+PR age>=2d avg_watch_s             n= 5 median=     8.4 mean=    10.7 min=    7.5 max=    19.5

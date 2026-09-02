@@ -13,7 +13,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-02（19-5 完了で Phase 19 完了: /step・補充スキル 2 本・/idea に確認待ちリストの照合と起票ルールを組み込み。確認待ちリストを新設し 19-1・19-3 を作業完了で閉じる。19-4 完了: ステップ単位を「人間ゲート間の 1 ゴール」へ改訂・16-12 を 16-12a / b に分割。19-2 は 19-4 の実行で初回試行を完了。19-1・19-3 は初回試行待ち）</span>
+  <span>最終更新: 2026-09-02（16-5・16-12a 完了〔現行フォーマットの水準評価・指標セット確定〕・fantasy-animals-1 の停止決定で Phase 20 を起票。19-5 完了で Phase 19 完了: /step・補充スキル 2 本・/idea に確認待ちリストの照合と起票ルールを組み込み。確認待ちリストを新設し 19-1・19-3 を作業完了で閉じる。19-4 完了: ステップ単位を「人間ゲート間の 1 ゴール」へ改訂・16-12 を 16-12a / b に分割。19-2 は 19-4 の実行で初回試行を完了。19-1・19-3 は初回試行待ち）</span>
 </div>
 
 <div class="note">
@@ -91,6 +91,7 @@
 <tr><td>16-5 効果検証</td><td>Opus 5 / high（指標の解釈で詰まったら Fable 5 へ切替）</td><td>なし（インサイト画面の目視のため委譲不向き）</td></tr>
 <tr><td>16-12a 指標セットの確定（16-5 完了後・ユーザー判断）</td><td><strong>Fable 5</strong> / デフォルト（候補整理の壁打ち）</td><td>なし</td></tr>
 <tr><td>16-12b 指標セット確定の反映（16-12a 完了後）</td><td>Opus 5 / high</td><td>terra / high（昇格 DDL・ビュー生成のみ）</td></tr>
+<tr><td>20-1 fantasy-animals-1 の停止（16-5 の決定を受けて 2026-09-02 起票）</td><td>Opus 5 / high</td><td>なし（CDK の Scheduler 削除 3 件と設計書更新のみ）</td></tr>
 <tr><td>Phase XX（プラットフォーム展開）調査・着手判断</td><td><strong>Fable 5</strong> / デフォルト</td><td>—</td></tr>
 <tr><td>19-1 CodePipeline 完走待ちの <code>/goal</code> 化</td><td>Opus 5 / high（CLAUDE.md 1 行 + 初回試行）</td><td>なし</td></tr>
 <tr><td>19-2 <code>/step</code> スキル新設</td><td><strong>Fable 5</strong> / high（スキル本文の設計と実機確認）</td><td>なし（スキル本文は判断を伴うため）</td></tr>
@@ -119,11 +120,7 @@
 <li>✅ <strong>16-4c</strong> 動画構成の見直し — 2026-08-23。4 カット → 3 カット・つかみ帯・ズーム廃止。全 63 本を再ビルド・再配置</li>
 <li>✅ <strong>16-4d</strong> 昼スロット（フェルミ推定）の当分停止 — 2026-08-24。noon Scheduler を CDK ごと DISABLED 化・資材は凍結残置・補充対象は朝・夜のみへ（廃止ではなく当分停止。再開判断は将来）</li>
 <li>✅ <strong>16-4e</strong> イラストプロンプトの文字禁止の緩和（提示物問題への対応） — 2026-09-02。<code>_build_illustration_prompt</code> の定型文を「情景で明示的に指定された文字・数字は指定どおりの字形で正確に描く / 指定されていない文字・数字・記号は描かない」へ変更（<a href="../app/generators/gpt-quiz-multicut.html#illustration">gpt-quiz-multicut セクション 6</a> の decision）。プロンプトの手作業書き換えが不要になった。<strong>16-1 の実行時生成を休止解除する際は混入率を再評価</strong></li>
-<li>⬜ <strong>16-5</strong> 効果検証（切替後データの水準評価）— <strong>ユーザー判断・ゴール対象外</strong>（インサイト画面の目視と水準の解釈が本体のため <code>/step</code> でゴール化しない。Claude は集計クエリと壁打ちの補助のみ）
-  <ul>
-  <li>内容: <strong>2026-08-10 のユーザー決定で「切替前との前後比較はしない」方針に変更</strong>（切替前の投稿がアーカイブ済みで Graph API から読めず、自動収集データでの比較が成立しないため。経緯は<a href="development-log.html">開発記録</a>の 16-11 (5) を参照）。<strong>2026-08-08 以降に投稿されたリールとそれ以降の投稿を母集団</strong>として、スキップ率・視聴維持・保存・フォロワーの水準と推移を評価し、事業戦略書の KPI 実績へ記録する。前後比較の代わりに「現行フォーマットの絶対水準が目標に届いているか」「投稿を重ねて改善傾向にあるか」を判断材料にする。視聴維持カーブと View Rate は API 非対応のためアプリ画面での目視（16-6 の分担）。ここで「継続的に見たい指標」を確定し、16-12 の入力とする</li>
-  <li>留意（2026-08-28 追記）: 16-4c（3 カット化・2026-08-23）と 16-4d（昼停止・2026-08-24）でフォーマットが直近に変わっているため、現行フォーマットの水準評価は 9 月上旬以降にデータが 1.5〜2 週間たまってからが筋が良い（Phase 18 の壁打ちでの整理）</li>
-  </ul></li>
+<li>✅ <strong>16-5</strong> 効果検証（切替後データの水準評価）— 2026-09-02。<strong>ユーザー判断</strong>（Claude は集計と壁打ち）。2026-08-08 以降のリール 101 本（logic-training-1 67 / fantasy-animals-1 26 / pref-ranking-1 8）を母集団に、最新スナップショットと 72 時間水準で評価。<strong>logic-training-1</strong>: 3 カット化（08-23）以降の朝・夜の中央値は views 1,731・スキップ率 50.6%・平均視聴 12.4 秒・コメント 10 件（4 カット期は 140・69.7%・5.4 秒・0 件）で改善傾向は明確、フォロワーは 19（09-01）→ <strong>次の改善対象とする</strong>（R-1 の着手条件を満たした。ベースラインは<a href="logic-training-1.html">セット計画書</a>の KPI 欄）。<strong>fantasy-animals-1</strong>: スキップ率中央値 92.3%・views 75・フォロワー 1 で改善傾向なし → <strong>停止を決定</strong>（Phase 20 を起票）。<strong>pref-ranking-1</strong>: 7 本で時期尚早（中央値 views 230・スキップ率 60.3%）。集計ランナーは <code>content/insights-analysis/</code> に配置（読み取り専用・再実行可）。前後比較は行わない方針（2026-08-10）のまま、水準の評価で閉じた。詳細は<a href="development-log.html">開発記録</a>の 16-5</li>
 </ul>
 
 <h3>後段ブロック: インサイト収集バッチ</h3>
@@ -135,14 +132,8 @@
 <li>✅ <strong>16-9</strong> insights-batch アプリ実装 — 2026-08-10。<code>services/insights-batch/</code> + shared 昇格 2 モジュールを新設（v25.0 ピン留め・メトリクス束ね + 自動縮退）</li>
 <li>✅ <strong>16-10</strong> インフラ実装・デプロイ — 2026-08-10。InsightsBatchStack 新設・本番デプロイ済み（TaskDef・SFN・Scheduler 4 件・CI/CD）</li>
 <li>✅ <strong>16-11</strong> 再認可・稼働確認・バックフィル — 2026-08-10。<code>instagram_manage_insights</code> 再認可・リール 25 投稿 + 日次 90 日 × 2 アカウントを収集し定常運用入り</li>
-<li>⬜ <strong>16-12a</strong> 指標セットの確定（<strong>16-5 完了後・ユーザー判断・ゴール対象外</strong>。19-4 で旧 16-12 を確定 / 反映に分割）
-  <ul>
-  <li>内容: 16-5 の評価結果から「継続的に見る指標セット」（生成カラム / ビューへ昇格する指標・事業戦略書 KPI 実績表へ転記する指標・各セット計画書の KPI 欄に置く指標）をユーザーが確定する（2 段階 Fix の後段の判断部分）。Claude は <code>post_insights</code> / <code>account_insights_daily</code> の JSON キーから候補を整理し壁打ちに付き合うのみ</li>
-  <li>完了条件: 確定した指標セット（名称・算出式・参照元 JSON キー・転記先）を<a href="development-log.html">開発記録</a>に記録</li>
-  <li>人間ゲート: 本ステップ全体（設計判断）</li>
-  <li>停止点・上限: —（ゴールにしない）</li>
-  </ul></li>
-<li>⬜ <strong>16-12b</strong> 指標セット確定の反映（<strong>16-12a 完了後</strong>・1 ゴール）
+<li>✅ <strong>16-12a</strong> 指標セットの確定 — 2026-09-02（<strong>ユーザー判断</strong>。19-4 で旧 16-12 を確定 / 反映に分割）。投稿単位（リール・72 時間水準）= views / reels_skip_rate / ig_reels_avg_watch_time / comments / saved の 5 指標、アカウント単位（日次）= followers_count / reach の 2 指標を「継続的に見る指標セット」として確定。転記先は投稿単位 → 各セット計画書の KPI 欄（月次中央値）、アカウント単位 → 事業戦略書 KPI 実績表（月末フォロワー・月間 reach）。名称・算出式・参照元 JSON キー・転記先の一覧は<a href="development-log.html">開発記録</a>の 16-12a。生成カラム / ビューへの昇格と転記運用の明文化は 16-12b</li>
+<li>⬜ <strong>16-12b</strong> 指標セット確定の反映（<strong>16-12a は 2026-09-02 完了・着手可</strong>・1 ゴール。<code>/step 16-12b</code> で起動）
   <ul>
   <li>内容: 16-12a で確定した指標の生成カラム / ビューへの昇格 DDL（<code>database/V011</code>）と <a href="../app/data-model.html">data-model.html</a> セクション 4.11 の更新、KPI 転記運用の追記（<a href="../app/operation.html">operation.html</a> セクション 6・事業戦略書 KPI 実績表との接続）、<strong>各セット計画書の KPI 欄を埋める（Phase 18 で枠のみ先行設置済み）</strong>。以後の日常の KPI 観察はセットレーンへ移る</li>
   <li>完了条件: DDL がローカル MySQL（<code>acps-mysql</code>・<code>--default-character-set=utf8mb4</code>）で適用でき、適用結果とカラム / ビュー定義の出力を会話に貼る。設計書 3 本（data-model・operation・事業戦略書）とセット計画書 3 本の更新、変更 HTML のタグ対応・ローカルリンクの機械チェック通過、日本語メッセージでコミット</li>
@@ -189,6 +180,21 @@
 
 <hr>
 
+<h2>Phase 20: fantasy-animals-1 の停止</h2>
+<p><strong>ゴール</strong>: fantasy-animals-1 の自動投稿・インサイト収集・生成 AI API の定常費を止め、資材とデータは残置する（<a href="../app/operation.html#set-retire">運用設計 2.2 セット廃止</a>の初回実地検証を兼ねる）</p>
+<blockquote>2026-09-02 の 16-5 効果検証で、切替後 26 本のスキップ率中央値 92.3%・views 中央値 75・フォロワー 1 と改善傾向なしが確認され、ユーザーが停止を決定。検証用セット（<a href="../strategy/business-strategy.html#portfolio">事業戦略書セクション 6</a>）としての役目（パイプラインの定常稼働確認・リール投稿の実験台）は Phase 14 で果たし終えている。決定の経緯は<a href="development-log.html">開発記録</a>の 16-5。</blockquote>
+<ul>
+<li>⬜ <strong>20-1</strong> fantasy-animals-1 の停止（1 ゴール。<code>/step 20-1</code> で起動）
+  <ul>
+  <li>内容: ① CDK から fantasy-animals-1 の Scheduler 3 件（<code>image-batch-stack.ts</code> の 21:00 画像生成 1 件・<code>insights-batch-stack.ts</code> の 06:00 / 18:00 インサイト収集 2 件）を削除する（16-4d の noon のような DISABLED 化ではなく削除。復活時は定義の再追加で足りる）。② <code>batch_sets.is_active = 0</code> の UPDATE 文を用意し、ローカル MySQL に適用・Aurora 向けは文の提示まで。insights-batch も <code>is_active = 0</code> のセットをスキップするため、最終投稿から 14 日の追跡ウィンドウは打ち切りになる（許容。残す場合はユーザーが UPDATE を 14 日遅らせる）。③ <a href="../app/sets/fantasy-animals-1.html">セット別設計書</a>に停止バッジ・停止日を付与、<a href="fantasy-animals-1.html">セット計画書</a>のステータスを停止へ、事業戦略書のセクション 3（予算 月 1,000 円前後 → 0 円）・セクション 6（位置づけ）を更新、運用設計 2.2 に初回実地の気づきがあれば追記。DB レコード・音源ストックは削除しない</li>
+  <li>完了条件: <code>infra/</code> で jest 全パスと <code>cdk synth -c env=prod ImageBatchStack InsightsBatchStack</code> 成功（要約行を貼る）、<code>cdk diff</code> の要約に Scheduler 3 件の削除以外の差分がないこと（既知のイメージタグ差分を除く）、ローカル MySQL で UPDATE 後の <code>SELECT set_code, is_active FROM batch_sets</code> の出力を貼る、設計書・計画書・事業戦略書の更新、日本語メッセージでコミット（<code>infra/</code> を触るため push は差分確認後）</li>
+  <li>人間ゲート: ゴール終了後に差分確認 → push → <code>cdk deploy -c env=prod ImageBatchStack InsightsBatchStack</code>（イメージタグ 3 つの Context 指定）→ Aurora へ UPDATE 適用（ユーザー）。停止の効果確認は確認待ちリストへ</li>
+  <li>停止点・上限: コミットまで。cdk deploy・Aurora 更新は行わない。stop after 20 turns</li>
+  </ul></li>
+</ul>
+
+<hr>
+
 <h2>トラブルシューティングログ</h2>
 <p>開発・基盤の横断的な問題と解決策を記録する。<strong>セット固有の稼働トラブル（事象の記録）は各セット記録（<code>docs/plans/&lt;set&gt;-log.html</code>）へ</strong>、恒久対策の課題は本書の設計課題リストへ記録する（Phase 18 で二分。logic-training-1 の 2026-08-06・2026-08-23 の事象は <a href="logic-training-1-log.html">logic-training-1 記録</a>へ移設済み）。</p>
 <div class="table-wrap"><table>
@@ -206,6 +212,7 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-09-02 / 19-1 CodePipeline 完走待ちの <code>/goal</code> 化（初回試行）</td><td>次に <code>services/</code> <code>shared/</code> を触るコミットを push したとき</td><td>① push 直後に Claude が CLAUDE.md の D 定型行（<code>&lt;sha&gt;</code> 置換済み）を提示するか ② ユーザーが打った <code>/goal</code> の evaluator が、貼られた aws cli 出力（パイプラインの Succeeded・タスク定義の新リビジョン）から到達を判定して止まるか ③ 15 ターン以内に収まるか</td><td>提示されない → CLAUDE.md の文言を直す。判定できない → 定型行の証跡指定（貼らせる出力）を具体化する。いずれも設計課題リストではなく Phase 19 の追補ステップとして起こす</td><td>—</td></tr>
+<tr><td>2026-09-02 / 20-1 fantasy-animals-1 の停止（効果確認）</td><td>20-1 の deploy と Aurora の UPDATE を適用した翌日 21:00 JST 以降</td><td>① fantasy-animals-1 の 21:00 投稿が起きていない（<code>posts</code> に新規行なし・Instagram に新規投稿なし）② 画像生成 SFN が fantasy-animals-1 で起動していない（EventBridge Scheduler 一覧に fantasy-animals-1 の名前がない）③ インサイト収集 SFN の 06:00 / 18:00 実行が他セット分だけで成功している</td><td>投稿が起きている → deploy 未反映か Scheduler の削除漏れ。20-1 の追補ステップとして起こす。インサイト収集が失敗する → 収集バッチの <code>is_active = 0</code> の扱いを確認し設計課題リストへ</td><td>—</td></tr>
 </tbody>
 </table></div>
 
@@ -230,6 +237,7 @@
 <tr><td>2026-08-23</td><td>docs/app/operation.html, docs/infra/workflow.html</td><td>投稿対象の決定が「終端状態の posts を持たない最古の generation_run」であるため、<strong>リールが <code>failed</code> になった直後の SFN Retry は「対象なし」と判定して 0 件処理で正常終了する</strong>。結果として Step Functions 実行は SUCCEEDED になり、SFN 失敗アラームでは投稿の欠番に気づけない（2026-08-23 の事象では ECS タスク異常終了通知だけが手がかりだった）。<code>batch_execution_logs</code> に <code>records_processed=0</code> は残るが、これを見る運用・アラームがない</td><td><code>batch_execution_logs</code> の <code>records_processed=0</code>（かつ当日の投稿 success が 0 件）を検知する仕組み（CloudWatch カスタムメトリクス、または ECS タスク異常終了通知の受信時チェック手順の明文化）を検討する。当面は <strong>ECS タスク異常終了通知を受けたら投稿の成否を必ず確認する</strong>運用で代替する（2026-07-07 の stale データ検知・2026-07-25 のバックログ滞留と同じ「可視化がない」系の課題であり、まとめて扱う）</td><td>未定（発生頻度を見て判断。可視化の枠組みは 2026-07-07 の項と合わせて検討）</td></tr>
 <tr><td>2026-08-28</td><td>infra/（bin/infra.ts <code>SUPPORTED_ENVS</code>）, docs/infra/architecture.html</td><td>ステージング環境の要否を検討した（アイデア「ウミガメのスープ」の壁打ちに付随）。<strong>結論: フルのステージング環境（Aurora・ECS・SFN・パイプラインの 2 面化）は現時点では作らない</strong>。理由: ①日次バッチ構成のため障害の影響半径が小さく（最悪でも当日 1 投稿の欠落・翌日回復可）、最重要のコンテンツ品質リスクは事前ビルド + 全数人間レビューで別レイヤーで担保済み ②ソロ運用での 2 面同期・二重デプロイの維持コストと、月 2 万円予算・探索期に固定費を積まない方針に不釣り合い ③検証で最も不安な Instagram 境界は AWS 複製では再現できない</td><td>再検討トリガーは 3 点: ①収益発生により prod 停止が実害になったとき ②AdminApiStack 等の常時稼働・ユーザー向けコンポーネント導入時 ③複数プラットフォーム展開でリリース頻度が上がったとき。CDK は envName でパラメータ化済みのため、導入時は <code>SUPPORTED_ENVS</code> への追加で立ち上げる。<strong>例外</strong>: ウミガメのスープのコメント自動返信（外向き発信・イングレスを持つ初の機能）は、PoC 資材（テスト用 Meta アプリ + テスト用 Instagram アカウント + 最小 Lambda）を使い捨てにせず、採用後も当該経路専用のステージング面として恒久利用する（アイデア詳細: <a href="../ideas/umigame-soup-set.html">umigame-soup-set.html</a>）</td><td>トリガー 3 点のいずれか発生時に再検討</td></tr>
 <tr><td>2026-09-02</td><td>docs/plans/index.html（並行作業ルール）</td><td>開発レーンを常に 1 セッションに絞る理由の一つが「push 後の CodePipeline 完走確認の混線防止」だが、Phase 19-1 で完走確認が <code>/goal</code> により確実になれば、この制約を緩和できる可能性がある（アイデア壁打ち 2026-09-02 で指摘）</td><td>19-1 の初回試行が安定した後、開発レーンの並行可否（少なくとも docs のみの作業の並行）を再検討する。緩和する場合は index.html セクション 2・3 と CLAUDE.md の並行作業ルールを同時に改訂する</td><td>19-1 安定後</td></tr>
+<tr><td>2026-09-02</td><td><code>services/insights-batch/app/metrics_catalog.py</code>, <code>insights_api.py</code>, <code>docs/app/data-model.html</code> セクション 4.11</td><td>16-5 の集計で、<code>account_insights_daily.metrics</code> に <code>follows_and_unfollows</code>（<code>breakdown=follow_type</code>）のキーが 1 日も入っていないことが判明（実データのキーは views / reach / accounts_engaged / total_interactions / likes / comments / saves / shares / replies / profile_links_taps の 10 個）。breakdown 付き要求の応答が正規化で落ちているのか API が返していないのかは未確認。フォロー増減は <code>followers_count</code> の日次差分でしか追えない</td><td>16-12b の着手時に CloudWatch Logs で breakdown 要求の応答を確認する。取得できているなら正規化（<code>insights_api.py</code>）を直す。API が返していないなら定数から外し、data-model 4.11 に「フォロー増減は followers_count の差分で見る」を明記する</td><td>16-12b</td></tr>
 </tbody>
 </table></div>
 
