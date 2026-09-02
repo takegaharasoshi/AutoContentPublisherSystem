@@ -13,7 +13,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-08-28（Phase 18 で新設）</span>
+  <span>最終更新: 2026-09-02（改修 R-1 を起票）</span>
 </div>
 
 <div class="note">
@@ -42,7 +42,56 @@
 </table></div>
 
 <h2>3. 進行中ステップ</h2>
-<p>なし（週次補充の定常運用のみ）。</p>
+
+<h3>改修 R-1: 動画レンダラーの Remotion 載せ替え（全編モーション + 上部余白の見直し）</h3>
+<p>
+  起票 2026-09-02（アイデア体系の壁打ち 5 巡を経て採用。経緯・維持カーブの読み・棄却した線は <a href="../ideas/logic-training-remotion-rebuild.md">logic-training-remotion-rebuild.md</a> が正）。
+  <strong>ねらい</strong>: 現行動画（Pillow 組版 + ffmpeg 合成。7 版面中 5 枚が完全静止・動きはコーチのバウンド 2 箇所のみ）を、pref-ranking-1 で実証済みの Remotion に載せ替え、<strong>どのフレームも生きている</strong>動画にする。視聴者は 16 秒で解けず<strong>ループして見る</strong>という行動仮説が土台で、ループ先頭 0〜7 秒の完全静止の解消を最優先とする。期待効果は 16 秒全体に一定勾配で散っている損失の減少と、コメント率・いいね率の向上。
+  <strong>根拠</strong>: 視聴維持カーブ 3 本の目視（2026-09-02）で 0〜2 秒の崖はなく（0:02 で約 70%）、0:06 で 40〜47%・0:16 で 20〜32% まで一定勾配で減る。8 秒（tick）・13 秒（chime）のイベントに変曲点は出ていない。冒頭フック用途ではなく全編の品質・ペーシング用途と位置づける。
+  <strong>不変条件</strong>: 16 秒・3 カット・SE タイミング（tick 8.0 秒 / chime 13.0 秒）・BGM と SE のミックス設計・「答えはキャプションで開示」の情報設計・イラスト（既存の <code>&lt;content_key&gt;_illustration.png</code> を再利用）は変更しない。変えるのはレンダラー・カット内の動き・上部の余白だけ。TTS は入れない。
+  <strong>投入方針</strong>: 段階ビルド（補充バッチだけ新版面の混在投稿）は<strong>行わない</strong>（ユーザー判断 2026-09-02）。プロトタイプで目視判断 → 在庫を全数一括で再ビルド・差し替える。本番投入は <strong>16-5 効果検証〔開発レーン〕の水準評価を済ませてから</strong>とし、投入日をセット記録に残す。
+</p>
+<div class="table-wrap"><table>
+<thead><tr><th>ステップ</th><th>内容</th><th>完了条件</th><th>状態</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>R-1-1</strong><br>ループ仮説の確認（ユーザー）</td>
+  <td>Instagram アプリのリールインサイトで直近投稿 3 本以上の<strong>平均再生時間</strong>を見る。16 秒（動画尺）を超えていればループが実証される。再生回数・replays 系の指標は Graph API から廃止済みで insights-batch では取れないため、アプリ目視が唯一の手段。R-1-2 の着手はブロックしない（結果はプロトタイプの重み付け〔ループ継ぎ目をどこまで重視するか〕に使う）</td>
+  <td>平均再生時間の値（3 本以上）がセット記録に残っている</td>
+  <td>未着手</td>
+</tr>
+<tr>
+  <td><strong>R-1-2</strong><br>プロトタイプ（既存 1 問）</td>
+  <td><code>content/video-build/logic-training-1/remotion/</code> に Remotion コンポジションを新設し、既存 1 問（ビルド済み・イラストあり）で 16 秒版を試作する。レンダリング環境は pref-ranking-1 の <code>Dockerfile.render</code> と <code>build.py</code> の <code>_render()</code>（Docker 経由 <code>npx remotion render</code>）を流用。<strong>動きの内容</strong>: ① コーチの常時浮遊（pref-ranking-1 型。<strong>周期は 480 フレームの約数</strong>にしてループ継ぎ目で位相が飛ばないようにする）② つかみ帯の動き（目立たせる。可読性優先） ③ 問題文の読む速さに合わせた段階表示 ④ 3〜8 秒の「考える」ビート ⑤ 8〜13 秒のカウントダウン（数字のスケール・リング進行・tick 同期のパルス） ⑥ 13〜16 秒の誘導強調。<strong>版面</strong>: 上部（時間帯ピル・つかみ帯・見出し・問題文）は左右対称の余白で使い切り、Instagram UI の右 12% 予約は下部（イラスト・コーチ・吹き出し）だけに残す高さ依存のセーフエリアへ変える。<strong>音声</strong>は現行の ffmpeg ミックス（BGM LRU + SE 固定ディレイ）を維持し Remotion は映像のみ出力する（Remotion 側で鳴らすかは試作時に判断。SE タイミングは不変）</td>
+  <td>1 問の MP4 が出力され、現行版と並べて再生できる。<code>tsc --noEmit</code> が通る</td>
+  <td>未着手</td>
+</tr>
+<tr>
+  <td><strong>R-1-3</strong><br>プレビュー確認（ユーザー判断 = R-1-4 以降の go / no-go）</td>
+  <td>プロトタイプを実機（スマホ）でループ再生して確認する。観点は 5 つ: ① 0〜7 秒が生きているか（ループ先頭で止まって見えないか） ② 16 秒末尾 → 0 秒の継ぎ目が自然か ③ 動きが問題文・つかみ帯の可読性を邪魔していないか ④ 上部余白の使い切りで文字が大きくなり、Instagram UI と重ならないか ⑤ 8 秒・13 秒のイベントが視覚的に立っているか。no-go なら本改修を見送りとしてアイデア記録に理由を残す</td>
+  <td>ユーザーが 5 観点で OK と判断（調整の往復はここで吸収する）</td>
+  <td>未着手</td>
+</tr>
+<tr>
+  <td><strong>R-1-4</strong><br>ビルドツーリングの切替</td>
+  <td><code>content/video-build/logic-training-1/build.py</code> のレンダラーを Remotion に切り替え（<code>services/image-batch</code> の <code>gpt_quiz_multicut</code> への import 依存を外す。<code>services/</code> 側のコードは休止方式として残置・削除しない）。<code>review_sheet.py</code> を新版面に追随。pref-ranking-1 と同様に <code>tests/</code>（版面定数・タイムライン導出値の固定テスト）を新設する（現状 logic-training-1 側にはテストがない）</td>
+  <td><code>pytest</code> 全パス。1 問のビルドが <code>build.py</code> 経由で通る</td>
+  <td>未着手</td>
+</tr>
+<tr>
+  <td><strong>R-1-5</strong><br>在庫全数の再ビルド・差し替え・全数レビュー</td>
+  <td>稼働在庫 56 問（朝 28 / 夜 28。使用済み含む。LRU が再利用で旧版を出すため）を一括で再ビルド → レビューシートで<strong>全数人間レビュー</strong> → S3 差し替え → <code>quiz_stock_items.video_s3_key / video_audio_asset_id / video_built_at</code> をローカル・Aurora 両環境で更新（<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8 の手順）。凍結中の昼 21 問は<strong>再ビルドしない</strong>（再開判断時にまとめて行う）。<strong>着手条件: 16-5 の水準評価が完了していること</strong></td>
+  <td>両環境で 56 問すべてが新版に差し替わり、抜き取りで再生確認できる。投入日（新版の初出投稿）がセット記録に残っている</td>
+  <td>未着手</td>
+</tr>
+<tr>
+  <td><strong>R-1-6</strong><br>設計書・記録の更新</td>
+  <td><a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8（レンダラー・組版の記述）を Remotion 版へ書き換え、decision に経緯を残す。<a href="logic-training-1-log.html">セット記録</a>セクション 3 に実施記録を追記。本計画書ステータス表の「生成方式」行を更新。<strong>共通設計書 <a href="../app/batch-flow.html">batch-flow.html</a> の方式カタログ行（quiz-prebuilt の「Pillow 組版 → ffmpeg 連結」の記述）と gpt-quiz-multicut の「事前ビルドのレンダラーとして継続使用」の注記は開発レーン</strong>のため、本ステップでは<a href="development-plan.html">開発レーン</a>の設計課題リストに 1 行起票し、開発レーンのセッションで直す</td>
+  <td>セット側の設計書・記録が実装に一致し、共通設計書の修正が設計課題リストに起票されている</td>
+  <td>未着手</td>
+</tr>
+</tbody>
+</table></div>
 
 </div>
 </body>
