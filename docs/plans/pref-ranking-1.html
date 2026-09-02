@@ -13,7 +13,7 @@
 <h1>セット計画書: 表彰台五郎の都道府県ランキング（pref-ranking-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-08-29（改修 R-1 完了）</span>
+  <span>最終更新: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新（枠のみ → 16-5 の参考値 + 2026-09 転記予定））</span>
 </div>
 
 <div class="note">
@@ -29,7 +29,7 @@
 <tr><th>生成方式</th><td>ranking-prebuilt（Remotion 事前ビルド・作り置き）。<strong>尺は 30 秒単尺で確定（2026-08-24）</strong>。20 秒版はタイムライン・コンポジション・方式モジュールとも実装済みのまま<strong>休眠</strong>（増便・尺再検討時の保険。削除しない）</td></tr>
 <tr><th>BGM</th><td><strong>1 曲運用</strong>（世界観の統一。17-5b のユーザー判断）。ミュート検知時は在庫全本の再ビルドが必要な点に注意（<a href="../app/sets/pref-ranking-1.html">セット別設計書</a>セクション 6 の decision）</td></tr>
 <tr><th>ストック運用</th><td>スキル <code>/ranking-stock-replenish</code> で週次補充（7 ネタ目安・在庫水位 14 件以上）。直近: 17-7（2026-08-28）でストック 30 件・30 秒版ビルド済みが両環境に揃った（未ビルド 0 件・Aurora 未使用在庫 28 件）。<strong>2026-08-29: 改修 R-1 で全 30 件を同一版へ再ビルド・差し替え済み</strong>。<strong>ネタ帳は使い切ったため以後の供給は家計調査の品目採掘が主軸</strong></td></tr>
-<tr><th>KPI</th><td>（枠のみ。<strong>継続的に見る指標セットは 16-12〔開発レーン〕で確定予定</strong> — 確定までは独自の指標記録を始めない）</td></tr>
+<tr><th>KPI</th><td>指標セットは 16-12a（2026-09-02）で確定、欄の様式と転記運用は 16-12b（2026-09-03）で確定（正は <a href="../app/operation.html#insights-analysis">運用設計 6.3</a>。転記元はビュー <code>v_post_kpi_monthly</code> / <code>v_account_kpi_monthly</code>〔V011〕、<code>content/insights-analysis/run_queries.py kpi_post_monthly kpi_account_monthly</code>。月初 4 日以降に前月分を追記）。夜 20:00 の 1 スロットのため <code>evening</code> 行 = <code>all</code> 行（1 行で転記）。16-5 時点では母数が少なく水準評価は時期尚早。<div class="table-wrap" style="margin:.4rem 0 0;"><table><thead><tr><th>年月</th><th>スロット</th><th>本数</th><th>views</th><th>スキップ率</th><th>平均視聴秒</th><th>コメント</th><th>保存</th><th>月末フォロワー</th><th>備考</th></tr></thead><tbody><tr><td>参考（16-5・08-27〜08-31）</td><td>夜</td><td>5</td><td>230</td><td>60.3%</td><td>8.4</td><td>—</td><td>—</td><td>1（08-31）</td><td>2 日以上経った 5 本の中央値（ビュー導入前・72 時間基準ではない。ベースラインとしては母数不足）。1 本が 3,457 views。出典: <a href="development-log.html">開発記録</a>の 16-5</td></tr><tr><td>2026-09</td><td>夜</td><td colspan="7">2026-10-04 以降に転記</td><td>初の月次値。改修 R-1（2026-08-29 差し替え）後の水準になる</td></tr></tbody></table></div></td></tr>
 </tbody>
 </table></div>
 

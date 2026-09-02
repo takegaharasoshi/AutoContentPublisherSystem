@@ -8,6 +8,7 @@ JSON メトリクスを集計し、セット横断で「現行フォーマット
     python run_queries.py                       # 全クエリ
     python run_queries.py population weekly     # 指定クエリのみ
     python run_queries.py --since 2026-08-08 --split 2026-08-23
+    python run_queries.py kpi_post_monthly kpi_account_monthly   # 月次 KPI 転記用（V011 のビュー）
 
 出力: 標準出力にテキスト表、``results/<name>.json`` に生データ。
 接続先は ``AURORA_CLUSTER_ARN`` / ``AURORA_SECRET_ARN``（未設定なら aws cli で自動解決）。
@@ -136,6 +137,19 @@ SELECT bs.set_code, ai.metric_date, ai.followers_count,
 FROM account_insights_daily ai JOIN batch_sets bs ON bs.id = ai.set_id
 WHERE ai.metric_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
 ORDER BY bs.set_code, ai.metric_date""",
+
+        # 16-12b: 月次転記用。V011 のビューをそのまま引く（--since / --split は使わない）
+        "kpi_post_monthly": """
+SELECT set_code, post_month, slot, posts, median_views, median_skip_rate_pct, median_avg_watch_s,
+       median_comments, median_saved
+FROM v_post_kpi_monthly
+ORDER BY set_code, post_month, FIELD(slot, 'all', 'morning', 'noon', 'evening')""",
+
+        "kpi_account_monthly": """
+SELECT set_code, metric_month, days_collected, first_date, last_date,
+       month_end_followers, month_end_followers_date, reach_total
+FROM v_account_kpi_monthly
+ORDER BY set_code, metric_month""",
     }
 
 

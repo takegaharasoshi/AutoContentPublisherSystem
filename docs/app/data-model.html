@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-3 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-08-09</span>
+  <span>最終更新: 2026-09-03（16-12b: セクション 4.11 に指標セットのビュー昇格〔V011・ビュー 6 本〕の decision を追加。follows_and_unfollows は 100 フォロワー未満では API が返さないと確認）</span>
 </div>
 
 <div class="note">
@@ -621,13 +621,13 @@ LIMIT 1;</code></pre>
   </ul>
 </div>
 
-<h3 id="detail-insights">4.11 post_insights / account_insights_daily（インサイト収集。Phase 16-7 設計・16-8 で作成済み）</h3>
+<h3 id="detail-insights">4.11 post_insights / account_insights_daily（インサイト収集。Phase 16-7 設計・16-8 で作成済み・16-12b で KPI ビュー昇格〔V011〕）</h3>
 
 <div class="decision">
   <span class="callout-title">決定（2026-08-10、Phase 16-7）: インサイト 2 テーブルの新設（V009）と「JSON 全量 + 後から昇格」方式</span>
   インサイト収集バッチ（第 3 のバッチ。処理フローは <a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）の書き込み先として 2 テーブルを新設する。
   収集は「API で取得可能な生メトリクスの全量収集」であり、<strong>メトリクスは API レスポンスを整形した JSON カラムで全量保存する</strong>。
-  「継続的に見る指標セット」（可視化・KPI 転記の対象）は 16-5 完了後に確定し、確定した指標のみを<strong>生成カラム（MySQL 8 の JSON 抽出）またはビューとして後から昇格</strong>させる（2 段階 Fix。再収集は不要で、Meta のメトリクス改廃にも DDL 追随が不要）。
+  「継続的に見る指標セット」（可視化・KPI 転記の対象）は 16-5 完了後に確定し、確定した指標のみを<strong>生成カラム（MySQL 8 の JSON 抽出）またはビューとして後から昇格</strong>させる（2 段階 Fix。再収集は不要で、Meta のメトリクス改廃にも DDL 追随が不要）。<strong>後段は 16-12a（指標セットの確定・2026-09-02）と 16-12b（ビュー昇格 V011・2026-09-03。次の decision）で完了。</strong>
   ワイドカラム方式（収集対象を今決め打ち・改廃のたびに DDL 変更）と EAV 方式（数値のみで breakdown 構造が持てない・分析クエリが毎回ピボット）は不採用。
   <p style="margin:.6rem 0 .2rem;"><strong>post_insights（投稿別インサイトのスナップショット。追記型）</strong></p>
   <div class="table-wrap" style="margin:.2rem 0 0;">
@@ -654,7 +654,7 @@ LIMIT 1;</code></pre>
       <tr><td><code>set_id</code></td><td>複合 FK 用の非正規化（<code>(set_id, sns_account_id) → sns_accounts(set_id, id)</code>。参照先の <code>UNIQUE (set_id, id)</code> は V001 から存在）</td></tr>
       <tr><td><code>sns_account_id</code></td><td><code>sns_accounts.id</code> への参照</td></tr>
       <tr><td><code>metric_date</code></td><td><code>DATE NOT NULL</code>。<strong>UTC 日</strong>（アカウントレベル Insights の <code>period=day</code> は UTC 区切りのため。JST 表示への変換は分析側の責務）。<strong><code>UNIQUE (sns_account_id, metric_date)</code></strong> で 1 日 1 行。<strong>UTC 日が閉じてから取得した確定値のみを書き、以後更新しない</strong>（INSERT IGNORE の upsert-once）</td></tr>
-      <tr><td><code>metrics</code></td><td><code>JSON NOT NULL</code>。アカウントレベル Insights 全メトリクスの生値マップ（<code>follows_and_unfollows</code> の breakdown 等も構造ごと保存）</td></tr>
+      <tr><td><code>metrics</code></td><td><code>JSON NOT NULL</code>。アカウントレベル Insights 全メトリクスの生値マップ（breakdown 付きメトリクスは構造ごと保存）。<strong><code>follows_and_unfollows</code>（<code>breakdown=follow_type</code>）は 100 フォロワー未満のアカウントには API が返さない</strong>ため、現行 3 アカウントの行にはキー自体が入っていない（次の decision）</td></tr>
       <tr><td><code>followers_count</code></td><td><code>INT UNSIGNED NULL</code>。行作成時点の IG User <code>followers_count</code> スナップショット（Insights ではなくユーザーフィールド。<strong>日締値ではなく収集時点の残高</strong>である点に注意）。過去日の残高は API から復元不可のため、バックフィルで作られた過去日行は NULL</td></tr>
       <tr><td><code>collected_at</code> / <code>api_version</code></td><td><code>post_insights</code> と同じ</td></tr>
       <tr><td><code>created_at</code> / <code>updated_at</code></td><td>全テーブル共通</td></tr>
@@ -666,6 +666,33 @@ LIMIT 1;</code></pre>
     <li><strong>ストーリーズの最終値</strong>: ストーリーズは投稿後 24 時間で API から取得不可になるため、期限内の最後のスナップショットを最終値として扱う（1 日 2 回実行で各ストーリーズは寿命の 17〜22 時間時点まで計測される。収集タイミングの設計は <a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）</li>
     <li><strong>問題別パフォーマンスの突合経路</strong>: <code>post_insights → posts（generation_run_id）→ quiz_items → stock_item_id → quiz_stock_items</code>。<code>posts</code> と <code>quiz_items</code> はともに <code>generation_runs</code> の子であり、この JOIN で「どの問題のリールがどう伸びたか」を引ける</li>
     <li><strong>V009 の適用順序</strong>: 全変更が追加的（新テーブル 2 本 + <code>posts</code> への UNIQUE 追加 + <code>batch_execution_logs.batch_type</code> ENUM の末尾追加）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。FK の向きにより <code>posts</code> の ALTER（UNIQUE 追加）を <code>post_insights</code> の CREATE より先に行う。<strong>2026-08-10（16-8）にローカル MySQL と Aurora の両環境へ適用済み</strong>（<code>database/V009__insights_support.sql</code>）</li>
+  </ul>
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-09-03、Phase 16-12b）: 「継続的に見る指標セット」のビュー昇格（V011）と follows_and_unfollows の扱い</span>
+  16-12a で確定した指標セット（投稿単位 = views / スキップ率 / 平均視聴秒 / コメント / 保存 の 72 時間水準、アカウント単位 = フォロワー数 / reach。名称・算出式・転記先の一覧は<a href="../plans/development-log.html">開発記録</a>の 16-12a）を、<code>database/V011__insights_kpi_views.sql</code> の<strong>ビュー 6 本</strong>で昇格した。
+  <strong>生成カラムは追加しない</strong>（ビューのみ）。理由: ①投稿単位の基準スナップショット（<code>posted_at + 72 時間</code>以降の最初の行）は JOIN でしか選べず生成カラムでは表現できない ②現行規模（<code>post_insights</code> 1 日約 200 行）では JSON 抽出のインデックス化が不要 ③Meta のメトリクス改名時は <code>CREATE OR REPLACE VIEW</code> だけで追随でき、稼働中テーブルの ALTER を伴わない。
+  <div class="table-wrap" style="margin:.4rem 0 0;">
+  <table>
+    <thead><tr><th>ビュー</th><th>粒度</th><th>主な列</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>v_post_kpi_72h</code></td><td>1 投稿 1 行（72 時間水準に達したリールのみ）</td><td><code>set_code</code> / <code>post_id</code> / <code>posted_at</code>（UTC）/ <code>post_month</code>（JST の年月）/ <code>slot</code>（morning・noon・evening）/ <code>collected_at</code> / <code>age_hours</code> / <code>views</code> / <code>skip_rate_pct</code> / <code>avg_watch_s</code> / <code>comments</code> / <code>saved</code></td><td>投稿単位の水準の確認・改修の効果判定（ベースライン比較）</td></tr>
+      <tr><td><code>v_post_kpi_monthly</code></td><td>セット × 年月 × スロット（+ 全スロット合算の <code>slot='all'</code> 行）</td><td><code>posts</code>（本数）/ <code>median_views</code> / <code>median_skip_rate_pct</code> / <code>median_avg_watch_s</code> / <code>median_comments</code> / <code>median_saved</code></td><td><strong>各セット計画書の KPI 欄へ転記する行</strong>（<a href="operation.html#insights-analysis">operation.html 6.3</a>）</td></tr>
+      <tr><td><code>v_account_kpi_daily</code></td><td>1 アカウント・UTC 日につき 1 行</td><td><code>metric_date</code> / <code>metric_month</code>（UTC 日の年月）/ <code>followers_count</code> / <code>followers_delta</code>（前行との差）/ <code>reach</code></td><td>フォロワー推移の確認。<code>followers_delta</code> がフォロー増減の代替</td></tr>
+      <tr><td><code>v_account_kpi_monthly</code></td><td>セット × アカウント × 年月</td><td><code>days_collected</code> / <code>first_date</code> / <code>last_date</code> / <code>month_end_followers</code>（+ その日付）/ <code>reach_total</code></td><td><strong>事業戦略書 KPI 実績表へ転記する行</strong></td></tr>
+      <tr><td><code>v_post_kpi_72h_ranked</code> / <code>v_account_kpi_daily_ranked</code></td><td>内部ビュー</td><td>中央値・月末フォロワーを求めるための順位付け（ウィンドウ関数）</td><td>直接は参照しない</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul style="margin:.4rem 0 0;">
+    <li><strong>母集団</strong>: <code>posts.status = 'success'</code> かつ <code>platform_post_id IS NOT NULL</code> かつ <code>media_type = 'reel'</code>（集計ランナー <code>content/insights-analysis/run_queries.py</code> と同一。ストーリーズ・フィード画像は対象外）</li>
+    <li><strong>基準スナップショット（72 時間水準）</strong>: <code>collected_at &gt;= posted_at + INTERVAL 72 HOUR</code> を満たす <code>post_insights</code> のうち <code>collected_at, id</code> の昇順で最初の 1 行。1 日 2 回収集のため実際の投稿年齢は 72〜84 時間になる（<code>age_hours</code> で確認できる）。72 時間に達していない投稿は行を持たない（月次の転記は月が閉じて 3 日以上経ってから行う理由）</li>
+    <li><strong>スロット境界</strong>: JST の時で <code>&lt; 11</code> = morning、<code>&lt; 16</code> = noon、それ以外 = evening（logic-training-1 の 07:00 / 12:00 / 21:00、pref-ranking-1 の 20:00 がそれぞれ morning / noon / evening / evening に入る）。年月は投稿は JST、アカウント日次は <code>metric_date</code>（UTC 日）のまま切る（アカウント日次の UTC 定義はこのセクションの前段どおり）</li>
+    <li><strong>中央値</strong>: MySQL に中央値の集約関数がないため、内部ビューで指標ごとに <code>ROW_NUMBER()</code> を振り、非 NULL の値の中央（偶数件は中央 2 件の平均）を取る。キー欠落（NULL）の投稿は当該指標の分母に入れない。平均ではなく中央値にするのは 1 本のバズで歪むため（16-5 の判断と同じ）</li>
+    <li><strong>月末フォロワー</strong>: その月の行のうち <code>followers_count</code> が非 NULL で最も遅い日の値（バックフィルで作られた過去日行は NULL のため除外。<code>month_end_followers_date</code> で実際の日を確認する）。<code>reach_total</code> は収集できた日の合計で、<code>days_collected</code> が月の日数に満たない月は部分合計（欠測日は補完しない）</li>
+    <li><strong>follows_and_unfollows が入っていない理由と扱い</strong>（設計課題リスト 2026-09-02 の解消）: CloudWatch Logs（2026-08-10 の稼働開始以降）にアカウント収集の要求失敗・<code>Unsupported Instagram insights metric</code> の警告は一切なく、応答に当該要素が含まれていないだけと確認した。Meta の IG User Insights リファレンスは <code>follows_and_unfollows</code> に「Not returned if the IG User has less than 100 followers」と明記しており（2026-09-03 確認）、現行 3 アカウント（最大 19 フォロワー）が閾値未満のため返らない。<strong><code>metrics_catalog.py</code> の要求定数は外さない</strong>（1 アカウント 1 日 1 回の追加要求で害はなく、外すと閾値到達後のデータを取り逃す）。到達までのフォロー増減は <code>v_account_kpi_daily.followers_delta</code> で見る。いずれかのアカウントが 100 フォロワーに達した後にキーが入り始めるかは、開発計画の確認待ちリストで追う</li>
+    <li><strong>適用状況</strong>: ローカル MySQL へ 2026-09-03 適用済み（フィクスチャで中央値・月末フォロワー・NULL 除外の挙動を検証）。Aurora への適用は 16-12b の人間ゲート（差分確認 → push → 適用）で行い、結果は<a href="../plans/development-log.html">開発記録</a>の 16-12b に追記する</li>
   </ul>
 </div>
 

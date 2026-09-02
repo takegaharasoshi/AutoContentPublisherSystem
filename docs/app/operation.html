@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
-  <span>最終更新: 2026-09-02（セクション 6 に集計ランナーと 16-12a の指標セットへの導線を追記）</span>
+  <span>最終更新: 2026-09-03（16-12b: セクション 6.3 を月次 KPI 転記の手順・セット計画書 KPI 欄の様式で確定。転記元はビュー v_post_kpi_monthly / v_account_kpi_monthly〔V011〕）</span>
 </div>
 
 <div class="note">
@@ -792,16 +792,34 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   <li><strong>閲覧者不足によるインサイト非開示（16-11 で判明）</strong>: 閲覧者が少ないメディアに対して Meta は全メトリクスを <code>(#10) Not enough viewers for the media to show insights</code> で拒否する（プライバシー閾値）。<strong>ストーリーズでは常態的に発生する</strong>ため、<code>InstagramInsightsUnavailable</code> として対象不存在と同じ WARNING スキップに分類しており失敗にはならない（ログは <code>Insights withheld below Instagram's viewer threshold</code>）。リーチが伸びれば自然に取得できるようになるため、運用上の対応は不要。<code>post_insights</code> に行が入らないことが該当メディアの記録になる</li>
 </ul>
 
-<h3 id="insights-analysis">6.3 集計ランナーと「継続的に見る指標セット」（16-5 / 16-12a・2026-09-02）</h3>
+<h3 id="insights-analysis">6.3 「継続的に見る指標セット」と月次 KPI 転記（16-5 / 16-12a / 16-12b・2026-09-03 確定）</h3>
 <ul>
-  <li><strong>集計ランナー</strong>: <code>content/insights-analysis/run_queries.py</code>（読み取り専用。RDS Data API で本番 Aurora に <code>SELECT</code> のみ発行）。母集団・期間比較・週次の 72 時間水準・成長カーブ・アカウント日次の 6 クエリ。使い方・読み方の注意は同ディレクトリの README</li>
-  <li><strong>指標セット</strong>: 16-12a で確定（投稿単位 = views / reels_skip_rate / ig_reels_avg_watch_time / comments / saved の 72 時間水準、アカウント単位 = followers_count / reach の日次）。名称・算出式・参照元キー・転記先の一覧は<a href="../plans/development-log.html">開発記録</a>の 16-12a</li>
-  <li><strong>転記運用</strong>（暫定。16-12b で本節に確定版を置く）: 月初に <code>run_queries.py account_daily</code> で前月末の <code>followers_count</code> と月間 reach 合計を出し、事業戦略書 KPI 実績表へ。<code>per_post_latest</code> から前月投稿の 72 時間水準の中央値を出し、各セット計画書の KPI 欄へ。生成カラム / ビューへの昇格は 16-12b</li>
+  <li><strong>指標セット</strong>: 16-12a で確定（投稿単位 = views / reels_skip_rate / ig_reels_avg_watch_time / comments / saved の 72 時間水準、アカウント単位 = followers_count / reach）。名称・算出式・参照元キーの一覧は<a href="../plans/development-log.html">開発記録</a>の 16-12a。<strong>ビュー定義（V011）</strong>は <a href="data-model.html#detail-insights">data-model.html セクション 4.11</a>: 転記元は <code>v_post_kpi_monthly</code>（セット × 年月 × スロットの中央値。<code>slot='all'</code> が全スロット合算）と <code>v_account_kpi_monthly</code>（月末フォロワー・月間 reach 合計）。目標水準は置かない（事業戦略書の KPI はマイルストーン制）</li>
+  <li><strong>集計ランナー</strong>: <code>content/insights-analysis/run_queries.py</code>（読み取り専用。RDS Data API で本番 Aurora に <code>SELECT</code> のみ発行）。転記用の <code>kpi_post_monthly</code> / <code>kpi_account_monthly</code> はビューをそのまま引く。補助指標（reach・likes・shares 等）・成長カーブ・期間比較（<code>--split</code>）は従来の 6 クエリ。使い方・読み方の注意は同ディレクトリの README</li>
+  <li><strong>レーン</strong>: セット計画書の KPI 欄の転記はセットレーン（以後の日常の KPI 観察はセットレーンで行う）。事業戦略書 KPI 実績表は共通ドキュメントのため開発レーンで更新する（<a href="../plans/index.html">計画体系</a>の並行作業ルール）</li>
 </ul>
 
+<p><strong>月次転記の手順</strong>（前月分。<strong>月初 4 日以降</strong>に行う — 月末の投稿が 72 時間水準に達するのを待つため。停止したセットは転記しない）:</p>
+<ol>
+  <li><code>python3 content/insights-analysis/run_queries.py kpi_post_monthly kpi_account_monthly</code> を実行し、前月の行を取る（出力は <code>results/</code> に JSON。残す集計は <code>results/YYYY-MM-DD.txt</code> として明示的にコミット）</li>
+  <li><strong>セット計画書の KPI 欄</strong>: <code>v_post_kpi_monthly</code> の前月行を、スロットが分かれるセットはスロット別 + <code>all</code>、1 スロットのセットは 1 行で転記する。月末フォロワーは <code>v_account_kpi_monthly.month_end_followers</code>。様式は下表。備考には KPI 欄のベースライン行（改修前の 72 時間中央値）と比べて悪化していないかを一言添える（改修の効果判定は 16-12a の「ベースライン比較」）</li>
+  <li><strong>事業戦略書 KPI 実績表</strong>（<a href="../strategy/business-strategy.html#kpi-actual">セクション 4.1</a>）: 年月 × セットの行に <code>month_end_followers</code> と <code>reach_total</code> を転記する。<code>days_collected</code> が月の日数に満たない月は備考に「n 日分」と書く（欠測日は補完しない）</li>
+  <li>悪化していれば当該セット計画書のバックログに起こす（KPI 欄には結論だけ残す）</li>
+</ol>
+<p><strong>セット計画書 KPI 欄の様式</strong>（Phase 18 で設置した枠に、次の表を入れる。値は <code>v_post_kpi_monthly</code> の列をそのまま。views は中央値、スキップ率は %、平均視聴は秒）:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>年月</th><th>スロット</th><th>本数</th><th>views</th><th>スキップ率</th><th>平均視聴秒</th><th>コメント</th><th>保存</th><th>月末フォロワー</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>ベースライン（改修前の期間）</td><td>—</td><td>n</td><td colspan="5">改修前の 72 時間中央値（改修の効果判定の比較対象。ビュー導入前の 16-5 の値を使う場合はその旨を備考に）</td><td>—</td><td>出典（16-5 / 集計日）</td></tr>
+    <tr><td>YYYY-MM</td><td>all / morning / noon / evening</td><td>n</td><td colspan="5"><code>v_post_kpi_monthly</code> の当該行</td><td><code>month_end_followers</code></td><td>ベースライン比の一言・特記（バズ 1 本など）</td></tr>
+  </tbody>
+</table>
+</div>
+
 <div class="note">
-  <span class="callout-title">2 段階 Fix の後段（16-12b）で残っている作業</span>
-  上記指標のビュー昇格 DDL（<code>database/V011</code>）、<a href="data-model.html">data-model.html</a> セクション 4.11 の更新、本節の転記運用の確定、セット計画書 KPI 欄の様式統一。それまで本節の転記運用は暫定扱い。
+  <span class="callout-title">2 段階 Fix の完了（16-12b・2026-09-03）</span>
+  16-7 で「JSON 全量 + 後から昇格」とした 2 段階 Fix は、16-12a（指標セット確定）と 16-12b（V011 のビュー昇格・本節の転記運用・セット計画書 KPI 欄の様式統一）で完了した。<code>follows_and_unfollows</code> が入っていない理由（100 フォロワー未満では API が返さない）と扱いは data-model.html 4.11 の decision を参照。
 </div>
 
 <p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。<code>post_records.attempt_number</code> / <code>max_post_retries</code> に基づく再試行上限確認は、自動再試行を行わない方針への変更に伴い不採用。SNS アカウント追加手順・手動補正の記録ルール・トークン更新の考え方は本書に引き継いだ。現役の設計書ではない）</p>

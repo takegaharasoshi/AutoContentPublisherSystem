@@ -11,6 +11,7 @@ cd content/insights-analysis
 python3 run_queries.py                    # 全クエリ（Aurora が一時停止中なら復帰を最大 8 回待つ）
 python3 run_queries.py population weekly_age_fixed
 python3 run_queries.py --since 2026-08-08 --split 2026-08-23
+python3 run_queries.py kpi_post_monthly kpi_account_monthly   # 月次 KPI 転記用（16-12b）
 ```
 
 - 接続先は `AURORA_CLUSTER_ARN` / `AURORA_SECRET_ARN`。未設定なら aws cli で自動解決する（`apply_aurora.py` と同じ方式）
@@ -26,6 +27,10 @@ python3 run_queries.py --since 2026-08-08 --split 2026-08-23
 | `weekly_age_fixed` | 投稿週別の **72 時間水準**（投稿 + 3 日以降の最初のスナップショット。投稿年齢をそろえた推移用） |
 | `growth_curve` | 投稿年齢（日）別の平均 views・スキップ率（何日で伸び切るかの確認） |
 | `account_daily` | アカウント日次（直近 30 日）: フォロワー数・views・reach・engaged・comments・saves |
+| `kpi_post_monthly` | **月次 KPI 転記用**（16-12b）。ビュー `v_post_kpi_monthly`（セット × 年月 × スロットの 72 時間水準の中央値。`slot='all'` は全スロット合算）をそのまま出す |
+| `kpi_account_monthly` | **月次 KPI 転記用**（16-12b）。ビュー `v_account_kpi_monthly`（月末フォロワー・月間 reach 合計・収集日数）をそのまま出す |
+
+`kpi_*` の転記先・手順は `docs/app/operation.html` セクション 6.3、ビューの定義は `docs/app/data-model.html` セクション 4.11（`database/V011__insights_kpi_views.sql`）。
 
 ## 読み方の注意
 
@@ -33,4 +38,4 @@ python3 run_queries.py --since 2026-08-08 --split 2026-08-23
 - `ig_reels_avg_watch_time` はミリ秒。表では秒に換算している
 - 投稿翌日までのスナップショットは値が動く。比較には `weekly_age_fixed` の 72 時間水準を使う
 - 平均は 1 本のバズで大きく歪む。判断には `per_post_latest` から中央値を取る（16-5 の記録を参照）
-- `account_insights_daily.metrics` に `follows_and_unfollows` の内訳は入っていない（開発レーンの設計課題リスト 2026-09-02）。フォロー増減は `followers_count` の差分で見る
+- `account_insights_daily.metrics` に `follows_and_unfollows` の内訳は入っていない（Meta の仕様で 100 フォロワー未満のアカウントには返らない。16-12b で確認）。フォロー増減は `followers_count` の差分（ビュー `v_account_kpi_daily.followers_delta`）で見る

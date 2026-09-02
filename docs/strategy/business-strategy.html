@@ -13,7 +13,7 @@
 <h1>事業戦略書</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-09-02（KPI 実績に 2026-08 を追記・fantasy-animals-1 の停止決定・KPI 転記元を 16-12a の指標セットへ）</span>
+  <span>最終更新: 2026-09-03（16-12b: KPI 実績表に「月間 reach」列を追加し、転記元をビュー v_account_kpi_monthly・手順の正を運用設計 6.3 へ接続）</span>
   <span>初版は 2026-07-23 の壁打ち（Phase 14-1）に基づく</span>
 </div>
 
@@ -167,39 +167,44 @@
 </div>
 
 <h3 id="kpi-actual">4.1 KPI 実績</h3>
-<p>月次の手動更新。2026-09 以降は 16-12a（2026-09-02）で確定した指標（月末の <code>followers_count</code>・月間 reach 合計）を <code>content/insights-analysis/run_queries.py account_daily</code> の出力から転記する（転記手順の正は 16-12b で <a href="../app/operation.html#insights-ops">運用設計 セクション 6</a> に置く）。投稿単位の水準（views・スキップ率・平均視聴秒・コメント・保存の 72 時間中央値）は各セット計画書の KPI 欄で追い、本表には載せない。</p>
+<p>月次の手動更新（月初 4 日以降に前月分。手順の正は <a href="../app/operation.html#insights-analysis">運用設計 セクション 6.3</a>）。2026-09 以降は 16-12a（2026-09-02）で確定した指標（月末フォロワー・月間 reach 合計）を、16-12b（2026-09-03）で昇格したビュー <code>v_account_kpi_monthly</code>（<code>content/insights-analysis/run_queries.py kpi_account_monthly</code>）から転記する。月間 reach はビュー導入前の月は「—」。投稿単位の水準（views・スキップ率・平均視聴秒・コメント・保存の 72 時間中央値）は各セット計画書の KPI 欄で追い、本表には載せない。</p>
 <div class="table-wrap">
 <table>
-  <thead><tr><th>年月</th><th>セット</th><th>フォロワー</th><th>備考</th></tr></thead>
+  <thead><tr><th>年月</th><th>セット</th><th>月末フォロワー</th><th>月間 reach</th><th>備考</th></tr></thead>
   <tbody>
     <tr>
       <td>2026-07</td>
       <td>fantasy-animals-1</td>
       <td>0</td>
+      <td>—</td>
       <td>検証用セットのため成長施策なし（セクション 6）。07-22 に静止画 1 日 3 回で運用開始 → 07-26 にリール 1 日 1 回へ切替（M1 達成）。再生数は Phase 16 のインサイト収集バッチ実装後に計測開始</td>
     </tr>
     <tr>
       <td>2026-07</td>
       <td>logic-training-1</td>
       <td>0</td>
+      <td>—</td>
       <td>07-29 に投入（実投稿成功・1 日 3 回の自動スケジュール有効化）。計測はここから</td>
     </tr>
     <tr>
       <td>2026-08</td>
       <td>fantasy-animals-1</td>
       <td>1</td>
+      <td>—</td>
       <td>08-31 時点。16-5 効果検証（09-02）: 08-08 以降のリール 22 本の中央値は views 75.5・スキップ率 92.3%、改善傾向なし → <strong>停止を決定</strong>（セクション 6・開発レーン Phase 20-1）</td>
     </tr>
     <tr>
       <td>2026-08</td>
       <td>logic-training-1</td>
       <td>18</td>
-      <td>08-31 時点（08-20 の 2 から 12 日で 18。月間 reach 合計は 16-12b 以降に転記）。16-5 効果検証（09-02）: 3 カット化（08-23）以降の朝・夜 15 本の中央値は views 1,731・スキップ率 50.6%・平均視聴 12.4 秒・コメント 10 件で改善傾向は明確。1 本が 33,463 views。次の改善対象（R-1 Remotion 載せ替え）</td>
+      <td>—</td>
+      <td>08-31 時点（08-20 の 2 から 12 日で 18。月間 reach はビュー導入前のため未転記）。16-5 効果検証（09-02）: 3 カット化（08-23）以降の朝・夜 15 本の中央値は views 1,731・スキップ率 50.6%・平均視聴 12.4 秒・コメント 10 件で改善傾向は明確。1 本が 33,463 views。次の改善対象（R-1 Remotion 載せ替え）</td>
     </tr>
     <tr>
       <td>2026-08</td>
       <td>pref-ranking-1</td>
       <td>1</td>
+      <td>—</td>
       <td>08-31 時点（16-5 効果検証〔09-02〕では 7 本で時期尚早。中央値 views 230・スキップ率 60.3%）。08-10 に 17-1 テーマ Fix 完了 → 08-26 に <code>daigoro_ranking</code> を開設（17-5b）→ 同日 17-5c で在庫 14 本を配置し <strong>30 秒リール 1 日 1 回（20:00 JST）で運用開始</strong>。計測はここから</td>
     </tr>
   </tbody>
