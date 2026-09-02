@@ -13,7 +13,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-02（改修 R-1 を起票・R-1-1 完了）</span>
+  <span>最終更新: 2026-09-02（改修 R-1 を起票・R-1-1 完了。19-3 の /goal 組み込みを進行中ステップへ）</span>
 </div>
 
 <div class="note">
@@ -38,11 +38,13 @@
 <tbody>
 <tr><td>2026-08-24</td><td>16-4d の昼スロット停止後も、キャプションテンプレートの固定ハッシュタグに <code>#フェルミ推定</code> が残っており、朝・夜の投稿にも付き続ける（実害は軽微だが出題内容と合わない）。変更には <code>caption_templates</code> の DB 差し替え（旧テンプレート <code>is_active=0</code> 化）が必要（<a href="development-plan.html">開発レーン</a>の設計課題リストから 2026-08-28 に移設）</td><td>昼スロットの再開判断時、またはテンプレートを他の理由で差し替えるタイミングで合わせて見直す（単独での差し替えはしない）</td><td>昼スロット再開判断時</td></tr>
 <tr><td>2026-09-02</td><td><strong>イラストプロンプトの文字禁止の緩和（16-4e）の効果観察</strong>。コード側の定型文を「情景で指定された文字は指定どおりに描く / 指定されていない文字は描かない」へ緩めたため（<a href="development-log.html">開発記録</a> 16-4e）、答えバレ・看板文字の混入を抑える歯止めが弱まる方向の変更になっている</td><td>次の <strong>2 バッチ</strong>の補充で、<strong>非例外問題（情景文に文字を指定していない問題）へのイラスト文字混入の件数</strong>を各バッチの補充記録（<code>content/quiz-stock/logic-training-1/&lt;batch&gt;/STATUS.md</code>）に残す。<strong>戻し基準</strong>: 1 バッチで 3 件以上、または再生成 2 回で解消しない事例が出たら<a href="development-plan.html">開発レーン</a>の設計課題リストへ再起票する（プロンプト文言 1 箇所の変更で戻せる）</td><td>次の 2 バッチの週次補充</td></tr>
-<tr><td>2026-09-02</td><td><strong>quiz 週次補充スキルへの <code>/goal</code> 組み込み（導線）</strong>。<a href="development-plan.html">開発レーン</a> Phase 19-3 で <code>quiz-stock-replenish</code> SKILL.md に G1（執筆・機械検証）/ G2（投入・ビルド・レビューシート）/ G3（配置・締め）の 3 本のゴールを追加する。触るのは補充スキルのみだが管理は Phase 19 で行う</td><td>19-3 着手時に本計画書の進行中ステップへ 1 行起こし、初回試行の結果を本セットの記録へ残す</td><td>Phase 19-3 着手時（19-1・19-2 の後）</td></tr>
 </tbody>
 </table></div>
 
 <h2>3. 進行中ステップ</h2>
+
+<h3>週次補充への /goal 組み込みの初回試行（開発レーン Phase 19-3・バックログ 2026-09-02 から移動）</h3>
+<p>⬜ <code>quiz-stock-replenish</code> SKILL.md への「起動時の /goal」節（G1 執筆・機械検証 / G2 投入・ビルド・レビューシート / G3 配置・締め）の追記は <strong>2026-09-02 完了</strong>（管理は<a href="development-plan.html">開発レーン</a> Phase 19-3）。残りは<strong>次の週次補充での初回試行</strong> — G1 → G3 の 3 本を実際に立てて回し、結果を<a href="logic-training-1-log.html">セット記録</a>へ残す（要点は開発記録の 19-3 へ）。</p>
 
 <h3>改修 R-1: 動画レンダラーの Remotion 載せ替え（全編モーション + 上部余白の見直し）</h3>
 <p>

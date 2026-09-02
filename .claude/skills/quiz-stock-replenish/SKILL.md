@@ -12,6 +12,26 @@ logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 �
 
 **資材の置き場**: `content/quiz-stock/<set_code>/<バッチ名>/`(git 管理)。バッチごとに自己完結の資材一式 — 単一ソース `stock_items.py`・検証 `validate.py` / `verify_logic.py`・生成 `generate.py`・リサーチ `research*.md`(source_note が参照する出典台帳)・投入した `insert_quiz_stock.sql` — を置く。参照実装は初期整備の `content/quiz-stock/logic-training-1/2026-08-initial/`。補充時は最新バッチの一式を新しいバッチディレクトリ(`2026-08-w3` 等)へコピーして同じ流れを回し、**投入完了時にディレクトリごとコミットする**(`review.md` は generate.py の派生物のため gitignore 済み・コミットしない)。plans/ は使い捨てスクラッチ用で、ストック資材は置かない。
 
+## 起動時の /goal(工程に入る前に必ず。Phase 19-3 で導入)
+
+週次補充は人間レビューの前後で 3 本のゴールに切って走らせる。**goal が立つまで工程 1(リサーチ)に入らない**。`/goal` は Claude・スキルからは起動できないため、本スキル起動直後に Claude が G1 の行をコードブロックで提示し、ユーザーが打つ(G2 はレビュー全問承認後に N を埋めて提示、G3 は review.html のレビュー承認後に提示)。ユーザーは `/goal`(引数なし)で設定を確認できる。
+
+```
+/goal セットレーン logic-training-1・週次補充 G1。完了条件: 朝・夜スロットの在庫確認クエリで不足数を確認し(出力を貼る)、不足分(各スロット最大 7 問)のリサーチ → 執筆 → スキル セクション 4 の機械検証が全問パス(出力を貼る)→ 1 問ずつ提示できる状態。投入・S3 配置・Aurora 更新は行わない。人間レビューは開始しない。or stop after 30 turns
+```
+
+```
+/goal セットレーン logic-training-1・週次補充 G2。完了条件: レビューで承認された N 問を投入(セクション 6)→ export_prompts → イラスト生成(文字混入・1536x1024 の自己確認込み)→ intake → build → review_sheet で work/review.html を生成。配置(publish)は行わない。or stop after 30 turns
+```
+
+```
+/goal セットレーン logic-training-1・週次補充 G3。完了条件: approved.txt の承認 id を publish(dry-run → 本実行)→ Aurora 適用の更新行数 = 承認件数(出力を貼る)→ 在庫確認クエリで unbuilt = 0(出力を貼る)→ ツール・台帳の変更をコミット・push・セット記録を更新。or stop after 15 turns
+```
+
+- **人間レビューはゴールに含めない**: G1 と G2 の間(1 問ずつのチャットレビュー)・G2 と G3 の間(review.html の全数レビュー)は人間の作業。ゴール到達 = レビュー開始できる状態、まで
+- **証跡は会話に貼る**: 在庫クエリ・検証・更新行数・unbuilt=0 の出力は省略せずそのまま貼る(/goal の evaluator は会話ログしか見ない)
+- G2・G3 は Aurora 更新・S3 配置を含むため **auto mode で走らせない**(許可プロンプトがゲートを兼ねる)
+
 ## 0. 在庫確認(入口)
 
 operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「型 × 難度」ごとの在庫を確認し、7 問を下回る組を補充対象にする。**ただし L3 / standard(昼)は 16-4d で停止中のため、数字にかかわらず補充対象にしない。**quiz-prebuilt 方式では**「未使用かつビルド済み」(`unused_built`)を在庫と数える**。`unbuilt` 列が 0 以外なら投入済みのビルド漏れなので、補充より先にセクション 7 のビルドを終わらせる。再利用 WARNING・未ビルト WARNING がログに出ていたら優先対応。
