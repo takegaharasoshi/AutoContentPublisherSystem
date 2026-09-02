@@ -48,9 +48,6 @@ import {
   COUNTDOWN_STEP,
   INTRO_END,
   LOOP_PERIODS,
-  QUESTION_IN_START,
-  QUESTION_LINE_DELAY,
-  QUESTION_LINE_RISE,
   SEAM_SWITCH,
   THINK_BEAT_FADE,
   THINK_BEAT_IN,
@@ -281,13 +278,15 @@ const Heading: React.FC<{ frame: number; design: Design; palette: Palette }> = (
   );
 };
 
-/** 問題文。行ごとの段階表示（読む速さに合わせる）。継ぎ目では逆再生で畳む */
+/**
+ * 問題文。フレーム 0 から全文を出し、最後まで消さない（R-1-3 のユーザー指摘）。
+ * ループ視聴が常態のため、段階表示は 2 周目以降に「読み始めた文が無い」
+ * 状態を作ってしまう。継ぎ目でも落とさない = frame 479 と frame 0 が一致する。
+ */
 const QuestionText: React.FC<{
-  frame: number;
   design: Design;
   palette: Palette;
-  seam: number;
-}> = ({ frame, design, palette, seam }) => {
+}> = ({ design, palette }) => {
   const { text } = design.question;
   return (
     <div
@@ -298,30 +297,21 @@ const QuestionText: React.FC<{
         width: design.question.width,
       }}
     >
-      {text.lines.map((line, index) => {
-        const appear = clamp01(
-          (frame - (QUESTION_IN_START + index * QUESTION_LINE_DELAY)) /
-            QUESTION_LINE_RISE,
-        );
-        const eased = easeOut(appear);
-        return (
-          <div
-            key={index}
-            style={{
-              fontFamily: FONT_STACK,
-              fontWeight: 400,
-              fontSize: text.fontSize,
-              lineHeight: `${text.lineHeight}px`,
-              color: palette.text,
-              whiteSpace: "nowrap",
-              opacity: eased * (1 - seam),
-              transform: `translateY(${(1 - eased) * 20 - seam * 14}px)`,
-            }}
-          >
-            {line}
-          </div>
-        );
-      })}
+      {text.lines.map((line, index) => (
+        <div
+          key={index}
+          style={{
+            fontFamily: FONT_STACK,
+            fontWeight: 400,
+            fontSize: text.fontSize,
+            lineHeight: `${text.lineHeight}px`,
+            color: palette.text,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {line}
+        </div>
+      ))}
     </div>
   );
 };
@@ -606,7 +596,7 @@ export const QuizVideo: React.FC<QuizProps> = (props) => {
       />
       <HookBand frame={frame} design={design} palette={palette} />
       <Heading frame={frame} design={design} palette={palette} />
-      <QuestionText frame={frame} design={design} palette={palette} seam={seam} />
+      <QuestionText design={design} palette={palette} />
 
       {/* 情景イラスト: 枠に内接させた矩形の中でゆっくり呼吸し、光が渡る */}
       <div

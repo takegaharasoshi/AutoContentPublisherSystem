@@ -33,24 +33,31 @@ export const THINK_BEAT_FADE = 10;
  * 表情と吹き出しの文言は**クロスフェードせずスナップで切り替える**
  * （SEAM_SWITCH）。別ポーズ・別文言の重ね合わせは二重露光に見えて
  * 不具合と区別がつかないため（試作 1 回目の frame 474 で確認）。
- * 消えるだけの要素（問題文・誘導の強調）は SEAM_FADE で淡く落とす。
+ * 消えるだけの要素（誘導の強調など、フレーム 0 に存在しないもの）は
+ * SEAM_FADE で淡く落とす。問題文はフレーム 0 から出ているので落とさない。
  */
 export const SEAM_START = TOTAL_FRAMES - 12; // 468 = 15.6s
 export const SEAM_FADE = 6; // 468 → 474 で落としきる
 export const SEAM_SWITCH = SEAM_START + SEAM_FADE; // 474 = 15.8s
 /** 474〜479 は導入カットと同じ状態 = frame 0 と一致する */
 
-/** 問題文の段階表示（1 行あたりの遅延と 1 行の立ち上がり） */
-export const QUESTION_IN_START = 6;
-export const QUESTION_LINE_DELAY = 9;
-export const QUESTION_LINE_RISE = 14;
+/**
+ * 問題文は**フレーム 0 から全文が出ている**（R-1-3 のユーザー指摘・2026-09-02）。
+ * 段階表示（行ごとのフェードイン）は、ループ視聴では 2 周目以降に
+ * 「読もうとした文が消えている」状態を作るため廃止した。継ぎ目でも落とさない。
+ */
 
-/** コーチ + 吹き出しの減衰ホップ（現行 ffmpeg 版と同じ 2 箇所・同じ諸元） */
+/**
+ * コーチ + 吹き出しの減衰ホップ（諸元は現行 ffmpeg 版と同じ）。
+ * 発火は 0.0 秒（冒頭・R-1-3 で追加）・8.0 秒（tick）・13.0 秒（chime）の 3 箇所。
+ * ホップは局所的に 1 秒で収束し、frame 0 と frame 480 はいずれも持ち上げ量 0 =
+ * ループ継ぎ目で飛ばない（frame 0 の値が 0 なのは sin(0) = 0 のため）。
+ */
 export const HOP_AMPLITUDE = 150;
 export const HOP_DURATION = 1 * FPS; // 30
 export const HOP_FREQUENCY_HZ = 1.6;
 export const HOP_DECAY_PER_SECOND = 3.0;
-export const HOP_FRAMES = [INTRO_END, COUNTDOWN_END] as const;
+export const HOP_FRAMES = [0, INTRO_END, COUNTDOWN_END] as const;
 
 /**
  * 周期アニメーションの周期（フレーム）。**すべて 480 の約数**。
