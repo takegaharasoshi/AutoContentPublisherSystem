@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code のループ / ゴール系スキルを開発プロセスに組み込む | アイデア詳細</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アイデア体系</a> / Claude Code のループ / ゴール系スキルを開発プロセスに組み込む</nav>
+<h1>Claude Code のループ / ゴール系スキルを開発プロセスに組み込む</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">醸成中</span>
+  <span>種別: 単発 / 作成 2026-08-29 / 更新 2026-09-02 / 記録層: <a href="claude-code-loop-goal-skills.md">claude-code-loop-goal-skills.md</a></span>
+</div>
+
+<div class="warn">
+  <span class="callout-title">本書の位置づけ（設計書に非ず）</span>
+  採用判断のための<strong>検討記録</strong>。ここに書いた組み込み案・テンプレート文・ガードレールは暫定であり、運用ルールの正ではない。採用が決まったら CLAUDE.md（git 運用・Codex 連携）、補充スキル（<code>.claude/skills/*-stock-replenish/</code>）、<code>docs/plans/index.html</code>（並行作業ルール）へ落とし込み、そこで確定する。
+</div>
+
+<h2>1. 一言で</h2>
+<p>Claude Code の <code>/goal</code>（完了条件を宣言して到達まで自走）と <code>/loop</code>（時間ベースの反復。引数なしなら <code>.claude/loop.md</code> を読んで自走）を、本プロジェクトの「ステップ実行」「夜間のストック整備」「常駐の見回り」に組み込み、人間が張り付く時間を減らして開発速度を上げる。実行環境はローカル CLI（WSL）で端末は常時起動できる。Routines（クラウド無人実行）は今回のスコープ外。</p>
+
+<h2>2. 機能の事実（公式ドキュメント・CHANGELOG で確認済み）</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>機能</th><th>何をするか</th><th>押さえるべき仕様</th></tr></thead>
+<tbody>
+<tr><td><code>/goal &lt;条件&gt;</code><br>（v2.1.139〜）</td><td>完了条件を宣言し、各ターン末に Haiku が会話ログだけを見て「達成 / 未達 / 不可能」を判定。未達なら続行</td><td>判定はコマンドを実行しない（<strong>証跡を会話に出させる</strong>必要がある）。条件は 4,000 字まで。<code>or stop after N turns</code> がソフト上限として機能。数ターン tool 未使用で警告停止。権限モードは変えない。<code>claude -p "/goal ..."</code> で headless 実行可。<code>/goal clear</code> で解除。連続 8 回ブロックで強制解除</td></tr>
+<tr><td><code>/loop &lt;間隔&gt; &lt;prompt&gt;</code><br>（v2.1.71〜）</td><td>固定間隔で prompt を再実行（内部は cron）</td><td>セッションが開いている間だけ動く。7 日で失効。Esc で起床を取消</td></tr>
+<tr><td><code>/loop &lt;prompt&gt;</code></td><td>自己ペース。毎回 1 分〜1 時間の次回間隔を Claude が決め、終わったら自分で停止</td><td>停止条件は prompt 内に書く（例: 「5 回連続 green まで」）</td></tr>
+<tr><td><code>/loop</code>（引数なし）</td><td>内蔵の保守 prompt、または <code>.claude/loop.md</code>（&gt; <code>~/.claude/loop.md</code>）を読んで自走。既定は「未完作業の継続 → PR の CI / レビュー / コンフリクト対応 → バグハント・簡素化。新規着手はしない」</td><td>loop.md は構造自由・25,000 bytes で切詰・編集は次イテレーションから反映。<code>/usage</code> に Loops の内訳が出る</td></tr>
+</tbody>
+</table></div>
+<p>役割分担: <code>/loop</code> は時間駆動（見守り・定期）、<code>/goal</code> は条件駆動（1 タスクの完走）。両者は「timer を外側・condition を内側・skill を最内」に重ねるのがコミュニティの定石。</p>
+
+<h2>3. 実践者の使い方（X・Zenn・GitHub の二次情報。2026-09 時点）</h2>
+<div class="note">
+  <span class="callout-title">取得制約</span>
+  X / Reddit / Zenn 本体は本セッションの環境から直接取得できず、GitHub 上のキュレーション（serenakeyitan/awesome-agent-loops 等）と検索スニペット経由の二次情報。パターンの分類は一次情報を優先し、投稿の細部は要再確認。
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th>#</th><th>パターン</th><th>典型例</th><th>本プロジェクトへの示唆</th></tr></thead>
+<tbody>
+<tr><td>P1</td><td><strong>テスト / lint が通るまで <code>/goal</code></strong>（最も共有が多い）</td><td><code>/goal all tests pass and lint is clean — stop after 20 turns</code>。API 移行を「全ファイルが v2 を import・tests pass・typecheck clean」で宣言し「マルチエージェント構成より単一 /goal が良かった」との報告も</td><td>開発レーンのステップ実行にそのまま当てはまる。完了条件 = 「pytest 全パス + 設計書更新 + コミット済み」</td></tr>
+<tr><td>P2</td><td><strong>夜間の自走ビルド・QA を <code>/loop 30m</code> 〜 <code>2h</code></strong></td><td>estie 木村氏: 移行後の QA を「テスト計画 → Playwright 実行 → 差分修正 → push → 進捗をファイル追記」で一晩完走。green_tea: <code>/loop 2h /evolve</code> で 1 機能ずつ実装 → テスト → commit</td><td>「明確なゴール + 人間判断の排除 + 進捗ファイル」が要点。ストック補充の「レビュー提示直前まで」を夜間に回す型</td></tr>
+<tr><td>P3</td><td><strong>引数なし <code>/loop</code> + loop.md を「現場監督（foreman）」にする</strong></td><td>moai-adk: 毎回 1 カード・冪等・報告のみ（AskUserQuestion 不可前提）・スキル欠落時は自己停止。dominno / cobusgreyling: 信頼レベル L1（報告のみ）→ L2（実装者 + 別検証者）→ L3（無人）を loop.md に宣言し、denylist（auth / secrets / infra / CI / migrations）を置く</td><td>「セッションを跨いで自走」に最も近い型。本プロジェクトでは計画書・バックログ・在庫水位が「カンバン」に相当する</td></tr>
+<tr><td>P4</td><td><strong>PR / CI の見守りを <code>/loop 10m</code></strong></td><td><code>/loop 10m run gh pr checks 1234; if all pass ...</code>、<code>/loop 20m /review-pr 1234</code></td><td>push 後の CodePipeline 完走待ちがこれ。最小の導入</td></tr>
+<tr><td>P5</td><td><strong>大型リファクタを <code>/goal</code> + サブエージェント</strong></td><td>専用ブランチ・1 単位 1 コミット・レビュア通過必須・auto-merge しない、をセットで運用</td><td>Codex 委譲と組み合わせる型（Claude = 監督、Codex = 作業者、/goal = 判定）</td></tr>
+</tbody>
+</table></div>
+
+<h3>3.1 実践者が挙げる落とし穴</h3>
+<ul>
+<li><strong>「main で /goal は自殺行為」</strong>: 無人実行はブランチ / worktree で。本プロジェクトは「コミット即 push main」ルールなので、無人区間では push の扱いを決める必要がある（セクション 5）</li>
+<li><strong>context rot</strong>: <code>/goal</code> は Ralph loop の「外部オラクル」を内蔵化したものだが、イテレーションごとに context を捨てないので長時間タスクで劣化する。長い作業は「1 ステップ 1 ゴール」に刻むか、シェルの while ループで <code>claude -p "/goal ..."</code> を回して都度 context を捨てる</li>
+<li><strong>判定できない条件は永遠に未達</strong>: 未登録のスキル名を条件に書いて 30 回超ループした報告（#58348）。「レビューが終わった」のような人間判断も同類。<strong>決定的に検証できる条件だけ</strong>書き、証跡（テスト出力・件数）を会話に出させる</li>
+<li>30 行超のゴール文で evaluator が落ちる（#58192。<code>/goal clear</code> で復旧）。トークン / 時間の予算機能は両者とも未搭載（要望 #56085）。「Unattended loops make unattended mistakes」</li>
+<li>裸 <code>/loop</code> が loop.md を無視した版があった（#47883。回避: <code>/loop follow .claude/loop.md</code>）</li>
+</ul>
+
+<h2>4. 本プロジェクトへの組み込み案（第 2 巡）</h2>
+<p>第 1 巡の「ポーリングだけ」から広げ、実践パターンに沿って 4 案に再編。導入は信頼レベル順（L1 報告のみ → L2 機械工程まで → L3 無人）で段階的に上げる。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>案</th><th>型</th><th>内容</th><th>レーン</th><th>人間が残る点</th></tr></thead>
+<tbody>
+<tr><td><strong>A. ステップ実行の標準ラッパー</strong></td><td>P1 / P5</td><td>開発レーンの各ステップを <code>/goal</code> で起動する。テンプレ: <code>/goal &lt;ステップ番号&gt; の実装が完了: pytest 全パス（出力を貼る）・cdk synth 成功・関連設計書の更新・日本語メッセージでコミット済み。cdk deploy / DDL 適用 / publish は行わない。or stop after 20 turns</code>。実装は従来どおり Codex 委譲（Claude = 監督、/goal = 判定）</td><td>開発</td><td>AWS 稼働確認（現行どおり）。push の扱いは論点 1</td></tr>
+<tr><td><strong>B. 夜間ストック整備</strong></td><td>P2</td><td>補充スキルの「レビュー提示直前まで」を 1 本の <code>/goal</code> に: <code>/goal quiz 朝スロット 7 問がリサーチ → 執筆 → validate / verify_logic 全パス → review 用にまとめ済み。投入（publish / apply）・S3 配置は禁止。or stop after 30 turns</code>。翌朝レビュー後に第 2 ゴール「承認済み N 件を投入 → ビルド → unbuilt=0 → S3 配置 → 記録更新」</td><td>セット（並行可）</td><td>1 問ずつのレビュー・review.html 承認・動画全数レビュー（現行どおり）</td></tr>
+<tr><td><strong>C. 常駐の見回り（loop.md）</strong></td><td>P3</td><td><code>.claude/loop.md</code> を書き、引数なし <code>/loop</code> で自走。L1 から開始: 在庫水位（quiz 3 組 × 7 問下限・ranking 14 件）、CodePipeline 状態、アイデア inbox の滞留、計画書 ⇄ 記録の整合を確認して報告ファイルに追記するだけ。L2 で「承認済みストックのビルド・配置」など判断ゼロのセットレーン工程を許可。開発レーンの変更は permanent denylist（レーン 1 セッション制約のため）</td><td>アイデア / セット</td><td>報告を読んで次の指示を出す</td></tr>
+<tr><td><strong>D. CodePipeline 完走待ち</strong></td><td>P4</td><td><code>/loop 2m</code> または <code>/goal 該当パイプラインが Succeeded かつタスク定義の新リビジョンが登録済み</code>。CLAUDE.md の git 運用ルールに定型文として 1 行追加</td><td>開発</td><td>なし</td></tr>
+</tbody>
+</table></div>
+
+<h2>5. ガードレール（採用時に CLAUDE.md / loop.md へ落とす候補）</h2>
+<ul>
+<li><strong>denylist</strong>: <code>cdk deploy</code>、本番 DDL 適用、<code>publish.py</code> / <code>apply_aurora.py</code> の投入、SNS 投稿、Secrets への接触、<code>docs/plans/</code> のルール変更。ゴール文と loop.md の両方に明記</li>
+<li><strong>証跡を会話に出す</strong>: pytest の要約行・件数クエリの結果・<code>unbuilt=0</code> の出力をそのまま貼らせる（evaluator は会話しか見ない）</li>
+<li><strong>上限</strong>: 必ず <code>or stop after N turns</code>。夜間は Ctrl+C できる端末で、朝一で <code>/usage</code> の Loops 内訳を見る</li>
+<li><strong>レーン規律</strong>: ゴール文の冒頭でレーンを宣言。開発レーンのゴール実行中はユーザー自身も開発レーンを触らない（1 セッション制約）</li>
+<li><strong>1 ステップ 1 ゴール</strong>: 大きなフェーズを 1 本のゴールにしない（context rot）</li>
+</ul>
+
+<h2>6. 未決の論点（第 3 巡で決める）</h2>
+<ol>
+<li><strong>無人区間の push</strong>: 「コミット即 push main」ルールと「main で無人 /goal は危険」の衝突。候補は (a) 現行どおり push まで（稼働確認は現行と同じくユーザー）、(b) <code>services/ shared/ infra/ database/</code> を触るゴールは「コミットまで・push は差分確認後」に止める、(c) 作業ブランチに push してユーザーが main へ取り込む。推奨は (b): docs だけのゴールは (a) でよい</li>
+<li><strong>最初に試す案</strong>: 推奨は D（最小）→ A（16-12 の DDL・ビュー生成が自然な初回）→ B（quiz か ranking）→ C（loop.md は L1 から）の順。ただし「想定していた使い方」が C（常駐自走）なら C-L1 を先に始めても損はない（報告のみで安全）</li>
+<li><strong>B の対象</strong>: quiz（1 問ずつレビュー・朝 / 夜スロット）と ranking（review.html 一括承認・一次データのパース検証あり）のどちらが夜間自走に向くか。機械検証が厚い ranking の方が「レビュー提示直前まで」の自走価値が高いと見る</li>
+</ol>
+
+</div>
+</body>
+</html>
