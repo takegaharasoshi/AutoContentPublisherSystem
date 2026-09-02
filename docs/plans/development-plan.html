@@ -13,7 +13,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-02（19-1〜19-3 の実装を実施・いずれも初回試行待ち）</span>
+  <span>最終更新: 2026-09-02（19-4 を起票: 計画のステップ単位・記載様式の改訂。19-1〜19-3 は初回試行待ち）</span>
 </div>
 
 <div class="note">
@@ -94,6 +94,7 @@
 <tr><td>19-1 CodePipeline 完走待ちの <code>/goal</code> 化</td><td>Opus 5 / high（CLAUDE.md 1 行 + 初回試行）</td><td>なし</td></tr>
 <tr><td>19-2 <code>/step</code> スキル新設</td><td><strong>Fable 5</strong> / high（スキル本文の設計と実機確認）</td><td>なし（スキル本文は判断を伴うため）</td></tr>
 <tr><td>19-3 quiz 補充スキルへの <code>/goal</code> 組み込み</td><td>Opus 5 / high</td><td>なし</td></tr>
+<tr><td>19-4 計画のステップ単位・記載様式の改訂（<code>/step 19-4</code> で起動し 19-2 の初回試行を兼ねる）</td><td>Opus 5 / high（docs のみ）</td><td>なし</td></tr>
 </tbody>
 </table></div>
 
@@ -175,6 +176,15 @@
   <li>内容: <code>.claude/skills/quiz-stock-replenish/SKILL.md</code> に「起動時の <code>/goal</code>」節を追加し、G1（在庫確認 → リサーチ → 執筆 → 機械検証全問パス。投入禁止）/ G2（承認分の投入 → イラスト生成 → intake → build → review.html 生成。配置禁止）/ G3（publish → Aurora 適用の更新行数一致 → unbuilt=0 → コミット・push・記録更新）の 3 本を人間レビューの前後で切って置く（テンプレはアイデア詳細 7.1）。「goal が立つまで工程 1 に入らない」規律を本文に書く。触るパスはセットレーン（補充スキル）のみだが、Phase 19 で一括管理する（<a href="logic-training-1.html">logic-training-1 計画書</a>のバックログに導線あり）</li>
   <li>完了条件: SKILL.md 追記 + 次の週次補充での初回試行（結果は logic-training-1 記録へ、要点を開発記録へ）</li>
   <li>進捗: <strong>SKILL.md 追記は 2026-09-02 完了</strong>（「起動時の /goal」節 + G1/G2/G3 テンプレ + goal が立つまで工程 1 に入らない規律）。<strong>残りは次の週次補充での初回試行のみ</strong> — 詳細は<a href="development-log.html">開発記録</a>の Phase 19</li>
+  </ul></li>
+<li>⬜ <strong>19-4</strong> 計画のステップ単位・記載様式の改訂（<code>/goal</code> 前提）
+  <ul>
+  <li>背景: これまでの「1 ステップ = 1 プロンプト + ユーザー確認」は、Claude が 1 ターンでこなせる量と、ユーザーが確認したい地点の 2 つで区切っていた。<code>/goal</code> は前者の制約を外す（完了条件まで何ターンでも自走する）ため、以後のステップ境界は<strong>人間ゲート（稼働確認・レビュー・go / no-go・設計判断）だけ</strong>で決める。2026-09-02 のユーザーの問いで判明した Phase 19 の抜け</li>
+  <li>内容: ① 本書「進め方の方針」の「1 ステップ = 1 プロンプト」の行を「1 ステップ = 人間ゲート間の 1 ゴール」に改め、切り方の目安 3 つ（ゲートのない連続作業〔実装 → テスト → 設計書 → コミット〕はまとめる / 確認・判断で終わる地点は境界に残す・ユーザー作業のステップはゴールにしない / 20〜30 ターン超や 2 レーンまたぎは機械検証できる中間点で割る）を書く ② <a href="index.html">計画体系</a>に「ステップの記載様式」節を追加し、<strong>内容 / 完了条件（機械検証できる形・証跡をコマンド出力で示せるもの）/ 人間ゲート（ゴール終了後にユーザーが行う確認）/ 停止点・上限（コミットまで or push まで・stop after N turns）</strong>の 4 項目を開発計画・セット計画書共通の様式と定める（本書からはリンクのみ） ③ <code>.claude/skills/step/SKILL.md</code> 手順 1 に旧形式フォールバック（完了条件のないステップは「内容」から案を作りユーザー確認後にゴール行へ埋める。分割が必要ならその場で提案する）を追記 ④ 16-12 を「指標セットの確定（ユーザー判断・ゴール対象外）」と「反映（DDL・ビュー・運用手順・計画書。1 ゴール）」に分割し 4 項目で書き直す（16-5 は目視ステップのためゴール対象外と明記するのみ。R-1 の分割〔R-1-5 をビルドまで / レビュー後の差し替え + R-1-6 吸収〕はセット計画書のため、次に <code>/step logic-training-1 R-1-5</code> を起動したときにフォールバックで扱いそのセッションで書き換える） ⑤ 開発記録に単位が変わる理由を残す</li>
+  <li>完了条件: ①〜⑤の変更が入り、変更した HTML のタグ対応・ローカルリンクの機械チェックが通り、日本語メッセージでコミットし pull --rebase → push まで完了（docs と <code>/step</code> の本文のみ・CodePipeline は起動しない）</li>
+  <li>人間ゲート: なし（push 後にユーザーが本書・計画体系の文面を一読する程度）</li>
+  <li>停止点・上限: push まで。stop after 20 turns</li>
+  <li>起動: <code>/step 19-4</code>。<strong>本ステップの実行を 19-2（<code>/step</code> スキル）の初回試行に充てる</strong>（新様式で書かれたステップを <code>/step</code> が読んでゴール行を組み立てられるかの実機確認。結果は開発記録の 19-2 の項へ）</li>
   </ul></li>
 </ul>
 
