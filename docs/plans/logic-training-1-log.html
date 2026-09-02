@@ -34,6 +34,16 @@
 <li><strong>配置（2026-08-24）</strong>: 63 問を承認 → S3 へ 126 オブジェクト（mp4 + イラスト）→ ローカル MySQL 63 行 → Aurora へ <code>update_prebuilt.sql</code> を Data API で 63 文適用（<strong>各 1 行更新・<code>video_audio_asset_id</code> の NULL 化なし</strong>）。適用前に <code>question_text</code> が両環境とも 63 件すべて一意であることを確認した（安定キーで解決する SQL のため）。<strong>両環境とも <code>unbuilt = 0</code>・各組 <code>unused_built = 7</code></strong> で在庫閾値を回復</li>
 </ul>
 </li>
+<li><strong>logic-training-1 / 2026-08-w5（14 問。2026-08-31 着手 〜 2026-09-02 完了）</strong><ul>
+<li>資材: <a href="../../content/quiz-stock/logic-training-1/2026-08-w5/">content/quiz-stock/logic-training-1/2026-08-w5/</a>。<strong>昼（L3 / standard）の停止（16-4d）後はじめての補充</strong>のため、対象は<strong>朝・夜の 2 組 × 7 問だけ</strong>（ユーザー決定 2026-08-31）。着手時の在庫は<strong>朝 0 / 夜 0</strong>で、のべ使用 23 回 &gt; 有効在庫 21 問と<strong>すでに再利用出題に突入した状態</strong>だった。ツーリングは <code>validate.py</code> の内訳期待値を <code>{L1/light:7, L1/deep:7}</code> に、<code>generate.py</code> の <code>GROUPS</code> から昼を外して対応</li>
+<li><strong>朝の採用帯が「大人が一手間かける言葉あそび」に定まった</strong>: 承認 7 問中 6 問が漢字・語彙・法則発見の中〜高難度で、却下 4 問はすべて「一目で解ける単発の言葉あそび」。<strong>隠れ言葉型（単語の中に別の語が入っている）は朝には易しすぎる</strong>／<strong>「知っている人が少ない知識」が答えの一部になる問題は不可</strong>（A28 の鵜）／<strong>流布形をそのまま使わず問い方で難度を上げる</strong>（A27「どんな顔?」→「なんと読む?」）。夜は<strong>「具体的な物を動かす手順もの」</strong>が採用帯で、軽いひっかけ・抽象概念もの・雑学着地の水平思考は却下。答えが手順の問題は <code>answer</code> に全手順を書く（30 字超は <code>validate.py</code> の OVERRIDES に理由付きで登録）。いずれもスキル <code>/quiz-stock-replenish</code> へ反映済み</li>
+<li><strong>投入（2026-09-02）</strong>: 既出題（<code>quiz_items</code> 89 件 + <code>quiz_stock_items</code> 63 件）と突合し重複なしを確認 → ローカル MySQL はトランザクション + ROLLBACK のドライラン後に本適用 → Aurora は Data API で 14 文適用。<code>content_key</code> は両環境とも <code>morning/night-022</code>〜<code>028</code> で一致</li>
+<li><strong>イラストの文字入れ例外が 4 件 → 6 件に増えた</strong>: 提示物そのものを見せる問題（A22「十月十日」/ A27「あいうおお」/ A25「0〜9」/ A32「柿=傘…西=?」）に加え、動画レビューでユーザー指示により <strong>A31・A29 も黒板形式へ変更</strong>（<code>illustration_scene</code> を修正し両環境の DB を <code>JSON_SET</code> で更新 → 再生成 → 再ビルド）。<strong>空欄は問題文の「〇」ではなく「?」で描く</strong>のが流儀（imagegen に「〇」を描かせると漢字で埋めてしまうため）</li>
+<li><strong>プロンプトの定型文と文字入れ例外が衝突した</strong>: <code>_build_illustration_prompt</code> の定型文「『?』以外の文字・数字・記号は一切描画しない」が例外 6 問の情景文と矛盾するため、<code>work/prompts/&lt;id&gt;.txt</code> を手で緩和して生成した。<strong>恒久対応は開発レーン</strong>（<a href="development-plan.html">設計課題リスト</a>に記録）</li>
+<li><strong>配置（2026-09-02）</strong>: 14 問を承認 → S3 へ 28 オブジェクト（mp4 + イラスト）→ ローカル MySQL 14 行 → Aurora へ <code>update_prebuilt.sql</code> を Data API で 14 文適用（各 1 行更新）。<strong>両環境とも <code>unbuilt = 0</code>・朝夜とも <code>unused_built = 7</code></strong> で在庫閾値を回復し、再利用出題を解消した</li>
+<li><strong>レビューをスマホで行えるようにした</strong>: <code>serve-docs.sh</code> を <code>DOCS_PORT=8766 DOCS_ROOT=&lt;work/&gt;</code> で別インスタンス起動し（docs 配信の 8765 は止めない）、当該バッチ 14 件だけを載せた viewport 対応のシート <code>work/review_w5.html</code> を生成して tailnet 内に公開した</li>
+</ul>
+</li>
 </ul>
 
 <h2>2. トラブル対応の記録</h2>
