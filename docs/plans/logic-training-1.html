@@ -13,7 +13,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新し 2026-08 の月次行をビューから転記。ほかは 2026-09-02 時点のまま: 16-5 のベースライン記入・確認待ちリストに R-1 の効果確認。改修 R-1: R-1-1〜R-1-4 完了。次は R-1-5 在庫全数の再ビルド）</span>
+  <span>最終更新: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新し 2026-08 の月次行をビューから転記。ほかは 2026-09-02 時点のまま: 16-5 のベースライン記入・確認待ちリストに R-1 の効果確認。改修 R-1: R-1-1〜R-1-4 完了。<code>/step logic-training-1 R-1-5</code> 起動時に R-1-5 を 4 項目様式へ書き換え、ビルドまでの R-1-5 と差し替え + 設計書・記録更新の R-1-6 に分割〔2026-09-03〕。次は R-1-5 在庫全数の再ビルド）</span>
 </div>
 
 <div class="note">
@@ -52,7 +52,7 @@
   <strong>投入方針</strong>: 段階ビルド（補充バッチだけ新版面の混在投稿）は<strong>行わない</strong>（ユーザー判断 2026-09-02）。プロトタイプで目視判断 → 在庫を全数一括で再ビルド・差し替える。本番投入は <strong>16-5 効果検証〔開発レーン〕の水準評価を済ませてから</strong>とし、投入日をセット記録に残す。
 </p>
 <div class="table-wrap"><table>
-<thead><tr><th>ステップ</th><th>内容</th><th>完了条件</th><th>状態</th></tr></thead>
+<thead><tr><th>ステップ</th><th>内容</th><th>完了条件 / 人間ゲート / 停止点</th><th>状態</th></tr></thead>
 <tbody>
 <tr>
   <td><strong>R-1-1</strong><br>ループ仮説の確認（ユーザー）</td>
@@ -79,15 +79,15 @@
   <td><strong>完了</strong>（2026-09-02）<br><code>build.py</code> をホスト実行 + Docker（Remotion / ffmpeg）方式へ全面書き換え。<code>gpt_quiz_multicut</code> 依存を除去（<code>services/</code> 側は残置）。<code>tests/</code> 新設で <strong>28 件パス</strong>（うち <code>timeline.ts</code> との同期テスト 5 件）。<code>id=85</code> を <code>--rebuild --item 85</code> でビルド完了（16.000 秒 / 1080x1920 / h264 + aac）。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
 </tr>
 <tr>
-  <td><strong>R-1-5</strong><br>在庫全数の再ビルド・差し替え・全数レビュー</td>
-  <td>稼働在庫 56 問（朝 28 / 夜 28。使用済み含む。LRU が再利用で旧版を出すため）を一括で再ビルド → レビューシートで<strong>全数人間レビュー</strong> → S3 差し替え → <code>quiz_stock_items.video_s3_key / video_audio_asset_id / video_built_at</code> をローカル・Aurora 両環境で更新（<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8 の手順）。凍結中の昼 21 問は<strong>再ビルドしない</strong>（再開判断時にまとめて行う）。<strong>着手条件: 16-5 の水準評価が完了していること</strong></td>
-  <td>両環境で 56 問すべてが新版に差し替わり、抜き取りで再生確認できる。投入日（新版の初出投稿）がセット記録に残っている</td>
+  <td><strong>R-1-5</strong><br>在庫全数の再ビルドとレビューシート生成（レビュー提出まで）</td>
+  <td>稼働在庫 56 問（朝 28 / 夜 28。使用済み含む。LRU が再利用で旧版を出すため）を <code>build.py --rebuild</code> で一括再ビルドし、<code>review_sheet.py</code> で <code>work/review.html</code> を生成して<strong>全数人間レビュー</strong>に出すところまで。凍結中の昼 21 問は<strong>再ビルドしない</strong>（再開判断時にまとめて行う）。対象抽出で昼を除外する必要が出たらビルドツール側を直す。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・<a href="logic-training-1-log.html">セット記録</a>。<strong>着手条件: 16-5 の水準評価が完了していること</strong>（2026-09-02 完了済み）<br><strong>分割の経緯</strong>: 旧 R-1-5（再ビルド → レビュー → S3 差し替え → 両環境 DB 更新）は人間レビューがステップ途中に入るため、<code>/step</code> 起動時（2026-09-03）に本ステップ（ビルドまで）と R-1-6（差し替え + 設計書・記録の更新）へ分割した</td>
+  <td><strong>完了条件</strong>: ① <code>build.py</code> の対象件数 = 成功件数（朝・夜 56 件 / 昼 0 件）の出力を貼る ② 出力 MP4 全数が 16.000 秒・1080x1920・h264 + aac であることを ffprobe 一括チェックの出力で示す ③ <code>work/review.html</code> が 56 問分生成されている ④ <code>python -m pytest</code> 全パスの要約行 ⑤ 本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>review.html</code> での全数レビュー（承認 ID を <code>work/approved.txt</code> に記載）<br><strong>停止点・上限</strong>: push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。<code>publish.py</code> の実行・S3 アップロード・ローカル / Aurora の DB 更新は行わない。stop after 25 turns</td>
   <td>未着手</td>
 </tr>
 <tr>
-  <td><strong>R-1-6</strong><br>設計書・記録の更新</td>
-  <td><a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8（レンダラー・組版の記述）を Remotion 版へ書き換え、decision に経緯を残す。<a href="logic-training-1-log.html">セット記録</a>セクション 3 に実施記録を追記。本計画書ステータス表の「生成方式」行を更新。<strong>共通設計書 <a href="../app/batch-flow.html">batch-flow.html</a> の方式カタログ行（quiz-prebuilt の「Pillow 組版 → ffmpeg 連結」の記述）と gpt-quiz-multicut の「事前ビルドのレンダラーとして継続使用」の注記は開発レーン</strong>のため、本ステップでは<a href="development-plan.html">開発レーン</a>の設計課題リストに 1 行起票し、開発レーンのセッションで直す</td>
-  <td>セット側の設計書・記録が実装に一致し、共通設計書の修正が設計課題リストに起票されている</td>
+  <td><strong>R-1-6</strong><br>差し替えと設計書・記録の更新（R-1-5 のレビュー承認後）</td>
+  <td>① 承認済み ID（<code>work/approved.txt</code>）をもとに<strong>ユーザーが</strong> <code>publish.py --dry-run</code> → 本実行（S3 差し替え + ローカル DB 更新）→ <code>work/update_prebuilt.sql</code> を Aurora へ適用する（<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8 の手順。Claude はコマンド行の提示のみで実行しない） ② <a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8（レンダラー・組版の記述）を Remotion 版へ書き換え、decision に経緯を残す ③ <a href="logic-training-1-log.html">セット記録</a>セクション 3 に実施記録と差し替え日を追記 ④ 本計画書ステータス表の「生成方式」行と<a href="#pending-checks">確認待ちリスト</a>の R-1 効果確認行（トリガー起点 = 差し替え日）を更新 ⑤ <strong>共通設計書 <a href="../app/batch-flow.html">batch-flow.html</a> の方式カタログ行（quiz-prebuilt の「Pillow 組版 → ffmpeg 連結」の記述）と gpt-quiz-multicut の「事前ビルドのレンダラーとして継続使用」の注記は開発レーン</strong>のため、本ステップでは<strong>起票文面を用意して提示するまで</strong>とし、<a href="development-plan.html">開発計画</a>の設計課題リストへの書き込みは開発レーンのセッションで行う（旧 R-1-6「設計書・記録の更新」を吸収）</td>
+  <td><strong>完了条件</strong>: ① 両環境で <code>video_built_at</code> が差し替え日の <code>quiz_stock_items</code> 行が 56 件であることを件数クエリの出力で示す ② セット側の設計書・記録・本計画書が実装に一致する ③ 設計課題リストへの起票文面を会話に提示 ④ 日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>publish.py</code> の実行と Aurora への <code>update_prebuilt.sql</code> 適用、差し替え後の抜き取り再生確認<br><strong>停止点・上限</strong>: push まで（<code>docs/</code> のみ）。<code>publish.py</code>・Aurora 適用・<code>development-plan.html</code> への書き込みは行わない。stop after 20 turns<br><strong>注</strong>: 「投入日（新版の初出投稿）」は自セッション外の出来事のため完了条件に含めず、差し替え日を記録して効果は<a href="#pending-checks">確認待ちリスト</a>で追う</td>
   <td>未着手</td>
 </tr>
 </tbody>
