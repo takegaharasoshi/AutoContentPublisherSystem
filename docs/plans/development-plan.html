@@ -98,74 +98,75 @@
 
 <h2 id="phase-21">Phase 21: ウミガメのスープ参加型セット（第 4 セット）</h2>
 <p><strong>ゴール</strong>: Instagram リールで 1 日 1 問の「ウミガメのスープ」（水平思考クイズ）を投稿し、コメント欄の質問に AI 出題者が「はい / いいえ / 関係ありません」で自動返信する参加型セットを新設して稼働開始し、運用をセットレーンへ移管する。<strong>コメント自動返信は外向き発信・イングレスを持つ初の機能</strong>であり、投稿時（既存 ECS + Aurora）とコメント時（S3 スナップショット + Lambda・Aurora 不使用）を完全分離する構成をとる</p>
-<blockquote>経緯: アイデア体系で 2 回の壁打ち（2026-08-28。企画・事業面の論点は全決着）→ 待機（採用条件 = Meta コメント Webhook + AI 自動返信 PoC の成功）→ <strong>PoC 成功（2026-09-03）</strong>→ 採用・本フェーズ起票。インプットは<a href="../ideas/umigame-soup-set.html">アイデア詳細</a>（設計書に非ず。設計 Fix は 21-2 で <code>docs/app/</code> <code>docs/infra/</code> 側で行う）と PoC 資材 <code>poc/umigame-comment-webhook/</code> + <code>UmigamePocStack</code>（実測: 公開モード必須・App Review 不要・役割なしの一般アカウントのコメントも届く・受信 → 返信 約 4 秒・署名鍵は Instagram アプリシークレット）。PoC 資材（Meta アプリ + テスト用アカウント <code>test_tkghr</code>）は設計課題リスト 2026-08-28 の decision どおりコメント経路のステージング面として恒久利用する。<code>set_code</code> は仮に <code>umigame-soup-1</code> とし 21-1 で確定する。ステップ順は 21-1 → 21-2 → 21-3a/b → 21-4a/b/c → 21-5 → 21-6 → 21-7（21-5 は 21-3・21-4 と独立のため前倒し可）</blockquote>
+<blockquote>経緯: アイデア体系で 2 回の壁打ち（2026-08-28。企画・事業面の論点は全決着）→ 待機（採用条件 = Meta コメント Webhook + AI 自動返信 PoC の成功）→ <strong>PoC 成功（2026-09-03）</strong>→ 採用・本フェーズ起票。インプットは<a href="../ideas/umigame-soup-set.html">アイデア詳細</a>（設計書に非ず。設計 Fix は 21-3 で <code>docs/app/</code> <code>docs/infra/</code> 側で行う）と PoC 資材 <code>poc/umigame-comment-webhook/</code> + <code>UmigamePocStack</code>（実測: 公開モード必須・App Review 不要・役割なしの一般アカウントのコメントも届く・受信 → 返信 約 4 秒・署名鍵は Instagram アプリシークレット）。PoC 資材（Meta アプリ + テスト用アカウント <code>test_tkghr</code>）は設計課題リスト 2026-08-28 の decision どおりコメント経路のステージング面として恒久利用する。<code>set_code</code> は仮に <code>umigame-soup-1</code> とし 21-1 で確定する。
+<strong>ストックの単位は「問題文 + 真相 + 確定事実シート」だけではなく、リール 1 本を作るのに要る素材一式</strong>（イラスト作成用プロンプト・フック文・プレイ例・キャプション等）とし、その項目は<strong>完成版リールの PoC（21-2）で動画のイメージを固めてから確定</strong>する（2026-09-03 のユーザー指示。動画のイメージがないままストックをレビューするのは難しいため）。ステップ順は 21-1 → 21-2 → 21-3 → 21-4a/b → 21-5a/b → 21-6 → 21-7 → 21-8（21-6 は 21-4・21-5 と独立のため前倒し可）</blockquote>
 <ul>
 <li>⬜ <strong>21-1</strong> テーマ・企画の Fix 壁打ち（<strong>ユーザー判断・ゴール対象外</strong>）
   <ul>
-  <li>内容: アイデア詳細をインプットに、実装に必要な未確定点を壁打ちで決める。① <code>set_code</code>・アカウント名・ユーザーネーム ② リール版面（問題文 + プレイ例 2〜3 往復の焼き込み）・尺・ナレーション有無（VOICEVOX）・BGM ③ 生成方式（Remotion ローカル事前ビルド = ranking-prebuilt 同型を第一候補。定常費ゼロ路線） ④ 投稿時刻・固定コメント文面・助手サブアカウントの初期要否 ⑤ AI 出題者のモデル（PoC は gpt-4o-mini）と月額試算・利用上限 ⑥ コメント経路の構成（PoC の Function URL 直結を本番でも使うか、API Gateway + SQS 分離か）と Lambda コードの置き場・デプロイ方式（CDK asset か CodePipeline か） ⑦ 本番 Meta アプリ（新規・公開モード）と PoC アプリ（ステージング）の使い分け・<code>UmigamePocStack</code> の扱い。記録は <code>docs/app/requirements-notes-set4.html</code></li>
+  <li>内容: アイデア詳細をインプットに、実装に必要な未確定点を壁打ちで決める。① <code>set_code</code>・アカウント名・ユーザーネーム ② リール版面（問題文 + プレイ例 2〜3 往復の焼き込み）・尺・ナレーション有無（VOICEVOX）・BGM・イラストの要否と画風 ③ 生成方式（Remotion ローカル事前ビルド = ranking-prebuilt 同型を第一候補。定常費ゼロ路線） ④ 投稿時刻・固定コメント文面・助手サブアカウントの初期要否 ⑤ AI 出題者のモデル（PoC は gpt-4o-mini）と月額試算・利用上限 ⑥ コメント経路の構成（PoC の Function URL 直結を本番でも使うか、API Gateway + SQS 分離か）と Lambda コードの置き場・デプロイ方式（CDK asset か CodePipeline か） ⑦ 本番 Meta アプリ（新規・公開モード）と PoC アプリ（ステージング）の使い分け・<code>UmigamePocStack</code> の扱い ⑧ ストック 1 件の素材項目の<strong>仮リスト</strong>（問題文・真相・確定事実シート・想定質問・イラスト作成用プロンプト・フック文・プレイ例・キャプション・出典メモ等。確定は 21-2 の PoC 後）と 21-2 で作る PoC 用の 1 問の選定。記録は <code>docs/app/requirements-notes-set4.html</code></li>
   <li>完了条件: —（ユーザー判断）</li>
-  <li>人間ゲート: 上記 ①〜⑦ の決定</li>
+  <li>人間ゲート: 上記 ①〜⑧ の決定</li>
   <li>停止点・上限: —（ゴールにしない）</li>
   </ul></li>
-<li>⬜ <strong>21-2</strong> 設計書 Fix（21-1 完了後）
+<li>⬜ <strong>21-2</strong> リール動画の PoC — 完成版 1 本を作って動画のイメージを固める（21-1 完了後）
   <ul>
-  <li>内容: ① セット別設計書 <code>docs/app/sets/umigame-soup-1.html</code>（雛形は <a href="../app/operation.html">運用設計</a> 2.1 手順 0。コメント返信の運用・出題者プロンプト・モデレーション一行・正解宣言方式を含む） ② 方式設計書 <code>docs/app/generators/umigame-prebuilt.html</code> + <code>batch-flow.html</code> 方式カタログへ 1 行 ③ 共通設計書は blocker のみ: <code>data-model.html</code>（<code>umigame_stock_items</code>〔問題文・真相・確定事実シート・想定質問〕/ 消費履歴 <code>umigame_items</code> / <code>batch_sets</code> の投稿後スナップショット出力フラグ）、<code>batch-flow.html</code>（投稿成功直後の S3 スナップショット <code>assets/{set_code}/problems/{media_id}.json</code> 出力） ④ インフラ設計: <code>docs/infra/architecture.html</code>・<code>stacks.html</code> にコメント返信スタック（Webhook 受信 → SQS + DLQ → Reply Lambda → S3 / OpenAI / Graph API。VPC 外・NAT 不要）、<code>security.html</code> に Meta アプリ・シークレット、<code>operation.html</code> に DLQ アラーム ⑤ <code>V012</code> DDL の草案（本文は 21-3a）</li>
+  <li>内容: 21-1 で選んだ仮の 1 問について、<strong>ストック 1 件分の素材一式を手作業で揃え、完成版のリール MP4 を 1 本作る</strong>。① 素材: 問題文・真相・確定事実シート・想定質問 15〜20・イラスト作成用プロンプト（→ imagegen でイラスト生成）・フック文・プレイ例 2〜3 往復・キャプション案・BGM（CC0）を <code>content/video-build/umigame-soup-1/poc/</code> に 1 問 = 1 ディレクトリで置く ② <code>content/video-build/umigame-soup-1/</code> に Remotion コンポジション（フック → 問題文 → プレイ例のアニメーション → 質問を促す締め。ナレーションは 21-1 の決定次第）を作り、Docker 委譲の既存手順でビルド ③ 版面の静止フレーム（各カット 1 枚）を書き出してレビュー用に並べる</li>
+  <li>完了条件: 完成版 MP4 が 1 本生成され、ffprobe の寸法（9:16）・尺・音声トラックが 21-1 の仕様どおり（出力を貼る）。素材ディレクトリに ① の項目が揃っている（ls の一覧）。push</li>
+  <li>人間ゲート: 完成版動画の目視レビュー（フック・版面・テンポ・イラストの画風・キャプション）。<strong>修正はレビュー中に反復し、この動画をもってストックの素材項目（何を執筆・生成・レビューするか）を確定する</strong>。フォーマット自体の go / no-go もここで判断</li>
+  <li>停止点・上限: push まで（content/ のみ）。stop after 30 turns</li>
+  </ul></li>
+<li>⬜ <strong>21-3</strong> 設計書 Fix（21-2 のレビュー完了後）
+  <ul>
+  <li>内容: ① セット別設計書 <code>docs/app/sets/umigame-soup-1.html</code>（雛形は <a href="../app/operation.html">運用設計</a> 2.1 手順 0。リールの構成・<strong>21-2 で確定したストックの素材項目</strong>・コメント返信の運用・出題者プロンプト・モデレーション一行・正解宣言方式を含む） ② 方式設計書 <code>docs/app/generators/umigame-prebuilt.html</code> + <code>batch-flow.html</code> 方式カタログへ 1 行 ③ 共通設計書は blocker のみ: <code>data-model.html</code>（<code>umigame_stock_items</code>〔問題文・真相・確定事実シート・想定質問 + リール素材項目〔イラストプロンプト・フック・プレイ例・キャプション用フィールド〕〕/ 消費履歴 <code>umigame_items</code> / <code>batch_sets</code> の投稿後スナップショット出力フラグ）、<code>batch-flow.html</code>（投稿成功直後の S3 スナップショット <code>assets/{set_code}/problems/{media_id}.json</code> 出力） ④ インフラ設計: <code>docs/infra/architecture.html</code>・<code>stacks.html</code> にコメント返信スタック（Webhook 受信 → SQS + DLQ → Reply Lambda → S3 / OpenAI / Graph API。VPC 外・NAT 不要）、<code>security.html</code> に Meta アプリ・シークレット、<code>operation.html</code> に DLQ アラーム ⑤ <code>V012</code> DDL の草案（本文は 21-4a）</li>
   <li>完了条件: 変更した HTML 全ファイルについて <code>python3</code>（html.parser）によるタグ対応チェックと相対リンクの存在チェックがエラー 0 件（出力を貼る）。日本語メッセージでコミット・push</li>
   <li>人間ゲート: 設計レビュー（観点限定・最大 2 巡・blocker のみ修正）</li>
   <li>停止点・上限: push まで（docs/ のみ）。stop after 25 turns</li>
   </ul></li>
-<li>⬜ <strong>21-3a</strong> DDL・ストック整備ツーリング・第 1 バッチ執筆（21-2 完了後）
+<li>⬜ <strong>21-4a</strong> DDL・ストック整備ツーリング・第 1 バッチ執筆（21-3 完了後）
   <ul>
-  <li>内容: ① <code>database/V012__umigame_stock.sql</code>（ストック + 消費履歴。<code>V010</code> 同型・LRU 索引は軸なし） ② <code>content/umigame-stock/umigame-soup-1/batch-01/</code>: <code>stock_items.py</code>（1 問 = 問題文 + 真相 + 確定事実シート + 想定質問 15〜20）、<code>validate.py</code>（文字数・必須項目・オリジナル宣言）、<code>probe_test.py</code>（想定質問を AI 出題者に実際に答えさせ <code>work/review.html</code> に並べる。返信ロジックは PoC の <code>generate_reply</code> を流用）、<code>generate.py</code> → insert SQL ③ 第 1 バッチ 10 問の執筆（完全オリジナル・本家等の転載改変不可）と機械検証・プローブテストの実行</li>
+  <li>内容: ① <code>database/V012__umigame_stock.sql</code>（ストック + 消費履歴。<code>V010</code> 同型・LRU 索引は軸なし） ② <code>content/umigame-stock/umigame-soup-1/batch-01/</code>: <code>stock_items.py</code>（1 問 = 21-2 で確定した素材一式。問題文 + 真相 + 確定事実シート + 想定質問 15〜20 + イラストプロンプト + フック + プレイ例 + キャプション用フィールド）、<code>validate.py</code>（文字数・必須項目・オリジナル宣言）、<code>probe_test.py</code>（想定質問を AI 出題者に実際に答えさせ <code>work/review.html</code> に並べる。返信ロジックは PoC の <code>generate_reply</code> を流用）、<code>generate.py</code> → insert SQL ③ 第 1 バッチ 10 問の執筆（完全オリジナル・本家等の転載改変不可）と機械検証・プローブテストの実行</li>
   <li>完了条件: <code>validate.py</code> 全件 OK の出力、<code>probe_test.py</code> が 10 問 × 15 問以上の応答を含む review.html を生成した旨の出力、ローカル MySQL への V012 適用と insert SQL の <code>--dry-run</code> 成功。日本語メッセージでコミット</li>
-  <li>人間ゲート: 1 問ずつのチャットレビュー + プローブ結果の一括レビュー（修正はレビュー中に反復）→ Aurora へ V012 適用（ユーザー）</li>
+  <li>人間ゲート: 1 問ずつのチャットレビュー（素材一式を 21-2 の完成版動画のイメージで見る）+ プローブ結果の一括レビュー（修正はレビュー中に反復）→ Aurora へ V012 適用（ユーザー）</li>
   <li>停止点・上限: コミットまで（database/ を触る。push は差分確認後）。stop after 30 turns</li>
   </ul></li>
-<li>⬜ <strong>21-3b</strong> 第 1 バッチの投入（21-3a のレビュー・V012 適用後）
+<li>⬜ <strong>21-4b</strong> 第 1 バッチの投入（21-4a のレビュー・V012 適用後）
   <ul>
   <li>内容: <code>batch_sets</code> 行（<code>is_active = 0</code>）とレビュー反映後の 10 問をローカル MySQL と Aurora（Data API）の両環境へ投入</li>
   <li>完了条件: 両環境で <code>umigame_stock_items</code> の件数クエリが 10・<code>content_key</code> の重複 0（クエリ結果を貼る）。push</li>
   <li>人間ゲート: なし</li>
   <li>停止点・上限: push まで（content/ のみ）。stop after 15 turns</li>
   </ul></li>
-<li>⬜ <strong>21-4a</strong> リール版面・コンポジション（21-1 完了後）
+<li>⬜ <strong>21-5a</strong> ビルドツーリングと第 1 バッチ全数ビルド（21-4b 完了後）
   <ul>
-  <li>内容: <code>content/video-build/umigame-soup-1/</code> に Remotion コンポジション（問題文の表示 + プレイ例 2〜3 往復のアニメーション + BGM〔ナレーションは 21-1 の決定次第〕）とサンプル 2 問のビルド（ffmpeg / Remotion は既存の Docker 委譲手順）</li>
-  <li>完了条件: <code>build.py --item</code> で 2 本の MP4 が生成され、ffprobe の寸法・尺が仕様どおり（出力を貼る）。push</li>
-  <li>人間ゲート: サンプル動画の目視レビュー（版面・テンポ。修正はレビュー中に反復）</li>
-  <li>停止点・上限: push まで（content/ のみ）。stop after 30 turns</li>
-  </ul></li>
-<li>⬜ <strong>21-4b</strong> ビルドツーリングと第 1 バッチ全数ビルド（21-3b・21-4a 完了後）
-  <ul>
-  <li>内容: <code>build.py</code> / <code>review_sheet.py</code> / <code>publish.py</code>（ranking のツーリングを流用。S3 は <code>assets/umigame-soup-1/prebuilt/{content_key}.mp4</code>）、第 1 バッチ 10 本のビルド、<code>work/review.html</code> の生成、<code>publish.py --dry-run</code></li>
+  <li>内容: 21-2 の PoC コンポジションを本組み（ストックのフィールドから props を組む形へ）し、<code>export_prompts.py</code> / <code>intake.py</code> / <code>build.py</code> / <code>review_sheet.py</code> / <code>publish.py</code>（quiz / ranking のツーリングを流用。S3 は <code>assets/umigame-soup-1/prebuilt/{content_key}.mp4</code>）を整備。第 1 バッチ 10 本のイラスト生成（imagegen）→ ビルド → <code>work/review.html</code> の生成 → <code>publish.py --dry-run</code></li>
   <li>完了条件: 10 本の MP4 が work/ に存在（ls の件数）、review.html 生成、<code>publish.py --dry-run</code> の出力。push</li>
   <li>人間ゲート: 全数レビュー → <code>work/approved.txt</code> の作成</li>
-  <li>停止点・上限: push まで（content/ のみ）。stop after 25 turns</li>
+  <li>停止点・上限: push まで（content/ のみ）。stop after 30 turns</li>
   </ul></li>
-<li>⬜ <strong>21-4c</strong> 方式モジュール・キャプション・投稿後スナップショット出力（21-4b のレビュー完了後）
+<li>⬜ <strong>21-5b</strong> 方式モジュール・キャプション・投稿後スナップショット出力（21-5a のレビュー完了後）
   <ul>
-  <li>内容: ① <code>approved.txt</code> に基づく publish 本実行 + Aurora への <code>update_prebuilt.sql</code> 適用 ② <code>services/image-batch/app/generators/umigame_prebuilt.py</code>（ranking_prebuilt 同型・LRU 軸なし）+ <code>REGISTRY</code> 登録 ③ sns-post-batch: <code>captions.py</code> に umigame プレースホルダ辞書、<code>processing.py</code> の publish 成功直後に <code>batch_sets</code> のフラグで有効化する S3 スナップショット出力（<code>problems/{media_id}.json</code>: 問題文・真相・確定事実シート・出題者ルール） ④ 単体テスト ⑤ 方式設計書・batch-flow の実態合わせ</li>
+  <li>内容: ① <code>approved.txt</code> に基づく publish 本実行 + Aurora への <code>update_prebuilt.sql</code> 適用 ② <code>services/image-batch/app/generators/umigame_prebuilt.py</code>（ranking_prebuilt 同型・LRU 軸なし）+ <code>REGISTRY</code> 登録 ③ sns-post-batch: <code>captions.py</code> に umigame プレースホルダ辞書（ストックのキャプション用フィールドを差し込む）、<code>processing.py</code> の publish 成功直後に <code>batch_sets</code> のフラグで有効化する S3 スナップショット出力（<code>problems/{media_id}.json</code>: 問題文・真相・確定事実シート・出題者ルール） ④ 単体テスト ⑤ 方式設計書・batch-flow の実態合わせ</li>
   <li>完了条件: image-batch・sns-post-batch とも pytest 全パス（要約行）、<code>unbuilt = 0</code> のクエリ結果、日本語メッセージでコミット</li>
   <li>人間ゲート: 差分確認 → push → Claude が提示する定型行で <code>/goal</code>（CodePipeline 2 本の完走とタスク定義新リビジョン確認）</li>
   <li>停止点・上限: コミットまで（services/）。stop after 30 turns</li>
   </ul></li>
-<li>⬜ <strong>21-5</strong> コメント自動返信経路の本番化（21-2 完了後。21-3・21-4 とは独立）
+<li>⬜ <strong>21-6</strong> コメント自動返信経路の本番化（21-3 完了後。21-4・21-5 とは独立）
   <ul>
   <li>内容: ① Lambda コード <code>services/comment-reply/</code>（Webhook 受信〔署名検証・自己返信スキップ〕→ SQS enqueue / Reply〔S3 GET <code>problems/{media_id}.json</code> → OpenAI → Graph API 返信。モデレーション一行をプロンプトに含む〕。PoC handler を分割・移植、pytest） ② <code>infra/lib/comment-reply-stack.ts</code>（Webhook Lambda + Function URL または API Gateway〔21-1 の決定〕、SQS + DLQ、Reply Lambda、Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code>、既存バケットの <code>assets/umigame-soup-1/problems/</code> 読み取り権限。ステージング / 本番の切替は Webhook 先と Secret の値で行う） ③ MonitoringStack に DLQ アラーム（既存 <code>createAlarm</code> パターン） ④ <code>bin/infra.ts</code> 配線 ⑤ <code>docs/infra/</code> の実態合わせ</li>
   <li>完了条件: pytest 全パス（要約行）、<code>infra/</code> で jest 全パスと <code>cdk synth -c env=prod CommentReplyStack MonitoringStack</code> 成功、日本語メッセージでコミット</li>
   <li>人間ゲート: 差分確認 → push → <code>cdk deploy</code> → ステージング面へ接続（PoC の Meta アプリの Webhook 先を新スタックへ切替・<code>test_tkghr</code> のリール用にサンプル <code>problems/{media_id}.json</code> を配置）→ 実コメントで返信・DLQ 0 件を確認（ユーザー）</li>
   <li>停止点・上限: コミットまで（infra/ services/）。stop after 30 turns</li>
   </ul></li>
-<li>⬜ <strong>21-6</strong> アカウント・Meta アプリ・セット登録の準備（21-4c・21-5 完了後）
+<li>⬜ <strong>21-7</strong> アカウント・Meta アプリ・セット登録の準備（21-5b・21-6 完了後）
   <ul>
   <li>内容: ① <a href="../app/operation.html">運用設計</a> 2.1 手順 2 の INSERT / UPDATE SQL 一式（<code>batch_sets</code> の <code>generator_name</code>・スナップショット出力フラグ、<code>prompt_configs</code>、<code>caption_templates</code>、<code>sns_accounts</code>、<code>audio_assets</code>） ② CDK: <code>image-batch-stack.ts</code> の Scheduler 1 件 + <code>insights-batch-stack.ts</code> の 2 件 ③ シークレットの名前・投入手順書（sns 用 + comment-reply 用） ④ 本番 Meta アプリの作成手順（PoC README を本番向けに転記: 公開モード・comments 購読・Webhook 先 = CommentReplyStack）</li>
   <li>完了条件: SQL のローカル MySQL <code>--dry-run</code> 成功、<code>cdk synth -c env=prod ImageBatchStack InsightsBatchStack</code> 成功、日本語メッセージでコミット</li>
   <li>人間ゲート（稼働開始・ユーザー作業）: Instagram プロアカウント開設 → 本番 Meta アプリ作成・公開モード・Webhook 設定 → Secrets 投入 → Aurora へ SQL 適用 → push → <code>cdk deploy</code> → SFN 手動実行で 1 本目の投稿 → 自分で 1 コメントして返信を確認 → <code>is_active = 1</code>・Scheduler 有効化（有効化前に未投稿バックログ 0 件を確認）</li>
   <li>停止点・上限: コミットまで（infra/）。stop after 25 turns</li>
   </ul></li>
-<li>⬜ <strong>21-7</strong> セットレーンへの移管と補充スキル化（稼働開始後）
+<li>⬜ <strong>21-8</strong> セットレーンへの移管と補充スキル化（稼働開始後）
   <ul>
-  <li>内容: ① セット計画書 <code>docs/plans/umigame-soup-1.html</code> + <code>umigame-soup-1-log.html</code>（KPI 欄の様式・週次補充ステップ・確認待ちリストに効果仮説〔コメント率 = コメント数 / reach が logic-training-1 比で高く、リーチの伸び率に転化するか。トリガー: 稼働 2 週間後〕を起票）と <code>docs/plans/index.html</code> の表更新 ② <code>.claude/skills/umigame-stock-replenish/SKILL.md</code>（quiz-stock-replenish の骨格 + 3 項データ構造 + プローブテスト。週 2 回 × 4 問レビュー） ③ 第 2 バッチ 8 問の執筆・機械検証・プローブテスト（スキルの実地テスト。投入・ビルドはセットレーンの週次補充として行う） ④ CLAUDE.md・docs 参照ガイド・<code>docs/index.html</code> の更新</li>
+  <li>内容: ① セット計画書 <code>docs/plans/umigame-soup-1.html</code> + <code>umigame-soup-1-log.html</code>（KPI 欄の様式・週次補充ステップ・確認待ちリストに効果仮説〔コメント率 = コメント数 / reach が logic-training-1 比で高く、リーチの伸び率に転化するか。トリガー: 稼働 2 週間後〕を起票）と <code>docs/plans/index.html</code> の表更新 ② <code>.claude/skills/umigame-stock-replenish/SKILL.md</code>（quiz-stock-replenish の骨格 + 素材一式の執筆 + プローブテスト。週 2 回 × 4 問レビュー） ③ 第 2 バッチ 8 問の執筆・機械検証・プローブテスト（スキルの実地テスト。投入・ビルドはセットレーンの週次補充として行う） ④ CLAUDE.md・docs 参照ガイド・<code>docs/index.html</code> の更新</li>
   <li>完了条件: HTML のタグ対応・リンクチェック 0 件、validate / probe の出力、push</li>
   <li>人間ゲート: 第 2 バッチのレビュー（以降はセットレーン）</li>
   <li>停止点・上限: push まで（docs/ content/ .claude/ のみ）。stop after 25 turns</li>
@@ -191,7 +192,7 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-09-02 / 19-1 CodePipeline 完走待ちの <code>/goal</code> 化（初回試行）</td><td>次に <code>services/</code> <code>shared/</code> を触るコミットを push したとき</td><td>① push 直後に Claude が CLAUDE.md の D 定型行（<code>&lt;sha&gt;</code> 置換済み）を提示するか ② ユーザーが打った <code>/goal</code> の evaluator が、貼られた aws cli 出力（パイプラインの Succeeded・タスク定義の新リビジョン）から到達を判定して止まるか ③ 15 ターン以内に収まるか</td><td>提示されない → CLAUDE.md の文言を直す。判定できない → 定型行の証跡指定（貼らせる出力）を具体化する。いずれも設計課題リストではなく Phase 19 の追補ステップとして起こす</td><td>—</td></tr>
-<tr><td>2026-09-03 / ウミガメ PoC 資材（ステージング面）の長期トークン</td><td><strong>21-5 の人間ゲート（ステージング面への接続）に着手するとき</strong>。<code>test_tkghr</code> の長期トークンは 2026-09-03 生成・60 日有効（2026-11-02 頃失効）</td><td>Secrets Manager <code>umigame-poc/credentials</code> の <code>ig_access_token</code> で <code>GET graph.instagram.com/v23.0/me</code> が 200 を返す。失効していれば Meta アプリの「設定」タブで再生成して差し替える（手順は <code>poc/umigame-comment-webhook/README.md</code>）</td><td>再生成して続行（課題にはしない）</td><td>—</td></tr>
+<tr><td>2026-09-03 / ウミガメ PoC 資材（ステージング面）の長期トークン</td><td><strong>21-6 の人間ゲート（ステージング面への接続）に着手するとき</strong>。<code>test_tkghr</code> の長期トークンは 2026-09-03 生成・60 日有効（2026-11-02 頃失効）</td><td>Secrets Manager <code>umigame-poc/credentials</code> の <code>ig_access_token</code> で <code>GET graph.instagram.com/v23.0/me</code> が 200 を返す。失効していれば Meta アプリの「設定」タブで再生成して差し替える（手順は <code>poc/umigame-comment-webhook/README.md</code>）</td><td>再生成して続行（課題にはしない）</td><td>—</td></tr>
 <tr><td>2026-09-02 / 20-1 fantasy-animals-1 の停止（効果確認）</td><td><strong>2026-09-04 の 21:00 JST 以降</strong>（deploy と Aurora の <code>is_active = 0</code> は 2026-09-03 に適用済み。翌 06:00 のインサイト収集も観察対象）</td><td>① fantasy-animals-1 の 21:00 投稿が起きていない（<code>posts</code> に新規行なし・Instagram に新規投稿なし）② 画像生成 SFN が fantasy-animals-1 で起動していない（EventBridge Scheduler 一覧に fantasy-animals-1 の名前がない）③ インサイト収集 SFN の 06:00 / 18:00 実行が他セット分だけで成功している</td><td>投稿が起きている → deploy 未反映か Scheduler の削除漏れ。20-1 の追補ステップとして起こす。インサイト収集が失敗する → 収集バッチの <code>is_active = 0</code> の扱いを確認し設計課題リストへ</td><td>—</td></tr>
 <tr><td>2026-09-03 / 16-12b <code>follows_and_unfollows</code>（100 フォロワー閾値後の確認）</td><td>月次 KPI 転記時に <code>v_account_kpi_monthly.month_end_followers</code> が 100 以上のアカウントが初めて現れたとき</td><td>そのアカウントのその月の <code>account_insights_daily.metrics</code> に <code>follows_and_unfollows</code> キー（<code>breakdowns</code> の <code>follow_type</code> 内訳）が入り始めているか（<code>SELECT metric_date, JSON_EXTRACT(metrics, '$.follows_and_unfollows') FROM account_insights_daily WHERE sns_account_id = ? ORDER BY metric_date DESC LIMIT 7</code>）。入っていれば OK → data-model 4.11 に「100 フォロワー以上で取得可」を追記し、ビュー <code>v_account_kpi_daily</code> への昇格を検討する</td><td>入っていない → 正規化（<code>insights_api.py</code>）か要求パラメータの問題として開発レーンの設計課題リストへ起票（応答本文を CloudWatch Logs では確認できないため、要求のデバッグログ追加を含めて扱う）</td><td>—</td></tr>
 </tbody>
