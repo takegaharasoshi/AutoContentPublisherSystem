@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（15-13 で作成・16-1 / 16-2b / 16-3b / 16-4b / 16-4d で改訂）</span>
   <span>set_code: logic-training-1</span>
-  <span>最終更新: 2026-08-24</span>
+  <span>最終更新: 2026-09-03（改修 R-1〔セットレーン〕: 動画レンダラーを Remotion へ載せ替えた旨をセクション 1・6・9 に追記。仕様の正は <a href="../generators/quiz-prebuilt.html#build">quiz-prebuilt.html セクション 8</a>）</span>
 </div>
 
 <div class="note">
@@ -41,7 +41,7 @@
 <tr><td><code>L3</code></td><td>フェルミ推定（答えは「約〇〇（目安）」の幅で示す）。<strong>16-4d で昼スロットごと当分停止中</strong>（現在は出題されない。ストックは凍結・残置）</td><td>投入時の人間レビュー（16-1〜。旧: 独立 LLM 推定とのオーダー一致検証 = 休止）。断定表現の禁止は執筆ガイドとして維持</td></tr>
 </table>
 </div>
-<p>動画構成は <strong>16 秒・3 カット</strong>（導入 8 秒〔固定吹き出し「わかったらコメントしてくれ！」〕→ カウントダウン 5 秒〔1 秒 × 5 枚・吹き出しは動的ヒント <code>hint</code>〕→ 誘導 3 秒。16-4c でカット 1「つかみ」とカット 2「考える」を導入 8 秒へ統合し、全体ズームを廃止）。<strong>版面は全カット固定</strong>で問題文と<strong>つかみ帯</strong>（スロット別の <code>slot_hook</code>）が 1 フレーム目から表示され、<strong>答え・解説は動画に載せずキャプションで開示</strong>する（16-1 テコ入れ）。動画の作りは方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。<strong>16-3b の転換により動画は実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く</strong>（実行時方式は <a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>。ビルド運用は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a>）。16-4b（2026-08-09）で<strong>コーチ + 吹き出しのバウンド演出</strong>（ヒント登場・答え誘導の 2 箇所で大きく弾ませ既存 SE と同期。視線誘導の改善）と<strong>イラスト見切れの解消</strong>（比率を保った内接 + 3:2 生成のプロンプト明示）を追加し、既存 42 本を再ビルドで差し替えた（<a href="../generators/gpt-quiz-multicut.html#bounce">方式設計書セクション 9.1</a> と同 8.2 の 16-4b decision）。</p>
+<p>動画構成は <strong>16 秒・3 カット</strong>（導入 8 秒〔固定吹き出し「わかったらコメントしてくれ！」〕→ カウントダウン 5 秒〔1 秒 × 5 枚・吹き出しは動的ヒント <code>hint</code>〕→ 誘導 3 秒。16-4c でカット 1「つかみ」とカット 2「考える」を導入 8 秒へ統合し、全体ズームを廃止）。<strong>版面は全カット固定</strong>で問題文と<strong>つかみ帯</strong>（スロット別の <code>slot_hook</code>）が 1 フレーム目から表示され、<strong>答え・解説は動画に載せずキャプションで開示</strong>する（16-1 テコ入れ）。動画の作りは方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。<strong>16-3b の転換により動画は実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く</strong>（実行時方式は <a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>。ビルド運用は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a>）。16-4b（2026-08-09）で<strong>コーチ + 吹き出しのバウンド演出</strong>（ヒント登場・答え誘導の 2 箇所で大きく弾ませ既存 SE と同期。視線誘導の改善）と<strong>イラスト見切れの解消</strong>（比率を保った内接 + 3:2 生成のプロンプト明示）を追加し、既存 42 本を再ビルドで差し替えた（<a href="../generators/gpt-quiz-multicut.html#bounce">方式設計書セクション 9.1</a> と同 8.2 の 16-4b decision）。<strong>改修 R-1（セットレーン。2026-09-03 差し替え）でレンダラーを Pillow 組版から Remotion へ載せ替え</strong>、全フレームにモーションを持たせた（コーチの常時浮遊・つかみ帯の光沢・カウントダウンのリング進行・ループ継ぎ目の連続性）。尺・カット構成・SE・「答えはキャプション」は不変。以後の版面・動きの正は <a href="../generators/quiz-prebuilt.html#build">quiz-prebuilt.html セクション 8</a> と <code>content/video-build/logic-training-1/remotion/</code>（<code>gpt-quiz-multicut.html</code> の組版仕様は旧版の記録）。</p>
 
 <h2>2. 投稿先アカウント構成</h2>
 <p>Instagram プロアカウント 1 件（1 セット 1 アカウント）。<strong>15-7</strong> で新規開設し、Secret 登録とトークン実働確認まで済んでいる。</p>
@@ -146,7 +146,7 @@
 
 <div class="note">
   <span class="callout-title">14-11 の知見の流用</span>
-  fantasy-animals-1 のプロンプト設計で効いた「①構成の明示 ②毎回変える要素の明示 ③Instagram UI セーフエリア」のうち、①②は上記の題材・question 条件として文言に取り込んだ。③は<strong>本方式ではプロンプト側の指定が不要</strong>で、組版（Pillow）がセーフエリア（右 12% / 下 15%）を計算して文字とコーチを配置する。イラストは<strong>カード内の専用ブロック</strong>に敷かれる（15-14 で全面背景から変更）ため、文字の見切れは構造的に発生しない。
+  fantasy-animals-1 のプロンプト設計で効いた「①構成の明示 ②毎回変える要素の明示 ③Instagram UI セーフエリア」のうち、①②は上記の題材・question 条件として文言に取り込んだ。③は<strong>本方式ではプロンプト側の指定が不要</strong>で、レンダラーがセーフエリアを計算して文字とコーチを配置する（旧 Pillow 組版は右 12% / 下 15%。改修 R-1 の Remotion 版は高さ依存の 2 ゾーンで、上部は左右対称・右 12% の予約は下部のイラスト・コーチ・吹き出しだけに掛ける）。イラストは<strong>カード内の専用ブロック</strong>に敷かれる（15-14 で全面背景から変更）ため、文字の見切れは構造的に発生しない。
 </div>
 
 <h2>5. キャプションの作り方</h2>
@@ -224,7 +224,7 @@
 </ul>
 
 <h2>9. 共通フローからの差分・特記事項</h2>
-<p><strong>使用方式は <code>quiz-prebuilt</code></strong>（16-3b の転換。<code>batch_sets.generator_name</code> は 16-4〔2026-08-08〕で切替済み）: ストック LRU 選定 → S3 の事前動画取得 → 返却のみの軽量実行（<a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>）。動画の作り・組版は <code>gpt-quiz-multicut</code>（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>。実行時方式としては休止・事前ビルドのレンダラーへ転用）を正とする。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）で、いずれも 16-3b の転換による変更はない。</p>
+<p><strong>使用方式は <code>quiz-prebuilt</code></strong>（16-3b の転換。<code>batch_sets.generator_name</code> は 16-4〔2026-08-08〕で切替済み）: ストック LRU 選定 → S3 の事前動画取得 → 返却のみの軽量実行（<a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>）。動画の作り・組版は当初 <code>gpt-quiz-multicut</code>（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>。実行時方式としては休止）のレンダラーを事前ビルドへ転用していたが、<strong>改修 R-1（2026-09-03）で Remotion へ載せ替え</strong>、以後は <a href="../generators/quiz-prebuilt.html#build">quiz-prebuilt.html セクション 8</a> を正とする。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）で、いずれも 16-3b の転換による変更はない。</p>
 <p>本セットは共通テーブルのうち <code>quiz_stock_items</code>（問題ストック）と <code>quiz_items</code>（出題履歴。16-1 で <code>stock_item_id</code> による突合を追加）を使う唯一のセットである（<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4.9 / 4.10</a>）。</p>
 
 </div>

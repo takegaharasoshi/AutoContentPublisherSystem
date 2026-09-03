@@ -143,7 +143,7 @@ operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「
 
 1. **プロンプト書き出し**: `export_prompts.py`(実行は `cd services/image-batch && uv run python ../../content/video-build/logic-training-1/export_prompts.py`。以下の Python 実行も同じ uv 環境)
 2. **イラスト生成(Codex imagegen 委譲)**: `work/prompts/<id>.txt` の全文を渡し、imagegen で生成して `work/illustrations_raw/<id>.png` へ保存させる。**「情景で指定されていない文字・数字・記号の混入を Codex 自身に確認させ、混入時は再生成」を指示に含める**(1 問通し確認でも初回混入 → 再生成が実際に発生した)。提示物問題(情景文に文字を明示した問題)は逆に**指定した文字が字形どおり正確に描かれているか**を確認させる。プロンプト末尾に **3:2(1536x1024)の明示行**が入っている(16-5 追加)。imagegen は指定しないと 16:9 前後で出力が揺れ、3:2 以外は次の intake で左右が捨てられるため、**保存されたファイルのサイズが 1536x1024 かを Codex に確認させ、違えば再生成させる**
-3. **取り込み → ビルド**: `intake.py` → `build.py`。build.py は Docker 実行(README の docker run 例が動作確認済みの形: `~/.aws` 読み取りマウント + `LOCAL_DB_HOST=host.docker.internal` + `--user $(id -u):$(id -g)`)。イラスト未配置の行は自動スキップされるので部分ビルドでよい
+3. **取り込み → ビルド**: `intake.py` → `build.py`。build.py は**ホスト(WSL)で実行**し(`S3_BUCKET_NAME=<bucket> python3 build.py`。依存は pymysql のみ)、Remotion レンダリングと ffmpeg 処理だけを Docker に委譲する(改修 R-1〔2026-09-03〕で Pillow 組版から Remotion へ載せ替え。事前に `remotion-render` / `image-batch:ffmpeg-check` の 2 イメージをビルドしておく。README 参照)。イラスト未配置の行は自動スキップされるので部分ビルドでよい
    - `intake.py` は 3:2 でない素材を **WARNING + 切り捨て率**で報告する。被写体が端にある問題(操作パネル等)は切り捨てで見切れるため、警告が出たら該当問題のイラストだけ再生成する
    - レンダラー変更を既ビルド分へ反映する場合は **`build.py --rebuild`**(ビルド済み行を対象・BGM は `video_audio_asset_id` を引き継ぎ LRU を消費しない)
 4. **全数人間レビュー**: `review_sheet.py` → `work/review.html`。観点はイラスト(文字混入・画風・情景適合)・版面・音。NG は imagegen 再試行または `illustration_scene` 修正(DB 更新)→ 再ビルド

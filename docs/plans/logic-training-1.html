@@ -13,7 +13,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新し 2026-08 の月次行をビューから転記。ほかは 2026-09-02 時点のまま: 16-5 のベースライン記入・確認待ちリストに R-1 の効果確認。改修 R-1: R-1-1〜R-1-4 完了。<code>/step logic-training-1 R-1-5</code> 起動時に R-1-5 を 4 項目様式へ書き換え、ビルドまでの R-1-5 と差し替え + 設計書・記録更新の R-1-6 に分割〔2026-09-03〕。R-1-5 完了〔2026-09-03。再ビルド 56 本・全数レビューで全件承認〕。次は R-1-6 差し替えと設計書・記録の更新）</span>
+  <span>最終更新: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新し 2026-08 の月次行をビューから転記。ほかは 2026-09-02 時点のまま: 16-5 のベースライン記入・確認待ちリストに R-1 の効果確認。改修 R-1: R-1-1〜R-1-4 完了。<code>/step logic-training-1 R-1-5</code> 起動時に R-1-5 を 4 項目様式へ書き換え、ビルドまでの R-1-5 と差し替え + 設計書・記録更新の R-1-6 に分割〔2026-09-03〕。R-1-5 完了〔2026-09-03。再ビルド 56 本・全数レビューで全件承認〕。<strong>R-1-6 完了〔2026-09-03。S3・両環境 DB を差し替え・方式設計書セクション 8 を Remotion 版へ・共通設計書の追随は開発レーンへ起票文面を提示〕= 改修 R-1 完了</strong>。効果確認は確認待ちリスト〔差し替え 2 週間後〕）</span>
 </div>
 
 <div class="note">
@@ -26,7 +26,7 @@
 <tbody>
 <tr><th>アカウント</th><td>@d_brain_coach「脳みそコーチのロジトレ」（Instagram）</td></tr>
 <tr><th>投稿スロット</th><td>朝 7:30（定番なぞなぞ）・夜 21:00（とんち・水平思考）の 1 日 2 回。<strong>昼 12:30（フェルミ推定）は 16-4d（2026-08-24）で当分停止中</strong>（noon Scheduler = DISABLED・資材は凍結残置。再開判断は将来。経緯は<a href="../app/sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</td></tr>
-<tr><th>生成方式</th><td>quiz-prebuilt（動画事前ビルド・作り置き。<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>）。16 秒・3 カット構成（16-4c）</td></tr>
+<tr><th>生成方式</th><td>quiz-prebuilt（動画事前ビルド・作り置き。<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>）。16 秒・3 カット構成（16-4c）。<strong>レンダラーは Remotion</strong>（改修 R-1。2026-09-03 に稼働在庫 56 問〔朝・夜〕を差し替え。凍結中の昼 21 問は旧 Pillow 版のまま。仕様の正は方式設計書セクション 8）</td></tr>
 <tr><th>ストック運用</th><td>スキル <code>/quiz-stock-replenish</code> で週次補充。補充閾値 = 各組 7 問（朝・夜の 2 組のみ。昼は凍結）。直近: <strong>2026-08-w5 補充（朝・夜 14 問）で両環境とも各組 unused_built 7 に回復（2026-09-02）</strong>。着手時は朝・夜とも在庫 0 で再利用出題に突入していたため、<strong>在庫 0 まで待たず閾値割れの時点で着手する</strong>こと</td></tr>
 <tr><th>KPI</th><td>指標セットは 16-12a（2026-09-02）で確定、欄の様式と転記運用は 16-12b（2026-09-03）で確定（正は <a href="../app/operation.html#insights-analysis">運用設計 6.3</a>。転記元はビュー <code>v_post_kpi_monthly</code> / <code>v_account_kpi_monthly</code>〔V011〕、<code>content/insights-analysis/run_queries.py kpi_post_monthly kpi_account_monthly</code>。月初 4 日以降に前月分を追記）。<strong>ユーザー判断: 次の改善対象</strong>（R-1 の効果はベースライン行との比較で判定。確認待ちリスト参照）。<div class="table-wrap" style="margin:.4rem 0 0;"><table><thead><tr><th>年月</th><th>スロット</th><th>本数</th><th>views</th><th>スキップ率</th><th>平均視聴秒</th><th>コメント</th><th>保存</th><th>月末フォロワー</th><th>備考</th></tr></thead><tbody><tr><td>ベースライン（16-5・3 カット化 08-23〜08-31）</td><td>朝・夜</td><td>15</td><td><strong>1,731</strong></td><td><strong>50.6%</strong></td><td><strong>12.4</strong></td><td><strong>10</strong></td><td><strong>1</strong></td><td>19（09-01）</td><td>3 日以上経った投稿の中央値（ビュー導入前のため集計ランナー <code>per_post_latest</code> の値。72 時間基準ではなく最終スナップショット）。4 カット期（08-08〜08-22）の朝・夜 29 本は 140 / 69.7% / 5.4 / 0 / 0。1 本が 33,463 views。出典: <a href="development-log.html">開発記録</a>の 16-5</td></tr><tr><td>2026-08</td><td>all</td><td>58</td><td>118</td><td>70.9%</td><td>4.9</td><td>0</td><td>0</td><td>18（08-31）</td><td rowspan="4">V011 適用時（09-03）にビューから遡って転記。月全体では 4 カット期（08-08〜08-22）29 本が中央値を支配しベースラインより低く見える。<code>v_post_kpi_72h</code> を 08-23 で分けると 3 カット期の朝・夜 16 本は 1,951 / 50.2% / 12.5 / 7.5 / 1 でベースラインと整合（08-23 以前 29 本は 118 / 71.3% / 5.2 / 0 / 0）。昼（フェルミ推定）は 16-4d で 08-24 に停止済み</td></tr><tr><td>2026-08</td><td>morning</td><td>22</td><td>131.5</td><td>70.4%</td><td>5.5</td><td>0</td><td>0</td><td>—</td></tr><tr><td>2026-08</td><td>noon</td><td>13</td><td>99</td><td>90.3%</td><td>1.8</td><td>0</td><td>0</td><td>—</td></tr><tr><td>2026-08</td><td>evening</td><td>23</td><td>178</td><td>63.1%</td><td>7.6</td><td>0</td><td>0</td><td>—</td></tr><tr><td>2026-09</td><td>all / morning / evening</td><td colspan="7">2026-10-04 以降に転記</td><td>R-1 差し替え後の分はベースラインと比較</td></tr></tbody></table></div></td></tr>
 </tbody>
@@ -44,6 +44,7 @@
 <h2>3. 進行中ステップ</h2>
 
 <h3>改修 R-1: 動画レンダラーの Remotion 載せ替え（全編モーション + 上部余白の見直し）</h3>
+<p><strong>完了（2026-09-03）</strong>: R-1-1〜R-1-6 をすべて完了し、稼働在庫 56 問を Remotion 版へ差し替えた。効果確認は<a href="#pending-checks">確認待ちリスト</a>（差し替え 2 週間後）で追い、結果はセット記録と KPI 欄へ反映する。以下は起票時の計画（記録として残置）。</p>
 <p>
   起票 2026-09-02（アイデア体系の壁打ち 5 巡を経て採用。経緯・維持カーブの読み・棄却した線は <a href="../ideas/logic-training-remotion-rebuild.md">logic-training-remotion-rebuild.md</a> が正）。
   <strong>ねらい</strong>: 現行動画（Pillow 組版 + ffmpeg 合成。7 版面中 5 枚が完全静止・動きはコーチのバウンド 2 箇所のみ）を、pref-ranking-1 で実証済みの Remotion に載せ替え、<strong>どのフレームも生きている</strong>動画にする。視聴者は 16 秒で解けず<strong>ループして見る</strong>という行動仮説が土台で（<strong>R-1-1 で実証済み・2026-09-02</strong>）、ループ先頭 0〜7 秒の完全静止の解消を最優先とする。期待効果は 16 秒全体に一定勾配で散っている損失の減少と、コメント率・いいね率の向上。
@@ -88,7 +89,7 @@
   <td><strong>R-1-6</strong><br>差し替えと設計書・記録の更新（R-1-5 のレビュー承認後）</td>
   <td>① 承認済み ID（<code>work/approved.txt</code>）をもとに<strong>ユーザーが</strong> <code>publish.py --dry-run</code> → 本実行（S3 差し替え + ローカル DB 更新）→ <code>work/update_prebuilt.sql</code> を Aurora へ適用する（<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8 の手順。Claude はコマンド行の提示のみで実行しない） ② <a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8（レンダラー・組版の記述）を Remotion 版へ書き換え、decision に経緯を残す ③ <a href="logic-training-1-log.html">セット記録</a>セクション 3 に実施記録と差し替え日を追記 ④ 本計画書ステータス表の「生成方式」行と<a href="#pending-checks">確認待ちリスト</a>の R-1 効果確認行（トリガー起点 = 差し替え日）を更新 ⑤ <strong>共通設計書 <a href="../app/batch-flow.html">batch-flow.html</a> の方式カタログ行（quiz-prebuilt の「Pillow 組版 → ffmpeg 連結」の記述）と gpt-quiz-multicut の「事前ビルドのレンダラーとして継続使用」の注記は開発レーン</strong>のため、本ステップでは<strong>起票文面を用意して提示するまで</strong>とし、<a href="development-plan.html">開発計画</a>の設計課題リストへの書き込みは開発レーンのセッションで行う（旧 R-1-6「設計書・記録の更新」を吸収）</td>
   <td><strong>完了条件</strong>: ① 両環境で <code>video_built_at</code> が差し替え日の <code>quiz_stock_items</code> 行が 56 件であることを件数クエリの出力で示す ② セット側の設計書・記録・本計画書が実装に一致する ③ 設計課題リストへの起票文面を会話に提示 ④ 日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>publish.py</code> の実行と Aurora への <code>update_prebuilt.sql</code> 適用、差し替え後の抜き取り再生確認<br><strong>停止点・上限</strong>: push まで（<code>docs/</code> のみ）。<code>publish.py</code>・Aurora 適用・<code>development-plan.html</code> への書き込みは行わない。stop after 20 turns<br><strong>注</strong>: 「投入日（新版の初出投稿）」は自セッション外の出来事のため完了条件に含めず、差し替え日を記録して効果は<a href="#pending-checks">確認待ちリスト</a>で追う</td>
-  <td>未着手</td>
+  <td><strong>完了</strong>（2026-09-03）<br><strong>差し替え日 2026-09-03</strong>（人間ゲートはユーザー指示により Claude が代行）: <code>publish.py</code> で S3 112 オブジェクト（mp4 + イラスト）を上書き・ローカル 56 行 → Aurora へ <code>update_prebuilt.sql</code> 56 文（<code>apply_aurora.py</code> 流用）。両環境とも <code>video_built_at</code> = 2026-09-03 の行が 56 件。方式設計書セクション 8 を Remotion 版へ書き換え・R-1 の decision 追加、セット別設計書・補充スキルの陳腐化記述も追随。共通設計書（batch-flow / gpt-quiz-multicut）の追随は<a href="development-plan.html">開発計画</a>の設計課題リストへ起票文面を提示（書き込みは開発レーン）。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
 </tr>
 </tbody>
 </table></div>
@@ -99,7 +100,7 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-09-02 / <a href="development-plan.html">開発レーン</a> Phase 19-3 quiz 週次補充スキルへの <code>/goal</code> 組み込み（初回試行。進行中ステップから移動）</td><td>本セットの次の週次補充（<code>/quiz-stock-replenish</code> 起動時）</td><td>G1 → G2 → G3 の 3 本を実際に立てて回し、① 各ゴールの evaluator が貼られた証跡（機械検証の出力・更新行数 = 承認件数・unbuilt = 0）から到達を判定して止まるか ② 人間レビューの前後でゴールが正しく切れているか（レビュー中に自走しないか）③ 各ゴールが上限ターン内に収まるか</td><td>判定できない → SKILL.md のゴール文の証跡指定を具体化する。レビュー中に自走する → G1 の停止点を明確化する。いずれも開発レーン Phase 19 の追補ステップとして起こす（スキル本文はセットレーンで直せるが管理は Phase 19）</td><td>—（結果はセット記録へ、要点を開発記録の 19-3 へ）</td></tr>
-<tr><td>2026-09-02 / 改修 R-1（Remotion 載せ替え）の効果確認</td><td>R-1 の再ビルド動画を S3・DB に差し替えてから 2 週間後（<code>python3 content/insights-analysis/run_queries.py weekly_age_fixed per_post_latest</code> を実行）</td><td>差し替え後の朝・夜投稿で 3 日以上経ったものの中央値を、KPI 欄のベースライン（views 1,731 / スキップ率 50.6% / 平均視聴 12.4 秒 / コメント 10 / 保存 1）と比較し、① スキップ率と平均視聴秒が悪化していない ② コメント数が維持されている、の 2 点で判定する（views はアカウントの配信状況で振れるため参考値）</td><td>悪化 → 演出の見直し（差し替え前の版に戻す判断を含む）を本計画書のバックログに起こす。判定に足る本数がない → トリガーを 1 週間延ばして再確認</td><td>—（結果はセット記録へ。要点を KPI 欄に反映）</td></tr>
+<tr><td>2026-09-02 / 改修 R-1（Remotion 載せ替え）の効果確認</td><td>R-1 の再ビルド動画を S3・DB に差し替えてから 2 週間後 = <strong>差し替え日 2026-09-03（R-1-6）→ 2026-09-17 以降</strong>（<code>python3 content/insights-analysis/run_queries.py weekly_age_fixed per_post_latest</code> を実行）</td><td>差し替え後の朝・夜投稿で 3 日以上経ったものの中央値を、KPI 欄のベースライン（views 1,731 / スキップ率 50.6% / 平均視聴 12.4 秒 / コメント 10 / 保存 1）と比較し、① スキップ率と平均視聴秒が悪化していない ② コメント数が維持されている、の 2 点で判定する（views はアカウントの配信状況で振れるため参考値）</td><td>悪化 → 演出の見直し（差し替え前の版に戻す判断を含む）を本計画書のバックログに起こす。判定に足る本数がない → トリガーを 1 週間延ばして再確認</td><td>—（結果はセット記録へ。要点を KPI 欄に反映）</td></tr>
 </tbody>
 </table></div>
 

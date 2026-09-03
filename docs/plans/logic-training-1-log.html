@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-03（改修 R-1 の R-1-5 完了を記録。全数 56 問承認・差し替えは R-1-6）</span>
+  <span>最終更新: 2026-09-03（改修 R-1 の R-1-6 完了を記録 = R-1 完了。2026-09-03 に S3・両環境 DB を Remotion 版 56 本へ差し替え）</span>
 </div>
 
 <div class="note">
@@ -59,7 +59,7 @@
 <h2>3. セット内改修の記録</h2>
 <p>セット内で閉じる改修の実施記録（過去のフォーマット改修 16-4b〜16-4d は開発レーンのフェーズ作業として<a href="development-log.html">開発記録</a> Phase 16 に記録済み）。計画は<a href="logic-training-1.html">セット計画書</a>セクション 3。</p>
 <ul>
-<li><strong>改修 R-1: 動画レンダラーの Remotion 載せ替え（2026-09-02 起票・進行中）</strong><ul>
+<li><strong>改修 R-1: 動画レンダラーの Remotion 載せ替え（2026-09-02 起票・2026-09-03 完了。差し替え日 2026-09-03）</strong><ul>
 <li><strong>R-1-1 ループ仮説の確認（2026-09-02 完了）</strong>: Instagram アプリのリールインサイトをユーザーが目視。<strong>平均再生時間が 16 秒（動画尺）を超えている動画が多数</strong>あり、<strong>ループ視聴が常態であることが実証された</strong>。個別本数の秒数値は控えていないため、以後の定量比較（前後比較・水準評価）には使わず、設計判断の根拠としてのみ扱う。再生回数・replays 系の指標は Graph API から廃止済みで insights-batch では取得できず、アプリ目視が唯一の手段であることも変わらない</li>
 <li><strong>R-1-1 が R-1-2 以降に与えた影響</strong>: ①ループ先頭 0〜7 秒の完全静止の解消が最優先という<a href="../ideas/logic-training-remotion-rebuild.md">アイデア記録</a> 4 巡目の読みが裏付けられた（2 巡目の「動画内ペイオフの欠如が本質」読みは後退。ループするなら動画内で答えを開示する必要はない）②周期アニメーションの周期を<strong>すべて 480 フレーム（16 秒 × 30fps）の約数</strong>とし、16 秒末尾の状態が 0 秒の状態に一致することを R-1-2 の<strong>必須要件</strong>に格上げ（従来は「重み付けに使う」程度の位置づけだった）③R-1-3 のプレビュー確認で観点②（末尾 → 先頭の継ぎ目）を必須の go / no-go 条件とした</li>
 <li><strong>R-1-2 プロトタイプ（2026-09-02 完了）</strong>: <code>content/video-build/logic-training-1/remotion/</code> に Remotion コンポジション（Remotion 4 + React 19）を新設し、既存 1 問（<code>id=85</code> / <code>morning-001</code>・朝スロット）の 16 秒版を試作した。レンダリング環境は pref-ranking-1 の <code>Dockerfile.render</code>（WSL に Chrome の共有ライブラリが無いため Docker 経由）を流用。入口は <code>scripts/prototype.py --item &lt;id&gt;</code> の 1 本で、npm install → フォント配置 → コーチ立ち絵の取得（S3・4 表情共通矩形でトリミング）→ props 生成（ローカル DB）→ Remotion レンダリング（映像のみ）→ ffmpeg で音声ミックス、までを通す。<strong>S3 にも DB にも書き戻さない</strong>（BGM は台帳 <code>build_manifest.json</code> の音源で固定し、LRU の <code>last_used_at</code> も更新しない）
@@ -106,6 +106,14 @@
 </ul>
 </li>
 <li><strong>人間ゲート（2026-09-03 完了）</strong>: ユーザーがスマホで 4 ページを全数レビューし、<strong>56 問すべて承認</strong>。<code>work/approved.txt</code> を今回分（56 件）に置き換えた（<code>publish.py._approved_ids</code> で 56 件・ビルド対象と一致を確認。前回の 2026-08-w5 分は <code>work/approved_2026-08-w5.txt.bak</code> に退避）。差し替えは R-1-6</li>
+</ul>
+</li>
+<li><strong>R-1-6 差し替えと設計書・記録の更新（2026-09-03 完了）</strong>: 承認済み 56 問を S3・両環境 DB へ差し替え、設計書・記録を Remotion 版へ追随させた。
+<ul>
+<li><strong>差し替え（2026-09-03 13:01 UTC = 22:01 JST）</strong>: 人間ゲートは「ユーザーが実行・Claude は提示のみ」の計画だったが、<strong>ユーザーの指示で今回に限り Claude が代行</strong>した（<code>/step</code> スキルの denylist〔<code>publish.py</code>・<code>apply_aurora.py</code>〕をユーザー判断で解除。dry-run の結果を見てから本実行へ進む条件付き）。<code>publish.py --dry-run</code>（112 アップロードコマンド = 56 × mp4 + イラスト、<code>work/update_prebuilt.sql</code> 56 文を再生成。両環境とも <code>question_text</code> が 77 件すべて一意であることを事前確認）→ 本実行で S3 の <code>assets/logic-training-1/prebuilt/{content_key}.mp4</code> / <code>_illustration.png</code> を上書き・ローカル MySQL 56 行 UPDATE → Aurora へ pref-ranking-1 の <code>common/apply_aurora.py</code>（Data API。<code>;</code> 分割 + resume リトライ）を流用して 56 文適用（各 1 行更新）。旧版の S3 オブジェクトは上書きで消える（イラストは同一素材の再アップロード）。<strong>両環境とも <code>video_built_at</code> = 2026-09-03 の <code>quiz_stock_items</code> 行が朝 28 / 夜 28 = 56 件</strong>（件数クエリで確認。Aurora は 56 文すべて <code>updated=1</code>・合計 56。S3 は当日更新の mp4 56 + イラスト 56。昼 21 問は 08-23 のまま）。<code>last_used_at</code>（出題キュー）は触っていないため差し替えによる再投稿は発生しない</li>
+<li><strong>設計書の追随（セットレーンの範囲）</strong>: <a href="../app/generators/quiz-prebuilt.html#build">方式設計書 quiz-prebuilt セクション 8</a> の工程 3 を「gpt_quiz_multicut のレンダラー流用（Pillow + ffmpeg）」から「Remotion レンダリング（映像のみ・Docker）+ ffmpeg 音声ミックス（ホスト実行の <code>build.py</code>）」へ書き換え、ループ要件・不変条件の単一ソース（<code>spec.py</code> ⇔ <code>timeline.ts</code>）・<code>--slot</code> / <code>--per-page</code>・ビルド時の依存（<code>remotion-render</code> イメージ）を反映し、<strong>R-1 の decision</strong>（背景・不変条件・版面・ループ・実行場所・投入・共通設計書への波及）を追加。<a href="../app/sets/logic-training-1.html">セット別設計書</a>は動画構成（セクション 1）・セーフエリア（6）・使用方式（9）の Pillow 前提の記述に R-1 の追記を入れ、正を quiz-prebuilt セクション 8 へ向けた。補充スキル <code>/quiz-stock-replenish</code> 手順 7-3 の「build.py は Docker 実行」も R-1-4 の実態（ホスト実行）へ修正</li>
+<li><strong>共通設計書への波及は開発レーンへ起票</strong>: <a href="../app/batch-flow.html#generator-catalog">batch-flow.html 方式カタログ</a>の quiz-prebuilt 行（「gpt-quiz-multicut のレンダラー流用」）と gpt-quiz-multicut 行（「組版・ffmpeg 合成は quiz-prebuilt の事前ビルドのレンダラーとして継続使用」）、<a href="../app/generators/gpt-quiz-multicut.html">gpt-quiz-multicut.html</a> 冒頭の転用注記、<a href="../app/operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a> の工程要約（「gpt-quiz-multicut のレンダラーによる組版 + ffmpeg ビルド〔image-batch の Docker イメージで実行〕」）が旧レンダラー前提のまま。起票文面を会話で提示し、<a href="development-plan.html">開発計画</a>の設計課題リストへの書き込みは開発レーンのセッションで行う</li>
+<li><strong>効果確認</strong>: <a href="logic-training-1.html#pending-checks">確認待ちリスト</a>の R-1 効果確認行のトリガー起点を差し替え日 2026-09-03（→ 2026-09-17 以降）に確定。新版の初出投稿は翌朝 7:30 の朝スロット以降（LRU 順のため旧版と混在はしない = 在庫全数を差し替え済み）</li>
 </ul>
 </li>
 </ul>

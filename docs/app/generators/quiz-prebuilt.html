@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / quiz-prebuilt</nav>
 <h1>方式設計書: quiz-prebuilt</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（16-3b で作成）</span>
+  <span class="badge badge-fixed">Fix（16-3b で作成・改修 R-1 でレンダラーを Remotion へ）</span>
   <span>方式名（レジストリキー）: quiz-prebuilt</span>
-  <span>最終更新: 2026-08-09</span>
+  <span>最終更新: 2026-09-03（改修 R-1〔セットレーン〕: セクション 8 のレンダラーを Pillow 組版から Remotion へ書き換え・decision 追加。実行時仕様は変更なし）</span>
 </div>
 
 <div class="note">
@@ -24,11 +24,11 @@
 
 <div class="warn">
   <span class="callout-title">適用状態</span>
-  16-3b（2026-08-08）の設計 Fix → 16-3c 実装 → 16-3d 初期 42 問ビルド・S3 配置を経て、<strong>16-4（2026-08-08）で本番稼働開始</strong>（<code>batch_sets.generator_name</code> を <code>quiz-prebuilt</code> へ切替・生成スケジュール 3 本を再有効化。投稿前レビュー + リール / ストーリーズ実投稿 success を確認済み）。16-4b（2026-08-09）でフォーマット改善（バウンド演出・見切れ解消・イラスト 3:2 明示）を反映し、42 本を再ビルド・差し替え済み。
+  16-3b（2026-08-08）の設計 Fix → 16-3c 実装 → 16-3d 初期 42 問ビルド・S3 配置を経て、<strong>16-4（2026-08-08）で本番稼働開始</strong>（<code>batch_sets.generator_name</code> を <code>quiz-prebuilt</code> へ切替・生成スケジュール 3 本を再有効化。投稿前レビュー + リール / ストーリーズ実投稿 success を確認済み）。16-4b（2026-08-09）でフォーマット改善（バウンド演出・見切れ解消・イラスト 3:2 明示）を反映し、42 本を再ビルド・差し替え済み。<strong>改修 R-1（セットレーン。2026-09-02〜03）で事前ビルドのレンダラーを Pillow 組版から Remotion へ載せ替え</strong>、稼働在庫 56 本（朝・夜）を再ビルド・全数レビューのうえ <strong>2026-09-03 に差し替え済み</strong>（凍結中の昼 21 本は旧版のまま）。実行時仕様（セクション 2〜7）に変更はない。
 </div>
 
 <h2>1. 方式概要</h2>
-<p><strong>イラスト〜動画を事前にローカルでビルドし、全数人間レビューのうえ S3 に作り置き</strong>しておき、実行時は問題ストック（<code>quiz_stock_items</code>）の LRU 順繰り選定と<strong>事前動画の取得・返却だけを行う</strong>軽量なクイズ方式。実行時に外部 API（画像生成・LLM）を一切呼ばず、Pillow 組版・ffmpeg 合成も行わない。動画の作り（16 秒・3 カット・版面固定・答えはキャプションへ）は <code>gpt-quiz-multicut</code> の 16-1 / 16-2b / 16-4c 設計をそのまま踏襲し、生成のタイミングを実行時からビルド時へ移しただけの関係にある。</p>
+<p><strong>イラスト〜動画を事前にローカルでビルドし、全数人間レビューのうえ S3 に作り置き</strong>しておき、実行時は問題ストック（<code>quiz_stock_items</code>）の LRU 順繰り選定と<strong>事前動画の取得・返却だけを行う</strong>軽量なクイズ方式。実行時に外部 API（画像生成・LLM）を一切呼ばず、組版・レンダリング・ffmpeg 合成も行わない。動画の作り（16 秒・3 カット・答えはキャプションへ）は <code>gpt-quiz-multicut</code> の 16-1 / 16-2b / 16-4c 設計を踏襲し、生成のタイミングを実行時からビルド時へ移した関係にある。<strong>レンダラーは改修 R-1（2026-09-03）で Pillow 組版から Remotion へ載せ替え</strong>、以後の版面・動きの正はセクション 8 と <code>content/video-build/logic-training-1/remotion/</code> のコンポジションになった（<code>gpt-quiz-multicut</code> の組版仕様は旧版の記録）。</p>
 <div class="decision">
   <span class="callout-title">決定（2026-08-08 ユーザー決定、16-3 完了後の仕様変更）: 動画の事前生成方式への転換</span>
   16-3 の実 API 品質確認で、情景が意味的に文字を誘発するケース（動物園ゲートの「ZOO」看板・階数ボタンの数字）は<strong>プロンプトの禁止指定では抑えきれない</strong>ことが判明した。一方、Codex 組み込みの画像生成（imagegen。サブスク内・API 課金なし）に画風指定 1 行を足した再試行では、<strong>6 枚全てがブランドのフラットイラスト調に統一され禁止事項も全遵守</strong>となり品質面で最良だった（比較の詳細は <a href="../../plans/development-log.html">docs/plans/development-log.html</a> の 16-3 (8)）。これを受け、実行時生成をやめ事前生成へ転換する。狙いは 3 点:
@@ -46,7 +46,7 @@
 <tr><td>実装ファイル</td><td><code>services/image-batch/app/generators/quiz_prebuilt.py</code>（1 ファイルに完結）</td></tr>
 <tr><td>レジストリ登録</td><td><code>services/image-batch/app/generators/__init__.py</code> の <code>REGISTRY</code></td></tr>
 <tr><td>使用 API・ツール</td><td><strong>実行時は外部 API・組版・動画合成を一切使わない</strong>（S3 GetObject と DB のみ）。ビルド時のツールはセクション 8</td></tr>
-<tr><td>最終メディア</td><td>MP4 1 本（<code>file_format='mp4'</code>。1080x1920 / 30fps / 16 秒 / H.264 + AAC = ビルド時に <code>gpt-quiz-multicut</code> のレンダラーが保証する仕様）</td></tr>
+<tr><td>最終メディア</td><td>MP4 1 本（<code>file_format='mp4'</code>。1080x1920 / 30fps / 16 秒 / H.264 + AAC = ビルド時に事前ビルドツーリングのレンダラー〔Remotion + ffmpeg。セクション 8〕が保証する仕様）</td></tr>
 <tr><td>中間生成物</td><td><strong>なし</strong>（動画は事前レビュー済みのため、投稿前レビュー用のカット PNG を実行時に作らない）</td></tr>
 <tr><td>補助テーブル</td><td><code>quiz_stock_items</code>（ストック LRU 取得 + 事前動画参照 <code>video_s3_key</code>）・<code>quiz_items</code>（出題履歴の INSERT）。<strong><code>audio_assets</code> は実行時には使わない</strong>（BGM・SE はベイク済み。セクション 6 の decision）</td></tr>
 </table>
@@ -123,8 +123,8 @@
 <ol>
   <li><strong>対象抽出</strong>: <code>video_s3_key IS NULL</code> の有効ストック行を列挙する（初回 = 16-3d は 42 問全量、以後は補充分のみ）</li>
   <li><strong>イラスト生成（imagegen 委譲 + 3:2 センタークロップ）</strong>: 行の <code>illustration_scene</code> からイラストプロンプトを組み立て（<code>gpt-quiz-multicut</code> のコード側固定プロンプト〔情景 + スロット別ムード + ブランド配色 + 禁止事項 = <a href="gpt-quiz-multicut.html#illustration">同セクション 6</a>〕を移植し、<strong>画風 1 行を恒久追加</strong> = 下記 decision）、Codex 組み込み画像生成（imagegen）で生成する。プロンプト末尾に<strong>画像サイズ 3:2（1536x1024）の明示行</strong>を付ける（16-4b 追加 = 下記 decision）。<code>intake.py</code> は 3:2 センタークロップ → 1536x1024 リサイズで組版入力の縦横比を旧方式と一致させ、<strong>3:2 でなかった素材は WARNING + 切り捨て率を報告</strong>する（見切れたら該当問題だけ再生成する運用）</li>
-  <li><strong>組版 + ffmpeg ビルド</strong>: <code>gpt_quiz_multicut.py</code> の<strong>レンダラー（Pillow 組版 + ffmpeg 合成。7 枚版面・SE ディレイ・BGM トリム + afade）を import して流用</strong>する（作りは <a href="gpt-quiz-multicut.html#composition">同セクション 8〜9</a> を正とし、本書には重複記載しない）。BGM はスロット別 LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行う（セクション 6 の decision）。実行環境はホストに ffmpeg がないため <strong>image-batch の Docker イメージにリポジトリをマウントして実行</strong>する（16-3 のオフライン確認と同じ方法）</li>
-  <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（+ イラスト・カット代表画像）を一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>イラスト再生成（imagegen 再試行）または情景修正（<code>illustration_scene</code> の書き直し → DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は operation.html セクション 3 の手順 5）</li>
+  <li><strong>Remotion レンダリング + ffmpeg 音声ミックス</strong>（改修 R-1〔2026-09-03〕で Pillow 組版から載せ替え = 下記 decision）: <code>build.py</code> が<strong>ホスト（WSL）</strong>で対象抽出・スロット解決・props 生成（ローカル DB。依存は pymysql のみ）を行い、<code>remotion/</code> の Remotion コンポジション（<code>Quiz16s</code>。Remotion 4 + React 19。版面・動き・タイムラインは <code>remotion/src/</code>、構成の一覧は <code>remotion/README.md</code>）を Docker（<code>remotion/Dockerfile.render</code>。WSL に Chrome の共有ライブラリが無いため）で<strong>映像のみ</strong>レンダリングし、<code>remotion/scripts/mix_audio.py</code> が image-batch イメージの ffmpeg で BGM + SE を旧版と同値のフィルタで載せる（pref-ranking-1 の <code>build.py</code> と同じ方式）。<strong>不変条件</strong>（尺 16 秒・3 カット・SE 8.0 / 13.0 秒・音量・CRF 20・書体 Noto Sans JP）は <code>remotion/scripts/spec.py</code> を Python 側の単一ソースとし、<code>tests/test_timeline_sync.py</code> が <code>remotion/src/timeline.ts</code> と突き合わせる（TypeScript 側で壊すと pytest が落ちる）。<strong>ループ要件</strong>: 周期アニメーションの周期はすべて 480 フレームの約数（<code>timeline.ts</code> の <code>LOOP_PERIODS</code>。違反はモジュール読み込み時に例外）とし、末尾 479f の見た目を先頭 0f に一致させる（R-1-1 でループ視聴が常態と実証されたため）。BGM はスロット別 LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行う（セクション 6 の decision。<code>--rebuild</code> では既存の <code>video_audio_asset_id</code> を引き継ぎ LRU を消費しない）。<code>services/image-batch</code> の <code>gpt_quiz_multicut.py</code> への import 依存は無い（イラストプロンプトの組み立て <code>export_prompts.py</code> だけが同モジュールの <code>_build_illustration_prompt</code> を使う。プロンプトはレンダラーと別の資産で R-1 の対象外）</li>
+  <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（+ イラスト・完成 MP4 から抜いた 5 枚のスチル〔先頭 0f・各カット・末尾 479f。<strong>先頭と末尾を隣接表示してループ継ぎ目を全数で目視する</strong>〕）を一覧できるレビューシート <code>review_sheet.py</code>（<code>--slot</code> で対象スロット限定・<code>--per-page</code>〔既定 14〕でページ分割。スマホでの全数レビュー用）を生成し、ユーザーが全数レビューする。NG は<strong>イラスト再生成（imagegen 再試行）または情景修正（<code>illustration_scene</code> の書き直し → DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は operation.html セクション 3 の手順 5）</li>
   <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> へアップロードし（イラスト原画 <code>{content_key}_illustration.png</code> も再ビルド資産として併置。DB 記録なし）、<code>quiz_stock_items</code> の <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>（V006）を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する。Aurora 反映 SQL と S3 ファイル名のどちらも環境ローカルな <code>id</code> を使わない（安定キー = <code>set_code</code> + <code>question_text</code> と <code>content_key</code> で解決。<a href="../data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a> の V007 コールアウト）</li>
 </ol>
 <div class="decision">
@@ -140,15 +140,27 @@
     <li>組版側の枠埋め廃止（<a href="gpt-quiz-multicut.html#composition">gpt-quiz-multicut セクション 8.2</a> の 16-4b decision）と合わせて、<strong>3:2 で生成された素材は切り捨てゼロで動画に載る</strong></li>
   </ul>
 </div>
+<div class="decision">
+  <span class="callout-title">決定（改修 R-1 = 2026-09-02〜03。セットレーン）: 事前ビルドのレンダラーを Pillow 組版から Remotion へ載せ替える</span>
+  <ul>
+    <li><strong>背景</strong>: 16-5 の水準評価で 3 カット化後もスキップ率 50.6%・平均視聴 12.4 秒（ベースライン）。R-1-1 でリールの平均再生時間が尺 16 秒を超える動画が多数 = <strong>ループ視聴が常態</strong>と実証された一方、旧レンダラー（Pillow 7 枚版面 + ffmpeg 連結）は 7 版面中 5 枚が完全静止で、ループ先頭の 0〜7 秒が止まって見えていた（壁打ちの経緯は <a href="../../ideas/logic-training-remotion-rebuild.md">アイデア記録</a>）</li>
+    <li><strong>決定</strong>: レンダラーを pref-ranking-1 で実証済みの Remotion（React コンポジション）へ載せ替え、<strong>どのフレームも動いている</strong>動画にする。<strong>不変条件</strong>（16 秒・3 カット・SE タイミング・BGM / SE のミックス・答えはキャプションで開示・イラストの再利用・書体）は変えず、前後比較の条件を保つ。TTS は入れない</li>
+    <li><strong>版面</strong>: セーフエリアを高さ依存の 2 ゾーンへ変更。上部（時間帯ピル・つかみ帯・見出し・問題文）は左右対称の余白でカード幅を使い切り、Instagram UI の右 12% 予約は下部（イラスト・コーチ・吹き出し）だけに残す。本文の実効幅 797 → 902px・問題文 56 → 68px</li>
+    <li><strong>ループ</strong>: 周期はすべて 480 の約数、継ぎ目は 15.8 秒で導入カットの状態へ<strong>スナップ</strong>（クロスフェードは二重露光に見え不具合と区別がつかないため不採用）。問題文はフレーム 0 から全文表示（行ごとの段階表示は 2 周目以降に「読み始めた文がまだ出ていない」状態を作るため R-1-3 で廃止）。冒頭 0 秒にもコーチのバウンドを置く</li>
+    <li><strong>実行場所</strong>: <code>build.py</code> は image-batch コンテナ内実行からホスト実行へ変わり、Remotion / ffmpeg だけを Docker に委譲する。<code>gpt_quiz_multicut</code> への import 依存を除去し、<code>services/</code> 側は<strong>休止方式として残置</strong>（削除しない。実行時生成へ戻す経路は残す）</li>
+    <li><strong>投入</strong>: 段階ビルド（補充分だけ新版面の混在投稿）は行わず、稼働在庫 56 本を一括再ビルド → 全数レビュー（全件承認）→ <strong>2026-09-03 に S3・両環境 DB を差し替え</strong>。凍結中の昼 21 本は旧版のまま。効果は差し替え 2 週間後に<a href="../../plans/logic-training-1.html#pending-checks">セット計画書の確認待ちリスト</a>で判定する（悪化時は旧版へ戻す判断を含む）。実施の詳細は<a href="../../plans/logic-training-1-log.html">セット記録</a>セクション 3</li>
+    <li><strong>共通設計書への波及</strong>: <a href="../batch-flow.html#generator-catalog">batch-flow.html の方式カタログ</a>（quiz-prebuilt の「gpt-quiz-multicut のレンダラー流用」・gpt-quiz-multicut の「事前ビルドのレンダラーとして継続使用」）と <a href="gpt-quiz-multicut.html">gpt-quiz-multicut.html</a> 冒頭の転用注記は<strong>開発レーン</strong>のため、本改修では開発計画の設計課題リストに起票するまでとし、書き換えは開発レーンのセッションで行う</li>
+  </ul>
+</div>
 <div class="warn">
   <span class="callout-title">版面・スロット構成・音源の変更は事前動画の再ビルドを伴う</span>
   事前動画にはスロット別パレット・<code>slot_label</code>・<code>slot_hook</code>・BGM・SE・版面がベイクされている。以下の変更は<strong>該当する事前動画の全再ビルド + 差し替え</strong>が必要になる（実行時生成なら設定変更だけで済んだものが、ビルド資産の更新作業になるトレードオフ）:
   <ul style="margin:.3rem 0 0;">
-    <li>版面・カット構成・尺の変更（レンダラー改修 → 全量再ビルド）。<strong>16-4c（3 カット化・つかみ帯・ズーム廃止）がこの warn の初の実例</strong>で、全 63 本の再ビルド・再配置を伴った</li>
+    <li>版面・カット構成・尺の変更（レンダラー改修 → 全量再ビルド）。<strong>16-4c（3 カット化・つかみ帯・ズーム廃止）がこの warn の初の実例</strong>で、全 63 本の再ビルド・再配置を伴った。<strong>改修 R-1（Remotion 載せ替え。2026-09-03）が 2 例目</strong>で、稼働在庫の朝・夜 56 本を再ビルド・差し替えた（凍結中の昼 21 本は <code>--slot</code> で除外し旧 Pillow 版のまま。再開判断時にまとめて再ビルドする）</li>
     <li><code>parameters.slots</code> の型・難度 ⇔ スロット対応やパレット・<code>slot_label</code> / <code>slot_hook</code> の変更（該当スロットの再ビルド。事前動画は行の型・難度から一意に決まるスロット向けにビルドされるため、対応を変えると版面とスロットが食い違う）</li>
     <li>BGM の差し替え（ミュート検知時を含む。<code>is_active=0</code> にするだけでは既ビルド動画に古い曲が残る — <a href="../operation.html#mute-check">operation.html セクション 4.4</a> の追記を参照。対象は <code>video_audio_asset_id</code> で特定できる）</li>
   </ul>
-  一括再ビルドは <code>build.py --rebuild</code> で行う（16-4b で追加。<code>video_s3_key IS NOT NULL</code> のビルド済み行を対象に、BGM を <code>video_audio_asset_id</code> から引き継いで再ビルドする = 選曲 LRU を消費せず、<code>last_used_at</code>〔出題キュー〕も変えないため差し替えで再投稿は発生しない）。再ビルド後の全数レビュー → S3 上書き → 両環境 DB 反映の運用手順は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a> を参照。
+  一括再ビルドは <code>build.py --rebuild</code> で行う（16-4b で追加。<code>--slot &lt;slot_code&gt;</code>〔複数可。R-1-5 で追加〕で対象スロットを限定できる。<code>video_s3_key IS NOT NULL</code> のビルド済み行を対象に、BGM を <code>video_audio_asset_id</code> から引き継いで再ビルドする = 選曲 LRU を消費せず、<code>last_used_at</code>〔出題キュー〕も変えないため差し替えで再投稿は発生しない）。再ビルド後の全数レビュー → S3 上書き → 両環境 DB 反映の運用手順は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a> を参照。
 </div>
 
 <h2>9. 依存ライブラリ・実行環境</h2>
@@ -157,7 +169,7 @@
 <tr><th>項目</th><th>内容</th></tr>
 <tr><td>実行時の依存</td><td><code>acps_shared</code>（DB・S3）のみ。<strong>openai / Pillow / ffmpeg / フォントは実行時には使わない</strong>（コンテナイメージは image-batch 共通のため同梱のままだが、本方式のコードパスでは参照しない）</td></tr>
 <tr><td>Fargate タスクサイズ</td><td>1 vCPU / 2 GB のまま据え置き（<code>ImageBatchStack</code> は kenburns と共通のため変更しない。本方式単体では過剰だが、分離の実益がない）</td></tr>
-<tr><td>ビルド時の依存</td><td>imagegen（Codex 委譲）・image-batch Docker イメージ（Pillow / ffmpeg / フォント同梱）・ローカル MySQL / Aurora への接続。セクション 8</td></tr>
+<tr><td>ビルド時の依存</td><td>imagegen（Codex 委譲）・<code>remotion-render</code> Docker イメージ（Node 22 + Chrome の共有ライブラリ。<code>remotion/Dockerfile.render</code>）・image-batch Docker イメージ（ffmpeg / ffprobe）・ホストの Python（pymysql）・ローカル MySQL / Aurora への接続。フォントは pref-ranking-1 の <code>remotion/public/fonts/</code> から <code>build.py</code> が複製する。セクション 8</td></tr>
 </table>
 </div>
 
