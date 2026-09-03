@@ -13,7 +13,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-03（16-12b 完了〔V011 ビュー昇格・月次 KPI 転記運用とセット計画書 KPI 欄様式の確定・集計ランナーに kpi_* 2 クエリ〕。follows_and_unfollows の設計課題を解消済みへ移動し、確認待ちリストに 16-12b の 2 行〔本番ビュー値・100 フォロワー閾値後〕を追加。開発レーンの次は Phase 20-1〔fantasy-animals-1 の停止〕）</span>
+  <span>最終更新: 2026-09-03（16-12b 完了〔V011 ビュー昇格・月次 KPI 転記運用とセット計画書 KPI 欄様式の確定・集計ランナーに kpi_* 2 クエリ〕。同日に人間ゲートを実施し V011 を Aurora へ適用・本番値の確認 OK〔確認待ち行は開発記録へ移動〕。follows_and_unfollows の設計課題を解消済みへ移動し、100 フォロワー閾値後の確認を確認待ちリストに追加。開発レーンの次は Phase 20-1〔fantasy-animals-1 の停止〕）</span>
 </div>
 
 <div class="note">
@@ -207,7 +207,6 @@
 <tbody>
 <tr><td>2026-09-02 / 19-1 CodePipeline 完走待ちの <code>/goal</code> 化（初回試行）</td><td>次に <code>services/</code> <code>shared/</code> を触るコミットを push したとき</td><td>① push 直後に Claude が CLAUDE.md の D 定型行（<code>&lt;sha&gt;</code> 置換済み）を提示するか ② ユーザーが打った <code>/goal</code> の evaluator が、貼られた aws cli 出力（パイプラインの Succeeded・タスク定義の新リビジョン）から到達を判定して止まるか ③ 15 ターン以内に収まるか</td><td>提示されない → CLAUDE.md の文言を直す。判定できない → 定型行の証跡指定（貼らせる出力）を具体化する。いずれも設計課題リストではなく Phase 19 の追補ステップとして起こす</td><td>—</td></tr>
 <tr><td>2026-09-02 / 20-1 fantasy-animals-1 の停止（効果確認）</td><td>20-1 の deploy と Aurora の UPDATE を適用した翌日 21:00 JST 以降</td><td>① fantasy-animals-1 の 21:00 投稿が起きていない（<code>posts</code> に新規行なし・Instagram に新規投稿なし）② 画像生成 SFN が fantasy-animals-1 で起動していない（EventBridge Scheduler 一覧に fantasy-animals-1 の名前がない）③ インサイト収集 SFN の 06:00 / 18:00 実行が他セット分だけで成功している</td><td>投稿が起きている → deploy 未反映か Scheduler の削除漏れ。20-1 の追補ステップとして起こす。インサイト収集が失敗する → 収集バッチの <code>is_active = 0</code> の扱いを確認し設計課題リストへ</td><td>—</td></tr>
-<tr><td>2026-09-03 / 16-12b V011 ビューの本番値（人間ゲートの後段）</td><td>ユーザーが Aurora へ <code>database/V011</code> を適用した翌日以降（インサイト収集後）に <code>python3 content/insights-analysis/run_queries.py kpi_post_monthly kpi_account_monthly</code> を実行したとき</td><td>① 6 本のビューが引ける ② <code>v_account_kpi_monthly</code> の 2026-08 の <code>month_end_followers</code> が事業戦略書 KPI 実績表の 08-31 値（fantasy-animals-1 = 1 / logic-training-1 = 18 / pref-ranking-1 = 1）と一致する ③ <code>v_post_kpi_monthly</code> の 2026-08 <code>all</code> 行が 16-5 の集計と桁・傾向で整合する（母集団が月単位・72 時間基準のため一致はしない。logic-training-1 が views 数百〜千台・スキップ率 50〜70%、fantasy-animals-1 が views 数十・スキップ率 90% 前後なら OK）</td><td>ビューが引けない → 適用漏れ（再適用は冪等）。値が食い違う → ビュー定義の誤りとして 16-12c を起票（<code>database/</code> のみ）</td><td>—（結果は開発記録の 16-12b へ）</td></tr>
 <tr><td>2026-09-03 / 16-12b <code>follows_and_unfollows</code>（100 フォロワー閾値後の確認）</td><td>月次 KPI 転記時に <code>v_account_kpi_monthly.month_end_followers</code> が 100 以上のアカウントが初めて現れたとき</td><td>そのアカウントのその月の <code>account_insights_daily.metrics</code> に <code>follows_and_unfollows</code> キー（<code>breakdowns</code> の <code>follow_type</code> 内訳）が入り始めているか（<code>SELECT metric_date, JSON_EXTRACT(metrics, '$.follows_and_unfollows') FROM account_insights_daily WHERE sns_account_id = ? ORDER BY metric_date DESC LIMIT 7</code>）。入っていれば OK → data-model 4.11 に「100 フォロワー以上で取得可」を追記し、ビュー <code>v_account_kpi_daily</code> への昇格を検討する</td><td>入っていない → 正規化（<code>insights_api.py</code>）か要求パラメータの問題として開発レーンの設計課題リストへ起票（応答本文を CloudWatch Logs では確認できないため、要求のデバッグログ追加を含めて扱う）</td><td>—</td></tr>
 </tbody>
 </table></div>
