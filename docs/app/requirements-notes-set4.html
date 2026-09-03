@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ウミガメのスープ参加型セット（セット 4）壁打ち記録（21-1） | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / ウミガメのスープ参加型セット（セット 4）壁打ち記録（21-1）</nav>
+<h1>ウミガメのスープ参加型セット（セット 4）壁打ち記録（21-1）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">Phase 21-1 テーマ・企画 Fix 壁打ちの記録</span>
+  <span>set_code: umigame-soup-1</span>
+  <span>最終更新: 2026-09-03（21-1 完了）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  Phase 21-1（テーマ・企画の Fix 壁打ち。ユーザー判断・ゴール対象外）の記録であり、設計書ではない。決定の反映先（正）は 21-3 で Fix する各設計書（<code>docs/app/sets/umigame-soup-1.html</code> / <code>docs/app/generators/umigame-prebuilt.html</code> / <code>docs/infra/</code>）。
+  インプットは<a href="../ideas/umigame-soup-set.html">アイデア詳細</a>（企画・アーキテクチャ・事業面の論点は 2026-08-28 の 2 回の壁打ちで決着済み）と PoC 資材 <code>poc/umigame-comment-webhook/</code>（2026-09-03 成功）。本書はアイデア詳細で未確定だった実装上の 8 論点（<a href="../plans/development-plan.html#phase-21">開発計画 21-1</a> の ①〜⑧）だけを扱う。
+  版面（②）は <strong>21-2 の完成版リール PoC を見てから直す前提の叩き台</strong>であり、ストック 1 件の素材項目（⑧）も同 PoC 後に確定する。
+</div>
+
+<h2 id="decisions">1. 決定一覧（①〜⑧）</h2>
+
+<h3 id="d1">① set_code・アカウント名・ユーザーネーム</h3>
+<div class="decision">
+  <span class="callout-title">decision（2026-09-03 ユーザー決定）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><code>set_code</code> = <strong><code>umigame-soup-1</code></strong>（起票時の仮称をそのまま確定。方式名・S3 プレフィックス・Secret 名は計画書の前提どおり）</li>
+    <li>ユーザーネーム = <strong><code>umigame.soup.jp</code></strong>（空き確認と取得はユーザーの作業。21-7 のアカウント登録で使う）</li>
+    <li>表示名（<code>sns_accounts.account_name</code>）は 21-2 で出題者キャラの名前が決まってから確定する。方向は「アカウント自体を出題者として立てる」（AI 返信がアカウント名義で付くため）</li>
+  </ul>
+</div>
+
+<h3 id="d2">② リール版面・尺・ナレーション・BGM・イラスト（叩き台）</h3>
+<p>ユーザーの要望: <strong>構成は logic-training-1 に寄せる</strong>。フック・問題文・遊び方のルールはずっと表示し、下部でキャラクターとコメント（吹き出し）が時間経過で切り替わる。ナレーションは問題文とルールの読み上げのみで吹き出しと同期しない。イラストは背景に使う。</p>
+<div class="decision">
+  <span class="callout-title">decision: 版面の叩き台（2026-09-03 ユーザー決定。21-2 の PoC で修正する前提）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>尺 = 20 秒（600 フレーム・30fps）・1 尺のみ・ループ前提</strong>（末尾と先頭の状態を一致させる。周期アニメーションの周期は総フレームの約数。logic-training-1 の <code>timeline.ts</code> の不変条件を踏襲）</li>
+    <li><strong>ずっと表示する要素（フレーム 0 から末尾まで不変）</strong>: つかみ帯（フック文）/ 見出し「問題」+ 問題文の全文（段階表示はしない。R-1-3 の教訓）/ 問題文直下の<strong>ルール帯</strong>「『はい / いいえ / 関係ない』で答えられる質問をコメントしてね。出題者が全部返事します」（logic-training-1 の時間帯ピルに相当する固定要素）</li>
+    <li><strong>背景 = 問題の情景イラスト 1 枚を全面に敷き、暗いオーバーレイの上にカードを乗せる</strong>（logic-training-1 はカード内にイラスト矩形を置くが、本セットは下部ゾーンを吹き出しに使い切るため背景へ回す）</li>
+    <li><strong>時間で切り替わる要素（下部ゾーン。右 12% は Instagram UI に空ける）</strong>: 出題者キャラを下部左に常駐（logic-training-1 のコーチの位置）。質問者キャラが吹き出しで質問例を出し、出題者が「はい。」「いいえ。」「関係ありません。」と短く返す。切り替えはクロスフェードせず<strong>スナップ</strong>（二重露光に見える実測は R-1 で確認済み）。吹き出し出現の SE は 1 種のみ</li>
+    <li><strong>ビート案</strong>: 導入 3 秒（出題者「質問してみて！」）→ 3 往復 × 4 秒（質問 2 秒 → 返答 2 秒）→ 締め 5 秒（出題者「正解が出るまで何度でも答えるよ。コメントで質問！」）→ 末尾 0.4 秒で導入の状態へ戻す</li>
+    <li><strong>キャラ構成 = 出題者 1 体 + 質問者 1 体</strong>（いずれも imagegen の静的アセット、表情差分は各 1〜2。pref-ranking-1 の五郎と同じ固定アセット方式）。質問者を 1 体に絞るのは<strong>将来「助手」サブアカウントとして独立させる可能性があり、管理しやすくするため</strong>（ユーザー判断。Claude の当初案は質問者 3 体）</li>
+    <li><strong>キャラ設定（仮）</strong>: 出題者 = <strong>探偵風のウミガメ</strong>（アカウントの顔。真相を握る側）、質問者 = <strong>助手</strong>（プレイヤー側の代表。助手サブアカウント構想と名前を揃える）。名前・ビジュアルの細部・画風は 21-2 の試し生成で決める</li>
+    <li><strong>ナレーション = あり。VOICEVOX で冒頭に問題文とルール帯を 1 回だけ読む</strong>（吹き出しと同期させない）。問題文 60〜80 字 + ルール 30 字で 12〜14 秒程度の見込み。pref-ranking-1 の TTS アダプタと実測長の予算検査を流用し、超過はビルドエラー。話者は 21-2 で試聴して決める</li>
+    <li><strong>BGM = 既存 CC0 プール（<code>audio_assets</code>）から LRU 選曲</strong>（quiz-prebuilt / ranking-prebuilt と同じビルド時の移管）</li>
+    <li><strong>イラスト = 1 問 1 枚 imagegen。画風は暗めの単色トーンにシルエット寄りのフラットイラスト。真相の手がかりを描かない指示を固定にする</strong>（問題文の情景のみ）。文字は入れない</li>
+  </ul>
+</div>
+
+<h3 id="d3">③ 生成方式と Remotion Skills の導入先</h3>
+<div class="decision">
+  <span class="callout-title">decision（2026-09-03。方式名はユーザー決定、導入先は Claude に一任）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li>方式名 = <strong><code>umigame-prebuilt</code></strong>（「コンテンツ種別 + prebuilt」の命名慣例。Remotion ローカル事前ビルド = ranking-prebuilt 同型・定常費ゼロ路線）</li>
+    <li>Remotion Skills は <strong>skills CLI でリポジトリルートに導入</strong>する: <code>npx skills add remotion-dev/skills -a claude-code -a codex -y</code>。導入対象は <strong>best-practices / create / markup / render / docs / upgrade の 6 本</strong>（maps・captions・saas・interactivity・multimedia は本セットで使わないため入れない）</li>
+    <li>配置の前提: skills CLI は正本を <code>.agents/skills/&lt;skill&gt;/</code> に置き、<code>.claude/skills/&lt;skill&gt;</code> に<strong>スキル単位</strong>のシンボリックリンクを張る。ディレクトリ丸ごとのリンクではないため、自前スキルの実ディレクトリ <code>.claude/skills/</code> と共存できる（= 計画書 21-1 ③ の候補①が CLI の既定動作そのもの）。<strong>21-2 の導入時に実測し、スキル単位リンクにならなければ手動でスキル単位リンクに切り替える</strong></li>
+    <li>コミット対象 = 正本（<code>.agents/skills/remotion-*</code>）+ リンク（<code>.claude/skills/remotion-*</code>）+ CLI のロックファイル。更新は <code>npx skills update</code>（導入した版は 21-2 の README に記録）</li>
+    <li>レンダリング経路は既存どおり <code>build.py</code> からの Docker 委譲（<code>npx remotion render</code>）を維持する</li>
+  </ul>
+</div>
+
+<h3 id="d4">④ 投稿時刻・固定コメント・助手サブアカウント</h3>
+<div class="decision">
+  <span class="callout-title">decision（2026-09-03 ユーザー決定）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>投稿時刻 = 20:00 JST・1 日 1 回</strong>（Claude は失敗アラーム対応の重なりを避けて 19:00 を提案したが、ユーザー判断で 20:00。pref-ranking-1 の夜スロットと同時刻になるため、21-3 の運用設計で同時刻運用の注意〔15-15 決定と同じく <code>set_code</code> で分離〕を明記する）</li>
+    <li><strong>固定コメント（ピン留め）は初期版では置かない</strong>（遊び方はリール版面のルール帯で示す）</li>
+    <li><strong>助手サブアカウントは初期版では作らない</strong>。要否は 21-7 で作るセット計画書の確認待ち（稼働 2 週間後）で判断する。質問者キャラを 1 体にしたのはこの布石</li>
+  </ul>
+</div>
+
+<h3 id="d5">⑤ AI 出題者のモデルと月額試算・利用上限</h3>
+<div class="decision">
+  <span class="callout-title">decision（2026-09-03 ユーザー決定）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>モデル = gpt-5.6-luna</strong>（PoC の gpt-4o-mini から変更）。API 上のモデル ID と単価は <strong>21-6 の実装時にダッシュボードで確認</strong>する（本書には単価を書かない）。PoC のプロンプトは gpt-4o-mini で検証したものなので、<strong>21-4b のプローブテストは luna で行う</strong></li>
+    <li>試算の枠組み: 返信 1 件 = 入力 600 トークン前後（問題文・真相・確定事実シート・ルール・質問）+ 出力 30 トークン程度。月 6,000 件で入力 3.6M・出力 0.2M トークン。事業戦略書 3.1 の費目「コメント自動返信の LLM API（従量のみ・月数百円規模）」の範囲に収まる見込み。単価確認後に外れていれば 21-6 で戦略書を直す</li>
+    <li>利用上限は 2 段: <strong>OpenAI 側のプロジェクト月額予算上限</strong> + <strong>Reply Lambda の予約同時実行数</strong>（SQS が吸収するため取りこぼしにはならない）。モデルはプローブテスト後、本番稼働まで固定</li>
+  </ul>
+</div>
+
+<h3 id="d6">⑥ コメント経路の構成とコード置き場・デプロイ方式</h3>
+<div class="decision">
+  <span class="callout-title">decision（2026-09-03 ユーザー決定）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li>経路 = <strong>Lambda Function URL（署名検証のみ）→ Webhook Lambda → SQS + DLQ → Reply Lambda</strong>。API Gateway は採らない（WAF・スロットリングが要るまで不要。Function URL は無料）</li>
+    <li>コード置き場 = <strong><code>services/comment-reply/</code></strong>（pytest 付き。PoC ハンドラを Webhook / Reply に分割して移植）</li>
+    <li>デプロイ = <strong>CDK asset</strong>（外部依存ゼロの Python のままバンドル不要。コンテナではないため CodePipeline は通さず、手動 <code>cdk deploy</code> の既存ルールに乗せる）</li>
+  </ul>
+</div>
+
+<h3 id="d7">⑦ Meta アプリの使い分けと UmigamePocStack・プライバシーポリシー</h3>
+<p>ユーザーから「既存セット（logic-training-1 等）の Meta アプリは使えないのか」の確認があり、以下の判断材料で「投稿は既存アプリ流用のまま、コメント Webhook だけ新規アプリ」に決着した。</p>
+<ul>
+  <li><strong>既存アプリは開発モードで、稼働中セットの無期限トークンはその構成に依存する</strong>（<a href="operation.html">運用設計</a> 5.1 の実測記録）。コメント Webhook は PoC で「開発モードでは一切届かない」と実証済みのため、既存アプリで受けるには公開モードへ切り替える必要があり、logic-training-1 / pref-ranking-1 のトークンが 60 日失効へ戻る可能性がある</li>
+  <li><strong>API の方式が違う</strong>: 既存アプリは Facebook ページ経由（<code>graph.facebook.com</code>）、PoC は Instagram ログイン方式（<code>graph.instagram.com</code>。署名鍵は Instagram アプリシークレット）。既存アプリで受けるなら Webhook 購読手順と返信経路を作り直して再実証が要る</li>
+  <li>自動返信の規約リスクを既存資産から切り離せる（2026-08-28 の桜アカウント見送りと同じ考え方）</li>
+</ul>
+<div class="decision">
+  <span class="callout-title">decision（2026-09-03 ユーザー決定）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>投稿 = 既存 Meta アプリの流用</strong>（運用設計 5.1 の通常手順。Facebook ページを新規作成して umigame.soup.jp を連携。2026-07-27 の「2 セット目以降は既存アプリ流用」決定はそのまま）</li>
+    <li><strong>コメント Webhook = 本番用 Meta アプリを新規作成し公開モードで運用</strong>（Instagram ログイン方式。PoC の手順をそのまま本番アカウントで再実施）。PoC アプリ + <code>test_tkghr</code> はステージング専用のまま維持</li>
+    <li><strong>umigame.soup.jp は両方のアプリに接続する</strong>（投稿用に既存アプリ、コメント用に新規アプリ）。<strong>投稿バッチが記録する <code>media_id</code> と Webhook の <code>media.id</code> が同じ値かを 21-6 でステージング面で照合する</strong>（S3 スナップショット <code>problems/{media_id}.json</code> のキーが一致しなければ経路が成立しない）</li>
+    <li><strong>プライバシーポリシー = S3 静的ホスティング</strong>（公開モードの必須要件。21-6 の CDK に HTML 1 枚を載せる）</li>
+    <li><strong><code>UmigamePocStack</code> は 21-6 で新スタックを同一コードから本番面・ステージング面の 2 面で立て、ステージング用 Meta アプリの Webhook 先を切り替えた後に削除</strong>する（PoC ハンドラを別コードで残すと本番と乖離するため。2 面分の定常費はほぼゼロ）。ステージング面の長期トークン失効は開発計画の確認待ちリストで追う</li>
+  </ul>
+</div>
+
+<h3 id="d8">⑧ ストック 1 件の素材項目（仮リスト）と 21-2 の PoC 用の 1 問</h3>
+<div class="decision">
+  <span class="callout-title">decision（2026-09-03 ユーザー決定）</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>素材項目の仮リスト</strong>（確定は 21-2 の PoC 後）: 問題文 / 真相 / 確定事実シート（「はい・いいえ・関係ない」で答える事実の列挙）/ 想定質問 15〜20 と期待回答（プローブテスト用）/ イラスト作成用プロンプト / フック文 / プレイ例 2〜3 往復（版面の吹き出し台本）/ ナレーション cue（問題文 + ルール帯）/ キャプション + ハッシュタグ / 出典・オリジナル性メモ / 難易度</li>
+    <li><strong>21-2 の PoC 用の 1 問 = 古典の「ウミガメのスープ」本編</strong>（男がレストランでウミガメのスープを飲み、店員に本物か確かめてから自殺する）。広く流布した題材のため PoC に限って使い、ストック本体はオリジナル問題で執筆する（オリジナル性の基準は 21-4b で決める）</li>
+  </ul>
+</div>
+
+<h2 id="handoff">2. 後続ステップへの引き継ぎ</h2>
+<ul>
+  <li><strong>21-2（リール PoC）</strong>: 版面②の叩き台を Remotion Skills の指針で実装し、静止フレームを見て②を修正する。キャラ 2 体（探偵風ウミガメ・助手）の試し生成と名前決め、VOICEVOX 話者の試聴、ナレーション実測長の確認、skills CLI の配置（スキル単位リンクか）の実測、素材項目の確定</li>
+  <li><strong>21-3（設計書 Fix）</strong>: 本書 ①〜⑧ を <code>docs/app/sets/umigame-soup-1.html</code> / <code>generators/umigame-prebuilt.html</code> / <code>docs/infra/</code> へ反映。20:00 同時刻運用の注意、表示名の確定</li>
+  <li><strong>21-4b（ストック）</strong>: プローブテストは gpt-5.6-luna で行う。オリジナル性の基準</li>
+  <li><strong>21-6（コメント経路）</strong>: モデル ID・単価の確認と戦略書 3.1 の見直し、<code>media_id</code> の照合、プライバシーポリシーの S3 静的ホスティング、2 面構成と <code>UmigamePocStack</code> の削除</li>
+  <li><strong>ユーザー作業（時期は 21-7 まで）</strong>: <code>umigame.soup.jp</code> の取得、Facebook ページの新規作成、本番用 Meta アプリの作成</li>
+</ul>
+
+</div>
+</body>
+</html>

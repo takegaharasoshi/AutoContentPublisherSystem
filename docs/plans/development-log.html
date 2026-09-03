@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-03（計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
+  <span>最終更新: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
@@ -1938,6 +1938,17 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 </ul>
 </details>
 </details>
+<h3>Phase 21: ウミガメのスープ参加型セット（第 4 セット）</h3>
+<p><strong>ゴール</strong>: Instagram リールで 1 日 1 問の「ウミガメのスープ」を投稿し、コメント欄の質問に AI 出題者が自動返信する参加型セットを新設して稼働開始する（計画は<a href="development-plan.html#phase-21">開発計画 Phase 21</a>）</p>
+<h3>21-1 テーマ・企画の Fix 壁打ち（2026-09-03）</h3>
+<ul>
+<li><strong>起動</strong>: <code>/step 21-1</code>。計画書に「ユーザー判断・ゴール対象外」と明記されたステップの初回で、スキルの手順 2 どおり <code>/goal</code> 行は提示せず、確認待ちリストの照合（該当なし）とレーン宣言のみ行って壁打ちに入った。触ったパスは <code>docs/app/requirements-notes-set4.html</code>（新規）・計画書・本記録・<code>docs/app/index.html</code>・CLAUDE.md（現況の一文）</li>
+<li><strong>進め方</strong>: Claude が ①〜⑧ の推奨案をまとめて提示し、ユーザーが項目ごとに採用・修正を返す 2 往復で全項目を決めた。決定一覧と判断材料は<a href="../app/requirements-notes-set4.html">壁打ち記録</a>セクション 1、後続ステップへの引き継ぎは同セクション 2</li>
+<li><strong>推奨から変わった点（ユーザー判断）</strong>: 投稿時刻 19:00 → 20:00 / 固定コメント案 → 初期版なし / 質問者キャラ 3 体 → 1 体（助手サブアカウント化に備えて管理しやすく）/ モデル gpt-4o-mini 継続 → gpt-5.6-luna / PoC の 1 問はオリジナル案 → 古典本編</li>
+<li><strong>前提の訂正</strong>: 計画書 21-1 ③ の「skills CLI の既定〔<code>.agents/skills</code> + <code>.claude/skills</code> シンボリックリンク〕は自前スキルの実ディレクトリと衝突する」は、CLI が<strong>スキル単位</strong>でリンクを張る仕様のため衝突しない（候補①が既定動作そのもの）。21-2 の導入時に実測する</li>
+<li><strong>ユーザーからの確認</strong>: 「既存セットの Meta アプリは使えないのか」→ 既存アプリは開発モードで稼働中セットの無期限トークンがその構成に依存すること、PoC の Instagram ログイン方式と API 方式が違うことから「投稿は既存アプリ流用・コメント Webhook だけ新規アプリ」で決着。両アプリに接続する結果、投稿バッチの <code>media_id</code> と Webhook の <code>media.id</code> の一致確認を 21-6 の確認項目にした</li>
+<li><strong>反映</strong>: 計画書 21-1 を完了に更新（前文の <code>set_code</code> 仮称の記述と現況の一文も更新）、<code>docs/app/index.html</code> に壁打ち記録のカードを追加、CLAUDE.md の次の着手を <code>/step 21-2</code> に更新</li>
+</ul>
 <details class="phase"><summary>次期計画の割当表・Phase XX（2026-09-03 に計画書から移設・原文）</summary><p><em>以下は 2026-09-03 の完了フェーズ整理で計画書から移設した原文。「次期計画」の割当表は Phase 16 残・19・20 のステップ割当の最終版（方針の要約は計画書「進め方の方針」に残した）。「Phase XX: プラットフォーム展開」は着手判断が未了のためアイデア体系（<a href="../ideas/platform-expansion-tiktok.md">platform-expansion-tiktok.md</a>・再醸成待ち）へ移管し、開発計画からは外した。</em></p>
 <h3>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h3>
 <p>2026-07-23 の壁打ちで策定。<strong>上位方針（収益化経路・予算・KPI・プラットフォーム展開方針）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする</strong>。優先順位の考え方: 配信面の拡大より先に「リーチ獲得能力（動画・リール）」→「勝負セット投入」→「効果測定」→「当たりが出てからプラットフォーム展開」の順。</p>
