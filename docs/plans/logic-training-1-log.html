@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-03（改修 R-1 の R-1-5 ビルド分を記録。全数レビュー待ち）</span>
+  <span>最終更新: 2026-09-03（改修 R-1 の R-1-5 ビルド分 + レビュー調整 1 往復を記録。全数レビュー待ち）</span>
 </div>
 
 <div class="note">
@@ -98,6 +98,13 @@
 <li><strong>実行</strong>: <code>S3_BUCKET_NAME=... python3 build.py --rebuild --slot morning --slot night</code> が完走（<code>完了: 56 件</code>）。対象 56 件 = <code>built with BGM</code> 56 件・イラスト欠落による skip 0 件・失敗 0 件。1 本あたり約 14 秒（Remotion 480 フレーム → ffmpeg ミックス → スチル 5 枚）で<strong>全体 13 分</strong>。<code>--rebuild</code> のため BGM は既存の <code>video_audio_asset_id</code> を引き継ぎ LRU を更新せず、<strong>S3 にも <code>quiz_stock_items</code> にも書き戻していない</strong>（差し替えは R-1-6）</li>
 <li><strong>機械検証</strong>: <code>image-batch:ffmpeg-check</code> 経由の ffprobe で 56 本を一括検証し、<strong>全数が 16.000000 秒 / 1080x1920 / h264 + aac、かつ当日更新</strong>（NG 0 件。出力は <code>work/probe_result.txt</code>）。台帳側は <code>renderer=remotion</code> が<strong>ちょうど 56 件</strong>で、昼 21 件は <code>renderer</code> なしのまま = 旧版据え置きを確認</li>
 <li><strong>レビューシート</strong>: <code>python3 review_sheet.py --slot morning --slot night</code> → <code>work/review.html</code> に <strong>56 カード</strong>（morning 28 / night 28 / noon 0）。動画 56・イラスト 56・スチル <strong>280 枚</strong>（56 × 5。先頭 0f と末尾 479f を隣接表示しループ継ぎ目を全数で目視できる）</li>
+<li><strong>レビュー中の調整 1 往復（2026-09-03）</strong>: スマホ配信（<code>tools/serve-docs.sh</code> を <code>DOCS_ROOT=work DOCS_PORT=8766</code> で起動）でユーザーが確認し、指摘 3 点を反映して<strong>56 本を再ビルド</strong>した（2 巡目も 56/56・失敗 0・ffprobe 全数 OK）。
+<ul>
+<li><strong>イラストの光沢を削除</strong>: つかみ帯と同型の光沢レイヤー（白 16% の帯を <code>illustrationDrift</code> 240f で横断）を <code>QuizVideo.tsx</code> から撤去。イラストに残るのは同周期の呼吸ズーム（+1.8%）のみ</li>
+<li><strong>夜の「つかみ帯を渡る光沢」が黒く見える不具合を修正</strong>: 光沢の色に <code>palette.card</code> を使っていたため、夜パレットでは <code>#111E3C</code>（濃紺）が琥珀色の帯（<code>accent</code> = <code>#F4B942</code>）の上を渡り<strong>暗い帯</strong>に見えていた。固定の <code>rgba(255,255,255,0.35)</code> へ変更。帯の地色は朝・夜とも同じ <code>accent</code> なので<strong>夜の光沢が朝と同一の見え方</strong>になる（朝・昼は <code>card</code> がほぼ白のため見た目は不変）。パレット定義（<code>palette.ts</code>）は触っていない</li>
+<li><strong>レビューシートのページ分割</strong>: 1 ページに 56 本を並べるとスマホで後半のメディアが読み込まれないため、<code>review_sheet.py</code> に <code>--per-page</code>（既定 <strong>14</strong>）を追加し <code>review.html</code> / <code>review-2〜4.html</code> の 4 ページ構成にした（1 ページ = 動画 14 本・スチル 70 枚）。上下にページャを置き、<strong>1 ページ目のファイル名は据え置き</strong>（既存リンクが生きる）。<code>paginate</code> / <code>page_name</code> / ページャ描画をテスト化し pytest は 31 → <strong>36 件</strong></li>
+</ul>
+</li>
 <li><strong>人間ゲート（次）</strong>: <code>work/review.html</code> で全数レビュー → 承認 ID を <code>work/approved.txt</code> に 1 行ずつ記載 → R-1-6 で <code>publish.py</code> による差し替え（S3 + ローカル DB）と Aurora への <code>work/update_prebuilt.sql</code> 適用</li>
 </ul>
 </li>

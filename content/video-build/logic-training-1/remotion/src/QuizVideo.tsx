@@ -200,7 +200,8 @@ const HookBand: React.FC<{ frame: number; design: Design; palette: Palette }> = 
           bottom: 0,
           left: -0.45 * width + sheen * 1.45 * width,
           width: 0.45 * width,
-          background: `linear-gradient(100deg, transparent, ${palette.card}59, transparent)`,
+          background:
+            "linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent)",
         }}
       />
       <div
@@ -561,8 +562,6 @@ export const QuizVideo: React.FC<QuizProps> = (props) => {
       : 0) *
     (1 - seam);
   const illustrationZoom = 1 + loopTriangle(frame, LOOP_PERIODS.illustrationDrift) * 0.018;
-  const sweep = loopPhase(frame, LOOP_PERIODS.illustrationDrift);
-  const illustrationWidth = design.illustration.right - design.illustration.left;
 
   return (
     <AbsoluteFill style={{ background: palette.background }}>
@@ -598,7 +597,7 @@ export const QuizVideo: React.FC<QuizProps> = (props) => {
       <Heading frame={frame} design={design} palette={palette} />
       <QuestionText design={design} palette={palette} />
 
-      {/* 情景イラスト: 枠に内接させた矩形の中でゆっくり呼吸し、光が渡る */}
+      {/* 情景イラスト: 枠に内接させた矩形の中でゆっくり呼吸する */}
       <div
         style={{
           ...boxOf(design.illustration),
@@ -614,17 +613,6 @@ export const QuizVideo: React.FC<QuizProps> = (props) => {
             height: "100%",
             objectFit: "cover",
             transform: `scale(${illustrationZoom})`,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: -0.5 * illustrationWidth + sweep * 1.6 * illustrationWidth,
-            width: 0.5 * illustrationWidth,
-            background:
-              "linear-gradient(105deg, transparent, rgba(255,255,255,0.16), transparent)",
           }}
         />
       </div>
