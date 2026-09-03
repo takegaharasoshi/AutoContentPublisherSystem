@@ -4,7 +4,7 @@ slug: umigame-soup-set
 status: 待機
 kind: 単発
 created: 2026-08-28
-updated: 2026-08-28
+updated: 2026-09-03
 condition: "Meta コメント Webhook + AI 自動返信 PoC の成功（使い捨て Meta アプリ + 最小 Lambda で実証。今すぐ着手）"
 parent: ""
 children: []
@@ -213,6 +213,13 @@ NAT Gateway も基本的には不要。Reply Lambda は VPC 外で動かし、S3
 - PoC 資材を実装しコミット済み: `poc/umigame-comment-webhook/`（Lambda 本体 + pytest + 手順書 README.md）+ `infra/lib/umigame-poc-stack.ts`（独立スタック `UmigamePocStack`。Function URL + Secrets Manager。デプロイチェーン外・手動 deploy）。設計課題リストの decision（2026-08-28）どおり、成功後もコメント経路専用ステージング面として恒久利用する前提の配置
 - PoC 用の簡略化: API Gateway / SQS / Lambda 分離は入れず単一 Lambda + Function URL。返信は OpenAI キー投入時のみ AI 出題者役（サンプル問題を Lambda に組み込み）、未投入時は固定文言。自己返信の無限ループ防止（`from.id == ig_user_id` スキップ）を実装
 - 次アクション（ユーザー作業）: `poc/umigame-comment-webhook/README.md` の手順で ① `cdk deploy UmigamePocStack` ② テスト用 Instagram アカウント作成 ③ テスト用 Meta アプリ作成 ④ シークレット投入 ⑤ Webhook 設定 → 実証テスト。成功判定チェックリストは README に記載
+
+### 2026-09-03（PoC 成功。採用条件を達成 → 転記待ち）
+
+- Meta 側セットアップの実測: テスト用アカウント test_tkghr を作成しアプリの Instagram テスターに追加（先に追加しないと接続時に `開発者の役割が不十分です` で拒否される）→ トークン生成 → Webhook 設定（Function URL の GET 検証は即成功）。**開発モードでは comments Webhook が一切届かず**、プライバシーポリシー URL を入れて公開（ライブ）モードへ切り替えたら届いた。App Review は不要（標準アクセス）
+- 実証結果（CloudWatch Logs で確認）: 09:19:49 JST リールへのコメント「テスト」を受信・署名検証通過 → 09:19:52 Graph API で返信成功（OpenAI 出題者役の返信「はい。」。受信から約 4 秒）→ 09:19:55 自分の返信の Webhook を受信しループ防止でスキップ。成功判定 5 項目すべて達成（チェックリストは `poc/umigame-comment-webhook/README.md`）
+- **採用条件を満たしたため disposition どおり「待機 → 採用」へ進める**。転記（開発計画への新セットフェーズ起案・事業戦略書のセットポートフォリオ）は開発レーン作業のため、進行中の 16-12b セッション完了後に `/idea` の採用転記で実施する。ステータスはそれまで待機のまま
+- PoC 資材（Meta アプリ・test_tkghr・UmigamePocStack）は設計課題リストの decision どおり削除せず、コメント経路のステージング面として維持する
 
 ## 壁打ち記録
 
