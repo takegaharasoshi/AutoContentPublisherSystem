@@ -46,7 +46,7 @@ aws cloudformation describe-stacks --stack-name Prod-UmigamePocStack --region ap
 3. **先にテスト用アカウントをアプリの「Instagram テスター」に追加する**（実測 2026-09-03: これをせずに接続すると `開発者の役割が不十分です` で拒否される）。ダッシュボード「アプリの役割」→「役割」→「人を追加」→ Instagram テスター → ユーザーネーム入力。次に **Instagram 側で承認**: テスト用アカウントで 設定 →「ウェブサイトのアクセス許可」→「テスター招待」タブ → 承認（Web: instagram.com/accounts/manage_access/）
 4. 「ユースケース」→「Instagram でメッセージとコンテンツを管理」の「カスタマイズ」→「設定」タブ（= API setup with Instagram login）で、「1. Instagram アカウントでアクセストークンを生成」→「アカウントを追加」→ テスト用アカウントでログイン・許可 → 「トークンを生成」で長期トークン（60 日有効）を取得。必要スコープ `instagram_business_basic` + `instagram_business_manage_comments` はユースケース選択時に付与済み
 5. あわせて以下を控える:
-   - **Instagram app secret**（同じページの最上部、または「Instagram ビジネスログインを設定」セクション内の「Instagram アプリシークレット」→「表示」）。**署名検証の鍵がこれか Facebook 側「アプリ設定 → ベーシック」の app secret かは実測で確定する**: まず Instagram 側を入れ、ログに「Webhook 署名の検証に失敗しました」が出たら Facebook 側に入れ替える
+   - **Instagram app secret**（同じページの最上部、または「Instagram ビジネスログインを設定」セクション内の「Instagram アプリシークレット」→「表示」）。Webhook 署名検証の鍵は**この Instagram アプリシークレット**（実測 2026-09-03 で確定。Facebook 側「アプリ設定 → ベーシック」の app secret ではない）
    - **Instagram user ID**（トークン生成時に表示される。ループ防止用。出なければ `GET https://graph.instagram.com/v23.0/me?fields=id,username&access_token=<トークン>` で取得）
 
 ### 4. シークレットへの値投入
@@ -74,7 +74,7 @@ Secrets Manager `umigame-poc/credentials` の JSON を AWS コンソールで編
 
 1. テスト用アカウントからリール（なければ通常投稿でも可）を 1 本投稿する
 2. **別アカウントから**コメントする（例: 「男は店員ですか？」）
-   - ⚠️ 開発モードのアプリは、アプリにロールを持つアカウントのイベントしか届かない可能性がある（ここが実測ポイント）。コメントが届かない場合は、コメントする側のアカウントをアプリのテスターとして追加して再試行し、結果を記録する
+   - 実測 2026-09-03: 公開モードなら**アプリに役割を持たない一般アカウントのコメントも届き、返信できる**（コメント側アカウントのテスター追加は不要）。届かない場合はアプリが開発モードのままでないかを疑う
 3. 確認:
    - CloudWatch Logs `/aws/lambda/acps-prod-umigame-comment-webhook` に受信ペイロード全文と Graph API 返信結果が出ている
    - Instagram 上でコメントに返信が付いている
@@ -93,6 +93,8 @@ Secrets Manager `umigame-poc/credentials` の JSON を AWS コンソールで編
 **→ PoC 成功（2026-09-03）。** 実測で分かったこと:
 
 - **開発モードでは comments Webhook は一切配信されない**（設定画面の注意書きどおり）。プライバシーポリシー URL を入れてアプリを**公開（ライブ）モード**に切り替えたら即座に届いた。App Review は不要だった（標準アクセスのまま）
+- **アプリに役割を持たない一般アカウントのコメントが届き、返信も表示された**（コメント側は gaharatake、アプリの役割なし）。本番で不特定のユーザーが参加できることの実証
+- Webhook 署名検証の鍵は **Instagram アプリシークレット**（Facebook 側の app secret ではない）
 - 受信ペイロードの形: `entry[].changes[].value` に `id`（コメント id）・`text`・`from.{id,username}`・`media.{id,media_product_type}`。自分の返信には `parent_id` と `from.self_ig_scoped_id` が付く。`from.id` は自分の返信なら Instagram user ID（`entry[].id` と同じ）で、ループ防止の照合キーとして使える
 - 受信 → 返信の所要は約 4 秒（OpenAI 呼び出し込み）。PoC 規模では Function URL 同期処理で問題なし
 
