@@ -304,9 +304,9 @@ export class InsightsBatchStack extends cdk.Stack {
     // docs/infra/workflow.html セクション 1.5 の decision）。
     const insightsCollectionSchedulesEnabled = true;
 
+    // fantasy-animals-1 の朝夕 2 件は Phase 20-1（2026-09-03）でセット停止に伴い削除。
+    // 復活時は同じ形の 2 エントリを再追加する
     const insightsCollectionSchedules = [
-      { setCode: 'fantasy-animals-1', slot: 'morning', minute: '0', hour: '6' },
-      { setCode: 'fantasy-animals-1', slot: 'evening', minute: '0', hour: '18' },
       { setCode: 'logic-training-1', slot: 'morning', minute: '0', hour: '6' },
       { setCode: 'logic-training-1', slot: 'evening', minute: '0', hour: '18' },
       // pref-ranking-1: 17-5c（2026-08-26）の稼働開始で追加

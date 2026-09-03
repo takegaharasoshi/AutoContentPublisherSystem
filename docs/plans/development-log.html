@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-03（16-12b の人間ゲート実施〔V011 を Aurora へ適用・本番値確認 OK〕を (5) に追記し、「確認待ちリスト（確認済み）」節を新設して行を移動。16-12b 指標セット確定の反映・設計課題リスト（解消済み）への移動）</span>
+  <span>最終更新: 2026-09-03（Phase 20-1 fantasy-animals-1 の停止を追加〔Scheduler 3 件削除・is_active = 0・廃止手順の初回実地の気づき〕。16-12b の人間ゲート実施〔V011 を Aurora へ適用・本番値確認 OK〕を (5) に追記し、「確認待ちリスト（確認済み）」節を新設して行を移動）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
@@ -1845,6 +1845,22 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>反映</strong>: ① <code>.claude/skills/step/SKILL.md</code> — 手順に「4. 確認待ちリストの照合」を新設（開発レーンは開発計画末尾、セットレーンは当該セット計画書のリストを読み、触るパス・ステップで起きる出来事をトリガー列と照合。該当行があれば「確認と結果列への記入」をゴールの完了条件に足す。該当なしも「確認待ち: 該当なし」と宣言して照合の痕跡を残す。リストの節が無い計画書は該当なし）。レーン宣言に照合結果を含め、ゴール行の提示で完了条件に足す文言を規定。ガードレールに「確認待ちの結果は必ず書く（OK なら記録へ移す・NG なら NG 時の扱いに従う）」「ステップを起こす・分割するときは 5.1 起票チェックリストを通す」を追加 ② <code>quiz-stock-replenish/SKILL.md</code> — 「起動時の /goal」節に、G1 提示前に logic-training-1 計画書の確認待ちリストを読み、トリガー「次の週次補充」の行を該当ゴール（G1〜G3 のうち確認が起きる工程）の完了条件に足して結果を書く規律を追記 ③ <code>ranking-stock-replenish/SKILL.md</code> — セクション 0 の冒頭に同旨を追記。pref-ranking-1 計画書には確認待ちリストが未設置のため「未設置なら該当なしとして進む」を明記（節の新設は必要になった時点で行う） ④ <code>idea/SKILL.md</code> — 終了規律の直後に「採用で着地するとき（転記下書きの書き方）」を新設: 転記下書きは計画体系 5 の 4 項目様式で書き、5.1 起票チェックリストを通す。自セッション外で起きる確認（次の push・次の週次補充・稼働後の効果）は完了条件に入れず 5.2 の確認待ち項目に分離。ユーザー作業はステップとして残すがゴール対象外と明記。フェーズ起票時も同じ。棚卸しモードの「転記下書きを用意」からこの節を参照 ⑤ CLAUDE.md「開発計画」節の Phase 19 現況を「2026-09-02 完了」に更新</li>
 <li><strong>判断</strong>: 補充スキルの照合対象は「トリガー = 次の週次補充」の行に限定した（補充スキルは投稿観察〔投稿 2 週間後 等〕のトリガーを機械判定できないため。それらはセット計画書の棚卸しで拾う）。<code>/step</code> 側は触るパスだけでなく「ステップで起きる出来事（push・デプロイ・ビルド）」もトリガーと照合する（19-1 のトリガーが「push したとき」であり、パスの一致だけでは拾えないため）</li>
 <li><strong>Phase 19 完了</strong>: 19-1〜19-5 の作業ステップがすべて完了。初回試行 3 件は確認待ちリストで追う（19-1: 開発計画〔次の <code>services/</code> <code>shared/</code> push〕、19-3: logic-training-1 計画書〔次の週次補充〕、19-5 自体の照合動作は上記 2 件の確認と同じ機会に観察する。19-2 は 19-4・19-5 の起動で試行済み）。設計課題リストの「開発レーン 1 セッション制約の緩和検討」は 19-1 の初回試行が OK になった後に着手判断する</li>
+</ul>
+</details>
+<details class="phase"><summary>Phase 20: fantasy-animals-1 の停止</summary>
+<ul>
+<li>
+<p>✅ <strong>20-1</strong> fantasy-animals-1 の停止</p>
+<ul>
+<li>備考: 2026-09-03 実施（Fable 5・Codex 委譲なし。<code>/step 20-1</code> でレーン宣言 → ユーザーが <code>/goal</code> を起動し 1 ゴールで実施。触るパスは <code>infra/</code> + docs、確認待ちリストは該当なし〔19-1 の行は <code>services/</code> <code>shared/</code> の push がトリガーで <code>infra/</code> のみの本ステップは非該当、20-1 効果確認の行は deploy 後がトリガー〕）。停止点はコミットまで（<code>infra/</code> を触るため push は差分確認後）</li>
+</ul>
+<p><strong>(1) CDK からの Scheduler 削除</strong>: <code>image-batch-stack.ts</code> の <code>{ setCode: 'fantasy-animals-1', minute: '0', hour: '21' }</code> 1 件と <code>insights-batch-stack.ts</code> の朝夕 2 件を削除（DISABLED 化ではなく削除。復活用の定義は両ファイルのコメントに残した）。テスト 2 本（<code>image-batch-stack.test.ts</code> は Schedule 数 5 → 4 と <code>test.each</code> の行、<code>insights-batch-stack.test.ts</code> は 6 → 4 と件名・テスト名「3 セット」→「2 セット」）を追随。<strong>jest 全パス（5 suites / 82 tests）</strong>。<code>cdk synth -c env=prod</code> は成功し、生成テンプレートの Schedule は ImageBatchStack 4 件（logic-training-1 の morning / noon〔DISABLED〕/ night、pref-ranking-1 evening）・InsightsBatchStack 4 件（logic-training-1・pref-ranking-1 の朝夕）で fantasy-animals-1 は消えた</p>
+<p><strong>(2) cdk diff の確認</strong>: 現行の ECS タスク定義から取得した実タグ（image-batch <code>d61f6f2e9405</code> / insights-batch <code>7f03ccf52946</code> / db-readiness-check <code>27d0ab20a77e</code> / sns-post-batch <code>7f03ccf52946</code>）を Context に与えて実行。差分は <strong>Scheduler 3 件の destroy</strong>（<code>ImageGenerationSchedule-fantasy-animals-1</code>・<code>InsightsCollectionSchedule-fantasy-animals-1-morning</code> / <code>-evening</code>）と、<strong>3 スタックのタスク定義のイメージタグ差分</strong>（CI/CD が CDK 外でタスク定義の新リビジョンを登録するため、スタックが保持するタグは常に古い。既知）のみ。FoundationStack は差分なし。<strong>deploy 時は必ず現行タグを Context に渡す</strong>（省略・古い値だとイメージが巻き戻る）</p>
+<p><strong>(3) DB</strong>: <code>UPDATE batch_sets SET is_active = 0 WHERE set_code = 'fantasy-animals-1';</code> をローカル MySQL に適用（<code>ROW_COUNT() = 1</code>。<code>--default-character-set=utf8mb4</code> 付き）。適用後の <code>SELECT set_code, is_active FROM batch_sets</code> は fantasy-animals-1 = 0 / logic-training-1 = 1 / pref-ranking-1 = 1。Aurora へは同じ 1 文を人間ゲートで適用する（Data API または Query Editor）。3 バッチとも <code>is_active</code> が偽なら実行ログを <code>succeeded</code> / <code>records_processed = 0</code> で閉じて正常終了することをコードで確認済み（<code>services/{image-batch,sns-post-batch,insights-batch}/app/main.py</code>）</p>
+<p><strong>(4) 設計書・計画書</strong>: <a href="../app/sets/fantasy-animals-1.html">セット別設計書</a>に停止バッジ（<code>badge-future</code>）と停止の decision（停止日・理由・残置物・復活手順）。<a href="fantasy-animals-1.html">セット計画書</a>のバッジと運用状態を停止へ（セットレーンの作業は今後発生しない旨を明記）。事業戦略書はセクション 3 の画像生成 API 予算を <strong>0 円</strong>へ（定常費が残る唯一のセットだった）、セクション 6 の位置づけとスクラップ&amp;ビルドの note を実施済みへ。<a href="../app/operation.html#set-retire">運用設計 2.2</a> に初回実地の気づきを note で追記し、セクション 2.1 の「セット追加で増えるのは Scheduler 1 件」を現行（画像生成 + インサイト収集 2 件）に訂正。<code>docs/app/index.html</code>・<code>docs/plans/index.html</code> のセット一覧にも停止を反映</p>
+<p><strong>(5) 実地で分かった 2 点（運用設計 2.2 へ反映済み）</strong>: ① <strong>インサイト追跡ウィンドウの打ち切り</strong> — インサイト収集バッチも <code>is_active = 0</code> をスキップするため、UPDATE の適用時点で「最終投稿から 14 日」の追跡が止まる。採り切りたい場合は UPDATE だけ 14 日遅らせればよい（Scheduler 削除は先行してよい）。20-1 では打ち切りを許容 ② <strong>Scheduler が 2 スタックにまたがる</strong> — 16-10 のインサイト収集 Scheduler 追加以降、1 セットあたり画像生成 + 朝夕 2 件が増えており、廃止時の削除漏れを防ぐには <code>cdk diff</code> の削除リソース件数を照合するのが確実</p>
+<p><strong>(6) 人間ゲート</strong>: 差分確認 → push → <code>cdk deploy -c env=prod -c imageBatchImageTag=&lt;現行&gt; -c insightsBatchImageTag=&lt;現行&gt; -c dbReadinessCheckImageTag=&lt;現行&gt; -c snsPostBatchImageTag=&lt;現行&gt; ImageBatchStack InsightsBatchStack</code> → Aurora へ UPDATE 適用（ユーザー）。停止の効果確認（21:00 投稿が起きない・Scheduler 一覧に名前がない・インサイト収集が他セット分だけで成功）は<a href="development-plan.html#pending-checks">確認待ちリスト</a>で追う</p>
+</li>
 </ul>
 </details>
 <details class="phase"><summary>確認待ちリスト（確認済み）</summary>

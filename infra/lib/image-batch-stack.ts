@@ -305,8 +305,9 @@ export class ImageBatchStack extends cdk.Stack {
       hour: string;
       enabled?: boolean;
     }[] = [
-      // fantasy-animals-1: 1 日 1 回（21:00 JST）。gpt-image-kenburns はスロット非対応
-      { setCode: 'fantasy-animals-1', minute: '0', hour: '21' },
+      // fantasy-animals-1 の 21:00 枠は Phase 20-1（2026-09-03）でセット停止に伴い削除。
+      // 復活時は { setCode: 'fantasy-animals-1', minute: '0', hour: '21' } を再追加する
+      // （gpt-image-kenburns はスロット非対応のためスロットサフィックスなし）
       // logic-training-1: 朝 7:30 / 夜 21:00 JST（昼 12:30 は 16-4d で当分停止中）。
       // スロット境界（morning=4 時〜 / noon=11 時〜 / night=17 時〜）に収まる
       // （2026-08-06 障害復旧で一時 DISABLED → 2026-08-08 の 16-4 切替〔quiz-prebuilt〕で再有効化）

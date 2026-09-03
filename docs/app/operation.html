@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
-  <span>最終更新: 2026-09-03（16-12b: セクション 6.3 を月次 KPI 転記の手順・セット計画書 KPI 欄の様式で確定。転記元はビュー v_post_kpi_monthly / v_account_kpi_monthly〔V011〕）</span>
+  <span>最終更新: 2026-09-03（20-1: セクション 2.2 にセット廃止の初回実地の気づき〔追跡ウィンドウの打ち切り・Scheduler は 2 スタックにまたがる〕を追記し、2.1 のセット追加時の増分を現行に合わせて訂正。16-12b: セクション 6.3 を月次 KPI 転記の手順・セット計画書 KPI 欄の様式で確定）</span>
 </div>
 
 <div class="note">
@@ -198,7 +198,7 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
 <div class="note">
   <span class="callout-title">セット追加で CDK スタックは増えない</span>
   スタック（FoundationStack / ImageBatchStack / SnsPostBatchStack / MonitoringStack）は<strong>機能単位</strong>であり、セット単位ではない。
-  セットを追加しても新しいスタックは作られず、増えるのは<strong>既存 ImageBatchStack 内の Scheduler 定義 1 件 + Secrets Manager の Secret + DB レコード</strong>のみ。
+  セットを追加しても新しいスタックは作られず、増えるのは<strong>Scheduler 定義（ImageBatchStack の画像生成 1 件〔スロット対応方式ならスロット数分〕 + InsightsBatchStack のインサイト収集 2 件〔06:00 / 18:00。16-10 で追加〕） + Secrets Manager の Secret + DB レコード</strong>のみ。
   Step Functions・ECS タスク定義・コンテナイメージは全セット共有で、Scheduler が渡す <code>set_code</code> によってどのセットの処理を行うかが決まる。
   したがって、インフラ設計書もセット追加では変更不要（2026-07-06 ユーザー質問を受けて明記）。
 </div>
@@ -206,10 +206,19 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
 <h3 id="set-retire">2.2 セット廃止・入れ替え（スクラップ&amp;ビルド）</h3>
 <ol>
   <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）。この時点でスケジュールが残っていても実害はないため、順序を厳密に守る必要はないが、次のステップより先に行うことを推奨する</li>
-  <li>CDK から該当セットの Scheduler 定義を削除して deploy する（イメージタグ 3 つの Context 指定が必須。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）</li>
+  <li>CDK から該当セットの Scheduler 定義を<strong>すべて</strong>削除して deploy する（イメージタグの Context 指定が必須。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>削除対象は 2 スタックにまたがる</strong>: <code>image-batch-stack.ts</code> の画像生成（スロット非対応なら 1 件・対応ならスロット数分）と <code>insights-batch-stack.ts</code> のインサイト収集 2 件（06:00 / 18:00。16-10 で追加）。DISABLED 化ではなく削除する（復活時は定義の再追加で足りるため。定義の中身はコード内のコメントに残す）</li>
   <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体（画像・動画ファイル）はインフラの 30 日ライフサイクルで自動削除される対象であり「残す」対象に含まない（Phase 9-3 で確定。<a href="data-model.html#s3-key">データモデル設計 セクション 5</a>）。<strong>音源ストック（<code>audio/{set_code}/</code>）はライフサイクル対象外のため自動削除されない</strong>が、廃止時もレコード・ファイルとも削除せず残す（容量は僅少で、セット復活・類似セットでの再利用可能性があるため。Phase 14-4 で確定）</li>
-  <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す</li>
+  <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す。あわせてセット計画書のステータス・事業戦略書（予算・セットポートフォリオ）も停止に合わせて更新する</li>
 </ol>
+
+<div class="note">
+  <span class="callout-title">初回実地の気づき（2026-09-03、Phase 20-1 で fantasy-animals-1 を停止）</span>
+  <p>上記手順どおりで完了し、手順の変更は不要だった。実地で分かった注意点は次の 2 つ。</p>
+  <ul>
+    <li><strong>インサイト追跡ウィンドウが打ち切られる</strong>: インサイト収集バッチも <code>is_active=0</code> のセットをスキップして正常終了する（<code>services/insights-batch/app/main.py</code>）ため、手順 1 を適用した時点で「最終投稿から 14 日」の追跡が止まる。最終投稿分の 14 日データまで採りたい場合は、<strong>手順 1 の UPDATE だけを 14 日遅らせる</strong>（Scheduler の削除は先に行ってよい。新規投稿が止まるだけで収集は動く）。20-1 では打ち切りを許容した</li>
+    <li><strong>Scheduler は 2 スタックにまたがる</strong>: 2.1 の「セット追加で増えるのは Scheduler 定義 1 件」は 16-10 のインサイト収集 Scheduler 追加以前の記述であり、現在は 1 セットあたり画像生成 + インサイト収集 2 件が増える。廃止時の削除漏れを防ぐため、<code>cdk diff</code> の削除リソースが想定件数と一致することを deploy 前に確認する</li>
+  </ul>
+</div>
 
 <h2 id="content-mgmt">3. プロンプト・キャプション・音源・問題/ランキングストック管理</h2>
 

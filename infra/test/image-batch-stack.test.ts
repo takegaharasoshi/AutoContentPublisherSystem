@@ -464,7 +464,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     ) as any[];
 
     expect(scheduleGroups).toHaveLength(1);
-    expect(schedules).toHaveLength(5);
+    expect(schedules).toHaveLength(4);
     for (const schedule of schedules) {
       expect(schedule.Properties.GroupName).toBe(
         scheduleGroups[0].Properties.Name,
@@ -473,7 +473,6 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     // 命名規約: acps-{env}-image-generation-{set_code}[-{slot_code}]
     expect(schedules.map((schedule) => schedule.Properties.Name).sort()).toEqual(
       [
-        'acps-prod-image-generation-fantasy-animals-1',
         'acps-prod-image-generation-logic-training-1-morning',
         'acps-prod-image-generation-logic-training-1-night',
         'acps-prod-image-generation-logic-training-1-noon',
@@ -483,7 +482,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
   });
 
   test.each([
-    ['acps-prod-image-generation-fantasy-animals-1', 'cron(0 21 * * ? *)', 'fantasy-animals-1', 'ENABLED'],
+    // fantasy-animals-1 は Phase 20-1（2026-09-03）の停止でスケジュールごと削除
     ['acps-prod-image-generation-logic-training-1-morning', 'cron(30 7 * * ? *)', 'logic-training-1', 'ENABLED'],
     // noon は 16-4d（2026-08-24）で当分停止中
     ['acps-prod-image-generation-logic-training-1-noon', 'cron(30 12 * * ? *)', 'logic-training-1', 'DISABLED'],

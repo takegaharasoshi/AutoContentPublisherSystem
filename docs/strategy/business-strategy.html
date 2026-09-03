@@ -13,7 +13,7 @@
 <h1>事業戦略書</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-09-03（16-12b: KPI 実績表に「月間 reach」列を追加し 2026-07・08 をビューから転記、転記元をビュー v_account_kpi_monthly・手順の正を運用設計 6.3 へ接続）</span>
+  <span>最終更新: 2026-09-03（20-1: fantasy-animals-1 の停止をセクション 3〔画像生成 API の予算 0 円へ〕・セクション 6〔位置づけ・スクラップ&amp;ビルド初回実地〕に反映。16-12b: KPI 実績表に「月間 reach」列を追加し転記元をビュー v_account_kpi_monthly へ接続）</span>
   <span>初版は 2026-07-23 の壁打ち（Phase 14-1）に基づく</span>
 </div>
 
@@ -92,7 +92,7 @@
     </tr>
     <tr>
       <td>画像生成 API</td>
-      <td>fantasy-animals-1（リール元画像 1 日 1 枚・high）で月 1,000 円前後（<strong>2026-09-02 に停止を決定</strong>。Phase 20-1 の適用後は 0 円）。<strong>logic-training-1 は 0 円</strong>（2026-08-08 改訂）</td>
+      <td><strong>0 円</strong>（2026-09-03 改訂）。定常費が残る唯一のセットだった fantasy-animals-1（リール元画像 1 日 1 枚・high で月 1,000 円前後）を <strong>Phase 20-1（2026-09-03）で停止</strong>したため、稼働中の全セット（logic-training-1・pref-ranking-1）が画像生成 API の定常費ゼロになった</td>
       <td><strong>2026-07-28（15-9 壁打ち）で「勝負セットは画像 API 定常ゼロ」（15-3 試算）を改訂</strong>: 全カット常駐の情景イラスト採用（ユーザー決定）により logic-training-1 にも定常費が復活。月 600 円前後（medium 1024x1024）を許容（<a href="../app/requirements-notes-set2.html#tokekomi-figure">15-9 壁打ち記録 11.3</a>）。<strong>15-14 の組版再設計でイラストを横長 1536x1024 へ変更</strong>したため月 900 円前後へ改訂（15-16 記録）。<strong>→ 2026-08-08（16-3b）の動画事前生成方式への転換で再びゼロ化</strong>: イラストは Codex 組み込みの imagegen（サブスク内・API 課金なし）で事前一括生成し、全数人間レビューのうえ動画を S3 に作り置く（品質面でも gpt-image-1 の弱点〔情景起因の文字混入〕を解消 = 転換の decision は <a href="../app/generators/quiz-prebuilt.html">方式設計書 quiz-prebuilt</a>）</td>
     </tr>
     <tr>
@@ -249,9 +249,10 @@
   <tbody>
     <tr>
       <td><a href="../app/sets/fantasy-animals-1.html">fantasy-animals-1</a></td>
-      <td><strong>検証用セット</strong>（2026-07-23 壁打ちで確定）</td>
+      <td><strong>検証用セット</strong>（2026-07-23 壁打ちで確定）→ <strong>停止（2026-09-03）</strong></td>
       <td>収益化・フォロワー成長は狙わない。パイプラインの定常稼働の確認と、<strong>新機能（リール投稿等）を本番 API で試す実験台</strong>として運用する。
-      実行頻度・方式は 14-2 壁打ち（2026-07-23）で<strong>「全て動画（リール）に置換・1 日 1 回」に決定</strong>（適用は Phase 14 実装時。<a href="../app/requirements-notes-video.html">壁打ち記録</a>）。<strong>2026-09-02 に停止を決定</strong>（下の decision。実施は開発レーン Phase 20-1）</td>
+      実行頻度・方式は 14-2 壁打ち（2026-07-23）で<strong>「全て動画（リール）に置換・1 日 1 回」に決定</strong>（適用は Phase 14 実装時。<a href="../app/requirements-notes-video.html">壁打ち記録</a>）。
+      <strong>2026-09-03 に停止（Phase 20-1）</strong>: Scheduler 3 件を CDK から削除し <code>batch_sets.is_active = 0</code> を適用。DB レコード・音源ストック・アカウント・設計書は残置（下の decision）。<strong>稼働中のセットは logic-training-1・pref-ranking-1 の 2 本</strong></td>
     </tr>
     <tr>
       <td><a href="../app/sets/logic-training-1.html">logic-training-1</a>（勝負セット）</td>
@@ -291,7 +292,7 @@
 
 <div class="note">
   <span class="callout-title">スクラップ&amp;ビルドとの関係</span>
-  セット廃止運用（<a href="../app/operation.html#set-retire">アプリ運用設計 セクション 2.2</a>）の初回実地検証は、fantasy-animals-1 の停止（開発レーン Phase 20-1）で行う。
+  セット廃止運用（<a href="../app/operation.html#set-retire">アプリ運用設計 セクション 2.2</a>）の初回実地検証は、fantasy-animals-1 の停止（開発レーン Phase 20-1）で <strong>2026-09-03 に実施済み</strong>。手順どおり <code>is_active = 0</code> → Scheduler 削除 → データ残置で完了し、廃止手順の変更は不要だった（実地の気づきは運用設計 2.2 の note に追記）。
 </div>
 
 <div class="decision">

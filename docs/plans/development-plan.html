@@ -13,7 +13,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-03（16-12b 完了〔V011 ビュー昇格・月次 KPI 転記運用とセット計画書 KPI 欄様式の確定・集計ランナーに kpi_* 2 クエリ〕。同日に人間ゲートを実施し V011 を Aurora へ適用・本番値の確認 OK〔確認待ち行は開発記録へ移動〕。follows_and_unfollows の設計課題を解消済みへ移動し、100 フォロワー閾値後の確認を確認待ちリストに追加。開発レーンの次は Phase 20-1〔fantasy-animals-1 の停止〕）</span>
+  <span>最終更新: 2026-09-03（20-1 の作業を実施〔Scheduler 3 件削除・<code>is_active = 0</code>・設計書 / 計画書 / 事業戦略書の更新〕。<strong>人間ゲート待ち</strong>: push → cdk deploy → Aurora の UPDATE。同日に 16-12b 完了と人間ゲート〔V011 を Aurora へ適用・本番値の確認 OK〕。開発レーンの次は Phase 20 の効果確認〔確認待ちリスト〕を経て Phase XX〔プラットフォーム展開〕の着手判断）</span>
 </div>
 
 <div class="note">
@@ -178,7 +178,7 @@
 <p><strong>ゴール</strong>: fantasy-animals-1 の自動投稿・インサイト収集・生成 AI API の定常費を止め、資材とデータは残置する（<a href="../app/operation.html#set-retire">運用設計 2.2 セット廃止</a>の初回実地検証を兼ねる）</p>
 <blockquote>2026-09-02 の 16-5 効果検証で、切替後 26 本のスキップ率中央値 92.3%・views 中央値 75・フォロワー 1 と改善傾向なしが確認され、ユーザーが停止を決定。検証用セット（<a href="../strategy/business-strategy.html#portfolio">事業戦略書セクション 6</a>）としての役目（パイプラインの定常稼働確認・リール投稿の実験台）は Phase 14 で果たし終えている。決定の経緯は<a href="development-log.html">開発記録</a>の 16-5。</blockquote>
 <ul>
-<li>⬜ <strong>20-1</strong> fantasy-animals-1 の停止（1 ゴール。<code>/step 20-1</code> で起動）
+<li>✅ <strong>20-1</strong> fantasy-animals-1 の停止 — 2026-09-03（<code>/step 20-1</code> → <code>/goal</code> の 1 ゴールで実施。CDK から Scheduler 3 件を削除〔jest 82 件パス・synth 成功・<code>cdk diff</code> は Scheduler 3 件の destroy とイメージタグ差分のみ〕、ローカル MySQL に <code>is_active = 0</code> を適用、セット別設計書・セット計画書・事業戦略書 3・6・運用設計 2.1 / 2.2 を更新。<strong>人間ゲート未実施</strong>: push → <code>cdk deploy</code> → Aurora の UPDATE。詳細は<a href="development-log.html">開発記録</a>の 20-1）
   <ul>
   <li>内容: ① CDK から fantasy-animals-1 の Scheduler 3 件（<code>image-batch-stack.ts</code> の 21:00 画像生成 1 件・<code>insights-batch-stack.ts</code> の 06:00 / 18:00 インサイト収集 2 件）を削除する（16-4d の noon のような DISABLED 化ではなく削除。復活時は定義の再追加で足りる）。② <code>batch_sets.is_active = 0</code> の UPDATE 文を用意し、ローカル MySQL に適用・Aurora 向けは文の提示まで。insights-batch も <code>is_active = 0</code> のセットをスキップするため、最終投稿から 14 日の追跡ウィンドウは打ち切りになる（許容。残す場合はユーザーが UPDATE を 14 日遅らせる）。③ <a href="../app/sets/fantasy-animals-1.html">セット別設計書</a>に停止バッジ・停止日を付与、<a href="fantasy-animals-1.html">セット計画書</a>のステータスを停止へ、事業戦略書のセクション 3（予算 月 1,000 円前後 → 0 円）・セクション 6（位置づけ）を更新、運用設計 2.2 に初回実地の気づきがあれば追記。DB レコード・音源ストックは削除しない</li>
   <li>完了条件: <code>infra/</code> で jest 全パスと <code>cdk synth -c env=prod ImageBatchStack InsightsBatchStack</code> 成功（要約行を貼る）、<code>cdk diff</code> の要約に Scheduler 3 件の削除以外の差分がないこと（既知のイメージタグ差分を除く）、ローカル MySQL で UPDATE 後の <code>SELECT set_code, is_active FROM batch_sets</code> の出力を貼る、設計書・計画書・事業戦略書の更新、日本語メッセージでコミット（<code>infra/</code> を触るため push は差分確認後）</li>

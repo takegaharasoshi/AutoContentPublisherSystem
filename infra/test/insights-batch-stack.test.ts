@@ -78,14 +78,13 @@ describe('InsightsBatchStack', () => {
     }
   });
 
-  test('3 セットの朝夕用 Scheduler、ScheduleGroup、DLQ を作成する', () => {
+  test('2 セットの朝夕用 Scheduler、ScheduleGroup、DLQ を作成する', () => {
     const schedules = Object.values(
       template.findResources('AWS::Scheduler::Schedule'),
     ) as any[];
-    expect(schedules).toHaveLength(6);
+    expect(schedules).toHaveLength(4);
     for (const [setCode, slot, hour] of [
-      ['fantasy-animals-1', 'morning', '6'],
-      ['fantasy-animals-1', 'evening', '18'],
+      // fantasy-animals-1 は Phase 20-1（2026-09-03）の停止でスケジュールごと削除
       ['logic-training-1', 'morning', '6'],
       ['logic-training-1', 'evening', '18'],
       // pref-ranking-1 は 17-5c（2026-08-26）の稼働開始で追加

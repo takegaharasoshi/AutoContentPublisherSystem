@@ -12,9 +12,16 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 架空のかわいい動物図鑑</nav>
 <h1>セット別設計書: 架空のかわいい動物図鑑</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（14-12 で動画運用へ更新。定常運用中）</span>
+  <span class="badge badge-future">停止（2026-09-03 / Phase 20-1）</span>
   <span>set_code: fantasy-animals-1</span>
-  <span>最終更新: 2026-07-26</span>
+  <span>最終更新: 2026-09-03（Phase 20-1 で停止。以下の記載は停止時点の実態の記録）</span>
+</div>
+
+<div class="decision">
+  <span class="callout-title">decision: 2026-09-03（Phase 20-1）にセットを停止した</span>
+  <p><strong>停止日</strong>: 2026-09-03（最終投稿は 2026-09-02 の 21:00 枠）。<strong>理由</strong>: 16-5 の効果検証（2026-09-02）で、切替後 26 本のスキップ率中央値 92.3%・views 中央値 75・フォロワー 1 と改善傾向が見られず、ユーザーが停止を決定した。検証用セット（<a href="../../strategy/business-strategy.html#portfolio">事業戦略書セクション 6</a>）としての役目（パイプラインの定常稼働確認・リール投稿の実験台）は Phase 14 で果たし終えている。</p>
+  <p><strong>停止の内容</strong>（<a href="../operation.html#set-retire">運用設計 2.2</a> の手順どおり）: ① <code>batch_sets.is_active = 0</code>（両バッチが当セットをスキップして正常終了する）② CDK から Scheduler 3 件（画像生成 21:00 × 1・インサイト収集 06:00 / 18:00 × 2）を削除して deploy。<strong>残すもの</strong>: DB レコード（メタ情報・投稿履歴・インサイト）・音源ストック（<code>audio/fantasy-animals-1/</code>）・Secrets・本設計書。Instagram アカウント <code>dokonimo_inai_zukan</code> と過去投稿もそのまま残す（削除しない）。</p>
+  <p><strong>復活する場合</strong>: <code>is_active = 1</code> に戻し、CDK に Scheduler 定義を再追加して deploy すれば足りる（定義はコード内のコメントに復活用の記載を残した）。</p>
 </div>
 
 <div class="note">

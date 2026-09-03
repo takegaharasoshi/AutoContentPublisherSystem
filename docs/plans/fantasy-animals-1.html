@@ -12,8 +12,8 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / fantasy-animals-1</nav>
 <h1>セット計画書: 架空のかわいい動物図鑑（fantasy-animals-1）</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-03（16-12b〔開発レーン〕で KPI 欄に「月次表様式は適用しない」を明記（停止決定のため））</span>
+  <span class="badge badge-future">停止（2026-09-03）</span>
+  <span>最終更新: 2026-09-03（20-1〔開発レーン〕で停止を実施。Scheduler 3 件削除 + <code>is_active = 0</code>。セットレーンの作業は今後発生しない）</span>
 </div>
 
 <div class="note">
@@ -24,7 +24,7 @@
 <h2>1. ステータス</h2>
 <div class="table-wrap"><table>
 <tbody>
-<tr><th>運用状態</th><td><strong>停止決定（2026-09-02）</strong>。16-5 効果検証で改善傾向なし（下の KPI 欄）と判断しユーザーが停止を決定。実施は開発レーン <a href="development-plan.html">Phase 20-1</a>（Scheduler 3 件の削除 + <code>is_active = 0</code>。<code>infra/</code> を触るためセットレーンでは扱わない）。適用までは 21:00 の自動投稿が続く。経緯は<a href="development-log.html">開発記録</a>の 16-5、決定は<a href="../strategy/business-strategy.html#portfolio">事業戦略書セクション 6</a></td></tr>
+<tr><th>運用状態</th><td><strong>停止（2026-09-03、Phase 20-1 で実施）</strong>。16-5 効果検証で改善傾向なし（下の KPI 欄）と判断しユーザーが停止を決定し、開発レーン <a href="development-plan.html">Phase 20-1</a> で Scheduler 3 件（画像生成 21:00・インサイト収集 06:00 / 18:00）を CDK から削除し <code>batch_sets.is_active = 0</code> を適用した。<strong>本セットのセットレーン作業（週次補充・セット内改修）は今後発生しない</strong>。DB レコード・音源ストック・Instagram アカウント・<a href="../app/sets/fantasy-animals-1.html">セット別設計書</a>は残置（復活は <code>is_active = 1</code> + Scheduler 定義の再追加）。経緯は<a href="development-log.html">開発記録</a>の 16-5 と 20-1、決定は<a href="../strategy/business-strategy.html#portfolio">事業戦略書セクション 6</a></td></tr>
 <tr><th>アカウント</th><td>@dokonimo_inai_zukan「どこにもいない動物図鑑」（Instagram）</td></tr>
 <tr><th>投稿スロット</th><td>夜 21:00 JST の 1 日 1 回（14-12 で 1 日 3 回 → 1 回へ削減）</td></tr>
 <tr><th>生成方式</th><td>gpt-image-kenburns（実行時に画像生成 API で生成 → Ken Burns 動画化。<strong>ストック運用なし = 週次補充なし</strong>）</td></tr>
@@ -37,7 +37,7 @@
 <p>なし（2026-08-28 時点）。</p>
 
 <h2>3. 進行中ステップ</h2>
-<p>なし。停止の実施は開発レーン <a href="development-plan.html">Phase 20-1</a>。</p>
+<p>なし（停止済み）。停止の実施は開発レーン <a href="development-plan.html">Phase 20-1</a> で完了（2026-09-03）。deploy と Aurora への <code>is_active = 0</code> 適用は人間ゲート、停止の効果確認は開発計画書の確認待ちリストで追う。</p>
 
 </div>
 </body>
