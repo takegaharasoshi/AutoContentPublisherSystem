@@ -12,9 +12,9 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アイデア体系</a> / ウミガメのスープ参加型アカウント</nav>
 <h1>ウミガメのスープ参加型アカウント</h1>
 <div class="page-meta">
-  <span class="badge badge-future">待機</span>
-  <span>種別: 単発 / 作成 2026-08-28 / 更新 2026-08-28 / 記録層: <a href="umigame-soup-set.md">umigame-soup-set.md</a></span>
-  <span>採用条件: Meta コメント Webhook + AI 自動返信 PoC の成功（今すぐ着手）</span>
+  <span class="badge badge-fixed">採用</span>
+  <span>種別: 単発 / 作成 2026-08-28 / 更新 2026-09-03 / 記録層: <a href="umigame-soup-set.md">umigame-soup-set.md</a></span>
+  <span>採用（2026-09-03）: PoC 成功 → <a href="../plans/development-plan.html#phase-21">開発計画 Phase 21</a> へ展開済み</span>
 </div>
 
 <div class="warn">
@@ -233,6 +233,11 @@ AI      「はい。重要です。」</pre>
 <div class="decision">
   <span class="callout-title">decision: 採用条件は「PoC 成功」のみ・ステータスは待機（2026-08-28）</span>
   当初候補だった「16-5 効果検証の完了」ゲートは議論の結果外した（16-5 は参加型フォーマットの成否を予測しない / 着手 → 稼働のリードタイム数週間の間に 16-5 の結果は自然に出る / 実制約はレビュー帯域〔クリア済み〕と開発レーンの直列化〔転記時のステップ順序で解決〕）。<strong>PoC が成功したら採用とし、開発計画（新セットのフェーズ起案）・事業戦略書（セットポートフォリオ）へ転記する</strong>。PoC は今すぐ着手（ユーザー決定）。
+</div>
+<div class="decision">
+  <span class="callout-title">decision: PoC 成功 → 採用（2026-09-03）</span>
+  PoC 資材 <code>poc/umigame-comment-webhook/</code> + <code>UmigamePocStack</code> で、公開モードの Meta アプリが役割なしの一般アカウントのコメントを Webhook で配信し、OpenAI 出題者役の返信が約 4 秒で付き、自己返信のループ防止が効くことを実測（詳細は記録層 MD の PoC 実施記録と PoC README）。開発モードでは Webhook が一切届かない点と、署名鍵が Instagram アプリシークレットである点も確定。
+  採用条件を満たしたため採用とし、<a href="../plans/development-plan.html#phase-21">開発計画 Phase 21</a>（21-1〜21-7）と<a href="../strategy/business-strategy.html#portfolio">事業戦略書 6</a>へ展開した。本書で未確定のまま残した生成方式・版面・アカウント名・コメント経路の構成・モデルと月額は 21-1 の壁打ちで決める。PoC 資材はコメント経路のステージング面として恒久利用する。
 </div>
 <p>PoC の内容: 使い捨ての Meta アプリ + 最小 Lambda で「<strong>自アカウントのリールに付いたコメントを Webhook で受信し、Graph API で自動返信できる</strong>」ことを実証する。自アカウント運用ならアプリの開発モード（ロール保持アカウント）で App Review なしに動く公算があるが、仕様変更が多い領域のため実測で確認する。失敗（権限が取れない・返信が拒否される等）の場合は企画の根幹が不成立となり、見送りまたはピボットの再壁打ちを行う。</p>
 

@@ -101,6 +101,11 @@
       <td>当初は logic-training-1 の問題生成・検証で月 700〜900 円（gpt-5.6-terra。15-5 試算）。<strong>16-1（2026-08-01）のストックのみ方式への転換で実行時の LLM 生成・検証チェーンを休止しゼロ化</strong>（出題は人間レビュー済みストックの LRU 再利用。生成経路を再開する場合の旧試算として記録を残す）</td>
     </tr>
     <tr>
+      <td>コメント自動返信の LLM API（第 4 セット umigame-soup-1）</td>
+      <td><strong>従量のみ・月数百円規模の見込み</strong>（1 返信 ≈ 入力 1.5k + 出力 0.05k トークン × 想定 6,000 返信 / 月。gpt-4o-mini 級で 200 円前後。モデルと試算は Phase 21-1 で確定）</td>
+      <td>2026-09-03 追加。画像・動画生成の定常費ゼロ路線とは別枠の、<strong>コメント数に比例する変動費</strong>。固定費なしのため探索期の方針（従量課金のみ）に整合する。コメントが想定の 10 倍来ても数千円で月額上限 2 万円の内側だが、OpenAI 側の利用上限（ハードリミット）を設定して暴走を防ぐ（Phase 21-5 の設計で確定）</td>
+    </tr>
+    <tr>
       <td>動画生成 API（生成 AI 動画方式の場合）</td>
       <td>例: Sora 2 $0.10/秒 → 10 秒 1 本 75〜150 円 → 1 日 1 本で月 2,300〜4,500 円</td>
       <td>初期は「静止画 + 音楽」の簡易動画方式（ffmpeg 等のローカル合成）で開始し、この費目をほぼゼロに抑える。生成 AI 動画方式は generator strategy の差し替えで後から導入する</td>
@@ -252,7 +257,7 @@
       <td><strong>検証用セット</strong>（2026-07-23 壁打ちで確定）→ <strong>停止（2026-09-03）</strong></td>
       <td>収益化・フォロワー成長は狙わない。パイプラインの定常稼働の確認と、<strong>新機能（リール投稿等）を本番 API で試す実験台</strong>として運用する。
       実行頻度・方式は 14-2 壁打ち（2026-07-23）で<strong>「全て動画（リール）に置換・1 日 1 回」に決定</strong>（適用は Phase 14 実装時。<a href="../app/requirements-notes-video.html">壁打ち記録</a>）。
-      <strong>2026-09-03 に停止（Phase 20-1）</strong>: Scheduler 3 件を CDK から削除し <code>batch_sets.is_active = 0</code> を適用。DB レコード・音源ストック・アカウント・設計書は残置（下の decision）。<strong>稼働中のセットは logic-training-1・pref-ranking-1 の 2 本</strong></td>
+      <strong>2026-09-03 に停止（Phase 20-1）</strong>: Scheduler 3 件を CDK から削除し <code>batch_sets.is_active = 0</code> を適用。DB レコード・音源ストック・アカウント・設計書は残置（下の decision）。<strong>稼働中のセットは logic-training-1・pref-ranking-1 の 2 本</strong>（第 4 セット umigame-soup-1 は 2026-09-03 採用・開発計画 Phase 21 で準備中）</td>
     </tr>
     <tr>
       <td><a href="../app/sets/logic-training-1.html">logic-training-1</a>（勝負セット）</td>
@@ -270,8 +275,24 @@
       尺は <strong>30 秒</strong>（当初は 2 尺テスト投稿〔17-6〕で確定する計画 → 2026-08-24 に検証を実施せず 30 秒で確定）。投稿頻度は <strong>1 日 1 回</strong>（夜 20:00 JST。2026-08-24 に 17-2 設計の 1 日 2 回から変更）。
       <strong>2026-08-10 に 17-1 テーマ Fix 完了</strong>（経緯は <a href="../app/requirements-notes-set3.html">壁打ち記録</a>。投入は Phase 17 後半）</td>
     </tr>
+    <tr>
+      <td>umigame-soup-1（第 4 セット。<code>set_code</code> は仮・Phase 21-1 で確定）</td>
+      <td><strong>参加型フォーマットの実証</strong>（コメント自動返信を持つ初のセット。2026-09-03 採用）</td>
+      <td>テーマ = <strong>「ウミガメのスープ」</strong>（水平思考クイズ・日本語）。1 日 1 問のリール投稿 + コメント欄の質問に AI 出題者が「はい / いいえ / 関係ありません」で自動返信し、正解者にはコメント欄で「正解です！」と宣言する（解答編リールは作らない）。
+      セット固有の収益モデルは持たず、<strong>コメントエンゲージメント → リーチ増幅 → Meta ボーナス</strong>の本命経路（セクション 2）への乗り方が放送型の既存セットより構造的に強いことが企画価値。効果仮説「コメント率（コメント数 / reach）が既存セット比で高く、リーチの伸び率に転化する」は稼働 2 週間後にセット計画書の確認待ちで検証する。
+      呼び水は ①リール版面へのプレイ例の焼き込み ②固定コメントの質問例 ③必要時のみ助手キャラと明示した公式サブアカウント 1 つまで。<strong>桜アカウント（偽装の複数アカウント）は Meta の非真正行為規約に触れ、既存セット含む全アカウント資産とボーナス経路を巻き添えにするため不採用</strong>。
+      専用 Instagram プロアカウントを新規開設する。生成は Remotion のローカル事前ビルド（定常費ゼロ路線を踏襲）、追加の変動費は返信用 LLM API の従量のみ（セクション 3.1）。
+      <strong>2026-09-03 採用</strong>（Meta コメント Webhook + AI 自動返信の PoC 成功。<a href="../ideas/umigame-soup-set.html">アイデア詳細</a>）。実装は<a href="../plans/development-plan.html#phase-21">開発計画 Phase 21</a></td>
+    </tr>
   </tbody>
 </table>
+</div>
+
+<div class="decision">
+  <span class="callout-title">decision: 第 4 セット「ウミガメのスープ参加型」の採用（2026-09-03、PoC 成功）</span>
+  アイデア体系で 2 回の壁打ち（2026-08-28。コールドスタート・自動返信の初期実装・正解開示・ストック供給・収益接続・モデレーション・監視・効果仮説を決着）を経て、採用条件を「Meta コメント Webhook + AI 自動返信 PoC の成功」のみとして待機。
+  PoC（<code>poc/umigame-comment-webhook/</code>）で 2026-09-03 に、公開モードの Meta アプリで役割なしの一般アカウントからのコメント受信 → OpenAI 出題者役の返信 → 自己返信ループ防止までを実測し採用。
+  停止した fantasy-animals-1 の枠を、放送型ではない<strong>参加型フォーマットの探索</strong>に充てる位置づけ。詳細は<a href="../ideas/umigame-soup-set.html">アイデア詳細</a>、実装は<a href="../plans/development-plan.html#phase-21">開発計画 Phase 21</a>。
 </div>
 
 <div class="decision">
