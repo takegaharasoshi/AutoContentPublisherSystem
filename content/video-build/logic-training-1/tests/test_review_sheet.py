@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from review_sheet import generate_review_html
+from review_sheet import filter_manifest, generate_review_html
 from spec import STILL_FRAMES
 
 
@@ -45,3 +45,16 @@ def test_review_html_keeps_stills_in_spec_order(tmp_path: Path) -> None:
     assert positions == sorted(positions)
     assert ".still-seam_head{order:0}" in html
     assert ".still-seam_tail{order:1}" in html
+
+
+def test_filter_manifest_keeps_requested_slots_only() -> None:
+    manifest = {
+        "1": {"slot_code": "morning"},
+        "2": {"slot_code": "noon"},
+        "3": {"slot_code": "night"},
+        "4": {},
+    }
+
+    assert filter_manifest(manifest, None) == manifest
+    assert filter_manifest(manifest, []) == manifest
+    assert sorted(filter_manifest(manifest, ["morning", "night"])) == ["1", "3"]

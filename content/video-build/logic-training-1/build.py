@@ -126,6 +126,30 @@ def select_items(
     return [item for item in items if int(item["id"]) in requested]
 
 
+def filter_by_slots(
+    items: list[dict[str, Any]],
+    slots: dict[tuple[str, str], dict[str, str]],
+    slot_codes: list[str] | None,
+) -> list[dict[str, Any]]:
+    """CLI で指定されたスロットの対象のみに絞る。
+
+    昼（noon）が凍結中のように、稼働スロットだけを再ビルドしたい場合に使う。
+    """
+    if not slot_codes:
+        return list(items)
+    requested = set(slot_codes)
+    known = {slot["slot_code"] for slot in slots.values()}
+    unknown = sorted(requested - known)
+    if unknown:
+        values = ", ".join(unknown)
+        raise ValueError(f"prompt_configs にない slot_code です: {values}")
+    return [
+        item
+        for item in items
+        if _slot_for(item, slots)["slot_code"] in requested
+    ]
+
+
 def _png_size(path: Path) -> tuple[int, int]:
     """PNG の IHDR チャンクからピクセル寸法を読む。"""
     header = path.read_bytes()[:24]
@@ -365,6 +389,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--list", action="store_true", help="対象一覧を表示して終了する")
     parser.add_argument(
+        "--slot",
+        action="append",
+        metavar="SLOT_CODE",
+        help="対象スロット（morning / noon / night。複数指定可）",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="props 生成まで行いレンダリングを省略する",
@@ -416,6 +446,7 @@ def main(argv: list[str] | None = None) -> int:
                 fetch_unbuilt_items(connection, rebuild=args.rebuild),
                 args.item,
             )
+            items = filter_by_slots(items, slots, args.slot)
         except Exception as exc:
             print(f"エラー: 対象を解決できません: {exc}", file=sys.stderr)
             return 1

@@ -12,6 +12,7 @@ from build import (
     _png_size,
     build_props,
     resolve_bgm_source,
+    filter_by_slots,
     select_items,
     validate_props_input,
 )
@@ -119,6 +120,47 @@ def test_select_items_returns_all_or_requested_rows() -> None:
 def test_select_items_rejects_unknown_id() -> None:
     with pytest.raises(ValueError, match="対象一覧にない.*99"):
         select_items([{"id": 1}], [99])
+
+
+SLOTS_FIXTURE = {
+    ("L1", "light"): {
+        "slot_code": "morning",
+        "slot_label": "朝",
+        "slot_hook": "朝のなぞなぞ",
+    },
+    ("L3", "standard"): {
+        "slot_code": "noon",
+        "slot_label": "昼",
+        "slot_hook": "昼のフェルミ推定",
+    },
+    ("L1", "deep"): {
+        "slot_code": "night",
+        "slot_label": "夜",
+        "slot_hook": "夜のとんち",
+    },
+}
+
+
+def test_filter_by_slots_keeps_requested_slots_only() -> None:
+    items = [
+        {"id": 1, "quiz_type": "L1", "difficulty": "light"},
+        {"id": 2, "quiz_type": "L3", "difficulty": "standard"},
+        {"id": 3, "quiz_type": "L1", "difficulty": "deep"},
+    ]
+
+    assert filter_by_slots(items, SLOTS_FIXTURE, None) == items
+    assert filter_by_slots(items, SLOTS_FIXTURE, []) == items
+    assert [
+        item["id"]
+        for item in filter_by_slots(items, SLOTS_FIXTURE, ["morning", "night"])
+    ] == [1, 3]
+
+
+def test_filter_by_slots_rejects_unknown_slot_code() -> None:
+    items = [{"id": 1, "quiz_type": "L1", "difficulty": "light"}]
+
+    with pytest.raises(ValueError, match="slot_code です: lunch"):
+        filter_by_slots(items, SLOTS_FIXTURE, ["lunch"])
 
 
 def test_png_size_reads_ihdr_without_pillow(tmp_path: Path) -> None:

@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-02（改修 R-1 の R-1-4 を記録）</span>
+  <span>最終更新: 2026-09-03（改修 R-1 の R-1-5 ビルド分を記録。全数レビュー待ち）</span>
 </div>
 
 <div class="note">
@@ -89,6 +89,16 @@
 <li><strong><code>tests/</code> の新設（pytest 28 件・DB / Docker / ネットワーク不要）</strong>: props 検査と組み立て・BGM の引き継ぎ判定・対象絞り込み・PNG 実寸読み・CLI 既定値（<code>test_build.py</code>）、スロット定義の検査と一意解決（<code>test_common.py</code>）、レビュー HTML のエスケープと並び順（<code>test_review_sheet.py</code>）。加えて <strong><code>test_timeline_sync.py</code> が <code>remotion/src/timeline.ts</code> をテキストで読み、<code>spec.py</code> と突き合わせる</strong> — FPS・尺・<code>LOOP_PERIODS</code> が 480 の約数であること（R-1-2 の <code>check_loop_periods.py</code> の pytest 化）・<code>INTRO_END</code> / <code>COUNTDOWN_END</code> が SE 時刻（8.0 / 13.0 秒）と一致すること・スチル位置が各カット内に収まること。<strong>TypeScript 側を触って不変条件を壊すと Python のテストが落ちる</strong>ようにするのが狙い</li>
 <li><strong>ビットレート方針（R-1-2 の持ち越し）</strong>: <strong>現行の <code>Config.setCrf(20)</code> のまま据え置く</strong>。16 秒で 4.4MB（約 2.3Mbps）は Instagram の投稿上限に対して十分小さく、全編モーションで画質を落とす理由がないため。画質パラメータを現行版と同値に保つことは R-1 の比較条件でもある</li>
 <li><strong>稼働確認</strong>: <code>S3_BUCKET_NAME=... python build.py --rebuild --item 85</code> が完走（Remotion 480 フレーム → ffmpeg ミックス → スチル 5 枚 → 台帳更新）。出力は <strong>16.000 秒 / 1080x1920 / 480 フレーム / h264 + aac</strong>。<code>--rebuild</code> のため BGM は <code>audio_asset_id=13</code> を引き継ぎ、<strong>S3 にも <code>quiz_stock_items</code> にも書き戻していない</strong>。<code>review_sheet.py</code> の再生成も確認済み</li>
+</ul>
+</li>
+<li><strong>R-1-5 在庫全数の再ビルド（2026-09-03 ビルド完了・全数レビュー待ち）</strong>: 稼働在庫 56 問（朝 28 / 夜 28。使用済み含む）を Remotion 版へ一括再ビルドし、全数レビューに出すところまで。
+<ul>
+<li><strong>ステップの分割</strong>: 着手時（<code>/step logic-training-1 R-1-5</code>）に旧 R-1-5（再ビルド → レビュー → S3 差し替え → 両環境 DB 更新）を<strong>人間レビューの前で割った</strong> — 本ステップ（ビルドまで）と R-1-6（差し替え + 旧 R-1-6 の設計書・記録更新を吸収）。<a href="development-log.html">開発記録</a> Phase 19-4 の申し送りどおり</li>
+<li><strong>対象抽出の改修</strong>: <code>--rebuild</code> は「<code>video_s3_key IS NOT NULL</code> の稼働行すべて」を拾うため、そのままだと<strong>凍結中の昼（noon）21 問も再ビルドしてしまう</strong>（<code>prompt_configs</code> の slots には noon が残置されているため <code>_slot_for</code> でも落ちない）。<code>build.py</code> に <code>--slot &lt;slot_code&gt;</code>（複数指定可）を追加し <code>morning</code> + <code>night</code> = 56 件に限定した。<code>review_sheet.py</code> も台帳 <code>build_manifest.json</code>（77 件）を全部描くため<strong>旧 Pillow 版の昼 21 問がレビューシートに混入する</strong>ので、同じ <code>--slot</code> を追加。どちらも純関数（<code>filter_by_slots</code> / <code>filter_manifest</code>）として切り出し、pytest は 28 → <strong>31 件</strong></li>
+<li><strong>実行</strong>: <code>S3_BUCKET_NAME=... python3 build.py --rebuild --slot morning --slot night</code> が完走（<code>完了: 56 件</code>）。対象 56 件 = <code>built with BGM</code> 56 件・イラスト欠落による skip 0 件・失敗 0 件。1 本あたり約 14 秒（Remotion 480 フレーム → ffmpeg ミックス → スチル 5 枚）で<strong>全体 13 分</strong>。<code>--rebuild</code> のため BGM は既存の <code>video_audio_asset_id</code> を引き継ぎ LRU を更新せず、<strong>S3 にも <code>quiz_stock_items</code> にも書き戻していない</strong>（差し替えは R-1-6）</li>
+<li><strong>機械検証</strong>: <code>image-batch:ffmpeg-check</code> 経由の ffprobe で 56 本を一括検証し、<strong>全数が 16.000000 秒 / 1080x1920 / h264 + aac、かつ当日更新</strong>（NG 0 件。出力は <code>work/probe_result.txt</code>）。台帳側は <code>renderer=remotion</code> が<strong>ちょうど 56 件</strong>で、昼 21 件は <code>renderer</code> なしのまま = 旧版据え置きを確認</li>
+<li><strong>レビューシート</strong>: <code>python3 review_sheet.py --slot morning --slot night</code> → <code>work/review.html</code> に <strong>56 カード</strong>（morning 28 / night 28 / noon 0）。動画 56・イラスト 56・スチル <strong>280 枚</strong>（56 × 5。先頭 0f と末尾 479f を隣接表示しループ継ぎ目を全数で目視できる）</li>
+<li><strong>人間ゲート（次）</strong>: <code>work/review.html</code> で全数レビュー → 承認 ID を <code>work/approved.txt</code> に 1 行ずつ記載 → R-1-6 で <code>publish.py</code> による差し替え（S3 + ローカル DB）と Aurora への <code>work/update_prebuilt.sql</code> 適用</li>
 </ul>
 </li>
 </ul>

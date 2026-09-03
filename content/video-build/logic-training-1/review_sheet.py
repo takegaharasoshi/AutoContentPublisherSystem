@@ -106,16 +106,41 @@ video{width:270px;max-height:480px;background:#111}
 """ + "\n".join(cards) + "</body></html>\n"
 
 
+def filter_manifest(
+    manifest: dict[str, Any], slot_codes: list[str] | None
+) -> dict[str, Any]:
+    """指定スロットのエントリのみに絞る。
+
+    昼（noon）のように凍結中で再ビルドしないスロットをレビュー対象から外す。
+    """
+    if not slot_codes:
+        return dict(manifest)
+    requested = set(slot_codes)
+    return {
+        stock_id: record
+        for stock_id, record in manifest.items()
+        if str(record.get("slot_code", "")) in requested
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     """work/build_manifest.json から work/review.html を書き出す。"""
-    argparse.ArgumentParser(description=__doc__).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--slot",
+        action="append",
+        metavar="SLOT_CODE",
+        help="対象スロット（morning / noon / night。複数指定可）",
+    )
+    args = parser.parse_args(argv)
     manifest = load_json(WORK / "build_manifest.json", {})
     if not isinstance(manifest, dict):
         raise RuntimeError("work/build_manifest.json は JSON オブジェクトにしてください")
+    manifest = filter_manifest(manifest, args.slot)
     output = WORK / "review.html"
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(generate_review_html(manifest), encoding="utf-8")
-    print(f"レビューシートを書き出しました: {output}")
+    print(f"レビューシートを書き出しました: {output}（{len(manifest)} 件）")
     return 0
 
 
