@@ -13,7 +13,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新し 2026-08 の月次行をビューから転記。ほかは 2026-09-02 時点のまま: 16-5 のベースライン記入・確認待ちリストに R-1 の効果確認。改修 R-1: R-1-1〜R-1-4 完了。<code>/step logic-training-1 R-1-5</code> 起動時に R-1-5 を 4 項目様式へ書き換え、ビルドまでの R-1-5 と差し替え + 設計書・記録更新の R-1-6 に分割〔2026-09-03〕。R-1-5 は再ビルド 56 本 + レビューシート生成まで完了し全数レビュー待ち〔2026-09-03〕。次は R-1-6 差し替え）</span>
+  <span>最終更新: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新し 2026-08 の月次行をビューから転記。ほかは 2026-09-02 時点のまま: 16-5 のベースライン記入・確認待ちリストに R-1 の効果確認。改修 R-1: R-1-1〜R-1-4 完了。<code>/step logic-training-1 R-1-5</code> 起動時に R-1-5 を 4 項目様式へ書き換え、ビルドまでの R-1-5 と差し替え + 設計書・記録更新の R-1-6 に分割〔2026-09-03〕。R-1-5 完了〔2026-09-03。再ビルド 56 本・全数レビューで全件承認〕。次は R-1-6 差し替えと設計書・記録の更新）</span>
 </div>
 
 <div class="note">
@@ -82,7 +82,7 @@
   <td><strong>R-1-5</strong><br>在庫全数の再ビルドとレビューシート生成（レビュー提出まで）</td>
   <td>稼働在庫 56 問（朝 28 / 夜 28。使用済み含む。LRU が再利用で旧版を出すため）を <code>build.py --rebuild</code> で一括再ビルドし、<code>review_sheet.py</code> で <code>work/review.html</code> を生成して<strong>全数人間レビュー</strong>に出すところまで。凍結中の昼 21 問は<strong>再ビルドしない</strong>（再開判断時にまとめて行う）。対象抽出で昼を除外する必要が出たらビルドツール側を直す。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・<a href="logic-training-1-log.html">セット記録</a>。<strong>着手条件: 16-5 の水準評価が完了していること</strong>（2026-09-02 完了済み）<br><strong>分割の経緯</strong>: 旧 R-1-5（再ビルド → レビュー → S3 差し替え → 両環境 DB 更新）は人間レビューがステップ途中に入るため、<code>/step</code> 起動時（2026-09-03）に本ステップ（ビルドまで）と R-1-6（差し替え + 設計書・記録の更新）へ分割した</td>
   <td><strong>完了条件</strong>: ① <code>build.py</code> の対象件数 = 成功件数（朝・夜 56 件 / 昼 0 件）の出力を貼る ② 出力 MP4 全数が 16.000 秒・1080x1920・h264 + aac であることを ffprobe 一括チェックの出力で示す ③ <code>work/review.html</code> が 56 問分生成されている ④ <code>python -m pytest</code> 全パスの要約行 ⑤ 本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>review.html</code> での全数レビュー（承認 ID を <code>work/approved.txt</code> に記載）<br><strong>停止点・上限</strong>: push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。<code>publish.py</code> の実行・S3 アップロード・ローカル / Aurora の DB 更新は行わない。stop after 25 turns</td>
-  <td><strong>ビルド完了</strong>（2026-09-03）・全数レビュー待ち<br>56 本（朝 28 / 夜 28）を Remotion 版へ再ビルドし全数 16.000000 秒 / 1080x1920 / h264 + aac を ffprobe 確認（NG 0 件）。<code>work/review.html</code> に 56 カード。昼 21 問は対象外。<code>build.py</code> / <code>review_sheet.py</code> に <code>--slot</code>、レビューシートに 14 本 × 4 ページの分割（<code>--per-page</code>）を追加（pytest 36 件）。レビュー調整 1 往復（イラストの光沢削除・夜のつかみ帯の光沢を白へ・ページ分割）を反映し再ビルド済み。詳細は<a href="logic-training-1-log.html">セット記録</a>。<strong>レビュー承認後にチェックを入れる</strong></td>
+  <td><strong>完了</strong>（2026-09-03）<br>56 本（朝 28 / 夜 28）を Remotion 版へ再ビルドし全数 16.000000 秒 / 1080x1920 / h264 + aac を ffprobe 確認（NG 0 件）。<code>work/review.html</code> に 56 カード。昼 21 問は対象外。<code>build.py</code> / <code>review_sheet.py</code> に <code>--slot</code>、レビューシートに 14 本 × 4 ページの分割（<code>--per-page</code>）を追加（pytest 36 件）。レビュー調整 1 往復（イラストの光沢削除・夜のつかみ帯の光沢を白へ・ページ分割）を反映し再ビルド済み。<strong>全数レビューで 56 問すべて承認</strong>（2026-09-03。<code>work/approved.txt</code> に記載済み）。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
 </tr>
 <tr>
   <td><strong>R-1-6</strong><br>差し替えと設計書・記録の更新（R-1-5 のレビュー承認後）</td>

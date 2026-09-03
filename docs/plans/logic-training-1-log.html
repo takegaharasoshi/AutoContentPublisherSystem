@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-03（改修 R-1 の R-1-5 ビルド分 + レビュー調整 1 往復を記録。全数レビュー待ち）</span>
+  <span>最終更新: 2026-09-03（改修 R-1 の R-1-5 完了を記録。全数 56 問承認・差し替えは R-1-6）</span>
 </div>
 
 <div class="note">
@@ -91,7 +91,7 @@
 <li><strong>稼働確認</strong>: <code>S3_BUCKET_NAME=... python build.py --rebuild --item 85</code> が完走（Remotion 480 フレーム → ffmpeg ミックス → スチル 5 枚 → 台帳更新）。出力は <strong>16.000 秒 / 1080x1920 / 480 フレーム / h264 + aac</strong>。<code>--rebuild</code> のため BGM は <code>audio_asset_id=13</code> を引き継ぎ、<strong>S3 にも <code>quiz_stock_items</code> にも書き戻していない</strong>。<code>review_sheet.py</code> の再生成も確認済み</li>
 </ul>
 </li>
-<li><strong>R-1-5 在庫全数の再ビルド（2026-09-03 ビルド完了・全数レビュー待ち）</strong>: 稼働在庫 56 問（朝 28 / 夜 28。使用済み含む）を Remotion 版へ一括再ビルドし、全数レビューに出すところまで。
+<li><strong>R-1-5 在庫全数の再ビルド（2026-09-03 完了）</strong>: 稼働在庫 56 問（朝 28 / 夜 28。使用済み含む）を Remotion 版へ一括再ビルドし、全数レビューに出すところまで。
 <ul>
 <li><strong>ステップの分割</strong>: 着手時（<code>/step logic-training-1 R-1-5</code>）に旧 R-1-5（再ビルド → レビュー → S3 差し替え → 両環境 DB 更新）を<strong>人間レビューの前で割った</strong> — 本ステップ（ビルドまで）と R-1-6（差し替え + 旧 R-1-6 の設計書・記録更新を吸収）。<a href="development-log.html">開発記録</a> Phase 19-4 の申し送りどおり</li>
 <li><strong>対象抽出の改修</strong>: <code>--rebuild</code> は「<code>video_s3_key IS NOT NULL</code> の稼働行すべて」を拾うため、そのままだと<strong>凍結中の昼（noon）21 問も再ビルドしてしまう</strong>（<code>prompt_configs</code> の slots には noon が残置されているため <code>_slot_for</code> でも落ちない）。<code>build.py</code> に <code>--slot &lt;slot_code&gt;</code>（複数指定可）を追加し <code>morning</code> + <code>night</code> = 56 件に限定した。<code>review_sheet.py</code> も台帳 <code>build_manifest.json</code>（77 件）を全部描くため<strong>旧 Pillow 版の昼 21 問がレビューシートに混入する</strong>ので、同じ <code>--slot</code> を追加。どちらも純関数（<code>filter_by_slots</code> / <code>filter_manifest</code>）として切り出し、pytest は 28 → <strong>31 件</strong></li>
@@ -105,7 +105,7 @@
 <li><strong>レビューシートのページ分割</strong>: 1 ページに 56 本を並べるとスマホで後半のメディアが読み込まれないため、<code>review_sheet.py</code> に <code>--per-page</code>（既定 <strong>14</strong>）を追加し <code>review.html</code> / <code>review-2〜4.html</code> の 4 ページ構成にした（1 ページ = 動画 14 本・スチル 70 枚）。上下にページャを置き、<strong>1 ページ目のファイル名は据え置き</strong>（既存リンクが生きる）。<code>paginate</code> / <code>page_name</code> / ページャ描画をテスト化し pytest は 31 → <strong>36 件</strong></li>
 </ul>
 </li>
-<li><strong>人間ゲート（次）</strong>: <code>work/review.html</code> で全数レビュー → 承認 ID を <code>work/approved.txt</code> に 1 行ずつ記載 → R-1-6 で <code>publish.py</code> による差し替え（S3 + ローカル DB）と Aurora への <code>work/update_prebuilt.sql</code> 適用</li>
+<li><strong>人間ゲート（2026-09-03 完了）</strong>: ユーザーがスマホで 4 ページを全数レビューし、<strong>56 問すべて承認</strong>。<code>work/approved.txt</code> を今回分（56 件）に置き換えた（<code>publish.py._approved_ids</code> で 56 件・ビルド対象と一致を確認。前回の 2026-08-w5 分は <code>work/approved_2026-08-w5.txt.bak</code> に退避）。差し替えは R-1-6</li>
 </ul>
 </li>
 </ul>
