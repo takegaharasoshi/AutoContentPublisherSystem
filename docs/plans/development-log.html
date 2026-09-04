@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-04（21-3 の実施記録を追加）。前回: 2026-09-04（21-2 の人間ゲート通過を追記）。前回: 2026-09-04（21-2 の実施記録を追加）。前回: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
+  <span>最終更新: 2026-09-04（21-3 の人間ゲート通過を追記）。前回: 2026-09-04（21-3 の実施記録を追加）。前回: 2026-09-04（21-2 の人間ゲート通過を追記）。前回: 2026-09-04（21-2 の実施記録を追加）。前回: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
@@ -1992,6 +1992,13 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>人間ゲートへの論点（設計レビューで見るところ）</strong>: (a) 表示名「グルメ探偵カメロック」 (b) 出題者プロンプトの正を <code>prompt_configs.prompt_text</code> に置く decision（代替: Lambda コード埋め込み） (c) SQS FIFO の採用 (d) <code>umigame_items</code> を SNS 投稿バッチが更新する点（代替: <code>posts</code> に持つ） (e) プライバシーポリシー用の専用公開バケット (f) ステージング面のスナップショットプレフィックス <code>assets/umigame-soup-1/staging/problems/</code></li>
 <li><strong>論点 (a) の決着（2026-09-04・ユーザー判断）</strong>: <strong>キャラ名は「探偵カメロック」</strong>（21-2 の意匠は「グルメ探偵」のままだが呼称に「グルメ」は付けない）、<strong>表示名は「コメントで推理！探偵カメロックのウミガメのスープ」</strong>（24 字）。セット別設計書のタイトル・テーマ・出題者プロンプト・固定アセット表・<code>docs/app/index.html</code> のセット一覧を新呼称に統一し、決定を同書セクション 2 の decision に記録した。<code>account_name</code> は表示専用のため後日変更可・Instagram の名前欄は 14 日 2 回制限、という確認も同 decision に残した</li>
 <li><strong>次</strong>: 設計レビュー（観点限定・最大 2 巡・blocker のみ修正）→ <code>/step 21-4a</code>（DDL・ストック整備ツーリング・第 1 バッチ執筆）。21-6 は独立のため前倒し可</li>
+</ul>
+<h3>21-3 人間ゲート通過（2026-09-04）</h3>
+<ul>
+<li><strong>レビュー 1 巡で通過</strong>（観点限定・blocker なし）。指摘は表示名まわりの 1 件のみで、<strong>キャラ名「探偵カメロック」・表示名「コメントで推理！探偵カメロックのウミガメのスープ」</strong>として反映済み（上記「論点 (a) の決着」）。設計課題リストへの新規起票なし</li>
+<li><strong>承認された 5 論点</strong>（設計書の記述がそのまま正になった）: ① AI 出題者プロンプトのセット固定部分の正を <code>prompt_configs.prompt_text</code> に置き、publish 成功直後に S3 スナップショットへ転記して Lambda はスナップショットだけを読む ② SQS を FIFO にし <code>comment_id</code> を重複排除 ID にして二重返信を抑止 ③ <code>umigame_items</code> の <code>snapshot_s3_key</code> / <code>snapshot_written_at</code> を SNS 投稿バッチが更新する（<code>posts</code> にコメント経路の情報を持ち込まない）④ プライバシーポリシーは専用の小バケットのみを公開設定にする（画像バケットの Block Public Access は維持）⑤ ステージング面のスナップショットは <code>assets/umigame-soup-1/staging/problems/</code></li>
+<li><strong>これで 21-3 は完了</strong>。以後、本セットの設計の正は <a href="../app/sets/umigame-soup-1.html">sets/umigame-soup-1.html</a> と <a href="../app/generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>、コメント経路は <a href="../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>。壁打ち記録（21-1）とアイデア詳細はインプットの記録であり設計の正ではない</li>
+<li><strong>次</strong>: <code>/step 21-4a</code>（DDL <code>V012</code>・ストック整備ツーリング・第 1 バッチ 10 問の執筆）。<code>/step 21-6</code>（コメント自動返信経路の本番化）は 21-4・21-5 と独立のため前倒し可。21-6 に着手する際は確認待ちリストの「ウミガメ PoC 資材の長期トークン」（2026-11-02 頃失効）を照合する</li>
 </ul>
 <details class="phase"><summary>次期計画の割当表・Phase XX（2026-09-03 に計画書から移設・原文）</summary><p><em>以下は 2026-09-03 の完了フェーズ整理で計画書から移設した原文。「次期計画」の割当表は Phase 16 残・19・20 のステップ割当の最終版（方針の要約は計画書「進め方の方針」に残した）。「Phase XX: プラットフォーム展開」は着手判断が未了のためアイデア体系（<a href="../ideas/platform-expansion-tiktok.md">platform-expansion-tiktok.md</a>・再醸成待ち）へ移管し、開発計画からは外した。</em></p>
 <h3>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h3>
