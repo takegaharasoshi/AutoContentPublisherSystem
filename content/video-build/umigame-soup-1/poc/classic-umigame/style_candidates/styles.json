@@ -1,0 +1,10 @@
+{
+  "subject": "A cute anthropomorphic sea turtle detective standing upright, wearing a brown deerstalker hat and a small orange trench coat over its green shell, holding a magnifying glass in one flipper, calm confident half-smile, facing slightly to the right. Full body, centered, no text, no letters, no logos. PNG with a fully transparent background (alpha channel), square 1024x1024, subject fills about 80% of the canvas.",
+  "styles": {
+    "A_flat_vector": "Style: clean flat vector illustration, minimal geometric shapes, no outlines, soft two-tone shading, limited harmonious palette, modern infographic/explainer look (Kurzgesagt-like).",
+    "B_watercolor_picturebook": "Style: hand-painted watercolor children's picture-book illustration, soft washes, visible paper texture within the character, gentle pencil linework, warm and cozy.",
+    "C_retro_anime_cel": "Style: 1990s Japanese TV anime cel-shading, crisp dark ink outlines, flat cel colors with hard shadow shapes, slightly nostalgic muted palette, expressive anime eyes.",
+    "D_3d_toy_render": "Style: 3D rendered toy/vinyl-figure look, soft studio lighting, subtle subsurface scattering, rounded plush proportions, Pixar-like charm, glossy plastic materials.",
+    "E_chibi_pastel": "Style: super-deformed chibi mascot with big head and tiny body, rounded kawaii shapes, thick soft outlines, pastel palette with pink/mint accents, sticker-like look with a white sticker border."
+  }
+}

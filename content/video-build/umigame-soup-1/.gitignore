@@ -3,3 +3,10 @@ work/
 poc/*/normalized/
 poc/*/narration/**/*.wav
 poc/*/work_gen_*.log
+# 候補比較の個別画像・試聴音源は git 管理外（比較シート jpg・プロンプト・json は残す）
+poc/*/style_candidates/*.png
+poc/*/persona_candidates/*.png
+poc/*/bg_candidates/*.png
+poc/*/jr_candidates/*.png
+poc/*/narration_alt/
+poc/*/narration_mix/

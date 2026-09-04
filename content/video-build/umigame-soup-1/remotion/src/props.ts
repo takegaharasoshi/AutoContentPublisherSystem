@@ -14,18 +14,24 @@ export const umigameReelSchema = z.object({
   ruleText: z.string(),
   /** 背景イラスト（public/ 相対。JPEG） */
   background: z.string(),
+  /** 出題者（カメロック）。happy は返答が「はい」のときのポーズ */
   master: z.object({
     name: z.string(),
     base: z.string(),
     happy: z.string(),
   }),
-  assistant: z.object({
+  /** 質問者（カメロック Jr.） */
+  jr: z.object({
     name: z.string(),
     base: z.string(),
   }),
   /** 出題者の導入・締めのセリフ */
   masterLines: z.object({
     intro: z.string(),
+    outro: z.string(),
+  }),
+  /** Jr. の締めのセリフ（いいね・フォロー） */
+  jrLines: z.object({
     outro: z.string(),
   }),
   /** プレイ例（質問 → 返答の順で 3 往復 = 6 件）。返答に「はい」を含むと出題者が喜ぶポーズになる */

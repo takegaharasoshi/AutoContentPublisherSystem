@@ -1962,6 +1962,15 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>成果物</strong>: <code>content/video-build/umigame-soup-1/</code>（README / build.py / scripts / tests / poc / remotion）。動画本体は <code>work/videos/classic-umigame.mp4</code>（git 管理外）、レビューは <code>work/review.html</code>。静止フレーム 9 枚（各カット + 継ぎ目）と ffprobe 出力は <code>poc/classic-umigame/stills/</code> と <code>ffprobe.txt</code> に記録として残した。合成音声（WAV）と正規化済み素材は VOICEVOX 規約（音声単体を保存しない）と再生成可能性から git 管理外</li>
 <li><strong>次</strong>: 人間ゲート（<code>work/review.html</code> の目視レビュー: フック・版面・テンポ・画風・キャプション・話者。ここで素材項目の確定・フォーマット go/no-go・Remotion Skills を標準ツーリングにするかを判断）→ <code>/step 21-3</code></li>
 </ul>
+<h3>21-2 人間ゲート第 1 巡と第 2 稿（2026-09-04）</h3>
+<ul>
+<li><strong>レビュー</strong>: ユーザーが第 1 稿をスマホで目視し「全体的に高品質」と評価したうえで 5 点の改善指示（キャラ名 / 画風の比較 / 画面効果を logic-training-1 と同水準に / 背景が暗すぎる / ナレーション品質と別方式の検討）。方針を全部決めてから作り直す進め方をユーザーが指定</li>
+<li><strong>比較材料の提示</strong>: 画風 6 案 → C 系の派生 4 案 → 出題者の個性 8 案（いずれも <code>codex exec</code> の imagegen で生成し比較シートをスマホへ送付）、ナレーションは VOICEVOX 3 話者 + Polly 3 話者を BGM 合成のうえ試聴（<code>scripts/mix_preview.py</code>）、尺は 20 秒 130% / 24 秒 120% / 24 秒 115% を比較</li>
+<li><strong>決定（ユーザー）</strong>: 画風 C4（90 年代 OVA 塗り）/ 出題者 P6 グルメ探偵（椀は透明なスープに）/ 質問者は「カメロック Jr.」（探偵の子ども）/ 尺 24 秒 / Polly Neural Takumi 125%・問題とルールの間 1.2 秒 / 吹き出しは質問 + 返答の並列表示 / 跳ねは小さく / Jr. の締め「面白かったら、いいね、フォローよろしくね！」（吹き出しのみ）/ 背景は中間調を C4 画風で作り直し。要点は README セクション 0</li>
+<li><strong>実装</strong>: <code>timeline.ts</code> を 720 フレーム・6 種のビートへ改訂（導入 → 質問 / 質問 + 返答 × 3 → 出題者締め → Jr. 締め → 継ぎ目）、logic-training-1 の効果 8 種を移植（跳ねは 30px）、名札を吹き出し内へ移動、<code>scripts/narration_polly.py</code>（PCM 出力から実測長）、<code>key_out_background.py</code>（imagegen が透過を無視した Jr. の単色背景を抜く）、<code>prepare_assets.py</code> を v2 画像・24 秒 BGM 対応に変更。ポーズ差分と Jr. は基本ポーズを <code>-i</code> の参照画像として生成し衣装を揃えた</li>
+<li><strong>結果</strong>: 1080x1920・30fps・24.1 秒・AAC・-14.4 LUFS。継ぎ目差分は平均 2 未満 / チャンネル。動画をスマホへ送付し第 2 巡のレビュー待ち。第 1 稿の記録（20 秒版の静止フレーム等）は上書きし、比較の個別画像と試聴音源は git 管理外にした（比較シートとプロンプトは残す）</li>
+<li><strong>Polly の所見</strong>: 日本語の男性声は Takumi のみで Generative エンジンは日本語未対応（2 リージョンで確認）。VOICEVOX と違いクレジット表記が不要で、既存の AWS 資格情報だけで動くため新規の秘密情報が増えない。21-3 の設計書では TTS を「Polly Neural（アダプタは差し替え可能）」として書く</li>
+</ul>
 <details class="phase"><summary>次期計画の割当表・Phase XX（2026-09-03 に計画書から移設・原文）</summary><p><em>以下は 2026-09-03 の完了フェーズ整理で計画書から移設した原文。「次期計画」の割当表は Phase 16 残・19・20 のステップ割当の最終版（方針の要約は計画書「進め方の方針」に残した）。「Phase XX: プラットフォーム展開」は着手判断が未了のためアイデア体系（<a href="../ideas/platform-expansion-tiktok.md">platform-expansion-tiktok.md</a>・再醸成待ち）へ移管し、開発計画からは外した。</em></p>
 <h3>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h3>
 <p>2026-07-23 の壁打ちで策定。<strong>上位方針（収益化経路・予算・KPI・プラットフォーム展開方針）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする</strong>。優先順位の考え方: 配信面の拡大より先に「リーチ獲得能力（動画・リール）」→「勝負セット投入」→「効果測定」→「当たりが出てからプラットフォーム展開」の順。</p>

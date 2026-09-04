@@ -2,7 +2,11 @@
   "style_line": "Flat vector-style character illustration with bold clean outlines, simple shapes, warm saturated colors, friendly and expressive, designed to read clearly at small size on a dark teal background. Full body, centered, no shadow on the ground, no text, no letters, no logos. PNG with a fully transparent background (alpha channel), square 1024x1024, subject fills about 80% of the canvas.",
   "characters": {
     "master": {
-      "name_candidates": ["カメロック", "亀ノ介", "ウミガメ探偵ソウプ"],
+      "name_candidates": [
+        "カメロック",
+        "亀ノ介",
+        "ウミガメ探偵ソウプ"
+      ],
       "adopted_name": "カメロック",
       "role": "出題者（アカウントの顔。真相を握る探偵風のウミガメ）",
       "base_prompt": "A cute anthropomorphic sea turtle detective standing upright, wearing a brown deerstalker hat and a small orange trench coat over its green shell, holding a magnifying glass in one flipper, calm confident half-smile, eyes slightly narrowed like a clever detective, facing slightly to the right.",
@@ -12,7 +16,11 @@
       }
     },
     "assistant": {
-      "name_candidates": ["クマ助", "ワトミ", "ニモ助"],
+      "name_candidates": [
+        "クマ助",
+        "ワトミ",
+        "ニモ助"
+      ],
       "adopted_name": "クマ助",
       "role": "質問者（プレイヤー側の代表。将来の助手サブアカウント）",
       "base_prompt": "A small cute anthropomorphic clownfish (orange with white stripes) standing upright, wearing round glasses and a tiny green bow tie, holding a small notebook and pencil, curious wide eyes, facing slightly to the left.",
@@ -20,5 +28,6 @@
         "assistant_base": "curious tilted head, one fin raised with index finger up as if asking a question, notebook held in the other fin"
       }
     }
-  }
+  },
+  "note": "2026-09-04 のレビューで画風 C4（90 年代 OVA 塗り）・出題者 P6（グルメ探偵）・質問者はカメロックの子ども「カメロック Jr.」に決定。確定版の設定とプロンプトは v2/design.json。本ファイルの以下は 21-2 初版（PoC 第 1 稿）の記録"
 }

@@ -5,7 +5,7 @@
 - キャラ: 透過 PNG の不透明 bbox を切り出し、ポーズ間で「bbox 高さ = 共通」になる倍率で
   共通キャンバス（CHAR_CANVAS）へ下端中央揃えで配置する（pref-ranking-1 の五郎と同じ方式。
   ポーズ切替でキャラが跳ねないようにする）
-- BGM: 元トラック（bgm_*.m4a の 1 本目）を動画尺 20 秒ちょうどに切り出す（不足はループ）
+- BGM: 元トラック（bgm_*.m4a の 1 本目）を動画尺（VIDEO_SECONDS 秒）ちょうどに切り出す（不足はループ）
 - SE: 吹き出し出現音「ポン」を ffmpeg の sine で合成する（0.14 秒・880 + 1320 Hz。ライセンス不要）
 
 normalized/ は git 管理外で、本スクリプトで再生成する。
@@ -26,7 +26,8 @@ from PIL import Image, ImageOps
 BG_SIZE = (1080, 1920)
 CHAR_CANVAS = (1000, 1100)
 CHAR_HEIGHT = 1000  # 共通キャンバス上のキャラ bbox 高さ
-GROUPS = {"master": ["master_base", "master_happy"], "assistant": ["assistant_base"]}
+GROUPS = {"master": ["master_base", "master_happy"], "jr": ["jr_base"]}
+VIDEO_SECONDS = 24
 
 
 def prepare_background(src: Path, dst: Path) -> None:
@@ -62,8 +63,8 @@ def prepare_audio(src_dir: Path, dst_dir: Path) -> None:
     if not sources:
         raise SystemExit(f"BGM の元トラック（bgm_*.m4a）が {src_dir} にありません")
     subprocess.run([
-        "ffmpeg", "-v", "error", "-y", "-stream_loop", "-1", "-i", str(sources[0]), "-t", "20",
-        "-c:a", "aac", "-b:a", "128k", "-ar", "48000", str(dst_dir / "bgm_20s.m4a"),
+        "ffmpeg", "-v", "error", "-y", "-stream_loop", "-1", "-i", str(sources[0]), "-t", str(VIDEO_SECONDS),
+        "-c:a", "aac", "-b:a", "128k", "-ar", "48000", str(dst_dir / f"bgm_{VIDEO_SECONDS}s.m4a"),
     ], check=True)
     subprocess.run([
         "ffmpeg", "-v", "error", "-y",
@@ -73,16 +74,18 @@ def prepare_audio(src_dir: Path, dst_dir: Path) -> None:
         "[0:a][1:a]amix=inputs=2:normalize=0,afade=t=in:st=0:d=0.005,afade=t=out:st=0.05:d=0.09,volume=0.5,aresample=48000",
         "-c:a", "pcm_s16le", str(dst_dir / "se_pop.wav"),
     ], check=True)
-    print(f"audio: {sources[0].name} -> bgm_20s.m4a, se_pop.wav (synth)")
+    print(f"audio: {sources[0].name} -> bgm_{VIDEO_SECONDS}s.m4a, se_pop.wav (synth)")
 
 
 def main() -> int:
+    """引数: <item_dir>（bgm_*.m4a と normalized/ の置き場）[<image_dir>]（画像の置き場。既定は item_dir/v2）。"""
     src = Path(sys.argv[1])
+    images = Path(sys.argv[2]) if len(sys.argv) > 2 else src / "v2"
     dst = src / "normalized"
     dst.mkdir(exist_ok=True)
-    prepare_background(src / "background.png", dst / "background.jpg")
+    prepare_background(images / "background.png", dst / "background.jpg")
     for names in GROUPS.values():
-        prepare_group(src, dst, names)
+        prepare_group(images, dst, names)
     prepare_audio(src, dst)
     return 0
 

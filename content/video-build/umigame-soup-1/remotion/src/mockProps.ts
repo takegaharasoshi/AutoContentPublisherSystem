@@ -12,10 +12,13 @@ export const mockProps: UmigameReelProps = {
   ruleText: "「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します",
   background: "bg/classic-umigame.jpg",
   master: { name: "カメロック", base: "char/master_base.png", happy: "char/master_happy.png" },
-  assistant: { name: "クマ助", base: "char/assistant_base.png" },
+  jr: { name: "カメロック Jr.", base: "char/jr_base.png" },
   masterLines: {
     intro: "質問してみて！",
     outro: "何度でも答えるよ。コメントで質問！",
+  },
+  jrLines: {
+    outro: "面白かったら、いいね、フォローよろしくね！",
   },
   playExample: [
     { role: "questioner", text: "スープに毒が入ってた？" },
@@ -26,8 +29,8 @@ export const mockProps: UmigameReelProps = {
     { role: "master", text: "関係ありません。" },
   ],
   narration: {
-    problem: { file: "narration/classic-umigame/problem.wav", frames: 313 },
-    rule: { file: "narration/classic-umigame/rule.wav", frames: 164 },
+    problem: { file: "narration/classic-umigame/problem.wav", frames: 372 },
+    rule: { file: "narration/classic-umigame/rule.wav", frames: 162 },
   },
   bgm: "audio/bgm.m4a",
   bubbleSe: "audio/se_pop.wav",

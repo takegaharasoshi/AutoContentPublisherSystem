@@ -1,5 +1,7 @@
 # umigame-soup-1 動画ビルド（21-2 PoC）
 
+> **第 2 稿（2026-09-04 の人間ゲート反映）**: セクション 0 に決定事項と変更点をまとめた。セクション 2〜5 は第 1 稿の記録で、数値（20 秒・VOICEVOX 等）は第 2 稿で置き換わっている。
+
 ウミガメのスープ参加型セット（`set_code = umigame-soup-1`・方式 `umigame-prebuilt`）のリール動画ビルド資材。
 Phase 21-2（2026-09-04）で **完成版リール 1 本の PoC** として作ったもので、ストックからの本組み（`export_prompts.py` /
 `intake.py` / `publish.py` 等）は 21-5a で整備する。21-1 の決定（版面・尺・ナレーション・キャラ構成）は
@@ -18,6 +20,50 @@ umigame-soup-1/
 ├── remotion/                 # Remotion プロジェクト（Remotion Skills 2.0 の指針で作成）
 └── work/                     # ビルド出力（git 管理外）: props/ out/ videos/ stills/ probe/ review.html
 ```
+
+## 0. 第 2 稿の決定事項（2026-09-04 人間ゲート・ユーザー決定）
+
+第 1 稿（20 秒・VOICEVOX 玄野武宏・カートゥーン画風・質問者クマノミ）を目視レビューし、以下を決めて作り直した。
+候補の比較シートは `poc/classic-umigame/{style_candidates,persona_candidates}/*.jpg`（個別 PNG は git 管理外）。
+
+| 項目 | 決定 | 経緯 |
+|---|---|---|
+| 画風 | **C4: 90 年代 OVA の手描きセル塗り**（太い主線・エアブラシのハイライト・リムライト） | 6 案（現行 / フラット / 水彩 / 90 年代セル / 3D トイ / ちび）→ C 系 → C の派生 4 案（ハードボイルド / キッズ / 淡色 / OVA 塗り）から選択 |
+| 出題者カメロックの個性 | **P6: グルメ探偵**（丸い体・前掛け・透明な黄金スープの椀と匙・虫眼鏡） | 個性 8 案（マッチョ / 眼鏡 / 白ひげ / くたびれ / 英国紳士 / グルメ / ガジェット / ミステリアス）から選択。初回生成の椀の中身がかつ丼に見えたため「透明なコンソメ風」を明示 |
+| 質問者 | **カメロック Jr.**（探偵の子ども。大きすぎる鹿撃ち帽・蝶ネクタイ・メモ帳・父と同じ前掛け） | クマノミ「クマ助」から変更 |
+| 尺 | **24 秒（720 フレーム）** | ナレーションの文を削らず Jr. の締めを足すため 20 秒から延長 |
+| ナレーション | **Amazon Polly Neural / Takumi / 話速 125%**。問題文とルールの間 **1.2 秒** | VOICEVOX 3 話者・Polly 3 話者を BGM 合成で試聴。Polly の日本語男性声は Takumi のみ（Generative は日本語未対応）。クレジット表記が不要になる |
+| 吹き出しの流れ | 質問 → **質問を残したまま返答を追加** → 両方消える → 次の質問 | 第 1 稿の「質問 → 消える → 返答」から変更 |
+| 締め | 出題者「何度でも答えるよ。コメントで質問！」→ **Jr.「面白かったら、いいね、フォローよろしくね！」**（吹き出しのみ・ナレーションなし） | Jr. の一言を追加 |
+| 画面効果 | logic-training-1 から 8 種を移植: つかみ帯の光沢スイープ + 呼吸 / 見出しバー伸縮 / キャラの浮遊 + 呼吸 / 切替時の**小さな跳ね（30px）** / 締めの吹き出しのグロー脈動 / 名札の点の脈動 / 背景のズーム呼吸 / カード縁の光 | 跳ねは「大きくしない」指示 |
+| 背景 | 中間調（月明かりと蝋燭で情景が見える）を **C4 と同じ画風**で生成し、オーバーレイを薄くした | 第 1 稿は暗すぎて見えなかった |
+
+### 第 2 稿のビルド手順
+
+```bash
+cd content/video-build/umigame-soup-1
+# 1) 画像: poc/classic-umigame/v2/design.json のプロンプトで imagegen（codex exec）。喜びポーズと Jr. は
+#    基本ポーズを -i で参照画像として渡す（引数はプロンプトを先に書き、-i は最後。stdin は < /dev/null で閉じる）
+# 2) 透過にならなかった画像は scripts/key_out_background.py で単色背景を抜く（Jr. で実施）
+# 3) 正規化（画像は v2/ から。BGM は 24 秒に切り出し）
+docker run --rm -u $(id -u):$(id -g) -v "$PWD/../../..:/repo" -w /repo/content/video-build/umigame-soup-1 \
+  --entrypoint python image-batch:ffmpeg-check scripts/prepare_assets.py poc/classic-umigame poc/classic-umigame/v2
+# 4) ナレーション（Polly。~/.aws の資格情報で実行。新規の秘密情報なし）
+python3 scripts/narration_polly.py poc/classic-umigame/problem.json poc/classic-umigame/narration/polly_Takumi_x125 --voice Takumi --rate 125 --gap-seconds 1.2
+# 5) ビルド
+python3 build.py classic-umigame --narration polly_Takumi_x125
+```
+
+第 2 稿の ffprobe: h264 1080x1920 30fps / aac 48kHz 2ch / 24.1 秒 / 19.3 MB（-14.4 LUFS / TP -1.7）。継ぎ目はフレーム 0 と 719 の差分で検証。
+
+### 第 2 稿で分かったこと（素材項目・ツーリングへの反映）
+
+- **Polly は問題文 78 字 + ルール 37 字を 125% で 17.8 秒**。24 秒尺なら余裕があり、問題文の上限は 85 字程度まで広げられる（`validate.py` で実測長を検査する方針は変わらない）。
+- **キャラのポーズ差分は基本ポーズを参照画像にすると揃う**（`codex exec ... -i base.png`）。参照なしだと衣装・色が変わる。
+- imagegen が透過指定を無視して単色背景を返すことがある（Jr. で発生）。`key_out_background.py` で回復できる。
+- 24 秒尺のため BGM プールは **24 秒ちょうど**のトラックとして調達する（本 PoC は 20 秒トラックのループで 20 秒地点につなぎ目がある）。
+- 吹き出しの 1 行上限（42px）: 出題者 17 字 / Jr. 16 字。Jr. の締めは 2 行になるが単独表示なので許容。
+- Polly 採用でキャプションの VOICEVOX クレジット行は不要になる（`#AIart` は維持）。
 
 ## 1. Remotion Skills 2.0 の導入記録（21-1 ③ の決定の実測）
 

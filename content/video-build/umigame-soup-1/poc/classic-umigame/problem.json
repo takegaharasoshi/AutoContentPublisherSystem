@@ -136,5 +136,8 @@
   },
   "illustration_prompt": "A flat, minimalist illustration in a dark monochrome teal palette with silhouette-style shapes. A lone man sits at a small table by a large window in a seaside restaurant at night; a single bowl of soup steams in front of him; the sea and a faint horizon are visible through the window. Moody, quiet, slightly ominous atmosphere. No text, no letters, no logos. Do not depict any clue to the story's truth (no ships, no wreck, no other people besides one waiter silhouette in the background at most). Vertical 9:16 composition, large empty dark areas suitable for overlaying text cards.",
   "caption": "【ウミガメのスープ 第1問】\nある男が海辺のレストランでウミガメのスープを注文した。ひと口飲んだ男は店員に本当にウミガメのスープかと確かめ、「はい」と聞くと店を出て自ら命を絶った。なぜ？\n\n「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ。\n\n#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart",
-  "source_note": "古典『ウミガメのスープ』（Situation puzzle の代表例。作者不詳・広く流布）。PoC に限って使用し、ストック本体はオリジナル問題で執筆する（21-1 ⑧ の決定）。"
+  "source_note": "古典『ウミガメのスープ』（Situation puzzle の代表例。作者不詳・広く流布）。PoC に限って使用し、ストック本体はオリジナル問題で執筆する（21-1 ⑧ の決定）。",
+  "jr_lines": {
+    "outro": "面白かったら、いいね、フォローよろしくね！"
+  }
 }

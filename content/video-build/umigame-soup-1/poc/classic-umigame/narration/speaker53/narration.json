@@ -1,0 +1,19 @@
+{
+  "speaker": 53,
+  "speed_scale": 1.2,
+  "intonation_scale": 1.6,
+  "cues": {
+    "problem": {
+      "seconds": 10.4,
+      "frames": 312
+    },
+    "rule": {
+      "seconds": 5.429,
+      "frames": 163
+    }
+  },
+  "total_seconds": 16.329,
+  "total_frames": 490,
+  "engine_id": "voicevox/latest/speaker53/int1.6",
+  "gap_seconds": 0.5
+}

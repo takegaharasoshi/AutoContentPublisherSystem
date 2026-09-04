@@ -1,0 +1,17 @@
+{
+  "engine_id": "polly/neural/Takumi/rate125",
+  "voice": "Takumi",
+  "rate": 125,
+  "gap_seconds": 1.2,
+  "cues": {
+    "problem": {
+      "seconds": 12.402,
+      "frames": 372
+    },
+    "rule": {
+      "seconds": 5.397,
+      "frames": 162
+    }
+  },
+  "total_seconds": 19.0
+}

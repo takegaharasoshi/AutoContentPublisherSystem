@@ -1,0 +1,19 @@
+{
+  "style_line": "Style: 1990s Japanese OVA hand-painted cel look: thick brush-like black ink outlines, airbrushed cel highlights on the shell and hat, rich deep colors, strong rim lighting, a little gritty and cinematic. No text, no letters, no logos. PNG with a fully transparent background (alpha channel), square 1024x1024, subject fills about 80% of the canvas, full body, centered, standing upright.",
+  "master": {
+    "name": "カメロック",
+    "design": "An anthropomorphic sea turtle detective who is a plump gourmet: round chubby body, an orange trench coat over a brown tweed vest with a gold watch chain, a white bib napkin tucked into the collar, a brown tweed deerstalker hat, rosy cheeks. In one flipper he holds a white ceramic bowl of CLEAR GOLDEN BROTH SOUP: thin transparent consommé-like liquid with a few small green herb leaves floating and gentle steam rising, with a silver spoon (it must clearly read as a light clear soup; absolutely no rice, no cutlet, no egg, no noodles). In the other flipper a golden magnifying glass.",
+    "poses": {
+      "master_base": "Facing slightly to the right, eyes open with a calm confident half-smile, the magnifying glass raised as if inviting a question.",
+      "master_happy": "Facing slightly to the right, wide delighted grin with eyes closed happily, cheeks flushed, lifting the soup bowl a little higher as if celebrating a great question."
+    }
+  },
+  "jr": {
+    "name": "カメロック Jr.",
+    "design": "The small child of the gourmet turtle detective: a cute chubby baby sea turtle with a round belly, wearing an oversized brown tweed deerstalker hat that slips down over one eye, a small green bow tie, and a tiny white bib napkin like his father's, holding a small spiral notebook and a yellow pencil, big curious sparkling eyes, mouth open as if asking a question.",
+    "poses": {
+      "jr_base": "Facing slightly to the left, one flipper raised with a finger up as if asking a question, notebook held in the other flipper."
+    }
+  },
+  "background_prompt": "A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes): the interior of a seaside restaurant at night seen from inside. A lone man sits at a small table with a white tablecloth by a large arched window; on the table a single white bowl of soup steams, lit warmly by a candle. Through the window, a clearly visible moonlit sea with waves and a bright full moon. Mid-key lighting, NOT dark: warm amber light on the table and walls, cool blue moonlight outside, strong readable shapes and high contrast, colors stay readable even when darkened by 30 percent. No text, no letters, no logos. Do not depict any clue to the story's truth (no ships, no wreck, no other people except at most one waiter silhouette far in the background). Vertical 9:16 composition, output 1024x1536 portrait, keep the upper 55 percent relatively calm (sky, wall, window) so text can be overlaid."
+}

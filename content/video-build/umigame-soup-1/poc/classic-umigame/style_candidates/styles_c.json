@@ -1,0 +1,9 @@
+{
+  "subject": "A cute anthropomorphic sea turtle detective standing upright, wearing a brown deerstalker hat and a small orange trench coat over its green shell, holding a magnifying glass in one flipper, calm confident half-smile, facing slightly to the right. Full body, centered, no text, no letters, no logos. PNG with a fully transparent background (alpha channel), square 1024x1024, subject fills about 80% of the canvas.",
+  "styles": {
+    "C1_hardboiled": "Style: 1990s Japanese anime cel-shading in a hardboiled detective look (City Hunter / Lupin III era): sharp angular ink outlines, narrow confident eyes with a glint, collar of the trench coat turned up, dramatic two-tone cel shadows, slightly desaturated palette with warm amber accents.",
+    "C2_kids_mascot": "Style: 1990s Japanese kids' TV anime mascot (Pokemon / Digimon era): rounder proportions, big glossy round eyes with large highlights, bright saturated cel colors, clean bold ink outlines, cheerful and energetic pose.",
+    "C3_retro_soft": "Style: 1990s Japanese anime cel with a soft nostalgic finish: muted pastel cel colors, gentle film grain and slight color bleed like an old VHS anime, sparkly expressive eyes, thin delicate ink lines, warm cozy mood.",
+    "C4_ova_painted": "Style: 1990s Japanese OVA hand-painted cel look: thick brush-like black ink outlines, airbrushed cel highlights on the shell and hat, rich deep colors, strong rim lighting, a little gritty and cinematic."
+  }
+}

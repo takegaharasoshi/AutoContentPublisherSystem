@@ -6,7 +6,7 @@ Remotion と ffmpeg は Docker で実行し（WSL に Chrome の共有ライブ�
 
 工程:
   1. 素材を remotion/public/ へ配置（フォントは pref-ranking-1 の public/fonts から、
-     背景・キャラ・音源は poc/<key>/normalized から、ナレーションは poc/<key>/narration/speaker<id> から）
+     背景・キャラ・音源は poc/<key>/normalized から、ナレーションは poc/<key>/narration/<name> から）
   2. ナレーション実測長の予算検査（NARRATION_DEADLINE までに終わらなければエラー）→ props JSON
   3. docker run remotion-render npx remotion render → work/out/<key>.raw.mp4
   4. docker run image-batch:ffmpeg-check normalize_loudness.py（pref-ranking-1 のスクリプトを流用）→ work/videos/<key>.mp4
@@ -15,7 +15,7 @@ Remotion と ffmpeg は Docker で実行し（WSL に Chrome の共有ライブ�
   7. work/review.html（動画 + 静止フレーム + 素材一覧）
 
 使い方（このディレクトリで）:
-  python build.py classic-umigame --speaker 11
+  python build.py classic-umigame --narration polly_Takumi_x125
 """
 
 from __future__ import annotations
@@ -40,14 +40,14 @@ NORMALIZE_SCRIPT = PREF_DIR / "remotion" / "scripts" / "normalize_loudness.py"
 
 REMOTION_IMAGE = os.environ.get("REMOTION_IMAGE", "remotion-render")
 FFMPEG_IMAGE = os.environ.get("FFMPEG_IMAGE", "image-batch:ffmpeg-check")
-COMPOSITION_ID = "UmigameReel20s"
+COMPOSITION_ID = "UmigameReel24s"
 
 # remotion/src/timeline.ts と同じ値（tests/test_timeline_sync.py で同期を検査する）
 FPS = 30
-TOTAL_FRAMES = 600
+TOTAL_FRAMES = 720
 NARRATION_START = 15
-NARRATION_GAP = 15
-NARRATION_DEADLINE = 510
+NARRATION_GAP = 36
+NARRATION_DEADLINE = 708
 
 # レビュー用の静止フレーム（各カット 1 枚 + 継ぎ目の前後）
 STILL_FRAMES = {
@@ -58,8 +58,9 @@ STILL_FRAMES = {
     "a2": 300,
     "q3": 360,
     "a3": 420,
-    "outro": 500,
-    "seam_tail": 594,
+    "master_outro": 500,
+    "jr_outro": 620,
+    "seam_tail": 714,
 }
 
 
@@ -82,21 +83,21 @@ def _docker(image: str, workdir: Path, args: list[str], *, entrypoint: str | Non
     subprocess.run(command, check=True)
 
 
-def stage_assets(item_dir: Path, key: str, speaker: int) -> dict[str, object]:
+def stage_assets(item_dir: Path, key: str, narration_name: str) -> dict[str, object]:
     """素材を public/ に配置し、props に書くパス（public 相対）を返す。"""
     normalized = item_dir / "normalized"
-    narration_dir = item_dir / "narration" / f"speaker{speaker}"
+    narration_dir = item_dir / "narration" / narration_name
     if not narration_dir.exists():
-        raise SystemExit(f"ナレーションがありません: {narration_dir}（scripts/narration.py を先に実行）")
+        raise SystemExit(f"ナレーションがありません: {narration_dir}（scripts/narration_polly.py または narration.py を先に実行）")
 
     for sub in ("fonts", "bg", "char", "audio", f"narration/{key}"):
         (PUBLIC_DIR / sub).mkdir(parents=True, exist_ok=True)
     for name in FONT_FILES:
         shutil.copy2(FONT_SOURCE / name, PUBLIC_DIR / "fonts" / name)
     shutil.copy2(normalized / "background.jpg", PUBLIC_DIR / "bg" / f"{key}.jpg")
-    for name in ("master_base", "master_happy", "assistant_base"):
+    for name in ("master_base", "master_happy", "jr_base"):
         shutil.copy2(normalized / f"{name}.png", PUBLIC_DIR / "char" / f"{name}.png")
-    shutil.copy2(normalized / "bgm_20s.m4a", PUBLIC_DIR / "audio" / "bgm.m4a")
+    shutil.copy2(normalized / "bgm_24s.m4a", PUBLIC_DIR / "audio" / "bgm.m4a")
     shutil.copy2(normalized / "se_pop.wav", PUBLIC_DIR / "audio" / "se_pop.wav")
     for cue in ("problem", "rule"):
         shutil.copy2(narration_dir / f"{cue}.wav", PUBLIC_DIR / "narration" / key / f"{cue}.wav")
@@ -106,7 +107,7 @@ def stage_assets(item_dir: Path, key: str, speaker: int) -> dict[str, object]:
         "background": f"bg/{key}.jpg",
         "master_base": "char/master_base.png",
         "master_happy": "char/master_happy.png",
-        "assistant_base": "char/assistant_base.png",
+        "jr_base": "char/jr_base.png",
         "bgm": "audio/bgm.m4a",
         "se": "audio/se_pop.wav",
         "narration": {
@@ -117,7 +118,7 @@ def stage_assets(item_dir: Path, key: str, speaker: int) -> dict[str, object]:
     }
 
 
-def build_props(problem: dict, key: str, characters: dict, assets: dict) -> dict:
+def build_props(problem: dict, key: str, design: dict, assets: dict) -> dict:
     narration = assets["narration"]
     rule_start = NARRATION_START + narration["problem"]["frames"] + NARRATION_GAP
     end = rule_start + narration["rule"]["frames"]
@@ -131,16 +132,16 @@ def build_props(problem: dict, key: str, characters: dict, assets: dict) -> dict
     play = problem["play_example"]
     if len(play) != 6:
         raise SystemExit("play_example は質問 → 返答 × 3 往復（6 件）にしてください")
-    chars = characters["characters"]
     return {
         "contentKey": key,
         "hook": problem["hook"],
         "problemText": problem["problem_text"],
         "ruleText": problem["rule_text"],
         "background": assets["background"],
-        "master": {"name": chars["master"]["adopted_name"], "base": assets["master_base"], "happy": assets["master_happy"]},
-        "assistant": {"name": chars["assistant"]["adopted_name"], "base": assets["assistant_base"]},
+        "master": {"name": design["master"]["name"], "base": assets["master_base"], "happy": assets["master_happy"]},
+        "jr": {"name": design["jr"]["name"], "base": assets["jr_base"]},
         "masterLines": problem["master_lines"],
+        "jrLines": problem["jr_lines"],
         "playExample": [{"role": p["role"], "text": p["text"]} for p in play],
         "narration": narration,
         "bgm": assets["bgm"],
@@ -208,7 +209,7 @@ figcaption{{font-size:12px;color:#aaa}}pre{{background:#222;padding:12px;overflo
 <section><h2>完成版 MP4</h2><video controls loop src="{rel(final_path)}"></video><pre>{probe_text}</pre></section>
 <section><h2>静止フレーム（各カット 1 枚）</h2><div class="stills">{still_cards}</div></section>
 <section><h2>版面の文言</h2><p><b>フック</b>: {props['hook']}</p><p><b>問題文</b>: {props['problemText']}</p><p><b>ルール帯</b>: {props['ruleText']}</p>
-<p><b>導入</b>: {props['masterLines']['intro']} / <b>締め</b>: {props['masterLines']['outro']}</p><ol>{play}</ol></section>
+<p><b>導入</b>: {props['masterLines']['intro']} / <b>締め</b>: {props['masterLines']['outro']} / <b>Jr. 締め</b>: {props['jrLines']['outro']}</p><ol>{play}</ol></section>
 <section><h2>素材</h2><p>{rel(item_dir)}/ の problem.json / characters.json / normalized/ / narration/ を参照</p></section>
 </body></html>"""
     review = WORK_DIR / "review.html"
@@ -219,17 +220,18 @@ figcaption{{font-size:12px;color:#aaa}}pre{{background:#222;padding:12px;overflo
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("content_key")
-    parser.add_argument("--speaker", type=int, default=11, help="VOICEVOX 話者スタイル ID（既定 11 = 玄野武宏 ノーマル）")
+    parser.add_argument("--narration", default="polly_Takumi_x125",
+                        help="poc/<key>/narration/ 配下のディレクトリ名（既定 polly_Takumi_x125。VOICEVOX 版は speaker11 等）")
     parser.add_argument("--skip-render", action="store_true", help="props 生成までで止める")
     args = parser.parse_args()
 
     key = args.content_key
     item_dir = HERE / "poc" / key
     problem = json.loads((item_dir / "problem.json").read_text(encoding="utf-8"))
-    characters = json.loads((item_dir / "characters.json").read_text(encoding="utf-8"))
+    design = json.loads((item_dir / "v2" / "design.json").read_text(encoding="utf-8"))
 
-    assets = stage_assets(item_dir, key, args.speaker)
-    props = build_props(problem, key, characters, assets)
+    assets = stage_assets(item_dir, key, args.narration)
+    props = build_props(problem, key, design, assets)
     props_path = WORK_DIR / "props" / f"{key}.json"
     props_path.parent.mkdir(parents=True, exist_ok=True)
     props_path.write_text(json.dumps(props, ensure_ascii=False, indent=2), encoding="utf-8")

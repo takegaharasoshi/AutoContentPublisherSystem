@@ -4,7 +4,7 @@ import { mockProps } from "./mockProps";
 import { umigameReelSchema } from "./props";
 import { FPS, HEIGHT, TOTAL_FRAMES, WIDTH } from "./timeline";
 
-export const COMPOSITION_ID = "UmigameReel20s";
+export const COMPOSITION_ID = "UmigameReel24s";
 
 export const RemotionRoot: React.FC = () => {
   return (
