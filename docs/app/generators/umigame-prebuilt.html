@@ -211,7 +211,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
     <tr><td>Amazon Polly（Neural・Takumi）</td><td><code>boto3</code>・ローカルの AWS 資格情報</td><td>クレジット不要。VOICEVOX Engine は不要（アダプタは残置）</td></tr>
     <tr><td>ffmpeg / ffprobe</td><td><code>image-batch:ffmpeg-check</code> Docker イメージ</td><td>WSL に ffmpeg は無い。正規化・ラウドネス・静止フレーム・継ぎ目検査に使う</td></tr>
     <tr><td>imagegen</td><td>Codex CLI 0.144.1 の <code>image_gen.imagegen</code>（<code>codex exec</code>）</td><td>1 枚 1〜2 分。透過指定の無視・ノイズ状背景の対処は 21-2 README</td></tr>
-    <tr><td>OpenAI API（プローブテスト）</td><td><code>gpt-5.6-luna</code>（21-1 ⑤）</td><td>ローカルの環境変数からキーを読む。本番の Reply Lambda と同じプロンプト（<code>master_prompt.txt</code>）を使う</td></tr>
+    <tr><td>OpenAI API（プローブテスト）</td><td><code>gpt-5.6-luna</code>（21-1 ⑤）</td><td>キーは Secrets Manager <code>umigame-poc/credentials</code> の <code>openai_api_key</code> を <code>probe_test.py</code> 内で boto3 により実行時に読む（値を出力・保存しない。環境変数 <code>OPENAI_API_KEY</code> があれば優先。ローカルにキーを置かない = 2026-09-04 ユーザー判断）。本番の Reply Lambda と同じプロンプト（<code>master_prompt.txt</code>）を使う</td></tr>
   </tbody>
 </table>
 </div>
