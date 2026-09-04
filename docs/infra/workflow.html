@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集ワークフロー（1.6・5.4・11）を追加</span>
-  <span>最終更新: 2026-08-10</span>
+  <span>最終更新: 2026-09-04（21-3: セクション 8 にコメント自動返信 DLQ のアラーム、10.1 に DLQ 定義を追加）</span>
 </div>
 
 <p>Step Functions・EventBridge Scheduler・DB 準備確認タスク・監視リソースの実装仕様を定義する。アーキテクチャ上の位置付けは <a href="architecture.html">architecture.html</a>、CDK リソース定義は <a href="stacks.html">stacks.html</a>、運用時の対応手順は <a href="operation.html">operation.html</a> を参照。</p>
@@ -548,6 +548,7 @@
     <tr><td>Aurora メモリ</td><td><code>AWS/RDS</code></td><td><code>FreeableMemory</code></td><td><code>DBClusterIdentifier=${AuroraClusterIdentifier}</code></td><td>&lt;= 268435456（256 MB）</td><td>300 秒</td><td>3</td><td>3</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>Scheduler 起動失敗</td><td><code>AWS/Scheduler</code></td><td><code>TargetErrorCount</code>、<code>TargetErrorThrottledCount</code>、<code>InvocationThrottleCount</code>、<code>InvocationDroppedCount</code>、<code>InvocationsSentToDeadLetterCount</code>、<code>InvocationsFailedToBeSentToDeadLetterCount</code>（メトリクスごとに個別アラーム、計 6 個）</td><td><code>ScheduleGroup=${ImageScheduleGroupName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>インサイト Scheduler 起動失敗</td><td><code>AWS/Scheduler</code></td><td>上と同じ 6 メトリクス（個別アラーム、計 6 個）</td><td><code>ScheduleGroup=${InsightsScheduleGroupName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>コメント自動返信 DLQ の滞留（<code>acps-{env}-comment-reply-dlq-messages</code>。21-3 追加・21-6 実装）</td><td><code>AWS/SQS</code></td><td><code>ApproximateNumberOfMessagesVisible</code></td><td><code>QueueName=${CommentReplyDlqName}</code>（本番面のみ）</td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
   </tbody>
 </table>
 </div>
@@ -615,6 +616,21 @@
 </div>
 
 <p>DLQ にメッセージが入った場合は、対象 <code>set_code</code> と <code>scheduled_at</code> を確認し、必要に応じて画像生成 Step Functions を手動実行する（手順は <a href="operation.html">operation.html</a> を参照）。</p>
+
+<h3 id="comment-reply-dlq">10.1 コメント自動返信 DLQ（CommentReplyStack。21-3 設計・21-6 実装）</h3>
+<p>Scheduler DLQ とは別に、コメント自動返信経路（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）の Reply Lambda が 3 回失敗したメッセージを退避する SQS DLQ を持つ。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>値</th></tr></thead>
+  <tbody>
+    <tr><td>Queue 名</td><td><code>acps-prod-comment-reply-dlq.fifo</code>（ステージング面は <code>-staging</code> 接尾辞。アラーム対象外）</td></tr>
+    <tr><td>用途</td><td>OpenAI / Graph API の失敗が再試行 3 回で解消しなかったコメントイベントの退避（メッセージ本文 = Webhook の <code>value</code>: <code>comment_id</code> / <code>media_id</code> / コメント本文 / 送信者 id）</td></tr>
+    <tr><td>Message retention</td><td>14 日</td></tr>
+    <tr><td>監視</td><td><code>AWS/SQS</code> の <code>ApproximateNumberOfMessagesVisible</code> &gt;= 1（セクション 8）を MonitoringStack で監視</td></tr>
+  </tbody>
+</table>
+</div>
+<p>通知が来たらやることは <a href="operation.html#monitoring">operation.html セクション 4.1</a>。復旧後は SQS コンソールの「DLQ 再処理」でメインキューへ戻す（FIFO のため元の順序で再処理される）。</p>
 
 <h2 id="insights-asl">11. インサイト収集 Step Functions ASL 定義</h2>
 

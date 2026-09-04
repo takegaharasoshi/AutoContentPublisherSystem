@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-3 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-09-03（16-12b: セクション 4.11 に指標セットのビュー昇格〔V011・ビュー 6 本〕の decision を追加。follows_and_unfollows は 100 フォロワー未満では API が返さないと確認）</span>
+  <span>最終更新: 2026-09-04（21-3: セクション 4.14 <code>umigame_items</code> / 4.15 <code>umigame_stock_items</code> の新設と <code>batch_sets.problem_snapshot_enabled</code>〔V012 草案〕、S3 キーに問題スナップショットを追加）。前回: 2026-09-03（16-12b: セクション 4.11 に指標セットのビュー昇格〔V011・ビュー 6 本〕の decision を追加。follows_and_unfollows は 100 フォロワー未満では API が返さないと確認）</span>
 </div>
 
 <div class="note">
@@ -159,7 +159,7 @@
   <line x1="605" y1="263" x2="605" y2="310" stroke="var(--diag-line)" stroke-width="1.5"/>
   <text x="612" y="290" font-size="10" fill="var(--diag-text)">1 : N（収集ラン）</text>
 </svg>
-<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_media</code>（生成メディア: 画像・動画。旧 <code>generated_images</code>）は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。<code>audio_assets</code>（音源ストック。Phase 14-4 新設）はセットの子であり、動画の <code>generated_media</code> から使用音源として参照される（破線）。<code>quiz_items</code>（出題履歴。Phase 15-5 新設）は生成実行と 1 : 1 で、クイズ方式のセットのみ行が作られる。<code>quiz_stock_items</code>（問題ストック。Phase 16-1 新設）はセットの子で、出題時に消費（LRU 順繰り）され、<code>quiz_items.stock_item_id</code> から参照される（破線）。<code>post_insights</code>（投稿別インサイトのスナップショット）と <code>account_insights_daily</code>（アカウント日次インサイト）は Phase 16-7 で設計 Fix したインサイト収集バッチ（第 3 のバッチ）用のテーブル（セクション 4.11。テーブルは 16-8 の V009 で作成済み）。<code>ranking_items</code>（ランキング履歴）と <code>ranking_stock_items</code>（ランキングストック）は Phase 17-2 で設計したランキング方式用のペアで、<code>quiz_items</code> / <code>quiz_stock_items</code> と同じ構造パターンに 2 尺の事前動画参照を加えたもの（セクション 4.12 / 4.13。テーブル作成は 17-3 の V010）。</figcaption>
+<figcaption>データモデル概要。強調（黄色）は生成実行を中心とする新設エンティティ。<code>generation_runs</code>（生成実行）が「1 起動 = 1 投稿」の単位。<code>generated_media</code>（生成メディア: 画像・動画。旧 <code>generated_images</code>）は生成実行の子、<code>posts</code> は生成実行 × アカウントで作られる。<code>audio_assets</code>（音源ストック。Phase 14-4 新設）はセットの子であり、動画の <code>generated_media</code> から使用音源として参照される（破線）。<code>quiz_items</code>（出題履歴。Phase 15-5 新設）は生成実行と 1 : 1 で、クイズ方式のセットのみ行が作られる。<code>quiz_stock_items</code>（問題ストック。Phase 16-1 新設）はセットの子で、出題時に消費（LRU 順繰り）され、<code>quiz_items.stock_item_id</code> から参照される（破線）。<code>post_insights</code>（投稿別インサイトのスナップショット）と <code>account_insights_daily</code>（アカウント日次インサイト）は Phase 16-7 で設計 Fix したインサイト収集バッチ（第 3 のバッチ）用のテーブル（セクション 4.11。テーブルは 16-8 の V009 で作成済み）。<code>ranking_items</code>（ランキング履歴）と <code>ranking_stock_items</code>（ランキングストック）は Phase 17-2 で設計したランキング方式用のペアで、<code>quiz_items</code> / <code>quiz_stock_items</code> と同じ構造パターンに 2 尺の事前動画参照を加えたもの（セクション 4.12 / 4.13。テーブル作成は 17-3 の V010）。<code>umigame_items</code> / <code>umigame_stock_items</code>（Phase 21-3 設計・V012）はランキングの 2 テーブルと同じ関係（ストックはセットの子、出題履歴は生成実行と 1 : 1。図には未反映）。</figcaption>
 </figure>
 
 <h2 id="entities">2. エンティティ一覧</h2>
@@ -217,6 +217,16 @@
       <td><code>ranking_stock_items</code><span class="badge badge-fixed" style="margin-left:.4rem">17-2 設計</span></td>
       <td>ランキングストック（人間レビュー済みのネタプール + 2 尺の事前動画参照）。セットの子で、ランキング方式が LRU 順繰りで消費する</td>
       <td><code>quiz_stock_items</code> の「セット配下の有効レコード + LRU 順繰り + 証跡カラム一元管理 + セット境界の複合 FK + 業務キー <code>content_key</code>」パターンを踏襲し、2 尺カラム（<code>video_s3_key_20s</code> / <code>_30s</code>）・構造化データ（<code>ranking_data</code>）・ナレーション台本（<code>narration</code>）を加えたもの（セクション 4.13）</td>
+    </tr>
+    <tr>
+      <td><code>umigame_items</code><span class="badge badge-fixed" style="margin-left:.4rem">21-3 設計</span></td>
+      <td>ウミガメのスープ出題履歴（ウミガメ方式〔<code>umigame-prebuilt</code>〕が投稿した問題固有部分のスナップショット + <strong>投稿後の問題スナップショット JSON の出力記録</strong>）。<code>generation_runs</code> と 1 : 1</td>
+      <td>キャプション展開（umigame 系プレースホルダ）と publish 成功直後の S3 スナップショット出力（<a href="batch-flow.html#problem-snapshot">batch-flow.html 3.3 手順 6</a>）の展開元。<code>ranking_items</code> と同じ「行の作成は方式・commit は共通骨格」の契約に、SNS 投稿バッチからの <code>snapshot_s3_key</code> 更新が加わる（セクション 4.14。テーブル作成は 21-4a の V012）</td>
+    </tr>
+    <tr>
+      <td><code>umigame_stock_items</code><span class="badge badge-fixed" style="margin-left:.4rem">21-3 設計</span></td>
+      <td>ウミガメのスープの問題ストック（人間レビュー + プローブテスト済みの<strong>素材 14 項目</strong> + 事前動画参照）。セットの子で、ウミガメ方式が軸なしの LRU 順繰りで消費する</td>
+      <td><code>ranking_stock_items</code> のパターン（セット配下の有効レコード + LRU 順繰り + 証跡カラム + セット境界の複合 FK + 業務キー <code>content_key</code>）を踏襲し、単尺の事前動画参照（<code>video_s3_key</code>）と参加型固有の素材（真相・確定事実シート・想定質問・プレイ例・キャラのセリフ）を加えたもの（セクション 4.15）</td>
     </tr>
     <tr>
       <td><code>sns_accounts</code></td>
@@ -300,6 +310,16 @@
     <li><strong>セット単位のカラムで持つ理由</strong>: ストーリーズ再掲は「セットの投稿演出」の選択であり（15-9 でセット単位の有効化を決定）、バッチが実行時に参照する挙動スイッチのため設計書では表現できない（<code>generator_name</code> と同じ性質）。<code>sns_accounts</code> に持つと複数アカウント時に設定が分散し、生成方式（<code>generator_name</code>）に絡めると投稿側の関心が生成側へ漏れる</li>
     <li><code>DEFAULT 0</code> により既存セット（fantasy-animals-1）の挙動は不変。<code>logic-training-1</code> の有効化は 15-14 のセット登録時に UPDATE で行う</li>
     <li><code>TINYINT(1)</code> は <code>is_active</code> と同型（真偽フラグの既存慣行）</li>
+  </ul>
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、Phase 21-3）: 投稿後の問題スナップショット出力フラグ problem_snapshot_enabled の追加（V012 草案）</span>
+  <code>problem_snapshot_enabled TINYINT(1) NOT NULL DEFAULT 0</code> を追加する。<code>1</code> のセットは SNS 投稿バッチがリール投稿成功直後に、当該実行の <code>umigame_items</code> と <code>prompt_configs.prompt_text</code> から問題スナップショット JSON を S3 <code>assets/{set_code}/problems/{media_id}.json</code> へ出力する（<a href="batch-flow.html#problem-snapshot">batch-flow.html セクション 3.3 手順 6</a>。コメント自動返信経路〔<a href="../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>〕の読み取り元）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong><code>stories_enabled</code> と同じ性質</strong>（バッチが実行時に参照する挙動スイッチ。セット単位）のため同じ形で持つ。<code>generator_name = 'umigame-prebuilt'</code> から暗黙に決めない理由: 方式とスナップショット出力は別の関心事で、ステージング検証や停止時に<strong>投稿を続けたままスナップショットだけ止める</strong>操作を UPDATE 1 文で行えるようにするため</li>
+    <li><code>DEFAULT 0</code> により既存 3 セットの挙動は不変。umigame-soup-1 の有効化は 21-7 のセット登録で行う</li>
+    <li>DDL は <code>database/V012__umigame_stock.sql</code>（本文は 21-4a。本フラグの ALTER と 4.14 / 4.15 の CREATE を同一ファイルに含める）</li>
   </ul>
 </div>
 
@@ -772,6 +792,91 @@ LIMIT 1;</code></pre>
   <br>V010 の適用順序: 全変更が追加的（新テーブル 2 本のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。FK の向きにより <code>ranking_stock_items</code> の CREATE を <code>ranking_items</code> の CREATE より先に行う。DDL は 17-2 で作成済み（<code>database/V010__pref_ranking_stock.sql</code>）、<strong>適用は 17-3 でローカル MySQL と Aurora の両環境へ行う</strong>。初期ストックの INSERT は DDL に含めない（17-5 の投入作業）。
 </div>
 
+<h3 id="detail-umigame-items">4.14 umigame_items（ウミガメのスープ出題履歴 + スナップショット記録。Phase 21-3 設計・テーブル作成は 21-4a〔V012〕）</h3>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、Phase 21-3）: 出題履歴テーブル umigame_items の新設（V012）</span>
+  <code>ranking_items</code>（セクション 4.12）と同じ「生成実行と 1 : 1・行の作成は方式・commit は共通骨格」の契約で、ウミガメ方式（<code>umigame-prebuilt</code>）が投稿する問題の<strong>投稿時点の内容</strong>を持つ。加えて、SNS 投稿バッチが publish 成功直後に出力する問題スナップショット JSON の記録（<code>snapshot_s3_key</code> / <code>snapshot_written_at</code>）を持つ（<a href="batch-flow.html#problem-snapshot">batch-flow.html セクション 3.3 手順 6</a>）。
+  <div class="table-wrap" style="margin:.4rem 0 0;">
+  <table>
+    <thead><tr><th>カラム</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>主キー（<code>AUTO_INCREMENT</code>）</td></tr>
+      <tr><td><code>set_id</code></td><td><code>batch_sets.id</code> への FK</td></tr>
+      <tr><td><code>generation_run_id</code></td><td><code>(set_id, generation_run_id) → generation_runs(set_id, id)</code> の複合 FK + <code>UNIQUE (generation_run_id)</code>（1 実行 1 問）</td></tr>
+      <tr><td><code>stock_item_id</code></td><td><code>BIGINT UNSIGNED NOT NULL</code>。<code>(set_id, stock_item_id) → umigame_stock_items(set_id, id)</code> の複合 FK。出典ストックの追跡（再出題の検出・品質問題の遡及）</td></tr>
+      <tr><td><code>content_key</code></td><td><code>VARCHAR(64) NOT NULL</code>。ストックの業務キーの転記（スナップショット JSON に載せ、環境をまたいで問題を特定するため）</td></tr>
+      <tr><td><code>problem_text</code></td><td><code>VARCHAR(255) NOT NULL</code>。問題文（投稿時点のスナップショット。版面に焼き込まれた文と一致）</td></tr>
+      <tr><td><code>truth</code></td><td><code>TEXT NOT NULL</code>。真相（AI 出題者の判定根拠。版面・キャプションには出さない）</td></tr>
+      <tr><td><code>fact_sheet</code></td><td><code>JSON NOT NULL</code>。確定事実シート（文字列の配列）</td></tr>
+      <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（スナップショット JSON に載せる）</td></tr>
+      <tr><td><code>hook</code> / <code>caption</code></td><td><code>VARCHAR(40) NOT NULL</code> / <code>TEXT NOT NULL</code>。umigame 系プレースホルダ（<code>{{hook}}</code> / <code>{{caption}}</code>）の展開元</td></tr>
+      <tr><td><code>snapshot_s3_key</code></td><td><code>VARCHAR(512) NULL</code>。出力した問題スナップショットの S3 キー（<code>assets/{set_code}/problems/{media_id}.json</code>）。<strong>NULL = 未出力</strong>（出力失敗の検出クエリ <code>WHERE snapshot_s3_key IS NULL</code> と、<code>posts.status='success'</code> の突合で運用が拾う）。SNS 投稿バッチが更新する唯一のカラム</td></tr>
+      <tr><td><code>snapshot_written_at</code></td><td><code>DATETIME NULL</code>。出力日時（UTC）</td></tr>
+      <tr><td><code>created_at</code> / <code>updated_at</code></td><td>全テーブル共通</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>問題固有部分を丸ごと持つ理由</strong>: SNS 投稿バッチがストックを再参照せずにキャプション展開とスナップショット出力を行えるようにし、ストックの後日修正が投稿済み問題の返信ルールに波及しないようにする（投稿時点で固定）。<code>expected_questions</code> / <code>illustration_prompt</code> / <code>narration</code> / <code>play_example</code> は投稿後に使わないためスナップショットしない</li>
+    <li><strong>方式テーブルを SNS 投稿バッチが更新する</strong>のは本テーブルが初（<code>ranking_items</code> は読むだけ）。更新は <code>snapshot_s3_key</code> / <code>snapshot_written_at</code> の 2 カラムに限り、<code>posts</code>（共通テーブル）にはコメント経路の情報を持ち込まない</li>
+    <li><code>UNIQUE (set_id, id)</code> は持たない（子テーブルから参照されないため）</li>
+  </ul>
+</div>
+
+<h3 id="detail-umigame-stock-items">4.15 umigame_stock_items（ウミガメのスープ問題ストック。Phase 21-3 設計・テーブル作成は 21-4a〔V012〕）</h3>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、Phase 21-3）: 問題ストックテーブル umigame_stock_items の新設（V012）。1 行 = 素材 14 項目 + 事前動画参照</span>
+  <strong>人間レビュー + プローブテスト済みの問題のプール</strong>を表すテーブルを新設する。<code>ranking_stock_items</code>（セクション 4.13）の「セット配下の有効レコード + LRU 順繰り + 証跡カラム一元管理 + セット境界の複合 FK + 環境非依存の業務キー <code>content_key</code>」パターンを踏襲し、ウミガメ固有の差分として<strong>素材 14 項目（<a href="sets/umigame-soup-1.html#stock-items">セット別設計書セクション 4</a> が正）と単尺の事前動画参照</strong>を持つ。素材の執筆・検証・投入の運用は 21-8 の補充スキル、取得アルゴリズムは <a href="generators/umigame-prebuilt.html#stock">方式設計書セクション 4</a> を正とする。
+  <div class="table-wrap" style="margin:.4rem 0 0;">
+  <table>
+    <thead><tr><th>カラム</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>主キー（<code>AUTO_INCREMENT</code>）</td></tr>
+      <tr><td><code>set_id</code></td><td><code>batch_sets.id</code> への FK。ストックはセット専属。<strong><code>UNIQUE (set_id, id)</code> を持つ</strong>（<code>umigame_items.stock_item_id</code> の複合 FK の参照先）</td></tr>
+      <tr><td><code>content_key</code></td><td><code>VARCHAR(64) NOT NULL</code>。環境非依存の業務キー <strong><code>{3 桁連番}-{slug}</code></strong>（例: <code>001-lighthouse-letter</code>。ランキングと同じ形式・スロット接頭辞なし）。<code>UNIQUE (set_id, content_key)</code>。連番は取り下げ後も再利用しない。事前動画・背景の S3 キーの構成要素（セクション 5）</td></tr>
+      <tr><td><code>title</code></td><td><code>VARCHAR(100) NOT NULL</code>。管理用の題名（版面・キャプションには出さない）</td></tr>
+      <tr><td><code>difficulty</code></td><td><code>TINYINT UNSIGNED NOT NULL</code>。難易度 1〜5（運用の目安。取得の軸にはしない）</td></tr>
+      <tr><td><code>problem_text</code></td><td><code>VARCHAR(255) NOT NULL</code>。問題文（78〜85 字。版面の問題カード）</td></tr>
+      <tr><td><code>truth</code></td><td><code>TEXT NOT NULL</code>。真相</td></tr>
+      <tr><td><code>fact_sheet</code></td><td><code>JSON NOT NULL</code>。確定事実シート（文字列の配列・8〜12 件）</td></tr>
+      <tr><td><code>expected_questions</code></td><td><code>JSON NOT NULL</code>。想定質問と期待回答（<code>[{"q": …, "a": …}]</code>・15〜20 件。プローブテスト用。DB に入れるのは「レビュー済みの検証セット」を投入物と一緒に残すため）</td></tr>
+      <tr><td><code>hook</code></td><td><code>VARCHAR(40) NOT NULL</code>。フック文（12 字前後）</td></tr>
+      <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（45 字前後。セット既定文）</td></tr>
+      <tr><td><code>narration</code></td><td><code>JSON NOT NULL</code>。読み上げ用の cue <code>{"problem": …, "rule": …}</code>（cue の予算検査は <a href="generators/umigame-prebuilt.html#tts-sync">方式設計書 8.3</a>）</td></tr>
+      <tr><td><code>play_example</code></td><td><code>JSON NOT NULL</code>。プレイ例 3 往復 <code>[{"role": "questioner"|"master", "text": …} × 6]</code>（1 つは「はい」）</td></tr>
+      <tr><td><code>character_lines</code></td><td><code>JSON NOT NULL</code>。<code>{"master": {"intro": …, "outro": …}, "jr": {"outro": …}}</code>（各 17 字以内。セット既定文あり）</td></tr>
+      <tr><td><code>illustration_prompt</code></td><td><code>TEXT NOT NULL</code>。背景イラスト作成用プロンプト（画風固定行 + 情景 + 禁止事項）</td></tr>
+      <tr><td><code>caption</code></td><td><code>TEXT NOT NULL</code>。キャプション本文 + ハッシュタグ（<code>#AIart</code> 必須）</td></tr>
+      <tr><td><code>source_note</code></td><td><code>TEXT NOT NULL</code>。出典・オリジナル性メモ（完全オリジナル宣言。証跡）</td></tr>
+      <tr><td><code>video_s3_key</code></td><td><code>VARCHAR(512) NULL</code>。事前動画マスターの S3 キー（<code>assets/{set_code}/prebuilt/{content_key}.mp4</code>。セクション 5）。<strong>NULL = 未ビルド（投稿候補から除外）</strong>。方式はキーを組み立てず常にカラム経由で参照する</td></tr>
+      <tr><td><code>video_audio_asset_id</code></td><td><code>BIGINT UNSIGNED NULL</code>。ビルド時に選曲しベイクした BGM。<code>(set_id, video_audio_asset_id) → audio_assets(set_id, id)</code> の複合 FK。実行時に <code>generated_media.audio_asset_id</code> へ転記</td></tr>
+      <tr><td><code>video_built_at</code></td><td><code>DATETIME NULL</code>。最終ビルド日時（UTC）。再ビルド対象の識別</td></tr>
+      <tr><td><code>is_active</code></td><td>有効フラグ。品質問題（矛盾・ネタバレ回答・不適切）の取り下げと、在庫不足時の投稿スキップ（<a href="generators/umigame-prebuilt.html#stock">方式設計書 4</a>）に使う</td></tr>
+      <tr><td><code>use_count</code> / <code>last_used_at</code></td><td>LRU 順繰りの状態</td></tr>
+      <tr><td><code>created_at</code> / <code>updated_at</code></td><td>全テーブル共通</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul style="margin:.3rem 0 0;">
+    <li>インデックスは取得絞り込み用に <code>KEY (set_id, is_active, last_used_at)</code>（ランキングと同じ 3 カラム。難易度の軸は持たない）</li>
+    <li><strong>素材 14 項目を JSON 1 本にまとめず個別カラムにする理由</strong>: 方式・SNS 投稿バッチ・ツーリングが参照する項目（問題文・真相・確定事実シート・キャプション・フック・ルール帯）はクエリで直接取りたい一方、版面専用の構造化データ（<code>narration</code> / <code>play_example</code> / <code>character_lines</code>）と検証用データ（<code>expected_questions</code>）は JSON で持つ。ランキングの <code>content_fields</code> / <code>ranking_data</code> / <code>narration</code> と同じ粒度の判断</li>
+    <li>プローブテストの結果（回答ログ・レビュー所見）は DB に記録しない（<code>quiz_items</code> の検証メタと同じ割り切り。証跡は <code>content/umigame-stock/.../work/review.html</code> と git）</li>
+    <li>0 件フェイルラウド・再利用 WARNING・防御的フィールド検査は <code>ranking_stock_items</code> と同方針</li>
+  </ul>
+</div>
+
+<div class="decision">
+  <span class="callout-title">V012 草案（2026-09-04、Phase 21-3。本文は 21-4a）: 変更点と適用順序</span>
+  <ol style="margin:.3rem 0 0;">
+    <li><code>ALTER TABLE batch_sets ADD COLUMN problem_snapshot_enabled TINYINT(1) NOT NULL DEFAULT 0</code>（セクション 4.1）</li>
+    <li><code>CREATE TABLE umigame_stock_items</code>（本節。<code>UNIQUE (set_id, id)</code> / <code>UNIQUE (set_id, content_key)</code> / <code>KEY (set_id, is_active, last_used_at)</code> / 複合 FK 2 本）</li>
+    <li><code>CREATE TABLE umigame_items</code>（セクション 4.14。<code>UNIQUE (generation_run_id)</code> / 複合 FK 2 本。FK の向きにより <code>umigame_stock_items</code> の後）</li>
+  </ol>
+  全変更が追加的（新テーブル 2 本 + DEFAULT 付きカラム 1 本）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V010 と同じ扱い）。<strong>適用は 21-4a の人間ゲートでローカル MySQL と Aurora の両環境へ行う</strong>。初期ストックの INSERT は DDL に含めない（21-4b の投入作業）。<code>batch_sets</code> 行の INSERT・フラグの有効化は 21-7。
+</div>
+
 <h2 id="s3-key">5. S3 キー設計</h2>
 <div class="decision">
   <span class="callout-title">決定: S3 キー命名規約（Phase 14-4 で動画・音源、Phase 15-5 で SE・固定アセットを追加）</span>
@@ -785,7 +890,10 @@ assets/{set_code}/{固定ファイル名}.png                                   
 assets/{set_code}/prebuilt/{content_key}.mp4                                                     … 事前ビルド済み動画マスター（quiz_stock_items.video_s3_key が参照。16-3b 追加・16-3d でキーを content_key に改訂）
 assets/{set_code}/prebuilt/{content_key}_illustration.png                                        … 事前動画のイラスト原画（再ビルド資産。DB 記録なし。16-3b 追加）
 assets/{set_code}/prebuilt/{content_key}_20s.mp4 / _30s.mp4                                      … ランキング事前動画マスター（2 尺。ranking_stock_items.video_s3_key_20s / _30s が参照。17-2 追加）
-assets/{set_code}/prebuilt/{content_key}_bg.png                                                  … ランキング動画の背景イラスト原画（再ビルド資産。DB 記録なし。17-2 追加）</code></pre>
+assets/{set_code}/prebuilt/{content_key}_bg.png                                                  … ランキング動画の背景イラスト原画（再ビルド資産。DB 記録なし。17-2 追加）
+assets/{set_code}/prebuilt/{content_key}.mp4 / _bg.png                                           … ウミガメ事前動画マスターと背景原画（umigame_stock_items.video_s3_key が参照。quiz / ranking と同じ規約。21-3 追加）
+assets/{set_code}/problems/{media_id}.json                                                       … 投稿後の問題スナップショット（umigame_items.snapshot_s3_key が参照。コメント自動返信 Lambda の読み取り元。ライフサイクル対象外。21-3 追加）
+assets/{set_code}/staging/problems/{media_id}.json                                               … 同・ステージング面用（手動配置。DB 記録なし。21-3 追加）</code></pre>
 <p>事前動画のファイル名に <code>quiz_stock_items.id</code> は使わない（AUTO_INCREMENT はローカル MySQL と Aurora で値が一致しない環境ローカルなキーのため。<code>content_key</code> の設計はセクション 4.10 の V007 コールアウト）。ランキング方式（17-2 追加）の事前動画は<strong>尺サフィックス（<code>_20s</code> / <code>_30s</code>）付き</strong>で、<code>content_key</code> の形式は <code>{3 桁連番}-{slug}</code>（セクション 4.13。同じ「環境非依存の業務キーでファイル名を組む」原則）。背景原画 <code>_bg.png</code> はイラスト原画 <code>_illustration.png</code> と同じ再ビルド資産の扱い（DB 記録なし・ライフサイクル対象外）。</p>
   <ul style="margin:.3rem 0 0;">
     <li><code>{set_code}</code> は <code>SET_CODE</code> 環境変数（<code>batch_sets.set_code</code>）</li>

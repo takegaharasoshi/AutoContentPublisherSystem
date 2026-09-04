@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集バッチ（セクション 4）を追加</span>
-  <span>最終更新: 2026-08-10</span>
+  <span>最終更新: 2026-09-04（21-3: 方式カタログに <code>umigame-prebuilt</code> を追加、3.3 手順 6 に問題スナップショット出力、キャプション展開に umigame 系プレースホルダを追加）</span>
 </div>
 
 <div class="note">
@@ -162,6 +162,12 @@
       <td>採用予定（<strong>17-2（2026-08-10）で設計 Fix</strong>。pref-ranking-1 が採用予定 = 実装 17-4・稼働開始 17-5 以降。docs/plans/development-plan.html Phase 17）</td>
       <td><a href="generators/ranking-prebuilt.html">generators/ranking-prebuilt.html</a>（17-2 で作成）</td>
     </tr>
+    <tr>
+      <td><code>umigame-prebuilt</code></td>
+      <td>ウミガメのスープ（水平思考クイズ）リール動画の<strong>事前生成方式</strong>。<code>ranking-prebuilt</code> と同型（背景イラスト〔imagegen〕+ ナレーション〔<strong>Amazon Polly Neural</strong> の cue 単位 TTS をタイムライン定数へフレーム同期〕+ Remotion レンダリング〔Remotion Skills 2.0 の指針で作ったコンポジション〕）で、<strong>24 秒の単尺・ループ前提</strong>の動画を事前にローカルでビルドし、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はストック（<code>umigame_stock_items</code>）のビルド済み行を軸なしの LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>umigame_items</code> に問題固有部分（問題文・真相・確定事実シート・キャプション）をスナップショットし、SNS 投稿バッチの umigame 系プレースホルダ展開（3.3 の decision）と <strong>publish 成功直後の問題スナップショット出力</strong>（<a href="#problem-snapshot">3.3 手順 6</a>。コメント自動返信経路の読み取り元）の展開元にする</td>
+      <td>採用予定（<strong>21-3（2026-09-04）で設計 Fix</strong>。umigame-soup-1 が採用予定 = ツーリング 21-5a・方式実装 21-5b・稼働開始 21-7。docs/plans/development-plan.html Phase 21）</td>
+      <td><a href="generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>（21-3 で作成）</td>
+    </tr>
   </tbody>
 </table>
 </div>
@@ -253,6 +259,7 @@
           <li>成功 → <code>platform_post_id</code> を保存し <code>status='success'</code> に更新</li>
           <li>明確な失敗（投稿未完了と判定できる応答）→ <code>status='failed'</code> に更新</li>
           <li>重複 publish 応答、またはタイムアウト・接続断で結果不明 → <code>status='published_unconfirmed'</code> に更新</li>
+          <li id="problem-snapshot"><strong>成功直後の問題スナップショット出力（<code>batch_sets.problem_snapshot_enabled=1</code> のセットのみ。Phase 21-3 設計・21-5b 実装）</strong>: リール行が <code>success</code> に達した直後に、当該生成実行の <code>umigame_items</code>（問題文・真相・確定事実シート・ルール帯）と対象セットの <code>prompt_configs.prompt_text</code>（AI 出題者プロンプトのセット固定部分。<code>is_active=1</code> の <code>id</code> 昇順 1 件）から JSON を組み、S3 <code>assets/{set_code}/problems/{platform_post_id}.json</code> へ PUT する（<code>media_id</code> = <code>media_publish</code> の応答 id。スキーマは <a href="sets/umigame-soup-1.html#snapshot">セット別設計書 10.2</a>）。PUT 成功で <code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code> を更新する。<strong>出力失敗は投稿失敗にしない</strong>（WARNING ログ + <code>snapshot_s3_key</code> NULL のまま次へ。手動再出力は運用側）。フラグが 0 のセット・<code>umigame_items</code> 行のない実行では何もしない。コメント自動返信の Lambda はこの JSON だけを読み Aurora に触れない（<a href="../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>）</li>
         </ul>
       </li>
       <li><strong>ストーリーズ再掲（<code>batch_sets.stories_enabled=1</code> のセットのみ。Phase 15-10 追加）</strong>: リール行が <code>success</code> に達した場合のみ、同一動画をストーリーズへ再掲する。<code>posts</code> へ <code>media_type='story'</code> の行を <code>pending</code> で INSERT-or-skip（既存ストーリーズ行があればその状態から 3.2 と同型の分岐で再開・終端ならスキップ。<code>post_media</code> は手順 2 と同様にストーリーズ行にも同一メディアを <code>display_order=0</code> で 1 行紐づける〔15-12 実装〕。キャプションは非対応のため <code>caption_template_id</code> / <code>caption_text_snapshot</code> は NULL のまま）→ 同一 MP4 の Presigned URL でコンテナ作成（<code>media_type=STORIES</code> + <code>video_url</code>。<strong>キャプション・<code>share_to_feed</code>・カバーは指定しない</strong>〔ストーリーズはキャプション非対応〕）→ ステータスポーリング（動画の間隔 10 秒 × 最大 60 回を流用）→ パブリッシュ（結果の反映は手順 6 と同じ）。リール行が <code>success</code> 以外で終わったアカウントではストーリーズ行を作成しない</li>
@@ -304,11 +311,12 @@
 </ul>
 
 <div class="decision" id="caption-extension">
-  <span class="callout-title">セット別拡張ポイント: キャプションの作り方（16-1 でプレースホルダ展開方式を導入・17-2 でランキング系を追加）</span>
+  <span class="callout-title">セット別拡張ポイント: キャプションの作り方（16-1 でプレースホルダ展開方式を導入・17-2 でランキング系・21-3 で umigame 系を追加）</span>
   初期実装は <code>caption_templates</code> の固定文テンプレートの素通し適用（3.3 の手順 3）。<strong>16-1 で「テンプレート + 出題データの動的組み立て」へ拡張</strong>した（答え・解説を動画からキャプションへ移すテコ入れ方針の実現方式。設計 16-1・実装 16-3）。<strong>17-2 でランキングセット用のプレースホルダ系統を追加</strong>した（設計 17-2・実装 17-4）。展開規則:
   <ul style="margin:.3rem 0 0;">
     <li>プレースホルダは 2 系統。<strong>クイズ系 5 種</strong>（<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>。16-1）は当該生成実行の <code>quiz_items</code> 1 行（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>。<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）から、<strong>ランキング系 5 種</strong>（<code>{{hook}}</code> / <code>{{title}}</code> / <code>{{result_list}}</code> / <code>{{trivia}}</code> / <code>{{source_display}}</code>。17-2）は当該生成実行の <code>ranking_items</code> 1 行（<code>title</code> カラム + <code>content_fields</code> の各キー。<a href="data-model.html#detail-ranking-items">data-model.html セクション 4.12</a>）から展開する。いずれも<strong>文字列の単純参照</strong>であり、展開時の整形ロジックは持たない（<code>{{result_list}}</code> は整形済みテキストをストック側が持つ = <a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）</li>
-    <li><strong>どちらの系として展開するかは、当該実行に存在する行（<code>quiz_items</code> / <code>ranking_items</code>）で決まる</strong>（方式は 1 実行につきどちらか一方しか記録しないため、両方存在することはない）。<code>{{hook}}</code> は両系共通のトークンで、存在する行の <code>content_fields.hook</code> から展開する</li>
+    <li><strong>umigame 系 4 種</strong>（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>。21-3 設計・21-5b 実装）は当該生成実行の <code>umigame_items</code> 1 行から展開する。umigame-soup-1 のテンプレートは <code>{{caption}}</code> の 1 行（ストック側の <code>caption</code> が本文 + ハッシュタグ〔<code>#AIart</code> 含む〕を持つ。<a href="sets/umigame-soup-1.html#caption">セット別設計書 6</a>）</li>
+    <li><strong>どちらの系として展開するかは、当該実行に存在する行（<code>quiz_items</code> / <code>ranking_items</code> / <code>umigame_items</code>）で決まる</strong>（方式は 1 実行につきどちらか一方しか記録しないため、両方存在することはない）。<code>{{hook}}</code> は両系共通のトークンで、存在する行の <code>content_fields.hook</code> から展開する</li>
     <li><strong>プレースホルダを含むテンプレートは展開元の行を必須</strong>とし、行がなければ異常終了する（フェイルラウド。テンプレートとセットの設定ミス検知。クイズ系トークンをランキングセットのテンプレートに書いた等の系の取り違えもこれで検知される）</li>
     <li><strong>プレースホルダを含まないテンプレートは従来どおり素通し</strong>（fantasy-animals-1 は無変更で共存。どちらの動きになるかはテンプレート文言そのもので決まり、セット別のフラグは持たない）</li>
     <li>既知トークン集合（<strong>両系の和集合 9 種</strong>）以外の <code>{{英小文字とアンダースコア}}</code> 形式トークンがテンプレートにある場合も異常終了する（タイポで壊れたキャプションがそのまま公開されるのを防ぐ。16-3 実装時の決定を 17-2 で和集合へ拡張）</li>

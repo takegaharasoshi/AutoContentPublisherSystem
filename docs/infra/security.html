@@ -13,7 +13,7 @@
 <h1>セキュリティ設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-08-10</span>
+  <span>最終更新: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
 </div>
 
 <h2 id="secrets">1. Secrets Manager 管理方針</h2>
@@ -36,6 +36,7 @@
     <tr><td>DB 認証情報</td><td><code>acps/{env}/db/credentials</code></td><td><code>acps/prod/db/credentials</code></td></tr>
     <tr><td>画像生成 API キー</td><td><code>acps/{env}/image/api-key</code></td><td><code>acps/prod/image/api-key</code></td></tr>
     <tr><td>SNS 認証情報</td><td><code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code></td><td><code>acps/prod/fashion-set-1/sns/instagram/main-account</code></td></tr>
+    <tr><td>コメント自動返信（Webhook + OpenAI + 返信用トークン。21-3 追加）</td><td><code>acps/{env}/{set_code}/comment-reply{-staging}</code></td><td><code>acps/prod/umigame-soup-1/comment-reply</code> / <code>acps/prod/umigame-soup-1/comment-reply-staging</code></td></tr>
   </tbody>
 </table>
 </div>
@@ -110,6 +111,34 @@
   </tbody>
 </table>
 </div>
+
+<h4 id="comment-reply-secret">コメント自動返信（umigame-soup-1。Phase 21-3 設計・21-6 実装）</h4>
+<p>Secret 名: <code>acps/{env}/{set_code}/comment-reply</code>（ステージング面は <code>-staging</code> 接尾辞）。CDK（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）が空値テンプレートで作成し <code>verify_token</code> だけを自動生成する。他の値は手動投入（PoC と同じ運用）。</p>
+<pre><code>{
+  "verify_token": "（CDK が自動生成。Meta の Webhook 購読設定に貼る）",
+  "app_secret": "...",
+  "ig_access_token": "...",
+  "ig_user_id": "...",
+  "openai_api_key": "...",
+  "token_expires_at": "2026-11-02T00:00:00Z"
+}</code></pre>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>キー</th><th>必須</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td><code>verify_token</code></td><td>YES</td><td>Webhook 購読時の GET 検証（<code>hub.verify_token</code>）に使う共有文字列。CDK が生成し変更しない</td></tr>
+    <tr><td><code>app_secret</code></td><td>YES</td><td>Webhook 署名（<code>X-Hub-Signature-256</code>）の HMAC 鍵。<strong>Instagram アプリシークレット</strong>（Facebook 側「アプリ設定 → ベーシック」の app secret ではない。PoC 2026-09-03 で実測）</td></tr>
+    <tr><td><code>ig_access_token</code></td><td>YES</td><td>コメント返信用の長期アクセストークン（<strong>Instagram ログイン方式・スコープ <code>instagram_business_basic</code> + <code>instagram_business_manage_comments</code></strong>）。投稿用 Secret の <code>access_token</code>（Facebook ページ経由・既存 Meta アプリ）とは別のアプリ・別の方式のトークンで、同じアカウントに 2 本のトークンが存在する。60 日で失効</td></tr>
+    <tr><td><code>ig_user_id</code></td><td>YES</td><td>自アカウントの Instagram user ID。<strong>自己返信ループ防止の照合キー</strong>（未設定のままコメントが来ると自分の返信に返信し続けるため、投入を最優先する）</td></tr>
+    <tr><td><code>openai_api_key</code></td><td>YES</td><td>OpenAI API キー（プロジェクト単位で月額予算上限を設定したもの。利用上限の 1 段目）。空なら固定文言で返信（疎通確認用）</td></tr>
+    <tr><td><code>token_expires_at</code></td><td>NO</td><td>コメント返信用トークンの失効日時の運用メモ。<a href="../app/operation.html">app/operation.html セクション 5.4</a> のリマインド運用に載せる</td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li>PoC の Secret <code>umigame-poc/credentials</code> は <code>acps/{env}/</code> 規約の外にある（PoC のため）。21-6 でステージング面を <code>acps/prod/umigame-soup-1/comment-reply-staging</code> に作り直し、<code>UmigamePocStack</code> と一緒に削除する</li>
+  <li>投稿用 Secret（上記「SNS 認証情報」）は本セットでも既存どおり作る。コメント返信用 Secret と<strong>キーを混ぜない</strong>（読むサービスが違い、IAM の許可プレフィックスも違う）</li>
+</ul>
 
 <h3>1.4 将来の複数環境対応</h3>
 <div class="table-wrap">
@@ -242,6 +271,18 @@
   <li>アクションロール（Source / Build）はサービスプリンシパルではなくパイプラインロールが <code>sts:AssumeRole</code> する連鎖構造のため、信頼ポリシーはアカウント root（またはパイプラインロール）を許可する</li>
 </ul>
 
+<h3 id="iam-comment-reply">2.6 コメント自動返信 Lambda 実行ロール（21-3 追加）</h3>
+<p>CommentReplyStack（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）の Lambda 2 本はそれぞれ専用の実行ロールを持ち、VPC 権限を持たない（VPC 外）。面（本番 / ステージング）ごとにロールも分かれる。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ロール</th><th>許可</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>Webhook Lambda</td><td><code>secretsmanager:GetSecretValue</code>（当該面の Secret 1 件のみ）/ <code>sqs:SendMessage</code>（当該面のメインキューのみ）/ CloudWatch Logs（基本実行ロール）</td><td>S3・Graph API・OpenAI には触れない（署名検証と enqueue だけ）</td></tr>
+    <tr><td>Reply Lambda</td><td><code>secretsmanager:GetSecretValue</code>（当該面の Secret 1 件のみ）/ <code>sqs:ReceiveMessage</code> <code>DeleteMessage</code> <code>GetQueueAttributes</code>（メインキュー。イベントソースマッピング用）/ <code>s3:GetObject</code> を <strong><code>arn:aws:s3:::{bucket}/assets/umigame-soup-1/problems/*</code>（ステージング面は <code>.../staging/problems/*</code>）に限定</strong> / CloudWatch Logs</td><td><code>s3:PutObject</code>・<code>ListBucket</code>・他プレフィックスは付与しない（読み取り専用データストア）。OpenAI・Graph API は IAM ではなく Secret 内のキー・トークンで認証</td></tr>
+  </tbody>
+</table>
+</div>
+
 <h2 id="network">3. ネットワークセキュリティ</h2>
 <ul>
   <li><strong>Aurora</strong>: Isolated Subnet に配置し、インターネットからの直接アクセスを遮断する。Security Group はアウトバウンド通信を完全に遮断する（CDK で <code>allowAllOutbound: false</code> を明示指定）</li>
@@ -252,6 +293,8 @@
       <li>アウトバウンド: インターネットアクセス（外部 API、Secrets Manager、CloudWatch Logs）と VPC 内通信（Aurora）を許可</li>
     </ul>
   </li>
+  <li><strong>コメント自動返信 Lambda（21-3 追加）</strong>: VPC 外で実行し、Function URL を<strong>認証なし（<code>authType: NONE</code>）</strong>で公開する。インバウンドの正当性は Meta の <code>X-Hub-Signature-256</code> 署名検証（鍵は Instagram アプリシークレット）で担保し、署名不一致は 401 で捨てる。Reply Lambda はインバウンドを持たず SQS トリガーのみ。アウトバウンドは Secrets Manager・S3・OpenAI・Graph API（すべて TLS）。NAT Gateway・VPC Endpoint は使わない（<a href="architecture.html#comment-reply">architecture.html セクション 1.1</a>）</li>
+  <li><strong>プライバシーポリシー用 S3 バケット（21-3 追加）</strong>: Meta アプリの公開モードに必須の到達可能 URL を提供するため、<strong>専用の小バケットだけ</strong>を静的ウェブサイトホスティング + 公開読み取りにする。画像保存バケットの Block Public Access は維持する</li>
   <li><strong>Secrets Manager</strong>: ECS Fargate のパブリック IP 経由でアクセス（通信は TLS で暗号化）
     <ul>
       <li>Interface VPC Endpoint は使用しない（コスト削減のため。より厳格なネットワーク分離が必要な場合は導入を検討）</li>
@@ -270,6 +313,7 @@
   <li>ECS タスクには最小権限の IAM ロールを付与する</li>
   <li>Secrets Manager 権限はサービスごとに最小プレフィックスで制限し、環境およびサービスを跨いだ参照を避ける</li>
   <li>Security Group で不要な通信を遮断する</li>
+  <li>コメント自動返信の Lambda コード・プロンプトの変更は、必ずステージング面（PoC の Meta アプリ + テスト用アカウント）で実コメントを打ってから本番面の Webhook 先を切り替える（外向き発信を持つ経路の変更手順。21-3 追加）</li>
   <li>CloudWatch Logs と DB の API レスポンス保存欄には、API キー、アクセストークン、Authorization ヘッダー、Presigned URL、Secret 値を出力・保存しない。外部 API レスポンスを保存する場合はマスキング済みの値のみを保存する（アプリ実装時のログ出力方針はアプリ設計で具体化する）</li>
 </ul>
 

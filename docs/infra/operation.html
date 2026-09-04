@@ -13,7 +13,7 @@
 <h1>インフラ運用設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-07-06</span>
+  <span>最終更新: 2026-09-04（21-3: 4.1 にコメント自動返信 DLQ の対応を追加）</span>
 </div>
 
 <div class="note">
@@ -132,6 +132,7 @@ aws stepfunctions start-execution \
     <tr><td>SNS 投稿起動失敗</td><td>カスタムメトリクス（<code>SnsPostStartFailureCount</code>）で検知。手動で sns-posting-sfn を起動する</td></tr>
     <tr><td>ECS タスク異常終了</td><td>CloudWatch Logs でエラー内容を確認。アプリケーションのバグの場合は修正してデプロイ</td></tr>
     <tr><td>Aurora 異常</td><td>Aurora の状態を AWS Console で確認。ACU 設定の見直しを検討</td></tr>
+    <tr><td>コメント自動返信 DLQ の滞留（<code>acps-prod-comment-reply-dlq-messages</code>。21-3 追加・21-6 実装）</td><td>DLQ のメッセージ本文（<code>comment_id</code> / <code>media_id</code> / コメント本文）と Reply Lambda のログで原因を分ける: ① OpenAI 障害・レート制限 → 復旧後に SQS コンソールの「DLQ 再処理」でメインキューへ戻す ② Graph API のトークン失効（401）→ Secret の <code>ig_access_token</code> を再生成して再処理 ③ スナップショット欠落（S3 404 は本来 DLQ に入らない。入っていれば Lambda のバグ）→ <code>umigame_items.snapshot_s3_key IS NULL</code> を確認し手動再出力。古すぎるコメント（数日前）は返信の鮮度を優先して破棄してよい。投稿バッチには影響しない</td></tr>
   </tbody>
 </table>
 </div>

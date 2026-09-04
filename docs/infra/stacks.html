@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
   <span class="badge badge-fixed">Phase 16-7 で InsightsBatchStack（3.5）を追加</span>
-  <span>最終更新: 2026-08-10</span>
+  <span>最終更新: 2026-09-04（21-3: セクション 3.6 CommentReplyStack を追加。AdminApi / AdminWeb を 3.7 / 3.8 へ繰り下げ）</span>
 </div>
 
 <h2 id="policy">1. スタック分割方針</h2>
@@ -34,6 +34,7 @@
     <tr><td>ImageBatchStack</td><td>初期</td><td>画像生成バッチ実行基盤</td></tr>
     <tr><td>SnsPostBatchStack</td><td>初期</td><td>SNS 投稿バッチ実行基盤</td></tr>
     <tr><td>InsightsBatchStack</td><td>Phase 16（16-7 設計・16-10 実装）</td><td>インサイト収集バッチ実行基盤</td></tr>
+    <tr><td>CommentReplyStack（本番面 / ステージング面の 2 インスタンス）</td><td>Phase 21（21-3 設計・21-6 実装）</td><td>ウミガメのスープのコメント自動返信経路（Webhook 受信 → SQS → Reply Lambda。VPC 外）+ プライバシーポリシーの静的ホスティング</td></tr>
     <tr><td>MonitoringStack</td><td>初期</td><td>監視・通知</td></tr>
     <tr><td>AdminApiStack</td><td>将来</td><td>管理画面バックエンド API</td></tr>
     <tr><td>AdminWebStack</td><td>将来</td><td>管理画面フロントエンド</td></tr>
@@ -246,7 +247,7 @@
 </table>
 </div>
 
-<p><strong>依存スタック</strong>: FoundationStack、ImageBatchStack、SnsPostBatchStack、InsightsBatchStack（インサイト収集 SFN の失敗アラーム・Scheduler メトリクスの Dimension を受け取る）</p>
+<p><strong>依存スタック</strong>: FoundationStack、ImageBatchStack、SnsPostBatchStack、InsightsBatchStack（インサイト収集 SFN の失敗アラーム・Scheduler メトリクスの Dimension を受け取る）、CommentReplyStack（本番面の DLQ を受け取る。21-3 追加・21-6 実装）</p>
 
 <h4>注意事項</h4>
 <ul>
@@ -285,12 +286,57 @@
 
 <p><strong>依存スタック</strong>: FoundationStack</p>
 
-<h3 id="admin-api">3.6 AdminApiStack（将来拡張）</h3>
+<h3 id="comment-reply">3.6 CommentReplyStack（Phase 21-3 設計・21-6 実装）</h3>
+<p><strong>目的</strong>: umigame-soup-1 のコメント自動返信経路（アプリの振る舞いは <a href="../app/sets/umigame-soup-1.html#comment-reply">セット別設計書セクション 10</a>、全体像は <a href="architecture.html#comment-reply">architecture.html セクション 1.1</a>）を構築する。本システムで初めてイングレス（Meta Webhook）を持つスタックであり、既存のバッチ系スタックとは<strong>VPC・Aurora・CodePipeline を共有しない</strong>。</p>
+
+<div class="note">
+  <span class="callout-title">設計方針: 外部依存ゼロの Python を CDK asset でデプロイし、同一コードから本番面とステージング面を立てる</span>
+  Lambda コードは <code>services/comment-reply/</code>（pytest 付き。PoC の <code>poc/umigame-comment-webhook/lambda/handler.py</code> を Webhook / Reply の 2 ハンドラに分割して移植）。標準ライブラリ + boto3 のみでバンドル不要のため <code>lambda.Code.fromAsset</code> で直接デプロイし、コンテナではないので CodePipeline は通さず手動 <code>cdk deploy</code> の既存ルールに乗せる（21-1 ⑥）。スタックは <code>face</code>（<code>prod</code> / <code>staging</code>）をコンストラクタ引数に取り、<code>bin/infra.ts</code> で 2 回インスタンス化する（<code>Prod-CommentReplyStack</code> / <code>Prod-CommentReplyStagingStack</code>）。面ごとに異なるのは<strong>リソース名の接尾辞・Secret 名・S3 プレフィックス・Webhook 先（Meta アプリ側の設定）</strong>だけで、コードと構成は同一。
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>リソース</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td>Webhook Lambda</td><td><code>acps-{env}-comment-reply-webhook{-staging}</code>。Python 3.13・128 MB・タイムアウト 10 秒。Function URL（<code>authType: NONE</code>）で Meta Webhook を受ける。GET は <code>hub.verify_token</code> の照合（購読時の検証）、POST は <code>X-Hub-Signature-256</code> の HMAC-SHA256 検証（鍵は Secret の <code>app_secret</code> = Instagram アプリシークレット）→ <code>comments</code> フィールドのイベントを 1 件ずつ SQS へ送信 → 200。自己返信（<code>from.id == ig_user_id</code>）はここで捨てる。署名不一致は 401。<strong>Function URL を認証なしにする根拠は署名検証</strong>（Meta 以外は正しい署名を作れない）。環境変数: <code>SECRET_ARN</code> / <code>QUEUE_URL</code></td></tr>
+    <tr><td>SQS（メインキュー）</td><td><code>acps-{env}-comment-reply{-staging}.fifo</code>。<strong>FIFO</strong>・<code>MessageDeduplicationId = comment_id</code>（Meta の再送による二重返信を 5 分窓で抑止）・<code>MessageGroupId = media_id</code>（同じ投稿への返信順を保つ）。可視性タイムアウト 90 秒（Reply Lambda のタイムアウト 30 秒 × 3）・保持 4 日・<code>maxReceiveCount: 3</code> で DLQ へ</td></tr>
+    <tr><td>SQS（DLQ）</td><td><code>acps-{env}-comment-reply-dlq{-staging}.fifo</code>。保持 14 日。MonitoringStack が <code>ApproximateNumberOfMessagesVisible</code> を監視（<a href="workflow.html#comment-reply-dlq">workflow.html セクション 10</a>）。本番面のみアラーム対象（ステージング面は目視）</td></tr>
+    <tr><td>Reply Lambda</td><td><code>acps-{env}-comment-reply-reply{-staging}</code>。Python 3.13・256 MB・タイムアウト 30 秒・<strong>予約同時実行数 2</strong>（利用上限の 2 段目 = セット別設計書 10.4）。SQS イベントソース（バッチサイズ 1）。処理: S3 GET <code>{SNAPSHOT_PREFIX}{media_id}.json</code>（404 は返信せず正常終了）→ system プロンプト組み立て（<code>master_rules</code> + 問題固有部分）→ OpenAI Chat Completions（<code>OPENAI_MODEL</code> 環境変数。既定 gpt-5.6-luna）→ <code>NO_REPLY</code> 判定 → Graph API <code>POST /{comment_id}/replies</code>。OpenAI / Graph API の失敗は例外で終了し SQS の再試行に委ねる（最終試行のみ固定文言で返信）。環境変数: <code>SECRET_ARN</code> / <code>S3_BUCKET_NAME</code> / <code>SNAPSHOT_PREFIX</code>（<code>assets/umigame-soup-1/problems/</code> または <code>assets/umigame-soup-1/staging/problems/</code>）/ <code>GRAPH_API_BASE</code> / <code>OPENAI_MODEL</code></td></tr>
+    <tr><td>Secrets Manager</td><td><code>acps/{env}/umigame-soup-1/comment-reply{-staging}</code>（<a href="security.html#comment-reply-secret">security.html セクション 1.3</a>）。CDK が空値テンプレートで作成し <code>verify_token</code> のみ自動生成、他の値は手動投入（PoC と同じ運用）。<code>removalPolicy: RETAIN</code>（PoC の DESTROY から変更。トークンの再投入を避ける）</td></tr>
+    <tr><td>IAM Role（Lambda 実行ロール × 2）</td><td>Webhook: Secret の <code>GetSecretValue</code>（当該 Secret のみ）+ メインキューへの <code>sqs:SendMessage</code>。Reply: Secret の <code>GetSecretValue</code> + メインキューの受信・削除 + 既存バケットの <code>s3:GetObject</code> を <strong><code>{SNAPSHOT_PREFIX}*</code> に限定</strong>（PUT・List は付与しない）。いずれも VPC 権限なし。<a href="security.html#iam-comment-reply">security.html セクション 2.6</a></td></tr>
+    <tr><td>CloudWatch Log Group × 2</td><td>他スタックと同方針（リテンション 90 日・<code>removalPolicy: DESTROY</code>）。PoC の Lambda は未指定（無期限）だったため、本スタックでは明示する。返信本文・コメント本文はログに出してよいが、トークン・署名・Secret 値は出さない（security.html セクション 4）</td></tr>
+    <tr><td>S3（プライバシーポリシー）</td><td><code>acps-{env}-umigame-privacy-policy</code>（新規・小バケット・静的ウェブサイトホスティング + 当該バケット限定の <code>PublicReadGetObject</code>。既存の画像バケットは Block Public Access を維持するため分ける）。HTML 1 枚を <code>BucketDeployment</code> で配置。Meta アプリの公開モードに必須の URL（App Review は不要）。本番面のみ作成（ステージング面は PoC の到達可能 URL を流用）</td></tr>
+    <tr><td>CfnOutput</td><td><code>FunctionUrl</code>（Meta 側の Webhook コールバック URL）・<code>SecretName</code>・<code>PrivacyPolicyUrl</code>・<code>DlqUrl</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、21-3）: Function URL 直結 + SQS FIFO。API Gateway・Aurora 接続・VPC 配置は採らない</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>Function URL</strong>（21-1 ⑥ ユーザー決定）: API Gateway の WAF・スロットリング・使用量プランが要る規模になるまで不要。Function URL は無料で、署名検証を Lambda 内で行うため認証なしで公開しても Meta 以外の要求は 401 で落ちる。DDoS 級の呼び出しは Lambda の同時実行上限（アカウント既定）で頭打ちになり費用も僅少</li>
+    <li><strong>SQS FIFO</strong>: 標準キューの at-least-once では Meta の再送 + SQS の重複配信で同じコメントに二重返信しうる（ユーザーに見える不具合）。FIFO の重複排除 ID に <code>comment_id</code> を使えば追加実装なしで 5 分窓の重複を抑止できる。スループット上限（300 msg/秒）はコメント規模（1 日 200 件）に対して十分。窓外の再送による二重返信は許容（発生したら設計課題へ）</li>
+    <li><strong>VPC 外</strong>: Aurora に触れないため VPC に置く理由がなく、置くと NAT Gateway（月 4,000 円超）が要る。Secrets Manager・S3・OpenAI・Graph API はいずれもパブリックエンドポイント（TLS）</li>
+    <li><strong>ステージング面を同一コードで立てる</strong>: PoC ハンドラを別コードで残すと本番と乖離するため、21-6 で新スタックをステージング面としても立て、PoC の Meta アプリの Webhook 先を切り替えてから <code>UmigamePocStack</code>（と規約外の Secret <code>umigame-poc/credentials</code>）を削除する（21-1 ⑦）。2 面分の定常費はほぼゼロ（Lambda・SQS は従量、Secret は月 0.4 USD × 2）</li>
+  </ul>
+</div>
+
+<h4>注意事項</h4>
+<ul>
+  <li>デプロイは <code>cdk deploy -c env=prod CommentReplyStack CommentReplyStagingStack</code>（イメージタグの指定は不要。ECS Task Definition を持たないため）。MonitoringStack は本スタックの DLQ を受け取るため、MonitoringStack のデプロイには 5 スタックすべての依存が解決されている必要がある</li>
+  <li>Meta 側の設定（本番用 Meta アプリの作成・公開モード・<code>comments</code> 購読・アカウント単位の Webhook トグル・コールバック URL に <code>FunctionUrl</code>・<code>verify_token</code>）は CDK 管理外。手順は PoC README（<code>poc/umigame-comment-webhook/README.md</code>）を本番向けに転記して 21-7 で手順書化する</li>
+  <li>Secret の値を変えたら Lambda はコールドスタート時にしか読み直さないため、環境変数を touch するか十数分待つ（PoC の運用と同じ）</li>
+  <li>本スタックは Lambda コードのデプロイも <code>cdk deploy</code> で行う（<code>services/</code> だが CodePipeline の対象外）。CLAUDE.md「Git 運用ルール」の CodePipeline 完走確認は本サービスには適用しない</li>
+</ul>
+
+<p><strong>依存スタック</strong>: FoundationStack（S3 バケットの参照のみ。VPC・Aurora・ECS は使わない）</p>
+
+<h3 id="admin-api">3.7 AdminApiStack（将来拡張）</h3>
 <p><strong>目的</strong>: 管理画面から利用するバックエンド API を提供する</p>
 <p><strong>想定リソース</strong>: ECS Service または Lambda、ALB または API Gateway、IAM Role</p>
 <p><strong>依存スタック</strong>: FoundationStack</p>
 
-<h3 id="admin-web">3.7 AdminWebStack（将来拡張）</h3>
+<h3 id="admin-web">3.8 AdminWebStack（将来拡張）</h3>
 <p><strong>目的</strong>: 管理画面のフロントエンドを提供する</p>
 <p><strong>想定リソース</strong>: S3（静的ファイル配信）、CloudFront、Route 53、ACM</p>
 <p><strong>連携先</strong>: AdminApiStack</p>
@@ -340,7 +386,7 @@
 
 <div class="note">
   <span class="callout-title">デプロイ方法</span>
-  上記 1〜4 のスタックは開発者が <code>cdk diff</code> で差分確認後、<code>cdk deploy</code> で手動デプロイする。インフラパイプラインは構築しない（詳細は <a href="cicd.html">cicd.html</a> を参照）。
+  上記 1〜4 のスタックは開発者が <code>cdk diff</code> で差分確認後、<code>cdk deploy</code> で手動デプロイする。CommentReplyStack（3.6）は FoundationStack の後・MonitoringStack の前に入る（バッチ系 3 スタックとは独立。21-3 追加・図には未反映）。インフラパイプラインは構築しない（詳細は <a href="cicd.html">cicd.html</a> を参照）。
 </div>
 
 <h2 id="data-passing">5. スタック間のデータ受け渡し</h2>
@@ -367,7 +413,12 @@ ImageBatchStack
 InsightsBatchStack（16-7 追加・16-10 実装）
   ├── insightsCollectionSfnArn  → MonitoringStack（失敗アラーム）
   ├── insightsScheduleGroupName → MonitoringStack（Scheduler 失敗メトリクスの Dimension）
-  └── insightsSchedulerDlqArn   → 運用確認用</code></pre>
+  └── insightsSchedulerDlqArn   → 運用確認用
+
+CommentReplyStack（21-3 設計・21-6 実装。face = prod / staging の 2 インスタンス）
+  ├── replyDlq（本番面のみ）     → MonitoringStack（DLQ 滞留アラーム）
+  ├── functionUrl               → CfnOutput（Meta アプリの Webhook 先。CDK 管理外の手動設定）
+  └── privacyPolicyUrl（本番面のみ）→ CfnOutput（Meta アプリの公開モード設定）</code></pre>
 
 <div class="decision">
   <span class="callout-title">MonitoringStack への入力と DB 準備確認 SG のエッジを追記（2026-07-23、Phase 13-2）</span>

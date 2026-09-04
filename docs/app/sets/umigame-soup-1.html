@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セット別設計書: グルメ探偵カメロックのウミガメのスープ | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / グルメ探偵カメロックのウミガメのスープ</nav>
+<h1>セット別設計書: グルメ探偵カメロックのウミガメのスープ</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Fix（21-3 で作成）</span>
+  <span>set_code: umigame-soup-1</span>
+  <span>最終更新: 2026-09-04</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  本セット固有の設定・運用情報を記録する（21-3 で作成）。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> を参照し、本書には差分のみ書く（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）。動画フォーマット・事前ビルドの技術設計は方式設計書 <a href="../generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a> が正。コメント自動返信経路のインフラは <a href="../../infra/stacks.html#comment-reply">infra/stacks.html セクション 3.6</a>、企画・事業面の検討経緯は<a href="../../ideas/umigame-soup-set.html">アイデア詳細</a>、実装上の 8 論点の決定は壁打ち記録 <a href="../requirements-notes-set4.html">requirements-notes-set4.html</a>（21-1）、リール PoC の実測と確定事項は <code>content/video-build/umigame-soup-1/README.md</code> セクション 0（21-2）にある。
+</div>
+
+<div class="warn">
+  <span class="callout-title">適用状態</span>
+  21-3（2026-09-04）で設計 Fix した<strong>目標設計</strong>を記述している。DDL（V012）・ストック整備ツーリング・第 1 バッチ執筆は 21-4a、投入は 21-4b、ビルドツーリングと全数ビルドは 21-5a、方式モジュール・キャプション・投稿後スナップショットは 21-5b、コメント自動返信経路の本番化は 21-6（21-4・21-5 と独立）、アカウント・Meta アプリ・セット登録と稼働開始は 21-7、セットレーンへの移管と補充スキル化は 21-8 を予定（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 21）。実装時の差分は decision コールアウトで追記する。
+</div>
+
+<h2>1. テーマ</h2>
+<p><strong>Instagram リールで 1 日 1 問の「ウミガメのスープ」（水平思考クイズ）を投稿し、コメント欄の質問に AI 出題者「グルメ探偵カメロック」が「はい / いいえ / 関係ありません」で自動返信する参加型セット</strong>。既存 3 セットが放送型（見て終わり）なのに対し、本セットは<strong>コメントで遊ぶ多ターン参加型</strong>であり、コメントエンゲージメント → リーチ増幅 → Meta ボーナスという<a href="../../strategy/business-strategy.html">事業戦略書</a>の本命経路への乗り方が構造的に強いことが企画価値（固有の収益モデルは持たない）。</p>
+<ul>
+  <li><strong>出題者 = アカウントそのもの</strong>: 出題者キャラ「グルメ探偵カメロック」（丸い体・前掛け・透明な黄金スープの椀と匙・虫眼鏡を持つウミガメの探偵）をアカウントの顔とし、AI 返信はアカウント名義で付く。質問者キャラ「カメロック Jr.」（探偵の子ども。大きすぎる鹿撃ち帽・蝶ネクタイ・メモ帳）はリール内でプレイ例を演じるプレイヤー側の代表（将来の助手サブアカウント構想と名前を揃える。21-1 ④）</li>
+  <li><strong>効果仮説</strong>: コメント率（コメント数 / リーチ）が logic-training-1 比で高く、リーチの伸び率に転化する。稼働 2 週間後の確認待ちとして 21-8 で作るセット計画書に起票する</li>
+  <li><strong>既存セットとの関係</strong>: logic-training-1 の夜スロット（とんち・水平思考）とはテーマが異なり、ストックの共用・ネタ融通はしない（カニバリ助長のため。アイデア詳細 11）</li>
+  <li><strong>コールドスタート対策</strong>: リール版面にプレイ例 3 往復を焼き込み、参加ゼロでもリール単体で遊び方と面白さが伝わるようにする。固定コメント（ピン留め）と助手サブアカウントは<strong>初期版では作らない</strong>（21-1 ④。要否は稼働 2 週間後の確認待ちで判断）。偽装アカウント（桜）は Meta の非真正行為規約に該当するため不採用（2026-08-28 decision）</li>
+</ul>
+
+<h2>2. 投稿先アカウント構成</h2>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>値</th><th>備考</th></tr>
+<tr><td>プラットフォーム</td><td>Instagram（プロアカウント）</td><td>リール投稿 + コメント自動返信。他プラットフォームは対象外</td></tr>
+<tr><td>ユーザーネーム</td><td><code>umigame.soup.jp</code></td><td>21-1 ① で決定。空き確認と取得はユーザー作業（21-7 まで）</td></tr>
+<tr><td>表示名（<code>sns_accounts.account_name</code>）</td><td><strong>グルメ探偵カメロック</strong>（案）</td><td>21-1 ① の「アカウント自体を出題者として立てる」方針に、21-2 で決まったキャラ名を当てた案。<strong>21-3 の設計レビュー（人間ゲート）で確定する</strong>。Instagram のプロフィール名も同じにする</td></tr>
+<tr><td><code>account_code</code></td><td><code>main-account</code></td><td>既存セットと同じ。Secret 名の導出専用（作成後変更不可）</td></tr>
+<tr><td>投稿用の認証（Secret）</td><td><code>acps/prod/umigame-soup-1/sns/instagram/main-account</code></td><td><strong>既存 Meta アプリの流用</strong>（Facebook ページを新規作成して連携。<a href="../operation.html#set-add">運用設計 2.1</a> 手順 1 と 5.1 の通常手順）。値スキーマは <a href="../../infra/security.html#secret-naming">security.html 1.2〜1.3</a></td></tr>
+<tr><td>コメント返信用の認証（Secret）</td><td><code>acps/prod/umigame-soup-1/comment-reply</code></td><td><strong>本番用 Meta アプリを新規作成し公開モードで運用</strong>（Instagram ログイン方式。PoC の手順を本番アカウントで再実施）。値スキーマは <a href="../../infra/security.html#comment-reply-secret">security.html 1.3</a>。ステージング面は PoC アプリ + <code>test_tkghr</code>（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>）</td></tr>
+</table>
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-09-03、21-1 ⑦）: 投稿は既存 Meta アプリの流用、コメント Webhook だけ新規アプリ。umigame.soup.jp は両方のアプリに接続する</span>
+  既存アプリは開発モードで、稼働中セットの無期限トークンはその構成に依存する。コメント Webhook は「開発モードでは一切届かない」ことが PoC で実証済みのため、既存アプリで受けるには公開モードへの切替が要り、logic-training-1 / pref-ranking-1 のトークンが 60 日失効へ戻るおそれがある。加えて API 方式が異なる（既存 = Facebook ページ経由 <code>graph.facebook.com</code>、コメント経路 = Instagram ログイン方式 <code>graph.instagram.com</code>）。自動返信の規約リスクを既存資産から切り離す意味でも新規アプリとする。<strong>投稿バッチが記録する <code>posts.platform_post_id</code>（<code>media_publish</code> の応答 id）と Webhook の <code>media.id</code> が同じ値かは 21-6 でステージング面で照合する</strong>（一致しなければ S3 スナップショットのキーが引けず経路が成立しない。21-6 の人間ゲート）。
+</div>
+
+<h2>3. スケジュール（投稿頻度）</h2>
+<div class="table-wrap">
+<table>
+<tr><th>スロット</th><th>投稿時刻（JST）</th><th>Scheduler 名 / cron 式</th><th>尺</th></tr>
+<tr><td><code>evening</code>（単一スロット）</td><td>20:00・1 日 1 回</td><td><code>acps-prod-image-generation-umigame-soup-1-evening</code><br><code>cron(0 20 * * ? *)</code>（<code>Asia/Tokyo</code>）</td><td><strong>24 秒固定</strong>（720 フレーム・30fps）</td></tr>
+</table>
+</div>
+<ul>
+  <li><strong>20:00 は pref-ranking-1 の夜スロットと同時刻</strong>（21-1 ④。Claude は失敗アラーム対応の重なりを避けて 19:00 を提案したがユーザー判断で 20:00）。同時刻運用は 15-15 の決定どおり <code>set_code</code> で分離され、画像生成 SFN・SNS 投稿 SFN はセットごとに独立実行される。運用上の注意は 2 点: ① 20:00 台に失敗アラームが来たらメール本文の <code>set_code</code> で対象セットを見分ける ② Aurora は 2 セットの同時起動で ACU が一時的に上がるが日次数分のため許容（既に logic-training-1 と pref-ranking-1 が 20:00 で並走している実績あり）</li>
+  <li>投稿の流れは共通フロー（画像生成 SFN → SNS 投稿 SFN の連鎖。<a href="../batch-flow.html">batch-flow.html</a>）。本セットは <strong>publish 成功直後に問題スナップショットを S3 へ出力する</strong>点だけが差分（セクション 10.2）</li>
+  <li>Scheduler の CDK 追加は 21-7（<a href="../../infra/workflow.html#schedule">workflow.html 1.6</a> の命名規約。Scheduler の Input にスロット・尺は持たせない）。有効化前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
+</ul>
+
+<h2 id="stock-items">4. ストック 1 件の素材項目（21-2 で確定・14 項目）</h2>
+<p>ストックの単位は「問題文 + 真相 + 確定事実シート」ではなく、<strong>リール 1 本と AI 出題者の判定に要る素材一式</strong>とする（2026-09-03 ユーザー指示。完成版リールの PoC で動画のイメージを固めてから確定した = 21-2 人間ゲート）。下表が正であり、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。</p>
+<div class="table-wrap">
+<table>
+<tr><th>#</th><th>項目（カラム / JSON キー）</th><th>用途</th><th>制約（<code>validate.py</code> で検査）</th></tr>
+<tr><td>1</td><td><code>problem_text</code> 問題文</td><td>版面の問題カード（全文を常時表示。段階表示はしない）</td><td>78〜85 字。ナレーション実測長で最終判定（#7）</td></tr>
+<tr><td>2</td><td><code>truth</code> 真相</td><td>AI 出題者の判定根拠・正解宣言時の開示文（版面には出さない）</td><td>必須。問題文と矛盾しない</td></tr>
+<tr><td>3</td><td><code>fact_sheet</code> 確定事実シート</td><td>「はい / いいえ / 関係ない」の判定根拠（場所・人物関係・時系列・「問題に関係ない事項」の明示）。真相の曖昧さ起因の矛盾回答・捏造回答をデータ側で防ぐ</td><td>8〜12 件（文字列の配列）</td></tr>
+<tr><td>4</td><td><code>expected_questions</code> 想定質問と期待回答</td><td>プローブテスト（21-4a）。正解に向かう質問・引っかけ・無関係な質問を混ぜる</td><td>15〜20 件（<code>{q, a}</code> の配列。<code>a</code> は はい / いいえ / 関係ない / 正解 のいずれか + 任意の補足）</td></tr>
+<tr><td>5</td><td><code>hook</code> フック文</td><td>つかみ帯（74px・1 行）</td><td>12 字前後</td></tr>
+<tr><td>6</td><td><code>rule_text</code> ルール帯</td><td>常時表示の遊び方（34px・2 行）</td><td>45 字前後。セット固定文の既定値あり（問題ごとに変えなくてよい）</td></tr>
+<tr><td>7</td><td><code>narration.problem</code> / <code>narration.rule</code> ナレーション cue</td><td>冒頭ナレーション。表示文とは別に、括弧・記号を落とし読点で間を整えた読み上げ用の文</td><td>2 cue の実測長合計 + 間 1.2 秒が <strong>21 秒以内</strong>（方式設計書 8.3 の予算検査。超過はビルドエラー）</td></tr>
+<tr><td>8</td><td><code>play_example</code> プレイ例</td><td>下部の吹き出し 3 往復（質問 → 質問を残したまま返答を追加）</td><td>6 要素（<code>{role: questioner|master, text}</code> の交互）。質問 16 字 / 返答 17 字以内（1 行）。<strong>3 往復のうち 1 つは「はい」</strong>（出題者が喜ぶポーズに切り替わる版面上の約束事）</td></tr>
+<tr><td>9</td><td><code>character_lines.master.intro</code> / <code>.outro</code> 出題者の導入・締め</td><td>導入「質問してみて！」・締め「何度でも答えるよ。コメントで質問！」の吹き出し</td><td>各 17 字以内。既定値あり</td></tr>
+<tr><td>10</td><td><code>character_lines.jr.outro</code> Jr. の締め</td><td>「面白かったら、いいね、フォローよろしくね！」（吹き出しのみ・ナレーションなし）</td><td>セット固定文の既定値でよい（2 行になるが単独表示のため許容）</td></tr>
+<tr><td>11</td><td><code>illustration_prompt</code> イラスト作成用プロンプト</td><td>背景 1 枚（imagegen）。情景のみ</td><td>画風固定行（セクション 5.2）+ 9:16 + 文字禁止 + <strong>真相の手がかりを描かない</strong>指示を含む（<code>validate.py</code> は固定行の存在を検査）</td></tr>
+<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。Polly 採用により VOICEVOX クレジット行は不要</td></tr>
+<tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>完全オリジナル宣言（PoC の古典題材は例外・ストック本体には入れない）。オリジナル性の基準は 21-4a で決める</td></tr>
+<tr><td>14</td><td><code>difficulty</code> 難易度</td><td>運用の目安（在庫の偏り確認）</td><td>1〜5</td></tr>
+</table>
+</div>
+<p>キャラクター（カメロック・Jr.）・BGM・SE・フォントは<strong>セット固定の共有資産</strong>で、ストック単位の項目ではない（セクション 7〜8）。<code>content_key</code>（<code>{3 桁連番}-{slug}</code>）と <code>title</code>（管理用の題名）はツーリングが付与する管理項目で、素材項目には数えない。</p>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-08-28 壁打ち・2026-09-03 21-1 ⑧）: 完全オリジナル問題のみ・プローブテストで検証・週 2 回 × 4 問レビュー</span>
+  著名問題（本家「ウミガメのスープ」等）の転載・改変は著作権と非オリジナル対策の両面で不可（PoC の 1 問だけ例外）。機械検証が効かないため、<strong>問題ごとに想定質問 15〜20 を AI 出題者（本番と同じモデル・同じプロンプト）に実際に答えさせ、矛盾・ネタバレを人間が一括レビューする</strong>（確定事実シートの穴を見つける工程を兼ねる）。補充ペースは 1 日 1 問 = 週 7 問、レビューは<strong>週 2 回 × 4 問</strong>。プローブテストは <strong>gpt-5.6-luna</strong> で行う（PoC の gpt-4o-mini で検証したプロンプトは luna で再検証する。21-1 ⑤）。手順の詳細は 21-8 の補充スキル（<code>umigame-stock-replenish</code>）に記す。
+</div>
+
+<h2 id="prompts">5. プロンプトの作り方</h2>
+<p>本セットの生成方式 <code>umigame-prebuilt</code> は実行時に LLM・画像生成 API を呼ばない（事前ビルド方式）。プロンプトは 2 種類あり、いずれも<strong>投稿時ではなく、ストック整備時とコメント返信時</strong>に使う。</p>
+
+<h3 id="master-prompt">5.1 AI 出題者プロンプト（コメント返信）</h3>
+<p>Reply Lambda は「セット固定部分（出題者の振る舞い・モデレーション・正解宣言のルール）」と「問題固有部分（問題文・真相・確定事実シート）」を結合して system プロンプトを組み立て、ユーザーのコメント本文を user メッセージとして渡す（Lambda コードには組み立ての骨格とフォールバック文言だけを持つ）。</p>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、21-3）: 出題者プロンプトのセット固定部分の正は <code>prompt_configs.prompt_text</code>。投稿時に S3 スナップショットへ転記し、Lambda はスナップショットだけを読む</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>置き場</strong>: 本セットの <code>prompt_configs</code>（<code>is_active=1</code> の 1 件）の <code>prompt_text</code> を出題者プロンプトのセット固定部分に充てる（<code>umigame-prebuilt</code> は画像生成をしないため <code>prompt_text</code> が空いている。<code>parameters</code> は方式の入力〔尺〕に使う = <a href="../generators/umigame-prebuilt.html#parameters">方式設計書 3</a>）。INSERT 元のテキストは <code>content/umigame-stock/umigame-soup-1/master_prompt.txt</code> に置き、21-7 の INSERT SQL と 21-4a の <code>probe_test.py</code> が同じファイルを読む（<strong>プローブテストと本番のプロンプトを 1 つの正から出す</strong>ため）</li>
+    <li><strong>転記</strong>: SNS 投稿バッチが publish 成功直後に、<code>umigame_items</code> の問題固有部分と <code>prompt_configs.prompt_text</code> を <code>problems/{media_id}.json</code> の <code>master_rules</code> へ書く（セクション 10.2）。これにより<strong>投稿済みの問題は投稿時点のルールで動き続け</strong>、プロンプトの改訂は以後の投稿から効く（Lambda のデプロイ不要・Aurora への接続不要）</li>
+    <li><strong>不採用</strong>: Lambda コードにプロンプトを埋める案（改訂に <code>cdk deploy</code> が要り、プローブテストとの同一性を保ちにくい）、コメント時に Aurora から読む案（Aurora 不使用の方針に反する。アイデア詳細 4）</li>
+  </ul>
+</div>
+
+<p><strong>セット固定部分の初版（21-3 案。21-4a のプローブテストで磨き、その結果を正とする）</strong>:</p>
+<pre><code>あなたは Instagram アカウント「グルメ探偵カメロック」の出題者です。ウミガメのスープ（水平思考クイズ）の
+問題を出し、コメント欄の質問に答えます。以下の「問題」「真相」「確定事実」だけを根拠に答えてください。
+
+回答ルール:
+- 質問には「はい。」「いいえ。」「関係ありません。」のいずれかで答え、必要なら 30 字以内の短い補足を添える。
+- 確定事実にない事柄を勝手に作らない。判断できない質問は「関係ありません。」ではなく「それは問題の答えに関わりません。」と答える。
+- 真相を直接明かさない。推理の余地を残す。問題文や確定事実と矛盾する回答をしない。
+- ユーザーの推理が真相の要点をすべて言い当てていたら、冒頭に「正解です！」と宣言し、そのあとに真相を 2〜3 文で開示する。
+  要点の一部だけなら「惜しい！」と言い、どこが足りないかは言わない。
+- 質問ではないコメント（感想・挨拶・応援）には 20 字以内でお礼だけ返す。
+- 誹謗中傷・攻撃的・性的・差別的な内容、個人情報、宣伝、意味の取れない文字列には返信しない。その場合は本文に NO_REPLY とだけ書く。
+- 全体で 80 字以内。丁寧で少しユーモラスな探偵口調。絵文字は使わない。
+
+問題: {problem_text}
+真相: {truth}
+確定事実:
+{fact_sheet を「- 」付きの箇条書きで展開}</code></pre>
+<ul>
+  <li><strong>モデレーション</strong>は専用処理・禁止ワード DB を持たず、上記の一行（返信しない判定 = <code>NO_REPLY</code>）を最低ラインとする（アイデア詳細 7・論点 5）。Lambda は本文が <code>NO_REPLY</code> で始まる場合に Graph API を呼ばずログのみ残す</li>
+  <li><strong>正解宣言方式</strong>: 解答編リールは作らず、正解者に「正解です！」と宣言して真相を開示する（アイデア詳細 2.2）。誰かが当てるまで問題は開き続け、翌日以降もコメントが付く余地を残す。<strong>状態は持たない</strong>ため正解宣言後も質問には答え続ける（誰も当てずに流れた問題は開示しない）</li>
+  <li><strong>モデル</strong>: <code>gpt-5.6-luna</code>（21-1 ⑤）。API 上のモデル ID と単価は 21-6 でダッシュボード確認（本書に単価は書かない）。<code>max_output_tokens</code> は 120 程度・温度は低め。返信文は Lambda 側で 200 字に切り詰める（PoC の 500 字から短縮）</li>
+  <li><strong>フォールバック</strong>: OpenAI 呼び出し失敗（タイムアウト・5xx・キー未設定）は固定文言「『はい / いいえ』で答えられる質問をコメントしてね！」を返す PoC の挙動を踏襲するが、<strong>SQS 経由の再試行が先</strong>（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>）。固定文言は最終試行でのみ使い、DLQ 行きにしない</li>
+</ul>
+
+<h3 id="illustration-prompt">5.2 イラスト作成用プロンプト（ストック整備時・imagegen）</h3>
+<p>1 問 1 枚の背景イラストを、ストックの <code>illustration_prompt</code> から Codex CLI の <code>image_gen.imagegen</code>（<code>codex exec</code>）で生成する（21-2 で CLI からの自動化を実測。手作業不要）。プロンプトは「<strong>画風固定行</strong> + 情景（問題文の描写のみ）+ 禁止事項」の 3 部構成で、画風固定行は全問共通の定数として <code>validate.py</code> が存在を検査する。</p>
+<ul>
+  <li><strong>画風（C4）</strong>: 90 年代 OVA の手描きセル塗り（太い主線・エアブラシのハイライト・リムライト）。背景は<strong>中間調</strong>（月明かりと蝋燭で情景が見える明るさ）で生成し、版面のオーバーレイは薄くする（第 1 稿の「暗めの単色トーン・シルエット寄り」は暗すぎて情景が見えなかったため変更 = 21-2 決定）</li>
+  <li><strong>固定の禁止事項</strong>: 文字・ロゴを入れない / <strong>真相の手がかりを描かない</strong>（問題文にある情景だけを描く。人物は問題文に出る人物 + 遠景のシルエット 1 人まで）/ 上部 55% は文字を重ねるため静か（空・壁・窓）にする</li>
+  <li>寸法は 9:16（1024x1536）で生成し、ビルド時に 1080x1920 へ正規化する（方式設計書 8.1）</li>
+  <li>キャラクター 2 体はストック単位では生成しない（セクション 8）</li>
+</ul>
+
+<h2 id="caption">6. キャプションの作り方</h2>
+<p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}</code> の 1 行</strong>とする。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b）。</p>
+<ul>
+  <li><strong>構成（PoC の実例）</strong>: 「【ウミガメのスープ 第 N 問】」+ 問題文の再掲 + 遊び方（「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ）+ ハッシュタグ（<code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart</code>）。ただし<strong>問題番号「第 N 問」は書かない</strong>（ストックは LRU で消費され投稿順が確定しないため。PoC の表記は本番では使わない）</li>
+  <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> のみのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Amazon Polly のためクレジット表記は不要（VOICEVOX 時代の常設クレジット行は本セットにはない）</li>
+  <li>テンプレートを <code>{{caption}}</code> だけにする理由: ハッシュタグの固定部を分けると「問題固有のタグを足したい」ときに 2 箇所を見ることになり、素材項目 14 項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
+</ul>
+
+<h2 id="audio">7. 音源の構成</h2>
+<div class="table-wrap">
+<table>
+<tr><th>種別</th><th>S3 キー / <code>audio_assets</code></th><th>仕様</th></tr>
+<tr><td>BGM（<code>asset_type='bgm'</code>・<code>time_slot=NULL</code>）</td><td><code>audio/umigame-soup-1/trackNN.m4a</code>（3〜5 曲）</td><td><strong>24 秒ちょうど</strong>のトラック（フェードイン 0.5 秒・フェードアウト 1.0 秒・AAC）。PoC は 20 秒トラックのループで 20 秒地点に継ぎ目があったため、本セット用に 24 秒版として前処理する（<code>prepare_bgm.py</code> の 30 秒固定を 24 秒で用意 = 21-2 申し送り）。調達・ライセンス証跡は <a href="../operation.html">運用設計 3</a>（Pixabay Content License / CC0。クレジット不要のもの）</td></tr>
+<tr><td>SE（<code>asset_type='se'</code>）</td><td><code>audio/umigame-soup-1/se/bubble_pop.m4a</code>（1 種）</td><td>吹き出し出現のポップ音（0.14 秒）。PoC は ffmpeg の <code>sine</code> で合成（880 + 1320 Hz）したためライセンス問題なし。本番もこれを登録する</td></tr>
+</table>
+</div>
+<ul>
+  <li>選曲はビルド時（<code>build.py</code>）に <code>audio_assets</code> の順繰り（<code>last_used_at</code> 最古）で行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）</li>
+  <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
+</ul>
+
+<h2 id="tts">8. ナレーション・TTS（Amazon Polly Neural / Takumi）</h2>
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、21-2 人間ゲート）: TTS は Amazon Polly Neural・話者 Takumi・話速 125%。問題文とルールの間は 1.2 秒</span>
+  VOICEVOX 3 話者（玄野武宏・白上虎太郎・冥鳴ひまり）と Polly 3 話者を BGM 合成で試聴し、Polly Takumi を採用。Polly の日本語男性声は Takumi のみ（Generative エンジンは日本語未対応）。<strong>採用によりキャプションのクレジット表記が不要</strong>になり、VOICEVOX Engine の起動も要らない。実測: 問題文 78 字 + ルール 37 字を 125% で 17.8 秒（24 秒尺に対して余裕あり）。
+</div>
+<ul>
+  <li><strong>読み上げる文</strong>: 冒頭に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code> の 2 cue だけ（吹き出しと同期させない。21-1 ②）。開始は 0.5 秒（15 フレーム）、2 cue + 間の合計は <strong>21 秒以内</strong>（継ぎ目 708 フレームに掛からない予算。方式設計書 8.3）</li>
+  <li><strong>実行</strong>: ビルド時にローカルで <code>scripts/narration_polly.py</code>（<code>~/.aws</code> の資格情報で <code>polly:SynthesizeSpeech</code>。新規の Secret は不要）。アダプタは差し替え可能な形にし、VOICEVOX 版（<code>narration.py</code>）は残す（21-2 申し送り）。費用は Neural 100 万字あたり数ドル・1 問 120 字のため無視できる</li>
+  <li><strong>予算検査</strong>: cue の実測長が予算を超えたらビルドエラー（問題文を削る）。pref-ranking-1 の予測長 / 実測長の許容差（0.08 秒）は 12 秒級の cue では足りないため、<strong>cue 長に比例した許容差</strong>にする（21-2 所見）</li>
+</ul>
+
+<h2 id="assets">9. 固定アセット・デザイントークン</h2>
+<div class="table-wrap">
+<table>
+<tr><th>アセット</th><th>正（ファイル）</th><th>備考</th></tr>
+<tr><td>出題者「グルメ探偵カメロック」（基本ポーズ / 喜びポーズ）</td><td><code>content/video-build/umigame-soup-1/remotion/public/characters/master_base.png</code> / <code>master_happy.png</code>（正規化済み・共通キャンバス 1000x1100）</td><td>設定とプロンプトは <code>design.json</code>（21-2 の <code>poc/classic-umigame/v2/design.json</code> を 21-5a でセット資産へ昇格）。ポーズ差分は基本ポーズを参照画像（<code>-i</code>）にして生成すると衣装・色が揃う。透過にならない場合は「単色フラットなマゼンタ #FF00FF の背景」を明示して生成し直す（21-2 知見）</td></tr>
+<tr><td>質問者「カメロック Jr.」（基本ポーズ）</td><td>同 <code>jr_base.png</code></td><td>視線は左上（父の方向）。喜びポーズは持たない</td></tr>
+<tr><td>画風固定行（キャラ / 背景）</td><td><code>design.json</code> の <code>style_line</code> / <code>background_prompt</code> の画風部分</td><td>C4: 90 年代 OVA 手描きセル塗り。セクション 5.2 の固定行と同一</td></tr>
+<tr><td>フォント</td><td>Zen Kaku Gothic New（Regular / Medium / Bold。<code>remotion/public/fonts/</code>）</td><td>pref-ranking-1 と同じ（SIL OFL）。<code>@remotion/fonts</code> の <code>loadFont</code> で読み込む</td></tr>
+<tr><td>版面の座標・ビート・効果</td><td><code>remotion/src/timeline.ts</code> / <code>UmigameReel.tsx</code></td><td>実装が正。設計書には構成と不変条件のみ（方式設計書 8.2）</td></tr>
+</table>
+</div>
+<p>キャラ・フォントは git 管理のローカル資産で、S3 の固定アセット（<code>assets/{set_code}/</code>）には置かない（事前ビルド方式は実行時にアセットを使わないため。ranking-prebuilt の五郎と同じ扱い）。</p>
+
+<h2 id="comment-reply">10. コメント自動返信の運用</h2>
+<p>コメント時の処理は<strong>投稿時（既存 ECS + Aurora）と完全に分離</strong>し、Aurora を一切使わない。S3 の問題スナップショットを <code>media_id</code> キーの読み取り専用データストアとして使う（アイデア詳細 4）。インフラの構成（Function URL → Webhook Lambda → SQS FIFO + DLQ → Reply Lambda → S3 / OpenAI / Graph API。VPC 外・NAT 不要）は <a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>、監視は <a href="../../infra/workflow.html#alarms">workflow.html 8</a>、Secret は <a href="../../infra/security.html#comment-reply-secret">security.html 1.3</a> が正。本節はアプリの振る舞いと運用ルールを書く。</p>
+
+<h3>10.1 1 日の動き</h3>
+<div class="table-wrap">
+<table>
+<tr><th>時間帯</th><th>流れ</th><th>Aurora</th></tr>
+<tr><td>20:00 リール投稿</td><td>画像生成 SFN（ストック LRU → 事前動画取得 → <code>umigame_items</code> INSERT）→ SNS 投稿 SFN（キャプション展開 → publish）→ <strong>publish 成功直後に <code>problems/{media_id}.json</code> を S3 へ出力</strong>（10.2）</td><td>起動（従来どおり）→ 0 ACU へ</td></tr>
+<tr><td>日中〜翌日以降: コメント</td><td>コメント → Meta Webhook → Webhook Lambda（署名検証・自己返信スキップ・SQS enqueue・即時 200）→ Reply Lambda（S3 GET → OpenAI → Graph API 返信）。<strong>受信 → 返信 約 4 秒</strong>（PoC 実測）</td><td><strong>一度も起動しない</strong></td></tr>
+</table>
+</div>
+
+<h3 id="snapshot">10.2 投稿後スナップショット <code>problems/{media_id}.json</code></h3>
+<p>SNS 投稿バッチは <code>batch_sets.problem_snapshot_enabled=1</code> のセットについて、リール行が <code>success</code> に達した直後に S3 <code>assets/{set_code}/problems/{media_id}.json</code> を PUT し、<code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code> に記録する（共通フローの拡張ポイント = <a href="../batch-flow.html#problem-snapshot">batch-flow.html 3.3 手順 6</a>。データは <a href="../data-model.html#detail-umigame-items">data-model.html 4.14</a>）。<code>media_id</code> は <code>posts.platform_post_id</code>（<code>media_publish</code> の応答 id）。</p>
+<pre><code>{
+  "schema_version": 1,
+  "set_code": "umigame-soup-1",
+  "media_id": "17912345678901234",
+  "content_key": "001-lighthouse-letter",
+  "posted_at": "2026-09-20T11:00:12Z",
+  "problem_text": "……なぜ？",
+  "truth": "……",
+  "fact_sheet": ["……", "……"],
+  "rule_text": "「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します",
+  "master_rules": "（prompt_configs.prompt_text のセット固定部分。セクション 5.1）"
+}</code></pre>
+<ul>
+  <li>スナップショットの<strong>出力失敗は投稿失敗にしない</strong>（投稿は成功しているため <code>posts.status</code> は <code>success</code> のまま）。<code>snapshot_s3_key</code> が NULL の行を運用の確認クエリで拾い、手動で再出力する（<code>content/umigame-stock/.../tools/write_snapshot.py</code> を 21-5b で用意）。スナップショットが無い投稿へのコメントは Reply Lambda が S3 404 として<strong>返信せずログのみ</strong>残す（DLQ に入れない）</li>
+  <li>プレフィックス <code>assets/…/problems/</code> は 30 日ライフサイクルの対象外（<code>images/</code> <code>videos/</code> 限定）のため、投稿済み問題は残り続ける = 翌日以降のコメントにも答えられる</li>
+  <li>ステージング面（PoC アプリ + <code>test_tkghr</code>）は <code>assets/umigame-soup-1/staging/problems/</code> を読む。サンプルの JSON は手で置く（21-6 の人間ゲート）</li>
+</ul>
+
+<h3>10.3 返信の振る舞い（MVP スコープ）</h3>
+<ul>
+  <li><strong>返信する</strong>: 自アカウントのリールへのコメントと、そのスレッドへの返信（<code>parent_id</code> 付き。推理の続きであることが多い）。判定はすべて AI 出題者プロンプト（5.1）に委ねる</li>
+  <li><strong>返信しない</strong>: 自分の返信（<code>from.id == ig_user_id</code>。無限ループ防止）/ プロンプトが <code>NO_REPLY</code> を返したコメント / スナップショットの無い <code>media_id</code>（本セット以外の投稿・出力失敗）</li>
+  <li><strong>作らないもの</strong>（アイデア詳細 7）: ユーザーごとの質問回数制限・コメント回数の DB 管理・禁止ワード DB・ルールベース判定・会話状態管理・Lambda メモリキャッシュ・コメント処理からの Aurora アクセス・翌日の解答編リール。将来のゲーム化構想を理由に状態管理を先行実装しない（ステートレス方針）</li>
+  <li><strong>重複返信の抑止</strong>: Meta Webhook は同一イベントを再送しうるため、SQS FIFO の重複排除 ID に <code>comment_id</code> を使う（5 分窓）。窓外の再送で二重返信が起きる可能性は許容する（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a> の decision）</li>
+</ul>
+
+<h3>10.4 利用上限・費用</h3>
+<ul>
+  <li><strong>上限は 2 段</strong>（21-1 ⑤）: ① OpenAI 側のプロジェクト月額予算上限 ② Reply Lambda の予約同時実行数（初期値 2。SQS が吸収するため取りこぼしにならず、上限到達時は返信が遅れるだけ）</li>
+  <li><strong>試算の枠組み</strong>: 返信 1 件 = 入力 600 トークン前後（問題文・真相・確定事実シート・ルール・質問）+ 出力 30 トークン程度。月 6,000 件（1 日 200 コメント）で入力 3.6M・出力 0.2M トークン。事業戦略書 3.1 の費目「コメント自動返信の LLM API（従量のみ・月数百円規模）」の範囲。単価確認後に外れていれば 21-6 で戦略書を直す。AWS 側（Lambda・SQS・S3 GET 月 6,000 回・CloudWatch）は無料枠内〜数十円</li>
+  <li>モデルはプローブテスト後、本番稼働まで固定。差し替えは Secret ではなく Lambda の環境変数（<code>OPENAI_MODEL</code>）で行う</li>
+</ul>
+
+<h3>10.5 監視・運用</h3>
+<ul>
+  <li><strong>DLQ アラーム</strong>（<code>acps-prod-comment-reply-dlq-messages</code>。DLQ の可視メッセージ数 ≥ 1）が初期版の唯一の能動監視。通知が来たら DLQ のメッセージ本文（コメント id・media_id）と Reply Lambda のログで原因を見る（OpenAI 障害 / Graph API のトークン失効 / スナップショット欠落）。復旧後に DLQ → 元キューへ再駆動（SQS コンソールの「DLQ 再処理」）。手順は <a href="../../infra/operation.html#monitoring">infra/operation.html 4.1</a></li>
+  <li><strong>トークン</strong>: コメント返信用の長期トークン（Instagram ログイン方式）は 60 日で失効する。初期版は投稿用トークンと同じく手動更新とし、失効日は <code>token_expires_at</code> を Secret に持たせて <a href="../operation.html">運用設計 5.4</a> のリマインド運用に載せる。自動リフレッシュ（<code>GET /refresh_access_token</code>）の要否は開発計画の設計課題（2026-09-04）で追う</li>
+  <li><strong>ステージング面</strong>: PoC 資材（Meta アプリ + <code>test_tkghr</code> + 同一コードのステージング面スタック）を恒久利用し、プロンプト改訂・Lambda 改修は必ずステージング面で実コメントを打ってから本番の Webhook 先を切り替える</li>
+  <li><strong>コメント欄の目視</strong>: 稼働初期（2 週間）は毎日コメント欄を目視し、ネタバレ回答・矛盾回答・不適切な返信がないかを確認する。問題があればストックを <code>is_active=0</code> にし、プロンプト（5.1）を直してステージングで再検証する。週次補充スキル（21-8）にチェック項目として組み込む</li>
+</ul>
+
+<h2>11. 失敗時ポリシー</h2>
+<ul>
+  <li><strong>投稿側</strong>は共通フローどおり（<a href="../batch-flow.html">batch-flow.html</a> 3.2 / <a href="../operation.html">operation.html</a> 4）。事前動画の取得失敗・ストック 0 件はフェイルラウド（縮退しない）。1 日 1 回のため 1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの判断は共通課題（設計課題リスト 2026-07-26）に従う</li>
+  <li><strong>スナップショット出力の失敗</strong>は投稿失敗にせず、NULL 行の確認クエリと手動再出力で回復する（10.2）</li>
+  <li><strong>コメント側</strong>: Reply Lambda の失敗は SQS の再試行（最大 3 回）→ DLQ → アラーム。返信が遅れる・付かないことはあっても<strong>投稿には影響しない</strong>。Webhook Lambda は署名検証に失敗した要求を 401 で拒否し、正常受信は SQS へ入れた時点で 200 を返す（Meta の再送を招かないため、enqueue 失敗以外は 200）</li>
+  <li><strong>OpenAI の長期障害</strong>: 予約同時実行数と SQS の保持期間（4 日）内なら復旧後に自動で返信が付く。それを超えた分は DLQ から手動で再駆動するか、古すぎれば破棄する（返信の鮮度を優先）</li>
+</ul>
+
+<h2>12. 共通フローからの差分・特記事項</h2>
+<p><strong>使用方式は <code>umigame-prebuilt</code></strong>（<a href="../generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>。Remotion ローカル事前ビルド + 実行時は取得のみ。ranking-prebuilt 同型で LRU 軸なし・単尺）。本セットは共通テーブルのうち <code>umigame_stock_items</code>（ストック）と <code>umigame_items</code>（投稿履歴 + スナップショット記録）を使う唯一のセットである（<a href="../data-model.html#detail-umigame-items">data-model.html 4.14 / 4.15</a>。V012）。</p>
+<ul>
+  <li><strong>共通骨格への変更は 2 点のみ</strong>: ① SNS 投稿バッチのキャプション展開に umigame 系プレースホルダを追加 ② publish 成功直後の問題スナップショット出力（<code>batch_sets.problem_snapshot_enabled</code> で有効化。V012 で追加）。いずれも 21-5b で実装</li>
+  <li><strong>外向き発信・イングレスを持つ初の機能</strong>: コメント自動返信は本システムで初めて外部からの要求（Meta Webhook）を受け、ユーザーに向けて自動で発信する。投稿時と完全分離した構成（10）と、ステージング面での必須検証（10.5）でリスクを閉じる。ステージング環境の一般論は設計課題リスト 2026-08-28（フル 2 面化はしない・本経路だけ例外）</li>
+  <li><strong>Remotion Skills 2.0 を標準ツーリングとして継続</strong>（21-2 人間ゲート）: <code>.agents/skills/remotion-*</code> 正本 + <code>.claude/skills/remotion-*</code> のスキル単位リンク（skills CLI 1.5.23・スキル版 4.0.520）。更新は <code>npx skills update</code>。既存 2 セットへの遡及適用は本フェーズの対象外</li>
+  <li><strong>ストーリーズ再掲</strong>は初期版では使わない（<code>stories_enabled=0</code>）。コメント欄への導線はリール本体が担うため</li>
+  <li><strong>効果検証</strong>: インサイト収集（<a href="../batch-flow.html#flow-insights">batch-flow.html 4</a>）は既存どおり Scheduler 2 件を 21-7 で追加。コメント系指標（<code>comments</code>）は既存の指標セットに含まれており、コメント率の確認は月次 KPI 転記（<a href="../operation.html">運用設計 6.3</a>）で行う</li>
+</ul>
+
+</div>
+</body>
+</html>

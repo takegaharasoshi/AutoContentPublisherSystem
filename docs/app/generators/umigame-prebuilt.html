@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方式設計書: umigame-prebuilt | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / umigame-prebuilt</nav>
+<h1>方式設計書: umigame-prebuilt</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Fix（21-3 で作成）</span>
+  <span>方式名（レジストリキー）: umigame-prebuilt</span>
+  <span>最終更新: 2026-09-04</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  生成方式 <code>umigame-prebuilt</code>（ウミガメのスープ リール動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプラインの技術設計（セクション 8。Remotion コンポジション・TTS 同期を含む）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、採用セット固有の設定（アカウント・スケジュール・素材項目・キャプション・音源・TTS 話者・固定アセット・コメント返信の運用）は <a href="../sets/umigame-soup-1.html">sets/umigame-soup-1.html</a> を参照。<strong><code>ranking-prebuilt</code>（<a href="ranking-prebuilt.html">方式設計書</a>）と同型</strong>で、差分は「単尺（24 秒）・LRU の軸なし・投稿後スナップショットの対象（スナップショット出力自体は SNS 投稿バッチの責務）」の 3 点。21-2 の PoC（<code>content/video-build/umigame-soup-1/</code>）で完成版リールを 1 本作り、人間ゲートで「この版面を本方式の基準とする」と決めたうえで本書を Fix した。
+</div>
+
+<div class="warn">
+  <span class="callout-title">適用状態</span>
+  21-3（2026-09-04）で設計 Fix。ビルドツーリングと第 1 バッチの全数ビルドは 21-5a、方式モジュール（<code>services/image-batch/app/generators/umigame_prebuilt.py</code> + <code>REGISTRY</code> 登録）は 21-5b、稼働開始は 21-7 を予定（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 21）。本書は目標設計であり、実装時の差分は decision コールアウトで追記する。版面の座標・ビート・効果の<strong>実装の正は <code>remotion/src/timeline.ts</code> と <code>UmigameReel.tsx</code></strong>であり、本書には構成と不変条件だけを書く（21-2 申し送り）。
+</div>
+
+<h2>1. 方式概要</h2>
+<p><strong>ウミガメのスープ 1 問につきリール動画（1080x1920・30fps・24 秒・AAC）をローカルで事前にビルドし、全数人間レビューのうえ S3 に作り置く</strong>。実行時（画像生成バッチ）はストック <code>umigame_stock_items</code> のうちビルド済みの行を LRU 順繰りで 1 件選び、事前動画を S3 から取得して <code>GeneratorResult</code> として返すだけで、<strong>外部 API・レンダリングを実行時に使わない</strong>（定常費ゼロ路線。<code>quiz-prebuilt</code> / <code>ranking-prebuilt</code> と同じ思想）。</p>
+<ul>
+  <li><strong>レンダラー</strong>: Remotion 4.0.520（<code>create-video</code> 雛形 + <strong>Remotion Skills 2.0</strong> の指針〔<code>remotion-create</code> / <code>remotion-markup</code> / <code>remotion-render</code>〕で作ったコンポジション）。レンダリングは既存どおり <code>build.py</code> からの Docker 委譲（<code>remotion-render</code> イメージへの bind-mount + <code>npx remotion render</code>）</li>
+  <li><strong>フォーマット</strong>: 9:16・<strong>24 秒 = 720 フレーム固定・ループ前提</strong>（末尾と先頭の状態を一致させる）。つかみ帯 + 問題カード + ルール帯を常時表示し、下部ゾーンでキャラ 2 体の吹き出しが時間で切り替わる（セクション 8.2）</li>
+  <li><strong>素材</strong>: ストック 1 件 = 素材 14 項目（<a href="../sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>）。背景イラストは imagegen で 1 問 1 枚、キャラ 2 体はセット固定</li>
+  <li><strong>ナレーション</strong>: Amazon Polly Neural（Takumi・125%）で冒頭の 2 cue（問題文・ルール）だけを読む。吹き出しとは同期しない</li>
+  <li><strong>参加型の要素は方式の外</strong>: コメント自動返信は SNS 投稿バッチが出力する問題スナップショット（<a href="../batch-flow.html#problem-snapshot">batch-flow.html 3.3 手順 6</a>）と Lambda（<a href="../../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>）が担い、本方式は <code>umigame_items</code> に問題固有部分をスナップショットしておくところまでを責務とする</li>
+</ul>
+
+<h2>2. 契約の実装</h2>
+<p>共通の契約（<a href="../batch-flow.html#generator-strategy">batch-flow.html「生成方式の契約」</a>）を <code>generate(context: GeneratorContext) -&gt; GeneratorResult</code> で実装する。冪等性（完了判定）・S3 保存・DB 登録・トランザクション制御は共通骨格（<code>processing.py</code>）の責務であり、本方式は関与しない。<strong>共通骨格・SNS 投稿バッチの変更は、キャプション展開への umigame 系プレースホルダ追加と、publish 成功直後の問題スナップショット出力（<a href="../batch-flow.html#problem-snapshot">batch-flow.html 3.3</a>。実装 21-5b）の 2 点のみ</strong>。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>要素</th><th>使い方</th></tr></thead>
+  <tbody>
+    <tr><td><code>context.prompt_config</code></td><td><code>parameters</code>（尺。セクション 3）・<code>set_id</code>。<code>prompt_text</code> は<strong>本方式では未使用</strong>（セット別設計書 5.1 の decision により AI 出題者プロンプトのセット固定部分に充てる。読むのは SNS 投稿バッチのスナップショット出力）</td></tr>
+    <tr><td><code>context.scheduled_at</code></td><td>スロット解決には使わない（単一スロット）。ログ出力のみ</td></tr>
+    <tr><td><code>context.generation_run_id</code></td><td><code>umigame_items</code> INSERT の紐づけ</td></tr>
+    <tr><td><code>context.cursor</code></td><td><code>batch_sets</code>（set_code 解決）・<code>umigame_stock_items</code>（ストック取得・<code>last_used_at</code> / <code>use_count</code> 更新）・<code>umigame_items</code>（履歴 INSERT）</td></tr>
+    <tr><td><code>context.s3_client</code> / <code>context.s3_bucket</code></td><td>事前動画の取得（<code>acps_shared.s3.get_object</code>。セクション 5）</td></tr>
+    <tr><td>戻り値 <code>GeneratorResult.media</code></td><td><code>MediaOutput</code> 1 件（MP4、<code>width</code>=1080 / <code>height</code>=1920 / <code>duration_seconds</code>=24 / <code>audio_asset_id</code>=ストック行の <code>video_audio_asset_id</code> を転記）</td></tr>
+    <tr><td>戻り値 <code>GeneratorResult.intermediates</code></td><td>0 件</td></tr>
+  </tbody>
+</table>
+</div>
+<p>処理順序: ① <code>parameters</code> 検証 → ② <strong>ストック取得（ビルド済み限定の LRU。セクション 4）</strong> → ③ <strong>S3 から事前動画を取得</strong>（欠落はフェイルラウド。セクション 5）→ ④ <code>umigame_items</code> INSERT + ストックの <code>last_used_at</code> / <code>use_count</code> 更新 → ⑤ <code>GeneratorResult</code> を返す。フォント・キャラアセット・BGM の事前検査、API キー取得はいずれも<strong>不要</strong>（実行時に使わないため）。</p>
+
+<h2 id="parameters">3. 入力（parameters。単一スロット・単尺）</h2>
+<p><code>prompt_configs.parameters</code> は次の 1 キーのみ。スロット定義（<code>slots</code>）は持たない（投稿は 20:00 の 1 日 1 回・尺は 1 つのため。<a href="../sets/umigame-soup-1.html">セット別設計書 3</a>）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>フィールド</th><th>必須</th><th>役割</th></tr></thead>
+  <tbody>
+    <tr><td><code>duration_seconds</code></td><td>必須</td><td>投稿する尺。<strong>24 のみ許容</strong>（それ以外は parameters 不正として異常終了）。<code>MediaOutput.duration_seconds</code> に転記し、ストック行の <code>video_s3_key</code> が指す動画の尺と一致することの宣言でもある</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、21-3）: 単尺・単一スロット。尺の複数化は想定しない</span>
+  ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。理由: ① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低い。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。
+</div>
+
+<h2 id="stock">4. ストックの取得（ビルド済み限定の LRU 順繰り・軸なし）</h2>
+<pre><code>SELECT id, content_key, problem_text, truth, fact_sheet, rule_text, caption, hook,
+       video_s3_key, video_audio_asset_id, use_count
+FROM umigame_stock_items
+WHERE set_id = %s AND is_active = 1 AND video_s3_key IS NOT NULL
+ORDER BY last_used_at IS NULL DESC, last_used_at ASC, id ASC
+LIMIT 1 FOR UPDATE;</code></pre>
+<ul>
+  <li><strong>絞り込み</strong>: セット専属・有効・<strong>ビルド済み（<code>video_s3_key IS NOT NULL</code>）</strong>のみ。難易度・型・スロットの軸は持たない（<code>ranking-prebuilt</code> と同じ 3 カラム索引 <code>KEY (set_id, is_active, last_used_at)</code>）</li>
+  <li><strong>0 件はフェイルラウド</strong>（縮退しない）。在庫水位の監視は運用側（週次補充。在庫 14 件以上を目安 = セット計画書で管理）</li>
+  <li><strong>再利用 WARNING</strong>: 選んだ行の <code>use_count &gt;= 1</code> なら WARNING ログ（「ストック枯渇により再出題」）。参加型の性質上、<strong>同じ問題の再出題はコメント欄の推理が使い回されるため、既存 2 セットより再利用の弊害が大きい</strong>。補充が追いつかない場合は再出題より投稿スキップ（<code>is_active=0</code> による一時停止）を優先する運用とする（セット計画書のバックログ）</li>
+  <li>取得後、同一トランザクションで <code>last_used_at = NOW()</code> / <code>use_count = use_count + 1</code> に更新し、<code>umigame_items</code> に問題固有部分をスナップショットする（セクション 6）</li>
+  <li><strong>防御的フィールド検査</strong>: <code>fact_sheet</code> が配列でない・<code>problem_text</code> が空などは方式内で検出して異常終了（スナップショット出力がコメント経路の前提になるため、投稿前に止める）</li>
+</ul>
+
+<h2 id="fetch">5. 事前動画の取得</h2>
+<p><code>umigame_stock_items.video_s3_key</code>（<code>assets/{set_code}/prebuilt/{content_key}.mp4</code>。<a href="../data-model.html#s3-key">data-model.html 5</a>）から MP4 を取得し、<code>MediaOutput</code> のバイト列として返す。方式はキーを組み立てず<strong>常にカラム経由で参照</strong>する。取得失敗（NoSuchKey・権限）は縮退せず異常終了（NULL でない = ビルド済みの宣言と S3 の実体が食い違う状態は、ツーリング側の publish 手順の不備なので投稿を止めて気づく）。</p>
+
+<h2>6. 出力とストレージ</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>成果物</th><th>S3</th><th>DB</th></tr></thead>
+  <tbody>
+    <tr><td>投稿する MP4</td><td><code>videos/{set_code}/{YYYYMMDD}/{generation_run_id}/{prompt_config_id}_0.mp4</code>（共通骨格が保存。事前動画のコピー）</td><td><code>generated_media</code> 1 行（<code>file_format='mp4'</code>・<code>audio_asset_id</code> = ストックの <code>video_audio_asset_id</code>）</td></tr>
+    <tr><td>出題履歴 + 問題固有部分のスナップショット</td><td>—</td><td><code>umigame_items</code> 1 行（<code>generation_run_id</code> と 1 : 1。<code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>rule_text</code> / <code>caption</code> / <code>hook</code> / <code>stock_item_id</code>。<a href="../data-model.html#detail-umigame-items">data-model.html 4.14</a>）。行の作成は方式・commit は共通骨格</td></tr>
+    <tr><td>問題スナップショット JSON（コメント返信用）</td><td><code>assets/{set_code}/problems/{media_id}.json</code></td><td><code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code>。<strong>本方式ではなく SNS 投稿バッチが publish 成功直後に出力・記録する</strong>（<code>media_id</code> は publish 後にしか分からないため）</td></tr>
+  </tbody>
+</table>
+</div>
+<p><code>umigame_items</code> に問題固有部分を丸ごと持つ理由: SNS 投稿バッチが<strong>ストックを再参照せずに</strong>キャプション展開とスナップショット出力を行えるようにするため（ストックの後日修正が投稿済み問題の返信ルールに波及しない = 投稿時点の内容で固定される）。<code>expected_questions</code> / <code>illustration_prompt</code> / <code>narration</code> はスナップショットしない（投稿後に使わないため）。</p>
+
+<h2>7. エラーハンドリング</h2>
+<p>方式内リカバリループ（再生成・代替素材）は持たない。すべて異常終了させ、共通骨格が <code>generation_runs.status='failed'</code> にして Step Functions の失敗アラームで通知する。</p>
+<ul>
+  <li><code>parameters</code> 不正（<code>duration_seconds</code> ≠ 24・欠落）→ 異常終了</li>
+  <li>ストック 0 件（有効・ビルド済みなし）→ 異常終了（フェイルラウド）</li>
+  <li>事前動画の取得失敗 → 異常終了</li>
+  <li>ストック行のフィールド不正（JSON の型・必須空）→ 異常終了</li>
+  <li>再出題（<code>use_count &gt;= 1</code>）→ 続行 + WARNING</li>
+</ul>
+
+<h2 id="build">8. 事前ビルドパイプライン（供給側の設計）</h2>
+
+<h3 id="build-steps">8.1 工程（6 段 + レビュー）</h3>
+<p>ツーリングは <code>content/umigame-stock/umigame-soup-1/</code>（ストック整備）と <code>content/video-build/umigame-soup-1/</code>（ビルド）に置く。quiz / ranking のツーリング（<code>export_prompts.py</code> / <code>intake.py</code> / <code>build.py</code> / <code>review_sheet.py</code> / <code>publish.py</code>）を流用し、21-2 の PoC 資材（<code>build.py</code>・<code>scripts/</code>・<code>remotion/</code>）を本組みする（21-5a）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>#</th><th>工程</th><th>入力 → 出力</th><th>ツール</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>素材執筆・機械検証</td><td>素材 14 項目（<code>stock_items.py</code>）→ <code>validate.py</code> 全件 OK（字数・必須項目・<code>#AIart</code>・画風固定行・プレイ例の「はい」1 つ・オリジナル宣言）</td><td>21-4a</td></tr>
+    <tr><td>2</td><td>プローブテスト</td><td><code>expected_questions</code> を AI 出題者（本番と同じモデル・<code>master_prompt.txt</code>）に答えさせ <code>work/review.html</code> に並べる → 人間が矛盾・ネタバレを一括レビュー</td><td><code>probe_test.py</code>（返信ロジックは PoC の <code>generate_reply</code> を流用）</td></tr>
+    <tr><td>3</td><td>背景イラスト生成</td><td><code>illustration_prompt</code> → <code>{content_key}_bg.png</code>（imagegen 9:16）→ 1080x1920 へ正規化（<code>prepare_assets.py</code>）</td><td><code>codex exec</code> の <code>image_gen.imagegen</code>（<code>gen_images.sh</code>）</td></tr>
+    <tr><td>4</td><td>BGM 選曲</td><td><code>audio_assets</code>（<code>asset_type='bgm'</code>）の順繰り → S3 から取得・<code>video_audio_asset_id</code> を確定</td><td><code>build.py</code></td></tr>
+    <tr><td>5</td><td>ナレーション TTS</td><td><code>narration.problem</code> / <code>.rule</code> → Polly Neural（Takumi・125%）→ cue ごとの MP3 + 実測長 → 予算検査（8.3）</td><td><code>scripts/narration_polly.py</code></td></tr>
+    <tr><td>6</td><td>レンダリング + 正規化</td><td>props（素材 + 画像 + 音声 + 実測長）→ Remotion → MP4 → ラウドネス正規化（-14 LUFS / -2 dBTP）→ ffprobe 検査 + 継ぎ目検査（フレーム 0 と 719 の差分）→ 静止フレーム書き出し</td><td><code>build.py</code>（Docker 委譲）</td></tr>
+    <tr><td>R</td><td>全数レビュー → 配置</td><td><code>work/review.html</code>（動画 + 静止フレーム + キャプション）→ <code>work/approved.txt</code> → <code>publish.py</code>（S3 <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> + <code>_bg.png</code>）→ <code>update_prebuilt.sql</code>（<code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>）をローカル MySQL と Aurora へ</td><td>人間ゲート + <code>publish.py</code></td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li><strong>再現性</strong>: 工程 3・5 の出力（背景 PNG・TTS 音声）は <code>work/</code> に残し、版面だけの改訂は工程 6 からやり直せるようにする。背景原画は S3 <code>_bg.png</code> にも置く（再ビルド資産。DB 記録なし）</li>
+  <li><strong>プローブテスト（工程 2）はレビューの前提</strong>: 素材レビューは「動画のイメージ + 想定質問への実回答」を並べて見る（21-2 で確定した進め方）</li>
+  <li>キャラ画像・フォント・SE はセット固定資産（<a href="../sets/umigame-soup-1.html#assets">セット別設計書 9</a>）で工程には含めない</li>
+</ul>
+
+<h3 id="composition">8.2 動画の作り（24 秒・ループ前提のコンポジション）</h3>
+<p>1080x1920・30fps・<strong>720 フレーム</strong>。版面は logic-training-1 の骨格（常時表示の上部 + 時間で切り替わる下部）に寄せ、イラストは背景に敷く。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ゾーン</th><th>要素</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>背景（全面）</td><td>問題の情景イラスト 1 枚 + 薄いオーバーレイ。ゆっくりしたズーム呼吸（周期 720）</td><td>中間調で生成し、暗くしすぎない（21-2 決定）</td></tr>
+    <tr><td>上部（常時・不変）</td><td>つかみ帯（<code>hook</code>・74px・1 行。光沢スイープ + 呼吸）→ 見出し「問題」（アクセントバー伸縮）+ 問題カード（<code>problem_text</code> 全文・44px）→ ルール帯（<code>rule_text</code>・34px・2 行）</td><td>幅 900・左右余白 90 で中央寄せ（第 3 稿）。フレーム 0 から末尾まで不変</td></tr>
+    <tr><td>下部（時間で切替）</td><td>出題者カメロック（左下に常駐。浮遊 + 呼吸。「はい」の返答時だけ喜びポーズ）+ 名札 / 質問者 Jr.（右寄り。浮遊）/ 吹き出し（スナップ切替 + ポップイン + 小さな跳ね 30px + SE）</td><td>右 12% は Instagram UI に空ける。吹き出し 42px・1 行上限は出題者 17 字 / Jr. 16 字</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>ビート（<code>timeline.ts</code> の <code>BEATS</code>）</strong>:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>区間</th><th>フレーム</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>導入</td><td>0〜90（3 秒）</td><td>出題者「質問してみて！」（吹き出しは静止 = 継ぎ目でフレーム 0 と一致させるためポップインしない）</td></tr>
+    <tr><td>3 往復</td><td>90〜450（4 秒 × 3）</td><td>各往復: Jr. の質問 60f → <strong>質問を残したまま</strong>出題者の返答を追加 60f。返答「はい」の往復で出題者が喜びポーズに切り替わる</td></tr>
+    <tr><td>出題者の締め</td><td>450〜570（4 秒）</td><td>「何度でも答えるよ。コメントで質問！」（グロー脈動）</td></tr>
+    <tr><td>Jr. の締め</td><td>570〜708（4.6 秒）</td><td>「面白かったら、いいね、フォローよろしくね！」（吹き出しのみ・ナレーションなし）</td></tr>
+    <tr><td>継ぎ目</td><td>708〜720（0.4 秒）</td><td>導入と同じ状態へ戻す</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>不変条件</strong>（logic-training-1 の <code>timeline.ts</code> を踏襲。モジュール読み込み時に検査）:</p>
+<ul>
+  <li>フレーム 720 = フレーム 0（ループの継ぎ目が見えない）。ビルド後に最終 MP4 のフレーム 0 と 719 の差分で検証する</li>
+  <li>周期アニメーション（つかみ帯の光沢 120 / 呼吸 144 / 見出しバー 144 / 出題者の浮遊 120・呼吸 180 / Jr. の浮遊 90 / 締めのグロー 90 / 名札の点 80 / 背景ズーム 720）の周期はすべて <strong>720 の約数</strong></li>
+  <li>吹き出しの切替は<strong>スナップ</strong>（クロスフェードは二重露光に見える。R-1 の実測）。切替フレームで SE を 1 回鳴らし、小さな跳ね（30px・減衰 0.8 秒）を付ける</li>
+  <li>ビートは順序どおり・隙間なし・末尾が 720</li>
+</ul>
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、21-2 人間ゲート 2 巡）: 版面の基準は第 3 稿。実装は <code>Interactive.Div</code> + inline <code>interpolate()</code> の構造を維持する</span>
+  第 1 稿（20 秒・VOICEVOX・カートゥーン画風・質問者クマノミ）→ 第 2 稿（画風 C4・グルメ探偵カメロック + Jr.・24 秒・Polly Takumi 125%・質問と返答の並列表示・効果 8 種）→ 第 3 稿（Jr. の視線を父へ・つかみ帯と問題カードを中央寄せ）で承認。Remotion Skills の指針どおり <code>Interactive.Div</code> + inline style + inline <code>interpolate()</code> で書いた構造は Studio で要素を選択・調整できるため、21-5a の本組み（ストックのフィールドから props を組む形へ）でもこの構造を崩さない。周期アニメーション（sin のゆれ）は <code>interpolate()</code> で書けないため <code>translate</code> 文字列で書く（Studio では計算値扱い）。<code>video-layout.md</code> の下限（重要テキスト 44px）に対しルール帯 34px は下回るが、常時表示の固定要素で 2 行に収める必要があり人間ゲートで許容した。
+</div>
+
+<h3 id="tts-sync">8.3 ナレーションと TTS のフレーム同期（固定アンカー + 予算検査）</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>cue</th><th>開始</th><th>内容</th><th>予算</th></tr></thead>
+  <tbody>
+    <tr><td><code>problem</code></td><td>フレーム 15（0.5 秒）</td><td><code>narration.problem</code>（表示文と別の読み上げ用の文）</td><td rowspan="2"><code>problem</code> 実測長 + 1.2 秒 + <code>rule</code> 実測長 ≦ <strong>21.0 秒</strong>（= 開始 0.5 秒 + 21 秒 &lt; 継ぎ目 23.6 秒に 2 秒の余裕）</td></tr>
+    <tr><td><code>rule</code></td><td><code>problem</code> 終了 + 36 フレーム（1.2 秒）</td><td><code>narration.rule</code></td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li>cue ごとに Polly で合成し（Neural・Takumi・<code>&lt;prosody rate="125%"&gt;</code>）、実測長（ffprobe）を props に渡してアンカーへ配置する。<strong>吹き出しとは同期しない</strong>ため、cue の長短で版面は変わらない</li>
+  <li><strong>予算超過はビルドエラー</strong>（問題文か cue の句読点を削る）。予測長 / 実測長の許容差は cue 長に比例させる（12 秒級で 0.1 秒程度ずれる実測。21-2 所見）</li>
+  <li>BGM は <code>@remotion/media</code> の <code>&lt;Audio&gt;</code> で 24 秒トラックをそのまま敷く（ループなし = 継ぎ目なし）。ナレーション区間は BGM を -6dB 程度ダッキングし、SE は切替フレームに置く。最終 MP4 を -14 LUFS / -2 dBTP へ正規化</li>
+  <li>TTS アダプタは差し替え可能にする（Polly が既定。VOICEVOX 版は残置）。Polly は <code>~/.aws</code> の資格情報でビルド時にローカル実行し、新規の Secret は要らない</li>
+</ul>
+
+<h3 id="rebuild">8.4 再ビルドが必要になる変更</h3>
+<div class="warn">
+  <span class="callout-title">事前動画はベイク済み。以下を変えたら対象ストックを再ビルドして <code>publish.py</code> で差し替える</span>
+  <ul style="margin:.3rem 0 0;">
+    <li>素材の表示部分（<code>problem_text</code> / <code>hook</code> / <code>rule_text</code> / <code>play_example</code> / <code>character_lines</code> / <code>narration</code> / 背景）。<strong><code>truth</code> / <code>fact_sheet</code> / <code>expected_questions</code> / <code>caption</code> / <code>source_note</code> の修正は再ビルド不要</strong>（版面に出ないため）。ただし <code>caption</code> は <code>umigame_items</code> に投稿時点でスナップショットされるため、修正は以後の投稿から効く</li>
+    <li>版面（<code>timeline.ts</code> / <code>UmigameReel.tsx</code>）・キャラ画像・フォント・SE・尺</li>
+    <li>TTS 話者・話速・cue 間の間隔</li>
+    <li>Remotion / <code>@remotion/media</code> の版（見た目が変わりうる）</li>
+  </ul>
+  再ビルド後は <code>video_built_at</code> を更新する。全数再ビルドは在庫（14〜30 件）に対して 1 件 1〜2 分（TTS + レンダリング）で、背景再生成を伴わなければ 1 時間以内。
+</div>
+
+<h2>9. 依存ライブラリ・実行環境</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>依存</th><th>版 / 実行形態</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>Remotion（<code>remotion</code> / <code>@remotion/cli</code> / <code>@remotion/media</code> / <code>@remotion/fonts</code>）</td><td>4.0.520（<code>create-video</code> 雛形。Tailwind は外し、<code>tsconfig</code> に <code>dom</code> を追加）</td><td>レンダリングは <code>remotion-render</code> Docker イメージへの bind-mount（<code>-e HOME=/tmp --user uid:gid</code>）。Studio はホストで <code>npm run studio</code></td></tr>
+    <tr><td>Remotion Skills 2.0</td><td>skills CLI 1.5.23・スキル版 4.0.520・6 本（best-practices / create / markup / render / docs / upgrade）</td><td><code>.agents/skills/remotion-*</code> 正本 + <code>.claude/skills/remotion-*</code> リンク + <code>skills-lock.json</code>。更新は <code>npx skills update</code>（版が上がったら README とロックを更新してコミット）</td></tr>
+    <tr><td>Amazon Polly（Neural・Takumi）</td><td><code>boto3</code>・ローカルの AWS 資格情報</td><td>クレジット不要。VOICEVOX Engine は不要（アダプタは残置）</td></tr>
+    <tr><td>ffmpeg / ffprobe</td><td><code>image-batch:ffmpeg-check</code> Docker イメージ</td><td>WSL に ffmpeg は無い。正規化・ラウドネス・静止フレーム・継ぎ目検査に使う</td></tr>
+    <tr><td>imagegen</td><td>Codex CLI 0.144.1 の <code>image_gen.imagegen</code>（<code>codex exec</code>）</td><td>1 枚 1〜2 分。透過指定の無視・ノイズ状背景の対処は 21-2 README</td></tr>
+    <tr><td>OpenAI API（プローブテスト）</td><td><code>gpt-5.6-luna</code>（21-1 ⑤）</td><td>ローカルの環境変数からキーを読む。本番の Reply Lambda と同じプロンプト（<code>master_prompt.txt</code>）を使う</td></tr>
+  </tbody>
+</table>
+</div>
+
+</div>
+</body>
+</html>

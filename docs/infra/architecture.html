@@ -13,7 +13,7 @@
 <h1>アーキテクチャ設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-07-06</span>
+  <span>最終更新: 2026-09-04（21-3: セクション 1.1 にコメント自動返信経路〔イングレス・VPC 外・2 面構成〕を追加）</span>
 </div>
 
 <p>本システムは AWS マネージドサービスを中心に構成し、バッチ実行時のみリソースを起動するコスト効率の高い設計とする。</p>
@@ -121,6 +121,72 @@
 <figcaption>全体アーキテクチャ。ワークフローの詳細は <a href="workflow.html">workflow.html</a>、CI/CD の詳細は <a href="cicd.html">cicd.html</a> を参照。</figcaption>
 </figure>
 
+<h3 id="comment-reply">1.1 コメント自動返信経路（イングレスを持つ初の機能。Phase 21-3 設計・21-6 実装）</h3>
+<p>第 4 セット umigame-soup-1（<a href="../app/sets/umigame-soup-1.html">セット別設計書</a>）のコメント自動返信は、本システムで初めて<strong>外部からの要求（Meta Webhook）を受け、ユーザーに向けて自動で発信する</strong>経路である。投稿時（上図の既存バッチ + Aurora）と<strong>完全に分離</strong>し、コメント時は Aurora を使わず S3 の問題スナップショットだけを読む。VPC の外で動き、NAT Gateway を使わない。</p>
+<figure class="diagram">
+<svg viewBox="0 0 900 330" role="img" aria-label="コメント自動返信経路">
+  <defs>
+    <marker id="arrow-cr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--diag-line)"/>
+    </marker>
+  </defs>
+  <!-- 投稿時（既存） -->
+  <rect x="20" y="20" width="400" height="120" rx="10" fill="none" stroke="var(--diag-box-border)" stroke-width="1.5"/>
+  <text x="220" y="42" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">投稿時（既存: 20:00 の日次バッチ。Aurora 使用）</text>
+  <rect x="40" y="60" width="120" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="100" y="78" text-anchor="middle" font-size="12" fill="var(--diag-text)">sns-post-batch</text>
+  <text x="100" y="94" text-anchor="middle" font-size="10" fill="var(--diag-text)">ECS + Aurora</text>
+  <rect x="200" y="60" width="90" height="44" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="245" y="86" text-anchor="middle" font-size="12" fill="var(--diag-text)">Instagram</text>
+  <line x1="160" y1="82" x2="196" y2="82" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow-cr)"/>
+  <text x="178" y="72" text-anchor="middle" font-size="9" fill="var(--diag-text)">publish</text>
+  <rect x="310" y="60" width="96" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="358" y="78" text-anchor="middle" font-size="11" fill="var(--diag-text)">S3</text>
+  <text x="358" y="94" text-anchor="middle" font-size="9" fill="var(--diag-text)">problems/{media_id}.json</text>
+  <line x1="160" y1="96" x2="308" y2="110" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow-cr)"/>
+  <text x="240" y="128" text-anchor="middle" font-size="9" fill="var(--diag-text)">成功直後にスナップショット PUT</text>
+  <!-- コメント時（新規） -->
+  <rect x="20" y="160" width="860" height="150" rx="10" fill="none" stroke="var(--diag-box-border)" stroke-width="1.5"/>
+  <text x="450" y="182" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">コメント時（CommentReplyStack。VPC 外・Aurora 不使用）</text>
+  <rect x="40" y="210" width="90" height="44" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="85" y="228" text-anchor="middle" font-size="11" fill="var(--diag-text)">Meta</text>
+  <text x="85" y="244" text-anchor="middle" font-size="10" fill="var(--diag-text)">Webhook</text>
+  <rect x="170" y="210" width="130" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="235" y="228" text-anchor="middle" font-size="11" fill="var(--diag-text)">Webhook Lambda</text>
+  <text x="235" y="244" text-anchor="middle" font-size="9" fill="var(--diag-text)">Function URL・署名検証</text>
+  <line x1="130" y1="232" x2="166" y2="232" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow-cr)"/>
+  <rect x="340" y="210" width="110" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="395" y="228" text-anchor="middle" font-size="11" fill="var(--diag-text)">SQS FIFO</text>
+  <text x="395" y="244" text-anchor="middle" font-size="9" fill="var(--diag-text)">+ DLQ（アラーム）</text>
+  <line x1="300" y1="232" x2="336" y2="232" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow-cr)"/>
+  <rect x="490" y="210" width="120" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="550" y="228" text-anchor="middle" font-size="11" fill="var(--diag-text)">Reply Lambda</text>
+  <text x="550" y="244" text-anchor="middle" font-size="9" fill="var(--diag-text)">予約同時実行 2</text>
+  <line x1="450" y1="232" x2="486" y2="232" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow-cr)"/>
+  <rect x="660" y="196" width="100" height="32" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
+  <text x="710" y="216" text-anchor="middle" font-size="10" fill="var(--diag-text)">S3 GET（問題）</text>
+  <rect x="660" y="238" width="100" height="32" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="710" y="258" text-anchor="middle" font-size="10" fill="var(--diag-text)">OpenAI API</text>
+  <rect x="660" y="280" width="100" height="26" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
+  <text x="710" y="297" text-anchor="middle" font-size="10" fill="var(--diag-text)">Graph API 返信</text>
+  <line x1="610" y1="224" x2="656" y2="212" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow-cr)"/>
+  <line x1="610" y1="232" x2="656" y2="254" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow-cr)"/>
+  <line x1="610" y1="240" x2="656" y2="292" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow-cr)"/>
+  <rect x="780" y="210" width="90" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
+  <text x="825" y="228" text-anchor="middle" font-size="10" fill="var(--diag-text)">Secrets</text>
+  <text x="825" y="244" text-anchor="middle" font-size="9" fill="var(--diag-text)">comment-reply</text>
+  <!-- 投稿時 → コメント時（S3 経由） -->
+  <line x1="358" y1="104" x2="700" y2="192" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow-cr)"/>
+</svg>
+<figcaption>コメント自動返信経路。上段は既存の投稿バッチが publish 成功直後に問題スナップショットを S3 へ置くところまで、下段はコメントごとの処理（Aurora に触れない）。スタックの構成は <a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>、Secret は <a href="security.html#comment-reply-secret">security.html セクション 1.3</a>、アプリの振る舞いは <a href="../app/sets/umigame-soup-1.html#comment-reply">セット別設計書セクション 10</a> を参照。</figcaption>
+</figure>
+<ul>
+  <li><strong>受信</strong>: Lambda Function URL（<code>authType: NONE</code>）で Meta Webhook を直接受ける。認証は Meta の <code>X-Hub-Signature-256</code>（HMAC-SHA256・鍵は Instagram アプリシークレット）を Lambda 内で検証することで担保する。API Gateway は採らない（WAF・スロットリングが要るまで不要。Function URL は無料。21-1 ⑥ の決定）</li>
+  <li><strong>非同期化</strong>: Webhook Lambda は署名検証と自己返信スキップだけを行い、SQS FIFO へ enqueue して即時 200 を返す（Meta の再送を招かない）。AI 処理は Reply Lambda が SQS トリガーで行う。再試行 3 回で DLQ へ退避し、DLQ の滞留を MonitoringStack のアラームで通知する</li>
+  <li><strong>データ</strong>: Reply Lambda は既存 S3 バケットの <code>assets/{set_code}/problems/{media_id}.json</code> を GET するだけ（読み取り専用・当該プレフィックス限定の IAM）。Aurora・VPC・NAT Gateway に依存しないため、コメントが何件来ても Aurora は起動しない</li>
+  <li><strong>2 面構成</strong>: 同一コードから本番面とステージング面（PoC の Meta アプリ + テスト用アカウント <code>test_tkghr</code>）を立てる。フルのステージング環境は作らない方針（設計課題リスト 2026-08-28）の唯一の例外で、外向き発信を持つ本経路だけに限る。PoC の <code>UmigamePocStack</code> は 21-6 でステージング面へ置き換えた後に削除する</li>
+</ul>
+
 <h2 id="network">2. ネットワーク構成</h2>
 
 <h3>2.1 VPC 設計</h3>
@@ -211,6 +277,7 @@
   <li>ECS タスクのログを CloudWatch Logs に出力（ロググループはサービスごとに分離）</li>
   <li>Step Functions 失敗、EventBridge Scheduler 起動失敗、ECS タスク異常終了、Aurora 異常を監視し SNS Topic で通知</li>
   <li>監視リソースの具体的なメトリクス名・しきい値は <a href="workflow.html#alarms">workflow.html セクション 7〜10</a> を参照</li>
+  <li>コメント自動返信経路（セクション 1.1）は Lambda のログを CloudWatch Logs に出力（リテンション 90 日）し、SQS DLQ の滞留を監視して SNS Topic で通知（<a href="workflow.html#comment-reply-dlq">workflow.html セクション 10</a>。21-3 追加）</li>
 </ul>
 
 <h2 id="deploy">7. デプロイ方式</h2>
