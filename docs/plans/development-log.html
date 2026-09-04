@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-04（21-2 の実施記録を追加）。前回: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
+  <span>最終更新: 2026-09-04（21-2 の人間ゲート通過を追記）。前回: 2026-09-04（21-2 の実施記録を追加）。前回: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
@@ -1970,6 +1970,14 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>実装</strong>: <code>timeline.ts</code> を 720 フレーム・6 種のビートへ改訂（導入 → 質問 / 質問 + 返答 × 3 → 出題者締め → Jr. 締め → 継ぎ目）、logic-training-1 の効果 8 種を移植（跳ねは 30px）、名札を吹き出し内へ移動、<code>scripts/narration_polly.py</code>（PCM 出力から実測長）、<code>key_out_background.py</code>（imagegen が透過を無視した Jr. の単色背景を抜く）、<code>prepare_assets.py</code> を v2 画像・24 秒 BGM 対応に変更。ポーズ差分と Jr. は基本ポーズを <code>-i</code> の参照画像として生成し衣装を揃えた</li>
 <li><strong>結果</strong>: 1080x1920・30fps・24.1 秒・AAC・-14.4 LUFS。継ぎ目差分は平均 2 未満 / チャンネル。動画をスマホへ送付し第 2 巡のレビュー待ち。第 1 稿の記録（20 秒版の静止フレーム等）は上書きし、比較の個別画像と試聴音源は git 管理外にした（比較シートとプロンプトは残す）</li>
 <li><strong>Polly の所見</strong>: 日本語の男性声は Takumi のみで Generative エンジンは日本語未対応（2 リージョンで確認）。VOICEVOX と違いクレジット表記が不要で、既存の AWS 資格情報だけで動くため新規の秘密情報が増えない。21-3 の設計書では TTS を「Polly Neural（アダプタは差し替え可能）」として書く</li>
+</ul>
+<h3>21-2 人間ゲート通過（2026-09-04）</h3>
+<ul>
+<li><strong>第 2 巡の指摘と第 3 稿</strong>: ①Jr. の視線が親を向いていない → 「頭・体・瞳を左（父の方向）へ」を明示して再生成 ②つかみ帯と問題カードが左に寄っている → <code>left</code> を 60 → 90 にして左右の余白を 90 ずつに。第 3 稿でユーザー承認</li>
+<li><strong>3 判断の結果（ユーザー承認）</strong>: フォーマットは <strong>go</strong>（24 秒・9:16・ループ前提を umigame-prebuilt の基準とする）/ ストックの素材項目を <strong>14 項目で確定</strong>（問題文・真相・確定事実シート・想定質問・フック・ルール帯・ナレーション cue 2 本・プレイ例・出題者セリフ 2 本・Jr. セリフ・イラストプロンプト・キャプション・出典メモ・難易度。字数制約つき。表は <a href="../../content/video-build/umigame-soup-1/README.md">README セクション 0</a>）/ <strong>Remotion Skills は標準ツーリングとして継続</strong>（既存 2 セットへの遡及は対象外）</li>
+<li><strong>21-3 以降への申し送り</strong>: BGM は 24 秒ちょうどのトラックで調達（PoC は 20 秒トラックのループで継ぎ目あり）/ TTS は Polly Neural・アダプタ差し替え可能な形にする / 版面の実装の正は <code>timeline.ts</code> と <code>UmigameReel.tsx</code>、設計書には構成と不変条件を書く / キャプションの VOICEVOX クレジットは不要になり <code>#AIart</code> のみ必須</li>
+<li><strong>imagegen の知見</strong>: 透過指定を無視して<strong>ノイズ状</strong>の背景（緑 + マゼンタ）が返るとキャラの緑と色が近く自動キーイングでは抜けない（輪郭ごと漏れる）。「単色フラットなマゼンタ #FF00FF の背景」を明示して生成し直すのが確実。<code>scripts/key_out_background.py</code> は外周の代表色 + 外周連結の塗りつぶし方式（彩度の低い輪郭線は背景色から除外）</li>
+<li><strong>次</strong>: <code>/step 21-3</code>（設計書 Fix）</li>
 </ul>
 <details class="phase"><summary>次期計画の割当表・Phase XX（2026-09-03 に計画書から移設・原文）</summary><p><em>以下は 2026-09-03 の完了フェーズ整理で計画書から移設した原文。「次期計画」の割当表は Phase 16 残・19・20 のステップ割当の最終版（方針の要約は計画書「進め方の方針」に残した）。「Phase XX: プラットフォーム展開」は着手判断が未了のためアイデア体系（<a href="../ideas/platform-expansion-tiktok.md">platform-expansion-tiktok.md</a>・再醸成待ち）へ移管し、開発計画からは外した。</em></p>
 <h3>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h3>
