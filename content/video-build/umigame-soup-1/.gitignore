@@ -1,0 +1,5 @@
+work/
+# 再生成できる正規化物（scripts/prepare_assets.py）と合成音声（VOICEVOX 規約: 音声単体を保存しない）
+poc/*/normalized/
+poc/*/narration/**/*.wav
+poc/*/work_gen_*.log

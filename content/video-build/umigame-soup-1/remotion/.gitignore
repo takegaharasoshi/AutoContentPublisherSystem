@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+.env
+out
+# 実行時に build.py が配置する素材（フォント・背景・キャラ・音源・ナレーション）
+public/

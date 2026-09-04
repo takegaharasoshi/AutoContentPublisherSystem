@@ -1,0 +1,30 @@
+{
+  "name": "umigame-soup-1-remotion",
+  "version": "1.0.0",
+  "description": "umigame-soup-1 (umigame-prebuilt) Remotion composition",
+  "repository": {},
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.520",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.520",
+    "@remotion/media": "4.0.520",
+    "@remotion/fonts": "4.0.520",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.520",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.19.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "studio": "remotion studio",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src && tsc --noEmit"
+  }
+}

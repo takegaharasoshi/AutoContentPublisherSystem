@@ -1,0 +1,24 @@
+{
+  "style_line": "Flat vector-style character illustration with bold clean outlines, simple shapes, warm saturated colors, friendly and expressive, designed to read clearly at small size on a dark teal background. Full body, centered, no shadow on the ground, no text, no letters, no logos. PNG with a fully transparent background (alpha channel), square 1024x1024, subject fills about 80% of the canvas.",
+  "characters": {
+    "master": {
+      "name_candidates": ["カメロック", "亀ノ介", "ウミガメ探偵ソウプ"],
+      "adopted_name": "カメロック",
+      "role": "出題者（アカウントの顔。真相を握る探偵風のウミガメ）",
+      "base_prompt": "A cute anthropomorphic sea turtle detective standing upright, wearing a brown deerstalker hat and a small orange trench coat over its green shell, holding a magnifying glass in one flipper, calm confident half-smile, eyes slightly narrowed like a clever detective, facing slightly to the right.",
+      "poses": {
+        "master_base": "calm confident half-smile, one flipper raised in a 'go ahead, ask me' gesture, holding a magnifying glass in the other flipper",
+        "master_happy": "wide delighted grin, eyes closed happily, both flippers raised as if celebrating a good question, magnifying glass tucked under one arm"
+      }
+    },
+    "assistant": {
+      "name_candidates": ["クマ助", "ワトミ", "ニモ助"],
+      "adopted_name": "クマ助",
+      "role": "質問者（プレイヤー側の代表。将来の助手サブアカウント）",
+      "base_prompt": "A small cute anthropomorphic clownfish (orange with white stripes) standing upright, wearing round glasses and a tiny green bow tie, holding a small notebook and pencil, curious wide eyes, facing slightly to the left.",
+      "poses": {
+        "assistant_base": "curious tilted head, one fin raised with index finger up as if asking a question, notebook held in the other fin"
+      }
+    }
+  }
+}
