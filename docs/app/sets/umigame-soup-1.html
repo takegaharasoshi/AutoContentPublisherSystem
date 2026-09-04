@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>セット別設計書: グルメ探偵カメロックのウミガメのスープ | AutoContentPublisherSystem</title>
+<title>セット別設計書: 探偵カメロックのウミガメのスープ | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../../assets/style.css">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / グルメ探偵カメロックのウミガメのスープ</nav>
-<h1>セット別設計書: グルメ探偵カメロックのウミガメのスープ</h1>
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / 探偵カメロックのウミガメのスープ</nav>
+<h1>セット別設計書: 探偵カメロックのウミガメのスープ</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
@@ -28,9 +28,9 @@
 </div>
 
 <h2>1. テーマ</h2>
-<p><strong>Instagram リールで 1 日 1 問の「ウミガメのスープ」（水平思考クイズ）を投稿し、コメント欄の質問に AI 出題者「グルメ探偵カメロック」が「はい / いいえ / 関係ありません」で自動返信する参加型セット</strong>。既存 3 セットが放送型（見て終わり）なのに対し、本セットは<strong>コメントで遊ぶ多ターン参加型</strong>であり、コメントエンゲージメント → リーチ増幅 → Meta ボーナスという<a href="../../strategy/business-strategy.html">事業戦略書</a>の本命経路への乗り方が構造的に強いことが企画価値（固有の収益モデルは持たない）。</p>
+<p><strong>Instagram リールで 1 日 1 問の「ウミガメのスープ」（水平思考クイズ）を投稿し、コメント欄の質問に AI 出題者「探偵カメロック」が「はい / いいえ / 関係ありません」で自動返信する参加型セット</strong>。既存 3 セットが放送型（見て終わり）なのに対し、本セットは<strong>コメントで遊ぶ多ターン参加型</strong>であり、コメントエンゲージメント → リーチ増幅 → Meta ボーナスという<a href="../../strategy/business-strategy.html">事業戦略書</a>の本命経路への乗り方が構造的に強いことが企画価値（固有の収益モデルは持たない）。</p>
 <ul>
-  <li><strong>出題者 = アカウントそのもの</strong>: 出題者キャラ「グルメ探偵カメロック」（丸い体・前掛け・透明な黄金スープの椀と匙・虫眼鏡を持つウミガメの探偵）をアカウントの顔とし、AI 返信はアカウント名義で付く。質問者キャラ「カメロック Jr.」（探偵の子ども。大きすぎる鹿撃ち帽・蝶ネクタイ・メモ帳）はリール内でプレイ例を演じるプレイヤー側の代表（将来の助手サブアカウント構想と名前を揃える。21-1 ④）</li>
+  <li><strong>出題者 = アカウントそのもの</strong>: 出題者キャラ「探偵カメロック」（丸い体・前掛け・透明な黄金スープの椀と匙・虫眼鏡を持つウミガメの探偵）をアカウントの顔とし、AI 返信はアカウント名義で付く。質問者キャラ「カメロック Jr.」（探偵の子ども。大きすぎる鹿撃ち帽・蝶ネクタイ・メモ帳）はリール内でプレイ例を演じるプレイヤー側の代表（将来の助手サブアカウント構想と名前を揃える。21-1 ④）</li>
   <li><strong>効果仮説</strong>: コメント率（コメント数 / リーチ）が logic-training-1 比で高く、リーチの伸び率に転化する。稼働 2 週間後の確認待ちとして 21-8 で作るセット計画書に起票する</li>
   <li><strong>既存セットとの関係</strong>: logic-training-1 の夜スロット（とんち・水平思考）とはテーマが異なり、ストックの共用・ネタ融通はしない（カニバリ助長のため。アイデア詳細 11）</li>
   <li><strong>コールドスタート対策</strong>: リール版面にプレイ例 3 往復を焼き込み、参加ゼロでもリール単体で遊び方と面白さが伝わるようにする。固定コメント（ピン留め）と助手サブアカウントは<strong>初期版では作らない</strong>（21-1 ④。要否は稼働 2 週間後の確認待ちで判断）。偽装アカウント（桜）は Meta の非真正行為規約に該当するため不採用（2026-08-28 decision）</li>
@@ -42,7 +42,7 @@
 <tr><th>項目</th><th>値</th><th>備考</th></tr>
 <tr><td>プラットフォーム</td><td>Instagram（プロアカウント）</td><td>リール投稿 + コメント自動返信。他プラットフォームは対象外</td></tr>
 <tr><td>ユーザーネーム</td><td><code>umigame.soup.jp</code></td><td>21-1 ① で決定。空き確認と取得はユーザー作業（21-7 まで）</td></tr>
-<tr><td>表示名（<code>sns_accounts.account_name</code>）</td><td><strong>グルメ探偵カメロック</strong>（案）</td><td>21-1 ① の「アカウント自体を出題者として立てる」方針に、21-2 で決まったキャラ名を当てた案。<strong>21-3 の設計レビュー（人間ゲート）で確定する</strong>。Instagram のプロフィール名も同じにする</td></tr>
+<tr><td>表示名（<code>sns_accounts.account_name</code>）</td><td><strong>コメントで推理！探偵カメロックのウミガメのスープ</strong>（24 字・確定）</td><td>2026-09-04 ユーザー決定（下記 decision）。Instagram のプロフィール名も同じにする。<code>account_name</code> は表示専用の列で Secret 名・キャプションには入らないため、後日の変更は UPDATE 1 文 + Instagram 側の変更で済む</td></tr>
 <tr><td><code>account_code</code></td><td><code>main-account</code></td><td>既存セットと同じ。Secret 名の導出専用（作成後変更不可）</td></tr>
 <tr><td>投稿用の認証（Secret）</td><td><code>acps/prod/umigame-soup-1/sns/instagram/main-account</code></td><td><strong>既存 Meta アプリの流用</strong>（Facebook ページを新規作成して連携。<a href="../operation.html#set-add">運用設計 2.1</a> 手順 1 と 5.1 の通常手順）。値スキーマは <a href="../../infra/security.html#secret-naming">security.html 1.2〜1.3</a></td></tr>
 <tr><td>コメント返信用の認証（Secret）</td><td><code>acps/prod/umigame-soup-1/comment-reply</code></td><td><strong>本番用 Meta アプリを新規作成し公開モードで運用</strong>（Instagram ログイン方式。PoC の手順を本番アカウントで再実施）。値スキーマは <a href="../../infra/security.html#comment-reply-secret">security.html 1.3</a>。ステージング面は PoC アプリ + <code>test_tkghr</code>（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>）</td></tr>
@@ -52,6 +52,16 @@
 <div class="decision">
   <span class="callout-title">決定（2026-09-03、21-1 ⑦）: 投稿は既存 Meta アプリの流用、コメント Webhook だけ新規アプリ。umigame.soup.jp は両方のアプリに接続する</span>
   既存アプリは開発モードで、稼働中セットの無期限トークンはその構成に依存する。コメント Webhook は「開発モードでは一切届かない」ことが PoC で実証済みのため、既存アプリで受けるには公開モードへの切替が要り、logic-training-1 / pref-ranking-1 のトークンが 60 日失効へ戻るおそれがある。加えて API 方式が異なる（既存 = Facebook ページ経由 <code>graph.facebook.com</code>、コメント経路 = Instagram ログイン方式 <code>graph.instagram.com</code>）。自動返信の規約リスクを既存資産から切り離す意味でも新規アプリとする。<strong>投稿バッチが記録する <code>posts.platform_post_id</code>（<code>media_publish</code> の応答 id）と Webhook の <code>media.id</code> が同じ値かは 21-6 でステージング面で照合する</strong>（一致しなければ S3 スナップショットのキーが引けず経路が成立しない。21-6 の人間ゲート）。
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-09-04、ユーザー判断）: キャラ名は「探偵カメロック」、表示名は「コメントで推理！探偵カメロックのウミガメのスープ」</span>
+  21-2 で採用した意匠は「グルメ探偵」（丸い体・前掛け・透明な黄金スープの椀と匙）のままだが、<strong>呼称に「グルメ」は付けない</strong>。以後、キャラ名の正は<strong>探偵カメロック</strong>とし、キャプション・AI 出題者プロンプト・版面の名札もこれに揃える（21-2 の選択肢名「P6 グルメ探偵」は画風・意匠の選定記録としてのみ残る）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>表示名にセット名を含める</strong>: Instagram の検索は名前とユーザーネームを対象にするため、「ウミガメのスープ」「推理」を名前に入れて発見されやすくする。「コメントで推理！」で参加型であることも名前で示す（既存 3 セットの表示名がキャラ名 + テーマの形式なのと同じ考え方）</li>
+    <li><strong>字数</strong>: 24 字（Instagram の名前欄の上限 30 字に収まる）</li>
+    <li><strong>変更の制約</strong>: <code>account_name</code> は表示専用のため DB 側はいつでも変えられる。ただし Instagram の名前欄は<strong>14 日間に 2 回まで</strong>しか変更できないため、開設時にこの名前で登録し、頻繁な試行はしない。<code>account_code</code>（<code>main-account</code>）とユーザーネーム（<code>umigame.soup.jp</code>）は実質固定で、表示名の変更とは独立</li>
+  </ul>
 </div>
 
 <h2>3. スケジュール（投稿頻度）</h2>
@@ -111,7 +121,7 @@
 </div>
 
 <p><strong>セット固定部分の初版（21-3 案。21-4a のプローブテストで磨き、その結果を正とする）</strong>:</p>
-<pre><code>あなたは Instagram アカウント「グルメ探偵カメロック」の出題者です。ウミガメのスープ（水平思考クイズ）の
+<pre><code>あなたは Instagram アカウント「探偵カメロック」の出題者です。ウミガメのスープ（水平思考クイズ）の
 問題を出し、コメント欄の質問に答えます。以下の「問題」「真相」「確定事実」だけを根拠に答えてください。
 
 回答ルール:
@@ -180,7 +190,7 @@
 <div class="table-wrap">
 <table>
 <tr><th>アセット</th><th>正（ファイル）</th><th>備考</th></tr>
-<tr><td>出題者「グルメ探偵カメロック」（基本ポーズ / 喜びポーズ）</td><td><code>content/video-build/umigame-soup-1/remotion/public/characters/master_base.png</code> / <code>master_happy.png</code>（正規化済み・共通キャンバス 1000x1100）</td><td>設定とプロンプトは <code>design.json</code>（21-2 の <code>poc/classic-umigame/v2/design.json</code> を 21-5a でセット資産へ昇格）。ポーズ差分は基本ポーズを参照画像（<code>-i</code>）にして生成すると衣装・色が揃う。透過にならない場合は「単色フラットなマゼンタ #FF00FF の背景」を明示して生成し直す（21-2 知見）</td></tr>
+<tr><td>出題者「探偵カメロック」（基本ポーズ / 喜びポーズ）</td><td><code>content/video-build/umigame-soup-1/remotion/public/characters/master_base.png</code> / <code>master_happy.png</code>（正規化済み・共通キャンバス 1000x1100）</td><td>設定とプロンプトは <code>design.json</code>（21-2 の <code>poc/classic-umigame/v2/design.json</code> を 21-5a でセット資産へ昇格）。ポーズ差分は基本ポーズを参照画像（<code>-i</code>）にして生成すると衣装・色が揃う。透過にならない場合は「単色フラットなマゼンタ #FF00FF の背景」を明示して生成し直す（21-2 知見）</td></tr>
 <tr><td>質問者「カメロック Jr.」（基本ポーズ）</td><td>同 <code>jr_base.png</code></td><td>視線は左上（父の方向）。喜びポーズは持たない</td></tr>
 <tr><td>画風固定行（キャラ / 背景）</td><td><code>design.json</code> の <code>style_line</code> / <code>background_prompt</code> の画風部分</td><td>C4: 90 年代 OVA 手描きセル塗り。セクション 5.2 の固定行と同一</td></tr>
 <tr><td>フォント</td><td>Zen Kaku Gothic New（Regular / Medium / Bold。<code>remotion/public/fonts/</code>）</td><td>pref-ranking-1 と同じ（SIL OFL）。<code>@remotion/fonts</code> の <code>loadFont</code> で読み込む</td></tr>

@@ -169,7 +169,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
 </ul>
 <div class="decision">
   <span class="callout-title">決定（2026-09-04、21-2 人間ゲート 2 巡）: 版面の基準は第 3 稿。実装は <code>Interactive.Div</code> + inline <code>interpolate()</code> の構造を維持する</span>
-  第 1 稿（20 秒・VOICEVOX・カートゥーン画風・質問者クマノミ）→ 第 2 稿（画風 C4・グルメ探偵カメロック + Jr.・24 秒・Polly Takumi 125%・質問と返答の並列表示・効果 8 種）→ 第 3 稿（Jr. の視線を父へ・つかみ帯と問題カードを中央寄せ）で承認。Remotion Skills の指針どおり <code>Interactive.Div</code> + inline style + inline <code>interpolate()</code> で書いた構造は Studio で要素を選択・調整できるため、21-5a の本組み（ストックのフィールドから props を組む形へ）でもこの構造を崩さない。周期アニメーション（sin のゆれ）は <code>interpolate()</code> で書けないため <code>translate</code> 文字列で書く（Studio では計算値扱い）。<code>video-layout.md</code> の下限（重要テキスト 44px）に対しルール帯 34px は下回るが、常時表示の固定要素で 2 行に収める必要があり人間ゲートで許容した。
+  第 1 稿（20 秒・VOICEVOX・カートゥーン画風・質問者クマノミ）→ 第 2 稿（画風 C4・探偵カメロック〔グルメ探偵の意匠〕+ Jr.・24 秒・Polly Takumi 125%・質問と返答の並列表示・効果 8 種）→ 第 3 稿（Jr. の視線を父へ・つかみ帯と問題カードを中央寄せ）で承認。Remotion Skills の指針どおり <code>Interactive.Div</code> + inline style + inline <code>interpolate()</code> で書いた構造は Studio で要素を選択・調整できるため、21-5a の本組み（ストックのフィールドから props を組む形へ）でもこの構造を崩さない。周期アニメーション（sin のゆれ）は <code>interpolate()</code> で書けないため <code>translate</code> 文字列で書く（Studio では計算値扱い）。<code>video-layout.md</code> の下限（重要テキスト 44px）に対しルール帯 34px は下回るが、常時表示の固定要素で 2 行に収める必要があり人間ゲートで許容した。
 </div>
 
 <h3 id="tts-sync">8.3 ナレーションと TTS のフレーム同期（固定アンカー + 予算検査）</h3>
