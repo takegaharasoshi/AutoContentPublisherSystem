@@ -45,6 +45,110 @@ CACHE_PATH = WORK_DIR / "probe_results.json"
 REVIEW_PATH = WORK_DIR / "review.html"
 REPLY_MAX_CHARS = 200  # Lambda 側の切り詰め（セット別設計書 5.1）
 
+# review.html のスタイル（スマホ縦持ちを既定にした 1 カラム。表は使わず縦積みのカードで出す）
+REVIEW_CSS = """
+:root{--bg:#fff;--fg:#1b1f24;--muted:#5c6672;--line:#d8dee6;--card:#f5f7fa;
+      --bad:#c0392b;--bad-bg:#fdecea;--warn:#8a6100;--warn-bg:#fff6dc;--ok:#1e7a46;--accent:#2c5aa0}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#14171a;--fg:#e6e9ed;--muted:#9aa4b0;--line:#2c333b;--card:#1c2126;
+        --bad:#ff8a7a;--bad-bg:#3a1f1c;--warn:#f0c060;--warn-bg:#37301a;--ok:#6ed49b;--accent:#8ab4f8}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);line-height:1.65;
+     font:16px/1.65 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+     -webkit-text-size-adjust:100%}
+main{padding:0 14px 64px;max-width:820px;margin:0 auto}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+     padding:8px 14px;max-width:820px;margin:0 auto}
+.bar-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bar-row+.bar-row{margin-top:6px}
+.muted{color:var(--muted);font-size:13px}
+.filters .f{font:inherit;font-size:14px;padding:7px 12px;min-height:38px;border:1px solid var(--line);
+     border-radius:999px;background:var(--card);color:var(--fg);text-decoration:none;display:inline-flex;
+     align-items:center;cursor:pointer}
+.filters .f.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.note{color:var(--muted);font-size:13.5px;margin:14px 0}
+h2{font-size:17px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.index{display:flex;flex-direction:column;gap:8px}
+.idx{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:10px;
+     background:var(--card);color:inherit;text-decoration:none;min-height:52px}
+.idx-no{font-weight:700;font-variant-numeric:tabular-nums}
+.idx-title{flex:1;font-size:15px}
+.idx-badges{display:flex;gap:5px}
+.idx.done{opacity:.5}
+.b{min-width:26px;text-align:center;border-radius:6px;padding:2px 6px;font-size:13px;font-weight:700}
+.b.bad{background:var(--bad-bg);color:var(--bad)}
+.b.warn{background:var(--warn-bg);color:var(--warn)}
+.b.ok{background:transparent;color:var(--ok)}
+.b.n{background:transparent;color:var(--muted);font-weight:400}
+.item{scroll-margin-top:96px;padding-top:4px}
+.item-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-top:34px}
+.item-h .no{color:var(--accent)}
+.tag{font-size:12px;color:var(--muted);font-weight:400}
+.problem{background:var(--card);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
+     padding:12px 14px;margin:10px 0;font-size:16.5px}
+.len{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+details{margin:8px 0;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+summary{cursor:pointer;padding:11px 14px;font-size:14.5px;min-height:44px;display:flex;align-items:center}
+details>p,details>ul{margin:0;padding:0 14px 12px}
+details>ul{padding-left:32px}
+details li{margin:4px 0;font-size:14.5px}
+.qa{list-style:none;margin:14px 0 0;padding:0;counter-reset:qa}
+.qa li{counter-increment:qa;border:1px solid var(--line);border-left-width:4px;border-radius:0 8px 8px 0;
+     padding:10px 12px;margin:0 0 8px}
+.qa li.mismatch{border-left-color:var(--bad);background:var(--bad-bg)}
+.qa li.check{border-left-color:var(--warn);background:var(--warn-bg)}
+.qa li.match{border-left-color:var(--line)}
+.qa .q{margin:0;font-weight:600;font-size:15px}
+.qa .q::before{content:counter(qa) ". ";color:var(--muted);font-weight:400}
+.qa .a{margin:6px 0 0;font-size:15px}
+.exp{display:inline-block;border:1px solid var(--line);border-radius:5px;padding:1px 7px;font-size:12.5px;
+     color:var(--muted);background:var(--bg)}
+.arrow{color:var(--muted);margin:0 6px}
+.qa li.extra .q{color:var(--muted)}
+.done{display:flex;align-items:center;gap:10px;margin:16px 0 6px;padding:12px;border:1px dashed var(--line);
+     border-radius:10px;font-size:15px;min-height:48px}
+.done input{width:22px;height:22px}
+.top{margin:6px 0 0;font-size:14px}
+.handover{border-color:var(--accent)}
+.handover>ul{padding:0 14px 12px 32px}
+.handover li{margin:8px 0}
+code{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:13px;word-break:break-all}
+a{color:var(--accent)}
+body.f-flag .qa li.match,body.f-flag .item.clean{display:none}
+body.f-extra .qa li.expected{display:none}
+"""
+
+# 端末内で完結する軽い操作（絞り込みと確認済みチェック。localStorage は失敗しても無視する）
+REVIEW_JS = """
+(function(){
+  var KEY='umigame-batch01-done';
+  var done={};
+  try{done=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){done={}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
+  document.querySelectorAll('input[data-done]').forEach(function(cb){
+    var no=cb.getAttribute('data-done');
+    cb.checked=!!done[no];
+    mark(no);
+    cb.addEventListener('change',function(){done[no]=cb.checked;save();mark(no)});
+  });
+  function mark(no){
+    var link=document.querySelector('[data-idx="'+no+'"]');
+    if(link){link.classList.toggle('done',!!done[no])}
+  }
+  document.querySelectorAll('.item').forEach(function(sec){
+    if(!sec.querySelector('.qa li.mismatch, .qa li.check')){sec.classList.add('clean')}
+  });
+  document.querySelectorAll('button.f').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('button.f').forEach(function(b){b.classList.remove('on')});
+      btn.classList.add('on');
+      var f=btn.getAttribute('data-f');
+      document.body.className=(f==='all')?'':'f-'+f;
+    });
+  });
+})();
+"""
+
 # 全問共通の追加プローブ（期待: お礼 / NO_REPLY / 正解宣言）。expected_questions の件数には数えない。
 EXTRA_PROBES = [
     {"q": "面白い問題！", "a": "お礼", "kind": "extra"},
@@ -194,6 +298,46 @@ def run_probes(items: list[dict], api_key: str, model: str, workers: int) -> dic
     return results
 
 
+def handover_html() -> str:
+    """STATUS.md の「人間レビューへの申し送り」節を折りたたみブロックに変換する。
+
+    スマホ 1 ページでレビューを完結させるため、review.html の先頭に埋め込む。
+    節が無い場合は空文字を返す（STATUS.md 側の見出しを変えたら黙って消える）。
+
+    Returns:
+        ``<details>`` ブロックの HTML（見つからなければ空文字）。
+    """
+    status_path = HERE / "STATUS.md"
+    if not status_path.exists():
+        return ""
+    lines = status_path.read_text(encoding="utf-8").splitlines()
+    body: list[str] = []
+    collecting = False
+    for line in lines:
+        if line.startswith("## "):
+            if collecting:
+                break
+            collecting = "申し送り" in line
+            continue
+        if collecting:
+            body.append(line)
+    items = [re.sub(r"^[-*]\s+", "", ln).strip() for ln in body if ln.strip().startswith(("-", "*"))]
+    if not items:
+        return ""
+
+    def inline(text: str) -> str:
+        """太字とコード記法だけを HTML へ起こす（それ以外はエスケープする）。"""
+        escaped = html.escape(text)
+        escaped = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", escaped)
+        return re.sub(r"`(.+?)`", r"<code>\1</code>", escaped)
+
+    return (
+        "<details class='handover' open><summary>レビュー前の申し送り（STATUS.md）</summary><ul>"
+        + "".join(f"<li>{inline(i)}</li>" for i in items)
+        + "</ul></details>"
+    )
+
+
 def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
     """review.html を書き出す。
 
@@ -206,56 +350,83 @@ def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
     """
     by_no = {it["no"]: it for it in ITEMS}
     total = mismatch = 0
-    css = """
-    body{font-family:sans-serif;max-width:1100px;margin:24px auto;padding:0 16px;line-height:1.5}
-    h2{border-bottom:2px solid #345;padding-bottom:4px;margin-top:40px}
-    .meta{background:#f4f6f8;padding:10px 14px;border-radius:6px;margin:8px 0}
-    table{border-collapse:collapse;width:100%;font-size:14px}
-    th,td{border:1px solid #ccd;padding:6px 8px;vertical-align:top;text-align:left}
-    th{background:#e8ecf0}
-    tr.mismatch td{background:#fde8e8}
-    tr.check td{background:#fff6dc}
-    tr.extra td:first-child{color:#667}
-    .sum{font-weight:bold}
-    details summary{cursor:pointer;color:#345}
-    """
     out = [
         "<!doctype html><html lang='ja'><head><meta charset='utf-8'>",
-        f"<title>umigame-soup-1 batch-01 プローブテスト</title><style>{css}</style></head><body>",
-        f"<h1>umigame-soup-1 batch-01 プローブテスト（{html.escape(model)}）</h1>",
-        f"<p>生成: {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M %z')}。"
-        "赤 = 期待冒頭語と不一致（機械判定）。黄 = 機械判定不能（人間が見る）。"
-        "「真相の丸ごと言い当て」「感想」「意味不明」は全問共通の追加プローブ。</p>",
+        "<meta name='viewport' content='width=device-width,initial-scale=1'>",
+        "<meta name='color-scheme' content='light dark'>",
+        "<title>umigame-soup-1 batch-01 プローブ結果</title>",
+        f"<style>{REVIEW_CSS}</style></head><body>",
+        "<header class='bar'>",
+        "<div class='bar-row'><b>batch-01 プローブ結果</b>"
+        f"<span class='muted'>{html.escape(model)}</span></div>",
+        "<div class='bar-row filters'>"
+        "<button type='button' class='f on' data-f='all'>全部</button>"
+        "<button type='button' class='f' data-f='flag'>要チェックのみ</button>"
+        "<button type='button' class='f' data-f='extra'>共通プローブ</button>"
+        "<a class='f' href='#index'>目次</a></div>",
+        "</header>",
+        "<main>",
+        f"<p class='note'>生成 {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M')}。"
+        "<b class='bad'>不一致</b> = 期待した冒頭語と違う。<b class='warn'>要確認</b> = 機械判定できない。"
+        "「真相の丸ごと言い当て」「感想」「意味不明」は全問共通の追加プローブ。"
+        "各問の「確認済み」はこの端末のブラウザに保存される。</p>",
+        handover_html(),
     ]
-    summary_rows = []
+
+    index_rows = []
     for no, recs in results.items():
         it = by_no[no]
         n_mis = sum(1 for r in recs if r["judge"] == "mismatch")
         n_chk = sum(1 for r in recs if r["judge"] == "check")
         total += len(recs)
         mismatch += n_mis
-        summary_rows.append(f"<tr><td>{no}</td><td>{html.escape(it['title'])}</td><td>{len(recs)}</td><td>{n_mis}</td><td>{n_chk}</td></tr>")
-    out.append("<h2>サマリ</h2><table><tr><th>No</th><th>題名</th><th>応答数</th><th>不一致</th><th>要確認</th></tr>")
-    out += summary_rows
-    out.append("</table>")
+        badges = f"<span class='b bad'>{n_mis}</span>" if n_mis else ""
+        badges += f"<span class='b warn'>{n_chk}</span>" if n_chk else ""
+        badges = badges or "<span class='b ok'>0</span>"
+        index_rows.append(
+            f"<a class='idx' href='#{no}' data-idx='{no}'><span class='idx-no'>{no}</span>"
+            f"<span class='idx-title'>{html.escape(it['title'])}</span>"
+            f"<span class='idx-badges'>{badges}<span class='b n'>{len(recs)}</span></span></a>"
+        )
+    out.append("<h2 id='index'>目次（10 問）</h2><nav class='index'>")
+    out += index_rows
+    out.append("</nav>")
 
     for no, recs in results.items():
         it = by_no[no]
-        out.append(f"<h2>{no} {html.escape(it['title'])}（{it['puzzle_type']} / 難易度 {it['difficulty']}）</h2>")
-        out.append("<div class='meta'>")
-        out.append(f"<p><b>問題文</b>（{len(it['problem_text'])} 字）: {html.escape(it['problem_text'])}</p>")
-        out.append(f"<p><b>真相</b>: {html.escape(it['truth'])}</p>")
-        out.append("<details><summary>確定事実シート</summary><ul>")
+        out.append(f"<section class='item' id='{no}' data-no='{no}'>")
+        out.append(
+            f"<h2 class='item-h'><span class='no'>{no}</span> {html.escape(it['title'])}"
+            f"<span class='tag'>{it['puzzle_type']} / 難易度 {it['difficulty']}</span></h2>"
+        )
+        out.append(
+            f"<p class='problem'>{html.escape(it['problem_text'])}"
+            f"<span class='len'>{len(it['problem_text'])} 字</span></p>"
+        )
+        out.append(
+            f"<details class='truth'><summary>真相を見る</summary><p>{html.escape(it['truth'])}</p></details>"
+        )
+        out.append("<details class='facts'><summary>確定事実シート（{}）</summary><ul>".format(len(it["fact_sheet"])))
         out += [f"<li>{html.escape(f)}</li>" for f in it["fact_sheet"]]
-        out.append("</ul></details></div>")
-        out.append("<table><tr><th style='width:4%'>#</th><th style='width:34%'>質問</th><th style='width:12%'>期待</th><th>出題者の実回答</th><th style='width:8%'>判定</th></tr>")
-        for i, r in enumerate(recs, 1):
-            q = r["q"] if r["kind"] == "expected" or len(r["q"]) < 60 else "（真相の丸ごと言い当て）" + r["q"][:40] + "…"
+        out.append("</ul></details>")
+        out.append("<ol class='qa'>")
+        for r in recs:
+            long_truth = r["kind"] == "extra" and len(r["q"]) >= 60
+            q = "（真相の丸ごと言い当て）" if long_truth else r["q"]
             out.append(
-                f"<tr class='{r['judge']} {r['kind']}'><td>{i}</td><td>{html.escape(q)}</td>"
-                f"<td>{html.escape(r['a'])}</td><td>{html.escape(r['reply'])}</td><td>{r['judge']}</td></tr>"
+                f"<li class='{r['judge']} {r['kind']}'>"
+                f"<p class='q'>{html.escape(q)}</p>"
+                f"<p class='a'><span class='exp'>{html.escape(r['a'])}</span>"
+                f"<span class='arrow'>→</span>{html.escape(r['reply'])}</p></li>"
             )
-        out.append("</table>")
+        out.append("</ol>")
+        out.append(
+            f"<label class='done'><input type='checkbox' data-done='{no}'> {no} は確認済み</label>"
+        )
+        out.append("<p class='top'><a href='#index'>目次へ戻る</a></p>")
+        out.append("</section>")
+    out.append("</main>")
+    out.append(f"<script>{REVIEW_JS}</script>")
     out.append("</body></html>")
     REVIEW_PATH.write_text("\n".join(out), encoding="utf-8")
     return total, mismatch

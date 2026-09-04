@@ -46,6 +46,24 @@ WSL は NAT で独自の IP を持つため、Windows の Tailscale IP から WS
 
 Windows 側 Tailscale CLI: `/mnt/c/Program Files/Tailscale/tailscale.exe`(WSL からそのまま実行できる。管理者権限は不要)。
 
+## 2.5 レビュー HTML をスマホで見る(`content/` 配下)
+
+`content/**/work/review.html` 等の**レビュー資材は docs 配信を止めずに別ポートで出す**(`serve-docs.sh` は
+`DOCS_ROOT` + `DOCS_PORT` の上書きに対応済み。配信ルートは増やさない)。使用中のポート: 8765 = `docs/`、
+8766 = `content/video-build/logic-training-1/work`、8767 = `content/umigame-stock/umigame-soup-1/batch-01`。
+
+```bash
+DOCS_PORT=8767 DOCS_ROOT="$PWD/content/umigame-stock/umigame-soup-1/batch-01" tools/serve-docs.sh start
+# → http://takegaharapc:8767/work/review.html （ルート / はディレクトリ一覧。STATUS.md も text/plain で読める）
+```
+
+- **配信ルートはバッチディレクトリにする**(`work/` 単体にしない)。レビュー中に `STATUS.md`(申し送り)・`research.md` を
+  同じポートで開けるため
+- サーバーはリクエストごとにディスクを読むので、`probe_test.py` で再生成した内容は**リロードだけで反映される**
+- 停止・状態確認も同じ環境変数を付ける(`DOCS_PORT=8767 tools/serve-docs.sh stop`)
+- レビュー HTML 自体は**スマホ縦持ちを既定にした 1 カラム**で書く(表を使わない・ダークモード対応・タップ領域 44px 以上)。
+  参照実装は `content/umigame-stock/umigame-soup-1/batch-01/probe_test.py` の `REVIEW_CSS` / `write_review`
+
 ## 3. 停止
 
 ```bash
@@ -60,4 +78,4 @@ HTTP サーバーを止め、`tailscale serve` の公開設定も解除する。
 - **Funnel(`tailscale funnel`)は使わない**。インターネット全体に設計書が公開される。ユーザーが明示的に求めた場合のみ、リスクを説明した上で検討する
 - 外出先から見るには**自宅 PC が起動していて WSL とサーバーが動いている**必要がある。スリープすると切れる
 - ポートを変えたい場合は `DOCS_PORT=9000 ./tools/serve-docs.sh start`(stop / status も同じ環境変数を付ける)
-- 配信対象は `docs/` のみ。`content/` の動画やレビュー HTML を見せたい要望が出たら、配信ルートを増やすのではなく `docs_server.py` の `DOCS_DIR` を見直すか、別ポートで起動する判断をユーザーに確認する
+- 既定の配信対象は `docs/` のみ。`content/` の動画やレビュー HTML はセクション 2.5 の別ポート方式で出す(`docs_server.py` の配信ルートは増やさない)
