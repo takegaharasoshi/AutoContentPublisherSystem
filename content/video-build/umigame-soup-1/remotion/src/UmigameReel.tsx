@@ -111,7 +111,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
         name="Hook band"
         style={{
           position: "absolute",
-          left: 60,
+          left: 90,
           top: 100,
           width: 900,
           boxSizing: "border-box",
@@ -149,7 +149,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
         name="Problem card"
         style={{
           position: "absolute",
-          left: 60,
+          left: 90,
           top: 250,
           width: 900,
           boxSizing: "border-box",
