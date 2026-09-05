@@ -175,3 +175,43 @@ def test_generate_fails_for_invalid_caption_fields() -> None:
     cursor = Cursor(stock_row=_stock_row(fields=_fields(hint="")))
     with pytest.raises(RuntimeError, match="content_fields.hint is required"):
         quiz.generate(_context(cursor))
+
+
+def test_generate_accepts_long_caption_only_fields(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """キャプション専用フィールドは版面に出ないため長さを縛らない。
+
+    2026-09-04 夜の停止（answer_text 37 字）の再発防止。
+    """
+    long_answer = "1本目の両端と2本目の片端に同時点火。1本目が尽きたら2本目の残り端に点火"
+    row = list(_stock_row(fields=_fields(
+        answer=long_answer,
+        explanation="順を追って説明します。" * 12,
+        coach_comment="手順そのものが答えになる問題は落ち着いて順に追おう！",
+    )))
+    row[2] = long_answer
+    monkeypatch.setattr(quiz, "get_object", lambda *args, **kwargs: b"video")
+
+    cursor = Cursor(stock_row=tuple(row))
+    result = quiz.generate(_context(cursor))
+
+    assert len(long_answer) > 30
+    assert result.media[0].content == b"video"
+    insert = next(call for call in cursor.calls if "INSERT INTO quiz_items" in call[0])
+    assert long_answer in insert[1]
+
+
+def test_generate_still_enforces_question_length() -> None:
+    """question_text は版面に焼き込まれるため上限を維持する。"""
+    row = list(_stock_row())
+    row[1] = "あ" * 91
+    with pytest.raises(RuntimeError, match="question_text exceeds 90"):
+        quiz.generate(_context(Cursor(stock_row=tuple(row))))
+
+
+def test_generate_still_requires_non_empty_answer() -> None:
+    row = list(_stock_row())
+    row[2] = "  "
+    with pytest.raises(RuntimeError, match="answer_text is required"):
+        quiz.generate(_context(Cursor(stock_row=tuple(row))))

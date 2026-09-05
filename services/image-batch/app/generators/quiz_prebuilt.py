@@ -23,6 +23,13 @@ OUTPUT_WIDTH = 1080
 OUTPUT_HEIGHT = 1920
 OUTPUT_DURATION_SECONDS = 16
 
+# 版面に焼き込まれるのは hook / hint / question のみで、答え・解説・コーチの一言は
+# キャプション専用（動画には出ない）。prebuilt 方式の動画はビルド時に版面適合を
+# 検証済みのため、実行時にキャプション専用フィールドの長さを縛らない。
+# 縛ると「答えが手順の問題は全手順を書く」（2026-08-31 ユーザー決定）と衝突し、
+# 実際に 2026-09-04 夜の生成が answer_text 37 字で停止した。
+CAPTION_ONLY_FIELDS = frozenset({"answer", "explanation", "coach_comment"})
+
 
 def _fetch_prebuilt_stock_item(
     cursor: Any,
@@ -49,16 +56,17 @@ def _fetch_prebuilt_stock_item(
     stock_id = int(row[0])
     question_text = row[1]
     answer_text = row[2]
-    for name, value, limit in (
-        ("question_text", question_text, 90),
-        ("answer_text", answer_text, 30),
+    for name, value in (
+        ("question_text", question_text),
+        ("answer_text", answer_text),
     ):
         if not isinstance(value, str) or not value.strip():
             raise RuntimeError(f"quiz_stock_items.{name} is required")
-        if len(value) > limit:
-            raise RuntimeError(f"quiz_stock_items.{name} exceeds {limit} characters")
+    # question_text は版面に出るため上限を残す（answer_text はキャプション専用）
+    if len(question_text) > 90:
+        raise RuntimeError("quiz_stock_items.question_text exceeds 90 characters")
 
-    fields = validate_content_fields(row[3], quiz_type)
+    fields = validate_content_fields(row[3], quiz_type, CAPTION_ONLY_FIELDS)
     video_s3_key = row[4]
     if not isinstance(video_s3_key, str) or not video_s3_key.strip():
         raise RuntimeError("quiz_stock_items.video_s3_key is required")

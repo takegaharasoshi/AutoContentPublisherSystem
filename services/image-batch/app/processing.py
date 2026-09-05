@@ -88,10 +88,13 @@ def process_prompt_configs(
             )
         except Exception as exc:
             connection.rollback()
+            # 例外メッセージまで出す（型名だけでは CloudWatch から原因を特定できず、
+            # 2026-09-04 夜の停止で調査が長引いたため）
             logger.error(
-                "生成方式の呼び出しに失敗: prompt_config_id=%s type=%s",
+                "生成方式の呼び出しに失敗: prompt_config_id=%s type=%s error=%s",
                 prompt_config.id,
                 type(exc).__name__,
+                exc,
             )
             continue
 

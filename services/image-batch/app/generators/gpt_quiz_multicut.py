@@ -382,8 +382,20 @@ def _load_audio_assets(
     return bgm_id, bgm, tick, chime
 
 
-def validate_content_fields(fields: Any, quiz_type: str) -> dict[str, Any]:
-    """Validate one stock item's structured fields defensively."""
+def validate_content_fields(
+    fields: Any,
+    quiz_type: str,
+    unbounded_fields: frozenset[str] = frozenset(),
+) -> dict[str, Any]:
+    """Validate one stock item's structured fields defensively.
+
+    Args:
+        fields: Raw ``content_fields`` value from the stock row.
+        quiz_type: Quiz type code used for per-type limits.
+        unbounded_fields: Field names whose length limit is skipped. Used by
+            prebuilt方式 for caption-only fields (版面に出ないため実行時に
+            長さを縛る理由がない)。必須・非空の検証は従来どおり行う。
+    """
     if isinstance(fields, (bytes, bytearray)):
         fields = fields.decode("utf-8")
     if isinstance(fields, str):
@@ -398,6 +410,8 @@ def validate_content_fields(fields: Any, quiz_type: str) -> dict[str, Any]:
         value = fields.get(name)
         if not isinstance(value, str) or not value.strip():
             raise RuntimeError(f"content_fields.{name} is required")
+        if name in unbounded_fields:
+            continue
         limit = 240 if name == "explanation" and quiz_type == "L3" else default_limit
         if len(value) > limit:
             raise RuntimeError(
