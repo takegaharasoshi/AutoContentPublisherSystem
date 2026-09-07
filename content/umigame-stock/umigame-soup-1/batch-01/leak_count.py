@@ -15,7 +15,7 @@ CORE = {
     "U01": ["レントゲン", "病気", "医者", "主治医", "病院", "治療", "写真"],
     "U02": ["始発", "座"], "U03": ["合図", "無事", "耳"], "U04": ["バス", "合図", "知らせ"],
     "U05": ["誕生日", "料理", "うれし"], "U06": ["麺", "うどん"], "U07": ["体重", "ジム", "トレーナー", "減量"],
-    "U08": ["玉ねぎ"], "U09": ["ヒーローショー", "悪役", "演技", "スーツアクター", "ショー"], "U10": ["道の駅"],
+    "U08": ["玉ねぎ"], "U11": ["修理", "直し", "職人", "時計屋"], "U09": ["ヒーローショー", "悪役", "演技", "スーツアクター", "ショー"], "U10": ["道の駅"],
 }
 path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "work" / "probe_results.json"
 d = json.load(open(path, encoding="utf-8"))
@@ -23,7 +23,11 @@ allr = d if "U01" in d else d["results"]
 tot_q = tot_leak = tot_sup = 0
 for no, words in CORE.items():
     recs = [r for r in allr[no] if r["kind"] != "extra"]
-    leak = sum(1 for r in recs if any(w in r["reply"] and w not in r["q"] for w in words))
+    # 正解宣言の返答は真相を開示してよいので数えない
+    leak = sum(
+        1 for r in recs
+        if not r["reply"].startswith("正解") and any(w in r["reply"] and w not in r["q"] for w in words)
+    )
     sup = sum(1 for r in recs if len(r["reply"].strip()) > 8)
     mis = sum(1 for r in allr[no] if r["judge"] == "mismatch")
     tot_q += len(recs); tot_leak += leak; tot_sup += sup

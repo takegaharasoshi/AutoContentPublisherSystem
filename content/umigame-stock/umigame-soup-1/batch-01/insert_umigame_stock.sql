@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（10 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（11 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -291,3 +291,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「駅」→ 連想「電車・野菜の直売・道の駅」→ 抽象化（駅）→ 常識「駅には電車が来る」の逆。着想元の既存問題なし（研究台帳の「建物以外にも成立する場所語」構造を参照）。', 1);
+
+-- U11 時計台の下で満足する女
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '011-clock-tower', '時計台の下で満足する女', 3,
+        '女は毎朝同じ時刻に駅前の時計台の下へ行き、しばらく上を見上げてから、満足そうに帰っていく。雨の日も欠かさないが、そこへ誰かが来たことは一度もない。どういうこと？',
+        '女は時計職人。駅前の古い時計台は長いあいだ止まっていたが、女が引き受けて修理し、ようやく動き出した。女は毎朝同じ時刻に時計台の下へ行き、自分の腕時計と見比べて、今日も正しく動いているのを確かめてから満足して仕事へ向かう。誰かを待っていたわけではない。',
+        '["女は誰かを待っているのではない。待ち合わせをしたことも、すっぽかされたこともない","女が見上げているのは時計台の時計である","女は自分の腕時計を持っていて、時刻を知るために見上げているのではない","女は時計台が今日も正しく動いているかを確かめている","時計台は女が生まれる前からある古いもので、女が建てたのではない。最近まで長いあいだ止まっていた","女と時計台のあいだに何があったかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","女は駅員でも市役所の職員でもない","毎朝同じ時刻に行くのは、腕時計と時計台の時刻を毎日同じ条件で見比べるためである","女が満足そうなのは、時計台が今日も正しく動いていたからである","女は写真を撮ったり、何かを願ったりしているのではない","女の年齢・服装・駅の場所・天気は問題に関係ない"]',
+        '[{"q":"女は誰かを待っていますか？","a":"いいえ"},{"q":"女は待ち合わせをすっぽかされていますか？","a":"いいえ"},{"q":"女は時計台に何かを願っていますか？","a":"いいえ"},{"q":"女は写真を撮っていますか？","a":"いいえ"},{"q":"女は時計台を見上げていますか？","a":"はい"},{"q":"女は時刻を知りたくて見上げていますか？","a":"いいえ"},{"q":"女は腕時計を持っていますか？","a":"はい"},{"q":"時計台は今、動いていますか？","a":"はい"},{"q":"時計台は以前、止まっていたことがありますか？","a":"はい"},{"q":"女は時計台が正しく動いているか確かめていますか？","a":"はい"},{"q":"女は駅で働いていますか？","a":"いいえ"},{"q":"女の仕事は時計台に関係がありますか？","a":"はい"},{"q":"女は時計台を建てた人ですか？","a":"いいえ"},{"q":"女は時計台の修理に関わりましたか？","a":"はい"},{"q":"駅の場所は重要ですか？","a":"関係ない"},{"q":"女の年齢は重要ですか？","a":"関係ない"},{"q":"天気は重要ですか？","a":"関係ない"},{"q":"女は時計職人で、止まっていた駅前の時計台を自分で修理した。毎朝、自分が直した時計が今日も正しく動いているのを確かめて満足して帰っている。","a":"正解"}]',
+        '誰も来ないのに満足そう', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"女は毎朝同じ時刻に駅前の時計台の下へ行き、しばらく上を見上げてから、満足そうに帰っていく。雨の日も欠かさないが、そこへ誰かが来たことは一度もない。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"誰かを待ってる？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"時計台を見てる？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"駅の場所は関係ある？"},{"role":"master","text":"関係ありません。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A small station square in early morning with an old stone clock tower; a woman in a raincoat seen from behind standing at its base and looking up; wet pavement, a few closed shop fronts and a bicycle rack; soft overcast light, no other people, no clock face details readable.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+毎朝、駅前の時計台の下に立って見上げ、満足そうに帰っていく女。そこへ誰かが来たことはありません。
+
+女は毎朝同じ時刻に駅前の時計台の下へ行き、しばらく上を見上げてから、満足そうに帰っていく。雨の日も欠かさないが、そこへ誰かが来たことは一度もない。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（A→C 切り出し。A = 女が止まっていた時計台を修理した〔隠す〕/ C = 毎朝確かめに来る）。モチーフ「時計」（作問スキル umigame-problem-writer の抽選 3 語〔時計・毛糸・鏡〕から選択）→ 連想「時計台・待ち合わせ・止まる・直す」→ 常識「時計台の下に毎朝立つ女は誰かを待っている」の逆（誰も来ないのに満足）。着想元の既存問題なし（台帳に「修理した物を毎日確かめる」構造なし。#10「遠回り」#09「合図」とも別構造）。捨てた案: 鏡を割って喜ぶ（鏡開き = 一段の語呂で即答）/ 針が逆に回る時計（鏡像。理髪店の逆回り時計として既知）/ 口を動かさず鏡に話す（腹話術。なぞなぞとして既知の可能性）。', 1);
