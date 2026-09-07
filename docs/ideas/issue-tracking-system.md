@@ -192,4 +192,10 @@ generation_run が残ると投稿バッチが恒久的に詰まる」は、開�
   - 完了条件: 各 SKILL.md に照合手順が入っていることを grep で示す。コミット → pull --rebase → push
   - 人間ゲート: なし
   - 停止点・上限: push まで。stop after 15 turns
+- **触るファイル一覧（2026-09-07 に確定）**
+  - 新設 4 本: `docs/issues/index.html`（ダッシュボード〔レーン別の節〕+ クローズ節 + ルール節。22-1）/ `docs/issues/_template.md`（壁打ちファイルの雛形。22-1）/ `.claude/skills/issue/SKILL.md` / `.claude/skills/incident/SKILL.md`（22-3）。`docs/issues/<slug>.md` は壁打ちを始めたときに作るので Phase 22 では作らない
+  - 更新（ルール層・22-1）: `docs/index.html`（体系一覧・ディレクトリ図・セクション 4 の「設計課題リストに記録」の参照先）/ `CLAUDE.md`（リポジトリ構成・設計書体系の表・参照ガイド・並行作業ルールに課題レーン・設計 Fix ルールの参照先）/ `docs/plans/index.html`（セクション 2 判定表に課題レーン・4 記録の分担・5.1 に課題照合・5.2 のトリガー書式を課題体系へ参照）/ `docs/ideas/index.html`（4.2 採用の定義にある「バックログ」の文言を課題体系へ）
+  - 更新（移設・22-2・フリーズ窓）: `docs/plans/development-plan.html`（設計課題リスト節・トラブルシューティングログ節をリンクに置換。Phase 22 自体の起票もここ）/ `docs/plans/development-log.html`（「事象記録」節を新設して 3 行を移入・「設計課題リスト（解消済み）」をリンクに置換）/ `docs/plans/logic-training-1.html`・`docs/plans/pref-ranking-1.html`・`docs/plans/fantasy-animals-1.html`（バックログ節をリンクに置換。観察行は確認待ちへ。fantasy は「なし」なので置換のみ）
+  - 更新（入口・22-4）: `.claude/skills/step/SKILL.md`（手順 4 の照合対象に課題表・完了手順に「展開元の課題をクローズ節へ」）/ `.claude/skills/quiz-stock-replenish/SKILL.md`・`.claude/skills/ranking-stock-replenish/SKILL.md`（起動時のセット名照合。umigame の補充スキルは未作成のため、作成時に同じ手順を入れる）/ `.claude/skills/idea/SKILL.md`（採用転記時に 5.1 の課題照合を通す旨 1 行）/ `docs/app/operation.html`（6.3 月次 KPI 転記に棚卸し 1 行・セクション 4 失敗時ポリシーに「障害対応の入口は `/incident`」1 行）
+  - 触らない: 設計書（`docs/app/` `docs/infra/`）の decision コールアウト内の「設計課題リストへ記録した」等の過去形の記述は履歴なのでそのまま残す（リンク先 `development-plan.html` はファイルとして存続するため切れない）
 - **確認待ち項目（トリガー付き・ステップにしない）**: ① `/step` の課題照合の初回試行（次の `/step` 起動時）② 起票チェックリストの課題照合の初回試行（次にフェーズ・改修を起票するとき）③ `/incident` の初回試行（次の障害発生時。「予言されていたか」が原因究明の前に出るか）④ `/issue` 壁打ちの初回試行（最初に据え置き課題を壁打ちするとき。候補は可視化 3 件の統合設計）
