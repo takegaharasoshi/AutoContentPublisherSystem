@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（10 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（11 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -291,3 +291,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「駅」→ 連想「電車・野菜の直売・道の駅」→ 抽象化（駅）→ 常識「駅には電車が来る」の逆。着想元の既存問題なし（研究台帳の「建物以外にも成立する場所語」構造を参照）。', 1);
+
+-- U11 鏡文字で早く着く男たち
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '011-mirror-letters', '鏡文字で早く着く男たち', 3,
+        '男たちは自分たちの名前を、わざと鏡文字で大きく書いた。そのままではまっすぐ読めないのに、そのおかげで男たちは行き先にずっと早く着けるようになった。どういうこと？',
+        '男たちは救急隊員。救急車の前の面に書いた「救急」の文字を、左右を裏返した鏡文字にしてある。前を走る車の運転手がバックミラーで見ると正しく「救急」と読めるので、後ろから救急車が来たことにすぐ気づいて道を譲ってくれる。だから現場や病院に早く着ける。',
+        '["男たちは名前を隠したくて鏡文字にしたのではなく、読んでほしくて書いた","鏡文字は間違えて書いたのではなく、わざとそうした","文字は男たちの持ち物に書いてあり、男たちはそれと一緒に移動する","文字を読むのは男たちではなく、他の人である。読む人は鏡に映して正しく読む","文字がどこに書いてあり、誰がどんな鏡で読むかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","男たちは急いで行き先へ着かなければならない仕事をしている","文字を読んだ人が男たちのために何かをしてくれるので、早く着ける","男たちは芸術家・子ども・暗号の専門家・警察官ではない","鏡文字にすることは法律で禁じられていない","行き先は毎回違う","男たちの名前が何か・年齢・人数は問題に関係ない"]',
+        '[{"q":"男たちは名前を隠したいのですか？","a":"いいえ"},{"q":"鏡文字は間違えて書いたのですか？","a":"いいえ"},{"q":"男たちは芸術家ですか？","a":"いいえ"},{"q":"鏡文字は暗号ですか？","a":"いいえ"},{"q":"文字を読むのは男たち自身ですか？","a":"いいえ"},{"q":"文字を読む人は鏡を使って読みますか？","a":"はい"},{"q":"文字は建物に書いてありますか？","a":"いいえ"},{"q":"文字は乗り物に書いてありますか？","a":"はい"},{"q":"男たちはその乗り物に乗って移動しますか？","a":"はい"},{"q":"文字を読む人は、男たちの前にいますか？","a":"はい"},{"q":"読む人も乗り物に乗っていますか？","a":"はい"},{"q":"読む人が使う鏡は、車についている鏡ですか？","a":"はい"},{"q":"読んだ人は男たちに道を譲りますか？","a":"はい"},{"q":"男たちの仕事は急ぐ必要がありますか？","a":"はい"},{"q":"男たちは警察官ですか？","a":"いいえ"},{"q":"男たちの名前が何かは重要ですか？","a":"関係ない"},{"q":"男たちの年齢は重要ですか？","a":"関係ない"},{"q":"行き先がどこかは重要ですか？","a":"関係ない"},{"q":"男たちは救急隊員で、救急車の前に書いた文字を鏡文字にしたのは、前を走る車の運転手がバックミラーで正しく読めるようにするため。気づいた車が道を譲るので早く着ける。","a":"正解"}]',
+        '鏡文字のおかげで早く着く', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"男たちは自分たちの名前を、わざと鏡文字で大きく書いた。そのままではまっすぐ読めないのに、そのおかげで男たちは行き先にずっと早く着けるようになった。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"名前を隠したい？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"文字は建物にある？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"読む人は鏡を使う？"},{"role":"master","text":"はい！"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: Two men in plain work clothes seen from behind, standing in an open yard at dawn and holding a large blank white board between them; a small hand mirror resting on a wooden crate nearby; a low wall and a tree; soft morning light, no vehicles, no other people, no text or letters anywhere.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+自分たちの名前をわざと鏡文字で書いた男たち。そのままでは読めないのに、そのおかげで早く着けるようになりました。
+
+男たちは自分たちの名前を、わざと鏡文字で大きく書いた。そのままではまっすぐ読めないのに、そのおかげで男たちは行き先にずっと早く着けるようになった。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「鏡」（作問スキル umigame-problem-writer の抽選 3 語〔時計・毛糸・鏡〕から。初稿「時計台の下で満足する女」はコアが弱く 2026-09-07 のレビューで取り下げ、工程 2 からやり直した）→ 連想「鏡文字・合わせ鏡・鏡開き・バックミラー」→ 具体化（鏡文字 → 鏡で読ませるための文字）→ 常識「鏡文字は読ませたくない・遊び」の逆（読ませたい・そのおかげで早く着く）。着想元の既存問題なし（救急車の前面が鏡文字なのは一般知識だが、台帳・記憶にウミガメとしての出題なし。捨てた案: 時計を止める〔新記録と試合終了の 2 通りで核が定まらない〕/ 編んだ網を海に投げる〔U06 と同じ作業動詞の多義〕/ 鏡開き〔なぞなぞとして有名〕/ 針が逆回りの時計〔理髪店の逆回り時計として既知〕）。', 1);
