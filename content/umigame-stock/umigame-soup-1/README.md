@@ -12,6 +12,7 @@ umigame-soup-1/
     ├── stock_items.py       #   単一ソース（1 問 = 素材 14 項目 + 管理項目〔core = コア宣言 等〕）
     ├── validate.py          #   機械検証（字数・件数・#AIart・画風固定行・プレイ例の「はい」・オリジナル宣言・コア宣言の様式・ナレーション推定長）
     ├── probe_test.py        #   プローブテスト（想定質問を gpt-5.6-luna の出題者に答えさせ work/review.html に並べる）
+    ├── leak_count.py        #   補足の核心語漏れを数える（プロンプト改定の効果比較。核心語は手書き辞書）
     ├── generate.py          #   insert_umigame_stock.sql の生成 + ローカル MySQL でのドライラン（--dry-run）
     ├── research.md          #   リサーチ台帳（有名問題との構造照合用〔作問スキル工程 7〕+ オリジナル性の基準）
     ├── STATUS.md            #   進行状況（引き継ぎメモ）
@@ -26,6 +27,7 @@ cd content/umigame-stock/umigame-soup-1/batch-01
 python3 validate.py                 # 全件 OK になるまで stock_items.py を直す
 python3 probe_test.py               # OpenAI キーは Secrets Manager umigame-poc/credentials を boto3 で実行時に読む（値は出力しない）
 python3 probe_test.py --only U03    # 直した問題だけ再実行（他はキャッシュ）
+python3 leak_count.py               # 補足で正体を言った応答数（プロンプトを変えたら必ず前後で比べる）
 python3 generate.py --dry-run       # insert SQL を生成し、ローカル MySQL でトランザクション内に流して ROLLBACK
 ```
 
