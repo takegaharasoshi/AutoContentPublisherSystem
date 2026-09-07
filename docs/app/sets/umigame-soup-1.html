@@ -78,7 +78,7 @@
 </ul>
 
 <h2 id="stock-items">4. ストック 1 件の素材項目（21-2 で確定・14 項目）</h2>
-<p>ストックの単位は「問題文 + 真相 + 確定事実シート」ではなく、<strong>リール 1 本と AI 出題者の判定に要る素材一式</strong>とする（2026-09-03 ユーザー指示。完成版リールの PoC で動画のイメージを固めてから確定した = 21-2 人間ゲート）。下表が正であり、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。</p>
+<p>ストックの単位は「問題文 + 真相 + 確定事実シート」ではなく、<strong>リール 1 本と AI 出題者の判定に要る素材一式</strong>とする（2026-09-03 ユーザー指示。完成版リールの PoC で動画のイメージを固めてから確定した = 21-2 人間ゲート）。下表が正であり、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。作問の手順（ランダム語のモチーフ → コア宣言 → 動線・現実性・既存問題との照合の自己検査）はスキル <code>.claude/skills/umigame-problem-writer/SKILL.md</code>（21-4a-2）が正で、<code>stock_items.py</code> の管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）を <code>validate.py</code> が様式検査し、プローブ結果の review.html は問題文の直前に表示する（レビューはコア宣言から見る）。</p>
 <div class="table-wrap">
 <table>
 <tr><th>#</th><th>項目（カラム / JSON キー）</th><th>用途</th><th>制約（<code>validate.py</code> で検査）</th></tr>

@@ -98,13 +98,15 @@ def render_master_prompt(problem_text: str, truth: str, fact_sheet: list[str]) -
 
 
 # ---------- 素材項目の鍵一覧（stock_items.py の 1 問が持つキー） ----------
-# 管理項目（no / content_key / title / puzzle_type / difficulty）+ 素材 14 項目（rule_text /
-# character_lines は既定値で埋める）。puzzle_type はレビュー・在庫の偏り確認用で DB には入れない。
+# 管理項目（no / content_key / title / puzzle_type / core / difficulty）+ 素材 14 項目（rule_text /
+# character_lines は既定値で埋める）。puzzle_type はレビュー・在庫の偏り確認用、core はコア宣言
+# （作問スキル umigame-problem-writer 工程 3 の 1 文。レビューで最初に見る）で、どちらも DB には入れない。
 REQUIRED_KEYS = (
     "no",
     "content_key",
     "title",
     "puzzle_type",
+    "core",
     "difficulty",
     "problem_text",
     "truth",

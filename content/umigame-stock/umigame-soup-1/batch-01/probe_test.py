@@ -87,6 +87,8 @@ h2{font-size:17px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid 
 .problem{background:var(--card);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
      padding:12px 14px;margin:10px 0;font-size:16.5px}
 .len{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.core{border:1px dashed var(--accent);border-radius:8px;padding:9px 12px;margin:10px 0 0;font-size:14px;
+     font-weight:600;line-height:1.5}
 details{margin:8px 0;border:1px solid var(--line);border-radius:8px;background:var(--card)}
 summary{cursor:pointer;padding:11px 14px;font-size:14.5px;min-height:44px;display:flex;align-items:center}
 details>p,details>ul{margin:0;padding:0 14px 12px}
@@ -399,6 +401,7 @@ def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
             f"<h2 class='item-h'><span class='no'>{no}</span> {html.escape(it['title'])}"
             f"<span class='tag'>{it['puzzle_type']} / 難易度 {it['difficulty']}</span></h2>"
         )
+        out.append(f"<p class='core'>{html.escape(it['core'])}</p>")
         out.append(
             f"<p class='problem'>{html.escape(it['problem_text'])}"
             f"<span class='len'>{len(it['problem_text'])} 字</span></p>"
