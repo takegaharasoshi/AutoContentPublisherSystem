@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（11 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（10 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -291,32 +291,3 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「駅」→ 連想「電車・野菜の直売・道の駅」→ 抽象化（駅）→ 常識「駅には電車が来る」の逆。着想元の既存問題なし（研究台帳の「建物以外にも成立する場所語」構造を参照）。', 1);
-
--- U11 時計台の下で満足するおばあさん
-INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
-    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
-    caption, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
-        '011-clock-tower', '時計台の下で満足するおばあさん', 3,
-        'おばあさんは毎朝同じ時刻に駅前の時計台の下へ行き、しばらく上を見上げてから、満足そうに帰っていく。雨の日も欠かさないが、そこへ誰かが来たことは一度もない。どういうこと？',
-        'おばあさんの腕時計は亡き夫の形見の古い手巻き時計で、毎日少しずつ遅れる。おばあさんは毎朝の散歩の途中、駅前の時計台の長針がちょうど 12 を指す時刻に時計台の下へ行き、時計台の時刻に腕時計を合わせてから、満足して家へ帰る。誰かを待っていたわけではない。',
-        '["おばあさんは誰かを待っているのではない。待ち合わせをしたことも、すっぽかされたこともない","おばあさんが見上げているのは時計台の時計で、時計台は正確に動いている","おばあさんは古い腕時計をしていて、毎朝それと時計台を見比べている","その腕時計を毎朝どうしているか・なぜ毎日必要なのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","おばあさんは携帯電話やスマートフォンを持っていない","時計台へ行くのは毎朝の散歩の途中で、そのあと家へ帰る","毎朝同じ時刻に行くのは、時計台の長針がちょうど 12 を指す瞬間が合わせやすいからである","おばあさんが満足そうなのは、用事が済んだからである","おばあさんは時計台を直したり管理したりする仕事はしていない","おばあさんは写真を撮ったり、何かを願ったりしているのではない","おばあさんの年齢・駅の場所・天気は問題に関係ない"]',
-        '[{"q":"おばあさんは誰かを待っていますか？","a":"いいえ"},{"q":"おばあさんは待ち合わせをすっぽかされていますか？","a":"いいえ"},{"q":"おばあさんは時計台に何かを願っていますか？","a":"いいえ"},{"q":"おばあさんは写真を撮っていますか？","a":"いいえ"},{"q":"おばあさんは時計台を見上げていますか？","a":"はい"},{"q":"おばあさんは時計台の時刻を見ていますか？","a":"はい"},{"q":"おばあさんは腕時計をしていますか？","a":"はい"},{"q":"おばあさんはスマートフォンを持っていますか？","a":"いいえ"},{"q":"おばあさんは腕時計と時計台を見比べていますか？","a":"はい"},{"q":"おばあさんの腕時計は正確ですか？","a":"いいえ"},{"q":"おばあさんの腕時計は古いものですか？","a":"はい"},{"q":"おばあさんは時計台を直した人ですか？","a":"いいえ"},{"q":"おばあさんは時計台を管理する仕事をしていますか？","a":"いいえ"},{"q":"時計台へ行くのは散歩の途中ですか？","a":"はい"},{"q":"毎朝同じ時刻に行くことに理由がありますか？","a":"はい"},{"q":"駅の場所は重要ですか？","a":"関係ない"},{"q":"天気は重要ですか？","a":"関係ない"},{"q":"おばあさんの年齢は重要ですか？","a":"関係ない"},{"q":"おばあさんの腕時計は古い手巻き時計で毎日少し遅れるので、毎朝散歩の途中に時計台の時刻に合わせてから満足して帰っている。","a":"正解"}]',
-        '誰も来ないのに満足そう', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
-        '{"problem":"おばあさんは毎朝同じ時刻に駅前の時計台の下へ行き、しばらく上を見上げてから、満足そうに帰っていく。雨の日も欠かさないが、そこへ誰かが来たことは一度もない。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"誰かを待ってる？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"時計台を見てる？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"天気は関係ある？"},{"role":"master","text":"関係ありません。"}]',
-        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
-        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
-
-Scene: A small station square in early morning with an old stone clock tower; an elderly woman in a raincoat seen from behind standing at its base and looking up; wet pavement, a few closed shop fronts and a bicycle rack; soft overcast light, no other people, no clock face details readable, no wristwatch visible.
-
-Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
-        '【探偵カメロックのウミガメのスープ】
-毎朝、駅前の時計台の下に立って見上げ、満足そうに帰っていくおばあさん。そこへ誰かが来たことはありません。
-
-おばあさんは毎朝同じ時刻に駅前の時計台の下へ行き、しばらく上を見上げてから、満足そうに帰っていく。雨の日も欠かさないが、そこへ誰かが来たことは一度もない。どういうこと？
-
-「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
-
-#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
-        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（A→C 切り出し。A = 形見の手巻き時計が毎日遅れる〔隠す〕/ C = 毎朝時計台の下で満足して帰る）。モチーフ「時計」（作問スキル umigame-problem-writer の抽選 3 語〔時計・毛糸・鏡〕から選択）→ 連想「時計台・待ち合わせ・時刻を合わせる・手巻き」→ 常識「時計台の下に毎朝立つ人は誰かを待っている」の逆（誰も来ないのに満足）。着想元の既存問題なし。初稿の真相「自分が修理した時計台を毎朝確かめる」は 2026-09-07 のレビューで「修理した本人が毎日見に来るのは現実離れ」「問題文の『帰る』と真相の『仕事へ向かう』が不整合」の指摘を受け、動機を「毎日遅れる手巻き時計の時刻合わせ」に差し替えた。捨てた案: 鏡開き（一段の語呂で即答）/ 針が逆に回る時計（鏡像。理髪店の逆回り時計として既知）/ 口を動かさず鏡に話す（腹話術。なぞなぞとして既知の可能性）。', 1);
