@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（12 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（13 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -349,3 +349,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「階段」（作問スキル umigame-problem-writer の抽選 3 語〔テント・のど飴・階段〕から）→ 連想「ひな壇・段・踊り場・はしご・上っても着かない」→ 具体化（階段に並ぶ男たち → 段飾りに並ぶ五人囃子）→ 常識「楽器を構える人は音を出す」の逆（一度も音を出したことがない）。着想元の既存問題なし（人を人形に反転する構造は台帳 #07〔玩具〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: 上っても 2 階に着かない階段〔ランニングマシン型として既知・落差なし〕/ 違う足音で泣く女〔語の強制なし・U01 と結末が重なる〕/ 踊り場〔誤読が起きない〕/ 棚田〔階段と呼ばない〕/ 引っ越し屋の階段料金・段位〔知識クイズ〕。', 1);
+
+-- U13 50 年前の男の子から届いた手紙
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '013-fifty-year-letter', '50 年前の男の子から届いた手紙', 3,
+        '50 年前に男の子が書いた手紙が、男のもとに届いた。男はその子に一度も会ったことがないのに、その子がどんな大人になったのかを、誰よりもよく知っていた。どういうこと？',
+        '手紙は、男が 50 年前の小学生のころ、学校の記念行事で「未来の自分」に宛てて書き、タイムカプセルに入れて校庭に埋めたもの。50 年後の同窓会で掘り出され、男の手に渡った。手紙を書いた男の子は50 年前の男自身。自分のことだから、その子がどんな大人になったのかは誰よりもよく知っている。人は自分自身と「会う」ことはできないので、男がその子に一度も会ったことがないのも本当である。',
+        '["手紙を書いた男の子が誰なのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","手紙は郵便局が 50 年かけて配達したのではない。配達が遅れたのでも、途中で失くされていたのでもない","手紙は 50 年後に読まれるように、わざと保管されていたものである","手紙は男の子が小学生のとき、学校の行事で書いたものである","手紙には宛先があり、男はその宛先のとおりの正しい受け取り手である（誤配ではない）","手紙は男の家のポストに届いたのではなく、集まりの場で男に手渡された","男の子は今も生きている。男の子は男の息子・孫・親戚・友だち・教え子ではない","男の子は有名人ではない。男はテレビや本で男の子のことを知ったのでもない","男が「どんな大人になったのか」を知っているのは、誰かから聞いたからでも、調べたからでもない","手紙には男の子の将来の夢が書いてあった（夢の中身は問題に関係ない）","男は手紙を受け取っても驚かず、読んで懐かしそうに笑った","男の名前・住んでいる場所は問題に関係ない"]',
+        '[{"q":"手紙は配達に 50 年かかったのですか？","a":"いいえ"},{"q":"手紙はどこかで失くされていたのですか？","a":"いいえ"},{"q":"手紙は 50 年後に読まれるように、わざと取っておかれたのですか？","a":"はい"},{"q":"手紙は学校の行事と関係がありますか？","a":"はい"},{"q":"手紙はタイムカプセルに入っていましたか？","a":"はい"},{"q":"男の子は手紙を書いたとき、小学生でしたか？","a":"はい"},{"q":"男の子は今も生きていますか？","a":"はい"},{"q":"男の子は男の息子や孫ですか？","a":"いいえ"},{"q":"男は男の子の先生でしたか？","a":"いいえ"},{"q":"男の子は有名人ですか？","a":"いいえ"},{"q":"手紙はもともと男に宛てて書かれたものですか？","a":"はい"},{"q":"男は誰かから男の子のその後を聞いたのですか？","a":"いいえ"},{"q":"男は男の子と同じ小学校に通っていましたか？","a":"はい"},{"q":"手紙には将来の夢が書いてありましたか？","a":"はい"},{"q":"夢の中身は答えに関係ありますか？","a":"関係ない"},{"q":"男の住んでいる場所は関係ありますか？","a":"関係ない"},{"q":"手紙は男の家のポストに届きましたか？","a":"いいえ"},{"q":"手紙は男が小学生のとき、学校の行事でタイムカプセルに入れた未来の自分宛てのもの。書いた男の子は 50 年前の男自身だから、どんな大人になったのかを誰よりも知っていた。","a":"正解"}]',
+        '50年前から届いた手紙', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"50 年前に男の子が書いた手紙が、男のもとに届いた。男はその子に一度も会ったことがないのに、その子がどんな大人になったのかを、誰よりもよく知っていた。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"配達に 50 年かかった？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"わざと取っておいた？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"学校の行事と関係ある？"},{"role":"master","text":"はい、あります。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: An elderly man with gentle eyes sitting by a window in warm evening light, holding an old worn envelope with both hands and smiling nostalgically; behind him a faint dream-like image of a small schoolboy writing at a desk; simple background, no text or letters anywhere.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+50 年前に男の子が書いた手紙を受け取った男。一度も会ったことがないのに、その子がどんな大人になったのかを誰よりもよく知っています。
+
+50 年前に男の子が書いた手紙が、男のもとに届いた。男はその子に一度も会ったことがないのに、その子がどんな大人になったのかを、誰よりもよく知っていた。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「郵便」（作問スキル umigame-problem-writer の抽選 3 語〔片づけ・郵便・たまご〕から）→ 連想「タイムカプセル・卒業式に書く未来の自分への手紙」→ 具体化（50 年前の男の子が書いた手紙を受け取る男）→ 常識「手紙は書いた人と受け取る人が別人」の逆（差出人 = 受取人）。着想元の既存問題なし（別々に見せた人物を同一人物と明かす構造は台帳 #21〔人数の省略の補完〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: 他人の手紙を毎日読んで怒られない男〔代読。語の強制がない状況型〕/ サンタ宛ての手紙に毎年返事を書く係〔誤認がなく知識・雑学寄り〕。', 1);
