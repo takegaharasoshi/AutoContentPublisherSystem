@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-03（改修 R-1 の R-1-6 完了を記録 = R-1 完了。2026-09-03 に S3・両環境 DB を Remotion 版 56 本へ差し替え）</span>
+  <span>最終更新: 2026-09-12（週次補充 2026-09-w1〔朝・夜 14 問〕の完了を記録。あわせて Phase 19-3 の <code>/goal</code> 組み込み初回試行 = OK を確認待ちリストから移動）</span>
 </div>
 
 <div class="note">
@@ -42,6 +42,19 @@
 <li><strong>プロンプトの定型文と文字入れ例外が衝突した</strong>: <code>_build_illustration_prompt</code> の定型文「『?』以外の文字・数字・記号は一切描画しない」が例外 6 問の情景文と矛盾するため、<code>work/prompts/&lt;id&gt;.txt</code> を手で緩和して生成した。<strong>恒久対応は開発レーン</strong>（<a href="development-plan.html">設計課題リスト</a>に記録）→ <strong>2026-09-02 の 16-4e でコード側の定型文を緩和して解消</strong>（<a href="development-log.html">開発記録</a> 16-4e）。以後は手当て不要で、提示物問題は情景文に描くべき文字を明示する</li>
 <li><strong>配置（2026-09-02）</strong>: 14 問を承認 → S3 へ 28 オブジェクト（mp4 + イラスト）→ ローカル MySQL 14 行 → Aurora へ <code>update_prebuilt.sql</code> を Data API で 14 文適用（各 1 行更新）。<strong>両環境とも <code>unbuilt = 0</code>・朝夜とも <code>unused_built = 7</code></strong> で在庫閾値を回復し、再利用出題を解消した</li>
 <li><strong>レビューをスマホで行えるようにした</strong>: <code>serve-docs.sh</code> を <code>DOCS_PORT=8766 DOCS_ROOT=&lt;work/&gt;</code> で別インスタンス起動し（docs 配信の 8765 は止めない）、当該バッチ 14 件だけを載せた viewport 対応のシート <code>work/review_w5.html</code> を生成して tailnet 内に公開した</li>
+</ul>
+</li>
+<li><strong>logic-training-1 / 2026-09-w1（14 問。2026-09-03 着手 〜 2026-09-12 完了）</strong><ul>
+<li>資材: <a href="../../content/quiz-stock/logic-training-1/2026-09-w1/">content/quiz-stock/logic-training-1/2026-09-w1/</a>。対象は<strong>朝・夜の 2 組 × 7 問</strong>（昼は 16-4d で凍結）。着手時の在庫は朝 <code>unused_built</code> 6 / 夜 5 で<strong>両組とも閾値 7 割れ</strong>（w5 の反省どおり在庫 0 を待たずに着手できた）。番号は w5 の続きで朝 A33〜A39 / 夜 C35〜C41、<code>content_key</code> は両環境とも <code>morning/night-029</code>〜<code>035</code> で一致</li>
+<li><strong>リサーチ経路が変わった</strong>: Codex <code>--search exec</code> が chatgpt.com バックエンドの 404 で接続不能だったため、<strong>Claude の WebSearch で全 14 問の流布例を直接確認</strong>して <code>research.md</code> に台帳化した（補欠・落とした候補も記載）。既出題との突合は既存ストック 77 問 + Aurora <code>quiz_items</code> 92 件の <code>summary</code> と照合して重複なし</li>
+<li><strong>朝の採用基準が 2 つ増えた</strong>: ①<strong>「有名すぎる」古典は朝では却下されうる</strong>（風呂・スフィンクス級。folklore 級であることと視聴者にとって新鮮であることは別基準）②<strong>「気づき一発で終わる型」は『簡単』で却下される</strong>（森林・合体漢字・二文字しりとりの 3 連続却下）。通った帯は「答えを言われてもすぐには納得できず、説明されて初めて腑に落ちる距離」があるもので、<strong>朝を「なぞなぞ・言葉あそび」に縛らず数系・ひっかけ系も使う</strong>ほうが帯に届きやすい（A36 の数え上げ・A38 の時計が該当）。夜は逆に<strong>答えが数値・雑学で締まる問題を避ける</strong>（C40 米粒・C41 靴下がこの基準で却下）。差し替えは 6 問・修正は 4 問。いずれもスキル <code>/quiz-stock-replenish</code> へ反映済み</li>
+<li><strong>列挙が要る問題を図に逃がす構成を採った</strong>: A37（あるなしクイズ）はユーザー指示で<strong>問題文から 8 語を外して 26 字の短文にし、8 語をイラストの表で見せる</strong>形に変更。版面は締まるが<strong>イラストの字形検品が問題の成立条件になる</strong>ため、退避策 2 つ（問題文へ 8 語を戻す / 補欠と差し替え）を事前に合意してから工程 7 へ渡した（結果は再生成なしで通過）</li>
+<li><strong>投入（2026-09-12）</strong>: ローカル MySQL はトランザクション + ROLLBACK のドライラン後に本適用 → Aurora は Data API で 14 文適用。両環境とも 14 行・採番一致</li>
+<li><strong>イラストの再生成 2 件はどちらも「文字混入」型ではなかった</strong>: A35 は半紙の一字が「日」ではなく<strong>「目」</strong>で描かれ（本問の答え 8 字の 1 つ = 答えバレ）、C39 は棒が<strong>7 本</strong>描かれた（問題文の「6 本」と矛盾）。<strong>サイズ・文字混入のチェックだけでは両方 PASS で返ってくる</strong>ため、次回から<strong>文字なぞ・図形パズルには「本数・画数・個数」を数える検査と、誤答になる字形の名指し禁止を最初から指示に入れる</strong>（スキルへ反映）</li>
+<li><strong>全数レビューで「情景文が簡素だと imagegen が背景を埋める」ことが表面化した</strong>（3 巡）: ①C35・C37・C38 が<strong>縮小表示に対して描き込みが多く主役が読み取れない</strong> → <code>illustration_scene</code> を<strong>「夜を表す濃い紺色の無地の背景 + 主役だけ + 描かないものの名指し列挙 + 平らな色面」</strong>へ書き換え ②C38 のカタツムリを大きく ③内径いっぱいは大きすぎた（井戸が浅く見え「深さ10m」の印象が弱まる）ため<strong>内径の半分</strong>へ。<strong>次回補充からは全問この書き方に統一する</strong>（既存分の作り直しはユーザー判断）。あわせて<strong>「主役を大きく」と「規模・深さを見せる」は情景文の中で競合する</strong>ことが分かり、数値が効く問題は規模側を優先すると整理した</li>
+<li><strong>配置（2026-09-12）</strong>: 14 問を承認 → S3 へ 28 オブジェクト（154 → 182）→ ローカル MySQL 14 行 → Aurora へ <code>update_prebuilt.sql</code> を Data API で 14 文適用（<strong>各 1 行更新・合計 14 = 承認件数</strong>）。<strong>朝・夜とも <code>unbuilt = 0</code> / <code>unused_built = 7</code></strong> で閾値を回復。<strong>G3 は修正・再ビルドなしの 1 巡で完了</strong></li>
+<li><strong>16-4e（イラストプロンプトの文字禁止の緩和）の効果観察 1 バッチ目</strong>: <strong>非例外問題へのイラスト文字混入は 0 件</strong>（文字入れ例外は A34・A35・A36・A37・A39 の 5 問、残り 9 問は混入なし）。戻し基準「1 バッチで 3 件以上、または再生成 2 回で解消しない事例」には該当しない。観察はあと 1 バッチ残る</li>
+<li><strong>Phase 19-3（週次補充スキルへの <code>/goal</code> 組み込み）の初回試行 = OK</strong>（確認待ちリストから移動）。G1（2026-09-05 到達）→ G2 → G3（2026-09-12 到達）の 3 本を実際に立てて回した結果、①<strong>evaluator は貼られた証跡から到達を判定できた</strong>（G1 = <code>validate.py</code> / <code>verify_logic.py</code> の出力、G2 = 投入の更新行数と <code>build.py</code> の完了件数、G3 = Aurora の <code>updated=1</code> × 14 と在庫確認の <code>unbuilt = 0</code>）②<strong>人間レビューの前後でゴールが正しく切れており、レビュー中の自走は記録上見当たらない</strong>（1 問ずつのチャットレビューも <code>work/review.html</code> の全数レビューもゴール外）③<strong>G3 は上限 15 ターン内に到達</strong>（G1・G2 は到達自体を確認。消費ターン数は別セッションのため未検証だが打ち切りには至っていない）。<strong>SKILL.md のゴール文は修正不要</strong>で、開発レーン Phase 19 の追補ステップは起こさない。要点の<a href="development-log.html">開発記録</a> 19-3 への転記は<strong>開発レーンの作業のため本セッションでは行わず、起票文面の提示にとどめた</strong></li>
 </ul>
 </li>
 </ul>
