@@ -33,44 +33,44 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         '{"hook":"漢字は足し算で増えるぞ","hint":"上下左右、どこに足す?","question":"漢字の「日」に一画だけ足すと、別の漢字ができる。さて、いくつ作れる? 目標は8つだ。","answer":"目・田・白・旧・旦・甲・由・申(8字)","explanation":"上に足して白、中に足して目・田、横に足して旧、下に足して旦、突き抜けて甲・由・申。定番はこの8つ。旧字まで含めればさらに増える。何個出せたか教えてくれ。","coach_comment":"8個出せたら今日は絶好調だ!","tags":["なぞなぞ","朝の一問","漢字あそび"],"summary":"「日」に一画足してできる漢字を挙げる定番の漢字パズル。目・田・白・旧・旦・甲・由・申の8字が定番で、思いついた数を競う形式にした。","illustration_scene":"朝日が差し込む書道教室。文机の上の白い半紙に、墨で「日」の一字だけが大きく書かれている。そばに筆と硯。半紙の上の宙に大きな「?」。文字は「日」だけを例外的に描き、他の文字は描かない。人物は描かない。"}',
         '類型: 漢字の一画足し・列挙型(作者不詳の定番パズル。個数は 8〜16 で割れるため定番 8 字を答えとする)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10138380495 , https://www.okinawatimes.co.jp/articles/-/1793783 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
--- A36
-INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
-        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
-        'L1', 'light',
-        '朝は4本足、昼は2本足、夜は3本足で歩く生き物はなんだ? 神話の怪物スフィンクスが旅人にかけた、世界一有名ななぞなぞだ。',
-        '人間(赤ん坊・大人・杖をつく老人)',
-        '{"hook":"神話の怪物が出した名作だ","hint":"一生を一日にたとえるんだ!","question":"朝は4本足、昼は2本足、夜は3本足で歩く生き物はなんだ? 神話の怪物スフィンクスが旅人にかけた、世界一有名ななぞなぞだ。","answer":"人間(赤ん坊・大人・杖をつく老人)","explanation":"朝昼夜は人の一生のたとえ。赤ん坊は四つんばい、大人は二本の足、年をとると杖をついて三本足。ギリシャ神話ではオイディプスがこれを解き、スフィンクスは身を投げた。","coach_comment":"今日は二本足で元気に行こう!","tags":["なぞなぞ","朝の一問","神話の古典"],"summary":"朝4本・昼2本・夜3本の足で歩く生き物=人間というスフィンクスのなぞなぞ。一日を一生にたとえる比喩を見抜くギリシャ神話の古典。","illustration_scene":"朝日に照らされた砂漠にそびえる大きなスフィンクスの石像。ピラミッドが遠くに見え、空は朝焼け。石像の前の宙に大きな「?」。杖・赤ん坊・人物は描かない。文字は描かない。"}',
-        '類型: 一日を一生にたとえる比喩なぞなぞ(ギリシャ神話由来の世界的古典)。流布例: https://dailyportalz.jp/kiji/Sphinx-Quiz , https://kotobank.jp/word/%E3%81%99%E3%81%B5%E3%81%84%E3%82%93%E3%81%8F%E3%81%99-3156604 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q11263103891 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
-
 -- A37
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        'あるなしクイズだ。「ある」くじ・さく・まく・はし。「ない」かべ・ふた・みち・いす。「ある」に共通する決まりはなんだ?',
+        'あるなしクイズだ。「ある」に共通する決まりはなんだ?',
         '後ろに「ら」を付けると別の言葉になる',
-        '{"hook":"言葉には隠し扉があるぞ","hint":"後ろに1文字足してみろ!","question":"あるなしクイズだ。「ある」くじ・さく・まく・はし。「ない」かべ・ふた・みち・いす。「ある」に共通する決まりはなんだ?","answer":"後ろに「ら」を付けると別の言葉になる","explanation":"くじ→くじら、さく→さくら、まく→まくら、はし→はしら。どれも後ろに「ら」を足すと別の言葉に化ける。「ない」側は足しても言葉にならない。声に出すと見つかる。","coach_comment":"言葉のしっぽにもヒントはあるぞ!","tags":["なぞなぞ","朝の一問","あるなし"],"summary":"くじ・さく・まく・はしに共通する「後ろに『ら』を付けると別の言葉になる」法則を見つけるあるなしクイズ。形式は定番、語の組み合わせは自作。","illustration_scene":"朝日が差す公園。木の柵、舞台の赤い幕、くじ引きの箱、小川にかかる小さな橋が並び、その上の空に大きな「?」。クジラ・桜・枕・目立つ柱は描かない。文字は描かない。人物は描かない。"}',
+        '{"hook":"言葉には隠し扉があるぞ","hint":"後ろに1文字足してみろ!","question":"あるなしクイズだ。「ある」に共通する決まりはなんだ?","answer":"後ろに「ら」を付けると別の言葉になる","explanation":"くじ→くじら、さく→さくら、まく→まくら、はし→はしら。どれも後ろに「ら」を足すと別の言葉に化ける。「ない」側は足しても言葉にならない。声に出すと見つかる。","coach_comment":"言葉のしっぽにもヒントはあるぞ!","tags":["なぞなぞ","朝の一問","あるなし"],"summary":"くじ・さく・まく・はしに共通する「後ろに『ら』を付けると別の言葉になる」法則を見つけるあるなしクイズ。形式は定番、語の組み合わせは自作。","illustration_scene":"朝日が差し込む部屋の壁に、二つの枠が横に並んだ大きな紙が貼られている。左の枠は上に「ある」と書かれ、中に「くじ」「さく」「まく」「はし」が縦に並ぶ。右の枠は上に「ない」と書かれ、中に「かべ」「ふた」「みち」「いす」が縦に並ぶ。紙の右上に大きな「?」。文字はこの10語だけを字形どおり正確に描き、他の文字は描かない。人物は描かない。"}',
         '類型: あるなしクイズ(法則発見。形式は作者不詳の定番。語の組み合わせは自作問題・オリジナル書き下ろし)。形式の流布例: https://ja.wikipedia.org/wiki/%E3%81%82%E3%82%8B%E3%81%AA%E3%81%97%E3%82%AF%E3%82%A4%E3%82%BA , https://setuyaku-up.com/asobi-arunasi/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A36
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '1から100までの数を、順に紙へ書き出していく。このとき、9という数字は全部で何回書くことになる?',
+        '20回(一の位に10回、十の位に10回)',
+        '{"hook":"数えるだけ、なのに間違える","hint":"一の位だけじゃないぞ!","question":"1から100までの数を、順に紙へ書き出していく。このとき、9という数字は全部で何回書くことになる?","answer":"20回(一の位に10回、十の位に10回)","explanation":"一の位が9なのは9、19、29…99の10回。十の位が9なのは90〜99の10回。99は9を2つ書くので両方に数える。合わせて20回だ。","coach_comment":"数え漏れは油断だ、指差し確認!","tags":["なぞなぞ","朝の一問","数え上げ"],"summary":"1〜100を書き出したとき数字の9が何回現れるかを問う数え上げ問題。一の位10回+十の位10回=20回。「9のつく数は何個」と取り違えず、99を2回と数えられるかが分かれ目。","illustration_scene":"朝日が差し込む部屋の机に大きな紙が広げられ、鉛筆で「1,2,3,4,5,6,7,8,9,・・・」と横一列に大きく書かれている。紙のそばに鉛筆が置かれ、紙の上の宙に大きな「?」が浮かんでいる。文字はこの数字の並びだけを例外的に描き、他の文字・数字は描かない。人物は描かない。"}',
+        '類型: 数え上げ(1〜100 に数字の 9 が何回現れるか。作者不詳の定番。桁ごとに数える発想を問う)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1346484723 , https://oshiete.goo.ne.jp/qa/7794943.html , https://kutobill.hatenablog.com/entry/2025/04/27/193148 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A38
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '木が2本で「林」、3本で「森」。では、木が5本だとなんになる?',
-        '森林(森の3本+林の2本)',
-        '{"hook":"漢字は木でできている?","hint":"二文字の言葉でもいいぞ!","question":"木が2本で「林」、3本で「森」。では、木が5本だとなんになる?","answer":"森林(森の3本+林の2本)","explanation":"1文字で探すと行き止まり。森(3本)と林(2本)を並べた「森林」なら、木はちょうど5本だ。漢字1文字という思い込みを外せるかが分かれ目。","coach_comment":"枠を外せば道は開けるぞ!","tags":["なぞなぞ","朝の一問","漢字あそび"],"summary":"木2本=林、3本=森に続けて「木5本は?」と問い、漢字1文字の思い込みを外して二字熟語「森林」に辿り着く定番の漢字なぞなぞ。","illustration_scene":"朝もやの中、丘の上に木がぴったり5本だけ並んで立ち、その向こうから朝日が差し込む。木の上の空に大きな「?」。文字は描かない。人物は描かない。"}',
-        '類型: 漢字の構成(林・森の延長。作者不詳の定番)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1247541372 , https://kannbann.blogspot.com/2018/08/235.html , https://www.mokuzai-tonya.jp/geppou/2604/pdf/2604_06.pdf 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        'アナログ時計の長針と短針は、進むうちにぴったり重なる。0時ちょうどから24時間で、重なるのは何回?',
+        '22回(24回ではない)',
+        '{"hook":"毎日見ている時計の話だ","hint":"1時間に1回とは限らないぞ!","question":"アナログ時計の長針と短針は、進むうちにぴったり重なる。0時ちょうどから24時間で、重なるのは何回?","answer":"22回(24回ではない)","explanation":"長針は1時間に1回ずつ短針に追いつく。ところが11時台だけは追いつけず、次に重なるのは12時ちょうど。だから12時間で11回、1日では22回になる。","coach_comment":"思い込みの1回ぶんが命取りだ!","tags":["なぞなぞ","朝の一問","ひっかけ"],"summary":"アナログ時計の長針と短針が24時間で重なる回数を問う思い込み外し。1時間に1回で24回と答えたくなるが、11時台は一度も重ならず次は12時ちょうど。12時間で11回、1日22回が正解。","illustration_scene":"朝日が差し込む部屋の壁に、大きな丸いアナログ時計が掛かっている。長針と短針はぴったり重なって一本に見える。時計の横の宙に大きな「?」。文字盤には数字を描かず、目盛りの線だけにする。文字・数字は描かない。人物は描かない。"}',
+        '類型: 時計の針の重なり回数(1 日 22 回。作者不詳の定番パズルとして広く流布)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q12204617017 , https://www.keisan-mondai.com/1994.htm , https://inakadaisuki.com/clock_minute-hand-and-the-hour-hand_overlap/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A39
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '「たちつみと」。この5文字を、ある読み方で読むと、ちゃんとした言葉になる。なんと読む?',
+        '「たちつみと」。この5文字を、あるもので読むと、ちゃんとした言葉になる。なんと読む?',
         'てがみ(「て」が「み」になっている)',
-        '{"hook":"読めそうで読めない5文字だ","hint":"「た」の段を思い出せ!","question":"「たちつみと」。この5文字を、ある読み方で読むと、ちゃんとした言葉になる。なんと読む?","answer":"てがみ(「て」が「み」になっている)","explanation":"本来は「たちつてと」。4文字目の「て」が「み」に化けている。「て」が「み」、と口に出せば=てがみ。前回の「あいうおお=えがお」と同じ仕掛けだ。","coach_comment":"気づいた瞬間が一番気持ちいいな!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"「たちつみと」を「てがみ」と読み解く定番の文字置換なぞなぞ。「あいうおお=えがお」と同じ仕掛けの姉妹問題で、た行の「て」が「み」に変わっていることに気づかせる。","illustration_scene":"朝日が差し込む静かな教室。黒板に「たちつみと」とだけ大きく書かれ、右上の宙に大きな「?」。窓の外に青空と朝日。文字は「たちつみと」の5字だけを例外的に描き、他の文字は描かない。手紙・封筒は描かない。人物は描かない。"}',
+        '{"hook":"読めそうで読めない5文字だ","hint":"1文字だけ迷子がいるぞ!","question":"「たちつみと」。この5文字を、あるもので読むと、ちゃんとした言葉になる。なんと読む?","answer":"てがみ(「て」が「み」になっている)","explanation":"本来は「たちつてと」。4文字目の「て」が「み」に化けている。「て」が「み」、と口に出せば=てがみ。前回の「あいうおお=えがお」と同じ仕掛けだ。","coach_comment":"気づいた瞬間が一番気持ちいいな!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"「たちつみと」を「てがみ」と読み解く定番の文字置換なぞなぞ。「あいうおお=えがお」と同じ仕掛けの姉妹問題で、た行の「て」が「み」に変わっていることに気づかせる。","illustration_scene":"朝日が差し込む静かな教室。黒板に「たちつみと」とだけ大きく書かれ、右上の宙に大きな「?」。窓の外に青空と朝日。文字は「たちつみと」の5字だけを例外的に描き、他の文字は描かない。手紙・封筒は描かない。人物は描かない。"}',
         '類型: 五十音の文字置換(作者不詳の定番。A27「あいうおお」の姉妹問題)。流布例: https://kabu-elife.sakura.ne.jp/inc/nazonazo/cat5/075.html , https://nihongochan.hateblo.jp/entry/2019/10/20/194611 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C35
@@ -98,9 +98,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '宝石を箱に入れて遠くの友人に送る。錠をかけた箱は安全だが、錠のない箱や鍵は途中で盗まれる。2人とも自分の南京錠と鍵を持っている。どう送る?',
+        '宝石を箱に入れて遠くの友人に送る。錠をかけた箱だけは無事に届くが、それ以外すべて途中で盗まれる。2人とも自分の南京錠と鍵を持っている。どう送る?',
         '自分の錠で送る→相手が錠を足して返送→自分の錠を外して再送→相手が自分の鍵で開ける',
-        '{"hook":"暗号技術の原点になった一問","hint":"錠は何個かけてもいい!","question":"宝石を箱に入れて遠くの友人に送る。錠をかけた箱は安全だが、錠のない箱や鍵は途中で盗まれる。2人とも自分の南京錠と鍵を持っている。どう送る?","answer":"自分の錠で送る→相手が錠を足して返送→自分の錠を外して再送→相手が自分の鍵で開ける","explanation":"①自分の錠をかけて送る ②友人は自分の錠を追加して送り返す ③届いた箱から自分の錠だけ外して再送 ④友人が自分の鍵で開ける。箱は常にどちらかの錠で守られている。","coach_comment":"往復する勇気も作戦のうちだ!","tags":["水平思考","夜の一問","手順パズル"],"summary":"鍵を送らずに錠付きの箱を相手に開けさせる古典パズル。自分の錠→相手が錠を追加して返送→自分の錠を外して再送、の往復で箱が常に施錠された状態を保つ。","illustration_scene":"夜の郵便局のカウンターに、南京錠がひとつだけかかった木箱が置かれ、そばに鍵の束と伝票のない小包用の紐。窓の外は夜空と街灯。宙に大きな「?」。文字・数字は描かない。人物は描かない。"}',
+        '{"hook":"暗号技術の原点になった一問","hint":"錠は何個かけてもいい!","question":"宝石を箱に入れて遠くの友人に送る。錠をかけた箱だけは無事に届くが、それ以外すべて途中で盗まれる。2人とも自分の南京錠と鍵を持っている。どう送る?","answer":"自分の錠で送る→相手が錠を足して返送→自分の錠を外して再送→相手が自分の鍵で開ける","explanation":"①自分の錠をかけて送る ②友人は自分の錠を追加して送り返す ③届いた箱から自分の錠だけ外して再送 ④友人が自分の鍵で開ける。箱は常にどちらかの錠で守られている。","coach_comment":"往復する勇気も作戦のうちだ!","tags":["水平思考","夜の一問","手順パズル"],"summary":"鍵を送らずに錠付きの箱を相手に開けさせる古典パズル。自分の錠→相手が錠を追加して返送→自分の錠を外して再送、の往復で箱が常に施錠された状態を保つ。","illustration_scene":"夜、街灯に照らされた長い道。左端に自分、右端に遠くの友人が離れて立ち、二人とも片手に南京錠を持っている。自分はもう一方の手に、ふたの開いた小箱を抱え、中に宝石が見え、ふたには南京錠を通す掛け金がある。二人の間の夜空に大きな「?」。二人は手元の南京錠と箱がはっきり見える向きで描き、顔を描いてよい。文字・数字は描かない。"}',
         '類型: 手順パズル(暗号技術の比喩として流布・作者不詳)。流布例: https://gendai.media/articles/-/150729?page=2 , https://303books.jp/columns/3081/ , https://dmzcms.hyogo-c.ed.jp/takatsuka-hs/NC3/wysiwyg/file/download/26/1089 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C38
@@ -128,17 +128,17 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '殿様がほうびを尋ねると、家来は「今日は米1粒、明日は2粒、次は4粒と毎日倍にして30日ください」と答えた。30日目の1日分は約何粒?',
-        '約5億4千万粒(2の29乗。米で約10トン)',
-        '{"hook":"秀吉が青ざめた褒美の話だ","hint":"倍々は途中から爆発する!","question":"殿様がほうびを尋ねると、家来は「今日は米1粒、明日は2粒、次は4粒と毎日倍にして30日ください」と答えた。30日目の1日分は約何粒?","answer":"約5億4千万粒(2の29乗。米で約10トン)","explanation":"毎日倍だからn日目は2の(n−1)乗粒。30日目は2の29乗=約5億4千万粒。1粒0.02gなら約10トン、俵で約180俵。曽呂利新左衛門が秀吉に願った逸話だ。","coach_comment":"倍々の力、侮るなよ!","tags":["水平思考","夜の一問","数の直感"],"summary":"米1粒から毎日倍にして30日という褒美の30日目の量を問う、曽呂利新左衛門と秀吉の逸話に基づく倍々の直感崩し。2の29乗=約5億4千万粒。","illustration_scene":"夜、行灯の明かりが灯る和室。畳の上の小皿に米が数粒だけ載っていて、その隣に空っぽの米俵がひとつ置かれている。宙に大きな「?」。数字・文字は描かない。人物は描かない。"}',
-        '類型: 倍々の直感崩し(曽呂利新左衛門の逸話・作者不詳で広く流布)。流布例: https://ja.wikipedia.org/wiki/%E6%9B%BD%E5%91%82%E5%88%A9%E6%96%B0%E5%B7%A6%E8%A1%9B%E9%96%80 , https://bunshun.jp/bungeishunju/articles/h1532 , https://diamond.jp/articles/-/240078 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '兄と弟はケーキの取り分でいつもケンカ。母はナイフを兄に渡し、ある一言のルールを告げただけで、二人とも文句なく分けられた。何と言った?',
+        '切った人は、後から選ぶ(弟が先に好きな方を取る)',
+        '{"hook":"聖書にも出てくる分け方だ","hint":"切る役と選ぶ役を考えろ!","question":"兄と弟はケーキの取り分でいつもケンカ。母はナイフを兄に渡し、ある一言のルールを告げただけで、二人とも文句なく分けられた。何と言った?","answer":"切った人は、後から選ぶ(弟が先に好きな方を取る)","explanation":"「切った人は後から選ぶ」。兄は弟がどちらを取っても損しないよう、できるだけ半分に切る。弟は好きな方を選べる。二人とも自分で納得できる分け方になる。","coach_comment":"損しない仕組みを作れ!","tags":["水平思考","夜の一問","発想転換"],"summary":"ケーキの取り分でケンカする兄弟に、母が「切った人は後から選ぶ」のルールだけで解決させる古典(カット・アンド・チューズ)。切る側が公平に切る動機を仕組みで作る手順を問う。","illustration_scene":"夜、ダイニングテーブルの照明の下に、まだ切られていない丸いケーキがひとつ。そばにナイフと空の皿が2枚。ケーキの上の宙に大きな「?」。文字・数字は描かない。人物は描かない。"}',
+        '類型: 公平な分配の手順パズル(一人が切り、もう一人が選ぶ。作者不詳・旧約聖書の逸話にも通じる古典として広く流布)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1355365213 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1196770291 , https://otonasalone.jp/376676/2/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C41
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '引き出しに黒い靴下10足分と白い靴下10足分がバラバラに入っている。停電で真っ暗。同じ色のペアを確実に作るには、最低何枚取り出せばいい?',
-        '3枚(2枚が別色でも3枚目で必ずそろう)',
-        '{"hook":"暗闇でも確実にそろえろ","hint":"最悪の引きを考えろ!","question":"引き出しに黒い靴下10足分と白い靴下10足分がバラバラに入っている。停電で真っ暗。同じ色のペアを確実に作るには、最低何枚取り出せばいい?","answer":"3枚(2枚が別色でも3枚目で必ずそろう)","explanation":"色は2種類しかない。最悪でも1枚目と2枚目が黒と白。3枚目はどちらかの色だから、必ずどちらかとペアになる。枚数の多さに惑わされないこと。","coach_comment":"最悪を想定できる者が強い!","tags":["水平思考","夜の一問","論理パズル"],"summary":"黒白2色の靴下が混ざった引き出しから暗闇で同色ペアを確実に作る最低枚数を問う古典(鳩の巣原理)。合計枚数に惑わされず3枚と答える。","illustration_scene":"停電で真っ暗な寝室。懐中電灯の光の輪の中に、開いた引き出しと、そこからあふれるたくさんの黒と白の靴下。宙に大きな「?」。数字・文字は描かない。人物は描かない。"}',
-        '類型: 鳩の巣原理の古典(作者不詳・国際的に流布)。流布例: https://kquoe2.hatenablog.com/entry/20090715/1254120840 , https://www.quiz-puzzle.com/question/631_q.html , https://karapaia.com/archives/52251835.html 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '王が職人に純金の王冠を作らせた。重さは渡した金塊と同じだが、銀を混ぜてごまかした疑いがある。王冠を壊さず傷もつけずに見抜くには?',
+        '同じ重さの金塊と王冠を水に沈め、あふれる水の量を比べる',
+        '{"hook":"2000年前の鑑定トリックだ","hint":"金と銀、どっちが重い?","question":"王が職人に純金の王冠を作らせた。重さは渡した金塊と同じだが、銀を混ぜてごまかした疑いがある。王冠を壊さず傷もつけずに見抜くには?","answer":"同じ重さの金塊と王冠を水に沈め、あふれる水の量を比べる","explanation":"銀は金より軽い。同じ重さなら銀を混ぜた王冠はかさ(体積)が大きい。水を満たした器に沈め、あふれる水が同じ重さの金塊より多ければ混ぜ物あり。アルキメデスの故事だ。","coach_comment":"見えないものは比べて見抜け!","tags":["水平思考","夜の一問","故事"],"summary":"重さが同じ純金の王冠に銀の混ぜ物があるかを、壊さず見抜く方法を問うアルキメデスの故事。同じ重さの金塊と水に沈めてあふれる量を比べれば、体積の差から混ぜ物が分かる。","illustration_scene":"夜、ろうそくの明かりが灯る石造りの部屋。大きな天秤の左右の皿に、金の王冠と金塊が載ってぴったり釣り合っている。天秤の上の宙に大きな「?」。水・器は描かない。文字・数字は描かない。人物は描かない。"}',
+        '類型: 故事(アルキメデスの王冠。体積の比較で混ぜ物を見抜く逸話として広く流布・作者不詳)。流布例: https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%AB%E3%82%AD%E3%83%A1%E3%83%87%E3%82%B9 , https://gold.mmc.co.jp/primer/museum/02.html , http://sittoku-zatsugaku.com/archimedes/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);

@@ -69,19 +69,37 @@ if "A37" in BY_NO:
     aru = ["くじ", "さく", "まく", "はし"]
     nai = ["かべ", "ふた", "みち", "いす"]
     words = {"くじら", "さくら", "まくら", "はしら", "かけら", "とびら", "そら", "あぶら", "かめら"}
-    q = BY_NO["A37"]["question"]
-    check("A37", "問題文に ある/ない の 8 語", all(w in q for w in aru + nai), " ".join(aru + nai))
+    # 8 語は問題文ではなくイラスト(あるなしの表)で見せるため、情景文に字形指定があることを確認する
+    scene = BY_NO["A37"]["illustration_scene"]
+    check("A37", "情景に ある/ない の 8 語", all(f"「{w}」" in scene for w in aru + nai), " ".join(aru + nai))
+    check("A37", "情景に ある/ない の見出し", "「ある」" in scene and "「ない」" in scene, "見出し 2 語")
     check("A37", "ある側 + ら が語になる", all(w + "ら" in words for w in aru), ", ".join(w + "ら" for w in aru))
     check("A37", "ない側 + ら が語にならない", all(w + "ら" not in words for w in nai), ", ".join(w + "ら" for w in nai))
     check("A37", "解説に 4 語の変換を明記", all(f"{w}→{w}ら" in BY_NO["A37"]["explanation"] for w in aru), "explanation に 4 組")
 
 # ---------------------------------------------------------------
-# A38 森林: 木の本数 = 森 3 + 林 2 = 5
+# A38 時計の針: 0 時ちょうどから 24 時間で長針と短針が重なる回数を、
+#   角速度から解析的に数え、1 分刻みの走査でも同じ回数になることを確認する
 # ---------------------------------------------------------------
 if "A38" in BY_NO:
-    trees = {"林": 2, "森": 3}
-    total = sum(trees[c] for c in "森林")
-    check("A38", "「森林」の木の本数", total == 5, f"森 {trees['森']} + 林 {trees['林']} = {total}")
+    # 長針 6 度/分、短針 0.5 度/分 → 相対 5.5 度/分。360 度差をつけるのに 720/11 分
+    interval = 720 / 11
+    n = int(1440 // interval) + 1  # t=0(0 時)を含み、t=1440(翌 0 時)は含めない
+    overlaps = [k * interval for k in range(n) if k * interval < 1440]
+    # 走査による裏取り: 角度差の符号が変わる(= 追い越す)瞬間を数える
+    def diff(t: float) -> float:
+        d = (6 * t - 0.5 * t) % 360
+        return d - 360 if d > 180 else d
+
+    crossings = sum(1 for m in range(1440) if diff(m) <= 0 < diff(m + 1) or diff(m) == 0)
+    check("A38", "24 時間で重なる回数", len(overlaps) == 22, f"{len(overlaps)} 回(間隔 {interval:.4f} 分 = 約 65 分 27 秒)")
+    check("A38", "走査でも同じ回数", crossings == 22, f"1 分刻みの走査で {crossings} 回")
+    # 解説の柱: 「11 時台には一度も重ならず、次は 12 時ちょうど」(2026-09-07 ユーザー指示で説明方針を変更)
+    in_11 = [t for t in overlaps if 660 <= t < 720]
+    check("A38", "11 時台に重なりがない", not in_11, "660〜719 分に重なりなし")
+    check("A38", "次の重なりは 12 時ちょうど", any(abs(t - 720) < 1e-9 for t in overlaps), "t=720 分 = 12 時 00 分")
+    check("A38", "12 時間で 11 回", sum(1 for t in overlaps if t < 720) == 11, "0〜11 時台で 11 回")
+    check("A38", "解説が 11 時台と 12 時ちょうどに触れる", "11時台" in BY_NO["A38"]["explanation"] and "12時ちょうど" in BY_NO["A38"]["explanation"], "explanation に両方")
 
 # ---------------------------------------------------------------
 # A39 たちつみと: 「たちつてと」との差分が 1 箇所(4 文字目)で て→み であること
@@ -181,31 +199,19 @@ if "C39" in BY_NO:
     check("C39", "正四面体は辺 6・面 4", edges == 6 and faces == 4, f"頂点 {vertices} → 辺 {edges}・面 {faces}")
 
 # ---------------------------------------------------------------
-# C40 曽呂利の米粒: 30 日目 = 2^29、合計 = 2^30 − 1、重量換算
-# ---------------------------------------------------------------
-if "C40" in BY_NO:
-    day30 = 2 ** 29
-    total = 2 ** 30 - 1
-    tons = day30 * 0.02 / 1_000_000
-    bales = day30 * 0.02 / 60_000
-    check("C40", "30 日目 = 2^29 ≈ 5.4 億粒", 5.3e8 < day30 < 5.4e8, f"{day30:,} 粒(合計 {total:,} 粒)")
-    check("C40", "重量 ≈ 10 トン・俵 ≈ 180", 10 < tons < 11 and 175 < bales < 185, f"{tons:.1f} t / {bales:.0f} 俵")
-
-# ---------------------------------------------------------------
-# C41 靴下: 2 色から k 枚取ったとき、必ず同色ペアができる最小の k を全列挙で求める
+# C41 アルキメデスの王冠: 同じ質量なら、銀を混ぜた王冠のほうが体積(あふれる水)が大きいこと
+#   (密度 金 19.3 g/cm3・銀 10.5 g/cm3。手順の妥当性そのものは人間レビューが砦)
 # ---------------------------------------------------------------
 if "C41" in BY_NO:
-    colors = ["黒"] * 20 + ["白"] * 20
-
-    def always_pair(k: int) -> bool:
-        # 色の組合せだけが問題なので、黒の枚数 b = 0..k で全列挙
-        return all(max(b, k - b) >= 2 for b in range(0, k + 1) if b <= 20 and k - b <= 20)
-
-    kmin = next(k for k in range(1, 41) if always_pair(k))
-    check("C41", "確実にペアができる最小枚数", kmin == 3, f"k=2 は黒白で失敗, k={kmin} で必ず成立")
+    rho_au, rho_ag, mass = 19.3, 10.5, 1000.0  # g/cm3, g
+    v_pure = mass / rho_au
+    for ag_ratio in (0.1, 0.3, 0.5):
+        v_alloy = mass * (1 - ag_ratio) / rho_au + mass * ag_ratio / rho_ag
+        check("C41", f"銀 {int(ag_ratio*100)}% 混入で体積が増える", v_alloy > v_pure, f"{v_alloy:.1f} cm3 > 純金 {v_pure:.1f} cm3")
+    check("C41", "解説が『銀は金より軽い』を前提にする", "銀は金より軽い" in BY_NO["C41"]["explanation"] and rho_ag < rho_au, f"密度 銀 {rho_ag} < 金 {rho_au}")
 
 # ---------------------------------------------------------------
-# 機械検証不能(人間レビューが砦): A33 情景なぞなぞ / A36 神話の比喩 / C39 の「平面では 2 つが限界」
+# 機械検証不能(人間レビューが砦): A33 情景なぞなぞ / C39 の「平面では 2 つが限界」 / C40 ケーキの分け方(手順の妥当性)
 # ---------------------------------------------------------------
 
 print()
