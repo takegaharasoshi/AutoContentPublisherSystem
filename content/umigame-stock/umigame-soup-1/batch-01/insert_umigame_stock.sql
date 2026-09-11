@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（13 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（14 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -378,3 +378,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「郵便」（作問スキル umigame-problem-writer の抽選 3 語〔片づけ・郵便・たまご〕から）→ 連想「タイムカプセル・卒業式に書く未来の自分への手紙」→ 具体化（昔の男の子が書いた手紙を受け取る男）→ 常識「手紙は書いた人と受け取る人が別人」の逆（差出人 = 受取人）。着想元の既存問題なし（別々に見せた人物を同一人物と明かす構造は台帳 #21〔人数の省略の補完〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: 他人の手紙を毎日読んで怒られない男〔代読。語の強制がない状況型〕/ サンタ宛ての手紙に毎年返事を書く係〔誤認がなく知識・雑学寄り〕。', 1);
+
+-- U14 タネがないと胸を張る男
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '014-seedless-watermelon', 'タネがないと胸を張る男', 4,
+        '街角で男が「タネはひとつもありません」と胸を張った。集まった人たちは本当かどうかひとりひとり確かめると、何も始まらないうちに、お金を払って満足そうに帰っていった。なぜ？',
+        '男は夏の街角で種なしスイカを売っている。「タネはひとつもありません」は手品の口上ではなく、自慢の種なしスイカの売り文句。集まった人たちは切り分けた試食のスイカを食べて、本当に種がないことをひとりひとり確かめ、気に入ってスイカを買い、満足して帰っていった。見せ物が始まる予定はもともとなく、お金は芸への投げ銭ではなくスイカの代金である。',
+        '["男が売っているものが何かは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","男は手品師・大道芸人・役者ではない。芸や見せ物を見せる予定は、もともとない","「タネはひとつもありません」は嘘や口先だけの決まり文句ではなく、本当のことである","集まった人たちは、確かめるときに口を使った（目で見ただけではない）","人たちがお金を払って受け取ったものは、その場で男から買った品物である。お金は投げ銭やご祝儀ではない","確かめたものと、買って持ち帰ったものは同じ種類のものである","夏の暑い日の出来事である（季節は答えのヒントになる）","人たちはだまされていない。家に帰ったあとも満足したままである","集まった人たちは互いに知り合いではなく、通りがかりの客である","男の名前・年齢・街がどこかは問題に関係ない","何かが始まるのを待っていた人はいない。人たちは確かめて、買って、帰っただけである"]',
+        '[{"q":"男は手品師ですか？","a":"いいえ"},{"q":"男は大道芸人など、芸を見せる人ですか？","a":"いいえ"},{"q":"人たちは何かのショーが始まるのを待っていたのですか？","a":"いいえ"},{"q":"「タネはひとつもありません」は嘘ですか？","a":"いいえ"},{"q":"人たちが払ったお金は、芸への投げ銭ですか？","a":"いいえ"},{"q":"人たちは男から何かを買ったのですか？","a":"はい"},{"q":"買ったものは食べ物ですか？","a":"はい"},{"q":"人たちは確かめるとき、何かを口に入れましたか？","a":"はい"},{"q":"「タネ」というのは植物の種のことですか？","a":"はい"},{"q":"買ったものは果物ですか？","a":"はい"},{"q":"男はお店の人ですか？","a":"はい"},{"q":"人たちはだまされたのですか？","a":"いいえ"},{"q":"季節は答えに関係ありますか？","a":"はい"},{"q":"男の名前は答えに関係ありますか？","a":"関係ない"},{"q":"街がどこかは答えに関係ありますか？","a":"関係ない"},{"q":"集まった人たちは互いに知り合いですか？","a":"いいえ"},{"q":"男は種なしスイカを売っていて、「タネはありません」は売り文句。人たちは試食して本当に種がないことを確かめ、スイカを買って帰った。","a":"正解"}]',
+        'タネがないと大喜び？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"街角で男が、タネはひとつもありませんと胸を張った。集まった人たちは本当かどうかひとりひとり確かめると、何も始まらないうちに、お金を払って満足そうに帰っていった。なぜ？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"男は手品師？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"お金は芸への投げ銭？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"人たちは男から何かを買った？"},{"role":"master","text":"はい！"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A cheerful middle-aged man standing on a sunny summer street corner, puffing out his chest proudly with one hand raised as if declaring something, surrounded by curious people leaning in with interested faces; bright sunlight, simple background, no text anywhere.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+「タネはひとつもありません」と胸を張る男。集まった人たちは確かめただけで、何も始まらないうちにお金を払って帰っていきます。
+
+街角で男が「タネはひとつもありません」と胸を張った。集まった人たちは本当かどうかひとりひとり確かめると、何も始まらないうちに、お金を払って満足そうに帰っていった。なぜ？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「すいか」（作問スキル umigame-problem-writer の抽選 3 語〔自転車・すいか・花火〕から）→ 連想「種なしスイカ・手品のタネ・話のタネ・店先で叩いて選ぶ」→ 抽象化（「タネがない」を手品の定型口上に読ませる）→ 常識「手品師はタネを明かさない・『タネはない』は口先だけ」の逆（本当にタネがなく、確かめた客が喜んで金を払う）。着想元の既存問題なし（日常語の多義で場面を反転する構造は台帳 #16〔ホーム = 本塁〕・#23〔撃つ = 撮影〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: スイカ割り〔語の強制がない状況型・有名すぎて即バレ〕/ 交通 IC カード Suica〔表記依存・商標〕/ 丸い頭を叩いて選ぶ男〔スイカを頭と呼ぶ擬人化が出題者の作為で語の強制が弱い〕/ スイカに塩〔常識どおりで不思議が立たない〕。', 1);
