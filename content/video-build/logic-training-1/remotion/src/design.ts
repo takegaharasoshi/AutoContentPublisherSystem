@@ -28,9 +28,9 @@ import {
   HOOK_LINE_RATIO,
   HOOK_MAX_TEXT_HEIGHT,
   ILLUSTRATION_COACH_GAP,
+  ILLUSTRATION_GUARANTEED_HEIGHT,
   INTRO_BUBBLE_TEXT,
   LABEL_FONT_SIZE,
-  MIN_ILLUSTRATION_HEIGHT,
   PILL_DOT,
   PILL_DOT_GAP,
   PILL_HEIGHT,
@@ -39,7 +39,6 @@ import {
   QUESTION_FONT_SIZE_MAX,
   QUESTION_FONT_SIZE_MIN,
   QUESTION_LINE_RATIO,
-  QUESTION_MAX_HEIGHT,
   TOP_ZONE,
 } from "./layout";
 import { FittedText, fitText, measureEm } from "./textUtils";
@@ -73,7 +72,11 @@ const size = (rect: Rect) => ({
   height: rect.bottom - rect.top,
 });
 
-/** 枠に比率を保って内接させた矩形（現行版 _paste_illustration と同じ扱い） */
+/**
+ * 枠に比率を保って内接させた矩形。左右は中央、**上下は上端寄せ**（R-2）。
+ * イラスト優先配分では箱の高さが保証高を上回ることがあり、上下中央に置くと
+ * 余りが問題文との間に入って離れて見えるため、問題文の直下に寄せる。
+ */
 const containRect = (
   box: Rect,
   contentWidth: number,
@@ -84,7 +87,7 @@ const containRect = (
   const fittedWidth = Math.round(contentWidth * scale);
   const fittedHeight = Math.round(contentHeight * scale);
   const left = box.left + Math.round((width - fittedWidth) / 2);
-  const top = box.top + Math.round((height - fittedHeight) / 2);
+  const top = box.top;
   return {
     left,
     top,
@@ -148,15 +151,29 @@ export const deriveDesign = (props: QuizProps): Design => {
     bottom: badgeTop + BADGE_OUTER,
   };
 
+  // R-2: イラスト優先の配分。イラストの箱の下端（コーチの真上）は固定なので、
+  // そこから保証高と間隔を引いた残りが問題文に使える高さになる。
+  const illustrationBottom = COACH_TOP - ILLUSTRATION_COACH_GAP;
   const questionTop = headingTop + HEADING_TO_QUESTION;
+  const questionMaxHeight =
+    illustrationBottom - ILLUSTRATION_GUARANTEED_HEIGHT - CONTENT_GAP - questionTop;
   const questionWidth = TOP_ZONE.right - TOP_ZONE.left;
   const questionText = fitText(props.question, {
     maxWidth: questionWidth,
-    maxHeight: QUESTION_MAX_HEIGHT,
+    maxHeight: questionMaxHeight,
     maxFontSize: QUESTION_FONT_SIZE_MAX,
     minFontSize: QUESTION_FONT_SIZE_MIN,
     lineRatio: QUESTION_LINE_RATIO,
   });
+  if (questionText.height > questionMaxHeight) {
+    // fitText は下限サイズでも収まらないとき下限のまま返すため、ここで落とす。
+    // 旧「情景イラストの領域が残らない」例外と同じ砦の位置づけ
+    // （補充の 90 字上限なら下限 44px で収まる）。
+    throw new Error(
+      `問題文が長すぎて下限 ${QUESTION_FONT_SIZE_MIN}px でも残りの高さに収まらない`
+        + `（必要 ${questionText.height}px > 使える ${questionMaxHeight}px）`,
+    );
+  }
   const question = {
     left: TOP_ZONE.left,
     top: questionTop,
@@ -164,16 +181,14 @@ export const deriveDesign = (props: QuizProps): Design => {
     text: questionText,
   };
 
-  // イラストブロック: 問題文の下・コーチの真上。下部ゾーン（右 12% 予約あり）
+  // イラストブロック: 問題文の下・コーチの真上。下部ゾーン（右 12% 予約あり）。
+  // 箱の高さは保証高以上になり、余りが出たら containRect が上端に寄せる
   const illustrationBox: Rect = {
     left: BOTTOM_ZONE.left,
     top: questionTop + questionText.height + CONTENT_GAP,
     right: BOTTOM_ZONE.right,
-    bottom: COACH_TOP - ILLUSTRATION_COACH_GAP,
+    bottom: illustrationBottom,
   };
-  if (illustrationBox.bottom - illustrationBox.top < MIN_ILLUSTRATION_HEIGHT) {
-    throw new Error("問題文が長すぎて情景イラストの領域が残らない");
-  }
   const illustration = containRect(
     illustrationBox,
     props.illustrationWidth,

@@ -8,6 +8,14 @@
  * 上部の本文が実効 797px 幅に閉じ込められていた（新: 902px）。
  */
 
+/**
+ * R-2 の版面変更（ユーザー決定 2026-09-19）: 配分順序を「問題文優先」から
+ * **イラスト優先**へ入れ替える。イラストの箱に ILLUSTRATION_GUARANTEED_HEIGHT を
+ * 先に確保し、残った高さに問題文を収める（上限 68px 据え置き・下限 44px・行送り 1.4）。
+ * 原資はつかみ帯 64 → 52px・見出し 92 → 72px・見出しから問題文までの間隔 150 → 115px
+ * の縮小で作る。問題の長さで問題文のサイズが変わることを許容する。
+ */
+
 import { LINE_END_PROHIBITED, LINE_START_PROHIBITED } from "./textUtils";
 
 export const WIDTH = 1080;
@@ -55,7 +63,7 @@ export const PILL_TOP = CARD.top + 30;
 
 // ── つかみ帯 ──────────────────────────────────────────────────
 export const HOOK_GAP_ABOVE = 34;
-export const HOOK_FONT_SIZE_MAX = 64;
+export const HOOK_FONT_SIZE_MAX = 52;
 export const HOOK_FONT_SIZE_MIN = 44;
 export const HOOK_BAND_PADDING_X = 40;
 export const HOOK_BAND_PADDING_Y = 24;
@@ -66,23 +74,27 @@ export const HOOK_GAP_BELOW = 40;
 
 // ── 見出し「問題」 ───────────────────────────────────────────
 export const HEADING_TEXT = "問題";
-export const HEADING_FONT_SIZE = 92;
+export const HEADING_FONT_SIZE = 72;
 export const HEADING_BAR_WIDTH = 16;
 export const HEADING_BAR_GAP = 28;
 export const HEADING_BLOCK_HEIGHT = Math.round(HEADING_FONT_SIZE * 1.18);
-export const HEADING_TO_QUESTION = 150;
+export const HEADING_TO_QUESTION = 115;
 
 // ── 問題文 ────────────────────────────────────────────────────
 export const QUESTION_FONT_SIZE_MAX = 68;
-export const QUESTION_FONT_SIZE_MIN = 32;
-export const QUESTION_LINE_RATIO = 1.5;
-export const QUESTION_MAX_HEIGHT = 430;
+export const QUESTION_FONT_SIZE_MIN = 44;
+export const QUESTION_LINE_RATIO = 1.4;
+/**
+ * R-2: 問題文の最大高は定数で持たず、イラストの保証高から導く（design.ts）。
+ * 旧 QUESTION_MAX_HEIGHT = 430 は廃止。
+ */
 
 // ── イラスト / コーチ / 吹き出し ─────────────────────────────
 export const CONTENT_GAP = 48;
 export const ILLUSTRATION_RADIUS = 28;
 export const ILLUSTRATION_COACH_GAP = 16;
-export const MIN_ILLUSTRATION_HEIGHT = 200;
+/** R-2: イラストの箱に先取りで確保する高さ（配分順序を決める要） */
+export const ILLUSTRATION_GUARANTEED_HEIGHT = 500;
 export const COACH_BOX = { width: 300, height: 430 } as const;
 export const COACH_BOTTOM_MARGIN = 140;
 /** コーチはカード下端基準で立たせる（現行版 _coach_top と同値） */

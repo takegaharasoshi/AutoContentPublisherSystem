@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-19（<strong>改修 R-1 の効果確認</strong>をセクション 3 に記録〔判定は混在 = スキップ率・平均視聴秒は改善 / コメント数は低下。夜スロットに集中〕。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕の完了を記録。あわせて Phase 19-3 の <code>/goal</code> 組み込み初回試行 = OK を確認待ちリストから移動）</span>
+  <span>最終更新: 2026-09-19（<strong>改修 R-2-1</strong>〔版面変更とプレビュー出力〕をセクション 3 に記録。導出値は PoC 実測と一致・pytest 42 件全パス・問題文の字数上限 80 字の気づきをバックログへ。同日: <strong>改修 R-1 の効果確認</strong>をセクション 3 に記録〔判定は混在 = スキップ率・平均視聴秒は改善 / コメント数は低下。夜スロットに集中〕。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕の完了を記録。あわせて Phase 19-3 の <code>/goal</code> 組み込み初回試行 = OK を確認待ちリストから移動）</span>
 </div>
 
 <div class="note">
@@ -142,6 +142,19 @@
 </ul>
 </li>
 </ul>
+<li><strong>改修 R-2: イラスト拡大（イラスト優先配分。2026-09-19 起票）</strong><ul>
+<li><strong>R-2-1 版面変更とプレビュー出力（2026-09-19 完了）</strong>: <code>remotion/src/layout.ts</code> の定数を採用値へ変更し（<code>HOOK_FONT_SIZE_MAX</code> 64 → 52・<code>HEADING_FONT_SIZE</code> 92 → 72・<code>HEADING_TO_QUESTION</code> 150 → 115・<code>QUESTION_FONT_SIZE_MIN</code> 32 → 44・<code>QUESTION_LINE_RATIO</code> 1.5 → 1.4、<code>QUESTION_MAX_HEIGHT</code> 430 を廃止して <code>ILLUSTRATION_GUARANTEED_HEIGHT</code> = 500 を新設）、<code>design.ts</code> の導出順を<strong>イラスト優先</strong>へ入れ替えた。
+<ul>
+<li><strong>導出順</strong>: イラストの箱の下端（コーチの真上 = y 1293）は固定なので、そこから保証高 500px と間隔 48px を引いた残りが問題文の使える高さになる（<code>questionMaxHeight</code> = 294px。問題文の上端 451px は見出し縮小で 486 → 451 に上がった）。問題文は上限 68px・下限 44px で <code>fitText</code> し、<strong>下限でも収まらない場合は例外</strong>で落とす（旧「情景イラストの領域が残らない」例外と同じ砦）。<code>containRect</code> は<strong>上端寄せ</strong>に変更し、箱に余りが出ても問題文の直下に寄せる（左右は従来どおり中央）</li>
+<li><strong>導出値は PoC 実測と一致</strong>（在庫の最短 id=87 / 中央 id=169 / 最長 id=197）: 68px・2 行 → イラスト 797×531、54px・3 行 → 797×531、50px・4 行 → 771×514。つかみ帯は 3 問とも 52px・1 行。イラストの箱の高さは 604 / 566 / 514px でいずれも保証高 500px 以上</li>
+<li><strong>固定テスト</strong>: 版面導出は TypeScript 側にしか無いため、検査用エントリ <code>remotion/src/deriveDesignCli.ts</code>（標準入力の props → 導出値を JSON で返す。コンポジションからは参照しない）を追加し、pytest から esbuild で束ねて node で実行する <code>tests/test_layout_design.py</code> を新設した（3 問の固定値・保証高・上端寄せ・つかみ帯 52px・字数上限の 6 本）。<code>tsc --noEmit</code> 通過・<code>pytest</code> <strong>42 件全パス</strong></li>
+<li><strong>プレビュー</strong>: <code>build.py --rebuild --item 87 --item 169 --item 197</code> が完走（<code>完了: 3 件</code>）。<code>work/videos/{87,169,197}.mp4</code> と <code>work/cuts/&lt;id&gt;_{cut1,cut2,cut3,seam_head,seam_tail}.png</code>（各 5 枚）。最長 197 の MP4 は ffprobe で <strong>16.000000 秒 / 1080x1920 / h264 + aac</strong>。<code>--rebuild</code> のため BGM の LRU 更新・S3・DB への書き戻しは無し</li>
+<li><strong>気づき（バックログへ起票）</strong>: 採用値では<strong>問題文の字数上限が全角 80 字</strong>になる（81 字以上は下限 44px でも 5 行 = 310px となり 294px に収まらず例外）。補充スキルの上限 90 字との差は在庫最長 76 字のため現時点では顕在化しないが、R-2 を採用するなら整合が要る。テストで 80 字が通り 81 字が落ちることを固定した</li>
+<li><strong>版面の目視（Claude によるスチル確認）</strong>: カウントダウンバッジは見出し行の右にあり、縮小後も問題文の 1 行目と重ならない（バッジの外径下端 474px に対し 1 行目の字面は約 470px から始まり、横方向も 1 行目の行末が届くのは最長問題で x≈860px）。ただし余裕は小さいため、実機確認（R-2-2 の観点④）で最終判断する</li>
+</ul>
+</li>
+</ul>
+</li>
 
 </div>
 </body>
