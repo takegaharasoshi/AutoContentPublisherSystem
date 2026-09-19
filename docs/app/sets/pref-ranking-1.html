@@ -214,7 +214,7 @@ VOICEVOX:白上虎太郎
   <li><strong>未使用ストックが尽きた場合は利用済みストックを LRU で再利用</strong>する（投稿は止まらない。<strong>同一動画の再投稿になる点は許容</strong>・再利用時は WARNING ログ = 補充遅延のサイン。水位を守っていれば発生しない = <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
   <li><strong>事前動画の S3 欠落（DB はビルド済みなのに実体なし）は縮退せず異常終了</strong>（DB と S3 の不整合の検知。別の尺・別のネタへの差し替えはしない）</li>
   <li><strong>ストーリーズ投稿の失敗はリールの success を巻き戻さない</strong>。終端状態で確定した投稿失敗の検知は ECS タスク異常終了通知が担う（<a href="../batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a>）</li>
-  <li>1 日 1 回のため、1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの手順・判断基準は共通課題（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> 設計課題リスト 2026-07-26）に従う</li>
+  <li>1 日 1 回のため、1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの手順・判断基準は共通課題（課題体系 <a href="../../issues/index.html#I-019">I-019</a>）に従う</li>
 </ul>
 
 <h2>10. 共通フローからの差分・特記事項</h2>

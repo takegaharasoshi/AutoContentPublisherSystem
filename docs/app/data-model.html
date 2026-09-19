@@ -555,7 +555,7 @@ LIMIT 1;</code></pre>
     <li><strong>キャプション動的組み立ての展開元（16-1）</strong>: SNS 投稿バッチが <code>generation_run_id</code> で 1 行を取得し、プレースホルダを展開する（セクション 4.3 の decision）。<strong>ストック方式でも本テーブルへの記録は維持が必須</strong>（キャプションの入力になるため）</li>
     <li>直近履歴の取得（<code>KEY (set_id, quiz_type, created_at)</code>）は重複検査の休止に伴い休止（インデックスは残置）</li>
     <li><code>UNIQUE (set_id, id)</code> は<strong>持たない</strong>: 本テーブルを複合 FK で参照するテーブルが存在しないため（<code>prompt_configs</code> 等が持つのは被参照側の要件）。参照される必要が生じた時点で追加する（16-1 時点も不変 — <code>stock_item_id</code> は本テーブルが<strong>参照する側</strong>で、被参照要件は <code>quiz_stock_items</code> 側に発生する）</li>
-    <li><strong>検証・再生成の過程メタ（再生成回数・検証結果・類似度スコア）は記録しない割り切り</strong>: 観測は CloudWatch Logs で行う。<strong>16-1 の生成チェーン休止により、この過程メタ自体が発生しなくなった</strong>（設計課題リスト 2026-07-27 の行に現状を追記）</li>
+    <li><strong>検証・再生成の過程メタ（再生成回数・検証結果・類似度スコア）は記録しない割り切り</strong>: 観測は CloudWatch Logs で行う。<strong>16-1 の生成チェーン休止により、この過程メタ自体が発生しなくなった</strong>（課題体系 <a href="../issues/index.html#I-020">I-020</a> に現状を記録）</li>
   </ul>
 </div>
 

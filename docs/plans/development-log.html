@@ -20,10 +20,10 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-19（22-1 課題体系の器とルール Fix の実施記録を追加）。前回: 2026-09-04（21-3 の人間ゲート通過を追記）。前回: 2026-09-04（21-3 の実施記録を追加）。前回: 2026-09-04（21-2 の人間ゲート通過を追記）。前回: 2026-09-04（21-2 の実施記録を追加）。前回: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
+  <span>最終更新: 2026-09-19（22-2 既存課題の一括移設の実施記録を追加。旧トラブルシューティングログ 3 行を末尾の「事象記録」節へ、「設計課題リスト（解消済み）」13 行を課題体系のクローズ節へ移設）。前回: 2026-09-19（22-1 課題体系の器とルール Fix の実施記録を追加）。前回: 2026-09-04（21-3 の人間ゲート通過を追記）。前回: 2026-09-04（21-3 の実施記録を追加）。前回: 2026-09-04（21-2 の人間ゲート通過を追記）。前回: 2026-09-04（21-2 の実施記録を追加）。前回: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
 </div>
 
-<p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・トラブルシューティングログ・設計課題リストは <a href="development-plan.html">development-plan.html</a> を参照。</p>
+<p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・確認待ちリストは <a href="development-plan.html">development-plan.html</a>、課題（旧設計課題リスト）は<a href="../issues/index.html">課題体系</a>、横断・基盤のトラブルの事象は本ファイル末尾の<a href="#incidents">事象記録</a>を参照。</p>
 <ul>
 <li>各ステップの完了時、詳細な実施記録は本ファイルに追記する（development-plan.html 側はチェック + 完了日 + 要点のみ）</li>
 <li>記録は Phase 順に並べる（Phase D → A → 9 → 0〜8 → 10 以降）</li>
@@ -2077,6 +2077,17 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>機械チェック</strong>: 自作スクリプト（html.parser でタグ対応 + 相対 href/src の存在 + <code>#id</code> の存在を検査）を docs 配下 HTML 全 43 本にかけ、タグ不整合 0 件・リンク切れ 0 件（検査リンク 1483 本）（結果は会話に貼付）</li>
 <li><strong>次</strong>: 人間ゲート（ルール節 4.1〜4.9 のレビュー 1 巡・blocker のみ修正）→ <code>/step 22-2</code>（一括移設。フリーズ窓）。22-3（スキル 2 本）は 22-2 と並行可</li>
 </ul>
+<h3 id="step-22-2">22-2 既存課題の一括移設（2026-09-19・自走分完了。人間ゲート = 書き直しのレビュー〔特に据え置き → 受容へ倒した行〕待ち）</h3>
+<ul>
+<li><strong>起動</strong>: <code>/step 22-2</code> → 開発レーン宣言（フリーズ窓。触るパスは <code>docs/issues/index.html</code>・開発計画・開発記録・セット計画書 3 本・セット記録 + 設計書の参照先ポインタ）。確認待ちリストの照合は該当なし。22-1 の人間ゲート（ルール節レビュー）は未了のまま着手（ユーザー判断）</li>
+<li><strong>再カウント</strong>: 設計課題リスト 19 行 + logic-training-1 バックログ 4 行（起票時の 2 行から増加）+ pref-ranking-1 バックログ 2 行 + fantasy-animals-1 0 行 = live 25 行、トラブルシューティングログ 3 行、開発記録「設計課題リスト（解消済み）」13 行。計 41 行</li>
+<li><strong>振り分け</strong>（行き先 41 = 課題体系 live 20〔開発 18・logic-training-1 2〕+ クローズ 15〔旧解消済み 13 + 受容 1〔デプロイ分離〕+ 解消 1〔字数上限 80 字〕〕+ 確認待ちリスト 2〔logic-training-1: 16-4e 効果観察の 2 バッチ目 / pref-ranking-1: テスト投稿・初速確認〕+ 開発記録の事象記録 3 + 削除 1〔pref-ranking-1 の他レーン参照行〕）。表の全文は会話ログ（本ステップのゴール証跡）</li>
+<li><strong>判断</strong>: ① ID は起票日順に <code>I-001</code>〜<code>I-035</code> を採番（クローズ行にも付与。同日内は「旧解消済み → 開発 → セット」の順）② 「未定」「必要になったら」「頻度を見て」のトリガーは 4.4 の 5 型へ書き直し、発生実績型には回数を付けた ③ 据え置き → 受容へ倒したのは<strong>デプロイ分離の継ぎ目（旧 2026-07-12）1 行のみ</strong>（導入しないと決定済みでトリガーが書けない）④ 可視化 3 件（stale 検知・滞留・0 件処理）は対応方針が統合設計待ちのため<strong>ステータス「起票」</strong>とし、トリガーは 22-2 完了後最初の <code>/issue</code> 壁打ち（確認待ちリスト登録済み）⑤ 空 generation_run（旧 2026-07-22）は 2 回発生済みで 4.6 の既定は展開だが、恒久対策を sns-post-batch 改修フェーズに束ねる決定が先にあるため、据え置きのまま「次回改修時に必ず同梱・次の棚卸しでフェーズ起票の要否を再判断」とし、緩めた理由をトリガー列に明記 ⑥ 0 件処理（旧 2026-08-23）も 2 回発生済みのため、壁打ちの着地を「展開または受容〔ユーザー明示判断〕のみ」とトリガー列に明記 ⑦ 時刻形式の指標（旧 2026-08-10）は共通設計書に触れるため開発レーン節に置き、対象パス列にセット名を書いて補充スキルの照合に掛かるようにした</li>
+<li><strong>計画書側</strong>: 開発計画の「設計課題リスト」「トラブルシューティングログ」、セット計画書 3 本の「バックログ」（fantasy-animals-1 の空節を含む）をリンク 1 行に置換。pref-ranking-1 計画書に「5. 確認待ちリスト」を新設。設計書・記録内の「設計課題リスト YYYY-MM-DD」型のポインタ 17 箇所を課題体系の ID リンクへ付け替えた（解消の経緯を述べる decision 内の言及は歴史として残置）</li>
+<li><strong>機械チェック</strong>: 「未定」0 件・据え置き行のトリガー空欄 0 件・行数の一致（grep 件数）・docs 配下 HTML のタグ対応とリンク切れ（結果は会話に貼付）</li>
+<li><strong>触らなかったもの</strong>: CLAUDE.md（開発計画の段落に「22-2 完了までは旧置き場も併読」の文言が残る。ゴール文の「docs/ 以外は触らない」に従い、22-3 か 22-4 の完了時にまとめて更新）・<code>.claude/skills/ranking-stock-replenish/SKILL.md</code> の「バックログ」の文言（22-4 既存入口の拡張で扱う）・<code>docs/plans/index.html</code>（ルール層。22-2 での廃止は既に記述済み）</li>
+<li><strong>次</strong>: 人間ゲート（書き直しのレビュー。受容 1 行・起票 3 行・緩和 1 行を重点）→ <code>/step 22-3</code>（スキル <code>/issue</code>・<code>/incident</code>）</li>
+</ul>
 <details class="phase"><summary>次期計画の割当表・Phase XX（2026-09-03 に計画書から移設・原文）</summary><p><em>以下は 2026-09-03 の完了フェーズ整理で計画書から移設した原文。「次期計画」の割当表は Phase 16 残・19・20 のステップ割当の最終版（方針の要約は計画書「進め方の方針」に残した）。「Phase XX: プラットフォーム展開」は着手判断が未了のためアイデア体系（<a href="../ideas/platform-expansion-tiktok.md">platform-expansion-tiktok.md</a>・再醸成待ち）へ移管し、開発計画からは外した。</em></p>
 <h3>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h3>
 <p>2026-07-23 の壁打ちで策定。<strong>上位方針（収益化経路・予算・KPI・プラットフォーム展開方針）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする</strong>。優先順位の考え方: 配信面の拡大より先に「リーチ獲得能力（動画・リール）」→「勝負セット投入」→「効果測定」→「当たりが出てからプラットフォーム展開」の順。</p>
@@ -2105,6 +2116,18 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li>骨子: TikTok を第一候補とする（動画資産の転用。Content Posting API のアプリ審査等の要件は着手時に調査）。X は当面見送り（判断根拠は事業戦略書セクション 5）。着手判断の基準は「勝負セットで M2 到達が目安」。ステップ展開は着手判断時に行う</li>
 </ul>
 </details>
+<details class="phase" id="incidents" open><summary>事象記録（横断・基盤のトラブル）</summary>
+<p>横断・基盤起因のトラブルの<strong>事象</strong>（起きたこと・復旧・解決策）を記録する（22-2〔2026-09-19〕で開発計画の旧「トラブルシューティングログ」3 行を移設。切り分けのルールは<a href="../issues/index.html#rule-incident">課題体系 4.7</a>）。セット固有の事象は各セット記録（<code>docs/plans/&lt;set_code&gt;-log.html</code>）へ。これから変えるべきこと（恒久対策）は本節に書かず<a href="../issues/index.html">課題体系</a>へ起票する。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>日付</th><th>Phase-Step</th><th>事象</th><th>復旧・解決策</th><th>課題</th></tr></thead>
+<tbody>
+<tr><td>2026-07-18</td><td>10-3</td><td>V001 の複合 FK 5 本（<code>generated_images</code> 2 本・<code>posts</code> 3 本）に付けていた <code>COMMENT</code> 句が MySQL 構文違反（FOREIGN KEY 制約は COMMENT をサポートしない）。V001 は実 MySQL で未実行のため潜伏しており、10-4 の適用時に ERROR 1064 で失敗するところだった</td><td>10-3 の構文検証（sqlfluff・MySQL 方言）で検出。COMMENT の記載内容を FK 直前の行コメントへ移動して解消（<code>UNIQUE KEY</code>・<code>KEY</code> の COMMENT は正当な構文のため残置）。全 9 テーブルのパース成功を再検証済み</td><td>—</td></tr>
+<tr><td>2026-07-18</td><td>10-4</td><td>Query Editor での V001 初回実行が全 9 文 <code>Incorrect database name 'acps '; Error code: 1102</code> で失敗。接続ダイアログのデータベース名に末尾空白が入っていた（コピペ起因）。テーブルは 1 つも作られない</td><td>データベース名を空白なしの <code>acps</code> で入力し直して再実行 → 全文成功。Query Editor の接続ダイアログは入力値の前後空白をトリムしないため、DB 名はコピペ後に空白を確認する</td><td>—</td></tr>
+<tr><td>2026-07-29</td><td>15-10</td><td><code>docker exec -i acps-mysql mysql ... &lt; V004.sql</code> で DDL を適用すると、mysql クライアントの既定文字コードが latin1 のため日本語 COMMENT が二重エンコードで保存される（utf8mb4 クライアントで読むと文字化け。latin1 クライアントで読むと一見正常に見えるため気づきにくい）</td><td>カラム・インデックスを一度戻してから <code>--default-character-set=utf8mb4</code> を付けて再適用し解消。ローカル MySQL への SQL ファイル適用・日本語を含む SQL 実行では同オプションを必須とする（初回起動時の自動適用〔docker-entrypoint-initdb.d〕はサーバー設定で utf8mb4 になるため影響なし）</td><td>—</td></tr>
+</tbody>
+</table></div>
+</details>
+
 <details class="phase"><summary>確認待ちリスト（確認済み）</summary>
 <p><a href="development-plan.html#pending-checks">development-plan.html</a> の確認待ちリストのうち、確認して OK だった行をここへ移す（2026-09-03 に 16-12b の行で初めて移動。ルールは<a href="index.html#pending-checks">計画体系 5.2</a>）。NG だった行は追補ステップか課題として起こし、この表には載せない。</p>
 <div class="table-wrap"><table>
@@ -2114,113 +2137,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 </tbody></table></div>
 </details>
 
-<details class="phase"><summary>設計課題リスト（解消済み）</summary>
-<p><a href="development-plan.html">development-plan.html</a> の設計課題リストのうち解消済みの課題をここへ移す（2026-08-09 の計画書整理で導入。解消の経緯は各設計書の decision コールアウトにも記録されている）。</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>日付</th>
-<th>対象ドキュメント</th>
-<th>課題</th>
-<th>対応方針</th>
-<th>対応時期</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2026-09-02</td>
-<td><code>services/insights-batch/app/metrics_catalog.py</code>, <code>insights_api.py</code>, <code>docs/app/data-model.html</code> セクション 4.11</td>
-<td><code>account_insights_daily.metrics</code> に <code>follows_and_unfollows</code>（<code>breakdown=follow_type</code>）のキーが 1 日も入っていない。正規化で落ちているのか API が返していないのか未確認</td>
-<td><strong>16-12b（2026-09-03）で解消</strong>: CloudWatch Logs に要求失敗・Unsupported 警告がなく、Meta 公式リファレンスに「Not returned if the IG User has less than 100 followers」と明記。閾値未満のため API が返していないと確定。要求定数は残し（閾値到達後のデータを取り逃さないため）、フォロー増減は <code>v_account_kpi_daily.followers_delta</code> で見る。閾値到達後の確認は開発計画の確認待ちリスト</td>
-<td>16-12b（2026-09-03 解消）</td>
-</tr>
-<tr>
-<td>2026-07-06</td>
-<td>docs/infra/stacks.html</td>
-<td>セクション 5「スタック間のデータ受け渡し」のツリー図に MonitoringStack への入力（SnsPostingSfnArn・AuroraClusterIdentifier・EcsClusterArn・ImageGenerationSfnName）と DbReadinessCheckSgId の記載がない。3.1 出力一覧・3.4 依存スタックには記載済みのため実装は可能</td>
-<td><strong>解消済み（2026-07-23、Phase 13-2）</strong>: ツリー図に MonitoringStack へのエッジ 3 本（auroraCluster・ecsCluster・snsPostingSfnArn）と dbReadinessCheckSg → 両バッチスタックのエッジを実装（各スタックの props）どおり追記した（stacks.html セクション 5 の decision に記録）</td>
-<td>Phase 13-2</td>
-</tr>
-<tr>
-<td>2026-07-06</td>
-<td>docs/app/design-outline.html</td>
-<td>セット廃止時「データ（生成画像・投稿履歴）は残す」とあるが、S3 実体はインフラ設計の 30 日ライフサイクルで自動削除される。「残す」対象が DB レコード（メタ情報・投稿履歴）であることの明確化と S3 実体の保持要否の確認が必要</td>
-<td><strong>解消済み（2026-07-07）</strong>: 「残す」対象は DB レコードのみと確定。S3 実体は 30 日ライフサイクルで自動削除される前提を明記した（<a href="../app/data-model.html#s3-key">docs/app/data-model.html</a> セクション 5、<a href="../app/operation.html#set-retire">docs/app/operation.html</a> セクション 2.2）</td>
-<td>Phase 9-3</td>
-</tr>
-<tr>
-<td>2026-07-07</td>
-<td>docs/app/operation.html</td>
-<td>Instagram トークン失効日（<code>token_expires_at</code>）のリマインドは運用者の手動カレンダー管理としたが、セット数が増えると手運用が破綻する</td>
-<td><strong>解消済み（2026-07-29、15-16 の要否判断）</strong>: 自動化は導入しない。15-7 の実測で実効期限（<code>data_access_expires_at</code>）はユーザー × アプリの組で 1 つ・1 回の再認可で全セット同時延長と判明し、リマインダーは全セット 1 件に集約済み（operation.html 5.4）。リマインダー数がセット数に比例しない構造になったため「手運用が破綻する」前提が崩れた。再検討トリガーは ①Meta アプリの複数化 ②Live モード移行（60 日失効に戻る）③管理画面導入時（operation.html 5.4 の decision に記録）</td>
-<td>15-16</td>
-</tr>
-<tr>
-<td>2026-07-07</td>
-<td>docs/infra/security.html, docs/infra/workflow.html</td>
-<td>SNS 投稿バッチタスクロールに付与済みの <code>cloudwatch:PutMetricData</code>（Namespace=<code>ACPS</code>）は、Phase 9-2 でアプリ側は個別カスタムメトリクスを持たず既存の Step Functions 失敗アラーム 1 本に一本化する方針が確定したため、実装しても使用しない権限として残る</td>
-<td><strong>解消済み（2026-07-15、Phase 10-1）</strong>: 使用しないことが確定しているため SnsPostBatchStack のタスクロールから削除した（Step Functions 実行ロール側の <code>PutMetricData</code> は <code>SnsPostStartFailureCount</code> 発行に使用中のため残置）。経緯は security.html セクション 2.1 の decision に記録</td>
-<td>Phase 10-1</td>
-</tr>
-<tr>
-<td>2026-07-07</td>
-<td>docs/app/batch-flow.html</td>
-<td>posts の作成（3.3 手順 1）が Step Functions Retry での再実行時にも毎回 INSERT を試みる記述に読めるが、3.2 の復旧ロジックは既存 pending 行への分岐を前提としており、両者を combine して初めて「行が存在する場合は INSERT をスキップする」という意図が読み取れる。明文化されていないため誤読の余地がある</td>
-<td><strong>解消済み（2026-07-15、Phase 10-1）</strong>: batch-flow.html 3.3 手順 1 を「存在しなければ INSERT（INSERT-or-skip。既存行がある場合は 3.2 の復旧分岐で再開）」と明文化した</td>
-<td>Phase 10-1</td>
-</tr>
-<tr>
-<td>2026-07-12</td>
-<td>docs/app/batch-flow.html, docs/app/design-outline.html</td>
-<td>D-3 通読時の議論で、セット別生成ロジックの隔離方針（image-batch 内の strategy モジュール構造。方式の割当は DB のセット設定で行う）と、生成方式の設計書分冊ルール（batch-flow.html には契約 + 方式カタログのみ、方式本体は <code>docs/app/generators/</code> に 1 方式 1 本の 3 層構造）を合意した。現行のアプリ設計書には未反映</td>
-<td><strong>解消済み（2026-07-15、Phase 10-1）</strong>: design-outline.html セクション 1.1 を 3 層構造（契約 / 方式 / セット）へ拡張し、batch-flow.html セクション 2.1 に strategy 構造・方式の契約・方式カタログを新設した。検討メモ側にも反映済みを記録</td>
-<td>Phase 10-1</td>
-</tr>
-<tr>
-<td>2026-07-15</td>
-<td>docs/infra/workflow.html, docs/app/operation.html</td>
-<td>Scheduler は現在、機能名の 1 件（<code>acps-prod-image-generation-schedule</code>）のみで、セット別の命名規約が未定義。セット 2 追加時に「セットごとに Scheduler 1 件追加」する際の名前の付け方が決まっていない</td>
-<td><strong>完了（2026-07-29、15-15）</strong>: 命名規約を <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code> に確定（スロット対応方式のセットはスロットごとに 1 件・1 スケジュール 1 時刻が原則）。既存 1 件は <code>acps-prod-image-generation-fantasy-animals-1</code> へリネーム済みで、全 4 件が規約どおりの名前になっている。workflow.html 1.5 に規約と現行一覧を記載</td>
-<td>対応済み</td>
-</tr>
-<tr>
-<td>2026-07-18</td>
-<td>docs/infra/workflow.html（MonitoringStack の Aurora アラーム）</td>
-<td>Aurora の <code>acps-prod-aurora-cpu-high</code>（CPU ≥ 80%）と <code>acps-prod-aurora-memory-low</code>（FreeableMemory ≤ 256 MB）は、min ACU 0 からの再開直後の低容量状態（0.5〜1 ACU ≒ メモリ 1〜2 GiB）で構造的に鳴りやすい。10-4 の DDL 適用時、再開 + 軽微なアクセスのみで両方が ALARM → 数分で OK 復帰した実績あり（実負荷なし）。定常運用でバッチ起動のたびに同じ通知が届くノイズになる可能性がある</td>
-<td><strong>解消済み（2026-07-23、Phase 13-2）</strong>: 定常運用初日の定時実行（2026-07-22 12:00 JST）でも memory-low が発報（1〜6 分で OK 復帰。21:00 の回は非発報 = 毎回ではないが繰り返し発生）しノイズを確認したため、両アラームの DatapointsToAlarm を 2 → 3（5 分 × 3/3 = 15 分継続）へ延長し MonitoringStack をデプロイした（workflow.html セクション 8 の decision に記録）。以後の定時実行で非発報を観察する</td>
-<td>Phase 13-2</td>
-</tr>
-<tr>
-<td>2026-07-25</td>
-<td>database/V001__initial_schema.sql（<code>generated_media.file_format</code>）</td>
-<td>カラム COMMENT が「ファイル形式（Instagram 要件により jpg に変換して保存する）」のままで、動画（<code>mp4</code>）を含む 14-4 以降の実態とずれている。型は <code>VARCHAR(20)</code> のため動作影響はない</td>
-<td><strong>解消済み（2026-07-27、Phase 15-5）</strong>: クイズ方式対応の <code>V003__quiz_support.sql</code> で COMMENT を実態（<code>jpg</code> / <code>mp4</code> 等・S3 キーと <code>posts.media_type</code> 導出の入力）へ更新した</td>
-<td>Phase 15-5</td>
-</tr>
-<tr>
-<td>2026-07-26</td>
-<td>infra/lib/image-batch-stack.ts</td>
-<td>Scheduler の State は CDK テンプレートで <code>enabled: true</code> 固定のため、検証のためコンソール・CLI で <code>DISABLED</code> にしても次の <code>cdk deploy</code>（当該リソースに変更がある場合）で ENABLED に戻る。14-10〜14-12 は意図どおりだったが、<strong>「手動 DISABLE が deploy で無言のうちに解除される」性質は事故につながりうる</strong></td>
-<td>14-12 で workflow.html セクション 1.5 に「Scheduler の設定は CDK を単一の正とし、手動変更は一時的な検証時のみ」と decision として明記した。長期の停止が必要になった場合は CDK 側で <code>enabled: false</code> にして deploy する運用とする（対応不要・注意喚起として記録）</td>
-<td>対応不要（記録のみ）</td>
-</tr>
-<tr>
-<td>2026-08-10</td>
-<td>services/insights-batch/app/metrics_catalog.py</td>
-<td>16-9 の実装直前リサーチで、developers.facebook.com の Insights リファレンス本文が取得制限で直接読めず、<strong>2025-12 追加分（<code>reels_skip_rate</code> / <code>reposts</code> / <code>crossposted_views</code> / <code>facebook_views</code>）の <code>metric_type</code>・breakdown 要否と、<code>follows</code> / <code>profile_visits</code> のリール対応可否が一次情報で確定できなかった</strong>。実装は「未対応メトリクスの自動縮退 + WARNING ログ」で吸収する設計にしてあるため稼働はできるが、定数リストが実際の API 対応表とずれている可能性が残る</td>
-<td><strong>解消済み（2026-08-10、16-11）</strong>: 疎通確認の CloudWatch Logs で <code>follows</code> / <code>profile_visits</code> がリールで未対応と実証されたため定数から削除した（自動縮退のプローブ 1 往復を省く）。<code>reels_skip_rate</code> / <code>reposts</code> は <code>post_insights.metrics</code> に実データで格納されていることを確認済み（リールで取得できたキー: views / reach / likes / comments / saved / shares / total_interactions / reels_skip_rate / reposts / ig_reels_avg_watch_time / ig_reels_video_view_total_time）。feed_image は現時点で収集対象の実投稿がなく未確認のため、対象が出た時点でログを再確認する</td>
-<td>16-11</td>
-</tr>
-<tr>
-<td>2026-09-02</td>
-<td>services/image-batch（<code>app/generators/gpt_quiz_multicut.py</code> の <code>_build_illustration_prompt</code>）, docs/app/generators/gpt-quiz-multicut.html</td>
-<td>イラスト生成プロンプトの定型文が「情景の指定に「?」がある場合のみ大きな「?」を描いてよい。<strong>それ以外の文字・数字・記号は一切描画しない</strong>」と断定しているため、<strong>問題の提示物そのものを絵に出す問題</strong>（黒板に書かれた式・紙に書かれた文字など）と矛盾する。logic-training-1 の 2026-08-w5 補充ではこの例外が 6 問あり（A22「十月十日」/ A27「あいうおお」/ A25「0〜9」/ A31「花?…呼?」/ A32「柿=傘…西=?」/ A29「?楽…?隠」）、<code>work/prompts/&lt;id&gt;.txt</code> を毎回<strong>手で書き換えて</strong>生成した。<code>export_prompts.py</code> を再実行すると手当てが消えるため、再実行のたびに直す必要があり<strong>取りこぼしやすい</strong>（記録は <a href="logic-training-1-log.html">logic-training-1 記録</a> 2026-08-w5）</td>
-<td><strong>解消済み（2026-09-02、16-4e）</strong>: 定型文を「文字・数字は情景で明示的に指定されたものだけを、指定どおりの字形で正確に描く。情景で指定されていない文字・数字・記号は一切描画しない」へ変更した（<a href="../app/generators/gpt-quiz-multicut.html#illustration">gpt-quiz-multicut セクション 6</a> の decision に経緯・実績・注意を記録）。当初方針の「次回補充で混入率を観察してから本適用」は<strong>観察待ちを置かず本適用</strong>に変更（ユーザー決定）— 品質担保の主体は全数人間レビューでプロンプトの禁止は補助線であること、2026-08-w5 の手当てで例外 6 問とも成立し非例外への混入は 1 件（再生成 1 回で解消）・答えバレ 0 だったこと、戻しコストが文字列 1 箇所であることが根拠。観察は logic-training-1 のバックログ（2 バッチ分の混入件数を補充記録に残す）へ移し、<strong>16-1 の実行時生成を休止解除する際は混入率を再評価</strong>する</td>
-<td>16-4e</td>
-</tr>
-</tbody>
-</table></div>
-</details>
+<p id="resolved-issues"><strong>設計課題リスト（解消済み）</strong>: 22-2〔2026-09-19〕で<a href="../issues/index.html#closed">課題体系のクローズ節</a>へ移設した（13 行。ID は I-001〜I-029 の範囲に起票日順で採番）。以後、解消・受容した課題はクローズ節へ移す。</p>
 
 </div>
 </body>

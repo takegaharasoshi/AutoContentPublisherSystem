@@ -264,7 +264,7 @@
 
 <h2>11. 失敗時ポリシー</h2>
 <ul>
-  <li><strong>投稿側</strong>は共通フローどおり（<a href="../batch-flow.html">batch-flow.html</a> 3.2 / <a href="../operation.html">operation.html</a> 4）。事前動画の取得失敗・ストック 0 件はフェイルラウド（縮退しない）。1 日 1 回のため 1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの判断は共通課題（設計課題リスト 2026-07-26）に従う</li>
+  <li><strong>投稿側</strong>は共通フローどおり（<a href="../batch-flow.html">batch-flow.html</a> 3.2 / <a href="../operation.html">operation.html</a> 4）。事前動画の取得失敗・ストック 0 件はフェイルラウド（縮退しない）。1 日 1 回のため 1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの判断は共通課題（課題体系 <a href="../../issues/index.html#I-019">I-019</a>）に従う</li>
   <li><strong>スナップショット出力の失敗</strong>は投稿失敗にせず、NULL 行の確認クエリと手動再出力で回復する（10.2）</li>
   <li><strong>コメント側</strong>: Reply Lambda の失敗は SQS の再試行（最大 3 回）→ DLQ → アラーム。返信が遅れる・付かないことはあっても<strong>投稿には影響しない</strong>。Webhook Lambda は署名検証に失敗した要求を 401 で拒否し、正常受信は SQS へ入れた時点で 200 を返す（Meta の再送を招かないため、enqueue 失敗以外は 200）</li>
   <li><strong>OpenAI の長期障害</strong>: 予約同時実行数と SQS の保持期間（4 日）内なら復旧後に自動で返信が付く。それを超えた分は DLQ から手動で再駆動するか、古すぎれば破棄する（返信の鮮度を優先）</li>
@@ -274,7 +274,7 @@
 <p><strong>使用方式は <code>umigame-prebuilt</code></strong>（<a href="../generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>。Remotion ローカル事前ビルド + 実行時は取得のみ。ranking-prebuilt 同型で LRU 軸なし・単尺）。本セットは共通テーブルのうち <code>umigame_stock_items</code>（ストック）と <code>umigame_items</code>（投稿履歴 + スナップショット記録）を使う唯一のセットである（<a href="../data-model.html#detail-umigame-items">data-model.html 4.14 / 4.15</a>。V012）。</p>
 <ul>
   <li><strong>共通骨格への変更は 2 点のみ</strong>: ① SNS 投稿バッチのキャプション展開に umigame 系プレースホルダを追加 ② publish 成功直後の問題スナップショット出力（<code>batch_sets.problem_snapshot_enabled</code> で有効化。V012 で追加）。いずれも 21-5b で実装</li>
-  <li><strong>外向き発信・イングレスを持つ初の機能</strong>: コメント自動返信は本システムで初めて外部からの要求（Meta Webhook）を受け、ユーザーに向けて自動で発信する。投稿時と完全分離した構成（10）と、ステージング面での必須検証（10.5）でリスクを閉じる。ステージング環境の一般論は設計課題リスト 2026-08-28（フル 2 面化はしない・本経路だけ例外）</li>
+  <li><strong>外向き発信・イングレスを持つ初の機能</strong>: コメント自動返信は本システムで初めて外部からの要求（Meta Webhook）を受け、ユーザーに向けて自動で発信する。投稿時と完全分離した構成（10）と、ステージング面での必須検証（10.5）でリスクを閉じる。ステージング環境の一般論は課題体系 <a href="../../issues/index.html#I-027">I-027</a>（フル 2 面化はしない・本経路だけ例外）</li>
   <li><strong>Remotion Skills 2.0 を標準ツーリングとして継続</strong>（21-2 人間ゲート）: <code>.agents/skills/remotion-*</code> 正本 + <code>.claude/skills/remotion-*</code> のスキル単位リンク（skills CLI 1.5.23・スキル版 4.0.520）。更新は <code>npx skills update</code>。既存 2 セットへの遡及適用は本フェーズの対象外</li>
   <li><strong>ストーリーズ再掲</strong>は初期版では使わない（<code>stories_enabled=0</code>）。コメント欄への導線はリール本体が担うため</li>
   <li><strong>効果検証</strong>: インサイト収集（<a href="../batch-flow.html#flow-insights">batch-flow.html 4</a>）は既存どおり Scheduler 2 件を 21-7 で追加。コメント系指標（<code>comments</code>）は既存の指標セットに含まれており、コメント率の確認は月次 KPI 転記（<a href="../operation.html">運用設計 6.3</a>）で行う</li>

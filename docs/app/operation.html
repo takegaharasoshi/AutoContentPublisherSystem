@@ -190,7 +190,7 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
     <li>ランキング方式（<code>ranking-prebuilt</code>）のセットは、初期のランキングストックを <code>ranking_stock_items</code> へ投入し、必要尺（<code>pref-ranking-1</code> は 30 秒のみ = 2026-08-24 尺確定）の動画ビルド・配置（セクション 3）まで完了していること（<code>unbuilt</code> = 0）を在庫確認クエリで確認した。BGM は <code>time_slot</code> NULL の有効曲が 1 曲以上あることを確認した</li>
     <li>ストーリーズ再掲するセットは <code>batch_sets.stories_enabled=1</code> を設定した（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>インサイト収集 Scheduler 2 件</strong>（morning / evening）も InsightsBatchStack へ追加して deploy した（手順 3。<a href="../infra/workflow.html">infra/workflow.html セクション 1.6</a>）</li>
-    <li><strong>Scheduler の有効化前に、当該セットの SNS 投稿対象のバックログ（未投稿の生成実行）が 0 件であることを実クエリで確認した</strong>（未投稿 run の滞留は以後の投稿を恒常的に遅らせ、アラームでは気づけない。15-15 で確立した予防手順 = <a href="../plans/development-plan.html">docs/plans/development-plan.html</a> 設計課題リスト 2026-07-25。17-2 で本チェックリストに明記）</li>
+    <li><strong>Scheduler の有効化前に、当該セットの SNS 投稿対象のバックログ（未投稿の生成実行）が 0 件であることを実クエリで確認した</strong>（未投稿 run の滞留は以後の投稿を恒常的に遅らせ、アラームでは気づけない。15-15 で確立した予防手順 = 課題体系 <a href="../issues/index.html#I-017">I-017</a>。17-2 で本チェックリストに明記）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
   </ul>
 </div>
@@ -396,7 +396,7 @@ GROUP BY quiz_type, difficulty;</code></pre></li>
   <li><strong>ネタの採否ルール（17-3 で確立）</strong>
     <ul>
       <li><strong>TOP6 に同値があるネタは不採用</strong>: TOP5 地図ルーレット型は 1〜5 位の一意な順位を前提とする（方式設計書 セクション 4 の防御的検査も rank 1〜5 の一意性を要求する）。5 位と 6 位が同値の場合も、5 位だけを載せると順位付けが恣意的になるため 6 位まで検査する（例: 睡眠時間 = 4 位が同率 2 県 / カレールウ = 5 位と 6 位が同額のため不採用）</li>
-      <li><strong>時刻・時分の指標は現行のデータモデルに載らない</strong>: 表示は <code>value</code> + <code>value_suffix</code> の組み立てのため、平均就寝時刻（23:39）のような時刻表記は表現できない。分へ換算すれば数値化できるが、表示と読み上げの自然さは別途の設計判断が必要（設計課題リストに記録）</li>
+      <li><strong>時刻・時分の指標は現行のデータモデルに載らない</strong>: 表示は <code>value</code> + <code>value_suffix</code> の組み立てのため、平均就寝時刻（23:39）のような時刻表記は表現できない。分へ換算すれば数値化できるが、表示と読み上げの自然さは別途の設計判断が必要（課題体系 <a href="../issues/index.html#I-023">I-023</a>）</li>
     </ul>
   </li>
   <li><strong>手順 3（文言執筆）</strong>: <code>title</code> / <code>content_fields</code>（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>value_suffix</code>〔数値の単位表示〕/ <code>subtitle</code> / <code>bg_motif</code>）/ <code>narration</code>（30 秒版の cue 台本 = <a href="generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3</a> の cue 体系。<strong>尺確定〔2026-08-24〕後の新規執筆は 30 秒版のみ書く</strong>。既存行の 20 秒版台本は残置してよい）を執筆する。<strong><code>result_list</code> は手書きせず、ツーリングが <code>ranking_data</code> + <code>value_suffix</code> から機械整形して格納する</strong>（<a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）。ナレーションは cue ごとの時間予算（アンカー表由来）を意識して短く書く（超過はビルド時に検出される）。<strong>長さは文字数ではなくモーラ数で見積もる</strong>（<code>12899円</code> は 6 文字だが読みは 19 モーラ相当。文字数では数値の読み上げを過小評価する）。<strong>金額・件数などの数値はナレーションで読み上げず版面表示に任せる</strong>（2 秒の cue に 5 桁の金額は入らない。17-3 でネタ資材の投入前検証スクリプトにモーラ推定の検査を実装した）</li>
@@ -457,7 +457,7 @@ LIMIT 20;</code></pre>
 </ol>
 
 <h3 id="failure-correction">4.2 手動補正手順</h3>
-<p>DB を手動補正する前に、対象の <code>set_code</code>・<code>post_id</code>・現在の値をセット記録（<code>docs/plans/&lt;set_code&gt;-log.html</code> の「トラブル対応の記録」）に記録してから更新する。横断・基盤起因の事象は <a href="../plans/development-plan.html">開発レーン計画書</a>のトラブルシューティングログへ（記録先の二分は Phase 18 で導入。恒久対策の課題は開発レーンの設計課題リストに起票する）。</p>
+<p>DB を手動補正する前に、対象の <code>set_code</code>・<code>post_id</code>・現在の値をセット記録（<code>docs/plans/&lt;set_code&gt;-log.html</code> の「トラブル対応の記録」）に記録してから更新する。横断・基盤起因の事象は<a href="../plans/development-log.html#incidents">開発記録の「事象記録」</a>へ（記録先の二分は Phase 18 で導入、22-2 で開発記録側へ移設。恒久対策の課題は<a href="../issues/index.html">課題体系</a>に起票する）。</p>
 
 <h4>published_unconfirmed を投稿済みに補正する</h4>
 <p>Instagram 側で投稿済みを確認できた場合のみ実行する。</p>
@@ -753,7 +753,7 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   そのため初期運用では、<strong>期限の 7 日前を目安に運用者自身がカレンダー等の外部ツールにリマインダーを設定する</strong>運用とする（セット数が少ない初期スコープでは許容範囲と判断）。
   当初は「アカウントごとに登録」としていたが、上記のとおり <code>data_access_expires_at</code> がユーザー×アプリの組で共通であり 1 回の再認可で全セットが延長されるため、<strong>2026-07-27 以降はリマインダーを 1 件に集約する</strong>（セットごとにアプリを分けた場合はアプリごとに 1 件）。
   <br><strong>現在の登録内容: 2026-11-16</strong>（期限 2026-11-23 の 7 日前。<code>fantasy-animals-1</code> / <code>logic-training-1</code> / <code>pref-ranking-1</code> の 3 セットをカバー。2026-08-26 の 17-5b（<code>pref-ranking-1</code> のアカウント開設に伴う再認可）で <code>data_access_expires_at</code> が 2026-11-08T10:58:20Z → <strong>2026-11-23T16:39:43Z</strong> へ延長されたことに伴う更新。既存セットのトークンを <code>debug_token</code> で実測して確認した〔<code>expires_at</code> は引き続き無期限〕）
-  <br>セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（設計課題リストに記録）。
+  <br>セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（課題体系 <a href="../issues/index.html#I-003">I-003</a>。再検討トリガー 3 点付きで解消クローズ済み）。
   <br><strong>15-16（2026-07-29）の要否判断で本方針を確定</strong>: 自動化は導入しない。リマインダーがセット数に比例しない構造（Meta アプリ 1 つにつき 1 件）になったため、2026-07-07 の設計課題「セット数増で手運用が破綻」の前提が崩れた。再検討トリガーは ①Meta アプリを複数に分けた場合 ②Live モード移行で 60 日失効に戻った場合 ③管理画面（将来拡張）の導入時、の 3 点。
 </div>
 
@@ -813,7 +813,7 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   <li><code>python3 content/insights-analysis/run_queries.py kpi_post_monthly kpi_account_monthly</code> を実行し、前月の行を取る（出力は <code>results/</code> に JSON。残す集計は <code>results/YYYY-MM-DD.txt</code> として明示的にコミット）</li>
   <li><strong>セット計画書の KPI 欄</strong>: <code>v_post_kpi_monthly</code> の前月行を、スロットが分かれるセットはスロット別 + <code>all</code>、1 スロットのセットは 1 行で転記する。月末フォロワーは <code>v_account_kpi_monthly.month_end_followers</code>。様式は下表。備考には KPI 欄のベースライン行（改修前の 72 時間中央値）と比べて悪化していないかを一言添える（改修の効果判定は 16-12a の「ベースライン比較」）</li>
   <li><strong>事業戦略書 KPI 実績表</strong>（<a href="../strategy/business-strategy.html#kpi-actual">セクション 4.1</a>）: 年月 × セットの行に <code>month_end_followers</code> と <code>reach_total</code> を転記する。<code>days_collected</code> が月の日数に満たない月は備考に「n 日分」と書く（欠測日は補完しない）</li>
-  <li>悪化していれば当該セット計画書のバックログに起こす（KPI 欄には結論だけ残す）</li>
+  <li>悪化していれば<a href="../issues/index.html">課題体系</a>の当該セット節に起票する（KPI 欄には結論だけ残す）</li>
 </ol>
 <p><strong>セット計画書 KPI 欄の様式</strong>（Phase 18 で設置した枠に、次の表を入れる。値は <code>v_post_kpi_monthly</code> の列をそのまま。views は中央値、スキップ率は %、平均視聴は秒）:</p>
 <div class="table-wrap">

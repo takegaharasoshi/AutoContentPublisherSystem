@@ -110,7 +110,7 @@
 
 <div class="decision">
   <span class="callout-title">logic-training-1 の 3 スケジュールを Phase 16 リリースまで DISABLED（2026-08-06）</span>
-  2026-08-04 朝の生成失敗（クイズ検証の再生成上限到達）を起点に、メディア 0 件の generation_run が投稿対象選定をブロックし、logic-training-1 の投稿が停止・失敗アラームが定時実行のたびに発報する障害が発生した（復旧記録は <a href="../plans/development-plan.html">docs/plans/development-plan.html</a> トラブルシューティングログ 2026-08-06）。16-1 で生成チェーン休止（ストックのみ方式への転換）が決定済みであることを踏まえ、復旧時に前倒しで 3 スケジュールを停止した。CLI での即時 DISABLE に加え、上記ルール（CDK が単一の正）に従い CDK 側も <code>enabled: false</code> へ変更していた。<strong>16-4（2026-08-08）の事前生成方式（quiz-prebuilt）への切替と同時に、CDK の <code>enabled</code> 指定を外して 3 本とも再有効化済み</strong>（時刻・cron 式は変更なし）。
+  2026-08-04 朝の生成失敗（クイズ検証の再生成上限到達）を起点に、メディア 0 件の generation_run が投稿対象選定をブロックし、logic-training-1 の投稿が停止・失敗アラームが定時実行のたびに発報する障害が発生した（復旧記録は <a href="../plans/logic-training-1-log.html">logic-training-1 記録</a> 2026-08-06。Phase 18 で開発レーンのトラブルシューティングログから移設）。16-1 で生成チェーン休止（ストックのみ方式への転換）が決定済みであることを踏まえ、復旧時に前倒しで 3 スケジュールを停止した。CLI での即時 DISABLE に加え、上記ルール（CDK が単一の正）に従い CDK 側も <code>enabled: false</code> へ変更していた。<strong>16-4（2026-08-08）の事前生成方式（quiz-prebuilt）への切替と同時に、CDK の <code>enabled</code> 指定を外して 3 本とも再有効化済み</strong>（時刻・cron 式は変更なし）。
 </div>
 
 <div class="decision">
@@ -566,7 +566,7 @@
 <div class="decision">
   <span class="callout-title">Aurora アラームの DatapointsToAlarm を 2 → 3 に延長（2026-07-22、Phase 13-2）</span>
   Aurora の CPU / メモリアラームは当初 3 データポイント中 2 で発報としていたが、min ACU 0 からの再開直後の低容量状態（0.5〜1 ACU）で構造的に閾値を超え、バッチ起動のたびに ALARM → 数分で OK 復帰する誤報が発生した（10-4 の DDL 適用時に初観測。定常運用初日の 2026-07-22 12:00 JST の定時実行でもメモリアラームが発報し、1 日 3 回の通知ノイズになることを確認）。
-  実績上の一時的発報は 1〜6 分で収束するため、3/3（15 分継続）でのみ発報するよう変更した。持続的な高負荷は引き続き検知できる（検知は最大 5〜10 分遅くなるが、本システムはバッチのみで即時対応を要しない）。経緯は設計課題リスト 2026-07-18 の項を参照。
+  実績上の一時的発報は 1〜6 分で収束するため、3/3（15 分継続）でのみ発報するよう変更した。持続的な高負荷は引き続き検知できる（検知は最大 5〜10 分遅くなるが、本システムはバッチのみで即時対応を要しない）。経緯は課題体系 <a href="../issues/index.html#I-013">I-013</a>（クローズ節）を参照。
 </div>
 
 <h2 id="eventbridge-rule">9. EventBridge Rule 定義</h2>

@@ -80,7 +80,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
 <ul>
   <li><strong>絞り込み</strong>: セット専属・有効・<strong>ビルド済み（<code>video_s3_key IS NOT NULL</code>）</strong>のみ。難易度・型・スロットの軸は持たない（<code>ranking-prebuilt</code> と同じ 3 カラム索引 <code>KEY (set_id, is_active, last_used_at)</code>）</li>
   <li><strong>0 件はフェイルラウド</strong>（縮退しない）。在庫水位の監視は運用側（週次補充。在庫 14 件以上を目安 = セット計画書で管理）</li>
-  <li><strong>再利用 WARNING</strong>: 選んだ行の <code>use_count &gt;= 1</code> なら WARNING ログ（「ストック枯渇により再出題」）。参加型の性質上、<strong>同じ問題の再出題はコメント欄の推理が使い回されるため、既存 2 セットより再利用の弊害が大きい</strong>。補充が追いつかない場合は再出題より投稿スキップ（<code>is_active=0</code> による一時停止）を優先する運用とする（セット計画書のバックログ）</li>
+  <li><strong>再利用 WARNING</strong>: 選んだ行の <code>use_count &gt;= 1</code> なら WARNING ログ（「ストック枯渇により再出題」）。参加型の性質上、<strong>同じ問題の再出題はコメント欄の推理が使い回されるため、既存 2 セットより再利用の弊害が大きい</strong>。補充が追いつかない場合は再出題より投稿スキップ（<code>is_active=0</code> による一時停止）を優先する運用とする（課題が出たら課題体系の umigame-soup-1 節へ）</li>
   <li>取得後、同一トランザクションで <code>last_used_at = NOW()</code> / <code>use_count = use_count + 1</code> に更新し、<code>umigame_items</code> に問題固有部分をスナップショットする（セクション 6）</li>
   <li><strong>防御的フィールド検査</strong>: <code>fact_sheet</code> が配列でない・<code>problem_text</code> が空などは方式内で検出して異常終了（スナップショット出力がコメント経路の前提になるため、投稿前に止める）</li>
 </ul>

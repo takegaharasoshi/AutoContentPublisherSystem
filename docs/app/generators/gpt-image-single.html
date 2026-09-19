@@ -73,7 +73,7 @@
 <p>環境変数 <code>API_SECRET_ARN</code>（<a href="../../infra/workflow.html">infra/workflow.html セクション 5.1</a> の Task Definition 静的設定。実体は <code>acps/{env}/image/api-key</code>）を方式モジュールが直接読み、<code>acps_shared.get_secret_string</code> で取得した SecretString（JSON <code>{"api_key": "..."}</code>）をパースして API キーを得る。取得は <code>generate()</code> 呼び出しごとに行う（キャッシュなし。初期運用は 1 実行 1 <code>prompt_config</code> のため実害なし）。</p>
 <div class="decision">
   <span class="callout-title">決定（Phase 11-4）: Secret は方式モジュールが自分で取得する</span>
-  API Secret は共通骨格から引数で渡さず、方式モジュールが環境変数から自分で取得する。共通骨格（<code>main.py</code> / <code>processing.py</code> / レジストリ型 <code>GeneratorFn</code>）に特定 API の認証都合を持ち込まないための設計であり、契約「特定 API 固有の処理は方式側に閉じる」に沿う。将来プロバイダごとの Secret 分離が必要になった場合の扱いは設計課題リスト（2026-07-15、2 プロバイダ併用時）を参照。
+  API Secret は共通骨格から引数で渡さず、方式モジュールが環境変数から自分で取得する。共通骨格（<code>main.py</code> / <code>processing.py</code> / レジストリ型 <code>GeneratorFn</code>）に特定 API の認証都合を持ち込まないための設計であり、契約「特定 API 固有の処理は方式側に閉じる」に沿う。将来プロバイダごとの Secret 分離が必要になった場合の扱いは課題体系 <a href="../../issues/index.html#I-011">I-011</a>（2 プロバイダ併用時）を参照。
 </div>
 
 <h2>5. API 呼び出し</h2>

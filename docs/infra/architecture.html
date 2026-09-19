@@ -184,7 +184,7 @@
   <li><strong>受信</strong>: Lambda Function URL（<code>authType: NONE</code>）で Meta Webhook を直接受ける。認証は Meta の <code>X-Hub-Signature-256</code>（HMAC-SHA256・鍵は Instagram アプリシークレット）を Lambda 内で検証することで担保する。API Gateway は採らない（WAF・スロットリングが要るまで不要。Function URL は無料。21-1 ⑥ の決定）</li>
   <li><strong>非同期化</strong>: Webhook Lambda は署名検証と自己返信スキップだけを行い、SQS FIFO へ enqueue して即時 200 を返す（Meta の再送を招かない）。AI 処理は Reply Lambda が SQS トリガーで行う。再試行 3 回で DLQ へ退避し、DLQ の滞留を MonitoringStack のアラームで通知する</li>
   <li><strong>データ</strong>: Reply Lambda は既存 S3 バケットの <code>assets/{set_code}/problems/{media_id}.json</code> を GET するだけ（読み取り専用・当該プレフィックス限定の IAM）。Aurora・VPC・NAT Gateway に依存しないため、コメントが何件来ても Aurora は起動しない</li>
-  <li><strong>2 面構成</strong>: 同一コードから本番面とステージング面（PoC の Meta アプリ + テスト用アカウント <code>test_tkghr</code>）を立てる。フルのステージング環境は作らない方針（設計課題リスト 2026-08-28）の唯一の例外で、外向き発信を持つ本経路だけに限る。PoC の <code>UmigamePocStack</code> は 21-6 でステージング面へ置き換えた後に削除する</li>
+  <li><strong>2 面構成</strong>: 同一コードから本番面とステージング面（PoC の Meta アプリ + テスト用アカウント <code>test_tkghr</code>）を立てる。フルのステージング環境は作らない方針（課題体系 <a href="../issues/index.html#I-027">I-027</a>）の唯一の例外で、外向き発信を持つ本経路だけに限る。PoC の <code>UmigamePocStack</code> は 21-6 でステージング面へ置き換えた後に削除する</li>
 </ul>
 
 <h2 id="network">2. ネットワーク構成</h2>
