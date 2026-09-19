@@ -13,7 +13,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-19（開発レーン 22-2 でバックログを廃止し課題体系へ移設〔課題 2 行 + 解消 1 行〕。16-4e の効果観察は確認待ちリストへ。同日: <strong>R-2-1〔版面変更とプレビュー出力〕完了</strong>。導出値は PoC 実測と一致・pytest 42 件全パス・プレビュー 3 本を出力。次は R-2-2〔実機でのプレビュー確認・ユーザー判断〕。同日: <strong>改修 R-1 の効果確認を実施 = 判定は混在</strong>〔スキップ率・平均視聴秒は改善 / コメント数は低下〕。NG の扱いでバックログへ「コメント数低下の切り分け」を起票し、R-2 の着手可否はユーザー判断待ち。同日: 改修 R-2〔イラスト拡大・イラスト優先配分〕を起票。壁打ち 2 巡 + 静止画 PoC で採用値を確定・着手条件は R-1 効果確認の判定後。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕完了。在庫は朝・夜とも unused_built 7 / unbuilt 0 に回復し、確認待ちリストの Phase 19-3〔<code>/goal</code> 組み込み初回試行〕は OK 判定で<a href="logic-training-1-log.html">セット記録</a>へ移動。16-4e の効果観察はバックログに 1 バッチ目の結果を記入。以前の更新: 2026-09-03 に 16-12b で KPI 欄を確定様式へ・改修 R-1 完了）</span>
+  <span>最終更新: 2026-09-19（<strong>R-2-2〔プレビュー確認〕go</strong>〔実機で 4 観点すべて OK・調整の往復なし〕→ <strong>R-2-3〔在庫全数の再ビルドとレビューシート生成〕の自走分完了</strong>〔朝 35 / 夜 35 = 70 件を再ビルドし成功 70 件・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。<strong>全数レビューの人間ゲート待ち</strong>〕。あわせて補充スキルの <code>question</code> 上限を 90 → 80 字へ下げ、課題体系の <a href="../issues/index.html#I-035">I-035</a> は解消。同日: 開発レーン 22-2 でバックログを廃止し課題体系へ移設〔課題 2 行 + 解消 1 行〕。16-4e の効果観察は確認待ちリストへ。同日: <strong>R-2-1〔版面変更とプレビュー出力〕完了</strong>。導出値は PoC 実測と一致・pytest 42 件全パス・プレビュー 3 本を出力。次は R-2-2〔実機でのプレビュー確認・ユーザー判断〕。同日: <strong>改修 R-1 の効果確認を実施 = 判定は混在</strong>〔スキップ率・平均視聴秒は改善 / コメント数は低下〕。NG の扱いでバックログへ「コメント数低下の切り分け」を起票し、R-2 の着手可否はユーザー判断待ち。同日: 改修 R-2〔イラスト拡大・イラスト優先配分〕を起票。壁打ち 2 巡 + 静止画 PoC で採用値を確定・着手条件は R-1 効果確認の判定後。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕完了。在庫は朝・夜とも unused_built 7 / unbuilt 0 に回復し、確認待ちリストの Phase 19-3〔<code>/goal</code> 組み込み初回試行〕は OK 判定で<a href="logic-training-1-log.html">セット記録</a>へ移動。16-4e の効果観察はバックログに 1 バッチ目の結果を記入。以前の更新: 2026-09-03 に 16-12b で KPI 欄を確定様式へ・改修 R-1 完了）</span>
 </div>
 
 <div class="note">
@@ -110,13 +110,13 @@
   <td><strong>R-2-2</strong><br>プレビュー確認（ユーザー判断・ゴール対象外）</td>
   <td>R-2-1 の MP4 を実機（スマホ）でループ再生して確認する。観点は 4 つ: ① 4 行問題で 50px に縮んだ問題文の可読性 ② 問題文の直下に寄せたイラストと、つかみ帯・見出し・コーチとの間隔のバランス ③ 大きくなったイラストが Instagram UI（右 12%・下 15%）と重ならないか ④ 「考え中」ピル・カウントダウンバッジの位置が崩れていないか。no-go なら R-2 を見送り、理由をセット記録に残す</td>
   <td>ユーザーが 4 観点で OK と判断（調整の往復はここで吸収する）<br><strong>停止点</strong>: —（ゴールにしない）</td>
-  <td>未着手</td>
+  <td><strong>完了・go</strong>（2026-09-19）<br>プレビュー 3 本（最短 87 / 中央 169 / 最長 197）を実機で確認し 4 観点すべて OK。調整の往復なし。R-2 の採用を決定（詳細は<a href="logic-training-1-log.html">セット記録</a>）</td>
 </tr>
 <tr>
   <td><strong>R-2-3</strong><br>在庫全数の再ビルドとレビューシート生成（R-2-2 の go 後）</td>
   <td>稼働在庫の朝・夜全数（使用済み含む。着手時に <code>quiz_stock_items</code> の件数を確定。2026-09-12 時点で 70 問 = R-1 の 56 問 + 2026-09-w1 の 14 問）を <code>build.py --rebuild --slot</code> で一括再ビルドし、<code>review_sheet.py</code> で <code>work/review.html</code> を生成して全数人間レビューに出すところまで。凍結中の昼は再ビルドしない。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・セット記録</td>
   <td><strong>完了条件</strong>: ① <code>build.py</code> の対象件数 = 成功件数（昼 0 件）の出力 ② 出力 MP4 全数が 16.000 秒・1080x1920・h264 + aac であることを ffprobe 一括チェックの出力で示す ③ <code>work/review.html</code> が全数分生成されている ④ <code>python -m pytest</code> 全パス ⑤ 本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>review.html</code> での全数レビュー（承認 ID を <code>work/approved.txt</code> に記載）<br><strong>停止点・上限</strong>: push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。<code>publish.py</code>・S3・DB 更新は行わない。stop after 25 turns</td>
-  <td>未着手</td>
+  <td><strong>自走分完了</strong>（2026-09-19）<br>対象 70 件（朝 35 / 夜 35。昼 21 件は <code>--slot</code> で除外 = 0 件）を再ビルドし <strong>完了: 70 件</strong>（skip 0・失敗 0）。ffprobe 一括チェックで <strong>70 件すべて 16.000000 秒 / 1080x1920 / h264 + aac・当日更新</strong>（NG 0 件）。<code>work/review.html</code> ほか <strong>5 ページ × 14 件 = 70 件</strong>・スチル 350 枚を生成。<code>pytest</code> 42 件全パス。<strong>人間ゲート（全数レビュー → <code>work/approved.txt</code>）待ち</strong></td>
 </tr>
 <tr>
   <td><strong>R-2-4</strong><br>差し替えと設計書・記録の更新（R-2-3 のレビュー承認後）</td>
