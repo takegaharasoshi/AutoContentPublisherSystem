@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 22-1 で新設（2026-09-19）</span>
   <span>課題管理のルールの正</span>
-  <span>最終更新: 2026-09-19（22-3: スキル <code>/issue</code>・<code>/incident</code> の新設に伴い、移行中の注意と 4.5〜4.8 のスキル参照を現況へ更新）。前回: 2026-09-19（器とルール節を新設。既存課題の移設は 22-2）</span>
+  <span>最終更新: 2026-09-19（22-4: 既存入口の拡張に伴い、冒頭の注意を「入口の現況」へ書き換え、4.8 照合の入口・4.9 クローズの運用の組み込み状況を現況へ更新）。前回: 2026-09-19（22-3: スキル <code>/issue</code>・<code>/incident</code> の新設に伴い、移行中の注意と 4.5〜4.8 のスキル参照を現況へ更新）。前回: 2026-09-19（器とルール節を新設。既存課題の移設は 22-2）</span>
 </div>
 
 <div class="note">
@@ -22,11 +22,11 @@
   開発・運用で見つかった<strong>課題</strong>（= これから変えるべきこと + いつ再判断するかのトリガー）を、両レーン横断で 1 ファイルに集める場所。<strong>本ページの表が唯一の正</strong>で、壁打ちを始めた課題だけ <code>docs/issues/&lt;slug&gt;.md</code> を持つ（<a href="../ideas/index.html">アイデア体系</a>と正の置き方が逆）。開発計画の「設計課題リスト」・セット計画書の「バックログ」・開発計画の「トラブルシューティングログ」は本体系へ廃止統合した（移設は 2026-09-19 の <a href="../plans/development-plan.html#phase-22">Phase 22-2</a>。完了までは旧 3 箇所も併読）。検討の経緯は<a href="../ideas/issue-tracking-system.md">アイデア記録</a>（インプット。ルールの正は本ページ）。
 </div>
 
-<div class="warn">
-  <span class="callout-title">移行中の注意（22-2〜22-4 完了まで）</span>
+<div class="note">
+  <span class="callout-title">入口の現況（Phase 22 は 22-4〔2026-09-19〕で完了）</span>
   <ul>
-  <li><strong>2026-09-19 以降に見つかった課題は本ページへ起票する</strong>（旧 3 箇所には足さない）。既存行の移設は 22-2 で一括して行う</li>
-  <li>スキル <code>/issue</code>（起票・壁打ち・棚卸し）・<code>/incident</code>（障害対応の入口）は <a href="../plans/development-plan.html#phase-22">22-3</a>〔2026-09-19〕で新設済み。<code>/step</code>・補充スキルの照合（22-4）ができるまでは、ステップ着手・補充の起動時の照合を手で行う。照合は <code>grep -n "&lt;パス or セット名&gt;" docs/issues/index.html</code> で該当行を拾う</li>
+  <li><strong>課題は本ページへ起票する</strong>（旧 3 箇所〔設計課題リスト・セットバックログ・トラブルシューティングログ〕は 22-2 で移設・廃止済み）。起票・壁打ち・棚卸しはスキル <code>/issue</code>、障害対応の入口は <code>/incident</code>（<a href="../plans/development-plan.html#phase-22">22-3</a>）</li>
+  <li>起動時の照合は組み込み済み: <code>/step</code> が触るパスで、補充スキル（<code>/quiz-stock-replenish</code> <code>/ranking-stock-replenish</code>）がセット名で本ページの live 表を引き、「課題表: 該当なし」または該当行の扱いを宣言する（<a href="../plans/development-plan.html#phase-22">22-4</a>。umigame-soup-1 の補充スキルは 21-8 で同じ手順を入れる）。スキルを通らない作業では <code>grep -n "&lt;パス or セット名&gt;" docs/issues/index.html</code> で手で引く</li>
   </ul>
 </div>
 
@@ -193,14 +193,14 @@
 <h3 id="rule-lane">4.8 課題レーン・照合の入口・棚卸し</h3>
 <ul>
 <li><strong>課題レーン</strong>: <code>docs/issues/</code> 配下 + スキル <code>.claude/skills/issue/</code> <code>.claude/skills/incident/</code> で閉じる作業は<strong>常に並行可・宣言不要</strong>（アイデアレーンと同じ。<a href="../plans/index.html">計画体系</a>セクション 2 の判定表）。セットレーンのセッションが開発レーン向けの課題を見つけた場で起票できる。ただし<strong>展開（ステップ起票）は展開先の計画書のレーンで行う</strong>（開発計画なら開発レーン、セット計画書ならそのセットレーン）</li>
-<li><strong>照合の入口 5 つ</strong>（据え置き課題のトリガーを引く動線。(d)(e) は 22-3 のスキル 2 本に組み込み済み、(a)(b) は 22-4 で組み込む）: (a) <code>/step</code> 起動時に触るパスで対象パス列を照合 (b) 補充スキル起動時にセット名で照合 (c) <a href="../plans/index.html#step-checklist">起票チェックリスト 5.1</a>（フェーズ・改修・採用転記のすべての起票で、触るパスに該当する据え置き課題を同梱するかトリガーを更新する） (d) <code>/incident</code>（障害時） (e) 棚卸し</li>
+<li><strong>照合の入口 5 つ</strong>（据え置き課題のトリガーを引く動線。(d)(e) は 22-3 のスキル 2 本、(a)(b)(c) は 22-4 で <code>/step</code>・補充スキル 2 本・<code>/idea</code> の採用転記に組み込み済み。(e) の節目は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a> の月次 KPI 転記に明記）: (a) <code>/step</code> 起動時に触るパスで対象パス列を照合 (b) 補充スキル起動時にセット名で照合 (c) <a href="../plans/index.html#step-checklist">起票チェックリスト 5.1</a>（フェーズ・改修・採用転記のすべての起票で、触るパスに該当する据え置き課題を同梱するかトリガーを更新する） (d) <code>/incident</code>（障害時） (e) 棚卸し</li>
 <li><strong>該当行があったときの動作</strong>: そのゴール・起票の中で「同梱する（展開）/ トリガーを更新して据え置き継続 / 受容」を決めて表を更新する。黙って通り過ぎない（<code>/step</code> は「課題表: 該当なし」の宣言を残す）</li>
 <li><strong>棚卸しの節目</strong>（新しい儀式は作らない）: 月次 KPI 転記（<a href="../app/operation.html">運用設計</a> 6.3）と、フェーズ完了・改修完了の節目に、live のトリガー列を上から確認する（日付型・節目型を拾う）。起票 のまま残っている行はここで対応方針を決める。確認待ちリストの棚卸しと同時に行う</li>
 </ul>
 
 <h3 id="rule-close">4.9 クローズの運用</h3>
 <ul>
-<li><strong>解消</strong>: 展開したステップの完了時に、<code>/step</code> の完了手順（22-4 で追加。それまでは手動）が行をクローズ節へ移す（クローズ日 + ステップ・コミットへのリンク）</li>
+<li><strong>解消</strong>: 展開したステップの完了時に、<code>/step</code> の完了手順（22-4〔2026-09-19〕で追加。<code>.claude/skills/step/SKILL.md</code> セクション 5）が行をクローズ節へ移す（クローズ日 + ステップ・コミットへのリンク）</li>
 <li><strong>受容</strong>: 直さない理由を「結果」列に書いてクローズ節へ。再検討の余地があるなら受容ではなく据え置き（トリガー付き）にする</li>
 <li><strong>再発</strong>: <code>/incident</code> がクローズ節から live へ戻す（ID・発生履歴を継続し、エスカレーション規則を適用）</li>
 <li>クローズ節が 50 行を超えて閲覧の妨げになったら <code>closed.html</code> へ分け、本ページにリンクを残す（<code>/incident</code> の照合対象は分けた後も両方）</li>

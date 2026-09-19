@@ -20,7 +20,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <h1>開発記録（完了ステップの実施記録）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-19（22-3 スキル <code>/issue</code>・<code>/incident</code> の新設の実施記録を追加）。前回: 2026-09-19（22-2 の人間ゲート通過を追記〔22-1 のルール節レビューも同巡で通過〕。同日: 22-2 既存課題の一括移設の実施記録を追加。旧トラブルシューティングログ 3 行を末尾の「事象記録」節へ、「設計課題リスト（解消済み）」13 行を課題体系のクローズ節へ移設）。前回: 2026-09-19（22-1 課題体系の器とルール Fix の実施記録を追加）。前回: 2026-09-04（21-3 の人間ゲート通過を追記）。前回: 2026-09-04（21-3 の実施記録を追加）。前回: 2026-09-04（21-2 の人間ゲート通過を追記）。前回: 2026-09-04（21-2 の実施記録を追加）。前回: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
+  <span>最終更新: 2026-09-19（22-4 既存入口の拡張の実施記録を追加）。前回: 2026-09-19（22-3 スキル <code>/issue</code>・<code>/incident</code> の新設の実施記録を追加）。前回: 2026-09-19（22-2 の人間ゲート通過を追記〔22-1 のルール節レビューも同巡で通過〕。同日: 22-2 既存課題の一括移設の実施記録を追加。旧トラブルシューティングログ 3 行を末尾の「事象記録」節へ、「設計課題リスト（解消済み）」13 行を課題体系のクローズ節へ移設）。前回: 2026-09-19（22-1 課題体系の器とルール Fix の実施記録を追加）。前回: 2026-09-04（21-3 の人間ゲート通過を追記）。前回: 2026-09-04（21-3 の実施記録を追加）。前回: 2026-09-04（21-2 の人間ゲート通過を追記）。前回: 2026-09-04（21-2 の実施記録を追加）。前回: 2026-09-03（21-1 の実施記録を追加。同日、計画書の完了フェーズ整理に伴い、Phase 16・18・19・20 のステップ一覧の原文を各 Phase 末尾の移設ブロックへ、「次期計画」の割当表と旧 Phase XX の記載を Phase 20 直後の移設ブロックへ収容。同日に 20-1 の人間ゲート実施と 16-12b の確認済み行の移動）</span>
 </div>
 
 <p>完了した開発ステップの実施記録（確認条件・備考の全文）を保管するファイル。現役の計画・進め方の方針・確認待ちリストは <a href="development-plan.html">development-plan.html</a>、課題（旧設計課題リスト）は<a href="../issues/index.html">課題体系</a>、横断・基盤のトラブルの事象は本ファイル末尾の<a href="#incidents">事象記録</a>を参照。</p>
@@ -2097,6 +2097,18 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>起動確認</strong>: SKILL.md 保存直後にセッションの「available skills」通知に <code>issue</code>・<code>incident</code> の 2 本が description 付きで現れた（会話ログに貼付。frontmatter は name / description の 2 項目）</li>
 <li><strong>文言更新</strong>: CLAUDE.md（リポジトリ構成の issues/ 行・参照ガイドの課題行・開発計画段落の Phase 22 状況）/ <code>docs/issues/index.html</code>（移行中の注意・4.5 壁打ち入口・4.6 再発検知・4.7 障害対応の入口・4.8 照合の入口の組み込み状況・最終更新）。<code>docs/plans/index.html</code> セクション 2 の「（22-3 で新設）」は事実として正しいためルール節には触れていない</li>
 <li><strong>次</strong>: <code>/step 22-4</code>（既存入口の拡張 = <code>/step</code> 手順 4 の課題表照合と完了手順のクローズ移動・補充スキル 2 本のセット名照合・<code>/idea</code> の採用転記 1 行・operation.html 2 箇所）。初回試行は確認待ちリスト（<code>/incident</code> = 次の本番異常時・<code>/issue</code> 壁打ち = 可視化 3 件の統合設計）</li>
+</ul>
+<h3 id="step-22-4">22-4 既存入口の拡張（2026-09-19 完了。人間ゲートなし）</h3>
+<ul>
+<li><strong>起動</strong>: <code>/step 22-4</code> → 開発レーン宣言（触るパスは <code>.claude/skills/step/</code> <code>quiz-stock-replenish/</code> <code>ranking-stock-replenish/</code> <code>idea/</code> の SKILL.md + <code>docs/app/operation.html</code> + <code>docs/issues/index.html</code> の暫定文言 + 開発計画・開発記録）。確認待ちリストの照合は該当なし（22-4 の初回試行行はトリガーが「22-4 完了後の次の <code>/step</code>」）。<strong>課題表の照合（22-4 まで手動のルールに従い grep で実施）</strong>: 触るパスに該当する live 行は 4 件 — <code>I-033</code>（<code>quiz-stock-replenish/</code>。トリガーは logic-training-1 の次の週次補充）/ <code>I-006</code>・<code>I-019</code>・<code>I-025</code>（operation.html セクション 4。トリガーは <code>/issue</code> 壁打ち・失敗アラーム発生）。いずれもトリガーが本ステップの出来事に当たらないため<strong>据え置き継続・トリガー更新なし</strong>と判断（表の更新なし）</li>
+<li><strong><code>/step</code> SKILL.md</strong>: 手順 4 に「課題表の照合」の小項目（触るパスで対象パス列を grep・セットレーンはセット名でも・該当行があれば同梱 / トリガー更新 / 受容をゴール内で決めて表を更新・トリガーが当たらない行は据え置き継続の宣言で足りる・該当なしは「課題表: 該当なし」・課題の展開なら展開元を控える）。手順 5 のレーン宣言に課題表の照合結果を追加。新設のセクション 5「完了手順」に 4 手順（計画書 + 記録 / 確認待ちの結果列 / <strong>展開元の課題のクローズ移動</strong>〔部分解消なら行を残してトリガー更新〕/ コミット・push）。ガードレールの起票チェックリスト行に課題照合を追記</li>
+<li><strong>補充スキル 2 本</strong>: <code>quiz-stock-replenish</code> は「起動時の /goal」節の確認待ち照合の直後に、<code>ranking-stock-replenish</code> は「0. 在庫確認」の確認待ち照合の直後に、セット名で live 表を引きセット型トリガーの行を拾う手順を追加（該当行の扱いは同じ 3 択・該当なしは「課題表: 該当なし」）。ranking 側の「計画書の設計課題リスト」の古い参照を <code>I-023</code> へ付け替え（22-2 の積み残し）。umigame-soup-1 の補充スキルは 21-8 で同じ手順を入れる</li>
+<li><strong><code>/idea</code> SKILL.md</strong>: 「採用で着地するとき」に、5.1 の起票チェックリストが課題照合を含むことと、転記下書きに照合結果（ID と扱い、または該当なし）を 1 行残す旨を追加</li>
+<li><strong>operation.html</strong>: セクション 4 冒頭に「障害対応の入口はスキル <code>/incident</code>」の段落（4.1〜4.4 は切り分け・復旧の手順として参照する位置づけ）、6.3 の箇条書きに「課題の棚卸し（節目）」1 行（月次転記後に <code>/issue</code> の棚卸しモードで live 表のトリガー列と確認待ちリストを確認）。最終更新を更新</li>
+<li><strong><code>docs/issues/index.html</code></strong>: 冒頭の「移行中の注意」を「入口の現況」（note）に書き換え（手動 grep はスキルを通らない作業のフォールバックとして残す）。4.8 照合の入口の組み込み状況・4.9 の <code>/step</code> 完了手順の参照先・最終更新を現況へ</li>
+<li><strong>機械チェック</strong>: 各 SKILL.md の照合手順の grep 出力と、docs 配下 HTML のタグ対応 + 相対 href/src + <code>#id</code> の存在検査（22-1 と同じ自作スクリプト）でタグ不整合 0 件・リンク切れ 0 件（結果は会話に貼付）</li>
+<li><strong>触らなかったもの</strong>: CLAUDE.md（参照ガイドの「22-4 まで手で grep」・開発計画段落の「次は <code>/step 22-4</code>」が残る。ゴール文の「.claude/skills/ と docs/ のみ」に従い未更新。次に CLAUDE.md を触るときに現況へ直す）</li>
+<li><strong>次</strong>: Phase 22 は全 4 ステップ完了。<code>/step</code> の課題表照合の初回試行は確認待ちリストで追う（次の <code>/step</code> 起動時）。開発レーンの次は <code>/step 21-4a-3</code>〔U16〕または <code>/step 21-6</code></li>
 </ul>
 <details class="phase"><summary>次期計画の割当表・Phase XX（2026-09-03 に計画書から移設・原文）</summary><p><em>以下は 2026-09-03 の完了フェーズ整理で計画書から移設した原文。「次期計画」の割当表は Phase 16 残・19・20 のステップ割当の最終版（方針の要約は計画書「進め方の方針」に残した）。「Phase XX: プラットフォーム展開」は着手判断が未了のためアイデア体系（<a href="../ideas/platform-expansion-tiktok.md">platform-expansion-tiktok.md</a>・再醸成待ち）へ移管し、開発計画からは外した。</em></p>
 <h3>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h3>
