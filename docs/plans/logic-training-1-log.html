@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-19（<strong>改修 R-2-2〔プレビュー確認 = go〕と R-2-3〔在庫全数の再ビルド〕</strong>をセクション 3 に記録〔70 件再ビルド成功・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。全数レビューの人間ゲート待ち〕。同日: <strong>改修 R-2-1</strong>〔版面変更とプレビュー出力〕をセクション 3 に記録。導出値は PoC 実測と一致・pytest 42 件全パス・問題文の字数上限 80 字の気づきをバックログへ。同日: <strong>改修 R-1 の効果確認</strong>をセクション 3 に記録〔判定は混在 = スキップ率・平均視聴秒は改善 / コメント数は低下。夜スロットに集中〕。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕の完了を記録。あわせて Phase 19-3 の <code>/goal</code> 組み込み初回試行 = OK を確認待ちリストから移動）</span>
+  <span>最終更新: 2026-09-19（<strong>改修 R-2-2〔プレビュー確認 = go〕と R-2-3〔在庫全数の再ビルド〕</strong>をセクション 3 に記録〔70 件再ビルド成功・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。全数レビューの人間ゲートも同日通過 = 70 問すべて承認〕。同日: <strong>改修 R-2-1</strong>〔版面変更とプレビュー出力〕をセクション 3 に記録。導出値は PoC 実測と一致・pytest 42 件全パス・問題文の字数上限 80 字の気づきをバックログへ。同日: <strong>改修 R-1 の効果確認</strong>をセクション 3 に記録〔判定は混在 = スキップ率・平均視聴秒は改善 / コメント数は低下。夜スロットに集中〕。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕の完了を記録。あわせて Phase 19-3 の <code>/goal</code> 組み込み初回試行 = OK を確認待ちリストから移動）</span>
 </div>
 
 <div class="note">
@@ -162,7 +162,7 @@
 <li><strong>レビューシート</strong>: <code>python review_sheet.py --slot morning --slot night</code> → <strong>全 70 件 / 5 ページ</strong>（<code>review.html</code> + <code>review-2〜5.html</code>・1 ページ 14 件）。スチルは当日生成分が <strong>350 枚</strong>（70 × 5。先頭 0f と末尾 479f を隣接表示）</li>
 <li><strong>テスト</strong>: <code>python -m pytest</code> <strong>42 件全パス</strong>（版面導出の固定テスト 6 本を含む。R-2-1 から本数の増減なし）</li>
 <li><strong>補充スキルの字数上限を 90 → 80 字へ</strong>: R-2-2 が go になったため、再ビルドの前に<a href="../../.claude/skills/quiz-stock-replenish/SKILL.md">補充スキル</a>の <code>question</code> 上限を採用値に合わせて下げ、勘所に理由と「次回補充時は <code>validate.py</code> の <code>LIMITS["question"]</code> も 80 に追随させる」注記を追加した。課題体系の <a href="../issues/index.html#I-035">I-035</a> は同日クローズ（開発レーン 22-2 の移設時に解消として転記済み）</li>
-<li><strong>人間ゲート（未了）</strong>: <code>work/review.html</code> の全数レビューと <code>work/approved.txt</code> への承認 ID 記載。差し替え（S3・DB）は R-2-4 で行うため本ステップでは <code>publish.py</code> を実行していない</li>
+<li><strong>人間ゲート（2026-09-19 完了）</strong>: ユーザーがスマホで 5 ページを全数レビューし、<strong>70 問すべて承認</strong>（調整の往復なし）。<code>work/approved.txt</code> を今回分 70 件に置き換えた（<code>publish.py._approved_ids</code> で 70 件・重複なし・台帳の morning 35 / night 35 と一致を確認。前回の 2026-09-w1 分 14 件は <code>work/approved_2026-09-w1.txt.bak</code> に退避）。差し替え（S3・両環境 DB）は R-2-4 で行うため本ステップでは <code>publish.py</code> を実行していない</li>
 </ul>
 </li>
 </ul>
