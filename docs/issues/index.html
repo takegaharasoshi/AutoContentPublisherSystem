@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>課題体系 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / 課題体系</nav>
+<h1>課題体系（ダッシュボード兼・唯一の正）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">Phase 22-1 で新設（2026-09-19）</span>
+  <span>課題管理のルールの正</span>
+  <span>最終更新: 2026-09-19（器とルール節を新設。既存課題の移設は 22-2）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  開発・運用で見つかった<strong>課題</strong>（= これから変えるべきこと + いつ再判断するかのトリガー）を、両レーン横断で 1 ファイルに集める場所。<strong>本ページの表が唯一の正</strong>で、壁打ちを始めた課題だけ <code>docs/issues/&lt;slug&gt;.md</code> を持つ（<a href="../ideas/index.html">アイデア体系</a>と正の置き方が逆）。開発計画の「設計課題リスト」・セット計画書の「バックログ」・開発計画の「トラブルシューティングログ」は本体系へ廃止統合する（移設は <a href="../plans/development-plan.html#phase-22">Phase 22-2</a>。完了までは旧 3 箇所も併読）。検討の経緯は<a href="../ideas/issue-tracking-system.md">アイデア記録</a>（インプット。ルールの正は本ページ）。
+</div>
+
+<div class="warn">
+  <span class="callout-title">移行中の注意（22-2〜22-4 完了まで）</span>
+  <ul>
+  <li><strong>2026-09-19 以降に見つかった課題は本ページへ起票する</strong>（旧 3 箇所には足さない）。既存行の移設は 22-2 で一括して行う</li>
+  <li>スキル <code>/issue</code>・<code>/incident</code>（<a href="../plans/development-plan.html#phase-22">22-3</a>）と、<code>/step</code>・補充スキルの照合（22-4）ができるまでは、起票と照合を手で行う。照合は <code>grep -n "&lt;パス or セット名&gt;" docs/issues/index.html</code> で該当行を拾う</li>
+  </ul>
+</div>
+
+<h2 id="live">1. 課題一覧（live）</h2>
+<p>レーンごとの節に分ける（照合先は本ファイル 1 つのまま、セット別に眺められる）。列の書き方はセクション 4.2、ステータスは 4.3。行の <code>id</code> は課題 ID（<code>I-001</code> 形式・起票順の連番・レーン横断で一意）で、計画書・記録からは <code>index.html#I-001</code> でリンクする。</p>
+
+<h3 id="lane-dev">1.1 開発レーン（<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>・共通設計書・横断ルール）</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>起票日</th><th>対象パス</th><th>課題</th><th>対応方針</th><th>ステータス</th><th>トリガー</th><th>発生履歴</th><th>壁打ち</th></tr></thead>
+<tbody>
+<tr><td colspan="9"><em>（空。22-2 で開発計画の設計課題リストから移設する）</em></td></tr>
+</tbody>
+</table></div>
+
+<h3 id="lane-logic-training-1">1.2 セット logic-training-1</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>起票日</th><th>対象パス</th><th>課題</th><th>対応方針</th><th>ステータス</th><th>トリガー</th><th>発生履歴</th><th>壁打ち</th></tr></thead>
+<tbody>
+<tr><td colspan="9"><em>（空。22-2 でセット計画書のバックログから移設する）</em></td></tr>
+</tbody>
+</table></div>
+
+<h3 id="lane-pref-ranking-1">1.3 セット pref-ranking-1</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>起票日</th><th>対象パス</th><th>課題</th><th>対応方針</th><th>ステータス</th><th>トリガー</th><th>発生履歴</th><th>壁打ち</th></tr></thead>
+<tbody>
+<tr><td colspan="9"><em>（空。22-2 でセット計画書のバックログから移設する）</em></td></tr>
+</tbody>
+</table></div>
+
+<h3 id="lane-umigame-soup-1">1.4 セット umigame-soup-1（Phase 21 で新設中）</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>起票日</th><th>対象パス</th><th>課題</th><th>対応方針</th><th>ステータス</th><th>トリガー</th><th>発生履歴</th><th>壁打ち</th></tr></thead>
+<tbody>
+<tr><td colspan="9"><em>（空）</em></td></tr>
+</tbody>
+</table></div>
+
+<p>停止したセット（fantasy-animals-1）の節は置かない。停止セットに関する課題が出たら、関係セットを課題文に書いて開発レーンの節へ起票する。新しいセットを稼働させたら（セット計画書を作る時点で）節を 1 つ足す。</p>
+
+<h2 id="closed">2. クローズ（解消 / 受容）</h2>
+<p>解消・受容した行は live の節から本節へ移す（行はそのまま + クローズ日 + 根拠リンク。ID は保つ）。再発したら <code>/incident</code> が本節から live へ戻す（発生履歴を継続）。本節が <strong>50 行を超えて閲覧の妨げになったら <code>closed.html</code> へ分ける</strong>（本ページにリンクを残す）。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>起票日</th><th>レーン</th><th>対象パス</th><th>課題</th><th>結果（解消 / 受容）と根拠</th><th>クローズ日</th><th>発生履歴</th></tr></thead>
+<tbody>
+<tr><td colspan="8"><em>（空。22-2 で開発記録の「設計課題リスト（解消済み）」から移設する）</em></td></tr>
+</tbody>
+</table></div>
+
+<h2 id="pending-relation">3. 確認待ちリストとの関係</h2>
+<p>各計画書の<strong>確認待ちリスト</strong>（<a href="../plans/index.html#pending-checks">計画体系 5.2</a>）は本体系へ統合<strong>しない</strong>。ステップ・レーンに紐づく短命の観察項目で、レーンの入口（<code>/step</code>・補充スキル）が既に読んでいるため計画書に残す。違いはトリガーが引かれたときの動作にある。</p>
+<ul>
+<li><strong>確認待ち</strong>: 観察して OK / NG を判定し <strong>1 回で閉じる</strong>（OK → 記録へ移す / NG → 課題として本体系へ起票）</li>
+<li><strong>課題</strong>: トリガーごとに<strong>再判断を繰り返しうる</strong>（据え置き継続〔トリガー更新〕/ 展開 / 受容）</li>
+<li>共通化するのは<strong>トリガーの書式</strong>（4.4）と<strong>棚卸しの節目</strong>（4.8）だけ。確認待ちの「NG 時の扱い: 課題として起票」の行き先は本ページ</li>
+</ul>
+
+<h2 id="rules">4. 運用ルール（正）</h2>
+
+<h3 id="rule-unit">4.1 課題の単位とアイデアとの境界</h3>
+<ul>
+<li><strong>1 課題 = 対応方針を 1 つ決められる単位</strong>で、表の 1 行。<strong>課題とアイデアの境界（リトマス）: 課題 = 何もしないと損なわれるものがある</strong>（既存の欠陥・持ち越し・リスク・設計レビューの改善提案）<strong>/ アイデア = やれば増える価値がある</strong>（<a href="../ideas/index.html">アイデア体系</a>）。迷ったら「放置したとき何が損なわれるか」を具体的に言えるほうが課題</li>
+<li><strong>課題は「これから変えるべきこと + トリガー」だけを持つ</strong>。起きたこと（事象・復旧手順・解決策）は書かない（4.7）</li>
+<li>粒が大きく複数の対応方針に割れる課題は、壁打ち（4.5）で割ってから行を分ける。起票時は曖昧でよい（ステータス 起票）</li>
+</ul>
+
+<h3 id="rule-columns">4.2 列の書き方（起票の様式）</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>列</th><th>書くこと</th></tr></thead>
+<tbody>
+<tr><td>ID</td><td><code>I-001</code> 形式の起票順連番（レーン横断で一意・クローズ後も再利用しない）。<code>&lt;tr id="I-001"&gt;</code> に同じ値を付ける</td></tr>
+<tr><td>起票日</td><td>YYYY-MM-DD</td></tr>
+<tr><td>対象パス</td><td>変更が及ぶパスをリポジトリルートからの形で（複数可・<code>services/sns-post-batch/</code> のようにディレクトリ単位でよい）。<strong><code>/step</code> が触るパスで grep する列</strong>なので、設計書・スキルも含めて漏らさず書く。セット固有なら<strong>セット名も書く</strong>（補充スキルがセット名で照合する）</td></tr>
+<tr><td>課題</td><td>何が損なわれる（うる）か。1〜3 文</td></tr>
+<tr><td>対応方針</td><td>どう変えるか（未決なら「未決」と書き、ステータスを 起票 にする）。1〜3 文。壁打ちで長くなったら要旨を <code>&lt;slug&gt;.md</code> へ移しリンクにする</td></tr>
+<tr><td>ステータス</td><td>4.3 の 4 つのどれか</td></tr>
+<tr><td>トリガー</td><td>いつ再判断するか。4.4 の書式で、<strong>据え置きなら必須</strong></td></tr>
+<tr><td>発生履歴</td><td>「発生実績を見て判断」型で、発生した日付と事象記録へのリンクの羅列（例: <code>2026-08-06（<a href="../plans/logic-training-1-log.html">LT 記録</a>）・2026-09-04</code>）。復旧の経緯は書かない（4.7）</td></tr>
+<tr><td>壁打ち</td><td>壁打ちを始めたら <code>&lt;slug&gt;.md</code> へのリンク。始めていなければ「—」</td></tr>
+</tbody>
+</table></div>
+
+<h3 id="rule-status">4.3 ステータス（4 つ）</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>ステータス</th><th>対応方針</th><th>トリガー</th><th>置き場</th><th>意味</th></tr></thead>
+<tbody>
+<tr><td><strong>起票</strong></td><td>未決</td><td>任意</td><td>live</td><td>見つけて書き留めた。壁打ち（4.5）で対応方針を決めて次のどれかへ移す。長く留めない（目安: 次の棚卸しまで）</td></tr>
+<tr><td><strong>据え置き</strong></td><td>決まっている</td><td><strong>必須</strong></td><td>live</td><td>今はやらない。<strong>本体系の主役</strong>。トリガーが引かれたら再判断し、据え置き継続（トリガー更新）/ 展開 / 受容 のどれかに倒す。<strong>「未定」「将来」「頻度を見て」のようなトリガーの書けない据え置きは禁止</strong> — 具体トリガーが書けないなら受容</td></tr>
+<tr><td><strong>展開済み</strong></td><td>決まっている</td><td>—</td><td>live</td><td>ステップ・フェーズとして計画書に起票した（リンクを対応方針列に）。そのステップの完了で 解消 へ移す</td></tr>
+<tr><td><strong>解消 / 受容</strong></td><td>—</td><td>—</td><td>クローズ節</td><td><strong>解消</strong> = 変更が入った（ステップ・コミットへのリンク）。<strong>受容</strong> = 直さない・再判断もしないと決めた（理由必須。アイデア体系の「見送り」と同型）。再発したら live へ戻す</td></tr>
+</tbody>
+</table></div>
+
+<h3 id="rule-trigger">4.4 トリガーの書式（確認待ちリストと共通）</h3>
+<p><strong>入口が機械的に照合できる形</strong>で書く。次の 5 型のどれかに当てはめ、型ごとの照合の入口を意識して書く。確認待ちリスト（<a href="../plans/index.html#pending-checks">計画体系 5.2</a>）のトリガー列も同じ書式。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>型</th><th>書き方（例）</th><th>照合する入口</th></tr></thead>
+<tbody>
+<tr><td><strong>パス型</strong></td><td>「<code>services/sns-post-batch/</code> を次に改修するとき」（対象パス列と揃える）</td><td><code>/step</code>（触るパス）・起票チェックリスト 5.1（フェーズ・改修の起票時）</td></tr>
+<tr><td><strong>セット型</strong></td><td>「logic-training-1 の次の週次補充」「pref-ranking-1 の第 3 バッチ整備時」</td><td>補充スキル（セット名）</td></tr>
+<tr><td><strong>日付型</strong></td><td>「2026-10-15 以降」「稼働 2 週間後（= 2026-10-01 以降）」— <strong>相対表現は必ず絶対日付に換算して併記</strong></td><td>棚卸し（4.8）</td></tr>
+<tr><td><strong>発生実績型</strong></td><td>「次に発生したとき（現在 1 回。2 回目で据え置き不可）」— <strong>回数を必ず書く</strong>（4.6）</td><td><code>/incident</code>（症状・セット名・パス）</td></tr>
+<tr><td><strong>節目型</strong></td><td>「次の月次 KPI 転記」「Phase 21 完了時」「KPI M2 到達時」</td><td>棚卸し（4.8）</td></tr>
+</tbody>
+</table></div>
+<p>禁止: 「未定」「将来拡張」「発生頻度を見て判断」（回数なし）「必要になったら」。これらは<strong>トリガーが引かれる瞬間を誰も検知できない</strong>ため、据え置きの資格がない。書けないなら受容へ倒す。</p>
+
+<h3 id="rule-layers">4.5 2 層構造（表が正・壁打ち時のみ MD）</h3>
+<ul>
+<li><strong>正は本ページの表</strong>。起票時にファイルは作らない（課題は件数が多く粒が小さい。全件にファイルを作ると墓場化する）</li>
+<li><strong>壁打ちを始める時点で</strong> <code>docs/issues/&lt;slug&gt;.md</code> を <a href="_template.md">_template.md</a> から作り、壁打ち列にリンクを付ける。MD が持つのは「要旨（対応方針の現在形・Claude が毎回書き直す）」「選択肢と判断」「原文メモ（追記のみ）」「壁打ち記録（追記のみ・蒸留）」。<strong>表と MD が乖離したら表が正</strong>（ステータス・トリガーは表にだけ書き、MD には写さない）</li>
+<li>詳細 HTML <code>&lt;slug&gt;.html</code> は構成図・比較表が要るときだけ。作ったら MD の要旨はリンク 1 行に置き換える（同じ情報を 2 箇所に書かない）</li>
+<li><strong>壁打ちの終了規律</strong>（アイデア体系 4.4 と同型）: 1 回の壁打ちは必ず <strong>据え置き（トリガー更新）/ 展開（ステップ起票）/ 受容（理由付き）</strong> のどれかに着地し、表を同期する。「なんとなく放置」を許さない。壁打ち中に出た別の課題はその場で起票（壁打ちはしない）し、本筋に戻る。入口はスキル <code>/issue</code> の壁打ちモード（22-3 で新設）</li>
+</ul>
+
+<h3 id="rule-escalation">4.6 エスカレーション規則（発生実績型の既定）</h3>
+<ul>
+<li>「発生実績を見て判断」型のトリガーは<strong>回数を明記</strong>し、発生ごとに発生履歴列へ日付 + 事象記録リンクを足す</li>
+<li><strong>既定: 1 回目 = 記録 + 再判断</strong>（据え置き継続を選んでよいが、トリガーの回数を「2 回目で据え置き不可」に更新する）。<strong>2 回目 = 据え置き不可</strong>。ステップとして起票（展開）するのが既定で、受容へ倒すのはユーザーの明示の判断がある場合のみ（理由付き）</li>
+<li>既定より厳しくするのは自由（初回で展開）。緩めるとき（3 回目まで据え置く等）は理由をトリガー列に書く</li>
+<li>再発の検知と発生履歴の更新は <code>/incident</code>（22-3）の工程。それまでは障害対応の冒頭で本ページを症状・セット名・パスで grep する</li>
+</ul>
+
+<h3 id="rule-incident">4.7 事象記録との切り分け</h3>
+<ul>
+<li><strong>事象</strong>（起きたこと・復旧手順・解決策 = 過去向き）は<strong>記録ファイル</strong>へ: セット固有は <code>docs/plans/&lt;set_code&gt;-log.html</code>、横断・基盤は <a href="../plans/development-log.html">開発記録</a>の「事象記録」節（22-2 で新設。旧トラブルシューティングログの 3 行を移す）。<strong>課題</strong>（これから変えること = 未来向き）は本ページへ。行に復旧の経緯を書き込まない（行の肥大を防ぐ。2026-07-22 起票の「空 generation_run」の項がその実例）</li>
+<li><strong>障害 1 件から出るもの</strong> = 事象記録 1 件（必ず）+ 課題 0〜n 件（恒久対策が要るとき）+ 既存課題の発生履歴更新（再発のとき）</li>
+<li><strong>その場で直した対策も課題として起票し、即 解消 に落とす</strong>（「何が変わったか」の知識をクローズ節に集める。「何が起きたか」は記録に、と置き場を一意にする）</li>
+<li>障害対応の入口はスキル <code>/incident</code>（22-3）: 症状の聞き取り → <strong>照合（本ページの live + クローズ・当該レーンの確認待ち・事象記録を症状・セット名・パスで検索し「予言されていた課題」「前にも起きた事象」を原因究明の前に提示）</strong> → 切り分けと復旧（本番操作は人間ゲート）→ 事象記録 → 課題の更新 → コミット・push。コードでの修正は <code>/incident</code> の中では行わず、課題を起票して <code>/step</code>（開発レーン）で行う</li>
+</ul>
+
+<h3 id="rule-lane">4.8 課題レーン・照合の入口・棚卸し</h3>
+<ul>
+<li><strong>課題レーン</strong>: <code>docs/issues/</code> 配下 + スキル <code>.claude/skills/issue/</code> <code>.claude/skills/incident/</code> で閉じる作業は<strong>常に並行可・宣言不要</strong>（アイデアレーンと同じ。<a href="../plans/index.html">計画体系</a>セクション 2 の判定表）。セットレーンのセッションが開発レーン向けの課題を見つけた場で起票できる。ただし<strong>展開（ステップ起票）は展開先の計画書のレーンで行う</strong>（開発計画なら開発レーン、セット計画書ならそのセットレーン）</li>
+<li><strong>照合の入口 5 つ</strong>（据え置き課題のトリガーを引く動線。22-3・22-4 で各入口に組み込む）: (a) <code>/step</code> 起動時に触るパスで対象パス列を照合 (b) 補充スキル起動時にセット名で照合 (c) <a href="../plans/index.html#step-checklist">起票チェックリスト 5.1</a>（フェーズ・改修・採用転記のすべての起票で、触るパスに該当する据え置き課題を同梱するかトリガーを更新する） (d) <code>/incident</code>（障害時） (e) 棚卸し</li>
+<li><strong>該当行があったときの動作</strong>: そのゴール・起票の中で「同梱する（展開）/ トリガーを更新して据え置き継続 / 受容」を決めて表を更新する。黙って通り過ぎない（<code>/step</code> は「課題表: 該当なし」の宣言を残す）</li>
+<li><strong>棚卸しの節目</strong>（新しい儀式は作らない）: 月次 KPI 転記（<a href="../app/operation.html">運用設計</a> 6.3）と、フェーズ完了・改修完了の節目に、live のトリガー列を上から確認する（日付型・節目型を拾う）。起票 のまま残っている行はここで対応方針を決める。確認待ちリストの棚卸しと同時に行う</li>
+</ul>
+
+<h3 id="rule-close">4.9 クローズの運用</h3>
+<ul>
+<li><strong>解消</strong>: 展開したステップの完了時に、<code>/step</code> の完了手順（22-4 で追加。それまでは手動）が行をクローズ節へ移す（クローズ日 + ステップ・コミットへのリンク）</li>
+<li><strong>受容</strong>: 直さない理由を「結果」列に書いてクローズ節へ。再検討の余地があるなら受容ではなく据え置き（トリガー付き）にする</li>
+<li><strong>再発</strong>: <code>/incident</code> がクローズ節から live へ戻す（ID・発生履歴を継続し、エスカレーション規則を適用）</li>
+<li>クローズ節が 50 行を超えて閲覧の妨げになったら <code>closed.html</code> へ分け、本ページにリンクを残す（<code>/incident</code> の照合対象は分けた後も両方）</li>
+</ul>
+
+</div>
+</body>
+</html>

@@ -14,12 +14,12 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 18 で導入（2026-08-28）</span>
   <span>並行作業ルールの正</span>
-  <span>最終更新: 2026-09-02（19-4 でセクション 5 を新設・同日「起票チェックリスト」と「確認待ち項目」を追加）</span>
+  <span>最終更新: 2026-09-19（Phase 22-1 で課題レーンを判定表に追加・記録の分担に課題体系と事象記録・5.1 に課題表の照合・5.2 のトリガー書式を課題体系へ参照）</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  プロジェクト管理は<strong>開発レーン</strong>（フェーズ制の新規開発・基盤改修。常に 1 セッション）と<strong>セットレーン</strong>（セット別の保守運用・セット内で閉じる改修。セットごとに並行可）の 2 レーンで行う。本書はファイルの一覧と<strong>レーン振り分け・並行作業ルールの正</strong>。導入の経緯は<a href="development-log.html">開発記録</a>の Phase 18 を参照。意思決定前のアイデアは<a href="../ideas/index.html">アイデア体系</a>（アイデアレーン・常に並行可・2026-08-28 導入）で管理する。
+  プロジェクト管理は<strong>開発レーン</strong>（フェーズ制の新規開発・基盤改修。常に 1 セッション）と<strong>セットレーン</strong>（セット別の保守運用・セット内で閉じる改修。セットごとに並行可）の 2 レーンで行う。本書はファイルの一覧と<strong>レーン振り分け・並行作業ルールの正</strong>。導入の経緯は<a href="development-log.html">開発記録</a>の Phase 18 を参照。意思決定前のアイデアは<a href="../ideas/index.html">アイデア体系</a>（アイデアレーン・常に並行可・2026-08-28 導入）、開発・運用で見つかった課題は<a href="../issues/index.html">課題体系</a>（課題レーン・常に並行可・2026-09-19 導入。Phase 22）で管理する。
 </div>
 
 <h2>1. ファイル一覧</h2>
@@ -27,7 +27,7 @@
 <div class="table-wrap"><table>
 <thead><tr><th>レーン</th><th>計画書</th><th>記録</th><th>対象</th></tr></thead>
 <tbody>
-<tr><td>開発レーン</td><td><a href="development-plan.html">development-plan.html</a></td><td><a href="development-log.html">development-log.html</a></td><td>フェーズ制の新規開発・基盤改修・横断課題（トラブルの恒久対策・設計課題リスト）</td></tr>
+<tr><td>開発レーン</td><td><a href="development-plan.html">development-plan.html</a></td><td><a href="development-log.html">development-log.html</a></td><td>フェーズ制の新規開発・基盤改修・横断課題の展開（課題そのものは<a href="../issues/index.html">課題体系</a>へ。計画書内の設計課題リストは Phase 22-2 で移設）</td></tr>
 <tr><td>セットレーン</td><td><a href="fantasy-animals-1.html">fantasy-animals-1.html</a></td><td><a href="fantasy-animals-1-log.html">fantasy-animals-1-log.html</a></td><td>架空のかわいい動物図鑑（セット 1）。<strong>2026-09-03 に停止</strong>（Phase 20-1）。以後セットレーンの作業は発生しない</td></tr>
 <tr><td>セットレーン</td><td><a href="logic-training-1.html">logic-training-1.html</a></td><td><a href="logic-training-1-log.html">logic-training-1-log.html</a></td><td>脳みそトレーニング（セット 2・勝負セット）</td></tr>
 <tr><td>セットレーン</td><td><a href="pref-ranking-1.html">pref-ranking-1.html</a></td><td><a href="pref-ranking-1-log.html">pref-ranking-1-log.html</a></td><td>表彰台五郎の都道府県ランキング（セット 3）</td></tr>
@@ -40,6 +40,7 @@
 <thead><tr><th>レーン</th><th>触ってよいパス</th><th>作業例</th><th>並行</th></tr></thead>
 <tbody>
 <tr><td><strong>アイデアレーン</strong></td><td><code>docs/ideas/</code> 配下のみ（アイデア MD・詳細 HTML・ダッシュボード）+ スキル <code>.claude/skills/idea/</code></td><td>アイデアの捕捉・壁打ち・棚卸し（<code>/idea</code> スキル。起動がレーン宣言を兼ねる）</td><td><strong>常に並行可</strong>（宣言不要）。ただし「待機 → 採用」の転記は development-plan / 事業戦略書に触れるため<strong>開発レーン</strong>で行う</td></tr>
+<tr><td><strong>課題レーン</strong></td><td><code>docs/issues/</code> 配下のみ（課題表 index.html・壁打ち MD）+ スキル <code>.claude/skills/issue/</code> <code>.claude/skills/incident/</code>（22-3 で新設）</td><td>課題の起票・壁打ち・棚卸し（<code>/issue</code>）/ 障害時の照合・事象記録・発生履歴の更新（<code>/incident</code>）。ルールの正は<a href="../issues/index.html">課題体系</a></td><td><strong>常に並行可</strong>（宣言不要）。ただし課題の<strong>展開</strong>（ステップ起票）は展開先の計画書のレーンで行う（開発計画なら開発レーン、セット計画書ならそのセットレーン）。事象記録の書き込み先（セット記録 / 開発記録）はそのファイルのレーンに従う</td></tr>
 <tr><td><strong>セットレーン</strong></td><td><code>content/&lt;set&gt;/</code> 配下（ストック資材・ビルドツーリング・Remotion コンポジション）/ セット別設計書 <code>docs/app/sets/&lt;set&gt;.html</code> / そのセット専用の方式設計書 <code>docs/app/generators/*.html</code> / セット計画書・記録 <code>docs/plans/&lt;set&gt;*.html</code> / 補充スキル <code>.claude/skills/*-stock-replenish/</code></td><td>週次ストック補充 / 動画の演出・尺・構成のセット内改修（例: カット数変更 → 再ビルド → S3・DB 差し替え）/ キャプション・BGM の DB 差し替え / セット固有トラブルの事象記録</td><td><strong>セットごとに並行可</strong>（複数セッション同時 OK）</td></tr>
 <tr><td><strong>開発レーン</strong></td><td><code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>（DDL）/ 共通設計書（<code>docs/app/</code> の共通 4 本・<code>docs/infra/</code>・<code>docs/overview/</code>・<code>docs/index.html</code>）/ 事業戦略書 / CLAUDE.md / 本ディレクトリの development-plan / development-log</td><td>フェーズもの（16-5・16-12・Phase XX 等）/ バッチ・CDK の改修（デプロイ + パイプライン完走確認を伴う）/ スキーマ変更 / 横断の運用ルール改訂</td><td><strong>常に 1 セッションのみ</strong></td></tr>
 </tbody>
@@ -60,7 +61,7 @@
 <li><strong>計画書のステップ着手は <code>/step &lt;識別子&gt;</code> から</strong>（両レーン共通・Phase 19-2 で導入）: 起動がレーン宣言と <code>/goal</code> 完了条件の宣言を兼ねる。手順・テンプレの正は <code>.claude/skills/step/SKILL.md</code></li>
 <li><strong>git は trunk（main）直 push を継続</strong>し、<strong>push 前に <code>git pull --rebase origin main</code></strong> を必ず挟む。書き込みファイルがレーンで分離されているため、競合は原則発生しない</li>
 <li><strong>開発レーンは常に 1 本</strong>: <code>services/</code> / <code>shared/</code> に触れる push は CodePipeline 完走 + タスク定義新リビジョン確認まで見届ける必要があり、並行すると確認が混線するため</li>
-<li>レーンをまたぐ気づき（セット作業中に見つけた基盤の課題等）は、自分で直さず<strong>相手レーンの計画書に課題として記録</strong>する（セット → 開発: 設計課題リストへ / 開発 → セット: セット計画書のバックログへ）</li>
+<li>レーンをまたぐ気づき（セット作業中に見つけた基盤の課題等）は、自分で直さず<strong><a href="../issues/index.html">課題体系</a>の相手レーンの節に課題として起票</strong>する（課題レーンは常に並行可のため、見つけた場で書ける。2026-09-19 までは相手レーンの計画書〔設計課題リスト / バックログ〕に記録していた）</li>
 <li>本ディレクトリの整理・ルール変更（Phase 18 級の作業）は、他セッションが 1 本も動いていないフリーズ窓で単独実施する</li>
 </ul>
 
@@ -68,7 +69,7 @@
 <ul>
 <li><strong>plan（毎セッション読む）</strong>: ステータス / バックログ / 進行中ステップ。完了したらチェック + 完了日 + 要点 1〜2 行だけ残す</li>
 <li><strong>log(必要なときだけ読む)</strong>: 実施の詳細全文。週次補充は「1 回 = 表 1 行(日付・投入件数・在庫水位・特記)」の定型とし、特記事項があるときだけ本文を書く</li>
-<li><strong>トラブルの二分</strong>: セット固有の<strong>事象の記録</strong>はセット log へ、<strong>恒久対策の課題</strong>（コード・共通設計書に触れるもの）は開発レーンの設計課題リストへ（相互リンクを張る）</li>
+<li><strong>課題と事象と確認待ちの 3 分</strong>（Phase 22-1 で「トラブルの二分」を改訂）: <strong>課題</strong>（これから変えるべきこと + トリガー）は両レーンとも<a href="../issues/index.html">課題体系</a>へ / <strong>事象</strong>（起きたこと・復旧・解決策）は記録ファイルへ（セット固有はセット log、横断・基盤は開発 log の「事象記録」節〔22-2 で新設〕）/ <strong>確認待ち</strong>（ステップ付随の短命の観察項目）はそのレーンの plan の確認待ちリスト（5.2）へ。計画書の設計課題リスト・バックログ・トラブルシューティングログは 22-2 で廃止し、リンク 1 行に置換する。切り分けの詳細は<a href="../issues/index.html#rule-incident">課題体系 4.7</a></li>
 <li>同じ情報を複数ドキュメントに書かない原則は従来どおり。詳細は 1 箇所に書き、他からは参照リンクを張る</li>
 </ul>
 
@@ -95,6 +96,7 @@
 <li><strong>人間ゲートは push 直後に行えるものか</strong>。後日でないとできない確認は 1 と同じく確認待ちへ</li>
 <li><strong>ユーザー作業（目視・go / no-go・設計判断）はステップとして残すがゴールにしない</strong>（見出しに「ユーザー判断・ゴール対象外」）</li>
 <li><strong>切り方</strong>: ゲートのない連続作業はまとめる。20〜30 ターンを超えそう・2 レーンにまたがるものは機械検証できる中間点で割る</li>
+<li><strong>課題表の照合</strong>（Phase 22-1 で追加）: 起票するステップが触るパス・セット名で<a href="../issues/index.html">課題体系</a>の live 表を照合し、該当する据え置き課題があれば<strong>同梱する（展開済みにしてステップに含める）か、トリガーを更新して据え置きを続けるか</strong>を決めて表を更新する。判断の結果（「課題表: 該当なし」を含む）を起票文に 1 行残す。「〜の次回改修時」型のトリガーはここで引かれる</li>
 </ol>
 
 <h3 id="pending-checks">5.2 確認待ち項目（トリガー付き・ステップにしない）</h3>
@@ -103,13 +105,13 @@
 <thead><tr><th>列</th><th>書くこと</th></tr></thead>
 <tbody>
 <tr><td>日付 / 対象</td><td>起票日と、どのステップ・変更の確認か（リンク）</td></tr>
-<tr><td>トリガー</td><td>いつ確認するか。入口が機械的に照合できる形で（「次に <code>services/</code> <code>shared/</code> を push したとき」「logic-training-1 の次の週次補充」「投稿 2 週間後」）</td></tr>
+<tr><td>トリガー</td><td>いつ確認するか。入口が機械的に照合できる形で（「次に <code>services/</code> <code>shared/</code> を push したとき」「logic-training-1 の次の週次補充」「投稿 2 週間後（= 絶対日付を併記）」）。<strong>書式の正は<a href="../issues/index.html#rule-trigger">課題体系 4.4</a></strong>（パス型 / セット型 / 日付型 / 発生実績型 / 節目型の 5 型。課題表と共通）</td></tr>
 <tr><td>確認内容・判定基準</td><td>何を見て、何なら OK か（証跡はコマンド出力・画面の観察項目）</td></tr>
-<tr><td>NG 時の扱い</td><td>戻す / 直す / 課題として起票する、のどれか</td></tr>
+<tr><td>NG 時の扱い</td><td>戻す / 直す / 課題として起票する（起票先は<a href="../issues/index.html">課題体系</a>）、のどれか</td></tr>
 <tr><td>結果</td><td>確認したら日付 + 結果 + 記録へのリンク。OK なら行を記録へ移す</td></tr>
 </tbody>
 </table></div>
-<p><strong>眠らせない仕組み</strong>: トリガー側の入口が起動時に確認待ちリストを読む — <code>/step</code> は触るパスと開発計画の確認待ちを照合し、該当行があればそのゴールの中で確認して結果を書く。補充スキルは起動時に当該セット計画書の確認待ちを読む（Phase 19-5 で各スキルに追記）。棚卸しはフェーズ完了・改修完了の節目で、リストのトリガー列を上から確認する（アイデア体系の条件待ち棚卸しと同じ作法）。</p>
+<p><strong>眠らせない仕組み</strong>: トリガー側の入口が起動時に確認待ちリストを読む — <code>/step</code> は触るパスと開発計画の確認待ちを照合し、該当行があればそのゴールの中で確認して結果を書く。補充スキルは起動時に当該セット計画書の確認待ちを読む（Phase 19-5 で各スキルに追記）。棚卸しはフェーズ完了・改修完了・月次 KPI 転記の節目で、リストのトリガー列を上から確認する（アイデア体系の条件待ち棚卸し・<a href="../issues/index.html#rule-lane">課題体系 4.8</a> の棚卸しと同じ節目・同じ作法。課題表の照合も同じ入口が行う〔22-4 で各スキルに追記〕）。確認待ちと課題の違いは<a href="../issues/index.html#pending-relation">課題体系セクション 3</a>（確認は 1 回で閉じる / 課題は再判断を繰り返しうる）。</p>
 
 </div>
 </body>

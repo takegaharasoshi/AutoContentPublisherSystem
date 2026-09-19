@@ -18,6 +18,7 @@ AutoContentPublisherSystem/
 │   ├── app/                         #   アプリ設計書（共通設計書 + generators/ 方式別 + sets/ セット別の 3 層構造）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
 │   ├── ideas/                       #   アイデア体系（意思決定前のアイデアの捕捉・壁打ち・醸成。ルールの正は ideas/index.html。スキル /idea）
+│   ├── issues/                      #   課題体系（両レーンの課題をトリガー付きで追う。表 index.html が唯一の正・壁打ち時のみ MD。ルールの正は issues/index.html。スキル /issue・/incident は 22-3 で新設）
 │   └── plans/                       #   計画体系（開発レーン計画・記録 + セット別計画・記録。2 レーン運用ルールの正は plans/index.html）
 ├── infra/                           # AWS CDK プロジェクト（TypeScript）
 ├── services/
@@ -63,6 +64,7 @@ AutoContentPublisherSystem/
 | `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
 | `docs/plans/` | 計画体系（開発レーン + セット別の計画・記録。並行作業ルール） | `index.html`（レーン振り分け・並行作業ルールの正）, `development-plan.html` / `development-log.html`（開発レーン）, `<set_code>.html` / `<set_code>-log.html`（セットレーン × 3 セット） |
 | `docs/ideas/` | アイデア体系（意思決定前の事業アイデアの捕捉・壁打ち・醸成。6 ステータス管理） | `index.html`（ダッシュボード・運用ルールの正）, `<slug>.md`（記録層・正）, `<slug>.html`（深化したアイデアの詳細） |
+| `docs/issues/` | 課題体系（開発・運用で見つかった課題を両レーン横断で追う。4 ステータス・据え置きはトリガー必須・2 回目の発生で据え置き不可。Phase 22-1〔2026-09-19〕で新設。設計課題リスト・セットバックログ・トラブルシューティングログの後継〔移設は 22-2〕） | `index.html`（レーン別 live 表 + クローズ節 + 運用ルールの正。表が唯一の正）, `_template.md`（壁打ち雛形）, `<slug>.md`（壁打ちを始めた課題だけ） |
 | `docs/_archive/` | 旧 Markdown 設計書（アプリ設計の参考資料。現役ではない） | 過去の検討経緯の参照用 |
 
 ### ドキュメント参照ガイド（タスク別）
@@ -87,6 +89,7 @@ AutoContentPublisherSystem/
 | セットの運用状況・バックログの確認、週次補充・セット内改修（セットレーン） | `docs/plans/<set_code>.html`（記録は `<set_code>-log.html`）+ レーン判定は `docs/plans/index.html` |
 | 過去の実施記録・経緯を確認する | `docs/plans/development-log.html`（完了ステップの確認・備考の全文）/ セット運用の記録は `docs/plans/<set_code>-log.html` |
 | アイデアを書き留める・壁打ちする・棚卸しする | `docs/ideas/index.html`（ダッシュボード + 運用ルールの正。作業はスキル `/idea` で行う） |
+| 課題を起票する・据え置き課題を照合する・障害対応の入口 | `docs/issues/index.html`（課題表 + 運用ルールの正。課題 = 何もしないと損なわれるもの。スキル `/issue`・`/incident` は 22-3 で新設、それまでは手で起票・`grep` で照合） |
 
 ### 設計 Fix・レビューの運用ルール
 
@@ -94,13 +97,13 @@ AutoContentPublisherSystem/
 
 - 設計書は「次フェーズの作業に着手できる」水準で一時 Fix とする。「生成 AI の指摘ゼロ」を目指さない
 - 設計レビューは観点を限定して行い、最大 2 巡まで。指摘は blocker（誤り・矛盾・欠落）と改善提案に分類し、**blocker のみ修正**する
-- 改善提案・持ち越し論点は `docs/plans/development-plan.html` 末尾の「設計課題リスト」に記録する
+- 改善提案・持ち越し論点は課題体系 `docs/issues/index.html` に据え置き課題（トリガー付き）として起票する（2026-09-19 までは `docs/plans/development-plan.html` 末尾の「設計課題リスト」。既存行は 22-2 で移設）
 
 ## 開発計画（2 レーン体制）
 
 - **プロジェクト管理は 2 レーン体制**（Phase 18・2026-08-28 導入）: 開発レーン（フェーズ制の新規開発・基盤改修）は `docs/plans/development-plan.html`、セット別の保守運用・セット内で閉じる改修はセット計画書 `docs/plans/<set_code>.html` で管理する。**レーン振り分け（パス基準）・並行作業ルールの正は `docs/plans/index.html`**
 - ステップ・作業の完了時、計画書にはチェック + 完了日 + 要点のみを記録し、詳細な実施記録は対応する記録ファイル（`development-log.html` / `<set_code>-log.html`）に追記する（計画書の肥大化防止）
-- **Phase D〜15・17（設計 → インフラ構築 → アプリ実装 → 動画対応 → 勝負セット → 第 3 セット pref-ranking-1）は完了済み**。**16-5・16-12a・16-12b は 2026-09-02〜03 に完了**（水準評価・指標セット確定・V011 ビュー昇格と月次 KPI 転記運用。集計ランナーは `content/insights-analysis/`、月次転記の手順は `docs/app/operation.html` セクション 6.3）。**Phase 20-1（fantasy-animals-1 の停止）の作業は 2026-09-03 に完了**（Scheduler 3 件を CDK から削除・`batch_sets.is_active = 0`。deploy と Aurora への UPDATE は人間ゲート、停止の効果確認は計画書の確認待ちリスト）。稼働中のセットは logic-training-1・pref-ranking-1 の 2 本。16-12b の人間ゲート（Aurora への V011 適用と翌日のビュー値確認）は計画書の確認待ちリストで追う。**Phase 19（開発プロセスへの `/goal` 組み込み）は 2026-09-02 に完了**（`/step`・補充スキル 2 本・`/idea` に確認待ちリストの照合と起票ルールを組み込み済み。各スキルの初回試行は計画書末尾の「確認待ちリスト」でトリガー付きに追う）。**2026-09-03 に計画書を整理し、Phase 16・18・19・20 は「完了フェーズのサマリ」へ畳んだ（ステップ一覧の原文は開発記録の移設ブロック）。進行中の開発レーンは Phase 21（ウミガメのスープ参加型セット・第 4 セット。2026-09-03 にアイデア体系から採用転記。PoC 資材は `poc/umigame-comment-webhook/`）。21-1〔テーマ Fix 壁打ち〕は 2026-09-03 に完了〔記録は `docs/app/requirements-notes-set4.html`〕、21-2〔リール動画の PoC〕は 2026-09-04 に完了〔人間ゲート 2 巡で承認。24 秒版面・素材項目 14 項目・TTS は Amazon Polly Neural〔Takumi〕・Remotion Skills 継続。資材は `content/video-build/umigame-soup-1/`、決定は同 README セクション 0〕。**21-3〔設計書 Fix〕は 2026-09-04 に完了**〔セット別設計書 `docs/app/sets/umigame-soup-1.html`・方式設計書 `docs/app/generators/umigame-prebuilt.html`・共通設計書とインフラ設計書の追記〔CommentReplyStack・V012 草案〕。人間ゲート = 設計レビューは 1 巡・blocker なしで通過。キャラ名は「探偵カメロック」・表示名は「コメントで推理！探偵カメロックのウミガメのスープ」に確定〕。**21-4a〔DDL・ストック整備ツーリング・第 1 バッチ初稿〕は 2026-09-04 に完了**〔V012 ローカル適用・`content/umigame-stock/umigame-soup-1/` にツーリングと初稿 10 問〕。**2026-09-07 の人間ゲートで作問方針を変更**〔初稿はコアのない問題だったため、作問スキル `umigame-problem-writer` を先に作り 1 問試作 → 問題とスキルをレビュー → 確定後に残り 9 問。初稿 9 問はスキルの検査にかけて採否を決める〕。**21-4a-2〔作問スキル `.claude/skills/umigame-problem-writer/` + U01 試作 + コア宣言 `core` の必須化〕は 2026-09-07 に自走分完了・人間ゲート〔問題 + スキルのチャットレビュー〕待ち**。次の着手はレビュー後の `/step 21-4a-3`（残り 9 問）、または `/step 21-6`（コメント経路の本番化。独立のため並行可）**。プラットフォーム展開（旧 Phase XX）はアイデア体系 `docs/ideas/platform-expansion-tiktok.md` へ移管し再醸成待ち（条件: 勝負セットで KPI M2 到達の目安）
+- **Phase D〜15・17（設計 → インフラ構築 → アプリ実装 → 動画対応 → 勝負セット → 第 3 セット pref-ranking-1）は完了済み**。**16-5・16-12a・16-12b は 2026-09-02〜03 に完了**（水準評価・指標セット確定・V011 ビュー昇格と月次 KPI 転記運用。集計ランナーは `content/insights-analysis/`、月次転記の手順は `docs/app/operation.html` セクション 6.3）。**Phase 20-1（fantasy-animals-1 の停止）の作業は 2026-09-03 に完了**（Scheduler 3 件を CDK から削除・`batch_sets.is_active = 0`。deploy と Aurora への UPDATE は人間ゲート、停止の効果確認は計画書の確認待ちリスト）。稼働中のセットは logic-training-1・pref-ranking-1 の 2 本。16-12b の人間ゲート（Aurora への V011 適用と翌日のビュー値確認）は計画書の確認待ちリストで追う。**Phase 19（開発プロセスへの `/goal` 組み込み）は 2026-09-02 に完了**（`/step`・補充スキル 2 本・`/idea` に確認待ちリストの照合と起票ルールを組み込み済み。各スキルの初回試行は計画書末尾の「確認待ちリスト」でトリガー付きに追う）。**2026-09-03 に計画書を整理し、Phase 16・18・19・20 は「完了フェーズのサマリ」へ畳んだ（ステップ一覧の原文は開発記録の移設ブロック）。進行中の開発レーンは Phase 21（ウミガメのスープ参加型セット・第 4 セット。2026-09-03 にアイデア体系から採用転記。PoC 資材は `poc/umigame-comment-webhook/`）。21-1〔テーマ Fix 壁打ち〕は 2026-09-03 に完了〔記録は `docs/app/requirements-notes-set4.html`〕、21-2〔リール動画の PoC〕は 2026-09-04 に完了〔人間ゲート 2 巡で承認。24 秒版面・素材項目 14 項目・TTS は Amazon Polly Neural〔Takumi〕・Remotion Skills 継続。資材は `content/video-build/umigame-soup-1/`、決定は同 README セクション 0〕。**21-3〔設計書 Fix〕は 2026-09-04 に完了**〔セット別設計書 `docs/app/sets/umigame-soup-1.html`・方式設計書 `docs/app/generators/umigame-prebuilt.html`・共通設計書とインフラ設計書の追記〔CommentReplyStack・V012 草案〕。人間ゲート = 設計レビューは 1 巡・blocker なしで通過。キャラ名は「探偵カメロック」・表示名は「コメントで推理！探偵カメロックのウミガメのスープ」に確定〕。**21-4a〔DDL・ストック整備ツーリング・第 1 バッチ初稿〕は 2026-09-04 に完了**〔V012 ローカル適用・`content/umigame-stock/umigame-soup-1/` にツーリングと初稿 10 問〕。**2026-09-07 の人間ゲートで作問方針を変更**〔初稿はコアのない問題だったため、作問スキル `umigame-problem-writer` を先に作り 1 問試作 → 問題とスキルをレビュー → 確定後に残り 9 問。初稿 9 問はスキルの検査にかけて採否を決める〕。**21-4a-2〔作問スキル `.claude/skills/umigame-problem-writer/` + U01 試作 + コア宣言 `core` の必須化〕は 2026-09-07 に自走分完了・人間ゲート〔問題 + スキルのチャットレビュー〕待ち**。次の着手はレビュー後の `/step 21-4a-3`（残り 9 問）、または `/step 21-6`（コメント経路の本番化。独立のため並行可）**。**Phase 22（課題体系の新設）は 2026-09-19 に起票し、22-1〔器とルール Fix = `docs/issues/` 新設 + ルール層 4 本の改訂〕を同日完了**。次は `/step 22-2`〔既存課題の一括移設。フリーズ窓必須〕または `/step 22-3`〔スキル `/issue`・`/incident`〕。プラットフォーム展開（旧 Phase XX）はアイデア体系 `docs/ideas/platform-expansion-tiktok.md` へ移管し再醸成待ち（条件: 勝負セットで KPI M2 到達の目安）
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
 - 作業開始時はレーンを確認し、開発レーンなら `docs/plans/development-plan.html`、セットレーンなら該当セット計画書を読んでから着手する
 - **計画書のステップ着手は `/step <識別子>` から行う**（両レーン共通。Phase 19-2 で導入）。起動がレーン宣言と `/goal` 完了条件の宣言を兼ねる（`/step 16-12` = 開発レーン、`/step logic-training-1 R-1-2` = セットレーン）。手順・テンプレは `.claude/skills/step/SKILL.md`。goal が立つまで工程に着手しない
@@ -109,8 +112,9 @@ AutoContentPublisherSystem/
 
 - セッション開始時にレーンを宣言する。**開発レーン（`services/` `shared/` `infra/` `database/`・共通設計書に触れる作業）は常に 1 セッションのみ**。セットレーン（`content/<set>/` + セット別・専用方式設計書 + セット計画書で閉じる作業）は**セットごとに並行可**。補充スキルの起動はセットレーン宣言を兼ね、計画書ステップの着手は `/step` の起動がレーン宣言を兼ねる（Phase 19-2）
 - **アイデアレーン**（`docs/ideas/` 配下 + スキル `.claude/skills/idea/` で閉じる作業）は常に並行可・宣言不要（`/idea` スキル起動が宣言を兼ねる）。「待機 → 採用」の転記のみ開発レーンで行う
+- **課題レーン**（`docs/issues/` 配下 + スキル `.claude/skills/issue/` `.claude/skills/incident/` で閉じる作業）は常に並行可・宣言不要（Phase 22-1 で導入）。課題の展開（ステップ起票）だけは展開先の計画書のレーンで行う。ルールの正は `docs/issues/index.html`
 - 判定は `docs/plans/index.html` セクション 2 のパス基準判定表に従う。開発レーン対象のパスが 1 つでも入る作業は開発レーン行き（軽微に見えても）
-- レーンをまたぐ気づきは自分で直さず、相手レーンの計画書（開発レーンの設計課題リスト / セット計画書のバックログ）に記録する
+- レーンをまたぐ気づきは自分で直さず、課題体系 `docs/issues/index.html` の相手レーンの節に課題として起票する（課題レーンは並行可のため見つけた場で書ける。22-2 完了までは旧置き場〔設計課題リスト / バックログ〕も併読）
 - `docs/plans/` 自体の整理・ルール変更は、他セッションが動いていないフリーズ窓で単独実施する
 
 ## ドキュメント更新ルール
