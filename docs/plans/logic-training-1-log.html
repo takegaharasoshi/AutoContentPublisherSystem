@@ -13,7 +13,7 @@
 <h1>セット記録: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-12（週次補充 2026-09-w1〔朝・夜 14 問〕の完了を記録。あわせて Phase 19-3 の <code>/goal</code> 組み込み初回試行 = OK を確認待ちリストから移動）</span>
+  <span>最終更新: 2026-09-19（<strong>改修 R-1 の効果確認</strong>をセクション 3 に記録〔判定は混在 = スキップ率・平均視聴秒は改善 / コメント数は低下。夜スロットに集中〕。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕の完了を記録。あわせて Phase 19-3 の <code>/goal</code> 組み込み初回試行 = OK を確認待ちリストから移動）</span>
 </div>
 
 <div class="note">
@@ -128,6 +128,15 @@
 <li><strong>設計書の追随（セットレーンの範囲）</strong>: <a href="../app/generators/quiz-prebuilt.html#build">方式設計書 quiz-prebuilt セクション 8</a> の工程 3 を「gpt_quiz_multicut のレンダラー流用（Pillow + ffmpeg）」から「Remotion レンダリング（映像のみ・Docker）+ ffmpeg 音声ミックス（ホスト実行の <code>build.py</code>）」へ書き換え、ループ要件・不変条件の単一ソース（<code>spec.py</code> ⇔ <code>timeline.ts</code>）・<code>--slot</code> / <code>--per-page</code>・ビルド時の依存（<code>remotion-render</code> イメージ）を反映し、<strong>R-1 の decision</strong>（背景・不変条件・版面・ループ・実行場所・投入・共通設計書への波及）を追加。<a href="../app/sets/logic-training-1.html">セット別設計書</a>は動画構成（セクション 1）・セーフエリア（6）・使用方式（9）の Pillow 前提の記述に R-1 の追記を入れ、正を quiz-prebuilt セクション 8 へ向けた。補充スキル <code>/quiz-stock-replenish</code> 手順 7-3 の「build.py は Docker 実行」も R-1-4 の実態（ホスト実行）へ修正</li>
 <li><strong>共通設計書への波及は開発レーンへ起票</strong>: <a href="../app/batch-flow.html#generator-catalog">batch-flow.html 方式カタログ</a>の quiz-prebuilt 行（「gpt-quiz-multicut のレンダラー流用」）と gpt-quiz-multicut 行（「組版・ffmpeg 合成は quiz-prebuilt の事前ビルドのレンダラーとして継続使用」）、<a href="../app/generators/gpt-quiz-multicut.html">gpt-quiz-multicut.html</a> 冒頭の転用注記、<a href="../app/operation.html#quiz-stock-mgmt">operation.html セクション 3 手順 5</a> の工程要約（「gpt-quiz-multicut のレンダラーによる組版 + ffmpeg ビルド〔image-batch の Docker イメージで実行〕」）が旧レンダラー前提のまま。起票文面を会話で提示し、<a href="development-plan.html">開発計画</a>の設計課題リストへの書き込みは開発レーンのセッションで行う</li>
 <li><strong>効果確認</strong>: <a href="logic-training-1.html#pending-checks">確認待ちリスト</a>の R-1 効果確認行のトリガー起点を差し替え日 2026-09-03（→ 2026-09-17 以降）に確定。新版の初出投稿は翌朝 7:30 の朝スロット以降（LRU 順のため旧版と混在はしない = 在庫全数を差し替え済み）</li>
+</ul>
+</li>
+<li><strong>R-1 の効果確認（2026-09-19 実施・判定は混在）</strong>: 差し替え日 2026-09-03 の 2 週間後トリガーで <code>python3 content/insights-analysis/run_queries.py weekly_age_fixed per_post_latest</code> を実行し、差し替え後（09-04〜09-15 投稿・最終スナップショットが投稿 3 日以降）の朝・夜 <strong>22 本</strong>の中央値を、KPI 欄のベースライン（16-5 / 08-23〜08-31 の朝・夜 15 本: views 1,731 / スキップ率 50.6% / 平均視聴 12.4 秒 / コメント 10 / 保存 1）と比較した。
+<ul>
+<li><strong>判定 ①（スキップ率と平均視聴秒が悪化していない）= OK</strong>: スキップ率 50.6% → <strong>43.0%</strong>（-7.6pt）、平均視聴秒 12.4 → <strong>19.2 秒</strong>（+55%）。72 時間水準の週別平均（<code>weekly_age_fixed</code>）でも 08-24 週 52.1% / 15.1 秒 → 08-31 週 52.2% / 18.5 秒 → 09-07 週 <strong>44.9% / 18.3 秒</strong> → 09-14 週 <strong>45.4% / 22.2 秒</strong>と一貫して改善側で、単発の当たりによる振れではない。ループ継ぎ目の解消と全編モーション化のねらいと整合する</li>
+<li><strong>判定 ②（コメント数が維持されている）= NG</strong>: コメント中央値 10 → <strong>6</strong>。リーチあたりでも 8.84 → 2.47 件 / 1000 リーチ。<strong>低下は夜スロットに集中</strong>（朝 20 → 15・夜 <strong>9 → 2</strong>）。合計コメントは 18 本 269 件 → 22 本 233 件で、本数あたりでは下がっている</li>
+<li><strong>参考値（判定対象外）</strong>: views 中央値 1,731 → 1,471、保存 1 → 1.5。配信の振れは大きく、差し替え後に 144,549 views（09-10 夜）・60,544（09-08 朝）・33,698（09-12 夜）の当たりが出ている一方、数百 views の日も残る</li>
+<li><strong>切り分けの所見</strong>: 版面・演出は朝夜で共通なのに<strong>朝は高水準を維持し夜だけ落ちている</strong>こと、その夜の平均視聴秒はむしろ伸びている（13.0 → 24.5 秒）ことから、R-1 の演出変更よりも<strong>夜スロット（とんち・水平思考）の出題内容・難度の寄与が疑わしい</strong>。ベースライン側の夜 9 本にコメント 28 / 16 の当たりが含まれていた影響も残る（ベースラインは n が小さい）</li>
+<li><strong>扱い</strong>: 判定基準 2 点のうち 1 点が NG のため、NG 時の扱いに従い<a href="logic-training-1.html">セット計画書</a>のバックログへ「コメント数低下の切り分け」を 2026-09-19 付で起票した。<a href="logic-training-1.html#pending-checks">確認待ちリスト</a>の行は結果を記入したうえでリストに残す（全面 OK ではないため）。<strong>改修 R-2 の着手条件（効果確認の結果記入）は満たしたが、着手可否はユーザー判断待ち</strong></li>
 </ul>
 </li>
 </ul>
