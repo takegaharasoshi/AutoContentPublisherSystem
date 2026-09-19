@@ -17,6 +17,7 @@ CORE = {
     "U12": ["人形", "ひな", "雛", "五人囃子", "段飾り", "お祝い", "ひな祭り"],
     "U13": ["タイムカプセル", "本人", "同一人物", "自分自身", "未来の自分", "埋め", "同窓会", "掘り"],
     "U14": ["見習い", "弟子", "修行", "一人前", "人間", "職人"],
+    "U15": ["ラジオ", "配信", "遅れ", "電波", "数十秒", "過去"],
 }
 path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "work" / "probe_results.json"
 d = json.load(open(path, encoding="utf-8"))
