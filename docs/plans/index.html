@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 18 で導入（2026-08-28）</span>
   <span>並行作業ルールの正</span>
-  <span>最終更新: 2026-09-19（Phase 22-1 で課題レーンを判定表に追加・記録の分担に課題体系と事象記録・5.1 に課題表の照合・5.2 のトリガー書式を課題体系へ参照）</span>
+  <span>最終更新: 2026-09-20（Phase 23-1 でセクション 2 に「Codex 直接セッションは並行可レーンのみ」を追記。スキル実体は <code>.agents/skills/</code> へ集約）。前回: 2026-09-19（Phase 22-1 で課題レーンを判定表に追加・記録の分担に課題体系と事象記録・5.1 に課題表の照合・5.2 のトリガー書式を課題体系へ参照）</span>
 </div>
 
 <div class="note">
@@ -45,6 +45,7 @@
 <tr><td><strong>開発レーン</strong></td><td><code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>（DDL）/ 共通設計書（<code>docs/app/</code> の共通 4 本・<code>docs/infra/</code>・<code>docs/overview/</code>・<code>docs/index.html</code>）/ 事業戦略書 / CLAUDE.md / 本ディレクトリの development-plan / development-log</td><td>フェーズもの（16-5・16-12・Phase XX 等）/ バッチ・CDK の改修（デプロイ + パイプライン完走確認を伴う）/ スキーマ変更 / 横断の運用ルール改訂</td><td><strong>常に 1 セッションのみ</strong></td></tr>
 </tbody>
 </table></div>
+<p><strong>Codex 直接セッション</strong>（ユーザーが <code>codex</code> を起動してスキル <code>$idea</code> <code>$issue</code> <code>$quiz-stock-replenish</code> で回す運用。Phase 23-1〔2026-09-20〕で導入）は<strong>常に並行可のレーン（アイデア / 課題 / セット）のみ</strong>で、開発レーンは禁止（上表の「常に 1 セッションのみ」は Claude Code の開発レーンにだけ立てる）。許可 / 禁止パスの正は <code>AGENTS.md</code>「直接セッションのルール」。スキルの実体は <code>.agents/skills/</code> に集約し、上表の <code>.claude/skills/*</code> は同じ実体へのシンボリックリンク。</p>
 
 <div class="warn">
   <span class="callout-title">グレーゾーンの判定</span>
