@@ -82,14 +82,6 @@
   <td><a href="docs-responsive-mobile.md">MD</a></td>
   <td>2026-09-12</td>
 </tr>
-<tr>
-  <td>Codex から直接プロジェクトを動かす（AGENTS.md の docs 制約緩和 + スキルの両エージェント共用）</td>
-  <td>単発</td>
-  <td><span class="badge badge-wip">inbox</span></td>
-  <td>Claude Code のトークン節約のため、Codex を「呼ばれる実装ワーカー」から単独で作業を回すエージェントへ格上げする。障壁は <code>AGENTS.md</code> の <code>docs/</code> 変更禁止（記録の書き戻しができない）と、手順が <code>.claude/skills/</code> にあり Codex から起動できないこと。スキル実体を <code>.agents/skills/</code> に集約しシンボリックリンクで両エージェント共用にする方向</td>
-  <td><a href="codex-direct-operation.md">MD</a></td>
-  <td>2026-09-20</td>
-</tr>
 </tbody>
 </table></div>
 
@@ -113,6 +105,13 @@
 <div class="table-wrap"><table>
 <thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
 <tbody>
+<tr>
+  <td>Codex から直接プロジェクトを動かす（AGENTS.md の docs 制約緩和 + スキルの両エージェント共用）</td>
+  <td><span class="badge badge-fixed">採用</span></td>
+  <td>1 巡の壁打ち（2026-09-20）で採用。Codex 0.144.1 がリポジトリの <code>.agents/skills/</code> を拾うことを検証し、スキル実体を <code>.agents/skills/</code> に集約・<code>.claude/skills/</code> はシンボリックリンクに統一。Codex 直接セッションは常に並行可のレーン（アイデア / 課題 / セット）のみ・開発レーン禁止とし、<code>AGENTS.md</code> の許可パスをレーン規則と 1 対 1 で列挙。中立化するスキルは <code>idea</code>・<code>issue</code>・<code>quiz-stock-replenish</code> の 3 本、週次補充は G1〜G3 通しで Codex に任せて Aurora 到達込みで試す。<code>umigame-problem-writer</code> は対象外。開発計画 Phase 23（23-1〜23-3）へ展開（転記下書きは MD 末尾）</td>
+  <td><a href="codex-direct-operation.md">MD</a></td>
+  <td>2026-09-20</td>
+</tr>
 <tr>
   <td>課題体系を作る（回収トリガーを引く動線の整備）</td>
   <td><span class="badge badge-fixed">採用</span></td>
