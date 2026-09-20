@@ -8,40 +8,30 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '5+5+5=550。この式は間違っている。線をたった1本だけ足して、正しい式にしてくれ。',
-        '545+5=550(=を≠にするのも正解)',
-        '{"hook":"足し算なのに線を引くだけ?","hint":"数字じゃなく記号を見ろ!","question":"5+5+5=550。この式は間違っている。線をたった1本だけ足して、正しい式にしてくれ。","answer":"545+5=550(=を≠にするのも正解)","explanation":"左の「+」に斜線を1本足すと「4」になり、545+5=550で成立。数字をいじろうとすると詰まるが、記号なら一撃だ。「=」を「≠」にする裏技も正解。","coach_comment":"記号も数字の仲間だ、よく見たな!","tags":["なぞなぞ","朝の一問","式のパズル"],"summary":"「5+5+5=550」に線を1本足して正しい式にする定番の視覚パズル。「+」に斜線を足して「4」にし545+5=550。「=」を「≠」にする別解も正解に取り込む。","illustration_scene":"朝日が差し込む教室の黒板に、チョークで「5+5+5=550」と大きく1行だけ書かれ、その横に大きな「?」がある。文字はこの式と「?」だけを描き、他の文字・数字は描かない。人物は描かない。"}',
-        '類型: 線を1本足して式を直す視覚パズル(作者不詳・国内外に流布)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1034575295 , https://ddnavi.com/article/d532020/a/ , https://quiz.community.fmworld.net/nazonazo/content/63/answer3.html , https://nazoq.com/hardest/Q003458.html 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '黒板の式は、計算が合っていない。線をたった1本だけ足して、計算がぴったり合う式にしてくれ。',
+        '545+5=550(+に斜線を足して4にする)',
+        '{"hook":"足し算なのに線を引くだけ?","hint":"数字じゃなく記号を見ろ!","question":"黒板の式は、計算が合っていない。線をたった1本だけ足して、計算がぴったり合う式にしてくれ。","answer":"545+5=550(+に斜線を足して4にする)","explanation":"左の「+」に斜線を足して「4」にすれば545+5=550で計算が合う(右の+でも可)。「=」に線を足して「≠」にしても計算は合わないので不正解。記号を疑え。","coach_comment":"記号も数字の仲間だ、よく見たな!","tags":["なぞなぞ","朝の一問","式のパズル"],"summary":"「5+5+5=550」に線を1本足して計算が合う式にする定番の視覚パズル。「+」に斜線を足して「4」にし545+5=550。式は問題文に書かず黒板の絵で見せ、「計算が合う」で「≠」の別解を封じた。","illustration_scene":"朝日が差し込む教室の黒板に、チョークで「5+5+5=550」と大きく1行だけ書かれ、その横に大きな「?」がある。文字はこの式と「?」だけを描き、他の文字・数字は描かない。人物は描かない。"}',
+        '類型: 線を1本足して式を直す視覚パズル(作者不詳・国内外に流布)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1034575295 , https://ddnavi.com/article/d532020/a/ , https://quiz.community.fmworld.net/nazonazo/content/63/answer3.html , https://nazoq.com/hardest/Q003458.html 。式は問題文に書かずイラスト(黒板)で提示し、「計算が合う式」の条件で「=」→「≠」の別解を封じた(2026-09-20 レビュー)。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A42
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '止まったままの時計と、1日に1分ずつ遅れていく時計。「正しい時刻を示す回数」が多いのはどっちだ?',
-        '止まった時計(1日2回は正しい)',
-        '{"hook":"動かない時計にも取り柄がある?","hint":"正しい時刻を示す回数を数えろ!","question":"止まったままの時計と、1日に1分ずつ遅れていく時計。「正しい時刻を示す回数」が多いのはどっちだ?","answer":"止まった時計(1日2回は正しい)","explanation":"止まった時計は1日に2回、必ず正しい時刻を指す。一方1分ずつ遅れる時計は、12時間ぶん遅れて再び合うまで720日。つまり約2年に1回しか正しくない。","coach_comment":"常識を疑え、それが頭の体操だ!","tags":["ひっかけ","朝の一問","時計"],"summary":"止まった時計と1日1分遅れる時計のどちらが正しい時刻を多く示すかを問うルイス・キャロル由来の古典。止まった時計は1日2回、遅れる時計は720日に1回で、止まった方が多い。","illustration_scene":"朝日が差し込む棚の上に、古い置き時計が2つ並んでいる。片方はほこりをかぶって針が止まり、もう片方は小さく傾いて動いている。その間に大きな「?」。文字盤の数字は描かず、文字・数字は描かない。人物は描かない。"}',
-        '類型: 思い込み外し(止まった時計と遅れる時計。ルイス・キャロル『The Rectory Umbrella』由来で作者不詳の形で流布)。流布例: https://blog.goo.ne.jp/lemon-stoism/e/381964bfad6d0f3418f4e579663743ea , https://kzr-2.hatenadiary.org/entry/20090714/p2 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1322931153 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '好きな数を1つ思い浮かべろ。それを2倍して10を足し、2で割って、最初に思い浮かべた数を引く。答えはいくつになった?',
+        '必ず5(どんな数でも同じ)',
+        '{"hook":"頭の中だけで魔法をかけるぞ","hint":"元の数をxと置いてみろ!","question":"好きな数を1つ思い浮かべろ。それを2倍して10を足し、2で割って、最初に思い浮かべた数を引く。答えはいくつになった?","answer":"必ず5(どんな数でも同じ)","explanation":"元の数をxとすると(2x+10)÷2−x=x+5−x=5。最初の数は途中で消え、10÷2の5だけが残る。誰がやっても答えが同じになる計算マジックだ。","coach_comment":"種明かしまでできたら本物だ!","tags":["なぞなぞ","朝の一問","計算マジック"],"summary":"好きな数を2倍→10を足す→2で割る→元の数を引くと必ず5になる計算マジック。式で(2x+10)÷2−x=5と種明かしする。答えが全員同じになる驚きでコメントを誘う。","illustration_scene":"朝日が差し込むリビングで、後ろ姿の人が頭の上に吹き出しを浮かべ、その吹き出しの中に大きな「?」がある。周りに小さな星や光の粒が魔法のように舞う。顔は描かない。数字・文字は描かない。"}',
+        '類型: 計算マジック(2倍 → +10 → ÷2 → 元の数を引く = 必ず 5。作者不詳の定番)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1417987009 , https://land.toss-online.com/lesson/kttB1ZHLIXoLyTIwlDrj , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1116589591 (必ず 3 になる同型) 。初稿「止まった時計と遅れる時計」は簡単すぎ、2 案目「トーナメントの試合数」は面白くない、により 2026-09-20 レビューで差し替え。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A44
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '一、二、三…十。1から10を漢字で書いたとき、画数がいちばん多いのはどの数字だ?',
-        '四(5画)',
-        '{"hook":"漢字の一から十、書けるか?","hint":"全部書き出して数えろ!","question":"一、二、三…十。1から10を漢字で書いたとき、画数がいちばん多いのはどの数字だ?","answer":"四(5画)","explanation":"一1画、二2画、三3画、四5画、五4画、六4画、七2画、八2画、九2画、十2画。大きい数ほど画数が多いと思いきや、いちばん多いのは四の5画だ。","coach_comment":"思い込みを書き出して壊す、いいぞ!","tags":["漢字","朝の一問","数え上げ"],"summary":"1〜10を漢字で書いたとき画数が最多の字を問う。答えは四(5画)。数が大きいほど画数が多いという思い込みを、全部書き出して数える一手間で崩す。自作問題。","illustration_scene":"朝日が差し込む和室の机に半紙が広げられ、筆で「一 二 三 四 五 六 七 八 九 十」と横一列に大きく書かれている。その上に大きな「?」。文字はこの10字と「?」だけを描き、他の文字・数字は描かない。人物は描かない。"}',
-        'オリジナル書き下ろし(自作問題)。類型: 画数の数え上げ(漢数字の画数を問題化)。画数は常用漢字表どおり(四=5画・五=4画・六=4画)で verify_logic.py に一覧を記録。', 1);
-
--- A45
-INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
-        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
-        'L1', 'light',
-        '本棚に洋書の全集10巻が順に並ぶ。虫が1巻の1ページ目から10巻の最後のページまで一直線に食べ進んだ。各巻の厚さ3cm、表紙は無視すると食べた長さは?',
-        '24cm(1巻と10巻はほぼ食べない)',
-        '{"hook":"本を食べる虫の話だ","hint":"本棚での1ページ目の位置を思え!","question":"本棚に洋書の全集10巻が順に並ぶ。虫が1巻の1ページ目から10巻の最後のページまで一直線に食べ進んだ。各巻の厚さ3cm、表紙は無視すると食べた長さは?","answer":"24cm(1巻と10巻はほぼ食べない)","explanation":"洋書を棚に立てると表紙は右を向く。1巻の1ページ目は右端で2巻と隣り合い、10巻の最後のページは左端で9巻側。虫が食べるのは2〜9巻の8冊分=24cmだ。","coach_comment":"頭の中の本棚を疑ったな、見事だ!","tags":["ひっかけ","朝の一問","思い込み"],"summary":"本棚の全集10巻を1巻の1ページ目から10巻の最後まで食べる虫の距離を問う古典(bookworm puzzle)。1巻の1ページ目は2巻側にあるため2〜9巻の8冊分=24cm。30cmと早合点させる。","illustration_scene":"朝日が差し込む書斎の本棚に、背表紙を手前にした分厚い洋書の全集が10冊きっちり並び、その前に大きな「?」が浮かぶ。背表紙に文字や数字は描かない。虫は描かない。人物は描かない。"}',
-        '類型: 思い込み外し(本棚の虫。作者不詳・英語圏で広く流布する古典)。流布例: https://www.braingle.com/brainteasers/8363/the-bookworm.html , https://mathlair.allfunandgames.ca/bookworm.php , https://www.science20.com/chatter_box/blog/bookworm_and_encyclopedias_solution , https://riddlesbrainteasers.com/bookworm/ 。日本の縦書き本(右開き)では並びが逆になるため「洋書」と明記した。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        'カードの5文字は、ある決まりで並んでいる。「?」のカードに入るひらがな1文字はなんだ?',
+        'な(親指・人差し指・中指・薬指・小指)',
+        '{"hook":"たった5文字の暗号だ","hint":"自分の手を見てみろ!","question":"カードの5文字は、ある決まりで並んでいる。「?」のカードに入るひらがな1文字はなんだ?","answer":"な(親指・人差し指・中指・薬指・小指)","explanation":"お・ひ・?・く・こは、親指・人差し指・中指・薬指・小指の頭文字。だから「?」は中指の「な」。文字だけを見ていると気づけないが、手を広げれば一発だ。","coach_comment":"答えはいつも手元にあるぞ!","tags":["なぞなぞ","朝の一問","法則発見"],"summary":"「お・ひ・?・く・こ」の?を問う法則発見なぞなぞ。親指〜小指の頭文字で答えは「な」(中指)。5文字は問題文に書かずカードの絵で見せる。五十音や数字を疑わせて身体の名前に気づかせる。","illustration_scene":"朝日が差し込む木の机に、白いカードが5枚横一列に並び、左から「お」「ひ」「?」「く」「こ」と1文字ずつ大きく書かれている。文字はこの5枚のカードの文字だけを描き、他の文字・数字は描かない。手や人物は描かない。"}',
+        '類型: 法則発見(指の名前の頭文字。作者不詳の定番)。流布例: https://nazoq.com/hard/Q002762.html , https://www.nazo2.net/jyoukyuu/062.html 。5 文字は問題文に書かずイラスト(カード)で提示する(2026-09-20 レビュー)。初稿「一〜十の画数(四)」は簡単、2 案目「3 時 15 分の針の角度(7.5 度)」は数学っぽい、により 2026-09-20 レビューで差し替え。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A41
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
@@ -72,6 +62,16 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         '11〜2、3・4・9・10、5〜8の3組(各26)',
         '{"hook":"時計を3つに割るとは?","hint":"まず1〜12の合計を3で割れ!","question":"時計の文字盤に直線を2本引いて、3つの部分に分ける。どの部分も数字の合計が同じになる引き方は?","answer":"11〜2、3・4・9・10、5〜8の3組(各26)","explanation":"1〜12の合計は78なので1部分は26。11+12+1+2=26、5+6+7+8=26になるよう横向きの平行線を2本引くと、残る3・4・9・10も26になる。","coach_comment":"合計から逆算、それが近道だ!","tags":["なぞなぞ","朝の一問","時計"],"summary":"時計の文字盤を直線2本で3分割し各部分の数字の合計を等しくする古典パズル。合計78÷3=26から逆算し、11・12・1・2/3・4・9・10/5・6・7・8に分ける平行線2本。","illustration_scene":"朝日が差し込むリビングの壁に、1から12の数字がはっきり書かれた丸いアナログ時計が掛かり、その横に大きな「?」が浮かぶ。文字は時計の数字1〜12と「?」だけを描き、他の文字・数字は描かない。人物は描かない。"}',
         '類型: 文字盤の分割(作者不詳・国内外に流布)。流布例: https://nrich.maths.org/problems/split-clock-face , https://www.quora.com/How-do-I-draw-2-straight-lines-on-a-clock-face-to-separate-it-into-3-parts-and-that-each-parts-numbers-add-up-to-26 , https://puzzleaday.wordpress.com/2019/02/06/dividing-a-clock-face-into-sections/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A45
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '黒板の3組は、ある決まりで結ばれている。同じ決まりなら、最後の「馬」は何になる?',
+        'えみ=笑み(母音を1つ先へずらす)',
+        '{"hook":"今日は朝いちばんの難問だ","hint":"あいうえお表を思い出せ!","question":"黒板の3組は、ある決まりで結ばれている。同じ決まりなら、最後の「馬」は何になる?","answer":"えみ=笑み(母音を1つ先へずらす)","explanation":"かき→きく、あめ→いも、かに→きぬ。どの字も、あいうえお表で母音を1つ先へ送っている(か→き、き→く)。だから、うま→えみ。答えは笑みだ。","coach_comment":"この難問を越えたか、たいしたものだ!","tags":["なぞなぞ","朝の一問","法則発見"],"summary":"「柿→菊」「雨→芋」「蟹→絹」から「読みの各文字の母音を1つ先へずらす(あ→い→う→え→お)」法則を見つけ、馬→えみ(笑み)を導く朝の最難問。3組は問題文に書かず黒板の絵で見せる。","illustration_scene":"朝日が差し込む教室の黒板に、チョークで「柿 → 菊」「雨 → 芋」「蟹 → 絹」「馬 → ?」の4行が縦に大きく書かれている。文字はこの4行だけを描き、他の文字・数字は描かない。人物・動物は描かない。"}',
+        'オリジナル書き下ろし(自作問題)。類型: 法則発見(読みの母音を 1 段送る)。形式は A32(柿=傘・星=端・足=飯 → 西=腰。w5 で承認済み)と同じ対応当てで、語の組み合わせは自作。初稿「本棚の虫」・2 案目「マラソンの順位」・3 案目「鏡に映せない顔」・4 案目「濁点の法則」・5 案目「循環並べ替え」は 2026-09-20 レビューで面白くない / 簡単により差し替え。', 1);
 
 -- C42
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)

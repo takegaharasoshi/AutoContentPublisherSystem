@@ -17,25 +17,36 @@ Codex `--search exec` は w1 で接続不能だったため今回は使ってい
 - 流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1298194207 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q13314261373 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10245770900 , https://themathmompuzzles.blogspot.com/2011/04/eight-eights-that-are-thousand.html
 - 所見: 四則を許すと別解が多数あるため「足し算だけ」と条件で閉じた。一の位を 0 にするには 8 が 5 個要る、が解説の筋
 
-### A42 止まった時計と 1 日 1 分遅れる時計
-- 類型: 思い込み外し / 答え: 止まった時計(1 日 2 回 vs 720 日に 1 回)
-- 流布例: https://blog.goo.ne.jp/lemon-stoism/e/381964bfad6d0f3418f4e579663743ea , https://kzr-2.hatenadiary.org/entry/20090714/p2 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1322931153 , https://anond.hatelabo.jp/20240223152137
-- 所見: ルイス・キャロル『The Rectory Umbrella』由来だが作者を離れて流布。verify_logic.py で 720 日周期を確認
+### A42 計算マジック「必ず 5」(2 回目の差し替え後)
+- 類型: 計算マジック(思い浮かべた数が途中で消える) / 答え: 必ず 5(verify_logic.py で整数 −1000〜1000 と分数で確認)
+- 流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1417987009 , https://land.toss-online.com/lesson/kttB1ZHLIXoLyTIwlDrj , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1116589591 (必ず 3 になる同型)
+- 所見: 作者不詳の定番の数当てマジック。視聴者が頭の中で実演でき「全員 5 になる」驚きでコメントを誘う狙い
+- 差し替え経緯(2026-09-20 レビュー): 初稿「止まった時計と 1 日 1 分遅れる時計」は**簡単すぎる**で却下
+  (流布例: https://blog.goo.ne.jp/lemon-stoism/e/381964bfad6d0f3418f4e579663743ea , https://kzr-2.hatenadiary.org/entry/20090714/p2 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1322931153 )。
+  2 案目「100 チームのトーナメントは何試合(99)」は**面白くない**で却下(流布例: https://gendai.media/articles/-/103584?page=4 , https://diamond.jp/articles/-/342760 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1236109617 )。
+  ほかに裏取り済みだった「3 時 15 分の長針と短針の角度(7.5 度)」は A44 の差し替えに使った
 
 ### A43 時計の文字盤を直線 2 本で 3 分割
 - 類型: 文字盤の分割(法則発見) / 答え: {11,12,1,2}{3,4,9,10}{5,6,7,8}(各 26)。verify_logic.py で「交わらない 2 本」の分け方が一意であることを全列挙
 - 流布例: https://nrich.maths.org/problems/split-clock-face , https://www.quora.com/How-do-I-draw-2-straight-lines-on-a-clock-face-to-separate-it-into-3-parts-and-that-each-parts-numbers-add-up-to-26 , https://puzzleaday.wordpress.com/2019/02/06/dividing-a-clock-face-into-sections/ , https://note.com/todoroki18/n/n04acaa7fc644 (割れた文字盤の破片の和が等しい、の同型)
 - 所見: 日本語の流布例は同型(破片)が 1 件で、英語圏の流布が主。folklore 級と判断
 
-### A44 一〜十の画数(自作問題)
-- 類型: 数え上げ(漢数字の画数) / 答え: 四(5 画)
-- 出典: 自作問題(常用漢字表の画数: 一1 二2 三3 四5 五4 六4 七2 八2 九2 十2。verify_logic.py に一覧)。流布例なし(validate.py の「自作問題」明記ルール)
-- 所見: 「大きい数ほど画数が多い」思い込みを全部書き出す一手間で崩す。A37 と同じく形式のみ定番の自作
+### A44 指の頭文字「お・ひ・□・く・こ」(2 回目の差し替え後)
+- 類型: 法則発見(頭文字) / 答え: な(親指・人差し指・中指・薬指・小指。verify_logic.py で頭文字列を確認)
+- 流布例: https://nazoq.com/hard/Q002762.html , https://www.nazo2.net/jyoukyuu/062.html
+- 所見: 作者不詳の定番。数字でも五十音でもない「身体の名前」に気づく型で、朝の帯(なぞなぞ・言葉あそび)に合う。イラストはカード 5 枚の文字を描かせる提示物
+- 差し替え経緯(2026-09-20 レビュー): 初稿「一〜十の漢数字で画数最多は四(自作問題)」は**簡単**で却下。2 案目「3 時 15 分の長針と短針の角度(7.5 度)」は**数学っぽい**で却下
+  (流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1367066288 , https://jp.quora.com/tokei-ga-3-toki-15-fun-wo-sashi-te-iru-toki-choushin-to-tanshin-no-kan-no-kakudo-ha , https://okwave.jp/qa/q7127107.html )。
+  同型の候補「ひ・ふ・み・よ・い・む・な・や・こ・□ = と(和語の数え方)」( https://jpnculture.net/hifumiyo/ , https://ameblo.jp/k-konnothalasso/entry-12237013656.html )は補欠へ
 
-### A45 本棚の虫
-- 類型: 思い込み外し(本棚の並びの盲点) / 答え: 24cm(2〜9 巻の 8 冊分)
-- 流布例: https://www.braingle.com/brainteasers/8363/the-bookworm.html , https://mathlair.allfunandgames.ca/bookworm.php , https://www.science20.com/chatter_box/blog/bookworm_and_encyclopedias_solution , https://riddlesbrainteasers.com/bookworm/ , https://puzzleaday.wordpress.com/2018/10/24/the-bookworm/
-- 所見: 英語圏の古典(日本語の流布ページは検索で直接確認できず)。**縦書き(右開き)の本では並びが逆になり答えが 30cm になる**ため「洋書」と明記し、解説で「洋書は表紙が右を向く」を書いた。ページ数版は「ページと紙の枚数」で割れるので厚さ(cm)版にした
+### A45 母音送り「柿→菊、雨→芋、蟹→絹、馬→?」(5 回目の差し替え後・承認)
+- 類型: 法則発見(読みの各文字の母音を 1 段送る。あ→い→う→え→お) / 答え: えみ(笑み)
+- 出典: 自作問題(形式のみ定番。A32 と同じ対応当て)。verify_logic.py で 4 組すべてが母音送りの関係であること、および逆順・循環並べ替えでは説明できないことを機械確認
+- 所見: 操作は「漢字 → 読み」「母音を 1 段送る」の 2 段で、2 段目が非自明。**朝の最難問**として位置づけ、リスト順は朝の最後に置く
+- 差し替え経緯(2026-09-20 レビュー・4 回差し替え): ①「本棚の虫(24cm)」= 面白くないひっかけ ②「マラソンの順位(2 位)」= 面白くない
+  ③「鏡に映せない自分の顔(寝顔)」= 簡単(流布例: https://nazo-nazo.net/level1/633/ , https://nazonazonavi.net/mondai/00/008803.htm , https://nazoq.com/normal/Q031788.html )
+  ④「濁点の法則(天気→電気)」= 簡単 ⑤「循環並べ替え(時計→毛糸)」= 簡単
+- **却下 9 件から見えた帯(朝スロット)**: 答えが数値の問題は「面白くない」、1〜2 段でも操作が素直なものは「簡単」。通るのは A32 級の非自明な操作か、参加型の驚き
 
 ### A46 地球にロープ
 - 類型: 規模感の直感外し / 答え: 約 16cm(1/(2π) m。地球の大きさに依存しない。verify_logic.py で半径 6371km と 1m の両方で確認)
@@ -82,6 +93,17 @@ Codex `--search exec` は w1 で接続不能だったため今回は使ってい
 ## 補欠(レビューで差し替えが出たら使う)
 
 - 朝: 池のハスの葉(毎日 2 倍・30 日で全面 → 半分は 29 日目)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10140752310 , https://note.com/numa_fpt/n/n8afcaf3485f4 , https://blog.hamachiya.jp/entry/20091106/exp 。**答えを聞いて 3 秒で納得する型**のため本採用から外した
+- 朝: 本棚の虫(洋書 10 巻・24cm。A45 初稿。面白くないひっかけで却下)
+- 朝: マラソンの順位(2 位。A45 2 案目。面白くないで却下)
+- 朝: 鏡に映せない自分の顔 = 寝顔(A45 3 案目。簡単で却下)
+- 朝: 濁点の法則(柿→鍵・蓋→豚・戸→土 → 天気→電気。A45 4 案目。簡単で却下。自作)
+- 朝: 循環並べ替え(猫→こね・犬→ぬい・蜜柑→かんみ → 時計→けいと。A45 5 案目。簡単で却下。自作)
+- 朝: 錨(使うときに捨て、使わないときはしまう)。流布例: https://www.1101.com/nazonazo/021025_kaitou.html 。別解(網・釣り針)が塞ぎにくく保留
+- 朝: 秘密(2 人なら守れるが 3 人だと守れない)。日本語の流布ページを直接確認できず保留
+- 朝: ひ・ふ・み・よ・い・む・な・や・こ・□ = と(和語の数え方の頭文字。A44 と同型)。流布例は上の A44 の差し替え経緯に記載
+- 朝: 3 時 15 分の長針と短針の角度(7.5 度)。数学っぽいで却下(A44 2 案目)
+- 朝: 一〜十の漢数字で画数最多は四(自作問題・A44 初稿。簡単で却下)
+- 朝: 積んだサイコロ 3 個の見えない面の合計(向かい合う面の和 7 を使う)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q14225803194 , https://www.chugakujuken.com/sansu/kaisei-tsukukoma-nada/11_saikoro/ 。算数色が強め
 - 朝: 鏡に映った時計(3 時 20 分に見えたら実際は 8 時 40 分)。流布例: https://houkago.gakken.jp/contents/M20060.html , https://www.koov.io/column/14990 , https://kyozai-okiba.com/1_83.html 。時計ものが 3 問になるため外した
 - 朝: 取れば取るほど大きくなるもの(穴)。流布例: https://www.rarejob.com/englishlab/column/20170306/ , https://nazoq.com/hard/Q000585.html 。逆説型・軽め
 - 朝: 小町算(1〜9 の間に + − で 100。例 123−45−67+89)。流布例: https://ja.wikipedia.org/wiki/%E5%B0%8F%E7%94%BA%E7%AE%97 , https://www.weblio.jp/content/%E5%B0%8F%E7%94%BA%E7%AE%97 。A41 と型が重なるため外した

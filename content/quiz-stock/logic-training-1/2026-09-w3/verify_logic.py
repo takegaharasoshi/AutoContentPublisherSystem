@@ -39,7 +39,7 @@ if "A40" in BY_NO:
     check("A40", "元の式は不成立", (5 + 5 + 5) != 550, "5+5+5=15≠550")
     check("A40", "左の+を4に", 545 + 5 == 550, "545+5=550")
     check("A40", "右の+を4に(別解)", 5 + 545 == 550, "5+545=550")
-    check("A40", "=を≠に(別解)", (5 + 5 + 5) != 550, "5+5+5≠550 は真")
+    check("A40", "式は問題文に書かない(黒板で提示)", "5+5+5" not in BY_NO["A40"]["question"] and "5+5+5=550" in BY_NO["A40"]["illustration_scene"], "問題文に式なし・情景文に式あり")
     check("A40", "answer に 545+5=550", "545+5=550" in BY_NO["A40"]["answer"], BY_NO["A40"]["answer"])
 
 # ---------------------------------------------------------------
@@ -57,21 +57,15 @@ if "A41" in BY_NO:
     check("A41", "8 の個数", BY_NO["A41"]["answer"].count("8") == 8, BY_NO["A41"]["answer"])
 
 # ---------------------------------------------------------------
-# A42 止まった時計 vs 1 日 1 分遅れる時計: 正しい時刻を示す回数の比較
-#      止まった時計 = 1 日 2 回。遅れる時計 = 遅れの累計が 12 時間(720 分)の倍数になった瞬間だけ → 720 日に 1 回
+# A42 計算マジック: 整数・負の数・小数のどれから始めても (2x+10)÷2−x が必ず 5 になること
 # ---------------------------------------------------------------
 if "A42" in BY_NO:
-    lag = 0
-    days = 0
-    while True:
-        days += 1
-        lag += 1  # 1 日 1 分
-        if lag % 720 == 0:
-            break
-    stopped_per_720d = 2 * days
-    check("A42", "遅れる時計が再び合う周期", days == 720, f"{days} 日に 1 回")
-    check("A42", "同じ期間の止まった時計", stopped_per_720d > 1, f"720 日で {stopped_per_720d} 回 vs 遅れる時計 1 回")
-    check("A42", "explanation に 720 日", "720日" in BY_NO["A42"]["explanation"], "解説の数値と一致")
+    from fractions import Fraction
+
+    starts = [Fraction(n) for n in range(-1000, 1001)] + [Fraction(1, 3), Fraction(-7, 2), Fraction(123456789, 10)]
+    results = {(2 * x + 10) / 2 - x for x in starts}
+    check("A42", "答えは必ず 5", results == {Fraction(5)}, f"{len(starts)} 通りの初期値で結果 = {sorted(results)}")
+    check("A42", "answer に 5", "必ず5" in BY_NO["A42"]["answer"], BY_NO["A42"]["answer"])
 
 # ---------------------------------------------------------------
 # A43 文字盤を直線 2 本で 3 分割: 交わらない 2 本の線 = 両端の「弧」2 つ(連続した数字の並び)+ 残りの中央部。
@@ -100,27 +94,15 @@ if "A43" in BY_NO:
     check("A43", "分け方は一意", sols == {expected}, f"解: {[sorted(sorted(x) for x in s) for s in sols]}")
 
 # ---------------------------------------------------------------
-# A44 漢数字一〜十の画数: 常用漢字表の画数で最多が「四」のみであること
+# A44 指の頭文字: 親指〜小指の読みの頭文字が「お ひ な く こ」になり、□(3 番目)が「な」であること
 # ---------------------------------------------------------------
 if "A44" in BY_NO:
-    strokes = {"一": 1, "二": 2, "三": 3, "四": 5, "五": 4, "六": 4, "七": 2, "八": 2, "九": 2, "十": 2}
-    mx = max(strokes.values())
-    top = [k for k, v in strokes.items() if v == mx]
-    check("A44", "最多画数は四のみ", top == ["四"] and mx == 5, f"{strokes} → 最多 {top}({mx} 画)")
-    expl = BY_NO["A44"]["explanation"]
-    check("A44", "解説の画数一覧が一致", all(f"{k}{v}画" in expl for k, v in strokes.items()), "一1画〜十2画をすべて記載")
-
-# ---------------------------------------------------------------
-# A45 本棚の虫: 洋書(左開き)を背表紙を手前に順に並べると、各巻の 1 ページ目は右端・最後のページは左端。
-#      巻 i の区間を [3(i-1), 3i] cm とし、1 巻の 1 ページ目(x=3)から 10 巻の最後(x=27)までの距離
-# ---------------------------------------------------------------
-if "A45" in BY_NO:
-    t = 3
-    first_page_vol1 = 1 * t  # 右端
-    last_page_vol10 = 9 * t  # 10 巻の左端
-    dist = last_page_vol10 - first_page_vol1
-    check("A45", "食べた長さ", dist == 24, f"{last_page_vol10} - {first_page_vol1} = {dist} cm(早合点の 10 冊分は {10 * t} cm)")
-    check("A45", "answer に 24cm", "24cm" in BY_NO["A45"]["answer"], BY_NO["A45"]["answer"])
+    fingers = ["おやゆび", "ひとさしゆび", "なかゆび", "くすりゆび", "こゆび"]
+    initials = "".join(f[0] for f in fingers)
+    check("A44", "頭文字の並び", initials == "おひなくこ", f"{fingers} → {initials}")
+    check("A44", "□ は 3 番目 = な", initials[2] == "な" and BY_NO["A44"]["answer"].startswith("な"), BY_NO["A44"]["answer"])
+    check("A44", "情景文のカード 5 枚", all(f"「{c}」" in BY_NO["A44"]["illustration_scene"] for c in "おひ?くこ"), "お・ひ・?・く・こ を明示")
+    check("A44", "5 文字は問題文に書かない(カードで提示)", "お、ひ" not in BY_NO["A44"]["question"] and "□" not in BY_NO["A44"]["question"], "問題文に文字列なし・情景文にカードあり")
 
 # ---------------------------------------------------------------
 # A46 地球のロープ: 円周 +1m のとき半径の増分 = 1/(2π) m。地球半径に依存しないことを 2 つの半径で確認
@@ -132,6 +114,34 @@ if "A46" in BY_NO:
         r2 = (c + 1) / (2 * math.pi)
         gaps.append(round((r2 - r) * 100, 2))
     check("A46", "隙間は約 16cm", all(abs(g - 15.92) < 0.01 for g in gaps), f"半径 6371km と 1m のどちらでも {gaps} cm")
+
+# ---------------------------------------------------------------
+# A45 母音送り: 提示 3 組 + 答えのすべてが「読みの各文字の母音を 1 段送った語」であること、
+#      および単純な変換(逆順・循環並べ替え・濁点)では説明できないことを確認
+# ---------------------------------------------------------------
+if "A45" in BY_NO:
+    ROWS = ["あいうえお", "かきくけこ", "さしすせそ", "たちつてと", "なにぬねの",
+            "はひふへほ", "まみむめも", "らりるれろ"]
+    POS = {ch: (r, i) for r, row in enumerate(ROWS) for i, ch in enumerate(row)}
+
+    def shift_vowel(reading: str) -> str:
+        """各文字の母音を 1 段送る(あ→い→う→え→お→あ)。"""
+        out = []
+        for ch in reading:
+            r, i = POS[ch]
+            out.append(ROWS[r][(i + 1) % 5])
+        return "".join(out)
+
+    pairs = [("かき", "きく", "柿→菊"), ("あめ", "いも", "雨→芋"), ("かに", "きぬ", "蟹→絹"), ("うま", "えみ", "馬→笑み")]
+    for src, dst, label in pairs:
+        check("A45", f"母音送りで対応 {label}", shift_vowel(src) == dst, f"{src} → {shift_vowel(src)}")
+    # 他の単純変換では説明できないこと(逆順・循環並べ替え)
+    other = [(src, dst) for src, dst, _ in pairs if src[::-1] == dst or src[1:] + src[0] == dst]
+    check("A45", "逆順・循環では説明できない", not other, f"逆順/循環で一致する組: {other}")
+    check("A45", "answer は えみ", BY_NO["A45"]["answer"].startswith("えみ"), BY_NO["A45"]["answer"])
+    check("A45", "3 組は問題文に書かない(黒板で提示)",
+          "柿" not in BY_NO["A45"]["question"] and "柿 → 菊" in BY_NO["A45"]["illustration_scene"],
+          "問題文に組なし・情景文に 4 行あり")
 
 # ---------------------------------------------------------------
 # C48 ケーキを 3 回で 8 等分: 中心を通る直交 2 平面 + 高さ半分の水平面で 8 片の体積が等しいこと(モンテカルロ)
