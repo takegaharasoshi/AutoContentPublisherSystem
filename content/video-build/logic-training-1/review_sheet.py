@@ -138,6 +138,7 @@ def generate_review_html(
             f"content_key: {content_key}</p></section>"
         )
     return """<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>logic-training-1 動画レビュー</title><style>
 body{font-family:sans-serif;background:#f4f4f4;margin:24px;color:#222}
 section{background:#fff;padding:20px;margin:20px 0;border-radius:10px}
@@ -153,6 +154,14 @@ video{width:270px;max-height:480px;background:#111}
 padding:12px 16px;border-radius:10px;font-size:14px;margin:16px 0}
 .pager a,.pager .current{padding:6px 12px;border-radius:6px;text-decoration:none}
 .pager a{background:#eef1f6;color:#1b2a4a}.pager .current{background:#1b2a4a;color:#fff}
+/* スマホ縦持ち: 横スクロールを出さず、動画とイラストを画面幅いっぱいで見る */
+@media (max-width:640px){
+body{margin:12px}section{padding:14px;margin:14px 0}
+.review-media{gap:12px}video{width:100%;max-height:none}
+.still-area{min-width:0;width:100%}.still{width:calc(50% - 4px)}.still img{width:100%}
+.illustration{width:100%}
+.pager a,.pager .current{padding:12px 16px;min-height:44px;box-sizing:border-box}
+}
 </style></head><body><h1>logic-training-1 事前動画レビュー</h1>
 <p>全数確認: 文字・数字・記号の混入、画風、情景適合、版面
 （Instagram UI と重ならないか）、ループ継ぎ目

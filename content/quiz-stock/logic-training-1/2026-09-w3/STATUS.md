@@ -291,5 +291,6 @@ python3 content/quiz-stock/logic-training-1/2026-09-w3/generate.py
 ### 再開地点(G2 完了時点)
 
 - **次は工程 6c = `work/review-6.html` の全数人間レビュー**(14 件)。本セッションでは開始していない。
+- **スマホ配信済み**: `DOCS_PORT=8766 DOCS_ROOT=<work/> tools/serve-docs.sh start` で tailnet 内に公開(`http://takegaharapc:8766/review-6.html`)。あわせて `review_sheet.py` に **viewport 指定とスマホ縦持ち用のメディアクエリを追加**した(従来は viewport 未指定 + `.still-area{min-width:360px}` でスマホだと横にはみ出していた)。ビルドツールの pytest 42 件は全パス。
 - そのあと G3(`approved.txt` → `publish.py --dry-run` → 本実行 → Aurora へ `work/update_prebuilt.sql` 適用 → `unbuilt` = 0 の確認 → 確認待ちリスト「16-4e」と課題表 I-033 の更新・コミット)。
 - 未実施(G3 の範囲): `publish.py` の本実行・Aurora への `update_prebuilt.sql` 適用・S3 配置。
