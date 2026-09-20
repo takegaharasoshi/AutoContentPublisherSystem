@@ -2146,7 +2146,7 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 </ul>
 
 <h3 id="phase-23">Phase 23: Codex 直接セッションの導入（スキルの両エージェント共用 + AGENTS.md の線引き）</h3>
-<h3 id="step-23-1">23-1 器の整備（2026-09-20 自走分完了。人間ゲート = AGENTS.md の許可 / 禁止パスと条件文のレビューは未了）</h3>
+<h3 id="step-23-1">23-1 器の整備（2026-09-20 完了。人間ゲート = AGENTS.md の許可 / 禁止パスと条件文のレビューは同日 1 巡・修正なしで通過）</h3>
 <ul>
 <li><strong>起動</strong>: <code>/step 23-1</code> → 開発レーン宣言（触るパスは <code>.claude/skills/</code> <code>.agents/skills/</code> <code>AGENTS.md</code> <code>CLAUDE.md</code> <code>docs/plans/index.html</code>）。フリーズ窓の確認をユーザーに求めてから goal 起動。確認待ちリストは該当なし（23-3 の行はトリガーが 23-2 完了後）。課題表の照合は I-030（<code>docs/plans/index.html</code> セクション 2・CLAUDE.md 並行作業ルール）が該当 → 本ステップは 1 セッション制約を変えない側のため<strong>据え置き継続・トリガー更新なし</strong>（表の更新なし）。I-035 はクローズ済み。展開元の課題なし（クローズ移動: 該当なし）</li>
 <li><strong>スキル実体の集約</strong>: 実体 8 本（docs-mobile-view / idea / incident / issue / quiz-stock-replenish / ranking-stock-replenish / step / umigame-problem-writer）を <code>git mv</code> で <code>.agents/skills/</code> へ移し、<code>.claude/skills/&lt;name&gt;</code> を相対シンボリックリンク <code>../../.agents/skills/&lt;name&gt;</code> に置換（Remotion 6 本と同じ形）。<code>git ls-files -s .claude/skills | grep -c ^120000</code> = 14、<code>.agents/skills/</code> の実体 14 本、全リンクの <code>SKILL.md</code> 解決 OK</li>
@@ -2155,7 +2155,8 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>CLAUDE.md</strong>: Codex 連携節の運用箇条書きに「委譲指示文には必ず『<code>docs/</code> は触らない』を含める」（プロンプト優先の仕様で MCP ワーカー時を閉じる）を追加、「Codex 直接セッション」小節を新設（許可レーン・開発レーン禁止・正は AGENTS.md と計画体系セクション 2・実体は <code>.agents/skills/</code>）。開発計画パラグラフを 23-1 自走分完了・次は 23-2 に更新</li>
 <li><strong><code>docs/plans/index.html</code></strong>: セクション 2 の判定表直後に「Codex 直接セッションは並行可レーンのみ・開発レーン禁止・正は AGENTS.md・<code>.claude/skills/*</code> はシンボリックリンク」の 1 段落。最終更新を更新。タグ対応の機械チェック（自作スクリプト）は errors=0 unclosed=0</li>
 <li><strong>触らなかったもの</strong>: SKILL.md の本文（23-2 の範囲）。<code>docs/plans/index.html</code> 判定表の <code>.claude/skills/*</code> 表記（リンク経由で有効なため据え置き。段落で補足）</li>
-<li><strong>次</strong>: 人間ゲート = AGENTS.md の許可 / 禁止パスと条件文のレビュー（チャット）。通過後に <code>/step 23-2</code>（スキル 3 本の中立化）。<code>/step 21-4a-3</code>・<code>/step 21-6</code> とは独立</li>
+<li><strong>人間ゲート</strong>: AGENTS.md のレビューをチャットで 1 巡実施。計画書に無かった判断 3 点（禁止パスに <code>docs/overview/</code> <code>AGENTS.md</code> <code>.claude/</code> <code>.mcp.json</code> を追加し未掲載は禁止側扱い / <code>.agents/skills/</code> への書き込みはスキルの手順が定めた範囲に限定 / 開発レーンに触れる必要が出たら <code>$issue</code> で起票して報告）を提示し、ユーザー「このまま通す」で修正なし通過</li>
+<li><strong>次</strong>: <code>/step 23-2</code>（スキル 3 本の中立化）。<code>/step 21-4a-3</code>・<code>/step 21-6</code> とは独立</li>
 </ul>
 <details class="phase"><summary>次期計画の割当表・Phase XX（2026-09-03 に計画書から移設・原文）</summary><p><em>以下は 2026-09-03 の完了フェーズ整理で計画書から移設した原文。「次期計画」の割当表は Phase 16 残・19・20 のステップ割当の最終版（方針の要約は計画書「進め方の方針」に残した）。「Phase XX: プラットフォーム展開」は着手判断が未了のためアイデア体系（<a href="../ideas/platform-expansion-tiktok.md">platform-expansion-tiktok.md</a>・再醸成待ち）へ移管し、開発計画からは外した。</em></p>
 <h3>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h3>
