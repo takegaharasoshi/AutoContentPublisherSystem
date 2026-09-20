@@ -1,20 +1,20 @@
 ---
 title: Codex から直接プロジェクトを動かす（AGENTS.md の docs 制約緩和 + スキルの両エージェント共用）
 slug: codex-direct-operation
-status: 採用             # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
+status: 待機             # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
 kind: 単発               # 単発 | 構想
 created: 2026-09-20
 updated: 2026-09-20
-condition: ""            # 再醸成待ち・待機のとき必須（再検討トリガー / 落とし込み条件）
+condition: "開発レーンのフリーズ窓（docs/plans/index.html を触るため）で development-plan.html に Phase 23（23-1〜23-3 + 確認待ち 2 件）を起票する。転記下書きは codex-direct-operation.html セクション 8。起票が終わったら採用へ更新"
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: "codex-direct-operation.html"
-disposition: "開発計画 Phase 23（転記下書きは codex-direct-operation.html セクション 8。転記は開発レーンで行う）"
+disposition: ""          # 転記完了で採用に更新し、Phase 23 へのリンクを書く
 ---
 
 ## 要旨
 
-**2026-09-20 に採用**。整理された現在形（検証事実・線引き・リスク・ユーザー決定・Phase 23 の転記下書き）は `codex-direct-operation.html` を参照。
+**2026-09-20 の壁打ちで「やる」と決定（待機。開発計画への転記待ち）**。整理された現在形（検証事実・線引き・リスク・ユーザー決定・Phase 23 の転記下書き）は `codex-direct-operation.html` を参照。
 
 ## 前提条件・再検討トリガー
 
@@ -63,6 +63,8 @@ Claude Code のトークン消費を少なくするために、一部の作業�
 - 採用時のメモリ更新: Codex への制約 3 点のうち「docs 編集禁止・コミットは Claude」が条件付きに変わる。「独立レビュー（Codex 成果物は Claude がレビュー）」は維持
 
 **積み残し**: なし（Phase 23 の確認待ちへ）
+
+**着地の訂正**（同日）: 当初「採用」で置いたが、体系ルール（index.html セクション 4: 採用 = ステップとして展開済み。開発レーン行きはアイデアレーン内では転記下書きまでで**待機**）に照らして待機へ訂正。転記完了で採用へ更新する
 
 ## 転記下書き
 
