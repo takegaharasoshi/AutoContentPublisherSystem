@@ -74,5 +74,5 @@ description: 事業アイデアの捕捉・壁打ち・棚卸しを行う(docs/i
 - **起動**: Claude Code は `/idea`、Codex は `$idea`。本文で「スキル issue を起動」と書いてある箇所は同様に `/issue` / `$issue` と読む。`/step` は Claude Code 専用のため、Codex では「待機 → 採用」の転記(開発レーン)を行わず、転記下書きの用意で止めてユーザーに引き継ぐ(AGENTS.md「直接セッションのルール」)
 - **`/goal` 行**: 本スキルは起動時のゴール行を持たない(1 回の捕捉・壁打ちは短いため)。壁打ちを長く回すときにユーザーがゴールを立てる場合、Claude Code は末尾に `or stop after N turns` を付け、Codex はその句を外して打つ(Codex では無視される)。Codex 側の停止手段は `/goal pause` / `/goal clear`。Codex にはターン上限がないため、ゴール行に「3 ターン進捗がなければ blocked を申告して止まる」を明記する
 - **完了申告前の再確認(Codex)**: Codex の `/goal` は自己申告で完了になるため、終了規律 6 の前に実コマンドで状態を確かめてから申告する — `git status --short`(触ったのが `docs/ideas/` だけか)・`grep -n "<slug>" docs/ideas/index.html`(表に行があるか)・`git log origin/main..HEAD --oneline`(push 済みなら空)。出力を会話に貼る
-- **リサーチ**: 壁打ちで外部情報が要るとき、Claude Code は WebSearch / WebFetch、Codex は `codex --search` の web_search か curl で自分で行う(MCP 経由の委譲はしない)。出典 URL を壁打ち記録に残す点は共通
+- **リサーチ**: 壁打ちで外部情報が要るとき、Claude Code は WebSearch / WebFetch、Codex は組み込みの web_search(デスクトップアプリでは既定で有効。CLI なら `codex --search`)か curl で自分で行う(MCP 経由の委譲はしない)。出典 URL を壁打ち記録に残す点は共通
 - **触ってよいパス(Codex)**: `docs/ideas/` のみ。事業戦略書・開発計画への転記は禁止パス(AGENTS.md)

@@ -94,5 +94,5 @@ description: 開発・運用で見つかった課題の起票・壁打ち・棚�
 - **起動**: Claude Code は `/issue`、Codex は `$issue`。`/step` `/incident` は Claude Code 専用のため、Codex では **展開の転記(計画書への起票)を行わず下書きの用意で止める**(展開先が開発計画なら開発レーンで、セット計画書ならそのセットレーンのセッションで転記する)。障害の疑いがあるときは Codex では作業を止めてユーザーに報告し、`/incident` は Claude Code で起動してもらう
 - **`/goal` 行**: 本スキルは起動時のゴール行を持たない(起票 1〜2 分・棚卸しは表の走査のため)。壁打ちを長く回すときにユーザーがゴールを立てる場合、Claude Code は末尾に `or stop after N turns` を付け、Codex はその句を外して打つ(Codex では無視される)。Codex 側の停止手段は `/goal pause` / `/goal clear`。Codex にはターン上限がないため、ゴール行に「3 ターン進捗がなければ blocked を申告して止まる」を明記する
 - **完了申告前の再確認(Codex)**: Codex の `/goal` は自己申告で完了になるため、終了規律の最後(コミット + push)の前に実コマンドで状態を確かめてから申告する — `git status --short`(触ったのが `docs/issues/` だけか)・起票なら `grep -c '<tr id="I-' docs/issues/index.html` と `grep -o 'id="I-[0-9]*"' docs/issues/index.html | sort | uniq -d`(ID 重複なし)・`git log origin/main..HEAD --oneline`(push 済みなら空)。出力を会話に貼る
-- **リサーチ**: 壁打ちで外部情報が要るとき、Claude Code は WebSearch / WebFetch、Codex は `codex --search` の web_search か curl で自分で行う(MCP 経由の委譲はしない)
+- **リサーチ**: 壁打ちで外部情報が要るとき、Claude Code は WebSearch / WebFetch、Codex は組み込みの web_search(デスクトップアプリでは既定で有効。CLI なら `codex --search`)か curl で自分で行う(MCP 経由の委譲はしない)
 - **触ってよいパス(Codex)**: `docs/issues/` のみ。棚卸し手順 4 の「計画書の確認待ちリスト」は、開発計画(`development-plan.html`)が禁止パスのため Codex は**読むだけ**にし、NG の行があれば課題として起票するにとどめる(結果列の記入は Claude Code のセッションで行う)。セット計画書の確認待ちリストは許可パスなので更新してよい

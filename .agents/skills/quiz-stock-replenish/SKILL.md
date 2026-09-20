@@ -40,7 +40,7 @@ operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「
 
 ## 1. リサーチ(Web 裏取り)
 
-- 類型の候補出しと流布の裏取りを Web で行う。手段はエージェント別(差分節): Claude Code は WebSearch / WebFetch(まとまった裏取りは MCP ワーカーの Codex に curl で行わせてもよい)、Codex 直接セッションは `codex --search` の web_search か curl で自分で行う。DuckDuckGo は bot challenge が出ることが多いので、検索は web_search か既知の流布サイトへの直接アクセスを優先する
+- 類型の候補出しと流布の裏取りを Web で行う。手段はエージェント別(差分節): Claude Code は WebSearch / WebFetch(まとまった裏取りは MCP ワーカーの Codex に curl で行わせてもよい)、Codex 直接セッションは組み込みの web_search(デスクトップアプリでは既定で有効。CLI なら `codex --search`)か curl で自分で行う。DuckDuckGo は bot challenge が出ることが多いので、検索は web_search か既知の流布サイトへの直接アクセスを優先する
 - 成果物は「類型・解法構造の要約・出典 URL」のみ。**問題文の転載は禁止**(著作権: アイデア・解法構造は保護されず、表現は保護される)
 - **裏取りの基準を取り違えない**: 16-2 では「Wikipedia 級のページで古典と明記」に偏り、folklore 級なぞなぞをほぼ全部『未確認』にする実績があった。採用可否の基準は **作者不詳 + 複数の独立サイトに流布 = folklore 級 = 安全側**。流布例 URL を 1 件以上直接確認し、それを証跡として `research*.md` に残す(裏取りを別のワーカーに任せた場合も、採用判断は本スキルを回しているエージェントが行う)
 - 除外するもの: 特定サイト・書籍固有の創作問題(アイデア自体に強い独自性があり出所が特定できるもの)、実在企業名を冠した断定(「〇〇社の入社試験」)、解釈が割れて炎上しうる問題(男女パラドックス等)
@@ -159,26 +159,20 @@ operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「
 - **起動**: Claude Code は `/quiz-stock-replenish`、Codex は `$quiz-stock-replenish`。どちらも起動 = セットレーン logic-training-1 の宣言。Codex 直接セッションが触ってよいのは `content/quiz-stock/logic-training-1/` `content/video-build/logic-training-1/` `docs/plans/logic-training-1.html` `docs/plans/logic-training-1-log.html` `docs/issues/`(課題表の照合結果の反映)のみ(AGENTS.md「直接セッションのルール」)。`services/` `shared/` `database/` や共通設計書に触る必要が出たら手を止めて報告する(Claude Code の開発レーン行き。Codex では `$issue` で起票して終える)
 - **`/goal` 行(G1〜G3)**: 文面は上のコードブロックで共通。**Claude Code は行末に `or stop after N turns` を足して打つ**(N は G1 = 30・G2 = 30・G3 = 15)。**Codex はその句を付けない**(Codex では無視される構文)。Codex にはターン上限がなく自動継続するため、代わりに行末へ「3 ターン進捗がなければ blocked を申告して止まる」を足す。停止は `/goal pause` / `/goal clear`(ユーザー操作)。ゴールが `complete` にならないまま利用枠に達したら `usage_limited` で止まるので、再開時はどこまで進んだかを `git status` と `work/` の中身から復元する
 - **完了申告前の再確認(Codex)**: Codex の `/goal` は自己申告で完了になるため、各ゴールの完了を申告する前に実コマンドで状態を確かめ、出力を会話に貼る — G1: `validate.py` / `verify_logic.py` の再実行(全問パスの出力)・G2: `ls work/review.html` と `ls work/illustrations_raw | wc -l`(承認件数と一致)・G3: 在庫確認クエリの再実行(`unbuilt = 0`)と `git log origin/main..HEAD --oneline`(push 済みなら空)。「〜したはず」で申告しない
-- **リサーチ(工程 1)**: Claude Code は WebSearch / WebFetch(まとまった裏取りは MCP ワーカーの Codex に curl で行わせてもよい)。Codex 直接セッションは `codex --search` で起動しておき、web_search ツールか curl で**自分で**行う(MCP の往復はしない)。採用判断の基準(folklore 級 = 安全側)は共通
+- **リサーチ(工程 1)**: Claude Code は WebSearch / WebFetch(まとまった裏取りは MCP ワーカーの Codex に curl で行わせてもよい)。Codex 直接セッションは組み込みの web_search(デスクトップアプリでは既定で有効。CLI なら `codex --search` で起動)か curl で**自分で**行う(MCP の往復はしない)。採用判断の基準(folklore 級 = 安全側)は共通
 - **イラスト生成(工程 7-2)**: Claude Code は MCP ワーカーの Codex に imagegen で生成させる(手順・確認項目は 7-2 のとおり指示文に含める)。Codex 直接セッションは**組み込みの imagegen で自分で生成**し、文字混入・1536x1024 の確認も自分で行う
 - **承認モード**: G2・G3 は Aurora 更新・S3 配置を含むため、Claude Code は auto mode で走らせない、Codex は `--full-auto` / `--yolo` を使わず承認ポリシーを既定のままにする(サンドボックス外の実行やネットワーク到達の承認プロンプトがゲートを兼ねる)
-- **Codex 直接セッションでの Aurora / S3 到達(`~/.codex/config.toml`)**: Codex のサンドボックスは既定でネットワークを遮断するため、G3 の `aws rds-data` / S3 アップロード / `git push`、G1 の Web 裏取りは workspace-write サンドボックスにネットワーク許可を与えないと通らない。**リポジトリ外のローカル設定で、反映はユーザーが行う**(本スキルは編集しない)。設定例(既存の `[projects."<リポジトリの絶対パス>"]` 節の下に足す。プロファイルにしておくと他プロジェクトへ影響しない):
+- **Codex 直接セッションの実行環境(デスクトップアプリ。Phase 23 の運用形)**: ユーザーは Windows の Codex デスクトップアプリからこのリポジトリ(WSL 上の `/home/takegaharawork/projects/AutoContentPublisherSystem`)を開く。工程が使う `docker` `uv` `python` `aws` `mysql` はすべて WSL 側にあるため、**アプリの Settings でエージェントの実行環境を Windows native から WSL に切り替え、アプリを再起動してから起動する**(Windows native = PowerShell のままだとコマンドごとに `wsl -d Ubuntu-20.04 --` を挟むことになり、サンドボックスも Windows 側になる。この状態で週次補充を回さない)。WSL モードでもアプリが読む設定ファイルは **Windows 側の `%USERPROFILE%\.codex\config.toml`**(= `C:\Users\<user>\.codex\config.toml`)で、WSL の CLI が読む `~/.codex/config.toml` とは別物(公式ドキュメントの Windows アプリの節)。承認・サンドボックスの強さはアプリの設定画面で選ぶ(承認なしの「フルアクセス」にしない)
+- **Aurora / S3 到達の設定(ユーザーが反映。本スキルは編集しない)**: Codex のサンドボックスは既定でネットワークを遮断するため、G3 の `aws rds-data` / S3 アップロード / `git push`、G1 の Web 裏取り(curl)は workspace-write サンドボックスにネットワーク許可を与えないと通らない。Windows 側の `%USERPROFILE%\.codex\config.toml` に次を足す(既存の `[projects.'...']` 節や `[windows]` 節はそのまま。WSL のプロジェクトはアプリで開いて「信頼する」を選ぶと `[projects.'\\wsl.localhost\...']` 節が自動で追加される):
 
   ```toml
-  # ~/.codex/config.toml(抜粋)
-  [projects."/home/takegaharawork/projects/AutoContentPublisherSystem"]
-  trust_level = "trusted"
-
-  # 週次補充用のプロファイル。起動は codex --profile acps --search
-  [profiles.acps]
-  model = "gpt-5.6-terra"
-  model_reasoning_effort = "high"
-  sandbox_mode = "workspace-write"
-  approval_policy = "on-request"
-
+  # %USERPROFILE%\.codex\config.toml(抜粋・追記分)
   # workspace-write サンドボックスからのネットワーク到達を許可(aws rds-data・S3・git push・curl)
   [sandbox_workspace_write]
   network_access = true
+
+  # Web 検索は既定で有効(cached)。裏取りで最新ページが要るなら live にする(任意)
+  web_search = "live"
   ```
 
-  プロファイルを作らない場合は起動時に `codex --search -c 'sandbox_workspace_write.network_access=true'` でも同じ効果になる。`~/.aws` の認証情報はサンドボックスから読める(書き込みが cwd 外へ閉じるだけ)。ローカル MySQL への `docker exec` は Docker ソケットへの接続がサンドボックスで拒まれることがあるため、拒まれたらその 1 コマンドだけサンドボックス外実行の承認を求める(`--yolo` に切り替えない)
+  CLI(`codex` を WSL で直接起動)で回す場合は WSL 側の `~/.codex/config.toml` に同じ `[sandbox_workspace_write]` 節を足すか、起動時に `codex --search -c 'sandbox_workspace_write.network_access=true'` を付ける(プロファイルは `~/.codex/<name>.config.toml` の別ファイル形式で `--profile <name>`。`[profiles.<name>]` の表形式は現行の Codex では使わない)。`~/.aws` の認証情報はサンドボックスから読める(書き込みが cwd 外へ閉じるだけ)。ローカル MySQL への `docker exec` は Docker ソケットへの接続がサンドボックスで拒まれることがあるため、拒まれたらその 1 コマンドだけサンドボックス外実行の承認を求める(フルアクセスに切り替えない)
