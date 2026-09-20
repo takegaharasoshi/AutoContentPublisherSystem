@@ -23,6 +23,16 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         '{"hook":"頭の中だけで魔法をかけるぞ","hint":"元の数をxと置いてみろ!","question":"好きな数を1つ思い浮かべろ。それを2倍して10を足し、2で割って、最初に思い浮かべた数を引く。答えはいくつになった?","answer":"必ず5(どんな数でも同じ)","explanation":"元の数をxとすると(2x+10)÷2−x=x+5−x=5。最初の数は途中で消え、10÷2の5だけが残る。誰がやっても答えが同じになる計算マジックだ。","coach_comment":"種明かしまでできたら本物だ!","tags":["なぞなぞ","朝の一問","計算マジック"],"summary":"好きな数を2倍→10を足す→2で割る→元の数を引くと必ず5になる計算マジック。式で(2x+10)÷2−x=5と種明かしする。答えが全員同じになる驚きでコメントを誘う。","illustration_scene":"朝日が差し込むリビングで、後ろ姿の人が頭の上に吹き出しを浮かべ、その吹き出しの中に大きな「?」がある。周りに小さな星や光の粒が魔法のように舞う。顔は描かない。数字・文字は描かない。"}',
         '類型: 計算マジック(2倍 → +10 → ÷2 → 元の数を引く = 必ず 5。作者不詳の定番)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1417987009 , https://land.toss-online.com/lesson/kttB1ZHLIXoLyTIwlDrj , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1116589591 (必ず 3 になる同型) 。初稿「止まった時計と遅れる時計」は簡単すぎ、2 案目「トーナメントの試合数」は面白くない、により 2026-09-20 レビューで差し替え。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
+-- A46
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '黒板の磁石を3個だけ動かし、10個全部で同じ大きさの下向きの正三角形を作ってくれ。磁石を重ねたり、黒板を回したりしてはいけない。',
+        '①を一番下へ、⑦と⑩を②③の両外側へ',
+        '{"hook":"ほとんどそのままで逆向きに!","hint":"動かさずに残せる形を探せ!","question":"黒板の磁石を3個だけ動かし、10個全部で同じ大きさの下向きの正三角形を作ってくれ。磁石を重ねたり、黒板を回したりしてはいけない。","answer":"①を一番下へ、⑦と⑩を②③の両外側へ","explanation":"①⑦⑩だけを動かして、この配置にする。\\n⑦　②　③　⑩\\n　④　⑤　⑥\\n　　⑧　⑨\\n　　　①\\n真ん中の7個はそのまま。三角形全体を回す必要はない。","coach_comment":"残せる形を見抜いたな、見事だ!","tags":["視覚パズル","朝の一問","配置転換"],"summary":"正三角形に1・2・3・4個と並ぶ磁石10個を3個だけ動かし、同じ大きさの下向きの正三角形へ。頂点①を最下段へ、底辺両端⑦⑩を②③の両外側へ移す。中央7個を共有する配置を見抜く。","illustration_scene":"朝日が差す教室の黒板を正面から見る。同色・同寸の白い丸型磁石10個を、中心が正三角形の格子になるよう等間隔で並べる。上から1・2・3・4個の4段で左右対称。各磁石に黒字で、上段から左→右に「1」「2」「3」「4」「5」「6」「7」「8」「9」「10」と記す。上下左右に十分な余白。矢印・補助線・完成形・他の文字・人物は描かない。"}',
+        '類型: 10枚のコインを3枚動かして三角形を逆向きにする古典配置パズル。流布例: https://suugaku-kyousitu.com/blog/14560/ (問題2), https://arxiv.org/abs/1810.02202 。2026-09-20 Codexが直接開いて確認。コインを黒板の丸型磁石に置き換え、文面は書き直し済み。数値を計算する問題ではなく移動位置を問う。番号は解説との対応用で、磁石の位置以外の区別はしない。', 1);
+
 -- A44
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
@@ -38,30 +48,20 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '黒板の3つの言葉から、ある決まりで1文字ずつ取り出すと、別の言葉が現れる。その言葉はなんだ?',
-        'けんか(各語の2文字目)',
-        '{"hook":"3つの言葉に暗号が隠れてる","hint":"全部そろえて縦に読め!","question":"黒板の3つの言葉から、ある決まりで1文字ずつ取り出すと、別の言葉が現れる。その言葉はなんだ?","answer":"けんか(各語の2文字目)","explanation":"たけやぶ、ほんだな、さかみち。2文字目だけを順に拾うと、け・ん・か。つなげて「けんか」だ。1文字目も3文字目も言葉にならない。位置をそろえるのが鍵。","coach_comment":"文字の居場所を疑えたな、見事!","tags":["なぞなぞ","朝の一問","暗号"],"summary":"「たけやぶ・ほんだな・さかみち」から同じ位置の文字を拾う規則を見つけ、2文字目でけんかを導く暗号なぞなぞ。3語は問題文に書かず黒板の絵で見せる。位置をそろえる発想が鍵。","illustration_scene":"朝日が差し込む教室の黒板に、チョークで「たけやぶ」「ほんだな」「さかみち」の3語が縦に大きく書かれている。文字はこの3語だけを描き、他の文字・数字は描かない。人物は描かない。"}',
-        'オリジナル書き下ろし(自作問題)。類型: 暗号(各語の同じ位置の文字を拾う縦読み)。形式は定番の位置抽出暗号で、語の組み合わせは自作(1 文字目「たほさ」・3 文字目「やだみ」・4 文字目「ぶなち」はいずれも語にならないことを verify_logic.py で確認)。初稿「8 を 8 個使って 1000」・2 案目「つく = 嘘」は 2026-09-20 レビューで単純な計算問題 / 簡単により差し替え。', 1);
+        '黒板の上の3組には、同じ仕掛けがある。最後の「?」に入る生き物は何だろう?',
+        'オオカミ(flowを逆につづるとwolf)',
+        '{"hook":"つながるはずのない言葉たち","hint":"別の言語に着替えてみろ!","question":"黒板の上の3組には、同じ仕掛けがある。最後の「?」に入る生き物は何だろう?","answer":"オオカミ(flowを逆につづるとwolf)","explanation":"英語にして逆から読む。dog→god、net→ten、star→rats。流れはflow。逆につづるとwolf、オオカミだ。","coach_comment":"言葉の境界を越えたな、見事だ!","tags":["言葉あそび","朝の一問","法則発見"],"summary":"犬→神、網→十、星→ネズミたちを英訳し、つづりを逆順にする法則を発見。流れ→flow→wolf→オオカミを導く。英語への領域転換と逆順操作を組み合わせる。","illustration_scene":"朝日が差す教室の黒板に「犬 → 神」「網 → 十」「星 → ネズミたち」「流れ → ?」の4行を上から順に大きく、同じ白いチョークで書く。指定の4行だけを正確な字形で描き、英字・他の文字・絵・人物・動物は描かない。"}',
+        'オリジナル書き下ろし(自作問題)。英単語の逆つづりという既知の言葉あそびを、日本語の対応から発見する形式に構成。流布例: https://www.sightwordsgame.com/vocabulary-words/word-play/reverse-pair/ , https://www.enigami.fun/semordnilaps 。2026-09-20 Codex が直接開いて確認。前者に dog/God・net/ten・star/rats・flow/wolf の全組が掲載。日本語の問題文・組み合わせは自作で、特定の既存問題の転載ではない。', 1);
 
 -- A43
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '黒板に漢字の部品が4つ。全部を使って2文字の熟語を1つ作ってくれ。身のまわりにある道具の名前だ。',
-        '時計(日+寺=時、言+十=計)',
-        '{"hook":"バラバラの部品を組み立てろ","hint":"2つずつ組んで、熟語にしろ!","question":"黒板に漢字の部品が4つ。全部を使って2文字の熟語を1つ作ってくれ。身のまわりにある道具の名前だ。","answer":"時計(日+寺=時、言+十=計)","explanation":"日と寺を組むと「時」、言と十を組むと「計」。合わせて「時計」だ。4つを一度に眺めても見えないが、2つずつ組む発想に切り替えると現れる。","coach_comment":"部品を2つずつ、それが正解だ!","tags":["漢字","朝の一問","合体漢字"],"summary":"「日・寺・言・十」の4部品を2つずつ組んで熟語「時計」を作る合体漢字パズル。4つを一度に組もうとすると詰まり、2つずつに分ける発想が要る。部品は問題文に書かず黒板の絵で見せる。","illustration_scene":"朝日が差し込む教室の黒板に、チョークで「日」「寺」「言」「十」の4文字がバラバラの位置に大きく書かれている。文字はこの4字だけを描き、他の文字・数字は描かない。人物は描かない。"}',
-        '類型: 合体漢字パズル(部品を組んで熟語を作る。作者不詳の定番形式)。形式の流布例: https://web.quizknock.com/tag/%E5%90%88%E4%BD%93%E6%BC%A2%E5%AD%97 , https://kaigoshoku.mynavi.jp/contents/kaigonomirailab/recreation/kanji/1moji04/ , https://utages.net/entry/2023/11/25/210014 。部品の組み合わせ(日・寺・言・十 → 時計)は自作問題。文面はオリジナルに書き下ろし(表現は書き直し済み)。初稿「時計の文字盤を直線 2 本で 3 分割」・2 案目「大に一画足して天」は 2026-09-20 レビューで単純な計算問題 / 簡単により差し替え。', 1);
-
--- A46
-INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
-        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
-        'L1', 'light',
-        'さんま、しいたけ、ごぼう。この3つはある順番で並んでいる。では、次に来る言葉には何が隠れている?',
-        '数字の6(さんま3・しいたけ4・ごぼう5)',
-        '{"hook":"3つの言葉が順番に並ぶ","hint":"声に出して頭から読め!","question":"さんま、しいたけ、ごぼう。この3つはある順番で並んでいる。では、次に来る言葉には何が隠れている?","answer":"数字の6(さんま3・しいたけ4・ごぼう5)","explanation":"さんま(3)、しいたけ(4)、ごぼう(5)。どれも頭に数字が隠れていて、3から1つずつ増えている。だから次は6が隠れた言葉、たとえば「ろくろ」だ。","coach_comment":"言葉の中の数字に気づいたな!","tags":["なぞなぞ","朝の一問","法則発見"],"summary":"さんま・しいたけ・ごぼうに隠れた3・4・5に気づき、次は6と答える法則発見なぞなぞ。隠れた数字に気づく段と、増えていることに気づく段の2段構え。","illustration_scene":"朝日が差し込む台所のまな板の上に、さんま1匹、しいたけ1つ、ごぼう1本が左から順に並び、その右に大きな「?」が浮かんでいる。文字・数字は描かない。人物は描かない。"}',
-        'オリジナル書き下ろし(自作問題)。類型: 法則発見(語頭に隠れた数字 + 数列)。隠れ数字・隠れ言葉の形式は定番だが、語の組み合わせと「数が 1 つずつ増える」を重ねた点は自作。初稿「地球の赤道に巻いたロープ(約 16cm)」・2 案目「たてる = 顔」は 2026-09-20 レビューで単純な計算問題(数学) / 簡単により差し替え。', 1);
+        'ペンを一度も離さず、一筆書きで黒板の9つの点すべての中心を通ってくれ。使えるのは、つながった4本の直線。同じ線をなぞらず、どう描く?',
+        '点の並びからはみ出す(右→左下→上→右下)',
+        '{"hook":"頭の中で線を引けるか?","hint":"折り返す場所を疑ってみろ!","question":"ペンを一度も離さず、一筆書きで黒板の9つの点すべての中心を通ってくれ。使えるのは、つながった4本の直線。同じ線をなぞらず、どう描く?","answer":"点の並びからはみ出す(右→左下→上→右下)","explanation":"●1　●2　●3　A\\n●4　●5　●6\\n●7　●8　●9\\nB\\n1→A→B→1→9と一筆書き。A・Bは折り返し位置で、点の間隔1つ分外。","coach_comment":"見えない枠を飛び出せたな!","tags":["視覚パズル","朝の一問","発想転換"],"summary":"縦横等間隔の9点を4本の直線で一筆書きする古典。右上の右と左下の下へはみ出して折り返す。点の並びが作る見えない枠を越え、4本が連続する経路を組み立てる。","illustration_scene":"朝日が差す教室の大きな黒板。中央に同じ大きさの白い丸を縦3個・横3個、縦横同じ間隔の正方形配置で描く。9個の丸の周囲には点の間隔2つ分以上の余白を均等に残す。結ぶ線・矢印・枠線・文字・数字・他の記号・人物は描かない。黒板を正面から見た構図。"}',
+        '類型: ナインドットパズル(9点を4直線で一筆書きする古典)。流布例: https://www.a-spcc.jp/promotion/1/blog_detail.html?key=entry&value=116 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q11149057731 。2026-09-20 Codex が直接開いて確認。文面は書き直し済み。点の中心を通る条件で太い線や点の縁を利用する抜け道を除外。同じ点の再通過は許容し、同じ線の重複だけを禁止。過去w3/w5のresearchでは候補に挙がったがstock_itemsには未採用。', 1);
 
 -- A45
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)

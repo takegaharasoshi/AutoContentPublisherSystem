@@ -43,45 +43,141 @@ if "A40" in BY_NO:
     check("A40", "answer に 545+5=550", "545+5=550" in BY_NO["A40"]["answer"], BY_NO["A40"]["answer"])
 
 # ---------------------------------------------------------------
-# A41 位置抽出の暗号: 2 文字目を拾うと「けんか」になり、他の位置では語にならないこと
+# A41 日本語から英訳し、英単語のつづりを逆にして日本語へ戻す。
+# 英訳の選択・法則の面白さ・任意の別法則の排除は機械検証の対象外。
 # ---------------------------------------------------------------
 if "A41" in BY_NO:
-    words = ["たけやぶ", "ほんだな", "さかみち"]
-    picks = {i + 1: "".join(w[i] for w in words) for i in range(4)}
-    check("A41", "2 文字目で けんか", picks[2] == "けんか", f"位置ごとの縦読み: {picks}")
-    others = {k: v for k, v in picks.items() if k != 2}
-    check("A41", "他の位置は語にならない", set(others.values()) == {"たほさ", "やだみ", "ぶなち"},
-          f"1/3/4 文字目 = {sorted(others.values())}(いずれも意味のある語ではない)")
-    check("A41", "answer は けんか", BY_NO["A41"]["answer"].startswith("けんか"), BY_NO["A41"]["answer"])
-    check("A41", "3 語は問題文に書かない(黒板で提示)",
-          "たけやぶ" not in BY_NO["A41"]["question"] and "たけやぶ" in BY_NO["A41"]["illustration_scene"],
-          "問題文に語なし・情景文に 3 語あり")
+    pairs = [("犬", "dog", "神", "god"), ("網", "net", "十", "ten"),
+             ("星", "star", "ネズミたち", "rats"), ("流れ", "flow", "オオカミ", "wolf")]
+    for ja_src, en_src, ja_dst, en_dst in pairs:
+        check("A41", f"英訳後の逆順 {ja_src}→{ja_dst}", en_src[::-1] == en_dst,
+              f"{en_src} → {en_src[::-1]} = {en_dst}")
+    kana_pairs = [("いぬ", "かみ"), ("あみ", "じゅう"), ("ほし", "ねずみたち")]
+    check("A41", "日本語の逆さ読みでは成立しない",
+          all(src[::-1] != dst for src, dst in kana_pairs), str(kana_pairs))
+    it = BY_NO["A41"]
+    lines = [f"{src} → {dst}" for src, _, dst, _ in pairs[:3]] + ["流れ → ?"]
+    check("A41", "提示4行と順序", all(line in it["illustration_scene"] for line in lines)
+          and [it["illustration_scene"].index(line) for line in lines]
+          == sorted(it["illustration_scene"].index(line) for line in lines), str(lines))
+    check("A41", "問題文に語の一覧なし", all(src not in it["question"] for src, _, _, _ in pairs), it["question"])
+    check("A41", "答えと解説の整合", it["answer"].startswith("オオカミ")
+          and all(en in it["explanation"] for _, a, _, b in pairs for en in (a, b)), it["answer"])
+    check("A41", "情景指示に答え・英訳を含めない",
+          all(word not in it["illustration_scene"] for word in ("オオカミ", "狼", "wolf", "flow", "dog")),
+          "文字の対応だけを提示。完成画像の字形・答えバレは別途目視検品")
 
 # ---------------------------------------------------------------
-# A43 合体漢字: 4 部品が 2 つずつで「時」「計」を構成し、熟語「時計」になること
+# A43 9点の一筆書き。左上=(0,0)、右・下を正とする。
+# 解説の経路と回転・反転別解が全9点の中心を通り、線分を重複しないか検証。
 # ---------------------------------------------------------------
 if "A43" in BY_NO:
-    parts = ["日", "寺", "言", "十"]
-    compose = {("日", "寺"): "時", ("言", "十"): "計"}
-    made = [compose[k] for k in compose]
-    used = sorted(p for k in compose for p in k)
-    check("A43", "部品をすべて使う", used == sorted(parts), f"{used} = 提示の 4 部品")
-    check("A43", "2 つずつで時・計", made == ["時", "計"], f"{list(compose.items())}")
-    check("A43", "熟語は時計", "".join(made) == "時計" and BY_NO["A43"]["answer"].startswith("時計"), BY_NO["A43"]["answer"])
-    check("A43", "4 部品は問題文に書かない(黒板で提示)",
-          "寺" not in BY_NO["A43"]["question"] and "「寺」" in BY_NO["A43"]["illustration_scene"],
-          "問題文に部品なし・情景文に 4 字あり")
+    dots = {(x, y) for x in range(3) for y in range(3)}
+    route = [(0, 0), (3, 0), (0, 3), (0, 0), (2, 2)]
+
+    def on_segment(point, start, end):
+        """整数の外積と範囲から点が線分上にあるか判定する。"""
+        x, y = point
+        ax, ay = start
+        bx, by = end
+        return ((x-ax)*(by-ay) == (y-ay)*(bx-ax)
+                and min(ax, bx) <= x <= max(ax, bx)
+                and min(ay, by) <= y <= max(ay, by))
+
+    segments = list(zip(route, route[1:]))
+    hits = [{pt for pt in dots if on_segment(pt, a, b)} for a, b in segments]
+    check("A43", "4線分で全9点の中心を通る",
+          len(segments) == 4 and set.union(*hits) == dots, str(hits))
+    # 各線分の方向が互いに平行でなければ、同一直線のなぞりはない。
+    directions = [(b[0]-a[0], b[1]-a[1]) for a, b in segments]
+    check("A43", "同じ線をなぞらない",
+          all(u[0]*v[1] != u[1]*v[0] for i, u in enumerate(directions) for v in directions[i+1:]),
+          str(directions))
+    check("A43", "連続経路で点の並びの外へ出る",
+          all(a != b for a, b in segments) and any(x > 2 or y > 2 for x, y in route), str(route))
+    variants = []
+    for reflect in (False, True):
+        for turns in range(4):
+            transformed = []
+            for x, y in route:
+                if reflect:
+                    x = 2-x
+                for _ in range(turns):
+                    x, y = 2-y, x
+                transformed.append((x, y))
+            variants.append(transformed)
+    check("A43", "回転・反転の8経路も正解",
+          all({pt for a, b in zip(path, path[1:]) for pt in dots if on_segment(pt, a, b)} == dots
+              for path in variants), f"{len(variants)}経路で全9点を通過(一意解とはしない)")
+    it = BY_NO["A43"]
+    # キャプションの番号付き配置図から座標を復元し、記載経路を検証する。
+    diagram_lines = it["explanation"].splitlines()
+    labels = {}
+    for y, line in enumerate(diagram_lines[:4]):
+        for x, token in enumerate(line.split()):
+            labels[token[1:] if token.startswith("●") else token] = (x, y)
+    expected_dots = {str(3*y+x+1): (x, y) for y in range(3) for x in range(3)}
+    check("A43", "解説図の番号と折り返し位置",
+          labels == {**expected_dots, "A": (3, 0), "B": (0, 3)}
+          and all(f"●{n}" in it["explanation"] for n in range(1, 10)), str(labels))
+    caption_path = diagram_lines[4].split("と一筆書き。")[0].split("→")
+    check("A43", "解説図の経路は検証済み4線分と一致",
+          [labels.get(label) for label in caption_path] == route
+          and "点の間隔1つ分外" in it["explanation"], str(caption_path))
+    check("A43", "全体を一続きに描く条件を先頭で明示",
+          it["question"].startswith("ペンを一度も離さず、一筆書きで")
+          and all(word in it["question"] for word in ("中心", "つながった4本の直線", "同じ線をなぞらず")), it["question"])
+    check("A43", "図の指定は9点と余白、解答線は描かない",
+          all(word in it["illustration_scene"] for word in ("縦3個・横3個", "縦横同じ間隔", "余白", "結ぶ線・矢印・枠線", "描かない")),
+          "完成画像の個数・等間隔・余白・解答線の混入は目視検品が必要")
 
 # ---------------------------------------------------------------
-# A46 隠れ数字の数列: 各語の語頭に 3・4・5 が隠れ、1 ずつ増えていること(次は 6)
+# A46 10個の磁石の三角形反転。xは横間隔の半分、yは段間隔を単位とする。
+# 4段の等間隔配置を上下反転し、平行移動させた全候補の重なりを比較する。
 # ---------------------------------------------------------------
 if "A46" in BY_NO:
-    hidden = [("さんま", "さん", 3), ("しいたけ", "しい", 4), ("ごぼう", "ご", 5)]
-    for word, head, num in hidden:
-        check("A46", f"{word} の語頭に {num}", word.startswith(head), f"{word} → {head}({num})")
-    nums = [n for _, _, n in hidden]
-    check("A46", "1 ずつ増える", nums == list(range(nums[0], nums[0] + len(nums))), f"{nums} → 次は {nums[-1] + 1}")
-    check("A46", "answer は 6", "6" in BY_NO["A46"]["answer"], BY_NO["A46"]["answer"])
+    original = {}
+    number = 1
+    for y in range(4):
+        for x in range(-y, y + 1, 2):
+            original[number] = (x, y)
+            number += 1
+    original_points = set(original.values())
+    inverted = {(-x, -y) for x, y in original_points}
+    # 3個のみ移動なら7個以上の一致が必要。1個でも一致する平行移動は
+    # 元の点と反転した点の差で必ず列挙できるため、探索範囲の恣意的な制限はない。
+    shifts = {(x-a, y-b) for x, y in original_points for a, b in inverted}
+    candidates = {(dx, dy): {(x+dx, y+dy) for x, y in inverted} for dx, dy in shifts}
+    best_overlap = max(len(original_points & pts) for pts in candidates.values())
+    solutions = {shift: pts for shift, pts in candidates.items() if len(original_points & pts) == 7}
+    check("A46", "最大7個を残せるため必要な移動は3個",
+          best_overlap == 7, f"平行移動{len(shifts)}候補・最大共通点{best_overlap}個")
+    check("A46", "3個で逆向きになる完成位置",
+          set(solutions) == {(0, 4)}, f"解となる平行移動: {sorted(solutions)}")
+    it = BY_NO["A46"]
+    # キャプションの全角字下げと丸数字から完成図の座標を復元する。
+    numerals = "①②③④⑤⑥⑦⑧⑨⑩"
+    rows = it["explanation"].splitlines()[1:5]
+    final = {}
+    for y, row in enumerate(rows, start=1):
+        indent = len(row) - len(row.lstrip("　"))
+        for column, ch in enumerate(row.lstrip("　").split()):
+            final[numerals.index(ch)+1] = (-3 + indent + 2*column, y)
+    moved = {n for n in original if final.get(n) != original[n]}
+    check("A46", "番号図は10個を重複なく使う下向き正三角形",
+          set(final) == set(original) and len(set(final.values())) == 10
+          and set(final.values()) == candidates[(0, 4)], str(final))
+    check("A46", "動かすのは①⑦⑩だけ", moved == {1, 7, 10}, str(sorted(moved)))
+    check("A46", "答えの移動先と図が一致",
+          final[1] == (0, 4) and final[7] == (-3, 1) and final[10] == (3, 1)
+          and it["answer"] == "①を一番下へ、⑦と⑩を②③の両外側へ", it["answer"])
+    check("A46", "問題は数値計算でなく位置の変更を問う",
+          all(t in it["question"] for t in ("3個だけ動かし", "10個全部", "同じ大きさ", "下向きの正三角形", "重ねたり", "黒板を回したり")), it["question"])
+    check("A46", "提示図の番号と初期配置を指定",
+          all(f"「{n}」" in it["illustration_scene"] for n in range(1, 11))
+          and "上から1・2・3・4個" in it["illustration_scene"]
+          and "完成形・他の文字・人物は描かない" in it["illustration_scene"],
+          "完成画像の10個・字形・等間隔・初期配置は目視検品")
 
 # ---------------------------------------------------------------
 # A44 指の頭文字: 親指〜小指の読みの頭文字が「お ひ な く こ」になり、□(3 番目)が「な」であること
