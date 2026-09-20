@@ -78,9 +78,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '王が2人の騎手に「馬で競走せよ。ただし後にゴールした馬の持ち主の勝ち」と告げた。2人は動かない。賢者の一言で全力疾走したのは、なぜ?',
-        '「馬を交換しろ」(相手の馬で先にゴール)',
-        '{"hook":"遅い方が勝ちのレース?","hint":"ルールは変えずに立場を変えろ!","question":"王が2人の騎手に「馬で競走せよ。ただし後にゴールした馬の持ち主の勝ち」と告げた。2人は動かない。賢者の一言で全力疾走したのは、なぜ?","answer":"「馬を交換しろ」(相手の馬で先にゴール)","explanation":"勝つのは「自分の馬」が後にゴールすること。馬を交換すれば、相手の馬に乗って先にゴールするほど自分の馬が後になる。ルールはそのまま、立場を入れ替える発想だ。","coach_comment":"視点をひっくり返す、それが水平思考だ!","tags":["水平思考","夜の一問","発想転換"],"summary":"「後にゴールした馬の持ち主が勝ち」の膠着レースを賢者の一言「馬を交換しろ」で動かす古典の水平思考。相手の馬で先にゴールすれば自分の馬が後になる。","illustration_scene":"夜、松明に照らされた馬場に、2頭の馬が並んで立ち止まり、その上に大きな「?」が浮かぶ。馬に乗る2人の騎手は後ろ姿で顔は描かない。遠くのゴールの旗には文字を入れない。文字・数字は描かない。"}',
+        '王が、各自の馬を持つ2人に競走を命じた。「後にゴールした馬の元の持ち主が勝ち」。2人は動かない。どんな一言で、2人とも全力で走り出す?',
+        '互いの馬に乗り換えろ',
+        '{"hook":"勝負を動かす、たった一言","hint":"勝つのは騎手か、持ち主か?考えろ!","question":"王が、各自の馬を持つ2人に競走を命じた。「後にゴールした馬の元の持ち主が勝ち」。2人は動かない。どんな一言で、2人とも全力で走り出す?","answer":"互いの馬に乗り換えろ","explanation":"所有者は変えず、乗る馬だけ交換する。相手の馬で先着すれば、自分の馬は後着して自分の勝ち。同じルールのまま、相手の馬を速く走らせるほど有利になる。","coach_comment":"自分が乗る馬と、自分の馬を分けて考えたな!","tags":["水平思考","夜の一問","立場の転換"],"summary":"後着した馬の元の持ち主が勝つ競走で、所有者を変えず互いの馬に乗り換える。自分の先着が自分の馬の後着になるよう、騎手と所有者の関係を入れ替える古典。","illustration_scene":"夜、松明に照らされた馬場に、2頭の馬が並んで立ち止まり、その上に大きな「?」が浮かぶ。馬に乗る2人の騎手は後ろ姿で顔は描かない。遠くのゴールの旗には文字を入れない。文字・数字は描かない。"}',
         '類型: 水平思考(のろのろ馬レース。作者不詳の古典)。流布例: https://diamond.jp/articles/-/341503 , https://www.oricon.co.jp/article/2556546/ , https://sist8.com/2horse 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C43
@@ -88,57 +88,57 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '机の上にロウソク・マッチ・画びょうの入った箱。ロウソクを壁に固定し、火をつけてもロウが机にたれないようにしたい。どうする?',
-        '箱を画びょうで壁に留め、台にする',
-        '{"hook":"ロウがたれない工夫とは","hint":"箱はただの入れ物か?","question":"机の上にロウソク・マッチ・画びょうの入った箱。ロウソクを壁に固定し、火をつけてもロウが机にたれないようにしたい。どうする?","answer":"箱を画びょうで壁に留め、台にする","explanation":"画びょうを出して空いた箱を壁に留め、その上にロウソクを立てる。箱を「画びょうの入れ物」としか見ないと解けない。物の役割を固定しない発想が鍵だ。","coach_comment":"道具の役割を疑え、それが突破口だ!","tags":["水平思考","夜の一問","道具"],"summary":"ロウソク・マッチ・画びょうの箱でロウソクを壁に固定する古典(ドゥンカーのロウソク問題)。箱を画びょうで壁に留めて台にする。機能的固着を外す発想を問う。","illustration_scene":"夜、ランプに照らされた木の机の上に、1本のロウソク、マッチ箱、画びょうがぎっしり入った小さな紙箱が並び、後ろの壁に大きな「?」が浮かぶ。ロウソクは壁に付いていない。文字・数字は描かない。人物は描かない。"}',
+        '机にあるものを使って、ロウソクをコルクの壁に固定したい。火をつけても下の机にロウを落とさない方法は?',
+        '箱を空にして壁に留め、ロウ受け兼台にする',
+        '{"hook":"見慣れた道具が化けるぞ","hint":"道具の使い道を決めつけるな!","question":"机にあるものを使って、ロウソクをコルクの壁に固定したい。火をつけても下の机にロウを落とさない方法は?","answer":"箱を空にして壁に留め、ロウ受け兼台にする","explanation":"空にした箱の側面を画びょうで壁に留め、底にロウソクを立てる。箱が台とロウ受けを兼ねる。画びょうの入れ物も、使える道具の一つなのだ。","coach_comment":"入れ物まで道具にできたな、見事だ!","tags":["水平思考","夜の一問","道具"],"summary":"ロウソク・マッチ・画びょうの箱でロウソクを壁に固定する古典(ドゥンカーのロウソク問題)。箱を画びょうで壁に留めて台にする。機能的固着を外す発想を問う。","illustration_scene":"夜、室内灯に照らされた机に、火のついていないロウソク1本、表紙を開いた無地のブックマッチ1冊、たくさんの画びょうがぎっしり入った、浅く丈夫な厚紙製のふたなしの箱。紙の質感と角の折り目を見せる。ブックマッチは薄い紙の表紙に平たい紙製マッチが一列につながる冊子型で、箱型にしない。背後は平らなコルク壁。箱は机に置き、中の画びょうがよく見える。壁に大きな「?」。他の文字・数字・人物は描かない。"}',
         '類型: 水平思考(ロウソク問題。1945 年ドゥンカーの心理学実験に由来し、作者を離れて古典として流布)。流布例: https://ja.wikipedia.org/wiki/%E3%83%AD%E3%82%A6%E3%82%BD%E3%82%AF%E5%95%8F%E9%A1%8C , https://www.weblio.jp/content/%E3%83%AD%E3%82%A6%E3%82%BD%E3%82%AF%E5%95%8F%E9%A1%8C , https://mitani3.com/blog/2010/07/post-223.html 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
-
--- C46
-INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
-        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
-        'L1', 'deep',
-        'かごにリンゴが6個。6人の子どもが1人1個ずつ受け取ったのに、かごの中にはまだリンゴが1個残っている。切ったり分けたりはしていない。なぜ?',
-        '最後の1人はかごごと受け取った',
-        '{"hook":"かごのリンゴが消えない?","hint":"最後の1人の受け取り方だ!","question":"かごにリンゴが6個。6人の子どもが1人1個ずつ受け取ったのに、かごの中にはまだリンゴが1個残っている。切ったり分けたりはしていない。なぜ?","answer":"最後の1人はかごごと受け取った","explanation":"5人が1個ずつ取り、最後の1人はリンゴ入りのかごごと受け取った。だから6人とも1個ずつ持ち、かごの中にも1個ある。「かごの中=誰のものでもない」が思い込みだ。","coach_comment":"言葉の隙間を見つけたな、見事だ!","tags":["水平思考","夜の一問","ひっかけ"],"summary":"6個のリンゴを6人が1個ずつ受け取ったのにかごに1個残る理由を問う古典の水平思考。最後の1人がかごごと受け取った。「かごの中のリンゴは誰のものでもない」という思い込みを外す。","illustration_scene":"夜、台所の照明の下、木のテーブルに籐のかごが1つ置かれ、その中に赤いリンゴが1個だけ入っている。かごの横に大きな「?」。リンゴは1個だけ描く。人物は描かない。文字・数字は描かない。"}',
-        '類型: 水平思考(残ったリンゴ。作者不詳の定番)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1431927394 , https://ameblo.jp/01180622/entry-10290556264.html , https://mixi.jp/view_bbs.pl?comm_id=4284716&id=43356568 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C45
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '昔の中国。王に贈られたゾウの重さを知りたいが、ゾウが乗れる秤はない。あるのは大きな船と、たくさんの石と普通の秤。幼い王子はどう量った?',
-        '船の喫水線に印、同じ沈みまで石を積んで石を量る',
-        '{"hook":"巨大なゾウの体重を量れ","hint":"ゾウを何かに置き換えろ!","question":"昔の中国。王に贈られたゾウの重さを知りたいが、ゾウが乗れる秤はない。あるのは大きな船と、たくさんの石と普通の秤。幼い王子はどう量った?","answer":"船の喫水線に印、同じ沈みまで石を積んで石を量る","explanation":"ゾウを船に乗せ、水面の位置に印をつける。ゾウを降ろし、同じ印まで沈むよう石を積めば、石の総重量がゾウの重さ。三国志の曹沖が幼くして示したという故事だ。","coach_comment":"大きな問題は小分けにして量れ!","tags":["故事","夜の一問","発想転換"],"summary":"秤に乗らないゾウの重さを、船の喫水線に印をつけて同じ沈みまで石を積み替えて量る三国志の故事(曹沖称象)。等価置換の発想を問う。前バッチC41(王冠)と同じく水を使うが手順は別。","illustration_scene":"月夜の川岸に大きな木造の船が浮かび、岸には1頭の大きなゾウと石の山がある。船は空で、ゾウはまだ乗っていない。上に大きな「?」。人物は遠景の後ろ姿のみで顔は描かない。文字・数字は描かない。"}',
-        '類型: 故事(曹沖称象。『三国志』魏書 由来の逸話で作者不詳の形で流布)。流布例: https://ja.wikipedia.org/wiki/%E6%9B%B9%E6%B2%96 , https://hajimete-sangokushi.com/2015/01/25/post-1231/ , https://history-ancient.com/soucyuu-sangokusi/ , https://baike.baidu.com/item/%E6%9B%B9%E5%86%B2%E7%A7%B0%E8%B1%A1/5085 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '高さ制限の橋に、トラックの屋根が数センチつかえて進めない。荷台は空で、橋を壊すことも車を切ることもできない。どうやって通す?',
+        'タイヤの空気を抜いて車高を下げる',
+        '{"hook":"橋を壊す話まで出たらしいぞ!","hint":"橋じゃなく、車の方を見てみろ!","question":"高さ制限の橋に、トラックの屋根が数センチつかえて進めない。荷台は空で、橋を壊すことも車を切ることもできない。どうやって通す?","answer":"タイヤの空気を抜いて車高を下げる","explanation":"タイヤの空気を抜けば車体全体が数センチ沈み、屋根が橋を抜ける。通り過ぎたら空気を入れ直せばいい。橋か荷物ばかり見てしまうが、答えは足元にあった。","coach_comment":"答えは足元にあったな、よく気づいた!","tags":["水平思考","夜の一問","視点転換"],"summary":"高さ制限の橋につかえたトラックを、タイヤの空気を抜いて車高を下げて通す古典。橋や荷物へ向かう注意を足元へ向け直す視点転換を問う。水も計算も使わない。","illustration_scene":"夜の街灯に照らされた高架橋の下。大型トラックの箱型の屋根が橋げたに当たり、すき間なく止まっている。屋根と橋げたの接点が見える真横からの構図。橋の上に大きな「?」。空気の抜けたタイヤ・空気を抜く動作・工具・レッカー車・人物・文字・数字は描かない。"}',
+        '類型: 高さ制限の橋につかえたトラック(Stuck Truck。作者不詳で広く流布する水平思考の説話)。流布例: https://philipchircop.wordpress.com/2012/08/08/let-some-air-out-of-the-tyres/ (本文末に Source unknown 表記) , https://reasontestprep.com/stuck-truck/ 。2026-09-20 Claude が両本文を直接確認。原話の子ども・レッカー車の場面描写は使わず、道具と制約だけを示す日本語の出題へ書き直し済み。物理的な沈下量を機械検証したものではない。', 1);
+
+-- C46
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '輪が3個ずつつながった鎖が4本ある。12個全部をつなぎ合わせて、枝分かれのない大きな輪にしたい。つなぐために開いて閉じられる輪は3個だけ。どうつなぐ?',
+        '1本の3輪を全部開き、残り3本のつなぎに使う',
+        '{"hook":"つなぐ前に、何をする?","hint":"今あるまとまりを疑ってみろ!","question":"輪が3個ずつつながった鎖が4本ある。12個全部をつなぎ合わせて、枝分かれのない大きな輪にしたい。つなぐために開いて閉じられる輪は3個だけ。どうつなぐ?","answer":"1本の3輪を全部開き、残り3本のつなぎに使う","explanation":"1本だけをばらし、3個の輪をつなぎ部品にする。残る3本を三角形状に置き、隣り合う端を1個ずつでつないで閉じる。12個が一周する鎖になる。","coach_comment":"つなぐために一度ばらす、いい発想だ!","tags":["水平思考","夜の一問","組み替え"],"summary":"3輪の鎖4本を、3輪だけ開閉して12輪の閉じた鎖にする古典。1本を全てばらして接続部品に転用し、残る3本をつなぐ。切る場所を分散せず一組に集中させる。","illustration_scene":"夜の作業台を照らす卓上灯。銀色の輪が3個ずつつながった短い鎖を4本、互いに離して横一列に置く。全12個の輪は閉じていて、端同士はつながっていない。そばにペンチと大きな「?」。完成した輪・開いた輪・矢印・文字・数字・人物は描かない。"}',
+        '類型: 4本の鎖をつなぐ古典(Four Chains)。流布例: https://www.puzzleprime.com/puzzles/brain-teasers/insight/four-chains/ , https://suresolv.com/brain-teaser/make-a-circular-chain-riddle 。2026-09-20 Codexが両本文を直接確認(前者にUnknown Author表記)。金額や最少回数を答えにせず、3輪だけ開閉する手順を問う形に書き直し済み。', 1);
 
 -- C44
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '和尚が「この水あめは子どもが食べたら死ぬ毒だ」と言って出かけた。小僧たちは全部食べてしまった。戻った和尚に叱られない、とんちの一言は?',
-        '茶碗を割ったお詫びに毒を食べて死のうとしました',
-        '{"hook":"叱られる前の一手とは","hint":"和尚の嘘を逆手に取れ!","question":"和尚が「この水あめは子どもが食べたら死ぬ毒だ」と言って出かけた。小僧たちは全部食べてしまった。戻った和尚に叱られない、とんちの一言は?","answer":"茶碗を割ったお詫びに毒を食べて死のうとしました","explanation":"和尚の大事な茶碗をわざと割り「お詫びに死のうと毒を全部食べたのに死ねません」と泣く。毒と言った和尚の嘘を逆手に取れば、叱ると嘘がばれる。一休の古典とんちだ。","coach_comment":"相手の言葉で相手を封じる、見事だ!","tags":["とんち","夜の一問","古典"],"summary":"「子どもが食べたら死ぬ毒」と偽った和尚の水あめを食べた小僧が、茶碗を割って「死んでお詫びしようと毒を食べた」と返す一休咄の古典とんち(水あめの毒)。相手の嘘を逆手に取る。","illustration_scene":"夜、行灯に照らされた寺の板の間に、ふたの開いた空の壺が置かれ、その前に小さな小僧が3人、後ろ姿で正座している。上に大きな「?」。顔は描かない。茶碗は描かない。文字・数字は描かない。"}',
-        '類型: とんち(一休咄「水あめの毒」。作者不詳・江戸期の一休咄に由来し広く流布)。流布例: http://hukumusume.com/douwa/amime/jap/j03_19.html , https://news.mynavi.jp/article/20220928-2465292/ , https://tap-biz.jp/lifestyle/trivia/1038435?page=2 , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1011556050 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '校庭の地面に埋まった細い鉄パイプの中にピンポン玉が落ちた。手は届かないし、棒でも取れない。パイプは抜けそうにない。校庭にあるものだけを使い、玉を取り出すには?',
+        'パイプに水を注いで玉を浮かせる',
+        '{"hook":"みんな棒を探しに行ったらしい","hint":"取りに行くな、上げてこい!","question":"校庭の地面に埋まった細い鉄パイプの中にピンポン玉が落ちた。手は届かないし、棒でも取れない。パイプは抜けそうにない。校庭にあるものだけを使い、玉を取り出すには?","answer":"パイプに水を注いで玉を浮かせる","explanation":"水を注げば、軽い玉は水面と一緒に上がってくる。道具を細く長くする方向ではなく、玉の方を持ち上げる方向へ切り替える。水は校庭の水道で汲める。","coach_comment":"浮かせる手があったな、お見事!","tags":["水平思考","夜の一問","発想転換"],"summary":"校庭の地面に刺さったパイプの底のピンポン玉を、水を注いで浮かせて取り出す古典。道具で取りに行く方向から玉を上げる方向へ発想を変える。パイプを抜く別解と持ち込み道具は文面で塞ぐ。","illustration_scene":"夜の校庭、外灯の明かり。乾いた地面から少しだけ顔を出した細い鉄パイプ。その口に人の指先が差し込まれているが、深い底にある白いピンポン玉には全く届いていない。パイプの中が断面で見える構図で、指先と玉の距離が分かる。上に大きな「?」。顔・水・バケツ・ボトル・棒・道具・文字・数字は描かない。"}',
+        '類型: Ping Pong Ball(作者不詳で広く流布する水平思考パズル)。流布例: https://www.puzzleprime.com/puzzles/brain-teasers/insight/ping-pong-ball/ (Unknown Author 表記) , https://puzzlefry.com/puzzles/ping-pong-ball-stuck-into-the-pipe-puzzle/ 。2026-09-21 Claude が両本文を直接確認。原話が並べる道具一覧(ラケット・靴ひも・水のボトル)は答えへの道順になるため使わず、状況だけを示す日本語の出題へ書き直し済み。浮力の条件を機械検証したものではない。', 1);
 
 -- C48
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '丸いホールケーキを、ナイフで直線に3回だけ切って8等分にしたい。切ったあとに動かしたり重ねたりしてはいけない。どう切る?',
-        '上から十字に2回、横から水平に1回',
-        '{"hook":"切り方ひとつで差がつくぞ","hint":"上から見るだけじゃないぞ!","question":"丸いホールケーキを、ナイフで直線に3回だけ切って8等分にしたい。切ったあとに動かしたり重ねたりしてはいけない。どう切る?","answer":"上から十字に2回、横から水平に1回","explanation":"上から十字に切って4等分、最後に横から水平に切って上下に分ければ8等分。平面で4本目を探すと詰まる。ケーキは立体だと思い出せるかが分かれ目だ。","coach_comment":"高さを忘れるな、世界は立体だ!","tags":["発想転換","夜の一問","立体"],"summary":"丸いケーキを直線3回で8等分にする古典パズル。上から十字に2回、横から水平に1回。平面思考から立体へ切り替える(前バッチC39の棒6本と同じ立体化の発想。バッチは別)。","illustration_scene":"夜のダイニングテーブルの上に、切っていない丸いホールケーキと1本のナイフが置かれ、ケーキの上に大きな「?」が浮かぶ。周りに小皿が8枚。文字・数字は描かない。人物は描かない。"}',
-        '類型: 立体への発想転換(ケーキを3回で8等分。作者不詳の定番)。流布例: https://nazoq.com/hard/Q030995.html , https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1468155074 , https://www.torito.jp/puzzles/308.shtml , https://smart-flash.jp/lifemoney/158343/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '病院に急ぐ老人、運転できる親友、ずっと話したかった人が雨宿り中。二人乗りの車で来た君は、老人をすぐ送りつつ会話の機会も逃したくない。どうする?',
+        '親友に車を託して老人を送り、自分は残って話す',
+        '{"hook":"一人を選ぶしかないのか?","hint":"席の使い方から考え直してみろ!","question":"病院に急ぐ老人、運転できる親友、ずっと話したかった人が雨宿り中。二人乗りの車で来た君は、老人をすぐ送りつつ会話の機会も逃したくない。どうする?","answer":"親友に車を託して老人を送り、自分は残って話す","explanation":"親友に運転を頼み、老人を助手席に乗せて病院へ。自分は降りて、話したかった人と雨宿りを続ける。二人乗りでも、自分が運転席に居続ける必要はない。","coach_comment":"選ぶのは同乗者だけじゃないと気づいたな!","tags":["水平思考","夜の一問","役割分担"],"summary":"二人乗りの車と雨宿りする3人の古典。病院へ急ぐ人は運転できる親友に送りを任せ、自分は話したかった人と残る。運転席を自分の固定席と考える前提を外す。","illustration_scene":"雨の夜、屋根のあるバス停に3人の大人が後ろ姿で雨宿りしている。そばに、前席2つだけの小さな車が停まり、運転席にもう1人の後ろ姿。大きな「?」が浮かぶ。顔・文字・数字・鍵の受け渡し・乗り降りの動作は描かない。"}',
+        '類型: 二人乗りの車とバス停の3人(Tough Decisions / Bus-stop)。流布例: https://www.puzzleprime.com/puzzles/brain-teasers/insight/tough-decisions/ , https://www.youthfutureproject.org/wp-content/uploads/SportsPeaceWorkshop2013-Descriptions-of-the-games.pdf 。2026-09-20 Codexが両本文を直接確認。前者にUnknown Author表記。死の切迫や理想の恋人の表現を、病院へ急ぐ人と話したかった人へ変更。運転可能な親友を明示し書き直し済み。唯一の最善策や医療上の対応を問う問題ではない。', 1);
 
 -- C47
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '橋を渡るのに10分かかるが、番人が5分ごとに見回りに来て、見つかると来た方へ追い返される。番人と話さず、誰も傷つけずに向こう岸へ渡るには?',
-        '5分弱歩いたら向きを変え、追い返してもらう',
-        '{"hook":"見つかると追い返される橋","hint":"追い返される向きを利用しろ!","question":"橋を渡るのに10分かかるが、番人が5分ごとに見回りに来て、見つかると来た方へ追い返される。番人と話さず、誰も傷つけずに向こう岸へ渡るには?","answer":"5分弱歩いたら向きを変え、追い返してもらう","explanation":"渡り始めて5分弱で反対を向いて歩くふりをする。見回りの番人は「向こう岸から来た」と思い、こちらが行きたい岸へ「戻れ」と追い返す。番人の指示に従うだけで渡れる。","coach_comment":"敵のルールを味方につけろ!","tags":["水平思考","夜の一問","逆転"],"summary":"10分かかる橋を5分ごとの番人に追い返されずに渡る古典の水平思考。5分手前で向きを変え、番人に「戻れ」と目的の岸へ追い返してもらう。ルールをそのまま利用する逆転の発想。","illustration_scene":"月明かりの下、長い石橋が霧の川に架かり、橋の中ほどに番人小屋の明かりがともる。橋のたもとに旅人が後ろ姿で立ち、上に大きな「?」。顔は描かない。文字・数字は描かない。"}',
-        '類型: 水平思考(橋の番人。作者不詳の定番)。流布例: http://sui-hei.net/mondai/show/5849 , https://www.quiz-puzzle.com/question/74_q.html , https://www.quora.com/If-a-bridge-which-takes-30-mins-to-cross-has-a-guard-situated-in-house-half-way-along-the-bridge-who-checks-every-15mins-to-catch-people-crossing-and-if-caught-he-sends-them-back-the-way-they-came-how-can-you-get 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '初心者がチェスの達人2人と別々の盤で同時に対局。片方で白の先手、もう片方で黒の後手を持つ。時間制限なし。少なくとも1局は負けずに終える作戦は?',
+        '達人の指し手を別の盤に写し、達人同士を対戦させる',
+        '{"hook":"強敵が二人なら道が開ける?","hint":"二つの勝負を別々に考えるな!","question":"初心者がチェスの達人2人と別々の盤で同時に対局。片方で白の先手、もう片方で黒の後手を持つ。時間制限なし。少なくとも1局は負けずに終える作戦は?","answer":"達人の指し手を別の盤に写し、達人同士を対戦させる","explanation":"白の達人が指した手を、自分が白の盤でまねる。黒の達人の返し手を、もう一方でまねる。これを続ければ実質は達人同士の1局。自分は1勝1敗か、2引き分けになる。","coach_comment":"相手の強さを、もう一つの勝負に借りたな!","tags":["水平思考","夜の一問","作戦"],"summary":"チェスの達人2人との同時対局で白と黒を持ち、互いの指し手をもう一方の盤へ写す古典。実質的に達人同士を対戦させ、初心者でも1勝1敗か2引き分けにする。時計は使わない。","illustration_scene":"夜の室内を照らす卓上灯。離れた2つの机にチェス盤が1面ずつあり、駒は対局開始前の配置。中央に立つ1人と、各机の奥に座る1人ずつを遠景の後ろ姿で描く。大きな「?」。顔・指し手の矢印・文字・数字・時計は描かない。"}',
+        '類型: 達人2人とのチェス同時対局で指し手を中継する古典。流布例: https://groups.google.com/g/rec.puzzles/c/oadPpJyrGus (1995年の議論) , https://simonrs.com/eulercircle/cgt2021/yutao-dongshen-scoring.pdf (Scoring Gamesのman-in-the-middleの例)。2026-09-20 Codexが両本文を直接確認。複数の小説・手品でも使われる一般的な解法構造で、特定作品の場面は用いず書き直し済み。時間切れによる反例を防ぐため時間制限なし。競技大会の不正可否でなく、盤を使う仮想の作戦問題。', 1);

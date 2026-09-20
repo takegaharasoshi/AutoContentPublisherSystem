@@ -6,9 +6,8 @@
 from __future__ import annotations
 
 import math
-import random
 import sys
-from itertools import combinations_with_replacement
+from itertools import combinations, combinations_with_replacement
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from stock_items import ITEMS
@@ -219,29 +218,63 @@ if "A45" in BY_NO:
           "問題文に組なし・情景文に 4 行あり")
 
 # ---------------------------------------------------------------
-# C48 ケーキを 3 回で 8 等分: 中心を通る直交 2 平面 + 高さ半分の水平面で 8 片の体積が等しいこと(モンテカルロ)
+# C46 鎖: 輪を頂点、絡み合いを辺とするグラフで接続手順を検証する。
+# 開かない輪同士の接続は変更できない。開いたk輪で残る道を一周につなぐには、
+# 残る道の数がk以下である必要がある。輪の物理的な太さ等は扱わない。
 # ---------------------------------------------------------------
-if "C48" in BY_NO:
-    rng = random.Random(0)
-    counts = [0] * 8
-    n = 200_000
-    for _ in range(n):
-        x, y = rng.uniform(-1, 1), rng.uniform(-1, 1)
-        if x * x + y * y > 1:
-            continue
-        z = rng.uniform(0, 1)
-        idx = (x > 0) + 2 * (y > 0) + 4 * (z > 0.5)
-        counts[idx] += 1
-    mean = sum(counts) / 8
-    spread = max(abs(c - mean) / mean for c in counts)
-    check("C48", "8 片の体積が等しい", spread < 0.03, f"各片の比率のばらつき {spread:.3%}(サンプル {sum(counts)})")
+if "C46" in BY_NO and "鎖" in BY_NO["C46"]["question"]:
+    nodes = set(range(1, 13))
+    initial_edges = {frozenset((start + offset, start + offset + 1))
+                     for start in (1, 4, 7, 10) for offset in (0, 1)}
+
+    def components(vertices: set[int], edges: set[frozenset[int]]) -> int:
+        """無向グラフの連結成分数を数える。"""
+        remaining = set(vertices)
+        count = 0
+        while remaining:
+            count += 1
+            pending = [remaining.pop()]
+            while pending:
+                current = pending.pop()
+                neighbours = set().union(*(edge for edge in edges if current in edge)) if edges else set()
+                unseen = neighbours & remaining
+                remaining -= unseen
+                pending.extend(unseen)
+        return count
+
+    possible = {}
+    for k in range(4):
+        possible[k] = []
+        for opened_tuple in combinations(nodes, k):
+            opened = set(opened_tuple)
+            intact_edges = {edge for edge in initial_edges if not edge & opened}
+            if components(nodes - opened, intact_edges) <= k:
+                possible[k].append(opened_tuple)
+    check("C46", "0〜2輪の開閉では閉じた鎖にできない",
+          all(not possible[k] for k in range(3)),
+          f"必要条件を満たす組: {[len(possible[k]) for k in range(3)]}")
+    expected = {(start, start + 1, start + 2) for start in (1, 4, 7, 10)}
+    check("C46", "3輪を開く候補は1本全体をばらす4通り",
+          set(possible[3]) == expected, str(possible[3]))
+    route = [4, 5, 6, 1, 7, 8, 9, 2, 10, 11, 12, 3]
+    final_edges = {frozenset((a, b)) for a, b in zip(route, route[1:] + route[:1])}
+    opened = {1, 2, 3}
+    check("C46", "開かない9輪同士の接続を保存",
+          {e for e in final_edges if not e & opened}
+          == {e for e in initial_edges if not e & opened}, "開く輪1・2・3以外の接続はそのまま")
+    check("C46", "12輪全部が枝分かれのない一周になる",
+          set(route) == nodes and len(route) == len(nodes)
+          and components(nodes, final_edges) == 1
+          and all(sum(n in e for e in final_edges) == 2 for n in nodes), str(route))
 
 # ---------------------------------------------------------------
-# 機械検証できない問題(想定解の妥当性は人間レビューが砦)
+# 機械検証の限界: 面白さ・想定解の自然さ・道具の実現性は人間レビュー。
+# チェスの指し手中継や船の荷重置換は以下の自動検証に含めていない。
 # ---------------------------------------------------------------
-manual = [no for no in ("C42", "C43", "C44", "C45", "C46", "C47") if no in BY_NO]
-print(f"-- 機械検証対象外(人間レビューが砦): {', '.join(manual)}")
-print("   C45 は「同じ喫水線 = 同じ排水量 = 同じ重さ」(アルキメデスの原理)で成立。C42/C43/C44/C46/C47 は手順・一言の妥当性を人間が判断")
+manual = [it["no"] for it in ITEMS if it["difficulty"] == "deep"
+          and not (it["no"] == "C46" and "鎖" in it["question"])]
+print(f"-- 機械検証対象外(人間レビューが必要): {', '.join(manual)}")
+print("   C46は接続モデルのみ検証。夜全問の難度・条件の自然さ・別解・完成イラストは別途レビュー")
 
 if failures:
     print(f"\nNG: {len(failures)} 件")
