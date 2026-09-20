@@ -8,22 +8,13 @@ updated: 2026-09-20
 condition: ""            # 再醸成待ち・待機のとき必須（再検討トリガー / 落とし込み条件）
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
-detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: "開発計画 Phase 23（転記下書きは本ファイル末尾。転記は開発レーンで行う）"
+detail: "codex-direct-operation.html"
+disposition: "開発計画 Phase 23（転記下書きは codex-direct-operation.html セクション 8。転記は開発レーンで行う）"
 ---
 
 ## 要旨
 
-**2026-09-20 に採用**。開発計画 Phase 23（Codex 直接セッションの導入）へ展開する。転記下書きは末尾の「転記下書き」節。
-
-決めたこと:
-- Codex を「Claude から MCP で呼ばれる実装ワーカー」に加えて「単独で作業を回すエージェント」としても使う。対象は**常に並行可のレーン**（アイデアレーン・課題レーン・セットレーン）に限り、**開発レーンは Codex 直接セッション禁止**（Claude 側の並行作業ルールは変えない）
-- スキルの実体を `.agents/skills/` に集約し、`.claude/skills/<name>` は相対シンボリックリンク（Remotion スキルで既に運用中の形）。Codex 0.144.1 が `.agents/skills/` を拾うことは `codex exec` で検証済み
-- 両エージェント対応に中立化するスキルは `idea`・`issue`・`quiz-stock-replenish` の 3 本。残り 5 本は「Claude Code 専用」の注記のみ
-- `AGENTS.md` は「docs 全面禁止」をやめ、レーン規則と 1 対 1 の許可パス列挙に書き換える。MCP ワーカー時の docs 書き込みは、AGENTS.md の条件（スキル起動時 / 指示文で明示された場合のみ）+ CLAUDE.md の委譲ルール（指示文に「docs/ は触らない」を含める）で防ぐ
-- 週次補充は最初から G1〜G3 通しで Codex に任せ、Aurora 到達（サンドボックスのネットワーク設定）まで込みで試す
-- `umigame-problem-writer` は当面対象外
-- Codex 側の枠は ChatGPT サブスクの利用枠（Claude のトークンを Codex の枠へ付け替える）
+**2026-09-20 に採用**。整理された現在形（検証事実・線引き・リスク・ユーザー決定・Phase 23 の転記下書き）は `codex-direct-operation.html` を参照。
 
 ## 前提条件・再検討トリガー
 
@@ -73,30 +64,6 @@ Claude Code のトークン消費を少なくするために、一部の作業�
 
 **積み残し**: なし（Phase 23 の確認待ちへ）
 
-## 転記下書き（開発計画 Phase 23 へ。4 項目様式・5.1 チェックリスト通過済み）
+## 転記下書き
 
-**Phase 23: Codex 直接セッションの導入（スキルの両エージェント共用 + AGENTS.md の線引き）**
-狙い: Claude Code のトークン節約。常に並行可のレーン（アイデア・課題・セット）の定型作業を Codex 直接セッションで回す。開発レーン。23-1 は `docs/plans/index.html` を触るためフリーズ窓で単独実施。
-課題表: I-030（`docs/plans/index.html` セクション 2・CLAUDE.md 並行作業ルール）が対象パスで該当。本フェーズは開発レーンの 1 セッション制約を変えない（Codex 直接セッションを開発レーン禁止と明記する側）ため据え置き継続・トリガー更新なし。I-035 は解消済みで対象外。
-
-**23-1 器の整備（スキル実体の集約 + AGENTS.md / CLAUDE.md / レーン規則）**
-- 内容: `.claude/skills/` 直下の実体 8 本（docs-mobile-view / idea / incident / issue / quiz-stock-replenish / ranking-stock-replenish / step / umigame-problem-writer）を `git mv` で `.agents/skills/` へ移し、`.claude/skills/<name>` を相対シンボリックリンクに置換。`AGENTS.md` を書き換え（直接セッションの許可レーン = アイデア / 課題 / セット、開発レーン禁止、許可パス / 禁止パスの列挙、docs 書き込みは「スキル起動時 or 指示文で明示」の条件付き、スキルは `$<name>` で起動、Git 運用ルールは CLAUDE.md 参照、MCP ワーカー時の「commit は指示された場合のみ」は維持）。`CLAUDE.md` の Codex 連携節に「委譲指示文に『docs/ は触らない』を含める」と直接セッション運用の参照を追記。`docs/plans/index.html` セクション 2 に「Codex 直接セッションは並行可レーンのみ」の 1 行。触るパス: `.claude/skills/` `.agents/skills/` `AGENTS.md` `CLAUDE.md` `docs/plans/index.html`
-- 完了条件: `git ls-files -s .claude/skills | grep -c ^120000` = 14（既存 6 + 8）・`.agents/skills/` に実体 14 本（出力を貼る）。Claude Code から `/idea` が起動できる（本セッションで Skill 起動して手順の先頭が返ることを貼る）。`codex exec --sandbox read-only` にスキル列挙をさせ、8 本が `.agents/skills/` のパスで出る（出力を貼る）。`step` の `disable-model-invocation` が Codex の列挙を壊していないこと（同出力）。`docs/plans/index.html` のタグ対応の機械チェック
-- 人間ゲート: AGENTS.md の許可 / 禁止パスと条件文のレビュー
-- 停止点・上限: push まで。stop after 20 turns
-
-**23-2 スキル 3 本の中立化（23-1 完了後）**
-- 内容: `idea`・`issue`・`quiz-stock-replenish` の SKILL.md を両エージェント対応に書き換え（主語「Claude」→「エージェント」、`/idea` `/issue` の参照は「スキル idea を起動（Claude Code は `/idea`、Codex は `$idea`）」形式、末尾に「エージェント別の差分」節: Claude = `/goal` 起動 / Codex = 同じ完了条件文を `update_plan` に立て証跡を貼る・リサーチは `--search` と curl で自分で行う・イラストは組み込み imagegen で自分で生成）。残り 5 本の冒頭に「Claude Code 専用（Codex は起動しない）」を 1 行。`quiz-stock-replenish` には Codex 直接セッションでの Aurora 到達に必要な `~/.codex/config.toml` のプロジェクト設定例（`sandbox_workspace_write.network_access = true` 等）を記載。触るパス: `.agents/skills/{idea,issue,quiz-stock-replenish,docs-mobile-view,incident,ranking-stock-replenish,step,umigame-problem-writer}/SKILL.md`
-- 完了条件: 3 本の SKILL.md に無条件の `/goal` 記述・「Codex に委譲」の記述が残っていないことを `grep -n` で示す（差分節内の記述のみ許容）。`codex exec --sandbox read-only "$quiz-stock-replenish の工程を見出しだけ列挙して"` で工程が読めることを貼る。残り 5 本の先頭 5 行に注記があることを `head` で示す
-- 人間ゲート: 3 本の差分節のレビュー + ユーザーが `~/.codex/config.toml` に設定例を反映（リポジトリ外のローカル設定）
-- 停止点・上限: push まで。stop after 20 turns
-
-**23-3 Codex 直接セッションでの試行（ユーザー判断・ゴール対象外）**
-- 内容: ユーザーが `codex` を起動し、`$idea` で壁打ち 1 回・`$issue` で棚卸し 1 回・logic-training-1 の週次補充 1 バッチを G1〜G3 通しで実施する。結果の判定は下の確認待ち項目
-- 停止点: —（ゴールにしない）
-
-**確認待ち項目（5.2）**
-- 開発計画へ: トリガー = 節目型「Codex 直接セッションで `$idea`・`$issue` を各 1 回使い終えた後（目安 2026-10-04 まで）」。確認内容 = 終了規律（表更新・コミット・push）まで完走したか、許可パス外に触っていないか（`git show --stat` の出力）。NG 時 = AGENTS.md / 差分節を直すステップを起票、または課題起票
-- logic-training-1 セット計画書へ: トリガー = セット型「logic-training-1 の次の週次補充を Codex 直接セッションで行った回（2026-09-w4 以降の最初の回）」。確認内容 = G1〜G3 が完走したか（Aurora 適用の更新行数 = 承認件数・unbuilt=0 の出力）、差し戻し率（人間レビューの却下数 / 提出数）を 2026-09-w3 の Claude 実績と比較。NG 時 = 課題起票（線引き / スキル差分節 / 執筆勘所の不足）
-
-**Phase 完了時の付随作業**: CLAUDE.md の開発計画パラグラフ更新・メモリ（Codex への制約 3 点）の書き換え・本 MD の disposition にフェーズへのリンク
+`codex-direct-operation.html` セクション 8 を参照（開発計画 Phase 23。転記は開発レーンで行う）。

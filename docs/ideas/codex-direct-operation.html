@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex から直接プロジェクトを動かす | アイデア詳細</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アイデア体系</a> / Codex から直接プロジェクトを動かす</nav>
+<h1>Codex から直接プロジェクトを動かす（AGENTS.md の docs 制約緩和 + スキルの両エージェント共用）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">採用</span>
+  <span>種別: 単発 / 作成 2026-09-20 / 更新 2026-09-20 / 記録層: <a href="codex-direct-operation.md">codex-direct-operation.md</a></span>
+  <span>採用（2026-09-20・壁打ち 1 巡）: <a href="../plans/development-plan.html">開発計画</a> Phase 23 へ展開する（転記下書きはセクション 8。転記は開発レーンで行う）</span>
+</div>
+
+<div class="warn">
+  <span class="callout-title">本書の位置づけ（設計書に非ず）</span>
+  採用判断のための<strong>検討記録</strong>。ここに書いた線引き・AGENTS.md の条件文・スキルの差分節の案は暫定であり、運用ルールの正ではない。採用後の正は <code>AGENTS.md</code>・<code>CLAUDE.md</code>・<code>docs/plans/index.html</code> セクション 2 と各 SKILL.md（Phase 23 で確定）。
+</div>
+
+<h2>1. 一言で</h2>
+<p>Claude Code のトークン消費を下げるため、Codex を「Claude から MCP 経由で呼ばれる実装ワーカー」に加えて<strong>「ユーザーが <code>codex</code> を起動して単独で作業を回すエージェント」</strong>としても使えるようにする。対象は設計書・コード品質への影響が小さい定型作業（logic-training-1 の週次補充、アイデアの捕捉・壁打ち、課題の棚卸し）。障壁は 2 つ — <code>AGENTS.md</code> が <code>docs/</code> 配下・<code>CLAUDE.md</code>・<code>.claude/</code> の変更を禁止していること（記録の書き戻しができない）と、運用手順が <code>.claude/skills/</code> にあって Codex から起動できないこと。</p>
+
+<h2>2. 検証した事実（2026-09-20）</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>項目</th><th>結果</th><th>確認方法</th></tr></thead>
+<tbody>
+<tr><td>Codex のスキル探索パス</td><td><code>~/.codex/skills/</code>（<code>.system</code> 5 本）に加えて<strong>リポジトリの <code>.agents/skills/</code> を拾う</strong>。Remotion スキル 6 本が <code>.agents/skills/remotion-*/SKILL.md</code> のパスで列挙された</td><td><code>codex exec --sandbox read-only</code>（gpt-5.6-luna / low）で「見えているスキルの name と location を列挙」。codex-cli 0.144.1</td></tr>
+<tr><td>Claude Code 側の共用の前例</td><td><code>.claude/skills/remotion-*</code> は <code>../../.agents/skills/remotion-*</code> への相対シンボリックリンクで、Claude Code はリンク経由で同じ実体を読んでいる。リンク 6 本は git 追跡済み（mode 120000）</td><td><code>ls -la .claude/skills</code>・<code>git ls-files -s</code></td></tr>
+<tr><td>Codex の明示起動</td><td><code>$&lt;skill-name&gt;</code>（例: <code>$idea</code>）。description による自動起動もある</td><td>Codex 本体の指示文（<code>strings</code>）</td></tr>
+<tr><td>AGENTS.md の仕様</td><td>ディレクトリ単位でスコープする入れ子 AGENTS.md が使える（深い方が優先）。<strong>プロンプトの指示は AGENTS.md より優先</strong></td><td>Codex 本体の指示文</td></tr>
+<tr><td>SKILL.md の互換性</td><td>フロントマター（name / description）は共通。<code>step</code> だけが Claude 固有キー <code>disable-model-invocation: true</code> を持つ（Codex が無視するかは 23-1 で確認）</td><td>各 SKILL.md の先頭</td></tr>
+<tr><td>スキル本文の Claude 依存</td><td>3 種類だけ。① <code>/goal</code>（<code>quiz-stock-replenish</code> は G1〜G3 の 3 ゴールが工程の骨格、<code>step</code> は前提そのもの）② 「Codex に委譲」の記述（<code>quiz-stock-replenish</code> の curl 裏取りと imagegen、<code>ranking-stock-replenish</code> 3 箇所、<code>umigame-problem-writer</code> 1 箇所）③ <code>/step</code> <code>/idea</code> <code>/issue</code> のスラッシュ参照と主語「Claude」</td><td><code>grep</code> による棚卸し（サブエージェント・AskUserQuestion への依存は 0）</td></tr>
+</tbody>
+</table></div>
+<div class="note">
+  <span class="callout-title">Codex 直接実行では工程がむしろ短くなる</span>
+  <code>quiz-stock-replenish</code> の「Codex に委譲」工程（リサーチの curl 裏取り・イラストの imagegen）は、Codex 自身が実行する場合「自分でやる」に変わる。imagegen は Codex の組み込みツール、Web 検索は <code>codex --search</code> で使えるため、MCP の往復が消える。
+</div>
+
+<h2>3. 線引き — レーン規則をそのまま使う</h2>
+<p>挙がった 3 作業は全部「常に並行可」のレーン（アイデアレーン・課題レーン・セットレーン〔セットごと〕）に属する。開発レーンだけが「常に 1 セッション」。したがって <code>AGENTS.md</code> は「docs 全面禁止 → 作業ごとに列挙」ではなく、<strong>「Codex 直接セッションは開発レーン禁止。触れてよいパスは <a href="../plans/index.html">計画体系</a> セクション 2 の並行可レーンのパスに一致」</strong>と宣言する。Claude 側の並行作業ルールは一切変えない。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>区分</th><th>パス</th><th>根拠</th></tr></thead>
+<tbody>
+<tr><td>許可</td><td><code>docs/ideas/</code></td><td>アイデアレーン（常に並行可）</td></tr>
+<tr><td>許可</td><td><code>docs/issues/</code></td><td>課題レーン（常に並行可）</td></tr>
+<tr><td>許可</td><td><code>docs/plans/&lt;set_code&gt;.html</code>・<code>&lt;set_code&gt;-log.html</code>・<code>content/&lt;set&gt;/</code></td><td>セットレーン（セットごとに並行可）</td></tr>
+<tr><td>許可</td><td><code>.agents/skills/</code> 配下のスキル自身</td><td>スキルの終了規律で知見を書き戻す運用があるため</td></tr>
+<tr><td>禁止（据え置き）</td><td><code>docs/app/</code> <code>docs/infra/</code> <code>docs/strategy/</code> <code>docs/plans/development-*.html</code> <code>docs/plans/index.html</code> <code>docs/index.html</code></td><td>開発レーン（共通設計書・開発計画・ルール層）</td></tr>
+<tr><td>禁止（据え置き）</td><td><code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> <code>CLAUDE.md</code></td><td>開発レーン（コード・基盤・Claude の規約）</td></tr>
+</tbody>
+</table></div>
+
+<h2>4. 実現手段の論点 3 つ</h2>
+<h3>4.1 MCP ワーカー時との両立（最大のリスク）</h3>
+<p><code>AGENTS.md</code> は Claude から MCP 経由で呼ぶときも読まれる。素朴に緩めると「委譲した実装タスクで Codex が docs を書き換える」事故が起きる。対策は 2 段構え。</p>
+<ul>
+<li><code>AGENTS.md</code> 側: docs への書き込みは「<strong>スキル起動時</strong>（<code>$idea</code> <code>$issue</code> <code>$quiz-stock-replenish</code>）と、<strong>指示文で明示された場合のみ</strong>」の条件付きにする。MCP ワーカー時の「commit は指示された場合のみ」は維持</li>
+<li><code>CLAUDE.md</code> の Codex 連携節: 委譲指示文に「<code>docs/</code> は触らない」を含める（プロンプトが AGENTS.md より優先される仕様を使う）</li>
+</ul>
+<h3>4.2 git ルールの移植</h3>
+<p>直接セッションでスキルの終了規律（コミット + push）まで完走させるには、日本語メッセージ・<code>pull --rebase</code>・その場で push・ファイル指定 add・他セッションの変更を巻き込まない、が Codex にも要る。<code>CLAUDE.md</code> との二重記述を避け、<code>AGENTS.md</code> からは「Git 運用ルールは CLAUDE.md の当該節に従う」と参照で逃がす。</p>
+<h3>4.3 <code>/goal</code> の代替</h3>
+<p>Codex 側で同じ完了条件を強制する仕組みはない。各 SKILL.md に<strong>「エージェント別の差分」節</strong>を 1 つ設け、Claude = <code>/goal</code> 起動、Codex = 同じ完了条件文を <code>update_plan</code> の項目として立てて証跡（在庫クエリ・検証・更新行数の出力）を貼る、と書き分ける。骨格（G1〜G3 の切り方・証跡を貼る規律）は共通のまま。</p>
+
+<h2>5. リスク</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>リスク</th><th>見立て</th><th>扱い</th></tr></thead>
+<tbody>
+<tr><td>執筆の品質差（GPT-5.6 vs Claude）</td><td>勘所（I-033 の検証・question 80 字上限・folklore 級の裏取り基準）は SKILL.md 本文にあるので Codex も読める。人間ゲート（1 問ずつレビュー）が残るので事故ではなく「差し戻し率の上昇」として現れる</td><td>確認待ち項目で測る（1 バッチの差し戻し率を 2026-09-w3 の Claude 実績と比較）</td></tr>
+<tr><td>Aurora / AWS への到達</td><td>G3（publish・在庫確認クエリ）はネットワークが要る。Codex のサンドボックスは既定でネットワーク遮断</td><td><code>~/.codex/config.toml</code> のプロジェクト設定で緩める（設定例は 23-2 で quiz スキルに記載・反映はユーザー）</td></tr>
+<tr><td>同時編集の衝突（<code>docs/ideas/index.html</code> 等の表）</td><td>今の複数 Claude セッション運用と同じ性質</td><td><code>pull --rebase</code> 規律で吸収。新しいリスクではない</td></tr>
+<tr><td>Codex 側の利用枠</td><td>直接セッションは ChatGPT サブスクの枠で回す（= Claude のトークンを Codex の枠へ付け替える）。週次補充を毎週回すと枠の消費が出る</td><td>ユーザー了承済み（セクション 7）</td></tr>
+<tr><td>Claude のメモリ・規約との食い違い</td><td>Codex への制約 3 点のうち「docs 編集禁止・コミットは Claude」が条件付きに変わる</td><td>採用時にメモリを書き換え済み。「独立レビュー（Codex 成果物は Claude がレビュー）」は維持</td></tr>
+</tbody>
+</table></div>
+
+<h2>6. MVP スコープ</h2>
+<ul>
+<li><strong>やる</strong>: 全スキルの実体を <code>.agents/skills/</code> へ移し <code>.claude/skills/</code> をリンク化（置き場は 1 つに統一）。中立化するのは <code>idea</code>・<code>issue</code>・<code>quiz-stock-replenish</code> の 3 本だけ。残り 5 本（<code>step</code> <code>incident</code> <code>ranking-stock-replenish</code> <code>umigame-problem-writer</code> <code>docs-mobile-view</code>）は冒頭に「Claude Code 専用（Codex は起動しない）」を 1 行。<code>AGENTS.md</code> 書き換え + <code>CLAUDE.md</code> の委譲ルール追記。試行は「<code>$idea</code> で壁打ち 1 回・<code>$issue</code> で棚卸し 1 回・週次補充 1 バッチ」</li>
+<li><strong>あえてやらない</strong>: <code>/step</code> 相当（開発レーンだから）、<code>/incident</code>（本番操作の人間ゲートが濃い）、<code>umigame-problem-writer</code>（ユーザー決定・セクション 7）</li>
+</ul>
+
+<h2>7. ユーザー決定（2026-09-20）</h2>
+<ul>
+<li><strong>Codex 側の枠</strong>: 直接セッションは ChatGPT サブスクの利用枠で回す</li>
+<li><strong>週次補充の切り方</strong>: 最初から G1〜G3 通しで Codex に任せ、Aurora 到達の設定まで込みで試す（「G1 まで Codex・投入以降は Claude」案は不採用）</li>
+<li><strong><code>umigame-problem-writer</code></strong>: 当面取り組まない</li>
+</ul>
+
+<h2>8. 転記下書き（開発計画 Phase 23 へ。4 項目様式・5.1 チェックリスト通過済み）</h2>
+<div class="decision">
+  <span class="callout-title">Phase 23: Codex 直接セッションの導入（スキルの両エージェント共用 + AGENTS.md の線引き）</span>
+  狙い: Claude Code のトークン節約。常に並行可のレーン（アイデア・課題・セット）の定型作業を Codex 直接セッションで回す。開発レーン。<strong>23-1 は <code>docs/plans/index.html</code> を触るためフリーズ窓で単独実施</strong>。<br>
+  課題表: <strong>I-030</strong>（<code>docs/plans/index.html</code> セクション 2・CLAUDE.md 並行作業ルール）が対象パスで該当。本フェーズは開発レーンの 1 セッション制約を変えない（Codex 直接セッションを開発レーン禁止と明記する側）ため<strong>据え置き継続・トリガー更新なし</strong>。I-035 は解消済みで対象外。
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th>ステップ</th><th>内容</th><th>完了条件</th><th>人間ゲート</th><th>停止点・上限</th></tr></thead>
+<tbody>
+<tr><td><strong>23-1</strong> 器の整備（スキル実体の集約 + AGENTS.md / CLAUDE.md / レーン規則）</td>
+<td><code>.claude/skills/</code> 直下の実体 8 本（docs-mobile-view / idea / incident / issue / quiz-stock-replenish / ranking-stock-replenish / step / umigame-problem-writer）を <code>git mv</code> で <code>.agents/skills/</code> へ移し、<code>.claude/skills/&lt;name&gt;</code> を相対シンボリックリンクに置換。<code>AGENTS.md</code> を書き換え（直接セッションの許可レーン = アイデア / 課題 / セット、開発レーン禁止、許可 / 禁止パスの列挙〔セクション 3〕、docs 書き込みは「スキル起動時 or 指示文で明示」の条件付き、スキルは <code>$&lt;name&gt;</code> で起動、Git 運用ルールは CLAUDE.md 参照、MCP ワーカー時の「commit は指示された場合のみ」は維持）。<code>CLAUDE.md</code> の Codex 連携節に「委譲指示文に『docs/ は触らない』を含める」と直接セッション運用の参照を追記。<code>docs/plans/index.html</code> セクション 2 に「Codex 直接セッションは並行可レーンのみ」の 1 行。<br>触るパス: <code>.claude/skills/</code> <code>.agents/skills/</code> <code>AGENTS.md</code> <code>CLAUDE.md</code> <code>docs/plans/index.html</code></td>
+<td><code>git ls-files -s .claude/skills | grep -c ^120000</code> = 14（既存 6 + 8）・<code>.agents/skills/</code> に実体 14 本（出力を貼る）。Claude Code から <code>/idea</code> が起動できる（Skill 起動で手順の先頭が返ることを貼る）。<code>codex exec --sandbox read-only</code> にスキル列挙をさせ、8 本が <code>.agents/skills/</code> のパスで出る（出力を貼る）。<code>step</code> の <code>disable-model-invocation</code> が Codex の列挙を壊していないこと（同出力）。<code>docs/plans/index.html</code> のタグ対応の機械チェック</td>
+<td>AGENTS.md の許可 / 禁止パスと条件文のレビュー</td>
+<td>push まで。stop after 20 turns</td></tr>
+<tr><td><strong>23-2</strong> スキル 3 本の中立化（23-1 完了後）</td>
+<td><code>idea</code>・<code>issue</code>・<code>quiz-stock-replenish</code> の SKILL.md を両エージェント対応に書き換え（主語「Claude」→「エージェント」、<code>/idea</code> <code>/issue</code> の参照は「スキル idea を起動（Claude Code は <code>/idea</code>、Codex は <code>$idea</code>）」形式、末尾に「エージェント別の差分」節: Claude = <code>/goal</code> 起動 / Codex = 同じ完了条件文を <code>update_plan</code> に立て証跡を貼る・リサーチは <code>--search</code> と curl で自分で行う・イラストは組み込み imagegen で自分で生成）。残り 5 本の冒頭に「Claude Code 専用（Codex は起動しない）」を 1 行。<code>quiz-stock-replenish</code> には Codex 直接セッションでの Aurora 到達に必要な <code>~/.codex/config.toml</code> のプロジェクト設定例（<code>sandbox_workspace_write.network_access = true</code> 等）を記載。<br>触るパス: <code>.agents/skills/*/SKILL.md</code>（8 本）</td>
+<td>3 本の SKILL.md に無条件の <code>/goal</code> 記述・「Codex に委譲」の記述が残っていないことを <code>grep -n</code> で示す（差分節内の記述のみ許容）。<code>codex exec --sandbox read-only "$quiz-stock-replenish の工程を見出しだけ列挙して"</code> で工程が読めることを貼る。残り 5 本の先頭 5 行に注記があることを <code>head</code> で示す</td>
+<td>3 本の差分節のレビュー + ユーザーが <code>~/.codex/config.toml</code> に設定例を反映（リポジトリ外のローカル設定）</td>
+<td>push まで。stop after 20 turns</td></tr>
+<tr><td><strong>23-3</strong> Codex 直接セッションでの試行（<strong>ユーザー判断・ゴール対象外</strong>）</td>
+<td>ユーザーが <code>codex</code> を起動し、<code>$idea</code> で壁打ち 1 回・<code>$issue</code> で棚卸し 1 回・logic-training-1 の週次補充 1 バッチを G1〜G3 通しで実施する。結果の判定は下の確認待ち項目</td>
+<td>—</td><td>—</td><td>—（ゴールにしない）</td></tr>
+</tbody>
+</table></div>
+
+<h3>8.1 確認待ち項目（5.2・トリガー付き）</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>置き場</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th></tr></thead>
+<tbody>
+<tr><td>開発計画の確認待ちリスト</td><td>節目型: Codex 直接セッションで <code>$idea</code>・<code>$issue</code> を各 1 回使い終えた後（目安 2026-10-04 まで）</td><td>終了規律（表更新・コミット・push）まで完走したか。許可パス外に触っていないか（<code>git show --stat</code> の出力）</td><td>AGENTS.md / 差分節を直すステップを起票、または課題起票</td></tr>
+<tr><td>logic-training-1 計画書の確認待ちリスト</td><td>セット型: logic-training-1 の次の週次補充を Codex 直接セッションで行った回（2026-09-w4 以降の最初の回）</td><td>G1〜G3 が完走したか（Aurora 適用の更新行数 = 承認件数・unbuilt=0 の出力）。差し戻し率（人間レビューの却下数 / 提出数）を 2026-09-w3 の Claude 実績と比較</td><td>課題起票（線引き / スキル差分節 / 執筆勘所の不足）</td></tr>
+</tbody>
+</table></div>
+<p><strong>Phase 完了時の付随作業</strong>: CLAUDE.md の開発計画パラグラフ更新・Claude のメモリ（Codex への制約 3 点）の書き換え・記録層 MD の disposition にフェーズへのリンク。</p>
+
+</div>
+</body>
+</html>
