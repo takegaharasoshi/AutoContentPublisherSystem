@@ -268,13 +268,56 @@ if "C46" in BY_NO and "鎖" in BY_NO["C46"]["question"]:
           and all(sum(n in e for e in final_edges) == 2 for n in nodes), str(route))
 
 # ---------------------------------------------------------------
+# C48 堀と2枚の板: 外側の角に1枚を斜めに渡し、その中点から島の角へ2枚目を架ける
+#   構成が成立する条件を、板の長さ L = 1 として検算する。
+#   外側の角を原点、島の角を (w, w) とすると、1枚目は (a, 0)-(0, a) で a = L/√2。
+#   その中点 M = (a/2, a/2) から島の角までの距離は √2 * (w - a/2)。
+#   これが L 以下であればよく、解くと w <= 3L / (2√2) ≒ 1.0607 L。
+# ---------------------------------------------------------------
+if "C48" in BY_NO and "堀" in BY_NO["C48"]["question"]:
+    L = 1.0
+    a = L / math.sqrt(2)  # 1 枚目が岸を切り取る長さ
+    max_w = 3 * L / (2 * math.sqrt(2))
+
+    def second_plank_span(w: float) -> float:
+        """1 枚目の中点から島の角までの距離(2 枚目に必要な長さ)を返す。
+
+        Args:
+            w: 堀の幅(板の長さ L = 1 との比)。
+
+        Returns:
+            2 枚目に必要な長さ。
+        """
+        return math.sqrt(2) * (w - a / 2)
+
+    check("C48", "1枚では渡れない(幅が板より広い)", max_w > L,
+          f"板 L=1 に対し堀幅 w>1 が前提。構成可能な上限 w={max_w:.4f}")
+    check("C48", "上限ぴったりで2枚目が届く",
+          math.isclose(second_plank_span(max_w), L, rel_tol=1e-9),
+          f"w={max_w:.4f} のとき 2枚目の必要長={second_plank_span(max_w):.4f}=L")
+    check("C48", "「少し広い」範囲(w=1.03L)で成立",
+          second_plank_span(1.03 * L) <= L,
+          f"w=1.03 のとき必要長={second_plank_span(1.03 * L):.4f} <= 1")
+    check("C48", "広すぎる堀(w=1.10L)では成立しない",
+          second_plank_span(1.10 * L) > L,
+          f"w=1.10 のとき必要長={second_plank_span(1.10 * L):.4f} > 1")
+    check("C48", "要旨の「約1.06倍まで」と一致",
+          "1.06" in BY_NO["C48"]["summary"] and abs(max_w - 1.06) < 0.01,
+          f"上限 {max_w:.4f} / 要旨の記載と整合")
+    check("C48", "答えの物(渡した橋)を情景に描かない",
+          "渡した板" in BY_NO["C48"]["illustration_scene"]
+          and "斜めの板" in BY_NO["C48"]["illustration_scene"],
+          "情景文に「渡した板・斜めの板・橋は描かない」の指定あり")
+
+# ---------------------------------------------------------------
 # 機械検証の限界: 面白さ・想定解の自然さ・道具の実現性は人間レビュー。
 # チェスの指し手中継や船の荷重置換は以下の自動検証に含めていない。
 # ---------------------------------------------------------------
 manual = [it["no"] for it in ITEMS if it["difficulty"] == "deep"
-          and not (it["no"] == "C46" and "鎖" in it["question"])]
+          and not (it["no"] == "C46" and "鎖" in it["question"])
+          and not (it["no"] == "C48" and "堀" in it["question"])]
 print(f"-- 機械検証対象外(人間レビューが必要): {', '.join(manual)}")
-print("   C46は接続モデルのみ検証。夜全問の難度・条件の自然さ・別解・完成イラストは別途レビュー")
+print("   C46は接続モデル、C48は板の長さの成立条件のみ検証。夜全問の難度・条件の自然さ・別解・完成イラストは別途レビュー")
 
 if failures:
     print(f"\nNG: {len(failures)} 件")
