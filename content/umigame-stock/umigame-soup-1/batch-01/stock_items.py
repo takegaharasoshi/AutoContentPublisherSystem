@@ -1,4 +1,4 @@
-"""batch-01: umigame-soup-1 第 1 バッチの単一ソース（素材 14 項目 + 管理項目。全 10 問をスキル作問でため込み中）。
+"""batch-01: umigame-soup-1 第 1 バッチの単一ソース（素材 14 項目 + 管理項目。全 14 問〔story 7 / misdirection 7〕をスキル作問でため込み中）。
 
 - 仕様の正は docs/app/sets/umigame-soup-1.html セクション 4。検証は validate.py、プローブテストは
   probe_test.py、投入 SQL は generate.py が本ファイルから生成する。
@@ -7,7 +7,8 @@
 - core: コア宣言（作問スキル umigame-problem-writer 工程 3 の 1 文。レビューで最初に見る。DB には入れない）。
 - 全問が作問スキル umigame-problem-writer によるスキル作問（21-4a-2 で U01・U11〜U14 が人間ゲート通過。
   21-4a 初稿の U02〜U10 は 2026-09-12 の方針再変更で削除〔git 履歴で復元可〕。no は管理 ID として不変・再利用せず、
-  残り 5 問は U15〜U19・content_key 006〜010 を 21-4a-3 で作問する）。
+  U15・U16 は 21-4a-3 で通過。2026-09-20 に 14 問〔両型同数〕へ拡張し、残り 7 問は U17〜U23・content_key 008〜014 を
+  すべて story 型で作問する）。
 - rule_text / character_lines はセット既定文。illustration_prompt / caption は共通ヘルパーで組み立てる。
 """
 
