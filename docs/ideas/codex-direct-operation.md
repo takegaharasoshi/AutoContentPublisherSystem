@@ -19,7 +19,7 @@ disposition: ""          # 転記完了で採用に更新し、Phase 23 への�
 ## 前提条件・再検討トリガー
 
 - （解消）Codex のスキル探索パス: リポジトリの `.agents/skills/` を拾う（2026-09-20 に `codex exec --sandbox read-only` で Remotion スキル 6 本の列挙を確認。明示起動は `$<skill-name>`）
-- （解消）スキル本文の Claude 依存の棚卸し: `/goal`（quiz-stock-replenish の G1〜G3・step の前提）、「Codex に委譲」の記述（quiz のリサーチ・imagegen）、スラッシュ参照と主語「Claude」の 3 種類のみ
+- （解消）スキル本文の Claude 依存の棚卸し: `/goal`（quiz-stock-replenish の G1〜G3・step の前提。**ただし Codex にも `/goal` があり〔stable・既定で有効〕、差は stop after 句と評価者〔独立評価 vs 自己申告〕のみ**）、「Codex に委譲」の記述（quiz のリサーチ・imagegen）、スラッシュ参照と主語「Claude」の 3 種類のみ
 - （解消）線引き: 並行可レーンのパス = 許可、開発レーンのパス = 禁止。`docs/plans/index.html` セクション 2 の判定表と 1 対 1
 - 品質差の検証は Phase 23 の確認待ち項目で行う（1 バッチの差し戻し率を Claude 実績と比較）
 - `step` の Claude 固有フロントマター `disable-model-invocation: true` を Codex が無視するかは 23-1 の完了条件で確認
@@ -63,6 +63,8 @@ Claude Code のトークン消費を少なくするために、一部の作業�
 - 採用時のメモリ更新: Codex への制約 3 点のうち「docs 編集禁止・コミットは Claude」が条件付きに変わる。「独立レビュー（Codex 成果物は Claude がレビュー）」は維持
 
 **積み残し**: なし（Phase 23 の確認待ちへ）
+
+**事実の訂正**（同日・ユーザーの問いで判明）: 「Codex に `/goal` の等価物なし・`update_plan` で代替」は誤り。`codex features list` で `goals = stable / true`、`/goal [<objective>|clear|edit|pause|resume]` が使える。差は (a) Claude は独立評価者 + `stop after N turns`、Codex は自己申告 + 上限なし（`token_budget` は未提供）、(b) 停止はユーザーの `/goal pause` / `clear`。スキルのゴール行は両エージェント共通資産になり、差分節は「stop after 句」と「完了申告前の実コマンド再確認」の 2 点に縮む。詳細 HTML 2・4.3・5・8 を訂正済み
 
 **着地の訂正**（同日）: 当初「採用」で置いたが、体系ルール（index.html セクション 4: 採用 = ステップとして展開済み。開発レーン行きはアイデアレーン内では転記下書きまでで**待機**）に照らして待機へ訂正。転記完了で採用へ更新する
 
