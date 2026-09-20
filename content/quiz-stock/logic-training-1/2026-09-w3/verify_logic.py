@@ -43,55 +43,45 @@ if "A40" in BY_NO:
     check("A40", "answer に 545+5=550", "545+5=550" in BY_NO["A40"]["answer"], BY_NO["A40"]["answer"])
 
 # ---------------------------------------------------------------
-# A41 8 を 8 個で 1000: 8 だけで作る数(8/88/888/8888)の足し算で桁数の合計が 8 になる組を全列挙し、
-#      合計 1000 になる組がちょうど 1 つ(888+88+8+8+8)であること
+# A41 位置抽出の暗号: 2 文字目を拾うと「けんか」になり、他の位置では語にならないこと
 # ---------------------------------------------------------------
 if "A41" in BY_NO:
-    parts = [8, 88, 888, 8888]
-    sols: set[tuple[int, ...]] = set()
-    for k in range(1, 9):
-        for combo in combinations_with_replacement(parts, k):
-            if sum(len(str(p)) for p in combo) == 8 and sum(combo) == 1000:
-                sols.add(tuple(sorted(combo, reverse=True)))
-    check("A41", "足し算限定の解は一意", sols == {(888, 88, 8, 8, 8)}, f"解: {sorted(sols)}")
-    check("A41", "8 の個数", BY_NO["A41"]["answer"].count("8") == 8, BY_NO["A41"]["answer"])
+    words = ["たけやぶ", "ほんだな", "さかみち"]
+    picks = {i + 1: "".join(w[i] for w in words) for i in range(4)}
+    check("A41", "2 文字目で けんか", picks[2] == "けんか", f"位置ごとの縦読み: {picks}")
+    others = {k: v for k, v in picks.items() if k != 2}
+    check("A41", "他の位置は語にならない", set(others.values()) == {"たほさ", "やだみ", "ぶなち"},
+          f"1/3/4 文字目 = {sorted(others.values())}(いずれも意味のある語ではない)")
+    check("A41", "answer は けんか", BY_NO["A41"]["answer"].startswith("けんか"), BY_NO["A41"]["answer"])
+    check("A41", "3 語は問題文に書かない(黒板で提示)",
+          "たけやぶ" not in BY_NO["A41"]["question"] and "たけやぶ" in BY_NO["A41"]["illustration_scene"],
+          "問題文に語なし・情景文に 3 語あり")
 
 # ---------------------------------------------------------------
-# A42 計算マジック: 整数・負の数・小数のどれから始めても (2x+10)÷2−x が必ず 5 になること
-# ---------------------------------------------------------------
-if "A42" in BY_NO:
-    from fractions import Fraction
-
-    starts = [Fraction(n) for n in range(-1000, 1001)] + [Fraction(1, 3), Fraction(-7, 2), Fraction(123456789, 10)]
-    results = {(2 * x + 10) / 2 - x for x in starts}
-    check("A42", "答えは必ず 5", results == {Fraction(5)}, f"{len(starts)} 通りの初期値で結果 = {sorted(results)}")
-    check("A42", "answer に 5", "必ず5" in BY_NO["A42"]["answer"], BY_NO["A42"]["answer"])
-
-# ---------------------------------------------------------------
-# A43 文字盤を直線 2 本で 3 分割: 交わらない 2 本の線 = 両端の「弧」2 つ(連続した数字の並び)+ 残りの中央部。
-#      両弧と中央の合計がすべて等しい分け方を全列挙し、{11,12,1,2}{5,6,7,8}{3,4,9,10} のみであること
-#      (交わる 2 本は 4 つの部分になるため対象外)
+# A43 合体漢字: 4 部品が 2 つずつで「時」「計」を構成し、熟語「時計」になること
 # ---------------------------------------------------------------
 if "A43" in BY_NO:
-    nums = list(range(1, 13))
-    total = sum(nums)
-    arcs = []
-    for start in range(12):
-        for length in range(1, 11):  # 12 個すべて・11 個は他の部分が作れないので除外
-            arcs.append(frozenset((nums[(start + i) % 12]) for i in range(length)))
-    arcs = list(set(arcs))
-    sols = set()
-    for a, b in combinations(arcs, 2) if False else [(a, b) for i, a in enumerate(arcs) for b in arcs[i + 1:]]:
-        if a & b:
-            continue
-        mid = frozenset(nums) - a - b
-        if not mid:
-            continue
-        if sum(a) == sum(b) == sum(mid):
-            sols.add(frozenset([a, b, mid]))
-    expected = frozenset([frozenset({11, 12, 1, 2}), frozenset({5, 6, 7, 8}), frozenset({3, 4, 9, 10})])
-    check("A43", "各部分の合計", total // 3 == 26 and total % 3 == 0, f"1〜12 の合計 {total} ÷ 3 = {total // 3}")
-    check("A43", "分け方は一意", sols == {expected}, f"解: {[sorted(sorted(x) for x in s) for s in sols]}")
+    parts = ["日", "寺", "言", "十"]
+    compose = {("日", "寺"): "時", ("言", "十"): "計"}
+    made = [compose[k] for k in compose]
+    used = sorted(p for k in compose for p in k)
+    check("A43", "部品をすべて使う", used == sorted(parts), f"{used} = 提示の 4 部品")
+    check("A43", "2 つずつで時・計", made == ["時", "計"], f"{list(compose.items())}")
+    check("A43", "熟語は時計", "".join(made) == "時計" and BY_NO["A43"]["answer"].startswith("時計"), BY_NO["A43"]["answer"])
+    check("A43", "4 部品は問題文に書かない(黒板で提示)",
+          "寺" not in BY_NO["A43"]["question"] and "「寺」" in BY_NO["A43"]["illustration_scene"],
+          "問題文に部品なし・情景文に 4 字あり")
+
+# ---------------------------------------------------------------
+# A46 隠れ数字の数列: 各語の語頭に 3・4・5 が隠れ、1 ずつ増えていること(次は 6)
+# ---------------------------------------------------------------
+if "A46" in BY_NO:
+    hidden = [("さんま", "さん", 3), ("しいたけ", "しい", 4), ("ごぼう", "ご", 5)]
+    for word, head, num in hidden:
+        check("A46", f"{word} の語頭に {num}", word.startswith(head), f"{word} → {head}({num})")
+    nums = [n for _, _, n in hidden]
+    check("A46", "1 ずつ増える", nums == list(range(nums[0], nums[0] + len(nums))), f"{nums} → 次は {nums[-1] + 1}")
+    check("A46", "answer は 6", "6" in BY_NO["A46"]["answer"], BY_NO["A46"]["answer"])
 
 # ---------------------------------------------------------------
 # A44 指の頭文字: 親指〜小指の読みの頭文字が「お ひ な く こ」になり、□(3 番目)が「な」であること
@@ -103,17 +93,6 @@ if "A44" in BY_NO:
     check("A44", "□ は 3 番目 = な", initials[2] == "な" and BY_NO["A44"]["answer"].startswith("な"), BY_NO["A44"]["answer"])
     check("A44", "情景文のカード 5 枚", all(f"「{c}」" in BY_NO["A44"]["illustration_scene"] for c in "おひ?くこ"), "お・ひ・?・く・こ を明示")
     check("A44", "5 文字は問題文に書かない(カードで提示)", "お、ひ" not in BY_NO["A44"]["question"] and "□" not in BY_NO["A44"]["question"], "問題文に文字列なし・情景文にカードあり")
-
-# ---------------------------------------------------------------
-# A46 地球のロープ: 円周 +1m のとき半径の増分 = 1/(2π) m。地球半径に依存しないことを 2 つの半径で確認
-# ---------------------------------------------------------------
-if "A46" in BY_NO:
-    gaps = []
-    for r in (6_371_000.0, 1.0):
-        c = 2 * math.pi * r
-        r2 = (c + 1) / (2 * math.pi)
-        gaps.append(round((r2 - r) * 100, 2))
-    check("A46", "隙間は約 16cm", all(abs(g - 15.92) < 0.01 for g in gaps), f"半径 6371km と 1m のどちらでも {gaps} cm")
 
 # ---------------------------------------------------------------
 # A45 母音送り: 提示 3 組 + 答えのすべてが「読みの各文字の母音を 1 段送った語」であること、
