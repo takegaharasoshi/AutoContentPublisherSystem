@@ -2,6 +2,7 @@
 name: ranking-stock-replenish
 description: pref-ranking-1 のランキングストック(ranking_stock_items)を補充する。ネタ選定→一次データの機械パース検証→文言・ナレーション執筆→機械検証→人間レビュー→両環境投入→動画ビルド(ranking-prebuilt)の共通パイプラインと、17-3〜17-5c で確立した執筆・レビューの勘所への導線。週次補充(7 ネタ目安・在庫水位 14 件以上)・追加バッチ整備のどちらにも使う。
 ---
+> **Claude Code 専用(Codex は起動しない)**。Codex 直接セッションの対象スキルは idea / issue / quiz-stock-replenish の 3 本(Phase 23-2・AGENTS.md「直接セッションのルール」)。
 
 # ランキングストック補充スキル(ranking-stock-replenish)
 

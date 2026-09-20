@@ -3,6 +3,7 @@ name: step
 description: 計画書のステップ着手の唯一の入口(両レーン対応)。「/step 16-12」なら開発レーン計画書、「/step logic-training-1 R-1-2」のように set_code 付きならセット計画書を読み、レーン判定表に当ててレーン宣言し、レーン別テンプレを埋めた /goal 行を提示する。goal が立つまで着手しない。ユーザーのみ起動。
 disable-model-invocation: true
 ---
+> **Claude Code 専用(Codex は起動しない)**。Codex 直接セッションの対象スキルは idea / issue / quiz-stock-replenish の 3 本(Phase 23-2・AGENTS.md「直接セッションのルール」)。
 
 # ステップ着手スキル(step)
 

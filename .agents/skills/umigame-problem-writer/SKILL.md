@@ -2,6 +2,7 @@
 name: umigame-problem-writer
 description: umigame-soup-1（探偵カメロックのウミガメのスープ）の問題を 1 問ずつ作る作問スキル。起動時に型（story = 物語復元型 / misdirection = 意味誤誘導型）を宣言し、ランダム語のモチーフ → 連想 → 型別の工程（story.md / misdirection.md）でコア宣言 → 不思議にする → 動線・現実性・既存問題との照合の自己検査 → 素材化（stock_items.py の 1 問）まで。「ウミガメの問題を作る」「U0x を書き直す」「第 N バッチの作問」「物語復元型で 1 問」で使う。投入・ビルドは扱わない（運用ラッパーは umigame-stock-replenish）。
 ---
+> **Claude Code 専用(Codex は起動しない)**。Codex 直接セッションの対象スキルは idea / issue / quiz-stock-replenish の 3 本(Phase 23-2・AGENTS.md「直接セッションのルール」)。
 
 # ウミガメのスープ作問スキル（umigame-problem-writer）
 

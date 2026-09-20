@@ -2,6 +2,7 @@
 name: docs-mobile-view
 description: 設計書(docs/)をスマホ・外出先から閲覧できるようにする。WSL で HTTP サーバーを起動し Windows の tailscale serve で tailnet 内に公開する手順・URL の調べ方・停止・トラブルシュート。「スマホで設計書を見たい」「外出先から docs を見たい」「昨日のあれをスマホで開けるようにして」等で使う。
 ---
+> **Claude Code 専用(Codex は起動しない)**。Codex 直接セッションの対象スキルは idea / issue / quiz-stock-replenish の 3 本(Phase 23-2・AGENTS.md「直接セッションのルール」)。
 
 # 設計書のスマホ閲覧スキル(docs-mobile-view)
 

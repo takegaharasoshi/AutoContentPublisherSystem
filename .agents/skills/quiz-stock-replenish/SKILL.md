@@ -6,7 +6,7 @@ description: logic-training-1 の問題ストック(quiz_stock_items)を補充�
 # 問題ストック補充スキル(quiz-stock-replenish)
 
 logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 初期整備(2026-08)で確立した品質・手順で補充するためのスキル。
-運用ルールの正は `docs/app/operation.html` セクション 3(在庫確認クエリ・補充閾値 = 未使用 7 問/組以上・著作権ガイドライン)、フィールド仕様の正は `docs/app/generators/gpt-quiz-multicut.html` セクション 5。本スキルはそれらに「同品質で量産するための勘所」を足すもので、矛盾したら設計書が勝つ。
+運用ルールの正は `docs/app/operation.html` セクション 3(在庫確認クエリ・補充閾値 = 未使用 7 問/組以上・著作権ガイドライン)、フィールド仕様の正は `docs/app/generators/gpt-quiz-multicut.html` セクション 5。本スキルはそれらに「同品質で量産するための勘所」を足すもので、矛盾したら設計書が勝つ。Claude Code(`/quiz-stock-replenish`)と Codex 直接セッション(`$quiz-stock-replenish`)の両方から同じ手順で使う(リサーチ・イラスト生成の手段と `/goal` 行の扱いはエージェント別に異なる。末尾の「エージェント別の差分」節)。
 
 **昼スロット(noon = L3 / standard・フェルミ推定)は 16-4d(2026-08-24)で当分停止中**(スキップ率の高止まりによるユーザー決定。経緯・凍結範囲は `docs/app/sets/logic-training-1.html` 冒頭の注記が正)。**補充対象は朝(L1 / light)と夜(L1 / deep)の 2 組のみ**で、L3 / standard は在庫確認で数字が小さくても補充しない(既存在庫は凍結・残置)。セクション 3 の昼の執筆勘所は再開時の参照用として残している。
 
@@ -14,23 +14,23 @@ logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 �
 
 ## 起動時の /goal(工程に入る前に必ず。Phase 19-3 で導入)
 
-週次補充は人間レビューの前後で 3 本のゴールに切って走らせる。**goal が立つまで工程 1(リサーチ)に入らない**。`/goal` は Claude・スキルからは起動できないため、本スキル起動直後に Claude が G1 の行をコードブロックで提示し、ユーザーが打つ(G2 はレビュー全問承認後に N を埋めて提示、G3 は review.html のレビュー承認後に提示)。ユーザーは `/goal`(引数なし)で設定を確認できる。
+週次補充は人間レビューの前後で 3 本のゴールに切って走らせる。**goal が立つまで工程 1(リサーチ)に入らない**。`/goal` はエージェント・スキルからは起動できないため、本スキル起動直後にエージェントが G1 の行をコードブロックで提示し、ユーザーが打つ(ターン上限句の付け方はエージェント別。末尾の差分節)(G2 はレビュー全問承認後に N を埋めて提示、G3 は review.html のレビュー承認後に提示)。ユーザーは `/goal`(引数なし)で設定を確認できる。
 
 ```
-/goal セットレーン logic-training-1・週次補充 G1。完了条件: 朝・夜スロットの在庫確認クエリで不足数を確認し(出力を貼る)、不足分(各スロット最大 7 問)のリサーチ → 執筆 → スキル セクション 4 の機械検証が全問パス(出力を貼る)→ 1 問ずつ提示できる状態。投入・S3 配置・Aurora 更新は行わない。人間レビューは開始しない。or stop after 30 turns
-```
-
-```
-/goal セットレーン logic-training-1・週次補充 G2。完了条件: レビューで承認された N 問を投入(セクション 6)→ export_prompts → イラスト生成(文字混入・1536x1024 の自己確認込み)→ intake → build → review_sheet で work/review.html を生成。配置(publish)は行わない。or stop after 30 turns
+/goal セットレーン logic-training-1・週次補充 G1。完了条件: 朝・夜スロットの在庫確認クエリで不足数を確認し(出力を貼る)、不足分(各スロット最大 7 問)のリサーチ → 執筆 → スキル セクション 4 の機械検証が全問パス(出力を貼る)→ 1 問ずつ提示できる状態。投入・S3 配置・Aurora 更新は行わない。人間レビューは開始しない。
 ```
 
 ```
-/goal セットレーン logic-training-1・週次補充 G3。完了条件: approved.txt の承認 id を publish(dry-run → 本実行)→ Aurora 適用の更新行数 = 承認件数(出力を貼る)→ 在庫確認クエリで unbuilt = 0(出力を貼る)→ ツール・台帳の変更をコミット・push・セット記録を更新。or stop after 15 turns
+/goal セットレーン logic-training-1・週次補充 G2。完了条件: レビューで承認された N 問を投入(セクション 6)→ export_prompts → イラスト生成(文字混入・1536x1024 の自己確認込み)→ intake → build → review_sheet で work/review.html を生成。配置(publish)は行わない。
+```
+
+```
+/goal セットレーン logic-training-1・週次補充 G3。完了条件: approved.txt の承認 id を publish(dry-run → 本実行)→ Aurora 適用の更新行数 = 承認件数(出力を貼る)→ 在庫確認クエリで unbuilt = 0(出力を貼る)→ ツール・台帳の変更をコミット・push・セット記録を更新。
 ```
 
 - **人間レビューはゴールに含めない**: G1 と G2 の間(1 問ずつのチャットレビュー)・G2 と G3 の間(review.html の全数レビュー)は人間の作業。ゴール到達 = レビュー開始できる状態、まで
 - **証跡は会話に貼る**: 在庫クエリ・検証・更新行数・unbuilt=0 の出力は省略せずそのまま貼る(/goal の evaluator は会話ログしか見ない)
-- G2・G3 は Aurora 更新・S3 配置を含むため **auto mode で走らせない**(許可プロンプトがゲートを兼ねる)
+- G2・G3 は Aurora 更新・S3 配置を含むため **承認なしの自動実行にしない**(Claude Code は auto mode で走らせない・Codex は `--full-auto` / `--yolo` にせず承認ポリシーを既定のままにする。許可プロンプトがゲートを兼ねる)
 - **確認待ちリストの照合**(Phase 19-5 で導入): G1 の行を提示する前に `docs/plans/logic-training-1.html` の「確認待ちリスト」を読み、トリガー列が**「次の週次補充」**の行があれば、今回の補充で確認する。該当行の「確認内容・判定基準」を該当するゴール(G1〜G3 のうち確認が起きる工程)の完了条件に「確認待ちリストの『<対象>』を確認し結果列に記入」として足し、確認したら結果列に日付 + 結果を書く(OK なら行を `logic-training-1-log.html` へ移す。NG なら「NG 時の扱い」列に従う)。該当なしなら「確認待ち: 該当なし」と一言宣言して進む。ルールは `docs/plans/index.html` セクション 5.2
 - **課題表の照合(セット名)**(Phase 22-4 で導入。ルールは `docs/issues/index.html` セクション 4.8): 同じく G1 の行を提示する前に `grep -n "logic-training-1" docs/issues/index.html` で課題体系の live 表(logic-training-1 の節 + 開発レーンの節でセット名を含む行)を引き、トリガー列が**「logic-training-1 の次の週次補充」**(セット型)の行を拾う。該当行があれば、今回の補充で「同梱する(該当するゴールの完了条件に足す)/ トリガーを更新して据え置き継続 / 受容」を決めて表を更新する(黙って通り過ぎない。2026-09-12 の w1 補充で照合されなかった持ち越しが `I-033` にある)。該当なしなら「課題表: 該当なし」と一言宣言して進む
 
@@ -38,14 +38,14 @@ logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 �
 
 operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「型 × 難度」ごとの在庫を確認し、7 問を下回る組を補充対象にする。**ただし L3 / standard(昼)は 16-4d で停止中のため、数字にかかわらず補充対象にしない。**quiz-prebuilt 方式では**「未使用かつビルド済み」(`unused_built`)を在庫と数える**。`unbuilt` 列が 0 以外なら投入済みのビルド漏れなので、補充より先にセクション 7 のビルドを終わらせる。再利用 WARNING・未ビルト WARNING がログに出ていたら優先対応。
 
-## 1. リサーチ(Codex 委譲)
+## 1. リサーチ(Web 裏取り)
 
-- Codex に Web リサーチを委譲する。**Codex 環境に web_search ツールはない**。`config: {"sandbox_workspace_write.network_access": true}` でネットワークを許可し、curl でのページ取得・検索(DuckDuckGo は bot challenge が出ることが多い)を指示する
+- 類型の候補出しと流布の裏取りを Web で行う。手段はエージェント別(差分節): Claude Code は WebSearch / WebFetch(まとまった裏取りは MCP ワーカーの Codex に curl で行わせてもよい)、Codex 直接セッションは `codex --search` の web_search か curl で自分で行う。DuckDuckGo は bot challenge が出ることが多いので、検索は web_search か既知の流布サイトへの直接アクセスを優先する
 - 成果物は「類型・解法構造の要約・出典 URL」のみ。**問題文の転載は禁止**(著作権: アイデア・解法構造は保護されず、表現は保護される)
-- **Codex の裏取りは「Wikipedia 級のページで古典と明記」に偏り、folklore 級なぞなぞをほぼ全部『未確認』にする**(16-2 の実績)。これは基準の取り違えであり、採用可否は Claude が判断する: **作者不詳 + 複数の独立サイトに流布 = folklore 級 = 安全側**。Claude 自身の WebSearch で流布例 URL を 1 件以上直接確認し、それを証跡にする
+- **裏取りの基準を取り違えない**: 16-2 では「Wikipedia 級のページで古典と明記」に偏り、folklore 級なぞなぞをほぼ全部『未確認』にする実績があった。採用可否の基準は **作者不詳 + 複数の独立サイトに流布 = folklore 級 = 安全側**。流布例 URL を 1 件以上直接確認し、それを証跡として `research*.md` に残す(裏取りを別のワーカーに任せた場合も、採用判断は本スキルを回しているエージェントが行う)
 - 除外するもの: 特定サイト・書籍固有の創作問題(アイデア自体に強い独自性があり出所が特定できるもの)、実在企業名を冠した断定(「〇〇社の入社試験」)、解釈が割れて炎上しうる問題(男女パラドックス等)
 
-## 2. 執筆(Claude)
+## 2. 執筆(エージェント)
 
 単一ソース(`stock_items.py` 形式)に 1 問 = 1 dict で書く。フィールドと上限:
 
@@ -136,7 +136,7 @@ operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「
 - **`content_key`(`{slot_code}-{3 桁連番}`。V007 = 16-3d 決定)は generate.py の SQL がスロット内の既存最大連番 + 1 を適用時に解決する**。手動採番しない・両環境へ同じ SQL を適用する(NOT NULL のため採番漏れは投入時に必ずエラー)
 - 事前に Aurora の `quiz_items.summary` 全件と突合し、既出題と解法構造・題材が重複しないことを最終確認
 - ローカル: `docker exec -i acps-mysql mysql --default-character-set=utf8mb4 ...`(utf8mb4 指定必須)。事前にトランザクション + ROLLBACK でドライランする
-- Aurora: Data API(`aws rds-data execute-statement`)。auto mode classifier にブロックされる場合はユーザーに許可を求める
+- Aurora: Data API(`aws rds-data execute-statement`)。承認プロンプトでブロックされる場合はユーザーに許可を求める(Codex 直接セッションはネットワーク許可の設定が前提。差分節)
 - 投入後: 在庫確認クエリで件数・内訳を確認し、セット記録 `docs/plans/logic-training-1-log.html` の「週次補充の記録」へ要約を追記する（Phase 18 の 2 レーン化で記録先を変更。セット計画書 `docs/plans/logic-training-1.html` のステータス欄の在庫情報も更新する）
 
 ## 7. 動画ビルド・レビュー・配置(quiz-prebuilt。投入後に必ず)
@@ -144,10 +144,41 @@ operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「
 投入しただけの行(`video_s3_key IS NULL`)は出題候補にならない。技術設計の正は `docs/app/generators/quiz-prebuilt.html` セクション 8、運用ルールの正は operation.html セクション 3 手順 5。ツーリングは `content/video-build/logic-training-1/`(使い方は同ディレクトリの README.md。生成物は `work/` で gitignore)。
 
 1. **プロンプト書き出し**: `export_prompts.py`(実行は `cd services/image-batch && uv run python ../../content/video-build/logic-training-1/export_prompts.py`。以下の Python 実行も同じ uv 環境)
-2. **イラスト生成(Codex imagegen 委譲)**: `work/prompts/<id>.txt` の全文を渡し、imagegen で生成して `work/illustrations_raw/<id>.png` へ保存させる。**「情景で指定されていない文字・数字・記号の混入を Codex 自身に確認させ、混入時は再生成」を指示に含める**(1 問通し確認でも初回混入 → 再生成が実際に発生した)。提示物問題(情景文に文字を明示した問題)は逆に**指定した文字が字形どおり正確に描かれているか**を確認させる。プロンプト末尾に **3:2(1536x1024)の明示行**が入っている(16-5 追加)。imagegen は指定しないと 16:9 前後で出力が揺れ、3:2 以外は次の intake で左右が捨てられるため、**保存されたファイルのサイズが 1536x1024 かを Codex に確認させ、違えば再生成させる**
+2. **イラスト生成(imagegen)**: `work/prompts/<id>.txt` の全文をプロンプトにして imagegen で生成し、`work/illustrations_raw/<id>.png` へ保存する。生成の手段はエージェント別(差分節): Claude Code は MCP ワーカーの Codex に生成させる(`codex exec` の image_gen も可)、Codex 直接セッションは組み込みの imagegen で自分で生成する。どちらでも **生成した側が「情景で指定されていない文字・数字・記号の混入」を確認し、混入時は再生成する**(1 問通し確認でも初回混入 → 再生成が実際に発生した)。提示物問題(情景文に文字を明示した問題)は逆に**指定した文字が字形どおり正確に描かれているか**を確認する。プロンプト末尾に **3:2(1536x1024)の明示行**が入っている(16-5 追加)。imagegen は指定しないと 16:9 前後で出力が揺れ、3:2 以外は次の intake で左右が捨てられるため、**保存されたファイルのサイズが 1536x1024 か(`python3 -c "from PIL import Image; print(Image.open('<path>').size)"` 等)を生成した側が確認し、違えば再生成する**
 3. **取り込み → ビルド**: `intake.py` → `build.py`。build.py は**ホスト(WSL)で実行**し(`S3_BUCKET_NAME=<bucket> python3 build.py`。依存は pymysql のみ)、Remotion レンダリングと ffmpeg 処理だけを Docker に委譲する(改修 R-1〔2026-09-03〕で Pillow 組版から Remotion へ載せ替え。事前に `remotion-render` / `image-batch:ffmpeg-check` の 2 イメージをビルドしておく。README 参照)。イラスト未配置の行は自動スキップされるので部分ビルドでよい
    - `intake.py` は 3:2 でない素材を **WARNING + 切り捨て率**で報告する。被写体が端にある問題(操作パネル等)は切り捨てで見切れるため、警告が出たら該当問題のイラストだけ再生成する
    - レンダラー変更を既ビルド分へ反映する場合は **`build.py --rebuild`**(ビルド済み行を対象・BGM は `video_audio_asset_id` を引き継ぎ LRU を消費しない)
 4. **全数人間レビュー**: `review_sheet.py` → `work/review.html`。観点はイラスト(文字混入・画風・情景適合)・版面・音。NG は imagegen 再試行または `illustration_scene` 修正(DB 更新)→ 再ビルド
 5. **配置**: 承認 id を `approved.txt` に列挙 → `publish.py --dry-run` で `upload_prebuilt.sh` / `update_prebuilt.sql` を確認 → 本実行(S3 アップロード + ローカル MySQL 反映)→ Aurora へ `work/update_prebuilt.sql` を Data API で適用。**Aurora SQL は安定キー(set_code + question_text・BGM は s3_key)で解決する形式・S3 ファイル名も id ではなく `content_key`**(ローカルと Aurora で AUTO_INCREMENT id が一致しないため。id 直指定の SQL・id 入りの S3 キーを作らない)。適用後は更新行数 = 承認件数を確認
 6. **締め**: 在庫確認クエリ拡張版で `unbuilt` = 0 を確認し、ツール・台帳の変更をコミット
+
+## エージェント別の差分(Phase 23-2 で追加)
+
+本スキルは Claude Code と Codex 直接セッションで共用する(実体は `.agents/skills/quiz-stock-replenish/SKILL.md`、`.claude/skills/quiz-stock-replenish` はシンボリックリンク)。工程 0〜7 と G1〜G3 の切り方は共通で、違うのは次の点だけ。
+
+- **起動**: Claude Code は `/quiz-stock-replenish`、Codex は `$quiz-stock-replenish`。どちらも起動 = セットレーン logic-training-1 の宣言。Codex 直接セッションが触ってよいのは `content/quiz-stock/logic-training-1/` `content/video-build/logic-training-1/` `docs/plans/logic-training-1.html` `docs/plans/logic-training-1-log.html` `docs/issues/`(課題表の照合結果の反映)のみ(AGENTS.md「直接セッションのルール」)。`services/` `shared/` `database/` や共通設計書に触る必要が出たら手を止めて報告する(Claude Code の開発レーン行き。Codex では `$issue` で起票して終える)
+- **`/goal` 行(G1〜G3)**: 文面は上のコードブロックで共通。**Claude Code は行末に `or stop after N turns` を足して打つ**(N は G1 = 30・G2 = 30・G3 = 15)。**Codex はその句を付けない**(Codex では無視される構文)。Codex にはターン上限がなく自動継続するため、代わりに行末へ「3 ターン進捗がなければ blocked を申告して止まる」を足す。停止は `/goal pause` / `/goal clear`(ユーザー操作)。ゴールが `complete` にならないまま利用枠に達したら `usage_limited` で止まるので、再開時はどこまで進んだかを `git status` と `work/` の中身から復元する
+- **完了申告前の再確認(Codex)**: Codex の `/goal` は自己申告で完了になるため、各ゴールの完了を申告する前に実コマンドで状態を確かめ、出力を会話に貼る — G1: `validate.py` / `verify_logic.py` の再実行(全問パスの出力)・G2: `ls work/review.html` と `ls work/illustrations_raw | wc -l`(承認件数と一致)・G3: 在庫確認クエリの再実行(`unbuilt = 0`)と `git log origin/main..HEAD --oneline`(push 済みなら空)。「〜したはず」で申告しない
+- **リサーチ(工程 1)**: Claude Code は WebSearch / WebFetch(まとまった裏取りは MCP ワーカーの Codex に curl で行わせてもよい)。Codex 直接セッションは `codex --search` で起動しておき、web_search ツールか curl で**自分で**行う(MCP の往復はしない)。採用判断の基準(folklore 級 = 安全側)は共通
+- **イラスト生成(工程 7-2)**: Claude Code は MCP ワーカーの Codex に imagegen で生成させる(手順・確認項目は 7-2 のとおり指示文に含める)。Codex 直接セッションは**組み込みの imagegen で自分で生成**し、文字混入・1536x1024 の確認も自分で行う
+- **承認モード**: G2・G3 は Aurora 更新・S3 配置を含むため、Claude Code は auto mode で走らせない、Codex は `--full-auto` / `--yolo` を使わず承認ポリシーを既定のままにする(サンドボックス外の実行やネットワーク到達の承認プロンプトがゲートを兼ねる)
+- **Codex 直接セッションでの Aurora / S3 到達(`~/.codex/config.toml`)**: Codex のサンドボックスは既定でネットワークを遮断するため、G3 の `aws rds-data` / S3 アップロード / `git push`、G1 の Web 裏取りは workspace-write サンドボックスにネットワーク許可を与えないと通らない。**リポジトリ外のローカル設定で、反映はユーザーが行う**(本スキルは編集しない)。設定例(既存の `[projects."<リポジトリの絶対パス>"]` 節の下に足す。プロファイルにしておくと他プロジェクトへ影響しない):
+
+  ```toml
+  # ~/.codex/config.toml(抜粋)
+  [projects."/home/takegaharawork/projects/AutoContentPublisherSystem"]
+  trust_level = "trusted"
+
+  # 週次補充用のプロファイル。起動は codex --profile acps --search
+  [profiles.acps]
+  model = "gpt-5.6-terra"
+  model_reasoning_effort = "high"
+  sandbox_mode = "workspace-write"
+  approval_policy = "on-request"
+
+  # workspace-write サンドボックスからのネットワーク到達を許可(aws rds-data・S3・git push・curl)
+  [sandbox_workspace_write]
+  network_access = true
+  ```
+
+  プロファイルを作らない場合は起動時に `codex --search -c 'sandbox_workspace_write.network_access=true'` でも同じ効果になる。`~/.aws` の認証情報はサンドボックスから読める(書き込みが cwd 外へ閉じるだけ)。ローカル MySQL への `docker exec` は Docker ソケットへの接続がサンドボックスで拒まれることがあるため、拒まれたらその 1 コマンドだけサンドボックス外実行の承認を求める(`--yolo` に切り替えない)
