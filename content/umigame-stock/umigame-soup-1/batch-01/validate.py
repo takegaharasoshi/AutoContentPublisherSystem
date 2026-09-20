@@ -43,8 +43,17 @@ NARRATION_GAP_SEC = 1.2
 NARRATION_BUDGET_SEC = 21.0
 CONTENT_KEY_RE = re.compile(r"^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$")
 NUMBERED_RE = re.compile(r"第\s*\d+\s*問")
-# コア宣言の様式（作問スキル工程 3）: 「コア: 「<語・状況>」を <誤認> と読ませる → 実際は <反転>」
-CORE_RE = re.compile(r"^コア: 「.+」を.+と読ませる → 実際は.+$")
+# コア宣言の様式（作問スキル工程 3。2026-09-20 の型別分冊で型ごとに固定）:
+#   misdirection: 「コア: 「<語・状況>」を <誤認> と読ませる → 実際は <反転>」
+#   story:        「コア: 「<A→C の要約>」から読者に B を <誤った補完> と補わせる → 実際の B は <出来事・仕組み>」
+CORE_RE_BY_TYPE = {
+    "misdirection": re.compile(r"^コア: 「.+」を.+と読ませる → 実際は.+$"),
+    "story": re.compile(r"^コア: 「.+」から読者に B を.+と補わせる → 実際の B は.+$"),
+}
+CORE_FORMAT_BY_TYPE = {
+    "misdirection": "「コア: 「…」を … と読ませる → 実際は …」",
+    "story": "「コア: 「…」から読者に B を … と補わせる → 実際の B は …」",
+}
 CORE_MAX = 120
 
 errors: list[str] = []
@@ -77,8 +86,9 @@ def check_item(it: dict) -> None:
     core = it["core"]
     if not isinstance(core, str) or not core.strip():
         errors.append(f"{no}: core（コア宣言）が空。作問スキル umigame-problem-writer 工程 3 の 1 文を入れる")
-    elif not CORE_RE.match(core):
-        errors.append(f"{no}: core は「コア: 「…」を … と読ませる → 実際は …」の様式（→ を含む 1 文）: {core[:30]}")
+    elif it["puzzle_type"] in CORE_RE_BY_TYPE and not CORE_RE_BY_TYPE[it["puzzle_type"]].match(core):
+        fmt = CORE_FORMAT_BY_TYPE[it["puzzle_type"]]
+        errors.append(f"{no}: core は {it['puzzle_type']} 型の様式 {fmt}（→ を含む 1 文）: {core[:30]}")
     elif "\n" in core or len(core) > CORE_MAX:
         errors.append(f"{no}: core は改行なし {CORE_MAX} 字以内（{len(core)} 字）")
 
