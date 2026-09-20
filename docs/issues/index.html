@@ -19,14 +19,14 @@
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  開発・運用で見つかった<strong>課題</strong>（= これから変えるべきこと + いつ再判断するかのトリガー）を、両レーン横断で 1 ファイルに集める場所。<strong>本ページの表が唯一の正</strong>で、壁打ちを始めた課題だけ <code>docs/issues/&lt;slug&gt;.md</code> を持つ（<a href="../ideas/index.html">アイデア体系</a>と正の置き方が逆）。開発計画の「設計課題リスト」・セット計画書の「バックログ」・開発計画の「トラブルシューティングログ」は本体系へ廃止統合した（移設は 2026-09-19 の <a href="../plans/development-plan.html#phase-22">Phase 22-2</a>。完了までは旧 3 箇所も併読）。検討の経緯は<a href="../ideas/issue-tracking-system.md">アイデア記録</a>（インプット。ルールの正は本ページ）。
+  開発・運用で見つかった<strong>課題</strong>（= これから変えるべきこと + いつ再判断するかのトリガー）を、両レーン横断で 1 ファイルに集める場所。<strong>本ページの表が唯一の正</strong>で、壁打ちを始めた課題だけ <code>docs/issues/&lt;slug&gt;.md</code> を持つ（<a href="../ideas/index.html">アイデア体系</a>と正の置き方が逆）。開発計画の「設計課題リスト」・セット計画書の「バックログ」・開発計画の「トラブルシューティングログ」は本体系へ廃止統合した（移設は 2026-09-19 の <a href="../plans/development-log.html#phase-22">Phase 22-2</a>。完了までは旧 3 箇所も併読）。検討の経緯は<a href="../ideas/issue-tracking-system.md">アイデア記録</a>（インプット。ルールの正は本ページ）。
 </div>
 
 <div class="note">
   <span class="callout-title">入口の現況（Phase 22 は 22-4〔2026-09-19〕で完了）</span>
   <ul>
-  <li><strong>課題は本ページへ起票する</strong>（旧 3 箇所〔設計課題リスト・セットバックログ・トラブルシューティングログ〕は 22-2 で移設・廃止済み）。起票・壁打ち・棚卸しはスキル <code>/issue</code>、障害対応の入口は <code>/incident</code>（<a href="../plans/development-plan.html#phase-22">22-3</a>）</li>
-  <li>起動時の照合は組み込み済み: <code>/step</code> が触るパスで、補充スキル（<code>/quiz-stock-replenish</code> <code>/ranking-stock-replenish</code>）がセット名で本ページの live 表を引き、「課題表: 該当なし」または該当行の扱いを宣言する（<a href="../plans/development-plan.html#phase-22">22-4</a>。umigame-soup-1 の補充スキルは 21-8 で同じ手順を入れる）。スキルを通らない作業では <code>grep -n "&lt;パス or セット名&gt;" docs/issues/index.html</code> で手で引く</li>
+  <li><strong>課題は本ページへ起票する</strong>（旧 3 箇所〔設計課題リスト・セットバックログ・トラブルシューティングログ〕は 22-2 で移設・廃止済み）。起票・壁打ち・棚卸しはスキル <code>/issue</code>、障害対応の入口は <code>/incident</code>（<a href="../plans/development-log.html#phase-22">22-3</a>）</li>
+  <li>起動時の照合は組み込み済み: <code>/step</code> が触るパスで、補充スキル（<code>/quiz-stock-replenish</code> <code>/ranking-stock-replenish</code>）がセット名で本ページの live 表を引き、「課題表: 該当なし」または該当行の扱いを宣言する（<a href="../plans/development-log.html#phase-22">22-4</a>。umigame-soup-1 の補充スキルは 21-8 で同じ手順を入れる）。スキルを通らない作業では <code>grep -n "&lt;パス or セット名&gt;" docs/issues/index.html</code> で手で引く</li>
   </ul>
 </div>
 

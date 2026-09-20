@@ -9,7 +9,7 @@ condition: ""            # 採用済み（転記完了）
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: "../plans/development-plan.html#phase-22（Phase 22: 課題体系の新設。22-1〜22-4 + 確認待ち 4 件。2026-09-19 転記）"
+disposition: "../plans/development-log.html#phase-22（Phase 22: 課題体系の新設。22-1〜22-4 + 確認待ち 4 件。2026-09-19 転記）"
 ---
 
 ## 要旨
