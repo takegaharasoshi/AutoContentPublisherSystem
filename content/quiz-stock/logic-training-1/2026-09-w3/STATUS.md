@@ -1,10 +1,10 @@
 # 2026-09-w3 問題ストック補充: 進行状況(引き継ぎメモ)
 
-最終更新: 2026-09-21(**14 問すべてが動画の全数レビューも通過し、残すは G3 の配置のみ**)。**朝7問(A40〜A46)は全問承認済み・変更なし。夜7問はユーザーの「ゼロから見直す」指示を受けて全面再点検し、3問を修正・4問を差し替えた。C42・C43修正版は承認済み。2026-09-20〜21にClaudeが引き継ぎ、C46・C45・C44・C48・C47を承認し、**夜7問すべて承認済み(7/7)**。14問すべてが人間レビューを通過した**。
+最終更新: 2026-09-21(**G3 の配置まで完了 = 本バッチは完了**)。**朝7問(A40〜A46)は全問承認済み・変更なし。夜7問はユーザーの「ゼロから見直す」指示を受けて全面再点検し、3問を修正・4問を差し替えた。C42・C43修正版は承認済み。2026-09-20〜21にClaudeが引き継ぎ、C46・C45・C44・C48・C47を承認し、**夜7問すべて承認済み(7/7)**。14問すべてが人間レビューを通過した**。
 
 **今回の範囲**: 夜7問を1問ずつチャットレビュー(提示順は C42 → C43 → C46 → C45 → C44 → C48 → C47。**リスト順 = 出題順は 2026-09-21 に C42 → C43 → C45 → C46 → C44 → C48 → C47 へ変更**)。承認ごとに本ファイルへ記録。変更時は下の3コマンドを実行してから再提示する。**夜7問の承認後、日本語コミット → `git pull --rebase origin main` → pushで終了する。投入・S3配置・Aurora更新・G2には進まない。**
 
-**再開地点(2026-09-21 更新)**: **G2 は完了**(投入・イラスト生成・ビルド・レビューシート生成)。次は工程 6c = `content/video-build/logic-training-1/work/review-6.html` の全数人間レビュー(14 件)。そのあと G3(配置)。詳細は末尾「G2 の記録」節。
+**再開地点(2026-09-21 更新)**: **本バッチは完了(G1〜G3 すべて到達)。次の着手は次回バッチ(2026-09-w4 以降)の G1 から**。以下は経緯の記録。**G2 は完了**(投入・イラスト生成・ビルド・レビューシート生成)。次は工程 6c = `content/video-build/logic-training-1/work/review-6.html` の全数人間レビュー(14 件)。そのあと G3(配置)。詳細は末尾「G2 の記録」節。
 運用手順の正はスキル `$quiz-stock-replenish` と `docs/app/operation.html` セクション3。人間レビューはG1とG2の間に行う。
 
 ## Claudeへの引き継ぎ(2026-09-20)
@@ -293,7 +293,20 @@ python3 content/quiz-stock/logic-training-1/2026-09-w3/generate.py
 - **2026-09-21・ユーザー「レビューOK」= 14 件すべて承認**。修正・再生成・再ビルドは発生せず、**1 巡で通過**(w1 の G3 と同じ)。対象は `work/review-6.html` の 240〜253(`morning-036`〜`042` / `night-036`〜`042`)。
 - スマホ配信で確認した。`review_sheet.py` は従来 viewport 未指定 + `.still-area{min-width:360px}` でスマホだと横にはみ出していたため、**viewport 指定と 640px 以下のメディアクエリを追加**してから配信した(コミット `a22b69d`。ビルドツールの pytest 42 件は全パス)。
 
-### 再開地点(工程 6c 完了時点)
+### 工程 7-5. 配置(G3。2026-09-21 完了)
+
+- **approved.txt**: 今回分 14 件(ローカル id 240〜253)へ差し替え。前回分 70 件は `work/approved_2026-09-w1_g3.txt.bak` へ退避。
+- **`publish.py --dry-run`**: `28 upload commands and no DB updates`(動画 14 + イラスト 14)。`work/update_prebuilt.sql` は 14 文・`content_key` は `morning-036`〜`042` / `night-036`〜`042`・BGM は朝 `morning/track01.m4a` / 夜 `night/track01.m4a`。
+- **本実行**: `uploaded and registered 14 approved prebuilt videos`(S3 `acps-prod-images-516964473143/assets/logic-training-1/prebuilt/` へ 28 ファイル + ローカル MySQL 反映)。実行は `cd services/image-batch && uv run python ../../content/video-build/logic-training-1/publish.py ...`(publish.py は pymysql を要するため uv 環境で動かす)。
+- **Aurora 適用**: `python3 content/ranking-stock/pref-ranking-1/common/apply_aurora.py content/video-build/logic-training-1/work/update_prebuilt.sql` で **14 文すべて `updated=1`・`total records updated: 14`**(初回は `DatabaseResuming` で 1 回リトライ)。
+- **締めの在庫確認**:
+  - Aurora: L1/deep(夜) `unused_built` 7 / `unbuilt` 0 / used 35 / total_uses 43、L1/light(朝) 7 / 0 / 35 / 42、L3/standard(凍結) 7 / 0 / 14 / 16。**朝夜とも閾値 7 に回復**。
+  - ローカル MySQL: L1/deep 42 / 0、L1/light 42 / 0、L3/standard 21 / 0(投稿履歴を持たないため `unused_built` は有効在庫の全数)。**`unbuilt` = 0**。
+- **台帳の更新**: ①セット計画書の確認待ちリスト「16-4e イラストプロンプト文字禁止の緩和(2 バッチ目)」に「混入 0 件・再生成 0 回 = OK」を記入し `logic-training-1-log.html` へ移動(2 バッチ連続で戻し基準に非該当 → 観察終了) ②課題表 `docs/issues/index.html` の I-033 を **解消でクローズ**(①上限定義の一本化は未実施だが、②実行時同等検証で実害の経路が塞がった) ③セット記録の 2026-09-w3 エントリを「完了」にし全数レビュー・配置・在庫確認を追記 ④セット計画書の在庫欄を `unused_built` 7 / `unbuilt` 0 へ更新。
+- **SKILL.md セクション 4 の実行時同等検証**: G1 のコミット `5af83a9` で追記済み(「①は必ず uv 環境で実行する。素の `python3` だと実行時検証の import が失敗し NG 終了する」)。G3 での追加変更は不要だった。
+
+### 旧・再開地点(工程 6c 完了時点)
+
 
 - **次は G3(配置)**。`approved.txt` に 240〜253 の 14 件を列挙 → `publish.py --dry-run` → 本実行 → Aurora へ `work/update_prebuilt.sql` を Data API で適用(更新行数 = 14)→ 在庫確認クエリで `unbuilt` = 0 を確認。
 - あわせて G3 で行う台帳更新: ①確認待ちリスト「16-4e イラストプロンプト文字禁止の緩和(2 バッチ目)」の結果列に「混入 0 件・再生成 0 回 → OK」を記入し、行を `logic-training-1-log.html` へ移す ②課題表 `docs/issues/index.html` の I-033 を解消へ更新 + スキル SKILL.md セクション 4 へ実行時同等検証を追記 ③セット記録の 2026-09-w3 エントリのヘッダを「完了」にし、配置の要約を追記 ④セット計画書の在庫欄を `unused_built` 7 / `unbuilt` 0 に更新。
