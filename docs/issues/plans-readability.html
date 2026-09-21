@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I-036｜計画書のステップ表示 PoC</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.container{max-width:66rem} .lead{font-size:1.1rem;color:var(--text-muted)}
+nav.jump{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.5rem 0 2rem}
+.jump a{border:1px solid var(--border);border-radius:2rem;padding:.35rem 1rem;text-decoration:none}
+.step{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--bg);margin:1rem 0 2rem}
+.step-head{padding:1.4rem 1.6rem;background:var(--note-bg);border-bottom:1px solid var(--border)}
+.step-head h3{margin:.6rem 0;border:0;padding:0;font-size:1.4rem}
+.meta{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;font-size:.9rem}
+.pill{border-radius:5px;padding:.15rem .65rem;background:var(--badge-fixed-bg);color:var(--badge-fixed-text);font-weight:700}
+.step-body{padding:0 1.6rem 1.4rem}.step-body section{margin:1.4rem 0}
+.step-body h4{font-size:1rem;margin:0 0 .45rem;color:var(--link)}
+.step-body p{margin:.35rem 0}.step-body li{margin:.45rem 0}
+.step-body ul,.step-body ol{padding-left:1.4rem;margin:.3rem 0}
+.gates{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.gates>div{background:var(--bg-subtle);padding:1rem;border-radius:8px}
+.constraints{border-left:3px solid var(--warn-border);padding:.3rem 0 .3rem 1rem}
+details.fold{margin:.8rem 0;border:1px solid var(--border);border-radius:8px}
+.fold summary{padding:1rem;cursor:pointer;font-weight:700;background:var(--bg-subtle);border-radius:8px}
+.fold summary:focus-visible{outline:3px solid var(--link);outline-offset:3px}
+.fold[open] summary{border-bottom:1px solid var(--border);border-radius:8px 8px 0 0}
+.fold .inner{padding:1rem 1.2rem}.hint{color:var(--text-muted);font-size:.9rem}
+.result{margin-top:.8rem!important}.rules{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.rules>div{border:1px solid var(--border);border-radius:8px;padding:1rem}.rules h3{margin:0;font-size:1rem}
+.before .table-wrap{max-width:100%;overflow:auto}.before table{min-width:56rem;width:100%;table-layout:fixed}.before td{vertical-align:top;overflow-wrap:anywhere}
+.before th:first-child{width:16%}.before th:nth-child(2){width:32%}.before th:nth-child(3){width:27%}
+code{overflow-wrap:anywhere} [id]{scroll-margin-top:1rem}
+@media(max-width:640px){.container{padding:1.2rem 1rem 3rem}.step-head{padding:1.1rem}.step-body{padding:0 1rem 1rem}.gates,.rules{grid-template-columns:1fr}.step-head h3{font-size:1.2rem}.fold .inner{padding:.8rem}h1{font-size:1.65rem}}
+@media print{details.fold>.inner{display:block!important} .jump{display:none!important}}
+</style>
+</head>
+<body><main class="container">
+<nav class="breadcrumb"><a href="index.html#I-036">I-036</a> / 表示 PoC</nav>
+<h1>長いステップを、読み分けられる形へ</h1>
+<p class="lead">何をするか・何ができれば完了かを先に。実装の細部と作業記録は、必要なときに開く。</p>
+<p class="hint">2026-09-21 作成 · 表示検討用の PoC。実際の計画書は変更していません。例は完了済みの R-2-1 を使用し、現在の作業を示すものではありません。</p>
+<nav class="jump" aria-label="ページ内の移動"><a href="#after">変更後を試す</a><a href="#before">変更前を見る</a><a href="#policy">表示の方針</a><a href="#review">確認したいこと</a></nav>
+<h2 id="after">変更後：概要と実行条件を常時表示</h2>
+<p>「実装の細部・背景」「作業記録」はそれぞれ開閉できます。両方を同時に開くこともできます。</p>
+<article class="step" aria-labelledby="step-title">
+<header class="step-head">
+<div class="meta"><strong>logic-training-1 / R-2-1</strong><span class="pill">完了</span><span>2026-09-19</span></div>
+<h3 id="step-title">版面変更とプレビュー出力</h3>
+<p><strong>着手条件：</strong>R-1 の効果確認に結果が記入されていること。「戻す」判定なら R-2 の前提を見直す。</p>
+<p class="result"><strong>結果：</strong>3 問の導出値が PoC と一致。型チェックとテスト 42 件が通過し、プレビューを出力済み。</p>
+</header>
+<div class="step-body">
+<section><h4>1. 何をするか</h4><p>問題文とイラストの配置を採用済みの版面へ変更し、最短・中央・最長の 3 問で検証する。静止画 3 枚と、最長問題の動画 1 本をレビュー用に出力する。</p>
+<p class="hint">対象：<code>content/video-build/logic-training-1/</code>、セット計画書・セット記録。</p>
+<div class="constraints"><strong>守る条件</strong><p>動画尺 16 秒・3 カット・音声・既存イラスト・コーチとセーフエリアを維持する。イラストは再生成しない。問題文が下限 44px でも収まらない場合は例外として止める。</p></div></section>
+<section><h4>2. 完了条件</h4><ol>
+<li><code>tsc --noEmit</code> と <code>python -m pytest</code> が通り、全パスの要約行を示せる。</li>
+<li>3 問の「文字サイズ / 行数 / イラスト矩形」が PoC 実測と一致する。<ul><li>最短：68px / 2 行 / 797×531</li><li>中央：54px / 3 行 / 797×531</li><li>最長：50px / 4 行 / 771×514</li></ul></li>
+<li>静止画 3 枚と動画 1 本のパスを示せる。動画は <code>ffprobe</code> で 16.000 秒・1080×1920 を確認する。</li>
+<li>計画書・セット記録を更新し、日本語メッセージでコミット、<code>pull --rebase</code>、push を完了する。</li>
+</ol></section>
+<section><h4>3. 人が確認すること・止まる場所</h4><div class="gates">
+<div><strong>人が確認すること</strong><p>このステップではなし。</p><p>次の R-2-2 で、スマホ実機でプレビューを確認し、採用を判断する。</p></div>
+<div><strong>止まる場所・上限</strong><p>push まで。元計画の上限は 20 ターン。</p><p><strong>在庫全数の再ビルド・<code>publish.py</code>・DB 更新は行わない。</strong></p></div>
+</div></section>
+<details class="fold" id="implementation"><summary>4. 実装の細部・背景 <span class="hint">— 定数・配置計算・検証用素材</span></summary><div class="inner">
+<p class="hint">元の「内容」欄を保持した詳細。短い概要だけでは不足する仕様はここで確認できます。90 字に関する記述は起票時の想定で、判明した差異は作業記録に残っています。</p>
+<p><code>content/video-build/logic-training-1/remotion/src/layout.ts</code> の定数を採用値へ変更（<code>QUESTION_LINE_RATIO</code> 1.4・<code>QUESTION_FONT_SIZE_MIN</code> 44・<code>HOOK_FONT_SIZE_MAX</code> 52・<code>HEADING_FONT_SIZE</code> 72・<code>HEADING_TO_QUESTION</code> 115。<code>QUESTION_MAX_HEIGHT</code> 430 は廃止し、新設 <code>ILLUSTRATION_GUARANTEED_HEIGHT</code> = 500 から導出）。<code>design.ts</code> の導出順を「イラストの箱を先に確保 → 残りの高さに問題文を <code>fitText</code>（上限 68 / 下限 44）」へ入れ替え、<code>containRect</code> の結果を箱の上端に寄せる。問題文が下限 44px でも残りに収まらない場合は明示的に例外を投げる（現行の「イラスト領域が残らない」例外と同じ砦の位置づけ。補充の 90 字上限なら収まる）。<code>tests/</code> に版面導出値の固定テストを追加（最短・中央・最長の 3 問で問題文サイズ・行数・イラスト矩形を固定）。プレビューとして在庫の最短（87）・中央（169）・最長（197）の静止画 3 枚と、最長問題の MP4 1 本を <code>build.py --rebuild --item</code> で出力。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・セット記録</p>
+<p><strong>背景：</strong>問題文の読みやすさとイラスト領域の確保を両立するため、イラストの箱を先に確保する方式へ変更する。</p>
+</div></details>
+<details class="fold" id="work-record"><summary>5. 作業記録 <span class="hint">— 検証完了・文字数上限の差異は同日解消</span></summary><div class="inner">
+<p class="hint">計画整理前に保持する記録の表示例。以下は元の「状態」欄の実記録です。</p><p><strong>完了</strong>（2026-09-19）<br>定数を採用値へ変更し導出順をイラスト優先へ入れ替え（<code>ILLUSTRATION_GUARANTEED_HEIGHT</code> 500 から問題文の使える高さ 294px を導出・<code>containRect</code> は上端寄せ・下限 44px で収まらなければ例外）。<strong>3 問の導出値は PoC 実測と一致</strong>（68/2 行/797×531・54/3 行/797×531・50/4 行/771×514）。<code>tsc --noEmit</code> 通過・<code>pytest</code> 42 件全パス（版面固定テスト <code>tests/test_layout_design.py</code> を新設）。プレビューは <code>work/videos/{87,169,197}.mp4</code> と <code>work/cuts/</code> のスチル各 5 枚、最長 197 は 16.000000 秒 / 1080x1920。<strong>気づき</strong>: 採用値では問題文の字数上限が全角 80 字になり補充の 90 字と食い違う（課題体系 <a href="../issues/index.html#I-035">I-035</a>。同日解消）。詳細は<a href="../plans/logic-training-1-log.html">セット記録</a></p>
+</div></details>
+</div></article>
+<p class="hint">出典：<a href="../plans/logic-training-1.html">logic-training-1 計画書</a>の R-2-1 と R-2 の共通条件。2026-09-21 時点の文面を使った比較用スナップショットです。</p>
+<h2 id="before">変更前：長い文章が横に並ぶ</h2>
+<p>同じ R-2-1 の現在の行です。実装の細部と作業記録が常に見え、作業内容・完了条件・現況を複数の長い列から拾う構成です。狭い画面では表の内側を横スクロールできます。</p>
+<section class="before" aria-label="変更前の表"><div class="table-wrap"><table><thead><tr><th>ステップ</th><th>内容</th><th>完了条件 / 人間ゲート / 停止点</th><th>状態</th></tr></thead><tbody><tr>
+  <td><strong>R-2-1</strong><br>版面変更とプレビュー出力（R-1 効果確認の判定後）</td>
+  <td><code>content/video-build/logic-training-1/remotion/src/layout.ts</code> の定数を採用値へ変更（<code>QUESTION_LINE_RATIO</code> 1.4・<code>QUESTION_FONT_SIZE_MIN</code> 44・<code>HOOK_FONT_SIZE_MAX</code> 52・<code>HEADING_FONT_SIZE</code> 72・<code>HEADING_TO_QUESTION</code> 115。<code>QUESTION_MAX_HEIGHT</code> 430 は廃止し、新設 <code>ILLUSTRATION_GUARANTEED_HEIGHT</code> = 500 から導出）。<code>design.ts</code> の導出順を「イラストの箱を先に確保 → 残りの高さに問題文を <code>fitText</code>（上限 68 / 下限 44）」へ入れ替え、<code>containRect</code> の結果を箱の上端に寄せる。問題文が下限 44px でも残りに収まらない場合は明示的に例外を投げる（現行の「イラスト領域が残らない」例外と同じ砦の位置づけ。補充の 90 字上限なら収まる）。<code>tests/</code> に版面導出値の固定テストを追加（最短・中央・最長の 3 問で問題文サイズ・行数・イラスト矩形を固定）。プレビューとして在庫の最短（87）・中央（169）・最長（197）の静止画 3 枚と、最長問題の MP4 1 本を <code>build.py --rebuild --item</code> で出力。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・セット記録</td>
+  <td><strong>完了条件</strong>: ① <code>tsc --noEmit</code> と <code>python -m pytest</code> の全パス要約行 ② 3 問の導出値（問題文サイズ・行数・イラスト矩形）が PoC 実測（68/2 行/797×531、54/3 行/797×531、50/4 行/771×514）と一致する出力 ③ 静止画 3 枚と MP4 1 本のパス（MP4 は 16.000 秒 / 1080x1920 を ffprobe で確認）④ 本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: なし（判断は R-2-2）<br><strong>停止点・上限</strong>: push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。在庫の再ビルド・<code>publish.py</code>・DB 更新は行わない。stop after 20 turns</td>
+  <td><strong>完了</strong>（2026-09-19）<br>定数を採用値へ変更し導出順をイラスト優先へ入れ替え（<code>ILLUSTRATION_GUARANTEED_HEIGHT</code> 500 から問題文の使える高さ 294px を導出・<code>containRect</code> は上端寄せ・下限 44px で収まらなければ例外）。<strong>3 問の導出値は PoC 実測と一致</strong>（68/2 行/797×531・54/3 行/797×531・50/4 行/771×514）。<code>tsc --noEmit</code> 通過・<code>pytest</code> 42 件全パス（版面固定テスト <code>tests/test_layout_design.py</code> を新設）。プレビューは <code>work/videos/{87,169,197}.mp4</code> と <code>work/cuts/</code> のスチル各 5 枚、最長 197 は 16.000000 秒 / 1080x1920。<strong>気づき</strong>: 採用値では問題文の字数上限が全角 80 字になり補充の 90 字と食い違う（課題体系 <a href="../issues/index.html#I-035">I-035</a>。同日解消）。詳細は<a href="../plans/logic-training-1-log.html">セット記録</a></td>
+</tr></tbody></table></div></section>
+<h2 id="policy">表示と記録の扱い</h2>
+<div class="rules"><div><h3>常に見せる</h3><p>ステップ ID・状態・完了日・結果の要点・着手条件。成果物、完了条件、人の確認、停止点、重要な制約。</p></div>
+<div><h3>必要なときに開く</h3><p>実装の細部・背景と作業記録を別々に折りたたむ。見出しには中身が分かる短い要点を付ける。</p></div>
+<div><h3>開発中の記録</h3><p>計画書への追記を許容する。記録が増えても初期表示を圧迫しない。方針が変わったら、常時表示の概要・条件も最新化する。</p></div>
+<div><h3>計画を整理した後</h3><p>詳細を記録ファイルへ移し、計画書には状態・完了日・要点と記録へのリンクを残す。詳細本文は二重管理しない。</p><p><a href="../plans/logic-training-1-log.html">作業記録を読む →</a></p></div></div>
+<h2 id="review">この PoC で確認したいこと</h2>
+<ul><li>折りたたみを開かずに「何をする・何ができれば完了・人が次に何をする」が分かるか。</li><li>着手条件や禁止事項を見落とさないか。</li><li>実装の細部と作業記録を迷わず開けるか。</li><li>PC とスマホで、常時表示の情報量と読みやすさが適切か。</li></ul>
+<p>適用先と移行範囲は、この見本を確認してから決めます。検討の経緯は<a href="plans-readability.md">壁打ち記録</a>、課題の状態は<a href="index.html#I-036">課題表</a>を参照。</p>
+</main></body></html>
