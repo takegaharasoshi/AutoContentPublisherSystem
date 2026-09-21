@@ -10,7 +10,7 @@ detail: "plans-readability.html"
 
 ## 要旨（対応方針の現在形）
 
-整理された現在形と操作できる PoC は [plans-readability.html](plans-readability.html) を参照。
+整理された表示方針は [plans-readability.html](plans-readability.html)、開発計画全体の PoC は [development-plan-poc.html](development-plan-poc.html) を参照。
 
 ## 選択肢と判断
 
@@ -44,6 +44,8 @@ detail: "plans-readability.html"
 > OKです。
 > ではPOCとしてどのように変わるのかHTMLファイルでまとめてください。
 
+> [development-plan.html](http://takegaharapc:8765/plans/development-plan.html)  の PoC をやってほしいです
+
 ## 壁打ち記録
 
 ### 2026-09-21（議論中）
@@ -70,3 +72,11 @@ detail: "plans-readability.html"
 - 着手条件、重要な制約、完了条件、人の確認、停止点を常時表示。作業記録の見出しには結果の要点を付けた。例の進捗・成果は原文に基づき、現在進行中の作業とは区別した。
 - 元の内容・状態欄を保持し、計画整理後に記録リンクへ置き換える運用も示した。HTML 昇格に伴い MD の要旨をリンクへ一本化。
 - Phase 24 が完了済みであることを開発計画と記録で確認。着地は据え置き継続とし、PoC の読みやすさをユーザーが確認した時点で適用範囲と展開を再判断するよう課題表を更新。表示の本適用は行っていない。
+
+### 2026-09-21（開発計画全体の PoC）
+
+- ユーザーが PoC の対象として development-plan.html を指定。セット計画書の単一ステップ比較ではなく、開発計画の実データでページ全体を作成した。
+- Phase 21 の全 12 ステップを保持し、進行中・未着手の 7 件を先に表示。完了済み 5 件はまとめて開閉でき、各ステップにも実装詳細・作業記録の独立した折りたたみを設けた。
+- 現在地と次の候補を先頭に置き、確認待ち・完了フェーズ・進め方の方針・更新履歴も保持。重要な実行条件は常時表示し、完了条件は箇条書きにした。
+- 14 問への拡張と後続ステップに残る 10 件 / 本の記載は、PoC で勝手に修正せず原文の要確認点として明示した。
+- 元の開発計画・共通 CSS は変更せず、docs/issues/development-plan-poc.html に保存。対応方針の検討は据え置き継続で、見本のユーザー確認後に適用範囲と展開を再判断する。
