@@ -2306,6 +2306,42 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li><strong>検証</strong>: <code>python3 tools/docs_check.py --widths 360,390,430,767,768,1280 --baseline HEAD</code> は 4 セクションとも OK（<code>?v=</code> 付きの参照もリンク整合 0 件）。<strong>実機での再確認は 24-3 に戻す</strong></li>
 </ul>
 
+<h3 id="step-24-3">24-3 実機・PC の受け入れ確認（2026-09-21・<strong>go</strong>。ユーザー判断・ゴール対象外）</h3>
+<ul>
+<li><strong>判定</strong>: ユーザーが実機と PC で確認し <strong>go</strong>（2026-09-21）。これをもって <strong>Phase 24 完了</strong></li>
+<li><strong>一次確認は判定不能だった</strong>: 端末のブラウザーキャッシュで改修前の <code>style.css</code> が使われていたため（切り分けと対策は<a href="#step-24-3-cache">直前の節</a>）。対策後の再確認で go</li>
+<li><strong>残課題</strong>: 計画書の構成・ステップ表示の再設計は <a href="../issues/index.html#I-036">I-036</a>（本フェーズには同梱しない方針。トリガー「Phase 24 完了時に照合」がここで当たる）</li>
+</ul>
+
+<details class="moved"><summary>Phase 24 の計画書記載（2026-09-21 に計画書から移設・完了時点の原文）</summary><p><em>以下は 2026-09-21 の完了フェーズ整理で計画書（development-plan.html）から移設した原文。計画書上のステップ一覧と要点で、上の実施記録と重複する内容を含む。</em></p>
+<h4>Phase 24: 設計書 HTML のスマホ閲覧対応</h4>
+<p><strong>ゴール</strong>: <code>docs/</code> の現役 HTML がスマホ幅でも読める状態になっている。一般の表は短い列を折り返さず説明列に読める幅を確保して過剰な縦長化を解消し（収まらない分は表内だけ横スクロール）、課題・アイデア一覧はスマホ幅でカード表示になる。PC の表表示・ブラウザー内検索・ID 直接リンクは維持する</p>
+<blockquote>経緯: アイデア体系で捕捉（2026-09-12）→ 2 巡の壁打ちで方針一式を確定（2026-09-20）→ 待機 → <strong>2026-09-21 に採用・本フェーズ起票</strong>。インプットは<a href="../ideas/docs-responsive-mobile.html">アイデア詳細</a>（設計書に非ず。確定方針・確認基準はそちらが正。壁打ちの経緯は<a href="../ideas/docs-responsive-mobile.md">アイデア記録</a>）。<strong>対象外</strong>: 計画書の構成・ステップ表示の再設計（PC でも見づらい問題。課題 <a href="../issues/index.html#I-036">I-036</a> へ分離済み。<em>計画書内の一般表の列幅対策は本フェーズの対象</em>）、先頭列固定の初期導入、独自検索・絞り込み・並べ替え、開閉状態の保存、配信経路の変更、図・目次の全面改修。<strong>課題表の照合</strong>（<a href="index.html#step-checklist">5.1-5</a>）: 対象パス（<code>docs/assets/style.css</code>・<code>docs/issues/index.html</code>・<code>docs/ideas/index.html</code>・現役 HTML）が重なる live 課題は <a href="../issues/index.html#I-036">I-036</a> のみで、<strong>ユーザー指示により同梱しない</strong>（起票時に I-036 のトリガーへ「本フェーズ完了時にも照合」を追記した）。他に該当する据え置き課題なし。<strong>分割</strong>: 転記下書きの作業案 A は 20〜30 ターンに収まらない見込みのため、機械検証できる中間点で 24-1（一般表 + 検証ツール）と 24-2（カード化）に割った（<a href="index.html#step-checklist">5.1-4</a>）。作業案 B は 24-3。確認待ち項目の新設はなし（実機確認は push 直後に実施可能で、後日の効果観察を待たないため）</blockquote>
+<ul>
+<li>✅ <strong>24-1</strong> 一般表の列幅対策と検証ツールの整備 — 2026-09-21 完了（要点: <code>docs/assets/style.css</code> に <code>@media (max-width: 767.98px)</code> の共通規則 — <code>.table-wrap &gt; table</code> を <code>width: max-content; min-width: 100%; max-width: 100rem</code>、セルを <code>max-width: 16rem</code>、コンテナ左右余白 1.5rem → 1rem、長文バッジの <code>nowrap</code> 解除。個別調整は <code>requirements-notes-set2.html</code> の <code>.table-wrap</code> 追加 1 件のみ。検証ツール <code>tools/docs_check.py</code> を新設し、46 ページ・197 表／6 幅すべてで横はみ出し 0 件・リンク / アンカーの新規不備 0 件。360 CSS px のページ高さは代表 4 ページで 10〜45% 減、最小列幅 35〜38px → 44〜111px。詳細は<a href="development-log.html#step-24-1">開発記録</a>）
+  <ul>
+  <li>内容: ① <code>docs/assets/style.css</code> に一般表の共通規則を入れる（項目名・日付など短い列はなるべく折り返さない、説明列は文章として読める幅を確保、収まらない分は既存 <code>.table-wrap</code> の横スクロールへ逃がす、狭い画面では左右余白を少し減らす。<strong>本文の文字サイズは維持し、文字縮小・文章省略で収めない</strong>。全表一律の固定幅や全セル折り返し禁止にはしない） ② 共通規則に合わない表だけ個別調整する（今回の変更でページ全体が横にはみ出す箇所は直す） ③ 検証ツール <code>tools/docs_check.py</code> を新設（アーカイブを除く現役 HTML の列挙と件数・表の件数、指定幅でのページ全体の横はみ出し判定、<code>href</code> / アンカーと実ファイルの整合チェック。横はみ出し判定にヘッドレスブラウザーが使えない場合はその旨を出力し、静的チェック + 24-3 の実機確認へ委ねる） ④ 対象件数と検証結果を記録（2026-09-20 時点のソース確認では 44 ページ・196 表。<strong>固定の期待件数にせず実行時に再集計する</strong>）</li>
+  <li>完了条件: <code>tools/docs_check.py</code> の出力を貼る — 対象ページ数・表の件数、360 / 390 / 430 / 767 / 768 / 1280 CSS px でのページ全体の横はみ出し 0 件（実行できない幅・環境があれば理由と代替確認を明記し、未確認のまま合格扱いにしない）、リンク / アンカー整合で<strong>今回の差分による不備 0 件</strong>（既存不備は区別して列挙）。<code>docs/</code> <code>tools/</code> のみの変更を日本語メッセージでコミットし push</li>
+  <li>人間ゲート: なし（読みやすさの評価は 24-3 でまとめて行う）</li>
+  <li>停止点・上限: push まで（<code>docs/</code> <code>tools/</code> のみ）。stop after 25 turns。I-036 の改修・配信変更・外部サービス導入には進まない</li>
+  </ul></li>
+<li>✅ <strong>24-2</strong> 課題・アイデア一覧のカード化 — 2026-09-21 完了（要点: 表の DOM をそのまま使う方式。対象 8 表に <code>data-cards</code> / <code>data-card-extra</code>〔補足列の番号〕を付け、<code>docs/assets/style.css</code> の 767.98px 以下で <code>table[data-cards]</code> をカード化、新設の <code>docs/assets/docs-cards.js</code>〔外部依存なし〕が列名の付与・補足の折りたたみ〔<code>hidden="until-found"</code>・非対応は通常の <code>hidden</code>〕・行ごとのトグルを行う。PC 幅は改修前と同一。<code>tools/docs_check.py</code> にセクション 4 を追加し、767 / 768px で常時表示セル 234 件・補足セル 162 件・トグル 52 件・768px 側 458 件すべて NG 0 件、横はみ出しは 6 幅で 0 件 / 46 ページ。ミューテーションテストでチェックが効くことも確認。詳細は<a href="development-log.html#step-24-2">開発記録</a>）
+  <ul>
+  <li>内容: <a href="../issues/index.html">課題一覧</a>（レーン別 live 表 + クローズ節）と<a href="../ideas/index.html">アイデア一覧</a>（今動ける / 条件待ち / クローズ）の<strong>全一覧</strong>を、画面幅 <strong>768 CSS px 未満</strong>でカード表示に切り替える（境界を調整する場合は理由と検証結果を記録）。① 常時表示 = 課題: ID・内容・状態・対応方針・トリガー（クローズは状態・対応方針に相当する結果と根拠） / アイデア: タイトル・状態・要旨または条件（クローズは結果・昇格先 / 見送り理由）。詳細ページ・壁打ち記録へのリンクも常時表示 ② 補足情報（対象パス・発生履歴・日付・更新日など）は<strong>初期状態で閉じ</strong>、タップで開閉。複数カードを同時に開ける。開閉状態は保存しない ③ PC 幅では表形式を維持。同ページの運用ルール説明表は一般表として扱う ④ <strong>PC 用とスマホ用の文章を二重管理しない</strong>（同じ内容から表示を切り替える）。表示処理が動かない場合も元の表で読める。外部サービスへの依存は増やさない（表示用の HTML 属性・共通のローカル資材は可） ⑤ 行の追加時に同じ表示が適用される形にし、行の書き方を各ページの運用ルールに 1 行残す ⑥ 既存項目・既存文面を使う（短い課題名の新設・要約の書き直しはしない）</li>
+  <li>完了条件: <code>tools/docs_check.py</code> に追加したチェックの出力を貼る — 対象 2 ページでカード側の常時表示項目が元の表のセルと<strong>同一テキスト</strong>（差分 0 件）、補足情報の語が DOM 上に存在する（折りたたみに要素を使い、テキストを削っていない）、<code>#I-0xx</code> 等の ID アンカーが全行に存在する、767 / 768 CSS px での切り替えとページ全体の横はみ出し 0 件、全現役ページの横はみ出しリグレッション 0 件。<code>docs/</code> <code>tools/</code> のみの変更をコミットし push</li>
+  <li>人間ゲート: なし（開閉・検索・リンクの実挙動の評価は 24-3）</li>
+  <li>停止点・上限: push まで（<code>docs/</code> <code>tools/</code> のみ）。stop after 25 turns。カードの主要項目が展開せず読めない・検索が成立しない等で方式の見直しが要る場合は、実装方式の案を提示して停止する</li>
+  </ul></li>
+<li>⬜ <strong>24-3</strong> 実機・PC の受け入れ確認（<strong>ユーザー判断・ゴール対象外</strong>。24-2 完了後）— 2026-09-21 の一次確認は<strong>端末のキャッシュで改修前の CSS が使われていた</strong>ため判定不能。<code>docs_server.py</code> の <code>Cache-Control: no-store</code>・<code>style.css?v=20260921</code>・カード未適用時の警告表示を入れて再確認待ち（<a href="development-log.html#step-24-3-cache">経緯</a>）
+  <ul>
+  <li>内容: 普段使っているスマホと PC で代表 4 ページ（<a href="index.html">計画体系</a>・<a href="../strategy/business-strategy.html">事業戦略</a>・<a href="../issues/index.html">課題一覧</a>・<a href="../ideas/index.html">アイデア一覧</a>）を読み、① 表の過剰な縦長化が解消したか ② 表内の横スクロール ③ カードの主要項目が展開せず読めるか ④ 補足情報の開閉（複数同時） ⑤ 補足内の語がブラウザー内検索で見つかるか ⑥ 課題 ID への直接リンク ⑦ PC では表のままか、を確認する（閲覧は <code>tools/serve-docs.sh</code> = <code>/docs-mobile-view</code> 経由）</li>
+  <li>完了条件: —（ユーザー判断）</li>
+  <li>人間ゲート: このステップ自体が人間ゲート。<strong>使用した OS・ブラウザーと観点別 OK / NG、go / no-go を記録する</strong>。go で本フェーズ完了、no-go はページ・再現操作・問題を特定して 24-1 / 24-2 の範囲内で修正し再確認する。判定では<strong>一般表の列幅改善と、文章自体の長さによる行高を区別する</strong>（元から長い内容の行高短縮は保証しない）</li>
+  <li>停止点・上限: —（ゴールにしない）。結果は<a href="development-log.html">開発記録</a>へ反映する</li>
+  </ul></li>
+</ul>
+</details>
+
 <details class="phase"><summary>次期計画の割当表・Phase XX（2026-09-03 に計画書から移設・原文）</summary><p><em>以下は 2026-09-03 の完了フェーズ整理で計画書から移設した原文。「次期計画」の割当表は Phase 16 残・19・20 のステップ割当の最終版（方針の要約は計画書「進め方の方針」に残した）。「Phase XX: プラットフォーム展開」は着手判断が未了のためアイデア体系（<a href="../ideas/platform-expansion-tiktok.md">platform-expansion-tiktok.md</a>・再醸成待ち）へ移管し、開発計画からは外した。</em></p>
 <h3>次期計画: 収益化に向けた機能拡充（Phase 16 残・XX）</h3>
 <p>2026-07-23 の壁打ちで策定。<strong>上位方針（収益化経路・予算・KPI・プラットフォーム展開方針）は<a href="../strategy/business-strategy.html">事業戦略書</a>を正とする</strong>。優先順位の考え方: 配信面の拡大より先に「リーチ獲得能力（動画・リール）」→「勝負セット投入」→「効果測定」→「当たりが出てからプラットフォーム展開」の順。</p>

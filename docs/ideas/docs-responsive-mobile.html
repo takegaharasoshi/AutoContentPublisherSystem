@@ -11,7 +11,7 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アイデア体系</a> / スマホ閲覧対応</nav>
 <h1>設計書 HTML のスマホ閲覧対応</h1>
 <div class="page-meta"><span class="badge badge-fixed">採用</span><span>方針確定: 2026-09-20 / 採用・転記: 2026-09-21 / <a href="docs-responsive-mobile.md">壁打ち記録</a></span></div>
-<div class="note"><span class="callout-title">位置づけ（設計書に非ず）</span>採用判断のための検討記録。ユーザーが方針一式に合意し、2026-09-21 に<a href="../plans/development-plan.html#phase-24">開発計画 Phase 24</a>へ転記して<strong>採用</strong>で着地した。以降の議論・実施記録は開発計画と<a href="../plans/development-log.html">開発記録</a>が正。実装方式・詳細な列幅は開発レーンで設計 Fix する。</div>
+<div class="note"><span class="callout-title">位置づけ（設計書に非ず）</span>採用判断のための検討記録。ユーザーが方針一式に合意し、2026-09-21 に<a href="../plans/development-log.html#phase-24">開発計画 Phase 24</a>へ転記して<strong>採用</strong>で着地した。以降の議論・実施記録は開発計画と<a href="../plans/development-log.html">開発記録</a>が正。実装方式・詳細な列幅は開発レーンで設計 Fix する。</div>
 
 <h2 id="scope">1. 目的と範囲</h2>
 <p>スマホ幅に表が押し込まれ、細い列の折り返しで極端に縦長になる問題を解消する。一般の表は列幅を保ち、課題・アイデア一覧は情報のまとまりごとに読めるカードにする。</p>
@@ -61,7 +61,7 @@
 <p>列の具体的な数値や検索を成立させる実装方式は設計・試作で決める事項であり、方針未決として残すものではない。既存不備や環境制約で確認できない項目は、証跡・影響を記録し、未確認のまま合格扱いにしない。</p>
 
 <h2 id="handoff">6. 開発レーンへの転記下書き</h2>
-<p><strong>転記済み（2026-09-21）:</strong> 開発レーンの単独セッションで<a href="../plans/development-plan.html#phase-24">開発計画 Phase 24</a>へ登録した。作業案 A は機械検証できる中間点で <strong>24-1</strong>（一般表の列幅対策 + 検証ツール <code>tools/docs_check.py</code>）と <strong>24-2</strong>（課題・アイデア一覧のカード化）に分割し（<a href="../plans/index.html#step-checklist">計画体系 5.1-4</a>）、作業案 B は <strong>24-3</strong>（ユーザー判断・ゴール対象外）とした。方針・確認基準は変更していない。着手は <code>/step 24-1</code>。</p>
+<p><strong>転記済み（2026-09-21）:</strong> 開発レーンの単独セッションで<a href="../plans/development-log.html#phase-24">開発計画 Phase 24</a>へ登録した。作業案 A は機械検証できる中間点で <strong>24-1</strong>（一般表の列幅対策 + 検証ツール <code>tools/docs_check.py</code>）と <strong>24-2</strong>（課題・アイデア一覧のカード化）に分割し（<a href="../plans/index.html#step-checklist">計画体系 5.1-4</a>）、作業案 B は <strong>24-3</strong>（ユーザー判断・ゴール対象外）とした。方針・確認基準は変更していない。着手は <code>/step 24-1</code>。</p>
 <p><strong>課題表の照合（2026-09-21 の転記時に再照合済み。該当は I-036 のみで、同課題のトリガーへ「Phase 24 の完了時にも照合」を追記）:</strong> I-036 は同梱しない（ユーザー指示により構成改善を分離済み）。I-030 は計画体系の並行作業ルールの課題で、表示変更とは別件のため同梱せず既存トリガーを維持。他の据え置き課題には今回の一般表・カード表示に直接該当するものなし。転記時には最新の課題表を再照合する。</p>
 <p><strong>5.1 チェック:</strong> 実装と機械確認を一つの工程とし、ユーザー実機確認は別ステップ・ゴール対象外にする。自セッション外の確認を実装の完了条件に含めない。実機確認は成果物の push 直後から実施可能で、後日の効果観察を待つ計画ではないため確認待ち項目は新設しない。共通資産の表示改修として開発レーンに集約し、I-036 や並行作業ルールの改訂に広げない。</p>
 
