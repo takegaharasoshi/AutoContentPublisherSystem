@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>I-036｜変更ファイルと計画への展開草案</title><link rel="stylesheet" href="../assets/style.css?v=20260921"><style>
+.container{max-width:70rem}code{overflow-wrap:anywhere}.stage{border:1px solid var(--border);border-radius:10px;padding:1.2rem;margin:1.5rem 0}.stage h3{margin-top:0}.stage dt{font-weight:700;color:var(--link);margin-top:1rem}.stage dd{margin:.4rem 0 0}.files td{vertical-align:top}.note p{margin:.4rem 0}.tag{font-size:.85rem;color:var(--text-muted)}
+</style></head><body><main class="container">
+<nav class="breadcrumb"><a href="index.html#I-036">I-036</a> / <a href="plans-readability.html#maintenance">記載方針の維持</a> / 展開草案</nav>
+<h1>記載方針の維持：変更ファイルと展開草案</h1>
+<p class="tag">2026-09-21 · 検討用。以下の新規ファイル・コマンド・ステップは未実装・未起票。</p>
+<div class="note"><p><strong>初回は開発計画へ先行適用する提案。</strong>計画の本文は HTML のまま一箇所で管理する。共通ルール・テンプレート・CSS・検査を揃え、既存の作成・更新スキルが利用する。</p><p>今回のフェーズでは、セット計画書の全件変換・独自編集画面・データベース化・CI の新設は含めない。セット計画書は既存様式を維持し、個別の移行時に検査対象へ追加する。</p></div>
+<h2 id="files">1. 更新・新規作成するファイル</h2>
+<h3>新規作成：4 ファイル</h3>
+<div class="table-wrap"><table class="files"><thead><tr><th>新規パス（案）</th><th>役割・内容</th><th>作成ステップ</th></tr></thead><tbody>
+<tr><td><code>docs/plans/_templates/step.html</code></td><td>ブラウザーで読める単独の HTML 見本。コピー範囲を明示した 1 ステップの枠と、フェーズ内の「完了済みを上に畳む」配置例を置く。ID・状態・着手条件・重要な制約・概要・完了条件・人の確認・停止点・実装詳細・作業記録を含む。原則を重複説明せず計画体系 index へリンクする。サンプルであることを明記し、通常のリンク・表示検査にも通る内容にする。</td><td>A</td></tr>
+<tr><td><code>docs/assets/plans.css</code></td><td>計画書のステップ表示専用スタイル。既存 style.css の色・フォント変数を使い、<code>.plan-step</code> 等に限定する。PC / スマホの配置、折りたたみ、キーボードフォーカス、長いパスの折り返しを定義。共通 style.css は変更せず、移行済みの計画書とテンプレートだけから読み込む。</td><td>A</td></tr>
+<tr><td><code>tools/docs_plan_check.py</code></td><td>HTMLParser を用いた構造検査のモジュール。必須項目・配置・ID・状態・折りたたみを検査し、ファイル / ステップ ID / 違反項目を返す。テンプレートと例外形式を含めた検査仕様を実装する。初回の本番検査対象は development-plan.html のみ（登録は B）。</td><td>A</td></tr>
+<tr><td><code>tools/tests/test_docs_plan_check.py</code></td><td>標準ライブラリ unittest による回帰テスト。正常例に加え、必須欄削除・ID 重複・詳細の初期展開・完了条件の折りたたみ内混入・完了済みの配置違い・対象ページの印の削除を NG とする。未着手 / 作業中 / 完了、ユーザー判断、旧完了ステップの明示的な例外、記録移管後のリンク形式を検査する。テスト用 HTML は小さい文字列として保持し、fixture 用の追加ファイルは作らない。</td><td>A</td></tr>
+</tbody></table></div>
+<h3>既存ファイルの更新</h3>
+<div class="table-wrap"><table class="files"><thead><tr><th>更新パス</th><th>具体的な変更</th><th>ステップ</th></tr></thead><tbody>
+<tr><td><code>docs/plans/index.html</code></td><td>セクション 4・5 に新しい記載様式、記録の移管時期、完了済みの配置、テンプレートと検査コマンドへの導線を定義。旧 4 項目との対応（内容＝概要＋実装詳細、完了条件、人間ゲート、停止点）を明示。開発計画の「進め方の方針」への参照を解消し、必要な共通方針を既存ルールに統合する。適用対象は移行済み計画書に限定する。</td><td>B</td></tr>
+<tr><td><code>docs/plans/development-plan.html</code></td><td>レビュー済み PoC の表示を本適用。全ステップの ID・状態・条件を保持し、冒頭の目次・現況の重複・共通方針・長い更新履歴を除去。完了済みをフェーズ内の上に畳み、実装詳細と記録を分離。plans.css を読み込む。この改修自身のステップも新様式にする。確認待ちリストは保持する。</td><td>B・C・D</td></tr>
+<tr><td><code>docs/plans/development-log.html</code></td><td>移行前後の対応、作業記録、検査結果、受け入れ結果を記録。既にある詳細は重複転載せず既存の節へリンクする。計画書にしかない経緯を移す際は参照先を作る。</td><td>A〜D</td></tr>
+<tr><td><code>CLAUDE.md</code></td><td>「開発計画」の記録ルールを index 参照に揃え、完了時の要点更新と整理時の詳細移管を区別する。移行済み計画書を更新したら構造検査を行うことを明記。「進行中の開発レーン」の細かな進捗重複は計画書参照へ寄せる。既存のモデル・実行規約はここを参照し、移管先に複製しない。</td><td>C</td></tr>
+<tr><td><code>tools/docs_check.py</code></td><td>新モジュールを呼び出す「計画書の構造」検査を追加。通常の全体検査に統合し、違反は終了コード 1。日常更新用の <code>--plan-only</code> を追加し、ブラウザーなしで対象計画書の構造・参照だけを検査する。既存の <code>--no-browser</code> の「未確認は合格にしない」仕様は変更しない。</td><td>B</td></tr>
+<tr><td><code>.agents/skills/step/SKILL.md</code></td><td>手順 2 の読取を新様式に対応させ、概要と折りたたみ内の実装仕様を両方読む。分割・追加時はテンプレートを使用。手順 5 の終了時に状態・完了日・要点・記録を更新し、完了済みグループへ移動、構造検査を実行する。旧形式フォールバックは未移行の計画書に限定。ルール改訂の通常禁止は維持し、本フェーズで名指し承認された範囲とフリーズ窓だけを限定例外として扱う。</td><td>C（限定例外の明示は起票時）</td></tr>
+<tr><td><code>.agents/skills/idea/SKILL.md</code></td><td>採用転記・計画下書きの手順で、index の新様式とテンプレートを参照。移行済み計画書へ転記した場合は構造検査まで完了条件に含める。</td><td>C</td></tr>
+<tr><td><code>.agents/skills/issue/SKILL.md</code></td><td>展開下書き・計画への転記時の様式を揃える。4 項目の意味は維持し、HTML 化するときの表示枠と検査を指定。Codex の課題レーンは引き続き下書きまでとする。</td><td>C</td></tr>
+<tr><td><code>.agents/skills/incident/SKILL.md</code></td><td>恒久対策の展開下書きは共通様式を参照。確認待ちの結果などを移行済み計画書に書く場合は構造検査も行う。障害対応・人間ゲートの範囲は変更しない。</td><td>C</td></tr>
+<tr><td><code>.agents/skills/quiz-stock-replenish/SKILL.md</code><br><code>.agents/skills/ranking-stock-replenish/SKILL.md</code></td><td>計画書の状態・確認待ちを更新する終了手順に「移行済み計画書は新様式と構造検査を使う」を追加。現行セット計画書は未移行と明示して既存様式を維持。各セットの補充工程・在庫検査は変更しない。</td><td>C</td></tr>
+<tr><td><code>docs/issues/index.html</code></td><td>I-036 の対象パス・展開先・状態を同期。I-014 の削除される「現況と次の候補」への説明参照を課題表内の同梱方針へ置き換える。I-014 の対策そのものは実装しない。</td><td>起票時・B・D</td></tr>
+</tbody></table></div>
+<p><strong>追加しないもの：</strong>新スキル、生成用 JSON / YAML、HTML 自動生成ビルド、.github/workflows、Git hook。<code>.claude/skills/</code> は既存のシンボリックリンクなので別編集しない。<code>docs/index.html</code> の設計 Fix ルールは参照するだけ。セット計画書とその記録はこのフェーズでは変換しない。</p>
+<h2 id="contract">2. テンプレートと検査の契約</h2>
+<p>見出しの日本語だけで機械判定せず、HTML に構造を示す属性を付ける。本文の正は各計画書であり、属性は検査と表示のために使う。</p>
+<ul>
+<li>ページ：<code>data-plan-format="1"</code>。検査対象はモジュール内の明示リストに登録し、この属性を消しても検査を回避できない。登録済みページのファイル削除、ステップ 0 件、形式の混在も NG。</li>
+<li>フェーズ：<code>data-plan-phase</code>。内部に完了済みグループと進行中グループを持ち、完了済みが先。完了済みグループは <code>details</code> で <code>open</code> を付けない。</li>
+<li>ステップ：<code>article.plan-step</code>、安定した <code>id="step-21-6"</code>、<code>data-step-id</code>、<code>data-status="todo|doing|done|blocked"</code>。完了状態は完了日が必須。ID 重複と状態に合わないグループ配置を NG とする。</li>
+<li>常時表示の欄：<code>data-field="overview|prerequisites|constraints|acceptance|gate|stop|result"</code>。空欄は不可で、該当なしなら明記する。完了条件は <code>ul/ol</code> のリストで、実装詳細や記録の折りたたみ内に入れてはいけない。完了済みグループ自体の折りたたみは許容する。</li>
+<li>実装詳細：<code>details[data-field="implementation"]</code>。作業記録：<code>details[data-field="record"]</code>。別要素として置き、初期状態は閉じる。記録未作成はその旨を明記。整理後の記録欄は <code>section[data-field="record"]</code> 内の記録リンクだけでも可。</li>
+<li>ユーザー判断のステップ：<code>data-kind="decision"</code> と「ゴール対象外」を表示し、完了条件には判断内容、停止点にはゴールにしない旨を記載。</li>
+<li>完了条件等が残っていない古い完了ステップ：<code>data-kind="legacy-completed"</code> を明記した場合だけ、未記録の説明と記録リンクで代替可。done 以外でこの例外を使うことは禁止する。過去の条件を推測で作らない。</li>
+</ul>
+<p><strong>検査が担保しないこと：</strong>重要な制約が文章としてすべて拾われているか、要約が正しいか、記録と最新状態が一致するか。更新者は差分のステップについてこの 3 点を読み直す。構造検査の成功を内容の正しさと同一視しない。</p>
+<h2 id="workflow">3. 日常更新の流れ</h2>
+<ol><li>新規ステップはテンプレートの枠をコピーして ID と内容を記入。既存ステップは同じ枠内を更新。</li><li>作業中は記録の折りたたみに追記し、状態と短い結果・次の作業も更新。完了時は完了日を付け、同フェーズの完了済みグループへ移動する。</li><li>計画整理時に詳細を log へ移す。移した本文を plan に残さずリンクへ置き換える。経緯がまだ未移管でも、状態・完了日・要点の更新は遅らせない。</li><li><code>python3 tools/docs_check.py --plan-only</code>（追加予定）を実行。NG なら修正する。成功表示は「構造・参照のみ」で、表示の実測は別扱い。</li><li>CSS・テンプレート変更または新しい計画書への初回適用では、<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> と折りたたみ・フォーカスの確認も行う。</li></ol>
+<p>スキル外で手動編集したときも CLAUDE.md の共通規約から同じ検査へつなぐ。この案は<strong>検査を実行すれば崩れを検出する仕組み</strong>であり、検査を飛ばした push をサーバー側で阻止するものではない。現在リポジトリに .github/ はなく、CI の新設は別判断とする。</p>
+<h2 id="rollout">4. 計画書への転記草案</h2>
+<p><strong>フェーズ名案：</strong>開発計画の可読性改善と記載様式の定着。番号は採用・転記時に空き番号を確認して付ける。以下は仮の A〜D。<strong>レーンは開発</strong>。実装は Claude Code の開発レーンで行い、本課題セッションでは下書きまで。</p>
+<p><strong>着手前提：</strong>本草案の対象範囲を採用し、計画体系 3 の共通ルール改訂用フリーズ窓を確保する。step スキルの通常の「docs/plans/ のルール変更禁止」と衝突しないよう、採用時の指示に本フェーズの変更ファイルを明記する。無関係な規約変更まで例外にしない。</p>
+<article class="stage" id="stage-a"><h3>A. 表示・検査の基盤を作る</h3><dl>
+<dt>内容</dt><dd>新規 4 ファイルを作成する。テンプレートの構造を確定し、専用 CSS、検査 API、正常・異常系テストを揃える。現行の計画書はまだ検査対象に登録しない。開発記録に仕様・検証結果を書く。</dd>
+<dt>完了条件</dt><dd><ul><li><code>python3 -m unittest discover -s tools/tests -p 'test_docs_plan_check.py'</code> が全パスし、正常例と代表的な破損例を検出できる。</li><li>テンプレートのリンクと 360 / 390 / 768 / 1280px の表示に不備がなく、2 つの折りたたみを独立して操作できる。</li><li>実ページが未登録であることを記録し、実ページの検査済みとは申告しない。</li><li>計画・記録を更新し、日本語コミット、pull --rebase、push を完了する。</li></ul></dd>
+<dt>人間ゲート</dt><dd>なし。既にレビューした PoC の構成を使い、実データの最終確認は D で行う。</dd>
+<dt>停止点・上限</dt><dd>push まで。目安 20 ターン。開発計画本文の一括変換・既存スキル変更は B・C に分ける。</dd>
+</dl></article>
+<article class="stage" id="stage-b"><h3>B. 開発計画を移行し、構造検査を有効にする（A 完了後）</h3><dl>
+<dt>内容</dt><dd>計画体系 index・development-plan / log・docs_check.py・検査モジュールの対象登録・課題表の説明参照を更新。12 ステップだけに固定せず、着手時に存在する全ステップ（本フェーズも含む）を移行する。削除する補足の独自情報と参照先を点検する。計画本文の仕様・件数の不整合は勝手に変更せず、移行前後の対応表に要確認として記録する。</dd>
+<dt>完了条件</dt><dd><ul><li>移行前後のステップ ID・状態・完了条件・ゲート・停止点・確認待ちが照合でき、意図しない欠落が 0 件。既存アンカーと参照が有効。</li><li>登録済み development-plan.html で <code>--plan-only</code> が成功。ページの形式属性を消したテストでは失敗する。</li><li>全体のリンク・4 画面幅の表示検査に新規不備がなく、原文から移した記録の参照先が存在する。</li><li>計画体系のルールとテンプレートが一致し、更新履歴・現況の重複を取り除いている。</li><li>計画・記録を更新し、日本語コミット、pull --rebase、push を完了する。</li></ul></dd>
+<dt>人間ゲート</dt><dd>なし。受け入れ判断は D。</dd>
+<dt>停止点・上限</dt><dd>push まで。目安 25 ターン。セット計画書は変換しない。C 完了まで共通ルール改訂中として通常の計画更新を再開しない。</dd>
+</dl></article>
+<article class="stage" id="stage-c"><h3>C. 計画を作成・更新する入口を揃える（B 完了後）</h3><dl>
+<dt>内容</dt><dd>CLAUDE.md と step / idea / issue / incident / quiz-stock-replenish / ranking-stock-replenish の 6 本を、ファイル一覧の範囲で更新。新規作成・分割・作業中追記・完了・記録移管に共通ルールと構造検査を接続する。テスト内のサンプルで、新規追加 → 作業記録追記 → 完了済みへの移動 → 記録リンクへの置換を一巡させる。</dd>
+<dt>完了条件</dt><dd><ul><li>6 本の各更新入口が index / テンプレート / 検査へつながり、共通ルールと矛盾する完了時の記録指示が残っていない。</li><li>一巡のサンプルが検査を通り、各段階の必須欄欠落や配置違反は NG になる。稼働中の計画へ架空ステップを書き込まない。</li><li>未移行のセット計画書が新様式へ勝手に変換されず、既存補充工程・人間ゲートが変わっていないことを差分で確認する。</li><li><code>unittest</code> と実ページの <code>--plan-only</code> が成功し、計画・記録を更新、日本語コミット、pull --rebase、push を完了する。</li></ul></dd>
+<dt>人間ゲート</dt><dd>なし。スキルの共通ルール改訂範囲をレビューできる差分を残し、D へ進む。</dd>
+<dt>停止点・上限</dt><dd>push まで。目安 20 ターン。補充・本番操作・セット移行は実行しない。</dd>
+</dl></article>
+<article class="stage" id="stage-d"><h3>D. 本適用の受け入れ（B・C 完了後／ユーザー判断・ゴール対象外）</h3><dl>
+<dt>内容</dt><dd>PC とスマホで実際の開発計画を確認する。概要・完了条件・人の確認が閉じた状態で読めるか、記録が独立して開けるか、完了済みがフェーズ内の上に畳まれるか、不要とした節が除去されているかを確認する。</dd>
+<dt>完了条件</dt><dd>ユーザーの観点別 OK / NG と go / no-go が開発記録に残る。go でフェーズ完了・I-036 の開発計画への先行適用結果を課題表へ反映する。no-go は B / C の該当箇所を具体化して修正し、同じ観点で再確認する。</dd>
+<dt>人間ゲート</dt><dd>このステップ自体が人間ゲート。push 直後から確認可能。</dd>
+<dt>停止点・上限</dt><dd>—（ゴールにしない）。セット計画書にも適用するかは別のユーザー判断。I-036 全体を解消するのはセット側の扱いまで決まった場合のみ。</dd>
+</dl></article>
+<h2 id="checks">5. 起票チェックリストと課題の扱い</h2>
+<ul>
+<li><strong>外部待ち：</strong>A〜C の完了条件はローカルの成果物・検査・push に限定。次回の実運用を待つ条件は入れない。D はユーザー判断として独立。</li>
+<li><strong>粒度：</strong>A は独立した検査可能な基盤、B は実データ移行、C は更新入口。合計が 20〜30 ターンを超える見込みなので 3 つの機械検証可能な中間点に分ける。</li>
+<li><strong>レーン：</strong>共通体系・CLAUDE.md・ツールの改訂を含むため開発レーン。セット計画書の本文を触らず、2 レーンをまたぐ実作業を混在させない。</li>
+<li><strong>課題照合：</strong>I-036 が展開元。同じ index / CLAUDE.md に触れる <a href="index.html#I-030">I-030</a> は並行制約の緩和であり、本件に同梱しない。元の再判断トリガーを維持する。<a href="index.html#I-014">I-014</a> は表示を消す際の説明参照だけ修正し、SNS 投稿ロジックの課題は据え置き状態のまま。I-022・I-024 と束ねる既存方針を変えない。</li>
+<li><strong>状態：</strong>草案段階で展開済みにはしない。計画書へ転記してリンクができた時点で I-036 を展開済みへ更新。A〜C の途中では部分実装として閉じない。D 後もセット計画書の適用範囲が未決なら未解決分を残し、具体的な再判断トリガーを付ける。</li>
+<li><strong>確認待ち：</strong>受け入れは D で即時確認できるため、同じ確認を確認待ちへ重複起票しない。実運用で破綻が出たら既存の課題起票入口で扱う。</li>
+</ul>
+<p><a href="development-plan-poc.html">開発計画の表示 PoC</a> · <a href="plans-readability.html">表示方針と検討内容</a> · <a href="plans-readability.md">壁打ち記録</a></p>
+</main></body></html>
