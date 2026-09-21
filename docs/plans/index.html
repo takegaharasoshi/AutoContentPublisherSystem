@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 18 で導入（2026-08-28）</span>
   <span>並行作業ルールの正</span>
-  <span>最終更新: 2026-09-20（Phase 23-1 でセクション 2 に「Codex 直接セッションは並行可レーンのみ」を追記。スキル実体は <code>.agents/skills/</code> へ集約）。前回: 2026-09-19（Phase 22-1 で課題レーンを判定表に追加・記録の分担に課題体系と事象記録・5.1 に課題表の照合・5.2 のトリガー書式を課題体系へ参照）</span>
+  <span>最終更新: 2026-09-21（Phase 25-2 でセクション 4 に記録の移管時期・完了済みの配置を、セクション 5 にステップの切り方の目安と <a href="#step-layout">5.0 移行済み計画書の記載様式</a>〔常時表示 + 折りたたみ・テンプレート・構造検査への導線〕を追加。適用対象は移行済み計画書のみで、セット計画書は従来どおり 4 項目）。前回: 2026-09-20（Phase 23-1 でセクション 2 に「Codex 直接セッションは並行可レーンのみ」を追記。スキル実体は <code>.agents/skills/</code> へ集約）。前回: 2026-09-19（Phase 22-1 で課題レーンを判定表に追加・記録の分担に課題体系と事象記録・5.1 に課題表の照合・5.2 のトリガー書式を課題体系へ参照）</span>
 </div>
 
 <div class="note">
@@ -71,11 +71,14 @@
 <li><strong>plan（毎セッション読む）</strong>: ステータス / バックログ / 進行中ステップ。完了したらチェック + 完了日 + 要点 1〜2 行だけ残す</li>
 <li><strong>log(必要なときだけ読む)</strong>: 実施の詳細全文。週次補充は「1 回 = 表 1 行(日付・投入件数・在庫水位・特記)」の定型とし、特記事項があるときだけ本文を書く</li>
 <li><strong>課題と事象と確認待ちの 3 分</strong>（Phase 22-1 で「トラブルの二分」を改訂）: <strong>課題</strong>（これから変えるべきこと + トリガー）は両レーンとも<a href="../issues/index.html">課題体系</a>へ / <strong>事象</strong>（起きたこと・復旧・解決策）は記録ファイルへ（セット固有はセット log、横断・基盤は開発 log の「事象記録」節〔22-2 で新設〕）/ <strong>確認待ち</strong>（ステップ付随の短命の観察項目）はそのレーンの plan の確認待ちリスト（5.2）へ。計画書の設計課題リスト・バックログ・トラブルシューティングログは 22-2 で廃止し、リンク 1 行に置換する。切り分けの詳細は<a href="../issues/index.html#rule-incident">課題体系 4.7</a></li>
+<li><strong>移管の時期</strong>（Phase 25-2 で明文化）: ステップ完了時は <strong>plan の状態・完了日・要点・作業記録の更新を最優先</strong>で行う（記録ファイルへの詳細転記が済んでいなくても遅らせない）。計画整理のタイミングで、作業記録の本文を log へ移し、<strong>plan 側は log へのリンクに置き換える</strong>（移した本文を plan に残さない）。完了したフェーズは plan の「完了フェーズのサマリ」へ畳み、ステップ一覧の原文は log の移設ブロックに残す</li>
+<li><strong>完了済みの配置</strong>: 移行済み計画書では、完了したステップを<strong>同じフェーズの中で進行中より上に置き、折りたたんだグループにまとめる</strong>（様式は 5 を参照）</li>
 <li>同じ情報を複数ドキュメントに書かない原則は従来どおり。詳細は 1 箇所に書き、他からは参照リンクを張る</li>
 </ul>
 
 <h2 id="step-format">5. ステップの記載様式（<code>/goal</code> 前提・両レーン共通）</h2>
-<p>Phase 19-4（2026-09-02）で導入。計画書のステップは<strong>人間ゲート間の 1 ゴール</strong>を単位とし（切り方の目安は<a href="development-plan.html">開発計画</a>「進め方の方針」）、<code>/step</code> が読んでそのままゴール行に埋められるよう、開発計画・セット計画書とも次の 4 項目で書く。</p>
+<p>Phase 19-4（2026-09-02）で導入。計画書のステップは<strong>人間ゲート間の 1 ゴール</strong>を単位とし、<code>/step</code> が読んでそのままゴール行に埋められるよう、開発計画・セット計画書とも次の 4 項目を書く。着手は <code>/step &lt;識別子&gt;</code> から行い（起動がレーン宣言と完了条件の宣言を兼ねる）、<code>services/</code> <code>shared/</code> への push 後は <code>/goal</code> で CodePipeline 完走を確認する（手順の正は <code>CLAUDE.md</code>、検討経緯は<a href="../ideas/claude-code-loop-goal-skills.html">アイデア詳細</a>）。</p>
+<p><strong>ステップの切り方の目安</strong>（2026-09-02 に開発計画「進め方の方針」で定め、25-2 で本書へ集約）: ステップ境界は<strong>人間ゲート</strong>（稼働確認・レビュー・go / no-go・設計判断）だけで決め、「Claude が 1 ターンでこなせる量」では区切らない（<code>/goal</code> が完了条件まで自走するため）。目安は 3 つ — (a) ゲートのない連続作業（実装 → テスト → 設計書 → コミット）は 1 ステップにまとめる / (b) 確認・判断で終わる地点は境界に残し、ユーザー作業のステップはゴールにしない / (c) 20〜30 ターンを超えそうなもの・2 レーンをまたぐものは機械検証できる中間点で割る。</p>
 <div class="table-wrap"><table>
 <thead><tr><th>項目</th><th>書くこと</th><th>書き方の目安</th></tr></thead>
 <tbody>
@@ -88,6 +91,24 @@
 <ul>
 <li><strong>ユーザー判断のステップ</strong>（目視評価・設計判断・go / no-go）は見出しに「ユーザー判断・ゴール対象外」と明記し、停止点は「—（ゴールにしない）」とする。<code>/step</code> はこれを見て断る</li>
 <li><strong>旧形式のステップ</strong>（完了条件のないもの）は全面書き直しをせず、<code>/step</code> 起動時のフォールバック（<code>.claude/skills/step/SKILL.md</code> 手順 1）で「内容」から 4 項目を起こし、ユーザー確認のうえ計画書を書き換えてから着手する</li>
+</ul>
+
+<h3 id="step-layout">5.0 移行済み計画書の記載様式（Phase 25 で導入）</h3>
+<p><strong>適用対象は新様式へ移行済みの計画書だけ</strong>（2026-09-21 時点は<a href="development-plan.html">開発計画</a>のみ。セット計画書は未移行で、上の 4 項目をそのままの形で書く）。移行済み計画書では、1 ステップを<strong>常時表示の要点</strong>と<strong>折りたたみ</strong>に分けて書く。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>置き場所</th><th>書くこと</th><th>旧 4 項目との対応</th></tr></thead>
+<tbody>
+<tr><td><strong>常時表示</strong>（見出し部）</td><td>ステップ ID・状態（未着手 / 作業中 / 完了 + 完了日）・<strong>着手条件</strong>・<strong>結果 / 現況</strong>（1〜2 行）</td><td>旧「内容」冒頭の「（X 完了後）」と、完了行に書いていた完了日・要点</td></tr>
+<tr><td><strong>常時表示</strong>（本文 1〜3）</td><td><strong>何をするか</strong>（成果物の要約）・<strong>守る条件</strong>（触らない範囲。無ければ「なし」）・<strong>完了条件</strong>（箇条書き）・<strong>人が確認すること</strong>・<strong>止まる場所・上限</strong></td><td>「内容」= 概要 + 実装詳細に分割 / 「完了条件」/ 「人間ゲート」/ 「停止点・上限」</td></tr>
+<tr><td><strong>折りたたみ</strong>（既定は閉じる）</td><td><strong>実装の細部・背景</strong>（着手時に読む仕様・定数・設計判断の理由）と<strong>作業記録</strong>（作業中の追記。整理後は記録ファイルへのリンク 1 本でよい）を<strong>別々に</strong>置く</td><td>旧「内容」の長い仕様と、完了行の長い要点</td></tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>完了条件を折りたたみの中に入れない</strong>（<code>/step</code> と <code>/goal</code> が常時表示だけで読めるようにする）。方針が変わったら作業記録だけでなく常時表示側も直す</li>
+<li><strong>完了済みのステップは同じフェーズの中で進行中より上</strong>に置き、折りたたんだグループにまとめる（初期状態は閉じる）</li>
+<li><strong>ユーザー判断のステップ</strong>は「ユーザー判断・ゴール対象外」を常時表示に出し、停止点は「—（ゴールにしない）」とする。<strong>完了条件が残っていない古い完了ステップ</strong>は例外形式として記録リンクで代替してよい（推測で 4 項目を作らない）</li>
+<li><strong>雛形</strong>: <a href="_templates/step.html">docs/plans/_templates/step.html</a>（コピー範囲・属性の早見表つき）。<strong>構造の契約</strong>の正は<a href="../issues/plans-readability-rollout.html">変更ファイル・展開草案</a>セクション 2</li>
+<li><strong>検査</strong>: 移行済み計画書を更新したら <code>python3 tools/docs_check.py --plan-only</code>（構造 + 参照のみ・ブラウザー不要）を実行する。CSS・テンプレートを変えたとき、または新しい計画書を移行したときは <code>python3 tools/docs_check.py --widths 360,390,768,1280</code> と折りたたみの実機確認も行う。<strong>検査が担保しないこと</strong>（重要な制約を文章として拾えているか・要約が正しいか・記録と最新状態が一致するか）は更新者が差分のステップを読み直す</li>
 </ul>
 
 <h3 id="step-checklist">5.1 起票チェックリスト（ステップを起こすすべての入口で使う）</h3>

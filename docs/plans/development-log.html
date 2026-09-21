@@ -2395,6 +2395,102 @@ details.moved > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 <li>骨子: TikTok を第一候補とする（動画資産の転用。Content Posting API のアプリ審査等の要件は着手時に調査）。X は当面見送り（判断根拠は事業戦略書セクション 5）。着手判断の基準は「勝負セットで M2 到達が目安」。ステップ展開は着手判断時に行う</li>
 </ul>
 </details>
+<h3 id="step-25-2">25-2 開発計画を移行し、構造検査を有効にする（2026-09-21 完了。人間ゲートなし）</h3>
+<ul>
+<li><strong>起動</strong>: <code>/step 25-2</code> → 開発レーン宣言（触るパス: <code>docs/plans/index.html</code>・<code>docs/plans/development-plan.html</code>・<code>docs/plans/development-log.html</code>・<code>tools/docs_check.py</code>・<code>tools/docs_plan_check.py</code>・<code>docs/issues/index.html</code>）。<code>docs/plans/</code> の共通ルール改訂を含むため<strong>フリーズ窓</strong>で単独実施。<strong>確認待ちリストは該当なし</strong>（6 行のトリガーはいずれも本ステップの触るパス・出来事に当たらない。リストは移行後も本文どおり保持）。<strong>課題表</strong>: <a href="../issues/index.html#I-036">I-036</a>（展開元。クローズは 25-4 の go 後）・<a href="../issues/index.html#I-030">I-030</a>（<code>docs/plans/index.html</code> 2・3 と CLAUDE.md の並行制約は触らないため<strong>据え置き継続・トリガー更新なし</strong>）・<a href="../issues/index.html#I-014">I-014</a>（対策は実装せず、同梱方針の説明を課題表の対応方針・トリガー列へ集約）・I-034（セットレーンのパスのみで該当外）。クローズ移動: なし</li>
+<li><strong>変更ファイル</strong>（6 本。新規なし）:
+  <ul>
+  <li><code>docs/plans/index.html</code> — セクション 4 に「移管の時期」「完了済みの配置」を追加。セクション 5 に<strong>ステップの切り方の目安</strong>（開発計画「進め方の方針」から集約）と <a href="index.html#step-layout">5.0 移行済み計画書の記載様式</a>（常時表示 / 折りたたみの対応表・旧 4 項目との対応・テンプレートと <code>--plan-only</code> への導線・検査が担保しないこと）を新設。<strong>適用対象は移行済み計画書に限定</strong>と明記</li>
+  <li><code>docs/plans/development-plan.html</code> — 全 16 ステップを新様式へ移行（下の対応表）。<code>plans.css</code> を読み込み、<code>body data-plan-format="1"</code> を付与</li>
+  <li><code>tools/docs_plan_check.py</code> — <code>REGISTERED_PAGES</code> に <code>docs/plans/development-plan.html</code> を登録（コメントも「移行済み計画書だけを登録する」に更新）</li>
+  <li><code>tools/docs_check.py</code> — <code>docs_plan_check</code> を読み込み、全体検査に「<strong>5. 計画書の構造（25-2）</strong>」を追加（不備は終了コード 1）。日常更新用の <code>--plan-only</code>（構造 + 登録ページ発のリンク / アンカーのみ・ブラウザー不要）を追加。<strong><code>--no-browser</code> の「未確認は合格にしない」仕様は変更なし</strong></li>
+  <li><code>docs/issues/index.html</code> — I-022・I-024 の対応方針列に「束ね方・起票の判断は I-014 の対応方針列が正」を追記（下の「I-014 の扱い」）。<strong>本ファイルは課題レーンの別セッションが同時編集中</strong>だったため、<strong>自分のハンク 2 行だけを <code>git apply --cached --unidiff-zero</code> でステージ</strong>し、相手の作業中の行（I-014・I-017・page-meta）は巻き込まなかった</li>
+  <li><code>docs/plans/development-log.html</code> — 本記録（対応表・移設ブロック・検査結果）</li>
+  </ul></li>
+<li><strong>移行前後の対応表</strong>（意図しない欠落 0 件。「状態」は移行前の記号と移行後の <code>data-status</code>）:
+<div class="table-wrap"><table>
+<thead><tr><th>ステップ</th><th>状態</th><th>完了条件</th><th>人間ゲート</th><th>停止点</th><th>備考</th></tr></thead>
+<tbody>
+<tr><td>21-1</td><td>✅ → done（2026-09-03）</td><td>—（ユーザー判断）</td><td>①〜⑧ の決定</td><td>—（ゴールにしない）</td><td><code>data-kind="decision"</code>。①〜⑧ の原文は実装詳細へ、決定要点は結果欄へ</td></tr>
+<tr><td>21-2</td><td>✅ → done（2026-09-04）</td><td>3 件（Skills 導入の ls / ffprobe / 素材 ls + push）</td><td>目視レビュー・フォーマット go / 素材項目確定・Skills 継続判断</td><td>push まで（content/）・30 turns</td><td>長い完了要点は作業記録へ</td></tr>
+<tr><td>21-3</td><td>✅ → done（2026-09-04）</td><td>タグ対応 + リンクチェック 0 件・コミット / push</td><td>設計レビュー（2 巡まで・blocker のみ）</td><td>push まで（docs/）・25 turns</td><td>21-2 の確定事項は着手条件へ</td></tr>
+<tr><td>21-4a</td><td>✅ → done（2026-09-04）</td><td><strong>記録なし</strong></td><td><strong>記録なし</strong>（結果のみ残存）</td><td><strong>記録なし</strong></td><td><code>data-kind="legacy-completed"</code>。当時 4 項目が書かれていないため<strong>推測で起こさず</strong>記録リンクで代替</td></tr>
+<tr><td>21-4a-2</td><td>✅ → done（2026-09-12）</td><td>3 件（過程の貼付 / validate・probe・dry-run / コミット）</td><td>問題とスキルの両方のレビュー</td><td>コミットまで・20 turns</td><td>10 巡の反復記録は作業記録へ</td></tr>
+<tr><td>21-4a-3</td><td>⬜ → <strong>doing</strong></td><td>3 件（14 問通過・型内訳 / validate・review・dry-run / コミット）</td><td>1 問ずつのレビュー + Aurora へ V012 適用</td><td>コミットまで・1 問 = 2 ゴール・25 turns</td><td>実態が進行中のため状態を <code>doing</code> に（記号では表せなかった区別）。U15〜U17 の経緯は作業記録へ</td></tr>
+<tr><td>21-4b</td><td>⬜ → todo</td><td>件数クエリ + 重複 0・push</td><td>なし</td><td>push まで（content/）・15 turns</td><td><strong>要確認</strong>: 完了条件の「10 件」は 14 問化前の数字（勝手に直さず注記）</td></tr>
+<tr><td>21-5a</td><td>⬜ → todo</td><td>MP4 の件数 / review.html / publish --dry-run・push</td><td>全数レビュー → approved.txt</td><td>push まで（content/）・30 turns</td><td><strong>要確認</strong>: 「10 本」も同上</td></tr>
+<tr><td>21-5b</td><td>⬜ → todo</td><td>pytest 2 サービス / unbuilt = 0 / コミット</td><td>差分確認 → push → <code>/goal</code>（CodePipeline 2 本）</td><td>コミットまで（services/）・30 turns</td><td>—</td></tr>
+<tr><td>21-6</td><td>⬜ → todo</td><td>pytest / jest + cdk synth / コミット</td><td>差分確認 → push → deploy → ステージング接続 → 実コメント確認</td><td>コミットまで（infra/ services/）・30 turns</td><td>確認待ち「PoC の長期トークン」への導線を人間ゲート欄に明示（リストのトリガーと同期）</td></tr>
+<tr><td>21-7</td><td>⬜ → todo</td><td>SQL dry-run / cdk synth / コミット</td><td>稼働開始・ユーザー作業（7 手順）</td><td>コミットまで（infra/）・25 turns</td><td>—</td></tr>
+<tr><td>21-8</td><td>⬜ → todo</td><td>タグ対応 + リンク 0 件 / validate・probe / push</td><td>第 2 バッチのレビュー</td><td>push まで（docs/ content/ .claude/）・25 turns</td><td>—</td></tr>
+<tr><td>25-1</td><td>✅ → done（2026-09-21）</td><td>4 件（unittest / 表示・折りたたみ / 未登録の明記 / コミット・push）</td><td>なし</td><td>push まで（docs/ tools/）・20 turns</td><td>—</td></tr>
+<tr><td>25-2</td><td>⬜ → <strong>doing</strong></td><td>6 件（対応表 / アンカー / --plan-only の成功と失敗 / 表示・リンク / ルールとテンプレートの一致 / コミット・push）</td><td>なし（受け入れは 25-4）</td><td>push まで（docs/ tools/）・25 turns</td><td>本ステップ。着手時に存在した全ステップを移行対象にした</td></tr>
+<tr><td>25-3</td><td>⬜ → todo</td><td>5 件（入口 6 本の導線 / 一巡サンプル / git diff / unittest + --plan-only / コミット・push）</td><td>なし</td><td>push まで（docs/ .agents/ CLAUDE.md）・20 turns</td><td>—</td></tr>
+<tr><td>25-4</td><td>⬜ → todo</td><td>—（ユーザー判断）</td><td>このステップ自体（観点 ①〜④・go / no-go）</td><td>—（ゴールにしない）</td><td><code>data-kind="decision"</code></td></tr>
+</tbody>
+</table></div></li>
+<li><strong>フェーズ単位の保持</strong>: Phase 21・25 の<strong>ゴール文・経緯の <code>&lt;blockquote&gt;</code> はそのまま保持</strong>（新様式はステップの中だけを規定する）。21-4a と 21-4a-2 の間にあった「作問方針の変更（2026-09-07）」の <code>blockquote.decision</code> は、完了済みグループに畳むと読めなくなるため<strong>フェーズ直下へ移動</strong>し、見出しに「21-4a-2 / 21-4a-3 の前提」と補った。アンカー <code>#phase-21</code> <code>#phase-25</code> <code>#pending-checks</code> <code>#troubleshooting</code> <code>#design-issues</code> は維持し、ステップには新たに <code>id="step-&lt;ID&gt;"</code> を付与した</li>
+<li><strong>削除した節と移設先</strong>（独自情報の点検結果）:
+  <ul>
+  <li><strong>凡例</strong>（⬜ / ✅ / ⚠️）— 状態は <code>data-status</code> + 表示バッジになったため<strong>役目を終えて削除</strong>（下の移設ブロックに原文）</li>
+  <li><strong>進め方の方針</strong> — 「1 ステップ = 人間ゲート間の 1 ゴール」と切り方の目安 3 つ、<code>/goal</code> ラッパーの運用は<a href="index.html#step-format">計画体系 5</a>へ集約（<strong>計画体系 5 からの「開発計画『進め方の方針』参照」も解消</strong>）。記録の運用は計画体系 4 に既出。Phase の系譜（設計 → 構築 → 実装 → 拡充）は計画書「完了フェーズのサマリ」と本記録で追える。利用モデル・エフォートの方針は CLAUDE.md（Codex 連携）と本記録の割当表に既出。CDK の論理スタック ID / <code>-c env=prod</code> の注記は<a href="../infra/stacks.html">インフラ設計 stacks.html</a>と CLAUDE.md「よく使うコマンド」に既出。<strong>原文は下の移設ブロック</strong></li>
+  <li><strong>設計 Fix の運用ルール</strong> — 正は<a href="../index.html">docs/index.html</a> セクション 4（計画書の記述は要約の重複だった）。原文は移設ブロック</li>
+  <li><strong>現況と次の候補</strong> — 各ステップの状態・着手条件・現況が常時表示になったため<strong>進捗の重複を削除</strong>。残す価値のある「次のフェーズを起こすときの入口」（確認待ち / アイデア体系 / 課題体系 / 月次 KPI 転記）は完了フェーズのサマリ直下に 1 段落へ圧縮。原文は移設ブロック</li>
+  <li><strong>長い更新履歴</strong>（page-meta に積み上がっていた「前回:」6 世代）— 最新 1 件 + 「履歴は git 履歴と開発記録を参照」に置き換え</li>
+  </ul></li>
+<li><strong>I-014 の扱い</strong>（25-2 の ⑤）: 削除した「現況と次の候補」に書かれていた<strong>束ね方の説明</strong>（I-014・I-022・I-024 を <code>sns-post-batch</code> の次回改修で 1 フェーズにまとめる）を課題表内で完結させた。作業中、<strong>課題レーンの別セッションが同時に <a href="../issues/index.html#I-014">I-014</a> 行を書き替えており</strong>（2026-09-21 のユーザー承認「当回のセット × <code>scheduled_at</code> に固定」と、節目型トリガー「次の開発セッションで sns-post-batch 改修フェーズを起票するとき」を追記。<a href="../issues/index.html#I-017">I-017</a> の同梱も明記）、<strong>この時点で束ね方・起票の入口は課題表の中で完結していた</strong>。そのため本ステップでは I-014 行に重ねて書かず、<a href="../issues/index.html#I-022">I-022</a>・<a href="../issues/index.html#I-024">I-024</a> の対応方針列に「束ね方・起票の判断は I-014 の対応方針列が正」を足すだけにした。I-014 のトリガー（パス型・2 回発生済みで同梱必須）は従来どおりで、<strong>対策の実装は行っていない</strong></li>
+<li><strong>検査結果</strong>（会話に出力を貼付）:
+  <ul>
+  <li><code>python3 tools/docs_check.py --plan-only</code> → 構造チェック OK（不備 0 件 / 対象 1 ページ）・リンク不備 0 件・<strong>判定 OK</strong></li>
+  <li><strong>失敗の確認</strong>: <code>development-plan.html</code> の <code>data-plan-format</code> を消した複製で <code>--plan-only</code> 相当を実行 → <code>page-format</code> で NG・終了コード 1</li>
+  <li><code>python3 -m unittest discover -s tools/tests -p 'test_docs_plan_check.py'</code> → <code>Ran 14 tests</code> / <code>OK</code>（登録追加による影響なし）</li>
+  <li><code>python3 tools/docs_check.py --widths 360,390,768,1280 --baseline HEAD</code> → リンク / アンカー不備 <strong>今回差分 0 件・既存 0 件</strong>・4 幅すべて <strong>51 ページではみ出し 0 件</strong>・計画書の構造 OK</li>
+  <li><strong>カード表示の NG 5 件について</strong>: 1 回目の実行で <code>docs/issues/index.html</code> の I-014・I-017 行に「静的解析した文字列と、ブラウザーが読んだ文字列が違う」という NG が出た。原因は<strong>課題レーンの別セッションが測定中に同ファイルを書き替えていた</strong>ため（実行中にファイル更新時刻が動いた）。本ステップの変更に起因するものではなく、相手の編集が落ち着いた状態で再実行して 0 件を確認した</li>
+  </ul></li>
+<li><strong>触らなかったもの</strong>: セット計画書とその記録（未移行のまま）、<code>docs/assets/style.css</code> と <code>plans.css</code>、<code>CLAUDE.md</code> とスキル 6 本（25-3）、I-014 の対策コード、<code>docs/index.html</code> の設計 Fix ルール</li>
+</ul>
+<details class="phase"><summary>開発計画から削除した節の原文（2026-09-21・25-2 で移設）</summary>
+<p><em>以下は 25-2 の新様式移行で <code>development-plan.html</code> から削除した節の原文。移設先は上の「削除した節と移設先」を参照。</em></p>
+<h4>進め方の方針・設計 Fix の運用ルール・凡例（原文）</h4>
+<h2>進め方の方針</h2>
+<ul>
+<li><strong>設計（インフラ → アプリ）を先に固め、構築はインフラ → アプリ実装の順に進める</strong>
+  <ul><li>Phase D: インフラ設計の一時 Fix → Phase A: アプリ設計の大枠 → Phase 9: アプリ設計（詳細・前倒し）→ Phase 0〜8: インフラ構築 → Phase 10〜13: アプリ実装・定常運用開始 → Phase 14〜20: 収益化に向けた機能拡充と運用基盤の整備（上位方針は <a href="../strategy/business-strategy.html">事業戦略書</a>。優先順位は「リーチ獲得能力〔動画〕→ 勝負セット投入 → 効果測定 → 当たりが出てからプラットフォーム展開」の順）。前倒しの経緯は<a href="development-log.html">開発記録</a>の Phase A・9 を参照</li></ul></li>
+<li>各ステップで実際に AWS 上で稼働確認を行い、動作を確認してから次に進む</li>
+<li><strong>1 ステップ = 人間ゲート間の 1 ゴール</strong>（Phase 19-4〔2026-09-02〕で改訂。旧「1 ステップ = 1 プロンプト + ユーザー確認」）: ステップ境界は<strong>人間ゲート</strong>（稼働確認・レビュー・go / no-go・設計判断）だけで決め、「Claude が 1 ターンでこなせる量」では区切らない（<code>/goal</code> が完了条件まで自走するため）。切り方の目安は 3 つ — (a) ゲートのない連続作業（実装 → テスト → 設計書 → コミット）は 1 ステップにまとめる / (b) 確認・判断で終わる地点は境界に残し、ユーザー作業のステップはゴールにしない（「ユーザー判断・ゴール対象外」と明記する）/ (c) 20〜30 ターンを超えそうなもの・2 レーンをまたぐものは機械検証できる中間点で割る。ステップの記載様式（内容 / 完了条件 / 人間ゲート / 停止点・上限）の正は<a href="index.html#step-format">計画体系セクション 5</a>。各ゴールの終了後、ユーザーが人間ゲートの確認を行い、チェックを入れる</li>
+<li><strong>記録の運用</strong>: ステップ完了時、本書にはチェック + 完了日 + 要点（1〜2 行）のみを記録し、詳細な実施記録（検証内容・決定事項の全文）は <a href="development-log.html">開発記録</a>に追記する（計画書の肥大化防止。セット計画書 / セット記録も同じ作法）</li>
+<li><strong>ステップ実行は <code>/goal</code> をラッパーにする</strong>（Phase 19 で導入）: 計画書のステップ着手は <code>/step</code> スキルから行い（起動がレーン宣言と完了条件の宣言を兼ねる。開発レーン・セットレーン共通）、<code>services/</code> <code>shared/</code> への push 後は <code>/goal</code> で CodePipeline 完走を確認する。手順の正は CLAUDE.md、検討経緯は<a href="../ideas/claude-code-loop-goal-skills.html">アイデア詳細</a></li>
+<li><strong>利用モデル・エフォートレベル</strong>（2026-07-24 のトークン最適化検討で策定）: 壁打ち・設計 Fix・大型委譲成果物のレビューは Fable 5、それ以外の定型ステップは <code>/model</code> で最新の Opus に切り替える。Codex 委譲は terra / high を既定とし、機械的な横展開は luna、大型・新規性の高い実装は sol へ per-call で変更する（CLAUDE.md の Codex 連携ルールを参照）。エフォートは「確実にこなせる最低レベル」を選ぶ。フェーズ起票時にステップごとの割当を決め、完了後の割当実績は<a href="development-log.html">開発記録</a>の移設ブロック（割当表の原文）と git 履歴に残す</li>
+<li>CDK コマンド例では app 内の論理スタック ID（<code>FoundationStack</code> など）を指定する。<code>-c env=prod</code> により、CloudFormation 上の実スタック名は <code>Prod-FoundationStack</code> のように環境名付きで作成される</li>
+</ul>
+
+<h3>設計 Fix の運用ルール</h3>
+<p>設計書が Fix しない問題の再発防止ルール（詳細は <a href="../index.html">docs/index.html</a> セクション 4 を参照）:</p>
+<ul>
+<li>設計書は「<strong>次フェーズの作業に着手できる</strong>」水準で一時 Fix とする。「生成 AI の指摘ゼロ」は Fix 条件にしない</li>
+<li>生成 AI レビューは<strong>観点を限定</strong>して依頼し、<strong>最大 2 巡</strong>まで</li>
+<li>指摘は <strong>blocker</strong>（誤り・矛盾・欠落）と<strong>改善提案</strong>に分類し、blocker のみ修正する。改善提案・3 巡目以降の指摘は<a href="../issues/index.html">課題体系</a>に据え置き課題（トリガー付き）として起票する（2026-09-19 まで「設計課題リスト」〔本書末尾〕。22-2 で移設済み）</li>
+<li>インフラ設計書にアプリ仕様を書かない。アプリの論点は <a href="../app/index.html">docs/app/index.html</a> の検討メモへ</li>
+</ul>
+
+<h2>凡例</h2>
+<ul>
+<li>⬜ 未着手</li>
+<li>✅ 完了</li>
+<li>⚠️ 問題あり・要対応</li>
+</ul>
+<h4>現況と次の候補（原文・2026-09-21 時点）</h4>
+<h2>現況と次の候補</h2>
+<p>進行中の開発レーンのフェーズは <strong><a href="development-plan.html#phase-21">Phase 21: ウミガメのスープ参加型セット（第 4 セット）</a></strong>と <strong><a href="development-plan.html#phase-25">Phase 25: 計画書の可読性改善と記載様式の定着</a></strong>（2026-09-21 起票。課題 <a href="../issues/index.html#I-036">I-036</a> の展開。<strong>共通ルール改訂を含むためフリーズ窓で単独実施する</strong>。25-1 は 2026-09-21 完了。次は <code>/step 25-2</code>〔開発計画の移行と構造検査の有効化〕）の 2 本。Phase 21 は 2026-09-03 起票で、21-1〜21-3・21-4a・21-4a-2 が完了。現在のステップは <strong>21-4a-3</strong>〔作問スキルによる第 1 バッチの作問。2026-09-20 に 14 問〔story 7 / misdirection 7〕へ拡張し、U17 まで 8 問が人間ゲート通過・残り 6 問は story 型固定。1 問 = 2 ゴール〕で、次は <code>/step 21-4a-3</code>〔U18〕。<code>/step 21-6</code>〔コメント経路の本番化〕は独立のため並行して着手できる。資材は <code>content/umigame-stock/umigame-soup-1/batch-01/</code>〔申し送りは同 STATUS.md〕。方針変更の経緯（初稿 9 問の削除・スキル先行・14 問化）は Phase 21 節の各ステップと<a href="development-log.html">開発記録</a>を参照。<strong>Phase 24（設計書のスマホ閲覧対応）は 2026-09-21 に完了</strong>し「完了フェーズのサマリ」へ畳んだ（計画書の構成・ステップ表示の再設計は分離した I-036 → Phase 25 で扱う）。</p>
+<p>Phase 16・18・19・20・22・23 は完了し、上のサマリへ畳んだ（ステップ一覧の原文は開発記録の各 Phase 末尾の移設ブロック。旧「Phase XX: プラットフォーム展開」は<a href="../ideas/platform-expansion-tiktok.md">アイデア体系</a>へ移管）。次のフェーズは以下の候補から起票する。起票は<a href="index.html#step-format">計画体系セクション 5</a>の様式（4 項目 + 5.1 起票チェックリスト）に従い、着手は <code>/step</code> から行う。</p>
+<ul>
+<li><strong>Phase 20 の効果確認</strong> — 本書末尾の<a href="development-plan.html#pending-checks">確認待ちリスト</a>（トリガー: 2026-09-04 21:00 JST 以降）。NG なら 20-1 の追補ステップを起こす</li>
+<li><strong>アイデア体系の条件待ち</strong> — <a href="../ideas/index.html">アイデア体系</a>セクション 2 の条件列を節目で確認する。<a href="../ideas/platform-expansion-tiktok.md">プラットフォーム展開（TikTok）</a>は再醸成待ち（条件: 勝負セットで KPI M2 到達の目安）、<a href="../ideas/umigame-soup-set.md">ウミガメのスープ参加型アカウント</a>は 2026-09-03 に採用し <a href="development-plan.html#phase-21">Phase 21</a> へ、<a href="../ideas/docs-responsive-mobile.html">設計書 HTML のスマホ閲覧対応</a>は 2026-09-21 に採用し <a href="development-log.html#phase-24">Phase 24</a> へ展開済み</li>
+<li><strong>課題体系の「sns-post-batch の次回改修時」項目</strong>（<a href="../issues/index.html#lane-dev">課題体系 1.1</a> の <a href="../issues/index.html#I-014">I-014</a>〔空 run。2 回発生済みで同梱必須〕・<a href="../issues/index.html#I-022">I-022</a>〔shared 昇格・v25.0〕・<a href="../issues/index.html#I-024">I-024</a>〔コンテナ ERROR の理由〕） — sns-post-batch の次回改修（shared 昇格版への載せ替え・Graph API v25.0 化・コンテナ ERROR の理由取得）など、トリガーが揃った課題を束ねて 1 フェーズとして起票する</li>
+<li><strong>月次 KPI 転記</strong> — 毎月 4 日以降に<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>の手順で行う定常作業（フェーズにはしない）</li>
+</ul>
+</details>
+
 <details class="phase" id="incidents" open><summary>事象記録（横断・基盤のトラブル）</summary>
 <p>横断・基盤起因のトラブルの<strong>事象</strong>（起きたこと・復旧・解決策）を記録する（22-2〔2026-09-19〕で開発計画の旧「トラブルシューティングログ」3 行を移設。切り分けのルールは<a href="../issues/index.html#rule-incident">課題体系 4.7</a>）。セット固有の事象は各セット記録（<code>docs/plans/&lt;set_code&gt;-log.html</code>）へ。これから変えるべきこと（恒久対策）は本節に書かず<a href="../issues/index.html">課題体系</a>へ起票する。</p>
 <div class="table-wrap"><table>

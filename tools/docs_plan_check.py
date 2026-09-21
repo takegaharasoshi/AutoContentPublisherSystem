@@ -13,8 +13,9 @@ from typing import Iterable, Sequence
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # 本番の検査対象ページ（リポジトリルートからの相対パス）。
-# 25-1 時点では空。Phase 25-2 で "docs/plans/development-plan.html" を登録する。
-REGISTERED_PAGES: tuple[str, ...] = ()
+# 新様式へ移行した計画書だけを登録する（未移行のセット計画書は対象外）。
+# 25-2（2026-09-21）で開発計画を登録した。
+REGISTERED_PAGES: tuple[str, ...] = ("docs/plans/development-plan.html",)
 
 _VOID_TAGS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link",

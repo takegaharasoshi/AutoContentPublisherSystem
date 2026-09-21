@@ -5,55 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>開発計画 | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body>
+<body data-plan-format="1">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / 開発計画</nav>
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-21（<strong>25-1 完了</strong>: 表示・検査の基盤 4 ファイル〔テンプレート・<code>plans.css</code>・<code>docs_plan_check.py</code>・テスト〕を新設。実ページは未登録で、次は <code>/step 25-2</code>）。前回: 2026-09-21（<strong>Phase 25 起票</strong>: 課題 <a href="../issues/index.html#I-036">I-036</a>〔計画書が PC でもスマホでも読みにくい〕を <a href="#phase-25">Phase 25: 計画書の可読性改善と記載様式の定着</a>〔25-1 表示・検査の基盤 / 25-2 開発計画の移行と構造検査の有効化 / 25-3 計画の更新入口の統一 / 25-4 本適用の受け入れ〔ユーザー判断〕〕として展開。開発計画へ先行適用し、セット計画書の変換は対象外。進行中は Phase 21・25 の 2 本）。前回: 2026-09-21（<strong>Phase 24 完了</strong>: 24-2〔課題・アイデア一覧のカード化〕・24-3〔実機確認 = <strong>go</strong>〕が完了し、Phase 24 を「完了フェーズのサマリ」へ畳んだ〔ステップ一覧の原文は<a href="development-log.html">開発記録</a>の移設ブロック〕。一次確認で見つかった端末キャッシュ問題も同日対処済み。進行中は Phase 21 のみ）。前回: 2026-09-21（<strong>計画書の整理</strong>: 完了した Phase 22・23 を「完了フェーズのサマリ」へ畳み〔ステップ一覧の原文は<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロック〕、「現況と次の候補」と本欄を現況だけに書き直した。進行中は Phase 21 のみ。開発レーンの次は <code>/step 21-4a-3</code>〔U18〕または <code>/step 21-6</code>）。前回: 2026-09-21（23-4 完了 → Phase 23 完了。AGENTS.md の禁止パス例外と <code>quiz-stock-replenish</code> の Codex 側ゴール緩和を反映）。前回: 2026-09-20（21-4a-3 を 14 問体制〔story 7 / misdirection 7〕へ再定義・U17 通過で 8 問）。それ以前の更新履歴は git 履歴と開発記録を参照。</span>
+  <span>最終更新: 2026-09-21（<strong>25-2</strong>: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ（Phase 18 で 2 レーン化）</span>
-  本書は<strong>開発レーン</strong>（フェーズ制の新規開発・基盤改修。<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>・共通設計書に触れる作業）の計画書。セット別の保守運用・セット内で閉じる改修は各<strong>セット計画書</strong>（<a href="index.html">計画体系の目次</a>参照）で管理する。レーンの判定ルール・並行作業ルールの正は <a href="index.html">index.html</a>。
+  本書は<strong>開発レーン</strong>（フェーズ制の新規開発・基盤改修。<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>・共通設計書に触れる作業）の計画書。セット別の保守運用・セット内で閉じる改修は各<strong>セット計画書</strong>（<a href="index.html">計画体系の目次</a>参照）で管理する。<strong>レーン判定・並行作業ルール・ステップの記載様式・記録の分担の正は <a href="index.html">計画体系</a></strong>で、本書では繰り返さない。着手は <code>/step &lt;識別子&gt;</code> から行う。
 </div>
-
-<h2>進め方の方針</h2>
-<ul>
-<li><strong>設計（インフラ → アプリ）を先に固め、構築はインフラ → アプリ実装の順に進める</strong>
-  <ul><li>Phase D: インフラ設計の一時 Fix → Phase A: アプリ設計の大枠 → Phase 9: アプリ設計（詳細・前倒し）→ Phase 0〜8: インフラ構築 → Phase 10〜13: アプリ実装・定常運用開始 → Phase 14〜20: 収益化に向けた機能拡充と運用基盤の整備（上位方針は <a href="../strategy/business-strategy.html">事業戦略書</a>。優先順位は「リーチ獲得能力〔動画〕→ 勝負セット投入 → 効果測定 → 当たりが出てからプラットフォーム展開」の順）。前倒しの経緯は<a href="development-log.html">開発記録</a>の Phase A・9 を参照</li></ul></li>
-<li>各ステップで実際に AWS 上で稼働確認を行い、動作を確認してから次に進む</li>
-<li><strong>1 ステップ = 人間ゲート間の 1 ゴール</strong>（Phase 19-4〔2026-09-02〕で改訂。旧「1 ステップ = 1 プロンプト + ユーザー確認」）: ステップ境界は<strong>人間ゲート</strong>（稼働確認・レビュー・go / no-go・設計判断）だけで決め、「Claude が 1 ターンでこなせる量」では区切らない（<code>/goal</code> が完了条件まで自走するため）。切り方の目安は 3 つ — (a) ゲートのない連続作業（実装 → テスト → 設計書 → コミット）は 1 ステップにまとめる / (b) 確認・判断で終わる地点は境界に残し、ユーザー作業のステップはゴールにしない（「ユーザー判断・ゴール対象外」と明記する）/ (c) 20〜30 ターンを超えそうなもの・2 レーンをまたぐものは機械検証できる中間点で割る。ステップの記載様式（内容 / 完了条件 / 人間ゲート / 停止点・上限）の正は<a href="index.html#step-format">計画体系セクション 5</a>。各ゴールの終了後、ユーザーが人間ゲートの確認を行い、チェックを入れる</li>
-<li><strong>記録の運用</strong>: ステップ完了時、本書にはチェック + 完了日 + 要点（1〜2 行）のみを記録し、詳細な実施記録（検証内容・決定事項の全文）は <a href="development-log.html">開発記録</a>に追記する（計画書の肥大化防止。セット計画書 / セット記録も同じ作法）</li>
-<li><strong>ステップ実行は <code>/goal</code> をラッパーにする</strong>（Phase 19 で導入）: 計画書のステップ着手は <code>/step</code> スキルから行い（起動がレーン宣言と完了条件の宣言を兼ねる。開発レーン・セットレーン共通）、<code>services/</code> <code>shared/</code> への push 後は <code>/goal</code> で CodePipeline 完走を確認する。手順の正は CLAUDE.md、検討経緯は<a href="../ideas/claude-code-loop-goal-skills.html">アイデア詳細</a></li>
-<li><strong>利用モデル・エフォートレベル</strong>（2026-07-24 のトークン最適化検討で策定）: 壁打ち・設計 Fix・大型委譲成果物のレビューは Fable 5、それ以外の定型ステップは <code>/model</code> で最新の Opus に切り替える。Codex 委譲は terra / high を既定とし、機械的な横展開は luna、大型・新規性の高い実装は sol へ per-call で変更する（CLAUDE.md の Codex 連携ルールを参照）。エフォートは「確実にこなせる最低レベル」を選ぶ。フェーズ起票時にステップごとの割当を決め、完了後の割当実績は<a href="development-log.html">開発記録</a>の移設ブロック（割当表の原文）と git 履歴に残す</li>
-<li>CDK コマンド例では app 内の論理スタック ID（<code>FoundationStack</code> など）を指定する。<code>-c env=prod</code> により、CloudFormation 上の実スタック名は <code>Prod-FoundationStack</code> のように環境名付きで作成される</li>
-</ul>
-
-<h3>設計 Fix の運用ルール</h3>
-<p>設計書が Fix しない問題の再発防止ルール（詳細は <a href="../index.html">docs/index.html</a> セクション 4 を参照）:</p>
-<ul>
-<li>設計書は「<strong>次フェーズの作業に着手できる</strong>」水準で一時 Fix とする。「生成 AI の指摘ゼロ」は Fix 条件にしない</li>
-<li>生成 AI レビューは<strong>観点を限定</strong>して依頼し、<strong>最大 2 巡</strong>まで</li>
-<li>指摘は <strong>blocker</strong>（誤り・矛盾・欠落）と<strong>改善提案</strong>に分類し、blocker のみ修正する。改善提案・3 巡目以降の指摘は<a href="../issues/index.html">課題体系</a>に据え置き課題（トリガー付き）として起票する（2026-09-19 まで「設計課題リスト」〔本書末尾〕。22-2 で移設済み）</li>
-<li>インフラ設計書にアプリ仕様を書かない。アプリの論点は <a href="../app/index.html">docs/app/index.html</a> の検討メモへ</li>
-</ul>
-
-<h2>凡例</h2>
-<ul>
-<li>⬜ 未着手</li>
-<li>✅ 完了</li>
-<li>⚠️ 問題あり・要対応</li>
-</ul>
-
-<hr>
 
 <h2>完了フェーズのサマリ</h2>
 <p>設計（Phase D・A・9）・インフラ構築（Phase 0〜8）・アプリ実装と定常運用開始（Phase 10〜13）は 2026-07-06〜07-23 に、動画・リール対応（Phase 14）と勝負セットの投入（Phase 15）は 2026-07-23〜07-30 に、インサイト収集と KPI 運用（Phase 16）は 2026-08-01〜09-03 に、第 3 セット構築（Phase 17）は 2026-08-09〜08-28 に、プロジェクト管理の 2 レーン化（Phase 18）と <code>/goal</code> 組み込み（Phase 19）は 2026-08-28〜09-02 に、fantasy-animals-1 の停止（Phase 20）は 2026-09-03 に、課題体系の新設（Phase 22）は 2026-09-19 に、Codex 直接セッションの導入（Phase 23）は 2026-09-20〜09-21 に、設計書 HTML のスマホ閲覧対応（Phase 24）は 2026-09-21 に完了済み。各ステップの実施記録（確認・備考の全文）と、完了時に計画書から移設したステップ一覧の原文は<a href="development-log.html">開発記録</a>を参照。</p>
-<details class="phase"><summary>完了フェーズ一覧（Phase D〜23・クリックで展開）</summary>
+<details class="phase"><summary>完了フェーズ一覧（Phase D〜24・クリックで展開）</summary>
 <div class="table-wrap"><table>
 <thead><tr><th>Phase</th><th>ゴール（達成済み）</th></tr></thead>
 <tbody>
@@ -82,163 +53,653 @@
 <tr><td>Phase 19: 開発プロセスへの <code>/goal</code> 組み込み</td><td><code>/step</code> スキル新設（両レーンのステップ着手 = レーン宣言 + ゴール宣言）・CodePipeline 完走待ちの <code>/goal</code> 化・補充スキル 2 本への組み込み・ステップ単位を「人間ゲート間の 1 ゴール」へ改訂（<a href="index.html#step-format">計画体系 5</a>）・確認待ちリスト（トリガー付き）の導入。2026-09-02 完了。各スキルの初回試行は確認待ちリストで追う。検討経緯は<a href="../ideas/claude-code-loop-goal-skills.html">アイデア詳細</a></td></tr>
 <tr><td>Phase 20: fantasy-animals-1 の停止</td><td>16-5 の停止決定を受け、CDK から Scheduler 3 件を削除・<code>batch_sets.is_active = 0</code>・セット別設計書 / 事業戦略書 / 運用設計 2.2 を更新。2026-09-03 に人間ゲート（push → <code>cdk deploy</code> → Aurora の UPDATE）まで完了し、<a href="../app/operation.html#set-retire">運用設計 2.2 セット廃止</a>の初回実地検証を兼ねた（資材・DB レコードは残置）。停止の効果確認は<a href="#pending-checks">確認待ちリスト</a></td></tr>
 <tr><td>Phase 22: 課題体系の新設</td><td>課題体系 <code>docs/issues/</code>（レーン別 live 表 + クローズ節。4 ステータス・据え置きはトリガー必須・2 回目の発生で据え置き不可）を新設し、設計課題リスト・セットバックログ・トラブルシューティングログを廃止して <code>I-001</code>〜<code>I-035</code> として移設。スキル <code>/issue</code>・<code>/incident</code> を新設し、<code>/step</code>〔触るパス〕・補充スキル〔セット名〕・<code>/idea</code>〔採用転記〕の起動時照合を組み込んだ。2026-09-19 に 4 ステップを同日完了。検討経緯は<a href="../ideas/issue-tracking-system.md">アイデア記録</a>、ルールの正は<a href="../issues/index.html">課題体系</a>。<code>/incident</code>・<code>/issue</code> 壁打ちの初回試行は<a href="#pending-checks">確認待ちリスト</a></td></tr>
-<tr><td>Phase 24: 設計書 HTML のスマホ閲覧対応</td><td>狭い画面（768 CSS px 未満）で <code>docs/assets/style.css</code> の一般表を <code>width: max-content</code> + セル上限 16rem にして列の潰れを解消し（収まらない分は表内の横スクロール）、課題・アイデア一覧は <code>table[data-cards]</code> + <code>docs/assets/docs-cards.js</code>〔外部依存なし〕で<strong>1 行 = 1 カード</strong>（常時表示 + 補足の折りたたみ）に切り替えた。表の DOM をそのまま使うためPC 幅は改修前と同一・文章の二重管理なし。検証ツール <code>tools/docs_check.py</code> を新設し、46 ページ・202 表の横はみ出し 0 件 / リンク整合 / カード表示を機械検証する。2026-09-21 に 3 ステップを同日完了（24-3 の実機確認で <strong>go</strong>）。一次確認は端末のキャッシュで旧 CSS が使われて判定不能となり、<code>tools/docs_server.py</code> の <code>Cache-Control: no-store</code>・<code>style.css?v=20260921</code>・カード未適用時の警告表示を追加して解消（<a href="development-log.html#step-24-3-cache">経緯</a>）。検討経緯は<a href="../ideas/docs-responsive-mobile.html">アイデア詳細</a></td></tr>
 <tr><td>Phase 23: Codex 直接セッションの導入</td><td>スキル実体 8 本を <code>.agents/skills/</code> に集約して <code>.claude/skills/</code> は相対シンボリックリンクにし、AGENTS.md を「MCP ワーカー / 直接セッション」の 2 節構成〔並行可レーン限定の許可 / 禁止パス。禁止パスもユーザーが指示文で名指しした場合のみ可〕に書き換え、<code>idea</code> <code>issue</code> <code>quiz-stock-replenish</code> を両エージェント対応に中立化〔Codex 側は <code>/goal</code> 不要・進捗は <code>STATUS.md</code>〕。ユーザー試行 3 セッションは終了規律まで完走・許可パス外なし。2026-09-20〜09-21 に完了。運用形は Windows の Codex デスクトップアプリ + WSL 実行環境（bubblewrap 0.12.0）。検討経緯は<a href="../ideas/codex-direct-operation.html">アイデア詳細</a>、ルールの正は <code>AGENTS.md</code>。週次補充の Codex 試行は<a href="logic-training-1.html#pending-checks">logic-training-1 計画書の確認待ち</a></td></tr>
+<tr><td>Phase 24: 設計書 HTML のスマホ閲覧対応</td><td>狭い画面（768 CSS px 未満）で <code>docs/assets/style.css</code> の一般表を <code>width: max-content</code> + セル上限 16rem にして列の潰れを解消し（収まらない分は表内の横スクロール）、課題・アイデア一覧は <code>table[data-cards]</code> + <code>docs/assets/docs-cards.js</code>〔外部依存なし〕で<strong>1 行 = 1 カード</strong>（常時表示 + 補足の折りたたみ）に切り替えた。表の DOM をそのまま使うため PC 幅は改修前と同一・文章の二重管理なし。検証ツール <code>tools/docs_check.py</code> を新設し、46 ページ・202 表の横はみ出し 0 件 / リンク整合 / カード表示を機械検証する。2026-09-21 に 3 ステップを同日完了（24-3 の実機確認で <strong>go</strong>）。一次確認は端末のキャッシュで旧 CSS が使われて判定不能となり、<code>tools/docs_server.py</code> の <code>Cache-Control: no-store</code>・<code>style.css?v=20260921</code>・カード未適用時の警告表示を追加して解消（<a href="development-log.html#step-24-3-cache">経緯</a>）。検討経緯は<a href="../ideas/docs-responsive-mobile.html">アイデア詳細</a></td></tr>
 </tbody>
 </table></div>
 </details>
 
-<hr>
-
-<h2>現況と次の候補</h2>
-<p>進行中の開発レーンのフェーズは <strong><a href="#phase-21">Phase 21: ウミガメのスープ参加型セット（第 4 セット）</a></strong>と <strong><a href="#phase-25">Phase 25: 計画書の可読性改善と記載様式の定着</a></strong>（2026-09-21 起票。課題 <a href="../issues/index.html#I-036">I-036</a> の展開。<strong>共通ルール改訂を含むためフリーズ窓で単独実施する</strong>。25-1 は 2026-09-21 完了。次は <code>/step 25-2</code>〔開発計画の移行と構造検査の有効化〕）の 2 本。Phase 21 は 2026-09-03 起票で、21-1〜21-3・21-4a・21-4a-2 が完了。現在のステップは <strong>21-4a-3</strong>〔作問スキルによる第 1 バッチの作問。2026-09-20 に 14 問〔story 7 / misdirection 7〕へ拡張し、U17 まで 8 問が人間ゲート通過・残り 6 問は story 型固定。1 問 = 2 ゴール〕で、次は <code>/step 21-4a-3</code>〔U18〕。<code>/step 21-6</code>〔コメント経路の本番化〕は独立のため並行して着手できる。資材は <code>content/umigame-stock/umigame-soup-1/batch-01/</code>〔申し送りは同 STATUS.md〕。方針変更の経緯（初稿 9 問の削除・スキル先行・14 問化）は Phase 21 節の各ステップと<a href="development-log.html">開発記録</a>を参照。<strong>Phase 24（設計書のスマホ閲覧対応）は 2026-09-21 に完了</strong>し「完了フェーズのサマリ」へ畳んだ（計画書の構成・ステップ表示の再設計は分離した I-036 → Phase 25 で扱う）。</p>
-<p>Phase 16・18・19・20・22・23 は完了し、上のサマリへ畳んだ（ステップ一覧の原文は開発記録の各 Phase 末尾の移設ブロック。旧「Phase XX: プラットフォーム展開」は<a href="../ideas/platform-expansion-tiktok.md">アイデア体系</a>へ移管）。次のフェーズは以下の候補から起票する。起票は<a href="index.html#step-format">計画体系セクション 5</a>の様式（4 項目 + 5.1 起票チェックリスト）に従い、着手は <code>/step</code> から行う。</p>
-<ul>
-<li><strong>Phase 20 の効果確認</strong> — 本書末尾の<a href="#pending-checks">確認待ちリスト</a>（トリガー: 2026-09-04 21:00 JST 以降）。NG なら 20-1 の追補ステップを起こす</li>
-<li><strong>アイデア体系の条件待ち</strong> — <a href="../ideas/index.html">アイデア体系</a>セクション 2 の条件列を節目で確認する。<a href="../ideas/platform-expansion-tiktok.md">プラットフォーム展開（TikTok）</a>は再醸成待ち（条件: 勝負セットで KPI M2 到達の目安）、<a href="../ideas/umigame-soup-set.md">ウミガメのスープ参加型アカウント</a>は 2026-09-03 に採用し <a href="#phase-21">Phase 21</a> へ、<a href="../ideas/docs-responsive-mobile.html">設計書 HTML のスマホ閲覧対応</a>は 2026-09-21 に採用し <a href="development-log.html#phase-24">Phase 24</a> へ展開済み</li>
-<li><strong>課題体系の「sns-post-batch の次回改修時」項目</strong>（<a href="../issues/index.html#lane-dev">課題体系 1.1</a> の <a href="../issues/index.html#I-014">I-014</a>〔空 run。2 回発生済みで同梱必須〕・<a href="../issues/index.html#I-022">I-022</a>〔shared 昇格・v25.0〕・<a href="../issues/index.html#I-024">I-024</a>〔コンテナ ERROR の理由〕） — sns-post-batch の次回改修（shared 昇格版への載せ替え・Graph API v25.0 化・コンテナ ERROR の理由取得）など、トリガーが揃った課題を束ねて 1 フェーズとして起票する</li>
-<li><strong>月次 KPI 転記</strong> — 毎月 4 日以降に<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>の手順で行う定常作業（フェーズにはしない）</li>
-</ul>
+<p><strong>次のフェーズを起こすときの入口</strong>: <a href="#pending-checks">確認待ちリスト</a>（トリガーが来た項目）/ <a href="../ideas/index.html">アイデア体系</a>セクション 2 の条件待ち / <a href="../issues/index.html#lane-dev">課題体系の開発レーン節</a>（トリガーが揃った据え置き課題。束ね方・同梱の要否は課題表の対応方針・トリガー列が正）/ 月次 KPI 転記は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>の定常作業でフェーズにしない。起票は<a href="index.html#step-checklist">計画体系 5.1</a> のチェックリストに従う。</p>
 
 <hr>
 
-<h2 id="phase-21">Phase 21: ウミガメのスープ参加型セット（第 4 セット）</h2>
+<section class="plan-phase" data-plan-phase="21" id="phase-21">
+<h2>Phase 21: ウミガメのスープ参加型セット（第 4 セット）</h2>
 <p><strong>ゴール</strong>: Instagram リールで 1 日 1 問の「ウミガメのスープ」（水平思考クイズ）を投稿し、コメント欄の質問に AI 出題者が「はい / いいえ / 関係ありません」で自動返信する参加型セットを新設して稼働開始し、運用をセットレーンへ移管する。<strong>コメント自動返信は外向き発信・イングレスを持つ初の機能</strong>であり、投稿時（既存 ECS + Aurora）とコメント時（S3 スナップショット + Lambda・Aurora 不使用）を完全分離する構成をとる</p>
 <blockquote>経緯: アイデア体系で 2 回の壁打ち（2026-08-28。企画・事業面の論点は全決着）→ 待機（採用条件 = Meta コメント Webhook + AI 自動返信 PoC の成功）→ <strong>PoC 成功（2026-09-03）</strong>→ 採用・本フェーズ起票。インプットは<a href="../ideas/umigame-soup-set.html">アイデア詳細</a>（設計書に非ず。設計 Fix は 21-3 で <code>docs/app/</code> <code>docs/infra/</code> 側で行う）と PoC 資材 <code>poc/umigame-comment-webhook/</code> + <code>UmigamePocStack</code>（実測: 公開モード必須・App Review 不要・役割なしの一般アカウントのコメントも届く・受信 → 返信 約 4 秒・署名鍵は Instagram アプリシークレット）。PoC 資材（Meta アプリ + テスト用アカウント <code>test_tkghr</code>）は課題体系 <a href="../issues/index.html#I-027">I-027</a> の決定どおりコメント経路のステージング面として恒久利用する。<code>set_code</code> は 21-1（2026-09-03）で <code>umigame-soup-1</code> に確定した（決定一覧は <a href="../app/requirements-notes-set4.html">壁打ち記録</a>）。
 <strong>ストックの単位は「問題文 + 真相 + 確定事実シート」だけではなく、リール 1 本を作るのに要る素材一式</strong>（イラスト作成用プロンプト・フック文・プレイ例・キャプション等）とし、その項目は<strong>完成版リールの PoC（21-2）で動画のイメージを固めてから確定</strong>する（2026-09-03 のユーザー指示。動画のイメージがないままストックをレビューするのは難しいため）。<strong>動画生成は本セットから Remotion 公式の Agent Skills「Remotion Skills 2.0」を使ってコンポジションを作る</strong>（2026-09-03 ユーザー決定。2.0 は <a href="https://x.com/Remotion/status/2089295038932996194">2026-08-17 の公式発表</a>で、要点は Sub-skills〔remotion-create / remotion-markup / remotion-render / remotion-docs 等 12 本への分割〕・Interactive〔Studio での編集性〕・Taste-neutral〔デザインの好みを押し付けない指針〕。導入は <code>npx remotion skills add</code>〔公式既定は <code>.agents/skills</code> に入れ <code>.claude/skills</code> をシンボリックリンクにする〕または <code>npx skills add remotion-dev/skills</code>。導入時点の最新版を使い、導入した版はコミットで固定する）。レンダリングの実行経路は既存どおり <code>build.py</code> からの Docker 委譲（<code>npx remotion render</code>）を維持し、スキルはコンポジションの設計・実装の指針として使う。ステップ順は 21-1 → 21-2 → 21-3 → 21-4a → 21-4a-2 → 21-4a-3 → 21-4b → 21-5a/b → 21-6 → 21-7 → 21-8（21-6 は 21-4・21-5 と独立のため前倒し可。21-4a-2/3 は 2026-09-07 の作問方針変更で分割）</blockquote>
-<ul>
-<li>✅ <strong>21-1</strong> テーマ・企画の Fix 壁打ち（<strong>ユーザー判断・ゴール対象外</strong>） — 2026-09-03（<code>/step 21-1</code> で着手・ゴールは立てず壁打ちで ①〜⑧ を決定。要点: <code>umigame-soup-1</code> / <code>umigame.soup.jp</code>・版面は logic-training-1 の骨格に寄せ 20 秒 1 尺・出題者〔探偵風ウミガメ〕+ 質問者〔助手〕の 2 体・ナレーションは問題文 + ルール帯のみ・背景イラスト・方式名 <code>umigame-prebuilt</code>・Remotion Skills は skills CLI で 6 本をルート導入・20:00 投稿・固定コメントと助手サブアカは初期版なし・モデル gpt-5.6-luna・Function URL + SQS 経路と <code>services/comment-reply/</code> の CDK asset・投稿は既存 Meta アプリ流用 + コメント Webhook だけ新規アプリ・プライバシーポリシーは S3 静的ホスティング・PoC の 1 問は古典「ウミガメのスープ」。記録は <a href="../app/requirements-notes-set4.html">requirements-notes-set4.html</a>、後続への引き継ぎ〔media_id 照合・luna の単価確認・skills CLI の配置実測〕は同書セクション 2）
-  <ul>
-  <li>内容: アイデア詳細をインプットに、実装に必要な未確定点を壁打ちで決める。① <code>set_code</code>・アカウント名・ユーザーネーム ② リール版面（問題文 + プレイ例 2〜3 往復の焼き込み）・尺・ナレーション有無（VOICEVOX）・BGM・イラストの要否と画風 ③ 生成方式（Remotion ローカル事前ビルド = ranking-prebuilt 同型。コンポジションは Remotion Skills を使って作る〔決定済み〕。定常費ゼロ路線）と Remotion Skills の導入先（公式既定の <code>.agents/skills</code> + <code>.claude/skills</code> シンボリックリンクは、本リポジトリの <code>.claude/skills/</code> が自前スキルの実ディレクトリのためそのままでは使えない。候補: ① <code>.agents/skills</code> に入れて remotion-* だけ <code>.claude/skills/</code> へ個別リンク〔Codex 委譲でも同じ指針を読める。推奨〕② <code>npx skills add</code> で <code>.claude/skills/</code> 直下に入れる ③ ユーザー側 <code>~/.claude/skills/</code>。いずれもコミット対象と更新手順〔<code>npx remotion skills update</code>〕を決める） ④ 投稿時刻・固定コメント文面・助手サブアカウントの初期要否 ⑤ AI 出題者のモデル（PoC は gpt-4o-mini）と月額試算・利用上限 ⑥ コメント経路の構成（PoC の Function URL 直結を本番でも使うか、API Gateway + SQS 分離か）と Lambda コードの置き場・デプロイ方式（CDK asset か CodePipeline か） ⑦ 本番 Meta アプリ（新規・公開モード）と PoC アプリ（ステージング）の使い分け・<code>UmigamePocStack</code> の扱い ⑧ ストック 1 件の素材項目の<strong>仮リスト</strong>（問題文・真相・確定事実シート・想定質問・イラスト作成用プロンプト・フック文・プレイ例・キャプション・出典メモ等。確定は 21-2 の PoC 後）と 21-2 で作る PoC 用の 1 問の選定。記録は <code>docs/app/requirements-notes-set4.html</code></li>
-  <li>完了条件: —（ユーザー判断）</li>
-  <li>人間ゲート: 上記 ①〜⑧ の決定</li>
-  <li>停止点・上限: —（ゴールにしない）</li>
-  </ul></li>
-<li>✅ <strong>21-2</strong> リール動画の PoC — 完成版 1 本を作って動画のイメージを固める（21-1 完了後） — 2026-09-04 に自走分を完了（<code>/step 21-2</code> → <code>/goal</code>。要点: Remotion Skills 2.0〔skills CLI 1.5.23・スキル版 4.0.520・6 本〕を <code>.agents/skills</code> 正本 + <code>.claude/skills</code> スキル単位リンクで導入し自前スキルと共存を実測 / 古典 1 問の素材一式を <code>content/video-build/umigame-soup-1/poc/classic-umigame/</code> に整備〔イラスト 4 枚は Codex CLI の <code>image_gen.imagegen</code> で生成 = 手作業不要〕/ <code>remotion-create</code> の雛形 + <code>remotion-markup</code> の指針〔<code>Interactive.Div</code>・inline <code>interpolate()</code>・<code>@remotion/media</code>〕でコンポジションを作り、既存の Docker 委譲で 1080x1920・30fps・20 秒・AAC の MP4 を生成 / VOICEVOX 話者は 3 候補を実測し玄野武宏〔11〕のみ 17 秒予算に収まったため PoC 採用 / 所見は README セクション 5。人間ゲートは 2 巡で通過〔第 1 巡: 指示 5 点 → 第 2 稿〔画風 C4・グルメ探偵カメロック + Jr.・24 秒・Polly Takumi 125%・質問 + 返答の並列表示・効果 8 種〕/ 第 2 巡: Jr. の視線と版面の中央寄せ → 第 3 稿で<strong>承認</strong>〕。<strong>3 判断とも承認: フォーマット go / 素材項目 14 項目を確定〔README セクション 0〕/ Remotion Skills は標準ツーリングとして継続</strong>。記録は<a href="development-log.html">開発記録</a>）
-  <ul>
-  <li>内容: 21-1 で選んだ仮の 1 問について、<strong>ストック 1 件分の素材一式を手作業で揃え、完成版のリール MP4 を 1 本作る</strong>。① 素材: 問題文・真相・確定事実シート・想定質問 15〜20・イラスト作成用プロンプト（→ imagegen でイラスト生成）・フック文・プレイ例 2〜3 往復・キャプション案・BGM（CC0）を <code>content/video-build/umigame-soup-1/poc/</code> に 1 問 = 1 ディレクトリで置く ② <strong>Remotion Skills 2.0 を導入</strong>（<code>npx remotion skills add</code> または <code>npx skills add remotion-dev/skills</code>。21-1 で決めた導入先。導入された版・スキル一覧を <code>content/video-build/umigame-soup-1/README.md</code> に記録）し、<code>/remotion-create</code> <code>/remotion-markup</code> の指針に従って <code>content/video-build/umigame-soup-1/remotion/</code> にコンポジション（フック → 問題文 → プレイ例のアニメーション → 質問を促す締め。ナレーションは 21-1 の決定次第）を作る。レンダリングは既存の Docker 委譲手順（<code>build.py</code>）で行い、<code>/remotion-render</code> の指針と食い違う点があれば README に記録 ③ 版面の静止フレーム（各カット 1 枚）を書き出してレビュー用に並べる ④ 既存 2 セット（logic-training-1 / pref-ranking-1）の手組みコンポジションとの差（開発速度・品質・指針との乖離）を README に所見として残す</li>
-  <li>完了条件: Remotion Skills が導入されている（<code>ls</code> でスキルディレクトリ一覧を貼る）。完成版 MP4 が 1 本生成され、ffprobe の寸法（9:16）・尺・音声トラックが 21-1 の仕様どおり（出力を貼る）。素材ディレクトリに ① の項目が揃っている（ls の一覧）。push</li>
-  <li>人間ゲート: 完成版動画の目視レビュー（フック・版面・テンポ・イラストの画風・キャプション）。<strong>修正はレビュー中に反復し、この動画をもってストックの素材項目（何を執筆・生成・レビューするか）を確定する</strong>。フォーマット自体の go / no-go と、<strong>Remotion Skills を本セットの標準ツーリングとして続けるかの判断</strong>もここで行う（既存 2 セットへの遡及適用は本フェーズの対象外。価値があればアイデア体系またはセット計画書の改修として起票する）</li>
-  <li>停止点・上限: push まで（content/ のみ）。stop after 30 turns</li>
-  </ul></li>
-<li>✅ <strong>21-3</strong> 設計書 Fix（21-2 のレビュー完了後。<strong>21-2 の確定事項を反映する</strong>: 24 秒 720 フレームの版面・素材項目 14 項目・TTS は Amazon Polly Neural〔Takumi 125%〕でクレジット不要・BGM は 24 秒トラックで調達・Remotion Skills 継続。詳細は <code>content/video-build/umigame-soup-1/README.md</code> セクション 0） — 2026-09-04 に自走分を完了（<code>/step 21-3</code> → <code>/goal</code>。要点: 新規 2 本 = セット別設計書 <a href="../app/sets/umigame-soup-1.html">sets/umigame-soup-1.html</a>〔素材 14 項目・AI 出題者プロンプト初版〔正は <code>prompt_configs.prompt_text</code> → S3 スナップショットへ転記〕・モデレーション一行・正解宣言方式・コメント返信の運用・表示名〕+ 方式設計書 <a href="../app/generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>〔ranking-prebuilt 同型・24 秒単尺・LRU 軸なし・ビルド 6 工程 + プローブテスト〕/ 共通設計書は blocker のみ = <code>batch-flow.html</code>〔方式カタログ 1 行・3.3 手順 6 に問題スナップショット出力・umigame 系プレースホルダ〕・<code>data-model.html</code>〔4.14 <code>umigame_items</code>・4.15 <code>umigame_stock_items</code>・<code>batch_sets.problem_snapshot_enabled</code>・V012 草案・S3 キー〕・<code>index.html</code>〔セット一覧 + カード入れ子の修正〕/ インフラ = <code>architecture.html</code> 1.1〔イングレス経路の図〕・<code>stacks.html</code> 3.6 CommentReplyStack〔Function URL → SQS FIFO + DLQ → Reply Lambda・2 面構成・プライバシーポリシー S3〕・<code>security.html</code>〔comment-reply Secret スキーマ・Lambda ロール・ネットワーク〕・<code>workflow.html</code>〔DLQ アラーム + 10.1〕・<code>operation.html</code>〔DLQ 対応〕。タグ対応・リンクチェック 10 ファイル 0 件。<strong>2026-09-04 にキャラ名と表示名を確定</strong>〔ユーザー判断: キャラ名は「探偵カメロック」〔グルメは付けない〕・表示名は「コメントで推理！探偵カメロックのウミガメのスープ」。セット別設計書 2 の decision〕。<strong>人間ゲート（設計レビュー）は 2026-09-04 に通過</strong>〔レビュー 1 巡・blocker なし。持ち越した 5 論点〔出題者プロンプトの正を <code>prompt_configs.prompt_text</code> に置く / SQS FIFO / <code>umigame_items</code> を SNS 投稿バッチが更新 / プライバシーポリシー専用バケット / ステージング面のプレフィックス〕はいずれも承認され、設計書の記述がそのまま正となった〕。記録は<a href="development-log.html">開発記録</a>）
-  <ul>
-  <li>内容: ① セット別設計書 <code>docs/app/sets/umigame-soup-1.html</code>（雛形は <a href="../app/operation.html">運用設計</a> 2.1 手順 0。リールの構成・<strong>21-2 で確定したストックの素材項目</strong>・コメント返信の運用・出題者プロンプト・モデレーション一行・正解宣言方式を含む） ② 方式設計書 <code>docs/app/generators/umigame-prebuilt.html</code> + <code>batch-flow.html</code> 方式カタログへ 1 行 ③ 共通設計書は blocker のみ: <code>data-model.html</code>（<code>umigame_stock_items</code>〔問題文・真相・確定事実シート・想定質問 + リール素材項目〔イラストプロンプト・フック・プレイ例・キャプション用フィールド〕〕/ 消費履歴 <code>umigame_items</code> / <code>batch_sets</code> の投稿後スナップショット出力フラグ）、<code>batch-flow.html</code>（投稿成功直後の S3 スナップショット <code>assets/{set_code}/problems/{media_id}.json</code> 出力） ④ インフラ設計: <code>docs/infra/architecture.html</code>・<code>stacks.html</code> にコメント返信スタック（Webhook 受信 → SQS + DLQ → Reply Lambda → S3 / OpenAI / Graph API。VPC 外・NAT 不要）、<code>security.html</code> に Meta アプリ・シークレット、<code>operation.html</code> に DLQ アラーム ⑤ <code>V012</code> DDL の草案（本文は 21-4a）</li>
-  <li>完了条件: 変更した HTML 全ファイルについて <code>python3</code>（html.parser）によるタグ対応チェックと相対リンクの存在チェックがエラー 0 件（出力を貼る）。日本語メッセージでコミット・push</li>
-  <li>人間ゲート: 設計レビュー（観点限定・最大 2 巡・blocker のみ修正）</li>
-  <li>停止点・上限: push まで（docs/ のみ）。stop after 25 turns</li>
-  </ul></li>
-<li>✅ <strong>21-4a</strong> DDL・ストック整備ツーリング・第 1 バッチ初稿（2026-09-04 完了。<strong>2026-09-07 に「ツーリングと初稿まで」に読み替え</strong>）
-  <ul>
-  <li>要点: <code>V012</code> をローカル MySQL へ適用（Aurora は 21-4a-3 の人間ゲート）。<code>content/umigame-stock/umigame-soup-1/</code> に <code>master_prompt.txt</code>・<code>common/</code>・<code>batch-01/</code>（validate / probe_test / generate）を新設。初稿 10 問は validate 全件 OK・プローブ 194 応答（プロンプトに漏れ対策 3 行を追加）・dry-run 10 件 OK。オリジナル性の基準はセット別設計書 4 #13 に確定。記録は<a href="development-log.html">開発記録</a></li>
-  <li>人間ゲートの結果（2026-09-04〜07・U01 のみ）: 差し替え案の着想元が他者の自作問題と判明して取り下げ → 書き直し → 「問題のコア（引っ掛けるポイント）がない」の指摘。<strong>初稿 10 問は「候補」扱い</strong>とし、採否は 21-4a-3 で作問スキルの検査にかけて決める（詳細は開発記録）→ <strong>2026-09-12 に方針再変更: 初稿 9 問（U02〜U10）は採否検査をせず、いったん削除する</strong>（削除は 21-4a-3 で実施。git 履歴で復元可）</li>
-  </ul></li>
 <blockquote class="decision">
-<strong>作問方針の変更（2026-09-07・ユーザー決定）</strong>: 初稿は「モチーフを決める → 連想 → 言い方を変える（ここでコアが決まる）→ 不思議にする」の工程を踏まず、制約（字数・オリジナル性・一年中見える星座 等）から逆算して書いたため、引っ掛けのない問題になった。以後は<strong>作問手順をスキルに固定し、スキルで 1 問を試作して問題とスキルを同時にレビューし、スキルが確定してから残りを書く</strong>。
+<strong>作問方針の変更（2026-09-07・ユーザー決定。21-4a-2 / 21-4a-3 の前提）</strong>: 初稿は「モチーフを決める → 連想 → 言い方を変える（ここでコアが決まる）→ 不思議にする」の工程を踏まず、制約（字数・オリジナル性・一年中見える星座 等）から逆算して書いたため、引っ掛けのない問題になった。以後は<strong>作問手順をスキルに固定し、スキルで 1 問を試作して問題とスキルを同時にレビューし、スキルが確定してから残りを書く</strong>。
 参考の正は <a href="https://note.com/suekai0217/n/n35128e606a9b">note「ウミガメのスープの作り方」（suekai0217）</a>: 基本の 4 ステップ・良い問題の 3 条件（コアが明確・動線がある・現実離れしない）・2 類型（物語復元型 = A→C 切り出し / 意味誤誘導型）・納得感の優先。
 <strong>各問に「コア宣言」（何を誤認させ、真相で何が反転するか）を必須</strong>にし、書けない問題は捨てる。モチーフは記事どおりランダム語から出し、Codex のリサーチ台帳は「有名問題と構造がかぶらないか」の照合用に格下げする（既存問題からの着想を主経路にしない = U01 の出典問題の再発防止）。
 レビュー指摘は「問題の修正」と「スキルの修正」に分けて記録する（どちらが効いたか見えるようにする）。21-8 の補充スキルは作問をこのスキルに委ね、在庫確認・投入・ビルドの運用だけを担う。
 </blockquote>
-<li>✅ <strong>21-4a-2</strong> 作問スキルの新設と 1 問の試作（2026-09-12 完了。人間ゲート 10 巡の反復で U01・U11・U12・U13・U14 の 5 問が通過。スキルのブラッシュアップは 21-4a-3 の反復で継続する）
-  <ul>
-  <li>内容: ① <code>.claude/skills/umigame-problem-writer/SKILL.md</code> の新設（note 記事の 4 ステップ・3 条件・2 類型を手順化。コア宣言〔誤認させるもの → 反転〕・動線・現実性の自己検査を必須工程にする。セット固有の制約〔素材 14 項目・字数・プローブ〕は既存の validate.py / probe_test.py を参照するだけで重複記載しない。モチーフはランダム語から。有名問題との構造照合に <code>batch-01/research.md</code> を使う） ② <code>stock_items.py</code> の管理項目に <code>core</code>（コア宣言の一文）を追加し、<code>validate.py</code> で必須化・<code>probe_test.py</code> の review.html で問題文の直前に表示 ③ スキルで 1 問（U01 の差し替え）を作問し、validate → プローブテスト → dry-run を通す</li>
-  <li>完了条件: SKILL.md が存在し手順どおりに 1 問を作った過程（モチーフ・連想・言い換え・不思議にする・コア宣言・動線・現実性）を会話に貼る、<code>validate.py</code> 全件 OK の出力、<code>probe_test.py --only U01</code> の出力と review.html、<code>generate.py --dry-run</code> 成功。日本語メッセージでコミット</li>
-  <li>人間ゲート: 問題（コア宣言を最初に見る）とスキルの両方のチャットレビュー。指摘は「問題の修正」「スキルの修正」に分けて反復し、<strong>スキルが確定したら 21-4a-3 へ</strong></li>
-  <li>停止点・上限: コミットまで（<code>.claude/skills/</code> <code>content/</code>。push は差分確認後）。stop after 20 turns</li>
-  <li>要点: <code>.claude/skills/umigame-problem-writer/</code>（SKILL.md + <code>motifs.txt</code>〔ランダム語 98 語〕）を新設。<code>core</code>（コア宣言）を管理項目に追加し validate で様式検査・review.html の問題文直前に表示。U01 を抽選語「影」から作問（影が薄い = レントゲンの影。意味誤誘導型 / 難易度 4。人間ゲート 1 巡目「分かりやすすぎる」で手がかりを減らして改稿）: validate 全 10 問 OK・プローブ 23 応答で不一致 0・dry-run 10 件 OK。試作で判明したスキル修正 2 件（確定事実シートに核心の定義文を書かない / 工程 4.5「手がかりの棚卸し」= 人間ゲート 2 巡目の改稿知見）を反映。出題者プロンプトは 2 巡目で「補足は原則付けない」に振り切り（補足漏れ 56 → 2 件。設計書 5.1 の決定。採否は 21-4a-3 で最終判断）。3 巡目のスキル試行 2 問目 U11（時計台）は 5 巡目で「コアが弱い」と判定して取り下げ、コア検査（誤読の強制・落差）・動機の現実性・問題文と真相の突き合わせをスキルに追加 → 同じ抽選語から再作問した U11「鏡文字で早く着く男たち」（救急車の前面表記）をコア宣言の承認を経て素材化（暫定 11 問）。U02〜U10 の core は暫定（21-4a-3 で検査）→ 2026-09-12 に採否検査を廃止し削除方針へ。その後の反復（8〜10 巡目）で U12〔五人囃子〕・U13〔タイムカプセル〕・U14〔パン職人の卵〕が通過し、既定難易度 4〔A 型手がかり 0 個・消去法動線〕の確立、失敗パターン「売り文句・宣伝への反転」「不可能文で誤読が自壊」等をスキルへ追記（詳細は開発記録の各巡）。記録は<a href="development-log.html">開発記録</a></li>
-  </ul></li>
-<li>⬜ <strong>21-4a-3</strong> 初稿分の削除とスキル作問による全 14 問化（2026-09-12 に再定義、<strong>2026-09-20 に 10 問 → 14 問へ拡張</strong>〔ユーザー決定: 物語復元型と意味誤誘導型を 7 問ずつに揃える。通過 7 問はすべて misdirection のため、残り 7 問〔U17〜U23・content_key 008〜014〕は全問 story 型で作る。作問スキルを型別分冊〔SKILL.md 共通 + story.md / misdirection.md〕に改修済み〕。旧定義「初稿 9 問の採否検査」は廃止。<strong>①②〔削除・連番整理〕は 2026-09-12 完了</strong>: U02〜U10 を削除し U01・U11〜U14 の content_key を 001〜005 に振り直し。validate 全 5 問 OK・dry-run 5 件 OK。現 5 問は misdirection 5 / story 0 のため、③ の語選びで story 型を狙う。<strong>③ は 2026-09-19 に 1 問目 U15「画面より先に聞こえたホームラン」が通過</strong>〔6 問目。story 型は 2 案がコア宣言で NG となり misdirection 6 / story 0 のまま。残りは U16〜U19〕。<strong>2 問目 U16「助けに来た女も凍りついた」は 2026-09-20 に人間ゲート通過</strong>〔7 問目。misdirection / 難易度 4 / content_key 007。慣用句「凍りつく」× 氷鬼。1 巡目の指摘「少年・少女は氷鬼を連想させる」で登場人物を大人の夫婦〔鬼は子ども〕へ改稿し、スキル 4.5 に「登場人物の属性は A 型手がかり」を追記。validate 全 7 問 OK・プローブ 21 応答不一致 0・核心語漏れ 0・dry-run 7 件 OK。story 型は引き続き 0。残りは U17〜U19〕。<strong>3 問目 U17「誰も入っていないのに焦げた畳」は 2026-09-20 に人間ゲート通過</strong>〔8 問目・<strong>story 型の初通過</strong>。1 問 = 2 ゴールの初回: ゴール A〔コア宣言 = 窓辺の水入りガラス鉢が日光を集めて畳を焦がした〕を承認 → ゴール B で素材化 → 1 巡で通過。難易度 4 / content_key 008。工程 7 の Web 検索で仕組みが重なるラテシン投稿問題 1 件を提示し、着想元でなくコアも異なるため採用。validate 全 8 問 OK・プローブ 22 応答不一致 0・核心語漏れ 0・dry-run 8 件 OK。validate.py のコア宣言検査を型別様式に拡張・story.md を通過知見で書き換え。内訳 misdirection 7 / story 1。残りは U18〜U23〕。記録は<a href="development-log.html">開発記録</a>）
-  <ul>
-  <li>内容: ① 21-4a 初稿の 9 問（U02〜U10）を <code>stock_items.py</code> と <code>leak_count.py</code> の核心語辞書からいったん削除（git 履歴で復元可。<code>research.md</code> は工程 7 の照合台帳として残す。<code>master_prompt.txt</code> は変更しない） ② 通過済み 5 問の <code>content_key</code> 連番を 001〜005 に振り直す（<code>no</code>〔U01・U11〜U14〕は管理 ID として不変・再利用しない。プローブキャッシュは no キーのため保持される）→ validate・dry-run で全体検査し STATUS.md の旧 10 問向け申し送りを整理 ③ スキルで残り 9 問（no = U15〜U23・content_key = 006〜014。U15・U16 は misdirection で通過済み、<strong>U17〜U23 の 7 問は story 型固定</strong>）を 21-4a-2 と同じ反復で作問（<strong>1 問 = 2 ゴール</strong>: ゴール A = 工程 0〜3〔コア宣言の提示まで〕→ 人間ゲート → ゴール B = 素材化 → 機械検査〔validate / probe --only / leak_count / dry-run〕→ チャットレビュー → 記録・コミット。指摘は「問題の修正」「スキルの修正」に分け、スキルの修正は SKILL.md または型別分冊に反映してから次の問へ） ④ 14 問そろったら全問プローブ（review.html）と dry-run の全体検査</li>
-  <li>完了条件: スキル作問の 14 問（U01・U11〜U23）が全て人間ゲート通過、型の内訳が story 7 / misdirection 7、<code>validate.py</code> 全 14 問 OK・review.html・<code>generate.py --dry-run</code> 14 件 OK の出力、難易度の内訳。日本語メッセージでコミット</li>
-  <li>人間ゲート: 1 問ずつのチャットレビュー（コア宣言で一度停止 → 素材一式 → プローブ結果）。全問そろったら Aurora へ V012 適用（ユーザー。21-4b の前提）</li>
-  <li>停止点・上限: コミットまで（<code>content/</code> <code>.claude/skills/</code>。push は差分確認後）。1 問 = 2 ゴール（コア宣言の提示まで / 承認後の素材化〜コミット）、stop after 25 turns / goal</li>
-  </ul></li>
-<li>⬜ <strong>21-4b</strong> 第 1 バッチの投入（21-4a-3 のレビュー・V012 適用後）
-  <ul>
-  <li>内容: <code>batch_sets</code> 行（<code>is_active = 0</code>）とレビュー反映後の 14 問をローカル MySQL と Aurora（Data API）の両環境へ投入</li>
-  <li>完了条件: 両環境で <code>umigame_stock_items</code> の件数クエリが 10・<code>content_key</code> の重複 0（クエリ結果を貼る）。push</li>
-  <li>人間ゲート: なし</li>
-  <li>停止点・上限: push まで（content/ のみ）。stop after 15 turns</li>
-  </ul></li>
-<li>⬜ <strong>21-5a</strong> ビルドツーリングと第 1 バッチ全数ビルド（21-4b 完了後）
-  <ul>
-  <li>内容: 21-2 の PoC コンポジションを本組み（ストックのフィールドから props を組む形へ）し、<code>export_prompts.py</code> / <code>intake.py</code> / <code>build.py</code> / <code>review_sheet.py</code> / <code>publish.py</code>（quiz / ranking のツーリングを流用。S3 は <code>assets/umigame-soup-1/prebuilt/{content_key}.mp4</code>）を整備。第 1 バッチ 10 本のイラスト生成（imagegen）→ ビルド → <code>work/review.html</code> の生成 → <code>publish.py --dry-run</code></li>
-  <li>完了条件: 10 本の MP4 が work/ に存在（ls の件数）、review.html 生成、<code>publish.py --dry-run</code> の出力。push</li>
-  <li>人間ゲート: 全数レビュー → <code>work/approved.txt</code> の作成</li>
-  <li>停止点・上限: push まで（content/ のみ）。stop after 30 turns</li>
-  </ul></li>
-<li>⬜ <strong>21-5b</strong> 方式モジュール・キャプション・投稿後スナップショット出力（21-5a のレビュー完了後）
-  <ul>
-  <li>内容: ① <code>approved.txt</code> に基づく publish 本実行 + Aurora への <code>update_prebuilt.sql</code> 適用 ② <code>services/image-batch/app/generators/umigame_prebuilt.py</code>（ranking_prebuilt 同型・LRU 軸なし）+ <code>REGISTRY</code> 登録 ③ sns-post-batch: <code>captions.py</code> に umigame プレースホルダ辞書（ストックのキャプション用フィールドを差し込む）、<code>processing.py</code> の publish 成功直後に <code>batch_sets</code> のフラグで有効化する S3 スナップショット出力（<code>problems/{media_id}.json</code>: 問題文・真相・確定事実シート・出題者ルール） ④ 単体テスト ⑤ 方式設計書・batch-flow の実態合わせ</li>
-  <li>完了条件: image-batch・sns-post-batch とも pytest 全パス（要約行）、<code>unbuilt = 0</code> のクエリ結果、日本語メッセージでコミット</li>
-  <li>人間ゲート: 差分確認 → push → Claude が提示する定型行で <code>/goal</code>（CodePipeline 2 本の完走とタスク定義新リビジョン確認）</li>
-  <li>停止点・上限: コミットまで（services/）。stop after 30 turns</li>
-  </ul></li>
-<li>⬜ <strong>21-6</strong> コメント自動返信経路の本番化（21-3 完了後。21-4・21-5 とは独立）
-  <ul>
-  <li>内容: ① Lambda コード <code>services/comment-reply/</code>（Webhook 受信〔署名検証・自己返信スキップ〕→ SQS enqueue / Reply〔S3 GET <code>problems/{media_id}.json</code> → OpenAI → Graph API 返信。モデレーション一行をプロンプトに含む〕。PoC handler を分割・移植、pytest） ② <code>infra/lib/comment-reply-stack.ts</code>（Webhook Lambda + Function URL または API Gateway〔21-1 の決定〕、SQS + DLQ、Reply Lambda、Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code>、既存バケットの <code>assets/umigame-soup-1/problems/</code> 読み取り権限。ステージング / 本番の切替は Webhook 先と Secret の値で行う） ③ MonitoringStack に DLQ アラーム（既存 <code>createAlarm</code> パターン） ④ <code>bin/infra.ts</code> 配線 ⑤ <code>docs/infra/</code> の実態合わせ</li>
-  <li>完了条件: pytest 全パス（要約行）、<code>infra/</code> で jest 全パスと <code>cdk synth -c env=prod CommentReplyStack MonitoringStack</code> 成功、日本語メッセージでコミット</li>
-  <li>人間ゲート: 差分確認 → push → <code>cdk deploy</code> → ステージング面へ接続（PoC の Meta アプリの Webhook 先を新スタックへ切替・<code>test_tkghr</code> のリール用にサンプル <code>problems/{media_id}.json</code> を配置）→ 実コメントで返信・DLQ 0 件を確認（ユーザー）</li>
-  <li>停止点・上限: コミットまで（infra/ services/）。stop after 30 turns</li>
-  </ul></li>
-<li>⬜ <strong>21-7</strong> アカウント・Meta アプリ・セット登録の準備（21-5b・21-6 完了後）
-  <ul>
-  <li>内容: ① <a href="../app/operation.html">運用設計</a> 2.1 手順 2 の INSERT / UPDATE SQL 一式（<code>batch_sets</code> の <code>generator_name</code>・スナップショット出力フラグ、<code>prompt_configs</code>、<code>caption_templates</code>、<code>sns_accounts</code>、<code>audio_assets</code>） ② CDK: <code>image-batch-stack.ts</code> の Scheduler 1 件 + <code>insights-batch-stack.ts</code> の 2 件 ③ シークレットの名前・投入手順書（sns 用 + comment-reply 用） ④ 本番 Meta アプリの作成手順（PoC README を本番向けに転記: 公開モード・comments 購読・Webhook 先 = CommentReplyStack）</li>
-  <li>完了条件: SQL のローカル MySQL <code>--dry-run</code> 成功、<code>cdk synth -c env=prod ImageBatchStack InsightsBatchStack</code> 成功、日本語メッセージでコミット</li>
-  <li>人間ゲート（稼働開始・ユーザー作業）: Instagram プロアカウント開設 → 本番 Meta アプリ作成・公開モード・Webhook 設定 → Secrets 投入 → Aurora へ SQL 適用 → push → <code>cdk deploy</code> → SFN 手動実行で 1 本目の投稿 → 自分で 1 コメントして返信を確認 → <code>is_active = 1</code>・Scheduler 有効化（有効化前に未投稿バックログ 0 件を確認）</li>
-  <li>停止点・上限: コミットまで（infra/）。stop after 25 turns</li>
-  </ul></li>
-<li>⬜ <strong>21-8</strong> セットレーンへの移管と補充スキル化（稼働開始後）
-  <ul>
-  <li>内容: ① セット計画書 <code>docs/plans/umigame-soup-1.html</code> + <code>umigame-soup-1-log.html</code>（KPI 欄の様式・週次補充ステップ・確認待ちリストに効果仮説〔コメント率 = コメント数 / reach が logic-training-1 比で高く、リーチの伸び率に転化するか。トリガー: 稼働 2 週間後〕を起票）と <code>docs/plans/index.html</code> の表更新 ② <code>.claude/skills/umigame-stock-replenish/SKILL.md</code>（quiz-stock-replenish の骨格 = 在庫確認・投入・ビルドの運用ラッパー。<strong>作問は 21-4a-2 の <code>umigame-problem-writer</code> に委ね、本スキルは呼び出すだけ</strong>。週 2 回 × 4 問レビュー） ③ 第 2 バッチ 8 問の執筆・機械検証・プローブテスト（スキルの実地テスト。投入・ビルドはセットレーンの週次補充として行う） ④ CLAUDE.md・docs 参照ガイド・<code>docs/index.html</code> の更新</li>
-  <li>完了条件: HTML のタグ対応・リンクチェック 0 件、validate / probe の出力、push</li>
-  <li>人間ゲート: 第 2 バッチのレビュー（以降はセットレーン）</li>
-  <li>停止点・上限: push まで（docs/ content/ .claude/ のみ）。stop after 25 turns</li>
-  </ul></li>
+
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 5 件（21-1・21-2・21-3・21-4a・21-4a-2／クリックで展開）</summary>
+<div class="plan-group-inner">
+
+<article class="plan-step" id="step-21-1" data-step-id="21-1" data-status="done" data-completed="2026-09-03" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-1</strong><span class="plan-status">完了</span><span>2026-09-03</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>テーマ・企画の Fix 壁打ち</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。</p>
+<p data-field="result"><strong>結果：</strong><code>/step 21-1</code> で着手しゴールは立てず、壁打ちで ①〜⑧ を決定。<code>umigame-soup-1</code> / 版面は logic-training-1 の骨格・20 秒 1 尺・方式名 <code>umigame-prebuilt</code>・20:00 投稿・モデル gpt-5.6-luna・Function URL + SQS 経路。記録は <a href="../app/requirements-notes-set4.html">requirements-notes-set4.html</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>アイデア詳細をインプットに、実装に必要な未確定点（<code>set_code</code>・版面・生成方式・投稿時刻・AI モデル・コメント経路・Meta アプリの使い分け・ストック素材項目の仮リスト）を壁打ちで決め、<code>docs/app/requirements-notes-set4.html</code> に記録する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>設計書ではなく壁打ち記録に書く（設計 Fix は 21-3）。ゴールは立てない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>—（ユーザー判断）。①〜⑧ の決定が壁打ち記録に残ること。</li>
 </ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>①〜⑧ の決定（このステップ自体が人間ゲート）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 決めた 8 項目の原文</span></summary>
+<div class="plan-fold-inner">
+<p>① <code>set_code</code>・アカウント名・ユーザーネーム ② リール版面（問題文 + プレイ例 2〜3 往復の焼き込み）・尺・ナレーション有無（VOICEVOX）・BGM・イラストの要否と画風 ③ 生成方式（Remotion ローカル事前ビルド = ranking-prebuilt 同型。コンポジションは Remotion Skills を使って作る〔決定済み〕。定常費ゼロ路線）と Remotion Skills の導入先（公式既定の <code>.agents/skills</code> + <code>.claude/skills</code> シンボリックリンクは、本リポジトリの <code>.claude/skills/</code> が自前スキルの実ディレクトリのためそのままでは使えない。候補: ① <code>.agents/skills</code> に入れて remotion-* だけ <code>.claude/skills/</code> へ個別リンク〔Codex 委譲でも同じ指針を読める。推奨〕② <code>npx skills add</code> で <code>.claude/skills/</code> 直下に入れる ③ ユーザー側 <code>~/.claude/skills/</code>。いずれもコミット対象と更新手順〔<code>npx remotion skills update</code>〕を決める） ④ 投稿時刻・固定コメント文面・助手サブアカウントの初期要否 ⑤ AI 出題者のモデル（PoC は gpt-4o-mini）と月額試算・利用上限 ⑥ コメント経路の構成（PoC の Function URL 直結を本番でも使うか、API Gateway + SQS 分離か）と Lambda コードの置き場・デプロイ方式（CDK asset か CodePipeline か） ⑦ 本番 Meta アプリ（新規・公開モード）と PoC アプリ（ステージング）の使い分け・<code>UmigamePocStack</code> の扱い ⑧ ストック 1 件の素材項目の<strong>仮リスト</strong>（問題文・真相・確定事実シート・想定質問・イラスト作成用プロンプト・フック文・プレイ例・キャプション・出典メモ等。確定は 21-2 の PoC 後）と 21-2 で作る PoC 用の 1 問の選定。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 決定 8 項目・引き継ぎ 3 点</span></summary>
+<div class="plan-fold-inner">
+<p>決定の全文は <a href="../app/requirements-notes-set4.html">requirements-notes-set4.html</a>。出題者〔探偵風ウミガメ〕+ 質問者〔助手〕の 2 体・ナレーションは問題文 + ルール帯のみ・背景イラスト・Remotion Skills は skills CLI で 6 本をルート導入・固定コメントと助手サブアカは初期版なし・投稿は既存 Meta アプリ流用 + コメント Webhook だけ新規アプリ・プライバシーポリシーは S3 静的ホスティング・PoC の 1 問は古典「ウミガメのスープ」。後続への引き継ぎ〔media_id 照合・luna の単価確認・skills CLI の配置実測〕は同書セクション 2。</p>
+</div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-2" data-step-id="21-2" data-status="done" data-completed="2026-09-04">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-2</strong><span class="plan-status">完了</span><span>2026-09-04</span></div>
+<h3>リール動画の PoC — 完成版 1 本を作って動画のイメージを固める</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-1 の完了後。</p>
+<p data-field="result"><strong>結果：</strong>Remotion Skills 2.0 を <code>.agents/skills</code> 正本 + <code>.claude/skills</code> リンクで導入し自前スキルとの共存を実測。古典 1 問の素材一式で 1080x1920・30fps・24 秒の MP4 を生成し、人間ゲート 2 巡で<strong>承認</strong>（フォーマット go / 素材項目 14 項目を確定 / Remotion Skills は標準ツーリングとして継続）。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>21-1 で選んだ仮の 1 問について、<strong>ストック 1 件分の素材一式を手作業で揃え、完成版のリール MP4 を 1 本作る</strong>。この動画をもってストックの素材項目を確定する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>既存 2 セットへの Remotion Skills の遡及適用は本フェーズの対象外。レンダリングは既存の Docker 委譲手順（<code>build.py</code>）を維持する。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>Remotion Skills が導入されている（<code>ls</code> でスキルディレクトリ一覧を貼る）。</li>
+<li>完成版 MP4 が 1 本生成され、ffprobe の寸法（9:16）・尺・音声トラックが 21-1 の仕様どおり（出力を貼る）。</li>
+<li>素材ディレクトリに素材項目が揃っている（<code>ls</code> の一覧）。push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>完成版動画の目視レビュー（フック・版面・テンポ・イラストの画風・キャプション）。<strong>修正はレビュー中に反復し、この動画をもってストックの素材項目（何を執筆・生成・レビューするか）を確定する</strong>。フォーマット自体の go / no-go と、<strong>Remotion Skills を本セットの標準ツーリングとして続けるかの判断</strong>もここで行う（既存 2 セットへの遡及適用は対象外。価値があればアイデア体系またはセット計画書の改修として起票する）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/</code> のみ）。stop after 30 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 素材 ①〜④ の内訳</span></summary>
+<div class="plan-fold-inner">
+<p>① 素材: 問題文・真相・確定事実シート・想定質問 15〜20・イラスト作成用プロンプト（→ imagegen でイラスト生成）・フック文・プレイ例 2〜3 往復・キャプション案・BGM（CC0）を <code>content/video-build/umigame-soup-1/poc/</code> に 1 問 = 1 ディレクトリで置く ② <strong>Remotion Skills 2.0 を導入</strong>（<code>npx remotion skills add</code> または <code>npx skills add remotion-dev/skills</code>。21-1 で決めた導入先。導入された版・スキル一覧を <code>content/video-build/umigame-soup-1/README.md</code> に記録）し、<code>/remotion-create</code> <code>/remotion-markup</code> の指針に従って <code>content/video-build/umigame-soup-1/remotion/</code> にコンポジション（フック → 問題文 → プレイ例のアニメーション → 質問を促す締め。ナレーションは 21-1 の決定次第）を作る。レンダリングは既存の Docker 委譲手順（<code>build.py</code>）で行い、<code>/remotion-render</code> の指針と食い違う点があれば README に記録 ③ 版面の静止フレーム（各カット 1 枚）を書き出してレビュー用に並べる ④ 既存 2 セット（logic-training-1 / pref-ranking-1）の手組みコンポジションとの差（開発速度・品質・指針との乖離）を README に所見として残す。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 人間ゲート 2 巡で承認・3 判断とも go</span></summary>
+<div class="plan-fold-inner">
+<p>2026-09-04 に自走分を完了（<code>/step 21-2</code> → <code>/goal</code>）。Remotion Skills 2.0〔skills CLI 1.5.23・スキル版 4.0.520・6 本〕を <code>.agents/skills</code> 正本 + <code>.claude/skills</code> スキル単位リンクで導入し自前スキルと共存を実測 / 古典 1 問の素材一式を <code>content/video-build/umigame-soup-1/poc/classic-umigame/</code> に整備〔イラスト 4 枚は Codex CLI の <code>image_gen.imagegen</code> で生成 = 手作業不要〕/ <code>remotion-create</code> の雛形 + <code>remotion-markup</code> の指針〔<code>Interactive.Div</code>・inline <code>interpolate()</code>・<code>@remotion/media</code>〕でコンポジションを作り、既存の Docker 委譲で 1080x1920・30fps・20 秒・AAC の MP4 を生成 / VOICEVOX 話者は 3 候補を実測し玄野武宏〔11〕のみ 17 秒予算に収まったため PoC 採用 / 所見は README セクション 5。人間ゲートは 2 巡で通過〔第 1 巡: 指示 5 点 → 第 2 稿〔画風 C4・グルメ探偵カメロック + Jr.・24 秒・Polly Takumi 125%・質問 + 返答の並列表示・効果 8 種〕/ 第 2 巡: Jr. の視線と版面の中央寄せ → 第 3 稿で<strong>承認</strong>〕。<strong>3 判断とも承認: フォーマット go / 素材項目 14 項目を確定〔README セクション 0〕/ Remotion Skills は標準ツーリングとして継続</strong>。詳細は<a href="development-log.html">開発記録</a>。</p>
+</div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-3" data-step-id="21-3" data-status="done" data-completed="2026-09-04">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-3</strong><span class="plan-status">完了</span><span>2026-09-04</span></div>
+<h3>設計書 Fix（セット別・方式・共通・インフラ）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-2 のレビュー完了後。<strong>21-2 の確定事項を反映する</strong>（24 秒 720 フレームの版面・素材項目 14 項目・TTS は Amazon Polly Neural〔Takumi 125%〕でクレジット不要・BGM は 24 秒トラックで調達・Remotion Skills 継続。詳細は <code>content/video-build/umigame-soup-1/README.md</code> セクション 0）。</p>
+<p data-field="result"><strong>結果：</strong>新規 2 本（<a href="../app/sets/umigame-soup-1.html">sets/umigame-soup-1.html</a> + <a href="../app/generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>）と共通・インフラ設計書の blocker 修正を完了。キャラ名「探偵カメロック」・表示名「コメントで推理！探偵カメロックのウミガメのスープ」を確定し、設計レビュー 1 巡（blocker なし）で通過。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>セット別設計書・方式設計書を新設し、共通設計書（<code>data-model.html</code> / <code>batch-flow.html</code>）とインフラ設計書（コメント返信経路）に blocker 分を反映する。<code>V012</code> DDL の草案も用意する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>共通設計書は blocker のみ修正（改善提案は課題体系へ）。設計レビューは観点限定・最大 2 巡。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>変更した HTML 全ファイルについて <code>python3</code>（html.parser）によるタグ対応チェックと相対リンクの存在チェックがエラー 0 件（出力を貼る）。</li>
+<li>日本語メッセージでコミット・push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>設計レビュー（観点限定・最大 2 巡・blocker のみ修正）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> のみ）。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 対象 5 系統の内訳</span></summary>
+<div class="plan-fold-inner">
+<p>① セット別設計書 <code>docs/app/sets/umigame-soup-1.html</code>（雛形は <a href="../app/operation.html">運用設計</a> 2.1 手順 0。リールの構成・<strong>21-2 で確定したストックの素材項目</strong>・コメント返信の運用・出題者プロンプト・モデレーション一行・正解宣言方式を含む） ② 方式設計書 <code>docs/app/generators/umigame-prebuilt.html</code> + <code>batch-flow.html</code> 方式カタログへ 1 行 ③ 共通設計書は blocker のみ: <code>data-model.html</code>（<code>umigame_stock_items</code>〔問題文・真相・確定事実シート・想定質問 + リール素材項目〔イラストプロンプト・フック・プレイ例・キャプション用フィールド〕〕/ 消費履歴 <code>umigame_items</code> / <code>batch_sets</code> の投稿後スナップショット出力フラグ）、<code>batch-flow.html</code>（投稿成功直後の S3 スナップショット <code>assets/{set_code}/problems/{media_id}.json</code> 出力） ④ インフラ設計: <code>docs/infra/architecture.html</code>・<code>stacks.html</code> にコメント返信スタック（Webhook 受信 → SQS + DLQ → Reply Lambda → S3 / OpenAI / Graph API。VPC 外・NAT 不要）、<code>security.html</code> に Meta アプリ・シークレット、<code>operation.html</code> に DLQ アラーム ⑤ <code>V012</code> DDL の草案（本文は 21-4a）。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 新規 2 本 + 共通・インフラの blocker・レビュー 1 巡</span></summary>
+<div class="plan-fold-inner">
+<p>新規 2 本 = セット別設計書〔素材 14 項目・AI 出題者プロンプト初版〔正は <code>prompt_configs.prompt_text</code> → S3 スナップショットへ転記〕・モデレーション一行・正解宣言方式・コメント返信の運用・表示名〕+ 方式設計書〔ranking-prebuilt 同型・24 秒単尺・LRU 軸なし・ビルド 6 工程 + プローブテスト〕/ 共通設計書は blocker のみ = <code>batch-flow.html</code>〔方式カタログ 1 行・3.3 手順 6 に問題スナップショット出力・umigame 系プレースホルダ〕・<code>data-model.html</code>〔4.14 <code>umigame_items</code>・4.15 <code>umigame_stock_items</code>・<code>batch_sets.problem_snapshot_enabled</code>・V012 草案・S3 キー〕・<code>index.html</code>〔セット一覧 + カード入れ子の修正〕/ インフラ = <code>architecture.html</code> 1.1〔イングレス経路の図〕・<code>stacks.html</code> 3.6 CommentReplyStack〔Function URL → SQS FIFO + DLQ → Reply Lambda・2 面構成・プライバシーポリシー S3〕・<code>security.html</code>〔comment-reply Secret スキーマ・Lambda ロール・ネットワーク〕・<code>workflow.html</code>〔DLQ アラーム + 10.1〕・<code>operation.html</code>〔DLQ 対応〕。タグ対応・リンクチェック 10 ファイル 0 件。<strong>2026-09-04 にキャラ名と表示名を確定</strong>〔ユーザー判断: キャラ名は「探偵カメロック」〔グルメは付けない〕・表示名は「コメントで推理！探偵カメロックのウミガメのスープ」。セット別設計書 2 の decision〕。<strong>人間ゲート（設計レビュー）は 2026-09-04 に通過</strong>〔レビュー 1 巡・blocker なし。持ち越した 5 論点〔出題者プロンプトの正を <code>prompt_configs.prompt_text</code> に置く / SQS FIFO / <code>umigame_items</code> を SNS 投稿バッチが更新 / プライバシーポリシー専用バケット / ステージング面のプレフィックス〕はいずれも承認され、設計書の記述がそのまま正となった〕。詳細は<a href="development-log.html">開発記録</a>。</p>
+</div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-4a" data-step-id="21-4a" data-status="done" data-completed="2026-09-04" data-kind="legacy-completed">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-4a</strong><span class="plan-status">完了</span><span>2026-09-04</span><span class="plan-kind">旧形式の完了ステップ</span></div>
+<h3>DDL・ストック整備ツーリング・第 1 バッチ初稿</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-3 の完了後（当時の記載では前提の明示なし）。</p>
+<p data-field="result"><strong>結果：</strong><code>V012</code> をローカル MySQL へ適用（Aurora は 21-4a-3 の人間ゲート）。<code>content/umigame-stock/umigame-soup-1/</code> に <code>master_prompt.txt</code>・<code>common/</code>・<code>batch-01/</code>（validate / probe_test / generate）を新設。初稿 10 問は validate 全件 OK・プローブ 194 応答（プロンプトに漏れ対策 3 行を追加）・dry-run 10 件 OK。オリジナル性の基準はセット別設計書 4 #13 に確定。<strong>2026-09-07 に「ツーリングと初稿まで」に読み替え</strong>、<strong>当時の完了条件・人間ゲート・停止点は 4 項目様式では記録されていない</strong>（推測で書き起こさず記録へのリンクで代替する）。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>当時の記載は「<code>V012</code> 適用・ストック整備ツーリング（validate / probe_test / generate）の新設・第 1 バッチ初稿 10 問の作成」。初稿 10 問の扱いはのちに 21-4a-3 で再定義された（U02〜U10 は削除）。</p></div>
+</section>
+<section data-field="record"><h4>2. 作業記録</h4>
+<p>実施記録の全文は<a href="development-log.html">開発記録</a>。人間ゲートの結果（2026-09-04〜07・U01 のみ）: 差し替え案の着想元が他者の自作問題と判明して取り下げ → 書き直し → 「問題のコア（引っ掛けるポイント）がない」の指摘。<strong>初稿 10 問は「候補」扱い</strong>とし、採否は 21-4a-3 で作問スキルの検査にかけて決める → <strong>2026-09-12 に方針再変更: 初稿 9 問（U02〜U10）は採否検査をせず、いったん削除する</strong>（削除は <a href="#step-21-4a-3">21-4a-3</a> で実施。git 履歴で復元可）。</p>
+</section>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-4a-2" data-step-id="21-4a-2" data-status="done" data-completed="2026-09-12">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-4a-2</strong><span class="plan-status">完了</span><span>2026-09-12</span></div>
+<h3>作問スキルの新設と 1 問の試作</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-4a の完了後（2026-09-07 の作問方針変更を受けて分割）。</p>
+<p data-field="result"><strong>結果：</strong>人間ゲート 10 巡の反復で U01・U11・U12・U13・U14 の 5 問が通過。<code>umigame-problem-writer</code> スキルとコア宣言（<code>core</code>）の検査を確立した。スキルのブラッシュアップは 21-4a-3 の反復で継続する。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>作問手順をスキル <code>umigame-problem-writer</code> に固定し、コア宣言を管理項目に足したうえで、スキルで 1 問（U01 の差し替え）を作って問題とスキルを同時にレビューする。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>セット固有の制約（素材 14 項目・字数・プローブ）は既存の <code>validate.py</code> / <code>probe_test.py</code> を参照するだけで SKILL.md に重複記載しない。既存問題からの着想を主経路にしない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>SKILL.md が存在し、手順どおりに 1 問を作った過程（モチーフ・連想・言い換え・不思議にする・コア宣言・動線・現実性）を会話に貼る。</li>
+<li><code>validate.py</code> 全件 OK の出力、<code>probe_test.py --only U01</code> の出力と review.html、<code>generate.py --dry-run</code> 成功。</li>
+<li>日本語メッセージでコミット。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>問題（コア宣言を最初に見る）とスキルの両方のチャットレビュー。指摘は「問題の修正」「スキルの修正」に分けて反復し、<strong>スキルが確定したら 21-4a-3 へ</strong>。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>.claude/skills/</code> <code>content/</code>。push は差分確認後）。stop after 20 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— スキル・<code>core</code> 項目・試作の 3 点</span></summary>
+<div class="plan-fold-inner">
+<p>① <code>.claude/skills/umigame-problem-writer/SKILL.md</code> の新設（note 記事の 4 ステップ・3 条件・2 類型を手順化。コア宣言〔誤認させるもの → 反転〕・動線・現実性の自己検査を必須工程にする。モチーフはランダム語から。有名問題との構造照合に <code>batch-01/research.md</code> を使う） ② <code>stock_items.py</code> の管理項目に <code>core</code>（コア宣言の一文）を追加し、<code>validate.py</code> で必須化・<code>probe_test.py</code> の review.html で問題文の直前に表示 ③ スキルで 1 問（U01 の差し替え）を作問し、validate → プローブテスト → dry-run を通す。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 10 巡の反復で 5 問通過・スキル修正の履歴</span></summary>
+<div class="plan-fold-inner">
+<p><code>.claude/skills/umigame-problem-writer/</code>（SKILL.md + <code>motifs.txt</code>〔ランダム語 98 語〕）を新設。<code>core</code>（コア宣言）を管理項目に追加し validate で様式検査・review.html の問題文直前に表示。U01 を抽選語「影」から作問（影が薄い = レントゲンの影。意味誤誘導型 / 難易度 4。人間ゲート 1 巡目「分かりやすすぎる」で手がかりを減らして改稿）: validate 全 10 問 OK・プローブ 23 応答で不一致 0・dry-run 10 件 OK。試作で判明したスキル修正 2 件（確定事実シートに核心の定義文を書かない / 工程 4.5「手がかりの棚卸し」= 人間ゲート 2 巡目の改稿知見）を反映。出題者プロンプトは 2 巡目で「補足は原則付けない」に振り切り（補足漏れ 56 → 2 件。設計書 5.1 の決定。採否は 21-4a-3 で最終判断）。3 巡目のスキル試行 2 問目 U11（時計台）は 5 巡目で「コアが弱い」と判定して取り下げ、コア検査（誤読の強制・落差）・動機の現実性・問題文と真相の突き合わせをスキルに追加 → 同じ抽選語から再作問した U11「鏡文字で早く着く男たち」（救急車の前面表記）をコア宣言の承認を経て素材化（暫定 11 問）。U02〜U10 の core は暫定（21-4a-3 で検査）→ 2026-09-12 に採否検査を廃止し削除方針へ。その後の反復（8〜10 巡目）で U12〔五人囃子〕・U13〔タイムカプセル〕・U14〔パン職人の卵〕が通過し、既定難易度 4〔A 型手がかり 0 個・消去法動線〕の確立、失敗パターン「売り文句・宣伝への反転」「不可能文で誤読が自壊」等をスキルへ追記（詳細は開発記録の各巡）。記録は<a href="development-log.html">開発記録</a>。</p>
+</div>
+</details>
+</div>
+</article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<article class="plan-step" id="step-21-4a-3" data-step-id="21-4a-3" data-status="doing">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-4a-3</strong><span class="plan-status">作業中</span></div>
+<h3>初稿分の削除とスキル作問による全 14 問化</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-4a-2 の完了後（スキル確定後）。</p>
+<p data-field="result"><strong>現況：</strong>①②〔削除・連番整理〕は 2026-09-12 完了。③ は <strong>U17 まで 8 問が人間ゲート通過</strong>（内訳 misdirection 7 / story 1）。<strong>次は U18</strong>（U18〜U23 の 6 問は story 型固定）。資材は <code>content/umigame-stock/umigame-soup-1/batch-01/</code>、申し送りは同 <code>STATUS.md</code>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>初稿 9 問（U02〜U10）を削除して連番を整理し、作問スキルで残りを書いて<strong>全 14 問</strong>（story 7 / misdirection 7）を揃える。1 問 = 2 ゴール（コア宣言の提示まで / 承認後の素材化〜コミット）で進める。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><code>no</code>（U01・U11〜U23）は管理 ID として不変・再利用しない。<code>research.md</code> は工程 7 の照合台帳として残し、<code>master_prompt.txt</code> は変更しない。<strong>U18〜U23 は story 型固定</strong>。指摘は「問題の修正」「スキルの修正」に分け、スキルの修正は次の問へ進む前に反映する。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>スキル作問の 14 問（U01・U11〜U23）が全て人間ゲート通過し、型の内訳が story 7 / misdirection 7。</li>
+<li><code>validate.py</code> 全 14 問 OK・review.html・<code>generate.py --dry-run</code> 14 件 OK の出力、難易度の内訳を貼る。</li>
+<li>日本語メッセージでコミット。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>1 問ずつのチャットレビュー（コア宣言で一度停止 → 素材一式 → プローブ結果）。全問そろったら Aurora へ V012 適用（ユーザー。21-4b の前提）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>content/</code> <code>.claude/skills/</code>。push は差分確認後）。1 問 = 2 ゴール、stop after 25 turns / goal。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜④ の工程と 14 問化の経緯</span></summary>
+<div class="plan-fold-inner">
+<p>① 21-4a 初稿の 9 問（U02〜U10）を <code>stock_items.py</code> と <code>leak_count.py</code> の核心語辞書からいったん削除（git 履歴で復元可） ② 通過済み 5 問の <code>content_key</code> 連番を 001〜005 に振り直す（プローブキャッシュは no キーのため保持される）→ validate・dry-run で全体検査し STATUS.md の旧 10 問向け申し送りを整理 ③ スキルで残り 9 問（no = U15〜U23・content_key = 006〜014）を 21-4a-2 と同じ反復で作問（<strong>1 問 = 2 ゴール</strong>: ゴール A = 工程 0〜3〔コア宣言の提示まで〕→ 人間ゲート → ゴール B = 素材化 → 機械検査〔validate / probe --only / leak_count / dry-run〕→ チャットレビュー → 記録・コミット） ④ 14 問そろったら全問プローブ（review.html）と dry-run の全体検査。</p>
+<p><strong>再定義の経緯</strong>: 2026-09-12 に「初稿 9 問の採否検査」を廃止して本定義へ。<strong>2026-09-20 に 10 問 → 14 問へ拡張</strong>〔ユーザー決定: 物語復元型と意味誤誘導型を 7 問ずつに揃える。通過分はすべて misdirection のため残りは全問 story 型で作る。作問スキルを型別分冊〔SKILL.md 共通 + story.md / misdirection.md〕に改修済み〕。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— U15・U16・U17 の通過と検査結果</span></summary>
+<div class="plan-fold-inner">
+<p><strong>①②は 2026-09-12 完了</strong>: U02〜U10 を削除し U01・U11〜U14 の content_key を 001〜005 に振り直し。validate 全 5 問 OK・dry-run 5 件 OK。現 5 問は misdirection 5 / story 0 のため、③ の語選びで story 型を狙う方針とした。</p>
+<p><strong>③ 1 問目 U15「画面より先に聞こえたホームラン」は 2026-09-19 に通過</strong>〔6 問目。story 型は 2 案がコア宣言で NG となり misdirection 6 / story 0 のまま〕。<strong>2 問目 U16「助けに来た女も凍りついた」は 2026-09-20 に通過</strong>〔7 問目。misdirection / 難易度 4 / content_key 007。慣用句「凍りつく」× 氷鬼。1 巡目の指摘「少年・少女は氷鬼を連想させる」で登場人物を大人の夫婦〔鬼は子ども〕へ改稿し、スキル 4.5 に「登場人物の属性は A 型手がかり」を追記。validate 全 7 問 OK・プローブ 21 応答不一致 0・核心語漏れ 0・dry-run 7 件 OK〕。<strong>3 問目 U17「誰も入っていないのに焦げた畳」は 2026-09-20 に通過</strong>〔8 問目・<strong>story 型の初通過</strong>。1 問 = 2 ゴールの初回: ゴール A〔コア宣言 = 窓辺の水入りガラス鉢が日光を集めて畳を焦がした〕を承認 → ゴール B で素材化 → 1 巡で通過。難易度 4 / content_key 008。工程 7 の Web 検索で仕組みが重なるラテシン投稿問題 1 件を提示し、着想元でなくコアも異なるため採用。validate 全 8 問 OK・プローブ 22 応答不一致 0・核心語漏れ 0・dry-run 8 件 OK。validate.py のコア宣言検査を型別様式に拡張・story.md を通過知見で書き換え〕。詳細は<a href="development-log.html">開発記録</a>。</p>
+</div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-4b" data-step-id="21-4b" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-4b</strong><span class="plan-status">未着手</span></div>
+<h3>第 1 バッチの投入</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-4a-3 のレビュー完了と、ユーザーによる Aurora への V012 適用後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>batch_sets</code> 行（<code>is_active = 0</code>）とレビュー反映後の 14 問を、ローカル MySQL と Aurora（Data API）の両環境へ投入する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><code>is_active = 0</code> のまま投入する（稼働開始は 21-7 の人間ゲート）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>両環境で <code>umigame_stock_items</code> の件数クエリと <code>content_key</code> の重複 0 を確認（クエリ結果を貼る）。<strong>要確認</strong>: 旧記載は「件数が 10」だが 21-4a-3 で 14 問へ拡張済み（着手時に 14 で読み替えるか、ユーザーに確認する）。</li>
+<li>push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/</code> のみ）。stop after 15 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-5a" data-step-id="21-5a" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-5a</strong><span class="plan-status">未着手</span></div>
+<h3>ビルドツーリングと第 1 バッチ全数ビルド</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-4b の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>21-2 の PoC コンポジションを本組み（ストックのフィールドから props を組む形へ）し、ビルド系ツーリング一式を整備して第 1 バッチを全数ビルドし、レビュー用シートを出す。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>quiz / ranking のツーリングを流用し、S3 キーは <code>assets/umigame-soup-1/prebuilt/{content_key}.mp4</code>。publish は dry-run まで（本実行は 21-5b）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>全数の MP4 が <code>work/</code> に存在（<code>ls</code> の件数）。<strong>要確認</strong>: 旧記載は「10 本」だが 21-4a-3 で 14 問へ拡張済み。</li>
+<li><code>work/review.html</code> の生成と <code>publish.py --dry-run</code> の出力。</li>
+<li>push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>全数レビュー → <code>work/approved.txt</code> の作成。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/</code> のみ）。stop after 30 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 整備するスクリプト一覧</span></summary>
+<div class="plan-fold-inner">
+<p><code>export_prompts.py</code> / <code>intake.py</code> / <code>build.py</code> / <code>review_sheet.py</code> / <code>publish.py</code>（quiz / ranking のツーリングを流用。S3 は <code>assets/umigame-soup-1/prebuilt/{content_key}.mp4</code>）を整備。第 1 バッチのイラスト生成（imagegen）→ ビルド → <code>work/review.html</code> の生成 → <code>publish.py --dry-run</code>。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-5b" data-step-id="21-5b" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-5b</strong><span class="plan-status">未着手</span></div>
+<h3>方式モジュール・キャプション・投稿後スナップショット出力</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-5a のレビュー（<code>approved.txt</code> 作成）完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>承認済み動画の publish 本実行と、image-batch の方式モジュール <code>umigame_prebuilt.py</code>・sns-post-batch のキャプションと投稿後 S3 スナップショット出力を実装し、単体テストと設計書の実態合わせまで行う。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><code>services/</code> を触るため push は差分確認後。スナップショット出力は <code>batch_sets</code> のフラグで有効化する（他セットに影響させない）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>image-batch・sns-post-batch とも pytest 全パス（要約行）。</li>
+<li><code>unbuilt = 0</code> のクエリ結果。</li>
+<li>日本語メッセージでコミット。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → Claude が提示する定型行で <code>/goal</code>（CodePipeline 2 本の完走とタスク定義新リビジョン確認）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/</code>）。stop after 30 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜⑤ の内訳</span></summary>
+<div class="plan-fold-inner">
+<p>① <code>approved.txt</code> に基づく publish 本実行 + Aurora への <code>update_prebuilt.sql</code> 適用 ② <code>services/image-batch/app/generators/umigame_prebuilt.py</code>（ranking_prebuilt 同型・LRU 軸なし）+ <code>REGISTRY</code> 登録 ③ sns-post-batch: <code>captions.py</code> に umigame プレースホルダ辞書（ストックのキャプション用フィールドを差し込む）、<code>processing.py</code> の publish 成功直後に <code>batch_sets</code> のフラグで有効化する S3 スナップショット出力（<code>problems/{media_id}.json</code>: 問題文・真相・確定事実シート・出題者ルール） ④ 単体テスト ⑤ 方式設計書・batch-flow の実態合わせ。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6" data-step-id="21-6" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6</strong><span class="plan-status">未着手</span></div>
+<h3>コメント自動返信経路の本番化</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-3 の完了後。<strong>21-4・21-5 とは独立</strong>のため並行して着手できる。</p>
+<p data-field="result"><strong>現況：</strong>未着手（21-4a-3 と並行して着手可能）。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>PoC の Lambda を <code>services/comment-reply/</code> へ分割・移植し、<code>CommentReplyStack</code>（Webhook → SQS + DLQ → Reply Lambda）と DLQ アラームを CDK で構築して、インフラ設計書を実態に合わせる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。VPC 外・NAT 不要の構成を維持する。<code>cdk deploy</code> はユーザーの人間ゲート。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>pytest 全パス（要約行）。</li>
+<li><code>infra/</code> で jest 全パスと <code>cdk synth -c env=prod CommentReplyStack MonitoringStack</code> 成功。</li>
+<li>日本語メッセージでコミット。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → <code>cdk deploy</code> → ステージング面へ接続（PoC の Meta アプリの Webhook 先を新スタックへ切替・<code>test_tkghr</code> のリール用にサンプル <code>problems/{media_id}.json</code> を配置）→ 実コメントで返信・DLQ 0 件を確認（ユーザー）。<strong>接続時は<a href="#pending-checks">確認待ちリスト</a>の「PoC 資材の長期トークン」（2026-11-02 頃失効）を先に確認する。</strong></p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>infra/</code> <code>services/</code>）。stop after 30 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜⑤ の内訳</span></summary>
+<div class="plan-fold-inner">
+<p>① Lambda コード <code>services/comment-reply/</code>（Webhook 受信〔署名検証・自己返信スキップ〕→ SQS enqueue / Reply〔S3 GET <code>problems/{media_id}.json</code> → OpenAI → Graph API 返信。モデレーション一行をプロンプトに含む〕。PoC handler を分割・移植、pytest） ② <code>infra/lib/comment-reply-stack.ts</code>（Webhook Lambda + Function URL または API Gateway〔21-1 の決定〕、SQS + DLQ、Reply Lambda、Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code>、既存バケットの <code>assets/umigame-soup-1/problems/</code> 読み取り権限） ③ MonitoringStack に DLQ アラーム（既存 <code>createAlarm</code> パターン） ④ <code>bin/infra.ts</code> 配線 ⑤ <code>docs/infra/</code> の実態合わせ。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-7" data-step-id="21-7" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-7</strong><span class="plan-status">未着手</span></div>
+<h3>アカウント・Meta アプリ・セット登録の準備</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-6 の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>セット登録の SQL 一式・Scheduler の CDK 追加・シークレット投入手順書・本番 Meta アプリの作成手順を用意し、ユーザーの稼働開始作業に渡す。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>SQL の本番適用・<code>cdk deploy</code>・<code>is_active = 1</code> はユーザー作業（人間ゲート）。有効化前に未投稿バックログ 0 件を確認する。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>SQL のローカル MySQL <code>--dry-run</code> 成功。</li>
+<li><code>cdk synth -c env=prod ImageBatchStack InsightsBatchStack</code> 成功。</li>
+<li>日本語メッセージでコミット。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>稼働開始・ユーザー作業: Instagram プロアカウント開設 → 本番 Meta アプリ作成・公開モード・Webhook 設定 → Secrets 投入 → Aurora へ SQL 適用 → push → <code>cdk deploy</code> → SFN 手動実行で 1 本目の投稿 → 自分で 1 コメントして返信を確認 → <code>is_active = 1</code>・Scheduler 有効化（有効化前に未投稿バックログ 0 件を確認）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>infra/</code>）。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜④ の内訳</span></summary>
+<div class="plan-fold-inner">
+<p>① <a href="../app/operation.html">運用設計</a> 2.1 手順 2 の INSERT / UPDATE SQL 一式（<code>batch_sets</code> の <code>generator_name</code>・スナップショット出力フラグ、<code>prompt_configs</code>、<code>caption_templates</code>、<code>sns_accounts</code>、<code>audio_assets</code>） ② CDK: <code>image-batch-stack.ts</code> の Scheduler 1 件 + <code>insights-batch-stack.ts</code> の 2 件 ③ シークレットの名前・投入手順書（sns 用 + comment-reply 用） ④ 本番 Meta アプリの作成手順（PoC README を本番向けに転記: 公開モード・comments 購読・Webhook 先 = CommentReplyStack）。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-8" data-step-id="21-8" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-8</strong><span class="plan-status">未着手</span></div>
+<h3>セットレーンへの移管と補充スキル化</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-7 の稼働開始後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>セット計画書・記録を新設して運用をセットレーンへ移し、補充スキル <code>umigame-stock-replenish</code>（運用ラッパー）を作って第 2 バッチ 8 問で実地テストする。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>作問は <code>umigame-problem-writer</code> に委ね、補充スキルは在庫確認・投入・ビルドの運用だけを担う。第 2 バッチの投入・ビルドはセットレーンの週次補充として行う。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>HTML のタグ対応・リンクチェック 0 件。</li>
+<li>validate / probe の出力。</li>
+<li>push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>第 2 バッチのレビュー（以降はセットレーン）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> <code>content/</code> <code>.claude/</code> のみ）。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜④ の内訳</span></summary>
+<div class="plan-fold-inner">
+<p>① セット計画書 <code>docs/plans/umigame-soup-1.html</code> + <code>umigame-soup-1-log.html</code>（KPI 欄の様式・週次補充ステップ・確認待ちリストに効果仮説〔コメント率 = コメント数 / reach が logic-training-1 比で高く、リーチの伸び率に転化するか。トリガー: 稼働 2 週間後〕を起票）と <code>docs/plans/index.html</code> の表更新 ② <code>.claude/skills/umigame-stock-replenish/SKILL.md</code>（quiz-stock-replenish の骨格 = 在庫確認・投入・ビルドの運用ラッパー。週 2 回 × 4 問レビュー） ③ 第 2 バッチ 8 問の執筆・機械検証・プローブテスト（スキルの実地テスト） ④ CLAUDE.md・docs 参照ガイド・<code>docs/index.html</code> の更新。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</section>
 
 <hr>
 
-<h2 id="phase-25">Phase 25: 計画書の可読性改善と記載様式の定着（開発計画へ先行適用）</h2>
-<p><strong>ゴール</strong>: 計画書のステップを「常時表示の要点（概要・完了条件・人の確認・停止点）＋ 折りたたみの実装詳細・作業記録」で書く共通様式を定め、テンプレート・専用 CSS・構造検査（機械チェック）とともに<strong>開発計画へ先行適用</strong>する。あわせて計画を作成・更新する入口（CLAUDE.md と 6 本のスキル）を新様式・構造検査につなぎ、PC とスマホの両方で「計画の内容を把握できる」状態にする。<strong>セット計画書の変換は本フェーズの対象外</strong>（適用するかは D の後に別途ユーザーが判断する）</p>
-<blockquote>経緯: 課題体系 <a href="../issues/index.html#I-036">I-036</a>（2026-09-20 起票。Phase 24〔設計書のスマホ閲覧対応〕から「計画書は PC でも見づらい」として分離）の壁打ち → 表示方針と作業記録の折りたたみを確定 → <a href="../issues/index.html#I-036">PoC</a> 2 本（<a href="../issues/plans-readability.html">ステップ表示 PoC</a> / <a href="../issues/development-plan-poc.html">開発計画全体の PoC</a>）と<a href="../issues/plans-readability-rollout.html">変更ファイル・展開草案</a>を作成 → <strong>2026-09-21 にユーザーが展開を決定し本フェーズを起票</strong>。インプットは展開草案（設計書に非ず。<strong>テンプレートと検査の契約〔セクション 2〕・日常更新の流れ〔セクション 3〕はそちらが正</strong>。検討の経緯は<a href="../issues/plans-readability.md">壁打ち記録</a>）。<strong>対象外</strong>: セット計画書とその記録の変換（未移行として既存様式を維持。個別移行時に検査対象へ追加する）、新スキルの追加、生成用 JSON / YAML と HTML 自動生成ビルド、<code>.github/workflows</code>・Git hook による CI の新設、独自編集画面・データベース化、<code>docs/index.html</code> の設計 Fix ルールの改訂。<strong>課題表の照合</strong>（<a href="index.html#step-checklist">5.1-5</a>）: 触るパス（<code>docs/plans/</code>・<code>docs/assets/</code>・<code>tools/</code>・<code>.agents/skills/</code>・<code>CLAUDE.md</code>・<code>docs/issues/</code>）が重なる live 課題は <a href="../issues/index.html#I-030">I-030</a>〔並行作業ルールの緩和〕と <a href="../issues/index.html#I-014">I-014</a>〔空 run〕。<strong>I-030 は同梱しない</strong>（並行制約の緩和は表示様式と別件。既存の再判断トリガーを維持）。<strong>I-014 は対策を実装せず</strong>、25-2 で「現況と次の候補」の記述を整理する際に、そこへの説明参照だけを課題表内の同梱方針へ置き換える（I-022・I-024 と束ねる既存方針は変えない）。<strong>分割</strong>（<a href="index.html#step-checklist">5.1-4</a>）: 合計が 20〜30 ターンを超える見込みのため、機械検証できる中間点で 25-1〔基盤〕・25-2〔実データ移行〕・25-3〔更新入口〕に割り、ユーザー確認は 25-4 として独立させた。<strong>着手前提</strong>: 本フェーズは <code>docs/plans/</code> の共通ルール改訂を含むため、他セッションが動いていないフリーズ窓で行う（<a href="index.html">計画体系</a> 3）。<code>/step</code> の「<code>docs/plans/</code> のルール変更は原則禁止」に対する<strong>限定例外は本フェーズの変更ファイル一覧の範囲だけ</strong>とし、無関係な規約変更には広げない。<strong>確認待ちの新設なし</strong>（受け入れは 25-4 で push 直後に確認できるため）</blockquote>
-<ul>
-<li>✅ <strong>25-1</strong> 表示・検査の基盤を作る（<strong>2026-09-21 完了</strong>。人間ゲートなし。要点: 新規 4 ファイル = <code>docs/plans/_templates/step.html</code>〔フェーズ 1 つ分の骨組み + コピー範囲を明示した 1 ステップ + 例外形式 2 種の見本〕・<code>docs/assets/plans.css</code>〔共通 <code>style.css</code> は変更せず変数だけ利用・<code>.plan-*</code> に限定〕・<code>tools/docs_plan_check.py</code>〔<code>HTMLParser</code> で木を作り 24 規則を検査。対象は <code>REGISTERED_PAGES</code> の明示リスト〕・<code>tools/tests/test_docs_plan_check.py</code>〔unittest 14 件・正例はテンプレート実ファイル〕。検証: unittest 14 件 OK / 壊した見本で 13 規則の発火を独立確認 / <code>docs_check.py --widths 360,390,768,1280</code> がリンク 0 件・4 幅はみ出し 0 件で<strong>判定 OK</strong>。<strong>実ページは未登録</strong>〔<code>development-plan.html</code> の検査は 25-2〕。記録は<a href="development-log.html#step-25-1">開発記録</a>）
-  <ul>
-  <li>内容: 新規 4 ファイルを作る。① <code>docs/plans/_templates/step.html</code>（ブラウザーで読める単独の HTML 見本。コピー範囲を明示した 1 ステップの枠と、フェーズ内の「完了済みを上に畳む」配置例。ID・状態・着手条件・重要な制約・概要・完了条件・人の確認・停止点・実装詳細・作業記録を含み、原則は重複説明せず<a href="index.html">計画体系</a>へリンクする） ② <code>docs/assets/plans.css</code>（ステップ表示専用。既存 <code>style.css</code> の色・フォント変数を使い <code>.plan-step</code> 等に限定。PC / スマホの配置・折りたたみ・キーボードフォーカス・長いパスの折り返し。<strong>共通 <code>style.css</code> は変更せず</strong>、移行済みの計画書とテンプレートだけが読み込む） ③ <code>tools/docs_plan_check.py</code>（<code>HTMLParser</code> による構造検査モジュール。必須項目・配置・ID・状態・折りたたみを検査し、ファイル / ステップ ID / 違反項目を返す。<strong>検査対象はモジュール内の明示リストで管理</strong>し、初回は実ページ未登録） ④ <code>tools/tests/test_docs_plan_check.py</code>（標準 <code>unittest</code>。正常例に加え、必須欄削除・ID 重複・詳細の初期展開・完了条件が折りたたみ内・完了済みの配置違い・形式属性の削除を NG にする。未着手 / 作業中 / 完了、ユーザー判断、旧完了ステップの例外、記録移管後のリンク形式を検査。テスト用 HTML は文字列で持ち fixture ファイルを増やさない）。契約の詳細は<a href="../issues/plans-readability-rollout.html">展開草案</a>セクション 2</li>
-  <li>完了条件: <code>python3 -m unittest discover -s tools/tests -p 'test_docs_plan_check.py'</code> が全パスし、正常例と代表的な破損例を検出できる（出力を貼る）。テンプレートのリンク切れ 0 件と 360 / 390 / 768 / 1280px の表示に不備がなく、2 つの折りたたみを独立して操作できる。<strong>実ページが未登録であることを記録し、実ページを検査済みとは申告しない</strong>。計画・記録を更新し、日本語メッセージでコミット・<code>pull --rebase</code>・push</li>
-  <li>人間ゲート: なし（レビュー済みの PoC の構成を使う。実データの最終確認は 25-4）</li>
-  <li>停止点・上限: push まで（<code>docs/</code> <code>tools/</code> のみ）。stop after 20 turns。開発計画本文の一括変換・既存スキルの変更は 25-2・25-3 に分ける</li>
-  </ul></li>
-<li>⬜ <strong>25-2</strong> 開発計画を移行し、構造検査を有効にする（25-1 完了後）
-  <ul>
-  <li>内容: ① <code>docs/plans/index.html</code> セクション 4・5 に新しい記載様式・記録の移管時期・完了済みの配置・テンプレートと検査コマンドへの導線を定義（旧 4 項目との対応〔内容 = 概要 + 実装詳細 / 完了条件 / 人間ゲート / 停止点〕を明示。適用対象は移行済み計画書に限定） ② <code>development-plan.html</code> を新様式へ本適用（<strong>着手時に存在する全ステップ</strong>〔本フェーズ自身を含む〕の ID・状態・条件を保持し、冒頭の目次・現況の重複・共通方針・長い更新履歴を除去。完了済みをフェーズ内の上に畳み、実装詳細と作業記録を分離。<code>plans.css</code> を読み込む。確認待ちリストは保持） ③ <code>tools/docs_check.py</code> に「計画書の構造」検査を追加（全体検査へ統合・違反は終了コード 1・日常更新用の <code>--plan-only</code> を追加。既存 <code>--no-browser</code> の「未確認は合格にしない」仕様は変えない） ④ 検査モジュールの対象リストへ <code>development-plan.html</code> を登録 ⑤ <code>docs/issues/index.html</code> の I-014 の説明参照を課題表内の同梱方針へ置き換える ⑥ 削除する補足の独自情報と参照先を点検し、移行前後の対応・移した記録の参照先を <code>development-log.html</code> に残す。<strong>計画本文の仕様・件数の不整合は勝手に直さず</strong>、対応表に「要確認」として記録する</li>
-  <li>完了条件: 移行前後のステップ ID・状態・完了条件・人間ゲート・停止点・確認待ちが照合でき、意図しない欠落 0 件（対応表を記録に貼る）。既存アンカー（<code>#phase-21</code> 等）と他ファイルからの参照が有効。登録済みの <code>development-plan.html</code> で <code>--plan-only</code> が成功し、<strong>形式属性を消したテストでは失敗する</strong>（両方の出力を貼る）。全体のリンク検査と 4 画面幅の表示検査に新規不備 0 件。計画体系のルールとテンプレートが一致している。計画・記録を更新し、日本語メッセージでコミット・<code>pull --rebase</code>・push</li>
-  <li>人間ゲート: なし（受け入れ判断は 25-4）</li>
-  <li>停止点・上限: push まで（<code>docs/</code> <code>tools/</code> のみ）。stop after 25 turns。セット計画書は変換しない。25-3 完了までは共通ルール改訂中として通常の計画更新を再開しない</li>
-  </ul></li>
-<li>⬜ <strong>25-3</strong> 計画を作成・更新する入口を揃える（25-2 完了後）
-  <ul>
-  <li>内容: <code>CLAUDE.md</code> と 6 本のスキル（<code>.agents/skills/</code> の step / idea / issue / incident / quiz-stock-replenish / ranking-stock-replenish）を<a href="../issues/plans-readability-rollout.html">展開草案</a>セクション 1 のファイル一覧の範囲で更新し、新規作成・分割・作業中の追記・完了・記録移管の各操作を共通ルールと構造検査につなぐ。<code>CLAUDE.md</code> は記録ルールを <a href="index.html">計画体系</a>参照に揃え、完了時の要点更新と整理時の詳細移管を区別し、移行済み計画書を更新したら構造検査を行うことを明記する。<code>step</code> は手順 2 の読取を新様式に対応（概要と折りたたみ内の実装仕様を両方読む）・手順 5 の終了時に状態 / 完了日 / 要点 / 記録の更新 + 完了済みグループへの移動 + 構造検査を行う（旧形式フォールバックは未移行の計画書に限定。<strong>ルール改訂の通常禁止は維持し、本フェーズの変更ファイルとフリーズ窓だけを限定例外として明記</strong>）。<code>idea</code> / <code>issue</code> / <code>incident</code> は採用転記・展開下書き・恒久対策の下書きの様式を揃え、移行済み計画書へ転記したら構造検査まで行う（4 項目の意味は維持。Codex の課題レーンは下書きまでのまま）。補充スキル 2 本は終了手順に「移行済み計画書は新様式と構造検査を使う／現行セット計画書は未移行のため既存様式を維持」を追加する。<strong>テスト内のサンプル</strong>で「新規追加 → 作業記録の追記 → 完了済みへの移動 → 記録リンクへの置換」を一巡させる（<strong>稼働中の計画へ架空ステップを書き込まない</strong>）</li>
-  <li>完了条件: 6 本の各更新入口が <a href="index.html">計画体系</a> / テンプレート / 構造検査へつながり、共通ルールと矛盾する完了時の記録指示が残っていない。一巡のサンプルが検査を通り、各段階の必須欄欠落・配置違反は NG になる（出力を貼る）。未移行のセット計画書が新様式へ変換されておらず、既存の補充工程・人間ゲートが変わっていないことを <code>git diff</code> で確認する。<code>unittest</code> と実ページの <code>--plan-only</code> が成功。計画・記録を更新し、日本語メッセージでコミット・<code>pull --rebase</code>・push</li>
-  <li>人間ゲート: なし（スキルの共通ルール改訂範囲をレビューできる差分を残して 25-4 へ）</li>
-  <li>停止点・上限: push まで（<code>docs/</code> <code>.agents/</code> <code>CLAUDE.md</code> のみ）。stop after 20 turns。補充・本番操作・セット計画書の移行は実行しない</li>
-  </ul></li>
-<li>⬜ <strong>25-4</strong> 本適用の受け入れ（25-2・25-3 完了後。<strong>ユーザー判断・ゴール対象外</strong>）
-  <ul>
-  <li>内容: PC とスマホで実際の<a href="development-plan.html">開発計画</a>を開き、① 概要・完了条件・人の確認が折りたたみを開かずに読めるか ② 作業記録が独立して開けるか ③ 完了済みがフェーズ内の上に畳まれているか ④ 不要とした節（目次・現況の重複・共通方針・長い更新履歴）が除去されているか を観点別に確認する</li>
-  <li>完了条件: —（ユーザー判断）</li>
-  <li>人間ゲート: このステップ自体が人間ゲート（push 直後から確認可能）。観点別の OK / NG と go / no-go を<a href="development-log.html">開発記録</a>に残す。<strong>go</strong> で Phase 25 完了とし、開発計画への先行適用の結果を <a href="../issues/index.html#I-036">I-036</a> へ反映する（セット計画書の扱いが未決なら未解決分を残してトリガーを付け直す）。<strong>no-go</strong> は 25-2 / 25-3 の該当箇所を具体化して修正し、同じ観点で再確認する</li>
-  <li>停止点・上限: —（ゴールにしない）。セット計画書にも適用するかは別のユーザー判断</li>
-  </ul></li>
+<section class="plan-phase" data-plan-phase="25" id="phase-25">
+<h2>Phase 25: 計画書の可読性改善と記載様式の定着（開発計画へ先行適用）</h2>
+<p><strong>ゴール</strong>: 計画書のステップを「常時表示の要点（概要・完了条件・人の確認・停止点）＋ 折りたたみの実装詳細・作業記録」で書く共通様式を定め、テンプレート・専用 CSS・構造検査（機械チェック）とともに<strong>開発計画へ先行適用</strong>する。あわせて計画を作成・更新する入口（CLAUDE.md と 6 本のスキル）を新様式・構造検査につなぎ、PC とスマホの両方で「計画の内容を把握できる」状態にする。<strong>セット計画書の変換は本フェーズの対象外</strong>（適用するかは 25-4 の後に別途ユーザーが判断する）</p>
+<blockquote>経緯: 課題体系 <a href="../issues/index.html#I-036">I-036</a>（2026-09-20 起票。Phase 24〔設計書のスマホ閲覧対応〕から「計画書は PC でも見づらい」として分離）の壁打ち → 表示方針と作業記録の折りたたみを確定 → PoC 2 本（<a href="../issues/plans-readability.html">ステップ表示 PoC</a> / <a href="../issues/development-plan-poc.html">開発計画全体の PoC</a>）と<a href="../issues/plans-readability-rollout.html">変更ファイル・展開草案</a>を作成 → <strong>2026-09-21 にユーザーが展開を決定し本フェーズを起票</strong>。インプットは展開草案（設計書に非ず。<strong>テンプレートと検査の契約〔セクション 2〕・日常更新の流れ〔セクション 3〕はそちらが正</strong>。検討の経緯は<a href="../issues/plans-readability.md">壁打ち記録</a>）。<strong>対象外</strong>: セット計画書とその記録の変換（未移行として既存様式を維持。個別移行時に検査対象へ追加する）、新スキルの追加、生成用 JSON / YAML と HTML 自動生成ビルド、<code>.github/workflows</code>・Git hook による CI の新設、独自編集画面・データベース化、<code>docs/index.html</code> の設計 Fix ルールの改訂。<strong>課題表の照合</strong>（<a href="index.html#step-checklist">5.1-5</a>）: 触るパス（<code>docs/plans/</code>・<code>docs/assets/</code>・<code>tools/</code>・<code>.agents/skills/</code>・<code>CLAUDE.md</code>・<code>docs/issues/</code>）が重なる live 課題は <a href="../issues/index.html#I-030">I-030</a>〔並行作業ルールの緩和〕と <a href="../issues/index.html#I-014">I-014</a>〔空 run〕。<strong>I-030 は同梱しない</strong>（並行制約の緩和は表示様式と別件。既存の再判断トリガーを維持）。<strong>I-014 は対策を実装せず</strong>、同梱方針の説明は課題表（対応方針・トリガー列）に置く。<strong>分割</strong>（<a href="index.html#step-checklist">5.1-4</a>）: 合計が 20〜30 ターンを超える見込みのため、機械検証できる中間点で 25-1〔基盤〕・25-2〔実データ移行〕・25-3〔更新入口〕に割り、ユーザー確認は 25-4 として独立させた。<strong>着手前提</strong>: 本フェーズは <code>docs/plans/</code> の共通ルール改訂を含むため、他セッションが動いていないフリーズ窓で行う（<a href="index.html">計画体系</a> 3）。<code>/step</code> の「<code>docs/plans/</code> のルール変更は原則禁止」に対する<strong>限定例外は本フェーズの変更ファイル一覧の範囲だけ</strong>とし、無関係な規約変更には広げない。<strong>確認待ちの新設なし</strong>（受け入れは 25-4 で push 直後に確認できるため）</blockquote>
+
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 2 件（25-1・25-2／クリックで展開）</summary>
+<div class="plan-group-inner">
+
+<article class="plan-step" id="step-25-1" data-step-id="25-1" data-status="done" data-completed="2026-09-21">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>25-1</strong><span class="plan-status">完了</span><span>2026-09-21</span></div>
+<h3>表示・検査の基盤を作る</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。</p>
+<p data-field="result"><strong>結果：</strong>新規 4 ファイル（<a href="_templates/step.html">_templates/step.html</a>・<code>docs/assets/plans.css</code>・<code>tools/docs_plan_check.py</code>・<code>tools/tests/test_docs_plan_check.py</code>）を新設。unittest 14 件 OK / 壊した見本で 13 規則の発火を確認 / <code>docs_check.py --widths 360,390,768,1280</code> は判定 OK。<strong>実ページは未登録</strong>（登録は 25-2）。記録は<a href="development-log.html#step-25-1">開発記録</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>新様式の見本（テンプレート）・専用 CSS・構造検査モジュール・その回帰テストの 4 ファイルを作る。現行の計画書はまだ検査対象に登録しない。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>共通 <code>style.css</code> は変更せず、変数だけを使う。検査対象はモジュール内の明示リストで管理し、初回は実ページ未登録。テスト用 HTML は文字列で持ち fixture ファイルを増やさない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>python3 -m unittest discover -s tools/tests -p 'test_docs_plan_check.py'</code> が全パスし、正常例と代表的な破損例を検出できる（出力を貼る）。</li>
+<li>テンプレートのリンク切れ 0 件と 360 / 390 / 768 / 1280px の表示に不備がなく、2 つの折りたたみを独立して操作できる。</li>
+<li><strong>実ページが未登録であることを記録し、実ページを検査済みとは申告しない。</strong></li>
+<li>計画・記録を更新し、日本語メッセージでコミット・<code>pull --rebase</code>・push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし（レビュー済みの PoC の構成を使う。実データの最終確認は 25-4）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> <code>tools/</code> のみ）。stop after 20 turns。開発計画本文の一括変換・既存スキルの変更は 25-2・25-3 に分ける。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 新規 4 ファイルの役割</span></summary>
+<div class="plan-fold-inner">
+<p>① <code>docs/plans/_templates/step.html</code>（ブラウザーで読める単独の HTML 見本。コピー範囲を明示した 1 ステップの枠と、フェーズ内の「完了済みを上に畳む」配置例。ID・状態・着手条件・重要な制約・概要・完了条件・人の確認・停止点・実装詳細・作業記録を含み、原則は重複説明せず<a href="index.html">計画体系</a>へリンクする） ② <code>docs/assets/plans.css</code>（ステップ表示専用。既存 <code>style.css</code> の色・フォント変数を使い <code>.plan-step</code> 等に限定。PC / スマホの配置・折りたたみ・キーボードフォーカス・長いパスの折り返し） ③ <code>tools/docs_plan_check.py</code>（<code>HTMLParser</code> による構造検査モジュール。必須項目・配置・ID・状態・折りたたみを検査し、ファイル / ステップ ID / 違反項目を返す） ④ <code>tools/tests/test_docs_plan_check.py</code>（標準 <code>unittest</code>。正常例に加え、必須欄削除・ID 重複・詳細の初期展開・完了条件が折りたたみ内・完了済みの配置違い・形式属性の削除を NG にする）。契約の詳細は<a href="../issues/plans-readability-rollout.html">展開草案</a>セクション 2。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 24 規則・unittest 14 件・表示検査 OK</span></summary>
+<div class="plan-fold-inner">
+<p>新規 4 ファイル = テンプレート〔フェーズ 1 つ分の骨組み + コピー範囲を明示した 1 ステップ + 例外形式 2 種の見本〕・<code>plans.css</code>〔共通 <code>style.css</code> は変更せず変数だけ利用・<code>.plan-*</code> に限定〕・<code>docs_plan_check.py</code>〔<code>HTMLParser</code> で木を作り 24 規則を検査。対象は <code>REGISTERED_PAGES</code> の明示リスト〕・テスト〔unittest 14 件・正例はテンプレート実ファイル〕。検証: unittest 14 件 OK / 壊した見本で 13 規則の発火を独立確認 / <code>docs_check.py --widths 360,390,768,1280</code> がリンク 0 件・4 幅はみ出し 0 件で<strong>判定 OK</strong>。<strong>実ページは未登録</strong>のまま完了。詳細は<a href="development-log.html#step-25-1">開発記録</a>。</p>
+</div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-25-2" data-step-id="25-2" data-status="done" data-completed="2026-09-21">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>25-2</strong><span class="plan-status">完了</span><span>2026-09-21</span></div>
+<h3>開発計画を移行し、構造検査を有効にする</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>25-1 の完了後。<strong>フリーズ窓</strong>（他セッションが動いていないこと）で実施する。</p>
+<p data-field="result"><strong>結果：</strong>本書の全 16 ステップを新様式へ移行し、<code>docs_plan_check.py</code> の検査対象に登録。<code>tools/docs_check.py</code> に構造検査を統合して <code>--plan-only</code> を追加した。計画体系 <a href="index.html#step-layout">5.0</a> に様式を定義。検査は <code>--plan-only</code> OK / 形式属性を消すと NG（終了コード 1）/ リンク 0 件・4 幅はみ出し 0 件で<strong>総合判定 OK</strong>。移行前後の対応表は<a href="development-log.html#step-25-2">開発記録</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>計画体系 <a href="index.html">index.html</a> のセクション 4・5 に新様式を定義し、本書（開発計画）の全ステップを新様式へ移行して、<code>tools/docs_check.py</code> の構造検査（<code>--plan-only</code>）を有効にする。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><strong>着手時に存在する全ステップ（本フェーズ自身を含む）の ID・状態・条件を保持</strong>する。確認待ちリストは保持する。<strong>計画本文の仕様・件数の不整合は勝手に直さず</strong>、対応表に「要確認」として記録する。セット計画書は変換しない。<code>--no-browser</code> の「未確認は合格にしない」仕様は変えない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>移行前後のステップ ID・状態・完了条件・人間ゲート・停止点・確認待ちが照合でき、意図しない欠落 0 件（対応表を記録に貼る）。</li>
+<li>既存アンカー（<code>#phase-21</code> 等）と他ファイルからの参照が有効。</li>
+<li>登録済みの <code>development-plan.html</code> で <code>--plan-only</code> が成功し、<strong>形式属性を消したテストでは失敗する</strong>（両方の出力を貼る）。</li>
+<li>全体のリンク検査と 4 画面幅の表示検査に新規不備 0 件。</li>
+<li>計画体系のルールとテンプレートが一致している。</li>
+<li>計画・記録を更新し、日本語メッセージでコミット・<code>pull --rebase</code>・push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし（受け入れ判断は 25-4）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> <code>tools/</code> のみ）。stop after 25 turns。セット計画書は変換しない。25-3 完了までは共通ルール改訂中として通常の計画更新を再開しない。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜⑥ の内訳</span></summary>
+<div class="plan-fold-inner">
+<p>① <code>docs/plans/index.html</code> セクション 4・5 に新しい記載様式・記録の移管時期・完了済みの配置・テンプレートと検査コマンドへの導線を定義（旧 4 項目との対応〔内容 = 概要 + 実装詳細 / 完了条件 / 人間ゲート / 停止点〕を明示。適用対象は移行済み計画書に限定） ② <code>development-plan.html</code> を新様式へ本適用（冒頭の目次・現況の重複・共通方針・長い更新履歴を除去。完了済みをフェーズ内の上に畳み、実装詳細と作業記録を分離。<code>plans.css</code> を読み込む） ③ <code>tools/docs_check.py</code> に「計画書の構造」検査を追加（全体検査へ統合・違反は終了コード 1・日常更新用の <code>--plan-only</code> を追加） ④ 検査モジュールの対象リストへ <code>development-plan.html</code> を登録 ⑤ <code>docs/issues/index.html</code> の I-014 の説明参照を課題表内の同梱方針へ置き換える ⑥ 削除する補足の独自情報と参照先を点検し、移行前後の対応・移した記録の参照先を <code>development-log.html</code> に残す。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 対応表は開発記録へ</span></summary>
+<div class="plan-fold-inner">
+<p>移行前後の対応表（16 ステップ）・削除した節の移設先と原文・I-014 の扱い・検査結果は<a href="development-log.html#step-25-2">開発記録 25-2</a> に記載。<strong>要確認として残した点</strong>: 21-4b / 21-5a の完了条件に残る「10 件 / 10 本」は 14 問化前の数字（勝手に直さず注記）、<code>docs/ideas/docs-responsive-mobile.md</code> の <code>development-plan.html#phase-24</code> はPhase 24 を完了サマリへ畳んだ時点からアンカー不在（本移行前からの既存事象）。</p>
+</div>
+</details>
+</div>
+</article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+<article class="plan-step" id="step-25-3" data-step-id="25-3" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>25-3</strong><span class="plan-status">未着手</span></div>
+<h3>計画を作成・更新する入口を揃える</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>25-2 の完了後。フリーズ窓で実施する。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>CLAUDE.md</code> と 6 本のスキル（step / idea / issue / incident / quiz-stock-replenish / ranking-stock-replenish）を、新規作成・分割・作業中の追記・完了・記録移管の各操作が共通ルールと構造検査につながるように更新する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>更新範囲は<a href="../issues/plans-readability-rollout.html">展開草案</a>セクション 1 のファイル一覧まで。<strong>ルール改訂の通常禁止は維持</strong>し、本フェーズの変更ファイルとフリーズ窓だけを限定例外として明記する。4 項目の意味は維持。Codex の課題レーンは下書きまでのまま。未移行のセット計画書は既存様式を維持し、補充工程・人間ゲートを変えない。<strong>稼働中の計画へ架空ステップを書き込まない</strong>（一巡の検証はテスト内のサンプルで行う）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>6 本の各更新入口が<a href="index.html">計画体系</a> / テンプレート / 構造検査へつながり、共通ルールと矛盾する完了時の記録指示が残っていない。</li>
+<li>一巡のサンプル（新規追加 → 作業記録の追記 → 完了済みへの移動 → 記録リンクへの置換）が検査を通り、各段階の必須欄欠落・配置違反は NG になる（出力を貼る）。</li>
+<li>未移行のセット計画書が新様式へ変換されておらず、既存の補充工程・人間ゲートが変わっていないことを <code>git diff</code> で確認する。</li>
+<li><code>unittest</code> と実ページの <code>--plan-only</code> が成功。</li>
+<li>計画・記録を更新し、日本語メッセージでコミット・<code>pull --rebase</code>・push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし（スキルの共通ルール改訂範囲をレビューできる差分を残して 25-4 へ）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> <code>.agents/</code> <code>CLAUDE.md</code> のみ）。stop after 20 turns。補充・本番操作・セット計画書の移行は実行しない。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 入口ごとの変更点</span></summary>
+<div class="plan-fold-inner">
+<p><code>CLAUDE.md</code> は記録ルールを<a href="index.html">計画体系</a>参照に揃え、完了時の要点更新と整理時の詳細移管を区別し、移行済み計画書を更新したら構造検査を行うことを明記する。<code>step</code> は手順 2 の読取を新様式に対応（概要と折りたたみ内の実装仕様を両方読む）・手順 5 の終了時に状態 / 完了日 / 要点 / 記録の更新 + 完了済みグループへの移動 + 構造検査を行う（旧形式フォールバックは未移行の計画書に限定）。<code>idea</code> / <code>issue</code> / <code>incident</code> は採用転記・展開下書き・恒久対策の下書きの様式を揃え、移行済み計画書へ転記したら構造検査まで行う。補充スキル 2 本は終了手順に「移行済み計画書は新様式と構造検査を使う／現行セット計画書は未移行のため既存様式を維持」を追加する。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-25-4" data-step-id="25-4" data-status="todo" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>25-4</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>本適用の受け入れ</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>25-2・25-3 の完了後（push 直後から確認できる）。</p>
+<p data-field="result"><strong>現況：</strong>未確認。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>PC とスマホで実際の<a href="development-plan.html">開発計画</a>を開き、① 概要・完了条件・人の確認が折りたたみを開かずに読めるか ② 作業記録が独立して開けるか ③ 完了済みがフェーズ内の上に畳まれているか ④ 不要とした節（目次・現況の重複・共通方針・長い更新履歴）が除去されているか を観点別に確認する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>セット計画書にも適用するかは本ステップとは別のユーザー判断。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>—（ユーザー判断）。観点別の OK / NG と go / no-go が<a href="development-log.html">開発記録</a>に残ること。</li>
 </ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>このステップ自体が人間ゲート（push 直後から確認可能）。観点別の OK / NG と go / no-go を<a href="development-log.html">開発記録</a>に残す。<strong>go</strong> で Phase 25 完了とし、開発計画への先行適用の結果を <a href="../issues/index.html#I-036">I-036</a> へ反映する（セット計画書の扱いが未決なら未解決分を残してトリガーを付け直す）。<strong>no-go</strong> は 25-2 / 25-3 の該当箇所を具体化して修正し、同じ観点で再確認する。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>）。セット計画書にも適用するかは別のユーザー判断。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>確認前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</section>
 
 <hr>
-
-
-<h2 id="troubleshooting">トラブルシューティングログ（廃止）</h2>
-<p>22-2〔2026-09-19〕で廃止。横断・基盤のトラブルの事象は<a href="development-log.html#incidents">開発記録の「事象記録」</a>へ、セット固有の事象は各セット記録へ、恒久対策の課題は<a href="../issues/index.html">課題体系</a>へ（切り分けは<a href="../issues/index.html#rule-incident">課題体系 4.7</a>）。</p>
 
 <h2 id="pending-checks">確認待ちリスト（トリガー付き）</h2>
 <p>初回試行・効果観察など「次の機会に確かめる」項目を、ステップにせずここで追う（2026-09-02 導入。ルールと列の意味は<a href="index.html#pending-checks">計画体系 5.2</a>）。<strong>開発レーンのトリガー</strong>（<code>services/</code> <code>shared/</code> の push・デプロイ等）の項目だけを置き、セットの週次補充・投稿観察がトリガーの項目は各セット計画書の確認待ちリストへ。<code>/step</code> が起動時にこの表を照合する（19-5 で導入）。確認したら結果を書き、OK なら<a href="development-log.html">開発記録</a>へ移す。</p>
@@ -246,13 +707,16 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-09-02 / 19-1 CodePipeline 完走待ちの <code>/goal</code> 化（初回試行）</td><td>次に <code>services/</code> <code>shared/</code> を触るコミットを push したとき</td><td>① push 直後に Claude が CLAUDE.md の D 定型行（<code>&lt;sha&gt;</code> 置換済み）を提示するか ② ユーザーが打った <code>/goal</code> の evaluator が、貼られた aws cli 出力（パイプラインの Succeeded・タスク定義の新リビジョン）から到達を判定して止まるか ③ 15 ターン以内に収まるか</td><td>提示されない → CLAUDE.md の文言を直す。判定できない → 定型行の証跡指定（貼らせる出力）を具体化する。いずれも課題体系ではなく Phase 19 の追補ステップとして起こす</td><td>—</td></tr>
-<tr><td>2026-09-03 / ウミガメ PoC 資材（ステージング面）の長期トークン</td><td><strong>21-6 の人間ゲート（ステージング面への接続）に着手するとき</strong>。<code>test_tkghr</code> の長期トークンは 2026-09-03 生成・60 日有効（2026-11-02 頃失効）</td><td>Secrets Manager <code>umigame-poc/credentials</code> の <code>ig_access_token</code> で <code>GET graph.instagram.com/v23.0/me</code> が 200 を返す。失効していれば Meta アプリの「設定」タブで再生成して差し替える（手順は <code>poc/umigame-comment-webhook/README.md</code>）</td><td>再生成して続行（課題にはしない）</td><td>—</td></tr>
+<tr><td>2026-09-03 / ウミガメ PoC 資材（ステージング面）の長期トークン</td><td><strong><a href="#step-21-6">21-6</a> の人間ゲート（ステージング面への接続）に着手するとき</strong>。<code>test_tkghr</code> の長期トークンは 2026-09-03 生成・60 日有効（2026-11-02 頃失効）</td><td>Secrets Manager <code>umigame-poc/credentials</code> の <code>ig_access_token</code> で <code>GET graph.instagram.com/v23.0/me</code> が 200 を返す。失効していれば Meta アプリの「設定」タブで再生成して差し替える（手順は <code>poc/umigame-comment-webhook/README.md</code>）</td><td>再生成して続行（課題にはしない）</td><td>—</td></tr>
 <tr><td>2026-09-02 / 20-1 fantasy-animals-1 の停止（効果確認）</td><td><strong>2026-09-04 の 21:00 JST 以降</strong>（deploy と Aurora の <code>is_active = 0</code> は 2026-09-03 に適用済み。翌 06:00 のインサイト収集も観察対象）</td><td>① fantasy-animals-1 の 21:00 投稿が起きていない（<code>posts</code> に新規行なし・Instagram に新規投稿なし）② 画像生成 SFN が fantasy-animals-1 で起動していない（EventBridge Scheduler 一覧に fantasy-animals-1 の名前がない）③ インサイト収集 SFN の 06:00 / 18:00 実行が他セット分だけで成功している</td><td>投稿が起きている → deploy 未反映か Scheduler の削除漏れ。20-1 の追補ステップとして起こす。インサイト収集が失敗する → 収集バッチの <code>is_active = 0</code> の扱いを確認し課題体系（開発レーン節）へ起票</td><td>—</td></tr>
 <tr><td>2026-09-03 / 16-12b <code>follows_and_unfollows</code>（100 フォロワー閾値後の確認）</td><td>月次 KPI 転記時に <code>v_account_kpi_monthly.month_end_followers</code> が 100 以上のアカウントが初めて現れたとき</td><td>そのアカウントのその月の <code>account_insights_daily.metrics</code> に <code>follows_and_unfollows</code> キー（<code>breakdowns</code> の <code>follow_type</code> 内訳）が入り始めているか（<code>SELECT metric_date, JSON_EXTRACT(metrics, '$.follows_and_unfollows') FROM account_insights_daily WHERE sns_account_id = ? ORDER BY metric_date DESC LIMIT 7</code>）。入っていれば OK → data-model 4.11 に「100 フォロワー以上で取得可」を追記し、ビュー <code>v_account_kpi_daily</code> への昇格を検討する</td><td>入っていない → 正規化（<code>insights_api.py</code>）か要求パラメータの問題として課題体系（開発レーン節）へ起票（応答本文を CloudWatch Logs では確認できないため、要求のデバッグログ追加を含めて扱う）</td><td>—</td></tr>
 <tr><td>2026-09-19 / <a href="development-log.html#phase-22">22-3</a> <code>/incident</code>（初回試行）</td><td>22-3 完了後、次に本番・運用の異常が起きたとき</td><td>① 照合結果（予言されていた課題・前にも起きた事象）が原因究明の前に提示されるか ② 終了時に事象記録 + 課題の更新（発生履歴 / 起票 / 即 解消）が漏れなく行われるか</td><td>提示が後になる・更新が漏れる → SKILL.md の工程順を直す（Phase 22 の追補ステップ）</td><td>—</td></tr>
 <tr><td>2026-09-19 / <a href="development-log.html#phase-22">22-3</a> <code>/issue</code> 壁打ち（初回試行）</td><td>22-2 完了後、最初に据え置き課題を壁打ちするとき（候補: 可視化 3 件〔旧 2026-07-07・07-25・08-23〕の統合設計）</td><td>① 壁打ち開始時に <code>docs/issues/&lt;slug&gt;.md</code> が作られ行にリンクが付くか ② 終了規律で 据え置き / 展開 / 受容 のどれかに着地し index.html が同期されるか</td><td>着地しない・同期漏れ → SKILL.md の終了規律を直す（Phase 22 の追補ステップ）</td><td>—</td></tr>
 </tbody>
 </table></div>
+
+<h2 id="troubleshooting">トラブルシューティングログ（廃止）</h2>
+<p>22-2〔2026-09-19〕で廃止。横断・基盤のトラブルの事象は<a href="development-log.html#incidents">開発記録の「事象記録」</a>へ、セット固有の事象は各セット記録へ、恒久対策の課題は<a href="../issues/index.html">課題体系</a>へ（切り分けは<a href="../issues/index.html#rule-incident">課題体系 4.7</a>）。</p>
 
 <h2 id="design-issues">設計課題リスト（廃止）</h2>
 <p>22-2〔2026-09-19〕で<a href="../issues/index.html#lane-dev">課題体系の開発レーン節</a>へ移設した（19 行 → live 18 行 + 受容 1 行。ID は起票日順）。設計レビューの改善提案・持ち越し論点は以後、課題体系へ据え置き課題（トリガー付き）として起票する。</p>

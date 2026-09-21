@@ -41,6 +41,8 @@ from pathlib import Path
 from typing import Iterable, Sequence
 from urllib.parse import unquote, urlsplit
 
+import docs_plan_check
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXCLUDED_DIRS = {"_archive"}
 DEFAULT_WIDTHS = (360, 390, 430, 767, 768, 1280)
@@ -876,6 +878,56 @@ def check_card_measurements(
     return {key: (value[0], value[1]) for key, value in counts.items()}, findings
 
 
+def check_plan_structure() -> tuple[int, list[str]]:
+    """登録済み計画書の構造を検査し、対象件数と表示行を返す。
+
+    Returns:
+        （検査した計画書の件数, 不備 1 件 1 行の表示用リスト）。
+    """
+    findings = docs_plan_check.check_registered()
+    return len(docs_plan_check.REGISTERED_PAGES), docs_plan_check.format_findings(findings)
+
+
+def report_plan_structure() -> int:
+    """「計画書の構造」検査の結果を標準出力へ書き、不備件数を返す。"""
+    pages, lines = check_plan_structure()
+    if not pages:
+        print("対象: 0 ページ（tools/docs_plan_check.py の REGISTERED_PAGES が空）")
+        return 0
+    print(f"対象: {pages} ページ（{', '.join(docs_plan_check.REGISTERED_PAGES)}）")
+    print(f"構造チェック: {'OK' if not lines else 'NG'}（不備 {len(lines)} 件）")
+    for line in lines:
+        print(f"  NG {line}")
+    return len(lines)
+
+
+def run_plan_only() -> int:
+    """--plan-only の処理。登録済み計画書の構造と参照だけを検査する。
+
+    Returns:
+        終了コード（0: 合格 / 1: 不備あり）。ブラウザー実測は行わない。
+    """
+    print("=== 計画書の構造（--plan-only） ===")
+    exit_code = 1 if report_plan_structure() else 0
+
+    print()
+    print("=== 計画書のリンク / アンカー整合 ===")
+    tree = WorkTree(REPO_ROOT)
+    targets = set(docs_plan_check.REGISTERED_PAGES)
+    findings = [f for f in check_links(tree) if f.page in targets]
+    print(f"不備: {len(findings)} 件（対象ページ発のリンクのみ。全体は引数なしで実行）")
+    for line in format_findings(findings):
+        print(f"  NG {line}")
+    if findings:
+        exit_code = 1
+
+    print()
+    print("=== 判定 ===")
+    print("OK（構造・参照のみ。表示の実測は別途 --widths で確認する）"
+          if exit_code == 0 else "NG（上記の不備を参照）")
+    return exit_code
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """エントリポイント。
 
@@ -891,11 +943,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--no-browser", action="store_true", help="横はみ出し測定を行わない")
     parser.add_argument("--list", action="store_true", help="対象ページを全件列挙する")
     parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="登録済み計画書の構造・参照だけを検査する（ブラウザー不要・日常更新用）",
+    )
+    parser.add_argument(
         "--baseline",
         metavar="REF",
         help="指定 git ref の静的チェック結果と比較し、既存不備と今回の差分を区別する",
     )
     args = parser.parse_args(argv)
+
+    if args.plan_only:
+        return run_plan_only()
 
     widths = [int(w) for w in args.widths.split(",") if w.strip()]
     tree = WorkTree(REPO_ROOT)
@@ -1030,6 +1090,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             if card_findings:
                 exit_code = 1
             print("カード表示の判定: " + ("OK" if not card_findings and not card_static else "NG"))
+
+    print()
+    print("=== 5. 計画書の構造（25-2） ===")
+    if report_plan_structure():
+        exit_code = 1
 
     print()
     print("=== 判定 ===")
