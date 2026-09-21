@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I-014｜空の生成実行が投稿を止める問題と対応案</title>
+<link rel="stylesheet" href="../assets/style.css?v=20260921"><style>
+.container{max-width:68rem}main{overflow-wrap:anywhere}.intro{font-size:1.08rem;color:var(--text-muted)}
+.jump{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.5rem 0 2rem}.jump a{padding:.4rem .9rem;border:1px solid var(--border);border-radius:2rem;text-decoration:none}
+.lead-box{padding:1.2rem 1.5rem;border:1px solid var(--note-border);border-radius:12px;background:var(--note-bg)}
+.lead-box h2{margin-top:0;padding-top:0;border:0}.lead-box p:last-child{margin-bottom:0}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}.flow{padding:1.2rem;border:1px solid var(--border);border-radius:12px;background:var(--bg-subtle)}
+.flow h3{margin-top:0}.flow ol{padding-left:1.3rem}.flow li{margin:.6rem 0}.flow.after{border-color:var(--note-border);background:var(--note-bg)}
+.outcome{font-weight:700;border-top:1px solid var(--border);padding-top:.8rem}.options{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;list-style:none;padding:0!important}.options li{border:1px solid var(--border);border-radius:10px;padding:1rem;margin:0}.options li:first-child{background:var(--note-bg);border-color:var(--note-border)}
+.options strong{display:block;margin-bottom:.5rem}details{border:1px solid var(--border);border-radius:10px;margin:1rem 0}summary{padding:1rem;cursor:pointer;font-weight:700;background:var(--bg-subtle);border-radius:10px}.inner{padding:.2rem 1.2rem 1rem}a:focus-visible,summary:focus-visible{outline:3px solid var(--link);outline-offset:3px}
+section{margin-top:2.2rem}li{margin-bottom:.5rem}pre{max-width:100%;overflow-x:auto}pre code{overflow-wrap:normal;white-space:pre}code{overflow-wrap:anywhere}[id]{scroll-margin-top:1rem}.footnote{color:var(--text-muted);font-size:.9rem}
+@media(max-width:640px){.container{padding:1.2rem 1rem 3rem}.compare,.options{grid-template-columns:1fr}h1{font-size:1.65rem}.lead-box{padding:1rem}.inner{padding:.2rem 1rem 1rem}}
+@media print{.jump{display:none}details>.inner{display:block!important}.compare,.options{display:block}.flow,.options li{break-inside:avoid;margin-bottom:.7rem}}
+</style></head>
+<body><main class="container">
+<nav class="breadcrumb" aria-label="パンくず"><a href="../index.html">設計書</a> / <a href="index.html#I-014">課題 I-014</a> / 事象と対応案</nav>
+<header><p class="footnote">I-014 · 開発レーン · 2026-09-21 更新</p><h1>空の生成実行が、後続の投稿を止める</h1><p class="intro">なぜ正常に生成できた動画まで投稿されなくなるのか。原因と、投稿対象の選び方を変える対策をまとめます。</p></header>
+<div class="lead-box"><h2>推奨：素材のある実行だけを投稿候補にする</h2><p>推奨は、投稿対象の選定 SQL に「その生成実行の <code>generated_media</code> が 1 件以上ある」という条件を加えること。生成に失敗した空の実行を候補から外し、後続の正常な実行を投稿できるようにする。
+I-022・I-024 と同じ改修フェーズで管理する既存方針は維持し、I-014 は独立した先頭ステップにする案を提案する。API クライアント統合やリトライ設計の完了を、この修正のリリース条件にしない。
+本書は事象と対策を一緒に読める検討資料であり、実装済みの設計書ではない。実装・本番操作は今回行っていない。管理状態・再判断条件・発生履歴の正は <a href="index.html#I-014">課題表 I-014</a>。</p></div>
+<nav class="jump" aria-label="目次"><a href="#incident">1. 事象と原因</a><a href="#solution">2. 推奨する対応</a><a href="#options">3. 対応案の比較</a><a href="#rollout">4. 開発への引き継ぎ</a><a href="#sources">5. 根拠と確認範囲</a></nav>
+<section aria-labelledby="incident"><h2 id="incident">1. 事象と原因</h2>
+<div class="compare" aria-label="変更前と変更後の比較">
+<article class="flow"><h3>現状：空の実行で止まる</h3><ol><li>古い A：素材なし ／ 新しい B：素材あり</li><li>古い A が投稿候補になる</li><li>キャプション生成・素材取得で失敗</li><li>次回も A が選ばれる</li></ol><p class="outcome">B は正常でも、投稿に進めない。</p></article>
+<article class="flow after"><h3>対応案：素材のある実行を選ぶ</h3><ol><li>古い A：素材なし ／ 新しい B：素材あり</li><li>素材なしの A を候補から外す</li><li>既存条件を満たす B を選ぶ</li><li>B の投稿処理に進める</li></ol><p class="outcome">空の実行が、後続を塞がなくなる。</p></article></div><p><code>generation_runs</code> は「生成処理を始めた記録」、<code>generated_media</code> は「生成できた画像・動画の記録」である。実行記録があることと、投稿できる素材があることは同じではない。</p>
+<p>現行の画像生成バッチは、生成実行を確定（commit）してから素材の生成処理に進む。途中で検証などに失敗すると、実行記録だけが残り、素材が 0 件になることがある。これは投稿 API のエラーや在庫枯渇に限った問題ではない。</p>
+<p>投稿バッチは、同じセットの実行から「有効アカウントの少なくとも一つに、終端状態の投稿がないもの」を古い順に 1 件選ぶ。素材の有無を調べる条件がないため、空の実行も候補になる。</p>
+<ol><li>古い実行 A は生成失敗で素材が 0 件。新しい実行 B は生成成功で素材がある。</li><li>投稿バッチが A を選ぶ。</li><li>A のキャプション生成または素材取得で失敗する。アカウントごとの投稿処理に入る前なので、候補から外す終端状態の <code>posts</code> が作られない。</li><li>次回も A が選ばれ、B が投稿されない。この繰り返しが後続の投稿を塞ぐ。</li></ol>
+<p>影響は選定対象のセット内で生じる。1 回分の生成失敗が、その後の正常な生成分まで止める点が問題である。</p>
+<h3>実際の事象から分かること</h3>
+<p><a href="../plans/logic-training-1-log.html">logic-training-1 の事象記録</a>では、実行時生成の検証失敗で残った空の run 44 が後続を塞いだ例と、ストック方式の実行時文字数検証で残った run 165 が、正常生成された run 168 を塞いだ例が記録されている。後者は課題表で約 13 時間の停止として扱われている。日時と復旧操作の原記録は同リンクおよび課題表に集約する。</p>
+<p>run 44 は素材なしの例外、run 165 はそれより前のキャプション生成で例外になった。したがって、素材取得後の例外を握りつぶすだけでは両方を防げない。候補の選定段階で空の実行を外す必要がある。</p>
+<p>ストックの入力検証を改善しても、別の生成失敗で空の実行が残る経路はある。I-033 の対策だけで I-014 が解消したとは扱えない。</p></section>
+<section aria-labelledby="solution"><h2 id="solution">2. 推奨する対応</h2>
+<p>既存 SQL の <code>WHERE gr.set_id = %s</code> に続く条件として、次を追加する案とする。</p>
+<pre><code>AND EXISTS (
+    SELECT 1
+    FROM generated_media gm
+    WHERE gm.generation_run_id = gr.id
+)</code></pre>
+<p>既存の有効アカウント・終端状態の条件、<code>scheduled_at ASC, id ASC</code> の順序、1 回に 1 実行だけ処理する方針は維持する。<code>EXISTS</code> なら素材が複数ある場合でも実行候補を重複させず、必要な「少なくとも 1 件」を直接表せる。</p>
+<p>この修正後、A が空で B に素材があれば B が選ばれる。空の実行しかない場合は対象なしとなり、既存仕様どおり <code>records_processed=0</code> の正常終了になる。空の実行自体を削除したり、架空の投稿失敗行を作ったりする必要はない。後から生成の再実行で素材が登録されれば、その実行は再び候補になり得る。</p>
+<p>変更対象案:</p>
+<ul><li><code>services/sns-post-batch/app/target_selection.py</code>: 素材の存在条件を追加する。</li><li><code>services/sns-post-batch/tests/test_target_selection.py</code> と <code>test_e2e_local_mysql.py</code>: 条件と実際の選定結果を検証する。</li><li><code>docs/app/batch-flow.html</code> 3.1: 投稿可能な候補の定義を更新する。</li><li><code>docs/app/data-model.html</code> 4.4: 掲載している選定 SQL も同期する。フローだけ直すと SQL の説明が古いまま残る。</li></ul>
+<p>既存の <code>generated_media</code> には <code>generation_run_id</code> を先頭とする一意キーが設計されている。DDL 変更を前提にせず、開発時に実 DDL とローカル MySQL の実行計画を照合する。</p>
+<h3>この対策の限界</h3>
+<ul><li>DB に素材レコードがあることは、S3 上の実体やキャプション用データの健全性までは保証しない。今回防ぐのは素材 0 件の実行による連続停止である。</li><li>空の実行だけなら正常終了になるため、「投稿できたか」を別途見る必要がある。空の実行の可視化・投稿ゼロ検知は既存の I-006・I-025 の検討へつなぐ。今回の SQL 修正に監視基盤の完成を必須条件として足さない。</li><li>過去の正常な素材の滞留や、朝用動画を夜に投稿してしまう問題（I-017）は残る。空の実行を外せば、次に選ばれるのは「当回分」とは限らない。リリース前に対象セットのバックログと時間帯を確認し、復旧で必要な対象外化・在庫戻しは既存運用の人間ゲートで扱う。</li><li><code>main.py</code> の素材なし例外は残す。選定後にデータが変更されるなどの不整合まで、成功として隠さない。</li></ul></section>
+<section aria-labelledby="options"><h2 id="options">3. 対応案の比較</h2>
+<ul class="options"><li><strong>選定時に素材の存在を確認する（推奨）</strong>: 投稿側に閉じた変更で、生成失敗の原因によらず後続への波及を防げる。検証範囲が小さく、既存の再開条件も保てる。</li><li><strong>空の実行を手動削除・対象外化する</strong>: 過去の復旧には有効だったが、検知と人手に依存する。恒久対策にはしない。</li><li><strong>生成側の commit を遅らせる・失敗時に必ず削除する</strong>: 再実行の識別や途中成果の保存に関わる。外部 API・S3 操作まで DB の rollback で戻せるわけでもない。広い再開設計の変更を今回の前提にしない。</li><li><strong>生成完了ステータスを新設する</strong>: 将来、素材と付随データの完成を厳密に保証するなら検討余地はあるが、DDL・生成側・投稿側の更新が必要。素材 0 件の除外には大きすぎる。</li><li><strong>最新の実行だけ投稿する</strong>: 後続へ進めても、未投稿分の順序と再開方針を変える。I-017 と合わせた別の判断になる。</li><li><strong>生成失敗の原因だけ直す・何もしない</strong>: 異なる生成方式でも空の実行が詰まることが記録されており、再発経路を塞げない。</li></ul></section>
+<section aria-labelledby="rollout"><h2 id="rollout">4. 開発への引き継ぎ</h2>
+<p>既存の I-014・I-022・I-024 を束ねるフェーズ内で、I-014 を先頭の独立ステップにする案。残りの API 統合・エラー理由の保存・リトライは後続ステップとして分ける。ここでは I-022 の API バージョン移行や I-024 のリトライ仕様を新たに確定しない。</p>
+<details><summary>実装範囲・完了条件・受け入れケースを開く</summary><div class="inner"><h3>ステップ案: 空の生成実行を投稿対象から除外する</h3>
+<ul><li><strong>内容</strong>: 上記の選定 SQL・テスト・設計書 2 本を変更する。実装前に課題表を再照合し、同一フェーズの I-022・I-024 は後続ステップへ分離する。共通パスを持つ I-006・I-017・I-025 の監視・滞留対策、I-012 の SNS 別分冊、I-015 の AI 開示タグ検証は今回の修正に同梱しない。後続分のトリガー更新はフェーズを正式起票する開発レーンで行う。</li><li><strong>完了条件</strong>: ローカル MySQL で下記の選定ケースが通り、投稿バッチの既存テストが通る。フローと SQL の説明が実装と一致する。DB テストが実行できず skip の場合は合格としない。本番での再発なしや翌日の投稿は完了条件に含めない。</li><li><strong>人間ゲート</strong>: 差分・検証結果・既存バックログの扱いを確認してから push する。承認後の CodePipeline 確認は既存の開発手順に従う。本番データの削除・補正や SNS 投稿をこのステップで自動実行しない。</li><li><strong>停止点・上限</strong>: 実装セッションはコミットと証跡提示まで。目安 20 ターン。DDL や生成側の変更が必要と判明した場合は範囲を広げず、開発レーンで分割を再判断する。</li></ul>
+<h3>選定ロジックの受け入れケース</h3>
+<ol><li>古い空の実行 + 新しい素材あり実行 → 新しい実行を選ぶ。空の実行にキャプション用データもない場合を含める。</li><li>空の実行だけ → 対象なし。main の既存の 0 件終了へ進む。</li><li>素材ありの未完了実行が複数 → 既存どおり最古を選ぶ。同時刻なら ID 順。</li><li>素材ありでも有効アカウントすべてが終端状態 → 選ばない。有効アカウントがない場合も選ばない。</li><li>複数アカウントのうち一部だけ未完了、または pending / container_created → 既存の再開対象として選ぶ。</li><li>別セットの素材しかない実行 → 選ばない。同一実行に素材が複数 → 実行は 1 件として選ぶ。</li><li>一度空として除外した実行に素材を追加 → 終端条件を満たさなければ再び候補になる。</li><li>既存の素材なし例外テストを維持し、選定後の不整合は失敗として検知する。</li></ol>
+<p>現行の <code>test_target_selection.py</code> はカーソルをモックして SQL の一部を検査するため、それだけでは「空の先頭を飛ばして次を選ぶ」を実証できない。既存のローカル MySQL テストの仕組みを使って DB 上の選定を確認する。外部投稿 API は偽物を使う。</p>
+<p>計画体系 5.1 の照合: 変更は開発レーン内、I-014 単体は 20 ターン目安で収め、API 統合とは分離する。将来の定時実行を完了条件にせず、リリース後の投稿・時間帯・0 件処理の観察は必要に応じ開発レーンで確認待ちへ登録する。</p></div></details></section>
+<section aria-labelledby="sources"><h2 id="sources">5. 根拠と確認範囲</h2>
+<p>本書は 2026-09-21 のローカルリポジトリの確認に基づく。本番 DB・CloudWatch・現在の投稿状態は確認していない。</p>
+<ul><li><a href="index.html">課題表</a>: I-014 と関連課題・既存の同梱方針。</li><li><a href="../plans/logic-training-1-log.html">セットの事象記録</a>: 障害の症状、空の実行と後続実行、復旧時の時間帯の扱い。</li><li><code>services/image-batch/app/main.py</code>: 生成実行の commit が生成処理より前にある。</li><li><code>services/sns-post-batch/app/target_selection.py</code> / <code>main.py</code>: 素材の存在条件がなく、キャプション生成が素材取得より前にある。</li><li><a href="../app/batch-flow.html#sns-target">投稿フロー</a> / <a href="../app/data-model.html#target-selection">データモデル</a>: 選定と再開条件、掲載 SQL。</li></ul></section><footer><p class="footnote">検討経緯と原文メモは <a href="sns-empty-generation-run.md">壁打ち記録（Markdown）</a>へ。管理状態・トリガー・発生履歴は <a href="index.html#I-014">課題表</a>を参照。</p></footer>
+</main></body></html>
