@@ -230,3 +230,80 @@ figure.diagram figcaption { font-size: .85rem; color: var(--text-muted); margin-
   .table-wrap > table th,
   .table-wrap > table td { max-width: 16rem; }
 }
+
+/* ---- 課題・アイデア一覧のカード表示（Phase 24-2）---- */
+/* 対象は table[data-cards] のみ（同ページの運用ルール説明表は一般表のまま）。
+   - PC 幅（768 CSS px 以上）は表形式を維持する。ここでの指定は
+     docs-cards.js が足すトグル用セルを隠すことだけ（表の列は増えない）
+   - 狭い画面では 1 行 = 1 カードにし、列名は data-label から ::before で出す
+     （スマホ用の文章を別に持たない）
+   - 補足列（data-card-extra）は JS が hidden で閉じる。JS が動かない場合は
+     全項目が展開されたカードとして読める（表示が壊れて読めなくはならない） */
+td.card-toggle-cell { display: none; }
+.card-toggle { font: inherit; font-size: .82rem; }
+
+@media (max-width: 767.98px) {
+  .table-wrap > table[data-cards] {
+    display: block;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    font-size: .9rem;
+  }
+  .table-wrap > table[data-cards] > thead { display: none; }
+  .table-wrap > table[data-cards] > tbody { display: block; }
+  .table-wrap > table[data-cards] > tbody > tr {
+    display: block;
+    margin: .7rem 0;
+    padding: .55rem .75rem .65rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+  .table-wrap > table[data-cards] > tbody > tr:nth-child(even) {
+    background: color-mix(in srgb, var(--bg-subtle) 55%, var(--bg));
+  }
+  .table-wrap > table[data-cards] > tbody > tr > td {
+    display: block;
+    width: auto;
+    max-width: none;
+    border: 0;
+    padding: .18rem 0;
+  }
+  /* 非対応ブラウザー向けの通常の hidden（until-found は content-visibility で
+     隠れるため、ここで display を上書きしない = 検索で開ける状態を保つ） */
+  .table-wrap > table[data-cards] > tbody > tr > td[hidden]:not([hidden="until-found"]) {
+    display: none;
+  }
+  .table-wrap > table[data-cards] > tbody > tr > td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  /* 1 列目（ID・タイトル）はカードの見出しとして扱う */
+  .table-wrap > table[data-cards] > tbody > tr > td.card-main:first-child {
+    font-weight: 700;
+    font-size: 1.02em;
+    padding-bottom: .3rem;
+  }
+  .table-wrap > table[data-cards] > tbody > tr > td.card-extra {
+    color: var(--text-muted);
+  }
+  .table-wrap > table[data-cards] > tbody > tr > td.card-toggle-cell {
+    display: block;
+    padding: .35rem 0 0;
+  }
+  .card-toggle {
+    display: inline-block;
+    max-width: 100%;
+    text-align: left;
+    padding: .3rem .6rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+}

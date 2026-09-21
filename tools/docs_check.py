@@ -2,11 +2,12 @@
 """設計書 HTML（docs/）の機械検証ツール。
 
 Phase 24-1 で新設。アーカイブ（``docs/_archive/``）を除く現役 HTML について、
-次の 3 つを確認する。
+次の 4 つを確認する。
 
 1. 対象ページと表の件数（実行時に再集計する。固定の期待件数は持たない）
 2. リンク / アンカーの整合（相対 href・src の参照先ファイルと ``#id`` の実在）
 3. 指定幅でのページ全体の横はみ出し（ヘッドレス Chrome で実測）
+4. ``table[data-cards]`` の表構造と、767 / 768 CSS px でのカード表示
 
 横はみ出し判定はヘッドレスブラウザーを使う。使えない環境ではその旨を出力し、
 静的チェックのみで終了する（未確認を合格扱いにしない）。
@@ -65,6 +66,7 @@ class PageParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.refs: list[str] = []
+        self.script_srcs: list[str] = []
         self.ids: list[str] = []
         self.tables = 0
 
@@ -78,6 +80,8 @@ class PageParser(HTMLParser):
                 self.ids.append(value)
             elif name in REF_ATTRS:
                 self.refs.append(value)
+                if tag == "script" and name == "src":
+                    self.script_srcs.append(value)
 
     def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         self.handle_starttag(tag, attrs)
@@ -89,6 +93,141 @@ def parse_page(text: str) -> PageParser:
     parser.feed(text)
     parser.close()
     return parser
+
+
+def normalize_text(value: str) -> str:
+    """ブラウザーの ``textContent`` と比較できるよう空白を正規化する。"""
+    return re.sub(r"\s+", " ", value).strip()
+
+
+@dataclass(frozen=True)
+class CardRow:
+    """カード表示対象の tbody 行。
+
+    Attributes:
+        row_id: 行の ``id`` 属性。なければ ``None``。
+        cells: 元の td のテキスト（空白正規化済み）。
+        colspans: 各 td の ``colspan``。指定がなければ 1。
+    """
+
+    row_id: str | None
+    cells: tuple[str, ...]
+    colspans: tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class CardTable:
+    """``table[data-cards]`` 1 表の静的解析結果。"""
+
+    page: str
+    index: int
+    headers: tuple[str, ...]
+    extra_indexes: tuple[int, ...]
+    invalid_extra_indexes: tuple[str, ...]
+    rows: tuple[CardRow, ...]
+
+
+class CardTableParser(HTMLParser):
+    """``table[data-cards]`` の見出し・行・補足列指定を抽出する。"""
+
+    def __init__(self, page: str) -> None:
+        super().__init__(convert_charrefs=True)
+        self.page = page
+        self.tables: list[CardTable] = []
+        self._table_depth = 0
+        self._current: dict | None = None
+        self._section: str | None = None
+        self._row: dict | None = None
+        self._cell: list[str] | None = None
+        self._cell_colspan = 1
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """開始タグに応じて対象表の構造を記録する。"""
+        attr_map = dict(attrs)
+        if tag == "table":
+            self._table_depth += 1
+            if self._table_depth == 1 and "data-cards" in attr_map:
+                raw = attr_map.get("data-card-extra") or ""
+                indexes: list[int] = []
+                invalid: list[str] = []
+                for part in raw.split(","):
+                    value = part.strip()
+                    if not value:
+                        continue
+                    if value.isdigit():
+                        indexes.append(int(value))
+                    else:
+                        invalid.append(value)
+                self._current = {
+                    "index": len(self.tables),
+                    "headers": [],
+                    "extra_indexes": indexes,
+                    "invalid_extra_indexes": invalid,
+                    "rows": [],
+                }
+            return
+        if self._current is None:
+            return
+        if tag in {"thead", "tbody"}:
+            self._section = tag
+        elif tag == "tr" and self._section in {"thead", "tbody"}:
+            self._row = {"id": attr_map.get("id"), "cells": []}
+        elif tag in {"th", "td"} and self._row is not None:
+            if (self._section == "thead" and tag == "th") or (
+                self._section == "tbody" and tag == "td"
+            ):
+                self._cell = []
+                raw_colspan = attr_map.get("colspan") or "1"
+                self._cell_colspan = int(raw_colspan) if raw_colspan.isdigit() else 1
+
+    def handle_data(self, data: str) -> None:
+        """セル内のテキストを蓄積する。"""
+        if self._cell is not None:
+            self._cell.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        """終了タグに応じてセル・行・表を確定する。"""
+        if self._current is not None and tag in {"th", "td"} and self._cell is not None:
+            self._row["cells"].append(normalize_text("".join(self._cell)))
+            self._row.setdefault("colspans", []).append(self._cell_colspan)
+            self._cell = None
+        if self._current is not None and tag == "tr" and self._row is not None:
+            cells = self._row["cells"]
+            if self._section == "thead" and not self._current["headers"]:
+                self._current["headers"] = cells
+            elif self._section == "tbody":
+                self._current["rows"].append(
+                    CardRow(
+                        self._row["id"],
+                        tuple(cells),
+                        tuple(self._row["colspans"]),
+                    )
+                )
+            self._row = None
+        if self._current is not None and tag in {"thead", "tbody"}:
+            self._section = None
+        if tag == "table":
+            if self._table_depth == 1 and self._current is not None:
+                self.tables.append(
+                    CardTable(
+                        page=self.page,
+                        index=self._current["index"],
+                        headers=tuple(self._current["headers"]),
+                        extra_indexes=tuple(self._current["extra_indexes"]),
+                        invalid_extra_indexes=tuple(self._current["invalid_extra_indexes"]),
+                        rows=tuple(self._current["rows"]),
+                    )
+                )
+                self._current = None
+            self._table_depth -= 1
+
+
+def parse_card_tables(page: str, text: str) -> list[CardTable]:
+    """ページ内の ``table[data-cards]`` を静的に解析して返す。"""
+    parser = CardTableParser(page)
+    parser.feed(text)
+    parser.close()
+    return parser.tables
 
 
 @dataclass(frozen=True)
@@ -275,9 +414,8 @@ def find_browser() -> str | None:
     return None
 
 
-DRIVER_TEMPLATE = """<!DOCTYPE html><html><head><meta charset="utf-8"><title>docs_check</title></head>
+DRIVER_HEAD = """<!DOCTYPE html><html><head><meta charset="utf-8"><title>docs_check</title></head>
 <body><pre id="out">PENDING</pre><div id="host"></div><script>
-const PAGES = %s, WIDTHS = %s;
 function load(src, w) {
   return new Promise(res => {
     const f = document.createElement('iframe');
@@ -287,6 +425,10 @@ function load(src, w) {
     document.getElementById('host').appendChild(f);
   });
 }
+"""
+
+OVERFLOW_DRIVER_TEMPLATE = DRIVER_HEAD + """
+const PAGES = %s, WIDTHS = %s;
 async function main() {
   const out = [];
   for (const w of WIDTHS) {
@@ -325,6 +467,57 @@ async function main() {
 main();
 </script></body></html>"""
 
+CARD_DRIVER_TEMPLATE = DRIVER_HEAD + """
+const PAGES = %s, WIDTHS = %s;
+function textOf(el) {
+  return (el.textContent || '').replace(/\\s+/g, ' ').trim();
+}
+function cellsOf(tr) {
+  return Array.from(tr.children)
+    .filter(el => (el.tagName === 'TD' || el.tagName === 'TH') &&
+                  !el.classList.contains('card-toggle-cell'))
+    .map((el, i) => ({
+      column: i + 1,
+      text: textOf(el),
+      extra: el.classList.contains('card-extra'),
+      hidden: el.hasAttribute('hidden') ? el.getAttribute('hidden') : null,
+      visible: el.getClientRects().length > 0
+    }));
+}
+async function main() {
+  const out = [];
+  for (const w of WIDTHS) {
+    for (const p of PAGES) {
+      const f = await load(p, w);
+      const d = f.contentDocument;
+      const tables = Array.from(d.querySelectorAll('table[data-cards]'));
+      out.push({
+        page: p,
+        width: w,
+        tables: tables.map((table, index) => ({
+          index: index,
+          display: getComputedStyle(table).display,
+          rows: Array.from(table.querySelectorAll('tbody > tr')).map((tr, row) => {
+            const toggle = Array.from(tr.children).find(
+              el => el.classList && el.classList.contains('card-toggle-cell'));
+            return {
+              row: row + 1,
+              rowId: tr.id || null,
+              cells: cellsOf(tr),
+              toggle: toggle ? {exists: true, display: getComputedStyle(toggle).display} :
+                {exists: false, display: null}
+            };
+          })
+        }))
+      });
+      f.remove();
+    }
+  }
+  document.getElementById('out').textContent = JSON.stringify(out);
+}
+main();
+</script></body></html>"""
+
 
 def _make_handler(root: Path, driver_html: bytes):
     """ドライバーページを合成して返す HTTP ハンドラを作る。"""
@@ -349,35 +542,26 @@ def _make_handler(root: Path, driver_html: bytes):
     return Handler
 
 
-def measure_overflow(
-    pages: Sequence[str], root: Path, widths: Sequence[int], browser: str
-) -> list[dict]:
-    """指定幅でページ全体の横はみ出しを実測する。
-
-    ローカル HTTP サーバーを立て、同一オリジンの iframe に各ページを読み込んで
-    ``scrollWidth`` と ``clientWidth`` を比較する（iframe 幅 = CSS px のビューポート幅）。
+def run_browser_driver(root: Path, browser: str, driver_html: bytes, budget: int) -> list[dict]:
+    """ローカル HTTP サーバー上でドライバーをヘッドレス Chrome に実行させる。
 
     Args:
-        pages: 対象の現役 HTML（リポジトリ相対パス）。
         root: HTTP サーバーの公開ルート（リポジトリルート）。
-        widths: 測定する CSS px 幅。
         browser: ヘッドレス Chrome / Edge の実行パス。
+        driver_html: ``/__docs_check__.html`` として配信するドライバー HTML。
+        budget: ブラウザーに与える仮想時間の上限（ミリ秒）。
 
     Returns:
-        ``{page, width, vw, over, offenders}`` の一覧。
+        ドライバーが JSON として返した測定結果の一覧。
 
     Raises:
         RuntimeError: ブラウザーから測定結果を取得できなかった場合。
     """
-    urls = ["/" + rel for rel in pages]
-    driver = (DRIVER_TEMPLATE % (json.dumps(urls), json.dumps(list(widths)))).encode("utf-8")
-
-    server = socketserver.ThreadingTCPServer(("0.0.0.0", 0), _make_handler(root, driver))
+    server = socketserver.ThreadingTCPServer(("0.0.0.0", 0), _make_handler(root, driver_html))
     port = server.server_address[1]
     threading.Thread(target=server.serve_forever, daemon=True).start()
     time.sleep(1.5)  # WSL からの localhost 転送が張られるのを待つ
     try:
-        budget = 20000 + 500 * len(urls) * len(widths)
         proc = subprocess.run(
             [
                 browser,
@@ -404,9 +588,292 @@ def measure_overflow(
     return json.loads(html.unescape(match.group(1)))
 
 
+def measure_overflow(
+    pages: Sequence[str], root: Path, widths: Sequence[int], browser: str
+) -> list[dict]:
+    """指定幅でページ全体の横はみ出しを実測する。
+
+    同一オリジンの iframe に各ページを読み込んで ``scrollWidth`` と
+    ``clientWidth`` を比較する（iframe 幅 = CSS px のビューポート幅）。
+    """
+    urls = ["/" + rel for rel in pages]
+    driver = (
+        OVERFLOW_DRIVER_TEMPLATE % (json.dumps(urls), json.dumps(list(widths)))
+    ).encode("utf-8")
+    budget = 20000 + 500 * len(urls) * len(widths)
+    return run_browser_driver(root, browser, driver, budget)
+
+
+def measure_cards(
+    pages: Sequence[str], root: Path, widths: Sequence[int], browser: str
+) -> list[dict]:
+    """指定幅で ``table[data-cards]`` のセル・トグルの実測値を取得する。"""
+    urls = ["/" + rel for rel in pages]
+    driver = (CARD_DRIVER_TEMPLATE % (json.dumps(urls), json.dumps(list(widths)))).encode(
+        "utf-8"
+    )
+    budget = 20000 + 500 * len(urls) * len(widths)
+    return run_browser_driver(root, browser, driver, budget)
+
+
+CARD_WIDTHS = (767, 768)
+
+
+def measure_cards_with_retry(
+    pages: Sequence[str], root: Path, browser: str, attempts: int = 2
+) -> list[dict]:
+    """カード表示の実測を、取得できなかった場合に限り retry しながら行う。
+
+    Args:
+        pages: 対象の現役 HTML（リポジトリ相対パス）。
+        root: HTTP サーバーの公開ルート（リポジトリルート）。
+        browser: ヘッドレス Chrome / Edge の実行パス。
+        attempts: 最大試行回数。
+
+    Returns:
+        ドライバーが返した測定結果の一覧。
+
+    Raises:
+        RuntimeError: すべての試行で測定結果を取得できなかった場合。
+    """
+    last: Exception | None = None
+    for attempt in range(attempts):
+        try:
+            return measure_cards(pages, root, CARD_WIDTHS, browser)
+        except (RuntimeError, subprocess.TimeoutExpired) as exc:
+            last = exc
+            if attempt + 1 < attempts:
+                time.sleep(2.0)
+    raise RuntimeError(str(last))
+
+
 def format_findings(findings: Iterable[Finding]) -> list[str]:
     """指摘を表示用の行に整形する。"""
     return [f.line() for f in sorted(findings, key=lambda f: (f.page, f.kind, f.detail))]
+
+
+def check_card_static(
+    card_tables: Sequence[CardTable], texts: dict[str, str]
+) -> list[Finding]:
+    """カード表示対象表の HTML 構造とスクリプト読込を確認する。"""
+    findings: list[Finding] = []
+    pages = {table.page for table in card_tables}
+    for page in sorted(pages):
+        scripts = parse_page(texts[page]).script_srcs
+        if not any(urlsplit(src).path.endswith("docs-cards.js") for src in scripts):
+            findings.append(Finding(page, "cards-script", "docs-cards.js の script src がない"))
+
+    for table in card_tables:
+        label = f"table {table.index + 1}"
+        columns = len(table.headers)
+        for row_number, row in enumerate(table.rows, start=1):
+            row_columns = sum(row.colspans)
+            if row_columns != columns:
+                findings.append(
+                    Finding(
+                        table.page,
+                        "cards-column-count",
+                        f"{label} 行 {row_number}: thead {columns} 列 / tbody {row_columns} 列",
+                    )
+                )
+        for value in table.invalid_extra_indexes:
+            findings.append(
+                Finding(
+                    table.page,
+                    "cards-extra-index",
+                    f"{label}: data-card-extra の列番号でない値 '{value}'",
+                )
+            )
+        for value in table.extra_indexes:
+            if not 1 <= value <= columns:
+                findings.append(
+                    Finding(
+                        table.page,
+                        "cards-extra-index",
+                        f"{label}: data-card-extra={value}（列数 {columns} の範囲外）",
+                    )
+                )
+
+        has_issue_ids = any(
+            row.row_id is not None and re.fullmatch(r"I-\d+", row.row_id)
+            for row in table.rows
+        )
+        if has_issue_ids:
+            for row_number, row in enumerate(table.rows, start=1):
+                if row.row_id is None:
+                    findings.append(
+                        Finding(
+                            table.page,
+                            "cards-row-id",
+                            f"{label} 行 {row_number}: issues 形式の表に id がない",
+                        )
+                    )
+    return findings
+
+
+def card_table_summary(table: CardTable) -> str:
+    """表ごとの静的チェック結果を 1 行に整形する。"""
+    extras = set(table.extra_indexes)
+    main_labels = [name for i, name in enumerate(table.headers, start=1) if i not in extras]
+    extra_labels = [name for i, name in enumerate(table.headers, start=1) if i in extras]
+    issue_ids = sum(
+        row.row_id is not None and re.fullmatch(r"I-\d+", row.row_id) is not None
+        for row in table.rows
+    )
+    with_id = sum(row.row_id is not None for row in table.rows)
+    without_id = len(table.rows) - with_id
+    anchor = (
+        f"ID アンカーあり {issue_ids} 行 / id あり {with_id} 行 / id なし {without_id} 行"
+        if issue_ids
+        else f"id なし（元の表にも無し） {without_id} 行 / id あり {with_id} 行"
+    )
+    return (
+        f"  {table.page} table {table.index + 1}: {len(table.rows)} 行 / "
+        f"常時表示: {'・'.join(main_labels) or 'なし'} / "
+        f"補足: {'・'.join(extra_labels) or 'なし'} / {anchor}"
+    )
+
+
+def preview_text(value: str) -> str:
+    """NG 出力用にテキストの先頭 40 字を返す。"""
+    return value[:40] + ("…" if len(value) > 40 else "")
+
+
+def card_row_name(table: CardTable, row_number: int) -> str:
+    """NG 出力で使う行 ID または 1 始まり行番号を返す。"""
+    row = table.rows[row_number - 1]
+    return row.row_id or f"行 {row_number}"
+
+
+def check_card_measurements(
+    card_tables: Sequence[CardTable], results: Sequence[dict]
+) -> tuple[dict[str, tuple[int, int]], list[str]]:
+    """カード表示のブラウザー実測を静的な元表と突き合わせる。
+
+    Returns:
+        判定項目ごとの ``(確認数, NG 数)`` と、NG の詳細表示行。
+    """
+    counts: dict[str, list[int]] = {
+        "767px 表示:block": [0, 0],
+        "767px 常時表示セル": [0, 0],
+        "767px 補足セル": [0, 0],
+        "767px トグル": [0, 0],
+        "768px 表示・全セル・トグル": [0, 0],
+    }
+    findings: list[str] = []
+    by_result = {(rec["page"].lstrip("/"), rec["width"]): rec for rec in results}
+
+    def add(key: str, detail: str) -> None:
+        counts[key][1] += 1
+        findings.append(detail)
+
+    for table in card_tables:
+        extras = set(table.extra_indexes)
+        for width in (767, 768):
+            record = by_result.get((table.page, width))
+            prefix = f"{width}px {table.page} table {table.index + 1}"
+            if record is None or table.index >= len(record["tables"]):
+                keys = (
+                    ["767px 表示:block", "767px 常時表示セル", "767px 補足セル", "767px トグル"]
+                    if width == 767
+                    else ["768px 表示・全セル・トグル"]
+                )
+                for key in keys:
+                    counts[key][0] += 1
+                    add(key, f"{prefix}: 測定結果がない")
+                continue
+            measured = record["tables"][table.index]
+            if width == 767:
+                counts["767px 表示:block"][0] += 1
+                if measured["display"] != "block":
+                    add(
+                        "767px 表示:block",
+                        f"{prefix}: table display={measured['display']}（block ではない）",
+                    )
+            else:
+                counts["768px 表示・全セル・トグル"][0] += 1
+                if measured["display"] != "table":
+                    add(
+                        "768px 表示・全セル・トグル",
+                        f"{prefix}: table display={measured['display']}（table ではない）",
+                    )
+
+            if len(measured["rows"]) != len(table.rows):
+                key = "767px 常時表示セル" if width == 767 else "768px 表示・全セル・トグル"
+                counts[key][0] += 1
+                add(
+                    key,
+                    f"{prefix}: 元の表 {len(table.rows)} 行 / 実測 {len(measured['rows'])} 行",
+                )
+
+            for row_number, original in enumerate(table.rows, start=1):
+                if row_number > len(measured["rows"]):
+                    continue
+                actual = measured["rows"][row_number - 1]
+                row_name = card_row_name(table, row_number)
+                if len(actual["cells"]) != len(original.cells):
+                    key = "767px 常時表示セル" if width == 767 else "768px 表示・全セル・トグル"
+                    counts[key][0] += 1
+                    add(
+                        key,
+                        f"{prefix} {row_name}: 元の表 {len(original.cells)} セル / "
+                        f"実測 {len(actual['cells'])} セル",
+                    )
+                for column, original_text in enumerate(original.cells, start=1):
+                    if column > len(actual["cells"]):
+                        continue
+                    cell = actual["cells"][column - 1]
+                    expected_extra = column in extras
+                    if width == 767 and not expected_extra:
+                        counts["767px 常時表示セル"][0] += 1
+                        if cell["extra"] or not cell["visible"] or cell["text"] != original_text:
+                            add(
+                                "767px 常時表示セル",
+                                f"{prefix} {row_name} 列 {column}: 元='{preview_text(original_text)}' / "
+                                f"実='{preview_text(cell['text'])}' "
+                                f"（card-extra={cell['extra']}, 表示={cell['visible']}）",
+                            )
+                    elif width == 767:
+                        counts["767px 補足セル"][0] += 1
+                        hidden = cell["hidden"]
+                        if (
+                            not cell["extra"]
+                            or hidden not in {"", "until-found"}
+                            or cell["text"] != original_text
+                        ):
+                            add(
+                                "767px 補足セル",
+                                f"{prefix} {row_name} 列 {column}: 元='{preview_text(original_text)}' / "
+                                f"実='{preview_text(cell['text'])}' "
+                                f"（card-extra={cell['extra']}, hidden={hidden!r}）",
+                            )
+                    elif width == 768:
+                        counts["768px 表示・全セル・トグル"][0] += 1
+                        if not cell["visible"]:
+                            add(
+                                "768px 表示・全セル・トグル",
+                                f"{prefix} {row_name} 列 {column}: セルが表示されていない",
+                            )
+
+                row_has_extra = any(
+                    column in extras for column in range(1, len(original.cells) + 1)
+                )
+                if width == 767 and row_has_extra:
+                    counts["767px トグル"][0] += 1
+                    if not actual["toggle"]["exists"] or actual["toggle"]["display"] == "none":
+                        add(
+                            "767px トグル",
+                            f"{prefix} {row_name}: トグルセルがないか display=none",
+                        )
+                elif width == 768:
+                    counts["768px 表示・全セル・トグル"][0] += 1
+                    if actual["toggle"]["exists"] and actual["toggle"]["display"] != "none":
+                        add(
+                            "768px 表示・全セル・トグル",
+                            f"{prefix} {row_name}: トグルセル display={actual['toggle']['display']}",
+                        )
+
+    return {key: (value[0], value[1]) for key, value in counts.items()}, findings
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -435,6 +902,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     pages = tree.html_pages()
     texts = {p: tree.read(p) for p in pages}
     tables = sum(count_tables(t) for t in texts.values())
+    card_tables = [table for page in pages for table in parse_card_tables(page, texts[page])]
 
     print("=== 1. 対象 ===")
     print(f"現役ページ数: {len(pages)}（docs/ 配下の HTML から {'/'.join(sorted(EXCLUDED_DIRS))} を除外）")
@@ -489,41 +957,79 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     print()
     print("=== 3. ページ全体の横はみ出し ===")
+    browser_ready = False
+    browser: str | None = None
     if args.no_browser:
         print("スキップ（--no-browser）。未確認のため合格扱いにしない")
-        return 1
-    browser = find_browser()
-    if not browser:
+        exit_code = 1
+    else:
+        browser = find_browser()
+    if not args.no_browser and not browser:
         print("ヘッドレスブラウザーが見つからないため測定できない（未確認）。")
         print("  対処: DOCS_CHECK_CHROME に Chrome / Edge の実行パスを設定するか、")
         print("        静的チェックのみで進め、24-3 の実機確認に委ねる。")
-        return 1
-    print(f"ブラウザー: {browser}")
-    try:
-        results = measure_overflow(pages, REPO_ROOT, widths, browser)
-    except (RuntimeError, subprocess.TimeoutExpired) as exc:
-        print(f"測定に失敗した（未確認）: {exc}")
-        return 1
+        exit_code = 1
+    elif not args.no_browser:
+        print(f"ブラウザー: {browser}")
+        try:
+            results = measure_overflow(pages, REPO_ROOT, widths, browser)
+        except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
+            print(f"測定に失敗した（未確認）: {exc}")
+            exit_code = 1
+        else:
+            browser_ready = True
+            measured = {(r["page"], r["width"]) for r in results}
+            expected = {("/" + rel, w) for rel in pages for w in widths}
+            missing = expected - measured
+            over = [r for r in results if r["over"] > 1]
+            for width in widths:
+                count = sum(1 for r in results if r["width"] == width and r["over"] > 1)
+                total = sum(1 for r in results if r["width"] == width)
+                print(f"  {width:>5} CSS px: はみ出し {count} 件 / {total} ページ")
+            for rec in over:
+                print(f"  NG {rec['width']}px {rec['page']}: +{rec['over']}px")
+                for off in rec["offenders"]:
+                    print(f"       {off['tag']}.{off['cls']} right={off['right']} :: {off['text']}")
+            if missing:
+                print(f"  未測定: {len(missing)} 件（未確認のため合格扱いにしない）")
+                for page, width in sorted(missing)[:10]:
+                    print(f"       {width}px {page}")
+                exit_code = 1
+            if over:
+                exit_code = 1
 
-    measured = {(r["page"], r["width"]) for r in results}
-    expected = {("/" + rel, w) for rel in pages for w in widths}
-    missing = expected - measured
-    over = [r for r in results if r["over"] > 1]
-    for width in widths:
-        count = sum(1 for r in results if r["width"] == width and r["over"] > 1)
-        total = sum(1 for r in results if r["width"] == width)
-        print(f"  {width:>5} CSS px: はみ出し {count} 件 / {total} ページ")
-    for rec in over:
-        print(f"  NG {rec['width']}px {rec['page']}: +{rec['over']}px")
-        for off in rec["offenders"]:
-            print(f"       {off['tag']}.{off['cls']} right={off['right']} :: {off['text']}")
-    if missing:
-        print(f"  未測定: {len(missing)} 件（未確認のため合格扱いにしない）")
-        for page, width in sorted(missing)[:10]:
-            print(f"       {width}px {page}")
+    print()
+    print("=== 4. カード表示（24-2） ===")
+    card_static = check_card_static(card_tables, texts)
+    card_pages = {table.page for table in card_tables}
+    print(f"対象: {len(card_pages)} ページ / {len(card_tables)} 表")
+    for table in card_tables:
+        print(card_table_summary(table))
+    print(f"静的チェック: {'OK' if not card_static else 'NG'}（不備 {len(card_static)} 件）")
+    for line in format_findings(card_static):
+        print(f"  NG {line}")
+    if card_static:
         exit_code = 1
-    if over:
+
+    if not browser_ready:
+        print("ブラウザー実測: 未確認（セクション 3 と同じ理由。合格扱いにしない）")
         exit_code = 1
+    else:
+        try:
+            # セクション 3 の直後はブラウザーの起動が間に合わず空振りすることがあるため 1 度だけ retry する
+            card_results = measure_cards_with_retry(sorted(card_pages), REPO_ROOT, browser)
+        except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
+            print(f"ブラウザー実測: 未確認（測定に失敗: {exc}）")
+            exit_code = 1
+        else:
+            card_counts, card_findings = check_card_measurements(card_tables, card_results)
+            for name, (checked, failed) in card_counts.items():
+                print(f"  {name}: NG {failed} 件 / {checked} 件")
+            for finding in card_findings:
+                print(f"  NG {finding}")
+            if card_findings:
+                exit_code = 1
+            print("カード表示の判定: " + ("OK" if not card_findings and not card_static else "NG"))
 
     print()
     print("=== 判定 ===")

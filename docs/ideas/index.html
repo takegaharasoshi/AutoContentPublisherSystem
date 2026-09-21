@@ -23,7 +23,7 @@
 
 <h2>1. 今動ける（inbox + 醸成中）</h2>
 <p>次の壁打ち候補。ここが空でなければ、いつでも <code>/idea</code> で壁打ちを始められる。</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><table data-cards data-card-extra="2,6">
 <thead><tr><th>タイトル</th><th>種別</th><th>ステータス</th><th>要旨</th><th>リンク</th><th>更新日</th></tr></thead>
 <tbody>
 
@@ -73,7 +73,7 @@
 
 <h2>2. 条件待ち（再醸成待ち + 待機）</h2>
 <p>眠っているもの。棚卸し（フェーズ完了・効果検証などの節目）ではこの表の<strong>条件列だけ</strong>を順に確認する。</p>
-<div class="table-wrap"><table>
+<div class="table-wrap"><table data-cards data-card-extra="2,6">
 <thead><tr><th>タイトル</th><th>種別</th><th>ステータス</th><th>条件（満たされたら何をするか）</th><th>リンク</th><th>更新日</th></tr></thead>
 <tbody>
 <tr>
@@ -88,7 +88,7 @@
 </table></div>
 
 <h2>3. クローズ（採用 / 見送り）</h2>
-<div class="table-wrap"><table>
+<div class="table-wrap"><table data-cards data-card-extra="5">
 <thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
 <tbody>
 <tr>
@@ -188,6 +188,8 @@
 </tbody>
 </table></div>
 
+<p><strong>表示（24-2）</strong>: 768 CSS px 未満では 1〜3 節の表が<strong>カード表示</strong>になり（<code>docs/assets/docs-cards.js</code>）、常時表示 = タイトル・ステータス・要旨（or 条件）・リンク（クローズ節は タイトル・結果・昇格先 / 見送り理由・リンク）、補足 = 種別・更新日（クローズ節は完了日）が初期状態で閉じる。<strong>行は従来どおり列どおりの <code>&lt;td&gt;</code> で足せば同じ表示になる</strong>（行ごとの追加作業は不要。列を増減したときだけ <code>&lt;table data-card-extra&gt;</code> の列番号を直す）。</p>
+
 <h3>4.3 ファイルの 2 層構造</h3>
 <ul>
 <li><strong>記録層（MD・唯一の正）</strong>: 1 アイデア 1 ファイル。ユーザーは殴り書きのまま話し、整形は Claude の仕事。「要旨」は Claude が毎回書き直す生きた要約、「原文メモ」「壁打ち記録」は追記のみ（書き換え禁止）。壁打ち記録は会話ログの貼り付けではなく、論点・判断・積み残しの蒸留</li>
@@ -212,5 +214,6 @@
 </ul>
 
 </div>
+<script src="../assets/docs-cards.js" defer></script>
 </body>
 </html>
