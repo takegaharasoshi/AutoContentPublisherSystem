@@ -204,3 +204,29 @@ figure.diagram figcaption { font-size: .85rem; color: var(--text-muted); margin-
 }
 .card .card-title { font-weight: 700; margin-bottom: .2rem; }
 .card p { margin: .3rem 0 0; font-size: .88rem; color: var(--text-muted); }
+
+/* ---- 狭い画面（スマホ）---- */
+/* 一般表の列幅対策（Phase 24-1）。
+   - 表を max-content 幅にして、項目名・日付など短い列を折り返さない
+   - セルの上限 16rem で説明列に読める幅を確保しつつ長文は折り返す
+   - 収まらない分は .table-wrap の横スクロールへ逃がす（短い表は min-width: 100% で画面幅に収まる）
+   - 本文の文字サイズは変えない（文字縮小・文章省略で収めない）
+   .table-wrap を持たない表は従来どおり幅 100%（ページ全体をはみ出させない）。
+   セルの max-width を無視するブラウザーでは表が広がるだけで読めなくはならず、
+   表側の max-width 100rem が上限として効く。 */
+@media (max-width: 767.98px) {
+  .container { padding: 1.5rem 1rem 4rem; }
+
+  /* 長い注記を含むバッジは狭い画面で折り返す（nowrap のままだとページごと横にはみ出す） */
+  .badge { white-space: normal; }
+
+  .table-wrap { overscroll-behavior-x: contain; }
+  .table-wrap > table {
+    width: -webkit-max-content;
+    width: max-content;
+    min-width: 100%;
+    max-width: 100rem;
+  }
+  .table-wrap > table th,
+  .table-wrap > table td { max-width: 16rem; }
+}

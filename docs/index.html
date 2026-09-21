@@ -245,6 +245,7 @@
   <li>設計と異なる実装をした場合は、実装に合わせて設計書を修正し、変更理由を備考（<code>decision</code> コールアウト）に残す</li>
   <li>同じ情報を複数ドキュメントに書かない。詳細は 1 箇所に書き、他からは参照リンクを張る</li>
   <li>設計書は HTML（本体系）で記述する。開発計画のみ Markdown</li>
+  <li>表は必ず <code>&lt;div class="table-wrap"&gt;</code> で包む（狭い画面で列幅を保ち、収まらない分を表内の横スクロールへ逃がすための共通規則。<a href="plans/development-plan.html#phase-24">Phase 24-1</a>）。HTML の機械検証は <code>python3 tools/docs_check.py</code>（対象件数・リンク / アンカー整合・指定幅の横はみ出し）</li>
 </ul>
 
 <h2 id="archive">6. 旧設計書（_archive）について</h2>
