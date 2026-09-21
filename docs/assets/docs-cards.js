@@ -126,6 +126,29 @@
     rows.forEach(sync);
   }
 
+  /* CSS が古いまま（ブラウザーのキャッシュ）だとカード表示にならず、
+     24-1 の列幅対策も効かない。狭い画面で表のままなら気づけるように知らせる。 */
+  function warnIfStaleStyle(table) {
+    if (!mql.matches || !table) {
+      return;
+    }
+    if (window.getComputedStyle(table).display === 'block') {
+      return;
+    }
+    if (document.getElementById('docs-cards-stale')) {
+      return;
+    }
+    var box = document.createElement('div');
+    box.id = 'docs-cards-stale';
+    box.className = 'warn';
+    box.textContent =
+      'スタイルシートが古い可能性があります（ブラウザーのキャッシュ）。'
+      + 'ページを再読み込みしてください。表が読みにくいまま変わらない場合は、'
+      + 'キャッシュを消してから開き直してください。';
+    var container = document.querySelector('.container') || document.body;
+    container.insertBefore(box, container.firstChild);
+  }
+
   function setup() {
     var tables = document.querySelectorAll('table[data-cards]');
     for (var t = 0; t < tables.length; t++) {
@@ -137,6 +160,7 @@
         prepareRow(trs[r], labels, extraIndexes);
       }
     }
+    warnIfStaleStyle(tables[0]);
     if (mql.addEventListener) {
       mql.addEventListener('change', syncAll);
     } else if (mql.addListener) {

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>開発計画 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/style.css?v=20260921">
 </head>
 <body>
 <div class="container">
@@ -218,7 +218,7 @@
   <li>人間ゲート: なし（開閉・検索・リンクの実挙動の評価は 24-3）</li>
   <li>停止点・上限: push まで（<code>docs/</code> <code>tools/</code> のみ）。stop after 25 turns。カードの主要項目が展開せず読めない・検索が成立しない等で方式の見直しが要る場合は、実装方式の案を提示して停止する</li>
   </ul></li>
-<li>⬜ <strong>24-3</strong> 実機・PC の受け入れ確認（<strong>ユーザー判断・ゴール対象外</strong>。24-2 完了後）
+<li>⬜ <strong>24-3</strong> 実機・PC の受け入れ確認（<strong>ユーザー判断・ゴール対象外</strong>。24-2 完了後）— 2026-09-21 の一次確認は<strong>端末のキャッシュで改修前の CSS が使われていた</strong>ため判定不能。<code>docs_server.py</code> の <code>Cache-Control: no-store</code>・<code>style.css?v=20260921</code>・カード未適用時の警告表示を入れて再確認待ち（<a href="development-log.html#step-24-3-cache">経緯</a>）
   <ul>
   <li>内容: 普段使っているスマホと PC で代表 4 ページ（<a href="index.html">計画体系</a>・<a href="../strategy/business-strategy.html">事業戦略</a>・<a href="../issues/index.html">課題一覧</a>・<a href="../ideas/index.html">アイデア一覧</a>）を読み、① 表の過剰な縦長化が解消したか ② 表内の横スクロール ③ カードの主要項目が展開せず読めるか ④ 補足情報の開閉（複数同時） ⑤ 補足内の語がブラウザー内検索で見つかるか ⑥ 課題 ID への直接リンク ⑦ PC では表のままか、を確認する（閲覧は <code>tools/serve-docs.sh</code> = <code>/docs-mobile-view</code> 経由）</li>
   <li>完了条件: —（ユーザー判断）</li>

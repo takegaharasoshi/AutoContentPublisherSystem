@@ -38,6 +38,20 @@ class DocsRequestHandler(http.server.SimpleHTTPRequestHandler):
             return f"{ctype}; charset=utf-8"
         return ctype
 
+    def end_headers(self) -> None:
+        """キャッシュ禁止のヘッダを足してからヘッダを閉じる。
+
+        既定の ``SimpleHTTPRequestHandler`` は ``Cache-Control`` を返さないため、
+        スマホのブラウザーが ``Last-Modified`` からの経験則でキャッシュを効かせ、
+        ``style.css`` を更新しても古い版が使われ続けることがある
+        （24-3 の実機確認で発生。24-1・24-2 の CSS が端末に届いていなかった）。
+        設計書は閲覧専用・ローカル配信のみのため、常に再取得させる。
+        """
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
+
 
 def main() -> None:
     """コマンドライン引数を解釈してサーバーを起動する。"""

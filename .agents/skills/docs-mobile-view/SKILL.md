@@ -61,6 +61,10 @@ DOCS_PORT=8767 DOCS_ROOT="$PWD/content/umigame-stock/umigame-soup-1/batch-01" to
 - **配信ルートはバッチディレクトリにする**(`work/` 単体にしない)。レビュー中に `STATUS.md`(申し送り)・`research.md` を
   同じポートで開けるため
 - サーバーはリクエストごとにディスクを読むので、`probe_test.py` で再生成した内容は**リロードだけで反映される**
+- **スタイル・スクリプトが古いまま見える場合はブラウザーのキャッシュ**。`docs_server.py` は 2026-09-21 から
+  `Cache-Control: no-store` を返すが、**それ以前にキャッシュされた `style.css` は残る**ため、
+  サーバーを再起動(`stop` → `start`)したうえで端末側を再読み込みする。直らなければ端末のキャッシュを消す
+  (課題・アイデア一覧では、狭い幅で表のままなら `docs-cards.js` が警告を出す)
 - 停止・状態確認も同じ環境変数を付ける(`DOCS_PORT=8767 tools/serve-docs.sh stop`)
 - レビュー HTML 自体は**スマホ縦持ちを既定にした 1 カラム**で書く(表を使わない・ダークモード対応・タップ領域 44px 以上)。
   参照実装は `content/umigame-stock/umigame-soup-1/batch-01/probe_test.py` の `REVIEW_CSS` / `write_review`
