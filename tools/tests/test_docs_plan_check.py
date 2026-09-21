@@ -229,5 +229,86 @@ class DocsPlanCheckTests(unittest.TestCase):
         )
 
 
+class PlanLifecycleTests(unittest.TestCase):
+    """日常更新の一巡（追加 → 追記 → 完了移動 → 記録リンク）を検査する。"""
+
+    RECORD_TODO = '<details data-field="record"><summary>作業記録</summary>' \
+        "<p>着手前のため記録なし。</p></details>"
+    RECORD_DOING = '<details data-field="record"><summary>作業記録</summary>' \
+        "<p>2026-09-21: 下書きを作成。</p></details>"
+    RECORD_LINK = '<section data-field="record">' \
+        '<a href="development-log.html#step-00-9">開発記録</a></section>'
+
+    def stage_new(self) -> str:
+        """1. テンプレートの枠をコピーして未着手ステップを足した状態。"""
+        return page(groups='<div data-plan-group="active">' + step(
+            "00-9", record=self.RECORD_TODO) + "</div>")
+
+    def stage_doing(self) -> str:
+        """2. 作業中に記録へ追記し、状態と現況を更新した状態。"""
+        return page(groups='<div data-plan-group="active">' + step(
+            "00-9", status="doing", record=self.RECORD_DOING) + "</div>")
+
+    def stage_done(self) -> str:
+        """3. 完了日を付け、同フェーズの完了済みグループへ移した状態。"""
+        done = step("00-9", status="done", completed="2026-09-21",
+                    record=self.RECORD_DOING)
+        return page(groups=(
+            f'<details data-plan-group="done">{done}</details>'
+            f'<div data-plan-group="active">{step("00-10")}</div>'
+        ))
+
+    def stage_migrated(self) -> str:
+        """4. 計画整理で記録本文を log へ移し、リンクへ置き換えた状態。"""
+        done = step("00-9", status="done", completed="2026-09-21",
+                    record=self.RECORD_LINK)
+        return page(groups=(
+            f'<details data-plan-group="done">{done}</details>'
+            f'<div data-plan-group="active">{step("00-10")}</div>'
+        ))
+
+    def test_each_stage_passes(self) -> None:
+        """一巡の各段階がそのまま検査を通る。"""
+        for name, html in (
+            ("new", self.stage_new()), ("doing", self.stage_doing()),
+            ("done", self.stage_done()), ("migrated", self.stage_migrated()),
+        ):
+            with self.subTest(stage=name):
+                self.assertEqual(set(), rules(html))
+
+    def test_new_stage_rejects_missing_field(self) -> None:
+        """1. 完了条件を書き忘れた追加は NG。"""
+        broken = self.stage_new().replace(
+            '<ul data-field="acceptance"><li>確認</li></ul>', "")
+        self.assertIn("field-missing", rules(broken))
+
+    def test_doing_stage_rejects_fold_violations(self) -> None:
+        """2. 追記時に記録を初期展開・完了条件を折りたたみへ入れるのは NG。"""
+        opened = self.stage_doing().replace(
+            '<details data-field="record">', '<details data-field="record" open>')
+        self.assertIn("fold-open", rules(opened))
+        buried = self.stage_doing().replace(
+            '<ul data-field="acceptance"><li>確認</li></ul>',
+            '<details data-field="implementation">'
+            '<ul data-field="acceptance"><li>確認</li></ul></details>',
+        )
+        self.assertIn("field-in-fold", rules(buried))
+
+    def test_done_stage_rejects_placement_and_date(self) -> None:
+        """3. 完了済みを進行中に残す・完了日を付け忘れるのは NG。"""
+        stay = page(groups='<div data-plan-group="active">' + step(
+            "00-9", status="done", completed="2026-09-21",
+            record=self.RECORD_DOING) + "</div>")
+        self.assertIn("step-group", rules(stay))
+        undated = self.stage_done().replace(' data-completed="2026-09-21"', "")
+        self.assertIn("step-completed", rules(undated))
+
+    def test_migrated_stage_rejects_link_less_record(self) -> None:
+        """4. 記録本文を移した後にリンクを張らないのは NG。"""
+        broken = self.stage_migrated().replace(
+            '<a href="development-log.html#step-00-9">開発記録</a>', "開発記録")
+        self.assertIn("record-link", rules(broken))
+
+
 if __name__ == "__main__":
     unittest.main()

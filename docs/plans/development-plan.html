@@ -532,7 +532,7 @@
 <blockquote>経緯: 課題体系 <a href="../issues/index.html#I-036">I-036</a>（2026-09-20 起票。Phase 24〔設計書のスマホ閲覧対応〕から「計画書は PC でも見づらい」として分離）の壁打ち → 表示方針と作業記録の折りたたみを確定 → PoC 2 本（<a href="../issues/plans-readability.html">ステップ表示 PoC</a> / <a href="../issues/development-plan-poc.html">開発計画全体の PoC</a>）と<a href="../issues/plans-readability-rollout.html">変更ファイル・展開草案</a>を作成 → <strong>2026-09-21 にユーザーが展開を決定し本フェーズを起票</strong>。インプットは展開草案（設計書に非ず。<strong>テンプレートと検査の契約〔セクション 2〕・日常更新の流れ〔セクション 3〕はそちらが正</strong>。検討の経緯は<a href="../issues/plans-readability.md">壁打ち記録</a>）。<strong>対象外</strong>: セット計画書とその記録の変換（未移行として既存様式を維持。個別移行時に検査対象へ追加する）、新スキルの追加、生成用 JSON / YAML と HTML 自動生成ビルド、<code>.github/workflows</code>・Git hook による CI の新設、独自編集画面・データベース化、<code>docs/index.html</code> の設計 Fix ルールの改訂。<strong>課題表の照合</strong>（<a href="index.html#step-checklist">5.1-5</a>）: 触るパス（<code>docs/plans/</code>・<code>docs/assets/</code>・<code>tools/</code>・<code>.agents/skills/</code>・<code>CLAUDE.md</code>・<code>docs/issues/</code>）が重なる live 課題は <a href="../issues/index.html#I-030">I-030</a>〔並行作業ルールの緩和〕と <a href="../issues/index.html#I-014">I-014</a>〔空 run〕。<strong>I-030 は同梱しない</strong>（並行制約の緩和は表示様式と別件。既存の再判断トリガーを維持）。<strong>I-014 は対策を実装せず</strong>、同梱方針の説明は課題表（対応方針・トリガー列）に置く。<strong>分割</strong>（<a href="index.html#step-checklist">5.1-4</a>）: 合計が 20〜30 ターンを超える見込みのため、機械検証できる中間点で 25-1〔基盤〕・25-2〔実データ移行〕・25-3〔更新入口〕に割り、ユーザー確認は 25-4 として独立させた。<strong>着手前提</strong>: 本フェーズは <code>docs/plans/</code> の共通ルール改訂を含むため、他セッションが動いていないフリーズ窓で行う（<a href="index.html">計画体系</a> 3）。<code>/step</code> の「<code>docs/plans/</code> のルール変更は原則禁止」に対する<strong>限定例外は本フェーズの変更ファイル一覧の範囲だけ</strong>とし、無関係な規約変更には広げない。<strong>確認待ちの新設なし</strong>（受け入れは 25-4 で push 直後に確認できるため）</blockquote>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 2 件（25-1・25-2／クリックで展開）</summary>
+<summary>完了済み 3 件（25-1〜25-3／クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-25-1" data-step-id="25-1" data-status="done" data-completed="2026-09-21">
@@ -619,19 +619,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-<article class="plan-step" id="step-25-3" data-step-id="25-3" data-status="todo">
+<article class="plan-step" id="step-25-3" data-step-id="25-3" data-status="done" data-completed="2026-09-21">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>25-3</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>25-3</strong><span class="plan-status">完了</span><span>2026-09-21</span></div>
 <h3>計画を作成・更新する入口を揃える</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>25-2 の完了後。フリーズ窓で実施する。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><code>CLAUDE.md</code> と 6 本のスキルの更新入口を新様式・テンプレート・構造検査へ接続し、回帰テストに日常更新の一巡（追加 → 追記 → 完了移動 → 記録リンク）を追加した（19 テスト全パス）。<code>/step</code> には「<code>docs/plans/</code> のルール変更禁止」の<strong>限定例外</strong>（名指し承認 + フリーズ窓）を明文化。セット計画書・補充工程は未変更。詳細は<a href="development-log.html#step-25-3">開発記録</a>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -660,11 +653,22 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 入口ごとの変更点は開発記録へ</span></summary>
+<div class="plan-fold-inner">
+<p>6 本の入口の変更内容・一巡テストの構成・検査出力は<a href="development-log.html#step-25-3">開発記録 25-3</a> に記載。<strong>限定例外の範囲</strong>: <code>/step</code> の denylist に残した「<code>docs/plans/</code> のルール変更」は、①ユーザーが変更ファイルを名指しで承認し、②フリーズ窓で実施する場合だけ、その範囲に限り例外とする（通常のステップ追加・状態更新はルール変更に当たらないことも併記）。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
 
 <article class="plan-step" id="step-25-4" data-step-id="25-4" data-status="todo" data-kind="decision">
 <header class="plan-step-head">

@@ -81,6 +81,7 @@ python3 validate.py && python3 generate.py
    - **ユーザーに出す前に Claude がビルド後のスチルで一次スクリーニングする**(`ffmpeg -ss` で 14 秒〔3 位〕・22 秒〔1 位発表〕・27 秒〔結果総覧〕を切り出す)。**背景の合否は素材単体では判断できない**: 17-7 では素材として合格した 030 が、合成すると本棚の柱・棚板が地図を横切って可読性を損なっていた。再生成を頼むときは「中央の縦帯は無地」「モチーフは下 1/4 と左右端に淡く」のように**構図まで指定する**(禁止物だけ伝えると構図が濃くなって別の問題が出る)
 4. **配置**: 承認 `content_key` を `work/approved.txt` へ追記(承認台帳)。**publish には「そのバッチ分だけを列挙した別ファイル」を作り `--approved-file` で渡す**(`publish.py` は承認ファイル全件を対象にするため、既定のままだと過去に配置済みのネタも再アップロードし `video_built_at` を書き換える。17-7 で判明)。`publish.py --approved-file <file> --dry-run` で対象件数を確認 → 本実行(S3 + ローカル MySQL + **既定で Aurora まで自動適用**)。S3 キー・UPDATE は環境非依存の `content_key` 解決(id を使わない)
 5. **締め**: 在庫確認クエリで両環境 `unbuilt_30s = 0` を確認 → バッチ資材・台帳の変更をコミット + push → セット記録 `docs/plans/pref-ranking-1-log.html` の「週次補充の記録」へ表 1 行（+ 特記があれば本文）を追記し、セット計画書 `docs/plans/pref-ranking-1.html` のステータス欄の在庫情報も更新する（Phase 18 の 2 レーン化で記録先を変更）
+   - **計画書の様式**(Phase 25-3 で追加): `docs/plans/pref-ranking-1.html` / `pref-ranking-1-log.html` は **Phase 25 の新様式へ未移行**のため、ステータス欄・確認待ちリスト・記録とも**既存様式のまま**更新する(構造検査 `--plan-only` の対象外。移行は別判断)。**移行済み計画書**(2026-09-21 時点は `docs/plans/development-plan.html` のみ)に書く必要が出た場合だけ、`docs/plans/index.html` セクション 5.0 の新様式 + `docs/plans/_templates/step.html` を使い、更新後に `python3 tools/docs_check.py --plan-only` を実行する。**各セットの補充工程・在庫検査・人間ゲートは変更しない**
 
 ## 委譲・実行環境の要点
 
