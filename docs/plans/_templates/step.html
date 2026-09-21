@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ステップ記載テンプレート | 計画体系</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../../assets/plans.css?v=20260921">
+</head>
+<body data-plan-format="1">
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">計画体系</a> / ステップ記載テンプレート</nav>
+<h1>ステップ記載テンプレート（見本）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">テンプレート</span>
+  <span>最終更新: 2026-09-21（Phase 25-1 で新設）。このページは<strong>計画ではなく見本</strong>で、ここに書かれたフェーズ・ステップ・日付はすべて架空。実際の計画は<a href="../development-plan.html">開発計画</a>と各セット計画書にある。</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">使い方</span>
+  下の<strong>コピー範囲</strong>（<code>&lt;!-- ここから --&gt;</code> 〜 <code>&lt;!-- ここまで --&gt;</code>）を計画書に貼り、ID・状態・本文を書き換える。<strong>様式の原則（4 項目の意味・人間ゲートの置き方・記録の移管時期）は <a href="../index.html">計画体系</a>が正</strong>で、ここでは繰り返さない。構造の契約（属性名・必須欄・例外形式）の正は<a href="../../issues/plans-readability-rollout.html">変更ファイル・展開草案</a>セクション 2、機械検査は <code>tools/docs_plan_check.py</code>。
+</div>
+
+<h2 id="skeleton">1. 骨組み（フェーズ 1 つ分）</h2>
+<p><strong>完了済みは同じフェーズの中で進行中より上に置き、初期状態は閉じる</strong>。進行中・未着手はグループごと常時表示する。属性の意味は下の<a href="#contract">3. 属性の早見表</a>を参照。</p>
+
+<section class="plan-phase" data-plan-phase="00" id="phase-00">
+<h2 id="phase-00-title">Phase 00: 見本フェーズ（架空）</h2>
+<p><strong>ゴール</strong>: フェーズのゴールは 1〜2 文で。経緯・対象外・課題照合・分割理由は、これまでどおり <code>&lt;blockquote&gt;</code> に書く（テンプレートの対象外）。</p>
+
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 2 件（クリックで展開）</summary>
+<div class="plan-group-inner">
+
+<article class="plan-step" id="step-00-1" data-step-id="00-1" data-status="done" data-completed="2026-09-10">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>00-1</strong><span class="plan-status">完了</span><span>2026-09-10</span></div>
+<h3>完了したステップの見本</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。</p>
+<p data-field="result"><strong>結果：</strong>常時表示に残す要点を 1〜2 行で。詳細は作業記録と<a href="../development-log.html">開発記録</a>へ。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>成果物を短く説明する。長い仕様は下の「実装の細部・背景」へ入れ、ここでは何が出来上がるかだけを書く。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>壊してはいけないもの・触らない範囲を書く。無ければ「なし」と明記する（空欄にしない）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>条件は 1 つずつ箇条書きにする（<code>ul</code> / <code>ol</code> のどちらでもよい）。</li>
+<li>機械で確かめられる形にし、貼る出力（テスト要約行・件数クエリ等）を指定する。</li>
+<li>計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push まで含める。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>このステップではなし。次のステップで実機確認を行う、のように<strong>誰がいつ何を見るか</strong>を書く。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（触るディレクトリを書く）。stop after 20 turns。<strong>やらないこと</strong>も明記する。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 見出しに中身の要点を添える</span></summary>
+<div class="plan-fold-inner">
+<p>定数・ファイル構成・設計判断の理由など、着手時に必要だが常時表示すると読み取りを妨げる情報。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 完了・検証まで一巡</span></summary>
+<div class="plan-fold-inner">
+<p>作業中はここに追記する。方針が変わったら常時表示の「何をするか」「完了条件」も直す（記録だけに残さない）。</p>
+</div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-00-2" data-step-id="00-2" data-status="done" data-completed="2026-07-15" data-kind="legacy-completed">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>00-2</strong><span class="plan-status">完了</span><span>2026-07-15</span><span class="plan-kind">旧形式の完了ステップ</span></div>
+<h3>完了条件が残っていない古いステップの見本</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>—（完了済みのため記録なし）。</p>
+<p data-field="result"><strong>結果：</strong>要点を 1〜2 行で。<strong>当時の完了条件・人間ゲート・停止点は記録されていない</strong>。推測で書き起こさず、記録へのリンクで代替する。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>当時の「内容」欄をそのまま残す。この例外形式（<code>data-kind="legacy-completed"</code>）は<strong>完了済みのステップにだけ</strong>使える。</p></div>
+</section>
+<section data-field="record"><h4>2. 作業記録</h4>
+<p>整理後の記録欄は、折りたたみではなく<a href="../development-log.html">開発記録へのリンク</a> 1 本でよい（本文を二重管理しない）。</p>
+</section>
+</div>
+</article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<!-- ここから 1 ステップ分をコピーする（この行を含めない） -->
+<article class="plan-step" id="step-00-3" data-step-id="00-3" data-status="doing">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>00-3</strong><span class="plan-status">作業中</span></div>
+<h3>ステップの名称をここに書く</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>00-2 の完了後。前提が無ければ「なし」と明記する。</p>
+<p data-field="result"><strong>現況：</strong>途中経過を 1 行で。未着手なら「未着手」と書く（空欄にしない）。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>成果物を短く説明する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>守る範囲・触らない範囲。無ければ「なし」。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>条件 1（貼る出力を指定する）。</li>
+<li>条件 2。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>人間ゲートの内容。無ければ「なし」。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（対象ディレクトリ）。stop after N turns。やらないこと。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 要点を添える</span></summary>
+<div class="plan-fold-inner"><p>着手時に読む詳細。<strong>初期状態は閉じる</strong>（<code>open</code> を付けない）。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+<!-- ここまで -->
+
+<article class="plan-step" id="step-00-4" data-step-id="00-4" data-status="todo" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>00-4</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>ユーザー判断のステップの見本</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>00-3 の push 直後から確認できる。</p>
+<p data-field="result"><strong>現況：</strong>未確認。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>ユーザーが何を見て何を判断するかを書く（観点を並べる）。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>なし。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>—（ユーザー判断）。観点別の OK / NG と go / no-go が記録に残ること。</li>
+</ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>このステップ自体が人間ゲート。go で完了、no-go なら直前のステップを直して再確認する。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>。<code>/step</code> は goal 対象外として断る）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>確認前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</section>
+
+<h2 id="contract">3. 属性の早見表</h2>
+<p>見出しの日本語では機械判定せず、属性で構造を示す。<strong>本文の正は各計画書</strong>で、属性は検査と表示のためにある。検査仕様の全文は<a href="../../issues/plans-readability-rollout.html">展開草案</a>セクション 2。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>対象</th><th>書き方</th><th>検査で NG になる例</th></tr></thead>
+<tbody>
+<tr><td>ページ</td><td><code>&lt;body data-plan-format="1"&gt;</code>。検査対象は <code>docs_plan_check.py</code> の明示リストで管理する</td><td>登録済みページから属性を消す / ステップ 0 件 / 旧形式の行が混ざる</td></tr>
+<tr><td>フェーズ</td><td><code>section.plan-phase[data-plan-phase]</code>。中に完了済みグループ（<code>details[data-plan-group="done"]</code>・<code>open</code> を付けない）と進行中グループ（<code>[data-plan-group="active"]</code>）を置き、<strong>完了済みが先</strong></td><td>完了済みが進行中より後 / 完了済みグループに <code>open</code></td></tr>
+<tr><td>ステップ</td><td><code>article.plan-step</code> + <code>id="step-&lt;ID&gt;"</code> + <code>data-step-id</code> + <code>data-status="todo|doing|done|blocked"</code>。<code>done</code> は <code>data-completed="YYYY-MM-DD"</code> が必須</td><td>ID 重複 / <code>done</code> が進行中グループにある / 完了日なし</td></tr>
+<tr><td>常時表示の欄</td><td><code>data-field="overview|prerequisites|constraints|acceptance|gate|stop|result"</code>。空欄不可（該当なしは明記）。<code>acceptance</code> は <code>ul</code> / <code>ol</code></td><td>必須欄の削除 / 空欄 / 完了条件が折りたたみの中</td></tr>
+<tr><td>折りたたみ</td><td><code>details[data-field="implementation"]</code> と <code>details[data-field="record"]</code> を別々に置き、<code>open</code> を付けない。整理後の記録は <code>section[data-field="record"]</code> + リンクでも可</td><td>初期展開（<code>open</code>）/ 実装詳細と記録の同居</td></tr>
+<tr><td>例外形式</td><td>ユーザー判断は <code>data-kind="decision"</code>（「ゴール対象外」と「ゴールにしない」を表示）。古い完了ステップは <code>data-kind="legacy-completed"</code>（記録リンクで代替）</td><td><code>done</code> 以外で <code>legacy-completed</code> を使う / 判断ステップに停止点の明記がない</td></tr>
+</tbody>
+</table></div>
+
+<div class="warn">
+  <span class="callout-title">検査が担保しないこと</span>
+  重要な制約が文章としてすべて拾われているか・要約が正しいか・記録と最新状態が一致するか、の 3 点は機械では見ない。<strong>更新者は差分のステップについてこの 3 点を読み直す</strong>。構造検査の成功を内容の正しさと同一視しない。
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,201 @@
+/* ============================================================
+   計画書のステップ表示スタイル（Phase 25-1 で新設）
+   - 共通 style.css の色・フォント変数だけを使う（外部依存なし）
+   - セレクタは .plan-* と .plan-step 配下の [data-field] に限定し、
+     共通スタイルの既存要素には影響させない
+   - 読み込むのは移行済みの計画書とテンプレート（_templates/step.html）のみ
+   - 構造の契約は docs/issues/plans-readability-rollout.html セクション 2、
+     検査は tools/docs_plan_check.py
+   ============================================================ */
+
+/* --- フェーズと完了済みグループ ------------------------------ */
+
+.plan-phase { margin: 2rem 0 3rem; }
+
+.plan-group[data-plan-group="done"] {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-subtle);
+  margin: 1rem 0 1.6rem;
+}
+
+.plan-group[data-plan-group="done"] > summary {
+  padding: .9rem 1.2rem;
+  cursor: pointer;
+  font-weight: 700;
+  border-radius: 12px;
+}
+
+.plan-group[data-plan-group="done"][open] > summary {
+  border-bottom: 1px solid var(--border);
+  border-radius: 12px 12px 0 0;
+}
+
+.plan-group[data-plan-group="done"] > .plan-group-inner { padding: .4rem 1.2rem 1rem; }
+
+/* --- ステップの枠 -------------------------------------------- */
+
+.plan-step {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg);
+  margin: 1rem 0 2rem;
+}
+
+.plan-step-head {
+  padding: 1.3rem 1.5rem;
+  background: var(--note-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.plan-step-head h3 {
+  margin: .6rem 0;
+  border: 0;
+  padding: 0;
+  font-size: 1.35rem;
+}
+
+.plan-meta {
+  display: flex;
+  gap: .7rem;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: .9rem;
+}
+
+.plan-meta > strong { overflow-wrap: anywhere; }
+
+/* 状態の表示（data-status に対応。色は共通のバッジ変数を使う） */
+.plan-status {
+  border-radius: 5px;
+  padding: .15rem .65rem;
+  font-weight: 700;
+  background: var(--badge-future-bg);
+  color: var(--badge-future-text);
+}
+
+.plan-step[data-status="done"] .plan-status {
+  background: var(--badge-fixed-bg);
+  color: var(--badge-fixed-text);
+}
+
+.plan-step[data-status="doing"] .plan-status {
+  background: var(--badge-wip-bg);
+  color: var(--badge-wip-text);
+}
+
+.plan-step[data-status="blocked"] .plan-status {
+  background: var(--warn-bg);
+  color: var(--warn-border);
+  border: 1px solid var(--warn-border);
+}
+
+.plan-kind {
+  font-size: .85rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: .1rem .5rem;
+}
+
+/* --- 常時表示の欄 -------------------------------------------- */
+
+.plan-step-body { padding: 0 1.5rem 1.3rem; }
+.plan-step-body section { margin: 1.3rem 0; }
+
+.plan-step-body h4 {
+  font-size: 1rem;
+  margin: 0 0 .45rem;
+  color: var(--link);
+}
+
+.plan-step-body p { margin: .35rem 0; }
+.plan-step-body li { margin: .45rem 0; }
+
+.plan-step-body ul,
+.plan-step-body ol {
+  padding-left: 1.4rem;
+  margin: .3rem 0;
+}
+
+.plan-step [data-field="prerequisites"],
+.plan-step [data-field="result"] { margin: .5rem 0 0; }
+
+.plan-gates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.plan-gates > div {
+  background: var(--bg-subtle);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.plan-step [data-field="constraints"] {
+  border-left: 3px solid var(--warn-border);
+  padding: .3rem 0 .3rem 1rem;
+  margin: .8rem 0 0;
+}
+
+.plan-hint {
+  color: var(--text-muted);
+  font-size: .9rem;
+}
+
+/* --- 折りたたみ（実装詳細・作業記録） ------------------------ */
+
+.plan-fold {
+  margin: .8rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.plan-fold > summary {
+  padding: .9rem 1rem;
+  cursor: pointer;
+  font-weight: 700;
+  background: var(--bg-subtle);
+  border-radius: 8px;
+}
+
+.plan-fold[open] > summary {
+  border-bottom: 1px solid var(--border);
+  border-radius: 8px 8px 0 0;
+}
+
+.plan-fold > .plan-fold-inner { padding: 1rem 1.1rem; }
+
+/* キーボード操作の可視化（折りたたみは Tab で到達できる） */
+.plan-fold > summary:focus-visible,
+.plan-group[data-plan-group="done"] > summary:focus-visible {
+  outline: 3px solid var(--link);
+  outline-offset: 3px;
+}
+
+/* 長いパス・コマンドを枠からはみ出させない */
+.plan-step code,
+.plan-step a { overflow-wrap: anywhere; }
+
+.plan-step [id],
+.plan-step[id] { scroll-margin-top: 1rem; }
+
+/* --- 狭い画面 ------------------------------------------------ */
+
+@media (max-width: 640px) {
+  .plan-step-head { padding: 1.1rem 1rem; }
+  .plan-step-head h3 { font-size: 1.15rem; }
+  .plan-step-body { padding: 0 1rem 1rem; }
+  .plan-gates { grid-template-columns: 1fr; }
+  .plan-fold > .plan-fold-inner { padding: .8rem; }
+  .plan-group[data-plan-group="done"] > summary { padding: .8rem 1rem; }
+  .plan-group[data-plan-group="done"] > .plan-group-inner { padding: .3rem .8rem .8rem; }
+}
+
+/* 印刷時は折りたたみの中身も出す（記録を紙で追えるように） */
+@media print {
+  .plan-fold > .plan-fold-inner,
+  .plan-group[data-plan-group="done"] > .plan-group-inner { display: block !important; }
+}
