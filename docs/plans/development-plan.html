@@ -542,7 +542,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 3 件（25-1〜25-3／クリックで展開）</summary>
+<summary>完了済み 4 件（25-1〜25-4／クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-25-1" data-step-id="25-1" data-status="done" data-completed="2026-09-21">
@@ -671,21 +671,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-<article class="plan-step" id="step-25-4" data-step-id="25-4" data-status="todo" data-kind="decision">
+<article class="plan-step" id="step-25-4" data-step-id="25-4" data-status="done" data-completed="2026-09-22" data-kind="decision">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>25-4</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<div class="plan-meta"><strong>25-4</strong><span class="plan-status">完了</span><span>2026-09-22</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>本適用の受け入れ</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>25-2・25-3 の完了後（push 直後から確認できる）。</p>
-<p data-field="result"><strong>現況：</strong>未確認。</p>
+<p data-field="result"><strong>結果：</strong><strong>go</strong>（2026-09-22・ユーザー確認。観点別の NG 指摘なし）。確認の過程で<strong>フェーズ冒頭の背景が畳まれていない</strong>ことが見つかり、25-2 の追補として先に修正した（<a href="development-log.html#step-25-2">開発記録</a>）。go を受けて<strong>セット計画書にも適用する判断</strong>となり、Phase 25 に <a href="#step-25-5">25-5</a> を追加したため、フェーズの完了は 25-5 の完了時とする。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -704,11 +695,68 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>確認前のため記録なし。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— go の内容と 25-5 への接続は開発記録へ</span></summary>
+<div class="plan-fold-inner">
+<p>確認の経緯・go の扱い・25-5 を起こした理由は<a href="development-log.html#step-25-4">開発記録 25-4</a> に記載。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<article class="plan-step" id="step-25-5" data-step-id="25-5" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>25-5</strong><span class="plan-status">未着手</span></div>
+<h3>セット計画書の移行と検査登録</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>25-4 の go 後（2026-09-22 取得済み）。<strong>フリーズ窓</strong>（セットレーンを含め他セッションが 1 本も動いていないこと）で実施する。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>セット計画書 3 本（<code>logic-training-1.html</code>・<code>pref-ranking-1.html</code>・<code>fantasy-animals-1.html</code>）を新様式へ移行し、構造検査の対象に登録する。あわせて「セット計画書は未移行」を前提にしている記述（<a href="index.html#step-layout">計画体系 5.0</a>・<code>CLAUDE.md</code>・スキル <code>step</code> / <code>idea</code> / <code>issue</code> / <code>incident</code> / <code>quiz-stock-replenish</code> / <code>ranking-stock-replenish</code>）を移行後の状態に更新する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><strong>既存の改修 ID・ステップ ID（R-1-1 等）・状態・完了日・完了条件・人間ゲート・停止点・確認待ちリスト・ステータス節（在庫水位・KPI・投稿枠）を保持</strong>する。<strong>記録ファイル <code>&lt;set_code&gt;-log.html</code> は移行しない</strong>（開発記録と同じ扱い）。<strong>セットの補充工程・在庫検査・人間ゲートは変えない</strong>。改修の内容そのもの（在庫方針・演出方針）を書き換えない。完了条件が残っていない古い改修は <code>data-kind="legacy-completed"</code> で扱い、<strong>推測で 4 項目を作らない</strong>。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>3 本の移行前後で、改修・ステップの ID・状態・完了日・完了条件・人間ゲート・停止点・確認待ち行が照合でき、意図しない欠落 0 件（対応表を<a href="development-log.html">開発記録</a>に貼る）。</li>
+<li>既存アンカー（<code>#pending-checks</code> 等）と他ファイルからの参照が有効（リンク検査の新規不備 0 件）。</li>
+<li><code>REGISTERED_PAGES</code> に 3 本を追加して <code>--plan-only</code> が成功し、<strong>1 本で形式属性を消したテストでは失敗する</strong>（両方の出力を貼る）。</li>
+<li>「未移行」前提の記述の更新漏れ 0 件（<code>grep -rn "未移行" CLAUDE.md .agents/skills docs/plans</code> の結果を貼る）。</li>
+<li><code>unittest</code> と <code>python3 tools/docs_check.py --widths 360,390,768,1280 --baseline HEAD</code> が成功（新規不備 0 件）。</li>
+<li>計画・記録を更新し、日本語メッセージでコミット・<code>pull --rebase</code>・push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし（様式そのものは 25-4 で受け入れ済み。移行結果は push 直後に 25-4 と同じ 4 観点で任意に見られる状態にする）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> <code>tools/</code> <code>.agents/</code> <code>CLAUDE.md</code> のみ）。stop after 25 turns。<strong>分割の目安</strong>: <code>logic-training-1.html</code> の移行完了が機械検証できる中間点。超えそうならそこで 25-6 に割る。記録ファイルの移行・セット内容の改訂・補充作業・本番操作は行わない。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 対応関係・本数の実態・課題照合</span></summary>
+<div class="plan-fold-inner">
+<p><strong>対応関係</strong>: 改修（R-1 等）= <code>section.plan-phase</code>、その下のステップ（R-1-1 等）= <code>article.plan-step</code>。現在セット計画書は<strong>ステップを表の行で持っている</strong>（「ステップ / 内容 / 完了条件・人間ゲート・停止点 / 状態」の 4 列）ため、行ごとに枠へ展開する。ねらい・根拠・不変条件・投入方針は改修冒頭の<strong>背景の折りたたみ</strong>へ（25-2 追補の様式）。ステータス節・確認待ちリストは<strong>表のまま保持</strong>する（24-2 のカード表示が効く）。</p>
+<p><strong>本数の実態</strong>: 実質の移行対象は <code>logic-training-1.html</code> の 3 改修（R-1 = 完了 6 ステップ / R-2 / R-3）。<code>pref-ranking-1.html</code> は進行中ステップなし + 完了した改修 1 行、<code>fantasy-animals-1.html</code> は停止済みでステップなし（ステータス節のみ）のため軽い。<strong><code>umigame-soup-1</code> のセット計画書は 21-7 で新設予定</strong>なので、新設時に最初から新様式で作る（本ステップの対象外・新設時に登録する）。</p>
+<p><strong>課題表の照合</strong>（<a href="index.html#step-checklist">5.1-5</a>）: <a href="../issues/index.html#I-034">I-034</a>（<code>docs/plans/logic-training-1.html</code> を対象パスに含むが、トリガーは R-2 の効果確認〔2026-10-03 以降〕で様式移行では引かれない）=<strong>据え置き継続・トリガー更新なし</strong>。<a href="../issues/index.html#I-030">I-030</a>（<code>docs/plans/index.html</code> 2・3 と CLAUDE.md の並行作業ルール本文は触らない）=<strong>据え置き継続</strong>。<a href="../issues/index.html#I-036">I-036</a> は展開元で、<strong>本ステップの完了をもって開発計画・セット計画書の双方が移行済みになるためクローズ対象</strong>（完了手順でクローズ節へ移す）。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+
+
+
+
+
+
 
 </div>
 </section>
