@@ -14,7 +14,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-22（25-5 で新様式へ移行。改修 R-1〜R-3 の 13 ステップを表の行から <code>article.plan-step</code> の枠へ展開し、構造検査へ登録した。改修の背景は折りたたみへ。ステータス節・確認待ちリストは表のまま。<strong>改修の内容・ID・状態・完了日・完了条件・人間ゲート・停止点は不変</strong>）。前回: 2026-09-21（<strong>改修 R-3〔作問の 2 段階化: 候補の直感選別 + 後日の振り返り〕を起票</strong>〔アイデア <a href="../ideas/quiz-authoring-efficiency.html">quiz-authoring-efficiency</a> の転記。R-3-1〜R-3-3 + <a href="#pending-checks">確認待ち 2 件</a>。課題表の照合 = 同梱なし〔<a href="../issues/index.html#I-034">I-034</a> は既存トリガー維持・<a href="../issues/index.html#I-026">I-026</a> は対象外〕。本起票では手順の実装・作問は行っていない〕）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 完了 = G3 の配置まで到達</strong>〔全数レビュー 14 件が 1 巡で承認 → S3 へ 28 ファイル配置 → ローカル MySQL 14 行 → Aurora 14 文すべて <code>updated=1</code>。両環境とも <code>unbuilt</code> = 0・Aurora は朝夜とも <code>unused_built</code> 7 へ回復〕。確認待ちリストの <strong>16-4e〔イラストプロンプト文字禁止の緩和〕効果観察は 2 バッチ連続で戻し基準に非該当 = OK</strong> のため<a href="logic-training-1-log.html">セット記録</a>へ移動、課題体系の <a href="../issues/index.html#I-033">I-033</a> は解消でクローズ）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 の G2 完了</strong>〔14 問を両環境へ投入・<code>content_key</code> = <code>morning/night-036</code>〜<code>042</code>・イラスト 14 枚は再生成 0 回 / 文字混入 0 件・動画 14 件ビルド成功。次は <code>work/review-6.html</code> の全数人間レビュー → G3 の配置〕。16-4e の効果観察 2 バッチ目は混入 0 件で戻し基準に該当せず〔確認待ちリストへの結果記入は G3〕）。2026-09-20（確認待ちリストに開発計画 Phase 23-3〔Codex 直接セッションでの週次補充・初回試行〕を追加）。2026-09-19（<strong>R-2-4〔差し替えと設計書・記録の更新〕完了 = 改修 R-2 完了</strong>〔承認 70 件を S3・両環境 DB へ差し替え。両環境とも <code>video_built_at</code> = 2026-09-19 が朝 35 / 夜 35 = 70 件・Aurora は 70 文すべて <code>updated=1</code>。抜き取り再生確認 OK。方式設計書に R-2 の decision を追加。効果確認は確認待ちリストへ起票〔2026-10-03 以降〕〕。同日: <strong>R-2-2〔プレビュー確認〕go</strong>〔実機で 4 観点すべて OK・調整の往復なし〕→ <strong>R-2-3〔在庫全数の再ビルドとレビューシート生成〕の自走分完了</strong>〔朝 35 / 夜 35 = 70 件を再ビルドし成功 70 件・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。<strong>全数レビューの人間ゲートも同日通過 = 70 問すべて承認</strong>。次は R-2-4〔差し替え〕〕。あわせて補充スキルの <code>question</code> 上限を 90 → 80 字へ下げ、課題体系の <a href="../issues/index.html#I-035">I-035</a> は解消。同日: 開発レーン 22-2 でバックログを廃止し課題体系へ移設〔課題 2 行 + 解消 1 行〕。16-4e の効果観察は確認待ちリストへ。同日: <strong>R-2-1〔版面変更とプレビュー出力〕完了</strong>。導出値は PoC 実測と一致・pytest 42 件全パス・プレビュー 3 本を出力。次は R-2-2〔実機でのプレビュー確認・ユーザー判断〕。同日: <strong>改修 R-1 の効果確認を実施 = 判定は混在</strong>〔スキップ率・平均視聴秒は改善 / コメント数は低下〕。NG の扱いでバックログへ「コメント数低下の切り分け」を起票し、R-2 の着手可否はユーザー判断待ち。同日: 改修 R-2〔イラスト拡大・イラスト優先配分〕を起票。壁打ち 2 巡 + 静止画 PoC で採用値を確定・着手条件は R-1 効果確認の判定後。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕完了。在庫は朝・夜とも unused_built 7 / unbuilt 0 に回復し、確認待ちリストの Phase 19-3〔<code>/goal</code> 組み込み初回試行〕は OK 判定で<a href="logic-training-1-log.html">セット記録</a>へ移動。16-4e の効果観察はバックログに 1 バッチ目の結果を記入。以前の更新: 2026-09-03 に 16-12b で KPI 欄を確定様式へ・改修 R-1 完了）</span>
+  <span>最終更新: 2026-09-22（<strong>R-3-1〔候補保存形式と 2 段階の補充手順の整備〕完了</strong>〔候補ディレクトリ <code>content/quiz-stock/logic-training-1/candidates/</code> を新設・補充スキルを G1a / G1b の 2 段階へ改訂・検証例 3 バッチで集計と遷移を確認。課題表 I-034 は据え置き継続。次は R-3-2〕）。同日: 25-5 で新様式へ移行。改修 R-1〜R-3 の 13 ステップを表の行から <code>article.plan-step</code> の枠へ展開し、構造検査へ登録した。改修の背景は折りたたみへ。ステータス節・確認待ちリストは表のまま。<strong>改修の内容・ID・状態・完了日・完了条件・人間ゲート・停止点は不変</strong>）。前回: 2026-09-21（<strong>改修 R-3〔作問の 2 段階化: 候補の直感選別 + 後日の振り返り〕を起票</strong>〔アイデア <a href="../ideas/quiz-authoring-efficiency.html">quiz-authoring-efficiency</a> の転記。R-3-1〜R-3-3 + <a href="#pending-checks">確認待ち 2 件</a>。課題表の照合 = 同梱なし〔<a href="../issues/index.html#I-034">I-034</a> は既存トリガー維持・<a href="../issues/index.html#I-026">I-026</a> は対象外〕。本起票では手順の実装・作問は行っていない〕）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 完了 = G3 の配置まで到達</strong>〔全数レビュー 14 件が 1 巡で承認 → S3 へ 28 ファイル配置 → ローカル MySQL 14 行 → Aurora 14 文すべて <code>updated=1</code>。両環境とも <code>unbuilt</code> = 0・Aurora は朝夜とも <code>unused_built</code> 7 へ回復〕。確認待ちリストの <strong>16-4e〔イラストプロンプト文字禁止の緩和〕効果観察は 2 バッチ連続で戻し基準に非該当 = OK</strong> のため<a href="logic-training-1-log.html">セット記録</a>へ移動、課題体系の <a href="../issues/index.html#I-033">I-033</a> は解消でクローズ）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 の G2 完了</strong>〔14 問を両環境へ投入・<code>content_key</code> = <code>morning/night-036</code>〜<code>042</code>・イラスト 14 枚は再生成 0 回 / 文字混入 0 件・動画 14 件ビルド成功。次は <code>work/review-6.html</code> の全数人間レビュー → G3 の配置〕。16-4e の効果観察 2 バッチ目は混入 0 件で戻し基準に該当せず〔確認待ちリストへの結果記入は G3〕）。2026-09-20（確認待ちリストに開発計画 Phase 23-3〔Codex 直接セッションでの週次補充・初回試行〕を追加）。2026-09-19（<strong>R-2-4〔差し替えと設計書・記録の更新〕完了 = 改修 R-2 完了</strong>〔承認 70 件を S3・両環境 DB へ差し替え。両環境とも <code>video_built_at</code> = 2026-09-19 が朝 35 / 夜 35 = 70 件・Aurora は 70 文すべて <code>updated=1</code>。抜き取り再生確認 OK。方式設計書に R-2 の decision を追加。効果確認は確認待ちリストへ起票〔2026-10-03 以降〕〕。同日: <strong>R-2-2〔プレビュー確認〕go</strong>〔実機で 4 観点すべて OK・調整の往復なし〕→ <strong>R-2-3〔在庫全数の再ビルドとレビューシート生成〕の自走分完了</strong>〔朝 35 / 夜 35 = 70 件を再ビルドし成功 70 件・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。<strong>全数レビューの人間ゲートも同日通過 = 70 問すべて承認</strong>。次は R-2-4〔差し替え〕〕。あわせて補充スキルの <code>question</code> 上限を 90 → 80 字へ下げ、課題体系の <a href="../issues/index.html#I-035">I-035</a> は解消。同日: 開発レーン 22-2 でバックログを廃止し課題体系へ移設〔課題 2 行 + 解消 1 行〕。16-4e の効果観察は確認待ちリストへ。同日: <strong>R-2-1〔版面変更とプレビュー出力〕完了</strong>。導出値は PoC 実測と一致・pytest 42 件全パス・プレビュー 3 本を出力。次は R-2-2〔実機でのプレビュー確認・ユーザー判断〕。同日: <strong>改修 R-1 の効果確認を実施 = 判定は混在</strong>〔スキップ率・平均視聴秒は改善 / コメント数は低下〕。NG の扱いでバックログへ「コメント数低下の切り分け」を起票し、R-2 の着手可否はユーザー判断待ち。同日: 改修 R-2〔イラスト拡大・イラスト優先配分〕を起票。壁打ち 2 巡 + 静止画 PoC で採用値を確定・着手条件は R-1 効果確認の判定後。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕完了。在庫は朝・夜とも unused_built 7 / unbuilt 0 に回復し、確認待ちリストの Phase 19-3〔<code>/goal</code> 組み込み初回試行〕は OK 判定で<a href="logic-training-1-log.html">セット記録</a>へ移動。16-4e の効果観察はバックログに 1 バッチ目の結果を記入。以前の更新: 2026-09-03 に 16-12b で KPI 欄を確定様式へ・改修 R-1 完了）</span>
 </div>
 
 <div class="note">
@@ -28,7 +28,7 @@
 <tr><th>アカウント</th><td>@d_brain_coach「脳みそコーチのロジトレ」（Instagram）</td></tr>
 <tr><th>投稿スロット</th><td>朝 7:30（定番なぞなぞ）・夜 21:00（とんち・水平思考）の 1 日 2 回。<strong>昼 12:30（フェルミ推定）は 16-4d（2026-08-24）で当分停止中</strong>（noon Scheduler = DISABLED・資材は凍結残置。再開判断は将来。経緯は<a href="../app/sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</td></tr>
 <tr><th>生成方式</th><td>quiz-prebuilt（動画事前ビルド・作り置き。<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>）。16 秒・3 カット構成（16-4c）。<strong>レンダラーは Remotion</strong>（改修 R-1。2026-09-03 に稼働在庫 56 問〔朝・夜〕を差し替え。凍結中の昼 21 問は旧 Pillow 版のまま。仕様の正は方式設計書セクション 8）。<strong>版面はイラスト優先配分</strong>（改修 R-2。2026-09-19 に稼働在庫 70 問〔朝 35 / 夜 35〕を差し替え。イラストの箱に保証高 500px を先に確保し、残りの高さに問題文を 68 → 44px の可変で収める。昼 21 問は旧版面のまま）</td></tr>
-<tr><th>ストック運用</th><td>スキル <code>/quiz-stock-replenish</code> で週次補充。補充閾値 = 各組 7 問（朝・夜の 2 組のみ。昼は凍結）。直近: <strong>2026-09-w3 補充（朝・夜 14 問）完了（2026-09-21。<code>content_key</code> = <code>morning/night-036</code>〜<code>042</code>）。配置まで終わり、Aurora の在庫は朝（L1/light）・夜（L1/deep）とも <code>unused_built</code> 7 / <code>unbuilt</code> 0 で閾値まで回復</strong>。着手時も朝・夜とも在庫 0 で再利用出題に突入していたため（w5・w1 に続き 3 度目の後手）、<strong>在庫 0 まで待たず閾値割れの時点で着手する</strong>こと</td></tr>
+<tr><th>ストック運用</th><td>スキル <code>/quiz-stock-replenish</code> で週次補充（<strong>R-3-1〔2026-09-22〕から作問は 2 段階</strong>: G1a 候補準備 → 人間の直感選別 → G1b 完成稿準備。候補は <code>content/quiz-stock/logic-training-1/candidates/</code>）。補充閾値 = 各組 7 問（朝・夜の 2 組のみ。昼は凍結）。直近: <strong>2026-09-w3 補充（朝・夜 14 問）完了（2026-09-21。<code>content_key</code> = <code>morning/night-036</code>〜<code>042</code>）。配置まで終わり、Aurora の在庫は朝（L1/light）・夜（L1/deep）とも <code>unused_built</code> 7 / <code>unbuilt</code> 0 で閾値まで回復</strong>。着手時も朝・夜とも在庫 0 で再利用出題に突入していたため（w5・w1 に続き 3 度目の後手）、<strong>在庫 0 まで待たず閾値割れの時点で着手する</strong>こと</td></tr>
 <tr><th>KPI</th><td>指標セットは 16-12a（2026-09-02）で確定、欄の様式と転記運用は 16-12b（2026-09-03）で確定（正は <a href="../app/operation.html#insights-analysis">運用設計 6.3</a>。転記元はビュー <code>v_post_kpi_monthly</code> / <code>v_account_kpi_monthly</code>〔V011〕、<code>content/insights-analysis/run_queries.py kpi_post_monthly kpi_account_monthly</code>。月初 4 日以降に前月分を追記）。<strong>ユーザー判断: 次の改善対象</strong>（R-1 の効果はベースライン行との比較で判定。確認待ちリスト参照）。<div class="table-wrap" style="margin:.4rem 0 0;"><table><thead><tr><th>年月</th><th>スロット</th><th>本数</th><th>views</th><th>スキップ率</th><th>平均視聴秒</th><th>コメント</th><th>保存</th><th>月末フォロワー</th><th>備考</th></tr></thead><tbody><tr><td>ベースライン（16-5・3 カット化 08-23〜08-31）</td><td>朝・夜</td><td>15</td><td><strong>1,731</strong></td><td><strong>50.6%</strong></td><td><strong>12.4</strong></td><td><strong>10</strong></td><td><strong>1</strong></td><td>19（09-01）</td><td>3 日以上経った投稿の中央値（ビュー導入前のため集計ランナー <code>per_post_latest</code> の値。72 時間基準ではなく最終スナップショット）。4 カット期（08-08〜08-22）の朝・夜 29 本は 140 / 69.7% / 5.4 / 0 / 0。1 本が 33,463 views。出典: <a href="development-log.html">開発記録</a>の 16-5</td></tr><tr><td>2026-08</td><td>all</td><td>58</td><td>118</td><td>70.9%</td><td>4.9</td><td>0</td><td>0</td><td>18（08-31）</td><td rowspan="4">V011 適用時（09-03）にビューから遡って転記。月全体では 4 カット期（08-08〜08-22）29 本が中央値を支配しベースラインより低く見える。<code>v_post_kpi_72h</code> を 08-23 で分けると 3 カット期の朝・夜 16 本は 1,951 / 50.2% / 12.5 / 7.5 / 1 でベースラインと整合（08-23 以前 29 本は 118 / 71.3% / 5.2 / 0 / 0）。昼（フェルミ推定）は 16-4d で 08-24 に停止済み</td></tr><tr><td>2026-08</td><td>morning</td><td>22</td><td>131.5</td><td>70.4%</td><td>5.5</td><td>0</td><td>0</td><td>—</td></tr><tr><td>2026-08</td><td>noon</td><td>13</td><td>99</td><td>90.3%</td><td>1.8</td><td>0</td><td>0</td><td>—</td></tr><tr><td>2026-08</td><td>evening</td><td>23</td><td>178</td><td>63.1%</td><td>7.6</td><td>0</td><td>0</td><td>—</td></tr><tr><td>2026-09</td><td>all / morning / evening</td><td colspan="7">2026-10-04 以降に転記</td><td>R-1 差し替え後はベースライン比で<strong>スキップ率 50.6% → 43.0%・平均視聴 12.4 → 19.2 秒と改善、コメント 10 → 6 と低下</strong>（2026-09-19 の<a href="#pending-checks">効果確認</a>。差し替え後 09-04〜09-15 投稿の朝・夜 22 本の中央値。詳細は<a href="logic-training-1-log.html">セット記録</a>）</td></tr></tbody></table></div></td></tr>
 </tbody>
 </table></div>
@@ -433,7 +433,7 @@
 
 <section class="plan-phase" data-plan-phase="R-3" id="phase-R-3">
 <h2 id="r-3">改修 R-3: 作問の 2 段階化（候補の直感選別 + 後日の振り返りでスキルを育てる）</h2>
-<p><strong>ゴール</strong>: <strong>補充中の人間の判定から理由の言語化を外し</strong>、反射的な OK / NG / 保留だけを返せるようにする。理由の整理は後日の振り返りへ分け、その成果で補充スキルを育てる。<strong>進行中</strong>（R-3-1 から着手する）。</p>
+<p><strong>ゴール</strong>: <strong>補充中の人間の判定から理由の言語化を外し</strong>、反射的な OK / NG / 保留だけを返せるようにする。理由の整理は後日の振り返りへ分け、その成果で補充スキルを育てる。<strong>進行中</strong>（R-3-1 完了〔2026-09-22〕。次は R-3-2）。</p>
 <details class="plan-fold">
 <summary>改修の背景・決定の経緯 <span class="plan-hint">— ねらい・方針の要点・ゴールの区切り・不変条件・範囲外・評価・課題照合</span></summary>
 <div class="plan-fold-inner">
@@ -450,14 +450,16 @@
 </div>
 </details>
 
-<div class="plan-group" data-plan-group="active">
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 1 件（クリックで展開）</summary>
+<div class="plan-group-inner">
 
-<article class="plan-step" id="step-R-3-1" data-step-id="R-3-1" data-status="todo">
+<article class="plan-step" id="step-R-3-1" data-step-id="R-3-1" data-status="done" data-completed="2026-09-22">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>R-3-1</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>R-3-1</strong><span class="plan-status">完了</span><span>2026-09-22</span></div>
 <h3>候補保存形式と 2 段階の補充手順の整備</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし（改修の先頭）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>候補ディレクトリ <code>content/quiz-stock/logic-training-1/candidates/</code>（README・雛形・集計 <code>tally.py</code>・投稿対象外の検証例 3 バッチ）を新設し、補充スキルを G1a / G1b の 2 段階へ改訂した。集計は「候補 14 / 14 → OK 5 / 4 → 追加 4 / 6」「OK 7 / 5 → 追加 0 / 4」を再現、遷移例（未レビュー・余剰 OK・版の重複加算なし・完成稿 NG・別ファイル修正版）も確認済み。課題表 I-034 は据え置き継続（トリガー更新なし）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -480,17 +482,30 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-09-22 完了。検証例の集計出力・旧手順との対応表は candidates/README.md</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-09-22（Claude Code・セットレーン。<code>/step logic-training-1 R-3-1</code> → <code>/goal</code>）</strong>。照合: 確認待ち = 該当なし（R-3 効果確認は R-3-3 go 後の週次補充、Phase 23-3 は次の週次補充がトリガー）。課題表 = <a href="../issues/index.html#I-034">I-034</a> が対象パス <code>content/quiz-stock/logic-training-1/</code> で該当するが、トリガー（2026-10-03 以降の効果確認）は本ステップの出来事に当たらないため<strong>据え置き継続・トリガー更新なし</strong>。I-026 は対象外。展開元の課題なし（起票元はアイデア）。</p>
+<ul>
+<li><strong>候補ディレクトリ</strong>: <code>README.md</code>（置き方・必須項目・状態 8 種と遷移・集計規則・候補レビューの表示例・旧手順との対応表）、<code>_template.md</code>（1 候補 1 ファイル。フロントマター = id / batch / slot / state / version / supersedes / stock_no / source / example、本文 = 版ごとの原案 + 判定〔理由は任意〕）、<code>tally.py</code>（標準ライブラリのみ。朝夜別に候補・未レビュー・OK・NG・保留・完成稿 NG・余剰 OK・不足・追加 = 不足 × 2 を出し、朝夜とも不足 0 のときだけ G1b 可と判定。<code>--write-index</code> で ID・状態・版・リンクだけの <code>INDEX.md</code> を生成。形式チェック = 必須項目・slot・state・本文の判定と state の整合・id 重複）。</li>
+<li><strong>検証例（<code>examples/</code>・全ファイル <code>example: true</code>・本文にも投稿対象外を明記）</strong>: <code>w0-example-round1</code> = 候補 14 / 14・OK 朝 5 / 夜 4 → 追加 4 / 6。<code>w0-example-round2</code> = 追加後 18 / 20・OK 朝 7 / 夜 5 → 追加 0 / 4（朝だけ満たしても G1b へ進まない判定）。<code>w0-example-transitions</code> = 未レビュー 1（追加数を確定しない）・朝 OK 9 で余剰 2・m09 = 原案 NG（理由空欄）→ 版 2 追記で OK を 1 件として加算・n06 = 完成稿 NG → <code>final_ng</code>（OK に数えない）・n07 → n07r = 別ファイル修正版が <code>supersedes</code> で元を外す・n08 = 完成稿承認（<code>approved</code>）。3 バッチとも終了コード 0。</li>
+<li><strong>補充スキル</strong>: G1 を G1a（候補準備）/ G1b（完成稿準備）のゴール 2 本に分割し、セクション 1.5「候補の準備と選別」を新設（目標の 2 倍・前バッチ余剰の持ち越し・1 候補 3 行の提示と OK / NG / 保留 のみの返答・理由の推測禁止・朝夜別の不足 × 2・両スロット充足まで G1b に進まない・余剰 OK は仕上げない・候補 OK ≠ 完成稿承認・完成稿 NG の差し戻し <code>final_ng</code>・NG / 保留は振り返りスキルへ・再開地点は STATUS.md + INDEX.md）。セクション 2・5・エージェント別差分（ターン上限 G1a / G1b = 30・完了申告前の再確認）も同期。工程 0・1・4・6・7 と G2 / G3 のゲート・denylist は不変（対応表は README セクション 6）。</li>
+<li><strong>行っていないこと</strong>: 実候補のリサーチ・作問、既存在庫の移行、画像生成・DB・S3 操作、AGENTS.md / 共通設計書の変更。R-3-2（振り返りスキル）は本ステップの候補形式を前提に着手可。</li>
+</ul>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
 
 <article class="plan-step" id="step-R-3-2" data-step-id="R-3-2" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>R-3-2</strong><span class="plan-status">未着手</span></div>
 <h3>クイズ専用の振り返りスキルの整備（R-3-1 完了後）</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>R-3-1 完了後。着手時に既存スキル名との衝突を再確認する（2026-09-21 時点で同名なし）。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-3-1 完了後（2026-09-22 完了 = 着手可）。着手時に既存スキル名との衝突を再確認する（2026-09-21 時点で同名なし）。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
