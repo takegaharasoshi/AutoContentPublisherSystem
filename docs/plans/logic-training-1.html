@@ -14,7 +14,7 @@
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-22（<strong>R-3-1〔候補保存形式と 2 段階の補充手順の整備〕完了</strong>〔候補ディレクトリ <code>content/quiz-stock/logic-training-1/candidates/</code> を新設・補充スキルを G1a / G1b の 2 段階へ改訂・検証例 3 バッチで集計と遷移を確認。課題表 I-034 は据え置き継続。次は R-3-2〕）。同日: 25-5 で新様式へ移行。改修 R-1〜R-3 の 13 ステップを表の行から <code>article.plan-step</code> の枠へ展開し、構造検査へ登録した。改修の背景は折りたたみへ。ステータス節・確認待ちリストは表のまま。<strong>改修の内容・ID・状態・完了日・完了条件・人間ゲート・停止点は不変</strong>）。前回: 2026-09-21（<strong>改修 R-3〔作問の 2 段階化: 候補の直感選別 + 後日の振り返り〕を起票</strong>〔アイデア <a href="../ideas/quiz-authoring-efficiency.html">quiz-authoring-efficiency</a> の転記。R-3-1〜R-3-3 + <a href="#pending-checks">確認待ち 2 件</a>。課題表の照合 = 同梱なし〔<a href="../issues/index.html#I-034">I-034</a> は既存トリガー維持・<a href="../issues/index.html#I-026">I-026</a> は対象外〕。本起票では手順の実装・作問は行っていない〕）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 完了 = G3 の配置まで到達</strong>〔全数レビュー 14 件が 1 巡で承認 → S3 へ 28 ファイル配置 → ローカル MySQL 14 行 → Aurora 14 文すべて <code>updated=1</code>。両環境とも <code>unbuilt</code> = 0・Aurora は朝夜とも <code>unused_built</code> 7 へ回復〕。確認待ちリストの <strong>16-4e〔イラストプロンプト文字禁止の緩和〕効果観察は 2 バッチ連続で戻し基準に非該当 = OK</strong> のため<a href="logic-training-1-log.html">セット記録</a>へ移動、課題体系の <a href="../issues/index.html#I-033">I-033</a> は解消でクローズ）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 の G2 完了</strong>〔14 問を両環境へ投入・<code>content_key</code> = <code>morning/night-036</code>〜<code>042</code>・イラスト 14 枚は再生成 0 回 / 文字混入 0 件・動画 14 件ビルド成功。次は <code>work/review-6.html</code> の全数人間レビュー → G3 の配置〕。16-4e の効果観察 2 バッチ目は混入 0 件で戻し基準に該当せず〔確認待ちリストへの結果記入は G3〕）。2026-09-20（確認待ちリストに開発計画 Phase 23-3〔Codex 直接セッションでの週次補充・初回試行〕を追加）。2026-09-19（<strong>R-2-4〔差し替えと設計書・記録の更新〕完了 = 改修 R-2 完了</strong>〔承認 70 件を S3・両環境 DB へ差し替え。両環境とも <code>video_built_at</code> = 2026-09-19 が朝 35 / 夜 35 = 70 件・Aurora は 70 文すべて <code>updated=1</code>。抜き取り再生確認 OK。方式設計書に R-2 の decision を追加。効果確認は確認待ちリストへ起票〔2026-10-03 以降〕〕。同日: <strong>R-2-2〔プレビュー確認〕go</strong>〔実機で 4 観点すべて OK・調整の往復なし〕→ <strong>R-2-3〔在庫全数の再ビルドとレビューシート生成〕の自走分完了</strong>〔朝 35 / 夜 35 = 70 件を再ビルドし成功 70 件・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。<strong>全数レビューの人間ゲートも同日通過 = 70 問すべて承認</strong>。次は R-2-4〔差し替え〕〕。あわせて補充スキルの <code>question</code> 上限を 90 → 80 字へ下げ、課題体系の <a href="../issues/index.html#I-035">I-035</a> は解消。同日: 開発レーン 22-2 でバックログを廃止し課題体系へ移設〔課題 2 行 + 解消 1 行〕。16-4e の効果観察は確認待ちリストへ。同日: <strong>R-2-1〔版面変更とプレビュー出力〕完了</strong>。導出値は PoC 実測と一致・pytest 42 件全パス・プレビュー 3 本を出力。次は R-2-2〔実機でのプレビュー確認・ユーザー判断〕。同日: <strong>改修 R-1 の効果確認を実施 = 判定は混在</strong>〔スキップ率・平均視聴秒は改善 / コメント数は低下〕。NG の扱いでバックログへ「コメント数低下の切り分け」を起票し、R-2 の着手可否はユーザー判断待ち。同日: 改修 R-2〔イラスト拡大・イラスト優先配分〕を起票。壁打ち 2 巡 + 静止画 PoC で採用値を確定・着手条件は R-1 効果確認の判定後。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕完了。在庫は朝・夜とも unused_built 7 / unbuilt 0 に回復し、確認待ちリストの Phase 19-3〔<code>/goal</code> 組み込み初回試行〕は OK 判定で<a href="logic-training-1-log.html">セット記録</a>へ移動。16-4e の効果観察はバックログに 1 バッチ目の結果を記入。以前の更新: 2026-09-03 に 16-12b で KPI 欄を確定様式へ・改修 R-1 完了）</span>
+  <span>最終更新: 2026-09-22（<strong>R-3-2〔クイズ専用の振り返りスキルの整備〕完了</strong>〔新スキル <code>.agents/skills/quiz-review-learn/</code>・Claude Code 専用・検証例 4 件 + 記録の実例・補充スキルと候補 README に入口参照。課題表 I-034 は据え置き継続。次は R-3-3 = ユーザー確認〕）。同日: <strong>R-3-1〔候補保存形式と 2 段階の補充手順の整備〕完了</strong>〔候補ディレクトリ <code>content/quiz-stock/logic-training-1/candidates/</code> を新設・補充スキルを G1a / G1b の 2 段階へ改訂・検証例 3 バッチで集計と遷移を確認。課題表 I-034 は据え置き継続。次は R-3-2〕）。同日: 25-5 で新様式へ移行。改修 R-1〜R-3 の 13 ステップを表の行から <code>article.plan-step</code> の枠へ展開し、構造検査へ登録した。改修の背景は折りたたみへ。ステータス節・確認待ちリストは表のまま。<strong>改修の内容・ID・状態・完了日・完了条件・人間ゲート・停止点は不変</strong>）。前回: 2026-09-21（<strong>改修 R-3〔作問の 2 段階化: 候補の直感選別 + 後日の振り返り〕を起票</strong>〔アイデア <a href="../ideas/quiz-authoring-efficiency.html">quiz-authoring-efficiency</a> の転記。R-3-1〜R-3-3 + <a href="#pending-checks">確認待ち 2 件</a>。課題表の照合 = 同梱なし〔<a href="../issues/index.html#I-034">I-034</a> は既存トリガー維持・<a href="../issues/index.html#I-026">I-026</a> は対象外〕。本起票では手順の実装・作問は行っていない〕）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 完了 = G3 の配置まで到達</strong>〔全数レビュー 14 件が 1 巡で承認 → S3 へ 28 ファイル配置 → ローカル MySQL 14 行 → Aurora 14 文すべて <code>updated=1</code>。両環境とも <code>unbuilt</code> = 0・Aurora は朝夜とも <code>unused_built</code> 7 へ回復〕。確認待ちリストの <strong>16-4e〔イラストプロンプト文字禁止の緩和〕効果観察は 2 バッチ連続で戻し基準に非該当 = OK</strong> のため<a href="logic-training-1-log.html">セット記録</a>へ移動、課題体系の <a href="../issues/index.html#I-033">I-033</a> は解消でクローズ）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 の G2 完了</strong>〔14 問を両環境へ投入・<code>content_key</code> = <code>morning/night-036</code>〜<code>042</code>・イラスト 14 枚は再生成 0 回 / 文字混入 0 件・動画 14 件ビルド成功。次は <code>work/review-6.html</code> の全数人間レビュー → G3 の配置〕。16-4e の効果観察 2 バッチ目は混入 0 件で戻し基準に該当せず〔確認待ちリストへの結果記入は G3〕）。2026-09-20（確認待ちリストに開発計画 Phase 23-3〔Codex 直接セッションでの週次補充・初回試行〕を追加）。2026-09-19（<strong>R-2-4〔差し替えと設計書・記録の更新〕完了 = 改修 R-2 完了</strong>〔承認 70 件を S3・両環境 DB へ差し替え。両環境とも <code>video_built_at</code> = 2026-09-19 が朝 35 / 夜 35 = 70 件・Aurora は 70 文すべて <code>updated=1</code>。抜き取り再生確認 OK。方式設計書に R-2 の decision を追加。効果確認は確認待ちリストへ起票〔2026-10-03 以降〕〕。同日: <strong>R-2-2〔プレビュー確認〕go</strong>〔実機で 4 観点すべて OK・調整の往復なし〕→ <strong>R-2-3〔在庫全数の再ビルドとレビューシート生成〕の自走分完了</strong>〔朝 35 / 夜 35 = 70 件を再ビルドし成功 70 件・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。<strong>全数レビューの人間ゲートも同日通過 = 70 問すべて承認</strong>。次は R-2-4〔差し替え〕〕。あわせて補充スキルの <code>question</code> 上限を 90 → 80 字へ下げ、課題体系の <a href="../issues/index.html#I-035">I-035</a> は解消。同日: 開発レーン 22-2 でバックログを廃止し課題体系へ移設〔課題 2 行 + 解消 1 行〕。16-4e の効果観察は確認待ちリストへ。同日: <strong>R-2-1〔版面変更とプレビュー出力〕完了</strong>。導出値は PoC 実測と一致・pytest 42 件全パス・プレビュー 3 本を出力。次は R-2-2〔実機でのプレビュー確認・ユーザー判断〕。同日: <strong>改修 R-1 の効果確認を実施 = 判定は混在</strong>〔スキップ率・平均視聴秒は改善 / コメント数は低下〕。NG の扱いでバックログへ「コメント数低下の切り分け」を起票し、R-2 の着手可否はユーザー判断待ち。同日: 改修 R-2〔イラスト拡大・イラスト優先配分〕を起票。壁打ち 2 巡 + 静止画 PoC で採用値を確定・着手条件は R-1 効果確認の判定後。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕完了。在庫は朝・夜とも unused_built 7 / unbuilt 0 に回復し、確認待ちリストの Phase 19-3〔<code>/goal</code> 組み込み初回試行〕は OK 判定で<a href="logic-training-1-log.html">セット記録</a>へ移動。16-4e の効果観察はバックログに 1 バッチ目の結果を記入。以前の更新: 2026-09-03 に 16-12b で KPI 欄を確定様式へ・改修 R-1 完了）</span>
 </div>
 
 <div class="note">
@@ -433,7 +433,7 @@
 
 <section class="plan-phase" data-plan-phase="R-3" id="phase-R-3">
 <h2 id="r-3">改修 R-3: 作問の 2 段階化（候補の直感選別 + 後日の振り返りでスキルを育てる）</h2>
-<p><strong>ゴール</strong>: <strong>補充中の人間の判定から理由の言語化を外し</strong>、反射的な OK / NG / 保留だけを返せるようにする。理由の整理は後日の振り返りへ分け、その成果で補充スキルを育てる。<strong>進行中</strong>（R-3-1 完了〔2026-09-22〕。次は R-3-2）。</p>
+<p><strong>ゴール</strong>: <strong>補充中の人間の判定から理由の言語化を外し</strong>、反射的な OK / NG / 保留だけを返せるようにする。理由の整理は後日の振り返りへ分け、その成果で補充スキルを育てる。<strong>進行中</strong>（R-3-1・R-3-2 完了〔2026-09-22〕。次は R-3-3 = ユーザー確認）。</p>
 <details class="plan-fold">
 <summary>改修の背景・決定の経緯 <span class="plan-hint">— ねらい・方針の要点・ゴールの区切り・不変条件・範囲外・評価・課題照合</span></summary>
 <div class="plan-fold-inner">
@@ -451,7 +451,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 1 件（クリックで展開）</summary>
+<summary>完了済み 2 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-R-3-1" data-step-id="R-3-1" data-status="done" data-completed="2026-09-22">
@@ -496,17 +496,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-R-3-2" data-step-id="R-3-2" data-status="todo">
+<article class="plan-step" id="step-R-3-2" data-step-id="R-3-2" data-status="done" data-completed="2026-09-22">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>R-3-2</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>R-3-2</strong><span class="plan-status">完了</span><span>2026-09-22</span></div>
 <h3>クイズ専用の振り返りスキルの整備（R-3-1 完了後）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>R-3-1 完了後（2026-09-22 完了 = 着手可）。着手時に既存スキル名との衝突を再確認する（2026-09-21 時点で同名なし）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>2026-09-22 完了。新スキル <code>.agents/skills/quiz-review-learn/SKILL.md</code>（Claude Code 専用・<code>.claude/skills/</code> は相対リンク）を作成し、手順 8 工程・候補へ戻す条件・記録書式（個別修正 / 共通ルール / 仮説の 3 表）・禁止事項を明記。検証例 <code>candidates/examples/w0-example-review/</code>（4 例 + 記録の実例）は <code>tally.py</code> 形式チェック OK。補充スキル 1.5 と候補 README（セクション 7）に入口参照を追加。Codex 直接セッションは AGENTS.md 未登録のため利用可能と称していない。次は R-3-3（ユーザー確認）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -530,17 +525,33 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-09-22 完了。検証例の集計出力・差分の全文は<a href="logic-training-1-log.html#r-3">セット記録</a></span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-09-22（Claude Code・セットレーン。<code>/step logic-training-1 R-3-2</code> → <code>/goal</code>）</strong>。照合: 確認待ち = 該当なし（「振り返りスキルの初回利用」はユーザーの任意起動が終わった時、R-3 効果確認は R-3-3 go 後、Phase 23-3 は次の週次補充がトリガー）。課題表 = <a href="../issues/index.html#I-034">I-034</a> が対象パス <code>content/quiz-stock/logic-training-1/</code> で該当するが、トリガー（2026-10-03 以降の効果確認）は本ステップの出来事に当たらないため<strong>据え置き継続・トリガー更新なし</strong>。I-026 は対象外・I-036 は解消済み。展開元の課題なし（起票元はアイデア）・クローズ移動なし。スキル名 <code>quiz-review-learn</code> は <code>.agents/skills/</code> <code>.claude/skills/</code> とも衝突なし（仮称を正式名に確定）。</p>
+<ul>
+<li><strong>新スキル</strong>（<code>.agents/skills/quiz-review-learn/SKILL.md</code> + <code>.claude/skills/quiz-review-learn</code> 相対シンボリックリンク）: 冒頭に「Claude Code 専用」。工程 = 対象選択（人間）→ 原案確認（要約しない）→ 理由の言語化（人間・空欄可）→ AI の修正（版 N+1 を追記・仮説由来は冒頭に明示）→ 再判定（人間・2 回で決まらなければ保留）→ 分類（個別修正 / 共通ルール / 仮説。主語はユーザーの理由）→ 合意した差分の反映（承認済み例との衝突確認 → 差分案を貼る → 合意後に書き換え）→ 記録。候補へ戻す条件は R-3-1 の状態表に合わせて表化（OK → <code>ok</code> = 候補 OK であって投入ではない・未判定 → <code>unreviewed</code>・<code>final_ng</code> から戻るとき <code>stock_no</code> を空に・<code>approved</code> / <code>withdrawn</code> は触らない）。反映先は補充スキルの作問基準（セクション 2・3）と参照例に限定し、<code>validate.py</code>・設計書・AGENTS.md は対象外と明記。denylist に衝突確認なしの一般化・合意前のルール変更・理由不明の補完・全件消化と期限の必須化・投入を列挙。</li>
+<li><strong>記録書式</strong>: <code>candidates/reviews/&lt;YYYY-MM-DD&gt;.md</code>（バッチをまたぐため候補ディレクトリ直下の <code>reviews/</code>。<code>tally.py</code> には渡さない）。個別修正 / 共通ルール / 仮説の 3 表がそれぞれ候補 ID・版・元の判定 → 再判定・ユーザーの理由（原文）・更新したスキル箇所を持ち、候補ファイルの理由欄「振り返り &lt;日付&gt; 参照」で往復できる。</li>
+<li><strong>検証例</strong>（<code>examples/w0-example-review/</code>・全ファイル <code>example: true</code>）: <code>m01</code> = 理由空欄の NG → 修正版を書かず記録の「仮説」節にだけ AI の推測を残す（<code>state: ng</code> のまま）/ <code>m02</code> = 「答えが 2 通り」→ 版 2 → OK。個別修正でスキル不変 / <code>n01</code> = 保留 → ユーザーの方針「言い換えだけで解ける問題は全部避けたい」→ 衝突確認 → 差分案（検証例のため未反映）/ <code>n02</code> = <code>final_ng</code> → 版 2 → OK で <code>state: ok</code>・<code>stock_no</code> 空（転記・投入は次回 G1b）。<code>tally.py</code> の出力: 朝 候補 2・OK 1・NG 1、夜 候補 2・OK 2、形式チェック OK。</li>
+<li><strong>入口参照</strong>: 補充スキル 1.5 の項目 8（振り返りで OK に戻った候補が次回 G1b に混ざること・作問基準の差分は合意した共通ルールだけ）、候補 README の構成図・状態表（ng / final_ng の遷移）・新設セクション 7。</li>
+<li><strong>行っていないこと</strong>: 過去の NG / 保留の実判定、ユーザーの理由の生成、実データ由来の作問基準の更新、補充の開始、DB / S3 操作、AGENTS.md・共通設計書の変更。Codex 直接セッションでの利用は AGENTS.md 未登録のため未対応（必要なら開発レーンの別ステップ）。</li>
+</ul>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
 
 <article class="plan-step" id="step-R-3-3" data-step-id="R-3-3" data-status="todo" data-kind="decision">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>R-3-3</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>候補レビューと振り返り手順の確認（R-3-2 完了後）</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>R-3-2 完了後。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-3-2 完了後（2026-09-22 完了 = 着手可）。</p>
 <p data-field="result"><strong>現況：</strong>未確認。</p>
 </header>
 <div class="plan-step-body">
@@ -578,7 +589,7 @@
 <tr><td>2026-09-19 / 改修 R-2（イラスト優先配分）の効果確認</td><td>R-2 の再ビルド動画を S3・両環境 DB に差し替えてから 2 週間後 = <strong>差し替え日 2026-09-19（R-2-4）→ 2026-10-03 以降</strong>（<code>python3 content/insights-analysis/run_queries.py weekly_age_fixed per_post_latest</code> を実行）</td><td><strong>判定基準は R-1 と同じ</strong>: 差し替え後の朝・夜投稿で 3 日以上経ったものの中央値を、R-1 効果確認で得た直近水準（スキップ率 43.0% / 平均視聴 19.2 秒 / コメント中央値 6〔朝 15・夜 2〕）と比較し、① スキップ率と平均視聴秒が悪化していない ② コメント数が維持されている、の 2 点で判定する（views は配信状況で振れるため参考値）。イラスト拡大のねらい（主役の視認性向上）に照らし、<strong>朝夜それぞれの内訳</strong>も見る（R-1 でコメント低下が夜に集中したため）</td><td>悪化 → 版面の見直し（R-1 版面へ戻す判断を含む）を課題体系に起こす。判定に足る本数がない → トリガーを 1 週間延ばして再確認</td><td>—</td></tr>
 <tr><td>2026-09-20 / 開発計画 <a href="development-log.html#phase-23">Phase 23-3</a> Codex 直接セッションでの週次補充（初回試行）</td><td>セット型: logic-training-1 の次の週次補充を Codex 直接セッション（<code>$quiz-stock-replenish</code>）で行った回（23-2 完了後・2026-09-w4 以降の最初の回）</td><td>① G1〜G3 が完走したか（Aurora 適用の更新行数 = 承認件数・unbuilt=0 の出力。サンドボックスのネットワーク設定で Aurora に到達できたか）② 差し戻し率（人間レビューの却下数 / 提出数）を 2026-09-w3 の Claude 実績と比較して同等以下か</td><td>完走しない → 開発計画 Phase 23 に追補ステップを起票。差し戻し率が明確に悪い → 課題起票（線引き / スキル差分節 / 執筆勘所の不足）</td><td>—</td></tr>
 <tr><td>2026-09-21 / <a href="#r-3">改修 R-3</a>（2 段階レビュー）の効果確認</td><td>セット型: <strong>R-3-3 の go 後、logic-training-1 の最初の週次補充完了時</strong>（1 回目を記録したら 2 回目の補充完了時へトリガーを更新する）</td><td>① 理由の説明を必須にせず必要数の候補 OK が揃ったか ② 完成稿にしてからの差し替えが減ったか ③ 候補を読む負担と AI の追加調査が、減らした修正負担に見合うか ④ 条件不足・答え漏れ・出典不備・画像の作り直しが増えていないか。<strong>朝夜別に記録</strong>し、負担軽減と品質維持をユーザーが判断する（候補 NG 率だけで NG にしない）</td><td>負担増なら候補数・表示・記録項目を調整する。品質の問題は該当手順を修正し、必要なら<a href="../issues/index.html">課題体系</a>へ起票する。未計測・未実施は失敗と扱わず、次回トリガーと確認点を書き直す</td><td>未実施</td></tr>
-<tr><td>2026-09-21 / 振り返りスキル <code>quiz-review-learn</code>（仮称）の初回利用</td><td>節目型: <strong>ユーザーが任意に起動した初回の振り返りが終了したとき</strong>（週次補充とは独立。利用期限・全件消化は課さない）</td><td>原案が保持されているか・理由を捏造していないか・個別修正 / 共通ルール / 仮説を分けて記録できたか。共通ルールを更新した場合は<strong>合意と差分を追えるか</strong>（更新しない結論でも理由が記録されれば成立）。補充と振り返りの負担は分けて記録する</td><td>記録負担や区別の曖昧さがあれば形式・手順を直す。既存の承認例を壊す一般化があれば該当差分を再検討する。未利用の間は確認待ちのまま維持する</td><td>未実施</td></tr>
+<tr><td>2026-09-21 / 振り返りスキル <code>/quiz-review-learn</code>（R-3-2〔2026-09-22〕で整備・Claude Code 専用）の初回利用</td><td>節目型: <strong>ユーザーが任意に起動した初回の振り返りが終了したとき</strong>（週次補充とは独立。利用期限・全件消化は課さない）</td><td>原案が保持されているか・理由を捏造していないか・個別修正 / 共通ルール / 仮説を分けて記録できたか。共通ルールを更新した場合は<strong>合意と差分を追えるか</strong>（更新しない結論でも理由が記録されれば成立）。補充と振り返りの負担は分けて記録する</td><td>記録負担や区別の曖昧さがあれば形式・手順を直す。既存の承認例を壊す一般化があれば該当差分を再検討する。未利用の間は確認待ちのまま維持する</td><td>未実施</td></tr>
 </tbody>
 
 </table></div>
