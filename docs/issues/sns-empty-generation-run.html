@@ -16,11 +16,11 @@ section{margin-top:2.2rem}li{margin-bottom:.5rem}pre{max-width:100%;overflow-x:a
 </style></head>
 <body><main class="container">
 <nav class="breadcrumb" aria-label="パンくず"><a href="../index.html">設計書</a> / <a href="index.html#I-014">課題 I-014</a> / 事象と対応案</nav>
-<header><p class="footnote">I-014 · 開発レーン · 2026-09-22 更新</p><h1>朝の失敗を夜へ持ち越さない投稿にする</h1><p class="intro">当回の予定時刻で投稿対象を固定し、生成失敗や未投稿分の滞留があっても、次の回はその回の素材だけを扱う方針です。</p></header>
+<header><p class="footnote">I-014 · 開発レーン · 2026-09-22 更新（Phase 26 へ転記済み）</p><h1>朝の失敗を夜へ持ち越さない投稿にする</h1><p class="intro">当回の予定時刻で投稿対象を固定し、生成失敗や未投稿分の滞留があっても、次の回はその回の素材だけを扱う方針です。</p></header>
 <div class="lead-box"><h2>承認された方針：当回だけを対象にし、過去分へ戻らない</h2>
 <p><strong>セット名と当回の予定時刻で生成実行を特定し、素材がある場合だけ投稿する。</strong>朝の空の実行も、素材はあるが未投稿の朝の実行も、夜の投稿候補には入れない。夜・翌朝それぞれの生成と投稿が成功すれば、その回の内容で投稿する。当回が失敗した回は欠番を許容する。</p>
 <p>2026-09-21 にユーザーが方針を承認。以下は実コードを照合した変更範囲と開発レーンへの展開案であり、実装・本番操作は未実施。I-014 と I-017 の時間帯ずれ防止をまとめ、I-022・I-024 は同じフェーズの後続へ分ける。</p>
-<p>管理状態・再判断条件・発生履歴の正は <a href="index.html#I-014">I-014</a> / <a href="index.html#I-017">I-017</a>。正式なステップ番号は開発計画への転記時に採番する。</p></div>
+<p>管理状態・再判断条件・発生履歴の正は <a href="index.html#I-014">I-014</a> / <a href="index.html#I-017">I-017</a>。<strong>2026-09-22 に<a href="../plans/development-plan.html#phase-26">開発計画 Phase 26</a> として転記済み</strong>（A = 26-1 / B = 26-2 / C = 26-3 / D = 26-4。I-022 = 26-5・I-024 ① = 26-6）。以後の内容・完了条件の正は計画書で、本書は事象の説明・受け入れケース・切替の注意の参照先。</p></div>
 <nav class="jump" aria-label="目次"><a href="#incident">1. 事象と原因</a><a href="#solution">2. 推奨する対応</a><a href="#options">3. 対応案の比較</a><a href="#files">4. 変更ファイル</a><a href="#rollout">5. ステップ展開案</a><a href="#sources">6. 根拠と確認範囲</a></nav>
 <section aria-labelledby="incident"><h2 id="incident">1. 事象と原因</h2>
 <div class="compare" aria-label="変更前と変更後の比較">
@@ -83,7 +83,7 @@ section{margin-top:2.2rem}li{margin-bottom:.5rem}pre{max-width:100%;overflow-x:a
 </section>
 <section aria-labelledby="rollout"><h2 id="rollout">5. ステップ展開案</h2>
 <p><strong>A：設計 → B：実装・機械検証 → C：本番切替（人間）→ D：反映確認</strong>の 4 工程を推奨する。すべて開発レーン。I-014 と I-017 の時間帯ずれ防止を先に完了させ、I-022・I-024 は同じフェーズ内の独立した後続ステップへ置く。</p>
-<p>各工程は計画体系 5 の 4 項目で示す。今回の着地は<strong>承認方針を展開するための下書き完成</strong>。計画書への正式転記前なので「展開済み」とは記録しない。</p>
+<p>各工程は計画体系 5 の 4 項目で示す。2026-09-21 の着地は<strong>承認方針を展開するための下書き完成</strong>。2026-09-22 に開発レーンで <a href="../plans/development-plan.html#phase-26">Phase 26</a> へ転記し、I-014 は展開済みとした。</p>
 <details open><summary>A. 入力契約・選定・切替手順を設計する</summary><div class="inner"><ul>
 <li><strong>内容：</strong>上表の設計書・運用書 6 本を更新。run / 素材欠落と終端済みの結果、UTC 形式、手動復旧、期限ガードの要否を確定する。全セット共通の変更として、1 日 1 回のセットも含め影響を照合する。新旧入力・アプリ・親子 ASL の組合せと切戻し手順を記す。</li>
 <li><strong>完了条件：</strong>設計・環境変数・SQL・手動入力例が同じ契約。現役設計書内の「SNS は scheduled_at 不要」「最古 actionable」の旧記述を全件照合し、履歴と現行説明を区別。リンク検査に新規不備なし。B の受け入れケース・切替チェック表が揃う。</li>
@@ -113,7 +113,7 @@ section{margin-top:2.2rem}li{margin-bottom:.5rem}pre{max-width:100%;overflow-x:a
 <p><strong>トリガー：</strong>リリース後の logic-training-1 の最初の夜投稿と、その次の朝投稿の確認時。<strong>判定：</strong>各 SFN 入力の予定時刻・posts の generation_run_id・動画の時間帯表示が一致し、過去の run を選んでいない。<strong>NG：</strong>後続の自動実行継続を人間が判断し、障害対応へ引き継ぐ。自然再発を待たず、失敗ケースは B のローカル再現で担保する。転記先はセット計画書の確認待ち、全セットの反映確認は D の開発記録とする。</p>
 <h3>課題照合と分割判断</h3>
 <ul><li><strong>I-014・I-017：</strong>当回固定の実装対象として同梱。I-017 の可視化まで完了したとは扱わない。</li><li><strong>I-022・I-024：</strong>既存どおり同一フェーズの後続へ。API バージョン更新・共有クライアント統合・エラー詳細保存・リトライ判断は別ステップで検討し、今回の先行リリースの条件にはしない。正式起票時に後続のステップとトリガーを同期する。</li><li><strong>I-006・I-025：</strong>監視の統合設計は別途。今回の理由ログで解消としない。I-025 の再発による展開要件は維持。</li><li><strong>I-012・I-015・I-019：</strong>パスは重なるが、SNS 分冊・AI 開示・日次の当日リカバリ規約全体は同梱しない。I-019 の手順整備時は今回の時刻指定契約を前提にする。既存トリガーを維持する。</li></ul>
-<p><strong>転記時の様式（2026-09-22 確認）：</strong>開発計画は新様式へ移行済み。<a href="../plans/_templates/step.html">ステップ雛形</a>へ 4 項目の意味を保って転記し、着手条件・完了条件・人間ゲート・停止点を常時表示する。長い仕様と作業記録は別々の折りたたみに置き、フェーズの背景も折りたたむ。転記後は <code>python3 tools/docs_check.py --plan-only</code> を通してから課題表を「展開済み」にする。本書は課題レーンの下書きであり、計画書の転記は未実施。</p>
+<p><strong>転記時の様式（2026-09-22 確認）：</strong>開発計画は新様式へ移行済み。<a href="../plans/_templates/step.html">ステップ雛形</a>へ 4 項目の意味を保って転記し、着手条件・完了条件・人間ゲート・停止点を常時表示する。長い仕様と作業記録は別々の折りたたみに置き、フェーズの背景も折りたたむ。転記後は <code>python3 tools/docs_check.py --plan-only</code> を通してから課題表を「展開済み」にする。本書の下書きは 2026-09-22 に計画書へ転記済み（構造検査 <code>--plan-only</code> 通過）。</p>
 <p>5.1 の起票チェック：全工程は開発レーン内。設計・実装・本番人間ゲート・反映確認で区切り、後日の出来事は確認待ちに分離する。正式転記時に最新の計画書様式と関連課題を再照合する。</p>
 </section>
 <section aria-labelledby="sources"><h2 id="sources">6. 根拠と確認範囲</h2>

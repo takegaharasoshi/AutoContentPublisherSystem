@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-21（<strong>25-2</strong>: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -756,6 +756,259 @@
 </div>
 </section>
 
+<section class="plan-phase" data-plan-phase="26" id="phase-26">
+<h2>Phase 26: SNS 投稿バッチの当回固定（空 run・朝夜ずれの根絶と sns-post-batch 改修の束ね）</h2>
+<p><strong>ゴール</strong>: 投稿バッチが「当回のセット × <code>scheduled_at</code>」の生成実行だけを投稿対象にし、空の run や未投稿の滞留があっても後続の投稿を塞がず、朝夜の表記も入れ替わらない状態にする。同じ <code>services/sns-post-batch/</code> 改修の後続として <a href="../issues/index.html#I-022">I-022</a>〔shared クライアントへの載せ替え・v25.0 化〕と <a href="../issues/index.html#I-024">I-024</a> ①〔コンテナ ERROR の理由記録〕を実施する。</p>
+<details class="plan-fold">
+<summary>フェーズの背景・起票の経緯 <span class="plan-hint">— I-014 の壁打ちからの展開・対象外・課題照合・分割理由・着手順</span></summary>
+<div class="plan-fold-inner">
+<blockquote>経緯: 課題体系 <a href="../issues/index.html#I-014">I-014</a>（2026-07-22 起票。空の generation_run が投稿バッチを塞ぐ。2026-08-06・2026-09-04 の 2 回発生で据え置き継続不可）の <code>/issue</code> 壁打ち（2026-09-21・<a href="../issues/sns-empty-generation-run.md">壁打ち記録</a>）→ 素材 EXISTS だけの旧案を「当回のセット × <code>scheduled_at</code> に固定し過去分へ戻らない」方針へ置き換え、<strong>2026-09-21 にユーザーが承認</strong> → 変更ファイル・4 工程の展開下書き（<a href="../issues/sns-empty-generation-run.html">事象・対応案</a>。設計書に非ず。<strong>事象の説明・仕組みと境界・選択肢の比較・変更ファイル一覧・受け入れケース 9 件・切替の注意と切戻しはそちらが正</strong>）→ <strong>2026-09-22 に本フェーズを起票</strong>（課題レーンの下書きを開発レーンで転記）。<strong>対象外</strong>: 投稿ゼロ・stale の可視化（<a href="../issues/index.html#I-006">I-006</a>・<a href="../issues/index.html#I-017">I-017</a> の可視化部分・<a href="../issues/index.html#I-025">I-025</a> は別途統合設計）、在庫の自動返却、監視スタックの変更、コンテナ作成からのアプリ内リトライ（I-024 ②。再発頻度で判断）、生成側アプリ・DDL の変更、フルのステージング環境。<strong>課題表の照合</strong>（<a href="index.html#step-checklist">5.1-5</a>。触るパス: <code>services/sns-post-batch/</code>・<code>shared/acps_shared/</code>・<code>infra/lib/asl/</code>・<code>infra/test/</code>・<code>docs/app/</code> 4 本・<code>docs/infra/</code> 2 本）: <strong>I-014・I-017〔朝夜ずれ防止の部分〕は 26-1〜26-4 に同梱</strong>（I-014 = 展開済み。I-017 は可視化が未決のため 起票 のまま対応方針列に同梱先を記載）。<strong>I-022 は 26-5・I-024 ① は 26-6 に同梱</strong>（展開済み。「次回改修時」のパス型トリガーをここで引いた）。I-006・I-025〔可視化〕、I-012〔SNS 分冊〕・I-015〔AI 開示タグ〕・I-019〔当日リカバリ手順〕はパスが重なるが同梱せず既存トリガーを維持（I-019 の手順整備時は本フェーズの時刻指定契約を前提にする）。<strong>分割</strong>（<a href="index.html#step-checklist">5.1-4</a>）: 設計レビュー・go / no-go・本番切替の人間ゲートで 26-1〔設計〕・26-2〔実装〕・26-3〔本番切替 = ユーザー作業〕・26-4〔反映確認と記録〕に割り、後続の I-022・I-024 ① は独立ステップ 26-5・26-6 とした（先行リリースの条件にしない）。<strong>確認待ちの分離</strong>（5.1-1）: リリース後の「最初の夜投稿と翌朝投稿が当回の run を選んだか」は自セッションで確かめられないため、26-4 で <a href="logic-training-1.html#pending-checks">logic-training-1 計画書の確認待ちリスト</a>へ起票する。<strong>着手順</strong>: 開発レーンは 1 セッションのため Phase 21 とは直列。前後はユーザー判断（I-014 の既承認の猶予は延長しない。未着手のまま 2026-10-04 以降の月次 KPI 棚卸しを迎えたら着手順を再判断）</blockquote>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<article class="plan-step" id="step-26-1" data-step-id="26-1" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>26-1</strong><span class="plan-status">未着手</span></div>
+<h3>入力契約・当回選定・切替手順の設計（設計書 6 本の更新）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。他セッションが開発レーンで動いていないこと。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>docs/app/design-outline.html</code>・<code>batch-flow.html</code>・<code>data-model.html</code>・<code>operation.html</code>・<code>docs/infra/workflow.html</code>・<code>docs/infra/operation.html</code> を更新し、投稿バッチの入力契約（<code>SCHEDULED_AT</code> 必須・UTC 秒精度 <code>YYYY-MM-DDTHH:MM:SSZ</code>・現在時刻の代入や最古へのフォールバック禁止）、選定 SQL（<code>set_id</code> × <code>scheduled_at</code> の完全一致 + <code>generated_media</code> の EXISTS + 既存の有効アカウント・非終端条件。最古順の選定は廃止）、結果の分類（当回 run なし / 素材なし = 理由付き異常終了、終端済み = 0 件正常、pending / container_created = 同 run の復旧）、手動起動例・切戻し手順を確定する。26-2 の受け入れケース表（<a href="../issues/sns-empty-generation-run.html#rollout">事象・対応案</a>の 9 件が原案）と 26-3 の切替チェック表もここで作る。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>設計書と計画・課題表のみ触る（<code>services/</code> <code>infra/</code> <code>database/</code> <code>shared/</code> は触らない）。DDL の追加・生成側アプリの変更を前提にしない。監視・可視化は対象外。<code>docs/plans/</code> のルールを変えない。設計 Fix の基準は「26-2 に着手できる」水準（生成 AI の指摘ゼロを目指さない）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>設計書 6 本で環境変数名・SQL・手動起動の入力例が同じ契約になっている（更新箇所の一覧〔ファイル + セクション〕を貼る）。</li>
+<li>現役設計書の旧記述「SNS は <code>scheduled_at</code> を受け取らない」「最古の actionable な run」を <code>grep -rn</code> で全件照合し、現行説明としては残存 0 件（履歴として残す箇所は注記済み）であることを出力で示す。</li>
+<li>期限ガード（大幅に遅延した旧実行の扱い）の要否と、含める場合の閾値・例外が batch-flow に「設計判断」として明記されている。</li>
+<li>26-2 の受け入れケース表と 26-3 の切替チェック表（取得する証跡: 反映対象コミット・現行イメージタグ・旧 ASL・Scheduler 状態）が batch-flow / operation に載っている。</li>
+<li>変更 HTML のタグ対応・ローカルリンクの機械チェックに新規不備なし（結果を貼る）。</li>
+<li>計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。日本語メッセージでコミット、<code>pull --rebase</code>、push まで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>設計レビュー 1 巡（ユーザー）: 結果の分類、遅延実行と期限ガードの扱い、全セット〔1 日 1 回のセットを含む〕への適用範囲、切替手順と切戻し。blocker のみ修正し、通過をもって 26-2 へ。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/app/</code> <code>docs/infra/</code> <code>docs/plans/</code> <code>docs/issues/</code>）。stop after 20 turns。やらないこと: コード・ASL・テストの変更、本番操作、設計レビューの自己判定（ユーザー判断でゴール対象外）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 受け渡し経路・失敗と再実行の区別・ファイル別の更新点</span></summary>
+<div class="plan-fold-inner">
+<p><strong>受け渡し経路</strong>: Scheduler の <code>scheduled_at</code> → 画像生成 SFN / <code>generation_runs.scheduled_at</code>（<code>UNIQUE (set_id, scheduled_at)</code> は実 DDL に存在）→ 親 ASL <code>StartSnsPostBatch.Input</code> に <code>scheduled_at.$: $.scheduled_at</code> を追加 → 子 ASL から ECS の <code>SCHEDULED_AT</code> → <code>WHERE gr.set_id = %s AND gr.scheduled_at = %s</code>。新規カラム・DDL・生成アプリからの run ID 返却は不要な見込み。</p>
+<p><strong>失敗と再実行の区別</strong>: 生成失敗 = 親 SFN は成功時だけ子を起動するので当回は欠番 / 当回 run なし・素材なし = 過去を探さず理由付きで異常終了（終端済みの 0 件成功と分ける） / 当回が終端状態 = 再投稿しない / pending・container_created = 同じ予定時刻の Retry で同 run の復旧 / 過去分の滞留 = 自動で選ばない（削除・架空の failed・在庫巻き戻しは人間ゲート） / 手動起動 = 対象 run の実際の予定時刻を明示（互換モードは設けない）。単一の actionable 検索の None だけで結論を出さず「指定 run の取得 → 素材・投稿状態の判定」を分けるか結果型で理由を返す（実装形は本ステップで確定）。</p>
+<p><strong>ファイル別の更新点</strong>: design-outline = 「SNS は SCHEDULED_AT を受け取らない」の契約と最古選定の概要 / batch-flow・data-model = 当回の定義・対象決定・掲載 SQL・失敗時の扱い・将来の「追いつく」方針との関係 / workflow = 親子 ASL の掲載例・子 Input・投稿 ECS の環境変数表 / operation（app・infra）= 手動起動例・stale と失敗の補正・起動失敗と DLQ の復旧・「最古を自動消化」の説明を廃止し指定した予定時刻を確認する手順へ。期限ガードを採用する場合は投稿側 <code>app/clock.py</code>・期限値を渡す ASL・設定箇所を 26-2 の対象に追加して明示する。Scheduler の手動停止が stack の deploy で戻り得る点は切替チェック表に入れ、窓を確保できない場合は停止状態を CDK 側にも保持する変更を追加設計する。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-26-2" data-step-id="26-2" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>26-2</strong><span class="plan-status">未着手</span></div>
+<h3>親子 SFN の予定時刻受け渡しと当回選定の実装（26-1 の設計レビュー通過後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>26-1 の人間ゲート（設計レビュー）通過後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>アプリ 3 本（<code>services/sns-post-batch/app/config.py</code>・<code>target_selection.py</code>・<code>main.py</code>）、ASL 2 本（<code>infra/lib/asl/image-generation.asl.json</code>・<code>sns-posting.asl.json</code>）、テスト（<code>services/sns-post-batch/tests/</code> 4 本・<code>infra/test/</code> 2 本）、<code>services/sns-post-batch/README.md</code> を一体で変更する。親 → 子 → ECS へ予定時刻を渡し、投稿アプリは指定 run の確認（素材の存在・投稿状態）をキャプション生成より前に行い、どの失敗でも別の run へ移らない。外部投稿 API はテスト用の偽物を使う。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>生成側アプリ・DDL・<code>shared/</code> は触らない（shared は 26-5）。旧選定へ戻す互換モード・<code>SCHEDULED_AT</code> 欠落時の現在時刻代入・最新実行の検索・最古へのフォールバックを作らない。既存の二重投稿防止・ストーリーズの現行方針・リールと 1 日 1 回セットの正常系を維持。<strong>push しない</strong>（投稿アプリの push はパイプラインを起動するため 26-3 の停止窓まで待つ）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>26-1 で確定した受け入れケース（原案 9 件: 朝の空 run + 夜指定で夜だけ選ぶ → 翌朝は翌朝だけ / 朝に素材あり・posts なし・pending・container_created を残しても夜だけ選び朝の run と在庫を書き換えない / 当回欠落・素材なしは過去へ戻らず理由付き失敗 / 別セット・前日同スロット・当回より新しい実行を選ばない / 終端状態は再投稿しない・複数アカウントは当回の未完了分だけ / Retry で同 run を再開 / <code>SCHEDULED_AT</code> 欠落・空・不正形式・存在しない日時は API 呼出し 0 件で失敗 / 親 → 子 → ECS の値が一致し UTC と JST の日付が異なる朝でも DB と一致 / 既存の正常系維持）が <code>test_e2e_local_mysql.py</code> でローカル MySQL 実行され全通過（pytest 要約行。<strong>skipped 0 件</strong>。実行できない DB テストを skip 合格にしない）。</li>
+<li>sns-post-batch の <code>pytest</code> 全パス（要約行を貼る）。</li>
+<li><code>infra</code> の <code>npm run build</code> と Jest 全パス（要約行。ASL をパースして親 Input → 子 Overrides の予定時刻転送・入力拒否・Retry 時の同一値を検証するテストを含む）。</li>
+<li><code>cd infra &amp;&amp; cdk synth -c env=prod</code> が成功し、現行イメージの context を与えた <code>cdk diff</code> で意図した親子定義以外の差分がない（diff の要約を貼る）。</li>
+<li>切替チェック表（26-1）に反映対象コミット・現行イメージタグ・旧 ASL・Scheduler 状態を取得するコマンドが記入されている。</li>
+<li>計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。日本語メッセージでコミット（push しない）。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分と検証証跡（pytest・Jest・cdk diff）を確認し、26-3 の実施可否（go / no-go）と停止窓の日時を決める（ユーザー）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/sns-post-batch/</code> <code>infra/</code> <code>docs/plans/</code>。push は 26-3 の停止窓で）。stop after 25 turns。超える場合はアプリと ASL を別コミットに分けてよいが、片側だけを本番へ出さない。やらないこと: push、cdk deploy、本番 DB・Scheduler の操作。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ファイル別の変更点・テストの更新方針</span></summary>
+<div class="plan-fold-inner">
+<p><strong>ASL</strong>: image-generation = 子起動の Input に予定時刻を追加（Retry・既存の起動名は維持）/ sns-posting = 入力の存在・形式の入口検査を置き、ECS へ <code>SCHEDULED_AT</code> を渡す（DB・投稿に入る前に欠落を拒否）。<strong>アプリ</strong>: config = <code>AppConfig</code> に予定時刻を追加し必須・UTC 形式・実在日時を検証 / target_selection = セット × 予定時刻の完全一致・空素材の除外・該当なしと終端済みの識別 / main = 予定時刻を選定へ渡し欠落理由をログへ、対象 run と素材の健全性をキャプション作成より前に確認。<strong>テスト</strong>: 旧「SCHEDULED_AT 不要」のテストと AppConfig fixture を更新し、入力異常・選定・0 件と失敗の区別を追加。e2e は全 main 呼出しに fixture の予定時刻を設定。infra/test は ASL をパースして転送・拒否・Retry 同一値を検証。<strong>README</strong>: 必須変数とローカル実行例に予定時刻を明示。<strong>CDK スタック</strong>（<code>image-batch-stack.ts</code> / <code>sns-post-batch-stack.ts</code>）はソース変更不要の見込みだが両スタックのデプロイは必要（26-3）。Codex 委譲の目安: 仕様が 26-1 で確定しているため実装 + テスト修正ループは委譲対象（指示文に「<code>docs/</code> は触らない」「push しない」を含める）。成果物のレビューは Claude。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-26-3" data-step-id="26-3" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>26-3</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>定時実行を止めた窓での本番切替（ユーザー判断・ゴール対象外。26-2 の go 後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>26-2 の人間ゲートで go。定時刻をまたがない停止窓が確保できていること。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>影響するセット（稼働中の logic-training-1・pref-ranking-1）の Scheduler をユーザーが一時停止し、親子 SFN・ECS に実行中の処理がないことを確認してから 26-2 のコミットを push する。CodePipeline（sns-post-batch）の Succeeded と新しいタスク定義リビジョンの登録を <code>/goal</code> 定型行（CLAUDE.md「Git 運用ルール」）で確認し、そのイメージを維持した context で <code>SnsPostBatchStack</code> → <code>ImageBatchStack</code> をデプロイする。両者の実定義（親子 ASL・タスク定義）を確認してからスケジュールを再開する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>親子 ASL とアプリのすべてが新契約になったことを確認するまで実行を再開しない。本番 DDL は不要（適用しない）。本番 SNS をテスト目的で自動投稿しない。片側のデプロイ失敗時に自動で旧方式へ戻さない。各 deploy 後に Scheduler の有効状態を再確認する（手動停止が deploy で戻る可能性）。既存の実行は更新前の入力を持つため、定義更新だけで新契約へ移ったと扱わない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>切替チェック表（26-1）の証跡が揃う: Scheduler 停止、実行中 0 件、パイプライン Succeeded とタスク定義の新リビジョン、イメージタグ、親子 ASL の実定義、再開前の確認（すべて aws cli の出力）。</li>
+<li>再開後の Scheduler が有効で、次回の定時実行時刻が想定どおり（出力を貼る）。</li>
+<li>切戻しが必要になった場合: 停止状態を保ったまま旧イメージと両 ASL を対応する組合せへ戻し、既存 backlog を確認してから再開を判断した記録が残る。</li>
+</ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>すべてユーザー作業: Scheduler の停止・再開、push の承認、<code>cdk deploy</code>、必要なら切戻し。Claude は push 直後の <code>/goal</code> 定型行の提示と、依頼された読み取りコマンドの実行のみ行う。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（ゴールにしない）。エージェントが承認なしにデプロイ・Scheduler 操作をしない。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 切替の注意と切戻しの根拠</span></summary>
+<div class="plan-fold-inner">
+<p>詳細は<a href="../issues/sns-empty-generation-run.html#rollout">事象・対応案「C. 定時実行を止めた窓で切り替える」</a>。旧選定へ戻すと滞留した過去分を再び拾うため、切戻し時も backlog の確認なしに再開しない。反映確認の作法は既存の CodePipeline 確認手順（19-1 の <code>/goal</code> 化）を使う。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。実施したら日時・証跡の所在をここに残す。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-26-4" data-step-id="26-4" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>26-4</strong><span class="plan-status">未着手</span></div>
+<h3>反映の確認と記録・課題表・確認待ちの整理（26-3 完了後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>26-3（本番切替とスケジュール再開）完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>実環境の親子 ASL・タスク定義・Scheduler 設定・投稿の入力契約を読み取りで確認し、証跡を開発記録へ残す。課題表で <a href="../issues/index.html#I-014">I-014</a> を 解消 としてクローズ節へ移し、<a href="../issues/index.html#I-017">I-017</a> は朝夜ずれ防止の完了と可視化の残件（I-006・I-025 との統合設計）を対応方針列に反映する。リリース後の投稿確認（最初の夜投稿と翌朝投稿が当回の run を選んだか）を <a href="logic-training-1.html#pending-checks">logic-training-1 計画書の確認待ちリスト</a>へセット型で起票する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>読み取りのみ（本番の変更操作をしない）。将来の投稿を待つことを本ステップの完了条件にしない。新旧混在（ASL・イメージ・コードの不一致）があれば完了扱いにせず 26-3 の人間判断へ戻す。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>反映対象コミット・タスク定義のイメージタグ・親子 ASL の実定義がコードと一致し、Scheduler → 親 SFN → 子 SFN → ECS の予定時刻の転送経路が実定義で追える（aws cli の出力を貼る）。</li>
+<li>課題表（<code>docs/issues/index.html</code>）と開発計画・開発記録の記載が一致する（I-014 = 解消でクローズ、I-017 = 対応方針更新、最終更新の同期）。</li>
+<li>logic-training-1 計画書の確認待ちリストに行が載る（トリガー: リリース後の最初の夜投稿とその次の朝投稿の確認時 / 判定: 各 SFN 入力の予定時刻・<code>posts.generation_run_id</code>・動画の時間帯表示が一致し過去の run を選んでいない / NG: 自動実行の継続を人間が判断し <code>/incident</code> へ）。</li>
+<li>計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。日本語メッセージでコミット、<code>pull --rebase</code>、push まで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>反映証跡の確認（ユーザー）。投稿の目視は確認待ち行で扱う。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/plans/</code> <code>docs/issues/</code>）。stop after 15 turns。やらないこと: 本番の変更操作、コードの修正（不一致は 26-3 へ戻す）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 課題表の更新範囲</span></summary>
+<div class="plan-fold-inner">
+<p>I-014 のクローズ列は「解消: Phase 26 で当回固定を実装（26-3 で本番反映）」。I-017 は可視化が未決のためクローズせず、対応方針を「朝夜ずれ防止は 26-2 で実装済み。滞留・stale の可視化は I-006・I-025 と統合設計」に書き換える（トリガーは維持）。I-006・I-025 の行は触らない。今回の理由付きログをもって可視化が解消したとは扱わない。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-26-5" data-step-id="26-5" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>26-5</strong><span class="plan-status">未着手</span></div>
+<h3>Instagram クライアントの shared 昇格版への載せ替えと Graph API v25.0 化（I-022。26-4 完了後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>26-4 完了後（当回固定の本番反映と記録が済んでから）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>services/sns-post-batch/app/instagram_api.py</code> のローカル実装（HTTP / エラー処理・Secret 名規約）を、16-9 で <code>shared/acps_shared/</code> へ昇格した汎用層に載せ替え、Graph API のバージョンを insights-batch と同じ v25.0 系へ引き上げる（<a href="../issues/index.html#I-022">I-022</a>）。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>投稿・ストーリーズ・コンテナポーリングの外形（呼び出す API・リトライ回数・記録する <code>api_response</code>）を変えない。26-2 の当回選定・入力契約に触れない。<code>shared/</code> の既存利用者（insights-batch）の挙動を変えない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>sns-post-batch の <code>pytest</code> 全パス、<code>shared/</code> の <code>pytest</code> 全パス（要約行を貼る）。</li>
+<li>投稿系エンドポイント（メディアコンテナ作成・ポーリング・publish・ストーリーズ）で v25.0 系までに廃止・変更された項目がないことを Meta の changelog で照合し、結果を作業記録に残す。</li>
+<li>sns-post-batch 内に HTTP 層・Secret 名の重複実装が残らない（<code>grep -rn</code> の結果を貼る）。</li>
+<li>計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。日本語メッセージでコミットまで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → <code>/goal</code> 定型行で CodePipeline 完走とタスク定義の新リビジョンを確認（ユーザー）→ 次回の定時投稿が成功したことを確認。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/sns-post-batch/</code> <code>shared/</code> <code>docs/plans/</code>。push は差分確認後）。stop after 20 turns。やらないこと: API 呼び出しの追加・削除、当回選定の変更。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 16-9 の昇格範囲との関係</span></summary>
+<div class="plan-fold-inner">
+<p>16-9（Phase 16）で insights-batch 向けに shared へ昇格したのは HTTP クライアントの汎用層・エラー処理・SNS Secret 名規約。sns-post-batch は当時ローカル実装のまま残した（二重管理）。廃止メトリクス名は投稿系エンドポイントに影響しない見込み（I-022 の対応方針）だが、完了条件 2 で changelog を照合して確かめる。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-26-6" data-step-id="26-6" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>26-6</strong><span class="plan-status">未着手</span></div>
+<h3>コンテナ ERROR の理由をログと api_response に残す（I-024 ①。26-5 完了後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>26-5 完了後（同じ <code>instagram_api.py</code> を触るため直列）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>メディアコンテナのポーリングで <code>fields=status_code</code> に加えて <code>status</code> を取得し、<code>status_code=ERROR</code> のときの理由文字列をログと <code>posts.api_response</code> に残す（<a href="../issues/index.html#I-024">I-024</a> ①）。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>コンテナ作成からやり直すアプリ内リトライ（I-024 ②）は実装しない（人間ゲートで要否を判断）。ポーリング間隔・回数・publish の挙動を変えない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>ERROR 応答の偽物を返すテストで、理由文字列がログと <code>api_response</code> に残ることを検証するテストが追加され、sns-post-batch の <code>pytest</code> 全パス（要約行を貼る）。</li>
+<li>設計書の <code>api_response</code> の記載（data-model）に理由文字列が含まれる旨を同期する。</li>
+<li>計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。日本語メッセージでコミットまで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → <code>/goal</code> 定型行で CodePipeline 完走を確認（ユーザー）。あわせて I-024 ②（アプリ内リトライ）の要否をコンテナ ERROR の再発頻度で判断し、課題表を更新する（実装するなら別ステップとして起票。発生実績型トリガー〔2 回目で据え置き不可〕は維持）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/sns-post-batch/</code> <code>docs/app/data-model.html</code> <code>docs/plans/</code>。push は差分確認後）。stop after 10 turns。やらないこと: リトライの実装。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 数行の変更・先行実施可だった理由</span></summary>
+<div class="plan-fold-inner">
+<p>I-024 の対応方針では ① は数行で先行実施可としていたが、同じファイルを 26-5 で載せ替えるため、その後に置いて競合を避ける。コンテナ ERROR はパブリッシュ前のため二重投稿リスクはない。発生実績は 2026-08-23 の 1 回（logic-training-1 記録）。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</section>
+
 <hr>
 
 <h2 id="pending-checks">確認待ちリスト（トリガー付き）</h2>
@@ -768,7 +1021,6 @@
 <tr><td>2026-09-02 / 20-1 fantasy-animals-1 の停止（効果確認）</td><td><strong>2026-09-04 の 21:00 JST 以降</strong>（deploy と Aurora の <code>is_active = 0</code> は 2026-09-03 に適用済み。翌 06:00 のインサイト収集も観察対象）</td><td>① fantasy-animals-1 の 21:00 投稿が起きていない（<code>posts</code> に新規行なし・Instagram に新規投稿なし）② 画像生成 SFN が fantasy-animals-1 で起動していない（EventBridge Scheduler 一覧に fantasy-animals-1 の名前がない）③ インサイト収集 SFN の 06:00 / 18:00 実行が他セット分だけで成功している</td><td>投稿が起きている → deploy 未反映か Scheduler の削除漏れ。20-1 の追補ステップとして起こす。インサイト収集が失敗する → 収集バッチの <code>is_active = 0</code> の扱いを確認し課題体系（開発レーン節）へ起票</td><td>—</td></tr>
 <tr><td>2026-09-03 / 16-12b <code>follows_and_unfollows</code>（100 フォロワー閾値後の確認）</td><td>月次 KPI 転記時に <code>v_account_kpi_monthly.month_end_followers</code> が 100 以上のアカウントが初めて現れたとき</td><td>そのアカウントのその月の <code>account_insights_daily.metrics</code> に <code>follows_and_unfollows</code> キー（<code>breakdowns</code> の <code>follow_type</code> 内訳）が入り始めているか（<code>SELECT metric_date, JSON_EXTRACT(metrics, '$.follows_and_unfollows') FROM account_insights_daily WHERE sns_account_id = ? ORDER BY metric_date DESC LIMIT 7</code>）。入っていれば OK → data-model 4.11 に「100 フォロワー以上で取得可」を追記し、ビュー <code>v_account_kpi_daily</code> への昇格を検討する</td><td>入っていない → 正規化（<code>insights_api.py</code>）か要求パラメータの問題として課題体系（開発レーン節）へ起票（応答本文を CloudWatch Logs では確認できないため、要求のデバッグログ追加を含めて扱う）</td><td>—</td></tr>
 <tr><td>2026-09-19 / <a href="development-log.html#phase-22">22-3</a> <code>/incident</code>（初回試行）</td><td>22-3 完了後、次に本番・運用の異常が起きたとき</td><td>① 照合結果（予言されていた課題・前にも起きた事象）が原因究明の前に提示されるか ② 終了時に事象記録 + 課題の更新（発生履歴 / 起票 / 即 解消）が漏れなく行われるか</td><td>提示が後になる・更新が漏れる → SKILL.md の工程順を直す（Phase 22 の追補ステップ）</td><td>—</td></tr>
-<tr><td>2026-09-19 / <a href="development-log.html#phase-22">22-3</a> <code>/issue</code> 壁打ち（初回試行）</td><td>22-2 完了後、最初に据え置き課題を壁打ちするとき（候補: 可視化 3 件〔旧 2026-07-07・07-25・08-23〕の統合設計）</td><td>① 壁打ち開始時に <code>docs/issues/&lt;slug&gt;.md</code> が作られ行にリンクが付くか ② 終了規律で 据え置き / 展開 / 受容 のどれかに着地し index.html が同期されるか</td><td>着地しない・同期漏れ → SKILL.md の終了規律を直す（Phase 22 の追補ステップ）</td><td>—</td></tr>
 </tbody>
 </table></div>
 
