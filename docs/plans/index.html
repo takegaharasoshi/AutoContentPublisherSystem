@@ -106,6 +106,7 @@
 <ul>
 <li><strong>完了条件を折りたたみの中に入れない</strong>（<code>/step</code> と <code>/goal</code> が常時表示だけで読めるようにする）。方針が変わったら作業記録だけでなく常時表示側も直す</li>
 <li><strong>完了済みのステップは同じフェーズの中で進行中より上</strong>に置き、折りたたんだグループにまとめる（初期状態は閉じる）</li>
+<li><strong>フェーズ冒頭は「ゴール 1〜2 文」だけを常時表示</strong>し、経緯・対象外・課題照合・分割理由・着手前提・フェーズ単位の決定（<code>blockquote.decision</code>）は <code>details.plan-fold</code>「フェーズの背景・決定の経緯」に畳む（25-2 の追補・2026-09-22。移行時に PoC の見せ方を落としていたための修正）。<strong>着手に必要な条件は背景ではなくステップ側の「着手条件」「守る条件」に書く</strong>（背景を開かずに着手できる状態を保つ）</li>
 <li><strong>ユーザー判断のステップ</strong>は「ユーザー判断・ゴール対象外」を常時表示に出し、停止点は「—（ゴールにしない）」とする。<strong>完了条件が残っていない古い完了ステップ</strong>は例外形式として記録リンクで代替してよい（推測で 4 項目を作らない）</li>
 <li><strong>雛形</strong>: <a href="_templates/step.html">docs/plans/_templates/step.html</a>（コピー範囲・属性の早見表つき）。<strong>構造の契約</strong>の正は<a href="../issues/plans-readability-rollout.html">変更ファイル・展開草案</a>セクション 2</li>
 <li><strong>検査</strong>: 移行済み計画書を更新したら <code>python3 tools/docs_check.py --plan-only</code>（構造 + 参照のみ・ブラウザー不要）を実行する。CSS・テンプレートを変えたとき、または新しい計画書を移行したときは <code>python3 tools/docs_check.py --widths 360,390,768,1280</code> と折りたたみの実機確認も行う。<strong>検査が担保しないこと</strong>（重要な制約を文章として拾えているか・要約が正しいか・記録と最新状態が一致するか）は更新者が差分のステップを読み直す</li>
