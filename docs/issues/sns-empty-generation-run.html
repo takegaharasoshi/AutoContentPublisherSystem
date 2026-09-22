@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>I-014｜空の生成実行が投稿を止める問題と対応案</title>
+<title>I-014｜当回の生成実行だけを投稿する対応案</title>
 <link rel="stylesheet" href="../assets/style.css?v=20260921"><style>
-.container{max-width:68rem}main{overflow-wrap:anywhere}.intro{font-size:1.08rem;color:var(--text-muted)}
+.container{max-width:68rem}.table-wrap table{width:100%;table-layout:fixed}.table-wrap th:first-child{width:43%}.table-wrap th:last-child{width:12%}.table-wrap td{overflow-wrap:anywhere;vertical-align:top}main{overflow-wrap:anywhere}.intro{font-size:1.08rem;color:var(--text-muted)}
 .jump{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.5rem 0 2rem}.jump a{padding:.4rem .9rem;border:1px solid var(--border);border-radius:2rem;text-decoration:none}
 .lead-box{padding:1.2rem 1.5rem;border:1px solid var(--note-border);border-radius:12px;background:var(--note-bg)}
 .lead-box h2{margin-top:0;padding-top:0;border:0}.lead-box p:last-child{margin-bottom:0}
@@ -11,20 +11,21 @@
 .outcome{font-weight:700;border-top:1px solid var(--border);padding-top:.8rem}.options{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;list-style:none;padding:0!important}.options li{border:1px solid var(--border);border-radius:10px;padding:1rem;margin:0}.options li:first-child{background:var(--note-bg);border-color:var(--note-border)}
 .options strong{display:block;margin-bottom:.5rem}details{border:1px solid var(--border);border-radius:10px;margin:1rem 0}summary{padding:1rem;cursor:pointer;font-weight:700;background:var(--bg-subtle);border-radius:10px}.inner{padding:.2rem 1.2rem 1rem}a:focus-visible,summary:focus-visible{outline:3px solid var(--link);outline-offset:3px}
 section{margin-top:2.2rem}li{margin-bottom:.5rem}pre{max-width:100%;overflow-x:auto}pre code{overflow-wrap:normal;white-space:pre}code{overflow-wrap:anywhere}[id]{scroll-margin-top:1rem}.footnote{color:var(--text-muted);font-size:.9rem}
-@media(max-width:640px){.container{padding:1.2rem 1rem 3rem}.compare,.options{grid-template-columns:1fr}h1{font-size:1.65rem}.lead-box{padding:1rem}.inner{padding:.2rem 1rem 1rem}}
+@media(max-width:640px){.table-wrap th,.table-wrap td{padding:.5rem;font-size:.85rem}.container{padding:1.2rem 1rem 3rem}.compare,.options{grid-template-columns:1fr}h1{font-size:1.65rem}.lead-box{padding:1rem}.inner{padding:.2rem 1rem 1rem}}
 @media print{.jump{display:none}details>.inner{display:block!important}.compare,.options{display:block}.flow,.options li{break-inside:avoid;margin-bottom:.7rem}}
 </style></head>
 <body><main class="container">
 <nav class="breadcrumb" aria-label="パンくず"><a href="../index.html">設計書</a> / <a href="index.html#I-014">課題 I-014</a> / 事象と対応案</nav>
-<header><p class="footnote">I-014 · 開発レーン · 2026-09-21 更新</p><h1>空の生成実行が、後続の投稿を止める</h1><p class="intro">なぜ正常に生成できた動画まで投稿されなくなるのか。原因と、投稿対象の選び方を変える対策をまとめます。</p></header>
-<div class="lead-box"><h2>推奨：素材のある実行だけを投稿候補にする</h2><p>推奨は、投稿対象の選定 SQL に「その生成実行の <code>generated_media</code> が 1 件以上ある」という条件を加えること。生成に失敗した空の実行を候補から外し、後続の正常な実行を投稿できるようにする。
-I-022・I-024 と同じ改修フェーズで管理する既存方針は維持し、I-014 は独立した先頭ステップにする案を提案する。API クライアント統合やリトライ設計の完了を、この修正のリリース条件にしない。
-本書は事象と対策を一緒に読める検討資料であり、実装済みの設計書ではない。実装・本番操作は今回行っていない。管理状態・再判断条件・発生履歴の正は <a href="index.html#I-014">課題表 I-014</a>。</p></div>
-<nav class="jump" aria-label="目次"><a href="#incident">1. 事象と原因</a><a href="#solution">2. 推奨する対応</a><a href="#options">3. 対応案の比較</a><a href="#rollout">4. 開発への引き継ぎ</a><a href="#sources">5. 根拠と確認範囲</a></nav>
+<header><p class="footnote">I-014 · 開発レーン · 2026-09-22 更新</p><h1>朝の失敗を夜へ持ち越さない投稿にする</h1><p class="intro">当回の予定時刻で投稿対象を固定し、生成失敗や未投稿分の滞留があっても、次の回はその回の素材だけを扱う方針です。</p></header>
+<div class="lead-box"><h2>承認された方針：当回だけを対象にし、過去分へ戻らない</h2>
+<p><strong>セット名と当回の予定時刻で生成実行を特定し、素材がある場合だけ投稿する。</strong>朝の空の実行も、素材はあるが未投稿の朝の実行も、夜の投稿候補には入れない。夜・翌朝それぞれの生成と投稿が成功すれば、その回の内容で投稿する。当回が失敗した回は欠番を許容する。</p>
+<p>2026-09-21 にユーザーが方針を承認。以下は実コードを照合した変更範囲と開発レーンへの展開案であり、実装・本番操作は未実施。I-014 と I-017 の時間帯ずれ防止をまとめ、I-022・I-024 は同じフェーズの後続へ分ける。</p>
+<p>管理状態・再判断条件・発生履歴の正は <a href="index.html#I-014">I-014</a> / <a href="index.html#I-017">I-017</a>。正式なステップ番号は開発計画への転記時に採番する。</p></div>
+<nav class="jump" aria-label="目次"><a href="#incident">1. 事象と原因</a><a href="#solution">2. 推奨する対応</a><a href="#options">3. 対応案の比較</a><a href="#files">4. 変更ファイル</a><a href="#rollout">5. ステップ展開案</a><a href="#sources">6. 根拠と確認範囲</a></nav>
 <section aria-labelledby="incident"><h2 id="incident">1. 事象と原因</h2>
 <div class="compare" aria-label="変更前と変更後の比較">
 <article class="flow"><h3>現状：空の実行で止まる</h3><ol><li>古い A：素材なし ／ 新しい B：素材あり</li><li>古い A が投稿候補になる</li><li>キャプション生成・素材取得で失敗</li><li>次回も A が選ばれる</li></ol><p class="outcome">B は正常でも、投稿に進めない。</p></article>
-<article class="flow after"><h3>対応案：素材のある実行を選ぶ</h3><ol><li>古い A：素材なし ／ 新しい B：素材あり</li><li>素材なしの A を候補から外す</li><li>既存条件を満たす B を選ぶ</li><li>B の投稿処理に進める</li></ol><p class="outcome">空の実行が、後続を塞がなくなる。</p></article></div><p><code>generation_runs</code> は「生成処理を始めた記録」、<code>generated_media</code> は「生成できた画像・動画の記録」である。実行記録があることと、投稿できる素材があることは同じではない。</p>
+<article class="flow after"><h3>対応案：夜の回は夜の実行を指定</h3><ol><li>朝 A：失敗 ／ 夜 B：生成成功</li><li>夜の予定時刻を投稿側まで引き継ぐ</li><li>夜 B だけを照合し、素材があれば投稿</li><li>翌朝も、翌朝の予定時刻の実行だけを照合</li></ol><p class="outcome">朝 A の素材の有無にかかわらず、夜 B を塞がない。</p></article></div><p><code>generation_runs</code> は「生成処理を始めた記録」、<code>generated_media</code> は「生成できた画像・動画の記録」である。実行記録があることと、投稿できる素材があることは同じではない。</p>
 <p>現行の画像生成バッチは、生成実行を確定（commit）してから素材の生成処理に進む。途中で検証などに失敗すると、実行記録だけが残り、素材が 0 件になることがある。これは投稿 API のエラーや在庫枯渇に限った問題ではない。</p>
 <p>投稿バッチは、同じセットの実行から「有効アカウントの少なくとも一つに、終端状態の投稿がないもの」を古い順に 1 件選ぶ。素材の有無を調べる条件がないため、空の実行も候補になる。</p>
 <ol><li>古い実行 A は生成失敗で素材が 0 件。新しい実行 B は生成成功で素材がある。</li><li>投稿バッチが A を選ぶ。</li><li>A のキャプション生成または素材取得で失敗する。アカウントごとの投稿処理に入る前なので、候補から外す終端状態の <code>posts</code> が作られない。</li><li>次回も A が選ばれ、B が投稿されない。この繰り返しが後続の投稿を塞ぐ。</li></ol>
@@ -33,31 +34,89 @@ I-022・I-024 と同じ改修フェーズで管理する既存方針は維持し
 <p><a href="../plans/logic-training-1-log.html">logic-training-1 の事象記録</a>では、実行時生成の検証失敗で残った空の run 44 が後続を塞いだ例と、ストック方式の実行時文字数検証で残った run 165 が、正常生成された run 168 を塞いだ例が記録されている。後者は課題表で約 13 時間の停止として扱われている。日時と復旧操作の原記録は同リンクおよび課題表に集約する。</p>
 <p>run 44 は素材なしの例外、run 165 はそれより前のキャプション生成で例外になった。したがって、素材取得後の例外を握りつぶすだけでは両方を防げない。候補の選定段階で空の実行を外す必要がある。</p>
 <p>ストックの入力検証を改善しても、別の生成失敗で空の実行が残る経路はある。I-033 の対策だけで I-014 が解消したとは扱えない。</p></section>
-<section aria-labelledby="solution"><h2 id="solution">2. 推奨する対応</h2>
-<p>既存 SQL の <code>WHERE gr.set_id = %s</code> に続く条件として、次を追加する案とする。</p>
-<pre><code>AND EXISTS (
-    SELECT 1
-    FROM generated_media gm
-    WHERE gm.generation_run_id = gr.id
-)</code></pre>
-<p>既存の有効アカウント・終端状態の条件、<code>scheduled_at ASC, id ASC</code> の順序、1 回に 1 実行だけ処理する方針は維持する。<code>EXISTS</code> なら素材が複数ある場合でも実行候補を重複させず、必要な「少なくとも 1 件」を直接表せる。</p>
-<p>この修正後、A が空で B に素材があれば B が選ばれる。空の実行しかない場合は対象なしとなり、既存仕様どおり <code>records_processed=0</code> の正常終了になる。空の実行自体を削除したり、架空の投稿失敗行を作ったりする必要はない。後から生成の再実行で素材が登録されれば、その実行は再び候補になり得る。</p>
-<p>変更対象案:</p>
-<ul><li><code>services/sns-post-batch/app/target_selection.py</code>: 素材の存在条件を追加する。</li><li><code>services/sns-post-batch/tests/test_target_selection.py</code> と <code>test_e2e_local_mysql.py</code>: 条件と実際の選定結果を検証する。</li><li><code>docs/app/batch-flow.html</code> 3.1: 投稿可能な候補の定義を更新する。</li><li><code>docs/app/data-model.html</code> 4.4: 掲載している選定 SQL も同期する。フローだけ直すと SQL の説明が古いまま残る。</li></ul>
-<p>既存の <code>generated_media</code> には <code>generation_run_id</code> を先頭とする一意キーが設計されている。DDL 変更を前提にせず、開発時に実 DDL とローカル MySQL の実行計画を照合する。</p>
-<h3>この対策の限界</h3>
-<ul><li>DB に素材レコードがあることは、S3 上の実体やキャプション用データの健全性までは保証しない。今回防ぐのは素材 0 件の実行による連続停止である。</li><li>空の実行だけなら正常終了になるため、「投稿できたか」を別途見る必要がある。空の実行の可視化・投稿ゼロ検知は既存の I-006・I-025 の検討へつなぐ。今回の SQL 修正に監視基盤の完成を必須条件として足さない。</li><li>過去の正常な素材の滞留や、朝用動画を夜に投稿してしまう問題（I-017）は残る。空の実行を外せば、次に選ばれるのは「当回分」とは限らない。リリース前に対象セットのバックログと時間帯を確認し、復旧で必要な対象外化・在庫戻しは既存運用の人間ゲートで扱う。</li><li><code>main.py</code> の素材なし例外は残す。選定後にデータが変更されるなどの不整合まで、成功として隠さない。</li></ul></section>
-<section aria-labelledby="options"><h2 id="options">3. 対応案の比較</h2>
-<ul class="options"><li><strong>選定時に素材の存在を確認する（推奨）</strong>: 投稿側に閉じた変更で、生成失敗の原因によらず後続への波及を防げる。検証範囲が小さく、既存の再開条件も保てる。</li><li><strong>空の実行を手動削除・対象外化する</strong>: 過去の復旧には有効だったが、検知と人手に依存する。恒久対策にはしない。</li><li><strong>生成側の commit を遅らせる・失敗時に必ず削除する</strong>: 再実行の識別や途中成果の保存に関わる。外部 API・S3 操作まで DB の rollback で戻せるわけでもない。広い再開設計の変更を今回の前提にしない。</li><li><strong>生成完了ステータスを新設する</strong>: 将来、素材と付随データの完成を厳密に保証するなら検討余地はあるが、DDL・生成側・投稿側の更新が必要。素材 0 件の除外には大きすぎる。</li><li><strong>最新の実行だけ投稿する</strong>: 後続へ進めても、未投稿分の順序と再開方針を変える。I-017 と合わせた別の判断になる。</li><li><strong>生成失敗の原因だけ直す・何もしない</strong>: 異なる生成方式でも空の実行が詰まることが記録されており、再発経路を塞げない。</li></ul></section>
-<section aria-labelledby="rollout"><h2 id="rollout">4. 開発への引き継ぎ</h2>
-<p>既存の I-014・I-022・I-024 を束ねるフェーズ内で、I-014 を先頭の独立ステップにする案。残りの API 統合・エラー理由の保存・リトライは後続ステップとして分ける。ここでは I-022 の API バージョン移行や I-024 のリトライ仕様を新たに確定しない。</p>
-<details><summary>実装範囲・完了条件・受け入れケースを開く</summary><div class="inner"><h3>ステップ案: 空の生成実行を投稿対象から除外する</h3>
-<ul><li><strong>内容</strong>: 上記の選定 SQL・テスト・設計書 2 本を変更する。実装前に課題表を再照合し、同一フェーズの I-022・I-024 は後続ステップへ分離する。共通パスを持つ I-006・I-017・I-025 の監視・滞留対策、I-012 の SNS 別分冊、I-015 の AI 開示タグ検証は今回の修正に同梱しない。後続分のトリガー更新はフェーズを正式起票する開発レーンで行う。</li><li><strong>完了条件</strong>: ローカル MySQL で下記の選定ケースが通り、投稿バッチの既存テストが通る。フローと SQL の説明が実装と一致する。DB テストが実行できず skip の場合は合格としない。本番での再発なしや翌日の投稿は完了条件に含めない。</li><li><strong>人間ゲート</strong>: 差分・検証結果・既存バックログの扱いを確認してから push する。承認後の CodePipeline 確認は既存の開発手順に従う。本番データの削除・補正や SNS 投稿をこのステップで自動実行しない。</li><li><strong>停止点・上限</strong>: 実装セッションはコミットと証跡提示まで。目安 20 ターン。DDL や生成側の変更が必要と判明した場合は範囲を広げず、開発レーンで分割を再判断する。</li></ul>
-<h3>選定ロジックの受け入れケース</h3>
-<ol><li>古い空の実行 + 新しい素材あり実行 → 新しい実行を選ぶ。空の実行にキャプション用データもない場合を含める。</li><li>空の実行だけ → 対象なし。main の既存の 0 件終了へ進む。</li><li>素材ありの未完了実行が複数 → 既存どおり最古を選ぶ。同時刻なら ID 順。</li><li>素材ありでも有効アカウントすべてが終端状態 → 選ばない。有効アカウントがない場合も選ばない。</li><li>複数アカウントのうち一部だけ未完了、または pending / container_created → 既存の再開対象として選ぶ。</li><li>別セットの素材しかない実行 → 選ばない。同一実行に素材が複数 → 実行は 1 件として選ぶ。</li><li>一度空として除外した実行に素材を追加 → 終端条件を満たさなければ再び候補になる。</li><li>既存の素材なし例外テストを維持し、選定後の不整合は失敗として検知する。</li></ol>
-<p>現行の <code>test_target_selection.py</code> はカーソルをモックして SQL の一部を検査するため、それだけでは「空の先頭を飛ばして次を選ぶ」を実証できない。既存のローカル MySQL テストの仕組みを使って DB 上の選定を確認する。外部投稿 API は偽物を使う。</p>
-<p>計画体系 5.1 の照合: 変更は開発レーン内、I-014 単体は 20 ターン目安で収め、API 統合とは分離する。将来の定時実行を完了条件にせず、リリース後の投稿・時間帯・0 件処理の観察は必要に応じ開発レーンで確認待ちへ登録する。</p></div></details></section>
-<section aria-labelledby="sources"><h2 id="sources">5. 根拠と確認範囲</h2>
-<p>本書は 2026-09-21 のローカルリポジトリの確認に基づく。本番 DB・CloudWatch・現在の投稿状態は確認していない。</p>
+<section aria-labelledby="solution"><h2 id="solution">2. 対応の仕組みと境界</h2>
+<h3>既存の予定時刻を、そのまま投稿まで渡す</h3>
+<p>現在の Scheduler は <code>set_code</code> と <code>scheduled_at</code> を画像生成 SFN に渡している。生成側は <code>UNIQUE (set_id, scheduled_at)</code> で実行を一意に管理する。一方、子の投稿 SFN の起動入力は <code>set_code</code> だけで、ここで当回の識別情報が失われている。</p>
+<ol><li>親 ASL の <code>StartSnsPostBatch.Input</code> に <code>scheduled_at.$: $.scheduled_at</code> を追加する。</li><li>子 ASL から ECS の <code>SCHEDULED_AT</code> へ渡す。</li><li>投稿アプリが UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code> を必須入力として検証する。現在時刻の代入・最新実行の検索・最古の実行へのフォールバックは行わない。</li><li>同一セット・同一予定時刻の実行だけを照合し、素材の存在と既存のアカウント別終端条件を確認する。</li></ol>
+<pre><code>Scheduler の scheduled_at
+  → 画像生成 SFN / generation_runs.scheduled_at
+  → 投稿 SFN の scheduled_at
+  → 投稿 ECS の SCHEDULED_AT
+  → WHERE gr.set_id = %s AND gr.scheduled_at = %s</code></pre>
+<p>SQL はこの完全一致条件に <code>EXISTS (SELECT 1 FROM generated_media gm WHERE gm.generation_run_id = gr.id)</code> と既存の有効アカウント・非終端条件を組み合わせる。最古順の選定は廃止する。一意キーは実 DDL に存在するため、新規カラム・DDL・生成アプリからの run ID 返却は不要な見込み。</p>
+<h3>失敗と再実行を区別する</h3>
+<ul><li><strong>生成が失敗：</strong>現行の親 SFN は生成成功時だけ投稿 SFN を起動する。朝の生成が失敗すれば朝は欠番。夜の親は夜の予定時刻だけを渡す。</li><li><strong>当回の run がない・素材がない：</strong>過去を探さず、指定したセット・予定時刻と理由を記録して異常終了する案を推奨する。生成成功後に呼ばれる契約では不整合であり、単なる「投稿済み」と同じ 0 件成功にまとめない。</li><li><strong>当回が投稿済み・終端状態：</strong>既存の二重投稿防止を維持し、再投稿しない。終端状態による処理 0 件と、run / 素材欠落の理由を区別する。</li><li><strong>当回の pending / container_created：</strong>同じ予定時刻での Retry は同じ run の復旧処理につなぐ。success / failed / published_unconfirmed の扱いとストーリーズの現行方針は変更しない。</li><li><strong>過去分が滞留：</strong>自動で選ばない。削除・架空の failed 登録・在庫の last_used_at 巻き戻しは行わず、必要な補正は既存の人間ゲートで扱う。</li><li><strong>手動起動：</strong>対象 run の実際の予定時刻を明示する。現在時刻を便宜的に入れず、公開済み・未確認状態と時間帯を確認する。欠けた入力で旧選定へ戻す互換モードは設けない。</li></ul>
+<p>run / 素材欠落と終端状態を分けるため、単一の actionable 検索の <code>None</code> だけで結論を出さず、「指定 run の取得 → 素材・投稿状態の判定」を分けるか、結果型で理由を返す設計にする。実装の形はステップ A で確定する。</p>
+<h3>保証することと、別途扱うこと</h3>
+<p><strong>保証の単位は「予定された回」。</strong>夜の定時実行が朝の run を拾わず、翌朝も翌朝の run を扱う。素材に焼き込まれた朝夜ラベルと生成側スロット選択が正しいことは前提となる。</p>
+<p>一方、朝の古い実行そのものが大幅に遅延して夜に動く場合や、夜に朝の予定時刻を指定して手動再実行する場合は、完全一致だけでは防げない。これは後続が過去分を拾う問題と区別する。<strong>通常運用では期限を過ぎた旧実行の再開を避け、古い実行を確認して停止する</strong>手順を設ける。実時刻での投稿まで保証する期限ガードは、許容遅延・判定タイミング・手動復旧の例外をステップ A で判断する追加設計項目とする。未設計のまま「どんな遅延でも朝夜は絶対にずれない」とは扱わない。</p>
+<p>投稿ゼロ・stale の監視（I-006・I-025）、在庫の自動返却、期限ガード、コンテナリトライは、この当回固定だけで解決したとは扱わない。素材レコードがあっても S3 や付随データの破損までは保証しない。</p>
+</section>
+<section aria-labelledby="options"><h2 id="options">3. 選択肢と判断</h2>
+<ul class="options">
+<li><strong>セット × 予定時刻で固定（採用方針）</strong>既存の一意キーと Scheduler 入力を利用できる。朝夜だけでなく日付も固定し、欠番を翌回へずらさない。</li>
+<li><strong>素材の EXISTS だけ追加（旧案）</strong>空 run は除外できるが、素材がある未投稿 run の持ち越しは防げない。今回の要件には不足するため、当回固定へ置き換える。</li>
+<li><strong>generation_run_id を渡す</strong>対象は明確だが、現在の ECS 実行結果から業務 ID を返す経路を新設する必要がある。既存の予定時刻で同じ実行を特定できるため採らない。</li>
+<li><strong>朝・夜だけで絞る／最新だけ選ぶ</strong>前日以前の同じ時間帯や別の回を拾い得る。当回と完全一致する契約にはならない。</li>
+</ul></section>
+<section aria-labelledby="files"><h2 id="files">4. 修正が必要なファイル</h2>
+<p>以下は<strong>将来の開発ステップで触る候補</strong>。今回の編集は課題資料だけ。既存ファイルの存在と呼び出し箇所を確認した。長いパスは折り返し表示する。</p>
+<div class="table-wrap"><table><thead><tr><th>対象ファイル</th><th>変更内容</th><th>工程</th></tr></thead><tbody>
+<tr><td><code>infra/lib/asl/image-generation.asl.json</code></td><td>子起動の Input に予定時刻を渡す。Retry・既存の起動名を維持。</td><td>B</td></tr>
+<tr><td><code>infra/lib/asl/sns-posting.asl.json</code></td><td>入力の存在・形式の入口検査を設計し、ECS へ SCHEDULED_AT を渡す。DB / 投稿に入る前に欠落を拒否。</td><td>B</td></tr>
+<tr><td><code>services/sns-post-batch/app/config.py</code></td><td>AppConfig に予定時刻を追加し、必須・UTC 形式・実在日時を検証。</td><td>B</td></tr>
+<tr><td><code>services/sns-post-batch/app/target_selection.py</code></td><td>セット × 予定時刻で完全一致。空素材の除外と、該当なし・終端済みの識別。</td><td>B</td></tr>
+<tr><td><code>services/sns-post-batch/app/main.py</code></td><td>予定時刻を選定へ渡し、欠落理由をログへ。対象 run / 素材の健全性をキャプション作成より前に確認。</td><td>B</td></tr>
+<tr><td><code>services/sns-post-batch/tests/test_config.py</code><br><code>services/sns-post-batch/tests/test_target_selection.py</code><br><code>services/sns-post-batch/tests/test_main.py</code></td><td>旧「SCHEDULED_AT 不要」のテストと AppConfig fixture を更新。入力異常・選定・0 件と失敗の区別を追加。</td><td>B</td></tr>
+<tr><td><code>services/sns-post-batch/tests/test_e2e_local_mysql.py</code></td><td>全 main 呼出しに fixture の予定時刻を設定。朝失敗→夜→翌朝、滞留、再試行を実 DB で検証。</td><td>B</td></tr>
+<tr><td><code>infra/test/image-batch-stack.test.ts</code><br><code>infra/test/sns-post-batch-stack.test.ts</code></td><td>ASL をパースして親 Input と子 Overrides の予定時刻転送、入力拒否、Retry 時の同一値を検証。</td><td>B</td></tr>
+<tr><td><code>docs/app/design-outline.html</code></td><td>「SNS は SCHEDULED_AT を受け取らない」の契約と最古選定の概要を更新。</td><td>A</td></tr>
+<tr><td><code>docs/app/batch-flow.html</code><br><code>docs/app/data-model.html</code></td><td>当回の定義、対象決定、SQL、失敗時の扱い、将来の追いつく方針との関係を同期。</td><td>A</td></tr>
+<tr><td><code>docs/infra/workflow.html</code></td><td>親子 ASL 掲載例・子 Input・投稿 ECS 環境変数表を同期。</td><td>A</td></tr>
+<tr><td><code>docs/app/operation.html</code><br><code>docs/infra/operation.html</code></td><td>手動起動例、stale・失敗補正、起動失敗・DLQ 復旧を更新。「最古を自動消化」の説明を廃止し、指定した予定時刻を確認する手順へ。</td><td>A</td></tr>
+<tr><td><code>services/sns-post-batch/README.md</code></td><td>投稿バッチの必須変数とローカル実行例を現行処理に合わせ、予定時刻を明示。</td><td>B</td></tr>
+<tr><td><code>docs/plans/development-plan.html</code><br><code>docs/plans/development-log.html</code></td><td>正式なステップ・確認待ち・実施証跡。開発レーンでのみ転記。</td><td>転記・A〜D</td></tr>
+<tr><td><code>docs/issues/index.html</code><br><code>docs/issues/sns-empty-generation-run.html</code><br><code>docs/issues/sns-empty-generation-run.md</code></td><td>I-014 / I-017 の方針・展開先・完了範囲を同期。</td><td>今回・転記・D</td></tr>
+</tbody></table></div>
+<h3>原則として変更不要、設計時に再確認する範囲</h3>
+<ul><li><code>database/V001__initial_schema.sql</code> は一意キーを確認済み。DDL の追加や過去の migration の書換えは不要。</li><li><code>services/image-batch/app/generation_runs.py</code> と生成側アプリは予定時刻を既に保存。サービスをまたぐ import や shared への時刻 parser の移設は必須にしない。</li><li><code>infra/lib/image-batch-stack.ts</code> / <code>sns-post-batch-stack.ts</code> は ASL を読み込む既存構成を利用。ソース変更は原則不要だが、<strong>両スタックのデプロイは必要</strong>。Scheduler の恒常設定変更も不要な見込み。</li><li>期限ガードを追加採用するなら、投稿側 <code>app/clock.py</code> とテスト、期限値を受け渡す ASL・設定箇所も追加対象として A で明示する。監視スタックは今回の当回固定には含めない。</li></ul>
+</section>
+<section aria-labelledby="rollout"><h2 id="rollout">5. ステップ展開案</h2>
+<p><strong>A：設計 → B：実装・機械検証 → C：本番切替（人間）→ D：反映確認</strong>の 4 工程を推奨する。すべて開発レーン。I-014 と I-017 の時間帯ずれ防止を先に完了させ、I-022・I-024 は同じフェーズ内の独立した後続ステップへ置く。</p>
+<p>各工程は計画体系 5 の 4 項目で示す。今回の着地は<strong>承認方針を展開するための下書き完成</strong>。計画書への正式転記前なので「展開済み」とは記録しない。</p>
+<details open><summary>A. 入力契約・選定・切替手順を設計する</summary><div class="inner"><ul>
+<li><strong>内容：</strong>上表の設計書・運用書 6 本を更新。run / 素材欠落と終端済みの結果、UTC 形式、手動復旧、期限ガードの要否を確定する。全セット共通の変更として、1 日 1 回のセットも含め影響を照合する。新旧入力・アプリ・親子 ASL の組合せと切戻し手順を記す。</li>
+<li><strong>完了条件：</strong>設計・環境変数・SQL・手動入力例が同じ契約。現役設計書内の「SNS は scheduled_at 不要」「最古 actionable」の旧記述を全件照合し、履歴と現行説明を区別。リンク検査に新規不備なし。B の受け入れケース・切替チェック表が揃う。</li>
+<li><strong>人間ゲート：</strong>結果分類、遅延実行の扱い、全セットへの適用範囲、切替手順をレビュー。期限ガードを含める場合は閾値と例外をここで決める。</li>
+<li><strong>停止点・上限：</strong>設計書と記録の push まで、目安 20 ターン。設計 Fix のレビューはユーザー判断でありゴール対象外。</li></ul></div></details>
+<details open><summary>B. 親子の受け渡しと当回選定をまとめて実装する（A 承認後）</summary><div class="inner"><ul>
+<li><strong>内容：</strong>上表のアプリ 3 本・ASL 2 本・関連テスト・README を一体として変更。指定 run の確認後にキャプション処理へ進み、どの失敗でも別 run へ移らない。外部投稿 API はテスト用の偽物を使う。</li>
+<li><strong>完了条件：</strong>下記受け入れケースをローカル MySQL で実証し、SNS バッチの pytest、infra の build / Jest が通る。<code>cdk synth -c env=prod</code> と必要なイメージ context を用いた diff で、意図した親子定義以外の変更がないことを確認。実行できない DB テストを skip 合格にしない。反映対象コミット・旧イメージ・旧 ASL・Scheduler 状態の取得項目を切替チェック表へ記す。</li>
+<li><strong>人間ゲート：</strong>差分・検証証跡を確認して C の実施可否を判断。<strong>投稿アプリの main push はパイプラインを起動するため、停止窓を確保する前に push しない。</strong></li>
+<li><strong>停止点・上限：</strong>コミットと証跡提示まで、目安 25 ターン。超える場合はアプリと ASL の実装を分けるが、本番への片側だけのリリースはしない。</li></ul></div></details>
+<details open><summary>C. 定時実行を止めた窓で切り替える（ユーザー操作・ゴール対象外）</summary><div class="inner"><ul>
+<li><strong>内容：</strong>影響するセットの Scheduler を人間が一時停止し、親子 SFN・ECS に実行中処理がないことを確認する。B の push を承認し、投稿バッチの CodePipeline 成功と新しい task definition の登録を確認。そのイメージを維持した context で、人間が SnsPostBatchStack → ImageBatchStack をデプロイする。両者の実定義を確認してからスケジュールを再開する。</li>
+<li><strong>完了条件：</strong>停止・実行中 0 件・パイプライン・イメージ・親子 ASL・再開前確認の証跡が揃う。親子 ASL とアプリが全て新契約になったことを確認するまで実行を再開しない。</li>
+<li><strong>人間ゲート：</strong>Scheduler 操作、push 承認、cdk deploy、再開、必要なら切戻し。本番 DDL は不要。本番 SNS をテスト目的で自動投稿しない。</li>
+<li><strong>停止点・上限：</strong>—（人間作業をゴールにしない）。反映確認は既存の CodePipeline 確認手順を利用し、エージェントが承認なしにデプロイしない。</li></ul>
+<p><strong>切替の注意：</strong>Scheduler の手動停止がスタックの deploy で戻る可能性を考慮し、定時刻をまたがない窓を確保して、各 deploy 後に有効状態を再確認する。窓を確保できない場合は停止状態を CDK 側にも保持する変更を A で追加設計する。既存実行は更新前の入力を持つので、単なる定義更新をもって新契約へ移ったとは扱わない。</p>
+<p><strong>切戻し：</strong>停止状態を保ち、旧イメージと両 ASL を対応する組合せに戻してから再開を判断する。旧選定へ戻すと滞留を再び拾うため、既存 backlog の確認なしに再開しない。片側デプロイ失敗時も自動で旧方式へフォールバックしない。</p>
+</div></details>
+<details open><summary>D. 反映を確認し、記録と確認待ちを整理する（C 完了後）</summary><div class="inner"><ul>
+<li><strong>内容：</strong>実環境の親子 ASL、task definition、Scheduler 設定、投稿入力契約を読み取り確認し、開発記録へ証跡を残す。I-014 と I-017 の今回対処した範囲を課題表へ反映し、可視化の残件は I-006・I-025 との関係を整理して残す。</li>
+<li><strong>完了条件：</strong>反映コミット・イメージ・ASL とコードが一致し、入力転送経路が追える。課題表と計画記録が一致する。将来の朝夜投稿を待つことは本ステップの完了条件にしない。</li>
+<li><strong>人間ゲート：</strong>反映証跡の確認。投稿の目視は下記の確認待ちで扱う。</li>
+<li><strong>停止点・上限：</strong>記録の push まで、目安 15 ターン。新旧混在があれば完了扱いにせず C の人間判断へ戻す。</li></ul></div></details>
+<h3>受け入れケース（B の必須検証）</h3>
+<ol><li>朝の空 run を残し、夜の予定時刻を指定 → 夜だけ選ぶ。その夜が成功した後、翌朝の予定時刻で翌朝だけ選ぶ。</li><li>朝に素材あり・posts なし／pending／container_created をそれぞれ残す → 夜は夜だけ選ぶ。朝の run や在庫を勝手に書き換えない。</li><li>指定した当回が欠落または素材なし、過去には正常素材あり → 過去へ戻らず理由付き失敗。</li><li>同じ時刻の別セット、前日の同じ朝スロット、当回より新しい実行 → いずれも選ばない。</li><li>当回が success / failed / published_unconfirmed → 再投稿しない。複数アカウントは当回の未完了分だけ、既存の投稿・ストーリーズ規約を維持。</li><li>Retry で予定時刻を維持し、同じ run を再開。途中で新しい run を作っても対象が変わらない。</li><li>SCHEDULED_AT 欠落・空・不正形式・存在しない日時 → 投稿 API 呼出し 0 件で失敗。旧選定には戻らない。</li><li>親 Input → 子 Input → ECS の値が一致し、UTC 日付と JST 日付が異なる朝のケースでも DB の予定時刻と一致する。</li><li>既存の選定後不整合の失敗検知、リール・ストーリーズ・1 日 1 回セットの正常系を維持。</li></ol>
+<h3>確認待ちの下書き</h3>
+<p><strong>トリガー：</strong>リリース後の logic-training-1 の最初の夜投稿と、その次の朝投稿の確認時。<strong>判定：</strong>各 SFN 入力の予定時刻・posts の generation_run_id・動画の時間帯表示が一致し、過去の run を選んでいない。<strong>NG：</strong>後続の自動実行継続を人間が判断し、障害対応へ引き継ぐ。自然再発を待たず、失敗ケースは B のローカル再現で担保する。転記先はセット計画書の確認待ち、全セットの反映確認は D の開発記録とする。</p>
+<h3>課題照合と分割判断</h3>
+<ul><li><strong>I-014・I-017：</strong>当回固定の実装対象として同梱。I-017 の可視化まで完了したとは扱わない。</li><li><strong>I-022・I-024：</strong>既存どおり同一フェーズの後続へ。API バージョン更新・共有クライアント統合・エラー詳細保存・リトライ判断は別ステップで検討し、今回の先行リリースの条件にはしない。正式起票時に後続のステップとトリガーを同期する。</li><li><strong>I-006・I-025：</strong>監視の統合設計は別途。今回の理由ログで解消としない。I-025 の再発による展開要件は維持。</li><li><strong>I-012・I-015・I-019：</strong>パスは重なるが、SNS 分冊・AI 開示・日次の当日リカバリ規約全体は同梱しない。I-019 の手順整備時は今回の時刻指定契約を前提にする。既存トリガーを維持する。</li></ul>
+<p><strong>転記時の様式（2026-09-22 確認）：</strong>開発計画は新様式へ移行済み。<a href="../plans/_templates/step.html">ステップ雛形</a>へ 4 項目の意味を保って転記し、着手条件・完了条件・人間ゲート・停止点を常時表示する。長い仕様と作業記録は別々の折りたたみに置き、フェーズの背景も折りたたむ。転記後は <code>python3 tools/docs_check.py --plan-only</code> を通してから課題表を「展開済み」にする。本書は課題レーンの下書きであり、計画書の転記は未実施。</p>
+<p>5.1 の起票チェック：全工程は開発レーン内。設計・実装・本番人間ゲート・反映確認で区切り、後日の出来事は確認待ちに分離する。正式転記時に最新の計画書様式と関連課題を再照合する。</p>
+</section>
+<section aria-labelledby="sources"><h2 id="sources">6. 根拠と確認範囲</h2>
+<p>本書は 2026-09-21 のローカルリポジトリの確認に基づく。ASL 2 本、投稿側 config / main / 選定 / テスト、生成側の予定時刻処理、初期 DDL、設計・運用書を追加照合した。本番 DB・CloudWatch・現在の投稿状態は確認していない。</p>
 <ul><li><a href="index.html">課題表</a>: I-014 と関連課題・既存の同梱方針。</li><li><a href="../plans/logic-training-1-log.html">セットの事象記録</a>: 障害の症状、空の実行と後続実行、復旧時の時間帯の扱い。</li><li><code>services/image-batch/app/main.py</code>: 生成実行の commit が生成処理より前にある。</li><li><code>services/sns-post-batch/app/target_selection.py</code> / <code>main.py</code>: 素材の存在条件がなく、キャプション生成が素材取得より前にある。</li><li><a href="../app/batch-flow.html#sns-target">投稿フロー</a> / <a href="../app/data-model.html#target-selection">データモデル</a>: 選定と再開条件、掲載 SQL。</li></ul></section><footer><p class="footnote">検討経緯と原文メモは <a href="sns-empty-generation-run.md">壁打ち記録（Markdown）</a>へ。管理状態・トリガー・発生履歴は <a href="index.html#I-014">課題表</a>を参照。</p></footer>
 </main></body></html>
