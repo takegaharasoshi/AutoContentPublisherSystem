@@ -16,10 +16,12 @@ import docs_plan_check as checker  # noqa: E402
 
 def page(
     steps: str | None = None, *, format_attr: bool = True, legacy: str = "",
-    groups: str | None = None,
+    groups: str | None = None, plan_steps: str | None = None,
 ) -> str:
     """最小の正常ページ、または差し替え用の HTML を作る。"""
     body_attr = ' data-plan-format="1"' if format_attr else ""
+    if plan_steps is not None:
+        body_attr += f' data-plan-steps="{plan_steps}"'
     if groups is None:
         content = step() if steps is None else steps
         groups = f'<div data-plan-group="active">{content}</div>'
@@ -159,6 +161,18 @@ class DocsPlanCheckTests(unittest.TestCase):
             "page-legacy-mixed",
             rules(page(legacy="<li><code>✅ 例</code></li>")),
         )
+
+    def test_step_less_page_declaration(self) -> None:
+        """ステップ 0 件の宣言（25-5）を検査する。"""
+        declared_empty = page(steps="", plan_steps="none")
+        self.assertNotIn("page-empty", rules(declared_empty))
+        self.assertIn(
+            "page-steps-declared", rules(page(plan_steps="none"))
+        )
+        self.assertIn(
+            "page-steps-unknown", rules(page(steps="", plan_steps="few"))
+        )
+        self.assertIn("page-empty", rules(page(steps="", plan_steps="few")))
 
     def test_status_completion_and_acceptance_rules(self) -> None:
         """状態、完了日、完了条件タグを報告する。"""

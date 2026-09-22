@@ -202,7 +202,7 @@ python3 content/quiz-stock/logic-training-1/<batch>/generate.py
 - ローカル: `docker exec -i acps-mysql mysql --default-character-set=utf8mb4 ...`(utf8mb4 指定必須)。事前にトランザクション + ROLLBACK でドライランする
 - Aurora: Data API(`aws rds-data execute-statement`)。承認プロンプトでブロックされる場合はユーザーに許可を求める(Codex 直接セッションはネットワーク許可の設定が前提。差分節)
 - 投入後: 在庫確認クエリで件数・内訳を確認し、セット記録 `docs/plans/logic-training-1-log.html` の「週次補充の記録」へ要約を追記する（Phase 18 の 2 レーン化で記録先を変更。セット計画書 `docs/plans/logic-training-1.html` のステータス欄の在庫情報も更新する）
-- **計画書の様式**(Phase 25-3 で追加): `docs/plans/logic-training-1.html` / `logic-training-1-log.html` は **Phase 25 の新様式へ未移行**のため、ステータス欄・確認待ちリスト・記録とも**既存様式のまま**更新する(構造検査 `--plan-only` の対象外。移行は別判断)。**移行済み計画書**(2026-09-21 時点は `docs/plans/development-plan.html` のみ)に書く必要が出た場合だけ、`docs/plans/index.html` セクション 5.0 の新様式 + `docs/plans/_templates/step.html` を使い、更新後に `python3 tools/docs_check.py --plan-only` を実行する。**各セットの補充工程・在庫検査・人間ゲートは変更しない**
+- **計画書の様式**(25-5〔2026-09-22〕で更新): `docs/plans/logic-training-1.html` は **Phase 25 の新様式へ移行済み**で構造検査の対象。改修 R-x を `section.plan-phase`、ステップ R-x-n を `article.plan-step` で書き(枠は `docs/plans/_templates/step.html`、様式の正は `docs/plans/index.html` セクション 5.0)、**ステータス欄・確認待ちリストは表のまま**更新する。**記録ファイル `logic-training-1-log.html` は未移行**(従来どおり)。計画書を書き換えたら**コミット前に `python3 tools/docs_check.py --plan-only` を実行し出力を会話に貼る**(確認待ちリストの結果列だけを直した場合も同じ)。**各セットの補充工程・在庫検査・人間ゲートは変更しない**
 
 ## 7. 動画ビルド・レビュー・配置(quiz-prebuilt。投入後に必ず)
 

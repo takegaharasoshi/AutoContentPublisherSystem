@@ -532,7 +532,7 @@
 <hr>
 
 <section class="plan-phase" data-plan-phase="25" id="phase-25">
-<h2>Phase 25: 計画書の可読性改善と記載様式の定着（開発計画へ先行適用）</h2>
+<h2>Phase 25: 計画書の可読性改善と記載様式の定着（<span class="muted">2026-09-22 完了</span>）</h2>
 <p><strong>ゴール</strong>: 計画書のステップを「常時表示の要点（概要・完了条件・人の確認・停止点）＋ 折りたたみの実装詳細・作業記録」で書く共通様式を定め、テンプレート・専用 CSS・構造検査（機械チェック）とともに<strong>開発計画へ先行適用</strong>する。あわせて計画を作成・更新する入口（CLAUDE.md と 6 本のスキル）を新様式・構造検査につなぎ、PC とスマホの両方で「計画の内容を把握できる」状態にする。<strong>セット計画書の変換は本フェーズの対象外</strong>（適用するかは 25-4 の後に別途ユーザーが判断する）</p>
 <details class="plan-fold">
 <summary>フェーズの背景・起票の経緯 <span class="plan-hint">— I-036 からの分割・対象外・課題照合・分割理由</span></summary>
@@ -542,7 +542,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 4 件（25-1〜25-4／クリックで展開）</summary>
+<summary>完了済み 5 件（25-1〜25-5／クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-25-1" data-step-id="25-1" data-status="done" data-completed="2026-09-21">
@@ -703,17 +703,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-25-5" data-step-id="25-5" data-status="todo">
+<article class="plan-step" id="step-25-5" data-step-id="25-5" data-status="done" data-completed="2026-09-22">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>25-5</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>25-5</strong><span class="plan-status">完了</span><span>2026-09-22</span></div>
 <h3>セット計画書の移行と検査登録</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>25-4 の go 後（2026-09-22 取得済み）。<strong>フリーズ窓</strong>（セットレーンを含め他セッションが 1 本も動いていないこと）で実施する。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-22）</strong>。セット計画書 3 本を新様式へ移行し構造検査へ登録（対象 1 → 4 ページ・不備 0 件）。<code>logic-training-1</code> は改修 3・ステップ 13 を枠へ展開、<code>pref-ranking-1</code> の完了改修 R-1 は <code>legacy-completed</code>、ステップ 0 件の <code>fantasy-animals-1</code> 向けに契約へ <code>data-plan-steps="none"</code> を追加した。「未移行」前提の記述は <code>CLAUDE.md</code>・<a href="index.html#step-layout">計画体系 5.0</a>・スキル 6 本を更新。<strong>これで Phase 25 は完了</strong>（<a href="../issues/index.html#I-036">I-036</a> もクローズ）。対応表と検証は<a href="development-log.html#step-25-5">開発記録 25-5</a>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -745,19 +740,19 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 対応表・契約追加・破壊テスト</span></summary>
+<div class="plan-fold-inner">
+<p>移行前後の対応表（欠落 0 件）・<code>data-plan-steps="none"</code> を契約へ足した理由・検証出力（<code>--plan-only</code> の OK と破壊テストの NG 2 件・<code>unittest</code> 20 件・<code>--widths</code> 51 ページ × 4 幅で判定 OK）・触らなかったものは<a href="development-log.html#step-25-5">開発記録 25-5</a> に記載。</p>
+</div>
 </details>
 </div>
 </article>
 
+</div>
+</details>
 
-
-
-
-
-
-
+<div class="plan-group" data-plan-group="active">
+<p><strong>進行中・未着手のステップはなし。25-5（2026-09-22）の完了をもって Phase 25 は完了</strong>（<a href="../issues/index.html#I-036">I-036</a> もクローズ）。以後、計画書の様式に関する改善は課題体系へ起票する。</p>
 </div>
 </section>
 

@@ -78,7 +78,7 @@ description: 本番・運用の異常(投稿が出ていない・SFN 失敗ア�
 
 ### (6) コミット・push
 
-日本語メッセージ・`pull --rebase`・**ファイル指定 add**(並行セッションの変更を巻き込まない)。触るのは `docs/issues/index.html`・記録ファイル・計画書の確認待ちリスト(結果列)のみ。**移行済み計画書**(2026-09-21 時点は `docs/plans/development-plan.html` のみ)を書き換えたときは、コミット前に `python3 tools/docs_check.py --plan-only` を実行して出力を会話に貼る(確認待ちリストの結果列だけを直した場合も同じ)。**障害対応・人間ゲートの範囲は変えない**(コード修正は本スキルで行わず `/step` へ)。`services/` `shared/` `infra/` `database/` は触らない。
+日本語メッセージ・`pull --rebase`・**ファイル指定 add**(並行セッションの変更を巻き込まない)。触るのは `docs/issues/index.html`・記録ファイル・計画書の確認待ちリスト(結果列)のみ。**移行済み計画書**(25-5〔2026-09-22〕で開発計画とセット計画書 3 本すべてが移行済み。対象の正は `tools/docs_plan_check.py` の `REGISTERED_PAGES`)を書き換えたときは、コミット前に `python3 tools/docs_check.py --plan-only` を実行して出力を会話に貼る(確認待ちリストの結果列だけを直した場合も同じ)。**障害対応・人間ゲートの範囲は変えない**(コード修正は本スキルで行わず `/step` へ)。`services/` `shared/` `infra/` `database/` は触らない。
 
 ## 2. 終了チェックリスト(全部 ✅ になるまで終えない)
 

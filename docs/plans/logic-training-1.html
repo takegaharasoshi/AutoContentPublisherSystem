@@ -5,20 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>セット計画書: 脳みそトレーニング | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body>
+<body data-plan-format="1">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / logic-training-1</nav>
 <h1>セット計画書: 脳みそトレーニング（logic-training-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-21（<strong>改修 R-3〔作問の 2 段階化: 候補の直感選別 + 後日の振り返り〕を起票</strong>〔アイデア <a href="../ideas/quiz-authoring-efficiency.html">quiz-authoring-efficiency</a> の転記。R-3-1〜R-3-3 + <a href="#pending-checks">確認待ち 2 件</a>。課題表の照合 = 同梱なし〔<a href="../issues/index.html#I-034">I-034</a> は既存トリガー維持・<a href="../issues/index.html#I-026">I-026</a> は対象外〕。本起票では手順の実装・作問は行っていない〕）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 完了 = G3 の配置まで到達</strong>〔全数レビュー 14 件が 1 巡で承認 → S3 へ 28 ファイル配置 → ローカル MySQL 14 行 → Aurora 14 文すべて <code>updated=1</code>。両環境とも <code>unbuilt</code> = 0・Aurora は朝夜とも <code>unused_built</code> 7 へ回復〕。確認待ちリストの <strong>16-4e〔イラストプロンプト文字禁止の緩和〕効果観察は 2 バッチ連続で戻し基準に非該当 = OK</strong> のため<a href="logic-training-1-log.html">セット記録</a>へ移動、課題体系の <a href="../issues/index.html#I-033">I-033</a> は解消でクローズ）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 の G2 完了</strong>〔14 問を両環境へ投入・<code>content_key</code> = <code>morning/night-036</code>〜<code>042</code>・イラスト 14 枚は再生成 0 回 / 文字混入 0 件・動画 14 件ビルド成功。次は <code>work/review-6.html</code> の全数人間レビュー → G3 の配置〕。16-4e の効果観察 2 バッチ目は混入 0 件で戻し基準に該当せず〔確認待ちリストへの結果記入は G3〕）。2026-09-20（確認待ちリストに開発計画 Phase 23-3〔Codex 直接セッションでの週次補充・初回試行〕を追加）。2026-09-19（<strong>R-2-4〔差し替えと設計書・記録の更新〕完了 = 改修 R-2 完了</strong>〔承認 70 件を S3・両環境 DB へ差し替え。両環境とも <code>video_built_at</code> = 2026-09-19 が朝 35 / 夜 35 = 70 件・Aurora は 70 文すべて <code>updated=1</code>。抜き取り再生確認 OK。方式設計書に R-2 の decision を追加。効果確認は確認待ちリストへ起票〔2026-10-03 以降〕〕。同日: <strong>R-2-2〔プレビュー確認〕go</strong>〔実機で 4 観点すべて OK・調整の往復なし〕→ <strong>R-2-3〔在庫全数の再ビルドとレビューシート生成〕の自走分完了</strong>〔朝 35 / 夜 35 = 70 件を再ビルドし成功 70 件・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。<strong>全数レビューの人間ゲートも同日通過 = 70 問すべて承認</strong>。次は R-2-4〔差し替え〕〕。あわせて補充スキルの <code>question</code> 上限を 90 → 80 字へ下げ、課題体系の <a href="../issues/index.html#I-035">I-035</a> は解消。同日: 開発レーン 22-2 でバックログを廃止し課題体系へ移設〔課題 2 行 + 解消 1 行〕。16-4e の効果観察は確認待ちリストへ。同日: <strong>R-2-1〔版面変更とプレビュー出力〕完了</strong>。導出値は PoC 実測と一致・pytest 42 件全パス・プレビュー 3 本を出力。次は R-2-2〔実機でのプレビュー確認・ユーザー判断〕。同日: <strong>改修 R-1 の効果確認を実施 = 判定は混在</strong>〔スキップ率・平均視聴秒は改善 / コメント数は低下〕。NG の扱いでバックログへ「コメント数低下の切り分け」を起票し、R-2 の着手可否はユーザー判断待ち。同日: 改修 R-2〔イラスト拡大・イラスト優先配分〕を起票。壁打ち 2 巡 + 静止画 PoC で採用値を確定・着手条件は R-1 効果確認の判定後。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕完了。在庫は朝・夜とも unused_built 7 / unbuilt 0 に回復し、確認待ちリストの Phase 19-3〔<code>/goal</code> 組み込み初回試行〕は OK 判定で<a href="logic-training-1-log.html">セット記録</a>へ移動。16-4e の効果観察はバックログに 1 バッチ目の結果を記入。以前の更新: 2026-09-03 に 16-12b で KPI 欄を確定様式へ・改修 R-1 完了）</span>
+  <span>最終更新: 2026-09-22（25-5 で新様式へ移行。改修 R-1〜R-3 の 13 ステップを表の行から <code>article.plan-step</code> の枠へ展開し、構造検査へ登録した。改修の背景は折りたたみへ。ステータス節・確認待ちリストは表のまま。<strong>改修の内容・ID・状態・完了日・完了条件・人間ゲート・停止点は不変</strong>）。前回: 2026-09-21（<strong>改修 R-3〔作問の 2 段階化: 候補の直感選別 + 後日の振り返り〕を起票</strong>〔アイデア <a href="../ideas/quiz-authoring-efficiency.html">quiz-authoring-efficiency</a> の転記。R-3-1〜R-3-3 + <a href="#pending-checks">確認待ち 2 件</a>。課題表の照合 = 同梱なし〔<a href="../issues/index.html#I-034">I-034</a> は既存トリガー維持・<a href="../issues/index.html#I-026">I-026</a> は対象外〕。本起票では手順の実装・作問は行っていない〕）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 完了 = G3 の配置まで到達</strong>〔全数レビュー 14 件が 1 巡で承認 → S3 へ 28 ファイル配置 → ローカル MySQL 14 行 → Aurora 14 文すべて <code>updated=1</code>。両環境とも <code>unbuilt</code> = 0・Aurora は朝夜とも <code>unused_built</code> 7 へ回復〕。確認待ちリストの <strong>16-4e〔イラストプロンプト文字禁止の緩和〕効果観察は 2 バッチ連続で戻し基準に非該当 = OK</strong> のため<a href="logic-training-1-log.html">セット記録</a>へ移動、課題体系の <a href="../issues/index.html#I-033">I-033</a> は解消でクローズ）。前回: 2026-09-21（<strong>週次補充 2026-09-w3 の G2 完了</strong>〔14 問を両環境へ投入・<code>content_key</code> = <code>morning/night-036</code>〜<code>042</code>・イラスト 14 枚は再生成 0 回 / 文字混入 0 件・動画 14 件ビルド成功。次は <code>work/review-6.html</code> の全数人間レビュー → G3 の配置〕。16-4e の効果観察 2 バッチ目は混入 0 件で戻し基準に該当せず〔確認待ちリストへの結果記入は G3〕）。2026-09-20（確認待ちリストに開発計画 Phase 23-3〔Codex 直接セッションでの週次補充・初回試行〕を追加）。2026-09-19（<strong>R-2-4〔差し替えと設計書・記録の更新〕完了 = 改修 R-2 完了</strong>〔承認 70 件を S3・両環境 DB へ差し替え。両環境とも <code>video_built_at</code> = 2026-09-19 が朝 35 / 夜 35 = 70 件・Aurora は 70 文すべて <code>updated=1</code>。抜き取り再生確認 OK。方式設計書に R-2 の decision を追加。効果確認は確認待ちリストへ起票〔2026-10-03 以降〕〕。同日: <strong>R-2-2〔プレビュー確認〕go</strong>〔実機で 4 観点すべて OK・調整の往復なし〕→ <strong>R-2-3〔在庫全数の再ビルドとレビューシート生成〕の自走分完了</strong>〔朝 35 / 夜 35 = 70 件を再ビルドし成功 70 件・ffprobe 全数 OK・レビューシート 5 ページ 70 件・pytest 42 件全パス。<strong>全数レビューの人間ゲートも同日通過 = 70 問すべて承認</strong>。次は R-2-4〔差し替え〕〕。あわせて補充スキルの <code>question</code> 上限を 90 → 80 字へ下げ、課題体系の <a href="../issues/index.html#I-035">I-035</a> は解消。同日: 開発レーン 22-2 でバックログを廃止し課題体系へ移設〔課題 2 行 + 解消 1 行〕。16-4e の効果観察は確認待ちリストへ。同日: <strong>R-2-1〔版面変更とプレビュー出力〕完了</strong>。導出値は PoC 実測と一致・pytest 42 件全パス・プレビュー 3 本を出力。次は R-2-2〔実機でのプレビュー確認・ユーザー判断〕。同日: <strong>改修 R-1 の効果確認を実施 = 判定は混在</strong>〔スキップ率・平均視聴秒は改善 / コメント数は低下〕。NG の扱いでバックログへ「コメント数低下の切り分け」を起票し、R-2 の着手可否はユーザー判断待ち。同日: 改修 R-2〔イラスト拡大・イラスト優先配分〕を起票。壁打ち 2 巡 + 静止画 PoC で採用値を確定・着手条件は R-1 効果確認の判定後。前回 2026-09-12: 週次補充 2026-09-w1〔朝・夜 14 問〕完了。在庫は朝・夜とも unused_built 7 / unbuilt 0 に回復し、確認待ちリストの Phase 19-3〔<code>/goal</code> 組み込み初回試行〕は OK 判定で<a href="logic-training-1-log.html">セット記録</a>へ移動。16-4e の効果観察はバックログに 1 バッチ目の結果を記入。以前の更新: 2026-09-03 に 16-12b で KPI 欄を確定様式へ・改修 R-1 完了）</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  logic-training-1 の<strong>運用ステータス・進行中ステップ・確認待ちリスト</strong>を管理する（課題は<a href="../issues/index.html#lane-logic-training-1">課題体系</a>）（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="logic-training-1-log.html">セット記録</a>へ追記する。セットの仕様（スロット定義・キャプション・凍結範囲）の正は<a href="../app/sets/logic-training-1.html">セット別設計書</a>、補充手順の正は <a href="../app/operation.html">operation.html</a> セクション 3 + スキル <code>/quiz-stock-replenish</code>。
+  logic-training-1 の<strong>運用ステータス・改修とステップ・確認待ちリスト</strong>を管理する（課題は<a href="../issues/index.html#lane-logic-training-1">課題体系</a>）（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="logic-training-1-log.html">セット記録</a>へ追記する。セットの仕様（スロット定義・キャプション・凍結範囲）の正は<a href="../app/sets/logic-training-1.html">セット別設計書</a>、補充手順の正は <a href="../app/operation.html">operation.html</a> セクション 3 + スキル <code>/quiz-stock-replenish</code>。
 </div>
 
 <h2>1. ステータス</h2>
@@ -35,132 +36,523 @@
 <h2 id="backlog">2. バックログ（廃止）</h2>
 <p>22-2〔2026-09-19〕で<a href="../issues/index.html#lane-logic-training-1">課題体系の logic-training-1 節</a>へ移設した（課題 2 行 = <a href="../issues/index.html#I-026">I-026</a>〔#フェルミ推定 の残置〕・<a href="../issues/index.html#I-034">I-034</a>〔R-1 後のコメント数低下〕。解消済み 1 行 = <a href="../issues/index.html#I-035">I-035</a>〔問題文 80 字〕はクローズ節。16-4e の効果観察は本書の<a href="#pending-checks">確認待ちリスト</a>へ）。以後、セットの課題は課題体系へ起票する。</p>
 
-<h2>3. 進行中ステップ</h2>
+<h2>3. 改修とステップ</h2>
+<p>改修（R-x）を <code>section.plan-phase</code>、その下のステップ（R-x-n）を <code>article.plan-step</code> で書く（様式の正は<a href="index.html#step-layout">計画体系 5.0</a>、枠は<a href="_templates/step.html">ステップ記載テンプレート</a>）。<strong>進行中は改修 R-3</strong>（R-1・R-2 は完了）。</p>
 
-<h3>改修 R-1: 動画レンダラーの Remotion 載せ替え（全編モーション + 上部余白の見直し）</h3>
-<p><strong>完了（2026-09-03）</strong>: R-1-1〜R-1-6 をすべて完了し、稼働在庫 56 問を Remotion 版へ差し替えた。効果確認は<a href="#pending-checks">確認待ちリスト</a>（差し替え 2 週間後）で追い、結果はセット記録と KPI 欄へ反映する。以下は起票時の計画（記録として残置）。</p>
-<p>
+<section class="plan-phase" data-plan-phase="R-1" id="phase-R-1">
+<h2 id="r-1">改修 R-1: 動画レンダラーの Remotion 載せ替え（全編モーション + 上部余白の見直し）</h2>
+<p><strong>ゴール</strong>: Pillow 組版 + ffmpeg 合成の現行動画（7 版面中 5 枚が完全静止）を Remotion に載せ替え、<strong>どのフレームも生きている</strong>動画にする。<strong>完了（2026-09-03）</strong>: R-1-1〜R-1-6 をすべて完了し、稼働在庫 56 問を Remotion 版へ差し替えた。効果確認は<a href="#pending-checks">確認待ちリスト</a>（差し替え 2 週間後）で追う。</p>
+<details class="plan-fold">
+<summary>改修の背景・決定の経緯 <span class="plan-hint">— ねらい・維持カーブの根拠・不変条件・投入方針</span></summary>
+<div class="plan-fold-inner">
+<blockquote>
   起票 2026-09-02（アイデア体系の壁打ち 5 巡を経て採用。経緯・維持カーブの読み・棄却した線は <a href="../ideas/logic-training-remotion-rebuild.md">logic-training-remotion-rebuild.md</a> が正）。
   <strong>ねらい</strong>: 現行動画（Pillow 組版 + ffmpeg 合成。7 版面中 5 枚が完全静止・動きはコーチのバウンド 2 箇所のみ）を、pref-ranking-1 で実証済みの Remotion に載せ替え、<strong>どのフレームも生きている</strong>動画にする。視聴者は 16 秒で解けず<strong>ループして見る</strong>という行動仮説が土台で（<strong>R-1-1 で実証済み・2026-09-02</strong>）、ループ先頭 0〜7 秒の完全静止の解消を最優先とする。期待効果は 16 秒全体に一定勾配で散っている損失の減少と、コメント率・いいね率の向上。
   <strong>根拠</strong>: 視聴維持カーブ 3 本の目視（2026-09-02）で 0〜2 秒の崖はなく（0:02 で約 70%）、0:06 で 40〜47%・0:16 で 20〜32% まで一定勾配で減る。8 秒（tick）・13 秒（chime）のイベントに変曲点は出ていない。冒頭フック用途ではなく全編の品質・ペーシング用途と位置づける。
   <strong>不変条件</strong>: 16 秒・3 カット・SE タイミング（tick 8.0 秒 / chime 13.0 秒）・BGM と SE のミックス設計・「答えはキャプションで開示」の情報設計・イラスト（既存の <code>&lt;content_key&gt;_illustration.png</code> を再利用）は変更しない。変えるのはレンダラー・カット内の動き・上部の余白だけ。TTS は入れない。
   <strong>投入方針</strong>: 段階ビルド（補充バッチだけ新版面の混在投稿）は<strong>行わない</strong>（ユーザー判断 2026-09-02）。プロトタイプで目視判断 → 在庫を全数一括で再ビルド・差し替える。本番投入は <strong>16-5 効果検証〔開発レーン〕の水準評価を済ませてから</strong>とし、投入日をセット記録に残す。
-</p>
-<div class="table-wrap"><table>
-<thead><tr><th>ステップ</th><th>内容</th><th>完了条件 / 人間ゲート / 停止点</th><th>状態</th></tr></thead>
-<tbody>
-<tr>
-  <td><strong>R-1-1</strong><br>ループ仮説の確認（ユーザー）</td>
-  <td>Instagram アプリのリールインサイトで直近投稿 3 本以上の<strong>平均再生時間</strong>を見る。16 秒（動画尺）を超えていればループが実証される。再生回数・replays 系の指標は Graph API から廃止済みで insights-batch では取れないため、アプリ目視が唯一の手段。R-1-2 の着手はブロックしない（結果はプロトタイプの重み付け〔ループ継ぎ目をどこまで重視するか〕に使う）<br><strong>結果（2026-09-02・ユーザー目視）</strong>: <strong>平均再生時間が 16 秒を超えている動画が多数</strong>。ループ視聴が常態であることが実証された（個別の秒数値は未記録。定量比較には使わない）</td>
-  <td>平均再生時間の水準（16 秒超が多数）が<a href="logic-training-1-log.html">セット記録</a>に残っている</td>
-  <td><strong>完了</strong>（2026-09-02）<br>ループ実証 → 継ぎ目要件を格上げ</td>
-</tr>
-<tr>
-  <td><strong>R-1-2</strong><br>プロトタイプ（既存 1 問）</td>
-  <td><code>content/video-build/logic-training-1/remotion/</code> に Remotion コンポジションを新設し、既存 1 問（ビルド済み・イラストあり）で 16 秒版を試作する。レンダリング環境は pref-ranking-1 の <code>Dockerfile.render</code> と <code>build.py</code> の <code>_render()</code>（Docker 経由 <code>npx remotion render</code>）を流用。<strong>動きの内容</strong>: ① コーチの常時浮遊（pref-ranking-1 型。<strong>周期は 480 フレームの約数</strong>にしてループ継ぎ目で位相が飛ばないようにする。<strong>R-1-1 でループが実証されたため、周期アニメーションはすべて 480 フレームの約数とし、16 秒末尾の状態が 0 秒の状態に一致することを必須要件とする</strong>）② つかみ帯の動き（目立たせる。可読性優先） ③ 問題文の読む速さに合わせた段階表示 ④ 3〜8 秒の「考える」ビート ⑤ 8〜13 秒のカウントダウン（数字のスケール・リング進行・tick 同期のパルス） ⑥ 13〜16 秒の誘導強調。<strong>版面</strong>: 上部（時間帯ピル・つかみ帯・見出し・問題文）は左右対称の余白で使い切り、Instagram UI の右 12% 予約は下部（イラスト・コーチ・吹き出し）だけに残す高さ依存のセーフエリアへ変える。<strong>音声</strong>は現行の ffmpeg ミックス（BGM LRU + SE 固定ディレイ）を維持し Remotion は映像のみ出力する（Remotion 側で鳴らすかは試作時に判断。SE タイミングは不変）</td>
-  <td>1 問の MP4 が出力され、現行版と並べて再生できる。<code>tsc --noEmit</code> が通る。周期アニメーションの周期がすべて 480 フレームの約数であること（末尾 → 先頭の連続性）をコード上で確認済み</td>
-  <td><strong>完了</strong>（2026-09-02）<br><code>remotion/</code> 新設・<code>id=85</code> で 16 秒版を出力（<code>remotion/work/prototype/85.mp4</code>）。上部を 2 ゾーン化して本文幅 797 → 902px・問題文 56 → 68px。周期 11 件すべて 480 の約数（違反時はビルドが落ちる）。継ぎ目はクロスフェードを<strong>スナップに変更</strong>（二重露光のため）し、479 → 0 の差分は内部 1 フレーム送りと同等。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
-</tr>
-<tr>
-  <td><strong>R-1-3</strong><br>プレビュー確認（ユーザー判断 = R-1-4 以降の go / no-go）</td>
-  <td>プロトタイプを実機（スマホ）でループ再生して確認する。観点は 5 つ: ① 0〜7 秒が生きているか（ループ先頭で止まって見えないか） ② 16 秒末尾 → 0 秒の継ぎ目が自然か（<strong>R-1-1 でループ視聴が実証されたため必須要件。ここが不自然なら no-go</strong>） ③ 動きが問題文・つかみ帯の可読性を邪魔していないか ④ 上部余白の使い切りで文字が大きくなり、Instagram UI と重ならないか ⑤ 8 秒・13 秒のイベントが視覚的に立っているか。no-go なら本改修を見送りとしてアイデア記録に理由を残す</td>
-  <td>ユーザーが 5 観点で OK と判断（調整の往復はここで吸収する）</td>
-  <td><strong>完了</strong>（2026-09-02）<br><strong>go</strong>。調整 1 往復で決着（①問題文の段階表示を廃止しフレーム 0 から全文表示 + 継ぎ目のフェードも撤去 ②冒頭 0.0 秒にコーチのバウンドを追加）。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
-</tr>
-<tr>
-  <td><strong>R-1-4</strong><br>ビルドツーリングの切替</td>
-  <td><code>content/video-build/logic-training-1/build.py</code> のレンダラーを Remotion に切り替え（<code>services/image-batch</code> の <code>gpt_quiz_multicut</code> への import 依存を外す。<code>services/</code> 側のコードは休止方式として残置・削除しない）。<code>review_sheet.py</code> を新版面に追随。pref-ranking-1 と同様に <code>tests/</code>（版面定数・タイムライン導出値の固定テスト）を新設する（現状 logic-training-1 側にはテストがない）</td>
-  <td><code>pytest</code> 全パス。1 問のビルドが <code>build.py</code> 経由で通る</td>
-  <td><strong>完了</strong>（2026-09-02）<br><code>build.py</code> をホスト実行 + Docker（Remotion / ffmpeg）方式へ全面書き換え。<code>gpt_quiz_multicut</code> 依存を除去（<code>services/</code> 側は残置）。<code>tests/</code> 新設で <strong>28 件パス</strong>（うち <code>timeline.ts</code> との同期テスト 5 件）。<code>id=85</code> を <code>--rebuild --item 85</code> でビルド完了（16.000 秒 / 1080x1920 / h264 + aac）。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
-</tr>
-<tr>
-  <td><strong>R-1-5</strong><br>在庫全数の再ビルドとレビューシート生成（レビュー提出まで）</td>
-  <td>稼働在庫 56 問（朝 28 / 夜 28。使用済み含む。LRU が再利用で旧版を出すため）を <code>build.py --rebuild</code> で一括再ビルドし、<code>review_sheet.py</code> で <code>work/review.html</code> を生成して<strong>全数人間レビュー</strong>に出すところまで。凍結中の昼 21 問は<strong>再ビルドしない</strong>（再開判断時にまとめて行う）。対象抽出で昼を除外する必要が出たらビルドツール側を直す。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・<a href="logic-training-1-log.html">セット記録</a>。<strong>着手条件: 16-5 の水準評価が完了していること</strong>（2026-09-02 完了済み）<br><strong>分割の経緯</strong>: 旧 R-1-5（再ビルド → レビュー → S3 差し替え → 両環境 DB 更新）は人間レビューがステップ途中に入るため、<code>/step</code> 起動時（2026-09-03）に本ステップ（ビルドまで）と R-1-6（差し替え + 設計書・記録の更新）へ分割した</td>
-  <td><strong>完了条件</strong>: ① <code>build.py</code> の対象件数 = 成功件数（朝・夜 56 件 / 昼 0 件）の出力を貼る ② 出力 MP4 全数が 16.000 秒・1080x1920・h264 + aac であることを ffprobe 一括チェックの出力で示す ③ <code>work/review.html</code> が 56 問分生成されている ④ <code>python -m pytest</code> 全パスの要約行 ⑤ 本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>review.html</code> での全数レビュー（承認 ID を <code>work/approved.txt</code> に記載）<br><strong>停止点・上限</strong>: push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。<code>publish.py</code> の実行・S3 アップロード・ローカル / Aurora の DB 更新は行わない。stop after 25 turns</td>
-  <td><strong>完了</strong>（2026-09-03）<br>56 本（朝 28 / 夜 28）を Remotion 版へ再ビルドし全数 16.000000 秒 / 1080x1920 / h264 + aac を ffprobe 確認（NG 0 件）。<code>work/review.html</code> に 56 カード。昼 21 問は対象外。<code>build.py</code> / <code>review_sheet.py</code> に <code>--slot</code>、レビューシートに 14 本 × 4 ページの分割（<code>--per-page</code>）を追加（pytest 36 件）。レビュー調整 1 往復（イラストの光沢削除・夜のつかみ帯の光沢を白へ・ページ分割）を反映し再ビルド済み。<strong>全数レビューで 56 問すべて承認</strong>（2026-09-03。<code>work/approved.txt</code> に記載済み）。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
-</tr>
-<tr>
-  <td><strong>R-1-6</strong><br>差し替えと設計書・記録の更新（R-1-5 のレビュー承認後）</td>
-  <td>① 承認済み ID（<code>work/approved.txt</code>）をもとに<strong>ユーザーが</strong> <code>publish.py --dry-run</code> → 本実行（S3 差し替え + ローカル DB 更新）→ <code>work/update_prebuilt.sql</code> を Aurora へ適用する（<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8 の手順。Claude はコマンド行の提示のみで実行しない） ② <a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8（レンダラー・組版の記述）を Remotion 版へ書き換え、decision に経緯を残す ③ <a href="logic-training-1-log.html">セット記録</a>セクション 3 に実施記録と差し替え日を追記 ④ 本計画書ステータス表の「生成方式」行と<a href="#pending-checks">確認待ちリスト</a>の R-1 効果確認行（トリガー起点 = 差し替え日）を更新 ⑤ <strong>共通設計書 <a href="../app/batch-flow.html">batch-flow.html</a> の方式カタログ行（quiz-prebuilt の「Pillow 組版 → ffmpeg 連結」の記述）と gpt-quiz-multicut の「事前ビルドのレンダラーとして継続使用」の注記は開発レーン</strong>のため、本ステップでは<strong>起票文面を用意して提示するまで</strong>とし、<a href="development-plan.html">開発計画</a>の設計課題リストへの書き込みは開発レーンのセッションで行う（旧 R-1-6「設計書・記録の更新」を吸収）</td>
-  <td><strong>完了条件</strong>: ① 両環境で <code>video_built_at</code> が差し替え日の <code>quiz_stock_items</code> 行が 56 件であることを件数クエリの出力で示す ② セット側の設計書・記録・本計画書が実装に一致する ③ 設計課題リストへの起票文面を会話に提示 ④ 日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>publish.py</code> の実行と Aurora への <code>update_prebuilt.sql</code> 適用、差し替え後の抜き取り再生確認<br><strong>停止点・上限</strong>: push まで（<code>docs/</code> のみ）。<code>publish.py</code>・Aurora 適用・<code>development-plan.html</code> への書き込みは行わない。stop after 20 turns<br><strong>注</strong>: 「投入日（新版の初出投稿）」は自セッション外の出来事のため完了条件に含めず、差し替え日を記録して効果は<a href="#pending-checks">確認待ちリスト</a>で追う</td>
-  <td><strong>完了</strong>（2026-09-03）<br><strong>差し替え日 2026-09-03</strong>（人間ゲートはユーザー指示により Claude が代行）: <code>publish.py</code> で S3 112 オブジェクト（mp4 + イラスト）を上書き・ローカル 56 行 → Aurora へ <code>update_prebuilt.sql</code> 56 文（<code>apply_aurora.py</code> 流用）。両環境とも <code>video_built_at</code> = 2026-09-03 の行が 56 件。方式設計書セクション 8 を Remotion 版へ書き換え・R-1 の decision 追加、セット別設計書・補充スキルの陳腐化記述も追随。共通設計書（batch-flow / gpt-quiz-multicut）の追随は<a href="development-plan.html">開発計画</a>の設計課題リストへ起票文面を提示（書き込みは開発レーン）。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
-</tr>
-</tbody>
-</table></div>
+</blockquote>
+</div>
+</details>
 
-<h3>改修 R-2: イラスト拡大（文字サイズの縮小で原資を確保・イラスト優先配分へ）</h3>
-<p>
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 6 件（クリックで展開）</summary>
+<div class="plan-group-inner">
+
+<article class="plan-step" id="step-R-1-1" data-step-id="R-1-1" data-status="done" data-completed="2026-09-02">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-1</strong><span class="plan-status">完了</span><span>2026-09-02</span></div>
+<h3>ループ仮説の確認（ユーザー）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（改修の先頭）。R-1-2 の着手はブロックしない。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-02・ユーザー目視）</strong>。<strong>平均再生時間が 16 秒を超えている動画が多数</strong>で、ループ視聴が常態であることが実証された（個別の秒数値は未記録。定量比較には使わない）。これを受けてループ継ぎ目の要件を必須へ格上げした。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>Instagram アプリのリールインサイトで直近投稿 3 本以上の<strong>平均再生時間</strong>を見る。16 秒（動画尺）を超えていればループが実証される。再生回数・replays 系の指標は Graph API から廃止済みで insights-batch では取れないため、アプリ目視が唯一の手段。結果はプロトタイプの重み付け（ループ継ぎ目をどこまで重視するか）に使う。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>個別の秒数値は記録しない（アプリ目視のため定量比較に使わない）。R-1-2 の着手をブロックしない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>平均再生時間の水準（16 秒超が多数）が<a href="logic-training-1-log.html">セット記録</a>に残っている。</li>
+</ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>ユーザーが Instagram アプリで平均再生時間を目視する（このステップの作業自体が人間の観測）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（当時の記載なし。観測とセット記録への記入のみ）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 目視結果はセット記録へ</span></summary>
+<div class="plan-fold-inner"><p>実施記録は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-1-2" data-step-id="R-1-2" data-status="done" data-completed="2026-09-02">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-2</strong><span class="plan-status">完了</span><span>2026-09-02</span></div>
+<h3>プロトタイプ（既存 1 問）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（R-1-1 の結果を待たずに着手してよい）。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-02）</strong>。<code>remotion/</code> 新設・<code>id=85</code> で 16 秒版を出力（<code>remotion/work/prototype/85.mp4</code>）。上部を 2 ゾーン化して本文幅 797 → 902px・問題文 56 → 68px。周期 11 件すべて 480 の約数（違反時はビルドが落ちる）。継ぎ目はクロスフェードを<strong>スナップに変更</strong>（二重露光のため）し、479 → 0 の差分は内部 1 フレーム送りと同等。詳細は<a href="logic-training-1-log.html">セット記録</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>content/video-build/logic-training-1/remotion/</code> に Remotion コンポジションを新設し、既存 1 問（ビルド済み・イラストあり）で 16 秒版を試作する。レンダリング環境は pref-ranking-1 の <code>Dockerfile.render</code> と <code>build.py</code> の <code>_render()</code>（Docker 経由 <code>npx remotion render</code>）を流用する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><strong>周期アニメーションはすべて 480 フレームの約数</strong>とし、16 秒末尾の状態が 0 秒の状態に一致することを必須要件とする（R-1-1 でループが実証されたため）。<strong>音声</strong>は現行の ffmpeg ミックス（BGM LRU + SE 固定ディレイ）を維持し、Remotion は映像のみ出力する（SE タイミングは不変）。<strong>版面</strong>は上部（時間帯ピル・つかみ帯・見出し・問題文）を左右対称の余白で使い切り、Instagram UI の右 12% 予約は下部（イラスト・コーチ・吹き出し）だけに残す高さ依存のセーフエリアへ変える。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>1 問の MP4 が出力され、現行版と並べて再生できる。</li>
+<li><code>tsc --noEmit</code> が通る。</li>
+<li>周期アニメーションの周期がすべて 480 フレームの約数であること（末尾 → 先頭の連続性）をコード上で確認済み。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし（実機での判断は R-1-3）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（当時の記載なし。試作の出力まで）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 動きの内容 6 点</span></summary>
+<div class="plan-fold-inner">
+<p><strong>動きの内容</strong>: ① コーチの常時浮遊（pref-ranking-1 型） ② つかみ帯の動き（目立たせる。可読性優先） ③ 問題文の読む速さに合わせた段階表示 ④ 3〜8 秒の「考える」ビート ⑤ 8〜13 秒のカウントダウン（数字のスケール・リング進行・tick 同期のパルス） ⑥ 13〜16 秒の誘導強調。Remotion 側で音を鳴らすかは試作時に判断する。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 試作から継ぎ目のスナップ化まで</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。③ の段階表示は R-1-3 の調整で撤回した（フレーム 0 から全文表示）。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-1-3" data-step-id="R-1-3" data-status="done" data-completed="2026-09-02">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-3</strong><span class="plan-status">完了</span><span>2026-09-02</span></div>
+<h3>プレビュー確認（ユーザー判断 = R-1-4 以降の go / no-go）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-1-2 のプロトタイプが出力されていること。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-02）・go</strong>。調整 1 往復で決着（① 問題文の段階表示を廃止しフレーム 0 から全文表示 + 継ぎ目のフェードも撤去 ② 冒頭 0.0 秒にコーチのバウンドを追加）。詳細は<a href="logic-training-1-log.html">セット記録</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>プロトタイプを実機（スマホ）でループ再生して確認する。観点は 5 つ: ① 0〜7 秒が生きているか（ループ先頭で止まって見えないか） ② 16 秒末尾 → 0 秒の継ぎ目が自然か ③ 動きが問題文・つかみ帯の可読性を邪魔していないか ④ 上部余白の使い切りで文字が大きくなり、Instagram UI と重ならないか ⑤ 8 秒・13 秒のイベントが視覚的に立っているか。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>観点 ② は <strong>R-1-1 でループ視聴が実証されたため必須要件</strong>で、ここが不自然なら no-go とする。no-go なら本改修を見送りとしてアイデア記録に理由を残す。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>ユーザーが 5 観点で OK と判断（調整の往復はここで吸収する）。</li>
+</ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><strong>このステップ自体が人間ゲート</strong>。ユーザーが実機で 5 観点を見て go / no-go を出す。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（当時の記載なし。判断と調整の反映まで）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 調整 1 往復で go</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-1-4" data-step-id="R-1-4" data-status="done" data-completed="2026-09-02">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-4</strong><span class="plan-status">完了</span><span>2026-09-02</span></div>
+<h3>ビルドツーリングの切替</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-1-3 の go 後。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-02）</strong>。<code>build.py</code> をホスト実行 + Docker（Remotion / ffmpeg）方式へ全面書き換え。<code>gpt_quiz_multicut</code> 依存を除去（<code>services/</code> 側は残置）。<code>tests/</code> 新設で <strong>28 件パス</strong>（うち <code>timeline.ts</code> との同期テスト 5 件）。<code>id=85</code> を <code>--rebuild --item 85</code> でビルド完了（16.000 秒 / 1080x1920 / h264 + aac）。詳細は<a href="logic-training-1-log.html">セット記録</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>content/video-build/logic-training-1/build.py</code> のレンダラーを Remotion に切り替える（<code>services/image-batch</code> の <code>gpt_quiz_multicut</code> への import 依存を外す）。<code>review_sheet.py</code> を新版面に追随させ、pref-ranking-1 と同様に <code>tests/</code>（版面定数・タイムライン導出値の固定テスト）を新設する（現状 logic-training-1 側にはテストがない）。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><code>services/</code> 側のコード（<code>gpt_quiz_multicut</code>）は<strong>休止方式として残置し削除しない</strong>。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>pytest</code> 全パス。</li>
+<li>1 問のビルドが <code>build.py</code> 経由で通る。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（当時の記載なし。ビルドツールの切替まで）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— pytest 28 件・1 問ビルド確認</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-1-5" data-step-id="R-1-5" data-status="done" data-completed="2026-09-03">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-5</strong><span class="plan-status">完了</span><span>2026-09-03</span></div>
+<h3>在庫全数の再ビルドとレビューシート生成（レビュー提出まで）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><strong>16-5 の水準評価が完了していること</strong>（2026-09-02 完了済み）。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-03）</strong>。56 本（朝 28 / 夜 28）を Remotion 版へ再ビルドし全数 16.000000 秒 / 1080x1920 / h264 + aac を ffprobe 確認（NG 0 件）。<code>work/review.html</code> に 56 カード。昼 21 問は対象外。<code>build.py</code> / <code>review_sheet.py</code> に <code>--slot</code>、レビューシートに 14 本 × 4 ページの分割（<code>--per-page</code>）を追加（pytest 36 件）。レビュー調整 1 往復（イラストの光沢削除・夜のつかみ帯の光沢を白へ・ページ分割）を反映し再ビルド済み。<strong>全数レビューで 56 問すべて承認</strong>（<code>work/approved.txt</code> に記載済み）。詳細は<a href="logic-training-1-log.html">セット記録</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>稼働在庫 56 問（朝 28 / 夜 28。使用済み含む。LRU が再利用で旧版を出すため）を <code>build.py --rebuild</code> で一括再ビルドし、<code>review_sheet.py</code> で <code>work/review.html</code> を生成して<strong>全数人間レビュー</strong>に出すところまで。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>凍結中の昼 21 問は<strong>再ビルドしない</strong>（再開判断時にまとめて行う）。対象抽出で昼を除外する必要が出たらビルドツール側を直す。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>build.py</code> の対象件数 = 成功件数（朝・夜 56 件 / 昼 0 件）の出力を貼る。</li>
+<li>出力 MP4 全数が 16.000 秒・1080x1920・h264 + aac であることを ffprobe 一括チェックの出力で示す。</li>
+<li><code>work/review.html</code> が 56 問分生成されている。</li>
+<li><code>python -m pytest</code> 全パスの要約行。</li>
+<li>本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><code>review.html</code> での全数レビュー（承認 ID を <code>work/approved.txt</code> に記載）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。<code>publish.py</code> の実行・S3 アップロード・ローカル / Aurora の DB 更新は行わない。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 旧 R-1-5 からの分割の経緯</span></summary>
+<div class="plan-fold-inner">
+<p><strong>分割の経緯</strong>: 旧 R-1-5（再ビルド → レビュー → S3 差し替え → 両環境 DB 更新）は人間レビューがステップ途中に入るため、<code>/step</code> 起動時（2026-09-03）に本ステップ（ビルドまで）と R-1-6（差し替え + 設計書・記録の更新）へ分割した。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 56 本再ビルド・調整 1 往復・全数承認</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-1-6" data-step-id="R-1-6" data-status="done" data-completed="2026-09-03">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-6</strong><span class="plan-status">完了</span><span>2026-09-03</span></div>
+<h3>差し替えと設計書・記録の更新（R-1-5 のレビュー承認後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-1-5 の全数レビューで承認が出ていること（<code>work/approved.txt</code>）。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-03）・差し替え日 2026-09-03</strong>（人間ゲートはユーザー指示により Claude が代行）。<code>publish.py</code> で S3 112 オブジェクト（mp4 + イラスト）を上書き・ローカル 56 行 → Aurora へ <code>update_prebuilt.sql</code> 56 文（<code>apply_aurora.py</code> 流用）。両環境とも <code>video_built_at</code> = 2026-09-03 の行が 56 件。方式設計書セクション 8 を Remotion 版へ書き換え・R-1 の decision 追加、セット別設計書・補充スキルの陳腐化記述も追随。共通設計書（batch-flow / gpt-quiz-multicut）の追随は<a href="development-plan.html">開発計画</a>の設計課題リストへ起票文面を提示（書き込みは開発レーン）。詳細は<a href="logic-training-1-log.html">セット記録</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>① 承認済み ID（<code>work/approved.txt</code>）をもとに<strong>ユーザーが</strong> <code>publish.py --dry-run</code> → 本実行（S3 差し替え + ローカル DB 更新）→ <code>work/update_prebuilt.sql</code> を Aurora へ適用する（<a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8 の手順。Claude はコマンド行の提示のみで実行しない） ② <a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8（レンダラー・組版の記述）を Remotion 版へ書き換え、decision に経緯を残す ③ <a href="logic-training-1-log.html">セット記録</a>セクション 3 に実施記録と差し替え日を追記 ④ 本計画書ステータス表の「生成方式」行と<a href="#pending-checks">確認待ちリスト</a>の R-1 効果確認行（トリガー起点 = 差し替え日）を更新する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>⑤ <strong>共通設計書 <a href="../app/batch-flow.html">batch-flow.html</a> の方式カタログ行（quiz-prebuilt の「Pillow 組版 → ffmpeg 連結」の記述）と gpt-quiz-multicut の「事前ビルドのレンダラーとして継続使用」の注記は開発レーン</strong>のため、本ステップでは<strong>起票文面を用意して提示するまで</strong>とし、<a href="development-plan.html">開発計画</a>への書き込みは開発レーンのセッションで行う（旧 R-1-6「設計書・記録の更新」を吸収）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>両環境で <code>video_built_at</code> が差し替え日の <code>quiz_stock_items</code> 行が 56 件であることを件数クエリの出力で示す。</li>
+<li>セット側の設計書・記録・本計画書が実装に一致する。</li>
+<li>設計課題リストへの起票文面を会話に提示。</li>
+<li>日本語メッセージでコミット → <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><code>publish.py</code> の実行と Aurora への <code>update_prebuilt.sql</code> 適用、差し替え後の抜き取り再生確認。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> のみ）。<code>publish.py</code>・Aurora 適用・<code>development-plan.html</code> への書き込みは行わない。stop after 20 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 投入日を完了条件に入れない理由</span></summary>
+<div class="plan-fold-inner">
+<p><strong>注</strong>: 「投入日（新版の初出投稿）」は自セッション外の出来事のため完了条件に含めず、差し替え日を記録して効果は<a href="#pending-checks">確認待ちリスト</a>で追う。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 差し替え 56 件・設計書追随・起票文面の提示</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</details>
+</section>
+
+<section class="plan-phase" data-plan-phase="R-2" id="phase-R-2">
+<h2 id="r-2">改修 R-2: イラスト拡大（文字サイズの縮小で原資を確保・イラスト優先配分へ）</h2>
+<p><strong>ゴール</strong>: 配分を<strong>イラスト優先</strong>（イラストの箱に高さ 500px を先に確保し、残りの高さに問題文を収める）へ切り替え、どの問題でもイラストを幅いっぱい近く（797×531px。最長問題で 771×514px）で出す。<strong>完了（2026-09-19）</strong>: R-2-1〜R-2-4 をすべて完了し、稼働在庫 70 問を差し替えた。効果確認は<a href="#pending-checks">確認待ちリスト</a>（2026-10-03 以降）で追う。</p>
+<details class="plan-fold">
+<summary>改修の背景・決定の経緯 <span class="plan-hint">— ねらい・採用値・不変条件・投入方針・着手条件</span></summary>
+<div class="plan-fold-inner">
+<blockquote>
   起票 2026-09-19（壁打ち 2 巡 + 静止画 PoC で確定。PoC は作業ツリー外の複製で描き出し、比較ページは <a href="https://claude.ai/artifact/FntpW5RYN74ToiUqQnr34W">脳みそトレ 版面 PoC</a>〔私的アーティファクト〕。採用値と導出値は本節に転記済みで、ページが消えても再現できる）。
-  <strong>ねらい</strong>: 現行版面は問題文の最大高 430px を先に取り、残りをイラストに回すため、4 行問題（在庫 56 問中 37 問）でイラストが 504×336px（幅の 6 割）に痩せる。配分を<strong>イラスト優先</strong>（イラストの箱に高さ 500px を先に確保し、残りの高さに問題文を収める）へ切り替え、どの問題でもイラストを幅いっぱい近く（797×531px。最長問題で 771×514px）で出す。
+  <strong>ねらい</strong>: 現行版面は問題文の最大高 430px を先に取り、残りをイラストに回すため、4 行問題（在庫 56 問中 37 問）でイラストが 504×336px（幅の 6 割）に痩せる。
   <strong>採用値（ユーザー決定 2026-09-19）</strong>: 問題文 = 上限 68px 据え置き・行送り 1.5 → 1.4・下限 32 → 44px。<strong>問題の長さでサイズが変わることを許容</strong>（PoC 実測: 18 字 = 68px・2 行 / 50 字 = 54px・3 行 / 76 字 = 50px・4 行）。つかみ帯 64 → 52px。見出し「問題」は<strong>残す</strong>（92 → 72px、問題文までの間隔 150 → 115px）。イラストの箱に余りが出るときは<strong>問題文の直下に寄せる</strong>（現行の上下中央 → 上寄せ。間隔 48px）。見出しなし案（イラスト 531px 保証・バッジをイラスト右上へ）は PoC で比較のうえ不採用。
   <strong>不変条件</strong>: 16 秒・3 カット・SE タイミング・BGM / SE ミックス・「答えはキャプションで開示」・イラスト（再生成しない）・コーチ箱 300×430px と足元余白 140px・吹き出し・高さ依存 2 ゾーンのセーフエリア。変えるのは上部の文字サイズと配分順序・イラストの寄せ方だけ。
   <strong>投入方針</strong>: 混在なし（ユーザー判断 2026-09-19）。1 本の動画で go / no-go → 稼働在庫（朝・夜）を全数一括で再ビルド・差し替える。
   <strong>着手条件</strong>: <a href="#pending-checks">確認待ちリスト</a>の R-1 効果確認（トリガー 2026-09-17 以降）に<strong>結果が記入されていること</strong>（ユーザー判断 2026-09-19: R-1 の確認を待ってから着手）。R-1 が「戻す」判定なら R-2 は前提から見直す。
-</p>
-<div class="table-wrap"><table>
-<thead><tr><th>ステップ</th><th>内容</th><th>完了条件 / 人間ゲート / 停止点</th><th>状態</th></tr></thead>
-<tbody>
-<tr>
-  <td><strong>R-2-1</strong><br>版面変更とプレビュー出力（R-1 効果確認の判定後）</td>
-  <td><code>content/video-build/logic-training-1/remotion/src/layout.ts</code> の定数を採用値へ変更（<code>QUESTION_LINE_RATIO</code> 1.4・<code>QUESTION_FONT_SIZE_MIN</code> 44・<code>HOOK_FONT_SIZE_MAX</code> 52・<code>HEADING_FONT_SIZE</code> 72・<code>HEADING_TO_QUESTION</code> 115。<code>QUESTION_MAX_HEIGHT</code> 430 は廃止し、新設 <code>ILLUSTRATION_GUARANTEED_HEIGHT</code> = 500 から導出）。<code>design.ts</code> の導出順を「イラストの箱を先に確保 → 残りの高さに問題文を <code>fitText</code>（上限 68 / 下限 44）」へ入れ替え、<code>containRect</code> の結果を箱の上端に寄せる。問題文が下限 44px でも残りに収まらない場合は明示的に例外を投げる（現行の「イラスト領域が残らない」例外と同じ砦の位置づけ。補充の 90 字上限なら収まる）。<code>tests/</code> に版面導出値の固定テストを追加（最短・中央・最長の 3 問で問題文サイズ・行数・イラスト矩形を固定）。プレビューとして在庫の最短（87）・中央（169）・最長（197）の静止画 3 枚と、最長問題の MP4 1 本を <code>build.py --rebuild --item</code> で出力。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・セット記録</td>
-  <td><strong>完了条件</strong>: ① <code>tsc --noEmit</code> と <code>python -m pytest</code> の全パス要約行 ② 3 問の導出値（問題文サイズ・行数・イラスト矩形）が PoC 実測（68/2 行/797×531、54/3 行/797×531、50/4 行/771×514）と一致する出力 ③ 静止画 3 枚と MP4 1 本のパス（MP4 は 16.000 秒 / 1080x1920 を ffprobe で確認）④ 本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: なし（判断は R-2-2）<br><strong>停止点・上限</strong>: push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。在庫の再ビルド・<code>publish.py</code>・DB 更新は行わない。stop after 20 turns</td>
-  <td><strong>完了</strong>（2026-09-19）<br>定数を採用値へ変更し導出順をイラスト優先へ入れ替え（<code>ILLUSTRATION_GUARANTEED_HEIGHT</code> 500 から問題文の使える高さ 294px を導出・<code>containRect</code> は上端寄せ・下限 44px で収まらなければ例外）。<strong>3 問の導出値は PoC 実測と一致</strong>（68/2 行/797×531・54/3 行/797×531・50/4 行/771×514）。<code>tsc --noEmit</code> 通過・<code>pytest</code> 42 件全パス（版面固定テスト <code>tests/test_layout_design.py</code> を新設）。プレビューは <code>work/videos/{87,169,197}.mp4</code> と <code>work/cuts/</code> のスチル各 5 枚、最長 197 は 16.000000 秒 / 1080x1920。<strong>気づき</strong>: 採用値では問題文の字数上限が全角 80 字になり補充の 90 字と食い違う（課題体系 <a href="../issues/index.html#I-035">I-035</a>。同日解消）。詳細は<a href="logic-training-1-log.html">セット記録</a></td>
-</tr>
-<tr>
-  <td><strong>R-2-2</strong><br>プレビュー確認（ユーザー判断・ゴール対象外）</td>
-  <td>R-2-1 の MP4 を実機（スマホ）でループ再生して確認する。観点は 4 つ: ① 4 行問題で 50px に縮んだ問題文の可読性 ② 問題文の直下に寄せたイラストと、つかみ帯・見出し・コーチとの間隔のバランス ③ 大きくなったイラストが Instagram UI（右 12%・下 15%）と重ならないか ④ 「考え中」ピル・カウントダウンバッジの位置が崩れていないか。no-go なら R-2 を見送り、理由をセット記録に残す</td>
-  <td>ユーザーが 4 観点で OK と判断（調整の往復はここで吸収する）<br><strong>停止点</strong>: —（ゴールにしない）</td>
-  <td><strong>完了・go</strong>（2026-09-19）<br>プレビュー 3 本（最短 87 / 中央 169 / 最長 197）を実機で確認し 4 観点すべて OK。調整の往復なし。R-2 の採用を決定（詳細は<a href="logic-training-1-log.html">セット記録</a>）</td>
-</tr>
-<tr>
-  <td><strong>R-2-3</strong><br>在庫全数の再ビルドとレビューシート生成（R-2-2 の go 後）</td>
-  <td>稼働在庫の朝・夜全数（使用済み含む。着手時に <code>quiz_stock_items</code> の件数を確定。2026-09-12 時点で 70 問 = R-1 の 56 問 + 2026-09-w1 の 14 問）を <code>build.py --rebuild --slot</code> で一括再ビルドし、<code>review_sheet.py</code> で <code>work/review.html</code> を生成して全数人間レビューに出すところまで。凍結中の昼は再ビルドしない。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・セット記録</td>
-  <td><strong>完了条件</strong>: ① <code>build.py</code> の対象件数 = 成功件数（昼 0 件）の出力 ② 出力 MP4 全数が 16.000 秒・1080x1920・h264 + aac であることを ffprobe 一括チェックの出力で示す ③ <code>work/review.html</code> が全数分生成されている ④ <code>python -m pytest</code> 全パス ⑤ 本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>review.html</code> での全数レビュー（承認 ID を <code>work/approved.txt</code> に記載）<br><strong>停止点・上限</strong>: push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。<code>publish.py</code>・S3・DB 更新は行わない。stop after 25 turns</td>
-  <td><strong>完了</strong>（2026-09-19）<br>対象 70 件（朝 35 / 夜 35。昼 21 件は <code>--slot</code> で除外 = 0 件）を再ビルドし <strong>完了: 70 件</strong>（skip 0・失敗 0）。ffprobe 一括チェックで <strong>70 件すべて 16.000000 秒 / 1080x1920 / h264 + aac・当日更新</strong>（NG 0 件）。<code>work/review.html</code> ほか <strong>5 ページ × 14 件 = 70 件</strong>・スチル 350 枚を生成。<code>pytest</code> 42 件全パス。<strong>人間ゲート通過</strong>: 全数レビューで <strong>70 問すべて承認</strong>し <code>work/approved.txt</code> を 70 件に更新（差し替えは R-2-4）</td>
-</tr>
-<tr>
-  <td><strong>R-2-4</strong><br>差し替えと設計書・記録の更新（R-2-3 のレビュー承認後）</td>
-  <td>① 承認済み ID をもとに <code>publish.py --dry-run</code> → 本実行（S3 差し替え + ローカル DB 更新）→ <code>work/update_prebuilt.sql</code> を Aurora へ適用（R-1-6 と同じ手順。実行は人間ゲート） ② <a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8 の版面記述を採用値へ更新し decision に経緯（イラスト優先配分・サイズ可変の許容）を残す ③ セット記録に実施記録と差し替え日 ④ 本計画書ステータス表の「生成方式」行を更新し、確認待ちリストに「R-2 効果確認（差し替え 2 週間後。判定基準は R-1 と同じ）」を起票</td>
-  <td><strong>完了条件</strong>: ① 両環境で <code>video_built_at</code> が差し替え日の行数 = 対象件数であることを件数クエリの出力で示す ② 設計書・記録・本計画書が実装に一致する ③ 日本語メッセージでコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: <code>publish.py</code> の実行と Aurora への SQL 適用、差し替え後の抜き取り再生確認<br><strong>停止点・上限</strong>: push まで（<code>docs/</code>・<code>content/</code> のみ）。stop after 20 turns</td>
-  <td><strong>完了</strong>（2026-09-19）<br>承認 70 件を差し替え（<code>uploaded and registered 70 approved prebuilt videos</code>・Aurora は 70 文すべて <code>updated=1</code>・合計 70）。<strong>両環境とも <code>video_built_at</code> = 2026-09-19 が朝 35 / 夜 35 = 70 件</strong>（昼 21 件は 2026-08-23 のまま）。dry-run の事前確認で両環境の <code>question_text</code> は 91 件すべて一意。<code>last_used_at</code> は不変（差し替えによる再投稿なし）。<strong>人間ゲート通過</strong>: 本実行はユーザー判断で Claude が代行（R-1-6 と同じ条件付き）、S3 実体の抜き取り再生確認も済み。方式設計書セクション 8 に R-2 の decision を追加・セット別設計書と本計画書を追随</td>
-</tr>
-</tbody>
-</table></div>
+</blockquote>
+</div>
+</details>
 
-<h3 id="r-3">改修 R-3: 作問の 2 段階化（候補の直感選別 + 後日の振り返りでスキルを育てる）</h3>
-<p>
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 4 件（クリックで展開）</summary>
+<div class="plan-group-inner">
+
+<article class="plan-step" id="step-R-2-1" data-step-id="R-2-1" data-status="done" data-completed="2026-09-19">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-2-1</strong><span class="plan-status">完了</span><span>2026-09-19</span></div>
+<h3>版面変更とプレビュー出力（R-1 効果確認の判定後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#pending-checks">確認待ちリスト</a>の R-1 効果確認に結果が記入されていること。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-19）</strong>。定数を採用値へ変更し導出順をイラスト優先へ入れ替え（<code>ILLUSTRATION_GUARANTEED_HEIGHT</code> 500 から問題文の使える高さ 294px を導出・<code>containRect</code> は上端寄せ・下限 44px で収まらなければ例外）。<strong>3 問の導出値は PoC 実測と一致</strong>（68/2 行/797×531・54/3 行/797×531・50/4 行/771×514）。<code>tsc --noEmit</code> 通過・<code>pytest</code> 42 件全パス（版面固定テスト <code>tests/test_layout_design.py</code> を新設）。プレビューは <code>work/videos/{87,169,197}.mp4</code> と <code>work/cuts/</code> のスチル各 5 枚、最長 197 は 16.000000 秒 / 1080x1920。<strong>気づき</strong>: 採用値では問題文の字数上限が全角 80 字になり補充の 90 字と食い違う（課題体系 <a href="../issues/index.html#I-035">I-035</a>。同日解消）。詳細は<a href="logic-training-1-log.html">セット記録</a>。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>content/video-build/logic-training-1/remotion/src/layout.ts</code> の定数を採用値へ変更し、<code>design.ts</code> の導出順を「イラストの箱を先に確保 → 残りの高さに問題文を <code>fitText</code>（上限 68 / 下限 44）」へ入れ替え、<code>containRect</code> の結果を箱の上端に寄せる。<code>tests/</code> に版面導出値の固定テストを追加（最短・中央・最長の 3 問で問題文サイズ・行数・イラスト矩形を固定）。プレビューとして在庫の最短（87）・中央（169）・最長（197）の静止画 3 枚と、最長問題の MP4 1 本を <code>build.py --rebuild --item</code> で出力する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>問題文が下限 44px でも残りに収まらない場合は<strong>明示的に例外を投げる</strong>（現行の「イラスト領域が残らない」例外と同じ砦の位置づけ。補充の 90 字上限なら収まる）。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・セット記録。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>tsc --noEmit</code> と <code>python -m pytest</code> の全パス要約行。</li>
+<li>3 問の導出値（問題文サイズ・行数・イラスト矩形）が PoC 実測（68/2 行/797×531、54/3 行/797×531、50/4 行/771×514）と一致する出力。</li>
+<li>静止画 3 枚と MP4 1 本のパス（MP4 は 16.000 秒 / 1080x1920 を ffprobe で確認）。</li>
+<li>本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし（判断は R-2-2）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。在庫の再ビルド・<code>publish.py</code>・DB 更新は行わない。stop after 20 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 変更する定数の一覧</span></summary>
+<div class="plan-fold-inner">
+<p>変更する定数: <code>QUESTION_LINE_RATIO</code> 1.4・<code>QUESTION_FONT_SIZE_MIN</code> 44・<code>HOOK_FONT_SIZE_MAX</code> 52・<code>HEADING_FONT_SIZE</code> 72・<code>HEADING_TO_QUESTION</code> 115。<code>QUESTION_MAX_HEIGHT</code> 430 は廃止し、新設 <code>ILLUSTRATION_GUARANTEED_HEIGHT</code> = 500 から導出する。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 導出値一致・I-035 の発見</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-2-2" data-step-id="R-2-2" data-status="done" data-completed="2026-09-19" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-2-2</strong><span class="plan-status">完了</span><span>2026-09-19</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>プレビュー確認（ユーザー判断・ゴール対象外）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-2-1 の MP4 が出力されていること。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了・go（2026-09-19）</strong>。プレビュー 3 本（最短 87 / 中央 169 / 最長 197）を実機で確認し 4 観点すべて OK。調整の往復なし。R-2 の採用を決定（詳細は<a href="logic-training-1-log.html">セット記録</a>）。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>R-2-1 の MP4 を実機（スマホ）でループ再生して確認する。観点は 4 つ: ① 4 行問題で 50px に縮んだ問題文の可読性 ② 問題文の直下に寄せたイラストと、つかみ帯・見出し・コーチとの間隔のバランス ③ 大きくなったイラストが Instagram UI（右 12%・下 15%）と重ならないか ④ 「考え中」ピル・カウントダウンバッジの位置が崩れていないか。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>no-go なら R-2 を見送り、理由をセット記録に残す。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>ユーザーが 4 観点で OK と判断（調整の往復はここで吸収する）。</li>
+</ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><strong>このステップ自体が人間ゲート</strong>。ユーザーが実機で 4 観点を見て go / no-go を出す。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 調整なしで go</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-2-3" data-step-id="R-2-3" data-status="done" data-completed="2026-09-19">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-2-3</strong><span class="plan-status">完了</span><span>2026-09-19</span></div>
+<h3>在庫全数の再ビルドとレビューシート生成（R-2-2 の go 後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-2-2 の go 後。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-19）</strong>。対象 70 件（朝 35 / 夜 35。昼 21 件は <code>--slot</code> で除外 = 0 件）を再ビルドし <strong>完了: 70 件</strong>（skip 0・失敗 0）。ffprobe 一括チェックで <strong>70 件すべて 16.000000 秒 / 1080x1920 / h264 + aac・当日更新</strong>（NG 0 件）。<code>work/review.html</code> ほか <strong>5 ページ × 14 件 = 70 件</strong>・スチル 350 枚を生成。<code>pytest</code> 42 件全パス。<strong>人間ゲート通過</strong>: 全数レビューで <strong>70 問すべて承認</strong>し <code>work/approved.txt</code> を 70 件に更新（差し替えは R-2-4）。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>稼働在庫の朝・夜全数（使用済み含む。着手時に <code>quiz_stock_items</code> の件数を確定。2026-09-12 時点で 70 問 = R-1 の 56 問 + 2026-09-w1 の 14 問）を <code>build.py --rebuild --slot</code> で一括再ビルドし、<code>review_sheet.py</code> で <code>work/review.html</code> を生成して全数人間レビューに出すところまで。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>凍結中の昼は再ビルドしない。触るパス: <code>content/video-build/logic-training-1/</code>・本計画書・セット記録。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>build.py</code> の対象件数 = 成功件数（昼 0 件）の出力。</li>
+<li>出力 MP4 全数が 16.000 秒・1080x1920・h264 + aac であることを ffprobe 一括チェックの出力で示す。</li>
+<li><code>work/review.html</code> が全数分生成されている。</li>
+<li><code>python -m pytest</code> 全パス。</li>
+<li>本計画書・セット記録を更新し日本語メッセージでコミット → <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><code>review.html</code> での全数レビュー（承認 ID を <code>work/approved.txt</code> に記載）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/</code>・<code>docs/plans/</code> のみ）。<code>publish.py</code>・S3・DB 更新は行わない。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 70 件再ビルド・全数承認</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-2-4" data-step-id="R-2-4" data-status="done" data-completed="2026-09-19">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-2-4</strong><span class="plan-status">完了</span><span>2026-09-19</span></div>
+<h3>差し替えと設計書・記録の更新（R-2-3 のレビュー承認後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-2-3 の全数レビューで承認が出ていること。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-09-19）</strong>。承認 70 件を差し替え（<code>uploaded and registered 70 approved prebuilt videos</code>・Aurora は 70 文すべて <code>updated=1</code>・合計 70）。<strong>両環境とも <code>video_built_at</code> = 2026-09-19 が朝 35 / 夜 35 = 70 件</strong>（昼 21 件は 2026-08-23 のまま）。dry-run の事前確認で両環境の <code>question_text</code> は 91 件すべて一意。<code>last_used_at</code> は不変（差し替えによる再投稿なし）。<strong>人間ゲート通過</strong>: 本実行はユーザー判断で Claude が代行（R-1-6 と同じ条件付き）、S3 実体の抜き取り再生確認も済み。方式設計書セクション 8 に R-2 の decision を追加・セット別設計書と本計画書を追随。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>① 承認済み ID をもとに <code>publish.py --dry-run</code> → 本実行（S3 差し替え + ローカル DB 更新）→ <code>work/update_prebuilt.sql</code> を Aurora へ適用（R-1-6 と同じ手順。実行は人間ゲート） ② <a href="../app/generators/quiz-prebuilt.html">方式設計書</a>セクション 8 の版面記述を採用値へ更新し decision に経緯（イラスト優先配分・サイズ可変の許容）を残す ③ セット記録に実施記録と差し替え日 ④ 本計画書ステータス表の「生成方式」行を更新し、確認待ちリストに「R-2 効果確認（差し替え 2 週間後。判定基準は R-1 と同じ）」を起票する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>手順は R-1-6 と同じ（<code>publish.py</code> の本実行と Aurora への SQL 適用は人間ゲート）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>両環境で <code>video_built_at</code> が差し替え日の行数 = 対象件数であることを件数クエリの出力で示す。</li>
+<li>設計書・記録・本計画書が実装に一致する。</li>
+<li>日本語メッセージでコミット → <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><code>publish.py</code> の実行と Aurora への SQL 適用、差し替え後の抜き取り再生確認。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code>・<code>content/</code> のみ）。stop after 20 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 差し替え 70 件・設計書追随</span></summary>
+<div class="plan-fold-inner"><p>詳細は<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</details>
+</section>
+
+<section class="plan-phase" data-plan-phase="R-3" id="phase-R-3">
+<h2 id="r-3">改修 R-3: 作問の 2 段階化（候補の直感選別 + 後日の振り返りでスキルを育てる）</h2>
+<p><strong>ゴール</strong>: <strong>補充中の人間の判定から理由の言語化を外し</strong>、反射的な OK / NG / 保留だけを返せるようにする。理由の整理は後日の振り返りへ分け、その成果で補充スキルを育てる。<strong>進行中</strong>（R-3-1 から着手する）。</p>
+<details class="plan-fold">
+<summary>改修の背景・決定の経緯 <span class="plan-hint">— ねらい・方針の要点・ゴールの区切り・不変条件・範囲外・評価・課題照合</span></summary>
+<div class="plan-fold-inner">
+<blockquote>
   起票 2026-09-21（アイデア体系の壁打ち 4 巡を経て採用。方針の正は<a href="../ideas/quiz-authoring-efficiency.html">アイデア詳細</a>、原文メモは<a href="../ideas/quiz-authoring-efficiency.md">アイデア MD</a>）。
-  <strong>ねらい</strong>: 補充 1 回あたりの負担の中心は「完成稿レビューでの差し替え」と「微妙さの理由をユーザーが毎回言語化して AI へ伝える往復」にある（2026-09-w3 は朝 A45 が 5 回差し替え・夜も全面再点検後にさらに差し替え）。<strong>補充中の人間の判定から理由の言語化を外し</strong>、反射的な OK / NG / 保留だけを返せるようにする。理由の整理は後日の振り返りへ分け、その成果で補充スキルを育てる。
+  <strong>ねらい</strong>: 補充 1 回あたりの負担の中心は「完成稿レビューでの差し替え」と「微妙さの理由をユーザーが毎回言語化して AI へ伝える往復」にある（2026-09-w3 は朝 A45 が 5 回差し替え・夜も全面再点検後にさらに差し替え）。
   <strong>方針の要点</strong>: ① 仕上げ前の<strong>候補を目標の 2 倍</strong>用意する（初回は朝 14・夜 14 = 28 候補。候補 = 問題文・答え・必要な図の内容だけ） ② 人間が候補に OK / NG / 保留を付ける（<strong>理由は任意</strong>。AI も推測で埋めない） ③ 不足が出たら<strong>不足数の 2 倍</strong>を朝夜別に追加し、朝 7・夜 7 の OK が揃ってから完成稿（つかみ・ヒント・情景・検証コード）へ進む ④ NG・保留は候補ディレクトリに原案・版・出典・判定とともに残し、後日 <code>quiz-review-learn</code>（仮称）で理由を言語化 → 修正 → 再判定し、<strong>一般化できたものだけ</strong>を補充スキルの作問基準へ差分で反映する。
   <strong>ゴールの区切り</strong>: G1 を <strong>G1a（候補準備）→ 人間の選別 → G1b（完成稿準備）→ 人間の承認</strong>に割る（途中の人間判断をゴールの中に入れない）。候補の追加は G1a へ戻る。G2（投入）・動画レビュー・G3（配置）は現行どおり。
   <strong>不変条件</strong>: Web リサーチと出典本文の確認・問題文 80 字・既出照合・投入直前の実行時同等検証（<a href="../issues/index.html#I-033">I-033</a> の対応②）・G2 / G3 のゲート・承認済み在庫の保護は維持する。既存在庫の作り直し、投稿頻度・動画仕様の変更は行わない。
   <strong>範囲外</strong>: <code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code>・共通設計書（開発レーン）。新スキルを Codex 直接セッションで使えるようにする登録（<code>AGENTS.md</code> の許可レーン一覧）は上位規約の変更にあたるため本改修に混ぜず、必要になった時点で<strong>開発レーンの別ステップ</strong>、または対象ファイルを名指ししたユーザー指示として扱う（新スキル本文に許可を書いて上位規約を上書きしない）。
   <strong>評価</strong>: 候補の NG 率が高いこと自体は失敗としない（多めに出す方式のため）。理由の説明なしで必要数の OK が揃ったか・完成稿からの差し替えが減ったかを<a href="#pending-checks">確認待ちリスト</a>で追う。過去の人間の読解時間・AI の実働時間は未計測のため、短縮率は出さない。
   <strong>課題表の照合（2026-09-21）</strong>: <a href="../issues/index.html#I-034">I-034</a>（R-1 後のコメント数低下）は夜スロットの出題内容が絡むため関連するが、演出との切り分けは本改修に同梱せず既存トリガー（2026-10-03 以降）を維持する。<a href="../issues/index.html#I-026">I-026</a>（#フェルミ推定 の残置）はキャプションテンプレートの課題で対象外。<strong>同梱が必要な据え置き課題はなし</strong>。
-</p>
-<div class="table-wrap"><table>
-<thead><tr><th>ステップ</th><th>内容</th><th>完了条件 / 人間ゲート / 停止点</th><th>状態</th></tr></thead>
-<tbody>
-<tr>
-  <td><strong>R-3-1</strong><br>候補保存形式と 2 段階の補充手順の整備</td>
-  <td><code>content/quiz-stock/logic-training-1/candidates/</code> に README と「1 候補 1 ファイル」のテンプレートを用意する（候補 ID・版・原案〔問題文 / 答え / 必要な図の内容〕・朝夜・出典・人間の判定・任意の理由・修正版の参照）。<strong>原記録を正とし、一覧には ID・状態・リンクだけ</strong>を持たせる（原案と判定は上書きせず、修正版は追記）。あわせて補充スキル <code>.agents/skills/quiz-stock-replenish/SKILL.md</code> を本方針へ改訂し、G1a / G1b の停止点・不足数の 2 倍の追加・朝夜別の集計・<strong>候補 OK と完成稿承認の区別</strong>・未レビュー / 余剰 OK・完成稿からの差し戻し・再開地点の記録を明記する。触るパス: 補充スキル、候補ディレクトリ、本計画書と<a href="logic-training-1-log.html">セット記録</a></td>
-  <td><strong>完了条件</strong>: ① テンプレート・説明・候補レビューの表示例が揃い、参照リンクと必須項目を確認できる ② <strong>投稿対象外と明示した検証例</strong>で、目標 朝 7 / 夜 7 → 候補 14 / 14、OK 朝 5 / 夜 4 → 追加 4 / 6、OK 朝 7 / 夜 5 → 追加 0 / 4 の集計結果を出力で示す ③ 未レビュー・NG・保留・余剰 OK・原案 → 修正版・完成稿 NG からの再選別を追跡する遷移例を残す（<strong>理由空欄が有効</strong>・同じ候補の複数版を重複加算しない・朝夜の片方だけ満たしても仕上げに進まない、を確認する） ④ Web 出典確認・問題文 80 字・既出照合・実行時同等検証・承認済み内容の保護・G2 / G3 のゲートが残っていることを<strong>旧手順との対応表</strong>で示す ⑤ 差分・参照・確認結果を記録し、対象ファイル指定でコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: なし（表示例・選別手順は R-3-3 でまとめて確認する。実際の週次補充では G1a 後の候補選別と G1b 後の完成稿承認が別々の人間ゲートになる）<br><strong>停止点</strong>: 保存形式・補充手順・検証例と記録の push まで。実際の 28 候補のリサーチ・作問、既存在庫の移行、画像生成・DB・S3 操作は行わない。検証例は実問題の承認記録や投入 SQL に混ぜない。<code>stop after 20 turns</code></td>
-  <td>⬜ <strong>未着手</strong></td>
-</tr>
-<tr>
-  <td><strong>R-3-2</strong><br>クイズ専用の振り返りスキルの整備（R-3-1 完了後）</td>
-  <td>新スキル <code>.agents/skills/quiz-review-learn/</code>（仮称。着手時に既存名との衝突を再確認する。2026-09-21 時点で同名なし）を作成する。手順は<strong>対象選択 → 原案確認 → 人間による理由の言語化 → AI の修正 → 再判定 → 個別修正 / 共通ルール / 仮説の分類 → 合意したスキル差分の反映 → 記録</strong>。反映先は <code>quiz-stock-replenish</code> の作問基準・参照例<strong>に限定</strong>する。振り返り成果の記録書式と、候補へ戻せる条件を R-3-1 の候補形式に合わせる。触るパス: 新スキル、候補ディレクトリの説明・検証例、補充スキルからの入口参照、本計画書と<a href="logic-training-1-log.html">セット記録</a></td>
-  <td><strong>完了条件</strong>: ① <code>SKILL.md</code> のメタ情報・相対参照・記録形式と対象範囲を確認できる ② 理由のない NG が<strong>仮説扱いのまま残る</strong>例、個別修正だけで共通ルールを変えない例、ユーザーが共通方針を明示してルール差分を作る例、修正版 OK が候補へ戻るが投入はされない例を残す ③ 原案・判定・修正版・根拠・更新するスキル箇所を相互に追える ④ 既存の承認例との衝突確認・合意前のルール変更禁止・理由不明の補完禁止・振り返りの全件消化や期限を必須にしないこと、が明記されている ⑤ 対応する実行環境と規約上の利用条件を記録する（<strong>規約登録をしていない環境を利用可能と称さない</strong>） ⑥ 書式・リンク・差分の確認結果とともにコミット → <code>pull --rebase</code> → push<br><strong>人間ゲート</strong>: R-3-3 で新スキルの手順と更新差分の例を確認する（実際の振り返りでは対象選択・理由の説明・修正版の判定・ルール差分の合意が人間の作業。これらを自動で成立させた扱いにしない）<br><strong>停止点</strong>: 新スキル・説明・検証例・記録の push まで。過去の NG / 保留の実判定、ユーザーの理由の生成、実データ由来の作問基準の更新、補充の開始は行わない。上位規約の変更が必要なら該当パスと実施条件を提示して別工程へ分ける。<code>stop after 20 turns</code></td>
-  <td>⬜ <strong>未着手</strong></td>
-</tr>
-<tr>
-  <td><strong>R-3-3</strong><br>候補レビューと振り返り手順の確認（ユーザー判断・ゴール対象外。R-3-2 完了後）</td>
-  <td>R-3-1・R-3-2 の<strong>投稿対象外の表示例</strong>を使い、① 短い候補に OK / NG / 保留だけを返せること ② 理由を求められず次へ進めること ③ 候補から完成稿への区切りが分かること ④ 後日の振り返りで原案と修正・ルールの差分を読み取れること、をユーザーが確認する</td>
-  <td><strong>完了条件</strong>: 候補の表示量・判定と追加の進め方・候補から完成稿への区切り・後日の振り返りとルール更新の 4 観点について OK / NG と go / no-go を記録する（実問題 28 問の選別や補充の完走は本確認に含めない）<br><strong>人間ゲート</strong>: <strong>このステップ自体が人間ゲート</strong>。go で手順整備を完了とし、実運用の結果は<a href="#pending-checks">確認待ちリスト</a>で追う。no-go は該当箇所を R-3-1 / R-3-2 の範囲で直してこの確認へ戻る<br><strong>停止点</strong>: —（ゴールにしない）。確認結果を本計画書と<a href="logic-training-1-log.html">セット記録</a>へ反映する。go を週次補充の自動開始や本番操作の許可とは扱わない</td>
-  <td>⬜ <strong>未着手</strong></td>
-</tr>
-</tbody>
-</table></div>
+</blockquote>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<article class="plan-step" id="step-R-3-1" data-step-id="R-3-1" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-3-1</strong><span class="plan-status">未着手</span></div>
+<h3>候補保存形式と 2 段階の補充手順の整備</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（改修の先頭）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>content/quiz-stock/logic-training-1/candidates/</code> に README と「1 候補 1 ファイル」のテンプレートを用意する（候補 ID・版・原案〔問題文 / 答え / 必要な図の内容〕・朝夜・出典・人間の判定・任意の理由・修正版の参照）。あわせて補充スキル <code>.agents/skills/quiz-stock-replenish/SKILL.md</code> を本方針へ改訂し、G1a / G1b の停止点・不足数の 2 倍の追加・朝夜別の集計・<strong>候補 OK と完成稿承認の区別</strong>・未レビュー / 余剰 OK・完成稿からの差し戻し・再開地点の記録を明記する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><strong>原記録を正とし、一覧には ID・状態・リンクだけ</strong>を持たせる（原案と判定は上書きせず、修正版は追記）。触るパス: 補充スキル、候補ディレクトリ、本計画書と<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>テンプレート・説明・候補レビューの表示例が揃い、参照リンクと必須項目を確認できる。</li>
+<li><strong>投稿対象外と明示した検証例</strong>で、目標 朝 7 / 夜 7 → 候補 14 / 14、OK 朝 5 / 夜 4 → 追加 4 / 6、OK 朝 7 / 夜 5 → 追加 0 / 4 の集計結果を出力で示す。</li>
+<li>未レビュー・NG・保留・余剰 OK・原案 → 修正版・完成稿 NG からの再選別を追跡する遷移例を残す（<strong>理由空欄が有効</strong>・同じ候補の複数版を重複加算しない・朝夜の片方だけ満たしても仕上げに進まない、を確認する）。</li>
+<li>Web 出典確認・問題文 80 字・既出照合・実行時同等検証・承認済み内容の保護・G2 / G3 のゲートが残っていることを<strong>旧手順との対応表</strong>で示す。</li>
+<li>差分・参照・確認結果を記録し、対象ファイル指定でコミット → <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし（表示例・選別手順は R-3-3 でまとめて確認する。実際の週次補充では G1a 後の候補選別と G1b 後の完成稿承認が別々の人間ゲートになる）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>保存形式・補充手順・検証例と記録の push まで。実際の 28 候補のリサーチ・作問、既存在庫の移行、画像生成・DB・S3 操作は行わない。検証例は実問題の承認記録や投入 SQL に混ぜない。<code>stop after 20 turns</code>。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-3-2" data-step-id="R-3-2" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-3-2</strong><span class="plan-status">未着手</span></div>
+<h3>クイズ専用の振り返りスキルの整備（R-3-1 完了後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-3-1 完了後。着手時に既存スキル名との衝突を再確認する（2026-09-21 時点で同名なし）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>新スキル <code>.agents/skills/quiz-review-learn/</code>（仮称）を作成する。手順は<strong>対象選択 → 原案確認 → 人間による理由の言語化 → AI の修正 → 再判定 → 個別修正 / 共通ルール / 仮説の分類 → 合意したスキル差分の反映 → 記録</strong>。振り返り成果の記録書式と、候補へ戻せる条件を R-3-1 の候補形式に合わせる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>反映先は <code>quiz-stock-replenish</code> の作問基準・参照例<strong>に限定</strong>する。触るパス: 新スキル、候補ディレクトリの説明・検証例、補充スキルからの入口参照、本計画書と<a href="logic-training-1-log.html">セット記録</a>。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>SKILL.md</code> のメタ情報・相対参照・記録形式と対象範囲を確認できる。</li>
+<li>理由のない NG が<strong>仮説扱いのまま残る</strong>例、個別修正だけで共通ルールを変えない例、ユーザーが共通方針を明示してルール差分を作る例、修正版 OK が候補へ戻るが投入はされない例を残す。</li>
+<li>原案・判定・修正版・根拠・更新するスキル箇所を相互に追える。</li>
+<li>既存の承認例との衝突確認・合意前のルール変更禁止・理由不明の補完禁止・振り返りの全件消化や期限を必須にしないこと、が明記されている。</li>
+<li>対応する実行環境と規約上の利用条件を記録する（<strong>規約登録をしていない環境を利用可能と称さない</strong>）。</li>
+<li>書式・リンク・差分の確認結果とともにコミット → <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>R-3-3 で新スキルの手順と更新差分の例を確認する（実際の振り返りでは対象選択・理由の説明・修正版の判定・ルール差分の合意が人間の作業。これらを自動で成立させた扱いにしない）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>新スキル・説明・検証例・記録の push まで。過去の NG / 保留の実判定、ユーザーの理由の生成、実データ由来の作問基準の更新、補充の開始は行わない。上位規約の変更が必要なら該当パスと実施条件を提示して別工程へ分ける。<code>stop after 20 turns</code>。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-3-3" data-step-id="R-3-3" data-status="todo" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-3-3</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>候補レビューと振り返り手順の確認（R-3-2 完了後）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-3-2 完了後。</p>
+<p data-field="result"><strong>現況：</strong>未確認。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>R-3-1・R-3-2 の<strong>投稿対象外の表示例</strong>を使い、① 短い候補に OK / NG / 保留だけを返せること ② 理由を求められず次へ進めること ③ 候補から完成稿への区切りが分かること ④ 後日の振り返りで原案と修正・ルールの差分を読み取れること、をユーザーが確認する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>実問題 28 問の選別や補充の完走は本確認に含めない。go を週次補充の自動開始や本番操作の許可とは扱わない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>候補の表示量・判定と追加の進め方・候補から完成稿への区切り・後日の振り返りとルール更新の 4 観点について OK / NG と go / no-go を記録する。</li>
+</ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><strong>このステップ自体が人間ゲート</strong>。go で手順整備を完了とし、実運用の結果は<a href="#pending-checks">確認待ちリスト</a>で追う。no-go は該当箇所を R-3-1 / R-3-2 の範囲で直してこの確認へ戻る。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>）。確認結果を本計画書と<a href="logic-training-1-log.html">セット記録</a>へ反映する。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>確認前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</section>
 
 <h2 id="pending-checks">4. 確認待ちリスト（トリガー付き）</h2>
 <p>初回試行・効果観察など「次の機会に確かめる」項目を、ステップにせずここで追う（2026-09-02 導入。ルールと列の意味は<a href="index.html#pending-checks">計画体系 5.2</a>）。補充スキルが起動時にこの表を照合する（開発レーン Phase 19-5 で導入）。確認したら結果を書き、OK なら<a href="logic-training-1-log.html">セット記録</a>へ移す。</p>

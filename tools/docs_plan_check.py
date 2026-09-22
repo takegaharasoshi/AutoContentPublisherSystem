@@ -13,9 +13,14 @@ from typing import Iterable, Sequence
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # 本番の検査対象ページ（リポジトリルートからの相対パス）。
-# 新様式へ移行した計画書だけを登録する（未移行のセット計画書は対象外）。
-# 25-2（2026-09-21）で開発計画を登録した。
-REGISTERED_PAGES: tuple[str, ...] = ("docs/plans/development-plan.html",)
+# 新様式へ移行した計画書だけを登録する。
+# 25-2（2026-09-21）で開発計画を、25-5（2026-09-22）でセット計画書 3 本を登録した。
+REGISTERED_PAGES: tuple[str, ...] = (
+    "docs/plans/development-plan.html",
+    "docs/plans/logic-training-1.html",
+    "docs/plans/pref-ranking-1.html",
+    "docs/plans/fantasy-animals-1.html",
+)
 
 _VOID_TAGS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link",
@@ -190,8 +195,20 @@ def check_text(page: str, text: str) -> list[PlanFinding]:
     if body is None or body.attrs.get("data-plan-format") != "1":
         add(0, "-", "page-format", "body に data-plan-format=\"1\" がありません")
 
+    declared = body.attrs.get("data-plan-steps") if body is not None else None
+    if declared is not None and declared != "none":
+        add(0, "-", "page-steps-unknown", "data-plan-steps は none だけが使えます")
+
     steps = [node for node in nodes if _is_step(node)]
-    if not steps:
+    if declared == "none":
+        if steps:
+            add(
+                steps[0].position,
+                "-",
+                "page-steps-declared",
+                "data-plan-steps=\"none\" のページにステップがあります",
+            )
+    elif not steps:
         add(0, "-", "page-empty", "article.plan-step がありません")
 
     for node in nodes:

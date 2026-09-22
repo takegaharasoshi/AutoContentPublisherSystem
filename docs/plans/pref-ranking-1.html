@@ -5,20 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>セット計画書: 表彰台五郎の都道府県ランキング | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body>
+<body data-plan-format="1">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / pref-ranking-1</nav>
 <h1>セット計画書: 表彰台五郎の都道府県ランキング（pref-ranking-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-09-19（開発レーン 22-2 でバックログを廃止。テスト投稿・初速確認は新設の確認待ちリストへ、時刻形式指標の参照行は削除〔正は課題体系〕）。前回: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新し、16-5 の参考行と 2026-08 の月次行〔ビューから転記〕を記入）</span>
+  <span>最終更新: 2026-09-22（25-5 で新様式へ移行。完了した改修 R-1 を <code>data-kind="legacy-completed"</code> のステップ枠に移し、構造検査へ登録した。ステータス節・確認待ちリストは表のまま）。前回: 2026-09-19（開発レーン 22-2 でバックログを廃止。テスト投稿・初速確認は新設の確認待ちリストへ、時刻形式指標の参照行は削除〔正は課題体系〕）。前回: 2026-09-03（16-12b〔開発レーン〕で KPI 欄を確定様式〔月次表〕に更新し、16-5 の参考行と 2026-08 の月次行〔ビューから転記〕を記入）</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  pref-ranking-1 の<strong>運用ステータス・進行中ステップ・確認待ちリスト</strong>を管理する（課題は<a href="../issues/index.html#lane-pref-ranking-1">課題体系</a>）（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="pref-ranking-1-log.html">セット記録</a>へ追記する。セットの仕様の正は<a href="../app/sets/pref-ranking-1.html">セット別設計書</a>、動画・ビルドの技術設計は<a href="../app/generators/ranking-prebuilt.html">方式設計書</a>、補充手順の正は <a href="../app/operation.html">operation.html</a> セクション 3 + スキル <code>/ranking-stock-replenish</code>、執筆・レビューの勘所は <a href="../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a>。
+  pref-ranking-1 の<strong>運用ステータス・改修とステップ・確認待ちリスト</strong>を管理する（課題は<a href="../issues/index.html#lane-pref-ranking-1">課題体系</a>）（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="pref-ranking-1-log.html">セット記録</a>へ追記する。セットの仕様の正は<a href="../app/sets/pref-ranking-1.html">セット別設計書</a>、動画・ビルドの技術設計は<a href="../app/generators/ranking-prebuilt.html">方式設計書</a>、補充手順の正は <a href="../app/operation.html">operation.html</a> セクション 3 + スキル <code>/ranking-stock-replenish</code>、執筆・レビューの勘所は <a href="../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a>。
 </div>
 
 <h2>1. ステータス</h2>
@@ -36,22 +37,45 @@
 <h2 id="backlog">2. バックログ（廃止）</h2>
 <p>22-2〔2026-09-19〕で廃止。旧 2 行は「テスト投稿・初速確認」を本書の<a href="#pending-checks">確認待ちリスト</a>へ、「時刻・時間分形式の指標」の参照行は削除（正は課題体系 <a href="../issues/index.html#I-023">I-023</a>。対象パスにセット名を書いてあり補充スキルが照合する）。以後、セットの課題は<a href="../issues/index.html#lane-pref-ranking-1">課題体系の pref-ranking-1 節</a>へ起票する。</p>
 
-<h2>3. 進行中ステップ</h2>
-<p>現在なし（直近の改修 R-1 は 2026-08-29 に完了）。</p>
+<h2>3. 改修とステップ</h2>
+<p>改修（R-x）を <code>section.plan-phase</code>、その下のステップを <code>article.plan-step</code> で書く（様式の正は<a href="index.html#step-layout">計画体系 5.0</a>、枠は<a href="_templates/step.html">ステップ記載テンプレート</a>）。<strong>進行中の改修は現在なし</strong>（直近の R-1 は 2026-08-29 に完了）。</p>
 
-<h2>4. 完了した改修</h2>
-<div class="table-wrap"><table>
-<thead><tr><th>改修</th><th>内容</th><th>完了日</th></tr></thead>
-<tbody>
-<tr>
-  <td><strong>R-1</strong><br>冒頭フック改善<br>（ミュート離脱対策）</td>
-  <td>0.00〜5.00 秒の実質静止画を解消（<strong>予熱スピン</strong> = フレーム 0 から本番と同等の最高速で県を点滅・変化点は発光強度で作る / <strong>煽り吹き出しのポップイン + 揺れ</strong>を 0〜1 秒に集中）。タイムライン定数 <code>DURATION_SPECS</code> は無変更。<strong>使用済みを含む在庫全 30 件を再ビルドして S3・両環境 DB を差し替え</strong>。仕様は<a href="../app/generators/ranking-prebuilt.html">方式設計書セクション 8.2</a> の decision〔2026-08-29、R-1〕、実施記録は<a href="pref-ranking-1-log.html">セット記録セクション 3</a>、経緯は<a href="../ideas/ranking-opening-hook.md">アイデア記録</a>が正</td>
-  <td><strong>2026-08-29</strong><br><span class="muted">新版の初出は同日 20:00 JST の投稿</span></td>
-</tr>
-</tbody>
-</table></div>
+<section class="plan-phase" data-plan-phase="R-1" id="phase-R-1">
+<h2 id="r-1">改修 R-1: 冒頭フック改善（ミュート離脱対策）</h2>
+<p><strong>ゴール</strong>: 0.00〜5.00 秒が実質静止画で、ミュート視聴者が冒頭で離脱する状態を解消する。</p>
+<details class="plan-fold">
+<summary>改修の背景・決定の経緯 <span class="plan-hint">— 仕様・記録・経緯の所在</span></summary>
+<div class="plan-fold-inner">
+<blockquote>仕様の正は<a href="../app/generators/ranking-prebuilt.html">方式設計書セクション 8.2</a> の decision〔2026-08-29、R-1〕、実施記録は<a href="pref-ranking-1-log.html">セット記録セクション 3</a>、着想から採用までの経緯は<a href="../ideas/ranking-opening-hook.md">アイデア記録</a>が正。<strong>タイムライン定数 <code>DURATION_SPECS</code> は無変更</strong>（尺 30 秒単尺の確定〔2026-08-24〕を動かさない）。</blockquote>
+</div>
+</details>
 
-<h2 id="pending-checks">5. 確認待ちリスト（トリガー付き）</h2>
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 1 件（クリックで展開）</summary>
+<div class="plan-group-inner">
+
+<article class="plan-step" id="step-R-1" data-step-id="R-1" data-status="done" data-completed="2026-08-29" data-kind="legacy-completed">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1</strong><span class="plan-status">完了</span><span>2026-08-29</span><span class="plan-kind">旧形式の完了ステップ</span></div>
+<h3>冒頭フックの実装と在庫全件の差し替え</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>—（完了済みのため記録なし）。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-08-29 完了</strong>。使用済みを含む在庫全 30 件を再ビルドして S3・両環境 DB を差し替え、新版の初出は同日 20:00 JST の投稿。効果の確認は<a href="#pending-checks">確認待ちリスト</a>の月次 KPI 転記で追う。<strong>当時の完了条件・人間ゲート・停止点は記録されていない</strong>（本改修は 1 ステップに分解されないまま実施された。推測で書き起こさず記録へのリンクで代替する）。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>0.00〜5.00 秒の実質静止画を解消する（<strong>予熱スピン</strong> = フレーム 0 から本番と同等の最高速で県を点滅・変化点は発光強度で作る / <strong>煽り吹き出しのポップイン + 揺れ</strong>を 0〜1 秒に集中）。タイムライン定数 <code>DURATION_SPECS</code> は無変更。<strong>使用済みを含む在庫全 30 件を再ビルドして S3・両環境 DB を差し替える</strong>。</p></div>
+</section>
+<section data-field="record"><h4>2. 作業記録</h4>
+<p>実施記録は<a href="pref-ranking-1-log.html">セット記録セクション 3</a>、仕様は<a href="../app/generators/ranking-prebuilt.html">方式設計書セクション 8.2</a> の decision、経緯は<a href="../ideas/ranking-opening-hook.md">アイデア記録</a>。</p>
+</section>
+</div>
+</article>
+
+</div>
+</details>
+</section>
+
+<h2 id="pending-checks">4. 確認待ちリスト（トリガー付き）</h2>
 <p>初回試行・効果観察など「次の機会に確かめる」項目を、ステップにせずここで追う（22-2〔2026-09-19〕で新設。ルールと列の意味は<a href="index.html#pending-checks">計画体系 5.2</a>）。補充スキルが起動時にこの表を照合する。確認したら結果を書き、OK なら<a href="pref-ranking-1-log.html">セット記録</a>へ移す。</p>
 <div class="table-wrap"><table>
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>

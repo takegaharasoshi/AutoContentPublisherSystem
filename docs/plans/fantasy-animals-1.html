@@ -5,20 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>セット計画書: 架空のかわいい動物図鑑 | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body>
+<body data-plan-format="1" data-plan-steps="none">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / fantasy-animals-1</nav>
 <h1>セット計画書: 架空のかわいい動物図鑑（fantasy-animals-1）</h1>
 <div class="page-meta">
   <span class="badge badge-future">停止（2026-09-03）</span>
-  <span>最終更新: 2026-09-03（20-1〔開発レーン〕で停止を実施。Scheduler 3 件削除 + <code>is_active = 0</code>。セットレーンの作業は今後発生しない）</span>
+  <span>最終更新: 2026-09-22（25-5 で新様式へ移行。ステップは 0 件のままで <code>data-plan-steps="none"</code> を宣言し、構造検査へ登録した）。前回: 2026-09-03（20-1〔開発レーン〕で停止を実施。Scheduler 3 件削除 + <code>is_active = 0</code>。セットレーンの作業は今後発生しない）</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  fantasy-animals-1 の<strong>運用ステータス・進行中ステップ</strong>を管理する（課題は<a href="../issues/index.html">課題体系</a>）（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="fantasy-animals-1-log.html">セット記録</a>へ追記する。セットの仕様の正は<a href="../app/sets/fantasy-animals-1.html">セット別設計書</a>。
+  fantasy-animals-1 の<strong>運用ステータス</strong>を管理する（停止済みのためステップはない）（課題は<a href="../issues/index.html">課題体系</a>）（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="fantasy-animals-1-log.html">セット記録</a>へ追記する。セットの仕様の正は<a href="../app/sets/fantasy-animals-1.html">セット別設計書</a>。
 </div>
 
 <h2>1. ステータス</h2>
@@ -36,8 +37,8 @@
 <h2 id="backlog">2. バックログ（廃止）</h2>
 <p>22-2〔2026-09-19〕で廃止（移設対象 0 行）。停止セットのため課題体系に専用の節は置かず、本セットに関する課題が出たら関係セットを課題文に書いて<a href="../issues/index.html#lane-dev">課題体系の開発レーン節</a>へ起票する。</p>
 
-<h2>3. 進行中ステップ</h2>
-<p>なし（停止済み）。停止の実施は開発レーン <a href="development-plan.html">Phase 20-1</a> で完了（2026-09-03）。deploy と Aurora への <code>is_active = 0</code> 適用も同日に実施済み（本番 Scheduler 一覧から 3 件が消えたことを実測）。停止の効果確認は開発計画書の確認待ちリストで 2026-09-04 に追う。</p>
+<h2 id="steps">3. ステップ</h2>
+<p><strong>なし（停止済み。今後も発生しない）</strong>。本書は新様式（25-5）では<strong>ステップを持たないページ</strong>として <code>&lt;body data-plan-steps="none"&gt;</code> を宣言しており、構造検査はステップ 0 件を正常として扱う（ステップを足す場合はこの宣言を外し、<a href="_templates/step.html">ステップ記載テンプレート</a>の枠で書く）。停止の実施は開発レーン <a href="development-plan.html">Phase 20-1</a> で完了（2026-09-03）。deploy と Aurora への <code>is_active = 0</code> 適用も同日に実施済み（本番 Scheduler 一覧から 3 件が消えたことを実測）。停止の効果確認は開発計画書の確認待ちリストで 2026-09-04 に追う。</p>
 
 </div>
 </body>

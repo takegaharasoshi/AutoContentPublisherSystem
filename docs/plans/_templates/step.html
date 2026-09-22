@@ -176,7 +176,7 @@
 <div class="table-wrap"><table>
 <thead><tr><th>対象</th><th>書き方</th><th>検査で NG になる例</th></tr></thead>
 <tbody>
-<tr><td>ページ</td><td><code>&lt;body data-plan-format="1"&gt;</code>。検査対象は <code>docs_plan_check.py</code> の明示リストで管理する</td><td>登録済みページから属性を消す / ステップ 0 件 / 旧形式の行が混ざる</td></tr>
+<tr><td>ページ</td><td><code>&lt;body data-plan-format="1"&gt;</code>。検査対象は <code>docs_plan_check.py</code> の <code>REGISTERED_PAGES</code> で管理する。<strong>ステップを 1 件も持たないページ</strong>（停止セットの計画書など）は <code>data-plan-steps="none"</code> を併記して明示する（25-5 で追加）</td><td>登録済みページから属性を消す / 宣言のないページでステップ 0 件 / <code>data-plan-steps="none"</code> のページにステップがある / <code>none</code> 以外の値 / 旧形式の行が混ざる</td></tr>
 <tr><td>フェーズ</td><td><code>section.plan-phase[data-plan-phase]</code>。中に完了済みグループ（<code>details[data-plan-group="done"]</code>・<code>open</code> を付けない）と進行中グループ（<code>[data-plan-group="active"]</code>）を置き、<strong>完了済みが先</strong></td><td>完了済みが進行中より後 / 完了済みグループに <code>open</code></td></tr>
 <tr><td>ステップ</td><td><code>article.plan-step</code> + <code>id="step-&lt;ID&gt;"</code> + <code>data-step-id</code> + <code>data-status="todo|doing|done|blocked"</code>。<code>done</code> は <code>data-completed="YYYY-MM-DD"</code> が必須</td><td>ID 重複 / <code>done</code> が進行中グループにある / 完了日なし</td></tr>
 <tr><td>常時表示の欄</td><td><code>data-field="overview|prerequisites|constraints|acceptance|gate|stop|result"</code>。空欄不可（該当なしは明記）。<code>acceptance</code> は <code>ul</code> / <code>ol</code></td><td>必須欄の削除 / 空欄 / 完了条件が折りたたみの中</td></tr>

@@ -94,7 +94,7 @@
 </ul>
 
 <h3 id="step-layout">5.0 移行済み計画書の記載様式（Phase 25 で導入）</h3>
-<p><strong>適用対象は新様式へ移行済みの計画書だけ</strong>（2026-09-21 時点は<a href="development-plan.html">開発計画</a>のみ。セット計画書は未移行で、上の 4 項目をそのままの形で書く）。移行済み計画書では、1 ステップを<strong>常時表示の要点</strong>と<strong>折りたたみ</strong>に分けて書く。</p>
+<p><strong>適用対象は <code>tools/docs_plan_check.py</code> の <code>REGISTERED_PAGES</code> に登録された計画書</strong>（25-5〔2026-09-22〕で<a href="development-plan.html">開発計画</a>と<strong>セット計画書 3 本</strong>〔<a href="logic-training-1.html">logic-training-1</a>・<a href="pref-ranking-1.html">pref-ranking-1</a>・<a href="fantasy-animals-1.html">fantasy-animals-1</a>〕がすべて移行済みになった。<strong>新しいセット計画書は最初から新様式で作り登録する</strong>）。移行済み計画書では、1 ステップを<strong>常時表示の要点</strong>と<strong>折りたたみ</strong>に分けて書く。<strong>セット計画書では改修（R-x）が <code>section.plan-phase</code>、その下のステップ（R-x-n）が <code>article.plan-step</code></strong>に当たり、ステータス節・確認待ちリストは<strong>表のまま</strong>置く。<strong>ステップを 1 件も持たない計画書</strong>（停止セット等）は <code>&lt;body data-plan-format="1" data-plan-steps="none"&gt;</code> と宣言する（宣言したページにステップを書くと検査が NG にする）。</p>
 <div class="table-wrap"><table>
 <thead><tr><th>置き場所</th><th>書くこと</th><th>旧 4 項目との対応</th></tr></thead>
 <tbody>

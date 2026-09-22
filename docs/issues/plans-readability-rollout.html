@@ -32,7 +32,7 @@
 <h2 id="contract">2. テンプレートと検査の契約</h2>
 <p>見出しの日本語だけで機械判定せず、HTML に構造を示す属性を付ける。本文の正は各計画書であり、属性は検査と表示のために使う。</p>
 <ul>
-<li>ページ：<code>data-plan-format="1"</code>。検査対象はモジュール内の明示リストに登録し、この属性を消しても検査を回避できない。登録済みページのファイル削除、ステップ 0 件、形式の混在も NG。</li>
+<li>ページ：<code>data-plan-format="1"</code>。検査対象はモジュール内の明示リストに登録し、この属性を消しても検査を回避できない。登録済みページのファイル削除、ステップ 0 件、形式の混在も NG。<strong>25-5（2026-09-22）で追加</strong>：ステップを 1 件も持たないページは <code>data-plan-steps="none"</code> で明示的に宣言した場合だけステップ 0 件を許す（宣言したページにステップがある、<code>none</code> 以外の値を書く、はどちらも NG）。</li>
 <li>フェーズ：<code>data-plan-phase</code>。内部に完了済みグループと進行中グループを持ち、完了済みが先。完了済みグループは <code>details</code> で <code>open</code> を付けない。</li>
 <li>ステップ：<code>article.plan-step</code>、安定した <code>id="step-21-6"</code>、<code>data-step-id</code>、<code>data-status="todo|doing|done|blocked"</code>。完了状態は完了日が必須。ID 重複と状態に合わないグループ配置を NG とする。</li>
 <li>常時表示の欄：<code>data-field="overview|prerequisites|constraints|acceptance|gate|stop|result"</code>。空欄は不可で、該当なしなら明記する。完了条件は <code>ul/ol</code> のリストで、実装詳細や記録の折りたたみ内に入れてはいけない。完了済みグループ自体の折りたたみは許容する。</li>
