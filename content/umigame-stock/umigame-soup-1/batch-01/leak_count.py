@@ -20,6 +20,7 @@ CORE = {
     "U15": ["ラジオ", "配信", "遅れ", "電波", "数十秒", "過去"],
     "U16": ["氷鬼", "鬼ごっこ", "鬼", "タッチ", "遊", "ルール"],
     "U17": ["金魚鉢", "ガラス", "レンズ", "虫めがね", "集め", "収れん"],
+    "U18": ["消せる", "フリクション", "熱", "透明", "ドライヤー", "こする", "摩擦"],
 }
 path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "work" / "probe_results.json"
 d = json.load(open(path, encoding="utf-8"))
