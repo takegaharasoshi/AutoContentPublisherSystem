@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-22（<strong>21-4a-4 ゴール 1/3 壁打ち完了</strong>: story.md の再設計方針を物語先行方式で合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕。次はゴール 2/3 = story.md + validate.py の改修）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -306,12 +306,12 @@
 
 <div class="plan-group" data-plan-group="active">
 
-<article class="plan-step" id="step-21-4a-4" data-step-id="21-4a-4" data-status="todo">
+<article class="plan-step" id="step-21-4a-4" data-step-id="21-4a-4" data-status="doing">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-4a-4</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-4a-4</strong><span class="plan-status">進行中</span></div>
 <h3>物語復元型の作り方の壁打ちとスキル再設計</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-4a-3 の完了後。</p>
-<p data-field="result"><strong>現況：</strong>未着手（再設計の草案と論点 3 件は 21-4a-3 の U20 の巡で提示済み。会話記録と <code>STATUS.md</code> 参照）。</p>
+<p data-field="result"><strong>現況：</strong>進行中（ゴール 1/3 = 壁打ちは 2026-09-22 完了。論点 3 件は 一本化 / ゴール A で物語 2〜3 本 + 切り出し案を提示 / U20 旧候補は全て破棄 に決定。次はゴール 2/3 = <code>story.md</code> の書き換えと <code>validate.py</code> 追随）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -339,8 +339,10 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。着手は <code>/step 21-4a-4</code> から。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— ゴール 1/3 壁打ち（2026-09-22）</span></summary>
+<div class="plan-fold-inner">
+<p><strong>ゴール 1/3 壁打ち（2026-09-22 完了）</strong>: 参照記事の「物語復元型 = 隠蔽。ミスリードは要件でなく、カタルシスは復元できたこと自体から来る」に立ち返り、現行 story.md が必須にしていた「誤った補完 X の強制・役割の逆転か皮肉・前提を壊す反転」を必須要件から外す再設計案を提示。<strong>論点 3 件のユーザー決定</strong>: ① <strong>物語先行方式へ一本化</strong>（旧 U17〜U19 の「仕組みの反転」型は story.md に残さない。仕組みトリック系の案は U18 の前例どおり misdirection 側で語の仕掛けが立つかで判断）② <strong>物語ゲートはゴール A に置き、物語 2〜3 本 + 各の切り出し案を提示</strong>して選んでもらう（1 問 = 2 ゴール・人間ゲート 1 回は維持。NG 理由は「物語」「切り出し」に分けて記録。1 候補ずつ出して 5 連続 NG になった U20 の巡の反省）③ <strong>U20 の旧候補 5 案は全て破棄し新抽選で試作</strong>（no U20 の枠だけ再利用）。<strong>再設計案の骨子</strong>: 工程 1S = 連想を「仕組み・性質」から「その語のまわりで人に起きる出来事・事情・感情の動き」へ / 工程 2S = 5〜7 文の完結した物語を先に書き、物語単体の面白さ（話したくなるか。意外な事情・感情の反転・偶然の妙・小さな善意や皮肉のどれか）と現実性をここで検査 / 工程 3S = 切り出しの設計がコア（どこを隠すと A→C が最も不可解に見え復元の納得が最大か。B は出来事・事情・事実で気持ちだけは不可。仕組みは要求しない）/ 工程 4S = 現行流用（「X を壊さない」は「説明の候補が複数残る書き方」へ言い換え）/ 検査軸は<strong>物語単体の面白さ・切り出し後の不可解さ・復元の納得感</strong>の 3 本。コア宣言の様式は「コア: 物語「&lt;一文要約&gt;」の &lt;B&gt; を隠して「&lt;A→C の見え方&gt;」を出す → 復元: &lt;B を戻した一文&gt;」とし、<code>validate.py</code> の story 用正規表現を置き換える（既存 7 問は misdirection のため影響なし）。SKILL.md は misdirection 側の工程を変えず、story に言及する行（型表・工程 3 の様式・工程 9 の source_note）だけ最小改訂する。詳細は <code>content/umigame-stock/umigame-soup-1/batch-01/STATUS.md</code>。<strong>次</strong>: ゴール 2/3（story.md 書き換え + validate.py 追随）→ ゴール 3/3（新抽選で試作 1 問のコアゲート）。</p>
+</div>
 </details>
 </div>
 </article>
