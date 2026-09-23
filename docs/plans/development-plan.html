@@ -351,12 +351,12 @@
 
 <div class="plan-group" data-plan-group="active">
 
-<article class="plan-step" id="step-21-4a-5" data-step-id="21-4a-5" data-status="todo">
+<article class="plan-step" id="step-21-4a-5" data-step-id="21-4a-5" data-status="doing">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-4a-5</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-4a-5</strong><span class="plan-status">作業中</span></div>
 <h3>新スキルによる物語復元型 7 問の作問（全 14 問化）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-4a-4 の完了後（story.md の Fix 後）。<strong>2026-09-23 に充足</strong>（story.md Fix 済み・U20 のコア承認済み）。</p>
-<p data-field="result"><strong>現況：</strong>未着手（1 問目は U20「間違えたのは誰か」の素材化〔ゴール B〕から。承認済みコアは <code>STATUS.md</code>「U20 の試作候補・2 巡目」）。</p>
+<p data-field="result"><strong>現況：</strong>story 1/7。U20「間違えたのは誰か」を素材化し機械検査は全 OK（2026-09-23）。素材一式の人間ゲート待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -377,8 +377,8 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。着手は <code>/step 21-4a-5</code> から。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— 進行中</span></summary>
+<div class="plan-fold-inner"><p><strong>U20 ゴール B（2026-09-23・素材化）</strong>: 承認済みコアから工程 4S〜9 を実施し、<code>stock_items.py</code> に U20（<code>content_key</code> 008-who-made-the-mistake・story・難易度 4）を追加。<strong>切り出しの変更 1 件</strong>: 場面を「発表会の講師の模範演奏」から「ピアノの演奏会」へ移した（教室・発表会は家族に習う人がいることを指す A 型手がかりになり、講師が生徒の曲を弾く現実性も弱いため。A = 0 個で難易度 4）。コア宣言は上限 120 字に収めるため復元部分だけ「男は娘がつっかえる箇所ごと曲を覚えていた」に縮めた（意味は不変）。Web 照合（WebSearch 2 クエリ）で同一・近い真相なし、台帳 #09 は構造が別。機械検査: <code>validate.py</code> 全 8 問 OK（警告 0）/ プローブ 不一致 0・核心語漏れ 0（U20 は想定 17 問）/ <code>generate.py --dry-run</code> 8 件 OK。素材一式とプローブ結果を人間ゲートへ提示。確認待ち: 該当なし。課題表: 該当なし。</p></div>
 </details>
 </div>
 </article>

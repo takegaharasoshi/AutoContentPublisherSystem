@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（7 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（8 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -204,3 +204,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。21-4a-3 ④ の型別分離（2026-09-22・ユーザー決定）で、人間ゲート通過済みの story 版 U18「濡れた手紙を乾かしたら白紙になった」を、仕組み（消せるボールペンのインクが熱で消える）の面白さを買われて意味誤誘導型に書き換えたもの（U15 と差し替えて存続）。語の仕掛けは定型表現「（約束が）白紙に戻る」の文字どおりへの反転。誤認先の常識「取り消されたら悲しむ・守られない」の逆（悲しまない・果たされた）を 1 つ足した。着想元の既存問題なし（台帳に該当なし。story 版の Web 照合で同じ仕組みの投稿問題なし）。書き換え時の Web 照合をコアゲート前に先行し、「約束が白紙 × 消えるインク」のコアは日英とも該当なし。「白紙に戻る」の文字どおり化という語仕掛けが重なる投稿問題 1 件（反転後は折り紙で別）を提示の上、人間ゲートで採用。詳細は開発記録 21-4a-3 ④。', 1);
+
+-- U20 間違えたのは誰か
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '008-who-made-the-mistake', '間違えたのは誰か', 4,
+        'ピアノの演奏会で、男は途中で「あ、間違えた」と小声で言った。ピアニストの演奏は一音も外さない完璧なものだった。隣で聞いた女は、こらえきれずに吹き出した。どういうこと？',
+        '男は音楽に詳しくなく、ピアノも弾けない。男の娘は半年前からピアノを習い始め、毎晩リビングで同じ有名な曲を練習していた。娘は曲の同じ場所で決まってつっかえ、少し違う音で弾いてから先へ進む。男は皿を洗いながら毎晩それを聞くうちに、娘のつっかえ方ごと曲を覚え、鼻歌で歌えるようになっていた。演奏会でピアニストがその曲を弾いたとき、娘がいつも違う音で弾く場所で正しい音が鳴ったので、男は「間違えた」と本気で思った。隣の妻も毎晩娘の練習を聞いていたので、夫がどこで覚えた曲なのかがすぐに分かり、こらえきれずに笑った。間違えていたのはピアニストではなく、男が覚えた曲のほうだった。',
+        '["ピアニストは一音も間違えていない。楽譜どおりの正しい演奏だった","男は音楽に詳しくなく、ピアノも弾けない","男の耳や記憶力に問題があるわけではない","男はその曲をよく知っていて、鼻歌で歌えるほどだった","男がその曲を覚えたのは、CD・テレビ・ラジオ・動画からではない","男はその曲を、演奏会の前から毎日のように聞いていた","男が聞き慣れていた曲は、ある一か所がいつも同じように違っていた（なぜ違うのかは答えの核心。正解宣言のとき以外は補足で言わない）","別の編曲・別の版の楽譜の話ではない","隣の女は男の妻で、男がなぜそう言ったのかをすぐに分かった","女は男をばかにしたのではない。おかしくて、ほほえましくて笑った","ピアニストの名前・曲名・会場の場所は問題に関係ない"]',
+        '[{"q":"ピアニストは本当に間違えましたか？","a":"いいえ"},{"q":"男は音楽の専門家ですか？","a":"いいえ"},{"q":"男はその曲を知っていましたか？","a":"はい"},{"q":"男は別の編曲を聴き慣れていたのですか？","a":"いいえ"},{"q":"男は耳が悪いのですか？","a":"いいえ"},{"q":"男はその曲をCDやテレビで覚えましたか？","a":"いいえ"},{"q":"男は誰かが弾くのを聞いて曲を覚えましたか？","a":"はい"},{"q":"それは男の家族ですか？","a":"はい"},{"q":"その家族はプロのピアニストですか？","a":"いいえ"},{"q":"その家族はピアノを習っている途中ですか？","a":"はい"},{"q":"家族の弾き方には、いつも違うところがありましたか？","a":"はい"},{"q":"隣の女は男の家族ですか？","a":"はい"},{"q":"女は男をばかにして笑ったのですか？","a":"いいえ"},{"q":"女には男がそう言った理由が分かりましたか？","a":"はい"},{"q":"曲名は関係ありますか？","a":"関係ない"},{"q":"会場の場所は関係ありますか？","a":"関係ない"},{"q":"男は、娘が家で毎晩同じところを間違えて弾く練習を聞いてその曲を覚えていたので、ピアニストの正しい演奏を間違いだと思った。","a":"正解"}]',
+        '間違えたのは誰か', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"ピアノの演奏会で、男は途中で、あ、間違えた、と小声で言った。ピアニストの演奏は一音も外さない完璧なものだった。隣で聞いた女は、こらえきれずに吹き出した。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"ピアニストが間違えた？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男はその曲を知ってた？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"CDで覚えた？"},{"role":"master","text":"いいえ。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: Inside a small concert hall, a pianist in formal clothes playing a grand piano on the stage under warm stage lights; in the audience seats a man leans toward the woman beside him and whispers with a puzzled, serious face, while the woman covers her mouth, trying hard not to burst out laughing; no child, no sheet music, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+ピアノの演奏会で、男は途中で「あ、間違えた」と小声で言いました。ピアニストの演奏は一音も外さない完璧なものだったのに。
+
+ピアノの演奏会で、男は途中で「あ、間違えた」と小声で言った。ピアニストの演奏は一音も外さない完璧なものだった。隣で聞いた女は、こらえきれずに吹き出した。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式・21-4a-4 で新方式の初通過）。モチーフ「ピアノ」（抽選: ハンコ / ピアノ / ポスト）→ 連想（発表会・家での練習をいつも聞いている親・同じ箇所で止まる 等 16 件）→ 物語「娘の練習の間違いごと曲を覚えた父」→ 隠した B = 娘が毎晩同じ箇所で間違える練習を聞いて曲を覚えていたこと。着想元の既存問題なし（台帳 #09「音楽が止まって困る曲芸師」は音の実用的役割で構造が別）。Web 照合（ラテシン・らてらて・note・X・英語圏）で同一・近い真相の投稿問題なし。素材化時に場面を発表会の講師演奏から一般の演奏会へ移した（教室・発表会は家族に習う人がいる手がかりになるため）。', 1);
