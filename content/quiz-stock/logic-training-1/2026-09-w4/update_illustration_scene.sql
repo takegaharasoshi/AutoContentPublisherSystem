@@ -1,0 +1,9 @@
+-- 2026-09-w4 動画レビューでのイラスト修正: illustration_scene を 4 問更新(A47・A50・C51・C52。A47・C51 は 3 巡目の修正込みの最終値)。set_code + question_text で解決(ローカル / Aurora 共通・再適用しても同じ結果)
+-- A47
+UPDATE quiz_stock_items s JOIN batch_sets b ON b.id = s.set_id SET s.content_fields = JSON_SET(s.content_fields, '$.illustration_scene', '朝日の駐車場を真上から見下ろす。画面上側は中央線のない場内通路で、奥に向かい側のマスの端が見える。6つのマスが横一列に並び、「?」のマスを含む全マスの下端に車止めがある。各マスの上端の地面に白いペンキで、こちらから見て左から「16」「06」「68」「88」「?」「98」と大きく書く。「?」のマスにだけ赤い車が後ろ向き駐車で止まり、頭は上を向く。?は車の頭の上に見える。他の文字・人物は描かない。') WHERE b.set_code = 'logic-training-1' AND s.question_text = '上から見た駐車場の絵だ。マスの番号には、ある決まりがある。車が止まっている「?」のマスは何番?';
+-- A50
+UPDATE quiz_stock_items s JOIN batch_sets b ON b.id = s.set_id SET s.content_fields = JSON_SET(s.content_fields, '$.illustration_scene', '朝日が差す木の机の上に電卓が1台、正位置で置かれ、画面の大部分を占めるほど大きく近くから描く。液晶画面に角ばったデジタル数字で「0.7734」と表示されている。電卓の上に大きな「?」。文字は「0.7734」と「?」だけを描き、ボタンの文字・手・人物は描かない。') WHERE b.set_code = 'logic-training-1' AND s.question_text = '電卓で「0.7734」と打つと、画面にある言葉が隠れている。なんと読む?';
+-- C51
+UPDATE quiz_stock_items s JOIN batch_sets b ON b.id = s.set_id SET s.content_fields = JSON_SET(s.content_fields, '$.illustration_scene', '夜の街灯に照らされた、広めの一車線の一方通行の道路を少し上から見下ろす。中央線は描かない。道ばたに白い矢印が横向き(左向き)の長方形の青い一方通行標識が立つ。道の少し先の歩道に、こちらを向いて立つ警察官が中くらいの大きさで見える(この問題は顔を描いてよい)。道路の上に大きな「?」。トラック・車・歩く人・文字は描かない。') WHERE b.set_code = 'logic-training-1' AND s.question_text = 'トラックの運転手が、一方通行の道を逆向きに進んでいた。すぐそばの警察官は、注意もせずに見送った。なぜ?';
+-- C52
+UPDATE quiz_stock_items s JOIN batch_sets b ON b.id = s.set_id SET s.content_fields = JSON_SET(s.content_fields, '$.illustration_scene', '夜の街灯の下、真横から見た路線バス。見えている側面には同じ形の窓が並ぶだけで、ドアは1つもない。車体の前後は同じ形にし、運転席・ライト・ミラー・行き先表示は描かない。地面は模様のない一色の平らな面にし、車線・白線・歩道・縁石・ガードレールは描かない。バスの上に大きな「?」。人物・文字・数字は描かない。') WHERE b.set_code = 'logic-training-1' AND s.question_text = '日本の路線バスの絵だ。このバスは、右と左のどちらへ走っている?';
