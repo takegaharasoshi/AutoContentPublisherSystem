@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（11 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（12 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -320,3 +320,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「自動販売機」（抽選: シール / 時計 / 自動販売機。引き直し 2 回: たまご / 毛糸 / 片づけ・くしゃみ / 朝顔 / チャイム）→ 連想（お釣りの取り出し口をのぞく子ども・当たり付き・店先の自販機・売り上げは持ち主に入る 等 9 件）→ 物語「祖父がこっそり置いた十円玉が孫の贈り物になって戻る」→ 隠した B = 祖父が毎朝自分の自販機のお釣り口に十円玉を入れ、孫がそれを集めていたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 4 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
+
+-- U24 早く走った朝
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '012-early-morning-run', '早く走った朝', 4,
+        '男がいつもより早くジョギングに出た朝、通学路の家から小学生が次々に飛び出してきて、男を追い抜いて学校へ走っていった。誰も遅刻しそうではなかった。どういうこと？',
+        '男は十年ほど、毎朝七時四十分ちょうどに家を出て、小学校の通学路をジョギングしていた。通学路の家の子どもたちは、窓の外を男が走って通るのを見ると「そろそろ出なきゃ」と家を出るようになっていたが、男はそのことを知らなかった。ある朝、男は用事があって、いつもより二十分早く走り出た。男の姿を見た子どもたちは、遅刻すると思い込んで朝ごはんを口にくわえたまま次々に家を飛び出し、男を追い抜いて学校へ駆けていった。実際の時刻はまだ早く、子どもたちは校門が開くより先に門の前に並ぶことになった。',
+        '["子どもたちは男を怖がっていない。男は不審者でも、学校の先生でもない","その朝、学校に特別な行事はなかった。鬼ごっこや競走などの遊びでもない","男は子どもたちに何も言っていないし、合図を送ったつもりもない","男は十年ほど、毎朝同じ道を同じように走っている","子どもたちは、家の窓から男の姿を見て、急がなければと思った（なぜそう思ったかは答えの核心。正解宣言のとき以外は補足で言わない）","子どもたちは実際には遅刻しそうではなかった。学校に着いたとき、校門はまだ開いていなかった","家の時計は壊れていない。時計を見ていれば、まだ早いと分かった","男は、子どもたちが走っていった理由をその朝まで知らなかった","男がいつもより早く走ったのは用事があったから。用事の中身は問題に関係ない","子どもたちは男の家族でも知り合いでもない。名前も知らない","男の年齢・服装・走る速さは問題に関係ない"]',
+        '[{"q":"子どもたちは男が怖かったのですか？","a":"いいえ"},{"q":"男は学校の先生ですか？","a":"いいえ"},{"q":"学校で行事がありましたか？","a":"いいえ"},{"q":"鬼ごっこをしていたのですか？","a":"いいえ"},{"q":"男が子どもたちに何か言いましたか？","a":"いいえ"},{"q":"子どもたちは男を見て走り出しましたか？","a":"はい"},{"q":"子どもたちは遅刻すると思ったのですか？","a":"はい"},{"q":"本当に遅刻しそうでしたか？","a":"いいえ"},{"q":"家の時計が壊れていましたか？","a":"いいえ"},{"q":"男はいつも同じ時間に走っていますか？","a":"はい"},{"q":"男が走る時間と関係がありますか？","a":"はい"},{"q":"男は子どもたちの様子を知っていましたか？","a":"いいえ"},{"q":"子どもたちは男の知り合いですか？","a":"いいえ"},{"q":"男が早く出た理由は関係ありますか？","a":"関係ない"},{"q":"男の服装は関係ありますか？","a":"関係ない"},{"q":"子どもたちは毎朝同じ時刻に通学路を走る男を見て家を出る時刻を決めていたので、男がいつもより早く通った朝、遅刻すると思って飛び出した。","a":"正解"}]',
+        '子どもたちは何を見た？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"男がいつもより早くジョギングに出た朝、通学路の家から小学生が次々に飛び出してきて、男を追い抜いて学校へ走っていった。誰も遅刻しそうではなかった。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"男が怖かった？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男を見て走った？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"男は先生？"},{"role":"master","text":"いいえ。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A quiet Japanese residential street on a school route in the early morning; a middle-aged man in jogging clothes looks back in surprise as several elementary school children with school backpacks dash past him toward school, one child holding a piece of toast in the mouth; houses with windows along the street, no clocks, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+男がいつもより早くジョギングに出た朝、通学路の家から小学生が次々に飛び出してきました。
+
+男がいつもより早くジョギングに出た朝、通学路の家から小学生が次々に飛び出してきて、男を追い抜いて学校へ走っていった。誰も遅刻しそうではなかった。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「マラソン」「足音」（2 巡目の抽選: ろうそく / はしご / マラソン・弁当 / 豆まき / ろうそく・足音 / 日記 / ゴミ出し ほか）→ 連想（毎朝のジョギング・同じ時刻・通学路・すれ違う小学生・「あの人が通ったら家を出る」・遅刻 等 8 件）→ 物語「毎朝同じ時刻に走る男が、知らないうちに通学路の子どもたちの時計になっていた」→ 隠した B = 子どもたちが男を見て家を出る時刻を決めていたこと。着想元の既存問題なし（台帳に該当なし。「カントの散歩」の逸話と構造が近い点は人間ゲートで承認）。Web 照合（WebSearch 2 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
