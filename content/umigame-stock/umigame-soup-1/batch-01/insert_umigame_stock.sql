@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（13 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（14 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -378,3 +378,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「将棋」「郵便」（抽選 17 回: ネクタイ / 消しゴム / 傘・将棋 / マスク / 傘・バケツ / 畳 / 郵便 ほか）→ 連想（転校で別れた友人・年賀状・一年に一度の便り・手紙で指す将棋・床の間の盤・お年玉くじ 等 11 件）→ 物語「中学の友人と年賀状に一手ずつ書いて指した将棋が、五十五年かけて決着した」→ 隠した B = 二人が毎年の年賀状で将棋を一手ずつ指し続けていたこと。着想元の既存問題なし（台帳に該当なし。U21 と表面の「勝負の決着」が重なる点は人間ゲートで承認）。Web 照合（WebSearch 6 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
+
+-- U26 日本語を覚えた日から
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '014-kind-interpreter', '日本語を覚えた日から', 3,
+        '外国から嫁いできた女と義母は、同居してから十年間、近所で評判の仲のよさだった。ところが女が日本語を覚えて話せるようになると、二人は毎日けんかを始めた。どういうこと？',
+        '女は外国で日本人の夫と結婚し、息子が五歳のとき一家で日本へ移って、夫の母と同居を始めた。女は日本語がほとんど話せず、夫は仕事で帰りが遅かったので、義母との会話は二つの言葉を話す息子が通訳した。息子は二人のけんかを見たくなくて、義母が「味が薄い」と言えば母に「やさしい味だって」と伝え、母が「口を出さないで」と言えば義母に「教えてくれてありがとうだって」と伝えた。二人は十年間、近所で評判の仲のよい嫁と姑だった。息子が高校の寮に入った春、女は辞書を片手に日本語を覚え、義母と通訳なしで話すようになった。すると初めて本当の言葉が聞こえ、二人は毎日言い合いを始めた。やがて十年分の通訳がほとんど作り話だったと気づき、二人そろって息子に電話をかけた。',
+        '["義母の性格や考え方は、この十年で変わっていない。義母は前から同じようなことを言っていた","誰かが悪口を吹き込んだのではない。近所の人は何もしていない","女が日本語を覚える前も、二人は毎日たくさん会話をしていた","二人の会話には、いつも間に入って伝える家族がいた（誰がどう伝えていたかは答えの核心。正解宣言のとき以外は補足で言わない）","間に入っていたのは夫ではない。夫は仕事で帰りが遅く、平日はほとんど家にいなかった","同居は十年前、一家が女の国から日本へ移ってきたときに始まった","女が日本語を覚えたのはこの春から。辞書を使って自分で勉強した","けんかの中身は、料理の味つけや家事のやり方など、前から毎日話題にしていたこと","二人は本当は嫌い合ってはいない。今もけんかをしながら同じ家で暮らしている","二人はけんかの理由に気づき、今では笑い話にしている","女の出身の国、義母の年齢、家のある町は問題に関係ない"]',
+        '[{"q":"義母の性格が変わったのですか？","a":"いいえ"},{"q":"誰かが悪口を吹き込んだのですか？","a":"いいえ"},{"q":"近所の人が何かしたのですか？","a":"いいえ"},{"q":"日本語が分かるようになって、義母の文句に気づいたのですか？","a":"はい"},{"q":"義母は前から同じようなことを言っていたのですか？","a":"はい"},{"q":"前は二人の言葉が通じていなかったのですか？","a":"はい"},{"q":"二人の間に入って伝える人がいたのですか？","a":"はい"},{"q":"間に入っていたのは家族ですか？","a":"はい"},{"q":"間に入っていたのは夫ですか？","a":"いいえ"},{"q":"伝える人は、言葉をそのまま伝えていましたか？","a":"いいえ"},{"q":"女の言葉も変えて伝えられていましたか？","a":"はい"},{"q":"女が日本語を覚えたのは最近ですか？","a":"はい"},{"q":"二人は本当は嫌い合っているのですか？","a":"いいえ"},{"q":"女の出身の国がどこかは関係ありますか？","a":"関係ない"},{"q":"義母の年齢は関係ありますか？","a":"関係ない"},{"q":"二人の会話は家族が通訳していて、お互いの文句を褒め言葉に言い換えて伝えていたので、女が日本語を覚えて本当の言葉が分かるとけんかになった。","a":"正解"}]',
+        '言葉が通じたのに？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"外国から嫁いできた女と義母は、同居してから十年間、近所で評判の仲のよさだった。ところが女が日本語を覚えて話せるようになると、二人は毎日けんかを始めた。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"義母の性格が変わった？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"前から同じことを言ってた？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"誰かが悪口を吹き込んだ？"},{"role":"master","text":"いいえ。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A Japanese home kitchen; a woman in her forties and her elderly mother-in-law stand side by side at the stove, both frowning and arguing with animated hand gestures over a pot of miso soup; an open bilingual dictionary lies on the kitchen table; warm afternoon light, no readable writing, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+外国から嫁いできた女と義母は、十年間とても仲よしでした。ところが女が日本語を覚えると……。
+
+外国から嫁いできた女と義母は、同居してから十年間、近所で評判の仲のよさだった。ところが女が日本語を覚えて話せるようになると、二人は毎日けんかを始めた。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「辞書」（抽選 22 回: 毛糸 / お年玉 / バス停・ゴミ出し / 時計 / 辞書・バス停 / 畳 / 辞書 ほか）→ 連想（外国語・国際結婚・同居・嫁と姑・子どもが二つの言葉を話す・通訳・言葉が分かると聞こえ方が変わる 等 11 件）→ 物語「外国から嫁いだ母と義母の会話を、息子が十年間褒め言葉に作り変えて通訳していた」→ 隠した B = 息子が二人の文句を褒め言葉に変えて通訳していたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 8 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
