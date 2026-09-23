@@ -2,9 +2,10 @@
 
 - set_id は ``set_code='umigame-soup-1'`` のサブクエリで解決するため、ローカル / Aurora 共通の SQL。
 - content_key は stock_items.py で採番済みの値をそのまま入れる（{3 桁連番}-{slug}。両環境で同一）。
+- 先頭で batch_sets 行（``is_active = 0``）を既存でなければ作る（21-4b）。稼働化（``is_active = 1``）・
+  ``problem_snapshot_enabled`` / ``stories_enabled`` の有効化は 21-7 の人間ゲートで行い、本 SQL では触らない。
 - ``--dry-run`` はローカル MySQL（docker の acps-mysql）でトランザクション内に流し、件数と content_key の
-  重複を確認して ROLLBACK する。batch_sets 行がまだ無い環境（21-7 で登録）では、同じトランザクション内に
-  仮の行を作ってから流す（ROLLBACK で消える）。Aurora への投入は 21-4b（人間ゲート後）。
+  重複を確認して ROLLBACK する。
 
 使い方:
     python3 generate.py            # insert_umigame_stock.sql を生成
@@ -27,6 +28,8 @@ from stock_items import ITEMS  # noqa: E402
 from umigame_common import SET_CODE  # noqa: E402
 
 SQL_PATH = HERE / "insert_umigame_stock.sql"
+SET_NAME = "探偵カメロックのウミガメのスープ"
+GENERATOR_NAME = "umigame-prebuilt"
 MYSQL_CMD = [
     "docker", "exec", "-i", "acps-mysql", "mysql", "--default-character-set=utf8mb4",
     "-uroot", "-proot", "acps",
@@ -44,11 +47,16 @@ def jsonlit(obj) -> str:
 
 
 def build_sql() -> str:
-    """全問の INSERT 文を組み立てる。"""
+    """batch_sets 行と全問の INSERT 文を組み立てる。"""
     lines = [
         f"-- batch-01 ウミガメストック投入（{len(ITEMS)} 問。人間レビュー + プローブテスト承認後に実行）",
         "-- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）",
         "-- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。",
+        "",
+        "-- batch_sets 行（is_active = 0 で登録。稼働化は 21-7 の人間ゲート。既存なら作らない）",
+        "INSERT INTO batch_sets (set_code, name, generator_name, is_active)",
+        f"SELECT '{SET_CODE}', '{esc(SET_NAME)}', '{GENERATOR_NAME}', 0",
+        f"WHERE NOT EXISTS (SELECT 1 FROM batch_sets WHERE set_code = '{SET_CODE}');",
         "",
     ]
     for it in ITEMS:
@@ -87,15 +95,12 @@ def dry_run(sql: str) -> int:
     script = "\n".join(
         [
             "START TRANSACTION;",
-            f"INSERT INTO batch_sets (set_code, name, generator_name, is_active)",
-            f"SELECT '{SET_CODE}', 'umigame-soup-1（dry-run 仮行）', 'umigame-prebuilt', 0",
-            f"WHERE NOT EXISTS (SELECT 1 FROM batch_sets WHERE set_code = '{SET_CODE}');",
             sql,
             "SELECT COUNT(*) AS inserted, COUNT(DISTINCT content_key) AS distinct_keys,",
             "       MIN(CHAR_LENGTH(problem_text)) AS min_problem_len, MAX(CHAR_LENGTH(problem_text)) AS max_problem_len,",
             "       SUM(JSON_LENGTH(fact_sheet) BETWEEN 8 AND 12) AS fact_sheet_ok,",
             "       SUM(JSON_LENGTH(expected_questions) BETWEEN 15 AND 20) AS expected_q_ok,",
-            "       SUM(JSON_LENGTH(play_example) = 6) AS play_example_ok",
+            "       SUM(JSON_LENGTH(play_example) = 6) AS play_example_ok, MAX(b.is_active) AS set_is_active",
             "FROM umigame_stock_items s JOIN batch_sets b ON b.id = s.set_id",
             f"WHERE b.set_code = '{SET_CODE}';",
             "ROLLBACK;",

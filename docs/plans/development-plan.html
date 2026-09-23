@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -379,18 +379,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-<article class="plan-step" id="step-21-4b" data-step-id="21-4b" data-status="todo">
+<article class="plan-step" id="step-21-4b" data-step-id="21-4b" data-status="done" data-completed="2026-09-23">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-4b</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-4b</strong><span class="plan-status">完了</span><span>2026-09-23</span></div>
 <h3>第 1 バッチの投入</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-4a-5 の完了と、ユーザーによる Aurora への V012 適用後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。着手条件の V012 は 2026-09-23 に Aurora へ適用済み（ユーザーの依頼で Claude が <code>apply_aurora.py</code> 経由の Data API で 3 文を実行。<code>umigame_stock_items</code> 25 列・<code>umigame_items</code> 15 列・<code>batch_sets.problem_snapshot_enabled</code> の追加を確認）。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-4a-5 の完了と、ユーザーによる Aurora への V012 適用後。<strong>2026-09-23 に充足</strong>（V012 はユーザーの依頼で Claude が Data API で適用）。</p>
+<p data-field="result"><strong>結果：</strong><code>batch_sets</code> 行（<code>umigame-soup-1</code>・<code>is_active = 0</code>）と 14 問をローカル MySQL と Aurora の両環境へ投入した（2026-09-23）。両環境とも件数 14・<code>content_key</code> の重複 0・セットの <code>is_active = 0</code>。次は 21-5a。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -399,7 +393,7 @@
 </section>
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
-<li>両環境で <code>umigame_stock_items</code> の件数クエリと <code>content_key</code> の重複 0 を確認（クエリ結果を貼る）。<strong>要確認</strong>: 旧記載は「件数が 10」だが 21-4a-3 で 14 問へ拡張済み（着手時に 14 で読み替えるか、ユーザーに確認する）。</li>
+<li>両環境で <code>umigame_stock_items</code> の件数クエリと <code>content_key</code> の重複 0 を確認（クエリ結果を貼る）。旧記載の「件数が 10」は 21-4a-3 の 14 問化に合わせて <strong>14 で読み替えた</strong>（2026-09-23 着手時）。</li>
 <li>push。</li>
 </ol>
 </section>
@@ -410,11 +404,19 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>4. 作業記録</summary>
+<div class="plan-fold-inner"><p><strong>着手条件の充足（2026-09-23）</strong>: ユーザーの依頼で V012 を Aurora に適用（<code>content/ranking-stock/pref-ranking-1/common/apply_aurora.py</code> 経由の Data API で 3 文）。<code>umigame_stock_items</code> 25 列・<code>umigame_items</code> 15 列・<code>batch_sets.problem_snapshot_enabled</code>（既存 3 セットは 0）を確認。</p><p><strong>投入（2026-09-23・<code>/step 21-4b</code> → <code>/goal</code> の 1 ゴール）</strong>: ① <code>generate.py</code> の投入 SQL の先頭に <code>batch_sets</code> 行（名称「探偵カメロックのウミガメのスープ」・方式 <code>umigame-prebuilt</code>・<code>is_active = 0</code>・<code>WHERE NOT EXISTS</code> で既存なら作らない）を加え、dry-run の仮行を削除。<code>stories_enabled</code> / <code>problem_snapshot_enabled</code> は既定の 0 のまま（有効化は 21-7）。<code>generate.py --dry-run</code>: 14 件・キー 14 種・問題文 78〜84 字・シート / 想定質問 / プレイ例の件数 14 問 OK・<code>set_is_active</code> 0。② ローカル MySQL へ投入: <code>stock_count 14 / distinct_keys 14 / duplicate_keys 0</code>、<code>batch_sets</code> は <code>is_active 0</code>。③ Aurora へ流す直前で SQL（15 文）と対象クラスタを提示して停止し、ユーザー承認後に <code>apply_aurora.py</code> で実行（15 文とも <code>updated=1</code>）。Aurora も同じクエリで 14 / 14 / 0、<code>is_active 0</code>。件数の完了条件は 10 → 14 で読み替えた。確認待ち: 該当なし。課題表: 該当なし（クローズ移動も該当なし）。</p></div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
 
 <article class="plan-step" id="step-21-5a" data-step-id="21-5a" data-status="todo">
 <header class="plan-step-head">

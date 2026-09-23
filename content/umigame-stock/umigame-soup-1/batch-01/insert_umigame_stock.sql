@@ -2,6 +2,11 @@
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
+-- batch_sets 行（is_active = 0 で登録。稼働化は 21-7 の人間ゲート。既存なら作らない）
+INSERT INTO batch_sets (set_code, name, generator_name, is_active)
+SELECT 'umigame-soup-1', '探偵カメロックのウミガメのスープ', 'umigame-prebuilt', 0
+WHERE NOT EXISTS (SELECT 1 FROM batch_sets WHERE set_code = 'umigame-soup-1');
+
 -- U01 影が薄いと言われて喜ぶ男
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
