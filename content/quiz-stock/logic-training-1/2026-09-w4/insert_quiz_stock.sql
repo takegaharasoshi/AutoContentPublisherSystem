@@ -19,8 +19,8 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
         '黒板の「IX」はローマ数字の9だ。線を1本だけ書き足して、これを6にしてくれ。',
-        'SIX(前にSを1筆で書き足す)',
-        '{"hook":"線1本で数字が生まれ変わる","hint":"数字の外へ出てみろ!","question":"黒板の「IX」はローマ数字の9だ。線を1本だけ書き足して、これを6にしてくれ。","answer":"SIX(前にSを1筆で書き足す)","explanation":"ローマ数字のまま考えると、線1本ではVIにならない。前にSを一筆で書けば「SIX」、英語の6になる。数字を数字のまま扱わない発想だ。","coach_comment":"数字の外へ飛び出せたら合格だ!","tags":["なぞなぞ","朝の一問","文字パズル"],"summary":"ローマ数字「IX」に線を1本足して6にする定番。ローマ数字の中では作れず、前にSを書いて英語の「SIX」にする。数字から英単語へ領域を飛ばす。文字は黒板の絵で提示。","illustration_scene":"朝日が差し込む教室の黒板に、白いチョークで大きく「IX」とだけ書かれ、その右に大きな「?」がある。文字は「IX」と「?」だけを描き、他の文字・数字・人物は描かない。"}',
+        'SIX(前にSを一筆で書き足す)',
+        '{"hook":"線1本で数字が生まれ変わる","hint":"数字の外へ出てみろ!","question":"黒板の「IX」はローマ数字の9だ。線を1本だけ書き足して、これを6にしてくれ。","answer":"SIX(前にSを一筆で書き足す)","explanation":"ローマ数字のまま考えると、線1本ではVIにならない。前にSを一筆で書けば「SIX」、英語の6になる。数字を数字のまま扱わない発想だ。","coach_comment":"数字の外へ飛び出せたら合格だ!","tags":["なぞなぞ","朝の一問","文字パズル"],"summary":"ローマ数字「IX」に線を1本足して6にする定番。ローマ数字の中では作れず、前にSを書いて英語の「SIX」にする。数字から英単語へ領域を飛ばす。文字は黒板の絵で提示。","illustration_scene":"朝日が差し込む教室の黒板に、白いチョークで大きく「IX」とだけ書かれ、その右に大きな「?」がある。文字は「IX」と「?」だけを描き、他の文字・数字・人物は描かない。"}',
         '類型: ローマ数字に1画足して別の数にするなぞ(作者不詳・日英に流布)。流布例: https://nazoq.com/hardest/Q031001.html , https://j-town.net/2020/06/14306101.html?p=all 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A49
@@ -29,8 +29,8 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
         '町はあるのに家がない。森はあるのに木がない。海はあるのに水がない。それはなんだ?',
-        '地図',
-        '{"hook":"3つの謎を1つで解け","hint":"旅行の前に広げるものだ!","question":"町はあるのに家がない。森はあるのに木がない。海はあるのに水がない。それはなんだ?","answer":"地図","explanation":"地図には町・森・海が描かれているが、本物の家や木や水はない。3つの「あるのにない」が全部当てはまるのは、名前と記号だけがのっている地図だ。","coach_comment":"3つの条件を1つに束ねたな!","tags":["なぞなぞ","朝の一問","あるのにない"],"summary":"町・森・海はあるのに家・木・水はないものは何かという定番なぞ。答えは地図。3つの対比を1つの物にまとめる。","illustration_scene":"朝日が昇る海辺の丘で、後ろ姿の旅人が、町と森と海が広がる景色を眺めている。空に大きな「?」が浮かぶ。旅人は手に何も持たない。地図・紙・看板・文字は描かない。顔は描かない。"}',
+        '地図(地球儀も正解)',
+        '{"hook":"3つの謎を1つで解け","hint":"本物じゃなくても町は町だ!","question":"町はあるのに家がない。森はあるのに木がない。海はあるのに水がない。それはなんだ?","answer":"地図(地球儀も正解)","explanation":"地図には町・森・海が描かれているが、本物の家や木や水はない。名前と記号だけがのっているからだ。同じ理由で地球儀も正解。3つの「あるのにない」を束ねよう。","coach_comment":"3つの条件を1つに束ねたな!","tags":["なぞなぞ","朝の一問","あるのにない"],"summary":"町・森・海はあるのに家・木・水はないものは何かという定番なぞ。答えは地図(地球儀も正解)。3つの対比を1つの物にまとめる。","illustration_scene":"朝日が昇る海辺の丘で、後ろ姿の旅人が、町と森と海が広がる景色を眺めている。空に大きな「?」が浮かぶ。旅人は手に何も持たない。地図・地球儀・紙・看板・文字は描かない。顔は描かない。"}',
         '類型: 「町はあるのに家がない」の定番なぞ(作者不詳・日英に流布)。流布例: https://nazocchi.com/posts/935 , https://learnenglishkids.britishcouncil.org/fun-games/riddles/cities-no-houses 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A50
@@ -38,9 +38,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '電卓で「0.7734」と打ち、電卓をくるりと逆さにして画面を見てくれ。なんと書いてある?',
+        '電卓で「0.7734」と打つと、画面にある言葉が隠れている。なんと読む?',
         'hELLO(ハロー)',
-        '{"hook":"電卓で遊んだこと、あるか?","hint":"数字を文字として読め!","question":"電卓で「0.7734」と打ち、電卓をくるりと逆さにして画面を見てくれ。なんと書いてある?","answer":"hELLO(ハロー)","explanation":"逆さにすると4がh、3がE、7がL、0がOに見え、「hELLO」と読める。電卓の角ばった数字は、逆さにすると英字に化ける。昔ながらの電卓遊びだ。","coach_comment":"電卓からも朝のあいさつだ!","tags":["なぞなぞ","朝の一問","電卓あそび"],"summary":"電卓に0.7734と打って逆さにすると「hELLO」と読める電卓遊び。角ばった数字が英字に見える。数字を文字として読む領域の飛躍。","illustration_scene":"朝日が差す木の机の上に電卓が1台、正位置で置かれ、液晶画面に角ばったデジタル数字で「0.7734」と表示されている。電卓の上に大きな「?」。文字は「0.7734」と「?」だけを描き、ボタンの文字・手・人物は描かない。"}',
+        '{"hook":"電卓で遊んだこと、あるか?","hint":"数字を英字に見立ててみろ!","question":"電卓で「0.7734」と打つと、画面にある言葉が隠れている。なんと読む?","answer":"hELLO(ハロー)","explanation":"電卓を逆さにすると4がh、3がE、7がL、0がOに見え、「hELLO」と読める。電卓の角ばった数字は、逆さにすると英字に化ける。昔ながらの電卓遊びだ。","coach_comment":"電卓からも朝のあいさつだ!","tags":["なぞなぞ","朝の一問","電卓あそび"],"summary":"電卓に0.7734と打って逆さにすると「hELLO」と読める電卓遊び。角ばった数字が英字に見える。数字を文字として読む領域の飛躍。","illustration_scene":"朝日が差す木の机の上に電卓が1台、正位置で置かれ、液晶画面に角ばったデジタル数字で「0.7734」と表示されている。電卓の上に大きな「?」。文字は「0.7734」と「?」だけを描き、ボタンの文字・手・人物は描かない。"}',
         '類型: 電卓の逆さ読み(calculator spelling。作者不詳・英語圏に流布)。流布例: https://en.wikipedia.org/wiki/Calculator_spelling , https://math.answers.com/math-and-arithmetic/How_to_spell_hello_in_numbers 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A51
@@ -48,9 +48,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '黒板の式は、算数ならまちがいだ。でも、これが正しくなるものが身近にある。それはなんだ?',
+        'ノートの式は、算数ならまちがいだ。でも、これが正しくなるものが身近にある。それはなんだ?',
         '時計(10時の4時間後は2時)',
-        '{"hook":"算数ならバツ、でも正解","hint":"毎朝見ている丸いものだ!","question":"黒板の式は、算数ならまちがいだ。でも、これが正しくなるものが身近にある。それはなんだ?","answer":"時計(10時の4時間後は2時)","explanation":"時計の針は12を過ぎると1に戻る。10時から4時間たつと2時なので「10+4=2」が成り立つ。数字の世界を文字盤の上に移せば正しい式だ。","coach_comment":"時間の足し算も立派な計算だ!","tags":["なぞなぞ","朝の一問","式のパズル"],"summary":"「10+4=2」が正しくなる身近なものは何かというなぞ。答えは時計で、10時の4時間後は2時。数の世界から時計の文字盤へ領域を飛ばす。式は黒板の絵で提示。","illustration_scene":"朝日が差し込む教室の黒板に、白いチョークで「10+4=2」と大きく1行だけ書かれ、その横に大きな「?」がある。文字はこの式と「?」だけを描く。時計・人物は描かない。"}',
+        '{"hook":"算数ならバツ、でも正解","hint":"数字がぐるっと一周するぞ!","question":"ノートの式は、算数ならまちがいだ。でも、これが正しくなるものが身近にある。それはなんだ?","answer":"時計(10時の4時間後は2時)","explanation":"時計の針は12を過ぎると1に戻る。10時から4時間たつと2時なので「10+4=2」が成り立つ。数字の世界を文字盤の上に移せば正しい式だ。","coach_comment":"時間の足し算も立派な計算だ!","tags":["なぞなぞ","朝の一問","式のパズル"],"summary":"「10+4=2」が正しくなる身近なものは何かというなぞ。答えは時計で、10時の4時間後は2時。数の世界から時計の文字盤へ領域を飛ばす。式はノートの絵で提示。","illustration_scene":"朝日が差す机の上に開いたノートが1冊あり、鉛筆で「10+4=2」と大きく1行だけ書かれ、その横に大きな「?」がある。文字はこの式と「?」だけを描く。時計・腕時計・人物は描かない。"}',
         '類型: 時計算のなぞ(10+4=2・11+3=2。作者不詳・英語圏に流布)。流布例: https://blog.cledemy.com/clock-riddles/ , https://confessionsofparenting.com/clock-riddles/ 。式は問題文に書かずイラストで提示。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A52
@@ -58,9 +58,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        'カードの7文字は、ある決まりで並んでいる。最後の「?」に入るアルファベットはなんだ?',
+        'カードの文字は、ある決まりで並んでいる。最後の「?」に入るアルファベットはなんだ?',
         'E(One〜Eightの頭文字)',
-        '{"hook":"ABC順ではないらしいぞ","hint":"英語で数を数えてみろ!","question":"カードの7文字は、ある決まりで並んでいる。最後の「?」に入るアルファベットはなんだ?","answer":"E(One〜Eightの頭文字)","explanation":"One・Two・Three…Sevenと英語で数えた頭文字がO・T・T・F・F・S・S。次はEightのE。ABC順ではなく、数の名前の頭文字だった。","coach_comment":"1から数え直すのが近道だ!","tags":["なぞなぞ","朝の一問","法則発見"],"summary":"O・T・T・F・F・S・S・?の次の文字を当てる法則発見。英語の数One〜Sevenの頭文字で、答えはEightのE。アルファベットから数の名前へ領域を飛ばす。文字はカードの絵で提示。","illustration_scene":"朝日が差す木の机に、白いカードが8枚横一列に並ぶ。カードには左から大きく「O」「T」「T」「F」「F」「S」「S」「?」と1文字ずつ書かれている。他の文字・数字・人物は描かない。"}',
+        '{"hook":"ABC順ではないらしいぞ","hint":"その文字、何かの頭文字だぞ!","question":"カードの文字は、ある決まりで並んでいる。最後の「?」に入るアルファベットはなんだ?","answer":"E(One〜Eightの頭文字)","explanation":"One・Two・Three…Sevenと英語で数えた頭文字がO・T・T・F・F・S・S。次はEightのE。ABC順ではなく、数の名前の頭文字だった。","coach_comment":"1から数え直すのが近道だ!","tags":["なぞなぞ","朝の一問","法則発見"],"summary":"O・T・T・F・F・S・S・?の次の文字を当てる法則発見。英語の数One〜Sevenの頭文字で、答えはEightのE。アルファベットから数の名前へ領域を飛ばす。文字はカードの絵で提示。","illustration_scene":"朝日が差す木の机に、白いカードが8枚横一列に並ぶ。カードには左から大きく「O」「T」「T」「F」「F」「S」「S」「?」と1文字ずつ書かれている。他の文字・数字・人物は描かない。"}',
         '類型: OTTFFSS の数列(作者不詳・日本語の数列クイズ集に流布)。流布例: https://quizmondai.com/sequence-quiz-01/ , https://nazoq.com/hardest/Q001054.html 。空欄は Eight の位置に置いた。文字は問題文に書かずイラストで提示。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A53
@@ -70,7 +70,7 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         'L1', 'light',
         '「12の半分は7だ」と言い張る人がいる。実は、まちがってはいない。どういうこと?',
         'ローマ数字XIIを横半分に切るとVII',
-        '{"hook":"半分にしたら増える数?","hint":"横に真っ二つに切ってみろ!","question":"「12の半分は7だ」と言い張る人がいる。実は、まちがってはいない。どういうこと?","answer":"ローマ数字XIIを横半分に切るとVII","explanation":"12をローマ数字で書くとXII。これを横に真っ二つに切ると、上半分がVIIの形になり、ローマ数字の7と読める。量ではなく字の形を半分にしたわけだ。","coach_comment":"形で割るとは見事な発想だ!","tags":["なぞなぞ","朝の一問","文字パズル"],"summary":"「12の半分は7」が正しい理由を問うなぞ。ローマ数字XIIを横半分に切ると上半分がVIIになる。数量ではなく字形を半分にする発想。","illustration_scene":"朝日が差し込む教室の黒板に、白いチョークで大きく「12」とだけ書かれ、その横にハサミが1本置かれ、上に大きな「?」がある。文字は「12」と「?」だけを描き、ローマ数字・時計・人物は描かない。"}',
+        '{"hook":"半分なのに6じゃない?","hint":"横に真っ二つに切ってみろ!","question":"「12の半分は7だ」と言い張る人がいる。実は、まちがってはいない。どういうこと?","answer":"ローマ数字XIIを横半分に切るとVII","explanation":"12をローマ数字で書くとXII。これを横に真っ二つに切ると、上半分がVIIの形になり、ローマ数字の7と読める。量ではなく字の形を半分にしたわけだ。","coach_comment":"形で割るとは見事な発想だ!","tags":["なぞなぞ","朝の一問","文字パズル"],"summary":"「12の半分は7」が正しい理由を問うなぞ。ローマ数字XIIを横半分に切ると上半分がVIIになる。数量ではなく字形を半分にする発想。","illustration_scene":"朝日が差す机の上に白い紙が1枚あり、黒いペンで大きく「12」とだけ書かれ、紙の横にハサミが1本置かれ、上に大きな「?」がある。文字は「12」と「?」だけを描き、ローマ数字・時計・人物は描かない。"}',
         '類型: 「12の半分は7」のローマ数字なぞ(作者不詳・英語圏に流布)。流布例: https://blog.doublehelix.csiro.au/half-of-12-brainteaser/ , https://riddles.guru/riddles/half-of-12-be-7/764/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C49

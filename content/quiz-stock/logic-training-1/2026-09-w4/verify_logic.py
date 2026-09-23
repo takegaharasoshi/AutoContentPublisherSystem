@@ -85,7 +85,7 @@ if "A51" in BY_NO:
     check("A51", "12 時間制で 10+4", h == 2, f"(10+4) を 12 時間制で = {h}")
     check("A51", "式は情景文に明示・時計は描かない",
           "「10+4=2」" in BY_NO["A51"]["illustration_scene"]
-          and "時計・人物は描かない" in BY_NO["A51"]["illustration_scene"], "答えの物を描かない指定あり")
+          and "時計・腕時計・人物は描かない" in BY_NO["A51"]["illustration_scene"], "答えの物を描かない指定あり")
 
 # ---------------------------------------------------------------
 # A52 OTTFFSS: One〜Eight の頭文字
