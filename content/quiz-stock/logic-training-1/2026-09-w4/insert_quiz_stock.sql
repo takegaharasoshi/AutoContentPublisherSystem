@@ -1,0 +1,144 @@
+-- 2026-09-w4 問題ストック補充投入(14 問。レビュー承認後に実行)
+-- 生成元: content/quiz-stock/logic-training-1/2026-09-w4/stock_items.py(単一ソース)。適用先: ローカル MySQL / Aurora(acps)
+-- set_id は set_code から解決するため両環境共通で実行できる。
+-- content_key はスロット内の既存最大連番 + 1 を適用時に解決する(V007。両環境で同一値になる)。
+
+-- A47
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '上から見た駐車場の絵だ。マスの番号には、ある決まりがある。車が止まっている「?」のマスは何番?',
+        '87(逆さに読むと86〜91の連番)',
+        '{"hook":"大人ほど悩む駐車場の謎","hint":"運転席から見てみろ!","question":"上から見た駐車場の絵だ。マスの番号には、ある決まりがある。車が止まっている「?」のマスは何番?","answer":"87(逆さに読むと86〜91の連番)","explanation":"絵を逆さにして読むと、86・?・88・89・90・91と連番に並ぶ。?は87で、こちらから見ると「L8」の形。数字の計算ではなく、見る向きを変える問題だ。","coach_comment":"視点を変えたら一発だったな!","tags":["なぞなぞ","朝の一問","逆さ読み"],"summary":"駐車場のマス番号16・06・68・88・?・98の?を当てる視覚パズル。逆さから読むと86〜91の連番で答えは87。並びに計算の法則を探すと詰まり、見る向きを変えると解ける。番号は絵で提示。","illustration_scene":"朝日に照らされた駐車場を真上から見下ろす。横一列に6つのマスが並び、地面に白いペンキで左から「16」「06」「68」「88」「?」「98」と大きく書く。「?」のマスにだけ赤い車が1台止まり、?は車の手前に見える。他の文字・数字・人物は描かない。"}',
+        '類型: 駐車場の番号を逆さから読む視覚パズル(作者不詳・画像で世界的に流布)。流布例: https://karapaia.com/archives/52214100.html , https://kabu-elife.sakura.ne.jp/inc/nazonazo/cat1/002.html 。入試問題という由来は未確認のため書かない。番号は問題文に書かずイラストで提示。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A48
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '黒板の「IX」はローマ数字の9だ。線を1本だけ書き足して、これを6にしてくれ。',
+        'SIX(前にSを1筆で書き足す)',
+        '{"hook":"線1本で数字が生まれ変わる","hint":"数字の外へ出てみろ!","question":"黒板の「IX」はローマ数字の9だ。線を1本だけ書き足して、これを6にしてくれ。","answer":"SIX(前にSを1筆で書き足す)","explanation":"ローマ数字のまま考えると、線1本ではVIにならない。前にSを一筆で書けば「SIX」、英語の6になる。数字を数字のまま扱わない発想だ。","coach_comment":"数字の外へ飛び出せたら合格だ!","tags":["なぞなぞ","朝の一問","文字パズル"],"summary":"ローマ数字「IX」に線を1本足して6にする定番。ローマ数字の中では作れず、前にSを書いて英語の「SIX」にする。数字から英単語へ領域を飛ばす。文字は黒板の絵で提示。","illustration_scene":"朝日が差し込む教室の黒板に、白いチョークで大きく「IX」とだけ書かれ、その右に大きな「?」がある。文字は「IX」と「?」だけを描き、他の文字・数字・人物は描かない。"}',
+        '類型: ローマ数字に1画足して別の数にするなぞ(作者不詳・日英に流布)。流布例: https://nazoq.com/hardest/Q031001.html , https://j-town.net/2020/06/14306101.html?p=all 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A49
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '町はあるのに家がない。森はあるのに木がない。海はあるのに水がない。それはなんだ?',
+        '地図',
+        '{"hook":"3つの謎を1つで解け","hint":"旅行の前に広げるものだ!","question":"町はあるのに家がない。森はあるのに木がない。海はあるのに水がない。それはなんだ?","answer":"地図","explanation":"地図には町・森・海が描かれているが、本物の家や木や水はない。3つの「あるのにない」が全部当てはまるのは、名前と記号だけがのっている地図だ。","coach_comment":"3つの条件を1つに束ねたな!","tags":["なぞなぞ","朝の一問","あるのにない"],"summary":"町・森・海はあるのに家・木・水はないものは何かという定番なぞ。答えは地図。3つの対比を1つの物にまとめる。","illustration_scene":"朝日が昇る海辺の丘で、後ろ姿の旅人が、町と森と海が広がる景色を眺めている。空に大きな「?」が浮かぶ。旅人は手に何も持たない。地図・紙・看板・文字は描かない。顔は描かない。"}',
+        '類型: 「町はあるのに家がない」の定番なぞ(作者不詳・日英に流布)。流布例: https://nazocchi.com/posts/935 , https://learnenglishkids.britishcouncil.org/fun-games/riddles/cities-no-houses 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A50
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '電卓で「0.7734」と打ち、電卓をくるりと逆さにして画面を見てくれ。なんと書いてある?',
+        'hELLO(ハロー)',
+        '{"hook":"電卓で遊んだこと、あるか?","hint":"数字を文字として読め!","question":"電卓で「0.7734」と打ち、電卓をくるりと逆さにして画面を見てくれ。なんと書いてある?","answer":"hELLO(ハロー)","explanation":"逆さにすると4がh、3がE、7がL、0がOに見え、「hELLO」と読める。電卓の角ばった数字は、逆さにすると英字に化ける。昔ながらの電卓遊びだ。","coach_comment":"電卓からも朝のあいさつだ!","tags":["なぞなぞ","朝の一問","電卓あそび"],"summary":"電卓に0.7734と打って逆さにすると「hELLO」と読める電卓遊び。角ばった数字が英字に見える。数字を文字として読む領域の飛躍。","illustration_scene":"朝日が差す木の机の上に電卓が1台、正位置で置かれ、液晶画面に角ばったデジタル数字で「0.7734」と表示されている。電卓の上に大きな「?」。文字は「0.7734」と「?」だけを描き、ボタンの文字・手・人物は描かない。"}',
+        '類型: 電卓の逆さ読み(calculator spelling。作者不詳・英語圏に流布)。流布例: https://en.wikipedia.org/wiki/Calculator_spelling , https://math.answers.com/math-and-arithmetic/How_to_spell_hello_in_numbers 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A51
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '黒板の式は、算数ならまちがいだ。でも、これが正しくなるものが身近にある。それはなんだ?',
+        '時計(10時の4時間後は2時)',
+        '{"hook":"算数ならバツ、でも正解","hint":"毎朝見ている丸いものだ!","question":"黒板の式は、算数ならまちがいだ。でも、これが正しくなるものが身近にある。それはなんだ?","answer":"時計(10時の4時間後は2時)","explanation":"時計の針は12を過ぎると1に戻る。10時から4時間たつと2時なので「10+4=2」が成り立つ。数字の世界を文字盤の上に移せば正しい式だ。","coach_comment":"時間の足し算も立派な計算だ!","tags":["なぞなぞ","朝の一問","式のパズル"],"summary":"「10+4=2」が正しくなる身近なものは何かというなぞ。答えは時計で、10時の4時間後は2時。数の世界から時計の文字盤へ領域を飛ばす。式は黒板の絵で提示。","illustration_scene":"朝日が差し込む教室の黒板に、白いチョークで「10+4=2」と大きく1行だけ書かれ、その横に大きな「?」がある。文字はこの式と「?」だけを描く。時計・人物は描かない。"}',
+        '類型: 時計算のなぞ(10+4=2・11+3=2。作者不詳・英語圏に流布)。流布例: https://blog.cledemy.com/clock-riddles/ , https://confessionsofparenting.com/clock-riddles/ 。式は問題文に書かずイラストで提示。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A52
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        'カードの7文字は、ある決まりで並んでいる。最後の「?」に入るアルファベットはなんだ?',
+        'E(One〜Eightの頭文字)',
+        '{"hook":"ABC順ではないらしいぞ","hint":"英語で数を数えてみろ!","question":"カードの7文字は、ある決まりで並んでいる。最後の「?」に入るアルファベットはなんだ?","answer":"E(One〜Eightの頭文字)","explanation":"One・Two・Three…Sevenと英語で数えた頭文字がO・T・T・F・F・S・S。次はEightのE。ABC順ではなく、数の名前の頭文字だった。","coach_comment":"1から数え直すのが近道だ!","tags":["なぞなぞ","朝の一問","法則発見"],"summary":"O・T・T・F・F・S・S・?の次の文字を当てる法則発見。英語の数One〜Sevenの頭文字で、答えはEightのE。アルファベットから数の名前へ領域を飛ばす。文字はカードの絵で提示。","illustration_scene":"朝日が差す木の机に、白いカードが8枚横一列に並ぶ。カードには左から大きく「O」「T」「T」「F」「F」「S」「S」「?」と1文字ずつ書かれている。他の文字・数字・人物は描かない。"}',
+        '類型: OTTFFSS の数列(作者不詳・日本語の数列クイズ集に流布)。流布例: https://quizmondai.com/sequence-quiz-01/ , https://nazoq.com/hardest/Q001054.html 。空欄は Eight の位置に置いた。文字は問題文に書かずイラストで提示。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- A53
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
+        'L1', 'light',
+        '「12の半分は7だ」と言い張る人がいる。実は、まちがってはいない。どういうこと?',
+        'ローマ数字XIIを横半分に切るとVII',
+        '{"hook":"半分にしたら増える数?","hint":"横に真っ二つに切ってみろ!","question":"「12の半分は7だ」と言い張る人がいる。実は、まちがってはいない。どういうこと?","answer":"ローマ数字XIIを横半分に切るとVII","explanation":"12をローマ数字で書くとXII。これを横に真っ二つに切ると、上半分がVIIの形になり、ローマ数字の7と読める。量ではなく字の形を半分にしたわけだ。","coach_comment":"形で割るとは見事な発想だ!","tags":["なぞなぞ","朝の一問","文字パズル"],"summary":"「12の半分は7」が正しい理由を問うなぞ。ローマ数字XIIを横半分に切ると上半分がVIIになる。数量ではなく字形を半分にする発想。","illustration_scene":"朝日が差し込む教室の黒板に、白いチョークで大きく「12」とだけ書かれ、その横にハサミが1本置かれ、上に大きな「?」がある。文字は「12」と「?」だけを描き、ローマ数字・時計・人物は描かない。"}',
+        '類型: 「12の半分は7」のローマ数字なぞ(作者不詳・英語圏に流布)。流布例: https://blog.doublehelix.csiro.au/half-of-12-brainteaser/ , https://riddles.guru/riddles/half-of-12-be-7/764/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C49
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '男が車を押して、ホテルの前までやって来た。その瞬間、男は自分がすべてを失ったとさとった。なぜ?',
+        'ボードゲームの駒が相手のホテルに止まった',
+        '{"hook":"たった一瞬で全財産が消えた","hint":"本物の車とは限らないぞ!","question":"男が車を押して、ホテルの前までやって来た。その瞬間、男は自分がすべてを失ったとさとった。なぜ?","answer":"ボードゲームの駒が相手のホテルに止まった","explanation":"男が遊んでいたのは土地を売り買いするボードゲーム。車の形の駒を進めたら、相手がホテルを建てたマスに止まり、宿泊料が払えず破産した。","coach_comment":"盤の上の話と見抜けたら勝ちだ!","tags":["水平思考","夜の一問","思い込み"],"summary":"車を押してホテルの前に来た男が破産を悟った理由を問う水平思考の定番。土地売買のボードゲームで、車の駒が相手のホテルのマスに止まった。現実の話だと思い込ませる。","illustration_scene":"夜の街灯に照らされた道で、後ろ姿の男が古い乗用車を両手で押している。前方に明かりのついたホテルの建物があり、その上に大きな「?」。ボードゲーム・サイコロ・看板の文字は描かない。顔・文字・数字は描かない。"}',
+        '類型: 水平思考の定番(車を押してホテルへ・土地売買のボードゲーム。作者不詳・英語圏に流布)。流布例: https://en.wikipedia.org/wiki/Situation_puzzle , https://carxplorer.com/a-man-pushes-his-car-to-a-hotel/ 。商品名は出さない。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C50
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '港の船の横に縄ばしごが垂れ、下の3段が海に浸かっている。潮が満ちて、海面は1時間に1段分ずつ上がる。3時間後、浸かっているのは何段?',
+        '3段のまま(船ごと浮き上がる)',
+        '{"hook":"夜の港の静かな一問","hint":"はしごは何にぶら下がってる?","question":"港の船の横に縄ばしごが垂れ、下の3段が海に浸かっている。潮が満ちて、海面は1時間に1段分ずつ上がる。3時間後、浸かっているのは何段?","answer":"3段のまま(船ごと浮き上がる)","explanation":"縄ばしごは船にぶら下がっている。潮が満ちれば船も同じだけ浮き上がるので、海面とはしごの位置関係は変わらない。3+3=6段と足すのがひっかけだ。","coach_comment":"足し算の前に全体を見たな!","tags":["ひっかけ","夜の一問","思い込み"],"summary":"船の縄ばしごの下3段が浸かり、潮が1時間に1段ずつ満ちると3時間後は何段浸かるかという定番のひっかけ。船ごと浮くので3段のまま。6段と足させる。","illustration_scene":"夜の港、月明かりと街灯に照らされた海に、木造の船が1隻浮かぶ。船の横腹から縄ばしごが垂れ、下のほうが海に浸かっている。船の上に大きな「?」。人物・文字・数字は描かない。"}',
+        '類型: 縄ばしごと満ち潮の定番のひっかけ(作者不詳・日本語サイトに流布)。流布例: https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1020442200 , https://www.nazo2.net/ijiwaru/002.html 。問いの形を「何段浸かっている?」に変えた。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C51
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        'トラックの運転手が、一方通行の道を逆向きに進んでいた。すぐそばの警察官は、注意もせずに見送った。なぜ?',
+        '運転手は歩いていた(運転していない)',
+        '{"hook":"おまわりさん、見逃すの?","hint":"運転手が何をしてたかだ!","question":"トラックの運転手が、一方通行の道を逆向きに進んでいた。すぐそばの警察官は、注意もせずに見送った。なぜ?","answer":"運転手は歩いていた(運転していない)","explanation":"問題文は運転手が「進んでいた」と言うだけで、トラックに乗っていたとは言っていない。歩いて逆向きに進むのは違反ではない。肩書きで乗り物を思い浮かべさせる罠だ。","coach_comment":"言葉をよく読んだ者の勝ちだ!","tags":["水平思考","夜の一問","言葉の罠"],"summary":"一方通行を逆向きに進むトラック運転手を警察官が見送った理由を問う定番。運転手は歩いていた。「運転手=運転中」の思い込みを突く。","illustration_scene":"夜の街灯に照らされた一方通行の細い道路。道ばたに白い矢印だけの青い標識が立ち、道の奥に警察官の後ろ姿が小さく見える。道路の上に大きな「?」。トラック・車・歩く人・文字は描かない。顔は描かない。"}',
+        '類型: 一方通行を逆に進む運転手の定番(作者不詳・日本語サイトに流布。トラック版・タクシー版)。流布例: https://quiz.community.fmworld.net/nazonazo/content/346/question3.html , https://kabu-elife.sakura.ne.jp/inc/nazonazo/cat2/046.html 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C52
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '日本の路線バスの絵だ。このバスは、右と左のどちらへ走っている?',
+        '右(乗り口は左側。見えているのは右側面)',
+        '{"hook":"絵をよく見て決めてくれ","hint":"乗り口はどっち側にある?","question":"日本の路線バスの絵だ。このバスは、右と左のどちらへ走っている?","answer":"右(乗り口は左側。見えているのは右側面)","explanation":"日本は左側通行なので、路線バスの乗り降りのドアは車体の左側にある。絵のバスにはドアが見えないので右側面を見ていることになり、進む向きは右だ。","coach_comment":"見えないドアに気づいたか!","tags":["水平思考","夜の一問","観察力"],"summary":"前後の分からない路線バスの絵で進行方向を問う定番。日本はドアが左側なので、ドアの見えない面は右側面で、進行方向は右。見えないものから推理する。","illustration_scene":"夜の街灯の下、真横から見た路線バス。見えている側面には同じ形の窓が並ぶだけで、ドアは1つもない。車体の前後は同じ形にし、運転席・ライト・ミラー・行き先表示は描かない。バスの上に大きな「?」。人物・文字・数字は描かない。"}',
+        '類型: バスの進行方向の定番(作者不詳・2016年に世界的に拡散。左側通行の日本に合わせて答えを反転)。流布例: https://rocketnews24.com/2016/02/12/707091/2/ , https://answer-q.com/2016/09/q-7.html/ 。入試問題という由来は未確認のため書かない。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C53
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        'コルク栓をした空きびんの中に、硬貨が1枚入っている。栓は抜けず、びんも割らない。硬貨を取り出すには?',
+        '栓をびんの中へ押し込んで出す',
+        '{"hook":"力まかせはいらないぞ","hint":"引いてダメなら押してみろ!","question":"コルク栓をした空きびんの中に、硬貨が1枚入っている。栓は抜けず、びんも割らない。硬貨を取り出すには?","answer":"栓をびんの中へ押し込んで出す","explanation":"栓が抜けないなら、逆にびんの中へ押し込めばいい。口が開いたら、びんを逆さにして硬貨を振り出す。コルクは中に残るが、取り出したいのは硬貨だけだ。","coach_comment":"逆向きの発想、見事だった!","tags":["とんち","夜の一問","逆転の発想"],"summary":"コルク栓をしたびんの中の硬貨を、栓を抜かずびんも割らずに取り出す定番のとんち。栓をびんの中へ押し込む。抜く向きを押す向きに反転させる。","illustration_scene":"夜のランプに照らされた木のテーブルに、コルク栓をした緑色の空きびんが1本立ち、底に硬貨が1枚見える。びんの横に大きな「?」。コルク抜き・人物・文字・数字・硬貨の刻印は描かない。"}',
+        '類型: びんとコルクと硬貨の定番のとんち(作者不詳・英語圏に流布)。流布例: https://www.puzzleprime.com/puzzles/brain-teasers/insight/bottle-coin-and-cork/ , https://www.riddles.com/450 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C54
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        'ホテルで眠れない男が、隣の部屋に電話をかけた。何も話さずに切ると、すぐにぐっすり眠れた。なぜ?',
+        '隣の客のいびきを電話で止めた',
+        '{"hook":"電話1本でぐっすり?","hint":"隣の部屋から何が聞こえた?","question":"ホテルで眠れない男が、隣の部屋に電話をかけた。何も話さずに切ると、すぐにぐっすり眠れた。なぜ?","answer":"隣の客のいびきを電話で止めた","explanation":"眠れなかったのは、隣の客のいびきがうるさかったから。電話のベルで目を覚まさせれば、いびきが止まる。その間に自分が先に寝てしまえばいい。","coach_comment":"音の出どころを見抜いたな!","tags":["水平思考","夜の一問","状況推理"],"summary":"眠れない男が隣室に電話して無言で切るとすぐ眠れた理由を問う水平思考の定番。隣の客のいびきを電話で起こして止めた。いびきは問題文に出てこない。","illustration_scene":"夜のホテルの客室。スタンドの明かりの下、ベッドに腰かけた男の後ろ姿が受話器を耳に当てている。隣の部屋との壁の上に大きな「?」。隣の部屋の中・寝ている人・人物の顔・文字・数字は描かない。"}',
+        '類型: 眠れない男と隣室への電話の水平思考(作者不詳・英語圏に流布)。流布例: https://www.puzzlesandriddles.com/LateralThinking14.html , https://yesnogame.net/en/stories/187 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C55
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        'ざる1つで、水を運んでほしい。穴をふさぐものは何もない。どうする?',
+        '水を凍らせて氷にして運ぶ',
+        '{"hook":"キッチンの道具で頭の体操","hint":"水の形を変えてみろ!","question":"ざる1つで、水を運んでほしい。穴をふさぐものは何もない。どうする?","answer":"水を凍らせて氷にして運ぶ","explanation":"水のままでは穴からこぼれるが、凍らせて氷にすれば、ざるにのせて運べる。ざるはそのまま、水の形だけ変えればいい。溶ければまた水に戻る。","coach_comment":"形を変える発想、冴えてるぞ!","tags":["とんち","夜の一問","発想の転換"],"summary":"ざる1つで水を運ぶ方法を問う定番のとんち。水を凍らせて氷にすればざるで運べる。道具ではなく水の形を変える。","illustration_scene":"夜のキッチン、電灯の下で、金属のざるに注いだ水が穴からざあざあ流れ落ちている。ざるの上に大きな「?」。氷・冷凍庫・人物・文字は描かない。"}',
+        '類型: ざるで水を運ぶ定番のとんち(作者不詳・日英に流布)。流布例: https://nazoq.com/easy/Q005259.html , https://www.riddles.com/post/98/water-riddles 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
