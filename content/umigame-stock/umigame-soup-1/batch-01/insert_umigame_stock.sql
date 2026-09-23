@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（12 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（13 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -349,3 +349,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「マラソン」「足音」（2 巡目の抽選: ろうそく / はしご / マラソン・弁当 / 豆まき / ろうそく・足音 / 日記 / ゴミ出し ほか）→ 連想（毎朝のジョギング・同じ時刻・通学路・すれ違う小学生・「あの人が通ったら家を出る」・遅刻 等 8 件）→ 物語「毎朝同じ時刻に走る男が、知らないうちに通学路の子どもたちの時計になっていた」→ 隠した B = 子どもたちが男を見て家を出る時刻を決めていたこと。着想元の既存問題なし（台帳に該当なし。「カントの散歩」の逸話と構造が近い点は人間ゲートで承認）。Web 照合（WebSearch 2 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
+
+-- U25 五十五年目の年賀状
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '013-fifty-five-year-nengajo', '五十五年目の年賀状', 4,
+        '七十歳の男は元日、ある友人から届いた年賀状を読むと、家族の前で「勝った！」と万歳した。二人は中学を卒業してから五十五年間、一度も会っていない。どういうこと？',
+        '男は中学三年の春、放課後に友人と指していた将棋を終えないまま、友人の転校で離ればなれになった。二人は「続きは年賀状で」と約束し、それから毎年の年賀状に将棋の一手ずつを書いて送り合った。男は元日に届いた相手の一手を一年かけて考え、年末に次の一手を書いて出した。盤は駒を並べたまま、男の家の床の間に五十五年間置かれていた。七十歳の元日、友人の年賀状には次の一手の代わりに「参りました」と書かれていた。男は五十五年かけた一局に勝ち、家族の前で万歳した。二人は卒業以来、一度も会っていない。',
+        '["年賀状は友人本人が書いたもの。友人は元気に暮らしている","男はくじに当たったのではない。お金や品物は何ももらっていない","二人は何も賭けていない。お金や物のやりとりはない","長生きや、子ども・孫の数、年賀状の枚数を比べていたのではない","二人は中学の同級生。中学三年の春に友人が転校し、別の町へ引っ越した","二人は卒業してから電話もしていない。毎年の年賀状だけをやりとりしている","年賀状には、新年のあいさつのほかに短い言葉が書かれていた（何が書かれていたかは答えの核心。正解宣言のとき以外は補足で言わない）","二人がしていたのは体を動かす勝負ではなく、頭を使う勝負","勝負は中学のころに始まり、五十五年かけてこの元日に決着した","男は毎年、この友人への年賀状を書くのに長い時間をかけていた","家族は、男がこの友人と勝負を続けていることを知っていた","男の仕事、友人の住む町、年賀状の絵柄は問題に関係ない"]',
+        '[{"q":"くじに当たったのですか？","a":"いいえ"},{"q":"何かを賭けていたのですか？","a":"いいえ"},{"q":"友人は亡くなったのですか？","a":"いいえ"},{"q":"長生きを競っていたのですか？","a":"いいえ"},{"q":"二人は何かの勝負をしていたのですか？","a":"はい"},{"q":"体を動かす勝負ですか？","a":"いいえ"},{"q":"年賀状に書かれていた言葉が関係ありますか？","a":"はい"},{"q":"友人が負けを認めたのですか？","a":"はい"},{"q":"盤を使うゲームですか？","a":"はい"},{"q":"年賀状で勝負を進めていたのですか？","a":"はい"},{"q":"勝負は中学のころに始まりましたか？","a":"はい"},{"q":"二人は電話で話していましたか？","a":"いいえ"},{"q":"家族は勝負のことを知っていましたか？","a":"はい"},{"q":"男の仕事は関係ありますか？","a":"関係ない"},{"q":"年賀状の絵柄は関係ありますか？","a":"関係ない"},{"q":"二人は中学のときに終わらなかった将棋の続きを、毎年の年賀状に一手ずつ書いて指していて、この元日の年賀状で友人が負けを認めた。","a":"正解"}]',
+        '何に勝ったのか？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"七十歳の男は元日、ある友人から届いた年賀状を読むと、家族の前で、勝ったと言って万歳した。二人は中学を卒業してから五十五年間、一度も会っていない。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"くじに当たった？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"友人と勝負してた？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"何か賭けてた？"},{"role":"master","text":"いいえ。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A Japanese tatami living room on New Year''s morning; an elderly man in his seventies raises both arms in joy while holding a single New Year''s postcard, his wife and grown-up family around a low table with New Year''s dishes look at him with amused smiles; a pile of other postcards on the table, no readable writing, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+七十歳の男は元日、ある友人から届いた年賀状を読んで「勝った！」と万歳しました。
+
+七十歳の男は元日、ある友人から届いた年賀状を読むと、家族の前で「勝った！」と万歳した。二人は中学を卒業してから五十五年間、一度も会っていない。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「将棋」「郵便」（抽選 17 回: ネクタイ / 消しゴム / 傘・将棋 / マスク / 傘・バケツ / 畳 / 郵便 ほか）→ 連想（転校で別れた友人・年賀状・一年に一度の便り・手紙で指す将棋・床の間の盤・お年玉くじ 等 11 件）→ 物語「中学の友人と年賀状に一手ずつ書いて指した将棋が、五十五年かけて決着した」→ 隠した B = 二人が毎年の年賀状で将棋を一手ずつ指し続けていたこと。着想元の既存問題なし（台帳に該当なし。U21 と表面の「勝負の決着」が重なる点は人間ゲートで承認）。Web 照合（WebSearch 6 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
