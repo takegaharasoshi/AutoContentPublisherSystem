@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。BGM は暫定のため正式な 24 秒トラックの調達が publish の前提）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -423,7 +423,7 @@
 <div class="plan-meta"><strong>21-5a</strong><span class="plan-status">作業中（人間ゲート待ち）</span></div>
 <h3>ビルドツーリングと第 1 バッチ全数ビルド</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-4b の完了後。</p>
-<p data-field="result"><strong>現況：</strong>ツーリング一式を本組みし、14 本を全数ビルドした（2026-09-23）。<code>work/review.html</code> と <code>publish.py --dry-run</code> まで出した。次は全数レビューと <code>work/approved.txt</code> の作成（ユーザー）。<strong>BGM は暫定</strong>（umigame 用の 24 秒トラックが未調達）のため、publish の前に正式トラックの調達と再ビルドが要る。</p>
+<p data-field="result"><strong>現況：</strong>ツーリング一式を本組みし、14 本を全数ビルドした（2026-09-23）。<code>work/review.html</code> と <code>publish.py --dry-run</code> まで出した。2026-09-24 に BGM をユーザー選曲の「Strange Detectives」（Pixabay）へ差し替えて再ビルドし、dry-run の検査 OK。次は全数レビューと <code>work/approved.txt</code> の作成（ユーザー）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -457,7 +457,8 @@
 <li><strong>ビルド結果</strong>: 背景 14 枚を生成 → 14 本ビルド。全件 1080x1920・30fps・24.1 秒・AAC。ナレーションは 17.0〜19.8 秒（予算 21 秒）。フレーム 0 / 719 の継ぎ目差分は 1.50〜2.01（仮の閾値 3.0）</li>
 <li><strong>ビルド中に直した blocker</strong>: 12〜13 字のフック（001・004・005・006）が 74px で折り返し、2 行目が問題カードの下に隠れた。<code>UmigameReel.tsx</code> で字数に応じて縮めるようにし、折り返しを禁止した（上限 74px・内寸 828px）</li>
 <li><strong>設計との差分</strong>（方式設計書 8.1 とセット別設計書 7・9 に決定として追記）: ストックは DB ではなく <code>stock_items.py</code> から読む（ホストに pymysql・boto3 が無い）。選曲はローカル台帳の使用回数最少で行い、<code>video_audio_asset_id</code> は publish の SQL が BGM の S3 キーで解決する。固定アセットの正は <code>assets/</code>（<code>remotion/public/</code> は git 管理外の配置先）</li>
-<li><strong>残課題</strong>: umigame 用の 24 秒 BGM（3〜5 曲・Pixabay / CC0）はまだ調達していない。第 1 バッチは暫定 BGM（logic-training-1 の night track01 を 24 秒にループしたもので、20 秒地点に継ぎ目がある）でビルドしたため、<code>publish.py</code> は全件を検査エラーにする（dry-run の exit 1 は想定どおり）。正式トラックを <code>work/bgm/source/</code> に置いて <code>prepare_bgm.py</code> を実行し、<code>build.py --rebuild-bgm</code> で再ビルドする（背景とナレーションはキャッシュされるので、レンダリングだけ。1 本約 1.5 分）</li>
+<li><strong>BGM の確定（2026-09-24）</strong>: ユーザーが Pixabay の「Strange Detectives」（HarumachiMusic・Pixabay Content License・Content ID 登録あり）を選曲。先頭 24 秒を <code>prepare_bgm.py</code> で前処理し、<code>--rebuild-bgm</code> で 14 本を再ビルドして暫定 0 本・<code>publish.py --dry-run</code> 検査 OK（exit 0）。<code>audio_assets</code> の登録 SQL は <code>content/umigame-stock/umigame-soup-1/set-registration/03_audio_assets.sql</code>（未適用。publish の前に両環境へ適用する）。同日、作問スキルのプローブのレビューシートにプレイ例などの素材一式が載っておらず、プレイ例が人間レビューを通っていなかったことが分かったため、シートに素材 14 項目を載せた（<code>probe_test.py</code>）</li>
+<li><strong>（解消済み）当初の残課題</strong>: umigame 用の 24 秒 BGM（3〜5 曲・Pixabay / CC0）はまだ調達していない。第 1 バッチは暫定 BGM（logic-training-1 の night track01 を 24 秒にループしたもので、20 秒地点に継ぎ目がある）でビルドしたため、<code>publish.py</code> は全件を検査エラーにする（dry-run の exit 1 は想定どおり）。正式トラックを <code>work/bgm/source/</code> に置いて <code>prepare_bgm.py</code> を実行し、<code>build.py --rebuild-bgm</code> で再ビルドする（背景とナレーションはキャッシュされるので、レンダリングだけ。1 本約 1.5 分）</li>
 </ul>
 </div>
 </details>
@@ -468,7 +469,7 @@
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-5b</strong><span class="plan-status">未着手</span></div>
 <h3>方式モジュール・キャプション・投稿後スナップショット出力</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-5a のレビュー（<code>approved.txt</code> 作成）完了後。publish の本実行には、正式な 24 秒 BGM の調達（ユーザー）→ <code>prepare_bgm.py</code> → 再ビルドが先に要る（暫定 BGM の動画は <code>publish.py</code> が拒否する。<a href="#step-21-5a">21-5a の作業記録</a>）。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-5a のレビュー（<code>approved.txt</code> 作成）完了後。publish の本実行の前に、BGM の <code>audio_assets</code> 登録 SQL（<code>set-registration/03_audio_assets.sql</code>）を両環境へ適用する（<a href="#step-21-5a">21-5a の作業記録</a>）。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">

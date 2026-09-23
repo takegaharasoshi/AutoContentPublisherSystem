@@ -179,7 +179,7 @@
 </table>
 </div>
 <ul>
-  <li>選曲はビルド時（<code>build.py</code>）に行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）。21-5a の実装ではローカル台帳 <code>work/bgm/tracks.json</code> の使用回数最少で選び、ID は publish 時に S3 キーで解決する（<a href="../generators/umigame-prebuilt.html#build-steps">方式設計書 8.1 の決定</a>）。<strong>24 秒トラックは未調達</strong>（第 1 バッチは暫定 BGM でビルド。正式トラックの調達が publish の前提）</li>
+  <li>選曲はビルド時（<code>build.py</code>）に行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）。21-5a の実装ではローカル台帳 <code>work/bgm/tracks.json</code> の使用回数最少で選び、ID は publish 時に S3 キーで解決する（<a href="../generators/umigame-prebuilt.html#build-steps">方式設計書 8.1 の決定</a>）。第 1 バッチは 1 曲運用（track01 = Pixabay「Strange Detectives」/ HarumachiMusic。2026-09-24 ユーザー選曲・先頭 24 秒。配布ページに Content ID 登録の表示あり）</li>
   <li>SE は動画に焼き込むだけで実行時に使わないため、ファイルの正は <code>content/video-build/umigame-soup-1/assets/se/bubble_pop.wav</code>（git 管理）とし、S3 配置・<code>audio_assets</code> 登録は必要になるまで行わない</li>
   <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
 </ul>
