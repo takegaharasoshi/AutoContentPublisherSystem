@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（8 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（9 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -233,3 +233,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式・21-4a-4 で新方式の初通過）。モチーフ「ピアノ」（抽選: ハンコ / ピアノ / ポスト）→ 連想（発表会・家での練習をいつも聞いている親・同じ箇所で止まる 等 16 件）→ 物語「娘の練習の間違いごと曲を覚えた父」→ 隠した B = 娘が毎晩同じ箇所で間違える練習を聞いて曲を覚えていたこと。着想元の既存問題なし（台帳 #09「音楽が止まって困る曲芸師」は音の実用的役割で構造が別）。Web 照合（ラテシン・らてらて・note・X・英語圏）で同一・近い真相の投稿問題なし。素材化時に場面を発表会の講師演奏から一般の演奏会へ移した（教室・発表会は家族に習う人がいる手がかりになるため）。', 1);
+
+-- U21 一年越しの判定
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '009-year-late-verdict', '一年越しの判定', 4,
+        '夏、男は弟と実家へ帰った。庭のいちばん奥のすみに、小さなすいかが一つ実っていた。男はそれをしばらく黙って眺めてから、笑って弟に「お前の勝ちだ」と言った。どういうこと？',
+        '去年の夏、30 代の兄弟は実家の縁側ですいかを食べながら、子どものころのように種飛ばしで勝負した。兄の種は縁側のすぐ先に落ちるのを二人とも見ていた。弟は「庭のいちばん奥の塀ぎわまで飛んだ」と言い張ったが、種は草の中に消えて見つからず、兄は「そこまで飛ぶわけがない」と自分の勝ちを譲らなかった。今年の夏に帰省すると、庭のいちばん奥のすみに、誰も植えていないすいかが実っていた。母はすいかを植えておらず、あの縁側で種を飛ばしたのは去年のあの日だけだった。弟の種は本当に塀ぎわまで飛んでいて、そこで芽を出して育ったのだ。一年越しに証拠が出てきたので、男は笑って負けを認めた。',
+        '["すいかは男の母も家族も植えていない。すいかを育てる勝負をしていたのでもない","すいかは誰かが持ってきて置いたものではなく、その場所で自然に育った","男と弟は 30 代の大人で、子どもではない","男と弟は、ちょうど一年前の夏に、この実家である勝負をしていた","その勝負はお金や物を賭けたものではない","勝負のとき、決め手になるものが見つからず、二人とも自分の勝ちを言い張った（何が見つからなかったかは答えの核心。正解宣言のとき以外は補足で言わない）","すいかが実っていた場所が、勝負の結果と関係している","男は負けを認めたが、悔しいというより愉快だった","すいかの大きさ・味・品種は問題に関係ない","母や兄弟の仕事・住まいは問題に関係ない"]',
+        '[{"q":"すいかは誰かが植えたものですか？","a":"いいえ"},{"q":"すいかを育てる勝負をしていましたか？","a":"いいえ"},{"q":"すいかの大きさを比べる勝負ですか？","a":"いいえ"},{"q":"お金を賭けていましたか？","a":"いいえ"},{"q":"二人は以前に何かの勝負をしましたか？","a":"はい"},{"q":"その勝負は実家でしましたか？","a":"はい"},{"q":"その勝負は去年のことですか？","a":"はい"},{"q":"その勝負は、その場で決着がつきましたか？","a":"いいえ"},{"q":"すいかが実っていた場所は関係ありますか？","a":"はい"},{"q":"すいかは種から自然に育ちましたか？","a":"はい"},{"q":"勝負はすいかを食べたときにしましたか？","a":"はい"},{"q":"勝負に、すいかの種が関係していますか？","a":"はい"},{"q":"二人は子どもですか？","a":"いいえ"},{"q":"男は悔しがっていますか？","a":"いいえ"},{"q":"すいかの味は関係ありますか？","a":"関係ない"},{"q":"母の仕事は関係ありますか？","a":"関係ない"},{"q":"去年の夏、二人は実家ですいかの種飛ばしをして、弟は庭の奥まで飛んだと言い張ったが種が見つからなかった。その種が育ってすいかが実ったので、弟の勝ちだと分かった。","a":"正解"}]',
+        'すいかが下した判定', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"夏、男は弟と実家へ帰った。庭のいちばん奥のすみに、小さなすいかが一つ実っていた。男はそれをしばらく黙って眺めてから、笑って弟に、お前の勝ちだ、と言った。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"すいかは誰かが植えた？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"前に何か勝負をした？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"大きさ比べの勝負？"},{"role":"master","text":"いいえ。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A sunny summer afternoon in the garden of a Japanese family house with a wooden veranda; two adult brothers in their thirties stand at the far corner of the garden by the fence, looking down at a single small watermelon growing on a vine in the grass; one man grins and pats his brother on the shoulder, the other smiles proudly; no seeds, no people eating, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+夏、男は弟と実家へ帰りました。庭のいちばん奥のすみに、小さなすいかが一つ実っていたのです。
+
+夏、男は弟と実家へ帰った。庭のいちばん奥のすみに、小さなすいかが一つ実っていた。男はそれをしばらく黙って眺めてから、笑って弟に「お前の勝ちだ」と言った。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「すいか」（抽選: 階段 / すいか / コンビニ）→ 連想（縁側・兄弟の種飛ばし競争・勝ち負けの言い争い・草に消える種・捨てた種から翌年芽が出る 等 10 件）→ 物語「種飛ばしの勝負が一年後に庭のすいかで決着した」→ 隠した B = 去年の種飛ばしで弟の種が本当に塀ぎわまで飛んでいたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 3 クエリ）で同一・近い真相の投稿問題なし。捨てた種から翌年すいかが生える実例の投稿で現実性を確認。', 1);

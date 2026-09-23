@@ -356,7 +356,7 @@
 <div class="plan-meta"><strong>21-4a-5</strong><span class="plan-status">作業中</span></div>
 <h3>新スキルによる物語復元型 7 問の作問（全 14 問化）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-4a-4 の完了後（story.md の Fix 後）。<strong>2026-09-23 に充足</strong>（story.md Fix 済み・U20 のコア承認済み）。</p>
-<p data-field="result"><strong>現況：</strong>story 1/7。U20「間違えたのは誰か」が素材の人間ゲートを通過（2026-09-23・1 巡）。U21（content_key 009）は物語「一年越しの判定」のコアを承認（2026-09-23）。次は U21 のゴール B（素材化）。</p>
+<p data-field="result"><strong>現況：</strong>story 1/7。U20「間違えたのは誰か」が素材の人間ゲートを通過（2026-09-23・1 巡）。U21「一年越しの判定」（content_key 009）を素材化し機械検査は全 OK。素材一式の人間ゲート待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -378,7 +378,7 @@
 </section>
 <details class="plan-fold" data-field="record">
 <summary>4. 作業記録 <span class="plan-hint">— 進行中</span></summary>
-<div class="plan-fold-inner"><p><strong>U20 ゴール B（2026-09-23・素材化）</strong>: 承認済みコアから工程 4S〜9 を実施し、<code>stock_items.py</code> に U20（<code>content_key</code> 008-who-made-the-mistake・story・難易度 4）を追加。<strong>切り出しの変更 1 件</strong>: 場面を「発表会の講師の模範演奏」から「ピアノの演奏会」へ移した（教室・発表会は家族に習う人がいることを指す A 型手がかりになり、講師が生徒の曲を弾く現実性も弱いため。A = 0 個で難易度 4）。コア宣言は上限 120 字に収めるため復元部分だけ「男は娘がつっかえる箇所ごと曲を覚えていた」に縮めた（意味は不変）。Web 照合（WebSearch 2 クエリ）で同一・近い真相なし、台帳 #09 は構造が別。機械検査: <code>validate.py</code> 全 8 問 OK（警告 0）/ プローブ 不一致 0・核心語漏れ 0（U20 は想定 17 問）/ <code>generate.py --dry-run</code> 8 件 OK。素材一式とプローブ結果を人間ゲートへ提示し、<strong>ユーザー OK で通過</strong>（1 巡・問題の修正なし・場面変更も承認）。<strong>スキルの修正 1 件</strong>: ゴール文の完了条件に「人間ゲートの指摘を反映する」を入れたため、提示後の返答待ちを Stop フックが未達と判定し続けた。<code>SKILL.md</code> セクション 4 に「ゴール B の完了条件は素材一式の提示 + コミットまでで切る」を追記。確認待ち: 該当なし。課題表: 該当なし。</p><p><strong>U21 ゴール A（2026-09-23）</strong>: 抽選「階段 / すいか / コンビニ」から物語 2 本（「一年越しの判定」= 種飛ばしの勝負が一年後に庭のすいかで決着 / 「12 の次」= 階段で数を覚えた女の子）と切り出し案を提示。推奨は物語 1。物語 2 は B の構造が U20 と同じため不採用推奨。コンビニは定番の筋に寄るため捨てた。Web 照合で両本とも同一・近い真相なし。詳細は <code>STATUS.md</code>「U21 の候補」。人間ゲートで物語 1 を承認（物語 2 は不採用）。</p></div>
+<div class="plan-fold-inner"><p><strong>U20 ゴール B（2026-09-23・素材化）</strong>: 承認済みコアから工程 4S〜9 を実施し、<code>stock_items.py</code> に U20（<code>content_key</code> 008-who-made-the-mistake・story・難易度 4）を追加。<strong>切り出しの変更 1 件</strong>: 場面を「発表会の講師の模範演奏」から「ピアノの演奏会」へ移した（教室・発表会は家族に習う人がいることを指す A 型手がかりになり、講師が生徒の曲を弾く現実性も弱いため。A = 0 個で難易度 4）。コア宣言は上限 120 字に収めるため復元部分だけ「男は娘がつっかえる箇所ごと曲を覚えていた」に縮めた（意味は不変）。Web 照合（WebSearch 2 クエリ）で同一・近い真相なし、台帳 #09 は構造が別。機械検査: <code>validate.py</code> 全 8 問 OK（警告 0）/ プローブ 不一致 0・核心語漏れ 0（U20 は想定 17 問）/ <code>generate.py --dry-run</code> 8 件 OK。素材一式とプローブ結果を人間ゲートへ提示し、<strong>ユーザー OK で通過</strong>（1 巡・問題の修正なし・場面変更も承認）。<strong>スキルの修正 1 件</strong>: ゴール文の完了条件に「人間ゲートの指摘を反映する」を入れたため、提示後の返答待ちを Stop フックが未達と判定し続けた。<code>SKILL.md</code> セクション 4 に「ゴール B の完了条件は素材一式の提示 + コミットまでで切る」を追記。確認待ち: 該当なし。課題表: 該当なし。</p><p><strong>U21 ゴール A（2026-09-23）</strong>: 抽選「階段 / すいか / コンビニ」から物語 2 本（「一年越しの判定」= 種飛ばしの勝負が一年後に庭のすいかで決着 / 「12 の次」= 階段で数を覚えた女の子）と切り出し案を提示。推奨は物語 1。物語 2 は B の構造が U20 と同じため不採用推奨。コンビニは定番の筋に寄るため捨てた。Web 照合で両本とも同一・近い真相なし。詳細は <code>STATUS.md</code>「U21 の候補」。人間ゲートで物語 1 を承認（物語 2 は不採用）。</p><p><strong>U21 ゴール B（2026-09-23・素材化）</strong>: <code>stock_items.py</code> に U21（<code>009-year-late-verdict</code>・story・難易度 4）を追加。問題文から「誰も植えていない」を外し（種へ直行するため質問で開く）、フックは「一年越し」を避けて「すいかが下した判定」にした。機械検査: <code>validate.py</code> 全 9 問 OK / プローブ 不一致 0・核心語漏れ 0（感想コメントへの返事に 1 回だけ文字化けが出たが再実行で再現せず）/ <code>generate.py --dry-run</code> 9 件 OK。素材一式とプローブ結果を人間ゲートへ提示。</p></div>
 </details>
 </div>
 </article>
