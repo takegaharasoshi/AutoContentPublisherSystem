@@ -137,6 +137,8 @@ h3{font-size:15px;margin:22px 0 8px;color:var(--accent)}
 .chat li.yes .say{background:var(--warn-bg);border-color:var(--warn);font-weight:700}
 .chat li.gap{margin-top:12px}
 details.spoiler{border-color:var(--bad)}
+details.probe>.qa{padding:0 10px 4px}
+body.f-flag details.probe,body.f-extra details.probe{display:block}
 body.f-extra .qa li.expected{display:none}
 """
 
@@ -179,6 +181,7 @@ REVIEW_JS = """
       btn.classList.add('on');
       var f=btn.getAttribute('data-f');
       document.body.className=(f==='all')?'':'f-'+f;
+      if(f!=='all'){document.querySelectorAll('details.probe').forEach(function(d){d.open=true})}
     });
   });
 })();
@@ -517,7 +520,12 @@ def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
         out.append("<details class='facts spoiler'><summary>確定事実シート（{}）</summary><ul>".format(len(it["fact_sheet"])))
         out += [f"<li>{html.escape(f)}</li>" for f in it["fact_sheet"]]
         out.append("</ul></details>")
-        out.append(f"<h3>プローブ結果（想定質問 {len(it['expected_questions'])} + 共通）</h3>")
+        flagged = n_mis + n_chk
+        out.append(
+            "<details class='probe'><summary>"
+            f"プローブ結果（想定質問 {len(it['expected_questions'])} + 共通 = {len(recs)} 件"
+            f"{f'・要チェック {flagged}' if flagged else '・要チェックなし'}）</summary>"
+        )
         out.append("<ol class='qa'>")
         for r in recs:
             long_truth = r["kind"] == "extra" and len(r["q"]) >= 60
@@ -528,7 +536,7 @@ def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
                 f"<p class='a'><span class='exp'>{html.escape(r['a'])}</span>"
                 f"<span class='arrow'>→</span>{html.escape(r['reply'])}</p></li>"
             )
-        out.append("</ol>")
+        out.append("</ol></details>")
         out.append(
             f"<label class='done'><input type='checkbox' data-done='{no}'> {no} は確認済み</label>"
         )
