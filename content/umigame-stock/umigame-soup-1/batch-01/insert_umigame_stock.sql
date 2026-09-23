@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（10 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（11 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -291,3 +291,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「歯医者」（抽選: ストロー / くしゃみ / 歯医者。引き直し: 帽子 / 風船 / ヘルメット）→ 連想（待合室・定期検診・先生と患者の関係・開業 / 改装した医院・町の古い医院 等 10 件）→ 物語「育った家が歯医者になり、男が患者として通う」→ 隠した B = その歯医者が男の育った家を改装したものであること。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 3 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
+
+-- U23 おじいさんのお釣り
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '011-grandpas-change', 'おじいさんのお釣り', 4,
+        '女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡した。お金は元は全部おじいさんのもので、おこづかいではない。おじいさんは大笑いした。どういうこと？',
+        'おじいさんは小さな酒屋を営み、店の前に自動販売機を一台置いている。小学生の孫の女の子は、登校の途中に毎朝その自販機のお釣りの取り出し口をのぞくのが好きだった。おじいさんは「おじいちゃんの自販機だから、残っていたお金はもらっていいよ」と言い、毎朝孫が通る前に、取り出し口へこっそり十円玉を一枚入れておいた。女の子は「今日もあった」と喜んで、十円玉を瓶にためていった。おじいさんの誕生日、女の子はためた十円玉を持って店の前の自販機で缶コーヒーを一本買い、おじいさんに渡した。自分が入れた十円玉が、自分の自販機に戻ってきて缶コーヒーになったので、おじいさんは大笑いした。',
+        '["お金はおこづかい・お年玉・お手伝いの代金ではない。女の子がおじいさんの財布や家から持ち出したものでもない","女の子は、毎朝同じ場所にあった十円玉を一枚ずつ拾い、数か月かけてためた。道に落ちていたお金ではない","女の子がお金を見つけた場所は、おじいさんの持ち物だった（それが何かは答えの核心。正解宣言のとき以外は補足で言わない）","十円玉がそこにあったのは偶然ではない（どうしてあったかは答えの核心。正解宣言のとき以外は補足で言わない）","おじいさんは前から女の子に「その場所で見つけたお金はもらってよい」と言っていた。女の子は悪いことをしていない","女の子は、そのお金がもともとおじいさんのものだとは知らなかった","おじいさんはお店を営んでいる。女の子は缶コーヒーを、おじいさんのお店のものから買った","缶コーヒーの代金は、結局おじいさんのところへ戻った","おじいさんは怒っていない。うれしくて、おかしくて笑った","女の子の年齢・ほかの家族・缶コーヒーの銘柄は問題に関係ない"]',
+        '[{"q":"おこづかいをためたのですか？","a":"いいえ"},{"q":"お年玉ですか？","a":"いいえ"},{"q":"おじいさんの財布から取りましたか？","a":"いいえ"},{"q":"女の子はお金を拾ったのですか？","a":"はい"},{"q":"道に落ちていたお金ですか？","a":"いいえ"},{"q":"毎日同じ場所で見つけましたか？","a":"はい"},{"q":"お金はおじいさんがわざと置いていましたか？","a":"はい"},{"q":"女の子はそれを知っていましたか？","a":"いいえ"},{"q":"おじいさんはお店をしていますか？","a":"はい"},{"q":"缶コーヒーはおじいさんのお店のものですか？","a":"はい"},{"q":"自動販売機に関係がありますか？","a":"はい"},{"q":"女の子は悪いことをしましたか？","a":"いいえ"},{"q":"おじいさんは怒っていますか？","a":"いいえ"},{"q":"缶コーヒーの銘柄は関係ありますか？","a":"関係ない"},{"q":"女の子の年齢は関係ありますか？","a":"関係ない"},{"q":"おじいさんが毎朝、自分の店の自販機のお釣りの出口に十円玉を入れておき、女の子はそれを集めて、そのお金でおじいさんの自販機から缶コーヒーを買った。","a":"正解"}]',
+        '代金を出したのは誰？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡した。お金は元は全部おじいさんのもので、おこづかいではない。おじいさんは大笑いした。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"おこづかい？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"拾ったお金？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"道に落ちてた？"},{"role":"master","text":"いいえ。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: In front of a small old neighborhood shop in a quiet Japanese town, morning light; a young girl with a school backpack happily holds out a can of coffee with both hands to her grandfather, who laughs heartily with his head tilted back; a glass jar is not shown, no vending machine, no coins, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡しました。
+
+女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡した。お金は元は全部おじいさんのもので、おこづかいではない。おじいさんは大笑いした。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「自動販売機」（抽選: シール / 時計 / 自動販売機。引き直し 2 回: たまご / 毛糸 / 片づけ・くしゃみ / 朝顔 / チャイム）→ 連想（お釣りの取り出し口をのぞく子ども・当たり付き・店先の自販機・売り上げは持ち主に入る 等 9 件）→ 物語「祖父がこっそり置いた十円玉が孫の贈り物になって戻る」→ 隠した B = 祖父が毎朝自分の自販機のお釣り口に十円玉を入れ、孫がそれを集めていたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 4 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
