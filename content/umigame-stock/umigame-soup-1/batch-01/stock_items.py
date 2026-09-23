@@ -112,7 +112,7 @@ ITEMS: list[dict] = [
         ],
         hook="影が薄いと言われて大喜び",
         play_example=[
-            {"role": "questioner", "text": "影は本物の影？"},
+            {"role": "questioner", "text": "男は悪口を言われるのが好きな人？"},
             {"role": "master", "text": "いいえ。"},
             {"role": "questioner", "text": "相手は男の友だち？"},
             {"role": "master", "text": "いいえ。"},
