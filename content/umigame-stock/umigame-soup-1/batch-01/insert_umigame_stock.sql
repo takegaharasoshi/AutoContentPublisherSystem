@@ -1,4 +1,4 @@
--- batch-01 ウミガメストック投入（9 問。人間レビュー + プローブテスト承認後に実行）
+-- batch-01 ウミガメストック投入（10 問。人間レビュー + プローブテスト承認後に実行）
 -- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）。適用先: ローカル MySQL / Aurora（acps）
 -- set_id は set_code から解決するため両環境共通で実行できる。content_key は stock_items.py で採番済み。
 
@@ -262,3 +262,32 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「すいか」（抽選: 階段 / すいか / コンビニ）→ 連想（縁側・兄弟の種飛ばし競争・勝ち負けの言い争い・草に消える種・捨てた種から翌年芽が出る 等 10 件）→ 物語「種飛ばしの勝負が一年後に庭のすいかで決着した」→ 隠した B = 去年の種飛ばしで弟の種が本当に塀ぎわまで飛んでいたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 3 クエリ）で同一・近い真相の投稿問題なし。捨てた種から翌年すいかが生える実例の投稿で現実性を確認。', 1);
+
+-- U22 二時間かけて通う歯医者
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '010-two-hour-dentist', '二時間かけて通う歯医者', 4,
+        '虫歯も痛いところもない男が、電車で二時間かけて、ある町の小さな歯医者に半年ごとに通っている。診察が終わっても、男はしばらく待合室の同じ席に座ってから帰る。どういうこと？',
+        '男は小学生のころまで、その町の古い木造の家で育った。父の転勤で一家は引っ越し、家は人手に渡った。家を買った人は、1 階を改装して小さな歯医者を開いた。四十年後、男はそのことを知り、中に入る方法として、半年ごとの歯の検診をその歯医者で受けることにした。今の家からは電車で二時間かかるが、男には虫歯も痛みもない。待合室の柱には、子どものころに父が刻んだ男の背丈の傷がそのまま残っている。男は診察のあと、その柱の前の席にしばらく座ってから帰る。男が通っているのは、歯医者になった自分の生家だった。',
+        '["男には虫歯も痛いところもなく、特別な治療も受けていない。受けているのは半年ごとのふつうの検診","歯医者の先生・受付の人・ほかの患者は、男の知り合いでも家族でもない","その歯医者の腕や料金・設備が特別に良いわけではない","男は子どものころ、その町に住んでいた。今は電車で二時間かかる別の町に住んでいる","歯医者は古い建物を改装して開かれた小さな医院で、四十年ほど前にはまだ歯医者ではなかった","男が通う理由は、歯医者の建物そのものにある（どういう建物かは答えの核心。正解宣言のとき以外は補足で言わない）","待合室の男がいつも座る席の近くに、男にとって大切なものが残っている（それが何かは答えの核心。正解宣言のとき以外は補足で言わない）","先生は男が通う理由を知らない。男は誰にも迷惑をかけていない","男は悲しんでいるのではなく、懐かしんでいる","男の仕事・家族構成・年齢は問題に関係ない","電車の路線・歯医者の名前は問題に関係ない"]',
+        '[{"q":"先生の腕がいいからですか？","a":"いいえ"},{"q":"先生は男の知り合いですか？","a":"いいえ"},{"q":"受付の人に会いに行っていますか？","a":"いいえ"},{"q":"料金が安いからですか？","a":"いいえ"},{"q":"特別な治療を受けていますか？","a":"いいえ"},{"q":"歯医者という場所に理由がありますか？","a":"はい"},{"q":"男はその町に住んでいたことがありますか？","a":"はい"},{"q":"その歯医者は昔から歯医者でしたか？","a":"いいえ"},{"q":"歯医者の建物は昔、別の用途でしたか？","a":"はい"},{"q":"男はその建物に入ったことがありましたか？","a":"はい"},{"q":"待合室に男の思い出の物がありますか？","a":"はい"},{"q":"男は悲しんでいますか？","a":"いいえ"},{"q":"男の仕事は関係ありますか？","a":"関係ない"},{"q":"電車の路線は関係ありますか？","a":"関係ない"},{"q":"男は歯医者が好きなのですか？","a":"いいえ"},{"q":"その歯医者は、男が子どものころに育った家を改装したもので、男は検診を口実に自分の生家に通っている。","a":"正解"}]',
+        '虫歯のない男の通院', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"虫歯も痛いところもない男が、電車で二時間かけて、ある町の小さな歯医者に半年ごとに通っている。診察が終わっても、男はしばらく待合室の同じ席に座ってから帰る。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"先生が知り合い？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"場所に理由がある？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"腕のいい先生？"},{"role":"master","text":"いいえ。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: The small waiting room of a quiet dental clinic set inside an old renovated Japanese wooden house, afternoon light through a window; a man in his fifties sits alone on a bench by a dark wooden pillar, looking around the room with a gentle, nostalgic smile; a reception window in the background; no marks on the pillar, no dentist, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+虫歯も痛いところもない男が、電車で二時間かけて、ある町の小さな歯医者に半年ごとに通っています。
+
+虫歯も痛いところもない男が、電車で二時間かけて、ある町の小さな歯医者に半年ごとに通っている。診察が終わっても、男はしばらく待合室の同じ席に座ってから帰る。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「歯医者」（抽選: ストロー / くしゃみ / 歯医者。引き直し: 帽子 / 風船 / ヘルメット）→ 連想（待合室・定期検診・先生と患者の関係・開業 / 改装した医院・町の古い医院 等 10 件）→ 物語「育った家が歯医者になり、男が患者として通う」→ 隠した B = その歯医者が男の育った家を改装したものであること。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 3 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
