@@ -166,6 +166,7 @@
 <p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}</code> の 1 行</strong>とする。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b）。</p>
 <ul>
   <li><strong>構成（PoC の実例）</strong>: 「【ウミガメのスープ 第 N 問】」+ 問題文の再掲 + 遊び方（「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ）+ ハッシュタグ（<code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart</code>）。ただし<strong>問題番号「第 N 問」は書かない</strong>（ストックは LRU で消費され投稿順が確定しないため。PoC の表記は本番では使わない）</li>
+  <li><strong>問題文の要約（問題固有の一言）は入れない</strong>（2026-09-24 の素材レビューでユーザー決定）: 見出しの直後に問題固有の一言を置いていたが、中身が問題文の要約になり、すぐ下の問題文と同じ話が 2 回出るように見えるため廃止した。構成は「見出し【探偵カメロックのウミガメのスープ】→ 問題文 → 遊び方 → ハッシュタグ」の 4 段で全問共通（<code>umigame_common.caption()</code> が組み立てる）</li>
   <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> のみのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Amazon Polly のためクレジット表記は不要（VOICEVOX 時代の常設クレジット行は本セットにはない）</li>
   <li>テンプレートを <code>{{caption}}</code> だけにする理由: ハッシュタグの固定部を分けると「問題固有のタグを足したい」ときに 2 箇所を見ることになり、素材項目 14 項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
 </ul>

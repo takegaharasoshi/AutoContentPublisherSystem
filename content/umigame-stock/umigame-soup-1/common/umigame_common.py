@@ -59,20 +59,19 @@ CAPTION_PLAY = (
 HASHTAGS = "#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart"
 
 
-def caption(problem_text: str, lead: str = "") -> str:
-    """キャプション本文を組み立てる。
+def caption(problem_text: str) -> str:
+    """キャプション本文を組み立てる（見出し → 問題文 → 遊び方 → ハッシュタグ）。
+
+    問題固有の一言（旧 ``lead``）は 2026-09-24 のレビューで廃止した。問題文の要約になり、
+    すぐ下の問題文と同じ話が 2 回出るように見えるため。
 
     Args:
         problem_text: 問題文（版面と同じ全文）。
-        lead: 問題固有の一言（任意。問題文の前に 1 行置く）。
 
     Returns:
         本文 + ハッシュタグの完成キャプション（#AIart 含む）。
     """
-    parts = [CAPTION_HEADER]
-    if lead:
-        parts.append(lead)
-    parts += ["", problem_text, "", CAPTION_PLAY, "", HASHTAGS]
+    parts = [CAPTION_HEADER, "", problem_text, "", CAPTION_PLAY, "", HASHTAGS]
     return "\n".join(parts)
 
 

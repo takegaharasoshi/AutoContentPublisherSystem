@@ -27,7 +27,6 @@ Scene: A middle-aged man in a plain shirt seen from behind, walking alone along 
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-「影が薄くなった」と言われて泣いて喜び、相手に何度も頭を下げた男。相手もにこにこ笑っていました。
 
 久しぶりに会った相手から「影がずいぶん薄くなった」と言われて、男は泣いて喜んだ。そう言った相手もにこにこ笑っていて、男は相手に何度も頭を下げた。どういうこと？
 
@@ -56,7 +55,6 @@ Scene: Two men in plain work clothes seen from behind, standing in an open yard 
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-自分たちの名前をわざと鏡文字で書いている働く男たち。読みにくいのに、このおかげで仕事がやりやすくなっています。
 
 働く男たちは自分たちの名前を、わざと鏡文字で大きく書いている。そのままではとても読みにくいのに、このおかげで男たちの仕事がやりやすくなっている。どういうこと？
 
@@ -85,7 +83,6 @@ Scene: Five young men in plain clothes standing in a row on a short flight of wi
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-階段に並んで楽器を構えているのに、一度も音を出したことがない男たち。それでも見ている人たちは毎日うれしそうです。
 
 男たちは階段に横一列に並び、楽器を構えている。しかし、男たちは今まで一度も音を出したことがない。それでも見ている人たちは、うれしそうに毎日眺めている。どういうこと？
 
@@ -114,7 +111,6 @@ Scene: An elderly man with gentle eyes sitting by a window in warm evening light
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-男の子が書いた手紙を受け取った男。その子に一度も会ったことがないのに、どんな子なのかを誰よりもよく知っています。
 
 ある日、一人の男のもとに、男の子が書いた手紙が届いた。男はその子に、これまで一度も会ったことがない。それなのに、その子がどんな子なのか、誰よりもよく知っていた。なぜ？
 
@@ -143,7 +139,6 @@ Scene: A kind old baker in a warm bakery at dawn, gently cradling a large white 
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-店の卵をとても大切にしているパン屋の主人。焼くことも割ることもしないのに、パンがおいしいのはこの卵のおかげだといつも自慢しています。
 
 パン屋の主人は、店の卵をとても大切にしている。焼くことも、割ることもしない。それなのに主人は、うちのパンがおいしいのはこの卵のおかげだ、といつも自慢している。なぜ？
 
@@ -172,7 +167,6 @@ Scene: A man standing perfectly still on an open grassy field, arms held slightl
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-凍りついたまま助けを待っていた男。ようやく助けに来た女も、男のそばで同じように凍りついてしまいました。
 
 男は凍りついたまま、誰かが助けに来るのをじっと待っていた。ようやく助けに来た女は、男のそばまで来たところで、同じようにその場で凍りついてしまった。どういうこと？
 
@@ -201,7 +195,6 @@ Scene: A man and a woman in summer clothes sitting at a table in a bright Japane
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-男と女は大切な約束をしました。夏のある日、その約束は白紙に戻ってしまいました。それなのに、二人は少しも悲しまなかったのです。
 
 男と女は大切な約束をした。夏のある日、その約束は白紙に戻ってしまった。それなのに、二人は少しも悲しまなかった。そして約束は、後日きちんと果たされた。どういうこと？
 
@@ -230,7 +223,6 @@ Scene: Inside a small concert hall, a pianist in formal clothes playing a grand 
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-ピアノの演奏会で、男は途中で「あ、間違えた」と小声で言いました。ピアニストの演奏は一音も外さない完璧なものだったのに。
 
 ピアノの演奏会で、男は途中で「あ、間違えた」と小声で言った。ピアニストの演奏は一音も外さない完璧なものだった。隣で聞いた女は、こらえきれずに吹き出した。どういうこと？
 
@@ -259,7 +251,6 @@ Scene: A sunny summer afternoon in the garden of a Japanese family house with a 
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-夏、男は弟と実家へ帰りました。庭のいちばん奥のすみに、小さなすいかが一つ実っていたのです。
 
 夏、男は弟と実家へ帰った。庭のいちばん奥のすみに、小さなすいかが一つ実っていた。男はそれをしばらく黙って眺めてから、笑って弟に「お前の勝ちだ」と言った。どういうこと？
 
@@ -288,7 +279,6 @@ Scene: The small waiting room of a quiet dental clinic set inside an old renovat
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-虫歯も痛いところもない男が、電車で二時間かけて、ある町の小さな歯医者に半年ごとに通っています。
 
 虫歯も痛いところもない男が、電車で二時間かけて、ある町の小さな歯医者に半年ごとに通っている。診察が終わっても、男はしばらく待合室の同じ席に座ってから帰る。どういうこと？
 
@@ -317,7 +307,6 @@ Scene: In front of a small old neighborhood shop in a quiet Japanese town, morni
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡しました。
 
 女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡した。お金は元は全部おじいさんのもので、おこづかいではない。おじいさんは大笑いした。どういうこと？
 
@@ -346,7 +335,6 @@ Scene: A quiet Japanese residential street on a school route in the early mornin
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-男がいつもより早くジョギングに出た朝、通学路の家から小学生が次々に飛び出してきました。
 
 男がいつもより早くジョギングに出た朝、通学路の家から小学生が次々に飛び出してきて、男を追い抜いて学校へ走っていった。誰も遅刻しそうではなかった。どういうこと？
 
@@ -375,7 +363,6 @@ Scene: A Japanese tatami living room on New Year''s morning; an elderly man in h
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-七十歳の男は元日、ある友人から届いた年賀状を読んで「勝った！」と万歳しました。
 
 七十歳の男は元日、ある友人から届いた年賀状を読むと、家族の前で「勝った！」と万歳した。二人は中学を卒業してから五十五年間、一度も会っていない。どういうこと？
 
@@ -404,7 +391,6 @@ Scene: A Japanese home kitchen; a woman in her forties and her elderly mother-in
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
-外国から嫁いできた女と義母は、十年間とても仲よしでした。ところが女が日本語を覚えると……。
 
 外国から嫁いできた女と義母は、同居してから十年間、近所で評判の仲のよさだった。ところが女が日本語を覚えて話せるようになると、二人は毎日けんかを始めた。どういうこと？
 

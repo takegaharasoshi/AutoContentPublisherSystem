@@ -43,7 +43,7 @@ def _item(**kw: object) -> dict:
     kw.setdefault("character_lines", CHARACTER_LINES_DEFAULT)
     kw["narration"] = {"problem": kw.pop("narration_problem"), "rule": NARRATION_RULE_DEFAULT}
     kw["illustration_prompt"] = illustration_prompt(str(kw.pop("scene")))
-    kw["caption"] = caption(str(kw["problem_text"]), str(kw.pop("caption_lead")))
+    kw["caption"] = caption(str(kw["problem_text"]))
     kw["source_note"] = f"{kw.pop('method_note', METHOD_NOTE)} {kw['source_note']}"
     return kw
 
@@ -124,7 +124,6 @@ ITEMS: list[dict] = [
             "in late afternoon; his long shadow stretches ahead of him on the pavement; low houses, a utility pole "
             "and a hedge along the street; soft warm sunlight, no other people."
         ),
-        caption_lead="「影が薄くなった」と言われて泣いて喜び、相手に何度も頭を下げた男。相手もにこにこ笑っていました。",
         source_note=(
             "型: 意味誤誘導型。モチーフ「影」（作問スキル umigame-problem-writer の抽選 3 語〔影・鉛筆・ゴミ出し〕から選択）→ "
             "連想「影が薄い（慣用句）・レントゲンの影」→ 抽象化（影が薄い = 存在感 / 写真に写る影）→ "
@@ -207,7 +206,6 @@ ITEMS: list[dict] = [
             "blank white board between them; a small hand mirror resting on a wooden crate nearby; a low wall and "
             "a tree; soft morning light, no vehicles, no other people, no text or letters anywhere."
         ),
-        caption_lead="自分たちの名前をわざと鏡文字で書いている働く男たち。読みにくいのに、このおかげで仕事がやりやすくなっています。",
         source_note=(
             "型: 意味誤誘導型。モチーフ「鏡」（作問スキル umigame-problem-writer の抽選 3 語〔時計・毛糸・鏡〕から。"
             "初稿「時計台の下で満足する女」はコアが弱く 2026-09-07 のレビューで取り下げ、工程 2 からやり直した）→ "
@@ -290,7 +288,6 @@ ITEMS: list[dict] = [
             "flute but not playing, perfectly still; two or three people watching from below with delighted faces; "
             "warm soft light, simple background, no text or letters anywhere."
         ),
-        caption_lead="階段に並んで楽器を構えているのに、一度も音を出したことがない男たち。それでも見ている人たちは毎日うれしそうです。",
         source_note=(
             "型: 意味誤誘導型。モチーフ「階段」（作問スキル umigame-problem-writer の抽選 3 語〔テント・のど飴・階段〕から）→ "
             "連想「ひな壇・段・踊り場・はしご・上っても着かない」→ 具体化（階段に並ぶ男たち → 段飾りに並ぶ五人囃子）→ "
@@ -375,7 +372,6 @@ ITEMS: list[dict] = [
             "with both hands and smiling nostalgically; behind him a faint dream-like image of a small schoolboy "
             "writing at a desk; simple background, no text or letters anywhere."
         ),
-        caption_lead="男の子が書いた手紙を受け取った男。その子に一度も会ったことがないのに、どんな子なのかを誰よりもよく知っています。",
         source_note=(
             "型: 意味誤誘導型。モチーフ「郵便」（作問スキル umigame-problem-writer の抽選 3 語〔片づけ・郵便・たまご〕から）→ "
             "連想「タイムカプセル・卒業式に書く未来の自分への手紙」→ 具体化（昔の男の子が書いた手紙を受け取る男）→ "
@@ -457,7 +453,6 @@ ITEMS: list[dict] = [
             "like a treasure, shelves of freshly baked bread glowing behind him; soft morning light, "
             "simple background, no text anywhere."
         ),
-        caption_lead="店の卵をとても大切にしているパン屋の主人。焼くことも割ることもしないのに、パンがおいしいのはこの卵のおかげだといつも自慢しています。",
         source_note=(
             "型: 意味誤誘導型。モチーフ「たまご」（作問スキル umigame-problem-writer の抽選 3 語〔ベンチ・たまご・階段〕から。"
             "前 3 回の抽選〔自転車・すいか・花火 → 初案取り下げ / 帽子・体重計・お守り → 猫をかぶる案が差し戻し / のど飴・鍵・迷子 → 全滅で引き直し〕も記録）→ "
@@ -544,7 +539,6 @@ ITEMS: list[dict] = [
             "as if he cannot move, looking hopefully into the distance; a woman running toward him from far away; "
             "a few trees and a low fence in the background, bright daytime, no other people."
         ),
-        caption_lead="凍りついたまま助けを待っていた男。ようやく助けに来た女も、男のそばで同じように凍りついてしまいました。",
         source_note=(
             "型: 意味誤誘導型。モチーフ「氷」（作問スキル umigame-problem-writer の抽選 3 語〔氷・花火・くしゃみ〕から選択。"
             "花火は「音が光より遅れる」が U15 と同じ遅延構造・「朝の号砲」は地域慣習・煙や型物花火は語の仕掛けなし、"
@@ -636,10 +630,6 @@ ITEMS: list[dict] = [
             "while looking together at a single completely blank sheet of paper held between them, warm evening light "
             "after summer rain outside the window; no pen, no hair dryer, no text on the paper, nobody sad."
         ),
-        caption_lead=(
-            "男と女は大切な約束をしました。夏のある日、その約束は白紙に戻ってしまいました。"
-            "それなのに、二人は少しも悲しまなかったのです。"
-        ),
         source_note=(
             "型: 意味誤誘導型。21-4a-3 ④ の型別分離（2026-09-22・ユーザー決定）で、人間ゲート通過済みの story 版 U18"
             "「濡れた手紙を乾かしたら白紙になった」を、仕組み（消せるボールペンのインクが熱で消える）の面白さを買われて"
@@ -728,10 +718,6 @@ ITEMS: list[dict] = [
             "serious face, while the woman covers her mouth, trying hard not to burst out laughing; no child, "
             "no sheet music, no text."
         ),
-        caption_lead=(
-            "ピアノの演奏会で、男は途中で「あ、間違えた」と小声で言いました。"
-            "ピアニストの演奏は一音も外さない完璧なものだったのに。"
-        ),
         source_note=(
             "型: 物語復元型（物語先行方式・21-4a-4 で新方式の初通過）。モチーフ「ピアノ」（抽選: ハンコ / ピアノ / ポスト）→"
             " 連想（発表会・家での練習をいつも聞いている親・同じ箇所で止まる 等 16 件）→ 物語「娘の練習の間違いごと曲を覚えた父」→"
@@ -817,7 +803,6 @@ ITEMS: list[dict] = [
             "watermelon growing on a vine in the grass; one man grins and pats his brother on the shoulder, the other "
             "smiles proudly; no seeds, no people eating, no text."
         ),
-        caption_lead="夏、男は弟と実家へ帰りました。庭のいちばん奥のすみに、小さなすいかが一つ実っていたのです。",
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「すいか」（抽選: 階段 / すいか / コンビニ）→ 連想（縁側・兄弟の種飛ばし競争・"
             "勝ち負けの言い争い・草に消える種・捨てた種から翌年芽が出る 等 10 件）→ 物語「種飛ばしの勝負が一年後に庭のすいかで"
@@ -899,7 +884,6 @@ ITEMS: list[dict] = [
             "looking around the room with a gentle, nostalgic smile; a reception window in the background; "
             "no marks on the pillar, no dentist, no text."
         ),
-        caption_lead="虫歯も痛いところもない男が、電車で二時間かけて、ある町の小さな歯医者に半年ごとに通っています。",
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「歯医者」（抽選: ストロー / くしゃみ / 歯医者。引き直し: 帽子 / 風船 / ヘルメット）"
             "→ 連想（待合室・定期検診・先生と患者の関係・開業 / 改装した医院・町の古い医院 等 10 件）→ 物語「育った家が歯医者になり、"
@@ -981,7 +965,6 @@ ITEMS: list[dict] = [
             "happily holds out a can of coffee with both hands to her grandfather, who laughs heartily with his head tilted back; "
             "a glass jar is not shown, no vending machine, no coins, no text."
         ),
-        caption_lead="女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡しました。",
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「自動販売機」（抽選: シール / 時計 / 自動販売機。引き直し 2 回: "
             "たまご / 毛糸 / 片づけ・くしゃみ / 朝顔 / チャイム）→ 連想（お釣りの取り出し口をのぞく子ども・当たり付き・"
@@ -1064,7 +1047,6 @@ ITEMS: list[dict] = [
             "looks back in surprise as several elementary school children with school backpacks dash past him toward school, "
             "one child holding a piece of toast in the mouth; houses with windows along the street, no clocks, no text."
         ),
-        caption_lead="男がいつもより早くジョギングに出た朝、通学路の家から小学生が次々に飛び出してきました。",
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「マラソン」「足音」（2 巡目の抽選: ろうそく / はしご / マラソン・"
             "弁当 / 豆まき / ろうそく・足音 / 日記 / ゴミ出し ほか）→ 連想（毎朝のジョギング・同じ時刻・通学路・すれ違う小学生・"
@@ -1147,7 +1129,6 @@ ITEMS: list[dict] = [
             "while holding a single New Year's postcard, his wife and grown-up family around a low table with New Year's dishes "
             "look at him with amused smiles; a pile of other postcards on the table, no readable writing, no text."
         ),
-        caption_lead="七十歳の男は元日、ある友人から届いた年賀状を読んで「勝った！」と万歳しました。",
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「将棋」「郵便」（抽選 17 回: ネクタイ / 消しゴム / 傘・将棋 / マスク / 傘・"
             "バケツ / 畳 / 郵便 ほか）→ 連想（転校で別れた友人・年賀状・一年に一度の便り・手紙で指す将棋・床の間の盤・お年玉くじ 等 11 件）"
@@ -1231,7 +1212,6 @@ ITEMS: list[dict] = [
             "both frowning and arguing with animated hand gestures over a pot of miso soup; an open bilingual dictionary lies "
             "on the kitchen table; warm afternoon light, no readable writing, no text."
         ),
-        caption_lead="外国から嫁いできた女と義母は、十年間とても仲よしでした。ところが女が日本語を覚えると……。",
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「辞書」（抽選 22 回: 毛糸 / お年玉 / バス停・ゴミ出し / 時計 / 辞書・"
             "バス停 / 畳 / 辞書 ほか）→ 連想（外国語・国際結婚・同居・嫁と姑・子どもが二つの言葉を話す・通訳・言葉が分かると聞こえ方が変わる 等 11 件）"
