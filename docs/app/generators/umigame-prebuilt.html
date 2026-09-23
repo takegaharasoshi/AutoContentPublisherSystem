@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>方式名（レジストリキー）: umigame-prebuilt</span>
-  <span>最終更新: 2026-09-04</span>
+  <span>最終更新: 2026-09-23（21-5a の実装差分を 8.1 に追記）</span>
 </div>
 
 <div class="note">
@@ -134,6 +134,16 @@ LIMIT 1 FOR UPDATE;</code></pre>
   <li><strong>プローブテスト（工程 2）はレビューの前提</strong>: 素材レビューは「動画のイメージ + 想定質問への実回答」を並べて見る（21-2 で確定した進め方）</li>
   <li>キャラ画像・フォント・SE はセット固定資産（<a href="../sets/umigame-soup-1.html#assets">セット別設計書 9</a>）で工程には含めない</li>
 </ul>
+<div class="decision">
+  <span class="callout-title">決定（2026-09-23、21-5a）: ツーリング本組みでの実装差分</span>
+  <ul>
+    <li><strong>ストックの読み元は DB ではなくバッチの単一ソース</strong>（<code>content/umigame-stock/umigame-soup-1/&lt;batch&gt;/stock_items.py</code>）。ホストの Python 3.8 に pymysql・boto3 が無く、ローカル MySQL・Aurora とも同じ単一ソースから投入しているため（21-4b）。<code>content_key</code> は両環境と一致する</li>
+    <li><strong>ビルド時の選曲は <code>audio_assets</code> ではなくローカル台帳で行う</strong>: <code>work/bgm/tracks.json</code> の前処理済みトラックから、<code>work/manifest.json</code> 上の使用回数が最少の曲（同数は番号順）を割り当てる（再ビルドは割当を維持）。<code>video_audio_asset_id</code> は <code>publish.py</code> の <code>update_prebuilt.sql</code> が BGM の S3 キーで <code>audio_assets</code> を JOIN して解決する（環境ごとに ID が違っても同じ SQL で済む）。BGM のフェードは <code>prepare_bgm.py</code> が素材に焼き込み、コンポジションはダッキングだけを掛ける</li>
+    <li><strong>暫定 BGM</strong>: umigame 用の 24 秒トラックが未調達のため、第 1 バッチは PoC の <code>bgm_24s.m4a</code>（logic-training-1 night track01 の 20 秒版を 24 秒にループ。20 秒地点に継ぎ目あり）を <code>provisional</code> として使ってビルドした。<code>publish.py</code> は暫定 BGM の動画を検査エラーにする（正式トラックの調達 → <code>prepare_bgm.py</code> → 再ビルド〔レンダリングからやり直し〕が publish の前提）</li>
+    <li><strong>つかみ帯のフォントは字数で縮める</strong>: 74px の 1 行に収まるのは 11 字まで（内寸 828px）。12〜13 字のフック（第 1 バッチで 4 問）が折り返して問題カードの下に隠れたため、<code>UmigameReel.tsx</code> で <code>min(74, floor(828 / 字数) - 1)</code> の字数フィット + 折り返し禁止にした</li>
+    <li><strong>ビルド検査</strong>: ffprobe（1080x1920・30fps・24.0±0.2 秒・AAC）と、最終 MP4 のフレーム 0 / 719 の平均絶対差（仮の閾値 3.0。第 1 バッチの実測は 1.8 前後）。結果は <code>work/manifest.json</code> に残り、<code>review_sheet.py</code> が <code>work/review.html</code> に並べる</li>
+  </ul>
+</div>
 
 <h3 id="composition">8.2 動画の作り（24 秒・ループ前提のコンポジション）</h3>
 <p>1080x1920・30fps・<strong>720 フレーム</strong>。版面は logic-training-1 の骨格（常時表示の上部 + 時間で切り替わる下部）に寄せ、イラストは背景に敷く。</p>

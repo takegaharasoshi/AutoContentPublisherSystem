@@ -179,7 +179,8 @@
 </table>
 </div>
 <ul>
-  <li>選曲はビルド時（<code>build.py</code>）に <code>audio_assets</code> の順繰り（<code>last_used_at</code> 最古）で行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）</li>
+  <li>選曲はビルド時（<code>build.py</code>）に行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）。21-5a の実装ではローカル台帳 <code>work/bgm/tracks.json</code> の使用回数最少で選び、ID は publish 時に S3 キーで解決する（<a href="../generators/umigame-prebuilt.html#build-steps">方式設計書 8.1 の決定</a>）。<strong>24 秒トラックは未調達</strong>（第 1 バッチは暫定 BGM でビルド。正式トラックの調達が publish の前提）</li>
+  <li>SE は動画に焼き込むだけで実行時に使わないため、ファイルの正は <code>content/video-build/umigame-soup-1/assets/se/bubble_pop.wav</code>（git 管理）とし、S3 配置・<code>audio_assets</code> 登録は必要になるまで行わない</li>
   <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
 </ul>
 
@@ -198,10 +199,10 @@
 <div class="table-wrap">
 <table>
 <tr><th>アセット</th><th>正（ファイル）</th><th>備考</th></tr>
-<tr><td>出題者「探偵カメロック」（基本ポーズ / 喜びポーズ）</td><td><code>content/video-build/umigame-soup-1/remotion/public/characters/master_base.png</code> / <code>master_happy.png</code>（正規化済み・共通キャンバス 1000x1100）</td><td>設定とプロンプトは <code>design.json</code>（21-2 の <code>poc/classic-umigame/v2/design.json</code> を 21-5a でセット資産へ昇格）。ポーズ差分は基本ポーズを参照画像（<code>-i</code>）にして生成すると衣装・色が揃う。透過にならない場合は「単色フラットなマゼンタ #FF00FF の背景」を明示して生成し直す（21-2 知見）</td></tr>
+<tr><td>出題者「探偵カメロック」（基本ポーズ / 喜びポーズ）</td><td><code>content/video-build/umigame-soup-1/assets/characters/master_base.png</code> / <code>master_happy.png</code>（正規化済み・共通キャンバス 1000x1100）</td><td>設定とプロンプトは <code>assets/design.json</code>（21-2 の <code>poc/classic-umigame/v2/design.json</code> を 21-5a でセット資産へ昇格済み。<code>remotion/public/</code> はビルド時の配置先で git 管理外のため、正は <code>assets/</code> に置いた）。ポーズ差分は基本ポーズを参照画像（<code>-i</code>）にして生成すると衣装・色が揃う。透過にならない場合は「単色フラットなマゼンタ #FF00FF の背景」を明示して生成し直す（21-2 知見）</td></tr>
 <tr><td>質問者「カメロック Jr.」（基本ポーズ）</td><td>同 <code>jr_base.png</code></td><td>視線は左上（父の方向）。喜びポーズは持たない</td></tr>
 <tr><td>画風固定行（キャラ / 背景）</td><td><code>design.json</code> の <code>style_line</code> / <code>background_prompt</code> の画風部分</td><td>C4: 90 年代 OVA 手描きセル塗り。セクション 5.2 の固定行と同一</td></tr>
-<tr><td>フォント</td><td>Zen Kaku Gothic New（Regular / Medium / Bold。<code>remotion/public/fonts/</code>）</td><td>pref-ranking-1 と同じ（SIL OFL）。<code>@remotion/fonts</code> の <code>loadFont</code> で読み込む</td></tr>
+<tr><td>フォント</td><td>Zen Kaku Gothic New（Medium / Bold / Black。ビルド時に pref-ranking-1 の <code>remotion/public/fonts/</code> から配置）</td><td>pref-ranking-1 と同じ（SIL OFL）。<code>@remotion/fonts</code> の <code>loadFont</code> で読み込む</td></tr>
 <tr><td>版面の座標・ビート・効果</td><td><code>remotion/src/timeline.ts</code> / <code>UmigameReel.tsx</code></td><td>実装が正。設計書には構成と不変条件のみ（方式設計書 8.2）</td></tr>
 </table>
 </div>

@@ -1,4 +1,33 @@
-# umigame-soup-1 動画ビルド（21-2 PoC）
+# umigame-soup-1 動画ビルド
+
+## 本番の手順
+
+```bash
+cd content/video-build/umigame-soup-1
+
+# 1. ストックから背景プロンプトを出力し、画像生成後の PNG を work/backgrounds/raw/ に置く
+python3 export_prompts.py
+bash scripts/gen_backgrounds.sh
+python3 intake.py
+
+# 2. BGM を用意する。初回は PoC の 24 秒素材を暫定 track01 として台帳へ登録する
+python3 prepare_bgm.py --init-provisional
+python3 prepare_bgm.py
+
+# 3. Polly ナレーションを合成して 24 秒動画をビルドする
+python3 build.py
+python3 review_sheet.py
+
+# 4. 全数レビュー後、承認した content_key を work/approved.txt に 1 行ずつ記入する
+python3 publish.py --dry-run
+python3 publish.py
+```
+
+`--init-provisional` の BGM はレビュー用です。`publish.py` は暫定 BGM を検査エラーにするため、
+本番公開前に正式な BGM へ差し替えて `prepare_bgm.py` を再実行してください。既存 WAV を使う場合は
+`build.py --no-tts` を指定でき、不足時は Polly を呼ばずにエラーで停止します。
+
+## 21-2 PoC の記録
 
 > **第 2 稿（2026-09-04 の人間ゲート反映）**: セクション 0 に決定事項と変更点をまとめた。セクション 2〜5 は第 1 稿の記録で、数値（20 秒・VOICEVOX 等）は第 2 稿で置き換わっている。
 

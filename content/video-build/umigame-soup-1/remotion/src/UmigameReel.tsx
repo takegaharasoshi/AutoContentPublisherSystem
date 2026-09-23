@@ -25,6 +25,9 @@ import {
   loopSin,
 } from "./timeline";
 
+const HOOK_MAX_FONT_SIZE = 74;
+const HOOK_INNER_WIDTH = 828;
+
 /**
  * ウミガメのスープ参加型リール（PoC 第 2 稿。2026-09-04 の人間ゲートの指摘を反映）。
  *
@@ -66,6 +69,8 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
   const hop = hopLift(frame);
   const sheenPhase = loopPhase(frame, LOOP_PERIODS.hookSheen);
   const hookBreathe = 1 + loopSin(frame, LOOP_PERIODS.hookBreathe) * 0.006;
+  // つかみ帯は 1 行固定。内寸 828px（900 - 左右 36px）に収まるよう、11 字を超えたら字数に応じて縮める（上限 74px）
+  const hookFontSize = Math.min(HOOK_MAX_FONT_SIZE, Math.floor(HOOK_INNER_WIDTH / [...hook].length) - 1);
   const headingBar = 1 + loopSin(frame, LOOP_PERIODS.headingBar) * 0.09;
   const tagDot = (loopSin(frame, LOOP_PERIODS.tagDot) + 1) / 2;
 
@@ -120,8 +125,9 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
           backgroundColor: "#ffc42e",
           color: "#14202a",
           fontFamily: FONT_DISPLAY,
-          fontSize: 74,
+          fontSize: hookFontSize,
           lineHeight: 1.25,
+          whiteSpace: "nowrap",
           textAlign: "center",
           letterSpacing: 1,
           boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
