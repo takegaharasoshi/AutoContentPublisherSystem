@@ -51,7 +51,8 @@ Windows 側 Tailscale CLI: `/mnt/c/Program Files/Tailscale/tailscale.exe`(WSL �
 
 `content/**/work/review.html` 等の**レビュー資材は docs 配信を止めずに別ポートで出す**(`serve-docs.sh` は
 `DOCS_ROOT` + `DOCS_PORT` の上書きに対応済み。配信ルートは増やさない)。使用中のポート: 8765 = `docs/`、
-8766 = `content/video-build/logic-training-1/work`、8767 = `content/umigame-stock/umigame-soup-1/batch-01`。
+8766 = `content/video-build/logic-training-1/work`、8767 = `content/umigame-stock/umigame-soup-1/batch-01`、8768 = `content/video-build/umigame-soup-1/work`（21-5a の動画レビュー）。
+動画（MP4）は `docs_server.py` が単一 Range 要求に 206 で応えるので iPhone の Safari でも再生できる（2026-09-24 に対応。それ以前は 200 の全量返しで iOS が再生しなかった）。
 
 ```bash
 DOCS_PORT=8767 DOCS_ROOT="$PWD/content/umigame-stock/umigame-soup-1/batch-01" tools/serve-docs.sh start

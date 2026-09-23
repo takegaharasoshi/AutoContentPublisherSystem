@@ -10,13 +10,17 @@ from __future__ import annotations
 import argparse
 import functools
 import http.server
+import os
 from pathlib import Path
+import re
 
 DOCS_DIR = Path(__file__).resolve().parent.parent / "docs"
 
 _CHARSET_TYPES = frozenset(
     {"text/html", "text/css", "text/javascript", "application/javascript"}
 )
+
+_RANGE_RE = re.compile(r"bytes=(\d*)-(\d*)")
 
 
 class DocsRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -37,6 +41,56 @@ class DocsRequestHandler(http.server.SimpleHTTPRequestHandler):
         if ctype in _CHARSET_TYPES:
             return f"{ctype}; charset=utf-8"
         return ctype
+
+    def send_head(self):  # type: ignore[override]
+        """単一の ``Range: bytes=`` 要求に 206 で応える（それ以外は既定動作）。
+
+        iOS Safari は Range に 206 で応えないサーバーの MP4 を再生しないため、
+        レビュー HTML の動画（``content/**/work/videos/``）をスマホで見るのに要る。
+        """
+        range_header = self.headers.get("Range", "")
+        path = self.translate_path(self.path)
+        match = _RANGE_RE.fullmatch(range_header.strip())
+        if not match or not os.path.isfile(path):
+            return super().send_head()
+        size = os.path.getsize(path)
+        start_text, end_text = match.groups()
+        if start_text:
+            start = int(start_text)
+            end = min(int(end_text), size - 1) if end_text else size - 1
+        elif end_text:
+            start, end = max(size - int(end_text), 0), size - 1
+        else:
+            return super().send_head()
+        if start >= size or start > end:
+            self.send_response(416)
+            self.send_header("Content-Range", f"bytes */{size}")
+            self.end_headers()
+            return None
+        body = open(path, "rb")
+        body.seek(start)
+        self._range_remaining = end - start + 1
+        self.send_response(206)
+        self.send_header("Content-Type", self.guess_type(path))
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+        self.send_header("Content-Length", str(self._range_remaining))
+        self.end_headers()
+        return body
+
+    def copyfile(self, source, outputfile) -> None:  # type: ignore[override]
+        """Range 応答では要求された長さだけ送る。"""
+        remaining = getattr(self, "_range_remaining", None)
+        if remaining is None:
+            super().copyfile(source, outputfile)
+            return
+        self._range_remaining = None
+        while remaining > 0:
+            chunk = source.read(min(64 * 1024, remaining))
+            if not chunk:
+                break
+            outputfile.write(chunk)
+            remaining -= len(chunk)
 
     def end_headers(self) -> None:
         """キャッシュ禁止のヘッダを足してからヘッダを閉じる。
