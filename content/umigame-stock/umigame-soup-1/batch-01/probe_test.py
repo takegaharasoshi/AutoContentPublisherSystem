@@ -117,6 +117,26 @@ details li{margin:4px 0;font-size:14.5px}
 code{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:13px;word-break:break-all}
 a{color:var(--accent)}
 body.f-flag .qa li.match,body.f-flag .item.clean{display:none}
+details.item{margin:14px 0;background:var(--bg);border-width:1px 1px 1px 4px;border-left-color:var(--accent)}
+details.item>summary{flex-wrap:wrap;gap:8px;font-size:16px;font-weight:700;padding:12px 14px;min-height:52px}
+details.item>summary .no{color:var(--accent)}
+details.item>summary .idx-badges{margin-left:auto}
+details.item[open]>summary{border-bottom:1px solid var(--line)}
+.item-body{padding:4px 14px 14px}
+h3{font-size:15px;margin:22px 0 8px;color:var(--accent)}
+.fld{margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.fld .k{display:block;font-size:12.5px;color:var(--muted);margin-bottom:2px}
+.fld .v{font-size:15.5px;white-space:pre-wrap;word-break:break-word}
+.fld .v.mono{font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+.fld.scene{border-color:var(--accent)}
+.chat{list-style:none;margin:8px 0;padding:0}
+.chat li{display:flex;gap:8px;align-items:baseline;margin:6px 0}
+.chat .who{flex:0 0 auto;font-size:12px;color:var(--muted);min-width:5.5em}
+.chat .say{padding:7px 11px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:15.5px}
+.chat li.master .say{border-color:var(--accent)}
+.chat li.yes .say{background:var(--warn-bg);border-color:var(--warn);font-weight:700}
+.chat li.gap{margin-top:12px}
+details.spoiler{border-color:var(--bad)}
 body.f-extra .qa li.expected{display:none}
 """
 
@@ -140,9 +160,22 @@ REVIEW_JS = """
   document.querySelectorAll('.item').forEach(function(sec){
     if(!sec.querySelector('.qa li.mismatch, .qa li.check')){sec.classList.add('clean')}
   });
-  document.querySelectorAll('button.f').forEach(function(btn){
+  function openHash(){
+    var id=decodeURIComponent(location.hash.slice(1));
+    var el=id&&document.getElementById(id);
+    if(el&&el.tagName==='DETAILS'){el.open=true;el.scrollIntoView()}
+  }
+  window.addEventListener('hashchange',openHash);
+  openHash();
+  document.querySelectorAll('button[data-all]').forEach(function(btn){
     btn.addEventListener('click',function(){
-      document.querySelectorAll('button.f').forEach(function(b){b.classList.remove('on')});
+      var open=btn.getAttribute('data-all')==='open';
+      document.querySelectorAll('details.item').forEach(function(d){d.open=open});
+    });
+  });
+  document.querySelectorAll('button.f:not(.g)').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('button.f:not(.g)').forEach(function(b){b.classList.remove('on')});
       btn.classList.add('on');
       var f=btn.getAttribute('data-f');
       document.body.className=(f==='all')?'':'f-'+f;
@@ -340,6 +373,66 @@ def handover_html() -> str:
     )
 
 
+def _field(label: str, value: str, *, count: bool = True, cls: str = "", mono: bool = False) -> str:
+    """素材 1 項目をラベル付きのカードにする（字数を添える）。"""
+    suffix = f"（{len(value)} 字）" if count else ""
+    v_cls = "v mono" if mono else "v"
+    return (
+        f"<div class='fld {cls}'><span class='k'>{html.escape(label)}{suffix}</span>"
+        f"<div class='{v_cls}'>{html.escape(value)}</div></div>"
+    )
+
+
+def material_html(it: dict) -> list[str]:
+    """素材一式（版面の文言・プレイ例・セリフ・ナレーション・キャプション・プロンプト・出典）を HTML にする。
+
+    素材の人間ゲートで全項目が目に入るようにする（2026-09-24。プレイ例がシートに無く未レビューのまま
+    動画ビルドまで進んだため追加）。
+    """
+    out = ["<h3>版面に出る文言</h3>"]
+    out.append(_field("フック（つかみ帯）", it["hook"]))
+    out.append(_field("ルール帯", it["rule_text"]))
+    lines = it["character_lines"]
+    out.append("<div class='fld'><span class='k'>吹き出しの流れ（導入 → プレイ例 3 往復 → 締め）</span><ul class='chat'>")
+    out.append(
+        f"<li class='master'><span class='who'>カメロック</span>"
+        f"<span class='say'>{html.escape(lines['master']['intro'])}</span></li>"
+    )
+    for i, line in enumerate(it["play_example"]):
+        role = line["role"]
+        who = "カメロック" if role == "master" else "Jr."
+        yes = " yes" if role == "master" and line["text"].startswith("はい") else ""
+        gap = " gap" if role == "questioner" else ""
+        out.append(
+            f"<li class='{role}{yes}{gap}'><span class='who'>{who}（{len(line['text'])} 字）</span>"
+            f"<span class='say'>{html.escape(line['text'])}</span></li>"
+        )
+    out.append(
+        f"<li class='master gap'><span class='who'>カメロック</span>"
+        f"<span class='say'>{html.escape(lines['master']['outro'])}</span></li>"
+        f"<li class='questioner'><span class='who'>Jr.</span>"
+        f"<span class='say'>{html.escape(lines['jr']['outro'])}</span></li></ul>"
+        "<span class='len'>黄色 = 「はい」の返答（出題者が喜ぶポーズに切り替わる）。上限は質問 16 字・返答 17 字</span></div>"
+    )
+    out.append("<h3>ナレーション（読み上げ用の文）</h3>")
+    out.append(_field("問題文 cue", it["narration"]["problem"]))
+    out.append(_field("ルール cue", it["narration"]["rule"]))
+    out.append("<h3>キャプション</h3>")
+    out.append(_field("投稿本文 + ハッシュタグ", it["caption"]))
+    out.append("<h3>背景イラストのプロンプト</h3>")
+    prompt = it["illustration_prompt"]
+    scene = re.search(r"Scene:\s*(.+?)(?:\n\n|$)", prompt, re.S)
+    if scene:
+        out.append(_field("情景（問ごとに書いた部分）", scene.group(1).strip(), count=False, cls="scene"))
+    out.append(
+        "<details><summary>プロンプト全文（画風固定行・禁止事項を含む）</summary>"
+        f"<p class='v mono' style='white-space:pre-wrap'>{html.escape(prompt)}</p></details>"
+    )
+    out.append("<h3>出典・オリジナル性メモ</h3>")
+    out.append(_field("source_note", it["source_note"], count=False))
+    return out
+
+
 def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
     """review.html を書き出す。
 
@@ -365,13 +458,17 @@ def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
         "<button type='button' class='f on' data-f='all'>全部</button>"
         "<button type='button' class='f' data-f='flag'>要チェックのみ</button>"
         "<button type='button' class='f' data-f='extra'>共通プローブ</button>"
-        "<a class='f' href='#index'>目次</a></div>",
+        "<a class='f' href='#index'>目次</a>"
+        "<button type='button' class='g f' data-all='open'>すべて開く</button>"
+        "<button type='button' class='g f' data-all='close'>すべて閉じる</button></div>",
         "</header>",
         "<main>",
         f"<p class='note'>生成 {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M')}。"
         "<b class='bad'>不一致</b> = 期待した冒頭語と違う。<b class='warn'>要確認</b> = 機械判定できない。"
         "「真相の丸ごと言い当て」「感想」「意味不明」は全問共通の追加プローブ。"
-        "各問の「確認済み」はこの端末のブラウザに保存される。</p>",
+        "各問の「確認済み」はこの端末のブラウザに保存される。"
+        "各問は折りたたみ。素材 14 項目（版面の文言・プレイ例・セリフ・ナレーション・キャプション・イラストプロンプト・出典メモ）"
+        "→ 真相・確定事実 → プローブ結果の順に並ぶ。</p>",
         handover_html(),
     ]
 
@@ -390,28 +487,37 @@ def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
             f"<span class='idx-title'>{html.escape(it['title'])}</span>"
             f"<span class='idx-badges'>{badges}<span class='b n'>{len(recs)}</span></span></a>"
         )
-    out.append("<h2 id='index'>目次（10 問）</h2><nav class='index'>")
+    out.append(f"<h2 id='index'>目次（{len(results)} 問）</h2><nav class='index'>")
     out += index_rows
     out.append("</nav>")
 
     for no, recs in results.items():
         it = by_no[no]
-        out.append(f"<section class='item' id='{no}' data-no='{no}'>")
+        n_mis = sum(1 for r in recs if r["judge"] == "mismatch")
+        n_chk = sum(1 for r in recs if r["judge"] == "check")
+        badges = f"<span class='b bad'>{n_mis}</span>" if n_mis else ""
+        badges += f"<span class='b warn'>{n_chk}</span>" if n_chk else ""
+        badges = badges or "<span class='b ok'>0</span>"
+        out.append(f"<details class='item' id='{no}' data-no='{no}'>")
         out.append(
-            f"<h2 class='item-h'><span class='no'>{no}</span> {html.escape(it['title'])}"
-            f"<span class='tag'>{it['puzzle_type']} / 難易度 {it['difficulty']}</span></h2>"
+            f"<summary><span class='no'>{no}</span> {html.escape(it['title'])}"
+            f"<span class='tag'>{it['content_key']} / {it['puzzle_type']} / 難易度 {it['difficulty']}</span>"
+            f"<span class='idx-badges'>{badges}</span></summary><div class='item-body'>"
         )
         out.append(f"<p class='core'>{html.escape(it['core'])}</p>")
         out.append(
             f"<p class='problem'>{html.escape(it['problem_text'])}"
             f"<span class='len'>{len(it['problem_text'])} 字</span></p>"
         )
+        out += material_html(it)
+        out.append("<h3>真相・確定事実（ネタバレ）</h3>")
         out.append(
-            f"<details class='truth'><summary>真相を見る</summary><p>{html.escape(it['truth'])}</p></details>"
+            f"<details class='truth spoiler'><summary>真相を見る</summary><p>{html.escape(it['truth'])}</p></details>"
         )
-        out.append("<details class='facts'><summary>確定事実シート（{}）</summary><ul>".format(len(it["fact_sheet"])))
+        out.append("<details class='facts spoiler'><summary>確定事実シート（{}）</summary><ul>".format(len(it["fact_sheet"])))
         out += [f"<li>{html.escape(f)}</li>" for f in it["fact_sheet"]]
         out.append("</ul></details>")
+        out.append(f"<h3>プローブ結果（想定質問 {len(it['expected_questions'])} + 共通）</h3>")
         out.append("<ol class='qa'>")
         for r in recs:
             long_truth = r["kind"] == "extra" and len(r["q"]) >= 60
@@ -427,7 +533,7 @@ def write_review(results: dict[str, list[dict]], model: str) -> tuple[int, int]:
             f"<label class='done'><input type='checkbox' data-done='{no}'> {no} は確認済み</label>"
         )
         out.append("<p class='top'><a href='#index'>目次へ戻る</a></p>")
-        out.append("</section>")
+        out.append("</div></details>")
     out.append("</main>")
     out.append(f"<script>{REVIEW_JS}</script>")
     out.append("</body></html>")
