@@ -363,9 +363,9 @@ ITEMS: list[dict] = [
         play_example=[
             {"role": "questioner", "text": "その子は男の息子？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "最近書かれた手紙？"},
+            {"role": "questioner", "text": "その子は有名人？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "昔書かれた手紙？"},
+            {"role": "questioner", "text": "手紙の宛先に間違いはない？"},
             {"role": "master", "text": "はい！"},
         ],
         scene=(
