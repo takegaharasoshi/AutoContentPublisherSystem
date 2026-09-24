@@ -528,11 +528,11 @@ ITEMS: list[dict] = [
         ],
         hook="助けに来た女も凍りついた",
         play_example=[
-            {"role": "questioner", "text": "男は本当に凍ってる？"},
+            {"role": "questioner", "text": "寒い場所での出来事？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "怖くて動けないの？"},
+            {"role": "questioner", "text": "男と女は特殊な場所にいる？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "動けないのは決まりのせい？"},
+            {"role": "questioner", "text": "男は人間？"},
             {"role": "master", "text": "はい！"},
         ],
         scene=(
