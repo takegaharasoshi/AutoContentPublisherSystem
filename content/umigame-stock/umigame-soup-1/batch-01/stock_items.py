@@ -592,7 +592,7 @@ ITEMS: list[dict] = [
             "濡れたものを乾かしたことが関係している",
             "文字を書いた道具に特徴がある（種類は答えの核心。正解宣言のとき以外は補足で言わない）",
             "約束の中身は二人とも覚えていた",
-            "二人の職業・年齢・約束の中身は問題に関係ない",
+            "二人の関係・職業・年齢・約束の中身は問題に関係ない",
         ],
         expected_questions=[
             {"q": "二人はけんかをしましたか？", "a": "いいえ"},
@@ -621,10 +621,10 @@ ITEMS: list[dict] = [
         play_example=[
             {"role": "questioner", "text": "二人はけんかした？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "白紙に戻ったのは形のあるもの？"},
+            {"role": "questioner", "text": "季節は関係ある？"},
             {"role": "master", "text": "はい！"},
-            {"role": "questioner", "text": "その紙は破れた？"},
-            {"role": "master", "text": "いいえ。"},
+            {"role": "questioner", "text": "二人は恋人？"},
+            {"role": "master", "text": "関係ありません。"},
         ],
         scene=(
             "A man and a woman in summer clothes sitting at a table in a bright Japanese room, both smiling gently "
