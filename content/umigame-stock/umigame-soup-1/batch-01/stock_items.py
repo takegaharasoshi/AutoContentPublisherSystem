@@ -446,7 +446,7 @@ ITEMS: list[dict] = [
             {"role": "master", "text": "いいえ。"},
             {"role": "questioner", "text": "卵は材料として使う？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "卵は生き物？"},
+            {"role": "questioner", "text": "卵はパン作りに関係してる？"},
             {"role": "master", "text": "はい！"},
         ],
         scene=(
