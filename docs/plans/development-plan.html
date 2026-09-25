@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-26（<strong>21-6 を 21-6a〜f に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -503,35 +503,219 @@
 </div>
 </article>
 
-<article class="plan-step" id="step-21-6" data-step-id="21-6" data-status="todo">
+<article class="plan-step" id="step-21-6a" data-step-id="21-6a" data-status="todo">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6</strong><span class="plan-status">未着手</span></div>
-<h3>コメント自動返信経路の本番化</h3>
+<div class="plan-meta"><strong>21-6a</strong><span class="plan-status">未着手</span></div>
+<h3>コメント機能の品質レベルの定義</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-3 の完了後。<strong>21-4・21-5 とは独立</strong>のため並行して着手できる。</p>
-<p data-field="result"><strong>現況：</strong>未着手（21-4a-3 と並行して着手可能）。</p>
+<p data-field="result"><strong>現況：</strong>未着手（2026-09-26 にアイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」の採用で旧 21-6 を 21-6a〜f に分割）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>PoC の Lambda を <code>services/comment-reply/</code> へ分割・移植し、<code>CommentReplyStack</code>（Webhook → SQS + DLQ → Reply Lambda）と DLQ アラームを CDK で構築して、インフラ設計書を実態に合わせる。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。VPC 外・NAT 不要の構成を維持する。<code>cdk deploy</code> はユーザーの人間ゲート。</p></div>
+<div data-field="overview"><p>コメント自動返信の品質レベルを段階（レベル 0〜3）で定義し、<strong>最低ライン（リリースに必須）と目標ライン</strong>の案を <code>docs/app/sets/umigame-soup-1.html</code> の判定節に書く。各レベルに、機械プローブ（21-6d）と人間プローブ（21-6e）で合否を判定できる基準を付ける。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>軸は 2 つに分ける — <strong>返答の豊かさ</strong>（段階を付ける）と<strong>判定の正しさ</strong>（真相を漏らさない・誤答率の上限。どのレベルでも満たす前提条件）。方式（luna / Jev）はここでは決めない。<code>services/</code> <code>infra/</code> には触れない。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
-<li>pytest 全パス（要約行）。</li>
-<li><code>infra/</code> で jest 全パスと <code>cdk synth -c env=prod CommentReplyStack MonitoringStack</code> 成功。</li>
+<li>設計書 HTML のタグ対応・リンクの機械チェックが 0 件（出力を貼る）。</li>
+<li>レベル 0〜3 の定義・合否基準・最低 / 目標ラインの案が判定節にある（該当箇所の <code>grep</code> を貼る）。</li>
+<li>日本語メッセージでコミットし、<code>pull --rebase</code> のうえ push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><strong>品質レベルの承認（ユーザーの設計判断）</strong>。承認した最低ラインが 21-6b の機能設計と 21-6e の方式選定の前提になる。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> のみ）。stop after 15 turns。方式の設計・試走はしない（21-6b）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 叩き台のレベル 0〜3 と、分割の経緯</span></summary>
+<div class="plan-fold-inner">
+<p>叩き台（アイデアの壁打ち記録 2026-09-26 3 回目。崩してよい）: <strong>レベル 0</strong> =「はい / いいえ / わかりません / 正解」の 4 種のみ（bot に見えるためリリース不可・ユーザー見解）。<strong>レベル 1</strong> = どんなコメントにもちぐはぐにならない返事（感想・雑談・正解の断言を見分けて種別ごとの定型文、荒らしは無視、「惜しい！」と正解時の真相の開示、言い回しは複数をローテーション）。<strong>レベル 2</strong> = 探偵カメロックの口調で、真相に触れない短い一言を添える。<strong>レベル 3</strong> = 会話の流れを踏まえる（同じ人の過去の質問・行き詰まり時のヒント。会話の状態を持つ仕組みが要る）。Claude の所感は最低 = レベル 1、目標 = レベル 2。</p>
+<p>経緯: 旧 21-6 は「PoC の移植 + 本番スタック」の 1 ステップだった。2026-09-26 のアイデア壁打ちで、判定方式を luna の一括方式（パターン 1）と Jev の段階判定 + 定型文（パターン 2）で比べてから選ぶことにし、人間ゲート（品質レベルの承認・設計レビュー・方式選定・<code>cdk deploy</code>）ごとに 21-6a〜f へ分割した。検討の全文は<a href="../ideas/umigame-yesno-jev.md">アイデア記録</a>。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6b" data-step-id="21-6b" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6b</strong><span class="plan-status">未着手</span></div>
+<h3>判定の機能設計と 2 方式の試走</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6a の品質レベル承認後。Jev の API キー（無料クレジット 5 ドル）をユーザーが取得済みであること。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>docs/app/sets/umigame-soup-1.html</code> の判定節に、判定モジュールの契約（入力 = コメント本文 + 問題 JSON / 出力 = 返答種別 + 返信文、<code>NO_REPLY</code> を含む）と 2 方式の機能設計を書く — <strong>パターン 1</strong> = <code>gpt-5.6-luna</code> の一括方式、<strong>パターン 2</strong> = Jev の段階判定（質問か → 質問の品質 → はい / いいえ / 関係ありません）+ 定型文。21-4a の 10 問で 2 方式を試走するスクリプトを置き、全件プローブの合格基準とテスト質問の拡充方針を決める。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>21-6a で承認した最低ラインを満たす設計にする。<code>services/</code> <code>infra/</code> には触れない（試走スクリプトは本番コードに入れない。置き場は設計で決める）。問題 JSON に項目を足す場合は <code>docs/app/generators/umigame-prebuilt.html</code> も更新する。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>設計書 HTML のタグ対応・リンクの機械チェックが 0 件（出力を貼る）。</li>
+<li>試走スクリプトの出力（2 方式それぞれのラベル一致率と漏れ件数）を貼る。</li>
+<li>日本語メッセージでコミットし、<code>pull --rebase</code> のうえ push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>設計レビューと試走結果の確認（ユーザー）。OK なら 21-6c の実装へ。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/</code> と試走スクリプト）。stop after 25 turns。方式は選ばない（21-6e）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 設計で決める論点 9 件・Jev の仕様と規約</span></summary>
+<div class="plan-fold-inner">
+<p>設計で決める論点（アイデア記録の積み残し）: ① 質問以外のコメント（感想・「こういう問題があったら面白い」のような雑談・正解の断言・荒らし）の行き先。質問判定を「質問 / 正解推理 / 感想 / 荒らし / その他」の選択式にするか ② 正解宣言と「惜しい！」の判定段（例: 真相の要点ごとに Jev の Noul で判定）③ 質問の品質チェックの NG が多すぎると参加体験を損なう（閾値は 21-6d で調整）④ 正解時に開示する真相の文を誰が書くか（問題ごとに事前に書いてストックに持たせる / 正解時だけ LLM を呼ぶ）。「惜しい！」は漏れ防止のため定型 ⑤ 本丸のリスクは「はい / いいえ / 関係ありません」の判定（隠れた真相を前提に日本語を読む = Jev の苦手領域）⑥ テスト質問の偏り（<code>expected_questions</code> はパターン 1 の調整に使ったため、調整に使っていない評価用の質問を足す）⑦ 同じ誘導文の連投は bot っぽく、スパム判定の懸念もある（言い回しのローテーション）⑧ Jev が返す確率で「自信がないときは安全側に倒す」閾値を設計できる ⑨ Jev を選んでもパターン 1 へ戻せる切り替えを本番に残す。</p>
+<p>Jev（TypeSafe AI、2026-09-15 発表）: 選択式 / 採点 / 真偽確率の 3 型。入力 0.042 ドル / 100 万トークン・出力無料・応答 70〜500 ms・判断材料と質問で 3.2 万トークンまで。学習の中心は英語で日本語の精度は非公開。<strong>規約</strong>: API は<a href="https://typesafe.ai/legal/mca">マスター顧客契約（MCA、2026-09-23 更新）</a>で、自社アプリへの組み込み・エンドユーザーへの提供とも可（2026-09-26 に確認）。SLA はなく「AS IS」、値上げの可能性の留保あり。Acceptable Use Policy はキー取得時に確認する。</p>
+<p>機械プローブの足場: 各問題の <code>expected_questions</code>（想定質問 15〜20 件、<code>{q, a}</code>）と <code>content/umigame-stock/umigame-soup-1/batch-01/probe_test.py</code>。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6c" data-step-id="21-6c" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6c</strong><span class="plan-status">未着手</span></div>
+<h3>本番 Lambda の実装（2 方式を切り替え可能に）とローカル試行ツール</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6b の設計レビュー OK 後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>PoC の handler を <code>services/comment-reply/</code> の Webhook（署名検証・自己返信スキップ → SQS）と Reply（S3 → 判定モジュール → Graph API）に分割・移植し、判定モジュールをパターン 1 / 2 の 2 実装にして環境変数で切り替える。人間プローブ用に、問題を選んでコメントを打つと 2 方式の返信を並べて返す<strong>ローカル試行ツール（CLI）</strong>も用意する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。ローカル試行ツールは判定モジュールをそのまま呼び、Instagram と AWS は使わない。<code>infra/</code> には触れない（21-6f）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>pytest 全パス（要約行を貼る）。</li>
+<li>ローカル試行ツールで 1 問・1 コメントを 2 方式に通した出力を貼る。</li>
 <li>日本語メッセージでコミット。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
 <div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → <code>cdk deploy</code> → ステージング面へ接続（PoC の Meta アプリの Webhook 先を新スタックへ切替・<code>test_tkghr</code> のリール用にサンプル <code>problems/{media_id}.json</code> を配置）→ 実コメントで返信・DLQ 0 件を確認（ユーザー）。<strong>接続時は<a href="#pending-checks">確認待ちリスト</a>の「PoC 資材の長期トークン」（2026-11-02 頃失効）を先に確認する。</strong></p></div>
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push（ユーザー）。<code>services/</code> を触るため、push 後は <code>/goal</code> でパイプラインの状態を確認する（CLAUDE.md の定型行。CI/CD 未整備なら対象外と明記）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/</code>）。stop after 30 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 旧 21-6 ① と課題 I-031</span></summary>
+<div class="plan-fold-inner">
+<p>旧 21-6 ①: Lambda コード <code>services/comment-reply/</code>（Webhook 受信〔署名検証・自己返信スキップ〕→ SQS enqueue / Reply〔S3 GET <code>problems/{media_id}.json</code> → 判定モジュール → Graph API 返信〕。PoC handler を分割・移植、pytest）。</p>
+<p>課題表の照合: <a href="../issues/index.html">I-031</a>（コメント返信用トークンの自動リフレッシュ。パス型 = <code>/step 21-6</code>〔<code>services/comment-reply/</code>〕の起動時）は本ステップで要否を決める。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6d" data-step-id="21-6d" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6d</strong><span class="plan-status">未着手</span></div>
+<h3>全件の機械プローブ</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6c の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>全ストック問題 × テスト質問（<code>expected_questions</code> + 21-6b で足した非質問・曖昧な質問・正解推理・評価用の質問）を、21-6c の判定モジュールで 2 方式とも回して集計する（本番と同じコード経路・ローカル実行）。集計はラベル一致率・漏れ件数・誘導文の返信率・種別ごとの誤りで、比較レポートを残す。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>本番のコード経路を使う（試走スクリプトで代用しない）。方式は選ばない（21-6e）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>2 方式の集計出力を貼る。</li>
+<li>21-6a・21-6b の合格基準との照合結果を 1 行で示す。</li>
+<li>日本語メッセージでコミットし、<code>pull --rebase</code> のうえ push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>集計の確認（ユーザー）。方式選定は 21-6e の人間プローブの後。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで。stop after 20 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 閾値の調整</span></summary>
+<div class="plan-fold-inner"><p>パターン 2 の閾値（質問の品質 NG・自信がないときに安全側へ倒す確率）はここで調整する。21-4a 時点のプローブ（10 問 × 18〜21 応答）は暫定で、本ステップが全件の正式なプローブになる。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6e" data-step-id="21-6e" data-status="todo" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6e</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>人間プローブ（ローカル）と方式選定</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6d の集計確認後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>ユーザーが 21-6c のローカル試行ツールで、各問題に自由にコメントを入れて 2 方式の返信を確かめる（想定外の言い回し・曖昧な質問・感想・雑談・荒らし）。機械プローブと人間プローブの結果から方式を選ぶ。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>21-6a で承認した最低ラインを満たす方式から選ぶ。Jev を選ぶ場合は、MCA・Acceptable Use Policy に変更がないかを確認する。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>—（ユーザー判断）。NG の事例と、選んだ方式・理由が記録に残ること。</li>
+</ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>このステップ自体が人間ゲート（<strong>方式選定</strong>）。NG は 21-6b の設計か 21-6c の判定モジュールへ戻して直す。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>。<code>/step</code> は goal 対象外として断る）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>確認前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6f" data-step-id="21-6f" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6f</strong><span class="plan-status">未着手</span></div>
+<h3>本番スタックの構築とステージング疎通</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6e の方式選定後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>CommentReplyStack</code>（Webhook → SQS + DLQ → Reply Lambda）と DLQ アラームを CDK で構築し、インフラ設計書を実態に合わせる。判定方式の既定値は 21-6e の選定結果にする。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。VPC 外・NAT 不要の構成を維持する。<code>cdk deploy</code> はユーザーの人間ゲート。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>infra/</code> で jest 全パスと <code>cdk synth -c env=prod CommentReplyStack MonitoringStack</code> 成功（要約行を貼る）。</li>
+<li>日本語メッセージでコミット。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → <code>cdk deploy</code> → ステージング面へ接続（PoC の Meta アプリの Webhook 先を新スタックへ切替・<code>test_tkghr</code> のリール用にサンプル <code>problems/{media_id}.json</code> を配置）→ 実コメント数件で<strong>経路</strong>（返信が付く・自己返信しない・DLQ 0 件）を確認（ユーザー）。判定の品質は 21-6e で確認済みのため、ここでは経路だけを見る。<strong>接続時は<a href="#pending-checks">確認待ちリスト</a>の「PoC 資材の長期トークン」（2026-11-02 頃失効）を先に確認する。</strong></p></div>
 <div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>infra/</code> <code>services/</code>）。stop after 30 turns。</p></div>
 </div>
 </section>
 <details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜⑤ の内訳</span></summary>
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 旧 21-6 ②〜⑤ と課題 I-032</span></summary>
 <div class="plan-fold-inner">
-<p>① Lambda コード <code>services/comment-reply/</code>（Webhook 受信〔署名検証・自己返信スキップ〕→ SQS enqueue / Reply〔S3 GET <code>problems/{media_id}.json</code> → OpenAI → Graph API 返信。モデレーション一行をプロンプトに含む〕。PoC handler を分割・移植、pytest） ② <code>infra/lib/comment-reply-stack.ts</code>（Webhook Lambda + Function URL または API Gateway〔21-1 の決定〕、SQS + DLQ、Reply Lambda、Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code>、既存バケットの <code>assets/umigame-soup-1/problems/</code> 読み取り権限） ③ MonitoringStack に DLQ アラーム（既存 <code>createAlarm</code> パターン） ④ <code>bin/infra.ts</code> 配線 ⑤ <code>docs/infra/</code> の実態合わせ。</p>
+<p>② <code>infra/lib/comment-reply-stack.ts</code>（Webhook Lambda + Function URL または API Gateway〔21-1 の決定〕、SQS + DLQ、Reply Lambda、Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code>〔選んだ方式の API キーを含む〕、既存バケットの <code>assets/umigame-soup-1/problems/</code> 読み取り権限） ③ MonitoringStack に DLQ アラーム（既存 <code>createAlarm</code> パターン） ④ <code>bin/infra.ts</code> 配線 ⑤ <code>docs/infra/</code> の実態合わせ。</p>
+<p>課題表の照合: <a href="../issues/index.html">I-032</a>（PoC スタックと Secret の削除。節目型 = 21-6 の人間ゲート〔ステージング面への接続〕完了時）は本ステップの接続後に引く。</p>
 </div>
 </details>
 <details class="plan-fold" data-field="record">
@@ -545,7 +729,7 @@
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-7</strong><span class="plan-status">未着手</span></div>
 <h3>アカウント・Meta アプリ・セット登録の準備</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-6 の完了後。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-6f の完了後。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
@@ -1108,7 +1292,7 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-09-02 / 19-1 CodePipeline 完走待ちの <code>/goal</code> 化（初回試行）</td><td>次に <code>services/</code> <code>shared/</code> を触るコミットを push したとき</td><td>① push 直後に Claude が CLAUDE.md の D 定型行（<code>&lt;sha&gt;</code> 置換済み）を提示するか ② ユーザーが打った <code>/goal</code> の evaluator が、貼られた aws cli 出力（パイプラインの Succeeded・タスク定義の新リビジョン）から到達を判定して止まるか ③ 15 ターン以内に収まるか</td><td>提示されない → CLAUDE.md の文言を直す。判定できない → 定型行の証跡指定（貼らせる出力）を具体化する。いずれも課題体系ではなく Phase 19 の追補ステップとして起こす</td><td>—</td></tr>
-<tr><td>2026-09-03 / ウミガメ PoC 資材（ステージング面）の長期トークン</td><td><strong><a href="#step-21-6">21-6</a> の人間ゲート（ステージング面への接続）に着手するとき</strong>。<code>test_tkghr</code> の長期トークンは 2026-09-03 生成・60 日有効（2026-11-02 頃失効）</td><td>Secrets Manager <code>umigame-poc/credentials</code> の <code>ig_access_token</code> で <code>GET graph.instagram.com/v23.0/me</code> が 200 を返す。失効していれば Meta アプリの「設定」タブで再生成して差し替える（手順は <code>poc/umigame-comment-webhook/README.md</code>）</td><td>再生成して続行（課題にはしない）</td><td>—</td></tr>
+<tr><td>2026-09-03 / ウミガメ PoC 資材（ステージング面）の長期トークン</td><td><strong><a href="#step-21-6f">21-6f</a> の人間ゲート（ステージング面への接続）に着手するとき</strong>。<code>test_tkghr</code> の長期トークンは 2026-09-03 生成・60 日有効（2026-11-02 頃失効）</td><td>Secrets Manager <code>umigame-poc/credentials</code> の <code>ig_access_token</code> で <code>GET graph.instagram.com/v23.0/me</code> が 200 を返す。失効していれば Meta アプリの「設定」タブで再生成して差し替える（手順は <code>poc/umigame-comment-webhook/README.md</code>）</td><td>再生成して続行（課題にはしない）</td><td>—</td></tr>
 <tr><td>2026-09-02 / 20-1 fantasy-animals-1 の停止（効果確認）</td><td><strong>2026-09-04 の 21:00 JST 以降</strong>（deploy と Aurora の <code>is_active = 0</code> は 2026-09-03 に適用済み。翌 06:00 のインサイト収集も観察対象）</td><td>① fantasy-animals-1 の 21:00 投稿が起きていない（<code>posts</code> に新規行なし・Instagram に新規投稿なし）② 画像生成 SFN が fantasy-animals-1 で起動していない（EventBridge Scheduler 一覧に fantasy-animals-1 の名前がない）③ インサイト収集 SFN の 06:00 / 18:00 実行が他セット分だけで成功している</td><td>投稿が起きている → deploy 未反映か Scheduler の削除漏れ。20-1 の追補ステップとして起こす。インサイト収集が失敗する → 収集バッチの <code>is_active = 0</code> の扱いを確認し課題体系（開発レーン節）へ起票</td><td>—</td></tr>
 <tr><td>2026-09-03 / 16-12b <code>follows_and_unfollows</code>（100 フォロワー閾値後の確認）</td><td>月次 KPI 転記時に <code>v_account_kpi_monthly.month_end_followers</code> が 100 以上のアカウントが初めて現れたとき</td><td>そのアカウントのその月の <code>account_insights_daily.metrics</code> に <code>follows_and_unfollows</code> キー（<code>breakdowns</code> の <code>follow_type</code> 内訳）が入り始めているか（<code>SELECT metric_date, JSON_EXTRACT(metrics, '$.follows_and_unfollows') FROM account_insights_daily WHERE sns_account_id = ? ORDER BY metric_date DESC LIMIT 7</code>）。入っていれば OK → data-model 4.11 に「100 フォロワー以上で取得可」を追記し、ビュー <code>v_account_kpi_daily</code> への昇格を検討する</td><td>入っていない → 正規化（<code>insights_api.py</code>）か要求パラメータの問題として課題体系（開発レーン節）へ起票（応答本文を CloudWatch Logs では確認できないため、要求のデバッグログ追加を含めて扱う）</td><td>—</td></tr>
 <tr><td>2026-09-19 / <a href="development-log.html#phase-22">22-3</a> <code>/incident</code>（初回試行）</td><td>22-3 完了後、次に本番・運用の異常が起きたとき</td><td>① 照合結果（予言されていた課題・前にも起きた事象）が原因究明の前に提示されるか ② 終了時に事象記録 + 課題の更新（発生履歴 / 起票 / 即 解消）が漏れなく行われるか</td><td>提示が後になる・更新が漏れる → SKILL.md の工程順を直す（Phase 22 の追補ステップ）</td><td>—</td></tr>
