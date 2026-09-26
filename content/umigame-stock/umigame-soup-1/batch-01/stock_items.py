@@ -624,7 +624,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="なぜ間違いだと思ったのか？",
+        hook="男だけ間違いと思った真相は？",
         play_example=[
             {"role": "questioner", "text": "ピアニストが間違えた？"},
             {"role": "master", "text": "いいえ。"},
@@ -790,7 +790,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="虫歯のない男の通院？",
+        hook="2時間かけて通う真相は？",
         play_example=[
             {"role": "questioner", "text": "先生が知り合い？"},
             {"role": "master", "text": "いいえ。"},
