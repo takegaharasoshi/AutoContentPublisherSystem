@@ -872,7 +872,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="代金を出したのは誰？",
+        hook="なぜおじいさんのお金？",
         play_example=[
             {"role": "questioner", "text": "女の子は悪いことをしていた？"},
             {"role": "master", "text": "いいえ。"},
