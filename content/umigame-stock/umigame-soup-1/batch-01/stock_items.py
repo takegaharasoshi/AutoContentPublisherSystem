@@ -720,10 +720,12 @@ ITEMS: list[dict] = [
             {"role": "master", "text": "いいえ。"},
         ],
         scene=(
-            "A sunny summer afternoon in the garden of a Japanese family house with a wooden veranda; two adult brothers "
-            "in their thirties stand at the far corner of the garden by the fence, looking down at a single small "
-            "watermelon growing on a vine in the grass; one man grins and pats his brother on the shoulder, the other "
-            "smiles proudly; no seeds, no people eating, no text."
+            "A wide view of a sunny summer afternoon in the garden of a Japanese family house with a wooden veranda; "
+            "two adult brothers in their thirties stand far away at the far corner of the garden by the fence, "
+            "looking down at a single watermelon growing on a vine in the grass at their feet; one man grins and pats "
+            "his brother on the shoulder, the other smiles proudly. The watermelon is clearly visible: a bright green "
+            "striped ball, drawn slightly larger than life so it stands out against the grass. No seeds, no people "
+            "eating, no text."
         ),
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「すいか」（抽選: 階段 / すいか / コンビニ）→ 連想（縁側・兄弟の種飛ばし競争・"
