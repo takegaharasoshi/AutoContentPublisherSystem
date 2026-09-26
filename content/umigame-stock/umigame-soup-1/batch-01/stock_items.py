@@ -954,7 +954,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="子どもたちは何を見た？",
+        hook="子どもたちの行動の真相は？",
         play_example=[
             {"role": "questioner", "text": "男と小学生は競争していた？"},
             {"role": "master", "text": "いいえ。"},
