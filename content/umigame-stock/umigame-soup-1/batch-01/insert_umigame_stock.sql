@@ -327,7 +327,7 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
         '[{"q":"子どもたちは男が怖かったのですか？","a":"いいえ"},{"q":"男は学校の先生ですか？","a":"いいえ"},{"q":"学校で行事がありましたか？","a":"いいえ"},{"q":"鬼ごっこをしていたのですか？","a":"いいえ"},{"q":"男が子どもたちに何か言いましたか？","a":"いいえ"},{"q":"子どもたちは男を見て走り出しましたか？","a":"はい"},{"q":"子どもたちは遅刻すると思ったのですか？","a":"はい"},{"q":"本当に遅刻しそうでしたか？","a":"いいえ"},{"q":"家の時計が壊れていましたか？","a":"いいえ"},{"q":"男はいつも同じ時間に走っていますか？","a":"はい"},{"q":"男が走る時間と関係がありますか？","a":"はい"},{"q":"男は子どもたちの様子を知っていましたか？","a":"いいえ"},{"q":"子どもたちは男の知り合いですか？","a":"いいえ"},{"q":"男が早く出た理由は関係ありますか？","a":"関係ない"},{"q":"男の服装は関係ありますか？","a":"関係ない"},{"q":"子どもたちは毎朝同じ時刻に通学路を走る男を見て家を出る時刻を決めていたので、男がいつもより早く通った朝、遅刻すると思って飛び出した。","a":"正解"}]',
         '子どもたちは何を見た？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
         '{"problem":"男がいつもより早くジョギングに出た朝、通学路の家から小学生が次々に飛び出してきて、男を追い抜いて学校へ走っていった。誰も遅刻しそうではなかった。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"男が怖かった？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男を見て走った？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"男は先生？"},{"role":"master","text":"いいえ。"}]',
+        '[{"role":"questioner","text":"男と小学生は競争していた？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男を見て走った？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"男は先生？"},{"role":"master","text":"いいえ。"}]',
         '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
         'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
 

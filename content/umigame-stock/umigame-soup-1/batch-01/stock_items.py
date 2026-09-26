@@ -1036,7 +1036,7 @@ ITEMS: list[dict] = [
         ],
         hook="子どもたちは何を見た？",
         play_example=[
-            {"role": "questioner", "text": "男が怖かった？"},
+            {"role": "questioner", "text": "男と小学生は競争していた？"},
             {"role": "master", "text": "いいえ。"},
             {"role": "questioner", "text": "男を見て走った？"},
             {"role": "master", "text": "はい！"},
