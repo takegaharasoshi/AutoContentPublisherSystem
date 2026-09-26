@@ -537,7 +537,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="白紙に戻った約束？",
+        hook="白紙なのに果たされた約束？",
         play_example=[
             {"role": "questioner", "text": "二人はけんかした？"},
             {"role": "master", "text": "いいえ。"},
