@@ -10,6 +10,7 @@ python3 export_prompts.py
 bash scripts/gen_backgrounds.sh
 python3 intake.py
 python3 background_sheet.py   # 背景だけを投稿順に並べた work/backgrounds.html（動画の再ビルド前の背景レビュー用）
+python3 background_sheet.py --stills   # 各コマの静止画も今の文言・背景で書き出して並べる（Remotion renderStill・1 問 10 秒ほど）
 
 # 2. BGM を用意する。初回は PoC の 24 秒素材を暫定 track01 として台帳へ登録する
 python3 prepare_bgm.py --init-provisional
