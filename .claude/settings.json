@@ -10,13 +10,7 @@
       "WebFetch(domain:codex.danielvaughan.com)",
       "Bash(codex --version)",
       "Read(//home/takegaharawork/.codex/**)",
-      "mcp__codex"
+      "Bash(tools/codex_delegate.sh:*)"
     ]
-  },
-  "enabledMcpjsonServers": [
-    "codex"
-  ],
-  "env": {
-    "MCP_TOOL_TIMEOUT": "1200000"
   }
 }

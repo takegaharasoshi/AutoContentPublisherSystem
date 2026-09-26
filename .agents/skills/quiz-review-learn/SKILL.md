@@ -109,4 +109,4 @@ description: logic-training-1 の候補ディレクトリ(content/quiz-stock/log
 
 - **Claude Code のみ**(`/quiz-review-learn`)。実体は `.agents/skills/quiz-review-learn/SKILL.md`、`.claude/skills/quiz-review-learn` は相対シンボリックリンク
 - **Codex 直接セッション(`$quiz-review-learn`)は利用可能と称さない**: `AGENTS.md`「直接セッションのルール」の対象スキルに未登録(2026-09-22)。Codex で回したくなったら、`AGENTS.md` の対象一覧・許可パスへの追記を開発レーンの別ステップとして起票する(本スキルの記述だけで解禁しない)
-- MCP ワーカーの Codex へ委譲してよいのは、修正版の下書き(手順 4)のような自己完結した作業だけ。理由の聞き取り・再判定・合意は人間、分類とスキル差分の判断は Claude が行う
+- 委譲ワーカーの Codex へ委譲してよいのは、修正版の下書き(手順 4)のような自己完結した作業だけ。理由の聞き取り・再判定・合意は人間、分類とスキル差分の判断は Claude が行う

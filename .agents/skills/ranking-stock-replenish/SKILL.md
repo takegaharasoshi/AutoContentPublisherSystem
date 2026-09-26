@@ -26,7 +26,7 @@ operation.html セクション 3 の在庫確認クエリで `unused_built_30s`(
 - 供給源は ①ネタ帳 `plans/ranking-set-research/neta-30.md`(git 管理外・17-1 検証の 31 件。各バッチの `research.md` に採用済み・不採用の消し込みがある)②枯れたら家計調査の品目別ランキング(約 500 品目。食べ物系だけで数十本追加採掘可能)や官公庁統計の新規リサーチ
 - **ネタ選定基準は「下位の県の人が笑って自虐できるか」**(事業戦略書セクション 6)。× = 所得・離婚率・学力・肥満・犯罪率。△ 判定(出生率・家事育児など)は**上位のみ発表**構成が条件 — TOP5 版面はもともと下位を晒さないが、hook / trivia / closing でも下位・「最下位」に触れない
 - **既投入分とのテーマ・出典の重複を避ける**。同一出典ファイル(例: rank13 外食)・近いテーマ(食べ物系の連発)は不採用理由にはならないが、レビューで申し送り「投稿日を離す判断材料」として記録する
-- 新規リサーチを Codex に委譲する場合は **MCP 不可・`codex --search exec` 直接実行**(Web 検索が要るため)。出典の再検証も同様。成果物は「出典 URL・データ年・TOP5 の生値」まで。**採用判断と数値の正は必ず手順 2 の機械パースで取り直す**(Codex の報告値をそのまま使わない)
+- 新規リサーチを Codex に委譲する場合は **`codex --search exec` 直接実行**(Web 検索が要るため。`tools/codex_delegate.sh` は検索を有効にしない)。出典の再検証も同様。成果物は「出典 URL・データ年・TOP5 の生値」まで。**採用判断と数値の正は必ず手順 2 の機械パースで取り直す**(Codex の報告値をそのまま使わない)
 
 ## 2. データ検証・県換算(機械パース必須)
 
@@ -86,5 +86,5 @@ python3 validate.py && python3 generate.py
 ## 委譲・実行環境の要点
 
 - WSL に ffmpeg / Chrome は無い。Remotion レンダリング・ffmpeg・PIL(`intake.py`)は Docker 経由(README の docker run 例が動作確認済みの形)
-- Codex 委譲の使い分け: 背景 = imagegen / 実データ検証の突合 = terra/high / Web リサーチ・出典再検証 = `codex --search exec`(MCP 不可。バックグラウンド実行時は `< /dev/null` で stdin を閉じないとハングする)。執筆・レビュー・投入判断・コミットは Claude
+- Codex 委譲の使い分け: 背景 = imagegen / 実データ検証の突合 = terra/high / Web リサーチ・出典再検証 = `codex --search exec`(ラッパーは検索なしのため直接実行。バックグラウンド実行時は `< /dev/null` で stdin を閉じないとハングする)。執筆・レビュー・投入判断・コミットは Claude
 - Aurora の Data API が auto mode classifier にブロックされる場合はユーザーに許可を求める
