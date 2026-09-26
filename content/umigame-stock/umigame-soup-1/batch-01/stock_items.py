@@ -1120,7 +1120,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="言葉が通じたのに？",
+        hook="嫁姑、突然の不仲の真相は？",
         play_example=[
             {"role": "questioner", "text": "義母の性格が変わった？"},
             {"role": "master", "text": "いいえ。"},
