@@ -793,7 +793,7 @@ ITEMS: list[dict] = [
         play_example=[
             {"role": "questioner", "text": "すいかは誰かが植えた？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "前に何か勝負をした？"},
+            {"role": "questioner", "text": "何か勝負をしていた？"},
             {"role": "master", "text": "はい！"},
             {"role": "questioner", "text": "大きさ比べの勝負？"},
             {"role": "master", "text": "いいえ。"},
