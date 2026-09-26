@@ -122,7 +122,8 @@ ITEMS: list[dict] = [
         scene=(
             "A middle-aged man in a plain shirt seen from behind, walking alone along a quiet residential street "
             "in late afternoon; his long shadow stretches ahead of him on the pavement; low houses, a utility pole "
-            "and a hedge along the street; soft warm sunlight, no other people."
+            "and a hedge along the street; soft warm sunlight, no other people. The man is a small figure in the "
+            "middle distance, about one seventh of the image height, at the horizontal center of the picture."
         ),
         source_note=(
             "型: 意味誤誘導型。モチーフ「影」（作問スキル umigame-problem-writer の抽選 3 語〔影・鉛筆・ゴミ出し〕から選択）→ "
