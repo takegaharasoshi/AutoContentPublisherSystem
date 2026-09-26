@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from PIL import Image
@@ -100,6 +101,19 @@ def test_no_tts_preflight_reports_background_and_narration(tmp_path: Path, monke
     assert any("ナレーション未合成です" in error for error in errors)
 
 
+def test_no_tts_rejects_cached_gemini_over_tempo(tmp_path: Path) -> None:
+    for name in ("problem.wav", "rule.wav"):
+        (tmp_path / name).write_bytes(b"wav")
+    (tmp_path / "narration.json").write_text(json.dumps({
+        "texts": {"problem": "問題", "rule": "ルール"},
+        "engine_id": "gemini/model/voice", "tempo": 1.2,
+    }), encoding="utf-8")
+    with pytest.raises(build.narration_gemini.TempoLimitError):
+        build._load_cached_narration(
+            {"narration": {"problem": "問題", "rule": "ルール"}}, tmp_path
+        )
+
+
 def test_seam_mean_diff(tmp_path: Path) -> None:
     first = tmp_path / "first.png"
     last = tmp_path / "last.png"
@@ -107,3 +121,25 @@ def test_seam_mean_diff(tmp_path: Path) -> None:
     Image.new("RGB", (4, 4), (13, 23, 33)).save(last)
 
     assert seam_mean_diff(first, last) == pytest.approx(3.0)
+
+
+def test_manifest_narration_keeps_engine_and_tempo(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setattr(build, "WORK", tmp_path)
+    record = build._record(
+        {"content_key": "001-test", "title": "テスト"},
+        tmp_path / "props.json", tmp_path / "video.mp4",
+        _tracks()[0],
+        {
+            "problem_sec": 10.12345,
+            "rule_sec": 5.0,
+            "total_sec": 16.32345,
+            "tempo": 1.146,
+            "engine_id": "gemini/gemini-3.8-flash-tts/voice-test",
+        },
+        {}, {}, 0.1,
+    )
+    assert record["narration"]["problem_sec"] == 10.123
+    assert record["narration"]["tempo"] == 1.146
+    assert record["narration"]["engine_id"] == "gemini/gemini-3.8-flash-tts/voice-test"

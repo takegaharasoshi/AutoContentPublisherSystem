@@ -10,7 +10,10 @@ def test_review_html_escapes_stock_and_warns_provisional() -> None:
         "001-test": {
             "video": "videos/<bad>.mp4",
             "bgm": {"track": "track01.m4a", "s3_key": "audio/&.m4a", "provisional": True},
-            "narration": {"problem_sec": 10, "rule_sec": 5, "total_sec": 16.2},
+            "narration": {
+                "problem_sec": 10, "rule_sec": 5, "total_sec": 16.2,
+                "tempo": 1.146, "engine_id": "gemini/gemini-3.8-flash-tts/voice-test",
+            },
             "probe": {"width": 1080, "height": 1920, "fps": 30, "duration": 24, "audio_codec": "aac", "valid": True},
             "seam_mean_diff": 1.2,
             "stills": {"intro": "stills/<intro>.jpg"},
@@ -32,3 +35,5 @@ def test_review_html_escapes_stock_and_warns_provisional() -> None:
     assert "&lt;script&gt;" in html
     assert "<script>alert" not in html
     assert "videos/&lt;bad&gt;.mp4" in html
+    assert "×1.146" in html
+    assert "gemini/gemini-3.8-flash-tts/voice-test" in html

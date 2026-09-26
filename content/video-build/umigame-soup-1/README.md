@@ -16,8 +16,9 @@ python3 background_sheet.py --stills   # 各コマの静止画も今の文言・
 python3 prepare_bgm.py --init-provisional
 python3 prepare_bgm.py
 
-# 3. Polly ナレーションを合成して 24 秒動画をビルドする
+# 3. ナレーション（Gemini 3.8 Flash TTS）を合成して 24 秒動画をビルドする
 python3 build.py
+python3 build.py --retake-tts --content-key <key>   # 倍率 1.19 超・読み間違いの問を取り直す（1 問 3 回まで）
 python3 review_sheet.py
 
 # 4. 全数レビュー後、承認した content_key を work/approved.txt に 1 行ずつ記入する
@@ -27,7 +28,21 @@ python3 publish.py
 
 `--init-provisional` の BGM はレビュー用です。`publish.py` は暫定 BGM を検査エラーにするため、
 本番公開前に正式な BGM へ差し替えて `prepare_bgm.py` を再実行してください。既存 WAV を使う場合は
-`build.py --no-tts` を指定でき、不足時は Polly を呼ばずにエラーで停止します。
+`build.py --no-tts` を指定でき、不足時は TTS を呼ばずにエラーで停止します。
+
+### ナレーション（21-5c〔2026-09-27〕で Gemini 3.8 Flash TTS へ切替）
+
+- **既定は Gemini**（`scripts/narration_gemini.py`）。モデル・声 ID・声の説明文・演技指示・話速の上限は
+  `assets/design.json` の `narration` 節が正。API キーは `GEMINI_API_KEY` か `~/.config/gemini/api_key`。
+- 問題文とルール文を **1 回の呼び出し**で読ませ（別々に作るとルール文で口調が変わる）、文字数比に最も近い
+  0.3 秒以上の無音で切り分けて前後の無音を削る。2 cue + 間 1.2 秒が 21 秒を超える分だけ `atempo` で
+  19 秒に合わせる。**倍率が 1.19 を超えた問はビルドエラー**になるので `--retake-tts` で取り直す。
+  同じ設定でも取り直しで尺が 0.7〜2.3 秒揺れるため、再合成した問は全数を試聴する。
+- `work/narration/<key>/narration.json` に model・voice_id・style・tempo・切断位置（`split_at_seconds`）・
+  取り直し回数（`attempt`）が残る。文・声・演技指示が一致すればキャッシュを使い API を呼ばない。
+- Gemini の課金・レート制限エラー（`GeminiQuotaError`）が出たらビルドはその場で中断する。
+- Polly 版は `build.py --tts polly`（`scripts/narration_polly.py`・Takumi 125%。21-5a / 21-5b の初版 14 本）、
+  VOICEVOX 版は `scripts/narration.py`（PoC 用 CLI）として残す。声の比較 PoC は `poc/gemini-tts/`。
 
 ## 21-2 PoC の記録
 
@@ -44,6 +59,8 @@ umigame-soup-1/
 ├── README.md                 # 本書
 ├── build.py                  # PoC ビルド（素材配置 → props → Docker レンダリング → ラウドネス → 静止フレーム → ffprobe → review.html）
 ├── scripts/
+│   ├── narration_gemini.py   # 本番の TTS（Gemini 3.8 Flash TTS。1 回で合成 → 無音で切り分け → 話速調整。21-5c）
+│   ├── narration_polly.py    # Polly Takumi 125% のアダプタ（build.py --tts polly）
 │   ├── narration.py          # VOICEVOX でナレーション 2 cue を合成し実測長を出す（話者比較にも使う）
 │   └── prepare_assets.py     # 背景の 1080x1920 JPEG 化・キャラの共通キャンバス正規化（PIL。Docker で実行）
 ├── tests/test_timeline_sync.py  # build.py と timeline.ts の定数同期

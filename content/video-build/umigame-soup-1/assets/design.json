@@ -15,5 +15,17 @@
       "jr_base": "Head and body clearly turned toward the LEFT side of the image, looking UP and to the LEFT at his father who stands off-frame to the left; both eyes and pupils clearly directed to the left, chin slightly raised. The flipper nearer the viewer is raised with one finger up as if asking a question, the small spiral notebook held in the other flipper."
     }
   },
-  "background_prompt": "A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes): the interior of a seaside restaurant at night seen from inside. A lone man sits at a small table with a white tablecloth by a large arched window; on the table a single white bowl of soup steams, lit warmly by a candle. Through the window, a clearly visible moonlit sea with waves and a bright full moon. Mid-key lighting, NOT dark: warm amber light on the table and walls, cool blue moonlight outside, strong readable shapes and high contrast, colors stay readable even when darkened by 30 percent. No text, no letters, no logos. Do not depict any clue to the story's truth (no ships, no wreck, no other people except at most one waiter silhouette far in the background). Vertical 9:16 composition, output 1024x1536 portrait, keep the upper 55 percent relatively calm (sky, wall, window) so text can be overlaid."
+  "background_prompt": "A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes): the interior of a seaside restaurant at night seen from inside. A lone man sits at a small table with a white tablecloth by a large arched window; on the table a single white bowl of soup steams, lit warmly by a candle. Through the window, a clearly visible moonlit sea with waves and a bright full moon. Mid-key lighting, NOT dark: warm amber light on the table and walls, cool blue moonlight outside, strong readable shapes and high contrast, colors stay readable even when darkened by 30 percent. No text, no letters, no logos. Do not depict any clue to the story's truth (no ships, no wreck, no other people except at most one waiter silhouette far in the background). Vertical 9:16 composition, output 1024x1536 portrait, keep the upper 55 percent relatively calm (sky, wall, window) so text can be overlaid.",
+  "narration": {
+    "engine": "gemini",
+    "model": "gemini-3.8-flash-tts",
+    "voice_id": "voice_1m8w495yafud",
+    "voice_display_name": "kamerock-chubby",
+    "voice_description": "30歳くらいの日本人男性の探偵。お相撲さんのように太っていて食いしん坊。太っているのが声からも伝わる、丸みがあって太く柔らかい声で、少年っぽさの残る人懐っこさがある。可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。",
+    "style": "子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+    "gap_seconds": 1.2,
+    "budget_seconds": 21.0,
+    "target_seconds": 19.0,
+    "max_tempo": 1.19
+  }
 }

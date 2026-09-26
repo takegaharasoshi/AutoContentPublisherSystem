@@ -95,7 +95,7 @@
 <tr><td>9</td><td><code>character_lines.master.intro</code> / <code>.outro</code> 出題者の導入・締め</td><td>導入「質問してみて！」・締め「何度でも答えるよ。コメントで質問！」の吹き出し</td><td>各 17 字以内。既定値あり</td></tr>
 <tr><td>10</td><td><code>character_lines.jr.outro</code> Jr. の締め</td><td>「面白かったら、いいね、フォローよろしくね！」（吹き出しのみ・ナレーションなし）</td><td>セット固定文の既定値でよい（2 行になるが単独表示のため許容）</td></tr>
 <tr><td>11</td><td><code>illustration_prompt</code> イラスト作成用プロンプト</td><td>背景 1 枚（imagegen）。情景のみ</td><td>画風固定行（セクション 5.2）+ 9:16 + 文字禁止 + <strong>真相の手がかりを描かない</strong>指示を含む（<code>validate.py</code> は固定行の存在を検査）</td></tr>
-<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。Polly 採用により VOICEVOX クレジット行は不要</td></tr>
+<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。TTS のクレジット行は不要（Gemini TTS・セクション 8）</td></tr>
 <tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>完全オリジナル宣言（PoC の古典題材は例外・ストック本体には入れない）。<strong>オリジナル性の基準（21-4a で決定）</strong>: 既存問題の問題文・真相を転載しない。語句・登場人物・舞台の置き換えだけの改変もしない。借りてよいのは「型（物語復元 / 意味誤誘導）」と「仕掛けの構造」までで、モチーフ・真相・問題文は新規に作る。台帳で本家級（classic）の題材は構造ごと避ける。source_note に「完全オリジナル」宣言 + 型 + モチーフ → 連想 → 逆にした常識を書く（validate.py が宣言の有無を検査。作問法の正は <a href="https://note.com/suekai0217/n/n35128e606a9b">note 記事の 4 ステップ + 良い問題の 3 条件</a>）</td></tr>
 <tr><td>14</td><td><code>difficulty</code> 難易度</td><td>運用の目安（在庫の偏り確認）</td><td>1〜5</td></tr>
 </table>
@@ -176,7 +176,7 @@
 <ul>
   <li><strong>構成（PoC の実例）</strong>: 「【ウミガメのスープ 第 N 問】」+ 問題文の再掲 + 遊び方（「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ）+ ハッシュタグ（<code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart</code>。<code>#コメント即時返信</code> は 2026-09-26 の素材レビューで追加）。ただし<strong>問題番号「第 N 問」は書かない</strong>（ストックは LRU で消費され投稿順が確定しないため。PoC の表記は本番では使わない）</li>
   <li><strong>問題文の要約（問題固有の一言）は入れない</strong>（2026-09-24 の素材レビューでユーザー決定）: 見出しの直後に問題固有の一言を置いていたが、中身が問題文の要約になり、すぐ下の問題文と同じ話が 2 回出るように見えるため廃止した。構成は「見出し【探偵カメロックのウミガメのスープ】→ 問題文 → 遊び方 → ハッシュタグ」の 4 段で全問共通（<code>umigame_common.caption()</code> が組み立てる）</li>
-  <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> のみのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Amazon Polly のためクレジット表記は不要（VOICEVOX 時代の常設クレジット行は本セットにはない）</li>
+  <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> のみのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Gemini 3.8 Flash TTS でクレジット表記は不要（セクション 8。VOICEVOX 時代の常設クレジット行は本セットにはない）</li>
   <li>テンプレートを <code>{{caption}}</code> だけにする理由: ハッシュタグの固定部を分けると「問題固有のタグを足したい」ときに 2 箇所を見ることになり、素材項目 14 項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
 </ul>
 
@@ -194,15 +194,16 @@
   <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
 </ul>
 
-<h2 id="tts">8. ナレーション・TTS（Amazon Polly Neural / Takumi）</h2>
+<h2 id="tts">8. ナレーション・TTS（Gemini 3.8 Flash TTS / 声 G4「kamerock-chubby」）</h2>
 <div class="decision">
-  <span class="callout-title">決定（2026-09-04、21-2 人間ゲート）: TTS は Amazon Polly Neural・話者 Takumi・話速 125%。問題文とルールの間は 1.2 秒</span>
-  VOICEVOX 3 話者（玄野武宏・白上虎太郎・冥鳴ひまり）と Polly 3 話者を BGM 合成で試聴し、Polly Takumi を採用。Polly の日本語男性声は Takumi のみ（Generative エンジンは日本語未対応）。<strong>採用によりキャプションのクレジット表記が不要</strong>になり、VOICEVOX Engine の起動も要らない。実測: 問題文 78 字 + ルール 37 字を 125% で 17.8 秒（24 秒尺に対して余裕あり）。
+  <span class="callout-title">決定（2026-09-26、アイデア umigame-tts-gemini-flash の PoC → 21-5c）: TTS を Amazon Polly（Takumi・125%）から Gemini 3.8 Flash TTS・説明文から作った声 G4 へ切り替える。問題文とルールの間は 1.2 秒のまま</span>
+  2 問 × 15 パターンを本番と同じ Remotion で描き出して聞き比べ、どのパターンも Takumi より表現力がはっきり上がり、読み間違い・速度調整の違和感もなかったため切り替えた（経緯は <a href="../../ideas/umigame-tts-gemini-flash.md">アイデア記録</a>）。声は名探偵系（G1〜G3）ではなく、ぽっちゃりの食いしん坊パパ（G4）。笑いは入れない（推理というシリアスなアカウントのため）。PoC の知見: ① 演技をつけると話速が落ちるため、演技指示に「早口ぎみの速いテンポ」を入れ、残りは話速調整で合わせる（1.19 倍までは違和感なし）② 問題文とルール文を別の呼び出しで作るとルール文で口調が変わるため、<strong>1 回の呼び出しで読ませて無音で切り分ける</strong> ③ 同じ設定でも取り直しで尺が 0.7〜2.3 秒揺れるため、全数を 1 問ずつ試聴する。<strong>クレジット表記は不要</strong>（Gemini API 利用規約で生成物の所有権は Google が主張せず商用利用可。規約の attribution は引用元〔グラウンディング等〕の条項で音声出力に表記義務はない。2026-09-26 確認）。Polly Takumi 125%（2026-09-04、21-2 人間ゲートで VOICEVOX 3 話者・Polly 3 話者から採用）は 21-5a / 21-5b の初版 14 本に使い、アダプタとして残す。
 </div>
 <ul>
   <li><strong>読み上げる文</strong>: 冒頭に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code> の 2 cue だけ（吹き出しと同期させない。21-1 ②）。開始は 0.5 秒（15 フレーム）、2 cue + 間の合計は <strong>21 秒以内</strong>（継ぎ目 708 フレームに掛からない予算。方式設計書 8.3）</li>
-  <li><strong>実行</strong>: ビルド時にローカルで <code>scripts/narration_polly.py</code>（<code>~/.aws</code> の資格情報で <code>polly:SynthesizeSpeech</code>。新規の Secret は不要）。アダプタは差し替え可能な形にし、VOICEVOX 版（<code>narration.py</code>）は残す（21-2 申し送り）。費用は Neural 100 万字あたり数ドル・1 問 120 字のため無視できる</li>
-  <li><strong>予算検査</strong>: cue の実測長が予算を超えたらビルドエラー（問題文を削る）。pref-ranking-1 の予測長 / 実測長の許容差（0.08 秒）は 12 秒級の cue では足りないため、<strong>cue 長に比例した許容差</strong>にする（21-2 所見）</li>
+  <li><strong>声と演技</strong>: 声 ID・声の説明文・演技指示の正は <code>content/video-build/umigame-soup-1/assets/design.json</code> の <code>narration</code> 節（モデル <code>gemini-3.8-flash-tts</code>・声 <code>voice_1m8w495yafud</code>〔<code>store=true</code> で API キーのプロジェクトに保存〕）。演技指示は「子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。」。声 ID が失われたら説明文から作り直せる（<code>POST /v1beta/voices</code>）が、同じ声になる保証はないため作り直したら全数を再試聴する</li>
+  <li><strong>実行</strong>: ビルド時にローカルで <code>scripts/narration_gemini.py</code>（<code>build.py</code> の既定。API キーは <code>GEMINI_API_KEY</code> か <code>~/.config/gemini/api_key</code>。AWS の Secret は不要）。費用は音声 1 時間あたり約 0.81 ドル・1 問 20 秒のため無視できる。無料枠では入出力が Google の製品改善に使われるが、送るのは公開予定の問題文だけのため許容する。Polly 版（<code>narration_polly.py</code>・<code>build.py --tts polly</code>）と VOICEVOX 版（<code>narration.py</code>）はアダプタとして残す</li>
+  <li><strong>話速の調整と予算検査</strong>: 前後の無音を削った合計が 21 秒を超える分だけ ffmpeg の <code>atempo</code> で話速を上げて 19 秒に合わせる（Polly の 125% と同じ扱い）。<strong>倍率の上限は 1.19</strong>（PoC で違和感なしを確認した上限）で、超えた問は取り直す（1 問 3 回まで。続けて超えたら文を見直す）。調整後も予算を超えたらビルドエラー（方式設計書 8.3）</li>
 </ul>
 
 <h2 id="assets">9. 固定アセット・デザイントークン</h2>

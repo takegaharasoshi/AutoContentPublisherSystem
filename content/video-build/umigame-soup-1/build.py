@@ -11,6 +11,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 from typing import Any, Iterable
 
 from common import (
@@ -31,7 +32,7 @@ from common import (
     write_json,
 )
 from prepare_bgm import TRACKS_PATH, OUT_DIR as BGM_OUT_DIR, validate_tracks
-from scripts.narration_polly import synthesize_cues
+from scripts import narration_gemini, narration_polly
 
 
 PUBLIC_DIR = REMOTION_DIR / "public"
@@ -118,13 +119,15 @@ def validate_narration_budget(report: dict[str, Any]) -> dict[str, float]:
     return {"problem_sec": problem, "rule_sec": rule, "total_sec": total}
 
 
-def _load_cached_narration(item: dict[str, Any], out_dir: Path) -> dict[str, Any]:
+def _load_cached_narration(
+    item: dict[str, Any], out_dir: Path, *, max_tempo: float = 1.19
+) -> dict[str, Any]:
     report_path = out_dir / "narration.json"
     required = [report_path, out_dir / "problem.wav", out_dir / "rule.wav"]
     if not all(path.is_file() for path in required):
         raise RuntimeError(
             f"ナレーション未合成です: {out_dir} "
-            "（--no-tts を外して Polly 合成するか、先に narration_polly.py を実行）"
+            "（--no-tts を外して TTS 合成するか、先にナレーションを合成）"
         )
     report = json.loads(report_path.read_text(encoding="utf-8"))
     expected = {
@@ -133,6 +136,26 @@ def _load_cached_narration(item: dict[str, Any], out_dir: Path) -> dict[str, Any
     }
     if report.get("texts") != expected:
         raise RuntimeError(f"ナレーションの文章がストックと一致しません: {out_dir}")
+    if str(report.get("engine_id", "")).startswith("gemini/"):
+        tempo = float(report.get("tempo", 1.0))
+        if tempo > max_tempo:
+            raise narration_gemini.TempoLimitError(tempo, max_tempo)
+    return report
+
+
+def _synthesize_polly(
+    problem_text: str, rule_text: str, out_dir: Path, *, force: bool
+) -> dict[str, Any]:
+    """Polly アダプタを変更せず、取り直し時は一時領域で再合成する。"""
+    if not force:
+        return narration_polly.synthesize_cues(problem_text, rule_text, out_dir)
+    out_dir.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="polly-retake-", dir=out_dir.parent) as temp:
+        temporary_dir = Path(temp)
+        report = narration_polly.synthesize_cues(problem_text, rule_text, temporary_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for name in ("problem.wav", "rule.wav", "narration.json"):
+            (temporary_dir / name).replace(out_dir / name)
     return report
 
 
@@ -377,7 +400,7 @@ def inspect_seam(final_path: Path, content_key: str) -> float:
 
 def _record(
     item: dict[str, Any], props_path: Path, video_path: Path,
-    track: dict[str, Any], narration: dict[str, float], probe: dict[str, Any],
+    track: dict[str, Any], narration: dict[str, float | str], probe: dict[str, Any],
     stills: dict[str, str], seam_difference: float,
 ) -> dict[str, Any]:
     return {
@@ -394,7 +417,10 @@ def _record(
             "s3_key": track["s3_key"],
             "provisional": track["provisional"],
         },
-        "narration": {key: round(value, 3) for key, value in narration.items()},
+        "narration": {
+            key: round(value, 3) if isinstance(value, (int, float)) else value
+            for key, value in narration.items()
+        },
         "probe": probe,
         "seam_mean_diff": round(seam_difference, 4),
         "built_at": dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
@@ -408,13 +434,22 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--skip-render", action="store_true", help="props 生成までで止める")
     parser.add_argument("--rebuild-bgm", action="store_true", help="既存割当を破棄して再選曲する")
     parser.add_argument(
+        "--tts", choices=("gemini", "polly"), default="gemini",
+        help="ナレーションの TTS（既定: gemini）",
+    )
+    parser.add_argument(
+        "--retake-tts", action="store_true", help="対象のナレーションを取り直す",
+    )
+    parser.add_argument(
         "--no-tts", action="store_true",
-        help="Polly を呼ばず、work/narration の既存 WAV だけを使う",
+        help="TTS を呼ばず、work/narration の既存 WAV だけを使う",
     )
     return parser
 
 
-def _preflight_inputs(items: Iterable[dict[str, Any]], *, no_tts: bool) -> list[str]:
+def _preflight_inputs(
+    items: Iterable[dict[str, Any]], *, no_tts: bool, max_tempo: float = 1.19
+) -> list[str]:
     """BGM 前に問別の必須入力をまとめて検査する。"""
     errors: list[str] = []
     for item in items:
@@ -426,7 +461,9 @@ def _preflight_inputs(items: Iterable[dict[str, Any]], *, no_tts: bool) -> list[
             )
         if no_tts:
             try:
-                _load_cached_narration(item, WORK / "narration" / key)
+                _load_cached_narration(
+                    item, WORK / "narration" / key, max_tempo=max_tempo
+                )
             except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
                 errors.append(f"{key}: {exc}")
     return errors
@@ -434,6 +471,9 @@ def _preflight_inputs(items: Iterable[dict[str, Any]], *, no_tts: bool) -> list[
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.no_tts and args.retake_tts:
+        print("エラー: --no-tts と --retake-tts は同時に指定できません", file=sys.stderr)
+        return 1
     failures: list[str] = []
     try:
         targets = select_items(load_items(args.batch), args.content_keys)
@@ -443,7 +483,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"エラー: {exc}", file=sys.stderr)
         return 1
 
-    failures = _preflight_inputs(targets, no_tts=args.no_tts)
+    max_tempo = float(design["narration"]["max_tempo"])
+    failures = _preflight_inputs(
+        targets, no_tts=args.no_tts, max_tempo=max_tempo
+    )
     if failures:
         print("入力不足:", file=sys.stderr)
         for failure in failures:
@@ -465,12 +508,24 @@ def main(argv: list[str] | None = None) -> int:
                 )
             narration_dir = WORK / "narration" / key
             if args.no_tts:
-                report = _load_cached_narration(item, narration_dir)
+                report = _load_cached_narration(
+                    item, narration_dir, max_tempo=max_tempo
+                )
+            elif args.tts == "gemini":
+                report = narration_gemini.synthesize_cues(
+                    item["narration"]["problem"], item["narration"]["rule"],
+                    narration_dir, config=design["narration"], force=args.retake_tts,
+                )
             else:
-                report = synthesize_cues(
-                    item["narration"]["problem"], item["narration"]["rule"], narration_dir
+                report = _synthesize_polly(
+                    item["narration"]["problem"], item["narration"]["rule"],
+                    narration_dir, force=args.retake_tts,
                 )
             narration_summary = validate_narration_budget(report)
+            if report.get("engine_id") is not None:
+                narration_summary["engine_id"] = str(report["engine_id"])
+            if report.get("tempo") is not None:
+                narration_summary["tempo"] = float(report["tempo"])
             track = select_bgm_track(
                 manifest, key, tracks, rebuild_bgm=args.rebuild_bgm
             )
@@ -494,6 +549,16 @@ def main(argv: list[str] | None = None) -> int:
             )
             save_manifest(manifest)
             print(f"{key}: ビルド完了（seam={seam_difference:.3f}）")
+        except narration_gemini.GeminiQuotaError as exc:
+            failures.append(f"{key}: {exc}")
+            print(f"エラー: {key}: {exc}", file=sys.stderr)
+            print("\n失敗一覧:", file=sys.stderr)
+            for failure in failures:
+                print(f"- {failure}", file=sys.stderr)
+            return 1
+        except narration_gemini.TempoLimitError as exc:
+            failures.append(f"{key}: {exc}")
+            print(f"エラー: {key}: {exc}", file=sys.stderr)
         except Exception as exc:
             failures.append(f"{key}: {exc}")
             print(f"エラー: {key}: {exc}", file=sys.stderr)

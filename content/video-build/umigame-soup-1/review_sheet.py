@@ -58,6 +58,14 @@ def generate_review_html(
         narration = (
             record.get("narration") if isinstance(record.get("narration"), dict) else {}
         )
+        tempo_html = (
+            f" ×{_text(narration['tempo'])}"
+            if narration.get("tempo") is not None else ""
+        )
+        engine_html = (
+            f" / {_text(narration['engine_id'])}"
+            if narration.get("engine_id") else ""
+        )
         provisional = bgm.get("provisional") is True
         bgm_class = " provisional" if provisional else ""
         bgm_label = "暫定 BGM（publish 不可）" if provisional else "正式 BGM"
@@ -95,7 +103,8 @@ def generate_review_html(
             f"{_text(bgm.get('track'))} / {_text(bgm.get('s3_key'))}</p>"
             f"<p><b>ナレーション:</b> problem={_text(narration.get('problem_sec'))}s + "
             f"gap=1.2s + rule={_text(narration.get('rule_sec'))}s = "
-            f"<b>{_text(narration.get('total_sec'))}s / 21.0s</b></p>"
+            f"<b>{_text(narration.get('total_sec'))}s / 21.0s</b>"
+            f"{tempo_html}{engine_html}</p>"
             f"<p><b>ffprobe:</b> {_text(_probe_text(record.get('probe')))}</p>"
             f"<p><b>継ぎ目平均差分:</b> {_text(record.get('seam_mean_diff'))} / 3.0 以下</p>"
             '<details><summary>真相・確定事実シート（レビュー時だけ開く）</summary>'
