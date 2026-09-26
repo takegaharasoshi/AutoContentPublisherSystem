@@ -4,6 +4,7 @@
 - content_key は stock_items.py で採番済みの値をそのまま入れる（{3 桁連番}-{slug}。両環境で同一）。
 - 先頭で batch_sets 行（``is_active = 0``）を既存でなければ作る（21-4b）。稼働化（``is_active = 1``）・
   ``problem_snapshot_enabled`` / ``stories_enabled`` の有効化は 21-7 の人間ゲートで行い、本 SQL では触らない。
+- INSERT は ``stock_items.POST_ORDER`` の順に並べる（id の順 = 投稿順。2026-09-26 の素材の全数レビューで決定）。
 - ``--dry-run`` はローカル MySQL（docker の acps-mysql）でトランザクション内に流し、件数と content_key の
   重複を確認して ROLLBACK する。
 
@@ -24,7 +25,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "common"))
 
-from stock_items import ITEMS  # noqa: E402
+from stock_items import ITEMS, POST_ORDER  # noqa: E402
 from umigame_common import SET_CODE  # noqa: E402
 
 SQL_PATH = HERE / "insert_umigame_stock.sql"
@@ -59,9 +60,15 @@ def build_sql() -> str:
         f"WHERE NOT EXISTS (SELECT 1 FROM batch_sets WHERE set_code = '{SET_CODE}');",
         "",
     ]
-    for it in ITEMS:
+    by_no = {it["no"]: it for it in ITEMS}
+    lines += [
+        "-- INSERT は stock_items.POST_ORDER の順（= id の順 = 投稿順。投稿バッチは未使用のストックを id の小さい順に選ぶ）",
+        "",
+    ]
+    for order, no in enumerate(POST_ORDER, start=1):
+        it = by_no[no]
         lines += [
-            f"-- {it['no']} {it['title']}",
+            f"-- 投稿順 {order}: {it['no']} {it['title']}（{it['puzzle_type']}）",
             "INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,",
             "    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,",
             "    caption, source_note, is_active)",

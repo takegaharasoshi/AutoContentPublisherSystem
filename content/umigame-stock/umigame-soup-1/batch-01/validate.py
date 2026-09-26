@@ -18,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "common"))
 
-from stock_items import ITEMS  # noqa: E402
+from stock_items import ITEMS, POST_ORDER  # noqa: E402
 from umigame_common import (  # noqa: E402
     ANSWER_HEADS,
     PROHIBITION_LINE,
@@ -57,7 +57,8 @@ CORE_FORMAT_BY_TYPE = {
 CORE_MAX = 120
 # 欠番の content_key 連番（差し替えで ITEMS から外し、再利用しない番号。DB の行の扱いは全数レビュー後に決める）。
 # 002 = U11（2026-09-26 に U27 = 015 へ差し替え。素材の全数レビュー指摘 17）
-RETIRED_SERIALS = {2}
+# 011 = U23（2026-09-26 に U28 = 016 へ差し替え。本家ウミガメのスープ）
+RETIRED_SERIALS = {2, 11}
 
 errors: list[str] = []
 warnings: list[str] = []
@@ -223,6 +224,16 @@ def main() -> int:
     serials = sorted(set(serials) | RETIRED_SERIALS)
     if serials and serials != list(range(serials[0], serials[0] + len(serials))):
         errors.append(f"content_key の連番が連続していない: {serials}")
+
+    nos = [it.get("no") for it in ITEMS]
+    if sorted(POST_ORDER) != sorted(nos) or len(set(POST_ORDER)) != len(POST_ORDER):
+        errors.append(f"POST_ORDER が ITEMS の問題番号と一致しない（過不足・重複）: {POST_ORDER}")
+    else:
+        type_of = {it["no"]: it["puzzle_type"] for it in ITEMS}
+        seq = [type_of[n] for n in POST_ORDER]
+        same = [f"{POST_ORDER[i]}-{POST_ORDER[i + 1]}" for i in range(len(seq) - 1) if seq[i] == seq[i + 1]]
+        if same:
+            warnings.append(f"POST_ORDER で同じ型が続く（story / misdirection の交互が既定）: {same}")
 
     types = Counter(it.get("puzzle_type") for it in ITEMS)
     diffs = Counter(it.get("difficulty") for it in ITEMS)

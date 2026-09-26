@@ -74,6 +74,8 @@
 <ul>
   <li><strong>20:00 は pref-ranking-1 の夜スロットと同時刻</strong>（21-1 ④。Claude は失敗アラーム対応の重なりを避けて 19:00 を提案したがユーザー判断で 20:00）。同時刻運用は 15-15 の決定どおり <code>set_code</code> で分離され、画像生成 SFN・SNS 投稿 SFN はセットごとに独立実行される。運用上の注意は 2 点: ① 20:00 台に失敗アラームが来たらメール本文の <code>set_code</code> で対象セットを見分ける ② Aurora は 2 セットの同時起動で ACU が一時的に上がるが日次数分のため許容（既に logic-training-1 と pref-ranking-1 が 20:00 で並走している実績あり）</li>
   <li>投稿の流れは共通フロー（画像生成 SFN → SNS 投稿 SFN の連鎖。<a href="../batch-flow.html">batch-flow.html</a>）。本セットは <strong>publish 成功直後に問題スナップショットを S3 へ出力する</strong>点だけが差分（セクション 10.2）</li>
+  <li><strong>投稿順は INSERT の順番で決める</strong>（2026-09-26 の素材の全数レビューでユーザー決定。<strong>story と misdirection を交互に出す</strong>。第 1 バッチは本家を題材にした U28「本物のウミガメのスープ」を 1 本目にする）: 方式はビルド済みストックを「未使用 → <code>last_used_at</code> の古い順 → <code>id</code> の小さい順」で選ぶ（<a href="../generators/umigame-prebuilt.html#stock">umigame-prebuilt 4</a>）ため、最初に投入した順（= <code>id</code> の順）が一巡目以降もそのまま投稿順になる。順番の正はバッチの <code>stock_items.py</code> の <code>POST_ORDER</code> で、<code>generate.py</code> がその順に INSERT を並べ、<code>validate.py</code> が過不足と同じ型の連続（警告）を検査する。順番を変えるときは DB を入れ直す（<code>id</code> は UPDATE で変えられない）。後から足すバッチは既存の未使用分の後ろに並ぶ
+    <div class="callout decision"><span class="callout-title">決定（2026-09-26）: 投稿順の列（<code>post_order</code>）は足さない</span>DB に投稿順の列を足して選択 SQL を変える案（開発レーン: DDL + 投稿バッチ改修）もあったが、投稿開始前で入れ直しの負担がないため、コード変更なしで INSERT 順に寄せる案を採った。投稿開始後に順番を頻繁に差し替える必要が出たら、列の追加を課題として起票する</div></li>
   <li>Scheduler の CDK 追加は 21-7（<a href="../../infra/workflow.html#schedule">workflow.html 1.6</a> の命名規約。Scheduler の Input にスロット・尺は持たせない）。有効化前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
 </ul>
 

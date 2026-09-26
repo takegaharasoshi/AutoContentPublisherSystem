@@ -7,7 +7,37 @@ INSERT INTO batch_sets (set_code, name, generator_name, is_active)
 SELECT 'umigame-soup-1', '探偵カメロックのウミガメのスープ', 'umigame-prebuilt', 0
 WHERE NOT EXISTS (SELECT 1 FROM batch_sets WHERE set_code = 'umigame-soup-1');
 
--- U01 影が薄いと言われて喜ぶ男
+-- INSERT は stock_items.POST_ORDER の順（= id の順 = 投稿順。投稿バッチは未使用のストックを id の小さい順に選ぶ）
+
+-- 投稿順 1: U28 本物のウミガメのスープ（story）
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '016-umigame-soup', '本物のウミガメのスープ', 4,
+        '男はあるレストランでウミガメのスープを注文した。一口飲むとシェフを呼び、これは本物のウミガメのスープかと尋ねた。本物だと聞くと、男はその場で泣き崩れた。なぜ？',
+        '男は若いころ、乗っていた船が事故に遭い、仲間数人と救命ボートで何日も海を漂った。食べ物が尽きて弱っていく男に、仲間は「ウミガメを捕まえた。ウミガメのスープだ」と言ってスープを飲ませた。本当はそれは、漂流の途中で亡くなった仲間の肉で作ったスープだった。男は生き延びて家に帰り、そのスープをウミガメのスープだと信じていた。何年も後、男はレストランで初めて本物のウミガメのスープを飲み、あのときの味とまったく違うことに気づいた。シェフに本物だと確かめて、あのとき飲んだものの正体と、仲間が自分を生かすためについた嘘を悟り、男は泣き崩れた。',
+        '["今日のスープは本物のウミガメのスープ。店にもシェフにも落ち度はなく、嘘もついていない","スープはまずくなかった。毒や異物も入っていない","男の涙は、味が嫌だったからでも、料理に感動したからでもない","男は料理の専門家や評論家ではない","男は前にも「ウミガメのスープ」と呼ばれるものを飲んだことがある。今日のスープは、そのときの味とまったく違った","前に飲んだのは、男が若いころ、船の事故で仲間数人とボートで海を漂っていたとき。食べ物は尽きていた","そのとき、仲間が「ウミガメのスープだ」と言って男にスープを飲ませた","前に飲んだスープの材料が何だったかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","前に飲んだスープの材料は、ウミガメではなかった","漂っている間に、仲間の何人かは亡くなった","仲間は男を生かすためにそうした。悪意はない","男は今日まで、前に飲んだスープの正体を知らなかった","男は生き延びて家に帰り、今日のこの後も生きていく","店の場所・男の年齢・スープの値段は問題に関係ない"]',
+        '[{"q":"スープがまずかったのですか？","a":"いいえ"},{"q":"スープに毒が入っていましたか？","a":"いいえ"},{"q":"シェフは嘘をついていますか？","a":"いいえ"},{"q":"男は料理に感動して泣いたのですか？","a":"いいえ"},{"q":"男は料理の専門家ですか？","a":"いいえ"},{"q":"男は前にもウミガメのスープを飲んだことがありますか？","a":"はい"},{"q":"前に飲んだスープとは味が違いましたか？","a":"はい"},{"q":"前に飲んだのは本物のウミガメのスープですか？","a":"いいえ"},{"q":"男は海で遭難したことがありますか？","a":"はい"},{"q":"遭難したとき、仲間がスープを飲ませてくれたのですか？","a":"はい"},{"q":"男の仲間は亡くなりましたか？","a":"はい"},{"q":"仲間は男を助けようとしていましたか？","a":"はい"},{"q":"男は今日までスープの正体を知らなかったのですか？","a":"はい"},{"q":"男はこのあと死んでしまいますか？","a":"いいえ"},{"q":"男の年齢は関係ありますか？","a":"関係ない"},{"q":"スープの値段は関係ありますか？","a":"関係ない"},{"q":"男は昔、海で遭難したときに仲間から「ウミガメのスープ」だと言われて飲んだが、本物の味を知って、あれは本物ではなく亡くなった仲間の肉だったと気づいた。","a":"正解"}]',
+        'スープで泣き崩れた真相は？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"男はあるレストランでウミガメのスープを注文した。一口飲むとシェフを呼び、これは本物のウミガメのスープかと尋ねた。本物だと聞くと、男はその場で泣き崩れた。なぜ？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"スープがまずかった？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"シェフが嘘をついた？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"前にも飲んだことがある？"},{"role":"master","text":"はい！"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A quiet restaurant in the evening; a middle-aged man sits alone at a table with a bowl of soup and a spoon, covering his eyes with one hand as tears fall; a chef in a white uniform stands beside the table looking concerned; warm lamp light, a few empty tables behind, no readable writing, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+
+男はあるレストランでウミガメのスープを注文した。一口飲むとシェフを呼び、これは本物のウミガメのスープかと尋ねた。本物だと聞くと、男はその場で泣き崩れた。なぜ？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
+        '本家「ウミガメのスープ」（作者不詳・広く流布した水平思考問題の原点）の筋を題材にした（2026-09-26 のユーザー判断で作問スキル工程 7 の例外として採用。セットの最初の投稿に使う）。問題文・真相・確定事実は完全オリジナルの書き下ろしで、既存の文面は転載していない。結末は本家の自殺を外した和らげた版（ユーザー決定）。 型: 物語復元型。物語「遭難中に仲間からウミガメのスープだと言われて飲んだのは、亡くなった仲間の肉だった。何年も後に本物を飲んで正体に気づく」→ 隠した B = 遭難中に飲んだスープの正体。問題文から「海辺の」を外した（遭難の手がかり A を置かない）。U23「おじいさんのお釣り」（011-grandpas-change）の差し替え（素材の全数レビューでユーザー判断・面白さ不足）。', 1);
+
+-- 投稿順 2: U01 影が薄いと言われて喜ぶ男（misdirection）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
@@ -35,147 +65,7 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「影」（作問スキル umigame-problem-writer の抽選 3 語〔影・鉛筆・ゴミ出し〕から選択）→ 連想「影が薄い（慣用句）・レントゲンの影」→ 抽象化（影が薄い = 存在感 / 写真に写る影）→ 常識「影が薄いと言われたら傷つく」の逆。着想元の既存問題なし（台帳 #22「外科医は母親」の役割の思い込みとは構造が異なり、言った相手が医者であることは核ではない。核は「影」の多義）。2026-09-07 のレビューで「分かりやすすぎる」の指摘を受け、対称形（半年前に濃くなった）・丁寧語・「同じ相手」の手がかりを外して難易度を 3 → 4 に上げた。差し替え前の 2 案（貸出カード / カシオペヤ座）の経緯は STATUS.md。', 1);
 
--- U12 階段に並ぶ、音を出さない男たち
-INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
-    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
-    caption, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
-        '003-silent-musicians', '階段に並ぶ、音を出さない男たち', 2,
-        '男たちは階段に横一列に並び、楽器を構えている。しかし、男たちは今まで一度も音を出したことがない。それでも見ている人たちは、うれしそうに毎日眺めている。どういうこと？',
-        '男たちはひな人形の五人囃子。階段に見えるのは、ひな祭りの段飾りの段である。人形なので、太鼓や笛を構えたまま一度も音を出したことがない。家族は毎年ひな祭りの時期に飾り、飾っている間は毎日うれしそうに眺めている。',
-        '["男たちは生きている人間ではない。男たちの正体はこの問題の答えの核心である（正解宣言のとき以外は補足で言わない）","男たちは自分の意思で動いたり話したりしない。演奏の練習をしているのでも、音を出すのを止められているのでもない","男たちは楽器を演奏できない（使い方を知っている・覚えるということもない）","楽器は壊れていない。楽器の種類は問題に関係ない","男たちは家の中にいる。階段は建物の階段ではなく、そのために組み立てた段である","男たちの上の段にも並んでいる者がいる（男たちは一番上ではない）","男たちが並ぶのは一年のうち決まった時期だけで、その時期が終わると片づけられ、次の年にまた並ぶ","見ている人たちは、男たちを家に置いている家族である。男たちが音を出さないことを、家族は初めから知っている","家族がうれしそうなのは、その時期のお祝いを楽しんでいるから。女の子のためのお祝いである","男たちのうち 1 人は楽器を持たず、別の物を持っている（全員が楽器を持つのではない）","男たちは楽団・音楽家・パントマイム・銅像・おもちゃではない","男たちの年齢・人数・家の場所は問題に関係ない"]',
-        '[{"q":"楽器は壊れていますか？","a":"いいえ"},{"q":"男たちは演奏の練習中ですか？","a":"いいえ"},{"q":"男たちは誰かに音を出すのを止められていますか？","a":"いいえ"},{"q":"男たちは生きている人間ですか？","a":"いいえ"},{"q":"男たちは楽団ですか？","a":"いいえ"},{"q":"男たちは人形ですか？","a":"はい"},{"q":"男たちはおもちゃですか？","a":"いいえ"},{"q":"男たちは家の中にいますか？","a":"はい"},{"q":"階段は建物の階段ですか？","a":"いいえ"},{"q":"男たちは一年中そこにいますか？","a":"いいえ"},{"q":"決まった季節にだけ並びますか？","a":"はい"},{"q":"男たちの上の段にも誰かいますか？","a":"はい"},{"q":"見ている人たちは、男たちを家に置いている人ですか？","a":"はい"},{"q":"見ている人たちは何かをお祝いしていますか？","a":"はい"},{"q":"女の子のためのお祝いですか？","a":"はい"},{"q":"男たちが音を出せないことを、見ている人は知っていますか？","a":"はい"},{"q":"男たちは全員楽器を持っていますか？","a":"いいえ"},{"q":"楽器の種類は重要ですか？","a":"関係ない"},{"q":"男たちの年齢は関係ありますか？","a":"関係ない"},{"q":"男たちはひな人形の五人囃子で、階段はひな祭りの段飾り。人形だから楽器を構えたまま音を出さない。家族はひな祭りの飾りとして毎日眺めて楽しんでいる。","a":"正解"}]',
-        '音を出さない男たちの真相は？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
-        '{"problem":"男たちは階段に横一列に並び、楽器を構えている。しかし、男たちは今まで一度も音を出したことがない。それでも見ている人たちは、うれしそうに毎日眺めている。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"楽器は壊れている？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男たちは楽器を演奏できる？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"家の中にいる？"},{"role":"master","text":"はい！"}]',
-        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
-        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
-
-Scene: Five young men in plain clothes standing in a row on a short flight of wide steps, holding small drums and a flute but not playing, perfectly still; two or three people watching from below with delighted faces; warm soft light, simple background, no text or letters anywhere.
-
-Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
-        '【探偵カメロックのウミガメのスープ】
-
-男たちは階段に横一列に並び、楽器を構えている。しかし、男たちは今まで一度も音を出したことがない。それでも見ている人たちは、うれしそうに毎日眺めている。どういうこと？
-
-「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
-
-#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
-        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「階段」（作問スキル umigame-problem-writer の抽選 3 語〔テント・のど飴・階段〕から）→ 連想「ひな壇・段・踊り場・はしご・上っても着かない」→ 具体化（階段に並ぶ男たち → 段飾りに並ぶ五人囃子）→ 常識「楽器を構える人は音を出す」の逆（一度も音を出したことがない）。着想元の既存問題なし（人を人形に反転する構造は台帳 #07〔玩具〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: 上っても 2 階に着かない階段〔ランニングマシン型として既知・落差なし〕/ 違う足音で泣く女〔語の強制なし・U01 と結末が重なる〕/ 踊り場〔誤読が起きない〕/ 棚田〔階段と呼ばない〕/ 引っ越し屋の階段料金・段位〔知識クイズ〕。', 1);
-
--- U13 会ったことのない男の子からの手紙
-INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
-    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
-    caption, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
-        '004-fifty-year-letter', '会ったことのない男の子からの手紙', 4,
-        'ある日、1人の男のもとに、男の子が書いた手紙が届いた。男はその子に、これまで一度も会ったことがない。それなのに、その子がどんな子なのか、誰よりもよく知っていた。なぜ？',
-        '手紙は、男が 50 年前の小学生のころ、学校の記念行事で「未来の自分」に宛てて書き、タイムカプセルに入れて校庭に埋めたもの。50 年後の同窓会で掘り出され、男の手に渡った。手紙を書いた男の子は50 年前の男自身。自分のことだから、その子がどんな子で、どんな大人になったのかも誰よりもよく知っている。人は自分自身と「会う」ことはできないので、男がその子に一度も会ったことがないのも本当である。',
-        '["手紙を書いた男の子が誰なのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","手紙は書かれてから届くまでに何10年もたっている。郵便局が配達に何10年もかけたのではなく、配達が遅れたのでも、途中で失くされていたのでもない","手紙はあとで読まれるように、わざと保管されていたものである","手紙は男の子が小学生のとき、学校の行事で書いたものである","手紙には宛先があり、男はその宛先のとおりの正しい受け取り手である（誤配ではない）","手紙は男の家のポストに届いたのではなく、集まりの場で男に手渡された","男の子は今も生きていて、今はもう大人になっている。男の子は男の息子・孫・親戚・友だち・教え子ではない","男の子は有名人ではない。男はテレビや本で男の子のことを知ったのでもない","男が男の子のことをよく知っているのは、誰かから聞いたからでも、調べたからでもない","手紙には男の子の将来の夢が書いてあった（夢の中身は問題に関係ない）","男は手紙を受け取っても驚かず、読んで懐かしそうに笑った","男の名前・住んでいる場所は問題に関係ない"]',
-        '[{"q":"手紙は最近書かれたものですか？","a":"いいえ"},{"q":"手紙は何10年も前に書かれたものですか？","a":"はい"},{"q":"手紙はどこかで失くされていたのですか？","a":"いいえ"},{"q":"手紙は郵便局のミスで届くのが遅れたのですか？","a":"いいえ"},{"q":"手紙はあとで読まれるように、わざと取っておかれたのですか？","a":"はい"},{"q":"手紙は学校の行事と関係がありますか？","a":"はい"},{"q":"手紙はタイムカプセルに入っていましたか？","a":"はい"},{"q":"男の子は手紙を書いたとき、小学生でしたか？","a":"はい"},{"q":"男の子は今も子どもですか？","a":"いいえ"},{"q":"男の子は今も生きていますか？","a":"はい"},{"q":"男の子は男の息子や孫ですか？","a":"いいえ"},{"q":"男は男の子の先生でしたか？","a":"いいえ"},{"q":"男の子は有名人ですか？","a":"いいえ"},{"q":"手紙はもともと男に宛てて書かれたものですか？","a":"はい"},{"q":"男は誰かから男の子のことを聞いたのですか？","a":"いいえ"},{"q":"男は男の子と同じ小学校に通っていましたか？","a":"はい"},{"q":"手紙には将来の夢が書いてありましたか？","a":"はい"},{"q":"夢の中身は答えに関係ありますか？","a":"関係ない"},{"q":"男の住んでいる場所は関係ありますか？","a":"関係ない"},{"q":"手紙は男が小学生のとき、学校の行事でタイムカプセルに入れた未来の自分宛てのもの。書いた男の子は昔の男自身だから、どんな子なのかを誰よりもよく知っていた。","a":"正解"}]',
-        '会ったことのない子の手紙？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
-        '{"problem":"ある日、一人の男のもとに、男の子が書いた手紙が届いた。男はその子に、これまで一度も会ったことがない。それなのに、その子がどんな子なのか、誰よりもよく知っていた。なぜ？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"その子は男の息子？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"その子は有名人？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"手紙の宛先に間違いはない？"},{"role":"master","text":"はい！"}]',
-        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
-        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
-
-Scene: An elderly man with gentle eyes sitting by a window in warm evening light, holding an old worn envelope with both hands and smiling nostalgically; behind him a faint dream-like image of a small schoolboy writing at a desk; simple background, no text or letters anywhere.
-
-Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
-        '【探偵カメロックのウミガメのスープ】
-
-ある日、1人の男のもとに、男の子が書いた手紙が届いた。男はその子に、これまで一度も会ったことがない。それなのに、その子がどんな子なのか、誰よりもよく知っていた。なぜ？
-
-「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
-
-#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
-        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「郵便」（作問スキル umigame-problem-writer の抽選 3 語〔片づけ・郵便・たまご〕から）→ 連想「タイムカプセル・卒業式に書く未来の自分への手紙」→ 具体化（昔の男の子が書いた手紙を受け取る男）→ 常識「手紙は書いた人と受け取る人が別人」の逆（差出人 = 受取人）。着想元の既存問題なし（別々に見せた人物を同一人物と明かす構造は台帳 #21〔人数の省略の補完〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: 他人の手紙を毎日読んで怒られない男〔代読。語の強制がない状況型〕/ サンタ宛ての手紙に毎年返事を書く係〔誤認がなく知識・雑学寄り〕。', 1);
-
--- U14 割らない卵を自慢するパン屋
-INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
-    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
-    caption, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
-        '005-bakers-egg', '割らない卵を自慢するパン屋', 4,
-        'パン屋の主人は、店の卵をとても大切にしている。ゆでることも、割ることもしない。それなのに主人は、うちのパンがおいしいのはこの卵のおかげだ、といつも自慢している。なぜ？',
-        '「卵」とは、パン職人の卵、つまり見習いの若者のこと。主人は10年前に店へ来た見習いを、自分の店の「卵」と呼んでかわいがり、パン作りを教えて一人前に育て上げた。いまでは店でいちばんおいしいパンをその卵が焼いているので、「パンがおいしいのはこの卵のおかげ」という自慢は本当のこと。食べ物の卵ではないので、ゆでることも割ることもしない。',
-        '["「卵」が何（誰）なのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","卵はひよこや鶏になったのではない。温めてかえしたのでもない","魔法・おとぎ話・作り話ではない。現実にどこの町でも起こることである","卵はお守り・縁起物・飾り・置き物ではない","主人は卵をいつか食べたり売ったりするつもりはない","卵は冷蔵庫にも巣にも入っていない","卵はパンの材料として使われていない。それでも卵はパン作りに深く関係している","「大切にしている」は、えさや水をやるという意味ではない。教えて育てているという意味である","卵は毎日、主人といっしょに店で働いている","卵は主人の家族（子ども・孫・親せき）ではない","主人の自慢は嘘や冗談ではなく、本当のことである","店の場所・パンの種類は問題に関係ない"]',
-        '[{"q":"卵はお守りや縁起物として大切にされているのですか？","a":"いいえ"},{"q":"卵はひよこにかえったのですか？","a":"いいえ"},{"q":"卵は鶏になったのですか？","a":"いいえ"},{"q":"これは魔法やおとぎ話の出来事ですか？","a":"いいえ"},{"q":"主人は卵をいつか食べるつもりですか？","a":"いいえ"},{"q":"卵は冷蔵庫に入っていますか？","a":"いいえ"},{"q":"主人の自慢は嘘や冗談ですか？","a":"いいえ"},{"q":"卵はパンの材料として使われていますか？","a":"いいえ"},{"q":"「卵」は食べ物の卵ですか？","a":"いいえ"},{"q":"卵はパン作りに関係がありますか？","a":"はい"},{"q":"卵は生き物ですか？","a":"はい"},{"q":"卵は人ですか？","a":"はい"},{"q":"卵は店でパンを焼いていますか？","a":"はい"},{"q":"主人は卵にパンの作り方を教えましたか？","a":"はい"},{"q":"卵は主人の家族ですか？","a":"いいえ"},{"q":"パンの種類は答えに関係ありますか？","a":"関係ない"},{"q":"店の場所は答えに関係ありますか？","a":"関係ない"},{"q":"「卵」とはパン職人の卵、つまり見習いの人のこと。主人が育てた見習いがいまは店でいちばんおいしいパンを焼いているので、パンがおいしいのはこの卵のおかげ。","a":"正解"}]',
-        '割らない卵を自慢するパン屋？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
-        '{"problem":"パン屋の主人は、店の卵をとても大切にしている。ゆでることも、割ることもしない。それなのに主人は、うちのパンがおいしいのはこの卵のおかげだ、といつも自慢している。なぜ？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"卵はお守りみたいなもの？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"卵は材料として使う？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"卵はパン作りに関係してる？"},{"role":"master","text":"はい！"}]',
-        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
-        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
-
-Scene: A kind old baker in a warm bakery at dawn, gently cradling a large white egg in both hands like a treasure, shelves of freshly baked bread glowing behind him; soft morning light, simple background, no text anywhere.
-
-Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
-        '【探偵カメロックのウミガメのスープ】
-
-パン屋の主人は、店の卵をとても大切にしている。ゆでることも、割ることもしない。それなのに主人は、うちのパンがおいしいのはこの卵のおかげだ、といつも自慢している。なぜ？
-
-「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
-
-#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
-        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「たまご」（作問スキル umigame-problem-writer の抽選 3 語〔ベンチ・たまご・階段〕から。前 3 回の抽選〔自転車・すいか・花火 → 初案取り下げ / 帽子・体重計・お守り → 猫をかぶる案が差し戻し / のど飴・鍵・迷子 → 全滅で引き直し〕も記録）→ 連想「医者の卵・役者の卵 = 見習い」→ 抽象化（店の卵を大切にする → 職人の卵を育てる）→ 常識「卵は割ったりゆでたりして使う材料」の逆（ゆでることも割ることもしないのに、パンがおいしいのはこの卵のおかげだと自慢する）。初稿の逆「その卵が焼いている」「十年間育てた」は誤認の読みで不可能文となり誤読が自壊するためレビューで言い換え（情報は真相・シートへ）。着想元の既存問題なし（語の多義で場面を反転する構造は台帳 #16〔ホーム = 本塁〕・#23〔撃つ = 撮影〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: タネはありません = 種なしスイカの売り文句〔人間ゲートで「コアが弱い」と取り下げ〕/ 猫をかぶる = かぶりもの〔コア宣言で差し戻し〕/ 白い鍵と黒い鍵 = ピアノ〔英語圏の有名なぞなぞと同構造〕/ 迷子は大人〔決めつけ反転の classic 構造〕/ ベンチを温める〔落差なし・競技用語反転は台帳明示例と同構造〕/ コロンブスの卵・金の卵〔知識クイズ〕。2026-09-26 の素材レビューで、問題文・タイトル・フックの「焼く」を「ゆでる」「割らない」に変更（見習いは実際にパンを焼くため、真相と食い違って読める）。', 1);
-
--- U16 助けに来た女も凍りついた
-INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
-    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
-    caption, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
-        '006-frozen-tag', '助けに来た女も凍りついた', 4,
-        '男は凍りついたまま、誰かが助けに来るのをじっと待っていた。ようやく助けに来た女は、男のそばまで来たところで、同じようにその場で凍りついてしまった。どういうこと？',
-        '男と女は夫婦で、休みの日に公園で自分の子どもたちと鬼ごっこの一種「氷鬼」で遊んでいた。鬼は子ども。氷鬼では、鬼にタッチされた人は「凍った」ことになってその場から動けなくなり、仲間にタッチしてもらうと「溶けて」また動けるようになる。男は鬼の子どもにタッチされて凍り、仲間が助けに来てくれるのをじっと待っていた。女が助けに走ってきたが、鬼は凍った男のそばで見張っていて、女が男に触れる直前にタッチした。だから女も男のそばで凍ってしまった。凍りついたといっても本当に凍ったわけではなく、2人はこのあと別の子どもに助けてもらって、また走り回った。',
-        '["男も女も本当に凍ってはいないし、寒い場所にいるのでもない","男も女も怖がってはいないし、けがや病気でもない","2人がいるのは誰でも行ける身近な場所で、特別な施設ではない","2人がいる場所に危険なものや恐ろしいものはない","男と女は大人で、夫婦である。2人の子どもたちも同じ場所にいて、ほかに大人はいない","男が動けないのは、体のせいでも、誰かに縛られているせいでもなく、守らなければならない決まりのせいである","男と女が何をしていて、なぜ動けないのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","男が凍りついたのは、ある1人の相手に体をさわられたからで、その相手はまだ男の近くにいる。その相手は大人ではない","女が凍りついたのも、同じ相手に体をさわられたからである","女が来てくれたことは、男にとってうれしいことだった","子どもたちのうち鬼ではない子が2人の体にさわれば、2人はまた動けるようになる","このあと2人は元気に走り回っていて、悲しい出来事は何も起きていない","季節・時刻・2人の名前や職業は問題に関係ない"]',
-        '[{"q":"男は本当に凍っていますか？","a":"いいえ"},{"q":"寒い場所での出来事ですか？","a":"いいえ"},{"q":"男は怖くて動けないのですか？","a":"いいえ"},{"q":"男はけがや病気で動けないのですか？","a":"いいえ"},{"q":"男は誰かに縛られていますか？","a":"いいえ"},{"q":"男のそばに危ないものがありますか？","a":"いいえ"},{"q":"男が動けないのは、決まりを守っているからですか？","a":"はい"},{"q":"男と女は遊んでいますか？","a":"はい"},{"q":"鬼ごっこの仲間ですか？","a":"はい"},{"q":"男は誰かに体をさわられて凍りついたのですか？","a":"はい"},{"q":"女も同じ人にさわられたのですか？","a":"はい"},{"q":"女は男を助けられませんでしたか？","a":"はい"},{"q":"別の仲間がさわれば、2人はまた動けるようになりますか？","a":"はい"},{"q":"男と女は知り合いですか？","a":"はい"},{"q":"男と女は子どもですか？","a":"いいえ"},{"q":"季節は重要ですか？","a":"関係ない"},{"q":"2人にさわった相手は大人ですか？","a":"いいえ"},{"q":"2人は子どもたちと氷鬼をしていて、男は鬼にタッチされて動けなくなり、仲間の助けを待っていた。助けに来た女も鬼にタッチされて、男のそばで動けなくなった。","a":"正解"}]',
-        '凍りつく男女？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
-        '{"problem":"男は凍りついたまま、誰かが助けに来るのをじっと待っていた。ようやく助けに来た女は、男のそばまで来たところで、同じようにその場で凍りついてしまった。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"寒い場所での出来事？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男と女は特殊な場所にいる？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男は人間？"},{"role":"master","text":"はい！"}]',
-        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
-        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
-
-Scene: A man standing perfectly still on an open grassy field, arms held slightly out from his sides as if he cannot move, looking hopefully into the distance; a woman running toward him from far away; a few trees and a low fence in the background, bright daytime, no other people.
-
-Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
-        '【探偵カメロックのウミガメのスープ】
-
-男は凍りついたまま、誰かが助けに来るのをじっと待っていた。ようやく助けに来た女は、男のそばまで来たところで、同じようにその場で凍りついてしまった。どういうこと？
-
-「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
-
-#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
-        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「氷」（作問スキル umigame-problem-writer の抽選 3 語〔氷・花火・くしゃみ〕から選択。花火は「音が光より遅れる」が U15 と同じ遅延構造・「朝の号砲」は地域慣習・煙や型物花火は語の仕掛けなし、くしゃみは語の仕掛けが同音〔こしょう・ほこり〕か大人の迷信で不成立）→ 連想「凍りつく（慣用句）・氷鬼」→ 具体化（凍りついたまま助けを待つ = 氷鬼で鬼にタッチされて仲間を待つ）→ 常識「助けに来た者は凍りつかない」の逆（助けに来た女も凍りつく）。着想元の既存問題なし（台帳に遊びのルールをコアにした行はない。U12〔人形を人と読ませる〕とは慣用句の誤読という点で構造が異なる）。捨てた案: 滑る〔試験に滑る → 氷で滑る。第一義が氷で誤読が強制されない〕/ 真夏に毛布をかけて氷を運ぶ〔常識の逆だけで語の仕掛けなし〕/ 氷を入れても薄くならないジュース〔氷 = 凍らせたジュース。落差が小さい〕/ だるまさんがころんだ〔言葉で全員が凍りつく案は「はいチーズ」でも成立し正解が一つに定まらない〕。2026-09-20 の人間ゲート 1 巡目で「少年・少女は氷鬼を連想させる」の指摘を受け、登場人物を大人の夫婦（鬼は子ども）に差し替えた（登場人物の属性は正体のカテゴリを指す A 型手がかり。スキル 4.5 に反映）。', 1);
-
--- U18 白紙に戻った約束
-INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
-    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
-    caption, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
-        '007-blank-letter', '白紙に戻った約束', 4,
-        '男と女は大切な約束をした。夏のある日、その約束は白紙に戻ってしまった。それなのに、2人は少しも悲しまなかった。そして約束は、後日きちんと果たされた。どういうこと？',
-        '2人の約束は、男が女に渡した手紙に、消せるボールペンで書かれていた。夏の夕立で手紙がびしょ濡れになり、女があわててドライヤーで乾かしたところ、消せるボールペンのインクは熱で透明になる性質があるため、文字がすべて消えて、手紙は本当にまっさらな白紙に戻ってしまった。けれど約束の中身は2人とも覚えていたし、気持ちも変わっていなかった。2人は笑って書き直し、約束は後日きちんと果たされた。白紙に戻ったのは約束ではなく、手紙のほうだった。',
-        '["約束は取り消されていない。2人の気持ちも変わっていない","2人はけんかをしておらず、仲は良いまま","白紙に戻ったのは、目に見える形のあるもの","約束は口約束ではなく、書かれたものだった","書かれたものは破れても燃えてもおらず、今も手元にある","起きたことは事故のようなもので、誰のいたずらでもない","夏の天気（夕立）が関係している","濡れたものを乾かしたことが関係している","文字を書いた道具に特徴がある（種類は答えの核心。正解宣言のとき以外は補足で言わない）","約束の中身は2人とも覚えていた","2人の関係・職業・年齢・約束の中身は問題に関係ない"]',
-        '[{"q":"2人はけんかをしましたか？","a":"いいえ"},{"q":"どちらかの気持ちが変わったのですか？","a":"いいえ"},{"q":"約束は取り消されたのですか？","a":"いいえ"},{"q":"白紙に戻ったのは、形のあるものですか？","a":"はい"},{"q":"約束は紙に書かれていましたか？","a":"はい"},{"q":"その紙は破れたり燃えたりしましたか？","a":"いいえ"},{"q":"紙そのものは今もありますか？","a":"はい"},{"q":"書いてあった文字が消えたのですか？","a":"はい"},{"q":"誰かがわざと消したのですか？","a":"いいえ"},{"q":"消しゴムでこすって消したのですか？","a":"いいえ"},{"q":"夏の天気は関係ありますか？","a":"はい"},{"q":"紙は濡れましたか？","a":"はい"},{"q":"濡れたせいで文字が消えたのですか？","a":"いいえ"},{"q":"乾かしたことが関係ありますか？","a":"はい"},{"q":"特別なペンで書かれていましたか？","a":"はい"},{"q":"2人の職業は関係ありますか？","a":"関係ない"},{"q":"約束は消せるボールペンで手紙に書かれていて、夕立で濡れた手紙をドライヤーで乾かしたら、熱でインクが消えて紙が本当に白紙に戻った。","a":"正解"}]',
-        '白紙なのに果たされた約束？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
-        '{"problem":"男と女は大切な約束をした。夏のある日、その約束は白紙に戻ってしまった。それなのに、二人は少しも悲しまなかった。そして約束は、後日きちんと果たされた。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"2人はけんかした？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"季節は関係ある？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"2人は恋人？"},{"role":"master","text":"関係ありません。"}]',
-        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
-        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
-
-Scene: A man and a woman in summer clothes sitting at a table in a bright Japanese room, both smiling gently while looking together at a single completely blank sheet of paper held between them, warm evening light after summer rain outside the window; no pen, no hair dryer, no text on the paper, nobody sad.
-
-Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
-        '【探偵カメロックのウミガメのスープ】
-
-男と女は大切な約束をした。夏のある日、その約束は白紙に戻ってしまった。それなのに、2人は少しも悲しまなかった。そして約束は、後日きちんと果たされた。どういうこと？
-
-「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
-
-#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
-        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。21-4a-3 ④ の型別分離（2026-09-22・ユーザー決定）で、人間ゲート通過済みの story 版 U18「濡れた手紙を乾かしたら白紙になった」を、仕組み（消せるボールペンのインクが熱で消える）の面白さを買われて意味誤誘導型に書き換えたもの（U15 と差し替えて存続）。語の仕掛けは定型表現「（約束が）白紙に戻る」の文字どおりへの反転。誤認先の常識「取り消されたら悲しむ・守られない」の逆（悲しまない・果たされた）を 1 つ足した。着想元の既存問題なし（台帳に該当なし。story 版の Web 照合で同じ仕組みの投稿問題なし）。書き換え時の Web 照合をコアゲート前に先行し、「約束が白紙 × 消えるインク」のコアは日英とも該当なし。「白紙に戻る」の文字どおり化という語仕掛けが重なる投稿問題 1 件（反転後は折り紙で別）を提示の上、人間ゲートで採用。詳細は開発記録 21-4a-3 ④。', 1);
-
--- U20 間違えたのは誰か
+-- 投稿順 3: U20 間違えたのは誰か（story）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
@@ -203,7 +93,35 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式・21-4a-4 で新方式の初通過）。モチーフ「ピアノ」（抽選: ハンコ / ピアノ / ポスト）→ 連想（発表会・家での練習をいつも聞いている親・同じ箇所で止まる 等 16 件）→ 物語「娘の練習の間違いごと曲を覚えた父」→ 隠した B = 娘が毎晩同じ箇所で間違える練習を聞いて曲を覚えていたこと。着想元の既存問題なし（台帳 #09「音楽が止まって困る曲芸師」は音の実用的役割で構造が別）。Web 照合（ラテシン・らてらて・note・X・英語圏）で同一・近い真相の投稿問題なし。素材化時に場面を発表会の講師演奏から一般の演奏会へ移した（教室・発表会は家族に習う人がいる手がかりになるため）。', 1);
 
--- U21 1年越しの判定
+-- 投稿順 4: U12 階段に並ぶ、音を出さない男たち（misdirection）
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '003-silent-musicians', '階段に並ぶ、音を出さない男たち', 2,
+        '男たちは階段に横一列に並び、楽器を構えている。しかし、男たちは今まで一度も音を出したことがない。それでも見ている人たちは、うれしそうに毎日眺めている。どういうこと？',
+        '男たちはひな人形の五人囃子。階段に見えるのは、ひな祭りの段飾りの段である。人形なので、太鼓や笛を構えたまま一度も音を出したことがない。家族は毎年ひな祭りの時期に飾り、飾っている間は毎日うれしそうに眺めている。',
+        '["男たちは生きている人間ではない。男たちの正体はこの問題の答えの核心である（正解宣言のとき以外は補足で言わない）","男たちは自分の意思で動いたり話したりしない。演奏の練習をしているのでも、音を出すのを止められているのでもない","男たちは楽器を演奏できない（使い方を知っている・覚えるということもない）","楽器は壊れていない。楽器の種類は問題に関係ない","男たちは家の中にいる。階段は建物の階段ではなく、そのために組み立てた段である","男たちの上の段にも並んでいる者がいる（男たちは一番上ではない）","男たちが並ぶのは一年のうち決まった時期だけで、その時期が終わると片づけられ、次の年にまた並ぶ","見ている人たちは、男たちを家に置いている家族である。男たちが音を出さないことを、家族は初めから知っている","家族がうれしそうなのは、その時期のお祝いを楽しんでいるから。女の子のためのお祝いである","男たちのうち 1 人は楽器を持たず、別の物を持っている（全員が楽器を持つのではない）","男たちは楽団・音楽家・パントマイム・銅像・おもちゃではない","男たちの年齢・人数・家の場所は問題に関係ない"]',
+        '[{"q":"楽器は壊れていますか？","a":"いいえ"},{"q":"男たちは演奏の練習中ですか？","a":"いいえ"},{"q":"男たちは誰かに音を出すのを止められていますか？","a":"いいえ"},{"q":"男たちは生きている人間ですか？","a":"いいえ"},{"q":"男たちは楽団ですか？","a":"いいえ"},{"q":"男たちは人形ですか？","a":"はい"},{"q":"男たちはおもちゃですか？","a":"いいえ"},{"q":"男たちは家の中にいますか？","a":"はい"},{"q":"階段は建物の階段ですか？","a":"いいえ"},{"q":"男たちは一年中そこにいますか？","a":"いいえ"},{"q":"決まった季節にだけ並びますか？","a":"はい"},{"q":"男たちの上の段にも誰かいますか？","a":"はい"},{"q":"見ている人たちは、男たちを家に置いている人ですか？","a":"はい"},{"q":"見ている人たちは何かをお祝いしていますか？","a":"はい"},{"q":"女の子のためのお祝いですか？","a":"はい"},{"q":"男たちが音を出せないことを、見ている人は知っていますか？","a":"はい"},{"q":"男たちは全員楽器を持っていますか？","a":"いいえ"},{"q":"楽器の種類は重要ですか？","a":"関係ない"},{"q":"男たちの年齢は関係ありますか？","a":"関係ない"},{"q":"男たちはひな人形の五人囃子で、階段はひな祭りの段飾り。人形だから楽器を構えたまま音を出さない。家族はひな祭りの飾りとして毎日眺めて楽しんでいる。","a":"正解"}]',
+        '音を出さない男たちの真相は？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"男たちは階段に横一列に並び、楽器を構えている。しかし、男たちは今まで一度も音を出したことがない。それでも見ている人たちは、うれしそうに毎日眺めている。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"楽器は壊れている？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男たちは楽器を演奏できる？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"家の中にいる？"},{"role":"master","text":"はい！"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: Five young men in plain clothes standing in a row on a short flight of wide steps, holding small drums and a flute but not playing, perfectly still; two or three people watching from below with delighted faces; warm soft light, simple background, no text or letters anywhere.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+
+男たちは階段に横一列に並び、楽器を構えている。しかし、男たちは今まで一度も音を出したことがない。それでも見ている人たちは、うれしそうに毎日眺めている。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「階段」（作問スキル umigame-problem-writer の抽選 3 語〔テント・のど飴・階段〕から）→ 連想「ひな壇・段・踊り場・はしご・上っても着かない」→ 具体化（階段に並ぶ男たち → 段飾りに並ぶ五人囃子）→ 常識「楽器を構える人は音を出す」の逆（一度も音を出したことがない）。着想元の既存問題なし（人を人形に反転する構造は台帳 #07〔玩具〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: 上っても 2 階に着かない階段〔ランニングマシン型として既知・落差なし〕/ 違う足音で泣く女〔語の強制なし・U01 と結末が重なる〕/ 踊り場〔誤読が起きない〕/ 棚田〔階段と呼ばない〕/ 引っ越し屋の階段料金・段位〔知識クイズ〕。', 1);
+
+-- 投稿順 5: U21 1年越しの判定（story）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
@@ -231,7 +149,35 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「すいか」（抽選: 階段 / すいか / コンビニ）→ 連想（縁側・兄弟の種飛ばし競争・勝ち負けの言い争い・草に消える種・捨てた種から翌年芽が出る 等 10 件）→ 物語「種飛ばしの勝負が一年後に庭のすいかで決着した」→ 隠した B = 去年の種飛ばしで弟の種が本当に塀ぎわまで飛んでいたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 3 クエリ）で同一・近い真相の投稿問題なし。捨てた種から翌年すいかが生える実例の投稿で現実性を確認。', 1);
 
--- U22 2時間かけて通う歯医者
+-- 投稿順 6: U13 会ったことのない男の子からの手紙（misdirection）
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '004-fifty-year-letter', '会ったことのない男の子からの手紙', 4,
+        'ある日、1人の男のもとに、男の子が書いた手紙が届いた。男はその子に、これまで一度も会ったことがない。それなのに、その子がどんな子なのか、誰よりもよく知っていた。なぜ？',
+        '手紙は、男が 50 年前の小学生のころ、学校の記念行事で「未来の自分」に宛てて書き、タイムカプセルに入れて校庭に埋めたもの。50 年後の同窓会で掘り出され、男の手に渡った。手紙を書いた男の子は50 年前の男自身。自分のことだから、その子がどんな子で、どんな大人になったのかも誰よりもよく知っている。人は自分自身と「会う」ことはできないので、男がその子に一度も会ったことがないのも本当である。',
+        '["手紙を書いた男の子が誰なのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","手紙は書かれてから届くまでに何10年もたっている。郵便局が配達に何10年もかけたのではなく、配達が遅れたのでも、途中で失くされていたのでもない","手紙はあとで読まれるように、わざと保管されていたものである","手紙は男の子が小学生のとき、学校の行事で書いたものである","手紙には宛先があり、男はその宛先のとおりの正しい受け取り手である（誤配ではない）","手紙は男の家のポストに届いたのではなく、集まりの場で男に手渡された","男の子は今も生きていて、今はもう大人になっている。男の子は男の息子・孫・親戚・友だち・教え子ではない","男の子は有名人ではない。男はテレビや本で男の子のことを知ったのでもない","男が男の子のことをよく知っているのは、誰かから聞いたからでも、調べたからでもない","手紙には男の子の将来の夢が書いてあった（夢の中身は問題に関係ない）","男は手紙を受け取っても驚かず、読んで懐かしそうに笑った","男の名前・住んでいる場所は問題に関係ない"]',
+        '[{"q":"手紙は最近書かれたものですか？","a":"いいえ"},{"q":"手紙は何10年も前に書かれたものですか？","a":"はい"},{"q":"手紙はどこかで失くされていたのですか？","a":"いいえ"},{"q":"手紙は郵便局のミスで届くのが遅れたのですか？","a":"いいえ"},{"q":"手紙はあとで読まれるように、わざと取っておかれたのですか？","a":"はい"},{"q":"手紙は学校の行事と関係がありますか？","a":"はい"},{"q":"手紙はタイムカプセルに入っていましたか？","a":"はい"},{"q":"男の子は手紙を書いたとき、小学生でしたか？","a":"はい"},{"q":"男の子は今も子どもですか？","a":"いいえ"},{"q":"男の子は今も生きていますか？","a":"はい"},{"q":"男の子は男の息子や孫ですか？","a":"いいえ"},{"q":"男は男の子の先生でしたか？","a":"いいえ"},{"q":"男の子は有名人ですか？","a":"いいえ"},{"q":"手紙はもともと男に宛てて書かれたものですか？","a":"はい"},{"q":"男は誰かから男の子のことを聞いたのですか？","a":"いいえ"},{"q":"男は男の子と同じ小学校に通っていましたか？","a":"はい"},{"q":"手紙には将来の夢が書いてありましたか？","a":"はい"},{"q":"夢の中身は答えに関係ありますか？","a":"関係ない"},{"q":"男の住んでいる場所は関係ありますか？","a":"関係ない"},{"q":"手紙は男が小学生のとき、学校の行事でタイムカプセルに入れた未来の自分宛てのもの。書いた男の子は昔の男自身だから、どんな子なのかを誰よりもよく知っていた。","a":"正解"}]',
+        '会ったことのない子の手紙？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"ある日、一人の男のもとに、男の子が書いた手紙が届いた。男はその子に、これまで一度も会ったことがない。それなのに、その子がどんな子なのか、誰よりもよく知っていた。なぜ？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"その子は男の息子？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"その子は有名人？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"手紙の宛先に間違いはない？"},{"role":"master","text":"はい！"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: An elderly man with gentle eyes sitting by a window in warm evening light, holding an old worn envelope with both hands and smiling nostalgically; behind him a faint dream-like image of a small schoolboy writing at a desk; simple background, no text or letters anywhere.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+
+ある日、1人の男のもとに、男の子が書いた手紙が届いた。男はその子に、これまで一度も会ったことがない。それなのに、その子がどんな子なのか、誰よりもよく知っていた。なぜ？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「郵便」（作問スキル umigame-problem-writer の抽選 3 語〔片づけ・郵便・たまご〕から）→ 連想「タイムカプセル・卒業式に書く未来の自分への手紙」→ 具体化（昔の男の子が書いた手紙を受け取る男）→ 常識「手紙は書いた人と受け取る人が別人」の逆（差出人 = 受取人）。着想元の既存問題なし（別々に見せた人物を同一人物と明かす構造は台帳 #21〔人数の省略の補完〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: 他人の手紙を毎日読んで怒られない男〔代読。語の強制がない状況型〕/ サンタ宛ての手紙に毎年返事を書く係〔誤認がなく知識・雑学寄り〕。', 1);
+
+-- 投稿順 7: U22 2時間かけて通う歯医者（story）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
@@ -259,35 +205,35 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「歯医者」（抽選: ストロー / くしゃみ / 歯医者。引き直し: 帽子 / 風船 / ヘルメット）→ 連想（待合室・定期検診・先生と患者の関係・開業 / 改装した医院・町の古い医院 等 10 件）→ 物語「育った家が歯医者になり、男が患者として通う」→ 隠した B = その歯医者が男の育った家を改装したものであること。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 3 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
 
--- U23 おじいさんのお釣り
+-- 投稿順 8: U14 割らない卵を自慢するパン屋（misdirection）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
-        '011-grandpas-change', 'おじいさんのお釣り', 4,
-        '女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡した。お金は元は全部おじいさんのもので、おこづかいではない。おじいさんは大笑いした。どういうこと？',
-        'おじいさんは小さな酒屋を営み、店の前に自動販売機を1台置いている。小学生の孫の女の子は、登校の途中に毎朝その自販機のお釣りの取り出し口をのぞくのが好きだった。おじいさんは「おじいちゃんの自販機だから、残っていたお金はもらっていいよ」と言い、毎朝孫が通る前に、取り出し口へこっそり10円玉を1枚入れておいた。女の子は「今日もあった」と喜んで、10円玉を瓶にためていった。おじいさんの誕生日、女の子はためた10円玉を持って店の前の自販機で缶コーヒーを1本買い、おじいさんに渡した。自分が入れた10円玉が、自分の自販機に戻ってきて缶コーヒーになったので、おじいさんは大笑いした。',
-        '["お金はおこづかい・お年玉・お手伝いの代金ではない。女の子がおじいさんの財布や家から持ち出したものでもない","女の子は、毎朝同じ場所にあった10円玉を1枚ずつ拾い、数か月かけてためた。道に落ちていたお金ではない","女の子がお金を見つけた場所は、おじいさんの持ち物だった（それが何かは答えの核心。正解宣言のとき以外は補足で言わない）","10円玉がそこにあったのは偶然ではない（どうしてあったかは答えの核心。正解宣言のとき以外は補足で言わない）","おじいさんは前から女の子に「その場所で見つけたお金はもらってよい」と言っていた。女の子は悪いことをしていない","女の子は、そのお金がもともとおじいさんのものだとは知らなかった","おじいさんはお店を営んでいる。女の子は缶コーヒーを、おじいさんのお店のものから買った","缶コーヒーの代金は、結局おじいさんのところへ戻った","おじいさんは怒っていない。うれしくて、おかしくて笑った","女の子の年齢・ほかの家族・缶コーヒーの銘柄は問題に関係ない"]',
-        '[{"q":"おこづかいをためたのですか？","a":"いいえ"},{"q":"お年玉ですか？","a":"いいえ"},{"q":"おじいさんの財布から取りましたか？","a":"いいえ"},{"q":"女の子はお金を拾ったのですか？","a":"はい"},{"q":"道に落ちていたお金ですか？","a":"いいえ"},{"q":"毎日同じ場所で見つけましたか？","a":"はい"},{"q":"お金はおじいさんがわざと置いていましたか？","a":"はい"},{"q":"女の子はそれを知っていましたか？","a":"いいえ"},{"q":"おじいさんはお店をしていますか？","a":"はい"},{"q":"缶コーヒーはおじいさんのお店のものですか？","a":"はい"},{"q":"自動販売機に関係がありますか？","a":"はい"},{"q":"女の子は悪いことをしましたか？","a":"いいえ"},{"q":"おじいさんは怒っていますか？","a":"いいえ"},{"q":"缶コーヒーの銘柄は関係ありますか？","a":"関係ない"},{"q":"女の子の年齢は関係ありますか？","a":"関係ない"},{"q":"おじいさんが毎朝、自分の店の自販機のお釣りの出口に10円玉を入れておき、女の子はそれを集めて、そのお金でおじいさんの自販機から缶コーヒーを買った。","a":"正解"}]',
-        'お金の出所の真相は？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
-        '{"problem":"女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡した。お金は元は全部おじいさんのもので、おこづかいではない。おじいさんは大笑いした。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"女の子は悪いことをしていた？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"拾ったお金？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"道に落ちてた？"},{"role":"master","text":"いいえ。"}]',
+        '005-bakers-egg', '割らない卵を自慢するパン屋', 4,
+        'パン屋の主人は、店の卵をとても大切にしている。ゆでることも、割ることもしない。それなのに主人は、うちのパンがおいしいのはこの卵のおかげだ、といつも自慢している。なぜ？',
+        '「卵」とは、パン職人の卵、つまり見習いの若者のこと。主人は10年前に店へ来た見習いを、自分の店の「卵」と呼んでかわいがり、パン作りを教えて一人前に育て上げた。いまでは店でいちばんおいしいパンをその卵が焼いているので、「パンがおいしいのはこの卵のおかげ」という自慢は本当のこと。食べ物の卵ではないので、ゆでることも割ることもしない。',
+        '["「卵」が何（誰）なのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","卵はひよこや鶏になったのではない。温めてかえしたのでもない","魔法・おとぎ話・作り話ではない。現実にどこの町でも起こることである","卵はお守り・縁起物・飾り・置き物ではない","主人は卵をいつか食べたり売ったりするつもりはない","卵は冷蔵庫にも巣にも入っていない","卵はパンの材料として使われていない。それでも卵はパン作りに深く関係している","「大切にしている」は、えさや水をやるという意味ではない。教えて育てているという意味である","卵は毎日、主人といっしょに店で働いている","卵は主人の家族（子ども・孫・親せき）ではない","主人の自慢は嘘や冗談ではなく、本当のことである","店の場所・パンの種類は問題に関係ない"]',
+        '[{"q":"卵はお守りや縁起物として大切にされているのですか？","a":"いいえ"},{"q":"卵はひよこにかえったのですか？","a":"いいえ"},{"q":"卵は鶏になったのですか？","a":"いいえ"},{"q":"これは魔法やおとぎ話の出来事ですか？","a":"いいえ"},{"q":"主人は卵をいつか食べるつもりですか？","a":"いいえ"},{"q":"卵は冷蔵庫に入っていますか？","a":"いいえ"},{"q":"主人の自慢は嘘や冗談ですか？","a":"いいえ"},{"q":"卵はパンの材料として使われていますか？","a":"いいえ"},{"q":"「卵」は食べ物の卵ですか？","a":"いいえ"},{"q":"卵はパン作りに関係がありますか？","a":"はい"},{"q":"卵は生き物ですか？","a":"はい"},{"q":"卵は人ですか？","a":"はい"},{"q":"卵は店でパンを焼いていますか？","a":"はい"},{"q":"主人は卵にパンの作り方を教えましたか？","a":"はい"},{"q":"卵は主人の家族ですか？","a":"いいえ"},{"q":"パンの種類は答えに関係ありますか？","a":"関係ない"},{"q":"店の場所は答えに関係ありますか？","a":"関係ない"},{"q":"「卵」とはパン職人の卵、つまり見習いの人のこと。主人が育てた見習いがいまは店でいちばんおいしいパンを焼いているので、パンがおいしいのはこの卵のおかげ。","a":"正解"}]',
+        '割らない卵を自慢するパン屋？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"パン屋の主人は、店の卵をとても大切にしている。ゆでることも、割ることもしない。それなのに主人は、うちのパンがおいしいのはこの卵のおかげだ、といつも自慢している。なぜ？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"卵はお守りみたいなもの？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"卵は材料として使う？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"卵はパン作りに関係してる？"},{"role":"master","text":"はい！"}]',
         '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
         'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
 
-Scene: In front of a small old neighborhood shop in a quiet Japanese town, morning light; a young girl with a school backpack happily holds out a can of coffee with both hands to her grandfather, who laughs heartily with his head tilted back; a glass jar is not shown, no vending machine, no coins, no text.
+Scene: A kind old baker in a warm bakery at dawn, gently cradling a large white egg in both hands like a treasure, shelves of freshly baked bread glowing behind him; soft morning light, simple background, no text anywhere.
 
 Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
         '【探偵カメロックのウミガメのスープ】
 
-女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡した。お金は元は全部おじいさんのもので、おこづかいではない。おじいさんは大笑いした。どういうこと？
+パン屋の主人は、店の卵をとても大切にしている。ゆでることも、割ることもしない。それなのに主人は、うちのパンがおいしいのはこの卵のおかげだ、といつも自慢している。なぜ？
 
 「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
-        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「自動販売機」（抽選: シール / 時計 / 自動販売機。引き直し 2 回: たまご / 毛糸 / 片づけ・くしゃみ / 朝顔 / チャイム）→ 連想（お釣りの取り出し口をのぞく子ども・当たり付き・店先の自販機・売り上げは持ち主に入る 等 9 件）→ 物語「祖父がこっそり置いた十円玉が孫の贈り物になって戻る」→ 隠した B = 祖父が毎朝自分の自販機のお釣り口に十円玉を入れ、孫がそれを集めていたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 4 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「たまご」（作問スキル umigame-problem-writer の抽選 3 語〔ベンチ・たまご・階段〕から。前 3 回の抽選〔自転車・すいか・花火 → 初案取り下げ / 帽子・体重計・お守り → 猫をかぶる案が差し戻し / のど飴・鍵・迷子 → 全滅で引き直し〕も記録）→ 連想「医者の卵・役者の卵 = 見習い」→ 抽象化（店の卵を大切にする → 職人の卵を育てる）→ 常識「卵は割ったりゆでたりして使う材料」の逆（ゆでることも割ることもしないのに、パンがおいしいのはこの卵のおかげだと自慢する）。初稿の逆「その卵が焼いている」「十年間育てた」は誤認の読みで不可能文となり誤読が自壊するためレビューで言い換え（情報は真相・シートへ）。着想元の既存問題なし（語の多義で場面を反転する構造は台帳 #16〔ホーム = 本塁〕・#23〔撃つ = 撮影〕の型のみ借用。モチーフ・真相・問題文は新規）。捨てた案: タネはありません = 種なしスイカの売り文句〔人間ゲートで「コアが弱い」と取り下げ〕/ 猫をかぶる = かぶりもの〔コア宣言で差し戻し〕/ 白い鍵と黒い鍵 = ピアノ〔英語圏の有名なぞなぞと同構造〕/ 迷子は大人〔決めつけ反転の classic 構造〕/ ベンチを温める〔落差なし・競技用語反転は台帳明示例と同構造〕/ コロンブスの卵・金の卵〔知識クイズ〕。2026-09-26 の素材レビューで、問題文・タイトル・フックの「焼く」を「ゆでる」「割らない」に変更（見習いは実際にパンを焼くため、真相と食い違って読める）。', 1);
 
--- U24 早く走った朝
+-- 投稿順 9: U24 早く走った朝（story）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
@@ -315,7 +261,35 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「マラソン」「足音」（2 巡目の抽選: ろうそく / はしご / マラソン・弁当 / 豆まき / ろうそく・足音 / 日記 / ゴミ出し ほか）→ 連想（毎朝のジョギング・同じ時刻・通学路・すれ違う小学生・「あの人が通ったら家を出る」・遅刻 等 8 件）→ 物語「毎朝同じ時刻に走る男が、知らないうちに通学路の子どもたちの時計になっていた」→ 隠した B = 子どもたちが男を見て家を出る時刻を決めていたこと。着想元の既存問題なし（台帳に該当なし。「カントの散歩」の逸話と構造が近い点は人間ゲートで承認）。Web 照合（WebSearch 2 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
 
--- U25 55年目の年賀状
+-- 投稿順 10: U16 助けに来た女も凍りついた（misdirection）
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '006-frozen-tag', '助けに来た女も凍りついた', 4,
+        '男は凍りついたまま、誰かが助けに来るのをじっと待っていた。ようやく助けに来た女は、男のそばまで来たところで、同じようにその場で凍りついてしまった。どういうこと？',
+        '男と女は夫婦で、休みの日に公園で自分の子どもたちと鬼ごっこの一種「氷鬼」で遊んでいた。鬼は子ども。氷鬼では、鬼にタッチされた人は「凍った」ことになってその場から動けなくなり、仲間にタッチしてもらうと「溶けて」また動けるようになる。男は鬼の子どもにタッチされて凍り、仲間が助けに来てくれるのをじっと待っていた。女が助けに走ってきたが、鬼は凍った男のそばで見張っていて、女が男に触れる直前にタッチした。だから女も男のそばで凍ってしまった。凍りついたといっても本当に凍ったわけではなく、2人はこのあと別の子どもに助けてもらって、また走り回った。',
+        '["男も女も本当に凍ってはいないし、寒い場所にいるのでもない","男も女も怖がってはいないし、けがや病気でもない","2人がいるのは誰でも行ける身近な場所で、特別な施設ではない","2人がいる場所に危険なものや恐ろしいものはない","男と女は大人で、夫婦である。2人の子どもたちも同じ場所にいて、ほかに大人はいない","男が動けないのは、体のせいでも、誰かに縛られているせいでもなく、守らなければならない決まりのせいである","男と女が何をしていて、なぜ動けないのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","男が凍りついたのは、ある1人の相手に体をさわられたからで、その相手はまだ男の近くにいる。その相手は大人ではない","女が凍りついたのも、同じ相手に体をさわられたからである","女が来てくれたことは、男にとってうれしいことだった","子どもたちのうち鬼ではない子が2人の体にさわれば、2人はまた動けるようになる","このあと2人は元気に走り回っていて、悲しい出来事は何も起きていない","季節・時刻・2人の名前や職業は問題に関係ない"]',
+        '[{"q":"男は本当に凍っていますか？","a":"いいえ"},{"q":"寒い場所での出来事ですか？","a":"いいえ"},{"q":"男は怖くて動けないのですか？","a":"いいえ"},{"q":"男はけがや病気で動けないのですか？","a":"いいえ"},{"q":"男は誰かに縛られていますか？","a":"いいえ"},{"q":"男のそばに危ないものがありますか？","a":"いいえ"},{"q":"男が動けないのは、決まりを守っているからですか？","a":"はい"},{"q":"男と女は遊んでいますか？","a":"はい"},{"q":"鬼ごっこの仲間ですか？","a":"はい"},{"q":"男は誰かに体をさわられて凍りついたのですか？","a":"はい"},{"q":"女も同じ人にさわられたのですか？","a":"はい"},{"q":"女は男を助けられませんでしたか？","a":"はい"},{"q":"別の仲間がさわれば、2人はまた動けるようになりますか？","a":"はい"},{"q":"男と女は知り合いですか？","a":"はい"},{"q":"男と女は子どもですか？","a":"いいえ"},{"q":"季節は重要ですか？","a":"関係ない"},{"q":"2人にさわった相手は大人ですか？","a":"いいえ"},{"q":"2人は子どもたちと氷鬼をしていて、男は鬼にタッチされて動けなくなり、仲間の助けを待っていた。助けに来た女も鬼にタッチされて、男のそばで動けなくなった。","a":"正解"}]',
+        '凍りつく男女？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"男は凍りついたまま、誰かが助けに来るのをじっと待っていた。ようやく助けに来た女は、男のそばまで来たところで、同じようにその場で凍りついてしまった。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"寒い場所での出来事？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男と女は特殊な場所にいる？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"男は人間？"},{"role":"master","text":"はい！"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A man standing perfectly still on an open grassy field, arms held slightly out from his sides as if he cannot move, looking hopefully into the distance; a woman running toward him from far away; a few trees and a low fence in the background, bright daytime, no other people.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+
+男は凍りついたまま、誰かが助けに来るのをじっと待っていた。ようやく助けに来た女は、男のそばまで来たところで、同じようにその場で凍りついてしまった。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「氷」（作問スキル umigame-problem-writer の抽選 3 語〔氷・花火・くしゃみ〕から選択。花火は「音が光より遅れる」が U15 と同じ遅延構造・「朝の号砲」は地域慣習・煙や型物花火は語の仕掛けなし、くしゃみは語の仕掛けが同音〔こしょう・ほこり〕か大人の迷信で不成立）→ 連想「凍りつく（慣用句）・氷鬼」→ 具体化（凍りついたまま助けを待つ = 氷鬼で鬼にタッチされて仲間を待つ）→ 常識「助けに来た者は凍りつかない」の逆（助けに来た女も凍りつく）。着想元の既存問題なし（台帳に遊びのルールをコアにした行はない。U12〔人形を人と読ませる〕とは慣用句の誤読という点で構造が異なる）。捨てた案: 滑る〔試験に滑る → 氷で滑る。第一義が氷で誤読が強制されない〕/ 真夏に毛布をかけて氷を運ぶ〔常識の逆だけで語の仕掛けなし〕/ 氷を入れても薄くならないジュース〔氷 = 凍らせたジュース。落差が小さい〕/ だるまさんがころんだ〔言葉で全員が凍りつく案は「はいチーズ」でも成立し正解が一つに定まらない〕。2026-09-20 の人間ゲート 1 巡目で「少年・少女は氷鬼を連想させる」の指摘を受け、登場人物を大人の夫婦（鬼は子ども）に差し替えた（登場人物の属性は正体のカテゴリを指す A 型手がかり。スキル 4.5 に反映）。', 1);
+
+-- 投稿順 11: U25 55年目の年賀状（story）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
@@ -343,7 +317,35 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「将棋」「郵便」（抽選 17 回: ネクタイ / 消しゴム / 傘・将棋 / マスク / 傘・バケツ / 畳 / 郵便 ほか）→ 連想（転校で別れた友人・年賀状・一年に一度の便り・手紙で指す将棋・床の間の盤・お年玉くじ 等 11 件）→ 物語「中学の友人と年賀状に一手ずつ書いて指した将棋が、55年かけて決着した」→ 隠した B = 二人が毎年の年賀状で将棋を一手ずつ指し続けていたこと。着想元の既存問題なし（台帳に該当なし。U21 と表面の「勝負の決着」が重なる点は人間ゲートで承認）。Web 照合（WebSearch 6 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
 
--- U26 日本語を覚えた日から
+-- 投稿順 12: U18 白紙に戻った約束（misdirection）
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '007-blank-letter', '白紙に戻った約束', 4,
+        '男と女は大切な約束をした。夏のある日、その約束は白紙に戻ってしまった。それなのに、2人は少しも悲しまなかった。そして約束は、後日きちんと果たされた。どういうこと？',
+        '2人の約束は、男が女に渡した手紙に、消せるボールペンで書かれていた。夏の夕立で手紙がびしょ濡れになり、女があわててドライヤーで乾かしたところ、消せるボールペンのインクは熱で透明になる性質があるため、文字がすべて消えて、手紙は本当にまっさらな白紙に戻ってしまった。けれど約束の中身は2人とも覚えていたし、気持ちも変わっていなかった。2人は笑って書き直し、約束は後日きちんと果たされた。白紙に戻ったのは約束ではなく、手紙のほうだった。',
+        '["約束は取り消されていない。2人の気持ちも変わっていない","2人はけんかをしておらず、仲は良いまま","白紙に戻ったのは、目に見える形のあるもの","約束は口約束ではなく、書かれたものだった","書かれたものは破れても燃えてもおらず、今も手元にある","起きたことは事故のようなもので、誰のいたずらでもない","夏の天気（夕立）が関係している","濡れたものを乾かしたことが関係している","文字を書いた道具に特徴がある（種類は答えの核心。正解宣言のとき以外は補足で言わない）","約束の中身は2人とも覚えていた","2人の関係・職業・年齢・約束の中身は問題に関係ない"]',
+        '[{"q":"2人はけんかをしましたか？","a":"いいえ"},{"q":"どちらかの気持ちが変わったのですか？","a":"いいえ"},{"q":"約束は取り消されたのですか？","a":"いいえ"},{"q":"白紙に戻ったのは、形のあるものですか？","a":"はい"},{"q":"約束は紙に書かれていましたか？","a":"はい"},{"q":"その紙は破れたり燃えたりしましたか？","a":"いいえ"},{"q":"紙そのものは今もありますか？","a":"はい"},{"q":"書いてあった文字が消えたのですか？","a":"はい"},{"q":"誰かがわざと消したのですか？","a":"いいえ"},{"q":"消しゴムでこすって消したのですか？","a":"いいえ"},{"q":"夏の天気は関係ありますか？","a":"はい"},{"q":"紙は濡れましたか？","a":"はい"},{"q":"濡れたせいで文字が消えたのですか？","a":"いいえ"},{"q":"乾かしたことが関係ありますか？","a":"はい"},{"q":"特別なペンで書かれていましたか？","a":"はい"},{"q":"2人の職業は関係ありますか？","a":"関係ない"},{"q":"約束は消せるボールペンで手紙に書かれていて、夕立で濡れた手紙をドライヤーで乾かしたら、熱でインクが消えて紙が本当に白紙に戻った。","a":"正解"}]',
+        '白紙なのに果たされた約束？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"男と女は大切な約束をした。夏のある日、その約束は白紙に戻ってしまった。それなのに、二人は少しも悲しまなかった。そして約束は、後日きちんと果たされた。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"2人はけんかした？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"季節は関係ある？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"2人は恋人？"},{"role":"master","text":"関係ありません。"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A man and a woman in summer clothes sitting at a table in a bright Japanese room, both smiling gently while looking together at a single completely blank sheet of paper held between them, warm evening light after summer rain outside the window; no pen, no hair dryer, no text on the paper, nobody sad.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+
+男と女は大切な約束をした。夏のある日、その約束は白紙に戻ってしまった。それなのに、2人は少しも悲しまなかった。そして約束は、後日きちんと果たされた。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
+        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。21-4a-3 ④ の型別分離（2026-09-22・ユーザー決定）で、人間ゲート通過済みの story 版 U18「濡れた手紙を乾かしたら白紙になった」を、仕組み（消せるボールペンのインクが熱で消える）の面白さを買われて意味誤誘導型に書き換えたもの（U15 と差し替えて存続）。語の仕掛けは定型表現「（約束が）白紙に戻る」の文字どおりへの反転。誤認先の常識「取り消されたら悲しむ・守られない」の逆（悲しまない・果たされた）を 1 つ足した。着想元の既存問題なし（台帳に該当なし。story 版の Web 照合で同じ仕組みの投稿問題なし）。書き換え時の Web 照合をコアゲート前に先行し、「約束が白紙 × 消えるインク」のコアは日英とも該当なし。「白紙に戻る」の文字どおり化という語仕掛けが重なる投稿問題 1 件（反転後は折り紙で別）を提示の上、人間ゲートで採用。詳細は開発記録 21-4a-3 ④。', 1);
+
+-- 投稿順 13: U26 日本語を覚えた日から（story）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
@@ -371,7 +373,7 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「辞書」（抽選 22 回: 毛糸 / お年玉 / バス停・ゴミ出し / 時計 / 辞書・バス停 / 畳 / 辞書 ほか）→ 連想（外国語・国際結婚・同居・嫁と姑・子どもが二つの言葉を話す・通訳・言葉が分かると聞こえ方が変わる 等 11 件）→ 物語「外国から嫁いだ母と義母の会話を、息子が十年間褒め言葉に作り変えて通訳していた」→ 隠した B = 息子が二人の文句を褒め言葉に変えて通訳していたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 8 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
 
--- U27 免許のない男のドライブ
+-- 投稿順 14: U27 免許のない男のドライブ（misdirection）
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
     caption, source_note, is_active)
