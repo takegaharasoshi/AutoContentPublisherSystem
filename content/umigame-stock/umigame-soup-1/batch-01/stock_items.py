@@ -1055,7 +1055,8 @@ ITEMS: list[dict] = [
         scene=(
             "A Japanese home kitchen; a woman in her forties and her elderly mother-in-law stand side by side at the stove, "
             "both frowning and arguing with animated hand gestures over a pot of miso soup; an open bilingual dictionary lies "
-            "on the kitchen table; warm afternoon light, no readable writing, no text."
+            "on the kitchen table; warm afternoon light, no readable writing, no text. The two women are placed low in the "
+            "picture: their heads stay below about 62% of the image height."
         ),
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「辞書」（抽選 22 回: 毛糸 / お年玉 / バス停・ゴミ出し / 時計 / 辞書・"
