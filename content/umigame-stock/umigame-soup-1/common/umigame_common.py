@@ -29,12 +29,21 @@ STYLE_LINE = (
     "poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: "
     "moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark."
 )
+# 人物の配置は動画の版面（1080x1920）から決めた（2026-09-26 背景レビュー指摘 38）: フック帯と問題カードが
+# 上端〜約 47%、吹き出しが約 47〜61%、カメロックが左下（横 1〜41%・縦 61〜86%）、Jr. が右下（横 55〜84%・縦 67〜85%）
+# を覆う。人物が重ならずに見えるのは、下半分の中央の細い帯（横 41〜55%）だけ。
 PROHIBITION_LINE = (
     "Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. "
     "Depict only the scene described in the problem statement; do not depict any clue to the story's "
     "hidden truth. People: only the persons who appear in the problem, plus at most one distant "
-    "silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that "
-    "text cards can be overlaid there."
+    "silhouette. Wide establishing shot: show every person small and full-body in the middle distance "
+    "(each figure at most one fifth of the image height), never a close-up, portrait or half-body shot; "
+    "convey feelings through posture, not faces. Place all people in the lower-center: horizontally "
+    "within the middle 20% of the width (group several people closely, side by side or one behind "
+    "another), vertically between 55% and 85% of the image height. The upper half of the image must "
+    "contain no people at all: keep it calm and simple (sky, wall, ceiling, window) because text cards "
+    "are overlaid there. The left 40% and right 40% of the lower half: scenery and props only, no "
+    "people, because two mascot characters are overlaid there."
 )
 
 
