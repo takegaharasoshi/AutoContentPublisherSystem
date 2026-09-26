@@ -1037,7 +1037,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="何に勝ったのか？",
+        hook="55年後の勝利の真相は？",
         play_example=[
             {"role": "questioner", "text": "くじに当たった？"},
             {"role": "master", "text": "いいえ。"},
