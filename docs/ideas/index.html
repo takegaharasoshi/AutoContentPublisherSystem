@@ -69,14 +69,6 @@
 </tr>
 
 <tr>
-  <td>Claude Code から委譲する Codex のモデルを GPT-6 Luna（エフォート MAX）へ更新する</td>
-  <td>単発</td>
-  <td><span class="badge badge-wip">inbox</span></td>
-  <td>MCP 委譲の既定モデルを現行の <code>gpt-5.6-terra</code> / <code>high</code> から GPT-6 Luna / MAX へ切り替える。コスパが一番よいらしいため。モデル ID・effort の値・根拠と、luna / terra / sol の使い分けの置き換えは未確認</td>
-  <td><a href="codex-model-gpt6-luna.md">MD</a></td>
-  <td>2026-09-23</td>
-</tr>
-<tr>
   <td>レビューシートを Artifact のフォームで配信し、送信されたコメントを裏のルーティンが検知して自動で修正する</td>
   <td>単発</td>
   <td><span class="badge badge-wip">inbox</span></td>
@@ -107,6 +99,13 @@
 <div class="table-wrap"><table data-cards data-card-extra="5">
 <thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
 <tbody>
+<tr>
+  <td>Claude Code から委譲する Codex のモデルを GPT-6 Luna（エフォート MAX）へ更新する</td>
+  <td><span class="badge badge-fixed">採用</span></td>
+  <td>捕捉 → 壁打ち 1 回（2026-09-26）で確定し直接反映: Codex CLI を 0.157.1 へ更新し、委譲の既定を <code>gpt-6-luna</code> / <code>max</code> に（<code>.mcp.json</code>・WSL の <code>~/.codex/config.toml</code>・CLAUDE.md「委譲時のパラメータ・運用」。大型は <code>gpt-6-sol</code> / <code>max</code> 以上。Windows の Codex アプリは対象外）。派生でウミガメ判定のパターン 1 も <code>gpt-6-luna</code> / <code>max</code> に確定し、<a href="../plans/development-plan.html#step-21-6b">開発計画 21-6b</a>・セット設計書・方式設計書へ転記（<code>max_completion_tokens</code> 400 の測り直しを 21-6b の試走に追加）</td>
+  <td><a href="codex-model-gpt6-luna.md">MD</a></td>
+  <td>2026-09-26</td>
+</tr>
 <tr>
   <td>ウミガメのコメント返信を継続改善するため、受信・判定・返信の全記録を残し夜間バッチで Aurora に蓄積する</td>
   <td><span class="badge badge-fixed">採用</span></td>
