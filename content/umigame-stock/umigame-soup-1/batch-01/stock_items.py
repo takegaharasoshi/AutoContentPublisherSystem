@@ -1056,7 +1056,8 @@ ITEMS: list[dict] = [
             {"role": "master", "text": "はい！"},
         ],
         scene=(
-            "A Japanese home kitchen; a woman in her forties and her elderly mother-in-law stand side by side at the stove, "
+            "A Japanese home kitchen; a clearly Western (European-looking) woman in her forties with blonde hair and fair "
+            "skin, and her elderly Japanese mother-in-law stand side by side at the stove, "
             "both frowning and arguing with animated hand gestures over a pot of miso soup; an open bilingual dictionary lies "
             "on the kitchen table; warm afternoon light, no readable writing, no text. The two women are placed low in the "
             "picture: their heads stay below about 62% of the image height."
