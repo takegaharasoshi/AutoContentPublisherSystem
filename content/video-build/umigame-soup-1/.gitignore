@@ -10,3 +10,5 @@ poc/*/bg_candidates/*.png
 poc/*/jr_candidates/*.png
 poc/*/narration_alt/
 poc/*/narration_mix/
+# Gemini TTS 聞き比べの生成物（音声・動画）は git 管理外
+poc/gemini-tts/out/

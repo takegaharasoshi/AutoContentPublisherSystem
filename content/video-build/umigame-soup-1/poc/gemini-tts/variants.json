@@ -1,0 +1,160 @@
+{
+  "problems": [
+    "016-umigame-soup",
+    "014-kind-interpreter"
+  ],
+  "budget_seconds": 21.0,
+  "gap_seconds": 1.2,
+  "variants": [
+    {
+      "id": "g1-charon",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Charon",
+      "style_problem": "老練な名探偵が、とっておきの謎を語り聞かせるように。落ち着いた低い声で、ただし間は短く、早口ぎみの速いテンポで一気に語る。最後の問いかけは相手を試すように。",
+      "style_rule": "名探偵が視聴者に親しげに、少し得意げに呼びかけるように。早口ぎみの速いテンポで。",
+      "label": "既製声 Charon + 老練な名探偵の演技（問題文・ルール文を別々に合成）"
+    },
+    {
+      "id": "g2-algenib",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Algenib",
+      "style_problem": "老練な名探偵が、とっておきの謎を語り聞かせるように。落ち着いた低い声で、ただし間は短く、早口ぎみの速いテンポで一気に語る。最後の問いかけは相手を試すように。",
+      "style_rule": "名探偵が視聴者に親しげに、少し得意げに呼びかけるように。早口ぎみの速いテンポで。",
+      "label": "既製声 Algenib + 同じ演技（別々に合成）"
+    },
+    {
+      "id": "g3-designed",
+      "model": "gemini-3.8-flash-tts",
+      "design": {
+        "display_name": "kamerock-detective",
+        "description": "日本語を話す初老の名探偵。低く渋みのある男性の声で、知的で余裕があり、ユーモアのある少し芝居がかった語り口。聞き取りやすい明瞭な発音。"
+      },
+      "style_problem": "とっておきの謎を語り聞かせるように。ただし間は短く、早口ぎみの速いテンポで一気に語る。最後の問いかけは相手を試すように。",
+      "style_rule": "視聴者に親しげに、少し得意げに呼びかけるように。早口ぎみの速いテンポで。",
+      "label": "説明文から作成: 初老の名探偵・低く渋い・知的でユーモア（別々に合成）"
+    },
+    {
+      "id": "g4-chubby",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-chubby",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのように太っていて食いしん坊。太っているのが声からも伝わる、丸みがあって太く柔らかい声で、少年っぽさの残る人懐っこさがある。可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。"
+      },
+      "style": "子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "作成: 30 歳・お相撲さん体型・丸く太く柔らかい・優しいパパ（以降 1 回で合成）"
+    },
+    {
+      "id": "g5a-higher",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-chubby-5a",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのようにとても太っていて食いしん坊。成人男性としてはやや高めの声。大きなお腹から出るような、こもった丸い響きがあり、ふくよかな頬で話しているような柔らかくもっちりした発音。少し鼻にかかり、話の合間に息が少し混じる。人懐っこく可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。"
+      },
+      "style": "子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "G4 をやや高めに・お腹から出るこもった丸い響き・もっちり・少し鼻にかかる"
+    },
+    {
+      "id": "g5b-higher",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-chubby-5b",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのようにとても太っていて食いしん坊。声は高めで明るく、太った体型がはっきり伝わる、分厚くふっくらした丸い声。頬の肉で少しこもった、もごもごとした柔らかい響きで、息づかいが少し重い。無邪気で可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。"
+      },
+      "style": "子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "G4 をさらに高く明るく・頬の肉でもごもご・息づかいが重い"
+    },
+    {
+      "id": "g6a-rich",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-chubby-5a",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのようにとても太っていて食いしん坊。成人男性としてはやや高めの声。大きなお腹から出るような、こもった丸い響きがあり、ふくよかな頬で話しているような柔らかくもっちりした発音。少し鼻にかかり、話の合間に息が少し混じる。人懐っこく可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。"
+      },
+      "style": "子供に語り掛ける優しいパパの口調。表情豊かで少し芝居がかった声色で、とっておきの謎を「すごいでしょ」と言わんばかりに得意げに、余裕たっぷりに語る。最後の問いかけは『解けるかな？』と楽しげに投げかける。続けて同じ口調のまま、にこにこと親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "G5a の声 + 演技を濃く（芝居がかった得意げな語り・『解けるかな？』）"
+    },
+    {
+      "id": "g6b-laugh",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-chubby-5a",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのようにとても太っていて食いしん坊。成人男性としてはやや高めの声。大きなお腹から出るような、こもった丸い響きがあり、ふくよかな頬で話しているような柔らかくもっちりした発音。少し鼻にかかり、話の合間に息が少し混じる。人懐っこく可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。"
+      },
+      "style": "子供に語り掛ける優しいパパの口調。表情豊かで少し芝居がかった声色で、とっておきの謎を「すごいでしょ」と言わんばかりに得意げに、余裕たっぷりに語る。最後の問いかけは『解けるかな？』と楽しげに投げかける。続けて同じ口調のまま、にこにこと親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "rule_prefix": "<laughs> ",
+      "label": "G6a + ルール文の前に笑い（速度 1.34〜1.37 倍）"
+    },
+    {
+      "id": "g6c-quirk",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-chubby-6c",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのようにとても太っていて食いしん坊。成人男性としてはやや高めの声。大きなお腹から出るような、こもった丸い響きがあり、ふくよかな頬で話しているような柔らかくもっちりした発音。少し鼻にかかり、話の合間に息が少し混じる。普段はのんびりした口調だが要所でぽんと弾む独特の抑揚があり、おいしいものを思い浮かべているような嬉しそうな響きが常ににじむ。人懐っこく可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。"
+      },
+      "style": "子供に語り掛ける優しいパパの口調。表情豊かで少し芝居がかった声色で、とっておきの謎を「すごいでしょ」と言わんばかりに得意げに、余裕たっぷりに語る。最後の問いかけは『解けるかな？』と楽しげに投げかける。続けて同じ口調のまま、にこにこと親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "G5a に癖を追加: のんびり＋要所で弾む抑揚・嬉しそうな響き（速度 1.26 倍）"
+    },
+    {
+      "id": "g7a-thick",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-thick-7a",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのように非常に太った巨体で、声が極端に太い。声の高さは中くらいで低すぎないが、音色はとても分厚く重量感があり、巨大な胸と腹に響く豊かな共鳴がある。喉の奥で響くこもった声で、声帯が太いような少しざらついた濁りがあり、ふくよかな頬で話すもっちりした発音。息づかいが重く、体の大きさが声だけではっきりわかる。優しく温かい人柄。"
+      },
+      "style": "探偵が子供に語り掛けるような、落ち着いた真剣な語り口。優しいパパの温かさは残しつつ、ふざけたり笑ったりはせず、謎の不思議さが伝わるように静かに、自信を持って語る。続けて同じ口調のまま視聴者に呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "高さ中くらいのまま太さ最大: 胸と腹の共鳴・喉のこもり・ざらつき・重い息／真剣な語り口"
+    },
+    {
+      "id": "g7b-thick-en",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-thick-7b",
+        "description": "A Japanese man around 30, a detective who is extremely obese, built like a sumo wrestler. His voice is extremely thick, heavy and fat-sounding: medium pitch (not deep bass), but with a massive, dense, chubby timbre and a strong chest and belly resonance. Muffled, throaty, slightly gravelly thickness, as if speaking through full round cheeks; heavy breathing between phrases. You can clearly hear his huge body in the voice. Warm, gentle, fatherly personality. Speaks natural Japanese."
+      },
+      "style": "探偵が子供に語り掛けるような、落ち着いた真剣な語り口。優しいパパの温かさは残しつつ、ふざけたり笑ったりはせず、謎の不思議さが伝わるように静かに、自信を持って語る。続けて同じ口調のまま視聴者に呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "G7a と同じ中身を英語で説明（速度調整なし）／真剣な語り口"
+    },
+    {
+      "id": "g7c-heavier",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-thick-7c",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのように非常に太った巨体で、声が極端に太い。声の高さはやや低めで、音色はとても分厚く重量感があり、巨大な胸と腹に響く豊かな共鳴がある。喉の奥で響くこもった声で、声帯が太いような少しざらついた濁りがあり、ふくよかな頬で話すもっちりした発音。息づかいが重く、体の大きさが声だけではっきりわかる。優しく温かい人柄。G7a より一段と重く、どっしりとした声。"
+      },
+      "style": "探偵が子供に語り掛けるような、落ち着いた真剣な語り口。優しいパパの温かさは残しつつ、ふざけたり笑ったりはせず、謎の不思議さが伝わるように静かに、自信を持って語る。続けて同じ口調のまま視聴者に呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "G7a よりさらに重く・高さやや低め／真剣な語り口"
+    },
+    {
+      "id": "g8-7bvoice-4style",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-thick-7b",
+        "description": "A Japanese man around 30, a detective who is extremely obese, built like a sumo wrestler. His voice is extremely thick, heavy and fat-sounding: medium pitch (not deep bass), but with a massive, dense, chubby timbre and a strong chest and belly resonance. Muffled, throaty, slightly gravelly thickness, as if speaking through full round cheeks; heavy breathing between phrases. You can clearly hear his huge body in the voice. Warm, gentle, fatherly personality. Speaks natural Japanese."
+      },
+      "style": "子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "G7b の声 + G4 の演技（優しいパパが得意げに語る）"
+    },
+    {
+      "id": "g8-7bvoice-4style-take2",
+      "model": "gemini-3.8-flash-tts",
+      "single_call": true,
+      "design": {
+        "display_name": "kamerock-thick-7b",
+        "description": "A Japanese man around 30, a detective who is extremely obese, built like a sumo wrestler. His voice is extremely thick, heavy and fat-sounding: medium pitch (not deep bass), but with a massive, dense, chubby timbre and a strong chest and belly resonance. Muffled, throaty, slightly gravelly thickness, as if speaking through full round cheeks; heavy breathing between phrases. You can clearly hear his huge body in the voice. Warm, gentle, fatherly personality. Speaks natural Japanese."
+      },
+      "style": "子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。",
+      "label": "G7b の声 + G4 の演技（優しいパパが得意げに語る）・同じ設定の 2 回目"
+    }
+  ],
+  "target_seconds": 19.0
+}
