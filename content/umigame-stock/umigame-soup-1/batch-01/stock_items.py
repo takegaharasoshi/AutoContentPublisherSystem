@@ -954,7 +954,7 @@ ITEMS: list[dict] = [
         ],
         hook="代金を出したのは誰？",
         play_example=[
-            {"role": "questioner", "text": "おこづかい？"},
+            {"role": "questioner", "text": "女の子は悪いことをしていた？"},
             {"role": "master", "text": "いいえ。"},
             {"role": "questioner", "text": "拾ったお金？"},
             {"role": "master", "text": "はい！"},

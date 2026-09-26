@@ -299,7 +299,7 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
         '[{"q":"おこづかいをためたのですか？","a":"いいえ"},{"q":"お年玉ですか？","a":"いいえ"},{"q":"おじいさんの財布から取りましたか？","a":"いいえ"},{"q":"女の子はお金を拾ったのですか？","a":"はい"},{"q":"道に落ちていたお金ですか？","a":"いいえ"},{"q":"毎日同じ場所で見つけましたか？","a":"はい"},{"q":"お金はおじいさんがわざと置いていましたか？","a":"はい"},{"q":"女の子はそれを知っていましたか？","a":"いいえ"},{"q":"おじいさんはお店をしていますか？","a":"はい"},{"q":"缶コーヒーはおじいさんのお店のものですか？","a":"はい"},{"q":"自動販売機に関係がありますか？","a":"はい"},{"q":"女の子は悪いことをしましたか？","a":"いいえ"},{"q":"おじいさんは怒っていますか？","a":"いいえ"},{"q":"缶コーヒーの銘柄は関係ありますか？","a":"関係ない"},{"q":"女の子の年齢は関係ありますか？","a":"関係ない"},{"q":"おじいさんが毎朝、自分の店の自販機のお釣りの出口に十円玉を入れておき、女の子はそれを集めて、そのお金でおじいさんの自販機から缶コーヒーを買った。","a":"正解"}]',
         '代金を出したのは誰？', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
         '{"problem":"女の子は見つけて集めたお金で、おじいさんの誕生日に缶コーヒーを買って渡した。お金は元は全部おじいさんのもので、おこづかいではない。おじいさんは大笑いした。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"おこづかい？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"拾ったお金？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"道に落ちてた？"},{"role":"master","text":"いいえ。"}]',
+        '[{"role":"questioner","text":"女の子は悪いことをしていた？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"拾ったお金？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"道に落ちてた？"},{"role":"master","text":"いいえ。"}]',
         '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
         'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
 
