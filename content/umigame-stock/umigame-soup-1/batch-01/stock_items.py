@@ -1234,7 +1234,9 @@ ITEMS: list[dict] = [
         scene=(
             "A quiet restaurant in the evening; a middle-aged man sits alone at a table with a bowl of soup and a spoon, "
             "covering his eyes with one hand as tears fall; a chef in a white uniform stands beside the table looking concerned; "
-            "warm lamp light, a few empty tables behind, no readable writing, no text."
+            "warm lamp light, a few empty tables behind, no readable writing, no text. Wide shot from across the room: "
+            "the man's table and the chef are small figures in the lower-middle of the picture, the chef's head well below "
+            "the middle of the image height."
         ),
         method_note=(
             "本家「ウミガメのスープ」（作者不詳・広く流布した水平思考問題の原点）の筋を題材にした（2026-09-26 のユーザー判断で"
