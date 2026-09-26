@@ -1138,7 +1138,10 @@ ITEMS: list[dict] = [
         scene=(
             "A small family car driving along a long winding road through green hills and fields on a sunny holiday "
             "morning, seen from far away so that no one inside is visible; a few houses and trees along the road; "
-            "bright clear sky, no other vehicles, no people outside, no text."
+            "bright clear sky, no other vehicles, no people outside, no text. The road curves into the lower center "
+            "of the picture, and the car is on it exactly at the horizontal center, about 70% down from the top of "
+            "the image, small but clearly visible; the left and right sides of the lower half show only fields and "
+            "trees."
         ),
         method_note=(
             "問題文・真相・場面は完全オリジナル。ただし「現実の出来事に見せて、実はボードゲームの盤上の話」という構造は"
