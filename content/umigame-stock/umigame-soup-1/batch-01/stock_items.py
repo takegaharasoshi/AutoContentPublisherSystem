@@ -886,7 +886,8 @@ ITEMS: list[dict] = [
             {"role": "master", "text": "いいえ。"},
         ],
         scene=(
-            "A quiet Japanese residential street on a school route in the early morning; a middle-aged man in jogging clothes "
+            "A quiet Japanese residential street on a school route on a bright, clear morning around 7:30 (full daylight, "
+            "blue sky, fresh morning sunlight, every house light and street lamp switched off); a middle-aged man in jogging clothes "
             "looks back in surprise as several elementary school children with school backpacks dash past him toward school, "
             "one child holding a piece of toast in the mouth; houses with windows along the street, no clocks, no text."
         ),
