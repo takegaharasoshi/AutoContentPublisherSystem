@@ -205,7 +205,8 @@ ITEMS: list[dict] = [
         scene=(
             "Five young men in plain clothes standing in a row on a short flight of wide steps, holding small drums and a "
             "flute but not playing, perfectly still; two or three people watching from below with delighted faces; "
-            "warm soft light, simple background, no text or letters anywhere."
+            "warm soft light, simple background, no text or letters anywhere. The watching people stand together at the "
+            "foot of the steps in the horizontal center of the picture, not at the left or right edges."
         ),
         source_note=(
             "型: 意味誤誘導型。モチーフ「階段」（作問スキル umigame-problem-writer の抽選 3 語〔テント・のど飴・階段〕から）→ "
