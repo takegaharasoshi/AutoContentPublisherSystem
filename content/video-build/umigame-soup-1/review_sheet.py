@@ -66,6 +66,12 @@ def generate_review_html(
             f" / {_text(narration['engine_id'])}"
             if narration.get("engine_id") else ""
         )
+        if str(narration.get("engine_id", "")).startswith("irodori/"):
+            if narration.get("seed") is not None and narration.get("seconds") is not None:
+                engine_html += (
+                    f" (seed={_text(narration['seed'])}, "
+                    f"seconds={_text(narration['seconds'])})"
+                )
         provisional = bgm.get("provisional") is True
         bgm_class = " provisional" if provisional else ""
         bgm_label = "暫定 BGM（publish 不可）" if provisional else "正式 BGM"

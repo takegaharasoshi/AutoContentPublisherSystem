@@ -33,7 +33,7 @@
   <li><strong>レンダラー</strong>: Remotion 4.0.520（<code>create-video</code> 雛形 + <strong>Remotion Skills 2.0</strong> の指針〔<code>remotion-create</code> / <code>remotion-markup</code> / <code>remotion-render</code>〕で作ったコンポジション）。レンダリングは既存どおり <code>build.py</code> からの Docker 委譲（<code>remotion-render</code> イメージへの bind-mount + <code>npx remotion render</code>）</li>
   <li><strong>フォーマット</strong>: 9:16・<strong>24 秒 = 720 フレーム固定・ループ前提</strong>（末尾と先頭の状態を一致させる）。つかみ帯 + 問題カード + ルール帯を常時表示し、下部ゾーンでキャラ 2 体の吹き出しが時間で切り替わる（セクション 8.2）</li>
   <li><strong>素材</strong>: ストック 1 件 = 素材 14 項目（<a href="../sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>）。背景イラストは imagegen で 1 問 1 枚、キャラ 2 体はセット固定</li>
-  <li><strong>ナレーション</strong>: Gemini 3.8 Flash TTS（声 G4「kamerock-chubby」。21-5c で Amazon Polly Takumi 125% から切替）で冒頭の 2 cue（問題文・ルール）だけを読む。吹き出しとは同期しない</li>
+  <li><strong>ナレーション</strong>: ローカル GPU の Irodori-TTS v4.1-Small（声 G4「kamerock-chubby」のクローン。21-5c で Amazon Polly Takumi 125% → Gemini 3.8 Flash TTS → Irodori と切替）で冒頭の 2 cue（問題文・ルール）だけを読む。吹き出しとは同期しない</li>
   <li><strong>参加型の要素は方式の外</strong>: コメント自動返信は SNS 投稿バッチが出力する問題スナップショット（<a href="../batch-flow.html#problem-snapshot">batch-flow.html 3.3 手順 6</a>）と Lambda（<a href="../../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>）が担い、本方式は <code>umigame_items</code> に問題固有部分をスナップショットしておくところまでを責務とする</li>
 </ul>
 
@@ -127,7 +127,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
     <tr><td>2</td><td>プローブテスト</td><td><code>expected_questions</code> を AI 出題者（本番と同じモデル・<code>master_prompt.txt</code>）に答えさせ <code>work/review.html</code> に並べる → 人間が矛盾・ネタバレを一括レビュー</td><td><code>probe_test.py</code>（返信ロジックは PoC の <code>generate_reply</code> を流用）</td></tr>
     <tr><td>3</td><td>背景イラスト生成</td><td><code>illustration_prompt</code> → <code>{content_key}_bg.png</code>（imagegen 9:16）→ 1080x1920 へ正規化（<code>prepare_assets.py</code>）</td><td><code>codex exec</code> の <code>image_gen.imagegen</code>（<code>gen_images.sh</code>）</td></tr>
     <tr><td>4</td><td>BGM 選曲</td><td><code>audio_assets</code>（<code>asset_type='bgm'</code>）の順繰り → S3 から取得・<code>video_audio_asset_id</code> を確定</td><td><code>build.py</code></td></tr>
-    <tr><td>5</td><td>ナレーション TTS</td><td><code>narration.problem</code> / <code>.rule</code> → Gemini 3.8 Flash TTS で 1 回に合成 → 無音で 2 cue に切り分け → 話速調整 → cue ごとの WAV + 実測長 → 予算検査（8.3）</td><td><code>scripts/narration_gemini.py</code>（Polly 版 <code>narration_polly.py</code> は <code>--tts polly</code> で選べる）</td></tr>
+    <tr><td>5</td><td>ナレーション TTS</td><td><code>narration.problem</code> / <code>.rule</code> → Irodori-TTS で 1 回に合成（長さ指定つき）→ 無音で 2 cue に切り分け → cue ごとの WAV + 実測長 → 予算検査（超過なら長さを縮めて取り直し。8.3）</td><td><code>scripts/narration_irodori.py</code>（Gemini 版 <code>narration_gemini.py</code>・Polly 版 <code>narration_polly.py</code> は <code>--tts gemini</code> / <code>--tts polly</code> で選べる）</td></tr>
     <tr><td>6</td><td>レンダリング + 正規化</td><td>props（素材 + 画像 + 音声 + 実測長）→ Remotion → MP4 → ラウドネス正規化（-14 LUFS / -2 dBTP）→ ffprobe 検査 + 継ぎ目検査（フレーム 0 と 719 の差分）→ 静止フレーム書き出し</td><td><code>build.py</code>（Docker 委譲）</td></tr>
     <tr><td>R</td><td>全数レビュー → 配置</td><td><code>work/review.html</code>（動画 + 静止フレーム + キャプション）→ <code>work/approved.txt</code> → <code>publish.py</code>（S3 <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> + <code>_bg.png</code>）→ <code>update_prebuilt.sql</code>（<code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>）をローカル MySQL と Aurora へ</td><td>人間ゲート + <code>publish.py</code></td></tr>
   </tbody>
@@ -197,11 +197,11 @@ LIMIT 1 FOR UPDATE;</code></pre>
 </table>
 </div>
 <ul>
-  <li>2 cue を<strong>1 回の呼び出し</strong>で合成し（<code>POST /v1beta/interactions</code>・モデル <code>gemini-3.8-flash-tts</code>・保存済みの声 ID・<code>speech_metadata.style</code> で演技指示）、文字数比に最も近い 0.3 秒以上の無音で 2 つに切り分けて前後の無音を 0.05 秒残して削る。別々の呼び出しで作るとルール文で口調が変わるため（21-5c の PoC 知見）。実測長を props に渡してアンカーへ配置する。<strong>吹き出しとは同期しない</strong>ため、cue の長短で版面は変わらない</li>
-  <li><strong>話速の調整</strong>: 2 cue + 間の合計が 21 秒を超える分だけ ffmpeg の <code>atempo</code> で話速を上げて 19 秒に合わせる（倍率 =（合計 − 1.2）÷（19 − 1.2））。<strong>倍率が 1.19 を超えた問はビルドエラー</strong>とし、取り直す（<code>build.py --retake-tts --content-key &lt;key&gt;</code>）。同じ設定でも取り直しで尺が 0.7〜2.3 秒揺れる。<code>narration.json</code> にモデル・声 ID・演技指示・倍率・切断位置を残し、文・声・演技指示が一致すればキャッシュを使う</li>
-  <li><strong>予算超過はビルドエラー</strong>（話速調整後も超えたら問題文か cue の句読点を削る）。Gemini の課金・レート制限エラーはその場でビルドを中断する</li>
+  <li>2 cue を<strong>1 回の合成</strong>で読ませ（Irodori-TTS <code>infer.py</code>・参照音声 6 本で声 G4 をクローン・cuda / BF16・<code>--seconds</code> で全体の長さを指定）、文字数比に最も近い 0.3 秒以上の無音で 2 つに切り分けて前後の無音を 0.05 秒残して削る。別々に作るとルール文で口調が変わるため（21-5c の PoC 知見）。実測長を props に渡してアンカーへ配置する。<strong>吹き出しとは同期しない</strong>ため、cue の長短で版面は変わらない</li>
+  <li><strong>長さの制御と取り直し</strong>: 話速調整（atempo）はせず、<code>--seconds 20.0</code> で合成する（PoC で自然長 23〜25 秒の問が 19.0〜20.8 秒に収まった）。2 cue + 間の合計が 21 秒を超えたら、seed を 1 つ進めて <code>--seconds</code> を 0.5 秒縮めて取り直す（1 回のビルドで最大 3 テイク = 20.0 / 19.5 / 19.0 秒）。聞いて気になった問は <code>build.py --retake-tts --content-key &lt;key&gt;</code> で seed を進めて長さを初期値から取り直す。<code>narration.json</code> にモデル・参照音声（名前と sha256）・精度・seed・長さ・切断位置・試したテイク・通算の合成回数（<code>attempt</code>）を残し、文・モデル・参照音声・精度・長さの設定が一致して予算内ならキャッシュを使う</li>
+  <li><strong>予算超過はビルドエラー</strong>（3 テイクとも超えたら問題文か cue の句読点を削る）。<code>infer.py</code> の失敗（GPU・環境の問題）はその場でビルドを中断する</li>
   <li>BGM は <code>@remotion/media</code> の <code>&lt;Audio&gt;</code> で 24 秒トラックをそのまま敷く（ループなし = 継ぎ目なし）。ナレーション区間は BGM を -6dB 程度ダッキングし、SE は切替フレームに置く。最終 MP4 を -14 LUFS / -2 dBTP へ正規化</li>
-  <li>TTS アダプタは差し替え可能にする（Gemini が既定。Polly 版・VOICEVOX 版は残置）。Gemini は <code>~/.config/gemini/api_key</code>（または <code>GEMINI_API_KEY</code>）でビルド時にローカル実行し、AWS の Secret は要らない。声・演技指示の正はセット資産の <code>assets/design.json</code>（<a href="../sets/umigame-soup-1.html#tts">セット別設計書 8</a>）</li>
+  <li>TTS アダプタは差し替え可能にする（Irodori が既定。Gemini 版〔日次上限のため本番では使わない〕・Polly 版・VOICEVOX 版は残置）。Irodori はビルド時にローカル GPU で実行し、API キー・AWS の Secret は要らない。声と設定の正はセット資産の <code>assets/design.json</code> と参照音声 <code>assets/voice/kamerock-g4/</code>（<a href="../sets/umigame-soup-1.html#tts">セット別設計書 8</a>）</li>
 </ul>
 
 <h3 id="rebuild">8.4 再ビルドが必要になる変更</h3>
@@ -210,10 +210,10 @@ LIMIT 1 FOR UPDATE;</code></pre>
   <ul style="margin:.3rem 0 0;">
     <li>素材の表示部分（<code>problem_text</code> / <code>hook</code> / <code>rule_text</code> / <code>play_example</code> / <code>character_lines</code> / <code>narration</code> / 背景）。<strong><code>truth</code> / <code>fact_sheet</code> / <code>expected_questions</code> / <code>caption</code> / <code>source_note</code> の修正は再ビルド不要</strong>（版面に出ないため）。ただし <code>caption</code> は <code>umigame_items</code> に投稿時点でスナップショットされるため、修正は以後の投稿から効く</li>
     <li>版面（<code>timeline.ts</code> / <code>UmigameReel.tsx</code>）・キャラ画像・フォント・SE・尺</li>
-    <li>TTS のモデル・声・演技指示（<code>design.json</code> の <code>narration</code> 節）・話速の上限・cue 間の間隔。Gemini は同じ設定でも取り直しで尺と読みが揺れるため、再合成した問は全数を試聴し直す</li>
+    <li>TTS のモデル・参照音声・精度・長さ（<code>design.json</code> の <code>narration</code> 節と <code>assets/voice/kamerock-g4/</code>）・cue 間の間隔。拡散モデルのため seed・精度が変わると別テイクになり尺と読みが揺れるので、再合成した問は全数を試聴し直す</li>
     <li>Remotion / <code>@remotion/media</code> の版（見た目が変わりうる）</li>
   </ul>
-  再ビルド後は <code>video_built_at</code> を更新する。全数再ビルドは在庫（14〜30 件）に対して 1 件 1〜2 分（TTS + レンダリング）で、背景再生成を伴わなければ 1 時間以内。
+  再ビルド後は <code>video_built_at</code> を更新する。全数再ビルドは在庫（14〜30 件）に対して 1 件 2〜3 分（TTS 約 45 秒 × テイク数 + レンダリング）で、背景再生成を伴わなければ 1 時間以内。
 </div>
 
 <h2>9. 依存ライブラリ・実行環境</h2>
@@ -223,7 +223,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
   <tbody>
     <tr><td>Remotion（<code>remotion</code> / <code>@remotion/cli</code> / <code>@remotion/media</code> / <code>@remotion/fonts</code>）</td><td>4.0.520（<code>create-video</code> 雛形。Tailwind は外し、<code>tsconfig</code> に <code>dom</code> を追加）</td><td>レンダリングは <code>remotion-render</code> Docker イメージへの bind-mount（<code>-e HOME=/tmp --user uid:gid</code>）。Studio はホストで <code>npm run studio</code></td></tr>
     <tr><td>Remotion Skills 2.0</td><td>skills CLI 1.5.23・スキル版 4.0.520・6 本（best-practices / create / markup / render / docs / upgrade）</td><td><code>.agents/skills/remotion-*</code> 正本 + <code>.claude/skills/remotion-*</code> リンク + <code>skills-lock.json</code>。更新は <code>npx skills update</code>（版が上がったら README とロックを更新してコミット）</td></tr>
-    <tr><td>Gemini 3.8 Flash TTS</td><td>REST（<code>generativelanguage.googleapis.com/v1beta</code>・標準ライブラリの <code>urllib</code>）・ローカルの API キー</td><td>21-5c で既定に。クレジット不要。Amazon Polly（Neural・Takumi・AWS CLI）と VOICEVOX Engine はアダプタとして残置</td></tr>
+    <tr><td>Irodori-TTS</td><td>v4.1-Small（HF <code>Aratako/Irodori-TTS-v4.1-Small</code>）。本体はリポジトリ外 <code>~/tools/Irodori-TTS</code>（commit <code>89f9d8f</code>・<code>uv sync --extra cu128</code>）を subprocess で実行・cuda / BF16 必須</td><td>21-5c（2026-09-27）で既定に。MIT・クレジット不要。RTX 3050 Laptop（VRAM 4GB）・ドライバー 616.92 以上（CUDA 12.8）で 1 本約 45 秒。Gemini 3.8 Flash TTS（REST・日次上限 100 リクエスト）・Amazon Polly（Neural・Takumi・AWS CLI）・VOICEVOX Engine はアダプタとして残置</td></tr>
     <tr><td>ffmpeg / ffprobe</td><td><code>image-batch:ffmpeg-check</code> Docker イメージ</td><td>WSL に ffmpeg は無い。正規化・ラウドネス・静止フレーム・継ぎ目検査に使う</td></tr>
     <tr><td>imagegen</td><td>Codex CLI 0.144.1 の <code>image_gen.imagegen</code>（<code>codex exec</code>）</td><td>1 枚 1〜2 分。透過指定の無視・ノイズ状背景の対処は 21-2 README</td></tr>
     <tr><td>OpenAI API（プローブテスト）</td><td><code>gpt-6-luna</code> / effort <code>max</code>（2026-09-26 に 21-1 ⑤ の <code>gpt-5.6-luna</code> から切替。batch-01 の <code>probe_test.py</code> は旧モデルのまま = 21-4a の記録）</td><td>キーは Secrets Manager <code>umigame-poc/credentials</code> の <code>openai_api_key</code> を <code>probe_test.py</code> 内で boto3 により実行時に読む（値を出力・保存しない。環境変数 <code>OPENAI_API_KEY</code> があれば優先。ローカルにキーを置かない = 2026-09-04 ユーザー判断）。本番の Reply Lambda と同じプロンプト（<code>master_prompt.txt</code>）を使う</td></tr>

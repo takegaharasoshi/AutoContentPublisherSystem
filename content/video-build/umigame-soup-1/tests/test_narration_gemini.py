@@ -344,7 +344,7 @@ def test_build_quota_stops_before_next_item(tmp_path: Path, monkeypatch) -> None
         raise narration_gemini.GeminiQuotaError("interactions", 429, "quota")
 
     monkeypatch.setattr(build.narration_gemini, "synthesize_cues", gemini)
-    assert build.main(["--skip-render"]) == 1
+    assert build.main(["--tts", "gemini", "--skip-render"]) == 1
     assert calls == ["001-first"]
 
 
@@ -361,6 +361,6 @@ def test_build_tempo_failure_continues_to_next_item(
         return _report()
 
     monkeypatch.setattr(build.narration_gemini, "synthesize_cues", gemini)
-    assert build.main(["--skip-render", "--retake-tts"]) == 1
+    assert build.main(["--tts", "gemini", "--skip-render", "--retake-tts"]) == 1
     assert calls == [("001-first", True), ("002-next", True)]
     assert "倍率 1.234 > 1.19・--retake-tts で取り直し" in capsys.readouterr().err

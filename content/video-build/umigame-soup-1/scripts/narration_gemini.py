@@ -298,7 +298,7 @@ def main(argv: list[str] | None = None) -> int:
     if not isinstance(cues, dict):
         raise SystemExit("narration_cue または narration がありません")
     design_path = Path(__file__).resolve().parent.parent / "assets" / "design.json"
-    config = json.loads(design_path.read_text(encoding="utf-8"))["narration"]
+    config = json.loads(design_path.read_text(encoding="utf-8"))["narration_gemini"]
     try:
         report = synthesize_cues(
             str(cues["problem"]), str(cues["rule"]), args.out_dir,

@@ -95,7 +95,7 @@
 <tr><td>9</td><td><code>character_lines.master.intro</code> / <code>.outro</code> 出題者の導入・締め</td><td>導入「質問してみて！」・締め「何度でも答えるよ。コメントで質問！」の吹き出し</td><td>各 17 字以内。既定値あり</td></tr>
 <tr><td>10</td><td><code>character_lines.jr.outro</code> Jr. の締め</td><td>「面白かったら、いいね、フォローよろしくね！」（吹き出しのみ・ナレーションなし）</td><td>セット固定文の既定値でよい（2 行になるが単独表示のため許容）</td></tr>
 <tr><td>11</td><td><code>illustration_prompt</code> イラスト作成用プロンプト</td><td>背景 1 枚（imagegen）。情景のみ</td><td>画風固定行（セクション 5.2）+ 9:16 + 文字禁止 + <strong>真相の手がかりを描かない</strong>指示を含む（<code>validate.py</code> は固定行の存在を検査）</td></tr>
-<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。TTS のクレジット行は不要（Gemini TTS・セクション 8）</td></tr>
+<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。TTS のクレジット行は不要（Irodori-TTS・セクション 8）</td></tr>
 <tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>完全オリジナル宣言（PoC の古典題材は例外・ストック本体には入れない）。<strong>オリジナル性の基準（21-4a で決定）</strong>: 既存問題の問題文・真相を転載しない。語句・登場人物・舞台の置き換えだけの改変もしない。借りてよいのは「型（物語復元 / 意味誤誘導）」と「仕掛けの構造」までで、モチーフ・真相・問題文は新規に作る。台帳で本家級（classic）の題材は構造ごと避ける。source_note に「完全オリジナル」宣言 + 型 + モチーフ → 連想 → 逆にした常識を書く（validate.py が宣言の有無を検査。作問法の正は <a href="https://note.com/suekai0217/n/n35128e606a9b">note 記事の 4 ステップ + 良い問題の 3 条件</a>）</td></tr>
 <tr><td>14</td><td><code>difficulty</code> 難易度</td><td>運用の目安（在庫の偏り確認）</td><td>1〜5</td></tr>
 </table>
@@ -194,16 +194,16 @@
   <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
 </ul>
 
-<h2 id="tts">8. ナレーション・TTS（Gemini 3.8 Flash TTS / 声 G4「kamerock-chubby」）</h2>
+<h2 id="tts">8. ナレーション・TTS（Irodori-TTS v4.1-Small / 声 G4 のクローン）</h2>
 <div class="decision">
-  <span class="callout-title">決定（2026-09-26、アイデア umigame-tts-gemini-flash の PoC → 21-5c）: TTS を Amazon Polly（Takumi・125%）から Gemini 3.8 Flash TTS・説明文から作った声 G4 へ切り替える。問題文とルールの間は 1.2 秒のまま</span>
-  2 問 × 15 パターンを本番と同じ Remotion で描き出して聞き比べ、どのパターンも Takumi より表現力がはっきり上がり、読み間違い・速度調整の違和感もなかったため切り替えた（経緯は <a href="../../ideas/umigame-tts-gemini-flash.md">アイデア記録</a>）。声は名探偵系（G1〜G3）ではなく、ぽっちゃりの食いしん坊パパ（G4）。笑いは入れない（推理というシリアスなアカウントのため）。PoC の知見: ① 演技をつけると話速が落ちるため、演技指示に「早口ぎみの速いテンポ」を入れ、残りは話速調整で合わせる（1.19 倍までは違和感なし）② 問題文とルール文を別の呼び出しで作るとルール文で口調が変わるため、<strong>1 回の呼び出しで読ませて無音で切り分ける</strong> ③ 同じ設定でも取り直しで尺が 0.7〜2.3 秒揺れるため、全数を 1 問ずつ試聴する。<strong>クレジット表記は不要</strong>（Gemini API 利用規約で生成物の所有権は Google が主張せず商用利用可。規約の attribution は引用元〔グラウンディング等〕の条項で音声出力に表記義務はない。2026-09-26 確認）。Polly Takumi 125%（2026-09-04、21-2 人間ゲートで VOICEVOX 3 話者・Polly 3 話者から採用）は 21-5a / 21-5b の初版 14 本に使い、アダプタとして残す。
+  <span class="callout-title">決定（2026-09-27、21-5c）: TTS をローカル GPU の Irodori-TTS（v4.1-Small・BF16）へ切り替え、Gemini の声 G4「kamerock-chubby」を参照音声からクローンする。問題文とルールの間は 1.2 秒のまま</span>
+  2026-09-26 に Amazon Polly（Takumi・125%）から Gemini 3.8 Flash TTS・声 G4 へ切り替えた（2 問 × 15 パターンの聞き比べで表現力がはっきり上がった。経緯は <a href="../../ideas/umigame-tts-gemini-flash.md">アイデア記録</a>）が、作り直しの途中で Gemini の日次上限（Tier 1・100 リクエスト / 日）に当たった。上限の引き上げは応答まで 1〜2 か月の報告が多く、別アカウントでの回避は Google APIs 利用規約 2(d) に反するため、ローカルで動く Irodori-TTS（MIT・クレジット不要・実在人物の無断クローンは禁止 = G4 は Gemini の合成音声なので該当しない）へ移した。聞き比べ（<code>poc/irodori-tts/</code>）で、説明文だけの声（VoiceDesign）・別話者のクローン・演技指示つきより、<strong>G4 のクローン・説明文なし・後処理なし</strong>が最もよかった（ユーザー判断）。PoC の知見: ① 参照音声の息継ぎを下げると生成側の吸気音も減る ② 問題文とルール文を 1 回で読ませて無音で切り分ける（Gemini と同じ。別々に作ると口調が変わる）③ <code>--seconds 20.0</code> を指定すると話速調整なしで予算に収まる（自然長は 23〜25 秒）④ 既定の FP32 は VRAM 4GB からあふれて 1 本 4〜7 分、BF16 は約 45 秒で音質差なし。<strong>クレジット表記は不要</strong>。Gemini 版（<code>narration_gemini.py</code>）・Polly 版（21-5a / 21-5b の初版 14 本）・VOICEVOX 版はアダプタとして残す。
 </div>
 <ul>
   <li><strong>読み上げる文</strong>: 冒頭に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code> の 2 cue だけ（吹き出しと同期させない。21-1 ②）。開始は 0.5 秒（15 フレーム）、2 cue + 間の合計は <strong>21 秒以内</strong>（継ぎ目 708 フレームに掛からない予算。方式設計書 8.3）</li>
-  <li><strong>声と演技</strong>: 声 ID・声の説明文・演技指示の正は <code>content/video-build/umigame-soup-1/assets/design.json</code> の <code>narration</code> 節（モデル <code>gemini-3.8-flash-tts</code>・声 <code>voice_1m8w495yafud</code>〔<code>store=true</code> で API キーのプロジェクトに保存〕）。演技指示は「子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。」。声 ID が失われたら説明文から作り直せる（<code>POST /v1beta/voices</code>）が、同じ声になる保証はないため作り直したら全数を再試聴する</li>
-  <li><strong>実行</strong>: ビルド時にローカルで <code>scripts/narration_gemini.py</code>（<code>build.py</code> の既定。API キーは <code>GEMINI_API_KEY</code> か <code>~/.config/gemini/api_key</code>。AWS の Secret は不要）。費用は音声 1 時間あたり約 0.81 ドル・1 問 20 秒のため無視できる。無料枠では入出力が Google の製品改善に使われるが、送るのは公開予定の問題文だけのため許容する。Polly 版（<code>narration_polly.py</code>・<code>build.py --tts polly</code>）と VOICEVOX 版（<code>narration.py</code>）はアダプタとして残す</li>
-  <li><strong>話速の調整と予算検査</strong>: 前後の無音を削った合計が 21 秒を超える分だけ ffmpeg の <code>atempo</code> で話速を上げて 19 秒に合わせる（Polly の 125% と同じ扱い）。<strong>倍率の上限は 1.19</strong>（PoC で違和感なしを確認した上限）で、超えた問は取り直す（1 問 3 回まで。続けて超えたら文を見直す）。調整後も予算を超えたらビルドエラー（方式設計書 8.3）</li>
+  <li><strong>声</strong>: 参照音声 <code>content/video-build/umigame-soup-1/assets/voice/kamerock-g4/*.wav</code>（Gemini G4 で合成した 001・004・006 の problem / rule 6 本に息継ぎゲートをかけたもの。名前順にすべて渡す）のクローン。説明文（caption）・絵文字・後処理は使わない。モデル・精度・seed・長さの正は <code>assets/design.json</code> の <code>narration</code> 節（Gemini の設定は <code>narration_gemini</code> 節に残す）。<strong>参照音声を差し替えたら声が変わるため全数を再試聴する</strong></li>
+  <li><strong>実行</strong>: ビルド時にローカルで <code>scripts/narration_irodori.py</code>（<code>build.py</code> の既定 <code>--tts irodori</code>）。本体はリポジトリ外 <code>~/tools/Irodori-TTS</code>（環境変数 <code>IRODORI_DIR</code> で変更可。commit <code>89f9d8f</code>・<code>uv</code> 環境）を subprocess で呼び、<strong>必ず cuda・BF16</strong>。費用・API キー・AWS の Secret は不要。生成音声には SilentCipher の透かしが自動で入る</li>
+  <li><strong>長さの制御と予算検査</strong>: 話速調整（atempo）はしない。<code>--seconds 20.0</code> で合成し、切り分けて前後の無音を削った合計が 21 秒を超えたら、seed を進めて <code>--seconds</code> を 0.5 秒ずつ縮めて取り直す（1 回のビルドで最大 3 テイク。3 テイクとも超えたらその問はビルドエラー）。聞いて気になった問は <code>--retake-tts</code> で seed を進めて取り直す（1 問 3 回まで。続けて問題が出たら文を見直す）</li>
 </ul>
 
 <h2 id="assets">9. 固定アセット・デザイントークン</h2>

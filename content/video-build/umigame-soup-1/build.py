@@ -32,7 +32,7 @@ from common import (
     write_json,
 )
 from prepare_bgm import TRACKS_PATH, OUT_DIR as BGM_OUT_DIR, validate_tracks
-from scripts import narration_gemini, narration_polly
+from scripts import narration_gemini, narration_irodori, narration_polly
 
 
 PUBLIC_DIR = REMOTION_DIR / "public"
@@ -434,8 +434,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--skip-render", action="store_true", help="props 生成までで止める")
     parser.add_argument("--rebuild-bgm", action="store_true", help="既存割当を破棄して再選曲する")
     parser.add_argument(
-        "--tts", choices=("gemini", "polly"), default="gemini",
-        help="ナレーションの TTS（既定: gemini）",
+        "--tts", choices=("irodori", "gemini", "polly"), default="irodori",
+        help="ナレーションの TTS（既定: irodori）",
     )
     parser.add_argument(
         "--retake-tts", action="store_true", help="対象のナレーションを取り直す",
@@ -483,7 +483,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"エラー: {exc}", file=sys.stderr)
         return 1
 
-    max_tempo = float(design["narration"]["max_tempo"])
+    max_tempo = float(design["narration_gemini"]["max_tempo"])
     failures = _preflight_inputs(
         targets, no_tts=args.no_tts, max_tempo=max_tempo
     )
@@ -511,10 +511,15 @@ def main(argv: list[str] | None = None) -> int:
                 report = _load_cached_narration(
                     item, narration_dir, max_tempo=max_tempo
                 )
+            elif args.tts == "irodori":
+                report = narration_irodori.synthesize_cues(
+                    item["narration"]["problem"], item["narration"]["rule"],
+                    narration_dir, config=design["narration"], force=args.retake_tts,
+                )
             elif args.tts == "gemini":
                 report = narration_gemini.synthesize_cues(
                     item["narration"]["problem"], item["narration"]["rule"],
-                    narration_dir, config=design["narration"], force=args.retake_tts,
+                    narration_dir, config=design["narration_gemini"], force=args.retake_tts,
                 )
             else:
                 report = _synthesize_polly(
@@ -526,6 +531,9 @@ def main(argv: list[str] | None = None) -> int:
                 narration_summary["engine_id"] = str(report["engine_id"])
             if report.get("tempo") is not None:
                 narration_summary["tempo"] = float(report["tempo"])
+            if str(report.get("engine_id", "")).startswith("irodori/"):
+                narration_summary["seed"] = int(report["seed"])
+                narration_summary["seconds"] = float(report["seconds"])
             track = select_bgm_track(
                 manifest, key, tracks, rebuild_bgm=args.rebuild_bgm
             )
@@ -549,14 +557,14 @@ def main(argv: list[str] | None = None) -> int:
             )
             save_manifest(manifest)
             print(f"{key}: ビルド完了（seam={seam_difference:.3f}）")
-        except narration_gemini.GeminiQuotaError as exc:
+        except (narration_gemini.GeminiQuotaError, narration_irodori.IrodoriError) as exc:
             failures.append(f"{key}: {exc}")
             print(f"エラー: {key}: {exc}", file=sys.stderr)
             print("\n失敗一覧:", file=sys.stderr)
             for failure in failures:
                 print(f"- {failure}", file=sys.stderr)
             return 1
-        except narration_gemini.TempoLimitError as exc:
+        except (narration_gemini.TempoLimitError, narration_irodori.IrodoriBudgetError) as exc:
             failures.append(f"{key}: {exc}")
             print(f"エラー: {key}: {exc}", file=sys.stderr)
         except Exception as exc:

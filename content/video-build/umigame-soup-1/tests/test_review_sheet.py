@@ -37,3 +37,22 @@ def test_review_html_escapes_stock_and_warns_provisional() -> None:
     assert "videos/&lt;bad&gt;.mp4" in html
     assert "×1.146" in html
     assert "gemini/gemini-3.8-flash-tts/voice-test" in html
+
+
+def test_review_html_shows_irodori_seed_without_tempo() -> None:
+    manifest = {
+        "001-test": {
+            "narration": {
+                "problem_sec": 8.0, "rule_sec": 8.0, "total_sec": 17.2,
+                "engine_id": "irodori/model/kamerock-g4",
+                "seed": 4, "seconds": 19.5,
+            },
+            "bgm": {}, "stills": {},
+        },
+    }
+    html = generate_review_html(
+        manifest, [{"content_key": "001-test", "title": "テスト"}]
+    )
+
+    assert "irodori/model/kamerock-g4 (seed=4, seconds=19.5)" in html
+    assert "×" not in html
