@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>方式名（レジストリキー）: umigame-prebuilt</span>
-  <span>最終更新: 2026-09-23（21-5a の実装差分を 8.1 に追記）</span>
+  <span>最終更新: 2026-09-26（21-5b: 実行時モジュール <code>umigame_prebuilt.py</code> を実装し、セクション 2 に実装の差分を追記）。前回: 2026-09-23（21-5a の実装差分を 8.1 に追記）</span>
 </div>
 
 <div class="note">
@@ -54,6 +54,10 @@
 </table>
 </div>
 <p>処理順序: ① <code>parameters</code> 検証 → ② <strong>ストック取得（ビルド済み限定の LRU。セクション 4）</strong> → ③ <strong>S3 から事前動画を取得</strong>（欠落はフェイルラウド。セクション 5）→ ④ <code>umigame_items</code> INSERT + ストックの <code>last_used_at</code> / <code>use_count</code> 更新 → ⑤ <code>GeneratorResult</code> を返す。フォント・キャラアセット・BGM の事前検査、API キー取得はいずれも<strong>不要</strong>（実行時に使わないため）。</p>
+<div class="decision">
+  <span class="callout-title">実装（2026-09-26、21-5b）: <code>services/image-batch/app/generators/umigame_prebuilt.py</code>・REGISTRY 名 <code>umigame-prebuilt</code></span>
+  設計どおりに実装した。設計より厳しくした点が 2 つある: ① <code>parameters</code> は <code>duration_seconds</code> の 1 キーだけを許し、<code>slots</code> など他のキーがあれば不正として異常終了する（単一スロットの宣言を設定ミスから守るため） ② ストック行の <code>video_audio_asset_id</code> が NULL の行も異常終了にする（ビルド済みの行は BGM を焼き込んでいるので、NULL は publish 手順の不備）。ストックは取得 SQL（セクション 4）により<strong>未使用の行を id の小さい順</strong>に消費するため、投入時の INSERT 順がそのまま投稿順になる（21-5a の <code>POST_ORDER</code>。単体テストで ORDER BY 句と選ばれる行を押さえている）。
+</div>
 
 <h2 id="parameters">3. 入力（parameters。単一スロット・単尺）</h2>
 <p><code>prompt_configs.parameters</code> は次の 1 キーのみ。スロット定義（<code>slots</code>）は持たない（投稿は 20:00 の 1 日 1 回・尺は 1 つのため。<a href="../sets/umigame-soup-1.html">セット別設計書 3</a>）。</p>

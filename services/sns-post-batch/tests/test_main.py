@@ -202,6 +202,25 @@ def test_main_finalizes_success_with_processed_account_count(monkeypatch) -> Non
     assert finalizer.call_args.kwargs["records_processed"] == 1
     processor.assert_called_once()
     assert processor.call_args.kwargs["stories_enabled"] is False
+    assert processor.call_args.kwargs["problem_snapshot_enabled"] is False
+
+
+def test_main_passes_enabled_problem_snapshot_flag(monkeypatch) -> None:
+    connection = FakeConnection()
+    _patch_base(monkeypatch, connection)
+    _patch_started_log(monkeypatch)
+    monkeypatch.setattr(
+        main_module,
+        "find_batch_set_by_code",
+        lambda cursor, code: BatchSet(1, "set-a", True, False, True),
+    )
+    monkeypatch.setattr(main_module, "resolve_target_generation_run", lambda *args: 8)
+    _patch_target_dependencies(monkeypatch)
+    processor = Mock(return_value=ProcessingResult(1, True))
+    monkeypatch.setattr(main_module, "process_target_generation_run", processor)
+
+    assert main_module.main(s3_client=Mock(), urlopen=Mock()) == 0
+    assert processor.call_args.kwargs["problem_snapshot_enabled"] is True
 
 
 def test_main_builds_caption_once_before_processing_accounts(monkeypatch) -> None:

@@ -11,6 +11,7 @@ from app.models import (
     Post,
     RankingItem,
     SnsAccount,
+    UmigameItem,
 )
 
 
@@ -22,6 +23,9 @@ from app.models import (
         CaptionTemplate(3, "caption"),
         GeneratedMediaRef(4, "bucket", "key", "jpg"),
         RankingItem("ランキング題", {"hook": "つかみ"}),
+        UmigameItem(
+            1, "001-problem", "問題", "真相", ["事実"], "ルール", "フック", "本文"
+        ),
         Post(5, "pending", None, None),
     ],
 )

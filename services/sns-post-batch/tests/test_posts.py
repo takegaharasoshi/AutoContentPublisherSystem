@@ -169,7 +169,7 @@ def test_post_state_updates_use_expected_values(monkeypatch) -> None:
         error_message="unknown",
         api_response=None,
     )
-    posts.update_post_success(
+    posted_at = posts.update_post_success(
         cursor,
         5,
         platform_post_id="post",
@@ -193,3 +193,4 @@ def test_post_state_updates_use_expected_values(monkeypatch) -> None:
         fixed_now,
         5,
     )
+    assert posted_at == fixed_now

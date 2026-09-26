@@ -5,7 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 import app.captions as captions
-from app.models import QuizItem, RankingItem
+from app.models import QuizItem, RankingItem, UmigameItem
 
 
 def _quiz_item(**field_updates: object) -> QuizItem:
@@ -29,14 +29,32 @@ def _ranking_item(**field_updates: object) -> RankingItem:
     return RankingItem("住みたい都道府県ランキング", fields)
 
 
+def _umigame_item(**updates: object) -> UmigameItem:
+    fields: dict[str, object] = {
+        "id": 4,
+        "content_key": "001-problem",
+        "problem_text": "なぜ？",
+        "truth": "真相",
+        "fact_sheet": ["事実"],
+        "rule_text": "質問してね",
+        "hook": "解けるかな？",
+        "caption": "本文 #AIart",
+    }
+    fields.update(updates)
+    return UmigameItem(**fields)
+
+
 def test_build_caption_passes_through_without_reading_items(monkeypatch) -> None:
     quiz_fetch = Mock()
     ranking_fetch = Mock()
+    umigame_fetch = Mock()
     monkeypatch.setattr(captions, "fetch_quiz_item", quiz_fetch)
     monkeypatch.setattr(captions, "fetch_ranking_item", ranking_fetch)
+    monkeypatch.setattr(captions, "fetch_umigame_item", umigame_fetch)
     assert captions.build_caption(Mock(), 3, "固定文 #AI生成") == "固定文 #AI生成"
     quiz_fetch.assert_not_called()
     ranking_fetch.assert_not_called()
+    umigame_fetch.assert_not_called()
 
 
 def test_build_caption_expands_all_supported_placeholders(monkeypatch) -> None:
@@ -60,9 +78,10 @@ def test_build_caption_expands_all_supported_placeholders(monkeypatch) -> None:
 def test_build_caption_requires_item_for_placeholder(monkeypatch) -> None:
     monkeypatch.setattr(captions, "fetch_quiz_item", lambda cursor, run_id: None)
     monkeypatch.setattr(captions, "fetch_ranking_item", lambda cursor, run_id: None)
+    monkeypatch.setattr(captions, "fetch_umigame_item", lambda cursor, run_id: None)
     with pytest.raises(
         RuntimeError,
-        match="quiz_items or ranking_items.*generation_run_id=8",
+        match="quiz_items or ranking_items or umigame_items.*generation_run_id=8",
     ):
         captions.build_caption(Mock(), 8, "{{answer}}")
 
@@ -125,3 +144,68 @@ def test_build_caption_rejects_quiz_token_for_ranking_item(monkeypatch) -> None:
     )
     with pytest.raises(RuntimeError, match="answer"):
         captions.build_caption(Mock(), 8, "{{answer}}")
+
+
+def test_build_caption_expands_umigame_placeholders_in_fetch_order(monkeypatch) -> None:
+    calls: list[str] = []
+
+    def no_quiz(*args):
+        calls.append("quiz")
+        return None
+
+    def no_ranking(*args):
+        calls.append("ranking")
+        return None
+
+    def get_umigame(*args):
+        calls.append("umigame")
+        return _umigame_item()
+
+    monkeypatch.setattr(captions, "fetch_quiz_item", no_quiz)
+    monkeypatch.setattr(captions, "fetch_ranking_item", no_ranking)
+    monkeypatch.setattr(captions, "fetch_umigame_item", get_umigame)
+
+    assert captions.build_caption(
+        Mock(), 8, "{{caption}}\n{{problem_text}}\n{{hook}}\n{{rule_text}}"
+    ) == "本文 #AIart\nなぜ？\n解けるかな？\n質問してね"
+    assert calls == ["quiz", "ranking", "umigame"]
+
+
+@pytest.mark.parametrize("token", ["answer", "result_list"])
+def test_build_caption_rejects_other_family_token_for_umigame(
+    monkeypatch, token: str
+) -> None:
+    monkeypatch.setattr(captions, "fetch_quiz_item", lambda *args: None)
+    monkeypatch.setattr(captions, "fetch_ranking_item", lambda *args: None)
+    monkeypatch.setattr(captions, "fetch_umigame_item", lambda *args: _umigame_item())
+    with pytest.raises(RuntimeError, match=token):
+        captions.build_caption(Mock(), 8, "{{" + token + "}}")
+
+
+@pytest.mark.parametrize("family", ["quiz", "ranking"])
+def test_build_caption_rejects_umigame_token_for_other_family(
+    monkeypatch, family: str
+) -> None:
+    monkeypatch.setattr(
+        captions, "fetch_quiz_item",
+        lambda *args: _quiz_item() if family == "quiz" else None,
+    )
+    monkeypatch.setattr(
+        captions, "fetch_ranking_item",
+        lambda *args: _ranking_item() if family == "ranking" else None,
+    )
+    umigame_fetch = Mock()
+    monkeypatch.setattr(captions, "fetch_umigame_item", umigame_fetch)
+    with pytest.raises(RuntimeError, match="caption"):
+        captions.build_caption(Mock(), 8, "{{caption}}")
+    umigame_fetch.assert_not_called()
+
+
+def test_build_caption_rejects_unknown_umigame_like_token_without_fetch(
+    monkeypatch,
+) -> None:
+    umigame_fetch = Mock()
+    monkeypatch.setattr(captions, "fetch_umigame_item", umigame_fetch)
+    with pytest.raises(RuntimeError, match="fact_sheet"):
+        captions.build_caption(Mock(), 8, "{{fact_sheet}}")
+    umigame_fetch.assert_not_called()

@@ -15,6 +15,7 @@ from . import (
     gpt_quiz_multicut,
     quiz_prebuilt,
     ranking_prebuilt,
+    umigame_prebuilt,
 )
 
 
@@ -37,6 +38,7 @@ REGISTRY: dict[str, GeneratorFn] = {
     "gpt-quiz-multicut": gpt_quiz_multicut.generate,
     "quiz-prebuilt": quiz_prebuilt.generate,
     "ranking-prebuilt": ranking_prebuilt.generate,
+    "umigame-prebuilt": umigame_prebuilt.generate,
 }
 
 

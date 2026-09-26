@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-09-04</span>
+  <span>最終更新: 2026-09-26（21-5b: 10.2 に投稿後スナップショット出力の実装を追記し、手動再出力ツールを 21-7 へ移した）。前回: 2026-09-04</span>
 </div>
 
 <div class="note">
@@ -245,8 +245,10 @@
   "master_rules": "（prompt_configs.prompt_text のセット固定部分。セクション 5.1）"
 }</code></pre>
 <ul>
-  <li>スナップショットの<strong>出力失敗は投稿失敗にしない</strong>（投稿は成功しているため <code>posts.status</code> は <code>success</code> のまま）。<code>snapshot_s3_key</code> が NULL の行を運用の確認クエリで拾い、手動で再出力する（<code>content/umigame-stock/.../tools/write_snapshot.py</code> を 21-5b で用意）。スナップショットが無い投稿へのコメントは Reply Lambda が S3 404 として<strong>返信せずログのみ</strong>残す（DLQ に入れない）</li>
+  <li>スナップショットの<strong>出力失敗は投稿失敗にしない</strong>（投稿は成功しているため <code>posts.status</code> は <code>success</code> のまま）。<code>snapshot_s3_key</code> が NULL の行を運用の確認クエリで拾い、手動で再出力する（手動再出力ツール <code>content/umigame-stock/.../tools/write_snapshot.py</code> は 21-7 で用意する。21-5b では用意していない）。スナップショットが無い投稿へのコメントは Reply Lambda が S3 404 として<strong>返信せずログのみ</strong>残す（DLQ に入れない）</li>
   <li>プレフィックス <code>assets/…/problems/</code> は 30 日ライフサイクルの対象外（<code>images/</code> <code>videos/</code> 限定）のため、投稿済み問題は残り続ける = 翌日以降のコメントにも答えられる</li>
+  <li><strong>実装（2026-09-26、21-5b）</strong>: <code>services/sns-post-batch/app/problem_snapshot.py</code>。リール行の <code>success</code> 更新を commit した<strong>後</strong>に別のトランザクションで出力するため、スナップショット側の失敗（<code>umigame_items</code> 行の読み取り・<code>prompt_configs</code> の欠落・S3 の PUT・キーの記録）は WARNING ログとロールバックだけで済み、投稿の成功記録を巻き戻さない。<code>posted_at</code> は <code>posts.posted_at</code> に書いた値と同じ時刻（UTC・末尾 <code>Z</code>）。JSON は UTF-8（<code>ensure_ascii=False</code>）・<code>Content-Type: application/json; charset=utf-8</code> で PUT する。フラグが 0 のセットとストーリーズ行では何もしない</li>
+  <li><strong>IAM の前提</strong>: SNS 投稿バッチのタスクロールは S3 の読み取り権限（<code>grantRead</code>）しか持たないため、フラグを 1 にする前に <code>assets/umigame-soup-1/problems/*</code> への <code>s3:PutObject</code> を付ける必要がある（21-7 の CDK 変更に含める）。権限がないまま有効化すると、投稿は成功するが毎回スナップショットが WARNING で欠ける</li>
   <li>ステージング面（PoC アプリ + <code>test_tkghr</code>）は <code>assets/umigame-soup-1/staging/problems/</code> を読む。サンプルの JSON は手で置く（21-6 の人間ゲート）</li>
 </ul>
 

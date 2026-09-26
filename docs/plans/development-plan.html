@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -458,21 +458,13 @@
 </details>
 </div>
 </article>
-</div>
-</details>
 
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-<article class="plan-step" id="step-21-5b" data-step-id="21-5b" data-status="todo">
+<article class="plan-step" id="step-21-5b" data-step-id="21-5b" data-status="done" data-completed="2026-09-26">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-5b</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-5b</strong><span class="plan-status">完了</span><span>2026-09-26</span></div>
 <h3>方式モジュール・キャプション・投稿後スナップショット出力</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-5a のレビュー（<code>approved.txt</code> 作成）完了後。publish の本実行の前に、BGM の <code>audio_assets</code> 登録 SQL（<code>set-registration/03_audio_assets.sql</code>）を両環境へ適用する（<a href="#step-21-5a">21-5a の作業記録</a>）。</p>
-<p data-field="result"><strong>現況：</strong>① の publish 本実行と両環境への反映（<code>audio_assets</code> 登録・ストックの入れ直しを含む）は 2026-09-26 に済み（<a href="#step-21-5a">21-5a の作業記録</a>）。残りは ②〜⑤（<code>services/</code> の実装）。</p>
+<p data-field="result"><strong>結果：</strong>① は 2026-09-26 に反映済み（<a href="#step-21-5a">21-5a の作業記録</a>）。②〜⑤ として方式モジュール <code>umigame_prebuilt.py</code>・umigame 系キャプション・投稿後スナップショット出力を実装し、pytest は image-batch 161 passed / 5 skipped・sns-post-batch 148 passed（2026-09-26）。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは <a href="#step-21-7">21-7</a> へ送った。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -499,11 +491,28 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-09-26 ②〜⑤ の実装</span></summary>
+<div class="plan-fold-inner"><ul>
+<li><strong>委譲</strong>: 実装とテスト修正のループは Codex（<code>gpt-6-sol</code> / effort <code>max</code>）へ <code>tools/codex_delegate.sh</code> で委譲した（同日に MCP 経由から切替。CLI 0.157 で <code>codex mcp-server</code> が廃止されていた）。Claude が差分をレビューし、指摘はなかった</li>
+<li><strong>② image-batch</strong>: <code>app/generators/umigame_prebuilt.py</code> を新設し REGISTRY に <code>umigame-prebuilt</code> で登録。取得 SQL は方式設計書セクション 4 どおりで、未使用の行を id の小さい順に選ぶ = 投入時の INSERT 順（<code>POST_ORDER</code>）が投稿順になることをテストで押さえた。設計より厳しくした点（<code>parameters</code> は 1 キーのみ・<code>video_audio_asset_id</code> NULL は異常終了）は方式設計書セクション 2 の decision に記録</li>
+<li><strong>③ sns-post-batch</strong>: <code>captions.py</code> に umigame 系 4 種を追加（系の判定は quiz → ranking → umigame の順に存在する行）。<code>app/umigame_items.py</code>・<code>app/problem_snapshot.py</code> を新設し、<code>batch_sets.problem_snapshot_enabled</code> を読む。スナップショットはリール行の <code>success</code> を commit した後に別トランザクションで出力し、失敗は WARNING + スナップショット側のロールバックだけにした（投稿の成功記録を巻き戻さない）。<code>posted_at</code> は <code>posts.posted_at</code> と同じ値を使うため <code>update_post_success</code> が時刻を返すようにした</li>
+<li><strong>④ テスト</strong>: image-batch <code>161 passed, 5 skipped</code>・sns-post-batch <code>148 passed</code>（各サービスの <code>.venv</code> で e2e を含めて実行）。ローカル MySQL の確認（読み取りのみ）: umigame-soup-1 は total 14・unbuilt 0・no_audio 0・used 0（id 505〜518）、<code>is_active = 0</code>・<code>problem_snapshot_enabled = 0</code> のまま</li>
+<li><strong>⑤ 設計書</strong>: 方式設計書セクション 2・セット別設計書 10.2・batch-flow 3.3 手順 6 を実装に合わせた</li>
+<li><strong>後続へ送ったもの</strong>: ① SNS 投稿バッチのタスクロールは S3 の <code>grantRead</code> しか持たないため、<code>assets/umigame-soup-1/problems/*</code> への <code>s3:PutObject</code> を 21-7 の CDK 変更に加えた（権限なしで有効化すると毎回スナップショットが WARNING で欠ける） ② セット別設計書 10.2 が 21-5b で用意するとしていた手動再出力ツール <code>write_snapshot.py</code> は範囲外としたため、21-7 の ① に移した</li>
+</ul></div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
+
+
 
 <article class="plan-step" id="step-21-6a" data-step-id="21-6a" data-status="todo">
 <header class="plan-step-head">
@@ -784,7 +793,7 @@
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li>SQL のローカル MySQL <code>--dry-run</code> 成功。</li>
-<li><code>cdk synth -c env=prod ImageBatchStack InsightsBatchStack</code> 成功。</li>
+<li><code>cdk synth -c env=prod ImageBatchStack InsightsBatchStack SnsPostBatchStack</code> 成功。</li>
 <li>日本語メッセージでコミット。</li>
 </ol>
 </section>
@@ -797,7 +806,7 @@
 <details class="plan-fold" data-field="implementation">
 <summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜④ の内訳</span></summary>
 <div class="plan-fold-inner">
-<p>① <a href="../app/operation.html">運用設計</a> 2.1 手順 2 の INSERT / UPDATE SQL 一式（<code>batch_sets</code> の <code>generator_name</code>・スナップショット出力フラグ、<code>prompt_configs</code>、<code>caption_templates</code>、<code>sns_accounts</code>、<code>audio_assets</code>） ② CDK: <code>image-batch-stack.ts</code> の Scheduler 1 件 + <code>insights-batch-stack.ts</code> の 2 件 ③ シークレットの名前・投入手順書（sns 用 + comment-reply 用） ④ 本番 Meta アプリの作成手順（PoC README を本番向けに転記: 公開モード・comments 購読・Webhook 先 = CommentReplyStack）。</p>
+<p>① <a href="../app/operation.html">運用設計</a> 2.1 手順 2 の INSERT / UPDATE SQL 一式（<code>batch_sets</code> の <code>generator_name</code>・スナップショット出力フラグ、<code>prompt_configs</code>、<code>caption_templates</code>、<code>sns_accounts</code>、<code>audio_assets</code>）と、スナップショットの手動再出力ツール <code>content/umigame-stock/umigame-soup-1/tools/write_snapshot.py</code>（<code>snapshot_s3_key</code> が NULL の投稿を再出力する。21-5b から移管） ② CDK: <code>image-batch-stack.ts</code> の Scheduler 1 件 + <code>insights-batch-stack.ts</code> の 2 件 + <code>sns-post-batch-stack.ts</code> のタスクロールに <code>assets/umigame-soup-1/problems/*</code> への <code>s3:PutObject</code>（21-5b のスナップショット出力に必要。フラグを 1 にする前に deploy する） ③ シークレットの名前・投入手順書（sns 用 + comment-reply 用） ④ 本番 Meta アプリの作成手順（PoC README を本番向けに転記: 公開モード・comments 購読・Webhook 先 = CommentReplyStack）。</p>
 </div>
 </details>
 <details class="plan-fold" data-field="record">

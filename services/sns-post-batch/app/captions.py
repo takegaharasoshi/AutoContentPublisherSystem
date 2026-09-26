@@ -7,6 +7,7 @@ from typing import Any
 
 from .quiz_items import fetch_quiz_item
 from .ranking_items import fetch_ranking_item
+from .umigame_items import fetch_umigame_item
 
 
 QUIZ_PLACEHOLDERS = {
@@ -23,7 +24,10 @@ RANKING_PLACEHOLDERS = {
     "trivia",
     "source_display",
 }
-KNOWN_PLACEHOLDERS = QUIZ_PLACEHOLDERS | RANKING_PLACEHOLDERS
+UMIGAME_PLACEHOLDERS = {"caption", "problem_text", "hook", "rule_text"}
+KNOWN_PLACEHOLDERS = (
+    QUIZ_PLACEHOLDERS | RANKING_PLACEHOLDERS | UMIGAME_PLACEHOLDERS
+)
 TOKEN_PATTERN = re.compile(r"\{\{([a-z_]+)\}\}")
 
 
@@ -32,7 +36,7 @@ def build_caption(
     generation_run_id: int,
     template_text: str,
 ) -> str:
-    """Expand supported placeholders from the run's quiz or ranking item."""
+    """Expand supported placeholders from the run's generated item."""
     tokens = set(TOKEN_PATTERN.findall(template_text))
     unknown = tokens - KNOWN_PLACEHOLDERS
     if unknown:
@@ -54,20 +58,30 @@ def build_caption(
         }
     else:
         ranking_item = fetch_ranking_item(cursor, generation_run_id)
-        if ranking_item is None:
-            raise RuntimeError(
-                "quiz_items or ranking_items row is required for caption "
-                "placeholder expansion: "
-                f"generation_run_id={generation_run_id}"
-            )
-        placeholders = RANKING_PLACEHOLDERS
-        values = {
-            "hook": ranking_item.content_fields.get("hook"),
-            "title": ranking_item.title,
-            "result_list": ranking_item.content_fields.get("result_list"),
-            "trivia": ranking_item.content_fields.get("trivia"),
-            "source_display": ranking_item.content_fields.get("source_display"),
-        }
+        if ranking_item is not None:
+            placeholders = RANKING_PLACEHOLDERS
+            values = {
+                "hook": ranking_item.content_fields.get("hook"),
+                "title": ranking_item.title,
+                "result_list": ranking_item.content_fields.get("result_list"),
+                "trivia": ranking_item.content_fields.get("trivia"),
+                "source_display": ranking_item.content_fields.get("source_display"),
+            }
+        else:
+            umigame_item = fetch_umigame_item(cursor, generation_run_id)
+            if umigame_item is None:
+                raise RuntimeError(
+                    "quiz_items or ranking_items or umigame_items row is "
+                    "required for caption placeholder expansion: "
+                    f"generation_run_id={generation_run_id}"
+                )
+            placeholders = UMIGAME_PLACEHOLDERS
+            values = {
+                "caption": umigame_item.caption,
+                "problem_text": umigame_item.problem_text,
+                "hook": umigame_item.hook,
+                "rule_text": umigame_item.rule_text,
+            }
 
     mismatched = tokens - placeholders
     if mismatched:

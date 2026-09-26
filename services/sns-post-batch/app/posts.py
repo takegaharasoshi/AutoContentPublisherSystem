@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 from typing import Any
 
@@ -134,13 +135,15 @@ def update_post_success(
     *,
     platform_post_id: str,
     api_response: dict[str, Any] | None,
-) -> None:
-    """Mark a post successful and persist its platform response."""
+) -> datetime.datetime:
+    """Mark a post successful and return its persisted UTC posting time."""
+    posted_at = now_utc()
     cursor.execute(
         "UPDATE posts SET status = 'success', platform_post_id = %s, "
         "api_response = %s, posted_at = %s WHERE id = %s",
-        (platform_post_id, _encode_api_response(api_response), now_utc(), post_id),
+        (platform_post_id, _encode_api_response(api_response), posted_at, post_id),
     )
+    return posted_at
 
 
 def update_post_failed(

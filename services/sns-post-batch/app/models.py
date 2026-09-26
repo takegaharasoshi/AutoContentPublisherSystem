@@ -14,6 +14,7 @@ class BatchSet:
     set_code: str
     is_active: bool
     stories_enabled: bool = False
+    problem_snapshot_enabled: bool = False
 
 
 @dataclass(frozen=True)
@@ -59,6 +60,20 @@ class RankingItem:
 
     title: str
     content_fields: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class UmigameItem:
+    """One run's problem content for captions and comment reply snapshots."""
+
+    id: int
+    content_key: str
+    problem_text: str
+    truth: str
+    fact_sheet: list[str]
+    rule_text: str
+    hook: str
+    caption: str
 
 
 @dataclass(frozen=True)

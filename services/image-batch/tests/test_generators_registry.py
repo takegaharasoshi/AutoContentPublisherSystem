@@ -8,6 +8,7 @@ from app.generators import (
     gpt_image_single,
     gpt_quiz_multicut,
     ranking_prebuilt,
+    umigame_prebuilt,
 )
 
 
@@ -40,6 +41,11 @@ def test_resolve_generator_returns_gpt_quiz_multicut_generator() -> None:
 def test_resolve_generator_returns_ranking_prebuilt_generator() -> None:
     """The prebuilt ranking generator is registered."""
     assert resolve_generator("ranking-prebuilt") is ranking_prebuilt.generate
+
+
+def test_resolve_generator_returns_umigame_prebuilt_generator() -> None:
+    """The prebuilt umigame generator is registered."""
+    assert resolve_generator("umigame-prebuilt") is umigame_prebuilt.generate
 
 
 def test_resolve_generator_rejects_unknown_name() -> None:

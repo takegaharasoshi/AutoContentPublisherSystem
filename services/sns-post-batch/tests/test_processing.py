@@ -1,5 +1,7 @@
 """Tests for SNS posting processing behavior."""
 
+import datetime
+
 from unittest.mock import ANY, Mock
 
 import app.processing as processing
@@ -24,6 +26,7 @@ def _run(monkeypatch, accounts, get_post, **overrides):
     connection = Mock()
     generated_media = overrides.pop("generated_media", _media())
     stories_enabled = overrides.pop("stories_enabled", False)
+    problem_snapshot_enabled = overrides.pop("problem_snapshot_enabled", False)
     caption_text = overrides.pop("caption_text", None)
     monkeypatch.setattr(processing, "get_post", get_post)
     monkeypatch.setattr(processing, "create_pending_post", Mock(return_value=101))
@@ -50,6 +53,7 @@ def _run(monkeypatch, accounts, get_post, **overrides):
         caption_template=CaptionTemplate(3, "caption"),
         generated_media=generated_media,
         stories_enabled=stories_enabled,
+        problem_snapshot_enabled=problem_snapshot_enabled,
         env_name="prod",
         set_code="set-a",
         s3_bucket="configured-bucket",
@@ -448,3 +452,113 @@ def test_processing_does_not_create_story_for_feed_image(monkeypatch) -> None:
     assert result == processing.ProcessingResult(1, True)
     processing.create_pending_post.assert_called_once()
     assert processing.create_pending_post.call_args.kwargs["media_type"] == "feed_image"
+
+
+def test_processing_writes_snapshot_after_reel_commit_before_story(monkeypatch) -> None:
+    states = iter(
+        [None, None, Post(101, "success", "reel", "reel-post"),
+         Post(102, "success", "story", "story-post")]
+    )
+    events: list[str] = []
+    posted_at = datetime.datetime(2026, 9, 26, 11, 0, 12)
+    update_success = Mock(side_effect=lambda *args, **kwargs: (
+        events.append("reel-success" if args[1] == 101 else "story-success")
+        or posted_at
+    ))
+    def snapshot_after_commit(cursor, connection, **kwargs):
+        assert connection.commit.call_count == 3
+        events.append("snapshot")
+
+    write_snapshot = Mock(side_effect=snapshot_after_commit)
+
+    result, cursor, connection = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        stories_enabled=True,
+        problem_snapshot_enabled=True,
+        create_pending_post=Mock(side_effect=[101, 102]),
+        update_post_success=update_success,
+        write_problem_snapshot=write_snapshot,
+    )
+
+    assert result == processing.ProcessingResult(1, True)
+    assert events == ["reel-success", "snapshot", "story-success"]
+    write_snapshot.assert_called_once_with(
+        cursor,
+        connection,
+        set_id=1,
+        set_code="set-a",
+        generation_run_id=2,
+        media_id="post",
+        posted_at=posted_at,
+        s3_bucket="configured-bucket",
+        s3_client=ANY,
+    )
+
+
+def test_processing_does_no_snapshot_io_when_flag_is_false(monkeypatch) -> None:
+    states = iter([None, Post(101, "success", "container", "post")])
+    write_snapshot = Mock()
+    result, cursor, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        problem_snapshot_enabled=False,
+        write_problem_snapshot=write_snapshot,
+    )
+    assert result == processing.ProcessingResult(1, True)
+    write_snapshot.assert_not_called()
+    cursor.execute.assert_not_called()
+
+
+def test_processing_does_not_snapshot_feed_image_even_when_enabled(monkeypatch) -> None:
+    states = iter([None, Post(101, "success", "container", "post")])
+    write_snapshot = Mock()
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        problem_snapshot_enabled=True,
+        write_problem_snapshot=write_snapshot,
+    )
+    assert result == processing.ProcessingResult(1, True)
+    write_snapshot.assert_not_called()
+
+
+def test_processing_preserves_success_after_snapshot_failure(
+    monkeypatch, caplog
+) -> None:
+    states = iter([None, Post(101, "success", "container", "post")])
+    write_snapshot = Mock(side_effect=RuntimeError("S3 failed"))
+    result, _, connection = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        problem_snapshot_enabled=True,
+        write_problem_snapshot=write_snapshot,
+    )
+    assert result == processing.ProcessingResult(1, True)
+    processing.update_post_success.assert_called_once()
+    assert connection.commit.call_count == 3
+    connection.rollback.assert_called_once()
+    assert "問題スナップショットの出力に失敗" in caplog.text
+
+
+def test_processing_does_not_snapshot_failed_reel(monkeypatch) -> None:
+    states = iter([None, Post(101, "failed", None, None)])
+    write_snapshot = Mock()
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        generated_media=_media("mp4"),
+        problem_snapshot_enabled=True,
+        create_container=Mock(side_effect=InstagramRequestFailed("bad", None)),
+        write_problem_snapshot=write_snapshot,
+    )
+    assert result == processing.ProcessingResult(1, False)
+    write_snapshot.assert_not_called()

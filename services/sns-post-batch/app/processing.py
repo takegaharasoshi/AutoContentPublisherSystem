@@ -19,6 +19,7 @@ from .instagram_api import (
 from .media_types import MEDIA_TYPE_REEL, MEDIA_TYPE_STORY, derive_media_type
 from .models import CaptionTemplate, GeneratedMediaRef, SnsAccount
 from .post_media import ensure_post_media
+from .problem_snapshot import write_problem_snapshot
 from .posts import (
     create_pending_post,
     get_post,
@@ -93,6 +94,7 @@ def _process_account_media(
     generated_media: GeneratedMediaRef,
     media_type: str,
     save_caption_snapshot: bool,
+    problem_snapshot_enabled: bool,
     env_name: str,
     set_code: str,
     s3_bucket: str,
@@ -228,13 +230,35 @@ def _process_account_media(
             container_id,
             urlopen=urlopen,
         )
-        update_post_success(
+        posted_at = update_post_success(
             cursor,
             post_id,
             platform_post_id=platform_post_id,
             api_response=api_response,
         )
         connection.commit()
+        if problem_snapshot_enabled and media_type == MEDIA_TYPE_REEL:
+            try:
+                write_problem_snapshot(
+                    cursor,
+                    connection,
+                    set_id=set_id,
+                    set_code=set_code,
+                    generation_run_id=generation_run_id,
+                    media_id=platform_post_id,
+                    posted_at=posted_at,
+                    s3_bucket=s3_bucket,
+                    s3_client=s3_client,
+                )
+            except Exception:
+                logger.warning(
+                    "問題スナップショットの出力に失敗: "
+                    "generation_run_id=%s media_id=%s",
+                    generation_run_id,
+                    platform_post_id,
+                    exc_info=True,
+                )
+                _rollback_safely(connection)
         return True
     except InstagramRequestFailed as exc:
         logger.error(
@@ -303,6 +327,7 @@ def process_target_generation_run(
     caption_template: CaptionTemplate | None,
     generated_media: GeneratedMediaRef,
     stories_enabled: bool = False,
+    problem_snapshot_enabled: bool = False,
     env_name: str,
     set_code: str,
     s3_bucket: str,
@@ -332,6 +357,7 @@ def process_target_generation_run(
             generated_media=generated_media,
             media_type=media_type,
             save_caption_snapshot=True,
+            problem_snapshot_enabled=problem_snapshot_enabled,
             env_name=env_name,
             set_code=set_code,
             s3_bucket=s3_bucket,
@@ -353,6 +379,7 @@ def process_target_generation_run(
                 generated_media=generated_media,
                 media_type=MEDIA_TYPE_STORY,
                 save_caption_snapshot=False,
+                problem_snapshot_enabled=False,
                 env_name=env_name,
                 set_code=set_code,
                 s3_bucket=s3_bucket,
