@@ -93,14 +93,6 @@
 <thead><tr><th>タイトル</th><th>種別</th><th>ステータス</th><th>条件（満たされたら何をするか）</th><th>リンク</th><th>更新日</th></tr></thead>
 <tbody>
 <tr>
-  <td>ウミガメのコメント返信を継続改善するため、受信・判定・返信の全記録を残し夜間バッチで Aurora に蓄積する</td>
-  <td>単発</td>
-  <td><span class="badge badge-future">待機</span></td>
-  <td>Phase 21-6c の着手時（<code>/step 21-6c</code> の起動時）に転記下書きを開発計画へ転記する（21-6c に「Reply Lambda が 1 コメント 1 JSON を S3 へ記録」を追加 + リリース後の新ステップ 21-7b「06:00 の insights 実行に相乗りして S3 → Aurora へ取り込み、取り込み済みは消す」）</td>
-  <td><a href="umigame-comment-reply-logging.md">MD</a></td>
-  <td>2026-09-26</td>
-</tr>
-<tr>
   <td>プラットフォーム展開（TikTok を第一候補に、当たりの兆しが出たセットを他プラットフォームへ展開する）</td>
   <td>単発</td>
   <td><span class="badge badge-future">再醸成待ち</span></td>
@@ -115,6 +107,13 @@
 <div class="table-wrap"><table data-cards data-card-extra="5">
 <thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
 <tbody>
+<tr>
+  <td>ウミガメのコメント返信を継続改善するため、受信・判定・返信の全記録を残し夜間バッチで Aurora に蓄積する</td>
+  <td><span class="badge badge-fixed">採用</span></td>
+  <td>捕捉 → 壁打ち 1 回（2026-09-26）で方針確定し、開発計画へ展開: <a href="../plans/development-plan.html#step-21-6c">21-6c</a>（Reply Lambda が 1 コメント 1 JSON を S3 へ記録・username は持たない）/ <a href="../plans/development-plan.html#step-21-6f">21-6f</a>（書き込み権限）/ 新ステップ <a href="../plans/development-plan.html#step-21-7b">21-7b</a>（06:00 の insights 実行に相乗りして Aurora へ取り込み・S3 は 30 日で自動削除）</td>
+  <td><a href="umigame-comment-reply-logging.md">MD</a></td>
+  <td>2026-09-26</td>
+</tr>
 <tr>
   <td>ウミガメのスープのコメント返信（はい / いいえ判定）に AI サービス「Jev」を使う</td>
   <td><span class="badge badge-fixed">採用</span></td>

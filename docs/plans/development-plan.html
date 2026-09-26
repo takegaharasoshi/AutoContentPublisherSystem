@@ -591,13 +591,13 @@
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>PoC の handler を <code>services/comment-reply/</code> の Webhook（署名検証・自己返信スキップ → SQS）と Reply（S3 → 判定モジュール → Graph API）に分割・移植し、判定モジュールをパターン 1 / 2 の 2 実装にして環境変数で切り替える。人間プローブ用に、問題を選んでコメントを打つと 2 方式の返信を並べて返す<strong>ローカル試行ツール（CLI）</strong>も用意する。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。ローカル試行ツールは判定モジュールをそのまま呼び、Instagram と AWS は使わない。<code>infra/</code> には触れない（21-6f）。</p></div>
+<div data-field="overview"><p>PoC の handler を <code>services/comment-reply/</code> の Webhook（署名検証・自己返信スキップ → SQS）と Reply（S3 → 判定モジュール → Graph API）に分割・移植し、判定モジュールをパターン 1 / 2 の 2 実装にして環境変数で切り替える。人間プローブ用に、問題を選んでコメントを打つと 2 方式の返信を並べて返す<strong>ローカル試行ツール（CLI）</strong>も用意する。あわせて Reply が 1 コメントにつき 1 件の<strong>コメント記録 JSON</strong>（受信・判定・返信の全記録。継続改善用・取り込みは <a href="#step-21-7b">21-7b</a>）を S3 に書く。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。コメント記録の書き込み失敗で返信を止めない（警告ログのみ）。ローカル試行ツールは判定モジュールをそのまま呼び、Instagram と AWS は使わない。<code>infra/</code> には触れない（21-6f）。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li>pytest 全パス（要約行を貼る）。</li>
-<li>ローカル試行ツールで 1 問・1 コメントを 2 方式に通した出力を貼る。</li>
+<li>ローカル試行ツールで 1 問・1 コメントを 2 方式に通した出力を貼る（コメント記録 JSON がスキーマどおりに出ることを含む。ローカルではファイル出力）。</li>
 <li>日本語メッセージでコミット。</li>
 </ol>
 </section>
@@ -612,6 +612,7 @@
 <div class="plan-fold-inner">
 <p>旧 21-6 ①: Lambda コード <code>services/comment-reply/</code>（Webhook 受信〔署名検証・自己返信スキップ〕→ SQS enqueue / Reply〔S3 GET <code>problems/{media_id}.json</code> → 判定モジュール → Graph API 返信〕。PoC handler を分割・移植、pytest）。</p>
 <p>課題表の照合: <a href="../issues/index.html#I-031">I-031</a>（コメント返信用トークンの自動更新）は本ステップでは扱わない（独立ステップ <a href="#step-21-6g">21-6g</a> へ展開済み）。</p>
+<p><strong>コメント記録 JSON</strong>（アイデア <a href="../ideas/umigame-comment-reply-logging.md">umigame-comment-reply-logging</a> から 2026-09-26 に転記）: キー <code>comment-log/umigame-soup-1/dt=YYYY-MM-DD/{comment_id}.json</code>。項目 = コメント ID・親コメント ID・<code>media_id</code>・問題 ID・コメント者のアプリスコープ ID（<strong>username は持たない</strong>）・本文・時刻 4 種（Meta 側作成 / Webhook 受信 / 判定 / 返信）・判定ラベル・判定理由の短文（構造化出力に 1 項目足す）・返信文・返信 ID・モデル名・プロンプトと確定事実シートのバージョン・エラー。スキーマは<a href="../app/sets/umigame-soup-1.html">セット設計書</a> セクション 10 に書く。Webhook 受信時刻は SQS メッセージに載せて Reply へ渡す。</p>
 </div>
 </details>
 <details class="plan-fold" data-field="record">
@@ -696,7 +697,7 @@
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p><code>CommentReplyStack</code>（Webhook → SQS + DLQ → Reply Lambda）と DLQ アラームを CDK で構築し、インフラ設計書を実態に合わせる。判定方式の既定値は 21-6e の選定結果にする。</p></div>
+<div data-field="overview"><p><code>CommentReplyStack</code>（Webhook → SQS + DLQ → Reply Lambda）と DLQ アラームを CDK で構築し（Reply Lambda には <code>comment-log/</code> プレフィックスへの <code>s3:PutObject</code> を付ける。21-6c のコメント記録用）、インフラ設計書を実態に合わせる。判定方式の既定値は 21-6e の選定結果にする。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。VPC 外・NAT 不要の構成を維持する。<code>cdk deploy</code> はユーザーの人間ゲート。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
@@ -794,6 +795,49 @@
 <summary>4. 実装の細部・背景 <span class="plan-hint">— ①〜④ の内訳</span></summary>
 <div class="plan-fold-inner">
 <p>① <a href="../app/operation.html">運用設計</a> 2.1 手順 2 の INSERT / UPDATE SQL 一式（<code>batch_sets</code> の <code>generator_name</code>・スナップショット出力フラグ、<code>prompt_configs</code>、<code>caption_templates</code>、<code>sns_accounts</code>、<code>audio_assets</code>） ② CDK: <code>image-batch-stack.ts</code> の Scheduler 1 件 + <code>insights-batch-stack.ts</code> の 2 件 ③ シークレットの名前・投入手順書（sns 用 + comment-reply 用） ④ 本番 Meta アプリの作成手順（PoC README を本番向けに転記: 公開モード・comments 購読・Webhook 先 = CommentReplyStack）。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-7b" data-step-id="21-7b" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-7b</strong><span class="plan-status">未着手</span></div>
+<h3>コメント記録の夜間取り込み（S3 → Aurora）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-7 の稼働開始後（21-6c のコメント記録が本番 S3 に溜まり始めていること）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>21-6c で S3 に書いているコメント記録 JSON を、インサイト収集の 06:00 実行に相乗りして Aurora の新テーブル <code>umigame_comment_logs</code> へ取り込み、振り返り用の SQL ビューを 1 本用意する。S3 側は 30 日のライフサイクルで自動削除する。コメント返信の継続改善（誤判定を拾う → 確定事実シート / プロンプトを直す → 回帰プローブに足す）の土台。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>Aurora の起動回数を増やさない（06:00 の実行に相乗り）。取り込みは <code>comment_id</code> 主キー + <code>INSERT IGNORE</code> で冪等。コメント者は ID のみ保存し username は持たない。ライフサイクルは<strong>初回取り込みの成功後に有効化</strong>する（先に有効化すると未取り込みのまま 30 日を超えた分が消える）。DDL 適用と <code>cdk deploy</code> はユーザーの人間ゲート。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>DDL（<code>umigame_comment_logs</code> + ビュー）のローカル MySQL <code>--dry-run</code> 成功。</li>
+<li>取り込み処理の pytest 全パス（サンプル JSON からの取り込みと再実行での冪等性を含む。要約行を貼る）。</li>
+<li><code>infra/</code> で jest 全パスと <code>cdk synth</code> 成功（要約行を貼る）。</li>
+<li>設計書（<a href="../app/data-model.html">データモデル</a>・<a href="../app/sets/umigame-soup-1.html">セット設計書</a>・<a href="../infra/stacks.html">スタック設計</a>）を実態に合わせ、プライバシーポリシー HTML に保存する情報と保持期限を書く。</li>
+<li>日本語メッセージでコミット。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → DDL の本番適用 → push → <code>cdk deploy</code>（ユーザー）。<code>services/</code> を触るため push 後は <code>/goal</code> でパイプラインを確認する。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで。stop after 25 turns。Meta の規約確認でユーザー ID を保存できないと分かったら、ID を持たない形に縮めて止まる。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— アイデアからの転記・設計時に決めること</span></summary>
+<div class="plan-fold-inner">
+<p>経緯: アイデア <a href="../ideas/umigame-comment-reply-logging.md">umigame-comment-reply-logging</a>（2026-09-26 に壁打ち → 採用）。返信経路は Aurora 停止中でも動く設計のため直接書けず、記録は S3 に 1 件 1 JSON で置き（CloudWatch Logs は 90 日で消え、取り込み元として扱いにくい）、夜間に Aurora へ移す。コスト試算は 1 日 1 万件でも S3 で月 2 ドル弱。</p>
+<p>設計時に決めること: ① 相乗りの形（insights-collection の SFN にステートを足すか、insights-batch に処理を足すか） ② Aurora 側の保持期限（例: 1 年。プライバシーポリシーと揃える） ③ Meta Platform Terms 上のユーザーデータ保存の要件（プライバシーポリシーへの記載・データ削除要求への対応経路） ④ ライフサイクル規則の置き場所（S3 バケットを定義するスタック）。</p>
+<p>完了時に確認待ちリストへ登録する項目: 本番 deploy の翌朝、前日分のコメント記録が <code>umigame_comment_logs</code> に入っていること（NG なら課題として起票）。</p>
+<p>課題表の照合: <a href="../issues/index.html#I-031">I-031</a>・<a href="../issues/index.html#I-032">I-032</a> が <code>services/comment-reply/</code> 周辺で該当するが、本件と独立のため同梱しない。他は該当なし。</p>
 </div>
 </details>
 <details class="plan-fold" data-field="record">
