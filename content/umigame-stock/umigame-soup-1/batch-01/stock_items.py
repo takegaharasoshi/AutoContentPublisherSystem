@@ -548,9 +548,9 @@ ITEMS: list[dict] = [
             {"role": "master", "text": "関係ありません。"},
         ],
         scene=(
-            "A man and a woman in summer clothes sitting at a table in a bright Japanese room, both smiling gently "
-            "while looking together at a single completely blank sheet of paper held between them, warm evening light "
-            "after summer rain outside the window; no pen, no hair dryer, no text on the paper, nobody sad."
+            "A man and a woman in summer clothes standing face to face in a bright Japanese room, firmly holding each "
+            "other's hands as if making a promise, both smiling gently; warm evening light after summer rain outside "
+            "the window; no paper, no letter, no notebook, no pen, no hair dryer, nobody sad."
         ),
         source_note=(
             "型: 意味誤誘導型。21-4a-3 ④ の型別分離（2026-09-22・ユーザー決定）で、人間ゲート通過済みの story 版 U18"
