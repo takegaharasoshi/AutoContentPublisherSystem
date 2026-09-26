@@ -709,7 +709,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="すいかが下した判定？",
+        hook="弟の勝利の真相は？",
         play_example=[
             {"role": "questioner", "text": "すいかは誰かが植えた？"},
             {"role": "master", "text": "いいえ。"},
@@ -872,7 +872,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="なぜおじいさんのお金？",
+        hook="お金の出所の真相は？",
         play_example=[
             {"role": "questioner", "text": "女の子は悪いことをしていた？"},
             {"role": "master", "text": "いいえ。"},
