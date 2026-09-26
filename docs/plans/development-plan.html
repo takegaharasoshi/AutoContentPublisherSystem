@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-26（<strong>21-6 を 21-6a〜f に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-26（<strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -608,10 +608,10 @@
 </div>
 </section>
 <details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 旧 21-6 ① と課題 I-031</span></summary>
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 旧 21-6 ① の内訳</span></summary>
 <div class="plan-fold-inner">
 <p>旧 21-6 ①: Lambda コード <code>services/comment-reply/</code>（Webhook 受信〔署名検証・自己返信スキップ〕→ SQS enqueue / Reply〔S3 GET <code>problems/{media_id}.json</code> → 判定モジュール → Graph API 返信〕。PoC handler を分割・移植、pytest）。</p>
-<p>課題表の照合: <a href="../issues/index.html">I-031</a>（コメント返信用トークンの自動リフレッシュ。パス型 = <code>/step 21-6</code>〔<code>services/comment-reply/</code>〕の起動時）は本ステップで要否を決める。</p>
+<p>課題表の照合: <a href="../issues/index.html#I-031">I-031</a>（コメント返信用トークンの自動更新）は本ステップでは扱わない（独立ステップ <a href="#step-21-6g">21-6g</a> へ展開済み）。</p>
 </div>
 </details>
 <details class="plan-fold" data-field="record">
@@ -725,11 +725,51 @@
 </div>
 </article>
 
+<article class="plan-step" id="step-21-6g" data-step-id="21-6g" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6g</strong><span class="plan-status">未着手</span></div>
+<h3>コメント返信トークンの自動更新（コメント判定とは独立した機能）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6f の完了後（更新対象の Secret <code>acps/prod/umigame-soup-1/comment-reply</code> が 21-6f で作られるため）。<strong>21-7 の稼働開始前に必須</strong>（リリースまでに入れる・2026-09-26 ユーザー決定）。</p>
+<p data-field="result"><strong>現況：</strong>未着手（課題 <a href="../issues/index.html#I-031">I-031</a> の展開）。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>コメント返信用の長期アクセストークン（60 日で失効）を<strong>週 1 回の定期実行</strong>で <code>GET /refresh_access_token</code> により更新し、Secret のトークンと <code>token_expires_at</code> を書き戻す。失敗時はアラームで通知する。インフラ設計書・運用設計書の「手動更新」を実態に合わせる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>コメント受信（Webhook / Reply Lambda）の処理には組み込まない（コメントが途絶えた期間に失効させないため、ついで更新の方式は採らない）。判定モジュール（21-6b〜e）には触れない。<code>cdk deploy</code> はユーザーの人間ゲート。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>更新処理の pytest 全パス（成功・API 失敗・Secret 書き戻しのケースを含む。要約行を貼る）。</li>
+<li><code>infra/</code> で jest 全パスと <code>cdk synth -c env=prod CommentReplyStack MonitoringStack</code> 成功。</li>
+<li><code>docs/infra/security.html</code> セクション 1.3・<code>docs/app/operation.html</code> セクション 5.4 を自動更新に書き換え、HTML のタグ対応・リンクの機械チェックが 0 件。</li>
+<li>日本語メッセージでコミット。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → <code>cdk deploy</code> → ステージングで更新処理を手動実行し、Secret のトークンと <code>token_expires_at</code> が更新されたこと・返信が引き続き付くことを確認（ユーザー）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/</code> <code>infra/</code> <code>docs/</code>）。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 構成の目安と I-031 の経緯</span></summary>
+<div class="plan-fold-inner">
+<p>構成の目安: 更新用の小さな Lambda（<code>services/comment-reply/</code> 内の別エントリポイント）+ EventBridge Scheduler（週 1 回）+ Secret への読み書き権限 + 失敗時のアラーム（既存 <code>createAlarm</code> パターン）。置き場（<code>CommentReplyStack</code> に同居か）は着手時に決める。Instagram の長期トークンの更新は、発行から 24 時間以上経過した有効なトークンが条件。</p>
+<p>経緯: 21-3 では手動更新（<code>token_expires_at</code> + リマインド）とし、I-031 で「21-6 の実装時に要否を決める・失効事故 2 回で自動化」と据え置いていた。2026-09-26 のアイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」の展開時に、ユーザー決定でリリース前の必須とし、コメント判定とは切り離した独立ステップにした。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
 <article class="plan-step" id="step-21-7" data-step-id="21-7" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-7</strong><span class="plan-status">未着手</span></div>
 <h3>アカウント・Meta アプリ・セット登録の準備</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-6f の完了後。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-6f・21-6g の完了後。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
