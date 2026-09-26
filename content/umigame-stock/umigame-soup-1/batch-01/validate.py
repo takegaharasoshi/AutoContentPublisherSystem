@@ -131,6 +131,8 @@ def check_item(it: dict) -> None:
 
     if not it["hook"] or len(it["hook"]) > HOOK_MAX:
         errors.append(f"{no}: hook が空または {HOOK_MAX} 字超（{len(it['hook'])} 字）")
+    elif not it["hook"].endswith("？"):
+        errors.append(f"{no}: hook は「？」で終える（2026-09-26 素材レビュー）: {it['hook']}")
     elif len(it["hook"]) < 8:
         warnings.append(f"{no}: hook が {len(it['hook'])} 字（12 字前後が目安）")
     if not it["rule_text"] or len(it["rule_text"]) > RULE_MAX:

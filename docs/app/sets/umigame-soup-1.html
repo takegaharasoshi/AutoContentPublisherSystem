@@ -86,7 +86,7 @@
 <tr><td>2</td><td><code>truth</code> 真相</td><td>AI 出題者の判定根拠・正解宣言時の開示文（版面には出さない）</td><td>必須。問題文と矛盾しない</td></tr>
 <tr><td>3</td><td><code>fact_sheet</code> 確定事実シート</td><td>「はい / いいえ / 関係ない」の判定根拠（場所・人物関係・時系列・「問題に関係ない事項」の明示）。真相の曖昧さ起因の矛盾回答・捏造回答をデータ側で防ぐ</td><td>8〜20 件（文字列の配列）</td></tr>
 <tr><td>4</td><td><code>expected_questions</code> 想定質問と期待回答</td><td>プローブテスト（21-4a）。正解に向かう質問・引っかけ・無関係な質問を混ぜる</td><td>15〜20 件（<code>{q, a}</code> の配列。<code>a</code> は はい / いいえ / 関係ない / 正解 のいずれか + 任意の補足）</td></tr>
-<tr><td>5</td><td><code>hook</code> フック文</td><td>つかみ帯（74px・1 行）</td><td>12 字前後</td></tr>
+<tr><td>5</td><td><code>hook</code> フック文</td><td>つかみ帯（74px・1 行）</td><td>12 字前後（上限 14 字）。<strong>「？」で終える</strong>（2026-09-26 の素材レビューでユーザー決定。<code>validate.py</code> で検査）</td></tr>
 <tr><td>6</td><td><code>rule_text</code> ルール帯</td><td>常時表示の遊び方（34px・2 行）</td><td>45 字前後。セット固定文の既定値あり（問題ごとに変えなくてよい）</td></tr>
 <tr><td>7</td><td><code>narration.problem</code> / <code>narration.rule</code> ナレーション cue</td><td>冒頭ナレーション。表示文とは別に、括弧・記号を落とし読点で間を整えた読み上げ用の文</td><td>2 cue の実測長合計 + 間 1.2 秒が <strong>21 秒以内</strong>（方式設計書 8.3 の予算検査。超過はビルドエラー）</td></tr>
 <tr><td>8</td><td><code>play_example</code> プレイ例</td><td>下部の吹き出し 3 往復（質問 → 質問を残したまま返答を追加）</td><td>6 要素（<code>{role: questioner|master, text}</code> の交互）。質問 16 字 / 返答 17 字以内（1 行）。<strong>3 往復のうち 1 つは「はい」</strong>（出題者が喜ぶポーズに切り替わる版面上の約束事）</td></tr>
@@ -169,7 +169,7 @@
 <h2 id="caption">6. キャプションの作り方</h2>
 <p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}</code> の 1 行</strong>とする。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b）。</p>
 <ul>
-  <li><strong>構成（PoC の実例）</strong>: 「【ウミガメのスープ 第 N 問】」+ 問題文の再掲 + 遊び方（「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ）+ ハッシュタグ（<code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart</code>）。ただし<strong>問題番号「第 N 問」は書かない</strong>（ストックは LRU で消費され投稿順が確定しないため。PoC の表記は本番では使わない）</li>
+  <li><strong>構成（PoC の実例）</strong>: 「【ウミガメのスープ 第 N 問】」+ 問題文の再掲 + 遊び方（「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ）+ ハッシュタグ（<code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart</code>。<code>#コメント即時返信</code> は 2026-09-26 の素材レビューで追加）。ただし<strong>問題番号「第 N 問」は書かない</strong>（ストックは LRU で消費され投稿順が確定しないため。PoC の表記は本番では使わない）</li>
   <li><strong>問題文の要約（問題固有の一言）は入れない</strong>（2026-09-24 の素材レビューでユーザー決定）: 見出しの直後に問題固有の一言を置いていたが、中身が問題文の要約になり、すぐ下の問題文と同じ話が 2 回出るように見えるため廃止した。構成は「見出し【探偵カメロックのウミガメのスープ】→ 問題文 → 遊び方 → ハッシュタグ」の 4 段で全問共通（<code>umigame_common.caption()</code> が組み立てる）</li>
   <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> のみのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Amazon Polly のためクレジット表記は不要（VOICEVOX 時代の常設クレジット行は本セットにはない）</li>
   <li>テンプレートを <code>{{caption}}</code> だけにする理由: ハッシュタグの固定部を分けると「問題固有のタグを足したい」ときに 2 箇所を見ることになり、素材項目 14 項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
