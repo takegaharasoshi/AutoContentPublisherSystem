@@ -1,15 +1,15 @@
 ---
 title: umigame-soup-1 の動画音声を Gemini 3.8 Flash TTS で作る
 slug: umigame-tts-gemini-flash
-status: 待機            # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
+status: 採用            # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
 kind: 単発               # 単発 | 構想
 created: 2026-09-26
 updated: 2026-09-26
-condition: "開発レーン（Phase 21）のセッションが空き次第、下の転記下書きを development-plan に 21-5c として起票する。21-7（稼働開始）より前に完了させる"
+condition: ""
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: ""          # クローズ時の昇格先リンク / 見送り理由
+disposition: "../plans/development-plan.html#step-21-5c（開発計画 21-5c として起票・2026-09-26）"          # クローズ時の昇格先リンク / 見送り理由
 ---
 
 ## 要旨
@@ -20,7 +20,7 @@ umigame-soup-1（探偵カメロック）のナレーションを Amazon Polly�
 30 歳・お相撲さん体型の食いしん坊探偵・丸く太く柔らかい・子供に語り掛ける優しいパパ・謎を語るときは得意げ）。
 問題文とルール文は **1 回の呼び出しで読ませて無音で切り分ける**（別々に作ると口調がずれる）。演技をつけると尺が伸びるため、
 前後の無音を削ったうえで 21 秒予算を超える分だけ話速を上げ、合計 19 秒に合わせる（Polly の 125% と同じ扱い。PoC で違和感なしを確認できたのは 1.19 倍まで）。
-14 本は承認済みだがリリース前に作り直す（21-7 より前）。開発レーンの転記待ちのため **待機**。
+14 本は承認済みだがリリース前に作り直す（21-7 より前）。開発計画 [21-5c](../plans/development-plan.html#step-21-5c) として起票済み（**採用**）。
 
 ## 前提条件・再検討トリガー
 
@@ -29,7 +29,7 @@ umigame-soup-1（探偵カメロック）のナレーションを Amazon Polly�
 - 演技指示（`g4-chubby` の `style`）:「子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。」
 - PoC 資材: `content/video-build/umigame-soup-1/poc/gemini-tts/`（`run_poc.py`・`variants.json`。音声・動画の `out/` は git 管理外）
 
-### 転記下書き（開発レーンで development-plan の Phase 21 に 21-5c として起票する）
+### 転記下書き（2026-09-26 に development-plan の Phase 21 へ 21-5c として転記済み。正は計画書側）
 
 - **内容**: ① `scripts/narration_gemini.py` を新設（PoC の `run_poc.py` から合成部分を移す: 保存済み声 ID で 2 cue を 1 回で合成 → 文字数比に最も近い無音で切り分け → 前後の無音を削る → 21 秒予算を超える分だけ atempo で 19 秒に合わせる。`narration.json` に model・voice_id・style・tempo・切断位置を残し、texts・voice・style が一致すればキャッシュを使う）② `build.py` の TTS を Gemini 版に切り替える（Polly 版・VOICEVOX 版はアダプタとして残す）③ セット別設計書 `docs/app/sets/umigame-soup-1.html` セクション 8 を Gemini に書き換え（decision コールアウトに PoC の経緯）、声 ID と説明文・演技指示を `assets/design.json` へ昇格 ④ 14 問を再合成・再ビルドし、レビューシートで全数試聴 ⑤ 承認後に 21-5b ① と同じ手順で両環境へ再反映（S3 の動画差し替え・ストック更新）
 - **完了条件**: pytest 全パス / 14 本とも予算内でビルド成功し、各問の話速倍率が 1.19 以下（超えた問は取り直し）/ `approved.txt` をユーザー承認で更新 / 両環境のストックと S3 の動画が新しい版に差し替わっていることを確認クエリで提示
@@ -57,3 +57,4 @@ umigame-soup-1（探偵カメロック）のナレーションを Amazon Polly�
 - 着地: 開発レーン（Phase 21）への転記が要るため **待機**。転記下書きは「前提条件」節
 - 追記（同日）: 商用条件とクレジット表記を確認し、表記は不要と結論（出典: https://ai.google.dev/gemini-api/terms ・ https://policies.google.com/terms/generative-ai/use-policy ）。無料枠では入力と出力が Google の製品改善に使われるが、送るのは公開予定の問題文のみのため許容
 - 積み残し: logic-training-1・pref-ranking-1 への展開は今回は扱わない
+- 転記（同日）: ユーザーの指示で開発レーンとして development-plan の Phase 21 に 21-5c を起票し、21-7 の着手条件に 21-5c を追加。構造検査 `tools/docs_check.py --plan-only` OK。ステータスを **採用** に更新

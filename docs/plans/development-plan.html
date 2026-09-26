@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-26（<strong>21-5c を起票</strong>: アイデア「<a href="../ideas/umigame-tts-gemini-flash.md">Gemini 3.8 Flash TTS で動画音声を作る</a>」を採用。ナレーションを声 G4 の Gemini TTS へ切り替えて 14 本を作り直す。21-7 の着手条件に追加）。前回: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -70,7 +70,7 @@
 <summary>フェーズの背景・作問方針の決定経緯 <span class="plan-hint">— 企画の経緯・ストックの単位・2026-09-07 の方針変更</span></summary>
 <div class="plan-fold-inner">
 <blockquote>経緯: アイデア体系で 2 回の壁打ち（2026-08-28。企画・事業面の論点は全決着）→ 待機（採用条件 = Meta コメント Webhook + AI 自動返信 PoC の成功）→ <strong>PoC 成功（2026-09-03）</strong>→ 採用・本フェーズ起票。インプットは<a href="../ideas/umigame-soup-set.html">アイデア詳細</a>（設計書に非ず。設計 Fix は 21-3 で <code>docs/app/</code> <code>docs/infra/</code> 側で行う）と PoC 資材 <code>poc/umigame-comment-webhook/</code> + <code>UmigamePocStack</code>（実測: 公開モード必須・App Review 不要・役割なしの一般アカウントのコメントも届く・受信 → 返信 約 4 秒・署名鍵は Instagram アプリシークレット）。PoC 資材（Meta アプリ + テスト用アカウント <code>test_tkghr</code>）は課題体系 <a href="../issues/index.html#I-027">I-027</a> の決定どおりコメント経路のステージング面として恒久利用する。<code>set_code</code> は 21-1（2026-09-03）で <code>umigame-soup-1</code> に確定した（決定一覧は <a href="../app/requirements-notes-set4.html">壁打ち記録</a>）。
-<strong>ストックの単位は「問題文 + 真相 + 確定事実シート」だけではなく、リール 1 本を作るのに要る素材一式</strong>（イラスト作成用プロンプト・フック文・プレイ例・キャプション等）とし、その項目は<strong>完成版リールの PoC（21-2）で動画のイメージを固めてから確定</strong>する（2026-09-03 のユーザー指示。動画のイメージがないままストックをレビューするのは難しいため）。<strong>動画生成は本セットから Remotion 公式の Agent Skills「Remotion Skills 2.0」を使ってコンポジションを作る</strong>（2026-09-03 ユーザー決定。2.0 は <a href="https://x.com/Remotion/status/2089295038932996194">2026-08-17 の公式発表</a>で、要点は Sub-skills〔remotion-create / remotion-markup / remotion-render / remotion-docs 等 12 本への分割〕・Interactive〔Studio での編集性〕・Taste-neutral〔デザインの好みを押し付けない指針〕。導入は <code>npx remotion skills add</code>〔公式既定は <code>.agents/skills</code> に入れ <code>.claude/skills</code> をシンボリックリンクにする〕または <code>npx skills add remotion-dev/skills</code>。導入時点の最新版を使い、導入した版はコミットで固定する）。レンダリングの実行経路は既存どおり <code>build.py</code> からの Docker 委譲（<code>npx remotion render</code>）を維持し、スキルはコンポジションの設計・実装の指針として使う。ステップ順は 21-1 → 21-2 → 21-3 → 21-4a → 21-4a-2 → 21-4a-3 → 21-4a-4 → 21-4a-5 → 21-4b → 21-5a/b → 21-6 → 21-7 → 21-8（21-6 は 21-4・21-5 と独立のため前倒し可。21-4a-2/3 は 2026-09-07 の作問方針変更で分割、21-4a-4/5 は 2026-09-22 の型別分離で追加）</blockquote>
+<strong>ストックの単位は「問題文 + 真相 + 確定事実シート」だけではなく、リール 1 本を作るのに要る素材一式</strong>（イラスト作成用プロンプト・フック文・プレイ例・キャプション等）とし、その項目は<strong>完成版リールの PoC（21-2）で動画のイメージを固めてから確定</strong>する（2026-09-03 のユーザー指示。動画のイメージがないままストックをレビューするのは難しいため）。<strong>動画生成は本セットから Remotion 公式の Agent Skills「Remotion Skills 2.0」を使ってコンポジションを作る</strong>（2026-09-03 ユーザー決定。2.0 は <a href="https://x.com/Remotion/status/2089295038932996194">2026-08-17 の公式発表</a>で、要点は Sub-skills〔remotion-create / remotion-markup / remotion-render / remotion-docs 等 12 本への分割〕・Interactive〔Studio での編集性〕・Taste-neutral〔デザインの好みを押し付けない指針〕。導入は <code>npx remotion skills add</code>〔公式既定は <code>.agents/skills</code> に入れ <code>.claude/skills</code> をシンボリックリンクにする〕または <code>npx skills add remotion-dev/skills</code>。導入時点の最新版を使い、導入した版はコミットで固定する）。レンダリングの実行経路は既存どおり <code>build.py</code> からの Docker 委譲（<code>npx remotion render</code>）を維持し、スキルはコンポジションの設計・実装の指針として使う。ステップ順は 21-1 → 21-2 → 21-3 → 21-4a → 21-4a-2 → 21-4a-3 → 21-4a-4 → 21-4a-5 → 21-4b → 21-5a/b → 21-5c → 21-6 → 21-7 → 21-8（21-6 は 21-4・21-5 と独立のため前倒し可。21-4a-2/3 は 2026-09-07 の作問方針変更で分割、21-4a-4/5 は 2026-09-22 の型別分離で追加）</blockquote>
 <blockquote class="decision">
 <strong>作問方針の変更（2026-09-07・ユーザー決定。21-4a-2 / 21-4a-3 の前提）</strong>: 初稿は「モチーフを決める → 連想 → 言い方を変える（ここでコアが決まる）→ 不思議にする」の工程を踏まず、制約（字数・オリジナル性・一年中見える星座 等）から逆算して書いたため、引っ掛けのない問題になった。以後は<strong>作問手順をスキルに固定し、スキルで 1 問を試作して問題とスキルを同時にレビューし、スキルが確定してから残りを書く</strong>。<strong>型別の分離（2026-09-22・ユーザー決定。21-4a-3 の再定義と 21-4a-4/5 の前提）</strong>: 参照記事に「モチーフのミスリードを起点にする作り方では物語復元型の作問はできない」と明記されているのに、story 型スキルがミスリード（誤った補完 X）をコアの必須要件にしていた構造矛盾が U20 の 5 候補連続 NG で表面化。<strong>意味誤誘導型（7 問 + スキル一時 Fix = 21-4a-3）と物語復元型（作り方の壁打ちとスキル再設計 = 21-4a-4、7 問の作問 = 21-4a-5）に分離</strong>した。story 型として作った U17〜U19 は削除し、うち U18 は意味誤誘導型に書き換えて U15（面白さで劣る）と差し替える（U15・U17・U19 は欠番）。
 参考の正は <a href="https://note.com/suekai0217/n/n35128e606a9b">note「ウミガメのスープの作り方」（suekai0217）</a>: 基本の 4 ステップ・良い問題の 3 条件（コアが明確・動線がある・現実離れしない）・2 類型（物語復元型 = A→C 切り出し / 意味誤誘導型）・納得感の優先。
@@ -507,6 +507,46 @@
 </details>
 
 <div class="plan-group" data-plan-group="active">
+<article class="plan-step" id="step-21-5c" data-step-id="21-5c" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-5c</strong><span class="plan-status">未着手</span></div>
+<h3>ナレーションを Gemini 3.8 Flash TTS（声 G4）へ切り替えて 14 本を作り直す</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（21-5b 完了済み。Gemini API キーは <code>~/.config/gemini/api_key</code> に保存済み）。<a href="#step-21-7">21-7</a>（稼働開始）より前に完了させる。</p>
+<p data-field="result"><strong>現況：</strong>未着手。アイデア「<a href="../ideas/umigame-tts-gemini-flash.md">Gemini 3.8 Flash TTS で動画音声を作る</a>」の PoC（2026-09-26・2 問 × 15 パターン）で切り替えと声 G4「kamerock-chubby」を決定済み。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>umigame-soup-1 のナレーションを Amazon Polly（Takumi・125%）から Gemini 3.8 Flash TTS（説明文から作った声 G4・<code>voice_1m8w495yafud</code>）へ切り替える。合成スクリプトをビルド経路に組み込み、承認済みの 14 本を作り直して全数試聴のうえ、両環境の S3 動画とストックを差し替える。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> は触らない（ビルドはローカル実行のため AWS の Secret も不要）。Polly 版・VOICEVOX 版のアダプタは残す。問題文・ルール文などストックの文言は変えない。<code>batch_sets.is_active = 0</code> のまま（稼働開始は 21-7）。クレジット表記は不要（2026-09-26 に利用規約で確認済み）のため、キャプションと <code>validate.py</code> は変えない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>content/video-build/umigame-soup-1</code> の pytest 全パス（要約行を貼る）。</li>
+<li>14 問ともビルドが成功し、各問の <code>narration.json</code> で合計 21 秒以内かつ話速倍率 1.19 以下（14 問分の一覧を貼る。超えた問は取り直す）。</li>
+<li>ユーザーの全数試聴を経て <code>work/approved.txt</code> が更新されている（人間ゲート）。</li>
+<li>publish の本実行後、ローカル MySQL・Aurora とも <code>verify_prebuilt.sql</code> の結果が 14 件で、S3 の動画 14 本の更新時刻が再ビルド後であること（出力を貼る）。</li>
+<li>セット別設計書セクション 8・方式設計書（ナレーションの記述）・README を Gemini に合わせて更新し、計画・記録を更新して日本語メッセージでコミットし、<code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>① 14 本の全数試聴（読み間違い・問題文とルール文の口調のつながり・声の揺れ・速度の違和感）と <code>approved.txt</code> の更新（ユーザー。ゴール対象外）② publish 本実行（S3 上書きと Aurora 更新）の実行承認。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/video-build/umigame-soup-1/</code>・<code>docs/</code>）。1 問あたりの取り直しは 3 回まで（倍率 1.19 超や読み間違いが続いたら停止して提示）。Gemini API の課金・レート制限エラーはその場で停止して提示。stop after 30 turns。やらないこと: 21-7 の稼働開始・他セットへの展開。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 1 回で合成して切り分け・19 秒に合わせる・声 ID と演技指示</span></summary>
+<div class="plan-fold-inner">
+<p>① <code>scripts/narration_gemini.py</code> を新設し、PoC の <code>poc/gemini-tts/run_poc.py</code> から合成部分を移す: 保存済みの声 ID で問題文とルール文を <strong>1 回の呼び出し</strong>で読ませ（別々に作るとルール文で口調が変わる）、文字数比に最も近い 0.3 秒以上の無音で 2 つに切り分け、前後の無音を 0.05 秒残して削る。合計が 21 秒を超える分だけ ffmpeg の <code>atempo</code> で話速を上げて 19 秒に合わせる（Polly の 125% と同じ扱い。PoC で違和感なしを確認できたのは 1.19 倍まで）。<code>narration.json</code> に model・voice_id・style・tempo・切断位置を残し、texts・voice・style が一致すればキャッシュを使う。API は <code>POST /v1beta/interactions</code>（モデル <code>gemini-3.8-flash-tts</code>・<code>speech_metadata.style</code> で演技指示・<code>speech_config</code> で声 ID）。② <code>build.py</code> の TTS を Gemini 版に切り替える（Polly 版は選べる形で残す）。③ 声 ID・説明文・演技指示を <code>assets/design.json</code> へ昇格する。演技指示は「子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに語り、続けて同じ口調のまま親しげに呼びかける。間は短く、早口ぎみの速いテンポで。」、声の説明文は PoC の <code>variants.json</code> の <code>g4-chubby</code>。ID が失われても説明文から作り直せるが、同じ声になる保証はない。④ 14 問を再合成・再ビルドし、レビューシートで全数試聴する。同じ設定でも取り直しで尺が 0.7〜2.3 秒揺れる（PoC 実測）ため、1 問ずつ聞く。⑤ 承認後、21-5b ① と同じ <code>publish.py</code> で両環境へ反映する（S3 キーは content_key から決まるため同じキーへの上書きになり、ストックの UPDATE も冪等）。実装とテストはまとまったコード生成のため Codex へ委譲してよい（指示文に「<code>docs/</code> は触らない」を含める）。確認待ち: 該当なし（稼働後の効果は 21-7 以降のインサイトで見る）。課題表: 該当なし（<code>content/video-build/umigame-soup-1</code> で照合。2026-09-26）。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
 
 
 
@@ -782,7 +822,7 @@
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-7</strong><span class="plan-status">未着手</span></div>
 <h3>アカウント・Meta アプリ・セット登録の準備</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-6f・21-6g の完了後。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-5c・21-6f・21-6g の完了後。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
