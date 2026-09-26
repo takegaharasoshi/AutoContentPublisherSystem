@@ -1205,7 +1205,7 @@ ITEMS: list[dict] = [
                 "a": "正解",
             },
         ],
-        hook="免許なしで家族とドライブ？",
+        hook="無免許男の大暴走？",
         play_example=[
             {"role": "questioner", "text": "男は法律を破ってる？"},
             {"role": "master", "text": "いいえ。"},
