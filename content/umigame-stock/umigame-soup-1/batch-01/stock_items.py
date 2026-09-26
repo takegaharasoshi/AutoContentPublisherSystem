@@ -710,7 +710,7 @@ ITEMS: list[dict] = [
             {"role": "master", "text": "いいえ。"},
             {"role": "questioner", "text": "男はその曲を知ってた？"},
             {"role": "master", "text": "はい！"},
-            {"role": "questioner", "text": "CDで覚えた？"},
+            {"role": "questioner", "text": "男は音楽の専門家？"},
             {"role": "master", "text": "いいえ。"},
         ],
         scene=(
