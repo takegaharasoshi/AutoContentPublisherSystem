@@ -28,7 +28,7 @@ from umigame_common import (  # noqa: E402
 )
 
 PROBLEM_MIN, PROBLEM_MAX = 78, 85
-FACT_MIN, FACT_MAX = 8, 12
+FACT_MIN, FACT_MAX = 8, 20  # 上限は 2026-09-26 に 12 → 20（PoC の目安がそのまま上限になっていたため。セット別設計書 4）
 QUESTION_MIN, QUESTION_MAX = 15, 20
 HOOK_MAX = 14  # 12 字前後（74px・1 行）
 RULE_MAX = 50  # 45 字前後（34px・2 行）

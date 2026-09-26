@@ -840,7 +840,7 @@ LIMIT 1;</code></pre>
       <tr><td><code>difficulty</code></td><td><code>TINYINT UNSIGNED NOT NULL</code>。難易度 1〜5（運用の目安。取得の軸にはしない）</td></tr>
       <tr><td><code>problem_text</code></td><td><code>VARCHAR(255) NOT NULL</code>。問題文（78〜85 字。版面の問題カード）</td></tr>
       <tr><td><code>truth</code></td><td><code>TEXT NOT NULL</code>。真相</td></tr>
-      <tr><td><code>fact_sheet</code></td><td><code>JSON NOT NULL</code>。確定事実シート（文字列の配列・8〜12 件）</td></tr>
+      <tr><td><code>fact_sheet</code></td><td><code>JSON NOT NULL</code>。確定事実シート（文字列の配列・8〜20 件。上限は 2026-09-26 に 12 → 20。<a href="sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>）</td></tr>
       <tr><td><code>expected_questions</code></td><td><code>JSON NOT NULL</code>。想定質問と期待回答（<code>[{"q": …, "a": …}]</code>・15〜20 件。プローブテスト用。DB に入れるのは「レビュー済みの検証セット」を投入物と一緒に残すため）</td></tr>
       <tr><td><code>hook</code></td><td><code>VARCHAR(40) NOT NULL</code>。フック文（12 字前後）</td></tr>
       <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（45 字前後。セット既定文）</td></tr>
