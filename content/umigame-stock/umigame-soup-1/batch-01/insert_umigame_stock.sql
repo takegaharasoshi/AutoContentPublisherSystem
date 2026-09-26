@@ -35,34 +35,6 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「影」（作問スキル umigame-problem-writer の抽選 3 語〔影・鉛筆・ゴミ出し〕から選択）→ 連想「影が薄い（慣用句）・レントゲンの影」→ 抽象化（影が薄い = 存在感 / 写真に写る影）→ 常識「影が薄いと言われたら傷つく」の逆。着想元の既存問題なし（台帳 #22「外科医は母親」の役割の思い込みとは構造が異なり、言った相手が医者であることは核ではない。核は「影」の多義）。2026-09-07 のレビューで「分かりやすすぎる」の指摘を受け、対称形（半年前に濃くなった）・丁寧語・「同じ相手」の手がかりを外して難易度を 3 → 4 に上げた。差し替え前の 2 案（貸出カード / カシオペヤ座）の経緯は STATUS.md。', 1);
 
--- U11 鏡文字で早く着く男たち
-INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
-    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
-    caption, source_note, is_active)
-VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
-        '002-mirror-letters', '鏡文字で早く着く男たち', 4,
-        '働く男たちは自分たちの名前を、わざと鏡文字で大きく書いている。そのままではとても読みにくいのに、このおかげで男たちの仕事がやりやすくなっている。どういうこと？',
-        '男たちは救急隊員。救急車の前の面に書いた「救急」の文字を、左右を裏返した鏡文字にしてある。前を走る車の運転手がバックミラーで見ると正しく「救急」と読めるので、後ろから救急車が来たことにすぐ気づいて道を譲ってくれる。だから現場や病院に早く着ける。',
-        '["男たちは名前を隠したくて鏡文字にしたのではなく、読んでほしくて書いた","鏡文字は間違えて書いたのではなく、わざとそうした","文字は男たちの持ち物に書いてあり、男たちはそれと一緒に移動する","文字を読むのは男たちではなく、男たちより先を進んでいる他の人である。読む人は振り返らず、鏡に映して正しく読む","文字がどこに書いてあり、誰がどんな鏡で読むかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","男たちの仕事は、急いで行き先へ着かなければならない仕事である","文字は仕事で使う物に書いてあり、仕事中に他の人に見せている","文字を読んだ人が男たちのために何かをしてくれるので、早く着けて仕事がやりやすい","男たちは芸術家・子ども・暗号の専門家・警察官ではない","行き先は毎回違う。鏡文字にすることは法律で禁じられていない","男たちの名前が何か・年齢・人数は問題に関係ない"]',
-        '[{"q":"男たちは名前を隠したいのですか？","a":"いいえ"},{"q":"鏡文字は間違えて書いたのですか？","a":"いいえ"},{"q":"男たちは芸術家ですか？","a":"いいえ"},{"q":"鏡文字は暗号ですか？","a":"いいえ"},{"q":"文字を読むのは男たち自身ですか？","a":"いいえ"},{"q":"文字を読む人は鏡を使って読みますか？","a":"はい"},{"q":"文字は建物に書いてありますか？","a":"いいえ"},{"q":"文字は乗り物に書いてありますか？","a":"はい"},{"q":"男たちはその乗り物に乗って移動しますか？","a":"はい"},{"q":"文字を読む人は、男たちより先を進んでいますか？","a":"はい"},{"q":"読む人も乗り物に乗っていますか？","a":"はい"},{"q":"読む人が使う鏡は、車についている鏡ですか？","a":"はい"},{"q":"読んだ人は男たちに道を譲りますか？","a":"はい"},{"q":"男たちの仕事は急ぐ必要がありますか？","a":"はい"},{"q":"文字は仕事で使う物に書いてありますか？","a":"はい"},{"q":"文字を読むのは仕事の相手（客）ですか？","a":"いいえ"},{"q":"男たちは警察官ですか？","a":"いいえ"},{"q":"男たちの名前が何かは重要ですか？","a":"関係ない"},{"q":"行き先がどこかは重要ですか？","a":"関係ない"},{"q":"男たちは救急隊員で、救急車の前に書いた文字を鏡文字にしたのは、前を走る車の運転手がバックミラーで正しく読めるようにするため。気づいた車が道を譲るので早く着けて仕事がやりやすい。","a":"正解"}]',
-        '鏡文字で仕事がはかどる', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
-        '{"problem":"働く男たちは自分たちの名前を、わざと鏡文字で大きく書いている。そのままではとても読みにくいのに、このおかげで男たちの仕事がやりやすくなっている。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"名前を隠したい？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"文字は建物にある？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"読む人は鏡を使う？"},{"role":"master","text":"はい！"}]',
-        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
-        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
-
-Scene: Two men in plain work clothes seen from behind, standing in an open yard at dawn and holding a large blank white board between them; a small hand mirror resting on a wooden crate nearby; a low wall and a tree; soft morning light, no vehicles, no other people, no text or letters anywhere.
-
-Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
-        '【探偵カメロックのウミガメのスープ】
-
-働く男たちは自分たちの名前を、わざと鏡文字で大きく書いている。そのままではとても読みにくいのに、このおかげで男たちの仕事がやりやすくなっている。どういうこと？
-
-「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
-
-#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
-        '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 意味誤誘導型。モチーフ「鏡」（作問スキル umigame-problem-writer の抽選 3 語〔時計・毛糸・鏡〕から。初稿「時計台の下で満足する女」はコアが弱く 2026-09-07 のレビューで取り下げ、工程 2 からやり直した）→ 連想「鏡文字・合わせ鏡・鏡開き・バックミラー」→ 具体化（鏡文字 → 鏡で読ませるための文字）→ 常識「鏡文字は読ませたくない・遊び」の逆（読ませたい・そのおかげで早く着く）。着想元の既存問題なし（救急車の前面が鏡文字なのは一般知識だが、台帳・記憶にウミガメとしての出題なし。問題文は 2026-09-07 のレビューでユーザー案（「書いている」の状態形・「読みにくい」・「仕事がやりやすい」で仕事の枠を先に置く。字数下限のため「とても」を補った）に差し替え、難易度 3 → 4。捨てた案: 時計を止める〔新記録と試合終了の 2 通りで核が定まらない〕/ 編んだ網を海に投げる〔U06 と同じ作業動詞の多義〕/ 鏡開き〔なぞなぞとして有名〕/ 針が逆回りの時計〔理髪店の逆回り時計として既知〕）。', 1);
-
 -- U12 階段に並ぶ、音を出さない男たち
 INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
     expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
@@ -398,3 +370,31 @@ Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos
 
 #ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
         '完全オリジナル（既存問題の転載・改変ではない）。作問法は note 記事 https://note.com/suekai0217/n/n35128e606a9b の4 ステップ（モチーフ → 連想 → 言い方を変える → 不思議にする）と良い問題の 3 条件（コアが明確・動線がある・現実離れしない）に従う。着想の型は research.md（Codex Web リサーチ台帳）を参照。 型: 物語復元型（物語先行方式）。モチーフ「辞書」（抽選 22 回: 毛糸 / お年玉 / バス停・ゴミ出し / 時計 / 辞書・バス停 / 畳 / 辞書 ほか）→ 連想（外国語・国際結婚・同居・嫁と姑・子どもが二つの言葉を話す・通訳・言葉が分かると聞こえ方が変わる 等 11 件）→ 物語「外国から嫁いだ母と義母の会話を、息子が十年間褒め言葉に作り変えて通訳していた」→ 隠した B = 息子が二人の文句を褒め言葉に変えて通訳していたこと。着想元の既存問題なし（台帳に該当なし）。Web 照合（WebSearch 8 クエリ）で同一・近い真相の投稿問題・小話なし。', 1);
+
+-- U27 免許のない男のドライブ
+INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,
+    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,
+    caption, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
+        '015-unlicensed-driver', '免許のない男のドライブ', 3,
+        '男は運転免許を一度も取ったことがない。それでも週末になると、妻と子どもたちを車に乗せて、長い道のりを走る。家族はみんな楽しそうで、誰も止めようとしない。どういうこと？',
+        '男が走らせているのは本物の自動車ではなく、人生ゲーム（すごろく型のボードゲーム）の車の駒。週末になると男は家族とテーブルを囲んで人生ゲームで遊ぶ。ゲームの中で男は結婚し、子どもが生まれ、そのたびに妻や子どもを表すピンを車の駒の穴に差して乗せ、ルーレットを回して盤の上の長い道を進む。おもちゃなので免許はいらず、一緒に遊ぶ家族もみんな楽しんでいるので、止める人は誰もいない。',
+        '["男は運転免許を一度も取ったことがない（取り消されたのでも、取り上げられたのでもない）","男は決まりや法律を破っていない。警察に注意されることもない","車を動かしているのは男自身。自動運転の車ではなく、妻や他の人が代わりに運転しているのでもない","男の車は本物の自動車ではない。男は車の中に座っておらず、車の外から動かしている","車が何で、車に乗っている妻と子どもたちが何なのかは、この問題の答えの核心である（正解宣言のとき以外は補足で言わない）","車に乗っている妻と子どもたちは、本物の人間ではない。誰もけがをせず、危ないこともない","車が走るのは家の中。私有地・サーキット・遊園地・ゲームセンターではない","テレビやスマホの画面、コントローラーは使わない。ラジコンでもない","週末に本物の家族みんなで集まり、順番に楽しんでいる。家族が楽しそうなのはそのためである","車が一度にどこまで進むかは、男が決めるのではなく毎回変わる","車が走る道の途中では、仕事・結婚・家を買うといった人生の出来事が起きる","男の年齢・職業・車の色・家族の人数は問題に関係ない"]',
+        '[{"q":"男は法律を破っていますか？","a":"いいえ"},{"q":"男は免許を取り消されたのですか？","a":"いいえ"},{"q":"私有地で運転しているのですか？","a":"いいえ"},{"q":"自動運転の車ですか？","a":"いいえ"},{"q":"妻が代わりに運転しているのですか？","a":"いいえ"},{"q":"遊園地のゴーカートですか？","a":"いいえ"},{"q":"車は本物の自動車ですか？","a":"いいえ"},{"q":"男は車の中に座っていますか？","a":"いいえ"},{"q":"テレビゲームですか？","a":"いいえ"},{"q":"家の中での話ですか？","a":"はい"},{"q":"家族と一緒に遊んでいるのですか？","a":"はい"},{"q":"車がどこまで進むかは毎回変わりますか？","a":"はい"},{"q":"ボードゲームですか？","a":"はい"},{"q":"車に乗っている妻と子どもたちは本物の人間ですか？","a":"いいえ"},{"q":"車の色は関係ありますか？","a":"関係ない"},{"q":"男の年齢は関係ありますか？","a":"関係ない"},{"q":"男は週末に家族と人生ゲームで遊んでいて、車はゲームの車の駒、妻と子どもたちは駒に差したピンだった。","a":"正解"}]',
+        '免許なしで家族とドライブ', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
+        '{"problem":"男は運転免許を一度も取ったことがない。それでも週末になると、妻と子どもたちを車に乗せて、長い道のりを走る。家族はみんな楽しそうで、誰も止めようとしない。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
+        '[{"role":"questioner","text":"男は法律を破ってる？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"私有地で走ってる？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"家の中での話？"},{"role":"master","text":"はい！"}]',
+        '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
+        'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
+
+Scene: A small family car driving along a long winding road through green hills and fields on a sunny weekend morning, seen from far away so that no one inside is visible; a few houses and trees along the road; bright clear sky, no other vehicles, no people outside, no text.
+
+Vertical 9:16 composition (1024x1536). No text, no letters, no numbers, no logos, no signs. Depict only the scene described in the problem statement; do not depict any clue to the story''s hidden truth. People: only the persons who appear in the problem, plus at most one distant silhouette. Keep the upper 55% of the image calm and simple (sky, wall, ceiling, window) so that text cards can be overlaid there.',
+        '【探偵カメロックのウミガメのスープ】
+
+男は運転免許を一度も取ったことがない。それでも週末になると、妻と子どもたちを車に乗せて、長い道のりを走る。家族はみんな楽しそうで、誰も止めようとしない。どういうこと？
+
+「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事します。正解が出るまで何度でもどうぞ。
+
+#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #AIart',
+        '問題文・真相・場面は完全オリジナル。ただし「現実の出来事に見せて、実はボードゲームの盤上の話」という構造は有名問題（research.md #17「ホテル前まで車を押す破産者」・fame: classic）から借りている（2026-09-26 のユーザー判断で作問スキル工程 7 の例外として採用。理由: 元のモノポリーは日本で馴染みが薄い）。 型: 意味誤誘導型。モチーフ「人生ゲーム」（抽選せずユーザー指定。脳みそコーチ logic-training-1 の C49〔id 275・移動中に子どもが生まれる人生ゲーム版〕の仕掛けを使いたいという指定）→ 連想（車の駒・家族のピン・ルーレット・結婚・給料日・免許・私有地 等）→ 常識「免許がないと車は運転できない」の逆。C49 とは場面（出産 → 無免許運転）を分け、家族まで盤上のピンに縮む反転にした。捨てた案: 「一生を終えた」（DEBONO の投稿問題「人生」と仕掛けが同じ）/「三回結婚した女」「家を十回買った男」（車のコアでないためユーザー判断で不採用）/「走るだけで給料をもらう男」（給料日マスが知識寄り・ドライブ配信の別解）。Web 照合（WebSearch 3 クエリ）で無免許運転 × 人生ゲームの類題なし。', 1);

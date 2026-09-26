@@ -55,6 +55,9 @@ CORE_FORMAT_BY_TYPE = {
     "story": "「コア: 物語「…」の … を隠して「…」を出す → 復元: …」",
 }
 CORE_MAX = 120
+# 欠番の content_key 連番（差し替えで ITEMS から外し、再利用しない番号。DB の行の扱いは全数レビュー後に決める）。
+# 002 = U11（2026-09-26 に U27 = 015 へ差し替え。素材の全数レビュー指摘 17）
+RETIRED_SERIALS = {2}
 
 errors: list[str] = []
 warnings: list[str] = []
@@ -212,6 +215,10 @@ def main() -> int:
         if dup:
             errors.append(f"{field} が重複: {dup}")
     serials = sorted(int(it["content_key"][:3]) for it in ITEMS if CONTENT_KEY_RE.match(it.get("content_key", "")))
+    reused = sorted(RETIRED_SERIALS & set(serials))
+    if reused:
+        errors.append(f"欠番の content_key 連番を再利用している: {reused}")
+    serials = sorted(set(serials) | RETIRED_SERIALS)
     if serials and serials != list(range(serials[0], serials[0] + len(serials))):
         errors.append(f"content_key の連番が連続していない: {serials}")
 
