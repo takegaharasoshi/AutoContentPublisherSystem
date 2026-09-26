@@ -84,6 +84,14 @@
   <td><a href="review-sheet-artifact-feedback-loop.md">MD</a></td>
   <td>2026-09-24</td>
 </tr>
+<tr>
+  <td>ウミガメのコメント返信を継続改善するため、受信・判定・返信の全記録を残し夜間バッチで Aurora に蓄積する</td>
+  <td>単発</td>
+  <td><span class="badge badge-wip">inbox</span></td>
+  <td>コメントごとに受信時刻・本文・ユーザー ID・スレッド・判定内容・返信時刻と返信文を記録したい。返信経路は Aurora 停止中でも動く仕様のため、CloudWatch Logs 等へ構造化ログを吐き、1 日 1 回の夜間バッチで Aurora に蓄積する案（<a href="umigame-soup-set.md">ウミガメ</a>のコメント返信経路〔21-6〕に関係）</td>
+  <td><a href="umigame-comment-reply-logging.md">MD</a></td>
+  <td>2026-09-26</td>
+</tr>
 </tbody>
 </table></div>
 
