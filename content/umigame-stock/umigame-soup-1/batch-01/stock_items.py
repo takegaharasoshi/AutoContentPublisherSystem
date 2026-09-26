@@ -970,7 +970,9 @@ ITEMS: list[dict] = [
         scene=(
             "A Japanese tatami living room on New Year's morning; an elderly man in his seventies raises both arms in joy "
             "while holding a single New Year's postcard, his wife and grown-up family around a low table with New Year's dishes "
-            "look at him with amused smiles; a pile of other postcards on the table, no readable writing, no text."
+            "look at him with amused smiles; a pile of other postcards on the table, no readable writing, no text. "
+            "The whole family group is placed low in the picture: even the old man's raised hands stay below about 62% "
+            "of the image height."
         ),
         source_note=(
             "型: 物語復元型（物語先行方式）。モチーフ「将棋」「郵便」（抽選 17 回: ネクタイ / 消しゴム / 傘・将棋 / マスク / 傘・"
