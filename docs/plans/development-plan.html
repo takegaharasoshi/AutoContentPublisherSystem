@@ -512,7 +512,7 @@
 <div class="plan-meta"><strong>21-5c</strong><span class="plan-status">進行中</span></div>
 <h3>ナレーションを Gemini 3.8 Flash TTS（声 G4）へ切り替えて 14 本を作り直す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし（21-5b 完了済み。Gemini API キーは <code>~/.config/gemini/api_key</code> に保存済み）。<a href="#step-21-7">21-7</a>（稼働開始）より前に完了させる。</p>
-<p data-field="result"><strong>現況：</strong>進行中（2026-09-27 ゴール 1/2 を中断）。① 〜③ の実装・設計書・README は済み（pytest 42 passed）。14 問のうち 9 問は予算内でビルド済み、5 問（008・009・010・013・014）が話速倍率 1.19 超で未ビルド。Gemini TTS の日次上限（Tier 1・100 リクエスト / 日）に達して取り直しを止めた。再開は上限の回復後で、倍率上限の扱いをユーザーが判断してから。</p>
+<p data-field="result"><strong>現況：</strong>進行中。Gemini の日次上限（Tier 1・100 リクエスト / 日）で作り直しが止まったため、2026-09-27 にユーザー判断で <strong>TTS をローカル GPU の Irodori-TTS（v4.1-Small・BF16・声 G4 のクローン）へ切り替え</strong>た。PoC（<code>poc/irodori-tts/</code>）で声と設定は確定済み。次は Irodori 版の合成アダプタを組み込んで 14 問を作り直し、全数試聴へ。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -541,11 +541,12 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-09-27 ゴール 1/2 を日次上限で中断・5 問が倍率超過</span></summary>
+<summary>5. 作業記録 <span class="plan-hint">— Gemini の日次上限で中断 → Irodori-TTS（BF16・G4 クローン）へ切り替え</span></summary>
 <div class="plan-fold-inner">
 <p><strong>2026-09-27（ゴール 1/2・中断）</strong>: ①〜③ を Codex（<code>gpt-6-sol</code> / <code>max</code>）へ委譲して実装し、Claude が差分をレビューした。<code>scripts/narration_gemini.py</code>（1 回で合成 → 無音で切り分け → 前後の無音削り → 21 秒超の分だけ <code>atempo</code> で 19 秒へ → 倍率 1.19 超は <code>TempoLimitError</code>・429 と課金系は <code>GeminiQuotaError</code> で即中断・<code>narration.json</code> に model / voice_id / style / tempo / 切断位置 / attempt）、<code>build.py --tts {gemini,polly}</code>（既定 gemini）と <code>--retake-tts</code>、<code>assets/design.json</code> の <code>narration</code> 節、レビューシートへの倍率表示。レビューでの修正は 1 点（課金判定の正規表現が <code>generate</code> の中の <code>rate</code> に当たり、通常の 400 を課金エラーと誤判定するため <code>rate limit</code> に限定し、テスト 2 件を追加）。pytest: <code>42 passed</code>。設計書（セット別 8・方式設計書 2 / 5 / 8.3 / 8.4 / 依存表）と README を Gemini に合わせた。旧 Polly 版の <code>work/narration</code>・<code>work/videos</code>・<code>manifest.json</code>・<code>approved.txt</code> は <code>work/_polly-backup/</code> に退避した（git 管理外）。</p>
 <p><strong>合成結果</strong>（倍率 = 自然長から 19 秒へ合わせる話速。上限 1.19）: 1 回目で 7 問が予算内（001 ×1.0・004 ×1.0・006 ×1.0・005 ×1.178・012 ×1.171・015 ×1.169・016 ×1.152）。取り直しで 003（3 回目 ×1.16）・007（3 回目 ×1.168）が収まった。<strong>008（×1.22 / 1.241 / 1.232）・009（×1.308 / 1.306 / 1.264）は 3 回の取り直しでも収まらず</strong>、010（×1.29 / 1.193 / 1.286）の 3 回目で <strong>HTTP 429（<code>gemini-3.8-flash-tts</code> は Tier 1 で 100 リクエスト / 日。PoC 分を含めて到達）</strong>、013（×1.219）・014（×1.233）は取り直し前。これら 5 問の <code>work/videos</code> は Polly 版のまま（倍率超過の問はレンダリングしない）。PoC（016・014 の 2 問）より自然長が長い問が多く、1 回目で半数が上限を超えた。上限 1.19 は PoC で違和感なしを確認できた最大値で、1.2〜1.3 倍は未確認。</p>
-<p><strong>再開時の判断事項（ユーザー）</strong>: ① 倍率上限を 1.3 程度まで上げて聞いて判断する ② 演技指示のテンポをさらに上げる（全問再合成になる）③ 超過する問だけ取り直しを続ける（3 回上限の緩和）のどれにするか。日次上限は 2026-09-27 の約 8 時間後に回復する。</p>
+<p><strong>再開時の判断事項（ユーザー）</strong>（2026-09-27 に下記の Irodori 切り替えで解消）: ① 倍率上限を 1.3 程度まで上げて聞いて判断する ② 演技指示のテンポをさらに上げる ③ 超過する問だけ取り直しを続ける。</p>
+<p><strong>2026-09-27（Irodori-TTS へ切り替え・PoC）</strong>: 上限の引き上げ申請は応答まで 1〜2 か月の報告が多く当てにできず、別アカウントでの回避は Google APIs 利用規約 2(d) に反するため、ローカルで動く <a href="https://github.com/Aratako/Irodori-TTS">Irodori-TTS</a>（v4.1-Small・MIT・クレジット不要・実在人物の無断クローンは禁止）を検討した。GPU ドライバーを 511.81 → 616.92 に更新（ユーザー）し、<code>~/tools/Irodori-TTS</code>（commit <code>89f9d8f</code>・<code>uv sync --extra cu128</code>）で RTX 3050 Laptop（4GB）上に構築。<strong>BF16 で 1 本約 45 秒</strong>（既定の FP32 は VRAM からあふれて 4〜7 分。聞き比べで音質差なし）。聞き比べの結果（ユーザー判断）: <strong>声は G4 のクローン</strong>（Gemini G4 の 001・004・006 の problem / rule 6 本を参照にし、参照側の息継ぎ音を下げる〔①〕と生成音声の吸気音も減る。後処理・説明文での指示は不要）。説明文だけの声（VoiceDesign）は G4 に及ばず、別話者 voice2 のクローン・演技指示つきも比べたうえで G4 に決定。<code>--seconds 20.0</code> で合成すると 016・008 とも 19.0〜20.8 秒で予算内・話速調整なし（自然長は 23〜25 秒）。参照音声は <code>assets/voice/kamerock-g4/</code> へ昇格、試作スクリプトと決定の詳細は <code>poc/irodori-tts/README.md</code>。次: Irodori 版アダプタ（1 回で合成 → 無音で切り分け → 予算検査。Gemini・Polly 版は残置）を組み込み 14 問を再ビルド → 全数試聴 → publish。設計書（セット別 8・方式設計書）は Gemini 版の記述を Irodori へ書き換える。</p>
 </div>
 </details>
 </div>
