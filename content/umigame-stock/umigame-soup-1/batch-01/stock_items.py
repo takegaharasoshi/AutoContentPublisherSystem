@@ -1205,10 +1205,10 @@ ITEMS: list[dict] = [
         play_example=[
             {"role": "questioner", "text": "義母の性格が変わった？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "前から同じことを言ってた？"},
-            {"role": "master", "text": "はい！"},
-            {"role": "questioner", "text": "誰かが悪口を吹き込んだ？"},
+            {"role": "questioner", "text": "女と義母は十年間話してなかった？"},
             {"role": "master", "text": "いいえ。"},
+            {"role": "questioner", "text": "二人以外の誰かが関係している？"},
+            {"role": "master", "text": "はい！"},
         ],
         scene=(
             "A Japanese home kitchen; a woman in her forties and her elderly mother-in-law stand side by side at the stove, "
