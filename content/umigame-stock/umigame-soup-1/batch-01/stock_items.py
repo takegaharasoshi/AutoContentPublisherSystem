@@ -874,7 +874,7 @@ ITEMS: list[dict] = [
         play_example=[
             {"role": "questioner", "text": "先生が知り合い？"},
             {"role": "master", "text": "いいえ。"},
-            {"role": "questioner", "text": "場所に理由がある？"},
+            {"role": "questioner", "text": "お客さんとして行っている？"},
             {"role": "master", "text": "はい！"},
             {"role": "questioner", "text": "腕のいい先生？"},
             {"role": "master", "text": "いいえ。"},

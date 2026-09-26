@@ -271,7 +271,7 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'umigame-soup-1'),
         '[{"q":"先生の腕がいいからですか？","a":"いいえ"},{"q":"先生は男の知り合いですか？","a":"いいえ"},{"q":"受付の人に会いに行っていますか？","a":"いいえ"},{"q":"料金が安いからですか？","a":"いいえ"},{"q":"特別な治療を受けていますか？","a":"いいえ"},{"q":"歯医者という場所に理由がありますか？","a":"はい"},{"q":"男はその町に住んでいたことがありますか？","a":"はい"},{"q":"その歯医者は昔から歯医者でしたか？","a":"いいえ"},{"q":"歯医者の建物は昔、別の用途でしたか？","a":"はい"},{"q":"男はその建物に入ったことがありましたか？","a":"はい"},{"q":"待合室に男の思い出の物がありますか？","a":"はい"},{"q":"男は悲しんでいますか？","a":"いいえ"},{"q":"男の仕事は関係ありますか？","a":"関係ない"},{"q":"電車の路線は関係ありますか？","a":"関係ない"},{"q":"男は歯医者が好きなのですか？","a":"いいえ"},{"q":"その歯医者は、男が子どものころに育った家を改装したもので、男は検診を口実に自分の生家に通っている。","a":"正解"}]',
         '虫歯のない男の通院', '「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します',
         '{"problem":"虫歯も痛いところもない男が、電車で二時間かけて、ある町の小さな歯医者に半年ごとに通っている。診察が終わっても、男はしばらく待合室の同じ席に座ってから帰る。どういうこと？","rule":"はい、いいえ、関係ない、で答えられる質問をコメントしてね。全部返事するよ。"}',
-        '[{"role":"questioner","text":"先生が知り合い？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"場所に理由がある？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"腕のいい先生？"},{"role":"master","text":"いいえ。"}]',
+        '[{"role":"questioner","text":"先生が知り合い？"},{"role":"master","text":"いいえ。"},{"role":"questioner","text":"お客さんとして行っている？"},{"role":"master","text":"はい！"},{"role":"questioner","text":"腕のいい先生？"},{"role":"master","text":"いいえ。"}]',
         '{"master":{"intro":"質問してみて！","outro":"何度でも答えるよ。コメントで質問！"},"jr":{"outro":"面白かったら、いいね、フォローよろしくね！"}}',
         'A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes, thick brush-like outlines on key objects). Mid-key lighting: moonlight, lamps or candlelight keep the whole scene clearly visible, NOT dark.
 
