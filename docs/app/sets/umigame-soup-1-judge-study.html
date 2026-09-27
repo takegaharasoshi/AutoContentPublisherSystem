@@ -44,6 +44,20 @@ details.ref[open] > summary { background: var(--link); border-color: var(--link)
 .ref-panel .table-wrap { margin: .5rem 0 0; }
 tr.grp > th { background: var(--note-bg); font-size: .85rem; }
 td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
+.study-chart.trend .rl { font-size: 10.5px; }
+.study-chart.trend .lg, .study-chart.trend .tl { font-size: 10px; }
+.study-chart.trend .vl { font-size: 10px; fill: var(--text); }
+.study-chart.trend .ax { font-size: 9.5px; }
+.study-chart .ln { fill: none; stroke-width: 1.6; }
+.study-chart .s1l { stroke: var(--s1); } .study-chart .s2l { stroke: var(--s2); }
+.study-chart .t1 { fill: var(--s1); } .study-chart .t2 { fill: var(--s2); }
+.study-chart .axis0 { stroke: var(--border); stroke-width: 1; }
+.study-chart .hit { fill: transparent; }
+.study-chart.trend .target { stroke-width: 1; }
+details.trend-block { margin: .5rem 0; border: 1px solid var(--border); border-radius: 8px; padding: 0 .6rem; }
+details.trend-block > summary { cursor: pointer; font-weight: 700; font-size: .9rem; padding: .5rem 0; min-height: 36px; }
+details.trend-block figure.diagram { margin: .25rem 0 .6rem; padding: .5rem; }
+.trend-note { font-size: .85rem; color: var(--text-muted); }
 .pass { font-weight: 700; } .fail { font-weight: 700; color: var(--warn-border); }
 </style>
 </head>
@@ -140,7 +154,726 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <figcaption>試行ごとの種別一致率の推移（件数は 185 / 185 / 188 / 220 件以降。試行 6 のパターン 2 は 6b、試行 7 は 7b。すべて最新のラベルで数え直した値）</figcaption>
 </figure>
 
-<h2 id="compare">4. パターン 1 とパターン 2 の比較（試行 7 時点）</h2>
+<h2 id="compare">4. パターン 1 とパターン 2 の比較（全試行）</h2>
+<p class="trend-note">1 行 = 1 項目。横軸は試行 1〜7、縦は 0〜100%（点線はレベル 1 の基準）、右端の数字は試行 7 の値。点に触れると件数が出る。試行 6 のパターン 2 は 6b、試行 7 は 7b。すべて最新のラベルで数え直した値（試行 1〜3 は新しい質問が無いので、その行は試行 4 から）。</p>
+<h3>区分別の推移</h3>
+<figure class="diagram">
+<svg viewBox="0 0 400 284" role="img" aria-label="区分別の種別一致率の試行ごとの推移" class="study-chart trend">
+<rect x="124" y="6" width="10" height="10" rx="2" class="s1"/><text x="138" y="15" class="lg">パターン 1</text><rect x="214" y="6" width="10" height="10" rx="2" class="s2"/><text x="228" y="15" class="lg">パターン 2</text><text x="326" y="15" class="tl">試行 7</text>
+<line x1="0" y1="64" x2="400" y2="64" class="grid"/>
+<text x="0" y="49.0" class="rl">全体</text>
+<line x1="124" y1="33.2" x2="318" y2="33.2" class="target"/>
+<line x1="124" y1="62.0" x2="318" y2="62.0" class="axis0"/>
+<polyline points="124.0,31.4 156.3,31.4 188.7,30.9 221.0,30.6 253.3,30.4 285.7,30.7 318.0,30.9" class="ln s1l"/>
+<g><title>全体 / 試行 1 / パターン 1: 177/185（95.7%）</title><circle cx="124.0" cy="31.4" r="2.6" class="s1"/><circle cx="124.0" cy="31.4" r="7" class="hit"/></g>
+<g><title>全体 / 試行 2 / パターン 1: 177/185（95.7%）</title><circle cx="156.3" cy="31.4" r="2.6" class="s1"/><circle cx="156.3" cy="31.4" r="7" class="hit"/></g>
+<g><title>全体 / 試行 3 / パターン 1: 183/188（97.3%）</title><circle cx="188.7" cy="30.9" r="2.6" class="s1"/><circle cx="188.7" cy="30.9" r="7" class="hit"/></g>
+<g><title>全体 / 試行 4 / パターン 1: 216/220（98.2%）</title><circle cx="221.0" cy="30.6" r="2.6" class="s1"/><circle cx="221.0" cy="30.6" r="7" class="hit"/></g>
+<g><title>全体 / 試行 5 / パターン 1: 217/220（98.6%）</title><circle cx="253.3" cy="30.4" r="2.6" class="s1"/><circle cx="253.3" cy="30.4" r="7" class="hit"/></g>
+<g><title>全体 / 試行 6 / パターン 1: 215/220（97.7%）</title><circle cx="285.7" cy="30.7" r="2.6" class="s1"/><circle cx="285.7" cy="30.7" r="7" class="hit"/></g>
+<g><title>全体 / 試行 7 / パターン 1: 214/220（97.3%）</title><circle cx="318.0" cy="30.9" r="2.6" class="s1"/><circle cx="318.0" cy="30.9" r="7" class="hit"/></g>
+<polyline points="124.0,43.3 156.3,38.1 188.7,33.6 221.0,33.2 253.3,32.5 285.7,32.3 318.0,31.9" class="ln s2l"/>
+<g><title>全体 / 試行 1 / パターン 2: 108/185（58.4%）</title><circle cx="124.0" cy="43.3" r="2.6" class="s2"/><circle cx="124.0" cy="43.3" r="7" class="hit"/></g>
+<g><title>全体 / 試行 2 / パターン 2: 138/185（74.6%）</title><circle cx="156.3" cy="38.1" r="2.6" class="s2"/><circle cx="156.3" cy="38.1" r="7" class="hit"/></g>
+<g><title>全体 / 試行 3 / パターン 2: 167/188（88.8%）</title><circle cx="188.7" cy="33.6" r="2.6" class="s2"/><circle cx="188.7" cy="33.6" r="7" class="hit"/></g>
+<g><title>全体 / 試行 4 / パターン 2: 198/220（90.0%）</title><circle cx="221.0" cy="33.2" r="2.6" class="s2"/><circle cx="221.0" cy="33.2" r="7" class="hit"/></g>
+<g><title>全体 / 試行 5 / パターン 2: 203/220（92.3%）</title><circle cx="253.3" cy="32.5" r="2.6" class="s2"/><circle cx="253.3" cy="32.5" r="7" class="hit"/></g>
+<g><title>全体 / 試行 6 / パターン 2: 204/220（92.7%）</title><circle cx="285.7" cy="32.3" r="2.6" class="s2"/><circle cx="285.7" cy="32.3" r="7" class="hit"/></g>
+<g><title>全体 / 試行 7 / パターン 2: 207/220（94.1%）</title><circle cx="318.0" cy="31.9" r="2.6" class="s2"/><circle cx="318.0" cy="31.9" r="7" class="hit"/></g>
+<text x="326" y="40" class="vl"><tspan class="t1">■</tspan> 97%</text>
+<text x="326" y="55" class="vl"><tspan class="t2">■</tspan> 94%</text>
+<line x1="0" y1="104" x2="400" y2="104" class="grid"/>
+<text x="0" y="89.0" class="rl">質問系 ①〜③</text>
+<line x1="124" y1="73.2" x2="318" y2="73.2" class="target"/>
+<line x1="124" y1="102.0" x2="318" y2="102.0" class="axis0"/>
+<polyline points="124.0,70.9 156.3,70.9 188.7,70.4 221.0,70.0 253.3,70.0 285.7,70.3 318.0,70.6" class="ln s1l"/>
+<g><title>質問系 ①〜③ / 試行 1 / パターン 1: 73/75（97.3%）</title><circle cx="124.0" cy="70.9" r="2.6" class="s1"/><circle cx="124.0" cy="70.9" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 2 / パターン 1: 73/75（97.3%）</title><circle cx="156.3" cy="70.9" r="2.6" class="s1"/><circle cx="156.3" cy="70.9" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 3 / パターン 1: 74/75（98.7%）</title><circle cx="188.7" cy="70.4" r="2.6" class="s1"/><circle cx="188.7" cy="70.4" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 4 / パターン 1: 106/106（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s1"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 5 / パターン 1: 106/106（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s1"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 6 / パターン 1: 105/106（99.1%）</title><circle cx="285.7" cy="70.3" r="2.6" class="s1"/><circle cx="285.7" cy="70.3" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 7 / パターン 1: 104/106（98.1%）</title><circle cx="318.0" cy="70.6" r="2.6" class="s1"/><circle cx="318.0" cy="70.6" r="7" class="hit"/></g>
+<polyline points="124.0,91.3 156.3,78.5 188.7,71.7 221.0,71.8 253.3,71.8 285.7,71.5 318.0,71.5" class="ln s2l"/>
+<g><title>質問系 ①〜③ / 試行 1 / パターン 2: 25/75（33.3%）</title><circle cx="124.0" cy="91.3" r="2.6" class="s2"/><circle cx="124.0" cy="91.3" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 2 / パターン 2: 55/75（73.3%）</title><circle cx="156.3" cy="78.5" r="2.6" class="s2"/><circle cx="156.3" cy="78.5" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 3 / パターン 2: 71/75（94.7%）</title><circle cx="188.7" cy="71.7" r="2.6" class="s2"/><circle cx="188.7" cy="71.7" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 4 / パターン 2: 100/106（94.3%）</title><circle cx="221.0" cy="71.8" r="2.6" class="s2"/><circle cx="221.0" cy="71.8" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 5 / パターン 2: 100/106（94.3%）</title><circle cx="253.3" cy="71.8" r="2.6" class="s2"/><circle cx="253.3" cy="71.8" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 6 / パターン 2: 101/106（95.3%）</title><circle cx="285.7" cy="71.5" r="2.6" class="s2"/><circle cx="285.7" cy="71.5" r="7" class="hit"/></g>
+<g><title>質問系 ①〜③ / 試行 7 / パターン 2: 101/106（95.3%）</title><circle cx="318.0" cy="71.5" r="2.6" class="s2"/><circle cx="318.0" cy="71.5" r="7" class="hit"/></g>
+<text x="326" y="80" class="vl"><tspan class="t1">■</tspan> 98%</text>
+<text x="326" y="95" class="vl"><tspan class="t2">■</tspan> 95%</text>
+<line x1="0" y1="144" x2="400" y2="144" class="grid"/>
+<text x="0" y="129.0" class="rl">推理系 ④〜⑥</text>
+<line x1="124" y1="113.2" x2="318" y2="113.2" class="target"/>
+<line x1="124" y1="142.0" x2="318" y2="142.0" class="axis0"/>
+<polyline points="124.0,113.2 156.3,113.2 188.7,113.2 221.0,113.1 253.3,112.1 285.7,114.1 318.0,114.1" class="ln s1l"/>
+<g><title>推理系 ④〜⑥ / 試行 1 / パターン 1: 27/30（90.0%）</title><circle cx="124.0" cy="113.2" r="2.6" class="s1"/><circle cx="124.0" cy="113.2" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 2 / パターン 1: 27/30（90.0%）</title><circle cx="156.3" cy="113.2" r="2.6" class="s1"/><circle cx="156.3" cy="113.2" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 3 / パターン 1: 27/30（90.0%）</title><circle cx="188.7" cy="113.2" r="2.6" class="s1"/><circle cx="188.7" cy="113.2" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 4 / パターン 1: 28/31（90.3%）</title><circle cx="221.0" cy="113.1" r="2.6" class="s1"/><circle cx="221.0" cy="113.1" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 5 / パターン 1: 29/31（93.5%）</title><circle cx="253.3" cy="112.1" r="2.6" class="s1"/><circle cx="253.3" cy="112.1" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 6 / パターン 1: 27/31（87.1%）</title><circle cx="285.7" cy="114.1" r="2.6" class="s1"/><circle cx="285.7" cy="114.1" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 7 / パターン 1: 27/31（87.1%）</title><circle cx="318.0" cy="114.1" r="2.6" class="s1"/><circle cx="318.0" cy="114.1" r="7" class="hit"/></g>
+<polyline points="124.0,122.8 156.3,122.8 188.7,122.8 221.0,120.3 253.3,117.2 285.7,117.2 318.0,114.1" class="ln s2l"/>
+<g><title>推理系 ④〜⑥ / 試行 1 / パターン 2: 18/30（60.0%）</title><circle cx="124.0" cy="122.8" r="2.6" class="s2"/><circle cx="124.0" cy="122.8" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 2 / パターン 2: 18/30（60.0%）</title><circle cx="156.3" cy="122.8" r="2.6" class="s2"/><circle cx="156.3" cy="122.8" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 3 / パターン 2: 18/30（60.0%）</title><circle cx="188.7" cy="122.8" r="2.6" class="s2"/><circle cx="188.7" cy="122.8" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 4 / パターン 2: 21/31（67.7%）</title><circle cx="221.0" cy="120.3" r="2.6" class="s2"/><circle cx="221.0" cy="120.3" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 5 / パターン 2: 24/31（77.4%）</title><circle cx="253.3" cy="117.2" r="2.6" class="s2"/><circle cx="253.3" cy="117.2" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 6 / パターン 2: 24/31（77.4%）</title><circle cx="285.7" cy="117.2" r="2.6" class="s2"/><circle cx="285.7" cy="117.2" r="7" class="hit"/></g>
+<g><title>推理系 ④〜⑥ / 試行 7 / パターン 2: 27/31（87.1%）</title><circle cx="318.0" cy="114.1" r="2.6" class="s2"/><circle cx="318.0" cy="114.1" r="7" class="hit"/></g>
+<text x="326" y="120" class="vl"><tspan class="t1">■</tspan> 87%</text>
+<text x="326" y="135" class="vl"><tspan class="t2">■</tspan> 87%</text>
+<line x1="0" y1="184" x2="400" y2="184" class="grid"/>
+<text x="0" y="169.0" class="rl">その他 ⑦〜㉒</text>
+<line x1="124" y1="153.2" x2="318" y2="153.2" class="target"/>
+<line x1="124" y1="182.0" x2="318" y2="182.0" class="axis0"/>
+<polyline points="124.0,151.2 156.3,151.2 188.7,150.4 221.0,150.4 253.3,150.4 285.7,150.0 318.0,150.0" class="ln s1l"/>
+<g><title>その他 ⑦〜㉒ / 試行 1 / パターン 1: 77/80（96.2%）</title><circle cx="124.0" cy="151.2" r="2.6" class="s1"/><circle cx="124.0" cy="151.2" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 2 / パターン 1: 77/80（96.2%）</title><circle cx="156.3" cy="151.2" r="2.6" class="s1"/><circle cx="156.3" cy="151.2" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 3 / パターン 1: 82/83（98.8%）</title><circle cx="188.7" cy="150.4" r="2.6" class="s1"/><circle cx="188.7" cy="150.4" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 4 / パターン 1: 82/83（98.8%）</title><circle cx="221.0" cy="150.4" r="2.6" class="s1"/><circle cx="221.0" cy="150.4" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 5 / パターン 1: 82/83（98.8%）</title><circle cx="253.3" cy="150.4" r="2.6" class="s1"/><circle cx="253.3" cy="150.4" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 6 / パターン 1: 83/83（100.0%）</title><circle cx="285.7" cy="150.0" r="2.6" class="s1"/><circle cx="285.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 7 / パターン 1: 83/83（100.0%）</title><circle cx="318.0" cy="150.0" r="2.6" class="s1"/><circle cx="318.0" cy="150.0" r="7" class="hit"/></g>
+<polyline points="124.0,156.0 156.3,156.0 188.7,151.9 221.0,152.3 253.3,151.5 285.7,151.5 318.0,151.5" class="ln s2l"/>
+<g><title>その他 ⑦〜㉒ / 試行 1 / パターン 2: 65/80（81.2%）</title><circle cx="124.0" cy="156.0" r="2.6" class="s2"/><circle cx="124.0" cy="156.0" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 2 / パターン 2: 65/80（81.2%）</title><circle cx="156.3" cy="156.0" r="2.6" class="s2"/><circle cx="156.3" cy="156.0" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 3 / パターン 2: 78/83（94.0%）</title><circle cx="188.7" cy="151.9" r="2.6" class="s2"/><circle cx="188.7" cy="151.9" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 4 / パターン 2: 77/83（92.8%）</title><circle cx="221.0" cy="152.3" r="2.6" class="s2"/><circle cx="221.0" cy="152.3" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 5 / パターン 2: 79/83（95.2%）</title><circle cx="253.3" cy="151.5" r="2.6" class="s2"/><circle cx="253.3" cy="151.5" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 6 / パターン 2: 79/83（95.2%）</title><circle cx="285.7" cy="151.5" r="2.6" class="s2"/><circle cx="285.7" cy="151.5" r="7" class="hit"/></g>
+<g><title>その他 ⑦〜㉒ / 試行 7 / パターン 2: 79/83（95.2%）</title><circle cx="318.0" cy="151.5" r="2.6" class="s2"/><circle cx="318.0" cy="151.5" r="7" class="hit"/></g>
+<text x="326" y="160" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="175" class="vl"><tspan class="t2">■</tspan> 95%</text>
+<line x1="0" y1="224" x2="400" y2="224" class="grid"/>
+<text x="0" y="209.0" class="rl">① 判定（従来）</text>
+<line x1="124" y1="193.2" x2="318" y2="193.2" class="target"/>
+<line x1="124" y1="222.0" x2="318" y2="222.0" class="axis0"/>
+<polyline points="124.0,190.0 156.3,190.0 188.7,190.0 221.0,190.0 253.3,190.0 285.7,190.0 318.0,190.0" class="ln s1l"/>
+<g><title>① 判定（従来） / 試行 1 / パターン 1: 51/51（100.0%）</title><circle cx="124.0" cy="190.0" r="2.6" class="s1"/><circle cx="124.0" cy="190.0" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 2 / パターン 1: 51/51（100.0%）</title><circle cx="156.3" cy="190.0" r="2.6" class="s1"/><circle cx="156.3" cy="190.0" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 3 / パターン 1: 51/51（100.0%）</title><circle cx="188.7" cy="190.0" r="2.6" class="s1"/><circle cx="188.7" cy="190.0" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 4 / パターン 1: 50/50（100.0%）</title><circle cx="221.0" cy="190.0" r="2.6" class="s1"/><circle cx="221.0" cy="190.0" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 5 / パターン 1: 50/50（100.0%）</title><circle cx="253.3" cy="190.0" r="2.6" class="s1"/><circle cx="253.3" cy="190.0" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 6 / パターン 1: 51/51（100.0%）</title><circle cx="285.7" cy="190.0" r="2.6" class="s1"/><circle cx="285.7" cy="190.0" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 7 / パターン 1: 51/51（100.0%）</title><circle cx="318.0" cy="190.0" r="2.6" class="s1"/><circle cx="318.0" cy="190.0" r="7" class="hit"/></g>
+<polyline points="124.0,214.5 156.3,198.2 188.7,190.6 221.0,191.3 253.3,190.6 285.7,191.9 318.0,191.3" class="ln s2l"/>
+<g><title>① 判定（従来） / 試行 1 / パターン 2: 12/51（23.5%）</title><circle cx="124.0" cy="214.5" r="2.6" class="s2"/><circle cx="124.0" cy="214.5" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 2 / パターン 2: 38/51（74.5%）</title><circle cx="156.3" cy="198.2" r="2.6" class="s2"/><circle cx="156.3" cy="198.2" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 3 / パターン 2: 50/51（98.0%）</title><circle cx="188.7" cy="190.6" r="2.6" class="s2"/><circle cx="188.7" cy="190.6" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 4 / パターン 2: 49/51（96.1%）</title><circle cx="221.0" cy="191.3" r="2.6" class="s2"/><circle cx="221.0" cy="191.3" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 5 / パターン 2: 50/51（98.0%）</title><circle cx="253.3" cy="190.6" r="2.6" class="s2"/><circle cx="253.3" cy="190.6" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 6 / パターン 2: 48/51（94.1%）</title><circle cx="285.7" cy="191.9" r="2.6" class="s2"/><circle cx="285.7" cy="191.9" r="7" class="hit"/></g>
+<g><title>① 判定（従来） / 試行 7 / パターン 2: 49/51（96.1%）</title><circle cx="318.0" cy="191.3" r="2.6" class="s2"/><circle cx="318.0" cy="191.3" r="7" class="hit"/></g>
+<text x="326" y="200" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="215" class="vl"><tspan class="t2">■</tspan> 96%</text>
+<line x1="0" y1="264" x2="400" y2="264" class="grid"/>
+<text x="0" y="249.0" class="rl">① 判定（新しい質問）</text>
+<line x1="124" y1="233.2" x2="318" y2="233.2" class="target"/>
+<line x1="124" y1="262.0" x2="318" y2="262.0" class="axis0"/>
+<polyline points="221.0,232.1 253.3,230.0 285.7,230.0 318.0,232.1" class="ln s1l"/>
+<g><title>① 判定（新しい質問） / 試行 4 / パターン 1: 29/31（93.5%）</title><circle cx="221.0" cy="232.1" r="2.6" class="s1"/><circle cx="221.0" cy="232.1" r="7" class="hit"/></g>
+<g><title>① 判定（新しい質問） / 試行 5 / パターン 1: 31/31（100.0%）</title><circle cx="253.3" cy="230.0" r="2.6" class="s1"/><circle cx="253.3" cy="230.0" r="7" class="hit"/></g>
+<g><title>① 判定（新しい質問） / 試行 6 / パターン 1: 31/31（100.0%）</title><circle cx="285.7" cy="230.0" r="2.6" class="s1"/><circle cx="285.7" cy="230.0" r="7" class="hit"/></g>
+<g><title>① 判定（新しい質問） / 試行 7 / パターン 1: 29/31（93.5%）</title><circle cx="318.0" cy="232.1" r="2.6" class="s1"/><circle cx="318.0" cy="232.1" r="7" class="hit"/></g>
+<polyline points="221.0,234.1 253.3,235.2 285.7,232.1 318.0,232.1" class="ln s2l"/>
+<g><title>① 判定（新しい質問） / 試行 4 / パターン 2: 27/31（87.1%）</title><circle cx="221.0" cy="234.1" r="2.6" class="s2"/><circle cx="221.0" cy="234.1" r="7" class="hit"/></g>
+<g><title>① 判定（新しい質問） / 試行 5 / パターン 2: 26/31（83.9%）</title><circle cx="253.3" cy="235.2" r="2.6" class="s2"/><circle cx="253.3" cy="235.2" r="7" class="hit"/></g>
+<g><title>① 判定（新しい質問） / 試行 6 / パターン 2: 29/31（93.5%）</title><circle cx="285.7" cy="232.1" r="2.6" class="s2"/><circle cx="285.7" cy="232.1" r="7" class="hit"/></g>
+<g><title>① 判定（新しい質問） / 試行 7 / パターン 2: 29/31（93.5%）</title><circle cx="318.0" cy="232.1" r="2.6" class="s2"/><circle cx="318.0" cy="232.1" r="7" class="hit"/></g>
+<text x="326" y="240" class="vl"><tspan class="t1">■</tspan> 94%</text>
+<text x="326" y="255" class="vl"><tspan class="t2">■</tspan> 94%</text>
+<text x="124.0" y="278" class="ax" text-anchor="middle">1</text>
+<text x="156.3" y="278" class="ax" text-anchor="middle">2</text>
+<text x="188.7" y="278" class="ax" text-anchor="middle">3</text>
+<text x="221.0" y="278" class="ax" text-anchor="middle">4</text>
+<text x="253.3" y="278" class="ax" text-anchor="middle">5</text>
+<text x="285.7" y="278" class="ax" text-anchor="middle">6</text>
+<text x="318.0" y="278" class="ax" text-anchor="middle">7</text>
+<text x="120" y="278" class="ax" text-anchor="end">試行</text>
+</svg>
+<figcaption>区分別の種別一致率と ① の判定一致（点線 = 全体の基準 90%）</figcaption>
+</figure>
+<h3>種別ごとの推移</h3>
+<p class="trend-note">系統ごとに折りたたんである（質問系・推理系は開いた状態）。点線 = 質問以外の種別の基準 80%。</p>
+<details class="trend-block" open><summary>質問系 ①〜③</summary>
+<figure class="diagram">
+<svg viewBox="0 0 400 164" role="img" aria-label="質問系 ①〜③ の種別ごとの一致率の推移" class="study-chart trend">
+<rect x="124" y="6" width="10" height="10" rx="2" class="s1"/><text x="138" y="15" class="lg">パターン 1</text><rect x="214" y="6" width="10" height="10" rx="2" class="s2"/><text x="228" y="15" class="lg">パターン 2</text><text x="326" y="15" class="tl">試行 7</text>
+<line x1="0" y1="64" x2="400" y2="64" class="grid"/>
+<text x="0" y="49.0" class="rl">① はい / いいえ質問</text>
+<line x1="124" y1="36.4" x2="318" y2="36.4" class="target"/>
+<line x1="124" y1="62.0" x2="318" y2="62.0" class="axis0"/>
+<polyline points="124.0,30.0 156.3,30.0 188.7,30.0 221.0,30.0 253.3,30.0 285.7,30.0 318.0,30.4" class="ln s1l"/>
+<g><title>① はい / いいえ質問 / 試行 1 / パターン 1: 51/51（100.0%）</title><circle cx="124.0" cy="30.0" r="2.6" class="s1"/><circle cx="124.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 2 / パターン 1: 51/51（100.0%）</title><circle cx="156.3" cy="30.0" r="2.6" class="s1"/><circle cx="156.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 3 / パターン 1: 51/51（100.0%）</title><circle cx="188.7" cy="30.0" r="2.6" class="s1"/><circle cx="188.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 4 / パターン 1: 81/81（100.0%）</title><circle cx="221.0" cy="30.0" r="2.6" class="s1"/><circle cx="221.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 5 / パターン 1: 81/81（100.0%）</title><circle cx="253.3" cy="30.0" r="2.6" class="s1"/><circle cx="253.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 6 / パターン 1: 82/82（100.0%）</title><circle cx="285.7" cy="30.0" r="2.6" class="s1"/><circle cx="285.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 7 / パターン 1: 81/82（98.8%）</title><circle cx="318.0" cy="30.4" r="2.6" class="s1"/><circle cx="318.0" cy="30.4" r="7" class="hit"/></g>
+<polyline points="124.0,54.5 156.3,38.2 188.7,30.6 221.0,31.6 253.3,31.6 285.7,31.2 318.0,31.2" class="ln s2l"/>
+<g><title>① はい / いいえ質問 / 試行 1 / パターン 2: 12/51（23.5%）</title><circle cx="124.0" cy="54.5" r="2.6" class="s2"/><circle cx="124.0" cy="54.5" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 2 / パターン 2: 38/51（74.5%）</title><circle cx="156.3" cy="38.2" r="2.6" class="s2"/><circle cx="156.3" cy="38.2" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 3 / パターン 2: 50/51（98.0%）</title><circle cx="188.7" cy="30.6" r="2.6" class="s2"/><circle cx="188.7" cy="30.6" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 4 / パターン 2: 78/82（95.1%）</title><circle cx="221.0" cy="31.6" r="2.6" class="s2"/><circle cx="221.0" cy="31.6" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 5 / パターン 2: 78/82（95.1%）</title><circle cx="253.3" cy="31.6" r="2.6" class="s2"/><circle cx="253.3" cy="31.6" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 6 / パターン 2: 79/82（96.3%）</title><circle cx="285.7" cy="31.2" r="2.6" class="s2"/><circle cx="285.7" cy="31.2" r="7" class="hit"/></g>
+<g><title>① はい / いいえ質問 / 試行 7 / パターン 2: 79/82（96.3%）</title><circle cx="318.0" cy="31.2" r="2.6" class="s2"/><circle cx="318.0" cy="31.2" r="7" class="hit"/></g>
+<text x="326" y="40" class="vl"><tspan class="t1">■</tspan> 99%</text>
+<text x="326" y="55" class="vl"><tspan class="t2">■</tspan> 96%</text>
+<line x1="0" y1="104" x2="400" y2="104" class="grid"/>
+<text x="0" y="89.0" class="rl">② 複数の質問</text>
+<line x1="124" y1="76.4" x2="318" y2="76.4" class="target"/>
+<line x1="124" y1="102.0" x2="318" y2="102.0" class="axis0"/>
+<polyline points="124.0,70.0 156.3,70.0 188.7,70.0 221.0,70.0 253.3,70.0 285.7,70.0 318.0,70.0" class="ln s1l"/>
+<g><title>② 複数の質問 / 試行 1 / パターン 1: 10/10（100.0%）</title><circle cx="124.0" cy="70.0" r="2.6" class="s1"/><circle cx="124.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 2 / パターン 1: 10/10（100.0%）</title><circle cx="156.3" cy="70.0" r="2.6" class="s1"/><circle cx="156.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 3 / パターン 1: 10/10（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s1"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 4 / パターン 1: 10/10（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s1"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 5 / パターン 1: 10/10（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s1"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 6 / パターン 1: 10/10（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s1"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 7 / パターン 1: 10/10（100.0%）</title><circle cx="318.0" cy="70.0" r="2.6" class="s1"/><circle cx="318.0" cy="70.0" r="7" class="hit"/></g>
+<polyline points="124.0,76.4 156.3,73.2 188.7,70.0 221.0,70.0 253.3,70.0 285.7,70.0 318.0,70.0" class="ln s2l"/>
+<g><title>② 複数の質問 / 試行 1 / パターン 2: 8/10（80.0%）</title><circle cx="124.0" cy="76.4" r="2.6" class="s2"/><circle cx="124.0" cy="76.4" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 2 / パターン 2: 9/10（90.0%）</title><circle cx="156.3" cy="73.2" r="2.6" class="s2"/><circle cx="156.3" cy="73.2" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 3 / パターン 2: 10/10（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s2"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 4 / パターン 2: 10/10（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s2"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 5 / パターン 2: 10/10（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s2"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 6 / パターン 2: 10/10（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s2"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>② 複数の質問 / 試行 7 / パターン 2: 10/10（100.0%）</title><circle cx="318.0" cy="70.0" r="2.6" class="s2"/><circle cx="318.0" cy="70.0" r="7" class="hit"/></g>
+<text x="326" y="80" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="95" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="144" x2="400" y2="144" class="grid"/>
+<text x="0" y="129.0" class="rl">③ 答えられない質問</text>
+<line x1="124" y1="116.4" x2="318" y2="116.4" class="target"/>
+<line x1="124" y1="142.0" x2="318" y2="142.0" class="axis0"/>
+<polyline points="124.0,114.6 156.3,114.6 188.7,112.3 221.0,110.0 253.3,110.0 285.7,112.3 318.0,112.3" class="ln s1l"/>
+<g><title>③ 答えられない質問 / 試行 1 / パターン 1: 12/14（85.7%）</title><circle cx="124.0" cy="114.6" r="2.6" class="s1"/><circle cx="124.0" cy="114.6" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 2 / パターン 1: 12/14（85.7%）</title><circle cx="156.3" cy="114.6" r="2.6" class="s1"/><circle cx="156.3" cy="114.6" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 3 / パターン 1: 13/14（92.9%）</title><circle cx="188.7" cy="112.3" r="2.6" class="s1"/><circle cx="188.7" cy="112.3" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 4 / パターン 1: 15/15（100.0%）</title><circle cx="221.0" cy="110.0" r="2.6" class="s1"/><circle cx="221.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 5 / パターン 1: 15/15（100.0%）</title><circle cx="253.3" cy="110.0" r="2.6" class="s1"/><circle cx="253.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 6 / パターン 1: 13/14（92.9%）</title><circle cx="285.7" cy="112.3" r="2.6" class="s1"/><circle cx="285.7" cy="112.3" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 7 / パターン 1: 13/14（92.9%）</title><circle cx="318.0" cy="112.3" r="2.6" class="s1"/><circle cx="318.0" cy="112.3" r="7" class="hit"/></g>
+<polyline points="124.0,130.6 156.3,123.7 188.7,116.9 221.0,114.6 253.3,114.6 285.7,114.6 318.0,114.6" class="ln s2l"/>
+<g><title>③ 答えられない質問 / 試行 1 / パターン 2: 5/14（35.7%）</title><circle cx="124.0" cy="130.6" r="2.6" class="s2"/><circle cx="124.0" cy="130.6" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 2 / パターン 2: 8/14（57.1%）</title><circle cx="156.3" cy="123.7" r="2.6" class="s2"/><circle cx="156.3" cy="123.7" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 3 / パターン 2: 11/14（78.6%）</title><circle cx="188.7" cy="116.9" r="2.6" class="s2"/><circle cx="188.7" cy="116.9" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 4 / パターン 2: 12/14（85.7%）</title><circle cx="221.0" cy="114.6" r="2.6" class="s2"/><circle cx="221.0" cy="114.6" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 5 / パターン 2: 12/14（85.7%）</title><circle cx="253.3" cy="114.6" r="2.6" class="s2"/><circle cx="253.3" cy="114.6" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 6 / パターン 2: 12/14（85.7%）</title><circle cx="285.7" cy="114.6" r="2.6" class="s2"/><circle cx="285.7" cy="114.6" r="7" class="hit"/></g>
+<g><title>③ 答えられない質問 / 試行 7 / パターン 2: 12/14（85.7%）</title><circle cx="318.0" cy="114.6" r="2.6" class="s2"/><circle cx="318.0" cy="114.6" r="7" class="hit"/></g>
+<text x="326" y="120" class="vl"><tspan class="t1">■</tspan> 93%</text>
+<text x="326" y="135" class="vl"><tspan class="t2">■</tspan> 86%</text>
+<text x="124.0" y="158" class="ax" text-anchor="middle">1</text>
+<text x="156.3" y="158" class="ax" text-anchor="middle">2</text>
+<text x="188.7" y="158" class="ax" text-anchor="middle">3</text>
+<text x="221.0" y="158" class="ax" text-anchor="middle">4</text>
+<text x="253.3" y="158" class="ax" text-anchor="middle">5</text>
+<text x="285.7" y="158" class="ax" text-anchor="middle">6</text>
+<text x="318.0" y="158" class="ax" text-anchor="middle">7</text>
+<text x="120" y="158" class="ax" text-anchor="end">試行</text>
+</svg>
+</figure>
+</details>
+<details class="trend-block" open><summary>推理系 ④〜⑥</summary>
+<figure class="diagram">
+<svg viewBox="0 0 400 164" role="img" aria-label="推理系 ④〜⑥ の種別ごとの一致率の推移" class="study-chart trend">
+<rect x="124" y="6" width="10" height="10" rx="2" class="s1"/><text x="138" y="15" class="lg">パターン 1</text><rect x="214" y="6" width="10" height="10" rx="2" class="s2"/><text x="228" y="15" class="lg">パターン 2</text><text x="326" y="15" class="tl">試行 7</text>
+<line x1="0" y1="64" x2="400" y2="64" class="grid"/>
+<text x="0" y="49.0" class="rl">④ 正解推理</text>
+<line x1="124" y1="36.4" x2="318" y2="36.4" class="target"/>
+<line x1="124" y1="62.0" x2="318" y2="62.0" class="axis0"/>
+<polyline points="124.0,32.9 156.3,32.9 188.7,35.8 221.0,32.9 253.3,32.9 285.7,32.9 318.0,30.0" class="ln s1l"/>
+<g><title>④ 正解推理 / 試行 1 / パターン 1: 10/11（90.9%）</title><circle cx="124.0" cy="32.9" r="2.6" class="s1"/><circle cx="124.0" cy="32.9" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 2 / パターン 1: 10/11（90.9%）</title><circle cx="156.3" cy="32.9" r="2.6" class="s1"/><circle cx="156.3" cy="32.9" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 3 / パターン 1: 9/11（81.8%）</title><circle cx="188.7" cy="35.8" r="2.6" class="s1"/><circle cx="188.7" cy="35.8" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 4 / パターン 1: 10/11（90.9%）</title><circle cx="221.0" cy="32.9" r="2.6" class="s1"/><circle cx="221.0" cy="32.9" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 5 / パターン 1: 10/11（90.9%）</title><circle cx="253.3" cy="32.9" r="2.6" class="s1"/><circle cx="253.3" cy="32.9" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 6 / パターン 1: 10/11（90.9%）</title><circle cx="285.7" cy="32.9" r="2.6" class="s1"/><circle cx="285.7" cy="32.9" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 7 / パターン 1: 11/11（100.0%）</title><circle cx="318.0" cy="30.0" r="2.6" class="s1"/><circle cx="318.0" cy="30.0" r="7" class="hit"/></g>
+<polyline points="124.0,41.6 156.3,41.6 188.7,41.6 221.0,44.5 253.3,35.8 285.7,32.9 318.0,35.8" class="ln s2l"/>
+<g><title>④ 正解推理 / 試行 1 / パターン 2: 7/11（63.6%）</title><circle cx="124.0" cy="41.6" r="2.6" class="s2"/><circle cx="124.0" cy="41.6" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 2 / パターン 2: 7/11（63.6%）</title><circle cx="156.3" cy="41.6" r="2.6" class="s2"/><circle cx="156.3" cy="41.6" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 3 / パターン 2: 7/11（63.6%）</title><circle cx="188.7" cy="41.6" r="2.6" class="s2"/><circle cx="188.7" cy="41.6" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 4 / パターン 2: 6/11（54.5%）</title><circle cx="221.0" cy="44.5" r="2.6" class="s2"/><circle cx="221.0" cy="44.5" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 5 / パターン 2: 9/11（81.8%）</title><circle cx="253.3" cy="35.8" r="2.6" class="s2"/><circle cx="253.3" cy="35.8" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 6 / パターン 2: 10/11（90.9%）</title><circle cx="285.7" cy="32.9" r="2.6" class="s2"/><circle cx="285.7" cy="32.9" r="7" class="hit"/></g>
+<g><title>④ 正解推理 / 試行 7 / パターン 2: 9/11（81.8%）</title><circle cx="318.0" cy="35.8" r="2.6" class="s2"/><circle cx="318.0" cy="35.8" r="7" class="hit"/></g>
+<text x="326" y="40" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="55" class="vl"><tspan class="t2">■</tspan> 82%</text>
+<line x1="0" y1="104" x2="400" y2="104" class="grid"/>
+<text x="0" y="89.0" class="rl">⑤ 惜しい推理</text>
+<line x1="124" y1="76.4" x2="318" y2="76.4" class="target"/>
+<line x1="124" y1="102.0" x2="318" y2="102.0" class="axis0"/>
+<polyline points="124.0,74.0 156.3,74.0 188.7,70.0 221.0,74.0 253.3,70.0 285.7,70.0 318.0,78.0" class="ln s1l"/>
+<g><title>⑤ 惜しい推理 / 試行 1 / パターン 1: 7/8（87.5%）</title><circle cx="124.0" cy="74.0" r="2.6" class="s1"/><circle cx="124.0" cy="74.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 2 / パターン 1: 7/8（87.5%）</title><circle cx="156.3" cy="74.0" r="2.6" class="s1"/><circle cx="156.3" cy="74.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 3 / パターン 1: 8/8（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s1"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 4 / パターン 1: 7/8（87.5%）</title><circle cx="221.0" cy="74.0" r="2.6" class="s1"/><circle cx="221.0" cy="74.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 5 / パターン 1: 8/8（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s1"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 6 / パターン 1: 8/8（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s1"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 7 / パターン 1: 6/8（75.0%）</title><circle cx="318.0" cy="78.0" r="2.6" class="s1"/><circle cx="318.0" cy="78.0" r="7" class="hit"/></g>
+<polyline points="124.0,102.0 156.3,102.0 188.7,102.0 221.0,82.0 253.3,86.0 285.7,86.0 318.0,74.0" class="ln s2l"/>
+<g><title>⑤ 惜しい推理 / 試行 1 / パターン 2: 0/8（0.0%）</title><circle cx="124.0" cy="102.0" r="2.6" class="s2"/><circle cx="124.0" cy="102.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 2 / パターン 2: 0/8（0.0%）</title><circle cx="156.3" cy="102.0" r="2.6" class="s2"/><circle cx="156.3" cy="102.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 3 / パターン 2: 0/8（0.0%）</title><circle cx="188.7" cy="102.0" r="2.6" class="s2"/><circle cx="188.7" cy="102.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 4 / パターン 2: 5/8（62.5%）</title><circle cx="221.0" cy="82.0" r="2.6" class="s2"/><circle cx="221.0" cy="82.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 5 / パターン 2: 4/8（50.0%）</title><circle cx="253.3" cy="86.0" r="2.6" class="s2"/><circle cx="253.3" cy="86.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 6 / パターン 2: 4/8（50.0%）</title><circle cx="285.7" cy="86.0" r="2.6" class="s2"/><circle cx="285.7" cy="86.0" r="7" class="hit"/></g>
+<g><title>⑤ 惜しい推理 / 試行 7 / パターン 2: 7/8（87.5%）</title><circle cx="318.0" cy="74.0" r="2.6" class="s2"/><circle cx="318.0" cy="74.0" r="7" class="hit"/></g>
+<text x="326" y="80" class="vl"><tspan class="t1">■</tspan> 75%</text>
+<text x="326" y="95" class="vl"><tspan class="t2">■</tspan> 88%</text>
+<line x1="0" y1="144" x2="400" y2="144" class="grid"/>
+<text x="0" y="129.0" class="rl">⑥ 外れた推理</text>
+<line x1="124" y1="116.4" x2="318" y2="116.4" class="target"/>
+<line x1="124" y1="142.0" x2="318" y2="142.0" class="axis0"/>
+<polyline points="124.0,112.9 156.3,112.9 188.7,112.9 221.0,112.7 253.3,112.7 285.7,118.0 318.0,115.3" class="ln s1l"/>
+<g><title>⑥ 外れた推理 / 試行 1 / パターン 1: 10/11（90.9%）</title><circle cx="124.0" cy="112.9" r="2.6" class="s1"/><circle cx="124.0" cy="112.9" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 2 / パターン 1: 10/11（90.9%）</title><circle cx="156.3" cy="112.9" r="2.6" class="s1"/><circle cx="156.3" cy="112.9" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 3 / パターン 1: 10/11（90.9%）</title><circle cx="188.7" cy="112.9" r="2.6" class="s1"/><circle cx="188.7" cy="112.9" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 4 / パターン 1: 11/12（91.7%）</title><circle cx="221.0" cy="112.7" r="2.6" class="s1"/><circle cx="221.0" cy="112.7" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 5 / パターン 1: 11/12（91.7%）</title><circle cx="253.3" cy="112.7" r="2.6" class="s1"/><circle cx="253.3" cy="112.7" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 6 / パターン 1: 9/12（75.0%）</title><circle cx="285.7" cy="118.0" r="2.6" class="s1"/><circle cx="285.7" cy="118.0" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 7 / パターン 1: 10/12（83.3%）</title><circle cx="318.0" cy="115.3" r="2.6" class="s1"/><circle cx="318.0" cy="115.3" r="7" class="hit"/></g>
+<polyline points="124.0,110.0 156.3,110.0 188.7,110.0 221.0,115.3 253.3,112.7 285.7,115.3 318.0,112.7" class="ln s2l"/>
+<g><title>⑥ 外れた推理 / 試行 1 / パターン 2: 11/11（100.0%）</title><circle cx="124.0" cy="110.0" r="2.6" class="s2"/><circle cx="124.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 2 / パターン 2: 11/11（100.0%）</title><circle cx="156.3" cy="110.0" r="2.6" class="s2"/><circle cx="156.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 3 / パターン 2: 11/11（100.0%）</title><circle cx="188.7" cy="110.0" r="2.6" class="s2"/><circle cx="188.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 4 / パターン 2: 10/12（83.3%）</title><circle cx="221.0" cy="115.3" r="2.6" class="s2"/><circle cx="221.0" cy="115.3" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 5 / パターン 2: 11/12（91.7%）</title><circle cx="253.3" cy="112.7" r="2.6" class="s2"/><circle cx="253.3" cy="112.7" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 6 / パターン 2: 10/12（83.3%）</title><circle cx="285.7" cy="115.3" r="2.6" class="s2"/><circle cx="285.7" cy="115.3" r="7" class="hit"/></g>
+<g><title>⑥ 外れた推理 / 試行 7 / パターン 2: 11/12（91.7%）</title><circle cx="318.0" cy="112.7" r="2.6" class="s2"/><circle cx="318.0" cy="112.7" r="7" class="hit"/></g>
+<text x="326" y="120" class="vl"><tspan class="t1">■</tspan> 83%</text>
+<text x="326" y="135" class="vl"><tspan class="t2">■</tspan> 92%</text>
+<text x="124.0" y="158" class="ax" text-anchor="middle">1</text>
+<text x="156.3" y="158" class="ax" text-anchor="middle">2</text>
+<text x="188.7" y="158" class="ax" text-anchor="middle">3</text>
+<text x="221.0" y="158" class="ax" text-anchor="middle">4</text>
+<text x="253.3" y="158" class="ax" text-anchor="middle">5</text>
+<text x="285.7" y="158" class="ax" text-anchor="middle">6</text>
+<text x="318.0" y="158" class="ax" text-anchor="middle">7</text>
+<text x="120" y="158" class="ax" text-anchor="end">試行</text>
+</svg>
+</figure>
+</details>
+<details class="trend-block"><summary>依頼系 ⑦〜⑨</summary>
+<figure class="diagram">
+<svg viewBox="0 0 400 164" role="img" aria-label="依頼系 ⑦〜⑨ の種別ごとの一致率の推移" class="study-chart trend">
+<rect x="124" y="6" width="10" height="10" rx="2" class="s1"/><text x="138" y="15" class="lg">パターン 1</text><rect x="214" y="6" width="10" height="10" rx="2" class="s2"/><text x="228" y="15" class="lg">パターン 2</text><text x="326" y="15" class="tl">試行 7</text>
+<line x1="0" y1="64" x2="400" y2="64" class="grid"/>
+<text x="0" y="49.0" class="rl">⑦ ヒント要求</text>
+<line x1="124" y1="36.4" x2="318" y2="36.4" class="target"/>
+<line x1="124" y1="62.0" x2="318" y2="62.0" class="axis0"/>
+<polyline points="124.0,30.0 156.3,30.0 188.7,30.0 221.0,30.0 253.3,30.0 285.7,30.0 318.0,30.0" class="ln s1l"/>
+<g><title>⑦ ヒント要求 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="30.0" r="2.6" class="s1"/><circle cx="124.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="30.0" r="2.6" class="s1"/><circle cx="156.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="30.0" r="2.6" class="s1"/><circle cx="188.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="30.0" r="2.6" class="s1"/><circle cx="221.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="30.0" r="2.6" class="s1"/><circle cx="253.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="30.0" r="2.6" class="s1"/><circle cx="285.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="30.0" r="2.6" class="s1"/><circle cx="318.0" cy="30.0" r="7" class="hit"/></g>
+<polyline points="124.0,36.4 156.3,36.4 188.7,30.0 221.0,30.0 253.3,30.0 285.7,30.0 318.0,30.0" class="ln s2l"/>
+<g><title>⑦ ヒント要求 / 試行 1 / パターン 2: 4/5（80.0%）</title><circle cx="124.0" cy="36.4" r="2.6" class="s2"/><circle cx="124.0" cy="36.4" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 2 / パターン 2: 4/5（80.0%）</title><circle cx="156.3" cy="36.4" r="2.6" class="s2"/><circle cx="156.3" cy="36.4" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="30.0" r="2.6" class="s2"/><circle cx="188.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="30.0" r="2.6" class="s2"/><circle cx="221.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="30.0" r="2.6" class="s2"/><circle cx="253.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="30.0" r="2.6" class="s2"/><circle cx="285.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑦ ヒント要求 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="30.0" r="2.6" class="s2"/><circle cx="318.0" cy="30.0" r="7" class="hit"/></g>
+<text x="326" y="40" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="55" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="104" x2="400" y2="104" class="grid"/>
+<text x="0" y="89.0" class="rl">⑧ ネタバレ要求</text>
+<line x1="124" y1="76.4" x2="318" y2="76.4" class="target"/>
+<line x1="124" y1="102.0" x2="318" y2="102.0" class="axis0"/>
+<polyline points="124.0,70.0 156.3,70.0 188.7,70.0 221.0,70.0 253.3,70.0 285.7,70.0 318.0,70.0" class="ln s1l"/>
+<g><title>⑧ ネタバレ要求 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="70.0" r="2.6" class="s1"/><circle cx="124.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="70.0" r="2.6" class="s1"/><circle cx="156.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s1"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s1"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s1"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s1"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="70.0" r="2.6" class="s1"/><circle cx="318.0" cy="70.0" r="7" class="hit"/></g>
+<polyline points="124.0,70.0 156.3,70.0 188.7,70.0 221.0,70.0 253.3,70.0 285.7,70.0 318.0,70.0" class="ln s2l"/>
+<g><title>⑧ ネタバレ要求 / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="70.0" r="2.6" class="s2"/><circle cx="124.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="70.0" r="2.6" class="s2"/><circle cx="156.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s2"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s2"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s2"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s2"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑧ ネタバレ要求 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="70.0" r="2.6" class="s2"/><circle cx="318.0" cy="70.0" r="7" class="hit"/></g>
+<text x="326" y="80" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="95" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="144" x2="400" y2="144" class="grid"/>
+<text x="0" y="129.0" class="rl">⑨ 遊び方の質問</text>
+<line x1="124" y1="116.4" x2="318" y2="116.4" class="target"/>
+<line x1="124" y1="142.0" x2="318" y2="142.0" class="axis0"/>
+<polyline points="124.0,110.0 156.3,110.0 188.7,110.0 221.0,116.4 253.3,116.4 285.7,110.0 318.0,110.0" class="ln s1l"/>
+<g><title>⑨ 遊び方の質問 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="110.0" r="2.6" class="s1"/><circle cx="124.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="110.0" r="2.6" class="s1"/><circle cx="156.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="110.0" r="2.6" class="s1"/><circle cx="188.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 4 / パターン 1: 4/5（80.0%）</title><circle cx="221.0" cy="116.4" r="2.6" class="s1"/><circle cx="221.0" cy="116.4" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 5 / パターン 1: 4/5（80.0%）</title><circle cx="253.3" cy="116.4" r="2.6" class="s1"/><circle cx="253.3" cy="116.4" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="110.0" r="2.6" class="s1"/><circle cx="285.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="110.0" r="2.6" class="s1"/><circle cx="318.0" cy="110.0" r="7" class="hit"/></g>
+<polyline points="124.0,129.2 156.3,129.2 188.7,110.0 221.0,110.0 253.3,110.0 285.7,110.0 318.0,110.0" class="ln s2l"/>
+<g><title>⑨ 遊び方の質問 / 試行 1 / パターン 2: 2/5（40.0%）</title><circle cx="124.0" cy="129.2" r="2.6" class="s2"/><circle cx="124.0" cy="129.2" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 2 / パターン 2: 2/5（40.0%）</title><circle cx="156.3" cy="129.2" r="2.6" class="s2"/><circle cx="156.3" cy="129.2" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="110.0" r="2.6" class="s2"/><circle cx="188.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="110.0" r="2.6" class="s2"/><circle cx="221.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="110.0" r="2.6" class="s2"/><circle cx="253.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="110.0" r="2.6" class="s2"/><circle cx="285.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑨ 遊び方の質問 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="110.0" r="2.6" class="s2"/><circle cx="318.0" cy="110.0" r="7" class="hit"/></g>
+<text x="326" y="120" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="135" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<text x="124.0" y="158" class="ax" text-anchor="middle">1</text>
+<text x="156.3" y="158" class="ax" text-anchor="middle">2</text>
+<text x="188.7" y="158" class="ax" text-anchor="middle">3</text>
+<text x="221.0" y="158" class="ax" text-anchor="middle">4</text>
+<text x="253.3" y="158" class="ax" text-anchor="middle">5</text>
+<text x="285.7" y="158" class="ax" text-anchor="middle">6</text>
+<text x="318.0" y="158" class="ax" text-anchor="middle">7</text>
+<text x="120" y="158" class="ax" text-anchor="end">試行</text>
+</svg>
+</figure>
+</details>
+<details class="trend-block"><summary>反応系 ⑩〜⑰</summary>
+<figure class="diagram">
+<svg viewBox="0 0 400 364" role="img" aria-label="反応系 ⑩〜⑰ の種別ごとの一致率の推移" class="study-chart trend">
+<rect x="124" y="6" width="10" height="10" rx="2" class="s1"/><text x="138" y="15" class="lg">パターン 1</text><rect x="214" y="6" width="10" height="10" rx="2" class="s2"/><text x="228" y="15" class="lg">パターン 2</text><text x="326" y="15" class="tl">試行 7</text>
+<line x1="0" y1="64" x2="400" y2="64" class="grid"/>
+<text x="0" y="49.0" class="rl">⑩ 感想</text>
+<line x1="124" y1="36.4" x2="318" y2="36.4" class="target"/>
+<line x1="124" y1="62.0" x2="318" y2="62.0" class="axis0"/>
+<polyline points="124.0,30.0 156.3,30.0 188.7,30.0 221.0,30.0 253.3,30.0 285.7,30.0 318.0,30.0" class="ln s1l"/>
+<g><title>⑩ 感想 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="30.0" r="2.6" class="s1"/><circle cx="124.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="30.0" r="2.6" class="s1"/><circle cx="156.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="30.0" r="2.6" class="s1"/><circle cx="188.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="30.0" r="2.6" class="s1"/><circle cx="221.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="30.0" r="2.6" class="s1"/><circle cx="253.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="30.0" r="2.6" class="s1"/><circle cx="285.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="30.0" r="2.6" class="s1"/><circle cx="318.0" cy="30.0" r="7" class="hit"/></g>
+<polyline points="124.0,30.0 156.3,30.0 188.7,30.0 221.0,30.0 253.3,30.0 285.7,30.0 318.0,30.0" class="ln s2l"/>
+<g><title>⑩ 感想 / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="30.0" r="2.6" class="s2"/><circle cx="124.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="30.0" r="2.6" class="s2"/><circle cx="156.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="30.0" r="2.6" class="s2"/><circle cx="188.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="30.0" r="2.6" class="s2"/><circle cx="221.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="30.0" r="2.6" class="s2"/><circle cx="253.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="30.0" r="2.6" class="s2"/><circle cx="285.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑩ 感想 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="30.0" r="2.6" class="s2"/><circle cx="318.0" cy="30.0" r="7" class="hit"/></g>
+<text x="326" y="40" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="55" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="104" x2="400" y2="104" class="grid"/>
+<text x="0" y="89.0" class="rl">⑪ 挨拶</text>
+<line x1="124" y1="76.4" x2="318" y2="76.4" class="target"/>
+<line x1="124" y1="102.0" x2="318" y2="102.0" class="axis0"/>
+<polyline points="124.0,70.0 156.3,70.0 188.7,70.0 221.0,70.0 253.3,70.0 285.7,70.0 318.0,70.0" class="ln s1l"/>
+<g><title>⑪ 挨拶 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="70.0" r="2.6" class="s1"/><circle cx="124.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="70.0" r="2.6" class="s1"/><circle cx="156.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s1"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s1"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s1"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s1"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="70.0" r="2.6" class="s1"/><circle cx="318.0" cy="70.0" r="7" class="hit"/></g>
+<polyline points="124.0,70.0 156.3,70.0 188.7,70.0 221.0,70.0 253.3,70.0 285.7,70.0 318.0,70.0" class="ln s2l"/>
+<g><title>⑪ 挨拶 / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="70.0" r="2.6" class="s2"/><circle cx="124.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="70.0" r="2.6" class="s2"/><circle cx="156.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s2"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s2"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s2"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s2"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑪ 挨拶 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="70.0" r="2.6" class="s2"/><circle cx="318.0" cy="70.0" r="7" class="hit"/></g>
+<text x="326" y="80" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="95" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="144" x2="400" y2="144" class="grid"/>
+<text x="0" y="129.0" class="rl">⑫ 応援</text>
+<line x1="124" y1="116.4" x2="318" y2="116.4" class="target"/>
+<line x1="124" y1="142.0" x2="318" y2="142.0" class="axis0"/>
+<polyline points="124.0,110.0 156.3,110.0 188.7,110.0 221.0,110.0 253.3,110.0 285.7,110.0 318.0,110.0" class="ln s1l"/>
+<g><title>⑫ 応援 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="110.0" r="2.6" class="s1"/><circle cx="124.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="110.0" r="2.6" class="s1"/><circle cx="156.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="110.0" r="2.6" class="s1"/><circle cx="188.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="110.0" r="2.6" class="s1"/><circle cx="221.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="110.0" r="2.6" class="s1"/><circle cx="253.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="110.0" r="2.6" class="s1"/><circle cx="285.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="110.0" r="2.6" class="s1"/><circle cx="318.0" cy="110.0" r="7" class="hit"/></g>
+<polyline points="124.0,116.4 156.3,116.4 188.7,110.0 221.0,110.0 253.3,110.0 285.7,110.0 318.0,110.0" class="ln s2l"/>
+<g><title>⑫ 応援 / 試行 1 / パターン 2: 4/5（80.0%）</title><circle cx="124.0" cy="116.4" r="2.6" class="s2"/><circle cx="124.0" cy="116.4" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 2 / パターン 2: 4/5（80.0%）</title><circle cx="156.3" cy="116.4" r="2.6" class="s2"/><circle cx="156.3" cy="116.4" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="110.0" r="2.6" class="s2"/><circle cx="188.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="110.0" r="2.6" class="s2"/><circle cx="221.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="110.0" r="2.6" class="s2"/><circle cx="253.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="110.0" r="2.6" class="s2"/><circle cx="285.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑫ 応援 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="110.0" r="2.6" class="s2"/><circle cx="318.0" cy="110.0" r="7" class="hit"/></g>
+<text x="326" y="120" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="135" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="184" x2="400" y2="184" class="grid"/>
+<text x="0" y="169.0" class="rl">⑬ 雑談</text>
+<line x1="124" y1="156.4" x2="318" y2="156.4" class="target"/>
+<line x1="124" y1="182.0" x2="318" y2="182.0" class="axis0"/>
+<polyline points="124.0,150.0 156.3,150.0 188.7,150.0 221.0,150.0 253.3,150.0 285.7,150.0 318.0,150.0" class="ln s1l"/>
+<g><title>⑬ 雑談 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="150.0" r="2.6" class="s1"/><circle cx="124.0" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="150.0" r="2.6" class="s1"/><circle cx="156.3" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="150.0" r="2.6" class="s1"/><circle cx="188.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="150.0" r="2.6" class="s1"/><circle cx="221.0" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="150.0" r="2.6" class="s1"/><circle cx="253.3" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="150.0" r="2.6" class="s1"/><circle cx="285.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="150.0" r="2.6" class="s1"/><circle cx="318.0" cy="150.0" r="7" class="hit"/></g>
+<polyline points="124.0,150.0 156.3,150.0 188.7,150.0 221.0,150.0 253.3,150.0 285.7,150.0 318.0,150.0" class="ln s2l"/>
+<g><title>⑬ 雑談 / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="150.0" r="2.6" class="s2"/><circle cx="124.0" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="150.0" r="2.6" class="s2"/><circle cx="156.3" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="150.0" r="2.6" class="s2"/><circle cx="188.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="150.0" r="2.6" class="s2"/><circle cx="221.0" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="150.0" r="2.6" class="s2"/><circle cx="253.3" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="150.0" r="2.6" class="s2"/><circle cx="285.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>⑬ 雑談 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="150.0" r="2.6" class="s2"/><circle cx="318.0" cy="150.0" r="7" class="hit"/></g>
+<text x="326" y="160" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="175" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="224" x2="400" y2="224" class="grid"/>
+<text x="0" y="209.0" class="rl">⑭ リクエスト</text>
+<line x1="124" y1="196.4" x2="318" y2="196.4" class="target"/>
+<line x1="124" y1="222.0" x2="318" y2="222.0" class="axis0"/>
+<polyline points="124.0,190.0 156.3,190.0 188.7,190.0 221.0,190.0 253.3,190.0 285.7,190.0 318.0,190.0" class="ln s1l"/>
+<g><title>⑭ リクエスト / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="190.0" r="2.6" class="s1"/><circle cx="124.0" cy="190.0" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="190.0" r="2.6" class="s1"/><circle cx="156.3" cy="190.0" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="190.0" r="2.6" class="s1"/><circle cx="188.7" cy="190.0" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="190.0" r="2.6" class="s1"/><circle cx="221.0" cy="190.0" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="190.0" r="2.6" class="s1"/><circle cx="253.3" cy="190.0" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="190.0" r="2.6" class="s1"/><circle cx="285.7" cy="190.0" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="190.0" r="2.6" class="s1"/><circle cx="318.0" cy="190.0" r="7" class="hit"/></g>
+<polyline points="124.0,190.0 156.3,190.0 188.7,196.4 221.0,196.4 253.3,196.4 285.7,196.4 318.0,196.4" class="ln s2l"/>
+<g><title>⑭ リクエスト / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="190.0" r="2.6" class="s2"/><circle cx="124.0" cy="190.0" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="190.0" r="2.6" class="s2"/><circle cx="156.3" cy="190.0" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 3 / パターン 2: 4/5（80.0%）</title><circle cx="188.7" cy="196.4" r="2.6" class="s2"/><circle cx="188.7" cy="196.4" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 4 / パターン 2: 4/5（80.0%）</title><circle cx="221.0" cy="196.4" r="2.6" class="s2"/><circle cx="221.0" cy="196.4" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 5 / パターン 2: 4/5（80.0%）</title><circle cx="253.3" cy="196.4" r="2.6" class="s2"/><circle cx="253.3" cy="196.4" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 6 / パターン 2: 4/5（80.0%）</title><circle cx="285.7" cy="196.4" r="2.6" class="s2"/><circle cx="285.7" cy="196.4" r="7" class="hit"/></g>
+<g><title>⑭ リクエスト / 試行 7 / パターン 2: 4/5（80.0%）</title><circle cx="318.0" cy="196.4" r="2.6" class="s2"/><circle cx="318.0" cy="196.4" r="7" class="hit"/></g>
+<text x="326" y="200" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="215" class="vl"><tspan class="t2">■</tspan> 80%</text>
+<line x1="0" y1="264" x2="400" y2="264" class="grid"/>
+<text x="0" y="249.0" class="rl">⑮ 指摘・クレーム</text>
+<line x1="124" y1="236.4" x2="318" y2="236.4" class="target"/>
+<line x1="124" y1="262.0" x2="318" y2="262.0" class="axis0"/>
+<polyline points="124.0,230.0 156.3,230.0 188.7,230.0 221.0,230.0 253.3,230.0 285.7,230.0 318.0,230.0" class="ln s1l"/>
+<g><title>⑮ 指摘・クレーム / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="230.0" r="2.6" class="s1"/><circle cx="124.0" cy="230.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="230.0" r="2.6" class="s1"/><circle cx="156.3" cy="230.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 3 / パターン 1: 8/8（100.0%）</title><circle cx="188.7" cy="230.0" r="2.6" class="s1"/><circle cx="188.7" cy="230.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 4 / パターン 1: 8/8（100.0%）</title><circle cx="221.0" cy="230.0" r="2.6" class="s1"/><circle cx="221.0" cy="230.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 5 / パターン 1: 8/8（100.0%）</title><circle cx="253.3" cy="230.0" r="2.6" class="s1"/><circle cx="253.3" cy="230.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 6 / パターン 1: 8/8（100.0%）</title><circle cx="285.7" cy="230.0" r="2.6" class="s1"/><circle cx="285.7" cy="230.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 7 / パターン 1: 8/8（100.0%）</title><circle cx="318.0" cy="230.0" r="2.6" class="s1"/><circle cx="318.0" cy="230.0" r="7" class="hit"/></g>
+<polyline points="124.0,242.8 156.3,242.8 188.7,234.0 221.0,234.0 253.3,234.0 285.7,234.0 318.0,234.0" class="ln s2l"/>
+<g><title>⑮ 指摘・クレーム / 試行 1 / パターン 2: 3/5（60.0%）</title><circle cx="124.0" cy="242.8" r="2.6" class="s2"/><circle cx="124.0" cy="242.8" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 2 / パターン 2: 3/5（60.0%）</title><circle cx="156.3" cy="242.8" r="2.6" class="s2"/><circle cx="156.3" cy="242.8" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 3 / パターン 2: 7/8（87.5%）</title><circle cx="188.7" cy="234.0" r="2.6" class="s2"/><circle cx="188.7" cy="234.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 4 / パターン 2: 7/8（87.5%）</title><circle cx="221.0" cy="234.0" r="2.6" class="s2"/><circle cx="221.0" cy="234.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 5 / パターン 2: 7/8（87.5%）</title><circle cx="253.3" cy="234.0" r="2.6" class="s2"/><circle cx="253.3" cy="234.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 6 / パターン 2: 7/8（87.5%）</title><circle cx="285.7" cy="234.0" r="2.6" class="s2"/><circle cx="285.7" cy="234.0" r="7" class="hit"/></g>
+<g><title>⑮ 指摘・クレーム / 試行 7 / パターン 2: 7/8（87.5%）</title><circle cx="318.0" cy="234.0" r="2.6" class="s2"/><circle cx="318.0" cy="234.0" r="7" class="hit"/></g>
+<text x="326" y="240" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="255" class="vl"><tspan class="t2">■</tspan> 88%</text>
+<line x1="0" y1="304" x2="400" y2="304" class="grid"/>
+<text x="0" y="289.0" class="rl">⑯ メンション</text>
+<line x1="124" y1="276.4" x2="318" y2="276.4" class="target"/>
+<line x1="124" y1="302.0" x2="318" y2="302.0" class="axis0"/>
+<polyline points="124.0,270.0 156.3,270.0 188.7,270.0 221.0,270.0 253.3,270.0 285.7,270.0 318.0,270.0" class="ln s1l"/>
+<g><title>⑯ メンション / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="270.0" r="2.6" class="s1"/><circle cx="124.0" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="270.0" r="2.6" class="s1"/><circle cx="156.3" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="270.0" r="2.6" class="s1"/><circle cx="188.7" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="270.0" r="2.6" class="s1"/><circle cx="221.0" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="270.0" r="2.6" class="s1"/><circle cx="253.3" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="270.0" r="2.6" class="s1"/><circle cx="285.7" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="270.0" r="2.6" class="s1"/><circle cx="318.0" cy="270.0" r="7" class="hit"/></g>
+<polyline points="124.0,270.0 156.3,270.0 188.7,270.0 221.0,270.0 253.3,270.0 285.7,270.0 318.0,270.0" class="ln s2l"/>
+<g><title>⑯ メンション / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="270.0" r="2.6" class="s2"/><circle cx="124.0" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="270.0" r="2.6" class="s2"/><circle cx="156.3" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="270.0" r="2.6" class="s2"/><circle cx="188.7" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="270.0" r="2.6" class="s2"/><circle cx="221.0" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="270.0" r="2.6" class="s2"/><circle cx="253.3" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="270.0" r="2.6" class="s2"/><circle cx="285.7" cy="270.0" r="7" class="hit"/></g>
+<g><title>⑯ メンション / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="270.0" r="2.6" class="s2"/><circle cx="318.0" cy="270.0" r="7" class="hit"/></g>
+<text x="326" y="280" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="295" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="344" x2="400" y2="344" class="grid"/>
+<text x="0" y="329.0" class="rl">⑰ 絵文字だけ</text>
+<line x1="124" y1="316.4" x2="318" y2="316.4" class="target"/>
+<line x1="124" y1="342.0" x2="318" y2="342.0" class="axis0"/>
+<polyline points="124.0,310.0 156.3,310.0 188.7,310.0 221.0,310.0 253.3,310.0 285.7,310.0 318.0,310.0" class="ln s1l"/>
+<g><title>⑰ 絵文字だけ / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="310.0" r="2.6" class="s1"/><circle cx="124.0" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="310.0" r="2.6" class="s1"/><circle cx="156.3" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="310.0" r="2.6" class="s1"/><circle cx="188.7" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="310.0" r="2.6" class="s1"/><circle cx="221.0" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="310.0" r="2.6" class="s1"/><circle cx="253.3" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="310.0" r="2.6" class="s1"/><circle cx="285.7" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="310.0" r="2.6" class="s1"/><circle cx="318.0" cy="310.0" r="7" class="hit"/></g>
+<polyline points="124.0,310.0 156.3,310.0 188.7,310.0 221.0,310.0 253.3,310.0 285.7,310.0 318.0,310.0" class="ln s2l"/>
+<g><title>⑰ 絵文字だけ / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="310.0" r="2.6" class="s2"/><circle cx="124.0" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="310.0" r="2.6" class="s2"/><circle cx="156.3" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="310.0" r="2.6" class="s2"/><circle cx="188.7" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="310.0" r="2.6" class="s2"/><circle cx="221.0" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="310.0" r="2.6" class="s2"/><circle cx="253.3" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="310.0" r="2.6" class="s2"/><circle cx="285.7" cy="310.0" r="7" class="hit"/></g>
+<g><title>⑰ 絵文字だけ / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="310.0" r="2.6" class="s2"/><circle cx="318.0" cy="310.0" r="7" class="hit"/></g>
+<text x="326" y="320" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="335" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<text x="124.0" y="358" class="ax" text-anchor="middle">1</text>
+<text x="156.3" y="358" class="ax" text-anchor="middle">2</text>
+<text x="188.7" y="358" class="ax" text-anchor="middle">3</text>
+<text x="221.0" y="358" class="ax" text-anchor="middle">4</text>
+<text x="253.3" y="358" class="ax" text-anchor="middle">5</text>
+<text x="285.7" y="358" class="ax" text-anchor="middle">6</text>
+<text x="318.0" y="358" class="ax" text-anchor="middle">7</text>
+<text x="120" y="358" class="ax" text-anchor="end">試行</text>
+</svg>
+</figure>
+</details>
+<details class="trend-block"><summary>不適切系 ⑱〜㉑</summary>
+<figure class="diagram">
+<svg viewBox="0 0 400 204" role="img" aria-label="不適切系 ⑱〜㉑ の種別ごとの一致率の推移" class="study-chart trend">
+<rect x="124" y="6" width="10" height="10" rx="2" class="s1"/><text x="138" y="15" class="lg">パターン 1</text><rect x="214" y="6" width="10" height="10" rx="2" class="s2"/><text x="228" y="15" class="lg">パターン 2</text><text x="326" y="15" class="tl">試行 7</text>
+<line x1="0" y1="64" x2="400" y2="64" class="grid"/>
+<text x="0" y="49.0" class="rl">⑱ 荒らし</text>
+<line x1="124" y1="36.4" x2="318" y2="36.4" class="target"/>
+<line x1="124" y1="62.0" x2="318" y2="62.0" class="axis0"/>
+<polyline points="124.0,30.0 156.3,30.0 188.7,30.0 221.0,30.0 253.3,30.0 285.7,30.0 318.0,30.0" class="ln s1l"/>
+<g><title>⑱ 荒らし / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="30.0" r="2.6" class="s1"/><circle cx="124.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="30.0" r="2.6" class="s1"/><circle cx="156.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="30.0" r="2.6" class="s1"/><circle cx="188.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="30.0" r="2.6" class="s1"/><circle cx="221.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="30.0" r="2.6" class="s1"/><circle cx="253.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="30.0" r="2.6" class="s1"/><circle cx="285.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="30.0" r="2.6" class="s1"/><circle cx="318.0" cy="30.0" r="7" class="hit"/></g>
+<polyline points="124.0,42.8 156.3,42.8 188.7,42.8 221.0,36.4 253.3,36.4 285.7,36.4 318.0,36.4" class="ln s2l"/>
+<g><title>⑱ 荒らし / 試行 1 / パターン 2: 3/5（60.0%）</title><circle cx="124.0" cy="42.8" r="2.6" class="s2"/><circle cx="124.0" cy="42.8" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 2 / パターン 2: 3/5（60.0%）</title><circle cx="156.3" cy="42.8" r="2.6" class="s2"/><circle cx="156.3" cy="42.8" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 3 / パターン 2: 3/5（60.0%）</title><circle cx="188.7" cy="42.8" r="2.6" class="s2"/><circle cx="188.7" cy="42.8" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 4 / パターン 2: 4/5（80.0%）</title><circle cx="221.0" cy="36.4" r="2.6" class="s2"/><circle cx="221.0" cy="36.4" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 5 / パターン 2: 4/5（80.0%）</title><circle cx="253.3" cy="36.4" r="2.6" class="s2"/><circle cx="253.3" cy="36.4" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 6 / パターン 2: 4/5（80.0%）</title><circle cx="285.7" cy="36.4" r="2.6" class="s2"/><circle cx="285.7" cy="36.4" r="7" class="hit"/></g>
+<g><title>⑱ 荒らし / 試行 7 / パターン 2: 4/5（80.0%）</title><circle cx="318.0" cy="36.4" r="2.6" class="s2"/><circle cx="318.0" cy="36.4" r="7" class="hit"/></g>
+<text x="326" y="40" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="55" class="vl"><tspan class="t2">■</tspan> 80%</text>
+<line x1="0" y1="104" x2="400" y2="104" class="grid"/>
+<text x="0" y="89.0" class="rl">⑲ 誹謗中傷</text>
+<line x1="124" y1="76.4" x2="318" y2="76.4" class="target"/>
+<line x1="124" y1="102.0" x2="318" y2="102.0" class="axis0"/>
+<polyline points="124.0,89.2 156.3,89.2 188.7,70.0 221.0,70.0 253.3,70.0 285.7,70.0 318.0,70.0" class="ln s1l"/>
+<g><title>⑲ 誹謗中傷 / 試行 1 / パターン 1: 2/5（40.0%）</title><circle cx="124.0" cy="89.2" r="2.6" class="s1"/><circle cx="124.0" cy="89.2" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 2 / パターン 1: 2/5（40.0%）</title><circle cx="156.3" cy="89.2" r="2.6" class="s1"/><circle cx="156.3" cy="89.2" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s1"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s1"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s1"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s1"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="70.0" r="2.6" class="s1"/><circle cx="318.0" cy="70.0" r="7" class="hit"/></g>
+<polyline points="124.0,89.2 156.3,89.2 188.7,70.0 221.0,70.0 253.3,70.0 285.7,70.0 318.0,70.0" class="ln s2l"/>
+<g><title>⑲ 誹謗中傷 / 試行 1 / パターン 2: 2/5（40.0%）</title><circle cx="124.0" cy="89.2" r="2.6" class="s2"/><circle cx="124.0" cy="89.2" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 2 / パターン 2: 2/5（40.0%）</title><circle cx="156.3" cy="89.2" r="2.6" class="s2"/><circle cx="156.3" cy="89.2" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="70.0" r="2.6" class="s2"/><circle cx="188.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="70.0" r="2.6" class="s2"/><circle cx="221.0" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="70.0" r="2.6" class="s2"/><circle cx="253.3" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="70.0" r="2.6" class="s2"/><circle cx="285.7" cy="70.0" r="7" class="hit"/></g>
+<g><title>⑲ 誹謗中傷 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="70.0" r="2.6" class="s2"/><circle cx="318.0" cy="70.0" r="7" class="hit"/></g>
+<text x="326" y="80" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="95" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="144" x2="400" y2="144" class="grid"/>
+<text x="0" y="129.0" class="rl">⑳ 宣伝・スパム</text>
+<line x1="124" y1="116.4" x2="318" y2="116.4" class="target"/>
+<line x1="124" y1="142.0" x2="318" y2="142.0" class="axis0"/>
+<polyline points="124.0,110.0 156.3,110.0 188.7,110.0 221.0,110.0 253.3,110.0 285.7,110.0 318.0,110.0" class="ln s1l"/>
+<g><title>⑳ 宣伝・スパム / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="110.0" r="2.6" class="s1"/><circle cx="124.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="110.0" r="2.6" class="s1"/><circle cx="156.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="110.0" r="2.6" class="s1"/><circle cx="188.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="110.0" r="2.6" class="s1"/><circle cx="221.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="110.0" r="2.6" class="s1"/><circle cx="253.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="110.0" r="2.6" class="s1"/><circle cx="285.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="110.0" r="2.6" class="s1"/><circle cx="318.0" cy="110.0" r="7" class="hit"/></g>
+<polyline points="124.0,110.0 156.3,110.0 188.7,110.0 221.0,110.0 253.3,110.0 285.7,110.0 318.0,110.0" class="ln s2l"/>
+<g><title>⑳ 宣伝・スパム / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="110.0" r="2.6" class="s2"/><circle cx="124.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="110.0" r="2.6" class="s2"/><circle cx="156.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="110.0" r="2.6" class="s2"/><circle cx="188.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="110.0" r="2.6" class="s2"/><circle cx="221.0" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="110.0" r="2.6" class="s2"/><circle cx="253.3" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="110.0" r="2.6" class="s2"/><circle cx="285.7" cy="110.0" r="7" class="hit"/></g>
+<g><title>⑳ 宣伝・スパム / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="110.0" r="2.6" class="s2"/><circle cx="318.0" cy="110.0" r="7" class="hit"/></g>
+<text x="326" y="120" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="135" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<line x1="0" y1="184" x2="400" y2="184" class="grid"/>
+<text x="0" y="169.0" class="rl">㉑ 個人情報</text>
+<line x1="124" y1="156.4" x2="318" y2="156.4" class="target"/>
+<line x1="124" y1="182.0" x2="318" y2="182.0" class="axis0"/>
+<polyline points="124.0,150.0 156.3,150.0 188.7,150.0 221.0,150.0 253.3,150.0 285.7,150.0 318.0,150.0" class="ln s1l"/>
+<g><title>㉑ 個人情報 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="150.0" r="2.6" class="s1"/><circle cx="124.0" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="150.0" r="2.6" class="s1"/><circle cx="156.3" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 3 / パターン 1: 5/5（100.0%）</title><circle cx="188.7" cy="150.0" r="2.6" class="s1"/><circle cx="188.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="150.0" r="2.6" class="s1"/><circle cx="221.0" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="150.0" r="2.6" class="s1"/><circle cx="253.3" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="150.0" r="2.6" class="s1"/><circle cx="285.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="150.0" r="2.6" class="s1"/><circle cx="318.0" cy="150.0" r="7" class="hit"/></g>
+<polyline points="124.0,150.0 156.3,150.0 188.7,150.0 221.0,150.0 253.3,150.0 285.7,150.0 318.0,150.0" class="ln s2l"/>
+<g><title>㉑ 個人情報 / 試行 1 / パターン 2: 5/5（100.0%）</title><circle cx="124.0" cy="150.0" r="2.6" class="s2"/><circle cx="124.0" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 2 / パターン 2: 5/5（100.0%）</title><circle cx="156.3" cy="150.0" r="2.6" class="s2"/><circle cx="156.3" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 3 / パターン 2: 5/5（100.0%）</title><circle cx="188.7" cy="150.0" r="2.6" class="s2"/><circle cx="188.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 4 / パターン 2: 5/5（100.0%）</title><circle cx="221.0" cy="150.0" r="2.6" class="s2"/><circle cx="221.0" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 5 / パターン 2: 5/5（100.0%）</title><circle cx="253.3" cy="150.0" r="2.6" class="s2"/><circle cx="253.3" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 6 / パターン 2: 5/5（100.0%）</title><circle cx="285.7" cy="150.0" r="2.6" class="s2"/><circle cx="285.7" cy="150.0" r="7" class="hit"/></g>
+<g><title>㉑ 個人情報 / 試行 7 / パターン 2: 5/5（100.0%）</title><circle cx="318.0" cy="150.0" r="2.6" class="s2"/><circle cx="318.0" cy="150.0" r="7" class="hit"/></g>
+<text x="326" y="160" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="175" class="vl"><tspan class="t2">■</tspan> 100%</text>
+<text x="124.0" y="198" class="ax" text-anchor="middle">1</text>
+<text x="156.3" y="198" class="ax" text-anchor="middle">2</text>
+<text x="188.7" y="198" class="ax" text-anchor="middle">3</text>
+<text x="221.0" y="198" class="ax" text-anchor="middle">4</text>
+<text x="253.3" y="198" class="ax" text-anchor="middle">5</text>
+<text x="285.7" y="198" class="ax" text-anchor="middle">6</text>
+<text x="318.0" y="198" class="ax" text-anchor="middle">7</text>
+<text x="120" y="198" class="ax" text-anchor="end">試行</text>
+</svg>
+</figure>
+</details>
+<details class="trend-block"><summary>その他 ㉒</summary>
+<figure class="diagram">
+<svg viewBox="0 0 400 84" role="img" aria-label="その他 ㉒ の種別ごとの一致率の推移" class="study-chart trend">
+<rect x="124" y="6" width="10" height="10" rx="2" class="s1"/><text x="138" y="15" class="lg">パターン 1</text><rect x="214" y="6" width="10" height="10" rx="2" class="s2"/><text x="228" y="15" class="lg">パターン 2</text><text x="326" y="15" class="tl">試行 7</text>
+<line x1="0" y1="64" x2="400" y2="64" class="grid"/>
+<text x="0" y="49.0" class="rl">㉒ 外国語</text>
+<line x1="124" y1="36.4" x2="318" y2="36.4" class="target"/>
+<line x1="124" y1="62.0" x2="318" y2="62.0" class="axis0"/>
+<polyline points="124.0,30.0 156.3,30.0 188.7,36.4 221.0,30.0 253.3,30.0 285.7,30.0 318.0,30.0" class="ln s1l"/>
+<g><title>㉒ 外国語 / 試行 1 / パターン 1: 5/5（100.0%）</title><circle cx="124.0" cy="30.0" r="2.6" class="s1"/><circle cx="124.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 2 / パターン 1: 5/5（100.0%）</title><circle cx="156.3" cy="30.0" r="2.6" class="s1"/><circle cx="156.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 3 / パターン 1: 4/5（80.0%）</title><circle cx="188.7" cy="36.4" r="2.6" class="s1"/><circle cx="188.7" cy="36.4" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 4 / パターン 1: 5/5（100.0%）</title><circle cx="221.0" cy="30.0" r="2.6" class="s1"/><circle cx="221.0" cy="30.0" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 5 / パターン 1: 5/5（100.0%）</title><circle cx="253.3" cy="30.0" r="2.6" class="s1"/><circle cx="253.3" cy="30.0" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 6 / パターン 1: 5/5（100.0%）</title><circle cx="285.7" cy="30.0" r="2.6" class="s1"/><circle cx="285.7" cy="30.0" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 7 / パターン 1: 5/5（100.0%）</title><circle cx="318.0" cy="30.0" r="2.6" class="s1"/><circle cx="318.0" cy="30.0" r="7" class="hit"/></g>
+<polyline points="124.0,49.2 156.3,49.2 188.7,36.4 221.0,49.2 253.3,36.4 285.7,36.4 318.0,36.4" class="ln s2l"/>
+<g><title>㉒ 外国語 / 試行 1 / パターン 2: 2/5（40.0%）</title><circle cx="124.0" cy="49.2" r="2.6" class="s2"/><circle cx="124.0" cy="49.2" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 2 / パターン 2: 2/5（40.0%）</title><circle cx="156.3" cy="49.2" r="2.6" class="s2"/><circle cx="156.3" cy="49.2" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 3 / パターン 2: 4/5（80.0%）</title><circle cx="188.7" cy="36.4" r="2.6" class="s2"/><circle cx="188.7" cy="36.4" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 4 / パターン 2: 2/5（40.0%）</title><circle cx="221.0" cy="49.2" r="2.6" class="s2"/><circle cx="221.0" cy="49.2" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 5 / パターン 2: 4/5（80.0%）</title><circle cx="253.3" cy="36.4" r="2.6" class="s2"/><circle cx="253.3" cy="36.4" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 6 / パターン 2: 4/5（80.0%）</title><circle cx="285.7" cy="36.4" r="2.6" class="s2"/><circle cx="285.7" cy="36.4" r="7" class="hit"/></g>
+<g><title>㉒ 外国語 / 試行 7 / パターン 2: 4/5（80.0%）</title><circle cx="318.0" cy="36.4" r="2.6" class="s2"/><circle cx="318.0" cy="36.4" r="7" class="hit"/></g>
+<text x="326" y="40" class="vl"><tspan class="t1">■</tspan> 100%</text>
+<text x="326" y="55" class="vl"><tspan class="t2">■</tspan> 80%</text>
+<text x="124.0" y="78" class="ax" text-anchor="middle">1</text>
+<text x="156.3" y="78" class="ax" text-anchor="middle">2</text>
+<text x="188.7" y="78" class="ax" text-anchor="middle">3</text>
+<text x="221.0" y="78" class="ax" text-anchor="middle">4</text>
+<text x="253.3" y="78" class="ax" text-anchor="middle">5</text>
+<text x="285.7" y="78" class="ax" text-anchor="middle">6</text>
+<text x="318.0" y="78" class="ax" text-anchor="middle">7</text>
+<text x="120" y="78" class="ax" text-anchor="end">試行</text>
+</svg>
+</figure>
+</details>
+<details class="trend-block"><summary>試行 7 時点の棒グラフ（件数つき）</summary>
 <figure class="diagram">
 <svg viewBox="0 0 400 386" role="img" aria-label="区分別の種別一致率の比較" class="study-chart">
 <rect x="8" y="6" width="12" height="12" rx="3" class="s1"/><text x="26" y="16" class="lg">パターン 1（luna）</text><rect x="158" y="6" width="12" height="12" rx="3" class="s2"/><text x="176" y="16" class="lg">パターン 2（Jev）</text>
@@ -167,7 +900,7 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <g><title>① の判定（新しい質問） / パターン 2: 29/31（93.5%）</title><rect x="8" y="342" width="269.4" height="12" rx="4" class="s2"/><text x="281.4" y="352" class="vl">94%（29/31）</text></g>
 <line x1="267.2" y1="48" x2="267.2" y2="368" class="target"/><text x="267.2" y="42" class="tl" text-anchor="middle">レベル 1 の基準 90%</text>
 </svg>
-<figcaption>区分別の種別一致率と ① の判定一致。点線はレベル 1 の基準（全体 90%）。棒に触れると件数が出る</figcaption>
+<figcaption>区分別の種別一致率と ① の判定一致（試行 7）</figcaption>
 </figure>
 <figure class="diagram">
 <svg viewBox="0 0 400 1218" role="img" aria-label="種別ごとの一致率の比較" class="study-chart">
@@ -243,8 +976,9 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <g><title>㉒ 外国語 / パターン 2: 4/5（80.0%）</title><rect x="8" y="1174" width="230.4" height="12" rx="4" class="s2"/><text x="242.4" y="1184" class="vl">80%（4/5）</text></g>
 <line x1="238.4" y1="48" x2="238.4" y2="1200" class="target"/><text x="238.4" y="42" class="tl" text-anchor="middle">種別ごとの基準 80%</text>
 </svg>
-<figcaption>種別ごとの一致率（各 5〜82 件）。点線は質問以外の種別の基準 80%</figcaption>
+<figcaption>種別ごとの一致率（試行 7。各 5〜82 件）</figcaption>
 </figure>
+</details>
 
 <h3>P1〜P7 の結果</h3>
 <ul>
