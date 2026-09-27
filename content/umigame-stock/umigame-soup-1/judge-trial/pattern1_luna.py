@@ -45,7 +45,7 @@ def judge(
     api_key: str,
     model: str = "gpt-6-luna",
     effort: str = "xhigh",
-    max_tokens: int = 800,
+    max_tokens: int = 1200,
 ) -> JudgeResult:
     """一回の chat completions で種別・回答・返信を生成する。"""
     started = time.monotonic()

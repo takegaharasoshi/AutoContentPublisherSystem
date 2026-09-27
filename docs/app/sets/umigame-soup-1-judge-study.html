@@ -261,7 +261,7 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <line x1="125.0" y1="50" x2="125.0" y2="72" class="ar" marker-end="url(#arw-p1)"/>
 <rect x="10" y="72" width="230" height="58" rx="8" class="bx"/><text x="125.0" y="90.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">system プロンプトを組み立て</text><text x="125.0" y="105.2" text-anchor="middle" font-size="12" class="ft">改訂案の判定ルール</text><text x="125.0" y="120.2" text-anchor="middle" font-size="12" class="ft">+ 問題文・真相・確定事実</text>
 <line x1="125.0" y1="130" x2="125.0" y2="152" class="ar" marker-end="url(#arw-p1)"/>
-<rect x="10" y="152" width="230" height="72" rx="8" class="bx2"/><text x="125.0" y="169.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">gpt-6-luna を 1 回呼ぶ</text><text x="125.0" y="184.7" text-anchor="middle" font-size="12" class="ft">effort xhigh・上限 800</text><text x="125.0" y="199.7" text-anchor="middle" font-size="12" class="ft">出力は JSON</text><text x="125.0" y="214.7" text-anchor="middle" font-size="12" class="ft">{種別, 判定, 返信文}</text>
+<rect x="10" y="152" width="230" height="72" rx="8" class="bx2"/><text x="125.0" y="169.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">gpt-6-luna を 1 回呼ぶ</text><text x="125.0" y="184.7" text-anchor="middle" font-size="12" class="ft">effort xhigh・上限 1,200</text><text x="125.0" y="199.7" text-anchor="middle" font-size="12" class="ft">出力は JSON</text><text x="125.0" y="214.7" text-anchor="middle" font-size="12" class="ft">{種別, 判定, 返信文}</text>
 <line x1="125.0" y1="224" x2="125.0" y2="246" class="ar" marker-end="url(#arw-p1)"/>
 <rect x="10" y="246" width="230" height="58" rx="8" class="bx"/><text x="125.0" y="264.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">コードの後処理</text><text x="125.0" y="279.2" text-anchor="middle" font-size="12" class="ft">種別で出口を分ける</text><text x="125.0" y="294.2" text-anchor="middle" font-size="12" class="ft">（LLM の判断を上書き）</text>
 <rect x="268" y="236" width="146" height="36" rx="8" class="ex"/><text x="341.0" y="250.8" text-anchor="middle" font-size="11" class="ft">⑳ 宣伝・㉑ 個人情報</text><text x="341.0" y="264.9" text-anchor="middle" font-size="11" class="ft">→ 返信しない</text>
@@ -278,7 +278,7 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
   <li><strong>呼び出し</strong>: コメント 1 件につき chat completions を 1 回。<code>response_format</code> を JSON スキーマ（strict）にし、<code>{種別, 判定, 返信文}</code> を返させる（種別を明示させることで、コードの上書きと種別一致率の集計ができる）</li>
   <li><strong>プロンプト</strong>: 5.1 のマスタープロンプトを改訂した <code>judge-trial/prompts/pattern1_rules.txt</code>。手順 1 で 22 種を定義して種別を選ばせ、手順 2 で判定、手順 3 で種別ごとの返し方（80 字以内・探偵口調・① は判定語 + 真相に触れない 20 字以内の一言）を書く。「荒らしには返信しない」はやめ、⑱〜㉑ は返信文を空にしてコードに任せる</li>
   <li><strong>足したルール</strong>: 正解時の開示は 70 字以内（試行 3）・作品へのけなしは ⑮、⑲ は人への攻撃・差別・性的な内容に限る（試行 3）・主語が曖昧な質問は ③（試行 3。試行 4 で評価データにない例文を追加）・かなを含まない漢字だけの文は中国語を疑う（試行 4）。絵についてのルールは試行 4 で削除</li>
-  <li><strong>パラメータ</strong>: effort <code>xhigh</code>・出力上限 800・温度は送らない</li>
+  <li><strong>パラメータ</strong>: effort <code>xhigh</code>・出力上限 1,200（試行 4 のあとユーザー承認で 800 から変更）・温度は送らない</li>
 </ul>
 <h3>5.2 結果（試行 4）</h3>
 <ul>
