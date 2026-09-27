@@ -19,7 +19,7 @@ T_POINT = 0.5
 T_CLOSE = 0.25  # 惜しい判定だけに使う（正解側の T_POINT は下げない。試行 4 で 0.35、試行 7b でコア基準に合わせて 0.25）
 CORRECT_FRACTION = 0.75  # 要点のこの割合以上が T_POINT 以上なら正解（試行 5・ユーザー承認）
 T_GUESS = 0.95  # 段 A1b で推理とする確率の下限（試行 6b。5 問で選んだ値なので 21-6d で確かめる）
-T_RECHECK = 0.5  # A2 が q_open のとき、問題文つきで答えられる質問か確かめ直す（試行 5・ユーザー指示）
+T_RECHECK = 0.6  # A2 が q_open のとき、問題文つきで答えられる質問か確かめ直す（試行 5・ユーザー指示。試行 8 で 0.5 → 0.6）
 T_QUALITY = 0.2
 T_ANSWER = 0.55
 MAX_RETRIES = 3
@@ -277,6 +277,33 @@ def judge(
         return JudgeResult(rule_kind, None, reply, "p2", debug)
 
     try:
+        _points_cache: dict = {}
+
+        def core_probs() -> dict:
+            """段 B（コアの要点ごとの noul）。段 A1b と正解判定で使い回すため 1 回だけ呼ぶ（試行 8）。"""
+            if "B" not in _points_cache:
+                # 要点ごとの noul を 1 リクエストにまとめる（試行 5。試行 4 は要点ごとに 1 回ずつ呼んで遅くなった）
+                point_questions = {
+                    f"point_{index}": {
+                        "type": "noul",
+                        "instructions": (
+                            "Estimate whether the comment states the same content as this truth point, "
+                            "including paraphrases or different wording with the same meaning. "
+                            f"The truth point is: {point!r}."
+                        ),
+                        "criteria": {
+                            "true": "The comment states this truth point, possibly in different words.",
+                            "false": "The comment does not state this truth point.",
+                        },
+                    }
+                    for index, point in enumerate(problem.core_points or problem.truth_points)
+                }
+                point_answers = _record_call(api_key, {"comment": text}, point_questions, debug)
+                point_probs = {point_id: _noul_true(point_answers[point_id]) for point_id in point_questions}
+                _points_cache["B"] = point_probs
+                debug["probabilities"]["B"] = point_probs
+            return _points_cache["B"]
+
         state_a = {"context": A_CONTEXT, "comment": text}
         a1_answers = _record_call(
             api_key,
@@ -314,6 +341,11 @@ def judge(
             # 最大確率で選ぶと、理由を確かめる質問（〜したから？）が推理に流れた（試行 6）
             if qg_probs:
                 major = "guess" if float(qg_probs.get("guess", 0)) >= t_guess else "question"
+                # 推理にするのはコアの要点のどれかに少しでも触れているときだけ（試行 8・ユーザー指示）。
+                # コアに全く触れない短い質問（「誰かのいたずらだった？」など）が推理の確率 0.95 を超えることがあった
+                if major == "guess" and max(core_probs().values(), default=0.0) < t_close:
+                    major = "question"
+                    debug["guess_demoted"] = True
             else:
                 major = _choice(qg_answers["qg"], tuple(QG_CRITERIA))
         if major == "guess":
@@ -336,7 +368,10 @@ def judge(
             )
             a_kind = _choice(a2_answers["kind"], tuple(sub))
             debug["probabilities"]["A2"] = _probability_map(a2_answers["kind"])
-            if a_kind == "q_open" or (a_kind == "q_yesno" and _DEMONSTRATIVE_RE.search(text)):
+            if a_kind == "q_open" and debug.get("guess_demoted"):
+                # 推理から質問に戻したが、はい / いいえの質問でもない → コアに触れない推理 = ⑥（試行 8b）
+                a_kind = "guess"
+            elif a_kind == "q_open" or (a_kind == "q_yesno" and _DEMONSTRATIVE_RE.search(text)):
                 # A2 は問題文を見ないので、主語が消去法で決まる質問まで q_open にしうる。問題文を渡して確かめ直す。
                 recheck_answers = _record_call(
                     api_key,
@@ -365,25 +400,7 @@ def judge(
         kind: str
         answer: str | None = None
         if a_kind in {"guess", "q_yesno"}:
-            # 要点ごとの noul を 1 リクエストにまとめる（試行 5。試行 4 は要点ごとに 1 回ずつ呼んで遅くなった）
-            point_questions = {
-                f"point_{index}": {
-                    "type": "noul",
-                    "instructions": (
-                        "Estimate whether the comment states the same content as this truth point, "
-                        "including paraphrases or different wording with the same meaning. "
-                        f"The truth point is: {point!r}."
-                    ),
-                    "criteria": {
-                        "true": "The comment states this truth point, possibly in different words.",
-                        "false": "The comment does not state this truth point.",
-                    },
-                }
-                for index, point in enumerate(problem.core_points or problem.truth_points)
-            }
-            point_answers = _record_call(api_key, {"comment": text}, point_questions, debug)
-            point_probs = {point_id: _noul_true(point_answers[point_id]) for point_id in point_questions}
-            debug["probabilities"]["B"] = point_probs
+            point_probs = core_probs()
             hits = sum(value >= t_point for value in point_probs.values())
             if problem.core_points:
                 # コア基準（試行 7・ユーザー合意）: コアの要点がすべて当たれば正解、どれかに触れれば惜しい、触れなければ外れ

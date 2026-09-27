@@ -297,3 +297,26 @@ def test_pattern2_core_points_rule(monkeypatch) -> None:
         ),
     )
     assert pattern2_jev.judge("C-13", "推理", core_problem, api_key="test").kind == "guess_close"
+
+
+def test_pattern2_guess_without_core_goes_back_to_question(monkeypatch) -> None:
+    """推理の確率が高くても、コアの要点に全く触れなければ質問に戻す（試行 8）。段 B は使い回す。"""
+    from dataclasses import replace
+
+    core_problem = replace(PROBLEM, core_points=["コア 1"])
+    monkeypatch.setattr(
+        pattern2_jev,
+        "_jev_request",
+        _mock_answers(
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "guess", "probabilities": {"guess": 0.97, "question": 0.03}}},
+            {"point_0": {"noul": 0.05}},
+            {"kind": {"choice": "q_yesno"}},
+            {"quality": {"noul": 0.9}},
+            {"answer": {"choice": "no", "probabilities": {"yes": 0.05, "no": 0.9, "irrelevant": 0.05}}},
+        ),
+    )
+    result = pattern2_jev.judge("C-14", "誰かのいたずらだった？", core_problem, api_key="test")
+    assert result.kind == "q_yesno" and result.answer == "no"
+    assert result.debug["guess_demoted"] is True
+    assert result.debug["calls"] == 6
