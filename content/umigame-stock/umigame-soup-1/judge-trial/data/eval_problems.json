@@ -1,0 +1,747 @@
+{
+  "U01": [
+    {
+      "id": "U01-e01",
+      "text": "男が言われた「影」って、足元にできる影なの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U01-e02",
+      "text": "あの相手は男の家族なの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U01-e03",
+      "text": "男はその相手のところに定期的に通ってた？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U01-e04",
+      "text": "男はその場所に入院してたの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U01-e05",
+      "text": "今日泣いたのは、悪い知らせを聞いたから？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U01-e06",
+      "text": "相手は男をからかって言ったの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U01-e07",
+      "text": "相手は男の友だちだったの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U01-e08",
+      "text": "男は会社員だったの？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "fact_sheet で男の職業は問題に関係ないとされている。"
+    },
+    {
+      "id": "U01-e09",
+      "text": "男は以前、影が濃くなったと知って落ち込んだことある？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U01-e10",
+      "text": "相手が笑ったのは、男に良い知らせを伝えられたから？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U01-e11",
+      "text": "相手ってお医者さん？それで影が薄くなったの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e12",
+      "text": "男はどこに通ってたの？相手は誰なの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e13",
+      "text": "なんで男はあんなに泣いて、何度も頭を下げたの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e14",
+      "text": "どうして相手もにこにこ笑ってたの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e15",
+      "text": "あの人はそれを見て嬉しかったの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e16",
+      "text": "男の「影」はレントゲン写真に写った病気の跡で、3か月ぶりの診察で薄くなったと主治医に聞いて回復を喜び、治療への感謝で頭を下げたんだね。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e17",
+      "text": "男の影はレントゲンに写る病気の跡で、主治医から回復の知らせを聞いて感謝した、ってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e18",
+      "text": "影は男の存在感のことじゃなくて、体の写真に写ったもの。病院に通ってたのかな？",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e19",
+      "text": "影が薄くなったのは、男の病気が良くなってきた知らせなんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e20",
+      "text": "男は存在感が薄いと嫌味を言われ、悔しくて泣きながら帰ったんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U01-e21",
+      "text": "相手は男をからかって笑い、男は怒って何度も頭を下げたんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    }
+  ],
+  "U13": [
+    {
+      "id": "U13-e01",
+      "text": "手紙って男の家のポストに届いたの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U13-e02",
+      "text": "郵便屋さんが何十年もかけて配達したの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U13-e03",
+      "text": "学校の行事で書かれた手紙なの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U13-e04",
+      "text": "あとで読まれるように保管されてた？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U13-e05",
+      "text": "書いた男の子って、男の息子なの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U13-e06",
+      "text": "その子は有名人だったの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U13-e07",
+      "text": "男はその子に会ったことがある？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U13-e08",
+      "text": "手紙に書かれてた夢の内容って、答えに関係ある？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "fact_sheet で夢の中身は問題に関係ないとされている。"
+    },
+    {
+      "id": "U13-e09",
+      "text": "手紙の宛先は男で合ってたの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U13-e10",
+      "text": "男は手紙を読んで驚いてた？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U13-e11",
+      "text": "手紙はいつ書いたの？誰が書いたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e12",
+      "text": "どこで手紙を受け取ったの？それは郵便で届いたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e13",
+      "text": "なぜ男は、その子がどんな子か誰よりよく知っていたの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e14",
+      "text": "どうして男はその子に一度も会っていないの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e15",
+      "text": "その子は彼に会ったことがある？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e16",
+      "text": "男が小学生のころ、未来の自分宛てに書いた手紙を学校のタイムカプセルに入れ、50年後の同窓会で受け取った。書いた子は昔の男自身だからよく知っているし、自分には会えなかったんだ。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e17",
+      "text": "小学生の男が未来の自分に宛てて書いた手紙を、学校のタイムカプセルから同窓会で受け取った。書いた子は昔の自分だから、誰より知っていても会ったことはないってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e18",
+      "text": "学校で書かれた古い手紙が何十年も保管されていて、男に渡ったんじゃない？",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e19",
+      "text": "手紙は未来の誰かに宛てたもので、男はその子についてよく知っていたのかな。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e20",
+      "text": "郵便局が配達を忘れていて、50年後に遅れて届けたんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U13-e21",
+      "text": "手紙を書いたのは男の息子で、男はその子のことを周りから聞いて知ったんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    }
+  ],
+  "U18": [
+    {
+      "id": "U18-e01",
+      "text": "約束は口約束だったの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U18-e02",
+      "text": "白紙になったのは、目に見えるもの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U18-e03",
+      "text": "ふたりはけんかしてた？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U18-e04",
+      "text": "夏の夕立が関係してる？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U18-e05",
+      "text": "濡れたものを乾かしたの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U18-e06",
+      "text": "約束そのものを取り消した？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U18-e07",
+      "text": "約束の中身は二人とも覚えてた？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U18-e08",
+      "text": "誰かのいたずらだった？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U18-e09",
+      "text": "二人は後日その約束を果たした？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U18-e10",
+      "text": "二人の年齢って謎を解くのに関係ある？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "fact_sheet で年齢は問題に関係ないとされている。"
+    },
+    {
+      "id": "U18-e11",
+      "text": "雨で何か濡れたの？そのあとどうしたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e12",
+      "text": "約束は取り消されたの？それでも二人はあとで実行したの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e13",
+      "text": "なぜ約束が白紙に戻ったのに、二人は悲しまなかったの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e14",
+      "text": "どうして後日その約束を果たせたの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e15",
+      "text": "それはまだ覚えてるの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e16",
+      "text": "男が消せるボールペンで書いた手紙が夕立で濡れ、女がドライヤーで乾かした熱で文字が消えて白紙になった。二人は約束の中身を覚えていて書き直し、後日果たした。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e17",
+      "text": "夕立で濡れた手紙をドライヤーで乾かしたら、消せるペンの文字が熱で消えた。でも二人とも約束は覚えていて、書き直して後日果たしたってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e18",
+      "text": "雨に濡れた紙の文字が消えて白紙になったけど、二人は約束の内容を覚えていたんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e19",
+      "text": "約束は紙に書かれていて、白紙になったあと二人は同じ約束を続けたんじゃない？",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e20",
+      "text": "二人が大げんかして約束を取り消し、仲直りしたあと別の約束をしたんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U18-e21",
+      "text": "約束を書いた紙を誰かに破られてしまい、二人は悲しくてそのまま諦めたんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    }
+  ],
+  "U20": [
+    {
+      "id": "U20-e01",
+      "text": "ピアニストが音を外したの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U20-e02",
+      "text": "男はピアノ弾けるの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U20-e03",
+      "text": "男は音楽に詳しい人？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U20-e04",
+      "text": "男は演奏会より前からその曲を毎日聞いてた？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U20-e05",
+      "text": "男が覚えたのはCDとか動画から？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U20-e06",
+      "text": "隣にいた女性は男の奥さん？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U20-e07",
+      "text": "女性は男をばかにして笑ったの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U20-e08",
+      "text": "男はその曲を鼻歌で歌えるくらい知ってた？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U20-e09",
+      "text": "曲名って謎の答えに関係ある？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "fact_sheet で曲名は問題に関係ないとされている。"
+    },
+    {
+      "id": "U20-e10",
+      "text": "男の耳か記憶力に問題があったの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U20-e11",
+      "text": "ピアニストは演奏を間違えたの？男はピアノを弾けるの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e12",
+      "text": "男はどの音で間違えたと思ったの？隣の女は誰？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e13",
+      "text": "なぜ男は完璧な演奏を「あ、間違えた」と思ったの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e14",
+      "text": "どうして隣の女は吹き出したの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e15",
+      "text": "彼は前からあれを知ってたの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e16",
+      "text": "娘が毎晩同じ曲を練習し、いつも同じ場所で違う音を弾いていたので、男はその癖ごと覚えた。演奏会でピアニストが正しい音を弾き、男は間違いと思い、妻は娘の練習を知っていて笑った。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e17",
+      "text": "娘が毎晩同じ所を間違えて弾く曲を男はそのまま覚えた。正しい音を弾くピアニストを間違いだと思い、妻も娘の練習を知っていたので笑った、ってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e18",
+      "text": "男はその曲を毎日のように聞いて覚えていたから、ピアニストの演奏を間違いだと思ったのかな。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e19",
+      "text": "隣の女性も男がその曲を知っている理由を分かっていて、思わず笑ったんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e20",
+      "text": "ピアニストが本当に何度も音を外し、隣の女は演奏が下手で笑ったんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U20-e21",
+      "text": "男は音楽のプロで、演奏会の曲が別の編曲だったから間違いに気づいたんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    }
+  ],
+  "U26": [
+    {
+      "id": "U26-e01",
+      "text": "日本語を覚える前も、二人は毎日会話してたの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U26-e02",
+      "text": "夫が間に入って通訳してた？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U26-e03",
+      "text": "間に入って伝えてたのは家族？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U26-e04",
+      "text": "女は最近、辞書で日本語を勉強したの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U26-e05",
+      "text": "義母の性格がこの10年で変わった？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U26-e06",
+      "text": "近所の人が悪口を吹き込んだの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": ""
+    },
+    {
+      "id": "U26-e07",
+      "text": "二人は今も同じ家に住んでるの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U26-e08",
+      "text": "言い合いの話題は料理とか家事だったの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U26-e09",
+      "text": "女がどこの国から来たかって、問題に関係ある？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "fact_sheet で女の出身国は問題に関係ないとされている。"
+    },
+    {
+      "id": "U26-e10",
+      "text": "夫は仕事で遅く帰ってたの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": ""
+    },
+    {
+      "id": "U26-e11",
+      "text": "誰が二人の間で訳してたの？夫は家にいなかったの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e12",
+      "text": "日本語が話せるようになったのはいつ？二人は何のことで言い合ってたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e13",
+      "text": "なぜ日本語を覚えてから、二人は毎日けんかするようになったの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e14",
+      "text": "どうして二人は10年間も近所で仲がいいと思われていたの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e15",
+      "text": "彼女はそれをいつから言ってたの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e16",
+      "text": "息子が母と義母の通訳をしていたが、けんかを避けるため互いの不満をやさしい言葉に作り替えていた。息子が寮に入り、母が日本語を覚えて本音を直接聞くと、二人は言い合いを始め、通訳が作り話だったと気づいた。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e17",
+      "text": "息子が嫁と義母の言葉を仲直りのために作り替えて訳していた。日本語を覚えた嫁に本音が伝わり、けんかが始まった、ってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e18",
+      "text": "会話の間にいつも家族が入って訳していて、その人の伝え方が変わったんじゃない？",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e19",
+      "text": "女が日本語を話せるようになって、義母の本音が直接伝わるようになったのかな。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e20",
+      "text": "義母がこの10年で急に意地悪になり、嫁が腹を立てたから毎日けんかしたんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    },
+    {
+      "id": "U26-e21",
+      "text": "近所の人が二人の間で嘘を吹き込み、仲を悪くしたんだ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": ""
+    }
+  ]
+}

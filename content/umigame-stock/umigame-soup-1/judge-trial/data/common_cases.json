@@ -1,0 +1,402 @@
+[
+  {
+    "id": "c-ask_hint-01",
+    "text": "ヒントください！",
+    "kind": "ask_hint"
+  },
+  {
+    "id": "c-ask_hint-02",
+    "text": "ちょっとだけヒントほしい〜",
+    "kind": "ask_hint"
+  },
+  {
+    "id": "c-ask_hint-03",
+    "text": "考え方のヒントある？",
+    "kind": "ask_hint"
+  },
+  {
+    "id": "c-ask_hint-04",
+    "text": "詰まった、助けて🙏",
+    "kind": "ask_hint"
+  },
+  {
+    "id": "c-ask_hint-05",
+    "text": "もう一声ヒントお願い！",
+    "kind": "ask_hint"
+  },
+  {
+    "id": "c-ask_spoiler-01",
+    "text": "答えだけ教えて〜",
+    "kind": "ask_spoiler"
+  },
+  {
+    "id": "c-ask_spoiler-02",
+    "text": "ネタバレどこ？笑",
+    "kind": "ask_spoiler"
+  },
+  {
+    "id": "c-ask_spoiler-03",
+    "text": "もう真相言っちゃって！",
+    "kind": "ask_spoiler"
+  },
+  {
+    "id": "c-ask_spoiler-04",
+    "text": "正解は何なん？",
+    "kind": "ask_spoiler"
+  },
+  {
+    "id": "c-ask_spoiler-05",
+    "text": "解説まだー？",
+    "kind": "ask_spoiler"
+  },
+  {
+    "id": "c-ask_howto-01",
+    "text": "これどうやって遊ぶの？",
+    "kind": "ask_howto"
+  },
+  {
+    "id": "c-ask_howto-02",
+    "text": "何をコメントしたらいいの？",
+    "kind": "ask_howto"
+  },
+  {
+    "id": "c-ask_howto-03",
+    "text": "はい・いいえで答えればいい感じ？",
+    "kind": "ask_howto"
+  },
+  {
+    "id": "c-ask_howto-04",
+    "text": "質問したら返事もらえるの？",
+    "kind": "ask_howto"
+  },
+  {
+    "id": "c-ask_howto-05",
+    "text": "これ中の人？自動で返してる？",
+    "kind": "ask_howto"
+  },
+  {
+    "id": "c-impression-01",
+    "text": "このシリーズ好き！",
+    "kind": "impression"
+  },
+  {
+    "id": "c-impression-02",
+    "text": "毎回考えちゃう、面白い",
+    "kind": "impression"
+  },
+  {
+    "id": "c-impression-03",
+    "text": "今回の設定ちょっと怖くて好き",
+    "kind": "impression"
+  },
+  {
+    "id": "c-impression-04",
+    "text": "うーん、なんかモヤモヤするね",
+    "kind": "impression"
+  },
+  {
+    "id": "c-impression-05",
+    "text": "短いのに奥が深い！",
+    "kind": "impression"
+  },
+  {
+    "id": "c-greeting-01",
+    "text": "おはようございます〜",
+    "kind": "greeting"
+  },
+  {
+    "id": "c-greeting-02",
+    "text": "こんばんは！",
+    "kind": "greeting"
+  },
+  {
+    "id": "c-greeting-03",
+    "text": "こんちは！",
+    "kind": "greeting"
+  },
+  {
+    "id": "c-greeting-04",
+    "text": "やっほー",
+    "kind": "greeting"
+  },
+  {
+    "id": "c-greeting-05",
+    "text": "こんにちは、初コメです",
+    "kind": "greeting"
+  },
+  {
+    "id": "c-cheer-01",
+    "text": "今日も投稿おつかれさま！",
+    "kind": "cheer"
+  },
+  {
+    "id": "c-cheer-02",
+    "text": "応援してます！",
+    "kind": "cheer"
+  },
+  {
+    "id": "c-cheer-03",
+    "text": "更新たのしみにしてる〜",
+    "kind": "cheer"
+  },
+  {
+    "id": "c-cheer-04",
+    "text": "いつも見てるよ、がんばって",
+    "kind": "cheer"
+  },
+  {
+    "id": "c-cheer-05",
+    "text": "このアカウント好きだから続けてほしい",
+    "kind": "cheer"
+  },
+  {
+    "id": "c-chat-01",
+    "text": "今日めっちゃ暑いね",
+    "kind": "chat"
+  },
+  {
+    "id": "c-chat-02",
+    "text": "通勤中に見てます",
+    "kind": "chat"
+  },
+  {
+    "id": "c-chat-03",
+    "text": "お腹すいてきた笑",
+    "kind": "chat"
+  },
+  {
+    "id": "c-chat-04",
+    "text": "週末ってあっという間だなー",
+    "kind": "chat"
+  },
+  {
+    "id": "c-chat-05",
+    "text": "昨日寝不足で頭回らん",
+    "kind": "chat"
+  },
+  {
+    "id": "c-request-01",
+    "text": "次は学校が舞台の問題が見たい！",
+    "kind": "request"
+  },
+  {
+    "id": "c-request-02",
+    "text": "動物が出てくるやつ希望",
+    "kind": "request"
+  },
+  {
+    "id": "c-request-03",
+    "text": "怖めの問題もお願いします",
+    "kind": "request"
+  },
+  {
+    "id": "c-request-04",
+    "text": "短めの問題リクエストです",
+    "kind": "request"
+  },
+  {
+    "id": "c-request-05",
+    "text": "次は家族もの出してほしいな",
+    "kind": "request"
+  },
+  {
+    "id": "c-complaint-01",
+    "text": "これちょっと説明足りなくない？",
+    "kind": "complaint"
+  },
+  {
+    "id": "c-complaint-02",
+    "text": "前の投稿と設定が被ってる気がする",
+    "kind": "complaint"
+  },
+  {
+    "id": "c-complaint-03",
+    "text": "答えを聞いても腑に落ちないかも",
+    "kind": "complaint"
+  },
+  {
+    "id": "c-complaint-04",
+    "text": "問題文に矛盾があると思います",
+    "kind": "complaint"
+  },
+  {
+    "id": "c-complaint-05",
+    "text": "最近ちょっと難しすぎるかも…",
+    "kind": "complaint"
+  },
+  {
+    "id": "c-mention-01",
+    "text": "@mika これ一緒に解こ！",
+    "kind": "mention"
+  },
+  {
+    "id": "c-mention-02",
+    "text": "@tomo また出てるよ〜",
+    "kind": "mention"
+  },
+  {
+    "id": "c-mention-03",
+    "text": "@yuki こういうの好きそう",
+    "kind": "mention"
+  },
+  {
+    "id": "c-mention-04",
+    "text": "@ken 見て見て",
+    "kind": "mention"
+  },
+  {
+    "id": "c-mention-05",
+    "text": "@hana あとで考えてみて！",
+    "kind": "mention"
+  },
+  {
+    "id": "c-emoji_only-01",
+    "text": "🤔💭",
+    "kind": "emoji_only"
+  },
+  {
+    "id": "c-emoji_only-02",
+    "text": "😂👏",
+    "kind": "emoji_only"
+  },
+  {
+    "id": "c-emoji_only-03",
+    "text": "😮",
+    "kind": "emoji_only"
+  },
+  {
+    "id": "c-emoji_only-04",
+    "text": "👍✨",
+    "kind": "emoji_only"
+  },
+  {
+    "id": "c-emoji_only-05",
+    "text": "🕵️‍♂️❓",
+    "kind": "emoji_only"
+  },
+  {
+    "id": "c-troll-01",
+    "text": "ぬぬぬぬぬ",
+    "kind": "troll"
+  },
+  {
+    "id": "c-troll-02",
+    "text": "QWERTYZZZ",
+    "kind": "troll"
+  },
+  {
+    "id": "c-troll-03",
+    "text": "らららららららら",
+    "kind": "troll"
+  },
+  {
+    "id": "c-troll-04",
+    "text": "あああ???ぴょ",
+    "kind": "troll"
+  },
+  {
+    "id": "c-troll-05",
+    "text": "無無無無むむむ",
+    "kind": "troll"
+  },
+  {
+    "id": "c-abuse-01",
+    "text": "つまらん、センスない",
+    "kind": "abuse"
+  },
+  {
+    "id": "c-abuse-02",
+    "text": "バカみたいな問題だな",
+    "kind": "abuse"
+  },
+  {
+    "id": "c-abuse-03",
+    "text": "作者ほんと頭悪そう",
+    "kind": "abuse"
+  },
+  {
+    "id": "c-abuse-04",
+    "text": "そういう人たちを見下す感じ、無理",
+    "kind": "abuse"
+  },
+  {
+    "id": "c-abuse-05",
+    "text": "性的なことばっか考えてそうでキモい",
+    "kind": "abuse"
+  },
+  {
+    "id": "c-spam-01",
+    "text": "新作はこちら https://example.invalid/deal",
+    "kind": "spam"
+  },
+  {
+    "id": "c-spam-02",
+    "text": "フォローしてくれたら相互します！",
+    "kind": "spam"
+  },
+  {
+    "id": "c-spam-03",
+    "text": "副業に興味ある人はプロフのリンクへ",
+    "kind": "spam"
+  },
+  {
+    "id": "c-spam-04",
+    "text": "投資案件紹介中！DMください",
+    "kind": "spam"
+  },
+  {
+    "id": "c-spam-05",
+    "text": "無料プレゼント応募は固定リンクから→ https://example.invalid/gift",
+    "kind": "spam"
+  },
+  {
+    "id": "c-personal_info-01",
+    "text": "連絡先これです 090-0000-0001",
+    "kind": "personal_info"
+  },
+  {
+    "id": "c-personal_info-02",
+    "text": "090-0000-0123 に電話ください",
+    "kind": "personal_info"
+  },
+  {
+    "id": "c-personal_info-03",
+    "text": "住所は東京都テスト区サンプル町000-0000です",
+    "kind": "personal_info"
+  },
+  {
+    "id": "c-personal_info-04",
+    "text": "本名はサンプル太郎、電話は090-0000-0456です",
+    "kind": "personal_info"
+  },
+  {
+    "id": "c-personal_info-05",
+    "text": "〒000-0000 東京都架空市テスト町1-2-3です",
+    "kind": "personal_info"
+  },
+  {
+    "id": "c-foreign-01",
+    "text": "That was fun!",
+    "kind": "foreign"
+  },
+  {
+    "id": "c-foreign-02",
+    "text": "I don't get it, can you explain?",
+    "kind": "foreign"
+  },
+  {
+    "id": "c-foreign-03",
+    "text": "这个好难啊",
+    "kind": "foreign"
+  },
+  {
+    "id": "c-foreign-04",
+    "text": "答案是什么？",
+    "kind": "foreign"
+  },
+  {
+    "id": "c-foreign-05",
+    "text": "이거 정말 재밌어요",
+    "kind": "foreign"
+  }
+]

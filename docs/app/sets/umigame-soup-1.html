@@ -149,7 +149,7 @@
 <ul>
   <li><strong>モデレーション</strong>は専用処理・禁止ワード DB を持たず、上記の一行（返信しない判定 = <code>NO_REPLY</code>）を最低ラインとする（アイデア詳細 7・論点 5）。Lambda は本文が <code>NO_REPLY</code> で始まる場合に Graph API を呼ばずログのみ残す</li>
   <li><strong>正解宣言方式</strong>: 解答編リールは作らず、正解者に「正解です！」と宣言して真相を開示する（アイデア詳細 2.2）。誰かが当てるまで問題は開き続け、翌日以降もコメントが付く余地を残す。<strong>状態は持たない</strong>ため正解宣言後も質問には答え続ける（誰も当てずに流れた問題は開示しない）</li>
-  <li><strong>モデル</strong>: <code>gpt-6-luna</code> / reasoning effort <code>max</code>（パターン 1 = 一括方式のモデル。2026-09-26 にユーザー判断で確定。21-1 ⑤ の <code>gpt-5.6-luna</code> から切替）。API 上のモデル ID・effort の指定値と単価は 21-6b の試走でダッシュボード確認（本書に単価は書かない）。<code>max_completion_tokens</code> は 400（luna は推論トークンも上限に含むため。21-4a のプローブテスト〔<code>gpt-5.6-luna</code>・既定エフォート〕で 194 応答すべてが 80 字以内に収まった）。<strong>effort <code>max</code> では推論トークンが増えて 400 で打ち切られる恐れがあるため、21-6b の試走で上限と応答時間を測り直す</strong>・温度パラメータは送らない（推論モデルは受け付けない）。返信文は Lambda 側で 200 字に切り詰める（PoC の 500 字から短縮）</li>
+  <li><strong>モデル</strong>: <code>gpt-6-luna</code> / reasoning effort <code>max</code>（パターン 1 = 一括方式のモデル。2026-09-26 にユーザー判断で確定。21-1 ⑤ の <code>gpt-5.6-luna</code> から切替）。API 上のモデル ID・effort の指定値と単価は 21-6b の試走でダッシュボード確認（本書に単価は書かない）。<code>max_completion_tokens</code> は 400（luna は推論トークンも上限に含むため。21-4a のプローブテスト〔<code>gpt-5.6-luna</code>・既定エフォート〕で 194 応答すべてが 80 字以内に収まった）。<strong>API は effort <code>max</code> を受け付けず、最上位は <code>xhigh</code>。上限と応答時間の測り直しは 21-6b の試走結果（5.1.2）を参照</strong>・温度パラメータは送らない（推論モデルは受け付けない）。返信文は Lambda 側で 200 字に切り詰める（PoC の 500 字から短縮）</li>
   <li><strong>21-4a プローブテストの知見（2026-09-04・gpt-5.6-luna・10 問 × 18〜21 応答）</strong>: 21-3 案のままだと ① 補足で真相の核心を言う（「はい。教え子たちの体重です」）② 感想コメントへのお礼で正体をほのめかす（「犯人は玉ねぎでした」）③ 質問の形の正解推理（「〜ってこと？」）に「はい」で答えて宣言しない、の 3 系統の漏れが出た。上記プロンプトの 3 行（補足の範囲・お礼で触れない・質問形でも推理扱い）はその対策で、再実行で ①② は解消、③ は 10 問中 1 問で残る（人間ゲートで反復）。残る不一致は「〜は重要ですか」への「いいえ」と「関係ありません」の揺れで、意味上は同等（probe_test.py の機械判定は同義扱い）</li>
   <li><strong>フォールバック</strong>: OpenAI 呼び出し失敗（タイムアウト・5xx・キー未設定）は固定文言「『はい / いいえ』で答えられる質問をコメントしてね！」を返す PoC の挙動を踏襲するが、<strong>SQS 経由の再試行が先</strong>（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>）。固定文言は最終試行でのみ使い、DLQ 行きにしない</li>
 </ul>
@@ -194,7 +194,7 @@
   <li><strong>不適切系</strong>: ⑱ 荒らし（意味の取れない文字列・連投）→ 定型文 ⑲ 誹謗中傷（攻撃的・差別的・性的な内容）→ 定型文（レベル 2 の一言は付けない。挑発に乗ったように見えるのを避ける） ⑳ 宣伝・スパム（リンク付き・フォロー稼ぎ）→ 返信しない（返信すると表示が上がり拡散に手を貸す） ㉑ 個人情報が書かれたもの → 返信しない（返信すると目立たせてしまう。削除・非表示は範囲外で、10.5 の目視で対応）</li>
   <li><strong>その他</strong>: ㉒ 外国語のコメント → 日本語の定型で「日本語で質問してね」</li>
 </ul>
-<p>5.1 の現行プロンプトの「誹謗中傷・攻撃的・…意味の取れない文字列には返信しない」は、⑱・⑲ を定型文で返す本節の決定と食い違う。プロンプトの改訂は方式の設計（21-6b）で行う。</p>
+<p>5.1 の現行プロンプトの「誹謗中傷・攻撃的・…意味の取れない文字列には返信しない」は、⑱・⑲ を定型文で返す本節の決定と食い違う。改訂案は 5.1.2 の「5.1 マスタープロンプトの改訂案」（21-6b）。</p>
 
 <h5>返答の豊かさ（レベル 0〜3）</h5>
 <ul>
@@ -214,6 +214,76 @@
   </li>
   <li><strong>レベル 3</strong>（定義のみ）: 会話の流れを踏まえる（同じ人の過去の質問を踏まえる・行き詰まったときのヒント・コメント欄全体の進み具合）。会話の状態を持つ仕組みが要る。21-6d・21-6e では測らない</li>
 </ul>
+
+<h4 id="judge-design">5.1.2 判定モジュールの機能設計（21-6b）</h4>
+<p>コメント 1 件を受けて「種別（5.1.1 の 22 種）・判定・返信文」を決める部分を<strong>判定モジュール</strong>として Reply Lambda から切り出す。2 方式（パターン 1 = luna の一括方式 / パターン 2 = Jev の段階判定 + 定型文）は同じ契約を実装し、21-6c で両方を実装して 21-6d・21-6e で比べる。方式はここでは選ばない（21-6e）。試走の資材は <code>content/umigame-stock/umigame-soup-1/judge-trial/</code>（README 参照）。</p>
+
+<div class="callout decision">
+  <span class="callout-title">決定（2026-09-27、21-6b）: 判定モジュールの契約</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>入力</strong>: <code>comment_id</code>・コメント本文・問題（<code>problems/{media_id}.json</code> の問題固有部分 = <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> に、下記の <code>truth_points</code> / <code>reveal_text</code> を足したもの）</li>
+    <li><strong>出力</strong>: <code>kind</code>（22 種のコード。①〜㉒ の順に <code>q_yesno</code> <code>q_multi</code> <code>q_open</code> <code>guess_correct</code> <code>guess_close</code> <code>guess_wrong</code> <code>ask_hint</code> <code>ask_spoiler</code> <code>ask_howto</code> <code>impression</code> <code>greeting</code> <code>cheer</code> <code>chat</code> <code>request</code> <code>complaint</code> <code>mention</code> <code>emoji_only</code> <code>troll</code> <code>abuse</code> <code>spam</code> <code>personal_info</code> <code>foreign</code>）・<code>answer</code>（<code>q_yesno</code> のときだけ <code>yes</code> / <code>no</code> / <code>irrelevant</code> / <code>unknown</code>）・<code>reply</code>（返信文。<strong>返信しない = <code>NO_REPLY</code> は <code>reply</code> が空</strong>）・<code>debug</code>（確率・トークン・応答時間。ログにだけ出す）</li>
+    <li><strong>方式に依らずコードで強制すること</strong>: ⑳ <code>spam</code>・㉑ <code>personal_info</code> は返信しない。⑱ <code>troll</code>・⑲ <code>abuse</code> はコードの定型文で返す（LLM の文面を使わない = 挑発に乗った文や漏れが出ない）。定型文は種別ごとに 3 通り以上を持ち、<code>sha1(comment_id)</code> で選ぶ（状態を持たずに言い回しを散らす = 論点 ⑦）。返信が 80 字を超えたら切り詰めずにログへ警告を出す（プローブで P7 違反として数えるため。本番の 200 字切り詰めは Lambda 側の最後の安全網として残す）</li>
+    <li><strong>方式の切り替え</strong>: Reply Lambda の環境変数 <code>JUDGE_METHOD</code>（<code>p1</code> / <code>p2</code>）。Jev を選んだ場合もパターン 1 の実装とキーを本番に残し、環境変数の変更だけで戻せるようにする（論点 ⑨。Jev は SLA なし・値上げの留保あり）。Jev の呼び出しが失敗したら（再試行後）同じコメントをパターン 1 で判定する</li>
+    <li><strong>問題 JSON に足す項目</strong>: <code>truth_points</code>（真相の要点 2〜3 個。パターン 2 の正解判定と、両方式の機械プローブの正解ラベルに使う）と <code>reveal_text</code>（正解時に開示する真相の要約。70 字以内。パターン 2 の開示文）。<strong>ストックへの追加・<a href="../generators/umigame-prebuilt.html">方式設計書</a>とスナップショット（10.2）の項目追加は 21-6c で行う</strong>（全 14 問の文面は 21-6c で起こし、人がレビューする。21-6b の試走は 5 問分の仮の値を <code>judge-trial/data/truth_points.json</code> に置いた）。パターン 1 を選んだ場合も項目は残す（機械プローブの正解ラベルに使うため）</li>
+  </ul>
+</div>
+
+<h5>パターン 1（<code>gpt-6-luna</code> の一括方式）</h5>
+<ul>
+  <li><strong>呼び出し</strong>: コメント 1 件につき chat completions を 1 回。<code>response_format</code> を JSON スキーマ（strict）にし、<code>{kind, answer, reply}</code> を返させる。種別を明示的に出させることで、コード側の強制（上記）と機械プローブの種別一致率の集計ができる</li>
+  <li><strong>system プロンプト</strong>: 5.1 のマスタープロンプトを改訂した案 = <code>judge-trial/prompts/pattern1_rules.txt</code>。変更点は ① 手順 1 で 22 種を定義して種別を選ばせる ② 「荒らしには返信しない」をやめ、⑱〜㉑ は <code>reply</code> を空にしてコードに任せる（5.1.1 の決定に合わせる） ③ 判定語の後ろに、真相に触れない 20 字以内の一言を添えてよいとする（レベル 2。一言にも確定事実シート・真相の文の言葉を入れない） ④ ②③⑤〜⑨・⑬〜⑰・㉒ の返し方を 1 行ずつ書く。補足を原則付けない方針（5.1 の決定 2026-09-07）は、一言を「判定語とは別の短い相づち」として許すことで両立させる</li>
+  <li><strong>モデルとパラメータ</strong>: <code>gpt-6-luna</code>。<strong>API は <code>reasoning_effort</code> に <code>max</code> を受け付けない</strong>（2026-09-27 の試走で 400 エラー。受け付けるのは <code>none</code> / <code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code>）。Codex CLI の <code>max</code> に当たる API 上の最上位は <code>xhigh</code> と見て、試走は <code>xhigh</code> で測った（人間ゲートで確認する）。<code>max_completion_tokens</code> 400・温度は送らない</li>
+</ul>
+
+<h5>パターン 2（Jev の段階判定 + 定型文）</h5>
+<p>Jev（<code>POST https://api.typesafe.ai/v1/systemone</code>、<code>model: jev-latest</code>）の <code>choice</code>（選択式・確率付き）と <code>noul</code>（真である確率）を段ごとに使い、返信文はすべてコードの定型文にする（返信文を AI に書かせない = 補足やお礼からの漏れが構造的に起きない）。指示文（<code>instructions</code> / <code>criteria</code>）は英語で書き、コメントと問題は日本語のまま <code>state</code> に渡す。</p>
+<ol>
+  <li><strong>段 0 文字種の規則（Jev を呼ばない）</strong>: URL を含む → ⑳、絵文字・記号だけ → ⑰、ひらがな・カタカナ・漢字を含まず英字などを含む → ㉒。<strong>禁止ワード DB ではなく文字種だけを見る最小の規則</strong>で、10.3 の「ルールベース判定を作らない」（語の一覧でモデレーションしない方針）には当たらないものとして扱う</li>
+  <li><strong>段 A 種別（choice）</strong>: <code>state</code> = コメント + 問題文。22 種のうち ④〜⑥ を 1 つの「推理」にまとめ、段 0 で決まる ⑰ を除いた 19 択</li>
+  <li><strong>段 B 正解判定（noul × 要点の数）</strong>: 段 A が「推理」か ① のとき、<code>truth_points</code> の要点ごとに「コメントがこの要点を言い当てている」の確率を取る。全要点が閾値 <code>T_POINT</code> 以上 → ④（質問の形でも推理扱い = 5.1 のルールと同じ）。「推理」で 1 つ以上 → ⑤、0 → ⑥（論点 ②）</li>
+  <li><strong>段 C 質問の品質（noul）</strong>: ① のとき「問題の状況に当てはめて、はい / いいえで一意に答えられる」の確率が <code>T_QUALITY</code> 未満なら ③ として誘導文を返す（論点 ③。NG が多すぎると参加体験を損なうため、試走は低め〔0.2〕から始める）</li>
+  <li><strong>段 D 判定（choice 3 択）</strong>: <code>state</code> = 問題文 + 真相 + 確定事実 + 質問。はい / いいえ / 関係ありません。最大確率が <code>T_ANSWER</code> 未満なら「それは問題の答えに関わりません。」に倒す（論点 ⑧ = 自信がないときの安全側。P3 の取り違えを P4 の揺れへ逃がす）</li>
+  <li><strong>返信</strong>: 判定語 + 20 字以内の定型の一言（探偵口調・真相に触れない汎用文を 6 通り以上。レベル 2 を定型のバリエーションで満たす）。④ は「正解です！」+ <code>reveal_text</code>（論点 ④）</li>
+</ol>
+<p>閾値 <code>T_POINT</code>・<code>T_QUALITY</code>・<code>T_ANSWER</code> は 21-6d の全件プローブで決める（試走の初期値は 0.5 / 0.2 / 0.55）。1 コメントあたりの Jev 呼び出しは 2〜3 回（段 A、段 B〜D は 1 リクエストにまとめられる分はまとめる）。</p>
+
+<h5>論点 9 件の結論（計画書 21-6b の折りたたみ）</h5>
+<ol>
+  <li><strong>① 質問以外のコメントの行き先</strong>: 結論。5.1.1 の 22 種で見分ける。パターン 1 は JSON の <code>kind</code>、パターン 2 は段 0 + 段 A の選択式（19 択）+ 段 B</li>
+  <li><strong>② 正解宣言と「惜しい！」の判定段</strong>: 結論。パターン 2 は <code>truth_points</code> の要点ごとの noul（全部 = 正解・一部 = 惜しい・なし = 外れ）。パターン 1 はプロンプトの手順 1 で判断させ、どちらも P2・P5 で測る</li>
+  <li><strong>③ 質問の品質チェックの NG が多すぎる</strong>: 段 C の閾値を低め（0.2）から始め、21-6d で ③ の誘導率（P6 とは別に「① を ③ と判定した率」）を見て決める。持ち越し先 = 21-6d</li>
+  <li><strong>④ 正解時に開示する真相の文を誰が書くか</strong>: 結論。パターン 2 は問題ごとに事前に書いた <code>reveal_text</code>（ストックに持たせる。21-6c で 14 問分を起こす）。パターン 1 は従来どおり LLM が 2〜3 文で書く。「惜しい！」は両方式とも定型（足りない点を言わない）</li>
+  <li><strong>⑤ 本丸は「はい / いいえ / 関係ありません」の判定</strong>: 試走で段 D の一致率と P3 を測った（下の試走結果）。全件の評価は 21-6d、合否は 5.1.1 の P3・P4</li>
+  <li><strong>⑥ テスト質問の偏り</strong>: 結論。評価用の質問は <code>expected_questions</code> を見ずに、問題文だけを見て（真相を見ずに）プレイヤーの立場で書き、あとから真相で正解ラベルを付ける（下の評価セット）。<code>expected_questions</code> は参考値として別に集計する</li>
+  <li><strong>⑦ 同じ誘導文の連投</strong>: 結論。定型文は種別ごとに 3 通り以上を <code>sha1(comment_id)</code> で選ぶ（契約）。5.1.1 レベル 1 の「最頻の言い回し 50% 以下」で測る</li>
+  <li><strong>⑧ 自信がないときは安全側</strong>: 結論。段 D は <code>T_ANSWER</code> 未満で「答えに関わりません」、段 B は <code>T_POINT</code> 未満の要点を満たさない扱い（誤った正解宣言 P2 を避ける側）。値は 21-6d で決める</li>
+  <li><strong>⑨ パターン 1 へ戻せる切り替え</strong>: 結論。環境変数 <code>JUDGE_METHOD</code> + Jev 失敗時のパターン 1 フォールバック（契約）。実装は 21-6c、本番の配線は 21-6f</li>
+</ol>
+
+<h5>5.1 マスタープロンプトの改訂案（パターン 1）</h5>
+<p>改訂案の本文は <code>judge-trial/prompts/pattern1_rules.txt</code>（上記の変更点 ①〜④）。<strong><code>master_prompt.txt</code> の差し替えは本ステップでは行わず、21-6c で行うことを提案する</strong>。出力が一語の文字列から JSON（<code>{kind, answer, reply}</code>）に変わるため、判定モジュールの実装と同時でないと <code>probe_test.py</code> と本番の経路が壊れる。差し替えたら 5.1 の本文も改訂案に置き換え、「荒らしには返信しない」の記述を消す。</p>
+
+<h5>評価セット（テストデータ）の作り方・置き場</h5>
+<ul>
+  <li><strong>置き場</strong>: <code>content/umigame-stock/umigame-soup-1/judge-trial/data/</code>。問題依存のケース <code>eval_problems.json</code>（問題ごと）と、問題に依存しない共通テストセット <code>common_cases.json</code>（⑦〜㉒）、仮の <code>truth_points.json</code>。21-6d でも同じ置き場を使い、問題を増やすときはファイルに問題番号のキーを足す</li>
+  <li><strong>問題依存のケース（1 問 21 件）</strong>: ① 10 件（問題文だけを見て書き、あとから真相と確定事実で <code>yes</code> / <code>no</code> / <code>irrelevant</code> を付ける。口語・主語の省略・誤字を混ぜる）・② 2 件・③ 3 件・④ 2 件（うち 1 件は質問の形）・⑤ 2 件・⑥ 2 件</li>
+  <li><strong>共通テストセット</strong>: ⑦〜㉒ の 16 種 × 5 件 = 80 件（5.1.1 の「種別ごとに 5 件以上」）。どの問題に付いても成り立つ文面にし、境界的なもの（感想と応援の中間など）も混ぜる。試走では対象の問題へ順繰りに割り当てる</li>
+  <li><strong>作り方</strong>: 下書きは判定プロンプトの調整に関わっていない書き手（Codex への委譲）が書き、Claude が正解ラベルを検め、人間ゲートでユーザーが抜き取りで見る。21-6b の試走は 5 問（U01・U13・U18・U20・U26）× 21 件 + 共通 80 件 = 185 件。21-6d で全 14 問 × 21 件に広げる（持ち越し先 = 21-6d）</li>
+  <li><strong>21-6d の合格基準</strong>: 5.1.1 の P1〜P7 とレベル 1 の機械プローブ基準をそのまま使う（種別一致率は全体 90% 以上・質問以外の種別それぞれ 80% 以上）。試走スクリプトの集計項目は、この基準と 1 対 1 に対応させた</li>
+</ul>
+
+<h5 id="judge-trial-result">試走結果（2026-09-27。5 問 × 21 件 + 共通 80 件 = 185 件）</h5>
+<p>方式は選ばない（21-6e）。以下は小さな試走の結果で、合否は 21-6d の全件プローブで判定する。パターン 2 は 1 回目の結果を見て段 A の指示文の食い違いを 1 か所だけ直し（下記）、再実行した値を載せる。閾値は初期値のまま。</p>
+<ul>
+  <li><strong>パターン 1（<code>gpt-6-luna</code> / <code>xhigh</code>・上限 400）</strong>: 種別一致率 178/185 = 96.2%（質問系 96.0%・推理系 96.7%・その他 96.2%）。判定一致 47/50・P3 0 件・P4 3/30（「〜は関係ある？」への「いいえ」3 件）・P2 0 件・P5 10/10・P1 漏れ候補 0 件・P6 ⑱⑲ の定型率 7/10（⑲ の 3 件を ⑮ クレームと判定）・⑳㉑ への返信 0 件・P7 違反 2 件（正解時の開示文が 85 字・87 字）。誤りは ③ → ① が 3 件（主語が曖昧な質問に答えた）</li>
+  <li><strong>パターン 1 の上限と応答時間</strong>: 応答時間の中央値 1.8 秒・p95 2.7 秒・最大 3.8 秒。出力トークンの平均 132（うち推理 89）。<strong>185 件中 1 件が推理で 400 を使い切って打ち切られた</strong>（<code>finish_reason=length</code> → 返信なし）。同じコメントを 3 回ずつ測り直すと、上限 400 では推理 252〜400 で 1 回打ち切り、800 では 173〜264 で 3 回とも収まった → <strong>上限は 800 に上げることを提案する</strong>（21-6c で確定）</li>
+  <li><strong>パターン 2（Jev・閾値 0.5 / 0.2 / 0.55）</strong>: 種別一致率 136/185 = 73.5%（質問系 72.0%・推理系 56.7%・その他 81.2%）。判定一致 33/50（段 D まで届いた 37 件中 33 件が一致）・P3 0 件・P4 4/30・P2 0 件・P5 7/10・P1 漏れ候補 0 件（定型文のため構造的に 0）・P6 ⑱⑲ の定型率 5/10・⑳㉑ への返信 0 件・P7 違反 0 件。応答時間の中央値 0.26 秒・最大 1.9 秒（1 コメント 3〜5 回の呼び出し）、入力の合計 33 万トークン</li>
+  <li><strong>パターン 2 の誤りの中身</strong>: ① → ⑥ 外れた推理が 13 件（段 A が質問を推理と判定し、段 B で要点 0 → 外れ）、⑤ 惜しい → ⑥ が 10/10 件（要点が 1 文に複数の事柄を詰めているため、一部だけ言い当てた推理の確率が 0.1〜0.3 に留まる）、④ → ⑤ が 3 件（質問形の正解推理）、③ → ① / ⑧ が 7 件、⑲ → ⑮ が 3 件、㉒ → ⑩ が 2 件（漢字だけの中国語が段 0 をすり抜けた）</li>
+  <li><strong>1 回目からの修正</strong>: 段 A の指示文に「質問の形の推理も推理に入れる」と書いていたため、① の 38/50 件が推理に流れた（一致率 57.3%）。質問の形の正解推理は段 B が拾う設計なので、指示文を「言い切った推理だけを推理に入れる」に直した（設計どおりに戻しただけで、閾値の調整はしていない）</li>
+  <li><strong>両方式に共通</strong>: P3（はい / いいえの取り違え）はどちらも 0 件。⑲ 誹謗中傷のうち「つまらん、センスない」型を ⑮ クレームと判定する（両方式とも 2〜3 件）。⑮ はお礼 + 「確認します」で返すため判定語や真相は出ないが、P6 の定型率 80% には届かない</li>
+</ul>
+<p><strong>試走から 21-6c・21-6d へ持ち越すこと</strong>: ① パターン 1 の上限を 800 にする（21-6c）② 正解時の開示文が 80 字を超える → パターン 1 のプロンプトで「開示は 70 字以内」とするか、両方式とも <code>reveal_text</code> を使うか（21-6c）③ パターン 2 の段 B は、要点を「1 要点 = 1 事柄」の短い文に割って書く（<code>truth_points</code> の書き方の基準。21-6c で 14 問分を起こすとき）と <code>T_POINT</code> の調整（21-6d）④ 段 0 に「漢字だけで、かなを含まない文」を外国語の候補にする規則を足すか（21-6c）⑤ ⑲ と ⑮ の境目（作品へのけなし = ⑮ か ⑲ か）を 5.1.1 の種別定義で明確にする（21-6d の前にユーザー判断）⑥ 評価用の ① の質問は、書き手が確定事実シートの言い回しに寄せてしまい易しめに偏った。21-6d では真相と確定事実を渡さずに書かせる手順を守らせ、人間プローブで出た質問も足す（21-6d）。数値は 5 問の小さな試走のもので、偏りの幅は大きい。</p>
 
 <h3 id="illustration-prompt">5.2 イラスト作成用プロンプト（ストック整備時・imagegen）</h3>
 <p>1 問 1 枚の背景イラストを、ストックの <code>illustration_prompt</code> から Codex CLI の <code>image_gen.imagegen</code>（<code>codex exec</code>）で生成する（21-2 で CLI からの自動化を実測。手作業不要）。プロンプトは「<strong>画風固定行</strong> + 情景（問題文の描写のみ）+ 禁止事項」の 3 部構成で、画風固定行は全問共通の定数として <code>validate.py</code> が存在を検査する。</p>
@@ -311,9 +381,9 @@
 
 <h3>10.3 返信の振る舞い（MVP スコープ）</h3>
 <ul>
-  <li><strong>返信する</strong>: 自アカウントのリールへのコメントと、そのスレッドへの返信（<code>parent_id</code> 付き。推理の続きであることが多い）。判定はすべて AI 出題者プロンプト（5.1）に委ねる</li>
+  <li><strong>返信する</strong>: 自アカウントのリールへのコメントと、そのスレッドへの返信（<code>parent_id</code> 付き。推理の続きであることが多い）。判定は判定モジュール（<a href="#judge-design">5.1.2</a>。方式はパターン 1 / 2 を環境変数で切り替え）に委ねる</li>
   <li><strong>返信しない</strong>: 自分の返信（<code>from.id == ig_user_id</code>。無限ループ防止）/ プロンプトが <code>NO_REPLY</code> を返したコメント / スナップショットの無い <code>media_id</code>（本セット以外の投稿・出力失敗）</li>
-  <li><strong>作らないもの</strong>（アイデア詳細 7）: ユーザーごとの質問回数制限・コメント回数の DB 管理・禁止ワード DB・ルールベース判定・会話状態管理・Lambda メモリキャッシュ・コメント処理からの Aurora アクセス・翌日の解答編リール。将来のゲーム化構想を理由に状態管理を先行実装しない（ステートレス方針）</li>
+  <li><strong>作らないもの</strong>（アイデア詳細 7）: ユーザーごとの質問回数制限・コメント回数の DB 管理・禁止ワード DB・語の一覧によるルールベース判定（パターン 2 の段 0 は文字種だけを見る規則で、これに当たらない = 5.1.2）・会話状態管理・Lambda メモリキャッシュ・コメント処理からの Aurora アクセス・翌日の解答編リール。将来のゲーム化構想を理由に状態管理を先行実装しない（ステートレス方針）</li>
   <li><strong>重複返信の抑止</strong>: Meta Webhook は同一イベントを再送しうるため、SQS FIFO の重複排除 ID に <code>comment_id</code> を使う（5 分窓）。窓外の再送で二重返信が起きる可能性は許容する（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a> の decision）</li>
 </ul>
 

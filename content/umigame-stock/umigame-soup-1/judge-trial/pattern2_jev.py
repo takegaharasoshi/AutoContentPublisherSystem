@@ -1,0 +1,306 @@
+"""Jev API を段階利用し、定型文で返信するパターン 2。"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import time
+import unicodedata
+from urllib import error, request
+
+from judge_contract import JudgeResult, KINDS, Problem
+import templates
+
+
+JEV_URL = "https://api.typesafe.ai/v1/systemone"
+T_POINT = 0.5
+T_QUALITY = 0.2
+T_ANSWER = 0.55
+MAX_RETRIES = 3
+_URL_RE = re.compile(r"(?:https?://|www\.)|\b[\w-]+(?:\.[\w-]+)+\b", re.IGNORECASE)
+_JAPANESE_RE = re.compile(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
+_LATIN_RE = re.compile(r"[A-Za-z]")
+
+
+KIND_CRITERIA = {
+    "q_yesno": "One clear question that can be answered yes or no.",
+    "q_multi": "The comment contains two or more questions.",
+    "q_open": "An open question, or an unclear question that cannot be answered uniquely with yes or no.",
+    "guess": "A claim or hypothesis about the hidden truth, including a question-form guess.",
+    "ask_hint": "The commenter asks for a hint.",
+    "ask_spoiler": "The commenter asks for the answer or a spoiler.",
+    "ask_howto": "The commenter asks how to play or asks whether this account is a bot.",
+    "impression": "A reaction or impression about the puzzle.",
+    "greeting": "A greeting.",
+    "cheer": "Words of support or encouragement.",
+    "chat": "Casual conversation unrelated to solving the puzzle.",
+    "request": "A request for a future puzzle or topic.",
+    "complaint": "A criticism, correction, or complaint about the puzzle.",
+    "mention": "A tag or mention inviting a friend to solve the puzzle.",
+    "troll": "Meaningless text or repeated disruptive comments.",
+    "abuse": "Abusive, hateful, discriminatory, sexual, or attacking content.",
+    "spam": "Advertising, a link, or a follow-for-follow promotion.",
+    "personal_info": "Personal identifying information such as a phone number, address, or full name.",
+    "foreign": "A comment written in a language other than Japanese.",
+}
+_A_KEYS = (
+    "q_yesno",
+    "q_multi",
+    "q_open",
+    "guess",
+    "ask_hint",
+    "ask_spoiler",
+    "ask_howto",
+    "impression",
+    "greeting",
+    "cheer",
+    "chat",
+    "request",
+    "complaint",
+    "mention",
+    "troll",
+    "abuse",
+    "spam",
+    "personal_info",
+    "foreign",
+)
+_A_CRITERIA = {key: KIND_CRITERIA[key] for key in _A_KEYS}
+
+
+class JevError(RuntimeError):
+    """Jev API request or response error."""
+
+
+def _rule_kind(text: str) -> str | None:
+    """仕様段 0 の URL・記号・英語コメント判定。"""
+    if _URL_RE.search(text):
+        return "spam"
+    nonspace = [char for char in text if not char.isspace()]
+    if nonspace and all(
+        unicodedata.category(char)[0] in {"P", "S", "C"}
+        or char in {"\ufe0e", "\ufe0f"}
+        for char in nonspace
+    ):
+        return "emoji_only"
+    if _LATIN_RE.search(text) and not _JAPANESE_RE.search(text):
+        return "foreign"
+    return None
+
+
+def _jev_request(api_key: str, state: dict, questions: dict[str, dict]) -> dict:
+    """SystemOne を呼び、429/529 のみ指数バックオフで再試行する。"""
+    payload = {"model": "jev-latest", "state": state, "questions": questions}
+    req = request.Request(
+        JEV_URL,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            with request.urlopen(req, timeout=90) as response:
+                result = json.loads(response.read().decode("utf-8"))
+            if not isinstance(result, dict) or not isinstance(result.get("answers"), dict):
+                raise JevError("応答に answers オブジェクトがありません")
+            return result
+        except error.HTTPError as exc:
+            if exc.code in {429, 529} and attempt < MAX_RETRIES:
+                time.sleep(2**attempt)
+                continue
+            detail = exc.read().decode("utf-8", "replace")[:300]
+            raise JevError(f"HTTP {exc.code}: {detail}") from exc
+        except (json.JSONDecodeError, error.URLError) as exc:
+            raise JevError(f"Jev API 応答を読めません: {exc}") from exc
+    raise JevError("Jev API の再試行回数を超えました")
+
+
+def _probability_map(answer: dict) -> dict:
+    probabilities = answer.get("probabilities", {})
+    if isinstance(probabilities, dict):
+        return probabilities
+    return {}
+
+
+def _noul_true(answer: dict) -> float:
+    value = answer.get("noul")
+    if isinstance(value, dict):
+        value = value.get("true")
+    if value is None:
+        value = _probability_map(answer).get("true")
+    return float(value)
+
+
+def _choice(answer: dict, keys: tuple[str, ...]) -> str:
+    choice = answer.get("choice")
+    if isinstance(choice, dict):
+        choice = choice.get("key", choice.get("choice"))
+    if isinstance(choice, str) and choice in keys:
+        return choice
+    probabilities = _probability_map(answer)
+    candidates = [(key, float(probabilities[key])) for key in keys if key in probabilities]
+    if candidates:
+        return max(candidates, key=lambda entry: entry[1])[0]
+    raise JevError(f"有効な choice がありません: {choice!r}")
+
+
+def _record_call(api_key: str, state: dict, questions: dict[str, dict], debug: dict) -> dict:
+    started = time.monotonic()
+    result = _jev_request(api_key, state, questions)
+    elapsed = time.monotonic() - started
+    usage = result.get("usage", {})
+    input_tokens = result.get("input_tokens", usage.get("input_tokens", 0))
+    debug["input_tokens"] += int(input_tokens or 0)
+    debug["latency_s"] = round(debug["latency_s"] + elapsed, 6)
+    debug["calls"] += 1
+    return result["answers"]
+
+
+def _error_result(exc: Exception, debug: dict) -> JudgeResult:
+    return JudgeResult(kind="error", answer=None, reply=None, method="p2", debug={**debug, "error": str(exc)})
+
+
+def judge(
+    comment_id: str,
+    text: str,
+    problem: Problem,
+    *,
+    api_key: str,
+    t_point: float = T_POINT,
+    t_quality: float = T_QUALITY,
+    t_answer: float = T_ANSWER,
+) -> JudgeResult:
+    """段階判定を行い、全ての返信をコード定型文から作る。"""
+    debug = {"input_tokens": 0, "latency_s": 0.0, "calls": 0, "probabilities": {}}
+    rule_kind = _rule_kind(text)
+    if rule_kind is not None:
+        reply = templates.pick(rule_kind, comment_id)
+        return JudgeResult(rule_kind, None, reply, "p2", debug)
+
+    try:
+        a_answers = _record_call(
+            api_key,
+            {"comment": text, "problem_text": problem.problem_text},
+            {
+                "kind": {
+                    "type": "choice",
+                    "instructions": (
+                        "Classify the Japanese comment by its primary intent using the criteria. "
+                        "Use guess only for a stated solution or claim; a single yes-or-no question stays q_yesno."
+                    ),
+                    "criteria": _A_CRITERIA,
+                }
+            },
+            debug,
+        )
+        a_answer = a_answers["kind"]
+        a_kind = _choice(a_answer, tuple(_A_CRITERIA))
+        debug["probabilities"]["A"] = _probability_map(a_answer)
+
+        kind: str
+        answer: str | None = None
+        if a_kind in {"guess", "q_yesno"}:
+            point_probs = {}
+            for index, point in enumerate(problem.truth_points):
+                point_id = f"point_{index}"
+                point_answers = _record_call(
+                    api_key,
+                    {"truth_point": point, "comment": text},
+                    {
+                        point_id: {
+                            "type": "noul",
+                            "instructions": (
+                                "Estimate whether the commenter explicitly states this truth point. "
+                                f"The truth point is: {point!r}. Use true only when its meaning is clearly present."
+                            ),
+                            "criteria": {
+                                "true": "The comment clearly states this truth point.",
+                                "false": "The comment does not clearly state this truth point.",
+                            },
+                        }
+                    },
+                    debug,
+                )
+                point_probs[point_id] = _noul_true(point_answers[point_id])
+            debug["probabilities"]["B"] = point_probs
+            all_points = bool(point_probs) and all(value >= t_point for value in point_probs.values())
+            some_points = any(value >= t_point for value in point_probs.values())
+            if all_points:
+                kind = "guess_correct"
+            elif a_kind == "guess":
+                kind = "guess_close" if some_points else "guess_wrong"
+            else:
+                quality_answers = _record_call(
+                    api_key,
+                    {"comment": text, "problem_text": problem.problem_text},
+                    {
+                        "quality": {
+                            "type": "noul",
+                            "instructions": (
+                                "Estimate whether this question is specific to the puzzle and can be "
+                                "answered uniquely with yes or no, with a clear subject and target."
+                            ),
+                            "criteria": {
+                                "true": "It is a clear, relevant, uniquely answerable yes-or-no question.",
+                                "false": "It is open-ended, vague, or not uniquely answerable yes or no.",
+                            },
+                        }
+                    },
+                    debug,
+                )
+                quality = _noul_true(quality_answers["quality"])
+                debug["probabilities"]["C"] = quality
+                if quality < t_quality:
+                    kind = "q_open"
+                else:
+                    kind = "q_yesno"
+                    d_answers = _record_call(
+                        api_key,
+                        {
+                            "problem_text": problem.problem_text,
+                            "truth": problem.truth,
+                            "fact_sheet": problem.fact_sheet,
+                            "question": text,
+                        },
+                        {
+                            "answer": {
+                                "type": "choice",
+                                "instructions": (
+                                    "Answer the question only from the supplied facts. Do not infer missing facts."
+                                ),
+                                "criteria": {
+                                    "yes": "The supplied facts support answering yes.",
+                                    "no": "The supplied facts support answering no.",
+                                    "irrelevant": "The question is unrelated to the puzzle facts.",
+                                },
+                            }
+                        },
+                        debug,
+                    )
+                    d_answer = d_answers["answer"]
+                    d_probs = _probability_map(d_answer)
+                    debug["probabilities"]["D"] = d_probs
+                    if d_probs:
+                        best_key, best_probability = max(
+                            ((key, float(d_probs.get(key, 0))) for key in ("yes", "no", "irrelevant")),
+                            key=lambda entry: entry[1],
+                        )
+                    else:
+                        best_key, best_probability = _choice(d_answer, ("yes", "no", "irrelevant")), 0.0
+                    answer = best_key if best_probability >= t_answer else "unknown"
+        else:
+            kind = a_kind
+
+        if kind in templates.NO_REPLY_KINDS:
+            reply = None
+        elif kind in {"troll", "abuse"}:
+            reply = templates.pick(kind, comment_id)
+        elif kind == "guess_correct":
+            reply = templates.correct_reply(problem.reveal_text)
+        elif kind == "q_yesno":
+            reply = templates.yesno_reply(answer or "unknown", comment_id)
+        else:
+            reply = templates.pick(kind, comment_id)
+        return JudgeResult(kind, answer, reply, "p2", debug)
+    except Exception as exc:  # noqa: BLE001 - API/応答異常を試走結果として残す
+        return _error_result(exc, debug)
