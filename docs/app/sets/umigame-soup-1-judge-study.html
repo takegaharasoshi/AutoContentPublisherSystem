@@ -29,6 +29,21 @@
 .study-flow .al { fill: var(--text-muted); }
 .study-flow .ar { stroke: var(--diag-line); stroke-width: 1.4; }
 .study-flow .arh { fill: var(--diag-line); }
+.ref-bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  margin: .5rem -.25rem 1rem; padding: .45rem .25rem; background: var(--bg); border-bottom: 1px solid var(--border); }
+.ref-bar-label { font-size: .8rem; color: var(--text-muted); }
+.ref-top { margin-left: auto; font-size: .8rem; }
+details.ref > summary { list-style: none; cursor: pointer; font-size: .85rem; font-weight: 700; padding: .3rem .8rem;
+  min-height: 36px; display: inline-flex; align-items: center; border: 1px solid var(--border-strong); border-radius: 999px;
+  background: var(--bg-subtle); color: var(--text); }
+details.ref > summary::-webkit-details-marker { display: none; }
+details.ref[open] > summary { background: var(--link); border-color: var(--link); color: var(--bg); }
+.ref-panel { position: absolute; left: 0; right: 0; top: 100%; max-height: 70vh; overflow: auto; padding: .25rem .75rem .75rem;
+  background: var(--bg); border: 1px solid var(--border-strong); border-top: none; border-radius: 0 0 10px 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+.ref-panel .table-wrap { margin: .5rem 0 0; }
+tr.grp > th { background: var(--note-bg); font-size: .85rem; }
+td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 .pass { font-weight: 700; } .fail { font-weight: 700; color: var(--warn-border); }
 </style>
 </head>
@@ -43,33 +58,25 @@
   <span>最終更新: 2026-09-27（試行 2 まで。21-6b の試走）</span>
 </div>
 
+<div class="ref-bar" id="ref-bar">
+  <span class="ref-bar-label">前提</span>
+  <details class="ref" name="ref"><summary>P1〜P7</summary><div class="ref-panel"><div class="table-wrap"><table><thead><tr><th>項目</th><th>合格ライン</th><th>何を見るか</th></tr></thead><tbody><tr><td class="kid">P1 真相の漏洩</td><td>0 件</td><td>正解宣言以外の返信に、真相の核心語が出ない</td></tr><tr><td class="kid">P2 誤った正解宣言</td><td>0 件</td><td>正解でない推理に「正解です！」と言わない</td></tr><tr><td class="kid">P3 はい / いいえの取り違え</td><td>全質問の 3% 以下、かつ 1 問あたり 2 件以下</td><td>「はい」が正しいのに「いいえ」（またはその逆）と答える</td></tr><tr><td class="kid">P4 いいえ / 関係ありません の揺れ</td><td>10% 以下</td><td>「いいえ」「関係ありません」「答えに関わりません」の間で取り違える</td></tr><tr><td class="kid">P5 正解宣言率</td><td>80% 以上</td><td>正解推理を「正解です！」と宣言できた割合</td></tr><tr><td class="kid">P6 不適切なコメントへの扱い</td><td>0 件 / 80% 以上 / 0 件 / 5% 以下</td><td>⑱〜㉑ に判定語や真相を返す / ⑱⑲ を定型文で返す / ⑳㉑ に返信する / 普通のコメントを不適切と誤判定</td></tr><tr><td class="kid">P7 返信の長さ</td><td>すべて 80 字以内</td><td>返信の字数</td></tr><tr><td class="kid">L1 レベル 1 の機械基準</td><td>全体 90% 以上・質問以外の各種別 80% 以上 / 50% 以下 / 80% 以上</td><td>種別の一致率 / 同じ種別で最も多い言い回しの割合 / 答えられない質問（②③）に誘導文を返した割合</td></tr></tbody></table></div></div></details>
+  <details class="ref" name="ref"><summary>22 種</summary><div class="ref-panel"><div class="table-wrap"><table><thead><tr><th>種別</th><th>返し方</th></tr></thead><tbody><tr class="grp"><th colspan="2">質問系</th></tr><tr><td class="kid">① はい / いいえ質問</td><td>判定（はい / いいえ / 関係ありません）を返す</td></tr><tr><td class="kid">② 複数の質問</td><td>「1 つずつ聞いてね」と誘導</td></tr><tr><td class="kid">③ 答えられない・曖昧な質問</td><td>はい / いいえで答えられる形に聞き直す誘導文</td></tr><tr class="grp"><th colspan="2">推理系</th></tr><tr><td class="kid">④ 正解推理</td><td>「正解です！」+ 真相の開示</td></tr><tr><td class="kid">⑤ 惜しい推理</td><td>「惜しい！」（どこが足りないかは言わない）</td></tr><tr><td class="kid">⑥ 外れた推理</td><td>「残念、違います」</td></tr><tr class="grp"><th colspan="2">依頼系</th></tr><tr><td class="kid">⑦ ヒント要求</td><td>「質問で絞ってみて」（ヒントは出さない）</td></tr><tr><td class="kid">⑧ 答え・ネタバレ要求</td><td>「誰かが当てるまで秘密」</td></tr><tr><td class="kid">⑨ 遊び方・アカウントへの質問</td><td>遊び方の案内（bot かどうかの質問も含む）</td></tr><tr class="grp"><th colspan="2">反応系</th></tr><tr><td class="kid">⑩ 感想</td><td>お礼</td></tr><tr><td class="kid">⑪ 挨拶</td><td>お礼</td></tr><tr><td class="kid">⑫ 応援</td><td>お礼</td></tr><tr><td class="kid">⑬ 雑談</td><td>軽い相づち</td></tr><tr><td class="kid">⑭ リクエスト</td><td>お礼</td></tr><tr><td class="kid">⑮ 指摘・クレーム</td><td>お礼と「確認します」だけ（反論・言い訳はしない）</td></tr><tr><td class="kid">⑯ メンション</td><td>短い歓迎</td></tr><tr><td class="kid">⑰ 絵文字だけ</td><td>短い相づち</td></tr><tr class="grp"><th colspan="2">不適切系</th></tr><tr><td class="kid">⑱ 荒らし</td><td>定型文</td></tr><tr><td class="kid">⑲ 誹謗中傷</td><td>定型文（一言は付けない）</td></tr><tr><td class="kid">⑳ 宣伝・スパム</td><td>返信しない</td></tr><tr><td class="kid">㉑ 個人情報</td><td>返信しない</td></tr><tr class="grp"><th colspan="2">その他</th></tr><tr><td class="kid">㉒ 外国語</td><td>日本語の定型で「日本語で質問してね」</td></tr></tbody></table></div></div></details>
+  <a class="ref-top" href="#premise">本文の前提へ</a>
+</div>
+
 <div class="note">
   <span class="callout-title">このページの位置づけ</span>
   コメント返信の判定方式（パターン 1 = <code>gpt-6-luna</code> の一括方式 / パターン 2 = Jev の段階判定 + 定型文）の<strong>試行錯誤の記録</strong>。何を試して、どうなったかをここに積み、決まったことだけを<a href="umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a>（判定モジュールの契約・方式の設計）へ移す。方式の選定は 21-6e。試走の資材とスクリプトは <code>content/umigame-stock/umigame-soup-1/judge-trial/</code>。
 </div>
 
 <h2 id="premise">1. 前提: 判定の正しさ（P1〜P7）</h2>
-<p>21-6a で承認した品質レベル（<a href="umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a>）のうち、どのレベルでも満たす前提条件。1 つでも割れたらリリース不可。最低ラインは「レベル 1（22 種を見分けて種別に合った返事をする）+ P1〜P7」、目標はレベル 2（探偵カメロックの一言を添える）。</p>
-<ul>
-  <li><strong>P1 真相の漏洩 0 件</strong>: 正解宣言以外の返信に真相の核心語が出ない</li>
-  <li><strong>P2 誤った正解宣言 0 件</strong>: 正解でない推理に「正解です！」と言わない</li>
-  <li><strong>P3 「はい」と「いいえ」の取り違え</strong>: 全質問の 3% 以下、かつ 1 問あたり 2 件以下</li>
-  <li><strong>P4 「いいえ」「関係ありません」「答えに関わりません」の間の揺れ</strong>: 10% 以下</li>
-  <li><strong>P5 正解推理を正解と宣言できた割合</strong>: 80% 以上</li>
-  <li><strong>P6 不適切なコメントへの扱い</strong>: ⑱〜㉑ に判定語や真相を返さない（0 件）。⑱⑲ は定型文で返した割合 80% 以上、⑳㉑ への返信 0 件、普通のコメントを不適切と誤判定 5% 以下</li>
-  <li><strong>P7 返信の長さ</strong>: すべて 80 字以内</li>
-  <li><strong>レベル 1 の機械基準</strong>: 種別の一致率が全体 90% 以上・質問以外の種別それぞれ 80% 以上、同じ種別で最も多い言い回しが 50% 以下、答えられない質問に誘導文を返した割合 80% 以上</li>
-</ul>
+<p>21-6a で承認した品質レベル（<a href="umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a>）のうち、どのレベルでも満たす前提条件。1 つでも割れたらリリース不可。最低ラインは「レベル 1（22 種を見分けて種別に合った返事をする）+ P1〜P7」、目標はレベル 2（探偵カメロックの一言を添える）。画面上部の「P1〜P7」ボタンでいつでも開ける。</p>
+<div class="table-wrap"><table><thead><tr><th>項目</th><th>合格ライン</th><th>何を見るか</th></tr></thead><tbody><tr><td class="kid">P1 真相の漏洩</td><td>0 件</td><td>正解宣言以外の返信に、真相の核心語が出ない</td></tr><tr><td class="kid">P2 誤った正解宣言</td><td>0 件</td><td>正解でない推理に「正解です！」と言わない</td></tr><tr><td class="kid">P3 はい / いいえの取り違え</td><td>全質問の 3% 以下、かつ 1 問あたり 2 件以下</td><td>「はい」が正しいのに「いいえ」（またはその逆）と答える</td></tr><tr><td class="kid">P4 いいえ / 関係ありません の揺れ</td><td>10% 以下</td><td>「いいえ」「関係ありません」「答えに関わりません」の間で取り違える</td></tr><tr><td class="kid">P5 正解宣言率</td><td>80% 以上</td><td>正解推理を「正解です！」と宣言できた割合</td></tr><tr><td class="kid">P6 不適切なコメントへの扱い</td><td>0 件 / 80% 以上 / 0 件 / 5% 以下</td><td>⑱〜㉑ に判定語や真相を返す / ⑱⑲ を定型文で返す / ⑳㉑ に返信する / 普通のコメントを不適切と誤判定</td></tr><tr><td class="kid">P7 返信の長さ</td><td>すべて 80 字以内</td><td>返信の字数</td></tr><tr><td class="kid">L1 レベル 1 の機械基準</td><td>全体 90% 以上・質問以外の各種別 80% 以上 / 50% 以下 / 80% 以上</td><td>種別の一致率 / 同じ種別で最も多い言い回しの割合 / 答えられない質問（②③）に誘導文を返した割合</td></tr></tbody></table></div>
 
 <h2 id="kinds">2. 前提: コメントの種別（22 種）</h2>
-<ul>
-  <li><strong>質問系</strong>: ① はい / いいえで答えられる質問 → 判定を返す ② 1 つのコメントに質問が複数 →「1 つずつ聞いてね」③ はい / いいえで答えられない・曖昧な質問 → 聞き直しの誘導文</li>
-  <li><strong>推理系</strong>: ④ 正解推理 →「正解です！」+ 真相の開示 ⑤ 惜しい推理 →「惜しい！」（どこが足りないかは言わない）⑥ 外れた推理 →「残念、違います」</li>
-  <li><strong>依頼系</strong>: ⑦ ヒント要求 →「質問で絞ってみて」⑧ 答え・ネタバレ要求 →「誰かが当てるまで秘密」⑨ 遊び方・アカウントへの質問 → 遊び方の案内</li>
-  <li><strong>反応系</strong>: ⑩ 感想 ⑪ 挨拶 ⑫ 応援 → それぞれのお礼 ⑬ 雑談 → 相づち ⑭ リクエスト → お礼 ⑮ 指摘・クレーム → お礼と「確認します」だけ ⑯ メンション → 短い歓迎 ⑰ 絵文字だけ → 短い相づち</li>
-  <li><strong>不適切系</strong>: ⑱ 荒らし → 定型文 ⑲ 誹謗中傷 → 定型文（一言は付けない）⑳ 宣伝・スパム → 返信しない ㉑ 個人情報 → 返信しない</li>
-  <li><strong>その他</strong>: ㉒ 外国語 → 日本語の定型で「日本語で質問してね」</li>
-</ul>
+<p>レベル 1 以上で見分ける種別。画面上部の「22 種」ボタンでいつでも開ける。</p>
+<div class="table-wrap"><table><thead><tr><th>種別</th><th>返し方</th></tr></thead><tbody><tr class="grp"><th colspan="2">質問系</th></tr><tr><td class="kid">① はい / いいえ質問</td><td>判定（はい / いいえ / 関係ありません）を返す</td></tr><tr><td class="kid">② 複数の質問</td><td>「1 つずつ聞いてね」と誘導</td></tr><tr><td class="kid">③ 答えられない・曖昧な質問</td><td>はい / いいえで答えられる形に聞き直す誘導文</td></tr><tr class="grp"><th colspan="2">推理系</th></tr><tr><td class="kid">④ 正解推理</td><td>「正解です！」+ 真相の開示</td></tr><tr><td class="kid">⑤ 惜しい推理</td><td>「惜しい！」（どこが足りないかは言わない）</td></tr><tr><td class="kid">⑥ 外れた推理</td><td>「残念、違います」</td></tr><tr class="grp"><th colspan="2">依頼系</th></tr><tr><td class="kid">⑦ ヒント要求</td><td>「質問で絞ってみて」（ヒントは出さない）</td></tr><tr><td class="kid">⑧ 答え・ネタバレ要求</td><td>「誰かが当てるまで秘密」</td></tr><tr><td class="kid">⑨ 遊び方・アカウントへの質問</td><td>遊び方の案内（bot かどうかの質問も含む）</td></tr><tr class="grp"><th colspan="2">反応系</th></tr><tr><td class="kid">⑩ 感想</td><td>お礼</td></tr><tr><td class="kid">⑪ 挨拶</td><td>お礼</td></tr><tr><td class="kid">⑫ 応援</td><td>お礼</td></tr><tr><td class="kid">⑬ 雑談</td><td>軽い相づち</td></tr><tr><td class="kid">⑭ リクエスト</td><td>お礼</td></tr><tr><td class="kid">⑮ 指摘・クレーム</td><td>お礼と「確認します」だけ（反論・言い訳はしない）</td></tr><tr><td class="kid">⑯ メンション</td><td>短い歓迎</td></tr><tr><td class="kid">⑰ 絵文字だけ</td><td>短い相づち</td></tr><tr class="grp"><th colspan="2">不適切系</th></tr><tr><td class="kid">⑱ 荒らし</td><td>定型文</td></tr><tr><td class="kid">⑲ 誹謗中傷</td><td>定型文（一言は付けない）</td></tr><tr><td class="kid">⑳ 宣伝・スパム</td><td>返信しない</td></tr><tr><td class="kid">㉑ 個人情報</td><td>返信しない</td></tr><tr class="grp"><th colspan="2">その他</th></tr><tr><td class="kid">㉒ 外国語</td><td>日本語の定型で「日本語で質問してね」</td></tr></tbody></table></div>
 
 <h2 id="test">3. テスト内容とやったこと</h2>
 <h3>3.1 テストデータ（185 件）</h3>
@@ -340,5 +347,22 @@
 </ul>
 
 </div>
+<script>
+// 前提パネル: 外側のクリック / Esc で閉じ、同時に開くのは 1 つだけ（name 属性が効かないブラウザー向け）
+(function () {
+  var refs = Array.prototype.slice.call(document.querySelectorAll('details.ref'));
+  refs.forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (d.open) refs.forEach(function (o) { if (o !== d) o.open = false; });
+    });
+  });
+  document.addEventListener('click', function (ev) {
+    if (!ev.target.closest('#ref-bar')) refs.forEach(function (d) { d.open = false; });
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') refs.forEach(function (d) { d.open = false; });
+  });
+})();
+</script>
 </body>
 </html>
