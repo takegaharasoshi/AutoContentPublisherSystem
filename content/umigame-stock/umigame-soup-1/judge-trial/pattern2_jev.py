@@ -18,6 +18,7 @@ JEV_URL = "https://api.typesafe.ai/v1/systemone"
 T_POINT = 0.5
 T_CLOSE = 0.35  # 惜しい判定だけに使う（正解側の T_POINT は下げない。試行 4）
 CORRECT_FRACTION = 0.75  # 要点のこの割合以上が T_POINT 以上なら正解（試行 5・ユーザー承認）
+T_GUESS = 0.95  # 段 A1b で推理とする確率の下限（試行 6b。5 問で選んだ値なので 21-6d で確かめる）
 T_RECHECK = 0.5  # A2 が q_open のとき、問題文つきで答えられる質問か確かめ直す（試行 5・ユーザー指示）
 T_QUALITY = 0.2
 T_ANSWER = 0.55
@@ -79,15 +80,12 @@ A_CONTEXT = (
     "or post guesses about the hidden story in the comments. This is one comment from that post."
 )
 MAJOR_CRITERIA = {
-    "question": (
-        "Question about the puzzle story: a yes/no question, several questions in one comment, or an open "
-        "question (why / who / what / how) or a vague question. "
-        "Examples: 「その人は男の家族？」「場所は海の近く？」「なぜ男は笑ったの？」「時間は夜？季節は冬？」"
-    ),
-    "guess": (
-        "Guess: the commenter states their own explanation of the hidden story, even when it ends with ？ "
-        "(〜ってこと？ / 〜でしょ？). Correct, partly correct and wrong guesses all belong here. "
-        "Examples: 「男は実は医者だったんだ」「犯人は弟ってこと？」「写真に写ってたのは昔の自分でしょ」"
+    # 質問と推理は問題文なしでは見分けにくいので、A1 では 1 つにまとめ、段 A1b で問題文つきで振り分け直す（試行 6・ユーザー指示）
+    "question_or_guess": (
+        "About the hidden story of the puzzle: either a question to the quiz master (yes/no, several questions, "
+        "why / who / what) or the commenter's own guess or explanation of what happened. "
+        "Examples: 「その人は男の家族？」「なぜ男は笑ったの？」「時間は夜？季節は冬？」「男は実は医者だったんだ」"
+        "「犯人は弟ってこと？」"
     ),
     "request": (
         "Request to the account instead of a question about the story: asking for a hint, for the answer or "
@@ -108,6 +106,23 @@ MAJOR_CRITERIA = {
     ),
     "other": "A comment not written in Japanese. Examples: 'nice puzzle', '太难了', '어려워요'",
 }
+# 段 A1b（試行 6）: 問題文を渡して、質問か推理かを振り分け直す。例は評価データ（data/）の文面を使わない。
+QG_CRITERIA = {
+    "question": (
+        "The comment asks the quiz master to confirm facts and is not itself an explanation of the puzzle. "
+        "Short confirmations that check one word, one person or one action in the puzzle text are questions, "
+        "even when they end with 〜ってこと？ / 〜って意味？ / 〜なの？. "
+        "Examples: 「『箱』って普通の箱のこと？」「相手は同じ職場の人ってこと？」「その話は夜のことなの？」"
+    ),
+    "guess": (
+        "The comment proposes its own answer to the puzzle: an explanation of why the strange situation happened "
+        "(a cause, a hidden identity or a twist), even when it ends with ？. "
+        "Examples: 「男は実は役者で、全部舞台の上の話だったってこと？」「手紙を書いたのは男の祖父で、昔から知っていたんだ」"
+    ),
+}
+# 指示語・代名詞。A2 が ① を選んでも、これを含む質問は段 A3 で主語が決まるか確かめ直す（試行 6）
+_DEMONSTRATIVE_RE = re.compile(r"それ|あれ|彼女|彼|あの人|その人|この人|その子|あの子|そいつ|あいつ")
+
 SUB_CRITERIA = {
     "question": {
         "q_yesno": "Exactly one question that can be answered yes or no. Examples: 「その人は男の家族？」「夜の出来事？」",
@@ -250,6 +265,7 @@ def judge(
     t_close: float = T_CLOSE,
     correct_fraction: float = CORRECT_FRACTION,
     t_recheck: float = T_RECHECK,
+    t_guess: float = T_GUESS,
     t_quality: float = T_QUALITY,
     t_answer: float = T_ANSWER,
 ) -> JudgeResult:
@@ -276,6 +292,30 @@ def judge(
         )
         major = _choice(a1_answers["major"], tuple(MAJOR_CRITERIA))
         debug["probabilities"]["A1"] = _probability_map(a1_answers["major"])
+        if major == "question_or_guess":
+            qg_answers = _record_call(
+                api_key,
+                {"problem_text": problem.problem_text, "comment": text},
+                {
+                    "qg": {
+                        "type": "choice",
+                        "instructions": (
+                            "The puzzle text is given. Decide whether the comment is a question to the quiz master "
+                            "or the commenter's own explanation (guess) of the puzzle."
+                        ),
+                        "criteria": QG_CRITERIA,
+                    }
+                },
+                debug,
+            )
+            qg_probs = _probability_map(qg_answers["qg"])
+            debug["probabilities"]["A1b"] = qg_probs
+            # 推理と言い切れるときだけ推理にし、迷ったら質問に倒す（質問の形の正解推理は段 B で拾える）。
+            # 最大確率で選ぶと、理由を確かめる質問（〜したから？）が推理に流れた（試行 6）
+            if qg_probs:
+                major = "guess" if float(qg_probs.get("guess", 0)) >= t_guess else "question"
+            else:
+                major = _choice(qg_answers["qg"], tuple(QG_CRITERIA))
         if major == "guess":
             a_kind = "guess"
         elif major == "other":
@@ -296,7 +336,7 @@ def judge(
             )
             a_kind = _choice(a2_answers["kind"], tuple(sub))
             debug["probabilities"]["A2"] = _probability_map(a2_answers["kind"])
-            if a_kind == "q_open":
+            if a_kind == "q_open" or (a_kind == "q_yesno" and _DEMONSTRATIVE_RE.search(text)):
                 # A2 は問題文を見ないので、主語が消去法で決まる質問まで q_open にしうる。問題文を渡して確かめ直す。
                 recheck_answers = _record_call(
                     api_key,
@@ -320,8 +360,7 @@ def judge(
                 )
                 recheck = _noul_true(recheck_answers["recheck"])
                 debug["probabilities"]["A3"] = recheck
-                if recheck >= t_recheck:
-                    a_kind = "q_yesno"
+                a_kind = "q_yesno" if recheck >= t_recheck else "q_open"
         debug["major"] = major
         kind: str
         answer: str | None = None
@@ -331,12 +370,13 @@ def judge(
                 f"point_{index}": {
                     "type": "noul",
                     "instructions": (
-                        "Estimate whether the commenter explicitly states this truth point. "
-                        f"The truth point is: {point!r}. Use true only when its meaning is clearly present."
+                        "Estimate whether the comment states the same content as this truth point, "
+                        "including paraphrases or different wording with the same meaning. "
+                        f"The truth point is: {point!r}."
                     ),
                     "criteria": {
-                        "true": "The comment clearly states this truth point.",
-                        "false": "The comment does not clearly state this truth point.",
+                        "true": "The comment states this truth point, possibly in different words.",
+                        "false": "The comment does not state this truth point.",
                     },
                 }
                 for index, point in enumerate(problem.truth_points)

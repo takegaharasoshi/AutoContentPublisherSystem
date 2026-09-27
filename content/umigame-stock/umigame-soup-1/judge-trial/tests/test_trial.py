@@ -71,7 +71,8 @@ def test_pattern2_b_threshold_close_and_correct(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
-            {"major": {"choice": "guess", "probabilities": {"guess": 0.8}}},
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "guess", "probabilities": {"guess": 0.98, "question": 0.02}}},
             {"point_0": {"noul": 0.7}, "point_1": {"noul": 0.49}},
         ),
     )
@@ -83,14 +84,15 @@ def test_pattern2_b_threshold_close_and_correct(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
-            {"major": {"choice": "guess"}},
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "guess"}},
             {"point_0": {"noul": 0.9}, "point_1": {"noul": 0.6}},
         ),
     )
     correct = pattern2_jev.judge("C-3", "全て言い当てた推理", PROBLEM, api_key="test")
     assert correct.kind == "guess_correct"
     assert correct.reply.startswith("正解です！")
-    assert correct.debug["input_tokens"] == 24  # 段 A1 + 段 B（要点をまとめて 1 回）
+    assert correct.debug["input_tokens"] == 36  # 段 A1 + 段 A1b + 段 B（要点をまとめて 1 回）
 
 
 def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
@@ -98,7 +100,8 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
-            {"major": {"choice": "question"}},
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
             {"point_0": {"noul": 0.2}, "point_1": {"noul": 0.1}},
             {"quality": {"noul": 0.19}},
@@ -111,7 +114,8 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
-            {"major": {"choice": "question"}},
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
             {"point_0": {"noul": 0.2}, "point_1": {"noul": 0.1}},
             {"quality": {"noul": 0.8}},
@@ -127,7 +131,8 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
-            {"major": {"choice": "question"}},
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
             {"point_0": {"noul": 0.2}, "point_1": {"noul": 0.1}},
             {"quality": {"noul": 0.8}},
@@ -247,7 +252,8 @@ def test_pattern2_recheck_turns_open_into_yesno(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
-            {"major": {"choice": "question"}},
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "question"}},
             {"kind": {"choice": "q_open"}},
             {"recheck": {"noul": 0.8}},
             {"point_0": {"noul": 0.1}, "point_1": {"noul": 0.1}},
@@ -258,3 +264,19 @@ def test_pattern2_recheck_turns_open_into_yesno(monkeypatch) -> None:
     result = pattern2_jev.judge("C-11", "その子は彼に会ったことがある？", PROBLEM, api_key="test")
     assert result.kind == "q_yesno" and result.answer == "no"
     assert result.debug["probabilities"]["A3"] == 0.8
+
+
+def test_pattern2_demonstrative_yesno_goes_to_recheck(monkeypatch) -> None:
+    """A2 が ① を選んでも、指示語を含む質問は段 A3 で確かめ直し、主語が決まらなければ ③（試行 6）。"""
+    monkeypatch.setattr(
+        pattern2_jev,
+        "_jev_request",
+        _mock_answers(
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "question"}},
+            {"kind": {"choice": "q_yesno"}},
+            {"recheck": {"noul": 0.2}},
+        ),
+    )
+    result = pattern2_jev.judge("C-12", "それはまだ持ってるの？", PROBLEM, api_key="test")
+    assert result.kind == "q_open"

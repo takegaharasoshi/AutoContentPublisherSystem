@@ -552,7 +552,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--t-answer", type=float, default=pattern2_jev.T_ANSWER)
     parser.add_argument("--model", default="gpt-6-luna")
     parser.add_argument("--effort", default="xhigh")
-    parser.add_argument("--max-tokens", type=int, default=1200)
+    parser.add_argument("--max-tokens", type=int, default=2400)
     parser.add_argument("--secret-id", default=pattern1_luna.DEFAULT_SECRET_ID)
     return parser
 

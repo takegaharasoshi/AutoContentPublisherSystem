@@ -55,7 +55,7 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <div class="page-meta">
   <span class="badge badge-wip">検討中（21-6b〜21-6e）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-09-27（試行 5 まで。21-6b の試走）</span>
+  <span>最終更新: 2026-09-27（試行 6 まで。21-6b の試走）</span>
 </div>
 
 <div class="ref-bar" id="ref-bar">
@@ -85,6 +85,7 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
   <li><strong>新しい質問（試行 4 で追加）</strong>: 真相を見せずに書かせた ① 32 件。50 件書かせたうち 18 件（36%）は、真相から答えが一つに決まらない質問だったので採点から外した。実際のプレイヤーもこの割合で「答えが決まらない質問」をしてくると見ておく</li>
   <li><strong>共通のケース</strong>: ⑦〜㉒ の 16 種 × 5 件 + 3 件 = 83 件。試行 3 で「作品へのけなしは ⑮」と決めたため、元の ⑲ のうち 3 件を ⑮ に付け替え、⑲ には人への攻撃・性的な文を 3 件足した（⑮ 8 件・⑲ 5 件）</li>
   <li><strong>ラベルの確認（試行 4 のあと・ユーザー）</strong>: 2 方式のどちらかがラベルと食い違った新しい質問 11 件をユーザーが確認。7 件はラベルどおり、4 件は「どちらでもよい」（「男はその子の主治医なの？」「男は有名人なの？」「演奏は録音だったの？」は いいえ / 関係ありません のどちらも正解、「曲の選び方を間違えたってこと？」は質問としての いいえ でも外れた推理でも正解）。「その子は彼に会ったことがある？」は、「その子」= 男の子なので「彼」は消去法で男と決まり、曖昧な主語ではない → ③ から ①（いいえ）へ付け替えた。<strong>過去の試行も、この確認後のラベルで数え直してある</strong></li>
+  <li><strong>ラベルの確認（試行 5 のあと・ユーザー）</strong>: パターン 1 の答えのうち 3 件を「許容範囲」として別解に登録した（「義母も外国出身なの？」→ 関係ありません、「義母は日本語以外の言葉を話してたの？」→ 答えに関わりません、「影が薄くなったのは見た目の変化？」→ はい）。「男はその場所に入院してたの？」（U01。確定事実は「入院はしていない」、パターン 1 は「その場所」が問題文に無いため聞き直しにした）はユーザー判断待ちで、ラベルは いいえ のまま</li>
   <li><strong>作り方</strong>: プロンプトの調整に使った想定質問（<code>expected_questions</code>）は使わない。新しい質問は、Codex を読み取り専用（ファイルを開かない指示つき）で動かし、問題文だけを渡して書かせた。正解ラベルは Claude が付け、ユーザーが確認した。プロンプトや Jev の説明に書く例文は、評価データと重ならない文にする。置き場は <code>judge-trial/data/</code></li>
 </ul>
 <h3>3.2 測ったこと</h3>
@@ -102,14 +103,15 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
   <li><strong>試行 2</strong>: パターン 2 の段 A の指示文を設計どおりに直して再実行。パターン 2 = 74.1%（パターン 1 は試行 1 のまま）。このあと、出力上限 400 → 800・effort <code>xhigh</code> をユーザーが承認</li>
   <li><strong>試行 3</strong>（ユーザー指示）: パターン 1 はプロンプトに開示文 70 字以内・作品へのけなしは ⑮・主語が曖昧な質問は ③ を追加。パターン 2 は段 A を「A1 大分類 6 択（問題文なし）→ A2 細分類」の 2 段に変えた。パターン 1 = 98.4%、パターン 2 = 88.3%</li>
   <li><strong>試行 4</strong>（次の打ち手の候補をそのまま実施）: パターン 1 は曖昧な主語の例文・漢字だけの中国語の扱いを追加（絵のルールは誤変換だったので削除）。パターン 2 は要点を「1 要点 = 1 事柄」の 4〜5 個に割り、惜しいの閾値 0.35 を新設、段 0 の英字の規則を外した。新しい質問 32 件を足して 220 件。パターン 1 = 98.6%、パターン 2 = 90.0%。このあと、出力上限 800 → 1,200 をユーザーが承認</li>
-  <li><strong>試行 5</strong>（ユーザー判断 + 判断不要の打ち手）: パターン 1 は「確定事実に直接書いていなくても、真相から明らかに違うことは いいえ」を手順 2 に追加。パターン 2 は正解判定を「要点の 75% 以上」に緩め（ユーザー承認）、A2 が ③ を選んだときだけ問題文つきで確かめ直す段 A3 を新設（ユーザー指示）、段 0 の英字の規則を「英単語 2 語以上なら ㉒」で戻し、段 B の呼び出しを 1 回にまとめた。パターン 1 = 99.1%（218/220）、パターン 2 = 92.3%（203/220）</li>
+  <li><strong>試行 5</strong>（ユーザー判断 + 判断不要の打ち手）: パターン 1 は「確定事実に直接書いていなくても、真相から明らかに違うことは いいえ」を手順 2 に追加。パターン 2 は正解判定を「要点の 75% 以上」に緩め（ユーザー承認）、A2 が ③ を選んだときだけ問題文つきで確かめ直す段 A3 を新設（ユーザー指示）、段 0 の英字の規則を「英単語 2 語以上なら ㉒」で戻し、段 B の呼び出しを 1 回にまとめた。パターン 1 = 99.1%、パターン 2 = 92.3%</li>
+  <li><strong>試行 6</strong>（ユーザー指示）: パターン 1 は出力上限を 2,400 に上げただけ（プロンプトは変えていない）。パターン 2 は大分類の「質問」と「推理」を 1 つにまとめ、問題文を渡して振り分け直す段 A1b を新設。指示語を含む ① も段 A3 で確かめ直し、要点の判定を「言い換えも含めて」に変えた。6a（最大確率で振り分け）= 75.9% に悪化したため、推理の確率 0.95 以上だけ推理にする 6b に直して再実行。パターン 1 = 98.6%（217/220）、パターン 2（6b）= 92.7%（204/220）</li>
 </ul>
 <figure class="diagram">
-<svg viewBox="0 0 400 334" role="img" aria-label="試行ごとの種別一致率の推移" class="study-chart">
+<svg viewBox="0 0 400 386" role="img" aria-label="試行ごとの種別一致率の推移" class="study-chart">
 <rect x="8" y="6" width="12" height="12" rx="3" class="s1"/><text x="26" y="16" class="lg">パターン 1（luna）</text><rect x="158" y="6" width="12" height="12" rx="3" class="s2"/><text x="176" y="16" class="lg">パターン 2（Jev）</text>
-<line x1="8.0" y1="48" x2="8.0" y2="316" class="grid"/><text x="8.0" y="328" class="ax" text-anchor="middle">0%</text>
-<line x1="152.0" y1="48" x2="152.0" y2="316" class="grid"/><text x="152.0" y="328" class="ax" text-anchor="middle">50%</text>
-<line x1="296.0" y1="48" x2="296.0" y2="316" class="grid"/><text x="296.0" y="328" class="ax" text-anchor="middle">100%</text>
+<line x1="8.0" y1="48" x2="8.0" y2="368" class="grid"/><text x="8.0" y="380" class="ax" text-anchor="middle">0%</text>
+<line x1="152.0" y1="48" x2="152.0" y2="368" class="grid"/><text x="152.0" y="380" class="ax" text-anchor="middle">50%</text>
+<line x1="296.0" y1="48" x2="296.0" y2="368" class="grid"/><text x="296.0" y="380" class="ax" text-anchor="middle">100%</text>
 <text x="8" y="62" class="rl">試行 1</text>
 <g><title>試行 1 / パターン 1: 179/185（96.8%）</title><rect x="8" y="68" width="278.7" height="12" rx="4" class="s1"/><text x="290.7" y="78" class="vl">97%（179/185）</text></g>
 <g><title>試行 1 / パターン 2: 107/185（57.8%）</title><rect x="8" y="82" width="166.6" height="12" rx="4" class="s2"/><text x="178.6" y="92" class="vl">58%（107/185）</text></g>
@@ -125,12 +127,15 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <text x="8" y="270" class="rl">試行 5</text>
 <g><title>試行 5 / パターン 1: 218/220（99.1%）</title><rect x="8" y="276" width="285.4" height="12" rx="4" class="s1"/><text x="297.4" y="286" class="vl">99%（218/220）</text></g>
 <g><title>試行 5 / パターン 2: 203/220（92.3%）</title><rect x="8" y="290" width="265.7" height="12" rx="4" class="s2"/><text x="277.7" y="300" class="vl">92%（203/220）</text></g>
-<line x1="267.2" y1="48" x2="267.2" y2="316" class="target"/><text x="267.2" y="42" class="tl" text-anchor="middle">レベル 1 の基準 90%</text>
+<text x="8" y="322" class="rl">試行 6</text>
+<g><title>試行 6 / パターン 1: 217/220（98.6%）</title><rect x="8" y="328" width="284.1" height="12" rx="4" class="s1"/><text x="296.1" y="338" class="vl">99%（217/220）</text></g>
+<g><title>試行 6 / パターン 2: 204/220（92.7%）</title><rect x="8" y="342" width="267.1" height="12" rx="4" class="s2"/><text x="279.1" y="352" class="vl">93%（204/220）</text></g>
+<line x1="267.2" y1="48" x2="267.2" y2="368" class="target"/><text x="267.2" y="42" class="tl" text-anchor="middle">レベル 1 の基準 90%</text>
 </svg>
-<figcaption>試行ごとの種別一致率の推移（件数は 185 / 185 / 188 / 220 / 220 件）</figcaption>
+<figcaption>試行ごとの種別一致率の推移（件数は 185 / 185 / 188 / 220 / 220 / 220 件。試行 6 のパターン 2 は 6b）</figcaption>
 </figure>
 
-<h2 id="compare">4. パターン 1 とパターン 2 の比較（試行 5 時点）</h2>
+<h2 id="compare">4. パターン 1 とパターン 2 の比較（試行 6 時点）</h2>
 <figure class="diagram">
 <svg viewBox="0 0 400 386" role="img" aria-label="区分別の種別一致率の比較" class="study-chart">
 <rect x="8" y="6" width="12" height="12" rx="3" class="s1"/><text x="26" y="16" class="lg">パターン 1（luna）</text><rect x="158" y="6" width="12" height="12" rx="3" class="s2"/><text x="176" y="16" class="lg">パターン 2（Jev）</text>
@@ -138,23 +143,23 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <line x1="152.0" y1="48" x2="152.0" y2="368" class="grid"/><text x="152.0" y="380" class="ax" text-anchor="middle">50%</text>
 <line x1="296.0" y1="48" x2="296.0" y2="368" class="grid"/><text x="296.0" y="380" class="ax" text-anchor="middle">100%</text>
 <text x="8" y="62" class="rl">全体</text>
-<g><title>全体 / パターン 1: 218/220（99.1%）</title><rect x="8" y="68" width="285.4" height="12" rx="4" class="s1"/><text x="297.4" y="78" class="vl">99%（218/220）</text></g>
-<g><title>全体 / パターン 2: 203/220（92.3%）</title><rect x="8" y="82" width="265.7" height="12" rx="4" class="s2"/><text x="277.7" y="92" class="vl">92%（203/220）</text></g>
+<g><title>全体 / パターン 1: 217/220（98.6%）</title><rect x="8" y="68" width="284.1" height="12" rx="4" class="s1"/><text x="296.1" y="78" class="vl">99%（217/220）</text></g>
+<g><title>全体 / パターン 2: 204/220（92.7%）</title><rect x="8" y="82" width="267.1" height="12" rx="4" class="s2"/><text x="279.1" y="92" class="vl">93%（204/220）</text></g>
 <text x="8" y="114" class="rl">質問系 ①〜③</text>
 <g><title>質問系 ①〜③ / パターン 1: 105/106（99.1%）</title><rect x="8" y="120" width="285.3" height="12" rx="4" class="s1"/><text x="297.3" y="130" class="vl">99%（105/106）</text></g>
-<g><title>質問系 ①〜③ / パターン 2: 100/106（94.3%）</title><rect x="8" y="134" width="271.7" height="12" rx="4" class="s2"/><text x="283.7" y="144" class="vl">94%（100/106）</text></g>
+<g><title>質問系 ①〜③ / パターン 2: 101/106（95.3%）</title><rect x="8" y="134" width="274.4" height="12" rx="4" class="s2"/><text x="286.4" y="144" class="vl">95%（101/106）</text></g>
 <text x="8" y="166" class="rl">推理系 ④〜⑥</text>
-<g><title>推理系 ④〜⑥ / パターン 1: 31/31（100.0%）</title><rect x="8" y="172" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="182" class="vl">100%（31/31）</text></g>
+<g><title>推理系 ④〜⑥ / パターン 1: 29/31（93.5%）</title><rect x="8" y="172" width="269.4" height="12" rx="4" class="s1"/><text x="281.4" y="182" class="vl">94%（29/31）</text></g>
 <g><title>推理系 ④〜⑥ / パターン 2: 24/31（77.4%）</title><rect x="8" y="186" width="223.0" height="12" rx="4" class="s2"/><text x="235.0" y="196" class="vl">77%（24/31）</text></g>
 <text x="8" y="218" class="rl">その他 ⑦〜㉒</text>
-<g><title>その他 ⑦〜㉒ / パターン 1: 82/83（98.8%）</title><rect x="8" y="224" width="284.5" height="12" rx="4" class="s1"/><text x="296.5" y="234" class="vl">99%（82/83）</text></g>
+<g><title>その他 ⑦〜㉒ / パターン 1: 83/83（100.0%）</title><rect x="8" y="224" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="234" class="vl">100%（83/83）</text></g>
 <g><title>その他 ⑦〜㉒ / パターン 2: 79/83（95.2%）</title><rect x="8" y="238" width="274.1" height="12" rx="4" class="s2"/><text x="286.1" y="248" class="vl">95%（79/83）</text></g>
 <text x="8" y="270" class="rl">① の判定（従来の質問）</text>
-<g><title>① の判定（従来の質問） / パターン 1: 50/51（98.0%）</title><rect x="8" y="276" width="282.4" height="12" rx="4" class="s1"/><text x="294.4" y="286" class="vl">98%（50/51）</text></g>
-<g><title>① の判定（従来の質問） / パターン 2: 50/51（98.0%）</title><rect x="8" y="290" width="282.4" height="12" rx="4" class="s2"/><text x="294.4" y="300" class="vl">98%（50/51）</text></g>
+<g><title>① の判定（従来の質問） / パターン 1: 51/51（100.0%）</title><rect x="8" y="276" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="286" class="vl">100%（51/51）</text></g>
+<g><title>① の判定（従来の質問） / パターン 2: 48/51（94.1%）</title><rect x="8" y="290" width="271.1" height="12" rx="4" class="s2"/><text x="283.1" y="300" class="vl">94%（48/51）</text></g>
 <text x="8" y="322" class="rl">① の判定（新しい質問）</text>
-<g><title>① の判定（新しい質問） / パターン 1: 28/31（90.3%）</title><rect x="8" y="328" width="260.1" height="12" rx="4" class="s1"/><text x="272.1" y="338" class="vl">90%（28/31）</text></g>
-<g><title>① の判定（新しい質問） / パターン 2: 26/31（83.9%）</title><rect x="8" y="342" width="241.5" height="12" rx="4" class="s2"/><text x="253.5" y="352" class="vl">84%（26/31）</text></g>
+<g><title>① の判定（新しい質問） / パターン 1: 31/31（100.0%）</title><rect x="8" y="328" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="338" class="vl">100%（31/31）</text></g>
+<g><title>① の判定（新しい質問） / パターン 2: 29/31（93.5%）</title><rect x="8" y="342" width="269.4" height="12" rx="4" class="s2"/><text x="281.4" y="352" class="vl">94%（29/31）</text></g>
 <line x1="267.2" y1="48" x2="267.2" y2="368" class="target"/><text x="267.2" y="42" class="tl" text-anchor="middle">レベル 1 の基準 90%</text>
 </svg>
 <figcaption>区分別の種別一致率と ① の判定一致。点線はレベル 1 の基準（全体 90%）。棒に触れると件数が出る</figcaption>
@@ -166,23 +171,23 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <line x1="152.0" y1="48" x2="152.0" y2="1200" class="grid"/><text x="152.0" y="1212" class="ax" text-anchor="middle">50%</text>
 <line x1="296.0" y1="48" x2="296.0" y2="1200" class="grid"/><text x="296.0" y="1212" class="ax" text-anchor="middle">100%</text>
 <text x="8" y="62" class="rl">① はい / いいえ質問</text>
-<g><title>① はい / いいえ質問 / パターン 1: 81/82（98.8%）</title><rect x="8" y="68" width="284.5" height="12" rx="4" class="s1"/><text x="296.5" y="78" class="vl">99%（81/82）</text></g>
-<g><title>① はい / いいえ質問 / パターン 2: 78/82（95.1%）</title><rect x="8" y="82" width="274.0" height="12" rx="4" class="s2"/><text x="286.0" y="92" class="vl">95%（78/82）</text></g>
+<g><title>① はい / いいえ質問 / パターン 1: 82/82（100.0%）</title><rect x="8" y="68" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="78" class="vl">100%（82/82）</text></g>
+<g><title>① はい / いいえ質問 / パターン 2: 79/82（96.3%）</title><rect x="8" y="82" width="277.5" height="12" rx="4" class="s2"/><text x="289.5" y="92" class="vl">96%（79/82）</text></g>
 <text x="8" y="114" class="rl">② 複数の質問</text>
 <g><title>② 複数の質問 / パターン 1: 10/10（100.0%）</title><rect x="8" y="120" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="130" class="vl">100%（10/10）</text></g>
 <g><title>② 複数の質問 / パターン 2: 10/10（100.0%）</title><rect x="8" y="134" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="144" class="vl">100%（10/10）</text></g>
 <text x="8" y="166" class="rl">③ 答えられない質問</text>
-<g><title>③ 答えられない質問 / パターン 1: 14/14（100.0%）</title><rect x="8" y="172" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="182" class="vl">100%（14/14）</text></g>
+<g><title>③ 答えられない質問 / パターン 1: 13/14（92.9%）</title><rect x="8" y="172" width="267.4" height="12" rx="4" class="s1"/><text x="279.4" y="182" class="vl">93%（13/14）</text></g>
 <g><title>③ 答えられない質問 / パターン 2: 12/14（85.7%）</title><rect x="8" y="186" width="246.9" height="12" rx="4" class="s2"/><text x="258.9" y="196" class="vl">86%（12/14）</text></g>
 <text x="8" y="218" class="rl">④ 正解推理</text>
 <g><title>④ 正解推理 / パターン 1: 10/10（100.0%）</title><rect x="8" y="224" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="234" class="vl">100%（10/10）</text></g>
-<g><title>④ 正解推理 / パターン 2: 9/10（90.0%）</title><rect x="8" y="238" width="259.2" height="12" rx="4" class="s2"/><text x="271.2" y="248" class="vl">90%（9/10）</text></g>
+<g><title>④ 正解推理 / パターン 2: 10/10（100.0%）</title><rect x="8" y="238" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="248" class="vl">100%（10/10）</text></g>
 <text x="8" y="270" class="rl">⑤ 惜しい推理</text>
 <g><title>⑤ 惜しい推理 / パターン 1: 10/10（100.0%）</title><rect x="8" y="276" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="286" class="vl">100%（10/10）</text></g>
 <g><title>⑤ 惜しい推理 / パターン 2: 5/10（50.0%）</title><rect x="8" y="290" width="144.0" height="12" rx="4" class="s2"/><text x="156.0" y="300" class="vl">50%（5/10）</text></g>
 <text x="8" y="322" class="rl">⑥ 外れた推理</text>
-<g><title>⑥ 外れた推理 / パターン 1: 11/11（100.0%）</title><rect x="8" y="328" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="338" class="vl">100%（11/11）</text></g>
-<g><title>⑥ 外れた推理 / パターン 2: 10/11（90.9%）</title><rect x="8" y="342" width="261.8" height="12" rx="4" class="s2"/><text x="273.8" y="352" class="vl">91%（10/11）</text></g>
+<g><title>⑥ 外れた推理 / パターン 1: 9/11（81.8%）</title><rect x="8" y="328" width="235.6" height="12" rx="4" class="s1"/><text x="247.6" y="338" class="vl">82%（9/11）</text></g>
+<g><title>⑥ 外れた推理 / パターン 2: 9/11（81.8%）</title><rect x="8" y="342" width="235.6" height="12" rx="4" class="s2"/><text x="247.6" y="352" class="vl">82%（9/11）</text></g>
 <text x="8" y="374" class="rl">⑦ ヒント要求</text>
 <g><title>⑦ ヒント要求 / パターン 1: 5/5（100.0%）</title><rect x="8" y="380" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="390" class="vl">100%（5/5）</text></g>
 <g><title>⑦ ヒント要求 / パターン 2: 5/5（100.0%）</title><rect x="8" y="394" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="404" class="vl">100%（5/5）</text></g>
@@ -190,7 +195,7 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <g><title>⑧ ネタバレ要求 / パターン 1: 5/5（100.0%）</title><rect x="8" y="432" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="442" class="vl">100%（5/5）</text></g>
 <g><title>⑧ ネタバレ要求 / パターン 2: 5/5（100.0%）</title><rect x="8" y="446" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="456" class="vl">100%（5/5）</text></g>
 <text x="8" y="478" class="rl">⑨ 遊び方の質問</text>
-<g><title>⑨ 遊び方の質問 / パターン 1: 4/5（80.0%）</title><rect x="8" y="484" width="230.4" height="12" rx="4" class="s1"/><text x="242.4" y="494" class="vl">80%（4/5）</text></g>
+<g><title>⑨ 遊び方の質問 / パターン 1: 5/5（100.0%）</title><rect x="8" y="484" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="494" class="vl">100%（5/5）</text></g>
 <g><title>⑨ 遊び方の質問 / パターン 2: 5/5（100.0%）</title><rect x="8" y="498" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="508" class="vl">100%（5/5）</text></g>
 <text x="8" y="530" class="rl">⑩ 感想</text>
 <g><title>⑩ 感想 / パターン 1: 5/5（100.0%）</title><rect x="8" y="536" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="546" class="vl">100%（5/5）</text></g>
@@ -239,23 +244,23 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <h3>P1〜P7 の結果</h3>
 <ul>
   <li><strong>P1 漏れ候補</strong>: パターン 1 = 0 件 <span class="pass">合格</span> / パターン 2 = 0 件 <span class="pass">合格</span>（定型文なので構造的に 0）</li>
-  <li><strong>P2 誤った正解宣言</strong>: パターン 1 = 0 件 <span class="pass">合格</span> / パターン 2 = 0 件 <span class="pass">合格</span>（正解判定を 75% に緩めても 0 件）</li>
-  <li><strong>P3 はい / いいえの取り違え</strong>: パターン 1 = 1/70（1.4%）<span class="pass">合格</span> / パターン 2 = 0 件 <span class="pass">合格</span></li>
-  <li><strong>P4 いいえ / 関係ありません の揺れ</strong>: パターン 1 = 2/51（3.9%）<span class="pass">合格</span> / パターン 2 = 1/51（2.0%）<span class="pass">合格</span></li>
-  <li><strong>P5 正解宣言率</strong>: パターン 1 = 10/10（100%）<span class="pass">合格</span> / パターン 2 = 9/10（90%）<span class="pass">合格</span>（試行 4 の 60% から回復）</li>
+  <li><strong>P2 誤った正解宣言</strong>: 両方式とも 0 件 <span class="pass">合格</span></li>
+  <li><strong>P3 はい / いいえの取り違え</strong>: 両方式とも 0 件 <span class="pass">合格</span></li>
+  <li><strong>P4 いいえ / 関係ありません の揺れ</strong>: パターン 1 = 0/50 <span class="pass">合格</span> / パターン 2 = 1/51（2.0%）<span class="pass">合格</span></li>
+  <li><strong>P5 正解宣言率</strong>: 両方式とも 10/10（100%）<span class="pass">合格</span></li>
   <li><strong>P6 ⑱⑲ を定型文で返した割合</strong>: パターン 1 = 10/10（100%）<span class="pass">合格</span> / パターン 2 = 9/10（90%）<span class="pass">合格</span>。⑱〜㉑ に判定語を返した・⑳㉑ に返信した・普通のコメントを不適切と誤判定は両方式とも 0 件</li>
   <li><strong>P7 80 字超</strong>: 両方式とも 0 件 <span class="pass">合格</span></li>
-  <li><strong>① の判定一致</strong>: パターン 1 = 従来 50/51（98%） / 新しい質問 28/31（90%）、パターン 2 = 従来 50/51（98%） / 新しい質問 26/31（84%）</li>
-  <li><strong>レベル 1 の種別一致率</strong>（全体 90% 以上・質問以外の各種別 80% 以上）: パターン 1 は全体 99.1% で全種別が基準内 <span class="pass">合格</span> / パターン 2 は全体 92.3% で全体の基準は初めて超えたが、⑤ 惜しい推理が 5/10（50%）で基準未満 <span class="fail">不合格</span>（ほかの種別は 80% 以上）</li>
+  <li><strong>① の判定一致</strong>: パターン 1 = 従来 51/51（100%） / 新しい質問 31/31（100%）、パターン 2 = 従来 48/51（94%） / 新しい質問 29/31（94%）</li>
+  <li><strong>レベル 1 の種別一致率</strong>（全体 90% 以上・質問以外の各種別 80% 以上）: パターン 1 は全体 98.6% で全種別が基準内 <span class="pass">合格</span> / パターン 2 は全体 92.7% で、⑤ 惜しい推理だけが 5/10（50%）で基準未満 <span class="fail">不合格</span></li>
 </ul>
-<h3>応答時間・トークン・金額（試行 5）</h3>
+<h3>応答時間・トークン・金額（試行 6。パターン 2 は 6b）</h3>
 <div class="card-grid">
-  <div class="card"><div class="card-title">応答時間（中央値）</div><p>パターン 1: 2.0 秒（p95 3.4 秒・最大 9.7 秒）<br>パターン 2: 0.47 秒（最大 2.2 秒。段 B を 1 回にまとめて試行 4 の 1.05 秒から短縮）</p></div>
-  <div class="card"><div class="card-title">トークン</div><p>パターン 1: 入力 合計 51 万・出力 平均 141（うち推論 99）・最大 1,160（上限 1,200 の手前）<br>パターン 2: 入力 合計 51 万（出力は無料）</p></div>
-  <div class="card"><div class="card-title">金額（1 件あたり）</div><p>パターン 1: $0.00030（約 0.046 円）<br>パターン 2: $0.00010（約 0.015 円）</p></div>
-  <div class="card"><div class="card-title">金額（月 6,000 件の見込み）</div><p>パターン 1: $1.82（約 270 円）<br>パターン 2: $0.58（約 90 円）<br>どちらも月数百円で、方式選定の決め手にはならない水準</p></div>
+  <div class="card"><div class="card-title">応答時間（中央値）</div><p>パターン 1: 1.9 秒（p95 4.3 秒・最大 6.5 秒）<br>パターン 2: 0.64 秒（最大 2.2 秒。振り分け直しの段で 1 回増えた）</p></div>
+  <div class="card"><div class="card-title">トークン</div><p>パターン 1: 入力 合計 51 万・出力 平均 140（うち推論 98）・最大 640（上限 2,400）<br>パターン 2: 入力 合計 59 万（出力は無料）</p></div>
+  <div class="card"><div class="card-title">金額（1 件あたり）</div><p>パターン 1: $0.00030（約 0.045 円）<br>パターン 2: $0.00011（約 0.017 円）</p></div>
+  <div class="card"><div class="card-title">金額（月 6,000 件の見込み）</div><p>パターン 1: $1.82（約 270 円）<br>パターン 2: $0.67（約 100 円）<br>どちらも月数百円で、方式選定の決め手にはならない水準</p></div>
 </div>
-<p><strong>試走で使った金額（試算）</strong>: 試行 1 = パターン 1 $0.048 / パターン 2 $0.012、試行 2 = パターン 1 $0.000 / パターン 2 $0.014、試行 3 = パターン 1 $0.052 / パターン 2 $0.018、試行 4 = パターン 1 $0.066 / パターン 2 $0.027、試行 5 = パターン 1 $0.067 / パターン 2 $0.021（試行 2 のパターン 1 は試行 1 の結果を流用したので 0。上限の測り直しなどの小さな実行は含まない）。5 回の合計 $0.33（約 49 円）。</p>
+<p><strong>試走で使った金額（試算）</strong>: 試行 1 = パターン 1 $0.048 / パターン 2 $0.012、試行 2 = パターン 1 $0.000 / パターン 2 $0.014、試行 3 = パターン 1 $0.052 / パターン 2 $0.018、試行 4 = パターン 1 $0.066 / パターン 2 $0.027、試行 5 = パターン 1 $0.067 / パターン 2 $0.021、試行 6 = パターン 1 $0.067 / パターン 2 $0.046（試行 2 のパターン 1 は試行 1 の結果を流用したので 0。上限の測り直しなどの小さな実行は含まない）。6 回の合計 $0.44（約 66 円）。</p>
 
 <h2 id="p1">5. パターン 1（gpt-6-luna の一括方式）</h2>
 <h3>5.1 処理方式</h3>
@@ -266,7 +271,7 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
 <line x1="125.0" y1="50" x2="125.0" y2="72" class="ar" marker-end="url(#arw-p1)"/>
 <rect x="10" y="72" width="230" height="58" rx="8" class="bx"/><text x="125.0" y="90.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">system プロンプトを組み立て</text><text x="125.0" y="105.2" text-anchor="middle" font-size="12" class="ft">改訂案の判定ルール</text><text x="125.0" y="120.2" text-anchor="middle" font-size="12" class="ft">+ 問題文・真相・確定事実</text>
 <line x1="125.0" y1="130" x2="125.0" y2="152" class="ar" marker-end="url(#arw-p1)"/>
-<rect x="10" y="152" width="230" height="72" rx="8" class="bx2"/><text x="125.0" y="169.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">gpt-6-luna を 1 回呼ぶ</text><text x="125.0" y="184.7" text-anchor="middle" font-size="12" class="ft">effort xhigh・上限 1,200</text><text x="125.0" y="199.7" text-anchor="middle" font-size="12" class="ft">出力は JSON</text><text x="125.0" y="214.7" text-anchor="middle" font-size="12" class="ft">{種別, 判定, 返信文}</text>
+<rect x="10" y="152" width="230" height="72" rx="8" class="bx2"/><text x="125.0" y="169.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">gpt-6-luna を 1 回呼ぶ</text><text x="125.0" y="184.7" text-anchor="middle" font-size="12" class="ft">effort xhigh・上限 2,400</text><text x="125.0" y="199.7" text-anchor="middle" font-size="12" class="ft">出力は JSON</text><text x="125.0" y="214.7" text-anchor="middle" font-size="12" class="ft">{種別, 判定, 返信文}</text>
 <line x1="125.0" y1="224" x2="125.0" y2="246" class="ar" marker-end="url(#arw-p1)"/>
 <rect x="10" y="246" width="230" height="58" rx="8" class="bx"/><text x="125.0" y="264.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">コードの後処理</text><text x="125.0" y="279.2" text-anchor="middle" font-size="12" class="ft">種別で出口を分ける</text><text x="125.0" y="294.2" text-anchor="middle" font-size="12" class="ft">（LLM の判断を上書き）</text>
 <rect x="268" y="236" width="146" height="36" rx="8" class="ex"/><text x="341.0" y="250.8" text-anchor="middle" font-size="11" class="ft">⑳ 宣伝・㉑ 個人情報</text><text x="341.0" y="264.9" text-anchor="middle" font-size="11" class="ft">→ 返信しない</text>
@@ -283,107 +288,111 @@ td.pid { white-space: nowrap; font-weight: 700; } td.kid { font-weight: 700; }
   <li><strong>呼び出し</strong>: コメント 1 件につき chat completions を 1 回。<code>response_format</code> を JSON スキーマ（strict）にし、<code>{種別, 判定, 返信文}</code> を返させる（種別を明示させることで、コードの上書きと種別一致率の集計ができる）</li>
   <li><strong>プロンプト</strong>: 5.1 のマスタープロンプトを改訂した <code>judge-trial/prompts/pattern1_rules.txt</code>。手順 1 で 22 種を定義して種別を選ばせ、手順 2 で判定、手順 3 で種別ごとの返し方（80 字以内・探偵口調・① は判定語 + 真相に触れない 20 字以内の一言）を書く。「荒らしには返信しない」はやめ、⑱〜㉑ は返信文を空にしてコードに任せる</li>
   <li><strong>足したルール</strong>: 正解時の開示は 70 字以内・作品へのけなしは ⑮ で ⑲ は人への攻撃などに限る・主語が曖昧な質問は ③（例文つき）・かなを含まない漢字だけの文は中国語を疑う・確定事実に直接書いていなくても真相から明らかに違うことは いいえ（試行 3〜5）</li>
-  <li><strong>パラメータ</strong>: effort <code>xhigh</code>・出力上限 1,200（ユーザー承認）・温度は送らない</li>
+  <li><strong>パラメータ</strong>: effort <code>xhigh</code>・出力上限 2,400（試行 6 でユーザー承認。上限を上げても課金は実際に使った分だけで、実害は推論が長いときの応答時間。本番の Reply Lambda と SQS のタイムアウトはこれより長く取る）・温度は送らない</li>
 </ul>
-<h3>5.2 結果（試行 5）</h3>
+<h3>5.2 結果（試行 6）</h3>
 <ul>
-  <li>種別一致率 99.1%（218/220）。推理系 31/31、③ 14/14（曖昧な主語の 3 件も聞き直しにできた）、㉒ 5/5</li>
-  <li><strong>効いた改善</strong>: 新しい質問の判定が試行 4 の 27/31（確認後のラベルで数え直した値）から 28/31（90%） へ。「演奏は録音だったの？」などに いいえ と言えるようになった。出力上限 1,200 で打ち切り 0 件</li>
-  <li><strong>残った誤り</strong>: 「義母も外国出身なの？」「義母は日本語以外の言葉を話してたの？」に 関係ありません / 答えに関わりません（正解は いいえ）、「影が薄くなったのは見た目の変化？」に はい（正解は いいえ）、「男はその場所に入院してたの？」を聞き直しにした、「これ中の人？自動で返してる？」を複数の質問と判定</li>
-  <li><strong>気になる点</strong>: 出力が最大 1,160 トークン（うち推論 1,106）まで伸び、上限 1,200 の手前だった。応答時間の最大も 9.7 秒</li>
+  <li>種別一致率 98.6%（217/220）。① の判定は 51/51（100%）・新しい質問 31/31（100%） ですべて一致（許容範囲の別解 3 件を登録したあと）。プロンプトは試行 5 から変えていない</li>
+  <li>残った誤り 3 件: 外れた推理を「惜しい」とした 2 件（「約束を書いた紙を誰かに破られて…」は真相の一部〔紙に書かれていた〕を含むので、ラベルのほうを見直す余地がある。「郵便局が配達を忘れていて、50 年後に遅れて届けた」）、曖昧な主語の「それはまだ覚えてるの？」に「はい。」（試行 5 では聞き直しにできていた = 実行ごとの揺れ）</li>
+  <li>出力の最大は 640 トークンで、上限 2,400 には遠い。打ち切り 0 件</li>
 </ul>
 <p>誤りの例:</p>
 <ul>
-<li>「義母も外国出身なの？」 — 正解 ① はい / いいえ質問（いいえ） → 判定 ① はい / いいえ質問（関係ありません）。返信「関係ありません。今回の謎の筋には絡みません。」</li>
-<li>「義母は日本語以外の言葉を話してたの？」 — 正解 ① はい / いいえ質問（いいえ） → 判定 ① はい / いいえ質問（答えに関わりません）。返信「それは問題の答えに関わりません。」</li>
-<li>「影が薄くなったのは見た目の変化？」 — 正解 ① はい / いいえ質問（いいえ） → 判定 ① はい / いいえ質問（はい）。返信「はい。細かな変化も見逃しませんね。」</li>
-<li>「男はその場所に入院してたの？」 — 正解 ① はい / いいえ質問（いいえ） → 判定 ③ 答えられない質問。返信「「その場所」がどこを指すか分からないため、はい／いいえで答えられる形にしていただけますか？」</li>
+<li>「約束を書いた紙を誰かに破られてしまい、二人は悲しくてそのまま諦めたんだ。」 — 正解 ⑥ 外れた推理 → 判定 ⑤ 惜しい推理。返信「惜しい！」</li>
+<li>「郵便局が配達を忘れていて、50年後に遅れて届けたんだ。」 — 正解 ⑥ 外れた推理 → 判定 ⑤ 惜しい推理。返信「惜しい！」</li>
+<li>「それはまだ覚えてるの？」 — 正解 ③ 答えられない質問 → 判定 ① はい / いいえ質問（はい）。返信「はい。」</li>
 </ul>
 <h3>5.3 見えた課題と次の打ち手</h3>
 <ul>
-  <li>推論が長くなるケース → 上限をさらに上げるより、推論が長引いた応答の種類を調べる（惜しい推理・長い推理で起きやすい）。21-6d の全件で打ち切りの件数を見てから決める</li>
-  <li>「義母も外国出身なの？」型 → 真相に書かれた人物の属性から推せる質問。レベル 1 の基準は満たしているので、21-6d の全件で同じ型が多ければ手当てする</li>
+  <li>レベル 1 の機械基準・P1〜P7 はすべて満たした。これ以上は 21-6d の全 14 問で、同じ型の誤りがまとまって出るかを見てから手当てする</li>
+  <li>「外れた推理に真相の一部が入っているもの」を ⑤ とするか ⑥ とするか（ユーザー判断。両方式とも ⑤ と判定している）</li>
 </ul>
 
 <h2 id="p2">6. パターン 2（Jev の段階判定 + 定型文）</h2>
 <h3>6.1 処理方式</h3>
 <figure class="diagram">
-<svg viewBox="0 0 420 760" role="img" aria-label="パターン 2 の処理フロー" class="study-flow">
+<svg viewBox="0 0 420 1000" role="img" aria-label="パターン 2 の処理フロー" class="study-flow">
 <defs><marker id="arw-p2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arh"/></marker></defs>
 <rect x="10" y="10" width="230" height="40" rx="8" class="bx"/><text x="125.0" y="26.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">コメント 1 件</text><text x="125.0" y="41.7" text-anchor="middle" font-size="12" class="ft">本文 + comment_id</text>
 <line x1="125.0" y1="50" x2="125.0" y2="70" class="ar" marker-end="url(#arw-p2)"/>
 <rect x="10" y="70" width="230" height="52" rx="8" class="bx2"/><text x="125.0" y="92.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 0 文字種の規則</text><text x="125.0" y="107.7" text-anchor="middle" font-size="12" class="ft">Jev を呼ばない</text>
-<rect x="262" y="62" width="152" height="68" rx="8" class="ex"/><text x="338.0" y="78.8" text-anchor="middle" font-size="11" class="ft">URL あり → ⑳ 返信しない</text><text x="338.0" y="92.8" text-anchor="middle" font-size="11" class="ft">絵文字だけ → ⑰ 相づち</text><text x="338.0" y="106.8" text-anchor="middle" font-size="11" class="ft">かな・漢字なし + 英字</text><text x="338.0" y="120.8" text-anchor="middle" font-size="11" class="ft">→ ㉒ 日本語でお願い</text>
+<rect x="262" y="62" width="152" height="68" rx="8" class="ex"/><text x="338.0" y="78.8" text-anchor="middle" font-size="11" class="ft">URL あり → ⑳ 返信しない</text><text x="338.0" y="92.8" text-anchor="middle" font-size="11" class="ft">絵文字だけ → ⑰ 相づち</text><text x="338.0" y="106.8" text-anchor="middle" font-size="11" class="ft">英単語 2 語以上（かな・</text><text x="338.0" y="120.8" text-anchor="middle" font-size="11" class="ft">漢字なし）→ ㉒</text>
 <line x1="240" y1="96" x2="262" y2="96" class="ar" marker-end="url(#arw-p2)"/><text x="244" y="90" font-size="10.5" class="al">当たり</text>
 <line x1="125.0" y1="122" x2="125.0" y2="146" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="138" font-size="10.5" class="al">当たらない</text>
-<rect x="10" y="146" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="162.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 A1 大分類</text><text x="125.0" y="177.7" text-anchor="middle" font-size="12" class="ft">Jev choice 6 択（問題文なし）</text><text x="125.0" y="192.7" text-anchor="middle" font-size="12" class="ft">質問 / 推理 / 依頼 /</text><text x="125.0" y="207.7" text-anchor="middle" font-size="12" class="ft">反応 / 不適切 / その他</text>
+<rect x="10" y="146" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="162.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 A1 大分類</text><text x="125.0" y="177.7" text-anchor="middle" font-size="12" class="ft">Jev choice 5 択（問題文なし）</text><text x="125.0" y="192.7" text-anchor="middle" font-size="12" class="ft">質問・推理 / 依頼 / 反応 /</text><text x="125.0" y="207.7" text-anchor="middle" font-size="12" class="ft">不適切 / その他</text>
 <rect x="262" y="162" width="152" height="36" rx="8" class="ex"/><text x="338.0" y="176.8" text-anchor="middle" font-size="11" class="ft">その他 → ㉒</text><text x="338.0" y="190.8" text-anchor="middle" font-size="11" class="ft">日本語でお願い</text>
 <line x1="240" y1="180" x2="262" y2="180" class="ar" marker-end="url(#arw-p2)"/>
-<line x1="125.0" y1="216" x2="125.0" y2="242" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="234" font-size="10.5" class="al">質問・依頼・反応・不適切</text>
-<rect x="10" y="242" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="259.3" text-anchor="middle" font-size="11.5" font-weight="700" class="ft">段 A2 細分類</text><text x="125.0" y="273.8" text-anchor="middle" font-size="11.5" class="ft">大分類ごとの Jev choice</text><text x="125.0" y="288.3" text-anchor="middle" font-size="11.5" class="ft">質問 → ①②③ / 依頼 → ⑦⑧⑨</text><text x="125.0" y="302.8" text-anchor="middle" font-size="11.5" class="ft">反応 → ⑩〜⑯ / 不適切 → ⑱〜㉑</text>
-<rect x="262" y="244" width="152" height="66" rx="8" class="ex"/><text x="338.0" y="259.9" text-anchor="middle" font-size="11" class="ft">②③⑦〜⑯・⑱⑲ →</text><text x="338.0" y="273.9" text-anchor="middle" font-size="11" class="ft">種別ごとの定型文</text><text x="338.0" y="287.9" text-anchor="middle" font-size="11" class="ft">⑳㉑ → 返信しない</text><text x="338.0" y="301.9" text-anchor="middle" font-size="11" class="ft">（3 通り以上を順繰り）</text>
-<line x1="240" y1="277" x2="262" y2="277" class="ar" marker-end="url(#arw-p2)"/>
-<line x1="125.0" y1="312" x2="125.0" y2="338" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="330" font-size="10.5" class="al">① または A1 が推理</text>
-<rect x="10" y="338" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="354.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 B 正解判定</text><text x="125.0" y="369.7" text-anchor="middle" font-size="12" class="ft">Jev noul × 要点の数</text><text x="125.0" y="384.7" text-anchor="middle" font-size="12" class="ft">「この要点を言い当てているか」</text><text x="125.0" y="399.7" text-anchor="middle" font-size="12" class="ft">の確率を要点ごとに取る</text>
-<rect x="262" y="330" width="152" height="40" rx="8" class="ok"/><text x="338.0" y="346.9" text-anchor="middle" font-size="11" font-weight="700" class="ft">全要点が 0.5 以上</text><text x="338.0" y="360.9" text-anchor="middle" font-size="11" class="ft">→ ④ 正解です！+ 開示文</text>
-<rect x="262" y="376" width="152" height="40" rx="8" class="ex"/><text x="338.0" y="392.9" text-anchor="middle" font-size="11" class="ft">推理で一部 → ⑤ 惜しい！</text><text x="338.0" y="406.9" text-anchor="middle" font-size="11" class="ft">推理でなし → ⑥ 違います</text>
-<line x1="240" y1="358" x2="262" y2="350" class="ar" marker-end="url(#arw-p2)"/>
-<line x1="240" y1="393" x2="262" y2="396" class="ar" marker-end="url(#arw-p2)"/>
-<line x1="125.0" y1="408" x2="125.0" y2="436" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="426" font-size="10.5" class="al">① で全要点には届かない</text>
-<rect x="10" y="436" width="230" height="58" rx="8" class="bx2"/><text x="125.0" y="454.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 C 質問の品質</text><text x="125.0" y="469.2" text-anchor="middle" font-size="12" class="ft">Jev noul「はい / いいえで</text><text x="125.0" y="484.2" text-anchor="middle" font-size="12" class="ft">一意に答えられるか」</text>
-<rect x="262" y="444" width="152" height="40" rx="8" class="ex"/><text x="338.0" y="460.9" text-anchor="middle" font-size="11" class="ft">確率 0.2 未満</text><text x="338.0" y="474.9" text-anchor="middle" font-size="11" class="ft">→ ③ 聞き直しの誘導文</text>
-<line x1="240" y1="465" x2="262" y2="465" class="ar" marker-end="url(#arw-p2)"/>
-<line x1="125.0" y1="494" x2="125.0" y2="520" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="512" font-size="10.5" class="al">0.2 以上</text>
-<rect x="10" y="520" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="536.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 D 判定</text><text x="125.0" y="551.7" text-anchor="middle" font-size="12" class="ft">Jev choice 3 択</text><text x="125.0" y="566.7" text-anchor="middle" font-size="12" class="ft">state = 問題文 + 真相</text><text x="125.0" y="581.7" text-anchor="middle" font-size="12" class="ft">+ 確定事実 + 質問</text>
-<rect x="262" y="528" width="152" height="54" rx="8" class="ex"/><text x="338.0" y="544.9" text-anchor="middle" font-size="11" class="ft">最大確率 0.55 未満</text><text x="338.0" y="558.9" text-anchor="middle" font-size="11" class="ft">→「それは問題の答えに</text><text x="338.0" y="572.9" text-anchor="middle" font-size="11" class="ft">関わりません。」</text>
-<line x1="240" y1="555" x2="262" y2="555" class="ar" marker-end="url(#arw-p2)"/>
-<line x1="125.0" y1="590" x2="125.0" y2="616" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="608" font-size="10.5" class="al">0.55 以上</text>
-<rect x="10" y="616" width="230" height="58" rx="8" class="bx3"/><text x="125.0" y="634.5" text-anchor="middle" font-size="11.5" font-weight="700" class="ft">返信（すべて定型文）</text><text x="125.0" y="649.0" text-anchor="middle" font-size="11.5" class="ft">はい。/ いいえ。/ 関係ありません。</text><text x="125.0" y="663.5" text-anchor="middle" font-size="11.5" class="ft">+ 20 字以内の定型の一言</text>
-<text x="10" y="704" font-size="10.5" class="al">閾値 0.5 / 0.2 / 0.55 は試走の初期値（21-6d で決める）。</text>
-<text x="10" y="722" font-size="10.5" class="al">1 コメントあたり Jev を 1〜7 回呼ぶ（段 B は要点の数だけ）。</text>
-<text x="10" y="740" font-size="10.5" class="al">返信文を AI に書かせないので、補足やお礼から真相が漏れない。</text>
+<line x1="125.0" y1="216" x2="125.0" y2="242" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="234" font-size="10.5" class="al">質問・推理</text>
+<rect x="10" y="242" width="230" height="58" rx="8" class="bx2"/><text x="125.0" y="260.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 A1b 振り分け直し</text><text x="125.0" y="275.2" text-anchor="middle" font-size="12" class="ft">Jev choice 2 択（問題文つき）</text><text x="125.0" y="290.2" text-anchor="middle" font-size="12" class="ft">質問 / 推理</text>
+<rect x="262" y="226" width="152" height="50" rx="8" class="ex"/><text x="338.0" y="247.8" text-anchor="middle" font-size="11" class="ft">依頼・反応・不適切は</text><text x="338.0" y="261.9" text-anchor="middle" font-size="11" class="ft">A1 から直接 A2 へ</text>
+<line x1="125.0" y1="300" x2="125.0" y2="326" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="318" font-size="10.5" class="al">質問（推理は段 B へ）</text>
+<rect x="10" y="326" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="343.3" text-anchor="middle" font-size="11.5" font-weight="700" class="ft">段 A2 細分類</text><text x="125.0" y="357.8" text-anchor="middle" font-size="11.5" class="ft">大分類ごとの Jev choice</text><text x="125.0" y="372.3" text-anchor="middle" font-size="11.5" class="ft">質問 → ①②③ / 依頼 → ⑦⑧⑨</text><text x="125.0" y="386.8" text-anchor="middle" font-size="11.5" class="ft">反応 → ⑩〜⑯ / 不適切 → ⑱〜㉑</text>
+<rect x="262" y="328" width="152" height="66" rx="8" class="ex"/><text x="338.0" y="343.9" text-anchor="middle" font-size="11" class="ft">②⑦〜⑯・⑱⑲ →</text><text x="338.0" y="357.9" text-anchor="middle" font-size="11" class="ft">種別ごとの定型文</text><text x="338.0" y="371.9" text-anchor="middle" font-size="11" class="ft">⑳㉑ → 返信しない</text><text x="338.0" y="385.9" text-anchor="middle" font-size="11" class="ft">（3 通り以上を順繰り）</text>
+<line x1="240" y1="361" x2="262" y2="361" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="396" x2="125.0" y2="422" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="414" font-size="10.5" class="al">③、または指示語を含む ①</text>
+<rect x="10" y="422" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="438.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 A3 確かめ直し</text><text x="125.0" y="453.7" text-anchor="middle" font-size="12" class="ft">Jev noul（問題文つき）</text><text x="125.0" y="468.7" text-anchor="middle" font-size="12" class="ft">主語が一つに決まる</text><text x="125.0" y="483.7" text-anchor="middle" font-size="12" class="ft">はい / いいえの質問か</text>
+<rect x="262" y="436" width="152" height="40" rx="8" class="ex"/><text x="338.0" y="452.9" text-anchor="middle" font-size="11" class="ft">0.5 未満</text><text x="338.0" y="466.9" text-anchor="middle" font-size="11" class="ft">→ ③ 聞き直しの誘導文</text>
+<line x1="240" y1="456" x2="262" y2="456" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="492" x2="125.0" y2="518" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="510" font-size="10.5" class="al">① または推理</text>
+<rect x="10" y="518" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="535.3" text-anchor="middle" font-size="11.5" font-weight="700" class="ft">段 B 正解判定</text><text x="125.0" y="549.8" text-anchor="middle" font-size="11.5" class="ft">Jev noul × 要点（1 回にまとめる）</text><text x="125.0" y="564.3" text-anchor="middle" font-size="11.5" class="ft">「言い換えも含めて</text><text x="125.0" y="578.8" text-anchor="middle" font-size="11.5" class="ft">同じ内容を述べているか」</text>
+<rect x="262" y="510" width="152" height="40" rx="8" class="ok"/><text x="338.0" y="526.9" text-anchor="middle" font-size="11" font-weight="700" class="ft">要点の 75% 以上が 0.5 以上</text><text x="338.0" y="540.9" text-anchor="middle" font-size="11" class="ft">→ ④ 正解です！+ 開示文</text>
+<rect x="262" y="556" width="152" height="40" rx="8" class="ex"/><text x="338.0" y="572.9" text-anchor="middle" font-size="11" class="ft">推理で 1 つ以上 0.35 以上</text><text x="338.0" y="586.9" text-anchor="middle" font-size="11" class="ft">→ ⑤ 惜しい！ / なし → ⑥</text>
+<line x1="240" y1="538" x2="262" y2="530" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="240" y1="573" x2="262" y2="576" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="588" x2="125.0" y2="616" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="606" font-size="10.5" class="al">① で正解に届かない</text>
+<rect x="10" y="616" width="230" height="58" rx="8" class="bx2"/><text x="125.0" y="634.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 C 質問の品質</text><text x="125.0" y="649.2" text-anchor="middle" font-size="12" class="ft">Jev noul「はい / いいえで</text><text x="125.0" y="664.2" text-anchor="middle" font-size="12" class="ft">一意に答えられるか」</text>
+<rect x="262" y="624" width="152" height="40" rx="8" class="ex"/><text x="338.0" y="640.9" text-anchor="middle" font-size="11" class="ft">確率 0.2 未満</text><text x="338.0" y="654.9" text-anchor="middle" font-size="11" class="ft">→ ③ 聞き直しの誘導文</text>
+<line x1="240" y1="645" x2="262" y2="645" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="674" x2="125.0" y2="700" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="692" font-size="10.5" class="al">0.2 以上</text>
+<rect x="10" y="700" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="716.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 D 判定</text><text x="125.0" y="731.7" text-anchor="middle" font-size="12" class="ft">Jev choice 3 択</text><text x="125.0" y="746.7" text-anchor="middle" font-size="12" class="ft">state = 問題文 + 真相</text><text x="125.0" y="761.7" text-anchor="middle" font-size="12" class="ft">+ 確定事実 + 質問</text>
+<rect x="262" y="708" width="152" height="54" rx="8" class="ex"/><text x="338.0" y="724.9" text-anchor="middle" font-size="11" class="ft">最大確率 0.55 未満</text><text x="338.0" y="738.9" text-anchor="middle" font-size="11" class="ft">→「それは問題の答えに</text><text x="338.0" y="752.9" text-anchor="middle" font-size="11" class="ft">関わりません。」</text>
+<line x1="240" y1="735" x2="262" y2="735" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="770" x2="125.0" y2="796" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="788" font-size="10.5" class="al">0.55 以上</text>
+<rect x="10" y="796" width="230" height="58" rx="8" class="bx3"/><text x="125.0" y="814.5" text-anchor="middle" font-size="11.5" font-weight="700" class="ft">返信（すべて定型文）</text><text x="125.0" y="829.0" text-anchor="middle" font-size="11.5" class="ft">はい。/ いいえ。/ 関係ありません。</text><text x="125.0" y="843.5" text-anchor="middle" font-size="11.5" class="ft">+ 20 字以内の定型の一言</text>
+<text x="10" y="884" font-size="10.5" class="al">閾値は試走の値（0.5 / 0.35 / 0.2 / 0.55。21-6d で決める）。</text>
+<text x="10" y="902" font-size="10.5" class="al">1 コメントあたり Jev を 1〜7 回呼ぶ（種別によって段の数が違う）。</text>
+<text x="10" y="920" font-size="10.5" class="al">返信文を AI に書かせないので、補足やお礼から真相が漏れない。</text>
 </svg>
 <figcaption>パターン 2: Jev の選択式（choice）と真偽の確率（noul）を段ごとに使い、返信文はすべてコードの定型文</figcaption>
 </figure>
 <ul>
   <li><strong>Jev の呼び方</strong>: <code>POST https://api.typesafe.ai/v1/systemone</code>（<code>model: jev-latest</code>）。<code>choice</code> は選択肢ごとの確率、<code>noul</code> は命題が真である確率を返す。指示文は英語、コメントと問題は日本語のまま渡す</li>
-  <li><strong>段 0</strong>: URL → ⑳、絵文字だけ → ⑰、かな・漢字を含まず英単語が 2 語以上 → ㉒（1 語の英字の羅列は荒らしのことがあるので段 A1 に任せる）</li>
-  <li><strong>段 A1 大分類</strong>: 問題文は渡さず、説明とコメントだけで、質問 / 推理 / 依頼 / 反応 / 不適切 / その他 の 6 択にする（各選択肢に種別と具体例を添える）。<strong>段 A2 細分類</strong>: 大分類ごとに ①②③ / ⑦⑧⑨ / ⑩〜⑯ / ⑱〜㉑ から選ぶ</li>
-  <li><strong>段 A3 確かめ直し（試行 5・ユーザー指示）</strong>: A2 が ③ を選んだときだけ、問題文を渡して「主語や指示語が問題文から（消去法も含めて）一つに決まる、はい / いいえで答えられる質問か」を聞き直す。0.5 以上なら ① として段 B へ進める</li>
-  <li><strong>段 B 正解判定</strong>: 要点 4〜5 個（「1 要点 = 1 事柄」）ごとの確率を 1 回の呼び出しでまとめて取る。<strong>要点の 75% 以上が 0.5 以上なら ④</strong>（試行 5・ユーザー承認）、推理で 1 つ以上が 0.35 以上なら ⑤、なければ ⑥</li>
-  <li><strong>段 C・段 D・返信</strong>: 段 C（質問の品質・閾値 0.2）・段 D（はい / いいえ / 関係ありません の 3 択・最大確率 0.55 未満は「答えに関わりません」）は変えていない。返信は種別ごとに 3 通り以上の定型文を <code>comment_id</code> のハッシュで選ぶ</li>
+  <li><strong>段 0</strong>: URL → ⑳、絵文字だけ → ⑰、かな・漢字を含まず英単語が 2 語以上 → ㉒</li>
+  <li><strong>段 A1 大分類（試行 6 で 5 択に）</strong>: 問題文は渡さず、説明とコメントだけで、質問・推理 / 依頼 / 反応 / 不適切 / その他 の 5 択。質問と推理は問題文なしでは見分けにくいので 1 つにまとめた（ユーザー指示）</li>
+  <li><strong>段 A1b 振り分け直し（試行 6・ユーザー指示）</strong>: 「質問・推理」だけ、問題文を渡して「質問（事実を 1 つ確かめる。〜ってこと？ / 〜って意味？ の短い確認を含む）か、推理（どういうこと？への自分の答え）か」を選ばせる。<strong>推理の確率が 0.95 以上のときだけ推理</strong>、それ以外は質問にする（試行 6b。質問側に倒しても、質問の形の正解推理は段 B で拾える）</li>
+  <li><strong>段 A2 細分類</strong>: 大分類ごとに ①②③ / ⑦⑧⑨ / ⑩〜⑯ / ⑱〜㉑ から選ぶ</li>
+  <li><strong>段 A3 確かめ直し</strong>: A2 が ③ を選んだとき、または ① でも指示語（それ・あれ・彼・あの人 など）を含むとき（試行 6）、問題文を渡して「主語が一つに決まる、はい / いいえの質問か」を聞き直す。0.5 以上なら ①、未満なら ③</li>
+  <li><strong>段 B 正解判定</strong>: 要点 4〜5 個ごとの確率を 1 回で取る（試行 6 から「言い換えも含めて同じ内容か」で聞く）。要点の 75% 以上が 0.5 以上なら ④、推理で 1 つ以上が 0.35 以上なら ⑤、なければ ⑥</li>
+  <li><strong>段 C・段 D・返信</strong>: 変えていない（段 C 閾値 0.2・段 D 最大確率 0.55 未満は「答えに関わりません」・定型文を <code>comment_id</code> のハッシュで選ぶ）</li>
 </ul>
-<h3>6.2 結果（試行 5）</h3>
+<h3>6.2 結果（試行 6）</h3>
 <ul>
-  <li>種別一致率 92.3%（203/220）。全体の基準 90% を初めて超えた。推理系 67.7% → 77.4%（試行 4 は確認後のラベルで 21/31）、④ 正解 9/10（P5 90%）</li>
-  <li><strong>効いた改善</strong>: 正解判定の 75% ルールで ④ が 6/10 → 9/10、誤った正解宣言は 0 件のまま。段 B をまとめて応答時間が 1.05 秒 → 0.47 秒。英字の規則を戻して ㉒ が 2/5 → 4/5。段 A3 は 11 件で動き、「なぜ〜？」「どうして〜？」10 件はすべて ③ のまま残した（誤って ① に戻したものは 0 件）</li>
-  <li><strong>残る最大の弱点は ⑤ 惜しい推理（5/10）</strong>: 言い換えた推理（「その人の伝え方が変わったんじゃない？」「男はその曲を毎日聞いて覚えていた」）では、要点ごとの確率が 0.02〜0.2 に留まる。Jev は要点の言い換えを「言い当てた」と見なしにくい</li>
-  <li><strong>質問を推理と判定する誤り 3 件</strong>: 「「影」って存在感のことなの？」「相手にお礼を言ってるってこと？」「「白紙」は紙が真っ白になったって意味？」。「〜ってこと？」「〜って意味？」の形が A1 で推理に振られる</li>
-  <li><strong>曖昧な主語</strong>: 3 件のうち 1 件（「それはまだ覚えてるの？」）を聞き直しにできた。残り 2 件（「あの人はそれを見て嬉しかったの？」「彼は前からあれを知ってたの？」）は A2 が ① を選ぶので、A3 の確かめ直しまで届かない</li>
-  <li>新しい質問の判定は 26/31（84%）（試行 4 の 27/31 から 1 件下がった。質問を推理と判定した 3 件が効いている）</li>
+  <li><strong>試行 6a（最大確率で質問か推理かを選んだ版）: 75.9% に悪化</strong>。はい / いいえ質問 35 件が推理に流れた。問題文を渡すと「今日泣いたのは、悪い知らせを聞いたから？」のような理由を確かめる質問まで推理側に寄る。一方で推理 30 件は「質問」の確率がすべて 0.05 以下で、推理の見分けは完璧だった</li>
+  <li><strong>試行 6b（推理の確率 0.95 以上だけ推理）: 92.7%（204/220）</strong>。これまでで最高。① 79/82・② 10/10・④ 10/10（P5 100%）。閾値ごとの試算では、0.95 で質問 107 件中 103 件を質問に、推理 30 件すべてを推理に振り分けられる（5 問で選んだ値なので、21-6d の全 14 問で確かめる）</li>
+  <li><strong>残る弱点は ⑤ 惜しい推理（5/10）</strong>: 要点の聞き方を「言い換えも含めて」に変えても改善しなかった。「男はその曲を毎日のように聞いて覚えていた」のように真相の一部を別の言葉で言うと、要点ごとの確率が 0.1〜0.2 に留まる</li>
+  <li>曖昧な主語: 3 件のうち「それはまだ覚えてるの？」は聞き直しにできたが、「あの人はそれを見て嬉しかったの？」「彼は前からあれを知ってたの？」は段 A3 で 0.53・0.56 と閾値 0.5 をわずかに超えて ① のまま</li>
 </ul>
 <p>誤りの例（括弧内は Jev が返した確率）:</p>
 <ul>
-<li>「会話の間にいつも家族が入って訳していて、その人の伝え方が変わったんじゃない？」 — 正解 ⑤ 惜しい推理 → 判定 ⑥ 外れた推理。返信「残念、違います。」（段 A1: guess 0.71 / question 0.29、段 B: 0.09 / 0.08 / 0.04 / 0.03）</li>
-<li>「男はその曲を毎日のように聞いて覚えていたから、ピアニストの演奏を間違いだと思ったのかな。」 — 正解 ⑤ 惜しい推理 → 判定 ⑥ 外れた推理。返信「その推理ではありません。」（段 A1: guess 0.94 / question 0.06、段 B: 0.03 / 0.02 / 0.21 / 0.07 / 0.02）</li>
-<li>「「白紙」は紙が真っ白になったって意味？」 — 正解 ① はい / いいえ質問（はい） → 判定 ⑥ 外れた推理。返信「その推理ではありません。」（段 A1: guess 0.60 / question 0.40、段 B: 0.02 / 0.01 / 0.01 / 0.02 / 0.01）</li>
-<li>「相手にお礼を言ってるってこと？」 — 正解 ① はい / いいえ質問（はい） → 判定 ⑥ 外れた推理。返信「残念、違います。」（段 A1: guess 0.90 / question 0.10、段 B: 0.01 / 0.01 / 0.02 / 0.01 / 0.06）</li>
-<li>「彼は前からあれを知ってたの？」 — 正解 ③ 答えられない質問 → 判定 ① はい / いいえ質問（はい）。返信「はい。続きの推理もお待ちしています。」（段 A1: question 1.00 / reaction 0.00、段 A2: q_yesno 0.78 / q_open 0.21、段 B: 0.01 / 0.01 / 0.05 / 0.01 / 0.01）</li>
-<li>「男の影はレントゲンに写る病気の跡で、主治医から回復の知らせを聞いて感謝した、ってこと？」 — 正解 ④ 正解推理 → 判定 ⑤ 惜しい推理。返信「惜しい！もう少し考えてみてください。」（段 A1: guess 0.99 / question 0.01、段 B: 0.85 / 0.91 / 0.73 / 0.40 / 0.31）</li>
+<li>「男はその曲を毎日のように聞いて覚えていたから、ピアニストの演奏を間違いだと思ったのかな。」 — 正解 ⑤ 惜しい推理 → 判定 ⑥ 外れた推理。返信「その推理ではありません。」（段 A1: question_or_guess 1.00 / other 0.00、段 A1b: guess 1.00 / question 0.00、段 B: 0.04 / 0.02 / 0.17 / 0.23 / 0.02）</li>
+<li>「会話の間にいつも家族が入って訳していて、その人の伝え方が変わったんじゃない？」 — 正解 ⑤ 惜しい推理 → 判定 ⑥ 外れた推理。返信「残念、違います。」（段 A1: question_or_guess 1.00 / inappropriate 0.00、段 A1b: guess 0.98 / question 0.02、段 B: 0.20 / 0.18 / 0.05 / 0.07）</li>
+<li>「手紙は未来の誰かに宛てたもので、男はその子についてよく知っていたのかな。」 — 正解 ⑤ 惜しい推理 → 判定 ⑥ 外れた推理。返信「残念、違います。」（段 A1: question_or_guess 1.00 / other 0.00、段 A1b: guess 0.99 / question 0.01、段 B: 0.09 / 0.10 / 0.06 / 0.04）</li>
+<li>「あの人はそれを見て嬉しかったの？」 — 正解 ③ 答えられない質問 → 判定 ① はい / いいえ質問（はい）。返信「はい。手掛かりを追ってみましょう。」（段 A1: question_or_guess 1.00 / reaction 0.00、段 A1b: question 0.93 / guess 0.07、段 A2: q_yesno 0.77 / q_open 0.22、段 A3: 0.53、段 B: 0.01 / 0.01 / 0.02 / 0.01 / 0.02）</li>
+<li>「濡れたものを乾かしたの？」 — 正解 ① はい / いいえ質問（はい） → 判定 ⑥ 外れた推理。返信「その推理ではありません。」（段 A1: question_or_guess 1.00 / other 0.00、段 A1b: guess 0.96 / question 0.04、段 B: 0.02 / 0.02 / 0.05 / 0.03 / 0.01）</li>
 </ul>
 <h3>6.3 見えた課題と次の打ち手</h3>
 <ul>
-  <li><strong>⑤ 惜しい推理</strong>: 要点ごとの noul を「言い換えも含めて、この要点と同じ内容を述べているか」に書き直す。または、推理全体を「真相と部分的に一致するか」の 1 問（noul）で見て、要点の判定は正解の判定だけに使う</li>
-  <li><strong>「〜ってこと？」型の質問</strong>: A1 の「質問」の具体例に「〜ってこと？」「〜って意味？」の短い確認の質問を足す（評価データと重ならない例で）。短い確認は ①、真相全体を説明する長いものは推理、という区別を説明に書く</li>
-  <li><strong>曖昧な主語</strong>: A2 が ① を選んだ場合でも、指示語（それ・あれ・彼・あの人）を含む質問だけは A3 の確かめ直しに回す</li>
+  <li><strong>⑤ 惜しい推理</strong>: 要点ごとの判定では言い換えを拾えない。推理全体を「真相と部分的に一致するか」の 1 問（noul）で聞き、要点の判定は ④ の判定だけに使う形を試す</li>
+  <li><strong>曖昧な主語</strong>: 段 A3 の閾値を 0.6 程度に上げると残り 2 件を拾える見込み（正しい ① を聞き直しにしないかを同時に見る）</li>
+  <li>「外れた推理に真相の一部が入っているもの」の扱い（パターン 1 と共通。ユーザー判断）</li>
 </ul>
 
 <h2 id="next">7. 次の試行の候補</h2>
 <p>両方式とも精度を上げる試行を続ける（ユーザー方針 2026-09-27）。試行ごとに 3.3 に 1 行足し、図を描き直す。合否の判定は 21-6d の全件プローブ（14 問）で行う。</p>
 <ul>
-  <li>パターン 1: レベル 1 の機械基準・P1〜P7 はすべて満たした。推論の長い応答（出力上限の手前）の中身を調べる</li>
-  <li>パターン 2: ⑤ 惜しい推理（要点の説明の書き直し）、「〜ってこと？」型の質問、指示語を含む質問の確かめ直し</li>
-  <li>共通: 新しい質問をもう少し増やす（今は 1 問あたり 4〜8 件）</li>
+  <li>パターン 1: レベル 1 の機械基準と P1〜P7 をすべて満たした。21-6d の全件で同じ型の誤りがまとまって出るかを見る</li>
+  <li>パターン 2: ⑤ 惜しい推理（推理全体の部分一致を 1 問で聞く）、段 A3 の閾値</li>
+  <li>共通: 「外れた推理に真相の一部が入っているもの」を ⑤ / ⑥ のどちらにするか決める、新しい質問をもう少し増やす（今は 1 問あたり 4〜8 件）</li>
 </ul>
 
 </div>
