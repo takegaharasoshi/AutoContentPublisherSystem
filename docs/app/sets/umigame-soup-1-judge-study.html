@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コメント返信処理方式の検討 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20260921">
+<style>
+/* 本ページだけの図の色。系列色はパレット検証済み（ライト / ダーク） */
+:root { --s1: #0a69da; --s2: #c2610c; --target: #b98900; --ok-box: #e6f4ea; --ok-box-border: #3f9a5a; }
+@media (prefers-color-scheme: dark) {
+  :root { --s1: #4d8fe0; --s2: #d67a2c; --target: #c69026; --ok-box: #15291c; --ok-box-border: #4fae6d; }
+}
+.study-chart, .study-flow { width: 100%; max-width: 560px; height: auto; }
+.study-chart .s1 { fill: var(--s1); } .study-chart .s2 { fill: var(--s2); }
+.study-chart text { fill: var(--text); }
+.study-chart .lg, .study-chart .rl { font-size: 12px; }
+.study-chart .vl { font-size: 10.5px; fill: var(--text-muted); }
+.study-chart .ax { font-size: 10px; fill: var(--text-muted); }
+.study-chart .grid { stroke: var(--border); stroke-width: 1; }
+.study-chart .target { stroke: var(--target); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.study-chart .tl { font-size: 10.5px; fill: var(--text-muted); }
+.study-flow .bx { fill: var(--diag-box-alt); stroke: var(--diag-box-alt-border); }
+.study-flow .bx2 { fill: var(--diag-box); stroke: var(--diag-box-border); }
+.study-flow .bx3 { fill: var(--diag-emph); stroke: var(--diag-emph-border); }
+.study-flow .ex { fill: var(--bg); stroke: var(--diag-box-alt-border); stroke-dasharray: 4 3; }
+.study-flow .ok { fill: var(--ok-box); stroke: var(--ok-box-border); }
+.study-flow .ft { fill: var(--diag-text); }
+.study-flow .al { fill: var(--text-muted); }
+.study-flow .ar { stroke: var(--diag-line); stroke-width: 1.4; }
+.study-flow .arh { fill: var(--diag-line); }
+.pass { font-weight: 700; } .fail { font-weight: 700; color: var(--warn-border); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / <a href="umigame-soup-1.html">探偵カメロックのウミガメのスープ</a> / コメント返信処理方式の検討</nav>
+<h1>コメント返信処理方式の検討</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">検討中（21-6b〜21-6e）</span>
+  <span>set_code: umigame-soup-1</span>
+  <span>最終更新: 2026-09-27（試行 2 まで。21-6b の試走）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">このページの位置づけ</span>
+  コメント返信の判定方式（パターン 1 = <code>gpt-6-luna</code> の一括方式 / パターン 2 = Jev の段階判定 + 定型文）の<strong>試行錯誤の記録</strong>。何を試して、どうなったかをここに積み、決まったことだけを<a href="umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a>（判定モジュールの契約・方式の設計）へ移す。方式の選定は 21-6e。試走の資材とスクリプトは <code>content/umigame-stock/umigame-soup-1/judge-trial/</code>。
+</div>
+
+<h2 id="premise">1. 前提: 判定の正しさ（P1〜P7）</h2>
+<p>21-6a で承認した品質レベル（<a href="umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a>）のうち、どのレベルでも満たす前提条件。1 つでも割れたらリリース不可。最低ラインは「レベル 1（22 種を見分けて種別に合った返事をする）+ P1〜P7」、目標はレベル 2（探偵カメロックの一言を添える）。</p>
+<ul>
+  <li><strong>P1 真相の漏洩 0 件</strong>: 正解宣言以外の返信に真相の核心語が出ない</li>
+  <li><strong>P2 誤った正解宣言 0 件</strong>: 正解でない推理に「正解です！」と言わない</li>
+  <li><strong>P3 「はい」と「いいえ」の取り違え</strong>: 全質問の 3% 以下、かつ 1 問あたり 2 件以下</li>
+  <li><strong>P4 「いいえ」「関係ありません」「答えに関わりません」の間の揺れ</strong>: 10% 以下</li>
+  <li><strong>P5 正解推理を正解と宣言できた割合</strong>: 80% 以上</li>
+  <li><strong>P6 不適切なコメントへの扱い</strong>: ⑱〜㉑ に判定語や真相を返さない（0 件）。⑱⑲ は定型文で返した割合 80% 以上、⑳㉑ への返信 0 件、普通のコメントを不適切と誤判定 5% 以下</li>
+  <li><strong>P7 返信の長さ</strong>: すべて 80 字以内</li>
+  <li><strong>レベル 1 の機械基準</strong>: 種別の一致率が全体 90% 以上・質問以外の種別それぞれ 80% 以上、同じ種別で最も多い言い回しが 50% 以下、答えられない質問に誘導文を返した割合 80% 以上</li>
+</ul>
+
+<h2 id="kinds">2. 前提: コメントの種別（22 種）</h2>
+<ul>
+  <li><strong>質問系</strong>: ① はい / いいえで答えられる質問 → 判定を返す ② 1 つのコメントに質問が複数 →「1 つずつ聞いてね」③ はい / いいえで答えられない・曖昧な質問 → 聞き直しの誘導文</li>
+  <li><strong>推理系</strong>: ④ 正解推理 →「正解です！」+ 真相の開示 ⑤ 惜しい推理 →「惜しい！」（どこが足りないかは言わない）⑥ 外れた推理 →「残念、違います」</li>
+  <li><strong>依頼系</strong>: ⑦ ヒント要求 →「質問で絞ってみて」⑧ 答え・ネタバレ要求 →「誰かが当てるまで秘密」⑨ 遊び方・アカウントへの質問 → 遊び方の案内</li>
+  <li><strong>反応系</strong>: ⑩ 感想 ⑪ 挨拶 ⑫ 応援 → それぞれのお礼 ⑬ 雑談 → 相づち ⑭ リクエスト → お礼 ⑮ 指摘・クレーム → お礼と「確認します」だけ ⑯ メンション → 短い歓迎 ⑰ 絵文字だけ → 短い相づち</li>
+  <li><strong>不適切系</strong>: ⑱ 荒らし → 定型文 ⑲ 誹謗中傷 → 定型文（一言は付けない）⑳ 宣伝・スパム → 返信しない ㉑ 個人情報 → 返信しない</li>
+  <li><strong>その他</strong>: ㉒ 外国語 → 日本語の定型で「日本語で質問してね」</li>
+</ul>
+
+<h2 id="test">3. テスト内容とやったこと</h2>
+<h3>3.1 テストデータ（185 件）</h3>
+<ul>
+  <li><strong>問題ごとのケース</strong>: 5 問（U01・U13・U18・U20・U26）× 21 件 = 105 件。内訳は 1 問あたり ① 10 件・② 2 件・③ 3 件・④ 2 件（うち 1 件は「〜ってこと？」の質問の形）・⑤ 2 件・⑥ 2 件。① には正解の判定（はい / いいえ / 関係ありません）も付けた</li>
+  <li><strong>共通のケース</strong>: ⑦〜㉒ の 16 種 × 5 件 = 80 件。どの問題に付いても成り立つ文面で、5 問に順番に割り当てた</li>
+  <li><strong>作り方</strong>: プロンプトの調整に使った想定質問（<code>expected_questions</code>）は使わず、Codex に新しく書かせ、Claude が正解ラベルを検めた。置き場は <code>judge-trial/data/</code></li>
+  <li><strong>弱点</strong>: ① の質問は書き手が確定事実シートの言い回しに寄せてしまい、実際のコメントより易しめ。5 問だけの小さな試走なので、数値の幅は大きい</li>
+</ul>
+<h3>3.2 測ったこと</h3>
+<ul>
+  <li>種別の一致率（全体・区分別・種別ごと）、① の判定の一致率</li>
+  <li>P1〜P7（上の基準をそのまま機械で数える。P1 は既存の <code>leak_count.py</code> の核心語辞書で漏れ候補を拾う）</li>
+  <li>パターン 1 の応答時間・出力トークン（うち推論）・打ち切り件数、パターン 2 の応答時間・入力トークン</li>
+</ul>
+<h3>3.3 試行の記録</h3>
+<ul>
+  <li><strong>試行 1</strong>（2026-09-27）: 2 方式を 185 件で実行。パターン 1 = 96.2%、パターン 2 = 57.3%。パターン 2 は段 A の指示文に「質問の形の推理も推理に入れる」と書いていたため、① のはい / いいえ質問 50 件中 38 件が推理に流れた</li>
+  <li><strong>試行 2</strong>（同日）: パターン 2 の段 A の指示文を「言い切った推理だけを推理に入れる」に直して再実行（質問の形の正解推理は段 B が拾う設計なので、設計どおりに戻しただけ。閾値は変えていない）。パターン 2 = 73.5%（136/185）。パターン 1 は試行 1 のまま</li>
+  <li><strong>追加の測定</strong>: パターン 1 で打ち切られた 1 件を、出力上限 400 と 800 で 3 回ずつ実行。400 は推論 252〜400 トークンで 3 回中 1 回打ち切り、800 は 173〜264 トークンで 3 回とも収まった → <strong>上限 800 に決定</strong>（2026-09-27 ユーザー承認）</li>
+  <li><strong>API の制約</strong>: OpenAI API は <code>gpt-6-luna</code> の effort に <code>max</code> を受け付けない（受け付けるのは none / low / medium / high / xhigh）。最上位の <code>xhigh</code> を使う（2026-09-27 ユーザー承認）</li>
+</ul>
+
+<h2 id="compare">4. パターン 1 とパターン 2 の比較（試行 2 時点）</h2>
+<figure class="diagram">
+<svg viewBox="0 0 400 334" role="img" aria-label="区分別の種別一致率の比較" class="study-chart">
+<rect x="8" y="6" width="12" height="12" rx="3" class="s1"/><text x="26" y="16" class="lg">パターン 1（luna）</text><rect x="158" y="6" width="12" height="12" rx="3" class="s2"/><text x="176" y="16" class="lg">パターン 2（Jev）</text>
+<line x1="8.0" y1="48" x2="8.0" y2="316" class="grid"/><text x="8.0" y="328" class="ax" text-anchor="middle">0%</text>
+<line x1="152.0" y1="48" x2="152.0" y2="316" class="grid"/><text x="152.0" y="328" class="ax" text-anchor="middle">50%</text>
+<line x1="296.0" y1="48" x2="296.0" y2="316" class="grid"/><text x="296.0" y="328" class="ax" text-anchor="middle">100%</text>
+<text x="8" y="62" class="rl">全体</text>
+<g><title>全体 / パターン 1: 178/185（96.2%）</title><rect x="8" y="68" width="277.1" height="12" rx="4" class="s1"/><text x="289.1" y="78" class="vl">96%（178/185）</text></g>
+<g><title>全体 / パターン 2: 136/185（73.5%）</title><rect x="8" y="82" width="211.7" height="12" rx="4" class="s2"/><text x="223.7" y="92" class="vl">74%（136/185）</text></g>
+<text x="8" y="114" class="rl">質問系 ①〜③</text>
+<g><title>質問系 ①〜③ / パターン 1: 72/75（96.0%）</title><rect x="8" y="120" width="276.5" height="12" rx="4" class="s1"/><text x="288.5" y="130" class="vl">96%（72/75）</text></g>
+<g><title>質問系 ①〜③ / パターン 2: 54/75（72.0%）</title><rect x="8" y="134" width="207.4" height="12" rx="4" class="s2"/><text x="219.4" y="144" class="vl">72%（54/75）</text></g>
+<text x="8" y="166" class="rl">推理系 ④〜⑥</text>
+<g><title>推理系 ④〜⑥ / パターン 1: 29/30（96.7%）</title><rect x="8" y="172" width="278.4" height="12" rx="4" class="s1"/><text x="290.4" y="182" class="vl">97%（29/30）</text></g>
+<g><title>推理系 ④〜⑥ / パターン 2: 17/30（56.7%）</title><rect x="8" y="186" width="163.2" height="12" rx="4" class="s2"/><text x="175.2" y="196" class="vl">57%（17/30）</text></g>
+<text x="8" y="218" class="rl">その他 ⑦〜㉒</text>
+<g><title>その他 ⑦〜㉒ / パターン 1: 77/80（96.2%）</title><rect x="8" y="224" width="277.2" height="12" rx="4" class="s1"/><text x="289.2" y="234" class="vl">96%（77/80）</text></g>
+<g><title>その他 ⑦〜㉒ / パターン 2: 65/80（81.2%）</title><rect x="8" y="238" width="234.0" height="12" rx="4" class="s2"/><text x="246.0" y="248" class="vl">81%（65/80）</text></g>
+<text x="8" y="270" class="rl">① の判定（はい / いいえ）</text>
+<g><title>① の判定（はい / いいえ） / パターン 1: 47/50（94.0%）</title><rect x="8" y="276" width="270.7" height="12" rx="4" class="s1"/><text x="282.7" y="286" class="vl">94%（47/50）</text></g>
+<g><title>① の判定（はい / いいえ） / パターン 2: 33/50（66.0%）</title><rect x="8" y="290" width="190.1" height="12" rx="4" class="s2"/><text x="202.1" y="300" class="vl">66%（33/50）</text></g>
+<line x1="267.2" y1="48" x2="267.2" y2="316" class="target"/><text x="267.2" y="42" class="tl" text-anchor="middle">レベル 1 の基準 90%</text>
+</svg>
+<figcaption>区分別の種別一致率。点線はレベル 1 の基準（全体 90%）。棒に触れると件数が出る</figcaption>
+</figure>
+<figure class="diagram">
+<svg viewBox="0 0 400 1218" role="img" aria-label="種別ごとの一致率の比較" class="study-chart">
+<rect x="8" y="6" width="12" height="12" rx="3" class="s1"/><text x="26" y="16" class="lg">パターン 1（luna）</text><rect x="158" y="6" width="12" height="12" rx="3" class="s2"/><text x="176" y="16" class="lg">パターン 2（Jev）</text>
+<line x1="8.0" y1="48" x2="8.0" y2="1200" class="grid"/><text x="8.0" y="1212" class="ax" text-anchor="middle">0%</text>
+<line x1="152.0" y1="48" x2="152.0" y2="1200" class="grid"/><text x="152.0" y="1212" class="ax" text-anchor="middle">50%</text>
+<line x1="296.0" y1="48" x2="296.0" y2="1200" class="grid"/><text x="296.0" y="1212" class="ax" text-anchor="middle">100%</text>
+<text x="8" y="62" class="rl">① はい / いいえ質問</text>
+<g><title>① はい / いいえ質問 / パターン 1: 50/50（100.0%）</title><rect x="8" y="68" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="78" class="vl">100%（50/50）</text></g>
+<g><title>① はい / いいえ質問 / パターン 2: 37/50（74.0%）</title><rect x="8" y="82" width="213.1" height="12" rx="4" class="s2"/><text x="225.1" y="92" class="vl">74%（37/50）</text></g>
+<text x="8" y="114" class="rl">② 複数の質問</text>
+<g><title>② 複数の質問 / パターン 1: 10/10（100.0%）</title><rect x="8" y="120" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="130" class="vl">100%（10/10）</text></g>
+<g><title>② 複数の質問 / パターン 2: 9/10（90.0%）</title><rect x="8" y="134" width="259.2" height="12" rx="4" class="s2"/><text x="271.2" y="144" class="vl">90%（9/10）</text></g>
+<text x="8" y="166" class="rl">③ 答えられない質問</text>
+<g><title>③ 答えられない質問 / パターン 1: 12/15（80.0%）</title><rect x="8" y="172" width="230.4" height="12" rx="4" class="s1"/><text x="242.4" y="182" class="vl">80%（12/15）</text></g>
+<g><title>③ 答えられない質問 / パターン 2: 8/15（53.3%）</title><rect x="8" y="186" width="153.6" height="12" rx="4" class="s2"/><text x="165.6" y="196" class="vl">53%（8/15）</text></g>
+<text x="8" y="218" class="rl">④ 正解推理</text>
+<g><title>④ 正解推理 / パターン 1: 10/10（100.0%）</title><rect x="8" y="224" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="234" class="vl">100%（10/10）</text></g>
+<g><title>④ 正解推理 / パターン 2: 7/10（70.0%）</title><rect x="8" y="238" width="201.6" height="12" rx="4" class="s2"/><text x="213.6" y="248" class="vl">70%（7/10）</text></g>
+<text x="8" y="270" class="rl">⑤ 惜しい推理</text>
+<g><title>⑤ 惜しい推理 / パターン 1: 9/10（90.0%）</title><rect x="8" y="276" width="259.2" height="12" rx="4" class="s1"/><text x="271.2" y="286" class="vl">90%（9/10）</text></g>
+<g><title>⑤ 惜しい推理 / パターン 2: 0/10（0.0%）</title><rect x="8" y="290" width="2.0" height="12" rx="4" class="s2"/><text x="14.0" y="300" class="vl">0%（0/10）</text></g>
+<text x="8" y="322" class="rl">⑥ 外れた推理</text>
+<g><title>⑥ 外れた推理 / パターン 1: 10/10（100.0%）</title><rect x="8" y="328" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="338" class="vl">100%（10/10）</text></g>
+<g><title>⑥ 外れた推理 / パターン 2: 10/10（100.0%）</title><rect x="8" y="342" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="352" class="vl">100%（10/10）</text></g>
+<text x="8" y="374" class="rl">⑦ ヒント要求</text>
+<g><title>⑦ ヒント要求 / パターン 1: 5/5（100.0%）</title><rect x="8" y="380" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="390" class="vl">100%（5/5）</text></g>
+<g><title>⑦ ヒント要求 / パターン 2: 4/5（80.0%）</title><rect x="8" y="394" width="230.4" height="12" rx="4" class="s2"/><text x="242.4" y="404" class="vl">80%（4/5）</text></g>
+<text x="8" y="426" class="rl">⑧ ネタバレ要求</text>
+<g><title>⑧ ネタバレ要求 / パターン 1: 5/5（100.0%）</title><rect x="8" y="432" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="442" class="vl">100%（5/5）</text></g>
+<g><title>⑧ ネタバレ要求 / パターン 2: 5/5（100.0%）</title><rect x="8" y="446" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="456" class="vl">100%（5/5）</text></g>
+<text x="8" y="478" class="rl">⑨ 遊び方の質問</text>
+<g><title>⑨ 遊び方の質問 / パターン 1: 5/5（100.0%）</title><rect x="8" y="484" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="494" class="vl">100%（5/5）</text></g>
+<g><title>⑨ 遊び方の質問 / パターン 2: 2/5（40.0%）</title><rect x="8" y="498" width="115.2" height="12" rx="4" class="s2"/><text x="127.2" y="508" class="vl">40%（2/5）</text></g>
+<text x="8" y="530" class="rl">⑩ 感想</text>
+<g><title>⑩ 感想 / パターン 1: 5/5（100.0%）</title><rect x="8" y="536" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="546" class="vl">100%（5/5）</text></g>
+<g><title>⑩ 感想 / パターン 2: 5/5（100.0%）</title><rect x="8" y="550" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="560" class="vl">100%（5/5）</text></g>
+<text x="8" y="582" class="rl">⑪ 挨拶</text>
+<g><title>⑪ 挨拶 / パターン 1: 5/5（100.0%）</title><rect x="8" y="588" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="598" class="vl">100%（5/5）</text></g>
+<g><title>⑪ 挨拶 / パターン 2: 5/5（100.0%）</title><rect x="8" y="602" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="612" class="vl">100%（5/5）</text></g>
+<text x="8" y="634" class="rl">⑫ 応援</text>
+<g><title>⑫ 応援 / パターン 1: 5/5（100.0%）</title><rect x="8" y="640" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="650" class="vl">100%（5/5）</text></g>
+<g><title>⑫ 応援 / パターン 2: 4/5（80.0%）</title><rect x="8" y="654" width="230.4" height="12" rx="4" class="s2"/><text x="242.4" y="664" class="vl">80%（4/5）</text></g>
+<text x="8" y="686" class="rl">⑬ 雑談</text>
+<g><title>⑬ 雑談 / パターン 1: 5/5（100.0%）</title><rect x="8" y="692" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="702" class="vl">100%（5/5）</text></g>
+<g><title>⑬ 雑談 / パターン 2: 5/5（100.0%）</title><rect x="8" y="706" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="716" class="vl">100%（5/5）</text></g>
+<text x="8" y="738" class="rl">⑭ リクエスト</text>
+<g><title>⑭ リクエスト / パターン 1: 5/5（100.0%）</title><rect x="8" y="744" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="754" class="vl">100%（5/5）</text></g>
+<g><title>⑭ リクエスト / パターン 2: 5/5（100.0%）</title><rect x="8" y="758" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="768" class="vl">100%（5/5）</text></g>
+<text x="8" y="790" class="rl">⑮ 指摘・クレーム</text>
+<g><title>⑮ 指摘・クレーム / パターン 1: 5/5（100.0%）</title><rect x="8" y="796" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="806" class="vl">100%（5/5）</text></g>
+<g><title>⑮ 指摘・クレーム / パターン 2: 3/5（60.0%）</title><rect x="8" y="810" width="172.8" height="12" rx="4" class="s2"/><text x="184.8" y="820" class="vl">60%（3/5）</text></g>
+<text x="8" y="842" class="rl">⑯ メンション</text>
+<g><title>⑯ メンション / パターン 1: 5/5（100.0%）</title><rect x="8" y="848" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="858" class="vl">100%（5/5）</text></g>
+<g><title>⑯ メンション / パターン 2: 5/5（100.0%）</title><rect x="8" y="862" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="872" class="vl">100%（5/5）</text></g>
+<text x="8" y="894" class="rl">⑰ 絵文字だけ</text>
+<g><title>⑰ 絵文字だけ / パターン 1: 5/5（100.0%）</title><rect x="8" y="900" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="910" class="vl">100%（5/5）</text></g>
+<g><title>⑰ 絵文字だけ / パターン 2: 5/5（100.0%）</title><rect x="8" y="914" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="924" class="vl">100%（5/5）</text></g>
+<text x="8" y="946" class="rl">⑱ 荒らし</text>
+<g><title>⑱ 荒らし / パターン 1: 5/5（100.0%）</title><rect x="8" y="952" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="962" class="vl">100%（5/5）</text></g>
+<g><title>⑱ 荒らし / パターン 2: 3/5（60.0%）</title><rect x="8" y="966" width="172.8" height="12" rx="4" class="s2"/><text x="184.8" y="976" class="vl">60%（3/5）</text></g>
+<text x="8" y="998" class="rl">⑲ 誹謗中傷</text>
+<g><title>⑲ 誹謗中傷 / パターン 1: 2/5（40.0%）</title><rect x="8" y="1004" width="115.2" height="12" rx="4" class="s1"/><text x="127.2" y="1014" class="vl">40%（2/5）</text></g>
+<g><title>⑲ 誹謗中傷 / パターン 2: 2/5（40.0%）</title><rect x="8" y="1018" width="115.2" height="12" rx="4" class="s2"/><text x="127.2" y="1028" class="vl">40%（2/5）</text></g>
+<text x="8" y="1050" class="rl">⑳ 宣伝・スパム</text>
+<g><title>⑳ 宣伝・スパム / パターン 1: 5/5（100.0%）</title><rect x="8" y="1056" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="1066" class="vl">100%（5/5）</text></g>
+<g><title>⑳ 宣伝・スパム / パターン 2: 5/5（100.0%）</title><rect x="8" y="1070" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="1080" class="vl">100%（5/5）</text></g>
+<text x="8" y="1102" class="rl">㉑ 個人情報</text>
+<g><title>㉑ 個人情報 / パターン 1: 5/5（100.0%）</title><rect x="8" y="1108" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="1118" class="vl">100%（5/5）</text></g>
+<g><title>㉑ 個人情報 / パターン 2: 5/5（100.0%）</title><rect x="8" y="1122" width="288.0" height="12" rx="4" class="s2"/><text x="300.0" y="1132" class="vl">100%（5/5）</text></g>
+<text x="8" y="1154" class="rl">㉒ 外国語</text>
+<g><title>㉒ 外国語 / パターン 1: 5/5（100.0%）</title><rect x="8" y="1160" width="288.0" height="12" rx="4" class="s1"/><text x="300.0" y="1170" class="vl">100%（5/5）</text></g>
+<g><title>㉒ 外国語 / パターン 2: 2/5（40.0%）</title><rect x="8" y="1174" width="115.2" height="12" rx="4" class="s2"/><text x="127.2" y="1184" class="vl">40%（2/5）</text></g>
+<line x1="238.4" y1="48" x2="238.4" y2="1200" class="target"/><text x="238.4" y="42" class="tl" text-anchor="middle">種別ごとの基準 80%</text>
+</svg>
+<figcaption>種別ごとの一致率（各 5〜50 件）。点線は質問以外の種別の基準 80%</figcaption>
+</figure>
+
+<h3>P1〜P7 の結果</h3>
+<ul>
+  <li><strong>P1 漏れ候補</strong>: パターン 1 = 0 件 <span class="pass">合格</span> / パターン 2 = 0 件 <span class="pass">合格</span>（定型文なので構造的に 0）</li>
+  <li><strong>P2 誤った正解宣言</strong>: パターン 1 = 0 件 <span class="pass">合格</span> / パターン 2 = 0 件 <span class="pass">合格</span></li>
+  <li><strong>P3 はい / いいえの取り違え</strong>: パターン 1 = 0 件 <span class="pass">合格</span> / パターン 2 = 0 件 <span class="pass">合格</span></li>
+  <li><strong>P4 いいえ / 関係ありません の揺れ</strong>: パターン 1 = 3/30（10.0%）<span class="pass">境界で合格</span> / パターン 2 = 4/30（13.3%）<span class="fail">不合格</span></li>
+  <li><strong>P5 正解宣言率</strong>: パターン 1 = 10/10（100%）<span class="pass">合格</span> / パターン 2 = 7/10（70%）<span class="fail">不合格</span></li>
+  <li><strong>P6 ⑱⑲ を定型文で返した割合</strong>: パターン 1 = 7/10（70%）<span class="fail">不合格</span> / パターン 2 = 5/10（50%）<span class="fail">不合格</span>。⑱〜㉑ に判定語を返した・⑳㉑ に返信した・普通のコメントを不適切と誤判定は両方式とも 0 件</li>
+  <li><strong>P7 80 字超</strong>: パターン 1 = 2 件（正解時の開示文 85 字・87 字）<span class="fail">不合格</span> / パターン 2 = 0 件 <span class="pass">合格</span></li>
+  <li><strong>① の判定一致</strong>: パターン 1 = 94.0%（47/50） / パターン 2 = 66.0%（33/50）（パターン 2 は段 D まで届いた 37 件に限ると 33 件一致 = 89%）</li>
+</ul>
+<div class="card-grid">
+  <div class="card"><div class="card-title">応答時間（中央値）</div><p>パターン 1: 1.8 秒（p95 2.7 秒・最大 3.8 秒）<br>パターン 2: 0.26 秒（最大 1.9 秒）</p></div>
+  <div class="card"><div class="card-title">トークン</div><p>パターン 1: 出力 平均 132（うち推論 89）・最大 400 で 1 件打ち切り<br>パターン 2: 入力 合計 33 万（185 件）</p></div>
+</div>
+
+<h2 id="p1">5. パターン 1（gpt-6-luna の一括方式）</h2>
+<h3>5.1 処理方式</h3>
+<figure class="diagram">
+<svg viewBox="0 0 420 470" role="img" aria-label="パターン 1 の処理フロー" class="study-flow">
+<defs><marker id="arw-p1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arh"/></marker></defs>
+<rect x="10" y="10" width="230" height="40" rx="8" class="bx"/><text x="125.0" y="26.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">コメント 1 件</text><text x="125.0" y="41.7" text-anchor="middle" font-size="12" class="ft">本文 + comment_id</text>
+<line x1="125.0" y1="50" x2="125.0" y2="72" class="ar" marker-end="url(#arw-p1)"/>
+<rect x="10" y="72" width="230" height="58" rx="8" class="bx"/><text x="125.0" y="90.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">system プロンプトを組み立て</text><text x="125.0" y="105.2" text-anchor="middle" font-size="12" class="ft">改訂案の判定ルール</text><text x="125.0" y="120.2" text-anchor="middle" font-size="12" class="ft">+ 問題文・真相・確定事実</text>
+<line x1="125.0" y1="130" x2="125.0" y2="152" class="ar" marker-end="url(#arw-p1)"/>
+<rect x="10" y="152" width="230" height="72" rx="8" class="bx2"/><text x="125.0" y="169.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">gpt-6-luna を 1 回呼ぶ</text><text x="125.0" y="184.7" text-anchor="middle" font-size="12" class="ft">effort xhigh・上限 800</text><text x="125.0" y="199.7" text-anchor="middle" font-size="12" class="ft">出力は JSON</text><text x="125.0" y="214.7" text-anchor="middle" font-size="12" class="ft">{種別, 判定, 返信文}</text>
+<line x1="125.0" y1="224" x2="125.0" y2="246" class="ar" marker-end="url(#arw-p1)"/>
+<rect x="10" y="246" width="230" height="58" rx="8" class="bx"/><text x="125.0" y="264.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">コードの後処理</text><text x="125.0" y="279.2" text-anchor="middle" font-size="12" class="ft">種別で出口を分ける</text><text x="125.0" y="294.2" text-anchor="middle" font-size="12" class="ft">（LLM の判断を上書き）</text>
+<rect x="268" y="236" width="146" height="36" rx="8" class="ex"/><text x="341.0" y="250.8" text-anchor="middle" font-size="11" class="ft">⑳ 宣伝・㉑ 個人情報</text><text x="341.0" y="264.9" text-anchor="middle" font-size="11" class="ft">→ 返信しない</text>
+<rect x="268" y="280" width="146" height="36" rx="8" class="ex"/><text x="341.0" y="294.9" text-anchor="middle" font-size="11" class="ft">⑱ 荒らし・⑲ 誹謗中傷</text><text x="341.0" y="308.9" text-anchor="middle" font-size="11" class="ft">→ コードの定型文</text>
+<line x1="240" y1="262" x2="268" y2="254" class="ar" marker-end="url(#arw-p1)"/>
+<line x1="240" y1="290" x2="268" y2="298" class="ar" marker-end="url(#arw-p1)"/>
+<line x1="125.0" y1="304" x2="125.0" y2="330" class="ar" marker-end="url(#arw-p1)"/><text x="131.0" y="322" font-size="10.5" class="al">その他 18 種</text>
+<rect x="10" y="330" width="230" height="96" rx="8" class="bx3"/><text x="125.0" y="353.0" text-anchor="middle" font-size="11.5" font-weight="700" class="ft">LLM の返信文をそのまま使う</text><text x="125.0" y="367.5" text-anchor="middle" font-size="11.5" class="ft">① 判定語 + 20 字以内の一言</text><text x="125.0" y="382.0" text-anchor="middle" font-size="11.5" class="ft">④ 正解です！+ 真相 2〜3 文</text><text x="125.0" y="396.5" text-anchor="middle" font-size="11.5" class="ft">⑤ 惜しい！ / ⑥ 残念、違います</text><text x="125.0" y="411.0" text-anchor="middle" font-size="11.5" class="ft">⑦〜⑰・㉒ 種別に合う短い返事</text>
+<text x="10" y="456" font-size="10.5" class="al">失敗・打ち切り（finish_reason=length）は返信なし。本番は固定文言にフォールバック</text>
+</svg>
+<figcaption>パターン 1: LLM に 1 回で種別・判定・返信文を出させ、不適切系だけコードが上書きする</figcaption>
+</figure>
+<ul>
+  <li><strong>呼び出し</strong>: コメント 1 件につき chat completions を 1 回。<code>response_format</code> を JSON スキーマ（strict）にし、<code>{種別, 判定, 返信文}</code> を返させる（種別を明示させることで、コードの上書きと種別一致率の集計ができる）</li>
+  <li><strong>プロンプト</strong>: 5.1 のマスタープロンプトを改訂した <code>judge-trial/prompts/pattern1_rules.txt</code>。手順 1 で 22 種を定義して種別を選ばせ、手順 2 で判定、手順 3 で種別ごとの返し方（80 字以内・探偵口調・① は判定語 + 真相に触れない 20 字以内の一言）を書く。「荒らしには返信しない」はやめ、⑱〜㉑ は返信文を空にしてコードに任せる</li>
+  <li><strong>パラメータ</strong>: effort <code>xhigh</code>・温度は送らない。試走は出力上限 400（今後は 800）</li>
+</ul>
+<h3>5.2 結果</h3>
+<ul>
+  <li>種別一致率 96.2%（178/185）。① 50/50・② 10/10・④ 10/10・⑥ 10/10 と、質問と推理はほぼ取れている</li>
+  <li>① の判定 94.0%（47/50）。外した 3 件はすべて「〜って関係ある？」に「いいえ」と答えたもの（正解は「関係ありません」）で、P4 の揺れに入る</li>
+  <li>誤りは ③ → ① が 3 件（主語が曖昧な質問に答えてしまう）、⑲ → ⑮ が 3 件（けなしをクレームと判定）、⑤ → 打ち切り 1 件</li>
+  <li>言い回しは自然に散る（① の最頻の返信でも 50 件中 2 件）。一方で ⑤「惜しい！」と ⑥「残念、違います」は 10 件中 9 件が同じ文</li>
+</ul>
+<p>誤り・違反の例:</p>
+<ul>
+<li>「それはまだ覚えてるの？」 — 正解 ③ 答えられない質問 → 判定 ① はい / いいえ質問（はい）。返信「はい。記憶は確かなようです。」</li>
+<li>「バカみたいな問題だな」 — 正解 ⑲ 誹謗中傷 → 判定 ⑮ 指摘・クレーム。返信「ご意見ありがとうございます。確認します。」</li>
+<li>「手紙に書かれてた夢の内容って、答えに関係ある？」 — 正解 ① はい / いいえ質問（関係ありません） → 判定 ① はい / いいえ質問（いいえ）。返信「いいえ。そこは捜査対象外です。」</li>
+<li>「小学生の男が未来の自分に宛てて書いた手紙を、学校のタイムカプセルから同窓会で受け取った。書いた子は昔の自分だから、誰より知っていても会ったことはないってこと？」 — 正解 ④ 正解推理 → 判定 ④ 正解推理。返信「正解です！男の子は50年前の男自身で、未来の自分宛てに書いた手紙でした。50年後の同窓会でタイムカプセルから受け取り、自分自身とは会えないので「会ったことがない」も本当です。」・87 字</li>
+</ul>
+<h3>5.3 見えた課題と次の打ち手</h3>
+<ul>
+  <li>正解時の開示文が 80 字を超える → プロンプトで「開示は 70 字以内」とするか、パターン 2 と同じく問題ごとの <code>reveal_text</code> を使う</li>
+  <li>⑤⑥ の言い回しが 1 通りに偏る → プロンプトで言い回しを散らすよう指示するか、⑤⑥ だけコードの定型文（3 通り以上）に差し替える</li>
+  <li>⑲ と ⑮ の境目（作品へのけなしはどちらか）を種別の定義で決める（ユーザー判断）</li>
+  <li>主語が曖昧な質問（「あの人は〜？」「それは〜？」）への扱いを手順 1 に足す</li>
+</ul>
+
+<h2 id="p2">6. パターン 2（Jev の段階判定 + 定型文）</h2>
+<h3>6.1 処理方式</h3>
+<figure class="diagram">
+<svg viewBox="0 0 420 650" role="img" aria-label="パターン 2 の処理フロー" class="study-flow">
+<defs><marker id="arw-p2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arh"/></marker></defs>
+<rect x="10" y="10" width="230" height="40" rx="8" class="bx"/><text x="125.0" y="26.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">コメント 1 件</text><text x="125.0" y="41.7" text-anchor="middle" font-size="12" class="ft">本文 + comment_id</text>
+<line x1="125.0" y1="50" x2="125.0" y2="70" class="ar" marker-end="url(#arw-p2)"/>
+<rect x="10" y="70" width="230" height="52" rx="8" class="bx2"/><text x="125.0" y="92.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 0 文字種の規則</text><text x="125.0" y="107.7" text-anchor="middle" font-size="12" class="ft">Jev を呼ばない</text>
+<rect x="262" y="62" width="152" height="68" rx="8" class="ex"/><text x="338.0" y="78.8" text-anchor="middle" font-size="11" class="ft">URL あり → ⑳ 返信しない</text><text x="338.0" y="92.8" text-anchor="middle" font-size="11" class="ft">絵文字だけ → ⑰ 相づち</text><text x="338.0" y="106.8" text-anchor="middle" font-size="11" class="ft">かな・漢字なし + 英字</text><text x="338.0" y="120.8" text-anchor="middle" font-size="11" class="ft">→ ㉒ 日本語でお願い</text>
+<line x1="240" y1="96" x2="262" y2="96" class="ar" marker-end="url(#arw-p2)"/><text x="244" y="90" font-size="10.5" class="al">当たり</text>
+<line x1="125.0" y1="122" x2="125.0" y2="146" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="138" font-size="10.5" class="al">当たらない</text>
+<rect x="10" y="146" width="230" height="58" rx="8" class="bx2"/><text x="125.0" y="164.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 A 種別を選ぶ</text><text x="125.0" y="179.2" text-anchor="middle" font-size="12" class="ft">Jev choice 19 択</text><text x="125.0" y="194.2" text-anchor="middle" font-size="12" class="ft">state = コメント + 問題文</text>
+<rect x="262" y="142" width="152" height="66" rx="8" class="ex"/><text x="338.0" y="157.8" text-anchor="middle" font-size="11" class="ft">②③⑦〜⑯・⑱⑲ →</text><text x="338.0" y="171.8" text-anchor="middle" font-size="11" class="ft">種別ごとの定型文</text><text x="338.0" y="185.8" text-anchor="middle" font-size="11" class="ft">⑳㉑ → 返信しない</text><text x="338.0" y="199.8" text-anchor="middle" font-size="11" class="ft">（3 通り以上を順繰り）</text>
+<line x1="240" y1="175" x2="262" y2="175" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="204" x2="125.0" y2="230" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="222" font-size="10.5" class="al">推理 または ①</text>
+<rect x="10" y="230" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="246.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 B 正解判定</text><text x="125.0" y="261.7" text-anchor="middle" font-size="12" class="ft">Jev noul × 要点の数</text><text x="125.0" y="276.7" text-anchor="middle" font-size="12" class="ft">「この要点を言い当てているか」</text><text x="125.0" y="291.7" text-anchor="middle" font-size="12" class="ft">の確率を要点ごとに取る</text>
+<rect x="262" y="222" width="152" height="40" rx="8" class="ok"/><text x="338.0" y="238.8" text-anchor="middle" font-size="11" font-weight="700" class="ft">全要点が 0.5 以上</text><text x="338.0" y="252.8" text-anchor="middle" font-size="11" class="ft">→ ④ 正解です！+ 開示文</text>
+<rect x="262" y="268" width="152" height="40" rx="8" class="ex"/><text x="338.0" y="284.9" text-anchor="middle" font-size="11" class="ft">推理で一部 → ⑤ 惜しい！</text><text x="338.0" y="298.9" text-anchor="middle" font-size="11" class="ft">推理でなし → ⑥ 違います</text>
+<line x1="240" y1="250" x2="262" y2="242" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="240" y1="285" x2="262" y2="288" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="300" x2="125.0" y2="328" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="318" font-size="10.5" class="al">① で全要点には届かない</text>
+<rect x="10" y="328" width="230" height="58" rx="8" class="bx2"/><text x="125.0" y="346.2" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 C 質問の品質</text><text x="125.0" y="361.2" text-anchor="middle" font-size="12" class="ft">Jev noul「はい / いいえで</text><text x="125.0" y="376.2" text-anchor="middle" font-size="12" class="ft">一意に答えられるか」</text>
+<rect x="262" y="336" width="152" height="40" rx="8" class="ex"/><text x="338.0" y="352.9" text-anchor="middle" font-size="11" class="ft">確率 0.2 未満</text><text x="338.0" y="366.9" text-anchor="middle" font-size="11" class="ft">→ ③ 聞き直しの誘導文</text>
+<line x1="240" y1="357" x2="262" y2="357" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="386" x2="125.0" y2="412" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="404" font-size="10.5" class="al">0.2 以上</text>
+<rect x="10" y="412" width="230" height="70" rx="8" class="bx2"/><text x="125.0" y="428.7" text-anchor="middle" font-size="12" font-weight="700" class="ft">段 D 判定</text><text x="125.0" y="443.7" text-anchor="middle" font-size="12" class="ft">Jev choice 3 択</text><text x="125.0" y="458.7" text-anchor="middle" font-size="12" class="ft">state = 問題文 + 真相</text><text x="125.0" y="473.7" text-anchor="middle" font-size="12" class="ft">+ 確定事実 + 質問</text>
+<rect x="262" y="420" width="152" height="54" rx="8" class="ex"/><text x="338.0" y="436.9" text-anchor="middle" font-size="11" class="ft">最大確率 0.55 未満</text><text x="338.0" y="450.9" text-anchor="middle" font-size="11" class="ft">→「それは問題の答えに</text><text x="338.0" y="464.9" text-anchor="middle" font-size="11" class="ft">関わりません。」</text>
+<line x1="240" y1="447" x2="262" y2="447" class="ar" marker-end="url(#arw-p2)"/>
+<line x1="125.0" y1="482" x2="125.0" y2="508" class="ar" marker-end="url(#arw-p2)"/><text x="131.0" y="500" font-size="10.5" class="al">0.55 以上</text>
+<rect x="10" y="508" width="230" height="58" rx="8" class="bx3"/><text x="125.0" y="526.5" text-anchor="middle" font-size="11.5" font-weight="700" class="ft">返信（すべて定型文）</text><text x="125.0" y="541.0" text-anchor="middle" font-size="11.5" class="ft">はい。/ いいえ。/ 関係ありません。</text><text x="125.0" y="555.5" text-anchor="middle" font-size="11.5" class="ft">+ 20 字以内の定型の一言</text>
+<text x="10" y="600" font-size="10.5" class="al">閾値 0.5 / 0.2 / 0.55 は試走の初期値（21-6d で決める）。</text>
+<text x="10" y="618" font-size="10.5" class="al">1 コメントあたり Jev を 1〜6 回呼ぶ（段 B は要点の数だけ）。</text>
+<text x="10" y="636" font-size="10.5" class="al">返信文を AI に書かせないので、補足やお礼から真相が漏れない。</text>
+</svg>
+<figcaption>パターン 2: Jev の選択式（choice）と真偽の確率（noul）を段ごとに使い、返信文はすべてコードの定型文</figcaption>
+</figure>
+<ul>
+  <li><strong>Jev の呼び方</strong>: <code>POST https://api.typesafe.ai/v1/systemone</code>（<code>model: jev-latest</code>）。<code>choice</code> は選択肢ごとの確率、<code>noul</code> は命題が真である確率を返す。指示文は英語、コメントと問題は日本語のまま渡す</li>
+  <li><strong>正解判定に使う要点</strong>: 問題ごとに真相の要点 2〜3 個（<code>truth_points</code>）と開示文（<code>reveal_text</code>・70 字以内）を用意した（試走では 5 問分の仮の値）。ストックへの追加は 21-6c</li>
+  <li><strong>定型文</strong>: 種別ごとに 3 通り以上を持ち、<code>comment_id</code> のハッシュで選ぶ（状態を持たずに言い回しを散らす）</li>
+</ul>
+<h3>6.2 結果</h3>
+<ul>
+  <li>種別一致率 73.5%（136/185）（試行 1 は 57.3%）。⑥ 10/10・② 9/10・⑧⑩⑪⑬⑭⑯⑰⑳㉑ は 5/5</li>
+  <li><strong>① → ⑥ が 13 件</strong>: 段 A で「推理」と「はい / いいえ質問」の確率が拮抗し（0.5 前後の差が小さい）、推理側に振れると段 B で要点 0 → 外れた推理になる</li>
+  <li><strong>⑤ → ⑥ が 10/10 件</strong>: 要点の 1 文に複数の事柄を詰めたため、一部だけ言い当てた推理の確率が 0.1〜0.3 に留まり、閾値 0.5 を超えない</li>
+  <li><strong>④ → ⑤・⑥ が 3 件</strong>: 質問の形の正解推理や、要点を言い換えた推理で、要点ごとの確率が下がる</li>
+  <li><strong>③ → ⑧ が 3 件</strong>: 「なぜ〜？」の質問をネタバレ要求と判定（確率は 0.5 前後で拮抗）</li>
+  <li><strong>㉒ → ⑩ ⑧ が 3 件</strong>: 中国語（漢字だけ）と韓国語（ハングル）が段 0 の規則をすり抜け、段 A は中身で判定してしまう</li>
+  <li>① のうち段 D まで届いた 37 件では 33 件が一致（89%）で、はい / いいえの取り違えは 0 件。段 D 自体の精度は悪くない</li>
+</ul>
+<p>誤りの例（括弧内は Jev が返した確率）:</p>
+<ul>
+<li>「夏の夕立が関係してる？」 — 正解 ① はい / いいえ質問（はい） → 判定 ⑥ 外れた推理。返信「残念ながら違います。」（段 A の確率: guess 0.88 / q_yesno 0.12、段 B: 0.02 / 0.03 / 0.02）</li>
+<li>「あとで読まれるように保管されてた？」 — 正解 ① はい / いいえ質問（はい） → 判定 ⑥ 外れた推理。返信「残念ながら違います。」（段 A の確率: guess 0.50 / q_yesno 0.48、段 B: 0.04 / 0.05 / 0.02）</li>
+<li>「影が薄くなったのは、男の病気が良くなってきた知らせなんだね。」 — 正解 ⑤ 惜しい推理 → 判定 ⑥ 外れた推理。返信「その推理ではありません。」（段 A の確率: guess 0.99 / q_yesno 0.01、段 B: 0.16 / 0.20 / 0.03）</li>
+<li>「息子が嫁と義母の言葉を仲直りのために作り替えて訳していた。日本語を覚えた嫁に本音が伝わり、けんかが始まった、ってこと？」 — 正解 ④ 正解推理 → 判定 ⑥ 外れた推理。返信「残念、違います。」（段 A の確率: guess 0.86 / q_yesno 0.12、段 B: 0.20 / 0.19 / 0.40）</li>
+<li>「なぜ男は、その子がどんな子か誰よりよく知っていたの？」 — 正解 ③ 答えられない質問 → 判定 ⑧ ネタバレ要求。返信「真相は名探偵の推理にお任せです。」（段 A の確率: ask_spoiler 0.48 / q_open 0.42）</li>
+<li>「이거 정말 재밌어요」 — 正解 ㉒ 外国語 → 判定 ⑩ 感想。返信「楽しんでもらえて何よりです。」（段 A の確率: impression 0.95 / foreign 0.05）</li>
+<li>「つまらん、センスない」 — 正解 ⑲ 誹謗中傷 → 判定 ⑮ 指摘・クレーム。返信「ご指摘ありがとうございます。確認します。」（段 A の確率: complaint 0.69 / impression 0.29）</li>
+</ul>
+<h3>6.3 見えた課題と次の打ち手</h3>
+<ul>
+  <li>段 A の「推理」と「①」の区別 → 段 A の選択肢から推理を外し、「言い切り（〜だ・〜んだ）か質問（〜？）か」を別の noul で判定する / 両者が拮抗したときは ① として段 B〜D に流す（段 B で正解推理は拾える）</li>
+  <li>要点の書き方 → 「1 要点 = 1 事柄」の短い文に割る（要点を 4〜6 個に増やし、全部 = 正解・半分以上 = 惜しい などの数え方にする）。<code>T_POINT</code> の調整</li>
+  <li>段 0 の外国語規則 → 「かなを 1 字も含まない文」を外国語の候補にする（ハングル・漢字だけの中国語を拾う）</li>
+  <li>③ と ⑧ → 「なぜ」「どうして」で始まる質問を ③ に寄せる選択肢の説明に直す</li>
+  <li>⑲ と ⑮ の境目はパターン 1 と同じ論点</li>
+</ul>
+
+<h2 id="next">7. 次の試行の候補</h2>
+<p>両方式とも精度を上げる試行を続ける（ユーザー方針 2026-09-27）。試行ごとに 3.3 に 1 行足し、4 の図を描き直す。合否の判定は 21-6d の全件プローブ（14 問）で行う。</p>
+<ul>
+  <li>パターン 1: 出力上限 800 で再実行・開示文 70 字の指示・⑤⑥ の言い回し・曖昧な主語の扱い</li>
+  <li>パターン 2: 段 A の選択肢の組み替え・要点の分割と数え方・段 0 の外国語規則・③ の説明文</li>
+  <li>共通: ⑲ と ⑮ の境目の決定、評価用の質問を真相を見せずに書かせ直す（易しめの偏りをなくす）</li>
+</ul>
+
+</div>
+</body>
+</html>
