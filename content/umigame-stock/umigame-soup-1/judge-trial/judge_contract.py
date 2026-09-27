@@ -95,8 +95,8 @@ def load_problem(no: str) -> Problem:
 
     if not isinstance(truth_points, list) or not all(isinstance(point, str) for point in truth_points):
         raise ValueError(f"{points_path} の {no}.truth_points は文字列配列で指定してください")
-    if not 2 <= len(truth_points) <= 4:
-        raise ValueError(f"{points_path} の {no}.truth_points は 2〜4 項目で指定してください")
+    if not 2 <= len(truth_points) <= 6:
+        raise ValueError(f"{points_path} の {no}.truth_points は 2〜6 項目で指定してください")
     if not isinstance(reveal_text, str):
         raise ValueError(f"{points_path} の {no}.reveal_text は文字列で指定してください")
     if len(reveal_text) > 70:

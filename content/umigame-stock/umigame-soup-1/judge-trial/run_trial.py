@@ -37,6 +37,25 @@ GROUPS = {
 
 
 
+# 金額の試算に使う単価（USD / 100 万トークン）。luna は公開情報（2026-09-27 時点）で、請求画面での確認が必要。
+# luna の推論トークンは出力として課金される前提。Jev は出力無料（アイデア記録 umigame-yesno-jev.md）。
+PRICE_USD_PER_M = {"luna_input": 0.10, "luna_output": 0.50, "jev_input": 0.042}
+USD_JPY = 150  # 円換算の仮レート
+MONTHLY_COMMENTS = 6000  # 月あたりのコメント数の見込み（アイデア記録の試算と同じ）
+
+
+def _cost(total_usd: float, count: int) -> dict:
+    per = total_usd / count if count else 0.0
+    return {"total_usd": total_usd, "per_comment_usd": per, "monthly_usd": per * MONTHLY_COMMENTS}
+
+
+def _format_cost(method: str, cost: dict) -> str:
+    return (
+        f"{method} 金額（試算）: 合計 ${cost['total_usd']:.4f} / 1 件あたり ${cost['per_comment_usd']:.6f}"
+        f" / 月 {MONTHLY_COMMENTS:,} 件で ${cost['monthly_usd']:.3f}（約 {cost['monthly_usd'] * USD_JPY:.0f} 円）"
+    )
+
+
 RELEVANCE_WORDS = ("関係", "重要", "大事")
 
 
@@ -194,6 +213,7 @@ def _run_one(
                 problem,
                 api_key=api_keys["p2"],
                 t_point=options["t_point"],
+                t_close=options["t_close"],
                 t_quality=options["t_quality"],
                 t_answer=options["t_answer"],
             )
@@ -357,17 +377,26 @@ def aggregate_results(
         latencies = [float(row.get("debug", {}).get("latency_s", 0) or 0) for row in results]
         completion = [int(row.get("debug", {}).get("completion_tokens", 0) or 0) for row in results]
         reasoning = [int(row.get("debug", {}).get("reasoning_tokens", 0) or 0) for row in results]
+        prompt = [int(row.get("debug", {}).get("prompt_tokens", 0) or 0) for row in results]
+        cost_p1 = (sum(prompt) * PRICE_USD_PER_M["luna_input"] + sum(completion) * PRICE_USD_PER_M["luna_output"]) / 1e6
         result["p1"] = {
             "finish_length": sum(row.get("debug", {}).get("finish_reason") == "length" for row in results),
             "errors": sum(row["kind"] == "error" for row in results),
             "latency_s": _median_p95_max(latencies),
             "completion_tokens": {"max": max(completion, default=0), "average": statistics.mean(completion) if completion else 0},
             "reasoning_tokens": {"max": max(reasoning, default=0), "average": statistics.mean(reasoning) if reasoning else 0},
+            "prompt_tokens": sum(prompt),
+            "cost": _cost(cost_p1, len(results)),
         }
     elif method == "p2":
         latencies = [float(row.get("debug", {}).get("latency_s", 0) or 0) for row in results]
         result["p2"] = {
             "input_tokens": sum(int(row.get("debug", {}).get("input_tokens", 0) or 0) for row in results),
+            "cost": _cost(
+                sum(int(row.get("debug", {}).get("input_tokens", 0) or 0) for row in results)
+                * PRICE_USD_PER_M["jev_input"] / 1e6,
+                len(results),
+            ),
             "latency_s": {
                 "median": statistics.median(latencies) if latencies else None,
                 "max": max(latencies) if latencies else None,
@@ -434,6 +463,8 @@ def summary_lines(metrics: dict[str, Any]) -> list[str]:
                 f"p1 latency 秒 中央値 / p95 / 最大: {latency['median']:.3f} / {latency['p95']:.3f} / {latency['max']:.3f}" if latency["median"] is not None else "p1 latency 秒: 対象なし",
                 f"p1 completion_tokens 最大 / 平均: {p1['completion_tokens']['max']} / {p1['completion_tokens']['average']:.1f}",
                 f"p1 reasoning_tokens 最大 / 平均: {p1['reasoning_tokens']['max']} / {p1['reasoning_tokens']['average']:.1f}",
+                f"p1 prompt_tokens 合計: {p1['prompt_tokens']}",
+                _format_cost("p1", p1["cost"]),
             ]
         )
     if "p2" in metrics:
@@ -442,6 +473,7 @@ def summary_lines(metrics: dict[str, Any]) -> list[str]:
         lines.extend(
             [
                 f"p2 Jev 総 input_tokens: {p2['input_tokens']}",
+                _format_cost("p2", p2["cost"]),
                 f"p2 1 コメント latency 秒 中央値 / 最大: {latency['median']:.3f} / {latency['max']:.3f}" if latency["median"] is not None else "p2 latency 秒: 対象なし",
             ]
         )
@@ -498,6 +530,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--from-cache", action="store_true", help="API を呼ばずキャッシュ済み結果だけで集計")
     parser.add_argument("--t-point", type=float, default=pattern2_jev.T_POINT)
+    parser.add_argument("--t-close", type=float, default=pattern2_jev.T_CLOSE)
     parser.add_argument("--t-quality", type=float, default=pattern2_jev.T_QUALITY)
     parser.add_argument("--t-answer", type=float, default=pattern2_jev.T_ANSWER)
     parser.add_argument("--model", default="gpt-6-luna")
@@ -543,6 +576,7 @@ def main(argv: list[str] | None = None) -> int:
             "effort": args.effort,
             "max_tokens": args.max_tokens,
             "t_point": args.t_point,
+            "t_close": args.t_close,
             "t_quality": args.t_quality,
             "t_answer": args.t_answer,
         }

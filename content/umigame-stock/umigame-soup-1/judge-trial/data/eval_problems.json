@@ -146,6 +146,48 @@
       "kind": "guess_wrong",
       "answer": null,
       "note": ""
+    },
+    {
+      "id": "U01-b22",
+      "text": "「影」って存在感のことなの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U01-b23",
+      "text": "影が薄くなったのは見た目の変化？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U01-b24",
+      "text": "相手は医者なの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U01-b25",
+      "text": "男は何かの治療を受けてた？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U01-b26",
+      "text": "これって舞台とか撮影の話？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U01-b27",
+      "text": "相手にお礼を言ってるってこと？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
     }
   ],
   "U13": [
@@ -295,6 +337,55 @@
       "kind": "guess_wrong",
       "answer": null,
       "note": ""
+    },
+    {
+      "id": "U13-b22",
+      "text": "手紙は郵便で届いたの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U13-b23",
+      "text": "男はその子の父親なの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U13-b24",
+      "text": "仕事を通じてその子を知ってたの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U13-b25",
+      "text": "手紙が届く前から知ってた？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U13-b26",
+      "text": "男はその子の主治医なの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U13-b27",
+      "text": "その子は実在する子なの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U13-b28",
+      "text": "男は有名人なの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
     }
   ],
   "U18": [
@@ -444,6 +535,55 @@
       "kind": "guess_wrong",
       "answer": null,
       "note": ""
+    },
+    {
+      "id": "U18-b22",
+      "text": "2人は直接会う約束をしてたの？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U18-b23",
+      "text": "「白紙」は紙が真っ白になったって意味？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U18-b24",
+      "text": "夏の日に何か予定外のことが起きた？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U18-b25",
+      "text": "2人は恋人同士なの？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U18-b26",
+      "text": "約束は延期になっただけなの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U18-b27",
+      "text": "約束の内容は夏に関係あるの？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U18-b28",
+      "text": "2人は子どもなの？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
     }
   ],
   "U20": [
@@ -593,6 +733,62 @@
       "kind": "guess_wrong",
       "answer": null,
       "note": ""
+    },
+    {
+      "id": "U20-b22",
+      "text": "男はピアニスト本人なの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U20-b23",
+      "text": "男と女は知り合いなの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U20-b24",
+      "text": "男はピアノを弾けるの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U20-b25",
+      "text": "女は男の言葉を聞いて笑ったの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U20-b26",
+      "text": "男も演奏会のお客さんなの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U20-b27",
+      "text": "演奏は録音だったの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U20-b28",
+      "text": "曲の選び方を間違えたってこと？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U20-b29",
+      "text": "ピアノ以外の楽器も演奏されてた？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
     }
   ],
   "U26": [
@@ -742,6 +938,34 @@
       "kind": "guess_wrong",
       "answer": null,
       "note": ""
+    },
+    {
+      "id": "U26-b22",
+      "text": "義母は日本語以外の言葉を話してたの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U26-b23",
+      "text": "2人は同じ家に住んでたの？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U26-b24",
+      "text": "義母も外国出身なの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U26-b25",
+      "text": "夫はけんかに関係してるの？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
     }
   ]
 }

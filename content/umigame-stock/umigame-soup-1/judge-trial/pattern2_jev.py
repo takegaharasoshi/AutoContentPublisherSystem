@@ -15,6 +15,7 @@ import templates
 
 JEV_URL = "https://api.typesafe.ai/v1/systemone"
 T_POINT = 0.5
+T_CLOSE = 0.35  # 惜しい判定だけに使う（正解側の T_POINT は下げない。試行 4）
 T_QUALITY = 0.2
 T_ANSWER = 0.55
 MAX_RETRIES = 3
@@ -156,8 +157,8 @@ def _rule_kind(text: str) -> str | None:
         for char in nonspace
     ):
         return "emoji_only"
-    if _LATIN_RE.search(text) and not _JAPANESE_RE.search(text):
-        return "foreign"
+    # 英字だけのコメントを外国語とみなす規則は試行 4 で外した（「QWERTYZZZ」などの荒らしを外国語にしていた）。
+    # 外国語の判定は段 A1 の other に任せる。
     return None
 
 
@@ -240,6 +241,7 @@ def judge(
     *,
     api_key: str,
     t_point: float = T_POINT,
+    t_close: float = T_CLOSE,
     t_quality: float = T_QUALITY,
     t_answer: float = T_ANSWER,
 ) -> JudgeResult:
@@ -314,7 +316,7 @@ def judge(
                 point_probs[point_id] = _noul_true(point_answers[point_id])
             debug["probabilities"]["B"] = point_probs
             all_points = bool(point_probs) and all(value >= t_point for value in point_probs.values())
-            some_points = any(value >= t_point for value in point_probs.values())
+            some_points = any(value >= t_close for value in point_probs.values())
             if all_points:
                 kind = "guess_correct"
             elif a_kind == "guess":
@@ -328,11 +330,14 @@ def judge(
                             "type": "noul",
                             "instructions": (
                                 "Estimate whether this question is specific to the puzzle and can be "
-                                "answered uniquely with yes or no, with a clear subject and target."
+                                "answered uniquely with yes or no, with a clear subject and target. "
+                                "If a pronoun or demonstrative (それ / あれ / 彼 / 彼女 / あの人 / その子) could refer to "
+                                "more than one person or thing in the puzzle text, or refers to nothing in it, "
+                                "the question is not uniquely answerable."
                             ),
                             "criteria": {
                                 "true": "It is a clear, relevant, uniquely answerable yes-or-no question.",
-                                "false": "It is open-ended, vague, or not uniquely answerable yes or no.",
+                                "false": "It is open-ended, vague, has an unclear pronoun, or is not uniquely answerable yes or no.",
                             },
                         }
                     },

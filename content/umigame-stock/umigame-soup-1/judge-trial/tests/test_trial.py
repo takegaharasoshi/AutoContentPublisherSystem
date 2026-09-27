@@ -45,7 +45,6 @@ def test_templates_have_rotations_and_are_deterministic() -> None:
     [
         ("詳細はこちら https://example.com", "spam"),
         ("✨👏🎉", "emoji_only"),
-        ("Please explain this puzzle", "foreign"),
     ],
 )
 def test_pattern2_local_rules_do_not_call_jev(monkeypatch, text: str, expected: str) -> None:
@@ -230,3 +229,11 @@ def test_pattern2_major_then_detailed_kind(monkeypatch) -> None:
     foreign = pattern2_jev.judge("C-8", "太难了", PROBLEM, api_key="test")
     assert foreign.kind == "foreign"
     assert foreign.debug["calls"] == 1
+
+
+def test_pattern2_latin_only_goes_to_jev(monkeypatch) -> None:
+    """英字だけのコメントは段 0 で外国語と決めず、段 A1 に任せる（試行 4）。"""
+    monkeypatch.setattr(pattern2_jev, "_jev_request", _mock_answers({"major": {"choice": "other"}}))
+    result = pattern2_jev.judge("C-9", "Please explain this puzzle", PROBLEM, api_key="test")
+    assert result.kind == "foreign"
+    assert result.debug["calls"] == 1
