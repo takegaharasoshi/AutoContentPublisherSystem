@@ -72,8 +72,7 @@ def test_pattern2_b_threshold_close_and_correct(monkeypatch) -> None:
         "_jev_request",
         _mock_answers(
             {"major": {"choice": "guess", "probabilities": {"guess": 0.8}}},
-            {"point_0": {"noul": 0.7}},
-            {"point_1": {"noul": 0.49}},
+            {"point_0": {"noul": 0.7}, "point_1": {"noul": 0.49}},
         ),
     )
     close = pattern2_jev.judge("C-2", "解決の推理", PROBLEM, api_key="test", t_point=0.5)
@@ -85,14 +84,13 @@ def test_pattern2_b_threshold_close_and_correct(monkeypatch) -> None:
         "_jev_request",
         _mock_answers(
             {"major": {"choice": "guess"}},
-            {"point_0": {"noul": 0.9}},
-            {"point_1": {"noul": 0.6}},
+            {"point_0": {"noul": 0.9}, "point_1": {"noul": 0.6}},
         ),
     )
     correct = pattern2_jev.judge("C-3", "全て言い当てた推理", PROBLEM, api_key="test")
     assert correct.kind == "guess_correct"
     assert correct.reply.startswith("正解です！")
-    assert correct.debug["input_tokens"] == 36
+    assert correct.debug["input_tokens"] == 24  # 段 A1 + 段 B（要点をまとめて 1 回）
 
 
 def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
@@ -102,8 +100,7 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         _mock_answers(
             {"major": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
-            {"point_0": {"noul": 0.2}},
-            {"point_1": {"noul": 0.1}},
+            {"point_0": {"noul": 0.2}, "point_1": {"noul": 0.1}},
             {"quality": {"noul": 0.19}},
         ),
     )
@@ -116,8 +113,7 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         _mock_answers(
             {"major": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
-            {"point_0": {"noul": 0.2}},
-            {"point_1": {"noul": 0.1}},
+            {"point_0": {"noul": 0.2}, "point_1": {"noul": 0.1}},
             {"quality": {"noul": 0.8}},
             {"answer": {"choice": "yes", "probabilities": {"yes": 0.54, "no": 0.4, "irrelevant": 0.06}}},
         ),
@@ -133,8 +129,7 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         _mock_answers(
             {"major": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
-            {"point_0": {"noul": 0.2}},
-            {"point_1": {"noul": 0.1}},
+            {"point_0": {"noul": 0.2}, "point_1": {"noul": 0.1}},
             {"quality": {"noul": 0.8}},
             {"answer": {"choice": "yes", "probabilities": {"yes": 0.7, "no": 0.2, "irrelevant": 0.1}}},
         ),
@@ -232,8 +227,34 @@ def test_pattern2_major_then_detailed_kind(monkeypatch) -> None:
 
 
 def test_pattern2_latin_only_goes_to_jev(monkeypatch) -> None:
-    """英字だけのコメントは段 0 で外国語と決めず、段 A1 に任せる（試行 4）。"""
+    """1 語だけの英字の羅列は段 0 で外国語と決めず、段 A1 に任せる（試行 5）。"""
     monkeypatch.setattr(pattern2_jev, "_jev_request", _mock_answers({"major": {"choice": "other"}}))
-    result = pattern2_jev.judge("C-9", "Please explain this puzzle", PROBLEM, api_key="test")
+    result = pattern2_jev.judge("C-9", "QWERTYZZZ", PROBLEM, api_key="test")
     assert result.kind == "foreign"
     assert result.debug["calls"] == 1
+
+
+def test_pattern2_multiword_english_is_foreign_without_jev(monkeypatch) -> None:
+    def forbidden(*args, **kwargs):
+        raise AssertionError("規則段では Jev を呼ばない")
+
+    monkeypatch.setattr(pattern2_jev, "_jev_request", forbidden)
+    assert pattern2_jev.judge("C-10", "Please explain this puzzle", PROBLEM, api_key="test").kind == "foreign"
+
+
+def test_pattern2_recheck_turns_open_into_yesno(monkeypatch) -> None:
+    monkeypatch.setattr(
+        pattern2_jev,
+        "_jev_request",
+        _mock_answers(
+            {"major": {"choice": "question"}},
+            {"kind": {"choice": "q_open"}},
+            {"recheck": {"noul": 0.8}},
+            {"point_0": {"noul": 0.1}, "point_1": {"noul": 0.1}},
+            {"quality": {"noul": 0.9}},
+            {"answer": {"choice": "no", "probabilities": {"yes": 0.1, "no": 0.85, "irrelevant": 0.05}}},
+        ),
+    )
+    result = pattern2_jev.judge("C-11", "その子は彼に会ったことがある？", PROBLEM, api_key="test")
+    assert result.kind == "q_yesno" and result.answer == "no"
+    assert result.debug["probabilities"]["A3"] == 0.8

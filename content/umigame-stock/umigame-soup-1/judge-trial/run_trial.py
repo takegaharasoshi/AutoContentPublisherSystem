@@ -156,8 +156,25 @@ def _normalize_case(entry: Any, no: str, *, source: str) -> dict[str, Any]:
         "comment_text": str(entry["text"]),
         "expected_kind": kind,
         "expected_answer": answer,
+        "accept_kinds": list(entry.get("accept_kinds", [])),
+        "accept_answers": list(entry.get("accept_answers", [])),
         "source": source,
     }
+
+
+def apply_labels(row: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
+    """キャッシュの結果に最新のラベルを付け直す（ラベルだけ直したときに API を呼び直さずに数え直すため）。
+
+    accept_kinds / accept_answers はユーザーが「どちらでもよい」とした別解。実際の出力が別解に当たれば、
+    その値を正解ラベルとして扱う。
+    """
+    row = {**row, "expected_kind": case["expected_kind"], "expected_answer": case["expected_answer"]}
+    if row["kind"] in case.get("accept_kinds", []):
+        row["expected_kind"] = row["kind"]
+        row["expected_answer"] = row["answer"] if row["kind"] == "q_yesno" else None
+    if row["kind"] == "q_yesno" and row["answer"] in case.get("accept_answers", []):
+        row["expected_answer"] = row["answer"]
+    return row
 
 
 def _row_from_result(case: dict[str, Any], result: JudgeResult, problem: Problem) -> dict[str, Any]:
@@ -595,7 +612,7 @@ def main(argv: list[str] | None = None) -> int:
     WORK_DIR.mkdir(parents=True, exist_ok=True)
     report_lines = ["# 21-6b 判定試走レポート", ""]
     for method in methods:
-        rows = [cache_results[_cache_key(case["id"], method)] for case in cases]
+        rows = [apply_labels(cache_results[_cache_key(case["id"], method)], case) for case in cases]
         metrics = aggregate_results(rows)
         heading = f"方式 {method} ({len(rows)} ケース)"
         print(heading)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import time
@@ -16,12 +17,15 @@ import templates
 JEV_URL = "https://api.typesafe.ai/v1/systemone"
 T_POINT = 0.5
 T_CLOSE = 0.35  # 惜しい判定だけに使う（正解側の T_POINT は下げない。試行 4）
+CORRECT_FRACTION = 0.75  # 要点のこの割合以上が T_POINT 以上なら正解（試行 5・ユーザー承認）
+T_RECHECK = 0.5  # A2 が q_open のとき、問題文つきで答えられる質問か確かめ直す（試行 5・ユーザー指示）
 T_QUALITY = 0.2
 T_ANSWER = 0.55
 MAX_RETRIES = 3
 _URL_RE = re.compile(r"(?:https?://|www\.)|\b[\w-]+(?:\.[\w-]+)+\b", re.IGNORECASE)
 _JAPANESE_RE = re.compile(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 _LATIN_RE = re.compile(r"[A-Za-z]")
+_LATIN_WORD_RE = re.compile(r"\b[A-Za-z]+(?:'[A-Za-z]+)?\b")
 
 
 KIND_CRITERIA = {
@@ -157,8 +161,10 @@ def _rule_kind(text: str) -> str | None:
         for char in nonspace
     ):
         return "emoji_only"
-    # 英字だけのコメントを外国語とみなす規則は試行 4 で外した（「QWERTYZZZ」などの荒らしを外国語にしていた）。
-    # 外国語の判定は段 A1 の other に任せる。
+    # 英字だけのコメントは、空白で区切られた英単語が 2 つ以上あるときだけ外国語とする（試行 5）。
+    # 「QWERTYZZZ」のような 1 語の羅列は段 A1 に任せる（試行 4 で英字の規則を丸ごと外したら英文が反応などに流れた）。
+    if not _JAPANESE_RE.search(text) and len(_LATIN_WORD_RE.findall(text)) >= 2:
+        return "foreign"
     return None
 
 
@@ -242,6 +248,8 @@ def judge(
     api_key: str,
     t_point: float = T_POINT,
     t_close: float = T_CLOSE,
+    correct_fraction: float = CORRECT_FRACTION,
+    t_recheck: float = T_RECHECK,
     t_quality: float = T_QUALITY,
     t_answer: float = T_ANSWER,
 ) -> JudgeResult:
@@ -288,34 +296,56 @@ def judge(
             )
             a_kind = _choice(a2_answers["kind"], tuple(sub))
             debug["probabilities"]["A2"] = _probability_map(a2_answers["kind"])
-        debug["major"] = major
-        kind: str
-        answer: str | None = None
-        if a_kind in {"guess", "q_yesno"}:
-            point_probs = {}
-            for index, point in enumerate(problem.truth_points):
-                point_id = f"point_{index}"
-                point_answers = _record_call(
+            if a_kind == "q_open":
+                # A2 は問題文を見ないので、主語が消去法で決まる質問まで q_open にしうる。問題文を渡して確かめ直す。
+                recheck_answers = _record_call(
                     api_key,
-                    {"truth_point": point, "comment": text},
+                    {"problem_text": problem.problem_text, "comment": text},
                     {
-                        point_id: {
+                        "recheck": {
                             "type": "noul",
                             "instructions": (
-                                "Estimate whether the commenter explicitly states this truth point. "
-                                f"The truth point is: {point!r}. Use true only when its meaning is clearly present."
+                                "Given the puzzle text, decide whether the comment can be read as exactly one question "
+                                "that can be answered with yes or no. Every pronoun or demonstrative (それ / あれ / 彼 / "
+                                "彼女 / あの人 / その子) must refer to exactly one person or thing in the puzzle text, "
+                                "possibly by elimination. Why / who / what / how questions cannot be answered with yes or no."
                             ),
                             "criteria": {
-                                "true": "The comment clearly states this truth point.",
-                                "false": "The comment does not clearly state this truth point.",
+                                "true": "It is one yes-or-no question whose subject and target are determined by the puzzle text.",
+                                "false": "It is an open question, or a pronoun cannot be resolved from the puzzle text.",
                             },
                         }
                     },
                     debug,
                 )
-                point_probs[point_id] = _noul_true(point_answers[point_id])
+                recheck = _noul_true(recheck_answers["recheck"])
+                debug["probabilities"]["A3"] = recheck
+                if recheck >= t_recheck:
+                    a_kind = "q_yesno"
+        debug["major"] = major
+        kind: str
+        answer: str | None = None
+        if a_kind in {"guess", "q_yesno"}:
+            # 要点ごとの noul を 1 リクエストにまとめる（試行 5。試行 4 は要点ごとに 1 回ずつ呼んで遅くなった）
+            point_questions = {
+                f"point_{index}": {
+                    "type": "noul",
+                    "instructions": (
+                        "Estimate whether the commenter explicitly states this truth point. "
+                        f"The truth point is: {point!r}. Use true only when its meaning is clearly present."
+                    ),
+                    "criteria": {
+                        "true": "The comment clearly states this truth point.",
+                        "false": "The comment does not clearly state this truth point.",
+                    },
+                }
+                for index, point in enumerate(problem.truth_points)
+            }
+            point_answers = _record_call(api_key, {"comment": text}, point_questions, debug)
+            point_probs = {point_id: _noul_true(point_answers[point_id]) for point_id in point_questions}
             debug["probabilities"]["B"] = point_probs
-            all_points = bool(point_probs) and all(value >= t_point for value in point_probs.values())
+            hits = sum(value >= t_point for value in point_probs.values())
+            all_points = bool(point_probs) and hits >= math.ceil(correct_fraction * len(point_probs))
             some_points = any(value >= t_close for value in point_probs.values())
             if all_points:
                 kind = "guess_correct"
