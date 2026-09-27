@@ -67,6 +67,79 @@ _A_KEYS = (
 )
 _A_CRITERIA = {key: KIND_CRITERIA[key] for key in _A_KEYS}
 
+# 段 A1（大分類）: 問題文は渡さず、「水平思考クイズへの SNS コメント」という説明とコメントだけで 6 択にする。
+# 具体例は評価データ（data/）の文面をそのまま使わない。
+A_CONTEXT = (
+    "A lateral-thinking quiz (Umigame no Soup) was posted on Instagram. Players ask yes/no questions "
+    "or post guesses about the hidden story in the comments. This is one comment from that post."
+)
+MAJOR_CRITERIA = {
+    "question": (
+        "Question about the puzzle story: a yes/no question, several questions in one comment, or an open "
+        "question (why / who / what / how) or a vague question. "
+        "Examples: 「その人は男の家族？」「場所は海の近く？」「なぜ男は笑ったの？」「時間は夜？季節は冬？」"
+    ),
+    "guess": (
+        "Guess: the commenter states their own explanation of the hidden story, even when it ends with ？ "
+        "(〜ってこと？ / 〜でしょ？). Correct, partly correct and wrong guesses all belong here. "
+        "Examples: 「男は実は医者だったんだ」「犯人は弟ってこと？」「写真に写ってたのは昔の自分でしょ」"
+    ),
+    "request": (
+        "Request to the account instead of a question about the story: asking for a hint, for the answer or "
+        "a spoiler, or how to play / whether replies are automatic. "
+        "Examples: 「ヒントほしいです」「真相はよ」「どうやって参加するの？」「返事してるのAI？」"
+    ),
+    "reaction": (
+        "Reaction: impression, greeting, support, casual chat unrelated to the story, a request for future "
+        "puzzles, criticism of the puzzle itself (including calling it boring or bad), tagging a friend. "
+        "Examples: 「今日のは難しかった」「おはよう」「毎日楽しみ」「雨やばい」「次は学校ものがいい」"
+        "「今回のはつまらない」「@friend 解いてみて」"
+    ),
+    "inappropriate": (
+        "Inappropriate: meaningless strings or spam-like repetition, insults or attacks against a person "
+        "(the author or other users), discriminatory or sexual content, advertising / links / follow-for-follow, "
+        "personal information such as phone numbers, addresses or real names. "
+        "Examples: 「hjkl;;;;」「管理人は性格悪い」「稼げる方法教えます→プロフ」「住所は〇〇市〇〇町です」"
+    ),
+    "other": "A comment not written in Japanese. Examples: 'nice puzzle', '太难了', '어려워요'",
+}
+SUB_CRITERIA = {
+    "question": {
+        "q_yesno": "Exactly one question that can be answered yes or no. Examples: 「その人は男の家族？」「夜の出来事？」",
+        "q_multi": "Two or more questions in one comment. Examples: 「場所は家？時間は朝？」「誰が来たの？何を持ってたの？」",
+        "q_open": (
+            "An open question (why / who / what / how) that cannot be answered with yes or no, or a question whose "
+            "subject is unclear (それ / あれ / 彼 / あの人). Examples: 「なぜ笑ったの？」「あれはいつのこと？」"
+        ),
+    },
+    "request": {
+        "ask_hint": "Asks for a hint. Examples: 「ヒントほしいです」「手がかりちょうだい」",
+        "ask_spoiler": "Asks for the answer, the truth or an explanation. Examples: 「真相はよ」「結局どういう話？」",
+        "ask_howto": "Asks how to play, what to comment, or whether replies are automatic / a bot. Examples: 「どうやって参加するの？」「返事してるのAI？」",
+    },
+    "reaction": {
+        "impression": "Impression of the puzzle (positive or mixed). Examples: 「今日のは難しかった」「ゾクッとした」",
+        "greeting": "A greeting. Examples: 「おはよう」「はじめまして」",
+        "cheer": "Support or encouragement for the account. Examples: 「毎日楽しみ」「これからも頑張って」",
+        "chat": "Casual talk unrelated to the puzzle. Examples: 「雨やばい」「昼休みに見てる」",
+        "request": "A request for future puzzles or themes. Examples: 「次は学校ものがいい」「ホラー回希望」",
+        "complaint": (
+            "Criticism of the puzzle itself, including disparaging it (boring, no sense, stupid puzzle), "
+            "pointing out a contradiction or saying it is too hard. Examples: 「今回のはつまらない」「設定に無理がある」"
+        ),
+        "mention": "Tags a friend with @ to invite them. Examples: 「@friend 解いてみて」「@aki これ好きそう」",
+    },
+    "inappropriate": {
+        "troll": "Meaningless strings or repeated characters. Examples: 「hjkl;;;;」「ほほほほほほ」",
+        "abuse": (
+            "Insults or attacks against a person (the author or other users), discriminatory or sexual content. "
+            "Criticism of the puzzle itself is not abuse. Examples: 「管理人は性格悪い」「こんなの作るやつ気持ち悪い」"
+        ),
+        "spam": "Advertising, links, follow-for-follow or money-making invitations. Examples: 「稼げる方法教えます→プロフ」",
+        "personal_info": "Contains personal information such as a phone number, address or real name. Examples: 「住所は〇〇市〇〇町です」",
+    },
+}
+
 
 class JevError(RuntimeError):
     """Jev API request or response error."""
@@ -178,25 +251,42 @@ def judge(
         return JudgeResult(rule_kind, None, reply, "p2", debug)
 
     try:
-        a_answers = _record_call(
+        state_a = {"context": A_CONTEXT, "comment": text}
+        a1_answers = _record_call(
             api_key,
-            {"comment": text, "problem_text": problem.problem_text},
+            state_a,
             {
-                "kind": {
+                "major": {
                     "type": "choice",
-                    "instructions": (
-                        "Classify the Japanese comment by its primary intent using the criteria. "
-                        "Use guess only for a stated solution or claim; a single yes-or-no question stays q_yesno."
-                    ),
-                    "criteria": _A_CRITERIA,
+                    "instructions": "Classify the Japanese comment into one broad category by its main intent.",
+                    "criteria": MAJOR_CRITERIA,
                 }
             },
             debug,
         )
-        a_answer = a_answers["kind"]
-        a_kind = _choice(a_answer, tuple(_A_CRITERIA))
-        debug["probabilities"]["A"] = _probability_map(a_answer)
-
+        major = _choice(a1_answers["major"], tuple(MAJOR_CRITERIA))
+        debug["probabilities"]["A1"] = _probability_map(a1_answers["major"])
+        if major == "guess":
+            a_kind = "guess"
+        elif major == "other":
+            a_kind = "foreign"
+        else:
+            sub = SUB_CRITERIA[major]
+            a2_answers = _record_call(
+                api_key,
+                state_a,
+                {
+                    "kind": {
+                        "type": "choice",
+                        "instructions": "Classify the Japanese comment into the most fitting detailed type.",
+                        "criteria": sub,
+                    }
+                },
+                debug,
+            )
+            a_kind = _choice(a2_answers["kind"], tuple(sub))
+            debug["probabilities"]["A2"] = _probability_map(a2_answers["kind"])
+        debug["major"] = major
         kind: str
         answer: str | None = None
         if a_kind in {"guess", "q_yesno"}:

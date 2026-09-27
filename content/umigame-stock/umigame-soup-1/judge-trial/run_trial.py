@@ -36,6 +36,24 @@ GROUPS = {
 }
 
 
+
+RELEVANCE_WORDS = ("関係", "重要", "大事")
+
+
+def answer_matches(row: dict) -> bool:
+    """期待判定と実判定が一致するか（「〜は関係ある？」への「いいえ」は「関係ありません」と同義に扱う）。
+
+    batch-01/probe_test.py の ``judge`` と同じ同義の扱い（セット別設計書 5.1 の 21-4a 知見）。
+    """
+    if row["expected_answer"] == row["answer"]:
+        return True
+    return (
+        row["expected_answer"] == "irrelevant"
+        and row["answer"] == "no"
+        and any(word in row.get("comment_text", "") for word in RELEVANCE_WORDS)
+    )
+
+
 def load_core_words(path: Path = CORE_PATH) -> dict[str, list[str]]:
     """leak_count.py の CORE を AST で取り出す。対象ファイルは実行しない。"""
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -237,7 +255,7 @@ def aggregate_results(
 
     q_cases = [row for row in results if row["expected_kind"] == "q_yesno"]
     q_correct = sum(
-        row["kind"] == "q_yesno" and row["expected_answer"] == row["answer"] for row in q_cases
+        row["kind"] == "q_yesno" and answer_matches(row) for row in q_cases
     )
     p3_cases = [row for row in q_cases if row["expected_answer"] in {"yes", "no"}]
     p3 = sum(
@@ -251,7 +269,7 @@ def aggregate_results(
     p4 = sum(
         row["kind"] == "q_yesno"
         and row["answer"] in p4_values
-        and row["answer"] != row["expected_answer"]
+        and not answer_matches(row)
         for row in p4_cases
     )
 
@@ -300,7 +318,7 @@ def aggregate_results(
         answer_wrong = (
             row["expected_kind"] == "q_yesno"
             and row["kind"] == "q_yesno"
-            and row["expected_answer"] != row["answer"]
+            and not answer_matches(row)
         )
         if kind_wrong or answer_wrong:
             errors.append(row)

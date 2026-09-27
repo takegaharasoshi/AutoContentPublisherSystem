@@ -300,14 +300,16 @@
     "kind": "troll"
   },
   {
-    "id": "c-abuse-01",
+    "id": "c-complaint-06",
     "text": "つまらん、センスない",
-    "kind": "abuse"
+    "kind": "complaint",
+    "note": "2026-09-27 ユーザー判断: 作品へのけなしは ⑮（元は abuse）"
   },
   {
-    "id": "c-abuse-02",
+    "id": "c-complaint-07",
     "text": "バカみたいな問題だな",
-    "kind": "abuse"
+    "kind": "complaint",
+    "note": "2026-09-27 ユーザー判断: 作品へのけなしは ⑮（元は abuse）"
   },
   {
     "id": "c-abuse-03",
@@ -315,9 +317,10 @@
     "kind": "abuse"
   },
   {
-    "id": "c-abuse-04",
+    "id": "c-complaint-08",
     "text": "そういう人たちを見下す感じ、無理",
-    "kind": "abuse"
+    "kind": "complaint",
+    "note": "2026-09-27 ユーザー判断: 作品へのけなしは ⑮（元は abuse）"
   },
   {
     "id": "c-abuse-05",
@@ -398,5 +401,20 @@
     "id": "c-foreign-05",
     "text": "이거 정말 재밌어요",
     "kind": "foreign"
+  },
+  {
+    "id": "c-abuse-06",
+    "text": "作者って絶対友達いないでしょ",
+    "kind": "abuse"
+  },
+  {
+    "id": "c-abuse-07",
+    "text": "ここでコメントしてる奴ら全員頭おかしい",
+    "kind": "abuse"
+  },
+  {
+    "id": "c-abuse-08",
+    "text": "作者の顔写真あげてよ、脱いでるやつ",
+    "kind": "abuse"
   }
 ]

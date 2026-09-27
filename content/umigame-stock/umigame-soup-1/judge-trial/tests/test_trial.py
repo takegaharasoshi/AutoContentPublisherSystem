@@ -72,7 +72,7 @@ def test_pattern2_b_threshold_close_and_correct(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
-            {"kind": {"choice": "guess", "probabilities": {"guess": 0.8}}},
+            {"major": {"choice": "guess", "probabilities": {"guess": 0.8}}},
             {"point_0": {"noul": 0.7}},
             {"point_1": {"noul": 0.49}},
         ),
@@ -85,7 +85,7 @@ def test_pattern2_b_threshold_close_and_correct(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
-            {"kind": {"choice": "guess"}},
+            {"major": {"choice": "guess"}},
             {"point_0": {"noul": 0.9}},
             {"point_1": {"noul": 0.6}},
         ),
@@ -101,6 +101,7 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
+            {"major": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
             {"point_0": {"noul": 0.2}},
             {"point_1": {"noul": 0.1}},
@@ -114,6 +115,7 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
+            {"major": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
             {"point_0": {"noul": 0.2}},
             {"point_1": {"noul": 0.1}},
@@ -130,6 +132,7 @@ def test_pattern2_c_and_d_thresholds(monkeypatch) -> None:
         pattern2_jev,
         "_jev_request",
         _mock_answers(
+            {"major": {"choice": "question"}},
             {"kind": {"choice": "q_yesno"}},
             {"point_0": {"noul": 0.2}},
             {"point_1": {"noul": 0.1}},
@@ -203,3 +206,27 @@ def test_aggregate_p3_p4_p2_p5_metrics() -> None:
     assert metrics["p2_wrong_correct_declarations"] == 1
     assert metrics["p5_correct_declaration_rate"]["correct"] == 1
     assert metrics["p5_correct_declaration_rate"]["total"] == 2
+
+
+def test_pattern2_major_then_detailed_kind(monkeypatch) -> None:
+    monkeypatch.setattr(
+        pattern2_jev,
+        "_jev_request",
+        _mock_answers(
+            {"major": {"choice": "reaction", "probabilities": {"reaction": 0.9}}},
+            {"kind": {"choice": "complaint", "probabilities": {"complaint": 0.7}}},
+        ),
+    )
+    result = pattern2_jev.judge("C-7", "つまらない問題", PROBLEM, api_key="test")
+    assert result.kind == "complaint"
+    assert result.debug["major"] == "reaction"
+    assert result.reply
+
+    monkeypatch.setattr(
+        pattern2_jev,
+        "_jev_request",
+        _mock_answers({"major": {"choice": "other"}}),
+    )
+    foreign = pattern2_jev.judge("C-8", "太难了", PROBLEM, api_key="test")
+    assert foreign.kind == "foreign"
+    assert foreign.debug["calls"] == 1
