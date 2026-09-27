@@ -16,7 +16,7 @@ import templates
 
 JEV_URL = "https://api.typesafe.ai/v1/systemone"
 T_POINT = 0.5
-T_CLOSE = 0.35  # 惜しい判定だけに使う（正解側の T_POINT は下げない。試行 4）
+T_CLOSE = 0.25  # 惜しい判定だけに使う（正解側の T_POINT は下げない。試行 4 で 0.35、試行 7b でコア基準に合わせて 0.25）
 CORRECT_FRACTION = 0.75  # 要点のこの割合以上が T_POINT 以上なら正解（試行 5・ユーザー承認）
 T_GUESS = 0.95  # 段 A1b で推理とする確率の下限（試行 6b。5 問で選んだ値なので 21-6d で確かめる）
 T_RECHECK = 0.5  # A2 が q_open のとき、問題文つきで答えられる質問か確かめ直す（試行 5・ユーザー指示）
@@ -379,13 +379,17 @@ def judge(
                         "false": "The comment does not state this truth point.",
                     },
                 }
-                for index, point in enumerate(problem.truth_points)
+                for index, point in enumerate(problem.core_points or problem.truth_points)
             }
             point_answers = _record_call(api_key, {"comment": text}, point_questions, debug)
             point_probs = {point_id: _noul_true(point_answers[point_id]) for point_id in point_questions}
             debug["probabilities"]["B"] = point_probs
             hits = sum(value >= t_point for value in point_probs.values())
-            all_points = bool(point_probs) and hits >= math.ceil(correct_fraction * len(point_probs))
+            if problem.core_points:
+                # コア基準（試行 7・ユーザー合意）: コアの要点がすべて当たれば正解、どれかに触れれば惜しい、触れなければ外れ
+                all_points = bool(point_probs) and hits == len(point_probs)
+            else:
+                all_points = bool(point_probs) and hits >= math.ceil(correct_fraction * len(point_probs))
             some_points = any(value >= t_close for value in point_probs.values())
             if all_points:
                 kind = "guess_correct"

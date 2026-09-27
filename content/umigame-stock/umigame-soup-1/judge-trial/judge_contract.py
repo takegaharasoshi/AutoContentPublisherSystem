@@ -49,6 +49,7 @@ class Problem:
     fact_sheet: list[str]
     truth_points: list[str]
     reveal_text: str
+    core_points: list[str] = field(default_factory=list)  # コアの要点（試行 7）。正解・惜しいはこれで判定する
 
 
 @dataclass(frozen=True)
@@ -108,4 +109,5 @@ def load_problem(no: str) -> Problem:
         fact_sheet=list(item["fact_sheet"]),
         truth_points=truth_points,
         reveal_text=reveal_text,
+        core_points=[str(point) for point in fixture.get("core_points", [])],
     )

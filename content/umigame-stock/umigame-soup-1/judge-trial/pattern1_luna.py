@@ -33,6 +33,21 @@ def load_api_key(secret_id: str = DEFAULT_SECRET_ID) -> str:
     return key
 
 
+
+def _post_with_retry(req: request.Request, retries: int = 3) -> dict:
+    """429（レート制限）と 5xx だけ指数バックオフで再試行する（試行 7。並列実行で TPM 上限に当たった）。"""
+    for attempt in range(retries + 1):
+        try:
+            with request.urlopen(req, timeout=90) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except error.HTTPError as exc:
+            if (exc.code == 429 or exc.code >= 500) and attempt < retries:
+                time.sleep(5 * 2**attempt)
+                continue
+            raise
+    raise RuntimeError("unreachable")
+
+
 def _error_result(message: str, debug: dict) -> JudgeResult:
     return JudgeResult(kind="error", answer=None, reply=None, method="p1", debug={**debug, "error": message})
 
@@ -61,6 +76,7 @@ def judge(
             problem_text=problem.problem_text,
             truth=problem.truth,
             fact_sheet="\n".join(f"- {line}" for line in problem.fact_sheet),
+            core_points="\n".join(f"- {point}" for point in (problem.core_points or problem.truth_points)),
         )
         schema = {
             "type": "object",
@@ -96,8 +112,7 @@ def judge(
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             method="POST",
         )
-        with request.urlopen(req, timeout=90) as response:
-            body = json.loads(response.read().decode("utf-8"))
+        body = _post_with_retry(req)
         choice = body["choices"][0]
         debug["finish_reason"] = choice.get("finish_reason")
         usage = body.get("usage", {})

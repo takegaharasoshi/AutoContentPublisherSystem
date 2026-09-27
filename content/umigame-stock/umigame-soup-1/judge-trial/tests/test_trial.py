@@ -280,3 +280,20 @@ def test_pattern2_demonstrative_yesno_goes_to_recheck(monkeypatch) -> None:
     )
     result = pattern2_jev.judge("C-12", "それはまだ持ってるの？", PROBLEM, api_key="test")
     assert result.kind == "q_open"
+
+
+def test_pattern2_core_points_rule(monkeypatch) -> None:
+    """コアの要点がすべて当たれば正解、1 つでも欠ければ惜しい（試行 7）。"""
+    from dataclasses import replace
+
+    core_problem = replace(PROBLEM, core_points=["コア 1", "コア 2"])
+    monkeypatch.setattr(
+        pattern2_jev,
+        "_jev_request",
+        _mock_answers(
+            {"major": {"choice": "question_or_guess"}},
+            {"qg": {"choice": "guess", "probabilities": {"guess": 0.99, "question": 0.01}}},
+            {"point_0": {"noul": 0.9}, "point_1": {"noul": 0.4}},
+        ),
+    )
+    assert pattern2_jev.judge("C-13", "推理", core_problem, api_key="test").kind == "guess_close"
