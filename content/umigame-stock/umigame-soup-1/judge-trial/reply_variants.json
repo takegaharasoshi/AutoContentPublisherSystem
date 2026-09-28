@@ -6,10 +6,26 @@
     "type": "as_is"
   },
   {
-    "name": "2a",
-    "label": "現行パターン 2",
-    "source_method": "p2",
-    "type": "as_is"
+    "name": "1b",
+    "label": "luna の手順 3 を作り直し（真相あり）",
+    "source_method": "p1",
+    "prompt": "reply_1b_with_truth.txt",
+    "with_truth": true,
+    "llm_correct": true,
+    "provider": "openai",
+    "model": "gpt-6-luna",
+    "effort": "xhigh",
+    "max_tokens": 2400,
+    "output": "json",
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ]
   },
   {
     "name": "1c",
@@ -17,5 +33,202 @@
     "source_method": "p1",
     "type": "template",
     "templates_module": "templates"
+  },
+  {
+    "name": "1d-luna",
+    "label": "luna の判定 + 書き手 gpt-6-luna（真相なし）",
+    "source_method": "p1",
+    "prompt": "reply_writer.txt",
+    "with_truth": false,
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ],
+    "provider": "openai",
+    "model": "gpt-6-luna",
+    "effort": "low",
+    "max_tokens": 800,
+    "output": "json"
+  },
+  {
+    "name": "1d-q9b",
+    "label": "luna の判定 + 書き手 Qwen3.5-9B（真相なし）",
+    "source_method": "p1",
+    "prompt": "reply_writer.txt",
+    "with_truth": false,
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ],
+    "provider": "openrouter",
+    "model": "qwen/qwen3.5-9b",
+    "max_tokens": 300,
+    "output": "text",
+    "extra_body": {
+      "reasoning": {
+        "enabled": false
+      }
+    }
+  },
+  {
+    "name": "1d-qflash",
+    "label": "luna の判定 + 書き手 Qwen3.5-Flash（真相なし）",
+    "source_method": "p1",
+    "prompt": "reply_writer.txt",
+    "with_truth": false,
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ],
+    "provider": "openrouter",
+    "model": "qwen/qwen3.5-flash-02-23",
+    "max_tokens": 300,
+    "output": "text",
+    "extra_body": {
+      "reasoning": {
+        "enabled": false
+      }
+    }
+  },
+  {
+    "name": "1d-gemma",
+    "label": "luna の判定 + 書き手 Gemma 4 26B-A4B（真相なし）",
+    "source_method": "p1",
+    "prompt": "reply_writer.txt",
+    "with_truth": false,
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ],
+    "provider": "gemini",
+    "model": "gemma-4-26b-a4b-it",
+    "max_tokens": 2048,
+    "output": "text",
+    "max_workers": 1
+  },
+  {
+    "name": "2a",
+    "label": "現行パターン 2",
+    "source_method": "p2",
+    "type": "as_is"
+  },
+  {
+    "name": "2b",
+    "label": "Jev の判定 + 定型文の作り直し",
+    "source_method": "p2",
+    "type": "template",
+    "templates_module": "templates_2b"
+  },
+  {
+    "name": "2c-luna",
+    "label": "Jev の判定 + 書き手 gpt-6-luna（真相なし）",
+    "source_method": "p2",
+    "prompt": "reply_writer.txt",
+    "with_truth": false,
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ],
+    "provider": "openai",
+    "model": "gpt-6-luna",
+    "effort": "low",
+    "max_tokens": 800,
+    "output": "json"
+  },
+  {
+    "name": "2c-q9b",
+    "label": "Jev の判定 + 書き手 Qwen3.5-9B（真相なし）",
+    "source_method": "p2",
+    "prompt": "reply_writer.txt",
+    "with_truth": false,
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ],
+    "provider": "openrouter",
+    "model": "qwen/qwen3.5-9b",
+    "max_tokens": 300,
+    "output": "text",
+    "extra_body": {
+      "reasoning": {
+        "enabled": false
+      }
+    }
+  },
+  {
+    "name": "2c-qflash",
+    "label": "Jev の判定 + 書き手 Qwen3.5-Flash（真相なし）",
+    "source_method": "p2",
+    "prompt": "reply_writer.txt",
+    "with_truth": false,
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ],
+    "provider": "openrouter",
+    "model": "qwen/qwen3.5-flash-02-23",
+    "max_tokens": 300,
+    "output": "text",
+    "extra_body": {
+      "reasoning": {
+        "enabled": false
+      }
+    }
+  },
+  {
+    "name": "2c-gemma",
+    "label": "Jev の判定 + 書き手 Gemma 4 26B-A4B（真相なし）",
+    "source_method": "p2",
+    "prompt": "reply_writer.txt",
+    "with_truth": false,
+    "type": "llm_fixed",
+    "style": "reply_style.txt",
+    "templates_module": "templates_2b",
+    "slots": [
+      "判定語だけ",
+      "判定語 + 復唱",
+      "判定語 + 一言",
+      "判定語 + 一言"
+    ],
+    "provider": "gemini",
+    "model": "gemma-4-26b-a4b-it",
+    "max_tokens": 2048,
+    "output": "text",
+    "max_workers": 1
   }
 ]

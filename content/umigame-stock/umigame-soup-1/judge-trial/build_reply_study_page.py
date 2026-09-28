@@ -18,7 +18,7 @@ OUT = REPO / "docs" / "app" / "sets" / "umigame-soup-1-reply-study.html"
 METRICS = HERE / "work" / "reply_metrics.json"
 COMPARE = HERE / "work" / "reply_compare.json"
 
-UPDATED = "2026-09-28（21-6b2 ゴール 1: 基準を決定（口調・一人称・絵文字・復唱・一言の割合・H5）、案 1d を追加。2c のモデルはゴール 2 の着手時に指定。試走の本実行はゴール 2）"
+UPDATED = "2026-09-28（21-6b2 ゴール 2: 13 案の試走 1 回目。基準と見比べの確認待ち）"
 
 # 種別の表示順と名前（5.1.1 の ①〜㉒）
 KINDS: list[tuple[str, str]] = [
@@ -56,18 +56,31 @@ CRITERIA_MACHINE: list[tuple[str, str, str, str]] = [
     ("M7 費用・応答時間", "軽量 LLM を呼ぶ案だけ。応答時間の中央値・p95・最大、1 件あたりの金額", "参考値（方式選定は 21-6e）", "叩き台"),
 ]
 OPEN_DECISIONS: list[str] = [
-    "2c・1d の書き手（軽量 LLM）のモデル 2 パターン: ユーザーがゴール 2 の着手時に指定する",
+    "基準（1.1〜1.3）と見比べ（4 章）の確認（ユーザー。21-6b2 の人間ゲート）",
 ]
 
 # ② 作り方の案（name, 判定元, 文章の作り方, 真相を渡すか, 費用・応答時間, 状態）
 VARIANT_PLANS: list[tuple[str, str, str, str, str, str]] = [
-    ("1a", "パターン 1（luna）", "今のプロンプト（pattern1_rules.txt 手順 3）のまま", "渡す（判定と同じ呼び出し）", "追加なし", "試走済み（試行 8b の返信）"),
-    ("1b", "パターン 1（luna）", "手順 3 を作り直す（口調・絵文字・復唱の規則とキャラ設定。例文は評価データにない汎用文）", "渡す", "追加なし（本番は判定と 1 回の呼び出し）", "判断待ち"),
-    ("1c", "パターン 1（luna）", "luna は判定だけ。返信文はコードの定型文（templates.py）", "—（文を作らない）", "追加なし", "試走済み（判定を固定して組み立て）"),
-    ("1d", "パターン 1（luna）", "luna の判定のあとに軽量な LLM で文章を書く（2c と同じ書き手。2026-09-28 ユーザー指示で追加）。④ は reveal_text の固定文・⑱〜㉑ はコード", "渡さない（コメント本文・種別・判定だけ）", "2c と同じ", "判断待ち（モデルは 2c と共通）"),
-    ("2a", "パターン 2（Jev）", "今の定型文（templates.py）", "—（文を作らない）", "追加なし", "試走済み（試行 8b の返信）"),
-    ("2b", "パターン 2（Jev）", "定型文を ① の基準で書き直し、種別ごとに 6〜10 通りに増やす", "—（文を作らない）", "追加なし", "判断待ち"),
-    ("2c", "パターン 2（Jev）", "Jev の判定のあとに軽量な LLM で文章を書く。④ は reveal_text の固定文・⑱〜㉑ はコード", "渡さない（コメント本文・種別・判定だけ）", "モデルを 2 パターン試す（ユーザーが別途指定）。参考: gpt-6-luna effort low なら 1 件約 $0.0001・応答 1〜3 秒の見込み（ゴール 2 で実測）", "判断待ち（モデル）"),
+    ("1a", "パターン 1（luna）", "今のプロンプト（pattern1_rules.txt 手順 3）のまま", "渡す（判定と同じ呼び出し）", "追加なし", "試走 1 回目済み"),
+    ("1b", "パターン 1（luna）", "手順 3 を作り直す（口調・絵文字・復唱の規則とキャラ設定。例文は評価データにない汎用文）", "渡す", "追加なし（本番は判定と 1 回の呼び出し）", "試走 1 回目済み"),
+    ("1c", "パターン 1（luna）", "luna は判定だけ。返信文はコードの定型文（templates.py）", "—（文を作らない）", "追加なし", "試走 1 回目済み"),
+    ("1d", "パターン 1（luna）", "luna の判定のあとに軽量な LLM で文章を書く（2c と同じ書き手。2026-09-28 ユーザー指示で追加）。④ は reveal_text の固定文・⑱〜㉑ はコード", "渡さない（コメント本文・種別・判定だけ）", "2c と同じ", "試走 1 回目済み（書き手 4 モデル = 1d-luna・1d-q9b・1d-qflash・1d-gemma）"),
+    ("2a", "パターン 2（Jev）", "今の定型文（templates.py）", "—（文を作らない）", "追加なし", "試走 1 回目済み"),
+    ("2b", "パターン 2（Jev）", "定型文を ① の基準で書き直し、種別ごとに 6〜10 通りに増やす", "—（文を作らない）", "追加なし", "試走 1 回目済み"),
+    ("2c", "パターン 2（Jev）", "Jev の判定のあとに軽量な LLM で文章を書く。④ は reveal_text の固定文・⑱〜㉑ はコード", "渡さない（コメント本文・種別・判定だけ）", "実測は 3 章 M7（gpt-6-luna effort low・OpenRouter の Qwen3.5-9B / Qwen3.5-Flash・Gemini API の Gemma 4 26B-A4B〔無料枠〕）", "試走 1 回目済み（2c-luna・2c-q9b・2c-qflash・2c-gemma）"),
+]
+
+
+FINDINGS: list[str] = [
+    "<strong>書き手が luna の案（1b・1d-luna・2c-luna）と定型文の案（1c・2a・2b）は、機械の基準をほぼ満たした</strong>。判定の食い違い（M2b）0〜1 件・CORE 語 0 件・近さを示す語 0 件・絵文字は一覧の中だけ。"
+    "① の形の割り振り（判定語だけ / 復唱 / 一言を 1:1:2）も守り、判定語だけの返事が 29% 前後（割り振りの 25% とほぼ同じ）。2c-luna の食い違い 1 件は「いいえ。曲名は謎の答えに関係ないよ。」",
+    "<strong>小型モデル（Qwen3.5-9B・Qwen3.5-Flash・Gemma 4 26B-A4B）は、判定を書き換える</strong>。① の返信が決まった判定語で始まる割合 86〜98%、判定の食い違い 3〜21 件"
+    "（例: 判定が「いいえ」なのに「いいえ。家族かどうかは関係ないんだよ」、Gemma が種別のコード「q_open」をそのまま書く、Qwen3.5-9B がプロンプトの「種別 q_yesno / 答え no」を返信に漏らす）。"
+    "真相を渡していないのに、Qwen3.5-9B は存在しない事実を作って外れた推理に説明を付けた（「隣の見守る男が、娘の失敗を…」）。真相の漏洩ではないが、誤った手がかりを与える",
+    "<strong>小型モデルは形の指定を守らない</strong>: 判定語だけの返事 0〜1%（指定は 25%）、絵文字が 159〜191 件/220 件（「付けないほうが多くてよい」を無視）。Qwen3.5-9B は一覧外の絵文字 12〜13 件・2 個以上 9 件・改行 46〜58 件、⑮ クレームや ④ 開示にも絵文字を付けた",
+    "<strong>応答時間</strong>: Qwen3.5-Flash が最速（中央値 0.7 秒）、luna（effort low）1.3〜1.5 秒、Qwen3.5-9B 1.8〜2.0 秒（p95 3〜8 秒）、Gemma 4（Gemini API 無料枠）は中央値 1.5 秒だが p95 33 秒・最大 66 秒（レート制限の再試行）。1b（luna xhigh・真相あり）は中央値 2.4 秒・p95 4.0 秒で、本番のパターン 1 は判定と返信を 1 回で出すので追加の呼び出しはない",
+    "<strong>費用（今回の 220 件あたり）</strong>: 1b $0.053・1d/2c-luna $0.030・Qwen3.5-9B $0.022・Qwen3.5-Flash $0.014・Gemma 4 $0（無料枠）。どれも 1 件 0.02 円以下で、費用は選ぶ決め手にならない",
+    "<strong>2b（定型文の作り直し）</strong>は API を呼ばず、食い違い・漏れ・近さの語がすべて 0。代わりに ① の一言は 9 通り（+ 一言なし）で、噛み合い（H3）はコメントに合わせられない",
 ]
 
 
@@ -100,17 +113,28 @@ def metrics_section(metrics: dict | None) -> str:
             for k, x in m3["by_kind"].items()
             if x.get("over_50_percent") and x.get("count", 0) >= 3 and k not in ("spam", "personal_info")
         ]
+        m7 = v.get("M7_llm")
+        if m7 and m7.get("request_count"):
+            lat = m7["latency_s"]
+            per = (m7["cost_usd"] or 0) / m7["request_count"] * 1000
+            m7_text = f"{lat['median']:.1f} / {lat['p95']:.1f} / {lat['max']:.1f} 秒・1,000 件 ${per:.3f}"
+        else:
+            m7_text = "—（API を呼ばない）"
         rows.append([
             f"<strong>{esc(name)}</strong> {esc(v.get('label'))}",
             f"{m1['average_chars']:.1f} / {m1['max_chars']}（80 字超 {m1['over_80_count']}）",
             f"{m2['starts_rate']:.0%}（{m2['starts_count']}/{m2['q_yesno_count']}）",
+            f"{m2.get('conflict_count', 0)}",
             f"{yes['distinct_replies']} 種・最頻 {yes['most_frequent_rate']:.0%}・一言なし {m3['q_yesno_one_liner_empty_rate']:.0%}",
             esc("、".join(over) or "なし"),
             f"CORE {m4['core_count']}・内容語 {m4['comment_missing_content_words_count']}",
-            f"{m5['reply_count']}",
+            f"{m5['reply_count']}（一覧外 {m5.get('unlisted_reply_count', 0)}・2 個以上 {m5.get('multiple_emoji_reply_count', 0)}）",
             f"{m6['count']}",
+            m7_text,
+            f"{v.get('error_count', 0)}",
         ])
-    head = ["案", "M1 字数 平均 / 最大", "M2 判定語", "M3 ① の一言", "M3 最頻 50% 超の種別（3 件以上）", "M4 漏れ候補", "M5 絵文字", "M6 近さ"]
+    head = ["案", "M1 字数 平均 / 最大", "M2 判定語", "M2b 判定の食い違い", "M3 ① の一言", "M3 最頻 50% 超の種別（3 件以上）",
+            "M4 漏れ候補", "M5 絵文字", "M6 近さ", "M7 応答 中央値 / p95 / 最大・費用", "エラー"]
     note = (
         '<p class="trend-note">M3 の種別ごとの件数は ⑦〜㉒ が 5 件前後と少なく、定型文 3 通りでは偏りで 60% になりやすい'
         "（sha1 の選び方の偶然）。⑳㉑ は返信しないので除いた。</p>"
@@ -175,9 +199,9 @@ details.cmp-kind > summary {{ cursor: pointer; font-weight: 700; font-size: .95r
 .cmp-q {{ margin: 0 0 .3rem; font-weight: 600; }}
 .cmp-id {{ font-size: .75rem; color: var(--text-muted); margin-right: .5rem; font-weight: 400; }}
 .cmp-diff {{ display: block; font-size: .78rem; color: var(--text-muted); font-weight: 400; }}
-.cmp-dl {{ display: grid; grid-template-columns: 2.5rem 1fr; gap: .15rem .5rem; margin: 0; font-size: .9rem; }}
+.cmp-dl {{ display: grid; grid-template-columns: 5.5rem 1fr; gap: .15rem .5rem; margin: 0; font-size: .9rem; }}
 .cmp-dl dt {{ font-weight: 700; color: var(--text-muted); }}
-.cmp-dl dd {{ margin: 0; overflow-wrap: anywhere; }}
+.cmp-dl dd {{ margin: 0; overflow-wrap: anywhere; white-space: pre-line; }}
 </style>
 </head>
 <body>
@@ -220,15 +244,19 @@ details.cmp-kind > summary {{ cursor: pointer; font-weight: 700; font-size: .95r
 <h2 id="metrics">3. 機械の集計（案ごと）</h2>
 <p>M1〜M6 の要約。詳細は <code>work/reply_report.md</code>（ローカルにだけある）。</p>
 {metrics_section(metrics)}
+<h3 id="findings">3.1 試走 1 回目で分かったこと（2026-09-28）</h3>
+<ul>{"".join(f"<li>{f}</li>" for f in FINDINGS)}</ul>
 
 <h2 id="compare">4. 種別ごとの見比べ</h2>
 <p>同じコメントに対する案ごとの返信を並べる。種別は評価データの正解ラベルで分けた（判定が違った案は「判定が違う」と書く）。括弧内は ① の判定。</p>
 {compare_section(compare, variant_names)}
 
-<h2 id="next">5. 次の打ち手</h2>
+<h2 id="next">5. 次の打ち手の候補（人間ゲートのあと）</h2>
 <ul>
-  <li>1b（luna の手順 3 の作り直し）・1d / 2c（判定 + 軽量 LLM の書き手。モデル 2 パターン）・2b（定型文の作り直し）を案の定義に足し、試走する（21-6b2 ゴール 2）。書き手の規則は 1b と共有し、キャラの正を 1 か所にする</li>
-  <li>M4 の許可語（<code>prompts/reply_allow_words.txt</code>）に、口調が決まったあとのキャラの汎用語（「探偵」「捜査」「推理」など）を足し、本当に見るべき語だけが残るようにする</li>
+  <li>小型モデルを残すなら、判定語はコードが付けて、書き手には判定語のあとの一言（20 字以内）だけを書かせる形を試す（判定を書き換える余地をなくす。種別のコードやプロンプトの文面を返信に写す事故も、返信を一言に限れば見つけやすい）</li>
+  <li>書き手の出力に機械の検査（判定語との食い違い・一覧外の絵文字・改行・種別のコード）をかけ、落ちたら定型文（2b）に差し替える安全網を試す</li>
+  <li>1b（luna の手順 3 の作り直し）は、判定を含めた 1 回の呼び出しで試行 8b の判定品質が保たれるかを 21-6d で確かめる（今回は判定を固定したので、判定品質への影響は測っていない）</li>
+  <li>方式の選定はしない（21-6e）</li>
 </ul>
 
 </div>

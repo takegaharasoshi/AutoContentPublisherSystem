@@ -98,4 +98,8 @@ python run_reply_trial.py --from-cache
 python run_reply_trial.py --force --variants 1a 2a 1c
 ```
 
-案は `reply_variants.json` で定義します。返信案の実行結果・集計・見比べ用データはそれぞれ `work/reply_results.json`、`work/reply_report.md` と `work/reply_metrics.json`、`work/reply_compare.json` に保存します。`llm_fixed` 案を追加するときは `prompts/` 内の prompt ファイルを指定できます。
+案は `reply_variants.json` で定義します。返信案の実行結果・集計・見比べ用データはそれぞれ `work/reply_results.json`、`work/reply_report.md` と `work/reply_metrics.json`、`work/reply_compare.json` に保存します。`llm_fixed` 案では `provider` に `openai`（既定）・`openrouter`・`gemini` を指定できます。OpenAI は既存のキー取得を使い、OpenRouter は `OPENROUTER_API_KEY`、Gemini は `GEMINI_API_KEY` または `~/.config/gemini/api_key` を使います。
+
+`output` は `json`（OpenAI の既定）または `text` です。OpenRouter と Gemini は `text` を既定にします。`extra_body` は provider のリクエスト本文へマージされ、`max_workers` は `--workers` より小さい案別の並列数を指定できます。429 と 5xx は指数バックオフで再試行し、案ごとの失敗は結果とレポートに error 件数として残します。
+
+prompt は `prompts/` 内のファイルを指定します。`{problem_text}`・`{kind}`・`{answer}` に加え、真相情報が許可される案では `{truth}`・`{fact_sheet}`・`{core_points}`・`{reveal_text}` を置換できます。`{style}` には `style` で指定した `prompts/` 内ファイルの内容を入れます。`with_truth: false` では真相系の値を空にします。

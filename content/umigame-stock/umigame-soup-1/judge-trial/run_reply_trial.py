@@ -7,6 +7,7 @@ import hashlib
 import importlib.util
 import json
 import math
+import os
 import re
 import statistics
 import time
@@ -14,6 +15,8 @@ from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
+from urllib import error, request
+from urllib.parse import quote
 
 import pattern1_luna
 import run_trial
@@ -29,6 +32,8 @@ REPORT_PATH = WORK_DIR / "reply_report.md"
 METRICS_PATH = WORK_DIR / "reply_metrics.json"
 COMPARE_PATH = WORK_DIR / "reply_compare.json"
 ALLOW_WORDS_PATH = HERE / "prompts" / "reply_allow_words.txt"
+OPENROUTER_CHAT_COMPLETIONS_URL = "https://openrouter.ai/api/v1/chat/completions"
+GEMINI_GENERATE_CONTENT_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
 ANSWER_WORDS = {
     "yes": ("はい",),
@@ -36,9 +41,20 @@ ANSWER_WORDS = {
     "irrelevant": ("関係ありません", "関係ない"),
     "unknown": ("答えに関わりません", "関わらない"),
 }
+# M2b: 判定と食い違う判定語（「いいえ。…関係ないんだ」のように、文の中で別の判定を言っているもの）
+CONFLICT_WORDS = {
+    "yes": ("いいえ", "関係ない", "関係ありません", "関わらない", "関わりません"),
+    "no": ("はい", "関係ない", "関係ありません", "関わらない", "関わりません"),
+    "irrelevant": ("はい", "いいえ"),
+    "unknown": ("はい", "いいえ"),
+}
 PROXIMITY_WORDS = ("鋭い", "いい線", "近い", "近づ", "核心", "惜しい", "迫っ", "着眼点")
+ALLOWED_EMOJIS = ("🐢", "🔍", "🥣", "📝")
 MODEL_PRICES_USD_PER_M = {
     "gpt-6-luna": {"input": 0.10, "output": 0.50},
+    "qwen/qwen3.5-9b": {"input": 0.10, "output": 0.15},
+    "qwen/qwen3.5-flash-02-23": {"input": 0.065, "output": 0.26},
+    "gemma-4-26b-a4b-it": {"input": 0.0, "output": 0.0},
 }
 
 _CJK_OR_KATAKANA = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff々〆ヵヶ]{2,}|[\u30a0-\u30ffー]{2,}")
@@ -93,10 +109,23 @@ def load_variants(path: Path) -> list[dict[str, Any]]:
             variant.setdefault("effort", "low")
             variant.setdefault("max_tokens", 800)
             variant.setdefault("with_truth", True)
+            variant.setdefault("provider", "openai")
+            variant.setdefault("output", "json" if variant["provider"] == "openai" else "text")
             if not isinstance(variant["with_truth"], bool):
                 raise ValueError(f"返信案 {name} の with_truth は真偽値で指定してください")
             if not isinstance(variant["max_tokens"], int) or variant["max_tokens"] < 1:
                 raise ValueError(f"返信案 {name} の max_tokens は 1 以上の整数が必要です")
+            if variant["provider"] not in {"openai", "openrouter", "gemini"}:
+                raise ValueError(f"返信案 {name} の provider が不正です: {variant['provider']}")
+            if variant["output"] not in {"json", "text"}:
+                raise ValueError(f"返信案 {name} の output は json/text が必要です")
+            if not isinstance(variant.get("extra_body", {}), dict):
+                raise ValueError(f"返信案 {name} の extra_body はオブジェクトが必要です")
+            max_workers = variant.get("max_workers")
+            if max_workers is not None and (not isinstance(max_workers, int) or max_workers < 1):
+                raise ValueError(f"返信案 {name} の max_workers は 1 以上の整数が必要です")
+            if not isinstance(variant.get("llm_correct", False), bool):
+                raise ValueError(f"返信案 {name} の llm_correct は真偽値で指定してください")
         variants.append(variant)
     return variants
 
@@ -116,7 +145,7 @@ def load_templates_module(name: str) -> Any:
         raise ImportError(f"templates_module を読み込めません: {path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    for attr in ("TEMPLATES", "YESNO_OPENERS", "CORRECT_PREFIX"):
+    for attr in ("TEMPLATES", "YESNO_OPENERS", "CORRECT_PREFIX", "pick"):
         if not hasattr(module, attr):
             raise ValueError(f"{path} に {attr} がありません")
     _TEMPLATE_MODULES[name] = module
@@ -216,74 +245,260 @@ def _prompt_path(relative_path: str) -> Path:
     return path
 
 
-def _render_prompt(template: str, row: dict[str, Any], problem: Problem, with_truth: bool) -> str:
+def pick_slot(variant: dict[str, Any], comment_id: str) -> str:
+    """q_yesno の返し方（判定語だけ / 復唱 / 一言）を sha1(comment_id) で決める（状態を持たずに散らす）。"""
+    slots = variant.get("slots") or []
+    if not slots:
+        return ""
+    digest = hashlib.sha1(f"slot:{comment_id}".encode("utf-8")).digest()
+    return str(slots[int.from_bytes(digest[:8], "big") % len(slots)])
+
+
+def _render_prompt(
+    template: str,
+    row: dict[str, Any],
+    problem: Problem,
+    with_truth: bool,
+    *,
+    style: str = "",
+    slot: str = "",
+) -> str:
     truth_values = {
         "truth": problem.truth if with_truth else "",
         "fact_sheet": "\n".join(f"- {fact}" for fact in problem.fact_sheet) if with_truth else "",
         "core_points": "\n".join(f"- {point}" for point in (problem.core_points or problem.truth_points)) if with_truth else "",
+        "reveal_text": problem.reveal_text if with_truth else "",
     }
     values = {
         "problem_text": problem.problem_text,
         **truth_values,
         "kind": str(row.get("kind") or ""),
         "answer": str(row.get("answer") or ""),
+        "style": style,
+        "slot": slot,
     }
     return re.sub(
-        r"\{(problem_text|truth|fact_sheet|core_points|kind|answer)\}",
+        r"\{(problem_text|truth|fact_sheet|core_points|reveal_text|kind|answer|style|slot)\}",
         lambda match: values[match.group(1)],
         template,
     )
 
 
+def _load_provider_api_key(provider: str) -> str:
+    """provider ごとの認証情報を環境変数または指定ファイルから読む。"""
+    if provider == "openai":
+        return pattern1_luna.load_api_key()
+    if provider == "openrouter":
+        key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+        if not key:
+            raise RuntimeError("OPENROUTER_API_KEY がありません")
+        return key
+    if provider == "gemini":
+        key = os.environ.get("GEMINI_API_KEY", "").strip()
+        if key:
+            return key
+        key_path = Path("~/.config/gemini/api_key").expanduser()
+        if not key_path.is_file():
+            raise RuntimeError("GEMINI_API_KEY と ~/.config/gemini/api_key がありません")
+        key = key_path.read_text(encoding="utf-8").strip()
+        if not key:
+            raise RuntimeError(f"{key_path} が空です")
+        return key
+    raise ValueError(f"未対応の provider です: {provider}")
+
+
+def _reply_json_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "properties": {"reply": {"type": "string"}},
+        "required": ["reply"],
+        "additionalProperties": False,
+    }
+
+
+def _build_provider_request(
+    row: dict[str, Any], variant: dict[str, Any], system: str, api_key: str
+) -> tuple[request.Request, str]:
+    provider = variant.get("provider", "openai")
+    output = variant.get("output", "json" if provider == "openai" else "text")
+    model = variant.get("model", "gpt-6-luna")
+    schema = _reply_json_schema()
+    comment = row["comment_text"]
+    extra_body = variant.get("extra_body", {})
+
+    if provider == "openai":
+        payload: dict[str, Any] = {
+            "model": model,
+            "reasoning_effort": variant.get("effort", "low"),
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": comment},
+            ],
+            "max_completion_tokens": variant.get("max_tokens", 800),
+        }
+        if output == "json":
+            payload["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {"name": "reply_only", "strict": True, "schema": schema},
+            }
+        url = pattern1_luna.OPENAI_CHAT_COMPLETIONS_URL
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    elif provider == "openrouter":
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": comment},
+            ],
+            "max_tokens": variant.get("max_tokens", 800),
+        }
+        if output == "json":
+            payload["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {"name": "reply_only", "strict": True, "schema": schema},
+            }
+        url = OPENROUTER_CHAT_COMPLETIONS_URL
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    elif provider == "gemini":
+        generation_config: dict[str, Any] = {"maxOutputTokens": variant.get("max_tokens", 800)}
+        if output == "json":
+            generation_config.update({
+                "responseMimeType": "application/json",
+                "responseSchema": {
+                    "type": "OBJECT",
+                    "properties": {"reply": {"type": "STRING"}},
+                    "required": ["reply"],
+                },
+            })
+        payload = {
+            "systemInstruction": {"parts": [{"text": system}]},
+            "contents": [{"role": "user", "parts": [{"text": comment}]}],
+            "generationConfig": generation_config,
+        }
+        url = GEMINI_GENERATE_CONTENT_URL.format(model=quote(str(model), safe=""))
+        headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
+    else:
+        raise ValueError(f"未対応の provider です: {provider}")
+
+    payload.update(extra_body)
+    req = request.Request(
+        url,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers=headers,
+        method="POST",
+    )
+    return req, output
+
+
+def _post_json_with_retry(req: request.Request, *, retries: int = 5, initial_backoff_s: float = 2.0) -> dict[str, Any]:
+    """429 / 5xx を最大5回、2秒からの指数バックオフで再試行する。"""
+    for attempt in range(retries + 1):
+        try:
+            with request.urlopen(req, timeout=90) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except error.HTTPError as exc:
+            if (exc.code == 429 or exc.code >= 500) and attempt < retries:
+                time.sleep(initial_backoff_s * (2 ** attempt))
+                continue
+            raise
+    raise RuntimeError("unreachable")
+
+
+def _message_text(body: dict[str, Any], provider: str) -> str:
+    if provider == "gemini":
+        parts = body["candidates"][0]["content"]["parts"]
+        return "".join(
+            str(part.get("text", ""))
+            for part in parts
+            if isinstance(part, dict) and not part.get("thought", False) and isinstance(part.get("text", ""), str)
+        )
+    content = body["choices"][0]["message"]["content"]
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "".join(str(part.get("text", "")) for part in content if isinstance(part, dict))
+    raise ValueError("応答本文がありません")
+
+
+def _usage_tokens(body: dict[str, Any], provider: str) -> tuple[int, int, int]:
+    if provider == "gemini":
+        usage = body.get("usageMetadata", {})
+        return (
+            int(usage.get("promptTokenCount", 0) or 0),
+            int(usage.get("candidatesTokenCount", 0) or 0),
+            int(usage.get("thoughtsTokenCount", 0) or 0),
+        )
+    usage = body.get("usage", {})
+    completion_details = usage.get("completion_tokens_details", {}) or {}
+    thought_tokens = int(
+        completion_details.get("reasoning_tokens", usage.get("reasoning_tokens", 0)) or 0
+    )
+    completion_tokens = int(usage.get("completion_tokens", 0) or 0)
+    return (
+        int(usage.get("prompt_tokens", 0) or 0),
+        max(completion_tokens - thought_tokens, 0),
+        thought_tokens,
+    )
+
+
+def _clean_text_reply(reply: str) -> str:
+    """think ブロック・囲み・返信ラベルを除いたプレーンテキストを返す。"""
+    if "</think>" in reply:
+        reply = reply.split("</think>", 1)[1]
+    reply = reply.strip()
+    quote_pairs = (("「", "」"), ("『", "』"), ('"', '"'), ("“", "”"))
+    for opening, closing in quote_pairs:
+        if reply.startswith(opening) and reply.endswith(closing) and len(reply) >= 2:
+            reply = reply[len(opening):-len(closing)].strip()
+            break
+    reply = re.sub(r"^(?:返信|reply)\s*[:：]\s*", "", reply, flags=re.IGNORECASE).strip()
+    for opening, closing in quote_pairs:
+        if reply.startswith(opening) and reply.endswith(closing) and len(reply) >= 2:
+            reply = reply[len(opening):-len(closing)].strip()
+            break
+    return reply
+
+
 def _call_llm_reply(
     row: dict[str, Any], variant: dict[str, Any], problem: Problem, api_key: str
 ) -> tuple[str | None, dict[str, Any]]:
-    """pattern1_luna のキー取得・再試行実装を使って返信だけを生成する。"""
+    """指定 provider に返信だけを要求する。"""
     started = time.monotonic()
     debug: dict[str, Any] = {
         "input_tokens": 0,
         "output_tokens": 0,
+        "thought_tokens": 0,
         "latency_s": 0.0,
         "error": None,
     }
     try:
         prompt_path = _prompt_path(variant["prompt"])
         prompt_template = prompt_path.read_text(encoding="utf-8")
-        system = _render_prompt(prompt_template, row, problem, variant.get("with_truth", True))
-        schema = {
-            "type": "object",
-            "properties": {"reply": {"type": "string"}},
-            "required": ["reply"],
-            "additionalProperties": False,
-        }
-        payload = {
-            "model": variant.get("model", "gpt-6-luna"),
-            "reasoning_effort": variant.get("effort", "low"),
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": row["comment_text"]},
-            ],
-            "max_completion_tokens": variant.get("max_tokens", 800),
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {"name": "reply_only", "strict": True, "schema": schema},
-            },
-        }
-        req = pattern1_luna.request.Request(
-            pattern1_luna.OPENAI_CHAT_COMPLETIONS_URL,
-            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            method="POST",
+        style = ""
+        if variant.get("style"):
+            style = _prompt_path(variant["style"]).read_text(encoding="utf-8")
+        slot = pick_slot(variant, row["id"]) if row.get("kind") == "q_yesno" else "（この種別では使わない）"
+        debug["slot"] = slot
+        system = _render_prompt(
+            prompt_template, row, problem, variant.get("with_truth", True), style=style, slot=slot
         )
-        body = pattern1_luna._post_with_retry(req)
-        usage = body.get("usage", {})
-        debug["input_tokens"] = int(usage.get("prompt_tokens", 0) or 0)
-        debug["output_tokens"] = int(usage.get("completion_tokens", 0) or 0)
-        content = body["choices"][0]["message"]["content"]
-        decoded = json.loads(content)
-        reply = decoded.get("reply") if isinstance(decoded, dict) else None
-        if not isinstance(reply, str):
-            raise ValueError("JSON reply が文字列ではありません")
+        provider = variant.get("provider", "openai")
+        output = variant.get("output", "json" if provider == "openai" else "text")
+        if output == "text":
+            system = system.rstrip() + "\n\n返信文だけをプレーンテキストで出力してください。"
+        req, output = _build_provider_request(row, variant, system, api_key)
+        body = _post_json_with_retry(req)
+        debug["input_tokens"], debug["output_tokens"], debug["thought_tokens"] = _usage_tokens(body, provider)
+        raw_reply = _message_text(body, provider)
+        if output == "json":
+            decoded = json.loads(raw_reply)
+            reply = decoded.get("reply") if isinstance(decoded, dict) else None
+            if not isinstance(reply, str):
+                raise ValueError("JSON reply が文字列ではありません")
+        else:
+            reply = _clean_text_reply(raw_reply)
+            if not reply:
+                raise ValueError("text 応答の reply が空です")
         return reply, debug
     except Exception as exc:  # noqa: BLE001 - 1 件の失敗で他の案を止めない
         debug["error"] = str(exc)
@@ -311,11 +526,13 @@ def _reply_for_row(
     if kind in templates.NO_REPLY_KINDS:
         return None, empty_debug
     if kind in {"troll", "abuse"}:
-        return templates.pick(kind, row["id"]), empty_debug
+        picker = getattr(module, "pick", None)
+        reply = picker(kind, row["id"]) if callable(picker) else _pick_from_module(module, kind, row["id"])
+        return reply, empty_debug
     # llm_correct（真相ありの案だけ）: 本番のパターン 1 と同じく、正解の開示も LLM に書かせる
     llm_writes_correct = variant.get("llm_correct", False) and variant.get("with_truth", True)
     if kind == "guess_correct" and not llm_writes_correct:
-        return templates.CORRECT_PREFIX + problem.reveal_text, empty_debug
+        return module.CORRECT_PREFIX + problem.reveal_text, empty_debug
     if api_key_error:
         return None, {**empty_debug, "error": api_key_error}
     if api_key is None:
@@ -323,11 +540,28 @@ def _reply_for_row(
     return _call_llm_reply(row, variant, problem, api_key)
 
 
+def _needs_llm_call(row: dict[str, Any], variant: dict[str, Any]) -> bool:
+    """code_rules で返信を決めない行かを判定する。"""
+    if variant.get("type") != "llm_fixed":
+        return False
+    kind = row.get("kind")
+    if kind in templates.NO_REPLY_KINDS or kind in {"troll", "abuse"}:
+        return False
+    if kind == "guess_correct":
+        return bool(variant.get("llm_correct", False) and variant.get("with_truth", True))
+    return True
+
+
+def _variant_worker_count(global_workers: int, variant: dict[str, Any]) -> int:
+    return min(global_workers, variant.get("max_workers", global_workers))
+
+
 def _cache_key(case_id: str, variant_name: str) -> str:
     return f"{case_id}::{variant_name}"
 
 
-def _load_cache(path: Path = RESULTS_PATH) -> dict[str, dict[str, Any]]:
+def _load_cache(path: Path | None = None) -> dict[str, dict[str, Any]]:
+    path = RESULTS_PATH if path is None else path
     if not path.is_file():
         return {}
     data = _read_json(path, "返信試走キャッシュ")
@@ -336,7 +570,8 @@ def _load_cache(path: Path = RESULTS_PATH) -> dict[str, dict[str, Any]]:
     return data["results"]
 
 
-def _save_cache(results: dict[str, dict[str, Any]], path: Path = RESULTS_PATH) -> None:
+def _save_cache(results: dict[str, dict[str, Any]], path: Path | None = None) -> None:
+    path = RESULTS_PATH if path is None else path
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + ".tmp")
     temp.write_text(json.dumps({"version": 1, "results": results}, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -438,6 +673,11 @@ def extract_emojis(reply: str) -> list[str]:
     return list(dict.fromkeys(match.group(0) for match in _EMOJI.finditer(reply)))
 
 
+def extract_emoji_occurrences(reply: str) -> list[str]:
+    """返信にある絵文字の出現列を重複込みで返す。"""
+    return [match.group(0) for match in _EMOJI.finditer(reply)]
+
+
 def aggregate_variant(
     rows: list[dict[str, Any]],
     variant: dict[str, Any],
@@ -485,6 +725,14 @@ def aggregate_variant(
         contains_count += bool(contains)
         answer_word_rows.append({"id": row["id"], "answer": row.get("answer"), "words": list(words),
                                  "starts": bool(starts), "contains": bool(contains), "reply": reply})
+    conflict_rows = [
+        {"id": row["id"], "answer": row.get("answer"), "reply": row.get("reply"),
+         "words": [w for w in CONFLICT_WORDS.get(row.get("answer"), ()) if w in row.get("reply")]}
+        for row in yesno
+        if isinstance(row.get("reply"), str)
+        and any(w in row["reply"] for w in CONFLICT_WORDS.get(row.get("answer"), ()))
+    ]
+    newline_rows = [row["id"] for row in rows if isinstance(row.get("reply"), str) and "\n" in row["reply"].strip()]
 
     core_by_no: dict[str, list[dict[str, Any]]] = defaultdict(list)
     comment_missing_words: list[dict[str, Any]] = []
@@ -514,16 +762,28 @@ def aggregate_variant(
     emoji_counts_by_kind: Counter[str] = Counter()
     all_emoji_types: list[str] = []
     special_emoji_counts: Counter[str] = Counter()
+    unlisted_emoji_rows = []
+    multiple_emoji_rows = []
     for row in rows:
         reply = row.get("reply")
-        found = extract_emojis(reply) if isinstance(reply, str) else []
-        if not found:
+        occurrences = extract_emoji_occurrences(reply) if isinstance(reply, str) else []
+        if not occurrences:
             continue
+        found = list(dict.fromkeys(occurrences))
         emoji_counts_by_kind[str(row.get("kind", ""))] += 1
         all_emoji_types.extend(found)
         if row.get("kind") in {"complaint", "abuse", "guess_correct"}:
             special_emoji_counts[str(row["kind"])] += 1
-        emoji_rows.append({"id": row["id"], "kind": row.get("kind"), "emojis": found, "reply": reply})
+        item = {
+            "id": row["id"], "kind": row.get("kind"), "emojis": found,
+            "occurrences": occurrences, "reply": reply,
+        }
+        emoji_rows.append(item)
+        unlisted = [emoji for emoji in found if emoji not in ALLOWED_EMOJIS]
+        if unlisted:
+            unlisted_emoji_rows.append({**item, "unlisted_emojis": unlisted})
+        if len(occurrences) >= 2:
+            multiple_emoji_rows.append(item)
 
     proximity_rows = []
     for row in rows:
@@ -541,6 +801,7 @@ def aggregate_variant(
         "variant": variant["name"],
         "label": variant.get("label", variant["name"]),
         "rows": len(rows),
+        "error_count": sum(bool((row.get("debug") or {}).get("error")) for row in rows),
         "M1_length": {
             "reply_count": len(lengths),
             "average_chars": statistics.mean(lengths) if lengths else None,
@@ -558,6 +819,10 @@ def aggregate_variant(
             "contains_count": contains_count,
             "contains_rate": contains_count / len(yesno) if yesno else None,
             "items": answer_word_rows,
+            "conflict_count": len(conflict_rows),
+            "conflict_items": conflict_rows,
+            "newline_count": len(newline_rows),
+            "newline_ids": newline_rows,
         },
         "M3_variation": {
             "by_kind": {kind: _variation([row for row in rows if row.get("kind") == kind]) for kind in kinds},
@@ -577,30 +842,47 @@ def aggregate_variant(
             "reply_count": len(emoji_rows),
             "by_kind": dict(sorted(emoji_counts_by_kind.items())),
             "types": sorted(set(all_emoji_types)),
+            "allowed_emojis": list(ALLOWED_EMOJIS),
+            "unlisted_reply_count": len(unlisted_emoji_rows),
+            "unlisted_ids": [row["id"] for row in unlisted_emoji_rows],
+            "multiple_emoji_reply_count": len(multiple_emoji_rows),
+            "multiple_emoji_ids": [row["id"] for row in multiple_emoji_rows],
             "complaint_abuse_guess_correct_count": sum(special_emoji_counts.values()),
             "complaint_abuse_guess_correct_by_kind": dict(sorted(special_emoji_counts.items())),
             "items": emoji_rows,
+            "unlisted_items": unlisted_emoji_rows,
+            "multiple_emoji_items": multiple_emoji_rows,
         },
         "M6_proximity": {"count": len(proximity_rows), "items": proximity_rows},
     }
     if variant.get("type") == "llm_fixed":
         llm_rows = [
             row for row in rows
-            if row.get("kind") not in templates.NO_REPLY_KINDS | {"troll", "abuse", "guess_correct"}
+            if (
+                row.get("kind") not in templates.NO_REPLY_KINDS | {"troll", "abuse"}
+                and (
+                    row.get("kind") != "guess_correct"
+                    or (variant.get("llm_correct", False) and variant.get("with_truth", True))
+                )
+            )
         ]
         debug_rows = [row.get("debug") or {} for row in llm_rows]
         input_tokens = sum(int(debug.get("input_tokens", 0) or 0) for debug in debug_rows)
         output_tokens = sum(int(debug.get("output_tokens", 0) or 0) for debug in debug_rows)
+        thought_tokens = sum(int(debug.get("thought_tokens", 0) or 0) for debug in debug_rows)
         latencies = [float(debug.get("latency_s", 0) or 0) for debug in debug_rows]
         model = variant.get("model", "gpt-6-luna")
         prices = MODEL_PRICES_USD_PER_M.get(model)
-        cost = None if prices is None else (input_tokens * prices["input"] + output_tokens * prices["output"]) / 1_000_000
+        cost = None if prices is None else (
+            input_tokens * prices["input"] + (output_tokens + thought_tokens) * prices["output"]
+        ) / 1_000_000
         metrics["M7_llm"] = {
             "model": model,
             "request_count": len(llm_rows),
             "latency_s": _median_p95_max(latencies),
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
+            "thought_tokens": thought_tokens,
             "cost_usd": cost,
             "unit_price_usd_per_million": prices,
             "error_count": sum(bool(debug.get("error")) for debug in debug_rows),
@@ -631,12 +913,14 @@ def _report_lines(metrics_by_variant: dict[str, dict[str, Any]], excluded: dict[
         lines.extend([
             "",
             f"## {name}: {metrics['label']} ({metrics['rows']} 件)",
+            f"- error: {metrics['error_count']} 件",
             f"- M1 字数: 平均 {avg} / 最大 {max_chars} / 80 字超 {m1['over_80_count']} 件 ({', '.join(m1['over_80_ids']) or '該当なし'})",
             f"- M1 q_yesno 一言 20 字超: {m1['q_yesno_one_liner_over_20_count']} 件 ({', '.join(m1['q_yesno_one_liner_over_20_ids']) or '該当なし'})",
             f"- M2 判定語: 冒頭 {m2['starts_count']}/{m2['q_yesno_count']} ({starts_rate}) / 含む {m2['contains_count']}/{m2['q_yesno_count']} ({contains_rate})",
+            f"- M2b 判定の食い違い: {m2.get('conflict_count', 0)} 件 / 改行を含む返信 {m2.get('newline_count', 0)} 件",
             f"- M3 q_yesno 一言: 異なる {m3['q_yesno_one_liner']['distinct_replies']} 種 / 最頻 {one_liner_rate_text} ({one_liner_flag}) / 判定語のみ {m3['q_yesno_one_liner_empty_count']} 件 ({empty_rate})",
             f"- M4 CORE 語候補 {m4['core_count']} 件 / コメントにない内容語 {m4['comment_missing_content_words_count']} 件",
-            f"- M5 絵文字返信 {m5['reply_count']} 件 / 種類 {', '.join(m5['types']) if m5['types'] else 'なし'} / complaint・abuse・guess_correct {m5['complaint_abuse_guess_correct_count']} 件",
+            f"- M5 絵文字返信 {m5['reply_count']} 件 / 種類 {', '.join(m5['types']) if m5['types'] else 'なし'} / 許可外 {m5['unlisted_reply_count']} 件 / 2個以上 {m5['multiple_emoji_reply_count']} 件 / complaint・abuse・guess_correct {m5['complaint_abuse_guess_correct_count']} 件",
             f"- M6 近さを示す語 {m6['count']} 件",
             "- M1 種別ごとの平均 / 最大字数:",
         ])
@@ -678,7 +962,7 @@ def _report_lines(metrics_by_variant: dict[str, dict[str, Any]], excluded: dict[
                 if latency["median"] is not None else "対象なし"
             )
             cost_text = f"${m7['cost_usd']:.6f}" if m7["cost_usd"] is not None else "単価未登録"
-            lines.append(f"- M7 LLM: 応答時間 中央値/p95/最大 {latency_text} / input {m7['input_tokens']}・output {m7['output_tokens']} tokens / {cost_text} / error {m7['error_count']} 件")
+            lines.append(f"- M7 LLM: 応答時間 中央値/p95/最大 {latency_text} / input {m7['input_tokens']}・output {m7['output_tokens']}・thought {m7['thought_tokens']} tokens / {cost_text} / error {m7['error_count']} 件")
     return lines
 
 
@@ -749,7 +1033,7 @@ def main(argv: list[str] | None = None) -> int:
             modules[variant["name"]] = templates
 
     cache = _load_cache()
-    jobs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    jobs_by_variant: dict[str, list[dict[str, Any]]] = defaultdict(list)
     keys_by_variant: dict[str, list[str]] = defaultdict(list)
     for variant in selected_variants:
         method = variant["source_method"]
@@ -759,51 +1043,59 @@ def main(argv: list[str] | None = None) -> int:
             if args.from_cache and key not in cache:
                 raise FileNotFoundError(f"--from-cache で必要な返信結果がありません: {key}")
             if args.force or key not in cache:
-                jobs.append((row, variant))
+                jobs_by_variant[variant["name"]].append(row)
             else:
                 cache[key] = _refresh_cached_row(cache[key], row, variant)
 
     needs_problem: set[str] = set()
-    needs_llm = False
-    for row, variant in jobs:
-        kind = row["kind"]
-        if variant["type"] == "template" and kind == "guess_correct":
-            needs_problem.add(row["no"])
-        elif variant["type"] == "llm_fixed":
-            if kind == "guess_correct":
+    providers_needed: set[str] = set()
+    for variant in selected_variants:
+        for row in jobs_by_variant[variant["name"]]:
+            kind = row["kind"]
+            if variant["type"] == "template" and kind == "guess_correct":
                 needs_problem.add(row["no"])
-            elif kind not in templates.NO_REPLY_KINDS and kind not in {"troll", "abuse"}:
-                needs_problem.add(row["no"])
-                needs_llm = True
+            elif variant["type"] == "llm_fixed":
+                if kind == "guess_correct":
+                    needs_problem.add(row["no"])
+                if _needs_llm_call(row, variant):
+                    needs_problem.add(row["no"])
+                    providers_needed.add(variant.get("provider", "openai"))
     problems = {no: load_problem(no) for no in sorted(needs_problem)}
-    api_key: str | None = None
-    api_key_error: str | None = None
-    if needs_llm:
+    credentials: dict[str, tuple[str | None, str | None]] = {}
+    for provider in providers_needed:
         try:
-            api_key = pattern1_luna.load_api_key()
+            credentials[provider] = (_load_provider_api_key(provider), None)
         except Exception as exc:  # noqa: BLE001 - API キー不足も各行に記録する
-            api_key_error = str(exc)
+            credentials[provider] = (None, str(exc))
 
-    if jobs:
-        with ThreadPoolExecutor(max_workers=args.workers) as pool:
-            futures = {
-                pool.submit(
-                    _run_job,
-                    row,
-                    variant,
-                    problems.get(row["no"], Problem(
-                        no=row["no"], problem_text=row.get("problem_text", ""), truth="", fact_sheet=[],
-                        truth_points=[], reveal_text="", core_points=[]
-                    )),
-                    modules[variant["name"]],
-                    api_key,
-                    api_key_error,
-                ): (row, variant)
-                for row, variant in jobs
-            }
-            for future in as_completed(futures):
-                row, variant = futures[future]
-                cache[_cache_key(row["id"], variant["name"])] = future.result()
+    has_jobs = any(jobs_by_variant.values())
+    if has_jobs:
+        for variant in selected_variants:
+            variant_jobs = jobs_by_variant[variant["name"]]
+            if not variant_jobs:
+                continue
+            provider = variant.get("provider", "openai")
+            api_key, api_key_error = credentials.get(provider, (None, None))
+            variant_workers = _variant_worker_count(args.workers, variant)
+            with ThreadPoolExecutor(max_workers=variant_workers) as pool:
+                futures = {
+                    pool.submit(
+                        _run_job,
+                        row,
+                        variant,
+                        problems.get(row["no"], Problem(
+                            no=row["no"], problem_text=row.get("problem_text", ""), truth="", fact_sheet=[],
+                            truth_points=[], reveal_text="", core_points=[]
+                        )),
+                        modules[variant["name"]],
+                        api_key,
+                        api_key_error,
+                    ): row
+                    for row in variant_jobs
+                }
+                for future in as_completed(futures):
+                    row = futures[future]
+                    cache[_cache_key(row["id"], variant["name"])] = future.result()
         _save_cache(cache)
     elif not args.from_cache and not args.force:
         # Preserve a cache file for a valid empty selection and keep the format stable.
