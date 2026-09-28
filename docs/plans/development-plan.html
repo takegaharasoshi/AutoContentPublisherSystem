@@ -691,19 +691,19 @@
 <article class="plan-step" id="step-21-6c" data-step-id="21-6c" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-6c</strong><span class="plan-status">未着手</span></div>
-<h3>本番 Lambda の実装（2 方式を切り替え可能に）とローカル試行ツール</h3>
+<h3>本番 Lambda の実装（判定 2 実装 + 組み合わせ 3 モード）とローカル試行ツール</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-6b・21-6b2 の完了後（判定の方針と返信文の作り方が決まっていること）。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>PoC の handler を <code>services/comment-reply/</code> の Webhook（署名検証・自己返信スキップ → SQS）と Reply（S3 → 判定モジュール → Graph API）に分割・移植し、判定モジュールをパターン 1 / 2 の 2 実装にして環境変数で切り替える。人間プローブ用に、問題を選んでコメントを打つと 2 方式の返信を並べて返す<strong>ローカル試行ツール（CLI）</strong>も用意する。あわせて Reply が 1 コメントにつき 1 件の<strong>コメント記録 JSON</strong>（受信・判定・返信の全記録。継続改善用・取り込みは <a href="#step-21-7b">21-7b</a>）を S3 に書く。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。コメント記録の書き込み失敗で返信を止めない（警告ログのみ）。ローカル試行ツールは判定モジュールをそのまま呼び、Instagram と AWS は使わない。<code>infra/</code> には触れない（21-6f）。</p></div>
+<div data-field="overview"><p>PoC の handler を <code>services/comment-reply/</code> の Webhook（署名検証・自己返信スキップ → SQS）と Reply（S3 → 判定モジュール → Graph API）に分割・移植する。判定モジュールは、<strong>判定の実装 2 つ</strong>（パターン 1 = luna・パターン 2 = Jev。同じ契約 = <a href="../app/sets/umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a>）と、それをどう使うかを決める<strong>組み合わせ役 1 つ</strong>に分け、組み合わせを環境変数で <strong>3 モード</strong>に切り替える — ① luna 単体 ② Jev 単体（luna が止まったときの逃げ道にもなる）③ ハイブリッド（<a href="../app/sets/umigame-soup-1.html#judge-policy">21-6b の暫定方針</a> = luna で返信し、Jev は見張り役〔食い違いのログ〕として並走、正解宣言は 2 方式が合意したときだけ）。ハイブリッドの見張り役と合意制はそれぞれ個別にオン / オフできるようにする（21-6d で「luna 単体」と「luna + 合意制」を設定だけで比べるため）。返信文を書く部分は、21-6b2 の結果（例: Jev の判定のあとに軽量な LLM で文章を書く）に合わせて判定と別の部品にする。人間プローブ用に、問題を選んでコメントを打つと 3 モードの返信を並べて返す<strong>ローカル試行ツール（CLI）</strong>も用意する。あわせて Reply が 1 コメントにつき 1 件の<strong>コメント記録 JSON</strong>（受信・判定・返信の全記録。継続改善用・取り込みは <a href="#step-21-7b">21-7b</a>）を S3 に書く。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>判定ロジックは 2 実装にだけ書き、モードごとに複製しない（ハイブリッドは 2 実装を部品として呼ぶ）。モードの既定値はハイブリッド（暫定。最終決定は 21-6e）。ステージング / 本番の切替は Webhook 先と Secret の値で行う（コードを分けない）。コメント記録の書き込み失敗で返信を止めない（警告ログのみ）。ローカル試行ツールは判定モジュールをそのまま呼び、Instagram と AWS は使わない。<code>infra/</code> には触れない（21-6f）。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li>pytest 全パス（要約行を貼る）。</li>
-<li>ローカル試行ツールで 1 問・1 コメントを 2 方式に通した出力を貼る（コメント記録 JSON がスキーマどおりに出ることを含む。ローカルではファイル出力）。</li>
+<li>ローカル試行ツールで 1 問・数コメント（質問・推理・正解推理・不適切を含む）を 3 モードに通した出力を貼る（ハイブリッドの見張り役の食い違い記録と、合意制で意見が割れたときの定型文を含む。コメント記録 JSON がスキーマどおりに出ることも確かめる。ローカルではファイル出力）。</li>
 <li>日本語メッセージでコミット。</li>
 </ol>
 </section>
@@ -716,6 +716,8 @@
 <details class="plan-fold" data-field="implementation">
 <summary>4. 実装の細部・背景 <span class="plan-hint">— 旧 21-6 ① の内訳</span></summary>
 <div class="plan-fold-inner">
+<p><strong>組み合わせの 3 モード（2026-09-28 にユーザーと整理）</strong>: 環境変数の例 = <code>JUDGE_MODE</code>（<code>luna</code> / <code>jev</code> / <code>hybrid</code>）・<code>JUDGE_SHADOW</code>（見張り役のオン / オフ）・<code>JUDGE_CONSENSUS</code>（合意制のオン / オフ）。ハイブリッドの中身: luna の判定で返信し、Jev の判定は返信に使わずコメント記録と食い違いのログに残す。正解宣言は Jev も ④ のときだけで、luna だけが ④ なら開示せず専用の定型文（例「核心にかなり迫っています！何が起きたのかを通して説明してみてください」、複数の言い回し）で説明の追加を促し、食い違いを記録してユーザーに知らせる（通知の配線と、手動で正解を伝える手段は本ステップで決め、アラームの基盤は 21-6f）。Jev だけが ④ なら luna の判定どおりに返してログのみ。Jev の呼び出しが失敗したら、ハイブリッドは luna 単体として続ける（開示は慎重側 = 合意が取れないので開示しない）。</p>
+<p><strong>21-6b から持ち込むもの</strong>: 判定のロジックと閾値は試走の最終版（試行 8b）を出発点にする（パターン 1 = <code>judge-trial/prompts/pattern1_rules.txt</code>・effort <code>xhigh</code>・出力上限 2,400、パターン 2 = <code>judge-trial/pattern2_jev.py</code> の段 0〜D と閾値）。OpenAI の 429・5xx は再試行の対象にする（試行 7 で 6 並列が 429 になった）。luna のモデルは日付付きの ID があれば固定する。問題 JSON に <code>core_points</code>・<code>support_points</code>・<code>reveal_text</code> を足す（方式設計書 <code>umigame-prebuilt.html</code> とスナップショット 10.2 の更新・14 問分の文面の作成とレビューを含む）。コメント記録 JSON には両方の判定と食い違いの有無も入れる。</p>
 <p>旧 21-6 ①: Lambda コード <code>services/comment-reply/</code>（Webhook 受信〔署名検証・自己返信スキップ〕→ SQS enqueue / Reply〔S3 GET <code>problems/{media_id}.json</code> → 判定モジュール → Graph API 返信〕。PoC handler を分割・移植、pytest）。</p>
 <p>課題表の照合: <a href="../issues/index.html#I-031">I-031</a>（コメント返信用トークンの自動更新）は本ステップでは扱わない（独立ステップ <a href="#step-21-6g">21-6g</a> へ展開済み）。</p>
 <p><strong>コメント記録 JSON</strong>（アイデア <a href="../ideas/umigame-comment-reply-logging.md">umigame-comment-reply-logging</a> から 2026-09-26 に転記）: キー <code>comment-log/umigame-soup-1/dt=YYYY-MM-DD/{comment_id}.json</code>。項目 = コメント ID・親コメント ID・<code>media_id</code>・問題 ID・コメント者のアプリスコープ ID（<strong>username は持たない</strong>）・本文・時刻 4 種（Meta 側作成 / Webhook 受信 / 判定 / 返信）・判定ラベル・判定理由の短文（構造化出力に 1 項目足す）・返信文・返信 ID・モデル名・プロンプトと確定事実シートのバージョン・エラー。スキーマは<a href="../app/sets/umigame-soup-1.html">セット設計書</a> セクション 10 に書く。Webhook 受信時刻は SQS メッセージに載せて Reply へ渡す。</p>
