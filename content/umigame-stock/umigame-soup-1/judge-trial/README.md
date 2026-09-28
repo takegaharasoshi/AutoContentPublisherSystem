@@ -73,3 +73,16 @@ bash -ic 'cd /home/takegaharawork/projects/AutoContentPublisherSystem/content/um
 ```bash
 /home/takegaharawork/projects/AutoContentPublisherSystem/services/image-batch/.venv/bin/python -m pytest -q tests
 ```
+
+## 検討ページの生成（21-6b）
+
+`build_study_page.py` は、試走の結果（`work/trial_results*.json`。gitignore なのでこの PC にだけある）から
+検討ページ `docs/app/sets/umigame-soup-1-judge-study.html` を組み立てる。本文はスクリプト内のテンプレートに直書きしている。
+
+```bash
+services/image-batch/.venv/bin/python content/umigame-stock/umigame-soup-1/judge-trial/build_study_page.py
+```
+
+試行を足すときは、前回のキャッシュを `work/trial_results_runN.json` として残してから `run_trial.py` を回し、
+スクリプトの `TRIALS` と実費の計算・3.3 の記録・4〜7 章の本文を書き換えて実行する。
+判定品質の検討は試行 8b で完了（21-6b）。返信文の品質の検討（21-6b2）は別の検討ページで行う。
