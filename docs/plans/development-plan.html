@@ -654,7 +654,7 @@
 <div class="plan-meta"><strong>21-6b2</strong><span class="plan-status">進行中</span></div>
 <h3>返信文の品質の検討と試走</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-6b 完了後（判定品質の方針 = パターン 1 主役 + Jev の見張り役・開示の二重確認が暫定で決まっていること）。</p>
-<p data-field="result"><strong>現況：</strong>ゴール 1/2（基準と案の設計）の途中。基準の叩き台（人が見る H1〜H5・機械で数える M1〜M7）と作り方の案 6 つ（1a〜2c）を提示し、口調・絵文字・復唱・一言の割合・近さを示す語の禁止の 5 論点がユーザー判断待ち。<a href="../app/sets/umigame-soup-1-reply-study.html">検討ページ</a>と、判定を固定して返信文だけを作り直す試走スクリプト（<code>judge-trial/run_reply_trial.py</code>）を用意した。試走の本実行はゴール 2。</p>
+<p data-field="result"><strong>現況：</strong>ゴール 1/2（基準と案の設計）の途中。基準の叩き台（人が見る H1〜H5・機械で数える M1〜M7）と作り方の案 6 つ（1a〜2c）を提示し、口調・絵文字・復唱・近さを示す語の禁止を決め、案 1d を追加した。一言の割合・一人称・2c のモデルが判断待ち。<a href="../app/sets/umigame-soup-1-reply-study.html">検討ページ</a>と、判定を固定して返信文だけを作り直す試走スクリプト（<code>judge-trial/run_reply_trial.py</code>）を用意した。試走の本実行はゴール 2。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -683,7 +683,7 @@
 </details>
 <details class="plan-fold" data-field="record">
 <summary>5. 作業記録 <span class="plan-hint">— ゴール 1/2 の途中</span></summary>
-<div class="plan-fold-inner"><p><strong>2026-09-28（ゴール 1/2）</strong>: 基準と案の設計（①〜③）と試走（④）でゴールを分けた。基準の叩き台 = 人が見る H1 口調の一貫性・H2 キャラらしさ・H3 噛み合い・H4 くどさ・H5 公平さ（一言がヒントにならない）、機械で数える M1 字数・M2 冒頭の判定語・M3 言い回しの散らばり・M4 漏れ候補（CORE 語 + コメントにない内容語）・M5 絵文字・M6 近さを示す語・M7 費用と応答時間。案 = 1a 今のパターン 1・1b 手順 3 の作り直し・1c luna の判定 + 定型文・2a 今のパターン 2・2b 定型文の作り直し・2c Jev の判定 + 軽量 LLM（真相を渡さない。第 1 候補 <code>gpt-6-luna</code> effort <code>low</code>）。発見: リールのカメロックはくだけた口調（「質問してみて！」「何度でも答えるよ」）なのに、返信のプロンプトと定型文は丁寧な探偵口調で食い違っている。今の返信を集計すると、1a は ⑤ 惜しいが 8/8 件同じ・⑥ 外れが 10/11 件同じで、「はい。鋭い質問ですね。」のような近さを示す一言が 5 件あった（H5 の根拠）。試走スクリプト <code>run_reply_trial.py</code> は Codex に委譲し、Claude が <code>llm_correct</code>（真相ありの案だけ正解の開示を LLM に書かせる）を足した（pytest 28 件パス）。検討ページは <code>build_reply_study_page.py</code> で生成する。ユーザー判断待ちの 5 論点は<a href="../app/sets/umigame-soup-1-reply-study.html#open">検討ページ 1.4</a>。</p></div>
+<div class="plan-fold-inner"><p><strong>2026-09-28（ゴール 1/2）</strong>: 基準と案の設計（①〜③）と試走（④）でゴールを分けた。基準の叩き台 = 人が見る H1 口調の一貫性・H2 キャラらしさ・H3 噛み合い・H4 くどさ・H5 公平さ（一言がヒントにならない）、機械で数える M1 字数・M2 冒頭の判定語・M3 言い回しの散らばり・M4 漏れ候補（CORE 語 + コメントにない内容語）・M5 絵文字・M6 近さを示す語・M7 費用と応答時間。案 = 1a 今のパターン 1・1b 手順 3 の作り直し・1c luna の判定 + 定型文・2a 今のパターン 2・2b 定型文の作り直し・2c Jev の判定 + 軽量 LLM（真相を渡さない。第 1 候補 <code>gpt-6-luna</code> effort <code>low</code>）。発見: リールのカメロックはくだけた口調（「質問してみて！」「何度でも答えるよ」）なのに、返信のプロンプトと定型文は丁寧な探偵口調で食い違っている。今の返信を集計すると、1a は ⑤ 惜しいが 8/8 件同じ・⑥ 外れが 10/11 件同じで、「はい。鋭い質問ですね。」のような近さを示す一言が 5 件あった（H5 の根拠）。試走スクリプト <code>run_reply_trial.py</code> は Codex に委譲し、Claude が <code>llm_correct</code>（真相ありの案だけ正解の開示を LLM に書かせる）を足した（pytest 28 件パス）。検討ページは <code>build_reply_study_page.py</code> で生成する。ユーザー判断待ちの 5 論点は<a href="../app/sets/umigame-soup-1-reply-study.html#open">検討ページ 1.4</a>。</p><p><strong>2026-09-28（ユーザー判断）</strong>: 口調 = リールに合わせたくだけた口調（パパが息子に話しかけるイメージ）、絵文字 = 決めた一覧から 1 個まで（⑮⑲・開示には付けない）、復唱 = ① だけ質問の言葉の範囲で許す、H5・M6（近さを示す語の禁止）を基準に入れる。案 1d（luna の判定 + 軽量 LLM の書き手）を追加し、2c の書き手のモデルは 2 パターン試す（ユーザーが別途指定）。一言を付ける割合（「一言なし」を候補に混ぜる案）と一人称は判断待ち。ゴールはここで解除（ユーザー）。</p></div>
 </details>
 </div>
 </article>
