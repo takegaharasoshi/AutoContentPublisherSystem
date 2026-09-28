@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import html
 import json
+import re
+from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -17,6 +19,7 @@ REPO = HERE.parents[3]
 OUT = REPO / "docs" / "app" / "sets" / "umigame-soup-1-reply-study.html"
 METRICS = HERE / "work" / "reply_metrics.json"
 COMPARE = HERE / "work" / "reply_compare.json"
+VARIANTS = HERE / "reply_variants.json"
 
 UPDATED = "2026-09-28（21-6b2 ゴール 2: 13 案の試走 1 回目。基準と見比べの確認待ち）"
 
@@ -172,6 +175,65 @@ def compare_section(compare: dict | None, variant_names: list[str]) -> str:
     return "\n".join(parts)
 
 
+EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF\u2600-\u27BF]")
+
+
+def per_variant_section(compare: dict | None, metrics: dict | None) -> str:
+    """案ごとに、その案の判定した種別で返信をまとめた表（件数・字数・散らばり・絵文字・機械検査・例）。"""
+    if not compare or not metrics:
+        return "<p>データはまだない。</p>"
+    variants = {v["name"]: v for v in json.loads(VARIANTS.read_text(encoding="utf-8"))}
+    parts = []
+    for name, m in metrics["variants"].items():
+        method = variants.get(name, {}).get("source_method", "p1")
+        flagged: dict[str, list[str]] = {}
+        for it in m["M2_answer_word"].get("conflict_items", []):
+            flagged.setdefault(it["id"], []).append("食い違い")
+        for group in m["M4_leak_candidates"]["core_by_no"].values():
+            for it in group["items"]:
+                flagged.setdefault(it["id"], []).append("CORE 語")
+        for it in m["M6_proximity"]["items"]:
+            flagged.setdefault(it["id"], []).append("近さ")
+        by_kind: dict[str, list[tuple[str, str | None]]] = {}
+        for case_id, case in compare["cases"].items():
+            kind = (case.get("kind") or {}).get(method) or "other"
+            by_kind.setdefault(kind, []).append((case_id, case.get("variants", {}).get(name)))
+        rows = []
+        for code, kname in KINDS:
+            items = sorted(by_kind.get(code, []))
+            if not items:
+                continue
+            replies = [r for _, r in items if r is not None]
+            lengths = [len(r) for r in replies]
+            counter = Counter(replies)
+            if replies:
+                top, top_n = counter.most_common(1)[0]
+                top_text = f"{esc(top) or '（空）'}（{top_n}/{len(replies)}・{top_n / len(replies):.0%}）"
+                length_text = f"{sum(lengths) / len(lengths):.1f} / {max(lengths)}"
+            else:
+                top_text, length_text = "（返信しない）", "—"
+            emoji = sum(bool(EMOJI_RE.search(r)) for r in replies)
+            flags = Counter(f for cid, _ in items for f in flagged.get(cid, []))
+            flag_text = "・".join(f"{k} {v}" for k, v in flags.items()) or "—"
+            seen: list[str] = []
+            for _, r in items:
+                if r is not None and r not in seen:
+                    seen.append(r)
+                if len(seen) == 2:
+                    break
+            examples = "<br>".join(esc(r).replace("\n", " ⏎ ") for r in seen) or "—"
+            rows.append([esc(kname), str(len(items)), length_text, str(len(counter)), top_text, str(emoji),
+                         flag_text, examples])
+        head = ["種別（この案の判定）", "件数", "字数 平均 / 最大", "異なる言い回し", "最も多い言い回し", "絵文字", "機械検査", "返信の例（最初の 2 通り）"]
+        judge = "パターン 1（luna）" if method == "p1" else "パターン 2（Jev）"
+        parts.append(
+            f'<details class="cmp-kind"><summary>{esc(name)} {esc(m.get("label"))}</summary>'
+            f'<p class="trend-note">種別は{judge}の判定（試行 8b）。機械検査は判定の食い違い（M2b）・CORE 語（M4）・近さの語（M6）の件数。</p>'
+            f'{table(head, rows, "per-variant")}</details>'
+        )
+    return "\n".join(parts)
+
+
 def build() -> str:
     metrics = load_json(METRICS)
     compare = load_json(COMPARE)
@@ -193,6 +255,9 @@ def build() -> str:
 <style>
 .kid {{ font-weight: 700; }}
 table.metrics td {{ white-space: nowrap; }}
+table.per-variant {{ font-size: .82rem; }}
+table.per-variant td:nth-child(1) {{ white-space: nowrap; font-weight: 700; }}
+table.per-variant td:nth-child(5), table.per-variant td:nth-child(8) {{ min-width: 14rem; }}
 details.cmp-kind {{ margin: .5rem 0; border: 1px solid var(--border); border-radius: 8px; padding: 0 .6rem; }}
 details.cmp-kind > summary {{ cursor: pointer; font-weight: 700; font-size: .95rem; padding: .5rem 0; min-height: 36px; }}
 .cmp-card {{ border-top: 1px solid var(--border); padding: .5rem 0; }}
@@ -251,7 +316,11 @@ details.cmp-kind > summary {{ cursor: pointer; font-weight: 700; font-size: .95r
 <p>同じコメントに対する案ごとの返信を並べる。種別は評価データの正解ラベルで分けた（判定が違った案は「判定が違う」と書く）。括弧内は ① の判定。</p>
 {compare_section(compare, variant_names)}
 
-<h2 id="next">5. 次の打ち手の候補（人間ゲートのあと）</h2>
+<h2 id="per-variant">5. 案ごとの種別別の結果</h2>
+<p>案を 1 つ開くと、その案の返信を種別ごとにまとめて見られる（4 章はコメントごとに案を並べる、この章は案ごとに種別を並べる）。種別はその案が使った判定（パターン 1 か 2）の結果で分けた。</p>
+{per_variant_section(compare, metrics)}
+
+<h2 id="next">6. 次の打ち手の候補（人間ゲートのあと）</h2>
 <ul>
   <li>小型モデルを残すなら、判定語はコードが付けて、書き手には判定語のあとの一言（20 字以内）だけを書かせる形を試す（判定を書き換える余地をなくす。種別のコードやプロンプトの文面を返信に写す事故も、返信を一言に限れば見つけやすい）</li>
   <li>書き手の出力に機械の検査（判定語との食い違い・一覧外の絵文字・改行・種別のコード）をかけ、落ちたら定型文（2b）に差し替える安全網を試す</li>
