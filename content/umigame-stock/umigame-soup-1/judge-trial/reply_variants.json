@@ -1,0 +1,21 @@
+[
+  {
+    "name": "1a",
+    "label": "現行パターン 1",
+    "source_method": "p1",
+    "type": "as_is"
+  },
+  {
+    "name": "2a",
+    "label": "現行パターン 2",
+    "source_method": "p2",
+    "type": "as_is"
+  },
+  {
+    "name": "1c",
+    "label": "luna 判定 + 現行定型文",
+    "source_method": "p1",
+    "type": "template",
+    "templates_module": "templates"
+  }
+]

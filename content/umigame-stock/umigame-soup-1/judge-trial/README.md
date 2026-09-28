@@ -86,3 +86,16 @@ services/image-batch/.venv/bin/python content/umigame-stock/umigame-soup-1/judge
 試行を足すときは、前回のキャッシュを `work/trial_results_runN.json` として残してから `run_trial.py` を回し、
 スクリプトの `TRIALS` と実費の計算・3.3 の記録・4〜7 章の本文を書き換えて実行する。
 判定品質の検討は試行 8b で完了（21-6b）。返信文の品質の検討（21-6b2）は別の検討ページで行う。
+
+## 返信文の試走（21-6b2）
+
+`run_reply_trial.py` は `work/trial_results.json` の判定結果を固定し、案ごとの返信文・集計を `work/` に保存します。初期案は現行パターン 1、現行パターン 2、パターン 1 の判定に現行定型文を組み合わせる案です。
+
+```bash
+python run_reply_trial.py
+python run_reply_trial.py --variants 1a 1c --only U01 U13 --workers 3
+python run_reply_trial.py --from-cache
+python run_reply_trial.py --force --variants 1a 2a 1c
+```
+
+案は `reply_variants.json` で定義します。返信案の実行結果・集計・見比べ用データはそれぞれ `work/reply_results.json`、`work/reply_report.md` と `work/reply_metrics.json`、`work/reply_compare.json` に保存します。`llm_fixed` 案を追加するときは `prompts/` 内の prompt ファイルを指定できます。
