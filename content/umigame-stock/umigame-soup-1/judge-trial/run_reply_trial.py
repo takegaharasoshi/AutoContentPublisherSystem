@@ -49,7 +49,8 @@ CONFLICT_WORDS = {
     "unknown": ("はい", "いいえ"),
 }
 PROXIMITY_WORDS = ("鋭い", "いい線", "近い", "近づ", "核心", "惜しい", "迫っ", "着眼点")
-ALLOWED_EMOJIS = ("🐢", "🔍", "🥣", "📝")
+# 2026-09-29 ユーザー指定で差し替え（旧: 🐢 🔍 🥣 📝）
+ALLOWED_EMOJIS = ("☺️", "😌", "😉", "🧐", "🙂‍↕️", "🙂‍↔️", "🥳", "🙌", "👏", "🤔", "🫢", "🤭", "🤐")
 MODEL_PRICES_USD_PER_M = {
     "gpt-6-luna": {"input": 0.10, "output": 0.50},
     "qwen/qwen3.5-9b": {"input": 0.10, "output": 0.15},
@@ -62,7 +63,7 @@ _EMOJI = re.compile(
     r"(?:[#*0-9]\ufe0f?\u20e3|[\U0001f1e6-\U0001f1ff]{2}|"
     r"[\u2300-\u23ff\u2600-\u27bf\U0001f000-\U0001faff]"
     r"\ufe0f?(?:[\U0001f3fb-\U0001f3ff])?"
-    r"(?:\u200d[\u2300-\u23ff\u2600-\u27bf\U0001f000-\U0001faff]"
+    r"(?:\u200d[\u2190-\u21ff\u2300-\u23ff\u2600-\u27bf\U0001f000-\U0001faff]"
     r"\ufe0f?(?:[\U0001f3fb-\U0001f3ff])?)*"
     r")"
 )

@@ -396,12 +396,12 @@ def test_reply_metrics_m2_to_m6_and_length_metrics() -> None:
         {
             "id": "fake-q1", "no": "N1", "kind": "q_yesno", "answer": "yes",
             "expected_kind": "q_yesno", "comment_text": "架空コメント。",
-            "reply": "はい。秘密の青空は核心に近い🔍",
+            "reply": "はい。秘密の青空は核心に近い🤔",
         },
         {
             "id": "fake-q2", "no": "N1", "kind": "q_yesno", "answer": "yes",
             "expected_kind": "q_yesno", "comment_text": "架空コメント。",
-            "reply": "はい。秘密の青空は核心に近い🔍",
+            "reply": "はい。秘密の青空は核心に近い🤔",
         },
         {
             "id": "fake-q3", "no": "N1", "kind": "q_yesno", "answer": "no",
@@ -458,7 +458,7 @@ def test_reply_metrics_m2_to_m6_and_length_metrics() -> None:
     assert all("秘密" not in item["words"] for item in missing_items)
     assert metrics["M5_emoji"]["reply_count"] == 4
     assert metrics["M5_emoji"]["complaint_abuse_guess_correct_count"] == 2
-    assert set(metrics["M5_emoji"]["types"]) == {"🔍", "✨"}
+    assert set(metrics["M5_emoji"]["types"]) == {"🤔", "✨"}
     assert metrics["M5_emoji"]["unlisted_reply_count"] == 2
     assert metrics["M5_emoji"]["unlisted_ids"] == ["fake-complaint", "fake-correct"]
     assert metrics["M5_emoji"]["multiple_emoji_reply_count"] == 1
