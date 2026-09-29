@@ -21,7 +21,7 @@ METRICS = HERE / "work" / "reply_metrics.json"
 COMPARE = HERE / "work" / "reply_compare.json"
 VARIANTS = HERE / "reply_variants.json"
 
-UPDATED = "2026-09-29（21-6b2 ゴール 2: 4 案を試走 3 回目〔🙂‍↕️ 🙂‍↔️ を外した〕・料金表を追加。基準と見比べの確認待ち）"
+UPDATED = "2026-09-29（21-6b2 完了: 基準と見比べをユーザーが確認。候補は 1b・1d-luna・2b・2c-luna）"
 
 # 種別の表示順と名前（5.1.1 の ①〜㉒）
 KINDS: list[tuple[str, str]] = [
@@ -60,7 +60,7 @@ CRITERIA_MACHINE: list[tuple[str, str, str, str]] = [
     ("M7 費用・応答時間", "軽量 LLM を呼ぶ案だけ。応答時間の中央値・p95・最大、1 件あたりの金額", "参考値（方式選定は 21-6e）", "叩き台"),
 ]
 OPEN_DECISIONS: list[str] = [
-    "基準（1.1〜1.3）と見比べ（4 章）の確認（ユーザー。21-6b2 の人間ゲート）",
+    "なし（2026-09-29 に基準と見比べをユーザーが確認。4 案からの決定は 21-6c 以降・方式の選定は 21-6e）",
 ]
 
 # ② 作り方の案（name, 判定元, 文章の作り方, 真相を渡すか, 費用・応答時間, 状態）
@@ -290,7 +290,7 @@ details.cmp-kind > summary {{ cursor: pointer; font-weight: 700; font-size: .95r
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / <a href="umigame-soup-1.html">探偵カメロックのウミガメのスープ</a> / コメント返信文の品質の検討</nav>
 <h1>コメント返信文の品質の検討</h1>
 <div class="page-meta">
-  <span class="badge badge-draft">検討中（21-6b2）</span>
+  <span class="badge badge-fixed">返信文の品質の検討は完了（21-6b2・2026-09-29）</span>
   <span>set_code: umigame-soup-1</span>
   <span>最終更新: {esc(UPDATED)}</span>
 </div>
@@ -352,7 +352,7 @@ details.cmp-kind > summary {{ cursor: pointer; font-weight: 700; font-size: .95r
 <p>案を 1 つ開くと、その案の返信を種別ごとにまとめて見られる（4 章はコメントごとに案を並べる、この章は案ごとに種別を並べる）。種別はその案が使った判定（パターン 1 か 2）の結果で分けた。</p>
 {per_variant_section(compare, metrics)}
 
-<h2 id="next">6. 次の打ち手の候補（人間ゲートのあと）</h2>
+<h2 id="next">6. 次の打ち手の候補（21-6c 以降）</h2>
 <ul>
   <li>小型モデルを残すなら、判定語はコードが付けて、書き手には判定語のあとの一言（20 字以内）だけを書かせる形を試す（判定を書き換える余地をなくす。種別のコードやプロンプトの文面を返信に写す事故も、返信を一言に限れば見つけやすい）</li>
   <li>書き手の出力に機械の検査（判定語との食い違い・一覧外の絵文字・改行・種別のコード）をかけ、落ちたら定型文（2b）に差し替える安全網を試す</li>

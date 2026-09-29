@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-28（<strong>21-6b 完了</strong>: 試行 8b で両方式とも P1〜P7・レベル 1 の機械基準を満たし、判定の暫定方針を「パターン 1 主役 + Jev は見張り役と開示の二重確認」に整理。返信文の品質の検討を <a href="#step-21-6b2">21-6b2</a> として起票。次は 21-6b2）。前回: 2026-09-27（<strong>21-6b 設計と試走</strong>: 判定モジュールの契約と 2 方式の機能設計を<a href="../app/sets/umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a> に書き、185 件で試走〔種別一致率 パターン 1 = 96.2% / パターン 2 = 73.5%〕。effort <code>xhigh</code>・上限 800 を承認し、試行錯誤の記録用に<a href="../app/sets/umigame-soup-1-judge-study.html">検討ページ</a>を新設）。前回: 2026-09-27（<strong>21-6a 完了</strong>: コメント返信の品質レベルを<a href="../app/sets/umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a> に定義。最低 = レベル 1 + 前提条件 P1〜P7・目標 = レベル 2・コメント種別 22 種。次は 21-6b）。前回: 2026-09-27（<strong>21-5c 完了</strong>: TTS を Irodori-TTS〔BF16・声 G4 のクローン〕へ切り替えて 14 本を作り直し、全数試聴を経て publish で両環境へ反映）。前回: 2026-09-26（<strong>21-5c を起票</strong>: アイデア「<a href="../ideas/umigame-tts-gemini-flash.md">Gemini 3.8 Flash TTS で動画音声を作る</a>」を採用。ナレーションを声 G4 の Gemini TTS へ切り替えて 14 本を作り直す。21-7 の着手条件に追加）。前回: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-29（<strong>21-6b2 完了</strong>: 返信文の基準を<a href="../app/sets/umigame-soup-1.html#reply-style">セット別設計書 5.1.1</a> に決め、13 案の試走から候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った。次は 21-6c）。前回: 2026-09-28（<strong>21-6b 完了</strong>: 試行 8b で両方式とも P1〜P7・レベル 1 の機械基準を満たし、判定の暫定方針を「パターン 1 主役 + Jev は見張り役と開示の二重確認」に整理。返信文の品質の検討を <a href="#step-21-6b2">21-6b2</a> として起票。次は 21-6b2）。前回: 2026-09-27（<strong>21-6b 設計と試走</strong>: 判定モジュールの契約と 2 方式の機能設計を<a href="../app/sets/umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a> に書き、185 件で試走〔種別一致率 パターン 1 = 96.2% / パターン 2 = 73.5%〕。effort <code>xhigh</code>・上限 800 を承認し、試行錯誤の記録用に<a href="../app/sets/umigame-soup-1-judge-study.html">検討ページ</a>を新設）。前回: 2026-09-27（<strong>21-6a 完了</strong>: コメント返信の品質レベルを<a href="../app/sets/umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a> に定義。最低 = レベル 1 + 前提条件 P1〜P7・目標 = レベル 2・コメント種別 22 種。次は 21-6b）。前回: 2026-09-27（<strong>21-5c 完了</strong>: TTS を Irodori-TTS〔BF16・声 G4 のクローン〕へ切り替えて 14 本を作り直し、全数試聴を経て publish で両環境へ反映）。前回: 2026-09-26（<strong>21-5c を起票</strong>: アイデア「<a href="../ideas/umigame-tts-gemini-flash.md">Gemini 3.8 Flash TTS で動画音声を作る</a>」を採用。ナレーションを声 G4 の Gemini TTS へ切り替えて 14 本を作り直す。21-7 の着手条件に追加）。前回: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -81,7 +81,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 6 件（21-1・21-2・21-3・21-4a・21-4a-2・21-4a-3／クリックで展開）</summary>
+<summary>完了済み 15 件（21-1〜21-6b2／クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-21-1" data-step-id="21-1" data-status="done" data-completed="2026-09-03" data-kind="decision">
@@ -633,28 +633,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-
-
-
-
-
-
-
-<article class="plan-step" id="step-21-6b2" data-step-id="21-6b2" data-status="doing">
+<article class="plan-step" id="step-21-6b2" data-step-id="21-6b2" data-status="done" data-completed="2026-09-29">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6b2</strong><span class="plan-status">進行中</span></div>
+<div class="plan-meta"><strong>21-6b2</strong><span class="plan-status">完了（2026-09-29）</span></div>
 <h3>返信文の品質の検討と試走</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-6b 完了後（判定品質の方針 = パターン 1 主役 + Jev の見張り役・開示の二重確認が暫定で決まっていること）。</p>
-<p data-field="result"><strong>現況：</strong>人間ゲート待ち（基準と見比べの確認）。返信文の基準を決め（<a href="../app/sets/umigame-soup-1.html#reply-style">セット別設計書 5.1.1</a>）、13 案の試走のあと、ユーザーが候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った（決めるのは以降のステップ。方式の選定は 21-6e）。絵文字の一覧と ⑧ ネタバレ要求の返し方を変えて 4 案を試走し直した。見比べは<a href="../app/sets/umigame-soup-1-reply-study.html#compare">検討ページ 4 章</a>。</p>
+<p data-field="result"><strong>結果：</strong>返信文の基準（くだけた口調・一人称「私」・絵文字の一覧・① だけ復唱・一言なしを混ぜる・近さを示す語の禁止・⑧ は真相を明かさない）を決め、<a href="../app/sets/umigame-soup-1.html#reply-style">セット別設計書 5.1.1</a> に書いた。13 案を試走し、候補を <strong>1b・1d-luna・2b・2c-luna の 4 案</strong>に絞った（小型モデルの書き手は判定を書き換えるため外した。決めるのは 21-6c 以降・方式の選定は 21-6e）。経緯は<a href="../app/sets/umigame-soup-1-reply-study.html">検討ページ</a>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -682,11 +666,28 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— ゴール 2/2 の人間ゲート待ち</span></summary>
-<div class="plan-fold-inner"><p><strong>2026-09-28（ゴール 1/2）</strong>: 基準と案の設計（①〜③）と試走（④）でゴールを分けた。基準の叩き台 = 人が見る H1 口調の一貫性・H2 キャラらしさ・H3 噛み合い・H4 くどさ・H5 公平さ（一言がヒントにならない）、機械で数える M1 字数・M2 冒頭の判定語・M3 言い回しの散らばり・M4 漏れ候補（CORE 語 + コメントにない内容語）・M5 絵文字・M6 近さを示す語・M7 費用と応答時間。案 = 1a 今のパターン 1・1b 手順 3 の作り直し・1c luna の判定 + 定型文・2a 今のパターン 2・2b 定型文の作り直し・2c Jev の判定 + 軽量 LLM（真相を渡さない。第 1 候補 <code>gpt-6-luna</code> effort <code>low</code>）。発見: リールのカメロックはくだけた口調（「質問してみて！」「何度でも答えるよ」）なのに、返信のプロンプトと定型文は丁寧な探偵口調で食い違っている。今の返信を集計すると、1a は ⑤ 惜しいが 8/8 件同じ・⑥ 外れが 10/11 件同じで、「はい。鋭い質問ですね。」のような近さを示す一言が 5 件あった（H5 の根拠）。試走スクリプト <code>run_reply_trial.py</code> は Codex に委譲し、Claude が <code>llm_correct</code>（真相ありの案だけ正解の開示を LLM に書かせる）を足した（pytest 28 件パス）。検討ページは <code>build_reply_study_page.py</code> で生成する。ユーザー判断待ちの 5 論点は<a href="../app/sets/umigame-soup-1-reply-study.html#open">検討ページ 1.4</a>。</p><p><strong>2026-09-28（ユーザー判断）</strong>: 口調 = リールに合わせたくだけた口調（パパが息子に話しかけるイメージ）、絵文字 = 決めた一覧から 1 個まで（⑮⑲・開示には付けない）、復唱 = ① だけ質問の言葉の範囲で許す、H5・M6（近さを示す語の禁止）を基準に入れる。案 1d（luna の判定 + 軽量 LLM の書き手）を追加し、2c の書き手のモデルは 2 パターン試す（ユーザーが別途指定）。続けて、一言を付ける割合 = 候補に「一言なし」を 1 つ混ぜる（判定語だけの返事も言い回しの 1 通り）、一人称 = 「私」に決まり、基準がすべて決まった（ゴール 1 完了）。2c・1d の書き手のモデル 2 パターンはゴール 2 の着手時にユーザーが指定する。</p><p><strong>2026-09-28（ゴール 2/2・試走 1 回目）</strong>: 書き手のモデルはユーザー指定で gpt-6-luna（effort low）・OpenRouter の Qwen3.5-9B / Qwen3.5-Flash・Gemini API の Gemma 4 26B-A4B（無料枠・Gemini TTS のキーを流用）の 4 通り。Qwen3.5-4B と Gemma 4 E2B / E4B は、API で呼べる提供先が確認できなかった（OpenRouter・DeepInfra の一覧・Alibaba・Bedrock になし）。規則の本文を <code>prompts/reply_style.txt</code> にまとめ、1b（真相あり・luna xhigh）と書き手（真相なし）が共有する形にし、2b の定型文 <code>templates_2b.py</code> を書いた（例文に評価データの文面を入れない。「雨」の例が U18 と重なったので「夕方」に差し替えた）。試走スクリプトに OpenRouter / Gemini の呼び出し（Codex に委譲）と、① の形の割り振り <code>{slot}</code>・判定の食い違い M2b（Claude）を足した（pytest 40 件パス）。13 案 × 220 件の結果: 1b・1d-luna・2c-luna・1c・2a・2b は判定の食い違い 0〜1 件・CORE 語 0 件・近さの語 0 件。小型モデルは判定語で始まる割合 86〜98%・食い違い 3〜21 件（「いいえ。家族かどうかは関係ないんだよ」）、種別のコードやプロンプトの文面の書き写し、存在しない事実の作り話、絵文字の付けすぎ（159〜191 件）と形の指定の無視があった。応答時間は Qwen3.5-Flash が最速（中央値 0.7 秒）、Gemma 4 の無料枠は p95 33 秒。費用はどれも 220 件で $0.06 以下。決まった基準をセット別設計書 5.1.1 の決定コールアウト <code>#reply-style</code> へ移した。人間ゲート（基準と見比べの確認）で停止。</p><p><strong>2026-09-28（ユーザー指示）</strong>: 検討ページに「5. 案ごとの種別別の結果」を追加（案ごとに、その案が使った判定の種別で返信をまとめ、件数・字数・異なる言い回し・最も多い言い回し・絵文字・機械検査の件数・返信の例を表にした）。この表で、Qwen3.5-Flash の書き手が ③ 答えられない質問に「はい！男の影が薄くなったからだよ。」と判定と中身を作って答える例が見えた。</p><p><strong>2026-09-29（ユーザー判断・試走 2 回目）</strong>: 基準は OK。候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った（小型モデルの書き手は外す）。絵文字の一覧を ☺️ 😌 😉 🧐 🙂‍↕️ 🙂‍↔️ 🥳 🙌 👏 🤔 🫢 🤭 🤐 に差し替え、⑧ ネタバレ要求は「質問には答えられるけど、真相は教えられないよ」の趣旨にした（「誰かが当てるまで秘密」だと、当てた人が出たら明かさなければならなくなるため）。<code>reply_style.txt</code>・<code>templates_2b.py</code>・試走スクリプトの絵文字の一覧（合成絵文字を数えられるよう正規表現も修正）とセット別設計書を直し、4 案を試走し直した。4 案とも機械の基準をほぼ満たしたまま（判定の食い違いは 2c-luna の 1 件だけ）で、⑧ は 4 案とも新しい形になった。発見: luna は 🙂‍↕️・🙂‍↔️ を出せず、ただの 🙂 を書く（3 案で 20〜21 件。一覧外として数えた）。扱いはユーザー判断で、🙂‍↕️ 🙂‍↔️ を一覧から外して 4 案を作り直した（試走 3 回目。一覧外 0 件）。あわせて、ユーザーの質問に答えて「判定 + 返信文」の料金表を検討ページ 2.1 に追加（これまでの M7 は返信文だけ。月 6,000 件で 1b 約 310 円・1d-luna 約 440 円・2b 約 100 円・2c-luna 約 230 円）。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-09-28〜29 基準・13 案の試走・4 案への絞り込み</span></summary>
+<div class="plan-fold-inner"><p><strong>2026-09-28（ゴール 1/2）</strong>: 基準と案の設計（①〜③）と試走（④）でゴールを分けた。基準の叩き台 = 人が見る H1 口調の一貫性・H2 キャラらしさ・H3 噛み合い・H4 くどさ・H5 公平さ（一言がヒントにならない）、機械で数える M1 字数・M2 冒頭の判定語・M3 言い回しの散らばり・M4 漏れ候補（CORE 語 + コメントにない内容語）・M5 絵文字・M6 近さを示す語・M7 費用と応答時間。案 = 1a 今のパターン 1・1b 手順 3 の作り直し・1c luna の判定 + 定型文・2a 今のパターン 2・2b 定型文の作り直し・2c Jev の判定 + 軽量 LLM（真相を渡さない。第 1 候補 <code>gpt-6-luna</code> effort <code>low</code>）。発見: リールのカメロックはくだけた口調（「質問してみて！」「何度でも答えるよ」）なのに、返信のプロンプトと定型文は丁寧な探偵口調で食い違っている。今の返信を集計すると、1a は ⑤ 惜しいが 8/8 件同じ・⑥ 外れが 10/11 件同じで、「はい。鋭い質問ですね。」のような近さを示す一言が 5 件あった（H5 の根拠）。試走スクリプト <code>run_reply_trial.py</code> は Codex に委譲し、Claude が <code>llm_correct</code>（真相ありの案だけ正解の開示を LLM に書かせる）を足した（pytest 28 件パス）。検討ページは <code>build_reply_study_page.py</code> で生成する。ユーザー判断待ちの 5 論点は<a href="../app/sets/umigame-soup-1-reply-study.html#open">検討ページ 1.4</a>。</p><p><strong>2026-09-28（ユーザー判断）</strong>: 口調 = リールに合わせたくだけた口調（パパが息子に話しかけるイメージ）、絵文字 = 決めた一覧から 1 個まで（⑮⑲・開示には付けない）、復唱 = ① だけ質問の言葉の範囲で許す、H5・M6（近さを示す語の禁止）を基準に入れる。案 1d（luna の判定 + 軽量 LLM の書き手）を追加し、2c の書き手のモデルは 2 パターン試す（ユーザーが別途指定）。続けて、一言を付ける割合 = 候補に「一言なし」を 1 つ混ぜる（判定語だけの返事も言い回しの 1 通り）、一人称 = 「私」に決まり、基準がすべて決まった（ゴール 1 完了）。2c・1d の書き手のモデル 2 パターンはゴール 2 の着手時にユーザーが指定する。</p><p><strong>2026-09-28（ゴール 2/2・試走 1 回目）</strong>: 書き手のモデルはユーザー指定で gpt-6-luna（effort low）・OpenRouter の Qwen3.5-9B / Qwen3.5-Flash・Gemini API の Gemma 4 26B-A4B（無料枠・Gemini TTS のキーを流用）の 4 通り。Qwen3.5-4B と Gemma 4 E2B / E4B は、API で呼べる提供先が確認できなかった（OpenRouter・DeepInfra の一覧・Alibaba・Bedrock になし）。規則の本文を <code>prompts/reply_style.txt</code> にまとめ、1b（真相あり・luna xhigh）と書き手（真相なし）が共有する形にし、2b の定型文 <code>templates_2b.py</code> を書いた（例文に評価データの文面を入れない。「雨」の例が U18 と重なったので「夕方」に差し替えた）。試走スクリプトに OpenRouter / Gemini の呼び出し（Codex に委譲）と、① の形の割り振り <code>{slot}</code>・判定の食い違い M2b（Claude）を足した（pytest 40 件パス）。13 案 × 220 件の結果: 1b・1d-luna・2c-luna・1c・2a・2b は判定の食い違い 0〜1 件・CORE 語 0 件・近さの語 0 件。小型モデルは判定語で始まる割合 86〜98%・食い違い 3〜21 件（「いいえ。家族かどうかは関係ないんだよ」）、種別のコードやプロンプトの文面の書き写し、存在しない事実の作り話、絵文字の付けすぎ（159〜191 件）と形の指定の無視があった。応答時間は Qwen3.5-Flash が最速（中央値 0.7 秒）、Gemma 4 の無料枠は p95 33 秒。費用はどれも 220 件で $0.06 以下。決まった基準をセット別設計書 5.1.1 の決定コールアウト <code>#reply-style</code> へ移した。人間ゲート（基準と見比べの確認）で停止。</p><p><strong>2026-09-28（ユーザー指示）</strong>: 検討ページに「5. 案ごとの種別別の結果」を追加（案ごとに、その案が使った判定の種別で返信をまとめ、件数・字数・異なる言い回し・最も多い言い回し・絵文字・機械検査の件数・返信の例を表にした）。この表で、Qwen3.5-Flash の書き手が ③ 答えられない質問に「はい！男の影が薄くなったからだよ。」と判定と中身を作って答える例が見えた。</p><p><strong>2026-09-29（ユーザー判断・試走 2 回目）</strong>: 基準は OK。候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った（小型モデルの書き手は外す）。絵文字の一覧を ☺️ 😌 😉 🧐 🙂‍↕️ 🙂‍↔️ 🥳 🙌 👏 🤔 🫢 🤭 🤐 に差し替え、⑧ ネタバレ要求は「質問には答えられるけど、真相は教えられないよ」の趣旨にした（「誰かが当てるまで秘密」だと、当てた人が出たら明かさなければならなくなるため）。<code>reply_style.txt</code>・<code>templates_2b.py</code>・試走スクリプトの絵文字の一覧（合成絵文字を数えられるよう正規表現も修正）とセット別設計書を直し、4 案を試走し直した。4 案とも機械の基準をほぼ満たしたまま（判定の食い違いは 2c-luna の 1 件だけ）で、⑧ は 4 案とも新しい形になった。発見: luna は 🙂‍↕️・🙂‍↔️ を出せず、ただの 🙂 を書く（3 案で 20〜21 件。一覧外として数えた）。扱いはユーザー判断で、🙂‍↕️ 🙂‍↔️ を一覧から外して 4 案を作り直した（試走 3 回目。一覧外 0 件）。あわせて、ユーザーの質問に答えて「判定 + 返信文」の料金表を検討ページ 2.1 に追加（これまでの M7 は返信文だけ。月 6,000 件で 1b 約 310 円・1d-luna 約 440 円・2b 約 100 円・2c-luna 約 230 円）。</p><p><strong>2026-09-29（完了）</strong>: ユーザーが基準と見比べを確認して OK。21-6b2 を完了にした。</p></div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <article class="plan-step" id="step-21-6c" data-step-id="21-6c" data-status="todo">
 <header class="plan-step-head">
