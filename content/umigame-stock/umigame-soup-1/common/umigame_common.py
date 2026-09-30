@@ -120,7 +120,6 @@ REQUIRED_KEYS = (
     "truth",
     "fact_sheet",
     "core_points",
-    "support_points",
     "reveal_text",
     "expected_questions",
     "hook",

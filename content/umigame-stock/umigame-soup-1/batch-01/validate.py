@@ -102,12 +102,8 @@ def check_item(it: dict) -> None:
     cps = it["core_points"]
     if not isinstance(cps, list) or not CORE_POINTS_MIN <= len(cps) <= CORE_POINTS_MAX:
         errors.append(f"{no}: core_points は {CORE_POINTS_MIN}〜{CORE_POINTS_MAX} 個のリスト")
-    sps = it["support_points"]
-    if not isinstance(sps, list):
-        errors.append(f"{no}: support_points はリスト")
-    for label, pts in (("core_points", cps), ("support_points", sps)):
-        if isinstance(pts, list) and any(not isinstance(x, str) or not x.strip() or "\n" in x for x in pts):
-            errors.append(f"{no}: {label} の要素は改行なしの空でない文字列")
+    if isinstance(cps, list) and any(not isinstance(x, str) or not x.strip() or "\n" in x for x in cps):
+        errors.append(f"{no}: core_points の要素は改行なしの空でない文字列")
     if isinstance(cps, list) and any(isinstance(x, str) and len(x) > CORE_POINT_MAX for x in cps):
         errors.append(f"{no}: core_points の要素は {CORE_POINT_MAX} 字以内（{[len(x) for x in cps]} 字）")
     rv = it["reveal_text"]
