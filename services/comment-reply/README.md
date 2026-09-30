@@ -64,3 +64,17 @@ OPENAI_API_KEY=... TYPESAFE_API_KEY=... .venv/bin/python tools/local_trial.py \
 `--snapshot path.json` で公開スナップショットを読み込めます。`--comment` は繰り返し指定可、`--comments-file` は 1 行 1 コメント、指定なしは対話入力です。`--shadow/--no-shadow` と `--consensus/--no-consensus` で hybrid のスイッチを切り替えます。`--out` の既定値は `work/local_trial/` で、モード別に本番と同じ形式の記録を保存します。stub 時に LLM 書き手が選択されていた場合、外部呼び出しを避けるため 2b 定型に切り替えます。
 
 `guess_correct` の 2b 返信は `CORRECT_PREFIX + reveal_text` の固定形式です。その他の返信種別は各 3 通り以上の定型文を持ち、`sha1(comment_id)` で選びます。語だけの q_open と合意制 split にはそれぞれ 3 通りの専用定型文があります。
+
+## コメント返信の評価プローブ
+
+`tools/probe_run.py` は評価ケースを本番の判定合成・書き手・コメント記録に通し、`results.json` と `metrics.json` を出します。判定結果はケース単位でパターン間共有し、`judge_cache.json` と `writer_cache.json` で中断後も再開できます。実行には `OPENAI_API_KEY` と `TYPESAFE_API_KEY` を環境変数で指定します。Instagram への送信は行いません。
+
+```bash
+cd services/comment-reply
+OPENAI_API_KEY=... TYPESAFE_API_KEY=... .venv/bin/python tools/probe_run.py \
+  --problems U01 U13 --out work/probe/sample
+.venv/bin/python tools/build_probe_page.py \
+  --results work/probe/sample/results.json --out /tmp/comment-reply-probe.html
+```
+
+`--patterns` で 5 パターンから選択、`--workers` で並列数を変更、`--refresh-judge` / `--refresh-writer` でキャッシュを更新できます。ページ生成器は `--out` を省くと `docs/app/sets/umigame-soup-1-probe.html` に出力し、生データの JS を同名ディレクトリに置きます。
