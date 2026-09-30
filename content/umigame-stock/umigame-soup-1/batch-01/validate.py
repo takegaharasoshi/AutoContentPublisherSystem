@@ -57,6 +57,7 @@ CORE_FORMAT_BY_TYPE = {
 CORE_MAX = 120
 CORE_POINTS_MIN, CORE_POINTS_MAX = 1, 2  # 判定用のコアの要点（21-6c1。セット別設計書 5.1.1・5.1.2）
 REVEAL_MAX = 70  # 正解時の開示文
+CORE_POINT_MAX = 20  # コアの要点 1 個の字数（目安 15 字前後。2026-09-30 ユーザー合意）
 # 欠番の content_key 連番（差し替えで ITEMS から外し、再利用しない番号。DB の行の扱いは全数レビュー後に決める）。
 # 002 = U11（2026-09-26 に U27 = 015 へ差し替え。素材の全数レビュー指摘 17）
 # 011 = U23（2026-09-26 に U28 = 016 へ差し替え。本家ウミガメのスープ）
@@ -107,6 +108,8 @@ def check_item(it: dict) -> None:
     for label, pts in (("core_points", cps), ("support_points", sps)):
         if isinstance(pts, list) and any(not isinstance(x, str) or not x.strip() or "\n" in x for x in pts):
             errors.append(f"{no}: {label} の要素は改行なしの空でない文字列")
+    if isinstance(cps, list) and any(isinstance(x, str) and len(x) > CORE_POINT_MAX for x in cps):
+        errors.append(f"{no}: core_points の要素は {CORE_POINT_MAX} 字以内（{[len(x) for x in cps]} 字）")
     rv = it["reveal_text"]
     if not isinstance(rv, str) or not rv.strip() or "\n" in rv or len(rv) > REVEAL_MAX:
         errors.append(f"{no}: reveal_text は改行なし {REVEAL_MAX} 字以内の空でない文字列（{len(rv) if isinstance(rv, str) else '-'} 字）")
