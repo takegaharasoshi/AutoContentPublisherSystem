@@ -1,0 +1,10 @@
+{
+  "comments": [
+    {"id": "local-u01-q", "comment": "男の影は本物？", "luna": {"kind": "q_yesno", "answer": "no"}, "jev": {"kind": "q_yesno", "answer": "no"}},
+    {"id": "local-u01-guess", "comment": "男はレントゲンを見て何かに気づいたのでは？", "luna": {"kind": "guess_close"}, "jev": {"kind": "guess_close"}},
+    {"id": "local-u01-correct", "comment": "影はレントゲンの病気の影で、病気が良くなったから泣いた？", "luna": {"kind": "guess_correct"}, "jev": {"kind": "guess_correct"}},
+    {"id": "local-u01-split", "comment": "レントゲンで病気が良くなったと分かったから感謝した？", "luna": {"kind": "guess_correct"}, "jev": {"kind": "guess_close"}},
+    {"id": "local-u01-bare", "comment": "レントゲン？", "luna": {"kind": "q_open", "bare_term": "レントゲン"}, "jev": {"kind": "q_open", "bare_term": "レントゲン"}},
+    {"id": "local-u01-abuse", "comment": "こんなの作るやつはバカだ", "luna": {"kind": "abuse"}, "jev": {"kind": "abuse"}}
+  ]
+}

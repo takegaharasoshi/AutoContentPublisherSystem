@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-30（<strong>21-6c1 完了</strong>: コアを「真相の説明に最低限必要な情報」として整理して 14 問分をレビュー済み、V013・スナップショット <code>schema_version</code> 2 を実装。push・パイプライン完走・両環境への V013 と <code>update_judge_points.sql</code> の適用まで済み。次は 21-6c2）。前回: 2026-09-29（<strong>21-6c を <a href="#step-21-6c1">21-6c1</a>〔問題 JSON の項目追加〕と <a href="#step-21-6c2">21-6c2</a>〔本番 Lambda〕に分割</strong>し、21-6c1 ゴール A で 14 問分の判定用の要点と開示文を起こした。次は文面の人間レビュー）。前回: 2026-09-29（<strong>21-6b2 完了</strong>: 返信文の基準を<a href="../app/sets/umigame-soup-1.html#reply-style">セット別設計書 5.1.1</a> に決め、13 案の試走から候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った。次は 21-6c）。前回: 2026-09-28（<strong>21-6b 完了</strong>: 試行 8b で両方式とも P1〜P7・レベル 1 の機械基準を満たし、判定の暫定方針を「パターン 1 主役 + Jev は見張り役と開示の二重確認」に整理。返信文の品質の検討を <a href="#step-21-6b2">21-6b2</a> として起票。次は 21-6b2）。前回: 2026-09-27（<strong>21-6b 設計と試走</strong>: 判定モジュールの契約と 2 方式の機能設計を<a href="../app/sets/umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a> に書き、185 件で試走〔種別一致率 パターン 1 = 96.2% / パターン 2 = 73.5%〕。effort <code>xhigh</code>・上限 800 を承認し、試行錯誤の記録用に<a href="../app/sets/umigame-soup-1-judge-study.html">検討ページ</a>を新設）。前回: 2026-09-27（<strong>21-6a 完了</strong>: コメント返信の品質レベルを<a href="../app/sets/umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a> に定義。最低 = レベル 1 + 前提条件 P1〜P7・目標 = レベル 2・コメント種別 22 種。次は 21-6b）。前回: 2026-09-27（<strong>21-5c 完了</strong>: TTS を Irodori-TTS〔BF16・声 G4 のクローン〕へ切り替えて 14 本を作り直し、全数試聴を経て publish で両環境へ反映）。前回: 2026-09-26（<strong>21-5c を起票</strong>: アイデア「<a href="../ideas/umigame-tts-gemini-flash.md">Gemini 3.8 Flash TTS で動画音声を作る</a>」を採用。ナレーションを声 G4 の Gemini TTS へ切り替えて 14 本を作り直す。21-7 の着手条件に追加）。前回: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-30（<strong>21-6c2 実装完了</strong>: <code>services/comment-reply/</code> を新設〔判定 2 実装 + 組み合わせ 3 モード・返信文 4 案・語だけのコメントの聞き返し・コメント記録 JSON・ローカル試行ツール〕。pytest 34 passed・実 API で 3 モードの試行済み。push はユーザー判断待ち。次は 21-6d）。前回: 2026-09-30（<strong>21-6c1 完了</strong>: コアを「真相の説明に最低限必要な情報」として整理して 14 問分をレビュー済み、V013・スナップショット <code>schema_version</code> 2 を実装。push・パイプライン完走・両環境への V013 と <code>update_judge_points.sql</code> の適用まで済み。次は 21-6c2）。前回: 2026-09-29（<strong>21-6c を <a href="#step-21-6c1">21-6c1</a>〔問題 JSON の項目追加〕と <a href="#step-21-6c2">21-6c2</a>〔本番 Lambda〕に分割</strong>し、21-6c1 ゴール A で 14 問分の判定用の要点と開示文を起こした。次は文面の人間レビュー）。前回: 2026-09-29（<strong>21-6b2 完了</strong>: 返信文の基準を<a href="../app/sets/umigame-soup-1.html#reply-style">セット別設計書 5.1.1</a> に決め、13 案の試走から候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った。次は 21-6c）。前回: 2026-09-28（<strong>21-6b 完了</strong>: 試行 8b で両方式とも P1〜P7・レベル 1 の機械基準を満たし、判定の暫定方針を「パターン 1 主役 + Jev は見張り役と開示の二重確認」に整理。返信文の品質の検討を <a href="#step-21-6b2">21-6b2</a> として起票。次は 21-6b2）。前回: 2026-09-27（<strong>21-6b 設計と試走</strong>: 判定モジュールの契約と 2 方式の機能設計を<a href="../app/sets/umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a> に書き、185 件で試走〔種別一致率 パターン 1 = 96.2% / パターン 2 = 73.5%〕。effort <code>xhigh</code>・上限 800 を承認し、試行錯誤の記録用に<a href="../app/sets/umigame-soup-1-judge-study.html">検討ページ</a>を新設）。前回: 2026-09-27（<strong>21-6a 完了</strong>: コメント返信の品質レベルを<a href="../app/sets/umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a> に定義。最低 = レベル 1 + 前提条件 P1〜P7・目標 = レベル 2・コメント種別 22 種。次は 21-6b）。前回: 2026-09-27（<strong>21-5c 完了</strong>: TTS を Irodori-TTS〔BF16・声 G4 のクローン〕へ切り替えて 14 本を作り直し、全数試聴を経て publish で両環境へ反映）。前回: 2026-09-26（<strong>21-5c を起票</strong>: アイデア「<a href="../ideas/umigame-tts-gemini-flash.md">Gemini 3.8 Flash TTS で動画音声を作る</a>」を採用。ナレーションを声 G4 の Gemini TTS へ切り替えて 14 本を作り直す。21-7 の着手条件に追加）。前回: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -709,31 +709,13 @@
 </details>
 </div>
 </article>
-</div>
-</details>
 
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<article class="plan-step" id="step-21-6c2" data-step-id="21-6c2" data-status="todo">
+<article class="plan-step" id="step-21-6c2" data-step-id="21-6c2" data-status="done" data-completed="2026-09-30">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6c2</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-6c2</strong><span class="plan-status">完了</span><span>2026-09-30</span></div>
 <h3>本番 Lambda の実装（判定 2 実装 + 組み合わせ 3 モード・返信文 4 案）とローカル試行ツール</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-6c1 の完了後（問題 JSON に <code>core_points</code>・<code>reveal_text</code> が入っていること）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><code>services/comment-reply/</code> を新設した（Webhook / Reply の 2 Lambda、判定 2 実装〔luna・Jev〕+ 組み合わせ役の 3 モード〔既定 hybrid〕、返信文 4 案〔既定 1d-luna・暫定〕、主語のない語だけのコメントへの聞き返し、コメント記録 JSON、ローカル試行ツール）。pytest 34 passed。U01 の 8 コメントを実 API で 3 モードに通し、質問の形の正解推理で合意制が割れて開示しないことを確認した。push はユーザー判断待ち（CI/CD は 21-6f で作るまで無い）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -765,11 +747,31 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-09-30</span></summary>
+<div class="plan-fold-inner"><p><strong>2026-09-30（実装）</strong>: コードは Codex（gpt-6-sol / max）へ委譲し、Claude がレビューした。試走版（試行 8b・21-6b2）のロジック・閾値・プロンプトをそのまま <code>services/comment-reply/app/</code> へ移植し、変えたのは「主語のない語だけのコメント」への対応（判定の出力に <code>bare_term</code> を追加・パターン 1 のプロンプトの q_open / guess_correct・パターン 2 の段 A・返信文 4 案の聞き返し）と、パターン 1 の構造化出力への <code>reason</code> の追加だけ。レビューで 1 件直させた: Jev の「語だけか」の確認が全コメントで別リクエストとして先に走り、呼び出しが 1 回増えるうえ一語の感想・挨拶を ③ に振るおそれがあった → 段 A1 と同じリクエストに同梱し、大分類が「質問・推理」のときだけ効かせる。試行ツールの小さな不具合 2 件（<code>comment_id</code> の接頭辞の重複・受信時刻が判定時刻より後になる）は Claude が直した。</p><p><strong>設計判断</strong>（セット別設計書 5.1.2 の<a href="../app/sets/umigame-soup-1.html#judge-impl">実装の節</a>・5.1 の決定・<a href="../app/sets/umigame-soup-1.html#comment-log">10.6</a>）: ① 契約の <code>JUDGE_METHOD</code> を <code>JUDGE_MODE</code>（<code>luna</code> / <code>jev</code> / <code>hybrid</code>）+ <code>JUDGE_SHADOW</code> + <code>JUDGE_CONSENSUS</code> に置き換えた。② 返信文は <code>REPLY_VARIANT</code>。<code>1d-luna</code> と <code>2c-luna</code> は同じ書き手の別名、既定は <code>1d-luna</code>（暫定）。LLM の書き手が判定語を外したら定型文へ落とす安全網を足した。③ 合意制が割れたときの通知は WARNING ログの固定マーカー <code>JUDGE_CONSENSUS_SPLIT</code>（メトリクスフィルタ・アラームは 21-6f）、手動で正解を伝える手段はユーザーが Instagram アプリから直接返信する（専用の仕組みは作らない）。④ 判定・返信のプロンプトは Lambda のコードに同梱し、スナップショットの <code>master_rules</code> は判定に使わない（プロンプトが 5 本に増えて <code>prompt_configs</code> 1 列に載らず、変更は 21-6d の機械プローブ合格後に限るため、デプロイを伴うほうが手順に合う）。<code>master_prompt.txt</code>・<code>probe_test.py</code> の扱いは 21-6d で決める。⑤ コメント記録のスキーマは設計書 10.6 を正にし、README からはリンクだけにした。</p><p><strong>検証</strong>: pytest <code>34 passed</code>（署名検証・GET 検証・自己返信スキップ・FIFO の重複排除 ID・enqueue 失敗で 500・スナップショット 404・Graph API の失敗で部分失敗・記録の書き込み失敗で返信を止めない・3 モードとスイッチの組み合わせ・書き手 4 案とフォールバック・定型文の 3 通り・記録に username を持たない、など）。ローカル試行ツールで U01 の 8 コメント（質問 2・推理 2・質問の形の正解推理・語だけ・感想・誹謗中傷）を実 API（luna + Jev）に通した。正解推理では luna が ④・Jev が ① と割れ、hybrid は <code>consensus_split</code> の定型文を返して開示せず、<code>JUDGE_SHADOW_MISMATCH</code> と <code>JUDGE_CONSENSUS_SPLIT</code> が出た。語だけの「レントゲン？」は両方式とも ③。luna の書き手の聞き返しは安全網に拾われて定型文に落ちた（21-6d で割合を見る）。stub モードでは合意の成立・割れの両方と記録 JSON（24 件）を確認した。OpenAI のキーはユーザーの承認を得て、試行の実行時だけ Secrets Manager から読んで環境変数で渡した（保存していない）。確認待ち: 該当なし。課題表: I-031 は据え置き継続（21-6g）。クローズ移動: 該当なし。<strong>残り</strong>: 差分確認 → push（ユーザー）。<code>services/comment-reply/</code> の CodePipeline は 21-6f で作るため、push 後のパイプライン確認は対象外。</p></div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <article class="plan-step" id="step-21-6d" data-step-id="21-6d" data-status="todo">
 <header class="plan-step-head">

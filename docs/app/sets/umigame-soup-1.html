@@ -253,8 +253,23 @@
     <li><strong>入力</strong>: <code>comment_id</code>・コメント本文・問題（<code>problems/{media_id}.json</code> の問題固有部分 = <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> に、下記の <code>truth_points</code> / <code>reveal_text</code> を足したもの）</li>
     <li><strong>出力</strong>: <code>kind</code>（22 種のコード。①〜㉒ の順に <code>q_yesno</code> <code>q_multi</code> <code>q_open</code> <code>guess_correct</code> <code>guess_close</code> <code>guess_wrong</code> <code>ask_hint</code> <code>ask_spoiler</code> <code>ask_howto</code> <code>impression</code> <code>greeting</code> <code>cheer</code> <code>chat</code> <code>request</code> <code>complaint</code> <code>mention</code> <code>emoji_only</code> <code>troll</code> <code>abuse</code> <code>spam</code> <code>personal_info</code> <code>foreign</code>）・<code>answer</code>（<code>q_yesno</code> のときだけ <code>yes</code> / <code>no</code> / <code>irrelevant</code> / <code>unknown</code>）・<code>reply</code>（返信文。<strong>返信しない = <code>NO_REPLY</code> は <code>reply</code> が空</strong>）・<code>debug</code>（確率・トークン・応答時間。ログにだけ出す）</li>
     <li><strong>方式に依らずコードで強制すること</strong>: ⑳ <code>spam</code>・㉑ <code>personal_info</code> は返信しない。⑱ <code>troll</code>・⑲ <code>abuse</code> はコードの定型文で返す（LLM の文面を使わない = 挑発に乗った文や漏れが出ない）。定型文は種別ごとに 3 通り以上を持ち、<code>sha1(comment_id)</code> で選ぶ（状態を持たずに言い回しを散らす = 論点 ⑦）。返信が 80 字を超えたら切り詰めずにログへ警告を出す（プローブで P7 違反として数えるため。本番の 200 字切り詰めは Lambda 側の最後の安全網として残す）</li>
-    <li><strong>方式の切り替え</strong>: Reply Lambda の環境変数 <code>JUDGE_METHOD</code>（<code>p1</code> / <code>p2</code>）。Jev を選んだ場合もパターン 1 の実装とキーを本番に残し、環境変数の変更だけで戻せるようにする（論点 ⑨。Jev は SLA なし・値上げの留保あり）。Jev の呼び出しが失敗したら（再試行後）同じコメントをパターン 1 で判定する</li>
+    <li><strong>方式の切り替え</strong>: Reply Lambda の環境変数 <code>JUDGE_METHOD</code>（<code>p1</code> / <code>p2</code>）。Jev を選んだ場合もパターン 1 の実装とキーを本番に残し、環境変数の変更だけで戻せるようにする（論点 ⑨。Jev は SLA なし・値上げの留保あり）。Jev の呼び出しが失敗したら（再試行後）同じコメントをパターン 1 で判定する。<strong>21-6c2 で <code>JUDGE_MODE</code>（3 モード）に置き換えた</strong>（下の実装の節）</li>
     <li><strong>問題 JSON に足す項目</strong>: <code>core_points</code>（コアの要点。説明に必要なだけ 1〜3 個・1 個 20 字以内〔5.1.1〕。④⑤⑥ の判定に使う。両方式が使う）と <code>reveal_text</code>（正解時に開示する真相の要約。70 字以内。パターン 2 の開示文）。<strong>ストックへの追加・<a href="../generators/umigame-prebuilt.html">方式設計書</a>とスナップショット（10.2）の項目追加は 21-6c1 で行う</strong>（全 14 問の文面は 21-6c1 で <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code> に起こし、人がレビューする。21-6b の試走は 5 問分の仮の値を <code>judge-trial/data/truth_points.json</code> に置いた）。パターン 1 を選んだ場合も項目は残す（機械プローブの正解ラベルに使うため）</li>
+  </ul>
+</div>
+
+<div class="callout decision" id="judge-impl">
+  <span class="callout-title">実装（2026-09-30、21-6c2）: <code>services/comment-reply/</code> の判定 2 実装 + 組み合わせ役 + 返信文 4 案</span>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>構成</strong>: 判定ロジックは <code>app/judge/luna.py</code>（パターン 1）と <code>app/judge/jev.py</code>（パターン 2）の 2 実装にだけ書き、<code>app/judge/combiner.py</code>（組み合わせ役）がそれを部品として呼ぶ。返信文は判定と別の部品 <code>app/reply/writer.py</code>（定型文は <code>app/reply/templates.py</code>）。ロジック・閾値・プロンプト文言は試走の最終版（試行 8b・21-6b2）をそのまま移植し、変えたのは下記の「語だけのコメント」対応と判定理由の項目追加だけ。環境変数・構成の一覧は <code>services/comment-reply/README.md</code></li>
+    <li><strong>組み合わせの 3 モード</strong>（上の契約の <code>JUDGE_METHOD</code> を置き換えた）: 環境変数 <code>JUDGE_MODE</code> = <code>luna</code> / <code>jev</code> / <code>hybrid</code>（既定 <code>hybrid</code>・暫定。最終決定は 21-6e）。<code>hybrid</code> は luna と Jev を並列に呼び、返信は luna の判定で作る。<code>JUDGE_SHADOW</code>（見張り役）と <code>JUDGE_CONSENSUS</code>（合意制）は <code>hybrid</code> のときだけ効き、個別にオン / オフできる（両方オフなら Jev を呼ばない = 21-6d で「luna 単体」と「luna + 合意制」を設定だけで比べる）</li>
+    <li><strong>失敗時</strong>: luna の失敗（再試行後）は例外にして SQS の再試行 → DLQ に回す（<code>luna</code> / <code>hybrid</code>）。<code>jev</code> モードで Jev が失敗したら同じコメントを luna で判定する（<code>decision = jev_fallback_luna</code>。論点 ⑨）。<code>hybrid</code> で Jev が失敗したら luna 単体として続け、luna が ④ でも合意が取れないので開示しない（割れた扱い）。OpenAI・Jev とも 429・5xx は指数バックオフで再試行する</li>
+    <li><strong>見張り役</strong>: kind か answer が食い違ったら WARNING ログ <code>JUDGE_SHADOW_MISMATCH</code>（JSON 付き）を出し、コメント記録（10.6）に両方の判定と <code>shadow_mismatch</code> を残す。食い違い率の監視（平常値の 2 倍で通知）は、このマーカーのメトリクスフィルタとして 21-6f で配線する</li>
+    <li><strong>合意制で割れたとき</strong>: luna だけが ④ なら開示せず専用の定型文（3 通り・<code>sha1(comment_id)</code> で選ぶ。例「かなり近づいているね。出来事を最初から説明してみて。」。近さを示す語の禁止の唯一の例外・絵文字なし）で説明の追加を促し、WARNING ログ <code>JUDGE_CONSENSUS_SPLIT</code> を出す。<strong>通知</strong>はこのマーカーのメトリクスフィルタ → アラーム → 既存の通知経路（21-6f で配線）。<strong>手動で正解を伝える手段</strong>は、ユーザーが Instagram アプリからそのコメントに直接返信する（コメント記録に <code>comment_id</code>・本文・両方の判定があるので対象を特定できる。専用の仕組みは作らない）。Jev だけが ④ なら luna の判定どおりに返し、ログだけ残す</li>
+    <li><strong>返信文の 4 案</strong>: 環境変数 <code>REPLY_VARIANT</code> = <code>1b</code> / <code>1d-luna</code> / <code>2b</code> / <code>2c-luna</code>（既定 <code>1d-luna</code>・暫定。真相を渡さない書き手なので構造的に漏れにくく、費用も低い。選定は 21-6d・21-6e）。判定のモードと独立に切り替わる。<code>1d-luna</code> と <code>2c-luna</code> は試走で判定元が違っただけなので、本番では同じ書き手（真相なし・luna effort <code>low</code>）の別名にした。<code>1b</code> は真相ありの書き手（effort <code>xhigh</code>）で正解の開示も書く。ほかの案の ④ は <code>正解！</code> + <code>reveal_text</code>。<strong>判定を書き手に書き換えさせない安全網</strong>: LLM の書き手が失敗・空応答のとき、① で判定語から始まらないとき、語だけのコメントへの聞き返しになっていないときは、<code>2b</code> の定型文に落として警告を残す（<code>reply.source = fallback_template</code>）</li>
+    <li><strong>主語のない語だけのコメント</strong>（5.1.1 ③）: 判定の出力に <code>bare_term</code>（語だけのコメントのときのその語）を足した。パターン 1 は <code>pattern1_rules.txt</code> の q_open に線引きと例を足し、guess_correct に「何についての推理か分かること（語だけのコメントは除く）」を条件として足した。パターン 2 は段 A1 の大分類と同じリクエストに「述語のない名詞・語句だけか」の noul を同梱し（Jev の呼び出し回数は増やさない）、大分類が「質問・推理」のときだけ 0.5 以上で ③ にする（一語の感想・挨拶を ③ にしないため）。返信は 4 案とも「何が{語}なのか教えてね」系の聞き返し（定型 3 通り・LLM の書き手には語を渡す）</li>
+    <li><strong>判定理由</strong>: コメント記録用に、パターン 1 の構造化出力へ <code>reason</code>（40 字程度）と <code>bare_term</code> を足した。パターン 2 は段と確率から理由の短文を作る</li>
+    <li><strong>ローカル試行ツール</strong>: <code>services/comment-reply/tools/local_trial.py</code>。判定モジュールと書き手を本番と同じ経路で呼び、問題（<code>--problem U01</code> = <code>batch-01/stock_items.py</code> からスナップショットと同じ形に組む、または <code>--snapshot</code>）にコメントを入れて 3 モードの返信を並べる。判定 API は 1 コメントにつき 1 回ずつ呼んで 3 モードで使い回す。キーは環境変数（<code>OPENAI_API_KEY</code>・<code>TYPESAFE_API_KEY</code>）からだけ読み、Instagram と AWS は使わない。判定を与えて動かす <code>--stub-judgements</code>（API を呼ばない）もある。コメント記録は本番と同じ組み立てで <code>work/local_trial/</code> にファイル出力する</li>
   </ul>
 </div>
 
@@ -292,6 +307,10 @@
 
 <h5>5.1 マスタープロンプトの改訂案（パターン 1）</h5>
 <p>改訂案の本文は <code>judge-trial/prompts/pattern1_rules.txt</code>（上記の変更点 ①〜④）。<strong><code>master_prompt.txt</code> の差し替えは本ステップでは行わず、21-6c で行うことを提案する</strong>。出力が一語の文字列から JSON（<code>{kind, answer, reply}</code>）に変わるため、判定モジュールの実装と同時でないと <code>probe_test.py</code> と本番の経路が壊れる。差し替えたら 5.1 の本文も改訂案に置き換え、「荒らしには返信しない」の記述を消す。</p>
+<div class="callout decision">
+  <span class="callout-title">決定（2026-09-30、21-6c2）: 判定・返信のプロンプトは Lambda のコードに同梱する。スナップショットの <code>master_rules</code> は判定に使わない</span>
+  <p>判定モジュールのプロンプトは 1 本ではなくなった（パターン 1 の判定・返信文の基準・書き手 2 種・Jev の指示文）。<code>prompt_configs.prompt_text</code> 1 列に載らず、どれも 5.1.2「モデル・プロンプトを変えるときは全件の機械プローブ（21-6d）に合格してから切り替える」に従うので、デプロイを伴うほうが手順に合う。このため 5.1 冒頭の決定（2026-09-04、21-3。プロンプトの正は <code>prompt_configs</code> → スナップショット経由で Lambda が読む）は判定モジュールには適用しない。プロンプトの正は <code>services/comment-reply/app/prompts/</code>（試走版 <code>judge-trial/prompts/</code> から移植）。同梱プロンプトの SHA-256 先頭 12 桁を <code>prompt_version</code> としてコメント記録（10.6）に残す。<code>master_prompt.txt</code> の差し替えは行わない。スナップショットの <code>master_rules</code> は既存のキーとして残る（投稿バッチは変えない）。<code>master_prompt.txt</code>・<code>probe_test.py</code> の扱い（廃止するか、21-6d の機械プローブへ寄せるか）は 21-6d で決める。</p>
+</div>
 
 <h5>評価セット（テストデータ）の作り方・置き場</h5>
 <ul>
@@ -404,7 +423,7 @@
 
 <h3>10.3 返信の振る舞い（MVP スコープ）</h3>
 <ul>
-  <li><strong>返信する</strong>: 自アカウントのリールへのコメントと、そのスレッドへの返信（<code>parent_id</code> 付き。推理の続きであることが多い）。判定は判定モジュール（<a href="#judge-design">5.1.2</a>。方式はパターン 1 / 2 を環境変数で切り替え）に委ねる</li>
+  <li><strong>返信する</strong>: 自アカウントのリールへのコメントと、そのスレッドへの返信（<code>parent_id</code> 付き。推理の続きであることが多い）。判定は判定モジュール（<a href="#judge-design">5.1.2</a>。組み合わせの 3 モードと返信文の 4 案を環境変数で切り替え = <a href="#judge-impl">実装</a>）に委ねる</li>
   <li><strong>返信しない</strong>: 自分の返信（<code>from.id == ig_user_id</code>。無限ループ防止）/ プロンプトが <code>NO_REPLY</code> を返したコメント / スナップショットの無い <code>media_id</code>（本セット以外の投稿・出力失敗）</li>
   <li><strong>作らないもの</strong>（アイデア詳細 7）: ユーザーごとの質問回数制限・コメント回数の DB 管理・禁止ワード DB・語の一覧によるルールベース判定（パターン 2 の段 0 は文字種だけを見る規則で、これに当たらない = 5.1.2）・会話状態管理・Lambda メモリキャッシュ・コメント処理からの Aurora アクセス・翌日の解答編リール。将来のゲーム化構想を理由に状態管理を先行実装しない（ステートレス方針）</li>
   <li><strong>重複返信の抑止</strong>: Meta Webhook は同一イベントを再送しうるため、SQS FIFO の重複排除 ID に <code>comment_id</code> を使う（5 分窓）。窓外の再送で二重返信が起きる可能性は許容する（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a> の decision）</li>
@@ -414,7 +433,7 @@
 <ul>
   <li><strong>上限は 2 段</strong>（21-1 ⑤）: ① OpenAI 側のプロジェクト月額予算上限 ② Reply Lambda の予約同時実行数（初期値 2。SQS が吸収するため取りこぼしにならず、上限到達時は返信が遅れるだけ）</li>
   <li><strong>試算の枠組み</strong>: 返信 1 件 = 入力 600 トークン前後（問題文・真相・確定事実シート・ルール・質問）+ 出力 30 トークン程度。月 6,000 件（1 日 200 コメント）で入力 3.6M・出力 0.2M トークン。事業戦略書 3.1 の費目「コメント自動返信の LLM API（従量のみ・月数百円規模）」の範囲。単価確認後に外れていれば 21-6 で戦略書を直す。AWS 側（Lambda・SQS・S3 GET 月 6,000 回・CloudWatch）は無料枠内〜数十円</li>
-  <li>モデルはプローブテスト後、本番稼働まで固定。差し替えは Secret ではなく Lambda の環境変数（<code>OPENAI_MODEL</code>）で行う</li>
+  <li>モデルはプローブテスト後、本番稼働まで固定。差し替えは Secret ではなく Lambda の環境変数（<code>LUNA_MODEL</code>。21-6c2 で <code>OPENAI_MODEL</code> から改名。判定と書き手が共用）で行う</li>
 </ul>
 
 <h3>10.5 監視・運用</h3>
@@ -423,7 +442,29 @@
   <li><strong>トークン</strong>: コメント返信用の長期トークン（Instagram ログイン方式）は 60 日で失効する。初期版は投稿用トークンと同じく手動更新とし、失効日は <code>token_expires_at</code> を Secret に持たせて <a href="../operation.html">運用設計 5.4</a> のリマインド運用に載せる。自動リフレッシュ（<code>GET /refresh_access_token</code>）の要否は開発計画の設計課題（2026-09-04）で追う</li>
   <li><strong>ステージング面</strong>: PoC 資材（Meta アプリ + <code>test_tkghr</code> + 同一コードのステージング面スタック）を恒久利用し、プロンプト改訂・Lambda 改修は必ずステージング面で実コメントを打ってから本番の Webhook 先を切り替える</li>
   <li><strong>コメント欄の目視</strong>: 稼働初期（2 週間）は毎日コメント欄を目視し、ネタバレ回答・矛盾回答・不適切な返信がないかを確認する。問題があればストックを <code>is_active=0</code> にし、プロンプト（5.1）を直してステージングで再検証する。週次補充スキル（21-8）にチェック項目として組み込む</li>
+  <li><strong>判定の食い違いと合意制の割れ</strong>（21-6c2）: Reply Lambda の WARNING ログ <code>JUDGE_SHADOW_MISMATCH</code>（見張り役の食い違い）・<code>JUDGE_CONSENSUS_SPLIT</code>（正解宣言の合意が割れた = 手動で正解を伝えるかの判断が要る）・<code>REPLY_WRITER_FALLBACK</code>（書き手の出力を捨てて定型文に落とした）・<code>REPLY_OVER_80</code> を固定マーカーにした。メトリクスフィルタとアラームの配線は 21-6f（<a href="#judge-impl">5.1.2 の実装</a>）</li>
 </ul>
+
+<h3 id="comment-log">10.6 コメント記録 JSON（21-6c2）</h3>
+<p>Reply Lambda は 1 コメントにつき 1 件、受信・判定・返信の全記録を S3 に書く（継続改善用。Aurora への取り込みは 21-7b）。キーは <code>comment-log/{set_code}/dt=YYYY-MM-DD/{comment_id}.json</code>（日付は Webhook 受信時刻の UTC 日付。バケットは環境変数 <code>COMMENT_LOG_BUCKET</code>、既定は問題スナップショットと同じバケット）。書き込みの失敗は WARNING だけにして返信を止めない。スナップショットの無いコメントも <code>errors</code> に <code>problem_not_found</code> を入れて記録する。処理が例外で終わった場合も、書ける範囲で記録してから再試行に回す（同じキーに上書き）。実装は <code>services/comment-reply/app/comment_log.py</code>、ローカル試行ツールは同じ組み立てでファイルに書く。</p>
+<table>
+  <thead><tr><th>キー</th><th>型・内容</th></tr></thead>
+  <tbody>
+    <tr><td><code>schema_version</code></td><td>整数 <code>1</code></td></tr>
+    <tr><td><code>comment_id</code>・<code>media_id</code>・<code>set_code</code>・<code>text</code></td><td>文字列。コメント ID・メディア ID・セット・コメント本文</td></tr>
+    <tr><td><code>parent_id</code></td><td>文字列または null（スレッドへの返信のとき）</td></tr>
+    <tr><td><code>commenter_id</code></td><td>文字列または null。コメント者のアプリスコープ ID（<code>from.id</code>）。<strong>username は持たない</strong></td></tr>
+    <tr><td><code>content_key</code>・<code>problem_schema_version</code></td><td>問題スナップショットの <code>content_key</code> と <code>schema_version</code>（見つからなければ null）</td></tr>
+    <tr><td><code>fact_sheet_hash</code></td><td>確定事実シートのバージョン。<code>content_key</code> + <code>fact_sheet</code> の SHA-256 先頭 12 桁</td></tr>
+    <tr><td><code>times</code></td><td><code>comment_created_at</code>（Webhook の <code>entry.time</code>、無ければ null）・<code>webhook_received_at</code>（Webhook Lambda が SQS メッセージに載せる）・<code>judged_at</code>・<code>replied_at</code>。UTC の ISO 8601（末尾 Z）</td></tr>
+    <tr><td><code>config</code></td><td><code>judge_mode</code>・<code>shadow</code>・<code>consensus</code>・<code>reply_variant</code>・<code>luna_model</code>・<code>prompt_version</code>（同梱プロンプトの SHA-256 先頭 12 桁。5.1.2 の決定）</td></tr>
+    <tr><td><code>judgements</code></td><td><code>luna</code> / <code>jev</code> それぞれ <code>{kind, answer, reason, bare_term, error, debug}</code> または null（呼ばなかった方式）。<code>debug</code> はモデル名・トークン数（推論トークン含む）・応答秒・Jev の確率。生の応答全文は入れない</td></tr>
+    <tr><td><code>shadow_mismatch</code></td><td>真偽値または null。両方の判定があるときの kind / answer の食い違い</td></tr>
+    <tr><td><code>final</code></td><td>返信に使った <code>kind</code>・<code>answer</code>・<code>decision</code>（<code>luna</code> / <code>jev</code> / <code>jev_fallback_luna</code> / <code>consensus_ok</code> / <code>consensus_split</code>）</td></tr>
+    <tr><td><code>reply</code></td><td><code>text</code>（送った本文〔200 字で切り詰めた後〕または null）・<code>source</code>（<code>template</code> / <code>llm</code> / <code>fallback_template</code> / <code>consensus_split</code> / <code>no_reply</code>）・<code>reply_id</code>（Graph API の返信 ID）・<code>over_80</code></td></tr>
+    <tr><td><code>errors</code></td><td>文字列の配列（Jev の失敗・書き手のフォールバック理由・処理の例外）</td></tr>
+  </tbody>
+</table>
 
 <h2>11. 失敗時ポリシー</h2>
 <ul>
