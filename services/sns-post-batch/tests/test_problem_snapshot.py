@@ -18,7 +18,8 @@ POSTED_AT = datetime.datetime(2026, 9, 26, 11, 0, 12)
 def _item() -> UmigameItem:
     return UmigameItem(
         42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実１", "事実２"],
-        "質問のルール", "フック", "本文 #AIart",
+        ["要点１", "要点２"], "開示する真相", "質問のルール", "フック",
+        "本文 #AIart",
     )
 
 
@@ -66,7 +67,7 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
     assert isinstance(body, bytes)
     assert b"\\u" not in body
     assert json.loads(body.decode("utf-8")) == {
-        "schema_version": 1,
+        "schema_version": 2,
         "set_code": "umigame-soup-1",
         "media_id": "17912345678901234",
         "content_key": "001-lighthouse-letter",
@@ -74,6 +75,8 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
         "problem_text": "なぜ？",
         "truth": "真相です",
         "fact_sheet": ["事実１", "事実２"],
+        "core_points": ["要点１", "要点２"],
+        "reveal_text": "開示する真相",
         "rule_text": "質問のルール",
         "master_rules": "固定プロンプト",
     }
@@ -93,6 +96,33 @@ def test_write_problem_snapshot_skips_run_without_item(monkeypatch) -> None:
     monkeypatch.setattr(snapshot, "put_object", put)
 
     assert not _write(cursor, connection)
+    cursor.execute.assert_not_called()
+    put.assert_not_called()
+    connection.commit.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "item",
+    [
+        UmigameItem(
+            42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実"],
+            None, "開示する真相", "質問のルール", "フック", "本文",
+        ),
+        UmigameItem(
+            42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実"],
+            ["要点"], None, "質問のルール", "フック", "本文",
+        ),
+    ],
+)
+def test_write_problem_snapshot_requires_judge_points(monkeypatch, item) -> None:
+    cursor = Mock()
+    connection = Mock()
+    monkeypatch.setattr(snapshot, "fetch_umigame_item", Mock(return_value=item))
+    put = Mock()
+    monkeypatch.setattr(snapshot, "put_object", put)
+
+    with pytest.raises(RuntimeError, match="V013.*umigame_stock_items"):
+        _write(cursor, connection)
     cursor.execute.assert_not_called()
     put.assert_not_called()
     connection.commit.assert_not_called()

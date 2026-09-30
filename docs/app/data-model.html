@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-3 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-09-04（21-3: セクション 4.14 <code>umigame_items</code> / 4.15 <code>umigame_stock_items</code> の新設と <code>batch_sets.problem_snapshot_enabled</code>〔V012 草案〕、S3 キーに問題スナップショットを追加）。前回: 2026-09-03（16-12b: セクション 4.11 に指標セットのビュー昇格〔V011・ビュー 6 本〕の decision を追加。follows_and_unfollows は 100 フォロワー未満では API が返さないと確認）</span>
+  <span>最終更新: 2026-09-30（21-6c1: 4.14 / 4.15 に <code>core_points</code>・<code>reveal_text</code> を追加〔V013〕）。前回: 2026-09-04（21-3: セクション 4.14 <code>umigame_items</code> / 4.15 <code>umigame_stock_items</code> の新設と <code>batch_sets.problem_snapshot_enabled</code>〔V012 草案〕、S3 キーに問題スナップショットを追加）。前回: 2026-09-03（16-12b: セクション 4.11 に指標セットのビュー昇格〔V011・ビュー 6 本〕の decision を追加。follows_and_unfollows は 100 フォロワー未満では API が返さないと確認）</span>
 </div>
 
 <div class="note">
@@ -809,6 +809,7 @@ LIMIT 1;</code></pre>
       <tr><td><code>problem_text</code></td><td><code>VARCHAR(255) NOT NULL</code>。問題文（投稿時点のスナップショット。版面に焼き込まれた文と一致）</td></tr>
       <tr><td><code>truth</code></td><td><code>TEXT NOT NULL</code>。真相（AI 出題者の判定根拠。版面・キャプションには出さない）</td></tr>
       <tr><td><code>fact_sheet</code></td><td><code>JSON NOT NULL</code>。確定事実シート（文字列の配列）</td></tr>
+      <tr><td><code>core_points</code> / <code>reveal_text</code></td><td><code>JSON NULL</code> / <code>VARCHAR(255) NULL</code>。コアの要点と正解時の開示文のスナップショット（21-6c1〔V013〕で追加。ストックから写す。NULL は V013 適用前の行のみ）</td></tr>
       <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（スナップショット JSON に載せる）</td></tr>
       <tr><td><code>hook</code> / <code>caption</code></td><td><code>VARCHAR(40) NOT NULL</code> / <code>TEXT NOT NULL</code>。umigame 系プレースホルダ（<code>{{hook}}</code> / <code>{{caption}}</code>）の展開元</td></tr>
       <tr><td><code>snapshot_s3_key</code></td><td><code>VARCHAR(512) NULL</code>。出力した問題スナップショットの S3 キー（<code>assets/{set_code}/problems/{media_id}.json</code>）。<strong>NULL = 未出力</strong>（出力失敗の検出クエリ <code>WHERE snapshot_s3_key IS NULL</code> と、<code>posts.status='success'</code> の突合で運用が拾う）。SNS 投稿バッチが更新する唯一のカラム</td></tr>
@@ -841,6 +842,8 @@ LIMIT 1;</code></pre>
       <tr><td><code>problem_text</code></td><td><code>VARCHAR(255) NOT NULL</code>。問題文（78〜85 字。版面の問題カード）</td></tr>
       <tr><td><code>truth</code></td><td><code>TEXT NOT NULL</code>。真相</td></tr>
       <tr><td><code>fact_sheet</code></td><td><code>JSON NOT NULL</code>。確定事実シート（文字列の配列・8〜20 件。上限は 2026-09-26 に 12 → 20。<a href="sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>）</td></tr>
+      <tr><td><code>core_points</code></td><td><code>JSON NULL</code>。コアの要点（文字列の配列 1〜3 個・1 個 20 字以内。問題文の不思議の真相を説明するのに最低限必要な情報。コメント返信の ④ 正解 / ⑤ 惜しいの判定に使う。基準は<a href="sets/umigame-soup-1.html#judge-design">セット別設計書 5.1.1・5.1.2</a>）。21-6c1〔V013〕で追加。NULL = 未設定で、ウミガメ方式は出題しない（異常終了）</td></tr>
+      <tr><td><code>reveal_text</code></td><td><code>VARCHAR(255) NULL</code>。正解時に開示する真相の要約（70 字以内）。21-6c1〔V013〕で追加。NULL の扱いは <code>core_points</code> と同じ</td></tr>
       <tr><td><code>expected_questions</code></td><td><code>JSON NOT NULL</code>。想定質問と期待回答（<code>[{"q": …, "a": …}]</code>・15〜20 件。プローブテスト用。DB に入れるのは「レビュー済みの検証セット」を投入物と一緒に残すため）</td></tr>
       <tr><td><code>hook</code></td><td><code>VARCHAR(40) NOT NULL</code>。フック文（12 字前後）</td></tr>
       <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（45 字前後。セット既定文）</td></tr>

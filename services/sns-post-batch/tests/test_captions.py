@@ -36,6 +36,8 @@ def _umigame_item(**updates: object) -> UmigameItem:
         "problem_text": "なぜ？",
         "truth": "真相",
         "fact_sheet": ["事実"],
+        "core_points": ["要点"],
+        "reveal_text": "開示する真相",
         "rule_text": "質問してね",
         "hook": "解けるかな？",
         "caption": "本文 #AIart",

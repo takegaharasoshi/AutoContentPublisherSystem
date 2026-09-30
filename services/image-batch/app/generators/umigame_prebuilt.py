@@ -60,10 +60,34 @@ def _fact_sheet(value: Any) -> list[str]:
     return value
 
 
+def _core_points(value: Any) -> list[str]:
+    """Decode and validate the minimum truth points needed for reply judging."""
+    if isinstance(value, (bytes, bytearray)):
+        try:
+            value = value.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise RuntimeError("core_points must be valid UTF-8 JSON") from exc
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("core_points must be valid JSON") from exc
+    if (
+        not isinstance(value, list)
+        or not 1 <= len(value) <= 3
+        or any(not isinstance(point, str) or not point.strip() for point in value)
+    ):
+        raise RuntimeError(
+            "core_points must be an array of 1 to 3 non-empty strings"
+        )
+    return value
+
+
 def _fetch_stock_item(cursor: Any, set_id: int) -> dict[str, Any]:
     """Lock the next built stock item in the configured posting order."""
     cursor.execute(
-        "SELECT id, content_key, problem_text, truth, fact_sheet, rule_text, "
+        "SELECT id, content_key, problem_text, truth, fact_sheet, core_points, "
+        "reveal_text, rule_text, "
         "caption, hook, video_s3_key, video_audio_asset_id, use_count "
         "FROM umigame_stock_items "
         "WHERE set_id = %s AND is_active = 1 AND video_s3_key IS NOT NULL "
@@ -77,18 +101,19 @@ def _fetch_stock_item(cursor: Any, set_id: int) -> dict[str, Any]:
 
     names = (
         "id", "content_key", "problem_text", "truth", "fact_sheet",
-        "rule_text", "caption", "hook", "video_s3_key",
+        "core_points", "reveal_text", "rule_text", "caption", "hook", "video_s3_key",
         "video_audio_asset_id", "use_count",
     )
     item = dict(zip(names, row))
     for name in (
         "content_key", "problem_text", "truth", "rule_text", "hook",
-        "caption", "video_s3_key",
+        "caption", "video_s3_key", "reveal_text",
     ):
         value = item[name]
         if not isinstance(value, str) or not value.strip():
             raise RuntimeError(f"umigame_stock_items.{name} is required")
     item["fact_sheet"] = _fact_sheet(item["fact_sheet"])
+    item["core_points"] = _core_points(item["core_points"])
     if item["video_audio_asset_id"] is None:
         raise RuntimeError("umigame_stock_items.video_audio_asset_id is required")
     if int(item["use_count"]) >= 1:
@@ -113,8 +138,8 @@ def generate(context: GeneratorContext) -> GeneratorResult:
     context.cursor.execute(
         "INSERT INTO umigame_items "
         "(set_id, generation_run_id, stock_item_id, content_key, problem_text, "
-        "truth, fact_sheet, rule_text, hook, caption) "
-        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        "truth, fact_sheet, core_points, reveal_text, rule_text, hook, caption) "
+        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (
             context.prompt_config.set_id,
             context.generation_run_id,
@@ -123,6 +148,8 @@ def generate(context: GeneratorContext) -> GeneratorResult:
             item["problem_text"],
             item["truth"],
             json.dumps(item["fact_sheet"], ensure_ascii=False),
+            json.dumps(item["core_points"], ensure_ascii=False),
+            item["reveal_text"],
             item["rule_text"],
             item["hook"],
             item["caption"],

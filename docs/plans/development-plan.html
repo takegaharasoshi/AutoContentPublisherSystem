@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-09-29（<strong>21-6c を <a href="#step-21-6c1">21-6c1</a>〔問題 JSON の項目追加〕と <a href="#step-21-6c2">21-6c2</a>〔本番 Lambda〕に分割</strong>し、21-6c1 ゴール A で 14 問分の判定用の要点と開示文を起こした。次は文面の人間レビュー）。前回: 2026-09-29（<strong>21-6b2 完了</strong>: 返信文の基準を<a href="../app/sets/umigame-soup-1.html#reply-style">セット別設計書 5.1.1</a> に決め、13 案の試走から候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った。次は 21-6c）。前回: 2026-09-28（<strong>21-6b 完了</strong>: 試行 8b で両方式とも P1〜P7・レベル 1 の機械基準を満たし、判定の暫定方針を「パターン 1 主役 + Jev は見張り役と開示の二重確認」に整理。返信文の品質の検討を <a href="#step-21-6b2">21-6b2</a> として起票。次は 21-6b2）。前回: 2026-09-27（<strong>21-6b 設計と試走</strong>: 判定モジュールの契約と 2 方式の機能設計を<a href="../app/sets/umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a> に書き、185 件で試走〔種別一致率 パターン 1 = 96.2% / パターン 2 = 73.5%〕。effort <code>xhigh</code>・上限 800 を承認し、試行錯誤の記録用に<a href="../app/sets/umigame-soup-1-judge-study.html">検討ページ</a>を新設）。前回: 2026-09-27（<strong>21-6a 完了</strong>: コメント返信の品質レベルを<a href="../app/sets/umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a> に定義。最低 = レベル 1 + 前提条件 P1〜P7・目標 = レベル 2・コメント種別 22 種。次は 21-6b）。前回: 2026-09-27（<strong>21-5c 完了</strong>: TTS を Irodori-TTS〔BF16・声 G4 のクローン〕へ切り替えて 14 本を作り直し、全数試聴を経て publish で両環境へ反映）。前回: 2026-09-26（<strong>21-5c を起票</strong>: アイデア「<a href="../ideas/umigame-tts-gemini-flash.md">Gemini 3.8 Flash TTS で動画音声を作る</a>」を採用。ナレーションを声 G4 の Gemini TTS へ切り替えて 14 本を作り直す。21-7 の着手条件に追加）。前回: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
+  <span>最終更新: 2026-09-30（<strong>21-6c1 完了</strong>: コアを「真相の説明に最低限必要な情報」として整理して 14 問分をレビュー済み、V013・スナップショット <code>schema_version</code> 2 を実装。次は push → パイプライン確認 → Aurora へ V013〔ユーザー〕→ 21-6c2）。前回: 2026-09-29（<strong>21-6c を <a href="#step-21-6c1">21-6c1</a>〔問題 JSON の項目追加〕と <a href="#step-21-6c2">21-6c2</a>〔本番 Lambda〕に分割</strong>し、21-6c1 ゴール A で 14 問分の判定用の要点と開示文を起こした。次は文面の人間レビュー）。前回: 2026-09-29（<strong>21-6b2 完了</strong>: 返信文の基準を<a href="../app/sets/umigame-soup-1.html#reply-style">セット別設計書 5.1.1</a> に決め、13 案の試走から候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った。次は 21-6c）。前回: 2026-09-28（<strong>21-6b 完了</strong>: 試行 8b で両方式とも P1〜P7・レベル 1 の機械基準を満たし、判定の暫定方針を「パターン 1 主役 + Jev は見張り役と開示の二重確認」に整理。返信文の品質の検討を <a href="#step-21-6b2">21-6b2</a> として起票。次は 21-6b2）。前回: 2026-09-27（<strong>21-6b 設計と試走</strong>: 判定モジュールの契約と 2 方式の機能設計を<a href="../app/sets/umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a> に書き、185 件で試走〔種別一致率 パターン 1 = 96.2% / パターン 2 = 73.5%〕。effort <code>xhigh</code>・上限 800 を承認し、試行錯誤の記録用に<a href="../app/sets/umigame-soup-1-judge-study.html">検討ページ</a>を新設）。前回: 2026-09-27（<strong>21-6a 完了</strong>: コメント返信の品質レベルを<a href="../app/sets/umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a> に定義。最低 = レベル 1 + 前提条件 P1〜P7・目標 = レベル 2・コメント種別 22 種。次は 21-6b）。前回: 2026-09-27（<strong>21-5c 完了</strong>: TTS を Irodori-TTS〔BF16・声 G4 のクローン〕へ切り替えて 14 本を作り直し、全数試聴を経て publish で両環境へ反映）。前回: 2026-09-26（<strong>21-5c を起票</strong>: アイデア「<a href="../ideas/umigame-tts-gemini-flash.md">Gemini 3.8 Flash TTS で動画音声を作る</a>」を採用。ナレーションを声 G4 の Gemini TTS へ切り替えて 14 本を作り直す。21-7 の着手条件に追加）。前回: 2026-09-26（<strong>21-5b 完了</strong>: 方式モジュール・umigame 系キャプション・投稿後スナップショット出力を実装。スナップショットの <code>s3:PutObject</code> 権限と手動再出力ツールは 21-7 へ）。前回: 2026-09-26（<strong>21-6b のパターン 1 のモデルを <code>gpt-6-luna</code> / effort <code>max</code> に確定</strong>〔アイデア「<a href="../ideas/codex-model-gpt6-luna.md">GPT-6 Luna への更新</a>」〕。前回: <strong>21-5a 完了</strong>: 全数レビュー〔素材・背景・動画〕を終えて 14 本を再ビルドし、続けて 21-5b ① 〔ストックの入れ直し・BGM 登録・publish 本実行〕を両環境へ反映。前回: <strong>21-6 を 21-6a〜g に分割</strong>: アイデア「<a href="../ideas/umigame-yesno-jev.md">Jev によるコメント判定</a>」を採用。品質レベルの定義 → 判定方式〔luna 一括 / Jev 段階判定〕の設計と試走 → 実装 → 全件の機械プローブ → ローカルの人間プローブと方式選定 → 本番スタック。コメント返信トークンの自動更新は判定と切り離した独立ステップ 21-6g〔I-031 の展開・リリース前に必須〕）。前回: 2026-09-23（<strong>21-5a 全数ビルド</strong>: ツーリングを本組みし 14 本をビルド。次は全数レビューと <code>approved.txt</code>〔ユーザー〕。2026-09-24 に BGM を確定して再ビルド済み）。前回: 2026-09-23（<strong>21-4b 完了</strong>: batch_sets 行〔is_active = 0〕と 14 問をローカル MySQL・Aurora の両環境へ投入。次は 21-5a）。前回: 2026-09-23（<strong>21-4a-5 完了</strong>: story 7 問が揃い全 14 問〔misdirection 7 / story 7〕。次は Aurora への V012 適用〔ユーザー〕→ 21-4b）。前回: 2026-09-23（21-4a-5 U26 ゴール B: 素材化して人間ゲートへ提示。全 14 問が揃った）。前回: 2026-09-23（21-4a-5 U26: 人間ゲートで物語 1「うそつきの通訳」を承認。次はゴール B）。前回: 2026-09-23（21-4a-5 U26 ゴール A: 物語 2 本 + 切り出し案を人間ゲートへ提示）。前回: 2026-09-23（<strong>21-4a-4 完了</strong>: story.md を物語先行方式で Fix・validate.py 追随・試作 U20「間違えたのは誰か」がコアゲート通過〔2 巡目〕。次の着手は 21-4a-5 = U20 の素材化から story 7 問）。前回: 2026-09-22（21-4a-4 ゴール 3/3 の 2 巡目を人間ゲートへ提示）。前回: 2026-09-22（21-4a-4 ゴール 2/3 スキル改修完了: story.md を物語先行方式で Fix・validate.py 追随）。前回: 2026-09-22（21-4a-4 ゴール 1/3 壁打ち完了: 再設計方針を合意〔一本化 / ゴール A で物語 2〜3 本 + 切り出し案 / U20 旧候補は破棄〕）。前回: 2026-09-22（<strong>21-4a-3 完了</strong>: 型別分離で「misdirection 7 問 + 意味誤誘導型スキルの一時 Fix」へ再定義して達成。U15・U17・U19 は削除、U18 は「白紙に戻った約束」として意味誤誘導型に書き換え。21-4a-4〔story 再設計壁打ち〕・21-4a-5〔story 7 問〕を新設し、次の着手は 21-4a-4）。前回: 2026-09-22（21-4a-3 ③ 5 問目 U19「雨が降ると鳴るチャイム」の人間ゲート通過〔コアゲート 5 巡・素材 1 巡〕。ストック 10 問・次は U20）。前回: 2026-09-22（<a href="#phase-26">Phase 26</a>〔SNS 投稿バッチの当回固定〕を課題 <a href="../issues/index.html#I-014">I-014</a> の展開として起票。I-022・I-024 ① を後続 26-5・26-6 に同梱。<code>/issue</code> 壁打ちの初回試行は OK として<a href="development-log.html#step-22-3">開発記録 22-3</a> へ移した）。前回: 2026-09-21（25-2: 全ステップを<a href="_templates/step.html">新しい記載様式</a>へ移行し、構造検査 <code>tools/docs_check.py --plan-only</code> の対象に登録した）。<strong>更新履歴はここに積まない</strong> — 各ステップの状態・要点はステップ本体、経緯の全文は<a href="development-log.html">開発記録</a>、変更履歴は git 履歴を参照する。</span>
 </div>
 
 <div class="note">
@@ -81,7 +81,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 15 件（21-1〜21-6b2／クリックで展開）</summary>
+<summary>完了済み 16 件（21-1〜21-6c1／クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-21-1" data-step-id="21-1" data-status="done" data-completed="2026-09-03" data-kind="decision">
@@ -671,30 +671,13 @@
 </details>
 </div>
 </article>
-</div>
-</details>
 
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<article class="plan-step" id="step-21-6c1" data-step-id="21-6c1" data-status="doing">
+<article class="plan-step" id="step-21-6c1" data-step-id="21-6c1" data-status="done" data-completed="2026-09-30">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6c1</strong><span class="plan-status">進行中</span></div>
+<div class="plan-meta"><strong>21-6c1</strong><span class="plan-status">完了</span><span>2026-09-30</span></div>
 <h3>問題 JSON の項目追加（判定用の要点・開示文）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>21-6b・21-6b2 の完了後（コア基準と開示の方針が決まっていること）。</p>
-<p data-field="result"><strong>現況：</strong>ゴール A（文面）: 14 問分の <code>core_points</code>（2026-09-30 にコアの考え方を整理して書き直した）・<code>reveal_text</code> を <code>stock_items.py</code> に起こし、<code>validate.py</code> 全 14 問 OK。文面の人間レビュー済み（2026-09-30）。<strong>次はゴール B</strong>（DDL・スナップショット・設計書）。</p>
+<p data-field="result"><strong>結果：</strong>コアを「問題文の不思議の真相を説明するのに最低限必要な情報」（1〜3 個・1 個 20 字以内）として整理し、14 問分の <code>core_points</code>・<code>reveal_text</code> をレビュー済みで <code>stock_items.py</code> に置いた。V013・投入 / UPDATE SQL・image-batch の転記・スナップショット <code>schema_version</code> 2 を実装（Aurora への適用はユーザー）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -722,10 +705,28 @@
 </details>
 <details class="plan-fold" data-field="record">
 <summary>5. 作業記録 <span class="plan-hint">— ゴール A まで</span></summary>
-<div class="plan-fold-inner"><p><strong>2026-09-29（ゴール A: 文面）</strong>: 14 問分の 3 項目を <code>stock_items.py</code> の <code>JUDGE_POINTS</code> に起こし、<code>umigame_common.REQUIRED_KEYS</code> に 3 項目を追加、<code>validate.py</code> に検査（コアの要点 1〜2 個・要素は改行なしの空でない文字列・開示文 70 字以内）を足した。結果: <code>validate.py</code> 全 14 問 OK（警告 2 件は既存の hook 字数とナレーション秒数）、開示文は 44〜56 字。わざと壊した値で検査が効くことを確認。</p><p><strong>2026-09-30（コアを最小に）</strong>: ユーザーの指摘（「2人は氷鬼をしていた？」がコアの後半の説明不足で不正解になりかねない）を受け、コアの要点を<strong>原則 1 個・目安 15 字前後・上限 20 字</strong>の「何だったか」だけに縮め、理由・結果・経緯は <code>support_points</code> へ回した（14 問とも 1 個・8〜16 字）。同日、周辺の要点は判定に使わない（使い道は機械プローブのラベル付けの参考だけで、真相の全文で足りる）ため、ユーザー判断で <code>support_points</code> を項目ごと廃止した（<code>REQUIRED_KEYS</code>・<code>validate.py</code>・設計書 5.1.1 / 5.1.2 から削除）。</p><p><strong>2026-09-30（コアの考え方の整理）</strong>: 「原則 1 個」は誤りだった。ユーザーの整理 = 正解の条件は問題文の不思議の真相を説明できているかで、コアは真相を説明するのに最低限必要な情報（要点は短く、個数は説明に必要なだけ）。これを普遍の前提としてセット別設計書 5.1.1 に書き、14 問のコアを書き直した（2 点 = U01・U14・U21・U28、他は 1 点。1 個 8〜18 字）。<code>validate.py</code> は 1〜3 個・1 個 20 字以内。同日、主語のない語だけのコメント（「ひな人形？」）は ③ で聞き返す線引き（案 A）と、その聞き返しに限って語の復唱を許す例外をユーザーが決定し、設計書 5.1.1 に書いた。プロンプト・返信文の対応は 21-6c2、評価データの追加は 21-6d の実装メモに入れた。</p><p><strong>2026-09-30（文面レビュー）</strong>: ユーザーが 14 問のコアと開示文をレビュー。修正 5 件 = U13 に「手紙はタイムカプセルに入っていた」、U18 に「文字は消せるペンで書かれていた」を追加、U21 の「去年」を削除、U22 の「生家」を「男が育った家」に、U24 を「子どもたちは毎日男を合図に家を出ていた」に変更。他 9 問と開示文 14 件はそのまま承認（U28 は真相を直接書いてよい）。<code>validate.py</code> 全 14 問 OK。規則をセット別設計書 5.1.1 のコア基準に書き、<code>validate.py</code> に 20 字の上限を足した（全 14 問 OK）。21-6b の試走の成績は長いコアで測ったもので、影響（正解宣言が増える・⑤ の幅が狭まる）は 21-6d の機械プローブで測る。<code>generate.py</code> の投入 SQL は差分なし（列の追加はゴール B）。<code>judge-trial</code> の pytest は変更前から 4 件失敗（<code>test_reply_trial.py</code>。本変更と無関係）。</p></div>
+<div class="plan-fold-inner"><p><strong>2026-09-29（ゴール A: 文面）</strong>: 14 問分の 3 項目を <code>stock_items.py</code> の <code>JUDGE_POINTS</code> に起こし、<code>umigame_common.REQUIRED_KEYS</code> に 3 項目を追加、<code>validate.py</code> に検査（コアの要点 1〜2 個・要素は改行なしの空でない文字列・開示文 70 字以内）を足した。結果: <code>validate.py</code> 全 14 問 OK（警告 2 件は既存の hook 字数とナレーション秒数）、開示文は 44〜56 字。わざと壊した値で検査が効くことを確認。</p><p><strong>2026-09-30（コアを最小に）</strong>: ユーザーの指摘（「2人は氷鬼をしていた？」がコアの後半の説明不足で不正解になりかねない）を受け、コアの要点を<strong>原則 1 個・目安 15 字前後・上限 20 字</strong>の「何だったか」だけに縮め、理由・結果・経緯は <code>support_points</code> へ回した（14 問とも 1 個・8〜16 字）。同日、周辺の要点は判定に使わない（使い道は機械プローブのラベル付けの参考だけで、真相の全文で足りる）ため、ユーザー判断で <code>support_points</code> を項目ごと廃止した（<code>REQUIRED_KEYS</code>・<code>validate.py</code>・設計書 5.1.1 / 5.1.2 から削除）。</p><p><strong>2026-09-30（コアの考え方の整理）</strong>: 「原則 1 個」は誤りだった。ユーザーの整理 = 正解の条件は問題文の不思議の真相を説明できているかで、コアは真相を説明するのに最低限必要な情報（要点は短く、個数は説明に必要なだけ）。これを普遍の前提としてセット別設計書 5.1.1 に書き、14 問のコアを書き直した（2 点 = U01・U14・U21・U28、他は 1 点。1 個 8〜18 字）。<code>validate.py</code> は 1〜3 個・1 個 20 字以内。同日、主語のない語だけのコメント（「ひな人形？」）は ③ で聞き返す線引き（案 A）と、その聞き返しに限って語の復唱を許す例外をユーザーが決定し、設計書 5.1.1 に書いた。プロンプト・返信文の対応は 21-6c2、評価データの追加は 21-6d の実装メモに入れた。</p><p><strong>2026-09-30（文面レビュー）</strong>: ユーザーが 14 問のコアと開示文をレビュー。修正 5 件 = U13 に「手紙はタイムカプセルに入っていた」、U18 に「文字は消せるペンで書かれていた」を追加、U21 の「去年」を削除、U22 の「生家」を「男が育った家」に、U24 を「子どもたちは毎日男を合図に家を出ていた」に変更。他 9 問と開示文 14 件はそのまま承認（U28 は真相を直接書いてよい）。<code>validate.py</code> 全 14 問 OK。規則をセット別設計書 5.1.1 のコア基準に書き、<code>validate.py</code> に 20 字の上限を足した（全 14 問 OK）。21-6b の試走の成績は長いコアで測ったもので、影響（正解宣言が増える・⑤ の幅が狭まる）は 21-6d の機械プローブで測る。<code>generate.py</code> の投入 SQL は差分なし（列の追加はゴール B）。<code>judge-trial</code> の pytest は変更前から 4 件失敗（<code>test_reply_trial.py</code>。本変更と無関係）。</p><p><strong>2026-09-30（ゴール B・完了）</strong>: <code>database/V013__umigame_judge_points.sql</code>（<code>umigame_stock_items</code>・<code>umigame_items</code> に <code>core_points JSON NULL</code>・<code>reveal_text VARCHAR(255) NULL</code>）、<code>generate.py</code>（INSERT に 2 列・既存 14 問向け <code>update_judge_points.sql</code>・dry-run は既存行があれば UPDATE を試す・<code>fact_sheet</code> の検査上限を 12 → 20 に合わせた）、image-batch の <code>umigame_prebuilt.py</code>（ストックの 2 列を検査して <code>umigame_items</code> へ写す。未設定なら異常終了）、sns-post-batch（<code>umigame_items</code> の 2 列を読み、スナップショットを <code>schema_version</code> 2 に。NULL なら例外 = WARNING で投稿は失敗にしない）。コードは Codex へ委譲し Claude がレビュー。ローカル MySQL に V013 を適用し <code>generate.py --dry-run</code> OK（14 件 UPDATE → 2 列とも 14 件設定・<code>core_points</code> 1〜3 個 14 件・開示文最大 56 字 → ROLLBACK）。pytest: image-batch 176 passed / 5 skipped・sns-post-batch 156 passed。設計書: セット別 10.2・方式設計書 4・data-model 4.14 / 4.15。<strong>残りの人間ゲート</strong>: push → CodePipeline 完走確認（確認待ちリスト 19-1 の初回試行を兼ねる）→ Aurora へ V013 → <code>update_judge_points.sql</code> の順（逆順だと image-batch の SELECT が失敗する。セットは <code>is_active = 0</code> なので実害はない）。確認待ち: 19-1（push 後に記入）。課題表のクローズ移動: 該当なし。</p></div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <article class="plan-step" id="step-21-6c2" data-step-id="21-6c2" data-status="todo">
 <header class="plan-step-head">

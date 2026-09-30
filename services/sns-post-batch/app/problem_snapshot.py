@@ -42,6 +42,16 @@ def write_problem_snapshot(
     item = fetch_umigame_item(cursor, generation_run_id)
     if item is None:
         return False
+    if (
+        not isinstance(item.core_points, list)
+        or not item.core_points
+        or not isinstance(item.reveal_text, str)
+        or not item.reveal_text.strip()
+    ):
+        raise RuntimeError(
+            "umigame_items.core_points / reveal_text is NULL or empty; "
+            "apply V013 and update the umigame_stock_items rows before publishing snapshots"
+        )
 
     cursor.execute(
         "SELECT prompt_text FROM prompt_configs "
@@ -60,7 +70,7 @@ def write_problem_snapshot(
 
     key = f"assets/{set_code}/problems/{media_id}.json"
     snapshot = {
-        "schema_version": 1,
+        "schema_version": 2,
         "set_code": set_code,
         "media_id": media_id,
         "content_key": item.content_key,
@@ -68,6 +78,8 @@ def write_problem_snapshot(
         "problem_text": item.problem_text,
         "truth": item.truth,
         "fact_sheet": item.fact_sheet,
+        "core_points": item.core_points,
+        "reveal_text": item.reveal_text,
         "rule_text": item.rule_text,
         "master_rules": prompt_row[0],
     }

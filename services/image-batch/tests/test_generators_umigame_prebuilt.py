@@ -20,6 +20,8 @@ def _stock_row(**updates: object) -> tuple[object, ...]:
         "problem_text": "問題文",
         "truth": "真相",
         "fact_sheet": json.dumps(["確定事実", "別の事実"], ensure_ascii=False),
+        "core_points": json.dumps(["要点", "別の要点"], ensure_ascii=False),
+        "reveal_text": "開示する真相",
         "rule_text": "質問のルール",
         "caption": "本文 #AIart",
         "hook": "なぜでしょう？",
@@ -84,8 +86,8 @@ def test_generate_fetches_video_and_stages_stock_and_history(monkeypatch) -> Non
     assert cursor.calls[1][1] == (used_at, 91)
     assert cursor.calls[2][1] == (
         9, 123, 91, "001-lighthouse-letter", "問題文", "真相",
-        '["確定事実", "別の事実"]', "質問のルール", "なぜでしょう？",
-        "本文 #AIart",
+        '["確定事実", "別の事実"]', '["要点", "別の要点"]',
+        "開示する真相", "質問のルール", "なぜでしょう？", "本文 #AIart",
     )
 
 
@@ -160,12 +162,36 @@ def test_generate_rejects_invalid_fact_sheet(value: object) -> None:
         umigame.generate(_context(Cursor([_stock_row(fact_sheet=value)])))
 
 
+@pytest.mark.parametrize(
+    "value",
+    [None, "{}", "[]", '["valid", "", "too many"]', '["valid", 2]',
+     "broken", b'["valid", ""]', b"\xff", ["valid", None]],
+)
+def test_generate_rejects_invalid_core_points(value: object) -> None:
+    with pytest.raises(RuntimeError, match="core_points"):
+        umigame.generate(_context(Cursor([_stock_row(core_points=value)])))
+
+
+@pytest.mark.parametrize("value", [None, "", " ", 123])
+def test_generate_rejects_invalid_reveal_text(value: object) -> None:
+    with pytest.raises(RuntimeError, match="reveal_text"):
+        umigame.generate(_context(Cursor([_stock_row(reveal_text=value)])))
+
+
 @pytest.mark.parametrize("value", [["事実"], b'["\xe4\xba\x8b\xe5\xae\x9f"]'])
 def test_generate_accepts_decoded_fact_sheet(monkeypatch, value: object) -> None:
     monkeypatch.setattr(umigame, "get_object", lambda *args, **kwargs: b"mp4")
     cursor = Cursor([_stock_row(fact_sheet=value)])
     umigame.generate(_context(cursor))
     assert json.loads(cursor.calls[2][1][6]) == ["事実"]
+
+
+@pytest.mark.parametrize("value", [["要点"], '["要点"]'.encode("utf-8")])
+def test_generate_accepts_decoded_core_points(monkeypatch, value: object) -> None:
+    monkeypatch.setattr(umigame, "get_object", lambda *args, **kwargs: b"mp4")
+    cursor = Cursor([_stock_row(core_points=value)])
+    umigame.generate(_context(cursor))
+    assert json.loads(cursor.calls[2][1][7]) == ["要点"]
 
 
 def test_generate_fails_when_s3_download_fails_without_staging_db(monkeypatch) -> None:

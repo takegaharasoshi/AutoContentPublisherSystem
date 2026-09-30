@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>方式名（レジストリキー）: umigame-prebuilt</span>
-  <span>最終更新: 2026-09-26（21-5b: 実行時モジュール <code>umigame_prebuilt.py</code> を実装し、セクション 2 に実装の差分を追記）。前回: 2026-09-23（21-5a の実装差分を 8.1 に追記）</span>
+  <span>最終更新: 2026-09-30（21-6c1: ストックから出題履歴へ写す項目に <code>core_points</code>・<code>reveal_text</code> を追加〔V013〕）。前回: 2026-09-26（21-5b: 実行時モジュール <code>umigame_prebuilt.py</code> を実装し、セクション 2 に実装の差分を追記）。前回: 2026-09-23（21-5a の実装差分を 8.1 に追記）</span>
 </div>
 
 <div class="note">
@@ -75,7 +75,7 @@
 </div>
 
 <h2 id="stock">4. ストックの取得（ビルド済み限定の LRU 順繰り・軸なし）</h2>
-<pre><code>SELECT id, content_key, problem_text, truth, fact_sheet, rule_text, caption, hook,
+<pre><code>SELECT id, content_key, problem_text, truth, fact_sheet, core_points, reveal_text, rule_text, caption, hook,
        video_s3_key, video_audio_asset_id, use_count
 FROM umigame_stock_items
 WHERE set_id = %s AND is_active = 1 AND video_s3_key IS NOT NULL
@@ -98,7 +98,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
   <thead><tr><th>成果物</th><th>S3</th><th>DB</th></tr></thead>
   <tbody>
     <tr><td>投稿する MP4</td><td><code>videos/{set_code}/{YYYYMMDD}/{generation_run_id}/{prompt_config_id}_0.mp4</code>（共通骨格が保存。事前動画のコピー）</td><td><code>generated_media</code> 1 行（<code>file_format='mp4'</code>・<code>audio_asset_id</code> = ストックの <code>video_audio_asset_id</code>）</td></tr>
-    <tr><td>出題履歴 + 問題固有部分のスナップショット</td><td>—</td><td><code>umigame_items</code> 1 行（<code>generation_run_id</code> と 1 : 1。<code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>rule_text</code> / <code>caption</code> / <code>hook</code> / <code>stock_item_id</code>。<a href="../data-model.html#detail-umigame-items">data-model.html 4.14</a>）。行の作成は方式・commit は共通骨格</td></tr>
+    <tr><td>出題履歴 + 問題固有部分のスナップショット</td><td>—</td><td><code>umigame_items</code> 1 行（<code>generation_run_id</code> と 1 : 1。<code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>core_points</code> / <code>reveal_text</code> / <code>rule_text</code> / <code>caption</code> / <code>hook</code> / <code>stock_item_id</code>。<code>core_points</code>・<code>reveal_text</code> は 21-6c1〔V013〕で追加。ストック側が NULL なら異常終了し、未設定の問題を出題しない。<a href="../data-model.html#detail-umigame-items">data-model.html 4.14</a>）。行の作成は方式・commit は共通骨格</td></tr>
     <tr><td>問題スナップショット JSON（コメント返信用）</td><td><code>assets/{set_code}/problems/{media_id}.json</code></td><td><code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code>。<strong>本方式ではなく SNS 投稿バッチが publish 成功直後に出力・記録する</strong>（<code>media_id</code> は publish 後にしか分からないため）</td></tr>
   </tbody>
 </table>

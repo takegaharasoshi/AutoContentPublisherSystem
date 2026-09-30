@@ -71,6 +71,8 @@ class UmigameItem:
     problem_text: str
     truth: str
     fact_sheet: list[str]
+    core_points: list[str] | None
+    reveal_text: str | None
     rule_text: str
     hook: str
     caption: str
