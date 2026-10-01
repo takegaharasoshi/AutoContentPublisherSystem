@@ -67,17 +67,41 @@ def _percent(rate: float | None) -> str:
     return f"{rate:.1%}" if rate is not None else "対象なし"
 
 
+def _row_anchor(pattern_id: str, case_id: str) -> str:
+    return f"r-{pattern_id}-{case_id}"
+
+
+def _ng_details(pattern_id: str, item: dict[str, Any]) -> str:
+    """合否表のセルに置く NG の ID 一覧（折りたたみ）。ID は下の一覧表の行へのリンク。"""
+    entries = item.get("ng") or []
+    if not entries:
+        return ""
+    links = "".join(
+        f'<li><a class="ng-link" href="#{_h(_row_anchor(pattern_id, e["id"]))}">{_h(e["id"])}</a>'
+        + (f' <span class="ng-note">{_h(e["note"])}</span>' if e.get("note") else "") + "</li>"
+        for e in entries)
+    return (f'<details class="ng-ids"><summary>NG {len(entries)} 件</summary>'
+            f"<ul>{links}</ul></details>")
+
+
 def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> str:
-    cells = ['<div class="table-wrap"><table class="summary-table"><thead><tr><th>指標</th>']
+    cells = ['<div class="ng-toolbar"><button type="button" class="ng-all" data-open="1">'
+             'NG の ID をすべて開く</button><button type="button" class="ng-all" data-open="0">'
+             'すべて閉じる</button></div>',
+             '<div class="table-wrap"><table class="summary-table"><thead><tr><th>指標</th>']
     cells.extend(f"<th>{_h(p['label'])}</th>" for p in patterns)
     cells.append("<th>合格ライン</th></tr></thead><tbody>")
     for heading, entries in SECTIONS:
         cells.append(f'<tr class="group"><th colspan="{len(patterns) + 2}">{_h(heading)}</th></tr>')
         for key, name in entries:
-            cells.append(f"<tr><th>{_h(name)}</th>")
+            has_ng = any(metrics["patterns"][p["id"]]["metrics"][key].get("ng") for p in patterns)
+            toggle = ('<button type="button" class="ng-row" aria-label="この行の NG を開く / 閉じる">'
+                      '行を開く</button>' if has_ng else "")
+            cells.append(f"<tr><th>{_h(name)}{toggle}</th>")
             for pattern in patterns:
                 item = metrics["patterns"][pattern["id"]]["metrics"][key]
-                cells.append(f"<td>{_h(item['value'])} {_badge(item['pass'])}</td>")
+                cells.append(f"<td>{_h(item['value'])} {_badge(item['pass'])}"
+                             f"{_ng_details(pattern['id'], item)}</td>")
             threshold = metrics["patterns"][patterns[0]["id"]]["metrics"][key]["threshold"]
             cells.append(f"<td>{_h(threshold)}</td></tr>")
     count = sum(len(entries) for _, entries in SECTIONS)
@@ -174,81 +198,74 @@ def _time_svg(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> str:
     return "".join(out)
 
 
-def _failure_detail(items: dict[str, Any]) -> str:
+def _metric_detail(key: str, item: dict[str, Any]) -> str:
     """不合格の指標の内訳（どの種別・何件で落ちたか）を短く書く。"""
-    parts = []
-    kind = items["L1_kind"]
-    if kind["pass"] is False:
-        low = [f"{_kind(k)} {v['count']}/{v['total']}" for k, v in kind["by_kind"].items()
+    if key == "L1_kind":
+        low = [f"{_kind(k)} {v['count']}/{v['total']}" for k, v in item["by_kind"].items()
                if v["total"] and v["rate"] is not None and v["rate"] < .8 and k not in
                {"q_yesno", "q_multi", "q_open"}]
-        parts.append("L1① で 80% 未満: " + ("・".join(low) if low else f"全体 {kind['value']}"))
-    phrasing = items["L1_phrasing"]
-    if phrasing["pass"] is False:
-        over = [f"{_kind(k)} {v['count']}/{v['total']}" for k, v in phrasing["by_kind"].items()
-                if v["rate"] > .5]
-        parts.append("L1② で 50% 超: " + "・".join(over))
-    for key in ("L2_one_liner", "L2_opener"):
-        if items[key]["pass"] is False:
-            item = items[key]
-            parts.append(f"{METRIC_NAMES[key]} {item['total'] - item['count']} 件")
-    for key in ("P1", "P2", "P7", "L2_conflict", "L2_proximity", "L2_emoji"):
-        if items[key]["pass"] is False:
-            parts.append(f"{METRIC_NAMES[key]} {items[key]['count']} 件")
-    return " / ".join(parts)
+        return "80% 未満: " + "・".join(low) if low else f"全体 {item['value']}"
+    if key == "L1_phrasing":
+        return "50% 超: " + "・".join(f"{_kind(k)} {v['count']}/{v['total']}"
+                                       for k, v in item["by_kind"].items() if v["rate"] > .5)
+    if key in {"L2_one_liner", "L2_opener"}:
+        return f"{item['total'] - item['count']} 件"
+    if key in {"P1", "P2", "P7", "L2_conflict", "L2_proximity", "L2_emoji"}:
+        return f"{item['count']} 件"
+    return str(item["value"])
+
+
+def _level_cell(items: dict[str, Any], keys: tuple[str, ...]) -> str:
+    failed = [key for key in keys if items[key]["pass"] is False]
+    if not failed:
+        unknown = all(items[key]["pass"] is None for key in keys)
+        return _badge(None if unknown else True)
+    rows = "".join(f"<li><strong>{_h(METRIC_NAMES[key])}</strong> "
+                   f"{_h(_metric_detail(key, items[key]))}</li>" for key in failed)
+    return f'{_badge(False)}<ul class="eval-fails">{rows}</ul>'
 
 
 def _evaluation(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> str:
-    def score(key: str, item: dict[str, Any]) -> tuple[float, ...]:
-        passed = 1.0 if item["pass"] is True else 0.0
-        if key == "P6":
-            details = item["details"]
-            return (passed, -details["restricted_openers"],
-                    details["template_rate"] if details["template_rate"] is not None else 1.0,
-                    -details["no_reply_violation"],
-                    -(details["ordinary_rate"] or 0))
-        if key in {"P5", "L1_kind", "L1_guidance", "L2_one_liner", "L2_opener"}:
-            return (passed, item["rate"] or 0)
-        if key in {"P3", "P4", "L1_phrasing"}:
-            return (passed, -(item["rate"] or 0))
-        return (passed, -item["count"])
-
-    lines = ["<ul>"]
-    all_pass = []
-    for pattern in patterns:
-        items = metrics["patterns"][pattern["id"]]["metrics"]
-        failed = [METRIC_NAMES[key] for key, value in items.items() if value["pass"] is False]
-        if all(value["pass"] is True for value in items.values()):
-            all_pass.append(pattern["label"])
-        failed_text = "、".join(failed) if failed else "なし"
-        detail = _failure_detail(items)
-        lines.append(f"<li>{_h(pattern['label'])}: 不合格 {_h(failed_text)}"
-                     + (f"（{_h(detail)}）" if detail else "") + "</li>")
-    passed_text = "、".join(all_pass) if all_pass else "なし"
-    lines.append(f"<li>全指標を満たしたパターン: {_h(passed_text)}</li>")
-    for key, name in METRIC_NAMES.items():
-        values = []
-        for pattern in patterns:
-            item = metrics["patterns"][pattern["id"]]["metrics"][key]
-            if item["rate"] is None and key not in {"P1", "P2", "P6", "P7",
-                                                     "L2_conflict", "L2_proximity", "L2_emoji"}:
-                continue
-            values.append((score(key, item), pattern["label"]))
-        if values:
-            best = max(score for score, _ in values)
-            winners = "、".join(label for score, label in values if score == best)
-            lines.append(f"<li>{_h(name)}の最良: {_h(winners)}</li>")
+    """パターンごとの評価を、レベル別の合否と人が確認するものの表にする。"""
+    levels = [(heading, tuple(key for key, _ in entries)) for heading, entries in SECTIONS]
+    total = sum(len(keys) for _, keys in levels)
+    out = ['<div class="table-wrap"><table class="eval-table"><thead><tr><th>パターン</th>'
+           '<th>合格した指標</th>']
+    out.extend(f"<th>{_h(heading)}</th>" for heading, _ in levels)
+    out.append("<th>処理時間（中央値）</th><th>人が確認するもの</th></tr></thead><tbody>")
+    premise_ok, all_ok = [], []
     for pattern in patterns:
         report = metrics["patterns"][pattern["id"]]
-        leaks = report["metrics"]["P1"]["count"]
-        lines.append(f"<li>{_h(pattern['label'])}: P1 漏れ候補 {leaks} 件（人が全件確認）</li>")
+        items, ref = report["metrics"], report["reference"]
+        passed = sum(v["pass"] is True for v in items.values())
+        if all(items[key]["pass"] is not False for key in levels[0][1]):
+            premise_ok.append(pattern["label"])
+        if all(v["pass"] is not False for v in items.values()):
+            all_ok.append(pattern["label"])
+        median = ref["timing"]["total_s"]["median"]
+        checks = [f"P1 漏れ候補 {items['P1']['count']} 件（全件を人が見る）"]
         if pattern["judge_mode"] == "hybrid":
-            ref = report["reference"]
-            lines.append(f"<li>{_h(pattern['label'])}: 見張り役の食い違い "
-                         f"{ref['watch_mismatch']['count']} 件、合意制で割れた "
-                         f"{ref['consensus_split']['count']} 件</li>")
-    lines.append("</ul>")
-    return "".join(lines)
+            checks.append(f"見張り役の食い違い {ref['watch_mismatch']['count']} 件・"
+                          f"合意制で割れた {ref['consensus_split']['count']} 件")
+        if ref["fallback"]["count"]:
+            checks.append(f"書き手の定型フォールバック {ref['fallback']['count']} 件")
+        if ref["errors"]["count"]:
+            checks.append(f"エラーを含む記録 {ref['errors']['count']} 件")
+        out.append(f'<tr><th>{_h(pattern["label"])}</th><td class="eval-score">{passed} / {total}</td>')
+        out.extend(f"<td>{_level_cell(items, keys)}</td>" for _, keys in levels)
+        out.append(f"<td>{f'{median:.1f} 秒' if median is not None else '—'}</td>"
+                   f'<td><ul class="eval-checks">{"".join(f"<li>{_h(c)}</li>" for c in checks)}'
+                   "</ul></td></tr>")
+    out.append("</tbody></table></div>")
+    fastest = min(patterns, key=lambda p: metrics["patterns"][p["id"]]["reference"]["timing"]
+                  ["total_s"]["median"] or float("inf"))
+    out.append('<div class="note"><span class="callout-title">まとめ（自動集計）</span><ul>'
+               f"<li>全指標を満たしたパターン: {_h('、'.join(all_ok) or 'なし')}</li>"
+               f"<li>前提条件 P1〜P7 を満たしたパターン: {_h('、'.join(premise_ok) or 'なし')}</li>"
+               f"<li>処理時間の中央値が最短: {_h(fastest['label'])}</li>"
+               "<li>不合格の行は、合否表の「NG n 件」を開くとコメント ID から一覧表の行へ飛べる</li>"
+               "</ul></div>")
+    return "".join(out)
 
 
 def _reference_table(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> str:
@@ -318,7 +335,7 @@ def _case_table(pattern: dict[str, Any], no: str, cases: list[dict[str, Any]],
         parts = row["timing"]
         title = f"判定 {parts.get('judge_s') or 0:.2f} 秒 / 書き手 {parts.get('writer_s') or 0:.2f} 秒"
         search = case["text"] + " " + (reply or "") + " " + case["id"]
-        out.append(f'<tr data-search="{_h(search)}" data-expected="{_h(case["expected_kind"])}" '
+        out.append(f'<tr id="{_h(_row_anchor(pattern["id"], case["id"]))}" data-search="{_h(search)}" data-expected="{_h(case["expected_kind"])}" '
                    f'data-final="{_h(final.get("kind") or "")}" '
                    f'data-diff="{1 if flags["label_mismatch"] or flags["watch_mismatch"] else 0}">')
         values = (
@@ -343,9 +360,25 @@ def _case_table(pattern: dict[str, Any], no: str, cases: list[dict[str, Any]],
 STYLE = """
 body { overflow-wrap: anywhere; }
 .container { min-width: 0; }
-.summary-table, .case-table { min-width: 820px; }
+.summary-table { min-width: 960px; }
+.case-table { min-width: 820px; }
 .summary-table td { min-width: 125px; }
+.summary-table tbody th { min-width: 10.5rem; }
+.eval-table tbody th { min-width: 8rem; }
 .group th { background: var(--note-bg); }
+.ng-toolbar { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0; }
+.ng-toolbar button, .ng-row { font: inherit; font-size: .8rem; padding: .15rem .55rem; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 4px; background: var(--bg-subtle); color: var(--text); }
+.ng-row { display: block; margin-top: .3rem; font-weight: 400; white-space: nowrap; }
+.ng-ids { margin-top: .3rem; font-size: .8rem; }
+.ng-ids summary { cursor: pointer; color: var(--link); }
+.ng-ids ul { margin: .25rem 0 0; padding-left: 1.1rem; }
+.ng-note { color: var(--text-muted, inherit); opacity: .8; }
+.eval-table { min-width: 820px; }
+.eval-table td, .eval-table th { vertical-align: top; }
+.eval-score { white-space: nowrap; font-weight: 700; }
+.eval-fails, .eval-checks { margin: .3rem 0 0; padding-left: 1.1rem; font-size: .85rem; }
+.case-table tr:target td { background: var(--warn-bg); }
 .probe-svg { display: block; width: 100%; height: auto; max-width: 560px; }
 .chart-bg { fill: var(--bg-subtle); }
 .chart-rate, .chart-judge { fill: var(--link); }
@@ -409,6 +442,30 @@ SCRIPT = r"""
       th.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); sort(); }
       });
+    });
+  });
+  document.querySelectorAll('.ng-all').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var open = button.dataset.open === '1';
+      document.querySelectorAll('.summary-table .ng-ids').forEach(function (d) { d.open = open; });
+    });
+  });
+  document.querySelectorAll('.ng-row').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var details = button.closest('tr').querySelectorAll('.ng-ids');
+      var open = !Array.from(details).every(function (d) { return d.open; });
+      details.forEach(function (d) { d.open = open; });
+      button.textContent = open ? '行を閉じる' : '行を開く';
+    });
+  });
+  document.querySelectorAll('.ng-link').forEach(function (link) {
+    link.addEventListener('click', function () {
+      var row = document.getElementById(link.getAttribute('href').slice(1));
+      if (!row || !row.hidden) return;
+      var controls = row.closest('section').querySelector('.probe-filters');
+      controls.querySelectorAll('input[type=search],select').forEach(function (i) { i.value = ''; });
+      controls.querySelector('.filter-diff').checked = false;
+      controls.querySelector('.filter-text').dispatchEvent(new Event('input'));
     });
   });
   document.querySelectorAll('.raw-details').forEach(function (detail) {

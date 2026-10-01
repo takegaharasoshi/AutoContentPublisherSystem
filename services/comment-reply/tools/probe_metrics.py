@@ -174,6 +174,12 @@ def _rate_metric(count: int, total: int, threshold: str, test: Any,
                    rate=rate, **extra)
 
 
+def _ng(selected: list[dict[str, Any]], note: Any = None) -> list[dict[str, str]]:
+    """NG になった行の ID 一覧（合否表の折りたたみに出す）。note は行から短い補足を作る関数。"""
+    return [{"id": x["case"]["id"], "no": x["case"]["no"],
+             "note": note(x) if note else ""} for x in selected]
+
+
 def _timing(values: list[float]) -> dict[str, float | None]:
     if not values:
         return {"median": None, "p95": None, "max": None}
@@ -221,12 +227,22 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
                                             "answer": x["answer"],
                                             "comment_text": x["case"]["text"]})]
         correct = [x for x in items if x["expected_kind"] == "guess_correct"]
-        declared = sum(bool(x["reply"] and x["reply"].startswith(CORRECT_OPENERS))
-                       for x in correct)
+        undeclared = [x for x in correct
+                      if not (x["reply"] and x["reply"].startswith(CORRECT_OPENERS))]
+        declared = len(correct) - len(undeclared)
         restricted = [x for x in items if x["expected_kind"] in RESTRICTED_KINDS]
         troll_abuse = [x for x in items if x["expected_kind"] in {"troll", "abuse"}]
         no_reply = [x for x in items if x["expected_kind"] in templates.NO_REPLY_KINDS]
         ordinary = [x for x in items if x["expected_kind"] not in RESTRICTED_KINDS]
+        p6_ng = (
+            _ng([x for x in restricted if _is_opener(x["reply"])], lambda x: "⑱〜㉑ に判定語")
+            + _ng([x for x in troll_abuse
+                   if x["reply"] != templates.pick(x["expected_kind"], x["case"]["id"])],
+                  lambda x: "⑱⑲ が定型文でない")
+            + _ng([x for x in no_reply if x["reply"]], lambda x: "⑳㉑ に返信")
+            + _ng([x for x in ordinary if x["kind"] in RESTRICTED_KINDS],
+                  lambda x: f"普通のコメントを {x['kind']} と判定")
+        )
         p6_counts = {
             "restricted_openers": sum(_is_opener(x["reply"]) for x in restricted),
             "template": sum(x["reply"] == templates.pick(x["expected_kind"], x["case"]["id"])
@@ -266,7 +282,9 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
                 phrasing[kind] = {"phrase": phrase, "count": count,
                                   "total": len(selected), "rate": count / len(selected)}
         guidance = [x for x in items if x["expected_kind"] in {"q_multi", "q_open"}]
-        guided = sum(x["kind"] in {"q_multi", "q_open"} and bool(x["reply"]) for x in guidance)
+        unguided = [x for x in guidance
+                    if not (x["kind"] in {"q_multi", "q_open"} and bool(x["reply"]))]
+        guided = len(guidance) - len(unguided)
         final_yesno = [x for x in items if x["kind"] == "q_yesno"]
         opener_rows = [x for x in final_yesno
                        if (x["record"].get("final") or {}).get("decision") != "consensus_split"]
@@ -285,6 +303,36 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
         leak_items = [{"case_id": x["case"]["id"], "no": x["case"]["no"],
                        "words": x["flags"]["leak_words"], "reply": x["reply"]}
                       for x in items if x["flags"]["leak_words"]]
+        phrasing_ng = [x for x in items if x["expected_kind"] in phrasing
+                       and phrasing[x["expected_kind"]]["rate"] > .5
+                       and (x["reply"] if x["reply"] is not None else "<NO_REPLY>")
+                       == phrasing[x["expected_kind"]]["phrase"]]
+        ng = {
+            "P1": _ng([x for x in items if x["flags"]["leak_words"]],
+                      lambda x: "・".join(x["flags"]["leak_words"])),
+            "P2": _ng([x for x in items if x["flags"]["wrong_correct"]]),
+            "P3": _ng(p3_items, lambda x: f"{x['expected_answer']} → {x['answer']}"),
+            "P4": _ng(p4_items, lambda x: f"{x['expected_answer']} → {x['answer']}"),
+            "P5": _ng(undeclared, lambda x: f"判定 {x['kind']}"),
+            "P6": p6_ng,
+            "P7": _ng([x for x in items if x["flags"]["over_80"]],
+                      lambda x: f"{len(x['reply'])} 字"),
+            "L1_kind": _ng([x for x in items if x["flags"]["kind_mismatch"]],
+                           lambda x: f"{x['expected_kind']} → {x['kind']}"),
+            "L1_phrasing": _ng(phrasing_ng, lambda x: f"最頻の言い回し（{x['expected_kind']}）"),
+            "L1_guidance": _ng(unguided, lambda x: f"判定 {x['kind']}"),
+            "L2_one_liner": _ng([x for x in final_yesno
+                                 if not x["reply"] or x["flags"]["one_liner_over_20"]],
+                                lambda x: f"一言 {len(_one_liner(x['reply']) or '')} 字"),
+            "L2_opener": _ng([x for x in opener_rows if not x["flags"]["opener"]],
+                             lambda x: f"判定 {x['answer']}"),
+            "L2_conflict": _ng([x for x in final_yesno if x["flags"]["conflict_words"]],
+                               lambda x: "・".join(x["flags"]["conflict_words"])),
+            "L2_proximity": _ng([x for x in items if x["flags"]["proximity_words"]],
+                                lambda x: "・".join(x["flags"]["proximity_words"])),
+            "L2_emoji": _ng([x for x in items if x["flags"]["emoji_violations"]],
+                            lambda x: "・".join(x["flags"]["emoji_violations"])),
+        }
         metrics = {
             "P1": _count_metric(len(leak_items), n, "0 件", not leak_items, candidates=leak_items),
             "P2": _count_metric(sum(x["flags"]["wrong_correct"] for x in items), n, "0 件",
@@ -342,6 +390,8 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
                                        n, "0 件",
                                        not any(x["flags"]["emoji_violations"] for x in items)),
         }
+        for key, entries in ng.items():
+            metrics[key]["ng"] = entries
         reference = {
             "yesno_accuracy": split_accuracy,
             "bare_term": _rate_metric(bare_count, len(bare), "参考", lambda _: None),

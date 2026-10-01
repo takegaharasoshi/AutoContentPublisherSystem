@@ -149,6 +149,11 @@ def test_run_cache_timing_record_and_offline_page(tmp_path):
     assert not re.search(r'(?:src|href)="https?://', source)
     assert "&lt;b&gt;関係ある？&lt;/b&gt;" in source
     assert "<b>関係ある？</b>" not in source
+    # 合否表の NG の ID は、一覧表に実在する行へのリンクになっている
+    row_ids = set(re.findall(r'<tr id="([^"]+)"', source))
+    ng_links = re.findall(r'class="ng-link" href="#([^"]+)"', source)
+    assert set(ng_links) <= row_ids
+    assert '<table class="eval-table">' in source
     raw = (page.parent / page.stem / "raw-luna-1b-U01.js").read_text(encoding="utf-8")
     assert 'window.PROBE_RAW["luna-1b/U01"] = ' in raw
     assert "<\\/script>" in raw
