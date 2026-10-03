@@ -1111,7 +1111,7 @@
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-6e</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>人間プローブ（ローカル）と方式選定</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-6d4 の完了後（21-6d3 の集計確認後）。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6d4 と <a href="#step-21-6h">21-6h</a>（truth の書き直し）の完了後（21-6d3 の集計確認後）。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
@@ -1215,11 +1215,87 @@
 </div>
 </article>
 
+<article class="plan-step" id="step-21-6h" data-step-id="21-6h" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6h</strong><span class="plan-status">未着手</span></div>
+<h3>真相（truth）・タイトル・キャプションを公開前提に書き直す</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d3d">21-6d3d</a> の完了後（同じ設計書 4 章と作問スキルに触るため）。truth は判定の根拠なので、<a href="#step-21-6e">21-6e</a>（人間プローブ）より前に完了させる。2026-10-04 起票（アイデア <a href="../ideas/umigame-truth-disclosure.md">umigame-truth-disclosure</a> の採用）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>前回の問題の <code>truth</code> 全文を翌日のリールのキャプション末尾で公開する方針（2026-10-04 ユーザー決定）に合わせて、コンテンツ側を整える。① 既存 14 問の <code>truth</code> を「公開されて読まれても自然な文・読みやすい位置で適切に改行・はいと答える根拠の事実をすべて明記」に書き直す。② <code>title</code> を公開前提で見直す（キャプションの見出しになるため、真相の手がかりにならないか）。③ <code>caption</code> を合意した形（見出し = 【問題タイトル】・問題文・新しい遊び方の文と「真相は明日のリールのキャプションにて公開するよ。フォローして待っててね。」の予告・ハッシュタグ）へ変える（<code>umigame_common.caption()</code> に title を渡す）。④ <code>validate.py</code> に truth の文字数上限の検査を足す。⑤ 作問スキル <code>umigame-problem-writer</code> とセット別設計書 4 章・6 章を更新する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>真相の中身（筋・事実）は変えない。変えるのは書き方・改行・根拠の事実の明記だけ（<code>fact_sheet</code>・<code>core_points</code>・<code>reveal_text</code> と矛盾させない）。<code>services/</code> <code>database/</code> は触らない（前回の真相ブロックの差し込みは <a href="#step-21-6i">21-6i</a>）。改行は機械的な「1 文 1 行」にしない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>14 問の <code>truth</code>・<code>title</code>・<code>caption</code> を書き直し、<code>validate.py</code> が全問通る（出力を貼る）。truth の文字数上限は 14 問の実測から決め、値と根拠を設計書 4 章に書く。</li>
+<li>21-6d3 のプローブ実行器で truth を渡す方式（パターン 1）を 14 問全件で再実行し、21-6d3 の結果と比べて判定が悪化していないことを差分の集計で示す。</li>
+<li>キャプションの展開例（前回の真相ブロックを除いた上半分）を 1 問分貼り、合意した形（アイデア MD の「合意したキャプションの形」）と一致する。</li>
+<li>作問スキルの工程（素材化・自己検査）に truth の書き方と title の見直しを足し、セット別設計書 4 章・6 章を更新する。<code>python3 tools/docs_check.py</code> と <code>--plan-only</code> の出力を貼る。</li>
+<li>計画書を更新し、日本語メッセージでコミットして <code>pull --rebase</code> → push まで行う。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>14 問の truth・title の目視（ユーザー・ゴール対象外）。ストックの DB への再投入（両環境）はユーザー作業。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/umigame-stock/umigame-soup-1/</code>・<code>.agents/skills/umigame-problem-writer/</code>・<code>docs/</code>）。stop after 30 turns。プローブで判定が悪化したら、該当問題と差分を示して止まる（判定ロジックは直さない）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 起票の経緯・truth 廃止案を採らない理由・課題照合</span></summary>
+<div class="plan-fold-inner"><p><strong>起票の経緯</strong>: AI 出題者は <code>truth</code> を根拠に判定するが、フォロワーに見えるのは正解者への <code>reveal_text</code>（70 字）だけで答え合わせができない（ユーザー指摘）。コメント欄に全文を出すと問題がその場でネタバレになるため、翌日リールのキャプション末尾（ハッシュタグの後ろ）に出す。1 日 1 問なので締め処理なしで 24 時間後に必ず出て、誰も正解しない回も同じ仕組みで答えが出る。壁打ち記録は <a href="../ideas/umigame-truth-disclosure.md">アイデア MD</a>。</p><p><strong>truth を廃止しない理由</strong>: 70 字の reveal_text でははい / いいえの根拠が足りない。核心を書いてよいのは返信に出ない truth だけ、という漏洩防止の設計が崩れる。21-6d3c の矛盾チェックの土台が細る。</p><p><strong>正解者への返信</strong>: reveal_text に「真相の全文は明日のリールで」を足すことはしない（ユーザー決定）。</p><p><strong>課題表の照合</strong>: 触るパス（<code>content/umigame-stock/umigame-soup-1/</code>・<code>.agents/skills/umigame-problem-writer/</code>・<code>docs/app/sets/umigame-soup-1.html</code>）で該当行なし。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6i" data-step-id="21-6i" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6i</strong><span class="plan-status">未着手</span></div>
+<h3>投稿バッチで前回の真相ブロックをキャプション末尾に差し込む</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6h">21-6h</a> の完了後（書き直した truth・title を差し込むため）。<a href="#phase-26">Phase 26</a> と同じ <code>services/sns-post-batch/</code> に触る。着手順はユーザー判断（どちらが先でも、後から着手する側が先の変更の上に載せる）。2026-10-04 起票。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>SNS 投稿バッチのキャプション展開に、同じセットで前回の問題の <code>title</code>・<code>truth</code> から「前回の真相ブロック」を組んで末尾に足す処理を加える。形は「空行 3 つ → <code>――― 前回の問題「{前回の title}」の真相（ネタバレ注意）―――</code> → <code>・</code> 4 行 → 【真相】 → truth 全文」。前回 = 同じセットで最後に投稿が成功した回。前回がない（初回）ときはブロックごと出さない。<code>caption_templates</code> のテンプレートを <code>{{caption}}</code> + ブロックのプレースホルダに変える。ブロックはハッシュタグの後ろに来る（caption を本文とタグに分けない。2026-09-24 の決定を保つ）。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>umigame 以外のセットの投稿・キャプションを変えない（プレースホルダを使わないテンプレートでは何も起きない）。投稿の当回選定（<a href="#phase-26">Phase 26</a> の範囲）には手を入れない。差し込み後のキャプションが 2,200 字を超えたら投稿せず失敗させる（黙って切り詰めない）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>pytest 全パス（要約行を貼る）。ケース: 前回あり / 初回で前回なし / 直前の回が投稿失敗（その前の成功回を使う）/ 2,200 字超過 / umigame 以外のセットで変化なし。</li>
+<li>展開結果のサンプル（2 問を続けて投稿した想定の 2 本目）を貼り、合意した形（<a href="../ideas/umigame-truth-disclosure.md">アイデア MD</a> の「合意したキャプションの形」）と一致する。</li>
+<li><code>umigame_items</code> に前回の title・truth が引ける形になっている（なければ写す。DDL が要るなら <code>database/</code> に追加し、適用はユーザー作業として明記）。</li>
+<li><a href="../app/batch-flow.html">batch-flow.html</a> 3.3 のプレースホルダ一覧とセット別設計書 6 章を更新する。21-7 のセット登録 SQL に入れるテンプレート文面をここで確定する。<code>python3 tools/docs_check.py --plan-only</code> の出力を貼る。</li>
+<li>計画書を更新し、日本語メッセージでコミットして <code>pull --rebase</code> → push まで行い、CodePipeline の完走とタスク定義の新リビジョンを <code>/goal</code> 定型行で確認する。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>DDL がある場合の本番適用（ユーザー・ゴール対象外）。稼働開始後の初回 2 本のキャプションの目視は 21-7 の稼働開始作業に含める。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push とパイプライン完走の確認まで（<code>services/sns-post-batch/</code>・必要なら <code>database/</code>・<code>docs/</code>）。stop after 30 turns。「前回」の定義が Phase 26 の当回選定と衝突したら止めて報告する。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ストックに書けない理由・課題照合・確認待ち</span></summary>
+<div class="plan-fold-inner"><p><strong>ストックに書けない理由</strong>: 投稿順はストックの LRU で決まり、作問時点では「前回」が分からない。そのため投稿時に差し込む。プレースホルダ名は設計時に決める（仮 <code>{{prev_truth_block}}</code>）。</p><p><strong>受け入れる仕様</strong>: 前日の投稿が失敗した日は、予告の「明日」が 1 日ずれる。</p><p><strong>課題表の照合</strong>（<code>services/sns-post-batch/</code>）: <a href="../issues/index.html#I-014">I-014</a> = Phase 26 本体（同梱しない。着手順をユーザーが決める）。<a href="../issues/index.html#I-015">I-015</a>（#AIart のシステム検証）は差し込み後のキャプションで検査する形にすれば同梱できる候補で、着手時に判断する。<a href="../issues/index.html#I-017">I-017</a>・<a href="../issues/index.html#I-022">I-022</a>・<a href="../issues/index.html#I-024">I-024</a> は Phase 26 側で扱うため同梱しない。</p><p><strong>確認待ち（自セッションの外）</strong>: 稼働 2 日目の投稿で前日の真相ブロックが入っていること（トリガー: 21-7 稼働開始の翌日）。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
 <article class="plan-step" id="step-21-7" data-step-id="21-7" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-7</strong><span class="plan-status">未着手</span></div>
 <h3>アカウント・Meta アプリ・セット登録の準備</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-5c・21-5d（採用なら 21-5e も）・21-6f・21-6g の完了後。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-5c・21-5d（採用なら 21-5e も）・21-6f・21-6g・21-6h・21-6i の完了後。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
