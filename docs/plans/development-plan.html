@@ -1073,7 +1073,7 @@
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-6d3e</strong><span class="plan-status">未着手</span></div>
 <h3>真相（truth）・タイトル・キャプションを公開前提に書き直す</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d3d">21-6d3d</a> の完了後（同じ設計書 4 章と作問スキルに触るため）。truth は判定の根拠なので、全件プローブを取り直す <a href="#step-21-6d4">21-6d4</a> より前に完了させる（21-6d4 と 21-6e を最終形の truth で測るため・2026-10-04 ユーザー指摘）。2026-10-04 起票（アイデア <a href="../ideas/umigame-truth-disclosure.md">umigame-truth-disclosure</a> の採用）。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d3d">21-6d3d</a> の完了後（同じ設計書 4 章と作問スキルに触るため）。truth は判定の根拠なので、全件プローブを取り直す <a href="#step-21-6d4">21-6d4</a> より前に完了させる（21-6d4 と 21-6e を最終形の truth で測るため・2026-10-04 ユーザー指摘。判定への影響は 21-6d4 の全件プローブでまとめて見るため、本ステップではプローブを回さない）。2026-10-04 起票（アイデア <a href="../ideas/umigame-truth-disclosure.md">umigame-truth-disclosure</a> の採用）。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
@@ -1084,7 +1084,6 @@
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li>14 問の <code>truth</code>・<code>title</code>・<code>caption</code> を書き直し、<code>validate.py</code> が全問通る（出力を貼る）。truth の文字数上限は 14 問の実測から決め、値と根拠を設計書 4 章に書く。</li>
-<li>判定のコードは変えずに、全件プローブ（14 問・441 件・5 パターン）を取り直す（truth を渡すパターンは判定キャッシュを取り直す）。21-6d3 の結果と比べて判定が悪化していないことを、パターンごとの差分の集計で示す。この結果を 21-6d4 の比較の基準にする。</li>
 <li>キャプションの展開例（前回の真相ブロックを除いた上半分）を 1 問分貼り、合意した形（アイデア MD の「合意したキャプションの形」）と一致する。</li>
 <li>作問スキルの工程（素材化・自己検査）に truth の書き方と title の見直しを足し、セット別設計書 4 章・6 章を更新する。<code>python3 tools/docs_check.py</code> と <code>--plan-only</code> の出力を貼る。</li>
 <li>計画書を更新し、日本語メッセージでコミットして <code>pull --rebase</code> → push まで行う。</li>
@@ -1093,7 +1092,7 @@
 <section><h4>3. 人が確認すること・止まる場所</h4>
 <div class="plan-gates">
 <div data-field="gate"><strong>人が確認すること</strong><p>14 問の truth・title の目視（ユーザー・ゴール対象外）。ストックの DB への再投入（両環境）はユーザー作業。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/umigame-stock/umigame-soup-1/</code>・<code>.agents/skills/umigame-problem-writer/</code>・<code>docs/</code>）。stop after 30 turns。プローブで判定が悪化したら、該当問題と差分を示して止まる（判定ロジックは直さない）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/umigame-stock/umigame-soup-1/</code>・<code>.agents/skills/umigame-problem-writer/</code>・<code>docs/</code>）。stop after 30 turns。判定ロジックは直さない。</p></div>
 </div>
 </section>
 <details class="plan-fold" data-field="implementation">
@@ -1122,7 +1121,7 @@
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li><code>services/comment-reply/</code> から答えとしての <code>unknown</code> が消え（<code>grep</code> の結果を貼る）、pytest が全パス（要約行を貼る）。</li>
-<li>全件プローブ（14 問・441 件・5 パターン）を判定から取り直し、集計出力と、21-6d3e（truth 書き直し後の全件プローブ）との差（P3・P4・L1①・はい / いいえの一致率に加え、21-6d3c の矛盾チェックの効果として P2・P5・L1① の ⑤）をパターンごとに 1 行で示す。</li>
+<li>全件プローブ（14 問・441 件・5 パターン）を判定から取り直し、集計出力と、21-6d3 との差（21-6d3e の truth 書き直しの影響も含む。悪化したケースは truth 由来か 3 値化由来かを個票で切り分ける）（P3・P4・L1①・はい / いいえの一致率に加え、21-6d3c の矛盾チェックの効果として P2・P5・L1① の ⑤）をパターンごとに 1 行で示す。</li>
 <li>評価ページを再生成し、<code>docs_check.py --plan-only</code> と <code>--widths 360,390,768,1280</code> の出力を貼る。</li>
 <li>セット別設計書（21-6d3b の整理後の 10 章）の 4 値の記述を 3 値に直し、決定を付録「決定の経緯」に残す。10.5 の現行プロンプトの転記と <code>prompt_version</code> を更新する。計画書を更新する。</li>
 <li>日本語メッセージでコミット（<code>services/</code> を触るため push はユーザー判断）。</li>
