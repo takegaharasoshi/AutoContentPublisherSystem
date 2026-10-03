@@ -1,0 +1,72 @@
+{
+  "problems": [
+    "016-umigame-soup",
+    "014-kind-interpreter"
+  ],
+  "budget_seconds": 21.0,
+  "gap_seconds": 1.2,
+  "target_seconds": 19.0,
+  "language_code": "ja",
+  "output_format": "pcm_24000",
+  "direction": "[子供に語り掛ける優しいパパの口調で、とっておきの謎を得意げに。間は短く、早口ぎみの速いテンポで]",
+  "rule_direction": "[同じ口調のまま、にこにこと親しげに呼びかける]",
+  "voice_settings": {
+    "stability": 0.5,
+    "similarity_boost": 0.75,
+    "style": 0.0,
+    "speed": 1.0,
+    "use_speaker_boost": true
+  },
+  "seed": 1,
+  "clone": {
+    "name": "kamerock-g4-clone",
+    "description": "探偵カメロック（声 G4 kamerock-chubby）のクローン。参照は assets/voice/kamerock-g4/ の 6 本（Irodori と同じ参照）。",
+    "files_dir": "assets/voice/kamerock-g4"
+  },
+  "design": {
+    "model_id": "eleven_ttv_v3",
+    "preview_problem": "016-umigame-soup",
+    "pick": "d1-0",
+    "versions": [
+      {
+        "id": "d1",
+        "description": "30歳くらいの日本人男性の探偵。お相撲さんのように太っていて食いしん坊。太っているのが声からも伝わる、丸みがあって太く柔らかい声で、少年っぽさの残る人懐っこさがある。可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。標準的な日本語の発音。"
+      },
+      {
+        "id": "d2",
+        "description": "Japanese man around 30, a chubby, food-loving detective built like a sumo wrestler. Warm, round, thick and soft voice, slightly higher than average for an adult man, with a boyish, friendly charm. Speaks like a kind dad telling a child a story, proudly and playfully when revealing a mystery. Native Japanese speaker, clear standard Japanese pronunciation."
+      },
+      {
+        "id": "d3",
+        "description": "30歳くらいの日本人男性。とても太っていて、大きなお腹から出るようなこもった丸い響きと、ふくよかな頬で話しているようなもっちりした柔らかい発音。成人男性としてはやや高めで明るい声。人懐っこく可愛らしいが、謎を語るときは得意げで少し芝居がかる。子供に語り掛ける優しいパパのような話し方。標準的な日本語の発音。"
+      }
+    ]
+  },
+  "variants": [
+    {
+      "id": "e1-irodori",
+      "baseline": true,
+      "label": "① 現行 Irodori-TTS（声 G4 のクローン・21-5c の承認済みビルド）"
+    },
+    {
+      "id": "e2-v4-clone",
+      "model_id": "eleven_v4",
+      "voice": "clone",
+      "label": "② v4 + 声 G4 のクローン"
+    },
+    {
+      "id": "e3-v4-design",
+      "model_id": "eleven_v4",
+      "voice": "design",
+      "label": "③ v4 + Voice Design（説明文から作った声）"
+    },
+    {
+      "id": "e4-v3-design",
+      "model_id": "eleven_v3",
+      "voice": "design",
+      "direction": "[proudly, warmly, like a kind dad telling a child a story, short pauses, fast pace]",
+      "rule_direction": "[same tone, friendly and smiling]",
+      "label": "④ ③ と同じ声を v3 で（v4 で演技が控えめになるかの対照）"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "clone": {
+    "voice_id": "lFuwa86wAYnMEbg0kQJO",
+    "name": "kamerock-g4-clone",
+    "description": "探偵カメロック（声 G4 kamerock-chubby）のクローン。参照は assets/voice/kamerock-g4/ の 6 本（Irodori と同じ参照）。",
+    "reference_files": [
+      "001-faint-shadow_problem.wav",
+      "001-faint-shadow_rule.wav",
+      "004-fifty-year-letter_problem.wav",
+      "004-fifty-year-letter_rule.wav",
+      "006-frozen-tag_problem.wav",
+      "006-frozen-tag_rule.wav"
+    ]
+  },
+  "design": {
+    "voice_id": "jjJOtoqBKRarIHhzsyRt",
+    "candidate": "d1-0",
+    "model_id": "eleven_ttv_v3",
+    "description": "30歳くらいの日本人男性の探偵。お相撲さんのように太っていて食いしん坊。太っているのが声からも伝わる、丸みがあって太く柔らかい声で、少年っぽさの残る人懐っこさがある。可愛らしいが、謎を語るときは得意げ。子供に語り掛ける優しいパパのような話し方。標準的な日本語の発音。",
+    "preview_text_problem": "016-umigame-soup"
+  }
+}
