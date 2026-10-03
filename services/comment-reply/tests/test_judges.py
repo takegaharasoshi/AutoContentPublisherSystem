@@ -195,6 +195,37 @@ def test_jev_contradiction_demotes_correct_candidate(monkeypatch, problem) -> No
     assert "B2" not in result.debug["probabilities"]
 
 
+def test_jev_low_confidence_answer_falls_back_to_irrelevant(monkeypatch, problem) -> None:
+    def run_with(probabilities: dict) -> Judgement:
+        def call(api_key, state, questions, debug):
+            name = next(iter(questions))
+            if name == "major":
+                return {
+                    "major": {"choice": "question_or_guess"},
+                    "bare_term": {"noul": {"true": 0.1}},
+                }
+            if name == "qg":
+                return {name: {"probabilities": {"guess": 0.01, "question": 0.99}}}
+            if name == "kind":
+                return {name: {"choice": "q_yesno"}}
+            if name == "point_0":
+                return {"point_0": {"noul": {"true": 0.1}},
+                        "point_1": {"noul": {"true": 0.1}}}
+            if name == "quality":
+                return {name: {"noul": {"true": 0.99}}}
+            if name == "answer":
+                return {name: {"probabilities": probabilities}}
+            raise AssertionError(name)
+
+        monkeypatch.setattr(jev, "_record_call", call)
+        return jev.judge("1", "男は病院にいた？", problem, api_key="fake")
+
+    result = run_with({"yes": 0.5, "no": 0.4, "irrelevant": 0.1})
+    assert (result.kind, result.answer) == ("q_yesno", "irrelevant")
+    result = run_with({"yes": 0.1, "no": 0.8, "irrelevant": 0.1})
+    assert (result.kind, result.answer) == ("q_yesno", "no")
+
+
 def _j(method: str, kind: str, answer: str | None = None) -> Judgement:
     return Judgement(method, kind, answer=answer, reason="stub")
 

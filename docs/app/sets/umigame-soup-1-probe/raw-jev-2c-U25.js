@@ -9,7 +9,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -27,8 +27,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4186,
-            "latency_s": 1.18986,
+            "input_tokens": 4225,
+            "latency_s": 1.090891,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -41,17 +41,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.88,
-                "question": 0.12
+                "guess": 0.91,
+                "question": 0.09
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.01,
-                "q_yesno": 0.99
+                "q_open": 0.0,
+                "q_yesno": 1.0
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.02
+                "point_0": 0.03
               },
               "C": 0.5,
               "D": {
@@ -63,7 +63,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.03"
         },
         "luna": null
       },
@@ -74,7 +74,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。その調子で聞いてごらん。"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -82,17 +82,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "中学時代に二人で何か賭けをしてたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.190203599020606,
-      "judge_s": 1.190203599020606,
+      "jev_s": 1.091142363002291,
+      "judge_s": 1.091142363002291,
       "luna_s": null,
-      "total_s": 2.6854588070127647,
-      "writer_s": 1.4952552079921588
+      "total_s": 2.27490571999806,
+      "writer_s": 1.1837633569957688
     }
   },
   {
@@ -104,7 +104,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -122,8 +122,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4222,
-            "latency_s": 1.151151,
+            "input_tokens": 4261,
+            "latency_s": 1.117253,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -136,8 +136,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.35,
-                "question": 0.65
+                "guess": 0.33,
+                "question": 0.67
               },
               "A2": {
                 "q_multi": 0.0,
@@ -148,11 +148,11 @@ window.PROBE_RAW["jev-2c/U25"] = [
               "B": {
                 "point_0": 0.01
               },
-              "C": 0.59,
+              "C": 0.57,
               "D": {
                 "irrelevant": 0.0,
-                "no": 0.0,
-                "yes": 1.0
+                "no": 0.01,
+                "yes": 0.99
               }
             }
           },
@@ -177,17 +177,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "「勝った」は、昔した勝負の結果について言ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.151461024011951,
-      "judge_s": 1.151461024011951,
+      "jev_s": 1.1174659469979815,
+      "judge_s": 1.1174659469979815,
       "luna_s": null,
-      "total_s": 2.251432212011423,
-      "writer_s": 1.099971187999472
+      "total_s": 2.327630333020352,
+      "writer_s": 1.2101643860223703
     }
   },
   {
@@ -199,7 +199,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -217,8 +217,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4198,
-            "latency_s": 1.165592,
+            "input_tokens": 4237,
+            "latency_s": 1.141512,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -231,8 +231,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.4,
-                "question": 0.6
+                "guess": 0.44,
+                "question": 0.56
               },
               "A2": {
                 "q_multi": 0.0,
@@ -243,7 +243,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
               "B": {
                 "point_0": 0.02
               },
-              "C": 0.38,
+              "C": 0.42,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.01,
@@ -272,17 +272,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "友人は毎年ずっと年賀状を送り続けていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1659396960167214,
-      "judge_s": 1.1659396960167214,
+      "jev_s": 1.1417291319812648,
+      "judge_s": 1.1417291319812648,
       "luna_s": null,
-      "total_s": 2.1869853509997483,
-      "writer_s": 1.021045654983027
+      "total_s": 2.1814826849731617,
+      "writer_s": 1.0397535529918969
     }
   },
   {
@@ -294,7 +294,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -312,8 +312,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4132,
-            "latency_s": 1.127525,
+            "input_tokens": 4171,
+            "latency_s": 1.142631,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -326,19 +326,19 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.14,
-                "question": 0.86
+                "guess": 0.08,
+                "question": 0.92
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.0,
                 "q_yesno": 1.0
               },
-              "A_bare": 0.03,
+              "A_bare": 0.02,
               "B": {
                 "point_0": 0.01
               },
-              "C": 0.56,
+              "C": 0.62,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -367,17 +367,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "二人は中学の同級生ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1278757020190824,
-      "judge_s": 1.1278757020190824,
+      "jev_s": 1.1428720800031442,
+      "judge_s": 1.1428720800031442,
       "luna_s": null,
-      "total_s": 2.063720218022354,
-      "writer_s": 0.9358445160032716
+      "total_s": 2.131234756001504,
+      "writer_s": 0.9883626759983599
     }
   },
   {
@@ -389,7 +389,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -407,8 +407,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4180,
-            "latency_s": 1.120435,
+            "input_tokens": 4219,
+            "latency_s": 1.066271,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -421,8 +421,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.8,
-                "question": 0.2
+                "guess": 0.81,
+                "question": 0.19
               },
               "A2": {
                 "q_multi": 0.0,
@@ -431,9 +431,9 @@ window.PROBE_RAW["jev-2c/U25"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.17
+                "point_0": 0.18
               },
-              "C": 0.7,
+              "C": 0.71,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.02,
@@ -443,7 +443,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.17"
+          "reason": "段A=question→q_yesno, 要点最低=0.18"
         },
         "luna": null
       },
@@ -462,17 +462,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "年賀状に勝負の答えが書かれていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1207215870090295,
-      "judge_s": 1.1207215870090295,
+      "jev_s": 1.0665583469963167,
+      "judge_s": 1.0665583469963167,
       "luna_s": null,
-      "total_s": 4.759802855027374,
-      "writer_s": 3.6390812680183444
+      "total_s": 2.0526008640008513,
+      "writer_s": 0.9860425170045346
     }
   },
   {
@@ -484,7 +484,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -492,18 +492,18 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "errors": [],
       "fact_sheet_hash": "bb5a6e203be0",
       "final": {
-        "answer": "no",
+        "answer": "irrelevant",
         "decision": "jev",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": {
-          "answer": "no",
+          "answer": "irrelevant",
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4198,
-            "latency_s": 1.143506,
+            "input_tokens": 4237,
+            "latency_s": 1.115586,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -516,8 +516,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.66,
-                "question": 0.34
+                "guess": 0.72,
+                "question": 0.28
               },
               "A2": {
                 "q_multi": 0.0,
@@ -528,11 +528,11 @@ window.PROBE_RAW["jev-2c/U25"] = [
               "B": {
                 "point_0": 0.01
               },
-              "C": 0.63,
+              "C": 0.59,
               "D": {
-                "irrelevant": 0.41,
-                "no": 0.58,
-                "yes": 0.01
+                "irrelevant": 0.47,
+                "no": 0.5,
+                "yes": 0.03
               }
             }
           },
@@ -549,7 +549,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。友人がまだ生きているか、気にしていたんですか？"
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -557,17 +557,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "男は友人がまだ生きているか気にしていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1437878389842808,
-      "judge_s": 1.1437878389842808,
+      "jev_s": 1.1160792490118183,
+      "judge_s": 1.1160792490118183,
       "luna_s": null,
-      "total_s": 7.174729666963685,
-      "writer_s": 6.0309418279794045
+      "total_s": 2.3607427880051546,
+      "writer_s": 1.2446635389933363
     }
   },
   {
@@ -579,7 +579,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -587,18 +587,18 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "errors": [],
       "fact_sheet_hash": "bb5a6e203be0",
       "final": {
-        "answer": "unknown",
+        "answer": "irrelevant",
         "decision": "jev",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": {
-          "answer": "unknown",
+          "answer": "irrelevant",
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4180,
-            "latency_s": 1.221148,
+            "input_tokens": 4219,
+            "latency_s": 1.338154,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -611,8 +611,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.28,
-                "question": 0.72
+                "guess": 0.31,
+                "question": 0.69
               },
               "A2": {
                 "q_multi": 0.01,
@@ -623,11 +623,11 @@ window.PROBE_RAW["jev-2c/U25"] = [
               "B": {
                 "point_0": 0.02
               },
-              "C": 0.33,
+              "C": 0.35,
               "D": {
-                "irrelevant": 0.38,
-                "no": 0.49,
-                "yes": 0.13
+                "irrelevant": 0.35,
+                "no": 0.5,
+                "yes": 0.15
               }
             }
           },
@@ -644,7 +644,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "それは答えに関わらないんだ。ほかも聞いてごらん。"
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -652,17 +652,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "二人とも元日に年賀状を受け取ったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.221453242993448,
-      "judge_s": 1.221453242993448,
+      "jev_s": 1.3385642150242347,
+      "judge_s": 1.3385642150242347,
       "luna_s": null,
-      "total_s": 2.7604207750118803,
-      "writer_s": 1.5389675320184324
+      "total_s": 2.3174979250179604,
+      "writer_s": 0.9789337099937256
     }
   },
   {
@@ -674,7 +674,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -692,8 +692,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4156,
-            "latency_s": 1.179252,
+            "input_tokens": 4195,
+            "latency_s": 1.327455,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -706,8 +706,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.04,
-                "question": 0.96
+                "guess": 0.02,
+                "question": 0.98
               },
               "A2": {
                 "q_multi": 0.0,
@@ -718,11 +718,11 @@ window.PROBE_RAW["jev-2c/U25"] = [
               "B": {
                 "point_0": 0.01
               },
-              "C": 0.26,
+              "C": 0.28,
               "D": {
-                "irrelevant": 0.08,
-                "no": 0.01,
-                "yes": 0.91
+                "irrelevant": 0.05,
+                "no": 0.0,
+                "yes": 0.95
               }
             }
           },
@@ -747,17 +747,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "友人は男と同じくらいの年齢ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1796727420005482,
-      "judge_s": 1.1796727420005482,
+      "jev_s": 1.3277569610218052,
+      "judge_s": 1.3277569610218052,
       "luna_s": null,
-      "total_s": 4.62427832299727,
-      "writer_s": 3.444605580996722
+      "total_s": 3.0903417830122635,
+      "writer_s": 1.7625848219904583
     }
   },
   {
@@ -769,7 +769,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -787,8 +787,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4180,
-            "latency_s": 1.139418,
+            "input_tokens": 4219,
+            "latency_s": 1.167695,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -801,8 +801,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.05,
-                "question": 0.95
+                "guess": 0.04,
+                "question": 0.96
               },
               "A2": {
                 "q_multi": 0.0,
@@ -813,7 +813,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
               "B": {
                 "point_0": 0.02
               },
-              "C": 0.37,
+              "C": 0.39,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -834,7 +834,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！男の家族は二人の約束を知っていたよ。"
+        "text": "はい！男の家族は二人の約束を知っていたんだね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -842,17 +842,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "男の家族は二人の約束を知っていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1397901019954588,
-      "judge_s": 1.1397901019954588,
+      "jev_s": 1.168195132020628,
+      "judge_s": 1.168195132020628,
       "luna_s": null,
-      "total_s": 33.68723662299453,
-      "writer_s": 32.547446520999074
+      "total_s": 3.343378905003192,
+      "writer_s": 2.175183772982564
     }
   },
   {
@@ -864,7 +864,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -883,8 +883,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 4198,
-            "latency_s": 1.129961,
+            "input_tokens": 4237,
+            "latency_s": 1.203697,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -907,19 +907,19 @@ window.PROBE_RAW["jev-2c/U25"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.05
+                "point_0": 0.04
               },
-              "C": 0.57,
+              "C": 0.58,
               "D": {
-                "irrelevant": 0.03,
-                "no": 0.97,
+                "irrelevant": 0.02,
+                "no": 0.98,
                 "yes": 0.0
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.05"
+          "reason": "段A=question→q_yesno, 要点最低=0.04"
         },
         "luna": null
       },
@@ -930,7 +930,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。次はどうかな？"
+        "text": "いいえ。ほかのことも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -938,17 +938,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "勝ったのは、年賀状が先に届いたからなんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1303396389994305,
-      "judge_s": 1.1303396389994305,
+      "jev_s": 1.2039580380078405,
+      "judge_s": 1.2039580380078405,
       "luna_s": null,
-      "total_s": 2.4923595160071272,
-      "writer_s": 1.3620198770076968
+      "total_s": 2.720978429017123,
+      "writer_s": 1.5170203910092823
     }
   },
   {
@@ -960,7 +960,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -979,7 +979,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2141,
-            "latency_s": 0.613844,
+            "latency_s": 0.578302,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -992,8 +992,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.91,
-                "question": 0.09
+                "guess": 0.9,
+                "question": 0.1
               },
               "A2": {
                 "q_multi": 0.99,
@@ -1016,7 +1016,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。まずはどちらか聞いてみよう！"
+        "text": "質問はひとつずつコメントしてね。どちらかから聞いてごらん☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1024,17 +1024,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "二人は中学のころに勝負したの？その勝負の決着がついたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.6140216559870169,
-      "judge_s": 0.6140216559870169,
+      "jev_s": 0.5784738090005703,
+      "judge_s": 0.5784738090005703,
       "luna_s": null,
-      "total_s": 1.8336074829858262,
-      "writer_s": 1.2195858269988094
+      "total_s": 2.5169747170002665,
+      "writer_s": 1.9385009079996962
     }
   },
   {
@@ -1046,7 +1046,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1065,7 +1065,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2147,
-            "latency_s": 0.579416,
+            "latency_s": 0.616347,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1078,8 +1078,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.21,
-                "question": 0.79
+                "guess": 0.24,
+                "question": 0.76
               },
               "A2": {
                 "q_multi": 0.97,
@@ -1102,7 +1102,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。まずはどちらか聞いてごらん。"
+        "text": "質問はひとつずつ聞いてごらん。どちらから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1110,17 +1110,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "年賀状は何十年も送り合ってたの？今年だけ特別な内容だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.5796118889993522,
-      "judge_s": 0.5796118889993522,
+      "jev_s": 0.616560421010945,
+      "judge_s": 0.616560421010945,
       "luna_s": null,
-      "total_s": 1.9690990209928714,
-      "writer_s": 1.3894871319935191
+      "total_s": 2.574718395015225,
+      "writer_s": 1.9581579740042798
     }
   },
   {
@@ -1132,7 +1132,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1151,7 +1151,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2614,
-            "latency_s": 0.918617,
+            "latency_s": 0.813303,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1164,8 +1164,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.07,
-                "question": 0.93
+                "guess": 0.09,
+                "question": 0.91
               },
               "A2": {
                 "q_multi": 0.0,
@@ -1189,7 +1189,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい／いいえで答えられる形で聞き直してごらん。"
+        "text": "はい・いいえで答えられる形で聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1197,17 +1197,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "男は何の勝負に勝ったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.9188171860005241,
-      "judge_s": 0.9188171860005241,
+      "jev_s": 0.8134977289882954,
+      "judge_s": 0.8134977289882954,
       "luna_s": null,
-      "total_s": 5.065741925995098,
-      "writer_s": 4.146924739994574
+      "total_s": 2.8202212059986778,
+      "writer_s": 2.0067234770103823
     }
   },
   {
@@ -1219,7 +1219,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1238,7 +1238,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2630,
-            "latency_s": 0.831254,
+            "latency_s": 0.787166,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1276,7 +1276,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "年賀状の内容について、はい・いいえで答えられる質問にしてみてね。"
+        "text": "年賀状に何が書いてあったのか、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1284,17 +1284,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "年賀状には何が書いてあったんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.8314764460083097,
-      "judge_s": 0.8314764460083097,
+      "jev_s": 0.7873632720147725,
+      "judge_s": 0.7873632720147725,
       "luna_s": null,
-      "total_s": 5.800961761007784,
-      "writer_s": 4.969485314999474
+      "total_s": 3.4576956140226685,
+      "writer_s": 2.670332342007896
     }
   },
   {
@@ -1306,7 +1306,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1325,7 +1325,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2658,
-            "latency_s": 0.901437,
+            "latency_s": 0.770906,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1338,21 +1338,21 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.21,
-                "question": 0.79
+                "guess": 0.18,
+                "question": 0.82
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.99,
-                "q_yesno": 0.01
+                "q_open": 0.98,
+                "q_yesno": 0.02
               },
-              "A3": 0.05,
+              "A3": 0.04,
               "A_bare": 0.02
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A=question→q_open, 再確認=0.05"
+          "reason": "段A=question→q_open, 再確認=0.04"
         },
         "luna": null
       },
@@ -1363,7 +1363,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で聞いてごらん。二人のことなら、誰のことかも書いてね。"
+        "text": "「二人は中学を卒業するときに約束をした？」のように、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1371,17 +1371,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "二人は中学を卒業するとき、どんな約束をしたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.9016754580079578,
-      "judge_s": 0.9016754580079578,
+      "jev_s": 0.7712722279829904,
+      "judge_s": 0.7712722279829904,
       "luna_s": null,
-      "total_s": 3.0342676609870978,
-      "writer_s": 2.13259220297914
+      "total_s": 4.606787147989962,
+      "writer_s": 3.835514920006972
     }
   },
   {
@@ -1393,7 +1393,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1410,12 +1410,12 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 1978,
-            "latency_s": 0.554463,
+            "calls": 4,
+            "input_tokens": 3214,
+            "latency_s": 0.798201,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 132,
+            "output_tokens": 154,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1430,13 +1430,14 @@ window.PROBE_RAW["jev-2c/U25"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.93
-              }
+                "point_0": 0.94
+              },
+              "B2": 0.07
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.93"
+          "reason": "段A=guess→guess_correct, 要点最低=0.94, 矛盾=0.07"
         },
         "luna": null
       },
@@ -1455,17 +1456,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "2人は年賀状で将棋を一手ずつ指し続けてたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.5546337639971171,
-      "judge_s": 0.5546337639971171,
+      "jev_s": 0.7997483430081047,
+      "judge_s": 0.7997483430081047,
       "luna_s": null,
-      "total_s": 0.5546484449878335,
-      "writer_s": 1.4680990716442466e-05
+      "total_s": 0.7997651949990541,
+      "writer_s": 1.6851990949362516e-05
     }
   },
   {
@@ -1477,7 +1478,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1494,12 +1495,12 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 2065,
-            "latency_s": 0.634518,
+            "calls": 4,
+            "input_tokens": 3330,
+            "latency_s": 0.78767,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 132,
+            "output_tokens": 154,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1514,13 +1515,14 @@ window.PROBE_RAW["jev-2c/U25"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.97
-              }
+                "point_0": 0.98
+              },
+              "B2": 0.08
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.97"
+          "reason": "段A=guess→guess_correct, 要点最低=0.98, 矛盾=0.08"
         },
         "luna": null
       },
@@ -1539,17 +1541,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "会えないまま、2人は年賀状で将棋を一手ずつ続けてたんだね。55年越しに相手が「参りました」と送ってきたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.6347212410182692,
-      "judge_s": 0.6347212410182692,
+      "jev_s": 0.7879384749976452,
+      "judge_s": 0.7879384749976452,
       "luna_s": null,
-      "total_s": 0.6347262890194543,
-      "writer_s": 5.0480011850595474e-06
+      "total_s": 0.7879435470094904,
+      "writer_s": 5.072011845186353e-06
     }
   },
   {
@@ -1561,7 +1563,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1580,7 +1582,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 1978,
-            "latency_s": 0.731459,
+            "latency_s": 0.609444,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 132,
@@ -1615,7 +1617,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！ほかの可能性も考えてみようか☺️"
+        "text": "惜しい！もう少し推理を続けてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1623,17 +1625,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "2人は年賀状で何かの勝負をずっと続けてたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7315648359945044,
-      "judge_s": 0.7315648359945044,
+      "jev_s": 0.6096758650091942,
+      "judge_s": 0.6096758650091942,
       "luna_s": null,
-      "total_s": 2.1854873839765787,
-      "writer_s": 1.4539225479820743
+      "total_s": 1.6312542610103264,
+      "writer_s": 1.0215783960011322
     }
   },
   {
@@ -1645,7 +1647,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1655,19 +1657,19 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "final": {
         "answer": null,
         "decision": "jev",
-        "kind": "guess_correct"
+        "kind": "guess_close"
       },
       "judgements": {
         "jev": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 2032,
-            "latency_s": 0.57316,
+            "calls": 4,
+            "input_tokens": 3286,
+            "latency_s": 0.833851,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 132,
+            "output_tokens": 154,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1682,13 +1684,14 @@ window.PROBE_RAW["jev-2c/U25"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.92
-              }
+                "point_0": 0.91
+              },
+              "B2": 0.98
             }
           },
           "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.92"
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.91, 矛盾=0.98"
         },
         "luna": null
       },
@@ -1698,8 +1701,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "reply": {
         "over_80": false,
         "reply_id": null,
-        "source": "template",
-        "text": "正解！2人は年賀状に将棋を1手ずつ書き、55年かけて1局を指していた。友人の年賀状に「参りました」とあり、男が勝った。"
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1707,17 +1710,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "年賀状で将棋を一手ずつ続けてたけど、2人は毎年会って、その場で次の手を決めてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.5733890020055696,
-      "judge_s": 0.5733890020055696,
+      "jev_s": 0.8342381149996072,
+      "judge_s": 0.8342381149996072,
       "luna_s": null,
-      "total_s": 0.5734026610152796,
-      "writer_s": 1.3659009709954262e-05
+      "total_s": 1.8304910110018682,
+      "writer_s": 0.996252896002261
     }
   },
   {
@@ -1729,7 +1732,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1748,8 +1751,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 4336,
-            "latency_s": 1.194413,
+            "input_tokens": 4375,
+            "latency_s": 1.174342,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -1766,15 +1769,15 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "question": 0.0
               },
               "A2": {
-                "q_multi": 0.02,
-                "q_open": 0.38,
-                "q_yesno": 0.6
+                "q_multi": 0.03,
+                "q_open": 0.34,
+                "q_yesno": 0.63
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.01
               },
-              "C": 0.4,
+              "C": 0.44,
               "D": {
                 "irrelevant": 0.01,
                 "no": 0.99,
@@ -1803,17 +1806,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "中学の時にどっちが先に結婚するか賭けていて、友人が独身だとわかったから勝ちを喜んだんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.194763949024491,
-      "judge_s": 1.194763949024491,
+      "jev_s": 1.1746971069951542,
+      "judge_s": 1.1746971069951542,
       "luna_s": null,
-      "total_s": 2.0911941940139513,
-      "writer_s": 0.8964302449894603
+      "total_s": 2.84768619100214,
+      "writer_s": 1.6729890840069856
     }
   },
   {
@@ -1825,7 +1828,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1845,7 +1848,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
             "calls": 4,
             "guess_demoted": true,
             "input_tokens": 2567,
-            "latency_s": 0.795191,
+            "latency_s": 0.792989,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1862,9 +1865,9 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "question": 0.0
               },
               "A2": {
-                "q_multi": 0.02,
-                "q_open": 0.85,
-                "q_yesno": 0.13
+                "q_multi": 0.01,
+                "q_open": 0.89,
+                "q_yesno": 0.1
               },
               "A_bare": 0.02,
               "B": {
@@ -1885,7 +1888,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。ほかの可能性も考えてみようか☺️"
+        "text": "残念、ちがうよ。別の可能性も考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1893,17 +1896,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "友人が年賀状で宝くじが当たったと知らせてきて、昔の賭けに勝ったんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7954512249852996,
-      "judge_s": 0.7954512249852996,
+      "jev_s": 0.7932903089968022,
+      "judge_s": 0.7932903089968022,
       "luna_s": null,
-      "total_s": 2.322628982976312,
-      "writer_s": 1.5271777579910122
+      "total_s": 1.9898016180086415,
+      "writer_s": 1.1965113090118393
     }
   },
   {
@@ -1915,14 +1918,12 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "013-fifty-five-year-nengajo",
-      "errors": [
-        "writer: writer did not ask what bare_term means"
-      ],
+      "errors": [],
       "fact_sheet_hash": "bb5a6e203be0",
       "final": {
         "answer": null,
@@ -1936,7 +1937,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 930,
-            "latency_s": 0.188673,
+            "latency_s": 0.190859,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -1947,12 +1948,12 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "reaction": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.87
+              "A_bare": 0.86
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A語句のみ: 0.87"
+          "reason": "段A語句のみ: 0.86"
         },
         "luna": null
       },
@@ -1962,8 +1963,8 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "reply": {
         "over_80": false,
         "reply_id": null,
-        "source": "fallback_template",
-        "text": "年賀状将棋がどうしたのか聞かせてね。"
+        "source": "llm",
+        "text": "年賀状将棋の何が知りたいのかな？はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1971,17 +1972,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "年賀状将棋？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.1887844009906985,
-      "judge_s": 0.1887844009906985,
+      "jev_s": 0.19098642698372714,
+      "judge_s": 0.19098642698372714,
       "luna_s": null,
-      "total_s": 5.077983053983189,
-      "writer_s": 4.889198652992491
+      "total_s": 2.9161433589761145,
+      "writer_s": 2.7251569319923874
     }
   },
   {
@@ -1993,7 +1994,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2014,7 +2015,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 927,
-            "latency_s": 0.173328,
+            "latency_s": 0.233712,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -2049,17 +2050,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "野球部",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.1734375100058969,
-      "judge_s": 0.1734375100058969,
+      "jev_s": 0.23382854400551878,
+      "judge_s": 0.23382854400551878,
       "luna_s": null,
-      "total_s": 5.826791242026957,
-      "writer_s": 5.65335373202106
+      "total_s": 4.197899249003967,
+      "writer_s": 3.9640707049984485
     }
   },
   {
@@ -2071,7 +2072,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2090,7 +2091,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1427,
-            "latency_s": 0.390765,
+            "latency_s": 0.400161,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 124,
@@ -2107,7 +2108,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "ask_howto": 1.0,
                 "ask_spoiler": 0.0
               },
-              "A_bare": 0.05
+              "A_bare": 0.04
             }
           },
           "error": null,
@@ -2131,17 +2132,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "これどうやって遊ぶの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.3908868399739731,
-      "judge_s": 0.3908868399739731,
+      "jev_s": 0.4002665279840585,
+      "judge_s": 0.4002665279840585,
       "luna_s": null,
-      "total_s": 1.3197465889970772,
-      "writer_s": 0.9288597490231041
+      "total_s": 1.5387429679685738,
+      "writer_s": 1.1384764399845153
     }
   },
   {
@@ -2153,7 +2154,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2172,7 +2173,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1580,
-            "latency_s": 0.464732,
+            "latency_s": 0.396892,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -2209,7 +2210,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "こんにちは！初コメありがとう、よろしくね☺️"
+        "text": "こんにちは！初コメントありがとう、よろしくね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2217,17 +2218,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "こんにちは、初コメです",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.4648756439855788,
-      "judge_s": 0.4648756439855788,
+      "jev_s": 0.39701076099299826,
+      "judge_s": 0.39701076099299826,
       "luna_s": null,
-      "total_s": 33.004676472977735,
-      "writer_s": 32.539800828992156
+      "total_s": 2.045285406988114,
+      "writer_s": 1.6482746459951159
     }
   },
   {
@@ -2239,7 +2240,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2258,7 +2259,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1429,
-            "latency_s": 0.380206,
+            "latency_s": 0.54949,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 124,
@@ -2267,15 +2268,15 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "inappropriate": 0.0,
                 "other": 0.0,
                 "question_or_guess": 0.0,
-                "reaction": 0.27,
-                "request": 0.73
+                "reaction": 0.22,
+                "request": 0.78
               },
               "A2": {
-                "ask_hint": 0.29,
-                "ask_howto": 0.63,
-                "ask_spoiler": 0.08
+                "ask_hint": 0.28,
+                "ask_howto": 0.65,
+                "ask_spoiler": 0.07
               },
-              "A_bare": 0.56
+              "A_bare": 0.51
             }
           },
           "error": null,
@@ -2291,7 +2292,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる質問をコメントしてね。私が答えるよ！"
+        "text": "はい・いいえで答えられる質問をコメントすると、私が答えるよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2299,17 +2300,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "短めの問題リクエストです",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.3803588139999192,
-      "judge_s": 0.3803588139999192,
+      "jev_s": 0.5496591519913636,
+      "judge_s": 0.5496591519913636,
       "luna_s": null,
-      "total_s": 3.978927301010117,
-      "writer_s": 3.5985684870101977
+      "total_s": 1.6206334099988453,
+      "writer_s": 1.0709742580074817
     }
   },
   {
@@ -2321,7 +2322,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2358,7 +2359,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "反応ありがとう！"
+        "text": "びっくりしたかな？☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2366,17 +2367,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "😮",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 2.0934996427968144e-05,
-      "judge_s": 2.0934996427968144e-05,
+      "jev_s": 3.8452009903267026e-05,
+      "judge_s": 3.8452009903267026e-05,
       "luna_s": null,
-      "total_s": 7.806929304992082,
-      "writer_s": 7.806908369995654
+      "total_s": 2.440752289025113,
+      "writer_s": 2.4407138370152097
     }
   },
   {
@@ -2388,7 +2389,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2407,7 +2408,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1484,
-            "latency_s": 0.3654,
+            "latency_s": 0.381372,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 128,
@@ -2425,7 +2426,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
                 "spam": 1.0,
                 "troll": 0.0
               },
-              "A_bare": 0.03
+              "A_bare": 0.04
             }
           },
           "error": null,
@@ -2449,17 +2450,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "フォローしてくれたら相互します！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.36557344600441866,
-      "judge_s": 0.36557344600441866,
+      "jev_s": 0.38151327200466767,
+      "judge_s": 0.38151327200466767,
       "luna_s": null,
-      "total_s": 0.36557788800564595,
-      "writer_s": 4.442001227289438e-06
+      "total_s": 0.38151515601202846,
+      "writer_s": 1.8840073607861996e-06
     }
   },
   {
@@ -2471,7 +2472,7 @@ window.PROBE_RAW["jev-2c/U25"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2490,25 +2491,25 @@ window.PROBE_RAW["jev-2c/U25"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1480,
-            "latency_s": 0.392157,
+            "latency_s": 0.431649,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 129,
             "probabilities": {
               "A1": {
-                "inappropriate": 0.87,
+                "inappropriate": 0.84,
                 "other": 0.0,
-                "question_or_guess": 0.11,
-                "reaction": 0.02,
+                "question_or_guess": 0.13,
+                "reaction": 0.03,
                 "request": 0.0
               },
               "A2": {
-                "abuse": 0.99,
+                "abuse": 1.0,
                 "personal_info": 0.0,
                 "spam": 0.0,
-                "troll": 0.01
+                "troll": 0.0
               },
-              "A_bare": 0.04
+              "A_bare": 0.05
             }
           },
           "error": null,
@@ -2532,17 +2533,17 @@ window.PROBE_RAW["jev-2c/U25"] = [
       "text": "作者って絶対友達いないでしょ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.3922273760254029,
-      "judge_s": 0.3922273760254029,
+      "jev_s": 0.4318399559997488,
+      "judge_s": 0.4318399559997488,
       "luna_s": null,
-      "total_s": 0.39225182301015593,
-      "writer_s": 2.4446984753012657e-05
+      "total_s": 0.4318721949821338,
+      "writer_s": 3.223898238502443e-05
     }
   }
 ];

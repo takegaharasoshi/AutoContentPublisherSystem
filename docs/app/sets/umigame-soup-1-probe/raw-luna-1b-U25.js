@@ -9,7 +9,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -27,16 +27,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 218,
+            "completion_tokens": 368,
             "finish_reason": "stop",
-            "latency_s": 2.303864,
+            "latency_s": 4.147033,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2968,
-            "reasoning_tokens": 150
+            "prompt_tokens": 2999,
+            "reasoning_tokens": 294
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "賭けの有無を尋ねる一つの質問で、確定事実では賭けていません。"
+          "reason": "確定事実で、二人は何も賭けていないと明示されています。"
         }
       },
       "media_id": "local-U25",
@@ -46,7 +46,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてごらん"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -54,17 +54,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "中学時代に二人で何か賭けをしてたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.3039187340182252,
-      "luna_s": 2.3039187340182252,
-      "total_s": 4.796334180020494,
-      "writer_s": 2.492415446002269
+      "judge_s": 4.1470722559897695,
+      "luna_s": 4.1470722559897695,
+      "total_s": 6.422680728981504,
+      "writer_s": 2.2756084729917347
     }
   },
   {
@@ -76,7 +76,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -94,16 +94,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 293,
+            "completion_tokens": 209,
             "finish_reason": "stop",
-            "latency_s": 2.989163,
+            "latency_s": 2.726254,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2967,
-            "reasoning_tokens": 212
+            "prompt_tokens": 2998,
+            "reasoning_tokens": 143
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "「勝った」が昔から続く勝負の結果かを確かめる質問で、真相でもその通りです。"
+          "reason": "「勝った」が昔から続く勝負の結果を指すかの確認です。"
         }
       },
       "media_id": "local-U25",
@@ -121,17 +121,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "「勝った」は、昔した勝負の結果について言ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.989221677999012,
-      "luna_s": 2.989221677999012,
-      "total_s": 4.1659161430143286,
-      "writer_s": 1.1766944650153164
+      "judge_s": 2.726281410024967,
+      "luna_s": 2.726281410024967,
+      "total_s": 3.7607636200264096,
+      "writer_s": 1.0344822100014426
     }
   },
   {
@@ -143,7 +143,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -161,16 +161,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 296,
+            "completion_tokens": 208,
             "finish_reason": "stop",
-            "latency_s": 8.231666,
+            "latency_s": 2.741548,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2968,
-            "reasoning_tokens": 220
+            "prompt_tokens": 2999,
+            "reasoning_tokens": 131
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実と真相から、毎年年賀状を送り合っていたと分かります。"
+          "reason": "確定事実で、二人は毎年年賀状だけをやりとりしていたと分かります。"
         }
       },
       "media_id": "local-U25",
@@ -188,17 +188,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "友人は毎年ずっと年賀状を送り続けていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 8.231694412999786,
-      "luna_s": 8.231694412999786,
-      "total_s": 15.851137154008029,
-      "writer_s": 7.619442741008243
+      "judge_s": 2.7415737429982983,
+      "luna_s": 2.7415737429982983,
+      "total_s": 4.395555322989821,
+      "writer_s": 1.6539815799915232
     }
   },
   {
@@ -210,7 +210,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -228,16 +228,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 232,
+            "completion_tokens": 163,
             "finish_reason": "stop",
-            "latency_s": 4.169777,
+            "latency_s": 2.176286,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2960,
-            "reasoning_tokens": 153
+            "prompt_tokens": 2991,
+            "reasoning_tokens": 96
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "「二人は中学の同級生か」という一つの質問で、確定事実にも同級生とあります。"
+          "reason": "確定事実に、二人は中学の同級生とあります。"
         }
       },
       "media_id": "local-U25",
@@ -255,17 +255,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "二人は中学の同級生ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.169830394006567,
-      "luna_s": 4.169830394006567,
-      "total_s": 5.335772798018297,
-      "writer_s": 1.16594240401173
+      "judge_s": 2.176340853999136,
+      "luna_s": 2.176340853999136,
+      "total_s": 3.8312135800078977,
+      "writer_s": 1.6548727260087617
     }
   },
   {
@@ -277,7 +277,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -295,16 +295,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 425,
+            "completion_tokens": 447,
             "finish_reason": "stop",
-            "latency_s": 3.68366,
+            "latency_s": 5.118558,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2966,
-            "reasoning_tokens": 349
+            "prompt_tokens": 2997,
+            "reasoning_tokens": 363
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "年賀状に勝負の結果が書かれていたかを尋ねる、単一のはい／いいえ質問です。"
+          "reason": "一つの事実を確かめる質問で、年賀状に勝負の決着を示す言葉が書かれていました。"
         }
       },
       "media_id": "local-U25",
@@ -322,17 +322,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "年賀状に勝負の答えが書かれていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.6837162929878104,
-      "luna_s": 3.6837162929878104,
-      "total_s": 4.850539942970499,
-      "writer_s": 1.166823649982689
+      "judge_s": 5.118582505994709,
+      "luna_s": 5.118582505994709,
+      "total_s": 9.634227857983205,
+      "writer_s": 4.515645351988496
     }
   },
   {
@@ -344,208 +344,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "013-fifty-five-year-nengajo",
-      "errors": [],
-      "fact_sheet_hash": "bb5a6e203be0",
-      "final": {
-        "answer": "unknown",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "unknown",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 754,
-            "finish_reason": "stop",
-            "latency_s": 7.180664,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2967,
-            "reasoning_tokens": 668
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "友人は元気ですが、男が生存を心配していたかは記載がありません。"
-        }
-      },
-      "media_id": "local-U25",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "それは答えに関わらないんだ。少しずつ聞いてみようか。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は友人がまだ生きているか気にしていたんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 7.180719655007124,
-      "luna_s": 7.180719655007124,
-      "total_s": 11.474729633016977,
-      "writer_s": 4.2940099780098535
-    }
-  },
-  {
-    "case_id": "U25-e07",
-    "record": {
-      "comment_id": "U25-e07",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "013-fifty-five-year-nengajo",
-      "errors": [],
-      "fact_sheet_hash": "bb5a6e203be0",
-      "final": {
-        "answer": "unknown",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "unknown",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 821,
-            "finish_reason": "stop",
-            "latency_s": 6.98564,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2965,
-            "reasoning_tokens": 728
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "男が元日に受け取ったことは分かりますが、友人側の受取日は不明です。"
-        }
-      },
-      "media_id": "local-U25",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "それは答えに関わらないんだ。ほかも聞いてごらん。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "二人とも元日に年賀状を受け取ったんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 6.985696133982856,
-      "luna_s": 6.985696133982856,
-      "total_s": 9.647788784990553,
-      "writer_s": 2.662092651007697
-    }
-  },
-  {
-    "case_id": "U25-e08",
-    "record": {
-      "comment_id": "U25-e08",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "013-fifty-five-year-nengajo",
-      "errors": [],
-      "fact_sheet_hash": "bb5a6e203be0",
-      "final": {
-        "answer": "unknown",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "unknown",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 1098,
-            "finish_reason": "stop",
-            "latency_s": 13.616454,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2963,
-            "reasoning_tokens": 1024
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "友人の年齢は問題文にも確定事実にも記載がありません。"
-        }
-      },
-      "media_id": "local-U25",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "それは答えに関わらないんだ。ほかのことも聞いてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "友人は男と同じくらいの年齢ですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 13.616507437021937,
-      "luna_s": 13.616507437021937,
-      "total_s": 18.25827750004828,
-      "writer_s": 4.6417700630263425
-    }
-  },
-  {
-    "case_id": "U25-e09",
-    "record": {
-      "comment_id": "U25-e09",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -563,16 +362,217 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 575,
+            "completion_tokens": 241,
             "finish_reason": "stop",
-            "latency_s": 4.756055,
+            "latency_s": 3.435119,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2966,
-            "reasoning_tokens": 493
+            "prompt_tokens": 2998,
+            "reasoning_tokens": 158
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "家族が約束を知っていたかは、勝負の真相を解くうえで関係しません。"
+          "reason": "友人を心配していたかは真相に記載がなく、勝負の結末にも関係しません。"
+        }
+      },
+      "media_id": "local-U25",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。次は何を聞こうか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男は友人がまだ生きているか気にしていたんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.435174187994562,
+      "luna_s": 3.435174187994562,
+      "total_s": 5.938823500007857,
+      "writer_s": 2.5036493120132945
+    }
+  },
+  {
+    "case_id": "U25-e07",
+    "record": {
+      "comment_id": "U25-e07",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "013-fifty-five-year-nengajo",
+      "errors": [],
+      "fact_sheet_hash": "bb5a6e203be0",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 495,
+            "finish_reason": "stop",
+            "latency_s": 5.395996,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2996,
+            "reasoning_tokens": 420
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "男性の受取日は分かりますが、友人側の受取日は示されていません。"
+        }
+      },
+      "media_id": "local-U25",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "二人とも元日に年賀状を受け取ったんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 5.396027836977737,
+      "luna_s": 5.396027836977737,
+      "total_s": 8.143983548972756,
+      "writer_s": 2.7479557119950186
+    }
+  },
+  {
+    "case_id": "U25-e08",
+    "record": {
+      "comment_id": "U25-e08",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "013-fifty-five-year-nengajo",
+      "errors": [],
+      "fact_sheet_hash": "bb5a6e203be0",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 215,
+            "finish_reason": "stop",
+            "latency_s": 3.15355,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2994,
+            "reasoning_tokens": 145
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "年齢差は真相にも確定事実にも示されていません。"
+        }
+      },
+      "media_id": "local-U25",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "友人は男と同じくらいの年齢ですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.153585785999894,
+      "luna_s": 3.153585785999894,
+      "total_s": 4.897457841987489,
+      "writer_s": 1.7438720559875946
+    }
+  },
+  {
+    "case_id": "U25-e09",
+    "record": {
+      "comment_id": "U25-e09",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "013-fifty-five-year-nengajo",
+      "errors": [],
+      "fact_sheet_hash": "bb5a6e203be0",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 330,
+            "finish_reason": "stop",
+            "latency_s": 3.858399,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2997,
+            "reasoning_tokens": 246
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "家族が勝負を知っていたことは確定していますが、約束まで知っていたかは示されていません。"
         }
       },
       "media_id": "local-U25",
@@ -590,17 +590,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "男の家族は二人の約束を知っていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.756103907013312,
-      "luna_s": 4.756103907013312,
-      "total_s": 6.650940921012079,
-      "writer_s": 1.8948370139987674
+      "judge_s": 3.8584602079936303,
+      "luna_s": 3.8584602079936303,
+      "total_s": 6.298022942006355,
+      "writer_s": 2.439562734012725
     }
   },
   {
@@ -612,7 +612,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -630,16 +630,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 358,
+            "completion_tokens": 354,
             "finish_reason": "stop",
-            "latency_s": 3.420708,
+            "latency_s": 4.327136,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2968,
-            "reasoning_tokens": 279
+            "prompt_tokens": 2999,
+            "reasoning_tokens": 276
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "勝った理由が到着の早さかを尋ねる、はい・いいえで答えられる質問です。"
+          "reason": "年賀状が先に届いたことが勝因ではなく、相手の投了で決着しました。"
         }
       },
       "media_id": "local-U25",
@@ -649,7 +649,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてごらん。"
+        "text": "いいえ。別のことも考えてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -657,17 +657,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "勝ったのは、年賀状が先に届いたからなんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.420752544014249,
-      "luna_s": 3.420752544014249,
-      "total_s": 5.211589468031889,
-      "writer_s": 1.7908369240176398
+      "judge_s": 4.327166094997665,
+      "luna_s": 4.327166094997665,
+      "total_s": 7.013122231001034,
+      "writer_s": 2.6859561360033695
     }
   },
   {
@@ -679,7 +679,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -697,16 +697,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 206,
+            "completion_tokens": 149,
             "finish_reason": "stop",
-            "latency_s": 2.891698,
+            "latency_s": 2.042282,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2972,
-            "reasoning_tokens": 124
+            "prompt_tokens": 3003,
+            "reasoning_tokens": 70
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "勝負を始めた時期と決着の有無を尋ねる質問が二つあります。"
+          "reason": "中学時代の勝負と決着について、質問が二つあります。"
         }
       },
       "media_id": "local-U25",
@@ -716,7 +716,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。どっちから聞こうか？"
+        "text": "質問はひとつずつコメントしてね。どちらから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -724,17 +724,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "二人は中学のころに勝負したの？その勝負の決着がついたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.8917548750177957,
-      "luna_s": 2.8917548750177957,
-      "total_s": 4.479063648002921,
-      "writer_s": 1.587308772985125
+      "judge_s": 2.0423248800216243,
+      "luna_s": 2.0423248800216243,
+      "total_s": 3.7037181310297456,
+      "writer_s": 1.6613932510081213
     }
   },
   {
@@ -746,7 +746,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -764,16 +764,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 135,
+            "completion_tokens": 212,
             "finish_reason": "stop",
-            "latency_s": 2.054885,
+            "latency_s": 3.966121,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2971,
-            "reasoning_tokens": 65
+            "prompt_tokens": 3002,
+            "reasoning_tokens": 129
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "年賀状の期間と今年の内容について、質問が二つあります。"
+          "reason": "年賀状のやり取りの期間と、今年の内容について二つ尋ねています。"
         }
       },
       "media_id": "local-U25",
@@ -783,7 +783,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どちらかから聞いてごらん☺️"
+        "text": "質問はひとつずつコメントしてね。どちらから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -791,17 +791,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "年賀状は何十年も送り合ってたの？今年だけ特別な内容だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.0549393520050216,
-      "luna_s": 2.0549393520050216,
-      "total_s": 3.677977773011662,
-      "writer_s": 1.6230384210066404
+      "judge_s": 3.966180766990874,
+      "luna_s": 3.966180766990874,
+      "total_s": 6.129714005975984,
+      "writer_s": 2.16353323898511
     }
   },
   {
@@ -813,7 +813,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -831,16 +831,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 150,
+            "completion_tokens": 147,
             "finish_reason": "stop",
-            "latency_s": 7.12189,
+            "latency_s": 2.075801,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2961,
-            "reasoning_tokens": 73
+            "prompt_tokens": 2992,
+            "reasoning_tokens": 71
           },
           "error": null,
           "kind": "q_open",
-          "reason": "勝負の種類を尋ねる、はい／いいえで答えられない質問です。"
+          "reason": "何の勝負かを尋ねる、はい・いいえでは答えられない質問です。"
         }
       },
       "media_id": "local-U25",
@@ -850,7 +850,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で聞いてごらん。"
+        "text": "はい・いいえで答えられる形で聞き直してみてね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -858,17 +858,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "男は何の勝負に勝ったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.121935572999064,
-      "luna_s": 7.121935572999064,
-      "total_s": 9.719774313009111,
-      "writer_s": 2.5978387400100473
+      "judge_s": 2.0758588839962613,
+      "luna_s": 2.0758588839962613,
+      "total_s": 5.610887667018687,
+      "writer_s": 3.535028783022426
     }
   },
   {
@@ -880,7 +880,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -890,7 +890,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "final": {
         "answer": null,
         "decision": "luna",
-        "kind": "q_open"
+        "kind": "ask_spoiler"
       },
       "judgements": {
         "jev": null,
@@ -898,16 +898,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 208,
+            "completion_tokens": 311,
             "finish_reason": "stop",
-            "latency_s": 17.734645,
+            "latency_s": 3.59308,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2961,
-            "reasoning_tokens": 122
+            "prompt_tokens": 2992,
+            "reasoning_tokens": 235
           },
           "error": null,
-          "kind": "q_open",
-          "reason": "何が書かれていたかを尋ねる、はい・いいえで答えられない質問です。"
+          "kind": "ask_spoiler",
+          "reason": "年賀状に何が書かれていたか、答えの核心を尋ねています。"
         }
       },
       "media_id": "local-U25",
@@ -917,7 +917,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "年賀状のこと、はい・いいえで答えられる形にして聞いてごらん。"
+        "text": "質問には答えられるけど、真相は教えられないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -925,17 +925,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "年賀状には何が書いてあったんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 17.73470358501072,
-      "luna_s": 17.73470358501072,
-      "total_s": 23.219741715001874,
-      "writer_s": 5.485038129991153
+      "judge_s": 3.5931575979921035,
+      "luna_s": 3.5931575979921035,
+      "total_s": 6.882773443008773,
+      "writer_s": 3.2896158450166695
     }
   },
   {
@@ -947,7 +947,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -965,12 +965,12 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 184,
+            "completion_tokens": 213,
             "finish_reason": "stop",
-            "latency_s": 2.104697,
+            "latency_s": 3.013552,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2969,
-            "reasoning_tokens": 101
+            "prompt_tokens": 3000,
+            "reasoning_tokens": 128
           },
           "error": null,
           "kind": "q_open",
@@ -984,7 +984,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形にして聞いてごらん。"
+        "text": "はい・いいえで答えられる形にして、もう一度聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -992,17 +992,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "二人は中学を卒業するとき、どんな約束をしたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.1047227199887857,
-      "luna_s": 2.1047227199887857,
-      "total_s": 6.606158668990247,
-      "writer_s": 4.501435949001461
+      "judge_s": 3.0136103259865195,
+      "luna_s": 3.0136103259865195,
+      "total_s": 6.959614111983683,
+      "writer_s": 3.9460037859971635
     }
   },
   {
@@ -1014,7 +1014,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1032,16 +1032,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 399,
+            "completion_tokens": 308,
             "finish_reason": "stop",
-            "latency_s": 19.010656,
+            "latency_s": 3.607788,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2971,
-            "reasoning_tokens": 286
+            "prompt_tokens": 3002,
+            "reasoning_tokens": 199
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "コアの将棋を年賀状で一手ずつ進めた点をすべて述べています。"
+          "reason": "年賀状で将棋を一手ずつ指すというコアの要点をすべて述べています。"
         }
       },
       "media_id": "local-U25",
@@ -1051,7 +1051,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！年賀状で将棋を一手ずつ指し続けていたんだ。55年かけた対局が、友人の「参りました」で決着したんだよ。"
+        "text": "正解！年賀状で毎年一手ずつ将棋を指し続けていたんだ。55年目、友人から「参りました」と届き、男は勝利を喜んだんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1059,17 +1059,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "2人は年賀状で将棋を一手ずつ指し続けてたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 19.010703526000725,
-      "luna_s": 19.010703526000725,
-      "total_s": 36.65203029802069,
-      "writer_s": 17.641326772019966
+      "judge_s": 3.60785262400168,
+      "luna_s": 3.60785262400168,
+      "total_s": 7.087914987991098,
+      "writer_s": 3.4800623639894184
     }
   },
   {
@@ -1081,7 +1081,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1099,16 +1099,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 294,
+            "completion_tokens": 280,
             "finish_reason": "stop",
-            "latency_s": 2.789663,
+            "latency_s": 3.390116,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2995,
-            "reasoning_tokens": 181
+            "prompt_tokens": 3026,
+            "reasoning_tokens": 170
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "年賀状で将棋を一手ずつ指した核心と、55年後の投了まで言い当てています。"
+          "reason": "年賀状で将棋を一手ずつ続け、55年後に決着した核心を捉えています。"
         }
       },
       "media_id": "local-U25",
@@ -1118,7 +1118,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！2人は年賀状で将棋を一手ずつ指し続けていたんだ。55年後、友人から「参りました」と届いて勝負が決着したんだよ。"
+        "text": "正解！2人は年賀状で将棋を一手ずつ指し続けていたんだ。55年越しの一局に、友人が「参りました」と告げたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1126,17 +1126,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "会えないまま、2人は年賀状で将棋を一手ずつ続けてたんだね。55年越しに相手が「参りました」と送ってきたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.7896877430030145,
-      "luna_s": 2.7896877430030145,
-      "total_s": 5.098378430004232,
-      "writer_s": 2.308690687001217
+      "judge_s": 3.3902025159914047,
+      "luna_s": 3.3902025159914047,
+      "total_s": 6.174219392007217,
+      "writer_s": 2.784016876015812
     }
   },
   {
@@ -1148,7 +1148,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1166,16 +1166,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 338,
+            "completion_tokens": 190,
             "finish_reason": "stop",
-            "latency_s": 2.985625,
+            "latency_s": 2.823472,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2972,
-            "reasoning_tokens": 263
+            "prompt_tokens": 3003,
+            "reasoning_tokens": 115
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "年賀状で勝負を続けた点には触れていますが、将棋を一手ずつ指したことまでは特定できていません。"
+          "reason": "年賀状で勝負を続けた点には触れていますが、将棋を一手ずつ指した点までは特定できていません。"
         }
       },
       "media_id": "local-U25",
@@ -1193,17 +1193,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "2人は年賀状で何かの勝負をずっと続けてたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.985687044012593,
-      "luna_s": 2.985687044012593,
-      "total_s": 5.674025268992409,
-      "writer_s": 2.688338224979816
+      "judge_s": 2.823533276998205,
+      "luna_s": 2.823533276998205,
+      "total_s": 6.598380262003047,
+      "writer_s": 3.7748469850048423
     }
   },
   {
@@ -1215,7 +1215,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1233,16 +1233,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 208,
+            "completion_tokens": 161,
             "finish_reason": "stop",
-            "latency_s": 2.407318,
+            "latency_s": 2.517273,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2988,
-            "reasoning_tokens": 143
+            "prompt_tokens": 3019,
+            "reasoning_tokens": 95
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "年賀状で将棋を続けた点には触れていますが、会っていたという誤りがあります。"
+          "reason": "年賀状で将棋を続けた点は合っていますが、毎年会っていた点が異なります。"
         }
       },
       "media_id": "local-U25",
@@ -1252,7 +1252,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか。"
+        "text": "惜しい！もう少し考えてみようか😉"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1260,17 +1260,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "年賀状で将棋を一手ずつ続けてたけど、2人は毎年会って、その場で次の手を決めてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.407341825979529,
-      "luna_s": 2.407341825979529,
-      "total_s": 4.740062269964255,
-      "writer_s": 2.3327204439847264
+      "judge_s": 2.517333623021841,
+      "luna_s": 2.517333623021841,
+      "total_s": 4.653229426039616,
+      "writer_s": 2.1358958030177746
     }
   },
   {
@@ -1282,7 +1282,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1300,16 +1300,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 287,
+            "completion_tokens": 216,
             "finish_reason": "stop",
-            "latency_s": 2.934357,
+            "latency_s": 2.813009,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2990,
-            "reasoning_tokens": 214
+            "prompt_tokens": 3021,
+            "reasoning_tokens": 150
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "年賀状を通じた勝負の仕掛けに触れておらず、確定事実とも異なる推理です。"
+          "reason": "核心の年賀状での勝負に触れておらず、賭けもしていません。"
         }
       },
       "media_id": "local-U25",
@@ -1319,7 +1319,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。ほかの可能性も考えてみようか☺️"
+        "text": "残念、ちがうよ。別の可能性も考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1327,17 +1327,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "中学の時にどっちが先に結婚するか賭けていて、友人が独身だとわかったから勝ちを喜んだんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.934411441005068,
-      "luna_s": 2.934411441005068,
-      "total_s": 4.585027571010869,
-      "writer_s": 1.650616130005801
+      "judge_s": 2.813066919974517,
+      "luna_s": 2.813066919974517,
+      "total_s": 4.958513467980083,
+      "writer_s": 2.145446548005566
     }
   },
   {
@@ -1349,7 +1349,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1367,16 +1367,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 206,
+            "completion_tokens": 260,
             "finish_reason": "stop",
-            "latency_s": 7.363087,
+            "latency_s": 3.162746,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2981,
-            "reasoning_tokens": 126
+            "prompt_tokens": 3012,
+            "reasoning_tokens": 187
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "年賀状での勝負には触れず、宝くじと賭けを推理しているため。"
+          "reason": "年賀状での知らせや賭けの推理で、将棋を一手ずつ指す核心には触れていません。"
         }
       },
       "media_id": "local-U25",
@@ -1386,7 +1386,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。ほかの可能性も考えてみようか。"
+        "text": "残念、ちがうよ。もう少し考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1394,17 +1394,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "友人が年賀状で宝くじが当たったと知らせてきて、昔の賭けに勝ったんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.363110459991731,
-      "luna_s": 7.363110459991731,
-      "total_s": 9.178007134993095,
-      "writer_s": 1.8148966750013642
+      "judge_s": 3.1628234060190152,
+      "luna_s": 3.1628234060190152,
+      "total_s": 5.579256355005782,
+      "writer_s": 2.416432948986767
     }
   },
   {
@@ -1416,7 +1416,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1436,16 +1436,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": "年賀状将棋",
           "debug": {
-            "completion_tokens": 241,
+            "completion_tokens": 258,
             "finish_reason": "stop",
-            "latency_s": 7.652767,
+            "latency_s": 4.822709,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2954,
-            "reasoning_tokens": 158
+            "prompt_tokens": 2985,
+            "reasoning_tokens": 170
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、はい・いいえで答えられない質問として扱います。"
+          "reason": "名詞句だけで述語がなく、はい・いいえで答えられる質問ではありません。"
         }
       },
       "media_id": "local-U25",
@@ -1463,17 +1463,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "年賀状将棋？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.652822807984194,
-      "luna_s": 7.652822807984194,
-      "total_s": 15.002849544980563,
-      "writer_s": 7.350026736996369
+      "judge_s": 4.822778893983923,
+      "luna_s": 4.822778893983923,
+      "total_s": 10.023593747988343,
+      "writer_s": 5.20081485400442
     }
   },
   {
@@ -1485,7 +1485,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1505,16 +1505,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": "野球部",
           "debug": {
-            "completion_tokens": 148,
+            "completion_tokens": 200,
             "finish_reason": "stop",
-            "latency_s": 7.44639,
+            "latency_s": 3.076217,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2951,
-            "reasoning_tokens": 72
+            "prompt_tokens": 2982,
+            "reasoning_tokens": 115
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、質問として聞き直していただきます。"
+          "reason": "述語のない語句だけのコメントなので、質問として聞き直してもらいます。"
         }
       },
       "media_id": "local-U25",
@@ -1532,17 +1532,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "野球部",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.4464460460003465,
-      "luna_s": 7.4464460460003465,
-      "total_s": 11.355191493988968,
-      "writer_s": 3.908745447988622
+      "judge_s": 3.0762701790081337,
+      "luna_s": 3.0762701790081337,
+      "total_s": 7.398549264995381,
+      "writer_s": 4.3222790859872475
     }
   },
   {
@@ -1554,7 +1554,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1572,16 +1572,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 127,
+            "completion_tokens": 176,
             "finish_reason": "stop",
-            "latency_s": 7.036632,
+            "latency_s": 2.541741,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2956,
-            "reasoning_tokens": 48
+            "prompt_tokens": 2987,
+            "reasoning_tokens": 97
           },
           "error": null,
           "kind": "ask_howto",
-          "reason": "遊び方を尋ねているため、質問形式の案内を返します。"
+          "reason": "遊び方を尋ねているため、遊び方の案内をします。"
         }
       },
       "media_id": "local-U25",
@@ -1591,7 +1591,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「はい／いいえ」で答えられる質問をコメントしてね。私が答えるよ。"
+        "text": "はい・いいえで答えられる質問をコメントしてごらん。私が答えるよ☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1599,17 +1599,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "これどうやって遊ぶの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.0366795680020005,
-      "luna_s": 7.0366795680020005,
-      "total_s": 8.6701467410021,
-      "writer_s": 1.6334671730000991
+      "judge_s": 2.5417979809863027,
+      "luna_s": 2.5417979809863027,
+      "total_s": 4.547353204980027,
+      "writer_s": 2.005555223993724
     }
   },
   {
@@ -1621,7 +1621,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1639,16 +1639,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 183,
+            "completion_tokens": 119,
             "finish_reason": "stop",
-            "latency_s": 17.631474,
+            "latency_s": 2.638386,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2954,
-            "reasoning_tokens": 132
+            "prompt_tokens": 2985,
+            "reasoning_tokens": 59
           },
           "error": null,
           "kind": "greeting",
-          "reason": "初コメントの挨拶への歓迎です。"
+          "reason": "初めてのコメントと挨拶を伝えているため。"
         }
       },
       "media_id": "local-U25",
@@ -1666,17 +1666,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "こんにちは、初コメです",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 17.631519816000946,
-      "luna_s": 17.631519816000946,
-      "total_s": 26.308731013006764,
-      "writer_s": 8.677211197005818
+      "judge_s": 2.6384460979897995,
+      "luna_s": 2.6384460979897995,
+      "total_s": 4.646685596992029,
+      "writer_s": 2.0082394990022294
     }
   },
   {
@@ -1688,7 +1688,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1706,16 +1706,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 186,
+            "completion_tokens": 131,
             "finish_reason": "stop",
-            "latency_s": 7.202944,
+            "latency_s": 1.890712,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2957,
-            "reasoning_tokens": 129
+            "prompt_tokens": 2988,
+            "reasoning_tokens": 74
           },
           "error": null,
           "kind": "request",
-          "reason": "短めの問題を求めるリクエストと判断しました。"
+          "reason": "短めの問題を出してほしいというリクエストです。"
         }
       },
       "media_id": "local-U25",
@@ -1725,7 +1725,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "リクエストありがとう！短めにするね"
+        "text": "リクエストありがとう！"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1733,17 +1733,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "短めの問題リクエストです",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.2029718489793595,
-      "luna_s": 7.2029718489793595,
-      "total_s": 10.125451123982202,
-      "writer_s": 2.9224792750028428
+      "judge_s": 1.8907650260080118,
+      "luna_s": 1.8907650260080118,
+      "total_s": 4.907249674986815,
+      "writer_s": 3.0164846489788033
     }
   },
   {
@@ -1755,7 +1755,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1773,16 +1773,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 136,
+            "completion_tokens": 108,
             "finish_reason": "stop",
-            "latency_s": 6.866001,
+            "latency_s": 1.831135,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2950,
-            "reasoning_tokens": 76
+            "prompt_tokens": 2981,
+            "reasoning_tokens": 55
           },
           "error": null,
           "kind": "emoji_only",
-          "reason": "絵文字だけのコメントなので、emoji_onlyと判定しました。"
+          "reason": "絵文字のみのコメントです。"
         }
       },
       "media_id": "local-U25",
@@ -1792,7 +1792,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "びっくりだね！"
+        "text": "びっくりだよね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1800,17 +1800,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "😮",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 6.866027979005594,
-      "luna_s": 6.866027979005594,
-      "total_s": 10.88669123701402,
-      "writer_s": 4.020663258008426
+      "judge_s": 1.831158927991055,
+      "luna_s": 1.831158927991055,
+      "total_s": 5.26354083197657,
+      "writer_s": 3.4323819039855152
     }
   },
   {
@@ -1822,7 +1822,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1840,16 +1840,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 105,
+            "completion_tokens": 100,
             "finish_reason": "stop",
-            "latency_s": 6.937487,
+            "latency_s": 1.908889,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2959,
-            "reasoning_tokens": 56
+            "prompt_tokens": 2990,
+            "reasoning_tokens": 47
           },
           "error": null,
           "kind": "spam",
-          "reason": "フォロー交換を呼びかける宣伝コメントのため。"
+          "reason": "相互フォローを呼びかけるフォロー稼ぎのコメントです。"
         }
       },
       "media_id": "local-U25",
@@ -1867,17 +1867,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "フォローしてくれたら相互します！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 6.9375129849941,
-      "luna_s": 6.9375129849941,
-      "total_s": 6.9375186629767995,
-      "writer_s": 5.677982699126005e-06
+      "judge_s": 1.908924643008504,
+      "luna_s": 1.908924643008504,
+      "total_s": 1.9089270000113174,
+      "writer_s": 2.3570028133690357e-06
     }
   },
   {
@@ -1889,7 +1889,7 @@ window.PROBE_RAW["luna-1b/U25"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1907,16 +1907,16 @@ window.PROBE_RAW["luna-1b/U25"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 143,
+            "completion_tokens": 116,
             "finish_reason": "stop",
-            "latency_s": 7.033381,
+            "latency_s": 2.005515,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2959,
-            "reasoning_tokens": 95
+            "prompt_tokens": 2990,
+            "reasoning_tokens": 68
           },
           "error": null,
           "kind": "abuse",
-          "reason": "作者本人への侮辱にあたるコメントです。"
+          "reason": "問題ではなく、作者本人を攻撃する内容です。"
         }
       },
       "media_id": "local-U25",
@@ -1934,17 +1934,17 @@ window.PROBE_RAW["luna-1b/U25"] = [
       "text": "作者って絶対友達いないでしょ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.0334314860228915,
-      "luna_s": 7.0334314860228915,
-      "total_s": 7.033527250023326,
-      "writer_s": 9.576400043442845e-05
+      "judge_s": 2.0055765110009816,
+      "luna_s": 2.0055765110009816,
+      "total_s": 2.005596003989922,
+      "writer_s": 1.949298894032836e-05
     }
   }
 ];

@@ -182,7 +182,6 @@ YESNO_OPENERS = {
     "yes": "はい！",
     "no": "いいえ。",
     "irrelevant": "関係ないよ。",
-    "unknown": "それは答えに関わらないんだ。",
 }
 
 
@@ -211,7 +210,7 @@ def bare_term_reply(term: str, comment_id: str) -> str:
 
 def yesno_reply(answer: str, comment_id: str) -> str:
     """判定語と一言（空 = 判定語だけ）を組み立てる。"""
-    return YESNO_OPENERS.get(answer, YESNO_OPENERS["unknown"]) + (pick("q_yesno", comment_id) or "")
+    return YESNO_OPENERS.get(answer, YESNO_OPENERS["irrelevant"]) + (pick("q_yesno", comment_id) or "")
 
 
 def correct_reply(reveal_text: str) -> str:

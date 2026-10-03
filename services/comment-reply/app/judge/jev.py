@@ -522,7 +522,7 @@ def judge(
                         )
                     else:
                         best_key, best_probability = _choice(d_answer, ("yes", "no", "irrelevant")), 0.0
-                    answer = best_key if best_probability >= t_answer else "unknown"
+                    answer = best_key if best_probability >= t_answer else "irrelevant"
         else:
             kind = a_kind
 

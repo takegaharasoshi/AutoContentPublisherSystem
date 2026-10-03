@@ -9,7 +9,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -27,12 +27,12 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 241,
+            "completion_tokens": 193,
             "finish_reason": "stop",
-            "latency_s": 2.368992,
+            "latency_s": 2.728936,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2883,
-            "reasoning_tokens": 167
+            "prompt_tokens": 2984,
+            "reasoning_tokens": 126
           },
           "error": null,
           "kind": "q_yesno",
@@ -54,17 +54,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "楽器を構えているのは実際の人間ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.36904035898624,
-      "luna_s": 2.36904035898624,
-      "total_s": 4.286804942006711,
-      "writer_s": 1.917764583020471
+      "judge_s": 2.7289704750000965,
+      "luna_s": 2.7289704750000965,
+      "total_s": 5.9139893259853125,
+      "writer_s": 3.185018850985216
     }
   },
   {
@@ -76,7 +76,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -94,16 +94,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 254,
+            "completion_tokens": 315,
             "finish_reason": "stop",
-            "latency_s": 2.677043,
+            "latency_s": 4.118481,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2884,
-            "reasoning_tokens": 178
+            "prompt_tokens": 2985,
+            "reasoning_tokens": 251
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、自分の意思で音を出すことはないとあります。"
+          "reason": "自分の意思で動いたり話したりしないと確定しています。"
         }
       },
       "media_id": "local-U12",
@@ -113,7 +113,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！自分の意思で音を出さないよ。"
+        "text": "はい！自分の意思では音を出さないんだね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -121,17 +121,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは自分の意思で音を出さないんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.6770969339995645,
-      "luna_s": 2.6770969339995645,
-      "total_s": 5.088056495995261,
-      "writer_s": 2.4109595619956963
+      "judge_s": 4.118537179980194,
+      "luna_s": 4.118537179980194,
+      "total_s": 8.52700795896817,
+      "writer_s": 4.408470778987976
     }
   },
   {
@@ -143,7 +143,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -161,16 +161,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 323,
+            "completion_tokens": 369,
             "finish_reason": "stop",
-            "latency_s": 3.334138,
+            "latency_s": 4.106948,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2883,
-            "reasoning_tokens": 264
+            "prompt_tokens": 2984,
+            "reasoning_tokens": 298
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "一つの確認質問で、楽器は壊れていないと確定しています。"
+          "reason": "楽器は壊れていないと確定しているため、音の出るものです。"
         }
       },
       "media_id": "local-U12",
@@ -188,17 +188,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "持っている楽器は本当に音が出るものですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.334205653023673,
-      "luna_s": 3.334205653023673,
-      "total_s": 4.444155523000518,
-      "writer_s": 1.1099498699768446
+      "judge_s": 4.106975781003712,
+      "luna_s": 4.106975781003712,
+      "total_s": 5.210544376022881,
+      "writer_s": 1.1035685950191692
     }
   },
   {
@@ -210,7 +210,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -228,16 +228,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 459,
+            "completion_tokens": 427,
             "finish_reason": "stop",
-            "latency_s": 4.399985,
+            "latency_s": 4.928605,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2880,
-            "reasoning_tokens": 387
+            "prompt_tokens": 2981,
+            "reasoning_tokens": 359
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男たちは家の中におり、段飾りも家の中にあります。"
+          "reason": "家の中にある段飾りなので、建物内にあります。"
         }
       },
       "media_id": "local-U12",
@@ -247,7 +247,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！次はどうかな？"
+        "text": "はい！ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -255,17 +255,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "階段は建物の中にあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.400039426021976,
-      "luna_s": 4.400039426021976,
-      "total_s": 7.270366008015117,
-      "writer_s": 2.8703265819931403
+      "judge_s": 4.9286421420110855,
+      "luna_s": 4.9286421420110855,
+      "total_s": 8.581580862024566,
+      "writer_s": 3.6529387200134806
     }
   },
   {
@@ -277,7 +277,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -295,16 +295,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 307,
+            "completion_tokens": 212,
             "finish_reason": "stop",
-            "latency_s": 3.371746,
+            "latency_s": 2.90402,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2886,
-            "reasoning_tokens": 246
+            "prompt_tokens": 2987,
+            "reasoning_tokens": 137
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "家族は音が出ないと知っており、演奏を期待してはいません。"
+          "reason": "家族は演奏を期待しておらず、音が出ないことを初めから知っています。"
         }
       },
       "media_id": "local-U12",
@@ -314,7 +314,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。次の質問もしてごらん。"
+        "text": "いいえ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -322,17 +322,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "見ている人たちは演奏を期待して集まってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.371801695000613,
-      "luna_s": 3.371801695000613,
-      "total_s": 7.5940397400117945,
-      "writer_s": 4.222238045011181
+      "judge_s": 2.9040938339894637,
+      "luna_s": 2.9040938339894637,
+      "total_s": 4.776393060979899,
+      "writer_s": 1.8722992269904353
     }
   },
   {
@@ -344,7 +344,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -352,26 +352,26 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "errors": [],
       "fact_sheet_hash": "95e164954bcf",
       "final": {
-        "answer": "unknown",
+        "answer": "yes",
         "decision": "luna",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": null,
         "luna": {
-          "answer": "unknown",
+          "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 594,
+            "completion_tokens": 554,
             "finish_reason": "stop",
-            "latency_s": 4.967407,
+            "latency_s": 5.963824,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2882,
-            "reasoning_tokens": 512
+            "prompt_tokens": 2983,
+            "reasoning_tokens": 484
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "家族が眺めることは分かりますが、毎日同じ人かは不明です。"
+          "reason": "見ている人たちは家族で、飾っている間は毎日眺めています。"
         }
       },
       "media_id": "local-U12",
@@ -381,7 +381,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "それは答えに関わらないんだ。ほかのことも聞いてごらん。"
+        "text": "はい！毎日見ているのは同じ人たちだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -389,17 +389,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "毎日見ているのは同じ人たちですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.967460999003379,
-      "luna_s": 4.967460999003379,
-      "total_s": 14.19290618202649,
-      "writer_s": 9.225445183023112
+      "judge_s": 5.963848562998464,
+      "luna_s": 5.963848562998464,
+      "total_s": 8.93655372899957,
+      "writer_s": 2.9727051660011057
     }
   },
   {
@@ -411,7 +411,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -429,16 +429,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 289,
+            "completion_tokens": 246,
             "finish_reason": "stop",
-            "latency_s": 3.017687,
+            "latency_s": 3.352825,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2884,
-            "reasoning_tokens": 217
+            "prompt_tokens": 2985,
+            "reasoning_tokens": 177
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "仕事で立っているのではなく、男たちは人形です。"
+          "reason": "仕事かどうかを尋ねる一問のはい・いいえ質問です。"
         }
       },
       "media_id": "local-U12",
@@ -456,17 +456,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは何かの仕事でそこに立っているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.017740451003192,
-      "luna_s": 3.017740451003192,
-      "total_s": 8.493960018007783,
-      "writer_s": 5.476219567004591
+      "judge_s": 3.3528530829935335,
+      "luna_s": 3.3528530829935335,
+      "total_s": 7.016202411003178,
+      "writer_s": 3.6633493280096445
     }
   },
   {
@@ -478,7 +478,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -496,16 +496,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 694,
+            "completion_tokens": 428,
             "finish_reason": "stop",
-            "latency_s": 5.578726,
+            "latency_s": 4.801912,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2889,
-            "reasoning_tokens": 613
+            "prompt_tokens": 2990,
+            "reasoning_tokens": 350
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "理由の有無を尋ねる一問で、演出上の理由は真相にありません。"
+          "reason": "演出上の理由があるかを尋ねる、はい／いいえで答えられる質問です。"
         }
       },
       "media_id": "local-U12",
@@ -515,7 +515,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。演出上の理由ではないよ。"
+        "text": "いいえ。演出上の理由があるんでしょか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -523,17 +523,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "音を出さないのは何か演出上の理由があるんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 5.5787538700096775,
-      "luna_s": 5.5787538700096775,
-      "total_s": 38.82858543400653,
-      "writer_s": 33.24983156399685
+      "judge_s": 4.801970766013255,
+      "luna_s": 4.801970766013255,
+      "total_s": 9.045241585030453,
+      "writer_s": 4.243270819017198
     }
   },
   {
@@ -545,7 +545,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -563,16 +563,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 226,
+            "completion_tokens": 160,
             "finish_reason": "stop",
-            "latency_s": 2.27384,
+            "latency_s": 2.763366,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2888,
-            "reasoning_tokens": 150
+            "prompt_tokens": 2989,
+            "reasoning_tokens": 89
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男たちは一度も音を出したことがなく、演奏を聞いた人はいません。"
+          "reason": "男たちは一度も音を出したことがないため、演奏を聞いたことはありません。"
         }
       },
       "media_id": "local-U12",
@@ -582,7 +582,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。次はどうかな？"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -590,17 +590,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "見てる人は男たちの演奏を聞いたことがあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2738918700197246,
-      "luna_s": 2.2738918700197246,
-      "total_s": 6.3441533660225105,
-      "writer_s": 4.070261496002786
+      "judge_s": 2.763389992993325,
+      "luna_s": 2.763389992993325,
+      "total_s": 4.880766674003098,
+      "writer_s": 2.117376681009773
     }
   },
   {
@@ -612,7 +612,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -630,16 +630,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 313,
+            "completion_tokens": 204,
             "finish_reason": "stop",
-            "latency_s": 3.174412,
+            "latency_s": 2.85898,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2880,
-            "reasoning_tokens": 234
+            "prompt_tokens": 2981,
+            "reasoning_tokens": 142
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "階段の色や材質は、男たちの正体を解く要点ではありません。"
+          "reason": "色や材質は真相や確定事実に関わらないためです。"
         }
       },
       "media_id": "local-U12",
@@ -649,7 +649,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。次は何を聞こうか？"
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -657,17 +657,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "階段の色や材質も関係ありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1744494309823494,
-      "luna_s": 3.1744494309823494,
-      "total_s": 5.048282568983268,
-      "writer_s": 1.8738331380009186
+      "judge_s": 2.8590410680044442,
+      "luna_s": 2.8590410680044442,
+      "total_s": 5.377761723008007,
+      "writer_s": 2.5187206550035626
     }
   },
   {
@@ -679,7 +679,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -697,16 +697,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 931,
+            "completion_tokens": 358,
             "finish_reason": "stop",
-            "latency_s": 7.226336,
+            "latency_s": 4.144246,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2886,
-            "reasoning_tokens": 850
+            "prompt_tokens": 2987,
+            "reasoning_tokens": 276
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "演奏者かどうかと人形かどうかを別々に尋ねています。"
+          "reason": "「本物の演奏者か」と「人形か」の二点を尋ねています。"
         }
       },
       "media_id": "local-U12",
@@ -716,7 +716,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どっちから聞いてみようか？"
+        "text": "質問はひとつずつコメントしてね。まずは気になるほうから聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -724,17 +724,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは本物の演奏者なの？それとも人形かなにか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.2263904600113165,
-      "luna_s": 7.2263904600113165,
-      "total_s": 9.23258718699799,
-      "writer_s": 2.0061967269866727
+      "judge_s": 4.144297471997561,
+      "luna_s": 4.144297471997561,
+      "total_s": 6.6297721120063215,
+      "writer_s": 2.4854746400087606
     }
   },
   {
@@ -746,7 +746,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -764,16 +764,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 143,
+            "completion_tokens": 186,
             "finish_reason": "stop",
-            "latency_s": 1.821864,
+            "latency_s": 2.698731,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2890,
-            "reasoning_tokens": 66
+            "prompt_tokens": 2991,
+            "reasoning_tokens": 109
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "「毎日来るのか」と「知り合いなのか」の質問が二つあります。"
+          "reason": "はい・いいえで答えられる質問が一つのコメントに二つあります。"
         }
       },
       "media_id": "local-U12",
@@ -783,7 +783,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。どちらか一つから聞いてごらん。"
+        "text": "質問はひとつずつコメントしてね。まずはどっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -791,17 +791,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "見ている人は毎日そこに来るの？男たちと知り合いなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.821910808008397,
-      "luna_s": 1.821910808008397,
-      "total_s": 3.5171713849995285,
-      "writer_s": 1.6952605769911315
+      "judge_s": 2.6988105589989573,
+      "luna_s": 2.6988105589989573,
+      "total_s": 4.551411034015473,
+      "writer_s": 1.8526004750165157
     }
   },
   {
@@ -813,7 +813,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -831,16 +831,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 194,
+            "completion_tokens": 177,
             "finish_reason": "stop",
-            "latency_s": 2.082187,
+            "latency_s": 2.418056,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2892,
-            "reasoning_tokens": 103
+            "prompt_tokens": 2993,
+            "reasoning_tokens": 92
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「どうして」と理由を尋ねており、はい・いいえでは答えられないため。"
+          "reason": "「どうして」と理由を尋ねており、はい・いいえでは答えられません。"
         }
       },
       "media_id": "local-U12",
@@ -850,7 +850,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "誰がうれしそうなのかも書いて、はい・いいえで答えられる質問にしてごらん。"
+        "text": "はい・いいえで答えられる形にして、聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -858,17 +858,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "音を一度も出したことがないのに、どうしてみんなうれしそうなんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.082215477974387,
-      "luna_s": 2.082215477974387,
-      "total_s": 6.397613267996348,
-      "writer_s": 4.3153977900219616
+      "judge_s": 2.4181172320095357,
+      "luna_s": 2.4181172320095357,
+      "total_s": 6.297659460018622,
+      "writer_s": 3.879542228009086
     }
   },
   {
@@ -880,7 +880,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -898,16 +898,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 156,
+            "completion_tokens": 232,
             "finish_reason": "stop",
-            "latency_s": 1.927603,
+            "latency_s": 2.687192,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2881,
-            "reasoning_tokens": 81
+            "prompt_tokens": 2982,
+            "reasoning_tokens": 153
           },
           "error": null,
           "kind": "q_open",
-          "reason": "何をしているかを尋ねる、はい・いいえで答えられない質問です。"
+          "reason": "何をしている人たちかを尋ねる、はい／いいえで答えられない質問です。"
         }
       },
       "media_id": "local-U12",
@@ -917,7 +917,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「この男たちは〜ですか？」みたいに、はい・いいえで答えられる形で聞いてごらん☺️"
+        "text": "はい・いいえで答えられる形で聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -925,17 +925,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "この男たちは何をしている人たちなんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.927627497992944,
-      "luna_s": 1.927627497992944,
-      "total_s": 4.6416508670081384,
-      "writer_s": 2.7140233690151945
+      "judge_s": 2.6872445560002234,
+      "luna_s": 2.6872445560002234,
+      "total_s": 5.606085409002844,
+      "writer_s": 2.918840853002621
     }
   },
   {
@@ -947,7 +947,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -965,16 +965,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 297,
+            "completion_tokens": 226,
             "finish_reason": "stop",
-            "latency_s": 2.888199,
+            "latency_s": 2.931409,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2888,
-            "reasoning_tokens": 210
+            "prompt_tokens": 2989,
+            "reasoning_tokens": 139
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「誰が」「何を」と、はい／いいえでは答えられない内容を尋ねています。"
+          "reason": "誰が何を見ているかを尋ねる、はい・いいえで答えられない質問です。"
         }
       },
       "media_id": "local-U12",
@@ -984,7 +984,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる質問にして、誰のことかも書いて聞いてごらん。"
+        "text": "はい・いいえで答えられる形にして、誰のことかも書いて聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -992,17 +992,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "誰が何を見て喜んでいるのか、もう少し知りたいです。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.8882266049913596,
-      "luna_s": 2.8882266049913596,
-      "total_s": 7.984156518999953,
-      "writer_s": 5.095929914008593
+      "judge_s": 2.931456555001205,
+      "luna_s": 2.931456555001205,
+      "total_s": 6.84542407898698,
+      "writer_s": 3.913967523985775
     }
   },
   {
@@ -1014,7 +1014,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1032,16 +1032,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 307,
+            "completion_tokens": 297,
             "finish_reason": "stop",
-            "latency_s": 2.9566,
+            "latency_s": 3.681189,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2884,
-            "reasoning_tokens": 193
+            "prompt_tokens": 2985,
+            "reasoning_tokens": 198
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "核心の「男たちは五人囃子のひな人形」を正しく言い当てています。"
+          "reason": "核心の五人囃子のひな人形だと特定しており、正解です。"
         }
       },
       "media_id": "local-U12",
@@ -1051,7 +1051,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちはひな人形の五人囃子だよ。ひな祭りの間、家族はお祝いを楽しみながら毎日眺めているんだ。"
+        "text": "正解！男たちはひな人形の五人囃子だったんだ。ひな祭りの段飾りに飾られ、家族は女の子のお祝いを楽しんでいたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1059,17 +1059,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは五人囃子のひな人形だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.956630395987304,
-      "luna_s": 2.956630395987304,
-      "total_s": 7.501571611006511,
-      "writer_s": 4.5449412150192074
+      "judge_s": 3.6812182769936044,
+      "luna_s": 3.6812182769936044,
+      "total_s": 6.184418947988888,
+      "writer_s": 2.503200670995284
     }
   },
   {
@@ -1081,7 +1081,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1099,16 +1099,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 243,
+            "completion_tokens": 242,
             "finish_reason": "stop",
-            "latency_s": 2.538809,
+            "latency_s": 2.760437,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2918,
-            "reasoning_tokens": 129
+            "prompt_tokens": 3019,
+            "reasoning_tokens": 123
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "五人囃子の人形であることと、音を出さず家族が飾って眺める点を言い当てています。"
+          "reason": "五人囃子の人形で、音を出さず家族が飾って眺める要点を捉えています。"
         }
       },
       "media_id": "local-U12",
@@ -1118,7 +1118,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちは、ひな祭りの段飾りに並ぶ五人囃子の人形だよ。家族はお祝いを楽しみながら、飾っている間眺めていたんだね。"
+        "text": "正解！男たちはひな人形の五人囃子だったんだ。ひな祭りの間、家族はお祝いを楽しみながら飾りを眺めていたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1126,17 +1126,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "段飾りに並ぶ五人囃子の人形だったんだね。人形だから音は出ないけど、家族は飾っている間うれしそうに眺めてたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5388367639970966,
-      "luna_s": 2.5388367639970966,
-      "total_s": 5.174122430005809,
-      "writer_s": 2.6352856660087127
+      "judge_s": 2.7604922789905686,
+      "luna_s": 2.7604922789905686,
+      "total_s": 5.591090528992936,
+      "writer_s": 2.8305982500023674
     }
   },
   {
@@ -1148,7 +1148,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1166,16 +1166,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 255,
+            "completion_tokens": 225,
             "finish_reason": "stop",
-            "latency_s": 2.503752,
+            "latency_s": 2.689965,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2886,
-            "reasoning_tokens": 157
+            "prompt_tokens": 2987,
+            "reasoning_tokens": 135
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "男たちが人形で音を出さないという核心を言い当てています。"
+          "reason": "核心の「男たちは人形」を言い当て、音を出さない理由も合っています。"
         }
       },
       "media_id": "local-U12",
@@ -1185,7 +1185,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちは、ひな人形の五人囃子だよ。ひな祭りの間、家族は毎日うれしそうに眺めているんだ。"
+        "text": "正解！男たちは、ひな人形の五人囃子だったんだ。ひな祭りに段飾りを飾り、家族はお祝いを楽しみながら毎日眺めていたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1193,17 +1193,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは人形なんでしょ。だから音を出さないんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.503779377002502,
-      "luna_s": 2.503779377002502,
-      "total_s": 6.968367513996782,
-      "writer_s": 4.46458813699428
+      "judge_s": 2.6900226669968106,
+      "luna_s": 2.6900226669968106,
+      "total_s": 6.183226646011462,
+      "writer_s": 3.493203979014652
     }
   },
   {
@@ -1215,7 +1215,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1233,16 +1233,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 151,
+            "completion_tokens": 133,
             "finish_reason": "stop",
-            "latency_s": 2.159455,
+            "latency_s": 2.241452,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2913,
-            "reasoning_tokens": 89
+            "prompt_tokens": 3014,
+            "reasoning_tokens": 66
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "ひな人形という核心には触れていますが、音が鳴るという誤りがあります。"
+          "reason": "五人囃子のひな人形という核心は合っていますが、音が鳴るという誤りがあります。"
         }
       },
       "media_id": "local-U12",
@@ -1260,17 +1260,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは五人囃子のひな人形で、飾ると本当に笛や太鼓の音が鳴るから、みんな毎日見に来るんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.1594940510112792,
-      "luna_s": 2.1594940510112792,
-      "total_s": 10.830075034027686,
-      "writer_s": 8.670580983016407
+      "judge_s": 2.241480959986802,
+      "luna_s": 2.241480959986802,
+      "total_s": 4.535803621984087,
+      "writer_s": 2.2943226619972847
     }
   },
   {
@@ -1282,7 +1282,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1300,16 +1300,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 315,
+            "completion_tokens": 261,
             "finish_reason": "stop",
-            "latency_s": 3.027498,
+            "latency_s": 3.12001,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2892,
-            "reasoning_tokens": 250
+            "prompt_tokens": 2993,
+            "reasoning_tokens": 190
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "演奏会前の写真撮影という推理で、核心の正体には触れていません。"
+          "reason": "演奏会前に写真を撮る習慣という推理で、ひな人形という核心には触れていません。"
         }
       },
       "media_id": "local-U12",
@@ -1327,17 +1327,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "演奏会の前に並んで写真を撮るのが恒例になってたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.0275493320077658,
-      "luna_s": 3.0275493320077658,
-      "total_s": 11.24171763699269,
-      "writer_s": 8.214168304984923
+      "judge_s": 3.120080669003073,
+      "luna_s": 3.120080669003073,
+      "total_s": 5.9725065139937215,
+      "writer_s": 2.8524258449906483
     }
   },
   {
@@ -1349,7 +1349,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1367,16 +1367,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 293,
+            "completion_tokens": 174,
             "finish_reason": "stop",
-            "latency_s": 3.17227,
+            "latency_s": 2.649565,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2894,
-            "reasoning_tokens": 220
+            "prompt_tokens": 2995,
+            "reasoning_tokens": 103
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "楽器を持つ像という推理で、核心の正体には触れていません。"
+          "reason": "ひな人形という核心に触れておらず、銅像という推理も確定事実と異なります。"
         }
       },
       "media_id": "local-U12",
@@ -1386,7 +1386,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。別の見方も考えてみようか。"
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1394,17 +1394,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは楽器を持った銅像で、観光客が見に来てるんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1723105190030765,
-      "luna_s": 3.1723105190030765,
-      "total_s": 4.946271508029895,
-      "writer_s": 1.7739609890268184
+      "judge_s": 2.6496010499831755,
+      "luna_s": 2.6496010499831755,
+      "total_s": 4.527476627001306,
+      "writer_s": 1.8778755770181306
     }
   },
   {
@@ -1416,7 +1416,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1436,16 +1436,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": "五人囃子",
           "debug": {
-            "completion_tokens": 282,
+            "completion_tokens": 215,
             "finish_reason": "stop",
-            "latency_s": 2.828309,
+            "latency_s": 3.134871,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2873,
-            "reasoning_tokens": 201
+            "prompt_tokens": 2974,
+            "reasoning_tokens": 127
           },
           "error": null,
           "kind": "q_open",
-          "reason": "名詞だけのコメントで、はい／いいえで答えられる質問ではありません。"
+          "reason": "名詞だけのコメントなので、はい・いいえで答えられる質問ではありません。"
         }
       },
       "media_id": "local-U12",
@@ -1463,17 +1463,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "五人囃子？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.8283309639955405,
-      "luna_s": 2.8283309639955405,
-      "total_s": 10.004845688003115,
-      "writer_s": 7.176514724007575
+      "judge_s": 3.134928184997989,
+      "luna_s": 3.134928184997989,
+      "total_s": 10.216019057988888,
+      "writer_s": 7.081090872990899
     }
   },
   {
@@ -1485,7 +1485,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1505,16 +1505,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": "カラオケ",
           "debug": {
-            "completion_tokens": 173,
+            "completion_tokens": 220,
             "finish_reason": "stop",
-            "latency_s": 1.883451,
+            "latency_s": 2.938582,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2871,
-            "reasoning_tokens": 88
+            "prompt_tokens": 2972,
+            "reasoning_tokens": 144
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、質問として聞き直してもらいます。"
+          "reason": "述語のない語句だけのコメントなので、質問として聞き直しをお願いします。"
         }
       },
       "media_id": "local-U12",
@@ -1532,17 +1532,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "カラオケ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.883500906988047,
-      "luna_s": 1.883500906988047,
-      "total_s": 7.850761071982561,
-      "writer_s": 5.967260164994514
+      "judge_s": 2.9386327110114507,
+      "luna_s": 2.9386327110114507,
+      "total_s": 6.8174388720071875,
+      "writer_s": 3.8788061609957367
     }
   },
   {
@@ -1554,7 +1554,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1572,16 +1572,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 201,
+            "completion_tokens": 268,
             "finish_reason": "stop",
-            "latency_s": 7.550688,
+            "latency_s": 3.447246,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2876,
-            "reasoning_tokens": 115
+            "prompt_tokens": 2977,
+            "reasoning_tokens": 183
           },
           "error": null,
           "kind": "ask_hint",
-          "reason": "ヒントを求めているため、質問で絞るよう促します。"
+          "reason": "直接ヒントを求めているため、質問で絞るよう促します。"
         }
       },
       "media_id": "local-U12",
@@ -1599,17 +1599,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "ちょっとだけヒントほしい〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.550740560982376,
-      "luna_s": 7.550740560982376,
-      "total_s": 9.032332803995814,
-      "writer_s": 1.4815922430134378
+      "judge_s": 3.4473025370098185,
+      "luna_s": 3.4473025370098185,
+      "total_s": 5.571501764992718,
+      "writer_s": 2.124199227982899
     }
   },
   {
@@ -1621,7 +1621,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1639,16 +1639,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 120,
+            "completion_tokens": 145,
             "finish_reason": "stop",
-            "latency_s": 2.163453,
+            "latency_s": 2.550883,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2871,
-            "reasoning_tokens": 58
+            "prompt_tokens": 2972,
+            "reasoning_tokens": 81
           },
           "error": null,
           "kind": "impression",
-          "reason": "シリーズへの好意を伝える、問題に対する前向きな感想です。"
+          "reason": "シリーズへの好意を伝える、問題についての感想です。"
         }
       },
       "media_id": "local-U12",
@@ -1666,17 +1666,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "このシリーズ好き！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.1634880240017083,
-      "luna_s": 2.1634880240017083,
-      "total_s": 10.21180491198902,
-      "writer_s": 8.048316887987312
+      "judge_s": 2.550941788998898,
+      "luna_s": 2.550941788998898,
+      "total_s": 4.545217590988614,
+      "writer_s": 1.9942758019897155
     }
   },
   {
@@ -1688,7 +1688,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1706,16 +1706,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 170,
+            "completion_tokens": 169,
             "finish_reason": "stop",
-            "latency_s": 2.238772,
+            "latency_s": 3.052264,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2879,
-            "reasoning_tokens": 106
+            "prompt_tokens": 2980,
+            "reasoning_tokens": 105
           },
           "error": null,
           "kind": "cheer",
-          "reason": "アカウントを好きだと伝え、続けてほしいと応援しているコメントです。"
+          "reason": "アカウントへの好意を示し、継続を応援しているコメントです。"
         }
       },
       "media_id": "local-U12",
@@ -1733,17 +1733,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "このアカウント好きだから続けてほしい",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2388311609975062,
-      "luna_s": 2.2388311609975062,
-      "total_s": 3.9955378610175103,
-      "writer_s": 1.756706700020004
+      "judge_s": 3.0523105890024453,
+      "luna_s": 3.0523105890024453,
+      "total_s": 4.857010067004012,
+      "writer_s": 1.8046994780015666
     }
   },
   {
@@ -1755,7 +1755,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1775,14 +1775,14 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "debug": {
             "completion_tokens": 138,
             "finish_reason": "stop",
-            "latency_s": 1.821529,
+            "latency_s": 2.919994,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2877,
-            "reasoning_tokens": 73
+            "prompt_tokens": 2978,
+            "reasoning_tokens": 74
           },
           "error": null,
           "kind": "complaint",
-          "reason": "問題文に矛盾があるという指摘のため、クレームとして分類します。"
+          "reason": "問題文に矛盾があるという指摘なので、クレームとして扱います。"
         }
       },
       "media_id": "local-U12",
@@ -1792,7 +1792,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "教えてくれてありがとう、確認するね。"
+        "text": "教えてくれてありがとう。問題文を確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1800,17 +1800,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "問題文に矛盾があると思います",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.821584350982448,
-      "luna_s": 1.821584350982448,
-      "total_s": 66.12493389897281,
-      "writer_s": 64.30334954799036
+      "judge_s": 2.920049679989461,
+      "luna_s": 2.920049679989461,
+      "total_s": 4.751432401972124,
+      "writer_s": 1.8313827219826635
     }
   },
   {
@@ -1822,7 +1822,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1840,16 +1840,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 79,
+            "completion_tokens": 114,
             "finish_reason": "stop",
-            "latency_s": 1.444714,
+            "latency_s": 1.868498,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2875,
-            "reasoning_tokens": 32
+            "prompt_tokens": 2976,
+            "reasoning_tokens": 60
           },
           "error": null,
           "kind": "troll",
-          "reason": "意味の取れない文字列の連続です。"
+          "reason": "意味の取れない文字列の連続で、推理や質問ではありません。"
         }
       },
       "media_id": "local-U12",
@@ -1867,17 +1867,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "らららららららら",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.4447669599903747,
-      "luna_s": 1.4447669599903747,
-      "total_s": 1.4447751679981593,
-      "writer_s": 8.208007784560323e-06
+      "judge_s": 1.8685538439895026,
+      "luna_s": 1.8685538439895026,
+      "total_s": 1.8685585819766857,
+      "writer_s": 4.73798718303442e-06
     }
   },
   {
@@ -1889,7 +1889,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1907,16 +1907,16 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 98,
+            "completion_tokens": 125,
             "finish_reason": "stop",
-            "latency_s": 1.624928,
+            "latency_s": 2.600913,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2877,
-            "reasoning_tokens": 48
+            "prompt_tokens": 2978,
+            "reasoning_tokens": 74
           },
           "error": null,
           "kind": "personal_info",
-          "reason": "電話番号にあたる個人情報が含まれています。"
+          "reason": "電話番号が含まれているため、個人情報として扱います。"
         }
       },
       "media_id": "local-U12",
@@ -1934,17 +1934,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "090-0000-0123 に電話ください",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.6249850840249564,
-      "luna_s": 1.6249850840249564,
-      "total_s": 1.6249880920222495,
-      "writer_s": 3.007997293025255e-06
+      "judge_s": 2.6009789390082005,
+      "luna_s": 2.6009789390082005,
+      "total_s": 2.600980444025481,
+      "writer_s": 1.5050172805786133e-06
     }
   }
 ];

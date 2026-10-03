@@ -23,7 +23,7 @@ def _schema() -> dict[str, Any]:
         "properties": {
             "kind": {"type": "string", "enum": list(KINDS)},
             "answer": {"anyOf": [
-                {"type": "string", "enum": ["yes", "no", "irrelevant", "unknown"]},
+                {"type": "string", "enum": ["yes", "no", "irrelevant"]},
                 {"type": "null"},
             ]},
             "reply": {"type": "string"},

@@ -81,7 +81,7 @@ def _clean_text_reply(reply: str) -> str:
 
 def _template_reply(result: Combined, comment_id: str, problem: Problem) -> str | None:
     if result.kind == "q_yesno":
-        return templates.yesno_reply(result.answer or "unknown", comment_id)
+        return templates.yesno_reply(result.answer or "irrelevant", comment_id)
     if result.kind == "guess_correct":
         return templates.correct_reply(problem.reveal_text)
     if result.kind == "q_open" and result.bare_term:
@@ -168,7 +168,7 @@ def write_reply(
             )
             if not value:
                 raise ValueError("writer reply is empty")
-            if kind == "q_yesno" and not value.startswith(templates.YESNO_OPENERS[result.answer or "unknown"]):
+            if kind == "q_yesno" and not value.startswith(templates.YESNO_OPENERS[result.answer or "irrelevant"]):
                 raise ValueError("writer reply does not begin with the required answer word")
             if kind == "q_open" and result.bare_term:
                 asks_about_term = (

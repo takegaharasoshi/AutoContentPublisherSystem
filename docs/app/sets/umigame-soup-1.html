@@ -278,7 +278,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td><strong>P1</strong> 真相の漏洩</td><td><strong>0 件</strong></td><td>機械プローブは <code>leak_count.py</code> と同じ方式で漏れ候補を拾い、全件を人が見る。人間プローブでも 0 件</td></tr>
 <tr><td><strong>P2</strong> 誤った正解宣言</td><td><strong>0 件</strong></td><td>正解でない推理に正解と言って真相を開くのは、漏洩と同じ扱い</td></tr>
 <tr><td><strong>P3</strong> 「はい」と「いいえ」の取り違え</td><td>全質問の 3% 以下、かつ 1 問あたり 2 件以下</td><td></td></tr>
-<tr><td><strong>P4</strong> 「いいえ」「関係ない」「答えに関わらない」の間の揺れ</td><td>10% 以下</td><td>意味はほぼ同じなので上限をゆるくするが、集計には必ず出す</td></tr>
+<tr><td><strong>P4</strong> 「いいえ」「関係ない」の間の揺れ</td><td>10% 以下</td><td>意味はほぼ同じなので上限をゆるくするが、集計には必ず出す</td></tr>
 <tr><td><strong>P5</strong> 正解推理を正解と宣言できた割合</td><td>80% 以上</td><td>見逃しても次のコメントで取り返せるので、P2 よりゆるい</td></tr>
 <tr><td><strong>P6</strong> 不適切なコメント（⑱〜㉑）への扱い</td><td>判定を含む返事・真相に触れる返事 0 件 / ⑱⑲ に定型文 80% 以上 / ⑳㉑ への返信 0 件 / 普通のコメントの誤判定 5% 以下</td><td>判定を含む返事 = はい / いいえ・推理への答え</td></tr>
 <tr><td><strong>P7</strong> 返信の長さ</td><td>すべて 80 字以内</td><td></td></tr>
@@ -365,7 +365,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>問題</td><td>スナップショットの <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>core_points</code> / <code>reveal_text</code>（<code>schema_version</code> 2 以上が必要 = <code>app/judge/contract.py</code>）</td></tr>
 <tr><td><code>core_points</code>・<code>reveal_text</code></td><td>コアの要点（1〜3 個・1 個 20 字以内。④⑤⑥ の判定に使う）と、正解時に開示する真相の要約（70 字以内）。文面の正は <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code>。どの方式でも機械プローブの正解ラベルに使うため残す</td></tr>
 <tr><td rowspan="5">出力<br>（<code>Judgement</code>）</td><td><code>kind</code></td><td>22 種のコード（10.2 の表）</td></tr>
-<tr><td><code>answer</code></td><td><code>q_yesno</code> のときだけ <code>yes</code> / <code>no</code> / <code>irrelevant</code> / <code>unknown</code>。ほかは null</td></tr>
+<tr><td><code>answer</code></td><td><code>q_yesno</code> のときだけ <code>yes</code> / <code>no</code> / <code>irrelevant</code> の 3 値（判断できないときは <code>irrelevant</code>。<a href="#d-20261004-three-answers">付録</a>）。ほかは null</td></tr>
 <tr><td><code>reason</code></td><td>判定理由の短文（記録用）</td></tr>
 <tr><td><code>bare_term</code></td><td>語だけのコメントのときのその語</td></tr>
 <tr><td><code>debug</code></td><td>確率・トークン・応答時間（記録にだけ出す）</td></tr>
@@ -439,7 +439,7 @@ nav.toc ul { margin: .3rem 0 0; }
     <div class="exits"><span class="exit">&lt; <code>T_QUALITY</code> → ③</span></div></div>
   <div class="flow-arrow">↓</div>
   <div class="flow-step emph"><div class="t">段 D 答え（choice 3 択・問題文 + 真相 + 確定事実）</div><div class="d">はい / いいえ / 関係ない</div>
-    <div class="exits"><span class="exit">最大確率 ≥ <code>T_ANSWER</code> → その答え</span><span class="exit">未満 → <code>unknown</code>（安全側）</span></div></div>
+    <div class="exits"><span class="exit">最大確率 ≥ <code>T_ANSWER</code> → その答え</span><span class="exit">未満 → <code>irrelevant</code>（安全側）</span></div></div>
 </div>
 <figcaption>図 10-2 パターン 2 の段の流れ。段 B の結果は A1b と正解判定で使い回す。段 B2 は ④ の候補のときだけ呼ぶ（このとき段 C・D は呼ばない。1 コメント 0〜6 回の呼び出し）</figcaption>
 </figure>
@@ -454,7 +454,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td><code>T_CLOSE</code></td><td>0.25</td><td>A1b・B</td><td>要点に触れたとみなす確率の下限（⑤ の判定と、推理扱いの条件）</td></tr>
 <tr><td><code>T_CONTRADICT</code></td><td>0.5</td><td>B2</td><td>④ の候補を、真相・確定事実と矛盾するとして ⑤ に落とす確率の下限</td></tr>
 <tr><td><code>T_QUALITY</code></td><td>0.2</td><td>C</td><td>はい / いいえで一意に答えられるとみなす確率の下限</td></tr>
-<tr><td><code>T_ANSWER</code></td><td>0.55</td><td>D</td><td>答えを返す確率の下限（未満は <code>unknown</code>）</td></tr>
+<tr><td><code>T_ANSWER</code></td><td>0.55</td><td>D</td><td>答えを返す確率の下限（未満は <code>irrelevant</code> = 関係ない）</td></tr>
 </table>
 </div>
 <ul>
@@ -534,7 +534,6 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td><code>yes</code></td><td>はい！</td></tr>
 <tr><td><code>no</code></td><td>いいえ。</td></tr>
 <tr><td><code>irrelevant</code></td><td>関係ないよ。</td></tr>
-<tr><td><code>unknown</code>（判断できない）</td><td>それは答えに関わらないんだ。</td></tr>
 </table>
 </div>
 <div class="table-wrap">
@@ -581,7 +580,7 @@ nav.toc ul { margin: .3rem 0 0; }
 </div>
 
 <h3 id="prompts">10.5 現行プロンプト全文</h3>
-<div class="note"><span class="callout-title">要点</span>判定と返信文のプロンプト 4 本の全文を転記する。<strong>正は <code>services/comment-reply/app/prompts/</code></strong>で、以下は <code>prompt_version</code> <code>5311b19312cf</code>（2026-09-30 の 21-6c2 で同梱した版）時点の転記。</div>
+<div class="note"><span class="callout-title">要点</span>判定と返信文のプロンプト 4 本の全文を転記する。<strong>正は <code>services/comment-reply/app/prompts/</code></strong>で、以下は <code>prompt_version</code> <code>de7b20ee3a37</code>（2026-10-04 の 21-6d4 で答えを 3 値にした版）時点の転記。</div>
 <ul>
   <li><strong><code>prompt_version</code></strong>: 同梱プロンプト全ファイル（名前順）のファイル名と中身の SHA-256 先頭 12 桁（<code>app/comment_log.py</code>）。コメント記録の <code>config.prompt_version</code>（<a href="#comment-log">10.8</a>）と評価ページの表示で、どの版で動いたかを照合できる</li>
   <li><strong>転記の扱い</strong>: 「同じ情報を 2 か所に書かない」の例外として転記している（2026-10-03 ユーザー承認）。<strong>プロンプトを変えるステップでは、この節の転記と <code>prompt_version</code> の更新を完了条件に入れる</strong></li>
@@ -591,7 +590,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="table-wrap">
 <table>
 <tr><th>ファイル</th><th>使う場所</th><th>埋め込む値</th></tr>
-<tr><td><code>pattern1_rules.txt</code></td><td>パターン 1 の判定（<a href="#pattern1">10.3.3</a>）。手順 3 の返信文は下書きで送らない（そのため ⑧ の旧い言い回し「誰かが当てるまで秘密」が残っているが、返信には出ない）</td><td>問題文・真相・確定事実・コアの要点</td></tr>
+<tr><td><code>pattern1_rules.txt</code></td><td>パターン 1 の判定（<a href="#pattern1">10.3.3</a>）。手順 3 の返信文は下書きで送らない</td><td>問題文・真相・確定事実・コアの要点</td></tr>
 <tr><td><code>reply_style.txt</code></td><td>書き手 2 種が共有する返信文の基準（<a href="#reply-style">10.4</a> の表と同じ内容）</td><td>なし（書き手の <code>{style}</code> に入る）</td></tr>
 <tr><td><code>reply_writer.txt</code></td><td>書き手 <code>1d-luna</code> / <code>2c-luna</code>（真相なし）</td><td>判定・語・① の形・基準・問題文</td></tr>
 <tr><td><code>reply_1b_with_truth.txt</code></td><td>書き手 <code>1b</code>（真相あり）</td><td>判定・語・① の形・基準・問題文・真相・確定事実・コアの要点</td></tr>
@@ -633,14 +632,14 @@ nav.toc ul { margin: .3rem 0 0; }
 - foreign: 日本語以外のコメント。ひらがな・カタカナを 1 字も含まない漢字だけの文（「答案是什么？」など）は中国語を疑い、
   日本語として自然に読めなければ foreign にする
 
-手順 2: answer は kind が q_yesno のときだけ yes / no / irrelevant / unknown のどれかを入れ、ほかは null にする。
+手順 2: answer は kind が q_yesno のときだけ yes / no / irrelevant のどれかを入れ、ほかは null にする。
 - 確定事実から判断できる質問は yes か no。真相に関係しない事柄は irrelevant。
 - 確定事実に直接書いていなくても、真相の文から考えて明らかに違うことは no、明らかに正しいことは yes と答える
   （例: 真相で品物を直接手渡している場面を「宅配便で届いたの？」と聞かれたら no）。
-- 真相にも確定事実にもない事柄を勝手に作らない。真相と確定事実のどちらからも判断できないときだけ unknown。
+- 真相にも確定事実にもない事柄を勝手に作らない。真相と確定事実のどちらからも判断できないときは irrelevant にする。
 
 手順 3: reply（返信文）を書く。全体で 80 字以内・丁寧で少しユーモラスな探偵口調・絵文字は使わない。
-- q_yesno: 冒頭を answer に応じて「はい。」「いいえ。」「関係ありません。」「それは問題の答えに関わりません。」のどれかにする。
+- q_yesno: 冒頭を answer に応じて「はい。」「いいえ。」「関係ありません。」のどれかにする。
   そのあとに、真相に触れない 20 字以内の探偵らしい一言を添えてよい（毎回同じ言い回しにしない）。
   一言にも真相の核心（答えそのもの・正体・理由・場所・人物の役割）や、確定事実シート・真相の文の言葉を含めない。
 - guess_correct: 冒頭に「正解です！」と宣言し、そのあとに真相を 2 文程度で開示する（「一語で答える」より優先）。
@@ -648,7 +647,7 @@ nav.toc ul { margin: .3rem 0 0; }
 - guess_close: 「惜しい！」と言う。どこが足りないか・どこが合っているかは言わない。
 - guess_wrong: 「残念、違います」の趣旨を返す。どこが違うかは言わない。
 - q_multi: 質問を 1 つずつコメントするよう促す。q_open: はい / いいえで答えられる形で聞き直すよう促す。
-- ask_hint: 質問で絞っていくよう促す（ヒントは出さない）。ask_spoiler: 誰かが当てるまで秘密だと伝える。
+- ask_hint: 質問で絞っていくよう促す（ヒントは出さない）。ask_spoiler: 質問には答えられるが真相は教えられないと伝える（いつか明かす約束はしない）。
 - ask_howto: 「はい / いいえで答えられる質問をコメントすると、探偵が答える」遊び方を案内する。
 - impression / greeting / cheer / request / chat / mention / emoji_only: 20 字以内のお礼・相づち・歓迎だけ。
   真相・正体・手がかりに触れない。complaint: お礼と「確認します」だけ。反論も言い訳もしない。
@@ -678,11 +677,11 @@ nav.toc ul { margin: .3rem 0 0; }
 - 返信文だけを書く。前置き・説明・かぎかっこでの囲みは付けない。
 
 【種別ごとの返し方】
-- q_yesno: 冒頭は判定語にする。yes →「はい！」、no →「いいえ。」、irrelevant →「関係ないよ。」、unknown →「それは答えに関わらないんだ。」。
+- q_yesno: 冒頭は判定語にする。yes →「はい！」、no →「いいえ。」、irrelevant →「関係ないよ。」。
   そのあとは、指定された形に従う:
   ・「判定語だけ」: 判定語のみで終える。
   ・「判定語 + 復唱」: コメントの言葉だけを使って短く言い直す（例: 質問「その人は夕方に帰ってきた？」が yes なら「はい！夕方に帰ってきたよ。」）。
-    コメントにない言葉を足さない。irrelevant / unknown のときは復唱せず「判定語 + 一言」にする。
+    コメントにない言葉を足さない。irrelevant のときは復唱せず「判定語 + 一言」にする。
   ・「判定語 + 一言」: 真相に触れない 20 字以内の一言を添える（「ふむふむ、次はどうかな？」「その調子で聞いてごらん」の類。毎回同じにしない）。
 - q_multi: 質問は 1 つずつコメントしてね、と促す。
 - q_open: はい / いいえ で答えられる形で聞き直してね、と促す。誰のことか分からない質問なら、誰のことか書いてね、と添える。
@@ -1107,6 +1106,16 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
     <li><strong>残る 1 件</strong>（U27-e18）はコアの一部しか言っていないのに要点 0.59 で ④ になった例で、矛盾チェックの対象外（<code>T_POINT</code> 側の問題）</li>
     <li><strong>hybrid への影響</strong>: luna も ④ とした誤り 2 件（U28-e19・U20-e30）は、これまで二重確認を通っていたが、Jev が ⑤ に落とすため正解宣言の保留（consensus_split）になる。本物の正解の保留は増えない</li>
     <li>確率は 1 回の呼び出しの値で、全件での効果は 21-6d4 の全件プローブで測る</li>
+  </ul>
+</div>
+
+<div class="decision" id="d-20261004-three-answers">
+  <span class="callout-title">2026-10-03 ユーザー決定・2026-10-04 21-6d4: はい / いいえ質問の答えを はい / いいえ / 関係ない の 3 値に戻し、「判断できない」（<code>unknown</code>）をやめる</span>
+  <p>21-4a の出題者プロンプト以来、想像で答えないための逃げ道として 4 値目「それは答えに関わらないんだ。」があったが、返事の上では「関係ないよ」と区別しにくく、正解ラベルも 3 値だったため 3 値に戻した。判断できないときは「関係ない」に寄せる（パターン 1 はプロンプトとスキーマ、パターン 2 は段 D の最大確率が <code>T_ANSWER</code> 0.55 未満のとき。閾値は据え置き）。21-6d3 では 5 パターン合計 52 件が「判断できない」で、P4 の NG の多くを占めていた。</p>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>Jev の寄せ先</strong>: 21-6d3 で Jev が <code>unknown</code> にした 8 件は、「関係ない」に寄せると 6 件が正解ラベルと合い取り違え 0、最大確率の答えを採ると はい / いいえの取り違えが 2 件出たため「関係ない」に寄せた</li>
+    <li><strong>全件プローブ</strong>（21-6d4・<code>prompt_version</code> <code>de7b20ee3a37</code>・truth は 21-6d3e の書き直し後）: P4 は luna 系 10.9% → 4.5%・Jev 系 4.5% → 1.8%。段 B2（<a href="#d-20261004-contradiction">上記</a>）と合わせて P2 は Jev 系 12 → 2 件・luna 系 3 → 1 件・hybrid 2 → 1 件、⑤ 惜しい推理の一致は Jev 系 11/28 → 21/28。悪化したはい / いいえ質問 3 件（U16-e03・U12-e02・U21-e01）はいずれも truth の書き直しで判定の材料が変わったもので、3 値化そのものによる悪化は見つからなかった（数値と内訳は<a href="umigame-soup-1-probe.html">評価ページ</a>と<a href="../../plans/development-plan.html#step-21-6d4">開発計画 21-6d4</a>）</li>
+    <li><strong>評価データ</strong>: U26-b22 の別解 <code>unknown</code> を <code>irrelevant</code> に読み替えた（正解ラベルは <code>no</code> のまま）</li>
   </ul>
 </div>
 

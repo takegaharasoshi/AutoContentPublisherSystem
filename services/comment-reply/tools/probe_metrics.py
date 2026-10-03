@@ -27,14 +27,13 @@ RELEVANCE_WORDS = ("関係", "重要", "大事")
 ANSWER_WORDS = {
     "yes": ("はい",), "no": ("いいえ",),
     "irrelevant": ("関係ありません", "関係ない"),
-    "unknown": ("答えに関わりません", "関わらない"),
 }
 OPENERS = tuple(dict.fromkeys((*templates.YESNO_OPENERS.values(),
                                   *(word for words in ANSWER_WORDS.values() for word in words))))
 CONFLICT_WORDS = {
-    "yes": ("いいえ", "関係ない", "関係ありません", "関わらない", "関わりません"),
-    "no": ("はい", "関係ない", "関係ありません", "関わらない", "関わりません"),
-    "irrelevant": ("はい", "いいえ"), "unknown": ("はい", "いいえ"),
+    "yes": ("いいえ", "関係ない", "関係ありません"),
+    "no": ("はい", "関係ない", "関係ありません"),
+    "irrelevant": ("はい", "いいえ"),
 }
 PROXIMITY_WORDS = ("鋭い", "いい線", "近い", "近づ", "核心", "惜しい", "迫っ", "着眼点")
 ALLOWED_EMOJIS = ("☺️", "😌", "😉", "🧐", "🥳", "🙌", "👏", "🤔", "🫢", "🤭", "🤐")
@@ -95,8 +94,7 @@ def _one_liner(reply: str | None) -> str | None:
 
 
 def _is_opener(reply: str | None) -> bool:
-    return bool(reply and reply.startswith(("はい", "いいえ", "関係", "正解",
-                                             templates.YESNO_OPENERS["unknown"])))
+    return bool(reply and reply.startswith(("はい", "いいえ", "関係", "正解")))
 
 
 def _emoji_violations(reply: str | None, kind: str | None) -> list[str]:
@@ -220,9 +218,9 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
         p3_items = [x for x in p3_cases if x["kind"] == "q_yesno"
                     and x["answer"] in {"yes", "no"} and x["answer"] != x["expected_answer"]]
         by_problem = Counter(x["case"]["no"] for x in p3_items)
-        p4_cases = [x for x in q if x["expected_answer"] in {"no", "irrelevant", "unknown"}]
+        p4_cases = [x for x in q if x["expected_answer"] in {"no", "irrelevant"}]
         p4_items = [x for x in p4_cases if x["kind"] == "q_yesno"
-                    and x["answer"] in {"no", "irrelevant", "unknown"}
+                    and x["answer"] in {"no", "irrelevant"}
                     and not answer_matches({"expected_answer": x["expected_answer"],
                                             "answer": x["answer"],
                                             "comment_text": x["case"]["text"]})]

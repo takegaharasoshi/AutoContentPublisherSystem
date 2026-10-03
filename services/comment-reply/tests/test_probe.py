@@ -281,13 +281,13 @@ def test_metrics_l1_kind_opener_and_answer_synonym():
                                    alternative)["label_mismatch"] is False
 
 
-def test_metrics_recognize_production_correct_and_unknown_openers():
+def test_metrics_recognize_production_correct_and_irrelevant_openers():
     cases = [_case("right", "guess_correct"), _case("wrong", "guess_wrong"),
-             _case("unknown", "q_yesno", "irrelevant", text="これは重要？")]
+             _case("irrelevant", "q_yesno", "irrelevant", text="これは重要？")]
     rows = [_row(cases[0], "guess_correct", reply="正解！開示文"),
             _row(cases[1], "guess_correct", reply="正解！開示文"),
-            _row(cases[2], "q_yesno", "unknown",
-                 templates.YESNO_OPENERS["unknown"] + "また聞いてね")]
+            _row(cases[2], "q_yesno", "irrelevant",
+                 templates.YESNO_OPENERS["irrelevant"] + "また聞いてね")]
     report = _aggregate(cases, rows)
     assert report["metrics"]["P5"]["count"] == 1
     assert report["metrics"]["P2"]["count"] == 1

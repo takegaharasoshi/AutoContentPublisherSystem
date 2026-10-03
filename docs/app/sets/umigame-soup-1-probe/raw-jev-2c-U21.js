@@ -9,7 +9,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -27,8 +27,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4188,
-            "latency_s": 1.361978,
+            "input_tokens": 4219,
+            "latency_s": 1.153253,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -45,26 +45,26 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "question": 0.91
               },
               "A2": {
-                "q_multi": 0.03,
+                "q_multi": 0.02,
                 "q_open": 0.0,
-                "q_yesno": 0.97
+                "q_yesno": 0.98
               },
               "A_bare": 0.03,
               "B": {
                 "point_0": 0.02,
-                "point_1": 0.02
+                "point_1": 0.01
               },
-              "C": 0.37,
+              "C": 0.42,
               "D": {
-                "irrelevant": 0.28,
-                "no": 0.0,
-                "yes": 0.72
+                "irrelevant": 0.44,
+                "no": 0.01,
+                "yes": 0.55
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -75,7 +75,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！ほかにも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -83,17 +83,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "男と弟は本当の兄弟ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.3622765459876973,
-      "judge_s": 1.3622765459876973,
+      "jev_s": 1.1535502939950675,
+      "judge_s": 1.1535502939950675,
       "luna_s": null,
-      "total_s": 4.72699932398973,
-      "writer_s": 3.364722778002033
+      "total_s": 2.888481364992913,
+      "writer_s": 1.7349310709978454
     }
   },
   {
@@ -105,7 +105,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -123,8 +123,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4242,
-            "latency_s": 1.228907,
+            "input_tokens": 4273,
+            "latency_s": 1.157853,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -150,11 +150,11 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "point_0": 0.06,
                 "point_1": 0.02
               },
-              "C": 0.64,
+              "C": 0.62,
               "D": {
                 "irrelevant": 0.0,
-                "no": 0.99,
-                "yes": 0.01
+                "no": 1.0,
+                "yes": 0.0
               }
             }
           },
@@ -171,7 +171,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。二人でスイカを育てる勝負じゃないんだね。"
+        "text": "いいえ。二人でスイカを育てる勝負をしていたの？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -179,17 +179,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "二人でスイカを育てる勝負をしていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2292618219798896,
-      "judge_s": 1.2292618219798896,
+      "jev_s": 1.1582113599870354,
+      "judge_s": 1.1582113599870354,
       "luna_s": null,
-      "total_s": 3.2845220099843573,
-      "writer_s": 2.0552601880044676
+      "total_s": 3.2546147859829944,
+      "writer_s": 2.096403425995959
     }
   },
   {
@@ -201,12 +201,14 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "009-year-late-verdict",
-      "errors": [],
+      "errors": [
+        "writer: writer reply does not begin with the required answer word"
+      ],
       "fact_sheet_hash": "441cba9e5415",
       "final": {
         "answer": "no",
@@ -219,8 +221,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4212,
-            "latency_s": 1.441458,
+            "input_tokens": 4243,
+            "latency_s": 1.23054,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -233,24 +235,24 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.13,
-                "question": 0.87
+                "guess": 0.16,
+                "question": 0.84
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.0,
-                "q_yesno": 1.0
+                "q_open": 0.01,
+                "q_yesno": 0.99
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.02,
-                "point_1": 0.22
+                "point_1": 0.2
               },
-              "C": 0.54,
+              "C": 0.51,
               "D": {
-                "irrelevant": 0.01,
-                "no": 0.9,
-                "yes": 0.09
+                "irrelevant": 0.02,
+                "no": 0.65,
+                "yes": 0.33
               }
             }
           },
@@ -266,8 +268,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "reply": {
         "over_80": false,
         "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。"
+        "source": "fallback_template",
+        "text": "いいえ。まだまだ聞いていいんだよ😌"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -275,17 +277,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "庭のスイカは弟が育てたものですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.4417906110174954,
-      "judge_s": 1.4417906110174954,
+      "jev_s": 1.2308772889955435,
+      "judge_s": 1.2308772889955435,
       "luna_s": null,
-      "total_s": 2.6222169950196985,
-      "writer_s": 1.1804263840022031
+      "total_s": 2.100420620990917,
+      "writer_s": 0.8695433319953736
     }
   },
   {
@@ -297,7 +299,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -315,8 +317,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4260,
-            "latency_s": 1.280837,
+            "input_tokens": 4291,
+            "latency_s": 1.176448,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 258,
@@ -329,8 +331,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.07,
-                "question": 0.93
+                "guess": 0.1,
+                "question": 0.9
               },
               "A2": {
                 "q_multi": 0.0,
@@ -342,11 +344,11 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "point_0": 0.01,
                 "point_1": 0.01
               },
-              "C": 0.36,
+              "C": 0.34,
               "D": {
-                "irrelevant": 0.6,
+                "irrelevant": 0.75,
                 "no": 0.04,
-                "yes": 0.36
+                "yes": 0.21
               }
             }
           },
@@ -371,17 +373,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "スイカはもう食べられるくらい大きくなってましたか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2811499960080255,
-      "judge_s": 1.2811499960080255,
+      "jev_s": 1.176783424016321,
+      "judge_s": 1.176783424016321,
       "luna_s": null,
-      "total_s": 2.5229838629893493,
-      "writer_s": 1.2418338669813238
+      "total_s": 2.4489510050043464,
+      "writer_s": 1.2721675809880253
     }
   },
   {
@@ -393,7 +395,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -411,8 +413,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4248,
-            "latency_s": 1.201605,
+            "input_tokens": 4279,
+            "latency_s": 1.250293,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -425,8 +427,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.1,
-                "question": 0.9
+                "guess": 0.12,
+                "question": 0.88
               },
               "A2": {
                 "q_multi": 0.0,
@@ -438,7 +440,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "point_0": 0.07,
                 "point_1": 0.01
               },
-              "C": 0.71,
+              "C": 0.66,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.01,
@@ -467,17 +469,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "「お前の勝ち」は、弟が勝ったという意味ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.20192038899404,
-      "judge_s": 1.20192038899404,
+      "jev_s": 1.2506670930015389,
+      "judge_s": 1.2506670930015389,
       "luna_s": null,
-      "total_s": 2.1774665460106917,
-      "writer_s": 0.9755461570166517
+      "total_s": 3.7309824830153957,
+      "writer_s": 2.480315390013857
     }
   },
   {
@@ -489,7 +491,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -507,8 +509,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4266,
-            "latency_s": 1.24133,
+            "input_tokens": 4297,
+            "latency_s": 1.142826,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -521,24 +523,24 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.76,
-                "question": 0.24
+                "guess": 0.71,
+                "question": 0.29
               },
               "A2": {
                 "q_multi": 0.01,
-                "q_open": 0.03,
-                "q_yesno": 0.96
+                "q_open": 0.04,
+                "q_yesno": 0.95
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.03,
                 "point_1": 0.02
               },
-              "C": 0.39,
+              "C": 0.43,
               "D": {
                 "irrelevant": 0.01,
-                "no": 0.02,
-                "yes": 0.97
+                "no": 0.03,
+                "yes": 0.96
               }
             }
           },
@@ -555,7 +557,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！昔のことを思い出したんだね。"
+        "text": "はい！スイカを見て昔のことを思い出したんだね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -563,17 +565,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "男はスイカを見て、何か昔のことを思い出したんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2416557539836504,
-      "judge_s": 1.2416557539836504,
+      "jev_s": 1.143211654998595,
+      "judge_s": 1.143211654998595,
       "luna_s": null,
-      "total_s": 3.4328934579971246,
-      "writer_s": 2.1912377040134743
+      "total_s": 4.429729541996494,
+      "writer_s": 3.286517886997899
     }
   },
   {
@@ -585,7 +587,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -603,8 +605,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4230,
-            "latency_s": 1.195724,
+            "input_tokens": 4261,
+            "latency_s": 1.344925,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -617,20 +619,20 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.02,
-                "question": 0.98
+                "guess": 0.03,
+                "question": 0.97
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.01,
-                "q_yesno": 0.99
+                "q_open": 0.0,
+                "q_yesno": 1.0
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.01,
                 "point_1": 0.02
               },
-              "C": 0.32,
+              "C": 0.34,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -659,17 +661,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "実家では毎年スイカを育てているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.196058035013266,
-      "judge_s": 1.196058035013266,
+      "jev_s": 1.3453142940124962,
+      "judge_s": 1.3453142940124962,
       "luna_s": null,
-      "total_s": 4.308631709020119,
-      "writer_s": 3.1125736740068533
+      "total_s": 2.6413484070217237,
+      "writer_s": 1.2960341130092274
     }
   },
   {
@@ -681,7 +683,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -699,8 +701,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4230,
-            "latency_s": 1.254087,
+            "input_tokens": 4261,
+            "latency_s": 1.203376,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -713,8 +715,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.83,
-                "question": 0.17
+                "guess": 0.84,
+                "question": 0.16
               },
               "A2": {
                 "q_multi": 0.0,
@@ -726,10 +728,10 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "point_0": 0.03,
                 "point_1": 0.01
               },
-              "C": 0.61,
+              "C": 0.65,
               "D": {
-                "irrelevant": 0.02,
-                "no": 0.98,
+                "irrelevant": 0.01,
+                "no": 0.99,
                 "yes": 0.0
               }
             }
@@ -755,17 +757,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "二人はスイカの大きさを競ってたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2543624009995256,
-      "judge_s": 1.2543624009995256,
+      "jev_s": 1.2037179289909545,
+      "judge_s": 1.2037179289909545,
       "luna_s": null,
-      "total_s": 4.392901435989188,
-      "writer_s": 3.1385390349896625
+      "total_s": 2.2771921639796346,
+      "writer_s": 1.07347423498868
     }
   },
   {
@@ -777,7 +779,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -795,8 +797,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4260,
-            "latency_s": 1.172578,
+            "input_tokens": 4291,
+            "latency_s": 1.230981,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -809,8 +811,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.04,
-                "question": 0.96
+                "guess": 0.02,
+                "question": 0.98
               },
               "A2": {
                 "q_multi": 0.0,
@@ -822,10 +824,10 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "point_0": 0.02,
                 "point_1": 0.02
               },
-              "C": 0.47,
+              "C": 0.44,
               "D": {
-                "irrelevant": 0.1,
-                "no": 0.9,
+                "irrelevant": 0.07,
+                "no": 0.93,
                 "yes": 0.0
               }
             }
@@ -851,17 +853,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "男はスイカが実っていることを事前に知ってましたか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1728795309900306,
-      "judge_s": 1.1728795309900306,
+      "jev_s": 1.2313739359960891,
+      "judge_s": 1.2313739359960891,
       "luna_s": null,
-      "total_s": 4.582658316998277,
-      "writer_s": 3.4097787860082462
+      "total_s": 2.3693024019885343,
+      "writer_s": 1.1379284659924451
     }
   },
   {
@@ -873,7 +875,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -891,8 +893,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4266,
-            "latency_s": 1.156437,
+            "input_tokens": 4297,
+            "latency_s": 1.206202,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -905,8 +907,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.13,
-                "question": 0.87
+                "guess": 0.18,
+                "question": 0.82
               },
               "A2": {
                 "q_multi": 0.0,
@@ -918,7 +920,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "point_0": 0.04,
                 "point_1": 0.01
               },
-              "C": 0.59,
+              "C": 0.61,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -939,7 +941,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！その調子で聞いてごらん。"
+        "text": "はい！次も聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -947,17 +949,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "スイカの置かれた場所が勝負の結果に関係するんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1567566630255897,
-      "judge_s": 1.1567566630255897,
+      "jev_s": 1.2065699090017006,
+      "judge_s": 1.2065699090017006,
       "luna_s": null,
-      "total_s": 5.058800799015444,
-      "writer_s": 3.902044135989854
+      "total_s": 2.9281694249948487,
+      "writer_s": 1.721599515993148
     }
   },
   {
@@ -969,7 +971,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -988,7 +990,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2150,
-            "latency_s": 0.633651,
+            "latency_s": 0.589285,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1001,8 +1003,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.76,
-                "question": 0.24
+                "guess": 0.79,
+                "question": 0.21
               },
               "A2": {
                 "q_multi": 0.96,
@@ -1025,7 +1027,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。順番に考えていこうか。"
+        "text": "質問はひとつずつ聞いてごらん。どっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1033,17 +1035,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "二人で何かを育ててたの？弟のスイカのほうが大きかったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.6338549659994897,
-      "judge_s": 0.6338549659994897,
+      "jev_s": 0.5894518199784216,
+      "judge_s": 0.5894518199784216,
       "luna_s": null,
-      "total_s": 4.340224101004424,
-      "writer_s": 3.706369135004934
+      "total_s": 2.261867958965013,
+      "writer_s": 1.6724161389865912
     }
   },
   {
@@ -1055,7 +1057,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1074,7 +1076,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2141,
-            "latency_s": 0.586456,
+            "latency_s": 0.549592,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1087,13 +1089,13 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.12,
-                "question": 0.88
+                "guess": 0.1,
+                "question": 0.9
               },
               "A2": {
-                "q_multi": 0.74,
+                "q_multi": 0.72,
                 "q_open": 0.01,
-                "q_yesno": 0.25
+                "q_yesno": 0.27
               },
               "A_bare": 0.02
             }
@@ -1111,7 +1113,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。まずは片方から聞いてごらん。"
+        "text": "質問は1つずつしてごらん。どっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1119,17 +1121,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "スイカは自然に生えたの？それとも弟が種をまいたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.5866174839902669,
-      "judge_s": 0.5866174839902669,
+      "jev_s": 0.5497958939813543,
+      "judge_s": 0.5497958939813543,
       "luna_s": null,
-      "total_s": 2.3240226820053067,
-      "writer_s": 1.7374051980150398
+      "total_s": 2.7129385549924336,
+      "writer_s": 2.1631426610110793
     }
   },
   {
@@ -1141,7 +1143,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1160,7 +1162,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2656,
-            "latency_s": 0.760201,
+            "latency_s": 0.754313,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1181,13 +1183,13 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "q_open": 0.99,
                 "q_yesno": 0.01
               },
-              "A3": 0.05,
+              "A3": 0.04,
               "A_bare": 0.02
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A=question→q_open, 再確認=0.05"
+          "reason": "段A=question→q_open, 再確認=0.04"
         },
         "luna": null
       },
@@ -1198,7 +1200,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "男が見たものについて、はい・いいえで答えられる質問にして聞いてごらん。"
+        "text": "「男は何かを見た？」のように、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1206,17 +1208,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "男は何を見て弟の勝ちだとわかったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.760400130006019,
-      "judge_s": 0.760400130006019,
+      "jev_s": 0.7545373259927146,
+      "judge_s": 0.7545373259927146,
       "luna_s": null,
-      "total_s": 5.177691124001285,
-      "writer_s": 4.417290993995266
+      "total_s": 5.476506367995171,
+      "writer_s": 4.721969042002456
     }
   },
   {
@@ -1228,7 +1230,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1247,7 +1249,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2648,
-            "latency_s": 0.867555,
+            "latency_s": 0.812806,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1260,21 +1262,21 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.07,
-                "question": 0.93
+                "guess": 0.09,
+                "question": 0.91
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 1.0,
                 "q_yesno": 0.0
               },
-              "A3": 0.06,
+              "A3": 0.07,
               "A_bare": 0.03
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A=question→q_open, 再確認=0.06"
+          "reason": "段A=question→q_open, 再確認=0.07"
         },
         "luna": null
       },
@@ -1285,7 +1287,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形にして、聞き直してみてね。"
+        "text": "はい・いいえで答えられる質問にして聞いてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1293,17 +1295,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "二人はどんな勝負をしていたんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.8677894849970471,
-      "judge_s": 0.8677894849970471,
+      "jev_s": 0.8130286099913064,
+      "judge_s": 0.8130286099913064,
       "luna_s": null,
-      "total_s": 2.689324298000429,
-      "writer_s": 1.8215348130033817
+      "total_s": 5.7824855979997665,
+      "writer_s": 4.96945698800846
     }
   },
   {
@@ -1315,7 +1317,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1334,7 +1336,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2620,
-            "latency_s": 0.799611,
+            "latency_s": 0.858392,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1372,7 +1374,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「弟は何かに勝ったの？」のように、はい・いいえで答えられる形で聞いてみてね。"
+        "text": "はい / いいえで答えられる形で聞き直してみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1380,17 +1382,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "弟は何に勝ったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7998224479961209,
-      "judge_s": 0.7998224479961209,
+      "jev_s": 0.8585660919779912,
+      "judge_s": 0.8585660919779912,
       "luna_s": null,
-      "total_s": 3.132649200997548,
-      "writer_s": 2.3328267530014273
+      "total_s": 5.012099315965315,
+      "writer_s": 4.153533223987324
     }
   },
   {
@@ -1402,7 +1404,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1421,7 +1423,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2092,
-            "latency_s": 0.577623,
+            "latency_s": 0.550297,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -1439,14 +1441,14 @@ window.PROBE_RAW["jev-2c/U21"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.26,
-                "point_1": 0.9
+                "point_0": 0.23,
+                "point_1": 0.89
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.26"
+          "reason": "段A=guess→guess_close, 要点最低=0.23"
         },
         "luna": null
       },
@@ -1457,7 +1459,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか☺️"
+        "text": "惜しい！推理を続けてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1465,17 +1467,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "去年の種飛ばしで、弟が飛ばした種からスイカが育ったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.5778388500039,
-      "judge_s": 0.5778388500039,
+      "jev_s": 0.5505137300060596,
+      "judge_s": 0.5505137300060596,
       "luna_s": null,
-      "total_s": 4.14580994300195,
-      "writer_s": 3.56797109299805
+      "total_s": 2.4679736669932026,
+      "writer_s": 1.917459936987143
     }
   },
   {
@@ -1487,7 +1489,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1504,12 +1506,12 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 2170,
-            "latency_s": 0.555012,
+            "calls": 4,
+            "input_tokens": 3377,
+            "latency_s": 0.873587,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 150,
+            "output_tokens": 172,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1524,14 +1526,15 @@ window.PROBE_RAW["jev-2c/U21"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.83,
+                "point_0": 0.81,
                 "point_1": 0.95
-              }
+              },
+              "B2": 0.09
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.83"
+          "reason": "段A=guess→guess_correct, 要点最低=0.81, 矛盾=0.09"
         },
         "luna": null
       },
@@ -1550,17 +1553,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "兄弟で去年スイカの種飛ばしをして、弟の種から今年の実がなったんだね。だから弟の飛距離が本当だったと分かったのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.5552102370129433,
-      "judge_s": 0.5552102370129433,
+      "jev_s": 0.8738010740198661,
+      "judge_s": 0.8738010740198661,
       "luna_s": null,
-      "total_s": 0.5552240730030462,
-      "writer_s": 1.383599010296166e-05
+      "total_s": 0.8738090970146004,
+      "writer_s": 8.022994734346867e-06
     }
   },
   {
@@ -1572,7 +1575,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1591,7 +1594,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2065,
-            "latency_s": 0.570657,
+            "latency_s": 0.606297,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -1609,7 +1612,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.96,
+                "point_0": 0.95,
                 "point_1": 0.02
               }
             }
@@ -1627,7 +1630,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてみようか。"
+        "text": "惜しい！もう少し考えてみようか☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1635,17 +1638,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "兄弟でスイカの種飛ばし勝負をしてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.5708321509882808,
-      "judge_s": 0.5708321509882808,
+      "jev_s": 0.606439583003521,
+      "judge_s": 0.606439583003521,
       "luna_s": null,
-      "total_s": 4.155197132000467,
-      "writer_s": 3.584364981012186
+      "total_s": 2.392511776997708,
+      "writer_s": 1.7860721939941868
     }
   },
   {
@@ -1657,7 +1660,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1667,19 +1670,19 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "final": {
         "answer": null,
         "decision": "jev",
-        "kind": "guess_correct"
+        "kind": "guess_close"
       },
       "judgements": {
         "jev": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 2161,
-            "latency_s": 0.655402,
+            "calls": 4,
+            "input_tokens": 3365,
+            "latency_s": 0.757718,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 150,
+            "output_tokens": 172,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1695,13 +1698,14 @@ window.PROBE_RAW["jev-2c/U21"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.93,
-                "point_1": 0.92
-              }
+                "point_1": 0.93
+              },
+              "B2": 0.89
             }
           },
           "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.92"
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.93, 矛盾=0.89"
         },
         "luna": null
       },
@@ -1711,8 +1715,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "reply": {
         "over_80": false,
         "reply_id": null,
-        "source": "template",
-        "text": "正解！去年の種飛ばしで弟の種は庭の奥まで飛んでいた。その種が育ってすいかが実り、1年越しに兄は負けを認めた。"
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1720,17 +1724,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "兄弟で種飛ばしをして、弟の種からスイカが育ったんだね。でも弟は勝負では負けていて、兄が勝ちを譲ったのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.6555885699926876,
-      "judge_s": 0.6555885699926876,
+      "jev_s": 0.7579935429967009,
+      "judge_s": 0.7579935429967009,
       "luna_s": null,
-      "total_s": 0.6556019879935775,
-      "writer_s": 1.341800088994205e-05
+      "total_s": 2.2966667500149924,
+      "writer_s": 1.5386732070182916
     }
   },
   {
@@ -1742,7 +1746,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1761,8 +1765,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 4326,
-            "latency_s": 1.122633,
+            "input_tokens": 4357,
+            "latency_s": 1.192062,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -1779,20 +1783,20 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "question": 0.01
               },
               "A2": {
-                "q_multi": 0.03,
-                "q_open": 0.04,
-                "q_yesno": 0.93
+                "q_multi": 0.04,
+                "q_open": 0.02,
+                "q_yesno": 0.94
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.05,
-                "point_1": 0.11
+                "point_1": 0.1
               },
-              "C": 0.52,
+              "C": 0.49,
               "D": {
                 "irrelevant": 0.01,
-                "no": 0.94,
-                "yes": 0.05
+                "no": 0.96,
+                "yes": 0.03
               }
             }
           },
@@ -1817,17 +1821,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "兄弟でどっちが先にスイカを実らせるか競争してて、弟の勝ちだったんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1231088579806965,
-      "judge_s": 1.1231088579806965,
+      "jev_s": 1.192381706991,
+      "judge_s": 1.192381706991,
       "luna_s": null,
-      "total_s": 2.457778566982597,
-      "writer_s": 1.3346697090019006
+      "total_s": 2.182495924993418,
+      "writer_s": 0.9901142180024181
     }
   },
   {
@@ -1839,7 +1843,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1859,7 +1863,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
             "calls": 4,
             "guess_demoted": true,
             "input_tokens": 2666,
-            "latency_s": 0.74245,
+            "latency_s": 0.757036,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 194,
@@ -1900,7 +1904,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。ほかの考え方もしてみようか？"
+        "text": "残念、ちがうよ。もう少し考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1908,17 +1912,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "弟が植えたスイカだけが鳥に食べられず残ってたから、弟の勝ちってことだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7426895819953643,
-      "judge_s": 0.7426895819953643,
+      "jev_s": 0.7573766840214375,
+      "judge_s": 0.7573766840214375,
       "luna_s": null,
-      "total_s": 1.8503217909892555,
-      "writer_s": 1.1076322089938913
+      "total_s": 1.8030502150359098,
+      "writer_s": 1.0456735310144722
     }
   },
   {
@@ -1930,14 +1934,12 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "009-year-late-verdict",
-      "errors": [
-        "writer: writer did not ask what bare_term means"
-      ],
+      "errors": [],
       "fact_sheet_hash": "441cba9e5415",
       "final": {
         "answer": null,
@@ -1951,7 +1953,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 929,
-            "latency_s": 0.185537,
+            "latency_s": 0.185603,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -1962,12 +1964,12 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "reaction": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.77
+              "A_bare": 0.8
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A語句のみ: 0.77"
+          "reason": "段A語句のみ: 0.80"
         },
         "luna": null
       },
@@ -1977,8 +1979,8 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "reply": {
         "over_80": false,
         "reply_id": null,
-        "source": "fallback_template",
-        "text": "種飛ばしが何のことか、もう少し詳しく教えて！"
+        "source": "llm",
+        "text": "何が種飛ばしなのかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1986,17 +1988,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "種飛ばし？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.18571045197313651,
-      "judge_s": 0.18571045197313651,
+      "jev_s": 0.18570936599280685,
+      "judge_s": 0.18570936599280685,
       "luna_s": null,
-      "total_s": 9.15073107596254,
-      "writer_s": 8.965020623989403
+      "total_s": 3.375469805992907,
+      "writer_s": 3.1897604400001
     }
   },
   {
@@ -2008,7 +2010,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2029,15 +2031,15 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 926,
-            "latency_s": 0.188684,
+            "latency_s": 0.180257,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.97,
-                "reaction": 0.03,
+                "question_or_guess": 0.98,
+                "reaction": 0.02,
                 "request": 0.0
               },
               "A_bare": 0.97
@@ -2064,17 +2066,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "花火",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.1887891789956484,
-      "judge_s": 0.1887891789956484,
+      "jev_s": 0.18036524200579152,
+      "judge_s": 0.18036524200579152,
       "luna_s": null,
-      "total_s": 5.060847938992083,
-      "writer_s": 4.872058759996435
+      "total_s": 3.5116977900033817,
+      "writer_s": 3.33133254799759
     }
   },
   {
@@ -2086,7 +2088,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2105,7 +2107,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1427,
-            "latency_s": 0.411272,
+            "latency_s": 0.378109,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 124,
@@ -2138,7 +2140,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問には答えられるけど、真相は教えられないよ。質問で少しずつ絞っていこう☺️"
+        "text": "質問には答えられるけど、真相は教えられないよ。質問で少しずつ絞っていこうね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2146,17 +2148,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "もう真相言っちゃって！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.4114046590111684,
-      "judge_s": 0.4114046590111684,
+      "jev_s": 0.3782747049990576,
+      "judge_s": 0.3782747049990576,
       "luna_s": null,
-      "total_s": 3.6335760180372745,
-      "writer_s": 3.222171359026106
+      "total_s": 1.606904651998775,
+      "writer_s": 1.2286299469997175
     }
   },
   {
@@ -2168,7 +2170,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2187,7 +2189,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1578,
-            "latency_s": 0.392847,
+            "latency_s": 0.352341,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -2208,7 +2210,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "mention": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.33
+              "A_bare": 0.36
             }
           },
           "error": null,
@@ -2232,17 +2234,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "こんばんは！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.3932502219977323,
-      "judge_s": 0.3932502219977323,
+      "jev_s": 0.35248816799139604,
+      "judge_s": 0.35248816799139604,
       "luna_s": null,
-      "total_s": 1.4941281510109548,
-      "writer_s": 1.1008779290132225
+      "total_s": 2.315263752010651,
+      "writer_s": 1.962775584019255
     }
   },
   {
@@ -2254,7 +2256,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2273,7 +2275,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1596,
-            "latency_s": 0.422465,
+            "latency_s": 0.375187,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -2310,7 +2312,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "リクエストありがとう！学校が舞台の問題も楽しみにしててね☺️"
+        "text": "リクエストありがとう！次の問題も楽しみにしててね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2318,17 +2320,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "次は学校が舞台の問題が見たい！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.42257965498720296,
-      "judge_s": 0.42257965498720296,
+      "jev_s": 0.3753066470089834,
+      "judge_s": 0.3753066470089834,
       "luna_s": null,
-      "total_s": 1.4969469499774277,
-      "writer_s": 1.0743672949902248
+      "total_s": 2.1201964810024947,
+      "writer_s": 1.7448898339935113
     }
   },
   {
@@ -2340,7 +2342,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2359,7 +2361,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1590,
-            "latency_s": 0.364844,
+            "latency_s": 0.469019,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -2367,9 +2369,9 @@ window.PROBE_RAW["jev-2c/U21"] = [
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.02,
-                "reaction": 0.93,
-                "request": 0.05
+                "question_or_guess": 0.01,
+                "reaction": 0.95,
+                "request": 0.04
               },
               "A2": {
                 "chat": 0.0,
@@ -2380,7 +2382,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
                 "mention": 1.0,
                 "request": 0.0
               },
-              "A_bare": 0.06
+              "A_bare": 0.05
             }
           },
           "error": null,
@@ -2396,7 +2398,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "うん、ゆっくり考えてみてね☺️"
+        "text": "うん、ゆっくり考えてみてね！"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2404,17 +2406,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "@hana あとで考えてみて！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.3649653229804244,
-      "judge_s": 0.3649653229804244,
+      "jev_s": 0.46934775001136586,
+      "judge_s": 0.46934775001136586,
       "luna_s": null,
-      "total_s": 1.7184182129858527,
-      "writer_s": 1.3534528900054283
+      "total_s": 2.9350348389998544,
+      "writer_s": 2.4656870889884885
     }
   },
   {
@@ -2426,7 +2428,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2445,7 +2447,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1598,
-            "latency_s": 0.409205,
+            "latency_s": 0.40521,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 149,
@@ -2453,16 +2455,16 @@ window.PROBE_RAW["jev-2c/U21"] = [
               "A1": {
                 "inappropriate": 0.07,
                 "other": 0.0,
-                "question_or_guess": 0.17,
-                "reaction": 0.76,
+                "question_or_guess": 0.21,
+                "reaction": 0.72,
                 "request": 0.0
               },
               "A2": {
                 "chat": 0.03,
                 "cheer": 0.0,
-                "complaint": 0.63,
+                "complaint": 0.67,
                 "greeting": 0.0,
-                "impression": 0.34,
+                "impression": 0.3,
                 "mention": 0.0,
                 "request": 0.0
               },
@@ -2482,7 +2484,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "教えてくれてありがとう。確認するね。"
+        "text": "伝えてくれてありがとう。確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2490,17 +2492,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "そういう人たちを見下す感じ、無理",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.4093790710030589,
-      "judge_s": 0.4093790710030589,
+      "jev_s": 0.40531974600162357,
+      "judge_s": 0.40531974600162357,
       "luna_s": null,
-      "total_s": 3.7638817849801853,
-      "writer_s": 3.3545027139771264
+      "total_s": 2.453841087030014,
+      "writer_s": 2.0485213410283905
     }
   },
   {
@@ -2512,7 +2514,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2531,16 +2533,16 @@ window.PROBE_RAW["jev-2c/U21"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 929,
-            "latency_s": 0.207906,
+            "latency_s": 0.198618,
             "major": "other",
             "model": "jev-latest",
             "output_tokens": 76,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
-                "other": 0.94,
+                "other": 0.93,
                 "question_or_guess": 0.0,
-                "reaction": 0.06,
+                "reaction": 0.07,
                 "request": 0.0
               },
               "A_bare": 0.09
@@ -2559,7 +2561,7 @@ window.PROBE_RAW["jev-2c/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "日本語で質問してみてね☺️"
+        "text": "日本語で質問してね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2567,17 +2569,17 @@ window.PROBE_RAW["jev-2c/U21"] = [
       "text": "这个好难啊",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.20801731999381445,
-      "judge_s": 0.20801731999381445,
+      "jev_s": 0.19874537200666964,
+      "judge_s": 0.19874537200666964,
       "luna_s": null,
-      "total_s": 4.485022046981612,
-      "writer_s": 4.277004726987798
+      "total_s": 1.5297456710250117,
+      "writer_s": 1.331000299018342
     }
   }
 ];

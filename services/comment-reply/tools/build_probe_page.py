@@ -33,7 +33,6 @@ KIND_LABEL = dict(zip(KINDS, KIND_NAMES))
 # 答え・判定経路の内部コードを、一覧表では日本語で出す（生データ JSON はコードのまま）
 ANSWER_LABEL = {
     "yes": "はい", "no": "いいえ", "irrelevant": "関係ない",
-    "unknown": "判断できない（答えに関わらない）",
 }
 DECISION_LABEL = {
     "luna": "luna の判定", "jev": "Jev の判定",
@@ -75,8 +74,6 @@ def _ja_note(note: str) -> str:
         code = match.group(0)
         if code in KIND_LABEL:
             return KIND_LABEL[code]
-        if code == "unknown":
-            return "判断できない"
         return ANSWER_LABEL.get(code, code)
     return _CODE_RE.sub(label, note)
 
@@ -592,9 +589,8 @@ def _problem_page(results: dict[str, Any], metrics: dict[str, Any],
         f'<nav class="problem-nav">{" ｜ ".join(neighbors)}</nav>',
         '<div class="note"><p><strong>問題文</strong>: ' + _h(problem["problem_text"]) + '</p>'
         '<p>合否と評価はサマリーページにある。共通ケースは問題に順番に割り振っている。</p>'
-        '<p>「判定内容」は 種別 / 答え / どの判定を採用したか の順。答えの「判断できない」は、'
-        '真相と確定事実のどちらからも はい / いいえ / 関係ない を決められなかったもの'
-        '（Jev は確信度が足りないとき）で、返信は「それは答えに関わらないんだ。」になる。</p></div>',
+        '<p>「判定内容」は 種別 / 答え / どの判定を採用したか の順。答えは はい / いいえ / 関係ない の 3 値で、'
+        '真相と確定事実のどちらからも決められないとき（Jev は確信度が足りないとき）は「関係ない」になる。</p></div>',
         '<nav aria-label="目次"><strong>目次</strong><ul>'])
     parts.extend(f'<li><a href="#pattern-{_h(p["id"])}">{_h(p["label"])}</a></li>'
                  for p in patterns)

@@ -9,7 +9,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -27,8 +27,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4124,
-            "latency_s": 1.216402,
+            "input_tokens": 4155,
+            "latency_s": 1.257885,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -53,7 +53,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
               "B": {
                 "point_0": 0.03
               },
-              "C": 0.6,
+              "C": 0.55,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -82,17 +82,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "ピアニストが音を外したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2166740949905943,
-      "judge_s": 1.2166740949905943,
+      "jev_s": 1.2585079229902476,
+      "judge_s": 1.2585079229902476,
       "luna_s": null,
-      "total_s": 1.2166756219812669,
-      "writer_s": 1.5269906725734472e-06
+      "total_s": 1.2585109260107856,
+      "writer_s": 3.0030205380171537e-06
     }
   },
   {
@@ -104,7 +104,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -122,8 +122,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4112,
-            "latency_s": 1.204719,
+            "input_tokens": 4143,
+            "latency_s": 1.189053,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -136,8 +136,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.12,
-                "question": 0.88
+                "guess": 0.09,
+                "question": 0.91
               },
               "A2": {
                 "q_multi": 0.0,
@@ -148,7 +148,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
               "B": {
                 "point_0": 0.02
               },
-              "C": 0.42,
+              "C": 0.43,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -177,17 +177,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男はピアノ弾けるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2049617779848631,
-      "judge_s": 1.2049617779848631,
+      "jev_s": 1.1893684370152187,
+      "judge_s": 1.1893684370152187,
       "luna_s": null,
-      "total_s": 1.2049635959847365,
-      "writer_s": 1.8179998733103275e-06
+      "total_s": 1.1893711680313572,
+      "writer_s": 2.7310161385685205e-06
     }
   },
   {
@@ -199,7 +199,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -217,8 +217,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4106,
-            "latency_s": 1.217518,
+            "input_tokens": 4137,
+            "latency_s": 1.192633,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -231,15 +231,15 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.13,
-                "question": 0.87
+                "guess": 0.19,
+                "question": 0.81
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.0,
                 "q_yesno": 1.0
               },
-              "A_bare": 0.07,
+              "A_bare": 0.05,
               "B": {
                 "point_0": 0.02
               },
@@ -272,17 +272,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男は音楽に詳しい人？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2177631630038377,
-      "judge_s": 1.2177631630038377,
+      "jev_s": 1.1929217749857344,
+      "judge_s": 1.1929217749857344,
       "luna_s": null,
-      "total_s": 1.2177648410142865,
-      "writer_s": 1.6780104488134384e-06
+      "total_s": 1.1929243890044745,
+      "writer_s": 2.614018740132451e-06
     }
   },
   {
@@ -294,7 +294,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -312,8 +312,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4172,
-            "latency_s": 1.156053,
+            "input_tokens": 4203,
+            "latency_s": 1.159254,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -326,8 +326,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.8,
-                "question": 0.2
+                "guess": 0.79,
+                "question": 0.21
               },
               "A2": {
                 "q_multi": 0.0,
@@ -338,7 +338,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
               "B": {
                 "point_0": 0.02
               },
-              "C": 0.5,
+              "C": 0.57,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -367,17 +367,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男は演奏会より前からその曲を毎日聞いてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.156347559997812,
-      "judge_s": 1.156347559997812,
+      "jev_s": 1.1596510029921774,
+      "judge_s": 1.1596510029921774,
       "luna_s": null,
-      "total_s": 1.15634926801431,
-      "writer_s": 1.7080164980143309e-06
+      "total_s": 1.1596539140155073,
+      "writer_s": 2.9110233299434185e-06
     }
   },
   {
@@ -389,7 +389,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -407,8 +407,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4136,
-            "latency_s": 1.292752,
+            "input_tokens": 4167,
+            "latency_s": 1.199545,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -421,19 +421,19 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.77,
-                "question": 0.23
+                "guess": 0.75,
+                "question": 0.25
               },
               "A2": {
-                "q_multi": 0.05,
-                "q_open": 0.04,
-                "q_yesno": 0.91
+                "q_multi": 0.06,
+                "q_open": 0.05,
+                "q_yesno": 0.89
               },
-              "A_bare": 0.03,
+              "A_bare": 0.04,
               "B": {
                 "point_0": 0.05
               },
-              "C": 0.29,
+              "C": 0.27,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -462,17 +462,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男が覚えたのはCDとか動画から？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2930876720056403,
-      "judge_s": 1.2930876720056403,
+      "jev_s": 1.1999178070109338,
+      "judge_s": 1.1999178070109338,
       "luna_s": null,
-      "total_s": 1.293089080019854,
-      "writer_s": 1.4080142136663198e-06
+      "total_s": 1.199920570012182,
+      "writer_s": 2.763001248240471e-06
     }
   },
   {
@@ -484,7 +484,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -502,8 +502,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4130,
-            "latency_s": 1.417682,
+            "input_tokens": 4161,
+            "latency_s": 1.110982,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -516,23 +516,23 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.27,
-                "question": 0.73
+                "guess": 0.2,
+                "question": 0.8
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.0,
                 "q_yesno": 1.0
               },
-              "A_bare": 0.03,
+              "A_bare": 0.04,
               "B": {
                 "point_0": 0.01
               },
-              "C": 0.32,
+              "C": 0.36,
               "D": {
-                "irrelevant": 0.01,
-                "no": 0.01,
-                "yes": 0.98
+                "irrelevant": 0.0,
+                "no": 0.0,
+                "yes": 1.0
               }
             }
           },
@@ -557,17 +557,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "隣にいた女性は男の奥さん？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.4180236729735043,
-      "judge_s": 1.4180236729735043,
+      "jev_s": 1.1112590680131689,
+      "judge_s": 1.1112590680131689,
       "luna_s": null,
-      "total_s": 1.4180256069812458,
-      "writer_s": 1.934007741510868e-06
+      "total_s": 1.1112615770252887,
+      "writer_s": 2.509012119844556e-06
     }
   },
   {
@@ -579,7 +579,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -597,8 +597,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4136,
-            "latency_s": 1.256832,
+            "input_tokens": 4167,
+            "latency_s": 2.422722,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -611,8 +611,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.71,
-                "question": 0.29
+                "guess": 0.73,
+                "question": 0.27
               },
               "A2": {
                 "q_multi": 0.01,
@@ -621,9 +621,9 @@ window.PROBE_RAW["jev-2b/U20"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.01
+                "point_0": 0.02
               },
-              "C": 0.61,
+              "C": 0.58,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -633,7 +633,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
         },
         "luna": null
       },
@@ -652,17 +652,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "女性は男をばかにして笑ったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2571771229850128,
-      "judge_s": 1.2571771229850128,
+      "jev_s": 2.423083212983329,
+      "judge_s": 2.423083212983329,
       "luna_s": null,
-      "total_s": 1.2571815159753896,
-      "writer_s": 4.392990376800299e-06
+      "total_s": 2.4230858919909224,
+      "writer_s": 2.6790075935423374e-06
     }
   },
   {
@@ -674,7 +674,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -692,8 +692,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4166,
-            "latency_s": 1.256583,
+            "input_tokens": 4197,
+            "latency_s": 1.245307,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -706,8 +706,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.83,
-                "question": 0.17
+                "guess": 0.76,
+                "question": 0.24
               },
               "A2": {
                 "q_multi": 0.0,
@@ -747,17 +747,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男はその曲を鼻歌で歌えるくらい知ってた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2569113979989197,
-      "judge_s": 1.2569113979989197,
+      "jev_s": 1.2456492999917828,
+      "judge_s": 1.2456492999917828,
       "luna_s": null,
-      "total_s": 1.256913870020071,
-      "writer_s": 2.4720211513340473e-06
+      "total_s": 1.2456517799873836,
+      "writer_s": 2.4799956008791924e-06
     }
   },
   {
@@ -769,7 +769,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -787,8 +787,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4136,
-            "latency_s": 1.156094,
+            "input_tokens": 4167,
+            "latency_s": 1.192904,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -813,10 +813,10 @@ window.PROBE_RAW["jev-2b/U20"] = [
               "B": {
                 "point_0": 0.02
               },
-              "C": 0.4,
+              "C": 0.36,
               "D": {
-                "irrelevant": 0.02,
-                "no": 0.98,
+                "irrelevant": 0.03,
+                "no": 0.97,
                 "yes": 0.0
               }
             }
@@ -842,17 +842,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "曲名って謎の答えに関係ある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1563508019899018,
-      "judge_s": 1.1563508019899018,
+      "jev_s": 1.193242993002059,
+      "judge_s": 1.193242993002059,
       "luna_s": null,
-      "total_s": 1.1563522589858621,
-      "writer_s": 1.4569959603250027e-06
+      "total_s": 1.1932459879899397,
+      "writer_s": 2.9949878808110952e-06
     }
   },
   {
@@ -864,7 +864,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -882,8 +882,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4148,
-            "latency_s": 1.242159,
+            "input_tokens": 4179,
+            "latency_s": 1.18275,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -896,19 +896,19 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.78,
-                "question": 0.22
+                "guess": 0.79,
+                "question": 0.21
               },
               "A2": {
-                "q_multi": 0.19,
+                "q_multi": 0.2,
                 "q_open": 0.0,
-                "q_yesno": 0.81
+                "q_yesno": 0.8
               },
-              "A_bare": 0.03,
+              "A_bare": 0.04,
               "B": {
                 "point_0": 0.07
               },
-              "C": 0.48,
+              "C": 0.53,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -937,17 +937,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男の耳か記憶力に問題があったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2424646080180537,
-      "judge_s": 1.2424646080180537,
+      "jev_s": 1.1831728020042647,
+      "judge_s": 1.1831728020042647,
       "luna_s": null,
-      "total_s": 1.242466093011899,
-      "writer_s": 1.4849938452243805e-06
+      "total_s": 1.1831752770231105,
+      "writer_s": 2.475018845871091e-06
     }
   },
   {
@@ -959,7 +959,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -978,7 +978,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2147,
-            "latency_s": 0.613411,
+            "latency_s": 0.592245,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -991,8 +991,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.07,
-                "question": 0.93
+                "guess": 0.08,
+                "question": 0.92
               },
               "A2": {
                 "q_multi": 0.99,
@@ -1023,17 +1023,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "ピアニストは演奏を間違えたの？男はピアノを弾けるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.6136023330036551,
-      "judge_s": 0.6136023330036551,
+      "jev_s": 0.5924449480080511,
+      "judge_s": 0.5924449480080511,
       "luna_s": null,
-      "total_s": 0.6136045260063838,
-      "writer_s": 2.1930027287453413e-06
+      "total_s": 0.5924478550150525,
+      "writer_s": 2.9070070013403893e-06
     }
   },
   {
@@ -1045,7 +1045,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1064,7 +1064,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2135,
-            "latency_s": 0.644186,
+            "latency_s": 0.637668,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1109,17 +1109,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男はどの音で間違えたと思ったの？隣の女は誰？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.6443826220056508,
-      "judge_s": 0.6443826220056508,
+      "jev_s": 0.6378494999953546,
+      "judge_s": 0.6378494999953546,
       "luna_s": null,
-      "total_s": 0.6443842979788315,
-      "writer_s": 1.675973180681467e-06
+      "total_s": 0.6378531490045134,
+      "writer_s": 3.649009158834815e-06
     }
   },
   {
@@ -1131,7 +1131,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1150,7 +1150,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2672,
-            "latency_s": 0.845726,
+            "latency_s": 0.820068,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1163,21 +1163,21 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.11,
-                "question": 0.89
+                "guess": 0.1,
+                "question": 0.9
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 1.0,
                 "q_yesno": 0.0
               },
-              "A3": 0.05,
+              "A3": 0.04,
               "A_bare": 0.02
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A=question→q_open, 再確認=0.05"
+          "reason": "段A=question→q_open, 再確認=0.04"
         },
         "luna": null
       },
@@ -1196,17 +1196,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "なぜ男は完璧な演奏を「あ、間違えた」と思ったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.845884112000931,
-      "judge_s": 0.845884112000931,
+      "jev_s": 0.8202690010075457,
+      "judge_s": 0.8202690010075457,
       "luna_s": null,
-      "total_s": 0.8458857980149332,
-      "writer_s": 1.6860140021890402e-06
+      "total_s": 0.8202717340027448,
+      "writer_s": 2.7329951990395784e-06
     }
   },
   {
@@ -1218,7 +1218,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1237,7 +1237,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2636,
-            "latency_s": 0.770267,
+            "latency_s": 0.887248,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1283,17 +1283,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "どうして隣の女は吹き出したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7704556160024367,
-      "judge_s": 0.7704556160024367,
+      "jev_s": 0.8874052400060464,
+      "judge_s": 0.8874052400060464,
       "luna_s": null,
-      "total_s": 0.7704571989888791,
-      "writer_s": 1.5829864423722029e-06
+      "total_s": 0.8874080759997014,
+      "writer_s": 2.835993655025959e-06
     }
   },
   {
@@ -1305,7 +1305,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1324,7 +1324,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2628,
-            "latency_s": 0.780425,
+            "latency_s": 0.75852,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 178,
@@ -1337,21 +1337,21 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.56,
-                "question": 0.44
+                "guess": 0.53,
+                "question": 0.47
               },
               "A2": {
                 "q_multi": 0.01,
-                "q_open": 0.22,
-                "q_yesno": 0.77
+                "q_open": 0.23,
+                "q_yesno": 0.76
               },
-              "A3": 0.57,
+              "A3": 0.55,
               "A_bare": 0.02
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A=question→q_open, 再確認=0.57"
+          "reason": "段A=question→q_open, 再確認=0.55"
         },
         "luna": null
       },
@@ -1370,17 +1370,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "彼は前からあれを知ってたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7806686240073759,
-      "judge_s": 0.7806686240073759,
+      "jev_s": 0.7586842529999558,
+      "judge_s": 0.7586842529999558,
       "luna_s": null,
-      "total_s": 0.7806704860122409,
-      "writer_s": 1.8620048649609089e-06
+      "total_s": 0.7586871539824642,
+      "writer_s": 2.9009825084358454e-06
     }
   },
   {
@@ -1392,7 +1392,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1409,12 +1409,12 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 2190,
-            "latency_s": 0.657842,
+            "calls": 4,
+            "input_tokens": 3457,
+            "latency_s": 0.792404,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 132,
+            "output_tokens": 154,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1430,12 +1430,13 @@ window.PROBE_RAW["jev-2b/U20"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.93
-              }
+              },
+              "B2": 0.05
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.93"
+          "reason": "段A=guess→guess_correct, 要点最低=0.93, 矛盾=0.05"
         },
         "luna": null
       },
@@ -1454,17 +1455,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "娘が毎晩同じ曲を練習し、いつも同じ場所で違う音を弾いていたので、男はその癖ごと覚えた。演奏会でピアニストが正しい音を弾き、男は間違いと思い、妻は娘の練習を知っていて笑った。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.6580981560109649,
-      "judge_s": 0.6580981560109649,
+      "jev_s": 0.7926116840098985,
+      "judge_s": 0.7926116840098985,
       "luna_s": null,
-      "total_s": 0.658099549007602,
-      "writer_s": 1.3929966371506453e-06
+      "total_s": 0.7926143030053936,
+      "writer_s": 2.6189954951405525e-06
     }
   },
   {
@@ -1476,7 +1477,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1493,12 +1494,12 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 2136,
-            "latency_s": 0.641091,
+            "calls": 4,
+            "input_tokens": 3385,
+            "latency_s": 0.821423,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 132,
+            "output_tokens": 154,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1508,18 +1509,19 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 1.0,
-                "question": 0.0
+                "guess": 0.99,
+                "question": 0.01
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.95
-              }
+              },
+              "B2": 0.08
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.95"
+          "reason": "段A=guess→guess_correct, 要点最低=0.95, 矛盾=0.08"
         },
         "luna": null
       },
@@ -1538,17 +1540,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "娘が毎晩同じ所を間違えて弾く曲を男はそのまま覚えた。正しい音を弾くピアニストを間違いだと思い、妻も娘の練習を知っていたので笑った、ってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.6413613339827862,
-      "judge_s": 0.6413613339827862,
+      "jev_s": 0.821822122001322,
+      "judge_s": 0.821822122001322,
       "luna_s": null,
-      "total_s": 0.6413625269779004,
-      "writer_s": 1.1929951142519712e-06
+      "total_s": 0.8218238239933271,
+      "writer_s": 1.701992005109787e-06
     }
   },
   {
@@ -1560,7 +1562,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1579,7 +1581,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2004,
-            "latency_s": 0.703192,
+            "latency_s": 0.548134,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 132,
@@ -1597,13 +1599,13 @@ window.PROBE_RAW["jev-2b/U20"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.44
+                "point_0": 0.49
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.44"
+          "reason": "段A=guess→guess_close, 要点最低=0.49"
         },
         "luna": null
       },
@@ -1622,17 +1624,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男が覚えてた曲のほうが、どこか間違った弾き方だったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7034098559815902,
-      "judge_s": 0.7034098559815902,
+      "jev_s": 0.548327361990232,
+      "judge_s": 0.548327361990232,
       "luna_s": null,
-      "total_s": 0.7034113330009859,
-      "writer_s": 1.4770193956792355e-06
+      "total_s": 0.548330038000131,
+      "writer_s": 2.676009899005294e-06
     }
   },
   {
@@ -1644,7 +1646,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1652,22 +1654,22 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "errors": [],
       "fact_sheet_hash": "cf479d5ab96c",
       "final": {
-        "answer": null,
+        "answer": "yes",
         "decision": "jev",
-        "kind": "guess_wrong"
+        "kind": "q_yesno"
       },
       "judgements": {
         "jev": {
-          "answer": null,
+          "answer": "yes",
           "bare_term": null,
           "debug": {
-            "calls": 4,
+            "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 2574,
-            "latency_s": 0.947352,
+            "input_tokens": 4299,
+            "latency_s": 1.201096,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 176,
+            "output_tokens": 238,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1682,18 +1684,24 @@ window.PROBE_RAW["jev-2b/U20"] = [
               },
               "A2": {
                 "q_multi": 0.01,
-                "q_open": 0.55,
-                "q_yesno": 0.44
+                "q_open": 0.48,
+                "q_yesno": 0.51
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.06
+                "point_0": 0.07
+              },
+              "C": 0.23,
+              "D": {
+                "irrelevant": 0.0,
+                "no": 0.01,
+                "yes": 0.99
               }
             }
           },
           "error": null,
-          "kind": "guess_wrong",
-          "reason": "段A=question→guess_wrong, 要点最低=0.06"
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.07"
         },
         "luna": null
       },
@@ -1704,7 +1712,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "over_80": false,
         "reply_id": null,
         "source": "template",
-        "text": "うーん、ちがうね。次の推理も待ってるよ。"
+        "text": "はい！"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1712,17 +1720,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "隣の女性も男がその曲を知っている理由を分かっていて、思わず笑ったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.9475895579962526,
-      "judge_s": 0.9475895579962526,
+      "jev_s": 1.2013463109906297,
+      "judge_s": 1.2013463109906297,
       "luna_s": null,
-      "total_s": 0.9475909800094087,
-      "writer_s": 1.4220131561160088e-06
+      "total_s": 1.2013491469842847,
+      "writer_s": 2.835993655025959e-06
     }
   },
   {
@@ -1734,7 +1742,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1754,7 +1762,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
             "calls": 4,
             "guess_demoted": true,
             "input_tokens": 2562,
-            "latency_s": 0.757113,
+            "latency_s": 0.865982,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1802,17 +1810,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "ピアニストが本当に何度も音を外し、隣の女は演奏が下手で笑ったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7573217780154664,
-      "judge_s": 0.7573217780154664,
+      "jev_s": 0.8661465519980993,
+      "judge_s": 0.8661465519980993,
       "luna_s": null,
-      "total_s": 0.7573234900191892,
-      "writer_s": 1.7120037227869034e-06
+      "total_s": 0.8661490429949481,
+      "writer_s": 2.4909968487918377e-06
     }
   },
   {
@@ -1824,7 +1832,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1844,7 +1852,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
             "calls": 4,
             "guess_demoted": true,
             "input_tokens": 2566,
-            "latency_s": 0.797591,
+            "latency_s": 0.79861,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1861,9 +1869,9 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "question": 0.0
               },
               "A2": {
-                "q_multi": 0.02,
-                "q_open": 0.79,
-                "q_yesno": 0.19
+                "q_multi": 0.01,
+                "q_open": 0.81,
+                "q_yesno": 0.18
               },
               "A_bare": 0.02,
               "B": {
@@ -1892,17 +1900,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男は音楽のプロで、演奏会の曲が別の編曲だったから間違いに気づいたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.7978319489920978,
-      "judge_s": 0.7978319489920978,
+      "jev_s": 0.7987872920057271,
+      "judge_s": 0.7987872920057271,
       "luna_s": null,
-      "total_s": 0.7978335579973646,
-      "writer_s": 1.6090052668005228e-06
+      "total_s": 0.7987898050050717,
+      "writer_s": 2.5129993446171284e-06
     }
   },
   {
@@ -1914,7 +1922,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -1932,8 +1940,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4118,
-            "latency_s": 1.385363,
+            "input_tokens": 4149,
+            "latency_s": 1.23131,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -1946,19 +1954,19 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.29,
-                "question": 0.71
+                "guess": 0.27,
+                "question": 0.73
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.01,
-                "q_yesno": 0.99
+                "q_open": 0.0,
+                "q_yesno": 1.0
               },
               "A_bare": 0.03,
               "B": {
                 "point_0": 0.02
               },
-              "C": 0.7,
+              "C": 0.71,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -1987,17 +1995,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男はピアニスト本人なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.3856752619904,
-      "judge_s": 1.3856752619904,
+      "jev_s": 1.231573761004256,
+      "judge_s": 1.231573761004256,
       "luna_s": null,
-      "total_s": 1.3856769089761656,
-      "writer_s": 1.6469857655465603e-06
+      "total_s": 1.2315766350075137,
+      "writer_s": 2.8740032576024532e-06
     }
   },
   {
@@ -2009,7 +2017,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2027,8 +2035,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4112,
-            "latency_s": 1.142183,
+            "input_tokens": 4143,
+            "latency_s": 1.123645,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -2053,7 +2061,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
               "B": {
                 "point_0": 0.01
               },
-              "C": 0.4,
+              "C": 0.33,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -2082,17 +2090,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男と女は知り合いなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1424705139943399,
-      "judge_s": 1.1424705139943399,
+      "jev_s": 1.1239284529874567,
+      "judge_s": 1.1239284529874567,
       "luna_s": null,
-      "total_s": 1.1424722440133337,
-      "writer_s": 1.7300189938396215e-06
+      "total_s": 1.1239309029770084,
+      "writer_s": 2.4499895516783e-06
     }
   },
   {
@@ -2104,7 +2112,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2122,8 +2130,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4118,
-            "latency_s": 1.223536,
+            "input_tokens": 4149,
+            "latency_s": 1.261157,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -2136,8 +2144,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.05,
-                "question": 0.95
+                "guess": 0.04,
+                "question": 0.96
               },
               "A2": {
                 "q_multi": 0.0,
@@ -2177,17 +2185,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男はピアノを弾けるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2237909859977663,
-      "judge_s": 1.2237909859977663,
+      "jev_s": 1.2614107980043627,
+      "judge_s": 1.2614107980043627,
       "luna_s": null,
-      "total_s": 1.2237925340014044,
-      "writer_s": 1.548003638163209e-06
+      "total_s": 1.261413258005632,
+      "writer_s": 2.4600012693554163e-06
     }
   },
   {
@@ -2199,7 +2207,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2217,8 +2225,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4136,
-            "latency_s": 1.222306,
+            "input_tokens": 4167,
+            "latency_s": 1.177922,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -2236,14 +2244,14 @@ window.PROBE_RAW["jev-2b/U20"] = [
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.0,
-                "q_yesno": 1.0
+                "q_open": 0.01,
+                "q_yesno": 0.99
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.01
+                "point_0": 0.02
               },
-              "C": 0.77,
+              "C": 0.74,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -2253,7 +2261,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
         },
         "luna": null
       },
@@ -2272,17 +2280,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "女は男の言葉を聞いて笑ったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.222568675992079,
-      "judge_s": 1.222568675992079,
+      "jev_s": 1.1782467729935888,
+      "judge_s": 1.1782467729935888,
       "luna_s": null,
-      "total_s": 1.2225713020015974,
-      "writer_s": 2.6260095182806253e-06
+      "total_s": 1.1782492079946678,
+      "writer_s": 2.435001078993082e-06
     }
   },
   {
@@ -2294,7 +2302,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2312,8 +2320,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4124,
-            "latency_s": 1.12109,
+            "input_tokens": 4155,
+            "latency_s": 1.146643,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -2326,8 +2334,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.04,
-                "question": 0.96
+                "guess": 0.03,
+                "question": 0.97
               },
               "A2": {
                 "q_multi": 0.0,
@@ -2336,19 +2344,19 @@ window.PROBE_RAW["jev-2b/U20"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.02
+                "point_0": 0.01
               },
-              "C": 0.56,
+              "C": 0.49,
               "D": {
-                "irrelevant": 0.19,
+                "irrelevant": 0.26,
                 "no": 0.03,
-                "yes": 0.78
+                "yes": 0.71
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -2367,17 +2375,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男も演奏会のお客さんなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.1212825660186354,
-      "judge_s": 1.1212825660186354,
+      "jev_s": 1.1469704170012847,
+      "judge_s": 1.1469704170012847,
       "luna_s": null,
-      "total_s": 1.1212840400112327,
-      "writer_s": 1.4739925973117352e-06
+      "total_s": 1.1469731940014753,
+      "writer_s": 2.77700019069016e-06
     }
   },
   {
@@ -2389,7 +2397,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2407,8 +2415,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4106,
-            "latency_s": 1.073923,
+            "input_tokens": 4137,
+            "latency_s": 1.211126,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -2421,8 +2429,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.82,
-                "question": 0.18
+                "guess": 0.83,
+                "question": 0.17
               },
               "A2": {
                 "q_multi": 0.0,
@@ -2433,10 +2441,10 @@ window.PROBE_RAW["jev-2b/U20"] = [
               "B": {
                 "point_0": 0.02
               },
-              "C": 0.66,
+              "C": 0.64,
               "D": {
-                "irrelevant": 0.15,
-                "no": 0.85,
+                "irrelevant": 0.11,
+                "no": 0.89,
                 "yes": 0.0
               }
             }
@@ -2462,17 +2470,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "演奏は録音だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.0741688239795621,
-      "judge_s": 1.0741688239795621,
+      "jev_s": 1.211419671017211,
+      "judge_s": 1.211419671017211,
       "luna_s": null,
-      "total_s": 1.0741702759987675,
-      "writer_s": 1.4520192053169012e-06
+      "total_s": 1.2114220830262639,
+      "writer_s": 2.4120090529322624e-06
     }
   },
   {
@@ -2484,7 +2492,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2503,8 +2511,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 4136,
-            "latency_s": 1.124088,
+            "input_tokens": 4167,
+            "latency_s": 1.102628,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 238,
@@ -2517,22 +2525,22 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.97,
-                "question": 0.03
+                "guess": 0.96,
+                "question": 0.04
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.01,
-                "q_yesno": 0.99
+                "q_open": 0.02,
+                "q_yesno": 0.98
               },
               "A_bare": 0.06,
               "B": {
                 "point_0": 0.08
               },
-              "C": 0.55,
+              "C": 0.53,
               "D": {
-                "irrelevant": 0.07,
-                "no": 0.93,
+                "irrelevant": 0.06,
+                "no": 0.94,
                 "yes": 0.0
               }
             }
@@ -2558,17 +2566,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "曲の選び方を間違えたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.12428596499376,
-      "judge_s": 1.12428596499376,
+      "jev_s": 1.1029835649824236,
+      "judge_s": 1.1029835649824236,
       "luna_s": null,
-      "total_s": 1.1242875510070007,
-      "writer_s": 1.5860132407397032e-06
+      "total_s": 1.1029860389826354,
+      "writer_s": 2.474000211805105e-06
     }
   },
   {
@@ -2580,7 +2588,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2598,8 +2606,8 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4142,
-            "latency_s": 1.237099,
+            "input_tokens": 4173,
+            "latency_s": 1.151116,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 240,
@@ -2612,22 +2620,22 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.17,
-                "question": 0.83
+                "guess": 0.21,
+                "question": 0.79
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.0,
                 "q_yesno": 1.0
               },
-              "A_bare": 0.03,
+              "A_bare": 0.02,
               "B": {
                 "point_0": 0.01
               },
-              "C": 0.42,
+              "C": 0.43,
               "D": {
-                "irrelevant": 0.88,
-                "no": 0.12,
+                "irrelevant": 0.9,
+                "no": 0.1,
                 "yes": 0.0
               }
             }
@@ -2653,17 +2661,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "ピアノ以外の楽器も演奏されてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 1.2374008859915193,
-      "judge_s": 1.2374008859915193,
+      "jev_s": 1.1514011390099768,
+      "judge_s": 1.1514011390099768,
       "luna_s": null,
-      "total_s": 1.2374021919677034,
-      "writer_s": 1.3059761840850115e-06
+      "total_s": 1.1514037860033568,
+      "writer_s": 2.6469933800399303e-06
     }
   },
   {
@@ -2675,7 +2683,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2685,19 +2693,19 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "final": {
         "answer": null,
         "decision": "jev",
-        "kind": "guess_correct"
+        "kind": "guess_close"
       },
       "judgements": {
         "jev": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 2067,
-            "latency_s": 0.596194,
+            "calls": 4,
+            "input_tokens": 3293,
+            "latency_s": 0.767916,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 132,
+            "output_tokens": 154,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2713,12 +2721,13 @@ window.PROBE_RAW["jev-2b/U20"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": 0.95
-              }
+              },
+              "B2": 0.73
             }
           },
           "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.95"
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.95, 矛盾=0.73"
         },
         "luna": null
       },
@@ -2729,7 +2738,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "over_80": false,
         "reply_id": null,
         "source": "template",
-        "text": "正解！男は娘が毎晩間違えて弾く曲を覚えていた。正しく弾くピアニストを間違いと思い、妻はその理由に笑った。"
+        "text": "惜しい！推理を続けてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2737,17 +2746,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "男は娘の間違った弾き方を聞いて曲を覚えたんだね。でも演奏会で弾いていたのも、実はその娘だったのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.5963735890109092,
-      "judge_s": 0.5963735890109092,
+      "jev_s": 0.7681900220050011,
+      "judge_s": 0.7681900220050011,
       "luna_s": null,
-      "total_s": 0.5963745430053677,
-      "writer_s": 9.53994458541274e-07
+      "total_s": 0.7681927340163384,
+      "writer_s": 2.7120113372802734e-06
     }
   },
   {
@@ -2759,7 +2768,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2778,7 +2787,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 933,
-            "latency_s": 0.22117,
+            "latency_s": 0.20229,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -2813,17 +2822,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "娘の弾き間違い？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.22129099399899133,
-      "judge_s": 0.22129099399899133,
+      "jev_s": 0.20240185799775645,
+      "judge_s": 0.20240185799775645,
       "luna_s": null,
-      "total_s": 0.2212929879897274,
-      "writer_s": 1.9939907360821962e-06
+      "total_s": 0.20240513602038845,
+      "writer_s": 3.2780226320028305e-06
     }
   },
   {
@@ -2835,7 +2844,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2854,15 +2863,15 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 927,
-            "latency_s": 0.223961,
+            "latency_s": 0.188928,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
               "A1": {
-                "inappropriate": 0.0,
+                "inappropriate": 0.01,
                 "other": 0.01,
-                "question_or_guess": 0.91,
-                "reaction": 0.08,
+                "question_or_guess": 0.89,
+                "reaction": 0.09,
                 "request": 0.0
               },
               "A_bare": 0.97
@@ -2889,17 +2898,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "月曜日",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.2240819960134104,
-      "judge_s": 0.2240819960134104,
+      "jev_s": 0.18905028500012122,
+      "judge_s": 0.18905028500012122,
       "luna_s": null,
-      "total_s": 0.224083902023267,
-      "writer_s": 1.9060098566114902e-06
+      "total_s": 0.18905325600644574,
+      "writer_s": 2.9710063245147467e-06
     }
   },
   {
@@ -2911,7 +2920,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -2930,7 +2939,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1421,
-            "latency_s": 0.496471,
+            "latency_s": 0.391338,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 124,
@@ -2939,15 +2948,15 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "inappropriate": 0.0,
                 "other": 0.0,
                 "question_or_guess": 0.01,
-                "reaction": 0.07,
-                "request": 0.92
+                "reaction": 0.1,
+                "request": 0.89
               },
               "A2": {
                 "ask_hint": 0.01,
                 "ask_howto": 0.0,
                 "ask_spoiler": 0.99
               },
-              "A_bare": 0.47
+              "A_bare": 0.48
             }
           },
           "error": null,
@@ -2971,17 +2980,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "ネタバレどこ？笑",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.49662402700050734,
-      "judge_s": 0.49662402700050734,
+      "jev_s": 0.39149354299297556,
+      "judge_s": 0.39149354299297556,
       "luna_s": null,
-      "total_s": 0.49663684199913405,
-      "writer_s": 1.2814998626708984e-05
+      "total_s": 0.3914962580020074,
+      "writer_s": 2.715009031817317e-06
     }
   },
   {
@@ -2993,7 +3002,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -3012,7 +3021,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1586,
-            "latency_s": 0.399902,
+            "latency_s": 0.37683,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -3033,7 +3042,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "mention": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.16
+              "A_bare": 0.15
             }
           },
           "error": null,
@@ -3057,17 +3066,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "おはようございます〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.4000908489979338,
-      "judge_s": 0.4000908489979338,
+      "jev_s": 0.3769215819775127,
+      "judge_s": 0.3769215819775127,
       "luna_s": null,
-      "total_s": 0.4000963069847785,
-      "writer_s": 5.457986844703555e-06
+      "total_s": 0.37692505298764445,
+      "writer_s": 3.4710101317614317e-06
     }
   },
   {
@@ -3079,7 +3088,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -3098,7 +3107,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1586,
-            "latency_s": 0.379217,
+            "latency_s": 0.414595,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -3119,7 +3128,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "mention": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.06
+              "A_bare": 0.08
             }
           },
           "error": null,
@@ -3143,17 +3152,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "昨日寝不足で頭回らん",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.3793430219811853,
-      "judge_s": 0.3793430219811853,
+      "jev_s": 0.41471788499620743,
+      "judge_s": 0.41471788499620743,
       "luna_s": null,
-      "total_s": 0.3793477979779709,
-      "writer_s": 4.775996785610914e-06
+      "total_s": 0.4147204769833479,
+      "writer_s": 2.5919871404767036e-06
     }
   },
   {
@@ -3165,7 +3174,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -3184,7 +3193,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1582,
-            "latency_s": 0.38789,
+            "latency_s": 0.363606,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -3205,7 +3214,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
                 "mention": 1.0,
                 "request": 0.0
               },
-              "A_bare": 0.09
+              "A_bare": 0.08
             }
           },
           "error": null,
@@ -3229,17 +3238,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "@ken 見て見て",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.38811497497954406,
-      "judge_s": 0.38811497497954406,
+      "jev_s": 0.36372584899072535,
+      "judge_s": 0.36372584899072535,
       "luna_s": null,
-      "total_s": 0.38811953098047525,
-      "writer_s": 4.556000931188464e-06
+      "total_s": 0.363728413998615,
+      "writer_s": 2.5650078896433115e-06
     }
   },
   {
@@ -3251,7 +3260,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -3270,7 +3279,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1470,
-            "latency_s": 0.421076,
+            "latency_s": 0.402252,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 129,
@@ -3312,17 +3321,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "作者ほんと頭悪そう",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 0.421209057996748,
-      "judge_s": 0.421209057996748,
+      "jev_s": 0.4024001049983781,
+      "judge_s": 0.4024001049983781,
       "luna_s": null,
-      "total_s": 0.4212140569870826,
-      "writer_s": 4.998990334570408e-06
+      "total_s": 0.40240312498644926,
+      "writer_s": 3.0199880711734295e-06
     }
   },
   {
@@ -3334,7 +3343,7 @@ window.PROBE_RAW["jev-2b/U20"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "2b",
         "shadow": false
       },
@@ -3379,17 +3388,17 @@ window.PROBE_RAW["jev-2b/U20"] = [
       "text": "I don't get it, can you explain?",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
-      "jev_s": 8.56629922054708e-05,
-      "judge_s": 8.56629922054708e-05,
+      "jev_s": 9.726700955070555e-05,
+      "judge_s": 9.726700955070555e-05,
       "luna_s": null,
-      "total_s": 9.00479790288955e-05,
-      "writer_s": 4.384986823424697e-06
+      "total_s": 0.00010016499436460435,
+      "writer_s": 2.897984813898802e-06
     }
   }
 ];

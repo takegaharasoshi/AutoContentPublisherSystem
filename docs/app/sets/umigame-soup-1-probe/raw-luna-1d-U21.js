@@ -9,208 +9,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "009-year-late-verdict",
-      "errors": [],
-      "fact_sheet_hash": "441cba9e5415",
-      "final": {
-        "answer": "yes",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "yes",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 351,
-            "finish_reason": "stop",
-            "latency_s": 8.830954,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2923,
-            "reasoning_tokens": 290
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "問題文で男と弟は兄弟として示されています。"
-        }
-      },
-      "media_id": "local-U21",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい！ほかにも聞いてごらん。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男と弟は本当の兄弟ですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 8.831010975001846,
-      "luna_s": 8.831010975001846,
-      "total_s": 9.99901294297888,
-      "writer_s": 1.168001967977034
-    }
-  },
-  {
-    "case_id": "U21-e02",
-    "record": {
-      "comment_id": "U21-e02",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "009-year-late-verdict",
-      "errors": [],
-      "fact_sheet_hash": "441cba9e5415",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 154,
-            "finish_reason": "stop",
-            "latency_s": 2.032134,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2930,
-            "reasoning_tokens": 78
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "確定事実で、すいかを育てる勝負ではないと明記されています。"
-        }
-      },
-      "media_id": "local-U21",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。二人でスイカを育てる勝負をしていたわけじゃないよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "二人でスイカを育てる勝負をしていたんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 2.0321632660052273,
-      "luna_s": 2.0321632660052273,
-      "total_s": 4.060109530983027,
-      "writer_s": 2.0279462649777997
-    }
-  },
-  {
-    "case_id": "U21-e03",
-    "record": {
-      "comment_id": "U21-e03",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "009-year-late-verdict",
-      "errors": [],
-      "fact_sheet_hash": "441cba9e5415",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 290,
-            "finish_reason": "stop",
-            "latency_s": 3.041781,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2926,
-            "reasoning_tokens": 219
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "弟が意図して育てたのではなく、飛ばした種から自然に育ったため。"
-        }
-      },
-      "media_id": "local-U21",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "庭のスイカは弟が育てたものですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.0418476249906234,
-      "luna_s": 3.0418476249906234,
-      "total_s": 3.913198724971153,
-      "writer_s": 0.8713510999805294
-    }
-  },
-  {
-    "case_id": "U21-e04",
-    "record": {
-      "comment_id": "U21-e04",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -228,16 +27,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 258,
+            "completion_tokens": 285,
             "finish_reason": "stop",
-            "latency_s": 2.821858,
+            "latency_s": 3.757809,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2930,
-            "reasoning_tokens": 192
+            "prompt_tokens": 2949,
+            "reasoning_tokens": 212
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "すいかの大きさは問題に関係ないため。"
+          "reason": "弟とは示されていますが、血縁上の関係かどうかは真相から判断できません。"
         }
       },
       "media_id": "local-U21",
@@ -247,238 +46,37 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。"
+        "text": "関係ないよ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "スイカはもう食べられるくらい大きくなってましたか？",
+      "text": "男と弟は本当の兄弟ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.8219137450214475,
-      "luna_s": 2.8219137450214475,
-      "total_s": 5.955701704020612,
-      "writer_s": 3.1337879589991644
+      "judge_s": 3.757869506982388,
+      "luna_s": 3.757869506982388,
+      "total_s": 4.995210883993423,
+      "writer_s": 1.2373413770110346
     }
   },
   {
-    "case_id": "U21-e05",
+    "case_id": "U21-e02",
     "record": {
-      "comment_id": "U21-e05",
+      "comment_id": "U21-e02",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "009-year-late-verdict",
-      "errors": [],
-      "fact_sheet_hash": "441cba9e5415",
-      "final": {
-        "answer": "yes",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "yes",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 208,
-            "finish_reason": "stop",
-            "latency_s": 8.098367,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2928,
-            "reasoning_tokens": 139
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "「お前の勝ち」の意味を一つだけ尋ねており、真相でも弟の勝ちを認めています。"
-        }
-      },
-      "media_id": "local-U21",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい！"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "「お前の勝ち」は、弟が勝ったという意味ですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 8.098392627987778,
-      "luna_s": 8.098392627987778,
-      "total_s": 11.170217806007713,
-      "writer_s": 3.0718251780199353
-    }
-  },
-  {
-    "case_id": "U21-e06",
-    "record": {
-      "comment_id": "U21-e06",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "009-year-late-verdict",
-      "errors": [],
-      "fact_sheet_hash": "441cba9e5415",
-      "final": {
-        "answer": "yes",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "yes",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 330,
-            "finish_reason": "stop",
-            "latency_s": 3.58044,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2934,
-            "reasoning_tokens": 264
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "男は昨年の勝負を思い出し、負けを認めました。"
-        }
-      },
-      "media_id": "local-U21",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい！昔のことを思い出したんだよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男はスイカを見て、何か昔のことを思い出したんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.5804694310063496,
-      "luna_s": 3.5804694310063496,
-      "total_s": 5.704478718980681,
-      "writer_s": 2.1240092879743315
-    }
-  },
-  {
-    "case_id": "U21-e07",
-    "record": {
-      "comment_id": "U21-e07",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "009-year-late-verdict",
-      "errors": [],
-      "fact_sheet_hash": "441cba9e5415",
-      "final": {
-        "answer": "unknown",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "unknown",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 689,
-            "finish_reason": "stop",
-            "latency_s": 5.697388,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2928,
-            "reasoning_tokens": 596
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "このスイカを家族が植えていないことは分かりますが、毎年育てるかは不明です。"
-        }
-      },
-      "media_id": "local-U21",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "それは答えに関わらないんだ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "実家では毎年スイカを育てているんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 5.69744108102168,
-      "luna_s": 5.69744108102168,
-      "total_s": 6.792725738021545,
-      "writer_s": 1.0952846569998655
-    }
-  },
-  {
-    "case_id": "U21-e08",
-    "record": {
-      "comment_id": "U21-e08",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -496,16 +94,83 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 250,
+            "completion_tokens": 198,
             "finish_reason": "stop",
-            "latency_s": 2.969447,
+            "latency_s": 2.959411,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2929,
-            "reasoning_tokens": 178
+            "prompt_tokens": 2956,
+            "reasoning_tokens": 124
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "競っていたのはスイカの大きさではなく、種を飛ばす勝負です。"
+          "reason": "育てる勝負かを尋ねる一つの質問で、確定事実では否定されています。"
+        }
+      },
+      "media_id": "local-U21",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。二人でスイカを育てる勝負ではないよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "二人でスイカを育てる勝負をしていたんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.959438321995549,
+      "luna_s": 2.959438321995549,
+      "total_s": 7.209125805995427,
+      "writer_s": 4.249687483999878
+    }
+  },
+  {
+    "case_id": "U21-e03",
+    "record": {
+      "comment_id": "U21-e03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "009-year-late-verdict",
+      "errors": [],
+      "fact_sheet_hash": "441cba9e5415",
+      "final": {
+        "answer": "no",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 612,
+            "finish_reason": "stop",
+            "latency_s": 6.836992,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2952,
+            "reasoning_tokens": 530
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "弟が植えたり世話したりしたのではなく、弟の種から自然に育ったためです。"
         }
       },
       "media_id": "local-U21",
@@ -520,32 +185,32 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "二人はスイカの大きさを競ってたんですか？",
+      "text": "庭のスイカは弟が育てたものですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.9694948210089933,
-      "luna_s": 2.9694948210089933,
-      "total_s": 3.9559567279939074,
-      "writer_s": 0.9864619069849141
+      "judge_s": 6.837045187014155,
+      "luna_s": 6.837045187014155,
+      "total_s": 8.37563938400126,
+      "writer_s": 1.5385941969871055
     }
   },
   {
-    "case_id": "U21-e09",
+    "case_id": "U21-e04",
     "record": {
-      "comment_id": "U21-e09",
+      "comment_id": "U21-e04",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -553,26 +218,26 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "errors": [],
       "fact_sheet_hash": "441cba9e5415",
       "final": {
-        "answer": "unknown",
+        "answer": "irrelevant",
         "decision": "luna",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": null,
         "luna": {
-          "answer": "unknown",
+          "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 738,
+            "completion_tokens": 216,
             "finish_reason": "stop",
-            "latency_s": 6.82987,
+            "latency_s": 3.32891,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2930,
-            "reasoning_tokens": 662
+            "prompt_tokens": 2956,
+            "reasoning_tokens": 136
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "事前に知っていたかどうかは、真相にも確定事実にもありません。"
+          "reason": "すいかの大きさは真相に関係せず、食べられる程度かは判断できません。"
         }
       },
       "media_id": "local-U21",
@@ -582,37 +247,37 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "それは答えに関わらないんだ。"
+        "text": "関係ないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "男はスイカが実っていることを事前に知ってましたか？",
+      "text": "スイカはもう食べられるくらい大きくなってましたか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 6.829923306999262,
-      "luna_s": 6.829923306999262,
-      "total_s": 7.90619606198743,
-      "writer_s": 1.0762727549881674
+      "judge_s": 3.3289382770017255,
+      "luna_s": 3.3289382770017255,
+      "total_s": 4.355413391982438,
+      "writer_s": 1.0264751149807125
     }
   },
   {
-    "case_id": "U21-e10",
+    "case_id": "U21-e05",
     "record": {
-      "comment_id": "U21-e10",
+      "comment_id": "U21-e05",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -630,16 +295,351 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 181,
+            "completion_tokens": 237,
             "finish_reason": "stop",
-            "latency_s": 2.374302,
+            "latency_s": 3.248467,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2933,
-            "reasoning_tokens": 105
+            "prompt_tokens": 2954,
+            "reasoning_tokens": 170
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、実った場所は勝負の結果と関係するとあるため。"
+          "reason": "「お前の勝ち」は弟が勝ったという意味で、真相とも一致します。"
+        }
+      },
+      "media_id": "local-U21",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "「お前の勝ち」は、弟が勝ったという意味ですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.2485010500240605,
+      "luna_s": 3.2485010500240605,
+      "total_s": 4.440387276030378,
+      "writer_s": 1.1918862260063179
+    }
+  },
+  {
+    "case_id": "U21-e06",
+    "record": {
+      "comment_id": "U21-e06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "009-year-late-verdict",
+      "errors": [],
+      "fact_sheet_hash": "441cba9e5415",
+      "final": {
+        "answer": "yes",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 591,
+            "finish_reason": "stop",
+            "latency_s": 7.019853,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2960,
+            "reasoning_tokens": 512
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "過去の出来事を思い出したかを尋ねる、単一のはい／いいえ質問です。"
+        }
+      },
+      "media_id": "local-U21",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！昔のことを思い出したんだね。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男はスイカを見て、何か昔のことを思い出したんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 7.019913625990739,
+      "luna_s": 7.019913625990739,
+      "total_s": 9.138025569001911,
+      "writer_s": 2.118111943011172
+    }
+  },
+  {
+    "case_id": "U21-e07",
+    "record": {
+      "comment_id": "U21-e07",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "009-year-late-verdict",
+      "errors": [],
+      "fact_sheet_hash": "441cba9e5415",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 323,
+            "finish_reason": "stop",
+            "latency_s": 4.055398,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2954,
+            "reasoning_tokens": 252
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "毎年育てているかは、提示された事実から判断できません。"
+        }
+      },
+      "media_id": "local-U21",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "実家では毎年スイカを育てているんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.055451705004089,
+      "luna_s": 4.055451705004089,
+      "total_s": 5.217494699987583,
+      "writer_s": 1.1620429949834943
+    }
+  },
+  {
+    "case_id": "U21-e08",
+    "record": {
+      "comment_id": "U21-e08",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "009-year-late-verdict",
+      "errors": [],
+      "fact_sheet_hash": "441cba9e5415",
+      "final": {
+        "answer": "no",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 184,
+            "finish_reason": "stop",
+            "latency_s": 2.758883,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2955,
+            "reasoning_tokens": 119
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "競っていたのはすいかの大きさではありません。"
+        }
+      },
+      "media_id": "local-U21",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "二人はスイカの大きさを競ってたんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.7589110740227625,
+      "luna_s": 2.7589110740227625,
+      "total_s": 4.452969320031116,
+      "writer_s": 1.6940582460083533
+    }
+  },
+  {
+    "case_id": "U21-e09",
+    "record": {
+      "comment_id": "U21-e09",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "009-year-late-verdict",
+      "errors": [],
+      "fact_sheet_hash": "441cba9e5415",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 345,
+            "finish_reason": "stop",
+            "latency_s": 4.739749,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2956,
+            "reasoning_tokens": 267
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "事前に知っていたかどうかは、真相にも確定事実にも示されていません。"
+        }
+      },
+      "media_id": "local-U21",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男はスイカが実っていることを事前に知ってましたか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.739803141012089,
+      "luna_s": 4.739803141012089,
+      "total_s": 5.750108175008791,
+      "writer_s": 1.0103050339967012
+    }
+  },
+  {
+    "case_id": "U21-e10",
+    "record": {
+      "comment_id": "U21-e10",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "009-year-late-verdict",
+      "errors": [],
+      "fact_sheet_hash": "441cba9e5415",
+      "final": {
+        "answer": "yes",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 264,
+            "finish_reason": "stop",
+            "latency_s": 3.211026,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2959,
+            "reasoning_tokens": 193
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "場所と勝負の結果に関係があるかを尋ねる、単独の二択質問です。"
         }
       },
       "media_id": "local-U21",
@@ -657,17 +657,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "スイカの置かれた場所が勝負の結果に関係するんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.374628454010235,
-      "luna_s": 2.374628454010235,
-      "total_s": 6.009103402990149,
-      "writer_s": 3.634474948979914
+      "judge_s": 3.2110554079990834,
+      "luna_s": 3.2110554079990834,
+      "total_s": 4.46039444298367,
+      "writer_s": 1.2493390349845868
     }
   },
   {
@@ -679,7 +679,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -697,16 +697,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 137,
+            "completion_tokens": 183,
             "finish_reason": "stop",
-            "latency_s": 2.270976,
+            "latency_s": 2.458655,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2937,
-            "reasoning_tokens": 61
+            "prompt_tokens": 2963,
+            "reasoning_tokens": 106
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "育てていたか、スイカの大きさか、質問が二つあります。"
+          "reason": "育てていたか、大きさか、二つの質問が含まれています。"
         }
       },
       "media_id": "local-U21",
@@ -716,7 +716,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつ聞いてごらん。どちらからいこうか？"
+        "text": "質問は一つずつコメントしてね。どっちから聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -724,17 +724,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "二人で何かを育ててたの？弟のスイカのほうが大きかったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2710288499947637,
-      "luna_s": 2.2710288499947637,
-      "total_s": 5.646095470001455,
-      "writer_s": 3.3750666200066917
+      "judge_s": 2.4587109870044515,
+      "luna_s": 2.4587109870044515,
+      "total_s": 4.0854346090054605,
+      "writer_s": 1.626723622001009
     }
   },
   {
@@ -746,7 +746,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -764,12 +764,12 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 410,
+            "completion_tokens": 230,
             "finish_reason": "stop",
-            "latency_s": 3.611891,
+            "latency_s": 3.196803,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2932,
-            "reasoning_tokens": 328
+            "prompt_tokens": 2958,
+            "reasoning_tokens": 150
           },
           "error": null,
           "kind": "q_multi",
@@ -783,7 +783,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつ聞いてごらん。どっちから聞こうか？"
+        "text": "質問はひとつずつ聞いてごらん。どちらからにしようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -791,17 +791,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "スイカは自然に生えたの？それとも弟が種をまいたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.6119153820036445,
-      "luna_s": 3.6119153820036445,
-      "total_s": 11.267033976997482,
-      "writer_s": 7.655118594993837
+      "judge_s": 3.196838909992948,
+      "luna_s": 3.196838909992948,
+      "total_s": 4.8839378170087,
+      "writer_s": 1.687098907015752
     }
   },
   {
@@ -813,7 +813,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -831,16 +831,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 140,
+            "completion_tokens": 206,
             "finish_reason": "stop",
-            "latency_s": 1.950816,
+            "latency_s": 2.583725,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2929,
-            "reasoning_tokens": 61
+            "prompt_tokens": 2955,
+            "reasoning_tokens": 115
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「何を見て」と理由を尋ねており、はい・いいえでは答えられません。"
+          "reason": "「何を見たか」を尋ねる質問で、はい／いいえでは答えられません。"
         }
       },
       "media_id": "local-U21",
@@ -850,7 +850,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "男は何かを見て弟の勝ちだとわかったのかな？はい・いいえで答えられる形で聞いてごらん。"
+        "text": "はい・いいえで答えられる形で聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -858,17 +858,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "男は何を見て弟の勝ちだとわかったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.9508462180092465,
-      "luna_s": 1.9508462180092465,
-      "total_s": 3.5605111490294803,
-      "writer_s": 1.6096649310202338
+      "judge_s": 2.5837580469960812,
+      "luna_s": 2.5837580469960812,
+      "total_s": 5.194915586995194,
+      "writer_s": 2.6111575399991125
     }
   },
   {
@@ -880,7 +880,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -898,16 +898,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 170,
+            "completion_tokens": 160,
             "finish_reason": "stop",
-            "latency_s": 2.102349,
+            "latency_s": 2.317191,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2924,
-            "reasoning_tokens": 96
+            "prompt_tokens": 2950,
+            "reasoning_tokens": 82
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「どんな勝負？」は、はい・いいえで答えられない質問です。"
+          "reason": "「どんな勝負か」は自由な説明が必要で、はい・いいえでは答えられません。"
         }
       },
       "media_id": "local-U21",
@@ -917,7 +917,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で聞き直してみてね。"
+        "text": "はい・いいえで答えられる形にして、聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -925,17 +925,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "二人はどんな勝負をしていたんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.102375952003058,
-      "luna_s": 2.102375952003058,
-      "total_s": 3.7950559269811492,
-      "writer_s": 1.6926799749780912
+      "judge_s": 2.3172473020094912,
+      "luna_s": 2.3172473020094912,
+      "total_s": 4.4449078750330955,
+      "writer_s": 2.1276605730236042
     }
   },
   {
@@ -947,7 +947,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -965,16 +965,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 166,
+            "completion_tokens": 181,
             "finish_reason": "stop",
-            "latency_s": 2.188113,
+            "latency_s": 2.483527,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2921,
-            "reasoning_tokens": 85
+            "prompt_tokens": 2947,
+            "reasoning_tokens": 103
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「何に勝ったか」を尋ねる、はい・いいえでは答えられない質問です。"
+          "reason": "「何に勝ったか」を尋ねる、はい／いいえでは答えられない質問です。"
         }
       },
       "media_id": "local-U21",
@@ -984,7 +984,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "弟は何かに勝ったの？みたいに、はい・いいえで答えられる形で聞いてごらん。"
+        "text": "弟は何かに勝ったのか、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -992,17 +992,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "弟は何に勝ったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.188176547992043,
-      "luna_s": 2.188176547992043,
-      "total_s": 3.771798896981636,
-      "writer_s": 1.5836223489895929
+      "judge_s": 2.4835565219982527,
+      "luna_s": 2.4835565219982527,
+      "total_s": 5.379786278994288,
+      "writer_s": 2.8962297569960356
     }
   },
   {
@@ -1014,7 +1014,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1032,16 +1032,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 400,
+            "completion_tokens": 306,
             "finish_reason": "stop",
-            "latency_s": 9.20922,
+            "latency_s": 3.461768,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2935,
-            "reasoning_tokens": 298
+            "prompt_tokens": 2961,
+            "reasoning_tokens": 204
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "種飛ばしの勝負と、弟の種からすいかが育った点を言い当てています。"
+          "reason": "種飛ばしの勝負と、弟の種から育った点の両方を言い当てています。"
         }
       },
       "media_id": "local-U21",
@@ -1059,17 +1059,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "去年の種飛ばしで、弟が飛ばした種からスイカが育ったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 9.209267103986349,
-      "luna_s": 9.209267103986349,
-      "total_s": 9.209278573980555,
-      "writer_s": 1.1469994205981493e-05
+      "judge_s": 3.461801978002768,
+      "luna_s": 3.461801978002768,
+      "total_s": 3.4618082579982,
+      "writer_s": 6.279995432123542e-06
     }
   },
   {
@@ -1081,7 +1081,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1099,16 +1099,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 282,
+            "completion_tokens": 213,
             "finish_reason": "stop",
-            "latency_s": 3.204264,
+            "latency_s": 2.579091,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2956,
-            "reasoning_tokens": 170
+            "prompt_tokens": 2982,
+            "reasoning_tokens": 113
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "種飛ばしの勝負と、弟の種から育った点を言い当てています。"
+          "reason": "種飛ばしの勝負と弟の種から育った点を言い当てています。"
         }
       },
       "media_id": "local-U21",
@@ -1126,17 +1126,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "兄弟で去年スイカの種飛ばしをして、弟の種から今年の実がなったんだね。だから弟の飛距離が本当だったと分かったのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.2042884769907687,
-      "luna_s": 3.2042884769907687,
-      "total_s": 3.2042935460049193,
-      "writer_s": 5.069014150649309e-06
+      "judge_s": 2.5791502679931,
+      "luna_s": 2.5791502679931,
+      "total_s": 2.5791519829945173,
+      "writer_s": 1.715001417323947e-06
     }
   },
   {
@@ -1148,7 +1148,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1166,16 +1166,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 123,
+            "completion_tokens": 155,
             "finish_reason": "stop",
-            "latency_s": 17.203871,
+            "latency_s": 2.166737,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2931,
-            "reasoning_tokens": 57
+            "prompt_tokens": 2957,
+            "reasoning_tokens": 93
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "種飛ばしの勝負には触れていますが、すいかが弟の種から育った点がありません。"
+          "reason": "種飛ばしの勝負には触れていますが、弟の種から育った点がありません。"
         }
       },
       "media_id": "local-U21",
@@ -1185,7 +1185,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてみようか。"
+        "text": "惜しい！もう少し考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1193,17 +1193,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "兄弟でスイカの種飛ばし勝負をしてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 17.20391182700405,
-      "luna_s": 17.20391182700405,
-      "total_s": 20.44784966201405,
-      "writer_s": 3.2439378350100014
+      "judge_s": 2.1667777830152772,
+      "luna_s": 2.1667777830152772,
+      "total_s": 3.7928781940136105,
+      "writer_s": 1.6261004109983332
     }
   },
   {
@@ -1215,7 +1215,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1233,16 +1233,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 240,
+            "completion_tokens": 172,
             "finish_reason": "stop",
-            "latency_s": 18.091139,
+            "latency_s": 2.633037,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2956,
-            "reasoning_tokens": 171
+            "prompt_tokens": 2982,
+            "reasoning_tokens": 108
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "種飛ばしと弟の種から育った点は合っていますが、勝負の結果の解釈が異なります。"
+          "reason": "種飛ばしと弟の種が育った点は合っていますが、勝敗の読み違いがあります。"
         }
       },
       "media_id": "local-U21",
@@ -1252,7 +1252,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！推理を続けてみようか。"
+        "text": "惜しい！もう少し推理を続けてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1260,17 +1260,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "兄弟で種飛ばしをして、弟の種からスイカが育ったんだね。でも弟は勝負では負けていて、兄が勝ちを譲ったのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 18.091197781002847,
-      "luna_s": 18.091197781002847,
-      "total_s": 19.706503266002983,
-      "writer_s": 1.6153054850001354
+      "judge_s": 2.6330731180205476,
+      "luna_s": 2.6330731180205476,
+      "total_s": 4.635546828008955,
+      "writer_s": 2.002473709988408
     }
   },
   {
@@ -1282,74 +1282,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "009-year-late-verdict",
-      "errors": [],
-      "fact_sheet_hash": "441cba9e5415",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 301,
-            "finish_reason": "stop",
-            "latency_s": 9.196224,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2944,
-            "reasoning_tokens": 237
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "兄弟の勝負と弟の勝ちは押さえていますが、勝負の内容が異なります。"
-        }
-      },
-      "media_id": "local-U21",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！推理を続けてみようか。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "兄弟でどっちが先にスイカを実らせるか競争してて、弟の勝ちだったんでしょ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 9.19625396799529,
-      "luna_s": 9.19625396799529,
-      "total_s": 10.303929235989926,
-      "writer_s": 1.1076752679946367
-    }
-  },
-  {
-    "case_id": "U21-e21",
-    "record": {
-      "comment_id": "U21-e21",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1367,16 +1300,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 206,
+            "completion_tokens": 309,
             "finish_reason": "stop",
-            "latency_s": 2.564235,
+            "latency_s": 4.035103,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2943,
-            "reasoning_tokens": 138
+            "prompt_tokens": 2970,
+            "reasoning_tokens": 223
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "弟の勝ちとは述べていますが、種飛ばしや種から育った点に触れていません。"
+          "reason": "種飛ばしと弟の種から育った点に触れず、別の勝負を推測しています。"
         }
       },
       "media_id": "local-U21",
@@ -1386,7 +1319,74 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。質問で少しずつ考えてみようか。"
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか☺️"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "兄弟でどっちが先にスイカを実らせるか競争してて、弟の勝ちだったんでしょ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-03T18:26:24Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-03T18:26:24Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.035155913006747,
+      "luna_s": 4.035155913006747,
+      "total_s": 5.721986397024011,
+      "writer_s": 1.686830484017264
+    }
+  },
+  {
+    "case_id": "U21-e21",
+    "record": {
+      "comment_id": "U21-e21",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "de7b20ee3a37",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "009-year-late-verdict",
+      "errors": [],
+      "fact_sheet_hash": "441cba9e5415",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 284,
+            "finish_reason": "stop",
+            "latency_s": 3.384131,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 2969,
+            "reasoning_tokens": 210
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "弟とすいかには触れていますが、仕掛けの核心には届いていません。"
+        }
+      },
+      "media_id": "local-U21",
+      "parent_id": null,
+      "problem_schema_version": 2,
+      "reply": {
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。別の可能性も考えてみようか☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1394,17 +1394,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "弟が植えたスイカだけが鳥に食べられず残ってたから、弟の勝ちってことだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5642882190004457,
-      "luna_s": 2.5642882190004457,
-      "total_s": 3.657112564018462,
-      "writer_s": 1.0928243450180162
+      "judge_s": 3.3841791890154127,
+      "luna_s": 3.3841791890154127,
+      "total_s": 4.793952391017228,
+      "writer_s": 1.4097732020018157
     }
   },
   {
@@ -1416,7 +1416,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1436,16 +1436,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": "種飛ばし",
           "debug": {
-            "completion_tokens": 181,
+            "completion_tokens": 142,
             "finish_reason": "stop",
-            "latency_s": 2.431029,
+            "latency_s": 2.500335,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2916,
-            "reasoning_tokens": 99
+            "prompt_tokens": 2942,
+            "reasoning_tokens": 67
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「種飛ばし？」は述語のない語句だけのコメントです。"
+          "reason": "述語のない語句だけのコメントなので、はい・いいえで答えられません。"
         }
       },
       "media_id": "local-U21",
@@ -1463,17 +1463,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "種飛ばし？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.431085735996021,
-      "luna_s": 2.431085735996021,
-      "total_s": 7.511814815981779,
-      "writer_s": 5.080729079985758
+      "judge_s": 2.5003956349974032,
+      "luna_s": 2.5003956349974032,
+      "total_s": 6.56254112298484,
+      "writer_s": 4.062145487987436
     }
   },
   {
@@ -1485,7 +1485,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1505,16 +1505,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": "花火",
           "debug": {
-            "completion_tokens": 169,
+            "completion_tokens": 211,
             "finish_reason": "stop",
-            "latency_s": 2.290355,
+            "latency_s": 2.968734,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2913,
-            "reasoning_tokens": 92
+            "prompt_tokens": 2939,
+            "reasoning_tokens": 125
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、質問として聞き直してもらいます。"
+          "reason": "述語のない語句だけのコメントなので、答えを一意にできない質問として扱います。"
         }
       },
       "media_id": "local-U21",
@@ -1532,17 +1532,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "花火",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2904114600096364,
-      "luna_s": 2.2904114600096364,
-      "total_s": 7.324987851025071,
-      "writer_s": 5.034576391015435
+      "judge_s": 2.968783730000723,
+      "luna_s": 2.968783730000723,
+      "total_s": 6.398932080017403,
+      "writer_s": 3.4301483500166796
     }
   },
   {
@@ -1554,7 +1554,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1572,16 +1572,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 214,
+            "completion_tokens": 111,
             "finish_reason": "stop",
-            "latency_s": 2.676088,
+            "latency_s": 2.201696,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2919,
-            "reasoning_tokens": 127
+            "prompt_tokens": 2945,
+            "reasoning_tokens": 35
           },
           "error": null,
           "kind": "ask_spoiler",
-          "reason": "真相を言ってほしいという、答えのネタバレを求めるコメントです。"
+          "reason": "「真相言っちゃって」と答えそのものの開示を求めています。"
         }
       },
       "media_id": "local-U21",
@@ -1591,7 +1591,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問には答えられるけど、真相は教えられないよ。質問で少しずつ絞っていこうね。"
+        "text": "真相は教えられないけど、質問には答えるよ。はい・いいえで聞いてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1599,17 +1599,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "もう真相言っちゃって！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.6761467950127553,
-      "luna_s": 2.6761467950127553,
-      "total_s": 3.747490821988322,
-      "writer_s": 1.0713440269755665
+      "judge_s": 2.2017265320173465,
+      "luna_s": 2.2017265320173465,
+      "total_s": 4.271070721035358,
+      "writer_s": 2.069344189018011
     }
   },
   {
@@ -1621,7 +1621,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1639,16 +1639,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 129,
+            "completion_tokens": 154,
             "finish_reason": "stop",
-            "latency_s": 7.012949,
+            "latency_s": 2.319551,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2913,
-            "reasoning_tokens": 75
+            "prompt_tokens": 2939,
+            "reasoning_tokens": 93
           },
           "error": null,
           "kind": "greeting",
-          "reason": "挨拶への返答です。"
+          "reason": "挨拶のみのコメントなので、歓迎の言葉を返します。"
         }
       },
       "media_id": "local-U21",
@@ -1658,7 +1658,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "こんばんは！来てくれてうれしいよ☺️"
+        "text": "こんばんは！今日もゆっくり楽しんでいってね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1666,17 +1666,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "こんばんは！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.013000509003177,
-      "luna_s": 7.013000509003177,
-      "total_s": 8.303854030993534,
-      "writer_s": 1.290853521990357
+      "judge_s": 2.3195947709900793,
+      "luna_s": 2.3195947709900793,
+      "total_s": 3.5594640559866093,
+      "writer_s": 1.23986928499653
     }
   },
   {
@@ -1688,7 +1688,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1706,16 +1706,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 126,
+            "completion_tokens": 160,
             "finish_reason": "stop",
-            "latency_s": 1.831023,
+            "latency_s": 2.57263,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2923,
-            "reasoning_tokens": 68
+            "prompt_tokens": 2949,
+            "reasoning_tokens": 106
           },
           "error": null,
           "kind": "request",
-          "reason": "次に出してほしい問題の舞台をリクエストしています。"
+          "reason": "次に出す問題の舞台についてリクエストしている"
         }
       },
       "media_id": "local-U21",
@@ -1725,7 +1725,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいね、リクエストありがとう！"
+        "text": "リクエストありがとう！学校が舞台の問題も楽しみにしててね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1733,17 +1733,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "次は学校が舞台の問題が見たい！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.8310657020192593,
-      "luna_s": 1.8310657020192593,
-      "total_s": 5.595853642036673,
-      "writer_s": 3.7647879400174133
+      "judge_s": 2.572683235979639,
+      "luna_s": 2.572683235979639,
+      "total_s": 4.159187416982604,
+      "writer_s": 1.5865041810029652
     }
   },
   {
@@ -1755,7 +1755,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1773,16 +1773,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 136,
+            "completion_tokens": 156,
             "finish_reason": "stop",
-            "latency_s": 2.176731,
+            "latency_s": 2.497585,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2921,
-            "reasoning_tokens": 80
+            "prompt_tokens": 2947,
+            "reasoning_tokens": 95
           },
           "error": null,
           "kind": "mention",
-          "reason": "友達をタグ付けして、あとで考えるよう促しています。"
+          "reason": "友人をメンションし、あとで考えるよう促しています。"
         }
       },
       "media_id": "local-U21",
@@ -1800,17 +1800,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "@hana あとで考えてみて！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.1768016220012214,
-      "luna_s": 2.1768016220012214,
-      "total_s": 5.856464289012365,
-      "writer_s": 3.6796626670111436
+      "judge_s": 2.497638608998386,
+      "luna_s": 2.497638608998386,
+      "total_s": 4.501735425001243,
+      "writer_s": 2.004096816002857
     }
   },
   {
@@ -1822,7 +1822,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1840,16 +1840,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 208,
+            "completion_tokens": 251,
             "finish_reason": "stop",
-            "latency_s": 8.126832,
+            "latency_s": 3.164746,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2924,
-            "reasoning_tokens": 143
+            "prompt_tokens": 2950,
+            "reasoning_tokens": 182
           },
           "error": null,
           "kind": "complaint",
-          "reason": "問題の登場人物への描写に否定的な感想を述べているため"
+          "reason": "問題の描写への否定的な意見で、作品へのクレームに当たります。"
         }
       },
       "media_id": "local-U21",
@@ -1859,7 +1859,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "伝えてくれてありがとう。確認するね。"
+        "text": "教えてくれてありがとう、確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1867,17 +1867,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "そういう人たちを見下す感じ、無理",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 8.126886176003609,
-      "luna_s": 8.126886176003609,
-      "total_s": 11.605341714981478,
-      "writer_s": 3.478455538977869
+      "judge_s": 3.1647934849897865,
+      "luna_s": 3.1647934849897865,
+      "total_s": 4.597054393001599,
+      "writer_s": 1.4322609080118127
     }
   },
   {
@@ -1889,7 +1889,7 @@ window.PROBE_RAW["luna-1d/U21"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "5311b19312cf",
+        "prompt_version": "de7b20ee3a37",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1907,16 +1907,16 @@ window.PROBE_RAW["luna-1d/U21"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 193,
+            "completion_tokens": 189,
             "finish_reason": "stop",
-            "latency_s": 2.504113,
+            "latency_s": 2.892197,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2915,
-            "reasoning_tokens": 124
+            "prompt_tokens": 2941,
+            "reasoning_tokens": 125
           },
           "error": null,
           "kind": "foreign",
-          "reason": "ひらがな・カタカナを含まず、中国語として自然な感想です。"
+          "reason": "中国語のコメントのため、日本語でのコメントをお願いする分類です。"
         }
       },
       "media_id": "local-U21",
@@ -1934,17 +1934,17 @@ window.PROBE_RAW["luna-1d/U21"] = [
       "text": "这个好难啊",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T09:17:58Z",
+        "judged_at": "2026-10-03T18:26:24Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T09:17:58Z"
+        "webhook_received_at": "2026-10-03T18:26:24Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.504133271984756,
-      "luna_s": 2.504133271984756,
-      "total_s": 3.6333401809970383,
-      "writer_s": 1.1292069090122823
+      "judge_s": 2.892257542000152,
+      "luna_s": 2.892257542000152,
+      "total_s": 3.7699830130150076,
+      "writer_s": 0.8777254710148554
     }
   }
 ];

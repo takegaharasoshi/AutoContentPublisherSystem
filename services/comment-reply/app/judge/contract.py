@@ -13,7 +13,7 @@ KINDS = (
     "greeting", "cheer", "chat", "request", "complaint", "mention",
     "emoji_only", "troll", "abuse", "spam", "personal_info", "foreign",
 )
-ANSWERS = frozenset({"yes", "no", "irrelevant", "unknown"})
+ANSWERS = frozenset({"yes", "no", "irrelevant"})
 
 
 def bare_term_text(text: str) -> str:
