@@ -15,7 +15,7 @@ from app.judge.contract import Judgement, Problem, bare_term_text
 JEV_URL = "https://api.typesafe.ai/v1/systemone"
 T_POINT = 0.5
 T_CLOSE = 0.25  # 惜しい判定だけに使う（正解側の T_POINT は下げない。試行 4 で 0.35、試行 7b でコア基準に合わせて 0.25）
-T_GUESS = 0.95  # 段 A1b で推理とする確率の下限（試行 6b。5 問で選んだ値なので 21-6d で確かめる）
+T_GUESS = 0.95  # 段 A1b で推理とする確率の下限（試行 6b。21-6d3 の全件 441 件で確かめ据え置き）
 T_RECHECK = 0.6  # A2 が q_open のとき、問題文つきで答えられる質問か確かめ直す（試行 5・ユーザー指示。試行 8 で 0.5 → 0.6）
 T_QUALITY = 0.2
 T_ANSWER = 0.55

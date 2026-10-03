@@ -120,13 +120,13 @@
 <div class="decision">
   <span class="callout-title">決定（2026-09-04、21-3）: 出題者プロンプトのセット固定部分の正は <code>prompt_configs.prompt_text</code>。投稿時に S3 スナップショットへ転記し、Lambda はスナップショットだけを読む</span>
   <ul style="margin:.3rem 0 0;">
-    <li><strong>置き場</strong>: 本セットの <code>prompt_configs</code>（<code>is_active=1</code> の 1 件）の <code>prompt_text</code> を出題者プロンプトのセット固定部分に充てる（<code>umigame-prebuilt</code> は画像生成をしないため <code>prompt_text</code> が空いている。<code>parameters</code> は方式の入力〔尺〕に使う = <a href="../generators/umigame-prebuilt.html#parameters">方式設計書 3</a>）。INSERT 元のテキストは <code>content/umigame-stock/umigame-soup-1/master_prompt.txt</code> に置き、21-7 の INSERT SQL と 21-4a の <code>probe_test.py</code> が同じファイルを読む（<strong>プローブテストと本番のプロンプトを 1 つの正から出す</strong>ため）</li>
+    <li><strong>置き場</strong>: 本セットの <code>prompt_configs</code>（<code>is_active=1</code> の 1 件）の <code>prompt_text</code> を出題者プロンプトのセット固定部分に充てる（<code>umigame-prebuilt</code> は画像生成をしないため <code>prompt_text</code> が空いている。<code>parameters</code> は方式の入力〔尺〕に使う = <a href="../generators/umigame-prebuilt.html#parameters">方式設計書 3</a>）。INSERT 元のテキストは <code>content/umigame-stock/umigame-soup-1/master_prompt.txt</code> に置き、21-7 の INSERT SQL と 21-4a の <code>probe_test.py</code> が同じファイルを読む（<strong>プローブテストと本番のプロンプトを 1 つの正から出す</strong>ため）。<strong>2026-10-03（21-6d3）に <code>master_prompt.txt</code>・旧プローブは退役</strong>（<a href="#judge-design">5.1.2 末尾の決定</a>）</li>
     <li><strong>転記</strong>: SNS 投稿バッチが publish 成功直後に、<code>umigame_items</code> の問題固有部分と <code>prompt_configs.prompt_text</code> を <code>problems/{media_id}.json</code> の <code>master_rules</code> へ書く（セクション 10.2）。これにより<strong>投稿済みの問題は投稿時点のルールで動き続け</strong>、プロンプトの改訂は以後の投稿から効く（Lambda のデプロイ不要・Aurora への接続不要）</li>
     <li><strong>不採用</strong>: Lambda コードにプロンプトを埋める案（改訂に <code>cdk deploy</code> が要り、プローブテストとの同一性を保ちにくい）、コメント時に Aurora から読む案（Aurora 不使用の方針に反する。アイデア詳細 4）</li>
   </ul>
 </div>
 
-<p><strong>セット固定部分（21-4a のプローブテストで磨いた版 = 正。INSERT 元は <code>content/umigame-stock/umigame-soup-1/master_prompt.txt</code>）</strong>:</p>
+<p><strong>セット固定部分（21-4a のプローブテストで磨いた版。<code>master_prompt.txt</code> は 21-6d3 で退役したため、以下は当時の記録）</strong>:</p>
 <pre><code>あなたは Instagram アカウント「探偵カメロック」の出題者です。ウミガメのスープ（水平思考クイズ）の
 問題を出し、コメント欄の質問に答えます。以下の「問題」「真相」「確定事実」だけを根拠に答えてください。
 
@@ -309,7 +309,15 @@
 <p>改訂案の本文は <code>judge-trial/prompts/pattern1_rules.txt</code>（上記の変更点 ①〜④）。<strong><code>master_prompt.txt</code> の差し替えは本ステップでは行わず、21-6c で行うことを提案する</strong>。出力が一語の文字列から JSON（<code>{kind, answer, reply}</code>）に変わるため、判定モジュールの実装と同時でないと <code>probe_test.py</code> と本番の経路が壊れる。差し替えたら 5.1 の本文も改訂案に置き換え、「荒らしには返信しない」の記述を消す。</p>
 <div class="callout decision">
   <span class="callout-title">決定（2026-09-30、21-6c2）: 判定・返信のプロンプトは Lambda のコードに同梱する。スナップショットの <code>master_rules</code> は判定に使わない</span>
-  <p>判定モジュールのプロンプトは 1 本ではなくなった（パターン 1 の判定・返信文の基準・書き手 2 種・Jev の指示文）。<code>prompt_configs.prompt_text</code> 1 列に載らず、どれも 5.1.2「モデル・プロンプトを変えるときは全件の機械プローブ（21-6d）に合格してから切り替える」に従うので、デプロイを伴うほうが手順に合う。このため 5.1 冒頭の決定（2026-09-04、21-3。プロンプトの正は <code>prompt_configs</code> → スナップショット経由で Lambda が読む）は判定モジュールには適用しない。プロンプトの正は <code>services/comment-reply/app/prompts/</code>（試走版 <code>judge-trial/prompts/</code> から移植）。同梱プロンプトの SHA-256 先頭 12 桁を <code>prompt_version</code> としてコメント記録（10.6）に残す。<code>master_prompt.txt</code> の差し替えは行わない。スナップショットの <code>master_rules</code> は既存のキーとして残る（投稿バッチは変えない）。<code>master_prompt.txt</code>・<code>probe_test.py</code> の扱い（廃止するか、21-6d の機械プローブへ寄せるか）は 21-6d で決める。</p>
+  <p>判定モジュールのプロンプトは 1 本ではなくなった（パターン 1 の判定・返信文の基準・書き手 2 種・Jev の指示文）。<code>prompt_configs.prompt_text</code> 1 列に載らず、どれも 5.1.2「モデル・プロンプトを変えるときは全件の機械プローブ（21-6d）に合格してから切り替える」に従うので、デプロイを伴うほうが手順に合う。このため 5.1 冒頭の決定（2026-09-04、21-3。プロンプトの正は <code>prompt_configs</code> → スナップショット経由で Lambda が読む）は判定モジュールには適用しない。プロンプトの正は <code>services/comment-reply/app/prompts/</code>（試走版 <code>judge-trial/prompts/</code> から移植）。同梱プロンプトの SHA-256 先頭 12 桁を <code>prompt_version</code> としてコメント記録（10.6）に残す。<code>master_prompt.txt</code> の差し替えは行わない。スナップショットの <code>master_rules</code> は既存のキーとして残る（投稿バッチは変えない）。<code>master_prompt.txt</code>・<code>probe_test.py</code> の扱い（廃止するか、21-6d の機械プローブへ寄せるか）は 21-6d で決める（→ 21-6d3 で退役。下の決定）。</p>
+</div>
+<div class="callout decision">
+  <span class="callout-title">決定（2026-10-03、21-6d3・ユーザー）: <code>master_prompt.txt</code> と <code>probe_test.py</code> の旧プローブを退役させる</span>
+  <p>旧プローブ（想定質問を <code>master_prompt.txt</code> の出題者に答えさせる）は本番の判定経路を通らず、本番経路の評価は <code>services/comment-reply/tools/probe_run.py</code>（21-6d1〜d3）が担うため、二重に持たない。<code>master_prompt.txt</code> は削除し、<code>probe_test.py</code> は作問レビュー用の素材シート（<code>work/review.html</code>）の生成だけを残して <code>batch-01/review_sheet.py</code> に改名した（API キー不要）。<code>leak_count.py</code> の核心語辞書は P1 漏れ候補の正として残す。作問時に本番経路で確かめるときは、評価データ <code>judge-trial/data/eval_problems.json</code> にケースを足して（正解ラベルは人が確認）<code>probe_run.py --problems &lt;no&gt;</code> を回す。5.1 冒頭の「INSERT 元は <code>master_prompt.txt</code>」は失効し、21-7 の <code>prompt_configs</code> INSERT で <code>prompt_text</code> に何を入れるか（空にするか、本節のセット固定部分を記録として転記するか）は 21-7 で決める（スナップショットの <code>master_rules</code> は判定に使われない）。</p>
+</div>
+<div class="callout decision">
+  <span class="callout-title">決定（2026-10-03、21-6d3）: パターン 2（Jev）の閾値は据え置く（<code>T_QUALITY</code> 0.2・<code>T_ANSWER</code> 0.55・<code>T_GUESS</code> 0.95・<code>T_POINT</code> 0.5）</span>
+  <p>全件プローブ（14 問・441 件・5 パターン。<a href="umigame-soup-1-probe.html">評価ページ</a>）の Jev のキャッシュ済み確率で閾値を掃引した（API を呼び直さない再計算）。① <code>T_ANSWER</code> を 0.7 に上げると、はい / いいえの取り違え（P3）は 3 → 1 件に減るが「わからない」が 8 → 18 件に増える。P3 は現状で合格なので据え置く。② <code>T_QUALITY</code> を上げると、はい / いいえ質問が <code>q_open</code> へ流れる（0.3 で 18 件・0.4 で 56 件）。③ <code>T_GUESS</code> は 0.95 で推理 → 質問 2 件・質問 → 推理 9 件となり、前後の値（0.9 / 0.99）より誤りが少ない。④ Jev の主な失点である誤った正解宣言（P2 12 件）は、惜しい推理の要点確率の最小値が 0.83〜0.97 に集まり、本物の正解と重なる。<code>T_POINT</code> を 0.95 にしても誤りは 4 件残り、正解宣言は 27 → 7 件に落ちる。閾値では分けられない（要点の問い方の問題）ため、閾値は変えず、方式選定（21-6e）の材料として残す。閾値を変えていないので全件の回し直しはしていない。</p>
 </div>
 
 <h5>評価セット（テストデータ）の作り方・置き場</h5>

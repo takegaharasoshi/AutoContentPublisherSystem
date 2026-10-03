@@ -2,17 +2,13 @@
 
 セット固定の既定文（ルール帯・キャラクターの台詞・ハッシュタグ）と、イラストプロンプト・
 キャプションの組み立て規則をここに置き、各バッチの ``stock_items.py`` / ``validate.py`` /
-``probe_test.py`` / ``generate.py`` が共有する。仕様の正は
+``review_sheet.py`` / ``generate.py`` が共有する。仕様の正は
 ``docs/app/sets/umigame-soup-1.html`` セクション 4（素材 14 項目）・5.2（イラスト）・6（キャプション）。
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-
 SET_CODE = "umigame-soup-1"
-SET_DIR = Path(__file__).resolve().parent.parent
-MASTER_PROMPT_PATH = SET_DIR / "master_prompt.txt"
 
 # ---------- セット固定の既定文（素材項目 #6 / #7 rule / #9 / #10） ----------
 RULE_TEXT_DEFAULT = "「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します"
@@ -82,27 +78,6 @@ def caption(problem_text: str) -> str:
     """
     parts = [CAPTION_HEADER, "", problem_text, "", CAPTION_PLAY, "", HASHTAGS]
     return "\n".join(parts)
-
-
-# ---------- 出題者プロンプト（master_prompt.txt が正。probe_test と 21-7 の INSERT が共有） ----------
-def render_master_prompt(problem_text: str, truth: str, fact_sheet: list[str]) -> str:
-    """master_prompt.txt のプレースホルダを 1 問の内容で展開する。
-
-    Args:
-        problem_text: 問題文。
-        truth: 真相。
-        fact_sheet: 確定事実シート（文字列の配列）。
-
-    Returns:
-        AI 出題者に渡す system prompt 全文。
-    """
-    template = MASTER_PROMPT_PATH.read_text(encoding="utf-8")
-    facts = "\n".join(f"- {f}" for f in fact_sheet)
-    return (
-        template.replace("{problem_text}", problem_text)
-        .replace("{truth}", truth)
-        .replace("{fact_sheet}", facts)
-    )
 
 
 # ---------- 素材項目の鍵一覧（stock_items.py の 1 問が持つキー） ----------

@@ -77,4 +77,4 @@ OPENAI_API_KEY=... TYPESAFE_API_KEY=... .venv/bin/python tools/probe_run.py \
   --results work/probe/sample/results.json --out /tmp/comment-reply-probe.html
 ```
 
-`--patterns` で 5 パターンから選択、`--workers` で並列数を変更、`--refresh-judge` / `--refresh-writer` でキャッシュを更新できます。ページ生成器は `--out` を省くと `docs/app/sets/umigame-soup-1-probe.html` に出力し、生データの JS を同名ディレクトリに置きます。
+`--patterns` で 5 パターンから選択、`--workers` で並列数を変更、`--refresh-judge` / `--refresh-writer` でキャッシュを更新できます。ページ生成器は `--out` を省くと `docs/app/sets/umigame-soup-1-probe.html`（サマリー = 合否表・グラフ・評価・問題の目次）に出力し、同名ディレクトリに問題ごとのページ（`U01.html` 等。パターンごとのコメント一覧）と生データの JS（開いたときに遅延読み込み）を置きます（21-6d3 で分割）。判定キャッシュのキーに Jev の閾値は入らないため、閾値を変えたら `--refresh-judge` で取り直してください。並列数を上げすぎると OpenAI の 429 が判定・書き手の記録に残るので、全件は `--workers 4` 程度で回します。

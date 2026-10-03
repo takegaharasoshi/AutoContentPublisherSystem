@@ -1,9 +1,9 @@
-"""プローブ結果の補足漏れを数える（21-4a-2 で新設）。
+"""核心語辞書と旧プローブ結果用 CLI。
 
-出題者の返答に、質問側には無い「核心語」（問題ごとに手書きの辞書。core 宣言の反転部分の語）が
-出た応答を数える。probe_test.py の機械判定（冒頭語）では拾えない「補足で正体を言う」漏れの指標。
+CORE は P1 漏れ候補の正で、services/comment-reply/tools/probe_metrics.py が AST で読む。
+旧プローブ結果の集計 CLI は 21-6d3 で退役。
 
-使い方: python3 leak_count.py [work/probe_results.json]
+使い方: python3 leak_count.py [work/probe_results.json]（旧結果がある場合のみ）
 """
 
 from __future__ import annotations
@@ -28,7 +28,10 @@ CORE = {
     "U26": ["通訳", "言い換え", "褒め言葉", "作り変え", "訳し", "息子"],
 }
 path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "work" / "probe_results.json"
-d = json.load(open(path, encoding="utf-8"))
+if not path.is_file():
+    raise SystemExit(f"旧プローブ結果がありません: {path}。この CLI は 21-6d3 で退役しました。")
+with path.open(encoding="utf-8") as f:
+    d = json.load(f)
 allr = d if "U01" in d else d["results"]
 tot_q = tot_leak = tot_sup = 0
 for no, words in CORE.items():

@@ -1,7 +1,7 @@
 """batch-01: umigame-soup-1 第 1 バッチの単一ソース（素材 14 項目 + 管理項目。全 14 問〔story 7 / misdirection 7〕をスキル作問でため込み中）。
 
-- 仕様の正は docs/app/sets/umigame-soup-1.html セクション 4。検証は validate.py、プローブテストは
-  probe_test.py、投入 SQL は generate.py が本ファイルから生成する。
+- 仕様の正は docs/app/sets/umigame-soup-1.html セクション 4。検証は validate.py、素材レビューシートは
+  review_sheet.py、投入 SQL は generate.py が本ファイルから生成する。
 - 全問が完全オリジナル。着想の台帳は research.md（Codex Web リサーチ + note 記事の作問法）。
 - puzzle_type: story = 物語復元型（A→B→C のうち B を隠す）/ misdirection = 意味誤誘導型（語の多義性・常識の逆）。
 - core: コア宣言（作問スキル umigame-problem-writer 工程 3 の 1 文。レビューで最初に見る。DB には入れない）。

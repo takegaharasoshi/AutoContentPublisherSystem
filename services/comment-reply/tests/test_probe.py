@@ -140,19 +140,29 @@ def test_run_cache_timing_record_and_offline_page(tmp_path):
                                   "--out", str(page)]) == 0
     source = page.read_text(encoding="utf-8")
     assert '<h2 id="summary">1. サマリー</h2>' in source
-    assert '<h2 id="patterns">2. パターン別の結果</h2>' in source
-    assert len(re.findall(r'<h3 id="pattern-', source)) == 5
-    assert len(re.findall(r'<h4 id="problem-', source)) == 10
-    assert source.count('<h5>コメント</h5>') == 10
-    assert source.count('<h5>テスト結果生データ</h5>') == 10
-    assert len(list((page.parent / page.stem).glob("raw-*.js"))) == 10
+    assert '<h2 id="problems">2. 問題ごとのページ</h2>' in source
+    assert '<table class="case-table">' not in source
+    page_dir = page.parent / page.stem
+    problem_pages = sorted(page_dir.glob("*.html"))
+    assert [p.name for p in problem_pages] == ["U01.html", "U13.html"]
+    for problem_page in problem_pages:
+        assert f'href="{page.stem}/{problem_page.name}"' in source
+        body = problem_page.read_text(encoding="utf-8")
+        assert len(re.findall(r'<h2 id="pattern-', body)) == 5
+        assert body.count('<h3>コメント</h3>') == 5
+        assert body.count('<h3>テスト結果生データ</h3>') == 5
+        assert 'href="../../../assets/style.css"' in body
+        assert not re.search(r'(?:src|href)="https?://', body)
+    assert len(list(page_dir.glob("raw-*.js"))) == 10
     assert not re.search(r'(?:src|href)="https?://', source)
-    assert "&lt;b&gt;関係ある？&lt;/b&gt;" in source
-    assert "<b>関係ある？</b>" not in source
-    # 合否表の NG の ID は、一覧表に実在する行へのリンクになっている
-    row_ids = set(re.findall(r'<tr id="([^"]+)"', source))
-    ng_links = re.findall(r'class="ng-link" href="#([^"]+)"', source)
-    assert set(ng_links) <= row_ids
+    u01 = (page_dir / "U01.html").read_text(encoding="utf-8")
+    assert "&lt;b&gt;関係ある？&lt;/b&gt;" in u01
+    assert "<b>関係ある？</b>" not in u01
+    # 合否表の NG の ID は、問題ごとのページに実在する行へのリンクになっている
+    row_ids = {(p.name, rid) for p in problem_pages
+               for rid in re.findall(r'<tr id="([^"]+)"', p.read_text(encoding="utf-8"))}
+    ng_links = re.findall(r'class="ng-link" href="[^"/]+/([^"#]+)#([^"]+)"', source)
+    assert ng_links and set(ng_links) <= row_ids
     assert '<table class="eval-table">' in source
     raw = (page.parent / page.stem / "raw-luna-1b-U01.js").read_text(encoding="utf-8")
     assert 'window.PROBE_RAW["luna-1b/U01"] = ' in raw
@@ -160,9 +170,11 @@ def test_run_cache_timing_record_and_offline_page(tmp_path):
     previous = source
     stale = page.parent / page.stem / "raw-stale.js"
     stale.write_text("old", encoding="utf-8")
+    stale_page = page.parent / page.stem / "U99.html"
+    stale_page.write_text("old", encoding="utf-8")
     build_probe_page.build_page(second, page)
     assert page.read_text(encoding="utf-8") == previous
-    assert not stale.exists()
+    assert not stale.exists() and not stale_page.exists()
 
 
 def test_combine_error_keeps_row(tmp_path, monkeypatch):

@@ -8,7 +8,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 
 SERVICE_DIR = Path(__file__).resolve().parent.parent
@@ -71,20 +71,22 @@ def _row_anchor(pattern_id: str, case_id: str) -> str:
     return f"r-{pattern_id}-{case_id}"
 
 
-def _ng_details(pattern_id: str, item: dict[str, Any]) -> str:
-    """合否表のセルに置く NG の ID 一覧（折りたたみ）。ID は下の一覧表の行へのリンク。"""
+def _ng_details(pattern_id: str, item: dict[str, Any],
+                page_of: Callable[[str, str], str] = lambda pid, cid: "") -> str:
+    """合否表のセルに置く NG の ID 一覧（折りたたみ）。ID は問題ごとのページの該当行へのリンク。"""
     entries = item.get("ng") or []
     if not entries:
         return ""
     links = "".join(
-        f'<li><a class="ng-link" href="#{_h(_row_anchor(pattern_id, e["id"]))}">{_h(e["id"])}</a>'
+        f'<li><a class="ng-link" href="{_h(page_of(pattern_id, e["id"]))}#{_h(_row_anchor(pattern_id, e["id"]))}">{_h(e["id"])}</a>'
         + (f' <span class="ng-note">{_h(e["note"])}</span>' if e.get("note") else "") + "</li>"
         for e in entries)
     return (f'<details class="ng-ids"><summary>NG {len(entries)} 件</summary>'
             f"<ul>{links}</ul></details>")
 
 
-def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> str:
+def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]],
+                   page_of: Callable[[str, str], str] = lambda pid, cid: "") -> str:
     cells = ['<div class="ng-toolbar"><button type="button" class="ng-all" data-open="1">'
              'NG の ID をすべて開く</button><button type="button" class="ng-all" data-open="0">'
              'すべて閉じる</button></div>',
@@ -101,7 +103,7 @@ def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> s
             for pattern in patterns:
                 item = metrics["patterns"][pattern["id"]]["metrics"][key]
                 cells.append(f"<td>{_h(item['value'])} {_badge(item['pass'])}"
-                             f"{_ng_details(pattern['id'], item)}</td>")
+                             f"{_ng_details(pattern['id'], item, page_of)}</td>")
             threshold = metrics["patterns"][patterns[0]["id"]]["metrics"][key]["threshold"]
             cells.append(f"<td>{_h(threshold)}</td></tr>")
     count = sum(len(entries) for _, entries in SECTIONS)
@@ -299,7 +301,7 @@ def _options(cases: list[dict[str, Any]], rows: list[dict[str, Any]],
 
 
 def _case_table(pattern: dict[str, Any], no: str, cases: list[dict[str, Any]],
-                rows: list[dict[str, Any]], raw_file: str) -> str:
+                rows: list[dict[str, Any]], raw_file: str, raw_heading: str = "h5") -> str:
     out = ['<div class="probe-filters">',
            '<label>全文検索 <input class="filter-text" type="search" placeholder="コメント・返信"></label>',
            '<label>想定種別 <select class="filter-expected"><option value="">すべて</option>',
@@ -350,7 +352,7 @@ def _case_table(pattern: dict[str, Any], no: str, cases: list[dict[str, Any]],
         out.append("</tr>")
     out.append("</tbody></table></div>")
     raw_key = f"{pattern['id']}/{no}"
-    out.append('<h5>テスト結果生データ</h5>')
+    out.append(f'<{raw_heading}>テスト結果生データ</{raw_heading}>')
     out.append(f'<details class="raw-details" data-raw-key="{_h(raw_key)}" '
                f'data-raw-src="{_h(raw_file)}"><summary>コメント記録 JSON を表示</summary>'
                '<pre>開くと読み込みます。</pre></details>')
@@ -379,6 +381,10 @@ body { overflow-wrap: anywhere; }
 .eval-score { white-space: nowrap; font-weight: 700; }
 .eval-fails, .eval-checks { margin: .3rem 0 0; padding-left: 1.1rem; font-size: .85rem; }
 .case-table tr:target td { background: var(--warn-bg); }
+.problem-index { min-width: 640px; }
+.problem-index tbody th { min-width: 12rem; }
+.problem-lead { display: block; font-weight: 400; font-size: .8rem; }
+.problem-nav { margin: .5rem 0 1rem; }
 .probe-svg { display: block; width: 100%; height: auto; max-width: 560px; }
 .chart-bg { fill: var(--bg-subtle); }
 .chart-rate, .chart-judge { fill: var(--link); }
@@ -460,7 +466,7 @@ SCRIPT = r"""
   });
   document.querySelectorAll('.ng-link').forEach(function (link) {
     link.addEventListener('click', function () {
-      var row = document.getElementById(link.getAttribute('href').slice(1));
+      var row = document.getElementById(link.getAttribute('href').split('#')[1]);
       if (!row || !row.hidden) return;
       var controls = row.closest('section').querySelector('.probe-filters');
       controls.querySelectorAll('input[type=search],select').forEach(function (i) { i.value = ''; });
@@ -486,8 +492,90 @@ SCRIPT = r"""
 """
 
 
+def _head(title: str, assets: str) -> list[str]:
+    return ['<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">',
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+            f'<title>{_h(title)} | AutoContentPublisherSystem</title>',
+            f'<link rel="stylesheet" href="{assets}assets/style.css">',
+            '<style>', STYLE, '</style></head><body><div class="container">']
+
+
+def _tail() -> list[str]:
+    return ['<script>', SCRIPT, '</script></div></body></html>\n']
+
+
+def _problem_index(results: dict[str, Any], metrics: dict[str, Any],
+                   patterns: list[dict[str, Any]], nos: list[str], page_dir: str) -> str:
+    """サマリーから問題ごとのページへの目次（パターンごとの相違件数つき）。"""
+    indexed = {case["id"]: case for case in results["cases"]}
+    out = ['<div class="table-wrap"><table class="problem-index"><thead><tr><th>問題</th>'
+           '<th>件数</th>']
+    out.extend(f"<th>{_h(p['label'])}<br>相違</th>" for p in patterns)
+    out.append("</tr></thead><tbody>")
+    for no in nos:
+        counts = results["meta"]["case_counts"][no]
+        text = results["problems"][no]["problem_text"]
+        heading = text[:40] + ("…" if len(text) > 40 else "")
+        total = sum(counts.values())
+        out.append(f'<tr><th><a href="{_h(page_dir)}/{_h(no)}.html">{_h(no)}</a>'
+                   f'<span class="problem-lead">{_h(heading)}</span></th><td>{total}</td>')
+        for pattern in patterns:
+            diff = 0
+            for row in results["rows"][pattern["id"]]:
+                if row["no"] != no:
+                    continue
+                flags = row_flags(row, indexed[row["case_id"]])
+                diff += bool(flags["label_mismatch"])
+            out.append(f"<td>{diff}</td>")
+        out.append("</tr>")
+    out.append("</tbody></table></div>")
+    return "".join(out)
+
+
+def _problem_page(results: dict[str, Any], metrics: dict[str, Any],
+                  patterns: list[dict[str, Any]], nos: list[str], no: str,
+                  summary_name: str) -> str:
+    cases = [case for case in results["cases"] if case["no"] == no]
+    counts = results["meta"]["case_counts"][no]
+    problem = results["problems"][no]
+    index = nos.index(no)
+    neighbors = []
+    if index > 0:
+        neighbors.append(f'<a href="{_h(nos[index - 1])}.html">← {_h(nos[index - 1])}</a>')
+    neighbors.append(f'<a href="../{_h(summary_name)}#problems">問題の一覧</a>')
+    if index + 1 < len(nos):
+        neighbors.append(f'<a href="{_h(nos[index + 1])}.html">{_h(nos[index + 1])} →</a>')
+    parts = _head(f"{no} コメント返信の評価（プローブ）", "../../../")
+    parts.extend([
+        '<nav class="breadcrumb"><a href="../../../index.html">設計書体系ガイド</a> / '
+        '<a href="../../index.html">アプリ設計</a> / '
+        '<a href="../umigame-soup-1.html">探偵カメロックのウミガメのスープ</a> / '
+        f'<a href="../{_h(summary_name)}">コメント返信の評価（プローブ）</a> / {_h(no)}</nav>',
+        f'<h1>{_h(no)} のコメント一覧（プローブ）</h1>',
+        f'<div class="page-meta"><span>実行日時: {_h(results["meta"]["run_at"])}</span>'
+        f'<span>ケース: {len(cases)} 件（評価 {counts["eval"]} / 語だけ {counts["bare_term"]} / '
+        f'共通 {counts["common"]}）</span></div>',
+        f'<nav class="problem-nav">{" ｜ ".join(neighbors)}</nav>',
+        '<div class="note"><p><strong>問題文</strong>: ' + _h(problem["problem_text"]) + '</p>'
+        '<p>合否と評価はサマリーページにある。共通ケースは問題に順番に割り振っている。</p></div>',
+        '<nav aria-label="目次"><strong>目次</strong><ul>'])
+    parts.extend(f'<li><a href="#pattern-{_h(p["id"])}">{_h(p["label"])}</a></li>'
+                 for p in patterns)
+    parts.append('</ul></nav>')
+    for pattern in patterns:
+        pattern_id = pattern["id"]
+        rows = [row for row in results["rows"][pattern_id] if row["no"] == no]
+        parts.append(f'<h2 id="pattern-{_h(pattern_id)}">{_h(pattern["label"])}</h2>')
+        parts.append('<h3>コメント</h3><section class="case-section">')
+        parts.append(_case_table(pattern, no, cases, rows, f"raw-{pattern_id}-{no}.js",
+                                 raw_heading="h3"))
+        parts.append("</section>")
+    parts.extend(_tail())
+    return "".join(parts)
+
+
 def build_page(results: dict[str, Any], out: Path) -> Path:
-    """Recompute metrics and write deterministic HTML and lazy raw JS files."""
+    """Write the summary page, one page per problem and lazy raw JS files."""
     out = Path(out)
     metrics = aggregate(results)
     patterns = results["meta"]["patterns"]
@@ -496,9 +584,9 @@ def build_page(results: dict[str, Any], out: Path) -> Path:
     for value in [*(p["id"] for p in patterns), *nos]:
         if not re.fullmatch(r"[A-Za-z0-9_-]+", value):
             raise ValueError(f"unsafe pattern or problem id: {value!r}")
-    raw_dir = out.parent / out.stem
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    for old in raw_dir.glob("raw-*.js"):
+    page_dir = out.parent / out.stem
+    page_dir.mkdir(parents=True, exist_ok=True)
+    for old in [*page_dir.glob("raw-*.js"), *page_dir.glob("*.html")]:
         old.unlink()
     for pattern in patterns:
         for no in nos:
@@ -509,78 +597,50 @@ def build_page(results: dict[str, Any], out: Path) -> Path:
             assignment = json.dumps(key, ensure_ascii=False) + "] = "
             data = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
             data = data.replace("</", "<\\/")
-            path = raw_dir / f"raw-{pattern['id']}-{no}.js"
+            path = page_dir / f"raw-{pattern['id']}-{no}.js"
             path.write_text("window.PROBE_RAW = window.PROBE_RAW || {};\n"
                             + "window.PROBE_RAW[" + assignment + data + ";\n", encoding="utf-8")
+    for no in nos:
+        (page_dir / f"{no}.html").write_text(
+            _problem_page(results, metrics, patterns, nos, no, out.name), encoding="utf-8")
+    case_no = {case["id"]: case["no"] for case in cases}
     count = len(cases)
-    count_details = "、".join(
-        f"{no}: 評価 {results['meta']['case_counts'][no]['eval']} / "
-        f"語だけ {results['meta']['case_counts'][no]['bare_term']} / "
-        f"共通 {results['meta']['case_counts'][no]['common']}"
-        for no in nos
-    )
-    parts = ['<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">',
-             '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
-             '<title>コメント返信の評価（プローブ） | AutoContentPublisherSystem</title>',
-             '<link rel="stylesheet" href="../../assets/style.css">',
-             '<style>', STYLE, '</style></head><body><div class="container">',
-             '<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / '
-             '<a href="../index.html">アプリ設計</a> / '
-             '<a href="umigame-soup-1.html">探偵カメロックのウミガメのスープ</a> / '
-             'コメント返信の評価（プローブ）</nav>',
-             '<h1>コメント返信の評価（プローブ）</h1>',
-             f'<div class="page-meta"><span>実行日時: {_h(results["meta"]["run_at"])}</span>'
-             f'<span>問題: {_h("・".join(nos))}</span><span>ケース: {count} 件</span></div>',
-             '<div class="note"><p>21-6d1 の様式確認用サンプル。'
-             f'問題 {len(nos)} 問、{count} ケース、実行日時 {_h(results["meta"]["run_at"])}。'
-             f'PROMPT_VERSION {_h(results["meta"]["prompt_version"])}、'
-             f'luna_model {_h(results["meta"]["luna_model"])}。</p>'
-             f'<p>件数の内訳: {_h(count_details)}。</p>'
-             '<p>判定 API はケースごとに各方式を 1 回呼んでパターン間で使い回し、'
-             '書き手だけパターンごとに呼んだ。件数が少なく、1 件で合否が割れる。</p></div>',
-             '<nav aria-label="目次"><strong>目次</strong><ul>',
-             '<li><a href="#summary">1. サマリー</a></li>',
-             '<li><a href="#patterns">2. パターン別の結果</a><ul>']
-    for pattern in patterns:
-        parts.append(f'<li><a href="#pattern-{_h(pattern["id"])}">{_h(pattern["label"])}</a><ul>')
-        for no in nos:
-            parts.append(f'<li><a href="#problem-{_h(pattern["id"])}-{_h(no)}">{_h(no)}</a></li>')
-        parts.append("</ul></li>")
-    parts.extend(['</ul></li></ul></nav>', '<h2 id="summary">1. サマリー</h2>',
-                  '<h3>合否表</h3>', _summary_table(metrics, patterns),
-                  '<p>L1② は設計書 5.1.1 どおり、返事が 20 件以上ある種別だけで数える'
-                  '（返信しない ⑳㉑ と、開示文が 1 つに決まる ④ は除く）。サンプルでは'
-                  '① 以外の種別が 5 件前後しかなく、1 件の変化で合否が割れる。</p>',
-                  '<h3>主要な率</h3>', _rate_svg(metrics, patterns),
-                  '<p>縦の点線は合格ライン。① 判定一致率は参考値なので基準線は置かない。棒に触れると件数が出る。</p>',
-                  '<h3>処理時間</h3>', _time_svg(metrics, patterns),
-                  '<p>中央値と p95 はそれぞれ判定・書き手・合計から個別に算出。'
-                  '積み上げた内訳と合計の数値は一致しない場合がある。</p>',
-                  '<h3>評価</h3>', _evaluation(metrics, patterns),
-                  '<h3>参考の数値</h3>', _reference_table(metrics, patterns),
-                  '<h2 id="patterns">2. パターン別の結果</h2>'])
-    for pattern in patterns:
-        pattern_id = pattern["id"]
-        report = metrics["patterns"][pattern_id]
-        failed = [METRIC_NAMES[key] for key, value in report["metrics"].items()
-                  if value["pass"] is False]
-        parts.append(f'<h3 id="pattern-{_h(pattern_id)}">{_h(pattern["label"])}</h3>')
-        parts.append(f'<p>不合格: {_h("、".join(failed) if failed else "なし")}</p>')
-        for no in nos:
-            problem_text = results["problems"][no]["problem_text"]
-            heading = problem_text[:60] + ("…" if len(problem_text) > 60 else "")
-            parts.append(f'<h4 id="problem-{_h(pattern_id)}-{_h(no)}">{_h(no)} '
-                         f'{_h(heading)}</h4>')
-            parts.append('<h5>コメント</h5>')
-            parts.append('<section class="case-section">')
-            selected_cases = [case for case in cases if case["no"] == no]
-            selected_rows = [row for row in results["rows"][pattern_id] if row["no"] == no]
-            raw_file = f"{out.stem}/raw-{pattern_id}-{no}.js"
-            parts.append(_case_table(pattern, no, selected_cases, selected_rows, raw_file))
-            parts.append("</section>")
-    parts.append('<script>')
-    parts.append(SCRIPT)
-    parts.append('</script></div></body></html>\n')
+    parts = _head("コメント返信の評価（プローブ）", "../../")
+    parts.extend([
+        '<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / '
+        '<a href="../index.html">アプリ設計</a> / '
+        '<a href="umigame-soup-1.html">探偵カメロックのウミガメのスープ</a> / '
+        'コメント返信の評価（プローブ）</nav>',
+        '<h1>コメント返信の評価（プローブ）</h1>',
+        f'<div class="page-meta"><span>実行日時: {_h(results["meta"]["run_at"])}</span>'
+        f'<span>問題: {len(nos)} 問</span><span>ケース: {count} 件</span></div>',
+        '<div class="note"><p>評価データの全件を 5 パターンに通した機械プローブ（21-6d3）。'
+        f'問題 {len(nos)} 問、{count} ケース、'
+        f'PROMPT_VERSION {_h(results["meta"]["prompt_version"])}、'
+        f'luna_model {_h(results["meta"]["luna_model"])}。</p>'
+        '<p>判定 API はケースごとに各方式を 1 回呼んでパターン間で使い回し、'
+        '書き手だけパターンごとに呼んだ。コメント一覧と生データは問題ごとのページにある'
+        '（合否表の NG の ID から該当の行へ飛べる）。</p></div>',
+        '<nav aria-label="目次"><strong>目次</strong><ul>',
+        '<li><a href="#summary">1. サマリー</a></li>',
+        '<li><a href="#problems">2. 問題ごとのページ</a></li></ul></nav>',
+        '<h2 id="summary">1. サマリー</h2>',
+        '<h3>合否表</h3>',
+        _summary_table(metrics, patterns,
+                       lambda pid, cid: f"{out.stem}/{case_no.get(cid, '')}.html"),
+        '<p>L1② は設計書 5.1.1 どおり、返事が 20 件以上ある種別だけで数える'
+        '（返信しない ⑳㉑ と、開示文が 1 つに決まる ④ は除く）。</p>',
+        '<h3>主要な率</h3>', _rate_svg(metrics, patterns),
+        '<p>縦の点線は合格ライン。① 判定一致率は参考値なので基準線は置かない。棒に触れると件数が出る。</p>',
+        '<h3>処理時間</h3>', _time_svg(metrics, patterns),
+        '<p>中央値と p95 はそれぞれ判定・書き手・合計から個別に算出。'
+        '積み上げた内訳と合計の数値は一致しない場合がある。</p>',
+        '<h3>評価</h3>', _evaluation(metrics, patterns),
+        '<h3>参考の数値</h3>', _reference_table(metrics, patterns),
+        '<h2 id="problems">2. 問題ごとのページ</h2>',
+        '<p>相違 = 正解ラベルとの不一致の件数（見張り役の食い違いは含めない）。</p>',
+        _problem_index(results, metrics, patterns, nos, out.stem)])
+    parts.extend(_tail())
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("".join(parts), encoding="utf-8")
     return out
