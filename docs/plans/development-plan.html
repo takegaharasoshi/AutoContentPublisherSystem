@@ -1069,11 +1069,49 @@
 </div>
 </article>
 
+<article class="plan-step" id="step-21-6d3e" data-step-id="21-6d3e" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6d3e</strong><span class="plan-status">未着手</span></div>
+<h3>真相（truth）・タイトル・キャプションを公開前提に書き直す</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d3d">21-6d3d</a> の完了後（同じ設計書 4 章と作問スキルに触るため）。truth は判定の根拠なので、全件プローブを取り直す <a href="#step-21-6d4">21-6d4</a> より前に完了させる（21-6d4 と 21-6e を最終形の truth で測るため・2026-10-04 ユーザー指摘）。2026-10-04 起票（アイデア <a href="../ideas/umigame-truth-disclosure.md">umigame-truth-disclosure</a> の採用）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>前回の問題の <code>truth</code> 全文を翌日のリールのキャプション末尾で公開する方針（2026-10-04 ユーザー決定）に合わせて、コンテンツ側を整える。① 既存 14 問の <code>truth</code> を「公開されて読まれても自然な文・読みやすい位置で適切に改行・はいと答える根拠の事実をすべて明記」に書き直す。② <code>title</code> を公開前提で見直す（キャプションの見出しになるため、真相の手がかりにならないか）。③ <code>caption</code> を合意した形（見出し = 【問題タイトル】・問題文・新しい遊び方の文と「真相は明日のリールのキャプションにて公開するよ。フォローして待っててね。」の予告・ハッシュタグ）へ変える（<code>umigame_common.caption()</code> に title を渡す）。④ <code>validate.py</code> に truth の文字数上限の検査を足す。⑤ 作問スキル <code>umigame-problem-writer</code> とセット別設計書 4 章・6 章を更新する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>真相の中身（筋・事実）は変えない。変えるのは書き方・改行・根拠の事実の明記だけ（<code>fact_sheet</code>・<code>core_points</code>・<code>reveal_text</code> と矛盾させない）。<code>services/</code> <code>database/</code> は触らない（前回の真相ブロックの差し込みは <a href="#step-21-6h">21-6h</a>）。改行は機械的な「1 文 1 行」にしない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>14 問の <code>truth</code>・<code>title</code>・<code>caption</code> を書き直し、<code>validate.py</code> が全問通る（出力を貼る）。truth の文字数上限は 14 問の実測から決め、値と根拠を設計書 4 章に書く。</li>
+<li>判定のコードは変えずに、全件プローブ（14 問・441 件・5 パターン）を取り直す（truth を渡すパターンは判定キャッシュを取り直す）。21-6d3 の結果と比べて判定が悪化していないことを、パターンごとの差分の集計で示す。この結果を 21-6d4 の比較の基準にする。</li>
+<li>キャプションの展開例（前回の真相ブロックを除いた上半分）を 1 問分貼り、合意した形（アイデア MD の「合意したキャプションの形」）と一致する。</li>
+<li>作問スキルの工程（素材化・自己検査）に truth の書き方と title の見直しを足し、セット別設計書 4 章・6 章を更新する。<code>python3 tools/docs_check.py</code> と <code>--plan-only</code> の出力を貼る。</li>
+<li>計画書を更新し、日本語メッセージでコミットして <code>pull --rebase</code> → push まで行う。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>14 問の truth・title の目視（ユーザー・ゴール対象外）。ストックの DB への再投入（両環境）はユーザー作業。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/umigame-stock/umigame-soup-1/</code>・<code>.agents/skills/umigame-problem-writer/</code>・<code>docs/</code>）。stop after 30 turns。プローブで判定が悪化したら、該当問題と差分を示して止まる（判定ロジックは直さない）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 起票の経緯・truth 廃止案を採らない理由・課題照合</span></summary>
+<div class="plan-fold-inner"><p><strong>起票の経緯</strong>: AI 出題者は <code>truth</code> を根拠に判定するが、フォロワーに見えるのは正解者への <code>reveal_text</code>（70 字）だけで答え合わせができない（ユーザー指摘）。コメント欄に全文を出すと問題がその場でネタバレになるため、翌日リールのキャプション末尾（ハッシュタグの後ろ）に出す。1 日 1 問なので締め処理なしで 24 時間後に必ず出て、誰も正解しない回も同じ仕組みで答えが出る。壁打ち記録は <a href="../ideas/umigame-truth-disclosure.md">アイデア MD</a>。</p><p><strong>truth を廃止しない理由</strong>: 70 字の reveal_text でははい / いいえの根拠が足りない。核心を書いてよいのは返信に出ない truth だけ、という漏洩防止の設計が崩れる。21-6d3c の矛盾チェックの土台が細る。</p><p><strong>正解者への返信</strong>: reveal_text に「真相の全文は明日のリールで」を足すことはしない（ユーザー決定）。</p><p><strong>課題表の照合</strong>: 触るパス（<code>content/umigame-stock/umigame-soup-1/</code>・<code>.agents/skills/umigame-problem-writer/</code>・<code>docs/app/sets/umigame-soup-1.html</code>）で該当行なし。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
 <article class="plan-step" id="step-21-6d4" data-step-id="21-6d4" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-6d4</strong><span class="plan-status">未着手</span></div>
 <h3>はい / いいえ質問の答えを 3 値に戻す（「判断できない」の廃止）</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-6d3b・<a href="#step-21-6d3c">21-6d3c</a> の完了後（設計書の整理を先にする = 2026-10-03 ユーザー決定。判定の実装を直してから全件を回す = 2026-10-04 ユーザー指摘）。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6d3b・<a href="#step-21-6d3c">21-6d3c</a>・<a href="#step-21-6d3e">21-6d3e</a>（truth の書き直し）の完了後（設計書の整理を先にする = 2026-10-03 ユーザー決定。判定の実装を直してから全件を回す = 2026-10-04 ユーザー指摘）。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
@@ -1084,7 +1122,7 @@
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li><code>services/comment-reply/</code> から答えとしての <code>unknown</code> が消え（<code>grep</code> の結果を貼る）、pytest が全パス（要約行を貼る）。</li>
-<li>全件プローブ（14 問・441 件・5 パターン）を判定から取り直し、集計出力と、21-6d3 との差（P3・P4・L1①・はい / いいえの一致率に加え、21-6d3c の矛盾チェックの効果として P2・P5・L1① の ⑤）をパターンごとに 1 行で示す。</li>
+<li>全件プローブ（14 問・441 件・5 パターン）を判定から取り直し、集計出力と、21-6d3e（truth 書き直し後の全件プローブ）との差（P3・P4・L1①・はい / いいえの一致率に加え、21-6d3c の矛盾チェックの効果として P2・P5・L1① の ⑤）をパターンごとに 1 行で示す。</li>
 <li>評価ページを再生成し、<code>docs_check.py --plan-only</code> と <code>--widths 360,390,768,1280</code> の出力を貼る。</li>
 <li>セット別設計書（21-6d3b の整理後の 10 章）の 4 値の記述を 3 値に直し、決定を付録「決定の経緯」に残す。10.5 の現行プロンプトの転記と <code>prompt_version</code> を更新する。計画書を更新する。</li>
 <li>日本語メッセージでコミット（<code>services/</code> を触るため push はユーザー判断）。</li>
@@ -1111,7 +1149,7 @@
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-6e</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>人間プローブ（ローカル）と方式選定</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-6d4 と <a href="#step-21-6h">21-6h</a>（truth の書き直し）の完了後（21-6d3 の集計確認後）。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6d4 の完了後（21-6d3 の集計確認後）。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
@@ -1218,46 +1256,8 @@
 <article class="plan-step" id="step-21-6h" data-step-id="21-6h" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-6h</strong><span class="plan-status">未着手</span></div>
-<h3>真相（truth）・タイトル・キャプションを公開前提に書き直す</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d3d">21-6d3d</a> の完了後（同じ設計書 4 章と作問スキルに触るため）。truth は判定の根拠なので、<a href="#step-21-6e">21-6e</a>（人間プローブ）より前に完了させる。2026-10-04 起票（アイデア <a href="../ideas/umigame-truth-disclosure.md">umigame-truth-disclosure</a> の採用）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>前回の問題の <code>truth</code> 全文を翌日のリールのキャプション末尾で公開する方針（2026-10-04 ユーザー決定）に合わせて、コンテンツ側を整える。① 既存 14 問の <code>truth</code> を「公開されて読まれても自然な文・読みやすい位置で適切に改行・はいと答える根拠の事実をすべて明記」に書き直す。② <code>title</code> を公開前提で見直す（キャプションの見出しになるため、真相の手がかりにならないか）。③ <code>caption</code> を合意した形（見出し = 【問題タイトル】・問題文・新しい遊び方の文と「真相は明日のリールのキャプションにて公開するよ。フォローして待っててね。」の予告・ハッシュタグ）へ変える（<code>umigame_common.caption()</code> に title を渡す）。④ <code>validate.py</code> に truth の文字数上限の検査を足す。⑤ 作問スキル <code>umigame-problem-writer</code> とセット別設計書 4 章・6 章を更新する。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>真相の中身（筋・事実）は変えない。変えるのは書き方・改行・根拠の事実の明記だけ（<code>fact_sheet</code>・<code>core_points</code>・<code>reveal_text</code> と矛盾させない）。<code>services/</code> <code>database/</code> は触らない（前回の真相ブロックの差し込みは <a href="#step-21-6i">21-6i</a>）。改行は機械的な「1 文 1 行」にしない。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>14 問の <code>truth</code>・<code>title</code>・<code>caption</code> を書き直し、<code>validate.py</code> が全問通る（出力を貼る）。truth の文字数上限は 14 問の実測から決め、値と根拠を設計書 4 章に書く。</li>
-<li>21-6d3 のプローブ実行器で truth を渡す方式（パターン 1）を 14 問全件で再実行し、21-6d3 の結果と比べて判定が悪化していないことを差分の集計で示す。</li>
-<li>キャプションの展開例（前回の真相ブロックを除いた上半分）を 1 問分貼り、合意した形（アイデア MD の「合意したキャプションの形」）と一致する。</li>
-<li>作問スキルの工程（素材化・自己検査）に truth の書き方と title の見直しを足し、セット別設計書 4 章・6 章を更新する。<code>python3 tools/docs_check.py</code> と <code>--plan-only</code> の出力を貼る。</li>
-<li>計画書を更新し、日本語メッセージでコミットして <code>pull --rebase</code> → push まで行う。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>14 問の truth・title の目視（ユーザー・ゴール対象外）。ストックの DB への再投入（両環境）はユーザー作業。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/umigame-stock/umigame-soup-1/</code>・<code>.agents/skills/umigame-problem-writer/</code>・<code>docs/</code>）。stop after 30 turns。プローブで判定が悪化したら、該当問題と差分を示して止まる（判定ロジックは直さない）。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 起票の経緯・truth 廃止案を採らない理由・課題照合</span></summary>
-<div class="plan-fold-inner"><p><strong>起票の経緯</strong>: AI 出題者は <code>truth</code> を根拠に判定するが、フォロワーに見えるのは正解者への <code>reveal_text</code>（70 字）だけで答え合わせができない（ユーザー指摘）。コメント欄に全文を出すと問題がその場でネタバレになるため、翌日リールのキャプション末尾（ハッシュタグの後ろ）に出す。1 日 1 問なので締め処理なしで 24 時間後に必ず出て、誰も正解しない回も同じ仕組みで答えが出る。壁打ち記録は <a href="../ideas/umigame-truth-disclosure.md">アイデア MD</a>。</p><p><strong>truth を廃止しない理由</strong>: 70 字の reveal_text でははい / いいえの根拠が足りない。核心を書いてよいのは返信に出ない truth だけ、という漏洩防止の設計が崩れる。21-6d3c の矛盾チェックの土台が細る。</p><p><strong>正解者への返信</strong>: reveal_text に「真相の全文は明日のリールで」を足すことはしない（ユーザー決定）。</p><p><strong>課題表の照合</strong>: 触るパス（<code>content/umigame-stock/umigame-soup-1/</code>・<code>.agents/skills/umigame-problem-writer/</code>・<code>docs/app/sets/umigame-soup-1.html</code>）で該当行なし。</p></div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-21-6i" data-step-id="21-6i" data-status="todo">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>21-6i</strong><span class="plan-status">未着手</span></div>
 <h3>投稿バッチで前回の真相ブロックをキャプション末尾に差し込む</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6h">21-6h</a> の完了後（書き直した truth・title を差し込むため）。<a href="#phase-26">Phase 26</a> と同じ <code>services/sns-post-batch/</code> に触る。着手順はユーザー判断（どちらが先でも、後から着手する側が先の変更の上に載せる）。2026-10-04 起票。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d3e">21-6d3e</a> の完了後（書き直した truth・title を差し込むため）。<a href="#phase-26">Phase 26</a> と同じ <code>services/sns-post-batch/</code> に触る。着手順はユーザー判断（どちらが先でも、後から着手する側が先の変更の上に載せる）。2026-10-04 起票。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
@@ -1295,7 +1295,7 @@
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-7</strong><span class="plan-status">未着手</span></div>
 <h3>アカウント・Meta アプリ・セット登録の準備</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-5c・21-5d（採用なら 21-5e も）・21-6f・21-6g・21-6h・21-6i の完了後。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-5b・21-5c・21-5d（採用なら 21-5e も）・21-6f・21-6g・21-6d3e・21-6h の完了後。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
