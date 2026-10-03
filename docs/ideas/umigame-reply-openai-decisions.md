@@ -1,11 +1,11 @@
 ---
 title: ウミガメのスープのコメント判定に OpenAI の Decisions API（Jev 相当）を候補として加える
 slug: umigame-reply-openai-decisions
-status: inbox            # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
+status: 再醸成待ち       # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
 kind: 単発               # 単発 | 構想
 created: 2026-10-03
 updated: 2026-10-03
-condition: ""            # 再醸成待ち・待機のとき必須（再検討トリガー / 落とし込み条件）
+condition: "(a) Jev に問題が出たとき（値上げ・提供停止・MCA / Acceptable Use Policy の変更）、または (b) Decisions API が一般公開され、公開ドキュメントで料金と確率を返すかが分かったとき、壁打ちを再開する。再開時は「Jev が使えなくなった場合の代わり」として、luna と同じモデルである弱みと天秤にかける"  # 再醸成待ち・待機のとき必須（再検討トリガー / 落とし込み条件）
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
@@ -14,14 +14,15 @@ disposition: ""          # クローズ時の昇格先リンク / 見送り理�
 
 ## 要旨
 
-OpenAI が Jev（TypeSafe AI）と同じ種類の判定専用 API「Decisions API」を出したらしい。これを umigame-soup-1 のコメント自動返信の判定に取り入れたい。
-すでに採用済みの [Jev 案](umigame-yesno-jev.md)（開発計画 21-6a〜g・2 方式比較。2026-10-03 時点で 21-6d1 完了・次は 21-6d2 評価データ）に、**3 つ目の方式として比較対象に加える**かどうかが論点。
-捕捉時の一次調べ（未検証・壁打ちで一次情報を確認する）: Decisions API は GPT-6 Luna 上で動き、約 150 ms で応答する。Jev と違い、選択肢ごとの確率（閾値設計に使う値）を返すかどうかは公式に書かれていないという比較記事がある。
+OpenAI の Decisions API（2026-09-29 発表・GPT-6 Luna 上で動く判定専用 API・限定プレビュー）を、umigame-soup-1 のコメント判定に取り入れるかを検討した。**結論は再醸成待ち**（2026-10-03）。
+21-6b の暫定方針で Jev は「見張り役」と「真相を開示する前の二重確認」を担い（21-6c2 で `hybrid` モードとして実装済み）、Decisions API が代わりうるのはこの役割。ただしこの役割は **luna とは別のモデルの意見であることが前提**で、中身が同じ GPT-6 Luna の Decisions API では luna の劣化・読み違いと誤りが連動しやすく、誤った開示を止められない。
+加えて、限定プレビューのため呼び出せず、料金・確率を返すかも未公開で設計もできない。評価データ（21-6d2）は方式に依存しないので、使えるようになってから 21-6d3 のプローブ実行器にパターンを足せば手戻りは出ない。
+再開時に検討する役割は「Jev が使えなくなった場合の代わり」（OpenAI キーの流用・契約先が減る・SLA のない Jev より安定、という利点と、独立性の喪失を天秤にかける）。
 
 ## 前提条件・再検討トリガー
 
-- 21-6 の方式選定（人間プローブと方式選定のステップ）より前に、加えるかどうかを決める必要がある。評価データ（21-6d2）・全件プローブ（21-6d3）に間に合えば比較のコストが小さい
-- 判断材料: 確率を返すか・日本語の精度・料金・規約（商用・エンドユーザー提供）・既存の OpenAI キー（パターン 1 の luna）を流用できるか
+- 再検討トリガー: (a) Jev の値上げ・提供停止・規約（MCA・Acceptable Use Policy）の変更 / (b) Decisions API の一般公開と公開ドキュメント（料金・確率を返すか・選択肢の上限・日本語対応）
+- 親の検討: [Jev 案](umigame-yesno-jev.md)（開発計画 21-6a〜g）。Jev の役割の設計は `docs/app/sets/umigame-soup-1.html` 5.1.2
 
 ## 原文メモ
 
@@ -29,4 +30,17 @@ OpenAI が Jev（TypeSafe AI）と同じ種類の判定専用 API「Decisions AP
 
 OpenAI から Jevのような API が出たということを聞きました。これを「ウミガメのスープ」のコメント返信の部分に取り入れたいと考えています。
 
+（2026-10-03 壁打ちでの発言）
+
+方針問題ないです
+
 ## 壁打ち記録
+
+### 2026-10-03
+
+- 一次調べ: 2026-09-29 の OpenAI DevDay で発表、一部の API 顧客向けの限定プレビュー（一般公開は「数日以内」）。開発者が決めた選択肢から 1 つ選ぶ・判断材料はテキストか画像・約 150 ms・中身は GPT-6 Luna。API リファレンス・料金・確率を返すか・選択肢の上限・日本語対応は未公開（10-02 時点で Docs・changelog・料金ページに記載なし）
+  - 出典: https://openai.com/index/devday-2026-recap/ ・ https://modelsystem.one/news/openai-decisions-api-preview/ ・ https://modelsystem.one/runtimes/openai-decisions-api/ ・ https://pasqualepillitteri.it/en/news/19372/openai-decisions-api-jev ・ https://www.valyu.ai/blogs/jev-vs-decisions-api
+- 捉え直し: 21-6b の暫定方針（luna が主役・Jev は見張り役と開示前の二重確認）では、Decisions API が代わりうるのは Jev の役割。この役割は別モデルの意見であることが前提で、同じ GPT-6 Luna の Decisions API では誤りが luna と連動しやすい（luna の劣化にも気づけず、誤った開示を止められない）
+- 利点（OpenAI キーの流用・契約先が 1 社減る・SLA のない Jev より安定しそう）は、独立性の喪失を上回らない
+- 実務面: プレビューに選ばれないと呼べない。21-6d2 は方式に依存しないため、今入れなくても後で 21-6d3 にパターンを足すだけで手戻りはない
+- 判断（ユーザー合意）: 再醸成待ち。トリガーは (a) Jev 側の問題 / (b) 一般公開と公開ドキュメント。再開時は「Jev の代わり」として独立性の弱みと天秤にかける
