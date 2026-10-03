@@ -39,6 +39,10 @@
       {
         "id": "d3",
         "description": "30歳くらいの日本人男性。とても太っていて、大きなお腹から出るようなこもった丸い響きと、ふくよかな頬で話しているようなもっちりした柔らかい発音。成人男性としてはやや高めで明るい声。人懐っこく可愛らしいが、謎を語るときは得意げで少し芝居がかる。子供に語り掛ける優しいパパのような話し方。標準的な日本語の発音。"
+      },
+      {
+        "id": "d4",
+        "description": "お相撲さんのように太っていて、食いしん坊な日本人男性。太っているのが声からも伝わる、優しく丸みがあって太く柔らかい声。少年っぽさの残る人懐っこさがある。子供に語りかける優しいパパのような話し方。標準的な日本語の発音。"
       }
     ]
   },
@@ -67,6 +71,27 @@
       "direction": "[proudly, warmly, like a kind dad telling a child a story, short pauses, fast pace]",
       "rule_direction": "[same tone, friendly and smiling]",
       "label": "④ ③ と同じ声を v3 で（v4 で演技が控えめになるかの対照）"
+    },
+    {
+      "id": "e3-v4-d4-0",
+      "model_id": "eleven_v4",
+      "voice": "design",
+      "design_pick": "d4-0",
+      "label": "③' v4 + Voice Design 説明文 d4（探偵・年齢を外した版）候補 0"
+    },
+    {
+      "id": "e3-v4-d4-1",
+      "model_id": "eleven_v4",
+      "voice": "design",
+      "design_pick": "d4-1",
+      "label": "③' v4 + Voice Design 説明文 d4（探偵・年齢を外した版）候補 1"
+    },
+    {
+      "id": "e3-v4-d4-2",
+      "model_id": "eleven_v4",
+      "voice": "design",
+      "design_pick": "d4-2",
+      "label": "③' v4 + Voice Design 説明文 d4（探偵・年齢を外した版）候補 2"
     }
   ]
 }

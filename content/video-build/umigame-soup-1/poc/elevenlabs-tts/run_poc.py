@@ -11,7 +11,8 @@
     python3 poc/elevenlabs-tts/run_poc.py --tts-only     # 合成と尺の実測だけ
     python3 poc/elevenlabs-tts/run_poc.py --force        # 既存の合成結果を捨てて取り直す
 
-Voice Design で使う候補は ``variants.json`` の ``design.pick``（``<版 id>-<候補番号>``）で選ぶ。
+Voice Design で使う候補は ``variants.json`` の ``design.pick``（``<版 id>-<候補番号>``）で選び、
+variant ごとに ``design_pick`` で上書きできる。
 作った声の ID と説明文は ``voices.lock.json``（git 管理）に残す。
 API キーは環境変数 ``ELEVENLABS_API_KEY`` か ``~/.config/elevenlabs/api_key`` から読む。
 """
@@ -149,12 +150,11 @@ def design_previews(cfg: dict[str, Any], credits: dict[str, int]) -> dict[str, A
     return previews
 
 
-def designed_voice(cfg: dict[str, Any], previews: dict[str, Any], credits: dict[str, int]) -> str:
-    """design.pick の候補を保存して voice_id を返す（同じ候補なら保存済みを使う）。"""
-    pick = cfg["design"]["pick"]
+def designed_voice(cfg: dict[str, Any], previews: dict[str, Any], credits: dict[str, int], pick: str) -> str:
+    """Voice Design の候補 pick を保存して voice_id を返す（保存済みならそれを使う）。"""
     lock = _load_lock()
-    if lock.get("design", {}).get("candidate") == pick:
-        return lock["design"]["voice_id"]
+    if pick in lock.get("designs", {}):
+        return lock["designs"][pick]["voice_id"]
     version_id = pick.rsplit("-", 1)[0]
     version = previews[version_id]
     candidate = next(c for c in version["candidates"] if c["candidate"] == pick)
@@ -164,8 +164,8 @@ def designed_voice(cfg: dict[str, Any], previews: dict[str, Any], credits: dict[
         "voice_description": version["description"],
         "generated_voice_id": candidate["generated_voice_id"],
     }).json()
-    credits["design_save"] = used_credits() - before
-    lock["design"] = {
+    credits[f"design_save_{pick}"] = used_credits() - before
+    lock.setdefault("designs", {})[pick] = {
         "voice_id": response["voice_id"],
         "candidate": pick,
         "model_id": cfg["design"]["model_id"],
@@ -293,11 +293,11 @@ def write_page(cfg: dict[str, Any], reports: dict[str, dict[str, Any]], previews
                 f"<figcaption>{html.escape(caption)}</figcaption></figure>"
             )
         rows.append(f"<h2>{html.escape(key)}</h2><div class=grid>{''.join(figures)}</div>")
-    pick = cfg["design"]["pick"]
+    picks = {v.get("design_pick", cfg["design"]["pick"]) for v in cfg["variants"] if v.get("voice") == "design"}
     design_rows = []
     for version_id, version in previews.items():
         audios = "".join(
-            f"<li>{'★ ' if c['candidate'] == pick else ''}{html.escape(c['candidate'])} "
+            f"<li>{'★ ' if c['candidate'] in picks else ''}{html.escape(c['candidate'])} "
             f'<audio controls preload="none" src="design/{c["file"]}"></audio></li>'
             for c in version["candidates"]
         )
@@ -313,7 +313,7 @@ def write_page(cfg: dict[str, Any], reports: dict[str, dict[str, Any]], previews
         "video{width:220px}figcaption{font-size:13px}.desc{font-size:13px;color:#bbb}"
         "ul{list-style:none;padding:0}li{margin:4px 0}</style>"
         "<h1>ElevenLabs v4 聞き比べ（21-5d）</h1>" + "".join(rows)
-        + f"<h2>Voice Design の候補（★ = ③④ に使った {html.escape(pick)}）</h2>" + "".join(design_rows),
+        + "<h2>Voice Design の候補（★ = 動画に使った候補）</h2>" + "".join(design_rows),
         encoding="utf-8",
     )
     return page
@@ -332,7 +332,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.design_only:
         print(json.dumps(credits, ensure_ascii=False))
         return 0
-    voices = {"clone": clone_voice(cfg, credits), "design": designed_voice(cfg, previews, credits)}
+    clone_id = clone_voice(cfg, credits)
     variants = [v for v in cfg["variants"] if not args.variant or v["id"] in args.variant]
     reports: dict[str, dict[str, Any]] = {}
     for key in cfg["problems"]:
@@ -340,7 +340,12 @@ def main(argv: list[str] | None = None) -> int:
             if variant.get("baseline"):
                 rep = baseline(key, variant)
             else:
-                rep = run_tts(key, variant, voices[variant["voice"]], cfg, args.force)
+                if variant["voice"] == "clone":
+                    voice_id = clone_id
+                else:
+                    pick = variant.get("design_pick", cfg["design"]["pick"])
+                    voice_id = designed_voice(cfg, previews, credits, pick)
+                rep = run_tts(key, variant, voice_id, cfg, args.force)
             reports[f"{key}/{variant['id']}"] = rep
             print(
                 f"{key} {variant['id']}: total {rep['total_seconds']}s tempo x{rep['tempo']} "
