@@ -225,7 +225,7 @@
     </tr>
     <tr>
       <td><code>umigame_stock_items</code><span class="badge badge-fixed" style="margin-left:.4rem">21-3 設計</span></td>
-      <td>ウミガメのスープの問題ストック（人間レビュー + プローブテスト済みの<strong>素材 14 項目</strong> + 事前動画参照）。セットの子で、ウミガメ方式が軸なしの LRU 順繰りで消費する</td>
+      <td>ウミガメのスープの問題ストック（人間レビュー + プローブテスト済みの<strong>素材 16 項目</strong> + 事前動画参照）。セットの子で、ウミガメ方式が軸なしの LRU 順繰りで消費する</td>
       <td><code>ranking_stock_items</code> のパターン（セット配下の有効レコード + LRU 順繰り + 証跡カラム + セット境界の複合 FK + 業務キー <code>content_key</code>）を踏襲し、単尺の事前動画参照（<code>video_s3_key</code>）と参加型固有の素材（真相・確定事実シート・想定質問・プレイ例・キャラのセリフ）を加えたもの（セクション 4.15）</td>
     </tr>
     <tr>
@@ -864,7 +864,7 @@ LIMIT 1;</code></pre>
   </div>
   <ul style="margin:.3rem 0 0;">
     <li>インデックスは取得絞り込み用に <code>KEY (set_id, is_active, last_used_at)</code>（ランキングと同じ 3 カラム。難易度の軸は持たない）</li>
-    <li><strong>素材 14 項目を JSON 1 本にまとめず個別カラムにする理由</strong>: 方式・SNS 投稿バッチ・ツーリングが参照する項目（問題文・真相・確定事実シート・キャプション・フック・ルール帯）はクエリで直接取りたい一方、版面専用の構造化データ（<code>narration</code> / <code>play_example</code> / <code>character_lines</code>）と検証用データ（<code>expected_questions</code>）は JSON で持つ。ランキングの <code>content_fields</code> / <code>ranking_data</code> / <code>narration</code> と同じ粒度の判断</li>
+    <li><strong>素材項目を JSON 1 本にまとめず個別カラムにする理由</strong>: 方式・SNS 投稿バッチ・ツーリングが参照する項目（問題文・真相・確定事実シート・キャプション・フック・ルール帯）はクエリで直接取りたい一方、版面専用の構造化データ（<code>narration</code> / <code>play_example</code> / <code>character_lines</code>）と検証用データ（<code>expected_questions</code>）は JSON で持つ。ランキングの <code>content_fields</code> / <code>ranking_data</code> / <code>narration</code> と同じ粒度の判断</li>
     <li>プローブテストの結果（回答ログ・レビュー所見）は DB に記録しない（<code>quiz_items</code> の検証メタと同じ割り切り。証跡は <code>content/umigame-stock/.../work/review.html</code> と git）</li>
     <li>0 件フェイルラウド・再利用 WARNING・防御的フィールド検査は <code>ranking_stock_items</code> と同方針</li>
   </ul>

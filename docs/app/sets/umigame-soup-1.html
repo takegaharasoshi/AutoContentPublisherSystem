@@ -111,8 +111,8 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>Scheduler の CDK 追加は 21-7</strong>（<a href="../../infra/workflow.html#schedule">workflow.html 1.6</a> の命名規約。Input にスロット・尺は持たせない）。有効化前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
 </ul>
 
-<h2 id="stock-items">4. ストック 1 件の素材項目（14 項目）</h2>
-<div class="note"><span class="callout-title">要点</span>ストック 1 件は「リール 1 本と AI 出題者の判定に要る素材一式」。下の 14 項目の表が正で、<code>validate.py</code>・テーブル <code>umigame_stock_items</code> はこれに従う。問題はすべて完全オリジナル。</div>
+<h2 id="stock-items">4. ストック 1 件の素材項目（16 項目）</h2>
+<div class="note"><span class="callout-title">要点</span>ストック 1 件は「リール 1 本と AI 出題者の判定に要る素材一式」。下の 16 項目の表が正で、<code>validate.py</code>・テーブル <code>umigame_stock_items</code> はこれに従う。#15・#16 はコメント返信の判定用で、ほかの項目と同じく作問時に書く。問題はすべて完全オリジナル。</div>
 <p>下表が正で、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。</p>
 <p>作問の手順（ランダム語のモチーフ → コア宣言 → 動線・現実性・既存問題との照合の自己検査）はスキル <code>.claude/skills/umigame-problem-writer/SKILL.md</code> が正。<code>stock_items.py</code> の管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）を <code>validate.py</code> が様式検査し、作問レビュー用の素材シート（<code>work/review.html</code>）は問題文の直前に表示する（レビューはコア宣言から見る）。</p>
 <div class="table-wrap">
@@ -132,6 +132,8 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。TTS のクレジット行は不要（セクション 8）</td></tr>
 <tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>「完全オリジナル」宣言 + 型 + モチーフ → 連想 → 逆にした常識を書く（<code>validate.py</code> が宣言の有無を検査）。オリジナル性の基準は表の下</td></tr>
 <tr><td>14</td><td><code>difficulty</code> 難易度</td><td>運用の目安（在庫の偏り確認）</td><td>1〜5</td></tr>
+<tr><td>15</td><td><code>core_points</code> コアの要点</td><td>コメント返信の判定根拠（④ 正解 / ⑤ 惜しい / ⑥ 不正解を見分ける）。機械プローブの正解ラベルにも使う。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ（管理項目 <code>core</code> = コア宣言の 1 文とは別物）</td><td>1〜3 個・1 個 20 字以内（文字列の配列）。真相の説明に最低限必要な情報だけを書く（基準の正は <a href="#core-points">10.2「コアで見分ける」</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
+<tr><td>16</td><td><code>reveal_text</code> 開示文</td><td>正解時に返信で開示する真相の要約（<code>正解！</code> に続ける文。<a href="#reply-style">10.4</a>）。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ</td><td>70 字以内（<a href="#judge-contract">10.3.1</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
 </table>
 </div>
 <ul>
@@ -141,7 +143,7 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>補充とレビューのペース</strong>: 1 日 1 問 = 週 7 問。レビューは<strong>週 2 回 × 4 問</strong>。手順の詳細は 21-8 の補充スキル（<code>umigame-stock-replenish</code>）に書く</li>
   <li><strong>作問時に本番経路で答えを確かめる</strong>: 評価データ <code>judge-trial/data/eval_problems.json</code> にケースを足し（正解ラベルは人が確認）、<code>probe_run.py --problems &lt;no&gt;</code> を回す（<a href="#evaluation">10.6</a>）</li>
   <li><strong>管理項目</strong>: <code>content_key</code>（<code>{3 桁連番}-{slug}</code>）と <code>title</code>（管理用の題名）はツーリングが付ける管理項目で、素材項目には数えない。キャラクター・BGM・SE・フォントは<strong>セット固定の共有資産</strong>で、ストック単位の項目ではない（セクション 7〜9）</li>
-  <li><strong>判定用の項目</strong>: コメント返信の判定に使う <code>core_points</code>・<code>reveal_text</code> は 14 項目とは別に <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code> に持つ（V013。<a href="#judge-contract">10.3.1</a>）</li>
+  <li><strong>判定用の項目（#15・#16）の持ち方</strong>: 21-6c1（V013）で後から足したため、<code>stock_items.py</code> では問題本体の辞書ではなく <code>JUDGE_POINTS</code>（問題番号 → 2 項目）に持つ。<code>validate.py</code> が個数・字数を、<code>generate.py</code> が投入 SQL への反映を扱う。21-6d3d で素材項目へ正式に数えた（それまでは表の外の注記。仕様は不変）</li>
 </ul>
 
 <h2 id="illustration-prompt">5. イラスト作成用プロンプト（ストック整備時・imagegen）</h2>
@@ -165,7 +167,7 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>ハッシュタグ</strong>: <code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart</code></li>
   <li><strong>書かないもの</strong>: 問題番号「第 N 問」（ストックは LRU で消費され、投稿順が確定しないため。PoC の表記は本番では使わない）。問題文の要約（すぐ下の問題文と同じ話が 2 回出るように見えるため。2026-09-24 ユーザー決定）</li>
   <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> だけのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Irodori-TTS でクレジット表記は不要（セクション 8）</li>
-  <li><strong>テンプレートを <code>{{caption}}</code> だけにする理由</strong>: ハッシュタグの固定部を分けると、問題固有のタグを足したいときに 2 か所を見ることになり、素材 14 項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
+  <li><strong>テンプレートを <code>{{caption}}</code> だけにする理由</strong>: ハッシュタグの固定部を分けると、問題固有のタグを足したいときに 2 か所を見ることになり、素材項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
 </ul>
 
 <h2 id="audio">7. 音源の構成</h2>
