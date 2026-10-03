@@ -965,7 +965,8 @@
 <p><strong>そのほかの気づき</strong>: <code>pattern1_rules.txt</code> の手順 3 には ⑧ の旧い言い回し「誰かが当てるまで秘密」が残っている（下書き用で送信されないため実害なし。10.5 に注記。プロンプトを触る 21-6d4 で直すかを判断する）。</p>
 <p><strong>400 字超の数え方</strong>: <code>html.parser</code> で <code>&lt;p&gt;</code>・<code>&lt;li&gt;</code>・コールアウト（<code>.note</code> / <code>.warn</code> / <code>.decision</code>）の直下の地の文を数え、入れ子のリスト・<code>&lt;pre&gt;</code> は親に数えない。新版 342 ブロック・最長 315 字・400 字超 0 件（旧版 184 ブロック・最長 843 字・17 件）。</p>
 <p><strong>他ページの参照</strong>: 旧アンカー 18 個はすべて同じ ID で残した。現役ページの節番号つきリンクの表記を更新（<code>batch-flow.html</code>・<code>data-model.html</code>・<code>generators/umigame-prebuilt.html</code>・検討ページ 2 枚）。検討ページ 2 枚は <code>content/.../judge-trial/build_*study_page.py</code> の生成物で、生成器側は <code>docs/</code> 外のため直していない（作り直すと旧表記に戻る。完了済みのページで作り直しの予定はない）。計画書・記録の過去の記述は当時の節番号のまま。</p>
-<p><strong>検査</strong>: <code>docs_check.py</code>（引数なし・リンク / アンカー不備 0）・<code>--plan-only</code>・<code>--widths 360,390,768,1280</code>（68 ページ・はみ出し 0）はすべて OK。人間ゲート（スマホでの読みやすさ）はユーザー確認待ち。</p></div>
+<p><strong>検査</strong>: <code>docs_check.py</code>（引数なし・リンク / アンカー不備 0）・<code>--plan-only</code>・<code>--widths 360,390,768,1280</code>（68 ページ・はみ出し 0）はすべて OK。</p>
+<p><strong>人間ゲート 1 巡目（2026-10-04 ユーザー）</strong>: 「10 章をもっと見やすく。表やフローチャートを使って」。10 章の箇条を表に置き換え（環境変数・P1〜P7・22 種・④⑤⑥・レベル 0〜3・2 方式の比較・契約・構成・パターン 1 のパラメータ・3 モード・判定語・書き方の基準・定型文・評価データ・5 パターン・スナップショットのキー・返信の区分・費用・監視）、フローチャート 4 枚（図 10-1 処理の流れ・10-2 パターン 2 の段・10-3 <code>hybrid</code> の見張り役と二重確認・10-4 返信文の決まり方）を HTML/CSS で足した（既存の <code>--diag-*</code> 変数でダークモード対応・外部ライブラリなし）。内容は変えていない。400 字超 0 件・検査 OK。</p></div>
 </details>
 </div>
 </article>
