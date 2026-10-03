@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>セット別設計書: 探偵カメロックのウミガメのスープ | AutoContentPublisherSystem</title>
 <link rel="stylesheet" href="../../assets/style.css?v=20260921">
+<style>
+details.fold { border: 1px solid var(--border); border-radius: 8px; padding: .5rem .9rem; margin: .7rem 0; }
+details.fold > summary { cursor: pointer; font-weight: 600; }
+details.fold[open] > summary { margin-bottom: .5rem; }
+details.fold pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+nav.toc ul { margin: .3rem 0 0; }
+</style>
 </head>
 <body>
 <div class="container">
@@ -14,57 +21,69 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-09-30（21-6c1: コアの考え方〔5.1.1〕と主語のない語だけのコメントの扱いを決め、10.2 のスナップショットを <code>schema_version</code> 2〔<code>core_points</code>・<code>reveal_text</code>〕にした）。前回: 2026-09-26（21-5b: 10.2 に投稿後スナップショット出力の実装を追記し、手動再出力ツールを 21-7 へ移した）。前回: 2026-09-04</span>
+  <span>最終更新: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  本セット固有の設定・運用情報を記録する（21-3 で作成）。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> を参照し、本書には差分のみ書く（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）。動画フォーマット・事前ビルドの技術設計は方式設計書 <a href="../generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a> が正。コメント自動返信経路のインフラは <a href="../../infra/stacks.html#comment-reply">infra/stacks.html セクション 3.6</a>、企画・事業面の検討経緯は<a href="../../ideas/umigame-soup-set.html">アイデア詳細</a>、実装上の 8 論点の決定は壁打ち記録 <a href="../requirements-notes-set4.html">requirements-notes-set4.html</a>（21-1）、リール PoC の実測と確定事項は <code>content/video-build/umigame-soup-1/README.md</code> セクション 0（21-2）にある。
+  <p>本セット固有の設定・運用情報を書く。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> が正で、本書には差分だけを書く（<a href="../design-outline.html#set-docs">design-outline.html 1.1</a>）。</p>
+  <p>本文は<strong>今の正だけ</strong>を書き、決定の理由と経緯は<a href="#history">付録「決定の経緯」</a>に日付順で集める。関連する資料:</p>
+  <ul>
+    <li>動画フォーマット・事前ビルドの技術設計: 方式設計書 <a href="../generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a></li>
+    <li>コメント自動返信経路のインフラ: <a href="../../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a></li>
+    <li>企画・事業面の検討経緯: <a href="../../ideas/umigame-soup-set.html">アイデア詳細</a>。実装上の 8 論点の決定: 壁打ち記録 <a href="../requirements-notes-set4.html">requirements-notes-set4.html</a>（21-1）</li>
+    <li>リール PoC の実測と確定事項: <code>content/video-build/umigame-soup-1/README.md</code> セクション 0（21-2）</li>
+    <li>コメント返信の試行錯誤: 検討ページ「<a href="umigame-soup-1-judge-study.html">処理方式</a>」「<a href="umigame-soup-1-reply-study.html">返信文</a>」と<a href="umigame-soup-1-probe.html">評価ページ</a></li>
+  </ul>
 </div>
 
 <div class="warn">
   <span class="callout-title">適用状態</span>
-  21-3（2026-09-04）で設計 Fix した<strong>目標設計</strong>を記述している。DDL（V012）・ストック整備ツーリング・第 1 バッチ執筆は 21-4a、投入は 21-4b、ビルドツーリングと全数ビルドは 21-5a、方式モジュール・キャプション・投稿後スナップショットは 21-5b、コメント自動返信経路の本番化は 21-6（21-4・21-5 と独立）、アカウント・Meta アプリ・セット登録と稼働開始は 21-7、セットレーンへの移管と補充スキル化は 21-8 を予定（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 21）。実装時の差分は decision コールアウトで追記する。
+  <p>21-3（2026-09-04）で設計 Fix した<strong>目標設計</strong>に、21-4〜21-6d3 の実装を反映している。ストック・ビルド・方式モジュール・判定モジュール（<code>services/comment-reply/</code>）は実装済み。コメント返信の方式選定は 21-6e、本番スタックは 21-6f、トークンの自動更新は 21-6g、アカウント・Meta アプリ・セット登録と稼働開始は 21-7、セットレーンへの移管と補充スキル化は 21-8 の予定（<a href="../../plans/development-plan.html">開発計画</a> Phase 21）。</p>
 </div>
 
-<h2>1. テーマ</h2>
-<p><strong>Instagram リールで 1 日 1 問の「ウミガメのスープ」（水平思考クイズ）を投稿し、コメント欄の質問に AI 出題者「探偵カメロック」が「はい / いいえ / 関係ありません」で自動返信する参加型セット</strong>。既存 3 セットが放送型（見て終わり）なのに対し、本セットは<strong>コメントで遊ぶ多ターン参加型</strong>であり、コメントエンゲージメント → リーチ増幅 → Meta ボーナスという<a href="../../strategy/business-strategy.html">事業戦略書</a>の本命経路への乗り方が構造的に強いことが企画価値（固有の収益モデルは持たない）。</p>
+<nav class="toc" aria-label="目次"><strong>目次</strong>
 <ul>
-  <li><strong>出題者 = アカウントそのもの</strong>: 出題者キャラ「探偵カメロック」（丸い体・前掛け・透明な黄金スープの椀と匙・虫眼鏡を持つウミガメの探偵）をアカウントの顔とし、AI 返信はアカウント名義で付く。質問者キャラ「カメロック Jr.」（探偵の子ども。大きすぎる鹿撃ち帽・蝶ネクタイ・メモ帳）はリール内でプレイ例を演じるプレイヤー側の代表（将来の助手サブアカウント構想と名前を揃える。21-1 ④）</li>
-  <li><strong>効果仮説</strong>: コメント率（コメント数 / リーチ）が logic-training-1 比で高く、リーチの伸び率に転化する。稼働 2 週間後の確認待ちとして 21-8 で作るセット計画書に起票する</li>
-  <li><strong>既存セットとの関係</strong>: logic-training-1 の夜スロット（とんち・水平思考）とはテーマが異なり、ストックの共用・ネタ融通はしない（カニバリ助長のため。アイデア詳細 11）</li>
-  <li><strong>コールドスタート対策</strong>: リール版面にプレイ例 3 往復を焼き込み、参加ゼロでもリール単体で遊び方と面白さが伝わるようにする。固定コメント（ピン留め）と助手サブアカウントは<strong>初期版では作らない</strong>（21-1 ④。要否は稼働 2 週間後の確認待ちで判断）。偽装アカウント（桜）は Meta の非真正行為規約に該当するため不採用（2026-08-28 decision）</li>
+  <li><a href="#theme">1. テーマ</a> / <a href="#account">2. 投稿先アカウント</a> / <a href="#schedule">3. スケジュール</a> / <a href="#stock-items">4. 素材項目</a> / <a href="#illustration-prompt">5. イラストプロンプト</a></li>
+  <li><a href="#caption">6. キャプション</a> / <a href="#audio">7. 音源</a> / <a href="#tts">8. ナレーション</a> / <a href="#assets">9. 固定アセット</a></li>
+  <li><a href="#comment-reply">10. コメント自動返信</a>: <a href="#reply-overview">10.1 全体像</a> / <a href="#quality-levels">10.2 品質基準</a> / <a href="#judge-design">10.3 判定方式</a> / <a href="#reply-style">10.4 返信文</a> / <a href="#prompts">10.5 現行プロンプト</a> / <a href="#evaluation">10.6 評価</a> / <a href="#reply-ops">10.7 運用</a> / <a href="#comment-log">10.8 コメント記録</a></li>
+  <li><a href="#failure">11. 失敗時ポリシー</a> / <a href="#diff">12. 差分・特記事項</a> / <a href="#history">付録 決定の経緯</a></li>
+</ul>
+</nav>
+
+<h2 id="theme">1. テーマ</h2>
+<div class="note"><span class="callout-title">要点</span>Instagram リールで 1 日 1 問のウミガメのスープを出し、コメントの質問に AI 出題者「探偵カメロック」が自動で答える参加型セット。コメントで遊ぶ仕組みが、事業戦略の本命経路（コメント → リーチ → Meta ボーナス）に乗りやすい。</div>
+<p>既存 3 セットは見て終わりの放送型。本セットは<strong>コメントで遊ぶ多ターン参加型</strong>で、コメントエンゲージメント → リーチ増幅 → Meta ボーナスという<a href="../../strategy/business-strategy.html">事業戦略書</a>の本命経路に構造的に乗りやすいことが企画価値（固有の収益モデルは持たない）。</p>
+<ul>
+  <li><strong>出題者 = アカウントそのもの</strong>: 出題者キャラ「探偵カメロック」（丸い体・前掛け・透明な黄金スープの椀と匙・虫眼鏡を持つウミガメの探偵）をアカウントの顔にし、AI の返信はアカウント名義で付く</li>
+  <li><strong>質問者キャラ</strong>: 「カメロック Jr.」（探偵の子ども。大きすぎる鹿撃ち帽・蝶ネクタイ・メモ帳）がリール内でプレイ例を演じる（将来の助手サブアカウント構想と名前を揃える。21-1 ④）</li>
+  <li><strong>効果仮説</strong>: コメント率（コメント数 / リーチ）が logic-training-1 より高く、リーチの伸び率に転化する。稼働 2 週間後の確認待ちとして、21-8 で作るセット計画書に起票する</li>
+  <li><strong>既存セットとの関係</strong>: logic-training-1 の夜スロット（とんち・水平思考）とはテーマが異なり、ストックの共用・ネタの融通はしない（カニバリを助長するため。アイデア詳細 11）</li>
+  <li><strong>コールドスタート対策</strong>: リール版面にプレイ例 3 往復を焼き込み、参加ゼロでもリール単体で遊び方と面白さが伝わるようにする。固定コメント（ピン留め）と助手サブアカウントは<strong>初期版では作らない</strong>（要否は稼働 2 週間後に判断）。偽装アカウント（桜）は Meta の非真正行為規約に当たるため使わない</li>
 </ul>
 
-<h2>2. 投稿先アカウント構成</h2>
+<h2 id="account">2. 投稿先アカウント構成</h2>
+<div class="note"><span class="callout-title">要点</span>アカウントは <code>umigame.soup.jp</code>。投稿は既存 Meta アプリを流用し、コメント返信だけ本番用の新しい Meta アプリ（公開モード）を使う。</div>
 <div class="table-wrap">
 <table>
 <tr><th>項目</th><th>値</th><th>備考</th></tr>
 <tr><td>プラットフォーム</td><td>Instagram（プロアカウント）</td><td>リール投稿 + コメント自動返信。他プラットフォームは対象外</td></tr>
 <tr><td>ユーザーネーム</td><td><code>umigame.soup.jp</code></td><td>21-1 ① で決定。空き確認と取得はユーザー作業（21-7 まで）</td></tr>
-<tr><td>表示名（<code>sns_accounts.account_name</code>）</td><td><strong>コメントで推理！探偵カメロックのウミガメのスープ</strong>（24 字・確定）</td><td>2026-09-04 ユーザー決定（下記 decision）。Instagram のプロフィール名も同じにする。<code>account_name</code> は表示専用の列で Secret 名・キャプションには入らないため、後日の変更は UPDATE 1 文 + Instagram 側の変更で済む</td></tr>
+<tr><td>表示名（<code>sns_accounts.account_name</code>）</td><td><strong>コメントで推理！探偵カメロックのウミガメのスープ</strong>（24 字・確定）</td><td>Instagram のプロフィール名も同じにする。<code>account_name</code> は表示専用の列で Secret 名・キャプションには入らない</td></tr>
 <tr><td><code>account_code</code></td><td><code>main-account</code></td><td>既存セットと同じ。Secret 名の導出専用（作成後変更不可）</td></tr>
 <tr><td>投稿用の認証（Secret）</td><td><code>acps/prod/umigame-soup-1/sns/instagram/main-account</code></td><td><strong>既存 Meta アプリの流用</strong>（Facebook ページを新規作成して連携。<a href="../operation.html#set-add">運用設計 2.1</a> 手順 1 と 5.1 の通常手順）。値スキーマは <a href="../../infra/security.html#secret-naming">security.html 1.2〜1.3</a></td></tr>
 <tr><td>コメント返信用の認証（Secret）</td><td><code>acps/prod/umigame-soup-1/comment-reply</code></td><td><strong>本番用 Meta アプリを新規作成し公開モードで運用</strong>（Instagram ログイン方式。PoC の手順を本番アカウントで再実施）。値スキーマは <a href="../../infra/security.html#comment-reply-secret">security.html 1.3</a>。ステージング面は PoC アプリ + <code>test_tkghr</code>（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>）</td></tr>
 </table>
 </div>
+<ul>
+  <li><strong>umigame.soup.jp は 2 つのアプリの両方に接続する</strong>: 投稿 = 既存アプリ（Facebook ページ経由 <code>graph.facebook.com</code>）、コメント Webhook = 新規アプリ（Instagram ログイン方式 <code>graph.instagram.com</code>）。理由は<a href="#d-20260903-meta-app">付録</a></li>
+  <li><strong>media id の照合（21-6 の人間ゲート）</strong>: 投稿バッチが記録する <code>posts.platform_post_id</code>（<code>media_publish</code> の応答 id）と Webhook の <code>media.id</code> が同じ値かを、ステージング面で照合する。一致しなければ S3 スナップショットのキーが引けず、経路が成立しない</li>
+  <li><strong>キャラ名の正は「探偵カメロック」</strong>: 意匠は 21-2 で採用した「グルメ探偵」のままだが、呼称に「グルメ」は付けない。キャプション・プロンプト・版面の名札もこれに揃える</li>
+  <li><strong>表示名を変えるときの制約</strong>: DB 側は UPDATE 1 文でいつでも変えられる。ただし Instagram の名前欄は<strong>14 日間に 2 回まで</strong>しか変えられないため、開設時にこの名前で登録し、頻繁な試行はしない。<code>account_code</code> とユーザーネームは実質固定で、表示名の変更とは独立</li>
+</ul>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-09-03、21-1 ⑦）: 投稿は既存 Meta アプリの流用、コメント Webhook だけ新規アプリ。umigame.soup.jp は両方のアプリに接続する</span>
-  既存アプリは開発モードで、稼働中セットの無期限トークンはその構成に依存する。コメント Webhook は「開発モードでは一切届かない」ことが PoC で実証済みのため、既存アプリで受けるには公開モードへの切替が要り、logic-training-1 / pref-ranking-1 のトークンが 60 日失効へ戻るおそれがある。加えて API 方式が異なる（既存 = Facebook ページ経由 <code>graph.facebook.com</code>、コメント経路 = Instagram ログイン方式 <code>graph.instagram.com</code>）。自動返信の規約リスクを既存資産から切り離す意味でも新規アプリとする。<strong>投稿バッチが記録する <code>posts.platform_post_id</code>（<code>media_publish</code> の応答 id）と Webhook の <code>media.id</code> が同じ値かは 21-6 でステージング面で照合する</strong>（一致しなければ S3 スナップショットのキーが引けず経路が成立しない。21-6 の人間ゲート）。
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-09-04、ユーザー判断）: キャラ名は「探偵カメロック」、表示名は「コメントで推理！探偵カメロックのウミガメのスープ」</span>
-  21-2 で採用した意匠は「グルメ探偵」（丸い体・前掛け・透明な黄金スープの椀と匙）のままだが、<strong>呼称に「グルメ」は付けない</strong>。以後、キャラ名の正は<strong>探偵カメロック</strong>とし、キャプション・AI 出題者プロンプト・版面の名札もこれに揃える（21-2 の選択肢名「P6 グルメ探偵」は画風・意匠の選定記録としてのみ残る）。
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>表示名にセット名を含める</strong>: Instagram の検索は名前とユーザーネームを対象にするため、「ウミガメのスープ」「推理」を名前に入れて発見されやすくする。「コメントで推理！」で参加型であることも名前で示す（既存 3 セットの表示名がキャラ名 + テーマの形式なのと同じ考え方）</li>
-    <li><strong>字数</strong>: 24 字（Instagram の名前欄の上限 30 字に収まる）</li>
-    <li><strong>変更の制約</strong>: <code>account_name</code> は表示専用のため DB 側はいつでも変えられる。ただし Instagram の名前欄は<strong>14 日間に 2 回まで</strong>しか変更できないため、開設時にこの名前で登録し、頻繁な試行はしない。<code>account_code</code>（<code>main-account</code>）とユーザーネーム（<code>umigame.soup.jp</code>）は実質固定で、表示名の変更とは独立</li>
-  </ul>
-</div>
-
-<h2>3. スケジュール（投稿頻度）</h2>
+<h2 id="schedule">3. スケジュール（投稿頻度）</h2>
+<div class="note"><span class="callout-title">要点</span>毎日 20:00 に 24 秒のリールを 1 本。投稿順はストックを INSERT した順で、story と misdirection を交互に出す。</div>
 <div class="table-wrap">
 <table>
 <tr><th>スロット</th><th>投稿時刻（JST）</th><th>Scheduler 名 / cron 式</th><th>尺</th></tr>
@@ -72,61 +91,663 @@
 </table>
 </div>
 <ul>
-  <li><strong>20:00 は pref-ranking-1 の夜スロットと同時刻</strong>（21-1 ④。Claude は失敗アラーム対応の重なりを避けて 19:00 を提案したがユーザー判断で 20:00）。同時刻運用は 15-15 の決定どおり <code>set_code</code> で分離され、画像生成 SFN・SNS 投稿 SFN はセットごとに独立実行される。運用上の注意は 2 点: ① 20:00 台に失敗アラームが来たらメール本文の <code>set_code</code> で対象セットを見分ける ② Aurora は 2 セットの同時起動で ACU が一時的に上がるが日次数分のため許容（既に logic-training-1 と pref-ranking-1 が 20:00 で並走している実績あり）</li>
-  <li>投稿の流れは共通フロー（画像生成 SFN → SNS 投稿 SFN の連鎖。<a href="../batch-flow.html">batch-flow.html</a>）。本セットは <strong>publish 成功直後に問題スナップショットを S3 へ出力する</strong>点だけが差分（セクション 10.2）</li>
-  <li><strong>投稿順は INSERT の順番で決める</strong>（2026-09-26 の素材の全数レビューでユーザー決定。<strong>story と misdirection を交互に出す</strong>。第 1 バッチは本家を題材にした U28「本物のウミガメのスープ」を 1 本目にする）: 方式はビルド済みストックを「未使用 → <code>last_used_at</code> の古い順 → <code>id</code> の小さい順」で選ぶ（<a href="../generators/umigame-prebuilt.html#stock">umigame-prebuilt 4</a>）ため、最初に投入した順（= <code>id</code> の順）が一巡目以降もそのまま投稿順になる。順番の正はバッチの <code>stock_items.py</code> の <code>POST_ORDER</code> で、<code>generate.py</code> がその順に INSERT を並べ、<code>validate.py</code> が過不足と同じ型の連続（警告）を検査する。順番を変えるときは DB を入れ直す（<code>id</code> は UPDATE で変えられない）。後から足すバッチは既存の未使用分の後ろに並ぶ
-    <div class="callout decision"><span class="callout-title">決定（2026-09-26）: 投稿順の列（<code>post_order</code>）は足さない</span>DB に投稿順の列を足して選択 SQL を変える案（開発レーン: DDL + 投稿バッチ改修）もあったが、投稿開始前で入れ直しの負担がないため、コード変更なしで INSERT 順に寄せる案を採った。投稿開始後に順番を頻繁に差し替える必要が出たら、列の追加を課題として起票する</div></li>
-  <li>Scheduler の CDK 追加は 21-7（<a href="../../infra/workflow.html#schedule">workflow.html 1.6</a> の命名規約。Scheduler の Input にスロット・尺は持たせない）。有効化前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
+  <li><strong>20:00 は pref-ranking-1 の夜スロットと同時刻</strong>（21-1 ④・ユーザー判断）。15-15 の決定どおり <code>set_code</code> で分離され、画像生成 SFN・SNS 投稿 SFN はセットごとに独立して動く</li>
+  <li><strong>同時刻運用の注意</strong>: ① 20:00 台に失敗アラームが来たら、メール本文の <code>set_code</code> で対象セットを見分ける ② Aurora は 2 セットの同時起動で ACU が一時的に上がるが、日次数分のため許容（logic-training-1 と pref-ranking-1 が 20:00 で並走している実績あり）</li>
+  <li><strong>投稿の流れ</strong>は共通フロー（画像生成 SFN → SNS 投稿 SFN の連鎖。<a href="../batch-flow.html">batch-flow.html</a>）。差分は <strong>publish 成功直後に問題スナップショットを S3 へ出力する</strong>点だけ（<a href="#snapshot">10.7.2</a>）</li>
+  <li><strong>投稿順は INSERT の順番</strong>: 方式はビルド済みストックを「未使用 → <code>last_used_at</code> の古い順 → <code>id</code> の小さい順」で選ぶ（<a href="../generators/umigame-prebuilt.html#stock">umigame-prebuilt 4</a>）。そのため最初に投入した順（= <code>id</code> の順）が、一巡目以降もそのまま投稿順になる</li>
+  <li><strong>並べ方</strong>: story と misdirection を交互に出す。第 1 バッチは本家を題材にした U28「本物のウミガメのスープ」を 1 本目にする（2026-09-26 ユーザー決定）。投稿順の列は DB に足さない（<a href="#d-20260926-post-order">付録</a>）</li>
+  <li><strong>順番の正</strong>はバッチの <code>stock_items.py</code> の <code>POST_ORDER</code>。<code>generate.py</code> がその順に INSERT を並べ、<code>validate.py</code> が過不足と同じ型の連続（警告）を検査する。順番を変えるときは DB を入れ直す（<code>id</code> は UPDATE で変えられない）。後から足すバッチは既存の未使用分の後ろに並ぶ</li>
+  <li><strong>Scheduler の CDK 追加は 21-7</strong>（<a href="../../infra/workflow.html#schedule">workflow.html 1.6</a> の命名規約。Input にスロット・尺は持たせない）。有効化前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
 </ul>
 
-<h2 id="stock-items">4. ストック 1 件の素材項目（21-2 で確定・14 項目）</h2>
-<p>ストックの単位は「問題文 + 真相 + 確定事実シート」ではなく、<strong>リール 1 本と AI 出題者の判定に要る素材一式</strong>とする（2026-09-03 ユーザー指示。完成版リールの PoC で動画のイメージを固めてから確定した = 21-2 人間ゲート）。下表が正であり、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。作問の手順（ランダム語のモチーフ → コア宣言 → 動線・現実性・既存問題との照合の自己検査）はスキル <code>.claude/skills/umigame-problem-writer/SKILL.md</code>（21-4a-2）が正で、<code>stock_items.py</code> の管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）を <code>validate.py</code> が様式検査し、プローブ結果の review.html は問題文の直前に表示する（レビューはコア宣言から見る）。</p>
+<h2 id="stock-items">4. ストック 1 件の素材項目（14 項目）</h2>
+<div class="note"><span class="callout-title">要点</span>ストック 1 件は「リール 1 本と AI 出題者の判定に要る素材一式」。下の 14 項目の表が正で、<code>validate.py</code>・テーブル <code>umigame_stock_items</code> はこれに従う。問題はすべて完全オリジナル。</div>
+<p>下表が正で、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。</p>
+<p>作問の手順（ランダム語のモチーフ → コア宣言 → 動線・現実性・既存問題との照合の自己検査）はスキル <code>.claude/skills/umigame-problem-writer/SKILL.md</code> が正。<code>stock_items.py</code> の管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）を <code>validate.py</code> が様式検査し、作問レビュー用の素材シート（<code>work/review.html</code>）は問題文の直前に表示する（レビューはコア宣言から見る）。</p>
 <div class="table-wrap">
 <table>
 <tr><th>#</th><th>項目（カラム / JSON キー）</th><th>用途</th><th>制約（<code>validate.py</code> で検査）</th></tr>
 <tr><td>1</td><td><code>problem_text</code> 問題文</td><td>版面の問題カード（全文を常時表示。段階表示はしない）</td><td>78〜85 字。ナレーション実測長で最終判定（#7）</td></tr>
 <tr><td>2</td><td><code>truth</code> 真相</td><td>AI 出題者の判定根拠・正解宣言時の開示文（版面には出さない）</td><td>必須。問題文と矛盾しない</td></tr>
 <tr><td>3</td><td><code>fact_sheet</code> 確定事実シート</td><td>「はい / いいえ / 関係ない」の判定根拠（場所・人物関係・時系列・「問題に関係ない事項」の明示）。真相の曖昧さ起因の矛盾回答・捏造回答をデータ側で防ぐ</td><td>8〜20 件（文字列の配列）</td></tr>
-<tr><td>4</td><td><code>expected_questions</code> 想定質問と期待回答</td><td>プローブテスト（21-4a）。正解に向かう質問・引っかけ・無関係な質問を混ぜる</td><td>15〜20 件（<code>{q, a}</code> の配列。<code>a</code> は はい / いいえ / 関係ない / 正解 のいずれか + 任意の補足）</td></tr>
-<tr><td>5</td><td><code>hook</code> フック文</td><td>つかみ帯（74px・1 行）</td><td>12 字前後（上限 14 字）。<strong>「？」で終える</strong>（2026-09-26 の素材レビューでユーザー決定。<code>validate.py</code> で検査）</td></tr>
+<tr><td>4</td><td><code>expected_questions</code> 想定質問と期待回答</td><td>作問時の確認用。正解に向かう質問・引っかけ・無関係な質問を混ぜる</td><td>15〜20 件（<code>{q, a}</code> の配列。<code>a</code> は はい / いいえ / 関係ない / 正解 のいずれか + 任意の補足）</td></tr>
+<tr><td>5</td><td><code>hook</code> フック文</td><td>つかみ帯（74px・1 行）</td><td>12 字前後（上限 14 字）。<strong>「？」で終える</strong></td></tr>
 <tr><td>6</td><td><code>rule_text</code> ルール帯</td><td>常時表示の遊び方（34px・2 行）</td><td>45 字前後。セット固定文の既定値あり（問題ごとに変えなくてよい）</td></tr>
 <tr><td>7</td><td><code>narration.problem</code> / <code>narration.rule</code> ナレーション cue</td><td>冒頭ナレーション。表示文とは別に、括弧・記号を落とし読点で間を整えた読み上げ用の文</td><td>2 cue の実測長合計 + 間 1.2 秒が <strong>21 秒以内</strong>（方式設計書 8.3 の予算検査。超過はビルドエラー）</td></tr>
 <tr><td>8</td><td><code>play_example</code> プレイ例</td><td>下部の吹き出し 3 往復（質問 → 質問を残したまま返答を追加）</td><td>6 要素（<code>{role: questioner|master, text}</code> の交互）。質問 16 字 / 返答 17 字以内（1 行）。<strong>3 往復のうち 1 つは「はい」</strong>（出題者が喜ぶポーズに切り替わる版面上の約束事）</td></tr>
 <tr><td>9</td><td><code>character_lines.master.intro</code> / <code>.outro</code> 出題者の導入・締め</td><td>導入「質問してみて！」・締め「何度でも答えるよ。コメントで質問！」の吹き出し</td><td>各 17 字以内。既定値あり</td></tr>
 <tr><td>10</td><td><code>character_lines.jr.outro</code> Jr. の締め</td><td>「面白かったら、いいね、フォローよろしくね！」（吹き出しのみ・ナレーションなし）</td><td>セット固定文の既定値でよい（2 行になるが単独表示のため許容）</td></tr>
-<tr><td>11</td><td><code>illustration_prompt</code> イラスト作成用プロンプト</td><td>背景 1 枚（imagegen）。情景のみ</td><td>画風固定行（セクション 5.2）+ 9:16 + 文字禁止 + <strong>真相の手がかりを描かない</strong>指示を含む（<code>validate.py</code> は固定行の存在を検査）</td></tr>
-<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。TTS のクレジット行は不要（Irodori-TTS・セクション 8）</td></tr>
-<tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>完全オリジナル宣言（PoC の古典題材は例外・ストック本体には入れない）。<strong>オリジナル性の基準（21-4a で決定）</strong>: 既存問題の問題文・真相を転載しない。語句・登場人物・舞台の置き換えだけの改変もしない。借りてよいのは「型（物語復元 / 意味誤誘導）」と「仕掛けの構造」までで、モチーフ・真相・問題文は新規に作る。台帳で本家級（classic）の題材は構造ごと避ける。source_note に「完全オリジナル」宣言 + 型 + モチーフ → 連想 → 逆にした常識を書く（validate.py が宣言の有無を検査。作問法の正は <a href="https://note.com/suekai0217/n/n35128e606a9b">note 記事の 4 ステップ + 良い問題の 3 条件</a>）</td></tr>
+<tr><td>11</td><td><code>illustration_prompt</code> イラスト作成用プロンプト</td><td>背景 1 枚（imagegen）。情景のみ</td><td>画風固定行（セクション 5）+ 9:16 + 文字禁止 + <strong>真相の手がかりを描かない</strong>指示を含む（<code>validate.py</code> は固定行の存在を検査）</td></tr>
+<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。TTS のクレジット行は不要（セクション 8）</td></tr>
+<tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>「完全オリジナル」宣言 + 型 + モチーフ → 連想 → 逆にした常識を書く（<code>validate.py</code> が宣言の有無を検査）。オリジナル性の基準は表の下</td></tr>
 <tr><td>14</td><td><code>difficulty</code> 難易度</td><td>運用の目安（在庫の偏り確認）</td><td>1〜5</td></tr>
 </table>
 </div>
-<div class="decision">
-  <span class="callout-title">決定（2026-09-26、21-5a の素材レビュー）: 確定事実シートの上限を 12 件から 20 件へ</span>
-  上限 12 件は 21-2 の PoC（1 問 10 件）から置いた目安の幅が、そのまま <code>validate.py</code> の上限になっていたもので、根拠は記録されていなかった。確定事実は AI 出題者の判定根拠で、件数が増えても DB（JSON）・プロンプトの費用に実害はなく、むしろ答えが安定する。素材レビューでプレイ例を差し替えた際に根拠の行を足したくても上限で足せない問が出た（U16・U25）ため、上限を 20 件に上げた。下限 8 件は答えの揺れを防ぐ意味があるので据え置く。<code>database/V012</code> のカラム COMMENT は「8〜12 件」のまま（適用済みの DDL のため次のスキーマ変更時に合わせる）。
+<ul>
+  <li><strong>オリジナル性の基準</strong>（21-4a）: 既存問題の問題文・真相を転載しない。語句・登場人物・舞台の置き換えだけの改変もしない。借りてよいのは「型（物語復元 / 意味誤誘導）」と「仕掛けの構造」までで、モチーフ・真相・問題文は新規に作る。台帳で本家級（classic）の題材は構造ごと避ける。PoC の古典題材だけは例外で、ストック本体には入れない</li>
+  <li><strong>作問法の正</strong>: <a href="https://note.com/suekai0217/n/n35128e606a9b">note 記事の 4 ステップ + 良い問題の 3 条件</a></li>
+  <li><strong>確定事実シートの件数</strong>: 下限 8 件は答えの揺れを防ぐため。上限は 20 件（2026-09-26 に 12 → 20。<a href="#d-20260926-fact-limit">付録</a>）。<code>database/V012</code> のカラム COMMENT は「8〜12 件」のまま（適用済みの DDL のため次のスキーマ変更時に合わせる）</li>
+  <li><strong>補充とレビューのペース</strong>: 1 日 1 問 = 週 7 問。レビューは<strong>週 2 回 × 4 問</strong>。手順の詳細は 21-8 の補充スキル（<code>umigame-stock-replenish</code>）に書く</li>
+  <li><strong>作問時に本番経路で答えを確かめる</strong>: 評価データ <code>judge-trial/data/eval_problems.json</code> にケースを足し（正解ラベルは人が確認）、<code>probe_run.py --problems &lt;no&gt;</code> を回す（<a href="#evaluation">10.6</a>）</li>
+  <li><strong>管理項目</strong>: <code>content_key</code>（<code>{3 桁連番}-{slug}</code>）と <code>title</code>（管理用の題名）はツーリングが付ける管理項目で、素材項目には数えない。キャラクター・BGM・SE・フォントは<strong>セット固定の共有資産</strong>で、ストック単位の項目ではない（セクション 7〜9）</li>
+  <li><strong>判定用の項目</strong>: コメント返信の判定に使う <code>core_points</code>・<code>reveal_text</code> は 14 項目とは別に <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code> に持つ（V013。<a href="#judge-contract">10.3.1</a>）</li>
+</ul>
+
+<h2 id="illustration-prompt">5. イラスト作成用プロンプト（ストック整備時・imagegen）</h2>
+<div class="note"><span class="callout-title">要点</span>1 問 1 枚の背景を、Codex CLI の画像生成で作る。プロンプトは「画風固定行 + 情景 + 禁止事項」の 3 部構成。人物は下半分の中央に小さく置く。</div>
+<p>本セットの生成方式 <code>umigame-prebuilt</code> は実行時に LLM・画像生成 API を呼ばない（事前ビルド方式）。背景イラストはストック整備時に、ストックの <code>illustration_prompt</code> から Codex CLI の <code>image_gen.imagegen</code>（<code>codex exec</code>）で生成する（21-2 で CLI からの自動化を実測。手作業不要）。画風固定行は全問共通の定数で、<code>validate.py</code> が存在を検査する。</p>
+<ul>
+  <li><strong>画風（C4）</strong>: 90 年代 OVA の手描きセル塗り（太い主線・エアブラシのハイライト・リムライト）。背景は<strong>中間調</strong>（月明かりと蝋燭で情景が見える明るさ）で生成し、版面のオーバーレイは薄くする（第 1 稿の暗めの単色トーンは暗すぎたため変更 = 21-2）</li>
+  <li><strong>固定の禁止事項</strong>: 文字・ロゴを入れない。<strong>真相の手がかりを描かない</strong>（問題文にある情景だけを描く。人物は問題文に出る人物 + 遠景のシルエット 1 人まで）</li>
+  <li><strong>人物の大きさと位置</strong>: 遠景の小さな全身像にし、<strong>下半分の中央（横幅の中央 20%・縦 55〜85%）にだけ置く</strong>。上半分には人物を置かず静か（空・壁・天井・窓）にし、下半分の左右 40% は景物だけにする。クローズアップ・半身は描かない（感情は表情でなく姿勢で出す）。理由は<a href="#d-20260926-figure">付録</a></li>
+  <li><strong>背景のレビュー</strong>: <code>background_sheet.py --stills</code>（今の文言と背景で動画の各コマを書き出す）で版面と重ねて見る</li>
+  <li>寸法は 9:16（1024x1536）で生成し、ビルド時に 1080x1920 へ正規化する（方式設計書 8.1）</li>
+  <li>キャラクター 2 体はストック単位では生成しない（セクション 9）</li>
+</ul>
+
+<h2 id="caption">6. キャプションの作り方</h2>
+<div class="note"><span class="callout-title">要点</span>キャプションはストックの <code>caption</code> に問題ごとに書き、テンプレートは <code>{{caption}}</code> の 1 行だけ。構成は全問共通の 4 段。</div>
+<p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}</code> の 1 行</strong>とする。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b）。</p>
+<ul>
+  <li><strong>構成</strong>: 見出し【探偵カメロックのウミガメのスープ】→ 問題文 → 遊び方 → ハッシュタグ の 4 段で全問共通（<code>umigame_common.caption()</code> が組み立てる）</li>
+  <li><strong>遊び方の文</strong>: 「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ</li>
+  <li><strong>ハッシュタグ</strong>: <code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart</code></li>
+  <li><strong>書かないもの</strong>: 問題番号「第 N 問」（ストックは LRU で消費され、投稿順が確定しないため。PoC の表記は本番では使わない）。問題文の要約（すぐ下の問題文と同じ話が 2 回出るように見えるため。2026-09-24 ユーザー決定）</li>
+  <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> だけのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Irodori-TTS でクレジット表記は不要（セクション 8）</li>
+  <li><strong>テンプレートを <code>{{caption}}</code> だけにする理由</strong>: ハッシュタグの固定部を分けると、問題固有のタグを足したいときに 2 か所を見ることになり、素材 14 項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
+</ul>
+
+<h2 id="audio">7. 音源の構成</h2>
+<div class="note"><span class="callout-title">要点</span>BGM は 24 秒ちょうどのトラック（第 1 バッチは 1 曲）、SE は吹き出しのポップ音 1 種。どちらもビルド時に動画へ焼き込む。</div>
+<div class="table-wrap">
+<table>
+<tr><th>種別</th><th>S3 キー / <code>audio_assets</code></th><th>仕様</th></tr>
+<tr><td>BGM（<code>asset_type='bgm'</code>・<code>time_slot=NULL</code>）</td><td><code>audio/umigame-soup-1/trackNN.m4a</code>（3〜5 曲）</td><td><strong>24 秒ちょうど</strong>のトラック（フェードイン 0.5 秒・フェードアウト 1.0 秒・AAC）。ループの継ぎ目を避けるため 24 秒版として前処理する（<code>prepare_bgm.py</code>）。調達・ライセンス証跡は <a href="../operation.html">運用設計 3</a>（Pixabay Content License / CC0。クレジット不要のもの）</td></tr>
+<tr><td>SE（<code>asset_type='se'</code>）</td><td><code>audio/umigame-soup-1/se/bubble_pop.m4a</code>（1 種）</td><td>吹き出し出現のポップ音（0.14 秒）。ffmpeg の <code>sine</code> で合成（880 + 1320 Hz）したためライセンス問題なし</td></tr>
+</table>
 </div>
-<p>キャラクター（カメロック・Jr.）・BGM・SE・フォントは<strong>セット固定の共有資産</strong>で、ストック単位の項目ではない（セクション 7〜8）。<code>content_key</code>（<code>{3 桁連番}-{slug}</code>）と <code>title</code>（管理用の題名）はツーリングが付与する管理項目で、素材項目には数えない。</p>
+<ul>
+  <li><strong>選曲</strong>はビルド時（<code>build.py</code>）に行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）。ローカル台帳 <code>work/bgm/tracks.json</code> の使用回数最少で選び、ID は publish 時に S3 キーで解決する（<a href="../generators/umigame-prebuilt.html#build-steps">方式設計書 8.1 の決定</a>）</li>
+  <li><strong>第 1 バッチは 1 曲運用</strong>: track01 = Pixabay「Strange Detectives」/ HarumachiMusic の先頭 24 秒（2026-09-24 ユーザー選曲。配布ページに Content ID 登録の表示あり）</li>
+  <li><strong>SE</strong> は動画に焼き込むだけで実行時に使わないため、ファイルの正は <code>content/video-build/umigame-soup-1/assets/se/bubble_pop.wav</code>（git 管理）とし、S3 配置・<code>audio_assets</code> 登録は必要になるまで行わない</li>
+  <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
+</ul>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-08-28 壁打ち・2026-09-03 21-1 ⑧）: 完全オリジナル問題のみ・プローブテストで検証・週 2 回 × 4 問レビュー</span>
-  著名問題（本家「ウミガメのスープ」等）の転載・改変は著作権と非オリジナル対策の両面で不可（PoC の 1 問だけ例外）。機械検証が効かないため、<strong>問題ごとに想定質問 15〜20 を AI 出題者（本番と同じモデル・同じプロンプト）に実際に答えさせ、矛盾・ネタバレを人間が一括レビューする</strong>（確定事実シートの穴を見つける工程を兼ねる）。補充ペースは 1 日 1 問 = 週 7 問、レビューは<strong>週 2 回 × 4 問</strong>。プローブテストは本番と同じ <strong><code>gpt-6-luna</code> / reasoning effort <code>max</code></strong> で行う（21-1 ⑤ で <code>gpt-5.6-luna</code> に決め、2026-09-26 に GPT-6 へ切替。21-4a のプローブは <code>gpt-5.6-luna</code> で実施済み）。手順の詳細は 21-8 の補充スキル（<code>umigame-stock-replenish</code>）に記す。
+<h2 id="tts">8. ナレーション・TTS（Irodori-TTS v4.1-Small / 声 G4 のクローン）</h2>
+<div class="note"><span class="callout-title">要点</span>ナレーションはローカル GPU の Irodori-TTS（BF16）で、Gemini の声 G4 を参照音声からクローンして作る。読むのは問題文とルールの 2 cue だけで、合計 21 秒以内。クレジット表記は不要。</div>
+<ul>
+  <li><strong>読み上げる文</strong>: 冒頭に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code> の 2 cue だけ（吹き出しと同期させない。21-1 ②）。開始は 0.5 秒（15 フレーム）、2 cue + 間の合計は <strong>21 秒以内</strong>（継ぎ目 708 フレームに掛からない予算。方式設計書 8.3）</li>
+  <li><strong>1 回で読ませる</strong>: 問題文とルール文を 1 回の合成で読ませ、無音で切り分ける（別々に作ると口調が変わる）</li>
+  <li><strong>声</strong>: 参照音声 <code>content/video-build/umigame-soup-1/assets/voice/kamerock-g4/*.wav</code>（Gemini G4 で合成した 001・004・006 の problem / rule 6 本に息継ぎゲートをかけたもの。名前順にすべて渡す）のクローン。説明文（caption）・絵文字・後処理は使わない</li>
+  <li><strong>設定の正</strong>: モデル・精度・seed・長さは <code>assets/design.json</code> の <code>narration</code> 節（Gemini の設定は <code>narration_gemini</code> 節に残す）。<strong>参照音声を差し替えたら声が変わるため全数を再試聴する</strong></li>
+  <li><strong>実行</strong>: ビルド時にローカルで <code>scripts/narration_irodori.py</code>（<code>build.py</code> の既定 <code>--tts irodori</code>）。本体はリポジトリ外 <code>~/tools/Irodori-TTS</code>（環境変数 <code>IRODORI_DIR</code> で変更可。commit <code>89f9d8f</code>・<code>uv</code> 環境）を subprocess で呼び、<strong>必ず cuda・BF16</strong>（FP32 は VRAM 4GB からあふれて 1 本 4〜7 分、BF16 は約 45 秒で音質差なし）</li>
+  <li><strong>費用・ライセンス</strong>: 費用・API キー・AWS の Secret は不要。MIT ライセンスでクレジット不要。生成音声には SilentCipher の透かしが自動で入る</li>
+  <li><strong>長さの制御</strong>: 話速調整（atempo）はしない。<code>--seconds 20.0</code> で合成し、切り分けて前後の無音を削った合計が 21 秒を超えたら、seed を進めて <code>--seconds</code> を 0.5 秒ずつ縮めて取り直す（1 回のビルドで最大 3 テイク。3 テイクとも超えたらその問はビルドエラー）</li>
+  <li><strong>取り直し</strong>: 聞いて気になった問は <code>--retake-tts</code> で seed を進めて取り直す（1 問 3 回まで。続けて問題が出たら文を見直す）</li>
+  <li><strong>旧アダプタ</strong>: Gemini 版（<code>narration_gemini.py</code>）・Polly 版・VOICEVOX 版はアダプタとして残す。切り替えの経緯は<a href="#d-20260927-tts">付録</a></li>
+</ul>
+
+<h2 id="assets">9. 固定アセット・デザイントークン</h2>
+<div class="note"><span class="callout-title">要点</span>キャラ・フォントは git 管理のローカル資産で、S3 には置かない。版面の座標・効果は Remotion の実装が正。</div>
+<div class="table-wrap">
+<table>
+<tr><th>アセット</th><th>正（ファイル）</th><th>備考</th></tr>
+<tr><td>出題者「探偵カメロック」（基本ポーズ / 喜びポーズ）</td><td><code>content/video-build/umigame-soup-1/assets/characters/master_base.png</code> / <code>master_happy.png</code>（正規化済み・共通キャンバス 1000x1100）</td><td>設定とプロンプトは <code>assets/design.json</code>（<code>remotion/public/</code> はビルド時の配置先で git 管理外のため、正は <code>assets/</code>）。ポーズ差分は基本ポーズを参照画像（<code>-i</code>）にして生成すると衣装・色が揃う。透過にならない場合は「単色フラットなマゼンタ #FF00FF の背景」を明示して生成し直す</td></tr>
+<tr><td>質問者「カメロック Jr.」（基本ポーズ）</td><td>同 <code>jr_base.png</code></td><td>視線は左上（父の方向）。喜びポーズは持たない</td></tr>
+<tr><td>画風固定行（キャラ / 背景）</td><td><code>design.json</code> の <code>style_line</code> / <code>background_prompt</code> の画風部分</td><td>C4: 90 年代 OVA 手描きセル塗り。セクション 5 の固定行と同一</td></tr>
+<tr><td>フォント</td><td>Zen Kaku Gothic New（Medium / Bold / Black。ビルド時に pref-ranking-1 の <code>remotion/public/fonts/</code> から配置）</td><td>pref-ranking-1 と同じ（SIL OFL）。<code>@remotion/fonts</code> の <code>loadFont</code> で読み込む</td></tr>
+<tr><td>版面の座標・ビート・効果</td><td><code>remotion/src/timeline.ts</code> / <code>UmigameReel.tsx</code></td><td>実装が正。設計書には構成と不変条件のみ（方式設計書 8.2）</td></tr>
+</table>
+</div>
+<p>キャラ・フォントは S3 の固定アセット（<code>assets/{set_code}/</code>）には置かない（事前ビルド方式は実行時にアセットを使わないため。ranking-prebuilt の五郎と同じ扱い）。</p>
+
+<h2 id="comment-reply">10. コメント自動返信</h2>
+
+<h3 id="reply-overview">10.1 全体像</h3>
+<div class="note"><span class="callout-title">要点</span>
+<ul style="margin:.3rem 0 0;">
+  <li>コメント 1 件ごとに<strong>判定</strong>（22 種の種別と、はい / いいえ質問なら答え）を決め、判定に合った<strong>返信文</strong>を書いて Instagram に返す。返信文は判定を変えない</li>
+  <li>判定は 2 方式（パターン 1 = <code>gpt-6-luna</code> の一括判定 / パターン 2 = Jev の段階判定）とその組み合わせ 3 モード、返信文は 4 案。どちらも環境変数で切り替える。既定（暫定）は <code>hybrid</code> + <code>1d-luna</code>。方式の確定は 21-6e</li>
+  <li>投稿側（ECS + Aurora）とは完全に分離し、Aurora を一切使わない。問題は投稿時に S3 へ書いたスナップショットから読む</li>
+</ul>
+</div>
+<p>インフラの構成（Function URL → Webhook Lambda → SQS FIFO + DLQ → Reply Lambda → S3 / OpenAI / Jev / Graph API。VPC 外・NAT 不要）は <a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>、監視は <a href="../../infra/workflow.html#alarms">workflow.html 8</a>、Secret は <a href="../../infra/security.html#comment-reply-secret">security.html 1.3</a> が正。本章はアプリの振る舞いと運用ルールを書く。コードは <code>services/comment-reply/</code>（環境変数・構成の一覧は同 <code>README.md</code>）。</p>
+<p><strong>処理の流れ（コメント 1 件）</strong>:</p>
+<ol>
+  <li><strong>Webhook Lambda</strong>（<code>app/webhook_handler.py</code>）: 署名を検証し、自分の返信を除いて SQS FIFO に入れ、すぐ 200 を返す</li>
+  <li><strong>問題の読み込み</strong>（<code>app/problem_store.py</code>）: Reply Lambda が <code>problems/{media_id}.json</code> を S3 から読む（<a href="#snapshot">10.7.2</a>）。無ければ返信せず記録だけ残す</li>
+  <li><strong>判定</strong>（<code>app/judge/combiner.py</code>）: モードに応じて luna と Jev を呼び、返信に使う判定を 1 つ決める（<a href="#judge-design">10.3</a>）</li>
+  <li><strong>返信文</strong>（<code>app/reply/writer.py</code>）: 判定と案に応じて、定型文か LLM の書き手で返信文を作る（<a href="#reply-style">10.4</a>）</li>
+  <li><strong>返信</strong>（<code>app/graph_api.py</code>）: Graph API でそのコメントに返信する。送る直前に 200 字で切り詰める</li>
+  <li><strong>記録</strong>（<code>app/comment_log.py</code>）: 受信・判定・返信の全記録を S3 に JSON で書く（<a href="#comment-log">10.8</a>）</li>
+</ol>
+<p>受信から返信まで約 4 秒（PoC 実測。luna の推論が長いと延びる = <a href="#pattern1">10.3.3</a>）。</p>
+
+<h3 id="quality-levels">10.2 品質基準</h3>
+<div class="note"><span class="callout-title">要点</span>品質は「判定の正しさ（P1〜P7）」と「返答の豊かさ（レベル 0〜3）」の 2 軸で測る。リリースに必須の最低ラインは<strong>レベル 1 + P1〜P7</strong>、目標は<strong>レベル 2</strong>。判定方式には依存せず、機械プローブ・人間プローブ・方式選定はすべてこの基準で合否を決める。</div>
+<ul>
+  <li><strong>最低 = レベル 1</strong>: レベル 0 は bot に見えるためリリース不可。レベル 1 はどちらの方式でも届く</li>
+  <li><strong>目標 = レベル 2</strong>: 探偵カメロックとして話すことで、ただのクイズ bot と差が付く。ただし自由な文は漏洩の危険を上げるため必須にしない。方式選定（21-6e）では、<strong>最低ラインを満たす方式のうち、P1 を落とさずにレベル 2 に届くほうを優先する</strong></li>
+  <li><strong>レベル 3 は稼働後の反応を見てから</strong>: 会話の状態を持つ仕組みが要り、「状態を持たない」方針（<a href="#reply-behavior">10.7.3</a>）とぶつかる。定義だけにし、機械プローブ・人間プローブでは測らない</li>
+</ul>
+
+<h4>判定の正しさ（全レベル共通の前提条件。1 つでも割れたらリリース不可）</h4>
+<p>数値の判定には<strong>評価用の質問</strong>（プロンプト調整に使っていないもの。<a href="#evaluation">10.6</a>）を使う。作問時の <code>expected_questions</code> は参考値として別に集計する。</p>
+<ul>
+  <li><strong>P1 真相の漏洩 0 件</strong>: 機械プローブでは <code>leak_count.py</code> と同じ方式で漏れ候補を拾い、全件を人が見て本当の漏洩が 0 件であること。人間プローブでも 0 件</li>
+  <li><strong>P2 誤った正解宣言 0 件</strong>: 正解でない推理に正解と言って真相を開くのは、漏洩と同じ扱いにする</li>
+  <li><strong>P3 「はい」と「いいえ」の取り違え</strong>: 全質問の 3% 以下、かつ 1 問あたり 2 件以下</li>
+  <li><strong>P4 「いいえ」「関係ない」「答えに関わらない」の間の揺れ</strong>: 10% 以下。意味はほぼ同じなので上限をゆるくするが、集計には必ず出す</li>
+  <li><strong>P5 正解推理を正解と宣言できた割合</strong>: 80% 以上。見逃しても次のコメントで取り返せるので、P2 よりゆるくする</li>
+  <li><strong>P6 不適切なコメントへの扱い</strong>: 不適切系（⑱〜㉑）に判定を含む返事（はい / いいえ・推理への答え）や真相に触れる返事をすることは 0 件。⑱・⑲ に定型文で返した割合が 80% 以上。⑳・㉑ に返信した件数は 0 件。普通のコメントを誤って不適切系と判定するのは 5% 以下</li>
+  <li><strong>P7 返信の長さ</strong>: すべて 80 字以内</li>
+</ul>
+
+<h4 id="comment-kinds">コメントの種別（22 種。レベル 1 以上で見分ける）</h4>
+<p>判定モジュールは次の 22 種のどれかを出す（コードは <a href="#judge-contract">10.3.1</a>）。各種別への返し方の詳細は <a href="#reply-style">10.4</a>。</p>
+<ul>
+  <li><strong>質問系</strong>
+    <ul>
+      <li>① はい / いいえで答えられる質問 → 判定を返す</li>
+      <li>② 1 つのコメントに質問が複数入っているもの（「A ですか？ B ですか？」）→「1 つずつ聞いてね」と誘導する</li>
+      <li>③ はい / いいえで答えられない・曖昧な質問 → 誘導文を返す。主語や対象（それ・あれ・彼・あの人）が問題文から一つに決まらない質問も ③</li>
+      <li>③ のうち<strong>名詞・語句だけで何についてのコメントか分からないもの</strong>（「ひな人形？」「レントゲン？」「タイムカプセル」）は、コアの語を含んでいても推理とせず ③ にし、コメントの語を使って主語を聞き返す（「何がひな人形なのか教えてね」）</li>
+      <li>主語を省いていても述語があり、問題文の人物や物について言っていると読めるもの（「泣いたのは病気が治ったから？」「人形なの？」）は ① / 推理として受ける（正解の条件は真相を説明できているかで、主語のない語は説明になっていないため）</li>
+    </ul>
+  </li>
+  <li><strong>推理系</strong>（コア = その問題の仕掛けで見分ける。コアの定義は下）
+    <ul>
+      <li>④ 正解推理: コアの要点をすべて言い当てていて、明らかな誤りがない（周辺の細部は欠けてよい）→ 正解を宣言し、真相を開示する</li>
+      <li>⑤ 惜しい推理: コアの要点のどれかに触れているが ④ に届かない（コアに半分触れた推理・コアは合っているが明らかな誤りを含む推理の両方）→ 定型の「惜しい！」（どこが足りないかは言わない）</li>
+      <li>⑥ 外れた推理: 言い切っているがコアに触れていない → 「残念、ちがうよ」系。周辺の事実だけ合っていても ⑥（周辺だけで「惜しい」と返すと見当違いの方向へ誘導するため）</li>
+      <li>問題文の言葉や事実を 1 つだけ確かめる短い質問は、コアの一部に触れていても ① として答える。何が起きたかを自分の言葉で説明し「〜かな」「〜じゃない？」を付けたものは推理</li>
+    </ul>
+  </li>
+  <li><strong>依頼系</strong>: ⑦ ヒントを求める →「質問で絞ってみて」系（真相には触れない） ⑧ 答え・ネタバレを求める →「質問には答えられるけど、真相は教えられないよ」系（いつか明かす約束はしない） ⑨ 遊び方やアカウントそのものへの質問（「どう遊ぶの？」「bot なの？」）→ 遊び方の案内</li>
+  <li><strong>反応系</strong>: ⑩ 感想 ⑪ 挨拶 ⑫ 応援 → それぞれ別の定型のお礼 ⑬ 雑談 → 軽い相づち ⑭ リクエスト（「こういう問題があったら面白い」）→ お礼 ⑯ 友達へのメンション・タグ付け（「@友達 これ解いて」）→ 短い歓迎 ⑰ 絵文字だけ → 短い相づち</li>
+  <li><strong>反応系のうち ⑮ 問題への指摘・クレーム</strong>（「矛盾してる」「無理がある」。「つまらん、センスない」のような作品そのものへのけなしも ⑮）→ お礼と「確認するね」だけ（反論も言い訳もしない）</li>
+  <li><strong>不適切系</strong>
+    <ul>
+      <li>⑱ 荒らし（意味の取れない文字列・連投）→ 定型文</li>
+      <li>⑲ 誹謗中傷（人〔作者・ほかの利用者〕への攻撃、差別的・性的な内容）→ 定型文（レベル 2 の一言は付けない。挑発に乗ったように見えるのを避ける）</li>
+      <li>⑳ 宣伝・スパム（リンク付き・フォロー稼ぎ）→ 返信しない（返信すると表示が上がり拡散に手を貸す）</li>
+      <li>㉑ 個人情報が書かれたもの → 返信しない（返信すると目立たせてしまう。削除・非表示は範囲外で、<a href="#reply-monitoring">10.7.5</a> の目視で対応）</li>
+    </ul>
+  </li>
+  <li><strong>その他</strong>: ㉒ 外国語のコメント → 日本語で「日本語で質問してね」</li>
+</ul>
+<p id="core-points"><strong>コアの考え方</strong>（普遍の前提）: 正解の条件は「問題文で提示した不思議の真相を説明できているか」。真相の全文は長く、生成 AI の判定が揺れやすいため、真相を説明するのに<strong>最低限必要な情報</strong>を要点に分けて「コア」とする。</p>
+<ul>
+  <li>コアをすべて当てている = 真相を説明できている = ④ 正解</li>
+  <li>コアの一部だけ・コアに半分触れている・コアは合っているが明らかな誤りを含む = 説明できていないが真相に近づいている = ⑤ 惜しい。コアに触れていない = ⑥</li>
+  <li>コアの要点は短い文（目安 15 字前後・上限 20 字）で、個数は説明に必要なだけ置く。問題文に書いてある事実は含めない（例: U01 は「影はレントゲンの影」だけでは泣いて喜んだ理由の説明にならないので「病気が良くなった」と 2 点）</li>
+</ul>
+
+<h4>返答の豊かさ（レベル 0〜3）</h4>
+<ul>
+  <li><strong>レベル 0</strong>（リリース不可）: 「はい / いいえ / わかりません / 正解」の 4 種だけで返す。機械判定では返信の種類が 4 種以下ならレベル 0</li>
+  <li><strong>レベル 1</strong>（最低ライン）: どんなコメントにもちぐはぐにならない返事ができる。22 種を見分けて種別に合った返事をし、同じ種別の返事は言い回しを 3 通り以上持たせる（状態は持たないため、コメント id のハッシュで選ぶ）
+    <ul>
+      <li>機械プローブ: ① 種別の一致率が全体 90% 以上、質問以外の種別もそれぞれ 80% 以上 ② 同じ種別の返事 20 件のうち、最も多い言い回しが 50% 以下 ③ 答えられない質問（②③）に誘導文を返した割合が 80% 以上</li>
+      <li>テストセット: 種別ごとに 5 件以上のラベル付きコメントを用意する。⑦〜㉒ はほとんど問題に依存しないため、全問で使う共通のテストセットにする（<a href="#evaluation">10.6</a>）</li>
+      <li>人間プローブ: 1 問あたり 10 件ほど自由にコメントし、「噛み合っていない」と感じた返事が 1 割以下</li>
+    </ul>
+  </li>
+  <li><strong>レベル 2</strong>（目標ライン）: レベル 1 に加えて探偵カメロックとして話す。真相に触れない 20 字以内の一言をキャラの口調で添える（定型のバリエーションでも、質問に合わせて作ってもよい。⑲ には付けない）
+    <ul>
+      <li>機械プローブ: 一言は 100% が 20 字以内。一言も含めて P1 の漏洩 0 件</li>
+      <li>機械プローブ（返信文の基準 = <a href="#reply-style">10.4</a>）: ① の判定語で始まる割合 100%・判定の食い違い 0 件・近さを示す語 0 件・絵文字は一覧の中から 1 個まで</li>
+      <li>人間プローブ: 「キャラが立っている」と感じた返事が過半数、かつ一言が浮いている・話がずれていると感じたものが 1 割以下</li>
+    </ul>
+  </li>
+  <li><strong>レベル 3</strong>（定義のみ）: 会話の流れを踏まえる（同じ人の過去の質問を踏まえる・行き詰まったときのヒント・コメント欄全体の進み具合）。会話の状態を持つ仕組みが要る。必要になったらアイデアとして起票する</li>
+</ul>
+
+<h3 id="judge-design">10.3 判定方式</h3>
+<div class="note"><span class="callout-title">要点</span>判定モジュールはコメント 1 件から「種別・答え」を決める部品で、2 方式が同じ契約を実装する。パターン 1 は luna に 1 回で判定させ、パターン 2 は Jev の確率を段ごとに使ってコードで分岐する。両者を組み合わせる 3 モードがあり、既定（暫定）の <code>hybrid</code> は luna の判定で返し、Jev は見張り役と正解開示前の二重確認に使う。</div>
+
+<h4 id="judge-contract">10.3.1 契約</h4>
+<ul>
+  <li><strong>入力</strong>: <code>comment_id</code>・コメント本文・問題（スナップショットの <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>core_points</code> / <code>reveal_text</code>。<code>schema_version</code> 2 以上が必要 = <code>app/judge/contract.py</code>）</li>
+  <li><strong>出力</strong>（<code>Judgement</code>）: <code>kind</code>（22 種のコード）・<code>answer</code>（<code>q_yesno</code> のときだけ <code>yes</code> / <code>no</code> / <code>irrelevant</code> / <code>unknown</code>、ほかは null）・<code>reason</code>（判定理由の短文）・<code>bare_term</code>（語だけのコメントのときのその語）・<code>debug</code>（確率・トークン・応答時間。記録にだけ出す）</li>
+  <li><strong>種別のコード</strong>（①〜㉒ の順）: <code>q_yesno</code> <code>q_multi</code> <code>q_open</code> <code>guess_correct</code> <code>guess_close</code> <code>guess_wrong</code> <code>ask_hint</code> <code>ask_spoiler</code> <code>ask_howto</code> <code>impression</code> <code>greeting</code> <code>cheer</code> <code>chat</code> <code>request</code> <code>complaint</code> <code>mention</code> <code>emoji_only</code> <code>troll</code> <code>abuse</code> <code>spam</code> <code>personal_info</code> <code>foreign</code></li>
+  <li><strong>返信文は判定の外</strong>: 判定モジュールは返信文を決めない。返信文は判定を受けて書き手が作る（<a href="#reply-style">10.4</a>）</li>
+  <li><strong>問題の判定用項目</strong>: <code>core_points</code>（コアの要点。説明に必要なだけ 1〜3 個・1 個 20 字以内。④⑤⑥ の判定に使い、両方式が使う）と <code>reveal_text</code>（正解時に開示する真相の要約。70 字以内）。文面の正は <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code>。どの方式を選んでも機械プローブの正解ラベルに使うため残す</li>
+</ul>
+
+<h4 id="judge-impl">10.3.2 構成</h4>
+<ul>
+  <li><strong>判定</strong>: ロジックは <code>app/judge/luna.py</code>（パターン 1）と <code>app/judge/jev.py</code>（パターン 2）の 2 実装にだけ書き、<code>app/judge/combiner.py</code>（組み合わせ役）がそれを部品として呼ぶ</li>
+  <li><strong>返信文</strong>: 判定と別の部品 <code>app/reply/writer.py</code>（定型文は <code>app/reply/templates.py</code>）</li>
+  <li><strong>プロンプト</strong>: <code>app/prompts/</code> に同梱し、Lambda と一緒にデプロイする（全文は <a href="#prompts">10.5</a>）。スナップショットの <code>master_rules</code> は判定に使わない</li>
+  <li><strong>ローカル試行ツール</strong>: <code>tools/local_trial.py</code>。判定モジュールと書き手を本番と同じ経路で呼び、問題（<code>--problem U01</code> = <code>batch-01/stock_items.py</code> からスナップショットと同じ形に組む、または <code>--snapshot</code>）にコメントを入れて 3 モードの返信を並べる</li>
+  <li><strong>ローカル試行ツールの動き</strong>: 判定 API は 1 コメントにつき 1 回ずつ呼んで 3 モードで使い回す。キーは環境変数（<code>OPENAI_API_KEY</code>・<code>TYPESAFE_API_KEY</code>）からだけ読み、Instagram と AWS は使わない。判定を与えて動かす <code>--stub-judgements</code>（API を呼ばない）もある。コメント記録は本番と同じ組み立てで <code>work/local_trial/</code> に書く</li>
+</ul>
+
+<h4 id="pattern1">10.3.3 パターン 1（<code>gpt-6-luna</code> の一括判定）</h4>
+<ul>
+  <li><strong>呼び出し</strong>: コメント 1 件につき chat completions を 1 回。system = <code>pattern1_rules.txt</code> に問題・真相・確定事実・コアの要点を埋めたもの、user = コメント本文</li>
+  <li><strong>出力</strong>: <code>response_format</code> を JSON スキーマ（strict）にし、<code>{kind, answer, reply, reason, bare_term}</code> を返させる。種別を明示的に出させることで、コード側の強制と機械プローブの種別一致率の集計ができる</li>
+  <li><strong><code>reply</code> は下書きで、返信には使わない</strong>: 返信文は 10.4 の書き手が判定を受けて書く。<code>pattern1_rules.txt</code> の手順 3 は下書き用として残っている</li>
+  <li><strong>コードでの後処理</strong>: <code>bare_term</code> が空でなければ、種別を <code>q_open</code>・答えを null に直し、語はコメント本文から取り直す。<code>q_yesno</code> 以外で答えが入っていたら、出力不正としてエラーにする</li>
+  <li><strong>モデルとパラメータ</strong>: <code>gpt-6-luna</code>（環境変数 <code>LUNA_MODEL</code>。日付付き ID も指定可）/ <code>reasoning_effort</code> <code>xhigh</code>（API は <code>max</code> を受け付けない）/ <code>max_completion_tokens</code> 2,400（推論トークンを含む）/ 温度は送らない</li>
+  <li><strong>応答時間</strong>: 推論が長いと最大 20 秒前後かかる見込み。Reply Lambda のタイムアウトと SQS の可視性タイムアウトはこれより長く取る（21-6f）。推論トークン数は記録に残して監視する</li>
+  <li><strong>失敗</strong>: 429・5xx は指数バックオフで再試行（3 回）。出力が上限で打ち切られた（<code>finish_reason = length</code>）・出力が不正なときはエラーにする（扱いは <a href="#judge-policy">10.3.5</a>）</li>
+</ul>
+
+<h4 id="pattern2">10.3.4 パターン 2（Jev の段階判定）</h4>
+<p>Jev（<code>POST https://api.typesafe.ai/v1/systemone</code>、<code>model: jev-latest</code>）の <code>choice</code>（選択式・確率付き）と <code>noul</code>（真である確率）を段ごとに使い、分岐はコードで決める。指示文（<code>instructions</code> / <code>criteria</code>）は英語で書き、コメントと問題は日本語のまま <code>state</code> に渡す（指示文の全文は <code>app/judge/jev.py</code>）。</p>
+<ol>
+  <li><strong>段 0 文字種の規則（Jev を呼ばない）</strong>: URL を含む → ⑳、絵文字・記号だけ → ⑰、かな・漢字を含まず英単語が 2 つ以上 → ㉒（1 語だけの英字の羅列は荒らしのことがあるので段 A1 に任せる）。禁止ワード DB ではなく<strong>文字種だけを見る最小の規則</strong>で、語の一覧でモデレーションしない方針（<a href="#reply-behavior">10.7.3</a>）には当たらない</li>
+  <li><strong>段 A1 大分類</strong>（choice 5 択。問題文は渡さない）: 質問・推理 / 依頼 / 反応 / 不適切 / その他。同じリクエストで「述語のない名詞・語句だけか」を noul で聞き、大分類が「質問・推理」で <code>T_BARE_TERM</code> 以上なら ③（語だけ）として返す。大分類を条件にするのは、一語の感想・挨拶を ③ にしないため</li>
+  <li><strong>段 A1b 質問か推理か</strong>（「質問・推理」のときだけ。問題文を渡す choice）: 推理にするのは、推理の確率が <code>T_GUESS</code> 以上で、かつコアの要点のどれかが <code>T_CLOSE</code> 以上（段 B を先に取って使い回す）のときだけ。それ以外は質問に倒す（質問の形の正解推理は段 B で拾える）</li>
+  <li><strong>段 A2 細分類</strong>（choice）: 質問 → ①②③、依頼 → ⑦⑧⑨、反応 → ⑩〜⑯、不適切 → ⑱〜㉑。推理は A2 を飛ばして段 B へ、その他は ㉒</li>
+  <li><strong>A2 の補正</strong>: A1b で推理から質問に戻したものを A2 が ③ と判定したら、コアに触れない推理（⑥）に戻す</li>
+  <li><strong>段 A3 確かめ直し</strong>（noul・問題文を渡す）: A2 が ③ を選んだとき、または ① を選んでも指示語・代名詞（それ・あれ・彼・彼女・あの人・その子 など）を含むときに、「主語や指示語が問題文から（消去法も含めて）一つに決まる、はい / いいえで答えられる質問か」を聞き直す。<code>T_RECHECK</code> 以上なら ①、未満なら ③</li>
+  <li><strong>段 B 正解判定</strong>（noul × コアの要点を 1 リクエストにまとめる）: 推理か ① のとき、要点ごとに「言い換えも含めて同じ内容を述べているか」の確率を取る。すべてが <code>T_POINT</code> 以上 → ④（質問の形でも推理扱い）。推理でどれかが <code>T_CLOSE</code> 以上 → ⑤、なし → ⑥</li>
+  <li><strong>段 C 質問の品質</strong>（noul）: ① で ④ にならなかったとき、「問題の状況に当てはめて、はい / いいえで一意に答えられる」の確率が <code>T_QUALITY</code> 未満なら ③</li>
+  <li><strong>段 D 答え</strong>（choice 3 択。<code>state</code> = 問題文 + 真相 + 確定事実 + 質問）: はい / いいえ / 関係ない。最大確率が <code>T_ANSWER</code> 未満なら <code>unknown</code>（答えに関わらない）に倒す（自信がないときの安全側。P3 の取り違えを P4 の揺れへ逃がす）</li>
+</ol>
+<div class="table-wrap">
+<table>
+<tr><th>閾値</th><th>値</th><th>使う段</th><th>意味</th></tr>
+<tr><td><code>T_BARE_TERM</code></td><td>0.5</td><td>A1</td><td>語だけのコメントとみなす確率の下限</td></tr>
+<tr><td><code>T_GUESS</code></td><td>0.95</td><td>A1b</td><td>推理とみなす確率の下限（迷ったら質問）</td></tr>
+<tr><td><code>T_RECHECK</code></td><td>0.6</td><td>A3</td><td>① として答えられるとみなす確率の下限</td></tr>
+<tr><td><code>T_POINT</code></td><td>0.5</td><td>B</td><td>要点を言い当てたとみなす確率の下限（全要点で ④）</td></tr>
+<tr><td><code>T_CLOSE</code></td><td>0.25</td><td>A1b・B</td><td>要点に触れたとみなす確率の下限（⑤ の判定と、推理扱いの条件）</td></tr>
+<tr><td><code>T_QUALITY</code></td><td>0.2</td><td>C</td><td>はい / いいえで一意に答えられるとみなす確率の下限</td></tr>
+<tr><td><code>T_ANSWER</code></td><td>0.55</td><td>D</td><td>答えを返す確率の下限（未満は <code>unknown</code>）</td></tr>
+</table>
+</div>
+<ul>
+  <li><strong>呼び出し回数</strong>: コメント 1 件につき 0〜6 回（段 0 で決まれば 0 回。段 B の結果は A1b と正解判定で使い回す）</li>
+  <li><strong>失敗</strong>: 429・5xx は指数バックオフで再試行（3 回）。それでも失敗したら例外にする（扱いは <a href="#judge-policy">10.3.5</a>）</li>
+  <li><strong>閾値</strong>は 21-6d3 の全件プローブで掃引し、すべて据え置いた（<a href="#d-20261003-thresholds">付録</a>）。各段・閾値を決めた試行の経緯は<a href="umigame-soup-1-judge-study.html#p2">検討ページ 6</a></li>
+</ul>
+
+<h4 id="judge-policy">10.3.5 組み合わせの 3 モード</h4>
+<ul>
+  <li><strong>切り替え</strong>: 環境変数 <code>JUDGE_MODE</code> = <code>luna</code> / <code>jev</code> / <code>hybrid</code>（既定 <code>hybrid</code>・暫定。最終決定は 21-6e）</li>
+  <li><strong><code>luna</code></strong>: luna だけを呼び、その判定で返す</li>
+  <li><strong><code>jev</code></strong>: Jev だけを呼び、その判定で返す。Jev が失敗したら同じコメントを luna で判定する（<code>decision = jev_fallback_luna</code>。Jev は SLA がなく値上げの留保もあるため、luna の実装とキーは常に本番に残す）</li>
+  <li><strong><code>hybrid</code></strong>: luna と Jev を並列に呼び、<strong>返信は luna の判定で作る</strong>。Jev は返信の判定には使わず、次の 2 役だけを持つ。<code>JUDGE_SHADOW</code> と <code>JUDGE_CONSENSUS</code> は個別にオン / オフでき（既定は両方オン）、両方オフなら Jev を呼ばない</li>
+  <li><strong>見張り役</strong>（<code>JUDGE_SHADOW</code>）: kind か answer が luna と食い違ったら WARNING ログ <code>JUDGE_SHADOW_MISMATCH</code>（JSON 付き）を出し、コメント記録に両方の判定と <code>shadow_mismatch</code> を残す。食い違い率が平常値の 2 倍を超えたら通知する（配線は 21-6f）。生成 AI の品質低下にも Jev 側の異常にも気づける</li>
+  <li><strong>正解開示前の二重確認</strong>（<code>JUDGE_CONSENSUS</code>・合意制）: 正解の宣言は luna と Jev の両方が ④ と判定したときだけ（<code>decision = consensus_ok</code>）</li>
+  <li><strong>合意が割れたとき</strong>: luna だけが ④ なら開示せず、専用の定型文で説明の追加を促し、WARNING ログ <code>JUDGE_CONSENSUS_SPLIT</code> を出す（<code>decision = consensus_split</code>）。Jev だけが ④ なら luna の判定どおりに返す。誤った開示は取り消せないため慎重側に倒す（見逃しは次のコメントで取り返せる）</li>
+  <li><strong>割れたときの人の対応</strong>: 通知はマーカーのメトリクスフィルタ → アラーム → 既存の通知経路（21-6f で配線）。手動で正解を伝えるときは、ユーザーが Instagram アプリからそのコメントに直接返信する（コメント記録に <code>comment_id</code>・本文・両方の判定があるので対象を特定できる。専用の仕組みは作らない）</li>
+  <li><strong>失敗時</strong>: luna の失敗（再試行後）は例外にして SQS の再試行 → DLQ に回す（<code>luna</code> / <code>hybrid</code>）。<code>hybrid</code> で Jev が失敗したら luna 単体として続け、luna が ④ でも合意が取れないので開示しない（割れた扱い）</li>
+  <li><strong>そのほかの守り</strong>: 生成 AI のモデルは日付付きの ID で固定できれば固定する。モデル・プロンプトを変えるときは、全件の機械プローブ（<a href="#evaluation">10.6</a>）に合格してから切り替える</li>
+</ul>
+
+<h3 id="reply-style">10.4 返信文</h3>
+<div class="note"><span class="callout-title">要点</span>返信文は判定を変えずに書く。口調はパパが息子に話しかけるくだけた口調で、答えへの近さを匂わせない。作り方は 4 案（定型文 1 案 + LLM の書き手 3 案〔中身は 2 種〕）から選ぶ。既定（暫定）は真相を渡さない書き手 <code>1d-luna</code>。</div>
+
+<h4>判定語と書き方の基準（どの案でも同じ）</h4>
+<ul>
+  <li><strong>判定語</strong>（① の冒頭）: はい →「はい！」、いいえ →「いいえ。」、関係ない →「関係ないよ。」、判断できない（<code>unknown</code>）→「それは答えに関わらないんだ。」</li>
+  <li><strong>口調</strong>: リールの台詞（「質問してみて！」「何度でも答えるよ」）に合わせたくだけた口調で、パパが息子に話しかけるイメージ。一人称は「私」（必要なときだけ使う）。です・ます の敬語は使わない</li>
+  <li><strong>長さ</strong>: 返信は 80 字以内。判定語や定型のあとの一言は 20 字以内。④ の開示は 70 字以内</li>
+  <li><strong>絵文字</strong>: ☺️ 😌 😉 🧐 🥳 🙌 👏 🤔 🫢 🤭 🤐 のどれか 1 個まで。付けない返事のほうが多くてよい。⑮ クレーム・⑲ 誹謗中傷・④ 正解の開示には付けない</li>
+  <li><strong>公平さ</strong>: 相手の推理や質問が答えにどれだけ近いかを匂わせる言葉（「鋭い」「いい線」「近い」「核心」「着眼点」など）を使わない。判定で一言の温度を変えない（それ自体がヒントになる）。合意制で割れたときの定型文だけは例外</li>
+  <li><strong>質問の復唱</strong>: ① だけ、コメントの言葉の範囲で許す（「はい！夕方に帰ってきたよ。」）。コメントにない言葉を足さない。推理（④⑤⑥）への返事では復唱しない（どこが合っているかを示してしまう）</li>
+  <li><strong>復唱の例外</strong>: 語だけのコメントへの聞き返し（「何がひな人形なのか教えてね」）は、コメントの語をそのまま使ってよい。語だけのコメントは当たり外れに関係なくすべて ③ で聞き返すので、返事の形から当たり外れは読めない（条件 = ③ の判定をコアとの近さで変えないこと・コメントにない言葉を足さないこと）</li>
+  <li><strong>① の返事の形</strong>: 判定語のあとを「判定語だけ / 判定語 + 復唱 / 判定語 + 一言」に割り振る（状態を持たずに散らす）。LLM の書き手には <code>sha1("slot:" + comment_id)</code> で 4 枠（判定語だけ 1・復唱 1・一言 2）から選んだ形を渡す。<code>irrelevant</code> / <code>unknown</code> では復唱せず一言にする</li>
+  <li><strong>⑧ ネタバレ要求</strong>: 「質問には答えられるけど、真相は教えられないよ」の趣旨で返す。「誰かが当てるまで秘密」は、当てた人が出たら明かさなければならなくなるので使わない</li>
+</ul>
+
+<h4 id="reply-variants">返信文の 4 案</h4>
+<p>環境変数 <code>REPLY_VARIANT</code> で選ぶ（既定 <code>1d-luna</code>・暫定。選定は 21-6e）。判定のモードとは独立に切り替わる。</p>
+<div class="table-wrap">
+<table>
+<tr><th>案</th><th>作り方</th><th>モデル</th><th>真相</th><th>④ 正解の返事</th></tr>
+<tr><td><code>1b</code></td><td>LLM の書き手（<code>reply_1b_with_truth.txt</code> + <code>reply_style.txt</code>）</td><td>luna・effort <code>xhigh</code>・上限 2,400</td><td>渡す</td><td>書き手が「正解！」+ 開示を書く</td></tr>
+<tr><td><code>1d-luna</code> / <code>2c-luna</code></td><td>LLM の書き手（<code>reply_writer.txt</code> + <code>reply_style.txt</code>）。2 つは同じ書き手の別名</td><td>luna・effort <code>low</code>・上限 800</td><td>渡さない（問題文だけ）</td><td><code>正解！</code> + <code>reveal_text</code></td></tr>
+<tr><td><code>2b</code></td><td>定型文だけ（<code>app/reply/templates.py</code>）</td><td>なし</td><td>使わない</td><td><code>正解！</code> + <code>reveal_text</code></td></tr>
+</table>
+</div>
+<ul>
+  <li><strong>既定を <code>1d-luna</code> にした理由</strong>: 真相を渡さない書き手なので構造的に漏れにくく、費用も低い</li>
+  <li><strong>書き手の呼び出し</strong>: system = 書き手のプロンプトに判定（種別・答え・語）・① の形・<code>reply_style.txt</code>・問題を埋めたもの、user = コメント本文。出力は JSON スキーマ（strict）の <code>{reply}</code>。429・5xx は指数バックオフで再試行（5 回）</li>
+  <li><strong>案によらずコードで決める返事</strong>: ⑳ <code>spam</code>・㉑ <code>personal_info</code> は返信しない。⑱ <code>troll</code>・⑲ <code>abuse</code> は定型文（LLM の文面を使わない = 挑発に乗った文や漏れが出ない）。合意制で割れたときは専用の定型文</li>
+</ul>
+
+<h4 id="reply-templates">定型文（<code>2b</code> と、ほかの案の落とし先）</h4>
+<ul>
+  <li><strong>選び方</strong>: 種別ごとの候補から <code>sha1(comment_id)</code> で 1 つ選ぶ（状態を持たずに言い回しを散らす）</li>
+  <li><strong>候補の数</strong>: ① の一言 10 通り（うち 2 つは空 = 判定語だけ）、②③⑤〜⑰・㉒ は各 6 通り、⑱⑲ は各 3 通り、合意制で割れたとき 3 通り、語だけのコメントへの聞き返し 3 通り（「何が{語}なのか教えてね。」など）</li>
+  <li><strong>① の返事</strong>: 判定語 + 一言（空なら判定語だけ）</li>
+</ul>
+
+<h4 id="reply-checks">安全網と検査</h4>
+<ul>
+  <li><strong>判定を書き手に書き換えさせない</strong>: LLM の書き手が失敗・空応答のとき、① で判定語から始まらないとき、語だけのコメントへの聞き返しになっていないとき（語と「何が / 何のこと / どうした」と「教えて / 聞かせて / ？」を含まない）は、<code>2b</code> の定型文に落とす。WARNING ログ <code>REPLY_WRITER_FALLBACK</code> を出し、<code>reply.source = fallback_template</code> を記録する</li>
+  <li><strong>長さ</strong>: 返信が 80 字を超えたら切り詰めずに WARNING ログ <code>REPLY_OVER_80</code> を出す（プローブで P7 違反として数えるため）。Graph API に送る直前に 200 字で切り詰めるのが唯一の切り詰め（最後の安全網）</li>
+</ul>
+
+<h3 id="prompts">10.5 現行プロンプト全文</h3>
+<div class="note"><span class="callout-title">要点</span>判定と返信文のプロンプト 4 本の全文を転記する。<strong>正は <code>services/comment-reply/app/prompts/</code></strong>で、以下は <code>prompt_version</code> <code>5311b19312cf</code>（2026-09-30 の 21-6c2 で同梱した版）時点の転記。</div>
+<ul>
+  <li><strong><code>prompt_version</code></strong>: 同梱プロンプト全ファイル（名前順）のファイル名と中身の SHA-256 先頭 12 桁（<code>app/comment_log.py</code>）。コメント記録の <code>config.prompt_version</code>（<a href="#comment-log">10.8</a>）と評価ページの表示で、どの版で動いたかを照合できる</li>
+  <li><strong>転記の扱い</strong>: 「同じ情報を 2 か所に書かない」の例外として転記している（2026-10-03 ユーザー承認）。<strong>プロンプトを変えるステップでは、この節の転記と <code>prompt_version</code> の更新を完了条件に入れる</strong></li>
+  <li><strong>埋め込み</strong>: <code>{...}</code> は実行時に埋める値。<code>{style}</code> には <code>reply_style.txt</code> の全文が入る。<code>{slot}</code> は ① の返事の形（<a href="#reply-style">10.4</a>）</li>
+  <li><strong>使われ方</strong>: <code>pattern1_rules.txt</code> = パターン 1 の判定（手順 3 の返信文は下書きで送らない。そのため手順 3 には ⑧ の旧い言い回し「誰かが当てるまで秘密」が残っているが、返信には出ない）。<code>reply_style.txt</code> = 書き手 2 種が共有する返信文の基準。<code>reply_writer.txt</code> = <code>1d-luna</code> / <code>2c-luna</code>。<code>reply_1b_with_truth.txt</code> = <code>1b</code></li>
+  <li><strong>Jev の指示文</strong>は短い英文が段ごとに散っているため転記しない（正は <code>app/judge/jev.py</code>。流れは <a href="#pattern2">10.3.4</a>）</li>
+</ul>
+<details class="fold"><summary><code>pattern1_rules.txt</code>（パターン 1 の判定）</summary>
+<pre><code>あなたは Instagram アカウント「探偵カメロック」の出題者です。ウミガメのスープ（水平思考クイズ）の
+問題を出し、コメント欄のコメントに返信します。以下の「問題」「真相」「確定事実」だけを根拠にしてください。
+出力は JSON で、kind（コメントの種別）・answer（判定）・reply（返信文）・reason（判定理由を40字程度）・bare_term（語だけのコメントならその語、ほかは null）の 5 項目を返します。
+
+手順 1: コメントの種別（kind）を次の 22 種から 1 つ選ぶ。
+- q_yesno: はい / いいえで答えられる質問が 1 つ
+- q_multi: 1 つのコメントに質問が 2 つ以上
+- q_open: はい / いいえで答えられない質問（「なぜ？」「誰？」など）、または主語や対象が曖昧で一意に答えられない質問
+  「ひな人形？」「レントゲン？」「タイムカプセル」のように、述語がなく名詞・語句だけのコメントも q_open。コアの語でも外れの語でも同じ扱い。
+  この場合 bare_term にはコメントの表記のまま、周囲の記号だけ除いた語句を入れる。それ以外の bare_term は null。
+  主語を省いても述語があり、問題文の人物・物の話と読める「泣いたのは病気が治ったから？」「人形なの？」は従来の質問・推理として判定する。
+  （「それ」「あれ」「彼」「あの人」などが問題文の誰・何を指すか一つに決まらない質問。問題文から一つに決まるなら q_yesno）
+  例: 問題文に母親と娘が出てくるときの「彼女は泣いてた？」は、「彼女」がどちらか決まらないので q_open。
+  「あれって大事なもの？」のように「あれ」が何を指すか書かれていないものも q_open。
+  一方「相手は家族？」は問題文の「相手」を指すと決まるので q_yesno。迷うときは q_open にして聞き直してもらう。
+- guess_correct: 下の「コアの要点」をすべて言い当てていて、明らかな誤りを含まない推理。周辺の細部は欠けていてもよい
+  （「〜ですか？」「〜ってこと？」の質問の形でも、コアの要点がすべて入り、何についての推理か分かればこれ。語だけのコメントは除く）
+- guess_close: コアの要点のどれかに触れているが guess_correct に届かない推理。コアは合っているが明らかな誤りを含むものもここ
+- guess_wrong: コアの要点に触れていない推理。周辺の事実がいくつか合っていても、コアに触れていなければこれ
+  「コアに触れている」とは、コアの要点の中身（仕掛けの答え）を正しく述べていること。問題文にある言葉をそのまま使っているだけや、
+  問題文どおりの読み方（出題者がわざと誘った読み方）で推理しているだけでは、コアに触れていない（guess_wrong）。
+- 問題文の言葉や事実を 1 つだけ確かめる短い質問（1 文。「『〇〇』って〜って意味？」「〜なの？」）は、コアの一部に触れていても
+  推理ではなく q_yesno として yes / no で答える。一方、何が起きたのかを自分の言葉で説明し、最後に「〜かな」「〜じゃない？」
+  「〜ってこと？」を付けたものは推理として扱う（コアの要点がすべて入っていれば guess_correct、一部なら guess_close）。
+- ask_hint: ヒントを求める / ask_spoiler: 答え・ネタバレを求める / ask_howto: 遊び方やアカウント（bot かどうか等）への質問
+- impression: 問題への感想 / greeting: 挨拶 / cheer: 応援 / chat: 問題と関係のない雑談 / request: 「こんな問題を出して」などのリクエスト
+- complaint: 問題への指摘・クレーム（「矛盾している」「無理がある」「難しすぎる」）。「つまらない」「センスない」「バカみたいな問題」など
+  問題（作品）そのものへのけなしもここに入れる
+- mention: 友達へのメンション・タグ付け（「@友達 これ解いて」）/ emoji_only: 絵文字だけ
+- troll: 意味の取れない文字列・連投 / abuse: 人（作者・ほかの利用者）への誹謗中傷・攻撃、差別的・性的な内容
+  （問題そのものへのけなしは abuse ではなく complaint）
+- spam: 宣伝・リンク・フォロー稼ぎ / personal_info: 電話番号・住所・本名など個人情報を含む
+- foreign: 日本語以外のコメント。ひらがな・カタカナを 1 字も含まない漢字だけの文（「答案是什么？」など）は中国語を疑い、
+  日本語として自然に読めなければ foreign にする
+
+手順 2: answer は kind が q_yesno のときだけ yes / no / irrelevant / unknown のどれかを入れ、ほかは null にする。
+- 確定事実から判断できる質問は yes か no。真相に関係しない事柄は irrelevant。
+- 確定事実に直接書いていなくても、真相の文から考えて明らかに違うことは no、明らかに正しいことは yes と答える
+  （例: 真相で品物を直接手渡している場面を「宅配便で届いたの？」と聞かれたら no）。
+- 真相にも確定事実にもない事柄を勝手に作らない。真相と確定事実のどちらからも判断できないときだけ unknown。
+
+手順 3: reply（返信文）を書く。全体で 80 字以内・丁寧で少しユーモラスな探偵口調・絵文字は使わない。
+- q_yesno: 冒頭を answer に応じて「はい。」「いいえ。」「関係ありません。」「それは問題の答えに関わりません。」のどれかにする。
+  そのあとに、真相に触れない 20 字以内の探偵らしい一言を添えてよい（毎回同じ言い回しにしない）。
+  一言にも真相の核心（答えそのもの・正体・理由・場所・人物の役割）や、確定事実シート・真相の文の言葉を含めない。
+- guess_correct: 冒頭に「正解です！」と宣言し、そのあとに真相を 2 文程度で開示する（「一語で答える」より優先）。
+  開示の部分は 70 字以内に収める（「正解です！」を含めて全体 80 字以内）。
+- guess_close: 「惜しい！」と言う。どこが足りないか・どこが合っているかは言わない。
+- guess_wrong: 「残念、違います」の趣旨を返す。どこが違うかは言わない。
+- q_multi: 質問を 1 つずつコメントするよう促す。q_open: はい / いいえで答えられる形で聞き直すよう促す。
+- ask_hint: 質問で絞っていくよう促す（ヒントは出さない）。ask_spoiler: 誰かが当てるまで秘密だと伝える。
+- ask_howto: 「はい / いいえで答えられる質問をコメントすると、探偵が答える」遊び方を案内する。
+- impression / greeting / cheer / request / chat / mention / emoji_only: 20 字以内のお礼・相づち・歓迎だけ。
+  真相・正体・手がかりに触れない。complaint: お礼と「確認します」だけ。反論も言い訳もしない。
+- foreign: 日本語で質問してほしいと日本語で返す。
+- troll / abuse / spam / personal_info: reply は空文字にする（返信はプログラム側で決める）。
+
+問題: {problem_text}
+真相: {truth}
+確定事実:
+{fact_sheet}
+コアの要点（推理の判定に使う。この問題の仕掛け）:
+{core_points}</code></pre>
+</details>
+<details class="fold"><summary><code>reply_style.txt</code>（返信文の基準・書き手 2 種で共有）</summary>
+<pre><code>【話し手】探偵カメロック（ウミガメの探偵。丸い体に前掛け、スープの椀と虫眼鏡を持っている）。
+コメント欄のプレイヤーに、パパが息子に話しかけるように、やさしく楽しそうなくだけた口調で話す。
+- 一人称は「私」。ただし一人称は必要なときだけ使う（毎回名乗らない）。
+- 語尾は「〜だよ」「〜だね」「〜かな」「〜してごらん」「〜しようか」など。です・ます の敬語は使わない。
+- からかう・説教する・上から目線で評価することはしない。
+
+【全体の決まり】
+- 返信は 80 字以内。判定語や定型のあとに添える一言は 20 字以内。
+- 絵文字は ☺️ 😌 😉 🧐 🥳 🙌 👏 🤔 🫢 🤭 🤐 のどれか 1 個まで（この一覧にない絵文字は使わない）。付けないほうが多くてよい。complaint と guess_correct には付けない。
+- 相手の推理や質問が答えにどれだけ近いかを匂わせる言葉を使わない（「鋭い」「いい線」「近い」「近づいた」「核心」「迫って」「着眼点」「いい質問」など）。
+  はい のときだけ褒める・いいえ のときだけ励ます、のように判定で一言の温度を変えない（それ自体がヒントになる）。
+- 真相の核心（答えそのもの・正体・理由・場所・人物の役割）に触れない。問題文とコメントにない新しい事実を書かない。
+- 返信文だけを書く。前置き・説明・かぎかっこでの囲みは付けない。
+
+【種別ごとの返し方】
+- q_yesno: 冒頭は判定語にする。yes →「はい！」、no →「いいえ。」、irrelevant →「関係ないよ。」、unknown →「それは答えに関わらないんだ。」。
+  そのあとは、指定された形に従う:
+  ・「判定語だけ」: 判定語のみで終える。
+  ・「判定語 + 復唱」: コメントの言葉だけを使って短く言い直す（例: 質問「その人は夕方に帰ってきた？」が yes なら「はい！夕方に帰ってきたよ。」）。
+    コメントにない言葉を足さない。irrelevant / unknown のときは復唱せず「判定語 + 一言」にする。
+  ・「判定語 + 一言」: 真相に触れない 20 字以内の一言を添える（「ふむふむ、次はどうかな？」「その調子で聞いてごらん」の類。毎回同じにしない）。
+- q_multi: 質問は 1 つずつコメントしてね、と促す。
+- q_open: はい / いいえ で答えられる形で聞き直してね、と促す。誰のことか分からない質問なら、誰のことか書いてね、と添える。
+- q_open で bare_term があるとき: コメントの語をそのまま使って「何が〜なのか」を聞き返す。コメントにない言葉を足さない。
+- guess_correct: 「正解！」で始め、何が起きたのかを 2 文ほどで明かす（明かす部分は 70 字以内）。
+- guess_close: 「惜しい！」で始め、推理を続けるよう促す。どこが合っている・足りないかは言わない。推理の言葉を繰り返さない。
+- guess_wrong: 「残念、ちがうよ」の趣旨を返す。どこが違うかは言わない。推理の言葉を繰り返さない。
+- ask_hint: ヒントは出さず、質問で少しずつ絞っていこう、と促す。
+- ask_spoiler: 質問には答えられるけど、真相は教えられないよ、と返す（「誰かが当てるまで」「当てた人には」のように、いつか明かす約束はしない）。
+- ask_howto: はい / いいえ で答えられる質問をコメントすると、探偵が答える、という遊び方を案内する。
+- impression / greeting / cheer / request / chat / mention / emoji_only: 20 字以内のお礼・あいさつ・相づち・歓迎だけ。問題の中身には触れない。
+- complaint: お礼と「確認するね」だけ。反論も言い訳もしない。
+- foreign: 日本語で質問してね、と日本語で返す。</code></pre>
+</details>
+<details class="fold"><summary><code>reply_writer.txt</code>（書き手 <code>1d-luna</code> / <code>2c-luna</code>・真相なし）</summary>
+<pre><code>あなたは Instagram アカウント「探偵カメロック」の返信係です。ウミガメのスープ（水平思考クイズ）の投稿のコメントに返信します。
+このコメントの判定は別の仕組みがすでに決めています。あなたは真相を知らされていません。判定を変えずに、返信文だけを書いてください。
+問題文は話題を合わせるための参考です。問題文とコメントにない事実を作らないでください。
+
+このコメントの判定: 種別 = {kind} / 答え = {answer}
+語だけのコメントの語（なければ空）: {bare_term}
+q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
+
+{style}
+
+問題文: {problem_text}</code></pre>
+</details>
+<details class="fold"><summary><code>reply_1b_with_truth.txt</code>（書き手 <code>1b</code>・真相あり）</summary>
+<pre><code>あなたは Instagram アカウント「探偵カメロック」の出題者です。ウミガメのスープ（水平思考クイズ）の問題を出し、
+コメント欄のコメントに返信します。このコメントの判定はすでに決まっています。判定を変えずに、返信文（reply）だけを書いてください。
+以下の「問題」「真相」「確定事実」だけを根拠にしてください。
+
+このコメントの判定: 種別 = {kind} / 答え = {answer}
+語だけのコメントの語（なければ空）: {bare_term}
+q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
+
+{style}
+
+問題: {problem_text}
+真相: {truth}
+確定事実:
+{fact_sheet}
+コアの要点:
+{core_points}</code></pre>
+</details>
+
+<h3 id="evaluation">10.6 評価</h3>
+<div class="note"><span class="callout-title">要点</span>評価データ（全 14 問・計 441 件）を本番と同じ判定・書き手の経路に通す機械プローブで、10.2 の基準の合否を出す。結果は評価ページ（サマリー + 問題ごとの 14 枚）にまとめる。</div>
+
+<h4>評価データ</h4>
+<ul>
+  <li><strong>置き場</strong>: <code>content/umigame-stock/umigame-soup-1/judge-trial/data/</code>。問題依存のケース <code>eval_problems.json</code>（問題番号がキー）、語だけのコメント <code>bare_term_cases.json</code>、問題に依存しない共通テストセット <code>common_cases.json</code>（⑦〜㉒）。問題を増やすときはファイルに問題番号のキーを足す</li>
+  <li><strong>問題依存のケース（1 問 21 件が基本）</strong>: ① 10 件（口語・主語の省略・誤字を混ぜる）・② 2 件・③ 3 件・④ 2 件（うち 1 件は質問の形）・⑤ 2 件・⑥ 2 件。21-6b の試走に使った 5 問（U01・U13・U18・U20・U26）は ① などが多く 25〜30 件。14 問で計 328 件</li>
+  <li><strong>語だけのコメント</strong>: 各問 2〜3 件（コアの語と外れの語）。計 30 件</li>
+  <li><strong>共通テストセット</strong>: ⑦〜㉒ の 16 種 × 5 件以上（計 83 件）。どの問題に付いても成り立つ文面にし、境界的なもの（感想と応援の中間など）も混ぜる。対象の問題へ順繰りに割り当てる</li>
+  <li><strong>件数</strong>: 計 441 件（328 + 30 + 83。数え方の正は <code>tools/probe_run.py</code> の <code>load_cases</code>）</li>
+  <li><strong>作り方（テストの偏りを避ける）</strong>: ① などの質問は <code>expected_questions</code> を見ずに、問題文だけを見て（真相を見ずに）プレイヤーの立場で書き、あとから真相と確定事実で正解ラベルを付ける。下書きは判定プロンプトの調整に関わっていない書き手（Codex への委譲）が書き、Claude が正解ラベルを検め、ユーザーが確認する</li>
+</ul>
+
+<h4>機械プローブ</h4>
+<ul>
+  <li><strong>実行器</strong>: <code>services/comment-reply/tools/probe_run.py</code>。評価ケースを本番の判定の組み合わせ・書き手・コメント記録に通し、<code>results.json</code> と <code>metrics.json</code> を出す（集計は <code>probe_metrics.py</code>）。Instagram への送信はしない。キーは環境変数（<code>OPENAI_API_KEY</code>・<code>TYPESAFE_API_KEY</code>）</li>
+  <li><strong>使い回しと再開</strong>: 判定 API はケースごとに各方式を 1 回呼んでパターン間で使い回し、書き手だけパターンごとに呼ぶ。<code>judge_cache.json</code> と <code>writer_cache.json</code> で中断後も再開できる</li>
+  <li><strong>比べる 5 パターン</strong>: ① luna + <code>1b</code> ② luna + <code>1d-luna</code> ③ hybrid + <code>1d-luna</code> ④ jev + <code>2b</code> ⑤ jev + <code>2c-luna</code></li>
+  <li><strong>合格基準</strong>: 10.2 の P1〜P7 とレベル 1・2 の機械プローブ基準をそのまま使う。集計項目は基準と 1 対 1 に対応させる。P1 の漏れ候補は <code>leak_count.py</code> の核心語辞書で拾う（辞書は P1 漏れ候補の正として残す）</li>
+</ul>
+
+<h4>評価ページ</h4>
+<ul>
+  <li><strong>ページ</strong>: <a href="umigame-soup-1-probe.html">コメント返信の評価（プローブ）</a>。サマリー 1 枚（合否表・指標）+ 問題ごとの 14 枚（コメント一覧と生データ）。合否表の NG の ID から該当の行へ飛べる。生成器は <code>tools/build_probe_page.py</code></li>
+  <li><strong>最新の結果</strong>（21-6d3・2026-10-03）: 全指標を満たすパターンはなかった（合格数は ① 9 / ② 11 / ③ 11 / ④ 12 / ⑤ 11。15 指標中）。方式選定（21-6e）の材料にする</li>
+</ul>
+
+<h4 id="judge-trial-result">試行錯誤の記録</h4>
+<p>判定方式の試走（試行 1〜8b）・2 方式の比較図・誤りの中身は検討ページ「<a href="umigame-soup-1-judge-study.html">コメント返信処理方式の検討</a>」、返信文の 13 案の試走は「<a href="umigame-soup-1-reply-study.html">コメント返信文の品質の検討</a>」にある。試行錯誤は検討ページで回し、決まったことだけを本書へ移す。</p>
+
+<h3 id="reply-ops">10.7 運用</h3>
+<div class="note"><span class="callout-title">要点</span>投稿は 20:00 の既存バッチ、コメント返信は Lambda だけで動き、Aurora は起動しない。投稿直後に S3 へ書く問題スナップショットが両者のつなぎ目。監視は DLQ アラームと WARNING ログのマーカー。</div>
+
+<h4>10.7.1 1 日の動き</h4>
+<div class="table-wrap">
+<table>
+<tr><th>時間帯</th><th>流れ</th><th>Aurora</th></tr>
+<tr><td>20:00 リール投稿</td><td>画像生成 SFN（ストック LRU → 事前動画取得 → <code>umigame_items</code> INSERT）→ SNS 投稿 SFN（キャプション展開 → publish）→ <strong>publish 成功直後に <code>problems/{media_id}.json</code> を S3 へ出力</strong>（10.7.2）</td><td>起動（従来どおり）→ 0 ACU へ</td></tr>
+<tr><td>日中〜翌日以降: コメント</td><td>コメント → Meta Webhook → Webhook Lambda → SQS → Reply Lambda（10.1 の流れ）。<strong>受信 → 返信 約 4 秒</strong>（PoC 実測）</td><td><strong>一度も起動しない</strong></td></tr>
+</table>
 </div>
 
-<h2 id="prompts">5. プロンプトの作り方</h2>
-<p>本セットの生成方式 <code>umigame-prebuilt</code> は実行時に LLM・画像生成 API を呼ばない（事前ビルド方式）。プロンプトは 2 種類あり、いずれも<strong>投稿時ではなく、ストック整備時とコメント返信時</strong>に使う。</p>
+<h4 id="snapshot">10.7.2 投稿後スナップショット <code>problems/{media_id}.json</code></h4>
+<p>SNS 投稿バッチは <code>batch_sets.problem_snapshot_enabled=1</code> のセットについて、リール行が <code>success</code> に達した直後に S3 <code>assets/{set_code}/problems/{media_id}.json</code> を PUT し、<code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code> に記録する（共通フローの拡張ポイント = <a href="../batch-flow.html#problem-snapshot">batch-flow.html 3.3 手順 6</a>。データは <a href="../data-model.html#detail-umigame-items">data-model.html 4.14</a>）。<code>media_id</code> は <code>posts.platform_post_id</code>（<code>media_publish</code> の応答 id）。</p>
+<pre><code>{
+  "schema_version": 2,
+  "set_code": "umigame-soup-1",
+  "media_id": "17912345678901234",
+  "content_key": "001-lighthouse-letter",
+  "posted_at": "2026-09-20T11:00:12Z",
+  "problem_text": "……なぜ？",
+  "truth": "……",
+  "fact_sheet": ["……", "……"],
+  "core_points": ["……", "……"],
+  "reveal_text": "……（70 字以内）",
+  "rule_text": "「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します",
+  "master_rules": "（prompt_configs.prompt_text。判定には使わない）"
+}</code></pre>
+<ul>
+  <li><strong>出力失敗は投稿失敗にしない</strong>（投稿は成功しているため <code>posts.status</code> は <code>success</code> のまま）。<code>snapshot_s3_key</code> が NULL の行を運用の確認クエリで拾い、手動で再出力する（手動再出力ツール <code>content/umigame-stock/.../tools/write_snapshot.py</code> は 21-7 で用意する）</li>
+  <li><strong>スナップショットが無い投稿へのコメント</strong>は、Reply Lambda が S3 404 として<strong>返信せず記録だけ</strong>残す（<code>errors</code> に <code>problem_not_found</code>。DLQ に入れない）</li>
+  <li><strong>保持</strong>: プレフィックス <code>assets/…/problems/</code> は 30 日ライフサイクルの対象外（<code>images/</code> <code>videos/</code> 限定）のため、投稿済み問題は残り続ける = 翌日以降のコメントにも答えられる</li>
+  <li><strong>実装</strong>（21-5b）: <code>services/sns-post-batch/app/problem_snapshot.py</code>。リール行の <code>success</code> 更新を commit した<strong>後</strong>に別のトランザクションで出力する。スナップショット側の失敗（行の読み取り・<code>prompt_configs</code> の欠落・S3 の PUT・キーの記録）は WARNING ログとロールバックだけで済み、投稿の成功記録を巻き戻さない</li>
+  <li><strong>形式</strong>: <code>posted_at</code> は <code>posts.posted_at</code> に書いた値と同じ時刻（UTC・末尾 <code>Z</code>）。JSON は UTF-8（<code>ensure_ascii=False</code>）・<code>Content-Type: application/json; charset=utf-8</code> で PUT する。フラグが 0 のセットとストーリーズ行では何もしない</li>
+  <li><strong><code>schema_version</code> 2</strong>（21-6c1）: 判定モジュール用の <code>core_points</code> と <code>reveal_text</code>（<a href="#judge-contract">10.3.1</a>）を持つ。どちらも <code>umigame_items</code> の同名列（V013）から写し、NULL なら出力しない（V013 未適用・ストック未更新の検出）。判定モジュールは 2 以上を前提にする</li>
+  <li><strong><code>master_rules</code></strong>: <code>prompt_configs.prompt_text</code> を写す既存のキーとして残るが、判定には使わない（プロンプトは Lambda に同梱 = <a href="#judge-impl">10.3.2</a>）。21-7 の <code>prompt_configs</code> INSERT で <code>prompt_text</code> に何を入れるか（空にするか、記録として転記するか）は 21-7 で決める</li>
+  <li><strong>IAM の前提</strong>: SNS 投稿バッチのタスクロールは S3 の読み取り権限（<code>grantRead</code>）しか持たないため、フラグを 1 にする前に <code>assets/umigame-soup-1/problems/*</code> への <code>s3:PutObject</code> を付ける（21-7 の CDK 変更に含める）。権限がないまま有効化すると、投稿は成功するが毎回スナップショットが WARNING で欠ける</li>
+  <li><strong>ステージング面</strong>（PoC アプリ + <code>test_tkghr</code>）は <code>assets/umigame-soup-1/staging/problems/</code> を読む（環境変数 <code>PROBLEMS_PREFIX</code>）。サンプルの JSON は手で置く（21-6 の人間ゲート）</li>
+</ul>
 
-<h3 id="master-prompt">5.1 AI 出題者プロンプト（コメント返信）</h3>
-<p>Reply Lambda は「セット固定部分（出題者の振る舞い・モデレーション・正解宣言のルール）」と「問題固有部分（問題文・真相・確定事実シート）」を結合して system プロンプトを組み立て、ユーザーのコメント本文を user メッセージとして渡す（Lambda コードには組み立ての骨格とフォールバック文言だけを持つ）。</p>
+<h4 id="reply-behavior">10.7.3 返信の振る舞い（MVP スコープ）</h4>
+<ul>
+  <li><strong>返信する</strong>: 自アカウントのリールへのコメントと、そのスレッドへの返信（<code>parent_id</code> 付き。推理の続きであることが多い）。返し方は判定（10.3）と返信文（10.4）に委ねる</li>
+  <li><strong>返信しない</strong>: 自分の返信（<code>from.id == ig_user_id</code>。無限ループ防止）/ ⑳ スパム・㉑ 個人情報と判定したコメント / スナップショットの無い <code>media_id</code>（本セット以外の投稿・出力失敗）</li>
+  <li><strong>正解宣言方式</strong>: 解答編リールは作らず、正解者に正解を宣言して真相を開示する（アイデア詳細 2.2）。誰かが当てるまで問題は開き続け、翌日以降もコメントが付く余地を残す</li>
+  <li><strong>状態を持たない</strong>: 正解宣言後も質問には答え続ける。誰も当てずに流れた問題は開示しない</li>
+  <li><strong>作らないもの</strong>（アイデア詳細 7）: ユーザーごとの質問回数制限・コメント回数の DB 管理・禁止ワード DB・語の一覧によるルールベース判定（パターン 2 の段 0 は文字種だけを見る規則で、これに当たらない）・会話状態管理・Lambda メモリキャッシュ・コメント処理からの Aurora アクセス・翌日の解答編リール</li>
+  <li><strong>ステートレス方針</strong>: 将来のゲーム化構想を理由に、状態管理を先行実装しない</li>
+  <li><strong>重複返信の抑止</strong>: Meta Webhook は同一イベントを再送しうるため、SQS FIFO の重複排除 ID に <code>comment_id</code> を使う（5 分窓）。窓外の再送で二重返信が起きる可能性は許容する（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a> の decision）</li>
+</ul>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-09-04、21-3）: 出題者プロンプトのセット固定部分の正は <code>prompt_configs.prompt_text</code>。投稿時に S3 スナップショットへ転記し、Lambda はスナップショットだけを読む</span>
+<h4>10.7.4 利用上限・費用</h4>
+<ul>
+  <li><strong>上限は 2 段</strong>（21-1 ⑤）: ① OpenAI 側のプロジェクト月額予算上限 ② Reply Lambda の予約同時実行数（初期値 2。SQS が吸収するため取りこぼしにならず、上限到達時は返信が遅れるだけ）</li>
+  <li><strong>試算の枠組み</strong>: 返信 1 件 = 入力 600 トークン前後（問題文・真相・確定事実シート・ルール・質問）+ 出力 30 トークン程度。月 6,000 件（1 日 200 コメント）で入力 3.6M・出力 0.2M トークン。事業戦略書 3.1 の費目「コメント自動返信の LLM API（従量のみ・月数百円規模）」の範囲。単価確認後に外れていれば 21-6 で戦略書を直す</li>
+  <li><strong>AWS 側</strong>（Lambda・SQS・S3 GET 月 6,000 回・CloudWatch）は無料枠内〜数十円。見張り役の Jev は月 100 円前後</li>
+  <li><strong>モデルの差し替え</strong>: 本番稼働まで固定。差し替えは Secret ではなく Lambda の環境変数 <code>LUNA_MODEL</code>（判定と書き手が共用）で行う</li>
+</ul>
+
+<h4 id="reply-monitoring">10.7.5 監視・運用</h4>
+<ul>
+  <li><strong>DLQ アラーム</strong>（<code>acps-prod-comment-reply-dlq-messages</code>。DLQ の可視メッセージ数 ≥ 1）が初期版の能動監視。通知が来たら DLQ のメッセージ本文（コメント id・media_id）と Reply Lambda のログで原因を見る（OpenAI 障害 / Graph API のトークン失効 / スナップショット欠落）</li>
+  <li><strong>DLQ からの復旧</strong>: 復旧後に DLQ → 元キューへ再駆動（SQS コンソールの「DLQ 再処理」）。手順は <a href="../../infra/operation.html#monitoring">infra/operation.html 4.1</a></li>
+  <li><strong>WARNING ログのマーカー</strong>: <code>JUDGE_SHADOW_MISMATCH</code>（見張り役の食い違い）・<code>JUDGE_CONSENSUS_SPLIT</code>（正解宣言の合意が割れた = 手動で正解を伝えるかの判断が要る）・<code>REPLY_WRITER_FALLBACK</code>（書き手の出力を捨てて定型文に落とした）・<code>REPLY_OVER_80</code>。メトリクスフィルタとアラームの配線は 21-6f</li>
+  <li><strong>トークン</strong>: コメント返信用の長期トークン（Instagram ログイン方式）は 60 日で失効する。失効日は <code>token_expires_at</code> を Secret に持たせて <a href="../operation.html">運用設計 5.4</a> のリマインド運用に載せる。自動更新（<code>GET /refresh_access_token</code>）は 21-6g で入れる（課題 <a href="../../issues/index.html#I-031">I-031</a> の展開・リリース前に必須）</li>
+  <li><strong>ステージング面</strong>: PoC 資材（Meta アプリ + <code>test_tkghr</code> + 同一コードのステージング面スタック）を恒久利用し、プロンプト改訂・Lambda 改修は必ずステージング面で実コメントを打ってから本番の Webhook 先を切り替える</li>
+  <li><strong>コメント欄の目視</strong>: 稼働初期（2 週間）は毎日コメント欄を目視し、ネタバレ回答・矛盾回答・不適切な返信がないかを確認する。問題があればストックを <code>is_active=0</code> にし、プロンプト（10.5）を直して機械プローブとステージングで再検証する。週次補充スキル（21-8）にチェック項目として組み込む</li>
+</ul>
+
+<h3 id="comment-log">10.8 コメント記録 JSON</h3>
+<div class="note"><span class="callout-title">要点</span>Reply Lambda は 1 コメントにつき 1 件、受信・判定・返信の全記録を S3 に書く（継続改善用。Aurora への取り込みは 21-7b）。書き込みの失敗は返信を止めない。</div>
+<ul>
+  <li><strong>キー</strong>: <code>comment-log/{set_code}/dt=YYYY-MM-DD/{comment_id}.json</code>（日付は Webhook 受信時刻の UTC 日付）。バケットは環境変数 <code>COMMENT_LOG_BUCKET</code>（既定は問題スナップショットと同じバケット）</li>
+  <li><strong>書き方</strong>: 書き込みの失敗は WARNING だけにして返信を止めない。スナップショットの無いコメントも <code>errors</code> に <code>problem_not_found</code> を入れて記録する。処理が例外で終わった場合も、書ける範囲で記録してから再試行に回す（同じキーに上書き）</li>
+  <li><strong>実装</strong>: <code>services/comment-reply/app/comment_log.py</code>。ローカル試行ツールと機械プローブも同じ組み立てでファイルに書く</li>
+</ul>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>キー</th><th>型・内容</th></tr></thead>
+  <tbody>
+    <tr><td><code>schema_version</code></td><td>整数 <code>1</code></td></tr>
+    <tr><td><code>comment_id</code>・<code>media_id</code>・<code>set_code</code>・<code>text</code></td><td>文字列。コメント ID・メディア ID・セット・コメント本文</td></tr>
+    <tr><td><code>parent_id</code></td><td>文字列または null（スレッドへの返信のとき）</td></tr>
+    <tr><td><code>commenter_id</code></td><td>文字列または null。コメント者のアプリスコープ ID（<code>from.id</code>）。<strong>username は持たない</strong></td></tr>
+    <tr><td><code>content_key</code>・<code>problem_schema_version</code></td><td>問題スナップショットの <code>content_key</code> と <code>schema_version</code>（見つからなければ null）</td></tr>
+    <tr><td><code>fact_sheet_hash</code></td><td>確定事実シートのバージョン。<code>content_key</code> + <code>fact_sheet</code> の SHA-256 先頭 12 桁</td></tr>
+    <tr><td><code>times</code></td><td><code>comment_created_at</code>（Webhook の <code>entry.time</code>、無ければ null）・<code>webhook_received_at</code>（Webhook Lambda が SQS メッセージに載せる）・<code>judged_at</code>・<code>replied_at</code>。UTC の ISO 8601（末尾 Z）</td></tr>
+    <tr><td><code>config</code></td><td><code>judge_mode</code>・<code>shadow</code>・<code>consensus</code>・<code>reply_variant</code>・<code>luna_model</code>・<code>prompt_version</code>（<a href="#prompts">10.5</a>）</td></tr>
+    <tr><td><code>judgements</code></td><td><code>luna</code> / <code>jev</code> それぞれ <code>{kind, answer, reason, bare_term, error, debug}</code> または null（呼ばなかった方式）。<code>debug</code> はモデル名・トークン数（推論トークン含む）・応答秒・Jev の確率。生の応答全文は入れない</td></tr>
+    <tr><td><code>shadow_mismatch</code></td><td>真偽値または null。両方の判定があるときの kind / answer の食い違い</td></tr>
+    <tr><td><code>final</code></td><td>返信に使った <code>kind</code>・<code>answer</code>・<code>decision</code>（<code>luna</code> / <code>jev</code> / <code>jev_fallback_luna</code> / <code>consensus_ok</code> / <code>consensus_split</code>）</td></tr>
+    <tr><td><code>reply</code></td><td><code>text</code>（送った本文〔200 字で切り詰めた後〕または null）・<code>source</code>（<code>template</code> / <code>llm</code> / <code>fallback_template</code> / <code>consensus_split</code> / <code>no_reply</code>）・<code>reply_id</code>（Graph API の返信 ID）・<code>over_80</code></td></tr>
+    <tr><td><code>errors</code></td><td>文字列の配列（Jev の失敗・書き手のフォールバック理由・処理の例外）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="failure">11. 失敗時ポリシー</h2>
+<ul>
+  <li><strong>投稿側</strong>は共通フローどおり（<a href="../batch-flow.html">batch-flow.html</a> 3.2 / <a href="../operation.html">operation.html</a> 4）。事前動画の取得失敗・ストック 0 件はフェイルラウド（縮退しない）。1 日 1 回のため 1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの判断は共通課題（課題体系 <a href="../../issues/index.html#I-019">I-019</a>）に従う</li>
+  <li><strong>スナップショット出力の失敗</strong>は投稿失敗にせず、NULL 行の確認クエリと手動再出力で回復する（<a href="#snapshot">10.7.2</a>）</li>
+  <li><strong>コメント側</strong>: Reply Lambda の失敗は SQS の再試行（最大 3 回）→ DLQ → アラーム。返信が遅れる・付かないことはあっても<strong>投稿には影響しない</strong>。固定文言での代わりの返信はしない</li>
+  <li><strong>Webhook Lambda</strong>は署名検証に失敗した要求を 401 で拒否し、正常受信は SQS へ入れた時点で 200 を返す（Meta の再送を招かないため、enqueue 失敗以外は 200）</li>
+  <li><strong>OpenAI の長期障害</strong>: 予約同時実行数と SQS の保持期間（4 日）内なら復旧後に自動で返信が付く。それを超えた分は DLQ から手動で再駆動するか、古すぎれば破棄する（返信の鮮度を優先）</li>
+</ul>
+
+<h2 id="diff">12. 共通フローからの差分・特記事項</h2>
+<p><strong>使用方式は <code>umigame-prebuilt</code></strong>（<a href="../generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>。Remotion ローカル事前ビルド + 実行時は取得のみ。ranking-prebuilt 同型で LRU 軸なし・単尺）。本セットは共通テーブルのうち <code>umigame_stock_items</code>（ストック）と <code>umigame_items</code>（投稿履歴 + スナップショット記録）を使う唯一のセットである（<a href="../data-model.html#detail-umigame-items">data-model.html 4.14 / 4.15</a>。V012）。</p>
+<ul>
+  <li><strong>共通骨格への変更は 2 点のみ</strong>: ① SNS 投稿バッチのキャプション展開に umigame 系プレースホルダを追加 ② publish 成功直後の問題スナップショット出力（<code>batch_sets.problem_snapshot_enabled</code> で有効化。V012 で追加）。いずれも 21-5b で実装</li>
+  <li><strong>外向き発信・イングレスを持つ初の機能</strong>: コメント自動返信は本システムで初めて外部からの要求（Meta Webhook）を受け、ユーザーに向けて自動で発信する。投稿時と完全分離した構成（10 章）と、ステージング面での必須検証（<a href="#reply-monitoring">10.7.5</a>）でリスクを閉じる。ステージング環境の一般論は課題体系 <a href="../../issues/index.html#I-027">I-027</a>（フル 2 面化はしない・本経路だけ例外）</li>
+  <li><strong>Remotion Skills 2.0 を標準ツーリングとして継続</strong>（21-2 人間ゲート）: <code>.agents/skills/remotion-*</code> 正本 + <code>.claude/skills/remotion-*</code> のスキル単位リンク（skills CLI 1.5.23・スキル版 4.0.520）。更新は <code>npx skills update</code>。既存 2 セットへの遡及適用は本フェーズの対象外</li>
+  <li><strong>ストーリーズ再掲</strong>は初期版では使わない（<code>stories_enabled=0</code>）。コメント欄への導線はリール本体が担うため</li>
+  <li><strong>効果検証</strong>: インサイト収集（<a href="../batch-flow.html#flow-insights">batch-flow.html 4</a>）は既存どおり Scheduler 2 件を 21-7 で追加。コメント系指標（<code>comments</code>）は既存の指標セットに含まれており、コメント率の確認は月次 KPI 転記（<a href="../operation.html">運用設計 6.3</a>）で行う</li>
+</ul>
+
+<h2 id="history">付録 決定の経緯</h2>
+<p>本文に書いた仕様の決定理由と、すでに失効した記述を日付順に残す。失効したものは見出しに「失効」と書く。本文と食い違ったら本文が正。</p>
+
+<div class="decision" id="d-20260828-original">
+  <span class="callout-title">2026-08-28 壁打ち・2026-09-03 21-1 ⑧: 完全オリジナル問題のみ・プローブテストで検証・週 2 回 × 4 問レビュー</span>
+  <p>著名問題（本家「ウミガメのスープ」等）の転載・改変は、著作権と非オリジナル対策の両面で不可（PoC の 1 問だけ例外）。機械検証が効かないため、問題ごとに想定質問 15〜20 を AI 出題者（本番と同じモデル・同じプロンプト）に答えさせ、矛盾・ネタバレを人間が一括レビューすることにした（確定事実シートの穴を見つける工程を兼ねる）。</p>
+  <p>プローブのモデルは 21-1 ⑤ で <code>gpt-5.6-luna</code> に決め、2026-09-26 に <code>gpt-6-luna</code> へ切り替えた（21-4a のプローブは <code>gpt-5.6-luna</code> で実施）。<strong>このプローブ（<code>probe_test.py</code>）は 2026-10-03 に退役</strong>し、本番経路の機械プローブ（10.6）に置き換わった（<a href="#d-20261003-probe-retire">下記</a>）。</p>
+</div>
+
+<div class="decision" id="d-20260903-meta-app">
+  <span class="callout-title">2026-09-03 21-1 ⑦: 投稿は既存 Meta アプリの流用、コメント Webhook だけ新規アプリ。umigame.soup.jp は両方に接続する</span>
+  <p>既存アプリは開発モードで、稼働中セットの無期限トークンはその構成に依存する。コメント Webhook は「開発モードでは一切届かない」ことが PoC で実証済み。既存アプリで受けるには公開モードへの切替が要り、logic-training-1 / pref-ranking-1 のトークンが 60 日失効へ戻るおそれがある。</p>
+  <p>加えて API 方式が異なる（既存 = Facebook ページ経由 <code>graph.facebook.com</code>、コメント経路 = Instagram ログイン方式 <code>graph.instagram.com</code>）。自動返信の規約リスクを既存資産から切り離す意味でも新規アプリとした。</p>
+</div>
+
+<div class="decision" id="d-20260904-name">
+  <span class="callout-title">2026-09-04 ユーザー判断: キャラ名は「探偵カメロック」、表示名は「コメントで推理！探偵カメロックのウミガメのスープ」</span>
+  <p>21-2 で採用した意匠は「グルメ探偵」（丸い体・前掛け・透明な黄金スープの椀と匙）のままだが、呼称に「グルメ」は付けないことにした（21-2 の選択肢名「P6 グルメ探偵」は画風・意匠の選定記録としてのみ残る）。</p>
+  <p>表示名にセット名を含めるのは、Instagram の検索が名前とユーザーネームを対象にするため（「ウミガメのスープ」「推理」で見つかりやすくする）。「コメントで推理！」で参加型であることも名前で示す。24 字で名前欄の上限 30 字に収まる。</p>
+</div>
+
+<div class="decision" id="d-20260904-prompt-configs">
+  <span class="callout-title">2026-09-04 21-3（判定モジュールには適用しない = 2026-09-30 に失効）: 出題者プロンプトのセット固定部分の正は <code>prompt_configs.prompt_text</code>。投稿時に S3 スナップショットへ転記し、Lambda はスナップショットだけを読む</span>
   <ul style="margin:.3rem 0 0;">
-    <li><strong>置き場</strong>: 本セットの <code>prompt_configs</code>（<code>is_active=1</code> の 1 件）の <code>prompt_text</code> を出題者プロンプトのセット固定部分に充てる（<code>umigame-prebuilt</code> は画像生成をしないため <code>prompt_text</code> が空いている。<code>parameters</code> は方式の入力〔尺〕に使う = <a href="../generators/umigame-prebuilt.html#parameters">方式設計書 3</a>）。INSERT 元のテキストは <code>content/umigame-stock/umigame-soup-1/master_prompt.txt</code> に置き、21-7 の INSERT SQL と 21-4a の <code>probe_test.py</code> が同じファイルを読む（<strong>プローブテストと本番のプロンプトを 1 つの正から出す</strong>ため）。<strong>2026-10-03（21-6d3）に <code>master_prompt.txt</code>・旧プローブは退役</strong>（<a href="#judge-design">5.1.2 末尾の決定</a>）</li>
-    <li><strong>転記</strong>: SNS 投稿バッチが publish 成功直後に、<code>umigame_items</code> の問題固有部分と <code>prompt_configs.prompt_text</code> を <code>problems/{media_id}.json</code> の <code>master_rules</code> へ書く（セクション 10.2）。これにより<strong>投稿済みの問題は投稿時点のルールで動き続け</strong>、プロンプトの改訂は以後の投稿から効く（Lambda のデプロイ不要・Aurora への接続不要）</li>
-    <li><strong>不採用</strong>: Lambda コードにプロンプトを埋める案（改訂に <code>cdk deploy</code> が要り、プローブテストとの同一性を保ちにくい）、コメント時に Aurora から読む案（Aurora 不使用の方針に反する。アイデア詳細 4）</li>
+    <li><strong>置き場</strong>: 本セットの <code>prompt_configs</code>（<code>is_active=1</code> の 1 件）の <code>prompt_text</code> を充てる（<code>umigame-prebuilt</code> は画像生成をしないため空いている。<code>parameters</code> は方式の入力〔尺〕に使う = <a href="../generators/umigame-prebuilt.html#parameters">方式設計書 3</a>）</li>
+    <li><strong>INSERT 元</strong>: <code>content/umigame-stock/umigame-soup-1/master_prompt.txt</code> に置き、21-7 の INSERT SQL と 21-4a の <code>probe_test.py</code> が同じファイルを読む（プローブと本番のプロンプトを 1 つの正から出すため）</li>
+    <li><strong>転記</strong>: SNS 投稿バッチが publish 成功直後に、問題固有部分と <code>prompt_text</code> を <code>master_rules</code> へ書く。投稿済みの問題は投稿時点のルールで動き続け、改訂は以後の投稿から効く（Lambda のデプロイ不要）</li>
+    <li><strong>不採用</strong>: Lambda コードにプロンプトを埋める案（改訂に <code>cdk deploy</code> が要る）、コメント時に Aurora から読む案（Aurora 不使用の方針に反する。アイデア詳細 4）</li>
+    <li><strong>失効</strong>: 2026-09-30（21-6c2）にプロンプトを Lambda へ同梱する決定（<a href="#d-20260930-bundle">下記</a>）で、判定モジュールには適用しないことになった。<code>master_prompt.txt</code> は 2026-10-03 に削除</li>
   </ul>
 </div>
 
-<p><strong>セット固定部分（21-4a のプローブテストで磨いた版。<code>master_prompt.txt</code> は 21-6d3 で退役したため、以下は当時の記録）</strong>:</p>
+<div class="decision" id="master-prompt">
+  <span class="callout-title">2026-09-04〜09-07 21-4a（失効）: 旧マスタープロンプト本文と 21-4a プローブの知見</span>
+  <p>判定モジュール以前の Reply Lambda は「セット固定部分」と「問題固有部分」を結合して system プロンプトにし、コメント本文を user メッセージとして渡す設計だった。以下は 21-4a のプローブで磨いた最終版（<code>master_prompt.txt</code>。2026-10-03 に退役）の記録。</p>
+<details class="fold"><summary>旧マスタープロンプト本文（退役・記録）</summary>
 <pre><code>あなたは Instagram アカウント「探偵カメロック」の出題者です。ウミガメのスープ（水平思考クイズ）の
 問題を出し、コメント欄の質問に答えます。以下の「問題」「真相」「確定事実」だけを根拠に答えてください。
 
@@ -146,351 +767,132 @@
 真相: {truth}
 確定事実:
 {fact_sheet を「- 」付きの箇条書きで展開}</code></pre>
-<ul>
-  <li><strong>モデレーション</strong>は専用処理・禁止ワード DB を持たず、上記の一行（返信しない判定 = <code>NO_REPLY</code>）を最低ラインとする（アイデア詳細 7・論点 5）。Lambda は本文が <code>NO_REPLY</code> で始まる場合に Graph API を呼ばずログのみ残す</li>
-  <li><strong>正解宣言方式</strong>: 解答編リールは作らず、正解者に「正解です！」と宣言して真相を開示する（アイデア詳細 2.2）。誰かが当てるまで問題は開き続け、翌日以降もコメントが付く余地を残す。<strong>状態は持たない</strong>ため正解宣言後も質問には答え続ける（誰も当てずに流れた問題は開示しない）</li>
-  <li><strong>モデル</strong>: <code>gpt-6-luna</code> / reasoning effort <code>xhigh</code>（パターン 1 = 一括方式のモデル。2026-09-27 に API の制約で <code>max</code> から変更。2026-09-26 にユーザー判断で確定。21-1 ⑤ の <code>gpt-5.6-luna</code> から切替）。API 上のモデル ID・effort の指定値と単価は 21-6b の試走でダッシュボード確認（本書に単価は書かない）。<code>max_completion_tokens</code> は 2,400（21-6b で 400 → 800 → 1,200 → 2,400 と変更。luna は推論トークンも上限に含むため。21-4a のプローブテスト〔<code>gpt-5.6-luna</code>・既定エフォート〕で 194 応答すべてが 80 字以内に収まった）。<strong>2026-09-27（21-6b）に effort <code>xhigh</code>・上限 2,400 へ改めた（API は <code>max</code> を受け付けない。5.1.2）</strong>・温度パラメータは送らない（推論モデルは受け付けない）。返信文は Lambda 側で 200 字に切り詰める（PoC の 500 字から短縮）</li>
-  <li><strong>21-4a プローブテストの知見（2026-09-04・gpt-5.6-luna・10 問 × 18〜21 応答）</strong>: 21-3 案のままだと ① 補足で真相の核心を言う（「はい。教え子たちの体重です」）② 感想コメントへのお礼で正体をほのめかす（「犯人は玉ねぎでした」）③ 質問の形の正解推理（「〜ってこと？」）に「はい」で答えて宣言しない、の 3 系統の漏れが出た。上記プロンプトの 3 行（補足の範囲・お礼で触れない・質問形でも推理扱い）はその対策で、再実行で ①② は解消、③ は 10 問中 1 問で残る（人間ゲートで反復）。残る不一致は「〜は重要ですか」への「いいえ」と「関係ありません」の揺れで、意味上は同等（probe_test.py の機械判定は同義扱い）</li>
-  <li><strong>フォールバック</strong>: OpenAI 呼び出し失敗（タイムアウト・5xx・キー未設定）は固定文言「『はい / いいえ』で答えられる質問をコメントしてね！」を返す PoC の挙動を踏襲するが、<strong>SQS 経由の再試行が先</strong>（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>）。固定文言は最終試行でのみ使い、DLQ 行きにしない</li>
-</ul>
-
-<div class="callout decision">
-  <span class="callout-title">決定（2026-09-07、21-4a-2 人間ゲート）: 補足は「原則付けない」に振り切る（テスト版。採否は 21-4a-3 の全数プローブで最終判断）</span>
-  21-4a 版（補足 30 字以内・核心を含めない）でも、出題者が確定事実シートや真相の文を補足に引用して 1 問目から正体を言う漏れが残った（<code>leak_count.py</code> = 質問側に無い核心語が返答に出た応答数: 想定質問 166 件中、補足あり 132・漏れ 56）。プロンプトを「一語だけで答える。補足は原則付けない（質問が二義的なときだけ 20 字以内）」に振り切ると補足あり 20・漏れ 2 に減った。副作用として質問形の正解推理を「はい。」で流す問が増えたため（U04・U07・U03 の「惜しい」）、正解宣言が一語ルールより優先する旨を明記して U07 は解消（U04 は 21-4a 版でも同じ・U03 は言い当て文が「転倒」の要点を欠いた = データ側）。冒頭語の不一致は 3 → 5 件で、増分は「いいえ / 関係ありません」の揺れ。上記の本文が現行の <code>master_prompt.txt</code>。プロンプト改定の効果は <code>leak_count.py</code> と probe_test の不一致数の両方で比べる。
-</div>
-
-<h4 id="quality-levels">5.1.1 コメント返信の品質レベル（21-6a）</h4>
-<p>コメント返信の品質は 2 つの軸で測る。<strong>判定の正しさ</strong>（真相を漏らさない・誤答率の上限）は、どのレベルでも満たす前提条件とする。<strong>返答の豊かさ</strong>はレベル 0〜3 の段階で表す。判定方式（パターン 1 = luna の一括方式 / パターン 2 = Jev の段階判定 + 定型文）には依存しない書き方にしてあり、21-6b の機能設計、21-6d の機械プローブ、21-6e の人間プローブと方式選定は、いずれも本節の基準で合否を判定する。</p>
-
-<div class="callout decision">
-  <span class="callout-title">決定（2026-09-27、21-6a 人間ゲート）: 最低ライン（リリースに必須）= レベル 1 + 前提条件 P1〜P7。目標ライン = レベル 2</span>
+</details>
   <ul style="margin:.3rem 0 0;">
-    <li><strong>最低 = レベル 1</strong>: レベル 0 は bot に見えるためリリース不可（ユーザー判断）。レベル 1 はどちらの方式でも届く（luna ならプロンプト、Jev なら種別判定 + 定型文）ため、21-6e の方式選定の余地を狭めない</li>
-    <li><strong>目標 = レベル 2</strong>: このアカウントの個性は「探偵カメロック」で、レベル 2 で初めてただのクイズ bot と差が付く。一方で 21-4a の漏れは主に補足やお礼の自由な文から出ており、レベル 2 は漏洩の危険を上げるため必須にしない。21-6e では<strong>最低ラインを満たす方式のうち、P1 を落とさずにレベル 2 に届くほうを優先する</strong></li>
-    <li><strong>レベル 3 は稼働後の反応を見てから</strong>: 会話の状態を持つ仕組みが要り、10.3 の「状態を持たない」方針とぶつかる。21-6 では定義だけにし、21-6d・21-6e では測らない。必要になったらアイデアとして起票する</li>
+    <li><strong>旧設計の運用</strong>: モデレーションは専用処理を持たず、上記の <code>NO_REPLY</code> 行を最低ラインにした。OpenAI の呼び出し失敗は固定文言「『はい / いいえ』で答えられる質問をコメントしてね！」を最終試行でだけ返す案だった（判定モジュールでは採らず、失敗は SQS 再試行 → DLQ）。返信は Lambda 側で 200 字に切り詰める（PoC の 500 字から短縮）</li>
+    <li><strong>21-4a の知見</strong>（2026-09-04・<code>gpt-5.6-luna</code>・10 問 × 18〜21 応答）: 21-3 案のままだと ① 補足で真相の核心を言う ② 感想へのお礼で正体をほのめかす ③ 質問の形の正解推理に「はい」で答えて宣言しない、の 3 系統の漏れが出た。上の 3 行（補足の範囲・お礼で触れない・質問形でも推理扱い）はその対策で、再実行で ①② は解消、③ は 10 問中 1 問で残った</li>
+    <li><strong>残った不一致</strong>は「〜は重要ですか」への「いいえ」と「関係ありません」の揺れで、意味上は同等（<code>probe_test.py</code> の機械判定は同義扱い）</li>
   </ul>
 </div>
 
-<p><strong>現行の返信経路の位置づけ（2026-09-27 時点）</strong>: PoC の Lambda（<code>poc/umigame-comment-webhook/lambda/handler.py</code>）は、サンプル問題 1 つに「はい / いいえ / 関係ありません」を中心に短く答えるだけで、質問以外のコメントも見分けないためレベル 0 に当たる。5.1 のマスタープロンプト（luna の一括方式）は、正解宣言と真相の開示・「惜しい！」・感想へのお礼・<code>NO_REPLY</code> までは押さえているが、返答が一語固定で言い回しを変えていないこと、誘導文がないこと、種別の見分けが明文化されていないことから、<strong>レベル 1 の一歩手前</strong>に当たる。</p>
+<div class="decision" id="d-20260907-no-supplement">
+  <span class="callout-title">2026-09-07 21-4a-2 人間ゲート: 補足は「原則付けない」に振り切る</span>
+  <p>21-4a 版（補足 30 字以内・核心を含めない）でも、出題者が確定事実シートや真相の文を補足に引用して正体を言う漏れが残った（<code>leak_count.py</code> = 質問側に無い核心語が返答に出た応答数: 想定質問 166 件中、補足あり 132・漏れ 56）。「一語だけで答える。補足は原則付けない（二義的なときだけ 20 字以内）」に振り切ると、補足あり 20・漏れ 2 に減った。</p>
+  <p>副作用として質問形の正解推理を「はい。」で流す問が増えたため、正解宣言が一語ルールより優先する旨を明記した。冒頭語の不一致は 3 → 5 件で、増分は「いいえ / 関係ありません」の揺れ。判定モジュールでは、一言を「判定語とは別の短い相づち」として許すことでこの方針と両立させた（10.4 の公平さ・近さの禁止で漏れを抑える）。</p>
+</div>
 
-<h5>判定の正しさ（全レベル共通の前提条件。1 つでも割れたらリリース不可）</h5>
-<p>数値の判定には、21-6b で足す<strong>評価用の質問</strong>（プロンプト調整に使っていないもの）を使う。調整に使った <code>expected_questions</code> は参考値として別に集計する。</p>
-<ul>
-  <li><strong>P1 真相の漏洩 0 件</strong>: 機械プローブでは <code>leak_count.py</code> と同じ方式で漏れ候補を拾い、全件を人が見て本当の漏洩が 0 件であること。人間プローブでも 0 件</li>
-  <li><strong>P2 誤った正解宣言 0 件</strong>: 正解でない推理に「正解です！」と言って真相を開くのは、漏洩と同じ扱いにする</li>
-  <li><strong>P3 「はい」と「いいえ」の取り違え</strong>: 全質問の 3% 以下、かつ 1 問あたり 2 件以下</li>
-  <li><strong>P4 「いいえ」「関係ありません」「答えに関わりません」の間の揺れ</strong>: 10% 以下。意味はほぼ同じなので上限をゆるくするが、集計には必ず出す</li>
-  <li><strong>P5 正解推理を正解と宣言できた割合</strong>: 80% 以上。見逃しても次のコメントで取り返せるので、P2 よりゆるくする</li>
-  <li><strong>P6 不適切なコメントへの扱い</strong>: 不適切系（下の種別 ⑱〜㉑）に、判定を含む返事（はい / いいえ・推理への答え）や真相に触れる返事をすることは 0 件。⑱・⑲ には定型文で返した割合が 80% 以上。⑳・㉑ に返信した件数は 0 件。普通のコメントを誤って不適切系と判定するのは 5% 以下</li>
-  <li><strong>P7 返信の長さ</strong>: すべて 80 字以内</li>
-</ul>
+<div class="decision" id="d-20260926-post-order">
+  <span class="callout-title">2026-09-26 素材の全数レビュー: 投稿順の列（<code>post_order</code>）は足さない</span>
+  <p>DB に投稿順の列を足して選択 SQL を変える案（開発レーン: DDL + 投稿バッチ改修）もあったが、投稿開始前で入れ直しの負担がないため、コード変更なしで INSERT 順に寄せる案を採った。投稿開始後に順番を頻繁に差し替える必要が出たら、列の追加を課題として起票する。</p>
+</div>
 
-<h5 id="comment-kinds">コメントの種別（22 種。レベル 1 以上で見分ける）</h5>
-<ul>
-  <li><strong>質問系</strong>: ① はい / いいえで答えられる質問 → 判定を返す ② 1 つのコメントに質問が複数入っているもの（「A ですか？ B ですか？」）→「1 つずつ聞いてね」と誘導する ③ はい / いいえで答えられない・曖昧な質問 → 誘導文を返す。<strong>名詞・語句だけで何についてのコメントか分からないもの</strong>（「ひな人形？」「レントゲン？」「タイムカプセル」）は、コアの語を含んでいても推理とせず ③ にし、コメントの語を使って主語を聞き返す（「何がひな人形なのか教えてね」）。主語を省いていても述語があり、問題文の人物や物について言っていると読めるもの（「泣いたのは病気が治ったから？」「人形なの？」）は ① / 推理として受ける（2026-09-30 ユーザー決定。正解の条件は真相を説明できているかで、主語のない語は説明になっていないため）</li>
-  <li><strong>推理系</strong>: ④ 正解推理 → 正解を宣言し、真相を開示する（2〜3 文） ⑤ 惜しい推理 → 定型の「惜しい！」（どこが足りないかは言わない） ⑥ 外れた推理（言い切っているが外れ）→「残念、違います」系。<strong>④⑤⑥ はコア（その問題の仕掛け）で見分ける</strong>（2026-09-27 ユーザー合意）= ④ はコアの要点をすべて言い当てていて明らかな誤りがない（周辺の細部は欠けてよい）、⑤ はコアの要点のどれかに触れているが ④ に届かない（コアに半分触れた推理・コアは合っているが明らかな誤りを含む推理の両方）、⑥ はコアに触れていない（周辺の事実だけ合っていても ⑥。周辺だけで「惜しい」と返すと見当違いの方向へ誘導するため）。<strong>コアの考え方（2026-09-30 ユーザー整理・普遍の前提）</strong>: 正解の条件は「問題文で提示した不思議の真相を説明できているか」。真相の全文は長く生成 AI の判定が揺れやすいため、真相を説明するのに<strong>最低限必要な情報</strong>を要点に分けて「コア」とする。コアをすべて当てている = 真相を説明できている = ④ 正解。コアの一部だけ・コアに半分触れている・コアは合っているが明らかな誤りを含む = 説明できていないが真相に近づいている = ⑤ 惜しい。コアに触れていない = ⑥。コアの要点は短い文（目安 15 字前後・上限 20 字）で、個数は説明に必要なだけ置く（例: U01 は「影はレントゲンの影」だけでは泣いて喜んだ理由の説明にならないので「病気が良くなった」と 2 点。問題文に書いてある事実は含めない）</li>
-  <li><strong>依頼系</strong>: ⑦ ヒントを求めるコメント →「質問で絞ってみて」系の定型（真相には触れない） ⑧ 答え・ネタバレを求めるコメント →「質問には答えられるけど、真相は教えられないよ」系（「誰かが当てるまで」のように、いつか明かす約束はしない。当てた人が出ても明かす義務が生じないように = 2026-09-29 ユーザー判断） ⑨ 遊び方やアカウントそのものへの質問（「どう遊ぶの？」「bot なの？」）→ 遊び方の案内</li>
-  <li><strong>反応系</strong>: ⑩ 感想 ⑪ 挨拶 ⑫ 応援 → それぞれ別の定型のお礼 ⑬ 雑談 → 軽い相づち ⑭ リクエスト（「こういう問題があったら面白い」）→ お礼 ⑮ 問題への指摘・クレーム（「矛盾してる」「無理がある」。「つまらん、センスない」のような作品そのものへのけなしも ⑮ に入れる = 2026-09-27 ユーザー判断）→ お礼と「確認します」だけ（反論も言い訳もしない） ⑯ 友達へのメンション・タグ付け（「@友達 これ解いて」）→ 短い歓迎 ⑰ 絵文字だけのコメント → 短い相づち</li>
-  <li><strong>不適切系</strong>: ⑱ 荒らし（意味の取れない文字列・連投）→ 定型文 ⑲ 誹謗中傷（人〔作者・ほかの利用者〕への攻撃、差別的・性的な内容）→ 定型文（レベル 2 の一言は付けない。挑発に乗ったように見えるのを避ける） ⑳ 宣伝・スパム（リンク付き・フォロー稼ぎ）→ 返信しない（返信すると表示が上がり拡散に手を貸す） ㉑ 個人情報が書かれたもの → 返信しない（返信すると目立たせてしまう。削除・非表示は範囲外で、10.5 の目視で対応）</li>
-  <li><strong>その他</strong>: ㉒ 外国語のコメント → 日本語の定型で「日本語で質問してね」</li>
-</ul>
-<p>5.1 の現行プロンプトの「誹謗中傷・攻撃的・…意味の取れない文字列には返信しない」は、⑱・⑲ を定型文で返す本節の決定と食い違う。改訂案は 5.1.2 の「5.1 マスタープロンプトの改訂案」（21-6b）。</p>
+<div class="decision" id="d-20260926-fact-limit">
+  <span class="callout-title">2026-09-26 21-5a の素材レビュー: 確定事実シートの上限を 12 件から 20 件へ</span>
+  <p>上限 12 件は 21-2 の PoC（1 問 10 件）から置いた目安の幅がそのまま <code>validate.py</code> の上限になっていたもので、根拠は記録されていなかった。確定事実は判定の根拠で、件数が増えても費用に実害はなく、むしろ答えが安定する。素材レビューでプレイ例を差し替えた際に根拠の行を足したくても上限で足せない問が出た（U16・U25）ため、上限を 20 件に上げた。</p>
+</div>
 
-<h5>返答の豊かさ（レベル 0〜3）</h5>
-<ul>
-  <li><strong>レベル 0</strong>（リリース不可）: 「はい / いいえ / わかりません / 正解」の 4 種だけで返す。機械判定では返信の種類が 4 種以下ならレベル 0</li>
-  <li><strong>レベル 1</strong>（最低ライン）: どんなコメントにもちぐはぐにならない返事ができる。上の 22 種を見分けて種別に合った返事をし、同じ種別の返事は言い回しを 3 通り以上持たせる（状態は持たないため、コメント id のハッシュなどで選ぶ）
-    <ul>
-      <li>機械プローブ: ① 種別ラベル付きのテストセットで種別の一致率が全体 90% 以上、質問以外の種別もそれぞれ 80% 以上 ② 同じ種別の返事 20 件のうち、最も多い言い回しが 50% 以下 ③ 答えられない質問（②③）に誘導文を返した割合が 80% 以上</li>
-      <li>テストセット: 種別ごとに 5 件以上のラベル付きコメントを用意する。⑦〜㉒ はほとんど問題に依存しないため、全問で使う共通のテストセットにする（作るのは 21-6b）</li>
-      <li>人間プローブ: 1 問あたり 10 件ほど自由にコメントし、「噛み合っていない」と感じた返事が 1 割以下</li>
-    </ul>
-  </li>
-  <li><strong>レベル 2</strong>（目標ライン）: レベル 1 に加えて探偵カメロックとして話す。真相に触れない 20 字以内の一言をキャラの口調で添える（定型のバリエーションでも、質問に合わせて作ってもよい。⑲ には付けない）
-    <ul>
-      <li>機械プローブ: 一言は 100% が 20 字以内。一言も含めて P1 の漏洩 0 件</li>
-      <li>人間プローブ: 「キャラが立っている」と感じた返事が過半数、かつ一言が浮いている・話がずれていると感じたものが 1 割以下</li>
-      <li>返信文の基準（21-6b2 で決定。下の決定コールアウト）: 機械プローブに ① の判定語で始まる割合 100%・判定の食い違い 0 件・近さを示す語 0 件・絵文字は一覧の中から 1 個までを足す</li>
-    </ul>
-  </li>
-  <li><strong>レベル 3</strong>（定義のみ）: 会話の流れを踏まえる（同じ人の過去の質問を踏まえる・行き詰まったときのヒント・コメント欄全体の進み具合）。会話の状態を持つ仕組みが要る。21-6d・21-6e では測らない</li>
-</ul>
+<div class="decision" id="d-20260926-figure">
+  <span class="callout-title">2026-09-26 背景の全数レビュー指摘 38: 人物は下半分の中央に小さく置く</span>
+  <p>版面（1080x1920）はフック帯と問題カードが上端〜約 47%、吹き出しが約 47〜61%、カメロックが左下（横 1〜41%）、Jr. が右下（横 55〜84%）を覆う。旧ルール（上部 55% を静かに）だけでは画像生成が人物を近景で大きく描き、問題カードの裏に顔が入る・キャラと人物が重なる背景が多かった。</p>
+  <p>人物が重ならずに見えるのは下半分の中央の細い帯だけのため、禁止事項に人物の大きさと位置を足した（3 問の試行で遵守を確認）。代わりに人物の表情は読めなくなる。</p>
+</div>
 
-<div class="decision" id="reply-style">
-  <span class="callout-title">決定（2026-09-28、21-6b2・ユーザー）: 返信文の基準（どの判定方式でも同じ。方式の選定は 21-6e）</span>
+<div class="decision" id="d-20260927-tts">
+  <span class="callout-title">2026-09-27 21-5c: TTS をローカル GPU の Irodori-TTS へ切り替え、Gemini の声 G4 をクローンする</span>
+  <p>2026-09-26 に Amazon Polly（Takumi・125%）から Gemini 3.8 Flash TTS・声 G4 へ切り替えた（2 問 × 15 パターンの聞き比べで表現力がはっきり上がった。経緯は <a href="../../ideas/umigame-tts-gemini-flash.md">アイデア記録</a>）。しかし作り直しの途中で Gemini の日次上限（Tier 1・100 リクエスト / 日）に当たった。</p>
+  <p>上限の引き上げは応答まで 1〜2 か月の報告が多く、別アカウントでの回避は Google APIs 利用規約 2(d) に反するため、ローカルで動く Irodori-TTS（MIT・クレジット不要・実在人物の無断クローンは禁止 = G4 は Gemini の合成音声なので該当しない）へ移した。</p>
+  <p>聞き比べ（<code>poc/irodori-tts/</code>）で、説明文だけの声（VoiceDesign）・別話者のクローン・演技指示つきより、<strong>G4 のクローン・説明文なし・後処理なし</strong>が最もよかった（ユーザー判断）。PoC の知見: ① 参照音声の息継ぎを下げると生成側の吸気音も減る ② 問題文とルール文は 1 回で読ませる ③ <code>--seconds 20.0</code> で話速調整なしに予算に収まる（自然長は 23〜25 秒）④ BF16 は FP32 と音質差なし。2026-10-03 の 21-5d で ElevenLabs v4 と聞き比べたが、大幅に良いとは言えず Irodori のまま。</p>
+</div>
+
+<div class="decision" id="d-20260927-quality">
+  <span class="callout-title">2026-09-27 21-6a 人間ゲート: 最低ライン = レベル 1 + P1〜P7、目標ライン = レベル 2</span>
   <ul style="margin:.3rem 0 0;">
-    <li><strong>口調</strong>: リールの台詞（「質問してみて！」「何度でも答えるよ」）に合わせたくだけた口調で、パパが息子に話しかけるイメージ。一人称は「私」（必要なときだけ使う）。です・ます の敬語は使わない</li>
-    <li><strong>絵文字</strong>: ☺️ 😌 😉 🧐 🥳 🙌 👏 🤔 🫢 🤭 🤐 のどれか 1 個まで（2026-09-29 ユーザー指定で差し替え。当初は 🐢 🔍 🥣 📝。同日、luna が出せない 🙂‍↕️ 🙂‍↔️ を外した）。付けない返事のほうが多くてよい。⑮ クレーム・⑲ 誹謗中傷・④ 正解の開示には付けない</li>
-    <li><strong>⑧ ネタバレ要求</strong>: 「質問には答えられるけど、真相は教えられないよ」の趣旨で返す。「誰かが当てるまで秘密」は、当てた人が出たら明かさなければならなくなるので使わない（2026-09-29 ユーザー）</li>
-    <li><strong>質問の復唱</strong>: ① はい / いいえ質問だけ、コメントの言葉の範囲で許す（「はい！夕方に帰ってきたよ。」）。コメントにない言葉を足さない。推理（④⑤⑥）への返事では復唱しない（どこが合っているかを示してしまう）。<strong>例外</strong>: ③ のうち主語のない語だけのコメントへの聞き返し（「何がひな人形なのか教えてね」）は、コメントの語をそのまま使ってよい（2026-09-30 ユーザー）。語だけのコメントは正解・外れに関係なくすべて ③ で聞き返すので、返事の形から当たり外れは読めない。条件 = ③ の判定をコアとの近さで変えないこと・コメントにない言葉を足さないこと</li>
-    <li><strong>一言の割合</strong>: ① の判定語のあとは「判定語だけ / 復唱 / 一言」を <code>sha1(comment_id)</code> で割り振る（状態を持たずに散らす）。一言の候補には「一言なし」を混ぜ、判定語だけの返事（「はい！」）も言い回しの 1 通りとして数える</li>
-    <li><strong>公平さ</strong>: 相手の推理や質問が答えにどれだけ近いかを匂わせる言葉（「鋭い」「いい線」「近い」「核心」「着眼点」など）を使わない。判定で一言の温度を変えない（それ自体がヒントになる）。21-6b の合意制で割れたときの定型文だけは例外</li>
-    <li><strong>判定語</strong>（くだけた口調に合わせて）: はい →「はい！」、いいえ →「いいえ。」、関係ない →「関係ないよ。」、判断できない →「それは答えに関わらないんだ。」</li>
-    <li><strong>返信文の作り方の候補</strong>（2026-09-29 ユーザー。以降のステップでこの 4 つから決める。方式の選定は 21-6e）: 1b = luna の一括判定で返信文も書く（手順 3 を上の基準で作り直し・真相あり）/ 1d-luna = luna の判定のあとに luna（effort <code>low</code>）が返信文だけを書く（真相なし）/ 2b = Jev の判定 + 上の基準で作り直した定型文 / 2c-luna = Jev の判定のあとに luna（effort <code>low</code>）が返信文だけを書く（真相なし）。小型モデル（Qwen3.5-9B・Qwen3.5-Flash・Gemma 4 26B-A4B）の書き手は、判定を書き換える食い違いが 3〜21 件出たため候補から外した</li>
-    <li>試走の記録・作り方の案の比較は検討ページ「<a href="umigame-soup-1-reply-study.html">コメント返信文の品質の検討</a>」。規則の本文は <code>judge-trial/prompts/reply_style.txt</code>（1b の手順 3 と、判定のあとに文章を書く書き手が共有する）、定型文は <code>judge-trial/templates_2b.py</code></li>
+    <li><strong>レベル 0 をリリース不可にした理由</strong>: bot に見える（ユーザー判断）。レベル 1 はどちらの方式でも届く（luna ならプロンプト、Jev なら種別判定 + 定型文）ため、方式選定の余地を狭めない</li>
+    <li><strong>レベル 2 を必須にしない理由</strong>: 21-4a の漏れは主に補足やお礼の自由な文から出ており、レベル 2 は漏洩の危険を上げる</li>
+    <li><strong>当時の返信経路の位置づけ</strong>: PoC の Lambda（<code>poc/umigame-comment-webhook/lambda/handler.py</code>）はサンプル問題 1 つに短く答えるだけで、質問以外のコメントも見分けないためレベル 0。旧マスタープロンプトは正解宣言・「惜しい！」・お礼・<code>NO_REPLY</code> までは押さえていたが、返答が一語固定で誘導文がなく、種別の見分けも明文化されていないため、レベル 1 の一歩手前だった</li>
+    <li><strong>種別の境界の決定</strong>: ④⑤⑥ をコアで見分ける（2026-09-27 ユーザー合意）。作品そのものへのけなしは ⑮ に入れる（同日ユーザー判断）</li>
   </ul>
 </div>
 
-<h4 id="judge-design">5.1.2 判定モジュールの機能設計（21-6b）</h4>
-<p>コメント 1 件を受けて「種別（5.1.1 の 22 種）・判定・返信文」を決める部分を<strong>判定モジュール</strong>として Reply Lambda から切り出す。2 方式（パターン 1 = luna の一括方式 / パターン 2 = Jev の段階判定 + 定型文）は同じ契約を実装し、21-6c で両方を実装して 21-6d・21-6e で比べる。方式はここでは選ばない（21-6e）。試走の資材は <code>content/umigame-stock/umigame-soup-1/judge-trial/</code>（README 参照）。</p>
+<div class="decision" id="d-20260927-contract">
+  <span class="callout-title">2026-09-27 21-6b: 判定モジュールの契約と 2 方式の機能設計（設計時の論点 9 件）</span>
+  <p>コメント 1 件を受けて種別・判定・返信文を決める部分を判定モジュールとして Reply Lambda から切り出し、2 方式が同じ契約を実装して比べることにした。当初の契約は出力に返信文 <code>reply</code> を含み、方式の切り替えは環境変数 <code>JUDGE_METHOD</code>（<code>p1</code> / <code>p2</code>）、問題の要点は <code>truth_points</code> と呼んでいた（2026-09-30 の実装で、返信文を書き手へ分離・<code>JUDGE_MODE</code> の 3 モード・<code>core_points</code> に改めた）。</p>
+  <ol>
+    <li><strong>質問以外のコメントの行き先</strong>: 22 種で見分ける。パターン 1 は JSON の <code>kind</code>、パターン 2 は段 0 + 段 A + 段 B</li>
+    <li><strong>正解宣言と「惜しい！」の判定段</strong>: パターン 2 は要点ごとの noul（全部 = 正解・一部 = 惜しい・なし = 外れ）。パターン 1 はプロンプトで判断させ、どちらも P2・P5 で測る</li>
+    <li><strong>質問の品質チェックの NG が多すぎる</strong>: 段 C の閾値を低め（0.2）から始め、21-6d で決める（→ 据え置き）</li>
+    <li><strong>正解時に開示する真相の文を誰が書くか</strong>: パターン 2 は問題ごとに事前に書いた <code>reveal_text</code>。パターン 1 は LLM が書く。「惜しい！」は両方式とも定型</li>
+    <li><strong>本丸は はい / いいえ / 関係ない の判定</strong>: 試走で段 D の一致率と P3 を測り、全件の評価は 21-6d へ</li>
+    <li><strong>テスト質問の偏り</strong>: 評価用の質問は <code>expected_questions</code> を見ずに、問題文だけを見て書き、あとから正解ラベルを付ける</li>
+    <li><strong>同じ誘導文の連投</strong>: 定型文は種別ごとに 3 通り以上を <code>sha1(comment_id)</code> で選ぶ</li>
+    <li><strong>自信がないときは安全側</strong>: 段 D は <code>T_ANSWER</code> 未満で答えに関わらない扱い、段 B は <code>T_POINT</code> 未満の要点を満たさない扱い（P2 を避ける側）</li>
+    <li><strong>パターン 1 へ戻せる切り替え</strong>: 環境変数での切り替え + Jev 失敗時のパターン 1 フォールバック</li>
+  </ol>
+  <p><strong>パターン 1 のプロンプト改訂</strong>（旧マスタープロンプト → <code>pattern1_rules.txt</code>）の変更点: ① 22 種を定義して種別を選ばせる ② 荒らしへの <code>NO_REPLY</code> をやめ、⑱〜㉑ はコードに任せる ③ 判定語の後ろに真相に触れない 20 字以内の一言を許す ④ ②③⑤〜⑨・⑬〜⑰・㉒ の返し方を 1 行ずつ書く。人間ゲートと試行 4〜8b で、正解開示 70 字以内・主語の曖昧な質問は ③・漢字だけの文は中国語を疑う・真相から明らかなことは yes / no、を足した。</p>
+  <p><strong>パラメータの経緯</strong>: effort は API が <code>max</code> を受け付けない（受け付けるのは <code>none</code> / <code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code>）ため <code>xhigh</code>（2026-09-27 ユーザー承認）。上限は 400 で試走 185 件中 1 件、800 で試行 4 の 220 件中 1 件が打ち切られ、1,200 でも試行 5 で最大 1,160 まで伸びたため 2,400 にした（課金は使った分だけ）。</p>
+  <p><strong>パターン 2 の段の経緯</strong>: 段 A は 19 択の 1 段から 2 段の choice へ（ユーザー指示）。A1 は質問と推理を分けた 6 択では確率が割れたため 5 択にまとめた（試行 6）。A1b・A3 は試行 5〜6、コアに触れない推理の扱いは試行 8・8b。<code>T_CLOSE</code> は周辺を含めた要点では 0.35 だったが、コア基準（試行 7）でコアに半分触れた推理の確率が 0.2〜0.3 に留まるため 0.25 に下げた（試行 7b）。<code>T_RECHECK</code> は試行 8 で 0.5 → 0.6。詳細は<a href="umigame-soup-1-judge-study.html">検討ページ</a>。</p>
+</div>
 
-<div class="callout decision" id="judge-policy">
-  <span class="callout-title">暫定方針（2026-09-28、21-6b 完了時・ユーザー）: パターン 1（luna）が主役。Jev は返信の判定には使わず「見張り役」と「真相を開示する前の二重確認」に使う（確定は 21-6e）</span>
+<div class="decision" id="d-20260928-policy">
+  <span class="callout-title">2026-09-28 21-6b 完了時・ユーザー: パターン 1（luna）が主役。Jev は「見張り役」と「真相を開示する前の二重確認」に使う（確定は 21-6e）</span>
   <ul style="margin:.3rem 0 0;">
-    <li><strong>根拠</strong>: 5 問・220 件の試行 8b で両方式とも P1〜P7 とレベル 1 の機械基準を満たしたが、パターン 1 のほうが安定して高い（種別と判定の両方が合う割合 98.2% 対 94.5%）。一方でパターン 1 は生成 AI の品質に直結するリスクがあり、パターン 2 は分岐を自前で制御できる。この両方を踏まえたハイブリッド（ユーザー）</li>
-    <li><strong>試算で採らなかった形</strong>（試行 8b の結果を組み替えて計算）: 質問は Jev・推理とそれ以外は luna（95.9%）、判定が食い違ったら「答えに関わりません」に倒す（94.1%。食い違い 9 件はすべて luna が正しかった）。返信の中身を分担・多数決にすると、精度の高い luna の判定を Jev が崩す</li>
-    <li><strong>見張り役</strong>: 全コメントを Jev にも判定させ、返信には使わず、luna との食い違い率だけをログに残す（試走の平常値は種別 10/220・判定 9 件）。平常値の 2 倍を超えたら通知する。生成 AI の品質低下にも Jev 側の異常にも気づける。費用は月 100 円前後</li>
-    <li><strong>真相を開示する前の二重確認（合意制）</strong>: 正解宣言は luna と Jev の両方が ④ と判定したときだけ。試算では成績を落とさない（正解宣言率 10/11・誤った正解宣言 0 件のまま）。<strong>意見が割れたとき</strong>: luna だけが ④ → 開示せず、専用の定型文（例「核心にかなり迫っています！何が起きたのかを通して説明してみてください」、言い回しは複数）で説明の追加を促し、食い違いをログに残してユーザーに通知する（手動で正解を伝えられる手段を 21-6c で決める）。Jev だけが ④ → 主役の luna の判定どおりに返し、ログにだけ残す。状態を持たないので見逃しは次のコメントで取り返せるが、誤った開示は取り消せないため慎重側に倒す</li>
-    <li><strong>そのほかの守り</strong>: 生成 AI のモデルは日付付きの ID で固定できれば固定し、モデル・プロンプトを変えるときは全件の機械プローブ（21-6d）に合格してから切り替える。<code>JUDGE_METHOD</code> によるパターン 2 への切り替えは残す（Jev にも SLA がない）</li>
-    <li><strong>21-6c・21-6d で行うこと</strong>: 両パターンの実装に加えて、見張り役（食い違い率のログ）と合意制（オン / オフ切り替え・割れたときの定型文・通知）を作る。21-6d でパターン 1 単独と「パターン 1 + 合意制」を比べ、割れる頻度とどちらが正しかったかを集計する。パターン 1 のプロンプトは試行 5 版と試行 8b 版も比べる</li>
-    <li><strong>返信文そのものの品質</strong>（同じ判定でも「はい」「はい、食べたことがあります。」「うん。食べたことがあるよ」のどれで返すか）: 21-6b2 で基準を決め（5.1.1 の決定 <a href="#reply-style">返信文の基準</a>）、候補を 1b・1d-luna・2b・2c-luna の 4 案に絞った。経緯は検討ページ「<a href="umigame-soup-1-reply-study.html">コメント返信文の品質の検討</a>」</li>
+    <li><strong>根拠</strong>: 5 問・220 件の試行 8b で両方式とも P1〜P7 とレベル 1 の機械基準を満たしたが、パターン 1 のほうが安定して高い（種別と判定の両方が合う割合 98.2% 対 94.5%）。一方でパターン 1 は生成 AI の品質に直結するリスクがあり、パターン 2 は分岐を自前で制御できる。この両方を踏まえたハイブリッド</li>
+    <li><strong>試算で採らなかった形</strong>（試行 8b の結果を組み替えて計算）: 質問は Jev・推理とそれ以外は luna（95.9%）、判定が食い違ったら答えに関わらない扱いに倒す（94.1%。食い違い 9 件はすべて luna が正しかった）。返信の中身を分担・多数決にすると、精度の高い luna の判定を Jev が崩す</li>
+    <li><strong>見張り役の平常値</strong>: 試走では種別 10/220・判定 9 件。合意制は試算で成績を落とさない（正解宣言率 10/11・誤った正解宣言 0 件のまま）</li>
   </ul>
 </div>
 
-<div class="callout decision">
-  <span class="callout-title">決定（2026-09-27、21-6b）: 判定モジュールの契約</span>
+<div class="decision" id="d-20260928-reply-style">
+  <span class="callout-title">2026-09-28〜29 21-6b2・ユーザー: 返信文の基準と、作り方の候補 4 案</span>
   <ul style="margin:.3rem 0 0;">
-    <li><strong>入力</strong>: <code>comment_id</code>・コメント本文・問題（<code>problems/{media_id}.json</code> の問題固有部分 = <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> に、下記の <code>truth_points</code> / <code>reveal_text</code> を足したもの）</li>
-    <li><strong>出力</strong>: <code>kind</code>（22 種のコード。①〜㉒ の順に <code>q_yesno</code> <code>q_multi</code> <code>q_open</code> <code>guess_correct</code> <code>guess_close</code> <code>guess_wrong</code> <code>ask_hint</code> <code>ask_spoiler</code> <code>ask_howto</code> <code>impression</code> <code>greeting</code> <code>cheer</code> <code>chat</code> <code>request</code> <code>complaint</code> <code>mention</code> <code>emoji_only</code> <code>troll</code> <code>abuse</code> <code>spam</code> <code>personal_info</code> <code>foreign</code>）・<code>answer</code>（<code>q_yesno</code> のときだけ <code>yes</code> / <code>no</code> / <code>irrelevant</code> / <code>unknown</code>）・<code>reply</code>（返信文。<strong>返信しない = <code>NO_REPLY</code> は <code>reply</code> が空</strong>）・<code>debug</code>（確率・トークン・応答時間。ログにだけ出す）</li>
-    <li><strong>方式に依らずコードで強制すること</strong>: ⑳ <code>spam</code>・㉑ <code>personal_info</code> は返信しない。⑱ <code>troll</code>・⑲ <code>abuse</code> はコードの定型文で返す（LLM の文面を使わない = 挑発に乗った文や漏れが出ない）。定型文は種別ごとに 3 通り以上を持ち、<code>sha1(comment_id)</code> で選ぶ（状態を持たずに言い回しを散らす = 論点 ⑦）。返信が 80 字を超えたら切り詰めずにログへ警告を出す（プローブで P7 違反として数えるため。本番の 200 字切り詰めは Lambda 側の最後の安全網として残す）</li>
-    <li><strong>方式の切り替え</strong>: Reply Lambda の環境変数 <code>JUDGE_METHOD</code>（<code>p1</code> / <code>p2</code>）。Jev を選んだ場合もパターン 1 の実装とキーを本番に残し、環境変数の変更だけで戻せるようにする（論点 ⑨。Jev は SLA なし・値上げの留保あり）。Jev の呼び出しが失敗したら（再試行後）同じコメントをパターン 1 で判定する。<strong>21-6c2 で <code>JUDGE_MODE</code>（3 モード）に置き換えた</strong>（下の実装の節）</li>
-    <li><strong>問題 JSON に足す項目</strong>: <code>core_points</code>（コアの要点。説明に必要なだけ 1〜3 個・1 個 20 字以内〔5.1.1〕。④⑤⑥ の判定に使う。両方式が使う）と <code>reveal_text</code>（正解時に開示する真相の要約。70 字以内。パターン 2 の開示文）。<strong>ストックへの追加・<a href="../generators/umigame-prebuilt.html">方式設計書</a>とスナップショット（10.2）の項目追加は 21-6c1 で行う</strong>（全 14 問の文面は 21-6c1 で <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code> に起こし、人がレビューする。21-6b の試走は 5 問分の仮の値を <code>judge-trial/data/truth_points.json</code> に置いた）。パターン 1 を選んだ場合も項目は残す（機械プローブの正解ラベルに使うため）</li>
+    <li><strong>基準</strong>（10.4 の本文）を決めた。絵文字は 2026-09-29 のユーザー指定で差し替えた（当初は 🐢 🔍 🥣 📝。同日、luna が出せない 🙂‍↕️ 🙂‍↔️ を外した）</li>
+    <li><strong>⑧ ネタバレ要求</strong>: 「誰かが当てるまで秘密」は、当てた人が出たら明かさなければならなくなるので使わない（2026-09-29 ユーザー）</li>
+    <li><strong>候補 4 案</strong>: 13 案の試走から 1b・1d-luna・2b・2c-luna に絞った。小型モデル（Qwen3.5-9B・Qwen3.5-Flash・Gemma 4 26B-A4B）の書き手は、判定を書き換える食い違いが 3〜21 件出たため外した。試走の記録は<a href="umigame-soup-1-reply-study.html">検討ページ</a></li>
+    <li><strong>試走時の置き場</strong>: 規則の本文は <code>judge-trial/prompts/reply_style.txt</code>、定型文は <code>judge-trial/templates_2b.py</code>（本番へ移植済み）</li>
   </ul>
 </div>
 
-<div class="callout decision" id="judge-impl">
-  <span class="callout-title">実装（2026-09-30、21-6c2）: <code>services/comment-reply/</code> の判定 2 実装 + 組み合わせ役 + 返信文 4 案</span>
+<div class="decision" id="d-20260930-core">
+  <span class="callout-title">2026-09-30 21-6c1・ユーザー: コアの考え方・語だけのコメント・スナップショット <code>schema_version</code> 2</span>
+  <p>コアを「真相の説明に最低限必要な情報」として整理し、14 問分をレビューした（10.2 のコアの考え方）。主語のない語だけのコメントは、正解の条件（真相を説明できているか）を満たさないため ③ で聞き返すことにした。判定用に <code>core_points</code>・<code>reveal_text</code> をストック・<code>umigame_items</code>（V013）・スナップショットに足した。</p>
+</div>
+
+<div class="decision" id="d-20260930-impl">
+  <span class="callout-title">2026-09-30 21-6c2: <code>services/comment-reply/</code> の実装で改めた点</span>
   <ul style="margin:.3rem 0 0;">
-    <li><strong>構成</strong>: 判定ロジックは <code>app/judge/luna.py</code>（パターン 1）と <code>app/judge/jev.py</code>（パターン 2）の 2 実装にだけ書き、<code>app/judge/combiner.py</code>（組み合わせ役）がそれを部品として呼ぶ。返信文は判定と別の部品 <code>app/reply/writer.py</code>（定型文は <code>app/reply/templates.py</code>）。ロジック・閾値・プロンプト文言は試走の最終版（試行 8b・21-6b2）をそのまま移植し、変えたのは下記の「語だけのコメント」対応と判定理由の項目追加だけ。環境変数・構成の一覧は <code>services/comment-reply/README.md</code></li>
-    <li><strong>組み合わせの 3 モード</strong>（上の契約の <code>JUDGE_METHOD</code> を置き換えた）: 環境変数 <code>JUDGE_MODE</code> = <code>luna</code> / <code>jev</code> / <code>hybrid</code>（既定 <code>hybrid</code>・暫定。最終決定は 21-6e）。<code>hybrid</code> は luna と Jev を並列に呼び、返信は luna の判定で作る。<code>JUDGE_SHADOW</code>（見張り役）と <code>JUDGE_CONSENSUS</code>（合意制）は <code>hybrid</code> のときだけ効き、個別にオン / オフできる（両方オフなら Jev を呼ばない = 21-6d で「luna 単体」と「luna + 合意制」を設定だけで比べる）</li>
-    <li><strong>失敗時</strong>: luna の失敗（再試行後）は例外にして SQS の再試行 → DLQ に回す（<code>luna</code> / <code>hybrid</code>）。<code>jev</code> モードで Jev が失敗したら同じコメントを luna で判定する（<code>decision = jev_fallback_luna</code>。論点 ⑨）。<code>hybrid</code> で Jev が失敗したら luna 単体として続け、luna が ④ でも合意が取れないので開示しない（割れた扱い）。OpenAI・Jev とも 429・5xx は指数バックオフで再試行する</li>
-    <li><strong>見張り役</strong>: kind か answer が食い違ったら WARNING ログ <code>JUDGE_SHADOW_MISMATCH</code>（JSON 付き）を出し、コメント記録（10.6）に両方の判定と <code>shadow_mismatch</code> を残す。食い違い率の監視（平常値の 2 倍で通知）は、このマーカーのメトリクスフィルタとして 21-6f で配線する</li>
-    <li><strong>合意制で割れたとき</strong>: luna だけが ④ なら開示せず専用の定型文（3 通り・<code>sha1(comment_id)</code> で選ぶ。例「かなり近づいているね。出来事を最初から説明してみて。」。近さを示す語の禁止の唯一の例外・絵文字なし）で説明の追加を促し、WARNING ログ <code>JUDGE_CONSENSUS_SPLIT</code> を出す。<strong>通知</strong>はこのマーカーのメトリクスフィルタ → アラーム → 既存の通知経路（21-6f で配線）。<strong>手動で正解を伝える手段</strong>は、ユーザーが Instagram アプリからそのコメントに直接返信する（コメント記録に <code>comment_id</code>・本文・両方の判定があるので対象を特定できる。専用の仕組みは作らない）。Jev だけが ④ なら luna の判定どおりに返し、ログだけ残す</li>
-    <li><strong>返信文の 4 案</strong>: 環境変数 <code>REPLY_VARIANT</code> = <code>1b</code> / <code>1d-luna</code> / <code>2b</code> / <code>2c-luna</code>（既定 <code>1d-luna</code>・暫定。真相を渡さない書き手なので構造的に漏れにくく、費用も低い。選定は 21-6d・21-6e）。判定のモードと独立に切り替わる。<code>1d-luna</code> と <code>2c-luna</code> は試走で判定元が違っただけなので、本番では同じ書き手（真相なし・luna effort <code>low</code>）の別名にした。<code>1b</code> は真相ありの書き手（effort <code>xhigh</code>）で正解の開示も書く。ほかの案の ④ は <code>正解！</code> + <code>reveal_text</code>。<strong>判定を書き手に書き換えさせない安全網</strong>: LLM の書き手が失敗・空応答のとき、① で判定語から始まらないとき、語だけのコメントへの聞き返しになっていないときは、<code>2b</code> の定型文に落として警告を残す（<code>reply.source = fallback_template</code>）</li>
-    <li><strong>主語のない語だけのコメント</strong>（5.1.1 ③）: 判定の出力に <code>bare_term</code>（語だけのコメントのときのその語）を足した。パターン 1 は <code>pattern1_rules.txt</code> の q_open に線引きと例を足し、guess_correct に「何についての推理か分かること（語だけのコメントは除く）」を条件として足した。パターン 2 は段 A1 の大分類と同じリクエストに「述語のない名詞・語句だけか」の noul を同梱し（Jev の呼び出し回数は増やさない）、大分類が「質問・推理」のときだけ 0.5 以上で ③ にする（一語の感想・挨拶を ③ にしないため）。返信は 4 案とも「何が{語}なのか教えてね」系の聞き返し（定型 3 通り・LLM の書き手には語を渡す）</li>
-    <li><strong>判定理由</strong>: コメント記録用に、パターン 1 の構造化出力へ <code>reason</code>（40 字程度）と <code>bare_term</code> を足した。パターン 2 は段と確率から理由の短文を作る</li>
-    <li><strong>ローカル試行ツール</strong>: <code>services/comment-reply/tools/local_trial.py</code>。判定モジュールと書き手を本番と同じ経路で呼び、問題（<code>--problem U01</code> = <code>batch-01/stock_items.py</code> からスナップショットと同じ形に組む、または <code>--snapshot</code>）にコメントを入れて 3 モードの返信を並べる。判定 API は 1 コメントにつき 1 回ずつ呼んで 3 モードで使い回す。キーは環境変数（<code>OPENAI_API_KEY</code>・<code>TYPESAFE_API_KEY</code>）からだけ読み、Instagram と AWS は使わない。判定を与えて動かす <code>--stub-judgements</code>（API を呼ばない）もある。コメント記録は本番と同じ組み立てで <code>work/local_trial/</code> にファイル出力する</li>
+    <li><strong>移植</strong>: ロジック・閾値・プロンプト文言は試走の最終版（試行 8b・21-6b2）をそのまま移植し、変えたのは「語だけのコメント」対応と判定理由（<code>reason</code>）の追加だけ</li>
+    <li><strong>切り替え</strong>: <code>JUDGE_METHOD</code> を <code>JUDGE_MODE</code> の 3 モードに置き換え、見張り役と合意制を設定だけで比べられるようにした</li>
+    <li><strong>返信文の分離</strong>: 返信文を判定から切り離し、<code>REPLY_VARIANT</code> の 4 案にした。<code>1d-luna</code> と <code>2c-luna</code> は試走で判定元が違っただけなので、本番では同じ書き手の別名にした</li>
+    <li><strong>語だけのコメント</strong>: パターン 1 はプロンプトの q_open に線引きと例を足し、guess_correct に「何についての推理か分かること」を足した。パターン 2 は段 A1 と同じリクエストに noul を同梱した（Jev の呼び出し回数は増やさない）</li>
   </ul>
 </div>
 
-<h5>パターン 1（<code>gpt-6-luna</code> の一括方式）</h5>
-<ul>
-  <li><strong>呼び出し</strong>: コメント 1 件につき chat completions を 1 回。<code>response_format</code> を JSON スキーマ（strict）にし、<code>{kind, answer, reply}</code> を返させる。種別を明示的に出させることで、コード側の強制（上記）と機械プローブの種別一致率の集計ができる</li>
-  <li><strong>system プロンプト</strong>: 5.1 のマスタープロンプトを改訂した案 = <code>judge-trial/prompts/pattern1_rules.txt</code>。変更点は ① 手順 1 で 22 種を定義して種別を選ばせる ② 「荒らしには返信しない」をやめ、⑱〜㉑ は <code>reply</code> を空にしてコードに任せる（5.1.1 の決定に合わせる） ③ 判定語の後ろに、真相に触れない 20 字以内の一言を添えてよいとする（レベル 2。一言にも確定事実シート・真相の文の言葉を入れない） ④ ②③⑤〜⑨・⑬〜⑰・㉒ の返し方を 1 行ずつ書く ⑤ 正解時の開示は 70 字以内（全体 80 字以内）⑥ 主語や対象（それ・あれ・彼・あの人）が問題文から一つに決まらない質問は ③（例つき）⑦ かなを含まない漢字だけの文は中国語を疑う ⑧ 確定事実に直接書いていなくても、真相から明らかに違うことは no・明らかに正しいことは yes、どちらからも判断できないときだけ unknown（⑤⑥ は 2026-09-27 の人間ゲートでユーザー指示、⑦⑧ は試行 4〜5 の打ち手）。補足を原則付けない方針（5.1 の決定 2026-09-07）は、一言を「判定語とは別の短い相づち」として許すことで両立させる</li>
-  <li><strong>モデルとパラメータ</strong>: <code>gpt-6-luna</code> / effort <code>xhigh</code> / <code>max_completion_tokens</code> 2,400・温度は送らない（<strong>2026-09-27 ユーザー承認</strong>。上限は 800 でも試行 4 の 220 件中 1 件が打ち切られ、1,200 でも試行 5 で最大 1,160 まで伸びたため 2,400 に上げた〔ユーザー承認〕。課金は実際に使った分だけなので費用はほぼ変わらず、実害は推論が長いときの応答時間〔最大 20 秒前後の見込み〕。Reply Lambda のタイムアウトと SQS の可視性タイムアウトはこれより長く取る〔21-6f〕。推論トークン数はログに残して監視する。API は <code>reasoning_effort</code> に <code>max</code> を受け付けず〔400 エラー。受け付けるのは <code>none</code> / <code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code>〕、最上位の <code>xhigh</code> を使う。上限は 400 だと試走 185 件中 1 件が推理で打ち切られたため 800 に上げた）</li>
-</ul>
-
-<h5>パターン 2（Jev の段階判定 + 定型文）</h5>
-<p>Jev（<code>POST https://api.typesafe.ai/v1/systemone</code>、<code>model: jev-latest</code>）の <code>choice</code>（選択式・確率付き）と <code>noul</code>（真である確率）を段ごとに使い、返信文はすべてコードの定型文にする（返信文を AI に書かせない = 補足やお礼からの漏れが構造的に起きない）。指示文（<code>instructions</code> / <code>criteria</code>）は英語で書き、コメントと問題は日本語のまま <code>state</code> に渡す。</p>
-<ol>
-  <li><strong>段 0 文字種の規則（Jev を呼ばない）</strong>: URL を含む → ⑳、絵文字・記号だけ → ⑰、かな・漢字を含まず空白で区切られた英単語が 2 つ以上ある → ㉒（1 語だけの英字の羅列は荒らしのことがあるので段 A1 に任せる。試行 4〜5 で調整）。<strong>禁止ワード DB ではなく文字種だけを見る最小の規則</strong>で、10.3 の「ルールベース判定を作らない」（語の一覧でモデレーションしない方針）には当たらないものとして扱う</li>
-  <li><strong>段 A 種別（2 段の choice。2026-09-27 ユーザー指示で 19 択の 1 段から変更）</strong>: <strong>A1 大分類</strong> = 問題文は渡さず、「水平思考クイズへの SNS コメント」という説明とコメントだけで 5 択（質問・推理 / 依頼 / 反応 / 不適切 / その他。試行 3 では質問と推理を別の選択肢にした 6 択だったが、問題文なしでは見分けにくく確率が割れたため、試行 6 でユーザー指示によりまとめた）。<strong>A1b 振り分け直し</strong>（試行 6）= 「質問・推理」だけ、問題文を渡して「質問（事実を 1 つ確かめる。〜ってこと？ / 〜って意味？ の短い確認を含む）か推理（どういうこと？への自分の答え）か」を choice で選ぶ。推理にするのは、推理の確率が 0.95 以上（<code>T_GUESS</code>。最大確率で選ぶと理由を確かめる質問が推理に流れた = 試行 6）かつコアの要点のどれかが <code>T_CLOSE</code> 以上（段 B を先に取って使い回す。試行 8）のときだけ。コアに全く触れないものはいったん質問に戻し、A2 が ③ と判定したら推理（⑥）に戻す（⑥ は定義上コアに触れないため。試行 8b）。各選択肢には含まれる種別と具体例を添える（例は評価データの文面を使わない）。<strong>A2 細分類</strong> = 大分類ごとに、質問 → ①②③、依頼 → ⑦⑧⑨、反応 → ⑩〜⑯、不適切 → ⑱〜㉑ から選ぶ。推理は A2 を飛ばして段 B へ、その他は ㉒ とする。<strong>A3 確かめ直し</strong>（試行 5・ユーザー指示）= A2 が ③ を選んだとき、または ① を選んでも指示語・代名詞（それ・あれ・彼・あの人・その子 など）を含むとき（試行 6）に、問題文を渡して「主語や指示語が問題文から（消去法も含めて）一つに決まる、はい / いいえで答えられる質問か」を noul で聞き直し、<code>T_RECHECK</code>（0.6。試行 8 で 0.5 から上げた）以上なら ① として段 B へ進め、未満なら ③ として聞き直す</li>
-  <li><strong>段 B 正解判定（noul × コアの要点）</strong>: 段 A が「推理」か ① のとき、<code>core_points</code> の要点ごとに「言い換えも含めて同じ内容を述べているか」の確率を 1 リクエストにまとめて取る。コアの要点がすべて <code>T_POINT</code>（0.5）以上 → ④（質問の形でも推理扱い = 5.1 のルールと同じ）。「推理」でどれかが <code>T_CLOSE</code>（0.25。周辺を含めた要点では 0.35 だったが、コアに半分触れた推理の確率が 0.2〜0.3 に留まるため試行 7b で下げた）以上 → ⑤、なし → ⑥（論点 ②）。パターン 1 のプロンプトには同じ定義と、「問題文の言葉を使っているだけ・問題文どおりの読み方をしているだけではコアに触れていない」（試行 7b）と、「問題文の言葉や事実を 1 つだけ確かめる短い質問は、コアの一部に触れていても はい / いいえ で答える。自分の言葉で説明して『〜かな』『〜じゃない？』を付けたものは推理」（試行 8b）を書く。経緯: 試行 4〜6 は周辺も含めた要点 4〜5 個で「75% 以上なら ④・1 つでも触れれば ⑤」としていたが、周辺の事実に触れただけの外れを ⑤ にしてしまうため、試行 7 でコア基準に改めた（5.1.1 の ④⑤⑥ の定義）</li>
-  <li><strong>段 C 質問の品質（noul）</strong>: ① のとき「問題の状況に当てはめて、はい / いいえで一意に答えられる」の確率が <code>T_QUALITY</code> 未満なら ③ として誘導文を返す（論点 ③。NG が多すぎると参加体験を損なうため、試走は低め〔0.2〕から始める）</li>
-  <li><strong>段 D 判定（choice 3 択）</strong>: <code>state</code> = 問題文 + 真相 + 確定事実 + 質問。はい / いいえ / 関係ありません。最大確率が <code>T_ANSWER</code> 未満なら「それは問題の答えに関わりません。」に倒す（論点 ⑧ = 自信がないときの安全側。P3 の取り違えを P4 の揺れへ逃がす）</li>
-  <li><strong>返信</strong>: 判定語 + 20 字以内の定型の一言（探偵口調・真相に触れない汎用文を 6 通り以上。レベル 2 を定型のバリエーションで満たす）。④ は「正解です！」+ <code>reveal_text</code>（論点 ④）</li>
-</ol>
-<p>閾値 <code>T_POINT</code>・<code>T_QUALITY</code>・<code>T_ANSWER</code> は 21-6d の全件プローブで決める（試走の初期値は 0.5 / 0.2 / 0.55）。1 コメントあたりの Jev 呼び出しは 2〜3 回（段 A、段 B〜D は 1 リクエストにまとめられる分はまとめる）。</p>
-
-<h5>論点 9 件の結論（計画書 21-6b の折りたたみ）</h5>
-<ol>
-  <li><strong>① 質問以外のコメントの行き先</strong>: 結論。5.1.1 の 22 種で見分ける。パターン 1 は JSON の <code>kind</code>、パターン 2 は段 0 + 段 A（大分類 6 択 → 細分類）+ 段 B</li>
-  <li><strong>② 正解宣言と「惜しい！」の判定段</strong>: 結論。パターン 2 は <code>truth_points</code> の要点ごとの noul（全部 = 正解・一部 = 惜しい・なし = 外れ）。パターン 1 はプロンプトの手順 1 で判断させ、どちらも P2・P5 で測る</li>
-  <li><strong>③ 質問の品質チェックの NG が多すぎる</strong>: 段 C の閾値を低め（0.2）から始め、21-6d で ③ の誘導率（P6 とは別に「① を ③ と判定した率」）を見て決める。持ち越し先 = 21-6d</li>
-  <li><strong>④ 正解時に開示する真相の文を誰が書くか</strong>: 結論。パターン 2 は問題ごとに事前に書いた <code>reveal_text</code>（ストックに持たせる。21-6c で 14 問分を起こす）。パターン 1 は従来どおり LLM が 2〜3 文で書く。「惜しい！」は両方式とも定型（足りない点を言わない）</li>
-  <li><strong>⑤ 本丸は「はい / いいえ / 関係ありません」の判定</strong>: 試走で段 D の一致率と P3 を測った（下の試走結果）。全件の評価は 21-6d、合否は 5.1.1 の P3・P4</li>
-  <li><strong>⑥ テスト質問の偏り</strong>: 結論。評価用の質問は <code>expected_questions</code> を見ずに、問題文だけを見て（真相を見ずに）プレイヤーの立場で書き、あとから真相で正解ラベルを付ける（下の評価セット）。<code>expected_questions</code> は参考値として別に集計する</li>
-  <li><strong>⑦ 同じ誘導文の連投</strong>: 結論。定型文は種別ごとに 3 通り以上を <code>sha1(comment_id)</code> で選ぶ（契約）。5.1.1 レベル 1 の「最頻の言い回し 50% 以下」で測る</li>
-  <li><strong>⑧ 自信がないときは安全側</strong>: 結論。段 D は <code>T_ANSWER</code> 未満で「答えに関わりません」、段 B は <code>T_POINT</code> 未満の要点を満たさない扱い（誤った正解宣言 P2 を避ける側）。値は 21-6d で決める</li>
-  <li><strong>⑨ パターン 1 へ戻せる切り替え</strong>: 結論。環境変数 <code>JUDGE_METHOD</code> + Jev 失敗時のパターン 1 フォールバック（契約）。実装は 21-6c、本番の配線は 21-6f</li>
-</ol>
-
-<h5>5.1 マスタープロンプトの改訂案（パターン 1）</h5>
-<p>改訂案の本文は <code>judge-trial/prompts/pattern1_rules.txt</code>（上記の変更点 ①〜④）。<strong><code>master_prompt.txt</code> の差し替えは本ステップでは行わず、21-6c で行うことを提案する</strong>。出力が一語の文字列から JSON（<code>{kind, answer, reply}</code>）に変わるため、判定モジュールの実装と同時でないと <code>probe_test.py</code> と本番の経路が壊れる。差し替えたら 5.1 の本文も改訂案に置き換え、「荒らしには返信しない」の記述を消す。</p>
-<div class="callout decision">
-  <span class="callout-title">決定（2026-09-30、21-6c2）: 判定・返信のプロンプトは Lambda のコードに同梱する。スナップショットの <code>master_rules</code> は判定に使わない</span>
-  <p>判定モジュールのプロンプトは 1 本ではなくなった（パターン 1 の判定・返信文の基準・書き手 2 種・Jev の指示文）。<code>prompt_configs.prompt_text</code> 1 列に載らず、どれも 5.1.2「モデル・プロンプトを変えるときは全件の機械プローブ（21-6d）に合格してから切り替える」に従うので、デプロイを伴うほうが手順に合う。このため 5.1 冒頭の決定（2026-09-04、21-3。プロンプトの正は <code>prompt_configs</code> → スナップショット経由で Lambda が読む）は判定モジュールには適用しない。プロンプトの正は <code>services/comment-reply/app/prompts/</code>（試走版 <code>judge-trial/prompts/</code> から移植）。同梱プロンプトの SHA-256 先頭 12 桁を <code>prompt_version</code> としてコメント記録（10.6）に残す。<code>master_prompt.txt</code> の差し替えは行わない。スナップショットの <code>master_rules</code> は既存のキーとして残る（投稿バッチは変えない）。<code>master_prompt.txt</code>・<code>probe_test.py</code> の扱い（廃止するか、21-6d の機械プローブへ寄せるか）は 21-6d で決める（→ 21-6d3 で退役。下の決定）。</p>
-</div>
-<div class="callout decision">
-  <span class="callout-title">決定（2026-10-03、21-6d3・ユーザー）: <code>master_prompt.txt</code> と <code>probe_test.py</code> の旧プローブを退役させる</span>
-  <p>旧プローブ（想定質問を <code>master_prompt.txt</code> の出題者に答えさせる）は本番の判定経路を通らず、本番経路の評価は <code>services/comment-reply/tools/probe_run.py</code>（21-6d1〜d3）が担うため、二重に持たない。<code>master_prompt.txt</code> は削除し、<code>probe_test.py</code> は作問レビュー用の素材シート（<code>work/review.html</code>）の生成だけを残して <code>batch-01/review_sheet.py</code> に改名した（API キー不要）。<code>leak_count.py</code> の核心語辞書は P1 漏れ候補の正として残す。作問時に本番経路で確かめるときは、評価データ <code>judge-trial/data/eval_problems.json</code> にケースを足して（正解ラベルは人が確認）<code>probe_run.py --problems &lt;no&gt;</code> を回す。5.1 冒頭の「INSERT 元は <code>master_prompt.txt</code>」は失効し、21-7 の <code>prompt_configs</code> INSERT で <code>prompt_text</code> に何を入れるか（空にするか、本節のセット固定部分を記録として転記するか）は 21-7 で決める（スナップショットの <code>master_rules</code> は判定に使われない）。</p>
-</div>
-<div class="callout decision">
-  <span class="callout-title">決定（2026-10-03、21-6d3）: パターン 2（Jev）の閾値は据え置く（<code>T_QUALITY</code> 0.2・<code>T_ANSWER</code> 0.55・<code>T_GUESS</code> 0.95・<code>T_POINT</code> 0.5）</span>
-  <p>全件プローブ（14 問・441 件・5 パターン。<a href="umigame-soup-1-probe.html">評価ページ</a>）の Jev のキャッシュ済み確率で閾値を掃引した（API を呼び直さない再計算）。① <code>T_ANSWER</code> を 0.7 に上げると、はい / いいえの取り違え（P3）は 3 → 1 件に減るが「わからない」が 8 → 18 件に増える。P3 は現状で合格なので据え置く。② <code>T_QUALITY</code> を上げると、はい / いいえ質問が <code>q_open</code> へ流れる（0.3 で 18 件・0.4 で 56 件）。③ <code>T_GUESS</code> は 0.95 で推理 → 質問 2 件・質問 → 推理 9 件となり、前後の値（0.9 / 0.99）より誤りが少ない。④ Jev の主な失点である誤った正解宣言（P2 12 件）は、惜しい推理の要点確率の最小値が 0.83〜0.97 に集まり、本物の正解と重なる。<code>T_POINT</code> を 0.95 にしても誤りは 4 件残り、正解宣言は 27 → 7 件に落ちる。閾値では分けられない（要点の問い方の問題）ため、閾値は変えず、方式選定（21-6e）の材料として残す。閾値を変えていないので全件の回し直しはしていない。</p>
+<div class="decision" id="d-20260930-bundle">
+  <span class="callout-title">2026-09-30 21-6c2: 判定・返信のプロンプトは Lambda のコードに同梱する。スナップショットの <code>master_rules</code> は判定に使わない</span>
+  <p>判定モジュールのプロンプトは 1 本ではなくなった（パターン 1 の判定・返信文の基準・書き手 2 種・Jev の指示文）。<code>prompt_configs.prompt_text</code> 1 列に載らず、どれも「モデル・プロンプトを変えるときは全件の機械プローブに合格してから切り替える」に従うので、デプロイを伴うほうが手順に合う。このため 2026-09-04 の決定は判定モジュールには適用しない。</p>
+  <p>プロンプトの正は <code>services/comment-reply/app/prompts/</code>（試走版 <code>judge-trial/prompts/</code> から移植）。同梱プロンプトのハッシュを <code>prompt_version</code> としてコメント記録に残す。スナップショットの <code>master_rules</code> は既存のキーとして残る（投稿バッチは変えない）。</p>
 </div>
 
-<h5>評価セット（テストデータ）の作り方・置き場</h5>
-<ul>
-  <li><strong>置き場</strong>: <code>content/umigame-stock/umigame-soup-1/judge-trial/data/</code>。問題依存のケース <code>eval_problems.json</code>（問題ごと）と、問題に依存しない共通テストセット <code>common_cases.json</code>（⑦〜㉒）、仮の <code>truth_points.json</code>。21-6d でも同じ置き場を使い、問題を増やすときはファイルに問題番号のキーを足す</li>
-  <li><strong>問題依存のケース（1 問 21 件）</strong>: ① 10 件（問題文だけを見て書き、あとから真相と確定事実で <code>yes</code> / <code>no</code> / <code>irrelevant</code> を付ける。口語・主語の省略・誤字を混ぜる）・② 2 件・③ 3 件・④ 2 件（うち 1 件は質問の形）・⑤ 2 件・⑥ 2 件</li>
-  <li><strong>共通テストセット</strong>: ⑦〜㉒ の 16 種 × 5 件 = 80 件（5.1.1 の「種別ごとに 5 件以上」）。どの問題に付いても成り立つ文面にし、境界的なもの（感想と応援の中間など）も混ぜる。試走では対象の問題へ順繰りに割り当てる</li>
-  <li><strong>作り方</strong>: 下書きは判定プロンプトの調整に関わっていない書き手（Codex への委譲）が書き、Claude が正解ラベルを検め、人間ゲートでユーザーが抜き取りで見る。21-6b の試走は 5 問（U01・U13・U18・U20・U26）× 21 件 + 共通 80 件 = 185 件。21-6d で全 14 問 × 21 件に広げる（持ち越し先 = 21-6d）</li>
-  <li><strong>21-6d の合格基準</strong>: 5.1.1 の P1〜P7 とレベル 1 の機械プローブ基準をそのまま使う（種別一致率は全体 90% 以上・質問以外の種別それぞれ 80% 以上）。試走スクリプトの集計項目は、この基準と 1 対 1 に対応させた</li>
-</ul>
-
-<h5 id="judge-trial-result">試走結果と試行錯誤の記録</h5>
-<p>試走の内容・2 方式の比較図・処理フロー・誤りの中身と次の打ち手は、検討ページ「<a href="umigame-soup-1-judge-study.html">コメント返信処理方式の検討</a>」に積む（2026-09-27 ユーザー指示。試行錯誤は検討ページで回し、決まったことだけを本節へ移す）。試行 2 時点の要約: 種別一致率はパターン 1 = 96.2%・パターン 2 = 73.5%、はい / いいえの取り違えは両方式とも 0 件。</p>
-
-<h3 id="illustration-prompt">5.2 イラスト作成用プロンプト（ストック整備時・imagegen）</h3>
-<p>1 問 1 枚の背景イラストを、ストックの <code>illustration_prompt</code> から Codex CLI の <code>image_gen.imagegen</code>（<code>codex exec</code>）で生成する（21-2 で CLI からの自動化を実測。手作業不要）。プロンプトは「<strong>画風固定行</strong> + 情景（問題文の描写のみ）+ 禁止事項」の 3 部構成で、画風固定行は全問共通の定数として <code>validate.py</code> が存在を検査する。</p>
-<ul>
-  <li><strong>画風（C4）</strong>: 90 年代 OVA の手描きセル塗り（太い主線・エアブラシのハイライト・リムライト）。背景は<strong>中間調</strong>（月明かりと蝋燭で情景が見える明るさ）で生成し、版面のオーバーレイは薄くする（第 1 稿の「暗めの単色トーン・シルエット寄り」は暗すぎて情景が見えなかったため変更 = 21-2 決定）</li>
-  <li><strong>固定の禁止事項</strong>: 文字・ロゴを入れない / <strong>真相の手がかりを描かない</strong>（問題文にある情景だけを描く。人物は問題文に出る人物 + 遠景のシルエット 1 人まで）/ <strong>人物は遠景の小さな全身像にし、下半分の中央（横幅の中央 20%・縦 55〜85%）にだけ置く</strong>。上半分には人物を置かず静か（空・壁・天井・窓）にし、下半分の左右 40% は景物だけにする。クローズアップ・半身は描かない（感情は表情でなく姿勢で出す）</li>
-</ul>
-<div class="callout decision"><span class="callout-title">決定（2026-09-26・背景の全数レビュー指摘 38）: 人物は下半分の中央に小さく置く</span>版面（1080x1920）はフック帯と問題カードが上端〜約 47%、吹き出しが約 47〜61%、カメロックが左下（横 1〜41%）、Jr. が右下（横 55〜84%）を覆う。旧ルール（上部 55% を静かに）だけでは画像生成が人物を近景で大きく描き、問題カードの裏に顔が入る・キャラと人物がぴったり重なる背景が多かった。人物が重ならずに見えるのは下半分の中央の細い帯だけのため、禁止事項に人物の大きさと位置を足した（3 問の試行で遵守を確認）。代わりに人物の表情は読めなくなる。背景のレビューは <code>background_sheet.py --stills</code>（今の文言と背景で動画の各コマを書き出す）で版面と重ねて見る。</div>
-<ul>
-  <li>寸法は 9:16（1024x1536）で生成し、ビルド時に 1080x1920 へ正規化する（方式設計書 8.1）</li>
-  <li>キャラクター 2 体はストック単位では生成しない（セクション 8）</li>
-</ul>
-
-<h2 id="caption">6. キャプションの作り方</h2>
-<p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}</code> の 1 行</strong>とする。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b）。</p>
-<ul>
-  <li><strong>構成（PoC の実例）</strong>: 「【ウミガメのスープ 第 N 問】」+ 問題文の再掲 + 遊び方（「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ）+ ハッシュタグ（<code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart</code>。<code>#コメント即時返信</code> は 2026-09-26 の素材レビューで追加）。ただし<strong>問題番号「第 N 問」は書かない</strong>（ストックは LRU で消費され投稿順が確定しないため。PoC の表記は本番では使わない）</li>
-  <li><strong>問題文の要約（問題固有の一言）は入れない</strong>（2026-09-24 の素材レビューでユーザー決定）: 見出しの直後に問題固有の一言を置いていたが、中身が問題文の要約になり、すぐ下の問題文と同じ話が 2 回出るように見えるため廃止した。構成は「見出し【探偵カメロックのウミガメのスープ】→ 問題文 → 遊び方 → ハッシュタグ」の 4 段で全問共通（<code>umigame_common.caption()</code> が組み立てる）</li>
-  <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> のみのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Gemini 3.8 Flash TTS でクレジット表記は不要（セクション 8。VOICEVOX 時代の常設クレジット行は本セットにはない）</li>
-  <li>テンプレートを <code>{{caption}}</code> だけにする理由: ハッシュタグの固定部を分けると「問題固有のタグを足したい」ときに 2 箇所を見ることになり、素材項目 14 項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
-</ul>
-
-<h2 id="audio">7. 音源の構成</h2>
-<div class="table-wrap">
-<table>
-<tr><th>種別</th><th>S3 キー / <code>audio_assets</code></th><th>仕様</th></tr>
-<tr><td>BGM（<code>asset_type='bgm'</code>・<code>time_slot=NULL</code>）</td><td><code>audio/umigame-soup-1/trackNN.m4a</code>（3〜5 曲）</td><td><strong>24 秒ちょうど</strong>のトラック（フェードイン 0.5 秒・フェードアウト 1.0 秒・AAC）。PoC は 20 秒トラックのループで 20 秒地点に継ぎ目があったため、本セット用に 24 秒版として前処理する（<code>prepare_bgm.py</code> の 30 秒固定を 24 秒で用意 = 21-2 申し送り）。調達・ライセンス証跡は <a href="../operation.html">運用設計 3</a>（Pixabay Content License / CC0。クレジット不要のもの）</td></tr>
-<tr><td>SE（<code>asset_type='se'</code>）</td><td><code>audio/umigame-soup-1/se/bubble_pop.m4a</code>（1 種）</td><td>吹き出し出現のポップ音（0.14 秒）。PoC は ffmpeg の <code>sine</code> で合成（880 + 1320 Hz）したためライセンス問題なし。本番もこれを登録する</td></tr>
-</table>
-</div>
-<ul>
-  <li>選曲はビルド時（<code>build.py</code>）に行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）。21-5a の実装ではローカル台帳 <code>work/bgm/tracks.json</code> の使用回数最少で選び、ID は publish 時に S3 キーで解決する（<a href="../generators/umigame-prebuilt.html#build-steps">方式設計書 8.1 の決定</a>）。第 1 バッチは 1 曲運用（track01 = Pixabay「Strange Detectives」/ HarumachiMusic。2026-09-24 ユーザー選曲・先頭 24 秒。配布ページに Content ID 登録の表示あり）</li>
-  <li>SE は動画に焼き込むだけで実行時に使わないため、ファイルの正は <code>content/video-build/umigame-soup-1/assets/se/bubble_pop.wav</code>（git 管理）とし、S3 配置・<code>audio_assets</code> 登録は必要になるまで行わない</li>
-  <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
-</ul>
-
-<h2 id="tts">8. ナレーション・TTS（Irodori-TTS v4.1-Small / 声 G4 のクローン）</h2>
-<div class="decision">
-  <span class="callout-title">決定（2026-09-27、21-5c）: TTS をローカル GPU の Irodori-TTS（v4.1-Small・BF16）へ切り替え、Gemini の声 G4「kamerock-chubby」を参照音声からクローンする。問題文とルールの間は 1.2 秒のまま</span>
-  2026-09-26 に Amazon Polly（Takumi・125%）から Gemini 3.8 Flash TTS・声 G4 へ切り替えた（2 問 × 15 パターンの聞き比べで表現力がはっきり上がった。経緯は <a href="../../ideas/umigame-tts-gemini-flash.md">アイデア記録</a>）が、作り直しの途中で Gemini の日次上限（Tier 1・100 リクエスト / 日）に当たった。上限の引き上げは応答まで 1〜2 か月の報告が多く、別アカウントでの回避は Google APIs 利用規約 2(d) に反するため、ローカルで動く Irodori-TTS（MIT・クレジット不要・実在人物の無断クローンは禁止 = G4 は Gemini の合成音声なので該当しない）へ移した。聞き比べ（<code>poc/irodori-tts/</code>）で、説明文だけの声（VoiceDesign）・別話者のクローン・演技指示つきより、<strong>G4 のクローン・説明文なし・後処理なし</strong>が最もよかった（ユーザー判断）。PoC の知見: ① 参照音声の息継ぎを下げると生成側の吸気音も減る ② 問題文とルール文を 1 回で読ませて無音で切り分ける（Gemini と同じ。別々に作ると口調が変わる）③ <code>--seconds 20.0</code> を指定すると話速調整なしで予算に収まる（自然長は 23〜25 秒）④ 既定の FP32 は VRAM 4GB からあふれて 1 本 4〜7 分、BF16 は約 45 秒で音質差なし。<strong>クレジット表記は不要</strong>。Gemini 版（<code>narration_gemini.py</code>）・Polly 版（21-5a / 21-5b の初版 14 本）・VOICEVOX 版はアダプタとして残す。
-</div>
-<ul>
-  <li><strong>読み上げる文</strong>: 冒頭に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code> の 2 cue だけ（吹き出しと同期させない。21-1 ②）。開始は 0.5 秒（15 フレーム）、2 cue + 間の合計は <strong>21 秒以内</strong>（継ぎ目 708 フレームに掛からない予算。方式設計書 8.3）</li>
-  <li><strong>声</strong>: 参照音声 <code>content/video-build/umigame-soup-1/assets/voice/kamerock-g4/*.wav</code>（Gemini G4 で合成した 001・004・006 の problem / rule 6 本に息継ぎゲートをかけたもの。名前順にすべて渡す）のクローン。説明文（caption）・絵文字・後処理は使わない。モデル・精度・seed・長さの正は <code>assets/design.json</code> の <code>narration</code> 節（Gemini の設定は <code>narration_gemini</code> 節に残す）。<strong>参照音声を差し替えたら声が変わるため全数を再試聴する</strong></li>
-  <li><strong>実行</strong>: ビルド時にローカルで <code>scripts/narration_irodori.py</code>（<code>build.py</code> の既定 <code>--tts irodori</code>）。本体はリポジトリ外 <code>~/tools/Irodori-TTS</code>（環境変数 <code>IRODORI_DIR</code> で変更可。commit <code>89f9d8f</code>・<code>uv</code> 環境）を subprocess で呼び、<strong>必ず cuda・BF16</strong>。費用・API キー・AWS の Secret は不要。生成音声には SilentCipher の透かしが自動で入る</li>
-  <li><strong>長さの制御と予算検査</strong>: 話速調整（atempo）はしない。<code>--seconds 20.0</code> で合成し、切り分けて前後の無音を削った合計が 21 秒を超えたら、seed を進めて <code>--seconds</code> を 0.5 秒ずつ縮めて取り直す（1 回のビルドで最大 3 テイク。3 テイクとも超えたらその問はビルドエラー）。聞いて気になった問は <code>--retake-tts</code> で seed を進めて取り直す（1 問 3 回まで。続けて問題が出たら文を見直す）</li>
-</ul>
-
-<h2 id="assets">9. 固定アセット・デザイントークン</h2>
-<div class="table-wrap">
-<table>
-<tr><th>アセット</th><th>正（ファイル）</th><th>備考</th></tr>
-<tr><td>出題者「探偵カメロック」（基本ポーズ / 喜びポーズ）</td><td><code>content/video-build/umigame-soup-1/assets/characters/master_base.png</code> / <code>master_happy.png</code>（正規化済み・共通キャンバス 1000x1100）</td><td>設定とプロンプトは <code>assets/design.json</code>（21-2 の <code>poc/classic-umigame/v2/design.json</code> を 21-5a でセット資産へ昇格済み。<code>remotion/public/</code> はビルド時の配置先で git 管理外のため、正は <code>assets/</code> に置いた）。ポーズ差分は基本ポーズを参照画像（<code>-i</code>）にして生成すると衣装・色が揃う。透過にならない場合は「単色フラットなマゼンタ #FF00FF の背景」を明示して生成し直す（21-2 知見）</td></tr>
-<tr><td>質問者「カメロック Jr.」（基本ポーズ）</td><td>同 <code>jr_base.png</code></td><td>視線は左上（父の方向）。喜びポーズは持たない</td></tr>
-<tr><td>画風固定行（キャラ / 背景）</td><td><code>design.json</code> の <code>style_line</code> / <code>background_prompt</code> の画風部分</td><td>C4: 90 年代 OVA 手描きセル塗り。セクション 5.2 の固定行と同一</td></tr>
-<tr><td>フォント</td><td>Zen Kaku Gothic New（Medium / Bold / Black。ビルド時に pref-ranking-1 の <code>remotion/public/fonts/</code> から配置）</td><td>pref-ranking-1 と同じ（SIL OFL）。<code>@remotion/fonts</code> の <code>loadFont</code> で読み込む</td></tr>
-<tr><td>版面の座標・ビート・効果</td><td><code>remotion/src/timeline.ts</code> / <code>UmigameReel.tsx</code></td><td>実装が正。設計書には構成と不変条件のみ（方式設計書 8.2）</td></tr>
-</table>
-</div>
-<p>キャラ・フォントは git 管理のローカル資産で、S3 の固定アセット（<code>assets/{set_code}/</code>）には置かない（事前ビルド方式は実行時にアセットを使わないため。ranking-prebuilt の五郎と同じ扱い）。</p>
-
-<h2 id="comment-reply">10. コメント自動返信の運用</h2>
-<p>コメント時の処理は<strong>投稿時（既存 ECS + Aurora）と完全に分離</strong>し、Aurora を一切使わない。S3 の問題スナップショットを <code>media_id</code> キーの読み取り専用データストアとして使う（アイデア詳細 4）。インフラの構成（Function URL → Webhook Lambda → SQS FIFO + DLQ → Reply Lambda → S3 / OpenAI / Graph API。VPC 外・NAT 不要）は <a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>、監視は <a href="../../infra/workflow.html#alarms">workflow.html 8</a>、Secret は <a href="../../infra/security.html#comment-reply-secret">security.html 1.3</a> が正。本節はアプリの振る舞いと運用ルールを書く。</p>
-
-<h3>10.1 1 日の動き</h3>
-<div class="table-wrap">
-<table>
-<tr><th>時間帯</th><th>流れ</th><th>Aurora</th></tr>
-<tr><td>20:00 リール投稿</td><td>画像生成 SFN（ストック LRU → 事前動画取得 → <code>umigame_items</code> INSERT）→ SNS 投稿 SFN（キャプション展開 → publish）→ <strong>publish 成功直後に <code>problems/{media_id}.json</code> を S3 へ出力</strong>（10.2）</td><td>起動（従来どおり）→ 0 ACU へ</td></tr>
-<tr><td>日中〜翌日以降: コメント</td><td>コメント → Meta Webhook → Webhook Lambda（署名検証・自己返信スキップ・SQS enqueue・即時 200）→ Reply Lambda（S3 GET → OpenAI → Graph API 返信）。<strong>受信 → 返信 約 4 秒</strong>（PoC 実測）</td><td><strong>一度も起動しない</strong></td></tr>
-</table>
+<div class="decision" id="d-20261003-probe-retire">
+  <span class="callout-title">2026-10-03 21-6d3・ユーザー: <code>master_prompt.txt</code> と <code>probe_test.py</code> の旧プローブを退役させる</span>
+  <p>旧プローブ（想定質問を旧マスタープロンプトの出題者に答えさせる）は本番の判定経路を通らず、本番経路の評価は <code>probe_run.py</code>（21-6d1〜d3）が担うため、二重に持たない。<code>master_prompt.txt</code> は削除し、<code>probe_test.py</code> は作問レビュー用の素材シート（<code>work/review.html</code>）の生成だけを残して <code>batch-01/review_sheet.py</code> に改名した（API キー不要）。<code>leak_count.py</code> の核心語辞書は P1 漏れ候補の正として残す。</p>
 </div>
 
-<h3 id="snapshot">10.2 投稿後スナップショット <code>problems/{media_id}.json</code></h3>
-<p>SNS 投稿バッチは <code>batch_sets.problem_snapshot_enabled=1</code> のセットについて、リール行が <code>success</code> に達した直後に S3 <code>assets/{set_code}/problems/{media_id}.json</code> を PUT し、<code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code> に記録する（共通フローの拡張ポイント = <a href="../batch-flow.html#problem-snapshot">batch-flow.html 3.3 手順 6</a>。データは <a href="../data-model.html#detail-umigame-items">data-model.html 4.14</a>）。<code>media_id</code> は <code>posts.platform_post_id</code>（<code>media_publish</code> の応答 id）。</p>
-<pre><code>{
-  "schema_version": 2,
-  "set_code": "umigame-soup-1",
-  "media_id": "17912345678901234",
-  "content_key": "001-lighthouse-letter",
-  "posted_at": "2026-09-20T11:00:12Z",
-  "problem_text": "……なぜ？",
-  "truth": "……",
-  "fact_sheet": ["……", "……"],
-  "core_points": ["……", "……"],
-  "reveal_text": "……（70 字以内）",
-  "rule_text": "「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します",
-  "master_rules": "（prompt_configs.prompt_text のセット固定部分。セクション 5.1）"
-}</code></pre>
-<ul>
-  <li>スナップショットの<strong>出力失敗は投稿失敗にしない</strong>（投稿は成功しているため <code>posts.status</code> は <code>success</code> のまま）。<code>snapshot_s3_key</code> が NULL の行を運用の確認クエリで拾い、手動で再出力する（手動再出力ツール <code>content/umigame-stock/.../tools/write_snapshot.py</code> は 21-7 で用意する。21-5b では用意していない）。スナップショットが無い投稿へのコメントは Reply Lambda が S3 404 として<strong>返信せずログのみ</strong>残す（DLQ に入れない）</li>
-  <li>プレフィックス <code>assets/…/problems/</code> は 30 日ライフサイクルの対象外（<code>images/</code> <code>videos/</code> 限定）のため、投稿済み問題は残り続ける = 翌日以降のコメントにも答えられる</li>
-  <li><strong>実装（2026-09-26、21-5b）</strong>: <code>services/sns-post-batch/app/problem_snapshot.py</code>。リール行の <code>success</code> 更新を commit した<strong>後</strong>に別のトランザクションで出力するため、スナップショット側の失敗（<code>umigame_items</code> 行の読み取り・<code>prompt_configs</code> の欠落・S3 の PUT・キーの記録）は WARNING ログとロールバックだけで済み、投稿の成功記録を巻き戻さない。<code>posted_at</code> は <code>posts.posted_at</code> に書いた値と同じ時刻（UTC・末尾 <code>Z</code>）。JSON は UTF-8（<code>ensure_ascii=False</code>）・<code>Content-Type: application/json; charset=utf-8</code> で PUT する。フラグが 0 のセットとストーリーズ行では何もしない</li>
-  <li><strong>IAM の前提</strong>: SNS 投稿バッチのタスクロールは S3 の読み取り権限（<code>grantRead</code>）しか持たないため、フラグを 1 にする前に <code>assets/umigame-soup-1/problems/*</code> への <code>s3:PutObject</code> を付ける必要がある（21-7 の CDK 変更に含める）。権限がないまま有効化すると、投稿は成功するが毎回スナップショットが WARNING で欠ける</li>
-  <li><strong><code>schema_version</code> 2（2026-09-30、21-6c1）</strong>: 判定モジュール用に <code>core_points</code>（コアの要点 1〜3 個。5.1.1）と <code>reveal_text</code>（正解時の開示文 70 字以内。5.1.2）を追加した（既存のキーは不変）。どちらも <code>umigame_items</code> の同名列（V013）から写し、NULL なら出力しない（V013 未適用・ストック未更新の検出）。判定モジュール（21-6c2）は 2 以上を前提にする。文面の正は <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code></li>
-  <li>ステージング面（PoC アプリ + <code>test_tkghr</code>）は <code>assets/umigame-soup-1/staging/problems/</code> を読む。サンプルの JSON は手で置く（21-6 の人間ゲート）</li>
-</ul>
+<div class="decision" id="d-20261003-thresholds">
+  <span class="callout-title">2026-10-03 21-6d3: パターン 2（Jev）の閾値は据え置く（<code>T_QUALITY</code> 0.2・<code>T_ANSWER</code> 0.55・<code>T_GUESS</code> 0.95・<code>T_POINT</code> 0.5）</span>
+  <p>全件プローブ（14 問・441 件・5 パターン。<a href="umigame-soup-1-probe.html">評価ページ</a>）の Jev のキャッシュ済み確率で閾値を掃引した（API を呼び直さない再計算）。</p>
+  <ul style="margin:.3rem 0 0;">
+    <li><code>T_ANSWER</code> を 0.7 に上げると、はい / いいえの取り違え（P3）は 3 → 1 件に減るが、答えに関わらない扱いが 8 → 18 件に増える。P3 は現状で合格なので据え置く</li>
+    <li><code>T_QUALITY</code> を上げると、はい / いいえ質問が <code>q_open</code> へ流れる（0.3 で 18 件・0.4 で 56 件）</li>
+    <li><code>T_GUESS</code> は 0.95 で推理 → 質問 2 件・質問 → 推理 9 件となり、前後の値（0.9 / 0.99）より誤りが少ない</li>
+    <li>Jev の主な失点である誤った正解宣言（P2 12 件）は、惜しい推理の要点確率の最小値が 0.83〜0.97 に集まり、本物の正解と重なる。<code>T_POINT</code> を 0.95 にしても誤りは 4 件残り、正解宣言は 27 → 7 件に落ちる。閾値では分けられない（要点の問い方の問題）ため、方式選定（21-6e）の材料として残す</li>
+  </ul>
+</div>
 
-<h3>10.3 返信の振る舞い（MVP スコープ）</h3>
-<ul>
-  <li><strong>返信する</strong>: 自アカウントのリールへのコメントと、そのスレッドへの返信（<code>parent_id</code> 付き。推理の続きであることが多い）。判定は判定モジュール（<a href="#judge-design">5.1.2</a>。組み合わせの 3 モードと返信文の 4 案を環境変数で切り替え = <a href="#judge-impl">実装</a>）に委ねる</li>
-  <li><strong>返信しない</strong>: 自分の返信（<code>from.id == ig_user_id</code>。無限ループ防止）/ プロンプトが <code>NO_REPLY</code> を返したコメント / スナップショットの無い <code>media_id</code>（本セット以外の投稿・出力失敗）</li>
-  <li><strong>作らないもの</strong>（アイデア詳細 7）: ユーザーごとの質問回数制限・コメント回数の DB 管理・禁止ワード DB・語の一覧によるルールベース判定（パターン 2 の段 0 は文字種だけを見る規則で、これに当たらない = 5.1.2）・会話状態管理・Lambda メモリキャッシュ・コメント処理からの Aurora アクセス・翌日の解答編リール。将来のゲーム化構想を理由に状態管理を先行実装しない（ステートレス方針）</li>
-  <li><strong>重複返信の抑止</strong>: Meta Webhook は同一イベントを再送しうるため、SQS FIFO の重複排除 ID に <code>comment_id</code> を使う（5 分窓）。窓外の再送で二重返信が起きる可能性は許容する（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a> の decision）</li>
-</ul>
-
-<h3>10.4 利用上限・費用</h3>
-<ul>
-  <li><strong>上限は 2 段</strong>（21-1 ⑤）: ① OpenAI 側のプロジェクト月額予算上限 ② Reply Lambda の予約同時実行数（初期値 2。SQS が吸収するため取りこぼしにならず、上限到達時は返信が遅れるだけ）</li>
-  <li><strong>試算の枠組み</strong>: 返信 1 件 = 入力 600 トークン前後（問題文・真相・確定事実シート・ルール・質問）+ 出力 30 トークン程度。月 6,000 件（1 日 200 コメント）で入力 3.6M・出力 0.2M トークン。事業戦略書 3.1 の費目「コメント自動返信の LLM API（従量のみ・月数百円規模）」の範囲。単価確認後に外れていれば 21-6 で戦略書を直す。AWS 側（Lambda・SQS・S3 GET 月 6,000 回・CloudWatch）は無料枠内〜数十円</li>
-  <li>モデルはプローブテスト後、本番稼働まで固定。差し替えは Secret ではなく Lambda の環境変数（<code>LUNA_MODEL</code>。21-6c2 で <code>OPENAI_MODEL</code> から改名。判定と書き手が共用）で行う</li>
-</ul>
-
-<h3>10.5 監視・運用</h3>
-<ul>
-  <li><strong>DLQ アラーム</strong>（<code>acps-prod-comment-reply-dlq-messages</code>。DLQ の可視メッセージ数 ≥ 1）が初期版の唯一の能動監視。通知が来たら DLQ のメッセージ本文（コメント id・media_id）と Reply Lambda のログで原因を見る（OpenAI 障害 / Graph API のトークン失効 / スナップショット欠落）。復旧後に DLQ → 元キューへ再駆動（SQS コンソールの「DLQ 再処理」）。手順は <a href="../../infra/operation.html#monitoring">infra/operation.html 4.1</a></li>
-  <li><strong>トークン</strong>: コメント返信用の長期トークン（Instagram ログイン方式）は 60 日で失効する。初期版は投稿用トークンと同じく手動更新とし、失効日は <code>token_expires_at</code> を Secret に持たせて <a href="../operation.html">運用設計 5.4</a> のリマインド運用に載せる。自動リフレッシュ（<code>GET /refresh_access_token</code>）の要否は開発計画の設計課題（2026-09-04）で追う</li>
-  <li><strong>ステージング面</strong>: PoC 資材（Meta アプリ + <code>test_tkghr</code> + 同一コードのステージング面スタック）を恒久利用し、プロンプト改訂・Lambda 改修は必ずステージング面で実コメントを打ってから本番の Webhook 先を切り替える</li>
-  <li><strong>コメント欄の目視</strong>: 稼働初期（2 週間）は毎日コメント欄を目視し、ネタバレ回答・矛盾回答・不適切な返信がないかを確認する。問題があればストックを <code>is_active=0</code> にし、プロンプト（5.1）を直してステージングで再検証する。週次補充スキル（21-8）にチェック項目として組み込む</li>
-  <li><strong>判定の食い違いと合意制の割れ</strong>（21-6c2）: Reply Lambda の WARNING ログ <code>JUDGE_SHADOW_MISMATCH</code>（見張り役の食い違い）・<code>JUDGE_CONSENSUS_SPLIT</code>（正解宣言の合意が割れた = 手動で正解を伝えるかの判断が要る）・<code>REPLY_WRITER_FALLBACK</code>（書き手の出力を捨てて定型文に落とした）・<code>REPLY_OVER_80</code> を固定マーカーにした。メトリクスフィルタとアラームの配線は 21-6f（<a href="#judge-impl">5.1.2 の実装</a>）</li>
-</ul>
-
-<h3 id="comment-log">10.6 コメント記録 JSON（21-6c2）</h3>
-<p>Reply Lambda は 1 コメントにつき 1 件、受信・判定・返信の全記録を S3 に書く（継続改善用。Aurora への取り込みは 21-7b）。キーは <code>comment-log/{set_code}/dt=YYYY-MM-DD/{comment_id}.json</code>（日付は Webhook 受信時刻の UTC 日付。バケットは環境変数 <code>COMMENT_LOG_BUCKET</code>、既定は問題スナップショットと同じバケット）。書き込みの失敗は WARNING だけにして返信を止めない。スナップショットの無いコメントも <code>errors</code> に <code>problem_not_found</code> を入れて記録する。処理が例外で終わった場合も、書ける範囲で記録してから再試行に回す（同じキーに上書き）。実装は <code>services/comment-reply/app/comment_log.py</code>、ローカル試行ツールは同じ組み立てでファイルに書く。</p>
-<table>
-  <thead><tr><th>キー</th><th>型・内容</th></tr></thead>
-  <tbody>
-    <tr><td><code>schema_version</code></td><td>整数 <code>1</code></td></tr>
-    <tr><td><code>comment_id</code>・<code>media_id</code>・<code>set_code</code>・<code>text</code></td><td>文字列。コメント ID・メディア ID・セット・コメント本文</td></tr>
-    <tr><td><code>parent_id</code></td><td>文字列または null（スレッドへの返信のとき）</td></tr>
-    <tr><td><code>commenter_id</code></td><td>文字列または null。コメント者のアプリスコープ ID（<code>from.id</code>）。<strong>username は持たない</strong></td></tr>
-    <tr><td><code>content_key</code>・<code>problem_schema_version</code></td><td>問題スナップショットの <code>content_key</code> と <code>schema_version</code>（見つからなければ null）</td></tr>
-    <tr><td><code>fact_sheet_hash</code></td><td>確定事実シートのバージョン。<code>content_key</code> + <code>fact_sheet</code> の SHA-256 先頭 12 桁</td></tr>
-    <tr><td><code>times</code></td><td><code>comment_created_at</code>（Webhook の <code>entry.time</code>、無ければ null）・<code>webhook_received_at</code>（Webhook Lambda が SQS メッセージに載せる）・<code>judged_at</code>・<code>replied_at</code>。UTC の ISO 8601（末尾 Z）</td></tr>
-    <tr><td><code>config</code></td><td><code>judge_mode</code>・<code>shadow</code>・<code>consensus</code>・<code>reply_variant</code>・<code>luna_model</code>・<code>prompt_version</code>（同梱プロンプトの SHA-256 先頭 12 桁。5.1.2 の決定）</td></tr>
-    <tr><td><code>judgements</code></td><td><code>luna</code> / <code>jev</code> それぞれ <code>{kind, answer, reason, bare_term, error, debug}</code> または null（呼ばなかった方式）。<code>debug</code> はモデル名・トークン数（推論トークン含む）・応答秒・Jev の確率。生の応答全文は入れない</td></tr>
-    <tr><td><code>shadow_mismatch</code></td><td>真偽値または null。両方の判定があるときの kind / answer の食い違い</td></tr>
-    <tr><td><code>final</code></td><td>返信に使った <code>kind</code>・<code>answer</code>・<code>decision</code>（<code>luna</code> / <code>jev</code> / <code>jev_fallback_luna</code> / <code>consensus_ok</code> / <code>consensus_split</code>）</td></tr>
-    <tr><td><code>reply</code></td><td><code>text</code>（送った本文〔200 字で切り詰めた後〕または null）・<code>source</code>（<code>template</code> / <code>llm</code> / <code>fallback_template</code> / <code>consensus_split</code> / <code>no_reply</code>）・<code>reply_id</code>（Graph API の返信 ID）・<code>over_80</code></td></tr>
-    <tr><td><code>errors</code></td><td>文字列の配列（Jev の失敗・書き手のフォールバック理由・処理の例外）</td></tr>
-  </tbody>
-</table>
-
-<h2>11. 失敗時ポリシー</h2>
-<ul>
-  <li><strong>投稿側</strong>は共通フローどおり（<a href="../batch-flow.html">batch-flow.html</a> 3.2 / <a href="../operation.html">operation.html</a> 4）。事前動画の取得失敗・ストック 0 件はフェイルラウド（縮退しない）。1 日 1 回のため 1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの判断は共通課題（課題体系 <a href="../../issues/index.html#I-019">I-019</a>）に従う</li>
-  <li><strong>スナップショット出力の失敗</strong>は投稿失敗にせず、NULL 行の確認クエリと手動再出力で回復する（10.2）</li>
-  <li><strong>コメント側</strong>: Reply Lambda の失敗は SQS の再試行（最大 3 回）→ DLQ → アラーム。返信が遅れる・付かないことはあっても<strong>投稿には影響しない</strong>。Webhook Lambda は署名検証に失敗した要求を 401 で拒否し、正常受信は SQS へ入れた時点で 200 を返す（Meta の再送を招かないため、enqueue 失敗以外は 200）</li>
-  <li><strong>OpenAI の長期障害</strong>: 予約同時実行数と SQS の保持期間（4 日）内なら復旧後に自動で返信が付く。それを超えた分は DLQ から手動で再駆動するか、古すぎれば破棄する（返信の鮮度を優先）</li>
-</ul>
-
-<h2>12. 共通フローからの差分・特記事項</h2>
-<p><strong>使用方式は <code>umigame-prebuilt</code></strong>（<a href="../generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>。Remotion ローカル事前ビルド + 実行時は取得のみ。ranking-prebuilt 同型で LRU 軸なし・単尺）。本セットは共通テーブルのうち <code>umigame_stock_items</code>（ストック）と <code>umigame_items</code>（投稿履歴 + スナップショット記録）を使う唯一のセットである（<a href="../data-model.html#detail-umigame-items">data-model.html 4.14 / 4.15</a>。V012）。</p>
-<ul>
-  <li><strong>共通骨格への変更は 2 点のみ</strong>: ① SNS 投稿バッチのキャプション展開に umigame 系プレースホルダを追加 ② publish 成功直後の問題スナップショット出力（<code>batch_sets.problem_snapshot_enabled</code> で有効化。V012 で追加）。いずれも 21-5b で実装</li>
-  <li><strong>外向き発信・イングレスを持つ初の機能</strong>: コメント自動返信は本システムで初めて外部からの要求（Meta Webhook）を受け、ユーザーに向けて自動で発信する。投稿時と完全分離した構成（10）と、ステージング面での必須検証（10.5）でリスクを閉じる。ステージング環境の一般論は課題体系 <a href="../../issues/index.html#I-027">I-027</a>（フル 2 面化はしない・本経路だけ例外）</li>
-  <li><strong>Remotion Skills 2.0 を標準ツーリングとして継続</strong>（21-2 人間ゲート）: <code>.agents/skills/remotion-*</code> 正本 + <code>.claude/skills/remotion-*</code> のスキル単位リンク（skills CLI 1.5.23・スキル版 4.0.520）。更新は <code>npx skills update</code>。既存 2 セットへの遡及適用は本フェーズの対象外</li>
-  <li><strong>ストーリーズ再掲</strong>は初期版では使わない（<code>stories_enabled=0</code>）。コメント欄への導線はリール本体が担うため</li>
-  <li><strong>効果検証</strong>: インサイト収集（<a href="../batch-flow.html#flow-insights">batch-flow.html 4</a>）は既存どおり Scheduler 2 件を 21-7 で追加。コメント系指標（<code>comments</code>）は既存の指標セットに含まれており、コメント率の確認は月次 KPI 転記（<a href="../operation.html">運用設計 6.3</a>）で行う</li>
-</ul>
+<div class="decision" id="d-20261003-restructure">
+  <span class="callout-title">2026-10-03 21-6d3b・ユーザー: 本書を仕様と経緯に分け、コメント返信を 10 章にまとめ、現行プロンプトを転記する</span>
+  <p>本文に決定コールアウト・試行番号・失効した記述が混ざり、コメント返信が 5.1 系と 10 章に分かれて読みにくかったため組み直した（仕様は変えていない）。プロンプトの転記は「同じ情報を 2 か所に書かない」の例外として承認された。旧節 → 新節の対応は<a href="../../plans/development-plan.html#step-21-6d3b">計画書 21-6d3b の作業記録</a>。</p>
+</div>
 
 </div>
 </body>

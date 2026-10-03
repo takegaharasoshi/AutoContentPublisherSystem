@@ -89,11 +89,11 @@ details.trend-block figure.diagram { margin: .25rem 0 .6rem; padding: .5rem; }
 
 <div class="note">
   <span class="callout-title">このページの位置づけ</span>
-  コメント返信の判定方式（パターン 1 = <code>gpt-6-luna</code> の一括方式 / パターン 2 = Jev の段階判定 + 定型文）の<strong>試行錯誤の記録</strong>。何を試して、どうなったかをここに積み、決まったことだけを<a href="umigame-soup-1.html#judge-design">セット別設計書 5.1.2</a>（判定モジュールの契約・方式の設計）へ移す。方式の選定は 21-6e。試走の資材とスクリプトは <code>content/umigame-stock/umigame-soup-1/judge-trial/</code>。
+  コメント返信の判定方式（パターン 1 = <code>gpt-6-luna</code> の一括方式 / パターン 2 = Jev の段階判定 + 定型文）の<strong>試行錯誤の記録</strong>。何を試して、どうなったかをここに積み、決まったことだけを<a href="umigame-soup-1.html#judge-design">セット別設計書 10.3</a>（判定モジュールの契約・方式の設計）へ移す。方式の選定は 21-6e。試走の資材とスクリプトは <code>content/umigame-stock/umigame-soup-1/judge-trial/</code>。
 </div>
 
 <h2 id="premise">1. 前提: 判定の正しさ（P1〜P7）</h2>
-<p>21-6a で承認した品質レベル（<a href="umigame-soup-1.html#quality-levels">セット別設計書 5.1.1</a>）のうち、どのレベルでも満たす前提条件。1 つでも割れたらリリース不可。最低ラインは「レベル 1（22 種を見分けて種別に合った返事をする）+ P1〜P7」、目標はレベル 2（探偵カメロックの一言を添える）。画面上部の「P1〜P7」ボタンでいつでも開ける。</p>
+<p>21-6a で承認した品質レベル（<a href="umigame-soup-1.html#quality-levels">セット別設計書 10.2</a>）のうち、どのレベルでも満たす前提条件。1 つでも割れたらリリース不可。最低ラインは「レベル 1（22 種を見分けて種別に合った返事をする）+ P1〜P7」、目標はレベル 2（探偵カメロックの一言を添える）。画面上部の「P1〜P7」ボタンでいつでも開ける。</p>
 <div class="table-wrap"><table><thead><tr><th>項目</th><th>合格ライン</th><th>何を見るか</th></tr></thead><tbody><tr><td class="kid">P1 真相の漏洩</td><td>0 件</td><td>正解宣言以外の返信に、真相の核心語が出ない</td></tr><tr><td class="kid">P2 誤った正解宣言</td><td>0 件</td><td>正解でない推理に「正解です！」と言わない</td></tr><tr><td class="kid">P3 はい / いいえの取り違え</td><td>全質問の 3% 以下、かつ 1 問あたり 2 件以下</td><td>「はい」が正しいのに「いいえ」（またはその逆）と答える</td></tr><tr><td class="kid">P4 いいえ / 関係ありません の揺れ</td><td>10% 以下</td><td>「いいえ」「関係ありません」「答えに関わりません」の間で取り違える</td></tr><tr><td class="kid">P5 正解宣言率</td><td>80% 以上</td><td>正解推理を「正解です！」と宣言できた割合</td></tr><tr><td class="kid">P6 不適切なコメントへの扱い</td><td>0 件 / 80% 以上 / 0 件 / 5% 以下</td><td>⑱〜㉑ に判定語や真相を返す / ⑱⑲ を定型文で返す / ⑳㉑ に返信する / 普通のコメントを不適切と誤判定</td></tr><tr><td class="kid">P7 返信の長さ</td><td>すべて 80 字以内</td><td>返信の字数</td></tr><tr><td class="kid">L1 レベル 1 の機械基準</td><td>全体 90% 以上・質問以外の各種別 80% 以上 / 50% 以下 / 80% 以上</td><td>種別の一致率 / 同じ種別で最も多い言い回しの割合 / 答えられない質問（②③）に誘導文を返した割合</td></tr></tbody></table></div>
 
 <h2 id="kinds">2. 前提: コメントの種別（22 種）</h2>
@@ -1755,7 +1755,7 @@ details.trend-block figure.diagram { margin: .25rem 0 .6rem; padding: .5rem; }
 <h2 id="summary">8. 判定品質の検討のまとめと方針（21-6b 完了・2026-09-28）</h2>
 <div class="decision">
   <span class="callout-title">暫定方針: パターン 1（luna）が主役。Jev は返信の判定には使わず「見張り役」と「真相を開示する前の二重確認」に使う（ユーザー。確定は 21-6e）</span>
-  判定品質の試行錯誤はここで区切る。返信文そのものの品質（同じ判定でも「はい」「はい、食べたことがあります。」「うん。食べたことがあるよ🐢」のどれで返すか）は、21-6b2 で別の検討ページを立てて試行錯誤する。設計書側の記載は<a href="umigame-soup-1.html#judge-policy">セット別設計書 5.1.2 の暫定方針</a>。
+  判定品質の試行錯誤はここで区切る。返信文そのものの品質（同じ判定でも「はい」「はい、食べたことがあります。」「うん。食べたことがあるよ🐢」のどれで返すか）は、21-6b2 で別の検討ページを立てて試行錯誤する。設計書側の記載は<a href="umigame-soup-1.html#judge-policy">セット別設計書 10.3.5</a>。
 </div>
 <h3>8.1 組み合わせ方の試算（試行 8b の結果を組み替えて計算。API は呼び直していない）</h3>
 <p>数字は「種別と、はい / いいえ の判定の両方が合っていた割合」（220 件）。</p>
