@@ -124,10 +124,10 @@
     },
     {
       "id": "U01-e18",
-      "text": "影は男の存在感のことじゃなくて、体の写真に写ったもの。病院に通ってたのかな？",
+      "text": "影ってレントゲンに写る影のことでしょ。男は医者に何か言われたんだ。",
       "kind": "guess_close",
       "answer": null,
-      "note": ""
+      "note": "2026-10-02 21-6d2 Claude 書き直し: 元の文は末尾が質問（病院に通ってたのかな？）で推理と質問のどちらとも読めたため、コア 1 だけを当てた ⑤ に改めた"
     },
     {
       "id": "U01-e19",
@@ -194,6 +194,169 @@
       "kind": "q_yesno",
       "answer": "yes",
       "note": "2026-09-27 ユーザー確認: ラベルどおりで問題なし"
+    },
+    {
+      "id": "U01-e28",
+      "text": "レントゲンの影が薄くなって病気は良くなったんだね。でも相手は治療してくれた医者じゃなくて、たまたま会った近所の人だったのか。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。レントゲンの影と回復は当てているが、相手が医者でないという部分が誤り。"
+    }
+  ],
+  "U12": [
+    {
+      "id": "U12-e01",
+      "text": "楽器を構えているのは実際の人間ですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e02",
+      "text": "男たちは自分の意思で音を出さないんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e03",
+      "text": "持っている楽器は本当に音が出るものですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
+    },
+    {
+      "id": "U12-e04",
+      "text": "階段は建物の中にあるんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e05",
+      "text": "見ている人たちは演奏を期待して集まってるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e06",
+      "text": "毎日見ているのは同じ人たちですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e07",
+      "text": "男たちは何かの仕事でそこに立っているんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e08",
+      "text": "音を出さないのは何か演出上の理由があるんでしょか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e09",
+      "text": "見てる人は男たちの演奏を聞いたことがあるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e10",
+      "text": "階段の色や材質も関係ありますか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e11",
+      "text": "男たちは本物の演奏者なの？それとも人形かなにか？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_kinds": [
+        "q_open"
+      ]
+    },
+    {
+      "id": "U12-e12",
+      "text": "見ている人は毎日そこに来るの？男たちと知り合いなの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e13",
+      "text": "音を一度も出したことがないのに、どうしてみんなうれしそうなんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e14",
+      "text": "この男たちは何をしている人たちなんでしょう？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e15",
+      "text": "誰が何を見て喜んでいるのか、もう少し知りたいです。",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e16",
+      "text": "男たちは五人囃子のひな人形だったってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。男たちがひな人形だと特定している。"
+    },
+    {
+      "id": "U12-e17",
+      "text": "段飾りに並ぶ五人囃子の人形だったんだね。人形だから音は出ないけど、家族は飾っている間うれしそうに眺めてたのか。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。ひな人形というコアを当てている。"
+    },
+    {
+      "id": "U12-e18",
+      "text": "男たちは人形なんでしょ。だから音を出さないんだ。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の「ひな祭りの段飾りの飾り」はほぼ ④ のため Claude が書き直し（人形までで ひな人形 と特定しない）"
+    },
+    {
+      "id": "U12-e19",
+      "text": "男たちは五人囃子のひな人形で、飾ると本当に笛や太鼓の音が鳴るから、みんな毎日見に来るんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。ひな人形は当てているが、音が鳴るという誤りがある。"
+    },
+    {
+      "id": "U12-e20",
+      "text": "演奏会の前に並んで写真を撮るのが恒例になってたんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U12-e21",
+      "text": "男たちは楽器を持った銅像で、観光客が見に来てるんだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
     }
   ],
   "U13": [
@@ -325,10 +488,10 @@
     },
     {
       "id": "U13-e19",
-      "text": "手紙は未来の誰かに宛てたもので、男はその子についてよく知っていたのかな。",
+      "text": "手紙を書いた男の子って、昔の男自身なんでしょ。",
       "kind": "guess_close",
       "answer": null,
-      "note": "2026-09-27 ユーザー確認（コア基準）: 「未来の自分宛てで長く保管された手紙」をコアの半分として扱うので惜しい"
+      "note": "2026-09-27 ユーザー確認（コア基準）: 「未来の自分宛てで長く保管された手紙」をコアの半分として扱うので惜しい / 2026-10-02 21-6d2 Claude 書き直し: 元の「未来の誰かに宛てた」は新しいコアのどちらにも当たらず ⑥ 相当のため、コア 1 だけを当てた ⑤ に改めた"
     },
     {
       "id": "U13-e20",
@@ -400,6 +563,314 @@
         "no",
         "irrelevant"
       ]
+    }
+  ],
+  "U14": [
+    {
+      "id": "U14-e01",
+      "text": "主人はパンを作るときに、その卵を材料として使ってるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e02",
+      "text": "ここでいう卵は鶏の卵ですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e03",
+      "text": "卵は店の中で飼っている鶏が産んだものですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e04",
+      "text": "卵を大切にしているのは、割れやすいからですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e05",
+      "text": "主人は卵をゆでたり割ったりしたことが一度もないんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e06",
+      "text": "パンの生地に卵を混ぜる工程はありますか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "irrelevant",
+        "no"
+      ]
+    },
+    {
+      "id": "U14-e07",
+      "text": "卵は商品名や店の名前に関係しているんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e08",
+      "text": "お客さんも卵のおかげだと知ってるんですか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e09",
+      "text": "卵はパン屋の主人が自分で買いに行くんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e10",
+      "text": "お店のオーブンは電気式ですか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e11",
+      "text": "卵は本物の食べ物なの？それとも卵の形をした何か？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_kinds": [
+        "q_open"
+      ]
+    },
+    {
+      "id": "U14-e12",
+      "text": "パンに卵を使ってるの？その卵を割るのは主人以外の人？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e13",
+      "text": "卵を使わずに、どうしてパンがおいしくなるんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e14",
+      "text": "主人が大切にしている卵って、何の卵なんでしょう？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e15",
+      "text": "どうやって卵がパンのおいしさにつながっているの？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e16",
+      "text": "卵ってパン職人の見習いだったってこと？その人が育ってパンを焼いてるから、おいしいのはこの卵のおかげなんだね。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。卵が見習いで、その見習いがパンを焼く点を当てている。"
+    },
+    {
+      "id": "U14-e17",
+      "text": "食べ物の卵じゃなくて、パン職人の見習いをそう呼んでたんだね。今はその人が焼いているから、主人が自慢するのも分かる。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。見習いと、その人がパンを焼く点を当てている。"
+    },
+    {
+      "id": "U14-e18",
+      "text": "卵はパン屋で修業中の人のことなんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。答えを漏らす独り言を削除"
+    },
+    {
+      "id": "U14-e19",
+      "text": "卵はパン職人の見習いで、その人が焼くパンがおいしいんだね。でも主人はパン作りを教えてなくて、その人が勝手に覚えたのか。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。見習いと、その人がパンを焼く点は当てているが、主人がパン作りを教えた真相と食い違う。"
+    },
+    {
+      "id": "U14-e20",
+      "text": "卵を産む鶏を店の奥で大事に飼っていて、その鶏の餌がパン生地に混ざってるんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U14-e21",
+      "text": "卵はパン屋の幸運のお守りで、主人がそう思い込んでるだけだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    }
+  ],
+  "U16": [
+    {
+      "id": "U16-e01",
+      "text": "男は本当に体が凍って動けなくなっているんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e02",
+      "text": "そこは外で、気温がかなり低い場所ですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e03",
+      "text": "男は生きていて、助けが来るのを待っているんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e04",
+      "text": "助けに来た女は男の知り合いですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e05",
+      "text": "女も男と同じ原因で動けなくなったんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e06",
+      "text": "二人は雪山にいるんでしょうか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e07",
+      "text": "男と女は氷の上に立っているんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e08",
+      "text": "誰かが二人を助けに来る可能性はまだありますか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e09",
+      "text": "男はけがをしていて動けないんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e10",
+      "text": "二人が凍りついたのは、寒さのせいなんでしょか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e11",
+      "text": "男は雪で遭難したの？女も同じ場所で遭難したの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e12",
+      "text": "女は助けに来た人なの？それとも男と一緒にいた人？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_kinds": [
+        "q_open"
+      ]
+    },
+    {
+      "id": "U16-e13",
+      "text": "助けに来た女まで動けなくなったのはなぜ？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e14",
+      "text": "二人はどこで、何をしている最中なんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e15",
+      "text": "誰が男を助けようとしていたんでしょうか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e16",
+      "text": "夫婦で子どもたちと氷鬼をしてたってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。2人が氷鬼をしていたと当てている。"
+    },
+    {
+      "id": "U16-e17",
+      "text": "夫婦で子どもたちと氷鬼をしてたんだね。男も女も鬼にタッチされて、その場で凍ってしまったのか。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。2人が氷鬼をしていたと当てている。"
+    },
+    {
+      "id": "U16-e18",
+      "text": "子どもたちと鬼ごっこをしてたんでしょ。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の文は氷鬼のルールをすべて説明し実質 ④ のため Claude が書き直し（鬼ごっこまで）"
+    },
+    {
+      "id": "U16-e19",
+      "text": "夫婦で子どもたちと氷鬼をしてたんだね。でも女は助けに来たふりで、実は鬼側に回って男を置き去りにしたのか。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。氷鬼は当てているが、女が助けに来ていた真相と食い違う。"
+    },
+    {
+      "id": "U16-e20",
+      "text": "二人とも吹雪で遭難して、助けを待ってるうちに凍えてしまったんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U16-e21",
+      "text": "男は氷の彫刻で、女も作品を見た瞬間に固まってしまったんだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
     }
   ],
   "U18": [
@@ -722,10 +1193,10 @@
     },
     {
       "id": "U20-e18",
-      "text": "男はその曲を毎日のように聞いて覚えていたから、ピアニストの演奏を間違いだと思ったのかな。",
+      "text": "男が覚えてた曲のほうが、どこか間違った弾き方だったんだね。",
       "kind": "guess_close",
       "answer": null,
-      "note": ""
+      "note": "2026-10-02 21-6d2 Claude 書き直し: 元の「毎日聞いて覚えていた」は fact_sheet の周辺事実だけでコアに触れないため、コアに半分触れた ⑤ に改めた"
     },
     {
       "id": "U20-e19",
@@ -810,6 +1281,636 @@
       "kind": "q_yesno",
       "answer": "irrelevant",
       "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    },
+    {
+      "id": "U20-e30",
+      "text": "男は娘の間違った弾き方を聞いて曲を覚えたんだね。でも演奏会で弾いていたのも、実はその娘だったのか。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。娘の間違った弾き方で覚えた点は当てているが、演奏者は娘ではなくピアニスト。"
+    }
+  ],
+  "U21": [
+    {
+      "id": "U21-e01",
+      "text": "男と弟は本当の兄弟ですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e02",
+      "text": "二人でスイカを育てる勝負をしていたんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e03",
+      "text": "庭のスイカは弟が育てたものですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e04",
+      "text": "スイカはもう食べられるくらい大きくなってましたか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e05",
+      "text": "「お前の勝ち」は、弟が勝ったという意味ですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e06",
+      "text": "男はスイカを見て、何か昔のことを思い出したんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e07",
+      "text": "実家では毎年スイカを育てているんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e08",
+      "text": "二人はスイカの大きさを競ってたんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e09",
+      "text": "男はスイカが実っていることを事前に知ってましたか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e10",
+      "text": "スイカの置かれた場所が勝負の結果に関係するんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。「置かれた」は不正確だが、実っていた場所が勝負の結果に関係する（fact_sheet）"
+    },
+    {
+      "id": "U21-e11",
+      "text": "二人で何かを育ててたの？弟のスイカのほうが大きかったの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e12",
+      "text": "スイカは自然に生えたの？それとも弟が種をまいたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_kinds": [
+        "q_open"
+      ]
+    },
+    {
+      "id": "U21-e13",
+      "text": "男は何を見て弟の勝ちだとわかったんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e14",
+      "text": "二人はどんな勝負をしていたんでしょう？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e15",
+      "text": "弟は何に勝ったんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e16",
+      "text": "去年の種飛ばしで、弟が飛ばした種からスイカが育ったってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。種飛ばしの勝負と、弟の種から育った点を当てている。"
+    },
+    {
+      "id": "U21-e17",
+      "text": "兄弟で去年スイカの種飛ばしをして、弟の種から今年の実がなったんだね。だから弟の飛距離が本当だったと分かったのか。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。種飛ばしの勝負と、弟の種から育った点を当てている。"
+    },
+    {
+      "id": "U21-e18",
+      "text": "兄弟でスイカの種飛ばし勝負をしてたんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。答えを漏らす独り言を削除"
+    },
+    {
+      "id": "U21-e19",
+      "text": "兄弟で種飛ばしをして、弟の種からスイカが育ったんだね。でも弟は勝負では負けていて、兄が勝ちを譲ったのか。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。種飛ばしと弟の種から育った点は当てているが、勝敗が逆。"
+    },
+    {
+      "id": "U21-e20",
+      "text": "兄弟でどっちが先にスイカを実らせるか競争してて、弟の勝ちだったんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U21-e21",
+      "text": "弟が植えたスイカだけが鳥に食べられず残ってたから、弟の勝ちってことだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    }
+  ],
+  "U22": [
+    {
+      "id": "U22-e01",
+      "text": "男は半年ごとに定期検診を受けてるんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e02",
+      "text": "歯医者に通うのは、歯の治療が目的じゃないんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。否定疑問。真相は「治療が目的ではない」= はい"
+    },
+    {
+      "id": "U22-e03",
+      "text": "その歯医者は男の昔からのかかりつけですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e04",
+      "text": "男は診察のあと誰かが来るのを待っているんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e05",
+      "text": "同じ席に座ることに意味があるんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e06",
+      "text": "男は毎回、歯医者の人と話をして帰るんですか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e07",
+      "text": "その町に家族や友人が住んでいますか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "irrelevant",
+        "no"
+      ]
+    },
+    {
+      "id": "U22-e08",
+      "text": "歯医者に行くのは電車じゃないといけない理由があるんですか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "irrelevant",
+        "no"
+      ]
+    },
+    {
+      "id": "U22-e09",
+      "text": "待合室にいる時間のほうが診察より長いんですか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e10",
+      "text": "その歯医者の建物は木造ですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e11",
+      "text": "男は歯の検診に来てるの？診察後は誰かを待ってるの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e12",
+      "text": "同じ席に座るのは昔から？その席に何か思い出があるの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e13",
+      "text": "男はどうして遠くの歯医者に通ってるんでしょう？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e14",
+      "text": "診察が終わったあと、待合室で誰を待っているんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e15",
+      "text": "その町や歯医者と男にはどんな関係があるんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e16",
+      "text": "歯医者は男が子どものころ住んでた家だったってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。歯医者が男の生家だと当てている。"
+    },
+    {
+      "id": "U22-e17",
+      "text": "歯医者になっていたのは男が育った家なんだね。懐かしい家の中に入るために、検診のたび待合室に残ってたのか。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。歯医者が男の生家だと当てている。"
+    },
+    {
+      "id": "U22-e18",
+      "text": "その歯医者の建物って、男が昔なにか関わってた場所なんでしょ。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の「待合室に子どものころの思い出」は fact_sheet の周辺事実だけで ⑥ 相当のため Claude が書き直し"
+    },
+    {
+      "id": "U22-e19",
+      "text": "歯医者は男が育った家で、待合室の柱の傷も残ってたんだね。あの背丈の傷は父親じゃなくて、歯医者を開いた人が刻んだのか。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。歯医者が生家という点は当てているが、傷を刻んだのは父親なので誤り。"
+    },
+    {
+      "id": "U22-e20",
+      "text": "昔から通ってる先生に会いたくて、診察を口実に半年ごとに訪ねてるんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U22-e21",
+      "text": "待合室の席に忘れ物をしていて、診察のたびに探してるんだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    }
+  ],
+  "U24": [
+    {
+      "id": "U24-e01",
+      "text": "男は毎朝同じ通学路を走ってるんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e02",
+      "text": "小学生たちは男を見てから走り出したんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e03",
+      "text": "この日は学校の始業時刻がいつもより早かったんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e04",
+      "text": "子どもたちは男を追い抜こうとして走ってるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e05",
+      "text": "男は子どもたちに何か声をかけましたか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e06",
+      "text": "小学生たちは全員、同じ学校に通ってるんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "yes",
+        "irrelevant"
+      ]
+    },
+    {
+      "id": "U24-e07",
+      "text": "子どもたちは走るのを楽しんでいるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e08",
+      "text": "男が早く出たのは、いつもと違う出来事があったからですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e09",
+      "text": "通学路沿いの家は、どれも同じ地区にあるんですか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "irrelevant",
+        "yes"
+      ]
+    },
+    {
+      "id": "U24-e10",
+      "text": "小学生はランドセルを背負ってたんでしょか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e11",
+      "text": "男は子どもたちの先生なの？走って学校に向かわせたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e12",
+      "text": "子どもたちは男を見つけて走り出したの？男を追いかけてたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e13",
+      "text": "子どもたちはどうして急に走り出したんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e14",
+      "text": "男は通学路で何をしている人なんでしょう？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e15",
+      "text": "誰が誰を追い抜いたのか、状況をもう少し知りたいです。",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e16",
+      "text": "子どもたちは毎日、男が走ってくるのを合図に家を出てたってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。子どもたちが男を毎日の出発の合図にしていたと当てている。"
+    },
+    {
+      "id": "U24-e17",
+      "text": "子どもたちは毎朝、走ってくる男を学校へ出る合図にしてたんだね。いつもより早く通ったから、勘違いして先に走り出したのか。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。子どもたちが男を毎日の出発の合図にしていたと当てている。"
+    },
+    {
+      "id": "U24-e18",
+      "text": "男がいつも通る時間と、子どもたちが家を出る時間に何か関係があるんでしょ。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の「走る姿で時刻の見当」はコアの言い換えで実質 ④ のため Claude が書き直し"
+    },
+    {
+      "id": "U24-e19",
+      "text": "子どもたちは毎日男を合図に家を出てたけど、その日は男がいつもより遅く走ってきたから、遅刻しそうだと勘違いして急いだんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。男を合図にしていた点は当てているが、その日は早く走ったので時刻の説明が誤り。"
+    },
+    {
+      "id": "U24-e20",
+      "text": "男がいつもより早く走り始めたから、子どもたちも競争だと思って走ったんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U24-e21",
+      "text": "男は学校の先生で、子どもたちを走らせる朝の運動をしてたんだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    }
+  ],
+  "U25": [
+    {
+      "id": "U25-e01",
+      "text": "中学時代に二人で何か賭けをしてたんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e02",
+      "text": "「勝った」は、昔した勝負の結果について言ってるんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e03",
+      "text": "友人は毎年ずっと年賀状を送り続けていたんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e04",
+      "text": "二人は中学の同級生ですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e05",
+      "text": "年賀状に勝負の答えが書かれていたんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。年賀状に「参りました」= 勝負の結果が書かれていた"
+    },
+    {
+      "id": "U25-e06",
+      "text": "男は友人がまだ生きているか気にしていたんですか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "irrelevant",
+        "no"
+      ]
+    },
+    {
+      "id": "U25-e07",
+      "text": "二人とも元日に年賀状を受け取ったんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "yes",
+        "irrelevant"
+      ]
+    },
+    {
+      "id": "U25-e08",
+      "text": "友人は男と同じくらいの年齢ですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e09",
+      "text": "男の家族は二人の約束を知っていたんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e10",
+      "text": "勝ったのは、年賀状が先に届いたからなんでしょか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e11",
+      "text": "二人は中学のころに勝負したの？その勝負の決着がついたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e12",
+      "text": "年賀状は何十年も送り合ってたの？今年だけ特別な内容だったの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e13",
+      "text": "男は何の勝負に勝ったんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e14",
+      "text": "年賀状には何が書いてあったんでしょう？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e15",
+      "text": "二人は中学を卒業するとき、どんな約束をしたんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e16",
+      "text": "2人は年賀状で将棋を一手ずつ指し続けてたってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。年賀状で将棋を一手ずつ続けていたと当てている。"
+    },
+    {
+      "id": "U25-e17",
+      "text": "会えないまま、2人は年賀状で将棋を一手ずつ続けてたんだね。55年越しに相手が「参りました」と送ってきたのか。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。年賀状で将棋を一手ずつ続けていたと当てている。"
+    },
+    {
+      "id": "U25-e18",
+      "text": "2人は年賀状で何かの勝負をずっと続けてたんでしょ。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の文は周辺（年賀状のやりとり）だけで答えを漏らす独り言付きのため Claude が書き直し"
+    },
+    {
+      "id": "U25-e19",
+      "text": "年賀状で将棋を一手ずつ続けてたけど、2人は毎年会って、その場で次の手を決めてたんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。年賀状将棋は当てているが、卒業後に一度も会っていない真相と食い違う。"
+    },
+    {
+      "id": "U25-e20",
+      "text": "中学の時にどっちが先に結婚するか賭けていて、友人が独身だとわかったから勝ちを喜んだんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U25-e21",
+      "text": "友人が年賀状で宝くじが当たったと知らせてきて、昔の賭けに勝ったんだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。元の「年賀状を出し続けたほうが勝ち」は年賀状で勝負に半分触れ ⑥ として紛らわしいため Claude が差し替え"
     }
   ],
   "U26": [
@@ -941,10 +2042,10 @@
     },
     {
       "id": "U26-e19",
-      "text": "女が日本語を話せるようになって、義母の本音が直接伝わるようになったのかな。",
+      "text": "誰かが2人の言葉をわざと良い言葉に変えて伝えてたんでしょ。",
       "kind": "guess_close",
       "answer": null,
-      "note": ""
+      "note": "2026-10-02 21-6d2 Claude 書き直し: 元の「本音が直接伝わるようになった」は問題文の言い換えに近いため、通訳の作り替えに触れ「息子」を言い当てていない ⑤ に改めた"
     },
     {
       "id": "U26-e20",
@@ -993,6 +2094,328 @@
       "kind": "q_yesno",
       "answer": "no",
       "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+    }
+  ],
+  "U27": [
+    {
+      "id": "U27-e01",
+      "text": "男は本物の車を公道で運転しているんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e02",
+      "text": "妻や子どもたちの誰かが運転席にいるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e03",
+      "text": "車は自動運転の車ですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e04",
+      "text": "男は運転免許を持っていないだけで、運転の経験はあるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
+    },
+    {
+      "id": "U27-e05",
+      "text": "家族は車の中で移動そのものを楽しんでるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e06",
+      "text": "この車は遊園地などの施設の中を走るものですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e07",
+      "text": "男は車の外から車を動かしてるんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。元の「男が運転しているように見えるだけ？」ははい / いいえ のどちらとも取れるため Claude が書き直し"
+    },
+    {
+      "id": "U27-e08",
+      "text": "家族は長い距離を何時間もかけて移動するんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
+    },
+    {
+      "id": "U27-e09",
+      "text": "乗っているのはガソリンで走る車ですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e10",
+      "text": "男は自分でハンドルを操作してるんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e11",
+      "text": "車は実際に道路を走ってるの？男以外の誰かが運転してるの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e12",
+      "text": "これは遊園地の乗り物なの？家族は運転ごっこをしてるの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e13",
+      "text": "免許がない男は、どうやって車を走らせているんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e14",
+      "text": "妻と子どもたちは誰の運転で移動しているんでしょう？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e15",
+      "text": "「長い道のり」とは、どこからどこまでのことですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e16",
+      "text": "人生ゲームの車の駒を動かしてたってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。人生ゲームの車の駒を動かしていたと当てている。"
+    },
+    {
+      "id": "U27-e17",
+      "text": "家族で人生ゲームをしていて、男が車の駒を盤の道に沿って進めてたんだね。免許がなくてもできるわけだ。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。人生ゲームの車の駒を動かしていたと当てている。"
+    },
+    {
+      "id": "U27-e18",
+      "text": "家族で何かのすごろくをしていて、車の駒を長い道に沿って進めてるんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。すごろくの車の駒は当てているが、人生ゲームとは特定していない。"
+    },
+    {
+      "id": "U27-e19",
+      "text": "人生ゲームの車の駒を進めてるんだね。楽しんでるのは男だけで、妻と子どもは嫌々付き合わされてるのか。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。人生ゲームの車の駒は当てているが、家族も楽しんでいた真相と食い違う。"
+    },
+    {
+      "id": "U27-e20",
+      "text": "妻が運転していて、男は助手席から道案内をしてるだけなんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U27-e21",
+      "text": "車型の遊園地の乗り物に家族で乗って、男が運転手役をしてるんだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    }
+  ],
+  "U28": [
+    {
+      "id": "U28-e01",
+      "text": "男は以前にもウミガメのスープを飲んだことがありますか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。「ウミガメのスープ」と呼ばれたものは飲んだが本物は初めて。はい / いいえ どちらも可",
+      "accept_answers": [
+        "no",
+        "yes"
+      ]
+    },
+    {
+      "id": "U28-e02",
+      "text": "男が泣いたのは、スープの味に覚えがあったからですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e03",
+      "text": "男は昔、遭難した経験があるんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e04",
+      "text": "本物だと聞いたことで、男の過去の記憶がよみがえったんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e05",
+      "text": "スープを飲む前から、男は本物かどうか疑っていたんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
+    },
+    {
+      "id": "U28-e06",
+      "text": "そのレストランは海辺にありますか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e07",
+      "text": "シェフは男のことを知っていたんですか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
+    },
+    {
+      "id": "U28-e08",
+      "text": "男はスープを飲んで、何か別のものを思い出したんですか？",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e09",
+      "text": "スープを出したのは、その店のシェフ本人ですか？",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e10",
+      "text": "男は昔、ウミガメを飼っていたんでしょか？",
+      "kind": "q_yesno",
+      "answer": "no",
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
+    },
+    {
+      "id": "U28-e11",
+      "text": "男は過去にウミガメを食べたことがあるの？その時の出来事を思い出したの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e12",
+      "text": "スープの味が記憶と違ったの？本物だと聞いて何かに気づいたの？",
+      "kind": "q_multi",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e13",
+      "text": "男はなぜ本物のウミガメかどうか確かめたんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e14",
+      "text": "スープを飲んだとき、男は何を思い出したんでしょう？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e15",
+      "text": "男が泣き崩れるまでに、どんな過去があったんですか？",
+      "kind": "q_open",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+    },
+    {
+      "id": "U28-e16",
+      "text": "昔ウミガメのスープだと言われて飲んだものが、仲間の肉だったってこと？",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。昔ウミガメのスープと言われたものと、その正体の両方を当てている。"
+    },
+    {
+      "id": "U28-e17",
+      "text": "昔、仲間の肉をウミガメのスープだと言われて飲んだんだね。本物の味が違って、あの時の嘘に気づいたのか。",
+      "kind": "guess_correct",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。昔ウミガメのスープと言われたものと、その正体の両方を当てている。"
+    },
+    {
+      "id": "U28-e18",
+      "text": "漂流していたとき、仲間からウミガメのスープだと言われて飲んだことがあったんだね。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。昔ウミガメのスープと言われた点は当てているが、仲間の肉だった点が抜けている。"
+    },
+    {
+      "id": "U28-e19",
+      "text": "仲間の肉をウミガメのスープだと言われて飲んだんだね。でもそのとき仲間はみんな助かって、あとで一緒に帰れたのか。",
+      "kind": "guess_close",
+      "answer": null,
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。昔ウミガメのスープと言われたものと仲間の肉は当てているが、仲間は亡くなっており誤り。"
+    },
+    {
+      "id": "U28-e20",
+      "text": "男はウミガメが大好きで、食べてしまったことが悲しくて泣いたんでしょ。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。元の「遭難したときのスープを思い出した」はコア 1 に触れ ⑥ でないため Claude が差し替え"
+    },
+    {
+      "id": "U28-e21",
+      "text": "子どものころに飼っていたカメがこのスープに使われたと思い込んで、悲しくなったんだと思う。",
+      "kind": "guess_wrong",
+      "answer": null,
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
     }
   ]
 }
