@@ -66,6 +66,21 @@ def _kind(kind: str | None) -> str:
     return KIND_LABEL.get(kind, str(kind) if kind else "—")
 
 
+_CODE_RE = re.compile(r"\b[a-z][a-z_]*\b")
+
+
+def _ja_note(note: str) -> str:
+    """NG の注記に含まれる種別・答えの内部コードを日本語にする。"""
+    def label(match: re.Match[str]) -> str:
+        code = match.group(0)
+        if code in KIND_LABEL:
+            return KIND_LABEL[code]
+        if code == "unknown":
+            return "判断できない"
+        return ANSWER_LABEL.get(code, code)
+    return _CODE_RE.sub(label, note)
+
+
 def _answer(answer: str | None) -> str:
     return ANSWER_LABEL.get(answer, str(answer) if answer else "—")
 
@@ -98,7 +113,7 @@ def _ng_details(pattern_id: str, item: dict[str, Any],
         return ""
     links = "".join(
         f'<li><a class="ng-link" href="{_h(page_of(pattern_id, e["id"]))}#{_h(_row_anchor(pattern_id, e["id"]))}">{_h(e["id"])}</a>'
-        + (f' <span class="ng-note">{_h(e["note"])}</span>' if e.get("note") else "") + "</li>"
+        + (f' <span class="ng-note">{_h(_ja_note(str(e["note"])))}</span>' if e.get("note") else "") + "</li>"
         for e in entries)
     return (f'<details class="ng-ids"><summary>NG {len(entries)} 件</summary>'
             f"<ul>{links}</ul></details>")
