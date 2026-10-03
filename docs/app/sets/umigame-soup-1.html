@@ -347,7 +347,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>API 呼び出し</td><td>1 回（推論が長いと最大 20 秒前後）</td><td>0〜6 回</td></tr>
 <tr><td>処理時間の中央値（21-6d3・書き手込み）</td><td>6〜7 秒</td><td>0.8 秒（定型文 <code>2b</code>）</td></tr>
 <tr><td>強み</td><td>種別・判定の精度が安定して高い</td><td>分岐を自前で制御できる</td></tr>
-<tr><td>弱み</td><td>生成 AI の品質に直結する</td><td>惜しい推理を正解と誤判定しやすい（P2）</td></tr>
+<tr><td>弱み</td><td>生成 AI の品質に直結する</td><td>惜しい推理を正解と誤判定しやすい（P2。誤りを含む推理の確認が未実装 = <a href="#pattern2">10.3.4</a>）</td></tr>
 <tr><td>コード</td><td><code>app/judge/luna.py</code></td><td><code>app/judge/jev.py</code></td></tr>
 </table>
 </div>
@@ -425,7 +425,8 @@ nav.toc ul { margin: .3rem 0 0; }
     <div class="exits"><span class="exit">≥ <code>T_RECHECK</code> → ①</span><span class="exit">未満 → ③ で確定</span></div></div>
   <div class="flow-arrow">↓ ① ／ 推理</div>
   <div class="flow-step emph"><div class="t">段 B 正解判定（noul × コアの要点）</div><div class="d">要点ごとに「言い換えも含めて同じ内容を述べているか」</div>
-    <div class="exits"><span class="exit">全要点 ≥ <code>T_POINT</code> → ④（質問の形でも）</span><span class="exit">推理でどれか ≥ <code>T_CLOSE</code> → ⑤</span><span class="exit">推理でなし → ⑥</span></div></div>
+    <div class="exits"><span class="exit">全要点 ≥ <code>T_POINT</code> → ④（質問の形でも）</span><span class="exit">推理でどれか ≥ <code>T_CLOSE</code> → ⑤</span><span class="exit">推理でなし → ⑥</span></div>
+    <div class="d"><strong>未実装</strong>: 「コアは合っているが明らかな誤りを含む → ⑤」の確認はない（21-6d3c で追加予定）</div></div>
   <div class="flow-arrow">↓ ① で ④ でない</div>
   <div class="flow-step q"><div class="t">段 C 質問の品質（noul）</div><div class="d">問題の状況に当てはめて、はい / いいえで一意に答えられるか</div>
     <div class="exits"><span class="exit">&lt; <code>T_QUALITY</code> → ③</span></div></div>
@@ -451,6 +452,8 @@ nav.toc ul { margin: .3rem 0 0; }
 <ul>
   <li><strong>段 0 の位置づけ</strong>: 禁止ワード DB ではなく<strong>文字種だけを見る最小の規則</strong>で、語の一覧でモデレーションしない方針（<a href="#reply-behavior">10.7.3</a>）には当たらない。1 語だけの英字の羅列は荒らしのことがあるので段 A1 に任せる</li>
   <li><strong>段の意図</strong>: A1 で語だけを大分類「質問・推理」に限るのは、一語の感想・挨拶を ③ にしないため。段 D の安全側は、P3 の取り違えを P4 の揺れへ逃がすため</li>
+  <li><strong>未実装の判定（21-6d3c で追加予定）</strong>: 10.2 の「コアは合っているが明らかな誤りを含む推理 → ⑤」を確かめる段がない。段 B は要点ごとに「同じ内容を述べているか」しか聞かないため、誤りを含む推理でも要点の確率が高く出て ④ になる。21-6d3 の全件プローブでは、正解ラベル ⑤ の 28 件のうち 12 件を ④ にした（= P2 の 12 件。うち 11 件がこの型）。パターン 1 はプロンプトの文章でこの条件を判定している</li>
+  <li><strong>追加する確認（予定）</strong>: 段 B で ④ の候補になったときだけ、「推理に、真相・確定事実と矛盾する内容が含まれるか」を noul で聞き、閾値以上なら ⑤ に落とす（<a href="../../plans/development-plan.html#step-21-6d3c">計画書 21-6d3c</a>）</li>
   <li><strong>失敗</strong>: 429・5xx は指数バックオフで 3 回再試行し、それでも失敗したら例外にする（扱いは <a href="#judge-policy">10.3.5</a>）</li>
   <li><strong>閾値</strong>は 21-6d3 の全件プローブで掃引し、すべて据え置いた（<a href="#d-20261003-thresholds">付録</a>）。各段・閾値を決めた試行の経緯は<a href="umigame-soup-1-judge-study.html#p2">検討ページ 6</a></li>
 </ul>
