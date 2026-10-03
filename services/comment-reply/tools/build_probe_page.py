@@ -30,6 +30,17 @@ KIND_NAMES = (
     "⑳ 宣伝・スパム", "㉑ 個人情報", "㉒ 外国語",
 )
 KIND_LABEL = dict(zip(KINDS, KIND_NAMES))
+# 答え・判定経路の内部コードを、一覧表では日本語で出す（生データ JSON はコードのまま）
+ANSWER_LABEL = {
+    "yes": "はい", "no": "いいえ", "irrelevant": "関係ない",
+    "unknown": "判断できない（答えに関わらない）",
+}
+DECISION_LABEL = {
+    "luna": "luna の判定", "jev": "Jev の判定",
+    "jev_fallback_luna": "Jev 失敗のため luna の判定",
+    "consensus_ok": "正解宣言（luna・Jev とも正解）",
+    "consensus_split": "正解宣言を保留（luna だけ正解）",
+}
 SECTIONS = (
     ("前提条件 P1〜P7", (
         ("P1", "P1 漏れ候補"), ("P2", "P2 誤った正解宣言"),
@@ -53,6 +64,14 @@ def _h(value: Any) -> str:
 
 def _kind(kind: str | None) -> str:
     return KIND_LABEL.get(kind, str(kind) if kind else "—")
+
+
+def _answer(answer: str | None) -> str:
+    return ANSWER_LABEL.get(answer, str(answer) if answer else "—")
+
+
+def _decision(decision: str | None) -> str:
+    return DECISION_LABEL.get(decision, str(decision) if decision else "—")
 
 
 def _badge(passed: bool | None) -> str:
@@ -327,11 +346,11 @@ def _case_table(pattern: dict[str, Any], no: str, cases: list[dict[str, Any]],
             mismatch += " 見張り" if mismatch else "見張り"
         expected = _kind(case["expected_kind"])
         if case.get("expected_answer"):
-            expected += " / " + case["expected_answer"]
+            expected += " / " + _answer(case["expected_answer"])
         actual = _kind(final.get("kind"))
         if final.get("answer"):
-            actual += " / " + final["answer"]
-        actual += " / " + (final.get("decision") or "—")
+            actual += " / " + _answer(final["answer"])
+        actual += " / " + _decision(final.get("decision"))
         duration = row["timing"].get("total_s")
         seconds = f"{duration:.2f}" if duration is not None else "—"
         parts = row["timing"]
@@ -557,7 +576,10 @@ def _problem_page(results: dict[str, Any], metrics: dict[str, Any],
         f'共通 {counts["common"]}）</span></div>',
         f'<nav class="problem-nav">{" ｜ ".join(neighbors)}</nav>',
         '<div class="note"><p><strong>問題文</strong>: ' + _h(problem["problem_text"]) + '</p>'
-        '<p>合否と評価はサマリーページにある。共通ケースは問題に順番に割り振っている。</p></div>',
+        '<p>合否と評価はサマリーページにある。共通ケースは問題に順番に割り振っている。</p>'
+        '<p>「判定内容」は 種別 / 答え / どの判定を採用したか の順。答えの「判断できない」は、'
+        '真相と確定事実のどちらからも はい / いいえ / 関係ない を決められなかったもの'
+        '（Jev は確信度が足りないとき）で、返信は「それは答えに関わらないんだ。」になる。</p></div>',
         '<nav aria-label="目次"><strong>目次</strong><ul>'])
     parts.extend(f'<li><a href="#pattern-{_h(p["id"])}">{_h(p["label"])}</a></li>'
                  for p in patterns)
