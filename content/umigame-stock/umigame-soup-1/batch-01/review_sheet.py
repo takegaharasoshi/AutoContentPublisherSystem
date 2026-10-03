@@ -91,6 +91,7 @@ h3{font-size:15px;margin:22px 0 8px;color:var(--accent)}
 .chat li.yes .say{background:var(--warn-bg);border-color:var(--warn);font-weight:700}
 .chat li.gap{margin-top:12px}
 details.spoiler{border-color:var(--bad)}
+details.judge li .len{display:inline;margin-left:.5em}
 """
 
 # 端末内で完結する軽い操作（確認済みチェック。localStorage は失敗しても無視する）
@@ -241,8 +242,8 @@ def write_review() -> None:
         "<button type='button' class='g f' data-all='close'>すべて閉じる</button></div>",
         "</header>",
         "<main>",
-        "<p class='note'>各問は折りたたみ。素材 14 項目（版面の文言・プレイ例・セリフ・ナレーション・キャプション・イラストプロンプト・出典メモ）"
-        "を確認した後、真相・確定事実シートを参照できます。各問の「確認済み」はこの端末のブラウザに保存されます。</p>",
+        "<p class='note'>各問は折りたたみ。素材 16 項目（版面の文言・プレイ例・セリフ・ナレーション・キャプション・イラストプロンプト・出典メモ）"
+        "を確認した後、真相・確定事実シート・判定用の項目（コアの要点・開示文）を参照できます。各問の「確認済み」はこの端末のブラウザに保存されます。</p>",
         handover_html(),
     ]
 
@@ -278,6 +279,16 @@ def write_review() -> None:
         out.append("<details class='facts spoiler'><summary>確定事実シート（{}）</summary><ul>".format(len(it["fact_sheet"])))
         out += [f"<li>{html.escape(f)}</li>" for f in it["fact_sheet"]]
         out.append("</ul></details>")
+        out.append(
+            "<details class='judge spoiler'><summary>判定用の項目（コアの要点 {} 個・開示文）</summary>"
+            "<div class='fld'><span class='k'>コアの要点 core_points（1〜3 個・1 個 20 字以内）</span><ul>".format(
+                len(it["core_points"])
+            )
+        )
+        out += [f"<li>{html.escape(p)}<span class='len'>{len(p)} 字</span></li>" for p in it["core_points"]]
+        out.append("</ul></div>")
+        out.append(_field("正解時の開示文 reveal_text（70 字以内）", it["reveal_text"]))
+        out.append("</details>")
         out.append(f"<label class='done'><input type='checkbox' data-done='{no}'> {no} は確認済み</label>")
         out.append("<p class='top'><a href='#index'>目次へ戻る</a></p>")
         out.append("</div></details>")
