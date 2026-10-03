@@ -5,7 +5,7 @@
 - 先頭で batch_sets 行（``is_active = 0``）を既存でなければ作る（21-4b）。稼働化（``is_active = 1``）・
   ``problem_snapshot_enabled`` / ``stories_enabled`` の有効化は 21-7 の人間ゲートで行い、本 SQL では触らない。
 - INSERT は ``stock_items.POST_ORDER`` の順に並べる（id の順 = 投稿順。2026-09-26 の素材の全数レビューで決定）。
-- 既存行向けに core_points / reveal_text の UPDATE SQL も生成する。
+- 既存行向けに core_points / reveal_text / title / truth / caption の UPDATE SQL も生成する（後ろ 3 つは 21-6d3e で追加）。
 - ``--dry-run`` はローカル MySQL（docker の acps-mysql）でトランザクション内に流し、件数と content_key の
   重複を確認して ROLLBACK する。セットに既存ストック行があれば UPDATE、なければ INSERT を試す。
 
@@ -96,9 +96,12 @@ def build_sql() -> str:
 
 
 def build_update_sql() -> str:
-    """既存 14 問へ core_points / reveal_text を設定する UPDATE 文を組み立てる。"""
+    """既存 14 問へ判定要点と公開前提の文（core_points / reveal_text / title / truth / caption）を設定する UPDATE 文を組み立てる。
+
+    title / truth / caption は 21-6d3e（truth を翌日リールのキャプションで公開する方針）で足した。
+    """
     lines = [
-        "-- batch-01 既存ストックの判定要点更新（V013 適用後に実行）",
+        "-- batch-01 既存ストックの判定要点・公開前提の文の更新（V013 適用後に実行。title / truth / caption は 21-6d3e で追加）",
         "-- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）",
         "-- 適用先: ローカル MySQL / Aurora（acps）。content_key で対象を特定する。",
         "",
@@ -109,7 +112,10 @@ def build_update_sql() -> str:
             "UPDATE umigame_stock_items s",
             "JOIN batch_sets b ON b.id = s.set_id",
             f"SET s.core_points = '{jsonlit(it['core_points'])}',",
-            f"    s.reveal_text = '{esc(it['reveal_text'])}'",
+            f"    s.reveal_text = '{esc(it['reveal_text'])}',",
+            f"    s.title = '{esc(it['title'])}',",
+            f"    s.truth = '{esc(it['truth'])}',",
+            f"    s.caption = '{esc(it['caption'])}'",
             f"WHERE b.set_code = '{SET_CODE}' AND s.content_key = '{esc(it['content_key'])}';",
             "",
         ]

@@ -119,7 +119,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <table>
 <tr><th>#</th><th>項目（カラム / JSON キー）</th><th>用途</th><th>制約（<code>validate.py</code> で検査）</th></tr>
 <tr><td>1</td><td><code>problem_text</code> 問題文</td><td>版面の問題カード（全文を常時表示。段階表示はしない）</td><td>78〜85 字。ナレーション実測長で最終判定（#7）</td></tr>
-<tr><td>2</td><td><code>truth</code> 真相</td><td>AI 出題者の判定根拠・正解宣言時の開示文（版面には出さない）</td><td>必須。問題文と矛盾しない</td></tr>
+<tr><td>2</td><td><code>truth</code> 真相</td><td>AI 出題者の判定根拠。<strong>翌日のリールのキャプション末尾で全文を公開する</strong>（前回の真相ブロック。差し込みは 21-6h。版面・コメント返信には出さない）</td><td>必須。問題文と矛盾しない。<strong>400 字以内（改行込み）</strong>。公開前提の書き方は表の下</td></tr>
 <tr><td>3</td><td><code>fact_sheet</code> 確定事実シート</td><td>「はい / いいえ / 関係ない」の判定根拠（場所・人物関係・時系列・「問題に関係ない事項」の明示）。真相の曖昧さ起因の矛盾回答・捏造回答をデータ側で防ぐ</td><td>8〜20 件（文字列の配列）</td></tr>
 <tr><td>4</td><td><code>expected_questions</code> 想定質問と期待回答</td><td>作問時の確認用。正解に向かう質問・引っかけ・無関係な質問を混ぜる</td><td>15〜20 件（<code>{q, a}</code> の配列。<code>a</code> は はい / いいえ / 関係ない / 正解 のいずれか + 任意の補足）</td></tr>
 <tr><td>5</td><td><code>hook</code> フック文</td><td>つかみ帯（74px・1 行）</td><td>12 字前後（上限 14 字）。<strong>「？」で終える</strong></td></tr>
@@ -129,7 +129,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>9</td><td><code>character_lines.master.intro</code> / <code>.outro</code> 出題者の導入・締め</td><td>導入「質問してみて！」・締め「何度でも答えるよ。コメントで質問！」の吹き出し</td><td>各 17 字以内。既定値あり</td></tr>
 <tr><td>10</td><td><code>character_lines.jr.outro</code> Jr. の締め</td><td>「面白かったら、いいね、フォローよろしくね！」（吹き出しのみ・ナレーションなし）</td><td>セット固定文の既定値でよい（2 行になるが単独表示のため許容）</td></tr>
 <tr><td>11</td><td><code>illustration_prompt</code> イラスト作成用プロンプト</td><td>背景 1 枚（imagegen）。情景のみ</td><td>画風固定行（セクション 5）+ 9:16 + 文字禁止 + <strong>真相の手がかりを描かない</strong>指示を含む（<code>validate.py</code> は固定行の存在を検査）</td></tr>
-<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。2,200 字以内。TTS のクレジット行は不要（セクション 8）</td></tr>
+<tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。見出しは【<code>title</code>】、遊び方と真相公開の予告を含む。前回の真相ブロックの枠（560 字）と合わせて 2,200 字以内。TTS のクレジット行は不要（セクション 8）</td></tr>
 <tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>「完全オリジナル」宣言 + 型 + モチーフ → 連想 → 逆にした常識を書く（<code>validate.py</code> が宣言の有無を検査）。オリジナル性の基準は表の下</td></tr>
 <tr><td>14</td><td><code>difficulty</code> 難易度</td><td>運用の目安（在庫の偏り確認）</td><td>1〜5</td></tr>
 <tr><td>15</td><td><code>core_points</code> コアの要点</td><td>コメント返信の判定根拠（④ 正解 / ⑤ 惜しい / ⑥ 不正解を見分ける）。機械プローブの正解ラベルにも使う。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ（管理項目 <code>core</code> = コア宣言の 1 文とは別物）</td><td>1〜3 個・1 個 20 字以内（文字列の配列）。真相の説明に最低限必要な情報だけを書く（基準の正は <a href="#core-points">10.2「コアで見分ける」</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
@@ -142,7 +142,9 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>確定事実シートの件数</strong>: 下限 8 件は答えの揺れを防ぐため。上限は 20 件（2026-09-26 に 12 → 20。<a href="#d-20260926-fact-limit">付録</a>）。<code>database/V012</code> のカラム COMMENT は「8〜12 件」のまま（適用済みの DDL のため次のスキーマ変更時に合わせる）</li>
   <li><strong>補充とレビューのペース</strong>: 1 日 1 問 = 週 7 問。レビューは<strong>週 2 回 × 4 問</strong>。手順の詳細は 21-8 の補充スキル（<code>umigame-stock-replenish</code>）に書く</li>
   <li><strong>作問時に本番経路で答えを確かめる</strong>: 評価データ <code>judge-trial/data/eval_problems.json</code> にケースを足し（正解ラベルは人が確認）、<code>probe_run.py --problems &lt;no&gt;</code> を回す（<a href="#evaluation">10.6</a>）</li>
-  <li><strong>管理項目</strong>: <code>content_key</code>（<code>{3 桁連番}-{slug}</code>）と <code>title</code>（管理用の題名）はツーリングが付ける管理項目で、素材項目には数えない。キャラクター・BGM・SE・フォントは<strong>セット固定の共有資産</strong>で、ストック単位の項目ではない（セクション 7〜9）</li>
+  <li><strong>管理項目</strong>: <code>content_key</code>（<code>{3 桁連番}-{slug}</code>）と <code>title</code>（題名）はツーリングが付ける管理項目で、素材項目には数えない。ただし <code>title</code> は<strong>キャプションの見出しと翌日の前回の真相ブロックに出る公開文</strong>（21-6d3e）なので、真相の手がかりにしない（問題文にある言葉・状況だけで付ける。例: 「間違えたのは誰か」→「完璧な演奏に「あ、間違えた」」、「1年越しの判定」→「庭のすみに実ったすいか」に改めた）。キャラクター・BGM・SE・フォントは<strong>セット固定の共有資産</strong>で、ストック単位の項目ではない（セクション 7〜9）</li>
+  <li><strong>truth の書き方（公開前提。21-6d3e）</strong>: 翌日のリールのキャプションで全文を公開するので、フォロワーが読んで自然な文にする。① 判定メモの言い回し（「〜のことではない」の羅列・「正解宣言のとき以外は言わない」等）を書かない。② <strong>はいと答える根拠の事実をすべて本文に書く</strong>（確定事実シートで「はい」になる事実が真相に書かれていないと、答え合わせで読者が「そんな話はない」と感じる）。③ 改行は<strong>読みやすい段落の区切り</strong>に入れる（場面・時間が変わるところ。<strong>機械的な 1 文 1 行にしない</strong>。段落の中では文を続ける。空行は入れない）。④ 数字と単位の間に空白を入れない（「3か月」）。筋・事実は <code>fact_sheet</code>・<code>core_points</code>・<code>reveal_text</code> と矛盾させない</li>
+  <li><strong>truth の上限 400 字の根拠</strong>（21-6d3e）: 書き直した 14 問の実測は 207〜382 字（改行込み・最長は U26 の 382 字。物語復元型は 273〜382 字、意味誤誘導型は 207〜273 字）。最長に少しの余裕を足した 400 字を上限にした。キャプションの上限 2,200 字に対しては、上半分（実測最長 270 字）+ 前回の真相ブロックの枠（区切り行などの定型 60 字 + 前回の <code>title</code> 100 字 + <code>truth</code> 400 字 = 560 字）でも 830 字で十分に収まるので、上限は読みやすさ（「続きを読む」の先で読み切れる長さ）で決めている。行数は検査しない（改行は書き手が読みやすい位置に入れ、機械的に決めないため）</li>
   <li><strong>判定用の項目（#15・#16）の持ち方</strong>: 21-6c1（V013）で後から足したため、<code>stock_items.py</code> では問題本体の辞書ではなく <code>JUDGE_POINTS</code>（問題番号 → 2 項目）に持つ。<code>validate.py</code> が個数・字数を、<code>generate.py</code> が投入 SQL への反映を扱う。21-6d3d で素材項目へ正式に数えた（それまでは表の外の注記。仕様は不変）</li>
 </ul>
 
@@ -159,11 +161,12 @@ nav.toc ul { margin: .3rem 0 0; }
 </ul>
 
 <h2 id="caption">6. キャプションの作り方</h2>
-<div class="note"><span class="callout-title">要点</span>キャプションはストックの <code>caption</code> に問題ごとに書き、テンプレートは <code>{{caption}}</code> の 1 行だけ。構成は全問共通の 4 段。</div>
+<div class="note"><span class="callout-title">要点</span>キャプションはストックの <code>caption</code> に問題ごとに書き、テンプレートは <code>{{caption}}</code> の 1 行だけ。構成は全問共通の 4 段（見出し = 問題タイトル）。ハッシュタグの後ろに、前回の問題の真相ブロックを投稿バッチが差し込む（21-6h）。</div>
 <p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}</code> の 1 行</strong>とする。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b）。</p>
 <ul>
-  <li><strong>構成</strong>: 見出し【探偵カメロックのウミガメのスープ】→ 問題文 → 遊び方 → ハッシュタグ の 4 段で全問共通（<code>umigame_common.caption()</code> が組み立てる）</li>
-  <li><strong>遊び方の文</strong>: 「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者のカメロックが全部返事します。正解が出るまで何度でもどうぞ</li>
+  <li><strong>構成</strong>: 見出し【<code>title</code>】→ 問題文 → 遊び方と真相公開の予告 → ハッシュタグ の 4 段で全問共通（<code>umigame_common.caption(title, problem_text)</code> が組み立てる。21-6d3e で見出しをセット名【探偵カメロックのウミガメのスープ】から問題タイトルへ変えた）</li>
+  <li><strong>遊び方と予告の文</strong>（4 行。改行もこのとおり）: 「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事するよ。／正解が出るまで何度でもどうぞ。／真相は明日のリールのキャプションにて公開するよ。／フォローして待っててね。</li>
+  <li><strong>前回の真相ブロック</strong>: ハッシュタグの後ろに「――― 前回の問題「<code>title</code>」の真相（ネタバレ注意）―――」→「・」の行 → 【真相】→ 前回の <code>truth</code> 全文を置く。投稿順が LRU で決まりストック作成時には「前回」が分からないため、ストックの <code>caption</code> には含めず <strong>SNS 投稿バッチが展開時に差し込む</strong>（前回 = 同じセットで最後に投稿が成功した回。初回はブロックごと出さない）。仕様・実装は 21-6h で決める。経緯は<a href="#d-20261004-truth-disclosure">付録</a></li>
   <li><strong>ハッシュタグ</strong>: <code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart</code></li>
   <li><strong>書かないもの</strong>: 問題番号「第 N 問」（ストックは LRU で消費され、投稿順が確定しないため。PoC の表記は本番では使わない）。問題文の要約（すぐ下の問題文と同じ話が 2 回出るように見えるため。2026-09-24 ユーザー決定）</li>
   <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> だけのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Irodori-TTS でクレジット表記は不要（セクション 8）</li>
@@ -1110,6 +1113,12 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <div class="decision" id="d-20261003-restructure">
   <span class="callout-title">2026-10-03 21-6d3b・ユーザー: 本書を仕様と経緯に分け、コメント返信を 10 章にまとめ、現行プロンプトを転記する</span>
   <p>本文に決定コールアウト・試行番号・失効した記述が混ざり、コメント返信が 5.1 系と 10 章に分かれて読みにくかったため組み直した（仕様は変えていない）。プロンプトの転記は「同じ情報を 2 か所に書かない」の例外として承認された。旧節 → 新節の対応は<a href="../../plans/development-plan.html#step-21-6d3b">計画書 21-6d3b の作業記録</a>。</p>
+</div>
+
+<div class="decision" id="d-20261004-truth-disclosure">
+  <span class="callout-title">2026-10-04 アイデア採用・21-6d3e: truth 全文を翌日リールのキャプション末尾で公開する。見出しを問題タイトルにし、truth・title を公開前提に書き直す</span>
+  <p>AI 出題者は <code>truth</code> を根拠に判定するが、フォロワーに見えるのは正解者への <code>reveal_text</code>（70 字）だけで答え合わせができなかった（ユーザー指摘）。コメント欄に全文を出すと問題がその場でネタバレになるため、翌日のリールのキャプション末尾（ハッシュタグの後ろ）に出す。1 日 1 問なので締め処理なしで 24 時間後に必ず出て、誰も正解しない回も同じ仕組みで答えが出る。<code>truth</code> を廃止して <code>reveal_text</code> を判定根拠にする案は、根拠が足りず漏洩防止の設計が崩れるため採らない。経緯は<a href="../../ideas/umigame-truth-disclosure.md">アイデア記録</a>。</p>
+  <p>21-6d3e で 14 問の <code>truth</code> を公開前提に書き直し（筋・事実は不変）、<code>title</code> 2 問（U20・U21）を手がかりにならない題に改め、キャプションの見出しと予告を変えた。<code>validate.py</code> に <code>truth</code> 400 字の上限を足した（根拠はセクション 4）。DB の既存行は <code>update_judge_points.sql</code>（title・truth・caption を含む UPDATE）で入れ替える。</p>
 </div>
 
 </div>

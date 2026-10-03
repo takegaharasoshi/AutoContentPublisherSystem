@@ -21,6 +21,7 @@ sys.path.insert(0, str(HERE.parent / "common"))
 from stock_items import ITEMS, POST_ORDER  # noqa: E402
 from umigame_common import (  # noqa: E402
     ANSWER_HEADS,
+    CAPTION_PLAY,
     PROHIBITION_LINE,
     PUZZLE_TYPES,
     REQUIRED_KEYS,
@@ -36,6 +37,11 @@ QUESTIONER_MAX, MASTER_MAX = 16, 17  # 吹き出し 1 行
 CHARACTER_LINE_MAX = 17
 TITLE_MAX = 100
 CAPTION_MAX = 2200
+# truth の上限（21-6d3e。翌日リールのキャプション末尾で全文公開するため）。改行も 1 字に数える。行数は検査しない
+# （改行は読みやすい位置に書き手が入れ、機械的に決めないため）。値の根拠はセット別設計書 4。
+TRUTH_MAX = 400
+# 投稿時に差し込まれる前回の真相ブロック（21-6h）の最大の見積もり: 区切り行と「・」の行・【真相】の定型 60 字 + 前回の title + truth。
+PREV_BLOCK_RESERVE = 60 + TITLE_MAX + TRUTH_MAX
 # ナレーション予算（8.3）: problem 実測長 + 1.2 秒 + rule 実測長 <= 21.0 秒。
 # Polly Takumi 125% の実測（21-2: 78 字 + 37 字 = 17.8 秒）から 1 字 0.155 秒として推定する。
 NARRATION_SEC_PER_CHAR = 0.155
@@ -118,6 +124,8 @@ def check_item(it: dict) -> None:
 
     if not it["truth"].strip():
         errors.append(f"{no}: truth が空")
+    elif len(it["truth"]) > TRUTH_MAX:
+        errors.append(f"{no}: truth が {len(it['truth'])} 字（上限 {TRUTH_MAX}。改行込み）")
 
     fs = it["fact_sheet"]
     if not (isinstance(fs, list) and all(isinstance(f, str) and f.strip() for f in fs)):
@@ -208,8 +216,14 @@ def check_item(it: dict) -> None:
     cap = it["caption"]
     if "#AIart" not in cap:
         errors.append(f"{no}: caption に #AIart がない")
-    if len(cap) > CAPTION_MAX:
-        errors.append(f"{no}: caption が {len(cap)} 字（上限 {CAPTION_MAX}）")
+    if len(cap) + PREV_BLOCK_RESERVE > CAPTION_MAX:
+        errors.append(
+            f"{no}: caption が {len(cap)} 字（前回の真相ブロックの枠 {PREV_BLOCK_RESERVE} 字と合わせて上限 {CAPTION_MAX}）"
+        )
+    if not cap.startswith(f"【{it['title']}】\n"):
+        errors.append(f"{no}: caption の見出しが【title】になっていない")
+    if CAPTION_PLAY not in cap:
+        errors.append(f"{no}: caption に遊び方と真相公開の予告がない")
     if NUMBERED_RE.search(cap):
         errors.append(f"{no}: caption に「第 N 問」がある（LRU 消費のため投稿順は確定しない）")
     if p not in cap:
