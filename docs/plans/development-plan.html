@@ -1052,7 +1052,7 @@
 <div class="plan-meta"><strong>21-6d3e</strong><span class="plan-status">完了（2026-10-04）</span></div>
 <h3>真相（truth）・タイトル・キャプションを公開前提に書き直す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d3d">21-6d3d</a> の完了後（同じ設計書 4 章と作問スキルに触るため）。truth は判定の根拠なので、全件プローブを取り直す <a href="#step-21-6d4">21-6d4</a> より前に完了させる（21-6d4 と 21-6e を最終形の truth で測るため・2026-10-04 ユーザー指摘。判定への影響は 21-6d4 の全件プローブでまとめて見るため、本ステップではプローブを回さない）。2026-10-04 起票（アイデア <a href="../ideas/umigame-truth-disclosure.md">umigame-truth-disclosure</a> の採用）。</p>
-<p data-field="result"><strong>結果：</strong>14 問の <code>truth</code> を公開前提（段落ごとの改行・はいの根拠の事実を明記）に書き直し、<code>title</code> 2 問（U20・U21）を改め、キャプションを【タイトル】見出し + 真相公開の予告の形にした。<code>validate.py</code> に truth 400 字の上限を足し全問 OK。DB の入れ替え（両環境・<code>update_judge_points.sql</code>）と 14 問の目視はユーザー作業。</p>
+<p data-field="result"><strong>結果：</strong>14 問の <code>truth</code> を公開前提（段落ごとの改行・はいの根拠の事実を明記）に書き直し、<code>title</code> 2 問（U20・U21）を改め、キャプションを【タイトル】見出し + 真相公開の予告の形にした。<code>validate.py</code> に truth 400 字の上限を足し全問 OK。14 問の目視はユーザー OK（2026-10-04）。<code>update_judge_points.sql</code> はローカル MySQL へ適用済み、Aurora への適用はユーザー実行待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -1081,7 +1081,8 @@
 <summary>5. 作業記録 <span class="plan-hint">— 2026-10-04</span></summary>
 <div class="plan-fold-inner"><p><strong>truth・title（2026-10-04）</strong>: 14 問の <code>truth</code> を段落の区切りで改行した文に書き直した（判定メモの言い回しを外し、<code>fact_sheet</code> で「はい」になる事実を本文に足した。例: U01 の「入院せずに定期的に通院・影が濃いと告げられて落ち込んだ」、U12 の上の段の人形・扇を持つ 1 人、U26 の「今では笑い話」。筋・事実は不変）。実測は改行込み 207〜382 字（最長 U26）で、上限を 400 字にした（根拠は<a href="../app/sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>）。<code>title</code> は U20「間違えたのは誰か」→「完璧な演奏に「あ、間違えた」」・U21「1年越しの判定」→「庭のすみに実ったすいか」（誤りの所在・勝負と 1 年前を示していたため）。他 12 問は問題文の言葉だけで付いており据え置き。<code>content_key</code> は不変。</p>
 <p><strong>キャプション・ツール</strong>: <code>umigame_common.caption(title, problem_text)</code> に変え、見出し【title】と遊び方 2 行 + 予告 2 行（アイデア MD の合意例どおり）にした（最長 270 字）。<code>validate.py</code> に truth 400 字・見出し・予告の検査と、前回の真相ブロックの枠 560 字を見込んだ 2,200 字検査を足した。<code>review_sheet.py</code> は真相欄で改行を保つ表示と字数を出すようにし、<code>work/review.html</code> を生成し直した（tailnet の素材シートに反映済み）。<code>generate.py</code> の既存行向け UPDATE（<code>update_judge_points.sql</code>）に title・truth・caption を足し、ローカル MySQL のドライラン（ROLLBACK）で 14 件 OK。</p>
-<p><strong>設計書・スキル</strong>: <a href="../app/sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>（#2・#12 の行・truth の書き方・上限の根拠・title を公開文として扱う）・<a href="../app/sets/umigame-soup-1.html#caption">6</a>（構成・予告文・前回の真相ブロックは 21-6h）・<a href="../app/sets/umigame-soup-1.html#d-20261004-truth-disclosure">付録</a>を更新。作問スキル <code>umigame-problem-writer</code> の工程 9 に truth の書き方と title の見直しを、自己検査に 10 行目を足した。プローブは回していない（判定への影響は <a href="#step-21-6d4">21-6d4</a> で見る）。</p></div>
+<p><strong>設計書・スキル</strong>: <a href="../app/sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>（#2・#12 の行・truth の書き方・上限の根拠・title を公開文として扱う）・<a href="../app/sets/umigame-soup-1.html#caption">6</a>（構成・予告文・前回の真相ブロックは 21-6h）・<a href="../app/sets/umigame-soup-1.html#d-20261004-truth-disclosure">付録</a>を更新。作問スキル <code>umigame-problem-writer</code> の工程 9 に truth の書き方と title の見直しを、自己検査に 10 行目を足した。プローブは回していない（判定への影響は <a href="#step-21-6d4">21-6d4</a> で見る）。</p>
+<p><strong>DB の入れ替え（2026-10-04）</strong>: ユーザーが 14 問の truth・title を目視で OK とした。<code>update_judge_points.sql</code> をローカル MySQL へ適用（14 行・truth の字数が実測と一致）。Aurora は <code>apply_aurora.py</code> のドライラン（14 文）まで済み、本適用は Claude の実行が権限の自動判定で止められたためユーザーが実行する。</p></div>
 </details>
 </div>
 </article>
