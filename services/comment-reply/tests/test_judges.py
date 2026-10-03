@@ -130,7 +130,7 @@ def test_jev_bare_term_only_applies_to_question_or_guess(monkeypatch, problem) -
 
 
 def test_jev_correct_requires_every_core_point(monkeypatch, problem) -> None:
-    def run_with(second: float) -> Judgement:
+    def run_with(second: float, contradiction: float = 0.1) -> Judgement:
         def call(api_key, state, questions, debug):
             name = next(iter(questions))
             if name == "major":
@@ -143,6 +143,9 @@ def test_jev_correct_requires_every_core_point(monkeypatch, problem) -> None:
             if name == "point_0":
                 return {"point_0": {"noul": {"true": 0.8}},
                         "point_1": {"noul": {"true": second}}}
+            if name == "contradict":
+                assert {"truth", "fact_sheet", "comment"} <= set(state)
+                return {"contradict": {"noul": {"true": contradiction}}}
             raise AssertionError(name)
 
         monkeypatch.setattr(jev, "_record_call", call)
@@ -150,6 +153,46 @@ def test_jev_correct_requires_every_core_point(monkeypatch, problem) -> None:
 
     assert run_with(0.49).kind == "guess_close"
     assert run_with(0.5).kind == "guess_correct"
+
+
+def test_jev_contradiction_demotes_correct_candidate(monkeypatch, problem) -> None:
+    def run_with(second: float, contradiction: float) -> tuple[Judgement, list[str]]:
+        names = []
+
+        def call(api_key, state, questions, debug):
+            name = next(iter(questions))
+            names.append(name)
+            if name == "major":
+                return {
+                    "major": {"choice": "question_or_guess"},
+                    "bare_term": {"noul": {"true": 0.1}},
+                }
+            if name == "qg":
+                return {name: {"probabilities": {"guess": 0.99, "question": 0.01}}}
+            if name == "point_0":
+                return {"point_0": {"noul": {"true": 0.9}},
+                        "point_1": {"noul": {"true": second}}}
+            if name == "contradict":
+                return {"contradict": {"noul": {"true": contradiction}}}
+            raise AssertionError(name)
+
+        monkeypatch.setattr(jev, "_record_call", call)
+        result = jev.judge("1", "男はレントゲンで回復を知った", problem, api_key="fake",
+                           t_contradict=0.5)
+        return result, names
+
+    result, names = run_with(0.9, 0.5)
+    assert result.kind == "guess_close"
+    assert result.debug["probabilities"]["B2"] == 0.5
+    assert "矛盾=0.50" in result.reason
+    assert names.count("contradict") == 1
+    result, _ = run_with(0.9, 0.49)
+    assert result.kind == "guess_correct"
+    # ④ の候補でなければ矛盾チェックは呼ばない
+    result, names = run_with(0.3, 0.9)
+    assert result.kind == "guess_close"
+    assert "contradict" not in names
+    assert "B2" not in result.debug["probabilities"]
 
 
 def _j(method: str, kind: str, answer: str | None = None) -> Judgement:

@@ -20,6 +20,7 @@ T_RECHECK = 0.6  # A2 が q_open のとき、問題文つきで答えられる�
 T_QUALITY = 0.2
 T_ANSWER = 0.55
 T_BARE_TERM = 0.5
+T_CONTRADICT = 0.5  # 21-6d3c: ④ の候補を ⑤ に落とす下限（掃引で正解推理の最大 0.30・誤りを含む推理の最小 0.57）
 MAX_RETRIES = 3
 _URL_RE = re.compile(r"(?:https?://|www\.)|\b[\w-]+(?:\.[\w-]+)+\b", re.IGNORECASE)
 _JAPANESE_RE = re.compile(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
@@ -159,6 +160,36 @@ SUB_CRITERIA = {
 }
 
 
+# 段 B2（21-6d3c）: 全要点が T_POINT 以上の推理に、真相・確定事実と矛盾する内容が含まれるか。
+# セット別設計書 10.2 の「コアは合っているが明らかな誤りを含む → ⑤」。段 B は要点ごとの一致しか見ないため足した。
+CONTRADICTION_QUESTION = {
+    "type": "noul",
+    "instructions": (
+        "The puzzle text, its hidden truth, the established facts and a player's comment are given. "
+        "Decide whether the comment's explanation contains a statement that contradicts the truth or "
+        "the established facts. Missing peripheral details, details the truth does not mention, and "
+        "paraphrases with the same meaning are not contradictions."
+    ),
+    "criteria": {
+        "true": "The comment states something that conflicts with the truth or the established facts.",
+        "false": (
+            "Everything the comment states is consistent with the truth and the established facts, "
+            "even if it omits details or uses different words."
+        ),
+    },
+}
+
+
+def contradiction_state(problem: Problem, text: str) -> dict:
+    """段 B2 に渡す state（掃引ツールと共有する）。"""
+    return {
+        "problem_text": problem.problem_text,
+        "truth": problem.truth,
+        "fact_sheet": list(problem.fact_sheet),
+        "comment": text,
+    }
+
+
 class JevError(RuntimeError):
     """Jev API request or response error."""
 
@@ -259,8 +290,9 @@ def judge(
     t_quality: float = T_QUALITY,
     t_answer: float = T_ANSWER,
     t_bare_term: float = T_BARE_TERM,
+    t_contradict: float = T_CONTRADICT,
 ) -> Judgement:
-    """Run the trial-8b staged classifier, plus a bare-term check in stage A."""
+    """Run the trial-8b staged classifier, plus a bare-term check in stage A and a contradiction check in stage B2."""
     debug = {"model": "jev-latest", "input_tokens": 0, "output_tokens": 0,
              "latency_s": 0.0, "calls": 0, "probabilities": {}}
     rule_kind = _rule_kind(text)
@@ -420,7 +452,13 @@ def judge(
             all_points = bool(point_probs) and hits == len(point_probs)
             some_points = any(value >= t_close for value in point_probs.values())
             if all_points:
-                kind = "guess_correct"
+                contradict_answers = _record_call(
+                    api_key, contradiction_state(problem, text),
+                    {"contradict": CONTRADICTION_QUESTION}, debug,
+                )
+                contradiction = _noul_true(contradict_answers["contradict"])
+                debug["probabilities"]["B2"] = contradiction
+                kind = "guess_close" if contradiction >= t_contradict else "guess_correct"
             elif a_kind == "guess":
                 kind = "guess_close" if some_points else "guess_wrong"
             else:
@@ -492,6 +530,8 @@ def judge(
         point_values = debug["probabilities"].get("B", {}).values()
         if point_values:
             reason += f", 要点最低={min(point_values):.2f}"
+            if "B2" in debug["probabilities"]:
+                reason += f", 矛盾={debug['probabilities']['B2']:.2f}"
         elif "A3" in debug["probabilities"]:
             reason += f", 再確認={debug['probabilities']['A3']:.2f}"
         return Judgement("jev", kind, answer=answer, reason=reason, debug=debug)

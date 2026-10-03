@@ -32,7 +32,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
+  <span>最終更新: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
 </div>
 
 <div class="note">
@@ -347,7 +347,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>API 呼び出し</td><td>1 回（推論が長いと最大 20 秒前後）</td><td>0〜6 回</td></tr>
 <tr><td>処理時間の中央値（21-6d3・書き手込み）</td><td>6〜7 秒</td><td>0.8 秒（定型文 <code>2b</code>）</td></tr>
 <tr><td>強み</td><td>種別・判定の精度が安定して高い</td><td>分岐を自前で制御できる</td></tr>
-<tr><td>弱み</td><td>生成 AI の品質に直結する</td><td>惜しい推理を正解と誤判定しやすい（P2。誤りを含む推理の確認が未実装 = <a href="#pattern2">10.3.4</a>）</td></tr>
+<tr><td>弱み</td><td>生成 AI の品質に直結する</td><td>惜しい推理を正解と誤判定しやすい（P2。誤りを含む推理は段 B2 の矛盾チェックで ⑤ に落とす = <a href="#pattern2">10.3.4</a>）</td></tr>
 <tr><td>コード</td><td><code>app/judge/luna.py</code></td><td><code>app/judge/jev.py</code></td></tr>
 </table>
 </div>
@@ -425,8 +425,10 @@ nav.toc ul { margin: .3rem 0 0; }
     <div class="exits"><span class="exit">≥ <code>T_RECHECK</code> → ①</span><span class="exit">未満 → ③ で確定</span></div></div>
   <div class="flow-arrow">↓ ① ／ 推理</div>
   <div class="flow-step emph"><div class="t">段 B 正解判定（noul × コアの要点）</div><div class="d">要点ごとに「言い換えも含めて同じ内容を述べているか」</div>
-    <div class="exits"><span class="exit">全要点 ≥ <code>T_POINT</code> → ④（質問の形でも）</span><span class="exit">推理でどれか ≥ <code>T_CLOSE</code> → ⑤</span><span class="exit">推理でなし → ⑥</span></div>
-    <div class="d"><strong>未実装</strong>: 「コアは合っているが明らかな誤りを含む → ⑤」の確認はない（21-6d3c で追加予定）</div></div>
+    <div class="exits"><span class="exit">全要点 ≥ <code>T_POINT</code> → 段 B2 へ（④ の候補・質問の形でも）</span><span class="exit">推理でどれか ≥ <code>T_CLOSE</code> → ⑤</span><span class="exit">推理でなし → ⑥</span></div></div>
+  <div class="flow-arrow">↓ ④ の候補</div>
+  <div class="flow-step emph"><div class="t">段 B2 矛盾チェック（noul・問題文 + 真相 + 確定事実）</div><div class="d">推理に、真相・確定事実と矛盾する内容が含まれるか（細部の欠け・言い換えは矛盾としない）</div>
+    <div class="exits"><span class="exit">≥ <code>T_CONTRADICT</code> → ⑤（コアは合っているが明らかな誤りを含む）</span><span class="exit">未満 → ④</span></div></div>
   <div class="flow-arrow">↓ ① で ④ でない</div>
   <div class="flow-step q"><div class="t">段 C 質問の品質（noul）</div><div class="d">問題の状況に当てはめて、はい / いいえで一意に答えられるか</div>
     <div class="exits"><span class="exit">&lt; <code>T_QUALITY</code> → ③</span></div></div>
@@ -434,7 +436,7 @@ nav.toc ul { margin: .3rem 0 0; }
   <div class="flow-step emph"><div class="t">段 D 答え（choice 3 択・問題文 + 真相 + 確定事実）</div><div class="d">はい / いいえ / 関係ない</div>
     <div class="exits"><span class="exit">最大確率 ≥ <code>T_ANSWER</code> → その答え</span><span class="exit">未満 → <code>unknown</code>（安全側）</span></div></div>
 </div>
-<figcaption>図 10-2 パターン 2 の段の流れ。段 B の結果は A1b と正解判定で使い回す（1 コメント 0〜6 回の呼び出し）</figcaption>
+<figcaption>図 10-2 パターン 2 の段の流れ。段 B の結果は A1b と正解判定で使い回す。段 B2 は ④ の候補のときだけ呼ぶ（このとき段 C・D は呼ばない。1 コメント 0〜6 回の呼び出し）</figcaption>
 </figure>
 
 <div class="table-wrap">
@@ -445,6 +447,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td><code>T_RECHECK</code></td><td>0.6</td><td>A3</td><td>① として答えられるとみなす確率の下限</td></tr>
 <tr><td><code>T_POINT</code></td><td>0.5</td><td>B</td><td>要点を言い当てたとみなす確率の下限（全要点で ④）</td></tr>
 <tr><td><code>T_CLOSE</code></td><td>0.25</td><td>A1b・B</td><td>要点に触れたとみなす確率の下限（⑤ の判定と、推理扱いの条件）</td></tr>
+<tr><td><code>T_CONTRADICT</code></td><td>0.5</td><td>B2</td><td>④ の候補を、真相・確定事実と矛盾するとして ⑤ に落とす確率の下限</td></tr>
 <tr><td><code>T_QUALITY</code></td><td>0.2</td><td>C</td><td>はい / いいえで一意に答えられるとみなす確率の下限</td></tr>
 <tr><td><code>T_ANSWER</code></td><td>0.55</td><td>D</td><td>答えを返す確率の下限（未満は <code>unknown</code>）</td></tr>
 </table>
@@ -452,10 +455,9 @@ nav.toc ul { margin: .3rem 0 0; }
 <ul>
   <li><strong>段 0 の位置づけ</strong>: 禁止ワード DB ではなく<strong>文字種だけを見る最小の規則</strong>で、語の一覧でモデレーションしない方針（<a href="#reply-behavior">10.7.3</a>）には当たらない。1 語だけの英字の羅列は荒らしのことがあるので段 A1 に任せる</li>
   <li><strong>段の意図</strong>: A1 で語だけを大分類「質問・推理」に限るのは、一語の感想・挨拶を ③ にしないため。段 D の安全側は、P3 の取り違えを P4 の揺れへ逃がすため</li>
-  <li><strong>未実装の判定（21-6d3c で追加予定）</strong>: 10.2 の「コアは合っているが明らかな誤りを含む推理 → ⑤」を確かめる段がない。段 B は要点ごとに「同じ内容を述べているか」しか聞かないため、誤りを含む推理でも要点の確率が高く出て ④ になる。21-6d3 の全件プローブでは、正解ラベル ⑤ の 28 件のうち 12 件を ④ にした（= P2 の 12 件。うち 11 件がこの型）。パターン 1 はプロンプトの文章でこの条件を判定している</li>
-  <li><strong>追加する確認（予定）</strong>: 段 B で ④ の候補になったときだけ、「推理に、真相・確定事実と矛盾する内容が含まれるか」を noul で聞き、閾値以上なら ⑤ に落とす（<a href="../../plans/development-plan.html#step-21-6d3c">計画書 21-6d3c</a>）</li>
+  <li><strong>段 B2 の役割</strong>: 10.2 の「コアは合っているが明らかな誤りを含む推理 → ⑤」を確かめる。段 B は要点ごとに「同じ内容を述べているか」しか聞かないため、誤りを含む推理でも要点の確率が高く出る。呼び出しを増やすのは ④ の候補のときだけ（パターン 1 はプロンプトの文章でこの条件を判定している。追加の経緯は<a href="#d-20261004-contradiction">付録</a>）</li>
   <li><strong>失敗</strong>: 429・5xx は指数バックオフで 3 回再試行し、それでも失敗したら例外にする（扱いは <a href="#judge-policy">10.3.5</a>）</li>
-  <li><strong>閾値</strong>は 21-6d3 の全件プローブで掃引し、すべて据え置いた（<a href="#d-20261003-thresholds">付録</a>）。各段・閾値を決めた試行の経緯は<a href="umigame-soup-1-judge-study.html#p2">検討ページ 6</a></li>
+  <li><strong>閾値</strong>は 21-6d3 の全件プローブで掃引し、すべて据え置いた（<a href="#d-20261003-thresholds">付録</a>）。<code>T_CONTRADICT</code> は 21-6d3c で、Jev が ④ とした 39 件の掃引から決めた（<a href="#d-20261004-contradiction">付録</a>）。各段・閾値を決めた試行の経緯は<a href="umigame-soup-1-judge-study.html#p2">検討ページ 6</a></li>
 </ul>
 
 <h4 id="judge-policy">10.3.5 組み合わせの 3 モード</h4>
@@ -1089,6 +1091,17 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
     <li><code>T_QUALITY</code> を上げると、はい / いいえ質問が <code>q_open</code> へ流れる（0.3 で 18 件・0.4 で 56 件）</li>
     <li><code>T_GUESS</code> は 0.95 で推理 → 質問 2 件・質問 → 推理 9 件となり、前後の値（0.9 / 0.99）より誤りが少ない</li>
     <li>Jev の主な失点である誤った正解宣言（P2 12 件）は、惜しい推理の要点確率の最小値が 0.83〜0.97 に集まり、本物の正解と重なる。<code>T_POINT</code> を 0.95 にしても誤りは 4 件残り、正解宣言は 27 → 7 件に落ちる。閾値では分けられない（要点の問い方の問題）ため、方式選定（21-6e）の材料として残す</li>
+  </ul>
+</div>
+
+<div class="decision" id="d-20261004-contradiction">
+  <span class="callout-title">2026-10-04 21-6d3c・ユーザー: パターン 2 に段 B2（矛盾チェック）を足し、<code>T_CONTRADICT</code> を 0.5 にする</span>
+  <p>21-6d3b の人間ゲートで、10.2 の「コアは合っているが明らかな誤りを含む → ⑤」がパターン 2 に未実装と指摘された（21-6d3 の P2 12 件のうち 11 件がこの型。<a href="#d-20261003-thresholds">上記</a>で「閾値では分けられない」とした失点）。段 B で ④ の候補になったときだけ、問題文・真相・確定事実・コメントを渡して「真相・確定事実と矛盾する内容を含むか」を noul で聞く段を足した。</p>
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>掃引</strong>（21-6d3 のキャッシュで Jev が ④ とした 39 件だけに新しい問いを投げた。<code>tools/contradiction_sweep.py</code>）: 誤りを含む推理 11 件の確率は 0.57〜0.98、本物の正解推理 27 件は 0.05〜0.30 に分かれた。閾値 0.4〜0.5 で誤った正解宣言 12 → 1 件・本物の正解の取りこぼし 0 件（0.3 では 1 件取りこぼし、0.6〜0.8 では 0.57 の 1 件が残る）。両側に余裕のある 0.5 にした</li>
+    <li><strong>残る 1 件</strong>（U27-e18）はコアの一部しか言っていないのに要点 0.59 で ④ になった例で、矛盾チェックの対象外（<code>T_POINT</code> 側の問題）</li>
+    <li><strong>hybrid への影響</strong>: luna も ④ とした誤り 2 件（U28-e19・U20-e30）は、これまで二重確認を通っていたが、Jev が ⑤ に落とすため正解宣言の保留（consensus_split）になる。本物の正解の保留は増えない</li>
+    <li>確率は 1 回の呼び出しの値で、全件での効果は 21-6d4 の全件プローブで測る</li>
   </ul>
 </div>
 
