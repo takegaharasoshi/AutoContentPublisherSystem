@@ -261,11 +261,15 @@ def test_metrics_l1_kind_opener_and_answer_synonym():
                 for i, case in enumerate(cases[95:]))
     report = _aggregate(cases, rows)
     assert report["metrics"]["L1_kind"]["pass"] is True
+    assert report["metrics"]["L1_kind_each"]["pass"] is True
     assert report["metrics"]["L1_kind"]["by_kind"]["impression"]["rate"] == .8
     rows[-2] = _row(cases[-2], "chat", reply="ありがとう")
     report = _aggregate(cases, rows)
     assert report["metrics"]["L1_kind"]["rate"] > .9
-    assert report["metrics"]["L1_kind"]["pass"] is False
+    assert report["metrics"]["L1_kind"]["pass"] is True
+    assert report["metrics"]["L1_kind_each"]["pass"] is False
+    assert set(report["metrics"]["L1_kind_each"]["by_kind"]) == {"impression"}
+    assert [x["id"] for x in report["metrics"]["L1_kind_each"]["ng"]] == ["i3", "i4"]
 
     q_cases = [_case("yes", "q_yesno", "yes"), _case("bad", "q_yesno", "yes")]
     q_rows = [_row(q_cases[0], "q_yesno", "yes", "はい！"),

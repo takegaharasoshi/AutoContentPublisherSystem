@@ -265,8 +265,10 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
             ]),
         }
         kind_accuracy = _accuracy(items)
-        non_question_ok = all(entry["rate"] is None or entry["rate"] >= .8
-                              for kind, entry in by_kind.items() if kind not in QUESTION_KINDS)
+        low_kinds = {kind: entry for kind, entry in by_kind.items()
+                     if kind not in QUESTION_KINDS and entry["rate"] is not None and entry["rate"] < .8}
+        non_question_rates = [entry["rate"] for kind, entry in by_kind.items()
+                              if kind not in QUESTION_KINDS and entry["rate"] is not None]
         # 5.1.1 L1②: 同じ種別の返事 20 件のうちの最頻。返信しない種別と開示文が 1 つに決まる ④ は数えない
         phrasing = {}
         for kind in KINDS:
@@ -317,6 +319,9 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
                       lambda x: f"{len(x['reply'])} 字"),
             "L1_kind": _ng([x for x in items if x["flags"]["kind_mismatch"]],
                            lambda x: f"{x['expected_kind']} → {x['kind']}"),
+            "L1_kind_each": _ng([x for x in items if x["flags"]["kind_mismatch"]
+                                 and x["expected_kind"] in low_kinds],
+                                lambda x: f"{x['expected_kind']} → {x['kind']}"),
             "L1_phrasing": _ng(phrasing_ng, lambda x: f"最頻の言い回し（{x['expected_kind']}）"),
             "L1_guidance": _ng(unguided, lambda x: f"判定 {x['kind']}"),
             "L2_one_liner": _ng([x for x in final_yesno
@@ -357,10 +362,20 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
                                    "ordinary_rate": ordinary_rate}),
             "P7": _count_metric(sum(x["flags"]["over_80"] for x in items), n, "0 件",
                                 not any(x["flags"]["over_80"] for x in items)),
-            "L1_kind": _metric(kind_accuracy["count"], n, "全体 90% 以上・質問以外の各種別 80% 以上",
-                               (kind_accuracy["rate"] >= .9 and non_question_ok)
+            "L1_kind": _metric(kind_accuracy["count"], n, "全体 90% 以上",
+                               kind_accuracy["rate"] >= .9
                                if kind_accuracy["rate"] is not None else None,
                                rate=kind_accuracy["rate"], by_kind=by_kind, groups=groups),
+            # 10.2 L1① の後段。全体とは別の行にして、どの種別で落ちたかを見えるようにする
+            "L1_kind_each": _metric(
+                len(low_kinds), len(non_question_rates), "質問以外の各種別 80% 以上",
+                not low_kinds if non_question_rates else None,
+                rate=min(non_question_rates, default=None),
+                value=("80% 未満 " + "・".join(f"{kind} {entry['count']}/{entry['total']}"
+                                               for kind, entry in low_kinds.items())
+                       if low_kinds else
+                       f"最低 {min(non_question_rates):.1%}" if non_question_rates else "対象なし"),
+                by_kind=low_kinds),
             "L1_phrasing": _metric(
                 max((v["count"] for v in phrasing.values()), default=0),
                 max((v["total"] for v in phrasing.values()), default=0),

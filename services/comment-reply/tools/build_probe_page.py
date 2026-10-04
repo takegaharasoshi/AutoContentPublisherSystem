@@ -47,7 +47,9 @@ SECTIONS = (
         ("P5", "P5 正解宣言率"), ("P6", "P6 不適切系の応答"),
         ("P7", "P7 80 字超"))),
     ("レベル 1", (
-        ("L1_kind", "L1① 種別一致率"), ("L1_phrasing", "L1② 言い回しの偏り"),
+        ("L1_kind", "L1① 種別一致率（全体）"),
+        ("L1_kind_each", "L1① 種別一致率（質問以外の各種別）"),
+        ("L1_phrasing", "L1② 言い回しの偏り"),
         ("L1_guidance", "L1③ 誘導率"))),
     ("レベル 2", (
         ("L2_one_liner", "L2 一言の長さ"), ("L2_opener", "L2 判定語の冒頭"),
@@ -133,7 +135,8 @@ def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]],
             cells.append(f"<tr><th>{_h(name)}{toggle}</th>")
             for pattern in patterns:
                 item = metrics["patterns"][pattern["id"]]["metrics"][key]
-                cells.append(f"<td>{_h(item['value'])} {_badge(item['pass'])}"
+                value = _ja_note(item["value"]) if key == "L1_kind_each" else item["value"]
+                cells.append(f"<td>{_h(value)} {_badge(item['pass'])}"
                              f"{_ng_details(pattern['id'], item, page_of)}</td>")
             threshold = metrics["patterns"][patterns[0]["id"]]["metrics"][key]["threshold"]
             cells.append(f"<td>{_h(threshold)}</td></tr>")
@@ -233,11 +236,9 @@ def _time_svg(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> str:
 
 def _metric_detail(key: str, item: dict[str, Any]) -> str:
     """不合格の指標の内訳（どの種別・何件で落ちたか）を短く書く。"""
-    if key == "L1_kind":
-        low = [f"{_kind(k)} {v['count']}/{v['total']}" for k, v in item["by_kind"].items()
-               if v["total"] and v["rate"] is not None and v["rate"] < .8 and k not in
-               {"q_yesno", "q_multi", "q_open"}]
-        return "80% 未満: " + "・".join(low) if low else f"全体 {item['value']}"
+    if key == "L1_kind_each":
+        return "80% 未満: " + "・".join(f"{_kind(k)} {v['count']}/{v['total']}"
+                                         for k, v in item["by_kind"].items())
     if key == "L1_phrasing":
         return "50% 超: " + "・".join(f"{_kind(k)} {v['count']}/{v['total']}"
                                        for k, v in item["by_kind"].items() if v["rate"] > .5)

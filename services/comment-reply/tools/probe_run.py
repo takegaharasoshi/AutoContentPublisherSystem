@@ -193,7 +193,7 @@ def _judge_timing(pattern: dict[str, Any], entries: dict[str, dict[str, Any]],
 
 
 def _print_summary(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> None:
-    names = ("P1", "P2", "P3", "P4", "P5", "P6", "P7", "L1_kind",
+    names = ("P1", "P2", "P3", "P4", "P5", "P6", "P7", "L1_kind", "L1_kind_each",
              "L1_phrasing", "L1_guidance", "L2_one_liner", "L2_opener",
              "L2_conflict", "L2_proximity", "L2_emoji")
     print("pattern | " + " | ".join(names) + " | total median / p95 (s)")
