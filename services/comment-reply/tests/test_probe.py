@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import json
+import random
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
 
 from app.comment_log import new_record
 from app.config import Config
-from app.judge.contract import Judgement, Problem
+from app.judge.contract import KINDS, Judgement, Problem
 from app.reply import templates
 from app.reply.writer import Reply
 from tools import build_probe_page, probe_metrics, probe_run
@@ -89,6 +93,123 @@ def _aggregate(cases: list[dict], rows: list[dict]) -> dict:
     data = {"meta": {"patterns": [{"id": "test"}]}, "cases": cases,
             "rows": {"test": rows}}
     return probe_metrics.aggregate(data)["patterns"]["test"]
+
+
+def _review_results() -> dict:
+    cases = []
+    for index in range(24):
+        cases.append(_case(f"imp-{index:02}", "impression", no="U01" if index % 2 else "U13"))
+    cases.extend([
+        _case("q-yes", "q_yesno", "yes", no="U01", text="関係ある？"),
+        _case("q-yes-b", "q_yesno", "yes", no="U13", text="そうなの？"),
+        _case("q-irrelevant", "q_yesno", "irrelevant", no="U01", text="重要ですか？"),
+        _case("q-no", "q_yesno", "no", no="U13", text="誰ですか？"),
+        _case("multi", "q_multi", no="U01"),
+        _case("open", "q_open", no="U13"),
+        _case("correct", "guess_correct", no="U01"),
+        _case("wrong", "guess_wrong", no="U13"),
+    ])
+    cases.extend(_case(f"kind-{kind}", kind, no="U01" if i % 2 else "U13")
+                 for i, kind in enumerate(KINDS)
+                 if kind not in {"q_yesno", "q_multi", "q_open", "guess_correct",
+                                 "impression", "guess_wrong"})
+    patterns = [{"id": f"pattern-{i}", "label": f"パターン {i}",
+                 "judge_mode": "hybrid" if i == 1 else "luna"} for i in range(1, 4)]
+    rows: dict[str, list[dict]] = {}
+    for pattern_index, pattern in enumerate(patterns):
+        pattern_rows = []
+        for case in cases:
+            kind, answer, reply = case["expected_kind"], case["expected_answer"], "ありがとう"
+            if case["id"].startswith("imp-") and int(case["id"].split("-")[1]) % 4 == 0:
+                kind, reply = "chat", "同じ返事"
+            elif case["id"] in {"q-yes", "q-yes-b"}:
+                kind, answer = "q_yesno", ("no" if pattern_index != 2 else "yes")
+                reply = "はい。"
+            elif case["id"] == "q-irrelevant":
+                kind, answer, reply = "q_yesno", "no", "関係ありません。"
+            elif case["id"] == "q-no":
+                kind, answer, reply = "q_yesno", "irrelevant", "関係ない。"
+            elif case["id"] == "multi":
+                kind, answer, reply = ("q_open", None, "答えです") if pattern_index == 1 else (
+                    "q_multi", None, "一つ目はこうです")
+            elif case["id"] == "open":
+                kind, answer, reply = "q_open", None, "答えです"
+            elif case["id"] == "correct":
+                kind, answer, reply = "guess_correct", None, "正解です！"
+            elif case["id"] == "wrong":
+                kind, answer, reply = "guess_correct", None, "正解！"
+            elif case["expected_kind"] in templates.NO_REPLY_KINDS:
+                kind, answer, reply = case["expected_kind"], None, None
+            else:
+                answer = None
+            item = _row(case, kind, answer, reply)
+            item["timing"] = {"total_s": 1.0, "judge_s": .4, "writer_s": .6}
+            pattern_rows.append(item)
+        rows[pattern["id"]] = pattern_rows
+    per_problem = {no: sum(case["no"] == no for case in cases) for no in ("U01", "U13")}
+    return {
+        "meta": {"run_at": "2026-10-04T00:00:00Z", "patterns": patterns,
+                 "problems": ["U01", "U13"],
+                 "case_counts": {no: {"eval": count, "bare_term": 0, "common": 0}
+                                 for no, count in per_problem.items()},
+                 "prompt_version": "test", "luna_model": "test"},
+        "cases": cases, "rows": rows,
+        "problems": {no: {"problem_text": f"{no} test"} for no in per_problem},
+    }
+
+
+def _review_scenarios(results: dict) -> list[set[str]]:
+    data = build_probe_page._review_data(results, probe_metrics.aggregate(results))
+    keys = [pair["key"] for pair in data["pairs"]]
+    rng = random.Random(2106)
+    scenarios = [set(), set(keys)]
+    for fraction in (.2, .5, .8):
+        count = round(len(keys) * fraction)
+        scenarios.append(set(rng.sample(keys, count)))
+    return scenarios
+
+
+def _assert_review_js_matches_python(results: dict) -> None:
+    if not shutil.which("node"):
+        pytest.skip("node is not installed")
+    baseline = probe_metrics.aggregate(results)
+    data = build_probe_page._review_data(results, baseline)
+    scenarios = _review_scenarios(results)
+    source = (build_probe_page.REVIEW_CORE + "\nvar payload = JSON.parse(require('fs').readFileSync(0, 'utf8'));"
+              + "\nconsole.log(JSON.stringify(payload.sets.map(function (keys) {"
+              + " return reviewMetrics(payload.data, keys); })));\n")
+    payload = json.dumps({"data": data, "sets": [sorted(keys) for keys in scenarios]},
+                         ensure_ascii=False, separators=(",", ":"))
+    completed = subprocess.run(["node", "-e", source], input=payload, check=True,
+                               capture_output=True, text=True)
+    actual = json.loads(completed.stdout)
+    for accepted, browser_result in zip(scenarios, actual):
+        report = probe_metrics.aggregate(results, accepted)
+        for pattern in results["meta"]["patterns"]:
+            pattern_id = pattern["id"]
+            python_report = report["patterns"][pattern_id]
+            browser_pattern = browser_result[pattern_id]
+            for key in build_probe_page.REVIEW_RECALCULATED:
+                item = python_report["metrics"][key]
+                value = build_probe_page._ja_note(item["value"]) if key == "L1_kind_each" else item["value"]
+                assert {name: browser_pattern[key][name] for name in ("value", "pass")} == {
+                    "value": value, "pass": item["pass"]}
+            python_kinds = {}
+            kind_items = python_report["metrics"]["L1_kind_each"]["kinds"]
+            for kind in KINDS:
+                if kind in probe_metrics.QUESTION_KINDS:
+                    continue
+                item = kind_items[kind]
+                value = (f"{item['rate']:.1%}（{item['count']}/{item['total']}）"
+                         if item["rate"] is not None else "対象なし")
+                python_kinds[kind] = {"value": value, "pass": item["pass"]}
+            assert browser_pattern["L1_kind_each"]["kinds"] == python_kinds
+            assert browser_pattern["yesno"] == {
+                name: {"value": python_report["reference"]["yesno_accuracy"][name]["value"]}
+                for name in ("existing", "new")
+            }
+            assert browser_pattern["passCount"] == sum(
+                item["pass"] is True for item in python_report["metrics"].values())
 
 
 def test_load_cases_round_robin_bare_and_duplicate(tmp_path):
@@ -299,3 +420,67 @@ def test_metrics_recognize_production_correct_and_irrelevant_openers():
     assert report["metrics"]["P5"]["count"] == 1
     assert report["metrics"]["P2"]["count"] == 1
     assert report["metrics"]["L2_opener"]["pass"] is True
+
+
+def test_aggregate_acceptance_matches_adding_alternate_labels():
+    results = _review_results()
+    assert probe_metrics.aggregate(results) == probe_metrics.aggregate(results, frozenset())
+    for case_id in ("q-yes", "multi"):
+        target_row = next(row for row in results["rows"]["pattern-1"]
+                          if row["case_id"] == case_id)
+        final = target_row["record"]["final"]
+        accepted_key = probe_metrics.pair_key(target_row["case_id"], final["kind"], final["answer"])
+        actual = probe_metrics.aggregate(results, {accepted_key})
+        expanded = deepcopy(results)
+        case = next(case for case in expanded["cases"] if case["id"] == target_row["case_id"])
+        case["accept_kinds"].append(final["kind"])
+        if final["kind"] == "q_yesno" and final["answer"]:
+            case["accept_answers"].append(final["answer"])
+        assert actual == probe_metrics.aggregate(expanded)
+
+
+def test_probe_review_page_controls_and_group_keys(tmp_path):
+    results = _review_results()
+    out = tmp_path / "probe.html"
+    build_probe_page.build_page(results, out)
+    summary = out.read_text(encoding="utf-8")
+    metrics = probe_metrics.aggregate(results)
+    review_data = build_probe_page._review_data(results, metrics)
+    assert '<h3 id="human-review">人間チェック後のサマリー</h3>' in summary
+    assert f'確認済み 0 / {len(review_data["pairs"])} 組' in summary
+    assert 'accept="application/json"' in summary
+    assert "window.reviewMetrics = reviewMetrics" in summary
+    problem = (out.parent / out.stem / "U01.html").read_text(encoding="utf-8")
+    selects = re.findall(r'<select class="review-select" data-pair="([^"]+)"', problem)
+    expected = []
+    by_id = {case["id"]: case for case in results["cases"]}
+    for pattern in results["meta"]["patterns"]:
+        for row in results["rows"][pattern["id"]]:
+            if row["no"] == "U01" and probe_metrics.row_flags(row, by_id[row["case_id"]])[
+                "label_mismatch"]:
+                final = row["record"]["final"]
+                expected.append(probe_metrics.pair_key(row["case_id"], final["kind"],
+                                                       final["answer"]))
+    assert selects == expected
+    assert f"確認済み 0 / {len(set(expected))} 組" in problem
+    assert "未確認の相違だけ" in problem
+    assert "../probe.html#human-review" in problem
+    for pattern in results["meta"]["patterns"]:
+        for row in results["rows"][pattern["id"]]:
+            if row["no"] == "U01" and probe_metrics.row_flags(
+                    row, by_id[row["case_id"]])["label_mismatch"]:
+                assert 'data-sort="✕"' in problem
+                break
+
+
+def test_review_core_matches_python_with_synthetic_results():
+    _assert_review_js_matches_python(_review_results())
+
+
+def test_review_core_matches_full_20261004_results_when_available():
+    path = Path(__file__).resolve().parents[1] / "work/probe/full-20261004/results.json"
+    if not path.is_file():
+        pytest.skip("full-20261004 results.json is not present")
+    results = json.loads(path.read_text(encoding="utf-8"))
+    assert len(build_probe_page._review_data(results, probe_metrics.aggregate(results))["pairs"]) == 52
+    _assert_review_js_matches_python(results)

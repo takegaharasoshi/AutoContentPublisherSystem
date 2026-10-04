@@ -764,6 +764,14 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 
 <h4>評価ページ</h4>
 <p><a href="umigame-soup-1-probe.html">コメント返信の評価（プローブ）</a>。サマリー 1 枚（合否表・指標）+ 問題ごとの 14 枚（コメント一覧と生データ）。合否表の NG の ID から該当の行へ飛べる。生成器は <code>tools/build_probe_page.py</code>。</p>
+<p><strong>人間チェック</strong>（21-6d5 で追加）: 機械判定の不一致を人が見て「許容 / 不可」を付け、許容を一致として数え直した合否を見る。</p>
+<ul>
+  <li><strong>判断の単位</strong>: コメント × 判定結果の<strong>組</strong>（キー <code>コメント ID|判定の種別|答え</code>。答えは q_yesno のときだけ。<code>probe_metrics.pair_key</code>）。問題ページの相違 ✕ の行にプルダウン（未確認 / 許容 / 不可）があり、同じ組の別パターンの行は連動する。21-6d4 の全件プローブでは不一致 136 行 = 52 組</li>
+  <li><strong>許容の意味</strong>: その行に限り、評価データの別解（<code>accept_kinds</code> / <code>accept_answers</code>）に判定結果を足したのと同じ扱いにする（<code>aggregate(results, accepted)</code>）。21-6d6 で別解に取り込んだときの合否と一致させるため</li>
+  <li><strong>サマリーの「人間チェック後のサマリー」</strong>: 正解ラベルに依存する P2・P3・P4・P5・L1①（全体・各種別と 19 種別の内訳）・L1②・L1③ と参考の ① 判定一致率をブラウザーで数え直す。P1・P6・P7・レベル 2 は機械判定の値を写す（ラベルに依存しないか、52 組に不適切系の種別がなく変わらない）。機械判定から変わったセルは色を変える。全組未確認のときは機械判定の合否表と同じ値になる（pytest で JS と Python の集計を突き合わせている）</li>
+  <li><strong>保存</strong>: ブラウザーの <code>localStorage</code>（キー <code>umigame-probe-review/&lt;実行日時&gt;</code>）。問題ページとサマリーで共有し、別タブの変更も再読み込みなしで反映する。<code>localStorage</code> はブラウザーと開き方（<code>file://</code> / HTTP）ごとに別なので、<strong>正式な記録は「書き出す」で保存した JSON</strong>（全組の キー・判断・日時）とし、「読み込む」で戻せる</li>
+</ul>
+<div class="decision"><span class="callout-title">決定（2026-10-04・21-6d5）</span>数え直す指標は計画書の列挙（P2〜P5・L1① と内訳・はい / いいえの一致率）に L1②（言い回しの偏り）と L1③（誘導率）を加えた。どちらも想定種別で集計対象が決まり、許容すると値が動くため、写すだけだと 21-6d6 で作り直したページと合わなくなる。</div>
 
 <h4 id="judge-trial-result">試行錯誤の記録</h4>
 <p>判定方式の試走（試行 1〜8b）・2 方式の比較図・誤りの中身は検討ページ「<a href="umigame-soup-1-judge-study.html">コメント返信処理方式の検討</a>」、返信文の 13 案の試走は「<a href="umigame-soup-1-reply-study.html">コメント返信文の品質の検討</a>」にある。試行錯誤は検討ページで回し、決まったことだけを本書へ移す。</p>

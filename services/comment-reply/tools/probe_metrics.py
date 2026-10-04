@@ -72,6 +72,11 @@ def answer_matches(row: dict[str, Any]) -> bool:
     )
 
 
+def pair_key(case_id: str, kind: str | None, answer: str | None) -> str:
+    """人間チェックで同じ判断を共有する行のキーを返す。"""
+    return f"{case_id}|{kind or ''}|{answer if kind == 'q_yesno' and answer else ''}"
+
+
 def apply_labels(row: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
     """Apply alternate acceptable kinds and answers to the expected label."""
     labeled = {**row, "expected_kind": case["expected_kind"],
@@ -192,7 +197,8 @@ def _accuracy(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "rate": count / len(rows) if rows else None}
 
 
-def aggregate(results: dict[str, Any]) -> dict[str, Any]:
+def aggregate(results: dict[str, Any],
+              accepted: frozenset[str] | set[str] = frozenset()) -> dict[str, Any]:
     """Aggregate each pattern without calls or changes to the input results."""
     cases = {case["id"]: case for case in results["cases"]}
     core = load_core_words()
@@ -205,6 +211,14 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
             record = row["record"]
             final = record.get("final") or {}
             reply = (record.get("reply") or {}).get("text")
+            if pair_key(row["case_id"], final.get("kind"), final.get("answer")) in accepted:
+                case = {**case,
+                        "accept_kinds": list(dict.fromkeys(
+                            [*case.get("accept_kinds", []), final.get("kind")])),
+                        "accept_answers": list(dict.fromkeys(
+                            [*case.get("accept_answers", []),
+                             *([final.get("answer")] if final.get("kind") == "q_yesno"
+                               and final.get("answer") else [])]))}
             flags = row_flags(row, case, core)
             labeled = apply_labels({"kind": final.get("kind"), "answer": final.get("answer"),
                                     "comment_text": case["text"]}, case)
