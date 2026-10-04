@@ -237,7 +237,7 @@ def _time_svg(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> str:
 def _metric_detail(key: str, item: dict[str, Any]) -> str:
     """不合格の指標の内訳（どの種別・何件で落ちたか）を短く書く。"""
     if key == "L1_kind_each":
-        return "80% 未満: " + "・".join(f"{_kind(k)} {v['count']}/{v['total']}"
+        return "80% 未満: " + "・".join(f"{_kind(k)} {v['rate']:.1%}（{v['count']}/{v['total']}）"
                                          for k, v in item["by_kind"].items())
     if key == "L1_phrasing":
         return "50% 超: " + "・".join(f"{_kind(k)} {v['count']}/{v['total']}"

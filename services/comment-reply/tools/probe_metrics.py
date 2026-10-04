@@ -371,8 +371,8 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
                 len(low_kinds), len(non_question_rates), "質問以外の各種別 80% 以上",
                 not low_kinds if non_question_rates else None,
                 rate=min(non_question_rates, default=None),
-                value=("80% 未満 " + "・".join(f"{kind} {entry['count']}/{entry['total']}"
-                                               for kind, entry in low_kinds.items())
+                value=("・".join(f"{kind} {entry['rate']:.1%}（{entry['count']}/{entry['total']}）"
+                                for kind, entry in low_kinds.items())
                        if low_kinds else
                        f"最低 {min(non_question_rates):.1%}" if non_question_rates else "対象なし"),
                 by_kind=low_kinds),
