@@ -270,6 +270,9 @@ def test_metrics_l1_kind_opener_and_answer_synonym():
     assert report["metrics"]["L1_kind_each"]["pass"] is False
     assert set(report["metrics"]["L1_kind_each"]["by_kind"]) == {"impression"}
     assert [x["id"] for x in report["metrics"]["L1_kind_each"]["ng"]] == ["i3", "i4"]
+    kinds = report["metrics"]["L1_kind_each"]["kinds"]
+    assert "q_yesno" not in kinds and kinds["impression"]["pass"] is False
+    assert [x["id"] for x in kinds["impression"]["ng"]] == ["i3", "i4"]
 
     q_cases = [_case("yes", "q_yesno", "yes"), _case("bad", "q_yesno", "yes")]
     q_rows = [_row(q_cases[0], "q_yesno", "yes", "はい！"),

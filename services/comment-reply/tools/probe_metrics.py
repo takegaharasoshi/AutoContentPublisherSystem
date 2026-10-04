@@ -375,7 +375,14 @@ def aggregate(results: dict[str, Any]) -> dict[str, Any]:
                                 for kind, entry in low_kinds.items())
                        if low_kinds else
                        f"最低 {min(non_question_rates):.1%}" if non_question_rates else "対象なし"),
-                by_kind=low_kinds),
+                by_kind=low_kinds,
+                # 合否表で種別ごとに 1 行ずつ出すための内訳（NG の ID 付き）
+                kinds={kind: {**entry,
+                              "pass": entry["rate"] >= .8 if entry["rate"] is not None else None,
+                              "ng": _ng([x for x in items if x["flags"]["kind_mismatch"]
+                                         and x["expected_kind"] == kind],
+                                        lambda x: f"{x['expected_kind']} → {x['kind']}")}
+                       for kind, entry in by_kind.items() if kind not in QUESTION_KINDS}),
             "L1_phrasing": _metric(
                 max((v["count"] for v in phrasing.values()), default=0),
                 max((v["total"] for v in phrasing.values()), default=0),

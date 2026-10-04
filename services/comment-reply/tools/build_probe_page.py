@@ -140,6 +140,8 @@ def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]],
                              f"{_ng_details(pattern['id'], item, page_of)}</td>")
             threshold = metrics["patterns"][patterns[0]["id"]]["metrics"][key]["threshold"]
             cells.append(f"<td>{_h(threshold)}</td></tr>")
+            if key == "L1_kind_each":
+                cells.append(_kind_rows(metrics, patterns, page_of))
     count = sum(len(entries) for _, entries in SECTIONS)
     cells.append("<tr><th>合格した指標の数</th>")
     for pattern in patterns:
@@ -147,6 +149,27 @@ def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]],
         cells.append(f"<td>{sum(v['pass'] is True for v in values)} / {count}</td>")
     cells.append("<td>参考: 対象なしは数えない</td></tr></tbody></table></div>")
     return "".join(cells)
+
+
+def _kind_rows(metrics: dict[str, Any], patterns: list[dict[str, Any]],
+               page_of: Callable[[str, str], str]) -> str:
+    """L1①（質問以外の各種別）の内訳を種別ごとに 1 行ずつ出す（合格指標の数には数えない）。"""
+    first = metrics["patterns"][patterns[0]["id"]]["metrics"]["L1_kind_each"]
+    rows = []
+    for kind in first.get("kinds", {}):
+        entries = [metrics["patterns"][p["id"]]["metrics"]["L1_kind_each"]["kinds"][kind]
+                   for p in patterns]
+        toggle = ('<button type="button" class="ng-row" aria-label="この行の NG を開く / 閉じる">'
+                  '行を開く</button>' if any(e["ng"] for e in entries) else "")
+        cells = [f'<tr class="sub-row"><th>{_h(_kind(kind))}{toggle}</th>']
+        for pattern, entry in zip(patterns, entries):
+            value = (f"{entry['rate']:.1%}（{entry['count']}/{entry['total']}）"
+                     if entry["rate"] is not None else "対象なし")
+            cells.append(f"<td>{_h(value)} {_badge(entry['pass'])}"
+                         f"{_ng_details(pattern['id'], entry, page_of)}</td>")
+        cells.append("<td>80% 以上</td></tr>")
+        rows.append("".join(cells))
+    return "".join(rows)
 
 
 # グラフはスマホ幅（360px）で 1:1 になる viewBox にし、PC では CSS の max-width で止める
@@ -400,6 +423,7 @@ body { overflow-wrap: anywhere; }
 .summary-table tbody th { min-width: 10.5rem; }
 .eval-table tbody th { min-width: 8rem; }
 .group th { background: var(--note-bg); }
+.sub-row th { padding-left: 1.6rem; font-weight: normal; }
 .ng-toolbar { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0; }
 .ng-toolbar button, .ng-row { font: inherit; font-size: .8rem; padding: .15rem .55rem; cursor: pointer;
   border: 1px solid var(--border); border-radius: 4px; background: var(--bg-subtle); color: var(--text); }
