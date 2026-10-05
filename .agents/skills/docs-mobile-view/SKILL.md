@@ -42,10 +42,23 @@ WSL は NAT で独自の IP を持つため、Windows の Tailscale IP から WS
 | スマホで開けない | `./tools/serve-docs.sh status` で HTTP サーバー稼働 + `tailscale serve` 設定の両方を見る |
 | 1 が死んでいる | PC 再起動後は WSL 側だけ落ちる(`tailscale serve` の設定は Windows 側に永続化される)。`start` で復帰 |
 | 2 だけ消えている | `tailscale serve status` が空。`start` で再設定 |
+| `tailscale status` が「Tailscale is starting」のまま・`start` が `unexpected state: NoState` | Windows の GUI(`tailscale-ipn.exe`)が起動していない(PC 再起動後に 2026-10-02・10-05 と続けて発生。サービス `tailscaled` は RUNNING でもこうなる。serve 設定も消える)。下記の手順で GUI を起動 → 接続を待つ → 全ポートで `start` をやり直す。再発防止はユーザーに Tailscale トレイメニューの「Run at startup」をオンにしてもらう |
 | サーバーは生きているのに届かない | Windows から `/mnt/c/Windows/System32/curl.exe -s -o NUL -w "%{http_code}\n" http://localhost:8765/index.html` で 1 の生死、続けて `http://<tailscale名>:8765/index.html` で 2 の生死を確認して層を特定する |
 | スマホ側 | Tailscale アプリが接続中か、同じアカウント(`tailscale status` にスマホが並んでいるか)を確認 |
 
 Windows 側 Tailscale CLI: `/mnt/c/Program Files/Tailscale/tailscale.exe`(WSL からそのまま実行できる。管理者権限は不要)。
+
+GUI が落ちているときの復旧(`tasklist.exe | grep -i tailscale-ipn` が空なら該当):
+
+```bash
+# 1. GUI を起動する。cmd.exe の start は WSL 側に終わらないプロセスを残すため、必ず Bash の run_in_background で起動する
+cd /mnt/c && /mnt/c/Windows/System32/cmd.exe /c start "" "C:\Program Files\Tailscale\tailscale-ipn.exe"
+# 2. 接続を待つ(自機が 100.x の IP 付きで並べば OK。通常 10〜30 秒)
+T="/mnt/c/Program Files/Tailscale/tailscale.exe"; timeout 90 bash -c "until \"$T\" status 2>&1 | grep -q '^100\..*takegaharapc'; do sleep 5; done"
+# 3. 使用中の全ポートで start をやり直す(serve 設定が消えているため。ポートと配信ルートは 2.5 の一覧)
+```
+
+残った WSL 側のプロセス(`ps aux | grep "cmd.exe /c start"`)は kill してよい。GUI(`tailscale-ipn.exe`)は Windows 側の別プロセスなので巻き込まれない(2026-10-05 確認)。
 
 ## 2.5 レビュー HTML をスマホで見る(`content/` 配下)
 
