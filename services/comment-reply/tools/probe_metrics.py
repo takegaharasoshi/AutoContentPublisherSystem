@@ -81,7 +81,11 @@ def apply_labels(row: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
     """Apply alternate acceptable kinds and answers to the expected label."""
     labeled = {**row, "expected_kind": case["expected_kind"],
                "expected_answer": case.get("expected_answer")}
-    if row["kind"] in case.get("accept_kinds", []):
+    # 種別 q_yesno を別解にしたケースは、accept_answers があればその答えだけ許容する（21-6d6）
+    yesno_limited = (row["kind"] == "q_yesno" and case["expected_kind"] != "q_yesno"
+                     and case.get("accept_answers")
+                     and row["answer"] not in case["accept_answers"])
+    if row["kind"] in case.get("accept_kinds", []) and not yesno_limited:
         labeled["expected_kind"] = row["kind"]
         labeled["expected_answer"] = row["answer"] if row["kind"] == "q_yesno" else None
     if row["kind"] == "q_yesno" and row["answer"] in case.get("accept_answers", []):

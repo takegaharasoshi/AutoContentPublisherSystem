@@ -439,6 +439,18 @@ def test_aggregate_acceptance_matches_adding_alternate_labels():
         assert actual == probe_metrics.aggregate(expanded)
 
 
+def test_apply_labels_yesno_alternate_kind_limited_to_accepted_answers():
+    case = {"expected_kind": "guess_wrong", "expected_answer": None,
+            "accept_kinds": ["q_yesno"], "accept_answers": ["no"]}
+    accepted = probe_metrics.apply_labels({"kind": "q_yesno", "answer": "no"}, case)
+    assert (accepted["expected_kind"], accepted["expected_answer"]) == ("q_yesno", "no")
+    other = probe_metrics.apply_labels({"kind": "q_yesno", "answer": "yes"}, case)
+    assert other["expected_kind"] == "guess_wrong"
+    unlimited = probe_metrics.apply_labels({"kind": "q_yesno", "answer": "yes"},
+                                           {**case, "accept_answers": []})
+    assert unlimited["expected_kind"] == "q_yesno"
+
+
 def test_probe_review_page_controls_and_group_keys(tmp_path):
     results = _review_results()
     out = tmp_path / "probe.html"

@@ -72,7 +72,11 @@
   {
     "id": "c-ask_howto-05",
     "text": "これ中の人？自動で返してる？",
-    "kind": "ask_howto"
+    "kind": "ask_howto",
+    "accept_kinds": [
+      "q_multi"
+    ],
+    "note": "2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_multi を許容"
   },
   {
     "id": "c-impression-01",
@@ -395,7 +399,11 @@
   {
     "id": "c-foreign-04",
     "text": "答案是什么？",
-    "kind": "foreign"
+    "kind": "foreign",
+    "accept_kinds": [
+      "ask_spoiler"
+    ],
+    "note": "2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 ask_spoiler を許容"
   },
   {
     "id": "c-foreign-05",

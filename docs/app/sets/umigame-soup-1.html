@@ -742,6 +742,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <tr><td colspan="2"><strong>計</strong>（数え方の正は <code>tools/probe_run.py</code> の <code>load_cases</code>）</td><td><strong>441</strong></td></tr>
 </table>
 </div>
+<p><strong>別解</strong>: ケースは正解ラベル（<code>kind</code> / <code>answer</code>）のほかに、許容する種別 <code>accept_kinds</code> と答え <code>accept_answers</code> を持てる（<code>probe_metrics.apply_labels</code>）。種別 q_yesno を別解にしたケースは、<code>accept_answers</code> があればその答えだけを許容する（21-6d6）。足したときは <code>note</code> に日付と根拠を書く。人間チェックの判断の記録は <code>data/human_review_21-6d6.json</code>。</p>
 <p><strong>作り方（テストの偏りを避ける）</strong>: 質問は <code>expected_questions</code> を見ずに、問題文だけを見て（真相を見ずに）プレイヤーの立場で書き、あとから真相と確定事実で正解ラベルを付ける。下書きは判定プロンプトの調整に関わっていない書き手（Codex への委譲）が書き、Claude が正解ラベルを検め、ユーザーが確認する。</p>
 
 <h4>機械プローブ</h4>
@@ -752,15 +753,15 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </ul>
 <div class="table-wrap">
 <table>
-<tr><th>パターン</th><th>判定のモード</th><th>返信文の案</th><th>21-6d4 の合格数（16 指標中）</th></tr>
-<tr><td>①</td><td><code>luna</code></td><td><code>1b</code></td><td>12</td></tr>
-<tr><td>②</td><td><code>luna</code></td><td><code>1d-luna</code></td><td>12</td></tr>
-<tr><td>③</td><td><code>hybrid</code></td><td><code>1d-luna</code></td><td>11</td></tr>
-<tr><td>④</td><td><code>jev</code></td><td><code>2b</code></td><td>13</td></tr>
-<tr><td>⑤</td><td><code>jev</code></td><td><code>2c-luna</code></td><td>12</td></tr>
+<tr><th>パターン</th><th>判定のモード</th><th>返信文の案</th><th>21-6d4 の合格数（16 指標中）</th><th>21-6d6 の人間チェック取り込み後</th></tr>
+<tr><td>①</td><td><code>luna</code></td><td><code>1b</code></td><td>12</td><td>13</td></tr>
+<tr><td>②</td><td><code>luna</code></td><td><code>1d-luna</code></td><td>12</td><td>13</td></tr>
+<tr><td>③</td><td><code>hybrid</code></td><td><code>1d-luna</code></td><td>11</td><td>12</td></tr>
+<tr><td>④</td><td><code>jev</code></td><td><code>2b</code></td><td>13</td><td>14</td></tr>
+<tr><td>⑤</td><td><code>jev</code></td><td><code>2c-luna</code></td><td>12</td><td>13</td></tr>
 </table>
 </div>
-<p>2026-10-04（21-6d4）の時点で、全指標を満たすパターンはない。方式選定（21-6e）の材料にする。L1① は「全体 90% 以上」と「質問以外の各種別 80% 以上」を別の指標として数える（2026-10-04 ユーザー指示。21-6d3 までは 1 指標・15 指標中で数えていた）。</p>
+<p>2026-10-04（21-6d4）の時点で、全指標を満たすパターンはない。2026-10-06（21-6d6）に人間チェックの「許容」26 組を評価データの別解へ取り込んで数え直すと、全パターンで L1① の各種別（guess_close・guess_wrong）が合格に変わったが、全指標を満たすパターンはまだない（残る NG は P2・L2 の一言 / 矛盾ほか。<a href="#d-20261006-human-review-import">付録</a>）。方式選定（21-6e）の材料にする。L1① は「全体 90% 以上」と「質問以外の各種別 80% 以上」を別の指標として数える（2026-10-04 ユーザー指示。21-6d3 までは 1 指標・15 指標中で数えていた）。</p>
 
 <h4>評価ページ</h4>
 <p><a href="umigame-soup-1-probe.html">コメント返信の評価（プローブ）</a>。サマリー 1 枚（合否表・指標）+ 問題ごとの 14 枚（コメント一覧と生データ）。合否表の NG の ID から該当の行へ飛べる。生成器は <code>tools/build_probe_page.py</code>。</p>
@@ -1136,6 +1137,13 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
   <span class="callout-title">2026-10-04 アイデア採用・21-6d3e: truth 全文を翌日リールのキャプション末尾で公開する。見出しを問題タイトルにし、truth・title を公開前提に書き直す</span>
   <p>AI 出題者は <code>truth</code> を根拠に判定するが、フォロワーに見えるのは正解者への <code>reveal_text</code>（70 字）だけで答え合わせができなかった（ユーザー指摘）。コメント欄に全文を出すと問題がその場でネタバレになるため、翌日のリールのキャプション末尾（ハッシュタグの後ろ）に出す。1 日 1 問なので締め処理なしで 24 時間後に必ず出て、誰も正解しない回も同じ仕組みで答えが出る。<code>truth</code> を廃止して <code>reveal_text</code> を判定根拠にする案は、根拠が足りず漏洩防止の設計が崩れるため採らない。経緯は<a href="../../ideas/umigame-truth-disclosure.md">アイデア記録</a>。</p>
   <p>21-6d3e で 14 問の <code>truth</code> を公開前提に書き直し（筋・事実は不変）、<code>title</code> 2 問（U20・U21）を手がかりにならない題に改め、キャプションの見出しと予告を変えた。<code>validate.py</code> に <code>truth</code> 400 字の上限を足した（根拠はセクション 4）。DB の既存行は <code>update_judge_points.sql</code>（title・truth・caption を含む UPDATE）で入れ替える。</p>
+</div>
+
+<div class="decision" id="d-20261006-human-review-import">
+  <span class="callout-title">2026-10-06 21-6d6: 人間チェックの「許容」26 組を評価データの別解に取り込み、評価ページを作り直す</span>
+  <p>21-6d5 の評価ページでユーザーが不一致 52 組を判断した（2026-10-05。許容 26・不可 26。書き出した JSON は <code>judge-trial/data/human_review_21-6d6.json</code>）。許容の組を 25 ケース（<code>eval_problems.json</code> 23・<code>common_cases.json</code> 2。語だけのコメントは該当なし）の別解に足した。種別が違えば <code>accept_kinds</code> に、q_yesno どうしで答えだけ違えば <code>accept_answers</code> に入れる。正解ラベルは変えていない。API は呼ばず、21-6d4 の <code>results.json</code> のケース定義だけを差し替えて作り直した。合否表は 21-6d5 の「人間チェック後のサマリー」（<code>aggregate(results, accepted)</code>）と全パターン・全指標で一致する。</p>
+  <p>あわせて <code>apply_labels</code> を直した。従来は種別 q_yesno を別解にすると答えを問わず許容になり、許容したのは「はい」の組だけなのに、次のプローブで「いいえ」も一致と数えてしまう。<code>accept_answers</code> があるときはその答えだけを許容する。既存のデータに種別 q_yesno の別解はなく、21-6d4 の集計は変わらない。</p>
+  <p>「不可」の 26 組は不一致のまま残る（評価ページの人間チェックでは「確認済み 0 / 26 組」と出る）。方式は 21-6e で選ぶ。</p>
 </div>
 
 </div>

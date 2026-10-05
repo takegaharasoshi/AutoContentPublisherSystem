@@ -127,14 +127,23 @@
       "text": "影ってレントゲンに写る影のことでしょ。男は医者に何か言われたんだ。",
       "kind": "guess_close",
       "answer": null,
-      "note": "2026-10-02 21-6d2 Claude 書き直し: 元の文は末尾が質問（病院に通ってたのかな？）で推理と質問のどちらとも読めたため、コア 1 だけを当てた ⑤ に改めた"
+      "note": "2026-10-02 21-6d2 Claude 書き直し: 元の文は末尾が質問（病院に通ってたのかな？）で推理と質問のどちらとも読めたため、コア 1 だけを当てた ⑤ に改めた。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（yes） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "yes"
+      ]
     },
     {
       "id": "U01-e19",
       "text": "影が薄くなったのは、男の病気が良くなってきた知らせなんだね。",
       "kind": "guess_correct",
       "answer": null,
-      "note": "2026-09-27 ユーザー確認（コア基準）: コアの 2 点（病気の影・良くなった知らせ）を言い当てているので正解"
+      "note": "2026-09-27 ユーザー確認（コア基準）: コアの 2 点（病気の影・良くなった知らせ）を言い当てているので正解。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 guess_close を許容",
+      "accept_kinds": [
+        "guess_close"
+      ]
     },
     {
       "id": "U01-e20",
@@ -349,7 +358,13 @@
       "text": "演奏会の前に並んで写真を撮るのが恒例になってたんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U12-e21",
@@ -484,7 +499,14 @@
       "text": "学校で書かれた古い手紙が何十年も保管されていて、男に渡ったんじゃない？",
       "kind": "guess_close",
       "answer": null,
-      "note": "2026-09-27 ユーザー確認（コア基準）: 「未来の自分宛てで長く保管された手紙」をコアの半分として扱うので惜しい"
+      "note": "2026-09-27 ユーザー確認（コア基準）: 「未来の自分宛てで長く保管された手紙」をコアの半分として扱うので惜しい。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 guess_wrong・q_yesno（yes） を許容",
+      "accept_kinds": [
+        "guess_wrong",
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "yes"
+      ]
     },
     {
       "id": "U13-e19",
@@ -631,7 +653,11 @@
       "text": "卵はパン屋の主人が自分で買いに行くんですか？",
       "kind": "q_yesno",
       "answer": "no",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 答え irrelevant を許容",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
     },
     {
       "id": "U14-e10",
@@ -711,7 +737,13 @@
       "text": "卵を産む鶏を店の奥で大事に飼っていて、その鶏の餌がパン生地に混ざってるんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U14-e21",
@@ -821,7 +853,10 @@
       "text": "二人はどこで、何をしている最中なんですか？",
       "kind": "q_open",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_multi を許容",
+      "accept_kinds": [
+        "q_multi"
+      ]
     },
     {
       "id": "U16-e15",
@@ -849,7 +884,13 @@
       "text": "子どもたちと鬼ごっこをしてたんでしょ。",
       "kind": "guess_close",
       "answer": null,
-      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の文は氷鬼のルールをすべて説明し実質 ④ のため Claude が書き直し（鬼ごっこまで）"
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の文は氷鬼のルールをすべて説明し実質 ④ のため Claude が書き直し（鬼ごっこまで）。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（yes） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "yes"
+      ]
     },
     {
       "id": "U16-e19",
@@ -863,7 +904,13 @@
       "text": "二人とも吹雪で遭難して、助けを待ってるうちに凍えてしまったんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U16-e21",
@@ -1019,7 +1066,10 @@
       "text": "約束を書いた紙を誰かに破られてしまい、二人は悲しくてそのまま諦めたんだ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "2026-09-27 ユーザー確認（コア基準）: 周辺（紙に書かれていた）だけでコアに触れていないので外れ"
+      "note": "2026-09-27 ユーザー確認（コア基準）: 周辺（紙に書かれていた）だけでコアに触れていないので外れ。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 guess_close を許容",
+      "accept_kinds": [
+        "guess_close"
+      ]
     },
     {
       "id": "U18-b22",
@@ -1203,7 +1253,13 @@
       "text": "隣の女性も男がその曲を知っている理由を分かっていて、思わず笑ったんだね。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "2026-09-27 ユーザー確認（コア基準）: 周辺（妻が笑った理由）だけでコアに触れていないので外れ"
+      "note": "2026-09-27 ユーザー確認（コア基準）: 周辺（妻が笑った理由）だけでコアに触れていないので外れ。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（yes） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "yes"
+      ]
     },
     {
       "id": "U20-e20",
@@ -1338,7 +1394,11 @@
       "text": "実家では毎年スイカを育てているんですか？",
       "kind": "q_yesno",
       "answer": "no",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 答え irrelevant を許容",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
     },
     {
       "id": "U21-e08",
@@ -1352,7 +1412,11 @@
       "text": "男はスイカが実っていることを事前に知ってましたか？",
       "kind": "q_yesno",
       "answer": "no",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 答え irrelevant を許容",
+      "accept_answers": [
+        "no",
+        "irrelevant"
+      ]
     },
     {
       "id": "U21-e10",
@@ -1432,7 +1496,13 @@
       "text": "兄弟でどっちが先にスイカを実らせるか競争してて、弟の勝ちだったんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U21-e21",
@@ -1575,7 +1645,13 @@
       "text": "その歯医者の建物って、男が昔なにか関わってた場所なんでしょ。",
       "kind": "guess_close",
       "answer": null,
-      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の「待合室に子どものころの思い出」は fact_sheet の周辺事実だけで ⑥ 相当のため Claude が書き直し"
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の「待合室に子どものころの思い出」は fact_sheet の周辺事実だけで ⑥ 相当のため Claude が書き直し。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（yes） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "yes"
+      ]
     },
     {
       "id": "U22-e19",
@@ -1589,7 +1665,13 @@
       "text": "昔から通ってる先生に会いたくて、診察を口実に半年ごとに訪ねてるんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U22-e21",
@@ -1732,7 +1814,13 @@
       "text": "男がいつも通る時間と、子どもたちが家を出る時間に何か関係があるんでしょ。",
       "kind": "guess_close",
       "answer": null,
-      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の「走る姿で時刻の見当」はコアの言い換えで実質 ④ のため Claude が書き直し"
+      "note": "21-6d2: 真相とコアを見せて書かせた下書き（Codex）。ラベルは Claude。元の「走る姿で時刻の見当」はコアの言い換えで実質 ④ のため Claude が書き直し。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（yes） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "yes"
+      ]
     },
     {
       "id": "U24-e19",
@@ -1746,7 +1834,13 @@
       "text": "男がいつもより早く走り始めたから、子どもたちも競争だと思って走ったんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U24-e21",
@@ -1861,7 +1955,10 @@
       "text": "年賀状には何が書いてあったんでしょう？",
       "kind": "q_open",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 ask_spoiler を許容",
+      "accept_kinds": [
+        "ask_spoiler"
+      ]
     },
     {
       "id": "U25-e15",
@@ -1903,7 +2000,13 @@
       "text": "中学の時にどっちが先に結婚するか賭けていて、友人が独身だとわかったから勝ちを喜んだんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U25-e21",
@@ -2243,7 +2346,13 @@
       "text": "妻が運転していて、男は助手席から道案内をしてるだけなんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U27-e21",
@@ -2327,7 +2436,11 @@
       "text": "スープを出したのは、その店のシェフ本人ですか？",
       "kind": "q_yesno",
       "answer": "irrelevant",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 答え yes を許容",
+      "accept_answers": [
+        "irrelevant",
+        "yes"
+      ]
     },
     {
       "id": "U28-e10",
@@ -2408,7 +2521,13 @@
       "text": "男はウミガメが大好きで、食べてしまったことが悲しくて泣いたんでしょ。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。元の「遭難したときのスープを思い出した」はコア 1 に触れ ⑥ でないため Claude が差し替え"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude。元の「遭難したときのスープを思い出した」はコア 1 に触れ ⑥ でないため Claude が差し替え。2026-10-06 21-6d6・人間チェック（2026-10-05 判断）: 判定 q_yesno（no） を許容",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U28-e21",
