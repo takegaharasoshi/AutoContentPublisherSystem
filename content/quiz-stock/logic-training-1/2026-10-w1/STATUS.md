@@ -1,6 +1,6 @@
 # 2026-10-w1 問題ストック補充: 進行状況(引き継ぎメモ)
 
-最終更新: 2026-10-05(**G3 完了 = バッチ完了**。配置 14 件〔296〜300・302〜309・311〕・Aurora update_prebuilt 14 文すべて updated=1・朝夜とも unused_built 7 / unbuilt 0。確認待ちリスト『改修 R-3 の効果確認』に 2 回目を記入〔③ はユーザー判断待ち〕)。Claude Code で実施。改修 R-3(2 段階化)後の 2 回目のバッチ。
+最終更新: 2026-10-05(**G3 完了 = バッチ完了**。配置 14 件〔296〜300・302〜309・311〕・Aurora update_prebuilt 14 文すべて updated=1・朝夜とも unused_built 7 / unbuilt 0。確認待ちリスト『改修 R-3 の効果確認』に 2 回目を記入〔③ = ユーザー判断「2 段階にした手間に見合っている」→ 2 回連続 OK で確認終了・セット記録へ移動〕)。Claude Code で実施。改修 R-3(2 段階化)後の 2 回目のバッチ。
 
 **再開地点(2026-10-05 G2 完了)**: 投入済み(ローカル MySQL 14 行・Aurora 14 文すべて updated=1。content_key = morning-050〜056 / night-050〜056・stock_item_id 296〜309)。イラスト 14 枚は codex exec で 1 本ずつ生成(再生成 0 回・全件 1536x1024・md5 重複なし・情景外の文字混入 0 件・提示物の字形 OK)→ intake(切り捨て警告は旧バッチのみ)→ build 14/14 成功(ffprobe 全件 1080x1920・16 秒・h264 + aac)→ review_sheet。**レビューページは `content/video-build/logic-training-1/work/review.html`**(build_manifest.json を今回の 14 件に絞って生成。全件版は `work/build_manifest_full_2026-10-w1.json`、ビルド前は `work/build_manifest_pre-2026-10-w1.bak.json`)。次は人間の全数レビュー → 承認 id を approved.txt へ → G3。
 **A61 の G2(2026-10-05)**: insert_a61.sql(A61 の 1 文のみ)をローカル〔ドライラン後〕・Aurora へ適用 = 各 1 行(morning-057・stock_item_id 311)。deactivate_a59.sql で 301(morning-055)を両環境 is_active=0 = 各 1 行。イラスト 311 は 1 回目で OK(1536x1024・字形 OK・混入なし)→ intake → build --item 311(BGM 13)→ build_manifest.json から 301 を外し review.html を 14 件(296〜300・302〜309・311)で再生成。**G3 の approved.txt は 296〜300・302〜309・311 の 14 件(301 は含めない)**。
