@@ -1237,7 +1237,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
     <li><strong>段 B2</strong>: <code>state</code> に <code>errors</code> を足し、指示文に「例のような誤りも矛盾に含める」を足した</li>
     <li><strong>luna</strong>: コアの要点の一覧は残し、その下に正解基準の節を足した。luna は判定と同じ呼び出しで下書き（<code>reply</code>）も書くが、下書きは送らない（10.3.3）ので、書き手に渡さない方針（上の表）とは矛盾しない</li>
     <li><strong>更新 SQL</strong>: 既存行には <code>batch-01/update_judge_criteria.sql</code>（14 問の <code>judge_criteria</code> + U27 の <code>fact_sheet</code>・<code>core_points</code>。ストックと出題済みの <code>umigame_items</code> の両方）を、V014 の適用後・image-batch / sns-post-batch のデプロイ前に流す。<code>update_judge_points.sql</code> も U27 の <code>core_points</code> に追随して再生成した</li>
-    <li><strong>小試走</strong>（Jev のみ・境目を中心に 10 件）: 8 件がラベルどおり（U12-e18・U27-e18 は ⑤、U12-e19・U27-e19 の誤り入りも ⑤）。U27-e16「人生ゲームの車の駒を動かしてたってこと？」（④）は当てた 0.18 で ⑤、U01-e19（④）は要点 1 の当てた 0.13 で ⑤。U27 は <code>hit</code> の「または」が家族のピンまで求めるように読まれた疑いがあり、21-6d8〜21-6d11 で扱う。luna は OpenAI のキーが手元の環境に無いため流していない</li>
+    <li><strong>小試走</strong>（Jev のみ・境目を中心に 10 件）: 8 件がラベルどおり（U12-e18・U27-e18 は ⑤、U12-e19・U27-e19 の誤り入りも ⑤）。U27-e16「人生ゲームの車の駒を動かしてたってこと？」（④）は当てた 0.18 で ⑤、U01-e19（④）は要点 1 の当てた 0.13 で ⑤。luna（同じ 10 件）も 8 件がラベルどおりで、外れは同じ 2 件。2 方式がそろって外したので、原因は正解基準と評価ラベルの食い違い（U27 は要点と <code>touch</code> が家族のピンまで求めているのに e16 は ④、U01 は要点 1 の <code>hit</code> が影の正体を求めているのに e19 は ④）。基準とラベルのどちらを直すかは 21-6d8 で決める</li>
   </ul>
 </div>
 
