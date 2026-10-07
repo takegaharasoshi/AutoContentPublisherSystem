@@ -111,8 +111,8 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>Scheduler の CDK 追加は 21-7</strong>（<a href="../../infra/workflow.html#schedule">workflow.html 1.6</a> の命名規約。Input にスロット・尺は持たせない）。有効化前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
 </ul>
 
-<h2 id="stock-items">4. ストック 1 件の素材項目（16 項目）</h2>
-<div class="note"><span class="callout-title">要点</span>ストック 1 件は「リール 1 本と AI 出題者の判定に要る素材一式」。下の 16 項目の表が正で、<code>validate.py</code>・テーブル <code>umigame_stock_items</code> はこれに従う。#15・#16 はコメント返信の判定用で、ほかの項目と同じく作問時に書く。問題はすべて完全オリジナル。</div>
+<h2 id="stock-items">4. ストック 1 件の素材項目（17 項目）</h2>
+<div class="note"><span class="callout-title">要点</span>ストック 1 件は「リール 1 本と AI 出題者の判定に要る素材一式」。下の 17 項目の表が正で、<code>validate.py</code>・テーブル <code>umigame_stock_items</code> はこれに従う。#15〜#17 はコメント返信の判定用で、ほかの項目と同じく作問時に書き、素材シートでレビューする。#17 正解基準は 21-6d7a で設計し、素材・<code>validate.py</code>・素材シートへの導入は 21-6d7b、DB・判定への組み込みは 21-6d7c（それまでは未記入）。問題はすべて完全オリジナル。</div>
 <p>下表が正で、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。</p>
 <p>作問の手順（ランダム語のモチーフ → コア宣言 → 動線・現実性・既存問題との照合の自己検査）はスキル <code>.claude/skills/umigame-problem-writer/SKILL.md</code> が正。<code>stock_items.py</code> の管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）を <code>validate.py</code> が様式検査し、作問レビュー用の素材シート（<code>work/review.html</code>）は問題文の直前に表示する（レビューはコア宣言から見る）。</p>
 <div class="table-wrap">
@@ -134,6 +134,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>14</td><td><code>difficulty</code> 難易度</td><td>運用の目安（在庫の偏り確認）</td><td>1〜5</td></tr>
 <tr><td>15</td><td><code>core_points</code> コアの要点</td><td>コメント返信の判定根拠（④ 正解 / ⑤ 惜しい / ⑥ 不正解を見分ける）。機械プローブの正解ラベルにも使う。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ（管理項目 <code>core</code> = コア宣言の 1 文とは別物）</td><td>1〜3 個・1 個 20 字以内（文字列の配列）。真相の説明に最低限必要な情報だけを書く（基準の正は <a href="#core-points">10.2「コアで見分ける」</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
 <tr><td>16</td><td><code>reveal_text</code> 開示文</td><td>正解時に返信で開示する真相の要約（<code>正解！</code> に続ける文。<a href="#reply-style">10.4</a>）。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ</td><td>70 字以内（<a href="#judge-contract">10.3.1</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
+<tr><td>17</td><td><code>judge_criteria</code> 正解基準</td><td>コアの要点ごとの ④⑤⑥ の境目（当てた / 触れた）と、正解から惜しいに落とす誤りの例。コメント返信の判定と評価データの正解ラベルの根拠。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ。素材シートでコアの要点と並べてレビューする</td><td>要点ごとに <code>hit</code>・<code>touch</code>（各 80 字以内）・誤りの例 0〜3 個（各 40 字以内）。書式・書き方・検査の正は <a href="#judge-criteria">10.2「正解基準」</a>。DB は <code>umigame_stock_items</code> の同名列（V014・21-6d7c）</td></tr>
 </table>
 </div>
 <ul>
@@ -146,6 +147,7 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>truth の書き方（公開前提。21-6d3e）</strong>: 翌日のリールのキャプションで全文を公開するので、フォロワーが読んで自然な文にする。① 判定メモの言い回し（「〜のことではない」の羅列・「正解宣言のとき以外は言わない」等）を書かない。② <strong>はいと答える根拠の事実をすべて本文に書く</strong>（確定事実シートで「はい」になる事実が真相に書かれていないと、答え合わせで読者が「そんな話はない」と感じる）。③ 改行は<strong>読みやすい段落の区切り</strong>に入れる（場面・時間が変わるところ。<strong>機械的な 1 文 1 行にしない</strong>。段落の中では文を続ける。空行は入れない）。④ 数字と単位の間に空白を入れない（「3か月」）。筋・事実は <code>fact_sheet</code>・<code>core_points</code>・<code>reveal_text</code> と矛盾させない</li>
   <li><strong>truth の上限 400 字の根拠</strong>（21-6d3e）: 書き直した 14 問の実測は 207〜382 字（改行込み・最長は U26 の 382 字。物語復元型は 273〜382 字、意味誤誘導型は 207〜273 字）。最長に少しの余裕を足した 400 字を上限にした。キャプションの上限 2,200 字に対しては、上半分（実測最長 270 字）+ 前回の真相ブロックの枠（区切り行などの定型 60 字 + 前回の <code>title</code> 100 字 + <code>truth</code> 400 字 = 560 字）でも 830 字で十分に収まるので、上限は読みやすさ（「続きを読む」の先で読み切れる長さ）で決めている。行数は検査しない（改行は書き手が読みやすい位置に入れ、機械的に決めないため）</li>
   <li><strong>判定用の項目（#15・#16）の持ち方</strong>: 21-6c1（V013）で後から足したため、<code>stock_items.py</code> では問題本体の辞書ではなく <code>JUDGE_POINTS</code>（問題番号 → 2 項目）に持つ。<code>validate.py</code> が個数・字数を、<code>generate.py</code> が投入 SQL への反映を扱う。21-6d3d で素材項目へ正式に数えた（それまでは表の外の注記。仕様は不変）</li>
+  <li><strong>正解基準（#17）の持ち方</strong>: #15・#16 と同じ <code>JUDGE_POINTS</code> に持つ。21-6d7a（2026-10-07）で設計して表に足し、素材・<code>validate.py</code>・素材シートへの導入は 21-6d7b、DB（V014）・判定への組み込みは 21-6d7c で行う</li>
 </ul>
 
 <h2 id="illustration-prompt">5. イラスト作成用プロンプト（ストック整備時・imagegen）</h2>
@@ -329,6 +331,82 @@ nav.toc ul { margin: .3rem 0 0; }
 </table>
 </div>
 <p>コアの要点は短い文（目安 15 字前後・上限 20 字）で、個数は説明に必要なだけ置く。問題文に書いてある事実は含めない（例: U01 は「影はレントゲンの影」だけでは泣いて喜んだ理由の説明にならないので「病気が良くなった」と 2 点）。</p>
+
+<h4 id="judge-criteria">正解基準 <code>judge_criteria</code>（設計。21-6d7a〔2026-10-07〕・導入は 21-6d7b〜c）</h4>
+<div class="note"><span class="callout-title">要点</span>上の表は全問共通の総則で、「言い当てた」「触れた」の境目は問題ごとに違う。<strong>正解基準</strong>は、コアの要点ごとに「当てた（④ に数える）」と「触れた（⑤ の下限）」の境目を書く素材項目で、コア・確定事実シートと同列に作問時に書く。総則はそのまま残り、正解基準はその問題での具体化として判定と評価ラベルの両方の正になる。確定事実シートには事実だけを書き、境目を書かない。</div>
+<p><strong>書式</strong>（JSON。<code>stock_items.py</code> では <code>JUDGE_POINTS[no]["judge_criteria"]</code> に持つ）:</p>
+<div class="table-wrap">
+<table>
+<tr><th>キー</th><th>中身</th><th>制約（<code>validate.py</code> で検査）</th></tr>
+<tr><td><code>points</code></td><td>コアの要点ごとの境目。<code>core_points</code> と<strong>同じ順・同じ個数</strong>で並べる（要点の文は写さない。対応は位置で取る）</td><td>個数 = <code>core_points</code> の個数</td></tr>
+<tr><td><code>points[].hit</code> 当てた</td><td>その要点を言い当てたとみなす<strong>粒度の下限</strong>と、認める言い換え。足りない言い方も 1 つ添える（「〜だけでは当てたにしない」）</td><td>必須・80 字以内</td></tr>
+<tr><td><code>points[].touch</code> 触れた</td><td>当てたに届かないが、その要点に触れたとみなす<strong>下限</strong>（上位概念・方向だけ合っている言い方）。これに届かなければその要点は「触れていない」</td><td>必須・80 字以内。<code>hit</code> と同文にしない</td></tr>
+<tr><td><code>errors</code> 明らかな誤り</td><td>要点がすべて当たっていても ⑤ に落とす誤りの代表（真相・確定事実と食い違う、その問題で出やすい言い方）。網羅しない（判定は 10.2 の「明らかな誤り」で行い、これは例示）</td><td>0〜3 個・1 個 40 字以内</td></tr>
+</table>
+</div>
+<p><strong>1 問分の記入例</strong>（U12「楽器を構えた男たち」。コアの要点は「男たちはひな人形」の 1 点。中身の確定は 21-6d7b）:</p>
+<pre><code>"judge_criteria": {
+  "points": [
+    {
+      "hit": "ひな人形・五人囃子・ひな祭りの段飾りの人形など、ひな祭りの人形だと特定している。「人形」だけでは当てたにしない",
+      "touch": "人形・飾り物・置物など、男たちが生きた人間ではなく飾られている物だと述べている"
+    }
+  ],
+  "errors": ["人形の楽器から本当に音が鳴る", "男たちが本物の人間や楽団である"]
+}</code></pre>
+<p>この基準なら U12-e18「男たちは人形なんでしょ。だから音を出さないんだ。」は「触れた」に当たり ⑤、「階段の段飾りの人形」まで言えば「当てた」に当たり ④ になる（評価データの正解ラベルの根拠もこの文で書ける）。</p>
+
+<p><strong>総則との関係と ④⑤⑥ の決め方</strong>: 総則の各行を、正解基準の言葉で次のように読む。</p>
+<div class="table-wrap">
+<table>
+<tr><th>総則（上の表）</th><th>正解基準での読み方</th><th>種別</th></tr>
+<tr><td>コアの要点をすべて言い当てていて、明らかな誤りがない</td><td>すべての要点で <code>hit</code> を満たし、<code>errors</code> その他の明らかな誤りがない</td><td>④</td></tr>
+<tr><td>コアの一部だけ</td><td>要点が 2 個以上の問題で、<code>hit</code> を満たす要点と満たさない要点がある</td><td>⑤</td></tr>
+<tr><td>コアに半分触れている</td><td><code>hit</code> を満たす要点はないが、どれかの要点で <code>touch</code> を満たす（要点 1 個の問題で ⑤ になるのは、この行と次の行だけ）</td><td>⑤</td></tr>
+<tr><td>コアは合っているが明らかな誤りを含む</td><td>すべての要点で <code>hit</code> を満たすが、明らかな誤りを含む</td><td>⑤</td></tr>
+<tr><td>コアに触れていない</td><td>どの要点でも <code>touch</code> を満たさない（周辺の事実だけ合っていても）</td><td>⑥</td></tr>
+</table>
+</div>
+<p>総則と正解基準が食い違うように見えたら正解基準を直す（総則は変えない）。評価データのラベル・<code>note</code> は正解基準を根拠に書き、正解基準と合わないラベルは正解基準に合わせて直す（21-6d7b）。</p>
+
+<p><strong>粒度の決め方</strong>（<code>hit</code> を書くときの目安）:</p>
+<ul>
+  <li><strong>説明テスト</strong>: 「その言い方の推理が本当だとしたら、問題文の不思議（「しかし」「それでも」の部分）がすべて説明できるか」。説明できる最も粗い言い方を <code>hit</code> の下限にし、説明が残る言い方は <code>touch</code> 側に置く（U12 の「人形」は音を出さない理由は説明できても、階段に並ぶ・毎日うれしそうに眺める理由が残るので <code>touch</code>）</li>
+  <li><strong>固有名は原則として要求しない</strong>: 商品名・作品名（人生ゲーム等）は、その名前でしか説明できない性質がある場合だけ要求する。性質を言えていれば固有名の代わりになる（例: 「すごろくの車の駒に家族のピンを差して進める」）。U27 の境目はこの目安で 21-6d7b に決める</li>
+  <li><strong>言い換え</strong>: 同じ中身の言い換え・ひらがな表記・言葉の誤用に近い言い方は <code>hit</code> に含める。代表的な言い方を 2〜3 個書けば足り、網羅しない（判定する側が「など」で広げる）</li>
+  <li><strong>評価データからは書き写さない</strong>: <code>hit</code>・<code>touch</code>・<code>errors</code> の言い回しに評価ケースの文をそのまま使わない（評価ケースがプロンプトの例と同じになると、プローブが基準の伝わり方を測れなくなる）</li>
+</ul>
+
+<p><strong>確定事実シートとの分担</strong>: 確定事実シートは「はい / いいえ / 関係ない」の根拠となる事実だけを書く。「〜まで言えたら正解」「〜だけでは正解にしない」のような ④⑤⑥ の境目は正解基準にだけ書く（U27 の該当行は 21-6d7b で移す）。「〜は答えの核心である（正解宣言のとき以外は補足で言わない）」の行は、質問への答えで真相を漏らさないための目印で正解基準ではないので、確定事実シートに残す。</p>
+
+<p><strong>保存先と受け渡し</strong>（実装は 21-6d7c）:</p>
+<div class="table-wrap">
+<table>
+<tr><th>場所</th><th>持ち方</th></tr>
+<tr><td>素材</td><td><code>stock_items.py</code> の <code>JUDGE_POINTS[no]["judge_criteria"]</code>（<code>core_points</code>・<code>reveal_text</code> と同じ置き場）。<code>generate.py</code> が投入 SQL に反映し、既存行には更新 SQL <code>update_judge_criteria.sql</code> で入れる</td></tr>
+<tr><td>DB</td><td><code>umigame_stock_items.judge_criteria</code>・<code>umigame_items.judge_criteria</code>（JSON。V014）。出題時にストックから写す。<code>core_points</code> と同じく、NULL なら出題時に異常終了する（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.14・4.15</a> は 21-6d7c で更新）</td></tr>
+<tr><td>スナップショット</td><td>キー <code>judge_criteria</code> を足し、<code>schema_version</code> を 3 に上げる（<a href="#snapshot">10.7.2</a>）。判定モジュール（<code>contract.py</code>）は 3 以上を前提にする。本番の投稿はまだ無いため、2 の読み替えは用意しない</td></tr>
+<tr><td>パターン 1（luna）</td><td><code>pattern1_rules.txt</code> のコアの要点の下に「正解基準」を足し、要点ごとに「要点 n: 〈要点〉／当てた: 〈hit〉／触れた: 〈touch〉」と、誤りの例を並べる。手順 1 の guess_correct / close / wrong の定義を「当てた = その要点の『当てた』を満たす」「触れた = 『触れた』を満たす」に言い換え、上の ④⑤⑥ の表と同じ規則にする</td></tr>
+<tr><td>パターン 2（Jev）</td><td>段 B の要点ごとの問いを、noul（同じ内容を述べているか）から <strong>choice 3 択（当てた / 触れた / 触れていない）</strong>に変え、選択肢の説明に <code>hit</code>・<code>touch</code> を入れる。当てた ≥ <code>T_POINT</code> で当てた、当てた + 触れた ≥ <code>T_CLOSE</code> で触れたとする（呼び出し回数は今と同じ。段 A1b の先取りも同じ結果を使う）。段 B2 の <code>state</code> に <code>errors</code> を足す。閾値は 21-6d11 で掃引し直す</td></tr>
+<tr><td>パターン ⑥（Decisions）</td><td>Jev の段 B と同じ形（要点ごとの 3 択に <code>hit</code>・<code>touch</code> を入れる）を基本にし、API の制約に合わせた対応付けは 21-6d10a で決める</td></tr>
+<tr><td>返信の書き手</td><td><strong>渡さない</strong>（4 案とも。<code>1b</code> は真相・確定事実・コアを受け取るが、正解基準は足さない）。書き手は判定済みの種別で文を書くので基準は要らず、基準は核心の語を並べたものなので、渡すと漏洩の入口が増えるだけになる</td></tr>
+<tr><td>作問レビュー用の素材シート</td><td><code>work/review.html</code>（<code>review_sheet.py</code>）でほかの素材と同じくレビューする。下の「素材シートでのレビュー」</td></tr>
+</table>
+</div>
+
+<p id="judge-criteria-review"><strong>素材シートでのレビュー</strong>（正解基準は素材の 1 つとして、<code>work/review.html</code> で作問の人間レビューと同じ流れで確認する。<code>review_sheet.py</code> の改修は 21-6d7b）:</p>
+<ul>
+  <li><strong>表示</strong>: 問題ごとの折りたたみ「判定用の項目」（ネタバレ扱い）を「コアの要点 n 個・正解基準・開示文」にし、コアの要点の一覧を<strong>要点ごとのまとまり</strong>に置き換える。1 つのまとまりに「要点 n: 〈要点〉（字数）」「当てた: 〈<code>hit</code>〉（字数）」「触れた: 〈<code>touch</code>〉（字数）」を縦に並べ、要点のあとに「正解にしない誤りの例」（<code>errors</code>。0 個なら「なし」）を置く。開示文はその下のまま。字数が上限を超えたら赤字にする（ほかの項目と同じ）</li>
+  <li><strong>見る順</strong>: コア宣言（問題文の上）→ 問題文 → 真相 → 確定事実シート → 正解基準。真相を読んでから境目を見るので、「その言い方で問題の不思議がすべて説明できるか」（説明テスト）をその場で確かめられる</li>
+  <li><strong>レビューの観点</strong>: ① <code>hit</code> の下限の言い方で説明テストが通り、<code>touch</code> の言い方では通らない ② 固有名を要求している場合、その名前でしか説明できない理由がある ③ <code>touch</code> が広すぎて、問題文どおりの読み方（出題者が誘った読み方）や周辺の事実だけでも触れたになる、ということがない ④ 誤りの例が真相・確定事実と本当に食い違っている ⑤ 確定事実シートに境目の言い方が残っていない</li>
+  <li><strong>14 問の初回</strong>（21-6d7b）は全問をこのシートでレビューし、評価データのラベル変更（U12-e18・U27-e18 など）は同じゴールでシートの境目と照らして決める</li>
+</ul>
+
+<p><strong>作問スキルと <code>validate.py</code> の改修</strong>（21-6d7b）:</p>
+<ul>
+  <li><strong>作問スキル</strong>（<code>.agents/skills/umigame-problem-writer/</code>）: 素材化の工程（工程 9）で <code>core_points</code> の直後に <code>judge_criteria</code> を書く手順を足す（説明テスト → <code>hit</code> → <code>touch</code> → <code>errors</code>）。自己検査に「確定事実シートに境目（正解・惜しいの条件）を書いていない」「<code>hit</code> の下限の言い方で説明テストが通り、<code>touch</code> の言い方では通らない」を足す</li>
+  <li><strong><code>validate.py</code></strong>: ① <code>judge_criteria</code> が全問にある ② <code>points</code> の個数が <code>core_points</code> と同じ ③ <code>hit</code>・<code>touch</code> が空でなく 80 字以内で、互いに同文でない ④ <code>errors</code> が 0〜3 個・各 40 字以内 ⑤ 確定事実シートに境目の言い方（「正解にする / しない」「正解とする」「言えたら正解」「惜しい」）を含む行がない（「正解宣言のとき以外は」の行は対象外）。いずれも違反はエラー</li>
+</ul>
 
 <h4>返答の豊かさ（レベル 0〜3）</h4>
 <div class="table-wrap">
