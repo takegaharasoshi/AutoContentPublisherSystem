@@ -2,22 +2,15 @@
 
 from __future__ import annotations
 
-import ast
 import math
 import re
 import statistics
 from collections import Counter
-from functools import lru_cache
-from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
-
-SERVICE_DIR = Path(__file__).resolve().parent.parent
-REPO_ROOT = SERVICE_DIR.parents[1]
-CORE_PATH = REPO_ROOT / "content/umigame-stock/umigame-soup-1/batch-01/leak_count.py"
 
 from app.judge.contract import KINDS, bare_term_text  # noqa: E402
-from app.reply import templates  # noqa: E402
+from app.reply import leak_guard, templates  # noqa: E402
 
 
 QUESTION_KINDS = frozenset({"q_yesno", "q_multi", "q_open"})
@@ -50,18 +43,9 @@ CORRECT_OPENERS = ("正解です", templates.CORRECT_PREFIX)
 PHRASING_MIN_CASES = 20
 
 
-@lru_cache(maxsize=4)
-def load_core_words(path: Path = CORE_PATH) -> dict[str, list[str]]:
-    """Read the literal CORE mapping without executing its script."""
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    for node in tree.body:
-        if isinstance(node, (ast.Assign, ast.AnnAssign)):
-            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-            if any(isinstance(target, ast.Name) and target.id == "CORE" for target in targets):
-                value = ast.literal_eval(node.value)
-                if isinstance(value, dict):
-                    return {str(no): list(words) for no, words in value.items()}
-    raise ValueError(f"literal CORE mapping not found: {path}")
+def load_core_words() -> dict[str, list[str]]:
+    """Keep the probe's old word-list API backed by the shared dictionary."""
+    return {no: list(entry.words) for no, entry in leak_guard.load_leak_words().items()}
 
 
 def answer_matches(row: dict[str, Any]) -> bool:
@@ -75,6 +59,11 @@ def answer_matches(row: dict[str, Any]) -> bool:
 def pair_key(case_id: str, kind: str | None, answer: str | None) -> str:
     """人間チェックで同じ判断を共有する行のキーを返す。"""
     return f"{case_id}|{kind or ''}|{answer if kind == 'q_yesno' and answer else ''}"
+
+
+def leak_key(case_id: str, reply: str) -> str:
+    """Share one human leak decision across patterns with the same reply."""
+    return f"leak|{case_id}|{reply}"
 
 
 def apply_labels(row: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
@@ -128,11 +117,16 @@ def row_flags(row: dict[str, Any], case: dict[str, Any],
     kind_mismatch = kind != labeled["expected_kind"]
     answer_mismatch = (kind == "q_yesno" and labeled["expected_kind"] == "q_yesno"
                        and not answer_matches(labeled))
-    core = load_core_words() if core is None else core
-    leak_words = [] if not reply or kind == "guess_correct" or reply.startswith("正解") else [
-        word for word in core.get(case["no"], [])
-        if word and word in reply and word not in case["text"]
-    ]
+    if not reply or leak_guard.is_correct_reveal(kind, reply):
+        leak_words = []
+    elif core is not None:
+        leak_words = [
+            word for word in core.get(case["no"], [])
+            if word and word in reply and word not in case["text"]
+        ]
+    else:
+        entry = leak_guard.load_leak_words().get(case["no"])
+        leak_words = leak_guard.find_leaks(reply, case["text"], entry) if entry else []
     decision = final.get("decision")
     proximity = [] if decision == "consensus_split" or kind not in {"q_yesno", "guess_wrong"} else [
         word for word in PROXIMITY_WORDS if word in (reply or "")
@@ -202,10 +196,11 @@ def _accuracy(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def aggregate(results: dict[str, Any],
-              accepted: frozenset[str] | set[str] = frozenset()) -> dict[str, Any]:
+              accepted: frozenset[str] | set[str] = frozenset(),
+              leak_decisions: Mapping[str, str] | None = None) -> dict[str, Any]:
     """Aggregate each pattern without calls or changes to the input results."""
     cases = {case["id"]: case for case in results["cases"]}
-    core = load_core_words()
+    leak_decisions = leak_decisions or {}
     output: dict[str, Any] = {"patterns": {}}
     for pattern in results["meta"]["patterns"]:
         pattern_id = pattern["id"]
@@ -223,7 +218,7 @@ def aggregate(results: dict[str, Any],
                             [*case.get("accept_answers", []),
                              *([final.get("answer")] if final.get("kind") == "q_yesno"
                                and final.get("answer") else [])]))}
-            flags = row_flags(row, case, core)
+            flags = row_flags(row, case)
             labeled = apply_labels({"kind": final.get("kind"), "answer": final.get("answer"),
                                     "comment_text": case["text"]}, case)
             items.append({"row": row, "case": case, "record": record, "kind": final.get("kind"),
@@ -318,16 +313,31 @@ def aggregate(results: dict[str, Any],
         bare = [x for x in items if x["case"]["source"] == "bare_term"]
         bare_count = sum(x["kind"] == "q_open" and bool(x["reply"])
                          and bare_term_text(x["case"]["text"]) in x["reply"] for x in bare)
-        leak_items = [{"case_id": x["case"]["id"], "no": x["case"]["no"],
-                       "words": x["flags"]["leak_words"], "reply": x["reply"]}
-                      for x in items if x["flags"]["leak_words"]]
+        leak_items = []
+        for x in items:
+            words = x["flags"]["leak_words"]
+            if not words:
+                continue
+            key = leak_key(x["case"]["id"], x["reply"])
+            decision = leak_decisions.get(key)
+            leak_items.append({
+                "case_id": x["case"]["id"], "no": x["case"]["no"],
+                "words": words, "reply": x["reply"], "key": key,
+                "decision": decision if decision in {"leak", "not_leak"} else None,
+            })
+        confirmed_leaks = [x for x in leak_items if x["decision"] == "leak"]
+        unconfirmed_leaks = sum(x["decision"] is None for x in leak_items)
+        guard_items = [{"case_id": x["case"]["id"], "no": x["case"]["no"],
+                        "words": guard["words"], "original_text": guard["original_text"]}
+                       for x in items
+                       if (guard := (x["record"].get("reply") or {}).get("guard"))]
         phrasing_ng = [x for x in items if x["expected_kind"] in phrasing
                        and phrasing[x["expected_kind"]]["rate"] > .5
                        and (x["reply"] if x["reply"] is not None else "<NO_REPLY>")
                        == phrasing[x["expected_kind"]]["phrase"]]
         ng = {
-            "P1": _ng([x for x in items if x["flags"]["leak_words"]],
-                      lambda x: "・".join(x["flags"]["leak_words"])),
+            "P1": [{"id": x["case_id"], "no": x["no"],
+                    "note": "・".join(x["words"])} for x in confirmed_leaks],
             "P2": _ng([x for x in items if x["flags"]["wrong_correct"]]),
             "P3": _ng(p3_items, lambda x: f"{x['expected_answer']} → {x['answer']}"),
             "P4": _ng(p4_items, lambda x: f"{x['expected_answer']} → {x['answer']}"),
@@ -355,7 +365,14 @@ def aggregate(results: dict[str, Any],
                             lambda x: "・".join(x["flags"]["emoji_violations"])),
         }
         metrics = {
-            "P1": _count_metric(len(leak_items), n, "0 件", not leak_items, candidates=leak_items),
+            "P1": _metric(
+                len(confirmed_leaks), n, "0 件",
+                False if confirmed_leaks else None if unconfirmed_leaks else True,
+                value=(f"確定 {len(confirmed_leaks)} 件（候補 {len(leak_items)}・"
+                       f"未確認 {unconfirmed_leaks}）" if leak_items else "0 件"),
+                candidates=leak_items, candidates_total=len(leak_items),
+                unconfirmed=unconfirmed_leaks,
+            ),
             "P2": _count_metric(sum(x["flags"]["wrong_correct"] for x in items), n, "0 件",
                                 not any(x["flags"]["wrong_correct"] for x in items)),
             "P3": _metric(len(p3_items), len(p3_cases), "全質問の 3% 以下・1 問 2 件以下",
@@ -444,6 +461,8 @@ def aggregate(results: dict[str, Any],
             ),
             "fallback": _count_metric(sum((x["record"].get("reply") or {}).get("source")
                                          == "fallback_template" for x in items), n, "参考", None),
+            "leak_guard": _count_metric(len(guard_items), n, "参考", None,
+                                         items=guard_items),
             "timing": {name: _timing([float(x["row"]["timing"][name]) for x in items
                                       if x["row"]["timing"].get(name) is not None])
                        for name in ("total_s", "judge_s", "writer_s")},

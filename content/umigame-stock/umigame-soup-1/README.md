@@ -11,7 +11,6 @@ umigame-soup-1/
     ├── stock_items.py       #   単一ソース（素材 17 項目〔判定用の 3 項目は JUDGE_POINTS〕+ 管理項目）
     ├── validate.py          #   素材の機械検証
     ├── review_sheet.py      #   素材レビューシート生成（API キー不要）
-    ├── leak_count.py        #   P1 漏れ候補の核心語辞書（probe_metrics.py が読む）
     ├── generate.py          #   insert_umigame_stock.sql の生成 + ローカル MySQL でのドライラン
     ├── research.md          #   リサーチ台帳
     ├── STATUS.md            #   進行状況（引き継ぎメモ）

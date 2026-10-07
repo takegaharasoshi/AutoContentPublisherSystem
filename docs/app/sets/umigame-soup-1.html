@@ -277,7 +277,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="table-wrap">
 <table>
 <tr><th>指標</th><th>合格ライン</th><th>補足</th></tr>
-<tr><td><strong>P1</strong> 真相の漏洩</td><td><strong>0 件</strong></td><td>機械プローブは <code>leak_count.py</code> と同じ方式で漏れ候補を拾い、全件を人が見る。人間プローブでも 0 件</td></tr>
+<tr><td><strong>P1</strong> 真相の漏洩</td><td><strong>0 件</strong></td><td>機械プローブは核心語の辞書で漏れ候補を拾い、全件を人が見て「漏洩」と確定したものだけを数える（21-6d9）。人間プローブでも 0 件。本番は出力ガード（10.4）で辞書の語を送らない</td></tr>
 <tr><td><strong>P2</strong> 誤った正解宣言</td><td><strong>0 件</strong></td><td>正解でない推理に正解と言って真相を開くのは、漏洩と同じ扱い</td></tr>
 <tr><td><strong>P3</strong> 「はい」と「いいえ」の取り違え</td><td>全質問の 3% 以下、かつ 1 問あたり 2 件以下</td><td></td></tr>
 <tr><td><strong>P4</strong> 「いいえ」「関係ない」の間の揺れ</td><td>10% 以下</td><td>意味はほぼ同じなので上限をゆるくするが、集計には必ず出す</td></tr>
@@ -600,6 +600,8 @@ nav.toc ul { margin: .3rem 0 0; }
   <div class="flow-arrow">↓</div>
   <div class="flow-step q"><div class="t">検査: 失敗・空 / ① が判定語で始まらない / 語だけへの聞き返しになっていない？</div><div class="exits"><span class="exit">はい → <code>2b</code> の定型文に落とす（<code>fallback_template</code>・WARNING <code>REPLY_WRITER_FALLBACK</code>）</span></div></div>
   <div class="flow-arrow">↓</div>
+  <div class="flow-step q"><div class="t">出力ガード: 正解宣言以外の返信に、その問題の核心語（コメント本文にない語）が入った？</div><div class="exits"><span class="exit">はい → 固定文へ差し替え（① は判定語だけ・ほかは「コメントありがとう！」。<code>leak_guard</code>・WARNING <code>REPLY_LEAK_GUARD</code>）</span></div></div>
+  <div class="flow-arrow">↓</div>
   <div class="flow-step alt"><div class="t">80 字を超えたら WARNING <code>REPLY_OVER_80</code>（切り詰めない）</div><div class="d">送る直前の 200 字の切り詰めが唯一の切り詰め</div></div>
 </div>
 <figcaption>図 10-4 返信文の決まり方（<code>app/reply/writer.py</code>）。括弧内は記録の <code>reply.source</code></figcaption>
@@ -642,6 +644,17 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>既定を <code>1d-luna</code> にした理由</strong>: 真相を渡さない書き手なので構造的に漏れにくく、費用も低い</li>
   <li><strong>書き手の呼び出し</strong>: system = 書き手のプロンプトに判定（種別・答え・語）・① の形・<code>reply_style.txt</code>・問題を埋めたもの、user = コメント本文。出力は JSON スキーマ（strict）の <code>{reply}</code>。429・5xx は指数バックオフで 5 回再試行</li>
 </ul>
+
+<h4 id="leak-guard">出力ガード（21-6d9）</h4>
+<p>モデルに依存せず漏洩を止める最後の関所。書き手の案・経路（定型文・LLM・割れたとき）を問わず、送る前の返信を核心語の辞書で照合する。</p>
+<ul>
+  <li><strong>辞書</strong>: <code>services/comment-reply/app/reply/leak_words.json</code>（問題番号ごとに <code>content_key</code>・<code>words</code>・照合の前に返信から除く語句 <code>except</code>）。本番は問題スナップショットの <code>content_key</code> で引き、評価ページの P1 漏れ候補も同じ辞書と同じ照合（<code>leak_guard.find_leaks</code>）を使う</li>
+  <li><strong>当たる条件</strong>: 正解宣言（④・「正解」で始まる返信）ではなく、辞書の語が返信にあり、コメント本文にはない（コメントの語の復唱は漏洩と数えない）</li>
+  <li><strong>差し替え</strong>: ① は判定語だけ（<code>はい！</code> / <code>いいえ。</code> / <code>関係ないよ。</code>。判定は変えない）、ほかの種別は「コメントありがとう！」。<code>source</code> を <code>leak_guard</code> にし、当たった語・差し替え前の文・元の <code>source</code> をコメント記録の <code>reply.guard</code> に残す</li>
+  <li><strong>辞書にない問題</strong>: 差し替えずに WARNING <code>REPLY_LEAK_GUARD_NO_DICT</code>。問題を足すときは辞書に 1 行足す（作問スキル工程 9）</li>
+  <li><strong>定型文</strong>: どの問題の辞書にも当たらないことを pytest で保証する（21-6d9 で「遊びにおいで」「当てる遊び」を言い換えた）</li>
+</ul>
+<div class="decision"><span class="callout-title">決定（2026-10-08・21-6d9）</span>辞書はサービスに同梱し、問題スナップショットには載せない（DDL とスナップショットの版上げを避ける。旧来の正 <code>batch-01/leak_count.py</code> は退役）。そのため問題を足すと <code>services/</code> の push が要る。問題の追加が週次の運用になったら（21-8 以降）スナップショットへの載せ替えを判断する。1 文字の語は活用・複合の形に具体化した（序盤・終盤・熱心・種類・ピンチなどの誤検知を外し、漏洩の言い方は拾う。根拠は辞書の <code>review_note</code>）。</div>
 
 <h4 id="reply-templates">定型文（<code>2b</code> と、ほかの案の落とし先）</h4>
 <p>種別ごとの候補から <code>sha1(comment_id)</code> で 1 つ選ぶ（状態を持たずに言い回しを散らす）。</p>
@@ -843,7 +856,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <ul>
   <li><strong>実行器</strong>: <code>services/comment-reply/tools/probe_run.py</code>。評価ケースを本番の判定の組み合わせ・書き手・コメント記録に通し、<code>results.json</code> と <code>metrics.json</code> を出す（集計は <code>probe_metrics.py</code>）。Instagram への送信はしない。キーは環境変数（<code>OPENAI_API_KEY</code>・<code>TYPESAFE_API_KEY</code>）</li>
   <li><strong>使い回しと再開</strong>: 判定 API はケースごとに各方式を 1 回呼んでパターン間で使い回し、書き手だけパターンごとに呼ぶ。<code>judge_cache.json</code> と <code>writer_cache.json</code> で中断後も再開できる</li>
-  <li><strong>合格基準</strong>: 10.2 の P1〜P7 とレベル 1・2 の機械プローブ基準をそのまま使い、集計項目は基準と 1 対 1 に対応させる。P1 の漏れ候補は <code>leak_count.py</code> の核心語辞書で拾う（辞書は P1 漏れ候補の正として残す）</li>
+  <li><strong>合格基準</strong>: 10.2 の P1〜P7 とレベル 1・2 の機械プローブ基準をそのまま使い、集計項目は基準と 1 対 1 に対応させる。P1 は 2 段: 機械が核心語の辞書（<code>app/reply/leak_words.json</code>。出力ガードと共通）で漏れ候補を拾い、人が評価ページで「漏洩 / 漏洩でない」を付け、<strong>確定した漏洩だけを P1 に数える</strong>（21-6d9）。未確認の候補が残る間は「要確認」で合否を出さない。出力ガードの発動件数は参考指標に出す</li>
 </ul>
 <div class="table-wrap">
 <table>
@@ -855,7 +868,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <tr><td>⑤</td><td><code>jev</code></td><td><code>2c-luna</code></td><td>12</td><td>13</td></tr>
 </table>
 </div>
-<p>2026-10-04（21-6d4）の時点で、全指標を満たすパターンはない。2026-10-06（21-6d6）に人間チェックの「許容」26 組を評価データの別解へ取り込んで数え直すと、全パターンで L1① の各種別（guess_close・guess_wrong）が合格に変わったが、全指標を満たすパターンはまだない（残る NG は P2・L2 の一言 / 矛盾ほか。<a href="#d-20261006-human-review-import">付録</a>）。方式選定（21-6e）の材料にする。L1① は「全体 90% 以上」と「質問以外の各種別 80% 以上」を別の指標として数える（2026-10-04 ユーザー指示。21-6d3 までは 1 指標・15 指標中で数えていた）。</p>
+<p>2026-10-04（21-6d4）の時点で、全指標を満たすパターンはない。2026-10-06（21-6d6）に人間チェックの「許容」26 組を評価データの別解へ取り込んで数え直すと、全パターンで L1① の各種別（guess_close・guess_wrong）が合格に変わったが、全指標を満たすパターンはまだない（残る NG は P2・L2 の一言 / 矛盾ほか。<a href="#d-20261006-human-review-import">付録</a>）。2026-10-08（21-6d9）に P1 を「候補 → 人の確認 → 確定」の 2 段にした。④ の P1 は漏れ候補 1 件（c-impression-04「また遊びにおいで。」）が人の確認待ちの「要確認」で、合格数から外れたまま（漏洩でないと確定すれば ④ は 15）。方式選定（21-6e）の材料にする。L1① は「全体 90% 以上」と「質問以外の各種別 80% 以上」を別の指標として数える（2026-10-04 ユーザー指示。21-6d3 までは 1 指標・15 指標中で数えていた）。</p>
 
 <h4>評価ページ</h4>
 <p><a href="umigame-soup-1-probe.html">コメント返信の評価（プローブ）</a>。サマリー 1 枚（合否表・指標）+ 問題ごとの 14 枚（コメント一覧と生データ）。合否表の NG の ID から該当の行へ飛べる。生成器は <code>tools/build_probe_page.py</code>。</p>
@@ -863,8 +876,9 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <ul>
   <li><strong>判断の単位</strong>: コメント × 判定結果の<strong>組</strong>（キー <code>コメント ID|判定の種別|答え</code>。答えは q_yesno のときだけ。<code>probe_metrics.pair_key</code>）。問題ページの相違 ✕ の行にプルダウン（未確認 / 許容 / 不可）があり、同じ組の別パターンの行は連動する。21-6d4 の全件プローブでは不一致 136 行 = 52 組</li>
   <li><strong>許容の意味</strong>: その行に限り、評価データの別解（<code>accept_kinds</code> / <code>accept_answers</code>）に判定結果を足したのと同じ扱いにする（<code>aggregate(results, accepted)</code>）。21-6d6 で別解に取り込んだときの合否と一致させるため</li>
-  <li><strong>サマリーの「人間チェック後のサマリー」</strong>: 正解ラベルに依存する P2・P3・P4・P5・L1①（全体・各種別と 19 種別の内訳）・L1②・L1③ と参考の ① 判定一致率をブラウザーで数え直す。P1・P6・P7・レベル 2 は機械判定の値を写す（ラベルに依存しないか、52 組に不適切系の種別がなく変わらない）。機械判定から変わったセルは色を変える。全組未確認のときは機械判定の合否表と同じ値になる（pytest で JS と Python の集計を突き合わせている）</li>
-  <li><strong>保存</strong>: ブラウザーの <code>localStorage</code>（キー <code>umigame-probe-review/&lt;実行日時&gt;</code>）。問題ページとサマリーで共有し、別タブの変更も再読み込みなしで反映する。<code>localStorage</code> はブラウザーと開き方（<code>file://</code> / HTTP）ごとに別なので、<strong>正式な記録は「書き出す」で保存した JSON</strong>（全組の キー・判断・日時）とし、「読み込む」で戻せる</li>
+  <li><strong>サマリーの「人間チェック後のサマリー」</strong>: 正解ラベルに依存する P2・P3・P4・P5・L1①（全体・各種別と 19 種別の内訳）・L1②・L1③ と参考の ① 判定一致率をブラウザーで数え直す。P1 は漏れ候補の判断（下）から数え直す。P6・P7・レベル 2 は機械判定の値を写す（ラベルに依存しないか、52 組に不適切系の種別がなく変わらない）。機械判定から変わったセルは色を変える。全組未確認のときは機械判定の合否表と同じ値になる（pytest で JS と Python の集計を突き合わせている）</li>
+  <li><strong>P1 の漏れ候補</strong>（21-6d9 で追加）: 候補の行（サマリーの P1 の NG 詳細・問題ページ）にプルダウン（未確認 / 漏洩 / 漏洩でない）があり、キー <code>leak|コメント ID|返信文</code>（<code>probe_metrics.leak_key</code>）で同じ返信の別パターンの行と連動する。<code>aggregate(results, accepted, leak_decisions)</code> と同じ数え方で、確定 NG &gt; 0 → 不合格・確定 0 かつ未確認 0 → 合格・未確認が残る → 要確認</li>
+  <li><strong>保存</strong>: ブラウザーの <code>localStorage</code>（キー <code>umigame-probe-review/&lt;実行日時&gt;</code>）。問題ページとサマリーで共有し、別タブの変更も再読み込みなしで反映する。<code>localStorage</code> はブラウザーと開き方（<code>file://</code> / HTTP）ごとに別なので、<strong>正式な記録は「書き出す」で保存した JSON</strong>（全組の キー・判断・日時と、21-6d9 からは漏れ候補の判断 <code>leak_decisions</code>）とし、「読み込む」で戻せる</li>
 </ul>
 <div class="decision"><span class="callout-title">決定（2026-10-04・21-6d5）</span>数え直す指標は計画書の列挙（P2〜P5・L1① と内訳・はい / いいえの一致率）に L1②（言い回しの偏り）と L1③（誘導率）を加えた。どちらも想定種別で集計対象が決まり、許容すると値が動くため、写すだけだと 21-6d6 で作り直したページと合わなくなる。</div>
 
@@ -965,6 +979,8 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <tr><td>WARNING <code>JUDGE_SHADOW_MISMATCH</code></td><td>見張り役の食い違い</td><td>食い違い率が平常値の 2 倍を超えたら通知</td></tr>
 <tr><td>WARNING <code>JUDGE_CONSENSUS_SPLIT</code></td><td>正解宣言の合意が割れた</td><td>手動で正解を伝えるかを判断する</td></tr>
 <tr><td>WARNING <code>REPLY_WRITER_FALLBACK</code></td><td>書き手の出力を捨てて定型文に落とした</td><td>多ければ書き手のプロンプトを見直す</td></tr>
+<tr><td>WARNING <code>REPLY_LEAK_GUARD</code></td><td>書き手の返信に核心語が入り、固定文へ差し替えた（P1 の危険）</td><td>コメント記録の <code>reply.guard</code> を見て、漏洩か誤検知かを判断する。漏洩なら書き手のプロンプト、誤検知なら辞書を直す</td></tr>
+<tr><td>WARNING <code>REPLY_LEAK_GUARD_NO_DICT</code></td><td>核心語の辞書にない問題へのコメント（ガードが効いていない）</td><td>辞書に 1 行足して push する</td></tr>
 <tr><td>WARNING <code>REPLY_OVER_80</code></td><td>返信が 80 字を超えた（P7 違反）</td><td>多ければプロンプトを見直す</td></tr>
 </table>
 </div>
@@ -1001,7 +1017,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
     <tr><td><code>judgements</code></td><td><code>luna</code> / <code>jev</code> それぞれ <code>{kind, answer, reason, bare_term, error, debug}</code> または null（呼ばなかった方式）。<code>debug</code> はモデル名・トークン数（推論トークン含む）・応答秒・Jev の確率。生の応答全文は入れない</td></tr>
     <tr><td><code>shadow_mismatch</code></td><td>真偽値または null。両方の判定があるときの kind / answer の食い違い</td></tr>
     <tr><td><code>final</code></td><td>返信に使った <code>kind</code>・<code>answer</code>・<code>decision</code>（<code>luna</code> / <code>jev</code> / <code>jev_fallback_luna</code> / <code>consensus_ok</code> / <code>consensus_split</code>）</td></tr>
-    <tr><td><code>reply</code></td><td><code>text</code>（送った本文〔200 字で切り詰めた後〕または null）・<code>source</code>（<code>template</code> / <code>llm</code> / <code>fallback_template</code> / <code>consensus_split</code> / <code>no_reply</code>）・<code>reply_id</code>（Graph API の返信 ID）・<code>over_80</code></td></tr>
+    <tr><td><code>reply</code></td><td><code>text</code>（送った本文〔200 字で切り詰めた後〕または null）・<code>source</code>（<code>template</code> / <code>llm</code> / <code>fallback_template</code> / <code>consensus_split</code> / <code>leak_guard</code> / <code>no_reply</code>）・<code>reply_id</code>（Graph API の返信 ID）・<code>over_80</code>・<code>guard</code>（出力ガードが発動したときだけ <code>{words, original_text, original_source}</code>。それ以外は null。21-6d9）</td></tr>
     <tr><td><code>errors</code></td><td>文字列の配列（Jev の失敗・書き手のフォールバック理由・処理の例外）</td></tr>
   </tbody>
 </table>

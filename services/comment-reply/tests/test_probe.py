@@ -170,7 +170,8 @@ def _review_scenarios(results: dict) -> list[set[str]]:
     return scenarios
 
 
-def _assert_review_js_matches_python(results: dict) -> None:
+def _assert_review_js_matches_python(results: dict,
+                                     leak_decisions: dict[str, str] | None = None) -> None:
     if not shutil.which("node"):
         pytest.skip("node is not installed")
     baseline = probe_metrics.aggregate(results)
@@ -178,14 +179,15 @@ def _assert_review_js_matches_python(results: dict) -> None:
     scenarios = _review_scenarios(results)
     source = (build_probe_page.REVIEW_CORE + "\nvar payload = JSON.parse(require('fs').readFileSync(0, 'utf8'));"
               + "\nconsole.log(JSON.stringify(payload.sets.map(function (keys) {"
-              + " return reviewMetrics(payload.data, keys); })));\n")
-    payload = json.dumps({"data": data, "sets": [sorted(keys) for keys in scenarios]},
+              + " return reviewMetrics(payload.data, keys, payload.leak_decisions); })));\n")
+    payload = json.dumps({"data": data, "sets": [sorted(keys) for keys in scenarios],
+                          "leak_decisions": leak_decisions or {}},
                          ensure_ascii=False, separators=(",", ":"))
     completed = subprocess.run(["node", "-e", source], input=payload, check=True,
                                capture_output=True, text=True)
     actual = json.loads(completed.stdout)
     for accepted, browser_result in zip(scenarios, actual):
-        report = probe_metrics.aggregate(results, accepted)
+        report = probe_metrics.aggregate(results, accepted, leak_decisions)
         for pattern in results["meta"]["patterns"]:
             pattern_id = pattern["id"]
             python_report = report["patterns"][pattern_id]
@@ -514,3 +516,88 @@ def test_review_core_matches_full_20261004_results_when_available():
     results = json.loads(path.read_text(encoding="utf-8"))
     assert len(build_probe_page._review_data(results, probe_metrics.aggregate(results))["pairs"]) == 52
     _assert_review_js_matches_python(results)
+
+
+def test_p1_requires_human_decision_and_shares_reply_key() -> None:
+    case = _case("case-1", "impression", no="U01", text="質問")
+    first = _row(case, "impression", reply="レントゲンだよ")
+    first["record"]["reply"]["guard"] = {
+        "words": ["写真"], "original_text": "写真だよ", "original_source": "llm",
+    }
+    results = {"meta": {"patterns": [{"id": "one"}, {"id": "two"}]},
+               "cases": [case], "rows": {"one": [first],
+                                           "two": [_row(case, "impression", reply="レントゲンだよ")]}}
+    key = probe_metrics.leak_key("case-1", "レントゲンだよ")
+    assert key == "leak|case-1|レントゲンだよ"
+    baseline = probe_metrics.aggregate(results)
+    for pattern in ("one", "two"):
+        p1 = baseline["patterns"][pattern]["metrics"]["P1"]
+        assert p1["count"] == 0 and p1["candidates_total"] == 1
+        assert p1["unconfirmed"] == 1 and p1["pass"] is None
+        assert p1["value"] == "確定 0 件（候補 1・未確認 1）"
+        assert p1["candidates"][0]["key"] == key
+        assert p1["candidates"][0]["decision"] is None
+        assert p1["ng"] == []
+    guarded = baseline["patterns"]["one"]["reference"]["leak_guard"]
+    assert guarded["count"] == 1
+    assert guarded["items"] == [{"case_id": "case-1", "no": "U01",
+                                 "words": ["写真"], "original_text": "写真だよ"}]
+
+    accepted = probe_metrics.aggregate(results, leak_decisions={key: "not_leak"})
+    for pattern in ("one", "two"):
+        p1 = accepted["patterns"][pattern]["metrics"]["P1"]
+        assert p1["pass"] is True and p1["count"] == 0 and p1["unconfirmed"] == 0
+        assert p1["value"] == "確定 0 件（候補 1・未確認 0）"
+
+    rejected = probe_metrics.aggregate(results, leak_decisions={key: "leak"})
+    for pattern in ("one", "two"):
+        p1 = rejected["patterns"][pattern]["metrics"]["P1"]
+        assert p1["pass"] is False and p1["count"] == 1 and p1["unconfirmed"] == 0
+        assert p1["value"] == "確定 1 件（候補 1・未確認 0）"
+        assert p1["ng"][0]["id"] == "case-1"
+
+    clean = deepcopy(results)
+    for rows in clean["rows"].values():
+        rows[0]["record"]["reply"]["text"] = "ありがとう"
+    empty = probe_metrics.aggregate(clean)["patterns"]["one"]["metrics"]["P1"]
+    assert empty["value"] == "0 件" and empty["pass"] is True
+
+
+def test_p1_default_applies_except_but_explicit_core_keeps_old_check() -> None:
+    case = _case("case-u16", "impression", no="U16", text="質問")
+    row = _row(case, "impression", reply="遊び方を教えるよ")
+    assert probe_metrics.row_flags(row, case)["leak_words"] == []
+    assert probe_metrics.row_flags(row, case, {"U16": ["遊び"]})["leak_words"] == ["遊び"]
+
+
+def test_probe_page_leak_select_escapes_reply_and_key(tmp_path) -> None:
+    results = _review_results()
+    reply = "レントゲン</SCRIPT><b>"
+    for pattern in results["meta"]["patterns"][:2]:
+        row = next(row for row in results["rows"][pattern["id"]]
+                   if row["case_id"] == "q-yes")
+        row["record"]["reply"]["text"] = reply
+    report = probe_metrics.aggregate(results)
+    data = build_probe_page._review_data(results, report)
+    key = probe_metrics.leak_key("q-yes", reply)
+    candidates = [item for item in data["leak_candidates"] if item["key"] == key]
+    assert len(candidates) == 2
+    assert {item["pattern"] for item in candidates} == {
+        results["meta"]["patterns"][0]["id"], results["meta"]["patterns"][1]["id"]}
+    out = tmp_path / "probe.html"
+    build_probe_page.build_page(results, out)
+    summary = out.read_text(encoding="utf-8")
+    problem = (tmp_path / "probe" / "U01.html").read_text(encoding="utf-8")
+    attr = f'data-leak="{build_probe_page._h(key)}"'
+    assert summary.count(f'<select class="leak-select" {attr}') == 2
+    assert problem.count(f'<select class="leak-select" {attr}') == 2
+    assert "漏れ候補: 確認済み 0 / 1" in problem
+    assert "漏れ候補: 確認済み 0 / 1" in summary
+    assert "漏れ候補 1 件" in summary
+    assert "レントゲン&lt;/SCRIPT&gt;&lt;b&gt;" in summary
+    assert "レントゲン</SCRIPT><b>" not in summary
+    assert "レントゲン\\u003c/SCRIPT>" in summary
+    assert "leak_decisions: leaks.map" in summary
+    assert "出力ガード発動" in summary
+    for decisions in ({}, {key: "not_leak"}, {key: "leak"}):
+        _assert_review_js_matches_python(results, decisions)

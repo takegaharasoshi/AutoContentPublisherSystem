@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import ast
 import json
 import math
 import statistics
@@ -25,7 +24,7 @@ CACHE_PATH = WORK_DIR / "trial_results.json"
 REPORT_PATH = WORK_DIR / "trial_report.md"
 EVAL_PATH = DATA_DIR / "eval_problems.json"
 COMMON_PATH = DATA_DIR / "common_cases.json"
-CORE_PATH = HERE.parent / "batch-01" / "leak_count.py"
+CORE_PATH = HERE.parents[3] / "services" / "comment-reply" / "app" / "reply" / "leak_words.json"
 GUESS_KINDS = {"guess_correct", "guess_close", "guess_wrong"}
 QUESTION_KINDS = {"q_yesno", "q_multi", "q_open"}
 RESTRICTED_KINDS = {"troll", "abuse", "spam", "personal_info"}
@@ -74,17 +73,9 @@ def answer_matches(row: dict) -> bool:
 
 
 def load_core_words(path: Path = CORE_PATH) -> dict[str, list[str]]:
-    """leak_count.py の CORE を AST で取り出す。対象ファイルは実行しない。"""
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    for node in tree.body:
-        if isinstance(node, (ast.Assign, ast.AnnAssign)):
-            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-            if any(isinstance(target, ast.Name) and target.id == "CORE" for target in targets):
-                value = ast.literal_eval(node.value)
-                if not isinstance(value, dict):
-                    break
-                return {str(no): list(words) for no, words in value.items()}
-    raise ValueError(f"{path} にリテラルの CORE 定義がありません")
+    """核心語辞書（21-6d9 で leak_count.py から leak_words.json へ移した）の語を問題番号ごとに返す。"""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return {str(no): list(item["words"]) for no, item in data["problems"].items()}
 
 
 def _read_json(path: Path, description: str) -> Any:

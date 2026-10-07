@@ -15,7 +15,7 @@ from urllib import request
 from app.http_util import post_json_with_retry
 from app.judge.combiner import Combined
 from app.judge.contract import Problem
-from app.reply import templates
+from app.reply import leak_guard, templates
 
 
 LOGGER = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ class Reply:
     over_80: bool
     error: str | None = None
     debug: dict[str, Any] = field(default_factory=dict)
+    guard: dict[str, Any] | None = None
 
 
 def pick_slot(comment_id: str) -> str:
@@ -183,7 +184,21 @@ def write_reply(
             error = str(exc)
             LOGGER.warning("REPLY_WRITER_FALLBACK comment_id=%s error=%s", comment_id, error)
             value, source, debug = _template_reply(result, comment_id, problem), "fallback_template", {}
+    guard = None
+    reveal_kind = None if result.decision == "consensus_split" else kind
+    if value is not None and not leak_guard.is_correct_reveal(reveal_kind, value):
+        entry = leak_guard.entry_for_content_key(problem.content_key)
+        if entry is None:
+            LOGGER.warning("REPLY_LEAK_GUARD_NO_DICT content_key=%s", problem.content_key)
+        else:
+            words = leak_guard.find_leaks(value, text, entry)
+            if words:
+                guard = {"words": words, "original_text": value, "original_source": source}
+                value = (templates.YESNO_OPENERS[result.answer or "irrelevant"]
+                         if kind == "q_yesno" else templates.LEAK_GUARD_TEXT)
+                source = "leak_guard"
+                LOGGER.warning("REPLY_LEAK_GUARD comment_id=%s words=%s", comment_id, words)
     over_80 = bool(value and len(value) > 80)
     if over_80:
         LOGGER.warning("REPLY_OVER_80 comment_id=%s length=%s", comment_id, len(value))
-    return Reply(value, source, over_80, error, debug)
+    return Reply(value, source, over_80, error, debug, guard)

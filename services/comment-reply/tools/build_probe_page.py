@@ -20,7 +20,7 @@ from app.judge.contract import KINDS  # noqa: E402
 from app.reply import templates  # noqa: E402
 from tools.probe_metrics import (  # noqa: E402
     CORRECT_OPENERS, PHRASING_MIN_CASES, QUESTION_KINDS, RELEVANCE_WORDS,
-    aggregate, apply_labels, pair_key, row_flags,
+    aggregate, apply_labels, leak_key, pair_key, row_flags,
 )
 
 
@@ -92,8 +92,10 @@ def _decision(decision: str | None) -> str:
     return DECISION_LABEL.get(decision, str(decision) if decision else "—")
 
 
-def _badge(passed: bool | None) -> str:
+def _badge(passed: bool | None, *, metric: str | None = None) -> str:
     if passed is None:
+        if metric == "P1":
+            return '<span class="badge badge-wip">要確認</span>'
         return '<span class="badge badge-future">対象なし</span>'
     if passed:
         return '<span class="badge badge-fixed">合格</span>'
@@ -109,17 +111,33 @@ def _row_anchor(pattern_id: str, case_id: str) -> str:
 
 
 def _ng_details(pattern_id: str, item: dict[str, Any],
-                page_of: Callable[[str, str], str] = lambda pid, cid: "") -> str:
+                page_of: Callable[[str, str], str] = lambda pid, cid: "",
+                *, metric: str | None = None) -> str:
     """合否表のセルに置く NG の ID 一覧（折りたたみ）。ID は問題ごとのページの該当行へのリンク。"""
-    entries = item.get("ng") or []
+    entries = (item.get("candidates") if metric == "P1" else item.get("ng")) or []
     if not entries:
         return ""
-    links = "".join(
-        f'<li><a class="ng-link" href="{_h(page_of(pattern_id, e["id"]))}#{_h(_row_anchor(pattern_id, e["id"]))}">{_h(e["id"])}</a>'
-        + (f' <span class="ng-note">{_h(_ja_note(str(e["note"])))}</span>' if e.get("note") else "") + "</li>"
-        for e in entries)
-    return (f'<details class="ng-ids"><summary>NG {len(entries)} 件</summary>'
+    if metric == "P1":
+        links = "".join(
+            f'<li><a class="ng-link" href="{_h(page_of(pattern_id, e["case_id"]))}#{_h(_row_anchor(pattern_id, e["case_id"]))}">{_h(e["case_id"])}</a>'
+            f' <span class="ng-note">{_h("・".join(e["words"]))}: {_h(e["reply"])}</span>'
+            f'{_leak_select(e["key"])}' + "</li>" for e in entries)
+        label = "漏れ候補"
+    else:
+        links = "".join(
+            f'<li><a class="ng-link" href="{_h(page_of(pattern_id, e["id"]))}#{_h(_row_anchor(pattern_id, e["id"]))}">{_h(e["id"])}</a>'
+            + (f' <span class="ng-note">{_h(_ja_note(str(e["note"])))}</span>' if e.get("note") else "") + "</li>"
+            for e in entries)
+        label = "NG"
+    return (f'<details class="ng-ids"><summary>{label} {len(entries)} 件</summary>'
             f"<ul>{links}</ul></details>")
+
+
+def _leak_select(key: str) -> str:
+    return (f'<select class="leak-select" data-leak="{_h(key)}" '
+            'aria-label="漏れ候補の確認"><option value="">未確認</option>'
+            '<option value="leak">漏洩</option>'
+            '<option value="not_leak">漏洩でない</option></select>')
 
 
 def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]],
@@ -133,15 +151,16 @@ def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]],
     for heading, entries in SECTIONS:
         cells.append(f'<tr class="group"><th colspan="{len(patterns) + 2}">{_h(heading)}</th></tr>')
         for key, name in entries:
-            has_ng = any(metrics["patterns"][p["id"]]["metrics"][key].get("ng") for p in patterns)
+            has_ng = any(metrics["patterns"][p["id"]]["metrics"][key].get(
+                "candidates" if key == "P1" else "ng") for p in patterns)
             toggle = ('<button type="button" class="ng-row" aria-label="この行の NG を開く / 閉じる">'
                       '行を開く</button>' if has_ng else "")
             cells.append(f"<tr><th>{_h(name)}{toggle}</th>")
             for pattern in patterns:
                 item = metrics["patterns"][pattern["id"]]["metrics"][key]
                 value = _ja_note(item["value"]) if key == "L1_kind_each" else item["value"]
-                cells.append(f"<td>{_h(value)} {_badge(item['pass'])}"
-                             f"{_ng_details(pattern['id'], item, page_of)}</td>")
+                cells.append(f"<td>{_h(value)} {_badge(item['pass'], metric=key)}"
+                             f"{_ng_details(pattern['id'], item, page_of, metric=key)}</td>")
             threshold = metrics["patterns"][patterns[0]["id"]]["metrics"][key]["threshold"]
             cells.append(f"<td>{_h(threshold)}</td></tr>")
             if key == "L1_kind_each":
@@ -177,8 +196,9 @@ def _kind_rows(metrics: dict[str, Any], patterns: list[dict[str, Any]],
 
 
 REVIEW_CORE = r"""
-function reviewMetrics(data, acceptedKeys) {
+function reviewMetrics(data, acceptedKeys, leakDecisions) {
   var accepted = acceptedKeys instanceof Set ? acceptedKeys : new Set(acceptedKeys || []);
+  var leakMap = leakDecisions || {};
   function percent(rate) {
     if (rate === null || rate === undefined) return '対象なし';
     var scaled = rate * 100 * 10;
@@ -267,6 +287,19 @@ function reviewMetrics(data, acceptedKeys) {
       return (x.kind === 'q_multi' || x.kind === 'q_open') && x.reply_present;
     }).length;
     var pattern = {passCount: 0, yesno: {}};
+    var leakCandidates = (data.leak_candidates || []).filter(function (item) {
+      return item.pattern === patternId;
+    });
+    var confirmedLeaks = leakCandidates.filter(function (item) {
+      return leakMap[item.key] === 'leak';
+    }).length;
+    var unconfirmedLeaks = leakCandidates.filter(function (item) {
+      return leakMap[item.key] !== 'leak' && leakMap[item.key] !== 'not_leak';
+    }).length;
+    pattern.P1 = metric(leakCandidates.length ?
+      '確定 ' + confirmedLeaks + ' 件（候補 ' + leakCandidates.length + '・未確認 ' +
+        unconfirmedLeaks + '）' : '0 件',
+      confirmedLeaks ? false : (unconfirmedLeaks ? null : true));
     pattern.P2 = metric(wrongCorrect + ' 件', wrongCorrect === 0);
     pattern.P3 = metric(p3Items.length + ' 件 / ' + p3Cases.length + ' 件', p3Cases.length ?
       (p3Items.length <= 0.03 * p3Cases.length && maxP3Problem <= 2) : null);
@@ -320,9 +353,9 @@ function reviewMetrics(data, acceptedKeys) {
 
 
 REVIEW_RECALCULATED = (
-    "P2", "P3", "P4", "P5", "L1_kind", "L1_kind_each", "L1_phrasing", "L1_guidance",
+    "P1", "P2", "P3", "P4", "P5", "L1_kind", "L1_kind_each", "L1_phrasing", "L1_guidance",
 )
-REVIEW_FIXED = ("P1", "P6", "P7", "L2_one_liner", "L2_opener", "L2_conflict",
+REVIEW_FIXED = ("P6", "P7", "L2_one_liner", "L2_opener", "L2_conflict",
                 "L2_proximity", "L2_emoji")
 
 
@@ -332,8 +365,13 @@ def _review_data(results: dict[str, Any], metrics: dict[str, Any]) -> dict[str, 
     patterns = results["meta"]["patterns"]
     review_rows: dict[str, list[dict[str, Any]]] = {}
     pairs: dict[str, dict[str, Any]] = {}
+    leak_candidates: list[dict[str, Any]] = []
     for pattern in patterns:
         pattern_id = pattern["id"]
+        leak_candidates.extend(
+            {**candidate, "pattern": pattern_id}
+            for candidate in metrics["patterns"][pattern_id]["metrics"]["P1"]["candidates"]
+        )
         phrases: dict[str, int] = {}
         facts = []
         for row in results["rows"].get(pattern_id, []):
@@ -383,7 +421,8 @@ def _review_data(results: dict[str, Any], metrics: dict[str, Any]) -> dict[str, 
         "no_reply_kinds": sorted(templates.NO_REPLY_KINDS),
         "phrasing_min_cases": PHRASING_MIN_CASES,
         "pattern_ids": [pattern["id"] for pattern in patterns],
-        "rows": review_rows, "pairs": list(pairs.values()), "fixed": fixed,
+        "rows": review_rows, "pairs": list(pairs.values()),
+        "leak_candidates": leak_candidates, "fixed": fixed,
         "metric_keys": [key for _, entries in SECTIONS for key, _ in entries],
     }
 
@@ -401,14 +440,15 @@ def _review_cell(value: str, passed: bool | None, *, metric: str | None = None,
         attrs += f' data-review-yesno="{_h(yesno)}"'
     if pattern:
         attrs += f' data-review-pattern="{_h(pattern)}"'
-    return f'<td{attrs}><span class="review-value">{_h(value)}</span> {_badge(passed)}</td>'
+    return f'<td{attrs}><span class="review-value">{_h(value)}</span> {_badge(passed, metric=metric)}</td>'
 
 
 def _human_review_table(metrics: dict[str, Any], patterns: list[dict[str, Any]],
-                        pairs_total: int) -> str:
+                        pairs_total: int, leaks_total: int) -> str:
     """人間チェック後の集計を即時反映する表を出力する。"""
     out = ['<div class="human-review-toolbar" id="human-review-toolbar">',
            f'<strong class="review-count">確認済み 0 / {pairs_total} 組（許容 0・不可 0）</strong>',
+           f'<strong class="leak-count">漏れ候補: 確認済み 0 / {leaks_total}（漏洩 0・漏洩でない 0）</strong>',
            '<button type="button" class="review-export">書き出す</button>',
            '<button type="button" class="review-import">読み込む</button>',
            '<input class="review-file" type="file" accept="application/json">',
@@ -565,6 +605,8 @@ def _metric_detail(key: str, item: dict[str, Any]) -> str:
 def _level_cell(items: dict[str, Any], keys: tuple[str, ...]) -> str:
     failed = [key for key in keys if items[key]["pass"] is False]
     if not failed:
+        if "P1" in keys and items["P1"]["pass"] is None:
+            return _badge(None, metric="P1")
         unknown = all(items[key]["pass"] is None for key in keys)
         return _badge(None if unknown else True)
     rows = "".join(f"<li><strong>{_h(METRIC_NAMES[key])}</strong> "
@@ -585,12 +627,13 @@ def _evaluation(metrics: dict[str, Any], patterns: list[dict[str, Any]]) -> str:
         report = metrics["patterns"][pattern["id"]]
         items, ref = report["metrics"], report["reference"]
         passed = sum(v["pass"] is True for v in items.values())
-        if all(items[key]["pass"] is not False for key in levels[0][1]):
+        if (items["P1"]["pass"] is True and
+                all(items[key]["pass"] is not False for key in levels[0][1])):
             premise_ok.append(pattern["label"])
-        if all(v["pass"] is not False for v in items.values()):
+        if items["P1"]["pass"] is True and all(v["pass"] is not False for v in items.values()):
             all_ok.append(pattern["label"])
         median = ref["timing"]["total_s"]["median"]
-        checks = [f"P1 漏れ候補 {items['P1']['count']} 件（全件を人が見る）"]
+        checks = [f"P1 漏れ候補 {items['P1']['candidates_total']} 件（全件を人が見る）"]
         if pattern["judge_mode"] == "hybrid":
             checks.append(f"見張り役の食い違い {ref['watch_mismatch']['count']} 件・"
                           f"合意制で割れた {ref['consensus_split']['count']} 件")
@@ -620,7 +663,8 @@ def _reference_table(metrics: dict[str, Any], patterns: list[dict[str, Any]]) ->
             ("yesno_accuracy", "new", "① 判定一致率（新しい質問）"),
             ("bare_term", None, "語だけの聞き返し"),
             ("errors", None, "エラーを含む記録"),
-            ("fallback", None, "書き手の定型フォールバック"))
+            ("fallback", None, "書き手の定型フォールバック"),
+            ("leak_guard", None, "出力ガード発動"))
     out = ['<div class="table-wrap"><table class="reference-table"><thead><tr><th>参考値</th>']
     out.extend(f"<th>{_h(p['label'])}</th>" for p in patterns)
     out.append("</tr></thead><tbody>")
@@ -703,7 +747,13 @@ def _case_table(pattern: dict[str, Any], no: str, cases: list[dict[str, Any]],
         out.append(f'<td data-sort="{_h(mismatch_display)}">{_h(mismatch_display)}{review_select}</td>')
         for i, (display, sort) in enumerate(values[4:], start=5):
             extra = f' title="{_h(title)}"' if i == 6 else ""
-            out.append(f'<td data-sort="{_h(sort)}"{extra}>{_h(display)}</td>')
+            if i == 5 and flags["leak_words"]:
+                key = leak_key(case["id"], reply)
+                out.append(f'<td data-sort="{_h(sort)}"{extra}>{_h(display)}'
+                           f'<small class="leak-words">漏れ候補: {_h("・".join(flags["leak_words"]))}</small>'
+                           f'{_leak_select(key)}</td>')
+            else:
+                out.append(f'<td data-sort="{_h(sort)}"{extra}>{_h(display)}</td>')
         out.append("</tr>")
     out.append("</tbody></table></div>")
     raw_key = f"{pattern['id']}/{no}"
@@ -740,6 +790,10 @@ body { overflow-wrap: anywhere; }
 .case-table tr[data-review-decision="accept"] td { background: rgba(40, 150, 80, .2); }
 .case-table tr[data-review-decision="reject"] td { background: rgba(210, 60, 60, .2); }
 .review-select { max-width: 6.5rem; margin-left: .35rem; font: inherit; font-size: .8rem; }
+.leak-select { max-width: 8rem; margin-left: .35rem; font: inherit; font-size: .8rem; }
+.leak-words { display: block; color: var(--text-muted, inherit); }
+.case-table tr[data-leak-decision="leak"] td:nth-child(6) { background: rgba(210, 60, 60, .2); }
+.case-table tr[data-leak-decision="not_leak"] td:nth-child(6) { background: rgba(40, 150, 80, .2); }
 .review-page-status, .review-toolbar { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; margin: .75rem 0; }
 .review-toolbar button { font: inherit; padding: .25rem .6rem; cursor: pointer; }
 .review-status { font-size: .85rem; color: var(--text-muted, inherit); }
@@ -875,11 +929,15 @@ REVIEW_CLIENT = r"""
   var runAt = data ? data.run_at : (pageStatus ? pageStatus.dataset.runAt : '');
   if (!runAt) return;
   var storageKey = 'umigame-probe-review/' + runAt;
+  var leakStorageKey = 'umigame-probe-leak-review/' + runAt;
   var status = document.querySelector('.review-status');
   var storageAvailable = true;
   var decisions = {};
+  var leakDecisions = {};
   var pairs = data ? data.pairs : [];
+  var leaks = data ? (data.leak_candidates || []) : [];
   var pairKeys = new Set(pairs.map(function (pair) { return pair.key; }));
+  var leakKeys = new Set(leaks.map(function (candidate) { return candidate.key; }));
   function showStorageError() {
     storageAvailable = false;
     if (status) status.textContent = 'この開き方では保存できません';
@@ -897,12 +955,23 @@ REVIEW_CLIENT = r"""
     });
     return result;
   }
+  function validLeakMap(value) {
+    var result = {};
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return result;
+    Object.keys(value).forEach(function (key) {
+      if (value[key] === 'leak' || value[key] === 'not_leak') result[key] = value[key];
+    });
+    return result;
+  }
   function load() {
     try {
       var raw = window.localStorage.getItem(storageKey);
       decisions = raw ? validMap(JSON.parse(raw)) : {};
+      var leakRaw = window.localStorage.getItem(leakStorageKey);
+      leakDecisions = leakRaw ? validLeakMap(JSON.parse(leakRaw)) : {};
     } catch (error) {
       decisions = {};
+      leakDecisions = {};
       showStorageError();
     }
   }
@@ -910,16 +979,29 @@ REVIEW_CLIENT = r"""
     try { window.localStorage.setItem(storageKey, JSON.stringify(decisions)); }
     catch (error) { showStorageError(); }
   }
+  function saveLeaks() {
+    try { window.localStorage.setItem(leakStorageKey, JSON.stringify(leakDecisions)); }
+    catch (error) { showStorageError(); }
+  }
   function setDecision(key, value, at) {
     if (!value) delete decisions[key];
     else decisions[key] = {decision: value, at: at || new Date().toISOString()};
     save();
   }
+  function setLeakDecision(key, value) {
+    if (!value) delete leakDecisions[key];
+    else leakDecisions[key] = value;
+    saveLeaks();
+  }
   function applyBadge(cell, passed) {
+    var pendingLeak = cell.dataset.reviewMetric === 'P1' &&
+      (passed === null || passed === undefined);
     var badge = document.createElement('span');
-    badge.className = 'badge ' + (passed === null || passed === undefined ? 'badge-future' :
+    badge.className = 'badge ' + (pendingLeak ? 'badge-wip' :
+      passed === null || passed === undefined ? 'badge-future' :
       (passed ? 'badge-fixed' : 'badge-wip'));
-    badge.textContent = passed === null || passed === undefined ? '対象なし' :
+    badge.textContent = pendingLeak ? '要確認' :
+      passed === null || passed === undefined ? '対象なし' :
       (passed ? '合格' : '不合格');
     cell.appendChild(document.createTextNode(' '));
     cell.appendChild(badge);
@@ -956,6 +1038,16 @@ REVIEW_CLIENT = r"""
     var confirmed = accept + reject;
     pageStatus.querySelector('.review-count').textContent = 'このページの組: 確認済み ' +
       confirmed + ' / ' + keys.size + ' 組（許容 ' + accept + '・不可 ' + reject + '）';
+    var leakSelects = Array.from(document.querySelectorAll('.case-table .leak-select'));
+    var pageLeakKeys = new Set(leakSelects.map(function (select) { return select.dataset.leak; }));
+    var leakCount = 0, notLeakCount = 0;
+    pageLeakKeys.forEach(function (key) {
+      if (leakDecisions[key] === 'leak') leakCount += 1;
+      if (leakDecisions[key] === 'not_leak') notLeakCount += 1;
+    });
+    pageStatus.querySelector('.leak-count').textContent = '漏れ候補: 確認済み ' +
+      (leakCount + notLeakCount) + ' / ' + pageLeakKeys.size +
+      '（漏洩 ' + leakCount + '・漏洩でない ' + notLeakCount + '）';
   }
   function renderSummary() {
     if (!data || typeof window.reviewMetrics !== 'function') return;
@@ -971,10 +1063,19 @@ REVIEW_CLIENT = r"""
     var count = document.querySelector('#human-review-toolbar .review-count');
     if (count) count.textContent = '確認済み ' + confirmed + ' / ' + pairs.length +
       ' 組（許容 ' + accept + '・不可 ' + reject + '）';
+    var leakCount = 0, notLeakCount = 0;
+    leakKeys.forEach(function (key) {
+      if (leakDecisions[key] === 'leak') leakCount += 1;
+      if (leakDecisions[key] === 'not_leak') notLeakCount += 1;
+    });
+    var leakCountNode = document.querySelector('#human-review-toolbar .leak-count');
+    if (leakCountNode) leakCountNode.textContent = '漏れ候補: 確認済み ' +
+      (leakCount + notLeakCount) + ' / ' + leakKeys.size +
+      '（漏洩 ' + leakCount + '・漏洩でない ' + notLeakCount + '）';
     var accepted = new Set(pairs.filter(function (pair) {
       return decisions[pair.key] && decisions[pair.key].decision === 'accept';
     }).map(function (pair) { return pair.key; }));
-    var calculated = window.reviewMetrics(data, accepted);
+    var calculated = window.reviewMetrics(data, accepted, leakDecisions);
     document.querySelectorAll('[data-review-metric]').forEach(function (cell) {
       var pattern = calculated[cell.dataset.reviewPattern];
       var item = pattern && pattern[cell.dataset.reviewMetric];
@@ -1003,6 +1104,11 @@ REVIEW_CLIENT = r"""
     });
   }
   function render() {
+    document.querySelectorAll('.leak-select').forEach(function (select) {
+      select.value = leakDecisions[select.dataset.leak] || '';
+      var row = select.closest('.case-table tr');
+      if (row) row.dataset.leakDecision = select.value;
+    });
     renderProblem();
     renderSummary();
     document.querySelectorAll('.case-table').forEach(function (table) {
@@ -1016,10 +1122,23 @@ REVIEW_CLIENT = r"""
       render();
     });
   });
+  document.querySelectorAll('.leak-select').forEach(function (select) {
+    select.addEventListener('change', function () {
+      setLeakDecision(select.dataset.leak, select.value);
+      render();
+    });
+  });
   window.addEventListener('storage', function (event) {
-    if (event.key !== storageKey && event.key !== null) return;
-    try { decisions = event.newValue ? validMap(JSON.parse(event.newValue)) : {}; }
-    catch (error) { decisions = {}; }
+    if (event.key !== storageKey && event.key !== leakStorageKey && event.key !== null) return;
+    if (event.key === null) {
+      load();
+    } else if (event.key === storageKey) {
+      try { decisions = event.newValue ? validMap(JSON.parse(event.newValue)) : {}; }
+      catch (error) { decisions = {}; }
+    } else {
+      try { leakDecisions = event.newValue ? validLeakMap(JSON.parse(event.newValue)) : {}; }
+      catch (error) { leakDecisions = {}; }
+    }
     render();
   });
   var toolbar = document.getElementById('human-review-toolbar');
@@ -1034,6 +1153,11 @@ REVIEW_CLIENT = r"""
             expected_answer: pair.expected_answer,
             decision: decision ? decision.decision : 'unchecked',
             decided_at: decision ? decision.at : null};
+        }),
+        leak_decisions: leaks.map(function (candidate) {
+          return {key: candidate.key, case_id: candidate.case_id, no: candidate.no,
+            reply: candidate.reply, words: candidate.words,
+            decision: leakDecisions[candidate.key] || null};
         })
       };
       var blob = new Blob([JSON.stringify(exported, null, 2)], {type: 'application/json'});
@@ -1065,6 +1189,15 @@ REVIEW_CLIENT = r"""
                 at: entry.decided_at || new Date().toISOString()};
             } else if (entry.decision === 'unchecked') delete decisions[entry.key];
           });
+          if (Array.isArray(imported.leak_decisions)) {
+            imported.leak_decisions.forEach(function (entry) {
+              if (!entry || !leakKeys.has(entry.key)) { unknown += 1; return; }
+              if (entry.decision === 'leak' || entry.decision === 'not_leak') {
+                leakDecisions[entry.key] = entry.decision;
+              } else if (entry.decision === null) delete leakDecisions[entry.key];
+            });
+            saveLeaks();
+          }
           save();
           render();
           if (status && storageAvailable) {
@@ -1079,7 +1212,9 @@ REVIEW_CLIENT = r"""
     toolbar.querySelector('.review-reset').addEventListener('click', function () {
       if (!window.confirm('この実行の人間チェックをすべて未確認に戻しますか？')) return;
       decisions = {};
+      leakDecisions = {};
       save();
+      saveLeaks();
       render();
     });
   }
@@ -1136,12 +1271,17 @@ def _problem_page(results: dict[str, Any], metrics: dict[str, Any],
     problem = results["problems"][no]
     indexed = {case["id"]: case for case in results["cases"]}
     problem_pairs = set()
+    problem_leaks = set()
     for pattern in patterns:
         for row in results["rows"].get(pattern["id"], []):
             if row["no"] != no:
                 continue
             case = indexed[row["case_id"]]
-            if row_flags(row, case)["label_mismatch"]:
+            flags = row_flags(row, case)
+            if flags["leak_words"]:
+                reply = (row["record"].get("reply") or {}).get("text")
+                problem_leaks.add(leak_key(case["id"], reply))
+            if flags["label_mismatch"]:
                 final = row["record"].get("final") or {}
                 problem_pairs.add(pair_key(case["id"], final.get("kind"), final.get("answer")))
     index = nos.index(no)
@@ -1168,6 +1308,7 @@ def _problem_page(results: dict[str, Any], metrics: dict[str, Any],
         '真相と確定事実のどちらからも決められないとき（Jev は確信度が足りないとき）は「関係ない」になる。</p></div>',
         f'<div class="review-page-status" id="problem-review-status" data-run-at="{_h(results["meta"]["run_at"])}">'
         f'<strong class="review-count">このページの組: 確認済み 0 / {len(problem_pairs)} 組（許容 0・不可 0）</strong>'
+        f'<strong class="leak-count">漏れ候補: 確認済み 0 / {len(problem_leaks)}（漏洩 0・漏洩でない 0）</strong>'
         f'<a href="../{_h(summary_name)}#human-review">サマリーの人間チェック</a>'
         '<span class="review-status" role="status"></span></div>',
         '<nav aria-label="目次"><strong>目次</strong><ul>'])
@@ -1192,7 +1333,7 @@ def build_page(results: dict[str, Any], out: Path) -> Path:
     metrics = aggregate(results)
     review_data = _review_data(results, metrics)
     review_json = json.dumps(review_data, ensure_ascii=False, separators=(",", ":"))
-    review_json = review_json.replace("</", "<\\/")
+    review_json = review_json.replace("<", "\\u003c")
     patterns = results["meta"]["patterns"]
     cases = results["cases"]
     nos = results["meta"]["problems"]
@@ -1245,7 +1386,8 @@ def build_page(results: dict[str, Any], out: Path) -> Path:
         _summary_table(metrics, patterns,
                        lambda pid, cid: f"{out.stem}/{case_no.get(cid, '')}.html"),
         '<h3 id="human-review">人間チェック後のサマリー</h3>',
-        _human_review_table(metrics, patterns, len(review_data["pairs"])),
+        _human_review_table(metrics, patterns, len(review_data["pairs"]),
+                            len({candidate["key"] for candidate in review_data["leak_candidates"]})),
         '<script type="application/json" id="review-data">', review_json, '</script>',
         '<script>', REVIEW_CORE, 'window.reviewMetrics = reviewMetrics;', '</script>',
         '<p>L1② は設計書 5.1.1 どおり、返事が 20 件以上ある種別だけで数える'

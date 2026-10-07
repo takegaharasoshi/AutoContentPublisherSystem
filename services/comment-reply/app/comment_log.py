@@ -103,7 +103,7 @@ def new_record(
         "final": {"kind": None, "answer": None, "decision": None},
         "reply": {
             "text": None, "source": "no_reply", "reply_id": None,
-            "over_80": False,
+            "over_80": False, "guard": None,
         },
         "errors": [],
     }
@@ -120,7 +120,8 @@ def apply_decision(
     record["shadow_mismatch"] = combined.mismatch
     record["final"] = combined.final_log()
     record["times"]["judged_at"] = judged_at or utc_now()
-    record["reply"].update({"text": reply.text, "source": reply.source, "over_80": reply.over_80})
+    record["reply"].update({"text": reply.text, "source": reply.source,
+                            "over_80": reply.over_80, "guard": reply.guard})
     record["errors"].extend(combined.errors)
     if reply.error:
         record["errors"].append(f"writer: {reply.error}")
