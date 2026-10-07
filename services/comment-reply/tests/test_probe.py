@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 import json
 import random
 import re
@@ -14,10 +15,11 @@ import pytest
 
 from app.comment_log import new_record
 from app.config import Config
-from app.judge.contract import KINDS, Judgement, Problem
+from app.judge.contract import JudgeCriteria, KINDS, Judgement, Problem
 from app.reply import templates
 from app.reply.writer import Reply
-from tools import build_probe_page, probe_metrics, probe_run
+from tools import build_probe_page, contradiction_sweep, probe_metrics, probe_run
+from tools.local_trial import _load_stock_problem
 
 
 def _write_data(path: Path, eval_data: dict, bare: dict | None = None,
@@ -31,12 +33,11 @@ def _write_data(path: Path, eval_data: dict, bare: dict | None = None,
 
 
 def _offline_problem(no: str) -> Problem:
-    return Problem.from_snapshot({
-        "schema_version": 2, "set_code": "umigame-soup-1", "media_id": "media-" + no,
-        "content_key": "key-" + no, "problem_text": f"{no} の問題文",
-        "truth": "真相", "fact_sheet": ["確定事実"], "core_points": ["核心"],
-        "reveal_text": "開示文",
-    })
+    return replace(
+        _load_stock_problem(no), media_id="media-" + no,
+        content_key="key-" + no, problem_text=f"{no} の問題文",
+        truth="真相", fact_sheet=("確定事実",), reveal_text="開示文",
+    )
 
 
 def _offline_run(tmp_path: Path) -> tuple[dict, dict[str, int], Path, dict]:
@@ -296,6 +297,23 @@ def test_run_cache_timing_record_and_offline_page(tmp_path):
     build_probe_page.build_page(second, page)
     assert page.read_text(encoding="utf-8") == previous
     assert not stale.exists() and not stale_page.exists()
+
+
+def test_probe_cache_key_changes_with_judge_criteria() -> None:
+    problem = _offline_problem("U01")
+    changed = replace(problem, judge_criteria=JudgeCriteria(
+        (("新しい当てた基準", "新しい触れた基準"),)
+        + problem.judge_criteria.points[1:], problem.judge_criteria.errors
+    ))
+    case = {"text": "コメント"}
+    assert probe_run._content_hash(case, problem) != probe_run._content_hash(case, changed)
+
+
+def test_contradiction_sweep_displays_old_and_new_point_probabilities() -> None:
+    assert contradiction_sweep._point_display(0.5) == "0.50"
+    assert contradiction_sweep._point_display({"hit": 0.5, "close": 0.8}) == (
+        "hit=0.50/close=0.80"
+    )
 
 
 def test_combine_error_keeps_row(tmp_path, monkeypatch):

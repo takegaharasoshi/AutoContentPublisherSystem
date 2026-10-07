@@ -27,6 +27,13 @@ from tools.local_trial import _load_stock_problem  # noqa: E402
 THRESHOLDS = (0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
 
 
+def _point_display(value: float | dict[str, float]) -> str:
+    """Render new hit/close debug values and old float probe caches."""
+    if isinstance(value, dict):
+        return f"hit={float(value['hit']):.2f}/close={float(value['close']):.2f}"
+    return f"{float(value):.2f}"
+
+
 def candidates(results: dict[str, Any]) -> list[dict[str, Any]]:
     """Return Jev guess_correct cases with labels and the hybrid luna kind."""
     cases = {case["id"]: case for case in results["cases"]}
@@ -105,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
           f" / other {sum(x['expected_kind'] != 'guess_correct' for x in items)})")
     print("id | label | luna | points | contradiction | text")
     for item in sorted(items, key=lambda x: (x["expected_kind"], -x["contradiction"])):
-        points = "/".join(f"{v:.2f}" for v in item["points"].values())
+        points = "/".join(_point_display(v) for v in item["points"].values())
         print(f"{item['id']} | {item['expected_kind']} | {item['luna_kind']} | {points} | "
               f"{item['contradiction']:.2f} | {item['text']}")
     print("threshold | wrong_correct | true_correct_demoted | hybrid_split (true / wrong)")

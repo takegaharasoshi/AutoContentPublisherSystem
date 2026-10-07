@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import json
 import logging
+from dataclasses import replace
 from unittest.mock import Mock
 from urllib.error import HTTPError
 
@@ -14,7 +15,7 @@ from app import http_util
 from app.config import Config
 from app.judge import jev, luna
 from app.judge.combiner import combine
-from app.judge.contract import Judgement, Problem, ProblemInvalid
+from app.judge.contract import JudgeCriteria, Judgement, Problem, ProblemInvalid
 
 
 class _Response:
@@ -31,18 +32,66 @@ class _Response:
         return self.body
 
 
-def test_problem_requires_v2_and_judge_points(problem) -> None:
-    raw = {**problem.__dict__, "fact_sheet": list(problem.fact_sheet),
-           "core_points": list(problem.core_points)}
+def _snapshot(problem) -> dict:
+    return {
+        **problem.__dict__,
+        "fact_sheet": list(problem.fact_sheet),
+        "core_points": list(problem.core_points),
+        "judge_criteria": {
+            "points": [{"hit": hit, "touch": touch}
+                       for hit, touch in problem.judge_criteria.points],
+            "errors": list(problem.judge_criteria.errors),
+        },
+    }
+
+
+def test_problem_requires_v3_and_judge_criteria(problem) -> None:
+    raw = _snapshot(problem)
+    assert Problem.from_snapshot(raw) == problem
     with pytest.raises(ProblemInvalid, match="schema_version"):
-        Problem.from_snapshot({**raw, "schema_version": 1})
+        Problem.from_snapshot({**raw, "schema_version": 2})
     with pytest.raises(ProblemInvalid, match="core_points"):
         Problem.from_snapshot({**raw, "core_points": []})
     with pytest.raises(ProblemInvalid, match="reveal_text"):
         Problem.from_snapshot({**raw, "reveal_text": None})
+    assert isinstance(problem.judge_criteria.points, tuple)
+    assert isinstance(problem.judge_criteria.errors, tuple)
 
 
-def test_luna_parses_strict_json_and_retries_429(monkeypatch, problem) -> None:
+@pytest.mark.parametrize("criteria", [
+    None,
+    {"points": [], "errors": []},
+    {"points": [{"hit": "当てた", "touch": "触れた"}], "errors": []},
+    {"points": [{"hit": "", "touch": "触れた"}] * 2, "errors": []},
+    {"points": [{"hit": "当てた", "touch": 1}] * 2, "errors": []},
+    {"points": [{"hit": "当てた", "touch": "触れた"}] * 2,
+     "errors": ["a", "b", "c", "d"]},
+    {"points": [{"hit": "当てた", "touch": "触れた"}] * 2,
+     "errors": [" "]},
+])
+def test_problem_rejects_invalid_judge_criteria(problem, criteria) -> None:
+    with pytest.raises(ProblemInvalid, match="judge_criteria"):
+        Problem.from_snapshot({**_snapshot(problem), "judge_criteria": criteria})
+
+
+def test_luna_formats_judge_criteria(problem) -> None:
+    lines = luna.format_judge_criteria(problem).splitlines()
+    for index, (point, (hit, touch)) in enumerate(
+        zip(problem.core_points, problem.judge_criteria.points), start=1
+    ):
+        assert lines[(index - 1) * 3:(index - 1) * 3 + 3] == [
+            f"- 要点 {index}: {point}", f"  当てた: {hit}", f"  触れた: {touch}",
+        ]
+    assert lines[-1] == "- 正解にしない誤りの例: " + "／".join(problem.judge_criteria.errors)
+    no_errors = replace(problem, judge_criteria=JudgeCriteria(
+        problem.judge_criteria.points, ()
+    ))
+    assert luna.format_judge_criteria(no_errors).splitlines()[-1] == (
+        "- 正解にしない誤りの例: なし"
+    )
+
+
+def test_luna_parses_strict_json_and_retries_429(monkeypatch, tmp_path, problem) -> None:
     decision = {"kind": "q_open", "answer": None, "reply": "聞き直してね",
                 "reason": "語だけ", "bare_term": "レントゲン"}
     body = {"choices": [{"finish_reason": "stop", "message": {"content": json.dumps(decision)}}],
@@ -57,6 +106,9 @@ def test_luna_parses_strict_json_and_retries_429(monkeypatch, problem) -> None:
         return _Response(body)
 
     monkeypatch.setattr(http_util.request, "urlopen", open_request)
+    rules = tmp_path / "rules.txt"
+    rules.write_text("{judge_criteria}", encoding="utf-8")
+    monkeypatch.setattr(luna, "RULES_PATH", rules)
     sleep = Mock()
     monkeypatch.setattr(http_util.time, "sleep", sleep)
     result = luna.judge("1", "レントゲン？", problem, api_key="fake")
@@ -66,6 +118,7 @@ def test_luna_parses_strict_json_and_retries_429(monkeypatch, problem) -> None:
     assert "temperature" not in calls[0]
     assert calls[0]["reasoning_effort"] == "xhigh"
     assert calls[0]["max_completion_tokens"] == 2400
+    assert calls[0]["messages"][0]["content"] == luna.format_judge_criteria(problem)
     schema = calls[0]["response_format"]["json_schema"]
     assert schema["strict"] is True
     assert "bare_term" in schema["schema"]["required"]
@@ -141,18 +194,58 @@ def test_jev_correct_requires_every_core_point(monkeypatch, problem) -> None:
             if name == "qg":
                 return {name: {"probabilities": {"guess": 0.99, "question": 0.01}}}
             if name == "point_0":
-                return {"point_0": {"noul": {"true": 0.8}},
-                        "point_1": {"noul": {"true": second}}}
+                assert all(question["type"] == "choice" for question in questions.values())
+                assert set(questions["point_0"]["criteria"]) == {"hit", "touch", "none"}
+                assert problem.core_points[0] in questions["point_0"]["criteria"]["hit"]
+                assert problem.judge_criteria.points[0][0] in questions["point_0"]["criteria"]["hit"]
+                assert problem.judge_criteria.points[0][1] in questions["point_0"]["criteria"]["touch"]
+                return {"point_0": {"probabilities": {"hit": 0.8, "touch": 0.1, "none": 0.1}},
+                        "point_1": {"probabilities": {"hit": second, "touch": 0.3,
+                                                      "none": 0.7 - second}}}
             if name == "contradict":
-                assert {"truth", "fact_sheet", "comment"} <= set(state)
+                assert {"truth", "fact_sheet", "comment", "errors"} <= set(state)
+                assert state["errors"] == list(problem.judge_criteria.errors)
                 return {"contradict": {"noul": {"true": contradiction}}}
             raise AssertionError(name)
 
         monkeypatch.setattr(jev, "_record_call", call)
         return jev.judge("1", "男はレントゲンで回復を知った", problem, api_key="fake")
 
-    assert run_with(0.49).kind == "guess_close"
+    close = run_with(0.49)
+    assert close.kind == "guess_close"
+    assert close.debug["probabilities"]["B"]["point_1"] == {"hit": 0.49, "close": 0.79}
     assert run_with(0.5).kind == "guess_correct"
+
+
+def test_jev_touch_can_be_close_without_hit(monkeypatch, problem) -> None:
+    def call(api_key, state, questions, debug):
+        name = next(iter(questions))
+        if name == "major":
+            return {"major": {"choice": "question_or_guess"},
+                    "bare_term": {"noul": {"true": 0.1}}}
+        if name == "qg":
+            return {"qg": {"probabilities": {"guess": 0.99, "question": 0.01}}}
+        if name == "point_0":
+            return {"point_0": {"probabilities": {"hit": 0.1, "touch": 0.3, "none": 0.6}},
+                    "point_1": {"choice": "none"}}
+        raise AssertionError(name)
+
+    monkeypatch.setattr(jev, "_record_call", call)
+    result = jev.judge("1", "影は体内のこと？", problem, api_key="fake")
+    assert result.kind == "guess_close"
+    assert result.debug["probabilities"]["B"] == {
+        "point_0": {"hit": 0.1, "close": 0.4},
+        "point_1": {"hit": 0.0, "close": 0.0},
+    }
+
+
+@pytest.mark.parametrize("choice, expected", [
+    ("hit", {"hit": 1.0, "close": 1.0}),
+    ("touch", {"hit": 0.0, "close": 1.0}),
+    ("none", {"hit": 0.0, "close": 0.0}),
+])
+def test_jev_core_choice_only_is_one_hot(choice, expected) -> None:
+    assert jev._core_point_probabilities({"choice": {"key": choice}}) == expected
 
 
 def test_jev_contradiction_demotes_correct_candidate(monkeypatch, problem) -> None:
@@ -170,8 +263,9 @@ def test_jev_contradiction_demotes_correct_candidate(monkeypatch, problem) -> No
             if name == "qg":
                 return {name: {"probabilities": {"guess": 0.99, "question": 0.01}}}
             if name == "point_0":
-                return {"point_0": {"noul": {"true": 0.9}},
-                        "point_1": {"noul": {"true": second}}}
+                return {"point_0": {"probabilities": {"hit": 0.9, "touch": 0.05, "none": 0.05}},
+                        "point_1": {"probabilities": {"hit": second, "touch": 0.2,
+                                                      "none": 0.8 - second}}}
             if name == "contradict":
                 return {"contradict": {"noul": {"true": contradiction}}}
             raise AssertionError(name)
@@ -209,8 +303,8 @@ def test_jev_low_confidence_answer_falls_back_to_irrelevant(monkeypatch, problem
             if name == "kind":
                 return {name: {"choice": "q_yesno"}}
             if name == "point_0":
-                return {"point_0": {"noul": {"true": 0.1}},
-                        "point_1": {"noul": {"true": 0.1}}}
+                return {"point_0": {"probabilities": {"hit": 0.1, "touch": 0.1, "none": 0.8}},
+                        "point_1": {"probabilities": {"hit": 0.1, "touch": 0.1, "none": 0.8}}}
             if name == "quality":
                 return {name: {"noul": {"true": 0.99}}}
             if name == "answer":

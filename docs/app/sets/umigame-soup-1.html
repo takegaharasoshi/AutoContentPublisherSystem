@@ -32,7 +32,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
+  <span>最終更新: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
 </div>
 
 <div class="note">
@@ -332,7 +332,7 @@ nav.toc ul { margin: .3rem 0 0; }
 </div>
 <p>コアの要点は短い文（目安 15 字前後・上限 20 字）で、個数は説明に必要なだけ置く。問題文に書いてある事実は含めない（例: U01 は「影はレントゲンの影」だけでは泣いて喜んだ理由の説明にならないので「病気が良くなった」と 2 点）。</p>
 
-<h4 id="judge-criteria">正解基準 <code>judge_criteria</code>（設計。21-6d7a〔2026-10-07〕・導入は 21-6d7b〜c）</h4>
+<h4 id="judge-criteria">正解基準 <code>judge_criteria</code>（設計 21-6d7a〔2026-10-07〕・素材 21-6d7b・判定への組み込み 21-6d7c〔2026-10-08〕）</h4>
 <div class="note"><span class="callout-title">要点</span>上の表は全問共通の総則で、「言い当てた」「触れた」の境目は問題ごとに違う。<strong>正解基準</strong>は、コアの要点ごとに「当てた（④ に数える）」と「触れた（⑤ の下限）」の境目を書く素材項目で、コア・確定事実シートと同列に作問時に書く。総則はそのまま残り、正解基準はその問題での具体化として判定と評価ラベルの両方の正になる。確定事実シートには事実だけを書き、境目を書かない。</div>
 <p><strong>書式</strong>（JSON。<code>stock_items.py</code> では <code>JUDGE_POINTS[no]["judge_criteria"]</code> に持つ）:</p>
 <div class="table-wrap">
@@ -379,7 +379,7 @@ nav.toc ul { margin: .3rem 0 0; }
 
 <p><strong>確定事実シートとの分担</strong>: 確定事実シートは「はい / いいえ / 関係ない」の根拠となる事実だけを書く。「〜まで言えたら正解」「〜だけでは正解にしない」のような ④⑤⑥ の境目は正解基準にだけ書く（U27 の該当行は 21-6d7b で正解基準へ移し、14 問のシートに境目の行は残っていない。<code>validate.py</code> が検査する）。「〜は答えの核心である（正解宣言のとき以外は補足で言わない）」の行は、質問への答えで真相を漏らさないための目印で正解基準ではないので、確定事実シートに残す。</p>
 
-<p><strong>保存先と受け渡し</strong>（実装は 21-6d7c）:</p>
+<p><strong>保存先と受け渡し</strong>（21-6d7c で実装済み。パターン ⑥ は 21-6d10a）:</p>
 <div class="table-wrap">
 <table>
 <tr><th>場所</th><th>持ち方</th></tr>
@@ -440,7 +440,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <table>
 <tr><th>向き</th><th>項目</th><th>中身</th></tr>
 <tr><td rowspan="3">入力</td><td><code>comment_id</code>・本文</td><td>コメント</td></tr>
-<tr><td>問題</td><td>スナップショットの <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>core_points</code> / <code>reveal_text</code>（<code>schema_version</code> 2 以上が必要 = <code>app/judge/contract.py</code>）</td></tr>
+<tr><td>問題</td><td>スナップショットの <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>core_points</code> / <code>reveal_text</code> / <code>judge_criteria</code>（<code>schema_version</code> 3 以上が必要。正解基準は要点と同数・<code>errors</code> 0〜3 個を検査 = <code>app/judge/contract.py</code>）</td></tr>
 <tr><td><code>core_points</code>・<code>reveal_text</code></td><td>コアの要点（1〜3 個・1 個 20 字以内。④⑤⑥ の判定に使う）と、正解時に開示する真相の要約（70 字以内）。文面の正は <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code>。どの方式でも機械プローブの正解ラベルに使うため残す</td></tr>
 <tr><td rowspan="5">出力<br>（<code>Judgement</code>）</td><td><code>kind</code></td><td>22 種のコード（10.2 の表）</td></tr>
 <tr><td><code>answer</code></td><td><code>q_yesno</code> のときだけ <code>yes</code> / <code>no</code> / <code>irrelevant</code> の 3 値（判断できないときは <code>irrelevant</code>。<a href="#d-20261004-three-answers">付録</a>）。ほかは null</td></tr>
@@ -471,7 +471,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="table-wrap">
 <table>
 <tr><th>項目</th><th>値</th></tr>
-<tr><td>呼び出し</td><td>コメント 1 件につき chat completions を 1 回。system = <code>pattern1_rules.txt</code> に問題・真相・確定事実・コアの要点を埋めたもの、user = コメント本文</td></tr>
+<tr><td>呼び出し</td><td>コメント 1 件につき chat completions を 1 回。system = <code>pattern1_rules.txt</code> に問題・真相・確定事実・コアの要点・正解基準を埋めたもの、user = コメント本文</td></tr>
 <tr><td>出力</td><td>JSON スキーマ（strict）で <code>{kind, answer, reply, reason, bare_term}</code>。種別を明示的に出させることで、コード側の強制と種別一致率の集計ができる</td></tr>
 <tr><td>モデル</td><td><code>gpt-6-luna</code>（<code>LUNA_MODEL</code>）</td></tr>
 <tr><td><code>reasoning_effort</code></td><td><code>xhigh</code>（API は <code>max</code> を受け付けない）</td></tr>
@@ -507,8 +507,8 @@ nav.toc ul { margin: .3rem 0 0; }
   <div class="flow-step q"><div class="t">段 A3 確かめ直し（noul・問題文あり）</div><div class="d">主語や指示語が問題文から一つに決まる、はい / いいえ質問か</div>
     <div class="exits"><span class="exit">≥ <code>T_RECHECK</code> → ①</span><span class="exit">未満 → ③ で確定</span></div></div>
   <div class="flow-arrow">↓ ① ／ 推理</div>
-  <div class="flow-step emph"><div class="t">段 B 正解判定（noul × コアの要点）</div><div class="d">要点ごとに「言い換えも含めて同じ内容を述べているか」</div>
-    <div class="exits"><span class="exit">全要点 ≥ <code>T_POINT</code> → 段 B2 へ（④ の候補・質問の形でも）</span><span class="exit">推理でどれか ≥ <code>T_CLOSE</code> → ⑤</span><span class="exit">推理でなし → ⑥</span></div></div>
+  <div class="flow-step emph"><div class="t">段 B 正解判定（choice 3 択 × コアの要点）</div><div class="d">要点ごとに「当てた / 触れた / 触れていない」。選択肢の説明に正解基準の <code>hit</code>・<code>touch</code> を入れる。当てたの確率 = P(当てた)、触れたの確率 = P(当てた) + P(触れた)</div>
+    <div class="exits"><span class="exit">全要点で当てた ≥ <code>T_POINT</code> → 段 B2 へ（④ の候補・質問の形でも）</span><span class="exit">推理でどれかの触れた ≥ <code>T_CLOSE</code> → ⑤</span><span class="exit">推理でなし → ⑥</span></div></div>
   <div class="flow-arrow">↓ ④ の候補</div>
   <div class="flow-step emph"><div class="t">段 B2 矛盾チェック（noul・問題文 + 真相 + 確定事実）</div><div class="d">推理に、真相・確定事実と矛盾する内容が含まれるか（細部の欠け・言い換えは矛盾としない）</div>
     <div class="exits"><span class="exit">≥ <code>T_CONTRADICT</code> → ⑤（コアは合っているが明らかな誤りを含む）</span><span class="exit">未満 → ④</span></div></div>
@@ -529,7 +529,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td><code>T_GUESS</code></td><td>0.95</td><td>A1b</td><td>推理とみなす確率の下限（迷ったら質問）</td></tr>
 <tr><td><code>T_RECHECK</code></td><td>0.6</td><td>A3</td><td>① として答えられるとみなす確率の下限</td></tr>
 <tr><td><code>T_POINT</code></td><td>0.5</td><td>B</td><td>要点を言い当てたとみなす確率の下限（全要点で ④）</td></tr>
-<tr><td><code>T_CLOSE</code></td><td>0.25</td><td>A1b・B</td><td>要点に触れたとみなす確率の下限（⑤ の判定と、推理扱いの条件）</td></tr>
+<tr><td><code>T_CLOSE</code></td><td>0.25</td><td>A1b・B</td><td>要点に触れたとみなす確率（当てた + 触れた）の下限（⑤ の判定と、推理扱いの条件）</td></tr>
 <tr><td><code>T_CONTRADICT</code></td><td>0.5</td><td>B2</td><td>④ の候補を、真相・確定事実と矛盾するとして ⑤ に落とす確率の下限</td></tr>
 <tr><td><code>T_QUALITY</code></td><td>0.2</td><td>C</td><td>はい / いいえで一意に答えられるとみなす確率の下限</td></tr>
 <tr><td><code>T_ANSWER</code></td><td>0.55</td><td>D</td><td>答えを返す確率の下限（未満は <code>irrelevant</code> = 関係ない）</td></tr>
@@ -658,7 +658,7 @@ nav.toc ul { margin: .3rem 0 0; }
 </div>
 
 <h3 id="prompts">10.5 現行プロンプト全文</h3>
-<div class="note"><span class="callout-title">要点</span>判定と返信文のプロンプト 4 本の全文を転記する。<strong>正は <code>services/comment-reply/app/prompts/</code></strong>で、以下は <code>prompt_version</code> <code>de7b20ee3a37</code>（2026-10-04 の 21-6d4 で答えを 3 値にした版）時点の転記。</div>
+<div class="note"><span class="callout-title">要点</span>判定と返信文のプロンプト 4 本の全文を転記する。<strong>正は <code>services/comment-reply/app/prompts/</code></strong>で、以下は <code>prompt_version</code> <code>cc9071fb8900</code>（2026-10-08 の 21-6d7c で推理の判定を正解基準に言い換えた版。前回は <code>de7b20ee3a37</code> = 21-6d4 で答えを 3 値にした版）時点の転記。</div>
 <ul>
   <li><strong><code>prompt_version</code></strong>: 同梱プロンプト全ファイル（名前順）のファイル名と中身の SHA-256 先頭 12 桁（<code>app/comment_log.py</code>）。コメント記録の <code>config.prompt_version</code>（<a href="#comment-log">10.8</a>）と評価ページの表示で、どの版で動いたかを照合できる</li>
   <li><strong>転記の扱い</strong>: 「同じ情報を 2 か所に書かない」の例外として転記している（2026-10-03 ユーザー承認）。<strong>プロンプトを変えるステップでは、この節の転記と <code>prompt_version</code> の更新を完了条件に入れる</strong></li>
@@ -668,7 +668,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="table-wrap">
 <table>
 <tr><th>ファイル</th><th>使う場所</th><th>埋め込む値</th></tr>
-<tr><td><code>pattern1_rules.txt</code></td><td>パターン 1 の判定（<a href="#pattern1">10.3.3</a>）。手順 3 の返信文は下書きで送らない</td><td>問題文・真相・確定事実・コアの要点</td></tr>
+<tr><td><code>pattern1_rules.txt</code></td><td>パターン 1 の判定（<a href="#pattern1">10.3.3</a>）。手順 3 の返信文は下書きで送らない</td><td>問題文・真相・確定事実・コアの要点・正解基準（<code>{judge_criteria}</code> = 要点ごとの当てた / 触れたと誤りの例。<code>luna.format_judge_criteria</code>）</td></tr>
 <tr><td><code>reply_style.txt</code></td><td>書き手 2 種が共有する返信文の基準（<a href="#reply-style">10.4</a> の表と同じ内容）</td><td>なし（書き手の <code>{style}</code> に入る）</td></tr>
 <tr><td><code>reply_writer.txt</code></td><td>書き手 <code>1d-luna</code> / <code>2c-luna</code>（真相なし）</td><td>判定・語・① の形・基準・問題文</td></tr>
 <tr><td><code>reply_1b_with_truth.txt</code></td><td>書き手 <code>1b</code>（真相あり）</td><td>判定・語・① の形・基準・問題文・真相・確定事実・コアの要点</td></tr>
@@ -690,15 +690,17 @@ nav.toc ul { margin: .3rem 0 0; }
   例: 問題文に母親と娘が出てくるときの「彼女は泣いてた？」は、「彼女」がどちらか決まらないので q_open。
   「あれって大事なもの？」のように「あれ」が何を指すか書かれていないものも q_open。
   一方「相手は家族？」は問題文の「相手」を指すと決まるので q_yesno。迷うときは q_open にして聞き直してもらう。
-- guess_correct: 下の「コアの要点」をすべて言い当てていて、明らかな誤りを含まない推理。周辺の細部は欠けていてもよい
-  （「〜ですか？」「〜ってこと？」の質問の形でも、コアの要点がすべて入り、何についての推理か分かればこれ。語だけのコメントは除く）
-- guess_close: コアの要点のどれかに触れているが guess_correct に届かない推理。コアは合っているが明らかな誤りを含むものもここ
-- guess_wrong: コアの要点に触れていない推理。周辺の事実がいくつか合っていても、コアに触れていなければこれ
+- guess_correct: 下の「正解基準」で、すべての要点の「当てた」を満たし、明らかな誤り（「正解にしない誤りの例」を含む）がない推理。
+  周辺の細部は欠けていてもよい
+  （「〜ですか？」「〜ってこと？」の質問の形でも、すべての要点の「当てた」を満たし、何についての推理か分かればこれ。語だけのコメントは除く）
+- guess_close: guess_correct に届かないが、どれかの要点で「当てた」か「触れた」を満たす推理。すべての要点の「当てた」を
+  満たしていても、明らかな誤りを含むものもここ
+- guess_wrong: どの要点でも「触れた」を満たさない推理。周辺の事実がいくつか合っていても、要点に触れていなければこれ
   「コアに触れている」とは、コアの要点の中身（仕掛けの答え）を正しく述べていること。問題文にある言葉をそのまま使っているだけや、
   問題文どおりの読み方（出題者がわざと誘った読み方）で推理しているだけでは、コアに触れていない（guess_wrong）。
 - 問題文の言葉や事実を 1 つだけ確かめる短い質問（1 文。「『〇〇』って〜って意味？」「〜なの？」）は、コアの一部に触れていても
   推理ではなく q_yesno として yes / no で答える。一方、何が起きたのかを自分の言葉で説明し、最後に「〜かな」「〜じゃない？」
-  「〜ってこと？」を付けたものは推理として扱う（コアの要点がすべて入っていれば guess_correct、一部なら guess_close）。
+  「〜ってこと？」を付けたものは推理として扱う（すべての要点の「当てた」を満たせば guess_correct、一部なら guess_close）。
 - ask_hint: ヒントを求める / ask_spoiler: 答え・ネタバレを求める / ask_howto: 遊び方やアカウント（bot かどうか等）への質問
 - impression: 問題への感想 / greeting: 挨拶 / cheer: 応援 / chat: 問題と関係のない雑談 / request: 「こんな問題を出して」などのリクエスト
 - complaint: 問題への指摘・クレーム（「矛盾している」「無理がある」「難しすぎる」）。「つまらない」「センスない」「バカみたいな問題」など
@@ -737,7 +739,9 @@ nav.toc ul { margin: .3rem 0 0; }
 確定事実:
 {fact_sheet}
 コアの要点（推理の判定に使う。この問題の仕掛け）:
-{core_points}</code></pre>
+{core_points}
+正解基準（推理の判定に使う。要点ごとに「当てた」「触れた」の下限を示す。言い換えも同じ中身なら満たす）:
+{judge_criteria}</code></pre>
 </details>
 <details class="fold"><summary><code>reply_style.txt</code>（返信文の基準・書き手 2 種で共有）</summary>
 <pre><code>【話し手】探偵カメロック（ウミガメの探偵。丸い体に前掛け、スープの椀と虫眼鏡を持っている）。
@@ -872,18 +876,19 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <div class="table-wrap">
 <table>
 <tr><th>キー</th><th>中身</th></tr>
-<tr><td><code>schema_version</code></td><td><code>2</code>（21-6c1 で <code>core_points</code>・<code>reveal_text</code> を追加。判定モジュールは 2 以上を前提にする）</td></tr>
+<tr><td><code>schema_version</code></td><td><code>3</code>（21-6c1 の 2 で <code>core_points</code>・<code>reveal_text</code>、21-6d7c の 3 で <code>judge_criteria</code> を追加。判定モジュールは 3 以上を前提にし、2 の読み替えは用意しない）</td></tr>
 <tr><td><code>set_code</code>・<code>media_id</code>・<code>content_key</code></td><td>セット・メディア ID・ストックのキー（例 <code>001-lighthouse-letter</code>）</td></tr>
 <tr><td><code>posted_at</code></td><td><code>posts.posted_at</code> に書いた値と同じ時刻（UTC・末尾 <code>Z</code>）</td></tr>
 <tr><td><code>problem_text</code>・<code>truth</code>・<code>fact_sheet</code></td><td>問題文・真相・確定事実シート（配列）</td></tr>
 <tr><td><code>core_points</code>・<code>reveal_text</code></td><td>コアの要点（配列）・正解時の開示文（70 字以内）。<code>umigame_items</code> の同名列（V013）から写し、NULL なら出力しない（V013 未適用・ストック未更新の検出）</td></tr>
+<tr><td><code>judge_criteria</code></td><td>正解基準（<code>points</code> = 要点ごとの <code>hit</code>・<code>touch</code>、<code>errors</code> = 誤りの例。<a href="#judge-criteria">10.2</a>）。<code>umigame_items.judge_criteria</code>（V014）から写し、NULL・要点との個数違いなら異常終了する</td></tr>
 <tr><td><code>rule_text</code></td><td>ルール帯の文</td></tr>
 <tr><td><code>master_rules</code></td><td><code>prompt_configs.prompt_text</code> を写す既存のキー。<strong>判定には使わない</strong>（プロンプトは Lambda に同梱 = <a href="#judge-impl">10.3.2</a>）。21-7 の INSERT で <code>prompt_text</code> に何を入れるか（空 / 記録として転記）は 21-7 で決める</td></tr>
 </table>
 </div>
 <details class="fold"><summary>JSON の例</summary>
 <pre><code>{
-  "schema_version": 2,
+  "schema_version": 3,
   "set_code": "umigame-soup-1",
   "media_id": "17912345678901234",
   "content_key": "001-lighthouse-letter",
@@ -892,6 +897,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
   "truth": "……",
   "fact_sheet": ["……", "……"],
   "core_points": ["……", "……"],
+  "judge_criteria": {"points": [{"hit": "……", "touch": "……"}, {"hit": "……", "touch": "……"}], "errors": ["……"]},
   "reveal_text": "……（70 字以内）",
   "rule_text": "「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します",
   "master_rules": "（prompt_configs.prompt_text。判定には使わない）"
@@ -1222,6 +1228,17 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
   <p>21-6d5 の評価ページでユーザーが不一致 52 組を判断した（2026-10-05。許容 26・不可 26。書き出した JSON は <code>judge-trial/data/human_review_21-6d6.json</code>）。許容の組を 25 ケース（<code>eval_problems.json</code> 23・<code>common_cases.json</code> 2。語だけのコメントは該当なし）の別解に足した。種別が違えば <code>accept_kinds</code> に、q_yesno どうしで答えだけ違えば <code>accept_answers</code> に入れる。正解ラベルは変えていない。API は呼ばず、21-6d4 の <code>results.json</code> のケース定義だけを差し替えて作り直した。合否表は 21-6d5 の「人間チェック後のサマリー」（<code>aggregate(results, accepted)</code>）と全パターン・全指標で一致する。</p>
   <p>あわせて <code>apply_labels</code> を直した。従来は種別 q_yesno を別解にすると答えを問わず許容になり、許容したのは「はい」の組だけなのに、次のプローブで「いいえ」も一致と数えてしまう。<code>accept_answers</code> があるときはその答えだけを許容する。既存のデータに種別 q_yesno の別解はなく、21-6d4 の集計は変わらない。</p>
   <p>「不可」の 26 組は不一致のまま残る（評価ページの人間チェックでは「確認済み 0 / 26 組」と出る）。方式は 21-6e で選ぶ。</p>
+</div>
+
+<div class="decision" id="d-20261008-judge-criteria-impl">
+  <span class="callout-title">2026-10-08 21-6d7c: 正解基準を判定に組み込む（実装上の決め事）</span>
+  <ul>
+    <li><strong>Jev 段 B</strong>: 要点ごとの choice のキーは <code>hit</code> / <code>touch</code> / <code>none</code>。「touch は hit を満たさないときだけ」を選択肢の説明に書き、確率は P(hit) を当てた、P(hit) + P(touch) を触れたとして既存の <code>T_POINT</code>・<code>T_CLOSE</code> と比べる（閾値は据え置き。掃引は 21-6d11）。確率が返らず choice だけ返ったら 1.0 とみなす。<code>debug.probabilities.B</code> は要点ごとに <code>{hit, close}</code>（旧形式の数値も評価ページ側で読める）</li>
+    <li><strong>段 B2</strong>: <code>state</code> に <code>errors</code> を足し、指示文に「例のような誤りも矛盾に含める」を足した</li>
+    <li><strong>luna</strong>: コアの要点の一覧は残し、その下に正解基準の節を足した。luna は判定と同じ呼び出しで下書き（<code>reply</code>）も書くが、下書きは送らない（10.3.3）ので、書き手に渡さない方針（上の表）とは矛盾しない</li>
+    <li><strong>更新 SQL</strong>: 既存行には <code>batch-01/update_judge_criteria.sql</code>（14 問の <code>judge_criteria</code> + U27 の <code>fact_sheet</code>・<code>core_points</code>。ストックと出題済みの <code>umigame_items</code> の両方）を、V014 の適用後・image-batch / sns-post-batch のデプロイ前に流す。<code>update_judge_points.sql</code> も U27 の <code>core_points</code> に追随して再生成した</li>
+    <li><strong>小試走</strong>（Jev のみ・境目を中心に 10 件）: 8 件がラベルどおり（U12-e18・U27-e18 は ⑤、U12-e19・U27-e19 の誤り入りも ⑤）。U27-e16「人生ゲームの車の駒を動かしてたってこと？」（④）は当てた 0.18 で ⑤、U01-e19（④）は要点 1 の当てた 0.13 で ⑤。U27 は <code>hit</code> の「または」が家族のピンまで求めるように読まれた疑いがあり、21-6d8〜21-6d11 で扱う。luna は OpenAI のキーが手元の環境に無いため流していない</li>
+  </ul>
 </div>
 
 </div>

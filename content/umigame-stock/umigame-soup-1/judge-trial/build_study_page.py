@@ -436,7 +436,11 @@ def examples(m, ids):
                     parts.append(f"段 {st}: " + " / ".join(f"{k} {v:.2f}" for k, v in top))
             extra = "（" + "、".join(parts)
             if P.get("B"):
-                extra += "、段 B: " + " / ".join(f"{v:.2f}" for v in P["B"].values())
+                extra += "、段 B: " + " / ".join(
+                    f"hit={v['hit']:.2f},close={v['close']:.2f}"
+                    if isinstance(v, dict) else f"{v:.2f}"
+                    for v in P["B"].values()
+                )
             extra += "）"
         reply = x["reply"] if x["reply"] else "（返信なし）"
         AN = {"yes": "はい", "no": "いいえ", "irrelevant": "関係ありません", "unknown": "答えに関わりません"}

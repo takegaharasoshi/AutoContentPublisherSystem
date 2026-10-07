@@ -41,10 +41,11 @@ def _load_stock_problem(no: str) -> Problem:
     if not isinstance(points, dict):
         raise ValueError(f"JUDGE_POINTS has no entry for {no}")
     return Problem.from_snapshot({
-        "schema_version": 2, "set_code": "umigame-soup-1",
+        "schema_version": 3, "set_code": "umigame-soup-1",
         "media_id": f"local-{no}", "content_key": item["content_key"],
         "problem_text": item["problem_text"], "truth": item["truth"],
         "fact_sheet": item["fact_sheet"], "core_points": points["core_points"],
+        "judge_criteria": points["judge_criteria"],
         "reveal_text": points["reveal_text"],
     })
 
@@ -64,7 +65,7 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--problem", help="ID from batch-01/stock_items.py, e.g. U01")
-    source.add_argument("--snapshot", type=Path, help="published schema-v2 snapshot JSON")
+    source.add_argument("--snapshot", type=Path, help="published schema-v3 snapshot JSON")
     parser.add_argument("--comment", action="append", default=[], help="comment; repeatable")
     parser.add_argument("--comments-file", type=Path, help="one comment per line")
     parser.add_argument("--modes", nargs="+", choices=("luna", "jev", "hybrid"),

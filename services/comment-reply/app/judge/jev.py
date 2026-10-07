@@ -165,9 +165,11 @@ SUB_CRITERIA = {
 CONTRADICTION_QUESTION = {
     "type": "noul",
     "instructions": (
-        "The puzzle text, its hidden truth, the established facts and a player's comment are given. "
+        "The puzzle text, its hidden truth, the established facts, examples of disqualifying errors "
+        "and a player's comment are given. "
         "Decide whether the comment's explanation contains a statement that contradicts the truth or "
-        "the established facts. Missing peripheral details, details the truth does not mention, and "
+        "the established facts, including an error like the supplied examples. "
+        "Missing peripheral details, details the truth does not mention, and "
         "paraphrases with the same meaning are not contradictions."
     ),
     "criteria": {
@@ -186,6 +188,7 @@ def contradiction_state(problem: Problem, text: str) -> dict:
         "problem_text": problem.problem_text,
         "truth": problem.truth,
         "fact_sheet": list(problem.fact_sheet),
+        "errors": list(problem.judge_criteria.errors),
         "comment": text,
     }
 
@@ -264,6 +267,44 @@ def _choice(answer: dict, keys: tuple[str, ...]) -> str:
     raise JevError(f"有効な choice がありません: {choice!r}")
 
 
+def _core_point_questions(problem: Problem) -> dict[str, dict]:
+    """Build one three-way choice per core point with its own boundaries."""
+    questions = {}
+    for index, (point, (hit, touch)) in enumerate(
+        zip(problem.core_points, problem.judge_criteria.points)
+    ):
+        questions[f"point_{index}"] = {
+            "type": "choice",
+            "instructions": (
+                "Classify the comment against this truth point. Choose hit when it meets the hit standard; "
+                "otherwise choose touch when it meets the touch standard; otherwise choose none. "
+                "Paraphrases with the same meaning count."
+            ),
+            "criteria": {
+                "hit": f"Truth point: {point}. Hit standard: {hit}",
+                "touch": (
+                    f"Truth point: {point}. Touch standard: {touch}; "
+                    f"Choose this only when the hit standard is not met: {hit}"
+                ),
+                "none": (
+                    f"Truth point: {point}. Neither standard is met. "
+                    f"Hit standard: {hit}; Touch standard: {touch}"
+                ),
+            },
+        }
+    return questions
+
+
+def _core_point_probabilities(answer: dict) -> dict[str, float]:
+    """Return hit and close probabilities, accepting choice-only replies."""
+    probabilities = _probability_map(answer)
+    if not probabilities:
+        selected = _choice(answer, ("hit", "touch", "none"))
+        probabilities = {selected: 1.0}
+    p_hit = float(probabilities.get("hit", 0.0))
+    return {"hit": p_hit, "close": p_hit + float(probabilities.get("touch", 0.0))}
+
+
 def _record_call(api_key: str, state: dict, questions: dict[str, dict], debug: dict) -> dict:
     started = time.monotonic()
     result = _jev_request(api_key, state, questions)
@@ -303,26 +344,15 @@ def judge(
         _points_cache: dict = {}
 
         def core_probs() -> dict:
-            """段 B（コアの要点ごとの noul）。段 A1b と正解判定で使い回すため 1 回だけ呼ぶ（試行 8）。"""
+            """段 B（コアの要点ごとの choice）。段 A1b と正解判定で使い回す。"""
             if "B" not in _points_cache:
-                # 要点ごとの noul を 1 リクエストにまとめる（試行 5。試行 4 は要点ごとに 1 回ずつ呼んで遅くなった）
-                point_questions = {
-                    f"point_{index}": {
-                        "type": "noul",
-                        "instructions": (
-                            "Estimate whether the comment states the same content as this truth point, "
-                            "including paraphrases or different wording with the same meaning. "
-                            f"The truth point is: {point!r}."
-                        ),
-                        "criteria": {
-                            "true": "The comment states this truth point, possibly in different words.",
-                            "false": "The comment does not state this truth point.",
-                        },
-                    }
-                    for index, point in enumerate(problem.core_points)
-                }
+                # 要点ごとの choice を 1 リクエストにまとめる。
+                point_questions = _core_point_questions(problem)
                 point_answers = _record_call(api_key, {"comment": text}, point_questions, debug)
-                point_probs = {point_id: _noul_true(point_answers[point_id]) for point_id in point_questions}
+                point_probs = {
+                    point_id: _core_point_probabilities(point_answers[point_id])
+                    for point_id in point_questions
+                }
                 _points_cache["B"] = point_probs
                 debug["probabilities"]["B"] = point_probs
             return _points_cache["B"]
@@ -389,7 +419,9 @@ def judge(
                 major = "guess" if float(qg_probs.get("guess", 0)) >= t_guess else "question"
                 # 推理にするのはコアの要点のどれかに少しでも触れているときだけ（試行 8・ユーザー指示）。
                 # コアに全く触れない短い質問（「誰かのいたずらだった？」など）が推理の確率 0.95 を超えることがあった
-                if major == "guess" and max(core_probs().values(), default=0.0) < t_close:
+                if major == "guess" and max(
+                    (value["close"] for value in core_probs().values()), default=0.0
+                ) < t_close:
                     major = "question"
                     debug["guess_demoted"] = True
             else:
@@ -447,10 +479,10 @@ def judge(
         answer: str | None = None
         if a_kind in {"guess", "q_yesno"}:
             point_probs = core_probs()
-            hits = sum(value >= t_point for value in point_probs.values())
+            hits = sum(value["hit"] >= t_point for value in point_probs.values())
             # コア基準（試行 8b）: 全要点が T_POINT 以上なら正解。
             all_points = bool(point_probs) and hits == len(point_probs)
-            some_points = any(value >= t_close for value in point_probs.values())
+            some_points = any(value["close"] >= t_close for value in point_probs.values())
             if all_points:
                 contradict_answers = _record_call(
                     api_key, contradiction_state(problem, text),
@@ -529,7 +561,7 @@ def judge(
         reason = f"段A={major}→{kind}"
         point_values = debug["probabilities"].get("B", {}).values()
         if point_values:
-            reason += f", 要点最低={min(point_values):.2f}"
+            reason += f", 要点最低={min(value['hit'] for value in point_values):.2f}"
             if "B2" in debug["probabilities"]:
                 reason += f", 矛盾={debug['probabilities']['B2']:.2f}"
         elif "A3" in debug["probabilities"]:

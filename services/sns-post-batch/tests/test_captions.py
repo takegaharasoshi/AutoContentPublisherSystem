@@ -37,6 +37,7 @@ def _umigame_item(**updates: object) -> UmigameItem:
         "truth": "真相",
         "fact_sheet": ["事実"],
         "core_points": ["要点"],
+        "judge_criteria": {"points": [{"hit": "当てた", "touch": "触れた"}], "errors": []},
         "reveal_text": "開示する真相",
         "rule_text": "質問してね",
         "hook": "解けるかな？",

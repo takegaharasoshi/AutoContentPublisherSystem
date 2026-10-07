@@ -16,6 +16,22 @@ OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
 RULES_PATH = Path(__file__).resolve().parent.parent / "prompts" / "pattern1_rules.txt"
 
 
+def format_judge_criteria(problem: Problem) -> str:
+    """Format each core point with its hit and touch boundary for Luna."""
+    lines = []
+    for index, (point, (hit, touch)) in enumerate(
+        zip(problem.core_points, problem.judge_criteria.points), start=1
+    ):
+        lines.extend((
+            f"- 要点 {index}: {point}",
+            f"  当てた: {hit}",
+            f"  触れた: {touch}",
+        ))
+    errors = "／".join(problem.judge_criteria.errors) or "なし"
+    lines.append(f"- 正解にしない誤りの例: {errors}")
+    return "\n".join(lines)
+
+
 def _schema() -> dict[str, Any]:
     """Return the strict OpenAI structured output contract."""
     return {
@@ -48,6 +64,7 @@ def judge(
         truth=problem.truth,
         fact_sheet="\n".join(f"- {fact}" for fact in problem.fact_sheet),
         core_points="\n".join(f"- {point}" for point in problem.core_points),
+        judge_criteria=format_judge_criteria(problem),
     )
     payload = {
         "model": model,

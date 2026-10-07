@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -11,7 +12,7 @@ import pytest
 from app import comment_log
 from app.config import Config
 from app.judge.combiner import Combined
-from app.judge.contract import Judgement
+from app.judge.contract import JudgeCriteria, Judgement
 from app.reply import templates, writer
 from tools import local_trial
 
@@ -91,6 +92,22 @@ def test_template_variety_and_bare_prompt(problem) -> None:
         style="style", slot="slot",
     )
     assert prompt == "q_open / レントゲン / style"
+
+
+@pytest.mark.parametrize("variant", ["1b", "1d-luna", "2b", "2c-luna"])
+def test_writer_prompt_excludes_judge_criteria(variant, problem) -> None:
+    hidden = ("HIT_PRIVATE_1", "TOUCH_PRIVATE_1", "ERROR_PRIVATE_1")
+    private_problem = replace(problem, judge_criteria=JudgeCriteria(
+        ((hidden[0], hidden[1]),) + problem.judge_criteria.points[1:], (hidden[2],)
+    ))
+    with_truth = variant == "1b"
+    prompt_name = "reply_1b_with_truth.txt" if with_truth else "reply_writer.txt"
+    template = (writer.PROMPTS_DIR / prompt_name).read_text(encoding="utf-8")
+    prompt = writer._render_prompt(
+        template, _combined("guess_close"), private_problem, with_truth,
+        style="style", slot="slot",
+    )
+    assert all(secret not in prompt for secret in hidden)
 
 
 @pytest.mark.parametrize("variant,effort,max_tokens,with_truth", [

@@ -31,6 +31,14 @@ class ProblemInvalid(ValueError):
 
 
 @dataclass(frozen=True)
+class JudgeCriteria:
+    """Immutable hit/touch boundaries and examples of disqualifying errors."""
+
+    points: tuple[tuple[str, str], ...]
+    errors: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Problem:
     """One published snapshot, kept separate from the stock authoring format."""
 
@@ -42,16 +50,17 @@ class Problem:
     truth: str
     fact_sheet: tuple[str, ...]
     core_points: tuple[str, ...]
+    judge_criteria: JudgeCriteria
     reveal_text: str
 
     @classmethod
     def from_snapshot(cls, raw: Mapping[str, Any]) -> Problem:
-        """Validate and build a problem from schema version 2 or later."""
+        """Validate and build a problem from schema version 3 or later."""
         if not isinstance(raw, Mapping):
             raise ProblemInvalid("snapshot must be an object")
         version = raw.get("schema_version")
-        if not isinstance(version, int) or isinstance(version, bool) or version < 2:
-            raise ProblemInvalid("schema_version must be >= 2")
+        if not isinstance(version, int) or isinstance(version, bool) or version < 3:
+            raise ProblemInvalid("schema_version must be >= 3")
         fields = ("set_code", "media_id", "content_key", "problem_text", "truth", "reveal_text")
         for key in fields:
             if not isinstance(raw.get(key), str) or not raw[key].strip():
@@ -62,12 +71,35 @@ class Problem:
                 not isinstance(item, str) or not item.strip() for item in value
             ):
                 raise ProblemInvalid(f"{key} must be a nonempty string array")
+        criteria = raw.get("judge_criteria")
+        if not isinstance(criteria, Mapping):
+            raise ProblemInvalid("judge_criteria must be an object")
+        points = criteria.get("points")
+        if not isinstance(points, list) or len(points) != len(raw["core_points"]):
+            raise ProblemInvalid("judge_criteria.points must match core_points")
+        parsed_points = []
+        for point in points:
+            if not isinstance(point, Mapping) or any(
+                not isinstance(point.get(key), str) or not point[key].strip()
+                for key in ("hit", "touch")
+            ):
+                raise ProblemInvalid("judge_criteria.points require nonempty hit and touch")
+            parsed_points.append((point["hit"], point["touch"]))
+        errors = criteria.get("errors")
+        if (
+            not isinstance(errors, list)
+            or len(errors) > 3
+            or any(not isinstance(error, str) or not error.strip() for error in errors)
+        ):
+            raise ProblemInvalid("judge_criteria.errors must be 0 to 3 nonempty strings")
         return cls(
             schema_version=version,
             set_code=raw["set_code"], media_id=raw["media_id"],
             content_key=raw["content_key"], problem_text=raw["problem_text"],
             truth=raw["truth"], fact_sheet=tuple(raw["fact_sheet"]),
-            core_points=tuple(raw["core_points"]), reveal_text=raw["reveal_text"],
+            core_points=tuple(raw["core_points"]),
+            judge_criteria=JudgeCriteria(tuple(parsed_points), tuple(errors)),
+            reveal_text=raw["reveal_text"],
         )
 
 

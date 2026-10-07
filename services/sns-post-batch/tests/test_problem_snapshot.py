@@ -18,7 +18,10 @@ POSTED_AT = datetime.datetime(2026, 9, 26, 11, 0, 12)
 def _item() -> UmigameItem:
     return UmigameItem(
         42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実１", "事実２"],
-        ["要点１", "要点２"], "開示する真相", "質問のルール", "フック",
+        ["要点１", "要点２"],
+        {"points": [{"hit": "当てた１", "touch": "触れた１"},
+                    {"hit": "当てた２", "touch": "触れた２"}], "errors": ["誤り"]},
+        "開示する真相", "質問のルール", "フック",
         "本文 #AIart",
     )
 
@@ -67,7 +70,7 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
     assert isinstance(body, bytes)
     assert b"\\u" not in body
     assert json.loads(body.decode("utf-8")) == {
-        "schema_version": 2,
+        "schema_version": 3,
         "set_code": "umigame-soup-1",
         "media_id": "17912345678901234",
         "content_key": "001-lighthouse-letter",
@@ -76,6 +79,9 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
         "truth": "真相です",
         "fact_sheet": ["事実１", "事実２"],
         "core_points": ["要点１", "要点２"],
+        "judge_criteria": {"points": [{"hit": "当てた１", "touch": "触れた１"},
+                                      {"hit": "当てた２", "touch": "触れた２"}],
+                           "errors": ["誤り"]},
         "reveal_text": "開示する真相",
         "rule_text": "質問のルール",
         "master_rules": "固定プロンプト",
@@ -106,11 +112,17 @@ def test_write_problem_snapshot_skips_run_without_item(monkeypatch) -> None:
     [
         UmigameItem(
             42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実"],
-            None, "開示する真相", "質問のルール", "フック", "本文",
+            None, {"points": [], "errors": []},
+            "開示する真相", "質問のルール", "フック", "本文",
         ),
         UmigameItem(
             42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実"],
-            ["要点"], None, "質問のルール", "フック", "本文",
+            ["要点"], {"points": [{"hit": "当てた", "touch": "触れた"}], "errors": []},
+            None, "質問のルール", "フック", "本文",
+        ),
+        UmigameItem(
+            42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実"],
+            ["要点"], None, "開示する真相", "質問のルール", "フック", "本文",
         ),
     ],
 )

@@ -7,6 +7,7 @@ import hmac
 import io
 import json
 import sys
+from dataclasses import asdict
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -97,7 +98,7 @@ def test_problem_404_and_invalid_snapshot(problem) -> None:
     with pytest.raises(problem_store.ProblemNotFound):
         problem_store.get_problem("bucket", "prefix/", "media-1", client=client)
     client.get_object.side_effect = None
-    raw = {**problem.__dict__, "core_points": None}
+    raw = {**asdict(problem), "core_points": None}
     client.get_object.return_value = {"Body": io.BytesIO(json.dumps(raw).encode())}
     with pytest.raises(ProblemInvalid):
         problem_store.get_problem("bucket", "prefix/", "media-1", client=client)

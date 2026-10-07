@@ -115,7 +115,9 @@ def _key(parts: Any) -> str:
 
 def _content_hash(case: dict[str, Any], problem: Problem) -> str:
     return _key([case["text"], problem.content_key,
-                 list(problem.core_points), list(problem.fact_sheet)])
+                 list(problem.core_points), list(problem.fact_sheet),
+                 {"points": list(problem.judge_criteria.points),
+                  "errors": list(problem.judge_criteria.errors)}])
 
 
 def _atomic_json(path: Path, value: Any) -> None:

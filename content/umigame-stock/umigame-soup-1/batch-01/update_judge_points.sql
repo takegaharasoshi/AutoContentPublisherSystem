@@ -271,7 +271,7 @@ WHERE b.set_code = 'umigame-soup-1' AND s.content_key = '014-kind-interpreter';
 -- 015-unlicensed-driver: 免許のない男のドライブ
 UPDATE umigame_stock_items s
 JOIN batch_sets b ON b.id = s.set_id
-SET s.core_points = '["人生ゲームの車の駒を動かしていた"]',
+SET s.core_points = '["車は人生ゲームの駒、家族はピン"]',
     s.reveal_text = '男が走らせているのは人生ゲームの車の駒。妻と子どもはピンで乗せていて、おもちゃなので免許はいらない。',
     s.title = '免許のない男のドライブ',
     s.truth = '男が走らせているのは本物の自動車ではなく、人生ゲーム（すごろく型のボードゲーム）の車の駒だった。
