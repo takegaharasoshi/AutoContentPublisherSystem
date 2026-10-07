@@ -1392,12 +1392,12 @@
 
 
 
-<article class="plan-step" id="step-21-6d10a" data-step-id="21-6d10a" data-status="todo">
+<article class="plan-step" id="step-21-6d10a" data-step-id="21-6d10a" data-status="doing">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6d10a</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-6d10a</strong><span class="plan-status">承認待ち</span></div>
 <h3>Decisions API の公開ドキュメントを確認し、パターン ⑥（Decisions + luna）を設計する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし（21-6d7〜d9 とは独立。アイデア「<a href="../ideas/umigame-reply-openai-decisions.md">Decisions API を候補に加える</a>」を 2026-10-07 に採用）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>現況：</strong>2026-10-08 に調査・設計（<a href="../app/sets/umigame-soup-1.html#pattern3-decisions">設計書 10.3.6</a>）・費用見積もり（21-6d10b + 21-6d11 で約 $0.45、上限 $3）を終え、料金・規約とパターン ⑥ の設計についてユーザーの承認待ち。疎通確認は未実施（キーが要るため、ユーザーがスクリプトを実行する）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -1420,8 +1420,8 @@
 <div class="plan-fold-inner"><p><strong>起票の経緯（2026-10-07 ユーザー）</strong>: Decisions API が一般公開されたので、⑤ jev + 2c-luna と同じ形で ⑥ Decisions + luna も試す。2026-10-03 の壁打ちでの懸念（luna と同じモデルのため誤りが連動する）は、21-6d11 の結果で評価する。</p><p><strong>課題表の照合</strong>: 触るパスは <code>docs/</code> のみで該当なし。</p></div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-08 調査・設計</span></summary>
+<div class="plan-fold-inner"><p><strong>調査（公式ドキュメント・2026-10-08）</strong>: 2026-10-06 にパブリックベータ（GA は数週間以内の見込み）・モデルは <code>gpt-6-luna</code> だけ。<code>predicate</code> は確率、<code>choice</code> は選択肢ごとの確率 + <code>confidence</code> を返す。料金は入力 100 万トークンあたり $0.10（出力・キャッシュは無料）。データは学習に使わない・不正利用監視ログ 30 日・ZDR 対象。問いの数・選択肢の数の上限、対応言語、応答時間の数値は公式に記載なし（第三者記事の「選択肢 2〜8・問い 1〜6・約 150 ms」は未確認扱い）。出典: <a href="https://developers.openai.com/api/docs/guides/decisions">ガイド</a>・<a href="https://developers.openai.com/api/reference/resources/decisions/methods/create">API リファレンス</a>・<a href="https://developers.openai.com/api/docs/guides/your-data">データの扱い</a>・<a href="https://developers.openai.com/api/docs/models/gpt-6-luna">gpt-6-luna</a>・<a href="https://community.openai.com/t/decisions-api-is-now-available-in-public-beta/1403877">公開の告知</a>。</p><p><strong>設計</strong>: 設計書 <a href="../app/sets/umigame-soup-1.html#pattern3-decisions">10.3.6</a> に書いた。パターン 2 の段を R1（A1）・R2（A1b + B）・R3（A2）・R4（A3）・R5（B2 ／ C + D）の最大 5 リクエストにまとめる（Jev は最大 6 回）。閾値は Jev と同じ初期値を別設定で持ち、21-6d11 で掃引する。拒否は判定の失敗として luna に切り替える。独立性がない点を警告として明記した。</p><p><strong>費用見積もり</strong>: 21-6d3c の全件プローブ（441 ケース）では、Jev は 1 ケース平均 2,975 入力トークン・4.1 回の呼び出し、書き手（luna）は 1 回平均 1,588 入力・108 出力トークン。正解基準が入って入力が増える分を見込み、Decisions は 1 ケース 6,000 トークンと置く。21-6d11 の 525 ケース × 6,000 = 315 万トークン → <strong>$0.32</strong>。⑥ の書き手は LLM を使うケースを約 7 割（360 回）として 360 × (1,588 × $0.10 + 108 × $0.50) / 100 万 = <strong>$0.08</strong>。21-6d10b の小試走（U01・U13 の約 70 ケース）は <strong>$0.05</strong>。合計約 <strong>$0.45</strong>。プロンプトの直しで取り直す分を見込み、<strong>21-6d10b と 21-6d11 を合わせて上限 $3</strong> とする（閾値の掃引はキャッシュから計算するので費用はかからない）。</p><p><strong>疎通確認</strong>: キーは環境変数になく、Secrets には触れないため未実施。4 回だけ呼ぶスクリプト（日本語の <code>predicate</code>・1 リクエストに 2 問・選択肢 8 個・9 個）を用意し、ユーザーに実行を依頼した。結果は承認時に記録する。</p><p><strong>ついでの修正</strong>: 21-6d10b の委譲モデルを、2026-10-08 の方針更新に合わせて <code>gpt-6.1-sol</code> / <code>max</code> に直した。</p><p><strong>照合</strong>: 確認待ち該当なし・課題表該当なし・クローズ移動: 該当なし。</p></div>
 </details>
 </div>
 </article>
@@ -1435,7 +1435,7 @@
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>判定モジュールに <code>decisions</code> モードを足し、プローブ実行器にパターン ⑥ を加え、評価ページを 6 パターン表示にする。U01・U13 で小試走する。実装は Codex に委ねる（<code>gpt-6-sol</code> / <code>max</code>）。</p></div>
+<div data-field="overview"><p>判定モジュールに <code>decisions</code> モードを足し、プローブ実行器にパターン ⑥ を加え、評価ページを 6 パターン表示にする。U01・U13 で小試走する。実装は Codex に委ねる（<code>gpt-6.1-sol</code> / <code>max</code>）。設計は<a href="../app/sets/umigame-soup-1.html#pattern3-decisions">設計書 10.3.6</a>（21-6d10a）。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>既存の 5 パターンの結果・キャッシュを壊さない。本番の判定モードの既定は変えない（方式の選定は 21-6e）。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>

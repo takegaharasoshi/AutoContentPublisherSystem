@@ -4,7 +4,7 @@ slug: umigame-reply-openai-decisions
 status: 採用             # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
 kind: 単発               # 単発 | 構想
 created: 2026-10-03
-updated: 2026-10-07
+updated: 2026-10-08
 condition: "(a) Jev に問題が出たとき（値上げ・提供停止・MCA / Acceptable Use Policy の変更）、または (b) Decisions API が一般公開され、公開ドキュメントで料金と確率を返すかが分かったとき、壁打ちを再開する。再開時は「Jev が使えなくなった場合の代わり」として、luna と同じモデルである弱みと天秤にかける"  # 再醸成待ち・待機のとき必須（再検討トリガー / 落とし込み条件）
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
@@ -50,3 +50,11 @@ OpenAI から Jevのような API が出たということを聞きました。�
 
 - トリガー (b) の発火: ユーザーから「Decisions API が一般公開された」。公開ドキュメント（料金・確率を返すか・選択肢の上限・日本語対応）の確認は 21-6d10a で行う
 - 判断（ユーザー）: ⑤ jev + 2c-luna と同じ形で ⑥ Decisions + luna も試す。採用し、開発計画 21-6d10a・21-6d10b・21-6d11 に展開した。luna と同じモデルである点（独立性）は、全件プローブの結果（誤りが luna と連動するか）で評価する
+
+### 2026-10-08（開発計画 21-6d10a）
+
+- 公開ドキュメントで確認（2026-10-06 にパブリックベータ・GA は数週間以内の見込み）: 料金は入力 100 万トークンあたり $0.10（出力・キャッシュは無料）、`predicate` は確率・`choice` は選択肢ごとの確率 + `confidence` を返す、1 リクエストに独立した問いを複数入れられる、学習に使わない・不正利用監視 30 日・ZDR 対象。問いの数・選択肢の数の上限、対応言語、応答時間の数値は記載なし（第三者記事の数値は未確認扱い）
+  - 出典: https://developers.openai.com/api/docs/guides/decisions ・ https://developers.openai.com/api/reference/resources/decisions/methods/create ・ https://developers.openai.com/api/docs/guides/your-data ・ https://community.openai.com/t/decisions-api-is-now-available-in-public-beta/1403877
+- 2026-10-03 の「料金・確率を返すかが分からず設計できない」は解消した。Jev の段は R1〜R5（最大 5 リクエスト）に対応付けて設計した（`docs/app/sets/umigame-soup-1.html` 10.3.6）。独立性がない点は設計書に警告として明記し、21-6d11 で luna と誤りが重なるかを見て評価する
+- 費用見積もり: 21-6d10b + 21-6d11 で約 $0.45（上限 $3）。Jev と違い契約先が増えない（OpenAI キーを流用）
+- 料金・規約と設計の承認待ち（ユーザー）。疎通確認はユーザーがキーを入れてスクリプトを実行する
