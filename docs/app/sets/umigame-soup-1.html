@@ -372,7 +372,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <p><strong>粒度の決め方</strong>（<code>hit</code> を書くときの目安）:</p>
 <ul>
   <li><strong>説明テスト</strong>: 「その言い方の推理が本当だとしたら、問題文の不思議（「しかし」「それでも」の部分）がすべて説明できるか」。説明できる最も粗い言い方を <code>hit</code> の下限にし、説明が残る言い方は <code>touch</code> 側に置く（U12 の「人形」は音を出さない理由は説明できても、階段に並ぶ・毎日うれしそうに眺める理由が残るので <code>touch</code>）</li>
-  <li><strong>固有名は原則として要求しない</strong>: 商品名・作品名（人生ゲーム等）は、その名前でしか説明できない性質がある場合だけ要求する。性質を言えていれば固有名の代わりになる（例: 「すごろくの車の駒に家族のピンを差して進める」）。U27 はこの目安で、<code>hit</code> =「人生ゲームの車の駒」または「すごろくの車の駒に家族のピンを乗せて進める」、<code>touch</code> =「車がボードゲーム・すごろく・おもちゃの駒」とした（21-6d7b。家族がピンであることはコア宣言に含まれるので、判定用要点も「車は人生ゲームの駒、家族はピン」に改めた）</li>
+  <li><strong>固有名は原則として要求しない</strong>: 商品名・作品名（人生ゲーム等）は、その名前でしか説明できない性質がある場合だけ要求する。性質を言えていれば固有名の代わりになる（例: 「すごろくの車の駒に家族のピンを差して進める」）。U27 はこの目安で、<code>hit</code> =「人生ゲームの車の駒」または「すごろくの車の駒に家族のピンを乗せて進める」（21-6d8 で、ピンが前段にも係ると読まれないよう「〜だと言うか、〜と言っている」に書き分けた。<a href="#eval-boundary-cases">10.6</a>）、<code>touch</code> =「車がボードゲーム・すごろく・おもちゃの駒」とした（21-6d7b。家族がピンであることはコア宣言に含まれるので、判定用要点も「車は人生ゲームの駒、家族はピン」に改めた）</li>
   <li><strong>言い換え</strong>: 同じ中身の言い換え・ひらがな表記・言葉の誤用に近い言い方は <code>hit</code> に含める。代表的な言い方を 2〜3 個書けば足り、網羅しない（判定する側が「など」で広げる）</li>
   <li><strong>評価データからは書き写さない</strong>: <code>hit</code>・<code>touch</code>・<code>errors</code> の言い回しに評価ケースの文をそのまま使わない（評価ケースがプロンプトの例と同じになると、プローブが基準の伝わり方を測れなくなる）</li>
 </ul>
@@ -811,20 +811,32 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </details>
 
 <h3 id="evaluation">10.6 評価</h3>
-<div class="note"><span class="callout-title">要点</span>評価データ（全 14 問・計 441 件）を本番と同じ判定・書き手の経路に通す機械プローブで、10.2 の基準の合否を出す。結果は評価ページ（サマリー + 問題ごとの 14 枚）にまとめる。</div>
+<div class="note"><span class="callout-title">要点</span>評価データ（全 14 問・計 525 件）を本番と同じ判定・書き手の経路に通す機械プローブで、10.2 の基準の合否を出す。結果は評価ページ（サマリー + 問題ごとの 14 枚）にまとめる。</div>
 
 <h4>評価データ</h4>
 <p>置き場は <code>content/umigame-stock/umigame-soup-1/judge-trial/data/</code>。問題を増やすときはファイルに問題番号のキーを足す。</p>
 <div class="table-wrap">
 <table>
 <tr><th>ファイル</th><th>中身</th><th>件数</th></tr>
-<tr><td><code>eval_problems.json</code></td><td>問題依存のケース。1 問 21 件が基本（① 10・② 2・③ 3・④ 2〔うち 1 件は質問の形〕・⑤ 2・⑥ 2）。① には口語・主語の省略・誤字を混ぜる。21-6b の試走に使った 5 問（U01・U13・U18・U20・U26）は 25〜30 件</td><td>328</td></tr>
+<tr><td><code>eval_problems.json</code></td><td>問題依存のケース。1 問 21 件が基本（① 10・② 2・③ 3・④ 2〔うち 1 件は質問の形〕・⑤ 2・⑥ 2）。① には口語・主語の省略・誤字を混ぜる。21-6b の試走に使った 5 問（U01・U13・U18・U20・U26）は 25〜30 件。これに<strong>境目ケース</strong>（ID は <code>k01</code>〜、各問 6 件・計 84 件。21-6d8）を足す</td><td>412</td></tr>
 <tr><td><code>bare_term_cases.json</code></td><td>語だけのコメント。各問 2〜3 件（コアの語と外れの語）</td><td>30</td></tr>
 <tr><td><code>common_cases.json</code></td><td>問題に依存しない共通テストセット（⑦〜㉒ の 16 種 × 5 件以上）。どの問題にも成り立つ文面で、境界的なもの（感想と応援の中間など）も混ぜる。対象の問題へ順繰りに割り当てる</td><td>83</td></tr>
-<tr><td colspan="2"><strong>計</strong>（数え方の正は <code>tools/probe_run.py</code> の <code>load_cases</code>）</td><td><strong>441</strong></td></tr>
+<tr><td colspan="2"><strong>計</strong>（数え方の正は <code>tools/probe_run.py</code> の <code>load_cases</code>）</td><td><strong>525</strong></td></tr>
 </table>
 </div>
 <p><strong>別解</strong>: ケースは正解ラベル（<code>kind</code> / <code>answer</code>）のほかに、許容する種別 <code>accept_kinds</code> と答え <code>accept_answers</code> を持てる（<code>probe_metrics.apply_labels</code>）。種別 q_yesno を別解にしたケースは、<code>accept_answers</code> があればその答えだけを許容する（21-6d6）。足したときは <code>note</code> に日付と根拠を書く。人間チェックの判断の記録は <code>data/human_review_21-6d6.json</code>。</p>
+<p id="eval-boundary-cases"><strong>境目ケース</strong>（21-6d8 で追加）: 正解基準（<a href="#judge-criteria">10.2</a>）の境目を突く推理のケース。キー <code>boundary</code> に境目の種類を持つ（判定・集計には使わない）。下書きは Codex（正解基準を見せて書かせる）、ラベルは Claude が正解基準で付け、ユーザーが確認する。</p>
+<div class="table-wrap">
+<table>
+<tr><th><code>boundary</code></th><th>中身</th><th>ラベル</th><th>件数</th></tr>
+<tr><td><code>near_correct</code> 正解すれすれ</td><td>要点の言い換え、または <code>hit</code> をぎりぎりの粒度で満たす</td><td>④</td><td>27</td></tr>
+<tr><td><code>close_upper</code> 惜しいの上限</td><td><code>hit</code> に一歩届かない粒度・一部の要点だけ <code>hit</code>・全要点 <code>hit</code> だが明らかな誤りを含む</td><td>⑤</td><td>29</td></tr>
+<tr><td><code>close_lower</code> 惜しいの下限</td><td><code>touch</code> をぎりぎり満たす</td><td>⑤</td><td>13</td></tr>
+<tr><td><code>wrong_upper</code> 外れの上限</td><td>方向は近いが <code>touch</code> に届かない（<code>touch</code> の「触れたにしない」に当たる）</td><td>⑥</td><td>15</td></tr>
+</table>
+</div>
+<p>各問 6 件（正解すれすれ 2・惜しいの上限 2・下限 1・外れの上限 1）を狙って書かせ、ラベルで 2 件を付け替えた（U20-k05 = 下限 → 外れの上限、U25-k02 = 正解すれすれ → 惜しいの上限）。問題ごとの内訳は <code>eval_problems.json</code> の <code>boundary</code> で数える。</p>
+<div class="decision"><span class="callout-title">決定（2026-10-08・21-6d8）</span>21-6d7c の小試走で Jev・luna がそろって ⑤ と判定した U27-e16（④）・U01-e19（④）は、<strong>ラベルではなく正解基準を直した</strong>。U27 の <code>hit</code> は「人生ゲームの車の駒、または〜家族のピンを乗せて進める」が「家族のピン」を両方に係ると読まれていたため、「人生ゲームの車の駒だと言うか、すごろくの車の駒に家族のピンを乗せて進めると言っている」にした（人生ゲームと言えばピンは含意される。e17〔④〕もピンに触れておらず、ラベルのほうが基準の意図どおり）。U01 の要点 1 の <code>hit</code> に「影が薄くなった＝病気が良くなったと結びつけている」を足した（影の薄さを病気の回復と結びつければ、影を病気の影として扱っている）。どちらも既存ラベルとの食い違いはなくなり、評価ラベルは変えていない。<code>stock_items.py</code> から <code>update_judge_criteria.sql</code> を作り直したが、<strong>両環境の DB への再適用は未実施</strong>（本番の判定はスナップショットの正解基準を使うので、リリース〔21-7〕前に適用する）。プローブはストックの素材を読むので、再適用を待たずに新しい基準で回る。</div>
 <p><strong>作り方（テストの偏りを避ける）</strong>: 質問は <code>expected_questions</code> を見ずに、問題文だけを見て（真相を見ずに）プレイヤーの立場で書き、あとから真相と確定事実で正解ラベルを付ける。下書きは判定プロンプトの調整に関わっていない書き手（Codex への委譲）が書き、Claude が正解ラベルを検め、ユーザーが確認する。</p>
 
 <h4>機械プローブ</h4>
