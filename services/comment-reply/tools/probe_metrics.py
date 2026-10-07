@@ -195,6 +195,12 @@ def _accuracy(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "rate": count / len(rows) if rows else None}
 
 
+def present_patterns(results: dict[str, Any]) -> list[dict[str, Any]]:
+    """Display only patterns included in the saved results, including legacy runs."""
+    return [pattern for pattern in results["meta"]["patterns"]
+            if pattern["id"] in results["rows"]]
+
+
 def aggregate(results: dict[str, Any],
               accepted: frozenset[str] | set[str] = frozenset(),
               leak_decisions: Mapping[str, str] | None = None) -> dict[str, Any]:
@@ -202,7 +208,7 @@ def aggregate(results: dict[str, Any],
     cases = {case["id"]: case for case in results["cases"]}
     leak_decisions = leak_decisions or {}
     output: dict[str, Any] = {"patterns": {}}
-    for pattern in results["meta"]["patterns"]:
+    for pattern in present_patterns(results):
         pattern_id = pattern["id"]
         items = []
         for row in results["rows"].get(pattern_id, []):
@@ -467,5 +473,18 @@ def aggregate(results: dict[str, Any],
                                       if x["row"]["timing"].get(name) is not None])
                        for name in ("total_s", "judge_s", "writer_s")},
         }
+        if pattern.get("judge_mode") == "decisions":
+            debug_items = [(x["record"].get("judgements", {}).get("decisions") or {}).get(
+                "debug", {}
+            ) for x in items]
+            reference["decisions_usage"] = {
+                key: sum(debug.get(key, 0) for debug in debug_items)
+                for key in ("input_tokens", "output_tokens", "calls")
+            }
+            reference["decisions_usage"]["refusals"] = {
+                "count": sum(debug.get("refusals", {}).get("count", 0) for debug in debug_items),
+                "names": [name for debug in debug_items
+                          for name in debug.get("refusals", {}).get("names", [])],
+            }
         output["patterns"][pattern_id] = {"metrics": metrics, "reference": reference}
     return output

@@ -22,7 +22,7 @@ if str(SERVICE_DIR) not in sys.path:
 
 from app.comment_log import PROMPT_VERSION, apply_decision, new_record, utc_now  # noqa: E402
 from app.config import Config  # noqa: E402
-from app.judge import jev, luna  # noqa: E402
+from app.judge import decisions, jev, luna  # noqa: E402
 from app.judge.combiner import combine  # noqa: E402
 from app.judge.contract import ANSWERS, Judgement, KINDS, Problem  # noqa: E402
 from app.reply.writer import Reply, write_reply  # noqa: E402
@@ -42,8 +42,11 @@ PATTERNS = (
      "consensus": False, "reply_variant": "2b"},
     {"id": "jev-2c", "label": "⑤ jev + 2c-luna", "judge_mode": "jev", "shadow": False,
      "consensus": False, "reply_variant": "2c-luna"},
+    {"id": "dec-2c", "label": "⑥ decisions + 2c-luna", "judge_mode": "decisions", "shadow": False,
+     "consensus": False, "reply_variant": "2c-luna"},
 )
 PATTERN_IDS = tuple(item["id"] for item in PATTERNS)
+LEGACY_PATTERN_IDS = PATTERN_IDS[:-1]
 
 
 def _json(path: Path) -> Any:
@@ -134,7 +137,10 @@ def _cache(path: Path) -> dict[str, Any]:
 
 def _judge_entry(outcome: Judgement | Exception, elapsed: float) -> dict[str, Any]:
     if isinstance(outcome, Exception):
-        return {"exception": {"type": type(outcome).__name__, "message": str(outcome)},
+        failure = {"type": type(outcome).__name__, "message": str(outcome)}
+        if isinstance(outcome, decisions.DecisionsError):
+            failure["debug"] = outcome.debug
+        return {"exception": failure,
                 "elapsed_s": elapsed}
     return {"judgement": asdict(outcome), "elapsed_s": elapsed}
 
@@ -143,6 +149,8 @@ def _judge_outcome(entry: dict[str, Any]) -> Judgement | Exception:
     if "judgement" in entry:
         return Judgement(**entry["judgement"])
     error = entry["exception"]
+    if error["type"] == "DecisionsError":
+        return decisions.DecisionsError(error["message"], debug=error.get("debug", {}))
     cls = getattr(builtins, error["type"], RuntimeError)
     if not isinstance(cls, type) or not issubclass(cls, Exception):
         cls = RuntimeError
@@ -153,7 +161,7 @@ def _timed_judge(method: str, call: Callable[..., Judgement], case: dict[str, An
                  problem: Problem, key: str, model: str) -> dict[str, Any]:
     start = time.perf_counter()
     try:
-        if method == "luna":
+        if method in {"luna", "decisions"}:
             outcome = call(case["id"], case["text"], problem, api_key=key, model=model)
         else:
             outcome = call(case["id"], case["text"], problem, api_key=key)
@@ -181,6 +189,13 @@ def _timed_writer(call: Callable[..., Reply], combined: Any, case: dict[str, Any
 def _judge_timing(pattern: dict[str, Any], entries: dict[str, dict[str, Any]],
                   decision: str | None) -> dict[str, float | None]:
     mode = pattern["judge_mode"]
+    if mode == "decisions":
+        decisions_s = entries["decisions"]["elapsed_s"]
+        luna_s = (entries["luna"]["elapsed_s"]
+                  if decision == "decisions_fallback_luna" else None)
+        judge_s = decisions_s + (luna_s or 0)
+        return {"luna_s": luna_s, "jev_s": None, "decisions_s": decisions_s,
+                "judge_s": judge_s, "writer_s": None, "total_s": judge_s}
     luna_s = (entries["luna"]["elapsed_s"]
               if mode != "jev" or decision == "jev_fallback_luna" else None)
     jev_s = entries["jev"]["elapsed_s"] if mode != "luna" else None
@@ -220,13 +235,19 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
               problem_loader: Callable[[str], Problem] = _load_stock_problem,
               luna_call: Callable[..., Judgement] = luna.judge,
               jev_call: Callable[..., Judgement] = jev.judge,
+              decisions_call: Callable[..., Judgement] = decisions.judge,
               writer_call: Callable[..., Reply] = write_reply,
               api_keys: dict[str, str] | None = None,
               run_at: str | None = None) -> dict[str, Any]:
-    """Run the selected cases; injected calls support fully offline tests."""
+    """Run selected cases; the Python default preserves the legacy five patterns.
+
+    The CLI explicitly selects all six when --patterns is omitted.
+    Injected calls support fully offline tests.
+    """
     if workers < 1:
         raise ValueError("workers must be at least 1")
-    selected_patterns = [p for p in PATTERNS if patterns is None or p["id"] in patterns]
+    selected_ids = LEGACY_PATTERN_IDS if patterns is None else patterns
+    selected_patterns = [p for p in PATTERNS if p["id"] in selected_ids]
     unknown_patterns = [p for p in (patterns or []) if p not in PATTERN_IDS]
     if unknown_patterns or not selected_patterns:
         raise ValueError(f"unknown or empty patterns: {', '.join(unknown_patterns)}")
@@ -243,8 +264,13 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
         "typesafe_api_key": os.environ.get("TYPESAFE_API_KEY", ""),
     }
     need_jev = any(p["judge_mode"] in {"jev", "hybrid"} for p in selected_patterns)
+    need_decisions = any(p["judge_mode"] == "decisions" for p in selected_patterns)
+    methods = ("luna",) + (("jev",) if need_jev else ()) + (
+        ("decisions",) if need_decisions else ()
+    )
     missing = []
-    if (luna_call is luna.judge or writer_call is write_reply) and not keys.get("openai_api_key"):
+    if (luna_call is luna.judge or writer_call is write_reply or
+            (need_decisions and decisions_call is decisions.judge)) and not keys.get("openai_api_key"):
         missing.append("OPENAI_API_KEY")
     if need_jev and jev_call is jev.judge and not keys.get("typesafe_api_key"):
         missing.append("TYPESAFE_API_KEY")
@@ -261,18 +287,18 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for case in cases:
             problem = snapshots[case["no"]]
-            for method in (("luna", "jev") if need_jev else ("luna",)):
+            for method in methods:
                 cache_key = _key([
                     case["id"], method, PROMPT_VERSION, _content_hash(case, problem),
-                    model if method == "luna" else None,
+                    model if method in {"luna", "decisions"} else None,
                 ])
                 index = case["id"], method
                 if not refresh_judge and cache_key in judge_cache:
                     judge_entries[index] = judge_cache[cache_key]
                     judge_status[index] = "hit"
                 else:
-                    call = luna_call if method == "luna" else jev_call
-                    api_key_name = "openai_api_key" if method == "luna" else "typesafe_api_key"
+                    call = {"luna": luna_call, "jev": jev_call, "decisions": decisions_call}[method]
+                    api_key_name = "typesafe_api_key" if method == "jev" else "openai_api_key"
                     api_key = keys.get(api_key_name, "")
                     future = pool.submit(_timed_judge, method, call, case, problem, api_key, model)
                     futures[future] = (index, cache_key)
@@ -288,6 +314,19 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                 _atomic_json(judge_path, judge_cache)
     if futures:
         _atomic_json(judge_path, judge_cache)
+    if need_decisions:
+        totals = {"input_tokens": 0, "calls": 0}
+        fresh = {"input_tokens": 0, "calls": 0}
+        for index, entry in judge_entries.items():
+            if index[1] != "decisions":
+                continue
+            debug = entry.get("judgement", entry.get("exception", {})).get("debug", {})
+            for key in totals:
+                totals[key] += debug.get(key, 0)
+                if judge_status[index] == "miss":
+                    fresh[key] += debug.get(key, 0)
+        print(f"Decisions: input_tokens={totals['input_tokens']}, calls={totals['calls']} "
+              f"(new: input_tokens={fresh['input_tokens']}, calls={fresh['calls']})")
 
     run_at = run_at or utc_now()
     counts = {no: {source: sum(case["no"] == no and case["source"] == source for case in cases)
@@ -323,26 +362,31 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                            "from": {"id": "probe"}, "media": {"id": problem.media_id}}
                 record = new_record(comment, None, run_at, config, problem)
                 supplied = {method: _judge_outcome(judge_entries[case_id, method])
-                            for method in (("luna", "jev") if need_jev else ("luna",))}
+                            for method in methods}
                 relevant = {method: judge_entries[case_id, method]
-                            for method in (("luna", "jev") if need_jev else ("luna",))}
+                            for method in methods}
                 cache = {method: judge_status.get((case_id, method), "none")
                          if (method == "luna" or need_jev) else "none"
                          for method in ("luna", "jev")}
+                if pattern["judge_mode"] == "decisions":
+                    cache["decisions"] = judge_status[case_id, "decisions"]
+                    cache["jev"] = "none"
                 cache["writer"] = "none"
                 try:
                     combined = combine(case_id, case["text"], problem, config, keys,
                                        precomputed=supplied)
                 except Exception as exc:
                     record["errors"].append(f"processing: {type(exc).__name__}: {exc}")
-                    jev_failed = need_jev and (isinstance(supplied.get("jev"), Exception) or
-                                                 bool(getattr(supplied.get("jev"), "error", None)))
+                    mode = pattern["judge_mode"]
+                    staged_failed = mode in {"jev", "decisions"} and (
+                        isinstance(supplied.get(mode), Exception) or
+                        bool(getattr(supplied.get(mode), "error", None))
+                    )
                     fallback_decision = (
-                        "jev_fallback_luna"
-                        if pattern["judge_mode"] == "jev" and jev_failed else None
+                        f"{mode}_fallback_luna" if staged_failed else None
                     )
                     timing = _judge_timing(pattern, relevant, fallback_decision)
-                    if pattern["judge_mode"] == "jev" and not jev_failed:
+                    if mode in {"jev", "decisions"} and not staged_failed:
                         cache["luna"] = "none"
                     if pattern["judge_mode"] == "luna":
                         cache["jev"] = "none"
@@ -350,7 +394,9 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                                  "timing": timing, "cache": cache})
                     continue
                 timing = _judge_timing(pattern, relevant, combined.decision)
-                if pattern["judge_mode"] == "jev" and combined.decision != "jev_fallback_luna":
+                if pattern["judge_mode"] in {"jev", "decisions"} and not combined.decision.endswith(
+                    "_fallback_luna"
+                ):
                     cache["luna"] = "none"
                 if pattern["judge_mode"] == "luna":
                     cache["jev"] = "none"
@@ -409,7 +455,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--refresh-writer", action="store_true")
     args = parser.parse_args(argv)
     try:
-        run_probe(out=args.out, problems=args.problems, patterns=args.patterns,
+        run_probe(out=args.out, problems=args.problems,
+                  patterns=args.patterns if args.patterns is not None else list(PATTERN_IDS),
                   workers=args.workers, refresh_judge=args.refresh_judge,
                   refresh_writer=args.refresh_writer)
     except (ValueError, FileNotFoundError) as exc:

@@ -98,7 +98,8 @@ def new_record(
             "luna_model": config.luna_model,
             "prompt_version": PROMPT_VERSION,
         },
-        "judgements": {"luna": None, "jev": None},
+        "judgements": {"luna": None, "jev": None,
+                       **({"decisions": None} if config.judge_mode == "decisions" else {})},
         "shadow_mismatch": None,
         "final": {"kind": None, "answer": None, "decision": None},
         "reply": {
@@ -117,6 +118,8 @@ def apply_decision(
         "luna": combined.luna.as_log() if combined.luna else None,
         "jev": combined.jev.as_log() if combined.jev else None,
     }
+    if combined.decisions is not None:
+        record["judgements"]["decisions"] = combined.decisions.as_log()
     record["shadow_mismatch"] = combined.mismatch
     record["final"] = combined.final_log()
     record["times"]["judged_at"] = judged_at or utc_now()

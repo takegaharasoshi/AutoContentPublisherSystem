@@ -20,7 +20,7 @@ from app.judge.contract import KINDS  # noqa: E402
 from app.reply import templates  # noqa: E402
 from tools.probe_metrics import (  # noqa: E402
     CORRECT_OPENERS, PHRASING_MIN_CASES, QUESTION_KINDS, RELEVANCE_WORDS,
-    aggregate, apply_labels, leak_key, pair_key, row_flags,
+    aggregate, apply_labels, leak_key, pair_key, present_patterns, row_flags,
 )
 
 
@@ -41,6 +41,8 @@ ANSWER_LABEL = {
 DECISION_LABEL = {
     "luna": "luna の判定", "jev": "Jev の判定",
     "jev_fallback_luna": "Jev 失敗のため luna の判定",
+    "decisions": "Decisions の判定",
+    "decisions_fallback_luna": "Decisions 失敗のため luna の判定",
     "consensus_ok": "正解宣言（luna・Jev とも正解）",
     "consensus_split": "正解宣言を保留（luna だけ正解）",
 }
@@ -362,7 +364,7 @@ REVIEW_FIXED = ("P6", "P7", "L2_one_liner", "L2_opener", "L2_conflict",
 def _review_data(results: dict[str, Any], metrics: dict[str, Any]) -> dict[str, Any]:
     """ブラウザーで数え直すための、ラベルに依存しない事実を組み立てる。"""
     cases = {case["id"]: case for case in results["cases"]}
-    patterns = results["meta"]["patterns"]
+    patterns = present_patterns(results)
     review_rows: dict[str, list[dict[str, Any]]] = {}
     pairs: dict[str, dict[str, Any]] = {}
     leak_candidates: list[dict[str, Any]] = []
@@ -675,6 +677,18 @@ def _reference_table(metrics: dict[str, Any], patterns: list[dict[str, Any]]) ->
             item = ref[key][sub] if sub else ref[key]
             out.append(f"<td>{_h(item['value'])}</td>")
         out.append("</tr>")
+    if any("decisions_usage" in metrics["patterns"][p["id"]]["reference"] for p in patterns):
+        for key, label in (("input_tokens", "Decisions 入力トークン"),
+                           ("calls", "Decisions 呼び出し回数"),
+                           ("refusals", "Decisions 拒否件数")):
+            out.append(f"<tr><th>{label}</th>")
+            for pattern in patterns:
+                usage = metrics["patterns"][pattern["id"]]["reference"].get("decisions_usage")
+                value = usage[key] if usage else "—"
+                if key == "refusals" and usage:
+                    value = value["count"]
+                out.append(f"<td>{_h(value)}</td>")
+            out.append("</tr>")
     out.append("</tbody></table></div>")
     return "".join(out)
 
@@ -1305,7 +1319,7 @@ def _problem_page(results: dict[str, Any], metrics: dict[str, Any],
         '<div class="note"><p><strong>問題文</strong>: ' + _h(problem["problem_text"]) + '</p>'
         '<p>合否と評価はサマリーページにある。共通ケースは問題に順番に割り振っている。</p>'
         '<p>「判定内容」は 種別 / 答え / どの判定を採用したか の順。答えは はい / いいえ / 関係ない の 3 値で、'
-        '真相と確定事実のどちらからも決められないとき（Jev は確信度が足りないとき）は「関係ない」になる。</p></div>',
+        '真相と確定事実のどちらからも決められないとき（段階判定は答えの確率が閾値に届かないとき）は「関係ない」になる。</p></div>',
         f'<div class="review-page-status" id="problem-review-status" data-run-at="{_h(results["meta"]["run_at"])}">'
         f'<strong class="review-count">このページの組: 確認済み 0 / {len(problem_pairs)} 組（許容 0・不可 0）</strong>'
         f'<strong class="leak-count">漏れ候補: 確認済み 0 / {len(problem_leaks)}（漏洩 0・漏洩でない 0）</strong>'
@@ -1334,7 +1348,7 @@ def build_page(results: dict[str, Any], out: Path) -> Path:
     review_data = _review_data(results, metrics)
     review_json = json.dumps(review_data, ensure_ascii=False, separators=(",", ":"))
     review_json = review_json.replace("<", "\\u003c")
-    patterns = results["meta"]["patterns"]
+    patterns = present_patterns(results)
     cases = results["cases"]
     nos = results["meta"]["problems"]
     for value in [*(p["id"] for p in patterns), *nos]:
@@ -1370,7 +1384,7 @@ def build_page(results: dict[str, Any], out: Path) -> Path:
         '<h1>コメント返信の評価（プローブ）</h1>',
         f'<div class="page-meta"><span>実行日時: {_h(results["meta"]["run_at"])}</span>'
         f'<span>問題: {len(nos)} 問</span><span>ケース: {count} 件</span></div>',
-        '<div class="note"><p>評価データの全件を 5 パターンに通した機械プローブ（21-6d3）。'
+        f'<div class="note"><p>評価データの全件を {len(patterns)} パターンに通した機械プローブ（21-6d3）。'
         f'問題 {len(nos)} 問、{count} ケース、'
         f'PROMPT_VERSION {_h(results["meta"]["prompt_version"])}、'
         f'luna_model {_h(results["meta"]["luna_model"])}。</p>'

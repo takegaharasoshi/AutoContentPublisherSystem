@@ -1416,21 +1416,12 @@
 </details>
 </div>
 </article>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-
-<article class="plan-step" id="step-21-6d10b" data-step-id="21-6d10b" data-status="todo">
+<article class="plan-step" id="step-21-6d10b" data-step-id="21-6d10b" data-status="done" data-completed="2026-10-08">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6d10b</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-6d10b</strong><span class="plan-status">完了（2026-10-08）</span></div>
 <h3>パターン ⑥（Decisions + luna）を実装して小試走する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d10a">21-6d10a</a> の承認後、<a href="#step-21-6d7c">21-6d7c</a> の完了後（正解基準を渡すため）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><code>decisions</code> モードとパターン ⑥（<code>dec-2c</code>）を足し、評価ページを 6 パターン表示にした。U01・U13（157 ケース）の小試走で ⑥ は種別一致 89.2%・④ 8/9・誤った正解宣言 1 件、判定の応答時間は中央値 0.71 秒（<a href="../app/sets/umigame-soup-1.html#pattern3-decisions">設計書 10.3.6 の決定</a>）。費用は約 $0.06。push はユーザー確認待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -1453,11 +1444,18 @@
 <div class="plan-fold-inner"><p><strong>課題表の照合</strong>: <code>services/comment-reply/</code> で I-031 が当たるが、据え置き継続（トリガーの更新なし）。</p></div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-08</span></summary>
+<div class="plan-fold-inner"><p><strong>実装</strong>（Codex・<code>gpt-6.1-sol</code> / <code>max</code>）: <code>app/judge/decisions.py</code> を新設。段の流れを <code>jev._judge_staged</code> に切り出して共有し、Jev・Decisions は transport・閾値（Decisions 専用の定数・初期値は同じ）・方式名を差し込む薄いラッパーにした。<code>combiner</code> に <code>decisions</code> モード（失敗・拒否は luna で判定し直し <code>decisions_fallback_luna</code>）、<code>config.JUDGE_MODES</code> に <code>decisions</code>（既定は <code>hybrid</code> のまま）、<code>probe_run</code> に <code>dec-2c</code>（判定キャッシュの方式名 <code>decisions</code>・旧 5 パターンのキャッシュキーは不変）、<code>probe_metrics</code> / <code>build_probe_page</code> を 6 パターン + Decisions の入力トークン・呼び出し回数・拒否件数の行に、<code>local_trial</code> に <code>--modes decisions</code>。テストを 67 件追加し、pytest は 144 passed。旧 5 パターンの results（<code>full-20261004</code>）からも 5 パターンのページが作れることを確かめた。</p><p><strong>小試走 1 回目</strong>（<code>work/probe/trial-6d10b/run1-*</code>）: ⑥ の正解の推理が 0/8。段 B は当てていたが、段 B2（矛盾チェック）が 0.92〜1.0（Jev は 0.05〜0.17）を返していた。Jev の <code>noul</code> には true / false の基準を渡しているのに、<code>predicate</code> への変換で落ちていたのが原因。基準を指示文の末尾に付ける修正を Claude が入れ（<code>decisions._questions</code>）、Decisions の分だけキャッシュを消して取り直した。</p><p><strong>小試走 2 回目</strong>（157 ケース）: ⑥ は P2（誤った正解宣言）1 件 ×（U01-k03・惜しいを ④）、L1 の種別一致 89.2% ×（⑤ は 95.5%）、L1 の種別ごと最低は guess_close 70.0% ×。ほかは ○。種別の誤りの多くは ① → ③（11 件・段 C の品質が閾値 0.2 未満）で、21-6d11 の掃引の材料。拒否 0・luna への切り替え 0。呼び出しは平均 3.05 回（最大 7 回。設計書の「0〜6 回」は Jev も含め誤りだったので 0〜7 回に直した）。判定の応答時間は中央値 0.71 / p95 2.25 秒（⑤ jev は 0.48 / 1.68 秒）。費用は 2 回で入力 565,371 トークン・約 $0.06（上限 $3 の内数）。</p><p><strong>照合</strong>: 確認待ち該当なし・課題表は I-031 据え置き継続・クローズ移動: 該当なし。</p></div>
 </details>
 </div>
 </article>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
 
 <article class="plan-step" id="step-21-6d11" data-step-id="21-6d11" data-status="todo">
 <header class="plan-step-head">

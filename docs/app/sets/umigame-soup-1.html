@@ -427,7 +427,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <table>
 <tr><th></th><th>パターン 1（luna）</th><th>パターン 2（Jev）</th></tr>
 <tr><td>判定のしかた</td><td><code>gpt-6-luna</code> に 1 回で種別・答えを出させる</td><td>Jev の確率を段ごとに取り、分岐はコードで決める</td></tr>
-<tr><td>API 呼び出し</td><td>1 回（推論が長いと最大 20 秒前後）</td><td>0〜6 回</td></tr>
+<tr><td>API 呼び出し</td><td>1 回（推論が長いと最大 20 秒前後）</td><td>0〜7 回</td></tr>
 <tr><td>処理時間の中央値（21-6d3・書き手込み）</td><td>6〜7 秒</td><td>0.8 秒（定型文 <code>2b</code>）</td></tr>
 <tr><td>強み</td><td>種別・判定の精度が安定して高い</td><td>分岐を自前で制御できる</td></tr>
 <tr><td>弱み</td><td>生成 AI の品質に直結する</td><td>惜しい推理を正解と誤判定しやすい（P2。誤りを含む推理は段 B2 の矛盾チェックで ⑤ に落とす = <a href="#pattern2">10.3.4</a>）</td></tr>
@@ -519,7 +519,7 @@ nav.toc ul { margin: .3rem 0 0; }
   <div class="flow-step emph"><div class="t">段 D 答え（choice 3 択・問題文 + 真相 + 確定事実）</div><div class="d">はい / いいえ / 関係ない</div>
     <div class="exits"><span class="exit">最大確率 ≥ <code>T_ANSWER</code> → その答え</span><span class="exit">未満 → <code>irrelevant</code>（安全側）</span></div></div>
 </div>
-<figcaption>図 10-2 パターン 2 の段の流れ。段 B の結果は A1b と正解判定で使い回す。段 B2 は ④ の候補のときだけ呼ぶ（このとき段 C・D は呼ばない。1 コメント 0〜6 回の呼び出し）</figcaption>
+<figcaption>図 10-2 パターン 2 の段の流れ。段 B の結果は A1b と正解判定で使い回す。段 B2 は ④ の候補のときだけ呼ぶ（このとき段 C・D は呼ばない。1 コメント 0〜7 回の呼び出し）</figcaption>
 </figure>
 
 <div class="table-wrap">
@@ -615,13 +615,14 @@ nav.toc ul { margin: .3rem 0 0; }
 </table>
 </div>
 <ul>
-  <li><strong>変えるのは呼び方だけ</strong>: 指示文・選択肢の説明・各段の入力・分岐・確率の計算（当てたの確率 = P(当てた)、触れたの確率 = P(当てた) + P(触れた)）・呼び出し回数（0〜6 回）はパターン 2 と同じにする。変換は機械的に行う: Jev の <code>state</code>（辞書）は同じキー・値の JSON 文字列（<code>ensure_ascii=False</code>）を <code>input</code> に入れ、<code>questions</code> の辞書は名前を <code>name</code> にした配列に、<code>criteria</code> の辞書は <code>choices</code> の <code>{value, description}</code> 配列にする。指示文は <code>jev.py</code> と共有し、二重に持たない</li>
+  <li><strong>変えるのは呼び方だけ</strong>: 指示文・選択肢の説明・各段の入力・分岐・確率の計算（当てたの確率 = P(当てた)、触れたの確率 = P(当てた) + P(触れた)）・呼び出し回数（0〜7 回）はパターン 2 と同じにする。変換は機械的に行う: Jev の <code>state</code>（辞書）は同じキー・値の JSON 文字列（<code>ensure_ascii=False</code>）を <code>input</code> に入れ、<code>questions</code> の辞書は名前を <code>name</code> にした配列に、<code>criteria</code> の辞書は <code>choices</code> の <code>{value, description}</code> 配列にする。<code>noul</code> の <code>criteria</code>（true / false の基準）は <code>predicate</code> に欄がないので、指示文の末尾に <code>True: …</code> / <code>False: …</code> の 2 行として付ける（21-6d10b で追加。下の決定）。指示文は <code>jev.py</code> と共有し、二重に持たない</li>
   <li><strong>まとめない理由</strong>: Decisions は入力にしか課金しないので、入力が同じ段を 1 回にまとめれば安く速くなる。しかし入力やリクエストの分け方を変えると、⑤ との差がモデルによるものか組み方によるものか切り分けられなくなる。評価の費用は小さい（21-6d10a の見積もりで約 $0.45）ので、そろえるほうを取る。まとめる最適化は、21-6e で ⑥ が本番の候補に残ったときに応答時間を測ってから検討する</li>
   <li><strong>閾値</strong>: 初期値はパターン 2 の 8 つ（<code>T_BARE_TERM</code>〜<code>T_ANSWER</code>）と同じ値を Decisions 専用の設定として別に持つ（確率の出方が Jev と違うため共有しない）。21-6d11 で段 B を中心に掃引する。コミュニティでは <code>choice</code> の確率の較正に癖があるとの報告がある（公式の記載ではない）ので、掃引の結果を見て決める</li>
   <li><strong>失敗</strong>: 429・5xx は指数バックオフで 3 回再試行する。再試行後も失敗した場合と、必要な問いに <code>refusal</code> が返った場合は例外にする。評価用の <code>decisions</code> モードは <code>jev</code> モードと同じく、同じコメントを luna で判定し直す（記録の <code>decision</code> は <code>decisions_fallback_luna</code>）</li>
   <li><strong>記録</strong>: <code>debug</code> に段ごとの確率・<code>confidence</code>・拒否の有無・リクエスト数・<code>usage.input_tokens</code>・応答時間を残す（パターン 2 と同じ形 + <code>confidence</code>・<code>refusals</code>）</li>
   <li><strong>プローブ</strong>: 判定キャッシュの方式名は <code>decisions</code>、パターン名は <code>dec-2c</code>（評価ページの ⑥）。既存の 5 パターンのキャッシュ・結果は変えない</li>
 </ul>
+<div class="decision"><span class="callout-title">決定（2026-10-08・21-6d10b）</span>実装は <code>app/judge/decisions.py</code>。段の流れは <code>jev._judge_staged</code> に切り出して Jev と共有し、Jev・Decisions はリクエストの送り方（transport）・閾値・方式名だけを差し込む薄いラッパーにした（Jev の挙動・記録の形は変えていない）。<code>JUDGE_MODE=decisions</code> は設定として選べるが、既定は <code>hybrid</code> のまま。<strong>predicate に基準を付けた理由</strong>: 基準なしの機械変換で U01・U13 を小試走したところ、段 B2（矛盾チェック）が正解の推理 8 件すべてに 0.92〜1.0（Jev は 0.05〜0.17）を返し、④ が 0/8 になった。Jev には true / false の基準を渡しているのに Decisions には渡っていなかったので、情報をそろえるために付けた（変換の機械性は保つ）。付けた後は ④ 8/9。<strong>小試走の結果</strong>（157 ケース・基準を付けた後）: L1 の種別一致 89.2%（⑤ jev は 95.5%）。誤りの多くは ① の質問を ③ に落とすもの（11 件。段 C の品質が 0.01〜0.18 で閾値 0.2 未満）で、段 C の閾値の掃引は 21-6d11 で行う。誤った正解宣言（P2）が 1 件（U01-k03、⑤ 惜しいを ④ と判定）。拒否・luna への切り替えは 0 件。呼び出しは平均 3.05 回、判定の応答時間は中央値 0.71 秒・p95 2.25 秒（⑤ jev は 0.48 / 1.68 秒）。費用は 2 回の実行で入力 56.5 万トークン・約 $0.06。</div>
 
 <h3 id="reply-style">10.4 返信文</h3>
 <div class="note"><span class="callout-title">要点</span>返信文は判定を変えずに書く。口調はパパが息子に話しかけるくだけた口調で、答えへの近さを匂わせない。作り方は 4 案（定型文 1 案 + LLM の書き手 3 案〔中身は 2 種〕）から選ぶ。既定（暫定）は真相を渡さない書き手 <code>1d-luna</code>。</div>

@@ -117,7 +117,7 @@ class Judgement:
     error: str | None = None
 
     def __post_init__(self) -> None:
-        if self.method not in {"luna", "jev"}:
+        if self.method not in {"luna", "jev", "decisions"}:
             raise ValueError("invalid judgement method")
         if self.error is None and self.kind not in KINDS:
             raise ValueError(f"invalid judgement kind: {self.kind}")

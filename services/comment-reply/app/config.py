@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Mapping
 
 
-JUDGE_MODES = frozenset({"luna", "jev", "hybrid"})
+JUDGE_MODES = frozenset({"luna", "jev", "hybrid", "decisions"})
 REPLY_VARIANTS = frozenset({"1b", "1d-luna", "2b", "2c-luna"})
 
 

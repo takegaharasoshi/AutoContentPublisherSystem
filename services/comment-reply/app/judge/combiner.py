@@ -1,4 +1,4 @@
-"""Compose the two independent judges without duplicating their classifiers."""
+"""Compose supported judge modes without duplicating their classifiers."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Mapping
 
 from app.config import Config
-from app.judge import jev, luna
+from app.judge import decisions, jev, luna
 from app.judge.contract import Judgement, Problem
 
 
@@ -29,6 +29,7 @@ class Combined:
     decision: str
     mismatch: bool | None
     errors: list[str] = field(default_factory=list)
+    decisions: Judgement | None = None
 
     def final_log(self) -> dict[str, str | None]:
         """Return the stable final-decision log object."""
@@ -42,8 +43,9 @@ def combine(
     precomputed: Mapping[str, Outcome] | None = None,
     luna_call: Callable[..., Judgement] = luna.judge,
     jev_call: Callable[..., Judgement] = jev.judge,
+    decisions_call: Callable[..., Judgement] = decisions.judge,
 ) -> Combined:
-    """Choose one of three modes, with optional precomputed local-trial calls."""
+    """Choose a mode, with optional precomputed local-trial calls."""
     supplied = precomputed or {}
     need_jev = config.judge_mode == "jev" or (
         config.judge_mode == "hybrid" and (config.shadow or config.consensus)
@@ -70,6 +72,38 @@ def combine(
             )
         except Exception as exc:
             return exc
+
+    if config.judge_mode == "decisions":
+        if "decisions" in supplied:
+            outcome = supplied["decisions"]
+        else:
+            try:
+                outcome = decisions_call(
+                    comment_id, text, problem,
+                    api_key=credentials.get("openai_api_key", ""), model=config.luna_model,
+                )
+            except Exception as exc:
+                outcome = exc
+        if isinstance(outcome, Judgement) and not outcome.error:
+            return Combined(
+                None, None, outcome.kind or "", outcome.answer, outcome.bare_term,
+                "decisions", None, decisions=outcome,
+            )
+        logged = outcome if isinstance(outcome, Judgement) else Judgement(
+            "decisions", None, error=str(outcome), debug=getattr(outcome, "debug", {}),
+        )
+        fallback = call_luna()
+        if isinstance(fallback, Exception):
+            raise fallback
+        if not isinstance(fallback, Judgement):
+            raise RuntimeError("Luna returned no judgement")
+        if fallback.error:
+            raise RuntimeError(fallback.error)
+        return Combined(
+            fallback, None, fallback.kind or "", fallback.answer, fallback.bare_term,
+            "decisions_fallback_luna", None, [f"decisions: {logged.error}"],
+            decisions=logged,
+        )
 
     if need_luna and need_jev and not supplied:
         with ThreadPoolExecutor(max_workers=2) as executor:

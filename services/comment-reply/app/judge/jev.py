@@ -6,6 +6,7 @@ import json
 import re
 import time
 import unicodedata
+from typing import Callable
 from urllib import error, request
 
 from app.http_util import post_json_with_retry
@@ -334,11 +335,38 @@ def judge(
     t_contradict: float = T_CONTRADICT,
 ) -> Judgement:
     """Run the trial-8b staged classifier, plus a bare-term check in stage A and a contradiction check in stage B2."""
-    debug = {"model": "jev-latest", "input_tokens": 0, "output_tokens": 0,
+    return _judge_staged(
+        comment_id, text, problem, api_key=api_key,
+        transport=lambda key, state, questions, debug, stage: _record_call(
+            key, state, questions, debug,
+        ),
+        method="jev", model="jev-latest",
+        make_error=lambda exc, debug: JevError(f"Jev judgement failed: {exc}"),
+        t_point=t_point, t_close=t_close, t_recheck=t_recheck, t_guess=t_guess,
+        t_quality=t_quality, t_answer=t_answer, t_bare_term=t_bare_term,
+        t_contradict=t_contradict,
+    )
+
+
+StageTransport = Callable[[str, dict, dict[str, dict], dict, str], dict]
+
+
+def _judge_staged(
+    comment_id: str, text: str, problem: Problem, *, api_key: str,
+    transport: StageTransport, method: str, model: str,
+    make_error: Callable[[Exception, dict], RuntimeError],
+    t_point: float, t_close: float, t_recheck: float, t_guess: float,
+    t_quality: float, t_answer: float, t_bare_term: float, t_contradict: float,
+    debug_fields: dict | None = None,
+) -> Judgement:
+    """Share every stage, input and branch across the staged API transports."""
+    debug = {"model": model, "input_tokens": 0, "output_tokens": 0,
              "latency_s": 0.0, "calls": 0, "probabilities": {}}
+    if debug_fields:
+        debug.update(debug_fields)
     rule_kind = _rule_kind(text)
     if rule_kind is not None:
-        return Judgement("jev", rule_kind, reason=f"段0規則: {rule_kind}", debug=debug)
+        return Judgement(method, rule_kind, reason=f"段0規則: {rule_kind}", debug=debug)
 
     try:
         _points_cache: dict = {}
@@ -348,7 +376,7 @@ def judge(
             if "B" not in _points_cache:
                 # 要点ごとの choice を 1 リクエストにまとめる。
                 point_questions = _core_point_questions(problem)
-                point_answers = _record_call(api_key, {"comment": text}, point_questions, debug)
+                point_answers = transport(api_key, {"comment": text}, point_questions, debug, "B")
                 point_probs = {
                     point_id: _core_point_probabilities(point_answers[point_id])
                     for point_id in point_questions
@@ -358,7 +386,7 @@ def judge(
             return _points_cache["B"]
 
         state_a = {"context": A_CONTEXT, "comment": text}
-        a1_answers = _record_call(
+        a1_answers = transport(
             api_key,
             state_a,
             {
@@ -383,6 +411,7 @@ def judge(
                 },
             },
             debug,
+            "A1",
         )
         major = _choice(a1_answers["major"], tuple(MAJOR_CRITERIA))
         debug["probabilities"]["A1"] = _probability_map(a1_answers["major"])
@@ -392,11 +421,11 @@ def judge(
             term = bare_term_text(text)
             if term:
                 return Judgement(
-                    "jev", "q_open", reason=f"段A語句のみ: {bare_probability:.2f}",
+                    method, "q_open", reason=f"段A語句のみ: {bare_probability:.2f}",
                     bare_term=term, debug=debug,
                 )
         if major == "question_or_guess":
-            qg_answers = _record_call(
+            qg_answers = transport(
                 api_key,
                 {"problem_text": problem.problem_text, "comment": text},
                 {
@@ -410,6 +439,7 @@ def judge(
                     }
                 },
                 debug,
+                "A1b",
             )
             qg_probs = _probability_map(qg_answers["qg"])
             debug["probabilities"]["A1b"] = qg_probs
@@ -432,7 +462,7 @@ def judge(
             a_kind = "foreign"
         else:
             sub = SUB_CRITERIA[major]
-            a2_answers = _record_call(
+            a2_answers = transport(
                 api_key,
                 state_a,
                 {
@@ -443,6 +473,7 @@ def judge(
                     }
                 },
                 debug,
+                "A2",
             )
             a_kind = _choice(a2_answers["kind"], tuple(sub))
             debug["probabilities"]["A2"] = _probability_map(a2_answers["kind"])
@@ -451,7 +482,7 @@ def judge(
                 a_kind = "guess"
             elif a_kind == "q_open" or (a_kind == "q_yesno" and _DEMONSTRATIVE_RE.search(text)):
                 # A2 は問題文を見ないので、主語が消去法で決まる質問まで q_open にしうる。問題文を渡して確かめ直す。
-                recheck_answers = _record_call(
+                recheck_answers = transport(
                     api_key,
                     {"problem_text": problem.problem_text, "comment": text},
                     {
@@ -470,6 +501,7 @@ def judge(
                         }
                     },
                     debug,
+                    "A3",
                 )
                 recheck = _noul_true(recheck_answers["recheck"])
                 debug["probabilities"]["A3"] = recheck
@@ -484,9 +516,9 @@ def judge(
             all_points = bool(point_probs) and hits == len(point_probs)
             some_points = any(value["close"] >= t_close for value in point_probs.values())
             if all_points:
-                contradict_answers = _record_call(
+                contradict_answers = transport(
                     api_key, contradiction_state(problem, text),
-                    {"contradict": CONTRADICTION_QUESTION}, debug,
+                    {"contradict": CONTRADICTION_QUESTION}, debug, "B2",
                 )
                 contradiction = _noul_true(contradict_answers["contradict"])
                 debug["probabilities"]["B2"] = contradiction
@@ -494,7 +526,7 @@ def judge(
             elif a_kind == "guess":
                 kind = "guess_close" if some_points else "guess_wrong"
             else:
-                quality_answers = _record_call(
+                quality_answers = transport(
                     api_key,
                     {"comment": text, "problem_text": problem.problem_text},
                     {
@@ -514,6 +546,7 @@ def judge(
                         }
                     },
                     debug,
+                    "C",
                 )
                 quality = _noul_true(quality_answers["quality"])
                 debug["probabilities"]["C"] = quality
@@ -521,7 +554,7 @@ def judge(
                     kind = "q_open"
                 else:
                     kind = "q_yesno"
-                    d_answers = _record_call(
+                    d_answers = transport(
                         api_key,
                         {
                             "problem_text": problem.problem_text,
@@ -543,6 +576,7 @@ def judge(
                             }
                         },
                         debug,
+                        "D",
                     )
                     d_answer = d_answers["answer"]
                     d_probs = _probability_map(d_answer)
@@ -566,6 +600,6 @@ def judge(
                 reason += f", 矛盾={debug['probabilities']['B2']:.2f}"
         elif "A3" in debug["probabilities"]:
             reason += f", 再確認={debug['probabilities']['A3']:.2f}"
-        return Judgement("jev", kind, answer=answer, reason=reason, debug=debug)
+        return Judgement(method, kind, answer=answer, reason=reason, debug=debug)
     except Exception as exc:
-        raise JevError(f"Jev judgement failed: {exc}") from exc
+        raise make_error(exc, debug) from exc

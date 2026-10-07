@@ -18,7 +18,7 @@ if str(SERVICE_DIR) not in sys.path:
 
 from app.comment_log import apply_decision, new_record, utc_now, write_record  # noqa: E402
 from app.config import Config, REPLY_VARIANTS  # noqa: E402
-from app.judge import jev, luna  # noqa: E402
+from app.judge import decisions, jev, luna  # noqa: E402
 from app.judge.combiner import combine  # noqa: E402
 from app.judge.contract import Judgement, Problem  # noqa: E402
 from app.reply.writer import write_reply  # noqa: E402
@@ -68,7 +68,7 @@ def _parser() -> argparse.ArgumentParser:
     source.add_argument("--snapshot", type=Path, help="published schema-v3 snapshot JSON")
     parser.add_argument("--comment", action="append", default=[], help="comment; repeatable")
     parser.add_argument("--comments-file", type=Path, help="one comment per line")
-    parser.add_argument("--modes", nargs="+", choices=("luna", "jev", "hybrid"),
+    parser.add_argument("--modes", nargs="+", choices=("luna", "jev", "hybrid", "decisions"),
                         default=["luna", "jev", "hybrid"])
     parser.add_argument("--reply-variant", choices=sorted(REPLY_VARIANTS))
     parser.add_argument("--shadow", action=argparse.BooleanOptionalAction, default=None)
@@ -111,7 +111,8 @@ def main(argv: list[str] | None = None) -> int:
                 break
             comments.append(line)
 
-    needs_luna = "luna" in args.modes or "hybrid" in args.modes or "jev" in args.modes
+    needs_luna = any(mode in args.modes for mode in ("luna", "hybrid", "jev", "decisions"))
+    needs_decisions = "decisions" in args.modes
     effective_shadow = base_config.shadow if args.shadow is None else args.shadow
     effective_consensus = base_config.consensus if args.consensus is None else args.consensus
     needs_jev = "jev" in args.modes or (
@@ -137,7 +138,7 @@ def main(argv: list[str] | None = None) -> int:
         received_at = utc_now()
         outcomes: dict[str, Judgement | Exception] = {}
         if fixture:
-            for method in ("luna", "jev"):
+            for method in ("luna", "jev") + (("decisions",) if needs_decisions else ()):
                 if method not in fixture:
                     raise ValueError(f"stub entry lacks {method}: {comment_text}")
                 outcomes[method] = _stub_result(method, fixture[method])
@@ -157,6 +158,14 @@ def main(argv: list[str] | None = None) -> int:
                     )
                 except Exception as exc:
                     outcomes["jev"] = exc
+            if needs_decisions:
+                try:
+                    outcomes["decisions"] = decisions.judge(
+                        comment_id, comment_text, problem,
+                        api_key=keys["openai_api_key"], model=base_config.luna_model,
+                    )
+                except Exception as exc:
+                    outcomes["decisions"] = exc
         judged_at = utc_now()
         print(f"\n{comment_text}")
         for mode in args.modes:
