@@ -1,4 +1,4 @@
-"""batch-01: stock_items.py の素材 14 項目 + 管理項目（コア宣言 core 等）を機械検証する。
+"""batch-01: stock_items.py の素材 17 項目 + 管理項目（コア宣言 core 等）を機械検証する。
 
 仕様の正は docs/app/sets/umigame-soup-1.html セクション 4（字数・件数）・5.2（画風固定行）・
 6（#AIart 必須・「第 N 問」を書かない）と docs/app/generators/umigame-prebuilt.html 8.3
@@ -64,6 +64,13 @@ CORE_MAX = 120
 CORE_POINTS_MIN, CORE_POINTS_MAX = 1, 3  # 判定用のコアの要点（21-6c1。セット別設計書 5.1.1・5.1.2）
 REVEAL_MAX = 70  # 正解時の開示文
 CORE_POINT_MAX = 20  # コアの要点 1 個の字数（目安 15 字前後。個数は説明に必要なだけ。2026-09-30 ユーザー整理）
+# 正解基準 judge_criteria（21-6d7b。セット別設計書 10.2「正解基準」）
+CRITERIA_TEXT_MAX = 80  # points[].hit / touch の字数
+CRITERIA_ERRORS_MAX = 3  # errors の個数（0 個も可）
+CRITERIA_ERROR_MAX = 40  # errors 1 個の字数
+# 確定事実シートに書いてはいけない境目の言い方（境目は正解基準にだけ書く）。漏洩防止の目印「正解宣言のとき以外は」の行は対象外
+BOUNDARY_RE = re.compile(r"正解にする|正解にしない|正解とする|言えたら正解|惜しい")
+BOUNDARY_EXEMPT = "正解宣言のとき以外は"
 # 欠番の content_key 連番（差し替えで ITEMS から外し、再利用しない番号。DB の行の扱いは全数レビュー後に決める）。
 # 002 = U11（2026-09-26 に U27 = 015 へ差し替え。素材の全数レビュー指摘 17）
 # 011 = U23（2026-09-26 に U28 = 016 へ差し替え。本家ウミガメのスープ）
@@ -71,6 +78,39 @@ RETIRED_SERIALS = {2, 11}
 
 errors: list[str] = []
 warnings: list[str] = []
+
+
+def check_judge_criteria(no: str, jc: object, cps: object) -> None:
+    """正解基準 judge_criteria を検査し、errors に追記する。
+
+    Args:
+        no: 問題番号（メッセージ用）。
+        jc: judge_criteria の値。
+        cps: 同じ問の core_points（points の個数の照合に使う）。
+    """
+    if not isinstance(jc, dict) or set(jc) != {"points", "errors"}:
+        errors.append(f"{no}: judge_criteria は {{points, errors}} の dict")
+        return
+    pts = jc["points"]
+    if not isinstance(pts, list) or not isinstance(cps, list) or len(pts) != len(cps):
+        n = len(pts) if isinstance(pts, list) else "-"
+        errors.append(f"{no}: judge_criteria.points の個数（{n}）が core_points と一致しない")
+    for i, pt in enumerate(pts if isinstance(pts, list) else [], start=1):
+        if not isinstance(pt, dict) or set(pt) != {"hit", "touch"}:
+            errors.append(f"{no}: judge_criteria.points[{i}] は {{hit, touch}} の dict")
+            continue
+        for key in ("hit", "touch"):
+            v = pt[key]
+            if not isinstance(v, str) or not v.strip() or "\n" in v or len(v) > CRITERIA_TEXT_MAX:
+                ln = len(v) if isinstance(v, str) else "-"
+                errors.append(f"{no}: judge_criteria.points[{i}].{key} は改行なし {CRITERIA_TEXT_MAX} 字以内の空でない文字列（{ln} 字）")
+        if pt["hit"] == pt["touch"]:
+            errors.append(f"{no}: judge_criteria.points[{i}] の hit と touch が同文")
+    errs = jc["errors"]
+    if not isinstance(errs, list) or len(errs) > CRITERIA_ERRORS_MAX:
+        errors.append(f"{no}: judge_criteria.errors は 0〜{CRITERIA_ERRORS_MAX} 個のリスト")
+    elif any(not isinstance(e, str) or not e.strip() or "\n" in e or len(e) > CRITERIA_ERROR_MAX for e in errs):
+        errors.append(f"{no}: judge_criteria.errors の要素は改行なし {CRITERIA_ERROR_MAX} 字以内の空でない文字列")
 
 
 def check_item(it: dict) -> None:
@@ -116,6 +156,8 @@ def check_item(it: dict) -> None:
     if not isinstance(rv, str) or not rv.strip() or "\n" in rv or len(rv) > REVEAL_MAX:
         errors.append(f"{no}: reveal_text は改行なし {REVEAL_MAX} 字以内の空でない文字列（{len(rv) if isinstance(rv, str) else '-'} 字）")
 
+    check_judge_criteria(no, it["judge_criteria"], cps)
+
     p = it["problem_text"]
     if not PROBLEM_MIN <= len(p) <= PROBLEM_MAX:
         errors.append(f"{no}: problem_text が {len(p)} 字（{PROBLEM_MIN}〜{PROBLEM_MAX}）")
@@ -132,6 +174,10 @@ def check_item(it: dict) -> None:
         errors.append(f"{no}: fact_sheet は非空文字列の配列")
     elif not FACT_MIN <= len(fs) <= FACT_MAX:
         errors.append(f"{no}: fact_sheet が {len(fs)} 件（{FACT_MIN}〜{FACT_MAX}）")
+    if isinstance(fs, list):
+        for f in fs:
+            if isinstance(f, str) and BOUNDARY_EXEMPT not in f and BOUNDARY_RE.search(f):
+                errors.append(f"{no}: fact_sheet に境目の言い方がある（正解基準 judge_criteria へ移す）: {f[:30]}")
 
     qs = it["expected_questions"]
     if not (isinstance(qs, list) and all(isinstance(q, dict) and q.get("q") and q.get("a") for q in qs)):

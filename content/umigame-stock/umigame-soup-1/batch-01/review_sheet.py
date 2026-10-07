@@ -92,6 +92,13 @@ h3{font-size:15px;margin:22px 0 8px;color:var(--accent)}
 .chat li.gap{margin-top:12px}
 details.spoiler{border-color:var(--bad)}
 details.judge li .len{display:inline;margin-left:.5em}
+.len.over{color:var(--bad);font-weight:700}
+.crit dl{margin:6px 0 0;padding:0}
+.crit dt{font-size:12.5px;color:var(--muted);margin-top:6px}
+.crit dd{margin:2px 0 0 0;padding-left:10px;border-left:3px solid var(--line)}
+.crit .pt{font-weight:700}
+.crit .len{display:inline;margin-left:.5em}
+details.judge>.muted{padding:0 14px}
 """
 
 # 端末内で完結する軽い操作（確認済みチェック。localStorage は失敗しても無視する）
@@ -227,6 +234,46 @@ def material_html(it: dict) -> list[str]:
     return out
 
 
+def _counted(text: str, limit: int) -> str:
+    """文に字数を添える（上限超えは赤字）。"""
+    over = " over" if len(text) > limit else ""
+    return f"{html.escape(text)}<span class='len{over}'>{len(text)} 字</span>"
+
+
+def judge_html(it: dict) -> list[str]:
+    """判定用の項目（コアの要点ごとの正解基準・誤りの例・開示文）を HTML にする。
+
+    正解基準は要点ごとのまとまり（要点 → 当てた → 触れた）で見せる（21-6d7b。セット別設計書 10.2
+    「素材シートでのレビュー」）。真相・確定事実シートを読んだあとに説明テストで境目を確かめる。
+    """
+    cps = it["core_points"]
+    jc = it["judge_criteria"]
+    out = [
+        f"<details class='judge spoiler'><summary>判定用の項目（コアの要点 {len(cps)} 個・正解基準・開示文）</summary>",
+        "<p class='muted'>コアの要点は 1 個 20 字以内、当てた / 触れたは各 80 字以内、誤りの例は 0〜3 個・各 40 字以内。"
+        "観点: ① 当てたの下限の言い方で問題文の不思議がすべて説明でき、触れたの言い方では説明が残る "
+        "② 固有名を求めるなら、その名前でしか説明できない理由がある ③ 触れたが広すぎない（問題文どおりの読み方や周辺の事実だけで触れたにならない） "
+        "④ 誤りの例が真相・確定事実と本当に食い違う ⑤ 確定事実シートに境目の言い方が残っていない</p>",
+    ]
+    for i, cp in enumerate(cps):
+        pt = jc["points"][i] if i < len(jc["points"]) else {"hit": "（未記入）", "touch": "（未記入）"}
+        out.append(
+            f"<div class='fld crit'><span class='k'>要点 {i + 1}</span><div class='v pt'>{_counted(cp, 20)}</div>"
+            f"<dl><dt>当てた（hit）</dt><dd>{_counted(pt['hit'], 80)}</dd>"
+            f"<dt>触れた（touch）</dt><dd>{_counted(pt['touch'], 80)}</dd></dl></div>"
+        )
+    errs = jc["errors"]
+    out.append("<div class='fld'><span class='k'>正解にしない誤りの例 errors</span>")
+    if errs:
+        out.append("<ul>" + "".join(f"<li>{_counted(e, 40)}</li>" for e in errs) + "</ul>")
+    else:
+        out.append("<div class='v'>なし</div>")
+    out.append("</div>")
+    out.append(_field("正解時の開示文 reveal_text（70 字以内）", it["reveal_text"]))
+    out.append("</details>")
+    return out
+
+
 def write_review() -> None:
     """ITEMS から素材レビュー用の review.html を書き出す。"""
     out = [
@@ -242,8 +289,8 @@ def write_review() -> None:
         "<button type='button' class='g f' data-all='close'>すべて閉じる</button></div>",
         "</header>",
         "<main>",
-        "<p class='note'>各問は折りたたみ。素材 16 項目（版面の文言・プレイ例・セリフ・ナレーション・キャプション・イラストプロンプト・出典メモ）"
-        "を確認した後、真相・確定事実シート・判定用の項目（コアの要点・開示文）を参照できます。各問の「確認済み」はこの端末のブラウザに保存されます。</p>",
+        "<p class='note'>各問は折りたたみ。素材 17 項目（版面の文言・プレイ例・セリフ・ナレーション・キャプション・イラストプロンプト・出典メモ）"
+        "を確認した後、真相・確定事実シート・判定用の項目（コアの要点ごとの正解基準・誤りの例・開示文）を参照できます。各問の「確認済み」はこの端末のブラウザに保存されます。</p>",
         handover_html(),
     ]
 
@@ -281,16 +328,7 @@ def write_review() -> None:
         out.append("<details class='facts spoiler'><summary>確定事実シート（{}）</summary><ul>".format(len(it["fact_sheet"])))
         out += [f"<li>{html.escape(f)}</li>" for f in it["fact_sheet"]]
         out.append("</ul></details>")
-        out.append(
-            "<details class='judge spoiler'><summary>判定用の項目（コアの要点 {} 個・開示文）</summary>"
-            "<div class='fld'><span class='k'>コアの要点 core_points（1〜3 個・1 個 20 字以内）</span><ul>".format(
-                len(it["core_points"])
-            )
-        )
-        out += [f"<li>{html.escape(p)}<span class='len'>{len(p)} 字</span></li>" for p in it["core_points"]]
-        out.append("</ul></div>")
-        out.append(_field("正解時の開示文 reveal_text（70 字以内）", it["reveal_text"]))
-        out.append("</details>")
+        out += judge_html(it)
         out.append(f"<label class='done'><input type='checkbox' data-done='{no}'> {no} は確認済み</label>")
         out.append("<p class='top'><a href='#index'>目次へ戻る</a></p>")
         out.append("</div></details>")

@@ -105,6 +105,7 @@ REQUIRED_KEYS = (
     "fact_sheet",
     "core_points",
     "reveal_text",
+    "judge_criteria",
     "expected_questions",
     "hook",
     "rule_text",
