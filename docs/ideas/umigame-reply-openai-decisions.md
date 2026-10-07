@@ -57,4 +57,5 @@ OpenAI から Jevのような API が出たということを聞きました。�
   - 出典: https://developers.openai.com/api/docs/guides/decisions ・ https://developers.openai.com/api/reference/resources/decisions/methods/create ・ https://developers.openai.com/api/docs/guides/your-data ・ https://community.openai.com/t/decisions-api-is-now-available-in-public-beta/1403877
 - 2026-10-03 の「料金・確率を返すかが分からず設計できない」は解消した。Jev の段・入力・リクエストの分け方をそのままにし、API の呼び方だけを差し替える形で設計した（当初のリクエストをまとめる案は、⑤ との比較が濁るためユーザー合意で取りやめ）（`docs/app/sets/umigame-soup-1.html` 10.3.6）。独立性がない点は設計書に警告として明記し、21-6d11 で luna と誤りが重なるかを見て評価する
 - 費用見積もり: 21-6d10b + 21-6d11 で約 $0.45（上限 $3）。Jev と違い契約先が増えない（OpenAI キーを流用）
-- 料金・規約と設計の承認待ち（ユーザー）。疎通確認はユーザーがキーを入れてスクリプトを実行する
+- 疎通確認（4 回）: すべて 200・1 リクエスト 0.21〜0.27 秒。日本語の指示・入力で確率が返り、1 リクエストに 2 問・選択肢 9 個も通った
+- 判断（ユーザー）: 料金・規約と設計（Jev とそろえる形）を承認。21-6d10a 完了、次は 21-6d10b（実装と小試走）
