@@ -93,14 +93,6 @@
 <thead><tr><th>タイトル</th><th>種別</th><th>ステータス</th><th>条件（満たされたら何をするか）</th><th>リンク</th><th>更新日</th></tr></thead>
 <tbody>
 <tr>
-  <td>ウミガメのスープのコメント判定に OpenAI の Decisions API（Jev 相当）を候補として加える</td>
-  <td>単発</td>
-  <td><span class="badge badge-future">再醸成待ち</span></td>
-  <td>(a) Jev に問題が出たとき（値上げ・提供停止・MCA / Acceptable Use Policy の変更）、または (b) Decisions API が一般公開され料金と確率を返すかが公開されたら壁打ちを再開。中身が luna と同じ GPT-6 Luna のため、Jev の役割（見張り役・開示前の二重確認）に必要な独立性がない点を天秤にかけ、「Jev の代わり」として検討する</td>
-  <td><a href="umigame-reply-openai-decisions.md">MD</a></td>
-  <td>2026-10-03</td>
-</tr>
-<tr>
   <td>プラットフォーム展開（TikTok を第一候補に、当たりの兆しが出たセットを他プラットフォームへ展開する）</td>
   <td>単発</td>
   <td><span class="badge badge-future">再醸成待ち</span></td>
@@ -115,6 +107,13 @@
 <div class="table-wrap"><table data-cards data-card-extra="5">
 <thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
 <tbody>
+<tr>
+  <td>ウミガメのスープのコメント判定に OpenAI の Decisions API（Jev 相当）を候補として加える</td>
+  <td><span class="badge badge-fixed">採用</span></td>
+  <td>壁打ち 1 回（2026-10-03）で再醸成待ち → 一般公開（トリガー b）を受けて 2026-10-07 に採用。⑤ jev + 2c-luna と同じ形のパターン ⑥（判定 = Decisions・返信文 = 2c-luna）を評価に加える。<a href="../plans/development-plan.html#step-21-6d10a">開発計画 21-6d10a</a>（公開ドキュメントの確認と設計）→ 21-6d10b（実装と小試走）→ 21-6d11（全件プローブ）。luna と同じモデルである点（独立性）は 21-6d11 の結果で評価する</td>
+  <td><a href="umigame-reply-openai-decisions.md">MD</a></td>
+  <td>2026-10-07</td>
+</tr>
 <tr>
   <td>ウミガメの真相全文（truth）をフォロワーが読める場所に公開する</td>
   <td><span class="badge badge-fixed">採用</span></td>
