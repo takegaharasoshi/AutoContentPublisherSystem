@@ -55,6 +55,6 @@ OpenAI から Jevのような API が出たということを聞きました。�
 
 - 公開ドキュメントで確認（2026-10-06 にパブリックベータ・GA は数週間以内の見込み）: 料金は入力 100 万トークンあたり $0.10（出力・キャッシュは無料）、`predicate` は確率・`choice` は選択肢ごとの確率 + `confidence` を返す、1 リクエストに独立した問いを複数入れられる、学習に使わない・不正利用監視 30 日・ZDR 対象。問いの数・選択肢の数の上限、対応言語、応答時間の数値は記載なし（第三者記事の数値は未確認扱い）
   - 出典: https://developers.openai.com/api/docs/guides/decisions ・ https://developers.openai.com/api/reference/resources/decisions/methods/create ・ https://developers.openai.com/api/docs/guides/your-data ・ https://community.openai.com/t/decisions-api-is-now-available-in-public-beta/1403877
-- 2026-10-03 の「料金・確率を返すかが分からず設計できない」は解消した。Jev の段は R1〜R5（最大 5 リクエスト）に対応付けて設計した（`docs/app/sets/umigame-soup-1.html` 10.3.6）。独立性がない点は設計書に警告として明記し、21-6d11 で luna と誤りが重なるかを見て評価する
+- 2026-10-03 の「料金・確率を返すかが分からず設計できない」は解消した。Jev の段・入力・リクエストの分け方をそのままにし、API の呼び方だけを差し替える形で設計した（当初のリクエストをまとめる案は、⑤ との比較が濁るためユーザー合意で取りやめ）（`docs/app/sets/umigame-soup-1.html` 10.3.6）。独立性がない点は設計書に警告として明記し、21-6d11 で luna と誤りが重なるかを見て評価する
 - 費用見積もり: 21-6d10b + 21-6d11 で約 $0.45（上限 $3）。Jev と違い契約先が増えない（OpenAI キーを流用）
 - 料金・規約と設計の承認待ち（ユーザー）。疎通確認はユーザーがキーを入れてスクリプトを実行する
