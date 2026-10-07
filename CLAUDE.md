@@ -151,9 +151,9 @@ Claude のトークン消費を抑えるため、以下のタスクは Codex CLI
 - 指示文はファイルに書き（スクラッチパッド等）、`tools/codex_delegate.sh new [-s read-only] [-m <model>] [-e <effort>] [-n <name>] <指示文ファイル>` で渡す。既定は `workspace-write`・cwd はリポジトリルート。同じタスクへの追加指示は `tools/codex_delegate.sh resume <session_id> <指示文ファイル>` で同一セッションに出す（`session_id` は実行結果の先頭行）
 - ラッパーは指示文の先頭に「【委譲ワーカー】」行を付け（AGENTS.md の起動判定に使う）、標準出力には session id・終了コード・Codex の最終メッセージだけを返す。実行ログ全文は `/tmp/codex-delegate/` に残るので、必要時だけ tail / grep で読む
 - Bash ツールの上限は 10 分のため、実装・テスト修正ループのように長くなる委譲は `run_in_background` で起動し完了通知を待つ
-- モデルの既定は `gpt-6-luna` / reasoning effort `max`（WSL の `~/.codex/config.toml` で設定。Windows 側の Codex アプリは対象外）。2026-09-26 に GPT-5.6 terra / high から切替（Codex CLI 0.157.1 以上が必要。根拠は DeepSWE v1.1 で Luna max が Sol の中間エフォート並みのスコアをタスクあたり数分の 1 のコストで出すこと = サブスク利用枠の節約。経緯は `docs/ideas/codex-model-gpt6-luna.md`）。per-call の使い分け（GPT-6 の序列は astra > sol > luna）:
+- モデルの既定は `gpt-6-luna` / reasoning effort `max`（WSL の `~/.codex/config.toml` で設定。Windows 側の Codex アプリは対象外）。2026-09-26 に GPT-5.6 terra / high から切替（Codex CLI 0.157.1 以上が必要。根拠は DeepSWE v1.1 で Luna max が Sol の中間エフォート並みのスコアをタスクあたり数分の 1 のコストで出すこと = サブスク利用枠の節約。経緯は `docs/ideas/codex-model-gpt6-luna.md`）。per-call の使い分け（GPT-6 の序列は astra > sol > luna。2026-10-08 に上位モデルを GPT-6.1 Sol へ更新 — 単価は旧 Sol と同じで Astra 並みの性能。Codex CLI 0.161.0 以上が必要。6.1 の Luna はないため既定は据え置き。経緯は `docs/ideas/codex-model-gpt61-sol.md`）:
   - **機械的な横展開・書式統一**: 既定のまま（`gpt-6-luna` / `max`）
-  - **14-7 級の大型・新規性の高い実装**（新モジュール新設・依存追加・複数コンポーネント横断）: `-m gpt-6-sol -e max` に上げる（詰まった場合は `-e ultra`）
+  - **14-7 級の大型・新規性の高い実装**（新モジュール新設・依存追加・複数コンポーネント横断）: `-m gpt-6.1-sol -e max` に上げる（詰まった場合は `-e ultra`）
 - プロジェクト規約は `AGENTS.md` に記載済みで Codex が自動で読む。指示文には規約を重複記載せず、タスク固有の要件（対象ファイル・仕様・完了条件）のみ書く
 - **委譲指示文には必ず「`docs/` は触らない」を含める**（Phase 23・2026-09-20 で導入。AGENTS.md の docs 書き込みは「スキル起動時 or 指示文で明示」の条件付きに緩めたため、プロンプトが AGENTS.md より優先される仕様を使って 委譲ワーカー時は明示的に閉じる。docs の更新を Codex に任せる場合だけ対象ファイルを名指しする）
 

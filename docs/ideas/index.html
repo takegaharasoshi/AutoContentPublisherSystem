@@ -28,14 +28,6 @@
 <tbody>
 
 <tr>
-  <td>Codex 委譲のモデルを GPT-6.1 Sol へ早期に切り替える</td>
-  <td>単発</td>
-  <td><span class="badge badge-wip">inbox</span></td>
-  <td>GPT-6.1 Sol の公開を受けて委譲モデルを 6.1 系へ切り替えたい。現状の既定は <code>gpt-6-luna</code> / <code>max</code>（Sol は大型タスクのみ。<a href="codex-model-gpt6-luna.md">前回の切替</a>）のため、6.1 のモデル ID・CLI 対応バージョン・Luna 版の有無・既定をどれにするかを確かめる</td>
-  <td><a href="codex-model-gpt61-sol.md">MD</a></td>
-  <td>2026-10-08</td>
-</tr>
-<tr>
   <td>pref-ranking-1 のネタ・タイトルの引きが冒頭離脱を支配している疑い</td>
   <td>単発</td>
   <td><span class="badge badge-wip">inbox</span></td>
@@ -123,6 +115,13 @@
 <div class="table-wrap"><table data-cards data-card-extra="5">
 <thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
 <tbody>
+<tr>
+  <td>Codex 委譲のモデルを GPT-6.1 Sol へ早期に切り替える</td>
+  <td><span class="badge badge-fixed">採用</span></td>
+  <td>捕捉 → 壁打ち 1 回（2026-10-08）で確定し直接反映: Codex CLI を 0.161.0 へ更新し、大型実装の上位モデルを <code>gpt-6-sol</code> → <code>gpt-6.1-sol</code>（同単価・Astra 並み）に。既定は <code>gpt-6-luna</code> / <code>max</code> のまま（6.1 Luna は未発表・Sol は約 20 倍の単価）。反映先は CLAUDE.md の委譲ルール</td>
+  <td><a href="codex-model-gpt61-sol.md">MD</a></td>
+  <td>2026-10-08</td>
+</tr>
 <tr>
   <td>ウミガメのスープのコメント判定に OpenAI の Decisions API（Jev 相当）を候補として加える</td>
   <td><span class="badge badge-fixed">採用</span></td>
