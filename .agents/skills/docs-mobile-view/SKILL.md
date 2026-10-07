@@ -42,7 +42,7 @@ WSL は NAT で独自の IP を持つため、Windows の Tailscale IP から WS
 | スマホで開けない | `./tools/serve-docs.sh status` で HTTP サーバー稼働 + `tailscale serve` 設定の両方を見る |
 | 1 が死んでいる | PC 再起動後は WSL 側だけ落ちる(`tailscale serve` の設定は Windows 側に永続化される)。`start` で復帰 |
 | 2 だけ消えている | `tailscale serve status` が空。`start` で再設定 |
-| `tailscale status` が「Tailscale is starting」のまま・`start` が `unexpected state: NoState` | Windows の GUI(`tailscale-ipn.exe`)が起動していない(PC 再起動後に 2026-10-02〜10-08 で 5 回発生。サービス `tailscaled` は RUNNING でもこうなる。serve 設定も消える)。下記の手順で GUI を起動 → 接続を待つ → 全ポートで `start` をやり直す。再発防止として 2026-10-08 に Windows のスタートアップフォルダーへ `Tailscale.lnk`(→ `tailscale-ipn.exe`)を設置済み。それでも再発したらショートカットの有無を確認する |
+| `tailscale status` が「Tailscale is starting」のまま・`start` が `unexpected state: NoState` | Windows の GUI(`tailscale-ipn.exe`)が起動していない(PC 再起動後に 2026-10-02〜10-08 で 5 回発生。サービス `tailscaled` は RUNNING でもこうなる。serve 設定も消える)。下記の手順で GUI を起動 → 接続を待つ → 全ポートで `start` をやり直す。再発防止として 2026-10-08 に **Unattended Mode を有効化**(`tailscale set --unattended`。`tailscale debug prefs` で `"ForceDaemon": true`。GUI が落ちても・ログオフしても接続を維持する)+ スタートアップフォルダーへ `Tailscale.lnk`(→ `tailscale-ipn.exe`)を設置済み。PC は再起動していなかった(画面オフ 1 分でモダンスタンバイに出入りしていた)ので、GUI の消失はスタンバイ復帰かログオフ時と推定・原因は未特定。再発したらまず `ForceDaemon` が true のままかを見る |
 | サーバーは生きているのに届かない | Windows から `/mnt/c/Windows/System32/curl.exe -s -o NUL -w "%{http_code}\n" http://localhost:8765/index.html` で 1 の生死、続けて `http://<tailscale名>:8765/index.html` で 2 の生死を確認して層を特定する |
 | スマホ側 | Tailscale アプリが接続中か、同じアカウント(`tailscale status` にスマホが並んでいるか)を確認 |
 
