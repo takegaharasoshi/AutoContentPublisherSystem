@@ -1601,22 +1601,13 @@
 </details>
 </div>
 </article>
-</details>
 
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-
-
-<article class="plan-step" id="step-21-6d14" data-step-id="21-6d14" data-status="todo">
+<article class="plan-step" id="step-21-6d14" data-step-id="21-6d14" data-status="done" data-completed="2026-10-09">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6d14</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-6d14</strong><span class="plan-status">完了</span></div>
 <h3>L2 の一言と P7 の合格基準を緩める（一言 30 字・返信 100 字。プロンプトの目標は 20 字・80 字のまま）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d13">21-6d13</a> の人間チェックの後（2026-10-08 済み）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>評価ツールの合格基準を一言 30 字・返信 100 字に緩め、評価ページを作り直した。人間チェック後の合格数は ① 15・② 15・③ 15・④ 15・⑤ 14・⑦ 16 / 16（⑦ が初めて全指標を満たした）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -1642,11 +1633,24 @@
 <div class="plan-fold-inner"><p>20 字は 21-4a-2（2026-09-07）の漏れ対策（補足 30 字で漏れ 56 件 → 原則なし・二義時のみ 20 字で 2 件）から引き継いだ数字。今は核心語の出力ガード（21-6d9）と P1 の人の確認が漏れを抑えており、21-6d13 の超過はすべて質問の復唱による 21〜27 字で漏れではない。30 字なら全パターンの超過が 0 件になる。プロンプトを 30 字にすると書き手がさらに伸びるおそれがあるため、目標 20 字は変えない（2026-10-08 ユーザー）。P7 の 80 字は設計書に理由の記載がなく、読みやすさの目安と見られる。本番は 80 字を超えても警告ログを出すだけで送り（切り詰めは送信直前の 200 字だけ）、Instagram のコメント上限は 2,200 字なので実害はない。21-6d13 の P7 の NG は ① の 1 件（正解の開示で 81 字）だけ。一言と同じ理由でプロンプトの目標 80 字は変えず、合格基準を 100 字にする（2026-10-08 ユーザー）。</p></div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-09</span></summary>
+<div class="plan-fold-inner"><ul>
+<li>2026-10-09: <code>tools/probe_metrics.py</code> に定数 <code>ONE_LINER_MAX_CHARS = 30</code>・<code>REPLY_MAX_CHARS = 100</code> を置き、行フラグを <code>one_liner_over_max</code> / <code>over_reply_max</code> に改名して基準の表示も定数から作るようにした（<code>build_probe_page.py</code> の見出しは「P7 100 字超」）。書き手・判定のプロンプトと本番コード（<code>REPLY_OVER_80</code> を含む）は変えていない。境界値のテスト（30 / 31 字・100 / 101 字）を足し、pytest 207 passed。</li>
+<li>2026-10-09: <code>build_probe_page.py --results work/probe/full-20261008-8p-merged/results.json --exclude-patterns dec-2c haiku-1d</code> で評価ページを作り直した（<code>run_at</code> 2026-10-08T06:51:13Z のまま・API 呼び出しなし）。6 パターンとも L2 の一言 100%・P7 0 件。最終の書き出し（許容 9）を取り込んだ合格数は ① 15・② 15・③ 15・④ 15・⑤ 14・⑦ 16。残る NG は ①②③ が L2 の矛盾語、④ が P2、⑤ が P2 と L2 の矛盾語。設計書 10.2・10.4・10.6 に決定を記録した。</li>
+</ul></div>
 </details>
 </div>
 </article>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
+
+
+
 
 <article class="plan-step" id="step-21-6d15" data-step-id="21-6d15" data-status="todo">
 <header class="plan-step-head">

@@ -601,3 +601,18 @@ def test_probe_page_leak_select_escapes_reply_and_key(tmp_path) -> None:
     assert "出力ガード発動" in summary
     for decisions in ({}, {key: "not_leak"}, {key: "leak"}):
         _assert_review_js_matches_python(results, decisions)
+
+
+def test_length_criteria_allow_slack_over_prompt_targets() -> None:
+    case = _case("len", "q_yesno", "yes")
+    flags = probe_metrics.row_flags(_row(case, "q_yesno", "yes", "はい。" + "あ" * 30), case)
+    assert flags["one_liner_over_max"] is False
+    flags = probe_metrics.row_flags(_row(case, "q_yesno", "yes", "はい。" + "あ" * 31), case)
+    assert flags["one_liner_over_max"] is True
+    assert probe_metrics.row_flags(_row(case, "q_yesno", "yes", "あ" * 100),
+                                   case)["over_reply_max"] is False
+    assert probe_metrics.row_flags(_row(case, "q_yesno", "yes", "あ" * 101),
+                                   case)["over_reply_max"] is True
+    metrics = _aggregate([case], [_row(case, "q_yesno", "yes", "はい。" + "あ" * 25)])["metrics"]
+    assert metrics["L2_one_liner"]["pass"] is True
+    assert metrics["L2_one_liner"]["threshold"] == "30 字以内 100%"

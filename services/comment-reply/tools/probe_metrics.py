@@ -41,6 +41,9 @@ EMOJI = re.compile(
 OPENING_PUNCTUATION = "。．.!！?？、，,:：;；…・ \u3000"
 CORRECT_OPENERS = ("正解です", templates.CORRECT_PREFIX)
 PHRASING_MIN_CASES = 20
+# 合格基準。書き手のプロンプトの目標（一言 20 字・返信 80 字）より緩くし、差をゆとりにする（21-6d14）
+ONE_LINER_MAX_CHARS = 30
+REPLY_MAX_CHARS = 100
 USD_PER_MILLION = {
     "luna": {"input": 0.10, "output": 0.50},
     "haiku": {"input": 0.10, "output": 0.50},
@@ -145,7 +148,8 @@ def row_flags(row: dict[str, Any], case: dict[str, Any],
         "kind_mismatch": kind_mismatch, "answer_mismatch": answer_mismatch,
         "label_mismatch": kind_mismatch or answer_mismatch,
         "watch_mismatch": record.get("shadow_mismatch") is True,
-        "leak_words": leak_words, "over_80": bool(reply and len(reply) > 80),
+        "leak_words": leak_words,
+        "over_reply_max": bool(reply and len(reply) > REPLY_MAX_CHARS),
         "wrong_correct": labeled["expected_kind"] != "guess_correct" and bool(
             reply and reply.startswith(CORRECT_OPENERS)),
         "opener": bool(reply and (
@@ -156,8 +160,9 @@ def row_flags(row: dict[str, Any], case: dict[str, Any],
         if kind == "q_yesno" else [],
         "proximity_words": proximity,
         "emoji_violations": _emoji_violations(reply, kind),
-        "one_liner_over_20": bool(
-            reply and kind == "q_yesno" and len(_one_liner(reply) or "") > 20
+        "one_liner_over_max": bool(
+            reply and kind == "q_yesno"
+            and len(_one_liner(reply) or "") > ONE_LINER_MAX_CHARS
         ),
     }
 
@@ -408,7 +413,7 @@ def aggregate(results: dict[str, Any],
         final_yesno = [x for x in items if x["kind"] == "q_yesno"]
         opener_rows = [x for x in final_yesno
                        if (x["record"].get("final") or {}).get("decision") != "consensus_split"]
-        one_liner_count = sum(bool(x["reply"]) and not x["flags"]["one_liner_over_20"]
+        one_liner_count = sum(bool(x["reply"]) and not x["flags"]["one_liner_over_max"]
                               for x in final_yesno)
         opener_count = sum(x["flags"]["opener"] for x in opener_rows)
         split_accuracy = {}
@@ -450,7 +455,7 @@ def aggregate(results: dict[str, Any],
             "P4": _ng(p4_items, lambda x: f"{x['expected_answer']} → {x['answer']}"),
             "P5": _ng(undeclared, lambda x: f"判定 {x['kind']}"),
             "P6": p6_ng,
-            "P7": _ng([x for x in items if x["flags"]["over_80"]],
+            "P7": _ng([x for x in items if x["flags"]["over_reply_max"]],
                       lambda x: f"{len(x['reply'])} 字"),
             "L1_kind": _ng([x for x in items if x["flags"]["kind_mismatch"]],
                            lambda x: f"{x['expected_kind']} → {x['kind']}"),
@@ -460,7 +465,7 @@ def aggregate(results: dict[str, Any],
             "L1_phrasing": _ng(phrasing_ng, lambda x: f"最頻の言い回し（{x['expected_kind']}）"),
             "L1_guidance": _ng(unguided, lambda x: f"判定 {x['kind']}"),
             "L2_one_liner": _ng([x for x in final_yesno
-                                 if not x["reply"] or x["flags"]["one_liner_over_20"]],
+                                 if not x["reply"] or x["flags"]["one_liner_over_max"]],
                                 lambda x: f"一言 {len(_one_liner(x['reply']) or '')} 字"),
             "L2_opener": _ng([x for x in opener_rows if not x["flags"]["opener"]],
                              lambda x: f"判定 {x['answer']}"),
@@ -502,8 +507,8 @@ def aggregate(results: dict[str, Any],
                           details={**p6_counts, "template_total": len(troll_abuse),
                                    "template_rate": template_rate, "ordinary_total": len(ordinary),
                                    "ordinary_rate": ordinary_rate}),
-            "P7": _count_metric(sum(x["flags"]["over_80"] for x in items), n, "0 件",
-                                not any(x["flags"]["over_80"] for x in items)),
+            "P7": _count_metric(sum(x["flags"]["over_reply_max"] for x in items), n, "0 件",
+                                not any(x["flags"]["over_reply_max"] for x in items)),
             "L1_kind": _metric(kind_accuracy["count"], n, "全体 90% 以上",
                                kind_accuracy["rate"] >= .9
                                if kind_accuracy["rate"] is not None else None,
@@ -536,7 +541,8 @@ def aggregate(results: dict[str, Any],
                 by_kind=phrasing,
             ),
             "L1_guidance": _rate_metric(guided, len(guidance), "80% 以上", lambda rate: rate >= .8),
-            "L2_one_liner": _rate_metric(one_liner_count, len(final_yesno), "20 字以内 100%",
+            "L2_one_liner": _rate_metric(one_liner_count, len(final_yesno),
+                                          f"{ONE_LINER_MAX_CHARS} 字以内 100%",
                                           lambda rate: rate == 1),
             "L2_opener": _rate_metric(opener_count, len(opener_rows), "判定語始まり 100%",
                                        lambda rate: rate == 1),

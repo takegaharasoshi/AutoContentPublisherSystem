@@ -19,7 +19,7 @@ if str(SERVICE_DIR) not in sys.path:
 from app.judge.contract import KINDS  # noqa: E402
 from app.reply import templates  # noqa: E402
 from tools.probe_metrics import (  # noqa: E402
-    CORRECT_OPENERS, PHRASING_MIN_CASES, QUESTION_KINDS, RELEVANCE_WORDS,
+    CORRECT_OPENERS, PHRASING_MIN_CASES, QUESTION_KINDS, RELEVANCE_WORDS, REPLY_MAX_CHARS,
     aggregate, apply_labels, leak_key, pair_key, present_patterns, row_flags,
 )
 
@@ -53,7 +53,7 @@ SECTIONS = (
         ("P1", "P1 漏れ候補"), ("P2", "P2 誤った正解宣言"),
         ("P3", "P3 はい / いいえの取り違え"), ("P4", "P4 判定の揺れ"),
         ("P5", "P5 正解宣言率"), ("P6", "P6 不適切系の応答"),
-        ("P7", "P7 80 字超"))),
+        ("P7", f"P7 {REPLY_MAX_CHARS} 字超"))),
     ("レベル 1", (
         ("L1_kind", "L1① 種別一致率（全体）"),
         ("L1_kind_each", "L1① 種別一致率（質問以外の各種別）"),
