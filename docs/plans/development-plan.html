@@ -1657,7 +1657,7 @@
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>ユーザーが 21-6c2 のローカル試行ツールで、各問題に自由にコメントを入れて 2 方式の返信を確かめる（想定外の言い回し・曖昧な質問・感想・雑談・荒らし）。機械プローブと人間プローブの結果から方式を選ぶ（パターン ⑥ Decisions + luna、⑦⑧ Haiku 5.5 を含む 8 パターン。⑦⑧ は 2026-10-08 追加）。<strong>「正解宣言は 2 方式の合意を必須にするか」と段 B の閾値も、21-6d11 の試算を見てここで決める</strong>（2026-10-07 ユーザー）。</p></div>
+<div data-field="overview"><p>ユーザーが 21-6c2 のローカル試行ツールで、各問題に自由にコメントを入れて 2 方式の返信を確かめる（想定外の言い回し・曖昧な質問・感想・雑談・荒らし）。機械プローブと人間プローブの結果から方式を選ぶ（候補は ①〜⑤ と ⑦ の 6 パターン。⑥ Decisions と ⑧ 1d-haiku は 21-6d13 の人間チェック後に不採用 = 2026-10-08 ユーザー）。<strong>「正解宣言は 2 方式の合意を必須にするか」と段 B の閾値も、21-6d11 の試算を見てここで決める</strong>（2026-10-07 ユーザー）。</p><p><strong>方針案（2026-10-08 ユーザー・未決定）</strong>: ⑦ haiku + 1b-haiku を第一候補とする。理由と着手前の確認事項は下の「実装の細部・背景」。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>21-6a で承認した最低ラインを満たす方式から選ぶ。Jev を選ぶ場合は、MCA・Acceptable Use Policy に変更がないかを確認する。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
@@ -1671,8 +1671,27 @@
 <div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>。<code>/step</code> は goal 対象外として断る）。</p></div>
 </div>
 </section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— ⑦ を第一候補とする方針案の理由と確認事項</span></summary>
+<div class="plan-fold-inner">
+<p><strong>理由</strong>（数字は 21-6d13 の人間チェック後・<code>max_tokens</code> 32,000 の結果。<a href="../app/sets/umigame-soup-1.html#probe-6d13">設計書 10.6</a>）:</p>
+<ul>
+<li>品質: 合格数 15 / 16 で 6 パターン中最高（P2 0 件・P5 100%・L1 の種別一致 99.4%）。残る NG の L2 一言は 21-6d14 で合格基準を緩めれば解消する見込み。</li>
+<li>安定性: 打ち切り・luna での判定し直し・拒否がいずれも 0 件。</li>
+<li>独立性: luna（OpenAI）と別の会社のモデルなので、見張り役・合意の相手として Jev より筋が通る。合意の試算は luna + Haiku で P2 0・P5 92.9%。</li>
+<li>費用: Claude Code の Max プランに付く API クレジット（月 $100。ユーザー申告）の範囲なら実費がかからない。1 コメントあたりは ⑦ 約 $0.004・① luna 約 $0.0007 で、単価は Haiku のほうが高い。$100 で約 25,000 コメント分（1 日 100 コメントなら月 $12 前後）。</li>
+</ul>
+<p><strong>決める前の確認事項</strong>:</p>
+<ol>
+<li>クレジットの条件（毎月リセットか・繰り越しの有無・自動返信の本番運用に使ってよいか・使い切った後は通常の課金になるか）を Console か Anthropic の案内で確かめる（ユーザー）。</li>
+<li>Console で月の使用額の上限を設定する（ユーザー）。</li>
+<li>Max プランをやめた場合に実費（上の単価）でも続けられるかを見ておく。</li>
+<li>応答時間は 1 コメント中央値 28 秒・最長約 3 分。本番の Lambda の制限時間に余裕を持たせる（21-6f）。</li>
+</ol>
+</div>
+</details>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
 <div class="plan-fold-inner"><p>確認前のため記録なし。</p></div>
 </details>
 </div>
