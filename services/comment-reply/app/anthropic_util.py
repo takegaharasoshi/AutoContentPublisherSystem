@@ -16,8 +16,9 @@ USAGE_FIELDS = (
     "input_tokens", "output_tokens", "cache_creation_input_tokens", "cache_read_input_tokens",
 )
 STRING_CONSTRAINTS = frozenset({"minLength", "maxLength", "pattern", "format"})
-# Thinking at effort max can approach max_tokens=16000; 90 s (the shared default) is too short.
-TIMEOUT_S = 300.0
+# Thinking at effort max can run past 16000 tokens (21-6d13: 7 truncations), so max_tokens is 32000;
+# at ~200 tokens/s that is up to ~160 s, and 90 s (the shared default) is too short.
+TIMEOUT_S = 420.0
 
 
 class AnthropicError(RuntimeError):

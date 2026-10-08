@@ -11,7 +11,7 @@ def judge(comment_id: str, text: str, problem: Problem, *, api_key: str) -> Judg
     """Ask Haiku once, preserving error telemetry for Luna fallback and probes."""
     data, debug = request_json(
         luna.build_prompt(problem), text, luna._schema(), api_key=api_key,
-        effort="max", max_tokens=16000,
+        effort="max", max_tokens=32000,
     )
     try:
         return luna.parse_judgement(data, text, method="haiku", debug=debug)

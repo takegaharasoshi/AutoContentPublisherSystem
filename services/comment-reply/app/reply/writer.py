@@ -123,7 +123,7 @@ def _llm_reply(
     if variant in HAIKU_VARIANTS:
         data, debug = anthropic_util.request_json(
             system, text, reply_schema(), api_key=api_key,
-            effort="max" if with_truth else "low", max_tokens=16000 if with_truth else 4000,
+            effort="max" if with_truth else "low", max_tokens=32000 if with_truth else 4000,
         )
         debug["slot"] = slot
         reply = data.get("reply")

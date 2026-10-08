@@ -88,7 +88,7 @@ def test_judge_text_blocks_request_and_usage(monkeypatch, problem) -> None:
     assert result.debug["prompt_tokens"] == 200 and result.debug["completion_tokens"] == 200
     assert result.debug["latency_s"] >= 0 and result.debug["stop_reason"] == "end_turn"
     assert "thinking" not in result.debug
-    _assert_request(post.call_args.args[0], "max", 16000,
+    _assert_request(post.call_args.args[0], "max", 32000,
                     luna.build_prompt(problem), "病院に行った？", luna._schema())
 
 
@@ -230,7 +230,7 @@ def test_combiner_refusal_rejudges_with_luna_and_logs_both(monkeypatch, problem)
 
 
 @pytest.mark.parametrize("variant,luna_variant,effort,max_tokens", [
-    ("1b-haiku", "1b", "max", 16000), ("1d-haiku", "1d-luna", "low", 4000),
+    ("1b-haiku", "1b", "max", 32000), ("1d-haiku", "1d-luna", "low", 4000),
 ])
 def test_writer_normal_request_and_shared_prompt(
     monkeypatch, problem, variant, luna_variant, effort, max_tokens,
