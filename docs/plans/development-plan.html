@@ -1455,7 +1455,7 @@
 <div class="plan-meta"><strong>21-6d11</strong><span class="plan-status">完了（2026-10-08）</span></div>
 <h3>6 パターンで全件プローブを取り直し、合意ルールと閾値の材料を出す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d7c">21-6d7c</a>・<a href="#step-21-6d8">21-6d8</a>・<a href="#step-21-6d9">21-6d9</a>・<a href="#step-21-6d10b">21-6d10b</a> の完了後。</p>
-<p data-field="result"><strong>結果：</strong>525 件 × 6 パターンの全件プローブで評価ページを作り直した。全指標合格はなし（合格数 ① 13・② 14・③ 14・④ 15・⑤ 13・⑥ 11 / 16）。閾値の掃引と合意ルールの試算は<a href="../app/sets/umigame-soup-1.html#probe-6d11">設計書 10.6</a> に載せた（Jev と Decisions は誤った正解宣言 U01-k03 を共有する。luna を含む合意なら P2 は 0）。費用は ⑥ の分で約 $0.21。不一致 131 組の人間チェックと push はユーザー待ち。</p>
+<p data-field="result"><strong>結果：</strong>525 件 × 6 パターンの全件プローブで評価ページを作り直した。全指標合格はなし（合格数 ① 13・② 14・③ 14・④ 15・⑤ 13・⑥ 11 / 16）。閾値の掃引と合意ルールの試算は<a href="../app/sets/umigame-soup-1.html#probe-6d11">設計書 10.6</a> に載せた（Jev と Decisions は誤った正解宣言 U01-k03 を共有する。luna を含む合意なら P2 は 0）。費用は ⑥ の分で約 $0.21。push 済み。不一致 131 組の人間チェックは 21-6d13 で 8 パターン分をまとめて行う（2026-10-08 ユーザー）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -1585,7 +1585,7 @@
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
 <div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>評価ページの確認と、⑦⑧ で増えた不一致の人間チェック（ユーザー）。push の可否。</p></div>
+<div data-field="gate"><strong>人が確認すること</strong><p>評価ページの確認と、8 パターン全体の不一致の人間チェック（ユーザー。21-6d11 の 6 パターン分〔131 組〕もここでまとめて行う〔2026-10-08 ユーザー〕）。push の可否。</p></div>
 <div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/comment-reply/</code>・<code>docs/</code>）。stop after 20 turns。</p></div>
 </div>
 </section>
