@@ -903,15 +903,57 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </ul>
 <div class="table-wrap">
 <table>
-<tr><th>パターン</th><th>判定のモード</th><th>返信文の案</th><th>21-6d4 の合格数（16 指標中）</th><th>21-6d6 の人間チェック取り込み後</th></tr>
-<tr><td>①</td><td><code>luna</code></td><td><code>1b</code></td><td>12</td><td>13</td></tr>
-<tr><td>②</td><td><code>luna</code></td><td><code>1d-luna</code></td><td>12</td><td>13</td></tr>
-<tr><td>③</td><td><code>hybrid</code></td><td><code>1d-luna</code></td><td>11</td><td>12</td></tr>
-<tr><td>④</td><td><code>jev</code></td><td><code>2b</code></td><td>13</td><td>14</td></tr>
-<tr><td>⑤</td><td><code>jev</code></td><td><code>2c-luna</code></td><td>12</td><td>13</td></tr>
+<tr><th>パターン</th><th>判定のモード</th><th>返信文の案</th><th>21-6d4 の合格数（16 指標中）</th><th>21-6d6 の人間チェック取り込み後</th><th>21-6d11（525 件・人間チェック前）</th></tr>
+<tr><td>①</td><td><code>luna</code></td><td><code>1b</code></td><td>12</td><td>13</td><td>13</td></tr>
+<tr><td>②</td><td><code>luna</code></td><td><code>1d-luna</code></td><td>12</td><td>13</td><td>14</td></tr>
+<tr><td>③</td><td><code>hybrid</code></td><td><code>1d-luna</code></td><td>11</td><td>12</td><td>14</td></tr>
+<tr><td>④</td><td><code>jev</code></td><td><code>2b</code></td><td>13</td><td>14</td><td>15</td></tr>
+<tr><td>⑤</td><td><code>jev</code></td><td><code>2c-luna</code></td><td>12</td><td>13</td><td>13</td></tr>
+<tr><td>⑥</td><td><code>decisions</code></td><td><code>2c-luna</code></td><td>—</td><td>—</td><td>11</td></tr>
 </table>
 </div>
 <p>2026-10-04（21-6d4）の時点で、全指標を満たすパターンはない。2026-10-06（21-6d6）に人間チェックの「許容」26 組を評価データの別解へ取り込んで数え直すと、全パターンで L1① の各種別（guess_close・guess_wrong）が合格に変わったが、全指標を満たすパターンはまだない（残る NG は P2・L2 の一言 / 矛盾ほか。<a href="#d-20261006-human-review-import">付録</a>）。2026-10-08（21-6d9）に P1 を「候補 → 人の確認 → 確定」の 2 段にした。④ の P1 の漏れ候補 1 件（c-impression-04「また遊びにおいで。」）は、同日ユーザーが「漏洩でない」と判断した。これで ④ の P1 は合格になり、合格数は 15 になる（ページ上の判断は書き出す JSON が正式な記録）。方式選定（21-6e）の材料にする。L1① は「全体 90% 以上」と「質問以外の各種別 80% 以上」を別の指標として数える（2026-10-04 ユーザー指示。21-6d3 までは 1 指標・15 指標中で数えていた）。</p>
+
+<p id="probe-6d11"><strong>21-6d11 の全件プローブ</strong>（2026-10-08・<code>work/probe/full-20261008</code>）: 正解基準入りの素材と、境目ケース込みの評価データ 525 件を 6 パターンに通した。全指標を満たすパターンはない。主な NG は次のとおり。</p>
+<ul>
+  <li>P2（誤った正解宣言）: Jev 系・⑥ が各 2 件（Jev は U01-k03・U12-k03、Decisions は U01-k03・U26-k04）</li>
+  <li>P7: ① が 1 件</li>
+  <li>レベル 2 の一言・矛盾語: ①②③⑤⑥</li>
+  <li>⑥ だけの NG: P3（13 件 / 149 件）と L1 の種別一致（85.7%）</li>
+</ul>
+<p>P1 の漏れ候補は全パターン 0 件。P5 は luna 系 94.6%・③ 87.5%・Jev 系 89.3%・⑥ 80.4%。⑥ は Decisions の呼び出し 2,075 回・入力 117 万トークン・拒否 0、判定の応答時間は中央値 0.93 / p95 1.68 秒（Jev 系の 1 ケース全体は 0.81 / 1.33 秒）。不一致は 207 行 = 131 組で、人間チェックはまだ（ユーザー）。</p>
+<p><strong>21-6e の材料</strong>（判定レベル。返信文の冒頭語で数える P2 とは数え方が違う。正解ラベル ④ は 56 件）: 掃引と試算は <code>tools/probe_sweep.py</code> が <code>results.json</code> から再計算する。T_POINT を下げて新たに候補に入るケースの段 B2 は、<code>--fill-b2</code> で実 API から取った（Jev 7 件・Decisions 10 件）。閾値と合意ルールは決めない（21-6e）。</p>
+<div class="table-wrap">
+<table>
+<tr><th>T_POINT</th><th>Jev 誤った正解宣言</th><th>Jev P5</th><th>Decisions 誤った正解宣言</th><th>Decisions P5</th></tr>
+<tr><td>0.3</td><td>4</td><td>98.2%</td><td>5</td><td>89.3%</td></tr>
+<tr><td>0.4</td><td>3</td><td>94.6%</td><td>3</td><td>85.7%</td></tr>
+<tr><td>0.5（現行）</td><td>2</td><td>89.3%</td><td>2</td><td>80.4%</td></tr>
+<tr><td>0.6</td><td>1</td><td>82.1%</td><td>2</td><td>80.4%</td></tr>
+<tr><td>0.7</td><td>1</td><td>78.6%</td><td>0</td><td>71.4%</td></tr>
+<tr><td>0.8</td><td>1</td><td>71.4%</td><td>0</td><td>58.9%</td></tr>
+<tr><td>0.9</td><td>0</td><td>48.2%</td><td>0</td><td>51.8%</td></tr>
+</table>
+</div>
+<p>T_CLOSE（推理の経路で全要点に当たらないケースの ⑤ / ⑥ の分かれ目）について:</p>
+<ul>
+  <li>Jev は 0.10 → 0.50 で「⑥ を ⑤ に上げる」が 11 → 0 件に減る。現行 0.25 では 5 件。「⑤ を ⑥ に落とす」は 0.50 で初めて 1 件出る</li>
+  <li>Decisions は 0.15 以上なら両方 0 件</li>
+</ul>
+<p>T_CONTRADICT（現行 0.5）は、Jev では 0.6 で P5 が 1 件増え、0.7 以上で誤った正解宣言が増える。Decisions は 0.3〜0.9 で変わらない。</p>
+<div class="table-wrap">
+<table>
+<tr><th>正解宣言に合意を要する組み合わせ</th><th>P2 誤った正解宣言</th><th>P5</th><th>割れ（一部だけ ④）</th></tr>
+<tr><td>luna 単独</td><td>0</td><td>94.6%（53/56）</td><td>—</td></tr>
+<tr><td>Jev 単独</td><td>2</td><td>89.3%（50/56）</td><td>—</td></tr>
+<tr><td>Decisions 単独</td><td>2</td><td>80.4%（45/56）</td><td>—</td></tr>
+<tr><td>luna + Jev</td><td>0</td><td>87.5%（49/56）</td><td>7</td></tr>
+<tr><td>luna + Decisions</td><td>0</td><td>78.6%（44/56）</td><td>12</td></tr>
+<tr><td>Jev + Decisions</td><td>1（U01-k03）</td><td>75.0%（42/56）</td><td>13</td></tr>
+<tr><td>3 方式すべて</td><td>0</td><td>75.0%（42/56）</td><td>16</td></tr>
+</table>
+</div>
+<div class="note"><span class="callout-title">読み方</span>Jev と Decisions が同じ誤り（U01-k03）をそろって宣言しているので、Decisions を Jev の見張り役に足しても P2 は 0 にならない。luna を組み合わせに入れると P2 は 0 になるが、P5 は合意の相手の分だけ下がる。⑥ は Jev と同じ段・閾値で動かしたが、P5 と L1 の種別一致はいずれも Jev より低い。</div>
 
 <h4>評価ページ</h4>
 <p><a href="umigame-soup-1-probe.html">コメント返信の評価（プローブ）</a>。サマリー 1 枚（合否表・指標）+ 問題ごとの 14 枚（コメント一覧と生データ）。合否表の NG の ID から該当の行へ飛べる。生成器は <code>tools/build_probe_page.py</code>。</p>

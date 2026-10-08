@@ -9,7 +9,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -27,26 +27,27 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 156,
+            "completion_tokens": 235,
             "finish_reason": "stop",
-            "latency_s": 2.492755,
+            "latency_s": 3.43359,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2977,
-            "reasoning_tokens": 92
+            "prompt_tokens": 3376,
+            "reasoning_tokens": 172
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実では、集まりの場で手渡されています。"
+          "reason": "確定事実では、男の家のポストではなく集まりの場で手渡されています。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。男の家のポストには届いていないよ。"
+        "text": "いいえ。手紙は男の家のポストに届いたのではないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -54,17 +55,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙って男の家のポストに届いたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.4928175380046014,
-      "luna_s": 2.4928175380046014,
-      "total_s": 5.430848093004897,
-      "writer_s": 2.938030555000296
+      "judge_s": 3.433656499022618,
+      "luna_s": 3.433656499022618,
+      "total_s": 5.48218078003265,
+      "writer_s": 2.0485242810100317
     }
   },
   {
@@ -76,7 +77,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -94,26 +95,27 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 160,
+            "completion_tokens": 205,
             "finish_reason": "stop",
-            "latency_s": 3.762005,
+            "latency_s": 2.853463,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2980,
-            "reasoning_tokens": 88
+            "prompt_tokens": 3379,
+            "reasoning_tokens": 139
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "何十年も配達にかけたわけではないと確定しています。"
+          "reason": "手紙は意図して保管されており、配達に何十年もかかったのではありません。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかの可能性も聞いてみようか？"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -121,17 +123,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "郵便屋さんが何十年もかけて配達したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.7620335439860355,
-      "luna_s": 3.7620335439860355,
-      "total_s": 5.692024728981778,
-      "writer_s": 1.9299911849957425
+      "judge_s": 2.8535148450173438,
+      "luna_s": 2.8535148450173438,
+      "total_s": 4.382129763951525,
+      "writer_s": 1.5286149189341813
     }
   },
   {
@@ -143,7 +145,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -161,22 +163,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 213,
+            "completion_tokens": 221,
             "finish_reason": "stop",
-            "latency_s": 3.18508,
+            "latency_s": 2.61258,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2976,
-            "reasoning_tokens": 145
+            "prompt_tokens": 3375,
+            "reasoning_tokens": 155
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、手紙は学校の行事で書かれたとあります。"
+          "reason": "学校の行事で書かれた手紙だと確定事実にあります。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -188,17 +191,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "学校の行事で書かれた手紙なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1851323220180348,
-      "luna_s": 3.1851323220180348,
-      "total_s": 4.272468308015959,
-      "writer_s": 1.0873359859979246
+      "judge_s": 2.612672023009509,
+      "luna_s": 2.612672023009509,
+      "total_s": 3.766822688980028,
+      "writer_s": 1.1541506659705192
     }
   },
   {
@@ -210,7 +213,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -228,22 +231,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 216,
+            "completion_tokens": 174,
             "finish_reason": "stop",
-            "latency_s": 2.85727,
+            "latency_s": 2.476777,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2976,
-            "reasoning_tokens": 147
+            "prompt_tokens": 3375,
+            "reasoning_tokens": 120
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "保管の目的を尋ねる質問で、確定事実に明記されています。"
+          "reason": "あとで読まれるよう意図して保管されていました。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -255,17 +259,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "あとで読まれるように保管されてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.8573320909927133,
-      "luna_s": 2.8573320909927133,
-      "total_s": 4.125505431991769,
-      "writer_s": 1.2681733409990557
+      "judge_s": 2.4768293109955266,
+      "luna_s": 2.4768293109955266,
+      "total_s": 3.5514013919746503,
+      "writer_s": 1.0745720809791237
     }
   },
   {
@@ -277,7 +281,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -295,22 +299,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 264,
+            "completion_tokens": 202,
             "finish_reason": "stop",
-            "latency_s": 3.236315,
+            "latency_s": 3.583241,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2976,
-            "reasoning_tokens": 184
+            "prompt_tokens": 3375,
+            "reasoning_tokens": 132
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "書き手が男の息子かを尋ねる、はい・いいえで答えられる質問です。"
+          "reason": "確定事実で、書いた男の子は男の息子ではないと示されています。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -322,17 +327,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "書いた男の子って、男の息子なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.236370981991058,
-      "luna_s": 3.236370981991058,
-      "total_s": 4.136391659965739,
-      "writer_s": 0.9000206779746804
+      "judge_s": 3.583386866026558,
+      "luna_s": 3.583386866026558,
+      "total_s": 5.121848889044486,
+      "writer_s": 1.538462023017928
     }
   },
   {
@@ -344,7 +349,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -362,26 +367,27 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 262,
+            "completion_tokens": 236,
             "finish_reason": "stop",
-            "latency_s": 3.302679,
+            "latency_s": 2.6902,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2972,
-            "reasoning_tokens": 193
+            "prompt_tokens": 3371,
+            "reasoning_tokens": 165
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、男の子は有名人ではないと明記されています。"
+          "reason": "男の子は有名人ではないと確定事実にあるため。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。その子は有名人ではなかったよ。"
+        "text": "いいえ。その子は有名人じゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -389,17 +395,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "その子は有名人だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.302738008002052,
-      "luna_s": 3.302738008002052,
-      "total_s": 5.734382889000699,
-      "writer_s": 2.431644880998647
+      "judge_s": 2.6902422659331933,
+      "luna_s": 2.6902422659331933,
+      "total_s": 5.211632308899425,
+      "writer_s": 2.5213900429662317
     }
   },
   {
@@ -411,7 +417,1095 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": "no",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 278,
+            "finish_reason": "stop",
+            "latency_s": 3.069214,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3373,
+            "reasoning_tokens": 212
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "真相では、男はその子に一度も会ったことがありません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。男はその子に会ったことはないよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男はその子に会ったことがある？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.069243893958628,
+      "luna_s": 3.069243893958628,
+      "total_s": 5.418511798954569,
+      "writer_s": 2.3492679049959406
+    }
+  },
+  {
+    "case_id": "U13-e08",
+    "record": {
+      "comment_id": "U13-e08",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": "no",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 351,
+            "finish_reason": "stop",
+            "latency_s": 3.960462,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3381,
+            "reasoning_tokens": 279
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "夢の中身は問題に関係ないと確定事実に明記されているため。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。ふむふむ、次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙に書かれてた夢の内容って、答えに関係ある？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.960516001912765,
+      "luna_s": 3.960516001912765,
+      "total_s": 5.65856032888405,
+      "writer_s": 1.698044326971285
+    }
+  },
+  {
+    "case_id": "U13-e09",
+    "record": {
+      "comment_id": "U13-e09",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": "yes",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 254,
+            "finish_reason": "stop",
+            "latency_s": 3.300731,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3376,
+            "reasoning_tokens": 183
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "確定事実で、男は手紙の宛先どおりの正しい受け取り手です。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！手紙の宛先は男で合ってたよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙の宛先は男で合ってたの？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.3007834979798645,
+      "luna_s": 3.3007834979798645,
+      "total_s": 5.801571585005149,
+      "writer_s": 2.5007880870252848
+    }
+  },
+  {
+    "case_id": "U13-e10",
+    "record": {
+      "comment_id": "U13-e10",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": "no",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 340,
+            "finish_reason": "stop",
+            "latency_s": 4.018462,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3375,
+            "reasoning_tokens": 262
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "確定事実に、男は手紙を受け取っても驚かなかったとあります。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男は手紙を読んで驚いてた？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.018516950076446,
+      "luna_s": 4.018516950076446,
+      "total_s": 5.223453039070591,
+      "writer_s": 1.2049360889941454
+    }
+  },
+  {
+    "case_id": "U13-e11",
+    "record": {
+      "comment_id": "U13-e11",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "q_multi"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 123,
+            "finish_reason": "stop",
+            "latency_s": 1.89144,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3376,
+            "reasoning_tokens": 45
+          },
+          "error": null,
+          "kind": "q_multi",
+          "reason": "「いつ書いたの？」と「誰が書いたの？」の二つの質問があります。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "質問は1つずつコメントしてね。どっちから聞こうか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙はいつ書いたの？誰が書いたの？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 1.8914656169945374,
+      "luna_s": 1.8914656169945374,
+      "total_s": 3.422941679949872,
+      "writer_s": 1.5314760629553348
+    }
+  },
+  {
+    "case_id": "U13-e12",
+    "record": {
+      "comment_id": "U13-e12",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "q_multi"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 201,
+            "finish_reason": "stop",
+            "latency_s": 2.672174,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3383,
+            "reasoning_tokens": 116
+          },
+          "error": null,
+          "kind": "q_multi",
+          "reason": "受け取った場所と郵便で届いたかの、二つの質問が含まれています。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "質問はひとつずつコメントしてね。まずはどちらか聞いてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "どこで手紙を受け取ったの？それは郵便で届いたの？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.6722024379996583,
+      "luna_s": 2.6722024379996583,
+      "total_s": 4.781163547071628,
+      "writer_s": 2.10896110907197
+    }
+  },
+  {
+    "case_id": "U13-e13",
+    "record": {
+      "comment_id": "U13-e13",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "q_open"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 170,
+            "finish_reason": "stop",
+            "latency_s": 2.13693,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3382,
+            "reasoning_tokens": 86
+          },
+          "error": null,
+          "kind": "q_open",
+          "reason": "「なぜ」と理由を尋ねる、はい／いいえで答えられない質問です。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい／いいえで答えられる形にして聞いてごらん。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "なぜ男は、その子がどんな子か誰よりよく知っていたの？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.1369758039945737,
+      "luna_s": 2.1369758039945737,
+      "total_s": 4.280357182025909,
+      "writer_s": 2.1433813780313358
+    }
+  },
+  {
+    "case_id": "U13-e14",
+    "record": {
+      "comment_id": "U13-e14",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "q_open"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 221,
+            "finish_reason": "stop",
+            "latency_s": 2.546386,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3378,
+            "reasoning_tokens": 129
+          },
+          "error": null,
+          "kind": "q_open",
+          "reason": "「どうして」と理由を尋ねる、はい／いいえで答えられない質問です。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい／いいえで答えられる形で聞いてごらん。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "どうして男はその子に一度も会っていないの？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.546478986972943,
+      "luna_s": 2.546478986972943,
+      "total_s": 4.833861564984545,
+      "writer_s": 2.287382578011602
+    }
+  },
+  {
+    "case_id": "U13-e15",
+    "record": {
+      "comment_id": "U13-e15",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": "no",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 227,
+            "finish_reason": "stop",
+            "latency_s": 3.324184,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3373,
+            "reasoning_tokens": 150
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "「その子」と「彼」は問題文の人物を指す二択質問で、会ったことはありません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。ふむふむ、次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "その子は彼に会ったことがある？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.3242285690503195,
+      "luna_s": 3.3242285690503195,
+      "total_s": 5.038827152107842,
+      "writer_s": 1.7145985830575228
+    }
+  },
+  {
+    "case_id": "U13-e16",
+    "record": {
+      "comment_id": "U13-e16",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 269,
+            "finish_reason": "stop",
+            "latency_s": 3.315199,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3432,
+            "reasoning_tokens": 160
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "手紙の主が昔の男自身で、タイムカプセルに入っていた点も当てています。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！手紙は小学生の男が未来の自分へ書いたもの。50年後、同窓会でタイムカプセルから受け取った。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男が小学生のころ、未来の自分宛てに書いた手紙を学校のタイムカプセルに入れ、50年後の同窓会で受け取った。書いた子は昔の男自身だからよく知っているし、自分には会えなかったんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.3152683340013027,
+      "luna_s": 3.3152683340013027,
+      "total_s": 3.31527525302954,
+      "writer_s": 6.919028237462044e-06
+    }
+  },
+  {
+    "case_id": "U13-e17",
+    "record": {
+      "comment_id": "U13-e17",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 367,
+            "finish_reason": "stop",
+            "latency_s": 3.595303,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3424,
+            "reasoning_tokens": 257
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "子どもの頃の本人とタイムカプセルの両方を明確に当てています。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！手紙は小学生の男が未来の自分へ書いたもの。50年後、同窓会でタイムカプセルから受け取った。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "小学生の男が未来の自分に宛てて書いた手紙を、学校のタイムカプセルから同窓会で受け取った。書いた子は昔の自分だから、誰より知っていても会ったことはないってこと？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.595357840997167,
+      "luna_s": 3.595357840997167,
+      "total_s": 3.5953604039968923,
+      "writer_s": 2.562999725341797e-06
+    }
+  },
+  {
+    "case_id": "U13-e18",
+    "record": {
+      "comment_id": "U13-e18",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 258,
+            "finish_reason": "stop",
+            "latency_s": 3.028211,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3391,
+            "reasoning_tokens": 193
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "手紙が長く保管されていた点には触れていますが、核心の説明には届いていません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "学校で書かれた古い手紙が何十年も保管されていて、男に渡ったんじゃない？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.0282362279249355,
+      "luna_s": 3.0282362279249355,
+      "total_s": 4.777887896983884,
+      "writer_s": 1.7496516690589488
+    }
+  },
+  {
+    "case_id": "U13-e19",
+    "record": {
+      "comment_id": "U13-e19",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": "yes",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 414,
+            "finish_reason": "stop",
+            "latency_s": 4.578075,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3380,
+            "reasoning_tokens": 348
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "書いた子が男自身かを一つだけ確認する質問です。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！ふむふむ、次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙を書いた男の子って、昔の男自身なんでしょ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.578131975024007,
+      "luna_s": 4.578131975024007,
+      "total_s": 6.977386708138511,
+      "writer_s": 2.3992547331145033
+    }
+  },
+  {
+    "case_id": "U13-e20",
+    "record": {
+      "comment_id": "U13-e20",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 241,
+            "finish_reason": "stop",
+            "latency_s": 3.26426,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3385,
+            "reasoning_tokens": 174
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "郵便の遅配という明確な誤りで、核心の要点には触れていません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。別の可能性も考えてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "郵便局が配達を忘れていて、50年後に遅れて届けたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.2643116409890354,
+      "luna_s": 3.2643116409890354,
+      "total_s": 4.721504688961431,
+      "writer_s": 1.457193047972396
+    }
+  },
+  {
+    "case_id": "U13-e21",
+    "record": {
+      "comment_id": "U13-e21",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 144,
+            "finish_reason": "stop",
+            "latency_s": 2.351696,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3391,
+            "reasoning_tokens": 78
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "手紙の主を息子という別人としており、核心の要点に触れていません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。別の可能性も考えてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙を書いたのは男の息子で、男はその子のことを周りから聞いて知ったんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.3517535889986902,
+      "luna_s": 2.3517535889986902,
+      "total_s": 3.5785199030069634,
+      "writer_s": 1.2267663140082732
+    }
+  },
+  {
+    "case_id": "U13-b22",
+    "record": {
+      "comment_id": "U13-b22",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": "no",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 284,
+            "finish_reason": "stop",
+            "latency_s": 3.318147,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3372,
+            "reasoning_tokens": 222
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "手紙は自宅のポストではなく、集まりの場で本人に手渡されています。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。郵便では届いていないよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙は郵便で届いたの？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.318193148006685,
+      "luna_s": 3.318193148006685,
+      "total_s": 6.029912409954704,
+      "writer_s": 2.7117192619480193
+    }
+  },
+  {
+    "case_id": "U13-b23",
+    "record": {
+      "comment_id": "U13-b23",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -431,1098 +1525,25 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "debug": {
             "completion_tokens": 335,
             "finish_reason": "stop",
-            "latency_s": 3.96944,
+            "latency_s": 3.348717,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2974,
-            "reasoning_tokens": 254
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "真相では昔の自分とは会えず、問題文でも一度も会っていないため。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。男はその子に会ったことはないよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男はその子に会ったことがある？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.969465564994607,
-      "luna_s": 3.969465564994607,
-      "total_s": 6.845569608005462,
-      "writer_s": 2.876104043010855
-    }
-  },
-  {
-    "case_id": "U13-e08",
-    "record": {
-      "comment_id": "U13-e08",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 269,
-            "finish_reason": "stop",
-            "latency_s": 3.597925,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2982,
-            "reasoning_tokens": 192
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "夢の内容が答えに関係するかを尋ねる、単独のはい／いいえ質問です。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。ほかのことも聞いてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "手紙に書かれてた夢の内容って、答えに関係ある？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.5979790530109312,
-      "luna_s": 3.5979790530109312,
-      "total_s": 4.973416671011364,
-      "writer_s": 1.3754376180004328
-    }
-  },
-  {
-    "case_id": "U13-e09",
-    "record": {
-      "comment_id": "U13-e09",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": "yes",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "yes",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 225,
-            "finish_reason": "stop",
-            "latency_s": 3.107181,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2977,
-            "reasoning_tokens": 151
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "確定事実で、男は宛先どおりの正しい受け取り手とされています。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい！手紙の宛先は男で合ってたよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "手紙の宛先は男で合ってたの？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.107235085015418,
-      "luna_s": 3.107235085015418,
-      "total_s": 4.2862915890000295,
-      "writer_s": 1.1790565039846115
-    }
-  },
-  {
-    "case_id": "U13-e10",
-    "record": {
-      "comment_id": "U13-e10",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [
-        "writer: writer reply does not begin with the required answer word"
-      ],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 195,
-            "finish_reason": "stop",
-            "latency_s": 2.582158,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2976,
-            "reasoning_tokens": 126
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "確定事実では、男は驚かず、懐かしそうに笑っています。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "fallback_template",
-        "text": "いいえ。ひとつずつ確かめていこうね。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は手紙を読んで驚いてた？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 2.5822129430016503,
-      "luna_s": 2.5822129430016503,
-      "total_s": 3.6483737810049206,
-      "writer_s": 1.0661608380032703
-    }
-  },
-  {
-    "case_id": "U13-e11",
-    "record": {
-      "comment_id": "U13-e11",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "q_multi"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 127,
-            "finish_reason": "stop",
-            "latency_s": 1.90592,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2977,
-            "reasoning_tokens": 55
-          },
-          "error": null,
-          "kind": "q_multi",
-          "reason": "「いつ書いたか」と「誰が書いたか」の質問が二つあります。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "質問はひとつずつ聞いてごらん。どっちからにする？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "手紙はいつ書いたの？誰が書いたの？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 1.9059489930223208,
-      "luna_s": 1.9059489930223208,
-      "total_s": 3.770747304020915,
-      "writer_s": 1.8647983109985944
-    }
-  },
-  {
-    "case_id": "U13-e12",
-    "record": {
-      "comment_id": "U13-e12",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "q_multi"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 161,
-            "finish_reason": "stop",
-            "latency_s": 2.508417,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2984,
-            "reasoning_tokens": 80
-          },
-          "error": null,
-          "kind": "q_multi",
-          "reason": "受け取った場所と郵便で届いたかの、質問が2つあります。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どちらかひとつ聞いてごらん。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "どこで手紙を受け取ったの？それは郵便で届いたの？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 2.5084459260106087,
-      "luna_s": 2.5084459260106087,
-      "total_s": 4.326679619989591,
-      "writer_s": 1.818233693978982
-    }
-  },
-  {
-    "case_id": "U13-e13",
-    "record": {
-      "comment_id": "U13-e13",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "q_open"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 185,
-            "finish_reason": "stop",
-            "latency_s": 2.502388,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2983,
-            "reasoning_tokens": 102
-          },
-          "error": null,
-          "kind": "q_open",
-          "reason": "「なぜ」と理由を尋ねており、はい・いいえでは答えられない質問です。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい・いいえで答えられる形にして、聞き直してごらん☺️"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "なぜ男は、その子がどんな子か誰よりよく知っていたの？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 2.502423539001029,
-      "luna_s": 2.502423539001029,
-      "total_s": 6.082053892983822,
-      "writer_s": 3.579630353982793
-    }
-  },
-  {
-    "case_id": "U13-e14",
-    "record": {
-      "comment_id": "U13-e14",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "q_open"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 195,
-            "finish_reason": "stop",
-            "latency_s": 2.415324,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2979,
-            "reasoning_tokens": 115
-          },
-          "error": null,
-          "kind": "q_open",
-          "reason": "理由を尋ねる質問で、はい／いいえでは答えられません。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "男がその子に一度も会っていないのは、何か理由があるの？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "どうして男はその子に一度も会っていないの？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 2.4153483519912697,
-      "luna_s": 2.4153483519912697,
-      "total_s": 4.912204638996627,
-      "writer_s": 2.4968562870053574
-    }
-  },
-  {
-    "case_id": "U13-e15",
-    "record": {
-      "comment_id": "U13-e15",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 331,
-            "finish_reason": "stop",
-            "latency_s": 4.238863,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2974,
+            "prompt_tokens": 3371,
             "reasoning_tokens": 262
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "一つのはい・いいえ質問で、真相から会っていないと判断できます。"
+          "reason": "男の子は男自身の子どもの頃であり、父親ではありません。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "その子は彼に会ったことがある？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 4.238919641007669,
-      "luna_s": 4.238919641007669,
-      "total_s": 5.422229172021616,
-      "writer_s": 1.183309531013947
-    }
-  },
-  {
-    "case_id": "U13-e16",
-    "record": {
-      "comment_id": "U13-e16",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_correct"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 283,
-            "finish_reason": "stop",
-            "latency_s": 3.227188,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3033,
-            "reasoning_tokens": 169
-          },
-          "error": null,
-          "kind": "guess_correct",
-          "reason": "手紙の主が子どもの頃の男自身で、タイムカプセルに入っていた点を説明しています。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "template",
-        "text": "正解！手紙は小学生の男が未来の自分へ書いたもの。50年後、同窓会でタイムカプセルから受け取った。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男が小学生のころ、未来の自分宛てに書いた手紙を学校のタイムカプセルに入れ、50年後の同窓会で受け取った。書いた子は昔の男自身だからよく知っているし、自分には会えなかったんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.2272247989894822,
-      "luna_s": 3.2272247989894822,
-      "total_s": 3.227240489970427,
-      "writer_s": 1.5690980944782495e-05
-    }
-  },
-  {
-    "case_id": "U13-e17",
-    "record": {
-      "comment_id": "U13-e17",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_correct"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 257,
-            "finish_reason": "stop",
-            "latency_s": 3.131084,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3025,
-            "reasoning_tokens": 152
-          },
-          "error": null,
-          "kind": "guess_correct",
-          "reason": "子どもの頃の自分とタイムカプセルの両方を言い当てています。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "template",
-        "text": "正解！手紙は小学生の男が未来の自分へ書いたもの。50年後、同窓会でタイムカプセルから受け取った。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "小学生の男が未来の自分に宛てて書いた手紙を、学校のタイムカプセルから同窓会で受け取った。書いた子は昔の自分だから、誰より知っていても会ったことはないってこと？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.131135331990663,
-      "luna_s": 3.131135331990663,
-      "total_s": 3.131140143988887,
-      "writer_s": 4.811998223885894e-06
-    }
-  },
-  {
-    "case_id": "U13-e18",
-    "record": {
-      "comment_id": "U13-e18",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_wrong"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 925,
-            "finish_reason": "stop",
-            "latency_s": 9.091964,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2992,
-            "reasoning_tokens": 853
-          },
-          "error": null,
-          "kind": "guess_wrong",
-          "reason": "保管と受け渡しに触れるだけで、核心の仕掛けには届いていません。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "残念、ちがうよ。ほかの考えも聞かせてね。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "学校で書かれた古い手紙が何十年も保管されていて、男に渡ったんじゃない？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 9.091993099980755,
-      "luna_s": 9.091993099980755,
-      "total_s": 10.984847792977234,
-      "writer_s": 1.8928546929964796
-    }
-  },
-  {
-    "case_id": "U13-e19",
-    "record": {
-      "comment_id": "U13-e19",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 236,
-            "finish_reason": "stop",
-            "latency_s": 3.242494,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2981,
-            "reasoning_tokens": 178
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "手紙の主が昔の男自身という核心の一部に触れています。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し考えてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "手紙を書いた男の子って、昔の男自身なんでしょ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.242633507004939,
-      "luna_s": 3.242633507004939,
-      "total_s": 4.670174318016507,
-      "writer_s": 1.4275408110115677
-    }
-  },
-  {
-    "case_id": "U13-e20",
-    "record": {
-      "comment_id": "U13-e20",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_wrong"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 265,
-            "finish_reason": "stop",
-            "latency_s": 3.356285,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2986,
-            "reasoning_tokens": 198
-          },
-          "error": null,
-          "kind": "guess_wrong",
-          "reason": "郵便局の配達遅延という推理で、仕掛けの核心には触れていません。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "残念、ちがうよ。別の可能性も考えてみようか。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "郵便局が配達を忘れていて、50年後に遅れて届けたんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.3563460980076343,
-      "luna_s": 3.3563460980076343,
-      "total_s": 4.497883965988876,
-      "writer_s": 1.141537867981242
-    }
-  },
-  {
-    "case_id": "U13-e21",
-    "record": {
-      "comment_id": "U13-e21",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_wrong"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 302,
-            "finish_reason": "stop",
-            "latency_s": 3.642199,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2992,
-            "reasoning_tokens": 232
-          },
-          "error": null,
-          "kind": "guess_wrong",
-          "reason": "手紙の主を息子とし、知った理由も真相と異なるため、核心に触れていません。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "手紙を書いたのは男の息子で、男はその子のことを周りから聞いて知ったんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.642254945007153,
-      "luna_s": 3.642254945007153,
-      "total_s": 5.030804189009359,
-      "writer_s": 1.3885492440022063
-    }
-  },
-  {
-    "case_id": "U13-b22",
-    "record": {
-      "comment_id": "U13-b22",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 176,
-            "finish_reason": "stop",
-            "latency_s": 2.791844,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2973,
-            "reasoning_tokens": 99
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "手紙は集まりの場で手渡されており、郵便で届いたわけではありません。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。郵便で届いたのではないよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "手紙は郵便で届いたの？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 2.7918775209982414,
-      "luna_s": 2.7918775209982414,
-      "total_s": 5.086981177009875,
-      "writer_s": 2.2951036560116336
-    }
-  },
-  {
-    "case_id": "U13-b23",
-    "record": {
-      "comment_id": "U13-b23",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": false
-      },
-      "content_key": "004-fifty-year-letter",
-      "errors": [],
-      "fact_sheet_hash": "fde385625dde",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 256,
-            "finish_reason": "stop",
-            "latency_s": 3.462391,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2972,
-            "reasoning_tokens": 199
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "確定事実で、男の子は男の息子ではありません。"
-        }
-      },
-      "media_id": "local-U13",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。次はどうかな？"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1530,17 +1551,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男はその子の父親なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.4624302760057617,
-      "luna_s": 3.4624302760057617,
-      "total_s": 4.324194072018145,
-      "writer_s": 0.861763796012383
+      "judge_s": 3.3487618829822168,
+      "luna_s": 3.3487618829822168,
+      "total_s": 4.5571946209529415,
+      "writer_s": 1.2084327379707247
     }
   },
   {
@@ -1552,7 +1573,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1570,22 +1591,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 191,
+            "completion_tokens": 311,
             "finish_reason": "stop",
-            "latency_s": 2.997175,
+            "latency_s": 4.41116,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2976,
-            "reasoning_tokens": 118
+            "prompt_tokens": 3375,
+            "reasoning_tokens": 239
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "真相では仕事を通じて知ったのではなく、自分自身のことです。"
+          "reason": "男がその子を知っていたのは、仕事を通じてではありません。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1597,17 +1619,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "仕事を通じてその子を知ってたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.997264062985778,
-      "luna_s": 2.997264062985778,
-      "total_s": 4.094134952989407,
-      "writer_s": 1.096870890003629
+      "judge_s": 4.4112422209000215,
+      "luna_s": 4.4112422209000215,
+      "total_s": 5.539124404895119,
+      "writer_s": 1.1278821839950979
     }
   },
   {
@@ -1619,7 +1641,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1637,26 +1659,27 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 961,
+            "completion_tokens": 295,
             "finish_reason": "stop",
-            "latency_s": 10.076584,
+            "latency_s": 3.892223,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2974,
-            "reasoning_tokens": 880
+            "prompt_tokens": 3373,
+            "reasoning_tokens": 222
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "その子は本人の子ども時代なので、手紙が届く前から知っていたと判断できます。"
+          "reason": "男は手紙を書いた子の成長後の本人なので、届く前から知っていた。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！その調子で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1664,17 +1687,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙が届く前から知ってた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 10.076637291000225,
-      "luna_s": 10.076637291000225,
-      "total_s": 10.982995886995923,
-      "writer_s": 0.9063585959956981
+      "judge_s": 3.8922851940151304,
+      "luna_s": 3.8922851940151304,
+      "total_s": 5.009303178056143,
+      "writer_s": 1.1170179840410128
     }
   },
   {
@@ -1686,7 +1709,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1704,12 +1727,12 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 210,
+            "completion_tokens": 207,
             "finish_reason": "stop",
-            "latency_s": 2.891121,
+            "latency_s": 3.418599,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2973,
-            "reasoning_tokens": 135
+            "prompt_tokens": 3372,
+            "reasoning_tokens": 133
           },
           "error": null,
           "kind": "q_yesno",
@@ -1718,8 +1741,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1731,17 +1755,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男はその子の主治医なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.891170802002307,
-      "luna_s": 2.891170802002307,
-      "total_s": 3.9772097879904322,
-      "writer_s": 1.0860389859881252
+      "judge_s": 3.4186579739907756,
+      "luna_s": 3.4186579739907756,
+      "total_s": 4.691170406062156,
+      "writer_s": 1.2725124320713803
     }
   },
   {
@@ -1753,7 +1777,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1771,22 +1795,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 326,
+            "completion_tokens": 303,
             "finish_reason": "stop",
-            "latency_s": 4.069124,
+            "latency_s": 3.783443,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2972,
-            "reasoning_tokens": 247
+            "prompt_tokens": 3371,
+            "reasoning_tokens": 233
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男の子が実在したかを尋ねる一問で、真相でも本人の過去として描かれています。"
+          "reason": "手紙を書いたのは男の幼少期の本人で、実在した子どもです。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1798,17 +1823,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "その子は実在する子なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.069151693984168,
-      "luna_s": 4.069151693984168,
-      "total_s": 5.472904193971772,
-      "writer_s": 1.403752499987604
+      "judge_s": 3.7834896879503503,
+      "luna_s": 3.7834896879503503,
+      "total_s": 5.063216535956599,
+      "writer_s": 1.2797268480062485
     }
   },
   {
@@ -1820,7 +1845,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1828,36 +1853,37 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "errors": [],
       "fact_sheet_hash": "fde385625dde",
       "final": {
-        "answer": "no",
+        "answer": "irrelevant",
         "decision": "luna",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": null,
         "luna": {
-          "answer": "no",
+          "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 207,
+            "completion_tokens": 288,
             "finish_reason": "stop",
-            "latency_s": 3.528513,
+            "latency_s": 3.878832,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2970,
-            "reasoning_tokens": 134
+            "prompt_tokens": 3369,
+            "reasoning_tokens": 211
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "手紙を書いた子は今の男と同一人物で、その子は有名人ではありません。"
+          "reason": "男の知名度は真相に関係せず、確定事実からも判断できません。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。"
+        "text": "関係ないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1865,17 +1891,425 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男は有名人なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.5285759269900154,
-      "luna_s": 3.5285759269900154,
-      "total_s": 4.617938028997742,
-      "writer_s": 1.0893621020077262
+      "judge_s": 3.878899198025465,
+      "luna_s": 3.878899198025465,
+      "total_s": 6.408182541024871,
+      "writer_s": 2.529283342999406
+    }
+  },
+  {
+    "case_id": "U13-k01",
+    "record": {
+      "comment_id": "U13-k01",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 470,
+            "finish_reason": "stop",
+            "latency_s": 4.60166,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3398,
+            "reasoning_tokens": 361
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "書き手が男自身で、未来向けに埋めた学校の箱にも触れています。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！手紙は小学生の男が未来の自分へ書いたもの。50年後、同窓会でタイムカプセルから受け取った。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "書き手は幼い頃の男自身で、学校の記念箱を掘り出して未来向けの手紙が届いたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.60172583500389,
+      "luna_s": 4.60172583500389,
+      "total_s": 4.601739995996468,
+      "writer_s": 1.4160992577672005e-05
+    }
+  },
+  {
+    "case_id": "U13-k02",
+    "record": {
+      "comment_id": "U13-k02",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 302,
+            "finish_reason": "stop",
+            "latency_s": 3.532363,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3395,
+            "reasoning_tokens": 186
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "少年が男自身で、手紙を将来読むため学校に埋めた企画から出た点を両方当てています。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！手紙は小学生の男が未来の自分へ書いたもの。50年後、同窓会でタイムカプセルから受け取った。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙の少年は昔の男で、校内の埋蔵企画に将来読むものとして預けられていたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.5324162259930745,
+      "luna_s": 3.5324162259930745,
+      "total_s": 3.532421477022581,
+      "writer_s": 5.251029506325722e-06
+    }
+  },
+  {
+    "case_id": "U13-k03",
+    "record": {
+      "comment_id": "U13-k03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 341,
+            "finish_reason": "stop",
+            "latency_s": 4.690075,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3400,
+            "reasoning_tokens": 270
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "書き手が男の子どもの頃の本人という要点は当たっていますが、タイムカプセルには触れていません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！ほかの可能性も考えてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "書き手は男が子どもだった頃の本人で、何十年も経ってから学校の記念行事で手紙が渡ったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.690152170020156,
+      "luna_s": 4.690152170020156,
+      "total_s": 6.361147043062374,
+      "writer_s": 1.6709948730422184
+    }
+  },
+  {
+    "case_id": "U13-k04",
+    "record": {
+      "comment_id": "U13-k04",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 364,
+            "finish_reason": "stop",
+            "latency_s": 4.363034,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3394,
+            "reasoning_tokens": 297
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "将来用に埋めた箱は当てていますが、書いた子が男自身とは述べていません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙を書いた子は同じ学校の卒業生で、将来用に埋めておいた箱から届いたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.363073818036355,
+      "luna_s": 4.363073818036355,
+      "total_s": 5.640531755052507,
+      "writer_s": 1.2774579370161518
+    }
+  },
+  {
+    "case_id": "U13-k05",
+    "record": {
+      "comment_id": "U13-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 218,
+            "finish_reason": "stop",
+            "latency_s": 3.06981,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3394,
+            "reasoning_tokens": 149
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "学校の手紙が長年保管された点には触れていますが、書き手が男自身とは述べていません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "手紙は古い学校の記念品で、何十年も保管されてから男の手元に来たんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.06993203505408,
+      "luna_s": 3.06993203505408,
+      "total_s": 4.363555631018244,
+      "writer_s": 1.2936235959641635
+    }
+  },
+  {
+    "case_id": "U13-k06",
+    "record": {
+      "comment_id": "U13-k06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "004-fifty-year-letter",
+      "errors": [],
+      "fact_sheet_hash": "fde385625dde",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 138,
+            "finish_reason": "stop",
+            "latency_s": 2.264958,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3391,
+            "reasoning_tokens": 74
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "郵便の遅配という推理で、核心となる要点には触れていません。"
+        }
+      },
+      "media_id": "local-U13",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "住所を間違えていた昔の手紙が、郵便局から何十年も遅れて届いたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.2650083389598876,
+      "luna_s": 2.2650083389598876,
+      "total_s": 3.7479151899460703,
+      "writer_s": 1.4829068509861827
     }
   },
   {
@@ -1887,7 +2321,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1907,22 +2341,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": "タイムカプセル",
           "debug": {
-            "completion_tokens": 184,
+            "completion_tokens": 147,
             "finish_reason": "stop",
-            "latency_s": 2.789623,
+            "latency_s": 2.513411,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2968,
-            "reasoning_tokens": 98
+            "prompt_tokens": 3367,
+            "reasoning_tokens": 72
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、q_openとして判定します。"
+          "reason": "名詞だけのコメントなので、推理ではなく q_open と判定します。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -1934,17 +2369,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "タイムカプセル",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.7896809889934957,
-      "luna_s": 2.7896809889934957,
-      "total_s": 6.542788612976437,
-      "writer_s": 3.7531076239829417
+      "judge_s": 2.5134588849032298,
+      "luna_s": 2.5134588849032298,
+      "total_s": 6.314112489926629,
+      "writer_s": 3.800653605023399
     }
   },
   {
@@ -1956,7 +2391,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1976,22 +2411,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": "同窓会",
           "debug": {
-            "completion_tokens": 231,
+            "completion_tokens": 168,
             "finish_reason": "stop",
-            "latency_s": 2.92741,
+            "latency_s": 2.70749,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2968,
-            "reasoning_tokens": 145
+            "prompt_tokens": 3367,
+            "reasoning_tokens": 94
           },
           "error": null,
           "kind": "q_open",
-          "reason": "名詞だけのコメントで、何を尋ねているのか一意に定まりません。"
+          "reason": "述語のない語句だけのコメントなので、質問の形をお願いする。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -2003,17 +2439,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "同窓会？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.9274352909997106,
-      "luna_s": 2.9274352909997106,
-      "total_s": 6.360121589008486,
-      "writer_s": 3.4326862980087753
+      "judge_s": 2.7075175039935857,
+      "luna_s": 2.7075175039935857,
+      "total_s": 6.359097510925494,
+      "writer_s": 3.6515800069319084
     }
   },
   {
@@ -2025,12 +2461,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
       "content_key": "004-fifty-year-letter",
-      "errors": [],
+      "errors": [
+        "writer: writer did not ask what bare_term means"
+      ],
       "fact_sheet_hash": "fde385625dde",
       "final": {
         "answer": null,
@@ -2043,12 +2481,12 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": "手紙",
           "debug": {
-            "completion_tokens": 113,
+            "completion_tokens": 193,
             "finish_reason": "stop",
-            "latency_s": 2.030796,
+            "latency_s": 2.864832,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2966,
-            "reasoning_tokens": 36
+            "prompt_tokens": 3365,
+            "reasoning_tokens": 106
           },
           "error": null,
           "kind": "q_open",
@@ -2057,12 +2495,13 @@ window.PROBE_RAW["luna-1d/U13"] = [
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "llm",
-        "text": "手紙の何が気になるのかな？はい・いいえで答えられる形で聞いてごらん。"
+        "source": "fallback_template",
+        "text": "手紙がどうしたのか聞かせてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2070,17 +2509,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.030848963011522,
-      "luna_s": 2.030848963011522,
-      "total_s": 4.808899473020574,
-      "writer_s": 2.7780505100090522
+      "judge_s": 2.8648758199997246,
+      "luna_s": 2.8648758199997246,
+      "total_s": 6.306770484079607,
+      "writer_s": 3.441894664079882
     }
   },
   {
@@ -2092,7 +2531,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -2110,22 +2549,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 198,
+            "completion_tokens": 218,
             "finish_reason": "stop",
-            "latency_s": 2.991284,
+            "latency_s": 2.964553,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2971,
-            "reasoning_tokens": 115
+            "prompt_tokens": 3370,
+            "reasoning_tokens": 135
           },
           "error": null,
           "kind": "ask_hint",
-          "reason": "答えそのものではなく、考え方のヒントを求めているため。"
+          "reason": "考え方のヒントを求めているため、ヒント希望と判断しました。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -2137,17 +2577,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "考え方のヒントある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.991340993990889,
-      "luna_s": 2.991340993990889,
-      "total_s": 4.257194158009952,
-      "writer_s": 1.2658531640190631
+      "judge_s": 2.9646087089786306,
+      "luna_s": 2.9646087089786306,
+      "total_s": 4.23626619996503,
+      "writer_s": 1.2716574909863994
     }
   },
   {
@@ -2159,7 +2599,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -2177,26 +2617,27 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 222,
+            "completion_tokens": 190,
             "finish_reason": "stop",
-            "latency_s": 3.117688,
+            "latency_s": 3.196842,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2973,
-            "reasoning_tokens": 158
+            "prompt_tokens": 3372,
+            "reasoning_tokens": 130
           },
           "error": null,
           "kind": "impression",
-          "reason": "問題を考えることや面白さへの好意的な感想で、質問ではありません。"
+          "reason": "問題について、考える楽しさと面白さを伝える感想です。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いつも考えてくれてうれしいよ！☺️"
+        "text": "いつも考えてくれてありがとう！楽しんでもらえてうれしいよ☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2204,17 +2645,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "毎回考えちゃう、面白い",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1178714410052635,
-      "luna_s": 3.1178714410052635,
-      "total_s": 4.430657573015196,
-      "writer_s": 1.3127861320099328
+      "judge_s": 3.1968656209064648,
+      "luna_s": 3.1968656209064648,
+      "total_s": 5.028866363922134,
+      "writer_s": 1.8320007430156693
     }
   },
   {
@@ -2226,7 +2667,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -2244,26 +2685,27 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 198,
+            "completion_tokens": 226,
             "finish_reason": "stop",
-            "latency_s": 2.978361,
+            "latency_s": 3.474011,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2970,
-            "reasoning_tokens": 139
+            "prompt_tokens": 3369,
+            "reasoning_tokens": 165
           },
           "error": null,
           "kind": "chat",
-          "reason": "問題とは関係のない日常の雑談なので、chatに分類します。"
+          "reason": "問題への質問や推理ではなく、今日の暑さについての雑談です。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ほんと暑いね〜、涼しくして過ごそうね😌"
+        "text": "ほんと暑いね、涼しくして過ごそうね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2271,17 +2713,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "今日めっちゃ暑いね",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.9784172530053183,
-      "luna_s": 2.9784172530053183,
-      "total_s": 4.781331737001892,
-      "writer_s": 1.8029144839965738
+      "judge_s": 3.474068778101355,
+      "luna_s": 3.474068778101355,
+      "total_s": 5.297551064169966,
+      "writer_s": 1.8234822860686108
     }
   },
   {
@@ -2293,7 +2735,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -2311,26 +2753,27 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 134,
+            "completion_tokens": 151,
             "finish_reason": "stop",
-            "latency_s": 2.157036,
+            "latency_s": 2.219285,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2975,
-            "reasoning_tokens": 69
+            "prompt_tokens": 3374,
+            "reasoning_tokens": 86
           },
           "error": null,
           "kind": "complaint",
-          "reason": "問題の難易度が難しすぎるという指摘のため。"
+          "reason": "最近の問題が難しすぎるという、問題への指摘です。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "教えてくれてありがとう。難しさを確認するね。"
+        "text": "教えてくれてありがとう。ちょっと確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2338,17 +2781,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "最近ちょっと難しすぎるかも…",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.1570881149964407,
-      "luna_s": 2.1570881149964407,
-      "total_s": 4.176295529003255,
-      "writer_s": 2.0192074140068144
+      "judge_s": 2.219335717963986,
+      "luna_s": 2.219335717963986,
+      "total_s": 5.266694491030648,
+      "writer_s": 3.0473587730666623
     }
   },
   {
@@ -2360,7 +2803,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -2378,12 +2821,12 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 125,
+            "completion_tokens": 159,
             "finish_reason": "stop",
-            "latency_s": 2.201064,
+            "latency_s": 2.575488,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2970,
-            "reasoning_tokens": 71
+            "prompt_tokens": 3369,
+            "reasoning_tokens": 105
           },
           "error": null,
           "kind": "troll",
@@ -2392,8 +2835,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -2405,17 +2849,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "あああ???ぴょ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.201165482023498,
-      "luna_s": 2.201165482023498,
-      "total_s": 2.2011745030176826,
-      "writer_s": 9.020994184538722e-06
+      "judge_s": 2.575545433908701,
+      "luna_s": 2.575545433908701,
+      "total_s": 2.5755518599180505,
+      "writer_s": 6.426009349524975e-06
     }
   },
   {
@@ -2427,7 +2871,7 @@ window.PROBE_RAW["luna-1d/U13"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -2445,22 +2889,23 @@ window.PROBE_RAW["luna-1d/U13"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 101,
+            "completion_tokens": 86,
             "finish_reason": "stop",
-            "latency_s": 1.844609,
+            "latency_s": 1.784686,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2978,
-            "reasoning_tokens": 45
+            "prompt_tokens": 3377,
+            "reasoning_tokens": 36
           },
           "error": null,
           "kind": "personal_info",
-          "reason": "住所にあたる情報が含まれているため、個人情報と判定しました。"
+          "reason": "住所にあたる個人情報が含まれているため。"
         }
       },
       "media_id": "local-U13",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "no_reply",
@@ -2472,17 +2917,17 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "住所は東京都テスト区サンプル町000-0000です",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.8446645259973593,
-      "luna_s": 1.8446645259973593,
-      "total_s": 1.8446676919993479,
-      "writer_s": 3.1660019885748625e-06
+      "judge_s": 1.7847405130742118,
+      "luna_s": 1.7847405130742118,
+      "total_s": 1.7847414111020043,
+      "writer_s": 8.980277925729752e-07
     }
   }
 ];

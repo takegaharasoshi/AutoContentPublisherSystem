@@ -9,7 +9,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -27,11 +27,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4067,
-            "latency_s": 1.149158,
+            "input_tokens": 4815,
+            "latency_s": 1.299484,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -41,8 +41,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.08,
-                "question": 0.92
+                "guess": 0.06,
+                "question": 0.94
               },
               "A2": {
                 "q_multi": 0.0,
@@ -51,10 +51,16 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.03,
-                "point_1": 0.02
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.39,
+              "C": 0.43,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -64,32 +70,33 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 245,
+            "completion_tokens": 270,
             "finish_reason": "stop",
-            "latency_s": 3.34862,
+            "latency_s": 3.140129,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2823,
-            "reasoning_tokens": 169
+            "prompt_tokens": 3205,
+            "reasoning_tokens": 196
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、約束は口約束ではなく書かれたものと示されています。"
+          "reason": "確定事実で、約束は口約束ではなく書かれたものとされています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかにも聞いてごらん。"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -97,17 +104,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "約束は口約束だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.149552495975513,
-      "judge_s": 3.348672672989778,
-      "luna_s": 3.348672672989778,
-      "total_s": 4.619986912002787,
-      "writer_s": 1.2713142390130088
+      "jev_s": 1.299804268986918,
+      "judge_s": 3.1402329329866916,
+      "luna_s": 3.1402329329866916,
+      "total_s": 4.60136266797781,
+      "writer_s": 1.4611297349911183
     }
   },
   {
@@ -119,7 +126,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -137,11 +144,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4103,
-            "latency_s": 1.191551,
+            "input_tokens": 4851,
+            "latency_s": 1.161973,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -151,8 +158,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.03,
-                "question": 0.97
+                "guess": 0.02,
+                "question": 0.98
               },
               "A2": {
                 "q_multi": 0.0,
@@ -161,10 +168,16 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.04,
               "B": {
-                "point_0": 0.25,
-                "point_1": 0.07
+                "point_0": {
+                  "close": 0.31,
+                  "hit": 0.22
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.34,
+              "C": 0.35,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -174,32 +187,33 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.07"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 224,
+            "completion_tokens": 266,
             "finish_reason": "stop",
-            "latency_s": 2.667525,
+            "latency_s": 3.324274,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2827,
-            "reasoning_tokens": 157
+            "prompt_tokens": 3209,
+            "reasoning_tokens": 192
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "白紙に戻ったのは目に見える形のあるものです。"
+          "reason": "確定事実で、白紙に戻ったのは目に見える形のあるものとされています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -207,17 +221,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "白紙になったのは、目に見えるもの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.1920290129783098,
-      "judge_s": 2.667581121000694,
-      "luna_s": 2.667581121000694,
-      "total_s": 3.9895432570192497,
-      "writer_s": 1.3219621360185556
+      "jev_s": 1.1626646330114454,
+      "judge_s": 3.324331152951345,
+      "luna_s": 3.324331152951345,
+      "total_s": 4.789580348879099,
+      "writer_s": 1.465249195927754
     }
   },
   {
@@ -229,7 +243,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -247,11 +261,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4067,
-            "latency_s": 1.21243,
+            "input_tokens": 4815,
+            "latency_s": 1.290597,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -261,8 +275,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.85,
-                "question": 0.15
+                "guess": 0.88,
+                "question": 0.12
               },
               "A2": {
                 "q_multi": 0.0,
@@ -271,10 +285,16 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.01,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.25,
+              "C": 0.22,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -284,32 +304,33 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 237,
+            "completion_tokens": 214,
             "finish_reason": "stop",
-            "latency_s": 3.05172,
+            "latency_s": 3.29047,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2823,
-            "reasoning_tokens": 166
+            "prompt_tokens": 3205,
+            "reasoning_tokens": 144
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、2人はけんかをしていないとあるため。"
+          "reason": "確定事実で、2人はけんかをしていないとされています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
+        "text": "いいえ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -317,17 +338,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "ふたりはけんかしてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2127657079836354,
-      "judge_s": 3.051771060010651,
-      "luna_s": 3.051771060010651,
-      "total_s": 4.357378308020998,
-      "writer_s": 1.3056072480103467
+      "jev_s": 1.2909384720260277,
+      "judge_s": 3.2905342240119353,
+      "luna_s": 3.2905342240119353,
+      "total_s": 5.043867603992112,
+      "writer_s": 1.7533333799801767
     }
   },
   {
@@ -339,7 +360,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -357,11 +378,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4067,
-            "latency_s": 1.222262,
+            "input_tokens": 4815,
+            "latency_s": 1.177719,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -371,20 +392,26 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.9,
-                "question": 0.1
+                "guess": 0.88,
+                "question": 0.12
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.0,
                 "q_yesno": 1.0
               },
-              "A_bare": 0.07,
+              "A_bare": 0.08,
               "B": {
-                "point_0": 0.03,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.11,
+                  "hit": 0.01
+                },
+                "point_1": {
+                  "close": 0.13,
+                  "hit": 0.0
+                }
               },
-              "C": 0.52,
+              "C": 0.51,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -394,28 +421,29 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 166,
+            "completion_tokens": 226,
             "finish_reason": "stop",
-            "latency_s": 2.064668,
+            "latency_s": 3.116362,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2824,
-            "reasoning_tokens": 95
+            "prompt_tokens": 3206,
+            "reasoning_tokens": 154
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、夏の天気として夕立が関係するとあります。"
+          "reason": "夏の夕立が関係するかを尋ねる一問で、確定事実に明記されています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -427,17 +455,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "夏の夕立が関係してる？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2226510549953673,
-      "judge_s": 2.064720486989245,
-      "luna_s": 2.064720486989245,
-      "total_s": 3.3777406599838287,
-      "writer_s": 1.3130201729945838
+      "jev_s": 1.17805274494458,
+      "judge_s": 3.1163984870072454,
+      "luna_s": 3.1163984870072454,
+      "total_s": 4.3220264269039035,
+      "writer_s": 1.205627939896658
     }
   },
   {
@@ -449,7 +477,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -467,11 +495,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4079,
-            "latency_s": 1.113848,
+            "input_tokens": 4827,
+            "latency_s": 1.223179,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -491,8 +519,14 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.03,
-                "point_1": 0.04
+                "point_0": {
+                  "close": 0.08,
+                  "hit": 0.01
+                },
+                "point_1": {
+                  "close": 0.09999999999999999,
+                  "hit": 0.01
+                }
               },
               "C": 0.26,
               "D": {
@@ -504,32 +538,33 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.03"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": {
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 256,
+            "completion_tokens": 162,
             "finish_reason": "stop",
-            "latency_s": 3.175547,
+            "latency_s": 2.821439,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2825,
-            "reasoning_tokens": 182
+            "prompt_tokens": 3207,
+            "reasoning_tokens": 93
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、濡れたものを乾かしたことが関係するとあります。"
+          "reason": "確定事実で、濡れたものを乾かしたことが関係すると示されています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！次はどうかな？"
+        "text": "はい！ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -537,17 +572,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "濡れたものを乾かしたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.1142112980014645,
-      "judge_s": 3.175600886985194,
-      "luna_s": 3.175600886985194,
-      "total_s": 5.133101485960651,
-      "writer_s": 1.9575005989754573
+      "jev_s": 1.2235275428975,
+      "judge_s": 2.821497697965242,
+      "luna_s": 2.821497697965242,
+      "total_s": 4.574565199902281,
+      "writer_s": 1.7530675019370392
     }
   },
   {
@@ -559,7 +594,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -577,11 +612,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4079,
-            "latency_s": 1.253131,
+            "input_tokens": 4827,
+            "latency_s": 1.24943,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -591,20 +626,26 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.93,
-                "question": 0.07
+                "guess": 0.92,
+                "question": 0.08
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.01,
                 "q_yesno": 0.99
               },
-              "A_bare": 0.06,
+              "A_bare": 0.07,
               "B": {
-                "point_0": 0.08,
-                "point_1": 0.02
+                "point_0": {
+                  "close": 0.01,
+                  "hit": 0.01
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.52,
+              "C": 0.53,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -614,32 +655,33 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 168,
+            "completion_tokens": 202,
             "finish_reason": "stop",
-            "latency_s": 2.292579,
+            "latency_s": 2.709622,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2823,
-            "reasoning_tokens": 93
+            "prompt_tokens": 3205,
+            "reasoning_tokens": 135
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、約束は取り消されていないと明示されています。"
+          "reason": "約束は取り消されていないと確定事実にあります。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。その調子で聞いてごらん。"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -647,17 +689,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "約束そのものを取り消した？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2534947759995703,
-      "judge_s": 2.292617129976861,
-      "luna_s": 2.292617129976861,
-      "total_s": 3.7383557879948057,
-      "writer_s": 1.4457386580179445
+      "jev_s": 1.25018829992041,
+      "judge_s": 2.709672078024596,
+      "luna_s": 2.709672078024596,
+      "total_s": 4.079354782006703,
+      "writer_s": 1.3696827039821073
     }
   },
   {
@@ -669,7 +711,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -687,11 +729,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4091,
-            "latency_s": 1.261152,
+            "input_tokens": 4839,
+            "latency_s": 1.22015,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -701,20 +743,26 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.03,
-                "question": 0.97
+                "guess": 0.02,
+                "question": 0.98
               },
               "A2": {
                 "q_multi": 0.01,
-                "q_open": 0.01,
-                "q_yesno": 0.98
+                "q_open": 0.02,
+                "q_yesno": 0.97
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.02,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.36,
+              "C": 0.33,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -724,18 +772,18 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 253,
+            "completion_tokens": 161,
             "finish_reason": "stop",
-            "latency_s": 2.737036,
+            "latency_s": 2.553652,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2827,
-            "reasoning_tokens": 181
+            "prompt_tokens": 3209,
+            "reasoning_tokens": 90
           },
           "error": null,
           "kind": "q_yesno",
@@ -744,8 +792,9 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -757,17 +806,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "約束の中身は二人とも覚えてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2614649360184558,
-      "judge_s": 2.7370935139770154,
-      "luna_s": 2.7370935139770154,
-      "total_s": 3.7361570629873313,
-      "writer_s": 0.9990635490103159
+      "jev_s": 1.2206089349929243,
+      "judge_s": 2.5537965439725667,
+      "luna_s": 2.5537965439725667,
+      "total_s": 3.7290453939931467,
+      "writer_s": 1.17524885002058
     }
   },
   {
@@ -779,7 +828,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -798,11 +847,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 4067,
-            "latency_s": 1.304226,
+            "input_tokens": 4815,
+            "latency_s": 1.216053,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -812,8 +861,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.97,
-                "question": 0.03
+                "guess": 0.96,
+                "question": 0.04
               },
               "A2": {
                 "q_multi": 0.0,
@@ -822,10 +871,16 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.07,
               "B": {
-                "point_0": 0.03,
-                "point_1": 0.02
+                "point_0": {
+                  "close": 0.02,
+                  "hit": 0.01
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.32,
+              "C": 0.26,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -835,28 +890,29 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 214,
+            "completion_tokens": 206,
             "finish_reason": "stop",
-            "latency_s": 2.696501,
+            "latency_s": 3.011539,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2822,
-            "reasoning_tokens": 149
+            "prompt_tokens": 3204,
+            "reasoning_tokens": 135
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、誰かのいたずらではなく事故とされています。"
+          "reason": "確定事実では、誰かのいたずらではなく事故のようなものです。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -868,17 +924,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "誰かのいたずらだった？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.30457381598535,
-      "judge_s": 2.6965594890061766,
-      "luna_s": 2.6965594890061766,
-      "total_s": 3.9397183779801708,
-      "writer_s": 1.2431588889739942
+      "jev_s": 1.2163457489805296,
+      "judge_s": 3.011564039043151,
+      "luna_s": 3.011564039043151,
+      "total_s": 4.460787693038583,
+      "writer_s": 1.449223653995432
     }
   },
   {
@@ -890,7 +946,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -908,11 +964,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4091,
-            "latency_s": 1.185162,
+            "input_tokens": 4839,
+            "latency_s": 1.436772,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -922,8 +978,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.07,
-                "question": 0.93
+                "guess": 0.09,
+                "question": 0.91
               },
               "A2": {
                 "q_multi": 0.0,
@@ -932,41 +988,48 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.01,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.81,
+              "C": 0.83,
               "D": {
-                "irrelevant": 0.02,
+                "irrelevant": 0.03,
                 "no": 0.0,
-                "yes": 0.98
+                "yes": 0.97
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 256,
+            "completion_tokens": 260,
             "finish_reason": "stop",
-            "latency_s": 3.216531,
+            "latency_s": 3.193106,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2827,
-            "reasoning_tokens": 188
+            "prompt_tokens": 3209,
+            "reasoning_tokens": 192
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、約束は後日きちんと果たされたとあります。"
+          "reason": "真相に、約束は後日きちんと果たされたとあります。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -978,17 +1041,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "二人は後日その約束を果たした？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.185468211013358,
-      "judge_s": 3.216592355980538,
-      "luna_s": 3.216592355980538,
-      "total_s": 4.214000652980758,
-      "writer_s": 0.99740829700022
+      "jev_s": 1.4371926529565826,
+      "judge_s": 3.193127893959172,
+      "luna_s": 3.193127893959172,
+      "total_s": 4.255749801057391,
+      "writer_s": 1.0626219070982188
     }
   },
   {
@@ -1000,7 +1063,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1018,11 +1081,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4115,
-            "latency_s": 1.315624,
+            "input_tokens": 4863,
+            "latency_s": 1.188011,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1032,8 +1095,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.02,
-                "question": 0.98
+                "guess": 0.03,
+                "question": 0.97
               },
               "A2": {
                 "q_multi": 0.0,
@@ -1042,45 +1105,52 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.01,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.44,
+              "C": 0.45,
               "D": {
-                "irrelevant": 0.02,
-                "no": 0.98,
+                "irrelevant": 0.01,
+                "no": 0.99,
                 "yes": 0.0
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 238,
+            "completion_tokens": 183,
             "finish_reason": "stop",
-            "latency_s": 3.098641,
+            "latency_s": 2.76388,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2831,
-            "reasoning_tokens": 171
+            "prompt_tokens": 3213,
+            "reasoning_tokens": 111
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、年齢は問題に関係ないとされています。"
+          "reason": "年齢は謎の解決に関係しないと確定事実にあります。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。次の質問もどうぞ。"
+        "text": "いいえ。ほかのことも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1088,17 +1158,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "二人の年齢って謎を解くのに関係ある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.3159668410080485,
-      "judge_s": 3.0986681319773197,
-      "luna_s": 3.0986681319773197,
-      "total_s": 4.882593425980303,
-      "writer_s": 1.7839252940029837
+      "jev_s": 1.188191411900334,
+      "judge_s": 2.7639050190337002,
+      "luna_s": 2.7639050190337002,
+      "total_s": 4.006126228021458,
+      "writer_s": 1.2422212089877576
     }
   },
   {
@@ -1110,7 +1180,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1129,7 +1199,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2122,
-            "latency_s": 0.637719,
+            "latency_s": 0.670189,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1142,12 +1212,12 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.64,
-                "question": 0.36
+                "guess": 0.62,
+                "question": 0.38
               },
               "A2": {
-                "q_multi": 0.97,
-                "q_open": 0.02,
+                "q_multi": 0.98,
+                "q_open": 0.01,
                 "q_yesno": 0.01
               },
               "A_bare": 0.02
@@ -1161,26 +1231,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 153,
+            "completion_tokens": 114,
             "finish_reason": "stop",
-            "latency_s": 2.318533,
+            "latency_s": 2.384968,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2830,
-            "reasoning_tokens": 77
+            "prompt_tokens": 3212,
+            "reasoning_tokens": 37
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "「何か濡れたか」と「その後どうしたか」の質問が二つあります。"
+          "reason": "雨で濡れたものと、その後の行動について質問が二つあります。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。まずはどちらか聞いてごらん。"
+        "text": "質問はひとつずつコメントしてね。まずどちらか聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1188,17 +1259,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "雨で何か濡れたの？そのあとどうしたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.6378967490163632,
-      "judge_s": 2.3185826929984614,
-      "luna_s": 2.3185826929984614,
-      "total_s": 4.137159576988779,
-      "writer_s": 1.8185768839903176
+      "jev_s": 0.6702730699907988,
+      "judge_s": 2.385020788991824,
+      "luna_s": 2.385020788991824,
+      "total_s": 4.309539848007262,
+      "writer_s": 1.924519059015438
     }
   },
   {
@@ -1210,7 +1281,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1229,7 +1300,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2143,
-            "latency_s": 0.65191,
+            "latency_s": 0.599185,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1242,8 +1313,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.28,
-                "question": 0.72
+                "guess": 0.24,
+                "question": 0.76
               },
               "A2": {
                 "q_multi": 0.98,
@@ -1261,26 +1332,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 156,
+            "completion_tokens": 162,
             "finish_reason": "stop",
-            "latency_s": 2.744467,
+            "latency_s": 2.443274,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2834,
-            "reasoning_tokens": 77
+            "prompt_tokens": 3216,
+            "reasoning_tokens": 86
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "約束の取消しと後日の実行について、質問が二つあります。"
+          "reason": "約束の取り消しと後日の実行について、質問が2つあります。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。一緒に考えようか？"
+        "text": "質問はひとつずつ聞いてごらん。どちらからにしようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1288,17 +1360,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "約束は取り消されたの？それでも二人はあとで実行したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.6520894609857351,
-      "judge_s": 2.7445014890108723,
-      "luna_s": 2.7445014890108723,
-      "total_s": 4.55490604499937,
-      "writer_s": 1.810404555988498
+      "jev_s": 0.5992850849870592,
+      "judge_s": 2.4433222360676154,
+      "luna_s": 2.4433222360676154,
+      "total_s": 4.167698632110842,
+      "writer_s": 1.7243763960432261
     }
   },
   {
@@ -1310,7 +1382,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1329,7 +1401,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2668,
-            "latency_s": 0.784052,
+            "latency_s": 0.778381,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1342,8 +1414,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.05,
-                "question": 0.95
+                "guess": 0.04,
+                "question": 0.96
               },
               "A2": {
                 "q_multi": 0.0,
@@ -1362,26 +1434,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 187,
+            "completion_tokens": 196,
             "finish_reason": "stop",
-            "latency_s": 2.164085,
+            "latency_s": 2.36748,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2836,
+            "prompt_tokens": 3218,
             "reasoning_tokens": 103
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「なぜ」と理由を尋ねており、はい／いいえでは答えられません。"
+          "reason": "「なぜ」と理由を尋ねており、はい・いいえでは答えられない質問です。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形にして、聞いてごらん。"
+        "text": "はい・いいえで答えられる形で聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1389,17 +1462,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "なぜ約束が白紙に戻ったのに、二人は悲しまなかったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7842932009953074,
-      "judge_s": 2.1641398000065237,
-      "luna_s": 2.1641398000065237,
-      "total_s": 3.916819636011496,
-      "writer_s": 1.7526798360049725
+      "jev_s": 0.778580283978954,
+      "judge_s": 2.3675366539973766,
+      "luna_s": 2.3675366539973766,
+      "total_s": 4.500035312958062,
+      "writer_s": 2.132498658960685
     }
   },
   {
@@ -1411,7 +1484,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1430,7 +1503,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2632,
-            "latency_s": 0.743733,
+            "latency_s": 0.818243,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1463,26 +1536,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 123,
+            "completion_tokens": 109,
             "finish_reason": "stop",
-            "latency_s": 2.023809,
+            "latency_s": 2.091482,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2828,
-            "reasoning_tokens": 47
+            "prompt_tokens": 3210,
+            "reasoning_tokens": 29
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「どうして」と理由を尋ねる、はい／いいえで答えられない質問です。"
+          "reason": "「どうして」と理由を尋ねており、はい・いいえでは答えられない質問です。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「後日その約束を果たせたの？」みたいに、はい・いいえで答えられる形で聞いてごらん。"
+        "text": "「後日その約束を果たせたの？」のように、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1490,17 +1564,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "どうして後日その約束を果たせたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7441035810043104,
-      "judge_s": 2.023878550011432,
-      "luna_s": 2.023878550011432,
-      "total_s": 3.6374250529916026,
-      "writer_s": 1.6135465029801708
+      "jev_s": 0.8184639780083671,
+      "judge_s": 2.091531928977929,
+      "luna_s": 2.091531928977929,
+      "total_s": 4.155688929953612,
+      "writer_s": 2.0641570009756833
     }
   },
   {
@@ -1512,7 +1586,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1520,9 +1594,9 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "errors": [],
       "fact_sheet_hash": "8832e6127fa7",
       "final": {
-        "answer": null,
+        "answer": "yes",
         "decision": "luna",
-        "kind": "q_open"
+        "kind": "q_yesno"
       },
       "judgements": {
         "jev": {
@@ -1531,7 +1605,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2608,
-            "latency_s": 1.027383,
+            "latency_s": 0.793376,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 178,
@@ -1539,8 +1613,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.97,
-                "reaction": 0.03,
+                "question_or_guess": 0.96,
+                "reaction": 0.04,
                 "request": 0.0
               },
               "A1b": {
@@ -1549,59 +1623,60 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.22,
-                "q_yesno": 0.78
+                "q_open": 0.17,
+                "q_yesno": 0.83
               },
-              "A3": 0.39,
+              "A3": 0.4,
               "A_bare": 0.03
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A=question→q_open, 再確認=0.39"
+          "reason": "段A=question→q_open, 再確認=0.40"
         },
         "luna": {
-          "answer": null,
+          "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 249,
+            "completion_tokens": 579,
             "finish_reason": "stop",
-            "latency_s": 3.246464,
+            "latency_s": 5.862082,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2822,
-            "reasoning_tokens": 168
+            "prompt_tokens": 3204,
+            "reasoning_tokens": 502
           },
           "error": null,
-          "kind": "q_open",
-          "reason": "「それ」が何を指すのか一つに定まらない質問です。"
+          "kind": "q_yesno",
+          "reason": "「それ」は約束の内容を指すと読め、二人とも覚えていたと確定しています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "何を覚えているのか、はい・いいえで答えられる形で聞いてごらん。"
+        "text": "はい！ほかにも聞いてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": false,
+      "shadow_mismatch": true,
       "text": "それはまだ覚えてるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.0276265630091075,
-      "judge_s": 3.246509420016082,
-      "luna_s": 3.246509420016082,
-      "total_s": 5.241789953026455,
-      "writer_s": 1.995280533010373
+      "jev_s": 0.7935806569876149,
+      "judge_s": 5.8621437340043485,
+      "luna_s": 5.8621437340043485,
+      "total_s": 7.567167164059356,
+      "writer_s": 1.7050234300550073
     }
   },
   {
@@ -1613,7 +1688,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1631,11 +1706,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 3325,
-            "latency_s": 0.891758,
+            "input_tokens": 4132,
+            "latency_s": 0.814613,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 172,
+            "output_tokens": 209,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1650,36 +1725,43 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.97,
-                "point_1": 0.98
+                "point_0": {
+                  "close": 1.0,
+                  "hit": 1.0
+                },
+                "point_1": {
+                  "close": 1.0,
+                  "hit": 0.99
+                }
               },
               "B2": 0.05
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.97, 矛盾=0.05"
+          "reason": "段A=guess→guess_correct, 要点最低=0.99, 矛盾=0.05"
         },
         "luna": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 251,
+            "completion_tokens": 370,
             "finish_reason": "stop",
-            "latency_s": 2.703942,
+            "latency_s": 4.018477,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2880,
-            "reasoning_tokens": 134
+            "prompt_tokens": 3262,
+            "reasoning_tokens": 252
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "文字が消せるペンで書かれていたことと、紙の文字が消えた仕掛けを説明しています。"
+          "reason": "消せるペンで書いた手紙の文字が消えた核心を、約束を果たした点まで正しく説明しています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -1691,17 +1773,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "男が消せるボールペンで書いた手紙が夕立で濡れ、女がドライヤーで乾かした熱で文字が消えて白紙になった。二人は約束の中身を覚えていて書き直し、後日果たした。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.8920870659931097,
-      "judge_s": 2.703991098998813,
-      "luna_s": 2.703991098998813,
-      "total_s": 2.704007852997165,
-      "writer_s": 1.6753998352214694e-05
+      "jev_s": 0.8149193529970944,
+      "judge_s": 4.0185502709355205,
+      "luna_s": 4.0185502709355205,
+      "total_s": 4.018565420992672,
+      "writer_s": 1.5150057151913643e-05
     }
   },
   {
@@ -1713,7 +1795,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1731,11 +1813,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 3289,
-            "latency_s": 0.746755,
+            "input_tokens": 4096,
+            "latency_s": 0.820258,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 172,
+            "output_tokens": 209,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1750,36 +1832,43 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.95,
-                "point_1": 0.97
+                "point_0": {
+                  "close": 0.97,
+                  "hit": 0.87
+                },
+                "point_1": {
+                  "close": 0.99,
+                  "hit": 0.98
+                }
               },
               "B2": 0.08
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.95, 矛盾=0.08"
+          "reason": "段A=guess→guess_correct, 要点最低=0.87, 矛盾=0.08"
         },
         "luna": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 257,
+            "completion_tokens": 244,
             "finish_reason": "stop",
-            "latency_s": 2.728382,
+            "latency_s": 3.159009,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2870,
-            "reasoning_tokens": 158
+            "prompt_tokens": 3252,
+            "reasoning_tokens": 138
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "文字が熱で消え、約束を覚えて書き直した点まで一致しています。"
+          "reason": "約束を書いた紙の文字が消えたことと、消せるペンを使ったことを当てています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -1791,17 +1880,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "夕立で濡れた手紙をドライヤーで乾かしたら、消せるペンの文字が熱で消えた。でも二人とも約束は覚えていて、書き直して後日果たしたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7469880360004026,
-      "judge_s": 2.7284408109844662,
-      "luna_s": 2.7284408109844662,
-      "total_s": 2.7284463579708245,
-      "writer_s": 5.546986358240247e-06
+      "jev_s": 0.8205526529345661,
+      "judge_s": 3.15906773309689,
+      "luna_s": 3.15906773309689,
+      "total_s": 3.1590734721394256,
+      "writer_s": 5.7390425354242325e-06
     }
   },
   {
@@ -1813,7 +1902,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1831,11 +1920,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 3,
-            "input_tokens": 2121,
-            "latency_s": 0.600166,
+            "input_tokens": 2869,
+            "latency_s": 0.603832,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 150,
+            "output_tokens": 187,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1850,39 +1939,46 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.96,
-                "point_1": 0.05
+                "point_0": {
+                  "close": 1.0,
+                  "hit": 0.99
+                },
+                "point_1": {
+                  "close": 0.7,
+                  "hit": 0.01
+                }
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.05"
+          "reason": "段A=guess→guess_close, 要点最低=0.01"
         },
         "luna": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 163,
+            "completion_tokens": 135,
             "finish_reason": "stop",
-            "latency_s": 2.46984,
+            "latency_s": 2.244863,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2848,
-            "reasoning_tokens": 94
+            "prompt_tokens": 3230,
+            "reasoning_tokens": 67
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "紙の文字が消え、約束を覚えていた点は合っていますが、消せるペンの要点がありません。"
+          "reason": "約束を書いた紙の文字が消えた点は当たっていますが、消せるペンには触れていません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか？"
+        "text": "惜しい！ほかの可能性も考えてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1890,17 +1986,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "雨に濡れた紙の文字が消えて白紙になったけど、二人は約束の内容を覚えていたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.6004157350107562,
-      "judge_s": 2.46987461700337,
-      "luna_s": 2.46987461700337,
-      "total_s": 4.1227269929950126,
-      "writer_s": 1.6528523759916425
+      "jev_s": 0.6041636419249699,
+      "judge_s": 2.2449178820243105,
+      "luna_s": 2.2449178820243105,
+      "total_s": 4.592325642006472,
+      "writer_s": 2.3474077599821612
     }
   },
   {
@@ -1912,7 +2008,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -1930,11 +2026,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 3,
-            "input_tokens": 2109,
-            "latency_s": 0.60446,
+            "input_tokens": 2857,
+            "latency_s": 0.609229,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 150,
+            "output_tokens": 187,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1949,39 +2045,46 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.88,
-                "point_1": 0.17
+                "point_0": {
+                  "close": 0.97,
+                  "hit": 0.95
+                },
+                "point_1": {
+                  "close": 0.02,
+                  "hit": 0.01
+                }
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.17"
+          "reason": "段A=guess→guess_close, 要点最低=0.01"
         },
         "luna": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 277,
+            "completion_tokens": 235,
             "finish_reason": "stop",
-            "latency_s": 2.937687,
+            "latency_s": 3.320365,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2844,
-            "reasoning_tokens": 204
+            "prompt_tokens": 3226,
+            "reasoning_tokens": 170
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "紙が白紙になった後も約束が続いた点に触れていますが、コアの要点すべてには届いていません。"
+          "reason": "紙が白紙になった点には触れていますが、書いた道具の特徴は示されていません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか。"
+        "text": "惜しい！ほかの可能性も考えながら、推理を続けてみようか😉"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1989,17 +2092,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "約束は紙に書かれていて、白紙になったあと二人は同じ約束を続けたんじゃない？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.604652937996434,
-      "judge_s": 2.9377155149995815,
-      "luna_s": 2.9377155149995815,
-      "total_s": 4.4887732390197925,
-      "writer_s": 1.551057724020211
+      "jev_s": 0.6094270859612152,
+      "judge_s": 3.320418950985186,
+      "luna_s": 3.320418950985186,
+      "total_s": 5.45168580499012,
+      "writer_s": 2.1312668540049344
     }
   },
   {
@@ -2011,7 +2114,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -2030,11 +2133,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 4,
             "guess_demoted": true,
-            "input_tokens": 2646,
-            "latency_s": 0.869379,
+            "input_tokens": 3394,
+            "latency_s": 0.782184,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 194,
+            "output_tokens": 231,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2048,45 +2151,52 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "question": 0.0
               },
               "A2": {
-                "q_multi": 0.04,
-                "q_open": 0.62,
-                "q_yesno": 0.34
+                "q_multi": 0.03,
+                "q_open": 0.7,
+                "q_yesno": 0.27
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.02,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               }
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "段A=question→guess_wrong, 要点最低=0.01"
+          "reason": "段A=question→guess_wrong, 要点最低=0.00"
         },
         "luna": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 168,
+            "completion_tokens": 256,
             "finish_reason": "stop",
-            "latency_s": 2.17655,
+            "latency_s": 3.443612,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2843,
-            "reasoning_tokens": 102
+            "prompt_tokens": 3225,
+            "reasoning_tokens": 184
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "けんかや約束の取り消しは、仕掛けの要点に触れていません。"
+          "reason": "けんかで約束を取り消したという推理で、文字や筆記具の仕掛けには触れていません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。ほかの可能性も考えてみようか。"
+        "text": "残念、ちがうよ。もう少し考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2094,17 +2204,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "二人が大げんかして約束を取り消し、仲直りしたあと別の約束をしたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.8695580460189376,
-      "judge_s": 2.176580055995146,
-      "luna_s": 2.176580055995146,
-      "total_s": 3.3866582089976873,
-      "writer_s": 1.2100781530025415
+      "jev_s": 0.7824919320410118,
+      "judge_s": 3.4436422089347616,
+      "luna_s": 3.4436422089347616,
+      "total_s": 4.657847873982973,
+      "writer_s": 1.2142056650482118
     }
   },
   {
@@ -2116,7 +2226,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -2126,7 +2236,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "final": {
         "answer": null,
         "decision": "luna",
-        "kind": "guess_close"
+        "kind": "guess_wrong"
       },
       "judgements": {
         "jev": {
@@ -2135,11 +2245,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 4,
             "guess_demoted": true,
-            "input_tokens": 2658,
-            "latency_s": 0.75278,
+            "input_tokens": 3406,
+            "latency_s": 0.808367,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 194,
+            "output_tokens": 231,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2153,63 +2263,70 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "question": 0.0
               },
               "A2": {
-                "q_multi": 0.01,
-                "q_open": 0.89,
-                "q_yesno": 0.1
+                "q_multi": 0.02,
+                "q_open": 0.82,
+                "q_yesno": 0.16
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.05,
-                "point_1": 0.02
+                "point_0": {
+                  "close": 0.01,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               }
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "段A=question→guess_wrong, 要点最低=0.02"
+          "reason": "段A=question→guess_wrong, 要点最低=0.00"
         },
         "luna": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 180,
+            "completion_tokens": 285,
             "finish_reason": "stop",
-            "latency_s": 2.44627,
+            "latency_s": 3.756197,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2845,
-            "reasoning_tokens": 109
+            "prompt_tokens": 3227,
+            "reasoning_tokens": 210
           },
           "error": null,
-          "kind": "guess_close",
-          "reason": "約束が紙に書かれていた点には触れていますが、破られたという部分が確定事実と異なります。"
+          "kind": "guess_wrong",
+          "reason": "紙が破られたという推理で、文字が消えた仕掛けには触れていません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！別の可能性も考えてみようか。"
+        "text": "残念、ちがうよ。別の可能性も考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": true,
+      "shadow_mismatch": false,
       "text": "約束を書いた紙を誰かに破られてしまい、二人は悲しくてそのまま諦めたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.75291661900701,
-      "judge_s": 2.44632008599001,
-      "luna_s": 2.44632008599001,
-      "total_s": 4.427043111005332,
-      "writer_s": 1.9807230250153225
+      "jev_s": 0.8086459420155734,
+      "judge_s": 3.7562557770870626,
+      "luna_s": 3.7562557770870626,
+      "total_s": 5.009508247021586,
+      "writer_s": 1.253252469934523
     }
   },
   {
@@ -2221,7 +2338,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -2239,11 +2356,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4091,
-            "latency_s": 1.171089,
+            "input_tokens": 4839,
+            "latency_s": 1.224728,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 258,
+            "output_tokens": 295,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2263,45 +2380,52 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.01,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.43,
+              "C": 0.45,
               "D": {
-                "irrelevant": 0.95,
-                "no": 0.04,
+                "irrelevant": 0.94,
+                "no": 0.05,
                 "yes": 0.01
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 303,
+            "completion_tokens": 240,
             "finish_reason": "stop",
-            "latency_s": 3.239979,
+            "latency_s": 4.093682,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2827,
-            "reasoning_tokens": 226
+            "prompt_tokens": 3209,
+            "reasoning_tokens": 166
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "約束の中身は真相に関係せず、直接会う内容かは判断できません。"
+          "reason": "約束の内容や直接会うかどうかは、真相から判断できません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。"
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2309,17 +2433,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "2人は直接会う約束をしてたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.171331140998518,
-      "judge_s": 3.240044328995282,
-      "luna_s": 3.240044328995282,
-      "total_s": 4.5653442420007195,
-      "writer_s": 1.3252999130054377
+      "jev_s": 1.2249800480203703,
+      "judge_s": 4.09372910100501,
+      "luna_s": 4.09372910100501,
+      "total_s": 5.202686894917861,
+      "writer_s": 1.1089577939128503
     }
   },
   {
@@ -2331,7 +2455,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -2349,11 +2473,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4115,
-            "latency_s": 1.075471,
+            "input_tokens": 4863,
+            "latency_s": 1.211677,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2363,55 +2487,62 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.01
               },
               "A1b": {
-                "guess": 0.04,
-                "question": 0.96
+                "guess": 0.05,
+                "question": 0.95
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.04,
                 "q_yesno": 0.96
               },
-              "A_bare": 0.05,
+              "A_bare": 0.04,
               "B": {
-                "point_0": 0.05,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.1,
+                  "hit": 0.08
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.46,
+              "C": 0.47,
               "D": {
                 "irrelevant": 0.0,
-                "no": 0.14,
-                "yes": 0.86
+                "no": 0.16,
+                "yes": 0.84
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 232,
+            "completion_tokens": 308,
             "finish_reason": "stop",
-            "latency_s": 3.132692,
+            "latency_s": 4.332497,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2828,
-            "reasoning_tokens": 159
+            "prompt_tokens": 3210,
+            "reasoning_tokens": 241
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "「白紙」が紙が真っ白になった意味かを尋ねる、一つのはい・いいえ質問です。"
+          "reason": "真相では手紙の文字が消え、紙がまっさらな白紙になっています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！紙が真っ白になったって意味だよ。"
+        "text": "はい！「白紙」は紙が真っ白になったって意味だよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2419,17 +2550,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "「白紙」は紙が真っ白になったって意味？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.0757536799937952,
-      "judge_s": 3.132743552996544,
-      "luna_s": 3.132743552996544,
-      "total_s": 5.3848200580105186,
-      "writer_s": 2.2520765050139744
+      "jev_s": 1.2119982991134748,
+      "judge_s": 4.332552887964994,
+      "luna_s": 4.332552887964994,
+      "total_s": 6.097150736022741,
+      "writer_s": 1.7645978480577469
     }
   },
   {
@@ -2441,7 +2572,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -2459,11 +2590,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4103,
-            "latency_s": 1.080583,
+            "input_tokens": 4851,
+            "latency_s": 1.210609,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2473,8 +2604,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.52,
-                "question": 0.48
+                "guess": 0.55,
+                "question": 0.45
               },
               "A2": {
                 "q_multi": 0.0,
@@ -2483,10 +2614,16 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.02,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.26,
+              "C": 0.28,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.0,
@@ -2496,32 +2633,33 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 275,
+            "completion_tokens": 228,
             "finish_reason": "stop",
-            "latency_s": 3.352763,
+            "latency_s": 3.54634,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2828,
-            "reasoning_tokens": 208
+            "prompt_tokens": 3210,
+            "reasoning_tokens": 169
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "夏の日に、予定外の事故のような出来事が起きています。"
+          "reason": "夏の日に予定外の事故が起きています。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2529,17 +2667,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "夏の日に何か予定外のことが起きた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.0809014659898821,
-      "judge_s": 3.352839232014958,
-      "luna_s": 3.352839232014958,
-      "total_s": 4.85072696703719,
-      "writer_s": 1.497887735022232
+      "jev_s": 1.2108930950053036,
+      "judge_s": 3.5463715320220217,
+      "luna_s": 3.5463715320220217,
+      "total_s": 5.196411821991205,
+      "writer_s": 1.6500402899691835
     }
   },
   {
@@ -2551,7 +2689,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -2565,15 +2703,15 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       },
       "judgements": {
         "jev": {
-          "answer": "irrelevant",
+          "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 6,
-            "input_tokens": 4061,
-            "latency_s": 1.174709,
+            "calls": 5,
+            "input_tokens": 3814,
+            "latency_s": 1.037887,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 258,
+            "output_tokens": 253,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2583,51 +2721,53 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.03,
-                "question": 0.97
+                "guess": 0.04,
+                "question": 0.96
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.0,
                 "q_yesno": 1.0
               },
-              "A_bare": 0.03,
+              "A_bare": 0.02,
               "B": {
-                "point_0": 0.01,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.22,
-              "D": {
-                "irrelevant": 0.97,
-                "no": 0.02,
-                "yes": 0.01
-              }
+              "C": 0.18
             }
           },
           "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "kind": "q_open",
+          "reason": "段A=question→q_open, 要点最低=0.00"
         },
         "luna": {
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 227,
+            "completion_tokens": 235,
             "finish_reason": "stop",
-            "latency_s": 2.872236,
+            "latency_s": 3.33855,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2823,
-            "reasoning_tokens": 143
+            "prompt_tokens": 3205,
+            "reasoning_tokens": 158
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "2人の関係は問題に関係せず、確定事実からも恋人同士かは判断できません。"
+          "reason": "2人の関係は問題に関係しないため、確定事実からは判断できません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -2635,21 +2775,21 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": false,
+      "shadow_mismatch": true,
       "text": "2人は恋人同士なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.175040803005686,
-      "judge_s": 2.8722946489870083,
-      "luna_s": 2.8722946489870083,
-      "total_s": 4.388168334000511,
-      "writer_s": 1.5158736850135028
+      "jev_s": 1.0383056480204687,
+      "judge_s": 3.338600979070179,
+      "luna_s": 3.338600979070179,
+      "total_s": 4.887577355024405,
+      "writer_s": 1.5489763759542257
     }
   },
   {
@@ -2661,117 +2801,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1d-luna",
-        "shadow": true
-      },
-      "content_key": "007-blank-letter",
-      "errors": [],
-      "fact_sheet_hash": "8832e6127fa7",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4085,
-            "latency_s": 1.118764,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 256,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.78,
-                "question": 0.22
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.0,
-                "q_yesno": 1.0
-              },
-              "A_bare": 0.03,
-              "B": {
-                "point_0": 0.01,
-                "point_1": 0.01
-              },
-              "C": 0.48,
-              "D": {
-                "irrelevant": 0.02,
-                "no": 0.65,
-                "yes": 0.33
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
-        },
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 329,
-            "finish_reason": "stop",
-            "latency_s": 3.848206,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 2823,
-            "reasoning_tokens": 259
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "約束が延期になっただけではなく、後日きちんと果たされています。"
-        }
-      },
-      "media_id": "local-U18",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。次はどうかな？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": false,
-      "text": "約束は延期になっただけなの？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.119117599009769,
-      "judge_s": 3.8482639160065446,
-      "luna_s": 3.8482639160065446,
-      "total_s": 5.649499599006958,
-      "writer_s": 1.8012356830004137
-    }
-  },
-  {
-    "case_id": "U18-b27",
-    "record": {
-      "comment_id": "U18-b27",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": true,
-        "judge_mode": "hybrid",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -2789,11 +2819,128 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4085,
-            "latency_s": 1.439624,
+            "input_tokens": 4833,
+            "latency_s": 1.331402,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 256,
+            "output_tokens": 293,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.82,
+                "question": 0.18
+              },
+              "A2": {
+                "q_multi": 0.0,
+                "q_open": 0.0,
+                "q_yesno": 1.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
+              },
+              "C": 0.48,
+              "D": {
+                "irrelevant": 0.02,
+                "no": 0.6,
+                "yes": 0.38
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
+        },
+        "luna": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 490,
+            "finish_reason": "stop",
+            "latency_s": 5.74094,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3205,
+            "reasoning_tokens": 414
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "約束が延期されたかどうかは、真相・確定事実から判断できません。"
+        }
+      },
+      "media_id": "local-U18",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。ほかのことも聞いてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": true,
+      "text": "約束は延期になっただけなの？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.3316943548852578,
+      "judge_s": 5.740993506042287,
+      "luna_s": 5.740993506042287,
+      "total_s": 7.2955986460438,
+      "writer_s": 1.554605140001513
+    }
+  },
+  {
+    "case_id": "U18-b27",
+    "record": {
+      "comment_id": "U18-b27",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": true,
+        "judge_mode": "hybrid",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": true
+      },
+      "content_key": "007-blank-letter",
+      "errors": [],
+      "fact_sheet_hash": "8832e6127fa7",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4833,
+            "latency_s": 1.21669,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 293,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2813,41 +2960,48 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.01,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.52,
+              "C": 0.56,
               "D": {
-                "irrelevant": 0.07,
-                "no": 0.81,
-                "yes": 0.12
+                "irrelevant": 0.09,
+                "no": 0.78,
+                "yes": 0.13
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 279,
+            "completion_tokens": 342,
             "finish_reason": "stop",
-            "latency_s": 3.809261,
+            "latency_s": 4.308278,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2826,
-            "reasoning_tokens": 211
+            "prompt_tokens": 3208,
+            "reasoning_tokens": 266
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "約束の中身が夏に関係するかは、真相や確定事実から判断できません。"
+          "reason": "約束の内容は明かされておらず、夏との関係は判断できません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -2859,17 +3013,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "約束の内容は夏に関係あるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.4399994669947773,
-      "judge_s": 3.8092856730218045,
-      "luna_s": 3.8092856730218045,
-      "total_s": 5.226845653029159,
-      "writer_s": 1.4175599800073542
+      "jev_s": 1.2170129340374842,
+      "judge_s": 4.308330907020718,
+      "luna_s": 4.308330907020718,
+      "total_s": 5.78672892099712,
+      "writer_s": 1.4783980139764026
     }
   },
   {
@@ -2881,7 +3035,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -2899,11 +3053,11 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4055,
-            "latency_s": 1.193313,
+            "input_tokens": 4803,
+            "latency_s": 1.223407,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 258,
+            "output_tokens": 295,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2913,8 +3067,8 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.67,
-                "question": 0.33
+                "guess": 0.7,
+                "question": 0.3
               },
               "A2": {
                 "q_multi": 0.0,
@@ -2923,45 +3077,52 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.01,
-                "point_1": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.37,
+              "C": 0.39,
               "D": {
-                "irrelevant": 0.93,
-                "no": 0.07,
+                "irrelevant": 0.94,
+                "no": 0.06,
                 "yes": 0.0
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": {
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 180,
+            "completion_tokens": 218,
             "finish_reason": "stop",
-            "latency_s": 2.664424,
+            "latency_s": 3.229883,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2822,
-            "reasoning_tokens": 106
+            "prompt_tokens": 3204,
+            "reasoning_tokens": 137
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "2人の年齢は真相にも確定事実にも関係しません。"
+          "reason": "2人の年齢は真相に関係なく、子どもかどうかも判断できません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ほかのことも聞いてごらん。"
+        "text": "関係ないよ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2969,17 +3130,660 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "2人は子どもなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.1936466270126402,
-      "judge_s": 2.6644580729771405,
-      "luna_s": 2.6644580729771405,
-      "total_s": 4.059790480969241,
-      "writer_s": 1.3953324079921003
+      "jev_s": 1.2237234760541469,
+      "judge_s": 3.229940028046258,
+      "luna_s": 3.229940028046258,
+      "total_s": 4.766507997061126,
+      "writer_s": 1.5365679690148681
+    }
+  },
+  {
+    "case_id": "U18-k01",
+    "record": {
+      "comment_id": "U18-k01",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": true,
+        "judge_mode": "hybrid",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": true
+      },
+      "content_key": "007-blank-letter",
+      "errors": [],
+      "fact_sheet_hash": "8832e6127fa7",
+      "final": {
+        "answer": null,
+        "decision": "consensus_split",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2854,
+            "latency_s": 0.611093,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 187,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 1.0,
+                  "hit": 1.0
+                },
+                "point_1": {
+                  "close": 0.99,
+                  "hit": 0.44
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.44"
+        },
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 302,
+            "finish_reason": "stop",
+            "latency_s": 3.214903,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3225,
+            "reasoning_tokens": 190
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "紙の文字が白紙に戻り、熱で消えるインクだった点を当てています。"
+        }
+      },
+      "media_id": "local-U18",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "consensus_split",
+        "text": "核心にかなり迫ってるよ！何が起きたのか、通して説明してみて。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": true,
+      "text": "約束を書いた紙は白紙に戻り、熱で消える種類のインクで記してあったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.611383119947277,
+      "judge_s": 3.21495620906353,
+      "luna_s": 3.21495620906353,
+      "total_s": 3.2149967839941382,
+      "writer_s": 4.057493060827255e-05
+    }
+  },
+  {
+    "case_id": "U18-k02",
+    "record": {
+      "comment_id": "U18-k02",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": true,
+        "judge_mode": "hybrid",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": true
+      },
+      "content_key": "007-blank-letter",
+      "errors": [],
+      "fact_sheet_hash": "8832e6127fa7",
+      "final": {
+        "answer": null,
+        "decision": "consensus_split",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 3980,
+            "latency_s": 0.825294,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 209,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.97,
+                  "hit": 0.95
+                },
+                "point_1": {
+                  "close": 1.0,
+                  "hit": 0.99
+                }
+              },
+              "B2": 0.59
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.95, 矛盾=0.59"
+        },
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 301,
+            "finish_reason": "stop",
+            "latency_s": 3.30623,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3227,
+            "reasoning_tokens": 197
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "手紙の文字が消えたことと、消せるペンの使用を両方当てています。"
+        }
+      },
+      "media_id": "local-U18",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "consensus_split",
+        "text": "核心にかなり迫ってるよ！何が起きたのか、通して説明してみて。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": true,
+      "text": "文字を失った手紙はまっさらになり、こすって消せるタイプのペンが使われてたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8255937549984083,
+      "judge_s": 3.3062732180114836,
+      "luna_s": 3.3062732180114836,
+      "total_s": 3.306289163068868,
+      "writer_s": 1.594505738466978e-05
+    }
+  },
+  {
+    "case_id": "U18-k03",
+    "record": {
+      "comment_id": "U18-k03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": true,
+        "judge_mode": "hybrid",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": true
+      },
+      "content_key": "007-blank-letter",
+      "errors": [],
+      "fact_sheet_hash": "8832e6127fa7",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2863,
+            "latency_s": 0.586874,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 187,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 1.0,
+                  "hit": 0.99
+                },
+                "point_1": {
+                  "close": 0.99,
+                  "hit": 0.01
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.01"
+        },
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 271,
+            "finish_reason": "stop",
+            "latency_s": 4.180771,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3228,
+            "reasoning_tokens": 206
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "紙の文字が消えた点は合っていますが、インクの性質が真相とは異なります。"
+        }
+      },
+      "media_id": "local-U18",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し考えてみようか☺️"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": false,
+      "text": "夕立で約束の手紙は白紙になったけど、インクは水に影響されやすい種類だったんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.5871553480392322,
+      "judge_s": 4.180826856056228,
+      "luna_s": 4.180826856056228,
+      "total_s": 5.6995308781042695,
+      "writer_s": 1.5187040220480412
+    }
+  },
+  {
+    "case_id": "U18-k04",
+    "record": {
+      "comment_id": "U18-k04",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": true,
+        "judge_mode": "hybrid",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": true
+      },
+      "content_key": "007-blank-letter",
+      "errors": [],
+      "fact_sheet_hash": "8832e6127fa7",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2872,
+            "latency_s": 0.571475,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 187,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.9,
+                  "hit": 0.02
+                },
+                "point_1": {
+                  "close": 0.98,
+                  "hit": 0.67
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.02"
+        },
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 464,
+            "finish_reason": "stop",
+            "latency_s": 5.642701,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3227,
+            "reasoning_tokens": 399
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "消せるインクには触れていますが、文字が消えた原因を濡れたこととしています。"
+        }
+      },
+      "media_id": "local-U18",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！ほかの可能性も考えてみようか☺️"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": false,
+      "text": "文字が濡れて読めなくなったのは、熱を加えると消えるインクを使っていたからなんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.5716585189802572,
+      "judge_s": 5.642753083957359,
+      "luna_s": 5.642753083957359,
+      "total_s": 8.018236491945572,
+      "writer_s": 2.375483407988213
+    }
+  },
+  {
+    "case_id": "U18-k05",
+    "record": {
+      "comment_id": "U18-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": true,
+        "judge_mode": "hybrid",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": true
+      },
+      "content_key": "007-blank-letter",
+      "errors": [],
+      "fact_sheet_hash": "8832e6127fa7",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2830,
+            "latency_s": 0.590314,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 187,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 1.0,
+                  "hit": 0.0
+                },
+                "point_1": {
+                  "close": 0.24000000000000002,
+                  "hit": 0.01
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.00"
+        },
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 124,
+            "finish_reason": "stop",
+            "latency_s": 2.234741,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3221,
+            "reasoning_tokens": 63
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "雨で紙の文字が読めなくなった点は、要点1に触れています。"
+        }
+      },
+      "media_id": "local-U18",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し考えてみようか☺️"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": false,
+      "text": "紙の文字が雨でにじんで、約束の中身が読めなくなったんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.5904109620023519,
+      "judge_s": 2.2347807029727846,
+      "luna_s": 2.2347807029727846,
+      "total_s": 4.003571219975129,
+      "writer_s": 1.7687905170023441
+    }
+  },
+  {
+    "case_id": "U18-k06",
+    "record": {
+      "comment_id": "U18-k06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": true,
+        "judge_mode": "hybrid",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": true
+      },
+      "content_key": "007-blank-letter",
+      "errors": [],
+      "fact_sheet_hash": "8832e6127fa7",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "guess_demoted": true,
+            "input_tokens": 3394,
+            "latency_s": 0.763889,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 231,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 0.98,
+                "reaction": 0.02,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.99,
+                "question": 0.01
+              },
+              "A2": {
+                "q_multi": 0.01,
+                "q_open": 0.89,
+                "q_yesno": 0.1
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.060000000000000005,
+                  "hit": 0.01
+                },
+                "point_1": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "段A=question→guess_wrong, 要点最低=0.00"
+        },
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 369,
+            "finish_reason": "stop",
+            "latency_s": 4.60234,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3228,
+            "reasoning_tokens": 292
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "文字が読めたという内容で、消える仕掛けの要点には触れていません。"
+        }
+      },
+      "media_id": "local-U18",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": false,
+      "text": "雨で手紙は少し濡れたけど、書かれた文字は消えずそのまま読めたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.7641236600466073,
+      "judge_s": 4.602392236003652,
+      "luna_s": 4.602392236003652,
+      "total_s": 6.223441956099123,
+      "writer_s": 1.6210497200954705
     }
   },
   {
@@ -2991,7 +3795,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -3012,7 +3816,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 933,
-            "latency_s": 0.185786,
+            "latency_s": 0.186232,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -3023,33 +3827,34 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "reaction": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.83
+              "A_bare": 0.87
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A語句のみ: 0.83"
+          "reason": "段A語句のみ: 0.87"
         },
         "luna": {
           "answer": null,
           "bare_term": "消せるボールペン",
           "debug": {
-            "completion_tokens": 245,
+            "completion_tokens": 227,
             "finish_reason": "stop",
-            "latency_s": 3.070631,
+            "latency_s": 3.3189,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2822,
-            "reasoning_tokens": 163
+            "prompt_tokens": 3204,
+            "reasoning_tokens": 145
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、推理ではなく q_open と判定しました。"
+          "reason": "名詞だけのコメントなので、質問として答えられる形をお願いする。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -3061,17 +3866,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "消せるボールペン？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.18587024699081667,
-      "judge_s": 3.070693529007258,
-      "luna_s": 3.070693529007258,
-      "total_s": 6.894932266004616,
-      "writer_s": 3.8242387369973585
+      "jev_s": 0.18637195706833154,
+      "judge_s": 3.3189536719582975,
+      "luna_s": 3.3189536719582975,
+      "total_s": 6.223329435917549,
+      "writer_s": 2.9043757639592513
     }
   },
   {
@@ -3083,12 +3888,14 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
       "content_key": "007-blank-letter",
-      "errors": [],
+      "errors": [
+        "writer: writer did not ask what bare_term means"
+      ],
       "fact_sheet_hash": "8832e6127fa7",
       "final": {
         "answer": null,
@@ -3102,48 +3909,49 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 932,
-            "latency_s": 0.209964,
+            "latency_s": 0.20322,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
-                "other": 0.09,
-                "question_or_guess": 0.91,
+                "other": 0.04,
+                "question_or_guess": 0.96,
                 "reaction": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.98
+              "A_bare": 0.97
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A語句のみ: 0.98"
+          "reason": "段A語句のみ: 0.97"
         },
         "luna": {
           "answer": null,
           "bare_term": "バスケットボール",
           "debug": {
-            "completion_tokens": 136,
+            "completion_tokens": 177,
             "finish_reason": "stop",
-            "latency_s": 2.342608,
+            "latency_s": 2.716921,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2819,
-            "reasoning_tokens": 58
+            "prompt_tokens": 3201,
+            "reasoning_tokens": 97
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、質問として聞き直してもらいます。"
+          "reason": "名詞だけのコメントで、質問の形になっていません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "llm",
-        "text": "バスケットボールの何が知りたいのかな？はい・いいえで聞いてごらん。"
+        "source": "fallback_template",
+        "text": "バスケットボールが何のことか、もう少し詳しく教えて！"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3151,17 +3959,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "バスケットボール",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.21002959899487905,
-      "judge_s": 2.342642239003908,
-      "luna_s": 2.342642239003908,
-      "total_s": 5.930481782008428,
-      "writer_s": 3.5878395430045202
+      "jev_s": 0.20337158406618983,
+      "judge_s": 2.716985346050933,
+      "luna_s": 2.716985346050933,
+      "total_s": 5.740036627044901,
+      "writer_s": 3.0230512809939682
     }
   },
   {
@@ -3173,7 +3981,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -3192,7 +4000,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1421,
-            "latency_s": 0.371467,
+            "latency_s": 0.38334,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 124,
@@ -3209,7 +4017,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "ask_howto": 0.0,
                 "ask_spoiler": 1.0
               },
-              "A_bare": 0.1
+              "A_bare": 0.09
             }
           },
           "error": null,
@@ -3220,26 +4028,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 250,
+            "completion_tokens": 204,
             "finish_reason": "stop",
-            "latency_s": 3.062857,
+            "latency_s": 3.095857,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2820,
-            "reasoning_tokens": 168
+            "prompt_tokens": 3202,
+            "reasoning_tokens": 115
           },
           "error": null,
           "kind": "ask_spoiler",
-          "reason": "「答えだけ教えて」と真相の開示を求めています。"
+          "reason": "答えそのものを求めているため、ネタバレ希望と判定しました。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問には答えられるけど、真相は教えられないよ。少しずつ聞いてごらん🧐"
+        "text": "質問には答えられるけど、真相は教えられないよ。質問で少しずつ絞っていこうね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3247,17 +4056,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "答えだけ教えて〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.37163605698151514,
-      "judge_s": 3.062909597007092,
-      "luna_s": 3.062909597007092,
-      "total_s": 4.592535808013054,
-      "writer_s": 1.5296262110059615
+      "jev_s": 0.3835064700106159,
+      "judge_s": 3.0959115530131385,
+      "luna_s": 3.0959115530131385,
+      "total_s": 4.53204292897135,
+      "writer_s": 1.4361313759582117
     }
   },
   {
@@ -3269,7 +4078,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -3288,7 +4097,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1584,
-            "latency_s": 0.376836,
+            "latency_s": 0.406194,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -3320,26 +4129,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 147,
+            "completion_tokens": 162,
             "finish_reason": "stop",
-            "latency_s": 2.180088,
+            "latency_s": 2.40815,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2823,
-            "reasoning_tokens": 93
+            "prompt_tokens": 3205,
+            "reasoning_tokens": 103
           },
           "error": null,
           "kind": "impression",
-          "reason": "問題への感想として、短さと奥深さを評価しています。"
+          "reason": "問題への肯定的な感想で、質問や推理ではありません。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "そう言ってもらえてうれしいよ☺️"
+        "text": "ありがとう！短くても楽しめるよね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3347,17 +4157,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "短いのに奥が深い！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.3770032500033267,
-      "judge_s": 2.1801210929988883,
-      "luna_s": 2.1801210929988883,
-      "total_s": 4.11511185701238,
-      "writer_s": 1.9349907640134916
+      "jev_s": 0.40637893800158054,
+      "judge_s": 2.408207803964615,
+      "luna_s": 2.408207803964615,
+      "total_s": 3.908223335049115,
+      "writer_s": 1.5000155310845003
     }
   },
   {
@@ -3369,7 +4179,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -3388,7 +4198,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1592,
-            "latency_s": 0.428392,
+            "latency_s": 0.379779,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -3420,26 +4230,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 133,
+            "completion_tokens": 165,
             "finish_reason": "stop",
-            "latency_s": 2.095258,
+            "latency_s": 2.768791,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2824,
-            "reasoning_tokens": 73
+            "prompt_tokens": 3206,
+            "reasoning_tokens": 102
           },
           "error": null,
           "kind": "chat",
-          "reason": "週末についての雑談で、問題の内容とは関係ありません。"
+          "reason": "問題とは関係のない日常の雑談なので、chatと判定します。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ほんと、週末ってあっという間だね😌"
+        "text": "ほんと、あっという間だね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3447,17 +4258,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "週末ってあっという間だなー",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.42856884200591594,
-      "judge_s": 2.0953342909924686,
-      "luna_s": 2.0953342909924686,
-      "total_s": 3.3392019469756633,
-      "writer_s": 1.2438676559831947
+      "jev_s": 0.37993982003536075,
+      "judge_s": 2.768819333985448,
+      "luna_s": 2.768819333985448,
+      "total_s": 4.169798841001466,
+      "writer_s": 1.400979507016018
     }
   },
   {
@@ -3469,7 +4280,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -3488,7 +4299,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1590,
-            "latency_s": 0.455056,
+            "latency_s": 0.415315,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -3509,7 +4320,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "mention": 1.0,
                 "request": 0.0
               },
-              "A_bare": 0.09
+              "A_bare": 0.08
             }
           },
           "error": null,
@@ -3520,26 +4331,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 204,
+            "completion_tokens": 174,
             "finish_reason": "stop",
-            "latency_s": 2.732167,
+            "latency_s": 3.148617,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2822,
-            "reasoning_tokens": 142
+            "prompt_tokens": 3204,
+            "reasoning_tokens": 113
           },
           "error": null,
           "kind": "mention",
-          "reason": "友人をタグ付けして、問題を勧めているコメントです。"
+          "reason": "友人をタグ付けし、問題を勧めているコメントです。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ふふ、ぜひ見ていってね☺️"
+        "text": "教えてくれてありがとう！☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3547,17 +4359,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "@yuki こういうの好きそう",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.45518738601822406,
-      "judge_s": 2.732223414001055,
-      "luna_s": 2.732223414001055,
-      "total_s": 4.722675015014829,
-      "writer_s": 1.990451601013774
+      "jev_s": 0.41543394699692726,
+      "judge_s": 3.14864737004973,
+      "luna_s": 3.14864737004973,
+      "total_s": 5.025479567004368,
+      "writer_s": 1.8768321969546378
     }
   },
   {
@@ -3569,7 +4381,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -3588,7 +4400,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1586,
-            "latency_s": 0.356623,
+            "latency_s": 0.510752,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 149,
@@ -3609,7 +4421,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
                 "mention": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.12
+              "A_bare": 0.14
             }
           },
           "error": null,
@@ -3620,26 +4432,27 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 143,
+            "completion_tokens": 115,
             "finish_reason": "stop",
-            "latency_s": 2.235275,
+            "latency_s": 3.079579,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2822,
-            "reasoning_tokens": 84
+            "prompt_tokens": 3204,
+            "reasoning_tokens": 55
           },
           "error": null,
           "kind": "complaint",
-          "reason": "問題そのものへのけなしなので、クレーム扱いです。"
+          "reason": "問題そのものをけなすコメントなので、complaintに分類します。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "コメントありがとう、確認するね。"
+        "text": "教えてくれてありがとう。確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3647,17 +4460,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "バカみたいな問題だな",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.35682195899426006,
-      "judge_s": 2.2353501209872775,
-      "luna_s": 2.2353501209872775,
-      "total_s": 4.360314607009059,
-      "writer_s": 2.1249644860217813
+      "jev_s": 0.5109397029737011,
+      "judge_s": 3.0796328290598467,
+      "luna_s": 3.0796328290598467,
+      "total_s": 4.954481856082566,
+      "writer_s": 1.8748490270227194
     }
   },
   {
@@ -3669,7 +4482,7 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
         "consensus": true,
         "judge_mode": "hybrid",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": true
       },
@@ -3701,22 +4514,23 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 118,
+            "completion_tokens": 126,
             "finish_reason": "stop",
-            "latency_s": 2.127981,
+            "latency_s": 2.118131,
             "model": "gpt-6-luna",
-            "prompt_tokens": 2818,
-            "reasoning_tokens": 55
+            "prompt_tokens": 3200,
+            "reasoning_tokens": 62
           },
           "error": null,
           "kind": "foreign",
-          "reason": "英語のみのコメントのため、日本語での質問をお願いします。"
+          "reason": "英語のみのコメントのため、日本語以外と判定しました。"
         }
       },
       "media_id": "local-U18",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -3728,17 +4542,17 @@ window.PROBE_RAW["hybrid-1d/U18"] = [
       "text": "That was fun!",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 6.184098310768604e-05,
-      "judge_s": 2.128047242993489,
-      "luna_s": 2.128047242993489,
-      "total_s": 3.142814090999309,
-      "writer_s": 1.01476684800582
+      "jev_s": 5.880801472812891e-05,
+      "judge_s": 2.118182193953544,
+      "luna_s": 2.118182193953544,
+      "total_s": 4.0409284139750525,
+      "writer_s": 1.9227462200215086
     }
   }
 ];

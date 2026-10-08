@@ -9,7 +9,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -27,22 +27,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 206,
+            "completion_tokens": 250,
             "finish_reason": "stop",
-            "latency_s": 2.650694,
+            "latency_s": 3.011755,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3070,
-            "reasoning_tokens": 139
+            "prompt_tokens": 3343,
+            "reasoning_tokens": 177
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、日本語を覚える前も毎日会話していたとあります。"
+          "reason": "確定事実に、日本語を覚える前も毎日たくさん会話していたとあります。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -54,17 +55,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "日本語を覚える前も、二人は毎日会話してたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.6507515530101955,
-      "luna_s": 2.6507515530101955,
-      "total_s": 4.112829799007159,
-      "writer_s": 1.4620782459969632
+      "judge_s": 3.0118107189191505,
+      "luna_s": 3.0118107189191505,
+      "total_s": 4.040412775008008,
+      "writer_s": 1.0286020560888574
     }
   },
   {
@@ -76,7 +77,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -94,26 +95,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 341,
+            "completion_tokens": 274,
             "finish_reason": "stop",
-            "latency_s": 4.13672,
+            "latency_s": 3.151873,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3062,
-            "reasoning_tokens": 264
+            "prompt_tokens": 3335,
+            "reasoning_tokens": 195
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "真相では息子が通訳し、夫は仕事で帰りが遅かったためです。"
+          "reason": "確定事実で、夫は通訳役ではなく、平日はほとんど家にいないとされています。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてみようか？"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -121,17 +123,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "夫が間に入って通訳してた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.136777242994867,
-      "luna_s": 4.136777242994867,
-      "total_s": 6.6638244920177385,
-      "writer_s": 2.5270472490228713
+      "judge_s": 3.151963823940605,
+      "luna_s": 3.151963823940605,
+      "total_s": 5.094909255974926,
+      "writer_s": 1.9429454320343211
     }
   },
   {
@@ -143,7 +145,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -161,26 +163,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 266,
+            "completion_tokens": 265,
             "finish_reason": "stop",
-            "latency_s": 3.050924,
+            "latency_s": 2.99669,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3063,
-            "reasoning_tokens": 189
+            "prompt_tokens": 3336,
+            "reasoning_tokens": 195
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "間に入っていた人物が家族かを尋ねる一つの質問で、確定事実から判断できます。"
+          "reason": "一つのはい・いいえで答えられる質問で、確定事実から肯定できます。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ほかにも聞いてごらん"
+        "text": "はい！ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -188,17 +191,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "間に入って伝えてたのは家族？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.050989342009416,
-      "luna_s": 3.050989342009416,
-      "total_s": 5.540224706026493,
-      "writer_s": 2.489235364017077
+      "judge_s": 2.996743528987281,
+      "luna_s": 2.996743528987281,
+      "total_s": 5.390058355988003,
+      "writer_s": 2.3933148270007223
     }
   },
   {
@@ -210,7 +213,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -228,22 +231,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 165,
+            "completion_tokens": 261,
             "finish_reason": "stop",
-            "latency_s": 2.143018,
+            "latency_s": 3.305724,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3067,
-            "reasoning_tokens": 96
+            "prompt_tokens": 3340,
+            "reasoning_tokens": 180
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、この春から辞書を使って自分で勉強したとあります。"
+          "reason": "確定事実に、女はこの春から辞書を使って自分で日本語を勉強したとあります。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -255,17 +259,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "女は最近、辞書で日本語を勉強したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.1430735909962095,
-      "luna_s": 2.1430735909962095,
-      "total_s": 3.6439797040075064,
-      "writer_s": 1.5009061130112968
+      "judge_s": 3.305782109964639,
+      "luna_s": 3.305782109964639,
+      "total_s": 4.273864629911259,
+      "writer_s": 0.9680825199466199
     }
   },
   {
@@ -277,7 +281,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -295,26 +299,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 311,
+            "completion_tokens": 259,
             "finish_reason": "stop",
-            "latency_s": 3.48978,
+            "latency_s": 3.17995,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3065,
-            "reasoning_tokens": 233
+            "prompt_tokens": 3338,
+            "reasoning_tokens": 184
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、義母の性格や考え方はこの10年で変わっていないとされています。"
+          "reason": "確定事実では、義母の性格や考え方は10年間変わっていません。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
+        "text": "いいえ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -322,17 +327,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "義母の性格がこの10年で変わった？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.489808587008156,
-      "luna_s": 3.489808587008156,
-      "total_s": 5.3627271029981785,
-      "writer_s": 1.8729185159900226
+      "judge_s": 3.180017893901095,
+      "luna_s": 3.180017893901095,
+      "total_s": 5.498751653940417,
+      "writer_s": 2.318733760039322
     }
   },
   {
@@ -344,7 +349,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -362,12 +367,12 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 238,
+            "completion_tokens": 223,
             "finish_reason": "stop",
-            "latency_s": 2.931414,
+            "latency_s": 3.133365,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3066,
-            "reasoning_tokens": 167
+            "prompt_tokens": 3339,
+            "reasoning_tokens": 154
           },
           "error": null,
           "kind": "q_yesno",
@@ -376,12 +381,13 @@ window.PROBE_RAW["luna-1b/U26"] = [
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてみようか？"
+        "text": "いいえ。次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -389,17 +395,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "近所の人が悪口を吹き込んだの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.9314428210200276,
-      "luna_s": 2.9314428210200276,
-      "total_s": 5.253946682030801,
-      "writer_s": 2.322503861010773
+      "judge_s": 3.133420797996223,
+      "luna_s": 3.133420797996223,
+      "total_s": 4.949632651056163,
+      "writer_s": 1.81621185305994
     }
   },
   {
@@ -411,7 +417,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -429,26 +435,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 218,
+            "completion_tokens": 259,
             "finish_reason": "stop",
-            "latency_s": 2.90414,
+            "latency_s": 2.766219,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3066,
-            "reasoning_tokens": 155
+            "prompt_tokens": 3339,
+            "reasoning_tokens": 196
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "今も同じ家で暮らしていると確定事実にあります。"
+          "reason": "真相に、今もけんかをしながら同じ家で暮らしているとあります。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！今も同じ家だよ。"
+        "text": "はい！次の質問も聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -456,17 +463,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "二人は今も同じ家に住んでるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.904170157999033,
-      "luna_s": 2.904170157999033,
-      "total_s": 7.072273969009984,
-      "writer_s": 4.168103811010951
+      "judge_s": 2.7662659470224753,
+      "luna_s": 2.7662659470224753,
+      "total_s": 7.262452309019864,
+      "writer_s": 4.496186361997388
     }
   },
   {
@@ -478,7 +485,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -496,26 +503,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 158,
+            "completion_tokens": 245,
             "finish_reason": "stop",
-            "latency_s": 2.605653,
+            "latency_s": 3.652934,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3066,
-            "reasoning_tokens": 99
+            "prompt_tokens": 3339,
+            "reasoning_tokens": 164
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、けんかの話題は料理や家事とされています。"
+          "reason": "けんかの話題が料理や家事だったかを尋ねており、確定事実に合致します。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -523,17 +531,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "言い合いの話題は料理とか家事だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.6057248710130807,
-      "luna_s": 2.6057248710130807,
-      "total_s": 4.8508487040235195,
-      "writer_s": 2.245123833010439
+      "judge_s": 3.6529918840387836,
+      "luna_s": 3.6529918840387836,
+      "total_s": 6.2057651210343465,
+      "writer_s": 2.552773236995563
     }
   },
   {
@@ -545,7 +553,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -563,22 +571,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 186,
+            "completion_tokens": 257,
             "finish_reason": "stop",
-            "latency_s": 2.51226,
+            "latency_s": 3.412595,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3068,
-            "reasoning_tokens": 115
+            "prompt_tokens": 3341,
+            "reasoning_tokens": 181
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "出身国は問題に関係ないと確定事実にあるため。"
+          "reason": "出身国は問題に関係ないと確定事実に明記されています。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -590,17 +599,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "女がどこの国から来たかって、問題に関係ある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.512288477999391,
-      "luna_s": 2.512288477999391,
-      "total_s": 4.59367127699079,
-      "writer_s": 2.081382798991399
+      "judge_s": 3.4126498230034485,
+      "luna_s": 3.4126498230034485,
+      "total_s": 5.684795520966873,
+      "writer_s": 2.272145697963424
     }
   },
   {
@@ -612,7 +621,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -630,12 +639,12 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 168,
+            "completion_tokens": 275,
             "finish_reason": "stop",
-            "latency_s": 2.732083,
+            "latency_s": 3.208296,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3063,
-            "reasoning_tokens": 110
+            "prompt_tokens": 3336,
+            "reasoning_tokens": 205
           },
           "error": null,
           "kind": "q_yesno",
@@ -644,12 +653,13 @@ window.PROBE_RAW["luna-1b/U26"] = [
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ほかのことも聞いてみようか。"
+        "text": "はい！ほかにも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -657,17 +667,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "夫は仕事で遅く帰ってたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.732139476982411,
-      "luna_s": 2.732139476982411,
-      "total_s": 4.945997786999214,
-      "writer_s": 2.2138583100168034
+      "judge_s": 3.2083556069992483,
+      "luna_s": 3.2083556069992483,
+      "total_s": 6.1019690779503435,
+      "writer_s": 2.8936134709510952
     }
   },
   {
@@ -679,7 +689,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -697,26 +707,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 173,
+            "completion_tokens": 159,
             "finish_reason": "stop",
-            "latency_s": 2.103309,
+            "latency_s": 2.527792,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3072,
-            "reasoning_tokens": 100
+            "prompt_tokens": 3345,
+            "reasoning_tokens": 81
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "通訳役と夫の在宅状況について、質問が二つあります。"
+          "reason": "誰が訳したか、夫が家にいなかったかの二つを尋ねています。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。どっちから聞こうか？"
+        "text": "質問はひとつずつコメントしてね。どちらから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -724,17 +735,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "誰が二人の間で訳してたの？夫は家にいなかったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.103366750990972,
-      "luna_s": 2.103366750990972,
-      "total_s": 4.454419397981837,
-      "writer_s": 2.3510526469908655
+      "judge_s": 2.5280904159881175,
+      "luna_s": 2.5280904159881175,
+      "total_s": 4.509613223024644,
+      "writer_s": 1.9815228070365265
     }
   },
   {
@@ -746,7 +757,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -764,26 +775,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 184,
+            "completion_tokens": 149,
             "finish_reason": "stop",
-            "latency_s": 2.275838,
+            "latency_s": 2.450514,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3077,
-            "reasoning_tokens": 100
+            "prompt_tokens": 3350,
+            "reasoning_tokens": 71
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "日本語を覚えた時期と、言い合いの内容を尋ねる質問が二つあります。"
+          "reason": "日本語を覚えた時期と、言い合いの内容の二つを尋ねています。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。まずはどっちから聞こうか？"
+        "text": "質問はひとつずつコメントしてね。どちらかひとつ聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -791,17 +803,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "日本語が話せるようになったのはいつ？二人は何のことで言い合ってたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.275895364000462,
-      "luna_s": 2.275895364000462,
-      "total_s": 3.716438773990376,
-      "writer_s": 1.440543409989914
+      "judge_s": 2.4505610449705273,
+      "luna_s": 2.4505610449705273,
+      "total_s": 5.614164113881998,
+      "writer_s": 3.1636030689114705
     }
   },
   {
@@ -813,7 +825,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -831,26 +843,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 191,
+            "completion_tokens": 180,
             "finish_reason": "stop",
-            "latency_s": 2.524824,
+            "latency_s": 2.620962,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3074,
-            "reasoning_tokens": 106
+            "prompt_tokens": 3347,
+            "reasoning_tokens": 103
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「なぜ」と理由を尋ねており、はい／いいえでは答えられない質問です。"
+          "reason": "「なぜ」と理由を尋ねており、はい／いいえでは答えられないため。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で聞いてごらん。"
+        "text": "「日本語を覚えてからけんかが始まったの？」みたいに、はい・いいえで答えられる形で聞いてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -858,17 +871,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "なぜ日本語を覚えてから、二人は毎日けんかするようになったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5248863070155494,
-      "luna_s": 2.5248863070155494,
-      "total_s": 4.962572762015043,
-      "writer_s": 2.4376864549994934
+      "judge_s": 2.6210202510701492,
+      "luna_s": 2.6210202510701492,
+      "total_s": 5.297374587971717,
+      "writer_s": 2.676354336901568
     }
   },
   {
@@ -880,7 +893,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -898,12 +911,12 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 163,
+            "completion_tokens": 174,
             "finish_reason": "stop",
-            "latency_s": 2.316696,
+            "latency_s": 2.507661,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3071,
-            "reasoning_tokens": 79
+            "prompt_tokens": 3344,
+            "reasoning_tokens": 93
           },
           "error": null,
           "kind": "q_open",
@@ -912,12 +925,13 @@ window.PROBE_RAW["luna-1b/U26"] = [
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「二人は仲がいいと思われていたの？」みたいに、はい・いいえで聞いてみてね。"
+        "text": "理由を知りたいんだね。はい／いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -925,17 +939,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "どうして二人は10年間も近所で仲がいいと思われていたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.3167856379877776,
-      "luna_s": 2.3167856379877776,
-      "total_s": 5.805278781976085,
-      "writer_s": 3.4884931439883076
+      "judge_s": 2.5076923050219193,
+      "luna_s": 2.5076923050219193,
+      "total_s": 6.1376803130842745,
+      "writer_s": 3.629988008062355
     }
   },
   {
@@ -947,7 +961,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -965,26 +979,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 323,
+            "completion_tokens": 267,
             "finish_reason": "stop",
-            "latency_s": 3.129917,
+            "latency_s": 3.159231,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3063,
-            "reasoning_tokens": 236
+            "prompt_tokens": 3336,
+            "reasoning_tokens": 174
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「いつから」ははい／いいえで答えられず、指す対象も曖昧です。"
+          "reason": "「彼女」と「それ」の指す対象が一つに定まらず、いつからかを尋ねる質問です。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい／いいえで答えられる形で聞き直してね。誰が何を言ったのかも書いてごらん。"
+        "text": "誰が何を言っていたのか書いて、はい・いいえで答えられる形に聞き直してみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -992,17 +1007,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "彼女はそれをいつから言ってたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.129973378003342,
-      "luna_s": 3.129973378003342,
-      "total_s": 7.526563930005068,
-      "writer_s": 4.396590552001726
+      "judge_s": 3.1592794850002974,
+      "luna_s": 3.1592794850002974,
+      "total_s": 7.315749644069001,
+      "writer_s": 4.156470159068704
     }
   },
   {
@@ -1014,7 +1029,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1032,26 +1047,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 486,
+            "completion_tokens": 308,
             "finish_reason": "stop",
-            "latency_s": 4.657281,
+            "latency_s": 3.357422,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3138,
-            "reasoning_tokens": 371
+            "prompt_tokens": 3411,
+            "reasoning_tokens": 192
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "息子が不満を和らげて通訳した仕掛けと、その後の変化まで説明しています。"
+          "reason": "息子が通訳し、双方の不満を好意的に言い換えた核心を正確に説明しています。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！息子はけんかを避けるため、互いの言葉をやさしく作り替えて伝えていたんだ。母が日本語を覚えて本音が伝わり、二人は言い合いを始めたよ。"
+        "text": "正解！息子はけんかを避けるため、互いの不満をやさしい言葉に変えて通訳していたんだ。母が日本語を覚えて本音を直接聞き、二人は言い合いになったよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1059,17 +1075,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "息子が母と義母の通訳をしていたが、けんかを避けるため互いの不満をやさしい言葉に作り替えていた。息子が寮に入り、母が日本語を覚えて本音を直接聞くと、二人は言い合いを始め、通訳が作り話だったと気づいた。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.65732191799907,
-      "luna_s": 4.65732191799907,
-      "total_s": 10.049045007996028,
-      "writer_s": 5.391723089996958
+      "judge_s": 3.3578489379724488,
+      "luna_s": 3.3578489379724488,
+      "total_s": 9.413282023975626,
+      "writer_s": 6.055433086003177
     }
   },
   {
@@ -1081,7 +1097,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1099,26 +1115,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 408,
+            "completion_tokens": 630,
             "finish_reason": "stop",
-            "latency_s": 3.911358,
+            "latency_s": 5.69395,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3102,
-            "reasoning_tokens": 284
+            "prompt_tokens": 3375,
+            "reasoning_tokens": 512
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "息子が悪口を好意的に変えて訳し、日本語習得後に本音が伝わった点まで合っています。"
+          "reason": "息子が双方の言葉を良い表現に作り替えて通訳した核心を押さえています。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！息子はけんかを見たくなくて、二人の言葉を作り替えて伝えていたんだ。嫁が日本語を覚えて本音を聞き、けんかが始まったよ。"
+        "text": "正解！息子は二人の言葉を、けんかを避けるために作り替えて伝えていたんだ。嫁が日本語を覚え、本当の言葉が伝わってけんかが始まったよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1126,17 +1143,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "息子が嫁と義母の言葉を仲直りのために作り替えて訳していた。日本語を覚えた嫁に本音が伝わり、けんかが始まった、ってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.911418236006284,
-      "luna_s": 3.911418236006284,
-      "total_s": 9.026135451014852,
-      "writer_s": 5.114717215008568
+      "judge_s": 5.694001122028567,
+      "luna_s": 5.694001122028567,
+      "total_s": 10.244730129023083,
+      "writer_s": 4.550729006994516
     }
   },
   {
@@ -1148,74 +1165,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "014-kind-interpreter",
-      "errors": [],
-      "fact_sheet_hash": "cb5eb45c4241",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 447,
-            "finish_reason": "stop",
-            "latency_s": 4.82514,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3080,
-            "reasoning_tokens": 380
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "家族が間に入る点には触れていますが、核心の言い換えまでは示せていません。"
-        }
-      },
-      "media_id": "local-U26",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し考えてみようか。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "会話の間にいつも家族が入って訳していて、その人の伝え方が変わったんじゃない？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 4.825198473001365,
-      "luna_s": 4.825198473001365,
-      "total_s": 8.77933391398983,
-      "writer_s": 3.954135440988466
-    }
-  },
-  {
-    "case_id": "U26-e19",
-    "record": {
-      "comment_id": "U26-e19",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1235,121 +1185,55 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "debug": {
             "completion_tokens": 247,
             "finish_reason": "stop",
-            "latency_s": 3.25978,
+            "latency_s": 2.924334,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3078,
-            "reasoning_tokens": 177
+            "prompt_tokens": 3353,
+            "reasoning_tokens": 181
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "言葉を良い方に変えて伝えた点は触れていますが、誰がしたかが特定されていません。"
+          "reason": "家族の通訳と伝え方に触れていますが、核心の仕掛けまでは示していません。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！推理を続けてみようか。"
+        "text": "惜しい！ほかの可能性も考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "誰かが2人の言葉をわざと良い言葉に変えて伝えてたんでしょ。",
+      "text": "会話の間にいつも家族が入って訳していて、その人の伝え方が変わったんじゃない？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.2598360430274624,
-      "luna_s": 3.2598360430274624,
-      "total_s": 5.330198082025163,
-      "writer_s": 2.0703620389977004
+      "judge_s": 2.924378574010916,
+      "luna_s": 2.924378574010916,
+      "total_s": 4.842671005055308,
+      "writer_s": 1.9182924310443923
     }
   },
   {
-    "case_id": "U26-e20",
+    "case_id": "U26-e19",
     "record": {
-      "comment_id": "U26-e20",
+      "comment_id": "U26-e19",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "014-kind-interpreter",
-      "errors": [],
-      "fact_sheet_hash": "cb5eb45c4241",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_wrong"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 239,
-            "finish_reason": "stop",
-            "latency_s": 2.874484,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3083,
-            "reasoning_tokens": 168
-          },
-          "error": null,
-          "kind": "guess_wrong",
-          "reason": "けんかの理由を推測していますが、通訳で言葉を変えた仕掛けには触れていません。"
-        }
-      },
-      "media_id": "local-U26",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "義母がこの10年で急に意地悪になり、嫁が腹を立てたから毎日けんかしたんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 2.874541468976531,
-      "luna_s": 2.874541468976531,
-      "total_s": 4.47097348497482,
-      "writer_s": 1.596432015998289
-    }
-  },
-  {
-    "case_id": "U26-e21",
-    "record": {
-      "comment_id": "U26-e21",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1367,22 +1251,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 349,
+            "completion_tokens": 147,
             "finish_reason": "stop",
-            "latency_s": 4.255158,
+            "latency_s": 2.373631,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3076,
-            "reasoning_tokens": 280
+            "prompt_tokens": 3351,
+            "reasoning_tokens": 78
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "伝言の食い違いには触れていますが、誰が何をしたかの推理が真相とは異なります。"
+          "reason": "言葉を良い表現に変えて伝えた点は触れていますが、息子とは特定できていません。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1391,20 +1276,156 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "近所の人が二人の間で嘘を吹き込み、仲を悪くしたんだ。",
+      "text": "誰かが2人の言葉をわざと良い言葉に変えて伝えてたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.255223044019658,
-      "luna_s": 4.255223044019658,
-      "total_s": 6.7281038320215885,
-      "writer_s": 2.4728807880019303
+      "judge_s": 2.373652684967965,
+      "luna_s": 2.373652684967965,
+      "total_s": 4.455175949027762,
+      "writer_s": 2.081523264059797
+    }
+  },
+  {
+    "case_id": "U26-e20",
+    "record": {
+      "comment_id": "U26-e20",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "014-kind-interpreter",
+      "errors": [],
+      "fact_sheet_hash": "cb5eb45c4241",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 225,
+            "finish_reason": "stop",
+            "latency_s": 2.803816,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3356,
+            "reasoning_tokens": 144
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "義母の性格が変わったという推理で、核心の通訳の仕掛けには触れていません。"
+        }
+      },
+      "media_id": "local-U26",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。別の可能性も考えてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "義母がこの10年で急に意地悪になり、嫁が腹を立てたから毎日けんかしたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.8038435919443145,
+      "luna_s": 2.8038435919443145,
+      "total_s": 4.509681876865216,
+      "writer_s": 1.705838284920901
+    }
+  },
+  {
+    "case_id": "U26-e21",
+    "record": {
+      "comment_id": "U26-e21",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "014-kind-interpreter",
+      "errors": [],
+      "fact_sheet_hash": "cb5eb45c4241",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 177,
+            "finish_reason": "stop",
+            "latency_s": 2.609522,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3349,
+            "reasoning_tokens": 106
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "近所の人が悪口を吹き込んだという推理は、真相の仕掛けと異なります。"
+        }
+      },
+      "media_id": "local-U26",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。もう少し考えてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "近所の人が二人の間で嘘を吹き込み、仲を悪くしたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.6095557359512895,
+      "luna_s": 2.6095557359512895,
+      "total_s": 5.274717106949538,
+      "writer_s": 2.6651613709982485
     }
   },
   {
@@ -1416,7 +1437,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1434,26 +1455,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 451,
+            "completion_tokens": 606,
             "finish_reason": "stop",
-            "latency_s": 4.811695,
+            "latency_s": 5.920113,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3067,
-            "reasoning_tokens": 373
+            "prompt_tokens": 3340,
+            "reasoning_tokens": 524
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "義母が日本語以外も話せたかは、真相や確定事実から判断できません。"
+          "reason": "真相や確定事実に義母が使った言語の説明はなく、判断できません。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ほかのことも聞いてごらん。"
+        "text": "関係ないよ。次の質問もしてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1461,17 +1483,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "義母は日本語以外の言葉を話してたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.811741581012029,
-      "luna_s": 4.811741581012029,
-      "total_s": 6.518827779014828,
-      "writer_s": 1.7070861980027985
+      "judge_s": 5.9201756190741435,
+      "luna_s": 5.9201756190741435,
+      "total_s": 9.065918320091441,
+      "writer_s": 3.145742701017298
     }
   },
   {
@@ -1483,7 +1505,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1501,22 +1523,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 266,
+            "completion_tokens": 250,
             "finish_reason": "stop",
-            "latency_s": 2.976586,
+            "latency_s": 2.937701,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3064,
-            "reasoning_tokens": 194
+            "prompt_tokens": 3337,
+            "reasoning_tokens": 179
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "真相で義母との同居が示されているため、同じ家に住んでいました。"
+          "reason": "確定事実に、2人は今も同じ家で暮らしているとあるため。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1528,17 +1551,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "2人は同じ家に住んでたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.9766128479968756,
-      "luna_s": 2.9766128479968756,
-      "total_s": 5.191108861006796,
-      "writer_s": 2.2144960130099207
+      "judge_s": 2.9377503379946575,
+      "luna_s": 2.9377503379946575,
+      "total_s": 5.710388091974892,
+      "writer_s": 2.7726377539802343
     }
   },
   {
@@ -1550,7 +1573,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1568,22 +1591,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 263,
+            "completion_tokens": 170,
             "finish_reason": "stop",
-            "latency_s": 3.303865,
+            "latency_s": 2.529828,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3059,
-            "reasoning_tokens": 192
+            "prompt_tokens": 3332,
+            "reasoning_tokens": 92
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "義母の出身地は真相・確定事実から判断できません。"
+          "reason": "義母の出身地は問題に関係なく、真相からも判断できません。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1595,17 +1619,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "義母も外国出身なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.3039277759962715,
-      "luna_s": 3.3039277759962715,
-      "total_s": 4.4479021320003085,
-      "writer_s": 1.143974356004037
+      "judge_s": 2.5298863688949496,
+      "luna_s": 2.5298863688949496,
+      "total_s": 3.555783751886338,
+      "writer_s": 1.0258973829913884
     }
   },
   {
@@ -1617,7 +1641,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1635,26 +1659,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 453,
+            "completion_tokens": 587,
             "finish_reason": "stop",
-            "latency_s": 5.213662,
+            "latency_s": 5.459555,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3063,
-            "reasoning_tokens": 383
+            "prompt_tokens": 3336,
+            "reasoning_tokens": 512
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "夫は通訳役ではなく、平日はほとんど家にいません。"
+          "reason": "夫は仕事で帰りが遅く、2人の会話を取り次いでいません。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。夫はけんかに関係してるの？"
+        "text": "いいえ。夫はけんかに関係していないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1662,17 +1687,425 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "夫はけんかに関係してるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 5.213723666995065,
-      "luna_s": 5.213723666995065,
-      "total_s": 8.283508808002807,
-      "writer_s": 3.069785141007742
+      "judge_s": 5.459607664961368,
+      "luna_s": 5.459607664961368,
+      "total_s": 10.209451723960228,
+      "writer_s": 4.74984405899886
+    }
+  },
+  {
+    "case_id": "U26-k01",
+    "record": {
+      "comment_id": "U26-k01",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "014-kind-interpreter",
+      "errors": [],
+      "fact_sheet_hash": "cb5eb45c4241",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 286,
+            "finish_reason": "stop",
+            "latency_s": 3.292947,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3361,
+            "reasoning_tokens": 167
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "息子が二人の不満を和らげた言葉に作り替えて通訳したと述べています。"
+        }
+      },
+      "media_id": "local-U26",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "正解！息子が二人の言葉を、けんかにならないように言い換えて伝えていたんだ。女が日本語を覚えて直接話すようになり、本当の言葉が伝わったんだよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "二人の会話を仲立ちした息子が、互いの不満を角の立たない言葉に直して伝えてたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.293041256023571,
+      "luna_s": 3.293041256023571,
+      "total_s": 7.263195010018535,
+      "writer_s": 3.970153753994964
+    }
+  },
+  {
+    "case_id": "U26-k02",
+    "record": {
+      "comment_id": "U26-k02",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "014-kind-interpreter",
+      "errors": [],
+      "fact_sheet_hash": "cb5eb45c4241",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 307,
+            "finish_reason": "stop",
+            "latency_s": 3.577439,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3357,
+            "reasoning_tokens": 189
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "息子が二人の言葉を気遣いのある表現に変えて伝えたと推理しています。"
+        }
+      },
+      "media_id": "local-U26",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "正解！息子は母と義母の言葉を、互いにやさしく聞こえるように変えて伝えていたんだ。日本語で直接話せるようになり、本当の言葉が届いてけんかが始まったんだよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "息子が母と祖母の間で、きつい言葉を気遣いのある表現に仕立てていたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.5774972630897537,
+      "luna_s": 3.5774972630897537,
+      "total_s": 7.627730627078563,
+      "writer_s": 4.050233363988809
+    }
+  },
+  {
+    "case_id": "U26-k03",
+    "record": {
+      "comment_id": "U26-k03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "014-kind-interpreter",
+      "errors": [],
+      "fact_sheet_hash": "cb5eb45c4241",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 134,
+            "finish_reason": "stop",
+            "latency_s": 2.403474,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3355,
+            "reasoning_tokens": 55
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "通訳の仕方が関係に影響した点には触れていますが、息子が悪口を良い言葉に変えたとは特定していません。"
+        }
+      },
+      "media_id": "local-U26",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "家族の誰かがいつも通訳していて、その訳し方が二人の関係に影響してたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.403535695048049,
+      "luna_s": 2.403535695048049,
+      "total_s": 4.74220836116001,
+      "writer_s": 2.338672666111961
+    }
+  },
+  {
+    "case_id": "U26-k04",
+    "record": {
+      "comment_id": "U26-k04",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "014-kind-interpreter",
+      "errors": [],
+      "fact_sheet_hash": "cb5eb45c4241",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 306,
+            "finish_reason": "stop",
+            "latency_s": 3.323231,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3353,
+            "reasoning_tokens": 228
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "息子の通訳と伝え方の違いには触れていますが、悪口を良い言葉に変えた点までは明示されていません。"
+        }
+      },
+      "media_id": "local-U26",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し考えてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "息子が間で訳してたけど、言葉を少し足したり省いたりして伝えていたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.3232877020491287,
+      "luna_s": 3.3232877020491287,
+      "total_s": 5.325112971011549,
+      "writer_s": 2.0018252689624205
+    }
+  },
+  {
+    "case_id": "U26-k05",
+    "record": {
+      "comment_id": "U26-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "014-kind-interpreter",
+      "errors": [],
+      "fact_sheet_hash": "cb5eb45c4241",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 147,
+            "finish_reason": "stop",
+            "latency_s": 2.302851,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3356,
+            "reasoning_tokens": 68
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "間に入った人と伝え方の問題には触れていますが、息子が言葉を良い内容に変えた点までは特定できていません。"
+        }
+      },
+      "media_id": "local-U26",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "二人の話はいつも誰かを通して届いていて、言葉の伝わり方に問題があったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.3029051800258458,
+      "luna_s": 2.3029051800258458,
+      "total_s": 4.20630569010973,
+      "writer_s": 1.903400510083884
+    }
+  },
+  {
+    "case_id": "U26-k06",
+    "record": {
+      "comment_id": "U26-k06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "014-kind-interpreter",
+      "errors": [],
+      "fact_sheet_hash": "cb5eb45c4241",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 281,
+            "finish_reason": "stop",
+            "latency_s": 3.273952,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3356,
+            "reasoning_tokens": 196
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "近所の人が悪口を吹き込んだという推理は、確定事実に反します。"
+        }
+      },
+      "media_id": "local-U26",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。別の可能性も考えてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "近所の人が義母の悪口を嫁に告げ、嫁はそれを聞いて義母とけんかしたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.2739997759927064,
+      "luna_s": 3.2739997759927064,
+      "total_s": 5.290825154981576,
+      "writer_s": 2.0168253789888695
     }
   },
   {
@@ -1684,7 +2117,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1704,22 +2137,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": "息子の通訳",
           "debug": {
-            "completion_tokens": 400,
+            "completion_tokens": 255,
             "finish_reason": "stop",
-            "latency_s": 4.053468,
+            "latency_s": 2.827553,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3057,
-            "reasoning_tokens": 317
+            "prompt_tokens": 3330,
+            "reasoning_tokens": 166
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない名詞句で、はい・いいえで答えられる質問になっていません。"
+          "reason": "名詞句だけで述語がなく、はい／いいえで答えられないため。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -1731,17 +2165,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "息子の通訳？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.053520144982031,
-      "luna_s": 4.053520144982031,
-      "total_s": 8.75208663297235,
-      "writer_s": 4.69856648799032
+      "judge_s": 2.827610098058358,
+      "luna_s": 2.827610098058358,
+      "total_s": 12.2028824291192,
+      "writer_s": 9.375272331060842
     }
   },
   {
@@ -1753,7 +2187,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1773,22 +2207,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": "富士山",
           "debug": {
-            "completion_tokens": 207,
+            "completion_tokens": 202,
             "finish_reason": "stop",
-            "latency_s": 2.698751,
+            "latency_s": 3.332741,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3054,
-            "reasoning_tokens": 121
+            "prompt_tokens": 3327,
+            "reasoning_tokens": 117
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない名詞だけのコメントなので、はい／いいえで答えられない質問として扱います。"
+          "reason": "述語のない名詞だけのコメントなので、質問として一意に答えられません。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -1800,17 +2235,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "富士山",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.6987788760161493,
-      "luna_s": 2.6987788760161493,
-      "total_s": 10.557945892011048,
-      "writer_s": 7.859167015994899
+      "judge_s": 3.332937282975763,
+      "luna_s": 3.332937282975763,
+      "total_s": 8.462398456060328,
+      "writer_s": 5.1294611730845645
     }
   },
   {
@@ -1822,7 +2257,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1840,26 +2275,27 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 165,
+            "completion_tokens": 190,
             "finish_reason": "stop",
-            "latency_s": 2.266018,
+            "latency_s": 3.993953,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3059,
-            "reasoning_tokens": 81
+            "prompt_tokens": 3332,
+            "reasoning_tokens": 102
           },
           "error": null,
           "kind": "ask_howto",
-          "reason": "遊び方として、何をコメントすればよいか尋ねています。"
+          "reason": "どんなコメントをすればよいか、遊び方を尋ねています。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい／いいえで答えられる質問をコメントしてね。私が答えるよ☺️"
+        "text": "はい・いいえで答えられる質問をコメントしてね。私が答えるよ☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1867,17 +2303,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "何をコメントしたらいいの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.266042205999838,
-      "luna_s": 2.266042205999838,
-      "total_s": 4.190250250976533,
-      "writer_s": 1.9242080449766945
+      "judge_s": 3.99401157500688,
+      "luna_s": 3.99401157500688,
+      "total_s": 5.753217407036573,
+      "writer_s": 1.7592058320296928
     }
   },
   {
@@ -1889,7 +2325,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1907,22 +2343,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 206,
+            "completion_tokens": 200,
             "finish_reason": "stop",
-            "latency_s": 2.499046,
+            "latency_s": 2.881421,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3061,
-            "reasoning_tokens": 144
+            "prompt_tokens": 3334,
+            "reasoning_tokens": 148
           },
           "error": null,
           "kind": "cheer",
-          "reason": "投稿へのねぎらいと応援のコメントで、問題内容への質問ではありません。"
+          "reason": "投稿へのねぎらいなので、応援に分類します。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1934,17 +2371,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "今日も投稿おつかれさま！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.4991012410027906,
-      "luna_s": 2.4991012410027906,
-      "total_s": 3.794890432007378,
-      "writer_s": 1.2957891910045873
+      "judge_s": 2.881477357004769,
+      "luna_s": 2.881477357004769,
+      "total_s": 4.806330626015551,
+      "writer_s": 1.9248532690107822
     }
   },
   {
@@ -1956,7 +2393,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1974,22 +2411,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 167,
+            "completion_tokens": 147,
             "finish_reason": "stop",
-            "latency_s": 3.910105,
+            "latency_s": 2.248255,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3061,
-            "reasoning_tokens": 110
+            "prompt_tokens": 3334,
+            "reasoning_tokens": 90
           },
           "error": null,
           "kind": "request",
-          "reason": "次に出す問題のテーマをリクエストしているため。"
+          "reason": "次に出す問題のテーマを希望するリクエストです。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -2001,17 +2439,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "次は家族もの出してほしいな",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.910172064002836,
-      "luna_s": 3.910172064002836,
-      "total_s": 6.316660769021837,
-      "writer_s": 2.406488705019001
+      "judge_s": 2.2482792460359633,
+      "luna_s": 2.2482792460359633,
+      "total_s": 4.540467977989465,
+      "writer_s": 2.2921887319535017
     }
   },
   {
@@ -2023,7 +2461,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2041,12 +2479,12 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 125,
+            "completion_tokens": 78,
             "finish_reason": "stop",
-            "latency_s": 4.811346,
+            "latency_s": 1.869286,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3053,
-            "reasoning_tokens": 73
+            "prompt_tokens": 3326,
+            "reasoning_tokens": 26
           },
           "error": null,
           "kind": "emoji_only",
@@ -2055,12 +2493,13 @@ window.PROBE_RAW["luna-1b/U26"] = [
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう、うれしいよ！"
+        "text": "ありがとう！🙌"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2068,17 +2507,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "👍✨",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.811610737990122,
-      "luna_s": 4.811610737990122,
-      "total_s": 7.015720052004326,
-      "writer_s": 2.204109314014204
+      "judge_s": 1.8693107479484752,
+      "luna_s": 1.8693107479484752,
+      "total_s": 3.378979990957305,
+      "writer_s": 1.5096692430088297
     }
   },
   {
@@ -2090,7 +2529,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2108,22 +2547,23 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 97,
+            "completion_tokens": 102,
             "finish_reason": "stop",
-            "latency_s": 1.620204,
+            "latency_s": 1.922537,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3064,
-            "reasoning_tokens": 44
+            "prompt_tokens": 3337,
+            "reasoning_tokens": 54
           },
           "error": null,
           "kind": "spam",
-          "reason": "副業への誘導とプロフィールのリンク案内を含む宣伝コメントです。"
+          "reason": "副業への誘導を目的とした宣伝コメントです。"
         }
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "no_reply",
@@ -2135,17 +2575,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "副業に興味ある人はプロフのリンクへ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.6202332380053122,
-      "luna_s": 1.6202332380053122,
-      "total_s": 1.6202351219835691,
-      "writer_s": 1.8839782569557428e-06
+      "judge_s": 1.9225827740738168,
+      "luna_s": 1.9225827740738168,
+      "total_s": 1.9225868090288714,
+      "writer_s": 4.034955054521561e-06
     }
   },
   {
@@ -2157,7 +2597,7 @@ window.PROBE_RAW["luna-1b/U26"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2175,12 +2615,12 @@ window.PROBE_RAW["luna-1b/U26"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 101,
+            "completion_tokens": 92,
             "finish_reason": "stop",
-            "latency_s": 1.761668,
+            "latency_s": 1.997401,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3064,
-            "reasoning_tokens": 52
+            "prompt_tokens": 3337,
+            "reasoning_tokens": 43
           },
           "error": null,
           "kind": "abuse",
@@ -2189,8 +2629,9 @@ window.PROBE_RAW["luna-1b/U26"] = [
       },
       "media_id": "local-U26",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -2202,17 +2643,17 @@ window.PROBE_RAW["luna-1b/U26"] = [
       "text": "ここでコメントしてる奴ら全員頭おかしい",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.761730030993931,
-      "luna_s": 1.761730030993931,
-      "total_s": 1.7617345250037033,
-      "writer_s": 4.494009772315621e-06
+      "judge_s": 1.9975924839964136,
+      "luna_s": 1.9975924839964136,
+      "total_s": 1.997613982995972,
+      "writer_s": 2.1498999558389187e-05
     }
   }
 ];

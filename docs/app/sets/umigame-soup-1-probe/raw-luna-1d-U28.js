@@ -9,7 +9,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -27,26 +27,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 235,
+            "completion_tokens": 298,
             "finish_reason": "stop",
-            "latency_s": 3.299148,
+            "latency_s": 3.830268,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3029,
-            "reasoning_tokens": 166
+            "prompt_tokens": 3363,
+            "reasoning_tokens": 234
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "過去にも「ウミガメのスープ」を飲んだと確定しています。"
+          "reason": "以前にも飲んだことがあるかを尋ねる、確定事実で判断できる質問です。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！ほかにも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -54,17 +55,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男は以前にもウミガメのスープを飲んだことがありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.299203591013793,
-      "luna_s": 3.299203591013793,
-      "total_s": 5.100478695996571,
-      "writer_s": 1.8012751049827784
+      "judge_s": 3.8303039690945297,
+      "luna_s": 3.8303039690945297,
+      "total_s": 5.373993503046222,
+      "writer_s": 1.5436895339516923
     }
   },
   {
@@ -76,7 +77,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -94,26 +95,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 286,
+            "completion_tokens": 391,
             "finish_reason": "stop",
-            "latency_s": 3.518114,
+            "latency_s": 4.641083,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3032,
-            "reasoning_tokens": 211
+            "prompt_tokens": 3366,
+            "reasoning_tokens": 313
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "以前と同じ味に覚えがあったのではなく、まったく違うと気づいたためです。"
+          "reason": "泣いた理由は味に覚えがあったからではなく、以前の味と違うと気づいたためです。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。スープの味に覚えがあったからではないよ。"
+        "text": "いいえ。スープの味に覚えがあったわけではないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -121,17 +123,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男が泣いたのは、スープの味に覚えがあったからですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.518167670990806,
-      "luna_s": 3.518167670990806,
-      "total_s": 6.123922703001881,
-      "writer_s": 2.605755032011075
+      "judge_s": 4.641150524956174,
+      "luna_s": 4.641150524956174,
+      "total_s": 7.029215262038633,
+      "writer_s": 2.388064737082459
     }
   },
   {
@@ -143,7 +145,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -161,26 +163,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 156,
+            "completion_tokens": 251,
             "finish_reason": "stop",
-            "latency_s": 2.571218,
+            "latency_s": 3.913101,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3024,
-            "reasoning_tokens": 82
+            "prompt_tokens": 3358,
+            "reasoning_tokens": 185
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "若いころ船の事故に遭い、仲間と海を漂っていました。"
+          "reason": "確定事実に、若いころ船の事故で海を漂ったとあります。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ほかにも聞いてごらん。"
+        "text": "はい！ほかにも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -188,17 +191,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男は昔、遭難した経験があるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.571273557987297,
-      "luna_s": 2.571273557987297,
-      "total_s": 3.882515481003793,
-      "writer_s": 1.311241923016496
+      "judge_s": 3.913133214926347,
+      "luna_s": 3.913133214926347,
+      "total_s": 5.318363522994332,
+      "writer_s": 1.4052303080679849
     }
   },
   {
@@ -210,7 +213,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -228,22 +231,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 823,
+            "completion_tokens": 1458,
             "finish_reason": "stop",
-            "latency_s": 9.511073,
+            "latency_s": 14.210156,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3036,
-            "reasoning_tokens": 739
+            "prompt_tokens": 3370,
+            "reasoning_tokens": 1371
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "本物だと確認したことで、過去の出来事にまつわる真実に気づいたため。"
+          "reason": "昔の出来事を思い返し、確認を経て気づく流れが真相に含まれるため。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -255,17 +259,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "本物だと聞いたことで、男の過去の記憶がよみがえったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 9.511141032999149,
-      "luna_s": 9.511141032999149,
-      "total_s": 10.576516161992913,
-      "writer_s": 1.0653751289937645
+      "judge_s": 14.210207336000167,
+      "luna_s": 14.210207336000167,
+      "total_s": 15.729923512903042,
+      "writer_s": 1.5197161769028753
     }
   },
   {
@@ -277,7 +281,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -285,36 +289,37 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "errors": [],
       "fact_sheet_hash": "c81ff384e8a1",
       "final": {
-        "answer": "no",
+        "answer": "irrelevant",
         "decision": "luna",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": null,
         "luna": {
-          "answer": "no",
+          "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 337,
+            "completion_tokens": 312,
             "finish_reason": "stop",
-            "latency_s": 4.335245,
+            "latency_s": 3.701365,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3032,
-            "reasoning_tokens": 252
+            "prompt_tokens": 3366,
+            "reasoning_tokens": 235
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "飲んだ後にシェフへ確認しており、飲む前に疑っていたとは読み取れません。"
+          "reason": "飲む前に疑っていたかどうかは、真相や確定事実から判断できません。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。飲む前から疑っていたわけではないよ。"
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -322,17 +327,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "スープを飲む前から、男は本物かどうか疑っていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.335269388015149,
-      "luna_s": 4.335269388015149,
-      "total_s": 6.214072844013572,
-      "writer_s": 1.8788034559984226
+      "judge_s": 3.7014189480105415,
+      "luna_s": 3.7014189480105415,
+      "total_s": 5.324621470994316,
+      "writer_s": 1.6232025229837745
     }
   },
   {
@@ -344,7 +349,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -362,22 +367,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 185,
+            "completion_tokens": 389,
             "finish_reason": "stop",
-            "latency_s": 3.265775,
+            "latency_s": 4.34063,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3021,
-            "reasoning_tokens": 108
+            "prompt_tokens": 3355,
+            "reasoning_tokens": 317
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "レストランの場所は、真相にも確定事実にも関係しないため判断できません。"
+          "reason": "店の立地は問題に関係せず、真相からも判断できません。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -389,17 +395,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "そのレストランは海辺にありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.2658382290101144,
-      "luna_s": 3.2658382290101144,
-      "total_s": 5.131486913014669,
-      "writer_s": 1.8656486840045545
+      "judge_s": 4.340688014985062,
+      "luna_s": 4.340688014985062,
+      "total_s": 6.149535802891478,
+      "writer_s": 1.8088477879064158
     }
   },
   {
@@ -411,7 +417,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -429,26 +435,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 283,
+            "completion_tokens": 174,
             "finish_reason": "stop",
-            "latency_s": 3.566569,
+            "latency_s": 2.768931,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3025,
-            "reasoning_tokens": 206
+            "prompt_tokens": 3359,
+            "reasoning_tokens": 90
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "シェフが男を以前から知っていたかは、真相や確定事実から判断できません。"
+          "reason": "シェフが男を知っていたかは真相にも確定事実にもなく、謎の核心と無関係です。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ほかのことも聞いてごらん。"
+        "text": "関係ないよ。ほかのことも聞いてごらん"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -456,17 +463,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "シェフは男のことを知っていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.5666230079950765,
-      "luna_s": 3.5666230079950765,
-      "total_s": 5.215669608005555,
-      "writer_s": 1.6490466000104789
+      "judge_s": 2.7689822718966752,
+      "luna_s": 2.7689822718966752,
+      "total_s": 4.515992433880456,
+      "writer_s": 1.7470101619837806
     }
   },
   {
@@ -478,7 +485,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -496,22 +503,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 407,
+            "completion_tokens": 378,
             "finish_reason": "stop",
-            "latency_s": 4.702499,
+            "latency_s": 4.551102,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3033,
-            "reasoning_tokens": 342
+            "prompt_tokens": 3367,
+            "reasoning_tokens": 301
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "以前の味との違いから、過去の出来事を悟ったためです。"
+          "reason": "味の違いから、以前の出来事やその真相に気づいたためです。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -523,17 +531,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男はスープを飲んで、何か別のものを思い出したんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.702550362009788,
-      "luna_s": 4.702550362009788,
-      "total_s": 6.254751607018989,
-      "writer_s": 1.5522012450092006
+      "judge_s": 4.551160725997761,
+      "luna_s": 4.551160725997761,
+      "total_s": 6.681260342942551,
+      "writer_s": 2.13009961694479
     }
   },
   {
@@ -545,7 +553,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -563,22 +571,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 281,
+            "completion_tokens": 250,
             "finish_reason": "stop",
-            "latency_s": 3.472524,
+            "latency_s": 3.616795,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3027,
-            "reasoning_tokens": 203
+            "prompt_tokens": 3361,
+            "reasoning_tokens": 175
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "誰が運んだかは真相・確定事実に記載がなく、核心にも関係しません。"
+          "reason": "誰が運んだかは示されておらず、真相にも関係しません。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -590,17 +599,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "スープを出したのは、その店のシェフ本人ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.472549240977969,
-      "luna_s": 3.472549240977969,
-      "total_s": 4.790490656974725,
-      "writer_s": 1.3179414159967564
+      "judge_s": 3.6168585038976744,
+      "luna_s": 3.6168585038976744,
+      "total_s": 5.85130378685426,
+      "writer_s": 2.2344452829565853
     }
   },
   {
@@ -612,7 +621,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -630,26 +639,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 268,
+            "completion_tokens": 221,
             "finish_reason": "stop",
-            "latency_s": 3.438016,
+            "latency_s": 2.869363,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3029,
-            "reasoning_tokens": 188
+            "prompt_tokens": 3363,
+            "reasoning_tokens": 141
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "飼っていたかどうかは、真相や確定事実から判断できず、謎にも関係ありません。"
+          "reason": "男が昔ウミガメを飼っていたかは、真相や確定事実から判断できません。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ほかのことも聞いてごらん"
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -657,17 +667,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男は昔、ウミガメを飼っていたんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.4380712709971704,
-      "luna_s": 3.4380712709971704,
-      "total_s": 5.202684708987363,
-      "writer_s": 1.7646134379901923
+      "judge_s": 2.8694053199142218,
+      "luna_s": 2.8694053199142218,
+      "total_s": 4.936763830948621,
+      "writer_s": 2.0673585110343993
     }
   },
   {
@@ -679,7 +689,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -697,26 +707,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 201,
+            "completion_tokens": 198,
             "finish_reason": "stop",
-            "latency_s": 2.29011,
+            "latency_s": 2.540418,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3040,
-            "reasoning_tokens": 116
+            "prompt_tokens": 3374,
+            "reasoning_tokens": 112
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "「食べたことがあるか」と「思い出したか」の二つの質問が含まれます。"
+          "reason": "過去に食べたかと、出来事を思い出したかの二問が含まれています。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。まずはどちらか聞いてみようか。"
+        "text": "質問はひとつずつコメントしてね。どっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -724,17 +735,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男は過去にウミガメを食べたことがあるの？その時の出来事を思い出したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2901380690163933,
-      "luna_s": 2.2901380690163933,
-      "total_s": 4.2431279370212,
-      "writer_s": 1.9529898680048063
+      "judge_s": 2.54044770100154,
+      "luna_s": 2.54044770100154,
+      "total_s": 4.533929430064745,
+      "writer_s": 1.9934817290632054
     }
   },
   {
@@ -746,7 +757,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -764,26 +775,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 163,
+            "completion_tokens": 159,
             "finish_reason": "stop",
-            "latency_s": 2.279238,
+            "latency_s": 2.320993,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3037,
-            "reasoning_tokens": 71
+            "prompt_tokens": 3371,
+            "reasoning_tokens": 86
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "「味が記憶と違ったのか」と「何かに気づいたのか」の質問が二つあります。"
+          "reason": "味の違いと気づいたことについて、質問が二つあります。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつ聞いてごらん☺️"
+        "text": "質問はひとつずつコメントしてね。どちらから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -791,17 +803,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "スープの味が記憶と違ったの？本物だと聞いて何かに気づいたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2792740699951537,
-      "luna_s": 2.2792740699951537,
-      "total_s": 4.553792318998603,
-      "writer_s": 2.2745182490034495
+      "judge_s": 2.321048747980967,
+      "luna_s": 2.321048747980967,
+      "total_s": 4.060100023983978,
+      "writer_s": 1.7390512760030106
     }
   },
   {
@@ -813,7 +825,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -831,26 +843,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 193,
+            "completion_tokens": 205,
             "finish_reason": "stop",
-            "latency_s": 2.530198,
+            "latency_s": 3.038056,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3032,
-            "reasoning_tokens": 109
+            "prompt_tokens": 3366,
+            "reasoning_tokens": 124
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「なぜ」と理由を尋ねる、はい／いいえで答えられない質問です。"
+          "reason": "「なぜ」を尋ねる質問で、はい／いいえでは答えられないため。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "理由を、はい・いいえで答えられる形にして聞いてみてね。"
+        "text": "はい／いいえで答えられる形で聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -858,17 +871,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男はなぜ本物のウミガメかどうか確かめたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5302253010158893,
-      "luna_s": 2.5302253010158893,
-      "total_s": 5.750014245015336,
-      "writer_s": 3.219788943999447
+      "judge_s": 3.0380935510620475,
+      "luna_s": 3.0380935510620475,
+      "total_s": 5.261502395034768,
+      "writer_s": 2.22340884397272
     }
   },
   {
@@ -880,7 +893,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -898,12 +911,12 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 192,
+            "completion_tokens": 209,
             "finish_reason": "stop",
-            "latency_s": 2.557131,
+            "latency_s": 3.23355,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3030,
-            "reasoning_tokens": 108
+            "prompt_tokens": 3364,
+            "reasoning_tokens": 124
           },
           "error": null,
           "kind": "q_open",
@@ -912,12 +925,13 @@ window.PROBE_RAW["luna-1d/U28"] = [
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "男が何を思い出したのか、はい・いいえで答えられる形で聞いてごらん。"
+        "text": "はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -925,17 +939,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "スープを飲んだとき、男は何を思い出したんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5571824199869297,
-      "luna_s": 2.5571824199869297,
-      "total_s": 4.497885082993889,
-      "writer_s": 1.9407026630069595
+      "judge_s": 3.2336195330135524,
+      "luna_s": 3.2336195330135524,
+      "total_s": 5.1991679010679945,
+      "writer_s": 1.965548368054442
     }
   },
   {
@@ -947,7 +961,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -965,26 +979,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 167,
+            "completion_tokens": 197,
             "finish_reason": "stop",
-            "latency_s": 2.396389,
+            "latency_s": 2.574296,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3032,
-            "reasoning_tokens": 80
+            "prompt_tokens": 3366,
+            "reasoning_tokens": 110
           },
           "error": null,
           "kind": "q_open",
-          "reason": "過去に何があったかを尋ねる、はい／いいえで答えられない質問です。"
+          "reason": "過去に何があったかを尋ねる、はい／いいえでは答えられない質問です。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "男の過去について、はい・いいえで答えられる質問にしてみてね。"
+        "text": "男の過去について、はい・いいえで答えられる質問にして聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -992,17 +1007,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男が泣き崩れるまでに、どんな過去があったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.3964363549894188,
-      "luna_s": 2.3964363549894188,
-      "total_s": 4.1407116829941515,
-      "writer_s": 1.7442753280047327
+      "judge_s": 2.5743488849839196,
+      "luna_s": 2.5743488849839196,
+      "total_s": 4.765228860080242,
+      "writer_s": 2.1908799750963226
     }
   },
   {
@@ -1014,7 +1029,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1032,22 +1047,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 282,
+            "completion_tokens": 269,
             "finish_reason": "stop",
-            "latency_s": 3.340722,
+            "latency_s": 3.021817,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3036,
-            "reasoning_tokens": 168
+            "prompt_tokens": 3370,
+            "reasoning_tokens": 146
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "昔飲んだスープと、その材料の核心を言い当てています。"
+          "reason": "昔ウミガメのスープと言われて飲んだ物と、その材料の両方を正しく推理しています。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -1059,17 +1075,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "昔ウミガメのスープだと言われて飲んだものが、仲間の肉だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.3407715749926865,
-      "luna_s": 3.3407715749926865,
-      "total_s": 3.34077795498888,
-      "writer_s": 6.379996193572879e-06
+      "judge_s": 3.0218458010349423,
+      "luna_s": 3.0218458010349423,
+      "total_s": 3.021862675086595,
+      "writer_s": 1.687405165284872e-05
     }
   },
   {
@@ -1081,7 +1097,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1099,22 +1115,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 287,
+            "completion_tokens": 349,
             "finish_reason": "stop",
-            "latency_s": 3.386294,
+            "latency_s": 4.041291,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3055,
-            "reasoning_tokens": 173
+            "prompt_tokens": 3389,
+            "reasoning_tokens": 234
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "昔のスープが仲間の肉で、味の違いから嘘に気づいた核心を言い当てています。"
+          "reason": "昔のスープが仲間の肉で、味の違いから嘘に気づいた核心を述べています。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -1126,17 +1143,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "昔、仲間の肉をウミガメのスープだと言われて飲んだんだね。本物の味が違って、あの時の嘘に気づいたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.386355234979419,
-      "luna_s": 3.386355234979419,
-      "total_s": 3.386358385963831,
-      "writer_s": 3.150984412059188e-06
+      "judge_s": 4.041349139995873,
+      "luna_s": 4.041349139995873,
+      "total_s": 4.041354691027664,
+      "writer_s": 5.551031790673733e-06
     }
   },
   {
@@ -1148,7 +1165,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1166,26 +1183,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 198,
+            "completion_tokens": 165,
             "finish_reason": "stop",
-            "latency_s": 2.545039,
+            "latency_s": 2.479267,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3042,
-            "reasoning_tokens": 127
+            "prompt_tokens": 3376,
+            "reasoning_tokens": 95
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "昔ウミガメのスープと言われて飲んだ点は合っていますが、材料の核心までは述べられていません。"
+          "reason": "漂流中に仲間からそう告げられて飲んだ点には触れていますが、材料までは述べていません。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！推理を続けてみようか。"
+        "text": "惜しい！推理を続けてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1193,17 +1211,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "漂流していたとき、仲間からウミガメのスープだと言われて飲んだことがあったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.545108247984899,
-      "luna_s": 2.545108247984899,
-      "total_s": 3.707362020999426,
-      "writer_s": 1.1622537730145268
+      "judge_s": 2.4793082599062473,
+      "luna_s": 2.4793082599062473,
+      "total_s": 3.8823918529087678,
+      "writer_s": 1.4030835930025205
     }
   },
   {
@@ -1215,7 +1233,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1233,22 +1251,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 905,
+            "completion_tokens": 661,
             "finish_reason": "stop",
-            "latency_s": 8.880385,
+            "latency_s": 6.74939,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3056,
-            "reasoning_tokens": 819
+            "prompt_tokens": 3390,
+            "reasoning_tokens": 578
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "仲間全員が助かって帰れたかを尋ねる質問。仲間の何人かは亡くなっています。"
+          "reason": "仲間全員が助かったかを尋ねており、何人かは漂流中に亡くなっています。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1260,17 +1279,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "仲間の肉をウミガメのスープだと言われて飲んだんだね。でもそのとき仲間はみんな助かって、あとで一緒に帰れたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 8.880440862005344,
-      "luna_s": 8.880440862005344,
-      "total_s": 10.00182925502304,
-      "writer_s": 1.1213883930176962
+      "judge_s": 6.749444140936248,
+      "luna_s": 6.749444140936248,
+      "total_s": 7.92614751693327,
+      "writer_s": 1.1767033759970218
     }
   },
   {
@@ -1282,7 +1301,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1300,26 +1319,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 193,
+            "completion_tokens": 204,
             "finish_reason": "stop",
-            "latency_s": 2.63823,
+            "latency_s": 2.841309,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3039,
-            "reasoning_tokens": 125
+            "prompt_tokens": 3373,
+            "reasoning_tokens": 146
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "涙の理由についての推理ですが、核心となる過去のスープの正体には触れていません。"
+          "reason": "核心となる昔のスープの正体には触れていません。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。もう少し考えてみようか。"
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1327,17 +1347,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "男はウミガメが大好きで、食べてしまったことが悲しくて泣いたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.6382880880264565,
-      "luna_s": 2.6382880880264565,
-      "total_s": 3.818423461052589,
-      "writer_s": 1.1801353730261326
+      "judge_s": 2.8413649030262604,
+      "luna_s": 2.8413649030262604,
+      "total_s": 3.8900307370349765,
+      "writer_s": 1.048665834008716
     }
   },
   {
@@ -1349,7 +1369,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1367,22 +1387,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 272,
+            "completion_tokens": 217,
             "finish_reason": "stop",
-            "latency_s": 3.210374,
+            "latency_s": 2.960533,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3044,
-            "reasoning_tokens": 210
+            "prompt_tokens": 3378,
+            "reasoning_tokens": 136
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "昔のスープの正体について、核心となる推理には触れていません。"
+          "reason": "今日のスープに飼っていたカメが使われたという推理で、核心には触れていません。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1394,17 +1415,425 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "子どものころに飼っていたカメがこのスープに使われたと思い込んで、悲しくなったんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.2104345969855785,
-      "luna_s": 3.2104345969855785,
-      "total_s": 4.682480777002638,
-      "writer_s": 1.4720461800170597
+      "judge_s": 2.960587978013791,
+      "luna_s": 2.960587978013791,
+      "total_s": 4.047946396982297,
+      "writer_s": 1.0873584189685062
+    }
+  },
+  {
+    "case_id": "U28-k01",
+    "record": {
+      "comment_id": "U28-k01",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 243,
+            "finish_reason": "stop",
+            "latency_s": 2.904743,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3380,
+            "reasoning_tokens": 122
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "漂流中に亀のスープと言われたことと、材料が仲間の肉だったことを当てています。"
+        }
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！男は遭難中、ウミガメのスープだと言われて亡くなった仲間の肉を飲んでいた。本物の味でそれに気づいた。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "漂流中に亀のスープと聞かされて口にした一杯は、実は仲間の肉から作られてたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.9047748900484294,
+      "luna_s": 2.9047748900484294,
+      "total_s": 2.9047808459727094,
+      "writer_s": 5.955924279987812e-06
+    }
+  },
+  {
+    "case_id": "U28-k02",
+    "record": {
+      "comment_id": "U28-k02",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 257,
+            "finish_reason": "stop",
+            "latency_s": 2.968877,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3383,
+            "reasoning_tokens": 139
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "昔飲んだスープが亡くなった仲間の肉だったと、二つの要点を正しく当てています。"
+        }
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！男は遭難中、ウミガメのスープだと言われて亡くなった仲間の肉を飲んでいた。本物の味でそれに気づいた。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "漂流中に亀の汁だと渡されて飲んだ一杯は仲間の肉で、男は正体に後から気づいたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.968934835982509,
+      "luna_s": 2.968934835982509,
+      "total_s": 2.9689368050312623,
+      "writer_s": 1.9690487533807755e-06
+    }
+  },
+  {
+    "case_id": "U28-k03",
+    "record": {
+      "comment_id": "U28-k03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 224,
+            "finish_reason": "stop",
+            "latency_s": 3.016992,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3377,
+            "reasoning_tokens": 154
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "昔ウミガメのスープと言われて飲んだ点と、材料が口にできないものだった点に触れています。"
+        }
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか😉"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "漂流中、ウミガメの汁だと説明されて飲んだけど、材料は口にしてはいけないものだったんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.017043442931026,
+      "luna_s": 3.017043442931026,
+      "total_s": 4.593275212915614,
+      "writer_s": 1.576231769984588
+    }
+  },
+  {
+    "case_id": "U28-k04",
+    "record": {
+      "comment_id": "U28-k04",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 208,
+            "finish_reason": "stop",
+            "latency_s": 2.907375,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3382,
+            "reasoning_tokens": 142
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "核心の二点は当たっていますが、仲間が全員無事に帰れたという誤りがあります。"
+        }
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "以前、亀のスープだと言われて飲んだのは仲間の肉だった。でも漂流仲間は全員無事に帰れたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 2.907450275029987,
+      "luna_s": 2.907450275029987,
+      "total_s": 4.468345602974296,
+      "writer_s": 1.5608953279443085
+    }
+  },
+  {
+    "case_id": "U28-k05",
+    "record": {
+      "comment_id": "U28-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 258,
+            "finish_reason": "stop",
+            "latency_s": 3.296593,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3373,
+            "reasoning_tokens": 192
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "以前のスープと今日の味の違いには触れていますが、正体までは述べていません。"
+        }
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか☺️"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男は昔もウミガメの汁を飲み、今のものとは味が違うと感じたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.2966397679410875,
+      "luna_s": 3.2966397679410875,
+      "total_s": 4.947224651928991,
+      "writer_s": 1.6505848839879036
+    }
+  },
+  {
+    "case_id": "U28-k06",
+    "record": {
+      "comment_id": "U28-k06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "1d-luna",
+        "shadow": false
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "completion_tokens": 295,
+            "finish_reason": "stop",
+            "latency_s": 3.944686,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3377,
+            "reasoning_tokens": 221
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "核心となる過去のスープの正体に触れておらず、今日のスープを偽物とする誤りがあります。"
+        }
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。別の可能性も考えてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "今日の椀は偽物で、シェフが男の昔話を信じ込ませるために嘘をついたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.9447364120278507,
+      "luna_s": 3.9447364120278507,
+      "total_s": 5.236647794023156,
+      "writer_s": 1.2919113819953054
     }
   },
   {
@@ -1416,7 +1845,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1436,22 +1865,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": "仲間の肉",
           "debug": {
-            "completion_tokens": 185,
+            "completion_tokens": 239,
             "finish_reason": "stop",
-            "latency_s": 2.26063,
+            "latency_s": 3.235042,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3015,
-            "reasoning_tokens": 105
+            "prompt_tokens": 3349,
+            "reasoning_tokens": 160
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、質問として聞き直してもらいます。"
+          "reason": "名詞句だけのコメントなので、推理ではなく開かれた質問として判定します。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -1463,17 +1893,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "仲間の肉？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.260683339991374,
-      "luna_s": 2.260683339991374,
-      "total_s": 4.570160224975552,
-      "writer_s": 2.3094768849841785
+      "judge_s": 3.2350682800170034,
+      "luna_s": 3.2350682800170034,
+      "total_s": 6.307358246063814,
+      "writer_s": 3.07228996604681
     }
   },
   {
@@ -1485,7 +1915,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1505,22 +1935,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": "レモン",
           "debug": {
-            "completion_tokens": 159,
+            "completion_tokens": 142,
             "finish_reason": "stop",
-            "latency_s": 2.563352,
+            "latency_s": 2.854773,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3013,
-            "reasoning_tokens": 73
+            "prompt_tokens": 3347,
+            "reasoning_tokens": 59
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、質問の形で聞き直してもらいます。"
+          "reason": "述語のない語句のみのコメントなので、質問として聞き直しをお願いします。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -1532,17 +1963,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "レモン",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5634051939996425,
-      "luna_s": 2.5634051939996425,
-      "total_s": 5.8042579230095726,
-      "writer_s": 3.24085272900993
+      "judge_s": 2.854825406917371,
+      "luna_s": 2.854825406917371,
+      "total_s": 5.487710007815622,
+      "writer_s": 2.632884600898251
     }
   },
   {
@@ -1554,7 +1985,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1572,26 +2003,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 227,
+            "completion_tokens": 170,
             "finish_reason": "stop",
-            "latency_s": 2.507826,
+            "latency_s": 2.201368,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3020,
-            "reasoning_tokens": 148
+            "prompt_tokens": 3354,
+            "reasoning_tokens": 92
           },
           "error": null,
           "kind": "ask_howto",
-          "reason": "質問への返信方法を尋ねているため、遊び方の質問です。"
+          "reason": "質問すると返事がもらえるか、遊び方を尋ねています。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "うん、はい・いいえで答えられる質問をコメントしてごらん。探偵が答えるよ☺️"
+        "text": "うん！はい・いいえで答えられる質問をコメントすると、私が答えるよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1599,17 +2031,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "質問したら返事もらえるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5078671630180907,
-      "luna_s": 2.5078671630180907,
-      "total_s": 3.892086365027353,
-      "writer_s": 1.3842192020092625
+      "judge_s": 2.2014046730473638,
+      "luna_s": 2.2014046730473638,
+      "total_s": 3.7916412020567805,
+      "writer_s": 1.5902365290094167
     }
   },
   {
@@ -1621,7 +2053,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1639,12 +2071,12 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 150,
+            "completion_tokens": 141,
             "finish_reason": "stop",
-            "latency_s": 2.292499,
+            "latency_s": 2.542753,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3018,
-            "reasoning_tokens": 92
+            "prompt_tokens": 3352,
+            "reasoning_tokens": 83
           },
           "error": null,
           "kind": "cheer",
@@ -1653,12 +2085,13 @@ window.PROBE_RAW["luna-1d/U28"] = [
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう！楽しみにしててね☺️"
+        "text": "ありがとう！更新も楽しみにしててね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1666,17 +2099,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "更新たのしみにしてる〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2925251639971975,
-      "luna_s": 2.2925251639971975,
-      "total_s": 3.7701854960178025,
-      "writer_s": 1.477660332020605
+      "judge_s": 2.54281228792388,
+      "luna_s": 2.54281228792388,
+      "total_s": 4.229639071971178,
+      "writer_s": 1.6868267840472981
     }
   },
   {
@@ -1688,7 +2121,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1706,26 +2139,27 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 181,
+            "completion_tokens": 228,
             "finish_reason": "stop",
-            "latency_s": 2.527439,
+            "latency_s": 3.113277,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3022,
-            "reasoning_tokens": 118
+            "prompt_tokens": 3356,
+            "reasoning_tokens": 161
           },
           "error": null,
           "kind": "complaint",
-          "reason": "前の投稿と設定が重複しているという、問題への指摘です。"
+          "reason": "前の投稿との設定の重複を指摘するコメントのため。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "教えてくれてありがとう。確認するね。"
+        "text": "教えてくれてありがとう、確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1733,17 +2167,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "前の投稿と設定が被ってる気がする",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5274858640041202,
-      "luna_s": 2.5274858640041202,
-      "total_s": 4.024028427025769,
-      "writer_s": 1.4965425630216487
+      "judge_s": 3.11335236299783,
+      "luna_s": 3.11335236299783,
+      "total_s": 4.801102761994116,
+      "writer_s": 1.687750398996286
     }
   },
   {
@@ -1755,7 +2189,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1773,22 +2207,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 106,
+            "completion_tokens": 83,
             "finish_reason": "stop",
-            "latency_s": 1.988857,
+            "latency_s": 1.941974,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3020,
-            "reasoning_tokens": 55
+            "prompt_tokens": 3354,
+            "reasoning_tokens": 37
           },
           "error": null,
           "kind": "troll",
-          "reason": "意味の取れない文字列のため、trollに分類します。"
+          "reason": "意味の取れない文字の連続です。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -1800,17 +2235,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "ぬぬぬぬぬ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.9889168069930747,
-      "luna_s": 1.9889168069930747,
-      "total_s": 1.9889563609904144,
-      "writer_s": 3.955399733968079e-05
+      "judge_s": 1.9420267079258338,
+      "luna_s": 1.9420267079258338,
+      "total_s": 1.9420470310142264,
+      "writer_s": 2.0323088392615318e-05
     }
   },
   {
@@ -1822,7 +2257,7 @@ window.PROBE_RAW["luna-1d/U28"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "1d-luna",
         "shadow": false
       },
@@ -1840,22 +2275,23 @@ window.PROBE_RAW["luna-1d/U28"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 100,
+            "completion_tokens": 79,
             "finish_reason": "stop",
-            "latency_s": 1.762927,
+            "latency_s": 1.808579,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3025,
-            "reasoning_tokens": 54
+            "prompt_tokens": 3359,
+            "reasoning_tokens": 28
           },
           "error": null,
           "kind": "spam",
-          "reason": "外部リンク付きのプレゼント応募宣伝です。"
+          "reason": "プレゼント応募への誘導と外部リンクを含む宣伝です。"
         }
       },
       "media_id": "local-U28",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "no_reply",
@@ -1867,17 +2303,17 @@ window.PROBE_RAW["luna-1d/U28"] = [
       "text": "無料プレゼント応募は固定リンクから→ https://example.invalid/gift",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.7629656179924496,
-      "luna_s": 1.7629656179924496,
-      "total_s": 1.762968955008546,
-      "writer_s": 3.3370160963386297e-06
+      "judge_s": 1.8086352149257436,
+      "luna_s": 1.8086352149257436,
+      "total_s": 1.8086359348380938,
+      "writer_s": 7.199123501777649e-07
     }
   }
 ];

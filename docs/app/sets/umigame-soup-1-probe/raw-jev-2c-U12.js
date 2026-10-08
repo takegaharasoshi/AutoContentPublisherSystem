@@ -9,7 +9,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -27,11 +27,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4227,
-            "latency_s": 1.079746,
+            "input_tokens": 4585,
+            "latency_s": 1.228484,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -41,8 +41,8 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.04,
-                "question": 0.96
+                "guess": 0.03,
+                "question": 0.97
               },
               "A2": {
                 "q_multi": 0.0,
@@ -51,7 +51,10 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.09
+                "point_0": {
+                  "close": 0.15000000000000002,
+                  "hit": 0.05
+                }
               },
               "C": 0.51,
               "D": {
@@ -63,18 +66,19 @@ window.PROBE_RAW["jev-2c/U12"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.09"
+          "reason": "段A=question→q_yesno, 要点最低=0.05"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。楽器を構えているのは実際の人間ではないよ。"
+        "text": "いいえ。実際の人間ではないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -82,17 +86,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "楽器を構えているのは実際の人間ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.0799922659934964,
-      "judge_s": 1.0799922659934964,
+      "jev_s": 1.2286957500036806,
+      "judge_s": 1.2286957500036806,
       "luna_s": null,
-      "total_s": 3.901856017007958,
-      "writer_s": 2.8218637510144617
+      "total_s": 3.354720492963679,
+      "writer_s": 2.1260247429599985
     }
   },
   {
@@ -104,7 +108,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -112,21 +116,21 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "errors": [],
       "fact_sheet_hash": "95e164954bcf",
       "final": {
-        "answer": "irrelevant",
+        "answer": "yes",
         "decision": "jev",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": {
-          "answer": "irrelevant",
+          "answer": "yes",
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4239,
-            "latency_s": 1.207017,
+            "input_tokens": 4597,
+            "latency_s": 1.199921,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -146,30 +150,34 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.11
+                "point_0": {
+                  "close": 0.19,
+                  "hit": 0.06
+                }
               },
-              "C": 0.52,
+              "C": 0.57,
               "D": {
-                "irrelevant": 0.01,
-                "no": 0.45,
-                "yes": 0.54
+                "irrelevant": 0.0,
+                "no": 0.35,
+                "yes": 0.65
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.11"
+          "reason": "段A=question→q_yesno, 要点最低=0.06"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ほかのことも聞いてごらん。"
+        "text": "はい！自分の意思で音を出さないんだね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -177,17 +185,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "男たちは自分の意思で音を出さないんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2076393399911467,
-      "judge_s": 1.2076393399911467,
+      "jev_s": 1.200185070047155,
+      "judge_s": 1.200185070047155,
       "luna_s": null,
-      "total_s": 3.0716046019806527,
-      "writer_s": 1.863965261989506
+      "total_s": 3.1860659801168367,
+      "writer_s": 1.9858809100696817
     }
   },
   {
@@ -199,7 +207,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -217,11 +225,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4239,
-            "latency_s": 1.142924,
+            "input_tokens": 4597,
+            "latency_s": 1.238054,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -231,8 +239,8 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.07,
-                "question": 0.93
+                "guess": 0.05,
+                "question": 0.95
               },
               "A2": {
                 "q_multi": 0.0,
@@ -241,13 +249,16 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.01
+                "point_0": {
+                  "close": 0.02,
+                  "hit": 0.01
+                }
               },
-              "C": 0.49,
+              "C": 0.47,
               "D": {
-                "irrelevant": 0.05,
-                "no": 0.28,
-                "yes": 0.67
+                "irrelevant": 0.06,
+                "no": 0.38,
+                "yes": 0.56
               }
             }
           },
@@ -259,8 +270,9 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -272,17 +284,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "持っている楽器は本当に音が出るものですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.143206064007245,
-      "judge_s": 1.143206064007245,
+      "jev_s": 1.2383887950563803,
+      "judge_s": 1.2383887950563803,
       "luna_s": null,
-      "total_s": 2.437508697010344,
-      "writer_s": 1.294302633003099
+      "total_s": 2.7384983130032197,
+      "writer_s": 1.5001095179468393
     }
   },
   {
@@ -294,7 +306,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -312,11 +324,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4203,
-            "latency_s": 1.232187,
+            "input_tokens": 4561,
+            "latency_s": 1.124392,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -336,26 +348,30 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.41,
+              "C": 0.43,
               "D": {
                 "irrelevant": 0.0,
-                "no": 0.17,
-                "yes": 0.83
+                "no": 0.12,
+                "yes": 0.88
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -367,17 +383,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "階段は建物の中にあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2325195599987637,
-      "judge_s": 1.2325195599987637,
+      "jev_s": 1.124739296035841,
+      "judge_s": 1.124739296035841,
       "luna_s": null,
-      "total_s": 3.1131844759802334,
-      "writer_s": 1.8806649159814697
+      "total_s": 2.674123221077025,
+      "writer_s": 1.5493839250411838
     }
   },
   {
@@ -389,7 +405,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -407,11 +423,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4263,
-            "latency_s": 1.203138,
+            "input_tokens": 4621,
+            "latency_s": 1.214664,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -421,8 +437,8 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.63,
-                "question": 0.37
+                "guess": 0.52,
+                "question": 0.48
               },
               "A2": {
                 "q_multi": 0.0,
@@ -431,9 +447,12 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.01
+                "point_0": {
+                  "close": 0.02,
+                  "hit": 0.01
+                }
               },
-              "C": 0.58,
+              "C": 0.57,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -449,12 +468,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
+        "text": "いいえ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -462,17 +482,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "見ている人たちは演奏を期待して集まってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2034219029883388,
-      "judge_s": 1.2034219029883388,
+      "jev_s": 1.2150529999053106,
+      "judge_s": 1.2150529999053106,
       "luna_s": null,
-      "total_s": 2.9360100609774236,
-      "writer_s": 1.7325881579890847
+      "total_s": 2.699281037901528,
+      "writer_s": 1.4842280379962176
     }
   },
   {
@@ -484,7 +504,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -502,11 +522,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4215,
-            "latency_s": 2.177801,
+            "input_tokens": 4573,
+            "latency_s": 1.297818,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -516,8 +536,8 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.01,
-                "question": 0.99
+                "guess": 0.0,
+                "question": 1.0
               },
               "A2": {
                 "q_multi": 0.0,
@@ -526,26 +546,30 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
               "C": 0.24,
               "D": {
-                "irrelevant": 0.2,
+                "irrelevant": 0.19,
                 "no": 0.04,
-                "yes": 0.76
+                "yes": 0.77
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -557,17 +581,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "毎日見ているのは同じ人たちですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 2.178053148993058,
-      "judge_s": 2.178053148993058,
+      "jev_s": 1.2980836409842595,
+      "judge_s": 1.2980836409842595,
       "luna_s": null,
-      "total_s": 4.2611024269717745,
-      "writer_s": 2.0830492779787164
+      "total_s": 2.694818760966882,
+      "writer_s": 1.3967351199826226
     }
   },
   {
@@ -579,7 +603,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -597,11 +621,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4251,
-            "latency_s": 1.08995,
+            "input_tokens": 4609,
+            "latency_s": 1.168029,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -611,40 +635,44 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.37,
-                "question": 0.63
+                "guess": 0.4,
+                "question": 0.6
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.03,
-                "q_yesno": 0.97
+                "q_open": 0.05,
+                "q_yesno": 0.95
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.03
+                "point_0": {
+                  "close": 0.02,
+                  "hit": 0.01
+                }
               },
-              "C": 0.43,
+              "C": 0.44,
               "D": {
                 "irrelevant": 0.0,
-                "no": 0.92,
-                "yes": 0.08
+                "no": 0.94,
+                "yes": 0.06
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.03"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。何かの仕事でそこに立っているの？"
+        "text": "いいえ。男たちは仕事でそこに立っているんじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -652,17 +680,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "男たちは何かの仕事でそこに立っているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.0901577430195175,
-      "judge_s": 1.0901577430195175,
+      "jev_s": 1.1684073429787531,
+      "judge_s": 1.1684073429787531,
       "luna_s": null,
-      "total_s": 5.041245261003496,
-      "writer_s": 3.9510875179839786
+      "total_s": 4.725188027950935,
+      "writer_s": 3.556780684972182
     }
   },
   {
@@ -674,7 +702,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -692,11 +720,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4263,
-            "latency_s": 1.130818,
+            "input_tokens": 4621,
+            "latency_s": 1.205243,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -706,8 +734,8 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.01
               },
               "A1b": {
-                "guess": 0.75,
-                "question": 0.25
+                "guess": 0.76,
+                "question": 0.24
               },
               "A2": {
                 "q_multi": 0.0,
@@ -716,9 +744,12 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.02
+                "point_0": {
+                  "close": 0.02,
+                  "hit": 0.01
+                }
               },
-              "C": 0.28,
+              "C": 0.31,
               "D": {
                 "irrelevant": 0.0,
                 "no": 0.99,
@@ -728,18 +759,19 @@ window.PROBE_RAW["jev-2c/U12"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。演出上の理由ではないよ。"
+        "text": "いいえ。音を出さないのは何か演出上の理由があるんでしょか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -747,17 +779,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "音を出さないのは何か演出上の理由があるんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.1310242790204939,
-      "judge_s": 1.1310242790204939,
+      "jev_s": 1.2056837680283934,
+      "judge_s": 1.2056837680283934,
       "luna_s": null,
-      "total_s": 5.815789827029221,
-      "writer_s": 4.684765548008727
+      "total_s": 4.292755643953569,
+      "writer_s": 3.087071875925176
     }
   },
   {
@@ -769,7 +801,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -787,18 +819,18 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4263,
-            "latency_s": 1.243586,
+            "input_tokens": 4621,
+            "latency_s": 1.145534,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.93,
-                "reaction": 0.04,
-                "request": 0.03
+                "question_or_guess": 0.95,
+                "reaction": 0.03,
+                "request": 0.02
               },
               "A1b": {
                 "guess": 0.03,
@@ -811,26 +843,30 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.02
+                "point_0": {
+                  "close": 0.09,
+                  "hit": 0.05
+                }
               },
-              "C": 0.45,
+              "C": 0.49,
               "D": {
                 "irrelevant": 0.0,
-                "no": 1.0,
-                "yes": 0.0
+                "no": 0.99,
+                "yes": 0.01
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.05"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -842,17 +878,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "見てる人は男たちの演奏を聞いたことがあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2438287700060755,
-      "judge_s": 1.2438287700060755,
+      "jev_s": 1.145917346002534,
+      "judge_s": 1.145917346002534,
       "luna_s": null,
-      "total_s": 2.7099680379906204,
-      "writer_s": 1.4661392679845449
+      "total_s": 2.4883504800964147,
+      "writer_s": 1.3424331340938807
     }
   },
   {
@@ -864,7 +900,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -882,11 +918,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4209,
-            "latency_s": 1.25809,
+            "input_tokens": 4567,
+            "latency_s": 1.320081,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 240,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -896,40 +932,44 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.04,
-                "question": 0.96
+                "guess": 0.03,
+                "question": 0.97
               },
               "A2": {
                 "q_multi": 0.02,
                 "q_open": 0.01,
                 "q_yesno": 0.97
               },
-              "A_bare": 0.03,
+              "A_bare": 0.04,
               "B": {
-                "point_0": 0.01
+                "point_0": {
+                  "close": 0.04,
+                  "hit": 0.02
+                }
               },
-              "C": 0.39,
+              "C": 0.4,
               "D": {
-                "irrelevant": 0.52,
-                "no": 0.48,
+                "irrelevant": 0.47,
+                "no": 0.53,
                 "yes": 0.0
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。階段の色や材質も関係ありますか？"
+        "text": "関係ないよ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -937,17 +977,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "階段の色や材質も関係ありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.258394198026508,
-      "judge_s": 1.258394198026508,
+      "jev_s": 1.3205263339914382,
+      "judge_s": 1.3205263339914382,
       "luna_s": null,
-      "total_s": 2.516556931019295,
-      "writer_s": 1.258162732992787
+      "total_s": 2.794146551983431,
+      "writer_s": 1.4736202179919928
     }
   },
   {
@@ -959,7 +999,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -978,7 +1018,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2136,
-            "latency_s": 0.733961,
+            "latency_s": 0.559559,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -991,13 +1031,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.73,
-                "question": 0.27
+                "guess": 0.75,
+                "question": 0.25
               },
               "A2": {
-                "q_multi": 0.58,
-                "q_open": 0.01,
-                "q_yesno": 0.41
+                "q_multi": 0.62,
+                "q_open": 0.02,
+                "q_yesno": 0.36
               },
               "A_bare": 0.02
             }
@@ -1010,12 +1050,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どちらか一つ聞いてごらん☺️"
+        "text": "質問はひとつずつしてごらん。私が答えるよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1023,17 +1064,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "男たちは本物の演奏者なの？それとも人形かなにか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7340831519977655,
-      "judge_s": 0.7340831519977655,
+      "jev_s": 0.5597382290288806,
+      "judge_s": 0.5597382290288806,
       "luna_s": null,
-      "total_s": 2.292126072017709,
-      "writer_s": 1.5580429200199433
+      "total_s": 2.6330824149772525,
+      "writer_s": 2.073344185948372
     }
   },
   {
@@ -1045,7 +1086,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1064,7 +1105,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2142,
-            "latency_s": 0.552766,
+            "latency_s": 0.621475,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1077,8 +1118,8 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.01,
-                "question": 0.99
+                "guess": 0.02,
+                "question": 0.98
               },
               "A2": {
                 "q_multi": 0.98,
@@ -1096,12 +1137,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どっちから聞いてみようか？"
+        "text": "質問はひとつずつ聞いてごらん。どっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1109,17 +1151,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "見ている人は毎日そこに来るの？男たちと知り合いなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.5529066710150801,
-      "judge_s": 0.5529066710150801,
+      "jev_s": 0.6216669450514019,
+      "judge_s": 0.6216669450514019,
       "luna_s": null,
-      "total_s": 2.2184122030157596,
-      "writer_s": 1.6655055320006795
+      "total_s": 2.430986270075664,
+      "writer_s": 1.809319325024262
     }
   },
   {
@@ -1131,7 +1173,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1150,7 +1192,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2704,
-            "latency_s": 0.753641,
+            "latency_s": 0.884929,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1163,32 +1205,33 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.03,
-                "question": 0.97
+                "guess": 0.02,
+                "question": 0.98
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.99,
                 "q_yesno": 0.01
               },
-              "A3": 0.06,
+              "A3": 0.05,
               "A_bare": 0.02
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A=question→q_open, 再確認=0.06"
+          "reason": "段A=question→q_open, 再確認=0.05"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「みんな」が誰か分かるようにして、はい／いいえで答えられる形で聞いてみてね。"
+        "text": "はい・いいえで答えられる形にして、聞き直してみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1196,17 +1239,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "音を一度も出したことがないのに、どうしてみんなうれしそうなんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.754103382001631,
-      "judge_s": 0.754103382001631,
+      "jev_s": 0.8852707730839029,
+      "judge_s": 0.8852707730839029,
       "luna_s": null,
-      "total_s": 4.268885254015913,
-      "writer_s": 3.5147818720142823
+      "total_s": 3.3899160760920495,
+      "writer_s": 2.5046453030081466
     }
   },
   {
@@ -1218,7 +1261,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1237,7 +1280,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2656,
-            "latency_s": 0.817604,
+            "latency_s": 0.820428,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1250,32 +1293,33 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.13,
-                "question": 0.87
+                "guess": 0.14,
+                "question": 0.86
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 1.0,
                 "q_yesno": 0.0
               },
-              "A3": 0.04,
-              "A_bare": 0.04
+              "A3": 0.05,
+              "A_bare": 0.03
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A=question→q_open, 再確認=0.04"
+          "reason": "段A=question→q_open, 再確認=0.05"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で聞いてごらん。"
+        "text": "はい／いいえで答えられる形で聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1283,17 +1327,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "この男たちは何をしている人たちなんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.8178540350054391,
-      "judge_s": 0.8178540350054391,
+      "jev_s": 0.820650492911227,
+      "judge_s": 0.820650492911227,
       "luna_s": null,
-      "total_s": 2.8924674080044497,
-      "writer_s": 2.0746133729990106
+      "total_s": 2.923491930938326,
+      "writer_s": 2.1028414380270988
     }
   },
   {
@@ -1305,7 +1349,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1324,7 +1368,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2668,
-            "latency_s": 0.774884,
+            "latency_s": 0.936102,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1332,21 +1376,21 @@ window.PROBE_RAW["jev-2c/U12"] = [
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.86,
+                "question_or_guess": 0.85,
                 "reaction": 0.01,
-                "request": 0.13
+                "request": 0.14
               },
               "A1b": {
                 "guess": 0.01,
                 "question": 0.99
               },
               "A2": {
-                "q_multi": 0.03,
-                "q_open": 0.97,
+                "q_multi": 0.02,
+                "q_open": 0.98,
                 "q_yesno": 0.0
               },
               "A3": 0.06,
-              "A_bare": 0.03
+              "A_bare": 0.04
             }
           },
           "error": null,
@@ -1357,12 +1401,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で聞いてごらん。誰のことかも書いてね。"
+        "text": "誰が何を見ているのか、はい・いいえで答えられる質問にして聞いてごらん。誰のことかも書いてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1370,17 +1415,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "誰が何を見て喜んでいるのか、もう少し知りたいです。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7751169200055301,
-      "judge_s": 0.7751169200055301,
+      "jev_s": 0.9363372629741207,
+      "judge_s": 0.9363372629741207,
       "luna_s": null,
-      "total_s": 3.086379544023657,
-      "writer_s": 2.311262624018127
+      "total_s": 3.124494288000278,
+      "writer_s": 2.1881570250261575
     }
   },
   {
@@ -1392,7 +1437,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1410,11 +1455,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 3215,
-            "latency_s": 0.825545,
+            "input_tokens": 3631,
+            "latency_s": 0.866121,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 154,
+            "output_tokens": 172,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1427,23 +1472,27 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "guess": 0.99,
                 "question": 0.01
               },
-              "A_bare": 0.05,
+              "A_bare": 0.04,
               "B": {
-                "point_0": 0.82
+                "point_0": {
+                  "close": 0.9400000000000001,
+                  "hit": 0.93
+                }
               },
               "B2": 0.07
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.82, 矛盾=0.07"
+          "reason": "段A=guess→guess_correct, 要点最低=0.93, 矛盾=0.07"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -1455,17 +1504,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "男たちは五人囃子のひな人形だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.8257827089983039,
-      "judge_s": 0.8257827089983039,
+      "jev_s": 0.8663686470827088,
+      "judge_s": 0.8663686470827088,
       "luna_s": null,
-      "total_s": 0.8257889569795225,
-      "writer_s": 6.247981218621135e-06
+      "total_s": 0.8663745850790292,
+      "writer_s": 5.937996320426464e-06
     }
   },
   {
@@ -1477,7 +1526,96 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "95e164954bcf",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 3779,
+            "latency_s": 0.799833,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.99,
+                  "hit": 0.98
+                }
+              },
+              "B2": 0.06
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.98, 矛盾=0.06"
+        },
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！男たちはひな人形の五人囃子。段飾りに並ぶ人形なので音は出さず、家族は飾っている間毎日眺めて楽しんでいる。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "段飾りに並ぶ五人囃子の人形だったんだね。人形だから音は出ないけど、家族は飾っている間うれしそうに眺めてたのか。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8001502259867266,
+      "judge_s": 0.8001502259867266,
+      "luna_s": null,
+      "total_s": 0.8001520950347185,
+      "writer_s": 1.8690479919314384e-06
+    }
+  },
+  {
+    "case_id": "U12-e18",
+    "record": {
+      "comment_id": "U12-e18",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1495,11 +1633,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 3,
-            "input_tokens": 2079,
-            "latency_s": 0.660314,
+            "input_tokens": 2332,
+            "latency_s": 0.826678,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 132,
+            "output_tokens": 150,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1514,109 +1652,28 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.44
+                "point_0": {
+                  "close": 0.96,
+                  "hit": 0.02
+                }
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.44"
+          "reason": "段A=guess→guess_close, 要点最低=0.02"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか☺️"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "段飾りに並ぶ五人囃子の人形だったんだね。人形だから音は出ないけど、家族は飾っている間うれしそうに眺めてたのか。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 0.6606426619982813,
-      "judge_s": 0.6606426619982813,
-      "luna_s": null,
-      "total_s": 2.2272441019886173,
-      "writer_s": 1.566601439990336
-    }
-  },
-  {
-    "case_id": "U12-e18",
-    "record": {
-      "comment_id": "U12-e18",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "003-silent-musicians",
-      "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
-      "final": {
-        "answer": null,
-        "decision": "jev",
-        "kind": "guess_correct"
-      },
-      "judgements": {
-        "jev": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "calls": 4,
-            "input_tokens": 3223,
-            "latency_s": 1.0204,
-            "major": "guess",
-            "model": "jev-latest",
-            "output_tokens": 154,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 1.0,
-                "question": 0.0
-              },
-              "A_bare": 0.03,
-              "B": {
-                "point_0": 0.51
-              },
-              "B2": 0.11
-            }
-          },
-          "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.51, 矛盾=0.11"
-        },
-        "luna": null
-      },
-      "media_id": "local-U12",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "template",
-        "text": "正解！男たちはひな人形の五人囃子。段飾りに並ぶ人形なので音は出さず、家族は飾っている間毎日眺めて楽しんでいる。"
+        "text": "惜しい！もう少し考えてみようか😌"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1624,17 +1681,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "男たちは人形なんでしょ。だから音を出さないんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.0206226320005953,
-      "judge_s": 1.0206226320005953,
+      "jev_s": 0.8269145189551637,
+      "judge_s": 0.8269145189551637,
       "luna_s": null,
-      "total_s": 1.0206373969849665,
-      "writer_s": 1.47649843711406e-05
+      "total_s": 2.576785960001871,
+      "writer_s": 1.7498714410467073
     }
   },
   {
@@ -1646,7 +1703,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1664,11 +1721,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 3327,
-            "latency_s": 0.741922,
+            "input_tokens": 3743,
+            "latency_s": 0.801025,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 154,
+            "output_tokens": 172,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1683,25 +1740,29 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.94
+                "point_0": {
+                  "close": 0.99,
+                  "hit": 0.99
+                }
               },
-              "B2": 0.87
+              "B2": 0.96
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.94, 矛盾=0.87"
+          "reason": "段A=guess→guess_close, 要点最低=0.99, 矛盾=0.96"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！推理を続けてみようか。"
+        "text": "惜しい！もう少し考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1709,17 +1770,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "男たちは五人囃子のひな人形で、飾ると本当に笛や太鼓の音が鳴るから、みんな毎日見に来るんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7423703570093494,
-      "judge_s": 0.7423703570093494,
+      "jev_s": 0.8014937340049073,
+      "judge_s": 0.8014937340049073,
       "luna_s": null,
-      "total_s": 2.5738449349883012,
-      "writer_s": 1.8314745779789519
+      "total_s": 3.058854450006038,
+      "writer_s": 2.2573607160011306
     }
   },
   {
@@ -1731,7 +1792,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1750,11 +1811,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 4281,
-            "latency_s": 1.197371,
+            "input_tokens": 4639,
+            "latency_s": 1.242342,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1769,31 +1830,35 @@ window.PROBE_RAW["jev-2c/U12"] = [
               },
               "A2": {
                 "q_multi": 0.01,
-                "q_open": 0.1,
-                "q_yesno": 0.89
+                "q_open": 0.12,
+                "q_yesno": 0.87
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.01
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.31,
+              "C": 0.28,
               "D": {
-                "irrelevant": 0.19,
-                "no": 0.81,
+                "irrelevant": 0.18,
+                "no": 0.82,
                 "yes": 0.0
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -1805,17 +1870,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "演奏会の前に並んで写真を撮るのが恒例になってたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.197656450996874,
-      "judge_s": 1.197656450996874,
+      "jev_s": 1.242605916922912,
+      "judge_s": 1.242605916922912,
       "luna_s": null,
-      "total_s": 3.2239177279989235,
-      "writer_s": 2.0262612770020496
+      "total_s": 2.466319600935094,
+      "writer_s": 1.223713684012182
     }
   },
   {
@@ -1827,7 +1892,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1846,11 +1911,11 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 4,
             "guess_demoted": true,
-            "input_tokens": 2534,
-            "latency_s": 0.841544,
+            "input_tokens": 2892,
+            "latency_s": 1.900395,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 176,
+            "output_tokens": 194,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1864,30 +1929,34 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "question": 0.0
               },
               "A2": {
-                "q_multi": 0.04,
-                "q_open": 0.7,
-                "q_yesno": 0.26
+                "q_multi": 0.03,
+                "q_open": 0.67,
+                "q_yesno": 0.3
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.02
+                "point_0": {
+                  "close": 0.01,
+                  "hit": 0.0
+                }
               }
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "段A=question→guess_wrong, 要点最低=0.02"
+          "reason": "段A=question→guess_wrong, 要点最低=0.00"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。ほかの可能性も考えてみようか☺️"
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1895,17 +1964,554 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "男たちは楽器を持った銅像で、観光客が見に来てるんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.8417797019938007,
-      "judge_s": 0.8417797019938007,
+      "jev_s": 1.9005821920000017,
+      "judge_s": 1.9005821920000017,
       "luna_s": null,
-      "total_s": 2.844423039990943,
-      "writer_s": 2.0026433379971422
+      "total_s": 3.5489482580451295,
+      "writer_s": 1.6483660660451278
+    }
+  },
+  {
+    "case_id": "U12-k01",
+    "record": {
+      "comment_id": "U12-k01",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "95e164954bcf",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 3695,
+            "latency_s": 0.894142,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 0.99,
+                "reaction": 0.01,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.98,
+                  "hit": 0.96
+                }
+              },
+              "B2": 0.06
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.96, 矛盾=0.06"
+        },
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！男たちはひな人形の五人囃子。段飾りに並ぶ人形なので音は出さず、家族は飾っている間毎日眺めて楽しんでいる。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "節句の段飾りにいる五人囃子の人形を、家族が毎年飾って眺めてたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8943403579760343,
+      "judge_s": 0.8943403579760343,
+      "luna_s": null,
+      "total_s": 0.8943510059034452,
+      "writer_s": 1.0647927410900593e-05
+    }
+  },
+  {
+    "case_id": "U12-k02",
+    "record": {
+      "comment_id": "U12-k02",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "95e164954bcf",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 3703,
+            "latency_s": 1.005495,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.95,
+                  "hit": 0.8099999999999999
+                }
+              },
+              "B2": 0.13
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.81, 矛盾=0.13"
+        },
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！男たちはひな人形の五人囃子。段飾りに並ぶ人形なので音は出さず、家族は飾っている間毎日眺めて楽しんでいる。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "ひな壇に並んだ小さな人形の楽団で、笛や太鼓は飾りとして持っているだけなんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.0057408469729125,
+      "judge_s": 1.0057408469729125,
+      "luna_s": null,
+      "total_s": 1.0057442779652774,
+      "writer_s": 3.430992364883423e-06
+    }
+  },
+  {
+    "case_id": "U12-k03",
+    "record": {
+      "comment_id": "U12-k03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "95e164954bcf",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 3683,
+            "latency_s": 0.837319,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.9299999999999999,
+                  "hit": 0.51
+                }
+              },
+              "B2": 0.08
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.51, 矛盾=0.08"
+        },
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！男たちはひな人形の五人囃子。段飾りに並ぶ人形なので音は出さず、家族は飾っている間毎日眺めて楽しんでいる。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "段に飾られた人形たちで、楽器を構えた姿を家族が毎日眺めていたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8375516599044204,
+      "judge_s": 0.8375516599044204,
+      "luna_s": null,
+      "total_s": 0.8375545209273696,
+      "writer_s": 2.86102294921875e-06
+    }
+  },
+  {
+    "case_id": "U12-k04",
+    "record": {
+      "comment_id": "U12-k04",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "95e164954bcf",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2374,
+            "latency_s": 0.574103,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 150,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.87,
+                  "hit": 0.43
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.43"
+        },
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！ほかの可能性も考えてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "楽器を手にして階段状に並ぶ飾り人形で、実際に演奏する人はいなかったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.5743444940308109,
+      "judge_s": 0.5743444940308109,
+      "luna_s": null,
+      "total_s": 2.747414003009908,
+      "writer_s": 2.173069508979097
+    }
+  },
+  {
+    "case_id": "U12-k05",
+    "record": {
+      "comment_id": "U12-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "95e164954bcf",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2356,
+            "latency_s": 0.607113,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 150,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.9600000000000001,
+                  "hit": 0.05
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.05"
+        },
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男たちは本物の演奏者じゃなく、家に飾っておく人形だったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.6073244010331109,
+      "judge_s": 0.6073244010331109,
+      "luna_s": null,
+      "total_s": 2.2549481809837744,
+      "writer_s": 1.6476237799506634
+    }
+  },
+  {
+    "case_id": "U12-k06",
+    "record": {
+      "comment_id": "U12-k06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "95e164954bcf",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "guess_demoted": true,
+            "input_tokens": 2932,
+            "latency_s": 0.804338,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 194,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A2": {
+                "q_multi": 0.02,
+                "q_open": 0.69,
+                "q_yesno": 0.29
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.02,
+                  "hit": 0.01
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "段A=question→guess_wrong, 要点最低=0.01"
+        },
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男たちは階段を背景にした一枚の絵で、楽器を持つ姿が描かれているだけだったんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8046212090412155,
+      "judge_s": 0.8046212090412155,
+      "luna_s": null,
+      "total_s": 2.4421668080613017,
+      "writer_s": 1.6375455990200862
     }
   },
   {
@@ -1917,7 +2523,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1938,30 +2544,31 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 930,
-            "latency_s": 0.193207,
+            "latency_s": 0.183848,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.99,
-                "reaction": 0.01,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.88
+              "A_bare": 0.91
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A語句のみ: 0.88"
+          "reason": "段A語句のみ: 0.91"
         },
         "luna": null
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -1973,17 +2580,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "五人囃子？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.1933345349971205,
-      "judge_s": 0.1933345349971205,
+      "jev_s": 0.18392285204026848,
+      "judge_s": 0.18392285204026848,
       "luna_s": null,
-      "total_s": 1.7685973549960181,
-      "writer_s": 1.5752628199988976
+      "total_s": 3.503539234981872,
+      "writer_s": 3.3196163829416037
     }
   },
   {
@@ -1995,12 +2602,14 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
-      "errors": [],
+      "errors": [
+        "writer: writer did not ask what bare_term means"
+      ],
       "fact_sheet_hash": "95e164954bcf",
       "final": {
         "answer": null,
@@ -2014,15 +2623,15 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 928,
-            "latency_s": 0.28035,
+            "latency_s": 0.18171,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.98,
-                "reaction": 0.02,
+                "question_or_guess": 0.97,
+                "reaction": 0.03,
                 "request": 0.0
               },
               "A_bare": 0.97
@@ -2036,12 +2645,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "llm",
-        "text": "カラオケでは何が起きているのかな？"
+        "source": "fallback_template",
+        "text": "何がカラオケなのか教えてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2049,17 +2659,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "カラオケ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.280532303993823,
-      "judge_s": 0.280532303993823,
+      "jev_s": 0.18186674604658037,
+      "judge_s": 0.18186674604658037,
       "luna_s": null,
-      "total_s": 3.3201349979790393,
-      "writer_s": 3.0396026939852163
+      "total_s": 3.3507494770456105,
+      "writer_s": 3.16888273099903
     }
   },
   {
@@ -2071,7 +2681,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2090,7 +2700,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1431,
-            "latency_s": 0.374434,
+            "latency_s": 0.403899,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 122,
@@ -2107,7 +2717,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "ask_howto": 0.0,
                 "ask_spoiler": 0.0
               },
-              "A_bare": 0.23
+              "A_bare": 0.25
             }
           },
           "error": null,
@@ -2118,12 +2728,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ヒントはまだ内緒だよ。質問で少しずつ絞っていこうか？"
+        "text": "ヒントは出せないけど、質問で少しずつ絞っていこうね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2131,17 +2742,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "ちょっとだけヒントほしい〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.3745835770096164,
-      "judge_s": 0.3745835770096164,
+      "jev_s": 0.4041065899655223,
+      "judge_s": 0.4041065899655223,
       "luna_s": null,
-      "total_s": 2.282602882012725,
-      "writer_s": 1.9080193050031085
+      "total_s": 1.6869303588755429,
+      "writer_s": 1.2828237689100206
     }
   },
   {
@@ -2153,7 +2764,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2172,7 +2783,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1584,
-            "latency_s": 0.420465,
+            "latency_s": 0.365978,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -2185,8 +2796,8 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "request": 0.0
               },
               "A2": {
-                "chat": 0.02,
-                "cheer": 0.47,
+                "chat": 0.03,
+                "cheer": 0.46,
                 "complaint": 0.0,
                 "greeting": 0.0,
                 "impression": 0.51,
@@ -2204,12 +2815,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう！そう言ってもらえてうれしいよ☺️"
+        "text": "そう言ってもらえてうれしいよ！"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2217,17 +2829,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "このシリーズ好き！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.420622903999174,
-      "judge_s": 0.420622903999174,
+      "jev_s": 0.366054086945951,
+      "judge_s": 0.366054086945951,
       "luna_s": null,
-      "total_s": 1.9991592460137326,
-      "writer_s": 1.5785363420145586
+      "total_s": 1.9655829009134322,
+      "writer_s": 1.5995288139674813
     }
   },
   {
@@ -2239,7 +2851,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2258,7 +2870,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1602,
-            "latency_s": 0.393859,
+            "latency_s": 0.555156,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 149,
@@ -2290,12 +2902,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "そう言ってもらえてうれしいよ！ありがとう☺️"
+        "text": "ありがとう！楽しんでもらえてうれしいよ☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2303,17 +2916,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "このアカウント好きだから続けてほしい",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.39399754101759754,
-      "judge_s": 0.39399754101759754,
+      "jev_s": 0.5553236120613292,
+      "judge_s": 0.5553236120613292,
       "luna_s": null,
-      "total_s": 2.0897301790246274,
-      "writer_s": 1.69573263800703
+      "total_s": 3.229182702023536,
+      "writer_s": 2.673859089962207
     }
   },
   {
@@ -2325,7 +2938,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2344,7 +2957,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1596,
-            "latency_s": 0.362299,
+            "latency_s": 0.330602,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 149,
@@ -2352,8 +2965,8 @@ window.PROBE_RAW["jev-2c/U12"] = [
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.04,
-                "reaction": 0.96,
+                "question_or_guess": 0.05,
+                "reaction": 0.95,
                 "request": 0.0
               },
               "A2": {
@@ -2365,7 +2978,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "mention": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.07
+              "A_bare": 0.06
             }
           },
           "error": null,
@@ -2376,12 +2989,13 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "教えてくれてありがとう。確認するね。"
+        "text": "教えてくれてありがとう、確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2389,17 +3003,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "問題文に矛盾があると思います",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.3624486420012545,
-      "judge_s": 0.3624486420012545,
+      "jev_s": 0.33068235707469285,
+      "judge_s": 0.33068235707469285,
       "luna_s": null,
-      "total_s": 1.693310057016788,
-      "writer_s": 1.3308614150155336
+      "total_s": 2.3146208020625636,
+      "writer_s": 1.9839384449878708
     }
   },
   {
@@ -2411,7 +3025,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2430,16 +3044,16 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1468,
-            "latency_s": 0.434981,
+            "latency_s": 0.433406,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 129,
             "probabilities": {
               "A1": {
-                "inappropriate": 0.95,
+                "inappropriate": 0.96,
                 "other": 0.0,
                 "question_or_guess": 0.01,
-                "reaction": 0.04,
+                "reaction": 0.03,
                 "request": 0.0
               },
               "A2": {
@@ -2448,7 +3062,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
                 "spam": 0.0,
                 "troll": 1.0
               },
-              "A_bare": 0.32
+              "A_bare": 0.3
             }
           },
           "error": null,
@@ -2459,8 +3073,9 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -2472,17 +3087,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "らららららららら",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.43510275200242177,
-      "judge_s": 0.43510275200242177,
+      "jev_s": 0.43355966603849083,
+      "judge_s": 0.43355966603849083,
       "luna_s": null,
-      "total_s": 0.4351129089773167,
-      "writer_s": 1.0156974894925952e-05
+      "total_s": 0.4335747690638527,
+      "writer_s": 1.5103025361895561e-05
     }
   },
   {
@@ -2494,7 +3109,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2513,7 +3128,7 @@ window.PROBE_RAW["jev-2c/U12"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1494,
-            "latency_s": 0.416529,
+            "latency_s": 0.504609,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 129,
@@ -2542,8 +3157,9 @@ window.PROBE_RAW["jev-2c/U12"] = [
       },
       "media_id": "local-U12",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "no_reply",
@@ -2555,17 +3171,17 @@ window.PROBE_RAW["jev-2c/U12"] = [
       "text": "090-0000-0123 に電話ください",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.4167038239829708,
-      "judge_s": 0.4167038239829708,
+      "jev_s": 0.5047682059230283,
+      "judge_s": 0.5047682059230283,
       "luna_s": null,
-      "total_s": 0.4167046199727338,
-      "writer_s": 7.959897629916668e-07
+      "total_s": 0.5047709979116917,
+      "writer_s": 2.7919886633753777e-06
     }
   }
 ];

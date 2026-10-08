@@ -9,13 +9,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": "no",
         "decision": "jev",
@@ -27,771 +27,11 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4304,
-            "latency_s": 1.181123,
+            "input_tokens": 4657,
+            "latency_s": 1.236095,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.06,
-                "question": 0.94
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.0,
-                "q_yesno": 1.0
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": 0.07
-              },
-              "C": 0.7,
-              "D": {
-                "irrelevant": 0.0,
-                "no": 1.0,
-                "yes": 0.0
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.07"
-        },
-        "luna": null
-      },
-      "media_id": "local-U27",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は本物の車を公道で運転しているんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.1813893660146277,
-      "judge_s": 1.1813893660146277,
-      "luna_s": null,
-      "total_s": 2.4426662790356204,
-      "writer_s": 1.2612769130209927
-    }
-  },
-  {
-    "case_id": "U27-e02",
-    "record": {
-      "comment_id": "U27-e02",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
-      "final": {
-        "answer": "no",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4310,
-            "latency_s": 1.261849,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 238,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.7,
-                "question": 0.3
-              },
-              "A2": {
-                "q_multi": 0.01,
-                "q_open": 0.01,
-                "q_yesno": 0.98
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": 0.07
-              },
-              "C": 0.6,
-              "D": {
-                "irrelevant": 0.02,
-                "no": 0.95,
-                "yes": 0.03
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.07"
-        },
-        "luna": null
-      },
-      "media_id": "local-U27",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。妻や子どもたちの誰かが運転席にいるんじゃないよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "妻や子どもたちの誰かが運転席にいるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.2622628640092444,
-      "judge_s": 1.2622628640092444,
-      "luna_s": null,
-      "total_s": 4.1134480820037425,
-      "writer_s": 2.851185217994498
-    }
-  },
-  {
-    "case_id": "U27-e03",
-    "record": {
-      "comment_id": "U27-e03",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
-      "final": {
-        "answer": "no",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4250,
-            "latency_s": 1.148041,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 238,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.9,
-                "question": 0.1
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.0,
-                "q_yesno": 1.0
-              },
-              "A_bare": 0.03,
-              "B": {
-                "point_0": 0.02
-              },
-              "C": 0.55,
-              "D": {
-                "irrelevant": 0.0,
-                "no": 1.0,
-                "yes": 0.0
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
-        },
-        "luna": null
-      },
-      "media_id": "local-U27",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "車は自動運転の車ですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.148351301002549,
-      "judge_s": 1.148351301002549,
-      "luna_s": null,
-      "total_s": 2.7857370800047647,
-      "writer_s": 1.6373857790022157
-    }
-  },
-  {
-    "case_id": "U27-e04",
-    "record": {
-      "comment_id": "U27-e04",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
-      "final": {
-        "answer": "no",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4358,
-            "latency_s": 1.244665,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 238,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.24,
-                "question": 0.76
-              },
-              "A2": {
-                "q_multi": 0.02,
-                "q_open": 0.01,
-                "q_yesno": 0.97
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": 0.03
-              },
-              "C": 0.68,
-              "D": {
-                "irrelevant": 0.01,
-                "no": 0.92,
-                "yes": 0.07
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.03"
-        },
-        "luna": null
-      },
-      "media_id": "local-U27",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。次はどう聞こうか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は運転免許を持っていないだけで、運転の経験はあるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.245066047005821,
-      "judge_s": 1.245066047005821,
-      "luna_s": null,
-      "total_s": 2.825226582994219,
-      "writer_s": 1.580160535988398
-    }
-  },
-  {
-    "case_id": "U27-e05",
-    "record": {
-      "comment_id": "U27-e05",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
-      "final": {
-        "answer": "irrelevant",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "irrelevant",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4322,
-            "latency_s": 1.255821,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 238,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.72,
-                "question": 0.28
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.03,
-                "q_yesno": 0.97
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": 0.04
-              },
-              "C": 0.56,
-              "D": {
-                "irrelevant": 0.06,
-                "no": 0.44,
-                "yes": 0.5
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.04"
-        },
-        "luna": null
-      },
-      "media_id": "local-U27",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "関係ないよ。ふむふむ、次はどうかな？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "家族は車の中で移動そのものを楽しんでるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.2562531440053135,
-      "judge_s": 1.2562531440053135,
-      "luna_s": null,
-      "total_s": 2.793767653987743,
-      "writer_s": 1.5375145099824294
-    }
-  },
-  {
-    "case_id": "U27-e06",
-    "record": {
-      "comment_id": "U27-e06",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
-      "final": {
-        "answer": "no",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4316,
-            "latency_s": 1.22824,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 238,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.67,
-                "question": 0.33
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.0,
-                "q_yesno": 1.0
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": 0.02
-              },
-              "C": 0.66,
-              "D": {
-                "irrelevant": 0.0,
-                "no": 1.0,
-                "yes": 0.0
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
-        },
-        "luna": null
-      },
-      "media_id": "local-U27",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。ほかのことも聞いてごらん。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "この車は遊園地などの施設の中を走るものですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.2285122370230965,
-      "judge_s": 1.2285122370230965,
-      "luna_s": null,
-      "total_s": 2.425119928026106,
-      "writer_s": 1.1966076910030097
-    }
-  },
-  {
-    "case_id": "U27-e07",
-    "record": {
-      "comment_id": "U27-e07",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
-      "final": {
-        "answer": "yes",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "yes",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4292,
-            "latency_s": 1.163946,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 238,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.91,
-                "question": 0.09
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.01,
-                "q_yesno": 0.99
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": 0.19
-              },
-              "C": 0.7,
-              "D": {
-                "irrelevant": 0.0,
-                "no": 0.01,
-                "yes": 0.99
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.19"
-        },
-        "luna": null
-      },
-      "media_id": "local-U27",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい！車の外から車を動かしてるんだね。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は車の外から車を動かしてるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.1641546600149013,
-      "judge_s": 1.1641546600149013,
-      "luna_s": null,
-      "total_s": 3.2224896430270746,
-      "writer_s": 2.0583349830121733
-    }
-  },
-  {
-    "case_id": "U27-e08",
-    "record": {
-      "comment_id": "U27-e08",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
-      "final": {
-        "answer": "irrelevant",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "irrelevant",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4322,
-            "latency_s": 1.179712,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 240,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.02,
-                "question": 0.98
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.02,
-                "q_yesno": 0.98
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": 0.13
-              },
-              "C": 0.66,
-              "D": {
-                "irrelevant": 0.56,
-                "no": 0.35,
-                "yes": 0.09
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.13"
-        },
-        "luna": null
-      },
-      "media_id": "local-U27",
-      "parent_id": null,
-      "problem_schema_version": 2,
-      "reply": {
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "関係ないよ。ほかのことも聞いてごらん"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "家族は長い距離を何時間もかけて移動するんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.179912224994041,
-      "judge_s": 1.179912224994041,
-      "luna_s": null,
-      "total_s": 3.1424627079686616,
-      "writer_s": 1.9625504829746205
-    }
-  },
-  {
-    "case_id": "U27-e09",
-    "record": {
-      "comment_id": "U27-e09",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
-      "final": {
-        "answer": "no",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4292,
-            "latency_s": 1.164836,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -811,12 +51,15 @@ window.PROBE_RAW["jev-2c/U27"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.05
+                "point_0": {
+                  "close": 0.08,
+                  "hit": 0.05
+                }
               },
-              "C": 0.38,
+              "C": 0.7,
               "D": {
-                "irrelevant": 0.01,
-                "no": 0.99,
+                "irrelevant": 0.0,
+                "no": 1.0,
                 "yes": 0.0
               }
             }
@@ -829,48 +72,49 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ガソリンで走る車ではないよ。"
+        "text": "いいえ。次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "乗っているのはガソリンで走る車ですか？",
+      "text": "男は本物の車を公道で運転しているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.1651129689998925,
-      "judge_s": 1.1651129689998925,
+      "jev_s": 1.23642866499722,
+      "judge_s": 1.23642866499722,
       "luna_s": null,
-      "total_s": 3.0375918280042242,
-      "writer_s": 1.8724788590043318
+      "total_s": 2.780628268024884,
+      "writer_s": 1.5441996030276641
     }
   },
   {
-    "case_id": "U27-e10",
+    "case_id": "U27-e02",
     "record": {
-      "comment_id": "U27-e10",
+      "comment_id": "U27-e02",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": "no",
         "decision": "jev",
@@ -882,11 +126,803 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4298,
-            "latency_s": 1.268882,
+            "input_tokens": 4663,
+            "latency_s": 1.137708,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.72,
+                "question": 0.28
+              },
+              "A2": {
+                "q_multi": 0.01,
+                "q_open": 0.01,
+                "q_yesno": 0.98
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.11,
+                  "hit": 0.09
+                }
+              },
+              "C": 0.63,
+              "D": {
+                "irrelevant": 0.01,
+                "no": 0.93,
+                "yes": 0.06
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.09"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。妻や子どもたちの誰かが運転席にいるんですか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "妻や子どもたちの誰かが運転席にいるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.1381605720380321,
+      "judge_s": 1.1381605720380321,
+      "luna_s": null,
+      "total_s": 3.4458601811202243,
+      "writer_s": 2.307699609082192
+    }
+  },
+  {
+    "case_id": "U27-e03",
+    "record": {
+      "comment_id": "U27-e03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": "no",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4603,
+            "latency_s": 1.207086,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.91,
+                "question": 0.09
+              },
+              "A2": {
+                "q_multi": 0.0,
+                "q_open": 0.0,
+                "q_yesno": 1.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
+              },
+              "C": 0.58,
+              "D": {
+                "irrelevant": 0.0,
+                "no": 1.0,
+                "yes": 0.0
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。ふむふむ、次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "車は自動運転の車ですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.2074239120120183,
+      "judge_s": 1.2074239120120183,
+      "luna_s": null,
+      "total_s": 2.778597500990145,
+      "writer_s": 1.5711735889781266
+    }
+  },
+  {
+    "case_id": "U27-e04",
+    "record": {
+      "comment_id": "U27-e04",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": "no",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4711,
+            "latency_s": 1.245697,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.3,
+                "question": 0.7
+              },
+              "A2": {
+                "q_multi": 0.03,
+                "q_open": 0.01,
+                "q_yesno": 0.96
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.01,
+                  "hit": 0.01
+                }
+              },
+              "C": 0.67,
+              "D": {
+                "irrelevant": 0.02,
+                "no": 0.93,
+                "yes": 0.05
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男は運転免許を持っていないだけで、運転の経験はあるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.2459805130492896,
+      "judge_s": 1.2459805130492896,
+      "luna_s": null,
+      "total_s": 2.861875360016711,
+      "writer_s": 1.6158948469674215
+    }
+  },
+  {
+    "case_id": "U27-e05",
+    "record": {
+      "comment_id": "U27-e05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4675,
+            "latency_s": 1.205469,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.65,
+                "question": 0.35
+              },
+              "A2": {
+                "q_multi": 0.0,
+                "q_open": 0.03,
+                "q_yesno": 0.97
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.01,
+                  "hit": 0.01
+                }
+              },
+              "C": 0.55,
+              "D": {
+                "irrelevant": 0.08,
+                "no": 0.45,
+                "yes": 0.47000000000000003
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。ふむふむ、次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "家族は車の中で移動そのものを楽しんでるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.2057779500028118,
+      "judge_s": 1.2057779500028118,
+      "luna_s": null,
+      "total_s": 2.671183345024474,
+      "writer_s": 1.4654053950216621
+    }
+  },
+  {
+    "case_id": "U27-e06",
+    "record": {
+      "comment_id": "U27-e06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": "no",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4669,
+            "latency_s": 1.226486,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.65,
+                "question": 0.35
+              },
+              "A2": {
+                "q_multi": 0.0,
+                "q_open": 0.0,
+                "q_yesno": 1.0
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.03,
+                  "hit": 0.01
+                }
+              },
+              "C": 0.67,
+              "D": {
+                "irrelevant": 0.0,
+                "no": 1.0,
+                "yes": 0.0
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。ほかのことも聞いてごらん。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "この車は遊園地などの施設の中を走るものですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.226770207984373,
+      "judge_s": 1.226770207984373,
+      "luna_s": null,
+      "total_s": 2.9244118540082127,
+      "writer_s": 1.6976416460238397
+    }
+  },
+  {
+    "case_id": "U27-e07",
+    "record": {
+      "comment_id": "U27-e07",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": "yes",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4645,
+            "latency_s": 1.146476,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.88,
+                "question": 0.12
+              },
+              "A2": {
+                "q_multi": 0.0,
+                "q_open": 0.01,
+                "q_yesno": 0.99
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.05,
+                  "hit": 0.02
+                }
+              },
+              "C": 0.7,
+              "D": {
+                "irrelevant": 0.0,
+                "no": 0.0,
+                "yes": 1.0
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！男は車の外から車を動かしてるんだね。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男は車の外から車を動かしてるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.1467082030139863,
+      "judge_s": 1.1467082030139863,
+      "luna_s": null,
+      "total_s": 4.342079212074168,
+      "writer_s": 3.1953710090601817
+    }
+  },
+  {
+    "case_id": "U27-e08",
+    "record": {
+      "comment_id": "U27-e08",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4675,
+            "latency_s": 1.242688,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 258,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.01,
+                "question": 0.99
+              },
+              "A2": {
+                "q_multi": 0.0,
+                "q_open": 0.01,
+                "q_yesno": 0.99
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.03,
+                  "hit": 0.02
+                }
+              },
+              "C": 0.65,
+              "D": {
+                "irrelevant": 0.52,
+                "no": 0.38,
+                "yes": 0.1
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。ふむふむ、ほかにも聞いてごらん。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "家族は長い距離を何時間もかけて移動するんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.243015912012197,
+      "judge_s": 1.243015912012197,
+      "luna_s": null,
+      "total_s": 2.8401307589374483,
+      "writer_s": 1.5971148469252512
+    }
+  },
+  {
+    "case_id": "U27-e09",
+    "record": {
+      "comment_id": "U27-e09",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": "no",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4645,
+            "latency_s": 1.306354,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.05,
+                "question": 0.95
+              },
+              "A2": {
+                "q_multi": 0.0,
+                "q_open": 0.0,
+                "q_yesno": 1.0
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.04,
+                  "hit": 0.03
+                }
+              },
+              "C": 0.41,
+              "D": {
+                "irrelevant": 0.01,
+                "no": 0.99,
+                "yes": 0.0
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.03"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。ガソリンで走る車ではないよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "乗っているのはガソリンで走る車ですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.3067298750393093,
+      "judge_s": 1.3067298750393093,
+      "luna_s": null,
+      "total_s": 3.7127189990133047,
+      "writer_s": 2.4059891239739954
+    }
+  },
+  {
+    "case_id": "U27-e10",
+    "record": {
+      "comment_id": "U27-e10",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": "no",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 4651,
+            "latency_s": 1.20843,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -906,30 +942,34 @@ window.PROBE_RAW["jev-2c/U27"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.46
+                "point_0": {
+                  "close": 0.05,
+                  "hit": 0.03
+                }
               },
               "C": 0.77,
               "D": {
                 "irrelevant": 0.0,
-                "no": 0.98,
-                "yes": 0.02
+                "no": 0.97,
+                "yes": 0.03
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.46"
+          "reason": "段A=question→q_yesno, 要点最低=0.03"
         },
         "luna": null
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。自分でハンドルを操作してはいないよ。"
+        "text": "いいえ。自分でハンドルを操作してるんじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -937,17 +977,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "男は自分でハンドルを操作してるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.2692332080041524,
-      "judge_s": 1.2692332080041524,
+      "jev_s": 1.2087204629788175,
+      "judge_s": 1.2087204629788175,
       "luna_s": null,
-      "total_s": 3.7999446030298714,
-      "writer_s": 2.530711395025719
+      "total_s": 3.406941713998094,
+      "writer_s": 2.1982212510192767
     }
   },
   {
@@ -959,13 +999,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -978,7 +1018,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2150,
-            "latency_s": 0.60711,
+            "latency_s": 0.586324,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -991,8 +1031,8 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.3,
-                "question": 0.7
+                "guess": 0.36,
+                "question": 0.64
               },
               "A2": {
                 "q_multi": 0.99,
@@ -1010,12 +1050,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どちらから聞こうか？"
+        "text": "質問はひとつずつ聞いてごらん。どっちからにしようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1023,17 +1064,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "車は実際に道路を走ってるの？男以外の誰かが運転してるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.6073442249908112,
-      "judge_s": 0.6073442249908112,
+      "jev_s": 0.5865205650916323,
+      "judge_s": 0.5865205650916323,
       "luna_s": null,
-      "total_s": 2.0710025650041644,
-      "writer_s": 1.4636583400133532
+      "total_s": 2.2503459530416876,
+      "writer_s": 1.6638253879500553
     }
   },
   {
@@ -1045,13 +1086,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -1064,7 +1105,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2147,
-            "latency_s": 0.630202,
+            "latency_s": 0.591884,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1077,8 +1118,8 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.91,
-                "question": 0.09
+                "guess": 0.9,
+                "question": 0.1
               },
               "A2": {
                 "q_multi": 0.98,
@@ -1096,12 +1137,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつ聞いてごらん。どっちから聞こうか？"
+        "text": "質問は1つずつコメントしてね。まずはどちらか聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1109,17 +1151,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "これは遊園地の乗り物なの？家族は運転ごっこをしてるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.6304303009819705,
-      "judge_s": 0.6304303009819705,
+      "jev_s": 0.5920637579401955,
+      "judge_s": 0.5920637579401955,
       "luna_s": null,
-      "total_s": 2.0853742699546274,
-      "writer_s": 1.4549439689726569
+      "total_s": 1.7598686849232763,
+      "writer_s": 1.1678049269830808
     }
   },
   {
@@ -1131,13 +1173,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -1150,7 +1192,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2676,
-            "latency_s": 0.795835,
+            "latency_s": 0.797509,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1183,12 +1225,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「男はどうやって車を走らせているの？」を、はい・いいえで答えられる形で聞いてみてね。"
+        "text": "はい・いいえで答えられる形にして、聞いてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1196,17 +1239,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "免許がない男は、どうやって車を走らせているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7961997870006599,
-      "judge_s": 0.7961997870006599,
+      "jev_s": 0.7977912040660158,
+      "judge_s": 0.7977912040660158,
       "luna_s": null,
-      "total_s": 4.168733442988014,
-      "writer_s": 3.372533655987354
+      "total_s": 3.7162655690917745,
+      "writer_s": 2.9184743650257587
     }
   },
   {
@@ -1218,13 +1261,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -1237,7 +1280,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2672,
-            "latency_s": 0.777028,
+            "latency_s": 0.745952,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1250,8 +1293,8 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.07,
-                "question": 0.93
+                "guess": 0.08,
+                "question": 0.92
               },
               "A2": {
                 "q_multi": 0.01,
@@ -1270,12 +1313,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「妻が運転しているの？」のように、はい・いいえで答えられる形で聞いてみてね。"
+        "text": "運転しているのは妻ですか？のように、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1283,17 +1327,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "妻と子どもたちは誰の運転で移動しているんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7772846900043078,
-      "judge_s": 0.7772846900043078,
+      "jev_s": 0.7462099329568446,
+      "judge_s": 0.7462099329568446,
       "luna_s": null,
-      "total_s": 4.683061159012141,
-      "writer_s": 3.905776469007833
+      "total_s": 4.565579304937273,
+      "writer_s": 3.8193693719804287
     }
   },
   {
@@ -1305,13 +1349,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -1324,7 +1368,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2672,
-            "latency_s": 0.768941,
+            "latency_s": 0.828863,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1341,9 +1385,9 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "question": 1.0
               },
               "A2": {
-                "q_multi": 0.06,
-                "q_open": 0.93,
-                "q_yesno": 0.01
+                "q_multi": 0.04,
+                "q_open": 0.96,
+                "q_yesno": 0.0
               },
               "A3": 0.04,
               "A_bare": 0.05
@@ -1357,12 +1401,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で聞き直してみてね。"
+        "text": "「長い道のり」について、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1370,17 +1415,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "「長い道のり」とは、どこからどこまでのことですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7691698959970381,
-      "judge_s": 0.7691698959970381,
+      "jev_s": 0.8292365130037069,
+      "judge_s": 0.8292365130037069,
       "luna_s": null,
-      "total_s": 3.6587190460122656,
-      "writer_s": 2.8895491500152275
+      "total_s": 3.372866817051545,
+      "writer_s": 2.543630304047838
     }
   },
   {
@@ -1392,29 +1437,29 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
-        "kind": "guess_correct"
+        "kind": "guess_close"
       },
       "judgements": {
         "jev": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 4,
-            "input_tokens": 3274,
-            "latency_s": 0.781728,
+            "calls": 3,
+            "input_tokens": 2390,
+            "latency_s": 0.618896,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 154,
+            "output_tokens": 150,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1429,25 +1474,28 @@ window.PROBE_RAW["jev-2c/U27"] = [
               },
               "A_bare": 0.06,
               "B": {
-                "point_0": 0.86
-              },
-              "B2": 0.09
+                "point_0": {
+                  "close": 0.9199999999999999,
+                  "hit": 0.45
+                }
+              }
             }
           },
           "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.86, 矛盾=0.09"
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.45"
         },
         "luna": null
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "template",
-        "text": "正解！男が走らせているのは人生ゲームの車の駒。妻と子どもはピンで乗せていて、おもちゃなので免許はいらない。"
+        "source": "llm",
+        "text": "惜しい！推理を続けてみようか☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1455,17 +1503,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "人生ゲームの車の駒を動かしてたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7819669609889388,
-      "judge_s": 0.7819669609889388,
+      "jev_s": 0.6191131770610809,
+      "judge_s": 0.6191131770610809,
       "luna_s": null,
-      "total_s": 0.7819828279898502,
-      "writer_s": 1.586700091138482e-05
+      "total_s": 2.4395105910953134,
+      "writer_s": 1.8203974140342325
     }
   },
   {
@@ -1477,29 +1525,29 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
-        "kind": "guess_correct"
+        "kind": "guess_close"
       },
       "judgements": {
         "jev": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 4,
-            "input_tokens": 3390,
-            "latency_s": 0.773244,
+            "calls": 3,
+            "input_tokens": 2477,
+            "latency_s": 0.637347,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 154,
+            "output_tokens": 150,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1514,25 +1562,28 @@ window.PROBE_RAW["jev-2c/U27"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.96
-              },
-              "B2": 0.11
+                "point_0": {
+                  "close": 0.96,
+                  "hit": 0.31
+                }
+              }
             }
           },
           "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.96, 矛盾=0.11"
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.31"
         },
         "luna": null
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "template",
-        "text": "正解！男が走らせているのは人生ゲームの車の駒。妻と子どもはピンで乗せていて、おもちゃなので免許はいらない。"
+        "source": "llm",
+        "text": "惜しい！もう少し考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1540,17 +1591,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "家族で人生ゲームをしていて、男が車の駒を盤の道に沿って進めてたんだね。免許がなくてもできるわけだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.773499630013248,
-      "judge_s": 0.773499630013248,
+      "jev_s": 0.637566905003041,
+      "judge_s": 0.637566905003041,
       "luna_s": null,
-      "total_s": 0.7735068820184097,
-      "writer_s": 7.252005161717534e-06
+      "total_s": 2.0268287850776687,
+      "writer_s": 1.3892618800746277
     }
   },
   {
@@ -1562,29 +1613,29 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
-        "kind": "guess_correct"
+        "kind": "guess_close"
       },
       "judgements": {
         "jev": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 4,
-            "input_tokens": 3334,
-            "latency_s": 0.832752,
+            "calls": 3,
+            "input_tokens": 2435,
+            "latency_s": 0.615642,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 154,
+            "output_tokens": 150,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1599,25 +1650,28 @@ window.PROBE_RAW["jev-2c/U27"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.58
-              },
-              "B2": 0.09
+                "point_0": {
+                  "close": 0.98,
+                  "hit": 0.09
+                }
+              }
             }
           },
           "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.58, 矛盾=0.09"
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.09"
         },
         "luna": null
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "template",
-        "text": "正解！男が走らせているのは人生ゲームの車の駒。妻と子どもはピンで乗せていて、おもちゃなので免許はいらない。"
+        "source": "llm",
+        "text": "惜しい！推理を続けてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1625,17 +1679,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "家族で何かのすごろくをしていて、車の駒を長い道に沿って進めてるんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.8330238070047926,
-      "judge_s": 0.8330238070047926,
+      "jev_s": 0.6159098299685866,
+      "judge_s": 0.6159098299685866,
       "luna_s": null,
-      "total_s": 0.8330304219853133,
-      "writer_s": 6.614980520680547e-06
+      "total_s": 2.2362031750380993,
+      "writer_s": 1.6202933450695127
     }
   },
   {
@@ -1647,13 +1701,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -1664,12 +1718,12 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 4,
-            "input_tokens": 3390,
-            "latency_s": 0.769424,
+            "calls": 3,
+            "input_tokens": 2477,
+            "latency_s": 0.634127,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 154,
+            "output_tokens": 150,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1684,25 +1738,28 @@ window.PROBE_RAW["jev-2c/U27"] = [
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.95
-              },
-              "B2": 0.95
+                "point_0": {
+                  "close": 0.87,
+                  "hit": 0.16
+                }
+              }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.95, 矛盾=0.95"
+          "reason": "段A=guess→guess_close, 要点最低=0.16"
         },
         "luna": null
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか。"
+        "text": "惜しい！もう少し推理を続けてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1710,17 +1767,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "人生ゲームの車の駒を進めてるんだね。楽しんでるのは男だけで、妻と子どもは嫌々付き合わされてるのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7697080119978637,
-      "judge_s": 0.7697080119978637,
+      "jev_s": 0.634497398044914,
+      "judge_s": 0.634497398044914,
       "luna_s": null,
-      "total_s": 3.2669488249812275,
-      "writer_s": 2.497240812983364
+      "total_s": 2.249061517068185,
+      "writer_s": 1.614564119023271
     }
   },
   {
@@ -1732,13 +1789,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": "no",
         "decision": "jev",
@@ -1751,11 +1808,11 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 4364,
-            "latency_s": 1.248824,
+            "input_tokens": 4717,
+            "latency_s": 1.26137,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 238,
+            "output_tokens": 256,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1770,14 +1827,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
               },
               "A2": {
                 "q_multi": 0.01,
-                "q_open": 0.06,
-                "q_yesno": 0.93
+                "q_open": 0.05,
+                "q_yesno": 0.94
               },
               "A_bare": 0.02,
               "B": {
-                "point_0": 0.02
+                "point_0": {
+                  "close": 0.0,
+                  "hit": 0.0
+                }
               },
-              "C": 0.32,
+              "C": 0.33,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -1787,18 +1847,19 @@ window.PROBE_RAW["jev-2c/U27"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.02"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": null
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかの可能性も考えてみようか？"
+        "text": "いいえ。ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1806,17 +1867,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "妻が運転していて、男は助手席から道案内をしてるだけなんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 1.249277983995853,
-      "judge_s": 1.249277983995853,
+      "jev_s": 1.261751738958992,
+      "judge_s": 1.261751738958992,
       "luna_s": null,
-      "total_s": 3.0456359069794416,
-      "writer_s": 1.7963579229835887
+      "total_s": 3.1811994219897315,
+      "writer_s": 1.9194476830307394
     }
   },
   {
@@ -1828,13 +1889,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -1847,11 +1908,11 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 4,
             "guess_demoted": true,
-            "input_tokens": 2561,
-            "latency_s": 0.767298,
+            "input_tokens": 2975,
+            "latency_s": 0.838524,
             "major": "question",
             "model": "jev-latest",
-            "output_tokens": 176,
+            "output_tokens": 194,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -1865,13 +1926,552 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "question": 0.0
               },
               "A2": {
-                "q_multi": 0.05,
-                "q_open": 0.58,
-                "q_yesno": 0.37
+                "q_multi": 0.04,
+                "q_open": 0.64,
+                "q_yesno": 0.32
               },
               "A_bare": 0.03,
               "B": {
-                "point_0": 0.03
+                "point_0": {
+                  "close": 0.01,
+                  "hit": 0.0
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "段A=question→guess_wrong, 要点最低=0.00"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "車型の遊園地の乗り物に家族で乗って、男が運転手役をしてるんだと思う。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8387906800489873,
+      "judge_s": 0.8387906800489873,
+      "luna_s": null,
+      "total_s": 1.9079130160389468,
+      "writer_s": 1.0691223359899595
+    }
+  },
+  {
+    "case_id": "U27-k01",
+    "record": {
+      "comment_id": "U27-k01",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 3744,
+            "latency_s": 0.823398,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.88,
+                  "hit": 0.67
+                }
+              },
+              "B2": 0.06
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.67, 矛盾=0.06"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！男が走らせているのは人生ゲームの車の駒。妻と子どもはピンで乗せていて、おもちゃなので免許はいらない。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "車も家族も盤上のコマやピンで、男は人生ゲームの長い道を進めていたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8236677899258211,
+      "judge_s": 0.8236677899258211,
+      "luna_s": null,
+      "total_s": 0.8236870348919183,
+      "writer_s": 1.9244966097176075e-05
+    }
+  },
+  {
+    "case_id": "U27-k02",
+    "record": {
+      "comment_id": "U27-k02",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 3748,
+            "latency_s": 0.844923,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.99,
+                  "hit": 0.98
+                }
+              },
+              "B2": 0.06
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.98, 矛盾=0.06"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！男が走らせているのは人生ゲームの車の駒。妻と子どもはピンで乗せていて、おもちゃなので免許はいらない。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "ゲームの車コマに家族を表すピンを挿して、人生ゲームで道を進んでいたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8451832579448819,
+      "judge_s": 0.8451832579448819,
+      "luna_s": null,
+      "total_s": 0.8451906869886443,
+      "writer_s": 7.429043762385845e-06
+    }
+  },
+  {
+    "case_id": "U27-k03",
+    "record": {
+      "comment_id": "U27-k03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2435,
+            "latency_s": 0.551466,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 150,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.92,
+                  "hit": 0.04
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.04"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！ほかの可能性も考えながら、推理を続けてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "家族でボードゲームを囲み、車のおもちゃを盤の道に沿って進めていたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.5517273619771004,
+      "judge_s": 0.5517273619771004,
+      "luna_s": null,
+      "total_s": 2.3872562049655244,
+      "writer_s": 1.835528842988424
+    }
+  },
+  {
+    "case_id": "U27-k04",
+    "record": {
+      "comment_id": "U27-k04",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2453,
+            "latency_s": 0.608157,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 150,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.99,
+                "question": 0.01
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.93,
+                  "hit": 0.02
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.02"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し考えてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "すごろくの車コマを進めてたんだね。でも家族は一緒に楽しまず、男につき合ってるだけか。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.6083962159464136,
+      "judge_s": 0.6083962159464136,
+      "luna_s": null,
+      "total_s": 1.8869113948894665,
+      "writer_s": 1.2785151789430529
+    }
+  },
+  {
+    "case_id": "U27-k05",
+    "record": {
+      "comment_id": "U27-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 2390,
+            "latency_s": 0.619045,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 150,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 0.99,
+                "reaction": 0.01,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.05,
+              "B": {
+                "point_0": {
+                  "close": 0.99,
+                  "hit": 0.07
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.07"
+        },
+        "luna": null
+      },
+      "media_id": "local-U27",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "車は盤の上で動かす遊びのコマだったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-07T23:44:37Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-07T23:44:37Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.619183189002797,
+      "judge_s": 0.619183189002797,
+      "luna_s": null,
+      "total_s": 2.1625221440335736,
+      "writer_s": 1.5433389550307766
+    }
+  },
+  {
+    "case_id": "U27-k06",
+    "record": {
+      "comment_id": "U27-k06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "cc9071fb8900",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "015-unlicensed-driver",
+      "errors": [],
+      "fact_sheet_hash": "3fa8694b418f",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "guess_demoted": true,
+            "input_tokens": 2959,
+            "latency_s": 0.848239,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 194,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A2": {
+                "q_multi": 0.03,
+                "q_open": 0.74,
+                "q_yesno": 0.23
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.04,
+                  "hit": 0.03
+                }
               }
             }
           },
@@ -1883,30 +2483,31 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。別の考え方もしてみようか。"
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "車型の遊園地の乗り物に家族で乗って、男が運転手役をしてるんだと思う。",
+      "text": "妻が本物の車を運転し、男は助手席から家族に道を教えてたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.7675559329800308,
-      "judge_s": 0.7675559329800308,
+      "jev_s": 0.8483896739780903,
+      "judge_s": 0.8483896739780903,
       "luna_s": null,
-      "total_s": 1.7313903369940817,
-      "writer_s": 0.963834404014051
+      "total_s": 2.5132634839974344,
+      "writer_s": 1.664873810019344
     }
   },
   {
@@ -1918,13 +2519,15 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
-      "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "errors": [
+        "writer: writer did not ask what bare_term means"
+      ],
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -1937,7 +2540,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 930,
-            "latency_s": 0.194899,
+            "latency_s": 0.1738,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -1948,23 +2551,24 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "reaction": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.85
+              "A_bare": 0.87
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A語句のみ: 0.85"
+          "reason": "段A語句のみ: 0.87"
         },
         "luna": null
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "llm",
-        "text": "人生ゲームの何が気になるのかな？はい・いいえで答えられる形で聞いてごらん。"
+        "source": "fallback_template",
+        "text": "人生ゲームが何のことか、もう少し詳しく教えて！"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1972,17 +2576,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "人生ゲーム？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.1949930810078513,
-      "judge_s": 0.1949930810078513,
+      "jev_s": 0.17389801901299506,
+      "judge_s": 0.17389801901299506,
       "luna_s": null,
-      "total_s": 3.3803140000090934,
-      "writer_s": 3.185320919001242
+      "total_s": 3.8773938580416143,
+      "writer_s": 3.7034958390286192
     }
   },
   {
@@ -1994,7 +2598,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2002,7 +2606,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "errors": [
         "writer: writer did not ask what bare_term means"
       ],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -2015,7 +2619,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 927,
-            "latency_s": 0.175805,
+            "latency_s": 0.198422,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -2037,8 +2641,9 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "fallback_template",
@@ -2050,17 +2655,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "遊園地",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.17591052400530316,
-      "judge_s": 0.17591052400530316,
+      "jev_s": 0.1985006429022178,
+      "judge_s": 0.1985006429022178,
       "luna_s": null,
-      "total_s": 4.200431795994518,
-      "writer_s": 4.024521271989215
+      "total_s": 3.473446639836766,
+      "writer_s": 3.274945996934548
     }
   },
   {
@@ -2072,13 +2677,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -2091,7 +2696,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1435,
-            "latency_s": 0.390184,
+            "latency_s": 0.404796,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 124,
@@ -2099,9 +2704,9 @@ window.PROBE_RAW["jev-2c/U27"] = [
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.2,
-                "reaction": 0.02,
-                "request": 0.78
+                "question_or_guess": 0.25,
+                "reaction": 0.04,
+                "request": 0.71
               },
               "A2": {
                 "ask_hint": 0.01,
@@ -2119,12 +2724,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "そうだよ！はい・いいえで答えられる質問をしてごらん。私が答えるよ。"
+        "text": "そうだよ！はい・いいえで答えられる質問をしてみてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2132,17 +2738,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "はい・いいえで答えればいい感じ？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.3903435739921406,
-      "judge_s": 0.3903435739921406,
+      "jev_s": 0.40496305807027966,
+      "judge_s": 0.40496305807027966,
       "luna_s": null,
-      "total_s": 2.112062970001716,
-      "writer_s": 1.7217193960095756
+      "total_s": 1.983587468159385,
+      "writer_s": 1.5786244100891054
     }
   },
   {
@@ -2154,13 +2760,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -2173,7 +2779,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1580,
-            "latency_s": 0.486678,
+            "latency_s": 0.392137,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 149,
@@ -2194,7 +2800,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "mention": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.06
+              "A_bare": 0.07
             }
           },
           "error": null,
@@ -2205,8 +2811,9 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -2218,17 +2825,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "応援してます！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.48677080898778513,
-      "judge_s": 0.48677080898778513,
+      "jev_s": 0.392305968911387,
+      "judge_s": 0.392305968911387,
       "luna_s": null,
-      "total_s": 1.6416449229873251,
-      "writer_s": 1.15487411399954
+      "total_s": 2.786873269826174,
+      "writer_s": 2.3945673009147868
     }
   },
   {
@@ -2240,13 +2847,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -2259,7 +2866,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1596,
-            "latency_s": 0.380645,
+            "latency_s": 0.48543,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 149,
@@ -2280,7 +2887,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "mention": 0.0,
                 "request": 0.02
               },
-              "A_bare": 0.05
+              "A_bare": 0.06
             }
           },
           "error": null,
@@ -2291,8 +2898,9 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
@@ -2304,17 +2912,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "これちょっと説明足りなくない？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.380733185011195,
-      "judge_s": 0.380733185011195,
+      "jev_s": 0.48558776907157153,
+      "judge_s": 0.48558776907157153,
       "luna_s": null,
-      "total_s": 1.7592948829988018,
-      "writer_s": 1.3785616979876067
+      "total_s": 2.3122183381346986,
+      "writer_s": 1.826630569063127
     }
   },
   {
@@ -2326,13 +2934,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -2358,12 +2966,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "反応ありがとう！"
+        "text": "コメントありがとう！"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2371,17 +2980,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "🕵️‍♂️❓",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 5.08539960719645e-05,
-      "judge_s": 5.08539960719645e-05,
+      "jev_s": 7.738207932561636e-05,
+      "judge_s": 7.738207932561636e-05,
       "luna_s": null,
-      "total_s": 1.5585711249732412,
-      "writer_s": 1.5585202709771693
+      "total_s": 2.7327049750601873,
+      "writer_s": 2.7326275929808617
     }
   },
   {
@@ -2393,13 +3002,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -2412,7 +3021,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1478,
-            "latency_s": 0.379601,
+            "latency_s": 0.400833,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 128,
@@ -2430,7 +3039,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "spam": 1.0,
                 "troll": 0.0
               },
-              "A_bare": 0.12
+              "A_bare": 0.11
             }
           },
           "error": null,
@@ -2441,8 +3050,9 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "no_reply",
@@ -2454,17 +3064,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "投資案件紹介中！DMください",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.37969043501652777,
-      "judge_s": 0.37969043501652777,
+      "jev_s": 0.40104221599176526,
+      "judge_s": 0.40104221599176526,
       "luna_s": null,
-      "total_s": 0.3796915060374886,
-      "writer_s": 1.0710209608078003e-06
+      "total_s": 0.40104470297228545,
+      "writer_s": 2.4869805201888084e-06
     }
   },
   {
@@ -2476,13 +3086,13 @@ window.PROBE_RAW["jev-2c/U27"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "de7b20ee3a37",
+        "prompt_version": "cc9071fb8900",
         "reply_variant": "2c-luna",
         "shadow": false
       },
       "content_key": "015-unlicensed-driver",
       "errors": [],
-      "fact_sheet_hash": "78e56e441eae",
+      "fact_sheet_hash": "3fa8694b418f",
       "final": {
         "answer": null,
         "decision": "jev",
@@ -2495,7 +3105,7 @@ window.PROBE_RAW["jev-2c/U27"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1486,
-            "latency_s": 0.368497,
+            "latency_s": 0.410395,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 129,
@@ -2508,8 +3118,8 @@ window.PROBE_RAW["jev-2c/U27"] = [
                 "request": 0.02
               },
               "A2": {
-                "abuse": 0.92,
-                "personal_info": 0.06,
+                "abuse": 0.95,
+                "personal_info": 0.03,
                 "spam": 0.0,
                 "troll": 0.02
               },
@@ -2524,8 +3134,9 @@ window.PROBE_RAW["jev-2c/U27"] = [
       },
       "media_id": "local-U27",
       "parent_id": null,
-      "problem_schema_version": 2,
+      "problem_schema_version": 3,
       "reply": {
+        "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "template",
@@ -2537,17 +3148,17 @@ window.PROBE_RAW["jev-2c/U27"] = [
       "text": "作者の顔写真あげてよ、脱いでるやつ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-03T18:26:24Z",
+        "judged_at": "2026-10-07T23:44:37Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-03T18:26:24Z"
+        "webhook_received_at": "2026-10-07T23:44:37Z"
       }
     },
     "timing": {
-      "jev_s": 0.3686807060148567,
-      "judge_s": 0.3686807060148567,
+      "jev_s": 0.41058034100569785,
+      "judge_s": 0.41058034100569785,
       "luna_s": null,
-      "total_s": 0.3686864869960118,
-      "writer_s": 5.780981155112386e-06
+      "total_s": 0.4105934490216896,
+      "writer_s": 1.310801599174738e-05
     }
   }
 ];
