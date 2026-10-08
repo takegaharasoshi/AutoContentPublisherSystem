@@ -199,6 +199,8 @@ def test_jev_correct_requires_every_core_point(monkeypatch, problem) -> None:
                 assert problem.core_points[0] in questions["point_0"]["criteria"]["hit"]
                 assert problem.judge_criteria.points[0][0] in questions["point_0"]["criteria"]["hit"]
                 assert problem.judge_criteria.points[0][1] in questions["point_0"]["criteria"]["touch"]
+                # 21-6d16: 誤りでない部分だけで数えるため、段 B にも真相と確定事実を渡す
+                assert state["truth"] == problem.truth and state["fact_sheet"] == list(problem.fact_sheet)
                 return {"point_0": {"probabilities": {"hit": 0.8, "touch": 0.1, "none": 0.1}},
                         "point_1": {"probabilities": {"hit": second, "touch": 0.3,
                                                       "none": 0.7 - second}}}

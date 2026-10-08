@@ -183,6 +183,16 @@ CONTRADICTION_QUESTION = {
 }
 
 
+def core_point_state(problem: Problem, text: str) -> dict:
+    """段 B に渡す state（21-6d16 で問題文・真相・確定事実を追加）。"""
+    return {
+        "problem_text": problem.problem_text,
+        "truth": problem.truth,
+        "fact_sheet": list(problem.fact_sheet),
+        "comment": text,
+    }
+
+
 def contradiction_state(problem: Problem, text: str) -> dict:
     """段 B2 に渡す state（掃引ツールと共有する）。"""
     return {
@@ -279,7 +289,10 @@ def _core_point_questions(problem: Problem) -> dict[str, dict]:
             "instructions": (
                 "Classify the comment against this truth point. Choose hit when it meets the hit standard; "
                 "otherwise choose touch when it meets the touch standard; otherwise choose none. "
-                "Paraphrases with the same meaning count."
+                "Paraphrases with the same meaning count. "
+                "Count only the parts of the comment that do not contradict the truth or the established facts: "
+                "a statement that conflicts with them does not meet a standard even if its words resemble it. "
+                "Restating what the puzzle text already says does not meet the touch standard."
             ),
             "criteria": {
                 "hit": f"Truth point: {point}. Hit standard: {hit}",
@@ -374,9 +387,10 @@ def _judge_staged(
         def core_probs() -> dict:
             """段 B（コアの要点ごとの choice）。段 A1b と正解判定で使い回す。"""
             if "B" not in _points_cache:
-                # 要点ごとの choice を 1 リクエストにまとめる。
+                # 要点ごとの choice を 1 リクエストにまとめる。誤りでない部分だけで数えるため（21-6d16）、
+                # 問題文・真相・確定事実も渡す。
                 point_questions = _core_point_questions(problem)
-                point_answers = transport(api_key, {"comment": text}, point_questions, debug, "B")
+                point_answers = transport(api_key, core_point_state(problem, text), point_questions, debug, "B")
                 point_probs = {
                     point_id: _core_point_probabilities(point_answers[point_id])
                     for point_id in point_questions
@@ -566,7 +580,11 @@ def _judge_staged(
                             "answer": {
                                 "type": "choice",
                                 "instructions": (
-                                    "Answer the question only from the supplied facts. Do not infer missing facts."
+                                    "Answer the question only from the supplied facts. Do not infer missing facts. "
+                                    "Answer a negative question (「〜しないの？」「〜じゃないんですか？」) in the ordinary "
+                                    "Japanese way: yes when the negative statement is true, no when it is false. "
+                                    "When the question has a qualifier such as 「自分の意思で」「わざと」「〜だけ」, answer "
+                                    "whether the qualifier holds; if it does not hold, answer no rather than irrelevant."
                                 ),
                                 "criteria": {
                                     "yes": "The supplied facts support answering yes.",

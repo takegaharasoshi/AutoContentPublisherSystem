@@ -196,7 +196,11 @@
   {
     "id": "c-request-04",
     "text": "短めの問題リクエストです",
-    "kind": "request"
+    "kind": "request",
+    "accept_kinds": [
+      "ask_howto"
+    ],
+    "note": "2026-10-09 21-6d16・人間チェック（2026-10-08 判断）: 判定 ask_howto を許容"
   },
   {
     "id": "c-request-05",

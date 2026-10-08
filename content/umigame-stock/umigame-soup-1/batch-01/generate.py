@@ -6,7 +6,7 @@
   ``problem_snapshot_enabled`` / ``stories_enabled`` の有効化は 21-7 の人間ゲートで行い、本 SQL では触らない。
 - INSERT は ``stock_items.POST_ORDER`` の順に並べる（id の順 = 投稿順。2026-09-26 の素材の全数レビューで決定）。
 - 既存行向けに core_points / reveal_text / title / truth / caption の UPDATE SQL と、
-  judge_criteria（全 14 問）・U27 の fact_sheet / core_points の UPDATE SQL を生成する。
+  judge_criteria（全 14 問）・U12 / U27 の fact_sheet・U27 の core_points の UPDATE SQL を生成する。
 - ``--dry-run`` はローカル MySQL（docker の acps-mysql）でトランザクション内に流し、件数と content_key の
   重複を確認して ROLLBACK する。セットに既存ストック行があれば UPDATE、なければ INSERT を試す。
 
@@ -125,9 +125,9 @@ def build_update_sql() -> str:
 
 
 def build_criteria_update_sql() -> str:
-    """既存の両表へ正解基準を設定し、U27 の変更済み事実と要点も反映する。"""
+    """既存の両表へ正解基準を設定し、U12・U27 の変更済み事実と U27 の要点も反映する。"""
     lines = [
-        "-- batch-01 既存 14 問の正解基準と U27 の事実・要点の更新（V014 適用後に実行）",
+        "-- batch-01 既存 14 問の正解基準と U12・U27 の事実・U27 の要点の更新（V014 適用後に実行）",
         "-- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）",
         "-- 適用先: ローカル MySQL / Aurora（acps）。set_code と content_key で対象を特定する。",
         "-- 出題済み行がある場合は umigame_items のスナップショット値も更新する。",
@@ -135,11 +135,10 @@ def build_criteria_update_sql() -> str:
     ]
     for it in ITEMS:
         updates = [f"judge_criteria = '{jsonlit(it['judge_criteria'])}'"]
+        if it["no"] in ("U12", "U27"):  # U12 は 21-6d16 で楽器の事実を追加
+            updates.append(f"fact_sheet = '{jsonlit(it['fact_sheet'])}'")
         if it["no"] == "U27":
-            updates += [
-                f"fact_sheet = '{jsonlit(it['fact_sheet'])}'",
-                f"core_points = '{jsonlit(it['core_points'])}'",
-            ]
+            updates.append(f"core_points = '{jsonlit(it['core_points'])}'")
         lines.append(f"-- {it['content_key']}: {it['title']}")
         for table, alias in (("umigame_stock_items", "s"), ("umigame_items", "i")):
             lines += [
