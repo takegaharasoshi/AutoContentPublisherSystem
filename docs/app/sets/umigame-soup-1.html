@@ -421,7 +421,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <p>レベル 1 のテストセットは種別ごとに 5 件以上のラベル付きコメントを用意する。⑦〜㉒ はほとんど問題に依存しないため、全問で使う共通のテストセットにする（<a href="#evaluation">10.6</a>）。</p>
 
 <h3 id="judge-design">10.3 判定方式</h3>
-<div class="note"><span class="callout-title">要点</span>判定モジュールはコメント 1 件から「種別・答え」を決める部品で、2 方式が同じ契約を実装する。パターン 1 は luna に 1 回で判定させ、パターン 2 は Jev の確率を段ごとに使ってコードで分岐する。既定（暫定）の <code>hybrid</code> は luna の判定で返し、Jev は見張り役と正解開示前の二重確認に使う。評価用に、パターン 2 の段を OpenAI の Decisions API に載せ替えたパターン 3 も設計した（<a href="#pattern3-decisions">10.3.6</a>。本番のモードは変えない）。</div>
+<div class="note"><span class="callout-title">要点</span>判定モジュールはコメント 1 件から「種別・答え」を決める部品で、2 方式が同じ契約を実装する。パターン 1 は luna に 1 回で判定させ、パターン 2 は Jev の確率を段ごとに使ってコードで分岐する。既定（暫定）の <code>hybrid</code> は luna の判定で返し、Jev は見張り役と正解開示前の二重確認に使う。評価用に、パターン 2 の段を OpenAI の Decisions API に載せ替えたパターン 3（<a href="#pattern3-decisions">10.3.6</a>）と、パターン 1 のモデルを Claude Haiku 5.5 に替えたパターン 4（<a href="#pattern-haiku">10.3.7</a>）も設計した（本番のモードは変えない）。</div>
 
 <div class="table-wrap">
 <table>
@@ -455,7 +455,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="table-wrap">
 <table>
 <tr><th>部品</th><th>ファイル</th><th>役割</th></tr>
-<tr><td>判定（2 実装）</td><td><code>app/judge/luna.py</code> / <code>jev.py</code></td><td>判定ロジックはここにだけ書く（評価用の <code>decisions.py</code> は 21-6d10b で足す = <a href="#pattern3-decisions">10.3.6</a>）</td></tr>
+<tr><td>判定（2 実装）</td><td><code>app/judge/luna.py</code> / <code>jev.py</code></td><td>判定ロジックはここにだけ書く（評価用の <code>decisions.py</code> は 21-6d10b で足す = <a href="#pattern3-decisions">10.3.6</a>。評価用の <code>haiku.py</code> は 21-6d12b で足す = <a href="#pattern-haiku">10.3.7</a>）</td></tr>
 <tr><td>組み合わせ役</td><td><code>app/judge/combiner.py</code></td><td>2 実装を部品として呼び、モードに応じて判定を 1 つ選ぶ</td></tr>
 <tr><td>返信文</td><td><code>app/reply/writer.py</code> / <code>templates.py</code></td><td>判定と別の部品。LLM の書き手と定型文</td></tr>
 <tr><td>プロンプト</td><td><code>app/prompts/</code></td><td>Lambda に同梱してデプロイする（全文は <a href="#prompts">10.5</a>）。スナップショットの <code>master_rules</code> は使わない</td></tr>
@@ -623,6 +623,33 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>プローブ</strong>: 判定キャッシュの方式名は <code>decisions</code>、パターン名は <code>dec-2c</code>（評価ページの ⑥）。既存の 5 パターンのキャッシュ・結果は変えない</li>
 </ul>
 <div class="decision"><span class="callout-title">決定（2026-10-08・21-6d10b）</span>実装は <code>app/judge/decisions.py</code>。段の流れは <code>jev._judge_staged</code> に切り出して Jev と共有し、Jev・Decisions はリクエストの送り方（transport）・閾値・方式名だけを差し込む薄いラッパーにした（Jev の挙動・記録の形は変えていない）。<code>JUDGE_MODE=decisions</code> は設定として選べるが、既定は <code>hybrid</code> のまま。<strong>predicate に基準を付けた理由</strong>: 基準なしの機械変換で U01・U13 を小試走したところ、段 B2（矛盾チェック）が正解の推理 8 件すべてに 0.92〜1.0（Jev は 0.05〜0.17）を返し、④ が 0/8 になった。Jev には true / false の基準を渡しているのに Decisions には渡っていなかったので、情報をそろえるために付けた（変換の機械性は保つ）。付けた後は ④ 8/9。<strong>小試走の結果</strong>（157 ケース・基準を付けた後）: L1 の種別一致 89.2%（⑤ jev は 95.5%）。誤りの多くは ① の質問を ③ に落とすもの（11 件。段 C の品質が 0.01〜0.18 で閾値 0.2 未満）で、段 C の閾値の掃引は 21-6d11 で行う。誤った正解宣言（P2）が 1 件（U01-k03、⑤ 惜しいを ④ と判定）。拒否・luna への切り替えは 0 件。呼び出しは平均 3.05 回、判定の応答時間は中央値 0.71 秒・p95 2.25 秒（⑤ jev は 0.48 / 1.68 秒）。費用は 2 回の実行で入力 56.5 万トークン・約 $0.06。</div>
+
+<h4 id="pattern-haiku">10.3.7 パターン 4（Claude Haiku 5.5 の一括判定と書き手。評価用・設計 21-6d12a〔2026-10-08〕）</h4>
+<div class="note"><span class="callout-title">要点</span>パターン 1（luna）と<strong>同じプロンプト・同じ JSON スキーマ・同じ後処理</strong>で、モデルだけを Claude Haiku 5.5（<code>claude-haiku-5-5</code>）に替える。判定も書き手（<code>1b</code> 相当・<code>1d</code> 相当）も Haiku にし、effort は luna と同じく「その API の最大」にそろえる（ユーザー決定 2026-10-08）。評価パターン ⑦（判定 = <code>haiku</code>・返信文 = <code>1b-haiku</code>。① と同じ形）と ⑧（判定 = <code>haiku</code>・返信文 = <code>1d-haiku</code>。② と同じ形）としてだけ使い、本番の 3 モードと既定の <code>hybrid</code>・<code>1d-luna</code> は変えない。本番での役割（luna の置き換えか、luna とは別のモデルとしての二重確認役か）は 21-6e で決める。実装は 21-6d12b。経緯は<a href="../../ideas/umigame-reply-haiku55.md">アイデア記録</a>。</div>
+
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>公式ドキュメントの記載（2026-10-08 確認）</th><th>設計での扱い</th></tr>
+<tr><td>料金</td><td>入力 $0.10 / 出力 $0.50（100 万トークンあたり。プロンプトが 10 万トークン以下のとき。超えると $0.50 / $2.50）。キャッシュ読み出しは入力の 0.1 倍・5 分の書き込みは 1.25 倍。<strong>思考トークンは出力として課金</strong></td><td>プロンプトは 1 万トークン未満なので安いほうの単価だけ。luna と単価は同じなので、差は出力（思考）トークンの量と品質・拒否で決まる</td></tr>
+<tr><td>effort</td><td><code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code> / <code>max</code>。既定は <code>medium</code>（明示が必要）。<code>xhigh</code>・<code>max</code> では思考を切れない（<code>disabled</code> は 400）。<code>xhigh</code> 以上は思考と返答が大きく伸びる</td><td><strong>判定と <code>1b-haiku</code> は <code>max</code></strong>（luna の判定・<code>1b</code> が API の最大 <code>xhigh</code> なので、Haiku も最大にそろえる）。<strong><code>1d-haiku</code> は <code>low</code></strong>（luna の <code>1d</code> と同じ段）。<code>thinking</code> は送らない（adaptive が既定）。<code>output_config.effort</code> で常に明示する</td></tr>
+<tr><td><code>max_tokens</code></td><td>上限 128K。思考トークンも含む。非ストリーミングは 1.6 万前後までが目安（HTTP のタイムアウト）</td><td>判定と <code>1b-haiku</code> は <strong>16,000</strong>、<code>1d-haiku</code> は <strong>4,000</strong>（luna の 2,400 / 800 は推論トークンを含むが Haiku の <code>max</code> は思考が長いため広げる）。非ストリーミングで呼ぶ。<code>stop_reason: "max_tokens"</code> は luna の <code>finish_reason = length</code> と同じくエラーにする。打ち切りの件数は小試走で数え、多ければ上げる</td></tr>
+<tr><td>出力形式</td><td>構造化出力 <code>output_config.format</code>（<code>type: json_schema</code>）に対応。<code>additionalProperties: false</code> 必須、<code>minLength</code> 等の文字列制約は不可。応答の先頭に <code>thinking</code> ブロックが来るので、本文は <code>type</code> が <code>text</code> のブロックから読む。思考の中身は既定で空（<code>display: omitted</code>）</td><td>luna の判定スキーマ <code>{kind, answer, reply, reason, bare_term}</code> と書き手のスキーマをそのまま移す（どちらも制約なしの enum / null で、そのまま通る想定。通らなければ 21-6d12b で制約を外し、検査はコード側の既存チェックに任せる）。思考の中身は取らない</td></tr>
+<tr><td>サンプリング</td><td><code>temperature</code>・<code>top_p</code>・<code>top_k</code> の既定以外は 400。アシスタントの prefill も 400</td><td>どれも送らない（luna も温度は送っていない）。<code>messages</code> は user 1 件で終える</td></tr>
+<tr><td>プロンプト</td><td>—</td><td>luna 用をそのまま使う（ユーザー決定）。判定は <code>pattern1_rules.txt</code> を問題で埋めたものを <code>system</code>、コメント本文を user。書き手は <code>reply_1b_with_truth.txt</code> / <code>reply_writer.txt</code> + <code>reply_style.txt</code>。Haiku 向けの調整は、21-6e で Haiku が候補に残った場合だけ検討する（モデルの差だけを見るため）</td></tr>
+<tr><td>キャッシュ</td><td>最小 512 トークン。プレフィックス一致。<code>cache_control</code> で明示する</td><td><code>system</code> の末尾に <code>cache_control: {type: "ephemeral"}</code>（5 分）を付ける。判定の <code>system</code> は問題ごとに固定で 512 トークンを超える。書き手の <code>system</code> は判定結果を埋め込むため、パターンごとに当たりは少ない。<code>usage</code> の <code>cache_creation_input_tokens</code>・<code>cache_read_input_tokens</code> を記録する。<strong>luna 側も <code>usage.prompt_tokens_details.cached_tokens</code> を記録に足す</strong>（費用を同じ条件で比べるため。記録だけで luna の挙動は変えない）</td></tr>
+<tr><td>拒否</td><td>安全分類器が断ると HTTP 200・<code>stop_reason: "refusal"</code>・<code>stop_details.category</code>（<code>cyber</code> / <code>bio</code> / <code>frontier_llm</code> / <code>general_harms</code>）。<strong>Haiku 5.5 にはサーバー側の代替モデル切替がない</strong>（<code>fallbacks</code> は付けない）</td><td>判定: 例外にし、<code>haiku</code> モードは <code>decisions</code> と同じく luna で判定し直す（記録の <code>decision</code> は <code>haiku_fallback_luna</code>）。書き手: 既存の書き手の失敗と同じく定型文へ（<code>fallback_template</code>）。どちらも件数とカテゴリを記録し、プローブでは<strong>拒否を失敗として別に数える</strong>（評価ページに行を足す）</td></tr>
+<tr><td>実装手段</td><td>公式は SDK（<code>anthropic</code>）を推奨</td><td><strong>urllib で <code>POST https://api.anthropic.com/v1/messages</code> を直接呼ぶ</strong>（ヘッダー <code>x-api-key</code>・<code>anthropic-version: 2023-06-01</code>）。comment-reply は「実行時は標準ライブラリだけ」（<code>requirements.txt</code>）で、luna・Jev・Decisions も <code>http_util.post_json_with_retry</code> で呼んでいる。依存を足すと Lambda のパッケージングが変わるので、評価段階ではそろえる。21-6e で Haiku を本番に採るときに SDK へ移すかを改めて決める</td></tr>
+<tr><td>再試行</td><td>429・5xx・529（過負荷）</td><td>luna と同じ指数バックオフ 3 回（<code>post_json_with_retry</code>）</td></tr>
+<tr><td>キー</td><td>—</td><td>環境変数 <code>ANTHROPIC_API_KEY</code>（ローカルのプローブだけ）。本番の Secret は 21-6f で Haiku が選ばれた場合だけ作る</td></tr>
+<tr><td>応答時間</td><td><code>xhigh</code> 以上は思考が長くなる</td><td>luna（判定は最大 20 秒前後）より伸びるおそれがある。小試走で中央値・p95 を測り、luna と並べる</td></tr>
+</table>
+</div>
+<ul>
+  <li><strong>名前</strong>: 判定モードと判定キャッシュの方式名は <code>haiku</code>、返信文の案は <code>1b-haiku</code> / <code>1d-haiku</code>、パターン名は <code>haiku-1b</code>（評価ページの ⑦）・<code>haiku-1d</code>（⑧）。既存 6 パターンのキャッシュと結果は変えない</li>
+  <li><strong>記録</strong>: <code>debug</code> に <code>usage</code>（入力・出力・キャッシュの書き込み / 読み出し）・<code>stop_reason</code>・拒否のカテゴリ・応答時間を残す（パターン 1 と同じ形 + キャッシュと拒否）。思考トークンは出力トークンに含まれて返る</li>
+  <li><strong>空の返答</strong>: <code>xhigh</code> 以上で、思考だけで終わり <code>text</code> が空になることがあると公式に記載がある。<code>text</code> ブロックがない・空のときは出力不正としてエラーにし、件数を数える</li>
+  <li><strong>評価費用の上限</strong>: 21-6d12b の小試走（U01・U13）は <strong>$1</strong>、21-6d13 の全件（525 件 × 判定 1 回 + 書き手 2 案）は <strong>$5</strong>。見込みは全件で約 $2（判定 525 回 + 書き手約 1,000 回。<code>max</code> の思考が 1 回 2,000〜3,000 トークンとして出力約 300 万トークン = $1.5 + 入力約 $0.3）。小試走の実績から全件の費用を見積もり直し、上限を超える見込みなら全件に進まずユーザーに諮る。費用は <code>usage</code> から計算し、Anthropic Console の利用額とも突き合わせる</li>
+</ul>
 
 <h3 id="reply-style">10.4 返信文</h3>
 <div class="note"><span class="callout-title">要点</span>返信文は判定を変えずに書く。口調はパパが息子に話しかけるくだけた口調で、答えへの近さを匂わせない。作り方は 4 案（定型文 1 案 + LLM の書き手 3 案〔中身は 2 種〕）から選ぶ。既定（暫定）は真相を渡さない書き手 <code>1d-luna</code>。</div>
@@ -910,6 +937,8 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <tr><td>④</td><td><code>jev</code></td><td><code>2b</code></td><td>13</td><td>14</td><td>15</td></tr>
 <tr><td>⑤</td><td><code>jev</code></td><td><code>2c-luna</code></td><td>12</td><td>13</td><td>13</td></tr>
 <tr><td>⑥</td><td><code>decisions</code></td><td><code>2c-luna</code></td><td>—</td><td>—</td><td>11</td></tr>
+<tr><td>⑦</td><td><code>haiku</code></td><td><code>1b-haiku</code></td><td>—</td><td>—</td><td>—（21-6d13 で追加。<a href="#pattern-haiku">10.3.7</a>）</td></tr>
+<tr><td>⑧</td><td><code>haiku</code></td><td><code>1d-haiku</code></td><td>—</td><td>—</td><td>—（同上）</td></tr>
 </table>
 </div>
 <p>2026-10-04（21-6d4）の時点で、全指標を満たすパターンはない。2026-10-06（21-6d6）に人間チェックの「許容」26 組を評価データの別解へ取り込んで数え直すと、全パターンで L1① の各種別（guess_close・guess_wrong）が合格に変わったが、全指標を満たすパターンはまだない（残る NG は P2・L2 の一言 / 矛盾ほか。<a href="#d-20261006-human-review-import">付録</a>）。2026-10-08（21-6d9）に P1 を「候補 → 人の確認 → 確定」の 2 段にした。④ の P1 の漏れ候補 1 件（c-impression-04「また遊びにおいで。」）は、同日ユーザーが「漏洩でない」と判断した。これで ④ の P1 は合格になり、合格数は 15 になる（ページ上の判断は書き出す JSON が正式な記録）。方式選定（21-6e）の材料にする。L1① は「全体 90% 以上」と「質問以外の各種別 80% 以上」を別の指標として数える（2026-10-04 ユーザー指示。21-6d3 までは 1 指標・15 指標中で数えていた）。</p>
