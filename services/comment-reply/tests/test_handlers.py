@@ -127,6 +127,25 @@ def test_reply_missing_snapshot_logs_and_succeeds(monkeypatch) -> None:
     assert write.call_args.args[0]["reply"]["text"] is None
 
 
+def test_reply_handler_passes_haiku_credentials_and_effort(monkeypatch, problem) -> None:
+    config = Config(judge_mode="haiku", reply_variant="1b-haiku", haiku_effort="xhigh",
+                    assets_bucket="bucket", comment_log_bucket="bucket")
+    credentials = {**_credentials(), "anthropic_api_key": "fake-anthropic"}
+    combined = Combined(None, None, "q_yesno", "yes", None, "haiku", None,
+                        haiku=Judgement("haiku", "q_yesno", "yes"))
+    monkeypatch.setattr(reply_handler, "get_problem", lambda *args, **kwargs: problem)
+    judge = Mock(return_value=combined)
+    writer = Mock(return_value=Reply("はい！", "llm", False))
+    monkeypatch.setattr(reply_handler, "combine", judge)
+    monkeypatch.setattr(reply_handler, "write_reply", writer)
+    monkeypatch.setattr(reply_handler, "reply_to_comment", Mock(return_value="reply-1"))
+    monkeypatch.setattr(reply_handler, "write_record", Mock())
+    reply_handler.process_message(_message(), config, credentials, s3_client=Mock())
+    assert judge.call_args.args[3].haiku_effort == "xhigh"
+    assert writer.call_args.kwargs["haiku_effort"] == "xhigh"
+    assert writer.call_args.kwargs["anthropic_api_key"] == "fake-anthropic"
+
+
 def test_graph_failure_is_partial_failure_and_log_failure_does_not_stop_reply(monkeypatch, problem) -> None:
     monkeypatch.setenv("SECRET_ARN", "test-secret")
     monkeypatch.setenv("ASSETS_BUCKET", "bucket")

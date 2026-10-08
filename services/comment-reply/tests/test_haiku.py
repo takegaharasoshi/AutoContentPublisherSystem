@@ -1,4 +1,4 @@
-"""Offline Haiku judge/writer requests, fallback telemetry and shared prompts."""
+"""Offline Haiku prompts, efforts, requests and fallback telemetry."""
 
 from __future__ import annotations
 
@@ -75,21 +75,46 @@ def _assert_request(req, effort: str, max_tokens: int, system: str, text: str, s
     assert not {"thinking", "temperature", "top_p", "top_k", "prefill", "fallbacks"} & payload.keys()
 
 
-def test_judge_text_blocks_request_and_usage(monkeypatch, problem) -> None:
+@pytest.mark.parametrize("effort", ["max", "xhigh", "high"])
+def test_judge_text_blocks_request_and_usage(monkeypatch, problem, effort) -> None:
     output = json.dumps(_decision(), ensure_ascii=False)
     body = _body(content=[{"type": "thinking", "thinking": "ignore invalid JSON"},
                           {"type": "text", "text": output[:20]},
                           {"type": "text", "text": output[20:]}])
     post = _mock_http(monkeypatch, body)
-    result = haiku.judge("c", "病院に行った？", problem, api_key="fake-anthropic")
+    result = haiku.judge("c", "病院に行った？", problem, api_key="fake-anthropic", effort=effort)
     assert (result.method, result.kind, result.answer) == ("haiku", "q_yesno", "yes")
     assert result.reply_draft == "はい！" and result.reason == "確定事実"
     assert result.debug["usage"] == body["usage"]
     assert result.debug["prompt_tokens"] == 200 and result.debug["completion_tokens"] == 200
     assert result.debug["latency_s"] >= 0 and result.debug["stop_reason"] == "end_turn"
     assert "thinking" not in result.debug
-    _assert_request(post.call_args.args[0], "max", 32000,
-                    luna.build_prompt(problem), "病院に行った？", luna._schema())
+    assert result.debug["effort"] == effort
+    system = haiku.build_prompt(problem)
+    template = haiku.RULES_PATH.read_text(encoding="utf-8")
+    assert haiku.RULES_PATH.name == "haiku_judge.txt"
+    values = {
+        "problem_text": problem.problem_text, "truth": problem.truth,
+        "fact_sheet": "\n".join(f"- {fact}" for fact in problem.fact_sheet),
+        "core_points": "\n".join(f"- {point}" for point in problem.core_points),
+        "judge_criteria": luna.format_judge_criteria(problem),
+    }
+    for name, value in values.items():
+        assert value in system
+        template = template.replace("{" + name + "}", value)
+    assert system == template and system != luna.build_prompt(problem)
+    _assert_request(post.call_args.args[0], effort, 32000,
+                    system, "<comment>\n病院に行った？\n</comment>", luna._schema())
+
+
+def test_judge_prompt_preserves_literal_braces_and_inserted_placeholders(tmp_path, monkeypatch, problem) -> None:
+    template = tmp_path / "haiku_judge.txt"
+    template.write_text('{problem_text}\n{truth}\n{"kind": "q_yesno"}\n{unknown}\n{', encoding="utf-8")
+    monkeypatch.setattr(haiku, "RULES_PATH", template)
+    problem = replace(problem, problem_text="{truth} と {literal}", truth="真相 {fact_sheet}")
+    assert haiku.build_prompt(problem) == (
+        '{truth} と {literal}\n真相 {fact_sheet}\n{"kind": "q_yesno"}\n{unknown}\n{'
+    )
 
 
 def test_judge_uses_luna_bare_term_postprocessing(monkeypatch, problem) -> None:
@@ -130,6 +155,7 @@ def test_judge_refusal_category_retained(monkeypatch, problem, category) -> None
     assert caught.value.debug["refusal_category"] == category
     assert caught.value.debug["usage"]["output_tokens"] == 200
     assert caught.value.debug["latency_s"] >= 0
+    assert caught.value.debug["effort"] == "max"
 
 
 @pytest.mark.parametrize("changes,reason", [
@@ -192,7 +218,7 @@ def test_combiner_success_skips_luna_and_jev(monkeypatch, problem) -> None:
     post = _mock_http(monkeypatch, _body())
     blocked = Mock(side_effect=AssertionError("Haiku succeeded"))
     result = combine(
-        "c", "質問", problem, Config(judge_mode="haiku"),
+        "c", "質問", problem, Config(judge_mode="haiku", haiku_effort="high"),
         {"anthropic_api_key": "fake-anthropic"}, luna_call=blocked, jev_call=blocked,
         decisions_call=blocked,
     )
@@ -200,6 +226,7 @@ def test_combiner_success_skips_luna_and_jev(monkeypatch, problem) -> None:
     assert result.luna is None and result.jev is None and result.decisions is None
     blocked.assert_not_called()
     assert post.call_count == 1
+    assert json.loads(post.call_args.args[0].data)["output_config"]["effort"] == "high"
 
 
 def test_combiner_refusal_rejudges_with_luna_and_logs_both(monkeypatch, problem) -> None:
@@ -229,21 +256,62 @@ def test_combiner_refusal_rejudges_with_luna_and_logs_both(monkeypatch, problem)
     assert record["final"]["decision"] == "haiku_fallback_luna"
 
 
-@pytest.mark.parametrize("variant,luna_variant,effort,max_tokens", [
-    ("1b-haiku", "1b", "max", 32000), ("1d-haiku", "1d-luna", "low", 4000),
+@pytest.mark.parametrize("variant,haiku_effort,effort,max_tokens", [
+    ("1b-haiku", "max", "max", 32000),
+    ("1b-haiku", "xhigh", "xhigh", 32000),
+    ("1b-haiku", "high", "high", 32000),
+    ("1d-haiku", "high", "low", 4000),
 ])
-def test_writer_normal_request_and_shared_prompt(
-    monkeypatch, problem, variant, luna_variant, effort, max_tokens,
+def test_writer_normal_request_and_variant_prompt(
+    monkeypatch, problem, variant, haiku_effort, effort, max_tokens,
 ) -> None:
     post = _mock_http(monkeypatch, _body({"reply": "はい！"}))
     combined = _combined()
     reply = writer.write_reply(combined, "c", "質問", problem,
-                               variant=variant, anthropic_api_key="fake-anthropic")
+                               variant=variant, anthropic_api_key="fake-anthropic",
+                               haiku_effort=haiku_effort)
     assert reply.text == "はい！" and reply.source == "llm" and reply.error is None
-    system, slot = writer.build_prompt(combined, "c", problem, variant=luna_variant)
+    system, slot = writer.build_prompt(combined, "c", problem, variant=variant)
     assert reply.debug["slot"] == slot and reply.debug["model"] == anthropic_util.MODEL
     assert reply.debug["cache_read_input_tokens"] == 60
-    _assert_request(post.call_args.args[0], effort, max_tokens, system, "質問", writer.reply_schema())
+    assert reply.debug["effort"] == effort
+    if variant == "1b-haiku":
+        template = (writer.PROMPTS_DIR / "haiku_reply_1b.txt").read_text(encoding="utf-8")
+        expected = writer._render_prompt(template, combined, problem, True, style="", slot=slot)
+        assert system == expected
+        assert problem.truth in system and f"- {problem.fact_sheet[0]}" in system
+        assert f"- {problem.core_points[0]}" in system
+        assert system != writer.build_prompt(combined, "c", problem, variant="1b")[0]
+        user = "<comment>\n質問\n</comment>"
+    else:
+        assert (system, slot) == writer.build_prompt(combined, "c", problem, variant="1d-luna")
+        user = "質問"
+    _assert_request(post.call_args.args[0], effort, max_tokens, system, user, writer.reply_schema())
+
+
+def test_haiku_truth_writer_does_not_read_shared_style(tmp_path, monkeypatch, problem) -> None:
+    template = (writer.PROMPTS_DIR / "haiku_reply_1b.txt").read_text(encoding="utf-8")
+    (tmp_path / "haiku_reply_1b.txt").write_text(template, encoding="utf-8")
+    monkeypatch.setattr(writer, "PROMPTS_DIR", tmp_path)
+    combined = replace(_combined("q_open", None), bare_term="{truth} レントゲン")
+    system, _ = writer.build_prompt(combined, "c", problem, variant="1b-haiku")
+    assert "{truth} レントゲン" in system and "{kind}" not in system
+
+
+def test_haiku_effort_config_defaults_and_allowed_values() -> None:
+    config = Config.from_env({})
+    assert config.haiku_effort == Config().haiku_effort == "max"
+    assert (config.judge_mode, config.reply_variant, config.shadow, config.consensus) == (
+        "hybrid", "1d-luna", True, True,
+    )
+    for effort in ("low", "medium", "high", "xhigh", "max"):
+        assert Config.from_env({"HAIKU_EFFORT": effort}).haiku_effort == effort
+
+
+@pytest.mark.parametrize("effort", ["", "invalid", "MAX", " high", "off"])
+def test_haiku_effort_config_rejects_invalid_values(effort) -> None:
+    with pytest.raises(ValueError, match="HAIKU_EFFORT"):
+        Config.from_env({"HAIKU_EFFORT": effort})
 
 
 @pytest.mark.parametrize("variant", ["1b-haiku", "1d-haiku"])

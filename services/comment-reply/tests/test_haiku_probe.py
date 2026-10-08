@@ -1,4 +1,4 @@
-"""Offline eight-pattern probe, frozen cache keys, usage and HTML reports."""
+"""Offline effort-specific Haiku probes, frozen legacy cache keys and reports."""
 
 from __future__ import annotations
 
@@ -12,8 +12,10 @@ import pytest
 
 from app import anthropic_util, comment_log, http_util
 from app.config import Config
+from app.judge import haiku
 from app.judge.combiner import Combined
 from app.judge.contract import JudgeCriteria, Judgement, Problem
+from app.reply import writer as reply_writer
 from app.reply.writer import Reply
 from tools import build_probe_page, probe_metrics, probe_run
 
@@ -39,17 +41,19 @@ def _writer(combined, *args, **kwargs) -> Reply:
     debug = _debug() if kwargs["variant"] in {"1b-haiku", "1d-haiku"} else {}
     if debug:
         assert kwargs["anthropic_api_key"] == "fake-anthropic"
+        debug["effort"] = kwargs["haiku_effort"] if kwargs["variant"] == "1b-haiku" else "low"
     return Reply("はい！" if combined.answer == "yes" else "いいえ。", "llm", False, debug=debug)
 
 
-def test_eight_patterns_and_production_defaults(tmp_path, monkeypatch) -> None:
+def test_ten_patterns_cli_selection_and_production_defaults(tmp_path, monkeypatch) -> None:
     assert probe_run.LEGACY_PATTERN_IDS == ("luna-1b", "luna-1d", "hybrid-1d", "jev-2b", "jev-2c")
-    assert len(probe_run.PATTERNS) == 8
+    assert len(probe_run.PATTERNS) == 10
     assert probe_run.PATTERNS[6:] == (
-        {"id": "haiku-1b", "label": "⑦ haiku + 1b-haiku", "judge_mode": "haiku",
-         "reply_variant": "1b-haiku", "shadow": False, "consensus": False},
+        *({"id": f"haiku-1b-{effort}", "label": f"⑦ haiku + 1b-haiku（{effort}）",
+           "judge_mode": "haiku", "reply_variant": "1b-haiku", "shadow": False,
+           "consensus": False, "haiku_effort": effort} for effort in ("max", "xhigh", "high")),
         {"id": "haiku-1d", "label": "⑧ haiku + 1d-haiku", "judge_mode": "haiku",
-         "reply_variant": "1d-haiku", "shadow": False, "consensus": False},
+         "reply_variant": "1d-haiku", "shadow": False, "consensus": False, "haiku_effort": "max"},
     )
     config = Config.from_env({})
     assert (config.judge_mode, config.reply_variant) == ("hybrid", "1d-luna")
@@ -59,13 +63,18 @@ def test_eight_patterns_and_production_defaults(tmp_path, monkeypatch) -> None:
     run = Mock()
     monkeypatch.setattr(probe_run, "run_probe", run)
     assert probe_run.main(["--out", str(tmp_path)]) == 0
-    assert run.call_args.kwargs["patterns"] == list(probe_run.PATTERN_IDS)
+    assert run.call_args.kwargs["patterns"] == [
+        "luna-1b", "luna-1d", "jev-2c", "haiku-1b-max", "haiku-1b-xhigh", "haiku-1b-high",
+    ]
+    assert run.call_args.kwargs["workers"] == 4
     assert probe_run.main(["--patterns", "haiku-1d", "--problems", "U01", "U13"]) == 0
     assert run.call_args.kwargs["patterns"] == ["haiku-1d"]
     assert run.call_args.kwargs["problems"] == ["U01", "U13"]
 
 
-def test_eight_pattern_probe_cache_and_page(tmp_path, monkeypatch, problem, capsys) -> None:
+def test_ten_pattern_probe_shares_judges_only_within_effort_and_builds_page(
+    tmp_path, monkeypatch, problem, capsys,
+) -> None:
     args = _inputs(tmp_path, problem)
     luna = Mock(return_value=Judgement("luna", "q_yesno", "yes"))
     jev = Mock(return_value=Judgement("jev", "q_yesno", "no"))
@@ -76,20 +85,32 @@ def test_eight_pattern_probe_cache_and_page(tmp_path, monkeypatch, problem, caps
         **args, patterns=list(probe_run.PATTERN_IDS), luna_call=luna, jev_call=jev,
         decisions_call=decisions, haiku_call=haiku, writer_call=writer,
     )
-    assert (luna.call_count, jev.call_count, decisions.call_count, haiku.call_count) == (1, 1, 1, 1)
-    assert writer.call_count == 8
-    haiku.assert_called_once_with("U01-cached", "病院に行った？", problem, api_key="fake-anthropic")
+    assert (luna.call_count, jev.call_count, decisions.call_count, haiku.call_count) == (1, 1, 1, 3)
+    assert writer.call_count == 10
+    assert {call.kwargs["effort"] for call in haiku.call_args_list} == {"max", "xhigh", "high"}
+    for call in haiku.call_args_list:
+        assert call.args == ("U01-cached", "病院に行った？", problem)
+        assert call.kwargs["api_key"] == "fake-anthropic"
     assert set(results["rows"]) == set(probe_run.PATTERN_IDS)
-    for pid in ("haiku-1b", "haiku-1d"):
-        row = results["rows"][pid][0]
+    for pattern in probe_run.PATTERNS[6:]:
+        row = results["rows"][pattern["id"]][0]
         assert row["record"]["final"]["decision"] == "haiku"
         assert row["record"]["reply"]["debug"]["output_tokens"] == 20
         assert row["cache"] == {"luna": "none", "jev": "none", "haiku": "miss", "writer": "miss"}
         assert row["timing"]["judge_s"] == row["timing"]["haiku_s"]
         assert row["timing"]["luna_s"] is None
+        assert row["record"]["judgements"]["haiku"]["debug"]["effort"] == pattern["haiku_effort"]
+        assert row["record"]["reply"]["debug"]["effort"] == (
+            "low" if pattern["id"] == "haiku-1d" else pattern["haiku_effort"]
+        )
+    calls = [call for call in writer.call_args_list if call.kwargs["variant"] == "1b-haiku"]
+    assert {call.kwargs["haiku_effort"] for call in calls} == {"max", "xhigh", "high"}
     log = capsys.readouterr().out
-    assert ("Anthropic: input_tokens=30, output_tokens=60, cache_creation_input_tokens=90, "
-            "cache_read_input_tokens=120, refusals=0") in log
+    for effort in ("max", "xhigh", "high"):
+        assert (f"Anthropic ({effort}): input_tokens=20, output_tokens=40, "
+                "cache_creation_input_tokens=60, cache_read_input_tokens=80, refusals=0") in log
+    assert ("Anthropic (low): input_tokens=10, output_tokens=20, "
+            "cache_creation_input_tokens=30, cache_read_input_tokens=40, refusals=0") in log
     before = {name: (args["out"] / name).read_bytes()
               for name in ("judge_cache.json", "writer_cache.json")}
     blocked = Mock(side_effect=AssertionError("cache must prevent every HTTP call"))
@@ -100,22 +121,193 @@ def test_eight_pattern_probe_cache_and_page(tmp_path, monkeypatch, problem, caps
     )
     blocked.assert_not_called()
     assert "new: input_tokens=0, output_tokens=0" in capsys.readouterr().out
-    assert replay["rows"]["haiku-1b"][0]["cache"]["haiku"] == "hit"
+    for effort in ("max", "xhigh", "high"):
+        assert replay["rows"][f"haiku-1b-{effort}"][0]["cache"]["haiku"] == "hit"
     for name, content in before.items():
         assert (args["out"] / name).read_bytes() == content
     page = build_probe_page.build_page(replay, tmp_path / "probe.html")
     source = page.read_text(encoding="utf-8")
     body = (tmp_path / "probe" / "U01.html").read_text(encoding="utf-8")
-    assert "8 パターン" in source and 'colspan="10"' in source
+    assert "10 パターン" in source and 'colspan="12"' in source
     for pattern in probe_run.PATTERNS:
         assert pattern["label"] in source and pattern["label"] in body
         assert f'id="pattern-{pattern["id"]}"' in body
         assert f"{pattern['label']}:" in source  # Each time-chart title includes this pattern.
-    assert body.count('<h3>コメント</h3>') == 8
-    assert len(list((tmp_path / "probe").glob("raw-*.js"))) == 8
+    assert body.count('<h3>コメント</h3>') == 10
+    assert len(list((tmp_path / "probe").glob("raw-*.js"))) == 10
     for text in ("拒否件数", "トークン（入力 / 出力 / キャッシュ）", "費用 USD", "応答時間",
                  "打ち切り max_tokens", "空応答", "Haiku から luna への再判定"):
         assert text in source
+    filtered = build_probe_page.exclude_patterns(replay, ["haiku-1b-xhigh", "haiku-1d"])
+    assert filtered["meta"]["run_at"] == replay["meta"]["run_at"]
+    kept_page = build_probe_page.build_page(filtered, tmp_path / "filtered.html")
+    kept_source = kept_page.read_text(encoding="utf-8")
+    assert "8 パターン" in kept_source
+    assert "⑦ haiku + 1b-haiku（xhigh）" not in kept_source
+    assert "⑦ haiku + 1b-haiku（max）" in kept_source
+    assert "⑦ haiku + 1b-haiku（high）" in kept_source
+
+
+def test_haiku_cache_keys_include_effort_and_only_their_own_template(
+    tmp_path, monkeypatch, problem,
+) -> None:
+    case = {"id": "cache-test", "text": "病院に行った？"}
+    combined = Combined(None, None, "q_yesno", "yes", None, "haiku", None)
+    judge_path = tmp_path / "haiku_judge.txt"
+    reply_path = tmp_path / "haiku_reply_1b.txt"
+    for path in reply_writer.PROMPTS_DIR.glob("*.txt"):
+        (tmp_path / path.name).write_bytes(path.read_bytes())
+    monkeypatch.setattr(haiku, "RULES_PATH", judge_path)
+    monkeypatch.setattr(probe_run, "PROMPTS_DIR", tmp_path)
+    monkeypatch.setattr(comment_log, "PROMPTS_DIR", tmp_path)
+    excluded = frozenset({"haiku_judge.txt", "haiku_reply_1b.txt"})
+    legacy_version = comment_log.prompt_version(exclude_names=excluded)
+    assert probe_run.PROMPT_VERSION == legacy_version
+    keys = {effort: probe_run._judge_cache_key(case, problem, "haiku", "gpt-6-luna",
+                                              haiku_effort=effort)
+            for effort in ("max", "xhigh", "high")}
+    assert len(set(keys.values())) == 3
+    # Keep the pattern ID fixed so this checks the effort field itself.
+    patterns = [{**probe_run.PATTERNS[6], "haiku_effort": effort}
+                for effort in ("max", "xhigh", "high")]
+    writer_keys = [probe_run._writer_cache_key(p, case, problem, combined, "gpt-6-luna")
+                   for p in patterns]
+    assert len(set(writer_keys)) == 3
+    legacy_judges = {method: probe_run._judge_cache_key(case, problem, method, "gpt-6-luna")
+                     for method in ("luna", "jev", "decisions")}
+    legacy_writers = [probe_run._writer_cache_key(p, case, problem, combined, "gpt-6-luna")
+                      for p in probe_run.PATTERNS[:6]]
+    judge_path.write_text(judge_path.read_text(encoding="utf-8") + "\n判定の変更", encoding="utf-8")
+    assert probe_run._judge_cache_key(case, problem, "haiku", "gpt-6-luna") != keys["max"]
+    assert probe_run._writer_cache_key(patterns[0], case, problem, combined, "gpt-6-luna") == writer_keys[0]
+    reply_path.write_text(reply_path.read_text(encoding="utf-8") + "\n返信の変更", encoding="utf-8")
+    assert probe_run._writer_cache_key(patterns[0], case, problem, combined, "gpt-6-luna") != writer_keys[0]
+    assert comment_log.prompt_version(exclude_names=excluded) == legacy_version
+    for method, key in legacy_judges.items():
+        assert probe_run._judge_cache_key(case, problem, method, "gpt-6-luna", haiku_effort="high") == key
+    for pattern, key in zip(probe_run.PATTERNS[:6], legacy_writers):
+        assert probe_run._writer_cache_key(pattern, case, problem, combined, "gpt-6-luna") == key
+    one_d = probe_run.PATTERNS[-1]
+    assert probe_run._writer_cache_key(one_d, case, problem, combined, "gpt-6-luna") == (
+        probe_run._writer_cache_key({**one_d, "haiku_effort": "high"}, case, problem, combined, "gpt-6-luna")
+    )
+
+
+def test_incremental_same_out_keeps_caches_and_rebuilds_six_patterns_without_calls(
+    tmp_path, problem,
+) -> None:
+    args = _inputs(tmp_path, problem)
+    calls = {
+        "luna_call": Mock(return_value=Judgement("luna", "q_yesno", "yes")),
+        "jev_call": Mock(return_value=Judgement("jev", "q_yesno", "yes")),
+        "haiku_call": Mock(return_value=Judgement("haiku", "q_yesno", "yes", debug=_debug())),
+        "writer_call": Mock(side_effect=_writer),
+    }
+    # Include a Luna row with only high selected to catch accidental max-judge lookups.
+    for pattern_ids in (["luna-1b", "haiku-1b-high"], ["haiku-1b-max"],
+                        ["haiku-1b-xhigh"], ["luna-1d", "jev-2c"]):
+        current = probe_run.run_probe(**args, patterns=pattern_ids, **calls)
+        assert set(current["rows"]) == set(pattern_ids)
+        saved = json.loads((args["out"] / "results.json").read_text(encoding="utf-8"))
+        assert set(saved["rows"]) == set(pattern_ids)  # results are overwritten each time
+    assert calls["haiku_call"].call_count == 3
+    assert calls["luna_call"].call_count == calls["jev_call"].call_count == 1
+    assert calls["writer_call"].call_count == 6
+    blocked = Mock(side_effect=AssertionError("all patterns should be cached"))
+    results = probe_run.run_probe(
+        **args, patterns=list(probe_run.DEFAULT_PATTERN_IDS), luna_call=blocked, jev_call=blocked,
+        haiku_call=blocked, writer_call=blocked,
+    )
+    blocked.assert_not_called()
+    assert list(results["rows"]) == list(probe_run.DEFAULT_PATTERN_IDS)
+    assert all(row["cache"]["writer"] == "hit" for rows in results["rows"].values() for row in rows)
+    assert all(results["rows"][f"haiku-1b-{effort}"][0]["cache"]["haiku"] == "hit"
+               for effort in ("max", "xhigh", "high"))
+    page = build_probe_page.build_page(results, tmp_path / "six.html")
+    assert "6 パターン" in page.read_text(encoding="utf-8")
+
+
+def test_metrics_keep_three_efforts_cost_tokens_failures_and_latency_separate() -> None:
+    cases = [{"id": f"case-{i}", "no": "U01", "text": "質問", "expected_kind": "q_yesno",
+              "expected_answer": "yes", "source": "eval", "accept_kinds": [], "accept_answers": []}
+             for i in range(20)]
+    patterns = list(probe_run.PATTERNS[6:9])
+    results = {"meta": {"patterns": patterns}, "cases": cases, "rows": {}}
+    for scale, pattern in enumerate(patterns, 1):
+        rows = []
+        for i, case in enumerate(cases):
+            judge = _debug(input_tokens=100 * scale, output_tokens=200 * scale,
+                           cache_creation_input_tokens=40 * scale, cache_read_input_tokens=60 * scale,
+                           effort=pattern["haiku_effort"])
+            writer = _debug(input_tokens=50 * scale, output_tokens=80 * scale,
+                            cache_creation_input_tokens=10 * scale, cache_read_input_tokens=20 * scale,
+                            effort=pattern["haiku_effort"])
+            if i < scale:
+                judge.update(stop_reason="refusal", refusal_category="general_harms")
+            elif 5 <= i < 5 + scale:
+                judge["stop_reason"] = "max_tokens"
+            if i < scale + 1:
+                writer.update(stop_reason="refusal", refusal_category="cyber")
+            elif 5 <= i < 9 - scale:
+                writer["stop_reason"] = "max_tokens"
+            rows.append({"case_id": case["id"], "no": "U01", "record": {
+                "final": {"kind": "q_yesno", "answer": "yes", "decision": "haiku"},
+                "judgements": {"haiku": {"debug": judge}},
+                "reply": {"text": "はい！", "source": "llm", "debug": writer},
+                "errors": [], "shadow_mismatch": None,
+            }, "timing": {"judge_s": (i + 1) * scale, "writer_s": 2 * (i + 1) * scale,
+                          "total_s": 3 * (i + 1) * scale}})
+        results["rows"][pattern["id"]] = rows
+    metrics = probe_metrics.aggregate(results)
+    for scale, pattern in enumerate(patterns, 1):
+        api = metrics["patterns"][pattern["id"]]["reference"]["api_usage"]
+        judge, writer = api["judge"], api["writer"]
+        assert judge["cost_usd"] == pytest.approx(.0001156 * 20 * scale)
+        assert writer["cost_usd"] == pytest.approx(.00004645 * 20 * scale)
+        assert judge["output_tokens"] == 4000 * scale
+        assert writer["output_tokens"] == 1600 * scale
+        assert judge["max_tokens"] == scale and writer["max_tokens"] == 4 - scale
+        assert judge["refusals"]["count"] == scale
+        assert writer["refusals"]["count"] == scale + 1
+        assert judge["latency_s"] == {"median": 10.5 * scale, "p95": 19 * scale, "max": 20 * scale}
+        assert writer["latency_s"] == {"median": 21 * scale, "p95": 38 * scale, "max": 40 * scale}
+
+
+def test_effort_specific_failure_and_decisions_survive_cache_replay(tmp_path, problem) -> None:
+    args = _inputs(tmp_path, problem)
+
+    def judge(*args, effort, **kwargs):
+        if effort == "high":
+            raise anthropic_util.AnthropicError("truncated", debug=_debug(
+                output_tokens=90, stop_reason="max_tokens", error_reason="max_tokens",
+            ))
+        return Judgement("haiku", "q_yesno", "yes" if effort == "max" else "no",
+                         debug=_debug(output_tokens=10 if effort == "max" else 30))
+
+    calls = {
+        "haiku_call": Mock(side_effect=judge),
+        "luna_call": Mock(return_value=Judgement("luna", "q_yesno", "no")),
+        "writer_call": Mock(side_effect=_writer),
+    }
+    selected = [p["id"] for p in probe_run.PATTERNS[6:9]]
+    results = probe_run.run_probe(**args, patterns=selected, **calls)
+    assert calls["haiku_call"].call_count == 3
+    for effort, decision, answer, output_tokens in (
+        ("max", "haiku", "yes", 10), ("xhigh", "haiku", "no", 30),
+        ("high", "haiku_fallback_luna", "no", 90),
+    ):
+        row = results["rows"][f"haiku-1b-{effort}"][0]
+        assert row["record"]["final"] == {"kind": "q_yesno", "answer": answer, "decision": decision}
+        api = probe_metrics.aggregate(results)["patterns"][f"haiku-1b-{effort}"]["reference"]["api_usage"]
+        assert api["judge"]["output_tokens"] == output_tokens
+        assert api["judge"]["max_tokens"] == int(effort == "high")
+        assert row["record"]["judgements"]["haiku"]["debug"]["effort"] == effort
+    blocked = Mock(side_effect=AssertionError("all efforts are cached"))
+    replay = probe_run.run_probe(**args, patterns=selected, haiku_call=blocked,
+                                luna_call=blocked, writer_call=blocked)
+    blocked.assert_not_called()
+    for pattern_id in selected:
+        assert replay["rows"][pattern_id][0]["record"] == results["rows"][pattern_id][0]["record"]
 
 
 def test_haiku_is_not_called_for_existing_six_patterns(tmp_path, problem, capsys) -> None:
@@ -130,7 +322,7 @@ def test_haiku_is_not_called_for_existing_six_patterns(tmp_path, problem, capsys
         haiku_call=blocked, writer_call=_writer,
     )
     blocked.assert_not_called()
-    assert "Anthropic:" not in capsys.readouterr().out
+    assert "Anthropic (" not in capsys.readouterr().out
     assert all("haiku" not in row["record"]["judgements"]
                for rows in results["rows"].values() for row in rows)
     for count in (6, 5):
@@ -163,11 +355,13 @@ def test_refusal_cache_round_trip_preserves_category_and_luna_usage(tmp_path, mo
     }))
     writer = Mock(return_value=Reply("はい！", "fallback_template", False, error="refused",
                                    debug=_debug(stop_reason="refusal", refusal_category="bio")))
-    results = probe_run.run_probe(**args, patterns=["haiku-1b", "haiku-1d"],
+    results = probe_run.run_probe(**args, patterns=["haiku-1b-max", "haiku-1d"],
                                  haiku_call=haiku, luna_call=luna, writer_call=writer)
     assert haiku.call_count == 1
-    # The shared judge refusal is counted once in the run log and once in each pattern's metrics.
-    assert "refusals=3" in capsys.readouterr().out
+    # The max judge is shared; the 1d writer's low usage is counted separately.
+    log = capsys.readouterr().out
+    assert "Anthropic (max):" in log and "refusals=2" in log
+    assert "Anthropic (low):" in log and "refusals=1" in log
     row = results["rows"]["haiku-1d"][0]
     assert row["record"]["final"]["decision"] == "haiku_fallback_luna"
     assert row["timing"]["judge_s"] == pytest.approx(row["timing"]["haiku_s"] + row["timing"]["luna_s"])
@@ -175,10 +369,10 @@ def test_refusal_cache_round_trip_preserves_category_and_luna_usage(tmp_path, mo
                         if entry.get("exception", {}).get("type") == "AnthropicRefusalError")
     restored = probe_run._judge_outcome(cached_haiku)
     assert isinstance(restored, anthropic_util.AnthropicRefusalError) and restored.category == "cyber"
-    assert restored.debug == debug
+    assert restored.debug == {**debug, "effort": "max"}
     blocked = Mock(side_effect=AssertionError("cached refusal must not retry HTTP"))
     monkeypatch.setattr(http_util.request, "urlopen", blocked)
-    replay = probe_run.run_probe(**args, patterns=["haiku-1b", "haiku-1d"],
+    replay = probe_run.run_probe(**args, patterns=["haiku-1b-max", "haiku-1d"],
                                 haiku_call=blocked, luna_call=blocked, writer_call=blocked)
     blocked.assert_not_called()
     assert "new: input_tokens=0, output_tokens=0" in capsys.readouterr().out
@@ -283,7 +477,9 @@ def test_metrics_token_cost_refusal_failures_and_latency() -> None:
             "judgements": judgements, "reply": {"text": "はい！", "source": "llm", "debug": writer_debug},
             "errors": [], "shadow_mismatch": None,
         }, "timing": {"judge_s": i + 1, "writer_s": 2 * (i + 1), "total_s": 3 * (i + 1)}})
-    results = {"meta": {"patterns": [probe_run.PATTERNS[6]]}, "cases": cases, "rows": {"haiku-1b": rows}}
+    legacy_pattern = {**probe_run.PATTERNS[6], "id": "haiku-1b", "label": "⑦ haiku + 1b-haiku"}
+    legacy_pattern.pop("haiku_effort")
+    results = {"meta": {"patterns": [legacy_pattern]}, "cases": cases, "rows": {"haiku-1b": rows}}
     original = deepcopy(results)
     report = probe_metrics.aggregate(results)["patterns"]["haiku-1b"]
     api = report["reference"]["api_usage"]
@@ -342,7 +538,7 @@ def test_failed_judges_preserve_usage_in_records_and_cached_errors(tmp_path, mon
                                  haiku_call=haiku, writer_call=blocked)
     blocked.assert_not_called()
     row = results["rows"]["haiku-1d"][0]
-    assert row["record"]["judgements"]["haiku"]["debug"] == haiku_debug
+    assert row["record"]["judgements"]["haiku"]["debug"] == {**haiku_debug, "effort": "max"}
     assert row["record"]["judgements"]["luna"]["debug"] == luna_error.debug
     api = probe_metrics.aggregate(results)["patterns"]["haiku-1d"]["reference"]["api_usage"]
     assert api["max_tokens"] == 2 and api["judge"]["output_tokens"] == 50
@@ -351,3 +547,25 @@ def test_failed_judges_preserve_usage_in_records_and_cached_errors(tmp_path, mon
                                 haiku_call=blocked, writer_call=blocked)
     blocked.assert_not_called()
     assert replay["rows"]["haiku-1d"][0]["record"] == row["record"]
+
+
+LEGACY_HAIKU_RESULTS = probe_run.SERVICE_DIR / "work/probe/full-20261008-8p-merged/results.json"
+
+
+@pytest.mark.skipif(not LEGACY_HAIKU_RESULTS.is_file(), reason="local legacy Haiku results not present")
+def test_saved_legacy_haiku_results_build_page_and_cli_exclusions(tmp_path) -> None:
+    before = LEGACY_HAIKU_RESULTS.read_bytes()
+    results = json.loads(before)
+    assert "haiku-1b" in results["rows"]
+    page = build_probe_page.build_page(results, tmp_path / "legacy-haiku.html")
+    source = page.read_text(encoding="utf-8")
+    assert "8 パターン" in source and "⑦ haiku + 1b-haiku" in source
+    assert "⑦ haiku + 1b-haiku（high）" not in source
+    assert build_probe_page.main([
+        "--results", str(LEGACY_HAIKU_RESULTS), "--out", str(tmp_path / "legacy-filtered.html"),
+        "--exclude-patterns", "dec-2c", "haiku-1d",
+    ]) == 0
+    source = (tmp_path / "legacy-filtered.html").read_text(encoding="utf-8")
+    assert "6 パターン" in source and "⑦ haiku + 1b-haiku" in source
+    assert "⑥ decisions + 2c-luna" not in source and "⑧ haiku + 1d-haiku" not in source
+    assert LEGACY_HAIKU_RESULTS.read_bytes() == before

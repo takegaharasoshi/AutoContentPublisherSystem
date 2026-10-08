@@ -6,6 +6,7 @@ import json
 import logging
 from dataclasses import replace
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 
@@ -126,12 +127,22 @@ def test_writer_request_variant_contract(monkeypatch, variant, effort, max_token
     result = writer.write_reply(
         _combined("q_yesno", "yes"), "1", "質問", problem,
         variant=variant, openai_api_key="fake", model="dated-model",
+        haiku_effort="high",
     )
     assert result.source == "llm"
     payload = requests[0]
     assert payload["model"] == "dated-model"
     assert payload["reasoning_effort"] == effort
     assert payload["max_completion_tokens"] == max_tokens
+    assert payload["messages"][1]["content"] == "質問"
+    template_name = "reply_1b_with_truth.txt" if with_truth else "reply_writer.txt"
+    expected = writer._render_prompt(
+        (writer.PROMPTS_DIR / template_name).read_text(encoding="utf-8"),
+        _combined("q_yesno", "yes"), problem, with_truth,
+        style=(writer.PROMPTS_DIR / "reply_style.txt").read_text(encoding="utf-8"),
+        slot=writer.pick_slot("1"),
+    )
+    assert payload["messages"][0]["content"] == expected
     assert (problem.truth in payload["messages"][0]["content"]) is with_truth
     assert "temperature" not in payload
 
@@ -178,3 +189,20 @@ def test_local_trial_stub_writes_three_mode_records_without_keys(tmp_path, monke
     assert split["shadow_mismatch"] is True
     assert split["reply"]["source"] == "consensus_split"
     assert "真相" not in split["reply"]["text"]
+
+
+def test_local_trial_passes_configured_haiku_effort_to_writer(tmp_path, monkeypatch, problem) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-openai")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "fake-anthropic")
+    monkeypatch.setenv("HAIKU_EFFORT", "high")
+    monkeypatch.setattr(local_trial, "_load_stock_problem", lambda no: problem)
+    monkeypatch.setattr(local_trial.luna, "judge", Mock(return_value=Judgement("luna", "q_yesno", "yes")))
+    call = Mock(return_value=writer.Reply("はい！", "llm", False))
+    monkeypatch.setattr(local_trial, "write_reply", call)
+    assert local_trial.main([
+        "--problem", "U01", "--comment", "質問", "--modes", "luna",
+        "--reply-variant", "1b-haiku", "--out", str(tmp_path),
+    ]) == 0
+    assert call.call_args.kwargs["haiku_effort"] == "high"
+    assert call.call_args.kwargs["anthropic_api_key"] == "fake-anthropic"
+    assert call.call_args.kwargs["variant"] == "1b-haiku"

@@ -194,7 +194,7 @@ def _api_rows(metrics: dict[str, Any], patterns: list[dict[str, Any]], *, thresh
 
     def latency_text(report: dict[str, Any]) -> str:
         timing = report["latency_s"]
-        return (f"{timing['median']:.2f} / {timing['p95']:.2f} 秒"
+        return (f"{timing['median']:.2f} / {timing['p95']:.2f} / {timing['max']:.2f} 秒"
                 if timing["median"] is not None else "—")
 
     rows = (
@@ -204,8 +204,8 @@ def _api_rows(metrics: dict[str, Any], patterns: list[dict[str, Any]], *, thresh
         ("書き手トークン（入力 / 出力 / キャッシュ）", lambda api: token_text(api["writer"])),
         ("費用 USD（判定 / 書き手 / 合計）", lambda api: (
             f"${api['judge']['cost_usd']:.6f} / ${api['writer']['cost_usd']:.6f} / ${api['cost_usd']:.6f}")),
-        ("判定の応答時間（中央値 / p95）", lambda api: latency_text(api["judge"])),
-        ("書き手の応答時間（中央値 / p95）", lambda api: latency_text(api["writer"])),
+        ("判定の応答時間（中央値 / p95 / 最大）", lambda api: latency_text(api["judge"])),
+        ("書き手の応答時間（中央値 / p95 / 最大）", lambda api: latency_text(api["writer"])),
         ("打ち切り max_tokens（判定 / 書き手）", lambda api: (
             f"{api['judge']['max_tokens']} / {api['writer']['max_tokens']} 件")),
         ("空応答（判定 / 書き手）", lambda api: (

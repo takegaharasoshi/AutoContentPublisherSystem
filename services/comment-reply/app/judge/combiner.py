@@ -85,6 +85,7 @@ def combine(
                     outcome = haiku_call(
                         comment_id, text, problem,
                         api_key=credentials.get("anthropic_api_key", ""),
+                        effort=config.haiku_effort,
                     )
                 else:
                     outcome = decisions_call(

@@ -96,11 +96,15 @@ def _template_reply(result: Combined, comment_id: str, problem: Problem) -> str 
 def build_prompt(
     result: Combined, comment_id: str, problem: Problem, *, variant: str,
 ) -> tuple[str, str]:
-    """Share the exact prompt and slot between the Luna and Haiku variants."""
+    """Render the variant's prompt and the common reply slot."""
     with_truth = variant in TRUTH_VARIANTS
-    prompt_name = "reply_1b_with_truth.txt" if with_truth else "reply_writer.txt"
+    if variant == "1b-haiku":
+        prompt_name = "haiku_reply_1b.txt"
+        style = ""
+    else:
+        prompt_name = "reply_1b_with_truth.txt" if with_truth else "reply_writer.txt"
+        style = (PROMPTS_DIR / "reply_style.txt").read_text(encoding="utf-8")
     template = (PROMPTS_DIR / prompt_name).read_text(encoding="utf-8")
-    style = (PROMPTS_DIR / "reply_style.txt").read_text(encoding="utf-8")
     slot = pick_slot(comment_id) if result.kind == "q_yesno" else "（この種別では使わない）"
     system = _render_prompt(template, result, problem, with_truth, style=style, slot=slot)
     return system, slot
@@ -116,14 +120,16 @@ def reply_schema() -> dict[str, Any]:
 
 def _llm_reply(
     result: Combined, comment_id: str, text: str, problem: Problem,
-    *, variant: str, api_key: str, model: str,
+    *, variant: str, api_key: str, model: str, haiku_effort: str = "max",
 ) -> tuple[str, dict[str, Any]]:
     system, slot = build_prompt(result, comment_id, problem, variant=variant)
     with_truth = variant in TRUTH_VARIANTS
     if variant in HAIKU_VARIANTS:
+        user = "<comment>\n" + text + "\n</comment>" if variant == "1b-haiku" else text
         data, debug = anthropic_util.request_json(
-            system, text, reply_schema(), api_key=api_key,
-            effort="max" if with_truth else "low", max_tokens=32000 if with_truth else 4000,
+            system, user, reply_schema(), api_key=api_key,
+            effort=haiku_effort if variant == "1b-haiku" else "low",
+            max_tokens=32000 if with_truth else 4000,
         )
         debug["slot"] = slot
         reply = data.get("reply")
@@ -185,7 +191,7 @@ def _llm_reply(
 def write_reply(
     result: Combined, comment_id: str, text: str, problem: Problem, *,
     variant: str, openai_api_key: str = "", model: str = "gpt-6-luna",
-    anthropic_api_key: str = "",
+    anthropic_api_key: str = "", haiku_effort: str = "max",
 ) -> Reply:
     """Write one reply, preserving the final kind and answer."""
     kind = result.kind
@@ -206,7 +212,7 @@ def write_reply(
             value, debug = _llm_reply(
                 result, comment_id, text, problem, variant=variant,
                 api_key=anthropic_api_key if variant in HAIKU_VARIANTS else openai_api_key,
-                model=model,
+                model=model, haiku_effort=haiku_effort,
             )
             if not value:
                 debug["error_reason"] = "empty_reply"

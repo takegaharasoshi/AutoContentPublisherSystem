@@ -9,7 +9,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -27,8 +27,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4584,
-            "latency_s": 1.243127,
+            "input_tokens": 5550,
+            "latency_s": 1.279711,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -41,8 +41,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.63,
-                "question": 0.37
+                "guess": 0.68,
+                "question": 0.32
               },
               "A2": {
                 "q_multi": 0.0,
@@ -52,21 +52,21 @@ window.PROBE_RAW["jev-2c/U22"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.16999999999999998,
+                  "hit": 0.08
                 }
               },
-              "C": 0.55,
+              "C": 0.6,
               "D": {
                 "irrelevant": 0.0,
-                "no": 0.03,
-                "yes": 0.97
+                "no": 0.09,
+                "yes": 0.91
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.08"
         },
         "luna": null
       },
@@ -75,11 +75,13 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 80,
-          "latency_s": 1.535941,
+          "cached_tokens": 1553,
+          "completion_tokens": 111,
+          "finish_reason": "stop",
+          "latency_s": 2.287023,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1443,
-          "reasoning_tokens": 46,
+          "prompt_tokens": 1556,
+          "reasoning_tokens": 77,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
@@ -94,17 +96,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "男は半年ごとに定期検診を受けてるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.2435078880516812,
-      "judge_s": 1.2435078880516812,
+      "jev_s": 1.2799712989944965,
+      "judge_s": 1.2799712989944965,
       "luna_s": null,
-      "total_s": 2.7797902510501444,
-      "writer_s": 1.5362823629984632
+      "total_s": 3.568095655995421,
+      "writer_s": 2.2881243570009246
     }
   },
   {
@@ -116,7 +118,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -124,18 +126,18 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "errors": [],
       "fact_sheet_hash": "a58f8fc39e79",
       "final": {
-        "answer": "no",
+        "answer": "yes",
         "decision": "jev",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": {
-          "answer": "no",
+          "answer": "yes",
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4620,
-            "latency_s": 1.201492,
+            "input_tokens": 5586,
+            "latency_s": 1.257976,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -148,8 +150,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.16,
-                "question": 0.84
+                "guess": 0.13,
+                "question": 0.87
               },
               "A2": {
                 "q_multi": 0.0,
@@ -159,21 +161,21 @@ window.PROBE_RAW["jev-2c/U22"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.01,
-                  "hit": 0.01
+                  "close": 0.06,
+                  "hit": 0.02
                 }
               },
-              "C": 0.44,
+              "C": 0.52,
               "D": {
                 "irrelevant": 0.0,
-                "no": 0.99,
-                "yes": 0.01
+                "no": 0.19,
+                "yes": 0.81
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
         },
         "luna": null
       },
@@ -182,18 +184,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 383,
-          "latency_s": 4.401304,
+          "cached_tokens": 1557,
+          "completion_tokens": 180,
+          "finish_reason": "stop",
+          "latency_s": 3.280864,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1447,
-          "reasoning_tokens": 352,
+          "prompt_tokens": 1560,
+          "reasoning_tokens": 150,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。歯の治療が目的なんだね。"
+        "text": "はい！歯の治療が目的じゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -201,17 +205,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "歯医者に通うのは、歯の治療が目的じゃないんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.2018130839569494,
-      "judge_s": 1.2018130839569494,
+      "jev_s": 1.258274128078483,
+      "judge_s": 1.258274128078483,
       "luna_s": null,
-      "total_s": 5.603598370915279,
-      "writer_s": 4.401785286958329
+      "total_s": 4.5401012731017545,
+      "writer_s": 3.2818271450232714
     }
   },
   {
@@ -223,7 +227,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -241,8 +245,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4590,
-            "latency_s": 1.339069,
+            "input_tokens": 5556,
+            "latency_s": 1.238324,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -263,24 +267,24 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "q_open": 0.0,
                 "q_yesno": 1.0
               },
-              "A_bare": 0.02,
+              "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.05,
-                  "hit": 0.01
+                  "close": 0.32,
+                  "hit": 0.16
                 }
               },
-              "C": 0.36,
+              "C": 0.35,
               "D": {
                 "irrelevant": 0.01,
-                "no": 0.97,
-                "yes": 0.02
+                "no": 0.94,
+                "yes": 0.05
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.16"
         },
         "luna": null
       },
@@ -289,18 +293,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 190,
-          "latency_s": 2.844518,
+          "cached_tokens": 0,
+          "completion_tokens": 141,
+          "finish_reason": "stop",
+          "latency_s": 2.407684,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1443,
-          "reasoning_tokens": 158,
+          "prompt_tokens": 1556,
+          "reasoning_tokens": 102,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。昔からのかかりつけではないよ。"
+        "text": "いいえ。その歯医者は男の昔からのかかりつけではないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -308,17 +314,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "その歯医者は男の昔からのかかりつけですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.3396812930004671,
-      "judge_s": 1.3396812930004671,
+      "jev_s": 1.2385486159473658,
+      "judge_s": 1.2385486159473658,
       "luna_s": null,
-      "total_s": 4.185121158952825,
-      "writer_s": 2.8454398659523576
+      "total_s": 3.6473112049279734,
+      "writer_s": 2.4087625889806077
     }
   },
   {
@@ -330,7 +336,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -348,8 +354,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4602,
-            "latency_s": 1.179897,
+            "input_tokens": 5568,
+            "latency_s": 1.166104,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -362,8 +368,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.88,
-                "question": 0.12
+                "guess": 0.86,
+                "question": 0.14
               },
               "A2": {
                 "q_multi": 0.0,
@@ -373,21 +379,21 @@ window.PROBE_RAW["jev-2c/U22"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.060000000000000005,
+                  "hit": 0.01
                 }
               },
-              "C": 0.6,
+              "C": 0.64,
               "D": {
-                "irrelevant": 0.01,
-                "no": 0.99,
+                "irrelevant": 0.0,
+                "no": 1.0,
                 "yes": 0.0
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -396,18 +402,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 87,
-          "latency_s": 1.822348,
+          "cached_tokens": 1553,
+          "completion_tokens": 85,
+          "finish_reason": "stop",
+          "latency_s": 3.653077,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1443,
-          "reasoning_tokens": 61,
+          "prompt_tokens": 1556,
+          "reasoning_tokens": 57,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。次の質問もどうぞ"
+        "text": "いいえ。次の質問もしてごらん"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -415,17 +423,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "男は診察のあと誰かが来るのを待っているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.180276480037719,
-      "judge_s": 1.180276480037719,
+      "jev_s": 1.1663588340161368,
+      "judge_s": 1.1663588340161368,
       "luna_s": null,
-      "total_s": 3.0035409320844337,
-      "writer_s": 1.8232644520467147
+      "total_s": 4.835580967017449,
+      "writer_s": 3.6692221330013126
     }
   },
   {
@@ -437,7 +445,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -455,329 +463,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4572,
-            "latency_s": 1.153914,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 256,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.03,
-                "question": 0.97
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.05,
-                "q_yesno": 0.95
-              },
-              "A_bare": 0.03,
-              "B": {
-                "point_0": {
-                  "close": 0.02,
-                  "hit": 0.01
-                }
-              },
-              "C": 0.32,
-              "D": {
-                "irrelevant": 0.0,
-                "no": 0.0,
-                "yes": 1.0
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 143,
-          "latency_s": 2.356783,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1439,
-          "reasoning_tokens": 111,
-          "slot": "判定語 + 復唱"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい！同じ席に座ることに意味があるよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "同じ席に座ることに意味があるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.1543031570035964,
-      "judge_s": 1.1543031570035964,
-      "luna_s": null,
-      "total_s": 3.522654679021798,
-      "writer_s": 2.3683515220182016
-    }
-  },
-  {
-    "case_id": "U22-e06",
-    "record": {
-      "comment_id": "U22-e06",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": "irrelevant",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "irrelevant",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4596,
-            "latency_s": 1.22119,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 256,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.54,
-                "question": 0.46
-              },
-              "A2": {
-                "q_multi": 0.0,
-                "q_open": 0.01,
-                "q_yesno": 0.99
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": {
-                  "close": 0.01,
-                  "hit": 0.0
-                }
-              },
-              "C": 0.58,
-              "D": {
-                "irrelevant": 0.35,
-                "no": 0.4,
-                "yes": 0.25
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 27,
-          "latency_s": 1.066121,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1444,
-          "reasoning_tokens": 0,
-          "slot": "判定語 + 一言"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "関係ないよ。ほかのことも聞いてみようか。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は毎回、歯医者の人と話をして帰るんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.2215199409984052,
-      "judge_s": 1.2215199409984052,
-      "luna_s": null,
-      "total_s": 2.2887640750268474,
-      "writer_s": 1.0672441340284422
-    }
-  },
-  {
-    "case_id": "U22-e07",
-    "record": {
-      "comment_id": "U22-e07",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": "no",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4566,
-            "latency_s": 1.337578,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 256,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.43,
-                "question": 0.57
-              },
-              "A2": {
-                "q_multi": 0.01,
-                "q_open": 0.0,
-                "q_yesno": 0.99
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": {
-                  "close": 0.05,
-                  "hit": 0.01
-                }
-              },
-              "C": 0.24,
-              "D": {
-                "irrelevant": 0.3,
-                "no": 0.69,
-                "yes": 0.01
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 28,
-          "latency_s": 2.982298,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1436,
-          "reasoning_tokens": 8,
-          "slot": "判定語だけ"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "その町に家族や友人が住んでいますか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.3381505699362606,
-      "judge_s": 1.3381505699362606,
-      "luna_s": null,
-      "total_s": 4.320881649968214,
-      "writer_s": 2.9827310800319538
-    }
-  },
-  {
-    "case_id": "U22-e08",
-    "record": {
-      "comment_id": "U22-e08",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": "irrelevant",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "irrelevant",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "input_tokens": 4638,
-            "latency_s": 1.261394,
+            "input_tokens": 5538,
+            "latency_s": 1.324021,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -795,27 +482,27 @@ window.PROBE_RAW["jev-2c/U22"] = [
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.34,
-                "q_yesno": 0.66
+                "q_open": 0.04,
+                "q_yesno": 0.96
               },
-              "A_bare": 0.02,
+              "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.33,
+                  "hit": 0.07
                 }
               },
-              "C": 0.41,
+              "C": 0.27,
               "D": {
-                "irrelevant": 0.29,
-                "no": 0.42,
-                "yes": 0.29
+                "irrelevant": 0.0,
+                "no": 0.01,
+                "yes": 0.99
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.07"
         },
         "luna": null
       },
@@ -824,48 +511,50 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 34,
-          "latency_s": 1.206281,
+          "cached_tokens": 1549,
+          "completion_tokens": 108,
+          "finish_reason": "stop",
+          "latency_s": 9.4512,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1445,
-          "reasoning_tokens": 12,
-          "slot": "判定語だけ"
+          "prompt_tokens": 1552,
+          "reasoning_tokens": 76,
+          "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。"
+        "text": "はい！同じ席に座ることに意味があるよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "歯医者に行くのは電車じゃないといけない理由があるんですか？",
+      "text": "同じ席に座ることに意味があるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.2617574980249628,
-      "judge_s": 1.2617574980249628,
+      "jev_s": 1.3242833419935778,
+      "judge_s": 1.3242833419935778,
       "luna_s": null,
-      "total_s": 2.4691601550439373,
-      "writer_s": 1.2074026570189744
+      "total_s": 10.775920574902557,
+      "writer_s": 9.451637232908979
     }
   },
   {
-    "case_id": "U22-e09",
+    "case_id": "U22-e06",
     "record": {
-      "comment_id": "U22-e09",
+      "comment_id": "U22-e06",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -883,8 +572,335 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4596,
-            "latency_s": 1.168339,
+            "input_tokens": 5562,
+            "latency_s": 1.314461,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.56,
+                "question": 0.44
+              },
+              "A2": {
+                "q_multi": 0.0,
+                "q_open": 0.01,
+                "q_yesno": 0.99
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.06,
+                  "hit": 0.02
+                }
+              },
+              "C": 0.53,
+              "D": {
+                "irrelevant": 0.21,
+                "no": 0.52,
+                "yes": 0.27
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 1554,
+          "completion_tokens": 83,
+          "finish_reason": "stop",
+          "latency_s": 2.140373,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1557,
+          "reasoning_tokens": 51,
+          "slot": "判定語 + 一言"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。ほかのことも聞いてごらん"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男は毎回、歯医者の人と話をして帰るんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.314755961066112,
+      "judge_s": 1.314755961066112,
+      "luna_s": null,
+      "total_s": 3.4559449610533193,
+      "writer_s": 2.1411889999872074
+    }
+  },
+  {
+    "case_id": "U22-e07",
+    "record": {
+      "comment_id": "U22-e07",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": "no",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 5532,
+            "latency_s": 1.232742,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.46,
+                "question": 0.54
+              },
+              "A2": {
+                "q_multi": 0.01,
+                "q_open": 0.0,
+                "q_yesno": 0.99
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.1,
+                  "hit": 0.03
+                }
+              },
+              "C": 0.23,
+              "D": {
+                "irrelevant": 0.21,
+                "no": 0.78,
+                "yes": 0.01
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.03"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 32,
+          "finish_reason": "stop",
+          "latency_s": 1.774872,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1549,
+          "reasoning_tokens": 12,
+          "slot": "判定語だけ"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "その町に家族や友人が住んでいますか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.2330664390465245,
+      "judge_s": 1.2330664390465245,
+      "luna_s": null,
+      "total_s": 3.0092644930118695,
+      "writer_s": 1.776198053965345
+    }
+  },
+  {
+    "case_id": "U22-e08",
+    "record": {
+      "comment_id": "U22-e08",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": "no",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 5604,
+            "latency_s": 1.214961,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.03,
+                "question": 0.97
+              },
+              "A2": {
+                "q_multi": 0.01,
+                "q_open": 0.26,
+                "q_yesno": 0.73
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.08,
+                  "hit": 0.02
+                }
+              },
+              "C": 0.45,
+              "D": {
+                "irrelevant": 0.14,
+                "no": 0.58,
+                "yes": 0.28
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 35,
+          "finish_reason": "stop",
+          "latency_s": 1.844886,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1558,
+          "reasoning_tokens": 15,
+          "slot": "判定語だけ"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "歯医者に行くのは電車じゃないといけない理由があるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.2152268289355561,
+      "judge_s": 1.2152268289355561,
+      "luna_s": null,
+      "total_s": 3.060923886951059,
+      "writer_s": 1.845697058015503
+    }
+  },
+  {
+    "case_id": "U22-e09",
+    "record": {
+      "comment_id": "U22-e09",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "input_tokens": 5562,
+            "latency_s": 1.260789,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 258,
@@ -897,8 +913,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.41,
-                "question": 0.59
+                "guess": 0.3,
+                "question": 0.7
               },
               "A2": {
                 "q_multi": 0.0,
@@ -908,21 +924,21 @@ window.PROBE_RAW["jev-2c/U22"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.07,
+                  "hit": 0.02
                 }
               },
-              "C": 0.48,
+              "C": 0.46,
               "D": {
-                "irrelevant": 0.72,
-                "no": 0.16,
-                "yes": 0.12
+                "irrelevant": 0.57,
+                "no": 0.22,
+                "yes": 0.21
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
         },
         "luna": null
       },
@@ -931,18 +947,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 76,
-          "latency_s": 1.995305,
+          "cached_tokens": 1552,
+          "completion_tokens": 84,
+          "finish_reason": "stop",
+          "latency_s": 1.982461,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1442,
-          "reasoning_tokens": 44,
+          "prompt_tokens": 1555,
+          "reasoning_tokens": 51,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ふむふむ、次はどうかな？"
+        "text": "関係ないよ。ほかのことも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -950,17 +968,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "待合室にいる時間のほうが診察より長いんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.1686212799977511,
-      "judge_s": 1.1686212799977511,
+      "jev_s": 1.2610378650715575,
+      "judge_s": 1.2610378650715575,
       "luna_s": null,
-      "total_s": 3.1655859630554914,
-      "writer_s": 1.9969646830577403
+      "total_s": 3.25021332106553,
+      "writer_s": 1.9891754559939727
     }
   },
   {
@@ -972,7 +990,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -990,8 +1008,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4554,
-            "latency_s": 1.353633,
+            "input_tokens": 5520,
+            "latency_s": 1.159225,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 256,
@@ -1004,32 +1022,32 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.13,
-                "question": 0.87
+                "guess": 0.12,
+                "question": 0.88
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.0,
                 "q_yesno": 1.0
               },
-              "A_bare": 0.02,
+              "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.01,
-                  "hit": 0.01
+                  "close": 0.39,
+                  "hit": 0.21
                 }
               },
-              "C": 0.25,
+              "C": 0.26,
               "D": {
-                "irrelevant": 0.16,
+                "irrelevant": 0.1,
                 "no": 0.02,
-                "yes": 0.82
+                "yes": 0.88
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.21"
         },
         "luna": null
       },
@@ -1038,11 +1056,13 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 69,
-          "latency_s": 1.527078,
+          "cached_tokens": 1547,
+          "completion_tokens": 67,
+          "finish_reason": "stop",
+          "latency_s": 1.790012,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1437,
-          "reasoning_tokens": 41,
+          "prompt_tokens": 1550,
+          "reasoning_tokens": 39,
           "slot": "判定語 + 一言"
         },
         "guard": null,
@@ -1057,17 +1077,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "その歯医者の建物は木造ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.354137249989435,
-      "judge_s": 1.354137249989435,
+      "jev_s": 1.1595290540717542,
+      "judge_s": 1.1595290540717542,
       "luna_s": null,
-      "total_s": 2.892420884920284,
-      "writer_s": 1.538283634930849
+      "total_s": 2.9498318370897323,
+      "writer_s": 1.790302783017978
     }
   },
   {
@@ -1079,7 +1099,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1098,7 +1118,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2145,
-            "latency_s": 0.627537,
+            "latency_s": 0.793642,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1133,18 +1153,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 84,
-          "latency_s": 2.348141,
+          "cached_tokens": 1558,
+          "completion_tokens": 73,
+          "finish_reason": "stop",
+          "latency_s": 1.924498,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1448,
-          "reasoning_tokens": 46,
+          "prompt_tokens": 1561,
+          "reasoning_tokens": 34,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつ聞いてごらん。どっちからいこうか？"
+        "text": "質問はひとつずつコメントしてね。どっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1152,17 +1174,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "男は歯の検診に来てるの？診察後は誰かを待ってるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.6281724750297144,
-      "judge_s": 0.6281724750297144,
+      "jev_s": 0.7937461229739711,
+      "judge_s": 0.7937461229739711,
       "luna_s": null,
-      "total_s": 2.9774855739669874,
-      "writer_s": 2.349313098937273
+      "total_s": 2.718830702942796,
+      "writer_s": 1.925084579968825
     }
   },
   {
@@ -1174,7 +1196,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1193,7 +1215,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2145,
-            "latency_s": 0.6463,
+            "latency_s": 0.60912,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1206,12 +1228,12 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.75,
-                "question": 0.25
+                "guess": 0.69,
+                "question": 0.31
               },
               "A2": {
-                "q_multi": 0.97,
-                "q_open": 0.02,
+                "q_multi": 0.96,
+                "q_open": 0.03,
                 "q_yesno": 0.01
               },
               "A_bare": 0.02
@@ -1228,18 +1250,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 91,
-          "latency_s": 2.157269,
+          "cached_tokens": 1556,
+          "completion_tokens": 95,
+          "finish_reason": "stop",
+          "latency_s": 2.155439,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1446,
-          "reasoning_tokens": 52,
+          "prompt_tokens": 1559,
+          "reasoning_tokens": 54,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつ聞いてごらん。どっちからにしようか？"
+        "text": "質問はひとつずつ聞いてごらん。まずはどっちからかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1247,17 +1271,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "同じ席に座るのは昔から？その席に何か思い出があるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.6464611840201542,
-      "judge_s": 0.6464611840201542,
+      "jev_s": 0.6092380420304835,
+      "judge_s": 0.6092380420304835,
       "luna_s": null,
-      "total_s": 2.804740317980759,
-      "writer_s": 2.1582791339606047
+      "total_s": 2.765565798035823,
+      "writer_s": 2.1563277560053393
     }
   },
   {
@@ -1269,7 +1293,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1288,7 +1312,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2670,
-            "latency_s": 0.752965,
+            "latency_s": 0.764116,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1301,13 +1325,13 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.2,
-                "question": 0.8
+                "guess": 0.18,
+                "question": 0.82
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 1.0,
-                "q_yesno": 0.0
+                "q_open": 0.99,
+                "q_yesno": 0.01
               },
               "A3": 0.05,
               "A_bare": 0.02
@@ -1324,18 +1348,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 146,
-          "latency_s": 5.113686,
+          "cached_tokens": 1551,
+          "completion_tokens": 155,
+          "finish_reason": "stop",
+          "latency_s": 3.666287,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1441,
-          "reasoning_tokens": 90,
+          "prompt_tokens": 1554,
+          "reasoning_tokens": 117,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「男は遠くの歯医者に通っているの？」みたいに、はい・いいえで答えられる形で聞いてごらん。"
+        "text": "男は遠くの歯医者に通う必要があるのかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1343,17 +1369,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "男はどうして遠くの歯医者に通ってるんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.7532478289213032,
-      "judge_s": 0.7532478289213032,
+      "jev_s": 0.7643415740458295,
+      "judge_s": 0.7643415740458295,
       "luna_s": null,
-      "total_s": 5.86829328595195,
-      "writer_s": 5.1150454570306465
+      "total_s": 4.431775951059535,
+      "writer_s": 3.6674343770137057
     }
   },
   {
@@ -1365,7 +1391,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1384,7 +1410,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2678,
-            "latency_s": 0.922565,
+            "latency_s": 0.859196,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1397,8 +1423,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.22,
-                "question": 0.78
+                "guess": 0.2,
+                "question": 0.8
               },
               "A2": {
                 "q_multi": 0.0,
@@ -1420,18 +1446,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 181,
-          "latency_s": 6.650911,
+          "cached_tokens": 1554,
+          "completion_tokens": 179,
+          "finish_reason": "stop",
+          "latency_s": 3.0345,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1444,
-          "reasoning_tokens": 145,
+          "prompt_tokens": 1557,
+          "reasoning_tokens": 134,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい／いいえで答えられる形で聞いてみてね。"
+        "text": "はい・いいえで答えられる形で聞いてみてね。誰のことかも書いてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1439,17 +1467,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "診察が終わったあと、待合室で誰を待っているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.9227996999397874,
-      "judge_s": 0.9227996999397874,
+      "jev_s": 0.8593880360713229,
+      "judge_s": 0.8593880360713229,
       "luna_s": null,
-      "total_s": 7.57481972000096,
-      "writer_s": 6.6520200200611725
+      "total_s": 3.9110791840357706,
+      "writer_s": 3.0516911479644477
     }
   },
   {
@@ -1461,7 +1489,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1480,7 +1508,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2674,
-            "latency_s": 0.839014,
+            "latency_s": 0.763352,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1493,8 +1521,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.06,
-                "question": 0.94
+                "guess": 0.05,
+                "question": 0.95
               },
               "A2": {
                 "q_multi": 0.03,
@@ -1502,7 +1530,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "q_yesno": 0.01
               },
               "A3": 0.06,
-              "A_bare": 0.03
+              "A_bare": 0.02
             }
           },
           "error": null,
@@ -1516,18 +1544,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 136,
-          "latency_s": 6.421697,
+          "cached_tokens": 1553,
+          "completion_tokens": 158,
+          "finish_reason": "stop",
+          "latency_s": 2.643054,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1443,
-          "reasoning_tokens": 79,
+          "prompt_tokens": 1556,
+          "reasoning_tokens": 120,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「男とその町や歯医者に関係があるの？」のように、はい・いいえで答えられる形で聞いてみてね。"
+        "text": "はい・いいえで答えられる形に聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1535,17 +1565,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "その町や歯医者と男にはどんな関係があるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.8393350150436163,
-      "judge_s": 0.8393350150436163,
+      "jev_s": 0.7635688269510865,
+      "judge_s": 0.7635688269510865,
       "luna_s": null,
-      "total_s": 7.283794461051002,
-      "writer_s": 6.444459446007386
+      "total_s": 3.406937232008204,
+      "writer_s": 2.6433684050571173
     }
   },
   {
@@ -1557,7 +1587,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1575,8 +1605,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 3633,
-            "latency_s": 0.828946,
+            "input_tokens": 4510,
+            "latency_s": 0.85557,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 172,
@@ -1595,8 +1625,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
               "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.88,
-                  "hit": 0.83
+                  "close": 0.97,
+                  "hit": 0.95
                 }
               },
               "B2": 0.12
@@ -1604,7 +1634,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.83, 矛盾=0.12"
+          "reason": "段A=guess→guess_correct, 要点最低=0.95, 矛盾=0.12"
         },
         "luna": null
       },
@@ -1624,17 +1654,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "歯医者は男が子どものころ住んでた家だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.8291888040257618,
-      "judge_s": 0.8291888040257618,
+      "jev_s": 0.855810281005688,
+      "judge_s": 0.855810281005688,
       "luna_s": null,
-      "total_s": 0.8291943790391088,
-      "writer_s": 5.575013346970081e-06
+      "total_s": 0.8558286010520533,
+      "writer_s": 1.8320046365261078e-05
     }
   },
   {
@@ -1646,7 +1676,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1664,589 +1694,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 3745,
-            "latency_s": 0.796258,
-            "major": "guess",
-            "model": "jev-latest",
-            "output_tokens": 172,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 1.0,
-                "question": 0.0
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": {
-                  "close": 0.97,
-                  "hit": 0.94
-                }
-              },
-              "B2": 0.17
-            }
-          },
-          "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.94, 矛盾=0.17"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "template",
-        "text": "正解！その歯医者は男が育った家を改装したもの。男は検診を口実に通い、背丈の傷が残る柱の前で過ごしてから帰る。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "歯医者になっていたのは男が育った家なんだね。懐かしい家の中に入るために、検診のたび待合室に残ってたのか。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 0.7965931509388611,
-      "judge_s": 0.7965931509388611,
-      "luna_s": null,
-      "total_s": 0.7965948198689148,
-      "writer_s": 1.6689300537109375e-06
-    }
-  },
-  {
-    "case_id": "U22-e18",
-    "record": {
-      "comment_id": "U22-e18",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": null,
-        "decision": "jev",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "calls": 3,
-            "input_tokens": 2347,
-            "latency_s": 0.590045,
-            "major": "guess",
-            "model": "jev-latest",
-            "output_tokens": 150,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.99,
-                "question": 0.01
-              },
-              "A_bare": 0.03,
-              "B": {
-                "point_0": {
-                  "close": 0.98,
-                  "hit": 0.01
-                }
-              }
-            }
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.01"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 86,
-          "latency_s": 1.786009,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1449,
-          "reasoning_tokens": 56,
-          "slot": "（この種別では使わない）"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し考えてみようか☺️"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "その歯医者の建物って、男が昔なにか関わってた場所なんでしょ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 0.5903129189973697,
-      "judge_s": 0.5903129189973697,
-      "luna_s": null,
-      "total_s": 2.376755851902999,
-      "writer_s": 1.7864429329056293
-    }
-  },
-  {
-    "case_id": "U22-e19",
-    "record": {
-      "comment_id": "U22-e19",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": null,
-        "decision": "jev",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "calls": 4,
-            "input_tokens": 3769,
-            "latency_s": 0.870844,
-            "major": "guess",
-            "model": "jev-latest",
-            "output_tokens": 172,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 0.99,
-                "question": 0.01
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": {
-                  "close": 0.99,
-                  "hit": 0.97
-                }
-              },
-              "B2": 0.95
-            }
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.97, 矛盾=0.95"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 71,
-          "latency_s": 1.520009,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1478,
-          "reasoning_tokens": 42,
-          "slot": "（この種別では使わない）"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し考えてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "歯医者は男が育った家で、待合室の柱の傷も残ってたんだね。あの背丈の傷は父親じゃなくて、歯医者を開いた人が刻んだのか。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 0.8711297560948879,
-      "judge_s": 0.8711297560948879,
-      "luna_s": null,
-      "total_s": 2.3920814871089533,
-      "writer_s": 1.5209517310140654
-    }
-  },
-  {
-    "case_id": "U22-e20",
-    "record": {
-      "comment_id": "U22-e20",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": "no",
-        "decision": "jev",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "calls": 6,
-            "guess_demoted": true,
-            "input_tokens": 4674,
-            "latency_s": 1.421115,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 256,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 1.0,
-                "question": 0.0
-              },
-              "A2": {
-                "q_multi": 0.01,
-                "q_open": 0.09,
-                "q_yesno": 0.9
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": {
-                  "close": 0.02,
-                  "hit": 0.01
-                }
-              },
-              "C": 0.44,
-              "D": {
-                "irrelevant": 0.0,
-                "no": 1.0,
-                "yes": 0.0
-              }
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 33,
-          "latency_s": 5.308724,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1452,
-          "reasoning_tokens": 13,
-          "slot": "判定語だけ"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "昔から通ってる先生に会いたくて、診察を口実に半年ごとに訪ねてるんでしょ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 1.4214156420202926,
-      "judge_s": 1.4214156420202926,
-      "luna_s": null,
-      "total_s": 6.730857052025385,
-      "writer_s": 5.309441410005093
-    }
-  },
-  {
-    "case_id": "U22-e21",
-    "record": {
-      "comment_id": "U22-e21",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": null,
-        "decision": "jev",
-        "kind": "guess_wrong"
-      },
-      "judgements": {
-        "jev": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "calls": 4,
-            "guess_demoted": true,
-            "input_tokens": 2890,
-            "latency_s": 0.808814,
-            "major": "question",
-            "model": "jev-latest",
-            "output_tokens": 194,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 1.0,
-                "question": 0.0
-              },
-              "A2": {
-                "q_multi": 0.02,
-                "q_open": 0.78,
-                "q_yesno": 0.2
-              },
-              "A_bare": 0.03,
-              "B": {
-                "point_0": {
-                  "close": 0.0,
-                  "hit": 0.0
-                }
-              }
-            }
-          },
-          "error": null,
-          "kind": "guess_wrong",
-          "reason": "段A=question→guess_wrong, 要点最低=0.00"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 28,
-          "latency_s": 1.053551,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1450,
-          "reasoning_tokens": 0,
-          "slot": "（この種別では使わない）"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "残念、ちがうよ。もう少し考えてみようか。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "待合室の席に忘れ物をしていて、診察のたびに探してるんだと思う。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 0.809069860028103,
-      "judge_s": 0.809069860028103,
-      "luna_s": null,
-      "total_s": 1.8632358229951933,
-      "writer_s": 1.0541659629670903
-    }
-  },
-  {
-    "case_id": "U22-k01",
-    "record": {
-      "comment_id": "U22-k01",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": null,
-        "decision": "jev",
-        "kind": "guess_correct"
-      },
-      "judgements": {
-        "jev": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "calls": 4,
-            "input_tokens": 3685,
-            "latency_s": 0.825798,
-            "major": "guess",
-            "model": "jev-latest",
-            "output_tokens": 172,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 1.0,
-                "question": 0.0
-              },
-              "A_bare": 0.03,
-              "B": {
-                "point_0": {
-                  "close": 0.99,
-                  "hit": 0.97
-                }
-              },
-              "B2": 0.07
-            }
-          },
-          "error": null,
-          "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.97, 矛盾=0.07"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "template",
-        "text": "正解！その歯医者は男が育った家を改装したもの。男は検診を口実に通い、背丈の傷が残る柱の前で過ごしてから帰る。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "通っている歯科医院は、男が幼い頃に家族と暮らしていた建物を使っているんだね。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 0.8260753200156614,
-      "judge_s": 0.8260753200156614,
-      "luna_s": null,
-      "total_s": 0.8260919540189207,
-      "writer_s": 1.663400325924158e-05
-    }
-  },
-  {
-    "case_id": "U22-k02",
-    "record": {
-      "comment_id": "U22-k02",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": null,
-        "decision": "jev",
-        "kind": "guess_correct"
-      },
-      "judgements": {
-        "jev": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "calls": 4,
-            "input_tokens": 3677,
-            "latency_s": 0.740301,
+            "input_tokens": 4622,
+            "latency_s": 0.740423,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 172,
@@ -2291,32 +1740,32 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "歯科医院の建物は、男が子どもの時に過ごした生まれた家そのものだったんだ。",
+      "text": "歯医者になっていたのは男が育った家なんだね。懐かしい家の中に入るために、検診のたび待合室に残ってたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.7405519780004397,
-      "judge_s": 0.7405519780004397,
+      "jev_s": 0.7405629800632596,
+      "judge_s": 0.7405629800632596,
       "luna_s": null,
-      "total_s": 0.7406631399644539,
-      "writer_s": 0.00011116196401417255
+      "total_s": 0.7405691550811753,
+      "writer_s": 6.175017915666103e-06
     }
   },
   {
-    "case_id": "U22-k03",
+    "case_id": "U22-e18",
     "record": {
-      "comment_id": "U22-k03",
+      "comment_id": "U22-e18",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2334,8 +1783,8 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "bare_term": null,
           "debug": {
             "calls": 3,
-            "input_tokens": 2353,
-            "latency_s": 0.770321,
+            "input_tokens": 3224,
+            "latency_s": 0.5479,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -2348,21 +1797,21 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 1.0,
-                "question": 0.0
+                "guess": 0.98,
+                "question": 0.02
               },
               "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.98,
-                  "hit": 0.01
+                  "close": 0.99,
+                  "hit": 0.18
                 }
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.01"
+          "reason": "段A=guess→guess_close, 要点最低=0.18"
         },
         "luna": null
       },
@@ -2371,48 +1820,50 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 82,
-          "latency_s": 1.572536,
+          "cached_tokens": 1559,
+          "completion_tokens": 74,
+          "finish_reason": "stop",
+          "latency_s": 1.753008,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1451,
-          "reasoning_tokens": 52,
+          "prompt_tokens": 1562,
+          "reasoning_tokens": 41,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか☺️"
+        "text": "惜しい！もう少し推理を続けてみようか😉"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "男には歯医者の建物が、子ども時代の思い出につながる場所なんだね。",
+      "text": "その歯医者の建物って、男が昔なにか関わってた場所なんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.7706772190285847,
-      "judge_s": 0.7706772190285847,
+      "jev_s": 0.5480596080888063,
+      "judge_s": 0.5480596080888063,
       "luna_s": null,
-      "total_s": 2.343988925102167,
-      "writer_s": 1.5733117060735822
+      "total_s": 2.302239437121898,
+      "writer_s": 1.7541798290330917
     }
   },
   {
-    "case_id": "U22-k04",
+    "case_id": "U22-e19",
     "record": {
-      "comment_id": "U22-k04",
+      "comment_id": "U22-e19",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2429,12 +1880,12 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "calls": 3,
-            "input_tokens": 2371,
-            "latency_s": 0.628961,
+            "calls": 4,
+            "input_tokens": 4646,
+            "latency_s": 0.805239,
             "major": "guess",
             "model": "jev-latest",
-            "output_tokens": 150,
+            "output_tokens": 172,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
@@ -2444,21 +1895,22 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 1.0,
-                "question": 0.0
+                "guess": 0.99,
+                "question": 0.01
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.93,
-                  "hit": 0.14
+                  "close": 0.9,
+                  "hit": 0.87
                 }
-              }
+              },
+              "B2": 0.96
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.14"
+          "reason": "段A=guess→guess_close, 要点最低=0.87, 矛盾=0.96"
         },
         "luna": null
       },
@@ -2467,107 +1919,13 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 67,
-          "latency_s": 1.534136,
+          "cached_tokens": 1588,
+          "completion_tokens": 65,
+          "finish_reason": "stop",
+          "latency_s": 1.570984,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1456,
-          "reasoning_tokens": 38,
-          "slot": "（この種別では使わない）"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し考えてみようか。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男が昔住んでいた家の跡地に医院が建ち、柱の傷だけが思い出として残ってるんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 0.6291822060011327,
-      "judge_s": 0.6291822060011327,
-      "luna_s": null,
-      "total_s": 2.1744528389535844,
-      "writer_s": 1.5452706329524517
-    }
-  },
-  {
-    "case_id": "U22-k05",
-    "record": {
-      "comment_id": "U22-k05",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "010-two-hour-dentist",
-      "errors": [],
-      "fact_sheet_hash": "a58f8fc39e79",
-      "final": {
-        "answer": null,
-        "decision": "jev",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "calls": 3,
-            "input_tokens": 2344,
-            "latency_s": 0.633772,
-            "major": "guess",
-            "model": "jev-latest",
-            "output_tokens": 150,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 1.0,
-                "question": 0.0
-              },
-              "A_bare": 0.03,
-              "B": {
-                "point_0": {
-                  "close": 0.61,
-                  "hit": 0.03
-                }
-              }
-            }
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.03"
-        },
-        "luna": null
-      },
-      "media_id": "local-U22",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 86,
-          "latency_s": 1.667354,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1452,
-          "reasoning_tokens": 53,
+          "prompt_tokens": 1591,
+          "reasoning_tokens": 32,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -2579,32 +1937,142 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "待合室の柱の傷は、男の幼い頃を思い出させる手がかりなんだね。",
+      "text": "歯医者は男が育った家で、待合室の柱の傷も残ってたんだね。あの背丈の傷は父親じゃなくて、歯医者を開いた人が刻んだのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.6340276399860159,
-      "judge_s": 0.6340276399860159,
+      "jev_s": 0.8054848089814186,
+      "judge_s": 0.8054848089814186,
       "luna_s": null,
-      "total_s": 2.302294990979135,
-      "writer_s": 1.6682673509931192
+      "total_s": 2.3884404299315065,
+      "writer_s": 1.582955620950088
     }
   },
   {
-    "case_id": "U22-k06",
+    "case_id": "U22-e20",
     "record": {
-      "comment_id": "U22-k06",
+      "comment_id": "U22-e20",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": "no",
+        "decision": "jev",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "calls": 6,
+            "guess_demoted": true,
+            "input_tokens": 5640,
+            "latency_s": 1.294847,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 256,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A2": {
+                "q_multi": 0.02,
+                "q_open": 0.09,
+                "q_yesno": 0.89
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.08,
+                  "hit": 0.01
+                }
+              },
+              "C": 0.37,
+              "D": {
+                "irrelevant": 0.0,
+                "no": 0.99,
+                "yes": 0.01
+              }
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 1527,
+          "completion_tokens": 39,
+          "finish_reason": "stop",
+          "latency_s": 1.391006,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1565,
+          "reasoning_tokens": 19,
+          "slot": "判定語だけ"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "昔から通ってる先生に会いたくて、診察を口実に半年ごとに訪ねてるんでしょ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.2951172679895535,
+      "judge_s": 1.2951172679895535,
+      "luna_s": null,
+      "total_s": 2.6868000340182334,
+      "writer_s": 1.39168276602868
+    }
+  },
+  {
+    "case_id": "U22-e21",
+    "record": {
+      "comment_id": "U22-e21",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2623,8 +2091,575 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 4,
             "guess_demoted": true,
-            "input_tokens": 2922,
-            "latency_s": 0.789125,
+            "input_tokens": 3767,
+            "latency_s": 1.836061,
+            "major": "question",
+            "model": "jev-latest",
+            "output_tokens": 194,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A2": {
+                "q_multi": 0.02,
+                "q_open": 0.75,
+                "q_yesno": 0.23
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.01,
+                  "hit": 0.0
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "段A=question→guess_wrong, 要点最低=0.00"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 1560,
+          "completion_tokens": 89,
+          "finish_reason": "stop",
+          "latency_s": 1.851702,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1563,
+          "reasoning_tokens": 52,
+          "slot": "（この種別では使わない）"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。別の可能性も考えてみようか☺️"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "待合室の席に忘れ物をしていて、診察のたびに探してるんだと思う。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.8362695620162413,
+      "judge_s": 1.8362695620162413,
+      "luna_s": null,
+      "total_s": 3.689194651087746,
+      "writer_s": 1.8529250890715048
+    }
+  },
+  {
+    "case_id": "U22-k01",
+    "record": {
+      "comment_id": "U22-k01",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 4562,
+            "latency_s": 0.740192,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 0.99,
+                "question": 0.01
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.99,
+                  "hit": 0.75
+                }
+              },
+              "B2": 0.08
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.75, 矛盾=0.08"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！その歯医者は男が育った家を改装したもの。男は検診を口実に通い、背丈の傷が残る柱の前で過ごしてから帰る。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "通っている歯科医院は、男が幼い頃に家族と暮らしていた建物を使っているんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.740417895023711,
+      "judge_s": 0.740417895023711,
+      "luna_s": null,
+      "total_s": 0.7404357959749177,
+      "writer_s": 1.7900951206684113e-05
+    }
+  },
+  {
+    "case_id": "U22-k02",
+    "record": {
+      "comment_id": "U22-k02",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 4554,
+            "latency_s": 0.856727,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.99,
+                  "hit": 0.99
+                }
+              },
+              "B2": 0.14
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.99, 矛盾=0.14"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！その歯医者は男が育った家を改装したもの。男は検診を口実に通い、背丈の傷が残る柱の前で過ごしてから帰る。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "歯科医院の建物は、男が子どもの時に過ごした生まれた家そのものだったんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.8569484949111938,
+      "judge_s": 0.8569484949111938,
+      "luna_s": null,
+      "total_s": 0.8569543989142403,
+      "writer_s": 5.904003046452999e-06
+    }
+  },
+  {
+    "case_id": "U22-k03",
+    "record": {
+      "comment_id": "U22-k03",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 3230,
+            "latency_s": 0.654808,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 150,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.04,
+              "B": {
+                "point_0": {
+                  "close": 0.96,
+                  "hit": 0.1
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.10"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 1561,
+          "completion_tokens": 83,
+          "finish_reason": "stop",
+          "latency_s": 2.119049,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1564,
+          "reasoning_tokens": 50,
+          "slot": "（この種別では使わない）"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか😉"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男には歯医者の建物が、子ども時代の思い出につながる場所なんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.6549632620299235,
+      "judge_s": 0.6549632620299235,
+      "luna_s": null,
+      "total_s": 2.785401173052378,
+      "writer_s": 2.1304379110224545
+    }
+  },
+  {
+    "case_id": "U22-k04",
+    "record": {
+      "comment_id": "U22-k04",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 4562,
+            "latency_s": 1.09473,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 172,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 0.98,
+                  "hit": 0.86
+                }
+              },
+              "B2": 0.18
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.86, 矛盾=0.18"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！その歯医者は男が育った家を改装したもの。男は検診を口実に通い、背丈の傷が残る柱の前で過ごしてから帰る。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男が昔住んでいた家の跡地に医院が建ち、柱の傷だけが思い出として残ってるんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 1.0949637509183958,
+      "judge_s": 1.0949637509183958,
+      "luna_s": null,
+      "total_s": 1.0949743089731783,
+      "writer_s": 1.0558054782450199e-05
+    }
+  },
+  {
+    "case_id": "U22-k05",
+    "record": {
+      "comment_id": "U22-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 3,
+            "input_tokens": 3221,
+            "latency_s": 0.570056,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 150,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.03,
+              "B": {
+                "point_0": {
+                  "close": 0.56,
+                  "hit": 0.1
+                }
+              }
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "段A=guess→guess_close, 要点最低=0.10"
+        },
+        "luna": null
+      },
+      "media_id": "local-U22",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 1562,
+          "completion_tokens": 27,
+          "finish_reason": "stop",
+          "latency_s": 1.255936,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1565,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "待合室の柱の傷は、男の幼い頃を思い出させる手がかりなんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.5702260119142011,
+      "judge_s": 0.5702260119142011,
+      "luna_s": null,
+      "total_s": 1.8268545338651165,
+      "writer_s": 1.2566285219509155
+    }
+  },
+  {
+    "case_id": "U22-k06",
+    "record": {
+      "comment_id": "U22-k06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "010-two-hour-dentist",
+      "errors": [],
+      "fact_sheet_hash": "a58f8fc39e79",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "guess_demoted": true,
+            "input_tokens": 3799,
+            "latency_s": 0.764606,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 194,
@@ -2642,13 +2677,13 @@ window.PROBE_RAW["jev-2c/U22"] = [
               },
               "A2": {
                 "q_multi": 0.01,
-                "q_open": 0.77,
-                "q_yesno": 0.22
+                "q_open": 0.75,
+                "q_yesno": 0.24
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.0,
+                  "close": 0.02,
                   "hit": 0.0
                 }
               }
@@ -2665,18 +2700,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 80,
-          "latency_s": 1.428402,
+          "cached_tokens": 1567,
+          "completion_tokens": 84,
+          "finish_reason": "stop",
+          "latency_s": 1.651144,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1457,
-          "reasoning_tokens": 43,
+          "prompt_tokens": 1570,
+          "reasoning_tokens": 46,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2684,17 +2721,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "男は昔から憧れていた歯科医師と話すため、痛くない歯の診察も受けてるんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.7894364340463653,
-      "judge_s": 0.7894364340463653,
+      "jev_s": 0.7648633220233023,
+      "judge_s": 0.7648633220233023,
       "luna_s": null,
-      "total_s": 2.218223807052709,
-      "writer_s": 1.4287873730063438
+      "total_s": 2.4171546599827707,
+      "writer_s": 1.6522913379594684
     }
   },
   {
@@ -2706,7 +2743,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2727,7 +2764,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 932,
-            "latency_s": 0.19538,
+            "latency_s": 0.205918,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -2738,12 +2775,12 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "reaction": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.87
+              "A_bare": 0.86
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A語句のみ: 0.87"
+          "reason": "段A語句のみ: 0.86"
         },
         "luna": null
       },
@@ -2751,6 +2788,16 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 1548,
+          "completion_tokens": 371,
+          "finish_reason": "stop",
+          "latency_s": 5.551943,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1551,
+          "reasoning_tokens": 322,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2763,17 +2810,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "生家の歯医者？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.19546223699580878,
-      "judge_s": 0.19546223699580878,
+      "jev_s": 0.2060386200901121,
+      "judge_s": 0.2060386200901121,
       "luna_s": null,
-      "total_s": 3.2764829179504886,
-      "writer_s": 3.08102068095468
+      "total_s": 5.759160595131107,
+      "writer_s": 5.553121975040995
     }
   },
   {
@@ -2785,7 +2832,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2806,7 +2853,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 928,
-            "latency_s": 0.176007,
+            "latency_s": 0.219899,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -2830,6 +2877,16 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 1541,
+          "completion_tokens": 229,
+          "finish_reason": "stop",
+          "latency_s": 3.112065,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1544,
+          "reasoning_tokens": 186,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2842,17 +2899,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "引っ越し",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.17612486495636404,
-      "judge_s": 0.17612486495636404,
+      "jev_s": 0.22001561697106808,
+      "judge_s": 0.22001561697106808,
       "luna_s": null,
-      "total_s": 3.604142271913588,
-      "writer_s": 3.428017406957224
+      "total_s": 3.3334009990794584,
+      "writer_s": 3.1133853821083903
     }
   },
   {
@@ -2864,7 +2921,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2883,7 +2940,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1419,
-            "latency_s": 0.403792,
+            "latency_s": 0.370637,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 124,
@@ -2891,16 +2948,16 @@ window.PROBE_RAW["jev-2c/U22"] = [
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.09,
+                "question_or_guess": 0.07,
                 "reaction": 0.0,
-                "request": 0.91
+                "request": 0.93
               },
               "A2": {
                 "ask_hint": 0.0,
                 "ask_howto": 0.0,
                 "ask_spoiler": 1.0
               },
-              "A_bare": 0.09
+              "A_bare": 0.12
             }
           },
           "error": null,
@@ -2914,18 +2971,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 113,
-          "latency_s": 2.302604,
+          "cached_tokens": 1541,
+          "completion_tokens": 149,
+          "finish_reason": "stop",
+          "latency_s": 2.900835,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1431,
-          "reasoning_tokens": 66,
+          "prompt_tokens": 1544,
+          "reasoning_tokens": 103,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問には答えられるけど、真相は教えられないよ。はい・いいえで質問してみてね！"
+        "text": "質問には答えられるけど、真相は教えられないよ。気になることを聞いてごらん😉"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2933,17 +2992,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "正解は何なん？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.4039100840454921,
-      "judge_s": 0.4039100840454921,
+      "jev_s": 0.37073405599221587,
+      "judge_s": 0.37073405599221587,
       "luna_s": null,
-      "total_s": 2.70692512311507,
-      "writer_s": 2.303015039069578
+      "total_s": 3.2723684310913086,
+      "writer_s": 2.9016343750990927
     }
   },
   {
@@ -2955,7 +3014,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2974,7 +3033,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1576,
-            "latency_s": 0.374975,
+            "latency_s": 0.504352,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -2995,7 +3054,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "mention": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.48
+              "A_bare": 0.49
             }
           },
           "error": null,
@@ -3009,11 +3068,13 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 60,
-          "latency_s": 1.346659,
+          "cached_tokens": 1535,
+          "completion_tokens": 61,
+          "finish_reason": "stop",
+          "latency_s": 1.959206,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1425,
-          "reasoning_tokens": 30,
+          "prompt_tokens": 1538,
+          "reasoning_tokens": 31,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -3028,17 +3089,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "こんちは！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.3751697880215943,
-      "judge_s": 0.3751697880215943,
+      "jev_s": 0.5044610529439524,
+      "judge_s": 0.5044610529439524,
       "luna_s": null,
-      "total_s": 1.722148232976906,
-      "writer_s": 1.3469784449553117
+      "total_s": 2.46437220799271,
+      "writer_s": 1.9599111550487578
     }
   },
   {
@@ -3050,7 +3111,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3069,7 +3130,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1588,
-            "latency_s": 0.401455,
+            "latency_s": 0.443835,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -3077,9 +3138,9 @@ window.PROBE_RAW["jev-2c/U22"] = [
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.05,
-                "reaction": 0.76,
-                "request": 0.19
+                "question_or_guess": 0.06,
+                "reaction": 0.72,
+                "request": 0.22
               },
               "A2": {
                 "chat": 0.0,
@@ -3090,7 +3151,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
                 "mention": 0.0,
                 "request": 1.0
               },
-              "A_bare": 0.31
+              "A_bare": 0.32
             }
           },
           "error": null,
@@ -3104,18 +3165,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 95,
-          "latency_s": 1.66333,
+          "cached_tokens": 1542,
+          "completion_tokens": 127,
+          "finish_reason": "stop",
+          "latency_s": 2.134156,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1432,
-          "reasoning_tokens": 65,
+          "prompt_tokens": 1545,
+          "reasoning_tokens": 104,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "リクエストありがとう！楽しみにしててね☺️"
+        "text": "リクエストありがとう！"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3123,17 +3186,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "動物が出てくるやつ希望",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.40152250707615167,
-      "judge_s": 0.40152250707615167,
+      "jev_s": 0.4439385839505121,
+      "judge_s": 0.4439385839505121,
       "luna_s": null,
-      "total_s": 2.071400943095796,
-      "writer_s": 1.6698784360196441
+      "total_s": 2.5788904778892174,
+      "writer_s": 2.1349518939387053
     }
   },
   {
@@ -3145,7 +3208,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3180,18 +3243,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 81,
-          "latency_s": 2.558697,
+          "cached_tokens": 1537,
+          "completion_tokens": 64,
+          "finish_reason": "stop",
+          "latency_s": 2.009163,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1427,
-          "reasoning_tokens": 56,
+          "prompt_tokens": 1540,
+          "reasoning_tokens": 40,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ふむふむ、ありがとう☺️"
+        "text": "考えてくれてありがとう☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3199,17 +3264,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "🤔💭",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 6.466801278293133e-05,
-      "judge_s": 6.466801278293133e-05,
+      "jev_s": 0.0006105010397732258,
+      "judge_s": 0.0006105010397732258,
       "luna_s": null,
-      "total_s": 2.559487714082934,
-      "writer_s": 2.559423046070151
+      "total_s": 2.016602760995738,
+      "writer_s": 2.015992259955965
     }
   },
   {
@@ -3221,7 +3286,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3240,25 +3305,25 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1486,
-            "latency_s": 0.419392,
+            "latency_s": 0.467807,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 129,
             "probabilities": {
               "A1": {
-                "inappropriate": 0.9,
+                "inappropriate": 0.88,
                 "other": 0.0,
                 "question_or_guess": 0.01,
-                "reaction": 0.09,
+                "reaction": 0.11,
                 "request": 0.0
               },
               "A2": {
-                "abuse": 0.99,
+                "abuse": 1.0,
                 "personal_info": 0.0,
                 "spam": 0.0,
-                "troll": 0.01
+                "troll": 0.0
               },
-              "A_bare": 0.04
+              "A_bare": 0.05
             }
           },
           "error": null,
@@ -3283,17 +3348,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "性的なことばっか考えてそうでキモい",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.41951949999202043,
-      "judge_s": 0.41951949999202043,
+      "jev_s": 0.46790299902204424,
+      "judge_s": 0.46790299902204424,
       "luna_s": null,
-      "total_s": 0.4195675529772416,
-      "writer_s": 4.805298522114754e-05
+      "total_s": 0.4679601959651336,
+      "writer_s": 5.719694308936596e-05
     }
   },
   {
@@ -3305,7 +3370,7 @@ window.PROBE_RAW["jev-2c/U22"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3324,17 +3389,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1417,
-            "latency_s": 0.358579,
+            "latency_s": 0.351609,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 124,
             "probabilities": {
               "A1": {
                 "inappropriate": 0.0,
-                "other": 0.0,
+                "other": 0.01,
                 "question_or_guess": 0.04,
                 "reaction": 0.0,
-                "request": 0.96
+                "request": 0.95
               },
               "A2": {
                 "ask_hint": 0.0,
@@ -3355,18 +3420,20 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 130,
-          "latency_s": 6.749556,
+          "cached_tokens": 1531,
+          "completion_tokens": 30,
+          "finish_reason": "stop",
+          "latency_s": 1.63436,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1428,
-          "reasoning_tokens": 82,
+          "prompt_tokens": 1541,
+          "reasoning_tokens": 0,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問には答えられるけど、真相は教えられないよ。はい・いいえで聞いてごらん☺️"
+        "text": "質問には答えられるけど、真相は教えられないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3374,17 +3441,17 @@ window.PROBE_RAW["jev-2c/U22"] = [
       "text": "答案是什么？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.3587380239041522,
-      "judge_s": 0.3587380239041522,
+      "jev_s": 0.351673859055154,
+      "judge_s": 0.351673859055154,
       "luna_s": null,
-      "total_s": 7.109408001881093,
-      "writer_s": 6.750669977976941
+      "total_s": 1.9872585190460086,
+      "writer_s": 1.6355846599908546
     }
   }
 ];

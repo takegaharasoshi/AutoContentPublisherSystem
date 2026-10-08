@@ -9,13 +9,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": "no",
         "decision": "luna",
@@ -27,16 +27,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 198,
+            "cached_tokens": 3687,
+            "completion_tokens": 205,
             "finish_reason": "stop",
-            "latency_s": 2.723017,
+            "latency_s": 3.429599,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3256,
-            "reasoning_tokens": 126
+            "prompt_tokens": 3690,
+            "reasoning_tokens": 134
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、男たちは生きている人間ではないとされています。"
+          "reason": "男たちは生きている人間ではないと確定しています。"
         }
       },
       "media_id": "local-U12",
@@ -44,11 +45,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 244,
-          "latency_s": 3.527303,
+          "cached_tokens": 0,
+          "completion_tokens": 110,
+          "finish_reason": "stop",
+          "latency_s": 2.015044,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2035,
-          "reasoning_tokens": 215,
+          "prompt_tokens": 2189,
+          "reasoning_tokens": 81,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
@@ -63,17 +66,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "楽器を構えているのは実際の人間ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.7230622860370204,
-      "luna_s": 2.7230622860370204,
-      "total_s": 6.2507969960570335,
-      "writer_s": 3.527734710020013
+      "judge_s": 3.429672708036378,
+      "luna_s": 3.429672708036378,
+      "total_s": 5.450618071015924,
+      "writer_s": 2.020945362979546
     }
   },
   {
@@ -85,13 +88,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": "no",
         "decision": "luna",
@@ -103,16 +106,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 323,
+            "cached_tokens": 3688,
+            "completion_tokens": 590,
             "finish_reason": "stop",
-            "latency_s": 5.371828,
+            "latency_s": 6.579139,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3257,
-            "reasoning_tokens": 252
+            "prompt_tokens": 3691,
+            "reasoning_tokens": 512
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "自分の意思で音を出さないのではなく、意思を持ちません。"
+          "reason": "自分の意思で音を出さないのではなく、意思を持たないため。"
         }
       },
       "media_id": "local-U12",
@@ -120,18 +124,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 1064,
-          "latency_s": 9.430794,
+          "cached_tokens": 2166,
+          "completion_tokens": 367,
+          "finish_reason": "stop",
+          "latency_s": 3.991318,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2036,
-          "reasoning_tokens": 1024,
+          "prompt_tokens": 2190,
+          "reasoning_tokens": 331,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。自分の意思で音を出さないんだね。"
+        "text": "いいえ。自分の意思で音を出さないわけじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -139,17 +145,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは自分の意思で音を出さないんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 5.37185455695726,
-      "luna_s": 5.37185455695726,
-      "total_s": 14.805460429051891,
-      "writer_s": 9.433605872094631
+      "judge_s": 6.579176414990798,
+      "luna_s": 6.579176414990798,
+      "total_s": 10.571180113009177,
+      "writer_s": 3.9920036980183795
     }
   },
   {
@@ -161,34 +167,35 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
-        "answer": "yes",
+        "answer": "no",
         "decision": "luna",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": null,
         "luna": {
-          "answer": "yes",
+          "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 330,
+            "cached_tokens": 3687,
+            "completion_tokens": 274,
             "finish_reason": "stop",
-            "latency_s": 3.680886,
+            "latency_s": 3.677427,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3256,
-            "reasoning_tokens": 257
+            "prompt_tokens": 3690,
+            "reasoning_tokens": 209
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "楽器は壊れていないと確定しているため、音が出るものです。"
+          "reason": "楽器は初めから音が出ない作り物です。"
         }
       },
       "media_id": "local-U12",
@@ -196,18 +203,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 46,
-          "latency_s": 1.24481,
+          "cached_tokens": 0,
+          "completion_tokens": 45,
+          "finish_reason": "stop",
+          "latency_s": 1.527644,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2032,
-          "reasoning_tokens": 27,
+          "prompt_tokens": 2186,
+          "reasoning_tokens": 25,
           "slot": "判定語だけ"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！"
+        "text": "いいえ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -215,17 +224,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "持っている楽器は本当に音が出るものですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.6809448219137266,
-      "luna_s": 3.6809448219137266,
-      "total_s": 4.926561974920332,
-      "writer_s": 1.2456171530066058
+      "judge_s": 3.6774655310437083,
+      "luna_s": 3.6774655310437083,
+      "total_s": 5.2062293130438775,
+      "writer_s": 1.5287637820001692
     }
   },
   {
@@ -237,165 +246,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 168,
-            "finish_reason": "stop",
-            "latency_s": 2.963089,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3253,
-            "reasoning_tokens": 85
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "階段は建物の階段ではなく、飾りのために組み立てた段です。"
-        }
-      },
-      "media_id": "local-U12",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 169,
-          "latency_s": 2.285362,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 2031,
-          "reasoning_tokens": 138,
-          "slot": "判定語 + 一言"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。ほかのことも聞いてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "階段は建物の中にあるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 2.9631376900942996,
-      "luna_s": 2.9631376900942996,
-      "total_s": 5.24958533316385,
-      "writer_s": 2.2864476430695504
-    }
-  },
-  {
-    "case_id": "U12-e05",
-    "record": {
-      "comment_id": "U12-e05",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "003-silent-musicians",
-      "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
-      "final": {
-        "answer": "no",
-        "decision": "luna",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 396,
-            "finish_reason": "stop",
-            "latency_s": 4.752493,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3259,
-            "reasoning_tokens": 319
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "家族は音が出ないと知っており、演奏を期待しているとは考えにくいためです。"
-        }
-      },
-      "media_id": "local-U12",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 147,
-          "latency_s": 2.197048,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 2037,
-          "reasoning_tokens": 117,
-          "slot": "判定語 + 一言"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。ほかのことも聞いてごらん"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "見ている人たちは演奏を期待して集まってるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 4.752515982021578,
-      "luna_s": 4.752515982021578,
-      "total_s": 6.951218132977374,
-      "writer_s": 2.1987021509557962
-    }
-  },
-  {
-    "case_id": "U12-e06",
-    "record": {
-      "comment_id": "U12-e06",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "003-silent-musicians",
-      "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": "yes",
         "decision": "luna",
@@ -407,16 +264,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 412,
+            "cached_tokens": 3684,
+            "completion_tokens": 388,
             "finish_reason": "stop",
-            "latency_s": 4.806025,
+            "latency_s": 5.11237,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3255,
-            "reasoning_tokens": 341
+            "prompt_tokens": 3687,
+            "reasoning_tokens": 314
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "見ている人たちは家族で、飾っている間は毎日眺めています。"
+          "reason": "一つの yes/no 質問で、段飾りは家の中に置かれます。"
         }
       },
       "media_id": "local-U12",
@@ -424,11 +282,171 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 235,
-          "latency_s": 3.378345,
+          "cached_tokens": 0,
+          "completion_tokens": 220,
+          "finish_reason": "stop",
+          "latency_s": 3.917225,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2034,
-          "reasoning_tokens": 201,
+          "prompt_tokens": 2185,
+          "reasoning_tokens": 192,
+          "slot": "判定語 + 一言"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！ほかにも聞いてみてね。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "階段は建物の中にあるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 5.112431554007344,
+      "luna_s": 5.112431554007344,
+      "total_s": 9.030718960915692,
+      "writer_s": 3.918287406908348
+    }
+  },
+  {
+    "case_id": "U12-e05",
+    "record": {
+      "comment_id": "U12-e05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "d77357e39b1f",
+      "final": {
+        "answer": "no",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "cached_tokens": 3690,
+            "completion_tokens": 276,
+            "finish_reason": "stop",
+            "latency_s": 3.59683,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3693,
+            "reasoning_tokens": 201
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "家族は音が出ないと知っており、お祝いを楽しんで眺めています。"
+        }
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 141,
+          "finish_reason": "stop",
+          "latency_s": 5.148449,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2191,
+          "reasoning_tokens": 110,
+          "slot": "判定語 + 一言"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。ほかのことも聞いてごらん。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "見ている人たちは演奏を期待して集まってるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.5969087730627507,
+      "luna_s": 3.5969087730627507,
+      "total_s": 8.745990663999692,
+      "writer_s": 5.149081890936941
+    }
+  },
+  {
+    "case_id": "U12-e06",
+    "record": {
+      "comment_id": "U12-e06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "d77357e39b1f",
+      "final": {
+        "answer": "yes",
+        "decision": "luna",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "cached_tokens": 3686,
+            "completion_tokens": 261,
+            "finish_reason": "stop",
+            "latency_s": 3.333388,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3689,
+            "reasoning_tokens": 181
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "見ているのは家に置いている家族で、飾っている間は毎日眺めています。"
+        }
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 201,
+          "finish_reason": "stop",
+          "latency_s": 3.095554,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2188,
+          "reasoning_tokens": 167,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
@@ -443,17 +461,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "毎日見ているのは同じ人たちですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.806053788983263,
-      "luna_s": 4.806053788983263,
-      "total_s": 8.185479601030238,
-      "writer_s": 3.379425812046975
+      "judge_s": 3.3334783179452643,
+      "luna_s": 3.3334783179452643,
+      "total_s": 6.429502694867551,
+      "writer_s": 3.096024376922287
     }
   },
   {
@@ -465,13 +483,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": "no",
         "decision": "luna",
@@ -483,16 +501,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 295,
+            "cached_tokens": 3688,
+            "completion_tokens": 273,
             "finish_reason": "stop",
-            "latency_s": 3.700604,
+            "latency_s": 3.760278,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3257,
-            "reasoning_tokens": 223
+            "prompt_tokens": 3691,
+            "reasoning_tokens": 196
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男たちは生きた人間ではなく、仕事で立っているわけではありません。"
+          "reason": "単一のはい・いいえ質問で、仕事として立っているわけではありません。"
         }
       },
       "media_id": "local-U12",
@@ -500,18 +519,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 400,
-          "latency_s": 5.182006,
+          "cached_tokens": 2166,
+          "completion_tokens": 174,
+          "finish_reason": "stop",
+          "latency_s": 2.452303,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2036,
-          "reasoning_tokens": 367,
+          "prompt_tokens": 2190,
+          "reasoning_tokens": 140,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。仕事でそこに立っているわけではないよ。"
+        "text": "いいえ。何かの仕事で立っているわけじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -519,17 +540,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは何かの仕事でそこに立っているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.700667636934668,
-      "luna_s": 3.700667636934668,
-      "total_s": 8.8856930679176,
-      "writer_s": 5.1850254309829324
+      "judge_s": 3.7603224590420723,
+      "luna_s": 3.7603224590420723,
+      "total_s": 6.213854920002632,
+      "writer_s": 2.4535324609605595
     }
   },
   {
@@ -541,13 +562,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": "no",
         "decision": "luna",
@@ -559,16 +580,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 380,
+            "cached_tokens": 3693,
+            "completion_tokens": 897,
             "finish_reason": "stop",
-            "latency_s": 4.307071,
+            "latency_s": 9.918385,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3262,
-            "reasoning_tokens": 306
+            "prompt_tokens": 3696,
+            "reasoning_tokens": 808
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "一つのはい・いいえ質問。音が出ないのは演出上の理由ではありません。"
+          "reason": "演出上の理由があるかを尋ねる、はい・いいえで答えられる質問です。"
         }
       },
       "media_id": "local-U12",
@@ -576,18 +598,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 538,
-          "latency_s": 5.064713,
+          "cached_tokens": 2166,
+          "completion_tokens": 340,
+          "finish_reason": "stop",
+          "latency_s": 4.032446,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2041,
-          "reasoning_tokens": 509,
+          "prompt_tokens": 2195,
+          "reasoning_tokens": 307,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。演出上の理由はないよ。"
+        "text": "いいえ。演出上の理由があるわけじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -595,17 +619,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "音を出さないのは何か演出上の理由があるんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.307129355962388,
-      "luna_s": 4.307129355962388,
-      "total_s": 9.372232335968874,
-      "writer_s": 5.065102980006486
+      "judge_s": 9.918422820977867,
+      "luna_s": 9.918422820977867,
+      "total_s": 13.952107585966587,
+      "writer_s": 4.03368476498872
     }
   },
   {
@@ -617,13 +641,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": "no",
         "decision": "luna",
@@ -635,16 +659,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 242,
+            "cached_tokens": 3692,
+            "completion_tokens": 306,
             "finish_reason": "stop",
-            "latency_s": 3.043857,
+            "latency_s": 4.042197,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3261,
-            "reasoning_tokens": 164
+            "prompt_tokens": 3695,
+            "reasoning_tokens": 232
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男たちは一度も音を出していないため、演奏を聞いたことはありません。"
+          "reason": "男たちは一度も音を出しておらず、家族も音を出さないと知っています。"
         }
       },
       "media_id": "local-U12",
@@ -652,11 +677,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 143,
-          "latency_s": 1.931046,
+          "cached_tokens": 2165,
+          "completion_tokens": 202,
+          "finish_reason": "stop",
+          "latency_s": 5.043913,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2039,
-          "reasoning_tokens": 112,
+          "prompt_tokens": 2193,
+          "reasoning_tokens": 171,
           "slot": "判定語 + 一言"
         },
         "guard": null,
@@ -671,17 +698,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "見てる人は男たちの演奏を聞いたことがあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.0439142680261284,
-      "luna_s": 3.0439142680261284,
-      "total_s": 4.975295508047566,
-      "writer_s": 1.9313812400214374
+      "judge_s": 4.042236081091687,
+      "luna_s": 4.042236081091687,
+      "total_s": 9.08740587811917,
+      "writer_s": 5.045169797027484
     }
   },
   {
@@ -693,34 +720,35 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
-        "answer": "irrelevant",
+        "answer": "no",
         "decision": "luna",
         "kind": "q_yesno"
       },
       "judgements": {
         "jev": null,
         "luna": {
-          "answer": "irrelevant",
+          "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 171,
+            "cached_tokens": 3684,
+            "completion_tokens": 592,
             "finish_reason": "stop",
-            "latency_s": 2.639782,
+            "latency_s": 7.009755,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3253,
-            "reasoning_tokens": 94
+            "prompt_tokens": 3687,
+            "reasoning_tokens": 506
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "階段の色や材質は、真相にも確定事実にも関係しないため。"
+          "reason": "色や材質は真相に関係しないため、「関係ありますか」への答えはいいえです。"
         }
       },
       "media_id": "local-U12",
@@ -728,18 +756,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 167,
-          "latency_s": 2.213574,
+          "cached_tokens": 2166,
+          "completion_tokens": 144,
+          "finish_reason": "stop",
+          "latency_s": 2.672393,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2032,
-          "reasoning_tokens": 134,
+          "prompt_tokens": 2186,
+          "reasoning_tokens": 111,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ほかのことも聞いてみようか？"
+        "text": "いいえ。階段の色や材質は関係ないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -747,17 +777,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "階段の色や材質も関係ありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.639839284005575,
-      "luna_s": 2.639839284005575,
-      "total_s": 4.854256889084354,
-      "writer_s": 2.214417605078779
+      "judge_s": 7.009828509995714,
+      "luna_s": 7.009828509995714,
+      "total_s": 9.683062560972758,
+      "writer_s": 2.673234050977044
     }
   },
   {
@@ -769,13 +799,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -787,16 +817,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 458,
+            "cached_tokens": 3690,
+            "completion_tokens": 530,
             "finish_reason": "stop",
-            "latency_s": 5.052179,
+            "latency_s": 5.933251,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3259,
-            "reasoning_tokens": 372
+            "prompt_tokens": 3693,
+            "reasoning_tokens": 453
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "演奏者か人形かという、別々の確認を一つのコメントで尋ねています。"
+          "reason": "演奏者か人形かを別々に尋ねる二つの質問です。"
         }
       },
       "media_id": "local-U12",
@@ -804,18 +835,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 142,
-          "latency_s": 2.650029,
+          "cached_tokens": 0,
+          "completion_tokens": 177,
+          "finish_reason": "stop",
+          "latency_s": 2.92569,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2037,
-          "reasoning_tokens": 100,
+          "prompt_tokens": 2191,
+          "reasoning_tokens": 136,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どちらか一つにして聞いてごらん☺️"
+        "text": "質問はひとつずつコメントしてね。気になることをひとつ聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -823,17 +856,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは本物の演奏者なの？それとも人形かなにか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 5.052206218941137,
-      "luna_s": 5.052206218941137,
-      "total_s": 7.7031731909373775,
-      "writer_s": 2.6509669719962403
+      "judge_s": 5.933287746971473,
+      "luna_s": 5.933287746971473,
+      "total_s": 8.859461955958977,
+      "writer_s": 2.9261742089875042
     }
   },
   {
@@ -845,13 +878,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -863,16 +896,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 202,
+            "cached_tokens": 3694,
+            "completion_tokens": 163,
             "finish_reason": "stop",
-            "latency_s": 2.923037,
+            "latency_s": 2.510571,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3263,
-            "reasoning_tokens": 124
+            "prompt_tokens": 3697,
+            "reasoning_tokens": 81
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "「毎日来るの？」と「知り合い？」の二つの質問です。"
+          "reason": "「毎日来るのか」「知り合いなのか」の二つを尋ねているため。"
         }
       },
       "media_id": "local-U12",
@@ -880,18 +914,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 110,
-          "latency_s": 1.968301,
+          "cached_tokens": 2165,
+          "completion_tokens": 114,
+          "finish_reason": "stop",
+          "latency_s": 2.112682,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2041,
-          "reasoning_tokens": 72,
+          "prompt_tokens": 2195,
+          "reasoning_tokens": 78,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どっちから聞いてみようか？"
+        "text": "質問はひとつずつコメントしてね。どっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -899,17 +935,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "見ている人は毎日そこに来るの？男たちと知り合いなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.9230900310212746,
-      "luna_s": 2.9230900310212746,
-      "total_s": 4.892434922978282,
-      "writer_s": 1.9693448919570073
+      "judge_s": 2.5106398459756747,
+      "luna_s": 2.5106398459756747,
+      "total_s": 4.624525579041801,
+      "writer_s": 2.1138857330661267
     }
   },
   {
@@ -921,13 +957,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -939,16 +975,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 203,
+            "cached_tokens": 3696,
+            "completion_tokens": 186,
             "finish_reason": "stop",
-            "latency_s": 3.034237,
+            "latency_s": 3.024393,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3265,
-            "reasoning_tokens": 119
+            "prompt_tokens": 3699,
+            "reasoning_tokens": 101
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「どうして」と理由を尋ねる質問で、はい／いいえでは答えられません。"
+          "reason": "「どうして」と理由を尋ねており、はい／いいえでは答えられないため。"
         }
       },
       "media_id": "local-U12",
@@ -956,18 +993,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 168,
-          "latency_s": 3.985556,
+          "cached_tokens": 0,
+          "completion_tokens": 368,
+          "finish_reason": "stop",
+          "latency_s": 4.527597,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2043,
-          "reasoning_tokens": 132,
+          "prompt_tokens": 2197,
+          "reasoning_tokens": 315,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい／いいえで答えられる質問にして聞いてごらん☺️"
+        "text": "「音を出さなくても、みんなうれしいの？」のように、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -975,17 +1014,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "音を一度も出したことがないのに、どうしてみんなうれしそうなんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.0343052729731426,
-      "luna_s": 3.0343052729731426,
-      "total_s": 7.020806951913983,
-      "writer_s": 3.98650167894084
+      "judge_s": 3.0244475840590894,
+      "luna_s": 3.0244475840590894,
+      "total_s": 7.55276276206132,
+      "writer_s": 4.528315178002231
     }
   },
   {
@@ -997,13 +1036,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1015,16 +1054,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 213,
+            "cached_tokens": 3685,
+            "completion_tokens": 215,
             "finish_reason": "stop",
-            "latency_s": 2.468726,
+            "latency_s": 2.952486,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3254,
-            "reasoning_tokens": 134
+            "prompt_tokens": 3688,
+            "reasoning_tokens": 126
           },
           "error": null,
           "kind": "q_open",
-          "reason": "何をしている人かを尋ねる、はい／いいえで答えられない質問です。"
+          "reason": "「何をしている人たちか」は自由回答で、はい／いいえでは答えられません。"
         }
       },
       "media_id": "local-U12",
@@ -1032,18 +1072,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 212,
-          "latency_s": 4.178024,
+          "cached_tokens": 2165,
+          "completion_tokens": 175,
+          "finish_reason": "stop",
+          "latency_s": 2.62003,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2032,
-          "reasoning_tokens": 171,
+          "prompt_tokens": 2186,
+          "reasoning_tokens": 141,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "この男たちについて、はい・いいえで答えられる質問にして聞いてごらん。"
+        "text": "はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1051,17 +1093,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "この男たちは何をしている人たちなんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.468818761059083,
-      "luna_s": 2.468818761059083,
-      "total_s": 6.647730222088285,
-      "writer_s": 4.178911461029202
+      "judge_s": 2.9525696840137243,
+      "luna_s": 2.9525696840137243,
+      "total_s": 5.573455598088913,
+      "writer_s": 2.6208859140751883
     }
   },
   {
@@ -1073,13 +1115,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1091,16 +1133,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 265,
+            "cached_tokens": 3692,
+            "completion_tokens": 382,
             "finish_reason": "stop",
-            "latency_s": 2.835543,
+            "latency_s": 4.617085,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3261,
-            "reasoning_tokens": 184
+            "prompt_tokens": 3695,
+            "reasoning_tokens": 301
           },
           "error": null,
           "kind": "q_open",
-          "reason": "誰が何を見ているかを尋ねる、はい・いいえで答えられない質問です。"
+          "reason": "「誰が」「何を」という、はい・いいえでは答えられない内容を尋ねています。"
         }
       },
       "media_id": "local-U12",
@@ -1108,18 +1151,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 226,
-          "latency_s": 4.148027,
+          "cached_tokens": 2165,
+          "completion_tokens": 352,
+          "finish_reason": "stop",
+          "latency_s": 4.183216,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2039,
-          "reasoning_tokens": 186,
+          "prompt_tokens": 2193,
+          "reasoning_tokens": 307,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "誰のことか書いて、はい／いいえで答えられる質問にしてみてね。"
+        "text": "はい・いいえで答えられる形で聞き直してね。誰のことかも書いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1127,17 +1172,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "誰が何を見て喜んでいるのか、もう少し知りたいです。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.8356039649806917,
-      "luna_s": 2.8356039649806917,
-      "total_s": 6.98456429305952,
-      "writer_s": 4.148960328078829
+      "judge_s": 4.6171222939156,
+      "luna_s": 4.6171222939156,
+      "total_s": 8.80137896782253,
+      "writer_s": 4.18425667390693
     }
   },
   {
@@ -1149,13 +1194,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1167,12 +1212,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 300,
+            "cached_tokens": 3688,
+            "completion_tokens": 215,
             "finish_reason": "stop",
-            "latency_s": 3.342219,
+            "latency_s": 2.521152,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3257,
-            "reasoning_tokens": 206
+            "prompt_tokens": 3691,
+            "reasoning_tokens": 120
           },
           "error": null,
           "kind": "guess_correct",
@@ -1184,18 +1230,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 317,
-          "latency_s": 3.63358,
+          "cached_tokens": 0,
+          "completion_tokens": 233,
+          "finish_reason": "stop",
+          "latency_s": 3.159557,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2035,
-          "reasoning_tokens": 237,
+          "prompt_tokens": 2189,
+          "reasoning_tokens": 155,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちはひな人形の五人囃子で、階段に見えたのはひな祭りの段飾りだよ。家族は女の子のお祝いを楽しみながら、人形を眺めていたんだね。"
+        "text": "正解！男たちは、ひな祭りの段飾りに並ぶ五人囃子のひな人形だったんだ。人形だから音は出さず、家族はお祝いの間、毎日眺めていたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1203,17 +1251,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは五人囃子のひな人形だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.3422838589176536,
-      "luna_s": 3.3422838589176536,
-      "total_s": 6.976268742932007,
-      "writer_s": 3.633984884014353
+      "judge_s": 2.5211898969719186,
+      "luna_s": 2.5211898969719186,
+      "total_s": 5.686580547015183,
+      "writer_s": 3.165390650043264
     }
   },
   {
@@ -1225,13 +1273,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1243,16 +1291,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 290,
+            "cached_tokens": 3722,
+            "completion_tokens": 285,
             "finish_reason": "stop",
-            "latency_s": 3.302148,
+            "latency_s": 3.29002,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3291,
-            "reasoning_tokens": 177
+            "prompt_tokens": 3725,
+            "reasoning_tokens": 166
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "五人囃子の人形と特定し、音が出ない理由や家族の様子も正しく説明しています。"
+          "reason": "五人囃子の人形と、飾っている間に家族が喜んで眺める点まで説明しています。"
         }
       },
       "media_id": "local-U12",
@@ -1260,10 +1309,12 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 197,
-          "latency_s": 2.648124,
+          "cached_tokens": 2165,
+          "completion_tokens": 215,
+          "finish_reason": "stop",
+          "latency_s": 2.692087,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2069,
+          "prompt_tokens": 2223,
           "reasoning_tokens": 139,
           "slot": "（この種別では使わない）"
         },
@@ -1271,7 +1322,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちはひな人形の五人囃子だったんだ。家族はひな祭りの段飾りを楽しんでいたんだよ。"
+        "text": "正解！男たちは、ひな祭りの段飾りに並ぶ五人囃子の人形だったんだ。家族は女の子のお祝いを楽しみながら、飾っている間眺めていたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1279,17 +1330,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "段飾りに並ぶ五人囃子の人形だったんだね。人形だから音は出ないけど、家族は飾っている間うれしそうに眺めてたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.302208467037417,
-      "luna_s": 3.302208467037417,
-      "total_s": 5.950986790005118,
-      "writer_s": 2.6487783229677007
+      "judge_s": 3.29008355201222,
+      "luna_s": 3.29008355201222,
+      "total_s": 5.982893863110803,
+      "writer_s": 2.692810311098583
     }
   },
   {
@@ -1301,13 +1352,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1319,16 +1370,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 185,
+            "cached_tokens": 3690,
+            "completion_tokens": 115,
             "finish_reason": "stop",
-            "latency_s": 2.815879,
+            "latency_s": 2.427577,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3259,
-            "reasoning_tokens": 123
+            "prompt_tokens": 3693,
+            "reasoning_tokens": 57
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "人形だとは推理していますが、ひな祭りの人形とは特定していません。"
+          "reason": "男たちを人形と推理しており、核心には触れています。"
         }
       },
       "media_id": "local-U12",
@@ -1336,18 +1388,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 274,
-          "latency_s": 3.278061,
+          "cached_tokens": 0,
+          "completion_tokens": 179,
+          "finish_reason": "stop",
+          "latency_s": 4.942857,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2037,
-          "reasoning_tokens": 241,
+          "prompt_tokens": 2191,
+          "reasoning_tokens": 149,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！このまま推理を続けてみようか。"
+        "text": "惜しい！推理を続けてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1355,17 +1409,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは人形なんでしょ。だから音を出さないんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.815909306053072,
-      "luna_s": 2.815909306053072,
-      "total_s": 6.094254200113937,
-      "writer_s": 3.278344894060865
+      "judge_s": 2.4276498750550672,
+      "luna_s": 2.4276498750550672,
+      "total_s": 7.371577555080876,
+      "writer_s": 4.9439276800258085
     }
   },
   {
@@ -1377,13 +1431,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1395,16 +1449,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 140,
+            "cached_tokens": 3717,
+            "completion_tokens": 220,
             "finish_reason": "stop",
-            "latency_s": 2.365541,
+            "latency_s": 3.071063,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3286,
-            "reasoning_tokens": 71
+            "prompt_tokens": 3720,
+            "reasoning_tokens": 155
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "五人囃子のひな人形とは当てていますが、音が鳴るという明らかな誤りがあります。"
+          "reason": "ひな人形という核心は合っていますが、音が鳴るという説明が真相と異なります。"
         }
       },
       "media_id": "local-U12",
@@ -1412,11 +1467,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 154,
-          "latency_s": 2.51059,
+          "cached_tokens": 2165,
+          "completion_tokens": 159,
+          "finish_reason": "stop",
+          "latency_s": 3.643619,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2064,
-          "reasoning_tokens": 125,
+          "prompt_tokens": 2218,
+          "reasoning_tokens": 130,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -1431,17 +1488,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは五人囃子のひな人形で、飾ると本当に笛や太鼓の音が鳴るから、みんな毎日見に来るんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.365590340923518,
-      "luna_s": 2.365590340923518,
-      "total_s": 4.876678587985225,
-      "writer_s": 2.511088247061707
+      "judge_s": 3.0711360099958256,
+      "luna_s": 3.0711360099958256,
+      "total_s": 6.71581577998586,
+      "writer_s": 3.6446797699900344
     }
   },
   {
@@ -1453,13 +1510,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1471,16 +1528,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 366,
+            "cached_tokens": 3696,
+            "completion_tokens": 311,
             "finish_reason": "stop",
-            "latency_s": 3.988227,
+            "latency_s": 4.396208,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3265,
-            "reasoning_tokens": 286
+            "prompt_tokens": 3699,
+            "reasoning_tokens": 242
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "演奏会前の記念撮影という推理で、核心のひな人形には触れていません。"
+          "reason": "ひな人形という核心に触れず、演奏会前の写真撮影という別筋の推理です。"
         }
       },
       "media_id": "local-U12",
@@ -1488,18 +1546,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 127,
-          "latency_s": 1.808336,
+          "cached_tokens": 0,
+          "completion_tokens": 132,
+          "finish_reason": "stop",
+          "latency_s": 3.449366,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2043,
-          "reasoning_tokens": 87,
+          "prompt_tokens": 2197,
+          "reasoning_tokens": 95,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。別の考え方でもう少し考えてみようか？"
+        "text": "残念、ちがうよ。ほかの可能性も考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1507,17 +1567,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "演奏会の前に並んで写真を撮るのが恒例になってたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.988335975096561,
-      "luna_s": 3.988335975096561,
-      "total_s": 5.797619002172723,
-      "writer_s": 1.8092830270761624
+      "judge_s": 4.396288666990586,
+      "luna_s": 4.396288666990586,
+      "total_s": 7.846535400021821,
+      "writer_s": 3.4502467330312356
     }
   },
   {
@@ -1529,13 +1589,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1547,16 +1607,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 124,
+            "cached_tokens": 3698,
+            "completion_tokens": 153,
             "finish_reason": "stop",
-            "latency_s": 2.26232,
+            "latency_s": 2.5041,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3267,
-            "reasoning_tokens": 53
+            "prompt_tokens": 3701,
+            "reasoning_tokens": 62
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "銅像は正体の要点に触れておらず、核心となる仕掛けも当たっていません。"
+          "reason": "銅像という推理は核心の人形に触れておらず、観光客も真相と異なります。"
         }
       },
       "media_id": "local-U12",
@@ -1564,11 +1625,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 140,
-          "latency_s": 2.1661,
+          "cached_tokens": 2165,
+          "completion_tokens": 97,
+          "finish_reason": "stop",
+          "latency_s": 2.957413,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2045,
-          "reasoning_tokens": 103,
+          "prompt_tokens": 2199,
+          "reasoning_tokens": 60,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -1583,17 +1646,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは楽器を持った銅像で、観光客が見に来てるんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.262350323027931,
-      "luna_s": 2.262350323027931,
-      "total_s": 4.429580809082836,
-      "writer_s": 2.1672304860549048
+      "judge_s": 2.50419344403781,
+      "luna_s": 2.50419344403781,
+      "total_s": 5.468207382014953,
+      "writer_s": 2.9640139379771426
     }
   },
   {
@@ -1605,13 +1668,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1623,16 +1686,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 244,
+            "cached_tokens": 3707,
+            "completion_tokens": 239,
             "finish_reason": "stop",
-            "latency_s": 3.073129,
+            "latency_s": 3.351563,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3276,
+            "prompt_tokens": 3710,
             "reasoning_tokens": 132
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "五人囃子の人形と特定し、毎年飾って眺める筋も合っています。"
+          "reason": "五人囃子のひな人形と特定し、毎年飾ることも当てています。"
         }
       },
       "media_id": "local-U12",
@@ -1640,18 +1704,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 238,
-          "latency_s": 2.594257,
+          "cached_tokens": 2165,
+          "completion_tokens": 184,
+          "finish_reason": "stop",
+          "latency_s": 2.536269,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2054,
-          "reasoning_tokens": 175,
+          "prompt_tokens": 2208,
+          "reasoning_tokens": 121,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちはひな人形の五人囃子だったんだ。ひな祭りの時期に家族が飾って、毎日眺めていたんだよ。"
+        "text": "正解！男たちはひな人形の五人囃子だったんだ。ひな祭りの間、家族は段飾りを飾って楽しんでいたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1659,17 +1725,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "節句の段飾りにいる五人囃子の人形を、家族が毎年飾って眺めてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.0731593220261857,
-      "luna_s": 3.0731593220261857,
-      "total_s": 5.6686961819650605,
-      "writer_s": 2.595536859938875
+      "judge_s": 3.3516391130397096,
+      "luna_s": 3.3516391130397096,
+      "total_s": 5.888982941978611,
+      "writer_s": 2.5373438289389014
     }
   },
   {
@@ -1681,13 +1747,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1699,16 +1765,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 992,
+            "cached_tokens": 3705,
+            "completion_tokens": 627,
             "finish_reason": "stop",
-            "latency_s": 8.197565,
+            "latency_s": 6.914102,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3274,
-            "reasoning_tokens": 886
+            "prompt_tokens": 3708,
+            "reasoning_tokens": 512
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "ひな壇の人形と笛・太鼓が飾りという核心を捉えています。"
+          "reason": "ひな壇の人形の楽団と述べ、五人囃子の正体を特定しています。"
         }
       },
       "media_id": "local-U12",
@@ -1716,18 +1783,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 279,
-          "latency_s": 3.687034,
+          "cached_tokens": 2165,
+          "completion_tokens": 253,
+          "finish_reason": "stop",
+          "latency_s": 3.000008,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2052,
-          "reasoning_tokens": 216,
+          "prompt_tokens": 2206,
+          "reasoning_tokens": 187,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちは、ひな人形の五人囃子だよ。ひな祭りの間、家族は段飾りを楽しんで眺めていたんだ。"
+        "text": "正解！男たちは、ひな祭りの段飾りに並ぶ五人囃子だよ。人形だから音は出さず、家族はお祝いを楽しんでいたんだ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1735,17 +1804,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "ひな壇に並んだ小さな人形の楽団で、笛や太鼓は飾りとして持っているだけなんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 8.197630216018297,
-      "luna_s": 8.197630216018297,
-      "total_s": 11.885720507008955,
-      "writer_s": 3.688090290990658
+      "judge_s": 6.914186871959828,
+      "luna_s": 6.914186871959828,
+      "total_s": 9.915097484947182,
+      "writer_s": 3.0009106129873544
     }
   },
   {
@@ -1757,13 +1826,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1775,16 +1844,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 204,
+            "cached_tokens": 3705,
+            "completion_tokens": 292,
             "finish_reason": "stop",
-            "latency_s": 3.128862,
+            "latency_s": 3.694325,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3274,
-            "reasoning_tokens": 141
+            "prompt_tokens": 3708,
+            "reasoning_tokens": 211
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "人形とは触れていますが、ひな祭りの人形だとは特定できていません。"
+          "reason": "人形だとは述べているが、ひな祭りの人形とは特定できていない。"
         }
       },
       "media_id": "local-U12",
@@ -1792,87 +1862,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 146,
-          "latency_s": 2.248999,
+          "cached_tokens": 2165,
+          "completion_tokens": 170,
+          "finish_reason": "stop",
+          "latency_s": 4.926858,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2052,
-          "reasoning_tokens": 117,
-          "slot": "（この種別では使わない）"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し考えてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "段に飾られた人形たちで、楽器を構えた姿を家族が毎日眺めていたんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.1289077969267964,
-      "luna_s": 3.1289077969267964,
-      "total_s": 5.379127577878535,
-      "writer_s": 2.2502197809517384
-    }
-  },
-  {
-    "case_id": "U12-k04",
-    "record": {
-      "comment_id": "U12-k04",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "003-silent-musicians",
-      "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 185,
-            "finish_reason": "stop",
-            "latency_s": 3.266209,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3273,
-            "reasoning_tokens": 122
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "人形だとは述べていますが、ひな祭りの人形だとは特定していません。"
-        }
-      },
-      "media_id": "local-U12",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 246,
-          "latency_s": 3.321547,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 2051,
-          "reasoning_tokens": 216,
+          "prompt_tokens": 2206,
+          "reasoning_tokens": 140,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -1884,38 +1880,38 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "楽器を手にして階段状に並ぶ飾り人形で、実際に演奏する人はいなかったんだね。",
+      "text": "段に飾られた人形たちで、楽器を構えた姿を家族が毎日眺めていたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.2662607539677992,
-      "luna_s": 3.2662607539677992,
-      "total_s": 6.588335314998403,
-      "writer_s": 3.322074561030604
+      "judge_s": 3.694396700942889,
+      "luna_s": 3.694396700942889,
+      "total_s": 8.621726006967947,
+      "writer_s": 4.927329306025058
     }
   },
   {
-    "case_id": "U12-k05",
+    "case_id": "U12-k04",
     "record": {
-      "comment_id": "U12-k05",
+      "comment_id": "U12-k04",
       "commenter_id": "probe",
       "config": {
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -1927,16 +1923,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 117,
+            "cached_tokens": 3704,
+            "completion_tokens": 161,
             "finish_reason": "stop",
-            "latency_s": 2.415798,
+            "latency_s": 2.326621,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3266,
-            "reasoning_tokens": 55
+            "prompt_tokens": 3707,
+            "reasoning_tokens": 96
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "人形だとは述べていますが、ひな祭りの人形とは特定していません。"
+          "reason": "飾り人形だとは触れていますが、ひな祭りの人形とは特定していません。"
         }
       },
       "media_id": "local-U12",
@@ -1944,11 +1941,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 103,
-          "latency_s": 1.834892,
+          "cached_tokens": 2165,
+          "completion_tokens": 157,
+          "finish_reason": "stop",
+          "latency_s": 3.469361,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2044,
-          "reasoning_tokens": 74,
+          "prompt_tokens": 2205,
+          "reasoning_tokens": 128,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -1960,20 +1959,99 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "男たちは本物の演奏者じゃなく、家に飾っておく人形だったんだね。",
+      "text": "楽器を手にして階段状に並ぶ飾り人形で、実際に演奏する人はいなかったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.415873244055547,
-      "luna_s": 2.415873244055547,
-      "total_s": 4.251565923099406,
-      "writer_s": 1.8356926790438592
+      "judge_s": 2.3267098570941016,
+      "luna_s": 2.3267098570941016,
+      "total_s": 5.797224272158928,
+      "writer_s": 3.4705144150648266
+    }
+  },
+  {
+    "case_id": "U12-k05",
+    "record": {
+      "comment_id": "U12-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "d77357e39b1f",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cached_tokens": 3697,
+            "completion_tokens": 223,
+            "finish_reason": "stop",
+            "latency_s": 3.081153,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3700,
+            "reasoning_tokens": 158
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "人形である点には触れていますが、ひな祭りの人形とは特定できていません。"
+        }
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 2165,
+          "completion_tokens": 129,
+          "finish_reason": "stop",
+          "latency_s": 3.718291,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2198,
+          "reasoning_tokens": 96,
+          "slot": "（この種別では使わない）"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "男たちは本物の演奏者じゃなく、家に飾っておく人形だったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.081231101998128,
+      "luna_s": 3.081231101998128,
+      "total_s": 6.806221310980618,
+      "writer_s": 3.72499020898249
     }
   },
   {
@@ -1985,13 +2063,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2003,16 +2081,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 148,
+            "cached_tokens": 3703,
+            "completion_tokens": 176,
             "finish_reason": "stop",
-            "latency_s": 2.33005,
+            "latency_s": 2.789501,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3272,
-            "reasoning_tokens": 86
+            "prompt_tokens": 3706,
+            "reasoning_tokens": 105
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "絵だという推理で、核心のひな人形には触れていません。"
+          "reason": "絵だという推理は核心の人形に触れていません。"
         }
       },
       "media_id": "local-U12",
@@ -2020,11 +2099,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 145,
-          "latency_s": 1.911136,
+          "cached_tokens": 2165,
+          "completion_tokens": 128,
+          "finish_reason": "stop",
+          "latency_s": 2.600978,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2050,
-          "reasoning_tokens": 108,
+          "prompt_tokens": 2204,
+          "reasoning_tokens": 91,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -2039,17 +2120,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "男たちは階段を背景にした一枚の絵で、楽器を持つ姿が描かれているだけだったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.3303018050501123,
-      "luna_s": 2.3303018050501123,
-      "total_s": 4.2421416870784014,
-      "writer_s": 1.9118398820282891
+      "judge_s": 2.7895799840334803,
+      "luna_s": 2.7895799840334803,
+      "total_s": 5.391798167023808,
+      "writer_s": 2.6022181829903275
     }
   },
   {
@@ -2061,7 +2142,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2069,7 +2150,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "errors": [
         "writer: writer did not ask what bare_term means"
       ],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2081,22 +2162,33 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": "五人囃子",
           "debug": {
-            "completion_tokens": 187,
+            "cached_tokens": 3677,
+            "completion_tokens": 216,
             "finish_reason": "stop",
-            "latency_s": 3.346668,
+            "latency_s": 3.138998,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3246,
-            "reasoning_tokens": 110
+            "prompt_tokens": 3680,
+            "reasoning_tokens": 130
           },
           "error": null,
           "kind": "q_open",
-          "reason": "語句だけのコメントは、核心に触れていても q_open と判定します。"
+          "reason": "述語のない語句だけのコメントなので、推理ではなく開かれた質問です。"
         }
       },
       "media_id": "local-U12",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 403,
+          "finish_reason": "stop",
+          "latency_s": 4.690068,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2183,
+          "reasoning_tokens": 355,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2109,17 +2201,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "五人囃子？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.346720024012029,
-      "luna_s": 3.346720024012029,
-      "total_s": 11.249958506086841,
-      "writer_s": 7.903238482074812
+      "judge_s": 3.1390955419046804,
+      "luna_s": 3.1390955419046804,
+      "total_s": 7.830228606006131,
+      "writer_s": 4.69113306410145
     }
   },
   {
@@ -2131,7 +2223,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2139,7 +2231,7 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "errors": [
         "writer: writer did not ask what bare_term means"
       ],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2151,22 +2243,33 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": "カラオケ",
           "debug": {
-            "completion_tokens": 222,
+            "cached_tokens": 3675,
+            "completion_tokens": 200,
             "finish_reason": "stop",
-            "latency_s": 2.775878,
+            "latency_s": 2.986062,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3244,
-            "reasoning_tokens": 133
+            "prompt_tokens": 3678,
+            "reasoning_tokens": 114
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、はい・いいえで答えられる質問ではありません。"
+          "reason": "述語のない語句だけのコメントなので、質問の形で聞き直してもらいます。"
         }
       },
       "media_id": "local-U12",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 695,
+          "finish_reason": "stop",
+          "latency_s": 6.817924,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2180,
+          "reasoning_tokens": 645,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2179,17 +2282,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "カラオケ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.7759337869938463,
-      "luna_s": 2.7759337869938463,
-      "total_s": 7.132032742025331,
-      "writer_s": 4.356098955031484
+      "judge_s": 2.98626666306518,
+      "luna_s": 2.98626666306518,
+      "total_s": 9.80582669202704,
+      "writer_s": 6.81956002896186
     }
   },
   {
@@ -2201,13 +2304,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2219,16 +2322,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 179,
+            "cached_tokens": 3667,
+            "completion_tokens": 189,
             "finish_reason": "stop",
-            "latency_s": 2.298769,
+            "latency_s": 2.517634,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3249,
-            "reasoning_tokens": 98
+            "prompt_tokens": 3683,
+            "reasoning_tokens": 99
           },
           "error": null,
           "kind": "ask_hint",
-          "reason": "ヒントを求めているため、質問で絞るよう促します。"
+          "reason": "ヒントを求めているため。答えは明かさず、質問で絞るよう促す。"
         }
       },
       "media_id": "local-U12",
@@ -2236,18 +2340,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 136,
-          "latency_s": 2.058941,
+          "cached_tokens": 0,
+          "completion_tokens": 132,
+          "finish_reason": "stop",
+          "latency_s": 2.6204,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2027,
-          "reasoning_tokens": 96,
+          "prompt_tokens": 2181,
+          "reasoning_tokens": 92,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ヒントは出せないけど、質問で少しずつ絞っていこうね☺️"
+        "text": "ヒントは出せないけど、質問で少しずつ絞っていこうか☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2255,17 +2361,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "ちょっとだけヒントほしい〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.298791885958053,
-      "luna_s": 2.298791885958053,
-      "total_s": 4.369983852957375,
-      "writer_s": 2.071191966999322
+      "judge_s": 2.5176937140058726,
+      "luna_s": 2.5176937140058726,
+      "total_s": 5.138595919008367,
+      "writer_s": 2.620902205002494
     }
   },
   {
@@ -2277,13 +2383,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2295,16 +2401,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 174,
+            "cached_tokens": 3667,
+            "completion_tokens": 120,
             "finish_reason": "stop",
-            "latency_s": 2.616532,
+            "latency_s": 2.067189,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3244,
-            "reasoning_tokens": 113
+            "prompt_tokens": 3678,
+            "reasoning_tokens": 64
           },
           "error": null,
           "kind": "impression",
-          "reason": "シリーズへの好意を伝える感想で、質問や推理ではありません。"
+          "reason": "シリーズへの好意を伝える感想です。"
         }
       },
       "media_id": "local-U12",
@@ -2312,11 +2419,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 122,
-          "latency_s": 2.70261,
+          "cached_tokens": 0,
+          "completion_tokens": 127,
+          "finish_reason": "stop",
+          "latency_s": 3.008563,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2021,
-          "reasoning_tokens": 97,
+          "prompt_tokens": 2175,
+          "reasoning_tokens": 102,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -2331,17 +2440,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "このシリーズ好き！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.6165608749724925,
-      "luna_s": 2.6165608749724925,
-      "total_s": 5.320153952925466,
-      "writer_s": 2.7035930779529735
+      "judge_s": 2.0672854410950094,
+      "luna_s": 2.0672854410950094,
+      "total_s": 5.0819089950528,
+      "writer_s": 3.01462355395779
     }
   },
   {
@@ -2353,13 +2462,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2371,16 +2480,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 215,
+            "cached_tokens": 3667,
+            "completion_tokens": 164,
             "finish_reason": "stop",
-            "latency_s": 3.100553,
+            "latency_s": 2.878314,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3252,
-            "reasoning_tokens": 151
+            "prompt_tokens": 3686,
+            "reasoning_tokens": 102
           },
           "error": null,
           "kind": "cheer",
-          "reason": "アカウントへの好意を伝え、継続を応援しているコメントです。"
+          "reason": "アカウントを好み、継続を願う応援のコメントです。"
         }
       },
       "media_id": "local-U12",
@@ -2388,18 +2498,20 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 184,
-          "latency_s": 3.096763,
+          "cached_tokens": 0,
+          "completion_tokens": 79,
+          "finish_reason": "stop",
+          "latency_s": 1.899138,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2029,
-          "reasoning_tokens": 156,
+          "prompt_tokens": 2183,
+          "reasoning_tokens": 53,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう！これからも楽しんでね☺️"
+        "text": "ありがとう！これからもよろしくね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2407,17 +2519,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "このアカウント好きだから続けてほしい",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1005870699882507,
-      "luna_s": 3.1005870699882507,
-      "total_s": 6.198630491038784,
-      "writer_s": 3.0980434210505337
+      "judge_s": 2.8784186699194834,
+      "luna_s": 2.8784186699194834,
+      "total_s": 4.778093266999349,
+      "writer_s": 1.8996745970798656
     }
   },
   {
@@ -2429,13 +2541,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2447,12 +2559,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 116,
+            "cached_tokens": 3667,
+            "completion_tokens": 128,
             "finish_reason": "stop",
-            "latency_s": 2.219424,
+            "latency_s": 2.322814,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3250,
-            "reasoning_tokens": 59
+            "prompt_tokens": 3684,
+            "reasoning_tokens": 69
           },
           "error": null,
           "kind": "complaint",
@@ -2464,11 +2577,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 72,
-          "latency_s": 1.604507,
+          "cached_tokens": 0,
+          "completion_tokens": 87,
+          "finish_reason": "stop",
+          "latency_s": 2.249415,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2027,
-          "reasoning_tokens": 45,
+          "prompt_tokens": 2181,
+          "reasoning_tokens": 60,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -2483,17 +2598,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "問題文に矛盾があると思います",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2194892230909318,
-      "luna_s": 2.2194892230909318,
-      "total_s": 3.825195120065473,
-      "writer_s": 1.6057058969745412
+      "judge_s": 2.3228943339781836,
+      "luna_s": 2.3228943339781836,
+      "total_s": 4.573359403875656,
+      "writer_s": 2.250465069897473
     }
   },
   {
@@ -2505,13 +2620,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2523,16 +2638,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 106,
+            "cached_tokens": 3667,
+            "completion_tokens": 89,
             "finish_reason": "stop",
-            "latency_s": 2.087111,
+            "latency_s": 1.937702,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3248,
-            "reasoning_tokens": 53
+            "prompt_tokens": 3682,
+            "reasoning_tokens": 38
           },
           "error": null,
           "kind": "troll",
-          "reason": "意味のない文字の連続で、推理や質問として読めません。"
+          "reason": "意味のある質問や推理として読み取れない文字列です。"
         }
       },
       "media_id": "local-U12",
@@ -2551,17 +2667,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "らららららららら",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.087308745016344,
-      "luna_s": 2.087308745016344,
-      "total_s": 2.087326181004755,
-      "writer_s": 1.7435988411307335e-05
+      "judge_s": 1.9377886870643124,
+      "luna_s": 1.9377886870643124,
+      "total_s": 1.937800063053146,
+      "writer_s": 1.1375988833606243e-05
     }
   },
   {
@@ -2573,13 +2689,13 @@ window.PROBE_RAW["luna-1b/U12"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "95e164954bcf",
+      "fact_sheet_hash": "d77357e39b1f",
       "final": {
         "answer": null,
         "decision": "luna",
@@ -2591,16 +2707,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 106,
+            "cached_tokens": 3667,
+            "completion_tokens": 142,
             "finish_reason": "stop",
-            "latency_s": 2.319099,
+            "latency_s": 2.449852,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3250,
-            "reasoning_tokens": 55
+            "prompt_tokens": 3684,
+            "reasoning_tokens": 85
           },
           "error": null,
           "kind": "personal_info",
-          "reason": "電話番号を含むコメントのため、個人情報に分類します。"
+          "reason": "電話番号を含む個人情報の投稿に当たるため、返信は控えます。"
         }
       },
       "media_id": "local-U12",
@@ -2619,17 +2736,17 @@ window.PROBE_RAW["luna-1b/U12"] = [
       "text": "090-0000-0123 に電話ください",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.319150466006249,
-      "luna_s": 2.319150466006249,
-      "total_s": 2.319154108990915,
-      "writer_s": 3.642984665930271e-06
+      "judge_s": 2.4498936489690095,
+      "luna_s": 2.4498936489690095,
+      "total_s": 2.449898914899677,
+      "writer_s": 5.265930667519569e-06
     }
   }
 ];

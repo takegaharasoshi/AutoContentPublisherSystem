@@ -20,18 +20,20 @@ REPO_ROOT = SERVICE_DIR.parents[1]
 if str(SERVICE_DIR) not in sys.path:
     sys.path.insert(0, str(SERVICE_DIR))
 
-from app.comment_log import PROMPT_VERSION, apply_decision, new_record, utc_now  # noqa: E402
+from app.comment_log import apply_decision, new_record, prompt_version, utc_now  # noqa: E402
 from app import anthropic_util  # noqa: E402
 from app.config import Config  # noqa: E402
 from app.judge import decisions, haiku, jev, luna  # noqa: E402
 from app.judge.combiner import combine  # noqa: E402
 from app.judge.contract import ANSWERS, Judgement, KINDS, Problem  # noqa: E402
-from app.reply.writer import HAIKU_VARIANTS, Reply, write_reply  # noqa: E402
+from app.reply.writer import HAIKU_VARIANTS, PROMPTS_DIR, Reply, write_reply  # noqa: E402
 from tools.local_trial import _load_stock_problem  # noqa: E402
 from tools.probe_metrics import aggregate  # noqa: E402
 
 
 DATA_DIR = REPO_ROOT / "content/umigame-stock/umigame-soup-1/judge-trial/data"
+# Haiku's dedicated templates must not invalidate the other providers' old caches.
+PROMPT_VERSION = prompt_version(exclude_names=frozenset({"haiku_judge.txt", "haiku_reply_1b.txt"}))
 PATTERNS = (
     {"id": "luna-1b", "label": "① luna + 1b", "judge_mode": "luna", "shadow": False,
      "consensus": False, "reply_variant": "1b"},
@@ -45,13 +47,21 @@ PATTERNS = (
      "consensus": False, "reply_variant": "2c-luna"},
     {"id": "dec-2c", "label": "⑥ decisions + 2c-luna", "judge_mode": "decisions", "shadow": False,
      "consensus": False, "reply_variant": "2c-luna"},
-    {"id": "haiku-1b", "label": "⑦ haiku + 1b-haiku", "judge_mode": "haiku", "shadow": False,
-     "consensus": False, "reply_variant": "1b-haiku"},
+    {"id": "haiku-1b-max", "label": "⑦ haiku + 1b-haiku（max）", "judge_mode": "haiku",
+     "shadow": False, "consensus": False, "reply_variant": "1b-haiku", "haiku_effort": "max"},
+    {"id": "haiku-1b-xhigh", "label": "⑦ haiku + 1b-haiku（xhigh）", "judge_mode": "haiku",
+     "shadow": False, "consensus": False, "reply_variant": "1b-haiku", "haiku_effort": "xhigh"},
+    {"id": "haiku-1b-high", "label": "⑦ haiku + 1b-haiku（high）", "judge_mode": "haiku",
+     "shadow": False, "consensus": False, "reply_variant": "1b-haiku", "haiku_effort": "high"},
     {"id": "haiku-1d", "label": "⑧ haiku + 1d-haiku", "judge_mode": "haiku", "shadow": False,
-     "consensus": False, "reply_variant": "1d-haiku"},
+     "consensus": False, "reply_variant": "1d-haiku", "haiku_effort": "max"},
 )
 PATTERN_IDS = tuple(item["id"] for item in PATTERNS)
 LEGACY_PATTERN_IDS = ("luna-1b", "luna-1d", "hybrid-1d", "jev-2b", "jev-2c")
+DEFAULT_PATTERN_IDS = (
+    "luna-1b", "luna-1d", "jev-2c", "haiku-1b-max", "haiku-1b-xhigh", "haiku-1b-high",
+)
+JudgeIndex = tuple[str, str, str | None]
 
 
 def _json(path: Path) -> Any:
@@ -128,21 +138,36 @@ def _content_hash(case: dict[str, Any], problem: Problem) -> str:
                   "errors": list(problem.judge_criteria.errors)}])
 
 
-def _judge_cache_key(case: dict[str, Any], problem: Problem, method: str, model: str) -> str:
-    """Preserve the legacy preimage; only Haiku adds its own model ID."""
+def _judge_cache_key(
+    case: dict[str, Any], problem: Problem, method: str, model: str, *, haiku_effort: str = "max",
+) -> str:
+    """Preserve legacy keys; isolate Haiku by model, effort and template contents."""
     cache_model = (anthropic_util.MODEL if method == "haiku" else
                    model if method in {"luna", "decisions"} else None)
-    return _key([case["id"], method, PROMPT_VERSION, _content_hash(case, problem), cache_model])
+    parts = [case["id"], method, PROMPT_VERSION, _content_hash(case, problem), cache_model]
+    if method == "haiku":
+        parts.extend((haiku_effort, hashlib.sha256(haiku.RULES_PATH.read_bytes()).hexdigest()))
+    return _key(parts)
+
+
+def _haiku_writer_effort(pattern: dict[str, Any]) -> str:
+    return pattern.get("haiku_effort", "max") if pattern["reply_variant"] == "1b-haiku" else "low"
 
 
 def _writer_cache_key(
     pattern: dict[str, Any], case: dict[str, Any], problem: Problem, combined: Any, model: str,
 ) -> str:
-    """Keep the six existing pattern keys byte-for-byte and isolate Haiku writers."""
+    """Keep existing non-Haiku keys and isolate Haiku writers by effort and prompt."""
     cache_model = anthropic_util.MODEL if pattern["reply_variant"] in HAIKU_VARIANTS else model
-    return _key([pattern["id"], case["id"], PROMPT_VERSION,
-                 [combined.kind, combined.answer, combined.bare_term, combined.decision],
-                 _content_hash(case, problem), cache_model])
+    parts = [pattern["id"], case["id"], PROMPT_VERSION,
+             [combined.kind, combined.answer, combined.bare_term, combined.decision],
+             _content_hash(case, problem), cache_model]
+    if pattern["reply_variant"] in HAIKU_VARIANTS:
+        prompt_name = ("haiku_reply_1b.txt" if pattern["reply_variant"] == "1b-haiku"
+                       else "reply_writer.txt")
+        parts.extend((_haiku_writer_effort(pattern),
+                      hashlib.sha256((PROMPTS_DIR / prompt_name).read_bytes()).hexdigest()))
+    return _key(parts)
 
 
 def _atomic_json(path: Path, value: Any) -> None:
@@ -186,28 +211,36 @@ def _judge_outcome(entry: dict[str, Any]) -> Judgement | Exception:
 
 
 def _timed_judge(method: str, call: Callable[..., Judgement], case: dict[str, Any],
-                 problem: Problem, key: str, model: str) -> dict[str, Any]:
+                 problem: Problem, key: str, model: str, haiku_effort: str = "max") -> dict[str, Any]:
     start = time.perf_counter()
     try:
         if method in {"luna", "decisions"}:
             outcome = call(case["id"], case["text"], problem, api_key=key, model=model)
+        elif method == "haiku":
+            outcome = call(case["id"], case["text"], problem, api_key=key, effort=haiku_effort)
         else:
             outcome = call(case["id"], case["text"], problem, api_key=key)
         if not isinstance(outcome, Judgement):
             raise TypeError(f"{method} returned {type(outcome).__name__}, expected Judgement")
     except Exception as exc:
         outcome = exc
-    return _judge_entry(outcome, time.perf_counter() - start)
+    entry = _judge_entry(outcome, time.perf_counter() - start)
+    if method == "haiku":
+        logged = entry.get("judgement", entry.get("exception", {}))
+        logged["debug"] = {**logged.get("debug", {}), "effort": haiku_effort}
+    return entry
 
 
 def _timed_writer(call: Callable[..., Reply], combined: Any, case: dict[str, Any],
                   problem: Problem, variant: str, key: str,
-                  model: str, anthropic_key: str = "") -> tuple[Reply | Exception, float]:
+                  model: str, anthropic_key: str = "",
+                  haiku_effort: str = "max") -> tuple[Reply | Exception, float]:
     start = time.perf_counter()
     try:
         reply = call(combined, case["id"], case["text"], problem,
                      variant=variant, openai_api_key=key, model=model,
-                     **({"anthropic_api_key": anthropic_key} if variant in HAIKU_VARIANTS else {}))
+                     **({"anthropic_api_key": anthropic_key, "haiku_effort": haiku_effort}
+                        if variant in HAIKU_VARIANTS else {}))
         if not isinstance(reply, Reply):
             raise TypeError(f"writer returned {type(reply).__name__}, expected Reply")
     except Exception as exc:
@@ -271,7 +304,7 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
               run_at: str | None = None) -> dict[str, Any]:
     """Run selected cases; the Python default preserves the legacy five patterns.
 
-    The CLI explicitly selects all eight when --patterns is omitted.
+    The CLI selects the six default patterns when --patterns is omitted.
     Injected calls support fully offline tests.
     """
     if workers < 1:
@@ -297,6 +330,8 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
     need_jev = any(p["judge_mode"] in {"jev", "hybrid"} for p in selected_patterns)
     need_decisions = any(p["judge_mode"] == "decisions" for p in selected_patterns)
     need_haiku = any(p["judge_mode"] == "haiku" for p in selected_patterns)
+    haiku_efforts = tuple(dict.fromkeys(p.get("haiku_effort", "max") for p in selected_patterns
+                                      if p["judge_mode"] == "haiku"))
     need_haiku_writer = any(p["reply_variant"] in HAIKU_VARIANTS for p in selected_patterns)
     methods = ("luna",) + (("jev",) if need_jev else ()) + (
         ("decisions",) if need_decisions else ()
@@ -317,27 +352,30 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
     out.mkdir(parents=True, exist_ok=True)
     judge_path, writer_path = out / "judge_cache.json", out / "writer_cache.json"
     judge_cache, writer_cache = _cache(judge_path), _cache(writer_path)
-    judge_entries: dict[tuple[str, str], dict[str, Any]] = {}
-    judge_status: dict[tuple[str, str], str] = {}
+    judge_entries: dict[JudgeIndex, dict[str, Any]] = {}
+    judge_status: dict[JudgeIndex, str] = {}
     futures = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for case in cases:
             problem = snapshots[case["no"]]
             for method in methods:
-                cache_key = _judge_cache_key(case, problem, method, model)
-                index = case["id"], method
-                if not refresh_judge and cache_key in judge_cache:
-                    judge_entries[index] = judge_cache[cache_key]
-                    judge_status[index] = "hit"
-                else:
-                    call = {"luna": luna_call, "jev": jev_call,
-                            "decisions": decisions_call, "haiku": haiku_call}[method]
-                    api_key_name = {"jev": "typesafe_api_key", "haiku": "anthropic_api_key"}.get(
-                        method, "openai_api_key",
-                    )
-                    api_key = keys.get(api_key_name, "")
-                    future = pool.submit(_timed_judge, method, call, case, problem, api_key, model)
-                    futures[future] = (index, cache_key)
+                for effort in haiku_efforts if method == "haiku" else (None,):
+                    cache_key = _judge_cache_key(case, problem, method, model,
+                                                 haiku_effort=effort or "max")
+                    index = case["id"], method, effort
+                    if not refresh_judge and cache_key in judge_cache:
+                        judge_entries[index] = judge_cache[cache_key]
+                        judge_status[index] = "hit"
+                    else:
+                        call = {"luna": luna_call, "jev": jev_call,
+                                "decisions": decisions_call, "haiku": haiku_call}[method]
+                        api_key_name = {"jev": "typesafe_api_key", "haiku": "anthropic_api_key"}.get(
+                            method, "openai_api_key",
+                        )
+                        api_key = keys.get(api_key_name, "")
+                        future = pool.submit(_timed_judge, method, call, case, problem, api_key,
+                                             model, effort or "max")
+                        futures[future] = (index, cache_key)
         completed = 0
         for future in as_completed(futures):
             index, cache_key = futures[future]
@@ -385,6 +423,7 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                 no: Config(
                     judge_mode=pattern["judge_mode"], shadow=pattern["shadow"],
                     consensus=pattern["consensus"], reply_variant=pattern["reply_variant"],
+                    haiku_effort=pattern.get("haiku_effort", "max"),
                     luna_model=model, set_code=snapshots[no].set_code,
                 ) for no in selected_nos
             }
@@ -397,16 +436,16 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                 comment = {"id": case_id, "text": case["text"],
                            "from": {"id": "probe"}, "media": {"id": problem.media_id}}
                 record = new_record(comment, None, run_at, config, problem)
-                supplied = {method: _judge_outcome(judge_entries[case_id, method])
-                            for method in methods}
-                relevant = {method: judge_entries[case_id, method]
-                            for method in methods}
-                cache = {method: judge_status.get((case_id, method), "none")
+                indices = {method: (case_id, method, config.haiku_effort if method == "haiku" else None)
+                           for method in methods if method != "haiku" or config.judge_mode == "haiku"}
+                relevant = {method: judge_entries[index] for method, index in indices.items()}
+                supplied = {method: _judge_outcome(entry) for method, entry in relevant.items()}
+                cache = {method: judge_status.get((case_id, method, None), "none")
                          if (method == "luna" or need_jev) else "none"
                          for method in ("luna", "jev")}
                 if pattern["judge_mode"] in {"decisions", "haiku"}:
                     mode = pattern["judge_mode"]
-                    cache[mode] = judge_status[case_id, mode]
+                    cache[mode] = judge_status[indices[mode]]
                     cache["jev"] = "none"
                 cache["writer"] = "none"
                 try:
@@ -462,6 +501,7 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                         _timed_writer, writer_call, combined, case, problem,
                         pattern["reply_variant"], keys.get("openai_api_key", ""), model,
                         keys.get("anthropic_api_key", ""),
+                        config.haiku_effort,
                     )
                     writer_futures[future] = (row, combined, writer_key)
         completed = 0
@@ -484,11 +524,16 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
     if writer_futures:
         _atomic_json(writer_path, writer_cache)
     if need_haiku or need_haiku_writer:
-        totals = _anthropic_totals(results, judge_entries, judge_status)
-        fresh = _anthropic_totals(results, judge_entries, judge_status, fresh_only=True)
-        fields = (*anthropic_util.USAGE_FIELDS, "refusals")
-        print("Anthropic: " + ", ".join(f"{key}={totals[key]}" for key in fields)
-              + " (new: " + ", ".join(f"{key}={fresh[key]}" for key in fields) + ")")
+        efforts = dict.fromkeys((*haiku_efforts, *(
+            _haiku_writer_effort(p) for p in selected_patterns if p["reply_variant"] in HAIKU_VARIANTS
+        )))
+        for effort in efforts:
+            totals = _anthropic_totals(results, judge_entries, judge_status, effort=effort)
+            fresh = _anthropic_totals(results, judge_entries, judge_status,
+                                      effort=effort, fresh_only=True)
+            fields = (*anthropic_util.USAGE_FIELDS, "refusals")
+            print(f"Anthropic ({effort}): " + ", ".join(f"{key}={totals[key]}" for key in fields)
+                  + " (new: " + ", ".join(f"{key}={fresh[key]}" for key in fields) + ")")
     metrics = aggregate(results)
     _atomic_json(out / "results.json", results)
     _atomic_json(out / "metrics.json", metrics)
@@ -497,16 +542,17 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
 
 
 def _anthropic_totals(
-    results: dict[str, Any], entries: dict[tuple[str, str], dict[str, Any]],
-    status: dict[tuple[str, str], str], *, fresh_only: bool = False,
+    results: dict[str, Any], entries: dict[JudgeIndex, dict[str, Any]],
+    status: dict[JudgeIndex, str], *, effort: str, fresh_only: bool = False,
 ) -> dict[str, int]:
-    """Count each shared Haiku judge once and each selected Haiku writer once."""
+    """Sum one effort's shared judge calls and writer calls without double counting."""
     debug_items = [entry.get("judgement", entry.get("exception", {})).get("debug", {})
-                   for index, entry in entries.items() if index[1] == "haiku"
+                   for index, entry in entries.items() if index[1:] == ("haiku", effort)
                    and (not fresh_only or status[index] == "miss")]
     debug_items.extend((row["record"].get("reply") or {}).get("debug", {})
                        for pattern in results["meta"]["patterns"]
                        if pattern["reply_variant"] in HAIKU_VARIANTS
+                       and _haiku_writer_effort(pattern) == effort
                        for row in results["rows"][pattern["id"]]
                        if not fresh_only or row["cache"]["writer"] == "miss")
     totals = {key: sum((debug.get("usage") or debug).get(key, 0) or 0 for debug in debug_items)
@@ -519,7 +565,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--problems", nargs="+", help="problem numbers; default: all eval problems")
     parser.add_argument("--patterns", nargs="+", choices=PATTERN_IDS,
-                        help="pattern ids; default: all")
+                        help="pattern ids; default: " + " ".join(DEFAULT_PATTERN_IDS))
     parser.add_argument("--out", type=Path,
                         default=SERVICE_DIR / "work/probe" / utc_now().replace(":", "-"))
     parser.add_argument("--workers", type=int, default=4)
@@ -528,7 +574,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         run_probe(out=args.out, problems=args.problems,
-                  patterns=args.patterns if args.patterns is not None else list(PATTERN_IDS),
+                  patterns=args.patterns if args.patterns is not None else list(DEFAULT_PATTERN_IDS),
                   workers=args.workers, refresh_judge=args.refresh_judge,
                   refresh_writer=args.refresh_writer)
     except (ValueError, FileNotFoundError) as exc:

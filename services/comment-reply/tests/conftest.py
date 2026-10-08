@@ -3,11 +3,21 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from urllib import request
 
 import pytest
 
 from app.judge.contract import Problem
 from tools.local_trial import _load_stock_problem
+
+
+@pytest.fixture(autouse=True)
+def block_live_http(monkeypatch) -> None:
+    """Require tests to install their own HTTP mocks before any request."""
+    def blocked(*args, **kwargs):
+        raise AssertionError("live HTTP requests are forbidden in offline tests")
+
+    monkeypatch.setattr(request, "urlopen", blocked)
 
 
 @pytest.fixture

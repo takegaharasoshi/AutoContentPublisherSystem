@@ -18,10 +18,12 @@ from app.reply.writer import Reply
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 
 
-def prompt_version() -> str:
-    """Hash the complete set of bundled prompt file names and contents."""
+def prompt_version(*, exclude_names: frozenset[str] = frozenset()) -> str:
+    """Hash bundled prompts, optionally excluding files for legacy probe keys."""
     digest = hashlib.sha256()
     for path in sorted(PROMPTS_DIR.glob("*.txt")):
+        if path.name in exclude_names:
+            continue
         digest.update(path.name.encode("utf-8"))
         digest.update(b"\0")
         digest.update(path.read_bytes())

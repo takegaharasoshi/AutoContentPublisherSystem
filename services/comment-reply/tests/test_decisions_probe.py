@@ -40,7 +40,7 @@ def test_six_patterns_cli_defaults_and_explicit_selection(tmp_path, monkeypatch)
     run = Mock(return_value={})
     monkeypatch.setattr(probe_run, "run_probe", run)
     assert probe_run.main(["--out", str(tmp_path)]) == 0
-    assert run.call_args.kwargs["patterns"] == list(probe_run.PATTERN_IDS)
+    assert run.call_args.kwargs["patterns"] == list(probe_run.DEFAULT_PATTERN_IDS)
     assert probe_run.main(["--patterns", "dec-2c", "--out", str(tmp_path)]) == 0
     assert run.call_args.kwargs["patterns"] == ["dec-2c"]
 

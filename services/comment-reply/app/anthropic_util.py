@@ -69,7 +69,7 @@ def request_json(
     """Request one non-streaming JSON object, ignoring thinking blocks.
 
     Args:
-        system: The shared Luna system prompt.
+        system: The rendered system prompt for this judge or writer.
         text: The single user message.
         schema: The shared structured output contract, copied for Anthropic.
         api_key: The local ANTHROPIC_API_KEY value.
@@ -84,7 +84,9 @@ def request_json(
         AnthropicError: Transport, truncation, or invalid output failure.
     """
     started = time.monotonic()
-    debug: dict[str, Any] = {"model": MODEL, "stop_reason": None, "refusal_category": None}
+    debug: dict[str, Any] = {
+        "model": MODEL, "effort": effort, "stop_reason": None, "refusal_category": None,
+    }
     try:
         if not api_key:
             raise ValueError("anthropic_api_key is empty")

@@ -9,7 +9,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -27,8 +27,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4924,
-            "latency_s": 1.139302,
+            "input_tokens": 5819,
+            "latency_s": 1.477084,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -41,30 +41,30 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.7,
-                "question": 0.3
+                "guess": 0.68,
+                "question": 0.32
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.01,
-                "q_yesno": 0.99
+                "q_open": 0.0,
+                "q_yesno": 1.0
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.02,
+                  "close": 0.08,
                   "hit": 0.01
                 },
                 "point_1": {
-                  "close": 0.03,
-                  "hit": 0.02
+                  "close": 0.14,
+                  "hit": 0.05
                 }
               },
-              "C": 0.7,
+              "C": 0.72,
               "D": {
                 "irrelevant": 0.0,
-                "no": 1.0,
-                "yes": 0.0
+                "no": 0.99,
+                "yes": 0.01
               }
             }
           },
@@ -79,18 +79,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 63,
-          "latency_s": 1.24493,
+          "cached_tokens": 1546,
+          "completion_tokens": 72,
+          "finish_reason": "stop",
+          "latency_s": 1.970584,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1436,
-          "reasoning_tokens": 33,
+          "prompt_tokens": 1549,
+          "reasoning_tokens": 43,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
+        "text": "いいえ。その調子で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -98,17 +100,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "主人はパンを作るときに、その卵を材料として使ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.1395990909077227,
-      "judge_s": 1.1395990909077227,
+      "jev_s": 1.4773796430090442,
+      "judge_s": 1.4773796430090442,
       "luna_s": null,
-      "total_s": 2.385043790913187,
-      "writer_s": 1.2454447000054643
+      "total_s": 3.4835720389382914,
+      "writer_s": 2.006192395929247
     }
   },
   {
@@ -120,7 +122,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -138,8 +140,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4846,
-            "latency_s": 1.237299,
+            "input_tokens": 5741,
+            "latency_s": 2.365433,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -163,15 +165,15 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.03,
-                  "hit": 0.01
+                  "close": 0.09000000000000001,
+                  "hit": 0.02
                 },
                 "point_1": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.05,
+                  "hit": 0.02
                 }
               },
-              "C": 0.51,
+              "C": 0.5,
               "D": {
                 "irrelevant": 0.0,
                 "no": 1.0,
@@ -181,7 +183,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
         },
         "luna": null
       },
@@ -190,18 +192,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 71,
-          "latency_s": 1.531669,
+          "cached_tokens": 1539,
+          "completion_tokens": 106,
+          "finish_reason": "stop",
+          "latency_s": 2.113705,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1429,
-          "reasoning_tokens": 41,
+          "prompt_tokens": 1542,
+          "reasoning_tokens": 75,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかの質問もしてごらん。"
+        "text": "いいえ。ほかのことも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -209,17 +213,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "ここでいう卵は鶏の卵ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.2376083780545741,
-      "judge_s": 1.2376083780545741,
+      "jev_s": 2.365718854009174,
+      "judge_s": 2.365718854009174,
       "luna_s": null,
-      "total_s": 2.7703194350469857,
-      "writer_s": 1.5327110569924116
+      "total_s": 4.479955360060558,
+      "writer_s": 2.114236506051384
     }
   },
   {
@@ -231,7 +235,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -249,8 +253,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4894,
-            "latency_s": 1.189473,
+            "input_tokens": 5789,
+            "latency_s": 1.238808,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -263,8 +267,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.74,
-                "question": 0.26
+                "guess": 0.8,
+                "question": 0.2
               },
               "A2": {
                 "q_multi": 0.0,
@@ -274,25 +278,25 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.02,
+                  "close": 0.03,
                   "hit": 0.01
                 },
                 "point_1": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.03,
+                  "hit": 0.01
                 }
               },
-              "C": 0.4,
+              "C": 0.47,
               "D": {
-                "irrelevant": 0.0,
-                "no": 1.0,
-                "yes": 0.0
+                "irrelevant": 0.01,
+                "no": 0.96,
+                "yes": 0.03
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -301,18 +305,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 83,
-          "latency_s": 1.44075,
+          "cached_tokens": 1546,
+          "completion_tokens": 101,
+          "finish_reason": "stop",
+          "latency_s": 2.182905,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1436,
-          "reasoning_tokens": 58,
+          "prompt_tokens": 1549,
+          "reasoning_tokens": 70,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。次はどうかな？"
+        "text": "いいえ。ほかのことも聞いてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -320,17 +326,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵は店の中で飼っている鶏が産んだものですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.1898696890566498,
-      "judge_s": 1.1898696890566498,
+      "jev_s": 1.2391434230376035,
+      "judge_s": 1.2391434230376035,
       "luna_s": null,
-      "total_s": 2.6313331690616906,
-      "writer_s": 1.4414634800050408
+      "total_s": 3.422541970969178,
+      "writer_s": 2.1833985479315743
     }
   },
   {
@@ -342,7 +348,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -360,8 +366,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4882,
-            "latency_s": 1.307907,
+            "input_tokens": 5777,
+            "latency_s": 1.446916,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -374,36 +380,36 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.72,
-                "question": 0.28
+                "guess": 0.64,
+                "question": 0.36
               },
               "A2": {
                 "q_multi": 0.0,
-                "q_open": 0.07,
-                "q_yesno": 0.93
+                "q_open": 0.08,
+                "q_yesno": 0.92
               },
-              "A_bare": 0.02,
+              "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.01,
+                  "close": 0.06999999999999999,
                   "hit": 0.01
                 },
                 "point_1": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.03,
+                  "hit": 0.01
                 }
               },
-              "C": 0.59,
+              "C": 0.61,
               "D": {
-                "irrelevant": 0.02,
+                "irrelevant": 0.01,
                 "no": 0.98,
-                "yes": 0.0
+                "yes": 0.01
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -412,11 +418,13 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 65,
-          "latency_s": 1.3335,
+          "cached_tokens": 1544,
+          "completion_tokens": 72,
+          "finish_reason": "stop",
+          "latency_s": 1.714256,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1434,
-          "reasoning_tokens": 35,
+          "prompt_tokens": 1547,
+          "reasoning_tokens": 42,
           "slot": "判定語 + 一言"
         },
         "guard": null,
@@ -431,17 +439,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵を大切にしているのは、割れやすいからですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.3082775209331885,
-      "judge_s": 1.3082775209331885,
+      "jev_s": 1.447194873006083,
+      "judge_s": 1.447194873006083,
       "luna_s": null,
-      "total_s": 2.6428111349232495,
-      "writer_s": 1.334533613990061
+      "total_s": 3.1617875499650836,
+      "writer_s": 1.7145926769590005
     }
   },
   {
@@ -453,7 +461,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -471,8 +479,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4912,
-            "latency_s": 1.23767,
+            "input_tokens": 5807,
+            "latency_s": 1.306563,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -496,12 +504,12 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.02,
+                  "close": 0.09,
                   "hit": 0.01
                 },
                 "point_1": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.06,
+                  "hit": 0.02
                 }
               },
               "C": 0.7,
@@ -514,7 +522,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -523,18 +531,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 91,
-          "latency_s": 1.541735,
+          "cached_tokens": 1546,
+          "completion_tokens": 71,
+          "finish_reason": "stop",
+          "latency_s": 2.063717,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1436,
-          "reasoning_tokens": 65,
+          "prompt_tokens": 1549,
+          "reasoning_tokens": 42,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！次の質問もどうぞ。"
+        "text": "はい！ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -542,17 +552,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "主人は卵をゆでたり割ったりしたことが一度もないんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.238027777057141,
-      "judge_s": 1.238027777057141,
+      "jev_s": 1.3068858990445733,
+      "judge_s": 1.3068858990445733,
       "luna_s": null,
-      "total_s": 2.7807974531315267,
-      "writer_s": 1.5427696760743856
+      "total_s": 3.386967550031841,
+      "writer_s": 2.0800816509872675
     }
   },
   {
@@ -564,7 +574,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -582,8 +592,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4864,
-            "latency_s": 1.207112,
+            "input_tokens": 5759,
+            "latency_s": 1.31054,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -596,8 +606,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.33,
-                "question": 0.67
+                "guess": 0.3,
+                "question": 0.7
               },
               "A2": {
                 "q_multi": 0.0,
@@ -607,25 +617,25 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.01,
-                  "hit": 0.0
+                  "close": 0.05,
+                  "hit": 0.01
                 },
                 "point_1": {
-                  "close": 0.02,
-                  "hit": 0.01
+                  "close": 0.09,
+                  "hit": 0.04
                 }
               },
-              "C": 0.74,
+              "C": 0.75,
               "D": {
-                "irrelevant": 0.25,
-                "no": 0.75,
+                "irrelevant": 0.29,
+                "no": 0.71,
                 "yes": 0.0
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -634,18 +644,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 82,
-          "latency_s": 1.629477,
+          "cached_tokens": 1540,
+          "completion_tokens": 89,
+          "finish_reason": "stop",
+          "latency_s": 3.44683,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1430,
-          "reasoning_tokens": 51,
+          "prompt_tokens": 1543,
+          "reasoning_tokens": 60,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてごらん。"
+        "text": "いいえ。次の質問もしてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -653,17 +665,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "パンの生地に卵を混ぜる工程はありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.2074686579871923,
-      "judge_s": 1.2074686579871923,
+      "jev_s": 1.3108388190157712,
+      "judge_s": 1.3108388190157712,
       "luna_s": null,
-      "total_s": 2.849044746020809,
-      "writer_s": 1.6415760880336165
+      "total_s": 4.758669172995724,
+      "writer_s": 3.4478303539799526
     }
   },
   {
@@ -675,7 +687,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -693,8 +705,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4876,
-            "latency_s": 1.271068,
+            "input_tokens": 5771,
+            "latency_s": 1.322408,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -707,36 +719,36 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.65,
-                "question": 0.35
+                "guess": 0.64,
+                "question": 0.36
               },
               "A2": {
                 "q_multi": 0.01,
-                "q_open": 0.0,
-                "q_yesno": 0.99
+                "q_open": 0.01,
+                "q_yesno": 0.98
               },
-              "A_bare": 0.03,
+              "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.04,
-                  "hit": 0.02
+                  "close": 0.05,
+                  "hit": 0.01
                 },
                 "point_1": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.03,
+                  "hit": 0.01
                 }
               },
-              "C": 0.49,
+              "C": 0.52,
               "D": {
-                "irrelevant": 0.16,
-                "no": 0.84,
+                "irrelevant": 0.11,
+                "no": 0.89,
                 "yes": 0.0
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -745,18 +757,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 60,
-          "latency_s": 2.372814,
+          "cached_tokens": 1542,
+          "completion_tokens": 73,
+          "finish_reason": "stop",
+          "latency_s": 2.308464,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1432,
-          "reasoning_tokens": 30,
+          "prompt_tokens": 1545,
+          "reasoning_tokens": 42,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
+        "text": "いいえ。ほかのことも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -764,17 +778,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵は商品名や店の名前に関係しているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.2714226229581982,
-      "judge_s": 1.2714226229581982,
+      "jev_s": 1.3227243761066347,
+      "judge_s": 1.3227243761066347,
       "luna_s": null,
-      "total_s": 3.644661971949972,
-      "writer_s": 2.373239348991774
+      "total_s": 3.632239918108098,
+      "writer_s": 2.3095155420014635
     }
   },
   {
@@ -786,7 +800,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -804,8 +818,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4870,
-            "latency_s": 1.319194,
+            "input_tokens": 5765,
+            "latency_s": 1.375021,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 295,
@@ -818,36 +832,36 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.08,
-                "question": 0.92
+                "guess": 0.07,
+                "question": 0.93
               },
               "A2": {
                 "q_multi": 0.0,
                 "q_open": 0.01,
                 "q_yesno": 0.99
               },
-              "A_bare": 0.03,
+              "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.05,
+                  "close": 0.06,
                   "hit": 0.02
                 },
                 "point_1": {
-                  "close": 0.02,
-                  "hit": 0.01
+                  "close": 0.15000000000000002,
+                  "hit": 0.07
                 }
               },
-              "C": 0.34,
+              "C": 0.41,
               "D": {
                 "irrelevant": 0.7,
-                "no": 0.29,
-                "yes": 0.01
+                "no": 0.28,
+                "yes": 0.02
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.02"
         },
         "luna": null
       },
@@ -856,11 +870,13 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 42,
-          "latency_s": 1.571947,
+          "cached_tokens": 1540,
+          "completion_tokens": 39,
+          "finish_reason": "stop",
+          "latency_s": 2.099122,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1430,
-          "reasoning_tokens": 20,
+          "prompt_tokens": 1543,
+          "reasoning_tokens": 17,
           "slot": "判定語だけ"
         },
         "guard": null,
@@ -875,17 +891,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "お客さんも卵のおかげだと知ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.3195424609584734,
-      "judge_s": 1.3195424609584734,
+      "jev_s": 1.3752233849372715,
+      "judge_s": 1.3752233849372715,
       "luna_s": null,
-      "total_s": 2.8922089469851926,
-      "writer_s": 1.5726664860267192
+      "total_s": 3.4754686009837314,
+      "writer_s": 2.10024521604646
     }
   },
   {
@@ -897,7 +913,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -915,8 +931,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 6,
-            "input_tokens": 4876,
-            "latency_s": 1.294659,
+            "input_tokens": 5771,
+            "latency_s": 1.47468,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -940,25 +956,25 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.03,
+                  "close": 0.05,
                   "hit": 0.01
                 },
                 "point_1": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.04,
+                  "hit": 0.01
                 }
               },
-              "C": 0.41,
+              "C": 0.4,
               "D": {
-                "irrelevant": 0.17,
+                "irrelevant": 0.16,
                 "no": 0.83,
-                "yes": 0.0
+                "yes": 0.01
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.00"
+          "reason": "段A=question→q_yesno, 要点最低=0.01"
         },
         "luna": null
       },
@@ -967,18 +983,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 85,
-          "latency_s": 1.473439,
+          "cached_tokens": 1544,
+          "completion_tokens": 89,
+          "finish_reason": "stop",
+          "latency_s": 4.206239,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1434,
-          "reasoning_tokens": 55,
+          "prompt_tokens": 1547,
+          "reasoning_tokens": 62,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてごらん"
+        "text": "いいえ。次の質問もどうぞ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -986,17 +1004,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵はパン屋の主人が自分で買いに行くんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.2949329760158435,
-      "judge_s": 1.2949329760158435,
+      "jev_s": 1.4750060569494963,
+      "judge_s": 1.4750060569494963,
       "luna_s": null,
-      "total_s": 2.7696691669989377,
-      "writer_s": 1.4747361909830943
+      "total_s": 5.682107842876576,
+      "writer_s": 4.20710178592708
     }
   },
   {
@@ -1008,7 +1026,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1026,8 +1044,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 5,
-            "input_tokens": 3754,
-            "latency_s": 1.092111,
+            "input_tokens": 4560,
+            "latency_s": 1.182523,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 253,
@@ -1055,11 +1073,11 @@ window.PROBE_RAW["jev-2c/U14"] = [
                   "hit": 0.0
                 },
                 "point_1": {
-                  "close": 0.0,
-                  "hit": 0.0
+                  "close": 0.02,
+                  "hit": 0.01
                 }
               },
-              "C": 0.11
+              "C": 0.1
             }
           },
           "error": null,
@@ -1073,18 +1091,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 182,
-          "latency_s": 2.545419,
+          "cached_tokens": 1520,
+          "completion_tokens": 155,
+          "finish_reason": "stop",
+          "latency_s": 2.519229,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1427,
-          "reasoning_tokens": 147,
+          "prompt_tokens": 1540,
+          "reasoning_tokens": 121,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で、聞いてみてね。"
+        "text": "はい・いいえで答えられる形で聞いてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1092,17 +1112,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "お店のオーブンは電気式ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.0924069239990786,
-      "judge_s": 1.0924069239990786,
+      "jev_s": 1.182819621055387,
+      "judge_s": 1.182819621055387,
       "luna_s": null,
-      "total_s": 3.6386684289900586,
-      "writer_s": 2.54626150499098
+      "total_s": 3.7031712870812044,
+      "writer_s": 2.5203516660258174
     }
   },
   {
@@ -1114,7 +1134,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1133,7 +1153,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2144,
-            "latency_s": 0.551245,
+            "latency_s": 0.692274,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1146,13 +1166,13 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.59,
-                "question": 0.41
+                "guess": 0.63,
+                "question": 0.37
               },
               "A2": {
-                "q_multi": 0.63,
+                "q_multi": 0.6,
                 "q_open": 0.02,
-                "q_yesno": 0.35
+                "q_yesno": 0.38
               },
               "A_bare": 0.03
             }
@@ -1168,18 +1188,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 97,
-          "latency_s": 1.945726,
+          "cached_tokens": 1546,
+          "completion_tokens": 110,
+          "finish_reason": "stop",
+          "latency_s": 1.800467,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1436,
-          "reasoning_tokens": 58,
+          "prompt_tokens": 1549,
+          "reasoning_tokens": 71,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。まずはどちらか聞いてみようか？"
+        "text": "質問はひとつずつコメントしてね。まずはどちらか聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1187,17 +1209,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵は本物の食べ物なの？それとも卵の形をした何か？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.5515325990272686,
-      "judge_s": 0.5515325990272686,
+      "jev_s": 0.6923948919866234,
+      "judge_s": 0.6923948919866234,
       "luna_s": null,
-      "total_s": 2.5037761280545965,
-      "writer_s": 1.952243529027328
+      "total_s": 2.4938970810035244,
+      "writer_s": 1.801502189016901
     }
   },
   {
@@ -1209,7 +1231,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1228,7 +1250,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 3,
             "input_tokens": 2150,
-            "latency_s": 0.628195,
+            "latency_s": 0.665278,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 154,
@@ -1241,13 +1263,13 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.24,
-                "question": 0.76
+                "guess": 0.27,
+                "question": 0.73
               },
               "A2": {
-                "q_multi": 0.96,
+                "q_multi": 0.97,
                 "q_open": 0.0,
-                "q_yesno": 0.04
+                "q_yesno": 0.03
               },
               "A_bare": 0.02
             }
@@ -1263,18 +1285,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 75,
-          "latency_s": 1.675029,
+          "cached_tokens": 1548,
+          "completion_tokens": 62,
+          "finish_reason": "stop",
+          "latency_s": 1.648529,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1438,
-          "reasoning_tokens": 33,
+          "prompt_tokens": 1551,
+          "reasoning_tokens": 32,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は一つずつコメントしてね。どちらか一つ聞いてごらん☺️"
+        "text": "質問はひとつずつ聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1282,17 +1306,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "パンに卵を使ってるの？その卵を割るのは主人以外の人？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.6283450260525569,
-      "judge_s": 0.6283450260525569,
+      "jev_s": 0.6653780341148376,
+      "judge_s": 0.6653780341148376,
       "luna_s": null,
-      "total_s": 2.3039275550981984,
-      "writer_s": 1.6755825290456414
+      "total_s": 2.3148887131828815,
+      "writer_s": 1.6495106790680438
     }
   },
   {
@@ -1304,7 +1328,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1323,7 +1347,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2676,
-            "latency_s": 0.936447,
+            "latency_s": 0.955899,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1336,8 +1360,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.11,
-                "question": 0.89
+                "guess": 0.08,
+                "question": 0.92
               },
               "A2": {
                 "q_multi": 0.0,
@@ -1359,18 +1383,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 88,
-          "latency_s": 2.28761,
+          "cached_tokens": 1543,
+          "completion_tokens": 91,
+          "finish_reason": "stop",
+          "latency_s": 1.629777,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1433,
-          "reasoning_tokens": 49,
+          "prompt_tokens": 1546,
+          "reasoning_tokens": 57,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい / いいえで答えられる形で聞き直してみてね。"
+        "text": "はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1378,17 +1404,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵を使わずに、どうしてパンがおいしくなるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.9367036978946999,
-      "judge_s": 0.9367036978946999,
+      "jev_s": 0.9561185300117359,
+      "judge_s": 0.9561185300117359,
       "luna_s": null,
-      "total_s": 3.225706709898077,
-      "writer_s": 2.289003012003377
+      "total_s": 2.587144142948091,
+      "writer_s": 1.6310256129363552
     }
   },
   {
@@ -1400,7 +1426,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1419,7 +1445,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2676,
-            "latency_s": 0.921048,
+            "latency_s": 0.965606,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1432,8 +1458,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.25,
-                "question": 0.75
+                "guess": 0.21,
+                "question": 0.79
               },
               "A2": {
                 "q_multi": 0.0,
@@ -1455,18 +1481,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 168,
-          "latency_s": 2.522305,
+          "cached_tokens": 1542,
+          "completion_tokens": 144,
+          "finish_reason": "stop",
+          "latency_s": 9.938968,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1432,
-          "reasoning_tokens": 130,
+          "prompt_tokens": 1545,
+          "reasoning_tokens": 102,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい・いいえで答えられる形で聞き直してみてね。"
+        "text": "卵の種類について、はい・いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1474,17 +1502,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "主人が大切にしている卵って、何の卵なんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.9212670539272949,
-      "judge_s": 0.9212670539272949,
+      "jev_s": 0.9657714159693569,
+      "judge_s": 0.9657714159693569,
       "luna_s": null,
-      "total_s": 3.4444211958907545,
-      "writer_s": 2.5231541419634596
+      "total_s": 10.906042653950863,
+      "writer_s": 9.940271237981506
     }
   },
   {
@@ -1496,7 +1524,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1515,7 +1543,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 4,
             "input_tokens": 2672,
-            "latency_s": 0.81979,
+            "latency_s": 0.918049,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 176,
@@ -1528,8 +1556,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.04,
-                "question": 0.96
+                "guess": 0.05,
+                "question": 0.95
               },
               "A2": {
                 "q_multi": 0.0,
@@ -1537,7 +1565,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "q_yesno": 0.0
               },
               "A3": 0.04,
-              "A_bare": 0.03
+              "A_bare": 0.02
             }
           },
           "error": null,
@@ -1551,18 +1579,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 133,
-          "latency_s": 2.135527,
+          "cached_tokens": 1541,
+          "completion_tokens": 121,
+          "finish_reason": "stop",
+          "latency_s": 2.057121,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1431,
-          "reasoning_tokens": 76,
+          "prompt_tokens": 1544,
+          "reasoning_tokens": 78,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「卵はパンのおいしさにつながっているの？」みたいに、はい／いいえで答えられる形で聞いてごらん。"
+        "text": "卵はパンのおいしさに関係しているの？という形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1570,17 +1600,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "どうやって卵がパンのおいしさにつながっているの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.8200736769940704,
-      "judge_s": 0.8200736769940704,
+      "jev_s": 0.9185387030011043,
+      "judge_s": 0.9185387030011043,
       "luna_s": null,
-      "total_s": 2.9562346059828997,
-      "writer_s": 2.1361609289888293
+      "total_s": 2.9766116350656375,
+      "writer_s": 2.0580729320645332
     }
   },
   {
@@ -1592,7 +1622,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1610,8 +1640,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 4049,
-            "latency_s": 0.904741,
+            "input_tokens": 4855,
+            "latency_s": 0.99927,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 209,
@@ -1624,18 +1654,18 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 1.0,
-                "question": 0.0
+                "guess": 0.99,
+                "question": 0.01
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.9400000000000001,
-                  "hit": 0.91
+                  "close": 1.0,
+                  "hit": 1.0
                 },
                 "point_1": {
-                  "close": 0.9400000000000001,
-                  "hit": 0.93
+                  "close": 1.0,
+                  "hit": 0.99
                 }
               },
               "B2": 0.06
@@ -1643,7 +1673,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.91, 矛盾=0.06"
+          "reason": "段A=guess→guess_correct, 要点最低=0.99, 矛盾=0.06"
         },
         "luna": null
       },
@@ -1663,17 +1693,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵ってパン職人の見習いだったってこと？その人が育ってパンを焼いてるから、おいしいのはこの卵のおかげなんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.9050316920038313,
-      "judge_s": 0.9050316920038313,
+      "jev_s": 0.9994442759780213,
+      "judge_s": 0.9994442759780213,
       "luna_s": null,
-      "total_s": 0.9050489629153162,
-      "writer_s": 1.727091148495674e-05
+      "total_s": 0.9994498880114406,
+      "writer_s": 5.612033419311047e-06
     }
   },
   {
@@ -1685,7 +1715,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1703,8 +1733,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 4057,
-            "latency_s": 0.780283,
+            "input_tokens": 4863,
+            "latency_s": 0.894333,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 209,
@@ -1723,12 +1753,12 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.99,
-                  "hit": 0.97
+                  "close": 1.0,
+                  "hit": 0.98
                 },
                 "point_1": {
                   "close": 1.0,
-                  "hit": 1.0
+                  "hit": 0.99
                 }
               },
               "B2": 0.06
@@ -1736,7 +1766,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.97, 矛盾=0.06"
+          "reason": "段A=guess→guess_correct, 要点最低=0.98, 矛盾=0.06"
         },
         "luna": null
       },
@@ -1756,17 +1786,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "食べ物の卵じゃなくて、パン職人の見習いをそう呼んでたんだね。今はその人が焼いているから、主人が自慢するのも分かる。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.7805877999635413,
-      "judge_s": 0.7805877999635413,
+      "jev_s": 0.894561107037589,
+      "judge_s": 0.894561107037589,
       "luna_s": null,
-      "total_s": 0.7805942599661648,
-      "writer_s": 6.46000262349844e-06
+      "total_s": 0.8945630610687658,
+      "writer_s": 1.954031176865101e-06
     }
   },
   {
@@ -1778,7 +1808,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1796,8 +1826,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 3,
-            "input_tokens": 2717,
-            "latency_s": 0.716239,
+            "input_tokens": 3523,
+            "latency_s": 0.715243,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 187,
@@ -1810,25 +1840,25 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "request": 0.0
               },
               "A1b": {
-                "guess": 0.99,
-                "question": 0.01
+                "guess": 1.0,
+                "question": 0.0
               },
               "A_bare": 0.04,
               "B": {
                 "point_0": {
-                  "close": 0.98,
-                  "hit": 0.89
+                  "close": 0.99,
+                  "hit": 0.91
                 },
                 "point_1": {
-                  "close": 0.8,
-                  "hit": 0.04
+                  "close": 0.76,
+                  "hit": 0.15
                 }
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.04"
+          "reason": "段A=guess→guess_close, 要点最低=0.15"
         },
         "luna": null
       },
@@ -1837,18 +1867,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 97,
-          "latency_s": 1.720338,
+          "cached_tokens": 1541,
+          "completion_tokens": 125,
+          "finish_reason": "stop",
+          "latency_s": 1.797457,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1431,
-          "reasoning_tokens": 64,
+          "prompt_tokens": 1544,
+          "reasoning_tokens": 86,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてみようか？"
+        "text": "惜しい！ほかの可能性も考えて、推理を続けてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1856,17 +1888,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵はパン屋で修業中の人のことなんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.7164887340040877,
-      "judge_s": 0.7164887340040877,
+      "jev_s": 0.7154996719909832,
+      "judge_s": 0.7154996719909832,
       "luna_s": null,
-      "total_s": 2.448338388931006,
-      "writer_s": 1.7318496549269184
+      "total_s": 2.556635285029188,
+      "writer_s": 1.8411356130382046
     }
   },
   {
@@ -1878,7 +1910,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1896,8 +1928,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 4065,
-            "latency_s": 0.827745,
+            "input_tokens": 4871,
+            "latency_s": 0.947455,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 209,
@@ -1916,20 +1948,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.99,
-                  "hit": 0.98
+                  "close": 0.8200000000000001,
+                  "hit": 0.77
                 },
                 "point_1": {
-                  "close": 0.8999999999999999,
-                  "hit": 0.84
+                  "close": 0.83,
+                  "hit": 0.73
                 }
               },
-              "B2": 0.95
+              "B2": 0.96
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.84, 矛盾=0.95"
+          "reason": "段A=guess→guess_close, 要点最低=0.73, 矛盾=0.96"
         },
         "luna": null
       },
@@ -1938,18 +1970,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 105,
-          "latency_s": 1.510658,
+          "cached_tokens": 1570,
+          "completion_tokens": 73,
+          "finish_reason": "stop",
+          "latency_s": 1.487412,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1460,
-          "reasoning_tokens": 73,
+          "prompt_tokens": 1573,
+          "reasoning_tokens": 43,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！ほかの可能性も考えてみようか。"
+        "text": "惜しい！もう少し考えてみようか☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1957,17 +1991,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵はパン職人の見習いで、その人が焼くパンがおいしいんだね。でも主人はパン作りを教えてなくて、その人が勝手に覚えたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.8280801939545199,
-      "judge_s": 0.8280801939545199,
+      "jev_s": 0.9476874870015308,
+      "judge_s": 0.9476874870015308,
       "luna_s": null,
-      "total_s": 2.3394305598922074,
-      "writer_s": 1.5113503659376875
+      "total_s": 2.464993278030306,
+      "writer_s": 1.5173057910287753
     }
   },
   {
@@ -1979,7 +2013,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -1998,8 +2032,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 6,
             "guess_demoted": true,
-            "input_tokens": 5020,
-            "latency_s": 1.247383,
+            "input_tokens": 5915,
+            "latency_s": 1.463126,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 293,
@@ -2016,32 +2050,32 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "question": 0.0
               },
               "A2": {
-                "q_multi": 0.03,
+                "q_multi": 0.04,
                 "q_open": 0.1,
-                "q_yesno": 0.87
+                "q_yesno": 0.86
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.02,
-                  "hit": 0.01
+                  "close": 0.01,
+                  "hit": 0.0
                 },
                 "point_1": {
-                  "close": 0.03,
-                  "hit": 0.02
+                  "close": 0.01,
+                  "hit": 0.0
                 }
               },
-              "C": 0.29,
+              "C": 0.33,
               "D": {
                 "irrelevant": 0.0,
-                "no": 1.0,
-                "yes": 0.0
+                "no": 0.99,
+                "yes": 0.01
               }
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "段A=question→q_yesno, 要点最低=0.01"
+          "reason": "段A=question→q_yesno, 要点最低=0.00"
         },
         "luna": null
       },
@@ -2050,18 +2084,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 89,
-          "latency_s": 1.552903,
+          "cached_tokens": 1520,
+          "completion_tokens": 94,
+          "finish_reason": "stop",
+          "latency_s": 3.259219,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1455,
-          "reasoning_tokens": 59,
+          "prompt_tokens": 1568,
+          "reasoning_tokens": 64,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
+        "text": "いいえ。ほかのことも聞いてごらん"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2069,17 +2105,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵を産む鶏を店の奥で大事に飼っていて、その鶏の餌がパン生地に混ざってるんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.2477665370097384,
-      "judge_s": 1.2477665370097384,
+      "jev_s": 1.4635043600574136,
+      "judge_s": 1.4635043600574136,
       "luna_s": null,
-      "total_s": 2.8014584890333936,
-      "writer_s": 1.5536919520236552
+      "total_s": 4.728464308078401,
+      "writer_s": 3.264959948020987
     }
   },
   {
@@ -2091,7 +2127,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2110,8 +2146,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 4,
             "guess_demoted": true,
-            "input_tokens": 3301,
-            "latency_s": 1.860384,
+            "input_tokens": 4107,
+            "latency_s": 0.91626,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 231,
@@ -2129,25 +2165,25 @@ window.PROBE_RAW["jev-2c/U14"] = [
               },
               "A2": {
                 "q_multi": 0.02,
-                "q_open": 0.63,
-                "q_yesno": 0.35
+                "q_open": 0.65,
+                "q_yesno": 0.33
               },
               "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.02,
-                  "hit": 0.01
+                  "close": 0.01,
+                  "hit": 0.0
                 },
                 "point_1": {
                   "close": 0.01,
-                  "hit": 0.01
+                  "hit": 0.0
                 }
               }
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "段A=question→guess_wrong, 要点最低=0.01"
+          "reason": "段A=question→guess_wrong, 要点最低=0.00"
         },
         "luna": null
       },
@@ -2156,18 +2192,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 80,
-          "latency_s": 1.866196,
+          "cached_tokens": 1551,
+          "completion_tokens": 31,
+          "finish_reason": "stop",
+          "latency_s": 1.176591,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1441,
-          "reasoning_tokens": 42,
+          "prompt_tokens": 1554,
+          "reasoning_tokens": 0,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。別の考え方も探してみようか☺️"
+        "text": "残念、ちがうよ。別の考え方でも考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2175,17 +2213,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵はパン屋の幸運のお守りで、主人がそう思い込んでるだけだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 1.860674808965996,
-      "judge_s": 1.860674808965996,
+      "jev_s": 0.9164772719377652,
+      "judge_s": 0.9164772719377652,
       "luna_s": null,
-      "total_s": 3.7380373009946197,
-      "writer_s": 1.8773624920286238
+      "total_s": 2.0942100879037753,
+      "writer_s": 1.17773281596601
     }
   },
   {
@@ -2197,107 +2235,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "2c-luna",
-        "shadow": false
-      },
-      "content_key": "005-bakers-egg",
-      "errors": [],
-      "fact_sheet_hash": "c764429cc6b6",
-      "final": {
-        "answer": null,
-        "decision": "jev",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "calls": 3,
-            "input_tokens": 2780,
-            "latency_s": 0.817767,
-            "major": "guess",
-            "model": "jev-latest",
-            "output_tokens": 187,
-            "probabilities": {
-              "A1": {
-                "inappropriate": 0.0,
-                "other": 0.0,
-                "question_or_guess": 1.0,
-                "reaction": 0.0,
-                "request": 0.0
-              },
-              "A1b": {
-                "guess": 1.0,
-                "question": 0.0
-              },
-              "A_bare": 0.02,
-              "B": {
-                "point_0": {
-                  "close": 0.48,
-                  "hit": 0.42
-                },
-                "point_1": {
-                  "close": 1.0,
-                  "hit": 1.0
-                }
-              }
-            }
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.42"
-        },
-        "luna": null
-      },
-      "media_id": "local-U14",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 81,
-          "latency_s": 1.670579,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1448,
-          "reasoning_tokens": 48,
-          "slot": "（この種別では使わない）"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！ほかの可能性も考えてみようか☺️"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "店が育てた職人見習いが今は焼き手で、その腕前がパンのおいしさにつながってるんだね。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": 0.8178962129168212,
-      "judge_s": 0.8178962129168212,
-      "luna_s": null,
-      "total_s": 2.488874482922256,
-      "writer_s": 1.6709782700054348
-    }
-  },
-  {
-    "case_id": "U14-k02",
-    "record": {
-      "comment_id": "U14-k02",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "jev",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2315,8 +2253,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 4,
-            "input_tokens": 4005,
-            "latency_s": 0.705354,
+            "input_tokens": 4795,
+            "latency_s": 0.957672,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 209,
@@ -2335,12 +2273,105 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.56,
-                  "hit": 0.5
+                  "close": 0.98,
+                  "hit": 0.96
                 },
                 "point_1": {
                   "close": 1.0,
-                  "hit": 1.0
+                  "hit": 0.99
+                }
+              },
+              "B2": 0.06
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "段A=guess→guess_correct, 要点最低=0.96, 矛盾=0.06"
+        },
+        "luna": null
+      },
+      "media_id": "local-U14",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "template",
+        "text": "正解！「卵」はパン職人の卵、つまり見習いのこと。主人が一人前に育てたその職人が、いまおいしいパンを焼いている。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "店が育てた職人見習いが今は焼き手で、その腕前がパンのおいしさにつながってるんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": 0.9579665380297229,
+      "judge_s": 0.9579665380297229,
+      "luna_s": null,
+      "total_s": 0.9579924150602892,
+      "writer_s": 2.5877030566334724e-05
+    }
+  },
+  {
+    "case_id": "U14-k02",
+    "record": {
+      "comment_id": "U14-k02",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "jev",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "2c-luna",
+        "shadow": false
+      },
+      "content_key": "005-bakers-egg",
+      "errors": [],
+      "fact_sheet_hash": "c764429cc6b6",
+      "final": {
+        "answer": null,
+        "decision": "jev",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "jev": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "calls": 4,
+            "input_tokens": 4811,
+            "latency_s": 0.93182,
+            "major": "guess",
+            "model": "jev-latest",
+            "output_tokens": 209,
+            "probabilities": {
+              "A1": {
+                "inappropriate": 0.0,
+                "other": 0.0,
+                "question_or_guess": 1.0,
+                "reaction": 0.0,
+                "request": 0.0
+              },
+              "A1b": {
+                "guess": 1.0,
+                "question": 0.0
+              },
+              "A_bare": 0.02,
+              "B": {
+                "point_0": {
+                  "close": 1.0,
+                  "hit": 0.99
+                },
+                "point_1": {
+                  "close": 1.0,
+                  "hit": 0.98
                 }
               },
               "B2": 0.07
@@ -2348,7 +2379,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "段A=guess→guess_correct, 要点最低=0.50, 矛盾=0.07"
+          "reason": "段A=guess→guess_correct, 要点最低=0.98, 矛盾=0.07"
         },
         "luna": null
       },
@@ -2368,17 +2399,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "パン職人を目指して店で修業する若手を主人が大切にし、今ではその人が店のパンを焼いてるんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.7055106549523771,
-      "judge_s": 0.7055106549523771,
+      "jev_s": 0.9321197299286723,
+      "judge_s": 0.9321197299286723,
       "luna_s": null,
-      "total_s": 0.7055166700156406,
-      "writer_s": 6.015063263475895e-06
+      "total_s": 0.932128575979732,
+      "writer_s": 8.846051059663296e-06
     }
   },
   {
@@ -2390,7 +2421,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2408,8 +2439,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 3,
-            "input_tokens": 2762,
-            "latency_s": 0.552777,
+            "input_tokens": 3568,
+            "latency_s": 0.620217,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 187,
@@ -2429,18 +2460,18 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "B": {
                 "point_0": {
                   "close": 0.94,
-                  "hit": 0.37
+                  "hit": 0.87
                 },
                 "point_1": {
-                  "close": 0.83,
-                  "hit": 0.01
+                  "close": 0.8899999999999999,
+                  "hit": 0.06
                 }
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.01"
+          "reason": "段A=guess→guess_close, 要点最低=0.06"
         },
         "luna": null
       },
@@ -2449,18 +2480,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 63,
-          "latency_s": 1.450258,
+          "cached_tokens": 1556,
+          "completion_tokens": 73,
+          "finish_reason": "stop",
+          "latency_s": 1.332153,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1446,
-          "reasoning_tokens": 30,
+          "prompt_tokens": 1559,
+          "reasoning_tokens": 44,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてみようか？"
+        "text": "惜しい！もう少し考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2468,17 +2501,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵は修業中の職人を指す呼び名だけど、今は仕込みを手伝う段階なんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.552915747044608,
-      "judge_s": 0.552915747044608,
+      "jev_s": 0.6204498480074108,
+      "judge_s": 0.6204498480074108,
       "luna_s": null,
-      "total_s": 2.00355988915544,
-      "writer_s": 1.450644142110832
+      "total_s": 1.95415074005723,
+      "writer_s": 1.3337008920498192
     }
   },
   {
@@ -2490,7 +2523,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2508,8 +2541,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 3,
-            "input_tokens": 2774,
-            "latency_s": 0.76503,
+            "input_tokens": 3580,
+            "latency_s": 0.666457,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 187,
@@ -2528,19 +2561,19 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.99,
-                  "hit": 0.99
+                  "close": 0.9400000000000001,
+                  "hit": 0.91
                 },
                 "point_1": {
                   "close": 0.97,
-                  "hit": 0.02
+                  "hit": 0.15
                 }
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.02"
+          "reason": "段A=guess→guess_close, 要点最低=0.15"
         },
         "luna": null
       },
@@ -2549,18 +2582,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 60,
-          "latency_s": 1.289113,
+          "cached_tokens": 1556,
+          "completion_tokens": 73,
+          "finish_reason": "stop",
+          "latency_s": 1.454072,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1446,
-          "reasoning_tokens": 30,
+          "prompt_tokens": 1559,
+          "reasoning_tokens": 40,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！推理を続けてみようか？"
+        "text": "惜しい！もう少し推理を続けてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2568,17 +2603,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵はパン職人の見習いだけど、店では生地をこねる作業までを担当しているんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.7652481379918754,
-      "judge_s": 0.7652481379918754,
+      "jev_s": 0.6666509989881888,
+      "judge_s": 0.6666509989881888,
       "luna_s": null,
-      "total_s": 2.0553457599598914,
-      "writer_s": 1.290097621968016
+      "total_s": 2.1327591739827767,
+      "writer_s": 1.466108174994588
     }
   },
   {
@@ -2590,7 +2625,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2608,8 +2643,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "bare_term": null,
           "debug": {
             "calls": 3,
-            "input_tokens": 2747,
-            "latency_s": 0.803333,
+            "input_tokens": 3553,
+            "latency_s": 0.723328,
             "major": "guess",
             "model": "jev-latest",
             "output_tokens": 187,
@@ -2628,19 +2663,19 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A_bare": 0.03,
               "B": {
                 "point_0": {
-                  "close": 0.99,
-                  "hit": 0.02
+                  "close": 0.98,
+                  "hit": 0.04
                 },
                 "point_1": {
-                  "close": 0.54,
-                  "hit": 0.02
+                  "close": 0.8300000000000001,
+                  "hit": 0.06
                 }
               }
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "段A=guess→guess_close, 要点最低=0.02"
+          "reason": "段A=guess→guess_close, 要点最低=0.04"
         },
         "luna": null
       },
@@ -2649,18 +2684,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 81,
-          "latency_s": 1.434817,
+          "cached_tokens": 1549,
+          "completion_tokens": 77,
+          "finish_reason": "stop",
+          "latency_s": 1.626011,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1439,
-          "reasoning_tokens": 51,
+          "prompt_tokens": 1552,
+          "reasoning_tokens": 45,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか😌"
+        "text": "惜しい！ほかの可能性も考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2668,17 +2705,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "卵は食べ物じゃなく、店で働く人のことをそう呼んでいたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.8036059810547158,
-      "judge_s": 0.8036059810547158,
+      "jev_s": 0.7235035779885948,
+      "judge_s": 0.7235035779885948,
       "luna_s": null,
-      "total_s": 2.2665422600694,
-      "writer_s": 1.4629362790146843
+      "total_s": 2.350716596003622,
+      "writer_s": 1.627213018015027
     }
   },
   {
@@ -2690,7 +2727,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2709,8 +2746,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 4,
             "guess_demoted": true,
-            "input_tokens": 3317,
-            "latency_s": 0.872611,
+            "input_tokens": 4123,
+            "latency_s": 0.820301,
             "major": "question",
             "model": "jev-latest",
             "output_tokens": 231,
@@ -2728,14 +2765,14 @@ window.PROBE_RAW["jev-2c/U14"] = [
               },
               "A2": {
                 "q_multi": 0.02,
-                "q_open": 0.76,
-                "q_yesno": 0.22
+                "q_open": 0.7,
+                "q_yesno": 0.28
               },
               "A_bare": 0.02,
               "B": {
                 "point_0": {
-                  "close": 0.04,
-                  "hit": 0.01
+                  "close": 0.01,
+                  "hit": 0.0
                 },
                 "point_1": {
                   "close": 0.0,
@@ -2755,11 +2792,13 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 79,
-          "latency_s": 1.621653,
+          "cached_tokens": 1555,
+          "completion_tokens": 80,
+          "finish_reason": "stop",
+          "latency_s": 1.811362,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1445,
-          "reasoning_tokens": 42,
+          "prompt_tokens": 1558,
+          "reasoning_tokens": 43,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -2774,17 +2813,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "主人の大事な卵は常連客から贈られた飾りで、棚に置いてあるだけなんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.872874011984095,
-      "judge_s": 0.872874011984095,
+      "jev_s": 0.8205449050292373,
+      "judge_s": 0.8205449050292373,
       "luna_s": null,
-      "total_s": 2.4953068559989333,
-      "writer_s": 1.6224328440148383
+      "total_s": 2.632642458076589,
+      "writer_s": 1.8120975530473515
     }
   },
   {
@@ -2796,7 +2835,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2817,7 +2856,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 932,
-            "latency_s": 0.195161,
+            "latency_s": 0.261566,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
@@ -2828,12 +2867,12 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "reaction": 0.0,
                 "request": 0.0
               },
-              "A_bare": 0.85
+              "A_bare": 0.84
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "段A語句のみ: 0.85"
+          "reason": "段A語句のみ: 0.84"
         },
         "luna": null
       },
@@ -2841,6 +2880,16 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 1538,
+          "completion_tokens": 182,
+          "finish_reason": "stop",
+          "latency_s": 9.87261,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1541,
+          "reasoning_tokens": 155,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2853,17 +2902,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "パン職人の卵？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.19526438403408974,
-      "judge_s": 0.19526438403408974,
+      "jev_s": 0.2616843390278518,
+      "judge_s": 0.2616843390278518,
       "luna_s": null,
-      "total_s": 4.342053110012785,
-      "writer_s": 4.146788725978695
+      "total_s": 10.135685020126402,
+      "writer_s": 9.87400068109855
     }
   },
   {
@@ -2875,7 +2924,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2896,14 +2945,14 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 1,
             "input_tokens": 930,
-            "latency_s": 0.197746,
+            "latency_s": 0.260145,
             "model": "jev-latest",
             "output_tokens": 78,
             "probabilities": {
               "A1": {
-                "inappropriate": 0.01,
+                "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.98,
+                "question_or_guess": 0.99,
                 "reaction": 0.01,
                 "request": 0.0
               },
@@ -2920,6 +2969,16 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 1535,
+          "completion_tokens": 268,
+          "finish_reason": "stop",
+          "latency_s": 4.127812,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1538,
+          "reasoning_tokens": 230,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2932,17 +2991,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "いちごジャム",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.1978259750176221,
-      "judge_s": 0.1978259750176221,
+      "jev_s": 0.2602674280060455,
+      "judge_s": 0.2602674280060455,
       "luna_s": null,
-      "total_s": 3.7454559539910406,
-      "writer_s": 3.5476299789734185
+      "total_s": 4.389320058049634,
+      "writer_s": 4.129052630043589
     }
   },
   {
@@ -2954,7 +3013,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -2973,7 +3032,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1427,
-            "latency_s": 0.378671,
+            "latency_s": 0.449974,
             "major": "request",
             "model": "jev-latest",
             "output_tokens": 122,
@@ -2982,13 +3041,13 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "inappropriate": 0.0,
                 "other": 0.0,
                 "question_or_guess": 0.01,
-                "reaction": 0.21,
-                "request": 0.78
+                "reaction": 0.24,
+                "request": 0.75
               },
               "A2": {
-                "ask_hint": 0.7,
+                "ask_hint": 0.73,
                 "ask_howto": 0.01,
-                "ask_spoiler": 0.29
+                "ask_spoiler": 0.26
               },
               "A_bare": 0.19
             }
@@ -3004,18 +3063,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 95,
-          "latency_s": 4.260758,
+          "cached_tokens": 1533,
+          "completion_tokens": 111,
+          "finish_reason": "stop",
+          "latency_s": 2.252968,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1423,
-          "reasoning_tokens": 55,
+          "prompt_tokens": 1536,
+          "reasoning_tokens": 61,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ヒントはまだ内緒だよ。質問で少しずつ絞っていこうか☺️"
+        "text": "ヒントは出せないけど、質問で少しずつ絞っていこう！はい・いいえで聞いてみてね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3023,17 +3084,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "詰まった、助けて🙏",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.37879649095702916,
-      "judge_s": 0.37879649095702916,
+      "jev_s": 0.4504186190897599,
+      "judge_s": 0.4504186190897599,
       "luna_s": null,
-      "total_s": 4.640000626910478,
-      "writer_s": 4.261204135953449
+      "total_s": 2.7044127631234005,
+      "writer_s": 2.2539941440336406
     }
   },
   {
@@ -3045,7 +3106,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3064,7 +3125,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1594,
-            "latency_s": 0.368995,
+            "latency_s": 0.462282,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 150,
@@ -3099,10 +3160,12 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
+          "cached_tokens": 1533,
           "completion_tokens": 66,
-          "latency_s": 1.698972,
+          "finish_reason": "stop",
+          "latency_s": 2.155199,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1423,
+          "prompt_tokens": 1536,
           "reasoning_tokens": 37,
           "slot": "（この種別では使わない）"
         },
@@ -3118,17 +3181,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "今回の設定ちょっと怖くて好き",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.36906204104889184,
-      "judge_s": 0.36906204104889184,
+      "jev_s": 0.4623774760402739,
+      "judge_s": 0.4623774760402739,
       "luna_s": null,
-      "total_s": 2.0690273840446025,
-      "writer_s": 1.6999653429957107
+      "total_s": 2.6185359980445355,
+      "writer_s": 2.1561585220042616
     }
   },
   {
@@ -3140,7 +3203,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3159,7 +3222,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1582,
-            "latency_s": 0.414703,
+            "latency_s": 0.504472,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -3167,8 +3230,8 @@ window.PROBE_RAW["jev-2c/U14"] = [
               "A1": {
                 "inappropriate": 0.0,
                 "other": 0.0,
-                "question_or_guess": 0.01,
-                "reaction": 0.99,
+                "question_or_guess": 0.0,
+                "reaction": 1.0,
                 "request": 0.0
               },
               "A2": {
@@ -3194,18 +3257,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 82,
-          "latency_s": 1.596936,
+          "cached_tokens": 1530,
+          "completion_tokens": 29,
+          "finish_reason": "stop",
+          "latency_s": 1.405354,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1420,
-          "reasoning_tokens": 49,
+          "prompt_tokens": 1533,
+          "reasoning_tokens": 0,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "通勤中に見てくれてるんだね、ありがとう☺️"
+        "text": "通勤中に見てくれてありがとう！気をつけてね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3213,17 +3278,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "通勤中に見てます",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.4148548679659143,
-      "judge_s": 0.4148548679659143,
+      "jev_s": 0.5046119099715725,
+      "judge_s": 0.5046119099715725,
       "luna_s": null,
-      "total_s": 2.023547226912342,
-      "writer_s": 1.6086923589464277
+      "total_s": 1.9103941209614277,
+      "writer_s": 1.4057822109898552
     }
   },
   {
@@ -3235,7 +3300,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3254,7 +3319,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1588,
-            "latency_s": 0.344623,
+            "latency_s": 0.430452,
             "major": "reaction",
             "model": "jev-latest",
             "output_tokens": 148,
@@ -3289,18 +3354,20 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 58,
-          "latency_s": 2.114712,
+          "cached_tokens": 1533,
+          "completion_tokens": 69,
+          "finish_reason": "stop",
+          "latency_s": 1.497015,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1423,
-          "reasoning_tokens": 30,
+          "prompt_tokens": 1536,
+          "reasoning_tokens": 40,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "もちろん！一緒に考えようね☺️"
+        "text": "一緒に解こう！楽しみだね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3308,17 +3375,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "@mika これ一緒に解こ！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.34474687394686043,
-      "judge_s": 0.34474687394686043,
+      "jev_s": 0.4305840990273282,
+      "judge_s": 0.4305840990273282,
       "luna_s": null,
-      "total_s": 2.4598008738830686,
-      "writer_s": 2.115053999936208
+      "total_s": 1.9438469720771536,
+      "writer_s": 1.5132628730498254
     }
   },
   {
@@ -3330,7 +3397,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3349,15 +3416,15 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1466,
-            "latency_s": 0.371144,
+            "latency_s": 0.455864,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 129,
             "probabilities": {
               "A1": {
-                "inappropriate": 0.95,
+                "inappropriate": 0.93,
                 "other": 0.0,
-                "question_or_guess": 0.03,
+                "question_or_guess": 0.05,
                 "reaction": 0.02,
                 "request": 0.0
               },
@@ -3367,7 +3434,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "spam": 0.0,
                 "troll": 1.0
               },
-              "A_bare": 0.6
+              "A_bare": 0.63
             }
           },
           "error": null,
@@ -3392,17 +3459,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "無無無無むむむ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.37129099504090846,
-      "judge_s": 0.37129099504090846,
+      "jev_s": 0.4559867160860449,
+      "judge_s": 0.4559867160860449,
       "luna_s": null,
-      "total_s": 0.37130866502411664,
-      "writer_s": 1.7669983208179474e-05
+      "total_s": 0.4560027370462194,
+      "writer_s": 1.6020960174500942e-05
     }
   },
   {
@@ -3414,7 +3481,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
         "consensus": false,
         "judge_mode": "jev",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "2c-luna",
         "shadow": false
       },
@@ -3433,7 +3500,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
           "debug": {
             "calls": 2,
             "input_tokens": 1506,
-            "latency_s": 0.382899,
+            "latency_s": 0.500129,
             "major": "inappropriate",
             "model": "jev-latest",
             "output_tokens": 129,
@@ -3451,7 +3518,7 @@ window.PROBE_RAW["jev-2c/U14"] = [
                 "spam": 0.0,
                 "troll": 0.0
               },
-              "A_bare": 0.04
+              "A_bare": 0.05
             }
           },
           "error": null,
@@ -3476,17 +3543,17 @@ window.PROBE_RAW["jev-2c/U14"] = [
       "text": "本名はサンプル太郎、電話は090-0000-0456です",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
-      "jev_s": 0.38305195595603436,
-      "judge_s": 0.38305195595603436,
+      "jev_s": 0.5002170379739255,
+      "judge_s": 0.5002170379739255,
       "luna_s": null,
-      "total_s": 0.3830548470141366,
-      "writer_s": 2.891058102250099e-06
+      "total_s": 0.5002204769989476,
+      "writer_s": 3.4390250220894814e-06
     }
   }
 ];

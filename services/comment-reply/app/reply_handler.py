@@ -56,6 +56,8 @@ def process_message(
             result, comment_id, record["text"], problem,
             variant=config.reply_variant,
             openai_api_key=credentials["openai_api_key"], model=config.luna_model,
+            anthropic_api_key=credentials.get("anthropic_api_key", ""),
+            haiku_effort=config.haiku_effort,
         )
         apply_decision(record, result, reply, judged_at=judged_at)
         if reply.text:

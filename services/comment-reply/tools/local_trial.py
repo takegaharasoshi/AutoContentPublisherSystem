@@ -119,7 +119,8 @@ def main(argv: list[str] | None = None) -> int:
         "hybrid" in args.modes and (effective_shadow or effective_consensus)
     )
     keys = {"openai_api_key": os.environ.get("OPENAI_API_KEY", ""),
-            "typesafe_api_key": os.environ.get("TYPESAFE_API_KEY", "")}
+            "typesafe_api_key": os.environ.get("TYPESAFE_API_KEY", ""),
+            "anthropic_api_key": os.environ.get("ANTHROPIC_API_KEY", "")}
     if not stub_rows:
         missing = []
         if needs_luna and not keys["openai_api_key"]:
@@ -174,6 +175,7 @@ def main(argv: list[str] | None = None) -> int:
                 shadow=base_config.shadow if args.shadow is None else args.shadow,
                 consensus=base_config.consensus if args.consensus is None else args.consensus,
                 reply_variant=variant, luna_model=base_config.luna_model,
+                haiku_effort=base_config.haiku_effort,
                 set_code=problem.set_code,
             )
             combined = combine(
@@ -183,6 +185,7 @@ def main(argv: list[str] | None = None) -> int:
             reply = write_reply(
                 combined, comment_id, comment_text, problem, variant=variant,
                 openai_api_key=keys["openai_api_key"], model=config.luna_model,
+                anthropic_api_key=keys["anthropic_api_key"], haiku_effort=config.haiku_effort,
             )
             comment = {"id": comment_id, "text": comment_text,
                        "from": {"id": "local-user"}, "media": {"id": problem.media_id}}

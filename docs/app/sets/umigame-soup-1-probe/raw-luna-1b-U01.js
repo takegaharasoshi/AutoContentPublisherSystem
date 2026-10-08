@@ -9,7 +9,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -27,16 +27,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 284,
+            "cached_tokens": 3731,
+            "completion_tokens": 239,
             "finish_reason": "stop",
-            "latency_s": 5.354834,
+            "latency_s": 3.337631,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3319,
-            "reasoning_tokens": 206
+            "prompt_tokens": 3734,
+            "reasoning_tokens": 160
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、太陽や照明による足元の影ではないと示されています。"
+          "reason": "確定事実で、足元にできる影ではないと明示されています。"
         }
       },
       "media_id": "local-U01",
@@ -44,18 +45,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 210,
-          "latency_s": 3.283803,
+          "cached_tokens": 2053,
+          "completion_tokens": 262,
+          "finish_reason": "stop",
+          "latency_s": 4.19628,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1965,
-          "reasoning_tokens": 182,
+          "prompt_tokens": 2078,
+          "reasoning_tokens": 235,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。次は何を聞こうか？"
+        "text": "いいえ。次の質問もどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -63,17 +66,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男が言われた「影」って、足元にできる影なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 5.354886331013404,
-      "luna_s": 5.354886331013404,
-      "total_s": 8.639372969046235,
-      "writer_s": 3.2844866380328313
+      "judge_s": 3.3376736759673804,
+      "luna_s": 3.3376736759673804,
+      "total_s": 7.537870017928071,
+      "writer_s": 4.200196341960691
     }
   },
   {
@@ -85,7 +88,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -103,16 +106,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 325,
+            "cached_tokens": 3724,
+            "completion_tokens": 226,
             "finish_reason": "stop",
-            "latency_s": 6.07164,
+            "latency_s": 3.947129,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3312,
-            "reasoning_tokens": 249
+            "prompt_tokens": 3727,
+            "reasoning_tokens": 150
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "問題文の「相手」を指す一つの質問で、確定事実では家族ではありません。"
+          "reason": "確定事実で、相手は男の家族ではないとされています。"
         }
       },
       "media_id": "local-U01",
@@ -120,18 +124,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 187,
-          "latency_s": 2.711346,
+          "cached_tokens": 0,
+          "completion_tokens": 148,
+          "finish_reason": "stop",
+          "latency_s": 3.319236,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1958,
-          "reasoning_tokens": 156,
+          "prompt_tokens": 2071,
+          "reasoning_tokens": 117,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてごらん。"
+        "text": "いいえ。ほかのことも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -139,17 +145,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "あの相手は男の家族なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 6.071688263909891,
-      "luna_s": 6.071688263909891,
-      "total_s": 8.783264309866354,
-      "writer_s": 2.7115760459564626
+      "judge_s": 3.9472011890029535,
+      "luna_s": 3.9472011890029535,
+      "total_s": 7.2680669309338555,
+      "writer_s": 3.320865741930902
     }
   },
   {
@@ -161,7 +167,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -179,12 +185,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 131,
+            "cached_tokens": 3729,
+            "completion_tokens": 187,
             "finish_reason": "stop",
-            "latency_s": 2.977912,
+            "latency_s": 3.296203,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3317,
-            "reasoning_tokens": 63
+            "prompt_tokens": 3732,
+            "reasoning_tokens": 121
           },
           "error": null,
           "kind": "q_yesno",
@@ -196,11 +203,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 37,
-          "latency_s": 1.381137,
+          "cached_tokens": 0,
+          "completion_tokens": 35,
+          "finish_reason": "stop",
+          "latency_s": 2.503728,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1961,
-          "reasoning_tokens": 18,
+          "prompt_tokens": 2074,
+          "reasoning_tokens": 16,
           "slot": "判定語だけ"
         },
         "guard": null,
@@ -215,17 +224,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男はその相手のところに定期的に通ってた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.9779393919743598,
-      "luna_s": 2.9779393919743598,
-      "total_s": 4.359498368925415,
-      "writer_s": 1.3815589769510552
+      "judge_s": 3.2962436450179666,
+      "luna_s": 3.2962436450179666,
+      "total_s": 5.808256534044631,
+      "writer_s": 2.512012889026664
     }
   },
   {
@@ -237,7 +246,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -255,16 +264,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 379,
+            "cached_tokens": 3724,
+            "completion_tokens": 755,
             "finish_reason": "stop",
-            "latency_s": 5.715694,
+            "latency_s": 7.218484,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3312,
-            "reasoning_tokens": 318
+            "prompt_tokens": 3727,
+            "reasoning_tokens": 683
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実では、男は入院せずに定期的に通っていました。"
+          "reason": "確定事実に、入院はしていないと明記されています。"
         }
       },
       "media_id": "local-U01",
@@ -272,11 +282,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 134,
-          "latency_s": 2.688727,
+          "cached_tokens": 2053,
+          "completion_tokens": 191,
+          "finish_reason": "stop",
+          "latency_s": 3.423193,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1958,
-          "reasoning_tokens": 103,
+          "prompt_tokens": 2071,
+          "reasoning_tokens": 160,
           "slot": "判定語 + 一言"
         },
         "guard": null,
@@ -291,17 +303,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男はその場所に入院してたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 5.71601336193271,
-      "luna_s": 5.71601336193271,
-      "total_s": 8.405356177943759,
-      "writer_s": 2.689342816011049
+      "judge_s": 7.2185403080657125,
+      "luna_s": 7.2185403080657125,
+      "total_s": 10.653874475159682,
+      "writer_s": 3.43533416709397
     }
   },
   {
@@ -313,7 +325,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -331,16 +343,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 202,
+            "cached_tokens": 3728,
+            "completion_tokens": 236,
             "finish_reason": "stop",
-            "latency_s": 4.122667,
+            "latency_s": 3.616001,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3316,
-            "reasoning_tokens": 126
+            "prompt_tokens": 3731,
+            "reasoning_tokens": 166
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実では、今日の涙は良い知らせを聞いたうれし涙です。"
+          "reason": "今日の涙は良い知らせを聞いた喜びによるものです。"
         }
       },
       "media_id": "local-U01",
@@ -348,18 +361,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 247,
-          "latency_s": 2.930279,
+          "cached_tokens": 2054,
+          "completion_tokens": 179,
+          "finish_reason": "stop",
+          "latency_s": 3.995685,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1963,
-          "reasoning_tokens": 216,
+          "prompt_tokens": 2076,
+          "reasoning_tokens": 148,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。悪い知らせを聞いたからではないよ。"
+        "text": "いいえ。悪い知らせを聞いたからじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -367,17 +382,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "今日泣いたのは、悪い知らせを聞いたから？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.122717092046514,
-      "luna_s": 4.122717092046514,
-      "total_s": 7.053260353044607,
-      "writer_s": 2.9305432609980926
+      "judge_s": 3.6160657930886373,
+      "luna_s": 3.6160657930886373,
+      "total_s": 7.62336984812282,
+      "writer_s": 4.007304055034183
     }
   },
   {
@@ -389,7 +404,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -407,16 +422,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 167,
+            "cached_tokens": 3725,
+            "completion_tokens": 268,
             "finish_reason": "stop",
-            "latency_s": 3.107994,
+            "latency_s": 3.213395,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3313,
-            "reasoning_tokens": 109
+            "prompt_tokens": 3728,
+            "reasoning_tokens": 192
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "相手はからかったり、意地悪で言ったりしていません。"
+          "reason": "相手がからかったかを尋ねる質問で、確定事実から判断できます。"
         }
       },
       "media_id": "local-U01",
@@ -424,18 +440,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 285,
-          "latency_s": 3.306476,
+          "cached_tokens": 2053,
+          "completion_tokens": 155,
+          "finish_reason": "stop",
+          "latency_s": 3.577551,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1959,
-          "reasoning_tokens": 258,
+          "prompt_tokens": 2072,
+          "reasoning_tokens": 124,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。からかってはいないよ。"
+        "text": "いいえ。ほかのことも聞いてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -443,17 +461,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "相手は男をからかって言ったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1080542230047286,
-      "luna_s": 3.1080542230047286,
-      "total_s": 6.415004130918533,
-      "writer_s": 3.306949907913804
+      "judge_s": 3.2134589860215783,
+      "luna_s": 3.2134589860215783,
+      "total_s": 6.895749413990416,
+      "writer_s": 3.6822904279688373
     }
   },
   {
@@ -465,7 +483,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -483,16 +501,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 200,
+            "cached_tokens": 3724,
+            "completion_tokens": 257,
             "finish_reason": "stop",
-            "latency_s": 3.956783,
+            "latency_s": 3.609578,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3312,
-            "reasoning_tokens": 129
+            "prompt_tokens": 3727,
+            "reasoning_tokens": 191
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、相手は友だちではないとされています。"
+          "reason": "相手は友人ではないと確定事実にあります。"
         }
       },
       "media_id": "local-U01",
@@ -500,18 +519,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 180,
-          "latency_s": 2.669378,
+          "cached_tokens": 0,
+          "completion_tokens": 106,
+          "finish_reason": "stop",
+          "latency_s": 3.487258,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1959,
-          "reasoning_tokens": 148,
+          "prompt_tokens": 2072,
+          "reasoning_tokens": 76,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。相手は男の友だちじゃないよ。"
+        "text": "いいえ。男の友だちではなかったよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -519,17 +540,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "相手は男の友だちだったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.9568310659378767,
-      "luna_s": 3.9568310659378767,
-      "total_s": 6.626673977938481,
-      "writer_s": 2.669842912000604
+      "judge_s": 3.609681703033857,
+      "luna_s": 3.609681703033857,
+      "total_s": 7.1073138670763,
+      "writer_s": 3.497632164042443
     }
   },
   {
@@ -541,7 +562,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -559,16 +580,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "irrelevant",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 147,
+            "cached_tokens": 3720,
+            "completion_tokens": 197,
             "finish_reason": "stop",
-            "latency_s": 3.32299,
+            "latency_s": 3.023797,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3308,
-            "reasoning_tokens": 73
+            "prompt_tokens": 3723,
+            "reasoning_tokens": 123
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男の職業は問題に関係ないと確定事実に明記されています。"
+          "reason": "男の職業は真相にも確定事実にも示されていません。"
         }
       },
       "media_id": "local-U01",
@@ -576,11 +598,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 108,
-          "latency_s": 1.882892,
+          "cached_tokens": 0,
+          "completion_tokens": 130,
+          "finish_reason": "stop",
+          "latency_s": 3.055286,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1954,
-          "reasoning_tokens": 75,
+          "prompt_tokens": 2067,
+          "reasoning_tokens": 97,
           "slot": "判定語 + 一言"
         },
         "guard": null,
@@ -595,17 +619,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男は会社員だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.3230529710417613,
-      "luna_s": 3.3230529710417613,
-      "total_s": 5.206450656056404,
-      "writer_s": 1.8833976850146428
+      "judge_s": 3.023885204922408,
+      "luna_s": 3.023885204922408,
+      "total_s": 6.170810733921826,
+      "writer_s": 3.146925528999418
     }
   },
   {
@@ -617,7 +641,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -635,16 +659,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 317,
+            "cached_tokens": 3735,
+            "completion_tokens": 192,
             "finish_reason": "stop",
-            "latency_s": 4.573146,
+            "latency_s": 2.936702,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3323,
-            "reasoning_tokens": 253
+            "prompt_tokens": 3738,
+            "reasoning_tokens": 118
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実に、以前影が濃くなってひどく落ち込んだとあります。"
+          "reason": "以前、影が濃くなったと分かり、男はひどく落ち込んでいました。"
         }
       },
       "media_id": "local-U01",
@@ -652,18 +677,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 128,
-          "latency_s": 1.978591,
+          "cached_tokens": 0,
+          "completion_tokens": 145,
+          "finish_reason": "stop",
+          "latency_s": 2.798069,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1969,
-          "reasoning_tokens": 102,
+          "prompt_tokens": 2082,
+          "reasoning_tokens": 118,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！次はどう聞こうか？"
+        "text": "はい！次も聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -671,17 +698,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男は以前、影が濃くなったと知って落ち込んだことある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.573197570978664,
-      "luna_s": 4.573197570978664,
-      "total_s": 6.55252514698077,
-      "writer_s": 1.979327576002106
+      "judge_s": 2.9367780199972913,
+      "luna_s": 2.9367780199972913,
+      "total_s": 5.735573969897814,
+      "writer_s": 2.798795949900523
     }
   },
   {
@@ -693,7 +720,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -711,16 +738,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 172,
+            "cached_tokens": 3734,
+            "completion_tokens": 205,
             "finish_reason": "stop",
-            "latency_s": 3.526835,
+            "latency_s": 2.789665,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3322,
-            "reasoning_tokens": 102
+            "prompt_tokens": 3737,
+            "reasoning_tokens": 148
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "相手が笑った理由を一つ尋ねており、確定事実から肯定できます。"
+          "reason": "相手が笑っていた理由として、確定事実に明記されています。"
         }
       },
       "media_id": "local-U01",
@@ -728,18 +756,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 114,
-          "latency_s": 1.852666,
+          "cached_tokens": 2053,
+          "completion_tokens": 105,
+          "finish_reason": "stop",
+          "latency_s": 1.824847,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1968,
-          "reasoning_tokens": 85,
+          "prompt_tokens": 2081,
+          "reasoning_tokens": 75,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -747,17 +777,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "相手が笑ったのは、男に良い知らせを伝えられたから？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.526904475991614,
-      "luna_s": 3.526904475991614,
-      "total_s": 5.380440074019134,
-      "writer_s": 1.8535355980275199
+      "judge_s": 2.7897639110451564,
+      "luna_s": 2.7897639110451564,
+      "total_s": 4.615959531045519,
+      "writer_s": 1.8261956200003624
     }
   },
   {
@@ -769,7 +799,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -787,16 +817,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 179,
+            "cached_tokens": 3731,
+            "completion_tokens": 274,
             "finish_reason": "stop",
-            "latency_s": 2.549677,
+            "latency_s": 3.470681,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3319,
-            "reasoning_tokens": 103
+            "prompt_tokens": 3734,
+            "reasoning_tokens": 194
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "相手の職業と影が薄くなった理由について、質問が二つあります。"
+          "reason": "医師かどうかと、影が薄くなった理由について二つ質問しています。"
         }
       },
       "media_id": "local-U01",
@@ -804,18 +835,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 169,
-          "latency_s": 3.608697,
+          "cached_tokens": 0,
+          "completion_tokens": 130,
+          "finish_reason": "stop",
+          "latency_s": 2.69533,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1965,
-          "reasoning_tokens": 126,
+          "prompt_tokens": 2078,
+          "reasoning_tokens": 96,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どちらかひとつにして聞いてごらん☺️"
+        "text": "質問は1つずつコメントしてね。どちらから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -823,17 +856,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "相手ってお医者さん？それで影が薄くなったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5497233199421316,
-      "luna_s": 2.5497233199421316,
-      "total_s": 6.160046775010414,
-      "writer_s": 3.610323455068283
+      "judge_s": 3.4707582949195057,
+      "luna_s": 3.4707582949195057,
+      "total_s": 6.167273646919057,
+      "writer_s": 2.696515351999551
     }
   },
   {
@@ -845,7 +878,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -863,16 +896,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 127,
+            "cached_tokens": 3729,
+            "completion_tokens": 101,
             "finish_reason": "stop",
-            "latency_s": 2.316749,
+            "latency_s": 3.209333,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3317,
-            "reasoning_tokens": 46
+            "prompt_tokens": 3732,
+            "reasoning_tokens": 33
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "「通っていた場所」と「相手の人物」の二つを尋ねているため。"
+          "reason": "通っていた場所と相手について、質問が二つあります。"
         }
       },
       "media_id": "local-U01",
@@ -880,18 +914,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 194,
-          "latency_s": 2.534798,
+          "cached_tokens": 2053,
+          "completion_tokens": 121,
+          "finish_reason": "stop",
+          "latency_s": 2.251873,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1963,
-          "reasoning_tokens": 153,
+          "prompt_tokens": 2076,
+          "reasoning_tokens": 85,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問はひとつずつコメントしてね。どちらか一つから聞いてごらん☺️"
+        "text": "質問はひとつずつコメントしてね。どっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -899,17 +935,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男はどこに通ってたの？相手は誰なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.316797856008634,
-      "luna_s": 2.316797856008634,
-      "total_s": 4.852685765945353,
-      "writer_s": 2.5358879099367186
+      "judge_s": 3.209392649005167,
+      "luna_s": 3.209392649005167,
+      "total_s": 5.46221183903981,
+      "writer_s": 2.252819190034643
     }
   },
   {
@@ -921,7 +957,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -939,16 +975,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 132,
+            "cached_tokens": 3734,
+            "completion_tokens": 122,
             "finish_reason": "stop",
-            "latency_s": 2.246647,
+            "latency_s": 2.011897,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3322,
-            "reasoning_tokens": 54
+            "prompt_tokens": 3737,
+            "reasoning_tokens": 45
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「なんで」と理由を尋ねており、はい・いいえでは答えられない質問です。"
+          "reason": "「なんで？」と理由を尋ねており、はい・いいえでは答えられません。"
         }
       },
       "media_id": "local-U01",
@@ -956,18 +993,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 307,
-          "latency_s": 4.183579,
+          "cached_tokens": 0,
+          "completion_tokens": 146,
+          "finish_reason": "stop",
+          "latency_s": 2.49743,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1968,
-          "reasoning_tokens": 268,
+          "prompt_tokens": 2081,
+          "reasoning_tokens": 111,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい／いいえで答えられる形にして、もう一度聞いてごらん。"
+        "text": "はい・いいえで答えられる形にして聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -975,17 +1014,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "なんで男はあんなに泣いて、何度も頭を下げたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.2467038659378886,
-      "luna_s": 2.2467038659378886,
-      "total_s": 6.430924967047758,
-      "writer_s": 4.18422110110987
+      "judge_s": 2.01195562700741,
+      "luna_s": 2.01195562700741,
+      "total_s": 4.52638256107457,
+      "writer_s": 2.51442693406716
     }
   },
   {
@@ -997,7 +1036,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1015,16 +1054,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 128,
+            "cached_tokens": 3727,
+            "completion_tokens": 174,
             "finish_reason": "stop",
-            "latency_s": 2.841569,
+            "latency_s": 2.258162,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3315,
-            "reasoning_tokens": 47
+            "prompt_tokens": 3730,
+            "reasoning_tokens": 90
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「どうして」と理由を尋ねており、はい・いいえでは答えられません。"
+          "reason": "「どうして」と理由を尋ねる質問で、はい・いいえでは答えられません。"
         }
       },
       "media_id": "local-U01",
@@ -1032,18 +1072,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 458,
-          "latency_s": 4.960761,
+          "cached_tokens": 2053,
+          "completion_tokens": 135,
+          "finish_reason": "stop",
+          "latency_s": 2.570717,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1961,
-          "reasoning_tokens": 404,
+          "prompt_tokens": 2074,
+          "reasoning_tokens": 99,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「相手が笑っていたのは何か理由があるの？」みたいに、はい・いいえで答えられる形で聞いてごらん。"
+        "text": "はい・いいえで答えられる形で聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1051,17 +1093,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "どうして相手もにこにこ笑ってたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.841617039986886,
-      "luna_s": 2.841617039986886,
-      "total_s": 7.803450183011591,
-      "writer_s": 4.961833143024705
+      "judge_s": 2.258232226013206,
+      "luna_s": 2.258232226013206,
+      "total_s": 4.8293767319992185,
+      "writer_s": 2.5711445059860125
     }
   },
   {
@@ -1073,7 +1115,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1091,12 +1133,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 260,
+            "cached_tokens": 3726,
+            "completion_tokens": 277,
             "finish_reason": "stop",
-            "latency_s": 3.891786,
+            "latency_s": 3.297481,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3314,
-            "reasoning_tokens": 173
+            "prompt_tokens": 3729,
+            "reasoning_tokens": 190
           },
           "error": null,
           "kind": "q_open",
@@ -1108,18 +1151,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 236,
-          "latency_s": 2.993729,
+          "cached_tokens": 2053,
+          "completion_tokens": 358,
+          "finish_reason": "stop",
+          "latency_s": 4.49919,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1960,
-          "reasoning_tokens": 194,
+          "prompt_tokens": 2073,
+          "reasoning_tokens": 311,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "誰のことか書いて、はい・いいえで答えられる質問にしてごらん。"
+        "text": "誰のことか分かるようにして、はい・いいえで答えられる形で聞いてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1127,17 +1172,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "あの人はそれを見て嬉しかったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.8918423489667475,
-      "luna_s": 3.8918423489667475,
-      "total_s": 6.8866568569792435,
-      "writer_s": 2.994814508012496
+      "judge_s": 3.2975156949833035,
+      "luna_s": 3.2975156949833035,
+      "total_s": 7.797150383004919,
+      "writer_s": 4.499634688021615
     }
   },
   {
@@ -1149,7 +1194,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1167,16 +1212,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 274,
+            "cached_tokens": 3774,
+            "completion_tokens": 225,
             "finish_reason": "stop",
-            "latency_s": 3.138285,
+            "latency_s": 2.520915,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3362,
-            "reasoning_tokens": 168
+            "prompt_tokens": 3777,
+            "reasoning_tokens": 111
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "レントゲンの病気の影と回復、主治医への感謝まで核心を正しく説明しています。"
+          "reason": "影をレントゲンの病気の跡とし、回復と感謝まで正しく推理しています。"
         }
       },
       "media_id": "local-U01",
@@ -1184,18 +1230,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 214,
-          "latency_s": 3.122359,
+          "cached_tokens": 0,
+          "completion_tokens": 306,
+          "finish_reason": "stop",
+          "latency_s": 3.915527,
           "model": "gpt-6-luna",
-          "prompt_tokens": 2008,
-          "reasoning_tokens": 145,
+          "prompt_tokens": 2121,
+          "reasoning_tokens": 234,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！影はレントゲンに写った肺の病気の跡だったんだ。薄くなったと聞いて、男はうれしくて泣き、主治医に感謝したんだよ。"
+        "text": "正解！「影」はレントゲンに写った肺の病気の跡だったんだ。病気が良くなったと知り、男はうれし涙を流して主治医に感謝したんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1203,17 +1251,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男の「影」はレントゲン写真に写った病気の跡で、3か月ぶりの診察で薄くなったと主治医に聞いて回復を喜び、治療への感謝で頭を下げたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1383339669555426,
-      "luna_s": 3.1383339669555426,
-      "total_s": 6.261596078868024,
-      "writer_s": 3.1232621119124815
+      "judge_s": 2.5210048489971086,
+      "luna_s": 2.5210048489971086,
+      "total_s": 6.43778159096837,
+      "writer_s": 3.916776741971262
     }
   },
   {
@@ -1225,7 +1273,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1243,16 +1291,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 237,
+            "cached_tokens": 3749,
+            "completion_tokens": 390,
             "finish_reason": "stop",
-            "latency_s": 3.100225,
+            "latency_s": 4.315314,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3337,
-            "reasoning_tokens": 133
+            "prompt_tokens": 3752,
+            "reasoning_tokens": 281
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "レントゲンの影と病気の回復を正しく結びつけています。"
+          "reason": "レントゲンの病気の影と、病気の回復を結びつけています。"
         }
       },
       "media_id": "local-U01",
@@ -1260,18 +1309,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 262,
-          "latency_s": 3.43986,
+          "cached_tokens": 2053,
+          "completion_tokens": 582,
+          "finish_reason": "stop",
+          "latency_s": 6.444941,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1983,
-          "reasoning_tokens": 186,
+          "prompt_tokens": 2096,
+          "reasoning_tokens": 500,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！「影」はレントゲン写真に写った肺の病気の跡で、薄くなったのは回復のしるしだよ。男はうれしくて、主治医に何度もお礼をしたんだ。"
+        "text": "正解！影はレントゲンに写る肺の病気の跡で、薄くなったのは病気が良くなった証拠だよ。男はうれし泣きして、主治医に何度も頭を下げたんだ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1279,17 +1330,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男の影はレントゲンに写る病気の跡で、主治医から回復の知らせを聞いて感謝した、ってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.100257847108878,
-      "luna_s": 3.100257847108878,
-      "total_s": 6.540873461053707,
-      "writer_s": 3.4406156139448285
+      "judge_s": 4.3154145770240575,
+      "luna_s": 4.3154145770240575,
+      "total_s": 10.761681623989716,
+      "writer_s": 6.446267046965659
     }
   },
   {
@@ -1301,7 +1352,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1319,12 +1370,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 459,
+            "cached_tokens": 3741,
+            "completion_tokens": 256,
             "finish_reason": "stop",
-            "latency_s": 4.723107,
+            "latency_s": 2.830933,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3329,
-            "reasoning_tokens": 395
+            "prompt_tokens": 3744,
+            "reasoning_tokens": 182
           },
           "error": null,
           "kind": "guess_close",
@@ -1336,18 +1388,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 137,
-          "latency_s": 2.221438,
+          "cached_tokens": 0,
+          "completion_tokens": 170,
+          "finish_reason": "stop",
+          "latency_s": 3.34237,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1975,
-          "reasoning_tokens": 104,
+          "prompt_tokens": 2088,
+          "reasoning_tokens": 143,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてみようか。"
+        "text": "惜しい！続きを考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1355,17 +1409,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "影ってレントゲンに写る影のことでしょ。男は医者に何か言われたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.723153045051731,
-      "luna_s": 4.723153045051731,
-      "total_s": 6.9453190041240305,
-      "writer_s": 2.2221659590722993
+      "judge_s": 2.8309683519182727,
+      "luna_s": 2.8309683519182727,
+      "total_s": 6.1796883079223335,
+      "writer_s": 3.348719956004061
     }
   },
   {
@@ -1377,7 +1431,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1395,16 +1449,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 317,
+            "cached_tokens": 3738,
+            "completion_tokens": 264,
             "finish_reason": "stop",
-            "latency_s": 4.001781,
+            "latency_s": 3.069671,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3326,
-            "reasoning_tokens": 216
+            "prompt_tokens": 3741,
+            "reasoning_tokens": 158
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "影が薄くなったことと病気の回復を結びつけています。"
+          "reason": "影が病気の回復を示すと結びつけ、核心の要点を両方当てています。"
         }
       },
       "media_id": "local-U01",
@@ -1412,18 +1467,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 266,
-          "latency_s": 2.701465,
+          "cached_tokens": 2053,
+          "completion_tokens": 258,
+          "finish_reason": "stop",
+          "latency_s": 3.55331,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1972,
-          "reasoning_tokens": 195,
+          "prompt_tokens": 2085,
+          "reasoning_tokens": 182,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！影はレントゲンに写った肺の病気の跡だったんだ。薄くなったのは病気が良くなってきた知らせで、男は主治医に感謝したんだよ。"
+        "text": "正解！影はレントゲンに写った肺の病気の跡で、薄くなったのは病気が良くなっている知らせだったんだ。男は喜んで、主治医に何度もお礼をしたよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1431,17 +1488,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "影が薄くなったのは、男の病気が良くなってきた知らせなんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.00183871795889,
-      "luna_s": 4.00183871795889,
-      "total_s": 6.706057399976999,
-      "writer_s": 2.7042186820181087
+      "judge_s": 3.0697064949199557,
+      "luna_s": 3.0697064949199557,
+      "total_s": 6.624145290930755,
+      "writer_s": 3.5544387960107997
     }
   },
   {
@@ -1453,7 +1510,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1471,16 +1528,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 189,
+            "cached_tokens": 3741,
+            "completion_tokens": 208,
             "finish_reason": "stop",
-            "latency_s": 3.177733,
+            "latency_s": 2.791553,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3329,
-            "reasoning_tokens": 124
+            "prompt_tokens": 3744,
+            "reasoning_tokens": 132
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "影を存在感と捉え、病状の回復にも触れていない推理です。"
+          "reason": "影を存在感、涙を悔し涙とする推理で、核心には触れていません。"
         }
       },
       "media_id": "local-U01",
@@ -1488,18 +1546,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 139,
-          "latency_s": 2.028166,
+          "cached_tokens": 0,
+          "completion_tokens": 107,
+          "finish_reason": "stop",
+          "latency_s": 2.10906,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1975,
-          "reasoning_tokens": 105,
+          "prompt_tokens": 2088,
+          "reasoning_tokens": 71,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。もう少し考えてみようか？"
+        "text": "残念、ちがうよ。別の可能性も考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1507,17 +1567,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男は存在感が薄いと嫌味を言われ、悔しくて泣きながら帰ったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1777570520062,
-      "luna_s": 3.1777570520062,
-      "total_s": 5.2070921789854765,
-      "writer_s": 2.0293351269792765
+      "judge_s": 2.7916250500129536,
+      "luna_s": 2.7916250500129536,
+      "total_s": 4.901575534022413,
+      "writer_s": 2.1099504840094596
     }
   },
   {
@@ -1529,7 +1589,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1547,16 +1607,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 179,
+            "cached_tokens": 3739,
+            "completion_tokens": 211,
             "finish_reason": "stop",
-            "latency_s": 2.702774,
+            "latency_s": 3.089328,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3327,
-            "reasoning_tokens": 111
+            "prompt_tokens": 3742,
+            "reasoning_tokens": 143
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "からかいや怒りの推理で、影の正体や病気の回復には触れていません。"
+          "reason": "影の正体や病状の改善に触れておらず、確定事実とも食い違います。"
         }
       },
       "media_id": "local-U01",
@@ -1564,18 +1625,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 94,
-          "latency_s": 1.846348,
+          "cached_tokens": 2053,
+          "completion_tokens": 103,
+          "finish_reason": "stop",
+          "latency_s": 2.229192,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1973,
-          "reasoning_tokens": 58,
+          "prompt_tokens": 2086,
+          "reasoning_tokens": 69,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。別の考え方もしてみようか？"
+        "text": "残念、ちがうよ。もう少し考えてみようか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1583,17 +1646,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "相手は男をからかって笑い、男は怒って何度も頭を下げたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.70286571898032,
-      "luna_s": 2.70286571898032,
-      "total_s": 4.55048680503387,
-      "writer_s": 1.8476210860535502
+      "judge_s": 3.089361925027333,
+      "luna_s": 3.089361925027333,
+      "total_s": 5.319112670957111,
+      "writer_s": 2.2297507459297776
     }
   },
   {
@@ -1605,7 +1668,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1623,16 +1686,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 271,
+            "cached_tokens": 3723,
+            "completion_tokens": 249,
             "finish_reason": "stop",
-            "latency_s": 3.42153,
+            "latency_s": 3.094233,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3311,
-            "reasoning_tokens": 199
+            "prompt_tokens": 3726,
+            "reasoning_tokens": 180
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で、影は男の存在感や性格ではないとされています。"
+          "reason": "「影」は存在感ではないと確定事実にあるため。"
         }
       },
       "media_id": "local-U01",
@@ -1640,11 +1704,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 47,
-          "latency_s": 1.432947,
+          "cached_tokens": 0,
+          "completion_tokens": 48,
+          "finish_reason": "stop",
+          "latency_s": 1.399838,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1955,
-          "reasoning_tokens": 27,
+          "prompt_tokens": 2068,
+          "reasoning_tokens": 28,
           "slot": "判定語だけ"
         },
         "guard": null,
@@ -1659,17 +1725,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "「影」って存在感のことなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.4216134960297495,
-      "luna_s": 3.4216134960297495,
-      "total_s": 4.855290889041498,
-      "writer_s": 1.4336773930117488
+      "judge_s": 3.0943614339921623,
+      "luna_s": 3.0943614339921623,
+      "total_s": 4.495197257958353,
+      "writer_s": 1.4008358239661902
     }
   },
   {
@@ -1681,7 +1747,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1699,16 +1765,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 755,
+            "cached_tokens": 3728,
+            "completion_tokens": 791,
             "finish_reason": "stop",
-            "latency_s": 8.229186,
+            "latency_s": 8.72859,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3316,
-            "reasoning_tokens": 679
+            "prompt_tokens": 3731,
+            "reasoning_tokens": 713
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "検査画像に写る影が薄くなったという見た目の変化です。"
+          "reason": "レントゲン画像上で影が薄くなった変化を指す質問です。"
         }
       },
       "media_id": "local-U01",
@@ -1716,18 +1783,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 119,
-          "latency_s": 1.857739,
+          "cached_tokens": 2053,
+          "completion_tokens": 260,
+          "finish_reason": "stop",
+          "latency_s": 2.99514,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1962,
-          "reasoning_tokens": 90,
+          "prompt_tokens": 2075,
+          "reasoning_tokens": 232,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！次の質問もしてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1735,17 +1804,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "影が薄くなったのは見た目の変化？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 8.229224128997885,
-      "luna_s": 8.229224128997885,
-      "total_s": 10.087581139057875,
-      "writer_s": 1.85835701005999
+      "judge_s": 8.72862776007969,
+      "luna_s": 8.72862776007969,
+      "total_s": 11.73021899512969,
+      "writer_s": 3.0015912350500003
     }
   },
   {
@@ -1757,7 +1826,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1775,16 +1844,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 149,
+            "cached_tokens": 3720,
+            "completion_tokens": 215,
             "finish_reason": "stop",
-            "latency_s": 2.580366,
+            "latency_s": 3.142876,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3308,
-            "reasoning_tokens": 76
+            "prompt_tokens": 3723,
+            "reasoning_tokens": 149
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "相手は男の主治医なので、医者かという質問への答えははいです。"
+          "reason": "真相では、相手は男の主治医です。"
         }
       },
       "media_id": "local-U01",
@@ -1792,11 +1862,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 128,
-          "latency_s": 2.173976,
+          "cached_tokens": 0,
+          "completion_tokens": 331,
+          "finish_reason": "stop",
+          "latency_s": 4.487107,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1955,
-          "reasoning_tokens": 101,
+          "prompt_tokens": 2068,
+          "reasoning_tokens": 304,
           "slot": "判定語 + 復唱"
         },
         "guard": null,
@@ -1811,17 +1883,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "相手は医者なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.5804278859868646,
-      "luna_s": 2.5804278859868646,
-      "total_s": 4.756379698985256,
-      "writer_s": 2.1759518129983917
+      "judge_s": 3.1429391539422795,
+      "luna_s": 3.1429391539422795,
+      "total_s": 7.630659150891006,
+      "writer_s": 4.4877199969487265
     }
   },
   {
@@ -1833,7 +1905,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1851,16 +1923,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 155,
+            "cached_tokens": 3726,
+            "completion_tokens": 189,
             "finish_reason": "stop",
-            "latency_s": 2.718679,
+            "latency_s": 2.768426,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3314,
-            "reasoning_tokens": 97
+            "prompt_tokens": 3729,
+            "reasoning_tokens": 112
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "真相に、病院へ通い治療を続けていたとあります。"
+          "reason": "真相では、男は病院に定期的に通い、治療を続けていました。"
         }
       },
       "media_id": "local-U01",
@@ -1868,11 +1941,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 46,
-          "latency_s": 1.507752,
+          "cached_tokens": 2051,
+          "completion_tokens": 37,
+          "finish_reason": "stop",
+          "latency_s": 1.413907,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1958,
-          "reasoning_tokens": 27,
+          "prompt_tokens": 2071,
+          "reasoning_tokens": 18,
           "slot": "判定語だけ"
         },
         "guard": null,
@@ -1887,17 +1962,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "男は何かの治療を受けてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.718736362992786,
-      "luna_s": 2.718736362992786,
-      "total_s": 4.227499602013268,
-      "writer_s": 1.5087632390204817
+      "judge_s": 2.768510826979764,
+      "luna_s": 2.768510826979764,
+      "total_s": 4.1830739449942484,
+      "writer_s": 1.4145631180144846
     }
   },
   {
@@ -1909,7 +1984,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -1927,16 +2002,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 584,
+            "cached_tokens": 3723,
+            "completion_tokens": 973,
             "finish_reason": "stop",
-            "latency_s": 7.239242,
+            "latency_s": 9.521597,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3311,
-            "reasoning_tokens": 509
+            "prompt_tokens": 3726,
+            "reasoning_tokens": 885
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "問題の状況が舞台や撮影の話かを尋ねる一つの質問です。"
+          "reason": "問題全体についての質問と読め、舞台や映像制作の話ではありません。"
         }
       },
       "media_id": "local-U01",
@@ -1944,18 +2020,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 167,
-          "latency_s": 2.609683,
+          "cached_tokens": 2053,
+          "completion_tokens": 212,
+          "finish_reason": "stop",
+          "latency_s": 3.300205,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1957,
-          "reasoning_tokens": 136,
+          "prompt_tokens": 2070,
+          "reasoning_tokens": 181,
           "slot": "判定語 + 一言"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかのことも聞いてみてね。"
+        "text": "いいえ。ほかのことも聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1963,17 +2041,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "これって舞台とか撮影の話？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 7.23928908596281,
-      "luna_s": 7.23928908596281,
-      "total_s": 9.850111574982293,
-      "writer_s": 2.6108224890194833
+      "judge_s": 9.52164701197762,
+      "luna_s": 9.52164701197762,
+      "total_s": 12.823095612926409,
+      "writer_s": 3.3014486009487882
     }
   },
   {
@@ -1985,7 +2063,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2003,16 +2081,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "completion_tokens": 283,
+            "cached_tokens": 3725,
+            "completion_tokens": 583,
             "finish_reason": "stop",
-            "latency_s": 4.031347,
+            "latency_s": 5.883486,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3313,
-            "reasoning_tokens": 218
+            "prompt_tokens": 3728,
+            "reasoning_tokens": 512
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "頭を下げたのは相手への感謝だと確定しています。"
+          "reason": "男が頭を下げたのは、相手への感謝を示すためです。"
         }
       },
       "media_id": "local-U01",
@@ -2020,11 +2099,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 43,
-          "latency_s": 1.146613,
+          "cached_tokens": 2051,
+          "completion_tokens": 42,
+          "finish_reason": "stop",
+          "latency_s": 1.54592,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1957,
-          "reasoning_tokens": 24,
+          "prompt_tokens": 2070,
+          "reasoning_tokens": 23,
           "slot": "判定語だけ"
         },
         "guard": null,
@@ -2039,17 +2120,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "相手にお礼を言ってるってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.031397258979268,
-      "luna_s": 4.031397258979268,
-      "total_s": 5.179039837908931,
-      "writer_s": 1.1476425789296627
+      "judge_s": 5.883554413099773,
+      "luna_s": 5.883554413099773,
+      "total_s": 7.429985581082292,
+      "writer_s": 1.5464311679825187
     }
   },
   {
@@ -2061,7 +2142,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2079,16 +2160,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 183,
+            "cached_tokens": 3763,
+            "completion_tokens": 304,
             "finish_reason": "stop",
-            "latency_s": 2.789527,
+            "latency_s": 3.85557,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3351,
-            "reasoning_tokens": 117
+            "prompt_tokens": 3766,
+            "reasoning_tokens": 245
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "影と病気の回復は当てていますが、相手を近所の人とする誤りがあります。"
+          "reason": "核心の二点は合っていますが、相手について明らかな誤りがあります。"
         }
       },
       "media_id": "local-U01",
@@ -2096,18 +2178,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 127,
-          "latency_s": 2.170411,
+          "cached_tokens": 2053,
+          "completion_tokens": 144,
+          "finish_reason": "stop",
+          "latency_s": 2.863849,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1997,
-          "reasoning_tokens": 98,
+          "prompt_tokens": 2110,
+          "reasoning_tokens": 111,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてみようか。"
+        "text": "惜しい！そのまま推理を続けてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2115,17 +2199,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "レントゲンの影が薄くなって病気は良くなったんだね。でも相手は治療してくれた医者じゃなくて、たまたま会った近所の人だったのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.7895863470621407,
-      "luna_s": 2.7895863470621407,
-      "total_s": 4.9610604220069945,
-      "writer_s": 2.171474074944854
+      "judge_s": 3.8556455599609762,
+      "luna_s": 3.8556455599609762,
+      "total_s": 6.7477508909069,
+      "writer_s": 2.892105330945924
     }
   },
   {
@@ -2137,7 +2221,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2155,16 +2239,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 571,
+            "cached_tokens": 3744,
+            "completion_tokens": 388,
             "finish_reason": "stop",
-            "latency_s": 5.936231,
+            "latency_s": 4.336228,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3332,
-            "reasoning_tokens": 455
+            "prompt_tokens": 3747,
+            "reasoning_tokens": 281
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "胸の画像の病変と治療による回復を述べ、二つの要点を満たしています。"
+          "reason": "胸の画像の病変と治療の効果を結びつけ、要点を満たしています。"
         }
       },
       "media_id": "local-U01",
@@ -2172,18 +2257,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 243,
-          "latency_s": 3.257559,
+          "cached_tokens": 2053,
+          "completion_tokens": 314,
+          "finish_reason": "stop",
+          "latency_s": 4.039505,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1978,
-          "reasoning_tokens": 181,
+          "prompt_tokens": 2091,
+          "reasoning_tokens": 237,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！影はレントゲンに写った肺の病気の跡だったんだ。薄くなったのは、治療で病気が良くなっていたからだよ。"
+        "text": "正解！レントゲンに写った肺の病気の影が薄くなり、病気が良くなっていたんだよ。男はうれしくて泣き、主治医に何度も頭を下げたんだね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2191,17 +2278,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "胸の画像に残っていた病変が目立たなくなり、治療が効いてきたと分かったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 5.936262132949196,
-      "luna_s": 5.936262132949196,
-      "total_s": 9.194345453986898,
-      "writer_s": 3.2580833210377023
+      "judge_s": 4.336302392999642,
+      "luna_s": 4.336302392999642,
+      "total_s": 8.376832938985899,
+      "writer_s": 4.0405305459862575
     }
   },
   {
@@ -2213,7 +2300,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2231,16 +2318,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 758,
+            "cached_tokens": 3749,
+            "completion_tokens": 520,
             "finish_reason": "stop",
-            "latency_s": 6.939161,
+            "latency_s": 4.444381,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3337,
-            "reasoning_tokens": 649
+            "prompt_tokens": 3752,
+            "reasoning_tokens": 410
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "肺の検査画像の異常と、病状の回復を結びつけています。"
+          "reason": "検査で見つかった肺の異常が薄れ、病状が快方に向かったと述べています。"
         }
       },
       "media_id": "local-U01",
@@ -2248,18 +2336,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 251,
-          "latency_s": 2.949481,
+          "cached_tokens": 2053,
+          "completion_tokens": 306,
+          "finish_reason": "stop",
+          "latency_s": 3.778872,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1983,
-          "reasoning_tokens": 180,
+          "prompt_tokens": 2096,
+          "reasoning_tokens": 236,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！レントゲンに写った肺の病気の影が薄くなり、病状が良くなっていたんだ。男は主治医に感謝して、うれし涙を流したんだよ。"
+        "text": "正解！レントゲンに写った肺の影が薄くなり、病気が良くなっていたんだ。男は主治医の知らせに喜び、何度も頭を下げたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2267,17 +2357,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "肺の検査で映った異常所見が軽くなり、男は病状が快方へ向かう知らせを受けたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 6.9392138560069725,
-      "luna_s": 6.9392138560069725,
-      "total_s": 9.889718752005138,
-      "writer_s": 2.950504895998165
+      "judge_s": 4.444456465076655,
+      "luna_s": 4.444456465076655,
+      "total_s": 8.224270602106117,
+      "writer_s": 3.7798141370294616
     }
   },
   {
@@ -2289,7 +2379,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2307,16 +2397,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 342,
+            "cached_tokens": 3743,
+            "completion_tokens": 465,
             "finish_reason": "stop",
-            "latency_s": 3.515279,
+            "latency_s": 4.807072,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3331,
-            "reasoning_tokens": 274
+            "prompt_tokens": 3746,
+            "reasoning_tokens": 402
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "病気の跡が検査画像で薄くなった点と、良い結果を聞いた点に触れています。"
+          "reason": "検査画像の影には触れていますが、病気の回復までは述べていません。"
         }
       },
       "media_id": "local-U01",
@@ -2324,18 +2415,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 171,
-          "latency_s": 2.548603,
+          "cached_tokens": 2053,
+          "completion_tokens": 220,
+          "finish_reason": "stop",
+          "latency_s": 3.689396,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1977,
-          "reasoning_tokens": 139,
+          "prompt_tokens": 2090,
+          "reasoning_tokens": 188,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！ほかの可能性も考えてみようか？"
+        "text": "惜しい！ほかの可能性も考えてみようか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2343,17 +2436,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "肺の病気の跡は検査画像で薄くなり、診察で良い結果を聞いたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.5153361989650875,
-      "luna_s": 3.5153361989650875,
-      "total_s": 6.065131186973304,
-      "writer_s": 2.549794988008216
+      "judge_s": 4.807119292905554,
+      "luna_s": 4.807119292905554,
+      "total_s": 8.497682839864865,
+      "writer_s": 3.6905635469593108
     }
   },
   {
@@ -2365,7 +2458,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2383,16 +2476,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 297,
+            "cached_tokens": 3753,
+            "completion_tokens": 636,
             "finish_reason": "stop",
-            "latency_s": 3.411419,
+            "latency_s": 6.524037,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3341,
-            "reasoning_tokens": 234
+            "prompt_tokens": 3756,
+            "reasoning_tokens": 563
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "影と病気の回復は当てていますが、相手について明らかな誤りがあります。"
+          "reason": "レントゲンの影と回復には触れていますが、相手を友人とする誤りがあります。"
         }
       },
       "media_id": "local-U01",
@@ -2400,163 +2494,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 148,
-          "latency_s": 2.303077,
+          "cached_tokens": 2053,
+          "completion_tokens": 144,
+          "finish_reason": "stop",
+          "latency_s": 10.04636,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1987,
-          "reasoning_tokens": 117,
-          "slot": "（この種別では使わない）"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！推理を続けてみようか☺️"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "肺の病変は画像に映る影で、体調は治療後よくなってきたんだ。でも相手は医者じゃなく友人だったのか。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.411445395904593,
-      "luna_s": 3.411445395904593,
-      "total_s": 5.715209487942047,
-      "writer_s": 2.3037640920374542
-    }
-  },
-  {
-    "case_id": "U01-k05",
-    "record": {
-      "comment_id": "U01-k05",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "001-faint-shadow",
-      "errors": [],
-      "fact_sheet_hash": "58478bf2d8f9",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 240,
-            "finish_reason": "stop",
-            "latency_s": 3.205166,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3327,
-            "reasoning_tokens": 172
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "検査で具合が良くなった点には触れていますが、影の正体までは述べていません。"
-        }
-      },
-      "media_id": "local-U01",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 186,
-          "latency_s": 2.728269,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1973,
-          "reasoning_tokens": 156,
-          "slot": "（この種別では使わない）"
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！推理を続けてみようか。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "病院で検査を受けたら、体の具合が前よりいいと分かったんだね。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
-      }
-    },
-    "timing": {
-      "jev_s": null,
-      "judge_s": 3.205221035052091,
-      "luna_s": 3.205221035052091,
-      "total_s": 5.93444676103536,
-      "writer_s": 2.7292257259832695
-    }
-  },
-  {
-    "case_id": "U01-k06",
-    "record": {
-      "comment_id": "U01-k06",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "luna",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
-        "reply_variant": "1b",
-        "shadow": false
-      },
-      "content_key": "001-faint-shadow",
-      "errors": [],
-      "fact_sheet_hash": "58478bf2d8f9",
-      "final": {
-        "answer": null,
-        "decision": "luna",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 845,
-            "finish_reason": "stop",
-            "latency_s": 9.874243,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3333,
-            "reasoning_tokens": 775
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "写真に関する推理ですが、友人が言ったという点が確定事実と異なります。"
-        }
-      },
-      "media_id": "local-U01",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "completion_tokens": 146,
-          "latency_s": 2.105452,
-          "model": "gpt-6-luna",
-          "prompt_tokens": 1979,
-          "reasoning_tokens": 117,
+          "prompt_tokens": 2100,
+          "reasoning_tokens": 115,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -2568,20 +2512,178 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "schema_version": 1,
       "set_code": "umigame-soup-1",
       "shadow_mismatch": null,
-      "text": "昔の集合写真で男の輪郭がぼんやり写っていて、久々に会った友人が気づいたんだ。",
+      "text": "肺の病変は画像に映る影で、体調は治療後よくなってきたんだ。でも相手は医者じゃなく友人だったのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 9.87429821898695,
-      "luna_s": 9.87429821898695,
-      "total_s": 11.980471679009497,
-      "writer_s": 2.1061734600225464
+      "judge_s": 6.524070366984233,
+      "luna_s": 6.524070366984233,
+      "total_s": 16.571163065964356,
+      "writer_s": 10.047092698980123
+    }
+  },
+  {
+    "case_id": "U01-k05",
+    "record": {
+      "comment_id": "U01-k05",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "001-faint-shadow",
+      "errors": [],
+      "fact_sheet_hash": "58478bf2d8f9",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cached_tokens": 3739,
+            "completion_tokens": 413,
+            "finish_reason": "stop",
+            "latency_s": 4.678049,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3742,
+            "reasoning_tokens": 350
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "検査や体調の改善には触れていますが、核心をすべて当ててはいません。"
+        }
+      },
+      "media_id": "local-U01",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 2053,
+          "completion_tokens": 99,
+          "finish_reason": "stop",
+          "latency_s": 2.419858,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2086,
+          "reasoning_tokens": 70,
+          "slot": "（この種別では使わない）"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し考えてみようか。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "病院で検査を受けたら、体の具合が前よりいいと分かったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 4.678080355050042,
+      "luna_s": 4.678080355050042,
+      "total_s": 7.098806070047431,
+      "writer_s": 2.4207257149973884
+    }
+  },
+  {
+    "case_id": "U01-k06",
+    "record": {
+      "comment_id": "U01-k06",
+      "commenter_id": "probe",
+      "config": {
+        "consensus": false,
+        "judge_mode": "luna",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b",
+        "shadow": false
+      },
+      "content_key": "001-faint-shadow",
+      "errors": [],
+      "fact_sheet_hash": "58478bf2d8f9",
+      "final": {
+        "answer": null,
+        "decision": "luna",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "jev": null,
+        "luna": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cached_tokens": 3745,
+            "completion_tokens": 273,
+            "finish_reason": "stop",
+            "latency_s": 3.598829,
+            "model": "gpt-6-luna",
+            "prompt_tokens": 3748,
+            "reasoning_tokens": 206
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "集合写真の写り方は核心の影に触れておらず、相手も友人ではありません。"
+        }
+      },
+      "media_id": "local-U01",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cached_tokens": 2053,
+          "completion_tokens": 125,
+          "finish_reason": "stop",
+          "latency_s": 2.305739,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2092,
+          "reasoning_tokens": 89,
+          "slot": "（この種別では使わない）"
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。別の可能性も考えてみようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "shadow_mismatch": null,
+      "text": "昔の集合写真で男の輪郭がぼんやり写っていて、久々に会った友人が気づいたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-08T18:25:22Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-08T18:25:22Z"
+      }
+    },
+    "timing": {
+      "jev_s": null,
+      "judge_s": 3.5989211701089516,
+      "luna_s": 3.5989211701089516,
+      "total_s": 5.905907706124708,
+      "writer_s": 2.3069865360157564
     }
   },
   {
@@ -2593,7 +2695,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2613,22 +2715,33 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": "レントゲン",
           "debug": {
-            "completion_tokens": 229,
+            "cached_tokens": 3718,
+            "completion_tokens": 147,
             "finish_reason": "stop",
-            "latency_s": 2.897062,
+            "latency_s": 2.710205,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3306,
-            "reasoning_tokens": 135
+            "prompt_tokens": 3721,
+            "reasoning_tokens": 67
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語句だけのコメントなので、はい・いいえで答えられない質問として扱います。"
+          "reason": "「レントゲン？」だけで述語がなく、質問の内容を一意に判断できません。"
         }
       },
       "media_id": "local-U01",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 403,
+          "finish_reason": "stop",
+          "latency_s": 5.391567,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2069,
+          "reasoning_tokens": 360,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2641,17 +2754,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "レントゲン？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.8971384830074385,
-      "luna_s": 2.8971384830074385,
-      "total_s": 7.086954436963424,
-      "writer_s": 4.189815953955986
+      "judge_s": 2.7110886280424893,
+      "luna_s": 2.7110886280424893,
+      "total_s": 8.104056156123988,
+      "writer_s": 5.392967528081499
     }
   },
   {
@@ -2663,14 +2776,12 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
       "content_key": "001-faint-shadow",
-      "errors": [
-        "writer: writer did not ask what bare_term means"
-      ],
+      "errors": [],
       "fact_sheet_hash": "58478bf2d8f9",
       "final": {
         "answer": null,
@@ -2683,27 +2794,38 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": "病院",
           "debug": {
-            "completion_tokens": 199,
+            "cached_tokens": 3715,
+            "completion_tokens": 165,
             "finish_reason": "stop",
-            "latency_s": 2.617854,
+            "latency_s": 2.533952,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3303,
-            "reasoning_tokens": 128
+            "prompt_tokens": 3718,
+            "reasoning_tokens": 91
           },
           "error": null,
           "kind": "q_open",
-          "reason": "名詞だけのコメントなので、質問内容が一意に定まりません。"
+          "reason": "名詞だけのコメントで、質問や推理の内容が特定できません。"
         }
       },
       "media_id": "local-U01",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 430,
+          "finish_reason": "stop",
+          "latency_s": 3.983487,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2065,
+          "reasoning_tokens": 385,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "fallback_template",
-        "text": "病院がどうしたのか聞かせてね。"
+        "source": "llm",
+        "text": "病院の何が気になるのかな？ はい／いいえで答えられる形で聞いてみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2711,17 +2833,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "病院",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.6178989430190995,
-      "luna_s": 2.6178989430190995,
-      "total_s": 13.665065897046588,
-      "writer_s": 11.047166954027489
+      "judge_s": 2.534046720014885,
+      "luna_s": 2.534046720014885,
+      "total_s": 6.518654236104339,
+      "writer_s": 3.9846075160894543
     }
   },
   {
@@ -2733,7 +2855,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2753,22 +2875,33 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": "影",
           "debug": {
-            "completion_tokens": 174,
+            "cached_tokens": 3715,
+            "completion_tokens": 148,
             "finish_reason": "stop",
-            "latency_s": 2.975855,
+            "latency_s": 2.931977,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3303,
-            "reasoning_tokens": 89
+            "prompt_tokens": 3718,
+            "reasoning_tokens": 77
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない名詞だけのコメントなので、はい・いいえで答えられません。"
+          "reason": "述語のない語句だけのコメントなので、質問の形を確認します。"
         }
       },
       "media_id": "local-U01",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "cached_tokens": 0,
+          "completion_tokens": 437,
+          "finish_reason": "stop",
+          "latency_s": 4.524509,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2064,
+          "reasoning_tokens": 396,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2781,17 +2914,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "影？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 2.9758787259925157,
-      "luna_s": 2.9758787259925157,
-      "total_s": 8.384798929910176,
-      "writer_s": 5.40892020391766
+      "judge_s": 2.9320711819455028,
+      "luna_s": 2.9320711819455028,
+      "total_s": 7.457700467901304,
+      "writer_s": 4.525629285955802
     }
   },
   {
@@ -2803,7 +2936,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2821,16 +2954,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 169,
+            "cached_tokens": 0,
+            "completion_tokens": 227,
             "finish_reason": "stop",
-            "latency_s": 3.178323,
+            "latency_s": 3.119143,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3305,
-            "reasoning_tokens": 91
+            "prompt_tokens": 3720,
+            "reasoning_tokens": 142
           },
           "error": null,
           "kind": "ask_hint",
-          "reason": "ヒントを求めているため、質問で絞るよう促します。"
+          "reason": "ヒントを求めているため、直接は明かさず質問で絞るよう促します。"
         }
       },
       "media_id": "local-U01",
@@ -2838,18 +2972,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 200,
-          "latency_s": 2.966449,
+          "cached_tokens": 0,
+          "completion_tokens": 209,
+          "finish_reason": "stop",
+          "latency_s": 2.481149,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1951,
-          "reasoning_tokens": 161,
+          "prompt_tokens": 2064,
+          "reasoning_tokens": 158,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ヒントは出せないけど、質問で少しずつ絞っていこうね！"
+        "text": "ヒントは出せないけど、質問で少しずつ絞っていこうか。はい・いいえで聞いてごらん☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2857,17 +2993,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "ヒントください！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.1783955650171265,
-      "luna_s": 3.1783955650171265,
-      "total_s": 6.145775843993761,
-      "writer_s": 2.967380278976634
+      "judge_s": 3.119196417974308,
+      "luna_s": 3.119196417974308,
+      "total_s": 5.62687472300604,
+      "writer_s": 2.5076783050317317
     }
   },
   {
@@ -2879,7 +3015,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2889,7 +3025,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "final": {
         "answer": null,
         "decision": "luna",
-        "kind": "ask_howto"
+        "kind": "q_multi"
       },
       "judgements": {
         "jev": null,
@@ -2897,16 +3033,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 289,
+            "cached_tokens": 3709,
+            "completion_tokens": 418,
             "finish_reason": "stop",
-            "latency_s": 3.366508,
+            "latency_s": 4.965777,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3313,
-            "reasoning_tokens": 212
+            "prompt_tokens": 3728,
+            "reasoning_tokens": 342
           },
           "error": null,
-          "kind": "ask_howto",
-          "reason": "アカウントが自動応答かどうかを尋ねています。"
+          "kind": "q_multi",
+          "reason": "「中の人か」と「自動返信か」の質問が二つあります。"
         }
       },
       "media_id": "local-U01",
@@ -2914,18 +3051,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 167,
-          "latency_s": 2.365333,
+          "cached_tokens": 2053,
+          "completion_tokens": 144,
+          "finish_reason": "stop",
+          "latency_s": 2.214787,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1961,
-          "reasoning_tokens": 128,
+          "prompt_tokens": 2072,
+          "reasoning_tokens": 108,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい / いいえで答えられる質問をコメントしてね。私が答えるよ！"
+        "text": "質問はひとつずつコメントしてね。どっちから聞こうか？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2933,17 +3072,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "これ中の人？自動で返してる？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 3.366534395958297,
-      "luna_s": 3.366534395958297,
-      "total_s": 5.732996367965825,
-      "writer_s": 2.366461972007528
+      "judge_s": 4.965850246953778,
+      "luna_s": 4.965850246953778,
+      "total_s": 7.182058899896219,
+      "writer_s": 2.2162086529424414
     }
   },
   {
@@ -2955,7 +3094,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -2973,16 +3112,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 201,
+            "cached_tokens": 3709,
+            "completion_tokens": 120,
             "finish_reason": "stop",
-            "latency_s": 4.046514,
+            "latency_s": 2.151141,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3312,
-            "reasoning_tokens": 140
+            "prompt_tokens": 3727,
+            "reasoning_tokens": 63
           },
           "error": null,
           "kind": "cheer",
-          "reason": "いつも見ているという好意と、頑張ってという応援のコメントです。"
+          "reason": "応援の言葉なので、励ましへのお礼を返します。"
         }
       },
       "media_id": "local-U01",
@@ -2990,18 +3130,20 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 96,
-          "latency_s": 2.608351,
+          "cached_tokens": 0,
+          "completion_tokens": 107,
+          "finish_reason": "stop",
+          "latency_s": 3.154024,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1957,
-          "reasoning_tokens": 64,
+          "prompt_tokens": 2070,
+          "reasoning_tokens": 79,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いつもありがとう！これからも楽しんでいこうね☺️"
+        "text": "いつもありがとう！がんばるね☺️"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -3009,17 +3151,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "いつも見てるよ、がんばって",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.046560668037273,
-      "luna_s": 4.046560668037273,
-      "total_s": 6.656038800952956,
-      "writer_s": 2.609478132915683
+      "judge_s": 2.151210659998469,
+      "luna_s": 2.151210659998469,
+      "total_s": 5.306232239934616,
+      "writer_s": 3.1550215799361467
     }
   },
   {
@@ -3031,7 +3173,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -3049,16 +3191,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 291,
+            "cached_tokens": 3709,
+            "completion_tokens": 302,
             "finish_reason": "stop",
-            "latency_s": 4.555341,
+            "latency_s": 3.865965,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3315,
-            "reasoning_tokens": 223
+            "prompt_tokens": 3730,
+            "reasoning_tokens": 232
           },
           "error": null,
           "kind": "complaint",
-          "reason": "答えを聞いても納得できないという、問題への否定的な指摘です。"
+          "reason": "答えが腑に落ちない可能性を示し、問題への不満を述べているため。"
         }
       },
       "media_id": "local-U01",
@@ -3066,11 +3209,13 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "completion_tokens": 96,
-          "latency_s": 1.760008,
+          "cached_tokens": 0,
+          "completion_tokens": 76,
+          "finish_reason": "stop",
+          "latency_s": 1.516648,
           "model": "gpt-6-luna",
-          "prompt_tokens": 1960,
-          "reasoning_tokens": 69,
+          "prompt_tokens": 2073,
+          "reasoning_tokens": 49,
           "slot": "（この種別では使わない）"
         },
         "guard": null,
@@ -3085,17 +3230,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "答えを聞いても腑に落ちないかも",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 4.55539500399027,
-      "luna_s": 4.55539500399027,
-      "total_s": 6.316737787914462,
-      "writer_s": 1.7613427839241922
+      "judge_s": 3.8660542720463127,
+      "luna_s": 3.8660542720463127,
+      "total_s": 5.383147133979946,
+      "writer_s": 1.5170928619336337
     }
   },
   {
@@ -3107,7 +3252,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -3125,16 +3270,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 83,
+            "cached_tokens": 3709,
+            "completion_tokens": 99,
             "finish_reason": "stop",
-            "latency_s": 1.717965,
+            "latency_s": 2.189535,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3307,
-            "reasoning_tokens": 29
+            "prompt_tokens": 3722,
+            "reasoning_tokens": 42
           },
           "error": null,
           "kind": "troll",
-          "reason": "意味を読み取れない文字列のため、荒らしとして判定しました。"
+          "reason": "意味の取れない英字の文字列で、質問や推理として判別できません。"
         }
       },
       "media_id": "local-U01",
@@ -3153,17 +3299,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "QWERTYZZZ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.7181445920141414,
-      "luna_s": 1.7181445920141414,
-      "total_s": 1.7181742860702798,
-      "writer_s": 2.9694056138396263e-05
+      "judge_s": 2.189569605048746,
+      "luna_s": 2.189569605048746,
+      "total_s": 2.189584115985781,
+      "writer_s": 1.451093703508377e-05
     }
   },
   {
@@ -3175,7 +3321,7 @@ window.PROBE_RAW["luna-1b/U01"] = [
         "consensus": false,
         "judge_mode": "luna",
         "luna_model": "gpt-6-luna",
-        "prompt_version": "cc9071fb8900",
+        "prompt_version": "9c2045d7fa0d",
         "reply_variant": "1b",
         "shadow": false
       },
@@ -3193,16 +3339,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "completion_tokens": 91,
+            "cached_tokens": 3709,
+            "completion_tokens": 96,
             "finish_reason": "stop",
-            "latency_s": 1.982427,
+            "latency_s": 3.787766,
             "model": "gpt-6-luna",
-            "prompt_tokens": 3314,
-            "reasoning_tokens": 40
+            "prompt_tokens": 3729,
+            "reasoning_tokens": 46
           },
           "error": null,
           "kind": "personal_info",
-          "reason": "電話番号と思われる個人情報がコメントに含まれています。"
+          "reason": "電話番号と思われる個人情報が含まれているため。"
         }
       },
       "media_id": "local-U01",
@@ -3221,17 +3368,17 @@ window.PROBE_RAW["luna-1b/U01"] = [
       "text": "連絡先これです 090-0000-0001",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T18:25:22Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T18:25:22Z"
       }
     },
     "timing": {
       "jev_s": null,
-      "judge_s": 1.9824771420098841,
-      "luna_s": 1.9824771420098841,
-      "total_s": 1.9824811629951,
-      "writer_s": 4.0209852159023285e-06
+      "judge_s": 3.7878503859974444,
+      "luna_s": 3.7878503859974444,
+      "total_s": 3.7878562080441043,
+      "writer_s": 5.822046659886837e-06
     }
   }
 ];
