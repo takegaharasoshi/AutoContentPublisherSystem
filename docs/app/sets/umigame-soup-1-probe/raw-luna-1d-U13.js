@@ -43,6 +43,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 138,
+          "latency_s": 2.047892,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1430,
+          "reasoning_tokens": 101,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -55,9 +63,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙って男の家のポストに届いたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -111,6 +119,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 24,
+          "latency_s": 1.527841,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1432,
+          "reasoning_tokens": 0,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -123,9 +139,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "郵便屋さんが何十年もかけて配達したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -179,6 +195,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 29,
+          "latency_s": 1.147406,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1426,
+          "reasoning_tokens": 10,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -191,9 +215,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "学校の行事で書かれた手紙なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -247,6 +271,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 27,
+          "latency_s": 1.074178,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1426,
+          "reasoning_tokens": 8,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -259,9 +291,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "あとで読まれるように保管されてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -315,6 +347,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 59,
+          "latency_s": 1.53761,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1428,
+          "reasoning_tokens": 29,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -327,9 +367,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "書いた男の子って、男の息子なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -383,6 +423,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 162,
+          "latency_s": 2.520669,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1425,
+          "reasoning_tokens": 133,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -395,9 +443,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "その子は有名人だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -451,6 +499,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 152,
+          "latency_s": 2.348271,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1427,
+          "reasoning_tokens": 120,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -463,9 +519,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男はその子に会ったことがある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -519,6 +575,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 70,
+          "latency_s": 1.690979,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1434,
+          "reasoning_tokens": 40,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -531,9 +595,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙に書かれてた夢の内容って、答えに関係ある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -587,6 +651,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 129,
+          "latency_s": 2.499896,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1430,
+          "reasoning_tokens": 96,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -599,9 +671,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙の宛先は男で合ってたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -655,6 +727,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 14,
+          "latency_s": 1.203715,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1426,
+          "reasoning_tokens": 0,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -667,9 +747,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男は手紙を読んで驚いてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -723,6 +803,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 57,
+          "latency_s": 1.531081,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1429,
+          "reasoning_tokens": 19,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -735,9 +823,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙はいつ書いたの？誰が書いたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -791,6 +879,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 97,
+          "latency_s": 2.108558,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1436,
+          "reasoning_tokens": 54,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -803,9 +899,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "どこで手紙を受け取ったの？それは郵便で届いたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -859,6 +955,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 104,
+          "latency_s": 2.142576,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1435,
+          "reasoning_tokens": 67,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -871,9 +975,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "なぜ男は、その子がどんな子か誰よりよく知っていたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -927,6 +1031,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 153,
+          "latency_s": 2.286341,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1431,
+          "reasoning_tokens": 117,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -939,9 +1051,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "どうして男はその子に一度も会っていないの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -995,6 +1107,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 69,
+          "latency_s": 1.713505,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1426,
+          "reasoning_tokens": 39,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1007,9 +1127,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "その子は彼に会ったことがある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1075,9 +1195,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男が小学生のころ、未来の自分宛てに書いた手紙を学校のタイムカプセルに入れ、50年後の同窓会で受け取った。書いた子は昔の男自身だからよく知っているし、自分には会えなかったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1143,9 +1263,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "小学生の男が未来の自分に宛てて書いた手紙を、学校のタイムカプセルから同窓会で受け取った。書いた子は昔の自分だから、誰より知っていても会ったことはないってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1199,6 +1319,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 27,
+          "latency_s": 1.742958,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1444,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1211,9 +1339,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "学校で書かれた古い手紙が何十年も保管されていて、男に渡ったんじゃない？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1267,6 +1395,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 72,
+          "latency_s": 2.398284,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1433,
+          "reasoning_tokens": 43,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1279,9 +1415,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙を書いた男の子って、昔の男自身なんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1335,6 +1471,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 75,
+          "latency_s": 1.455824,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1438,
+          "reasoning_tokens": 39,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1347,9 +1491,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "郵便局が配達を忘れていて、50年後に遅れて届けたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1403,6 +1547,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 30,
+          "latency_s": 1.225656,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1444,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1415,9 +1567,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙を書いたのは男の息子で、男はその子のことを周りから聞いて知ったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1471,6 +1623,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 197,
+          "latency_s": 2.710608,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1426,
+          "reasoning_tokens": 168,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1483,9 +1643,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙は郵便で届いたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1539,6 +1699,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 62,
+          "latency_s": 1.196898,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1424,
+          "reasoning_tokens": 32,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1551,9 +1719,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男はその子の父親なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1607,6 +1775,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 28,
+          "latency_s": 1.126592,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1426,
+          "reasoning_tokens": 8,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1619,9 +1795,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "仕事を通じてその子を知ってたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1675,6 +1851,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 23,
+          "latency_s": 1.115867,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1426,
+          "reasoning_tokens": 0,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1687,9 +1871,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙が届く前から知ってた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1743,6 +1927,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 31,
+          "latency_s": 1.272073,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1423,
+          "reasoning_tokens": 9,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1755,9 +1947,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男はその子の主治医なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1811,6 +2003,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 29,
+          "latency_s": 1.279312,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1422,
+          "reasoning_tokens": 10,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1823,9 +2023,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "その子は実在する子なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1879,6 +2079,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 40,
+          "latency_s": 2.523636,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1420,
+          "reasoning_tokens": 18,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1891,9 +2099,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "男は有名人なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1959,9 +2167,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "書き手は幼い頃の男自身で、学校の記念箱を掘り出して未来向けの手紙が届いたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2027,9 +2235,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙の少年は昔の男で、校内の埋蔵企画に将来読むものとして預けられていたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2083,6 +2291,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 69,
+          "latency_s": 1.670005,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1453,
+          "reasoning_tokens": 37,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2095,9 +2311,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "書き手は男が子どもだった頃の本人で、何十年も経ってから学校の記念行事で手紙が渡ったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2151,6 +2367,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 24,
+          "latency_s": 1.276004,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1447,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2163,9 +2387,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙を書いた子は同じ学校の卒業生で、将来用に埋めておいた箱から届いたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2219,6 +2443,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 27,
+          "latency_s": 1.286801,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1447,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2231,9 +2463,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙は古い学校の記念品で、何十年も保管されてから男の手元に来たんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2287,6 +2519,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 80,
+          "latency_s": 1.481484,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1444,
+          "reasoning_tokens": 43,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2299,9 +2539,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "住所を間違えていた昔の手紙が、郵便局から何十年も遅れて届いたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2369,9 +2609,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "タイムカプセル",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2439,9 +2679,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "同窓会？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2509,9 +2749,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "手紙？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2565,6 +2805,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 33,
+          "latency_s": 1.270577,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1423,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2577,9 +2825,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "考え方のヒントある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2633,6 +2881,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 30,
+          "latency_s": 1.82524,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1424,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2645,9 +2901,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "毎回考えちゃう、面白い",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2701,6 +2957,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 75,
+          "latency_s": 1.822538,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1421,
+          "reasoning_tokens": 42,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2713,9 +2977,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "今日めっちゃ暑いね",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2769,6 +3033,14 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 70,
+          "latency_s": 3.046692,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1426,
+          "reasoning_tokens": 40,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2781,9 +3053,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "最近ちょっと難しすぎるかも…",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2849,9 +3121,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "あああ???ぴょ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2917,9 +3189,9 @@ window.PROBE_RAW["luna-1d/U13"] = [
       "text": "住所は東京都テスト区サンプル町000-0000です",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {

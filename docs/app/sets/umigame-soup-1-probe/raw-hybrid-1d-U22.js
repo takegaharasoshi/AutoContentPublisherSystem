@@ -88,6 +88,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 78,
+          "latency_s": 1.452313,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1443,
+          "reasoning_tokens": 44,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -100,9 +108,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "男は半年ごとに定期検診を受けてるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -201,6 +209,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 178,
+          "latency_s": 2.483008,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1447,
+          "reasoning_tokens": 136,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -213,9 +229,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "歯医者に通うのは、歯の治療が目的じゃないんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -314,6 +330,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 89,
+          "latency_s": 1.895914,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1443,
+          "reasoning_tokens": 57,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -326,9 +350,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "その歯医者は男の昔からのかかりつけですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -427,6 +451,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 68,
+          "latency_s": 1.281381,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1443,
+          "reasoning_tokens": 39,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -439,9 +471,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "男は診察のあと誰かが来るのを待っているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -540,6 +572,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 109,
+          "latency_s": 1.7352,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1439,
+          "reasoning_tokens": 77,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -552,9 +592,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "同じ席に座ることに意味があるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -653,6 +693,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 27,
+          "latency_s": 1.085738,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1444,
+          "reasoning_tokens": 0,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -665,9 +713,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "男は毎回、歯医者の人と話をして帰るんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -766,6 +814,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 35,
+          "latency_s": 1.233854,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1436,
+          "reasoning_tokens": 13,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -778,9 +834,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "その町に家族や友人が住んでいますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -879,6 +935,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 36,
+          "latency_s": 1.151842,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1445,
+          "reasoning_tokens": 14,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -891,9 +955,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "歯医者に行くのは電車じゃないといけない理由があるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -992,6 +1056,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 102,
+          "latency_s": 1.369155,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1442,
+          "reasoning_tokens": 69,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1004,9 +1076,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "待合室にいる時間のほうが診察より長いんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1105,6 +1177,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 64,
+          "latency_s": 1.299092,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1437,
+          "reasoning_tokens": 36,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1117,9 +1197,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "その歯医者の建物は木造ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1206,6 +1286,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 89,
+          "latency_s": 1.874342,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1448,
+          "reasoning_tokens": 47,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1218,9 +1306,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "男は歯の検診に来てるの？診察後は誰かを待ってるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1307,6 +1395,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 75,
+          "latency_s": 1.761988,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1446,
+          "reasoning_tokens": 35,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1319,9 +1415,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "同じ席に座るのは昔から？その席に何か思い出があるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1409,6 +1505,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 89,
+          "latency_s": 1.868801,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1441,
+          "reasoning_tokens": 51,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1421,9 +1525,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "男はどうして遠くの歯医者に通ってるんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1511,6 +1615,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 241,
+          "latency_s": 3.438896,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1444,
+          "reasoning_tokens": 194,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1523,9 +1635,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "診察が終わったあと、待合室で誰を待っているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1613,6 +1725,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 155,
+          "latency_s": 2.530953,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1443,
+          "reasoning_tokens": 114,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1625,9 +1745,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "その町や歯医者と男にはどんな関係があるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1728,9 +1848,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "歯医者は男が子どものころ住んでた家だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1831,9 +1951,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "歯医者になっていたのは男が育った家なんだね。懐かしい家の中に入るために、検診のたび待合室に残ってたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1921,6 +2041,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 67,
+          "latency_s": 1.477865,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1449,
+          "reasoning_tokens": 38,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1933,9 +2061,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "その歯医者の建物って、男が昔なにか関わってた場所なんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2024,6 +2152,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 95,
+          "latency_s": 1.774695,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1478,
+          "reasoning_tokens": 62,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2036,9 +2172,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "歯医者は男が育った家で、待合室の柱の傷も残ってたんだね。あの背丈の傷は父親じゃなくて、歯医者を開いた人が刻んだのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2138,6 +2274,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 31,
+          "latency_s": 1.167072,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1454,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2150,9 +2294,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "昔から通ってる先生に会いたくて、診察を口実に半年ごとに訪ねてるんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2246,6 +2390,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 30,
+          "latency_s": 1.075256,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1450,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2258,9 +2410,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "待合室の席に忘れ物をしていて、診察のたびに探してるんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2361,9 +2513,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "通っている歯科医院は、男が幼い頃に家族と暮らしていた建物を使っているんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2464,9 +2616,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "歯科医院の建物は、男が子どもの時に過ごした生まれた家そのものだったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2554,6 +2706,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 83,
+          "latency_s": 1.630952,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1451,
+          "reasoning_tokens": 54,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2566,9 +2726,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "男には歯医者の建物が、子ども時代の思い出につながる場所なんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2656,6 +2816,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 82,
+          "latency_s": 1.944305,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1456,
+          "reasoning_tokens": 52,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2668,9 +2836,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "男が昔住んでいた家の跡地に医院が建ち、柱の傷だけが思い出として残ってるんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2758,6 +2926,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 27,
+          "latency_s": 1.195712,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1452,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2770,9 +2946,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "待合室の柱の傷は、男の幼い頃を思い出させる手がかりなんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2866,6 +3042,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 80,
+          "latency_s": 1.77599,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1457,
+          "reasoning_tokens": 43,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2878,9 +3062,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "男は昔から憧れていた歯科医師と話すため、痛くない歯の診察も受けてるんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2971,9 +3155,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "生家の歯医者？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -3064,9 +3248,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "引っ越し",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -3149,6 +3333,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 109,
+          "latency_s": 1.831029,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1431,
+          "reasoning_tokens": 63,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -3161,9 +3353,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "正解は何なん？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -3250,6 +3442,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 90,
+          "latency_s": 1.838241,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1425,
+          "reasoning_tokens": 60,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -3262,9 +3462,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "こんちは！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -3351,6 +3551,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 76,
+          "latency_s": 2.092608,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1432,
+          "reasoning_tokens": 51,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -3363,9 +3571,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "動物が出てくるやつ希望",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -3433,6 +3641,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 73,
+          "latency_s": 1.944905,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1427,
+          "reasoning_tokens": 44,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -3445,9 +3661,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "🤔💭",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -3543,9 +3759,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "性的なことばっか考えてそうでキモい",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -3628,6 +3844,14 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 58,
+          "latency_s": 1.34215,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1425,
+          "reasoning_tokens": 34,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -3640,9 +3864,9 @@ window.PROBE_RAW["hybrid-1d/U22"] = [
       "text": "答案是什么？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {

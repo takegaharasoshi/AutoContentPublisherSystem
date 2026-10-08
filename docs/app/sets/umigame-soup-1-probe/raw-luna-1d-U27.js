@@ -43,6 +43,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 63,
+          "latency_s": 1.818651,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1436,
+          "reasoning_tokens": 34,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -55,9 +63,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "男は本物の車を公道で運転しているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -111,6 +119,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 200,
+          "latency_s": 2.578161,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1439,
+          "reasoning_tokens": 160,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -123,9 +139,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "妻や子どもたちの誰かが運転席にいるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -179,6 +195,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 61,
+          "latency_s": 1.473522,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1429,
+          "reasoning_tokens": 31,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -191,9 +215,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "車は自動運転の車ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -247,6 +271,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 61,
+          "latency_s": 1.535784,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1442,
+          "reasoning_tokens": 36,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -259,9 +291,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "男は運転免許を持っていないだけで、運転の経験はあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -315,6 +347,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 79,
+          "latency_s": 1.328487,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1438,
+          "reasoning_tokens": 43,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -327,9 +367,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "家族は車の中で移動そのものを楽しんでるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -383,6 +423,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 59,
+          "latency_s": 1.58278,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1436,
+          "reasoning_tokens": 29,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -395,9 +443,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "この車は遊園地などの施設の中を走るものですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -451,6 +499,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 133,
+          "latency_s": 2.357651,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1435,
+          "reasoning_tokens": 100,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -463,9 +519,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "男は車の外から車を動かしてるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -519,6 +575,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 61,
+          "latency_s": 1.975461,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1439,
+          "reasoning_tokens": 31,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -531,9 +595,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "家族は長い距離を何時間もかけて移動するんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -587,6 +651,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 204,
+          "latency_s": 2.826738,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1434,
+          "reasoning_tokens": 174,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -599,9 +671,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "乗っているのはガソリンで走る車ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -655,6 +727,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 212,
+          "latency_s": 2.910995,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1435,
+          "reasoning_tokens": 177,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -667,9 +747,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "男は自分でハンドルを操作してるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -723,6 +803,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 79,
+          "latency_s": 1.487972,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1443,
+          "reasoning_tokens": 44,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -735,9 +823,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "車は実際に道路を走ってるの？男以外の誰かが運転してるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -791,6 +879,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 90,
+          "latency_s": 1.567474,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1441,
+          "reasoning_tokens": 53,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -803,9 +899,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "これは遊園地の乗り物なの？家族は運転ごっこをしてるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -859,6 +955,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 101,
+          "latency_s": 1.925663,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1439,
+          "reasoning_tokens": 48,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -871,9 +975,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "免許がない男は、どうやって車を走らせているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -927,6 +1031,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 163,
+          "latency_s": 2.285273,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1437,
+          "reasoning_tokens": 125,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -939,9 +1051,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "妻と子どもたちは誰の運転で移動しているんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -995,6 +1107,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 37,
+          "latency_s": 1.455498,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1438,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1007,9 +1127,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "「長い道のり」とは、どこからどこまでのことですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1063,6 +1183,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 93,
+          "latency_s": 1.846708,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1433,
+          "reasoning_tokens": 61,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1075,9 +1203,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "人生ゲームの車の駒を動かしてたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1131,6 +1259,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 76,
+          "latency_s": 2.052202,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1459,
+          "reasoning_tokens": 44,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1143,9 +1279,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "家族で人生ゲームをしていて、男が車の駒を盤の道に沿って進めてたんだね。免許がなくてもできるわけだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1199,6 +1335,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 27,
+          "latency_s": 1.483534,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1451,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1211,9 +1355,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "家族で何かのすごろくをしていて、車の駒を長い道に沿って進めてるんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1267,6 +1411,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 88,
+          "latency_s": 1.889881,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1461,
+          "reasoning_tokens": 55,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1279,9 +1431,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "人生ゲームの車の駒を進めてるんだね。楽しんでるのは男だけで、妻と子どもは嫌々付き合わされてるのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1335,6 +1487,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 31,
+          "latency_s": 0.948373,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1442,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1347,9 +1507,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "妻が運転していて、男は助手席から道案内をしてるだけなんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1403,6 +1563,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 28,
+          "latency_s": 0.91335,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1449,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1415,9 +1583,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "車型の遊園地の乗り物に家族で乗って、男が運転手役をしてるんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1483,9 +1651,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "車も家族も盤上のコマやピンで、男は人生ゲームの長い道を進めていたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1551,9 +1719,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "ゲームの車コマに家族を表すピンを挿して、人生ゲームで道を進んでいたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1607,6 +1775,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 27,
+          "latency_s": 1.041806,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1447,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1619,9 +1795,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "家族でボードゲームを囲み、車のおもちゃを盤の道に沿って進めていたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1675,6 +1851,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 27,
+          "latency_s": 1.64523,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1453,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1687,9 +1871,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "すごろくの車コマを進めてたんだね。でも家族は一緒に楽しまず、男につき合ってるだけか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1743,6 +1927,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 76,
+          "latency_s": 2.030901,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1437,
+          "reasoning_tokens": 48,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1755,9 +1947,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "車は盤の上で動かす遊びのコマだったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1811,6 +2003,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 31,
+          "latency_s": 0.927135,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1445,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1823,9 +2023,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "妻が本物の車を運転し、男は助手席から家族に道を教えてたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1893,9 +2093,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "人生ゲーム？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1963,9 +2163,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "遊園地",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2019,6 +2219,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 39,
+          "latency_s": 1.560784,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1431,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2031,9 +2239,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "はい・いいえで答えればいい感じ？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2087,6 +2295,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 23,
+          "latency_s": 1.235376,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1422,
+          "reasoning_tokens": 0,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2099,9 +2315,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "応援してます！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2155,6 +2371,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 64,
+          "latency_s": 1.544965,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1427,
+          "reasoning_tokens": 37,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2167,9 +2391,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "これちょっと説明足りなくない？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2223,6 +2447,14 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 75,
+          "latency_s": 1.729522,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1427,
+          "reasoning_tokens": 47,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2235,9 +2467,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "🕵️‍♂️❓",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2303,9 +2535,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "投資案件紹介中！DMください",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2371,9 +2603,9 @@ window.PROBE_RAW["luna-1d/U27"] = [
       "text": "作者の顔写真あげてよ、脱いでるやつ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {

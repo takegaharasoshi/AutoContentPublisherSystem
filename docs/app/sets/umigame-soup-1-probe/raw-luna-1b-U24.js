@@ -43,6 +43,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 38,
+          "latency_s": 1.189086,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1992,
+          "reasoning_tokens": 19,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -55,9 +63,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男は毎朝同じ通学路を走ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -111,6 +119,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 166,
+          "latency_s": 2.397767,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1994,
+          "reasoning_tokens": 139,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -123,9 +139,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "小学生たちは男を見てから走り出したんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -179,6 +195,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 94,
+          "latency_s": 1.784702,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1995,
+          "reasoning_tokens": 64,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -191,9 +215,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "この日は学校の始業時刻がいつもより早かったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -247,6 +271,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 46,
+          "latency_s": 1.549425,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1994,
+          "reasoning_tokens": 26,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -259,9 +291,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "子どもたちは男を追い抜こうとして走ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -315,6 +347,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 45,
+          "latency_s": 1.107681,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1992,
+          "reasoning_tokens": 25,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -327,9 +367,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男は子どもたちに何か声をかけましたか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -383,6 +423,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 221,
+          "latency_s": 2.688175,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1996,
+          "reasoning_tokens": 186,
+          "slot": "判定語 + 復唱"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -395,9 +443,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "小学生たちは全員、同じ学校に通ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -451,6 +499,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 46,
+          "latency_s": 1.133652,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1992,
+          "reasoning_tokens": 24,
+          "slot": "判定語だけ"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -463,9 +519,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "子どもたちは走るのを楽しんでいるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -519,6 +575,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 140,
+          "latency_s": 2.340869,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2000,
+          "reasoning_tokens": 107,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -531,9 +595,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男が早く出たのは、いつもと違う出来事があったからですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -587,6 +651,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 166,
+          "latency_s": 2.503596,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1998,
+          "reasoning_tokens": 134,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -599,9 +671,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "通学路沿いの家は、どれも同じ地区にあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -655,6 +727,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 177,
+          "latency_s": 2.599894,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1993,
+          "reasoning_tokens": 147,
+          "slot": "判定語 + 一言"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -667,9 +747,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "小学生はランドセルを背負ってたんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -723,6 +803,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 168,
+          "latency_s": 2.547814,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1998,
+          "reasoning_tokens": 129,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -735,9 +823,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男は子どもたちの先生なの？走って学校に向かわせたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -791,6 +879,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 104,
+          "latency_s": 1.680796,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2004,
+          "reasoning_tokens": 68,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -803,9 +899,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "子どもたちは男を見つけて走り出したの？男を追いかけてたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -859,6 +955,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 189,
+          "latency_s": 2.474152,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1994,
+          "reasoning_tokens": 150,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -871,9 +975,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "子どもたちはどうして急に走り出したんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -927,6 +1031,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 264,
+          "latency_s": 2.889321,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1991,
+          "reasoning_tokens": 215,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -939,9 +1051,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男は通学路で何をしている人なんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -995,6 +1107,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 281,
+          "latency_s": 2.759882,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1999,
+          "reasoning_tokens": 245,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1007,9 +1127,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "誰が誰を追い抜いたのか、状況をもう少し知りたいです。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1063,6 +1183,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 315,
+          "latency_s": 3.680881,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2004,
+          "reasoning_tokens": 248,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1075,9 +1203,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "子どもたちは毎日、男が走ってくるのを合図に家を出てたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1131,6 +1259,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 324,
+          "latency_s": 3.776813,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2027,
+          "reasoning_tokens": 256,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1143,9 +1279,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "子どもたちは毎朝、走ってくる男を学校へ出る合図にしてたんだね。いつもより早く通ったから、勘違いして先に走り出したのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1199,6 +1335,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 175,
+          "latency_s": 2.438778,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2009,
+          "reasoning_tokens": 145,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1211,9 +1355,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男がいつも通る時間と、子どもたちが家を出る時間に何か関係があるんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1267,6 +1411,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 145,
+          "latency_s": 2.734279,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2031,
+          "reasoning_tokens": 116,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1279,9 +1431,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "子どもたちは毎日男を合図に家を出てたけど、その日は男がいつもより遅く走ってきたから、遅刻しそうだと勘違いして急いだんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1335,6 +1487,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 103,
+          "latency_s": 1.734693,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2009,
+          "reasoning_tokens": 66,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1347,9 +1507,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男がいつもより早く走り始めたから、子どもたちも競争だと思って走ったんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1403,6 +1563,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 134,
+          "latency_s": 2.016163,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2006,
+          "reasoning_tokens": 97,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1415,9 +1583,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男は学校の先生で、子どもたちを走らせる朝の運動をしてたんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1471,6 +1639,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 248,
+          "latency_s": 2.941866,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2011,
+          "reasoning_tokens": 207,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1483,9 +1659,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "毎朝見かける男の姿を目安にして、子どもたちは登校の支度を始めていたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1539,6 +1715,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 237,
+          "latency_s": 2.715209,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2005,
+          "reasoning_tokens": 170,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1551,9 +1735,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "走る男が通るのを時計代わりに、家々の子どもは出発してたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1607,6 +1791,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 217,
+          "latency_s": 2.642903,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2007,
+          "reasoning_tokens": 184,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1619,9 +1811,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男が通る頃と子どもが家を出る時刻には、毎朝つながりがあったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1675,6 +1867,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 170,
+          "latency_s": 2.252259,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2007,
+          "reasoning_tokens": 141,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1687,9 +1887,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男を見ると子どもが家を出ていたけど、その日はいつもより遅く通ったから焦ったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1743,6 +1943,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 176,
+          "latency_s": 2.77872,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2008,
+          "reasoning_tokens": 146,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1755,9 +1963,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "男が家の前を走る時刻は、子どもたちの朝の準備に影響していたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1811,6 +2019,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 141,
+          "latency_s": 1.961025,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 2008,
+          "reasoning_tokens": 109,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -1823,9 +2039,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "子どもたちは早く出た男と競争したくて、通学路へ飛び出していったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1893,9 +2109,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "合図？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -1963,9 +2179,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "黄色い帽子",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2019,6 +2235,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 191,
+          "latency_s": 2.342758,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1984,
+          "reasoning_tokens": 141,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2031,9 +2255,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "解説まだー？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2087,6 +2311,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 77,
+          "latency_s": 1.952432,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1980,
+          "reasoning_tokens": 45,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2099,9 +2331,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "やっほー",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2155,6 +2387,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 93,
+          "latency_s": 1.887613,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1982,
+          "reasoning_tokens": 68,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2167,9 +2407,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "怖めの問題もお願いします",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2223,6 +2463,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 84,
+          "latency_s": 1.890813,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1979,
+          "reasoning_tokens": 63,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2235,9 +2483,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "😂👏",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2303,9 +2551,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "新作はこちら https://example.invalid/deal",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {
@@ -2359,6 +2607,14 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
+        "debug": {
+          "completion_tokens": 118,
+          "latency_s": 2.016606,
+          "model": "gpt-6-luna",
+          "prompt_tokens": 1983,
+          "reasoning_tokens": 94,
+          "slot": "（この種別では使わない）"
+        },
         "guard": null,
         "over_80": false,
         "reply_id": null,
@@ -2371,9 +2627,9 @@ window.PROBE_RAW["luna-1b/U24"] = [
       "text": "이거 정말 재밌어요",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-07T23:44:37Z",
+        "judged_at": "2026-10-08T06:51:13Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-07T23:44:37Z"
+        "webhook_received_at": "2026-10-08T06:51:13Z"
       }
     },
     "timing": {

@@ -67,7 +67,7 @@ def test_consensus_requires_every_method() -> None:
     assert table["luna+jev"]["wrong_correct"] == 0
     assert table["luna+jev"]["true_declared"] == 1
     assert table["luna+jev"]["split"] == 2  # c2（luna だけ）・c4（jev だけ）
-    assert "decisions" not in table
+    assert "decisions" not in table and "haiku" not in table
 
 
 def test_main_writes_report_without_api(tmp_path: Path, capsys) -> None:

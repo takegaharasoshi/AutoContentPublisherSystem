@@ -1,4 +1,4 @@
-"""Sweep stage-B thresholds and test consensus rules over a cached probe run (21-6d11).
+"""Sweep stage-B thresholds and test consensus rules over a cached probe run (21-6d11; haiku added in 21-6d13).
 
 全件プローブの results.json に残った判定（段 B の要点ごとの hit / close、段 B2 の矛盾確率）から、
 Jev・Decisions の閾値を変えたときの正解宣言と ⑤ / ⑥ の分かれ方を再計算する。
@@ -26,7 +26,7 @@ SERVICE_DIR = Path(__file__).resolve().parent.parent
 if str(SERVICE_DIR) not in sys.path:
     sys.path.insert(0, str(SERVICE_DIR))
 
-METHOD_ROWS = {"luna": "luna-1b", "jev": "jev-2b", "decisions": "dec-2c"}
+METHOD_ROWS = {"luna": "luna-1b", "jev": "jev-2b", "decisions": "dec-2c", "haiku": "haiku-1b"}
 STAGED = ("jev", "decisions")
 T_POINTS = (0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
 T_CLOSES = (0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5)

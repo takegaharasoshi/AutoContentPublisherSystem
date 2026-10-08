@@ -931,15 +931,15 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </ul>
 <div class="table-wrap">
 <table>
-<tr><th>パターン</th><th>判定のモード</th><th>返信文の案</th><th>21-6d4 の合格数（16 指標中）</th><th>21-6d6 の人間チェック取り込み後</th><th>21-6d11（525 件・人間チェック前）</th></tr>
+<tr><th>パターン</th><th>判定のモード</th><th>返信文の案</th><th>21-6d4 の合格数（16 指標中）</th><th>21-6d6 の人間チェック取り込み後</th><th>21-6d11・21-6d13（525 件・人間チェック前）</th></tr>
 <tr><td>①</td><td><code>luna</code></td><td><code>1b</code></td><td>12</td><td>13</td><td>13</td></tr>
 <tr><td>②</td><td><code>luna</code></td><td><code>1d-luna</code></td><td>12</td><td>13</td><td>14</td></tr>
 <tr><td>③</td><td><code>hybrid</code></td><td><code>1d-luna</code></td><td>11</td><td>12</td><td>14</td></tr>
 <tr><td>④</td><td><code>jev</code></td><td><code>2b</code></td><td>13</td><td>14</td><td>15</td></tr>
 <tr><td>⑤</td><td><code>jev</code></td><td><code>2c-luna</code></td><td>12</td><td>13</td><td>13</td></tr>
 <tr><td>⑥</td><td><code>decisions</code></td><td><code>2c-luna</code></td><td>—</td><td>—</td><td>11</td></tr>
-<tr><td>⑦</td><td><code>haiku</code></td><td><code>1b-haiku</code></td><td>—</td><td>—</td><td>—（21-6d13 で追加。<a href="#pattern-haiku">10.3.7</a>）</td></tr>
-<tr><td>⑧</td><td><code>haiku</code></td><td><code>1d-haiku</code></td><td>—</td><td>—</td><td>—（同上）</td></tr>
+<tr><td>⑦</td><td><code>haiku</code></td><td><code>1b-haiku</code></td><td>—</td><td>—</td><td>14（21-6d13。<a href="#pattern-haiku">10.3.7</a>）</td></tr>
+<tr><td>⑧</td><td><code>haiku</code></td><td><code>1d-haiku</code></td><td>—</td><td>—</td><td>11（21-6d13）</td></tr>
 </table>
 </div>
 <p>2026-10-04（21-6d4）の時点で、全指標を満たすパターンはない。2026-10-06（21-6d6）に人間チェックの「許容」26 組を評価データの別解へ取り込んで数え直すと、全パターンで L1① の各種別（guess_close・guess_wrong）が合格に変わったが、全指標を満たすパターンはまだない（残る NG は P2・L2 の一言 / 矛盾ほか。<a href="#d-20261006-human-review-import">付録</a>）。2026-10-08（21-6d9）に P1 を「候補 → 人の確認 → 確定」の 2 段にした。④ の P1 の漏れ候補 1 件（c-impression-04「また遊びにおいで。」）は、同日ユーザーが「漏洩でない」と判断した。これで ④ の P1 は合格になり、合格数は 15 になる（ページ上の判断は書き出す JSON が正式な記録）。方式選定（21-6e）の材料にする。L1① は「全体 90% 以上」と「質問以外の各種別 80% 以上」を別の指標として数える（2026-10-04 ユーザー指示。21-6d3 までは 1 指標・15 指標中で数えていた）。</p>
@@ -984,6 +984,36 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </table>
 </div>
 <div class="note"><span class="callout-title">読み方</span>Jev と Decisions が同じ誤り（U01-k03）をそろって宣言しているので、Decisions を Jev の見張り役に足しても P2 は 0 にならない。luna を組み合わせに入れると P2 は 0 になるが、P5 は合意の相手の分だけ下がる。⑥ は Jev と同じ段・閾値で動かしたが、P5 と L1 の種別一致はいずれも Jev より低い。</div>
+<p id="probe-6d13"><strong>21-6d13 の全件プローブ</strong>（2026-10-08・<code>work/probe/full-20261008-8p</code>）: 21-6d11 のキャッシュ（21-6d12b の小試走で取った Haiku の 157 件を含む）を写し、⑦⑧ だけを 525 件で回した。①〜⑥ の指標・閾値の掃引は 21-6d11 と一致する（再実行なし）。全指標を満たすパターンはまだない。</p>
+<ul>
+  <li>⑦ haiku + 1b-haiku（14 / 16）: NG は P2 1 件（U01-k03。Jev・Decisions と同じ誤り）と L2 の一言（93.1%・12 件超過）だけ。L1 の種別一致 98.7%（luna 系と同等以上）・P5 98.2%・はい / いいえの一致率 97.2%（既存）/ 96.8%（新規）。L2 の矛盾語は 0 件</li>
+  <li>⑧ haiku + 1d-haiku（11 / 16）: 判定は ⑦ と同じだが、書き手（effort <code>low</code>）で崩れる。P2 18 件（書き手の文面が冒頭で正解を言う）・L2 の一言 70.3%・矛盾語 10 件・絵文字 3 件・P7 1 件（92 字）。書き手の定型文落ちは 32 件</li>
+  <li>出力ガード（核心語）の発動: ⑦ 1 件・⑧ 2 件（いずれも U16 の「遊び」）。P1 の漏れ候補は 0 件</li>
+</ul>
+<div class="table-wrap">
+<table>
+<tr><th>⑦⑧ の実績（525 件）</th><th>判定（共通）</th><th>書き手 1b-haiku（⑦）</th><th>書き手 1d-haiku（⑧）</th></tr>
+<tr><td>費用</td><td>$1.28</td><td>$0.85</td><td>$0.09</td></tr>
+<tr><td>出力トークン</td><td>246 万（luna 13.5 万）</td><td>151 万（luna 1b 8.2 万）</td><td>1.9 万</td></tr>
+<tr><td>拒否・空応答</td><td>0 件・0 件</td><td>0 件・0 件</td><td>0 件・0 件</td></tr>
+<tr><td>打ち切り（max_tokens）</td><td>7 件（いずれも luna に切り替え）</td><td>2 件</td><td>0 件</td></tr>
+<tr><td>応答時間 中央値 / p95 / 最大</td><td>15.6 / 49.6 / 81.2 秒（luna 3.1 / 5.8 秒）</td><td>11.6 / 33.1 / 66.8 秒</td><td>1.4 / 2.0 / 13.3 秒</td></tr>
+</table>
+</div>
+<p>⑦⑧ の費用は合計 $2.21（小試走の $0.48 を含む。上限 $5 内）。1 ケース全体の応答時間は ⑦ 中央値 27.7 / p95 78.1 秒、⑧ 17.3 / 50.8 秒。luna の判定（$0.24）と比べ、費用は約 5 倍・応答時間は約 5 倍。判定の打ち切りは小試走では 0 件だったが、全件では 7 件出た（上限 16,000 トークンに思考が届く）。</p>
+<p>合意ルールの試算（判定レベル）に Haiku を足した結果は次のとおり。Haiku 単独は P2 1 件（U01-k03）・P5 96.4%（54/56）。luna と組むと P2 0・P5 92.9%（52/56）・割れ 4 で、luna + Jev（87.5%・割れ 7）より取りこぼしが少ない。Jev・Decisions と組む限り U01-k03 は残る（3 方式が同じ誤り）。</p>
+<div class="table-wrap">
+<table>
+<tr><th>正解宣言に合意を要する組み合わせ</th><th>P2 誤った正解宣言</th><th>P5</th><th>割れ（一部だけ ④）</th></tr>
+<tr><td>Haiku 単独</td><td>1（U01-k03）</td><td>96.4%（54/56）</td><td>—</td></tr>
+<tr><td>luna + Haiku</td><td>0</td><td>92.9%（52/56）</td><td>4</td></tr>
+<tr><td>Jev + Haiku</td><td>1（U01-k03）</td><td>85.7%（48/56）</td><td>9</td></tr>
+<tr><td>Decisions + Haiku</td><td>1（U01-k03）</td><td>78.6%（44/56）</td><td>12</td></tr>
+<tr><td>luna + Jev + Haiku</td><td>0</td><td>85.7%（48/56）</td><td>10</td></tr>
+<tr><td>4 方式すべて</td><td>0</td><td>73.2%（41/56）</td><td>18</td></tr>
+</table>
+</div>
+<p>全組み合わせの表は <code>work/probe/full-20261008-8p/sweep.txt</code>（<code>probe_sweep.py</code> の合意の方式に <code>haiku</code> を足した）。不一致の人間チェックは 21-6d11 の 6 パターン分と合わせて 8 パターンでまとめて行う（ユーザー）。</p>
 
 <h4>評価ページ</h4>
 <p><a href="umigame-soup-1-probe.html">コメント返信の評価（プローブ）</a>。サマリー 1 枚（合否表・指標）+ 問題ごとの 14 枚（コメント一覧と生データ）。合否表の NG の ID から該当の行へ飛べる。生成器は <code>tools/build_probe_page.py</code>。</p>
