@@ -1534,7 +1534,7 @@
 <div class="plan-meta"><strong>21-6d12b</strong><span class="plan-status">未着手</span></div>
 <h3>パターン ⑦⑧（Haiku 5.5）を実装して小試走する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d12a">21-6d12a</a> の承認と API キーの用意の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>現況：</strong>未着手。<strong>Anthropic の API キーは用意済み</strong>（2026-10-08・ユーザーが <code>~/.bashrc</code> に <code>export ANTHROPIC_API_KEY=…</code> を追記し、モデル情報の取得で有効を確認）。鍵の設定前に起動した Claude Code では環境に入っていないため、鍵を使うコマンド（小試走など）の頭で <code>eval "$(grep '^export ANTHROPIC_API_KEY=' ~/.bashrc)"</code> を実行して読み込む（開き直し不要。Codex に委ねる場合も指示文にこの行を含める）。鍵の値は出力・記録しない。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
