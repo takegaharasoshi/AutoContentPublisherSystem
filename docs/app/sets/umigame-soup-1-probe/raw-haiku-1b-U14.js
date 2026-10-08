@@ -85,9 +85,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "主人はパンを作るときに、その卵を材料として使ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -184,9 +184,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "ここでいう卵は鶏の卵ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -283,9 +283,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵は店の中で飼っている鶏が産んだものですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -382,9 +382,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵を大切にしているのは、割れやすいからですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -481,9 +481,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "主人は卵をゆでたり割ったりしたことが一度もないんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -580,9 +580,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "パンの生地に卵を混ぜる工程はありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -679,9 +679,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵は商品名や店の名前に関係しているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -778,9 +778,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "お客さんも卵のおかげだと知ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -877,9 +877,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵はパン屋の主人が自分で買いに行くんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -976,9 +976,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "お店のオーブンは電気式ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1004,87 +1004,70 @@ window.PROBE_RAW["haiku-1b/U14"] = [
         "shadow": false
       },
       "content_key": "005-bakers-egg",
-      "errors": [
-        "haiku: Anthropic response exceeded max_tokens"
-      ],
+      "errors": [],
       "fact_sheet_hash": "c764429cc6b6",
       "final": {
         "answer": null,
-        "decision": "haiku_fallback_luna",
-        "kind": "q_multi"
+        "decision": "haiku",
+        "kind": "q_open"
       },
       "judgements": {
         "haiku": {
           "answer": null,
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 4345,
-            "completion_tokens": 16000,
-            "error_reason": "max_tokens",
+            "cache_creation_input_tokens": 4345,
+            "cache_read_input_tokens": 0,
+            "completion_tokens": 5641,
             "input_tokens": 31,
-            "latency_s": 70.588065,
+            "latency_s": 25.253848,
             "model": "claude-haiku-5-5",
-            "output_tokens": 16000,
+            "output_tokens": 5641,
             "prompt_tokens": 4376,
             "refusal_category": null,
-            "stop_reason": "max_tokens",
+            "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 4345,
+              "cache_creation_input_tokens": 4345,
+              "cache_read_input_tokens": 0,
               "input_tokens": 31,
-              "output_tokens": 16000
+              "output_tokens": 5641
             }
           },
-          "error": "Anthropic response exceeded max_tokens",
-          "kind": null,
-          "reason": ""
+          "error": null,
+          "kind": "q_open",
+          "reason": "食べ物かそれ以外かを択一で問うており、はい／いいえで答えられない質問のため"
         },
         "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 415,
-            "finish_reason": "stop",
-            "latency_s": 4.152854,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3239,
-            "reasoning_tokens": 339
-          },
-          "error": null,
-          "kind": "q_multi",
-          "reason": "食べ物かどうかと、卵形の何かかを尋ねる質問が二つあります。"
-        }
+        "luna": null
       },
       "media_id": "local-U14",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 2560,
+          "cache_creation_input_tokens": 2559,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 3560,
+          "completion_tokens": 2785,
           "input_tokens": 31,
-          "latency_s": 19.344617,
+          "latency_s": 13.164507,
           "model": "claude-haiku-5-5",
-          "output_tokens": 3560,
-          "prompt_tokens": 2591,
+          "output_tokens": 2785,
+          "prompt_tokens": 2590,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 2560,
+            "cache_creation_input_tokens": 2559,
             "cache_read_input_tokens": 0,
             "input_tokens": 31,
-            "output_tokens": 3560
+            "output_tokens": 2785
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。ふたつまとめてだと、私も迷っちゃうよ。"
+        "text": "おっと、どっちかを選ぶ形だと答えにくいな。はい／いいえで答えられる形で聞き直してごらん🤔"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1092,18 +1075,18 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵は本物の食べ物なの？それとも卵の形をした何か？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
-      "haiku_s": 70.58834468596615,
+      "haiku_s": 25.25405742402654,
       "jev_s": null,
-      "judge_s": 74.741253028973,
-      "luna_s": 4.152908343006857,
-      "total_s": 94.08654038794339,
-      "writer_s": 19.34528735897038
+      "judge_s": 25.25405742402654,
+      "luna_s": null,
+      "total_s": 38.429781532031484,
+      "writer_s": 13.175724108004943
     }
   },
   {
@@ -1191,9 +1174,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "パンに卵を使ってるの？その卵を割るのは主人以外の人？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1290,9 +1273,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵を使わずに、どうしてパンがおいしくなるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1389,9 +1372,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "主人が大切にしている卵って、何の卵なんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1488,9 +1471,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "どうやって卵がパンのおいしさにつながっているの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1587,9 +1570,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵ってパン職人の見習いだったってこと？その人が育ってパンを焼いてるから、おいしいのはこの卵のおかげなんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1686,9 +1669,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "食べ物の卵じゃなくて、パン職人の見習いをそう呼んでたんだね。今はその人が焼いているから、主人が自慢するのも分かる。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1785,9 +1768,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵はパン屋で修業中の人のことなんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1884,9 +1867,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵はパン職人の見習いで、その人が焼くパンがおいしいんだね。でも主人はパン作りを教えてなくて、その人が勝手に覚えたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1983,9 +1966,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵を産む鶏を店の奥で大事に飼っていて、その鶏の餌がパン生地に混ざってるんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2082,9 +2065,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵はパン屋の幸運のお守りで、主人がそう思い込んでるだけだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2181,9 +2164,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "店が育てた職人見習いが今は焼き手で、その腕前がパンのおいしさにつながってるんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2280,9 +2263,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "パン職人を目指して店で修業する若手を主人が大切にし、今ではその人が店のパンを焼いてるんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2379,9 +2362,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵は修業中の職人を指す呼び名だけど、今は仕込みを手伝う段階なんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2478,9 +2461,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵はパン職人の見習いだけど、店では生地をこねる作業までを担当しているんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2577,9 +2560,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "卵は食べ物じゃなく、店で働く人のことをそう呼んでいたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2676,9 +2659,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "主人の大事な卵は常連客から贈られた飾りで、棚に置いてあるだけなんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2775,9 +2758,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "パン職人の卵？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2874,9 +2857,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "いちごジャム",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2973,9 +2956,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "詰まった、助けて🙏",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3072,9 +3055,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "今回の設定ちょっと怖くて好き",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3171,9 +3154,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "通勤中に見てます",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3270,9 +3253,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "@mika これ一緒に解こ！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3350,9 +3333,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "無無無無むむむ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3430,9 +3413,9 @@ window.PROBE_RAW["haiku-1b/U14"] = [
       "text": "本名はサンプル太郎、電話は090-0000-0456です",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {

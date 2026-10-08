@@ -85,9 +85,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男は以前にもウミガメのスープを飲んだことがありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -184,9 +184,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男が泣いたのは、スープの味に覚えがあったからですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -283,9 +283,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男は昔、遭難した経験があるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -382,9 +382,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "本物だと聞いたことで、男の過去の記憶がよみがえったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -481,9 +481,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "スープを飲む前から、男は本物かどうか疑っていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -580,9 +580,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "そのレストランは海辺にありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -679,9 +679,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "シェフは男のことを知っていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -778,9 +778,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男はスープを飲んで、何か別のものを思い出したんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -877,9 +877,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "スープを出したのは、その店のシェフ本人ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -976,9 +976,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男は昔、ウミガメを飼っていたんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1075,9 +1075,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男は過去にウミガメを食べたことがあるの？その時の出来事を思い出したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1174,9 +1174,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "スープの味が記憶と違ったの？本物だと聞いて何かに気づいたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1273,9 +1273,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男はなぜ本物のウミガメかどうか確かめたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1372,9 +1372,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "スープを飲んだとき、男は何を思い出したんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1471,9 +1471,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男が泣き崩れるまでに、どんな過去があったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1570,9 +1570,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "昔ウミガメのスープだと言われて飲んだものが、仲間の肉だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1669,9 +1669,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "昔、仲間の肉をウミガメのスープだと言われて飲んだんだね。本物の味が違って、あの時の嘘に気づいたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1768,9 +1768,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "漂流していたとき、仲間からウミガメのスープだと言われて飲んだことがあったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1867,9 +1867,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "仲間の肉をウミガメのスープだと言われて飲んだんだね。でもそのとき仲間はみんな助かって、あとで一緒に帰れたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1966,9 +1966,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男はウミガメが大好きで、食べてしまったことが悲しくて泣いたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2065,9 +2065,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "子どものころに飼っていたカメがこのスープに使われたと思い込んで、悲しくなったんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2164,9 +2164,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "漂流中に亀のスープと聞かされて口にした一杯は、実は仲間の肉から作られてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2263,9 +2263,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "漂流中に亀の汁だと渡されて飲んだ一杯は仲間の肉で、男は正体に後から気づいたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2362,9 +2362,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "漂流中、ウミガメの汁だと説明されて飲んだけど、材料は口にしてはいけないものだったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2461,9 +2461,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "以前、亀のスープだと言われて飲んだのは仲間の肉だった。でも漂流仲間は全員無事に帰れたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2560,9 +2560,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "男は昔もウミガメの汁を飲み、今のものとは味が違うと感じたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2659,9 +2659,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "今日の椀は偽物で、シェフが男の昔話を信じ込ませるために嘘をついたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2758,9 +2758,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "仲間の肉？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2857,9 +2857,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "レモン",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2956,9 +2956,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "質問したら返事もらえるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3055,9 +3055,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "更新たのしみにしてる〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3154,9 +3154,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "前の投稿と設定が被ってる気がする",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3234,9 +3234,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "ぬぬぬぬぬ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3314,9 +3314,9 @@ window.PROBE_RAW["haiku-1b/U28"] = [
       "text": "無料プレゼント応募は固定リンクから→ https://example.invalid/gift",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {

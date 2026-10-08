@@ -85,9 +85,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束は口約束だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -184,9 +184,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "白紙になったのは、目に見えるもの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -283,9 +283,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "ふたりはけんかしてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -382,9 +382,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "夏の夕立が関係してる？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -481,9 +481,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "濡れたものを乾かしたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -580,9 +580,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束そのものを取り消した？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -679,9 +679,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束の中身は二人とも覚えてた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -778,9 +778,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "誰かのいたずらだった？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -877,9 +877,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "二人は後日その約束を果たした？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -976,9 +976,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "二人の年齢って謎を解くのに関係ある？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1075,9 +1075,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "雨で何か濡れたの？そのあとどうしたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1174,9 +1174,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束は取り消されたの？それでも二人はあとで実行したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1273,9 +1273,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "なぜ約束が白紙に戻ったのに、二人は悲しまなかったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1372,9 +1372,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "どうして後日その約束を果たせたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1471,9 +1471,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "それはまだ覚えてるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1570,9 +1570,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "男が消せるボールペンで書いた手紙が夕立で濡れ、女がドライヤーで乾かした熱で文字が消えて白紙になった。二人は約束の中身を覚えていて書き直し、後日果たした。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1669,9 +1669,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "夕立で濡れた手紙をドライヤーで乾かしたら、消せるペンの文字が熱で消えた。でも二人とも約束は覚えていて、書き直して後日果たしたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1768,9 +1768,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "雨に濡れた紙の文字が消えて白紙になったけど、二人は約束の内容を覚えていたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1867,9 +1867,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束は紙に書かれていて、白紙になったあと二人は同じ約束を続けたんじゃない？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1966,9 +1966,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "二人が大げんかして約束を取り消し、仲直りしたあと別の約束をしたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2065,9 +2065,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束を書いた紙を誰かに破られてしまい、二人は悲しくてそのまま諦めたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2164,9 +2164,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "2人は直接会う約束をしてたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2263,9 +2263,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "「白紙」は紙が真っ白になったって意味？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2362,9 +2362,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "夏の日に何か予定外のことが起きた？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2461,9 +2461,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "2人は恋人同士なの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2489,87 +2489,70 @@ window.PROBE_RAW["haiku-1b/U18"] = [
         "shadow": false
       },
       "content_key": "007-blank-letter",
-      "errors": [
-        "haiku: Anthropic response exceeded max_tokens"
-      ],
+      "errors": [],
       "fact_sheet_hash": "8832e6127fa7",
       "final": {
-        "answer": "irrelevant",
-        "decision": "haiku_fallback_luna",
+        "answer": "yes",
+        "decision": "haiku",
         "kind": "q_yesno"
       },
       "judgements": {
         "haiku": {
-          "answer": null,
+          "answer": "yes",
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 4333,
-            "completion_tokens": 16000,
-            "error_reason": "max_tokens",
+            "cache_creation_input_tokens": 4333,
+            "cache_read_input_tokens": 0,
+            "completion_tokens": 16733,
             "input_tokens": 18,
-            "latency_s": 70.94739,
+            "latency_s": 84.556126,
             "model": "claude-haiku-5-5",
-            "output_tokens": 16000,
+            "output_tokens": 16733,
             "prompt_tokens": 4351,
             "refusal_category": null,
-            "stop_reason": "max_tokens",
+            "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 4333,
+              "cache_creation_input_tokens": 4333,
+              "cache_read_input_tokens": 0,
               "input_tokens": 18,
-              "output_tokens": 16000
+              "output_tokens": 16733
             }
-          },
-          "error": "Anthropic response exceeded max_tokens",
-          "kind": null,
-          "reason": ""
-        },
-        "jev": null,
-        "luna": {
-          "answer": "irrelevant",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 490,
-            "finish_reason": "stop",
-            "latency_s": 5.74094,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3205,
-            "reasoning_tokens": 414
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "約束が延期されたかどうかは、真相・確定事実から判断できません。"
-        }
+          "reason": "約束は取り消されず、真相では後日きちんと果たされたため、延期と判断できる。"
+        },
+        "jev": null,
+        "luna": null
       },
       "media_id": "local-U18",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 2527,
-          "completion_tokens": 2723,
+          "cache_creation_input_tokens": 2524,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 1706,
           "input_tokens": 18,
-          "latency_s": 13.012747,
+          "latency_s": 9.049835,
           "model": "claude-haiku-5-5",
-          "output_tokens": 2723,
-          "prompt_tokens": 2545,
+          "output_tokens": 1706,
+          "prompt_tokens": 2542,
           "refusal_category": null,
           "slot": "判定語 + 一言",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 2527,
+            "cache_creation_input_tokens": 2524,
+            "cache_read_input_tokens": 0,
             "input_tokens": 18,
-            "output_tokens": 2723
+            "output_tokens": 1706
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ふむふむ、次の質問はどうかな？"
+        "text": "はい！ふむふむ、次はどうかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2577,18 +2560,18 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束は延期になっただけなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
-      "haiku_s": 70.94774261396378,
+      "haiku_s": 84.55627901502885,
       "jev_s": null,
-      "judge_s": 76.68873612000607,
-      "luna_s": 5.740993506042287,
-      "total_s": 89.70272030599881,
-      "writer_s": 13.01398418599274
+      "judge_s": 84.55627901502885,
+      "luna_s": null,
+      "total_s": 93.60697016201448,
+      "writer_s": 9.050691146985628
     }
   },
   {
@@ -2676,9 +2659,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束の内容は夏に関係あるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2775,9 +2758,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "2人は子どもなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2874,9 +2857,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "約束を書いた紙は白紙に戻り、熱で消える種類のインクで記してあったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2973,9 +2956,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "文字を失った手紙はまっさらになり、こすって消せるタイプのペンが使われてたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3072,9 +3055,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "夕立で約束の手紙は白紙になったけど、インクは水に影響されやすい種類だったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3171,9 +3154,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "文字が濡れて読めなくなったのは、熱を加えると消えるインクを使っていたからなんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3270,9 +3253,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "紙の文字が雨でにじんで、約束の中身が読めなくなったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3369,9 +3352,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "雨で手紙は少し濡れたけど、書かれた文字は消えずそのまま読めたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3468,9 +3451,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "消せるボールペン？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3567,9 +3550,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "バスケットボール",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3666,9 +3649,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "答えだけ教えて〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3765,9 +3748,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "短いのに奥が深い！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3864,9 +3847,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "週末ってあっという間だなー",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3963,9 +3946,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "@yuki こういうの好きそう",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -4062,9 +4045,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "バカみたいな問題だな",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -4161,9 +4144,9 @@ window.PROBE_RAW["haiku-1b/U18"] = [
       "text": "That was fun!",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {

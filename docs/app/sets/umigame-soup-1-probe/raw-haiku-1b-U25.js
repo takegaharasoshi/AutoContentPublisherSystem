@@ -85,9 +85,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "中学時代に二人で何か賭けをしてたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -184,9 +184,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "「勝った」は、昔した勝負の結果について言ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -283,9 +283,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "友人は毎年ずっと年賀状を送り続けていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -382,9 +382,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "二人は中学の同級生ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -481,9 +481,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "年賀状に勝負の答えが書かれていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -580,9 +580,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "男は友人がまだ生きているか気にしていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -608,87 +608,70 @@ window.PROBE_RAW["haiku-1b/U25"] = [
         "shadow": false
       },
       "content_key": "013-fifty-five-year-nengajo",
-      "errors": [
-        "haiku: Anthropic response exceeded max_tokens"
-      ],
+      "errors": [],
       "fact_sheet_hash": "bb5a6e203be0",
       "final": {
-        "answer": "irrelevant",
-        "decision": "haiku_fallback_luna",
+        "answer": "yes",
+        "decision": "haiku",
         "kind": "q_yesno"
       },
       "judgements": {
         "haiku": {
-          "answer": null,
+          "answer": "yes",
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 4366,
-            "completion_tokens": 16000,
-            "error_reason": "max_tokens",
+            "cache_creation_input_tokens": 4366,
+            "cache_read_input_tokens": 0,
+            "completion_tokens": 14491,
             "input_tokens": 27,
-            "latency_s": 71.757165,
+            "latency_s": 63.857112,
             "model": "claude-haiku-5-5",
-            "output_tokens": 16000,
+            "output_tokens": 14491,
             "prompt_tokens": 4393,
             "refusal_category": null,
-            "stop_reason": "max_tokens",
+            "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 4366,
+              "cache_creation_input_tokens": 4366,
+              "cache_read_input_tokens": 0,
               "input_tokens": 27,
-              "output_tokens": 16000
+              "output_tokens": 14491
             }
-          },
-          "error": "Anthropic response exceeded max_tokens",
-          "kind": null,
-          "reason": ""
-        },
-        "jev": null,
-        "luna": {
-          "answer": "irrelevant",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 399,
-            "finish_reason": "stop",
-            "latency_s": 4.395914,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3258,
-            "reasoning_tokens": 315
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男が元日に受け取ったことは分かりますが、もう一人の受取日は定まっていません。"
-        }
+          "reason": "男は元日に受け取っており、毎年の年賀状の送り合いは元日に届く形と読めるため。"
+        },
+        "jev": null,
+        "luna": null
       },
       "media_id": "local-U25",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 2702,
-          "completion_tokens": 3763,
+          "cache_creation_input_tokens": 2699,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 1711,
           "input_tokens": 27,
-          "latency_s": 17.843245,
+          "latency_s": 8.300366,
           "model": "claude-haiku-5-5",
-          "output_tokens": 3763,
-          "prompt_tokens": 2729,
+          "output_tokens": 1711,
+          "prompt_tokens": 2726,
           "refusal_category": null,
           "slot": "判定語 + 復唱",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 2702,
+            "cache_creation_input_tokens": 2699,
+            "cache_read_input_tokens": 0,
             "input_tokens": 27,
-            "output_tokens": 3763
+            "output_tokens": 1711
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。次はどこを聞いてみようかな？"
+        "text": "はい！二人とも元日に年賀状を受け取ったよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -696,18 +679,18 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "二人とも元日に年賀状を受け取ったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
-      "haiku_s": 71.75749190500937,
+      "haiku_s": 63.85756548005156,
       "jev_s": null,
-      "judge_s": 76.15343509498052,
-      "luna_s": 4.395943189971149,
-      "total_s": 93.99709708604496,
-      "writer_s": 17.843661991064437
+      "judge_s": 63.85756548005156,
+      "luna_s": null,
+      "total_s": 72.15843375900295,
+      "writer_s": 8.300868278951384
     }
   },
   {
@@ -795,9 +778,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "友人は男と同じくらいの年齢ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -894,9 +877,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "男の家族は二人の約束を知っていたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -922,87 +905,70 @@ window.PROBE_RAW["haiku-1b/U25"] = [
         "shadow": false
       },
       "content_key": "013-fifty-five-year-nengajo",
-      "errors": [
-        "haiku: Anthropic response exceeded max_tokens"
-      ],
+      "errors": [],
       "fact_sheet_hash": "bb5a6e203be0",
       "final": {
         "answer": "no",
-        "decision": "haiku_fallback_luna",
+        "decision": "haiku",
         "kind": "q_yesno"
       },
       "judgements": {
         "haiku": {
-          "answer": null,
+          "answer": "no",
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 4366,
-            "completion_tokens": 16000,
-            "error_reason": "max_tokens",
+            "completion_tokens": 9987,
             "input_tokens": 31,
-            "latency_s": 70.885745,
+            "latency_s": 45.126296,
             "model": "claude-haiku-5-5",
-            "output_tokens": 16000,
+            "output_tokens": 9987,
             "prompt_tokens": 4397,
             "refusal_category": null,
-            "stop_reason": "max_tokens",
+            "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 4366,
               "input_tokens": 31,
-              "output_tokens": 16000
+              "output_tokens": 9987
             }
-          },
-          "error": "Anthropic response exceeded max_tokens",
-          "kind": null,
-          "reason": ""
-        },
-        "jev": null,
-        "luna": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 533,
-            "finish_reason": "stop",
-            "latency_s": 5.830622,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3261,
-            "reasoning_tokens": 460
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "到着順が勝敗を左右した事実はなく、質問への答えは否定です。"
-        }
+          "reason": "真相では勝ちの決め手は年賀状の内容で、到着の早さは無関係。よって no"
+        },
+        "jev": null,
+        "luna": null
       },
       "media_id": "local-U25",
       "parent_id": null,
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 2697,
-          "completion_tokens": 2087,
+          "cache_creation_input_tokens": 2697,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 2274,
           "input_tokens": 31,
-          "latency_s": 10.777928,
+          "latency_s": 11.614612,
           "model": "claude-haiku-5-5",
-          "output_tokens": 2087,
+          "output_tokens": 2274,
           "prompt_tokens": 2728,
           "refusal_category": null,
           "slot": "判定語 + 一言",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 2697,
+            "cache_creation_input_tokens": 2697,
+            "cache_read_input_tokens": 0,
             "input_tokens": 31,
-            "output_tokens": 2087
+            "output_tokens": 2274
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ふむふむ、次はどうかな？"
+        "text": "いいえ。さあ、次はどんな質問かな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1010,18 +976,18 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "勝ったのは、年賀状が先に届いたからなんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
-      "haiku_s": 70.88635250204243,
+      "haiku_s": 45.12667335802689,
       "jev_s": null,
-      "judge_s": 76.7170039000921,
-      "luna_s": 5.8306513980496675,
-      "total_s": 87.4960651230067,
-      "writer_s": 10.779061222914606
+      "judge_s": 45.12667335802689,
+      "luna_s": null,
+      "total_s": 56.74194430501666,
+      "writer_s": 11.615270946989767
     }
   },
   {
@@ -1109,9 +1075,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "二人は中学のころに勝負したの？その勝負の決着がついたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1208,9 +1174,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "年賀状は何十年も送り合ってたの？今年だけ特別な内容だったの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1307,9 +1273,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "男は何の勝負に勝ったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1406,9 +1372,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "年賀状には何が書いてあったんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1505,9 +1471,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "二人は中学を卒業するとき、どんな約束をしたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1604,9 +1570,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "2人は年賀状で将棋を一手ずつ指し続けてたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1703,9 +1669,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "会えないまま、2人は年賀状で将棋を一手ずつ続けてたんだね。55年越しに相手が「参りました」と送ってきたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1802,9 +1768,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "2人は年賀状で何かの勝負をずっと続けてたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1901,9 +1867,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "年賀状で将棋を一手ずつ続けてたけど、2人は毎年会って、その場で次の手を決めてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2000,9 +1966,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "中学の時にどっちが先に結婚するか賭けていて、友人が独身だとわかったから勝ちを喜んだんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2099,9 +2065,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "友人が年賀状で宝くじが当たったと知らせてきて、昔の賭けに勝ったんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2198,9 +2164,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "新年の便りに盤面の次の手を書き添えて、二人は将棋を何十年も続けてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2297,9 +2263,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "離れて暮らす二人が、年始のはがきで一手ずつ棋譜をつなぐ対局だったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2396,9 +2362,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "年賀状を通して二人は長く何かの勝負を続けていたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2495,9 +2461,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "新年のはがきで将棋の続きを送り合ってたけど、二人は毎年顔を合わせて次の手を決めてたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2594,9 +2560,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "年賀状には勝負の続きが記され、二人は毎年やりとりを重ねていたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2693,9 +2659,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "友人は年賀状で、55年ぶりに中学時代の話を思い出したと知らせたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2794,9 +2760,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "年賀状将棋？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2893,9 +2859,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "野球部",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2992,9 +2958,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "これどうやって遊ぶの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3091,9 +3057,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "こんにちは、初コメです",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3190,9 +3156,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "短めの問題リクエストです",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3289,9 +3255,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "😮",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3369,9 +3335,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "フォローしてくれたら相互します！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3449,9 +3415,9 @@ window.PROBE_RAW["haiku-1b/U25"] = [
       "text": "作者って絶対友達いないでしょ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {

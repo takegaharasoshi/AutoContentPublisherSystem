@@ -85,9 +85,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男は毎朝同じ通学路を走ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -184,9 +184,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "小学生たちは男を見てから走り出したんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -283,9 +283,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "この日は学校の始業時刻がいつもより早かったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -382,9 +382,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "子どもたちは男を追い抜こうとして走ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -481,9 +481,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男は子どもたちに何か声をかけましたか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -580,9 +580,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "小学生たちは全員、同じ学校に通ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -679,9 +679,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "子どもたちは走るのを楽しんでいるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -778,9 +778,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男が早く出たのは、いつもと違う出来事があったからですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -877,9 +877,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "通学路沿いの家は、どれも同じ地区にあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -976,9 +976,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "小学生はランドセルを背負ってたんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1075,9 +1075,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男は子どもたちの先生なの？走って学校に向かわせたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1174,9 +1174,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "子どもたちは男を見つけて走り出したの？男を追いかけてたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1273,9 +1273,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "子どもたちはどうして急に走り出したんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1372,9 +1372,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男は通学路で何をしている人なんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1471,9 +1471,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "誰が誰を追い抜いたのか、状況をもう少し知りたいです。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1499,14 +1499,11 @@ window.PROBE_RAW["haiku-1b/U24"] = [
         "shadow": false
       },
       "content_key": "012-early-morning-run",
-      "errors": [
-        "haiku: Anthropic response exceeded max_tokens",
-        "writer: Anthropic response exceeded max_tokens"
-      ],
+      "errors": [],
       "fact_sheet_hash": "aeaba231b36a",
       "final": {
         "answer": null,
-        "decision": "haiku_fallback_luna",
+        "decision": "haiku",
         "kind": "guess_correct"
       },
       "judgements": {
@@ -1514,44 +1511,29 @@ window.PROBE_RAW["haiku-1b/U24"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 4330,
-            "completion_tokens": 16000,
-            "error_reason": "max_tokens",
+            "cache_creation_input_tokens": 4330,
+            "cache_read_input_tokens": 0,
+            "completion_tokens": 14031,
             "input_tokens": 37,
-            "latency_s": 62.544849,
+            "latency_s": 55.496349,
             "model": "claude-haiku-5-5",
-            "output_tokens": 16000,
+            "output_tokens": 14031,
             "prompt_tokens": 4367,
             "refusal_category": null,
-            "stop_reason": "max_tokens",
+            "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 4330,
+              "cache_creation_input_tokens": 4330,
+              "cache_read_input_tokens": 0,
               "input_tokens": 37,
-              "output_tokens": 16000
+              "output_tokens": 14031
             }
-          },
-          "error": "Anthropic response exceeded max_tokens",
-          "kind": null,
-          "reason": ""
-        },
-        "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 231,
-            "finish_reason": "stop",
-            "latency_s": 3.258862,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3221,
-            "reasoning_tokens": 126
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "男を毎日の家を出る合図にしていた核心を当てています。"
-        }
+          "reason": "毎日男が通るのを合図に家を出ていたとする要点を当てており、明らかな誤りもない。"
+        },
+        "jev": null,
+        "luna": null
       },
       "media_id": "local-U24",
       "parent_id": null,
@@ -1560,27 +1542,27 @@ window.PROBE_RAW["haiku-1b/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 2665,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 16000,
-          "error_reason": "max_tokens",
+          "completion_tokens": 16198,
           "input_tokens": 37,
-          "latency_s": 66.779143,
+          "latency_s": 67.288367,
           "model": "claude-haiku-5-5",
-          "output_tokens": 16000,
+          "output_tokens": 16198,
           "prompt_tokens": 2702,
           "refusal_category": null,
-          "stop_reason": "max_tokens",
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 2665,
             "cache_read_input_tokens": 0,
             "input_tokens": 37,
-            "output_tokens": 16000
+            "output_tokens": 16198
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "fallback_template",
-        "text": "正解！子どもたちは毎朝同じ時刻に走る男を合図に家を出ていた。男が早く走った朝、遅刻だと思い込んで飛び出した。"
+        "source": "llm",
+        "text": "正解！子どもたちは窓から男が走るのを見て毎朝家を出ていたんだ。その朝は男が早く走ったから、遅刻と思って飛び出したけど、校門が開く前だったんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -1588,18 +1570,18 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "子どもたちは毎日、男が走ってくるのを合図に家を出てたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
-      "haiku_s": 62.54513447498903,
+      "haiku_s": 55.49976270296611,
       "jev_s": null,
-      "judge_s": 65.80402153602336,
-      "luna_s": 3.2588870610343292,
-      "total_s": 132.58433966501616,
-      "writer_s": 66.7803181289928
+      "judge_s": 55.49976270296611,
+      "luna_s": null,
+      "total_s": 122.79726273089182,
+      "writer_s": 67.29750002792571
     }
   },
   {
@@ -1687,9 +1669,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "子どもたちは毎朝、走ってくる男を学校へ出る合図にしてたんだね。いつもより早く通ったから、勘違いして先に走り出したのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1786,9 +1768,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男がいつも通る時間と、子どもたちが家を出る時間に何か関係があるんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1885,9 +1867,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "子どもたちは毎日男を合図に家を出てたけど、その日は男がいつもより遅く走ってきたから、遅刻しそうだと勘違いして急いだんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -1984,9 +1966,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男がいつもより早く走り始めたから、子どもたちも競争だと思って走ったんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2083,9 +2065,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男は学校の先生で、子どもたちを走らせる朝の運動をしてたんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2111,14 +2093,12 @@ window.PROBE_RAW["haiku-1b/U24"] = [
         "shadow": false
       },
       "content_key": "012-early-morning-run",
-      "errors": [
-        "haiku: Anthropic response exceeded max_tokens"
-      ],
+      "errors": [],
       "fact_sheet_hash": "aeaba231b36a",
       "final": {
         "answer": null,
-        "decision": "haiku_fallback_luna",
-        "kind": "guess_close"
+        "decision": "haiku",
+        "kind": "guess_correct"
       },
       "judgements": {
         "haiku": {
@@ -2127,42 +2107,27 @@ window.PROBE_RAW["haiku-1b/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 4330,
-            "completion_tokens": 16000,
-            "error_reason": "max_tokens",
+            "completion_tokens": 20526,
             "input_tokens": 43,
-            "latency_s": 64.176313,
+            "latency_s": 82.396033,
             "model": "claude-haiku-5-5",
-            "output_tokens": 16000,
+            "output_tokens": 20526,
             "prompt_tokens": 4373,
             "refusal_category": null,
-            "stop_reason": "max_tokens",
+            "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 4330,
               "input_tokens": 43,
-              "output_tokens": 16000
+              "output_tokens": 20526
             }
           },
-          "error": "Anthropic response exceeded max_tokens",
-          "kind": null,
-          "reason": ""
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "男の姿を合図（時計代わり）に登校の支度を始めたと述べ、要点1を当てている。誤りもない。"
         },
         "jev": null,
-        "luna": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "completion_tokens": 616,
-            "finish_reason": "stop",
-            "latency_s": 7.315402,
-            "model": "gpt-6-luna",
-            "prompt_tokens": 3228,
-            "reasoning_tokens": 545
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "男を目安にした点は近いですが、家を出る合図までは述べていません。"
-        }
+        "luna": null
       },
       "media_id": "local-U24",
       "parent_id": null,
@@ -2170,28 +2135,28 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 2664,
-          "completion_tokens": 4920,
+          "cache_read_input_tokens": 2665,
+          "completion_tokens": 25662,
           "input_tokens": 43,
-          "latency_s": 22.288448,
+          "latency_s": 101.543391,
           "model": "claude-haiku-5-5",
-          "output_tokens": 4920,
-          "prompt_tokens": 2707,
+          "output_tokens": 25662,
+          "prompt_tokens": 2708,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 2664,
+            "cache_read_input_tokens": 2665,
             "input_tokens": 43,
-            "output_tokens": 4920
+            "output_tokens": 25662
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！ 続きを考えてごらん。ゆっくりでいいよ。"
+        "text": "正解！子どもたちは毎朝、窓から男を見て家を出ていたんだね。その朝は男が早めに走ったから、遅刻と思って飛び出したけど、まだ校門は閉まってたよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
@@ -2199,18 +2164,18 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "毎朝見かける男の姿を目安にして、子どもたちは登校の支度を始めていたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
-      "haiku_s": 64.17688560695387,
+      "haiku_s": 82.39628558408003,
       "jev_s": null,
-      "judge_s": 71.49233771499712,
-      "luna_s": 7.315452108043246,
-      "total_s": 93.78166293702088,
-      "writer_s": 22.289325222023763
+      "judge_s": 82.39628558408003,
+      "luna_s": null,
+      "total_s": 183.94000020006206,
+      "writer_s": 101.54371461598203
     }
   },
   {
@@ -2298,9 +2263,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "走る男が通るのを時計代わりに、家々の子どもは出発してたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2397,9 +2362,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男が通る頃と子どもが家を出る時刻には、毎朝つながりがあったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2496,9 +2461,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男を見ると子どもが家を出ていたけど、その日はいつもより遅く通ったから焦ったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2595,9 +2560,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "男が家の前を走る時刻は、子どもたちの朝の準備に影響していたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2694,9 +2659,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "子どもたちは早く出た男と競争したくて、通学路へ飛び出していったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2793,9 +2758,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "合図？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2892,9 +2857,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "黄色い帽子",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -2991,9 +2956,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "解説まだー？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3090,9 +3055,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "やっほー",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3189,9 +3154,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "怖めの問題もお願いします",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3288,9 +3253,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "😂👏",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3368,9 +3333,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "新作はこちら https://example.invalid/deal",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
@@ -3467,9 +3432,9 @@ window.PROBE_RAW["haiku-1b/U24"] = [
       "text": "이거 정말 재밌어요",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T06:51:13Z",
+        "judged_at": "2026-10-08T14:20:36Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T06:51:13Z"
+        "webhook_received_at": "2026-10-08T14:20:36Z"
       }
     },
     "timing": {
