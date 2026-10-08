@@ -1641,23 +1641,13 @@
 </details>
 </div>
 </article>
-</details>
 
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-
-
-
-<article class="plan-step" id="step-21-6d15" data-step-id="21-6d15" data-status="todo">
+<article class="plan-step" id="step-21-6d15" data-step-id="21-6d15" data-status="done" data-completed="2026-10-09">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6d15</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>21-6d15</strong><span class="plan-status">完了</span></div>
 <h3>⑤ 惜しい / ⑥ 外れの境目のルールを精査する（確定事実と食い違う推理の扱い）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d14">21-6d14</a> の完了後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>⑤ / ⑥ の食い違いは 25 件・6 ケースで、すべて ⑥ → ⑤ の向き。主因はモデルの指示不追従と判断し境目のルールは新設せず、表の抜け（一部・半分触れた + 誤り = ⑤）の明記と「誤りでない部分だけで数える」を設計書 10.2 に足した（2026-10-09）。素材の直し（U01・U24 の <code>touch</code>、U20-k05）は 21-6d16。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -1682,11 +1672,27 @@
 <div class="plan-fold-inner"><p>21-6d13 の人間チェック後、U01-k06・U20-k05・U21-k06（ラベル ⑥・⑦ は ⑤）を見て、確定事実と食い違う推理の扱いが決まっていないことが分かった（2026-10-08 ユーザー「ルールをもう少し精査する」）。正解基準（素材 #17）の <code>touch</code> の下限・<code>errors</code>（正解から惜しいに落とす誤りの例）との関係も整理する。</p></div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-09</span></summary>
+<div class="plan-fold-inner">
+<p><strong>集計</strong>（<code>work/probe/full-20261008-8p-merged</code>・8 パターン × 525 件・API なし）: ラベル ⑤ / ⑥ と判定が食い違ったのは 25 件・6 ケース（U01-k06 5・U20-k05 7・U21-e21 2・U21-k06 4・U24-k06 5・U28-e21 2）。向きはすべてラベル ⑥ → 判定 ⑤ で、逆向きは 0 件。6 ケースとも 21-6d13 の人間チェックで ⑤ を却下済み。型: A 問題文から読める内容の言い換えを触れたと数えた（10 件。U20-k05・U21-k06 の haiku・U24-k06 の luna）、B <code>touch</code> の語に字面で当たった（5 件。U01-k06「集合写真」）、C 要点と食い違う説明を含むのに ⑤（LLM 10 件。A・B と重なる。判定理由が「触れたが確定事実に反する → ⑤」）、D Jev 段 B が低い確率で ⑤（10 件。<code>T_CLOSE</code> の問題）。参考: ④ / ⑤ の食い違い（④ → ⑤ 29・⑤ → ④ 8）は範囲外。</p>
+<p><strong>決定</strong>（ユーザー）: 案 1（問題文の言い換えを触れたにしない明文化）・案 2（要点ごとの食い違いで触れていない扱い）・案 3（<code>touch</code> のみ + 誤り → ⑥）を提示したが、モデルごとに外すケースが違い、問題文の言い換えの指示はプロンプトに既にあるため、ルールの新設は不要（案 0）とした。ユーザー指摘の表の抜け（「一部だけ / 半分触れている + 明らかな誤り」）は X（⑤ と明記 + 誤りでない部分だけで数える）で埋めた（Y = <code>touch</code> のみ + 誤り → ⑥ は U27-k04 のラベル変更が要るため不採用）。評価ラベルの変更 0 件。設計書 10.2「総則との関係と ④⑤⑥ の決め方」に追記と決定コールアウト。10.4（返信文）は変更不要。</p>
+<p><strong>21-6d16 へ渡したもの</strong>: 判定プロンプト・Jev の選択肢への X の反映、U01・U24 の <code>touch</code> の直し、U20-k05 の扱い（<code>touch</code> を絞るかラベルを ⑤ に戻すか）。</p>
+</div>
 </details>
 </div>
 </article>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
+
+
+
+
+
 
 <article class="plan-step" id="step-21-6d16" data-step-id="21-6d16" data-status="todo">
 <header class="plan-step-head">
@@ -1697,7 +1703,7 @@
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>全方式に効く 3 点を直す。(1) 否定形の質問は普通の日本語の受け答えで答える。ただし「自分の意思で」「わざと」のような限定がつく質問は、その限定が正しいかに答える（例: U12-e02「自分の意思で音を出さないんですか？」→「いいえ。自分の意思で出さないわけじゃないよ。」。人形には意思がない）。(2) 21-6d15 で決めた ⑤ / ⑥ の境目のルール。(3) U12 の確定事実シートに「人形の楽器で音は出ない」旨を足す（U12-e03）。luna・Jev の判定の指示と書き手のプロンプト、評価データのラベルを揃える。あわせて、21-6d13 の人間チェックで許容した 9 組を評価データの別解に取り込む（21-6d6 と同じ作業。新しいルールと合わない組は取り込まず、理由を残す。2026-10-09 ユーザー）。</p></div>
+<div data-field="overview"><p>全方式に効く 3 点を直す。(1) 否定形の質問は普通の日本語の受け答えで答える。ただし「自分の意思で」「わざと」のような限定がつく質問は、その限定が正しいかに答える（例: U12-e02「自分の意思で音を出さないんですか？」→「いいえ。自分の意思で出さないわけじゃないよ。」。人形には意思がない）。(2) 21-6d15 の決定（設計書 10.2「誤りでない部分だけで数える」と、一部・半分触れた + 誤り = ⑤ の明記）を判定プロンプトと Jev の選択肢に入れ、U01・U24 の <code>touch</code> を直し（U01「体を写した写真」を検査画像に絞る・U24「時刻に関係がある」を合図・目安の方向まで含める）、U20-k05 は <code>touch</code> を絞るかラベルを ⑤ に戻すかを決める。(3) U12 の確定事実シートに「人形の楽器で音は出ない」旨を足す（U12-e03）。luna・Jev の判定の指示と書き手のプロンプト、評価データのラベルを揃える。あわせて、21-6d13 の人間チェックで許容した 9 組を評価データの別解に取り込む（21-6d6 と同じ作業。新しいルールと合わない組は取り込まず、理由を残す。2026-10-09 ユーザー）。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>本番の判定モードの既定は変えない。Haiku 専用のプロンプトはここでは作らない（21-6d17）。素材の DB への再適用は 21-7 の前まで（ここでは行わない）。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
