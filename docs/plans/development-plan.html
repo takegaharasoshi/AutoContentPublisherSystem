@@ -1596,6 +1596,7 @@
 <li><strong>結果</strong>: ⑦ は P2 1 件（U01-k03）と L2 の一言（93.1%）だけが NG・L1 種別一致 98.7%・P5 98.2%。⑧ は書き手（<code>low</code>）で崩れ P2 18 件・一言 70.3%・矛盾語 10 件・絵文字 3 件・P7 1 件。費用は判定 $1.28・書き手 1b $0.85・1d $0.09（計 $2.21、小試走分を含む）。拒否・空応答 0、打ち切りは判定 7 件（luna に切り替え）・書き手 1b 2 件。判定の応答時間は中央値 15.6 / p95 49.6 / 最大 81.2 秒。合意の試算は luna + Haiku が P2 0・P5 92.9%・割れ 4。詳細は<a href="../app/sets/umigame-soup-1.html#probe-6d13">設計書 10.6</a>。</li>
 <li>本番の判定モードの既定（<code>hybrid</code> / <code>1d-luna</code>）は変えていない。</li>
 <li>2026-10-08（完了後の追補・ユーザー指示）: Haiku の <code>max_tokens</code> を判定・<code>1b-haiku</code> とも 16,000 → 32,000 に上げ、タイムアウトを 420 秒にした。切れた判定 7 件・書き手 2 件だけを回し直すと全件が答え、打ち切り 0（最大 20,526 トークン）。⑦ の P5 は 100%・P3 は 4 件。詳細は<a href="../app/sets/umigame-soup-1.html#probe-6d13">設計書 10.6</a> の決定。pytest 205 passed。</li>
+<li>2026-10-08（人間チェック・ユーザー）: 8 パターン分 132 組を判断し、許容 13・不可 119 を書き出した（<code>work/probe/full-20261008-8p/probe-review-2026-10-08.json</code> に控えた）。Decisions は使えないと判断し（ユーザー）、評価ページから ⑥ を外した（<code>build_probe_page.py</code> に <code>--exclude-patterns</code> を追加。pytest 206 passed）。許容を取り込んだ合格数は ① 13・② 14・③ 14・④ 15・⑤ 13・⑦ 15・⑧ 11（⑦ の NG は L2 の一言だけ）。詳細は<a href="../app/sets/umigame-soup-1.html#probe-6d13">設計書 10.6</a>。</li>
 </ul></div>
 </details>
 </div>

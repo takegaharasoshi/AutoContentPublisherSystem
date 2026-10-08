@@ -224,3 +224,17 @@ def test_saved_work_caches_decode_and_old_results_generate_page(tmp_path, monkey
     blocked.assert_not_called()
     for name, content in before.items():
         assert (LEGACY_WORK / name).read_bytes() == content
+
+
+def test_exclude_patterns_drops_decisions_and_keeps_run_at() -> None:
+    results = {"meta": {"run_at": "2026-10-08T06:51:13Z",
+                        "patterns": [{"id": "luna-1b"}, {"id": "dec-2c"}]},
+               "rows": {"luna-1b": [], "dec-2c": []}, "cases": []}
+    kept = build_probe_page.exclude_patterns(results, ["dec-2c"])
+    assert [p["id"] for p in kept["meta"]["patterns"]] == ["luna-1b"]
+    assert list(kept["rows"]) == ["luna-1b"]
+    assert kept["meta"]["run_at"] == results["meta"]["run_at"]
+    assert "dec-2c" in results["rows"]  # the saved results are not mutated
+    assert build_probe_page.exclude_patterns(results, []) is results
+    with pytest.raises(ValueError):
+        build_probe_page.exclude_patterns(results, ["nope"])

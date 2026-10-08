@@ -1389,6 +1389,20 @@ def _problem_page(results: dict[str, Any], metrics: dict[str, Any],
     return "".join(parts)
 
 
+def exclude_patterns(results: dict[str, Any], ids: list[str]) -> dict[str, Any]:
+    """Return results without the given patterns; run_at stays so human checks carry over."""
+    if not ids:
+        return results
+    known = {p["id"] for p in results["meta"]["patterns"]}
+    unknown = sorted(set(ids) - known)
+    if unknown:
+        raise ValueError(f"unknown pattern ids: {unknown}")
+    meta = {**results["meta"],
+            "patterns": [p for p in results["meta"]["patterns"] if p["id"] not in ids]}
+    rows = {pid: value for pid, value in results["rows"].items() if pid not in ids}
+    return {**results, "meta": meta, "rows": rows}
+
+
 def build_page(results: dict[str, Any], out: Path) -> Path:
     """Write the summary page, one page per problem and lazy raw JS files."""
     out = Path(out)
@@ -1449,7 +1463,9 @@ def build_page(results: dict[str, Any], out: Path) -> Path:
                        lambda pid, cid: f"{out.stem}/{case_no.get(cid, '')}.html"),
         '<p>トークンの入力はキャッシュ分を含む。費用は記録された usage から算出し、'
         'luna・Haiku は入力 $0.10 / 出力 $0.50（100 万トークン）、キャッシュ読み出しは入力の 0.1 倍、'
-        'Haiku の書き込みは 1.25 倍。Decisions は入力のみ $0.10、Jev の費用は含まない。'
+        'Haiku の書き込みは 1.25 倍。'
+        + ('Decisions は入力のみ $0.10、' if any(p["judge_mode"] == "decisions" for p in patterns) else '')
+        + 'Jev の費用は含まない。'
         '旧結果に usage の記録がない書き手は 0 として表示する。共有の判定はパターンごとに計上する。</p>',
         '<h3 id="human-review">人間チェック後のサマリー</h3>',
         _human_review_table(metrics, patterns, len(review_data["pairs"]),
@@ -1478,8 +1494,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results", type=Path, required=True)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--exclude-patterns", nargs="+", default=[],
+                        help="pattern ids to leave off the page (e.g. dec-2c)")
     args = parser.parse_args(argv)
-    build_page(json.loads(args.results.read_text(encoding="utf-8")), args.out)
+    results = json.loads(args.results.read_text(encoding="utf-8"))
+    build_page(exclude_patterns(results, args.exclude_patterns), args.out)
     return 0
 
 
