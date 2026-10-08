@@ -43,6 +43,8 @@ DECISION_LABEL = {
     "jev_fallback_luna": "Jev 失敗のため luna の判定",
     "decisions": "Decisions の判定",
     "decisions_fallback_luna": "Decisions 失敗のため luna の判定",
+    "haiku": "Haiku の判定",
+    "haiku_fallback_luna": "Haiku 失敗のため luna の判定",
     "consensus_ok": "正解宣言（luna・Jev とも正解）",
     "consensus_split": "正解宣言を保留（luna だけ正解）",
 }
@@ -172,8 +174,54 @@ def _summary_table(metrics: dict[str, Any], patterns: list[dict[str, Any]],
     for pattern in patterns:
         values = metrics["patterns"][pattern["id"]]["metrics"].values()
         cells.append(f"<td>{sum(v['pass'] is True for v in values)} / {count}</td>")
-    cells.append("<td>参考: 対象なしは数えない</td></tr></tbody></table></div>")
+    cells.append("<td>参考: 対象なしは数えない</td></tr>")
+    cells.append(f'<tr class="group"><th colspan="{len(patterns) + 2}">API の利用記録</th></tr>')
+    cells.append(_api_rows(metrics, patterns, threshold=True))
+    cells.append("</tbody></table></div>")
     return "".join(cells)
+
+
+def _api_rows(metrics: dict[str, Any], patterns: list[dict[str, Any]], *, threshold: bool) -> str:
+    """Show each stage's usage and failures without adding quality metrics."""
+    def refusal_text(report: dict[str, Any]) -> str:
+        refusal = report["refusals"]
+        categories = "・".join(f"{key}: {count}" for key, count in refusal["categories"].items())
+        return f"{refusal['count']} 件" + (f"（{categories}）" if categories else "")
+
+    def token_text(report: dict[str, Any]) -> str:
+        return (f"{report['input_tokens']:,} / {report['output_tokens']:,} / "
+                f"読 {report['cache_read_input_tokens']:,}・書 {report['cache_creation_input_tokens']:,}")
+
+    def latency_text(report: dict[str, Any]) -> str:
+        timing = report["latency_s"]
+        return (f"{timing['median']:.2f} / {timing['p95']:.2f} 秒"
+                if timing["median"] is not None else "—")
+
+    rows = (
+        ("拒否件数（判定 / 書き手）", lambda api: (
+            f"{refusal_text(api['judge'])} / {refusal_text(api['writer'])}")),
+        ("判定トークン（入力 / 出力 / キャッシュ）", lambda api: token_text(api["judge"])),
+        ("書き手トークン（入力 / 出力 / キャッシュ）", lambda api: token_text(api["writer"])),
+        ("費用 USD（判定 / 書き手 / 合計）", lambda api: (
+            f"${api['judge']['cost_usd']:.6f} / ${api['writer']['cost_usd']:.6f} / ${api['cost_usd']:.6f}")),
+        ("判定の応答時間（中央値 / p95）", lambda api: latency_text(api["judge"])),
+        ("書き手の応答時間（中央値 / p95）", lambda api: latency_text(api["writer"])),
+        ("打ち切り max_tokens（判定 / 書き手）", lambda api: (
+            f"{api['judge']['max_tokens']} / {api['writer']['max_tokens']} 件")),
+        ("空応答（判定 / 書き手）", lambda api: (
+            f"{api['judge']['empty_responses']} / {api['writer']['empty_responses']} 件")),
+        ("Haiku から luna への再判定", lambda api: f"{api['haiku_fallback_luna']} 件"),
+    )
+    out = []
+    for label, value in rows:
+        out.append(f"<tr><th>{_h(label)}</th>")
+        for pattern in patterns:
+            api = metrics["patterns"][pattern["id"]]["reference"]["api_usage"]
+            out.append(f"<td>{_h(value(api))}</td>")
+        if threshold:
+            out.append("<td>参考</td>")
+        out.append("</tr>")
+    return "".join(out)
 
 
 def _kind_rows(metrics: dict[str, Any], patterns: list[dict[str, Any]],
@@ -1399,6 +1447,10 @@ def build_page(results: dict[str, Any], out: Path) -> Path:
         '<h3>合否表</h3>',
         _summary_table(metrics, patterns,
                        lambda pid, cid: f"{out.stem}/{case_no.get(cid, '')}.html"),
+        '<p>トークンの入力はキャッシュ分を含む。費用は記録された usage から算出し、'
+        'luna・Haiku は入力 $0.10 / 出力 $0.50（100 万トークン）、キャッシュ読み出しは入力の 0.1 倍、'
+        'Haiku の書き込みは 1.25 倍。Decisions は入力のみ $0.10、Jev の費用は含まない。'
+        '旧結果に usage の記録がない書き手は 0 として表示する。共有の判定はパターンごとに計上する。</p>',
         '<h3 id="human-review">人間チェック後のサマリー</h3>',
         _human_review_table(metrics, patterns, len(review_data["pairs"]),
                             len({candidate["key"] for candidate in review_data["leak_candidates"]})),

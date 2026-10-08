@@ -1534,7 +1534,7 @@
 <div class="plan-meta"><strong>21-6d12b</strong><span class="plan-status">未着手</span></div>
 <h3>パターン ⑦⑧（Haiku 5.5）を実装して小試走する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d12a">21-6d12a</a> の承認と API キーの用意の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。<strong>Anthropic の API キーは用意済み</strong>（2026-10-08・ユーザーが <code>~/.bashrc</code> に <code>export ANTHROPIC_API_KEY=…</code> を追記し、モデル情報の取得で有効を確認）。鍵の設定前に起動した Claude Code では環境に入っていないため、鍵を使うコマンド（小試走など）の頭で <code>eval "$(grep '^export ANTHROPIC_API_KEY=' ~/.bashrc)"</code> を実行して読み込む（開き直し不要。Codex に委ねる場合も指示文にこの行を含める）。鍵の値は出力・記録しない。</p>
+<p data-field="result"><strong>現況：</strong>実装済み・コミット済み（push 前。pytest 205 passed）。<strong>小試走は Anthropic のクレジット残高不足（HTTP 400 <code>credit balance is too low</code>）で未実施</strong>（2026-10-08）。ユーザーのクレジット購入後に U01・U13 を回し直す。API キーは <code>~/.bashrc</code> にあり、使うコマンドの頭で <code>eval "$(grep '^export ANTHROPIC_API_KEY=' ~/.bashrc)"</code> を実行して読み込む（鍵の値は出力・記録しない）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -1559,8 +1559,13 @@
 <div class="plan-fold-inner"><p><code>tools/probe_run.py</code> の <code>PATTERNS</code>（<code>LEGACY_PATTERN_IDS</code> は末尾を除く定義なので注意）と <code>need_*</code>・判定キャッシュの方式名、<code>app/config.py</code> の <code>JUDGE_MODES</code> / <code>REPLY_VARIANTS</code>、<code>app/judge/</code> に Haiku の判定モジュール（<code>Judgement</code> を返す）、<code>app/judge/combiner.py</code>、<code>app/reply/writer.py</code>（現行は OpenAI の URL 固定）、<code>tools/probe_metrics.py</code> と <code>tools/build_probe_page.py</code>（拒否件数・トークンの行）。<code>max</code> では出力費と応答時間が luna より増える恐れがあるため、小試走の数字で全件に進むかを判断する。</p></div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 小試走の前で中断</span></summary>
+<div class="plan-fold-inner"><ul>
+<li>2026-10-08: 実装を Codex（gpt-6.1-sol / max）に委ねた。新設は <code>app/anthropic_util.py</code>（Messages API の urllib 呼び出し・スキーマの文字列制約の除去・拒否 / 打ち切り / 空応答の判別）と <code>app/judge/haiku.py</code>。luna の判定・書き手のプロンプト組み立てと後処理を関数に切り出して共有した。<code>LEGACY_PATTERN_IDS</code> は旧 5 パターンの明示タプルにし、既存 6 パターンのキャッシュキーは変えていない（⑦⑧ はキーにモデル名 <code>claude-haiku-5-5</code> を入れて分けた）。pytest 205 passed。</li>
+<li>2026-10-08: 小試走（8 パターン × U01・U13。キャッシュは <code>work/probe/full-20261008</code> の複写を <code>work/probe/trial-6d12b</code> で使用）で、Haiku の呼び出しが全件 HTTP 400（クレジット残高不足）。⑦⑧ は luna への切り替えと定型文の数字になったので使わない。失敗の結果のキャッシュ（判定 157・書き手 265 件）は消した。既存 6 パターンはキャッシュから読まれ、合否表は従来と一致した。</li>
+<li>2026-10-08: エラーの本文が記録に残らなかったので、<code>anthropic_util</code> で HTTP エラーの本文（<code>error.type</code>・<code>message</code>）を例外に含めるようにし、<code>max</code> の思考で 1.6 万トークン近く出ても切れないようタイムアウトを 300 秒にした（Claude の小修正）。</li>
+<li>再開地点: クレジット購入後に <code>services/comment-reply</code> で <code>tools/probe_run.py --patterns luna-1b luna-1d hybrid-1d jev-2b jev-2c dec-2c haiku-1b haiku-1d --problems U01 U13 --out work/probe/trial-6d12b</code>（3 つの API キーを <code>~/.bashrc</code> から読み込む）→ 集計を貼る → 設計書 10.3.7 に結果を書く → 完了処理。</li>
+</ul></div>
 </details>
 </div>
 </article>

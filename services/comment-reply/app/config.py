@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from typing import Mapping
 
 
-JUDGE_MODES = frozenset({"luna", "jev", "hybrid", "decisions"})
-REPLY_VARIANTS = frozenset({"1b", "1d-luna", "2b", "2c-luna"})
+JUDGE_MODES = frozenset({"luna", "jev", "hybrid", "decisions", "haiku"})
+REPLY_VARIANTS = frozenset({"1b", "1d-luna", "2b", "2c-luna", "1b-haiku", "1d-haiku"})
 
 
 def _flag(value: str, name: str) -> bool:

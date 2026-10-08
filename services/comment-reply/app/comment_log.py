@@ -99,7 +99,8 @@ def new_record(
             "prompt_version": PROMPT_VERSION,
         },
         "judgements": {"luna": None, "jev": None,
-                       **({"decisions": None} if config.judge_mode == "decisions" else {})},
+                       **({config.judge_mode: None}
+                          if config.judge_mode in {"decisions", "haiku"} else {})},
         "shadow_mismatch": None,
         "final": {"kind": None, "answer": None, "decision": None},
         "reply": {
@@ -120,11 +121,15 @@ def apply_decision(
     }
     if combined.decisions is not None:
         record["judgements"]["decisions"] = combined.decisions.as_log()
+    if combined.haiku is not None:
+        record["judgements"]["haiku"] = combined.haiku.as_log()
     record["shadow_mismatch"] = combined.mismatch
     record["final"] = combined.final_log()
     record["times"]["judged_at"] = judged_at or utc_now()
     record["reply"].update({"text": reply.text, "source": reply.source,
                             "over_80": reply.over_80, "guard": reply.guard})
+    if reply.debug:
+        record["reply"]["debug"] = reply.debug
     record["errors"].extend(combined.errors)
     if reply.error:
         record["errors"].append(f"writer: {reply.error}")

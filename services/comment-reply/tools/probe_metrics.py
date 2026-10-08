@@ -41,6 +41,16 @@ EMOJI = re.compile(
 OPENING_PUNCTUATION = "。．.!！?？、，,:：;；…・ \u3000"
 CORRECT_OPENERS = ("正解です", templates.CORRECT_PREFIX)
 PHRASING_MIN_CASES = 20
+USD_PER_MILLION = {
+    "luna": {"input": 0.10, "output": 0.50},
+    "haiku": {"input": 0.10, "output": 0.50},
+    "decisions": {"input": 0.10, "output": 0.0},
+}
+CACHE_READ_MULTIPLIER = 0.1
+HAIKU_CACHE_WRITE_MULTIPLIER = 1.25
+TOKEN_FIELDS = (
+    "input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens",
+)
 
 
 def load_core_words() -> dict[str, list[str]]:
@@ -199,6 +209,97 @@ def present_patterns(results: dict[str, Any]) -> list[dict[str, Any]]:
     """Display only patterns included in the saved results, including legacy runs."""
     return [pattern for pattern in results["meta"]["patterns"]
             if pattern["id"] in results["rows"]]
+
+
+def _usage_tokens(method: str, debug: dict[str, Any]) -> dict[str, int]:
+    """Normalize input totals, including cache tokens, without double billing."""
+    usage = debug.get("usage") or {}
+    if method == "haiku":
+        values = {key: int(usage.get(key, debug.get(key, 0)) or 0) for key in TOKEN_FIELDS}
+        values["input_tokens"] += (
+            values["cache_read_input_tokens"] + values["cache_creation_input_tokens"]
+        )
+        return values
+    prompt_details = usage.get("prompt_tokens_details") or {}
+    return {
+        "input_tokens": int(debug.get("prompt_tokens", usage.get("prompt_tokens",
+                            debug.get("input_tokens", usage.get("input_tokens", 0)))) or 0),
+        "output_tokens": int(debug.get("completion_tokens", usage.get("completion_tokens",
+                             debug.get("output_tokens", usage.get("output_tokens", 0)))) or 0),
+        "cache_read_input_tokens": int(debug.get("cached_tokens",
+                                       prompt_details.get("cached_tokens", 0)) or 0),
+        "cache_creation_input_tokens": 0,
+    }
+
+
+def _usage_summary(calls: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
+    """Sum recorded token costs and failures, keeping refusals separate."""
+    totals: dict[str, Any] = {key: 0 for key in TOKEN_FIELDS}
+    cost = 0.0
+    categories: Counter[str] = Counter()
+    empty_reasons: Counter[str] = Counter()
+    truncations = 0
+    unpriced = set()
+    for method, debug in calls:
+        tokens = _usage_tokens(method, debug)
+        for key in TOKEN_FIELDS:
+            totals[key] += tokens[key]
+        prices = USD_PER_MILLION.get(method)
+        if prices:
+            regular_input = max(0, tokens["input_tokens"] - tokens["cache_read_input_tokens"]
+                                - tokens["cache_creation_input_tokens"])
+            cost += (regular_input * prices["input"] + tokens["output_tokens"] * prices["output"]
+                     + tokens["cache_read_input_tokens"] * prices["input"] * CACHE_READ_MULTIPLIER
+                     + tokens["cache_creation_input_tokens"] * prices["input"]
+                     * HAIKU_CACHE_WRITE_MULTIPLIER) / 1_000_000
+        else:
+            unpriced.add(method)
+        if debug.get("stop_reason") == "refusal":
+            categories[debug.get("refusal_category") or "unspecified"] += 1
+        else:
+            refusals = debug.get("refusals") or {}
+            if refusals.get("count"):
+                categories["unspecified"] += refusals["count"]
+        truncations += (debug.get("stop_reason") == "max_tokens"
+                        or debug.get("finish_reason") == "length")
+        if debug.get("error_reason") in {"missing_text", "empty_text", "empty_reply"}:
+            empty_reasons[debug["error_reason"]] += 1
+    return {
+        **totals, "cost_usd": round(cost, 10), "unpriced_methods": sorted(unpriced),
+        "refusals": {"count": sum(categories.values()), "categories": dict(sorted(categories.items()))},
+        "max_tokens": truncations, "empty_responses": sum(empty_reasons.values()),
+        "empty_response_reasons": dict(sorted(empty_reasons.items())),
+    }
+
+
+def _api_usage(pattern: dict[str, Any], items: list[dict[str, Any]]) -> dict[str, Any]:
+    """Report judge and writer costs, including failed calls and Luna fallbacks."""
+    judge_calls = [(method, judgement.get("debug") or {})
+                   for item in items
+                   for method, judgement in (item["record"].get("judgements") or {}).items()
+                   if judgement is not None]
+    writer_method = "haiku" if pattern.get("reply_variant") in {"1b-haiku", "1d-haiku"} else "luna"
+    writer_calls = [(writer_method, debug) for item in items
+                    if (debug := (item["record"].get("reply") or {}).get("debug"))]
+    judge, writer = _usage_summary(judge_calls), _usage_summary(writer_calls)
+    for name, report in (("judge", judge), ("writer", writer)):
+        report["latency_s"] = _timing([
+            float(item["row"]["timing"][f"{name}_s"]) for item in items
+            if item["row"]["timing"].get(f"{name}_s") is not None
+        ])
+    categories = Counter(judge["refusals"]["categories"])
+    categories.update(writer["refusals"]["categories"])
+    return {
+        "judge": judge, "writer": writer,
+        "cost_usd": round(judge["cost_usd"] + writer["cost_usd"], 10),
+        "refusals": {"count": sum(categories.values()), "categories": dict(sorted(categories.items()))},
+        "max_tokens": judge["max_tokens"] + writer["max_tokens"],
+        "empty_responses": judge["empty_responses"] + writer["empty_responses"],
+        "haiku_fallback_luna": sum(
+            (item["record"].get("final") or {}).get("decision") == "haiku_fallback_luna"
+            for item in items
+        ),
+    }
 
 
 def aggregate(results: dict[str, Any],
@@ -454,6 +555,7 @@ def aggregate(results: dict[str, Any],
         for key, entries in ng.items():
             metrics[key]["ng"] = entries
         reference = {
+            "api_usage": _api_usage(pattern, items),
             "yesno_accuracy": split_accuracy,
             "bare_term": _rate_metric(bare_count, len(bare), "参考", lambda _: None),
             "watch_mismatch": _count_metric(sum(x["flags"]["watch_mismatch"] for x in items), n,

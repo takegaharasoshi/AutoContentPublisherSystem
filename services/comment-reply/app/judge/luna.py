@@ -51,6 +51,47 @@ def _schema() -> dict[str, Any]:
     }
 
 
+def build_prompt(problem: Problem) -> str:
+    """Render the unchanged single-pass system prompt for either provider."""
+    return RULES_PATH.read_text(encoding="utf-8").format(
+        problem_text=problem.problem_text,
+        truth=problem.truth,
+        fact_sheet="\n".join(f"- {fact}" for fact in problem.fact_sheet),
+        core_points="\n".join(f"- {point}" for point in problem.core_points),
+        judge_criteria=format_judge_criteria(problem),
+    )
+
+
+def parse_judgement(
+    data: Any, text: str, *, method: str, debug: dict[str, Any],
+) -> Judgement:
+    """Validate and normalize both single-pass judges with the Luna rules."""
+    label = "Luna" if method == "luna" else "Haiku"
+    if not isinstance(data, dict):
+        raise ValueError(f"{label} response is not an object")
+    kind = data["kind"]
+    answer = data["answer"]
+    draft = data["reply"]
+    reason = data["reason"]
+    bare_term = data["bare_term"]
+    if kind not in KINDS or not isinstance(draft, str) or not isinstance(reason, str):
+        raise ValueError(f"{label} response has invalid kind, reply or reason")
+    if bare_term is not None and not isinstance(bare_term, str):
+        raise ValueError(f"{label} response has invalid bare_term")
+    if bare_term:
+        bare_term = bare_term_text(text)
+        kind = "q_open"
+        answer = None
+    if kind == "q_yesno" and answer not in ANSWERS:
+        raise ValueError(f"{label} q_yesno answer is invalid")
+    if kind != "q_yesno" and answer is not None:
+        raise ValueError(f"{label} non-q_yesno answer must be null")
+    return Judgement(
+        method, kind, answer=answer, reason=reason, bare_term=bare_term or None,
+        reply_draft=draft, debug=debug,
+    )
+
+
 def judge(
     comment_id: str, text: str, problem: Problem, *, api_key: str,
     model: str = "gpt-6-luna",
@@ -59,13 +100,7 @@ def judge(
     if not api_key:
         raise ValueError("openai_api_key is empty")
     started = time.monotonic()
-    system = RULES_PATH.read_text(encoding="utf-8").format(
-        problem_text=problem.problem_text,
-        truth=problem.truth,
-        fact_sheet="\n".join(f"- {fact}" for fact in problem.fact_sheet),
-        core_points="\n".join(f"- {point}" for point in problem.core_points),
-        judge_criteria=format_judge_criteria(problem),
-    )
+    system = build_prompt(problem)
     payload = {
         "model": model,
         "reasoning_effort": "xhigh",
@@ -87,37 +122,24 @@ def judge(
     )
     body = post_json_with_retry(req, retries=3, initial_backoff_s=5)
     choice = body["choices"][0]
-    if choice.get("finish_reason") == "length":
-        raise ValueError("Luna response exceeded max_completion_tokens")
-    data = json.loads(choice["message"]["content"])
-    if not isinstance(data, dict):
-        raise ValueError("Luna response is not an object")
-    kind = data["kind"]
-    answer = data["answer"]
-    draft = data["reply"]
-    reason = data["reason"]
-    bare_term = data["bare_term"]
-    if kind not in KINDS or not isinstance(draft, str) or not isinstance(reason, str):
-        raise ValueError("Luna response has invalid kind, reply or reason")
-    if bare_term is not None and not isinstance(bare_term, str):
-        raise ValueError("Luna response has invalid bare_term")
-    if bare_term:
-        bare_term = bare_term_text(text)
-        kind = "q_open"
-        answer = None
-    if kind == "q_yesno" and answer not in ANSWERS:
-        raise ValueError("Luna q_yesno answer is invalid")
-    if kind != "q_yesno" and answer is not None:
-        raise ValueError("Luna non-q_yesno answer must be null")
     usage = body.get("usage", {}) or {}
     debug = {
         "model": model, "finish_reason": choice.get("finish_reason"),
         "prompt_tokens": usage.get("prompt_tokens", 0) or 0,
         "completion_tokens": usage.get("completion_tokens", 0) or 0,
         "reasoning_tokens": (usage.get("completion_tokens_details") or {}).get("reasoning_tokens", 0) or 0,
+        "cached_tokens": (usage.get("prompt_tokens_details") or {}).get("cached_tokens", 0) or 0,
         "latency_s": round(time.monotonic() - started, 6),
     }
-    return Judgement(
-        "luna", kind, answer=answer, reason=reason, bare_term=bare_term or None,
-        reply_draft=draft, debug=debug,
-    )
+    try:
+        if choice.get("finish_reason") == "length":
+            debug["error_reason"] = "max_tokens"
+            raise ValueError("Luna response exceeded max_completion_tokens")
+        content = choice["message"]["content"]
+        if not content:
+            debug["error_reason"] = "missing_text" if content is None else "empty_text"
+        return parse_judgement(json.loads(content), text, method="luna", debug=debug)
+    except Exception as exc:
+        # Preserve exception types and behavior while letting probes retain failed-call usage.
+        exc.debug = debug
+        raise

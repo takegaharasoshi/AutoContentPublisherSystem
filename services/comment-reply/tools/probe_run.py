@@ -21,11 +21,12 @@ if str(SERVICE_DIR) not in sys.path:
     sys.path.insert(0, str(SERVICE_DIR))
 
 from app.comment_log import PROMPT_VERSION, apply_decision, new_record, utc_now  # noqa: E402
+from app import anthropic_util  # noqa: E402
 from app.config import Config  # noqa: E402
-from app.judge import decisions, jev, luna  # noqa: E402
+from app.judge import decisions, haiku, jev, luna  # noqa: E402
 from app.judge.combiner import combine  # noqa: E402
 from app.judge.contract import ANSWERS, Judgement, KINDS, Problem  # noqa: E402
-from app.reply.writer import Reply, write_reply  # noqa: E402
+from app.reply.writer import HAIKU_VARIANTS, Reply, write_reply  # noqa: E402
 from tools.local_trial import _load_stock_problem  # noqa: E402
 from tools.probe_metrics import aggregate  # noqa: E402
 
@@ -44,9 +45,13 @@ PATTERNS = (
      "consensus": False, "reply_variant": "2c-luna"},
     {"id": "dec-2c", "label": "⑥ decisions + 2c-luna", "judge_mode": "decisions", "shadow": False,
      "consensus": False, "reply_variant": "2c-luna"},
+    {"id": "haiku-1b", "label": "⑦ haiku + 1b-haiku", "judge_mode": "haiku", "shadow": False,
+     "consensus": False, "reply_variant": "1b-haiku"},
+    {"id": "haiku-1d", "label": "⑧ haiku + 1d-haiku", "judge_mode": "haiku", "shadow": False,
+     "consensus": False, "reply_variant": "1d-haiku"},
 )
 PATTERN_IDS = tuple(item["id"] for item in PATTERNS)
-LEGACY_PATTERN_IDS = PATTERN_IDS[:-1]
+LEGACY_PATTERN_IDS = ("luna-1b", "luna-1d", "hybrid-1d", "jev-2b", "jev-2c")
 
 
 def _json(path: Path) -> Any:
@@ -123,6 +128,23 @@ def _content_hash(case: dict[str, Any], problem: Problem) -> str:
                   "errors": list(problem.judge_criteria.errors)}])
 
 
+def _judge_cache_key(case: dict[str, Any], problem: Problem, method: str, model: str) -> str:
+    """Preserve the legacy preimage; only Haiku adds its own model ID."""
+    cache_model = (anthropic_util.MODEL if method == "haiku" else
+                   model if method in {"luna", "decisions"} else None)
+    return _key([case["id"], method, PROMPT_VERSION, _content_hash(case, problem), cache_model])
+
+
+def _writer_cache_key(
+    pattern: dict[str, Any], case: dict[str, Any], problem: Problem, combined: Any, model: str,
+) -> str:
+    """Keep the six existing pattern keys byte-for-byte and isolate Haiku writers."""
+    cache_model = anthropic_util.MODEL if pattern["reply_variant"] in HAIKU_VARIANTS else model
+    return _key([pattern["id"], case["id"], PROMPT_VERSION,
+                 [combined.kind, combined.answer, combined.bare_term, combined.decision],
+                 _content_hash(case, problem), cache_model])
+
+
 def _atomic_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp")
@@ -138,7 +160,7 @@ def _cache(path: Path) -> dict[str, Any]:
 def _judge_entry(outcome: Judgement | Exception, elapsed: float) -> dict[str, Any]:
     if isinstance(outcome, Exception):
         failure = {"type": type(outcome).__name__, "message": str(outcome)}
-        if isinstance(outcome, decisions.DecisionsError):
+        if hasattr(outcome, "debug"):
             failure["debug"] = outcome.debug
         return {"exception": failure,
                 "elapsed_s": elapsed}
@@ -151,10 +173,16 @@ def _judge_outcome(entry: dict[str, Any]) -> Judgement | Exception:
     error = entry["exception"]
     if error["type"] == "DecisionsError":
         return decisions.DecisionsError(error["message"], debug=error.get("debug", {}))
+    if error["type"] in {"AnthropicError", "AnthropicRefusalError"}:
+        cls = getattr(anthropic_util, error["type"])
+        return cls(error["message"], debug=error.get("debug", {}))
     cls = getattr(builtins, error["type"], RuntimeError)
     if not isinstance(cls, type) or not issubclass(cls, Exception):
         cls = RuntimeError
-    return cls(error["message"])
+    outcome = cls(error["message"])
+    if "debug" in error:
+        outcome.debug = error["debug"]
+    return outcome
 
 
 def _timed_judge(method: str, call: Callable[..., Judgement], case: dict[str, Any],
@@ -174,11 +202,12 @@ def _timed_judge(method: str, call: Callable[..., Judgement], case: dict[str, An
 
 def _timed_writer(call: Callable[..., Reply], combined: Any, case: dict[str, Any],
                   problem: Problem, variant: str, key: str,
-                  model: str) -> tuple[Reply | Exception, float]:
+                  model: str, anthropic_key: str = "") -> tuple[Reply | Exception, float]:
     start = time.perf_counter()
     try:
         reply = call(combined, case["id"], case["text"], problem,
-                     variant=variant, openai_api_key=key, model=model)
+                     variant=variant, openai_api_key=key, model=model,
+                     **({"anthropic_api_key": anthropic_key} if variant in HAIKU_VARIANTS else {}))
         if not isinstance(reply, Reply):
             raise TypeError(f"writer returned {type(reply).__name__}, expected Reply")
     except Exception as exc:
@@ -189,12 +218,12 @@ def _timed_writer(call: Callable[..., Reply], combined: Any, case: dict[str, Any
 def _judge_timing(pattern: dict[str, Any], entries: dict[str, dict[str, Any]],
                   decision: str | None) -> dict[str, float | None]:
     mode = pattern["judge_mode"]
-    if mode == "decisions":
-        decisions_s = entries["decisions"]["elapsed_s"]
+    if mode in {"decisions", "haiku"}:
+        mode_s = entries[mode]["elapsed_s"]
         luna_s = (entries["luna"]["elapsed_s"]
-                  if decision == "decisions_fallback_luna" else None)
-        judge_s = decisions_s + (luna_s or 0)
-        return {"luna_s": luna_s, "jev_s": None, "decisions_s": decisions_s,
+                  if decision == f"{mode}_fallback_luna" else None)
+        judge_s = mode_s + (luna_s or 0)
+        return {"luna_s": luna_s, "jev_s": None, f"{mode}_s": mode_s,
                 "judge_s": judge_s, "writer_s": None, "total_s": judge_s}
     luna_s = (entries["luna"]["elapsed_s"]
               if mode != "jev" or decision == "jev_fallback_luna" else None)
@@ -236,12 +265,13 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
               luna_call: Callable[..., Judgement] = luna.judge,
               jev_call: Callable[..., Judgement] = jev.judge,
               decisions_call: Callable[..., Judgement] = decisions.judge,
+              haiku_call: Callable[..., Judgement] = haiku.judge,
               writer_call: Callable[..., Reply] = write_reply,
               api_keys: dict[str, str] | None = None,
               run_at: str | None = None) -> dict[str, Any]:
     """Run selected cases; the Python default preserves the legacy five patterns.
 
-    The CLI explicitly selects all six when --patterns is omitted.
+    The CLI explicitly selects all eight when --patterns is omitted.
     Injected calls support fully offline tests.
     """
     if workers < 1:
@@ -262,18 +292,24 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
     keys = api_keys if api_keys is not None else {
         "openai_api_key": os.environ.get("OPENAI_API_KEY", ""),
         "typesafe_api_key": os.environ.get("TYPESAFE_API_KEY", ""),
+        "anthropic_api_key": os.environ.get("ANTHROPIC_API_KEY", ""),
     }
     need_jev = any(p["judge_mode"] in {"jev", "hybrid"} for p in selected_patterns)
     need_decisions = any(p["judge_mode"] == "decisions" for p in selected_patterns)
+    need_haiku = any(p["judge_mode"] == "haiku" for p in selected_patterns)
+    need_haiku_writer = any(p["reply_variant"] in HAIKU_VARIANTS for p in selected_patterns)
     methods = ("luna",) + (("jev",) if need_jev else ()) + (
         ("decisions",) if need_decisions else ()
-    )
+    ) + (("haiku",) if need_haiku else ())
     missing = []
     if (luna_call is luna.judge or writer_call is write_reply or
             (need_decisions and decisions_call is decisions.judge)) and not keys.get("openai_api_key"):
         missing.append("OPENAI_API_KEY")
     if need_jev and jev_call is jev.judge and not keys.get("typesafe_api_key"):
         missing.append("TYPESAFE_API_KEY")
+    if ((need_haiku and haiku_call is haiku.judge) or
+            (need_haiku_writer and writer_call is write_reply)) and not keys.get("anthropic_api_key"):
+        missing.append("ANTHROPIC_API_KEY")
     if missing:
         raise ValueError("missing API key environment variable(s): " + ", ".join(missing))
 
@@ -288,17 +324,17 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
         for case in cases:
             problem = snapshots[case["no"]]
             for method in methods:
-                cache_key = _key([
-                    case["id"], method, PROMPT_VERSION, _content_hash(case, problem),
-                    model if method in {"luna", "decisions"} else None,
-                ])
+                cache_key = _judge_cache_key(case, problem, method, model)
                 index = case["id"], method
                 if not refresh_judge and cache_key in judge_cache:
                     judge_entries[index] = judge_cache[cache_key]
                     judge_status[index] = "hit"
                 else:
-                    call = {"luna": luna_call, "jev": jev_call, "decisions": decisions_call}[method]
-                    api_key_name = "typesafe_api_key" if method == "jev" else "openai_api_key"
+                    call = {"luna": luna_call, "jev": jev_call,
+                            "decisions": decisions_call, "haiku": haiku_call}[method]
+                    api_key_name = {"jev": "typesafe_api_key", "haiku": "anthropic_api_key"}.get(
+                        method, "openai_api_key",
+                    )
                     api_key = keys.get(api_key_name, "")
                     future = pool.submit(_timed_judge, method, call, case, problem, api_key, model)
                     futures[future] = (index, cache_key)
@@ -368,8 +404,9 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                 cache = {method: judge_status.get((case_id, method), "none")
                          if (method == "luna" or need_jev) else "none"
                          for method in ("luna", "jev")}
-                if pattern["judge_mode"] == "decisions":
-                    cache["decisions"] = judge_status[case_id, "decisions"]
+                if pattern["judge_mode"] in {"decisions", "haiku"}:
+                    mode = pattern["judge_mode"]
+                    cache[mode] = judge_status[case_id, mode]
                     cache["jev"] = "none"
                 cache["writer"] = "none"
                 try:
@@ -378,7 +415,7 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                 except Exception as exc:
                     record["errors"].append(f"processing: {type(exc).__name__}: {exc}")
                     mode = pattern["judge_mode"]
-                    staged_failed = mode in {"jev", "decisions"} and (
+                    staged_failed = mode in {"jev", "decisions", "haiku"} and (
                         isinstance(supplied.get(mode), Exception) or
                         bool(getattr(supplied.get(mode), "error", None))
                     )
@@ -386,7 +423,16 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                         f"{mode}_fallback_luna" if staged_failed else None
                     )
                     timing = _judge_timing(pattern, relevant, fallback_decision)
-                    if mode in {"jev", "decisions"} and not staged_failed:
+                    observed = ("luna", "jev") if mode == "hybrid" else (mode,)
+                    if staged_failed:
+                        observed += ("luna",)
+                    for method in observed:
+                        outcome = supplied[method]
+                        logged = outcome if isinstance(outcome, Judgement) else Judgement(
+                            method, None, error=str(outcome), debug=getattr(outcome, "debug", {}),
+                        )
+                        record["judgements"][method] = logged.as_log()
+                    if mode in {"jev", "decisions", "haiku"} and not staged_failed:
                         cache["luna"] = "none"
                     if pattern["judge_mode"] == "luna":
                         cache["jev"] = "none"
@@ -394,7 +440,7 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                                  "timing": timing, "cache": cache})
                     continue
                 timing = _judge_timing(pattern, relevant, combined.decision)
-                if pattern["judge_mode"] in {"jev", "decisions"} and not combined.decision.endswith(
+                if pattern["judge_mode"] in {"jev", "decisions", "haiku"} and not combined.decision.endswith(
                     "_fallback_luna"
                 ):
                     cache["luna"] = "none"
@@ -403,9 +449,7 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                 row = {"case_id": case_id, "no": no, "record": record,
                        "timing": timing, "cache": cache}
                 rows.append(row)
-                writer_key = _key([pattern["id"], case_id, PROMPT_VERSION,
-                                   [combined.kind, combined.answer, combined.bare_term,
-                                    combined.decision], _content_hash(case, problem), model])
+                writer_key = _writer_cache_key(pattern, case, problem, combined, model)
                 if not refresh_writer and writer_key in writer_cache:
                     cached = writer_cache[writer_key]
                     reply = Reply(**cached["reply"])
@@ -417,6 +461,7 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                     future = pool.submit(
                         _timed_writer, writer_call, combined, case, problem,
                         pattern["reply_variant"], keys.get("openai_api_key", ""), model,
+                        keys.get("anthropic_api_key", ""),
                     )
                     writer_futures[future] = (row, combined, writer_key)
         completed = 0
@@ -428,6 +473,8 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
             row["cache"]["writer"] = "miss"
             if isinstance(reply, Exception):
                 row["record"]["errors"].append(f"processing: {type(reply).__name__}: {reply}")
+                if getattr(reply, "debug", None):
+                    row["record"]["reply"]["debug"] = reply.debug
             else:
                 writer_cache[writer_key] = {"reply": asdict(reply), "elapsed_s": elapsed}
                 apply_decision(row["record"], combined, reply, judged_at=run_at)
@@ -436,11 +483,36 @@ def run_probe(*, out: Path, problems: list[str] | None = None,
                     _atomic_json(writer_path, writer_cache)
     if writer_futures:
         _atomic_json(writer_path, writer_cache)
+    if need_haiku or need_haiku_writer:
+        totals = _anthropic_totals(results, judge_entries, judge_status)
+        fresh = _anthropic_totals(results, judge_entries, judge_status, fresh_only=True)
+        fields = (*anthropic_util.USAGE_FIELDS, "refusals")
+        print("Anthropic: " + ", ".join(f"{key}={totals[key]}" for key in fields)
+              + " (new: " + ", ".join(f"{key}={fresh[key]}" for key in fields) + ")")
     metrics = aggregate(results)
     _atomic_json(out / "results.json", results)
     _atomic_json(out / "metrics.json", metrics)
     _print_summary(metrics, selected_patterns)
     return results
+
+
+def _anthropic_totals(
+    results: dict[str, Any], entries: dict[tuple[str, str], dict[str, Any]],
+    status: dict[tuple[str, str], str], *, fresh_only: bool = False,
+) -> dict[str, int]:
+    """Count each shared Haiku judge once and each selected Haiku writer once."""
+    debug_items = [entry.get("judgement", entry.get("exception", {})).get("debug", {})
+                   for index, entry in entries.items() if index[1] == "haiku"
+                   and (not fresh_only or status[index] == "miss")]
+    debug_items.extend((row["record"].get("reply") or {}).get("debug", {})
+                       for pattern in results["meta"]["patterns"]
+                       if pattern["reply_variant"] in HAIKU_VARIANTS
+                       for row in results["rows"][pattern["id"]]
+                       if not fresh_only or row["cache"]["writer"] == "miss")
+    totals = {key: sum((debug.get("usage") or debug).get(key, 0) or 0 for debug in debug_items)
+              for key in anthropic_util.USAGE_FIELDS}
+    totals["refusals"] = sum(debug.get("stop_reason") == "refusal" for debug in debug_items)
+    return totals
 
 
 def main(argv: list[str] | None = None) -> int:

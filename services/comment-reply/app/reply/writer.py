@@ -1,4 +1,4 @@
-"""Four reply variants using the final judge decision as immutable input."""
+"""Reply variants using the final judge decision as immutable input."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 from urllib import request
 
+from app import anthropic_util
 from app.http_util import post_json_with_retry
 from app.judge.combiner import Combined
 from app.judge.contract import Problem
@@ -22,6 +23,8 @@ LOGGER = logging.getLogger(__name__)
 PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
 OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
 SLOTS = ("判定語だけ", "判定語 + 復唱", "判定語 + 一言", "判定語 + 一言")
+HAIKU_VARIANTS = frozenset({"1b-haiku", "1d-haiku"})
+TRUTH_VARIANTS = frozenset({"1b", "1b-haiku"})
 
 
 @dataclass(frozen=True)
@@ -90,18 +93,46 @@ def _template_reply(result: Combined, comment_id: str, problem: Problem) -> str 
     return templates.pick(result.kind, comment_id)
 
 
-def _llm_reply(
-    result: Combined, comment_id: str, text: str, problem: Problem,
-    *, variant: str, api_key: str, model: str,
-) -> tuple[str, dict[str, Any]]:
-    if not api_key:
-        raise ValueError("openai_api_key is empty")
-    with_truth = variant == "1b"
+def build_prompt(
+    result: Combined, comment_id: str, problem: Problem, *, variant: str,
+) -> tuple[str, str]:
+    """Share the exact prompt and slot between the Luna and Haiku variants."""
+    with_truth = variant in TRUTH_VARIANTS
     prompt_name = "reply_1b_with_truth.txt" if with_truth else "reply_writer.txt"
     template = (PROMPTS_DIR / prompt_name).read_text(encoding="utf-8")
     style = (PROMPTS_DIR / "reply_style.txt").read_text(encoding="utf-8")
     slot = pick_slot(comment_id) if result.kind == "q_yesno" else "（この種別では使わない）"
     system = _render_prompt(template, result, problem, with_truth, style=style, slot=slot)
+    return system, slot
+
+
+def reply_schema() -> dict[str, Any]:
+    """Return the shared single-field structured reply contract."""
+    return {
+        "type": "object", "properties": {"reply": {"type": "string"}},
+        "required": ["reply"], "additionalProperties": False,
+    }
+
+
+def _llm_reply(
+    result: Combined, comment_id: str, text: str, problem: Problem,
+    *, variant: str, api_key: str, model: str,
+) -> tuple[str, dict[str, Any]]:
+    system, slot = build_prompt(result, comment_id, problem, variant=variant)
+    with_truth = variant in TRUTH_VARIANTS
+    if variant in HAIKU_VARIANTS:
+        data, debug = anthropic_util.request_json(
+            system, text, reply_schema(), api_key=api_key,
+            effort="max" if with_truth else "low", max_tokens=16000 if with_truth else 4000,
+        )
+        debug["slot"] = slot
+        reply = data.get("reply")
+        if not isinstance(reply, str):
+            debug["error_reason"] = "invalid_reply"
+            raise anthropic_util.AnthropicError("writer JSON reply is not a string", debug=debug)
+        return _clean_text_reply(reply), debug
+    if not api_key:
+        raise ValueError("openai_api_key is empty")
     payload = {
         "model": model,
         "reasoning_effort": "xhigh" if with_truth else "low",
@@ -111,10 +142,7 @@ def _llm_reply(
             "type": "json_schema",
             "json_schema": {
                 "name": "reply_only", "strict": True,
-                "schema": {
-                    "type": "object", "properties": {"reply": {"type": "string"}},
-                    "required": ["reply"], "additionalProperties": False,
-                },
+                "schema": reply_schema(),
             },
         },
     }
@@ -127,26 +155,37 @@ def _llm_reply(
     started = time.monotonic()
     body = post_json_with_retry(req, retries=5, initial_backoff_s=2)
     choice = body["choices"][0]
-    if choice.get("finish_reason") == "length":
-        raise ValueError("writer exceeded max_completion_tokens")
-    data = json.loads(choice["message"]["content"])
-    reply = data.get("reply") if isinstance(data, dict) else None
-    if not isinstance(reply, str):
-        raise ValueError("writer JSON reply is not a string")
     usage = body.get("usage", {}) or {}
     details = usage.get("completion_tokens_details", {}) or {}
     debug = {
         "model": model, "slot": slot, "prompt_tokens": usage.get("prompt_tokens", 0) or 0,
         "completion_tokens": usage.get("completion_tokens", 0) or 0,
         "reasoning_tokens": details.get("reasoning_tokens", 0) or 0,
+        "cached_tokens": (usage.get("prompt_tokens_details") or {}).get("cached_tokens", 0) or 0,
+        "finish_reason": choice.get("finish_reason"),
         "latency_s": round(time.monotonic() - started, 6),
     }
-    return _clean_text_reply(reply), debug
+    try:
+        if choice.get("finish_reason") == "length":
+            debug["error_reason"] = "max_tokens"
+            raise ValueError("writer exceeded max_completion_tokens")
+        content = choice["message"]["content"]
+        if not content:
+            debug["error_reason"] = "missing_text" if content is None else "empty_text"
+        data = json.loads(content)
+        reply = data.get("reply") if isinstance(data, dict) else None
+        if not isinstance(reply, str):
+            raise ValueError("writer JSON reply is not a string")
+        return _clean_text_reply(reply), debug
+    except Exception as exc:
+        exc.debug = debug
+        raise
 
 
 def write_reply(
     result: Combined, comment_id: str, text: str, problem: Problem, *,
     variant: str, openai_api_key: str = "", model: str = "gpt-6-luna",
+    anthropic_api_key: str = "",
 ) -> Reply:
     """Write one reply, preserving the final kind and answer."""
     kind = result.kind
@@ -158,16 +197,19 @@ def write_reply(
     elif kind in {"troll", "abuse"}:
         value, source = templates.pick(kind, comment_id), "template"
         error, debug = None, {}
-    elif variant == "2b" or (kind == "guess_correct" and variant != "1b"):
+    elif variant == "2b" or (kind == "guess_correct" and variant not in TRUTH_VARIANTS):
         value, source = _template_reply(result, comment_id, problem), "template"
         error, debug = None, {}
     else:
+        debug = {}
         try:
             value, debug = _llm_reply(
                 result, comment_id, text, problem, variant=variant,
-                api_key=openai_api_key, model=model,
+                api_key=anthropic_api_key if variant in HAIKU_VARIANTS else openai_api_key,
+                model=model,
             )
             if not value:
+                debug["error_reason"] = "empty_reply"
                 raise ValueError("writer reply is empty")
             if kind == "q_yesno" and not value.startswith(templates.YESNO_OPENERS[result.answer or "irrelevant"]):
                 raise ValueError("writer reply does not begin with the required answer word")
@@ -182,8 +224,9 @@ def write_reply(
             source, error = "llm", None
         except Exception as exc:
             error = str(exc)
+            debug = getattr(exc, "debug", debug)
             LOGGER.warning("REPLY_WRITER_FALLBACK comment_id=%s error=%s", comment_id, error)
-            value, source, debug = _template_reply(result, comment_id, problem), "fallback_template", {}
+            value, source = _template_reply(result, comment_id, problem), "fallback_template"
     guard = None
     reveal_kind = None if result.decision == "consensus_split" else kind
     if value is not None and not leak_guard.is_correct_reveal(reveal_kind, value):

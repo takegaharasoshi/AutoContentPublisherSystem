@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Mapping
 
 from app.config import Config
-from app.judge import decisions, jev, luna
+from app.judge import decisions, haiku, jev, luna
 from app.judge.contract import Judgement, Problem
 
 
@@ -30,6 +30,7 @@ class Combined:
     mismatch: bool | None
     errors: list[str] = field(default_factory=list)
     decisions: Judgement | None = None
+    haiku: Judgement | None = None
 
     def final_log(self) -> dict[str, str | None]:
         """Return the stable final-decision log object."""
@@ -44,6 +45,7 @@ def combine(
     luna_call: Callable[..., Judgement] = luna.judge,
     jev_call: Callable[..., Judgement] = jev.judge,
     decisions_call: Callable[..., Judgement] = decisions.judge,
+    haiku_call: Callable[..., Judgement] = haiku.judge,
 ) -> Combined:
     """Choose a mode, with optional precomputed local-trial calls."""
     supplied = precomputed or {}
@@ -73,24 +75,31 @@ def combine(
         except Exception as exc:
             return exc
 
-    if config.judge_mode == "decisions":
-        if "decisions" in supplied:
-            outcome = supplied["decisions"]
+    if config.judge_mode in {"decisions", "haiku"}:
+        method = config.judge_mode
+        if method in supplied:
+            outcome = supplied[method]
         else:
             try:
-                outcome = decisions_call(
-                    comment_id, text, problem,
-                    api_key=credentials.get("openai_api_key", ""), model=config.luna_model,
-                )
+                if method == "haiku":
+                    outcome = haiku_call(
+                        comment_id, text, problem,
+                        api_key=credentials.get("anthropic_api_key", ""),
+                    )
+                else:
+                    outcome = decisions_call(
+                        comment_id, text, problem,
+                        api_key=credentials.get("openai_api_key", ""), model=config.luna_model,
+                    )
             except Exception as exc:
                 outcome = exc
         if isinstance(outcome, Judgement) and not outcome.error:
             return Combined(
                 None, None, outcome.kind or "", outcome.answer, outcome.bare_term,
-                "decisions", None, decisions=outcome,
+                method, None, **{method: outcome},
             )
         logged = outcome if isinstance(outcome, Judgement) else Judgement(
-            "decisions", None, error=str(outcome), debug=getattr(outcome, "debug", {}),
+            method, None, error=str(outcome), debug=getattr(outcome, "debug", {}),
         )
         fallback = call_luna()
         if isinstance(fallback, Exception):
@@ -101,8 +110,8 @@ def combine(
             raise RuntimeError(fallback.error)
         return Combined(
             fallback, None, fallback.kind or "", fallback.answer, fallback.bare_term,
-            "decisions_fallback_luna", None, [f"decisions: {logged.error}"],
-            decisions=logged,
+            f"{method}_fallback_luna", None, [f"{method}: {logged.error}"],
+            **{method: logged},
         )
 
     if need_luna and need_jev and not supplied:

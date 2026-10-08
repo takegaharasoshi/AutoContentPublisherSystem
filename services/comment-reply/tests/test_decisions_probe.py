@@ -32,8 +32,8 @@ def _writer(combined, *args, **kwargs) -> Reply:
 
 
 def test_six_patterns_cli_defaults_and_explicit_selection(tmp_path, monkeypatch) -> None:
-    assert len(probe_run.PATTERNS) == 6
-    assert probe_run.PATTERNS[-1] == {
+    assert len(probe_run.PATTERNS[:6]) == 6
+    assert probe_run.PATTERNS[5] == {
         "id": "dec-2c", "label": "⑥ decisions + 2c-luna", "judge_mode": "decisions",
         "shadow": False, "consensus": False, "reply_variant": "2c-luna",
     }
@@ -56,7 +56,7 @@ def test_six_patterns_usage_cache_replay_and_page(tmp_path, monkeypatch, problem
     }))
     writer = Mock(side_effect=_writer)
     results = probe_run.run_probe(
-        **args, patterns=list(probe_run.PATTERN_IDS), luna_call=luna, jev_call=jev,
+        **args, patterns=list(probe_run.PATTERN_IDS[:6]), luna_call=luna, jev_call=jev,
         decisions_call=dec, writer_call=writer,
     )
     assert (luna.call_count, jev.call_count, dec.call_count, writer.call_count) == (1, 1, 1, 6)
@@ -72,13 +72,13 @@ def test_six_patterns_usage_cache_replay_and_page(tmp_path, monkeypatch, problem
         "input_tokens": 80, "output_tokens": 0, "calls": 4,
         "refusals": {"count": 0, "names": []},
     }
-    assert set(results["rows"]) == set(probe_run.PATTERN_IDS)
+    assert set(results["rows"]) == set(probe_run.PATTERN_IDS[:6])
     before = {name: (args["out"] / name).read_bytes()
               for name in ("judge_cache.json", "writer_cache.json")}
     blocked = Mock(side_effect=AssertionError("cache replay must not call an API"))
     monkeypatch.setattr(http_util.request, "urlopen", blocked)
     replay = probe_run.run_probe(
-        **args, patterns=list(probe_run.PATTERN_IDS), luna_call=blocked, jev_call=blocked,
+        **args, patterns=list(probe_run.PATTERN_IDS[:6]), luna_call=blocked, jev_call=blocked,
         decisions_call=blocked, writer_call=blocked,
     )
     assert "new: input_tokens=0, calls=0" in capsys.readouterr().out
@@ -190,7 +190,7 @@ def test_frozen_legacy_cache_keys_and_five_pattern_results(tmp_path, monkeypatch
     for name, content in before.items():
         assert (args["out"] / name).read_bytes() == content
     # A metadata-only sixth entry must not create an empty phantom pattern.
-    results["meta"]["patterns"].append(probe_run.PATTERNS[-1])
+    results["meta"]["patterns"].append(probe_run.PATTERNS[5])
     page = build_probe_page.build_page(results, tmp_path / "legacy.html")
     assert "5 パターン" in page.read_text(encoding="utf-8")
     assert "⑥ decisions + 2c-luna" not in page.read_text(encoding="utf-8")

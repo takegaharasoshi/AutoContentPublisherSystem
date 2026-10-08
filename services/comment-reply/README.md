@@ -69,17 +69,19 @@ OPENAI_API_KEY=... TYPESAFE_API_KEY=... .venv/bin/python tools/local_trial.py \
 
 ## コメント返信の評価プローブ
 
-`tools/probe_run.py` は評価ケースを本番の判定合成・書き手・コメント記録に通し、`results.json` と `metrics.json` を出します。判定結果はケース単位でパターン間共有し、`judge_cache.json` と `writer_cache.json` で中断後も再開できます。実行には `OPENAI_API_KEY` と `TYPESAFE_API_KEY` を環境変数で指定します。Instagram への送信は行いません。
+`tools/probe_run.py` は評価ケースを本番の判定合成・書き手・コメント記録に通し、`results.json` と `metrics.json` を出します。判定結果はケース単位でパターン間共有し、`judge_cache.json` と `writer_cache.json` で中断後も再開できます。実行には `OPENAI_API_KEY` と `TYPESAFE_API_KEY`、Haiku パターンを選ぶ場合は `ANTHROPIC_API_KEY` を環境変数で指定します。Instagram への送信は行いません。
 
 ```bash
 cd services/comment-reply
-OPENAI_API_KEY=... TYPESAFE_API_KEY=... .venv/bin/python tools/probe_run.py \
-  --problems U01 U13 --out work/probe/sample
+OPENAI_API_KEY=... TYPESAFE_API_KEY=... ANTHROPIC_API_KEY=... \
+  .venv/bin/python tools/probe_run.py --problems U01 U13 \
+  --patterns luna-1b luna-1d hybrid-1d jev-2b jev-2c dec-2c haiku-1b haiku-1d \
+  --out work/probe/sample
 .venv/bin/python tools/build_probe_page.py \
   --results work/probe/sample/results.json --out /tmp/comment-reply-probe.html
 ```
 
-`--patterns` は 6 パターン（既定は全件）から選べます。
+`--patterns` は 8 パターン（CLI の既定は全件）から選べます。本番の既定は `hybrid` / `1d-luna` のままです。
 
 | ID | 判定 + 返信文 |
 |---|---|
@@ -89,9 +91,17 @@ OPENAI_API_KEY=... TYPESAFE_API_KEY=... .venv/bin/python tools/probe_run.py \
 | `jev-2b` | ④ jev + 2b |
 | `jev-2c` | ⑤ jev + 2c-luna |
 | `dec-2c` | ⑥ decisions + 2c-luna |
+| `haiku-1b` | ⑦ haiku + 1b-haiku |
+| `haiku-1d` | ⑧ haiku + 1d-haiku |
 
-Decisions は `dec-2c` を選んだときだけ呼び、判定キャッシュの方式名は `decisions` です。実行ログに入力トークン合計と段の呼び出し回数（新規呼び出し分も併記）を出し、metrics と評価ページにも記録します。旧 5 パターンのキャッシュキーは変わりません。Decisions への変換（`decisions.py` の問いの組み立て）を変えてもキャッシュキーは変わらないため、取り直すときは `judge_cache.json` から方式 `decisions` のエントリだけを消して回します（`--refresh-judge` は luna・Jev も取り直します）。旧パターンだけを再開する場合は `--patterns luna-1b luna-1d hybrid-1d jev-2b jev-2c` を指定します。Python の `run_probe()` は既存呼び出しとの互換性のため省略時に旧 5 パターンを選び、6 パターンには `patterns=list(PATTERN_IDS)` を渡します。
+Decisions は `dec-2c` を選んだときだけ呼び、判定キャッシュの方式名は `decisions` です。実行ログに入力トークン合計と段の呼び出し回数（新規呼び出し分も併記）を出し、metrics と評価ページにも記録します。既存 6 パターンのキャッシュキーは変わりません。Decisions への変換（`decisions.py` の問いの組み立て）を変えてもキャッシュキーは変わらないため、取り直すときは `judge_cache.json` から方式 `decisions` のエントリだけを消して回します（`--refresh-judge` は luna・Jev も取り直します）。旧パターンだけを再開する場合は `--patterns luna-1b luna-1d hybrid-1d jev-2b jev-2c` を指定します。Python の `run_probe()` は既存呼び出しとの互換性のため省略時に旧 5 パターンを選び、8 パターンには `patterns=list(PATTERN_IDS)` を渡します。
 
-`--workers` で並列数を変更、`--refresh-judge` / `--refresh-writer` でキャッシュを更新できます。ページ生成器は `--out` を省くと `docs/app/sets/umigame-soup-1-probe.html`（サマリー = 合否表・グラフ・評価・問題の目次）に出力し、同名ディレクトリに問題ごとのページ（`U01.html` 等。パターンごとのコメント一覧）と生データの JS（開いたときに遅延読み込み）を置きます（21-6d3 で分割）。旧 5 パターンの results も、含まれているパターンだけで生成できます。判定キャッシュのキーに Jev・Decisions の閾値は入らないため、閾値を変えたら `--refresh-judge` で取り直してください。並列数を上げすぎると OpenAI の 429 が判定・書き手の記録に残るので、全件は `--workers 4` 程度で回します。
+Haiku は `haiku-1b` / `haiku-1d` を選んだときだけ呼びます。モデルは `claude-haiku-5-5`、判定と 1b は effort `max` / `max_tokens=16000`、1d は `low` / `4000` です。luna とプロンプト・スキーマ・後処理を共有し、判定の拒否・失敗は luna で再判定して `haiku_fallback_luna`、書き手の拒否・失敗は `fallback_template` を記録します。HTTP は標準ライブラリの urllib を使い、system の末尾に 5 分のキャッシュ指定を付けます。実行ログは Anthropic の入力・出力・キャッシュ書き込み・読み出しトークンと拒否件数を、合計 / 新規呼び出し分で表示します。
+
+追加キーは、従来と同じ JSON の SHA-256 です。判定は `[case_id, "haiku", PROMPT_VERSION, content_hash, "claude-haiku-5-5"]`、書き手は `[pattern_id, case_id, PROMPT_VERSION, [kind, answer, bare_term, decision], content_hash, "claude-haiku-5-5"]`（pattern_id は `haiku-1b` / `haiku-1d`）。プロンプトの変更時だけ既存と同じ `PROMPT_VERSION` が変わります。
+
+metrics の `reference.api_usage` に、判定 / 書き手ごとの入力・出力・キャッシュ読み書きトークン、費用 USD、応答時間の中央値 / p95、拒否のカテゴリ、打ち切り・空応答、Haiku から luna への再判定件数を出します。入力トークンはキャッシュ分を含み、費用は通常入力 $0.10 / 出力 $0.50（100 万トークン）、キャッシュ読み出しは入力の 0.1 倍、Haiku の書き込みは 1.25 倍で計算します（単価は `probe_metrics.py` の定数）。Decisions は設計どおり入力のみ $0.10、Jev は単価未設定のため費用に含めず `unpriced_methods` に残します。判定の共有分は各パターンに計上するため、パターン費用の和は実請求額と異なります。旧 results に書き手の debug がない場合はその usage を 0 として扱います。U01・U13 の小試走の費用上限は $1、全件は $5 です。
+
+`--workers` で並列数を変更、`--refresh-judge` / `--refresh-writer` でキャッシュを更新できます。ページ生成器は `--out` を省くと `docs/app/sets/umigame-soup-1-probe.html`（サマリー = 合否表・グラフ・評価・問題の目次）に出力し、同名ディレクトリに問題ごとのページ（`U01.html` 等。パターンごとのコメント一覧）と生データの JS（開いたときに遅延読み込み）を置きます（21-6d3 で分割）。旧 5 / 6 パターンの results も、含まれているパターンだけで生成できます。判定キャッシュのキーに Jev・Decisions の閾値は入らないため、閾値を変えたら `--refresh-judge` で取り直してください。並列数を上げすぎると OpenAI の 429 が判定・書き手の記録に残るので、全件は `--workers 4` 程度で回します。
 
 `tools/probe_sweep.py --probe <results.json のあるディレクトリ>` は、記録された段 B の hit / close と段 B2 の確率から Jev・Decisions の `T_POINT`・`T_CONTRADICT`・`T_CLOSE` の掃引と、「正解宣言は組み合わせの全方式の合意を必須にする」場合の P2・P5（判定レベル）を再計算し、`sweep.json` に書きます（21-6d11）。`T_POINT` を下げて新たに候補に入るケースは段 B2 を呼んでいないので、`--fill-b2` を付けるとその分だけ実 API で取って `sweep_b2_cache.json` に貯めます（付けないときは「B2 未取得」として数えます）。
