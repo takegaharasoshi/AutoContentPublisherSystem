@@ -1611,11 +1611,48 @@
 
 
 
+<article class="plan-step" id="step-21-6d14" data-step-id="21-6d14" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6d14</strong><span class="plan-status">未着手</span></div>
+<h3>L2 の一言の合格基準を 30 字に緩める（プロンプトの目標は 20 字のまま）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d13">21-6d13</a> の人間チェックの後（2026-10-08 済み）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>評価指標「L2 一言の長さ」の合格基準を「20 字以内 100%」から「30 字以内 100%」に変える。書き手のプロンプトの「20 字以内」は目標として残し、合格基準との差をゆとりにする。<code>probe_metrics</code> の基準を直し、21-6d13 の結果（<code>work/probe/full-20261008-8p-merged</code>）から評価ページを作り直す（⑥⑧ は外したまま）。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>書き手・判定のプロンプトとコードは変えない（本番の 30 字の上限確認は入れない。2026-10-08 ユーザー決定）。プローブの取り直しはしない（API を呼ばない）。<code>run_at</code> を保ち、人間チェックの判断を引き継ぐ。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>probe_metrics</code> の L2 一言の基準が 30 字になり、comment-reply の pytest が全パスする（要約行を貼る）。</li>
+<li>評価ページを作り直し、6 パターンの L2 一言の値と合格数（人間チェック後）を会話に貼る。</li>
+<li>設計書 10.2（レベル 2 の基準）と 10.4（長さ）に「プロンプトの目標 20 字・合格基準 30 字」と理由を書く。</li>
+<li>計画書を更新し、日本語メッセージでコミットする（<code>services/</code> を触るので push は確認待ち）。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>評価ページの確認と push の可否（ユーザー）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/comment-reply/tools/</code>・<code>tests/</code>・<code>docs/</code>）。stop after 15 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 20 字の由来と 30 字にする理由</span></summary>
+<div class="plan-fold-inner"><p>20 字は 21-4a-2（2026-09-07）の漏れ対策（補足 30 字で漏れ 56 件 → 原則なし・二義時のみ 20 字で 2 件）から引き継いだ数字。今は核心語の出力ガード（21-6d9）と P1 の人の確認が漏れを抑えており、21-6d13 の超過はすべて質問の復唱による 21〜27 字で漏れではない。30 字なら全パターンの超過が 0 件になる。プロンプトを 30 字にすると書き手がさらに伸びるおそれがあるため、目標 20 字は変えない（2026-10-08 ユーザー）。返信全体の 80 字（P7）は変えない。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
 <article class="plan-step" id="step-21-6e" data-step-id="21-6e" data-status="todo" data-kind="decision">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>21-6e</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>人間プローブ（ローカル）と方式選定</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-6d4 の完了後（21-6d3 の集計確認後）。<a href="#step-21-6d6">21-6d6</a>（人間チェックの取り込み）の完了後（2026-10-04 追加）。<a href="#step-21-6d11">21-6d11</a>（正解基準・境目ケース・P1 の 2 段化・パターン ⑥ を入れた全件プローブ）の完了後（2026-10-07 追加）。<a href="#step-21-6d13">21-6d13</a>（Haiku 5.5 のパターン ⑦⑧ を足した 8 パターンの全件プローブ）の完了後（2026-10-08 追加）。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6d4 の完了後（21-6d3 の集計確認後）。<a href="#step-21-6d6">21-6d6</a>（人間チェックの取り込み）の完了後（2026-10-04 追加）。<a href="#step-21-6d11">21-6d11</a>（正解基準・境目ケース・P1 の 2 段化・パターン ⑥ を入れた全件プローブ）の完了後（2026-10-07 追加）。<a href="#step-21-6d13">21-6d13</a>（Haiku 5.5 のパターン ⑦⑧ を足した 8 パターンの全件プローブ）の完了後（2026-10-08 追加）。<a href="#step-21-6d14">21-6d14</a>（L2 一言の合格基準を 30 字に）の完了後（2026-10-08 追加）。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
