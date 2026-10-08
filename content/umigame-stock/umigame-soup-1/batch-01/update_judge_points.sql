@@ -204,7 +204,7 @@ WHERE b.set_code = 'umigame-soup-1' AND s.content_key = '010-two-hour-dentist';
 -- 012-early-morning-run: 早く走った朝
 UPDATE umigame_stock_items s
 JOIN batch_sets b ON b.id = s.set_id
-SET s.core_points = '["子どもたちは毎日男を合図に家を出ていた"]',
+SET s.core_points = '["子どもたちは毎朝男を時計代わりにしていた"]',
     s.reveal_text = '子どもたちは毎朝同じ時刻に走る男を合図に家を出ていた。男が早く走った朝、遅刻だと思い込んで飛び出した。',
     s.title = '早く走った朝',
     s.truth = '男は10年ほど、毎朝7時40分ちょうどに家を出て、小学校の通学路をジョギングしていた。

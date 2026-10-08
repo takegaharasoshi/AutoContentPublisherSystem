@@ -107,12 +107,12 @@ WHERE b.set_code = 'umigame-soup-1' AND i.content_key = '010-two-hour-dentist';
 -- 012-early-morning-run: 早く走った朝
 UPDATE umigame_stock_items s
 JOIN batch_sets b ON b.id = s.set_id
-SET s.judge_criteria = '{"points":[{"hit":"子どもたちは毎朝決まった時刻に通る男を見て、家を出る合図（時計代わり）にしていたと言っている","touch":"男が通る時刻と子どもたちが家を出る時刻に毎朝つながりがあると述べている（男を見て出ていたとまでは言わない）。男が早く通った・男と競争した、では触れたにしない"}],"errors":["その朝、男がいつもより遅く通った","男が子どもたちに声をかけた・合図した"]}'
+SET s.judge_criteria = '{"points":[{"hit":"毎朝通る男の姿を、家を出る・支度をする時刻の目安（合図・時計代わり）にしていたと言っている。「男を見て走った」だけでは当てたにしない","touch":"男が通る時刻と子どもたちが家を出る時刻に毎朝つながりがあると述べている（男を見て出ていたとまでは言わない）。男が早く通った・男と競争した、では触れたにしない"}],"errors":["その朝、男がいつもより遅く通った","男が子どもたちに声をかけた・合図した"]}'
 WHERE b.set_code = 'umigame-soup-1' AND s.content_key = '012-early-morning-run';
 
 UPDATE umigame_items i
 JOIN batch_sets b ON b.id = i.set_id
-SET i.judge_criteria = '{"points":[{"hit":"子どもたちは毎朝決まった時刻に通る男を見て、家を出る合図（時計代わり）にしていたと言っている","touch":"男が通る時刻と子どもたちが家を出る時刻に毎朝つながりがあると述べている（男を見て出ていたとまでは言わない）。男が早く通った・男と競争した、では触れたにしない"}],"errors":["その朝、男がいつもより遅く通った","男が子どもたちに声をかけた・合図した"]}'
+SET i.judge_criteria = '{"points":[{"hit":"毎朝通る男の姿を、家を出る・支度をする時刻の目安（合図・時計代わり）にしていたと言っている。「男を見て走った」だけでは当てたにしない","touch":"男が通る時刻と子どもたちが家を出る時刻に毎朝つながりがあると述べている（男を見て出ていたとまでは言わない）。男が早く通った・男と競争した、では触れたにしない"}],"errors":["その朝、男がいつもより遅く通った","男が子どもたちに声をかけた・合図した"]}'
 WHERE b.set_code = 'umigame-soup-1' AND i.content_key = '012-early-morning-run';
 
 -- 013-fifty-five-year-nengajo: 55年目の年賀状
