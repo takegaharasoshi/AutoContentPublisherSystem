@@ -1648,16 +1648,127 @@
 </div>
 </article>
 
-<article class="plan-step" id="step-21-6e" data-step-id="21-6e" data-status="todo" data-kind="decision">
+<article class="plan-step" id="step-21-6d15" data-step-id="21-6d15" data-status="todo">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>21-6e</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
-<h3>人間プローブ（ローカル）と方式選定</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>21-6d4 の完了後（21-6d3 の集計確認後）。<a href="#step-21-6d6">21-6d6</a>（人間チェックの取り込み）の完了後（2026-10-04 追加）。<a href="#step-21-6d11">21-6d11</a>（正解基準・境目ケース・P1 の 2 段化・パターン ⑥ を入れた全件プローブ）の完了後（2026-10-07 追加）。<a href="#step-21-6d13">21-6d13</a>（Haiku 5.5 のパターン ⑦⑧ を足した 8 パターンの全件プローブ）の完了後（2026-10-08 追加）。<a href="#step-21-6d14">21-6d14</a>（L2 一言と P7 の合格基準を緩める）の完了後（2026-10-08 追加）。</p>
+<div class="plan-meta"><strong>21-6d15</strong><span class="plan-status">未着手</span></div>
+<h3>⑤ 惜しい / ⑥ 外れの境目のルールを精査する（確定事実と食い違う推理の扱い）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d14">21-6d14</a> の完了後。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>ユーザーが 21-6c2 のローカル試行ツールで、各問題に自由にコメントを入れて 2 方式の返信を確かめる（想定外の言い回し・曖昧な質問・感想・雑談・荒らし）。機械プローブと人間プローブの結果から方式を選ぶ（候補は ①〜⑤ と ⑦ の 6 パターン。⑥ Decisions と ⑧ 1d-haiku は 21-6d13 の人間チェック後に不採用 = 2026-10-08 ユーザー）。<strong>「正解宣言は 2 方式の合意を必須にするか」と段 B の閾値も、21-6d11 の試算を見てここで決める</strong>（2026-10-07 ユーザー）。</p><p><strong>方針案（2026-10-08 ユーザー・未決定）</strong>: ⑦ haiku + 1b-haiku を第一候補とする。理由と着手前の確認事項は下の「実装の細部・背景」。</p></div>
+<div data-field="overview"><p>今の判定ルールは「どれかの要点に触れていれば ⑤」だけで、確定事実と食い違う推理の扱いがない（例: U21-k06「母が植えた種」は Haiku が確定事実に反すると認めつつ ⑤ にした）。全パターンの ⑤ / ⑥ の不一致を洗い出して型に分け、境目のルール案を作る。ユーザーと詰めて設計書（判定の基準・正解基準の書き方）を Fix する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>この段階ではプロンプト・コード・評価データを変えない（反映は 21-6d16）。API を呼ばない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>21-6d13 の結果（<code>work/probe/full-20261008-8p-merged</code>）から、ラベル ⑤ / ⑥ と判定が食い違うケースを全パターン分まとめ、型ごとの件数と例を会話に貼る。</li>
+<li>境目のルール案（2〜3 案と推し）を提示し、ユーザーの決定を設計書 10.2 / 10.4（判定の基準）に書く。</li>
+<li>計画書を更新し、日本語メッセージでコミットする（docs だけなので pull --rebase → push まで。ただし未 push の services/ のコミットがあるときは確認待ち）。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>ルール案の選択（ユーザー判断）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>ルールの決定と設計書への記載まで（<code>docs/</code>）。stop after 15 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 起票の経緯</span></summary>
+<div class="plan-fold-inner"><p>21-6d13 の人間チェック後、U01-k06・U20-k05・U21-k06（ラベル ⑥・⑦ は ⑤）を見て、確定事実と食い違う推理の扱いが決まっていないことが分かった（2026-10-08 ユーザー「ルールをもう少し精査する」）。正解基準（素材 #17）の <code>touch</code> の下限・<code>errors</code>（正解から惜しいに落とす誤りの例）との関係も整理する。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6d16" data-step-id="21-6d16" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6d16</strong><span class="plan-status">未着手</span></div>
+<h3>共通の判定ルールと素材を直す（否定形・限定つきの質問の答え方 / ⑤⑥ の境目 / U12 の確定事実）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d15">21-6d15</a> の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>全方式に効く 3 点を直す。(1) 否定形の質問は普通の日本語の受け答えで答える。ただし「自分の意思で」「わざと」のような限定がつく質問は、その限定が正しいかに答える（例: U12-e02「自分の意思で音を出さないんですか？」→「いいえ。自分の意思で出さないわけじゃないよ。」。人形には意思がない）。(2) 21-6d15 で決めた ⑤ / ⑥ の境目のルール。(3) U12 の確定事実シートに「人形の楽器で音は出ない」旨を足す（U12-e03）。luna・Jev の判定の指示と書き手のプロンプト、評価データのラベルを揃える。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>本番の判定モードの既定は変えない。Haiku 専用のプロンプトはここでは作らない（21-6d17）。素材の DB への再適用は 21-7 の前まで（ここでは行わない）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>判定（luna・Jev）と書き手のプロンプトに (1)(2) を入れ、設計書 10.4 と 10.3 の現行プロンプトの転記を更新する。</li>
+<li><code>stock_items.py</code> の U12 に確定事実を足し、<code>validate.py</code> の出力を貼る。</li>
+<li>評価データのラベル（U12-e02 ほか (1)(2) に当たるもの）を見直し、変えたケースを一覧で貼る。</li>
+<li>境目の数ケースで ①・⑤ の小試走をし、結果を貼る。comment-reply の pytest が全パスする（要約行を貼る）。</li>
+<li>計画書を更新し、日本語メッセージでコミットする（push は確認待ち）。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>ラベルの見直しと小試走の結果の確認、push の可否（ユーザー）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/comment-reply/</code>・<code>content/umigame-stock/umigame-soup-1/</code>・<code>docs/</code>）。stop after 20 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— U12-e02 の解釈</span></summary>
+<div class="plan-fold-inner"><p>U12-e02 の正解は「いいえ」（2026-10-08 ユーザー確認）。質問は「音を出さないのは自分の意思か」を問うもので、人形には意思がないので前提が成り立たない。21-6d13 では Haiku が「はい！…自分の意思で音を出さないんだよ」（わざと出さないと認めた）、luna が「いいえ。自分の意思で音を出さないんだね」（文の中で食い違う）でどちらも誤り。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6d17" data-step-id="21-6d17" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6d17</strong><span class="plan-status">未着手</span></div>
+<h3>Haiku 専用の判定プロンプトを作り、effort 3 段（max / xhigh / high）で全件プローブを取り直す</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d16">21-6d16</a> の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>Haiku の判定・書き手（<code>1b-haiku</code>）のプロンプトを luna から分け、Claude 向けに組み直す（真相・確定事実・正解基準・コメントを XML タグで区切り、資料を前・指示を後ろに置く。ルールに理由を添える。評価データとは別に作った境目の例を数件入れる）。⑦ を effort <code>max</code> / <code>xhigh</code> / <code>high</code> の 3 通りで回し、残す ① ② ⑤ と合わせて 525 件の全件プローブを取り直す。評価ページを作り直す。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>評価から ③ hybrid + 1d-luna・④ jev + 2b を外す（⑥⑧ に続けて。2026-10-08 ユーザー）。本番の判定モードの既定（<code>hybrid</code> / <code>1d-luna</code>）は変えない（どうするかは 21-6e・21-6f で決める）。評価データの 525 件を例としてプロンプトに入れない。⑦ の費用の上限は 3 通り合わせて $10。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>Haiku 専用のプロンプトを実装し、設計書 10.3.7 に現行プロンプトと組み直しの理由を書く。comment-reply の pytest が全パスする（要約行を貼る）。</li>
+<li>① ② ⑤ と ⑦ × 3 通りの全件プローブを回し、合格数（人間チェック前）・費用・打ち切り・応答時間を設計書 10.6 に載せる。</li>
+<li>評価ページを作り直す（③④⑥⑧ は外す）。</li>
+<li>計画書を更新し、日本語メッセージでコミットする（push は確認待ち）。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>評価ページの確認と不一致の人間チェック、effort の選択の材料の確認、push の可否（ユーザー）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/comment-reply/</code>・<code>docs/</code>）。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— Haiku 向けに組み直す根拠</span></summary>
+<div class="plan-fold-inner"><p>Anthropic の Haiku 5.5 の案内では、effort の <code>xhigh</code>・<code>max</code> は「評価で効果が出る場合だけ」、指示を厳密に守らせる用途は <code>high</code> が推奨。21-6d13 の <code>max</code> は判定の思考が中央値 3,463・最大 20,526 トークンで、応答時間（中央値 15.6 秒）と費用の大半を占める。effort を下げても合格数が保てれば、遅さと費用も減る。プロンプトの組み直しは、luna 向けに書いた指示を Claude の書き方（タグで区切る・理由を添える・例を示す）に合わせるもの（2026-10-08 ユーザー「LLM の特性に合わせて書き直す」）。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-21-6e" data-step-id="21-6e" data-status="todo" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>21-6e</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>人間プローブ（ローカル）と方式選定</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>21-6d4 の完了後（21-6d3 の集計確認後）。<a href="#step-21-6d6">21-6d6</a>（人間チェックの取り込み）の完了後（2026-10-04 追加）。<a href="#step-21-6d11">21-6d11</a>（正解基準・境目ケース・P1 の 2 段化・パターン ⑥ を入れた全件プローブ）の完了後（2026-10-07 追加）。<a href="#step-21-6d13">21-6d13</a>（Haiku 5.5 のパターン ⑦⑧ を足した 8 パターンの全件プローブ）の完了後（2026-10-08 追加）。<a href="#step-21-6d14">21-6d14</a>（L2 一言と P7 の合格基準を緩める）の完了後（2026-10-08 追加）。<a href="#step-21-6d17">21-6d17</a>（共通ルールの見直しと Haiku 専用プロンプト後の全件プローブ）の完了後（2026-10-08 追加）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>ユーザーが 21-6c2 のローカル試行ツールで、各問題に自由にコメントを入れて 2 方式の返信を確かめる（想定外の言い回し・曖昧な質問・感想・雑談・荒らし）。機械プローブと人間プローブの結果から方式を選ぶ（候補は ① ② ⑤ ⑦ の 4 パターン。⑥ Decisions と ⑧ 1d-haiku は 21-6d13 の人間チェック後に不採用、③ hybrid + 1d-luna と ④ jev + 2b は 21-6d17 から評価に入れない = 2026-10-08 ユーザー。③ は本番の既定なので、既定をどうするかもここで決める）。<strong>「正解宣言は 2 方式の合意を必須にするか」と段 B の閾値も、21-6d11 の試算を見てここで決める</strong>（2026-10-07 ユーザー）。</p><p><strong>方針案（2026-10-08 ユーザー・未決定）</strong>: ⑦ haiku + 1b-haiku を第一候補とする。理由と着手前の確認事項は下の「実装の細部・背景」。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>21-6a で承認した最低ラインを満たす方式から選ぶ。Jev を選ぶ場合は、MCA・Acceptable Use Policy に変更がないかを確認する。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
