@@ -616,3 +616,17 @@ def test_length_criteria_allow_slack_over_prompt_targets() -> None:
     metrics = _aggregate([case], [_row(case, "q_yesno", "yes", "はい。" + "あ" * 25)])["metrics"]
     assert metrics["L2_one_liner"]["pass"] is True
     assert metrics["L2_one_liner"]["threshold"] == "30 字以内 100%"
+
+
+def test_conflict_words_count_only_sentence_initial_verdicts() -> None:
+    """21-6d17: substrings and restatements are not contradicting verdicts."""
+    from tools.probe_metrics import _conflict_words
+
+    assert _conflict_words("いいえ。本当に凍ってはいないよ。", "no") == []
+    assert _conflict_words("いいえ。曲名は関係ないよ。", "no") == []
+    assert _conflict_words("はい！入ってたよ", "yes") == []
+    assert _conflict_words("いいえ。はい、そうだね。", "no") == ["はい"]
+    assert _conflict_words("関係ないよ。はい！", "irrelevant") == ["はい"]
+    assert _conflict_words("いいえ。関係ありません。", "no") == ["関係ありません"]
+    assert _conflict_words("はい！「いいえ」じゃないよ", "yes") == []  # quoted, not a verdict
+    assert _conflict_words("はい！いいえ、ちがうかも", "yes") == ["いいえ"]

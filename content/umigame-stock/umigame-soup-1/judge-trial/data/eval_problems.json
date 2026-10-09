@@ -433,8 +433,11 @@
       "text": "ひな壇に並んだ小さな人形の楽団で、笛や太鼓は飾りとして持っているだけなんだ。",
       "kind": "guess_correct",
       "answer": null,
-      "note": "2026-10-08 21-6d8: 境目ケース（正解すれすれ）。下書きは Codex（正解基準を見せる）・ラベルは Claude。要点1はhit（ひな壇に飾る人形と特定）で、楽器が鳴らない理由も矛盾なく説明している。",
-      "boundary": "near_correct"
+      "note": "2026-10-08 21-6d8: 境目ケース（正解すれすれ）。下書きは Codex（正解基準を見せる）・ラベルは Claude。要点1はhit（ひな壇に飾る人形と特定）で、楽器が鳴らない理由も矛盾なく説明している。 / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 guess_close を許容",
+      "boundary": "near_correct",
+      "accept_kinds": [
+        "guess_close"
+      ]
     },
     {
       "id": "U12-k03",
@@ -794,7 +797,10 @@
       "text": "卵は商品名や店の名前に関係しているんですか？",
       "kind": "q_yesno",
       "answer": "no",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 q_yesno / irrelevant を許容",
+      "accept_answers": [
+        "irrelevant"
+      ]
     },
     {
       "id": "U14-e08",
@@ -1641,7 +1647,10 @@
       "text": "ピアノ以外の楽器も演奏されてた？",
       "kind": "q_yesno",
       "answer": "irrelevant",
-      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude"
+      "note": "試行 4: 真相を見せずに書かせた評価用の質問（blind）。ラベルは Claude / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 q_yesno / no を許容",
+      "accept_answers": [
+        "no"
+      ]
     },
     {
       "id": "U20-e30",
@@ -1687,8 +1696,11 @@
       "text": "男の知っていた曲は、本物の演奏とは音が違って聞こえていたんだね。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "2026-10-08 21-6d8: 境目ケース（外れの上限）。下書きは Codex（正解基準を見せる）・ラベルは Claude。Claude 修正（下書きの狙いは惜しいの下限 ⑤）: 男の知る曲と本物が違うとだけ言い、男の覚えたほうが間違っていたとまでは言わないので触れたに届かない → ⑥",
-      "boundary": "wrong_upper"
+      "note": "2026-10-08 21-6d8: 境目ケース（外れの上限）。下書きは Codex（正解基準を見せる）・ラベルは Claude。Claude 修正（下書きの狙いは惜しいの下限 ⑤）: 男の知る曲と本物が違うとだけ言い、男の覚えたほうが間違っていたとまでは言わないので触れたに届かない → ⑥ / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 guess_close を許容",
+      "boundary": "wrong_upper",
+      "accept_kinds": [
+        "guess_close"
+      ]
     },
     {
       "id": "U20-k06",
@@ -1705,7 +1717,10 @@
       "text": "男と弟は本当の兄弟ですか？",
       "kind": "q_yesno",
       "answer": "yes",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 q_yesno / irrelevant を許容",
+      "accept_answers": [
+        "irrelevant"
+      ]
     },
     {
       "id": "U21-e02",
@@ -1933,7 +1948,10 @@
       "text": "その歯医者は男の昔からのかかりつけですか？",
       "kind": "q_yesno",
       "answer": "no",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 q_yesno / irrelevant を許容",
+      "accept_answers": [
+        "irrelevant"
+      ]
     },
     {
       "id": "U22-e04",
@@ -2182,7 +2200,10 @@
       "text": "子どもたちは走るのを楽しんでいるんですか？",
       "kind": "q_yesno",
       "answer": "no",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 q_yesno / irrelevant を許容",
+      "accept_answers": [
+        "irrelevant"
+      ]
     },
     {
       "id": "U24-e08",
@@ -2343,8 +2364,14 @@
       "text": "子どもたちは早く出た男と競争したくて、通学路へ飛び出していったんだね。",
       "kind": "guess_wrong",
       "answer": null,
-      "note": "2026-10-08 21-6d8: 境目ケース（外れの上限）。下書きは Codex（正解基準を見せる）・ラベルは Claude。要点1はnone（男を毎日の出発合図にしていた関係に触れていない）。",
-      "boundary": "wrong_upper"
+      "note": "2026-10-08 21-6d8: 境目ケース（外れの上限）。下書きは Codex（正解基準を見せる）・ラベルは Claude。要点1はnone（男を毎日の出発合図にしていた関係に触れていない）。 / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 q_yesno / no を許容",
+      "boundary": "wrong_upper",
+      "accept_kinds": [
+        "q_yesno"
+      ],
+      "accept_answers": [
+        "no"
+      ]
     }
   ],
   "U25": [
@@ -2428,7 +2455,10 @@
       "text": "勝ったのは、年賀状が先に届いたからなんでしょか？",
       "kind": "q_yesno",
       "answer": "no",
-      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude"
+      "note": "21-6d2: 問題文だけを見て書かせた下書き（Codex・blind）。ラベルは Claude / 2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 guess_wrong を許容",
+      "accept_kinds": [
+        "guess_wrong"
+      ]
     },
     {
       "id": "U25-e11",

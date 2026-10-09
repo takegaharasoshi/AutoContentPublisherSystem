@@ -1731,7 +1731,7 @@
 <div class="plan-meta"><strong>21-6d17</strong><span class="plan-status">完了</span></div>
 <h3>Haiku 専用の判定プロンプトを作り、effort 3 段（max / xhigh / high）で全件プローブを取り直す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-6d16">21-6d16</a> の完了後。</p>
-<p data-field="result"><strong>結果：</strong>Haiku 専用の判定・書き手プロンプト（<code>haiku_judge.txt</code> / <code>haiku_reply_1b.txt</code>）と effort の設定 <code>HAIKU_EFFORT</code> を入れ、6 パターン 525 件の全件プローブで ⑦ max が初めて 16 / 16（xhigh・high は 14、① ② 14・⑤ 12。人間チェック前）。ただし max は 1 ケース中央値 35 秒・$2.81 で、high は 5.7 秒・$0.45（2026-10-09）。</p>
+<p data-field="result"><strong>結果：</strong>Haiku 専用の判定・書き手プロンプト（<code>haiku_judge.txt</code> / <code>haiku_reply_1b.txt</code>）と effort の設定 <code>HAIKU_EFFORT</code> を入れ、6 パターン 525 件の全件プローブで ⑦ max が初めて 16 / 16（人間チェック・矛盾語の検出修正後は high・xhigh・① ② 15、⑤ 14）。ただし max は 1 ケース中央値 35 秒・$2.81 で、high は 5.7 秒・$0.45（2026-10-09）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -1763,6 +1763,7 @@
 <p><strong>実装</strong>（Codex 委譲・<code>gpt-6.1-sol</code> / max）: <code>haiku.judge</code> と書き手 <code>1b-haiku</code> を専用プロンプトに切り替え、effort を引数・設定 <code>HAIKU_EFFORT</code>（既定 <code>max</code>）で渡す。既定の <code>hybrid</code> / <code>1d-luna</code> は不変。プローブは ⑦ を <code>haiku-1b-max</code> / <code>-xhigh</code> / <code>-high</code> に分け、CLI の既定を ① ② ⑤ + ⑦ × 3 にした。Haiku の判定・書き手のキャッシュキーに effort とプロンプトのハッシュを足し、luna・Jev のキーは Haiku 専用 2 本を除いた <code>prompt_version</code> で従来の形を保つ。評価ページの応答時間に最大を足した。pytest: <code>226 passed</code>。</p>
 <p><strong>全件プローブ</strong>（<code>work/probe/full-20261009-6d17</code>・6 パターン × 525 件）: ⑦ は effort ごとに別の出力先で回してキャッシュをまとめた。合格数 ① 14・② 14・⑤ 12・⑦ max 16・xhigh 14・high 14。⑦ の費用は max $2.81・xhigh $0.44・high $0.45（計 $3.70。上限 $10 内）、1 ケースの応答時間の中央値は max 35.3・xhigh 7.3・high 5.7 秒。max は判定 4 件が 32,000 トークンでも切れて luna で判定し直した。不一致は 69 行 = 48 組で人間チェックはまだ。詳細は設計書 <a href="../app/sets/umigame-soup-1.html#probe-6d17">10.6</a>。評価ページ（<code>docs/app/sets/umigame-soup-1-probe.html</code>）は 6 パターンで作り直した（③④⑥⑧ なし）。</p>
 <p><strong>人間チェック</strong>（2026-10-10・ユーザー）: 48 組で許容 13・不可 35（<code>judge-trial/data/human_review_21-6d17.json</code>）。数え直すと ⑦ max 16・xhigh 14・high 14・① ② 14・⑤ 13。残る矛盾語の NG は判定語と文が食い違っていない返信が多く、検出の誤検出が疑われる（設計書 <a href="../app/sets/umigame-soup-1.html#probe-6d17">10.6</a>）。別解への取り込みはしていない。</p>
+<p><strong>追補</strong>（2026-10-10・ユーザー指示）: 矛盾語の検出を「文の頭に別の判定語が判定として立つときだけ」に直し（<code>probe_metrics._conflict_words</code>・テスト追加。pytest <code>227 passed</code>）、許容 13 組を別解へ取り込んで同じ <code>run_at</code> で数え直した。⑦ max 16・high 15・xhigh 15・① ② 15・⑤ 14、矛盾語の NG は全パターン 0 件。評価ページも作り直した。</p>
 <p><strong>補足</strong>: 先に旧コードで回した ① ② ⑤ の 1 回目は、キャッシュキーの変更で使えず取り直した（1 回目の ①② は P2 0・合格 15。今回の P2 U28-e19 は luna の揺れ）。</p>
 </div>
 </details>

@@ -28,6 +28,15 @@ CONFLICT_WORDS = {
     "no": ("はい", "関係ない", "関係ありません"),
     "irrelevant": ("はい", "いいえ"),
 }
+# A conflicting answer word counts only when it opens a sentence as a verdict (「はい。」「関係ないよ。」).
+# Substrings such as 「凍ってはいないよ」 or a restated 「曲名は関係ないよ」 are not verdicts (21-6d17).
+_SENTENCE_SPLIT = re.compile(r"[。！？!?\n]+")
+_VERDICT_TAIL = {
+    "はい": "！!。、…ー〜",
+    "いいえ": "！!。、…ー〜",
+    "関係ない": "！!。、…ー〜よね",
+    "関係ありません": "！!。、…ー〜よね",
+}
 PROXIMITY_WORDS = ("鋭い", "いい線", "近い", "近づ", "核心", "惜しい", "迫っ", "着眼点")
 ALLOWED_EMOJIS = ("☺️", "😌", "😉", "🧐", "🥳", "🙌", "👏", "🤔", "🫢", "🤭", "🤐")
 EMOJI = re.compile(
@@ -118,6 +127,19 @@ def _emoji_violations(reply: str | None, kind: str | None) -> list[str]:
     return problems
 
 
+def _conflict_words(reply: str | None, answer: str | None) -> list[str]:
+    """Return answer words that contradict the verdict as a sentence-initial verdict."""
+    found = []
+    for sentence in _SENTENCE_SPLIT.split(reply or ""):
+        sentence = sentence.lstrip(" 　「『")
+        for word in CONFLICT_WORDS.get(answer, ()):
+            if sentence.startswith(word):
+                rest = sentence[len(word):]
+                if not rest or rest[0] in _VERDICT_TAIL[word]:
+                    found.append(word)
+    return list(dict.fromkeys(found))
+
+
 def row_flags(row: dict[str, Any], case: dict[str, Any],
               core: dict[str, list[str]] | None = None) -> dict[str, Any]:
     """Return row-level mismatches and reply quality flags."""
@@ -156,8 +178,7 @@ def row_flags(row: dict[str, Any], case: dict[str, Any],
             any(reply.startswith(word) for word in ANSWER_WORDS.get(answer, ()))
             or reply.startswith(templates.YESNO_OPENERS.get(answer, "\0"))
         )),
-        "conflict_words": [word for word in CONFLICT_WORDS.get(answer, ()) if word in (reply or "")]
-        if kind == "q_yesno" else [],
+        "conflict_words": _conflict_words(reply, answer) if kind == "q_yesno" else [],
         "proximity_words": proximity,
         "emoji_violations": _emoji_violations(reply, kind),
         "one_liner_over_max": bool(

@@ -131,7 +131,11 @@
   {
     "id": "c-cheer-01",
     "text": "今日も投稿おつかれさま！",
-    "kind": "cheer"
+    "kind": "cheer",
+    "accept_kinds": [
+      "greeting"
+    ],
+    "note": "2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 greeting を許容"
   },
   {
     "id": "c-cheer-02",
@@ -220,7 +224,11 @@
   {
     "id": "c-complaint-03",
     "text": "答えを聞いても腑に落ちないかも",
-    "kind": "complaint"
+    "kind": "complaint",
+    "accept_kinds": [
+      "impression"
+    ],
+    "note": "2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 impression を許容"
   },
   {
     "id": "c-complaint-04",
@@ -300,7 +308,11 @@
   {
     "id": "c-troll-04",
     "text": "あああ???ぴょ",
-    "kind": "troll"
+    "kind": "troll",
+    "accept_kinds": [
+      "impression"
+    ],
+    "note": "2026-10-10 21-6d17・人間チェック（2026-10-10 判断）: 判定 impression を許容"
   },
   {
     "id": "c-troll-05",
