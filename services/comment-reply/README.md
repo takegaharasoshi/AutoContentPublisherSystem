@@ -61,9 +61,13 @@ python3.12 -m venv .venv
 # 実 API を使う試行。キーは環境変数からだけ読む（Secrets Manager は読まない）
 OPENAI_API_KEY=... TYPESAFE_API_KEY=... .venv/bin/python tools/local_trial.py \
   --problem U01 --comment '男は病院に行ったの？' --modes luna jev hybrid decisions
+
+# 評価パターン（判定 + 返信文の案）で比べる。判定は 1 コメントにつき方式ごと 1 回で使い回す
+OPENAI_API_KEY=... TYPESAFE_API_KEY=... ANTHROPIC_API_KEY=... .venv/bin/python tools/local_trial.py \
+  --problem U01 --patterns 1 2 5 7 --haiku-effort max high
 ```
 
-`--snapshot path.json` で公開スナップショットを読み込めます。`--comment` は繰り返し指定可、`--comments-file` は 1 行 1 コメント、指定なしは対話入力です。`--shadow/--no-shadow` と `--consensus/--no-consensus` で hybrid のスイッチを切り替えます。`--out` の既定値は `work/local_trial/` で、モード別に本番と同じ形式の記録を保存します。stub 時に LLM 書き手が選択されていた場合、外部呼び出しを避けるため 2b 定型に切り替えます。
+`--snapshot path.json` で公開スナップショットを読み込めます。`--comment` は繰り返し指定可、`--comments-file` は 1 行 1 コメント、指定なしは対話入力です。`--shadow/--no-shadow` と `--consensus/--no-consensus` で hybrid のスイッチを切り替えます。`--out` の既定値は `work/local_trial/` で、モード別に本番と同じ形式の記録を保存します。stub 時に LLM 書き手が選択されていた場合、外部呼び出しを避けるため 2b 定型に切り替えます。`--patterns` は probe_run の ①〜⑧（1 = luna + 1b、2 = luna + 1d-luna、3 = hybrid + 1d-luna、4 = jev + 2b、5 = jev + 2c-luna、6 = decisions + 2c-luna、7 = haiku + 1b-haiku、8 = haiku + 1d-haiku）を番号で選び、`--modes` と `--reply-variant` より優先します（記録は `p<番号>-<モード>-<案>/` に保存）。`--modes haiku` も選べます。`--haiku-effort`（既定は `HAIKU_EFFORT`）は Haiku の判定と 1b-haiku の書き手に効き、`max high` のように複数を渡すと Haiku のパターンを effort ごとに 1 回ずつ回します（記録は `-<effort>` 付き）。判定・返信の所要秒数も表示します。
 
 `guess_correct` の 2b 返信は `CORRECT_PREFIX + reveal_text` の固定形式です。その他の返信種別は各 3 通り以上の定型文を持ち、`sha1(comment_id)` で選びます。語だけの q_open と合意制 split にはそれぞれ 3 通りの専用定型文があります。
 
