@@ -1336,7 +1336,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </div>
 <p>全組み合わせの表は <code>work/probe/full-20261008-8p/sweep.txt</code>（<code>probe_sweep.py</code> の合意の方式に <code>haiku</code> を足した）。不一致の人間チェックは 21-6d11 の 6 パターン分と合わせて 8 パターンでまとめて行う（ユーザー）。</p>
 
-<p id="probe-6d17"><strong>21-6d17 の全件プローブ</strong>（2026-10-09・<code>work/probe/full-20261009-6d17</code>）: 21-6d16 の判定ルール・素材で、残す ① ② ⑤ と、Haiku 専用プロンプト（<a href="#haiku-prompt-6d17">10.3.7</a>）の ⑦ を effort 3 通り（<code>haiku-1b-max</code> / <code>-xhigh</code> / <code>-high</code>。判定と書き手に同じ effort）で 525 件に通した。③ hybrid + 1d-luna・④ jev + 2b は評価から外した（⑥⑧ に続けて。2026-10-08 ユーザー）。⑦ は effort ごとに別の出力先で回し、キャッシュを 1 つにまとめて 6 パターンの結果を作った（luna の判定はそのとき取り直した 1 回分を全パターンで使う）。<strong>全指標を満たしたのは ⑦ max だけ（16 / 16）</strong>。数字は人間チェック前。</p>
+<p id="probe-6d17"><strong>21-6d17 の全件プローブ</strong>（2026-10-09・<code>work/probe/full-20261009-6d17</code>・評価ページの保存版は <a href="umigame-soup-1-probe-6d17.html">umigame-soup-1-probe-6d17.html</a>）: 21-6d16 の判定ルール・素材で、残す ① ② ⑤ と、Haiku 専用プロンプト（<a href="#haiku-prompt-6d17">10.3.7</a>）の ⑦ を effort 3 通り（<code>haiku-1b-max</code> / <code>-xhigh</code> / <code>-high</code>。判定と書き手に同じ effort）で 525 件に通した。③ hybrid + 1d-luna・④ jev + 2b は評価から外した（⑥⑧ に続けて。2026-10-08 ユーザー）。⑦ は effort ごとに別の出力先で回し、キャッシュを 1 つにまとめて 6 パターンの結果を作った（luna の判定はそのとき取り直した 1 回分を全パターンで使う）。<strong>全指標を満たしたのは ⑦ max だけ（16 / 16）</strong>。数字は人間チェック前。</p>
 <div class="table-wrap">
 <table>
 <tr><th>パターン</th><th>合格数（16 指標中）</th><th>NG</th><th>費用（判定 / 書き手）</th><th>打ち切り（判定 / 書き手）</th><th>1 ケース全体の応答時間 中央値 / p95 / 最大</th><th>判定の応答時間 中央値 / p95 / 最大</th></tr>
