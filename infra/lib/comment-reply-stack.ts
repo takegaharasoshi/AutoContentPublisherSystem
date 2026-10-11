@@ -112,7 +112,8 @@ export class CommentReplyStack extends cdk.Stack {
       runtime: lambda.Runtime.PYTHON_3_13,
       code,
       handler: 'app.webhook_handler.lambda_handler',
-      memorySize: 128,
+      // 128 MB ではコールドスタートが約 5.7 秒になり Meta の購読検証がタイムアウトしたため 512 MB にする。
+      memorySize: 512,
       timeout: cdk.Duration.seconds(10),
       logGroup: webhookLogGroup,
       environment: {

@@ -117,7 +117,7 @@ describe.each([
       FunctionName: webhookName,
       Runtime: 'python3.13',
       Handler: 'app.webhook_handler.lambda_handler',
-      MemorySize: 128,
+      MemorySize: 512,
       Timeout: 10,
       Environment: {
         Variables: Match.objectEquals({
