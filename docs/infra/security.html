@@ -140,7 +140,7 @@
 </table>
 </div>
 <ul>
-  <li>PoC の Secret <code>umigame-poc/credentials</code> は <code>acps/{env}/</code> 規約の外にある（PoC のため）。21-6 でステージング面を <code>acps/prod/umigame-soup-1/comment-reply-staging</code> に作り直し、<code>UmigamePocStack</code> と一緒に削除する</li>
+  <li>PoC の Secret <code>umigame-poc/credentials</code> は <code>acps/{env}/</code> 規約の外にある（PoC のため）。21-6 でステージング面を <code>acps/prod/umigame-soup-1/comment-reply-staging</code> に作り直し、<code>UmigamePocStack</code> と一緒に削除する → <strong>2026-10-11 に削除した</strong>（21-6f の接続後・課題 I-032。値は新しいステージングの Secret へ写してから消した）</li>
   <li>投稿用 Secret（上記「SNS 認証情報」）は本セットでも既存どおり作る。コメント返信用 Secret と<strong>キーを混ぜない</strong>（読むサービスが違い、IAM の許可プレフィックスも違う）</li>
 </ul>
 

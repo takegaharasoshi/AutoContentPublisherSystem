@@ -4,6 +4,7 @@
 **「自アカウントのリールに付いたコメントを Meta Webhook で受信し、Graph API で AI 自動返信できる」** ことを実証する最小構成。
 
 - 本 PoC 資材は使い捨てにせず、**採用後もコメント自動返信経路専用のステージング面として恒久利用する**（開発計画の設計課題リスト 2026-08-28 の decision）
+- **2026-10-11（21-6f・I-032）: AWS 側は本番と同一コードの `Prod-CommentReplyStagingStack` に置き換え、`Prod-UmigamePocStack` と Secret `umigame-poc/credentials` は削除した。** 恒久利用するのは Meta アプリ（PoC で作ったもの）とテスト用アカウント test_tkghr で、Webhook 先は新スタックの Function URL、認証情報は `acps/prod/umigame-soup-1/comment-reply-staging`。本書の「1. AWS 側のデプロイ」と `lambda/` は当時の記録として残す（もうデプロイできない）。Meta 側の設定手順（2 以降）は引き続き有効で、21-7 で本番向けに転記する。ステージング面の構成は [stacks.html セクション 3.6](../../docs/infra/stacks.html#comment-reply)
 - 本番設計（API Gateway + SQS + Webhook/Reply Lambda 分離）はアイデア詳細 HTML を参照。PoC は単一 Lambda + Function URL に簡略化している
 
 ## 構成

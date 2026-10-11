@@ -317,7 +317,7 @@
     <li><strong>Function URL</strong>（21-1 ⑥ ユーザー決定）: API Gateway の WAF・スロットリング・使用量プランが要る規模になるまで不要。Function URL は無料で、署名検証を Lambda 内で行うため認証なしで公開しても Meta 以外の要求は 401 で落ちる。DDoS 級の呼び出しは Lambda の同時実行上限（アカウント既定）で頭打ちになり費用も僅少</li>
     <li><strong>SQS FIFO</strong>: 標準キューの at-least-once では Meta の再送 + SQS の重複配信で同じコメントに二重返信しうる（ユーザーに見える不具合）。FIFO の重複排除 ID に <code>comment_id</code> を使えば追加実装なしで 5 分窓の重複を抑止できる。スループット上限（300 msg/秒）はコメント規模（1 日 200 件）に対して十分。窓外の再送による二重返信は許容（発生したら設計課題へ）</li>
     <li><strong>VPC 外</strong>: Aurora に触れないため VPC に置く理由がなく、置くと NAT Gateway（月 4,000 円超）が要る。Secrets Manager・S3・OpenAI・Graph API はいずれもパブリックエンドポイント（TLS）</li>
-    <li><strong>ステージング面を同一コードで立てる</strong>: PoC ハンドラを別コードで残すと本番と乖離するため、21-6 で新スタックをステージング面としても立て、PoC の Meta アプリの Webhook 先を切り替えてから <code>UmigamePocStack</code>（と規約外の Secret <code>umigame-poc/credentials</code>）を削除する（21-1 ⑦）。2 面分の定常費はほぼゼロ（Lambda・SQS は従量、Secret は月 0.4 USD × 2）</li>
+    <li><strong>ステージング面を同一コードで立てる</strong>: PoC ハンドラを別コードで残すと本番と乖離するため、21-6 で新スタックをステージング面としても立て、PoC の Meta アプリの Webhook 先を切り替えてから <code>UmigamePocStack</code>（と規約外の Secret <code>umigame-poc/credentials</code>）を削除する（21-1 ⑦。<strong>2026-10-11 に削除した</strong>。<code>infra/lib/umigame-poc-stack.ts</code> と <code>bin/infra.ts</code> の配線も外した。課題 I-032）。恒久利用するのは PoC の Meta アプリとテスト用アカウントで、スタックではない。2 面分の定常費はほぼゼロ（Lambda・SQS は従量、Secret は月 0.4 USD × 2）</li>
   </ul>
 </div>
 
