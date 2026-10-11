@@ -170,11 +170,13 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError(f"missing API key environment variable(s): {', '.join(missing)}")
 
     files: list[str] = []
+    # Run stamp keeps records of repeated runs on the same problem from overwriting each other.
+    run_stamp = time.strftime("%H%M%S")
     for index, comment_text in enumerate(comments, 1):
         fixture = next((row for row in stub_rows if row.get("comment") == comment_text), None)
         if stub_rows and fixture is None:
             raise ValueError(f"stub has no judgement for comment: {comment_text}")
-        comment_id = str(fixture.get("id") if fixture else f"{problem.media_id}-{index}")
+        comment_id = str(fixture.get("id") if fixture else f"{problem.media_id}-{run_stamp}-{index}")
         received_at = utc_now()
         outcomes: dict[str, Judgement | Exception] = {}
         haiku_outcomes: dict[str, Judgement | Exception] = {}
