@@ -62,7 +62,7 @@ python3 dry_run.py
 6. **本番用 Meta アプリを作る**（コメント返信用。下の「本番 Meta アプリの作成」）。
 7. **コメント返信用 Secret に値を入れる**（下の「コメント返信用 Secret」）。
 8. **Webhook を接続する**（下の「本番 Meta アプリの作成」手順 6〜8）。
-9. **有効化**: バックログ 0 件を確認してから `04_activate.sql` を両環境へ。
+9. **有効化**: 開発計画 21-7a1〜21-7a3（アカウントの整備・プロフィール画像・自己紹介文）の完了後に行う。バックログ 0 件を確認してから `04_activate.sql` を両環境へ。
    ```sql
    SELECT COUNT(*) FROM generation_runs gr JOIN batch_sets b ON b.id = gr.set_id
    WHERE b.set_code = 'umigame-soup-1'
