@@ -318,6 +318,11 @@ export class ImageBatchStack extends cdk.Stack {
       // pref-ranking-1: 1 日 1 回（20:00 JST）。ranking-prebuilt は単一スロット
       // （evening = from_jst_hour 17〜）で 17-5（2026-08-24）に 30 秒単尺・1 日 1 回へ確定
       { setCode: 'pref-ranking-1', slotCode: 'evening', minute: '0', hour: '20' },
+      // umigame-soup-1: 1 日 1 回（20:00 JST）。umigame-prebuilt は slots を持たない単一スロットだが、
+      // Schedule 名はセット別設計書 3 の acps-{env}-image-generation-umigame-soup-1-evening に揃える。
+      // 21-7 で追加。batch_sets.is_active=0 の間は実行しても何もせず終わるため有効のまま置き、
+      // 稼働の切り替えは is_active で行う（content/umigame-stock/umigame-soup-1/set-registration/04_activate.sql）
+      { setCode: 'umigame-soup-1', slotCode: 'evening', minute: '0', hour: '20' },
     ];
 
     for (const entry of imageGenerationSchedules) {

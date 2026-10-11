@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
-  <span>最終更新: 2026-09-19（22-4: セクション 4 冒頭に「障害対応の入口は <code>/incident</code>」、6.3 に月次転記を課題の棚卸しの節目とする 1 行を追加）。前回: 2026-09-03（20-1: セクション 2.2 にセット廃止の初回実地の気づき〔追跡ウィンドウの打ち切り・Scheduler は 2 スタックにまたがる〕を追記し、2.1 のセット追加時の増分を現行に合わせて訂正。16-12b: セクション 6.3 を月次 KPI 転記の手順・セット計画書 KPI 欄の様式で確定）</span>
+  <span>最終更新: 2026-10-12（21-7: 2.1 手順 3 に「Scheduler は有効で deploy し is_active で稼働を切り替える」、チェックリストに問題スナップショットの権限を追記）。前回: 2026-09-19（22-4: セクション 4 冒頭に「障害対応の入口は <code>/incident</code>」、6.3 に月次転記を課題の棚卸しの節目とする 1 行を追加）。前回: 2026-09-03（20-1: セクション 2.2 にセット廃止の初回実地の気づき〔追跡ウィンドウの打ち切り・Scheduler は 2 スタックにまたがる〕を追記し、2.1 のセット追加時の増分を現行に合わせて訂正。16-12b: セクション 6.3 を月次 KPI 転記の手順・セット計画書 KPI 欄の様式で確定）</span>
 </div>
 
 <div class="note">
@@ -165,6 +165,7 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
 <p>入力に <code>set_code</code> を指定したスケジュールを、<strong>投稿時刻 1 つにつき 1 件</strong>追加する。Schedule 名は命名規約 <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code> に従う（スロット対応方式のセットはスロットごとに 1 件・<code>slot_code</code> をサフィックスに付ける）。
 命名規約・cron 式・Scheduler 定義の書き方は <a href="../infra/workflow.html">infra/workflow.html セクション 1.5</a>、実装は <a href="../../infra/lib/image-batch-stack.ts">image-batch-stack.ts</a> の <code>imageGenerationSchedules</code> 配列（ここに 1 エントリ追加するだけでよい）。
 変更後のデプロイは <code>cdk deploy -c env=prod --exclusively ImageBatchStack</code>（<strong>イメージタグ 3 つの Context 指定が必須</strong>。指定ルール・現行タグの確認方法は <a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。</p>
+<p><strong>Scheduler は有効のまま deploy してよい</strong>: 画像生成・SNS 投稿・インサイト収集の 3 バッチは <code>batch_sets.is_active=0</code> のセットでは何もせず正常終了するため、登録中のセットは <code>is_active=0</code> で置き、稼働開始は <code>is_active</code> を 1 にする UPDATE で切り替える（21-7 で決定。<a href="../infra/workflow.html">infra/workflow.html セクション 1.5</a> の決定 21-7。適用例は <code>content/umigame-stock/umigame-soup-1/set-registration/</code>）。</p>
 <p>あわせて<strong>インサイト収集 Scheduler をセットごとに 2 件</strong>（<code>acps-{env}-insights-collection-{set_code}-{morning|evening}</code>。06:00 / 18:00 JST）InsightsBatchStack へ追加して deploy する（<a href="../infra/workflow.html">infra/workflow.html セクション 1.6</a>。16-10 で新設された第 3 のバッチ。17-2 で本手順に明記）。</p>
 
 <div class="warn">
@@ -190,7 +191,8 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
     <li>ランキング方式（<code>ranking-prebuilt</code>）のセットは、初期のランキングストックを <code>ranking_stock_items</code> へ投入し、必要尺（<code>pref-ranking-1</code> は 30 秒のみ = 2026-08-24 尺確定）の動画ビルド・配置（セクション 3）まで完了していること（<code>unbuilt</code> = 0）を在庫確認クエリで確認した。BGM は <code>time_slot</code> NULL の有効曲が 1 曲以上あることを確認した</li>
     <li>ストーリーズ再掲するセットは <code>batch_sets.stories_enabled=1</code> を設定した（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）</li>
     <li>ImageBatchStack に Scheduler を追加して <code>cdk deploy</code> した（イメージタグ 3 つを Context 指定。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>インサイト収集 Scheduler 2 件</strong>（morning / evening）も InsightsBatchStack へ追加して deploy した（手順 3。<a href="../infra/workflow.html">infra/workflow.html セクション 1.6</a>）</li>
-    <li><strong>Scheduler の有効化前に、当該セットの SNS 投稿対象のバックログ（未投稿の生成実行）が 0 件であることを実クエリで確認した</strong>（未投稿 run の滞留は以後の投稿を恒常的に遅らせ、アラームでは気づけない。15-15 で確立した予防手順 = 課題体系 <a href="../issues/index.html#I-017">I-017</a>。17-2 で本チェックリストに明記）</li>
+    <li>問題スナップショットを出すセット（<code>problem_snapshot_enabled=1</code>。現状 <code>umigame-soup-1</code> のみ）は、SnsPostBatchStack のタスクロールに当該セットの <code>assets/{set_code}/problems/*</code> への <code>s3:PutObject</code> を付けて deploy してからフラグを 1 にした（<a href="sets/umigame-soup-1.html#snapshot">セット別設計書 10.7.2</a>）</li>
+    <li><strong>Scheduler の有効化（Scheduler を有効で deploy 済みなら <code>is_active</code> を 1 にする UPDATE）の前に、当該セットの SNS 投稿対象のバックログ（未投稿の生成実行）が 0 件であることを実クエリで確認した</strong>（未投稿 run の滞留は以後の投稿を恒常的に遅らせ、アラームでは気づけない。15-15 で確立した予防手順 = 課題体系 <a href="../issues/index.html#I-017">I-017</a>。17-2 で本チェックリストに明記）</li>
     <li>手動実行で生成・投稿の成功を CloudWatch Logs で確認した</li>
   </ul>
 </div>

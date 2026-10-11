@@ -464,7 +464,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     ) as any[];
 
     expect(scheduleGroups).toHaveLength(1);
-    expect(schedules).toHaveLength(4);
+    expect(schedules).toHaveLength(5);
     for (const schedule of schedules) {
       expect(schedule.Properties.GroupName).toBe(
         scheduleGroups[0].Properties.Name,
@@ -477,6 +477,7 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
         'acps-prod-image-generation-logic-training-1-night',
         'acps-prod-image-generation-logic-training-1-noon',
         'acps-prod-image-generation-pref-ranking-1-evening',
+        'acps-prod-image-generation-umigame-soup-1-evening',
       ],
     );
   });
@@ -489,6 +490,8 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     ['acps-prod-image-generation-logic-training-1-night', 'cron(0 21 * * ? *)', 'logic-training-1', 'ENABLED'],
     // pref-ranking-1 は 17-5c（2026-08-26）の稼働開始で追加。1 日 1 回・20:00 JST
     ['acps-prod-image-generation-pref-ranking-1-evening', 'cron(0 20 * * ? *)', 'pref-ranking-1', 'ENABLED'],
+    // umigame-soup-1 は 21-7 で追加。稼働の切り替えは batch_sets.is_active で行うため有効のまま置く
+    ['acps-prod-image-generation-umigame-soup-1-evening', 'cron(0 20 * * ? *)', 'umigame-soup-1', 'ENABLED'],
   ])(
     'スケジュール %s を cron %s / set_code %s で Step Functions 起動先に設定する',
     (scheduleName, cronExpression, setCode, state) => {

@@ -186,7 +186,11 @@ describe.each([
   });
 
   test('3 Lambda は VPC 外で実行する', () => {
-    template.resourceCountIs('AWS::Lambda::Function', 3);
+    // 本番面はプライバシーポリシー配置用の BucketDeployment が名前なしの Lambda を 1 本足す
+    const named = Object.values(template.findResources('AWS::Lambda::Function'))
+      .filter((fn) => typeof fn.Properties.FunctionName === 'string'
+        && fn.Properties.FunctionName.startsWith('acps-prod-comment-reply-'));
+    expect(named).toHaveLength(3);
     for (const fn of Object.values(template.findResources('AWS::Lambda::Function'))) {
       expect(fn.Properties).not.toHaveProperty('VpcConfig');
     }
@@ -279,7 +283,12 @@ describe.each([
     expect(statements.flatMap((statement) => statement.Action).some(
       (action: string) => action.startsWith('kms:'),
     )).toBe(false);
-    template.resourceCountIs('AWS::S3::BucketPolicy', 0);
+    // 共有バケットのポリシーは変えない（本番面にあるのはプライバシーポリシー用バケットの 1 件だけ）
+    const bucketPolicies = Object.values(template.findResources('AWS::S3::BucketPolicy'));
+    expect(bucketPolicies).toHaveLength(face === 'prod' ? 1 : 0);
+    for (const policy of bucketPolicies) {
+      expect(policy.Properties.Bucket.Ref).toMatch(/^PrivacyPolicyBucket/);
+    }
     expect(foundationStack.dependencies).not.toContain(stack);
   });
 
@@ -299,7 +308,8 @@ describe.each([
 
   test('配布 asset は app/ だけを含み、キャッシュを含まない', () => {
     const assets = stack.node.findAll().filter(
-      (node): node is cdk.AssetStaging => node instanceof cdk.AssetStaging,
+      (node): node is cdk.AssetStaging => node instanceof cdk.AssetStaging
+        && node.sourcePath.includes(path.join('services', 'comment-reply')),
     );
     expect(assets.length).toBeGreaterThan(0);
     const checkContents = (directory: string): void => {
@@ -330,5 +340,50 @@ describe.each([
     template.hasOutput('TokenRefreshFunctionName', {
       Value: { Ref: tokenRefreshId },
     });
+  });
+});
+
+describe('CommentReplyStack のプライバシーポリシー', () => {
+  test('本番面は公開読み取りの小バケットに HTML を配置し、https の URL を出力する', () => {
+    const { stack } = createCommentReplyStack('prod');
+    const template = Template.fromStack(stack);
+    template.resourceCountIs('AWS::S3::Bucket', 1);
+    template.hasResourceProperties('AWS::S3::Bucket', {
+      BucketName: 'acps-prod-umigame-privacy-policy',
+      PublicAccessBlockConfiguration: {
+        BlockPublicAcls: true,
+        IgnorePublicAcls: true,
+        BlockPublicPolicy: false,
+        RestrictPublicBuckets: false,
+      },
+    });
+    template.hasResourceProperties('AWS::S3::BucketPolicy', {
+      PolicyDocument: {
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Action: 's3:GetObject',
+            Effect: 'Allow',
+            Principal: { AWS: '*' },
+          }),
+        ]),
+      },
+    });
+    template.resourceCountIs('Custom::CDKBucketDeployment', 1);
+    template.hasResourceProperties('Custom::CDKBucketDeployment', {
+      SystemMetadata: { 'content-type': 'text/html; charset=utf-8' },
+    });
+    template.hasOutput('PrivacyPolicyUrl', {});
+    const url = JSON.stringify(stack.resolve(stack.privacyPolicyUrl));
+    expect(url).toMatch(/^\{"Fn::Join":\["",\["https:\/\/",\{"Fn::GetAtt":\["PrivacyPolicyBucket[0-9A-F]+","RegionalDomainName"\]\},"\/index.html"\]\]\}$/);
+    expect(fs.existsSync(path.join(__dirname, '../assets/umigame-privacy-policy/index.html'))).toBe(true);
+  });
+
+  test('ステージング面はプライバシーポリシーを作らない', () => {
+    const { stack } = createCommentReplyStack('staging');
+    const template = Template.fromStack(stack);
+    template.resourceCountIs('AWS::S3::Bucket', 0);
+    template.resourceCountIs('Custom::CDKBucketDeployment', 0);
+    expect(stack.privacyPolicyUrl).toBeUndefined();
+    expect(Object.keys(template.findOutputs('PrivacyPolicyUrl'))).toHaveLength(0);
   });
 });

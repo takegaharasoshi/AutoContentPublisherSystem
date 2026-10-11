@@ -144,6 +144,19 @@ describe('SnsPostBatchStack のタスクロール', () => {
         }),
       ]),
     );
+
+    // umigame-soup-1 の問題スナップショット出力用（21-7）。PutObject はこのプレフィックスだけに付与する
+    const putStatements = policies
+      .flatMap((policy) => policy.Properties.PolicyDocument.Statement)
+      .filter((statement: any) => JSON.stringify(statement.Resource).includes('ImagesBucket'))
+      .filter((statement: any) => [statement.Action].flat().some(
+        (action: string) => action.startsWith('s3:Put') || action === 's3:*',
+      ));
+    expect(putStatements).toHaveLength(1);
+    expect(putStatements[0].Action).toBe('s3:PutObject');
+    expect(JSON.stringify(putStatements[0].Resource)).toContain(
+      '/assets/umigame-soup-1/problems/*',
+    );
   });
 });
 

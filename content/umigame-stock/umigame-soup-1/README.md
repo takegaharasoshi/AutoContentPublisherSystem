@@ -7,6 +7,8 @@
 ```
 umigame-soup-1/
 ├── common/umigame_common.py # セット既定文、イラスト / キャプションの組み立て、素材項目のキー一覧
+├── set-registration/        # セット登録 SQL 4 本・ローカル dry-run・稼働開始の手順書（STATUS.md。21-7）
+├── tools/write_snapshot.py  # 問題スナップショットの手動再出力（snapshot_s3_key が NULL の成功投稿。21-7）
 └── batch-01/                # 第 1 バッチ（全 14 問 = story 7 / misdirection 7）
     ├── stock_items.py       #   単一ソース（素材 17 項目〔判定用の 3 項目は JUDGE_POINTS〕+ 管理項目）
     ├── validate.py          #   素材の機械検証

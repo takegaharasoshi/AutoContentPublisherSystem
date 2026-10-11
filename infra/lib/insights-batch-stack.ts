@@ -312,6 +312,9 @@ export class InsightsBatchStack extends cdk.Stack {
       // pref-ranking-1: 17-5c（2026-08-26）の稼働開始で追加
       { setCode: 'pref-ranking-1', slot: 'morning', minute: '0', hour: '6' },
       { setCode: 'pref-ranking-1', slot: 'evening', minute: '0', hour: '18' },
+      // umigame-soup-1: 21-7 で追加（is_active=0 の間は 0 件で正常終了する）
+      { setCode: 'umigame-soup-1', slot: 'morning', minute: '0', hour: '6' },
+      { setCode: 'umigame-soup-1', slot: 'evening', minute: '0', hour: '18' },
     ];
 
     for (const entry of insightsCollectionSchedules) {

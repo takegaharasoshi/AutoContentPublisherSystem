@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集ワークフロー（1.6・5.4・11）を追加</span>
-  <span>最終更新: 2026-09-04（21-3: セクション 8 にコメント自動返信 DLQ のアラーム、10.1 に DLQ 定義を追加）</span>
+  <span>最終更新: 2026-10-12（21-7: 1.5 の現行一覧を実値に揃え〔fantasy-animals-1 の削除・pref-ranking-1 / umigame-soup-1 の追加〕、セット追加時の Scheduler の有効化方針を決定として追記）。前回: 2026-09-04（21-3: セクション 8 にコメント自動返信 DLQ のアラーム、10.1 に DLQ 定義を追加）</span>
 </div>
 
 <p>Step Functions・EventBridge Scheduler・DB 準備確認タスク・監視リソースの実装仕様を定義する。アーキテクチャ上の位置付けは <a href="architecture.html">architecture.html</a>、CDK リソース定義は <a href="stacks.html">stacks.html</a>、運用時の対応手順は <a href="operation.html">operation.html</a> を参照。</p>
@@ -90,14 +90,21 @@
 <table>
   <thead><tr><th>Schedule 名</th><th>cron 式</th><th>JST 時刻</th><th>Input の <code>set_code</code></th><th>State</th></tr></thead>
   <tbody>
-    <tr><td><code>acps-prod-image-generation-fantasy-animals-1</code></td><td><code>cron(0 21 * * ? *)</code></td><td>21:00</td><td><code>fantasy-animals-1</code></td><td><code>ENABLED</code></td></tr>
     <tr><td><code>acps-prod-image-generation-logic-training-1-morning</code></td><td><code>cron(30 7 * * ? *)</code></td><td>7:30</td><td><code>logic-training-1</code></td><td><code>ENABLED</code></td></tr>
     <tr><td><code>acps-prod-image-generation-logic-training-1-noon</code></td><td><code>cron(30 12 * * ? *)</code></td><td>12:30</td><td><code>logic-training-1</code></td><td><code>DISABLED</code>（昼スロットは 16-4d〔2026-08-24〕で当分停止中。経緯は <a href="../app/sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</td></tr>
     <tr><td><code>acps-prod-image-generation-logic-training-1-night</code></td><td><code>cron(0 21 * * ? *)</code></td><td>21:00</td><td><code>logic-training-1</code></td><td><code>ENABLED</code></td></tr>
+    <tr><td><code>acps-prod-image-generation-pref-ranking-1-evening</code></td><td><code>cron(0 20 * * ? *)</code></td><td>20:00</td><td><code>pref-ranking-1</code></td><td><code>ENABLED</code>（17-5c で追加）</td></tr>
+    <tr><td><code>acps-prod-image-generation-umigame-soup-1-evening</code></td><td><code>cron(0 20 * * ? *)</code></td><td>20:00</td><td><code>umigame-soup-1</code></td><td><code>ENABLED</code>（21-7 で追加。稼働の切り替えは <code>batch_sets.is_active</code>。下の決定 21-7）</td></tr>
   </tbody>
 </table>
 </div>
 <p>コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
+<p><code>fantasy-animals-1</code> の 21:00 枠は Phase 20-1（2026-09-03）のセット停止で削除した（復活時の再追加の仕方は <code>image-batch-stack.ts</code> のコメント）。</p>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-10-12、21-7）: 新セットの Scheduler は有効のまま deploy し、稼働の切り替えは <code>batch_sets.is_active</code> で行う</span>
+  画像生成・SNS 投稿・インサイト収集の 3 バッチは、いずれも <code>is_active=0</code> のセットでは実行ログだけ残して何もせず正常終了する（<code>generation_runs</code> も作らない）。そのため Scheduler を先に有効で deploy しておけば、稼働開始は DB の UPDATE 1 文（<code>umigame-soup-1</code> では <code>content/umigame-stock/umigame-soup-1/set-registration/04_activate.sql</code>）で済み、有効化のためだけの 2 回目の <code>cdk deploy</code> が要らない。セット追加手順の「Scheduler 有効化前のバックログ 0 件確認」（<a href="../app/operation.html#set-add">app/operation.html セクション 2.1</a>）は、<code>is_active</code> を 1 にする直前に行う。停止中の定時起動で増えるのは Step Functions の空実行と DB 準備確認だけで、同時刻に他セットが Aurora を起こしているため追加の費用はほぼない。長期停止は従来どおり CDK 側で外す（下の「Scheduler は CDK を単一の正とする」）。
+</div>
 
 <div class="decision">
   <span class="callout-title">当面は DISABLED で運用（2026-07-14）→ Phase 13-1 で本番化（2026-07-22）</span>

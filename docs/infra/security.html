@@ -13,7 +13,7 @@
 <h1>セキュリティ設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
+  <span>最終更新: 2026-10-12（21-7: SNS 投稿バッチのタスクロールにスナップショットの <code>s3:PutObject</code>、プライバシーポリシーのバケットを https のオブジェクト URL で公開する形に更新）。前回: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
 </div>
 
 <h2 id="secrets">1. Secrets Manager 管理方針</h2>
@@ -168,7 +168,7 @@
   <tbody>
     <tr><td>DB 準備確認タスクロール</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code>）</td></tr>
     <tr><td>画像生成バッチタスクロール</td><td>S3 読み書き、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/image/*</code>）</td></tr>
-    <tr><td>SNS 投稿バッチタスクロール</td><td>S3 読み取り、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>）</td></tr>
+    <tr><td>SNS 投稿バッチタスクロール</td><td>S3 読み取り、S3 書き込みは <code>assets/umigame-soup-1/problems/*</code> の <code>s3:PutObject</code> のみ（問題スナップショット。21-7 追加）、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>）</td></tr>
     <tr><td>インサイト収集バッチタスクロール（16-7 設計・16-10 実装）</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>。SNS 投稿バッチと同じ Instagram トークンを読む）。<strong>S3 権限は付与しない</strong>（S3 不使用）</td></tr>
   </tbody>
 </table>
@@ -299,7 +299,7 @@
     </ul>
   </li>
   <li><strong>コメント自動返信 Lambda（21-3 追加）</strong>: VPC 外で実行し、Function URL を<strong>認証なし（<code>authType: NONE</code>）</strong>で公開する。インバウンドの正当性は Meta の <code>X-Hub-Signature-256</code> 署名検証（鍵は Instagram アプリシークレット）で担保し、署名不一致は 401 で捨てる。Reply Lambda はインバウンドを持たず SQS トリガーのみ。アウトバウンドは Secrets Manager・S3・Anthropic・OpenAI・Typesafe・Graph API（すべて TLS）。NAT Gateway・VPC Endpoint は使わない（<a href="architecture.html#comment-reply">architecture.html セクション 1.1</a>）</li>
-  <li><strong>プライバシーポリシー用 S3 バケット（21-3 設計・21-7 で構築予定）</strong>: Meta アプリの公開モードに必須の到達可能 URL を提供するため、<strong>専用の小バケットだけ</strong>を静的ウェブサイトホスティング + 公開読み取りにする。画像保存バケットの Block Public Access は維持する。21-6f ではポリシー本文が未作成のため作らず、本番用 Meta アプリを準備する 21-7 へ回した（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）</li>
+  <li><strong>プライバシーポリシー用 S3 バケット（21-3 設計・21-7 構築）</strong>: Meta アプリの公開モードに必須の到達可能 URL を提供するため、<strong>専用の小バケット <code>acps-{env}-umigame-privacy-policy</code> だけ</strong>を公開読み取り（当該バケット限定の <code>s3:GetObject</code>）にし、https のオブジェクト URL で公開する（ウェブサイトエンドポイントは http のみのため使わない）。画像保存バケットの Block Public Access は維持する（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-7）</li>
   <li><strong>Secrets Manager</strong>: ECS Fargate のパブリック IP 経由でアクセス（通信は TLS で暗号化）
     <ul>
       <li>Interface VPC Endpoint は使用しない（コスト削減のため。より厳格なネットワーク分離が必要な場合は導入を検討）</li>

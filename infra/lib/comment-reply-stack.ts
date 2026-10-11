@@ -7,6 +7,7 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as scheduler from 'aws-cdk-lib/aws-scheduler';
 import * as schedulerTargets from 'aws-cdk-lib/aws-scheduler-targets';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Construct } from 'constructs';
@@ -28,6 +29,8 @@ export class CommentReplyStack extends cdk.Stack {
   public readonly functionUrl: lambda.FunctionUrl;
   /** 週次でコメント返信用トークンを更新する Lambda */
   public readonly tokenRefreshFunction: lambda.Function;
+  /** 本番面のみ: Meta アプリの公開モードに設定するプライバシーポリシーの URL */
+  public readonly privacyPolicyUrl?: string;
 
   constructor(scope: Construct, id: string, props: CommentReplyStackProps) {
     super(scope, id, props);
@@ -230,5 +233,34 @@ export class CommentReplyStack extends cdk.Stack {
       value: this.tokenRefreshFunction.functionName,
       description: 'コメント返信用トークン更新 Lambda の手動実行に使用する関数名',
     });
+
+    // プライバシーポリシー（本番面のみ。21-7）。Meta アプリの公開モードに到達可能な URL が必須のため、
+    // 専用の小バケットだけを公開読み取りにする（画像バケットの Block Public Access は維持する）。
+    // ウェブサイトエンドポイントは http しか使えないため、URL は https のオブジェクト URL を出す。
+    // ステージング面は PoC の Meta アプリのため作らない。
+    if (props.face === 'prod') {
+      const privacyPolicyBucket = new s3.Bucket(this, 'PrivacyPolicyBucket', {
+        bucketName: `acps-${props.envName}-umigame-privacy-policy`,
+        publicReadAccess: true,
+        blockPublicAccess: new s3.BlockPublicAccess({
+          blockPublicAcls: true,
+          ignorePublicAcls: true,
+          blockPublicPolicy: false,
+          restrictPublicBuckets: false,
+        }),
+        encryption: s3.BucketEncryption.S3_MANAGED,
+        removalPolicy: cdk.RemovalPolicy.RETAIN,
+      });
+      new s3deploy.BucketDeployment(this, 'PrivacyPolicyDeployment', {
+        destinationBucket: privacyPolicyBucket,
+        sources: [s3deploy.Source.asset(path.join(__dirname, '../assets/umigame-privacy-policy'))],
+        contentType: 'text/html; charset=utf-8',
+      });
+      this.privacyPolicyUrl = `https://${privacyPolicyBucket.bucketRegionalDomainName}/index.html`;
+      new cdk.CfnOutput(this, 'PrivacyPolicyUrl', {
+        value: this.privacyPolicyUrl,
+        description: '本番用 Meta アプリの「プライバシーポリシーの URL」に設定する URL',
+      });
+    }
   }
 }

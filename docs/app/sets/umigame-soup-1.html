@@ -32,7 +32,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-10-12（21-6h: セクション 6 の前回の真相ブロックを実装に合わせて確定し、テンプレート文面を <code>{{caption}}{{prev_truth_block}}</code> に決めた）。前回: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
+  <span>最終更新: 2026-10-12（21-7: 2 に稼働開始の手順書への導線、3 に Scheduler の追加と <code>is_active</code> での切り替え、10.7.2 に <code>master_rules</code> の中身・再出力ツール・IAM 付与済みを反映）。前回: 2026-10-12（21-6h: セクション 6 の前回の真相ブロックを実装に合わせて確定し、テンプレート文面を <code>{{caption}}{{prev_truth_block}}</code> に決めた）。前回: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
 </div>
 
 <div class="note">
@@ -79,7 +79,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <table>
 <tr><th>項目</th><th>値</th><th>備考</th></tr>
 <tr><td>プラットフォーム</td><td>Instagram（プロアカウント）</td><td>リール投稿 + コメント自動返信。他プラットフォームは対象外</td></tr>
-<tr><td>ユーザーネーム</td><td><code>umigame.soup.jp</code></td><td>21-1 ① で決定。空き確認と取得はユーザー作業（21-7 まで）</td></tr>
+<tr><td>ユーザーネーム</td><td><code>umigame.soup.jp</code></td><td>21-1 ① で決定。空き確認と取得はユーザー作業（稼働開始の手順 1。手順書は下の「稼働開始の手順」）</td></tr>
 <tr><td>表示名（<code>sns_accounts.account_name</code>）</td><td><strong>コメントで推理！探偵カメロックのウミガメのスープ</strong>（24 字・確定）</td><td>Instagram のプロフィール名も同じにする。<code>account_name</code> は表示専用の列で Secret 名・キャプションには入らない</td></tr>
 <tr><td><code>account_code</code></td><td><code>main-account</code></td><td>既存セットと同じ。Secret 名の導出専用（作成後変更不可）</td></tr>
 <tr><td>投稿用の認証（Secret）</td><td><code>acps/prod/umigame-soup-1/sns/instagram/main-account</code></td><td><strong>既存 Meta アプリの流用</strong>（Facebook ページを新規作成して連携。<a href="../operation.html#set-add">運用設計 2.1</a> 手順 1 と 5.1 の通常手順）。値スキーマは <a href="../../infra/security.html#secret-naming">security.html 1.2〜1.3</a></td></tr>
@@ -90,6 +90,7 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>umigame.soup.jp は 2 つのアプリの両方に接続する</strong>: 投稿 = 既存アプリ（Facebook ページ経由 <code>graph.facebook.com</code>）、コメント Webhook = 新規アプリ（Instagram ログイン方式 <code>graph.instagram.com</code>）。理由は<a href="#d-20260903-meta-app">付録</a></li>
   <li><strong>media id の照合（21-6 の人間ゲート）</strong>: 投稿バッチが記録する <code>posts.platform_post_id</code>（<code>media_publish</code> の応答 id）と Webhook の <code>media.id</code> が同じ値かを、ステージング面で照合する。一致しなければ S3 スナップショットのキーが引けず、経路が成立しない</li>
   <li><strong>キャラ名の正は「探偵カメロック」</strong>: 意匠は 21-2 で採用した「グルメ探偵」のままだが、呼称に「グルメ」は付けない。キャプション・プロンプト・版面の名札もこれに揃える</li>
+  <li><strong>稼働開始の手順</strong>（21-7 で用意）: アカウント開設 → 投稿用 Secret → DB 登録 → <code>cdk deploy</code> → 本番 Meta アプリ（公開モード・Webhook）→ コメント返信用 Secret → 有効化 → 1 本目と返信の確認、の順番・コマンド・Meta 側の画面操作は <code>content/umigame-stock/umigame-soup-1/set-registration/STATUS.md</code> にまとめた（登録 SQL 4 本も同じ場所）。Meta アプリの「プライバシーポリシーの URL」は <code>CommentReplyStack</code> の出力 <code>PrivacyPolicyUrl</code>（<a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>）</li>
   <li><strong>表示名を変えるときの制約</strong>: DB 側は UPDATE 1 文でいつでも変えられる。ただし Instagram の名前欄は<strong>14 日間に 2 回まで</strong>しか変えられないため、開設時にこの名前で登録し、頻繁な試行はしない。<code>account_code</code> とユーザーネームは実質固定で、表示名の変更とは独立</li>
 </ul>
 
@@ -108,7 +109,7 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>投稿順は INSERT の順番</strong>: 方式はビルド済みストックを「未使用 → <code>last_used_at</code> の古い順 → <code>id</code> の小さい順」で選ぶ（<a href="../generators/umigame-prebuilt.html#stock">umigame-prebuilt 4</a>）。そのため最初に投入した順（= <code>id</code> の順）が、一巡目以降もそのまま投稿順になる</li>
   <li><strong>並べ方</strong>: story と misdirection を交互に出す。第 1 バッチは本家を題材にした U28「本物のウミガメのスープ」を 1 本目にする（2026-09-26 ユーザー決定）。投稿順の列は DB に足さない（<a href="#d-20260926-post-order">付録</a>）</li>
   <li><strong>順番の正</strong>はバッチの <code>stock_items.py</code> の <code>POST_ORDER</code>。<code>generate.py</code> がその順に INSERT を並べ、<code>validate.py</code> が過不足と同じ型の連続（警告）を検査する。順番を変えるときは DB を入れ直す（<code>id</code> は UPDATE で変えられない）。後から足すバッチは既存の未使用分の後ろに並ぶ</li>
-  <li><strong>Scheduler の CDK 追加は 21-7</strong>（<a href="../../infra/workflow.html#schedule">workflow.html 1.6</a> の命名規約。Input にスロット・尺は持たせない）。有効化前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
+  <li><strong>Scheduler は 21-7 で CDK に追加した</strong>（画像生成 1 件 + インサイト収集 2 件。<a href="../../infra/workflow.html">workflow.html 1.5 / 1.6</a> の命名規約。Input にスロット・尺は持たせない）。<strong>Scheduler は有効のまま deploy し、稼働の切り替えは <code>batch_sets.is_active</code> で行う</strong>（<code>is_active=0</code> の間は 3 バッチとも何もせず正常終了する。workflow.html 1.5 の決定 21-7）。<code>is_active</code> を 1 にする直前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
 </ul>
 
 <h2 id="stock-items">4. ストック 1 件の素材項目（17 項目）</h2>
@@ -1432,7 +1433,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <tr><td><code>core_points</code>・<code>reveal_text</code></td><td>コアの要点（配列）・正解時の開示文（70 字以内）。<code>umigame_items</code> の同名列（V013）から写し、NULL なら出力しない（V013 未適用・ストック未更新の検出）</td></tr>
 <tr><td><code>judge_criteria</code></td><td>正解基準（<code>points</code> = 要点ごとの <code>hit</code>・<code>touch</code>、<code>errors</code> = 誤りの例。<a href="#judge-criteria">10.2</a>）。<code>umigame_items.judge_criteria</code>（V014）から写し、NULL・要点との個数違いなら異常終了する</td></tr>
 <tr><td><code>rule_text</code></td><td>ルール帯の文</td></tr>
-<tr><td><code>master_rules</code></td><td><code>prompt_configs.prompt_text</code> を写す既存のキー。<strong>判定には使わない</strong>（プロンプトは Lambda に同梱 = <a href="#judge-impl">10.3.2</a>）。21-7 の INSERT で <code>prompt_text</code> に何を入れるか（空 / 記録として転記）は 21-7 で決める</td></tr>
+<tr><td><code>master_rules</code></td><td><code>prompt_configs.prompt_text</code> を写す既存のキー。<strong>判定には使わない</strong>（プロンプトは Lambda に同梱 = <a href="#judge-impl">10.3.2</a>）。<code>prompt_text</code> には<strong>「プロンプトは Lambda に同梱・この列は記録用」という固定の記録文</strong>を入れる（21-7 で決定。空にするとスナップショット出力が欠落扱いで WARNING になり、プロンプト全文を転記すると正が 2 か所になるため）</td></tr>
 </table>
 </div>
 <details class="fold"><summary>JSON の例</summary>
@@ -1455,7 +1456,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <div class="table-wrap">
 <table>
 <tr><th>場面</th><th>扱い</th></tr>
-<tr><td>出力に失敗した</td><td><strong>投稿失敗にしない</strong>（<code>posts.status</code> は <code>success</code> のまま）。<code>snapshot_s3_key</code> が NULL の行を確認クエリで拾い、手動で再出力する（<code>content/umigame-stock/.../tools/write_snapshot.py</code> は 21-7 で用意）</td></tr>
+<tr><td>出力に失敗した</td><td><strong>投稿失敗にしない</strong>（<code>posts.status</code> は <code>success</code> のまま）。<code>snapshot_s3_key</code> が NULL の行を拾い、手動で再出力する: <code>content/umigame-stock/umigame-soup-1/tools/write_snapshot.py</code>（21-7。既定は対象の一覧だけ、<code>--apply</code> で S3 PUT → <code>umigame_items</code> に記録。JSON は投稿バッチと同じ組み立て・検証。Aurora は Data API、S3 は AWS CLI で触る）</td></tr>
 <tr><td>スナップショットが無い投稿にコメントが来た</td><td>Reply Lambda が S3 404 として<strong>返信せず記録だけ</strong>残す（<code>errors</code> に <code>problem_not_found</code>。DLQ に入れない）</td></tr>
 <tr><td>投稿から日がたった</td><td><code>assets/…/problems/</code> は 30 日ライフサイクルの対象外（<code>images/</code> <code>videos/</code> 限定）。投稿済み問題は残り続け、翌日以降のコメントにも答えられる</td></tr>
 <tr><td>フラグが 0 のセット・ストーリーズ行</td><td>何もしない</td></tr>
@@ -1464,7 +1465,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </div>
 <ul>
   <li><strong>実装</strong>（21-5b）: <code>services/sns-post-batch/app/problem_snapshot.py</code>。リール行の <code>success</code> 更新を commit した<strong>後</strong>に別のトランザクションで出力する。スナップショット側の失敗（行の読み取り・<code>prompt_configs</code> の欠落・S3 の PUT・キーの記録）は WARNING ログとロールバックだけで済み、投稿の成功記録を巻き戻さない。JSON は UTF-8（<code>ensure_ascii=False</code>）・<code>Content-Type: application/json; charset=utf-8</code> で PUT する</li>
-  <li><strong>IAM の前提</strong>: SNS 投稿バッチのタスクロールは S3 の読み取り権限（<code>grantRead</code>）しか持たないため、フラグを 1 にする前に <code>assets/umigame-soup-1/problems/*</code> への <code>s3:PutObject</code> を付ける（21-7 の CDK 変更に含める）。権限がないまま有効化すると、投稿は成功するが毎回スナップショットが WARNING で欠ける</li>
+  <li><strong>IAM の前提</strong>: SNS 投稿バッチのタスクロールに <code>assets/umigame-soup-1/problems/*</code> 限定の <code>s3:PutObject</code> を 21-7 で付けた（<a href="../../infra/stacks.html#sns-post-batch">stacks.html 3.3</a>）。フラグ <code>problem_snapshot_enabled</code> は <code>cdk deploy</code> 後に <code>04_activate.sql</code> で <code>is_active</code> と一緒に 1 にする。権限がないまま有効化すると、投稿は成功するが毎回スナップショットが WARNING で欠ける</li>
 </ul>
 
 <h4 id="reply-behavior">10.7.3 返信の振る舞い（MVP スコープ）</h4>
@@ -1559,7 +1560,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
   <li><strong>外向き発信・イングレスを持つ初の機能</strong>: コメント自動返信は本システムで初めて外部からの要求（Meta Webhook）を受け、ユーザーに向けて自動で発信する。投稿時と完全分離した構成（10 章）と、ステージング面での必須検証（<a href="#reply-monitoring">10.7.5</a>）でリスクを閉じる。ステージング環境の一般論は課題体系 <a href="../../issues/index.html#I-027">I-027</a>（フル 2 面化はしない・本経路だけ例外）</li>
   <li><strong>Remotion Skills 2.0 を標準ツーリングとして継続</strong>（21-2 人間ゲート）: <code>.agents/skills/remotion-*</code> 正本 + <code>.claude/skills/remotion-*</code> のスキル単位リンク（skills CLI 1.5.23・スキル版 4.0.520）。更新は <code>npx skills update</code>。既存 2 セットへの遡及適用は本フェーズの対象外</li>
   <li><strong>ストーリーズ再掲</strong>は初期版では使わない（<code>stories_enabled=0</code>）。コメント欄への導線はリール本体が担うため</li>
-  <li><strong>効果検証</strong>: インサイト収集（<a href="../batch-flow.html#flow-insights">batch-flow.html 4</a>）は既存どおり Scheduler 2 件を 21-7 で追加。コメント系指標（<code>comments</code>）は既存の指標セットに含まれており、コメント率の確認は月次 KPI 転記（<a href="../operation.html">運用設計 6.3</a>）で行う</li>
+  <li><strong>効果検証</strong>: インサイト収集（<a href="../batch-flow.html#flow-insights">batch-flow.html 4</a>）は既存どおり Scheduler 2 件（06:00 / 18:00）を 21-7 で追加した。コメント系指標（<code>comments</code>）は既存の指標セットに含まれており、コメント率の確認は月次 KPI 転記（<a href="../operation.html">運用設計 6.3</a>）で行う</li>
 </ul>
 
 <h2 id="history">付録 決定の経緯</h2>

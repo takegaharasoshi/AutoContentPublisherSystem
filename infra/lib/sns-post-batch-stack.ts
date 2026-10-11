@@ -87,6 +87,12 @@ export class SnsPostBatchStack extends cdk.Stack {
     });
 
     props.imagesBucket.grantRead(taskRole);
+    // umigame-soup-1 の問題スナップショット出力（problem_snapshot_enabled=1 のセット。21-5b の実装・21-7 で付与）。
+    // バケットポリシーは変えずロールのポリシーで付与し、プレフィックスを限る（List・Delete は付けない）
+    taskRole.addToPolicy(new iam.PolicyStatement({
+      actions: ['s3:PutObject'],
+      resources: [`${props.imagesBucket.bucketArn}/assets/umigame-soup-1/problems/*`],
+    }));
 
     const logGroup = new logs.LogGroup(this, 'SnsPostBatchLogGroup', {
       retention: logs.RetentionDays.THREE_MONTHS,
