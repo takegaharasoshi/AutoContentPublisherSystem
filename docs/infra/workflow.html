@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集ワークフロー（1.6・5.4・11）を追加</span>
-  <span>最終更新: 2026-10-12（21-7: 1.5 の現行一覧を実値に揃え〔fantasy-animals-1 の削除・pref-ranking-1 / umigame-soup-1 の追加〕、セット追加時の Scheduler の有効化方針を決定として追記）。前回: 2026-09-04（21-3: セクション 8 にコメント自動返信 DLQ のアラーム、10.1 に DLQ 定義を追加）</span>
+  <span>最終更新: 2026-10-12（21-6i: 1.5 の umigame-soup-1 の cron を週 4 回〔日・火・木・土〕に更新）。前回: 2026-10-12（21-7: 1.5 の現行一覧を実値に揃え〔fantasy-animals-1 の削除・pref-ranking-1 / umigame-soup-1 の追加〕、セット追加時の Scheduler の有効化方針を決定として追記）。前回: 2026-09-04（21-3: セクション 8 にコメント自動返信 DLQ のアラーム、10.1 に DLQ 定義を追加）</span>
 </div>
 
 <p>Step Functions・EventBridge Scheduler・DB 準備確認タスク・監視リソースの実装仕様を定義する。アーキテクチャ上の位置付けは <a href="architecture.html">architecture.html</a>、CDK リソース定義は <a href="stacks.html">stacks.html</a>、運用時の対応手順は <a href="operation.html">operation.html</a> を参照。</p>
@@ -94,7 +94,7 @@
     <tr><td><code>acps-prod-image-generation-logic-training-1-noon</code></td><td><code>cron(30 12 * * ? *)</code></td><td>12:30</td><td><code>logic-training-1</code></td><td><code>DISABLED</code>（昼スロットは 16-4d〔2026-08-24〕で当分停止中。経緯は <a href="../app/sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</td></tr>
     <tr><td><code>acps-prod-image-generation-logic-training-1-night</code></td><td><code>cron(0 21 * * ? *)</code></td><td>21:00</td><td><code>logic-training-1</code></td><td><code>ENABLED</code></td></tr>
     <tr><td><code>acps-prod-image-generation-pref-ranking-1-evening</code></td><td><code>cron(0 20 * * ? *)</code></td><td>20:00</td><td><code>pref-ranking-1</code></td><td><code>ENABLED</code>（17-5c で追加）</td></tr>
-    <tr><td><code>acps-prod-image-generation-umigame-soup-1-evening</code></td><td><code>cron(0 20 * * ? *)</code></td><td>20:00</td><td><code>umigame-soup-1</code></td><td><code>ENABLED</code>（21-7 で追加。稼働の切り替えは <code>batch_sets.is_active</code>。下の決定 21-7）</td></tr>
+    <tr><td><code>acps-prod-image-generation-umigame-soup-1-evening</code></td><td><code>cron(0 20 ? * SUN,TUE,THU,SAT *)</code></td><td>日・火・木・土 20:00</td><td><code>umigame-soup-1</code></td><td><code>ENABLED</code>（21-7 で追加・21-6i で週 4 回へ。稼働の切り替えは <code>batch_sets.is_active</code>。下の決定 21-7）</td></tr>
   </tbody>
 </table>
 </div>

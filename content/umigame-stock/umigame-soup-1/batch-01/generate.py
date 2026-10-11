@@ -100,7 +100,7 @@ def build_sql() -> str:
 def build_update_sql() -> str:
     """既存 14 問へ判定要点と公開前提の文（core_points / reveal_text / title / truth / caption）を設定する UPDATE 文を組み立てる。
 
-    title / truth / caption は 21-6d3e（truth を翌日リールのキャプションで公開する方針）で足した。
+    title / truth / caption は 21-6d3e（truth を次のリールのキャプションで公開する方針）で足した。
     """
     lines = [
         "-- batch-01 既存ストックの判定要点・公開前提の文の更新（V013 適用後に実行。title / truth / caption は 21-6d3e で追加）",

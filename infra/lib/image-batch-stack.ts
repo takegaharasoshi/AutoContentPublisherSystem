@@ -303,6 +303,8 @@ export class ImageBatchStack extends cdk.Stack {
       slotCode?: string;
       minute: string;
       hour: string;
+      /** 曜日指定（例: 'SUN,TUE,THU,SAT'）。省略時は毎日 */
+      weekDay?: string;
       enabled?: boolean;
     }[] = [
       // fantasy-animals-1 の 21:00 枠は Phase 20-1（2026-09-03）でセット停止に伴い削除。
@@ -318,11 +320,11 @@ export class ImageBatchStack extends cdk.Stack {
       // pref-ranking-1: 1 日 1 回（20:00 JST）。ranking-prebuilt は単一スロット
       // （evening = from_jst_hour 17〜）で 17-5（2026-08-24）に 30 秒単尺・1 日 1 回へ確定
       { setCode: 'pref-ranking-1', slotCode: 'evening', minute: '0', hour: '20' },
-      // umigame-soup-1: 1 日 1 回（20:00 JST）。umigame-prebuilt は slots を持たない単一スロットだが、
+      // umigame-soup-1: 週 4 回（日・火・木・土の 20:00 JST。21-6i で毎日から変更）。umigame-prebuilt は slots を持たない単一スロットだが、
       // Schedule 名はセット別設計書 3 の acps-{env}-image-generation-umigame-soup-1-evening に揃える。
       // 21-7 で追加。batch_sets.is_active=0 の間は実行しても何もせず終わるため有効のまま置き、
       // 稼働の切り替えは is_active で行う（content/umigame-stock/umigame-soup-1/set-registration/04_activate.sql）
-      { setCode: 'umigame-soup-1', slotCode: 'evening', minute: '0', hour: '20' },
+      { setCode: 'umigame-soup-1', slotCode: 'evening', minute: '0', hour: '20', weekDay: 'SUN,TUE,THU,SAT' },
     ];
 
     for (const entry of imageGenerationSchedules) {
@@ -336,6 +338,7 @@ export class ImageBatchStack extends cdk.Stack {
         schedule: scheduler.ScheduleExpression.cron({
           minute: entry.minute,
           hour: entry.hour,
+          weekDay: entry.weekDay,
           timeZone: cdk.TimeZone.ASIA_TOKYO,
         }),
         enabled: entry.enabled ?? true,

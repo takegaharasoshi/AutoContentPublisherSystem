@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>方式名（レジストリキー）: umigame-prebuilt</span>
-  <span>最終更新: 2026-10-12（21-6h: 出題履歴へ写す項目に <code>title</code> を追加〔V015。前回の真相ブロックの見出し用〕）。前回: 2026-10-08（21-6d7c: ストックから出題履歴へ写す項目に <code>judge_criteria</code> を追加〔V014〕）。前回: 2026-09-30（21-6c1: ストックから出題履歴へ写す項目に <code>core_points</code>・<code>reveal_text</code> を追加〔V013〕）。前回: 2026-09-26（21-5b: 実行時モジュール <code>umigame_prebuilt.py</code> を実装し、セクション 2 に実装の差分を追記）。前回: 2026-09-23（21-5a の実装差分を 8.1 に追記）</span>
+  <span>最終更新: 2026-10-12（21-6i: 投稿頻度を週 4 回〔日・火・木・土〕にしたのに合わせ、4 の在庫の目安を 8 件に・スロットの説明を直した）。前回: 2026-10-12（21-6h: 出題履歴へ写す項目に <code>title</code> を追加〔V015。前回の真相ブロックの見出し用〕）。前回: 2026-10-08（21-6d7c: ストックから出題履歴へ写す項目に <code>judge_criteria</code> を追加〔V014〕）。前回: 2026-09-30（21-6c1: ストックから出題履歴へ写す項目に <code>core_points</code>・<code>reveal_text</code> を追加〔V013〕）。前回: 2026-09-26（21-5b: 実行時モジュール <code>umigame_prebuilt.py</code> を実装し、セクション 2 に実装の差分を追記）。前回: 2026-09-23（21-5a の実装差分を 8.1 に追記）</span>
 </div>
 
 <div class="note">
@@ -60,7 +60,7 @@
 </div>
 
 <h2 id="parameters">3. 入力（parameters。単一スロット・単尺）</h2>
-<p><code>prompt_configs.parameters</code> は次の 1 キーのみ。スロット定義（<code>slots</code>）は持たない（投稿は 20:00 の 1 日 1 回・尺は 1 つのため。<a href="../sets/umigame-soup-1.html">セット別設計書 3</a>）。</p>
+<p><code>prompt_configs.parameters</code> は次の 1 キーのみ。スロット定義（<code>slots</code>）は持たない（投稿は日・火・木・土の 20:00 に 1 回ずつ〔週 4 回〕・尺は 1 つのため。<a href="../sets/umigame-soup-1.html">セット別設計書 3</a>）。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>フィールド</th><th>必須</th><th>役割</th></tr></thead>
@@ -83,7 +83,7 @@ ORDER BY last_used_at IS NULL DESC, last_used_at ASC, id ASC
 LIMIT 1 FOR UPDATE;</code></pre>
 <ul>
   <li><strong>絞り込み</strong>: セット専属・有効・<strong>ビルド済み（<code>video_s3_key IS NOT NULL</code>）</strong>のみ。難易度・型・スロットの軸は持たない（<code>ranking-prebuilt</code> と同じ 3 カラム索引 <code>KEY (set_id, is_active, last_used_at)</code>）</li>
-  <li><strong>0 件はフェイルラウド</strong>（縮退しない）。在庫水位の監視は運用側（週次補充。在庫 14 件以上を目安 = セット計画書で管理）</li>
+  <li><strong>0 件はフェイルラウド</strong>（縮退しない）。在庫水位の監視は運用側（週次補充。在庫 8 件以上〔週 4 回 × 2 週間分〕を目安 = セット計画書で管理。21-6i で週 4 回にしたため 14 件から変更）</li>
   <li><strong>再利用 WARNING</strong>: 選んだ行の <code>use_count &gt;= 1</code> なら WARNING ログ（「ストック枯渇により再出題」）。参加型の性質上、<strong>同じ問題の再出題はコメント欄の推理が使い回されるため、既存 2 セットより再利用の弊害が大きい</strong>。補充が追いつかない場合は再出題より投稿スキップ（<code>is_active=0</code> による一時停止）を優先する運用とする（課題が出たら課題体系の umigame-soup-1 節へ）</li>
   <li>取得後、同一トランザクションで <code>last_used_at = NOW()</code> / <code>use_count = use_count + 1</code> に更新し、<code>umigame_items</code> に問題固有部分をスナップショットする（セクション 6）</li>
   <li><strong>防御的フィールド検査</strong>: <code>fact_sheet</code> が配列でない・<code>problem_text</code> が空などは方式内で検出して異常終了（スナップショット出力がコメント経路の前提になるため、投稿前に止める）</li>

@@ -321,8 +321,8 @@ def write_review() -> None:
         out += material_html(it)
         out.append("<h3>真相・確定事実（ネタバレ）</h3>")
         out.append(
-            # truth は翌日リールのキャプションで公開する全文（21-6d3e）。書き手の改行をそのまま見せる
-            f"<details class='truth spoiler'><summary>真相を見る（{len(it['truth'])} 字・翌日のキャプションで公開）</summary>"
+            # truth は次のリールのキャプションで公開する全文（21-6d3e）。書き手の改行をそのまま見せる
+            f"<details class='truth spoiler'><summary>真相を見る（{len(it['truth'])} 字・次のリールのキャプションで公開）</summary>"
             f"<p class='v' style='white-space:pre-wrap'>{html.escape(it['truth'])}</p></details>"
         )
         out.append("<details class='facts spoiler'><summary>確定事実シート（{}）</summary><ul>".format(len(it["fact_sheet"])))

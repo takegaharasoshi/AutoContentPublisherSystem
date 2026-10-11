@@ -32,7 +32,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-10-12（21-7: 2 に稼働開始の手順書への導線、3 に Scheduler の追加と <code>is_active</code> での切り替え、10.7.2 に <code>master_rules</code> の中身・再出力ツール・IAM 付与済みを反映）。前回: 2026-10-12（21-6h: セクション 6 の前回の真相ブロックを実装に合わせて確定し、テンプレート文面を <code>{{caption}}{{prev_truth_block}}</code> に決めた）。前回: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
+  <span>最終更新: 2026-10-12（21-6i: 投稿を週 4 回〔日・火・木・土の 20:00〕に変え、1・3・4・6・10.7.1・11 と付録の決定を更新。予告文は「次のリール」へ）。前回: 2026-10-12（21-7: 2 に稼働開始の手順書への導線、3 に Scheduler の追加と <code>is_active</code> での切り替え、10.7.2 に <code>master_rules</code> の中身・再出力ツール・IAM 付与済みを反映）。前回: 2026-10-12（21-6h: セクション 6 の前回の真相ブロックを実装に合わせて確定し、テンプレート文面を <code>{{caption}}{{prev_truth_block}}</code> に決めた）。前回: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
 </div>
 
 <div class="note">
@@ -63,7 +63,7 @@ nav.toc ul { margin: .3rem 0 0; }
 </nav>
 
 <h2 id="theme">1. テーマ</h2>
-<div class="note"><span class="callout-title">要点</span>Instagram リールで 1 日 1 問のウミガメのスープを出し、コメントの質問に AI 出題者「探偵カメロック」が自動で答える参加型セット。コメントで遊ぶ仕組みが、事業戦略の本命経路（コメント → リーチ → Meta ボーナス）に乗りやすい。</div>
+<div class="note"><span class="callout-title">要点</span>Instagram リールで週 4 回（日・火・木・土）1 問ずつウミガメのスープを出し、コメントの質問に AI 出題者「探偵カメロック」が自動で答える参加型セット。コメントで遊ぶ仕組みが、事業戦略の本命経路（コメント → リーチ → Meta ボーナス）に乗りやすい。</div>
 <p>既存 3 セットは見て終わりの放送型。本セットは<strong>コメントで遊ぶ多ターン参加型</strong>で、コメントエンゲージメント → リーチ増幅 → Meta ボーナスという<a href="../../strategy/business-strategy.html">事業戦略書</a>の本命経路に構造的に乗りやすいことが企画価値（固有の収益モデルは持たない）。</p>
 <ul>
   <li><strong>出題者 = アカウントそのもの</strong>: 出題者キャラ「探偵カメロック」（丸い体・前掛け・透明な黄金スープの椀と匙・虫眼鏡を持つウミガメの探偵）をアカウントの顔にし、AI の返信はアカウント名義で付く</li>
@@ -95,11 +95,11 @@ nav.toc ul { margin: .3rem 0 0; }
 </ul>
 
 <h2 id="schedule">3. スケジュール（投稿頻度）</h2>
-<div class="note"><span class="callout-title">要点</span>毎日 20:00 に 24 秒のリールを 1 本。投稿順はストックを INSERT した順で、story と misdirection を交互に出す。</div>
+<div class="note"><span class="callout-title">要点</span>日・火・木・土の 20:00 に 24 秒のリールを 1 本（週 4 回。<a href="#d-20261012-post-frequency">21-6i</a>）。投稿順はストックを INSERT した順で、story と misdirection を交互に出す。</div>
 <div class="table-wrap">
 <table>
 <tr><th>スロット</th><th>投稿時刻（JST）</th><th>Scheduler 名 / cron 式</th><th>尺</th></tr>
-<tr><td><code>evening</code>（単一スロット）</td><td>20:00・1 日 1 回</td><td><code>acps-prod-image-generation-umigame-soup-1-evening</code><br><code>cron(0 20 * * ? *)</code>（<code>Asia/Tokyo</code>）</td><td><strong>24 秒固定</strong>（720 フレーム・30fps）</td></tr>
+<tr><td><code>evening</code>（単一スロット）</td><td>日・火・木・土の 20:00（週 4 回）</td><td><code>acps-prod-image-generation-umigame-soup-1-evening</code><br><code>cron(0 20 ? * SUN,TUE,THU,SAT *)</code>（<code>Asia/Tokyo</code>）</td><td><strong>24 秒固定</strong>（720 フレーム・30fps）</td></tr>
 </table>
 </div>
 <ul>
@@ -120,7 +120,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <table>
 <tr><th>#</th><th>項目（カラム / JSON キー）</th><th>用途</th><th>制約（<code>validate.py</code> で検査）</th></tr>
 <tr><td>1</td><td><code>problem_text</code> 問題文</td><td>版面の問題カード（全文を常時表示。段階表示はしない）</td><td>78〜85 字。ナレーション実測長で最終判定（#7）</td></tr>
-<tr><td>2</td><td><code>truth</code> 真相</td><td>AI 出題者の判定根拠。<strong>翌日のリールのキャプション末尾で全文を公開する</strong>（前回の真相ブロック。差し込みは 21-6h。版面・コメント返信には出さない）</td><td>必須。問題文と矛盾しない。<strong>400 字以内（改行込み）</strong>。公開前提の書き方は表の下</td></tr>
+<tr><td>2</td><td><code>truth</code> 真相</td><td>AI 出題者の判定根拠。<strong>次のリールのキャプション末尾で全文を公開する</strong>（前回の真相ブロック。差し込みは 21-6h。版面・コメント返信には出さない）</td><td>必須。問題文と矛盾しない。<strong>400 字以内（改行込み）</strong>。公開前提の書き方は表の下</td></tr>
 <tr><td>3</td><td><code>fact_sheet</code> 確定事実シート</td><td>「はい / いいえ / 関係ない」の判定根拠（場所・人物関係・時系列・「問題に関係ない事項」の明示）。真相の曖昧さ起因の矛盾回答・捏造回答をデータ側で防ぐ</td><td>8〜20 件（文字列の配列）</td></tr>
 <tr><td>4</td><td><code>expected_questions</code> 想定質問と期待回答</td><td>作問時の確認用。正解に向かう質問・引っかけ・無関係な質問を混ぜる</td><td>15〜20 件（<code>{q, a}</code> の配列。<code>a</code> は はい / いいえ / 関係ない / 正解 のいずれか + 任意の補足）</td></tr>
 <tr><td>5</td><td><code>hook</code> フック文</td><td>つかみ帯（74px・1 行）</td><td>12 字前後（上限 14 字）。<strong>「？」で終える</strong></td></tr>
@@ -142,10 +142,10 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>オリジナル性の基準</strong>（21-4a）: 既存問題の問題文・真相を転載しない。語句・登場人物・舞台の置き換えだけの改変もしない。借りてよいのは「型（物語復元 / 意味誤誘導）」と「仕掛けの構造」までで、モチーフ・真相・問題文は新規に作る。台帳で本家級（classic）の題材は構造ごと避ける。PoC の古典題材だけは例外で、ストック本体には入れない</li>
   <li><strong>作問法の正</strong>: <a href="https://note.com/suekai0217/n/n35128e606a9b">note 記事の 4 ステップ + 良い問題の 3 条件</a></li>
   <li><strong>確定事実シートの件数</strong>: 下限 8 件は答えの揺れを防ぐため。上限は 20 件（2026-09-26 に 12 → 20。<a href="#d-20260926-fact-limit">付録</a>）。<code>database/V012</code> のカラム COMMENT は「8〜12 件」のまま（適用済みの DDL のため次のスキーマ変更時に合わせる）</li>
-  <li><strong>補充とレビューのペース</strong>: 1 日 1 問 = 週 7 問。レビューは<strong>週 2 回 × 4 問</strong>。手順の詳細は 21-8 の補充スキル（<code>umigame-stock-replenish</code>）に書く</li>
+  <li><strong>補充とレビューのペース</strong>: 週 4 問（日・火・木・土の投稿 1 回 1 問）。レビューは<strong>週 1 回 × 4 問</strong>（21-6i で週 7 問・週 2 回 × 4 問から変更）。手順の詳細は 21-8 の補充スキル（<code>umigame-stock-replenish</code>）に書く</li>
   <li><strong>作問時に本番経路で答えを確かめる</strong>: 評価データ <code>judge-trial/data/eval_problems.json</code> にケースを足し（正解ラベルは人が確認）、<code>probe_run.py --problems &lt;no&gt;</code> を回す（<a href="#evaluation">10.6</a>）</li>
   <li><strong>管理項目</strong>: <code>content_key</code>（<code>{3 桁連番}-{slug}</code>）と <code>title</code>（題名）はツーリングが付ける管理項目で、素材項目には数えない。ただし <code>title</code> は<strong>キャプションの見出しと翌日の前回の真相ブロックに出る公開文</strong>（21-6d3e）なので、真相の手がかりにしない（問題文にある言葉・状況だけで付ける。例: 「間違えたのは誰か」→「完璧な演奏に「あ、間違えた」」、「1年越しの判定」→「庭のすみに実ったすいか」に改めた）。キャラクター・BGM・SE・フォントは<strong>セット固定の共有資産</strong>で、ストック単位の項目ではない（セクション 7〜9）</li>
-  <li><strong>truth の書き方（公開前提。21-6d3e）</strong>: 翌日のリールのキャプションで全文を公開するので、フォロワーが読んで自然な文にする。① 判定メモの言い回し（「〜のことではない」の羅列・「正解宣言のとき以外は言わない」等）を書かない。② <strong>はいと答える根拠の事実をすべて本文に書く</strong>（確定事実シートで「はい」になる事実が真相に書かれていないと、答え合わせで読者が「そんな話はない」と感じる）。③ 改行は<strong>読みやすい段落の区切り</strong>に入れる（場面・時間が変わるところ。<strong>機械的な 1 文 1 行にしない</strong>。段落の中では文を続ける。空行は入れない）。④ 数字と単位の間に空白を入れない（「3か月」）。筋・事実は <code>fact_sheet</code>・<code>core_points</code>・<code>reveal_text</code> と矛盾させない</li>
+  <li><strong>truth の書き方（公開前提。21-6d3e）</strong>: 次のリールのキャプションで全文を公開するので、フォロワーが読んで自然な文にする。① 判定メモの言い回し（「〜のことではない」の羅列・「正解宣言のとき以外は言わない」等）を書かない。② <strong>はいと答える根拠の事実をすべて本文に書く</strong>（確定事実シートで「はい」になる事実が真相に書かれていないと、答え合わせで読者が「そんな話はない」と感じる）。③ 改行は<strong>読みやすい段落の区切り</strong>に入れる（場面・時間が変わるところ。<strong>機械的な 1 文 1 行にしない</strong>。段落の中では文を続ける。空行は入れない）。④ 数字と単位の間に空白を入れない（「3か月」）。筋・事実は <code>fact_sheet</code>・<code>core_points</code>・<code>reveal_text</code> と矛盾させない</li>
   <li><strong>truth の上限 400 字の根拠</strong>（21-6d3e）: 書き直した 14 問の実測は 207〜382 字（改行込み・最長は U26 の 382 字。物語復元型は 273〜382 字、意味誤誘導型は 207〜273 字）。最長に少しの余裕を足した 400 字を上限にした。キャプションの上限 2,200 字に対しては、上半分（実測最長 270 字）+ 前回の真相ブロックの枠（区切り行などの定型 60 字 + 前回の <code>title</code> 100 字 + <code>truth</code> 400 字 = 560 字）でも 830 字で十分に収まるので、上限は読みやすさ（「続きを読む」の先で読み切れる長さ）で決めている。行数は検査しない（改行は書き手が読みやすい位置に入れ、機械的に決めないため）</li>
   <li><strong>判定用の項目（#15・#16）の持ち方</strong>: 21-6c1（V013）で後から足したため、<code>stock_items.py</code> では問題本体の辞書ではなく <code>JUDGE_POINTS</code>（問題番号 → 2 項目）に持つ。<code>validate.py</code> が個数・字数を、<code>generate.py</code> が投入 SQL への反映を扱う。21-6d3d で素材項目へ正式に数えた（それまでは表の外の注記。仕様は不変）</li>
   <li><strong>正解基準（#17）の持ち方</strong>: #15・#16 と同じ <code>JUDGE_POINTS</code> に持つ。21-6d7a（2026-10-07）で設計して表に足し、素材・<code>validate.py</code>・素材シートへの導入は 21-6d7b、DB（V014）・判定への組み込みは 21-6d7c で行う</li>
@@ -168,7 +168,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}{{prev_truth_block}}</code> の 1 行</strong>（間に改行を入れない。ブロック側が先頭の改行を持ち、初回は空になるため）とする。21-7 のセット登録 SQL にはこの文面を入れる。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code> / <code>{{prev_truth_block}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b・<code>{{prev_truth_block}}</code> は 21-6h）。</p>
 <ul>
   <li><strong>構成</strong>: 見出し【<code>title</code>】→ 問題文 → 遊び方と真相公開の予告 → ハッシュタグ の 4 段で全問共通（<code>umigame_common.caption(title, problem_text)</code> が組み立てる。21-6d3e で見出しをセット名【探偵カメロックのウミガメのスープ】から問題タイトルへ変えた）</li>
-  <li><strong>遊び方と予告の文</strong>（4 行。改行もこのとおり）: 「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事するよ。／正解が出るまで何度でもどうぞ。／真相は明日のリールのキャプションにて公開するよ。／フォローして待っててね。</li>
+  <li><strong>遊び方と予告の文</strong>（4 行。改行もこのとおり）: 「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事するよ。／正解が出るまで何度でもどうぞ。／真相は次のリールのキャプションにて公開するよ。／フォローして待っててね。</li>
   <li><strong>前回の真相ブロック</strong>: ハッシュタグの後ろに「――― 前回の問題「<code>title</code>」の真相（ネタバレ注意）―――」→「・」の行 → 【真相】→ 前回の <code>truth</code> 全文を置く（ハッシュタグ行との間は空行 3 つ・「・」は 4 行）。投稿順が LRU で決まりストック作成時には「前回」が分からないため、ストックの <code>caption</code> には含めず <strong>SNS 投稿バッチが展開時に差し込む</strong>（前回 = 同じセットで最後に投稿が成功した回。失敗した回は飛ばす。初回はブロックごと出さない。展開後 2,200 字を超えたら投稿せず失敗させる。仕様の正は <a href="../batch-flow.html#prev-truth-block">batch-flow.html 3.3</a>）。title・truth は <code>umigame_items</code> のスナップショット（V015 で <code>title</code> を追加）から引く。第 1 バッチ 14 問では最長の組み合わせでも約 720 字で、上限に余裕がある。経緯は<a href="#d-20261004-truth-disclosure">付録</a></li>
   <li><strong>ハッシュタグ</strong>: <code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart</code></li>
   <li><strong>書かないもの</strong>: 問題番号「第 N 問」（ストックは LRU で消費され、投稿順が確定しないため。PoC の表記は本番では使わない）。問題文の要約（すぐ下の問題文と同じ話が 2 回出るように見えるため。2026-09-24 ユーザー決定）</li>
@@ -1412,7 +1412,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <h3 id="reply-ops">10.7 運用</h3>
 <div class="note"><span class="callout-title">要点</span>投稿は 20:00 の既存バッチ、コメント返信は Lambda だけで動き、Aurora は起動しない。投稿直後に S3 へ書く問題スナップショットが両者のつなぎ目。監視は DLQ アラームと WARNING ログのマーカー。</div>
 
-<h4>10.7.1 1 日の動き</h4>
+<h4>10.7.1 投稿日の動き</h4>
 <div class="table-wrap">
 <table>
 <tr><th>時間帯</th><th>流れ</th><th>Aurora</th></tr>
@@ -1546,7 +1546,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 
 <h2 id="failure">11. 失敗時ポリシー</h2>
 <ul>
-  <li><strong>投稿側</strong>は共通フローどおり（<a href="../batch-flow.html">batch-flow.html</a> 3.2 / <a href="../operation.html">operation.html</a> 4）。事前動画の取得失敗・ストック 0 件はフェイルラウド（縮退しない）。1 日 1 回のため 1 回の失敗はその日の投稿の欠落に留まる。当日リカバリの判断は共通課題（課題体系 <a href="../../issues/index.html#I-019">I-019</a>）に従う</li>
+  <li><strong>投稿側</strong>は共通フローどおり（<a href="../batch-flow.html">batch-flow.html</a> 3.2 / <a href="../operation.html">operation.html</a> 4）。事前動画の取得失敗・ストック 0 件はフェイルラウド（縮退しない）。投稿日 1 回 1 本のため 1 回の失敗はその回の投稿の欠落に留まる。当日リカバリの判断は共通課題（課題体系 <a href="../../issues/index.html#I-019">I-019</a>）に従う</li>
   <li><strong>スナップショット出力の失敗</strong>は投稿失敗にせず、NULL 行の確認クエリと手動再出力で回復する（<a href="#snapshot">10.7.2</a>）</li>
   <li><strong>コメント側</strong>: Reply Lambda の失敗は SQS の再試行（最大 3 回）→ DLQ → アラーム。返信が遅れる・付かないことはあっても<strong>投稿には影響しない</strong>。固定文言での代わりの返信はしない</li>
   <li><strong>Webhook Lambda</strong>は署名検証に失敗した要求を 401 で拒否し、正常受信は SQS へ入れた時点で 200 を返す（Meta の再送を招かないため、enqueue 失敗以外は 200）</li>
@@ -1788,6 +1788,11 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
     <li><strong>更新 SQL</strong>: 既存行には <code>batch-01/update_judge_criteria.sql</code>（14 問の <code>judge_criteria</code> + U27 の <code>fact_sheet</code>・<code>core_points</code>。ストックと出題済みの <code>umigame_items</code> の両方）を、V014 の適用後・image-batch / sns-post-batch のデプロイ前に流す。<code>update_judge_points.sql</code> も U27 の <code>core_points</code> に追随して再生成した</li>
     <li><strong>小試走</strong>（Jev のみ・境目を中心に 10 件）: 8 件がラベルどおり（U12-e18・U27-e18 は ⑤、U12-e19・U27-e19 の誤り入りも ⑤）。U27-e16「人生ゲームの車の駒を動かしてたってこと？」（④）は当てた 0.18 で ⑤、U01-e19（④）は要点 1 の当てた 0.13 で ⑤。luna（同じ 10 件）も 8 件がラベルどおりで、外れは同じ 2 件。2 方式がそろって外したので、原因は正解基準と評価ラベルの食い違い（U27 は要点と <code>touch</code> が家族のピンまで求めているのに e16 は ④、U01 は要点 1 の <code>hit</code> が影の正体を求めているのに e19 は ④）。基準とラベルのどちらを直すかは 21-6d8 で決める</li>
   </ul>
+</div>
+
+<div class="decision" id="d-20261012-post-frequency">
+  <span class="callout-title">2026-10-12 21-6i: 投稿を毎日から週 4 回（日・火・木・土の 20:00）に変える</span>
+  <p>作問と評価（プローブ・人間レビュー）が重く、週 7 問の補充を続けるのは難しいため（アイデア <a href="../../ideas/umigame-post-frequency-4days.md">umigame-post-frequency-4days</a>・2026-10-08 の壁打ちで決定）。週 4 回だとどこかに連続日が出るので、週末の土 → 日に置いた。Scheduler 名は変えず、cron を <code>cron(0 20 ? * SUN,TUE,THU,SAT *)</code> にした（インサイト収集の朝夕 2 件は投稿のない日も前日までの投稿の指標を集めるため毎日のまま）。翌日に投稿があるとは限らないので、キャプションの予告を「真相は明日のリールのキャプションにて公開するよ。」から「真相は<strong>次の</strong>リールのキャプションにて公開するよ。」に、返信の定型文（応援）の「明日も出すからね」を「次の問題も出すからね」に変えた。既存 14 問の caption は <code>batch-01/update_caption_next_reel.sql</code> で置換した。動画の版面に「明日」は無いため作り直していない。転記が漏れたまま 21-7 で毎日の cron を deploy していたが、有効化（<code>is_active=1</code>）の前に気づいたため投稿への影響はない。</p>
 </div>
 
 </div>

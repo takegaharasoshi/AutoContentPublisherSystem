@@ -491,7 +491,8 @@ describe('ImageBatchStack の EventBridge Scheduler', () => {
     // pref-ranking-1 は 17-5c（2026-08-26）の稼働開始で追加。1 日 1 回・20:00 JST
     ['acps-prod-image-generation-pref-ranking-1-evening', 'cron(0 20 * * ? *)', 'pref-ranking-1', 'ENABLED'],
     // umigame-soup-1 は 21-7 で追加。稼働の切り替えは batch_sets.is_active で行うため有効のまま置く
-    ['acps-prod-image-generation-umigame-soup-1-evening', 'cron(0 20 * * ? *)', 'umigame-soup-1', 'ENABLED'],
+    // 21-6i で週 4 回（日・火・木・土）に変更
+    ['acps-prod-image-generation-umigame-soup-1-evening', 'cron(0 20 ? * SUN,TUE,THU,SAT *)', 'umigame-soup-1', 'ENABLED'],
   ])(
     'スケジュール %s を cron %s / set_code %s で Step Functions 起動先に設定する',
     (scheduleName, cronExpression, setCode, state) => {
