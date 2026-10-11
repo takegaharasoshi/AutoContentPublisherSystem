@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import io
 import json
-import logging
 from dataclasses import replace
 from unittest.mock import Mock
 from urllib.error import HTTPError
@@ -12,9 +11,7 @@ from urllib.error import HTTPError
 import pytest
 
 from app import http_util
-from app.config import Config
 from app.judge import jev, luna
-from app.judge.combiner import combine
 from app.judge.contract import JudgeCriteria, Judgement, Problem, ProblemInvalid
 
 
@@ -91,7 +88,8 @@ def test_luna_formats_judge_criteria(problem) -> None:
     )
 
 
-def test_luna_parses_strict_json_and_retries_429(monkeypatch, tmp_path, problem) -> None:
+@pytest.mark.parametrize("effort", ["low", "medium", "high", "xhigh", "max"])
+def test_luna_parses_strict_json_and_retries_429(monkeypatch, tmp_path, problem, effort) -> None:
     decision = {"kind": "q_open", "answer": None, "reply": "聞き直してね",
                 "reason": "語だけ", "bare_term": "レントゲン"}
     body = {"choices": [{"finish_reason": "stop", "message": {"content": json.dumps(decision)}}],
@@ -111,12 +109,12 @@ def test_luna_parses_strict_json_and_retries_429(monkeypatch, tmp_path, problem)
     monkeypatch.setattr(luna, "RULES_PATH", rules)
     sleep = Mock()
     monkeypatch.setattr(http_util.time, "sleep", sleep)
-    result = luna.judge("1", "レントゲン？", problem, api_key="fake")
+    result = luna.judge("1", "レントゲン？", problem, api_key="fake", effort=effort)
     assert (result.kind, result.bare_term, result.reason) == ("q_open", "レントゲン", "語だけ")
     assert result.debug["reasoning_tokens"] == 7
     assert len(calls) == 2
     assert "temperature" not in calls[0]
-    assert calls[0]["reasoning_effort"] == "xhigh"
+    assert calls[0]["reasoning_effort"] == effort
     assert calls[0]["max_completion_tokens"] == 2400
     assert calls[0]["messages"][0]["content"] == luna.format_judge_criteria(problem)
     schema = calls[0]["response_format"]["json_schema"]
@@ -213,13 +211,14 @@ def test_jev_correct_requires_every_core_point(monkeypatch, problem) -> None:
         monkeypatch.setattr(jev, "_record_call", call)
         return jev.judge("1", "男はレントゲンで回復を知った", problem, api_key="fake")
 
-    close = run_with(0.49)
+    close = run_with(0.59)
     assert close.kind == "guess_close"
-    assert close.debug["probabilities"]["B"]["point_1"] == {"hit": 0.49, "close": 0.79}
-    assert run_with(0.5).kind == "guess_correct"
+    assert close.debug["probabilities"]["B"]["point_1"] == pytest.approx({"hit": 0.59, "close": 0.89})
+    assert run_with(0.6).kind == "guess_correct"
 
 
-def test_jev_touch_can_be_close_without_hit(monkeypatch, problem) -> None:
+@pytest.mark.parametrize("touch,expected", [(0.3, "guess_close"), (0.29, "guess_wrong")])
+def test_jev_touch_can_be_close_without_hit(monkeypatch, problem, touch, expected) -> None:
     def call(api_key, state, questions, debug):
         name = next(iter(questions))
         if name == "major":
@@ -228,15 +227,18 @@ def test_jev_touch_can_be_close_without_hit(monkeypatch, problem) -> None:
         if name == "qg":
             return {"qg": {"probabilities": {"guess": 0.99, "question": 0.01}}}
         if name == "point_0":
-            return {"point_0": {"probabilities": {"hit": 0.1, "touch": 0.3, "none": 0.6}},
+            return {"point_0": {"probabilities": {"hit": 0.1, "touch": touch, "none": 0.9 - touch}},
                     "point_1": {"choice": "none"}}
+        if name == "kind":
+            return {"kind": {"choice": "q_open"}}
         raise AssertionError(name)
 
     monkeypatch.setattr(jev, "_record_call", call)
     result = jev.judge("1", "影は体内のこと？", problem, api_key="fake")
-    assert result.kind == "guess_close"
+    assert result.kind == expected
+    assert jev.T_POINT == 0.6 and jev.T_CLOSE == 0.40
     assert result.debug["probabilities"]["B"] == {
-        "point_0": {"hit": 0.1, "close": 0.4},
+        "point_0": {"hit": 0.1, "close": 0.1 + touch},
         "point_1": {"hit": 0.0, "close": 0.0},
     }
 
@@ -320,72 +322,3 @@ def test_jev_low_confidence_answer_falls_back_to_irrelevant(monkeypatch, problem
     assert (result.kind, result.answer) == ("q_yesno", "irrelevant")
     result = run_with({"yes": 0.1, "no": 0.8, "irrelevant": 0.1})
     assert (result.kind, result.answer) == ("q_yesno", "no")
-
-
-def _j(method: str, kind: str, answer: str | None = None) -> Judgement:
-    return Judgement(method, kind, answer=answer, reason="stub")
-
-
-@pytest.mark.parametrize("mode", ["luna", "jev", "hybrid"])
-def test_combiner_three_modes(mode, problem) -> None:
-    luna_call = Mock(return_value=_j("luna", "q_yesno", "yes"))
-    jev_call = Mock(return_value=_j("jev", "q_yesno", "yes"))
-    result = combine("c", "q", problem, Config(judge_mode=mode), {},
-                     luna_call=luna_call, jev_call=jev_call)
-    assert result.kind == "q_yesno"
-    assert result.decision == ("jev" if mode == "jev" else "luna")
-    assert luna_call.call_count == (0 if mode == "jev" else 1)
-    assert jev_call.call_count == (0 if mode == "luna" else 1)
-
-
-def test_combiner_shadow_and_consensus_cases(caplog, problem) -> None:
-    config = Config(judge_mode="hybrid")
-    correct = _j("luna", "guess_correct")
-    jev_correct = _j("jev", "guess_correct")
-    jev_close = _j("jev", "guess_close")
-    with caplog.at_level(logging.WARNING):
-        same = combine("c", "text", problem, config, {},
-                       precomputed={"luna": correct, "jev": jev_correct})
-        split = combine("d", "text", problem, config, {},
-                        precomputed={"luna": correct, "jev": jev_close})
-        failed = combine("e", "text", problem, config, {},
-                         precomputed={"luna": correct, "jev": RuntimeError("jev down")})
-        only_jev_correct = combine("f", "text", problem, config, {},
-                                   precomputed={"luna": _j("luna", "guess_close"), "jev": jev_correct})
-    assert same.decision == "consensus_ok" and same.mismatch is False
-    assert split.decision == "consensus_split" and split.mismatch is True
-    assert failed.decision == "consensus_split" and failed.jev.error == "jev down"
-    assert "jev down" in failed.errors[0]
-    assert only_jev_correct.decision == "luna"
-    assert caplog.text.count("JUDGE_CONSENSUS_SPLIT") == 2
-    assert "JUDGE_SHADOW_MISMATCH" in caplog.text
-
-
-def test_combiner_independent_switches_and_jev_fallback(problem, caplog) -> None:
-    correct = _j("luna", "guess_correct")
-    close = _j("jev", "guess_close")
-    with caplog.at_level(logging.WARNING):
-        no_shadow = combine("c", "text", problem, Config(shadow=False, consensus=True), {},
-                            precomputed={"luna": correct, "jev": close})
-        no_consensus = combine("c", "text", problem, Config(shadow=True, consensus=False), {},
-                               precomputed={"luna": correct, "jev": close})
-        both_off = combine("c", "text", problem, Config(shadow=False, consensus=False), {},
-                           luna_call=lambda *args, **kwargs: correct,
-                           jev_call=lambda *args, **kwargs: pytest.fail("Jev should not run"))
-    assert no_shadow.decision == "consensus_split"
-    assert no_consensus.decision == "luna"
-    assert both_off.jev is None and both_off.decision == "luna"
-    assert caplog.text.count("JUDGE_SHADOW_MISMATCH") == 1
-
-    fallback = combine("c", "text", problem, Config(judge_mode="jev"), {},
-                       precomputed={"jev": RuntimeError("down"), "luna": correct})
-    assert fallback.decision == "jev_fallback_luna"
-    assert fallback.kind == "guess_correct"
-    error_result = combine("c", "text", problem, Config(judge_mode="jev"), {},
-                           precomputed={"jev": Judgement("jev", None, error="bad response"),
-                                        "luna": correct})
-    assert error_result.decision == "jev_fallback_luna"
-    assert error_result.jev.error == "bad response"
-    with pytest.raises(RuntimeError, match="luna down"):
-        combine("c", "text", problem, Config(judge_mode="luna"), {},
-                precomputed={"luna": RuntimeError("luna down")})

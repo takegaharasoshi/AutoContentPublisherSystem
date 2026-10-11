@@ -41,6 +41,8 @@ ANSWER_LABEL = {
 DECISION_LABEL = {
     "luna": "luna の判定", "jev": "Jev の判定",
     "jev_fallback_luna": "Jev 失敗のため luna の判定",
+    "luna_fallback_haiku": "luna 失敗のため Haiku の判定",
+    "jev_fallback_haiku": "Jev 失敗のため Haiku の判定",
     "decisions": "Decisions の判定",
     "decisions_fallback_luna": "Decisions 失敗のため luna の判定",
     "haiku": "Haiku の判定",
@@ -210,7 +212,7 @@ def _api_rows(metrics: dict[str, Any], patterns: list[dict[str, Any]], *, thresh
             f"{api['judge']['max_tokens']} / {api['writer']['max_tokens']} 件")),
         ("空応答（判定 / 書き手）", lambda api: (
             f"{api['judge']['empty_responses']} / {api['writer']['empty_responses']} 件")),
-        ("Haiku から luna への再判定", lambda api: f"{api['haiku_fallback_luna']} 件"),
+        ("判定失敗による再判定", lambda api: f"{api['judge_fallbacks']} 件"),
     )
     out = []
     for label, value in rows:

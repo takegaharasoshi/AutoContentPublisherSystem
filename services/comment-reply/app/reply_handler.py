@@ -49,7 +49,6 @@ def process_message(
         record = new_record(comment, body.get("entry_time"), str(received), config, problem)
         result = combine(
             comment_id, record["text"], problem, config, credentials,
-            media_id=media_id,
         )
         judged_at = utc_now()
         reply = write_reply(
@@ -58,6 +57,7 @@ def process_message(
             openai_api_key=credentials["openai_api_key"], model=config.luna_model,
             anthropic_api_key=credentials.get("anthropic_api_key", ""),
             haiku_effort=config.haiku_effort,
+            luna_effort=config.luna_effort,
         )
         apply_decision(record, result, reply, judged_at=judged_at)
         if reply.text:

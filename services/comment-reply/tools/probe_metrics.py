@@ -299,7 +299,7 @@ def _usage_summary(calls: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
 
 
 def _api_usage(pattern: dict[str, Any], items: list[dict[str, Any]]) -> dict[str, Any]:
-    """Report judge and writer costs, including failed calls and Luna fallbacks."""
+    """Report judge and writer costs, including failed calls and judge fallbacks."""
     judge_calls = [(method, judgement.get("debug") or {})
                    for item in items
                    for method, judgement in (item["record"].get("judgements") or {}).items()
@@ -321,6 +321,14 @@ def _api_usage(pattern: dict[str, Any], items: list[dict[str, Any]]) -> dict[str
         "refusals": {"count": sum(categories.values()), "categories": dict(sorted(categories.items()))},
         "max_tokens": judge["max_tokens"] + writer["max_tokens"],
         "empty_responses": judge["empty_responses"] + writer["empty_responses"],
+        "judge_fallbacks": sum(
+            "_fallback_" in ((item["record"].get("final") or {}).get("decision") or "")
+            for item in items
+        ),
+        "fallback_decisions": dict(sorted(Counter(
+            decision for item in items
+            if "_fallback_" in (decision := (item["record"].get("final") or {}).get("decision") or "")
+        ).items())),
         "haiku_fallback_luna": sum(
             (item["record"].get("final") or {}).get("decision") == "haiku_fallback_luna"
             for item in items

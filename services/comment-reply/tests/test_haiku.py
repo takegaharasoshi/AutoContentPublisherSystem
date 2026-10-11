@@ -50,7 +50,7 @@ def _body(data: dict | None = None, **changes) -> dict:
 
 
 def _combined(kind: str = "q_yesno", answer: str | None = "yes", **changes) -> Combined:
-    return Combined(None, None, kind, answer, None, "haiku", None, **changes)
+    return Combined(None, None, kind, answer, None, "haiku", **changes)
 
 
 def _mock_http(monkeypatch, body: dict) -> Mock:
@@ -155,7 +155,7 @@ def test_judge_refusal_category_retained(monkeypatch, problem, category) -> None
     assert caught.value.debug["refusal_category"] == category
     assert caught.value.debug["usage"]["output_tokens"] == 200
     assert caught.value.debug["latency_s"] >= 0
-    assert caught.value.debug["effort"] == "max"
+    assert caught.value.debug["effort"] == "high"
 
 
 @pytest.mark.parametrize("changes,reason", [
@@ -220,10 +220,9 @@ def test_combiner_success_skips_luna_and_jev(monkeypatch, problem) -> None:
     result = combine(
         "c", "質問", problem, Config(judge_mode="haiku", haiku_effort="high"),
         {"anthropic_api_key": "fake-anthropic"}, luna_call=blocked, jev_call=blocked,
-        decisions_call=blocked,
     )
     assert result.decision == "haiku" and result.haiku.method == "haiku"
-    assert result.luna is None and result.jev is None and result.decisions is None
+    assert result.luna is None and result.jev is None
     blocked.assert_not_called()
     assert post.call_count == 1
     assert json.loads(post.call_args.args[0].data)["output_config"]["effort"] == "high"
@@ -300,9 +299,9 @@ def test_haiku_truth_writer_does_not_read_shared_style(tmp_path, monkeypatch, pr
 
 def test_haiku_effort_config_defaults_and_allowed_values() -> None:
     config = Config.from_env({})
-    assert config.haiku_effort == Config().haiku_effort == "max"
-    assert (config.judge_mode, config.reply_variant, config.shadow, config.consensus) == (
-        "hybrid", "1d-luna", True, True,
+    assert config.haiku_effort == Config().haiku_effort == "high"
+    assert (config.judge_mode, config.reply_variant, config.luna_effort) == (
+        "haiku", "1b-haiku", "xhigh",
     )
     for effort in ("low", "medium", "high", "xhigh", "max"):
         assert Config.from_env({"HAIKU_EFFORT": effort}).haiku_effort == effort
@@ -470,3 +469,13 @@ def test_local_trial_runs_haiku_patterns_once_per_effort(tmp_path, monkeypatch) 
     assert [call.kwargs["effort"] for call in judge.call_args_list] == ["max", "high"]
     assert sorted(path.name for path in (tmp_path / "trial").iterdir()) == [
         "haiku-high", "haiku-max"]
+
+
+def test_luna_judgement_survives_independent_haiku_writer_failure(monkeypatch, problem) -> None:
+    result = combine("c", "質問", problem, Config(judge_mode="luna"), {},
+                     precomputed={"luna": Judgement("luna", "q_yesno", "yes")})
+    _mock_http(monkeypatch, _body(content=[], stop_reason="refusal"))
+    reply = writer.write_reply(result, "c", "質問", problem, variant="1b-haiku",
+                               anthropic_api_key="fake-anthropic")
+    assert result.decision == "luna" and result.haiku is None
+    assert reply.source == "fallback_template" and reply.text.startswith("はい！")

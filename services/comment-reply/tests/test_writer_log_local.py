@@ -21,7 +21,7 @@ from tools import local_trial
 def _combined(kind: str, answer: str | None = None,
               term: str | None = None, decision: str = "luna") -> Combined:
     result = Judgement("luna", kind, answer=answer, bare_term=term)
-    return Combined(result, None, kind, answer, term, decision, None)
+    return Combined(result, None, kind, answer, term, decision)
 
 
 @pytest.mark.parametrize("variant", ["1b", "1d-luna", "2b", "2c-luna"])
@@ -46,7 +46,7 @@ def test_writer_forced_replies_and_correct_disclosure(monkeypatch, variant, prob
         assert correct.source == "template"
 
 
-def test_writer_yesno_guard_bare_term_split_and_over_80(monkeypatch, caplog, problem) -> None:
+def test_writer_yesno_guard_bare_term_and_over_80(monkeypatch, caplog, problem) -> None:
     monkeypatch.setattr(writer, "_llm_reply", lambda *args, **kwargs: ("そうかも", {}))
     with caplog.at_level(logging.WARNING):
         guarded = writer.write_reply(_combined("q_yesno", "yes"), "1", "質問", problem,
@@ -57,9 +57,6 @@ def test_writer_yesno_guard_bare_term_split_and_over_80(monkeypatch, caplog, pro
     bare = writer.write_reply(_combined("q_open", term="レントゲン"), "1", "レントゲン？", problem,
                               variant="2b")
     assert "レントゲン" in bare.text and ("何" in bare.text or "どう" in bare.text)
-    split = writer.write_reply(_combined("guess_correct", decision="consensus_split"), "1", "推理", problem,
-                               variant="1b", openai_api_key="fake")
-    assert split.source == "consensus_split" and problem.reveal_text not in split.text
     monkeypatch.setattr(writer, "_llm_reply", lambda *args, **kwargs: ("はい！" + "長" * 90, {}))
     with caplog.at_level(logging.WARNING):
         long = writer.write_reply(_combined("q_yesno", "yes"), "1", "質問", problem,
@@ -85,7 +82,6 @@ def test_template_variety_and_bare_prompt(problem) -> None:
         if kind in {"guess_correct", "spam", "personal_info"}:
             continue
         assert len(set(options)) >= 3, kind
-    assert len(set(templates.CONSENSUS_SPLIT)) >= 3
     assert len(set(templates.BARE_TERM_QUESTIONS)) >= 3
     result = _combined("q_open", term="レントゲン")
     prompt = writer._render_prompt(
@@ -113,6 +109,7 @@ def test_writer_prompt_excludes_judge_criteria(variant, problem) -> None:
 
 @pytest.mark.parametrize("variant,effort,max_tokens,with_truth", [
     ("1b", "xhigh", 2400, True),
+    ("1b", "medium", 2400, True),
     ("1d-luna", "low", 800, False),
     ("2c-luna", "low", 800, False),
 ])
@@ -127,7 +124,7 @@ def test_writer_request_variant_contract(monkeypatch, variant, effort, max_token
     result = writer.write_reply(
         _combined("q_yesno", "yes"), "1", "質問", problem,
         variant=variant, openai_api_key="fake", model="dated-model",
-        haiku_effort="high",
+        haiku_effort="high", luna_effort=effort if variant == "1b" else "max",
     )
     assert result.source == "llm"
     payload = requests[0]
@@ -159,10 +156,14 @@ def test_record_schema_and_local_sink_exclude_username(tmp_path, problem) -> Non
     comment_log.apply_decision(record, combined, reply)
     required = {"schema_version", "comment_id", "parent_id", "media_id", "set_code",
                 "content_key", "problem_schema_version", "commenter_id", "text", "times",
-                "config", "judgements", "shadow_mismatch", "final", "reply", "errors",
+                "config", "judgements", "final", "reply", "errors",
                 "fact_sheet_hash"}
     assert required <= record.keys()
     assert record["schema_version"] == 1
+    assert "shadow_mismatch" not in record
+    assert "shadow" not in record["config"] and "consensus" not in record["config"]
+    assert record["config"]["haiku_effort"] == "high"
+    assert record["config"]["luna_effort"] == "xhigh"
     assert record["times"]["comment_created_at"].endswith("Z")
     assert len(record["config"]["prompt_version"]) == 12
     assert len(record["fact_sheet_hash"]) == 12
@@ -183,12 +184,12 @@ def test_local_trial_stub_writes_three_mode_records_without_keys(tmp_path, monke
     ]) == 0
     files = list(tmp_path.rglob("*.json"))
     assert len(files) == 18
-    split = json.loads(next(path for path in files if path.parent.parent.parent.parent.name == "hybrid"
-                            and path.name == "local-u01-split.json").read_text(encoding="utf-8"))
-    assert split["final"]["decision"] == "consensus_split"
-    assert split["shadow_mismatch"] is True
-    assert split["reply"]["source"] == "consensus_split"
-    assert "真相" not in split["reply"]["text"]
+    assert {path.relative_to(tmp_path).parts[0] for path in files} == {"luna", "jev", "haiku"}
+    for mode in ("luna", "jev", "haiku"):
+        saved = json.loads(next((tmp_path / mode).rglob("local-u01-split.json")).read_text())
+        assert saved["final"]["decision"] == mode
+        assert "shadow_mismatch" not in saved
+        assert saved["reply"]["source"] == "template"
 
 
 def test_local_trial_passes_configured_haiku_effort_to_writer(tmp_path, monkeypatch, problem) -> None:
@@ -206,3 +207,64 @@ def test_local_trial_passes_configured_haiku_effort_to_writer(tmp_path, monkeypa
     assert call.call_args.kwargs["haiku_effort"] == "high"
     assert call.call_args.kwargs["anthropic_api_key"] == "fake-anthropic"
     assert call.call_args.kwargs["variant"] == "1b-haiku"
+
+
+@pytest.mark.parametrize("mode,pattern", [("luna", "9"), ("jev", "10")])
+def test_local_new_patterns_use_independent_haiku_writer(tmp_path, monkeypatch, mode, pattern) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "openai")
+    monkeypatch.setenv("TYPESAFE_API_KEY", "jev")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "anthropic")
+    judge = Mock(return_value=Judgement(mode, "q_yesno", "yes"))
+    monkeypatch.setattr(getattr(local_trial, mode), "judge", judge)
+    blocked = Mock(side_effect=AssertionError("main succeeded"))
+    monkeypatch.setattr(local_trial.haiku, "judge", blocked)
+    call = Mock(return_value=writer.Reply("はい！", "llm", False))
+    monkeypatch.setattr(local_trial, "write_reply", call)
+    assert local_trial.main(["--problem", "U01", "--patterns", pattern, "--comment", "質問",
+                             "--out", str(tmp_path)]) == 0
+    judge.assert_called_once()
+    blocked.assert_not_called()
+    assert call.call_args.kwargs["variant"] == "1b-haiku"
+    assert call.call_args.kwargs["haiku_effort"] == "high"
+    record = json.loads(next(tmp_path.rglob("*.json")).read_text())
+    assert record["final"]["decision"] == mode
+
+
+def test_local_luna_efforts_are_forwarded_and_cached(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "openai")
+    judge = Mock(return_value=Judgement("luna", "q_yesno", "yes"))
+    monkeypatch.setattr(local_trial.luna, "judge", judge)
+    call = Mock(return_value=writer.Reply("はい！", "llm", False))
+    monkeypatch.setattr(local_trial, "write_reply", call)
+    assert local_trial.main(["--problem", "U01", "--patterns", "1", "2", "--comment", "質問",
+                             "--luna-effort", "max", "high", "--out", str(tmp_path)]) == 0
+    assert [c.kwargs["effort"] for c in judge.call_args_list] == ["max", "high"]
+    assert [c.kwargs["luna_effort"] for c in call.call_args_list] == ["max", "high", "max", "high"]
+    assert len(list(tmp_path.rglob("*.json"))) == 4
+
+
+@pytest.mark.parametrize("mode,fallback", [("luna", "haiku"), ("jev", "haiku"), ("haiku", "luna")])
+def test_local_calls_fallback_only_after_main_failure(tmp_path, monkeypatch, mode, fallback) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "openai")
+    monkeypatch.setenv("TYPESAFE_API_KEY", "jev")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "anthropic")
+    order = []
+
+    def main(*a, **k):
+        order.append(mode)
+        raise ValueError("main failed")
+
+    def sub(*a, **k):
+        assert order == [mode]
+        order.append(fallback)
+        assert k["effort"] == ("high" if fallback == "haiku" else "xhigh")
+        return Judgement(fallback, "impression")
+
+    monkeypatch.setattr(getattr(local_trial, mode), "judge", main)
+    monkeypatch.setattr(getattr(local_trial, fallback), "judge", sub)
+    assert local_trial.main(["--problem", "U01", "--modes", mode, "--reply-variant", "2b",
+                             "--comment", "感想", "--out", str(tmp_path)]) == 0
+    record = json.loads(next(tmp_path.rglob("*.json")).read_text())
+    assert order == [mode, fallback]
+    assert record["final"]["decision"] == f"{mode}_fallback_{fallback}"
+    assert record["judgements"][mode]["error"] == "main failed"

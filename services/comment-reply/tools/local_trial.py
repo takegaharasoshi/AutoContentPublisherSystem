@@ -18,20 +18,19 @@ if str(SERVICE_DIR) not in sys.path:
     sys.path.insert(0, str(SERVICE_DIR))
 
 from app.comment_log import apply_decision, new_record, utc_now, write_record  # noqa: E402
-from app.config import Config, HAIKU_EFFORTS, REPLY_VARIANTS  # noqa: E402
-from app.judge import decisions, haiku, jev, luna  # noqa: E402
+from app.config import Config, HAIKU_EFFORTS, LUNA_EFFORTS, REPLY_VARIANTS  # noqa: E402
+from app.judge import haiku, jev, luna  # noqa: E402
 from app.judge.combiner import combine  # noqa: E402
 from app.judge.contract import Judgement, Problem  # noqa: E402
 from app.reply.writer import HAIKU_VARIANTS, write_reply  # noqa: E402
 
 
 STOCK_PATH = REPO_ROOT / "content/umigame-stock/umigame-soup-1/batch-01/stock_items.py"
-# Same combinations as probe_run.PATTERNS (21-6e compares 1, 2, 5 and 7 by hand).
+# Same numbered combinations as probe_run.PATTERNS.
 PATTERNS = {
-    "1": ("luna", "1b", False, False), "2": ("luna", "1d-luna", False, False),
-    "3": ("hybrid", "1d-luna", True, True), "4": ("jev", "2b", False, False),
-    "5": ("jev", "2c-luna", False, False), "6": ("decisions", "2c-luna", False, False),
-    "7": ("haiku", "1b-haiku", False, False), "8": ("haiku", "1d-haiku", False, False),
+    "1": ("luna", "1b"), "2": ("luna", "1d-luna"),
+    "5": ("jev", "2c-luna"), "7": ("haiku", "1b-haiku"),
+    "9": ("luna", "1b-haiku"), "10": ("jev", "1b-haiku"),
 }
 
 
@@ -77,30 +76,31 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--comment", action="append", default=[], help="comment; repeatable")
     parser.add_argument("--comments-file", type=Path, help="one comment per line")
     parser.add_argument("--modes", nargs="+",
-                        choices=("luna", "jev", "hybrid", "decisions", "haiku"),
-                        default=["luna", "jev", "hybrid"])
-    parser.add_argument("--patterns", nargs="+", choices=sorted(PATTERNS),
-                        help="evaluation patterns (mode + reply variant), e.g. 1 2 5 7; "
+                        choices=("luna", "jev", "haiku"),
+                        default=["luna", "jev", "haiku"])
+    parser.add_argument("--patterns", nargs="+", choices=sorted(PATTERNS, key=int),
+                        help="evaluation patterns (mode + reply variant), e.g. 7 9 10; "
                              "overrides --modes and --reply-variant")
     parser.add_argument("--haiku-effort", nargs="+", choices=sorted(HAIKU_EFFORTS),
                         help="effort(s) for the Haiku judge and 1b-haiku writer; several values "
                              "run each Haiku pattern once per effort (default: HAIKU_EFFORT)")
+    parser.add_argument("--luna-effort", nargs="+", choices=sorted(LUNA_EFFORTS),
+                        help="effort(s) for the Luna judge and 1b writer (default: LUNA_EFFORT)")
     parser.add_argument("--reply-variant", choices=sorted(REPLY_VARIANTS))
-    parser.add_argument("--shadow", action=argparse.BooleanOptionalAction, default=None)
-    parser.add_argument("--consensus", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--stub-judgements", type=Path, help="offline judge fixture JSON")
     parser.add_argument("--out", type=Path, default=SERVICE_DIR / "work/local_trial")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Run each judge once per comment, then replay outcomes through each mode."""
+    """Run selected modes, sharing outcomes and calling fallbacks only as needed."""
     args = _parser().parse_args(argv)
     problem = _load_stock_problem(args.problem) if args.problem else Problem.from_snapshot(
         json.loads(args.snapshot.read_text(encoding="utf-8"))
     )
     base_config = Config.from_env()
     haiku_efforts = list(dict.fromkeys(args.haiku_effort or [base_config.haiku_effort]))
+    luna_efforts = list(dict.fromkeys(args.luna_effort or [base_config.luna_effort]))
     variant = args.reply_variant or base_config.reply_variant
     stub_rows: list[dict[str, Any]] = []
     if args.stub_judgements:
@@ -127,43 +127,37 @@ def main(argv: list[str] | None = None) -> int:
                 break
             comments.append(line)
 
-    effective_shadow = base_config.shadow if args.shadow is None else args.shadow
-    effective_consensus = base_config.consensus if args.consensus is None else args.consensus
-    # (output label, judge mode, reply variant, shadow, consensus)
+    # (output label, judge mode, reply variant)
     if args.patterns:
         runs = [(f"p{no}-{PATTERNS[no][0]}-{PATTERNS[no][1]}", *PATTERNS[no])
                 for no in args.patterns]
         if stub_rows:
-            runs = [(label, mode, "2b", shadow, consensus)
-                    for label, mode, _, shadow, consensus in runs]
+            runs = [(label, mode, "2b") for label, mode, _ in runs]
     else:
-        runs = [(mode, mode, variant, effective_shadow, effective_consensus)
-                for mode in args.modes]
-    # Haiku patterns run once per effort; the others carry an unused effort.
+        runs = [(mode, mode, variant) for mode in args.modes]
     expanded = []
-    for label, mode, run_variant, shadow, consensus in runs:
+    for label, mode, run_variant in runs:
         uses_haiku = mode == "haiku" or run_variant in HAIKU_VARIANTS
-        for effort in haiku_efforts if uses_haiku else haiku_efforts[:1]:
-            suffix = f"-{effort}" if uses_haiku and len(haiku_efforts) > 1 else ""
-            expanded.append((label + suffix, mode, run_variant, shadow, consensus, effort))
+        uses_luna = mode == "luna" or run_variant == "1b"
+        for haiku_effort in haiku_efforts if uses_haiku else haiku_efforts[:1]:
+            for luna_effort in luna_efforts if uses_luna else luna_efforts[:1]:
+                suffix = f"-{haiku_effort}" if uses_haiku and len(haiku_efforts) > 1 else ""
+                if uses_luna and len(luna_efforts) > 1:
+                    suffix += f"-luna-{luna_effort}"
+                expanded.append((label + suffix, mode, run_variant, haiku_effort, luna_effort))
     runs = expanded
     modes = {run[1] for run in runs}
-    needs_luna = bool(modes & {"luna", "hybrid", "jev", "decisions"})
-    needs_decisions = "decisions" in modes
-    needs_haiku = "haiku" in modes
-    needs_jev = "jev" in modes or any(
-        mode == "hybrid" and (shadow or consensus) for _, mode, _, shadow, consensus, _ in runs
-    )
     keys = {"openai_api_key": os.environ.get("OPENAI_API_KEY", ""),
             "typesafe_api_key": os.environ.get("TYPESAFE_API_KEY", ""),
             "anthropic_api_key": os.environ.get("ANTHROPIC_API_KEY", "")}
     if not stub_rows:
         missing = []
-        if needs_luna and not keys["openai_api_key"]:
+        if ("luna" in modes or any(run[2] in {"1b", "1d-luna", "2c-luna"}
+                                   for run in runs)) and not keys["openai_api_key"]:
             missing.append("OPENAI_API_KEY")
-        if needs_jev and not keys["typesafe_api_key"]:
+        if "jev" in modes and not keys["typesafe_api_key"]:
             missing.append("TYPESAFE_API_KEY")
-        needs_anthropic = needs_haiku or any(run[2] in HAIKU_VARIANTS for run in runs)
+        needs_anthropic = "haiku" in modes or any(run[2] in HAIKU_VARIANTS for run in runs)
         if needs_anthropic and not keys["anthropic_api_key"]:
             missing.append("ANTHROPIC_API_KEY")
         if missing:
@@ -178,80 +172,52 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError(f"stub has no judgement for comment: {comment_text}")
         comment_id = str(fixture.get("id") if fixture else f"{problem.media_id}-{run_stamp}-{index}")
         received_at = utc_now()
-        outcomes: dict[str, Judgement | Exception] = {}
-        haiku_outcomes: dict[str, Judgement | Exception] = {}
-        seconds: dict[str, float] = {}
-        if fixture:
-            methods = ("luna", "jev") + (("decisions",) if needs_decisions else ()) + (
-                ("haiku",) if needs_haiku else ())
-            for method in methods:
-                if method not in fixture:
-                    raise ValueError(f"stub entry lacks {method}: {comment_text}")
-                outcomes[method] = _stub_result(method, fixture[method])
-            if needs_haiku:
-                haiku_outcomes = {effort: outcomes["haiku"] for effort in haiku_efforts}
-        else:
-            if needs_luna:
-                started = time.monotonic()
-                try:
-                    outcomes["luna"] = luna.judge(
-                        comment_id, comment_text, problem,
-                        api_key=keys["openai_api_key"], model=base_config.luna_model,
-                    )
-                except Exception as exc:
-                    outcomes["luna"] = exc
-                seconds["luna"] = time.monotonic() - started
-            if needs_jev:
-                started = time.monotonic()
-                try:
-                    outcomes["jev"] = jev.judge(
-                        comment_id, comment_text, problem, api_key=keys["typesafe_api_key"],
-                    )
-                except Exception as exc:
-                    outcomes["jev"] = exc
-                seconds["jev"] = time.monotonic() - started
-            if needs_decisions:
-                started = time.monotonic()
-                try:
-                    outcomes["decisions"] = decisions.judge(
-                        comment_id, comment_text, problem,
-                        api_key=keys["openai_api_key"], model=base_config.luna_model,
-                    )
-                except Exception as exc:
-                    outcomes["decisions"] = exc
-                seconds["decisions"] = time.monotonic() - started
-            for effort in haiku_efforts if needs_haiku else ():
-                started = time.monotonic()
-                try:
-                    haiku_outcomes[effort] = haiku.judge(
-                        comment_id, comment_text, problem,
-                        api_key=keys["anthropic_api_key"], effort=effort,
-                    )
-                except Exception as exc:
-                    haiku_outcomes[effort] = exc
-                seconds[f"haiku({effort})"] = time.monotonic() - started
-        judged_at = utc_now()
+        outcomes: dict[tuple[str, str | None], Judgement | Exception] = {}
         print(f"\n{comment_text}")
-        if seconds:
-            print("  判定の所要: " + " / ".join(f"{k} {v:.1f}秒" for k, v in seconds.items()))
-        for label, mode, run_variant, shadow, consensus, haiku_effort in runs:
+        for label, mode, run_variant, haiku_effort, luna_effort in runs:
             config = Config(
-                judge_mode=mode, shadow=shadow, consensus=consensus,
-                reply_variant=run_variant, luna_model=base_config.luna_model,
-                haiku_effort=haiku_effort,
-                set_code=problem.set_code,
+                judge_mode=mode, reply_variant=run_variant, luna_model=base_config.luna_model,
+                haiku_effort=haiku_effort, luna_effort=luna_effort, set_code=problem.set_code,
             )
+            seconds: dict[str, float] = {}
+
+            def cached_judge(method: str, **kwargs: Any) -> Judgement:
+                effort = kwargs.get("effort")
+                cache_key = method, effort
+                name = f"{method}({effort})" if effort else method
+                if cache_key not in outcomes:
+                    started = time.monotonic()
+                    try:
+                        if fixture:
+                            if method not in fixture:
+                                raise ValueError(f"stub entry lacks {method}: {comment_text}")
+                            outcomes[cache_key] = _stub_result(method, fixture[method])
+                        else:
+                            call = {"luna": luna.judge, "jev": jev.judge, "haiku": haiku.judge}[method]
+                            outcomes[cache_key] = call(comment_id, comment_text, problem, **kwargs)
+                    except Exception as exc:
+                        outcomes[cache_key] = exc
+                    seconds[name] = time.monotonic() - started
+                outcome = outcomes[cache_key]
+                if isinstance(outcome, Exception):
+                    raise outcome
+                return outcome
+
             combined = combine(
                 comment_id, comment_text, problem, config, keys,
-                precomputed={**outcomes, **(
-                    {"haiku": haiku_outcomes[haiku_effort]} if haiku_effort in haiku_outcomes
-                    else {})},
+                luna_call=lambda *a, **k: cached_judge("luna", **k),
+                jev_call=lambda *a, **k: cached_judge("jev", **k),
+                haiku_call=lambda *a, **k: cached_judge("haiku", **k),
             )
+            judged_at = utc_now()
+            if seconds:
+                print("  判定の所要: " + " / ".join(f"{k} {v:.1f}秒" for k, v in seconds.items()))
             started = time.monotonic()
             reply = write_reply(
                 combined, comment_id, comment_text, problem, variant=run_variant,
                 openai_api_key=keys["openai_api_key"], model=config.luna_model,
                 anthropic_api_key=keys["anthropic_api_key"], haiku_effort=config.haiku_effort,
+                luna_effort=config.luna_effort,
             )
             writer_seconds = time.monotonic() - started
             comment = {"id": comment_id, "text": comment_text,
@@ -261,7 +227,7 @@ def main(argv: list[str] | None = None) -> int:
             path = write_record(record, directory=args.out / label)
             files.append(path)
             print(f"  {label}: {combined.kind} / {combined.answer or '-'} / {combined.decision}"
-                  f" | {reply.text or '(返信なし)'} | mismatch={combined.mismatch}"
+                  f" | {reply.text or '(返信なし)'}"
                   f" | 返信 {writer_seconds:.1f}秒")
     print("\n記録ファイル:")
     for path in files:

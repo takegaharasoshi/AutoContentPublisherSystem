@@ -128,10 +128,10 @@ def test_reply_missing_snapshot_logs_and_succeeds(monkeypatch) -> None:
 
 
 def test_reply_handler_passes_haiku_credentials_and_effort(monkeypatch, problem) -> None:
-    config = Config(judge_mode="haiku", reply_variant="1b-haiku", haiku_effort="xhigh",
+    config = Config(judge_mode="haiku", reply_variant="1b-haiku", haiku_effort="xhigh", luna_effort="medium",
                     assets_bucket="bucket", comment_log_bucket="bucket")
     credentials = {**_credentials(), "anthropic_api_key": "fake-anthropic"}
-    combined = Combined(None, None, "q_yesno", "yes", None, "haiku", None,
+    combined = Combined(None, None, "q_yesno", "yes", None, "haiku",
                         haiku=Judgement("haiku", "q_yesno", "yes"))
     monkeypatch.setattr(reply_handler, "get_problem", lambda *args, **kwargs: problem)
     judge = Mock(return_value=combined)
@@ -143,6 +143,7 @@ def test_reply_handler_passes_haiku_credentials_and_effort(monkeypatch, problem)
     reply_handler.process_message(_message(), config, credentials, s3_client=Mock())
     assert judge.call_args.args[3].haiku_effort == "xhigh"
     assert writer.call_args.kwargs["haiku_effort"] == "xhigh"
+    assert writer.call_args.kwargs["luna_effort"] == "medium"
     assert writer.call_args.kwargs["anthropic_api_key"] == "fake-anthropic"
 
 
@@ -153,7 +154,7 @@ def test_graph_failure_is_partial_failure_and_log_failure_does_not_stop_reply(mo
     monkeypatch.setattr(reply_handler, "get_secrets", lambda arn: _credentials())
     monkeypatch.setattr(reply_handler, "get_problem", lambda *args, **kwargs: problem)
     combined = Combined(Judgement("luna", "q_yesno", "yes"), None,
-                        "q_yesno", "yes", None, "luna", None)
+                        "q_yesno", "yes", None, "luna")
     monkeypatch.setattr(reply_handler, "combine", lambda *args, **kwargs: combined)
     monkeypatch.setattr(reply_handler, "write_reply", lambda *args, **kwargs: Reply("はい！", "template", False))
     graph = Mock(side_effect=[RuntimeError("graph failed"), "reply-1"])
@@ -189,3 +190,28 @@ def test_graph_api_truncates_only_at_send_boundary(monkeypatch) -> None:
     long_text = "あ" * 210
     assert graph_api.reply_to_comment("comment-1", long_text, "fake") == "reply-1"
     assert payloads[0]["message"] == [long_text[:200]]
+
+
+def test_both_judges_failed_returns_sqs_batch_failure(monkeypatch, problem) -> None:
+    from functools import partial
+    from app.judge.combiner import combine
+
+    monkeypatch.setenv("SECRET_ARN", "test-secret")
+    monkeypatch.setenv("ASSETS_BUCKET", "bucket")
+    monkeypatch.setenv("JUDGE_MODE", "luna")
+    monkeypatch.setattr(reply_handler, "get_secrets", lambda arn: _credentials())
+    monkeypatch.setattr(reply_handler, "get_problem", lambda *args, **kwargs: problem)
+    main = Mock(side_effect=RuntimeError("Luna unavailable"))
+    fallback = Mock(return_value=Judgement("haiku", None, error="Haiku unavailable"))
+    monkeypatch.setattr(reply_handler, "combine", partial(combine, luna_call=main, haiku_call=fallback))
+    graph = Mock(side_effect=AssertionError("no reply after both judges fail"))
+    monkeypatch.setattr(reply_handler, "reply_to_comment", graph)
+    write = Mock()
+    monkeypatch.setattr(reply_handler, "write_record", write)
+    _install_boto3(monkeypatch, s3=Mock())
+    event = {"Records": [{"messageId": "retry-me", "body": json.dumps(_message())}]}
+    assert reply_handler.lambda_handler(event, None) == {"batchItemFailures": [{"itemIdentifier": "retry-me"}]}
+    assert main.call_count == fallback.call_count == 1
+    graph.assert_not_called()
+    errors = write.call_args.args[0]["errors"]
+    assert any("Luna unavailable" in error and "Haiku unavailable" in error for error in errors)

@@ -1,19 +1,17 @@
 # comment-reply
 
-Instagram コメントの Webhook 受信と返信を、2 本の Lambda に分けたサービスです。Webhook は署名検証後に SQS FIFO に入れ、Reply は投稿時の問題スナップショットを S3 から読みます。Reply は Aurora を参照しません。
+水平思考クイズの Instagram コメントへ返信する Lambda と、同じ判定・書き手を使うローカル評価ツールです。
 
-## 構成
-
-| パス | 役割 |
+| モジュール | 役割 |
 |---|---|
-| `app.webhook_handler.lambda_handler` | Function URL の GET 検証、POST 署名検証、SQS 送信 |
-| `app.reply_handler.lambda_handler` | SQS 部分失敗、問題取得、判定、返信、記録 |
-| `app/judge/luna.py`, `jev.py`, `decisions.py`, `combiner.py` | 3 方式と 4 モードの組み合わせ。Jev と Decisions は段の実装を共有 |
-| `app/reply/templates.py`, `writer.py` | 定型文と 4 案の返信文 |
+| `app/webhook_handler.py` | 署名検証、自己コメント除外、SQS FIFO への送信 |
+| `app/reply_handler.py` | 問題取得、判定、返信、コメント記録、SQS の部分失敗通知 |
+| `app/judge/luna.py`, `jev.py`, `haiku.py`, `combiner.py` | 3 方式の判定と、失敗時のサブ判定への切り替え |
+| `app/reply/templates.py`, `writer.py` | 定型文と LLM の返信文 |
 | `app/comment_log.py` | S3 / ローカル共通のコメント記録 |
-| `tools/local_trial.py` | AWS・Instagram を使わない試行 CLI |
+| `tools/local_trial.py`, `probe_run.py` | AWS・Instagram を使わない試行と評価 |
 
-Python 3.10 以上が必要です。Lambda 実行時の依存は標準ライブラリとランタイム同梱の boto3 のみです。`boto3` はハンドラ内で遅延 import するため、ローカル試行ツールは boto3 なしでも動きます。
+Python 3.10 以上が必要です。Lambda の依存は標準ライブラリとランタイム同梱の boto3 のみです。boto3 はハンドラ内で遅延 import するため、ローカル試行ツールは boto3 なしでも動きます。
 
 ## 環境変数
 
@@ -26,25 +24,37 @@ Python 3.10 以上が必要です。Lambda 実行時の依存は標準ライブ�
 | `COMMENT_LOG_BUCKET` | `ASSETS_BUCKET` | コメント記録のバケット |
 | `SET_CODE` | `umigame-soup-1` | 問題が見つからない場合の記録上のセット |
 | `GRAPH_API_BASE` | `https://graph.instagram.com/v23.0` | Graph API ベース URL |
-| `JUDGE_MODE` | `hybrid` | `luna` / `jev` / `hybrid` / `decisions` |
-| `JUDGE_SHADOW` | `on` | hybrid の見張り役。`on/off`、`true/false`、`1/0` を受け付ける |
-| `JUDGE_CONSENSUS` | `on` | hybrid の正解合意制。上と同じ真偽値 |
-| `REPLY_VARIANT` | `1d-luna` | `1b` / `1d-luna` / `2b` / `2c-luna` |
+| `JUDGE_MODE` | `haiku` | `luna` / `jev` / `haiku` |
+| `REPLY_VARIANT` | `1b-haiku` | `1b` / `1d-luna` / `2b` / `2c-luna` / `1b-haiku` / `1d-haiku` |
+| `HAIKU_EFFORT` | `high` | Haiku 判定・1b-haiku 書き手。`low` / `medium` / `high` / `xhigh` / `max` |
+| `LUNA_EFFORT` | `xhigh` | luna 判定・1b 書き手。許容値は `HAIKU_EFFORT` と同じ |
 | `LUNA_MODEL` | `gpt-6-luna` | 判定・書き手の OpenAI モデル名。日付付き ID を指定可 |
 
-Secret の必須キーは、Webhook が `verify_token`, `app_secret`, `ig_user_id`、Reply が `ig_access_token`, `ig_user_id`, `openai_api_key`, `typesafe_api_key` です。ステージングと本番は Secret と環境変数で切り替えます。
+Secret の必須キーは、Webhook が `verify_token`, `app_secret`, `ig_user_id`、Reply が `ig_access_token`, `ig_user_id`, `openai_api_key`, `typesafe_api_key` です。Haiku を使うときは `anthropic_api_key` も指定します。ステージングと本番は Secret と環境変数で切り替えます。ローカルツールは `OPENAI_API_KEY`, `TYPESAFE_API_KEY`, `ANTHROPIC_API_KEY` を読みます。
 
-`hybrid` では luna と Jev を並列に呼びます。`JUDGE_SHADOW` と `JUDGE_CONSENSUS` は独立です。合意制が on なら Jev を呼び、両方 off なら Jev を呼びません。luna の失敗は SQS 再試行に回し、Jev の失敗は luna 単体へ進めます。`jev` モードで Jev が失敗した場合も luna にフォールバックします。合意制の split は真相を開示しません。`JUDGE_SHADOW_MISMATCH` と `JUDGE_CONSENSUS_SPLIT` は WARNING ログの固定マーカーです。
+`hybrid` / `decisions` は使用できません。`JUDGE_SHADOW` / `JUDGE_CONSENSUS` は廃止しました。
 
-`decisions` は Jev と同じ段・入力・分岐を OpenAI Decisions API（既定モデル `gpt-6-luna`）で判定する評価用モードです。luna と同じ `openai_api_key` / `OPENAI_API_KEY` を使います。失敗・必要な問いの拒否は luna で判定し直し、`decisions_fallback_luna` を記録します。確率の閾値は Decisions 専用の定数で、`confidence` は記録にだけ使います。hybrid の見張り役・合意制には引き続き Jev を使います。
+## 判定とフォールバック
 
-`1d-luna` と `2c-luna` は試走時の判定元だけが異なり、本番では同じ書き手実装の別名です。`1b` だけ真相を渡し、正解開示も LLM に書かせます。それ以外の案は `正解！` と `reveal_text` を連結します。spam / personal_info は返信せず、troll / abuse は定型文です。LLM 書き手の失敗や判定語違反は 2b 定型へ戻します。80 字超は警告のみで、200 字の切り詰めは Graph API 送信直前に行います。
+| メイン | 失敗時のサブ | サブ成功時の `final.decision` |
+|---|---|---|
+| haiku | luna | `haiku_fallback_luna` |
+| luna | haiku | `luna_fallback_haiku` |
+| jev | haiku | `jev_fallback_haiku` |
+
+メインが成功すれば `final.decision` はメインの名前です。例外または `Judgement.error` がある場合だけサブを呼びます。メインとサブは順番に実行し、サブにも同じ effort 設定を使います。サブ成功時はメインのエラーを `errors` に残し、両方式の結果を `judgements` に記録します。両方が失敗すると例外を投げ、Reply Lambda が該当メッセージを `batchItemFailures` に入れて SQS 再試行に回します。各方式の判定ロジックは単一の実装を使います。
+
+Jev のコア判定は `T_POINT=0.6`、惜しい判定は `T_CLOSE=0.40` です。
+
+書き手は判定モードと独立です。`1b` と `1b-haiku` は真相を受け取り、正解開示も LLM が書きます。`1d-luna` / `2c-luna` は同じ書き手の別名で、effort は `low` のままです。`1d-haiku` も `low` です。真相を渡さない案の正解返信は `正解！` と `reveal_text` の連結です。spam / personal_info は返信せず、troll / abuse は定型文です。
+
+LLM 書き手の失敗・拒否や判定語違反は 2b 定型へ戻し、`fallback_template` を記録します。Anthropic が利用できないときも、判定済みの結果で定型返信を作ります。コア語の漏れは共通の漏れ止めで処理します。80 字超は警告のみで、200 字の切り詰めは Graph API 送信直前に行います。
 
 ## コメント記録 JSON（schema_version 1）
 
-キーは `comment-log/{set_code}/dt=YYYY-MM-DD/{comment_id}.json` です。日付は Webhook 受信時刻の UTC 日付です。書き込み失敗は WARNING にして返信処理を続けます。問題スナップショットがないコメントも `problem_not_found` を記録して成功扱いにします。
+キーは `comment-log/{set_code}/dt=YYYY-MM-DD/{comment_id}.json`、日付は Webhook 受信時刻の UTC 日付です。書き込み失敗はログに残して返信処理を続けます。問題スナップショットがないコメントは `problem_not_found` を記録して成功扱いにします。
 
-項目の定義（キーと型）の正はセット別設計書 `docs/app/sets/umigame-soup-1.html` の 10.6「コメント記録 JSON」です（ここには重複して書きません）。実装は `app/comment_log.py`。
+項目の定義（キーと型）の正はセット別設計書 `docs/app/sets/umigame-soup-1.html` の「コメント記録 JSON」です（ここには重複して書きません）。実装は `app/comment_log.py`。過去のキー（`shadow`・`consensus`・`shadow_mismatch`・`decisions`）や判定ラベルを含む JSON も、評価ページ・集計・掃引ツールで引き続き読めます。
 
 ## ローカル試行
 
@@ -54,58 +64,56 @@ python3.12 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python -m pytest -q
 
-# 同梱 stub はキーやネットワークを使わず、6 コメント × 3 モードを試せる
+# 同梱 stub: キーやネットワークを使わず、6 コメント × 3 モードを試す
 .venv/bin/python tools/local_trial.py --problem U01 \
   --stub-judgements tools/sample_stub_U01.json --reply-variant 2b
 
-# 実 API を使う試行。キーは環境変数からだけ読む（Secrets Manager は読まない）
-OPENAI_API_KEY=... TYPESAFE_API_KEY=... .venv/bin/python tools/local_trial.py \
-  --problem U01 --comment '男は病院に行ったの？' --modes luna jev hybrid decisions
+# 実 API: --modes の既定は luna jev haiku
+OPENAI_API_KEY=... TYPESAFE_API_KEY=... ANTHROPIC_API_KEY=... \
+  .venv/bin/python tools/local_trial.py --problem U01 \
+  --comment '男は病院に行ったの？' --modes luna jev haiku
 
-# 評価パターン（判定 + 返信文の案）で比べる。判定は 1 コメントにつき方式ごと 1 回で使い回す
-OPENAI_API_KEY=... TYPESAFE_API_KEY=... ANTHROPIC_API_KEY=... .venv/bin/python tools/local_trial.py \
-  --problem U01 --patterns 1 2 5 7 --haiku-effort max high
+# パターンを番号で比較。判定結果は方式・effort ごとに再利用する
+OPENAI_API_KEY=... TYPESAFE_API_KEY=... ANTHROPIC_API_KEY=... \
+  .venv/bin/python tools/local_trial.py --problem U01 \
+  --patterns 7 9 10 --haiku-effort high --luna-effort xhigh
 ```
 
-`--snapshot path.json` で公開スナップショットを読み込めます。`--comment` は繰り返し指定可、`--comments-file` は 1 行 1 コメント、指定なしは対話入力です。`--shadow/--no-shadow` と `--consensus/--no-consensus` で hybrid のスイッチを切り替えます。`--out` の既定値は `work/local_trial/` で、モード別に本番と同じ形式の記録を保存します。stub 時に LLM 書き手が選択されていた場合、外部呼び出しを避けるため 2b 定型に切り替えます。`--patterns` は probe_run の ①〜⑧（1 = luna + 1b、2 = luna + 1d-luna、3 = hybrid + 1d-luna、4 = jev + 2b、5 = jev + 2c-luna、6 = decisions + 2c-luna、7 = haiku + 1b-haiku、8 = haiku + 1d-haiku）を番号で選び、`--modes` と `--reply-variant` より優先します（記録は `p<番号>-<モード>-<案>/` に保存）。`--modes haiku` も選べます。`--haiku-effort`（既定は `HAIKU_EFFORT`）は Haiku の判定と 1b-haiku の書き手に効き、`max high` のように複数を渡すと Haiku のパターンを effort ごとに 1 回ずつ回します（記録は `-<effort>` 付き）。判定・返信の所要秒数も表示します。
+`--snapshot path.json` で公開スナップショットを読み込めます。`--comment` は繰り返し指定可、`--comments-file` は 1 行 1 コメント、指定なしは対話入力です。`--out` の既定は `work/local_trial/` です。stub 時の書き手は 2b 定型に切り替えます。
 
-`guess_correct` の 2b 返信は `CORRECT_PREFIX + reveal_text` の固定形式です。その他の返信種別は各 3 通り以上の定型文を持ち、`sha1(comment_id)` で選びます。語だけの q_open と合意制 split にはそれぞれ 3 通りの専用定型文があります。
+`--patterns` は下表の番号 `1 2 5 7 9 10` を受け付け、`--modes` と `--reply-variant` より優先します。記録は `p<番号>-<モード>-<案>/` に保存します。`--haiku-effort` / `--luna-effort` の既定は Config の値です。複数指定すると、その方式で判定するか対応する書き手を使うパターンを effort ごとに実行します。サブにだけ使う方式には最初の指定値を使います。判定・返信の所要秒数も表示します。
 
-## コメント返信の評価プローブ
+2b の正解返信は `CORRECT_PREFIX + reveal_text` です。その他の返信種別は各 3 通り以上の定型文を持ち、`sha1(comment_id)` で選びます。語だけの q_open は 3 通りの専用定型文です。
 
-`tools/probe_run.py` は評価ケースを本番の判定合成・書き手・コメント記録に通し、`results.json` と `metrics.json` を出します。判定結果はケース単位でパターン間共有し、`judge_cache.json` と `writer_cache.json` で中断後も再開できます。実行には `OPENAI_API_KEY` と `TYPESAFE_API_KEY`、Haiku パターンを選ぶ場合は `ANTHROPIC_API_KEY` を環境変数で指定します。Instagram への送信は行いません。
+## 評価プローブ
+
+`tools/probe_run.py` は本番の判定・書き手・コメント記録を通し、`results.json` と `metrics.json` を出します。ケースごとに方式・effort 単位で判定を共有し、`judge_cache.json` / `writer_cache.json` で再開できます。メイン成功時にはサブを呼びません。独立したケースと書き手は `--workers`（既定 4）で並列に実行します。
+
+| 番号 | プローブ ID | 判定 + 返信文 |
+|---|---|---|
+| ① | `luna-1b` | luna + 1b |
+| ② | `luna-1d` | luna + 1d-luna |
+| ⑤ | `jev-2c` | jev + 2c-luna |
+| ⑦ | `haiku-1b-max` / `haiku-1b-xhigh` / `haiku-1b-high` | haiku + 1b-haiku（3 effort） |
+| ⑨ | `luna-1b-haiku` | luna + 1b-haiku（Haiku effort high） |
+| ⑩ | `jev-1b-haiku` | jev + 1b-haiku（Haiku effort high） |
+
+CLI で `--patterns` を省くと ⑦ high・⑨・⑩ を選びます。Python の `run_probe()` で省略した場合の `LEGACY_PATTERN_IDS` は ①・②・⑤ です。全 8 パターンを実行するには `patterns=list(PATTERN_IDS)` を渡します。
 
 ```bash
-cd services/comment-reply
 OPENAI_API_KEY=... TYPESAFE_API_KEY=... ANTHROPIC_API_KEY=... \
   .venv/bin/python tools/probe_run.py --problems U01 U13 \
-  --patterns luna-1b luna-1d hybrid-1d jev-2b jev-2c dec-2c haiku-1b haiku-1d \
-  --out work/probe/sample
+  --patterns haiku-1b-high luna-1b-haiku jev-1b-haiku --out work/probe/sample
 .venv/bin/python tools/build_probe_page.py \
   --results work/probe/sample/results.json --out /tmp/comment-reply-probe.html
 ```
 
-`--patterns` は 8 パターン（CLI の既定は全件）から選べます。本番の既定は `hybrid` / `1d-luna` のままです。
+パターンの `luna_effort` は省略時に `LUNA_EFFORT`（既定 xhigh）、`haiku_effort` は省略時に `HAIKU_EFFORT`（既定 high）を使います。⑦・⑨・⑩ の Haiku effort はパターンで指定します。luna 判定・1b 書き手のキャッシュキーに luna effort、Haiku 判定・書き手には Haiku effort とプロンプト内容を含めます。Jev のキーには変更した `T_POINT` / `T_CLOSE` を含め、旧閾値の結果を再利用しません。`--refresh-judge` / `--refresh-writer` で取り直せます。
 
-| ID | 判定 + 返信文 |
-|---|---|
-| `luna-1b` | ① luna + 1b |
-| `luna-1d` | ② luna + 1d-luna |
-| `hybrid-1d` | ③ hybrid + 1d-luna |
-| `jev-2b` | ④ jev + 2b |
-| `jev-2c` | ⑤ jev + 2c-luna |
-| `dec-2c` | ⑥ decisions + 2c-luna |
-| `haiku-1b` | ⑦ haiku + 1b-haiku |
-| `haiku-1d` | ⑧ haiku + 1d-haiku |
+Haiku のモデルは `claude-haiku-5-5`、判定・1b-haiku の `max_tokens` は 32000、1d-haiku は 4000 です。HTTP は標準ライブラリの urllib を使い、system の末尾に 5 分のキャッシュ指定を付けます。実行ログは Anthropic の入力・出力・キャッシュ書き込み・読み出しトークンと拒否件数を、effort ごとに合計 / 新規呼び出し分で表示します。
 
-Decisions は `dec-2c` を選んだときだけ呼び、判定キャッシュの方式名は `decisions` です。実行ログに入力トークン合計と段の呼び出し回数（新規呼び出し分も併記）を出し、metrics と評価ページにも記録します。既存 6 パターンのキャッシュキーは変わりません。Decisions への変換（`decisions.py` の問いの組み立て）を変えてもキャッシュキーは変わらないため、取り直すときは `judge_cache.json` から方式 `decisions` のエントリだけを消して回します（`--refresh-judge` は luna・Jev も取り直します）。旧パターンだけを再開する場合は `--patterns luna-1b luna-1d hybrid-1d jev-2b jev-2c` を指定します。Python の `run_probe()` は既存呼び出しとの互換性のため省略時に旧 5 パターンを選び、8 パターンには `patterns=list(PATTERN_IDS)` を渡します。
+metrics の `reference.api_usage` は判定 / 書き手ごとのトークン・費用・応答時間・拒否・打ち切り・空応答を集計します。`judge_fallbacks` は `*_fallback_*` 全体の件数、`fallback_decisions` はラベルごとの件数です。過去の `decisions_fallback_luna`, `jev_fallback_luna`, `consensus_ok`, `consensus_split`, `shadow_mismatch` も表示・集計できます。旧記録に書き手の debug がなければ usage は 0 扱いです。単価は `probe_metrics.py` の定数で、Jev は単価未設定です。判定を共有した分も各パターンに計上するため、パターン費用の和は実請求額と異なります。
 
-Haiku は `haiku-1b` / `haiku-1d` を選んだときだけ呼びます。モデルは `claude-haiku-5-5`、判定と 1b は effort `max` / `max_tokens=16000`、1d は `low` / `4000` です。luna とプロンプト・スキーマ・後処理を共有し、判定の拒否・失敗は luna で再判定して `haiku_fallback_luna`、書き手の拒否・失敗は `fallback_template` を記録します。HTTP は標準ライブラリの urllib を使い、system の末尾に 5 分のキャッシュ指定を付けます。実行ログは Anthropic の入力・出力・キャッシュ書き込み・読み出しトークンと拒否件数を、合計 / 新規呼び出し分で表示します。
+ページ生成器は問題ごとのページと生データの JS を出し、過去のパターンも結果に含まれるものを表示します。`--out` 省略時は `docs/app/sets/umigame-soup-1-probe.html` に出力します。
 
-追加キーは、従来と同じ JSON の SHA-256 です。判定は `[case_id, "haiku", PROMPT_VERSION, content_hash, "claude-haiku-5-5"]`、書き手は `[pattern_id, case_id, PROMPT_VERSION, [kind, answer, bare_term, decision], content_hash, "claude-haiku-5-5"]`（pattern_id は `haiku-1b` / `haiku-1d`）。プロンプトの変更時だけ既存と同じ `PROMPT_VERSION` が変わります。
-
-metrics の `reference.api_usage` に、判定 / 書き手ごとの入力・出力・キャッシュ読み書きトークン、費用 USD、応答時間の中央値 / p95、拒否のカテゴリ、打ち切り・空応答、Haiku から luna への再判定件数を出します。入力トークンはキャッシュ分を含み、費用は通常入力 $0.10 / 出力 $0.50（100 万トークン）、キャッシュ読み出しは入力の 0.1 倍、Haiku の書き込みは 1.25 倍で計算します（単価は `probe_metrics.py` の定数）。Decisions は設計どおり入力のみ $0.10、Jev は単価未設定のため費用に含めず `unpriced_methods` に残します。判定の共有分は各パターンに計上するため、パターン費用の和は実請求額と異なります。旧 results に書き手の debug がない場合はその usage を 0 として扱います。U01・U13 の小試走の費用上限は $1、全件は $5 です。
-
-`--workers` で並列数を変更、`--refresh-judge` / `--refresh-writer` でキャッシュを更新できます。ページ生成器は `--out` を省くと `docs/app/sets/umigame-soup-1-probe.html`（サマリー = 合否表・グラフ・評価・問題の目次）に出力し、同名ディレクトリに問題ごとのページ（`U01.html` 等。パターンごとのコメント一覧）と生データの JS（開いたときに遅延読み込み）を置きます（21-6d3 で分割）。旧 5 / 6 パターンの results も、含まれているパターンだけで生成できます。判定キャッシュのキーに Jev・Decisions の閾値は入らないため、閾値を変えたら `--refresh-judge` で取り直してください。並列数を上げすぎると OpenAI の 429 が判定・書き手の記録に残るので、全件は `--workers 4` 程度で回します。
-
-`tools/probe_sweep.py --probe <results.json のあるディレクトリ>` は、記録された段 B の hit / close と段 B2 の確率から Jev・Decisions の `T_POINT`・`T_CONTRADICT`・`T_CLOSE` の掃引と、「正解宣言は組み合わせの全方式の合意を必須にする」場合の P2・P5（判定レベル）を再計算し、`sweep.json` に書きます（21-6d11）。`T_POINT` を下げて新たに候補に入るケースは段 B2 を呼んでいないので、`--fill-b2` を付けるとその分だけ実 API で取って `sweep_b2_cache.json` に貯めます（付けないときは「B2 未取得」として数えます）。
+`tools/probe_sweep.py --probe <results.json のあるディレクトリ>` は Jev の段 B / B2 から閾値を掃引し、`sweep.json` に書きます。Jev は過去の `jev-2b` と現在の `jev-2c` / `jev-1b-haiku` を読めます。`--fill-b2` は不足する B2 だけを Jev API で取得し、`sweep_b2_cache.json` に保存します。合意ルールの参考集計では、旧結果の Decisions の判定も読めます。新しい Decisions の判定・B2 取得は行いません。

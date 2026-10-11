@@ -120,7 +120,8 @@ def reply_schema() -> dict[str, Any]:
 
 def _llm_reply(
     result: Combined, comment_id: str, text: str, problem: Problem,
-    *, variant: str, api_key: str, model: str, haiku_effort: str = "max",
+    *, variant: str, api_key: str, model: str, haiku_effort: str = "high",
+    luna_effort: str = "xhigh",
 ) -> tuple[str, dict[str, Any]]:
     system, slot = build_prompt(result, comment_id, problem, variant=variant)
     with_truth = variant in TRUTH_VARIANTS
@@ -141,7 +142,7 @@ def _llm_reply(
         raise ValueError("openai_api_key is empty")
     payload = {
         "model": model,
-        "reasoning_effort": "xhigh" if with_truth else "low",
+        "reasoning_effort": luna_effort if with_truth else "low",
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": text}],
         "max_completion_tokens": 2400 if with_truth else 800,
         "response_format": {
@@ -164,7 +165,8 @@ def _llm_reply(
     usage = body.get("usage", {}) or {}
     details = usage.get("completion_tokens_details", {}) or {}
     debug = {
-        "model": model, "slot": slot, "prompt_tokens": usage.get("prompt_tokens", 0) or 0,
+        "model": model, "effort": payload["reasoning_effort"], "slot": slot,
+        "prompt_tokens": usage.get("prompt_tokens", 0) or 0,
         "completion_tokens": usage.get("completion_tokens", 0) or 0,
         "reasoning_tokens": details.get("reasoning_tokens", 0) or 0,
         "cached_tokens": (usage.get("prompt_tokens_details") or {}).get("cached_tokens", 0) or 0,
@@ -191,16 +193,13 @@ def _llm_reply(
 def write_reply(
     result: Combined, comment_id: str, text: str, problem: Problem, *,
     variant: str, openai_api_key: str = "", model: str = "gpt-6-luna",
-    anthropic_api_key: str = "", haiku_effort: str = "max",
+    anthropic_api_key: str = "", haiku_effort: str = "high", luna_effort: str = "xhigh",
 ) -> Reply:
     """Write one reply, preserving the final kind and answer."""
     kind = result.kind
     if kind in templates.NO_REPLY_KINDS:
         return Reply(None, "no_reply", False)
-    if result.decision == "consensus_split":
-        value, source = templates.split_reply(comment_id), "consensus_split"
-        error, debug = None, {}
-    elif kind in {"troll", "abuse"}:
+    if kind in {"troll", "abuse"}:
         value, source = templates.pick(kind, comment_id), "template"
         error, debug = None, {}
     elif variant == "2b" or (kind == "guess_correct" and variant not in TRUTH_VARIANTS):
@@ -212,7 +211,7 @@ def write_reply(
             value, debug = _llm_reply(
                 result, comment_id, text, problem, variant=variant,
                 api_key=anthropic_api_key if variant in HAIKU_VARIANTS else openai_api_key,
-                model=model, haiku_effort=haiku_effort,
+                model=model, haiku_effort=haiku_effort, luna_effort=luna_effort,
             )
             if not value:
                 debug["error_reason"] = "empty_reply"
@@ -234,8 +233,7 @@ def write_reply(
             LOGGER.warning("REPLY_WRITER_FALLBACK comment_id=%s error=%s", comment_id, error)
             value, source = _template_reply(result, comment_id, problem), "fallback_template"
     guard = None
-    reveal_kind = None if result.decision == "consensus_split" else kind
-    if value is not None and not leak_guard.is_correct_reveal(reveal_kind, value):
+    if value is not None and not leak_guard.is_correct_reveal(kind, value):
         entry = leak_guard.entry_for_content_key(problem.content_key)
         if entry is None:
             LOGGER.warning("REPLY_LEAK_GUARD_NO_DICT content_key=%s", problem.content_key)

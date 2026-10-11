@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from app.anthropic_util import AnthropicError, AnthropicRefusalError, MODEL, request_json
+from app.anthropic_util import AnthropicError, request_json
 from app.judge import luna
 from app.judge.contract import Judgement, Problem
 
@@ -28,7 +28,7 @@ def build_prompt(problem: Problem) -> str:
 
 
 def judge(
-    comment_id: str, text: str, problem: Problem, *, api_key: str, effort: str = "max",
+    comment_id: str, text: str, problem: Problem, *, api_key: str, effort: str = "high",
 ) -> Judgement:
     """Ask Haiku once, preserving error telemetry for Luna fallback and probes."""
     data, debug = request_json(

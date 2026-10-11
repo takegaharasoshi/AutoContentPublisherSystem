@@ -1,7 +1,7 @@
 """Sweep stage-B thresholds and test consensus rules over a cached probe run (21-6d11; haiku added in 21-6d13).
 
 全件プローブの results.json に残った判定（段 B の要点ごとの hit / close、段 B2 の矛盾確率）から、
-Jev・Decisions の閾値を変えたときの正解宣言と ⑤ / ⑥ の分かれ方を再計算する。
+Jev の閾値を変えたときの正解宣言と ⑤ / ⑥ の分かれ方を再計算する。
 「正解宣言は 2 方式の合意を必須にする」場合の P2（誤った正解宣言）と P5（正解推理の宣言率）も、
 方式の組み合わせごとに数える。どちらも判定レベルの集計で、返信文の冒頭語で数える probe_metrics の
 P2 とは数え方が異なる。閾値と合意ルールは決めない（21-6e）。
@@ -26,12 +26,18 @@ SERVICE_DIR = Path(__file__).resolve().parent.parent
 if str(SERVICE_DIR) not in sys.path:
     sys.path.insert(0, str(SERVICE_DIR))
 
-METHOD_ROWS = {"luna": "luna-1b", "jev": "jev-2b", "decisions": "dec-2c", "haiku": "haiku-1b"}
-STAGED = ("jev", "decisions")
+METHOD_ROWS = {
+    "luna": ("luna-1b", "luna-1d", "luna-1b-haiku"),
+    "jev": ("jev-2b", "jev-2c", "jev-1b-haiku"),
+    "haiku": ("haiku-1b-high", "haiku-1b-max", "haiku-1b-xhigh", "haiku-1b", "haiku-1d"),
+}
+# Historical Decisions votes remain available for read-only consensus reports.
+LEGACY_METHOD_ROWS = {"decisions": ("dec-2c",)}
+STAGED = ("jev",)
 T_POINTS = (0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
 T_CLOSES = (0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5)
 T_CONTRADICTS = (0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
-DEFAULTS = {"t_point": 0.5, "t_close": 0.25, "t_contradict": 0.5}
+DEFAULTS = {"t_point": 0.6, "t_close": 0.40, "t_contradict": 0.5}
 
 
 def _acceptable_correct(case: dict[str, Any]) -> bool:
@@ -39,14 +45,15 @@ def _acceptable_correct(case: dict[str, Any]) -> bool:
 
 
 def judgements(results: dict[str, Any]) -> dict[str, dict[str, dict[str, Any]]]:
-    """Return {method: {case_id: judgement}} from the pattern rows that ran each method."""
+    """Read current and archived votes from the available pattern rows."""
     found: dict[str, dict[str, dict[str, Any]]] = {}
-    for method, pattern in METHOD_ROWS.items():
-        rows = results["rows"].get(pattern, [])
-        found[method] = {
-            row["case_id"]: judgement for row in rows
-            if (judgement := (row["record"].get("judgements") or {}).get(method))
-        }
+    for method, patterns in {**METHOD_ROWS, **LEGACY_METHOD_ROWS}.items():
+        found[method] = {}
+        for pattern in patterns:
+            for row in results["rows"].get(pattern, []):
+                judgement = (row["record"].get("judgements") or {}).get(method)
+                if judgement:
+                    found[method].setdefault(row["case_id"], judgement)
     return found
 
 
@@ -63,10 +70,13 @@ def staged_items(results: dict[str, Any], method: str) -> list[dict[str, Any]]:
         kind = judgement.get("kind")
         all_default = all(v["hit"] >= DEFAULTS["t_point"] for v in points.values())
         # 段 B に来た経路: 推理（guess）か、はい / いいえ質問（q_yesno）か。
-        if debug.get("major") == "guess" or kind == "guess_wrong" or (
-                kind == "guess_close" and not all_default):
+        if debug.get("major") == "guess" or (
+                debug.get("guess_demoted") and kind in {"guess_close", "guess_wrong"}):
             path = "guess"
-        elif debug.get("guess_demoted") and kind in {"guess_close", "guess_wrong"}:
+        elif debug.get("major") == "question":
+            # Recorded intent remains authoritative when reading an older threshold run.
+            path = "q_yesno"
+        elif kind == "guess_wrong" or (kind == "guess_close" and not all_default):
             path = "guess"
         else:
             path = "q_yesno"
@@ -152,7 +162,7 @@ def consensus(results: dict[str, Any]) -> list[dict[str, Any]]:
     found = judgements(results)
     cases = results["cases"]
     total_correct = sum(case["expected_kind"] == "guess_correct" for case in cases)
-    methods = [m for m in METHOD_ROWS if found[m]]
+    methods = [m for m, votes in found.items() if votes]
     table = []
     for size in range(1, len(methods) + 1):
         for combo in itertools.combinations(methods, size):
@@ -175,16 +185,16 @@ def consensus(results: dict[str, Any]) -> list[dict[str, Any]]:
     return table
 
 
-def fill_b2(items: list[dict[str, Any]], method: str, cache: dict[str, float],
+def fill_b2(items: list[dict[str, Any]], cache: dict[str, float],
             workers: int) -> None:
     """Ask stage B2 for cases that become candidates at the lowest T_POINT."""
-    from app.judge import decisions, jev  # noqa: PLC0415
+    from app.judge import jev  # noqa: PLC0415
     from tools.local_trial import _load_stock_problem  # noqa: PLC0415
 
     todo = [x for x in items if x["b2"] is None and x["id"] not in cache
             and declared(x, min(T_POINTS), DEFAULTS["t_contradict"]) is None]
     if todo:
-        key_name = "TYPESAFE_API_KEY" if method == "jev" else "OPENAI_API_KEY"
+        key_name = "TYPESAFE_API_KEY"
         api_key = os.environ.get(key_name, "")
         if not api_key:
             raise SystemExit(f"missing {key_name}")
@@ -193,13 +203,8 @@ def fill_b2(items: list[dict[str, Any]], method: str, cache: dict[str, float],
         def ask(item: dict[str, Any]) -> float:
             state = jev.contradiction_state(problems[item["no"]], item["text"])
             questions = {"contradict": jev.CONTRADICTION_QUESTION}
-            if method == "jev":
-                debug = {"input_tokens": 0, "output_tokens": 0, "latency_s": 0.0, "calls": 0}
-                answers = jev._record_call(api_key, state, questions, debug)
-            else:
-                debug = {"input_tokens": 0, "output_tokens": 0, "latency_s": 0.0, "calls": 0,
-                         "confidence": {}, "refusals": {"count": 0, "names": []}}
-                answers = decisions._record_call(api_key, state, questions, debug, "B2")
+            debug = {"input_tokens": 0, "output_tokens": 0, "latency_s": 0.0, "calls": 0}
+            answers = jev._record_call(api_key, state, questions, debug)
             return jev._noul_true(answers["contradict"])
 
         with ThreadPoolExecutor(max_workers=workers) as pool:
@@ -232,7 +237,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
         method_cache = cache.setdefault(method, {})
         if args.fill_b2:
-            fill_b2(items, method, method_cache, args.workers)
+            fill_b2(items, method_cache, args.workers)
         else:
             for item in items:
                 if item["b2"] is None and item["id"] in method_cache:

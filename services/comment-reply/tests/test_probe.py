@@ -46,9 +46,9 @@ def _offline_run(tmp_path: Path) -> tuple[dict, dict[str, int], Path, dict]:
                  "kind": "q_yesno", "answer": "yes"}],
         "U13": [{"id": "U13-e01", "text": "正解を当てた", "kind": "guess_correct"}],
     })
-    counts = {"luna": 0, "jev": 0, "writer": 0}
+    counts = {"luna": 0, "jev": 0, "haiku": 0, "writer": 0}
 
-    def luna_call(comment_id, text, problem, *, api_key, model):
+    def luna_call(comment_id, text, problem, *, api_key, model, effort):
         counts["luna"] += 1
         return Judgement("luna", "q_yesno", "yes") if comment_id.startswith("U01") else Judgement(
             "luna", "guess_correct")
@@ -59,7 +59,11 @@ def _offline_run(tmp_path: Path) -> tuple[dict, dict[str, int], Path, dict]:
             raise RuntimeError("offline Jev failure")
         return Judgement("jev", "q_yesno", "no")
 
-    def writer_call(combined, comment_id, text, problem, *, variant, openai_api_key, model):
+    def haiku_call(comment_id, text, problem, *, api_key, effort):
+        counts["haiku"] += 1
+        return Judgement("haiku", "guess_correct")
+
+    def writer_call(combined, comment_id, text, problem, *, variant, openai_api_key, model, luna_effort):
         counts["writer"] += 1
         if combined.kind == "q_yesno":
             return Reply("はい！</script><b>返信</b>", "llm", False)
@@ -68,7 +72,8 @@ def _offline_run(tmp_path: Path) -> tuple[dict, dict[str, int], Path, dict]:
     out = tmp_path / "work"
     args = {"out": out, "eval_path": paths[0], "bare_term_path": paths[1],
             "common_path": paths[2], "problem_loader": _offline_problem,
-            "luna_call": luna_call, "jev_call": jev_call, "writer_call": writer_call,
+            "luna_call": luna_call, "jev_call": jev_call, "haiku_call": haiku_call,
+            "writer_call": writer_call,
             "api_keys": {}, "run_at": "2026-10-01T00:00:00Z"}
     results = probe_run.run_probe(**args)
     return results, counts, out, args
@@ -238,16 +243,16 @@ def test_load_cases_round_robin_bare_and_duplicate(tmp_path):
 
 def test_run_cache_timing_record_and_offline_page(tmp_path):
     results, counts, out, args = _offline_run(tmp_path)
-    assert counts == {"luna": 2, "jev": 2, "writer": 10}
+    assert counts == {"luna": 2, "jev": 2, "haiku": 1, "writer": 6}
     assert all(len(rows) == 2 for rows in results["rows"].values())
-    hybrid = results["rows"]["hybrid-1d"][0]
-    assert hybrid["timing"]["judge_s"] == max(hybrid["timing"]["luna_s"],
-                                                 hybrid["timing"]["jev_s"])
+    main = results["rows"]["luna-1d"][0]
+    assert main["timing"]["judge_s"] == main["timing"]["luna_s"]
+    assert main["timing"]["haiku_s"] is None
     fallback = results["rows"]["jev-2c"][1]
-    assert fallback["record"]["final"]["decision"] == "jev_fallback_luna"
+    assert fallback["record"]["final"]["decision"] == "jev_fallback_haiku"
     assert fallback["timing"]["judge_s"] == pytest.approx(
-        fallback["timing"]["jev_s"] + fallback["timing"]["luna_s"])
-    config = Config(judge_mode="luna", shadow=False, consensus=False,
+        fallback["timing"]["jev_s"] + fallback["timing"]["haiku_s"])
+    config = Config(judge_mode="luna",
                     reply_variant="1b", set_code="umigame-soup-1")
     baseline = new_record({"id": "U01-e01", "text": "<b>関係ある？</b>",
                            "from": {"id": "probe"}, "media": {"id": "media-U01"}},
@@ -256,9 +261,9 @@ def test_run_cache_timing_record_and_offline_page(tmp_path):
     assert (out / "results.json").is_file() and (out / "metrics.json").is_file()
 
     second = probe_run.run_probe(**args)
-    assert counts == {"luna": 2, "jev": 2, "writer": 10}
-    assert second["rows"]["hybrid-1d"][0]["cache"] == {
-        "luna": "hit", "jev": "hit", "writer": "hit"}
+    assert counts == {"luna": 2, "jev": 2, "haiku": 1, "writer": 6}
+    assert second["rows"]["luna-1d"][0]["cache"] == {
+        "luna": "hit", "jev": "none", "haiku": "none", "writer": "hit"}
     page = tmp_path / "page" / "probe.html"
     assert build_probe_page.main(["--results", str(out / "results.json"),
                                   "--out", str(page)]) == 0
@@ -272,12 +277,12 @@ def test_run_cache_timing_record_and_offline_page(tmp_path):
     for problem_page in problem_pages:
         assert f'href="{page.stem}/{problem_page.name}"' in source
         body = problem_page.read_text(encoding="utf-8")
-        assert len(re.findall(r'<h2 id="pattern-', body)) == 5
-        assert body.count('<h3>コメント</h3>') == 5
-        assert body.count('<h3>テスト結果生データ</h3>') == 5
+        assert len(re.findall(r'<h2 id="pattern-', body)) == 3
+        assert body.count('<h3>コメント</h3>') == 3
+        assert body.count('<h3>テスト結果生データ</h3>') == 3
         assert 'href="../../../assets/style.css"' in body
         assert not re.search(r'(?:src|href)="https?://', body)
-    assert len(list(page_dir.glob("raw-*.js"))) == 10
+    assert len(list(page_dir.glob("raw-*.js"))) == 6
     assert not re.search(r'(?:src|href)="https?://', source)
     u01 = (page_dir / "U01.html").read_text(encoding="utf-8")
     assert "&lt;b&gt;関係ある？&lt;/b&gt;" in u01
@@ -342,14 +347,14 @@ def test_luna_only_skips_jev_and_missing_key_stops_before_calls(tmp_path):
         "U01": [{"id": "only", "text": "質問", "kind": "q_yesno", "answer": "yes"}]})
     calls = {"luna": 0, "writer": 0}
 
-    def luna_call(comment_id, text, problem, *, api_key, model):
+    def luna_call(comment_id, text, problem, *, api_key, model, effort):
         calls["luna"] += 1
         return Judgement("luna", "q_yesno", "yes")
 
     def jev_call(*args, **kwargs):
         raise AssertionError("Jev must not run")
 
-    def writer_call(combined, comment_id, text, problem, *, variant, openai_api_key, model):
+    def writer_call(combined, comment_id, text, problem, *, variant, openai_api_key, model, luna_effort):
         calls["writer"] += 1
         return Reply("はい！", "template", False)
 

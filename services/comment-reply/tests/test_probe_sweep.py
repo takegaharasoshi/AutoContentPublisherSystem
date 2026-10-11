@@ -76,3 +76,54 @@ def test_main_writes_report_without_api(tmp_path: Path, capsys) -> None:
     report = json.loads((tmp_path / "sweep.json").read_text(encoding="utf-8"))
     assert report["total_correct"] == 1 and "jev" in report and "decisions" not in report
     assert "合意ルール" in capsys.readouterr().out
+
+
+def test_sweep_reads_any_jev_pattern_and_new_default_single_pass_patterns(tmp_path) -> None:
+    from copy import deepcopy
+
+    original = _results()
+    expected = probe_sweep.staged_items(original, "jev")
+    for pattern in ("jev-2b", "jev-2c", "jev-1b-haiku"):
+        results = deepcopy(original)
+        results["rows"][pattern] = results["rows"].pop("jev-2b")
+        results["rows"]["luna-1b-haiku"] = results["rows"].pop("luna-1b")
+        results["rows"]["haiku-1b-high"] = [{
+            "case_id": "c1", "record": {"judgements": {"haiku": {"kind": "guess_correct"}}},
+        }]
+        assert probe_sweep.staged_items(results, "jev") == expected
+        found = probe_sweep.judgements(results)
+        assert found["luna"]["c1"]["kind"] == found["haiku"]["c1"]["kind"] == "guess_correct"
+        (tmp_path / "results.json").write_text(json.dumps(results), encoding="utf-8")
+        assert probe_sweep.main(["--probe", str(tmp_path)]) == 0
+        report = json.loads((tmp_path / "sweep.json").read_text())
+        assert "jev" in report and "decisions" not in report
+
+
+def test_fill_b2_uses_only_jev(tmp_path, monkeypatch) -> None:
+    from unittest.mock import Mock
+    from app.judge import jev
+
+    monkeypatch.setenv("TYPESAFE_API_KEY", "fake-jev")
+    call = Mock(return_value={"contradict": {"noul": {"true": .7}}})
+    monkeypatch.setattr(jev, "_record_call", call)
+    items = [{"id": "b2", "no": "U01", "text": "推理", "b2": None,
+              "points": {"p": {"hit": .4, "close": .6}}}]
+    cache = {}
+    probe_sweep.fill_b2(items, cache, workers=1)
+    assert items[0]["b2"] == cache["b2"] == .7
+    assert call.call_args.args[0] == "fake-jev"
+    probe_sweep.fill_b2(items, cache, workers=1)
+    call.assert_called_once()
+
+
+def test_older_threshold_run_keeps_recorded_question_path() -> None:
+    results = _results()
+    judgement = results["rows"]["jev-2b"][0]["record"]["judgements"]["jev"]
+    judgement["kind"] = "guess_close"
+    judgement["debug"].update(major="question", probabilities={
+        "B": {"p1": {"hit": .55, "close": .8}}, "B2": .7,
+    })
+    item = probe_sweep.staged_items(results, "jev")[0]
+    assert item["path"] == "q_yesno"
+    judgement["debug"]["guess_demoted"] = True
+    assert probe_sweep.staged_items(results, "jev")[0]["path"] == "guess"

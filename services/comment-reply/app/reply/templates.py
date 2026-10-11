@@ -168,11 +168,6 @@ TEMPLATES: dict[str, tuple[str, ...] | None] = {
 
 NO_REPLY_KINDS = frozenset(("spam", "personal_info"))
 CORRECT_PREFIX = "正解！"
-CONSENSUS_SPLIT = (
-    "核心にかなり迫ってるよ！何が起きたのか、通して説明してみて。",
-    "真相まであと少しだよ。何が起きたか、もう一度まとめてみて。",
-    "かなり近づいているね。出来事を最初から説明してみて。",
-)
 BARE_TERM_QUESTIONS = (
     "何が{term}なのか教えてね。",
     "{term}が何のことか、もう少し詳しく教えて！",
@@ -197,11 +192,6 @@ def pick(kind: str, comment_id: str) -> str | None:
     if options is None:
         return None
     return _select(options, comment_id)
-
-
-def split_reply(comment_id: str) -> str:
-    """Choose one disclosure-safe message for a split decision."""
-    return _select(CONSENSUS_SPLIT, comment_id)
 
 
 def bare_term_reply(term: str, comment_id: str) -> str:

@@ -94,7 +94,7 @@ def parse_judgement(
 
 def judge(
     comment_id: str, text: str, problem: Problem, *, api_key: str,
-    model: str = "gpt-6-luna",
+    model: str = "gpt-6-luna", effort: str = "xhigh",
 ) -> Judgement:
     """Ask Luna once for kind, answer, rationale, term and a draft."""
     if not api_key:
@@ -103,7 +103,7 @@ def judge(
     system = build_prompt(problem)
     payload = {
         "model": model,
-        "reasoning_effort": "xhigh",
+        "reasoning_effort": effort,
         "messages": [
             {"role": "system", "content": system},
             {"role": "user", "content": text},
@@ -124,7 +124,7 @@ def judge(
     choice = body["choices"][0]
     usage = body.get("usage", {}) or {}
     debug = {
-        "model": model, "finish_reason": choice.get("finish_reason"),
+        "model": model, "effort": effort, "finish_reason": choice.get("finish_reason"),
         "prompt_tokens": usage.get("prompt_tokens", 0) or 0,
         "completion_tokens": usage.get("completion_tokens", 0) or 0,
         "reasoning_tokens": (usage.get("completion_tokens_details") or {}).get("reasoning_tokens", 0) or 0,

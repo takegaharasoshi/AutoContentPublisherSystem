@@ -17,7 +17,7 @@ from app.reply import leak_guard, templates, writer
 def _combined(kind: str, answer: str | None = None,
               decision: str = "luna") -> Combined:
     judgement = Judgement("luna", kind, answer=answer)
-    return Combined(judgement, None, kind, answer, None, decision, None)
+    return Combined(judgement, None, kind, answer, None, decision)
 
 
 def _problem(problem, no: str = "U01"):
@@ -82,18 +82,12 @@ def test_writer_reveal_comment_and_exception_do_not_guard(monkeypatch, problem) 
     assert excepted.source == "llm" and excepted.guard is None
 
 
-def test_writer_non_yesno_template_split_and_missing_dict(monkeypatch, caplog, problem) -> None:
+def test_writer_non_yesno_template_and_missing_dict(monkeypatch, caplog, problem) -> None:
     monkeypatch.setattr(writer, "_llm_reply", lambda *args, **kwargs: ("病院だよ", {}))
     reply = writer.write_reply(_combined("impression"), "1", "質問", _problem(problem),
                                variant="1b", openai_api_key="fake")
     assert reply.text == templates.LEAK_GUARD_TEXT
     assert reply.source == "leak_guard" and reply.guard["original_source"] == "llm"
-
-    monkeypatch.setattr(templates, "split_reply", lambda comment_id: "病院だよ")
-    split = writer.write_reply(_combined("guess_correct", decision="consensus_split"), "1",
-                               "質問", _problem(problem), variant="1b")
-    assert split.text == templates.LEAK_GUARD_TEXT
-    assert split.guard["original_source"] == "consensus_split"
 
     monkeypatch.setattr(templates, "pick", lambda kind, comment_id: "病院だよ")
     template = writer.write_reply(_combined("impression"), "1", "質問", _problem(problem),
@@ -111,7 +105,6 @@ def test_writer_non_yesno_template_split_and_missing_dict(monkeypatch, caplog, p
 def test_all_fixed_reply_phrases_are_safe_for_every_problem() -> None:
     phrases = [text for options in templates.TEMPLATES.values() if options is not None
                for text in options]
-    phrases.extend(templates.CONSENSUS_SPLIT)
     phrases.extend(templates.YESNO_OPENERS.values())
     phrases.extend(text.format(term="") for text in templates.BARE_TERM_QUESTIONS)
     phrases.append(templates.LEAK_GUARD_TEXT)

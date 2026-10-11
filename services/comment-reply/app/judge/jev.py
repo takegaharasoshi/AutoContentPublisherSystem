@@ -14,8 +14,9 @@ from app.judge.contract import Judgement, Problem, bare_term_text
 
 
 JEV_URL = "https://api.typesafe.ai/v1/systemone"
-T_POINT = 0.5
-T_CLOSE = 0.25  # 惜しい判定だけに使う（正解側の T_POINT は下げない。試行 4 で 0.35、試行 7b でコア基準に合わせて 0.25）
+# 21-6e で 0.6 / 0.40 に変更。
+T_POINT = 0.6
+T_CLOSE = 0.40  # 惜しい判定だけに使う（試行 4 で 0.35、試行 7b でコア基準に合わせて 0.25）
 T_GUESS = 0.95  # 段 A1b で推理とする確率の下限（試行 6b。21-6d3 の全件 441 件で確かめ据え置き）
 T_RECHECK = 0.6  # A2 が q_open のとき、問題文つきで答えられる質問か確かめ直す（試行 5・ユーザー指示。試行 8 で 0.5 → 0.6）
 T_QUALITY = 0.2
@@ -350,36 +351,28 @@ def judge(
     """Run the trial-8b staged classifier, plus a bare-term check in stage A and a contradiction check in stage B2."""
     return _judge_staged(
         comment_id, text, problem, api_key=api_key,
-        transport=lambda key, state, questions, debug, stage: _record_call(
-            key, state, questions, debug,
-        ),
-        method="jev", model="jev-latest",
-        make_error=lambda exc, debug: JevError(f"Jev judgement failed: {exc}"),
+        transport=_record_call,
         t_point=t_point, t_close=t_close, t_recheck=t_recheck, t_guess=t_guess,
         t_quality=t_quality, t_answer=t_answer, t_bare_term=t_bare_term,
         t_contradict=t_contradict,
     )
 
 
-StageTransport = Callable[[str, dict, dict[str, dict], dict, str], dict]
+StageTransport = Callable[[str, dict, dict[str, dict], dict], dict]
 
 
 def _judge_staged(
     comment_id: str, text: str, problem: Problem, *, api_key: str,
-    transport: StageTransport, method: str, model: str,
-    make_error: Callable[[Exception, dict], RuntimeError],
+    transport: StageTransport,
     t_point: float, t_close: float, t_recheck: float, t_guess: float,
     t_quality: float, t_answer: float, t_bare_term: float, t_contradict: float,
-    debug_fields: dict | None = None,
 ) -> Judgement:
-    """Share every stage, input and branch across the staged API transports."""
-    debug = {"model": model, "input_tokens": 0, "output_tokens": 0,
+    """Run the Jev stages through the supplied transport."""
+    debug = {"model": "jev-latest", "input_tokens": 0, "output_tokens": 0,
              "latency_s": 0.0, "calls": 0, "probabilities": {}}
-    if debug_fields:
-        debug.update(debug_fields)
     rule_kind = _rule_kind(text)
     if rule_kind is not None:
-        return Judgement(method, rule_kind, reason=f"段0規則: {rule_kind}", debug=debug)
+        return Judgement("jev", rule_kind, reason=f"段0規則: {rule_kind}", debug=debug)
 
     try:
         _points_cache: dict = {}
@@ -390,7 +383,7 @@ def _judge_staged(
                 # 要点ごとの choice を 1 リクエストにまとめる。誤りでない部分だけで数えるため（21-6d16）、
                 # 問題文・真相・確定事実も渡す。
                 point_questions = _core_point_questions(problem)
-                point_answers = transport(api_key, core_point_state(problem, text), point_questions, debug, "B")
+                point_answers = transport(api_key, core_point_state(problem, text), point_questions, debug)
                 point_probs = {
                     point_id: _core_point_probabilities(point_answers[point_id])
                     for point_id in point_questions
@@ -425,7 +418,6 @@ def _judge_staged(
                 },
             },
             debug,
-            "A1",
         )
         major = _choice(a1_answers["major"], tuple(MAJOR_CRITERIA))
         debug["probabilities"]["A1"] = _probability_map(a1_answers["major"])
@@ -435,7 +427,7 @@ def _judge_staged(
             term = bare_term_text(text)
             if term:
                 return Judgement(
-                    method, "q_open", reason=f"段A語句のみ: {bare_probability:.2f}",
+                    "jev", "q_open", reason=f"段A語句のみ: {bare_probability:.2f}",
                     bare_term=term, debug=debug,
                 )
         if major == "question_or_guess":
@@ -453,7 +445,6 @@ def _judge_staged(
                     }
                 },
                 debug,
-                "A1b",
             )
             qg_probs = _probability_map(qg_answers["qg"])
             debug["probabilities"]["A1b"] = qg_probs
@@ -487,7 +478,6 @@ def _judge_staged(
                     }
                 },
                 debug,
-                "A2",
             )
             a_kind = _choice(a2_answers["kind"], tuple(sub))
             debug["probabilities"]["A2"] = _probability_map(a2_answers["kind"])
@@ -515,7 +505,6 @@ def _judge_staged(
                         }
                     },
                     debug,
-                    "A3",
                 )
                 recheck = _noul_true(recheck_answers["recheck"])
                 debug["probabilities"]["A3"] = recheck
@@ -532,7 +521,7 @@ def _judge_staged(
             if all_points:
                 contradict_answers = transport(
                     api_key, contradiction_state(problem, text),
-                    {"contradict": CONTRADICTION_QUESTION}, debug, "B2",
+                    {"contradict": CONTRADICTION_QUESTION}, debug,
                 )
                 contradiction = _noul_true(contradict_answers["contradict"])
                 debug["probabilities"]["B2"] = contradiction
@@ -560,7 +549,6 @@ def _judge_staged(
                         }
                     },
                     debug,
-                    "C",
                 )
                 quality = _noul_true(quality_answers["quality"])
                 debug["probabilities"]["C"] = quality
@@ -594,7 +582,6 @@ def _judge_staged(
                             }
                         },
                         debug,
-                        "D",
                     )
                     d_answer = d_answers["answer"]
                     d_probs = _probability_map(d_answer)
@@ -618,6 +605,8 @@ def _judge_staged(
                 reason += f", 矛盾={debug['probabilities']['B2']:.2f}"
         elif "A3" in debug["probabilities"]:
             reason += f", 再確認={debug['probabilities']['A3']:.2f}"
-        return Judgement(method, kind, answer=answer, reason=reason, debug=debug)
+        return Judgement("jev", kind, answer=answer, reason=reason, debug=debug)
     except Exception as exc:
-        raise make_error(exc, debug) from exc
+        failure = JevError(f"Jev judgement failed: {exc}")
+        failure.debug = debug
+        raise failure from exc

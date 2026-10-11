@@ -94,16 +94,13 @@ def new_record(
         },
         "config": {
             "judge_mode": config.judge_mode,
-            "shadow": config.shadow,
-            "consensus": config.consensus,
             "reply_variant": config.reply_variant,
             "luna_model": config.luna_model,
+            "luna_effort": config.luna_effort,
+            "haiku_effort": config.haiku_effort,
             "prompt_version": PROMPT_VERSION,
         },
-        "judgements": {"luna": None, "jev": None,
-                       **({config.judge_mode: None}
-                          if config.judge_mode in {"decisions", "haiku"} else {})},
-        "shadow_mismatch": None,
+        "judgements": {"luna": None, "jev": None, "haiku": None},
         "final": {"kind": None, "answer": None, "decision": None},
         "reply": {
             "text": None, "source": "no_reply", "reply_id": None,
@@ -120,12 +117,8 @@ def apply_decision(
     record["judgements"] = {
         "luna": combined.luna.as_log() if combined.luna else None,
         "jev": combined.jev.as_log() if combined.jev else None,
+        "haiku": combined.haiku.as_log() if combined.haiku else None,
     }
-    if combined.decisions is not None:
-        record["judgements"]["decisions"] = combined.decisions.as_log()
-    if combined.haiku is not None:
-        record["judgements"]["haiku"] = combined.haiku.as_log()
-    record["shadow_mismatch"] = combined.mismatch
     record["final"] = combined.final_log()
     record["times"]["judged_at"] = judged_at or utc_now()
     record["reply"].update({"text": reply.text, "source": reply.source,
