@@ -1,15 +1,15 @@
 ---
 title: ウミガメのスープの投稿頻度を毎日から週 4 回（日・火・木・土）に減らす
 slug: umigame-post-frequency-4days
-status: 待機             # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
+status: 採用             # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
 kind: 単発               # 単発 | 構想
 created: 2026-10-08
-updated: 2026-10-08
+updated: 2026-10-12
 condition: "開発レーンで Phase 21 に 21-6i として転記する（21-7 の着手条件に追加）。転記したら採用へ"  # 再醸成待ち・待機のとき必須（再検討トリガー / 落とし込み条件）
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: ""          # クローズ時の昇格先リンク / 見送り理由
+disposition: "開発計画 21-6i（docs/plans/development-plan.html#step-21-6i）へ転記（2026-10-12）"          # クローズ時の昇格先リンク / 見送り理由
 ---
 
 ## 要旨
@@ -58,3 +58,7 @@ umigame-soup-1 の投稿頻度を「毎日 20:00」から**日・火・木・土
 - **21-7 の着手条件**に 21-6i の完了を足す
 - **課題表**: 該当なし（umigame-soup-1 の節は空・対象パス `content/umigame-stock` `docs/app/sets/umigame-soup-1.html` `infra/lib/image-batch-stack.ts` の live 行なし）
 
+
+### 2026-10-12（採用・転記）
+
+- 転記が漏れたまま 21-7 で Scheduler を毎日の cron で作り deploy していた（有効化の直前にユーザーが気づいた。未投稿）。開発計画 Phase 21 に **21-6i** として転記し採用。下書きとの差分: Scheduler は作成・deploy 済みのため「設計書の cron を変えるだけ」ではなく **CDK の cron 変更と ImageBatchStack の再 deploy** を含めた。21-7 の着手条件ではなく、有効化（`04_activate.sql`）の前提にした

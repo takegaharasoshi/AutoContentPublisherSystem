@@ -124,14 +124,6 @@
   <td><a href="umigame-multi-account-worldview.md">MD</a></td>
   <td>2026-10-08</td>
 </tr>
-<tr>
-  <td>ウミガメのスープの投稿頻度を毎日から週 4 回（日・火・木・土）に減らす</td>
-  <td>単発</td>
-  <td><span class="badge badge-future">待機</span></td>
-  <td>開発レーンで開発計画 Phase 21 に <strong>21-6i</strong>（21-6h の後・21-7 の前）として転記したら採用。中身は設計書の cron を <code>cron(0 20 ? * SUN,TUE,THU,SAT *)</code> に・補充ペースを週 4 問に・キャプション定型文「明日のリール」→「次のリール」とストック 14 行の caption 更新（両環境）。転記下書きは MD の壁打ち記録（2026-10-08）。動機は作問とテストが重く週 7 問の継続が難しいこと</td>
-  <td><a href="umigame-post-frequency-4days.md">MD</a></td>
-  <td>2026-10-08</td>
-</tr>
 </tbody>
 </table></div>
 
@@ -139,6 +131,13 @@
 <div class="table-wrap"><table data-cards data-card-extra="5">
 <thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
 <tbody>
+<tr>
+  <td>ウミガメのスープの投稿頻度を毎日から週 4 回（日・火・木・土）に減らす</td>
+  <td><span class="badge badge-fixed">採用</span></td>
+  <td>捕捉 → 壁打ち 1 回（2026-10-08）で決定し待機。転記が漏れたまま 21-7 で Scheduler を毎日の cron で deploy していたことに有効化の直前で気づき（未投稿）、<a href="../plans/development-plan.html#step-21-6i">開発計画 21-6i</a> として転記（CDK の cron 変更と再 deploy を含める）。有効化は 21-6i の後</td>
+  <td><a href="umigame-post-frequency-4days.md">MD</a></td>
+  <td>2026-10-12</td>
+</tr>
 <tr>
   <td>ウミガメのコメント返信の LLM として Claude Haiku 5.5 を luna の代替候補に加える</td>
   <td><span class="badge badge-fixed">採用</span></td>
