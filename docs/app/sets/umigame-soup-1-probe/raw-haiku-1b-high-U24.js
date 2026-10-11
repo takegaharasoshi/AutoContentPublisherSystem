@@ -6,12 +6,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -28,12 +28,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 6834,
             "cache_read_input_tokens": 0,
-            "completion_tokens": 410,
+            "completion_tokens": 360,
             "effort": "high",
             "input_tokens": 37,
-            "latency_s": 2.650438,
+            "latency_s": 2.238669,
             "model": "claude-haiku-5-5",
-            "output_tokens": 410,
+            "output_tokens": 360,
             "prompt_tokens": 6871,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -41,12 +41,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 6834,
               "cache_read_input_tokens": 0,
               "input_tokens": 37,
-              "output_tokens": 410
+              "output_tokens": 360
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実どおり、男は10年ほど毎朝同じ道を同じように走っているため。"
+          "reason": "確定事実「10年ほど毎朝同じ道を同じように走っている」に一致するためyes。"
         },
         "jev": null,
         "luna": null
@@ -58,12 +58,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3905,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 78,
+          "completion_tokens": 81,
           "effort": "high",
           "input_tokens": 37,
-          "latency_s": 1.705338,
+          "latency_s": 0.994823,
           "model": "claude-haiku-5-5",
-          "output_tokens": 78,
+          "output_tokens": 81,
           "prompt_tokens": 3942,
           "refusal_category": null,
           "slot": "判定語だけ",
@@ -72,7 +72,7 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3905,
             "cache_read_input_tokens": 0,
             "input_tokens": 37,
-            "output_tokens": 78
+            "output_tokens": 81
           }
         },
         "guard": null,
@@ -83,22 +83,21 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男は毎朝同じ通学路を走ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.655850114999339,
+      "haiku_s": 2.2388142850250006,
       "jev_s": null,
-      "judge_s": 2.655850114999339,
+      "judge_s": 2.2388142850250006,
       "luna_s": null,
-      "total_s": 4.362338564009406,
-      "writer_s": 1.7064884490100667
+      "total_s": 3.242898422991857,
+      "writer_s": 1.0040841379668564
     }
   },
   {
@@ -107,12 +106,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -127,27 +126,27 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 6834,
-            "cache_read_input_tokens": 0,
-            "completion_tokens": 491,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 470,
             "effort": "high",
             "input_tokens": 35,
-            "latency_s": 4.040023,
+            "latency_s": 3.412788,
             "model": "claude-haiku-5-5",
-            "output_tokens": 491,
+            "output_tokens": 470,
             "prompt_tokens": 6869,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 6834,
-              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
               "input_tokens": 35,
-              "output_tokens": 491
+              "output_tokens": 470
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "事実を1つ確かめる質問。子どもたちは男の姿を見てから家を出たので、言い方どおりでyes。"
+          "reason": "男を見てから走り出したかという事実確認の質問で、事実と一致するためyes。"
         },
         "jev": null,
         "luna": null
@@ -159,12 +158,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3907,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 334,
+          "completion_tokens": 306,
           "effort": "high",
           "input_tokens": 35,
-          "latency_s": 2.817718,
+          "latency_s": 2.40667,
           "model": "claude-haiku-5-5",
-          "output_tokens": 334,
+          "output_tokens": 306,
           "prompt_tokens": 3942,
           "refusal_category": null,
           "slot": "判定語 + 一言",
@@ -173,33 +172,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3907,
             "cache_read_input_tokens": 0,
             "input_tokens": 35,
-            "output_tokens": 334
+            "output_tokens": 306
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！その調子で次も聞いてごらん。"
+        "text": "はい！ふむふむ、次はどうかな？🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "小学生たちは男を見てから走り出したんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.0408013629494235,
+      "haiku_s": 3.4131088230060413,
       "jev_s": null,
-      "judge_s": 4.0408013629494235,
+      "judge_s": 3.4131088230060413,
       "luna_s": null,
-      "total_s": 6.859370580990799,
-      "writer_s": 2.8185692180413753
+      "total_s": 5.8206710340455174,
+      "writer_s": 2.407562211039476
     }
   },
   {
@@ -208,12 +206,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e03",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -230,12 +228,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 749,
+            "completion_tokens": 826,
             "effort": "high",
             "input_tokens": 39,
-            "latency_s": 4.98842,
+            "latency_s": 5.069165,
             "model": "claude-haiku-5-5",
-            "output_tokens": 749,
+            "output_tokens": 826,
             "prompt_tokens": 6873,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -243,12 +241,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 39,
-              "output_tokens": 749
+              "output_tokens": 826
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "始業時刻が早かったという事実はなく、学校に特別な行事もなかったため。"
+          "reason": "学校の始業時刻は変わっておらず、特別な行事もなかったため。"
         },
         "jev": null,
         "luna": null
@@ -260,12 +258,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3906,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 345,
+          "completion_tokens": 282,
           "effort": "high",
           "input_tokens": 39,
-          "latency_s": 2.903066,
+          "latency_s": 2.472622,
           "model": "claude-haiku-5-5",
-          "output_tokens": 345,
+          "output_tokens": 282,
           "prompt_tokens": 3945,
           "refusal_category": null,
           "slot": "判定語 + 一言",
@@ -274,7 +272,7 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3906,
             "cache_read_input_tokens": 0,
             "input_tokens": 39,
-            "output_tokens": 345
+            "output_tokens": 282
           }
         },
         "guard": null,
@@ -285,22 +283,21 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "この日は学校の始業時刻がいつもより早かったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.98899975407403,
+      "haiku_s": 5.069319854024798,
       "jev_s": null,
-      "judge_s": 4.98899975407403,
+      "judge_s": 5.069319854024798,
       "luna_s": null,
-      "total_s": 7.893008892075159,
-      "writer_s": 2.904009138001129
+      "total_s": 7.542922277934849,
+      "writer_s": 2.4736024239100516
     }
   },
   {
@@ -309,12 +306,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e04",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -331,12 +328,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 788,
+            "completion_tokens": 703,
             "effort": "high",
             "input_tokens": 40,
-            "latency_s": 4.643689,
+            "latency_s": 4.508545,
             "model": "claude-haiku-5-5",
-            "output_tokens": 788,
+            "output_tokens": 703,
             "prompt_tokens": 6874,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -344,12 +341,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 40,
-              "output_tokens": 788
+              "output_tokens": 703
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "追い抜くことが目的とは確定事実になく、子どもたちは遅刻すると思い込んで急いだ。"
+          "reason": "追い抜きは結果であり目的ではない。遊びでもないと確定事実にあるため no。"
         },
         "jev": null,
         "luna": null
@@ -361,12 +358,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3904,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 175,
+          "completion_tokens": 176,
           "effort": "high",
           "input_tokens": 40,
-          "latency_s": 2.035224,
+          "latency_s": 2.037184,
           "model": "claude-haiku-5-5",
-          "output_tokens": 175,
+          "output_tokens": 176,
           "prompt_tokens": 3944,
           "refusal_category": null,
           "slot": "判定語だけ",
@@ -375,7 +372,7 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3904,
             "cache_read_input_tokens": 0,
             "input_tokens": 40,
-            "output_tokens": 175
+            "output_tokens": 176
           }
         },
         "guard": null,
@@ -386,22 +383,21 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "子どもたちは男を追い抜こうとして走ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.644214909058064,
+      "haiku_s": 4.508703411906026,
       "jev_s": null,
-      "judge_s": 4.644214909058064,
+      "judge_s": 4.508703411906026,
       "luna_s": null,
-      "total_s": 6.680021611042321,
-      "writer_s": 2.0358067019842565
+      "total_s": 6.54673718882259,
+      "writer_s": 2.0380337769165635
     }
   },
   {
@@ -410,12 +406,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e05",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -432,12 +428,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 267,
+            "completion_tokens": 408,
             "effort": "high",
             "input_tokens": 34,
-            "latency_s": 2.583606,
+            "latency_s": 3.590247,
             "model": "claude-haiku-5-5",
-            "output_tokens": 267,
+            "output_tokens": 408,
             "prompt_tokens": 6868,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -445,12 +441,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 34,
-              "output_tokens": 267
+              "output_tokens": 408
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で男は子どもたちに何も言っていないため no"
+          "reason": "男が声をかけたかを問う質問で、確定事実から男は声をかけていないので no"
         },
         "jev": null,
         "luna": null
@@ -462,12 +458,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3904,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 28,
+          "completion_tokens": 32,
           "effort": "high",
           "input_tokens": 34,
-          "latency_s": 1.423622,
+          "latency_s": 1.261011,
           "model": "claude-haiku-5-5",
-          "output_tokens": 28,
+          "output_tokens": 32,
           "prompt_tokens": 3938,
           "refusal_category": null,
           "slot": "判定語だけ",
@@ -476,33 +472,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3904,
             "cache_read_input_tokens": 0,
             "input_tokens": 34,
-            "output_tokens": 28
+            "output_tokens": 32
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。男は何も声をかけていないよ。"
+        "text": "いいえ。男は子どもたちに声をかけていないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男は子どもたちに何か声をかけましたか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.5843146140687168,
+      "haiku_s": 3.590534604038112,
       "jev_s": null,
-      "judge_s": 2.5843146140687168,
+      "judge_s": 3.590534604038112,
       "luna_s": null,
-      "total_s": 4.008475632057525,
-      "writer_s": 1.4241610179888085
+      "total_s": 4.852286144043319,
+      "writer_s": 1.261751540005207
     }
   },
   {
@@ -511,12 +506,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e06",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -533,12 +528,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 709,
+            "completion_tokens": 780,
             "effort": "high",
             "input_tokens": 39,
-            "latency_s": 4.658325,
+            "latency_s": 4.863098,
             "model": "claude-haiku-5-5",
-            "output_tokens": 709,
+            "output_tokens": 780,
             "prompt_tokens": 6873,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -546,12 +541,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 39,
-              "output_tokens": 709
+              "output_tokens": 780
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "真相で子どもたちは同じ小学校へ向かっているため yes"
+          "reason": "真相で子どもたちは同じ学校と校門に向かっており、全員同じ学校と読めるため"
         },
         "jev": null,
         "luna": null
@@ -563,12 +558,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3908,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 281,
+          "completion_tokens": 218,
           "effort": "high",
           "input_tokens": 39,
-          "latency_s": 2.879342,
+          "latency_s": 2.034929,
           "model": "claude-haiku-5-5",
-          "output_tokens": 281,
+          "output_tokens": 218,
           "prompt_tokens": 3947,
           "refusal_category": null,
           "slot": "判定語 + 復唱",
@@ -577,33 +572,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3908,
             "cache_read_input_tokens": 0,
             "input_tokens": 39,
-            "output_tokens": 281
+            "output_tokens": 218
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！全員、同じ学校に通ってるよ。"
+        "text": "はい！同じ学校に通ってるよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "小学生たちは全員、同じ学校に通ってるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.658990378957242,
+      "haiku_s": 4.868439498939551,
       "jev_s": null,
-      "judge_s": 4.658990378957242,
+      "judge_s": 4.868439498939551,
       "luna_s": null,
-      "total_s": 7.5387641380075365,
-      "writer_s": 2.8797737590502948
+      "total_s": 6.903957380913198,
+      "writer_s": 2.0355178819736466
     }
   },
   {
@@ -612,12 +606,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e07",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -634,12 +628,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 856,
+            "completion_tokens": 623,
             "effort": "high",
             "input_tokens": 37,
-            "latency_s": 4.924776,
+            "latency_s": 3.759621,
             "model": "claude-haiku-5-5",
-            "output_tokens": 856,
+            "output_tokens": 623,
             "prompt_tokens": 6871,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -647,12 +641,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 37,
-              "output_tokens": 856
+              "output_tokens": 623
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "確定事実で鬼ごっこや競走などの遊びではないと明記されており、楽しんで走ったとは言えないため"
+          "reason": "走りを楽しんでいたかは真相から明らかに違うので no。"
         },
         "jev": null,
         "luna": null
@@ -662,23 +656,23 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3904,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 167,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3904,
+          "completion_tokens": 107,
           "effort": "high",
           "input_tokens": 37,
-          "latency_s": 1.393569,
+          "latency_s": 1.215479,
           "model": "claude-haiku-5-5",
-          "output_tokens": 167,
+          "output_tokens": 107,
           "prompt_tokens": 3941,
           "refusal_category": null,
           "slot": "判定語だけ",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3904,
-            "cache_read_input_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3904,
             "input_tokens": 37,
-            "output_tokens": 167
+            "output_tokens": 107
           }
         },
         "guard": null,
@@ -689,22 +683,21 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "子どもたちは走るのを楽しんでいるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.925242303987034,
+      "haiku_s": 3.7598883629543707,
       "jev_s": null,
-      "judge_s": 4.925242303987034,
+      "judge_s": 3.7598883629543707,
       "luna_s": null,
-      "total_s": 6.319173497031443,
-      "writer_s": 1.3939311930444092
+      "total_s": 4.976211151923053,
+      "writer_s": 1.2163227889686823
     }
   },
   {
@@ -713,12 +706,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e08",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -735,12 +728,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 800,
+            "completion_tokens": 512,
             "effort": "high",
             "input_tokens": 40,
-            "latency_s": 5.30846,
+            "latency_s": 3.109398,
             "model": "claude-haiku-5-5",
-            "output_tokens": 800,
+            "output_tokens": 512,
             "prompt_tokens": 6874,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -748,12 +741,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 40,
-              "output_tokens": 800
+              "output_tokens": 512
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "早く出た理由が用事だったかを問う質問。確定事実の用事があったに該当するため yes"
+          "reason": "用事があっていつもより早く走ったので、いつもと違う出来事があったと言える。"
         },
         "jev": null,
         "luna": null
@@ -765,12 +758,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 0,
           "cache_read_input_tokens": 3907,
-          "completion_tokens": 385,
+          "completion_tokens": 340,
           "effort": "high",
           "input_tokens": 40,
-          "latency_s": 2.228862,
+          "latency_s": 2.83981,
           "model": "claude-haiku-5-5",
-          "output_tokens": 385,
+          "output_tokens": 340,
           "prompt_tokens": 3947,
           "refusal_category": null,
           "slot": "判定語 + 一言",
@@ -779,7 +772,7 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 3907,
             "input_tokens": 40,
-            "output_tokens": 385
+            "output_tokens": 340
           }
         },
         "guard": null,
@@ -790,22 +783,21 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男が早く出たのは、いつもと違う出来事があったからですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 5.309075930039398,
+      "haiku_s": 3.1096719859633595,
       "jev_s": null,
-      "judge_s": 5.309075930039398,
+      "judge_s": 3.1096719859633595,
       "luna_s": null,
-      "total_s": 7.53852095711045,
-      "writer_s": 2.2294450270710513
+      "total_s": 5.94989909499418,
+      "writer_s": 2.8402271090308204
     }
   },
   {
@@ -814,12 +806,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e09",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -836,12 +828,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 441,
+            "completion_tokens": 460,
             "effort": "high",
             "input_tokens": 41,
-            "latency_s": 2.459124,
+            "latency_s": 3.161878,
             "model": "claude-haiku-5-5",
-            "output_tokens": 441,
+            "output_tokens": 460,
             "prompt_tokens": 6875,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -849,12 +841,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 41,
-              "output_tokens": 441
+              "output_tokens": 460
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "地区についての事柄は真相にも確定事実にもなく、判断できないため"
+          "reason": "真相・確定事実に地区の情報がなく、どちらからも判断できないためirrelevant。"
         },
         "jev": null,
         "luna": null
@@ -866,12 +858,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3910,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 263,
+          "completion_tokens": 301,
           "effort": "high",
           "input_tokens": 41,
-          "latency_s": 2.583466,
+          "latency_s": 2.759755,
           "model": "claude-haiku-5-5",
-          "output_tokens": 263,
+          "output_tokens": 301,
           "prompt_tokens": 3951,
           "refusal_category": null,
           "slot": "判定語 + 一言",
@@ -880,33 +872,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3910,
             "cache_read_input_tokens": 0,
             "input_tokens": 41,
-            "output_tokens": 263
+            "output_tokens": 301
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。その調子で次の質問をしてごらん😌"
+        "text": "関係ないよ。その調子で次の質問を聞いてごらん 😉"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "通学路沿いの家は、どれも同じ地区にあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.459499389049597,
+      "haiku_s": 3.162433131947182,
       "jev_s": null,
-      "judge_s": 2.459499389049597,
+      "judge_s": 3.162433131947182,
       "luna_s": null,
-      "total_s": 5.043917351053096,
-      "writer_s": 2.5844179620034993
+      "total_s": 5.923149758018553,
+      "writer_s": 2.760716626071371
     }
   },
   {
@@ -915,12 +906,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e10",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -937,12 +928,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 390,
+            "completion_tokens": 427,
             "effort": "high",
             "input_tokens": 36,
-            "latency_s": 2.348249,
+            "latency_s": 3.010707,
             "model": "claude-haiku-5-5",
-            "output_tokens": 390,
+            "output_tokens": 427,
             "prompt_tokens": 6870,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -950,12 +941,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 36,
-              "output_tokens": 390
+              "output_tokens": 427
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "ランドセルの有無は真相にも確定事実にもなく、どちらからも判断できないため irrelevant とした。"
+          "reason": "ランドセルは真相にも確定事実にもなく、無関係なので irrelevant"
         },
         "jev": null,
         "luna": null
@@ -967,12 +958,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3910,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 209,
+          "completion_tokens": 269,
           "effort": "high",
           "input_tokens": 36,
-          "latency_s": 1.739471,
+          "latency_s": 1.919965,
           "model": "claude-haiku-5-5",
-          "output_tokens": 209,
+          "output_tokens": 269,
           "prompt_tokens": 3946,
           "refusal_category": null,
           "slot": "判定語 + 一言",
@@ -981,33 +972,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3910,
             "cache_read_input_tokens": 0,
             "input_tokens": 36,
-            "output_tokens": 209
+            "output_tokens": 269
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。ふむふむ、次はどうかな？"
+        "text": "関係ないよ。次はどんなことが気になるかな？🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "小学生はランドセルを背負ってたんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.3489328459836543,
+      "haiku_s": 3.0109958719694987,
       "jev_s": null,
-      "judge_s": 2.3489328459836543,
+      "judge_s": 3.0109958719694987,
       "luna_s": null,
-      "total_s": 4.103341761045158,
-      "writer_s": 1.7544089150615036
+      "total_s": 4.932168887928128,
+      "writer_s": 1.9211730159586295
     }
   },
   {
@@ -1016,12 +1006,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e11",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -1038,12 +1028,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 257,
+            "completion_tokens": 340,
             "effort": "high",
             "input_tokens": 41,
-            "latency_s": 1.974825,
+            "latency_s": 2.24881,
             "model": "claude-haiku-5-5",
-            "output_tokens": 257,
+            "output_tokens": 340,
             "prompt_tokens": 6875,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1051,108 +1041,7 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 41,
-              "output_tokens": 257
-            }
-          },
-          "error": null,
-          "kind": "q_multi",
-          "reason": "「先生なの？」「走って向かわせたの？」と質問が2つあるため"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3905,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 310,
-          "effort": "high",
-          "input_tokens": 41,
-          "latency_s": 2.149135,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 310,
-          "prompt_tokens": 3946,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3905,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 41,
-            "output_tokens": 310
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "質問は1つずつコメントしてみてね。ひとつずつなら答えるよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は子どもたちの先生なの？走って学校に向かわせたの？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 1.9805431610438973,
-      "jev_s": null,
-      "judge_s": 1.9805431610438973,
-      "luna_s": null,
-      "total_s": 4.130287102074362,
-      "writer_s": 2.149743941030465
-    }
-  },
-  {
-    "case_id": "U24-e12",
-    "record": {
-      "comment_id": "U24-e12",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "q_multi"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 291,
-            "effort": "high",
-            "input_tokens": 44,
-            "latency_s": 2.500048,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 291,
-            "prompt_tokens": 6878,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 44,
-              "output_tokens": 291
+              "output_tokens": 340
             }
           },
           "error": null,
@@ -1169,61 +1058,60 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3905,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 265,
+          "completion_tokens": 231,
           "effort": "high",
-          "input_tokens": 44,
-          "latency_s": 2.454743,
+          "input_tokens": 41,
+          "latency_s": 2.51671,
           "model": "claude-haiku-5-5",
-          "output_tokens": 265,
-          "prompt_tokens": 3949,
+          "output_tokens": 231,
+          "prompt_tokens": 3946,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 3905,
             "cache_read_input_tokens": 0,
-            "input_tokens": 44,
-            "output_tokens": 265
+            "input_tokens": 41,
+            "output_tokens": 231
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてごらん。まずは一つ選んで聞いてね 🧐"
+        "text": "質問は1つずつコメントしてごらん。一つずつ聞いてくれたら、私が答えるからね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "子どもたちは男を見つけて走り出したの？男を追いかけてたの？",
+      "text": "男は子どもたちの先生なの？走って学校に向かわせたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.500491374055855,
+      "haiku_s": 2.2490162029862404,
       "jev_s": null,
-      "judge_s": 2.500491374055855,
+      "judge_s": 2.2490162029862404,
       "luna_s": null,
-      "total_s": 4.955940432031639,
-      "writer_s": 2.455449057975784
+      "total_s": 4.772210931987502,
+      "writer_s": 2.5231947290012613
     }
   },
   {
-    "case_id": "U24-e13",
+    "case_id": "U24-e12",
     "record": {
-      "comment_id": "U24-e13",
+      "comment_id": "U24-e12",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -1231,7 +1119,7 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "final": {
         "answer": null,
         "decision": "haiku",
-        "kind": "q_open"
+        "kind": "q_multi"
       },
       "judgements": {
         "haiku": {
@@ -1240,214 +1128,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 320,
-            "effort": "high",
-            "input_tokens": 35,
-            "latency_s": 2.660703,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 320,
-            "prompt_tokens": 6869,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 35,
-              "output_tokens": 320
-            }
-          },
-          "error": null,
-          "kind": "q_open",
-          "reason": "「なぜ」を問う質問で、はい・いいえで答えられないため聞き直しを促す。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3904,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 412,
-          "effort": "high",
-          "input_tokens": 35,
-          "latency_s": 3.220563,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 412,
-          "prompt_tokens": 3939,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3904,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 35,
-            "output_tokens": 412
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "その質問は「はい」か「いいえ」で答えられる形で聞き直してごらん。ひとつずつ聞いてくれたら答えるよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "子どもたちはどうして急に走り出したんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 2.6614803639240563,
-      "jev_s": null,
-      "judge_s": 2.6614803639240563,
-      "luna_s": null,
-      "total_s": 5.882525770924985,
-      "writer_s": 3.221045407000929
-    }
-  },
-  {
-    "case_id": "U24-e14",
-    "record": {
-      "comment_id": "U24-e14",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "q_open"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 295,
-            "effort": "high",
-            "input_tokens": 34,
-            "latency_s": 1.982462,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 295,
-            "prompt_tokens": 6868,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 34,
-              "output_tokens": 295
-            }
-          },
-          "error": null,
-          "kind": "q_open",
-          "reason": "「何をしている人か」は はい／いいえで答えられない問いのため、聞き直しを促す。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3904,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 472,
-          "effort": "high",
-          "input_tokens": 34,
-          "latency_s": 3.790329,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 472,
-          "prompt_tokens": 3938,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3904,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 34,
-            "output_tokens": 472
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい / いいえ で答えられる形で聞き直してみてね 🧐"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は通学路で何をしている人なんでしょう？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 1.9827674250118434,
-      "jev_s": null,
-      "judge_s": 1.9827674250118434,
-      "luna_s": null,
-      "total_s": 5.773824254050851,
-      "writer_s": 3.7910568290390074
-    }
-  },
-  {
-    "case_id": "U24-e15",
-    "record": {
-      "comment_id": "U24-e15",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "q_open"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 469,
+            "completion_tokens": 307,
             "effort": "high",
             "input_tokens": 44,
-            "latency_s": 2.569119,
+            "latency_s": 2.621418,
             "model": "claude-haiku-5-5",
-            "output_tokens": 469,
+            "output_tokens": 307,
             "prompt_tokens": 6878,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1455,12 +1141,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 44,
-              "output_tokens": 469
+              "output_tokens": 307
             }
           },
           "error": null,
-          "kind": "q_open",
-          "reason": "「誰が誰を追い抜いたのか」は、はい・いいえで答えられない質問のため q_open。"
+          "kind": "q_multi",
+          "reason": "1つのコメントに質問が2つあり、まとめて答えると対応が分からなくなるため"
         },
         "jev": null,
         "luna": null
@@ -1471,48 +1157,347 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3904,
-          "completion_tokens": 557,
+          "cache_read_input_tokens": 3905,
+          "completion_tokens": 274,
           "effort": "high",
           "input_tokens": 44,
-          "latency_s": 3.943913,
+          "latency_s": 2.187931,
           "model": "claude-haiku-5-5",
-          "output_tokens": 557,
-          "prompt_tokens": 3948,
+          "output_tokens": 274,
+          "prompt_tokens": 3949,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3904,
+            "cache_read_input_tokens": 3905,
             "input_tokens": 44,
-            "output_tokens": 557
+            "output_tokens": 274
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「はい」か「いいえ」で答えられる形で聞き直してみてね。誰のことを聞きたいのか、誰のことか書いてごらん。"
+        "text": "質問は1つずつコメントしてね。まとめて聞かれると、答えにくいからね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "誰が誰を追い抜いたのか、状況をもう少し知りたいです。",
+      "text": "子どもたちは男を見つけて走り出したの？男を追いかけてたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.569722883985378,
+      "haiku_s": 2.6216521579772234,
       "jev_s": null,
-      "judge_s": 2.569722883985378,
+      "judge_s": 2.6216521579772234,
       "luna_s": null,
-      "total_s": 6.5147888149367645,
-      "writer_s": 3.9450659309513867
+      "total_s": 4.810529032954946,
+      "writer_s": 2.1888768749777228
+    }
+  },
+  {
+    "case_id": "U24-e13",
+    "record": {
+      "comment_id": "U24-e13",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "q_open"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 362,
+            "effort": "high",
+            "input_tokens": 35,
+            "latency_s": 2.865705,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 362,
+            "prompt_tokens": 6869,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 35,
+              "output_tokens": 362
+            }
+          },
+          "error": null,
+          "kind": "q_open",
+          "reason": "「なぜ」で聞いており、はい／いいえで答えられない質問のため"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3904,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 324,
+          "effort": "high",
+          "input_tokens": 35,
+          "latency_s": 2.778036,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 324,
+          "prompt_tokens": 3939,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3904,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 35,
+            "output_tokens": 324
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いい問いかけだね。はい／いいえで答えられる形に言い直して、もう一度聞いてみてね。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "子どもたちはどうして急に走り出したんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 2.8660016970243305,
+      "jev_s": null,
+      "judge_s": 2.8660016970243305,
+      "luna_s": null,
+      "total_s": 5.644595861085691,
+      "writer_s": 2.77859416406136
+    }
+  },
+  {
+    "case_id": "U24-e14",
+    "record": {
+      "comment_id": "U24-e14",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "q_open"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 371,
+            "effort": "high",
+            "input_tokens": 34,
+            "latency_s": 2.191329,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 371,
+            "prompt_tokens": 6868,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 34,
+              "output_tokens": 371
+            }
+          },
+          "error": null,
+          "kind": "q_open",
+          "reason": "「何をしている人か」は、はい／いいえで答えられない問いのため聞き直しを促す"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3904,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 437,
+          "effort": "high",
+          "input_tokens": 34,
+          "latency_s": 3.146078,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 437,
+          "prompt_tokens": 3938,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3904,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 34,
+            "output_tokens": 437
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい／いいえで答えられる形で聞き直してみてね。ひとつずつ聞いてごらん🧐"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "男は通学路で何をしている人なんでしょう？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 2.191714178887196,
+      "jev_s": null,
+      "judge_s": 2.191714178887196,
+      "luna_s": null,
+      "total_s": 5.338725940906443,
+      "writer_s": 3.147011762019247
+    }
+  },
+  {
+    "case_id": "U24-e15",
+    "record": {
+      "comment_id": "U24-e15",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "q_open"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 392,
+            "effort": "high",
+            "input_tokens": 44,
+            "latency_s": 2.32492,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 392,
+            "prompt_tokens": 6878,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 44,
+              "output_tokens": 392
+            }
+          },
+          "error": null,
+          "kind": "q_open",
+          "reason": "「誰が」「状況」を尋ねる問いで、はい／いいえで答えられないため聞き直しを促す。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3904,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 411,
+          "effort": "high",
+          "input_tokens": 44,
+          "latency_s": 3.307115,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 411,
+          "prompt_tokens": 3948,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3904,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 44,
+            "output_tokens": 411
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい／いいえで答えられる形で聞き直してごらん。誰のことを聞いているのか、書いてくれるかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "誰が誰を追い抜いたのか、状況をもう少し知りたいです。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 2.3250787319848314,
+      "jev_s": null,
+      "judge_s": 2.3250787319848314,
+      "luna_s": null,
+      "total_s": 5.633057781029493,
+      "writer_s": 3.3079790490446612
     }
   },
   {
@@ -1521,12 +1506,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e16",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -1543,12 +1528,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 1174,
+            "completion_tokens": 992,
             "effort": "high",
             "input_tokens": 47,
-            "latency_s": 6.610797,
+            "latency_s": 5.16131,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1174,
+            "output_tokens": 992,
             "prompt_tokens": 6881,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1556,12 +1541,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 47,
-              "output_tokens": 1174
+              "output_tokens": 992
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "毎朝の男を時計代わりにしていたと当てており、明らかな誤りもない"
+          "reason": "毎朝通る男の姿を家を出る時刻の目安にしていたと述べ、要点1を当てている。"
         },
         "jev": null,
         "luna": null
@@ -1573,12 +1558,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3906,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 1208,
+          "completion_tokens": 681,
           "effort": "high",
           "input_tokens": 47,
-          "latency_s": 5.990164,
+          "latency_s": 4.028721,
           "model": "claude-haiku-5-5",
-          "output_tokens": 1208,
+          "output_tokens": 681,
           "prompt_tokens": 3953,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1587,33 +1572,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3906,
             "cache_read_input_tokens": 0,
             "input_tokens": 47,
-            "output_tokens": 1208
+            "output_tokens": 681
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！子どもたちは毎朝、男を時計代わりにして家を出ていたんだ。その朝は男が早く走ったので、遅刻だと思い込んで飛び出したんだよ。"
+        "text": "正解！子どもたちは毎朝、男の姿を時計代わりにしていたんだ。ある朝、男が早く走ったので、遅刻すると思い込んで飛び出したんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "子どもたちは毎日、男が走ってくるのを合図に家を出てたってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 6.622048884048127,
+      "haiku_s": 5.1745314340805635,
       "jev_s": null,
-      "judge_s": 6.622048884048127,
+      "judge_s": 5.1745314340805635,
       "luna_s": null,
-      "total_s": 12.61259409505874,
-      "writer_s": 5.9905452110106125
+      "total_s": 9.214673242066056,
+      "writer_s": 4.040141807985492
     }
   },
   {
@@ -1622,12 +1606,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e17",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -1644,12 +1628,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 1474,
+            "completion_tokens": 878,
             "effort": "high",
             "input_tokens": 75,
-            "latency_s": 7.351931,
+            "latency_s": 4.32899,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1474,
+            "output_tokens": 878,
             "prompt_tokens": 6909,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1657,12 +1641,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 75,
-              "output_tokens": 1474
+              "output_tokens": 878
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "毎朝男を合図・時計代わりにしていたと当て、早く通った点も正しく、明らかな誤りがない。"
+          "reason": "毎朝男を時計代わりにしていたと当てており、早く通った勘違いの流れにも誤りがない。"
         },
         "jev": null,
         "luna": null
@@ -1674,12 +1658,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3906,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 541,
+          "completion_tokens": 594,
           "effort": "high",
           "input_tokens": 75,
-          "latency_s": 3.071516,
+          "latency_s": 3.602583,
           "model": "claude-haiku-5-5",
-          "output_tokens": 541,
+          "output_tokens": 594,
           "prompt_tokens": 3981,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1688,33 +1672,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3906,
             "cache_read_input_tokens": 0,
             "input_tokens": 75,
-            "output_tokens": 541
+            "output_tokens": 594
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！子どもたちは毎朝、窓の外を通る男を時計代わりにしてたんだ。今朝は男が早く走ったから、遅刻だと思い込んで先に飛び出したんだよ。"
+        "text": "正解！男は毎朝同じ時刻に通る時計代わりだったんだ。いつもより早く走ったので、子どもたちは遅刻だと思い込んで走り出したんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "子どもたちは毎朝、走ってくる男を学校へ出る合図にしてたんだね。いつもより早く通ったから、勘違いして先に走り出したのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 7.352518563973717,
+      "haiku_s": 4.32939109695144,
       "jev_s": null,
-      "judge_s": 7.352518563973717,
+      "judge_s": 4.32939109695144,
       "luna_s": null,
-      "total_s": 10.425002255942672,
-      "writer_s": 3.072483691968955
+      "total_s": 7.932976512936875,
+      "writer_s": 3.6035854159854352
     }
   },
   {
@@ -1723,12 +1706,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e18",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -1745,12 +1728,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 605,
+            "completion_tokens": 777,
             "effort": "high",
             "input_tokens": 52,
-            "latency_s": 3.277432,
+            "latency_s": 4.3771,
             "model": "claude-haiku-5-5",
-            "output_tokens": 605,
+            "output_tokens": 777,
             "prompt_tokens": 6886,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1758,12 +1741,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 52,
-              "output_tokens": 605
+              "output_tokens": 777
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "男の通る時刻と子どもが家を出る時刻のつながりに触れており、要点1に触れている。当てたとまではいえない。"
+          "reason": "男の通過時刻と家を出る時刻につながりがあると述べ、要点1に触れている。ただし時計代わりとまでは言えていない。"
         },
         "jev": null,
         "luna": null
@@ -1775,12 +1758,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3905,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 358,
+          "completion_tokens": 262,
           "effort": "high",
           "input_tokens": 52,
-          "latency_s": 2.35179,
+          "latency_s": 2.439292,
           "model": "claude-haiku-5-5",
-          "output_tokens": 358,
+          "output_tokens": 262,
           "prompt_tokens": 3957,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1789,33 +1772,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3905,
             "cache_read_input_tokens": 0,
             "input_tokens": 52,
-            "output_tokens": 358
+            "output_tokens": 262
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらんよ 🧐"
+        "text": "惜しい！その調子で推理を続けてごらん 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男がいつも通る時間と、子どもたちが家を出る時間に何か関係があるんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.2777116720099,
+      "haiku_s": 4.377541622030549,
       "jev_s": null,
-      "judge_s": 3.2777116720099,
+      "judge_s": 4.377541622030549,
       "luna_s": null,
-      "total_s": 5.630317236064002,
-      "writer_s": 2.3526055640541017
+      "total_s": 6.81769399298355,
+      "writer_s": 2.440152370953001
     }
   },
   {
@@ -1824,12 +1806,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e19",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -1846,12 +1828,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 710,
+            "completion_tokens": 622,
             "effort": "high",
             "input_tokens": 78,
-            "latency_s": 5.173653,
+            "latency_s": 4.155717,
             "model": "claude-haiku-5-5",
-            "output_tokens": 710,
+            "output_tokens": 622,
             "prompt_tokens": 6912,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1859,12 +1841,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 78,
-              "output_tokens": 710
+              "output_tokens": 622
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "子どもたちが男を合図に出ていた点は当てているが、男が遅く来たという明らかな誤りを含むため"
+          "reason": "毎朝男を合図にした点は要点に触れるが、男が遅く走ったは確定事実と食い違う明らかな誤り。"
         },
         "jev": null,
         "luna": null
@@ -1876,12 +1858,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3905,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 343,
+          "completion_tokens": 307,
           "effort": "high",
           "input_tokens": 78,
-          "latency_s": 2.929629,
+          "latency_s": 2.670902,
           "model": "claude-haiku-5-5",
-          "output_tokens": 343,
+          "output_tokens": 307,
           "prompt_tokens": 3983,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1890,33 +1872,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3905,
             "cache_read_input_tokens": 0,
             "input_tokens": 78,
-            "output_tokens": 343
+            "output_tokens": 307
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えてごらん 🧐"
+        "text": "惜しい！もう少し考えを進めてごらん 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "子どもたちは毎日男を合図に家を出てたけど、その日は男がいつもより遅く走ってきたから、遅刻しそうだと勘違いして急いだんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 5.174111288972199,
+      "haiku_s": 4.156083344016224,
       "jev_s": null,
-      "judge_s": 5.174111288972199,
+      "judge_s": 4.156083344016224,
       "luna_s": null,
-      "total_s": 8.104341747006401,
-      "writer_s": 2.9302304580342025
+      "total_s": 6.8274199470179155,
+      "writer_s": 2.6713366030016914
     }
   },
   {
@@ -1925,12 +1906,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-e20",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -1947,12 +1928,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 567,
+            "completion_tokens": 534,
             "effort": "high",
             "input_tokens": 52,
-            "latency_s": 4.072269,
+            "latency_s": 3.588873,
             "model": "claude-haiku-5-5",
-            "output_tokens": 567,
+            "output_tokens": 534,
             "prompt_tokens": 6886,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1960,12 +1941,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 52,
-              "output_tokens": 567
+              "output_tokens": 534
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "男と競争したという説明は要点に触れず、競走ではないという確定事実とも食い違うため"
+          "reason": "男と競争したという誤りを含み、毎朝男の姿を時刻の目安にしていた点には触れていない"
         },
         "jev": null,
         "luna": null
@@ -1977,12 +1958,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3907,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 233,
+          "completion_tokens": 311,
           "effort": "high",
           "input_tokens": 52,
-          "latency_s": 1.865817,
+          "latency_s": 2.539741,
           "model": "claude-haiku-5-5",
-          "output_tokens": 233,
+          "output_tokens": 311,
           "prompt_tokens": 3959,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1991,714 +1972,7 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3907,
             "cache_read_input_tokens": 0,
             "input_tokens": 52,
-            "output_tokens": 233
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "残念、ちがうよ。別の方向からも考えてみようか 🧐"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男がいつもより早く走り始めたから、子どもたちも競争だと思って走ったんでしょ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 4.072582385968417,
-      "jev_s": null,
-      "judge_s": 4.072582385968417,
-      "luna_s": null,
-      "total_s": 5.939188820892014,
-      "writer_s": 1.8666064349235967
-    }
-  },
-  {
-    "case_id": "U24-e21",
-    "record": {
-      "comment_id": "U24-e21",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_wrong"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 529,
-            "effort": "high",
-            "input_tokens": 50,
-            "latency_s": 2.78608,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 529,
-            "prompt_tokens": 6884,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 50,
-              "output_tokens": 529
-            }
-          },
-          "error": null,
-          "kind": "guess_wrong",
-          "reason": "男を先生とし、運動を指導したとする説明は確定事実と食い違い、要点にも触れていない"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3907,
-          "completion_tokens": 306,
-          "effort": "high",
-          "input_tokens": 50,
-          "latency_s": 2.639618,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 306,
-          "prompt_tokens": 3957,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3907,
-            "input_tokens": 50,
-            "output_tokens": 306
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "残念、ちがうよ。別の角度から考えてごらんね。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は学校の先生で、子どもたちを走らせる朝の運動をしてたんだと思う。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 2.8077618459938094,
-      "jev_s": null,
-      "judge_s": 2.8077618459938094,
-      "luna_s": null,
-      "total_s": 5.447969006956555,
-      "writer_s": 2.6402071609627455
-    }
-  },
-  {
-    "case_id": "U24-k01",
-    "record": {
-      "comment_id": "U24-k01",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_correct"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 1276,
-            "effort": "high",
-            "input_tokens": 53,
-            "latency_s": 6.109668,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 1276,
-            "prompt_tokens": 6887,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 53,
-              "output_tokens": 1276
-            }
-          },
-          "error": null,
-          "kind": "guess_correct",
-          "reason": "毎朝通る男の姿を登校の支度の目安にしていたと述べ、要点を当てている。明らかな誤りはない。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3906,
-          "completion_tokens": 826,
-          "effort": "high",
-          "input_tokens": 53,
-          "latency_s": 4.453942,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 826,
-          "prompt_tokens": 3959,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3906,
-            "input_tokens": 53,
-            "output_tokens": 826
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "正解！男は毎朝同じ時間に走っていて、子どもたちはその姿を時計代わりにしていたんだ。今朝早く走ったから、遅刻と勘違いして飛び出したんだよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "毎朝見かける男の姿を目安にして、子どもたちは登校の支度を始めていたんだね。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 6.110426831059158,
-      "jev_s": null,
-      "judge_s": 6.110426831059158,
-      "luna_s": null,
-      "total_s": 10.564720743102953,
-      "writer_s": 4.454293912043795
-    }
-  },
-  {
-    "case_id": "U24-k02",
-    "record": {
-      "comment_id": "U24-k02",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_correct"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 1367,
-            "effort": "high",
-            "input_tokens": 46,
-            "latency_s": 6.457156,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 1367,
-            "prompt_tokens": 6880,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 46,
-              "output_tokens": 1367
-            }
-          },
-          "error": null,
-          "kind": "guess_correct",
-          "reason": "毎朝通る男を家を出る時刻の目安（時計代わり）にしていたと当てており、明らかな誤りもない。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3906,
-          "completion_tokens": 98,
-          "effort": "high",
-          "input_tokens": 46,
-          "latency_s": 0.9688,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 98,
-          "prompt_tokens": 3952,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3906,
-            "input_tokens": 46,
-            "output_tokens": 98
-          }
-        },
-        "guard": null,
-        "over_80": true,
-        "reply_id": null,
-        "source": "llm",
-        "text": "正解！男は毎朝決まった時間に走っていて、子どもたちはその姿を見て家を出るようになっていたんだ。ある朝、男がいつもより早く走ったので、子どもたちは遅刻だと思い込んでしまったんだよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "走る男が通るのを時計代わりに、家々の子どもは出発してたんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 6.4575341859599575,
-      "jev_s": null,
-      "judge_s": 6.4575341859599575,
-      "luna_s": null,
-      "total_s": 7.427606351906434,
-      "writer_s": 0.9700721659464762
-    }
-  },
-  {
-    "case_id": "U24-k03",
-    "record": {
-      "comment_id": "U24-k03",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 577,
-            "effort": "high",
-            "input_tokens": 50,
-            "latency_s": 3.403911,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 577,
-            "prompt_tokens": 6884,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 50,
-              "output_tokens": 577
-            }
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "男の通過時刻と家を出る時刻のつながりに触れたが、時計代わりとしての仕組みまでは述べていないため。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3905,
-          "completion_tokens": 335,
-          "effort": "high",
-          "input_tokens": 50,
-          "latency_s": 2.143736,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 335,
-          "prompt_tokens": 3955,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3905,
-            "input_tokens": 50,
-            "output_tokens": 335
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらん 🧐"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男が通る頃と子どもが家を出る時刻には、毎朝つながりがあったんだね。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 3.4044910699594766,
-      "jev_s": null,
-      "judge_s": 3.4044910699594766,
-      "luna_s": null,
-      "total_s": 5.548769240966067,
-      "writer_s": 2.14427817100659
-    }
-  },
-  {
-    "case_id": "U24-k04",
-    "record": {
-      "comment_id": "U24-k04",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 906,
-            "effort": "high",
-            "input_tokens": 56,
-            "latency_s": 4.888561,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 906,
-            "prompt_tokens": 6890,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 56,
-              "output_tokens": 906
-            }
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "男を見て家を出る点には触れているが、その日遅く通ったは真相と食い違う明らかな誤り。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3905,
-          "completion_tokens": 391,
-          "effort": "high",
-          "input_tokens": 56,
-          "latency_s": 2.425369,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 391,
-          "prompt_tokens": 3961,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3905,
-            "input_tokens": 56,
-            "output_tokens": 391
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！その調子で、もう少し推理を続けてごらんよ 🧐"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男を見ると子どもが家を出ていたけど、その日はいつもより遅く通ったから焦ったんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 4.889016552013345,
-      "jev_s": null,
-      "judge_s": 4.889016552013345,
-      "luna_s": null,
-      "total_s": 7.334007026976906,
-      "writer_s": 2.4449904749635607
-    }
-  },
-  {
-    "case_id": "U24-k05",
-    "record": {
-      "comment_id": "U24-k05",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 1309,
-            "effort": "high",
-            "input_tokens": 49,
-            "latency_s": 6.621875,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 1309,
-            "prompt_tokens": 6883,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 49,
-              "output_tokens": 1309
-            }
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "男の通る時刻が子どもの支度に影響したと述べ要点1に触れるが、時刻の目安にしていた点までは言えていない。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3905,
-          "completion_tokens": 231,
-          "effort": "high",
-          "input_tokens": 49,
-          "latency_s": 1.728377,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 231,
-          "prompt_tokens": 3954,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3905,
-            "input_tokens": 49,
-            "output_tokens": 231
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらん🧐"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男が家の前を走る時刻は、子どもたちの朝の準備に影響していたんだね。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 6.63118133705575,
-      "jev_s": null,
-      "judge_s": 6.63118133705575,
-      "luna_s": null,
-      "total_s": 8.360542551032268,
-      "writer_s": 1.7293612139765173
-    }
-  },
-  {
-    "case_id": "U24-k06",
-    "record": {
-      "comment_id": "U24-k06",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "012-early-morning-run",
-      "errors": [],
-      "fact_sheet_hash": "aeaba231b36a",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_wrong"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6834,
-            "completion_tokens": 388,
-            "effort": "high",
-            "input_tokens": 49,
-            "latency_s": 2.302754,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 388,
-            "prompt_tokens": 6883,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6834,
-              "input_tokens": 49,
-              "output_tokens": 388
-            }
-          },
-          "error": null,
-          "kind": "guess_wrong",
-          "reason": "男と競争したという説明は誤り。毎朝の時刻のつながりには触れていない"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U24",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3907,
-          "completion_tokens": 206,
-          "effort": "high",
-          "input_tokens": 49,
-          "latency_s": 2.368848,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 206,
-          "prompt_tokens": 3956,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3907,
-            "input_tokens": 49,
-            "output_tokens": 206
+            "output_tokens": 311
           }
         },
         "guard": null,
@@ -2709,22 +1983,721 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "子どもたちは早く出た男と競争したくて、通学路へ飛び出していったんだね。",
+      "text": "男がいつもより早く走り始めたから、子どもたちも競争だと思って走ったんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.3030330480542034,
+      "haiku_s": 3.5892347029875964,
       "jev_s": null,
-      "judge_s": 2.3030330480542034,
+      "judge_s": 3.5892347029875964,
       "luna_s": null,
-      "total_s": 4.672593967989087,
-      "writer_s": 2.3695609199348837
+      "total_s": 6.129621085943654,
+      "writer_s": 2.540386382956058
+    }
+  },
+  {
+    "case_id": "U24-e21",
+    "record": {
+      "comment_id": "U24-e21",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 360,
+            "effort": "high",
+            "input_tokens": 50,
+            "latency_s": 2.712069,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 360,
+            "prompt_tokens": 6884,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 50,
+              "output_tokens": 360
+            }
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "男を先生と見て運動の指示と推理しており、要点に触れていないため"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3907,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 34,
+          "effort": "high",
+          "input_tokens": 50,
+          "latency_s": 1.38019,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 34,
+          "prompt_tokens": 3957,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3907,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 50,
+            "output_tokens": 34
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。ほかの推理も考えてみてね。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "男は学校の先生で、子どもたちを走らせる朝の運動をしてたんだと思う。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 2.7124213939532638,
+      "jev_s": null,
+      "judge_s": 2.7124213939532638,
+      "luna_s": null,
+      "total_s": 4.110551697900519,
+      "writer_s": 1.398130303947255
+    }
+  },
+  {
+    "case_id": "U24-k01",
+    "record": {
+      "comment_id": "U24-k01",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 1051,
+            "effort": "high",
+            "input_tokens": 53,
+            "latency_s": 5.455075,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 1051,
+            "prompt_tokens": 6887,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 53,
+              "output_tokens": 1051
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "毎朝の男の姿を登校支度の目安にしていた点を当てており、明らかな誤りもない"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3906,
+          "completion_tokens": 1086,
+          "effort": "high",
+          "input_tokens": 53,
+          "latency_s": 5.413307,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 1086,
+          "prompt_tokens": 3959,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3906,
+            "input_tokens": 53,
+            "output_tokens": 1086
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "正解！毎朝の男の姿を時計代わりにしていたんだ。早く走った朝は、遅刻だと勘違いして飛び出したんだよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "毎朝見かける男の姿を目安にして、子どもたちは登校の支度を始めていたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 5.455608960008249,
+      "jev_s": null,
+      "judge_s": 5.455608960008249,
+      "luna_s": null,
+      "total_s": 10.869335463969037,
+      "writer_s": 5.413726503960788
+    }
+  },
+  {
+    "case_id": "U24-k02",
+    "record": {
+      "comment_id": "U24-k02",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "guess_correct"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 1157,
+            "effort": "high",
+            "input_tokens": 46,
+            "latency_s": 6.142479,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 1157,
+            "prompt_tokens": 6880,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 46,
+              "output_tokens": 1157
+            }
+          },
+          "error": null,
+          "kind": "guess_correct",
+          "reason": "毎朝通る男を時計代わりにしていたと述べ、要点を当てている。明らかな誤りもない。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3906,
+          "completion_tokens": 638,
+          "effort": "high",
+          "input_tokens": 46,
+          "latency_s": 3.896261,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 638,
+          "prompt_tokens": 3952,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3906,
+            "input_tokens": 46,
+            "output_tokens": 638
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "正解！毎朝7時40分に走る男を、子どもたちは時計代わりにしていたんだ。その朝、男が20分早く走ったから、みんな遅刻だと思って飛び出したんだよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "走る男が通るのを時計代わりに、家々の子どもは出発してたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 6.142762513016351,
+      "jev_s": null,
+      "judge_s": 6.142762513016351,
+      "luna_s": null,
+      "total_s": 10.039569585002027,
+      "writer_s": 3.896807071985677
+    }
+  },
+  {
+    "case_id": "U24-k03",
+    "record": {
+      "comment_id": "U24-k03",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 762,
+            "effort": "high",
+            "input_tokens": 50,
+            "latency_s": 4.358845,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 762,
+            "prompt_tokens": 6884,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 50,
+              "output_tokens": 762
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "毎朝の通過時刻と出発時刻につながりがあると述べ、要点1に触れている。ただ、男が時計代わりになっていた点までは言えていない。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3905,
+          "completion_tokens": 406,
+          "effort": "high",
+          "input_tokens": 50,
+          "latency_s": 2.607003,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 406,
+          "prompt_tokens": 3955,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3905,
+            "input_tokens": 50,
+            "output_tokens": 406
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もうひと推理してみようか 🤔"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "男が通る頃と子どもが家を出る時刻には、毎朝つながりがあったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 4.359154628007673,
+      "jev_s": null,
+      "judge_s": 4.359154628007673,
+      "luna_s": null,
+      "total_s": 6.96720901504159,
+      "writer_s": 2.608054387033917
+    }
+  },
+  {
+    "case_id": "U24-k04",
+    "record": {
+      "comment_id": "U24-k04",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 854,
+            "effort": "high",
+            "input_tokens": 56,
+            "latency_s": 4.970878,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 854,
+            "prompt_tokens": 6890,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 56,
+              "output_tokens": 854
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "男を見て家を出る習慣には触れているが、男がいつもより遅く通ったという明らかな誤りを含むため。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3905,
+          "completion_tokens": 325,
+          "effort": "high",
+          "input_tokens": 56,
+          "latency_s": 2.761554,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 325,
+          "prompt_tokens": 3961,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3905,
+            "input_tokens": 56,
+            "output_tokens": 325
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し推理を続けてごらん 🧐"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "男を見ると子どもが家を出ていたけど、その日はいつもより遅く通ったから焦ったんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 4.971185166970827,
+      "jev_s": null,
+      "judge_s": 4.971185166970827,
+      "luna_s": null,
+      "total_s": 7.7337067619664595,
+      "writer_s": 2.7625215949956328
+    }
+  },
+  {
+    "case_id": "U24-k05",
+    "record": {
+      "comment_id": "U24-k05",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 823,
+            "effort": "high",
+            "input_tokens": 49,
+            "latency_s": 4.38737,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 823,
+            "prompt_tokens": 6883,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 49,
+              "output_tokens": 823
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "男の通る時刻と子どもの準備のつながりに触れているが、時計代わりにしていたとは述べていない"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3905,
+          "completion_tokens": 319,
+          "effort": "high",
+          "input_tokens": 49,
+          "latency_s": 2.231435,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 319,
+          "prompt_tokens": 3954,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3905,
+            "input_tokens": 49,
+            "output_tokens": 319
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！その調子で、もう少し推理を続けてごらん🧐"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "男が家の前を走る時刻は、子どもたちの朝の準備に影響していたんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 4.387721402919851,
+      "jev_s": null,
+      "judge_s": 4.387721402919851,
+      "luna_s": null,
+      "total_s": 6.619471842888743,
+      "writer_s": 2.2317504399688914
+    }
+  },
+  {
+    "case_id": "U24-k06",
+    "record": {
+      "comment_id": "U24-k06",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "012-early-morning-run",
+      "errors": [],
+      "fact_sheet_hash": "aeaba231b36a",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "guess_wrong"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6834,
+            "completion_tokens": 446,
+            "effort": "high",
+            "input_tokens": 49,
+            "latency_s": 2.676962,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 446,
+            "prompt_tokens": 6883,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6834,
+              "input_tokens": 49,
+              "output_tokens": 446
+            }
+          },
+          "error": null,
+          "kind": "guess_wrong",
+          "reason": "男との競争という説明で、毎朝の時刻のつながりに触れておらず、誤りでない部分にも要点がないため。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U24",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3907,
+          "completion_tokens": 31,
+          "effort": "high",
+          "input_tokens": 49,
+          "latency_s": 1.063555,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 31,
+          "prompt_tokens": 3956,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3907,
+            "input_tokens": 49,
+            "output_tokens": 31
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "残念、ちがうよ。もう一度考えてみてね。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "子どもたちは早く出た男と競争したくて、通学路へ飛び出していったんだね。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 2.677255456917919,
+      "jev_s": null,
+      "judge_s": 2.677255456917919,
+      "luna_s": null,
+      "total_s": 3.74129194393754,
+      "writer_s": 1.0640364870196208
     }
   },
   {
@@ -2733,17 +2706,15 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-t01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
-      "errors": [
-        "writer: writer did not ask what bare_term means"
-      ],
+      "errors": [],
       "fact_sheet_hash": "aeaba231b36a",
       "final": {
         "answer": null,
@@ -2757,12 +2728,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 306,
+            "completion_tokens": 308,
             "effort": "high",
             "input_tokens": 19,
-            "latency_s": 1.920389,
+            "latency_s": 2.750367,
             "model": "claude-haiku-5-5",
-            "output_tokens": 306,
+            "output_tokens": 308,
             "prompt_tokens": 6853,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2770,12 +2741,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 19,
-              "output_tokens": 306
+              "output_tokens": 308
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語だけのコメントのため、はい／いいえで答えられる形で聞き直してもらう。"
+          "reason": "語だけのコメントで、何を聞きたいのか決まらないため"
         },
         "jev": null,
         "luna": null
@@ -2787,12 +2758,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3906,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 52,
+          "completion_tokens": 46,
           "effort": "high",
           "input_tokens": 19,
-          "latency_s": 1.551398,
+          "latency_s": 1.442168,
           "model": "claude-haiku-5-5",
-          "output_tokens": 52,
+          "output_tokens": 46,
           "prompt_tokens": 3925,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2801,33 +2772,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3906,
             "cache_read_input_tokens": 0,
             "input_tokens": 19,
-            "output_tokens": 52
+            "output_tokens": 46
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "fallback_template",
-        "text": "合図がどうしたのか聞かせてね。"
+        "source": "llm",
+        "text": "合図って、何が合図になったのかな？はい／いいえで答えられる形で聞き直してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "合図？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.9208489819429815,
+      "haiku_s": 2.7505326569080353,
       "jev_s": null,
-      "judge_s": 1.9208489819429815,
+      "judge_s": 2.7505326569080353,
       "luna_s": null,
-      "total_s": 3.4729454850312322,
-      "writer_s": 1.5520965030882508
+      "total_s": 4.193473998922855,
+      "writer_s": 1.4429413420148194
     }
   },
   {
@@ -2836,17 +2806,15 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "U24-t02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
-      "errors": [
-        "writer: writer did not ask what bare_term means"
-      ],
+      "errors": [],
       "fact_sheet_hash": "aeaba231b36a",
       "final": {
         "answer": null,
@@ -2860,12 +2828,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 320,
+            "completion_tokens": 359,
             "effort": "high",
             "input_tokens": 23,
-            "latency_s": 2.009867,
+            "latency_s": 2.279339,
             "model": "claude-haiku-5-5",
-            "output_tokens": 320,
+            "output_tokens": 359,
             "prompt_tokens": 6857,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2873,12 +2841,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 23,
-              "output_tokens": 320
+              "output_tokens": 359
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない名詞句だけのコメントなので、聞き直しを促す"
+          "reason": "述語のない語句だけのコメントなので、はい／いいえで答えられる形で聞き直してもらう"
         },
         "jev": null,
         "luna": null
@@ -2890,12 +2858,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3911,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 455,
+          "completion_tokens": 430,
           "effort": "high",
           "input_tokens": 23,
-          "latency_s": 3.34696,
+          "latency_s": 2.9096,
           "model": "claude-haiku-5-5",
-          "output_tokens": 455,
+          "output_tokens": 430,
           "prompt_tokens": 3934,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2904,33 +2872,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3911,
             "cache_read_input_tokens": 0,
             "input_tokens": 23,
-            "output_tokens": 455
+            "output_tokens": 430
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "fallback_template",
-        "text": "何が黄色い帽子なのか教えてね。"
+        "source": "llm",
+        "text": "「黄色い帽子」の何が知りたいのかな？はい／いいえで答えられる形で聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "黄色い帽子",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.010344767011702,
+      "haiku_s": 2.2797551820985973,
       "jev_s": null,
-      "judge_s": 2.010344767011702,
+      "judge_s": 2.2797551820985973,
       "luna_s": null,
-      "total_s": 5.3580397120676935,
-      "writer_s": 3.3476949450559914
+      "total_s": 5.189732770202681,
+      "writer_s": 2.909977588104084
     }
   },
   {
@@ -2939,12 +2906,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "c-ask_spoiler-05",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -2961,12 +2928,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 386,
+            "completion_tokens": 470,
             "effort": "high",
             "input_tokens": 22,
-            "latency_s": 3.185171,
+            "latency_s": 3.370235,
             "model": "claude-haiku-5-5",
-            "output_tokens": 386,
+            "output_tokens": 470,
             "prompt_tokens": 6856,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2974,12 +2941,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 22,
-              "output_tokens": 386
+              "output_tokens": 470
             }
           },
           "error": null,
           "kind": "ask_spoiler",
-          "reason": "解説（真相）を求めるコメントのため、ネタバレ要求として扱う。"
+          "reason": "解説・答えを求めるコメントなので、ネタバレ要求として扱う。"
         },
         "jev": null,
         "luna": null
@@ -2991,12 +2958,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3908,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 62,
+          "completion_tokens": 47,
           "effort": "high",
           "input_tokens": 22,
-          "latency_s": 1.684402,
+          "latency_s": 1.219832,
           "model": "claude-haiku-5-5",
-          "output_tokens": 62,
+          "output_tokens": 47,
           "prompt_tokens": 3930,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -3005,33 +2972,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3908,
             "cache_read_input_tokens": 0,
             "input_tokens": 22,
-            "output_tokens": 62
+            "output_tokens": 47
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "もうちょっと待ってね。質問には答えられるけど、真相はまだ教えられないよ。はい / いいえで聞いてごらん 🧐"
+        "text": "まだ解説はできないよ。質問には答えられるから、はい/いいえで聞いてごらん 😌"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "解説まだー？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.185334109934047,
+      "haiku_s": 3.3704287520376965,
       "jev_s": null,
-      "judge_s": 3.185334109934047,
+      "judge_s": 3.3704287520376965,
       "luna_s": null,
-      "total_s": 4.870519503951073,
-      "writer_s": 1.6851853940170258
+      "total_s": 4.590448116068728,
+      "writer_s": 1.2200193640310317
     }
   },
   {
@@ -3040,12 +3006,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "c-greeting-04",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -3062,12 +3028,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 80,
+            "completion_tokens": 76,
             "effort": "high",
             "input_tokens": 20,
-            "latency_s": 0.904574,
+            "latency_s": 0.959855,
             "model": "claude-haiku-5-5",
-            "output_tokens": 80,
+            "output_tokens": 76,
             "prompt_tokens": 6854,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -3075,12 +3041,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 20,
-              "output_tokens": 80
+              "output_tokens": 76
             }
           },
           "error": null,
           "kind": "greeting",
-          "reason": "挨拶のみのコメント"
+          "reason": "挨拶のみで問題に関係する内容がない"
         },
         "jev": null,
         "luna": null
@@ -3092,12 +3058,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3904,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 40,
+          "completion_tokens": 42,
           "effort": "high",
           "input_tokens": 20,
-          "latency_s": 1.559425,
+          "latency_s": 1.389298,
           "model": "claude-haiku-5-5",
-          "output_tokens": 40,
+          "output_tokens": 42,
           "prompt_tokens": 3924,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -3106,33 +3072,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3904,
             "cache_read_input_tokens": 0,
             "input_tokens": 20,
-            "output_tokens": 40
+            "output_tokens": 42
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "やっほー！来てくれてありがとうね。ゆっくり遊んでいってね。"
+        "text": "やっほー！来てくれてありがとうね。ゆっくり楽しんでいってね😌"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "やっほー",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 0.9055367689579725,
+      "haiku_s": 0.9602735630469397,
       "jev_s": null,
-      "judge_s": 0.9055367689579725,
+      "judge_s": 0.9602735630469397,
       "luna_s": null,
-      "total_s": 2.465810658875853,
-      "writer_s": 1.5602738899178803
+      "total_s": 2.3499565460952,
+      "writer_s": 1.3896829830482602
     }
   },
   {
@@ -3141,12 +3106,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "c-request-03",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -3163,12 +3128,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 318,
+            "completion_tokens": 261,
             "effort": "high",
             "input_tokens": 27,
-            "latency_s": 1.954304,
+            "latency_s": 2.153367,
             "model": "claude-haiku-5-5",
-            "output_tokens": 318,
+            "output_tokens": 261,
             "prompt_tokens": 6861,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -3176,12 +3141,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 27,
-              "output_tokens": 318
+              "output_tokens": 261
             }
           },
           "error": null,
           "kind": "request",
-          "reason": "怖めの問題を出してほしいというリクエストなので、お礼だけ返す"
+          "reason": "怖めの問題を求めるリクエストで、問題への推理や質問ではない"
         },
         "jev": null,
         "luna": null
@@ -3193,12 +3158,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3902,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 496,
+          "completion_tokens": 287,
           "effort": "high",
           "input_tokens": 27,
-          "latency_s": 3.471174,
+          "latency_s": 2.178626,
           "model": "claude-haiku-5-5",
-          "output_tokens": 496,
+          "output_tokens": 287,
           "prompt_tokens": 3929,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -3207,33 +3172,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3902,
             "cache_read_input_tokens": 0,
             "input_tokens": 27,
-            "output_tokens": 496
+            "output_tokens": 287
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう！怖めの問題、考えてみようか。"
+        "text": "ありがとう！次の問題も楽しみにしていてね。😌"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "怖めの問題もお願いします",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.9550814660033211,
+      "haiku_s": 2.1537299600895494,
       "jev_s": null,
-      "judge_s": 1.9550814660033211,
+      "judge_s": 2.1537299600895494,
       "luna_s": null,
-      "total_s": 5.427132331999019,
-      "writer_s": 3.4720508659956977
+      "total_s": 4.333259433042258,
+      "writer_s": 2.1795294729527086
     }
   },
   {
@@ -3242,12 +3206,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "c-emoji_only-02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -3264,12 +3228,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 82,
+            "completion_tokens": 71,
             "effort": "high",
             "input_tokens": 20,
-            "latency_s": 0.906081,
+            "latency_s": 1.581757,
             "model": "claude-haiku-5-5",
-            "output_tokens": 82,
+            "output_tokens": 71,
             "prompt_tokens": 6854,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -3277,12 +3241,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 20,
-              "output_tokens": 82
+              "output_tokens": 71
             }
           },
           "error": null,
           "kind": "emoji_only",
-          "reason": "絵文字だけのコメントのため、お礼のみ返す"
+          "reason": "絵文字だけのコメントのため"
         },
         "jev": null,
         "luna": null
@@ -3294,12 +3258,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3906,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 27,
+          "completion_tokens": 172,
           "effort": "high",
           "input_tokens": 20,
-          "latency_s": 0.819445,
+          "latency_s": 1.356511,
           "model": "claude-haiku-5-5",
-          "output_tokens": 27,
+          "output_tokens": 172,
           "prompt_tokens": 3926,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -3308,33 +3272,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3906,
             "cache_read_input_tokens": 0,
             "input_tokens": 20,
-            "output_tokens": 27
+            "output_tokens": 172
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう、うれしいな！ 🥳"
+        "text": "ありがとう！楽しんでくれてうれしいよ 👏"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "😂👏",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 0.9174274250399321,
+      "haiku_s": 1.5822643439751118,
       "jev_s": null,
-      "judge_s": 0.9174274250399321,
+      "judge_s": 1.5822643439751118,
       "luna_s": null,
-      "total_s": 1.7377402980346233,
-      "writer_s": 0.8203128729946911
+      "total_s": 2.93952564697247,
+      "writer_s": 1.3572613029973581
     }
   },
   {
@@ -3343,12 +3306,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "c-spam-01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -3365,12 +3328,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 50,
+            "completion_tokens": 62,
             "effort": "high",
             "input_tokens": 32,
-            "latency_s": 1.520865,
+            "latency_s": 0.835124,
             "model": "claude-haiku-5-5",
-            "output_tokens": 50,
+            "output_tokens": 62,
             "prompt_tokens": 6866,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -3378,12 +3341,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 32,
-              "output_tokens": 50
+              "output_tokens": 62
             }
           },
           "error": null,
           "kind": "spam",
-          "reason": "宣伝・リンクを含むコメントのため"
+          "reason": "宣伝・リンクを含むコメントのため、返信はプログラム側で決める"
         },
         "jev": null,
         "luna": null
@@ -3400,22 +3363,21 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "新作はこちら https://example.invalid/deal",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.5218094780575484,
+      "haiku_s": 0.8355486929649487,
       "jev_s": null,
-      "judge_s": 1.5218094780575484,
+      "judge_s": 0.8355486929649487,
       "luna_s": null,
-      "total_s": 1.5218175910413265,
-      "writer_s": 8.112983778119087e-06
+      "total_s": 0.8355519539909437,
+      "writer_s": 3.261025995016098e-06
     }
   },
   {
@@ -3424,12 +3386,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
       "comment_id": "c-foreign-05",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "012-early-morning-run",
       "errors": [],
@@ -3446,12 +3408,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6834,
-            "completion_tokens": 298,
+            "completion_tokens": 262,
             "effort": "high",
             "input_tokens": 27,
-            "latency_s": 1.829244,
+            "latency_s": 2.085541,
             "model": "claude-haiku-5-5",
-            "output_tokens": 298,
+            "output_tokens": 262,
             "prompt_tokens": 6861,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -3459,12 +3421,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6834,
               "input_tokens": 27,
-              "output_tokens": 298
+              "output_tokens": 262
             }
           },
           "error": null,
           "kind": "foreign",
-          "reason": "韓国語のコメントで、日本語以外のため foreign と判定"
+          "reason": "韓国語のコメントのため、日本語でのコメントを案内する。"
         },
         "jev": null,
         "luna": null
@@ -3476,12 +3438,12 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
         "debug": {
           "cache_creation_input_tokens": 3904,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 35,
+          "completion_tokens": 37,
           "effort": "high",
           "input_tokens": 27,
-          "latency_s": 1.71596,
+          "latency_s": 1.05495,
           "model": "claude-haiku-5-5",
-          "output_tokens": 35,
+          "output_tokens": 37,
           "prompt_tokens": 3931,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -3490,33 +3452,32 @@ window.PROBE_RAW["haiku-1b-high/U24"] = [
             "cache_creation_input_tokens": 3904,
             "cache_read_input_tokens": 0,
             "input_tokens": 27,
-            "output_tokens": 35
+            "output_tokens": 37
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "日本語で質問してね、日本語で返してくれると嬉しいな。"
+        "text": "日本語で質問してね、日本語で書いてくれるとうれしいよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "이거 정말 재밌어요",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.8297845639754087,
+      "haiku_s": 2.0859194240765646,
       "jev_s": null,
-      "judge_s": 1.8297845639754087,
+      "judge_s": 2.0859194240765646,
       "luna_s": null,
-      "total_s": 3.5463826719205827,
-      "writer_s": 1.716598107945174
+      "total_s": 3.14138626109343,
+      "writer_s": 1.0554668370168656
     }
   }
 ];

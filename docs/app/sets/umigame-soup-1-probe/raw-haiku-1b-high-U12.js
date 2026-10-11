@@ -6,16 +6,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": "no",
         "decision": "haiku",
@@ -26,27 +26,27 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 6859,
+            "cache_creation_input_tokens": 6869,
             "cache_read_input_tokens": 0,
-            "completion_tokens": 317,
+            "completion_tokens": 430,
             "effort": "high",
             "input_tokens": 34,
-            "latency_s": 2.689759,
+            "latency_s": 3.330946,
             "model": "claude-haiku-5-5",
-            "output_tokens": 317,
-            "prompt_tokens": 6893,
+            "output_tokens": 430,
+            "prompt_tokens": 6903,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 6859,
+              "cache_creation_input_tokens": 6869,
               "cache_read_input_tokens": 0,
               "input_tokens": 34,
-              "output_tokens": 317
+              "output_tokens": 430
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "生きている人間ではないので、実際の人間かとの問いには「いいえ」。"
+          "reason": "男たちは生きた人間ではないため、実際の人間かという質問にはいいえ。正体には触れない。"
         },
         "jev": null,
         "luna": null
@@ -56,49 +56,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3975,
+          "cache_creation_input_tokens": 3985,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 362,
+          "completion_tokens": 1081,
           "effort": "high",
           "input_tokens": 34,
-          "latency_s": 2.998969,
+          "latency_s": 5.989299,
           "model": "claude-haiku-5-5",
-          "output_tokens": 362,
-          "prompt_tokens": 4009,
+          "output_tokens": 1081,
+          "prompt_tokens": 4019,
           "refusal_category": null,
           "slot": "判定語 + 復唱",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3975,
+            "cache_creation_input_tokens": 3985,
             "cache_read_input_tokens": 0,
             "input_tokens": 34,
-            "output_tokens": 362
+            "output_tokens": 1081
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。楽器を構えているのは実際の人間じゃないよ。"
+        "text": "いいえ。楽器を構えているのは、実際の人間ですか？の答えはいいえだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "楽器を構えているのは実際の人間ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.690083866007626,
+      "haiku_s": 3.3313411340350285,
       "jev_s": null,
-      "judge_s": 2.690083866007626,
+      "judge_s": 3.3313411340350285,
       "luna_s": null,
-      "total_s": 5.689710945007391,
-      "writer_s": 2.999627078999765
+      "total_s": 9.321631571976468,
+      "writer_s": 5.9902904379414394
     }
   },
   {
@@ -107,16 +106,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": "no",
         "decision": "haiku",
@@ -127,330 +126,27 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 6859,
+            "cache_creation_input_tokens": 6869,
             "cache_read_input_tokens": 0,
-            "completion_tokens": 835,
+            "completion_tokens": 665,
             "effort": "high",
             "input_tokens": 35,
-            "latency_s": 5.318779,
+            "latency_s": 4.005871,
             "model": "claude-haiku-5-5",
-            "output_tokens": 835,
-            "prompt_tokens": 6894,
+            "output_tokens": 665,
+            "prompt_tokens": 6904,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 6859,
+              "cache_creation_input_tokens": 6869,
               "cache_read_input_tokens": 0,
               "input_tokens": 35,
-              "output_tokens": 835
+              "output_tokens": 665
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男たちは意思で音を控えていないため、限定が成り立たず no。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U12",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3975,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 595,
-          "effort": "high",
-          "input_tokens": 35,
-          "latency_s": 3.640574,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 595,
-          "prompt_tokens": 4010,
-          "refusal_category": null,
-          "slot": "判定語 + 復唱",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3975,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 35,
-            "output_tokens": 595
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。自分の意思で音を出さないわけじゃないよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男たちは自分の意思で音を出さないんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 5.319138934020884,
-      "jev_s": null,
-      "judge_s": 5.319138934020884,
-      "luna_s": null,
-      "total_s": 8.960554939927533,
-      "writer_s": 3.641416005906649
-    }
-  },
-  {
-    "case_id": "U12-e03",
-    "record": {
-      "comment_id": "U12-e03",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "003-silent-musicians",
-      "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
-      "final": {
-        "answer": "no",
-        "decision": "haiku",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 454,
-            "effort": "high",
-            "input_tokens": 34,
-            "latency_s": 4.218786,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 454,
-            "prompt_tokens": 6893,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
-              "input_tokens": 34,
-              "output_tokens": 454
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "楽器は形だけの作り物で、本当には音が出ないため、いいえと答える。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U12",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3972,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 143,
-          "effort": "high",
-          "input_tokens": 34,
-          "latency_s": 1.905243,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 143,
-          "prompt_tokens": 4006,
-          "refusal_category": null,
-          "slot": "判定語だけ",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3972,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 34,
-            "output_tokens": 143
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "持っている楽器は本当に音が出るものですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 4.2191475429572165,
-      "jev_s": null,
-      "judge_s": 4.2191475429572165,
-      "luna_s": null,
-      "total_s": 6.12488628202118,
-      "writer_s": 1.9057387390639633
-    }
-  },
-  {
-    "case_id": "U12-e04",
-    "record": {
-      "comment_id": "U12-e04",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "003-silent-musicians",
-      "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
-      "final": {
-        "answer": "no",
-        "decision": "haiku",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 983,
-            "effort": "high",
-            "input_tokens": 30,
-            "latency_s": 5.753721,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 983,
-            "prompt_tokens": 6889,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
-              "input_tokens": 30,
-              "output_tokens": 983
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "階段は建物の階段ではなく、そのために組み立てた段なので no"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U12",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3974,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 467,
-          "effort": "high",
-          "input_tokens": 30,
-          "latency_s": 3.484373,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 467,
-          "prompt_tokens": 4004,
-          "refusal_category": null,
-          "slot": "判定語 + 一言",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3974,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 30,
-            "output_tokens": 467
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。次はどんなことを聞いてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "階段は建物の中にあるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 5.754040568950586,
-      "jev_s": null,
-      "judge_s": 5.754040568950586,
-      "luna_s": null,
-      "total_s": 9.238985333009623,
-      "writer_s": 3.484944764059037
-    }
-  },
-  {
-    "case_id": "U12-e05",
-    "record": {
-      "comment_id": "U12-e05",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "003-silent-musicians",
-      "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
-      "final": {
-        "answer": "no",
-        "decision": "haiku",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 642,
-            "effort": "high",
-            "input_tokens": 38,
-            "latency_s": 4.267691,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 642,
-            "prompt_tokens": 6897,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
-              "input_tokens": 38,
-              "output_tokens": 642
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "見ている家族は音が出ないことを初めから知っており、演奏を期待してはいない"
+          "reason": "意思で音を出さないのかという限定を問う質問。男たちは意思を持って動くものではないため、限定が成り立たずno。"
         },
         "jev": null,
         "luna": null
@@ -461,66 +157,165 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3974,
-          "completion_tokens": 402,
+          "cache_read_input_tokens": 3985,
+          "completion_tokens": 784,
           "effort": "high",
-          "input_tokens": 38,
-          "latency_s": 2.986911,
+          "input_tokens": 35,
+          "latency_s": 5.010447,
           "model": "claude-haiku-5-5",
-          "output_tokens": 402,
-          "prompt_tokens": 4012,
+          "output_tokens": 784,
+          "prompt_tokens": 4020,
           "refusal_category": null,
-          "slot": "判定語 + 一言",
+          "slot": "判定語 + 復唱",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3974,
-            "input_tokens": 38,
-            "output_tokens": 402
+            "cache_read_input_tokens": 3985,
+            "input_tokens": 35,
+            "output_tokens": 784
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。ほかの角度からも聞いてごらん。"
+        "text": "いいえ。自分の意思で音を出さないわけじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "見ている人たちは演奏を期待して集まってるんですか？",
+      "text": "男たちは自分の意思で音を出さないんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.268505382002331,
+      "haiku_s": 4.0061342240078375,
       "jev_s": null,
-      "judge_s": 4.268505382002331,
+      "judge_s": 4.0061342240078375,
       "luna_s": null,
-      "total_s": 7.2556974809849635,
-      "writer_s": 2.987192098982632
+      "total_s": 9.017489547026344,
+      "writer_s": 5.011355323018506
     }
   },
   {
-    "case_id": "U12-e06",
+    "case_id": "U12-e03",
     "record": {
-      "comment_id": "U12-e06",
+      "comment_id": "U12-e03",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
+      "final": {
+        "answer": "no",
+        "decision": "haiku",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 581,
+            "effort": "high",
+            "input_tokens": 34,
+            "latency_s": 4.097527,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 581,
+            "prompt_tokens": 6903,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6869,
+              "input_tokens": 34,
+              "output_tokens": 581
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "楽器は形だけの作り物で、本当に音が出るものではないため「いいえ」。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3982,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 167,
+          "effort": "high",
+          "input_tokens": 34,
+          "latency_s": 2.022466,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 167,
+          "prompt_tokens": 4016,
+          "refusal_category": null,
+          "slot": "判定語だけ",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3982,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 34,
+            "output_tokens": 167
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "持っている楽器は本当に音が出るものですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 4.097831220948137,
+      "jev_s": null,
+      "judge_s": 4.097831220948137,
+      "luna_s": null,
+      "total_s": 6.121169540914707,
+      "writer_s": 2.0233383199665695
+    }
+  },
+  {
+    "case_id": "U12-e04",
+    "record": {
+      "comment_id": "U12-e04",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": "yes",
         "decision": "haiku",
@@ -532,26 +327,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 1009,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 238,
             "effort": "high",
-            "input_tokens": 33,
-            "latency_s": 5.606027,
+            "input_tokens": 30,
+            "latency_s": 2.500948,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1009,
-            "prompt_tokens": 6892,
+            "output_tokens": 238,
+            "prompt_tokens": 6899,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
-              "input_tokens": 33,
-              "output_tokens": 1009
+              "cache_read_input_tokens": 6869,
+              "input_tokens": 30,
+              "output_tokens": 238
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "見ている人は男たちを家に置く同じ家族で、毎日眺めているので同じ人たちと言える。"
+          "reason": "確定事実「階段は建物にある」から、建物の中にあると答えられる"
         },
         "jev": null,
         "luna": null
@@ -561,23 +356,223 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3976,
+          "cache_creation_input_tokens": 3985,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 228,
+          "completion_tokens": 234,
+          "effort": "high",
+          "input_tokens": 30,
+          "latency_s": 2.306226,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 234,
+          "prompt_tokens": 4015,
+          "refusal_category": null,
+          "slot": "判定語 + 一言",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3985,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 30,
+            "output_tokens": 234
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！ふむふむ、次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "階段は建物の中にあるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 2.501316515961662,
+      "jev_s": null,
+      "judge_s": 2.501316515961662,
+      "luna_s": null,
+      "total_s": 4.807952434872277,
+      "writer_s": 2.306635918910615
+    }
+  },
+  {
+    "case_id": "U12-e05",
+    "record": {
+      "comment_id": "U12-e05",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "371daef001a7",
+      "final": {
+        "answer": "no",
+        "decision": "haiku",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 527,
+            "effort": "high",
+            "input_tokens": 38,
+            "latency_s": 3.800995,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 527,
+            "prompt_tokens": 6907,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6869,
+              "input_tokens": 38,
+              "output_tokens": 527
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "家族は音が出ないことを初めから知っており、演奏を期待しているわけではないため。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3984,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 310,
+          "effort": "high",
+          "input_tokens": 38,
+          "latency_s": 2.574039,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 310,
+          "prompt_tokens": 4022,
+          "refusal_category": null,
+          "slot": "判定語 + 一言",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3984,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 38,
+            "output_tokens": 310
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。その調子で次も聞いてごらん。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "見ている人たちは演奏を期待して集まってるんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 3.8012804749887437,
+      "jev_s": null,
+      "judge_s": 3.8012804749887437,
+      "luna_s": null,
+      "total_s": 6.376137607963756,
+      "writer_s": 2.574857132975012
+    }
+  },
+  {
+    "case_id": "U12-e06",
+    "record": {
+      "comment_id": "U12-e06",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "003-silent-musicians",
+      "errors": [],
+      "fact_sheet_hash": "371daef001a7",
+      "final": {
+        "answer": "yes",
+        "decision": "haiku",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 704,
+            "effort": "high",
+            "input_tokens": 33,
+            "latency_s": 4.562045,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 704,
+            "prompt_tokens": 6902,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6869,
+              "input_tokens": 33,
+              "output_tokens": 704
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "毎日眺めているのは男たちを家に置いている同じ家族なので、はいと答える。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U12",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3986,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 340,
           "effort": "high",
           "input_tokens": 33,
-          "latency_s": 5.111616,
+          "latency_s": 2.88426,
           "model": "claude-haiku-5-5",
-          "output_tokens": 228,
-          "prompt_tokens": 4009,
+          "output_tokens": 340,
+          "prompt_tokens": 4019,
           "refusal_category": null,
           "slot": "判定語 + 復唱",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3976,
+            "cache_creation_input_tokens": 3986,
             "cache_read_input_tokens": 0,
             "input_tokens": 33,
-            "output_tokens": 228
+            "output_tokens": 340
           }
         },
         "guard": null,
@@ -588,22 +583,21 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "毎日見ているのは同じ人たちですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 5.606314965989441,
+      "haiku_s": 4.562344759935513,
       "jev_s": null,
-      "judge_s": 5.606314965989441,
+      "judge_s": 4.562344759935513,
       "luna_s": null,
-      "total_s": 10.719088171957992,
-      "writer_s": 5.112773205968551
+      "total_s": 7.447119232849218,
+      "writer_s": 2.884774472913705
     }
   },
   {
@@ -612,16 +606,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e07",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": "no",
         "decision": "haiku",
@@ -633,26 +627,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 577,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 543,
             "effort": "high",
             "input_tokens": 37,
-            "latency_s": 3.797691,
+            "latency_s": 3.401562,
             "model": "claude-haiku-5-5",
-            "output_tokens": 577,
-            "prompt_tokens": 6896,
+            "output_tokens": 543,
+            "prompt_tokens": 6906,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 37,
-              "output_tokens": 577
+              "output_tokens": 543
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男たちは自分の意思で動かず、仕事をしていない。確定事実から否と判断できる。"
+          "reason": "仕事で立っているかを問う質問で、男たちは仕事をしていないため no"
         },
         "jev": null,
         "luna": null
@@ -663,48 +657,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3975,
-          "completion_tokens": 328,
+          "cache_read_input_tokens": 3985,
+          "completion_tokens": 457,
           "effort": "high",
           "input_tokens": 37,
-          "latency_s": 2.09669,
+          "latency_s": 2.623067,
           "model": "claude-haiku-5-5",
-          "output_tokens": 328,
-          "prompt_tokens": 4012,
+          "output_tokens": 457,
+          "prompt_tokens": 4022,
           "refusal_category": null,
           "slot": "判定語 + 復唱",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3975,
+            "cache_read_input_tokens": 3985,
             "input_tokens": 37,
-            "output_tokens": 328
+            "output_tokens": 457
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。何かの仕事でそこに立っているんじゃないよ。"
+        "text": "いいえ。男たちは何かの仕事でそこに立っているんじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男たちは何かの仕事でそこに立っているんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.7981420350261033,
+      "haiku_s": 3.4019720259821042,
       "jev_s": null,
-      "judge_s": 3.7981420350261033,
+      "judge_s": 3.4019720259821042,
       "luna_s": null,
-      "total_s": 5.8955945279449224,
-      "writer_s": 2.097452492918819
+      "total_s": 6.028431075974368,
+      "writer_s": 2.6264590499922633
     }
   },
   {
@@ -713,16 +706,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e08",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": "no",
         "decision": "haiku",
@@ -734,26 +727,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 1026,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 713,
             "effort": "high",
             "input_tokens": 39,
-            "latency_s": 6.381131,
+            "latency_s": 4.972532,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1026,
-            "prompt_tokens": 6898,
+            "output_tokens": 713,
+            "prompt_tokens": 6908,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 39,
-              "output_tokens": 1026
+              "output_tokens": 713
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "音が出ないのは楽器の作りによるもので、演出の意図は事実にない"
+          "reason": "演出上の理由があるかという質問で、真相から見て違うのでno。"
         },
         "jev": null,
         "luna": null
@@ -764,48 +757,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3975,
-          "completion_tokens": 486,
+          "cache_read_input_tokens": 3985,
+          "completion_tokens": 735,
           "effort": "high",
           "input_tokens": 39,
-          "latency_s": 2.708386,
+          "latency_s": 3.9419,
           "model": "claude-haiku-5-5",
-          "output_tokens": 486,
-          "prompt_tokens": 4014,
+          "output_tokens": 735,
+          "prompt_tokens": 4024,
           "refusal_category": null,
           "slot": "判定語 + 復唱",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3975,
+            "cache_read_input_tokens": 3985,
             "input_tokens": 39,
-            "output_tokens": 486
+            "output_tokens": 735
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。演出上の理由があるわけじゃないよ。"
+        "text": "いいえ。音を出さないのは演出上の理由じゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "音を出さないのは何か演出上の理由があるんでしょか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 6.381308806012385,
+      "haiku_s": 4.972716697026044,
       "jev_s": null,
-      "judge_s": 6.381308806012385,
+      "judge_s": 4.972716697026044,
       "luna_s": null,
-      "total_s": 9.090263216057792,
-      "writer_s": 2.7089544100454077
+      "total_s": 8.91516044200398,
+      "writer_s": 3.942443744977936
     }
   },
   {
@@ -814,16 +806,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e09",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": "no",
         "decision": "haiku",
@@ -835,26 +827,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 484,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 690,
             "effort": "high",
             "input_tokens": 41,
-            "latency_s": 3.440838,
+            "latency_s": 12.334781,
             "model": "claude-haiku-5-5",
-            "output_tokens": 484,
-            "prompt_tokens": 6900,
+            "output_tokens": 690,
+            "prompt_tokens": 6910,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 41,
-              "output_tokens": 484
+              "output_tokens": 690
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男たちは一度も音を出したことがなく、見ている家族も音を聞いたことはない。"
+          "reason": "問題文どおり一度も音を出しておらず、演奏を聞いた事実はないため"
         },
         "jev": null,
         "luna": null
@@ -865,48 +857,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3974,
-          "completion_tokens": 361,
+          "cache_read_input_tokens": 3984,
+          "completion_tokens": 390,
           "effort": "high",
           "input_tokens": 41,
-          "latency_s": 3.99178,
+          "latency_s": 3.003328,
           "model": "claude-haiku-5-5",
-          "output_tokens": 361,
-          "prompt_tokens": 4015,
+          "output_tokens": 390,
+          "prompt_tokens": 4025,
           "refusal_category": null,
           "slot": "判定語 + 一言",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3974,
+            "cache_read_input_tokens": 3984,
             "input_tokens": 41,
-            "output_tokens": 361
+            "output_tokens": 390
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。その調子で次も聞いてごらんね 🧐"
+        "text": "いいえ。ふむふむ、次はどうかな？ 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "見てる人は男たちの演奏を聞いたことがあるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.4411850140895694,
+      "haiku_s": 12.334948470001109,
       "jev_s": null,
-      "judge_s": 3.4411850140895694,
+      "judge_s": 12.334948470001109,
       "luna_s": null,
-      "total_s": 7.433315151138231,
-      "writer_s": 3.9921301370486617
+      "total_s": 15.338978177052923,
+      "writer_s": 3.0040297070518136
     }
   },
   {
@@ -915,16 +906,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e10",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": "irrelevant",
         "decision": "haiku",
@@ -936,26 +927,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 505,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 491,
             "effort": "high",
             "input_tokens": 31,
-            "latency_s": 3.087628,
+            "latency_s": 3.311531,
             "model": "claude-haiku-5-5",
-            "output_tokens": 505,
-            "prompt_tokens": 6890,
+            "output_tokens": 491,
+            "prompt_tokens": 6900,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 31,
-              "output_tokens": 505
+              "output_tokens": 491
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "階段の色や材質は真相にも確定事実にも出てこず、判断できないためirrelevant"
+          "reason": "階段の色・材質は真相にも確定事実にも含まれず、判断できないため。"
         },
         "jev": null,
         "luna": null
@@ -965,49 +956,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3979,
+          "cache_creation_input_tokens": 3989,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 280,
+          "completion_tokens": 234,
           "effort": "high",
           "input_tokens": 31,
-          "latency_s": 2.673685,
+          "latency_s": 2.460136,
           "model": "claude-haiku-5-5",
-          "output_tokens": 280,
-          "prompt_tokens": 4010,
+          "output_tokens": 234,
+          "prompt_tokens": 4020,
           "refusal_category": null,
           "slot": "判定語 + 復唱",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3979,
+            "cache_creation_input_tokens": 3989,
             "cache_read_input_tokens": 0,
             "input_tokens": 31,
-            "output_tokens": 280
+            "output_tokens": 234
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。次はどんなことを聞いてみようか？"
+        "text": "関係ないよ。別のことを聞いてごらん🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "階段の色や材質も関係ありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.0884371490683407,
+      "haiku_s": 3.311942989937961,
       "jev_s": null,
-      "judge_s": 3.0884371490683407,
+      "judge_s": 3.311942989937961,
       "luna_s": null,
-      "total_s": 5.762834267108701,
-      "writer_s": 2.6743971180403605
+      "total_s": 5.77323342685122,
+      "writer_s": 2.4612904369132593
     }
   },
   {
@@ -1016,16 +1006,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e11",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1037,26 +1027,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 600,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 825,
             "effort": "high",
             "input_tokens": 40,
-            "latency_s": 3.869937,
+            "latency_s": 4.976968,
             "model": "claude-haiku-5-5",
-            "output_tokens": 600,
-            "prompt_tokens": 6899,
+            "output_tokens": 825,
+            "prompt_tokens": 6909,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 40,
-              "output_tokens": 600
+              "output_tokens": 825
             }
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "「本物の演奏者か」と「人形か」の2つの質問が含まれているため"
+          "reason": "「本物の演奏者か」と「人形か」の二つの質問が一つのコメントに含まれているため"
         },
         "jev": null,
         "luna": null
@@ -1066,49 +1056,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3973,
+          "cache_creation_input_tokens": 3983,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 265,
+          "completion_tokens": 340,
           "effort": "high",
           "input_tokens": 40,
-          "latency_s": 13.31933,
+          "latency_s": 2.67382,
           "model": "claude-haiku-5-5",
-          "output_tokens": 265,
-          "prompt_tokens": 4013,
+          "output_tokens": 340,
+          "prompt_tokens": 4023,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3973,
+            "cache_creation_input_tokens": 3983,
             "cache_read_input_tokens": 0,
             "input_tokens": 40,
-            "output_tokens": 265
+            "output_tokens": 340
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。ひとつずつ聞いてごらん。"
+        "text": "質問は一つずつコメントしてみてね。まずはどちらか一つから聞いてごらん 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男たちは本物の演奏者なの？それとも人形かなにか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.8701907750219107,
+      "haiku_s": 4.977262575062923,
       "jev_s": null,
-      "judge_s": 3.8701907750219107,
+      "judge_s": 4.977262575062923,
       "luna_s": null,
-      "total_s": 17.191202823072672,
-      "writer_s": 13.321012048050761
+      "total_s": 7.652061088127084,
+      "writer_s": 2.674798513064161
     }
   },
   {
@@ -1117,16 +1106,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e12",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1138,26 +1127,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 303,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 308,
             "effort": "high",
             "input_tokens": 42,
-            "latency_s": 10.658883,
+            "latency_s": 1.980067,
             "model": "claude-haiku-5-5",
-            "output_tokens": 303,
-            "prompt_tokens": 6901,
+            "output_tokens": 308,
+            "prompt_tokens": 6911,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 42,
-              "output_tokens": 303
+              "output_tokens": 308
             }
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "質問が2つ含まれており、まとめて答えると対応が分からなくなるため"
+          "reason": "「毎日来るの？」と「知り合いなの？」の二つの質問が一つのコメントにあるため"
         },
         "jev": null,
         "luna": null
@@ -1167,49 +1156,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3973,
+          "cache_creation_input_tokens": 3983,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 214,
+          "completion_tokens": 190,
           "effort": "high",
           "input_tokens": 42,
-          "latency_s": 1.752543,
+          "latency_s": 1.86674,
           "model": "claude-haiku-5-5",
-          "output_tokens": 214,
-          "prompt_tokens": 4015,
+          "output_tokens": 190,
+          "prompt_tokens": 4025,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3973,
+            "cache_creation_input_tokens": 3983,
             "cache_read_input_tokens": 0,
             "input_tokens": 42,
-            "output_tokens": 214
+            "output_tokens": 190
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてね。ひとつずつ聞いてごらん。"
+        "text": "質問は1つずつコメントしてね。一つずつ聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "見ている人は毎日そこに来るの？男たちと知り合いなの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 10.664598518051207,
+      "haiku_s": 1.9850549580296502,
       "jev_s": null,
-      "judge_s": 10.664598518051207,
+      "judge_s": 1.9850549580296502,
       "luna_s": null,
-      "total_s": 12.417524670017883,
-      "writer_s": 1.7529261519666761
+      "total_s": 3.855795940035023,
+      "writer_s": 1.8707409820053726
     }
   },
   {
@@ -1218,16 +1206,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e13",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1239,26 +1227,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 325,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 347,
             "effort": "high",
             "input_tokens": 46,
-            "latency_s": 2.168904,
+            "latency_s": 2.0946,
             "model": "claude-haiku-5-5",
-            "output_tokens": 325,
-            "prompt_tokens": 6905,
+            "output_tokens": 347,
+            "prompt_tokens": 6915,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 46,
-              "output_tokens": 325
+              "output_tokens": 347
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「どうして」で始まる理由を聞く質問で、はい／いいえで答えられない。"
+          "reason": "「どうして」で始まる理由を問う質問で、はい／いいえでは答えられないため。"
         },
         "jev": null,
         "luna": null
@@ -1268,49 +1256,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3972,
+          "cache_creation_input_tokens": 3982,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 413,
+          "completion_tokens": 385,
           "effort": "high",
           "input_tokens": 46,
-          "latency_s": 2.744389,
+          "latency_s": 2.944205,
           "model": "claude-haiku-5-5",
-          "output_tokens": 413,
-          "prompt_tokens": 4018,
+          "output_tokens": 385,
+          "prompt_tokens": 4028,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3972,
+            "cache_creation_input_tokens": 3982,
             "cache_read_input_tokens": 0,
             "input_tokens": 46,
-            "output_tokens": 413
+            "output_tokens": 385
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "うれしそうなわけを知りたいんだね。はい／いいえで答えられる形で聞き直してごらん。"
+        "text": "その質問は、はい／いいえで答えられる形で聞き直してごらん。誰がうれしそうなのかも書いてくれるかな？"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "音を一度も出したことがないのに、どうしてみんなうれしそうなんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.169821168994531,
+      "haiku_s": 2.0950968670658767,
       "jev_s": null,
-      "judge_s": 2.169821168994531,
+      "judge_s": 2.0950968670658767,
       "luna_s": null,
-      "total_s": 4.914786641020328,
-      "writer_s": 2.7449654720257968
+      "total_s": 5.039943768060766,
+      "writer_s": 2.9448469009948894
     }
   },
   {
@@ -1319,16 +1306,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e14",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1340,26 +1327,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 282,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 324,
             "effort": "high",
             "input_tokens": 35,
-            "latency_s": 1.841851,
+            "latency_s": 2.630308,
             "model": "claude-haiku-5-5",
-            "output_tokens": 282,
-            "prompt_tokens": 6894,
+            "output_tokens": 324,
+            "prompt_tokens": 6904,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 35,
-              "output_tokens": 282
+              "output_tokens": 324
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「何をしている人たちか」は、はい・いいえで答えられない問いのため"
+          "reason": "「何をしている人たち」は、はい・いいえで答えられない質問のため聞き直しを促す"
         },
         "jev": null,
         "luna": null
@@ -1369,49 +1356,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3972,
+          "cache_creation_input_tokens": 3982,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 352,
+          "completion_tokens": 329,
           "effort": "high",
           "input_tokens": 35,
-          "latency_s": 2.374458,
+          "latency_s": 2.705277,
           "model": "claude-haiku-5-5",
-          "output_tokens": 352,
-          "prompt_tokens": 4007,
+          "output_tokens": 329,
+          "prompt_tokens": 4017,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3972,
+            "cache_creation_input_tokens": 3982,
             "cache_read_input_tokens": 0,
             "input_tokens": 35,
-            "output_tokens": 352
+            "output_tokens": 329
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "その聞き方だと答えにくいから、はい／いいえで答えられる形に直して聞いてごらん。"
+        "text": "それは答えにくいから、はい／いいえで答えられる形で聞いてみようか。ひとつずつ質問してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "この男たちは何をしている人たちなんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.8424026990542188,
+      "haiku_s": 2.6305642800871283,
       "jev_s": null,
-      "judge_s": 1.8424026990542188,
+      "judge_s": 2.6305642800871283,
       "luna_s": null,
-      "total_s": 4.217548065120354,
-      "writer_s": 2.3751453660661355
+      "total_s": 5.336478332057595,
+      "writer_s": 2.705914051970467
     }
   },
   {
@@ -1420,16 +1406,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e15",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1441,26 +1427,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 367,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 460,
             "effort": "high",
             "input_tokens": 42,
-            "latency_s": 2.91139,
+            "latency_s": 2.803797,
             "model": "claude-haiku-5-5",
-            "output_tokens": 367,
-            "prompt_tokens": 6901,
+            "output_tokens": 460,
+            "prompt_tokens": 6911,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 42,
-              "output_tokens": 367
+              "output_tokens": 460
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「誰が何を見て」と問う、はい／いいえで答えられない質問のため"
+          "reason": "「誰が何を」と問う形で、はい／いいえで答えられない質問のため。"
         },
         "jev": null,
         "luna": null
@@ -1471,48 +1457,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3972,
-          "completion_tokens": 372,
+          "cache_read_input_tokens": 3982,
+          "completion_tokens": 357,
           "effort": "high",
           "input_tokens": 42,
-          "latency_s": 2.597979,
+          "latency_s": 2.821075,
           "model": "claude-haiku-5-5",
-          "output_tokens": 372,
-          "prompt_tokens": 4014,
+          "output_tokens": 357,
+          "prompt_tokens": 4024,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3972,
+            "cache_read_input_tokens": 3982,
             "input_tokens": 42,
-            "output_tokens": 372
+            "output_tokens": 357
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "もう少し知りたいんだね。はい／いいえで答えられる形で聞いてごらん。誰のことかも書いてね。"
+        "text": "もう少し知りたいんだね。はい／いいえで答えられる形で聞いてごらん。誰のことか、何のことか書いてくれると嬉しいな。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "誰が何を見て喜んでいるのか、もう少し知りたいです。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.9116787989623845,
+      "haiku_s": 2.8040869350079447,
       "jev_s": null,
-      "judge_s": 2.9116787989623845,
+      "judge_s": 2.8040869350079447,
       "luna_s": null,
-      "total_s": 5.510578900924884,
-      "writer_s": 2.5989001019624993
+      "total_s": 5.625568508985452,
+      "writer_s": 2.8214815739775077
     }
   },
   {
@@ -1521,16 +1506,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e16",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1542,26 +1527,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 799,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 813,
             "effort": "high",
             "input_tokens": 36,
-            "latency_s": 4.009676,
+            "latency_s": 3.990583,
             "model": "claude-haiku-5-5",
-            "output_tokens": 799,
-            "prompt_tokens": 6895,
+            "output_tokens": 813,
+            "prompt_tokens": 6905,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 36,
-              "output_tokens": 799
+              "output_tokens": 813
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "五人囃子のひな人形と特定しており、要点1を当てていて誤りもない。"
+          "reason": "五人囃子のひな人形と特定しており、要点1を当てている。明らかな誤りもない。"
         },
         "jev": null,
         "luna": null
@@ -1571,49 +1556,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3974,
+          "cache_creation_input_tokens": 3984,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 687,
+          "completion_tokens": 352,
           "effort": "high",
           "input_tokens": 36,
-          "latency_s": 4.197296,
+          "latency_s": 2.590218,
           "model": "claude-haiku-5-5",
-          "output_tokens": 687,
-          "prompt_tokens": 4010,
+          "output_tokens": 352,
+          "prompt_tokens": 4020,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3974,
+            "cache_creation_input_tokens": 3984,
             "cache_read_input_tokens": 0,
             "input_tokens": 36,
-            "output_tokens": 687
+            "output_tokens": 352
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちはひな祭りの五人囃子だったんだ。家族が毎年この時期に飾って、女の子のお祝いを楽しんでいたんだよ。"
+        "text": "正解！男たちは五人囃子のひな人形で、階段はひな祭りの段飾りだったんだ。毎年この時期に飾って、家族は女の子のお祝いを楽しんでいるんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男たちは五人囃子のひな人形だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.009972349042073,
+      "haiku_s": 3.990692990948446,
       "jev_s": null,
-      "judge_s": 4.009972349042073,
+      "judge_s": 3.990692990948446,
       "luna_s": null,
-      "total_s": 8.208552898140624,
-      "writer_s": 4.198580549098551
+      "total_s": 6.5812802138971165,
+      "writer_s": 2.5905872229486704
     }
   },
   {
@@ -1622,16 +1606,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e17",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1643,26 +1627,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 1011,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 946,
             "effort": "high",
             "input_tokens": 74,
-            "latency_s": 4.67162,
+            "latency_s": 4.418867,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1011,
-            "prompt_tokens": 6933,
+            "output_tokens": 946,
+            "prompt_tokens": 6943,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 74,
-              "output_tokens": 1011
+              "output_tokens": 946
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "五人囃子の人形と段飾りを挙げ、要点1を当てている。明らかな誤りなし。"
+          "reason": "五人囃子・段飾りの人形と特定し、家族の喜びも真相どおりで誤りなし"
         },
         "jev": null,
         "luna": null
@@ -1672,49 +1656,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3974,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 402,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3984,
+          "completion_tokens": 452,
           "effort": "high",
           "input_tokens": 74,
-          "latency_s": 3.774309,
+          "latency_s": 3.514539,
           "model": "claude-haiku-5-5",
-          "output_tokens": 402,
-          "prompt_tokens": 4048,
+          "output_tokens": 452,
+          "prompt_tokens": 4058,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3974,
-            "cache_read_input_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3984,
             "input_tokens": 74,
-            "output_tokens": 402
+            "output_tokens": 452
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちはひな祭りの五人囃子の人形だったんだよ。毎年この時期に段飾りとして飾られて、家族はお祝いを楽しみながら眺めているんだ。"
+        "text": "正解！男たちはひな人形の五人囃子だったんだよ。毎年ひな祭りの時期に段飾りを飾って、女の子のお祝いを楽しんでいたんだ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "段飾りに並ぶ五人囃子の人形だったんだね。人形だから音は出ないけど、家族は飾っている間うれしそうに眺めてたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.67422181495931,
+      "haiku_s": 4.419076668913476,
       "jev_s": null,
-      "judge_s": 4.67422181495931,
+      "judge_s": 4.419076668913476,
       "luna_s": null,
-      "total_s": 8.44914160890039,
-      "writer_s": 3.7749197939410806
+      "total_s": 7.937807984882966,
+      "writer_s": 3.5187313159694895
     }
   },
   {
@@ -1723,16 +1706,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e18",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1744,26 +1727,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 415,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 679,
             "effort": "high",
             "input_tokens": 40,
-            "latency_s": 3.247727,
+            "latency_s": 4.190126,
             "model": "claude-haiku-5-5",
-            "output_tokens": 415,
-            "prompt_tokens": 6899,
+            "output_tokens": 679,
+            "prompt_tokens": 6909,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 40,
-              "output_tokens": 415
+              "output_tokens": 679
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "人形だと述べているが、ひな祭りの人形とは特定していないため guess_close"
+          "reason": "男たちが人形だと述べ要点に触れたが、ひな人形とまでは特定していない"
         },
         "jev": null,
         "luna": null
@@ -1773,49 +1756,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3973,
+          "cache_creation_input_tokens": 3983,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 296,
+          "completion_tokens": 281,
           "effort": "high",
           "input_tokens": 40,
-          "latency_s": 2.724063,
+          "latency_s": 2.510706,
           "model": "claude-haiku-5-5",
-          "output_tokens": 296,
-          "prompt_tokens": 4013,
+          "output_tokens": 281,
+          "prompt_tokens": 4023,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3973,
+            "cache_creation_input_tokens": 3983,
             "cache_read_input_tokens": 0,
             "input_tokens": 40,
-            "output_tokens": 296
+            "output_tokens": 281
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらん。どこが足りないか、考えてみようか 🧐"
+        "text": "惜しい！もうひと推理してみようか 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男たちは人形なんでしょ。だから音を出さないんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.248155673034489,
+      "haiku_s": 4.190436228993349,
       "jev_s": null,
-      "judge_s": 3.248155673034489,
+      "judge_s": 4.190436228993349,
       "luna_s": null,
-      "total_s": 5.97253588901367,
-      "writer_s": 2.7243802159791812
+      "total_s": 6.702065106015652,
+      "writer_s": 2.5116288770223036
     }
   },
   {
@@ -1824,16 +1806,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e19",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1845,26 +1827,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
+            "cache_read_input_tokens": 6869,
             "completion_tokens": 536,
             "effort": "high",
             "input_tokens": 69,
-            "latency_s": 3.914834,
+            "latency_s": 3.085565,
             "model": "claude-haiku-5-5",
             "output_tokens": 536,
-            "prompt_tokens": 6928,
+            "prompt_tokens": 6938,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 69,
               "output_tokens": 536
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "五人囃子のひな人形と当てたが、楽器が本当に鳴るという明らかな誤りを含むため惜しい判定"
+          "reason": "要点1の五人囃子のひな人形は当てたが、音が鳴るとする点は確定事実と食い違う明らかな誤り。"
         },
         "jev": null,
         "luna": null
@@ -1874,49 +1856,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3973,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 338,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3983,
+          "completion_tokens": 333,
           "effort": "high",
           "input_tokens": 69,
-          "latency_s": 2.383241,
+          "latency_s": 4.924208,
           "model": "claude-haiku-5-5",
-          "output_tokens": 338,
-          "prompt_tokens": 4042,
+          "output_tokens": 333,
+          "prompt_tokens": 4052,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3973,
-            "cache_read_input_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3983,
             "input_tokens": 69,
-            "output_tokens": 338
+            "output_tokens": 333
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらん 🧐"
+        "text": "惜しい！もう少し推理を続けてみようか。🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男たちは五人囃子のひな人形で、飾ると本当に笛や太鼓の音が鳴るから、みんな毎日見に来るんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.9152109959395602,
+      "haiku_s": 3.0856721219606698,
       "jev_s": null,
-      "judge_s": 3.9152109959395602,
+      "judge_s": 3.0856721219606698,
       "luna_s": null,
-      "total_s": 6.298876503948122,
-      "writer_s": 2.383665508008562
+      "total_s": 8.010911041870713,
+      "writer_s": 4.9252389199100435
     }
   },
   {
@@ -1925,16 +1906,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e20",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -1946,26 +1927,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 341,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 332,
             "effort": "high",
             "input_tokens": 46,
-            "latency_s": 2.206703,
+            "latency_s": 2.707335,
             "model": "claude-haiku-5-5",
-            "output_tokens": 341,
-            "prompt_tokens": 6905,
+            "output_tokens": 332,
+            "prompt_tokens": 6915,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 46,
-              "output_tokens": 341
+              "output_tokens": 332
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "演奏会や楽団の話で、男たちが人形だという要点に触れていない"
+          "reason": "演奏会前の写真という楽団の話で、人形という要点に触れていないため"
         },
         "jev": null,
         "luna": null
@@ -1975,49 +1956,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3975,
+          "cache_creation_input_tokens": 3985,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 230,
+          "completion_tokens": 238,
           "effort": "high",
           "input_tokens": 46,
-          "latency_s": 2.245198,
+          "latency_s": 2.131773,
           "model": "claude-haiku-5-5",
-          "output_tokens": 230,
-          "prompt_tokens": 4021,
+          "output_tokens": 238,
+          "prompt_tokens": 4031,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3975,
+            "cache_creation_input_tokens": 3985,
             "cache_read_input_tokens": 0,
             "input_tokens": 46,
-            "output_tokens": 230
+            "output_tokens": 238
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。もう一度ゆっくり考えてごらん 🤔"
+        "text": "残念、ちがうよ。もう一度ゆっくり考えてごらん 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "演奏会の前に並んで写真を撮るのが恒例になってたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.2074261109810323,
+      "haiku_s": 2.707671081996523,
       "jev_s": null,
-      "judge_s": 2.2074261109810323,
+      "judge_s": 2.707671081996523,
       "luna_s": null,
-      "total_s": 4.453447507927194,
-      "writer_s": 2.246021396946162
+      "total_s": 4.839992199093103,
+      "writer_s": 2.1323211170965806
     }
   },
   {
@@ -2026,16 +2006,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-e21",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2047,26 +2027,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 423,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 339,
             "effort": "high",
             "input_tokens": 46,
-            "latency_s": 2.7586,
+            "latency_s": 2.805751,
             "model": "claude-haiku-5-5",
-            "output_tokens": 423,
-            "prompt_tokens": 6905,
+            "output_tokens": 339,
+            "prompt_tokens": 6915,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 46,
-              "output_tokens": 423
+              "output_tokens": 339
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "男たちを銅像とし、見ているのを観光客とする説明は誤りで、人形には触れていない。"
+          "reason": "銅像や観光客は誤りで、人形という要点に触れていない"
         },
         "jev": null,
         "luna": null
@@ -2076,49 +2056,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3975,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 250,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3985,
+          "completion_tokens": 219,
           "effort": "high",
           "input_tokens": 46,
-          "latency_s": 1.883969,
+          "latency_s": 2.314297,
           "model": "claude-haiku-5-5",
-          "output_tokens": 250,
-          "prompt_tokens": 4021,
+          "output_tokens": 219,
+          "prompt_tokens": 4031,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3975,
-            "cache_read_input_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3985,
             "input_tokens": 46,
-            "output_tokens": 250
+            "output_tokens": 219
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。別の考えも試してごらん。"
+        "text": "残念、ちがうよ。もう少し考えてごらん 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男たちは楽器を持った銅像で、観光客が見に来てるんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.7591747770784423,
+      "haiku_s": 2.806082478025928,
       "jev_s": null,
-      "judge_s": 2.7591747770784423,
+      "judge_s": 2.806082478025928,
       "luna_s": null,
-      "total_s": 4.646947424043901,
-      "writer_s": 1.887772646965459
+      "total_s": 5.120930972043425,
+      "writer_s": 2.3148484940174967
     }
   },
   {
@@ -2127,16 +2106,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-k01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2148,26 +2127,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 1247,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 821,
             "effort": "high",
             "input_tokens": 54,
-            "latency_s": 5.807604,
+            "latency_s": 4.087649,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1247,
-            "prompt_tokens": 6913,
+            "output_tokens": 821,
+            "prompt_tokens": 6923,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 54,
-              "output_tokens": 1247
+              "output_tokens": 821
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "五人囃子と段飾りを挙げ、ひな人形と特定。家族が毎年飾る点も一致し、明らかな誤りはない。"
+          "reason": "五人囃子＝ひな人形と特定し、毎年飾って眺める点も合っているため当てた。"
         },
         "jev": null,
         "luna": null
@@ -2178,48 +2157,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3974,
-          "completion_tokens": 404,
+          "cache_read_input_tokens": 3984,
+          "completion_tokens": 452,
           "effort": "high",
           "input_tokens": 54,
-          "latency_s": 2.221284,
+          "latency_s": 2.34812,
           "model": "claude-haiku-5-5",
-          "output_tokens": 404,
-          "prompt_tokens": 4028,
+          "output_tokens": 452,
+          "prompt_tokens": 4038,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3974,
+            "cache_read_input_tokens": 3984,
             "input_tokens": 54,
-            "output_tokens": 404
+            "output_tokens": 452
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！ひな祭りの時期に飾る、五人囃子のひな人形たちだったんだ。女の子のお祝いを楽しみながら、家族は毎年眺めていたんだよ。"
+        "text": "正解！男たちはひな人形の五人囃子だったんだ。ひな祭りの時期に毎年段飾りを飾って、女の子のお祝いを楽しんでいたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "節句の段飾りにいる五人囃子の人形を、家族が毎年飾って眺めてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 5.811895619961433,
+      "haiku_s": 4.087831137003377,
       "jev_s": null,
-      "judge_s": 5.811895619961433,
+      "judge_s": 4.087831137003377,
       "luna_s": null,
-      "total_s": 8.033394195954315,
-      "writer_s": 2.2214985759928823
+      "total_s": 6.436379538034089,
+      "writer_s": 2.348548401030712
     }
   },
   {
@@ -2228,20 +2206,20 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-k02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
-        "kind": "guess_correct"
+        "kind": "guess_close"
       },
       "judgements": {
         "haiku": {
@@ -2249,26 +2227,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 1315,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 757,
             "effort": "high",
             "input_tokens": 60,
-            "latency_s": 6.451266,
+            "latency_s": 4.644095,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1315,
-            "prompt_tokens": 6919,
+            "output_tokens": 757,
+            "prompt_tokens": 6929,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 60,
-              "output_tokens": 1315
+              "output_tokens": 757
             }
           },
           "error": null,
-          "kind": "guess_correct",
-          "reason": "ひな壇・人形・飾りの楽器から、ひな人形（五人囃子）だと当てている。明らかな誤りもない。"
+          "kind": "guess_close",
+          "reason": "ひな壇の人形と捉えた点は要点に触れるが、楽団とする説明は真相と食い違う明らかな誤り。"
         },
         "jev": null,
         "luna": null
@@ -2279,48 +2257,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3974,
-          "completion_tokens": 486,
+          "cache_read_input_tokens": 3983,
+          "completion_tokens": 339,
           "effort": "high",
           "input_tokens": 60,
-          "latency_s": 2.618996,
+          "latency_s": 2.272795,
           "model": "claude-haiku-5-5",
-          "output_tokens": 486,
-          "prompt_tokens": 4034,
+          "output_tokens": 339,
+          "prompt_tokens": 4043,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3974,
+            "cache_read_input_tokens": 3983,
             "input_tokens": 60,
-            "output_tokens": 486
+            "output_tokens": 339
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！男たちは、ひな祭りの五人囃子のお人形だったんだ。毎年ひな祭りの時期に段飾りとして飾られ、女の子のお祝いを楽しむ家族が眺めていたんだよ。"
+        "text": "惜しい！もう少し考えを進めてごらん 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "ひな壇に並んだ小さな人形の楽団で、笛や太鼓は飾りとして持っているだけなんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 6.451828719931655,
+      "haiku_s": 4.6444053290179,
       "jev_s": null,
-      "judge_s": 6.451828719931655,
+      "judge_s": 4.6444053290179,
       "luna_s": null,
-      "total_s": 9.071572231943719,
-      "writer_s": 2.6197435120120645
+      "total_s": 6.918030180968344,
+      "writer_s": 2.2736248519504443
     }
   },
   {
@@ -2329,16 +2306,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-k03",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2350,26 +2327,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 646,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 719,
             "effort": "high",
             "input_tokens": 53,
-            "latency_s": 3.77784,
+            "latency_s": 4.228128,
             "model": "claude-haiku-5-5",
-            "output_tokens": 646,
-            "prompt_tokens": 6912,
+            "output_tokens": 719,
+            "prompt_tokens": 6922,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 53,
-              "output_tokens": 646
+              "output_tokens": 719
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "人形だと述べ、要点1に触れている。ひな人形と特定できていないため近いが正解ではない。"
+          "reason": "段に並ぶ人形と述べ触れたが、ひな祭りの人形とは特定していないため"
         },
         "jev": null,
         "luna": null
@@ -2380,48 +2357,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3973,
-          "completion_tokens": 332,
+          "cache_read_input_tokens": 3983,
+          "completion_tokens": 357,
           "effort": "high",
           "input_tokens": 53,
-          "latency_s": 2.850948,
+          "latency_s": 2.624266,
           "model": "claude-haiku-5-5",
-          "output_tokens": 332,
-          "prompt_tokens": 4026,
+          "output_tokens": 357,
+          "prompt_tokens": 4036,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3973,
+            "cache_read_input_tokens": 3983,
             "input_tokens": 53,
-            "output_tokens": 332
+            "output_tokens": 357
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらん 🧐"
+        "text": "惜しい！もう少し推理を続けてごらん。どんな場面なのか、もっと想像してみようか 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "段に飾られた人形たちで、楽器を構えた姿を家族が毎日眺めていたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.7784654630813748,
+      "haiku_s": 4.228524946956895,
       "jev_s": null,
-      "judge_s": 3.7784654630813748,
+      "judge_s": 4.228524946956895,
       "luna_s": null,
-      "total_s": 6.630076357163489,
-      "writer_s": 2.851610894082114
+      "total_s": 6.853048871969804,
+      "writer_s": 2.624523925012909
     }
   },
   {
@@ -2430,16 +2406,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-k04",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2451,26 +2427,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 568,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 497,
             "effort": "high",
             "input_tokens": 56,
-            "latency_s": 3.445834,
+            "latency_s": 3.015545,
             "model": "claude-haiku-5-5",
-            "output_tokens": 568,
-            "prompt_tokens": 6915,
+            "output_tokens": 497,
+            "prompt_tokens": 6925,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 56,
-              "output_tokens": 568
+              "output_tokens": 497
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "人形と述べ触れているが、ひな祭りの人形とは特定していないため惜しい"
+          "reason": "人形だと述べているが、ひな人形と特定していないため惜しい判定"
         },
         "jev": null,
         "luna": null
@@ -2481,48 +2457,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3973,
-          "completion_tokens": 407,
+          "cache_read_input_tokens": 3983,
+          "completion_tokens": 524,
           "effort": "high",
           "input_tokens": 56,
-          "latency_s": 12.454981,
+          "latency_s": 3.690816,
           "model": "claude-haiku-5-5",
-          "output_tokens": 407,
-          "prompt_tokens": 4029,
+          "output_tokens": 524,
+          "prompt_tokens": 4039,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3973,
+            "cache_read_input_tokens": 3983,
             "input_tokens": 56,
-            "output_tokens": 407
+            "output_tokens": 524
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！その調子で、もう少し推理を続けてごらん 🧐"
+        "text": "惜しい！もう少し推理を続けてごらん。その調子で考えてみようか 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "楽器を手にして階段状に並ぶ飾り人形で、実際に演奏する人はいなかったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.4461057430598885,
+      "haiku_s": 3.015849116956815,
       "jev_s": null,
-      "judge_s": 3.4461057430598885,
+      "judge_s": 3.015849116956815,
       "luna_s": null,
-      "total_s": 15.901611853041686,
-      "writer_s": 12.455506109981798
+      "total_s": 6.707361620967276,
+      "writer_s": 3.6915125040104613
     }
   },
   {
@@ -2531,16 +2506,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-k05",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2552,26 +2527,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 590,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 587,
             "effort": "high",
             "input_tokens": 48,
-            "latency_s": 3.47625,
+            "latency_s": 3.46202,
             "model": "claude-haiku-5-5",
-            "output_tokens": 590,
-            "prompt_tokens": 6907,
+            "output_tokens": 587,
+            "prompt_tokens": 6917,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 48,
-              "output_tokens": 590
+              "output_tokens": 587
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "人形だと述べ要点に触れているが、ひな祭りの人形とは特定していない"
+          "reason": "人形に触れているが、ひな祭りとの結びつきを述べていないため惜しい止まり"
         },
         "jev": null,
         "luna": null
@@ -2582,48 +2557,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3973,
-          "completion_tokens": 337,
+          "cache_read_input_tokens": 3983,
+          "completion_tokens": 304,
           "effort": "high",
           "input_tokens": 48,
-          "latency_s": 2.61342,
+          "latency_s": 2.301075,
           "model": "claude-haiku-5-5",
-          "output_tokens": 337,
-          "prompt_tokens": 4021,
+          "output_tokens": 304,
+          "prompt_tokens": 4031,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3973,
+            "cache_read_input_tokens": 3983,
             "input_tokens": 48,
-            "output_tokens": 337
+            "output_tokens": 304
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらん 🧐"
+        "text": "惜しい！もうひと押し、推理を続けてみようか 🤔"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男たちは本物の演奏者じゃなく、家に飾っておく人形だったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.4767062400933355,
+      "haiku_s": 3.462310294038616,
       "jev_s": null,
-      "judge_s": 3.4767062400933355,
+      "judge_s": 3.462310294038616,
       "luna_s": null,
-      "total_s": 6.0936014441540465,
-      "writer_s": 2.616895204060711
+      "total_s": 5.7638739419635385,
+      "writer_s": 2.3015636479249224
     }
   },
   {
@@ -2632,16 +2606,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-k06",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2653,26 +2627,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 470,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 406,
             "effort": "high",
             "input_tokens": 57,
-            "latency_s": 2.839918,
+            "latency_s": 2.656537,
             "model": "claude-haiku-5-5",
-            "output_tokens": 470,
-            "prompt_tokens": 6916,
+            "output_tokens": 406,
+            "prompt_tokens": 6926,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 57,
-              "output_tokens": 470
+              "output_tokens": 406
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "男たちを絵とする推理で、要点の人形には触れていない"
+          "reason": "絵だと述べており、要点のひな人形には触れていないため不正解"
         },
         "jev": null,
         "luna": null
@@ -2683,48 +2657,47 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "reply": {
         "debug": {
           "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3975,
-          "completion_tokens": 276,
+          "cache_read_input_tokens": 3985,
+          "completion_tokens": 237,
           "effort": "high",
           "input_tokens": 57,
-          "latency_s": 2.613871,
+          "latency_s": 1.79473,
           "model": "claude-haiku-5-5",
-          "output_tokens": 276,
-          "prompt_tokens": 4032,
+          "output_tokens": 237,
+          "prompt_tokens": 4042,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3975,
+            "cache_read_input_tokens": 3985,
             "input_tokens": 57,
-            "output_tokens": 276
+            "output_tokens": 237
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。もう一度よく考えてみようか。"
+        "text": "残念、ちがうよ。もう一度、ゆっくり考えてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男たちは階段を背景にした一枚の絵で、楽器を持つ姿が描かれているだけだったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.840131929027848,
+      "haiku_s": 2.6623395069036633,
       "jev_s": null,
-      "judge_s": 2.840131929027848,
+      "judge_s": 2.6623395069036633,
       "luna_s": null,
-      "total_s": 5.454467146075331,
-      "writer_s": 2.6143352170474827
+      "total_s": 4.46198197780177,
+      "writer_s": 1.7996424708981067
     }
   },
   {
@@ -2733,18 +2706,18 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-t01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [
         "writer: writer did not ask what bare_term means"
       ],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2756,26 +2729,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": "五人囃子",
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 372,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 264,
             "effort": "high",
             "input_tokens": 22,
-            "latency_s": 2.242816,
+            "latency_s": 1.870018,
             "model": "claude-haiku-5-5",
-            "output_tokens": 372,
-            "prompt_tokens": 6881,
+            "output_tokens": 264,
+            "prompt_tokens": 6891,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 22,
-              "output_tokens": 372
+              "output_tokens": 264
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語だけのコメントなので、聞き直しを促す"
+          "reason": "述語のない語だけのコメントのため、聞き直しを促す"
         },
         "jev": null,
         "luna": null
@@ -2785,23 +2758,23 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3977,
+          "cache_creation_input_tokens": 3987,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 493,
+          "completion_tokens": 250,
           "effort": "high",
           "input_tokens": 22,
-          "latency_s": 2.677117,
+          "latency_s": 2.373361,
           "model": "claude-haiku-5-5",
-          "output_tokens": 493,
-          "prompt_tokens": 3999,
+          "output_tokens": 250,
+          "prompt_tokens": 4009,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3977,
+            "cache_creation_input_tokens": 3987,
             "cache_read_input_tokens": 0,
             "input_tokens": 22,
-            "output_tokens": 493
+            "output_tokens": 250
           }
         },
         "guard": null,
@@ -2812,22 +2785,21 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "五人囃子？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.2431381930364296,
+      "haiku_s": 1.870189027977176,
       "jev_s": null,
-      "judge_s": 2.2431381930364296,
+      "judge_s": 1.870189027977176,
       "luna_s": null,
-      "total_s": 4.92149493098259,
-      "writer_s": 2.67835673794616
+      "total_s": 4.245006288983859,
+      "writer_s": 2.374817261006683
     }
   },
   {
@@ -2836,16 +2808,18 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "U12-t02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
-      "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "errors": [
+        "writer: writer did not ask what bare_term means"
+      ],
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2857,26 +2831,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": "カラオケ",
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 323,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 290,
             "effort": "high",
             "input_tokens": 21,
-            "latency_s": 2.008309,
+            "latency_s": 2.113891,
             "model": "claude-haiku-5-5",
-            "output_tokens": 323,
-            "prompt_tokens": 6880,
+            "output_tokens": 290,
+            "prompt_tokens": 6890,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 21,
-              "output_tokens": 323
+              "output_tokens": 290
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語だけのコメントなので、はい・いいえで答えられる形で聞き直してもらう"
+          "reason": "述語のない語だけのコメントで、何を聞きたいのか決まらないため"
         },
         "jev": null,
         "luna": null
@@ -2886,49 +2860,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3976,
+          "cache_creation_input_tokens": 3986,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 322,
+          "completion_tokens": 396,
           "effort": "high",
           "input_tokens": 21,
-          "latency_s": 2.435779,
+          "latency_s": 3.101311,
           "model": "claude-haiku-5-5",
-          "output_tokens": 322,
-          "prompt_tokens": 3997,
+          "output_tokens": 396,
+          "prompt_tokens": 4007,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3976,
+            "cache_creation_input_tokens": 3986,
             "cache_read_input_tokens": 0,
             "input_tokens": 21,
-            "output_tokens": 322
+            "output_tokens": 396
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "llm",
-        "text": "カラオケの何が知りたいのかな？はい／いいえで答えられる形で聞き直してごらん 🧐"
+        "source": "fallback_template",
+        "text": "何がカラオケなのか教えてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "カラオケ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.0087994140340015,
+      "haiku_s": 2.114273336948827,
       "jev_s": null,
-      "judge_s": 2.0087994140340015,
+      "judge_s": 2.114273336948827,
       "luna_s": null,
-      "total_s": 4.4453283860348165,
-      "writer_s": 2.436528972000815
+      "total_s": 5.21629634895362,
+      "writer_s": 3.1020230120047927
     }
   },
   {
@@ -2937,16 +2910,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "c-ask_hint-02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -2957,19 +2930,19 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "answer": null,
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 6859,
+            "cache_creation_input_tokens": 6869,
             "cache_read_input_tokens": 0,
             "completion_tokens": 260,
             "effort": "high",
             "input_tokens": 31,
-            "latency_s": 2.328074,
+            "latency_s": 2.20302,
             "model": "claude-haiku-5-5",
             "output_tokens": 260,
-            "prompt_tokens": 6890,
+            "prompt_tokens": 6900,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 6859,
+              "cache_creation_input_tokens": 6869,
               "cache_read_input_tokens": 0,
               "input_tokens": 31,
               "output_tokens": 260
@@ -2977,7 +2950,7 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           },
           "error": null,
           "kind": "ask_hint",
-          "reason": "ヒントを求める発言のため、質問で絞るよう促す"
+          "reason": "ヒントを求める発言のため、質問で絞るよう案内した。"
         },
         "jev": null,
         "luna": null
@@ -2987,49 +2960,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3974,
+          "cache_creation_input_tokens": 3984,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 39,
+          "completion_tokens": 57,
           "effort": "high",
           "input_tokens": 31,
-          "latency_s": 1.456386,
+          "latency_s": 1.65147,
           "model": "claude-haiku-5-5",
-          "output_tokens": 39,
-          "prompt_tokens": 4005,
+          "output_tokens": 57,
+          "prompt_tokens": 4015,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3974,
+            "cache_creation_input_tokens": 3984,
             "cache_read_input_tokens": 0,
             "input_tokens": 31,
-            "output_tokens": 39
+            "output_tokens": 57
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ヒントは出さないけど、質問で少しずつ絞っていこうね！😉"
+        "text": "ヒントは出さないよ。はい・いいえで答えられる質問をコメントしてごらん、少しずつ絞っていこうか。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "ちょっとだけヒントほしい〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.3388222800567746,
+      "haiku_s": 2.214793852996081,
       "jev_s": null,
-      "judge_s": 2.3388222800567746,
+      "judge_s": 2.214793852996081,
       "luna_s": null,
-      "total_s": 3.795621974975802,
-      "writer_s": 1.4567996949190274
+      "total_s": 3.8777191799599677,
+      "writer_s": 1.6629253269638866
     }
   },
   {
@@ -3038,16 +3010,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "c-impression-01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -3059,26 +3031,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 211,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 71,
             "effort": "high",
             "input_tokens": 25,
-            "latency_s": 1.914293,
+            "latency_s": 1.567726,
             "model": "claude-haiku-5-5",
-            "output_tokens": 211,
-            "prompt_tokens": 6884,
+            "output_tokens": 71,
+            "prompt_tokens": 6894,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 25,
-              "output_tokens": 211
+              "output_tokens": 71
             }
           },
           "error": null,
           "kind": "impression",
-          "reason": "問題への好意的な感想。質問や推理を含まない"
+          "reason": "問題シリーズへの好意的な感想"
         },
         "jev": null,
         "luna": null
@@ -3088,49 +3060,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3971,
+          "cache_creation_input_tokens": 3981,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 24,
+          "completion_tokens": 28,
           "effort": "high",
           "input_tokens": 25,
-          "latency_s": 0.794219,
+          "latency_s": 1.365488,
           "model": "claude-haiku-5-5",
-          "output_tokens": 24,
-          "prompt_tokens": 3996,
+          "output_tokens": 28,
+          "prompt_tokens": 4006,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3971,
+            "cache_creation_input_tokens": 3981,
             "cache_read_input_tokens": 0,
             "input_tokens": 25,
-            "output_tokens": 24
+            "output_tokens": 28
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう、うれしいな！😌"
+        "text": "ありがとう！これからも楽しんでね 😌"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "このシリーズ好き！",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.9145311849424616,
+      "haiku_s": 1.5680120959877968,
       "jev_s": null,
-      "judge_s": 1.9145311849424616,
+      "judge_s": 1.5680120959877968,
       "luna_s": null,
-      "total_s": 2.709017219953239,
-      "writer_s": 0.7944860350107774
+      "total_s": 2.9338734269840643,
+      "writer_s": 1.3658613309962675
     }
   },
   {
@@ -3139,16 +3110,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "c-cheer-05",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -3160,26 +3131,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 450,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 295,
             "effort": "high",
             "input_tokens": 31,
-            "latency_s": 2.704091,
+            "latency_s": 2.320864,
             "model": "claude-haiku-5-5",
-            "output_tokens": 450,
-            "prompt_tokens": 6890,
+            "output_tokens": 295,
+            "prompt_tokens": 6900,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 31,
-              "output_tokens": 450
+              "output_tokens": 295
             }
           },
           "error": null,
           "kind": "cheer",
-          "reason": "アカウントへの応援と継続のお願い。問題や真相には触れていない。"
+          "reason": "アカウントが好きで続けてほしいという応援のコメントで、問題への推理や質問ではない。"
         },
         "jev": null,
         "luna": null
@@ -3189,49 +3160,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3972,
+          "cache_creation_input_tokens": 3982,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 35,
+          "completion_tokens": 32,
           "effort": "high",
           "input_tokens": 31,
-          "latency_s": 1.582577,
+          "latency_s": 1.374733,
           "model": "claude-haiku-5-5",
-          "output_tokens": 35,
-          "prompt_tokens": 4003,
+          "output_tokens": 32,
+          "prompt_tokens": 4013,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3972,
+            "cache_creation_input_tokens": 3982,
             "cache_read_input_tokens": 0,
             "input_tokens": 31,
-            "output_tokens": 35
+            "output_tokens": 32
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう！これからも楽しい問題を出していくからね 🥳"
+        "text": "ありがとう！これからも楽しんでいこうね 🥳"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "このアカウント好きだから続けてほしい",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.7046456850366667,
+      "haiku_s": 2.3211629550205544,
       "jev_s": null,
-      "judge_s": 2.7046456850366667,
+      "judge_s": 2.3211629550205544,
       "luna_s": null,
-      "total_s": 4.288301659049466,
-      "writer_s": 1.5836559740127996
+      "total_s": 3.697018360020593,
+      "writer_s": 1.3758554050000384
     }
   },
   {
@@ -3240,16 +3210,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "c-complaint-04",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -3261,26 +3231,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 210,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 207,
             "effort": "high",
             "input_tokens": 28,
-            "latency_s": 2.207895,
+            "latency_s": 1.939809,
             "model": "claude-haiku-5-5",
-            "output_tokens": 210,
-            "prompt_tokens": 6887,
+            "output_tokens": 207,
+            "prompt_tokens": 6897,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 28,
-              "output_tokens": 210
+              "output_tokens": 207
             }
           },
           "error": null,
           "kind": "complaint",
-          "reason": "問題文の矛盾を指摘するクレームなので、お礼と確認の旨だけ返す"
+          "reason": "問題文の矛盾を指摘しているため、お礼と確認の旨のみを返す。"
         },
         "jev": null,
         "luna": null
@@ -3290,49 +3260,48 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3972,
+          "cache_creation_input_tokens": 3982,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 116,
+          "completion_tokens": 206,
           "effort": "high",
           "input_tokens": 28,
-          "latency_s": 1.934044,
+          "latency_s": 1.979244,
           "model": "claude-haiku-5-5",
-          "output_tokens": 116,
-          "prompt_tokens": 4000,
+          "output_tokens": 206,
+          "prompt_tokens": 4010,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3972,
+            "cache_creation_input_tokens": 3982,
             "cache_read_input_tokens": 0,
             "input_tokens": 28,
-            "output_tokens": 116
+            "output_tokens": 206
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ご意見ありがとう。確認するね。"
+        "text": "教えてくれてありがとう！確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "問題文に矛盾があると思います",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.208250041003339,
+      "haiku_s": 1.9401089899474755,
       "jev_s": null,
-      "judge_s": 2.208250041003339,
+      "judge_s": 1.9401089899474755,
       "luna_s": null,
-      "total_s": 4.142858944949694,
-      "writer_s": 1.934608903946355
+      "total_s": 3.9196444440167397,
+      "writer_s": 1.9795354540692642
     }
   },
   {
@@ -3341,16 +3310,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "c-troll-03",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -3362,26 +3331,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 174,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 156,
             "effort": "high",
             "input_tokens": 21,
-            "latency_s": 1.316951,
+            "latency_s": 1.873546,
             "model": "claude-haiku-5-5",
-            "output_tokens": 174,
-            "prompt_tokens": 6880,
+            "output_tokens": 156,
+            "prompt_tokens": 6890,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 21,
-              "output_tokens": 174
+              "output_tokens": 156
             }
           },
           "error": null,
           "kind": "troll",
-          "reason": "意味の取れない文字列の連投なので、troll と判定した。"
+          "reason": "意味の取れない文字列の連投のため"
         },
         "jev": null,
         "luna": null
@@ -3398,22 +3367,21 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "らららららららら",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.3176261188928038,
+      "haiku_s": 1.873841018998064,
       "jev_s": null,
-      "judge_s": 1.3176261188928038,
+      "judge_s": 1.873841018998064,
       "luna_s": null,
-      "total_s": 1.3176771679427475,
-      "writer_s": 5.104904994368553e-05
+      "total_s": 1.8738480160245672,
+      "writer_s": 6.99702650308609e-06
     }
   },
   {
@@ -3422,16 +3390,16 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       "comment_id": "c-personal_info-02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "003-silent-musicians",
       "errors": [],
-      "fact_sheet_hash": "d77357e39b1f",
+      "fact_sheet_hash": "371daef001a7",
       "final": {
         "answer": null,
         "decision": "haiku",
@@ -3443,26 +3411,26 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
           "bare_term": null,
           "debug": {
             "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6859,
-            "completion_tokens": 115,
+            "cache_read_input_tokens": 6869,
+            "completion_tokens": 103,
             "effort": "high",
             "input_tokens": 29,
-            "latency_s": 1.307629,
+            "latency_s": 1.724046,
             "model": "claude-haiku-5-5",
-            "output_tokens": 115,
-            "prompt_tokens": 6888,
+            "output_tokens": 103,
+            "prompt_tokens": 6898,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6859,
+              "cache_read_input_tokens": 6869,
               "input_tokens": 29,
-              "output_tokens": 115
+              "output_tokens": 103
             }
           },
           "error": null,
           "kind": "personal_info",
-          "reason": "電話番号を含むため個人情報として扱い、返信は行わない"
+          "reason": "電話番号を含むため個人情報として扱う"
         },
         "jev": null,
         "luna": null
@@ -3479,22 +3447,21 @@ window.PROBE_RAW["haiku-1b-high/U12"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "090-0000-0123 に電話ください",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.3185358790215105,
+      "haiku_s": 1.7244262060848996,
       "jev_s": null,
-      "judge_s": 1.3185358790215105,
+      "judge_s": 1.7244262060848996,
       "luna_s": null,
-      "total_s": 1.3185388679848984,
-      "writer_s": 2.9889633879065514e-06
+      "total_s": 1.72442772006616,
+      "writer_s": 1.5139812603592873e-06
     }
   }
 ];

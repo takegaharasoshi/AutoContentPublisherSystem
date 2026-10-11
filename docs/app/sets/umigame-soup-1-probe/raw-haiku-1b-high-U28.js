@@ -6,12 +6,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -28,12 +28,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 6969,
             "cache_read_input_tokens": 0,
-            "completion_tokens": 464,
+            "completion_tokens": 432,
             "effort": "high",
             "input_tokens": 40,
-            "latency_s": 3.684677,
+            "latency_s": 3.022664,
             "model": "claude-haiku-5-5",
-            "output_tokens": 464,
+            "output_tokens": 432,
             "prompt_tokens": 7009,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -41,12 +41,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 6969,
               "cache_read_input_tokens": 0,
               "input_tokens": 40,
-              "output_tokens": 464
+              "output_tokens": 432
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男は以前にも「ウミガメのスープ」と呼ばれるものを飲んだことがあると確定しているため。"
+          "reason": "確定事実に、男が以前ウミガメのスープと呼ばれるものを飲んだとあるため yes"
         },
         "jev": null,
         "luna": null
@@ -58,12 +58,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3995,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 274,
+          "completion_tokens": 28,
           "effort": "high",
           "input_tokens": 40,
-          "latency_s": 2.426951,
+          "latency_s": 1.362989,
           "model": "claude-haiku-5-5",
-          "output_tokens": 274,
+          "output_tokens": 28,
           "prompt_tokens": 4035,
           "refusal_category": null,
           "slot": "判定語 + 一言",
@@ -72,33 +72,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3995,
             "cache_read_input_tokens": 0,
             "input_tokens": 40,
-            "output_tokens": 274
+            "output_tokens": 28
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？"
+        "text": "はい！以前にも飲んだことがあるよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男は以前にもウミガメのスープを飲んだことがありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.6910558809759095,
+      "haiku_s": 3.0229142491007224,
       "jev_s": null,
-      "judge_s": 3.6910558809759095,
+      "judge_s": 3.0229142491007224,
       "luna_s": null,
-      "total_s": 6.119053816073574,
-      "writer_s": 2.4279979350976646
+      "total_s": 4.386471082107164,
+      "writer_s": 1.3635568330064416
     }
   },
   {
@@ -107,12 +106,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -127,27 +126,27 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "answer": "no",
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 6969,
-            "cache_read_input_tokens": 0,
-            "completion_tokens": 558,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6969,
+            "completion_tokens": 672,
             "effort": "high",
             "input_tokens": 40,
-            "latency_s": 3.873522,
+            "latency_s": 4.334207,
             "model": "claude-haiku-5-5",
-            "output_tokens": 558,
+            "output_tokens": 672,
             "prompt_tokens": 7009,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 6969,
-              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6969,
               "input_tokens": 40,
-              "output_tokens": 558
+              "output_tokens": 672
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "今日のスープの味は以前飲んだものとまったく違ったため、味に覚えがあったからではない。"
+          "reason": "今日の味は以前の味とまったく違い、味の覚えで泣いたわけではないため"
         },
         "jev": null,
         "luna": null
@@ -159,12 +158,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3995,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 573,
+          "completion_tokens": 404,
           "effort": "high",
           "input_tokens": 40,
-          "latency_s": 3.1617,
+          "latency_s": 2.92756,
           "model": "claude-haiku-5-5",
-          "output_tokens": 573,
+          "output_tokens": 404,
           "prompt_tokens": 4035,
           "refusal_category": null,
           "slot": "判定語 + 復唱",
@@ -173,33 +172,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3995,
             "cache_read_input_tokens": 0,
             "input_tokens": 40,
-            "output_tokens": 573
+            "output_tokens": 404
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "いいえ。男が泣いたのは、スープの味に覚えがあったからじゃないよ。"
+        "text": "いいえ。スープの味に覚えがあったから泣いたわけじゃないよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男が泣いたのは、スープの味に覚えがあったからですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.873784188996069,
+      "haiku_s": 4.3345420230180025,
       "jev_s": null,
-      "judge_s": 3.873784188996069,
+      "judge_s": 4.3345420230180025,
       "luna_s": null,
-      "total_s": 7.036109065986238,
-      "writer_s": 3.1623248769901693
+      "total_s": 7.262762645026669,
+      "writer_s": 2.9282206220086664
     }
   },
   {
@@ -208,12 +206,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e03",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -228,27 +226,27 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "answer": "yes",
           "bare_term": null,
           "debug": {
-            "cache_creation_input_tokens": 6969,
-            "cache_read_input_tokens": 0,
-            "completion_tokens": 528,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6969,
+            "completion_tokens": 413,
             "effort": "high",
             "input_tokens": 33,
-            "latency_s": 4.038012,
+            "latency_s": 2.614458,
             "model": "claude-haiku-5-5",
-            "output_tokens": 528,
+            "output_tokens": 413,
             "prompt_tokens": 7002,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
-              "cache_creation_input_tokens": 6969,
-              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6969,
               "input_tokens": 33,
-              "output_tokens": 528
+              "output_tokens": 413
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "男は若いころ船の事故で仲間とボートに乗り、何日も海を漂った。確定事実と一致するので yes。"
+          "reason": "若いころ船の事故で救命ボートに乗り、何日も漂流した事実があるため yes。"
         },
         "jev": null,
         "luna": null
@@ -258,528 +256,23 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3995,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 213,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3995,
+          "completion_tokens": 275,
           "effort": "high",
           "input_tokens": 33,
-          "latency_s": 2.513293,
+          "latency_s": 2.6894,
           "model": "claude-haiku-5-5",
-          "output_tokens": 213,
+          "output_tokens": 275,
           "prompt_tokens": 4028,
           "refusal_category": null,
           "slot": "判定語 + 一言",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3995,
-            "cache_read_input_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3995,
             "input_tokens": 33,
-            "output_tokens": 213
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "はい！ふむふむ、次はどうかな？ 🧐"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は昔、遭難した経験があるんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 4.0383051440585405,
-      "jev_s": null,
-      "judge_s": 4.0383051440585405,
-      "luna_s": null,
-      "total_s": 6.551945633022115,
-      "writer_s": 2.513640488963574
-    }
-  },
-  {
-    "case_id": "U28-e04",
-    "record": {
-      "comment_id": "U28-e04",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "016-umigame-soup",
-      "errors": [],
-      "fact_sheet_hash": "c81ff384e8a1",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_wrong"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6969,
-            "completion_tokens": 2151,
-            "effort": "high",
-            "input_tokens": 45,
-            "latency_s": 10.888886,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 2151,
-            "prompt_tokens": 7014,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6969,
-              "input_tokens": 45,
-              "output_tokens": 2151
-            }
-          },
-          "error": null,
-          "kind": "guess_wrong",
-          "reason": "過去の記憶がよみがえったとする点は要点1・2のどちらにも触れておらず、きっかけの説明も食い違う。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U28",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3995,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 329,
-          "effort": "high",
-          "input_tokens": 45,
-          "latency_s": 2.114264,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 329,
-          "prompt_tokens": 4040,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3995,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 45,
-            "output_tokens": 329
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "残念、ちがうよ。別の角度からも考えてごらん 🤔"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "本物だと聞いたことで、男の過去の記憶がよみがえったんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 10.889185198931955,
-      "jev_s": null,
-      "judge_s": 10.889185198931955,
-      "luna_s": null,
-      "total_s": 13.004239435889758,
-      "writer_s": 2.1150542369578034
-    }
-  },
-  {
-    "case_id": "U28-e05",
-    "record": {
-      "comment_id": "U28-e05",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "016-umigame-soup",
-      "errors": [],
-      "fact_sheet_hash": "c81ff384e8a1",
-      "final": {
-        "answer": "no",
-        "decision": "haiku",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": "no",
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6969,
-            "completion_tokens": 831,
-            "effort": "high",
-            "input_tokens": 42,
-            "latency_s": 4.529836,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 831,
-            "prompt_tokens": 7011,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6969,
-              "input_tokens": 42,
-              "output_tokens": 831
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "真相では味の違いに飲んで初めて気づいており、飲む前に疑っていた根拠はない。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U28",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3995,
-          "completion_tokens": 570,
-          "effort": "high",
-          "input_tokens": 42,
-          "latency_s": 3.697192,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 570,
-          "prompt_tokens": 4037,
-          "refusal_category": null,
-          "slot": "判定語 + 復唱",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3995,
-            "input_tokens": 42,
-            "output_tokens": 570
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "いいえ。スープを飲む前から、男は本物かどうか疑っていなかったよ。"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "スープを飲む前から、男は本物かどうか疑っていたんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 4.530581088969484,
-      "jev_s": null,
-      "judge_s": 4.530581088969484,
-      "luna_s": null,
-      "total_s": 8.228276705020107,
-      "writer_s": 3.6976956160506234
-    }
-  },
-  {
-    "case_id": "U28-e06",
-    "record": {
-      "comment_id": "U28-e06",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "016-umigame-soup",
-      "errors": [],
-      "fact_sheet_hash": "c81ff384e8a1",
-      "final": {
-        "answer": "irrelevant",
-        "decision": "haiku",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": "irrelevant",
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6969,
-            "completion_tokens": 281,
-            "effort": "high",
-            "input_tokens": 30,
-            "latency_s": 2.455444,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 281,
-            "prompt_tokens": 6999,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6969,
-              "input_tokens": 30,
-              "output_tokens": 281
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "店の場所は問題に関係しないため、真相・確定事実から判断できない。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U28",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3999,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 225,
-          "effort": "high",
-          "input_tokens": 30,
-          "latency_s": 2.393302,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 225,
-          "prompt_tokens": 4029,
-          "refusal_category": null,
-          "slot": "判定語 + 復唱",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3999,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 30,
-            "output_tokens": 225
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "関係ないよ。次の質問はどうかな？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "そのレストランは海辺にありますか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 2.4724439840065315,
-      "jev_s": null,
-      "judge_s": 2.4724439840065315,
-      "luna_s": null,
-      "total_s": 4.866505428915843,
-      "writer_s": 2.394061444909312
-    }
-  },
-  {
-    "case_id": "U28-e07",
-    "record": {
-      "comment_id": "U28-e07",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "016-umigame-soup",
-      "errors": [],
-      "fact_sheet_hash": "c81ff384e8a1",
-      "final": {
-        "answer": "irrelevant",
-        "decision": "haiku",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": "irrelevant",
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6969,
-            "completion_tokens": 672,
-            "effort": "high",
-            "input_tokens": 32,
-            "latency_s": 4.21868,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 672,
-            "prompt_tokens": 7001,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6969,
-              "input_tokens": 32,
-              "output_tokens": 672
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "シェフと男の既知の関係は真相にも確定事実にも書かれておらず、判断できないため irrelevant とした。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U28",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 3999,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 254,
-          "effort": "high",
-          "input_tokens": 32,
-          "latency_s": 1.979316,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 254,
-          "prompt_tokens": 4031,
-          "refusal_category": null,
-          "slot": "判定語 + 復唱",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 3999,
-            "cache_read_input_tokens": 0,
-            "input_tokens": 32,
-            "output_tokens": 254
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "関係ないよ。次はどんなことを聞いてみようか？"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "シェフは男のことを知っていたんですか？",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 4.218944996013306,
-      "jev_s": null,
-      "judge_s": 4.218944996013306,
-      "luna_s": null,
-      "total_s": 6.198860393022187,
-      "writer_s": 1.979915397008881
-    }
-  },
-  {
-    "case_id": "U28-e08",
-    "record": {
-      "comment_id": "U28-e08",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "016-umigame-soup",
-      "errors": [],
-      "fact_sheet_hash": "c81ff384e8a1",
-      "final": {
-        "answer": "yes",
-        "decision": "haiku",
-        "kind": "q_yesno"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": "yes",
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6969,
-            "completion_tokens": 635,
-            "effort": "high",
-            "input_tokens": 40,
-            "latency_s": 3.957129,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 635,
-            "prompt_tokens": 7009,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6969,
-              "input_tokens": 40,
-              "output_tokens": 635
-            }
-          },
-          "error": null,
-          "kind": "q_yesno",
-          "reason": "一口で以前の記憶がよみがえったかの確認。今日の味と以前の味の違いが確定事実なのでyes。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U28",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3995,
-          "completion_tokens": 232,
-          "effort": "high",
-          "input_tokens": 40,
-          "latency_s": 2.390111,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 232,
-          "prompt_tokens": 4035,
-          "refusal_category": null,
-          "slot": "判定語 + 一言",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3995,
-            "input_tokens": 40,
-            "output_tokens": 232
+            "output_tokens": 275
           }
         },
         "guard": null,
@@ -790,36 +283,235 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男はスープを飲んで、何か別のものを思い出したんですか？",
+      "text": "男は昔、遭難した経験があるんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.95775649510324,
+      "haiku_s": 2.61474841600284,
       "jev_s": null,
-      "judge_s": 3.95775649510324,
+      "judge_s": 2.61474841600284,
       "luna_s": null,
-      "total_s": 6.348402069066651,
-      "writer_s": 2.390645573963411
+      "total_s": 5.304507574997842,
+      "writer_s": 2.6897591589950025
     }
   },
   {
-    "case_id": "U28-e09",
+    "case_id": "U28-e04",
     "record": {
-      "comment_id": "U28-e09",
+      "comment_id": "U28-e04",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": "yes",
+        "decision": "haiku",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6969,
+            "completion_tokens": 897,
+            "effort": "high",
+            "input_tokens": 45,
+            "latency_s": 6.143619,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 897,
+            "prompt_tokens": 7014,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6969,
+              "input_tokens": 45,
+              "output_tokens": 897
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "本物と確かめた後、以前の味と照らして正体に気づく流れと合うため"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3993,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 188,
+          "effort": "high",
+          "input_tokens": 45,
+          "latency_s": 1.745039,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 188,
+          "prompt_tokens": 4038,
+          "refusal_category": null,
+          "slot": "判定語だけ",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3993,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 45,
+            "output_tokens": 188
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "本物だと聞いたことで、男の過去の記憶がよみがえったんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 6.1441766490461305,
+      "jev_s": null,
+      "judge_s": 6.1441766490461305,
+      "luna_s": null,
+      "total_s": 7.8898266680771485,
+      "writer_s": 1.745650019031018
+    }
+  },
+  {
+    "case_id": "U28-e05",
+    "record": {
+      "comment_id": "U28-e05",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": "no",
+        "decision": "haiku",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": "no",
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6969,
+            "completion_tokens": 720,
+            "effort": "high",
+            "input_tokens": 42,
+            "latency_s": 4.559538,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 720,
+            "prompt_tokens": 7011,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6969,
+              "input_tokens": 42,
+              "output_tokens": 720
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "真相では一口飲んでから味の違いに気づいており、飲む前に疑っていたとは読み取れないため。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3995,
+          "completion_tokens": 480,
+          "effort": "high",
+          "input_tokens": 42,
+          "latency_s": 2.828846,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 480,
+          "prompt_tokens": 4037,
+          "refusal_category": null,
+          "slot": "判定語 + 復唱",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3995,
+            "input_tokens": 42,
+            "output_tokens": 480
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "いいえ。飲む前は疑っていなかったよ。"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "スープを飲む前から、男は本物かどうか疑っていたんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 4.559823725023307,
+      "jev_s": null,
+      "judge_s": 4.559823725023307,
+      "luna_s": null,
+      "total_s": 7.3895711180521175,
+      "writer_s": 2.8297473930288106
+    }
+  },
+  {
+    "case_id": "U28-e06",
+    "record": {
+      "comment_id": "U28-e06",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -836,25 +528,25 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 584,
+            "completion_tokens": 282,
             "effort": "high",
-            "input_tokens": 37,
-            "latency_s": 4.090443,
+            "input_tokens": 30,
+            "latency_s": 2.490006,
             "model": "claude-haiku-5-5",
-            "output_tokens": 584,
-            "prompt_tokens": 7006,
+            "output_tokens": 282,
+            "prompt_tokens": 6999,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
-              "input_tokens": 37,
-              "output_tokens": 584
+              "input_tokens": 30,
+              "output_tokens": 282
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "配膳者は確定事実にも真相にもなく、判断できないため irrelevant とした。"
+          "reason": "店の場所は確定事実で問題に関係ないと示されているため irrelevant"
         },
         "jev": null,
         "luna": null
@@ -864,23 +556,23 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3998,
+          "cache_creation_input_tokens": 3999,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 204,
+          "completion_tokens": 31,
           "effort": "high",
-          "input_tokens": 37,
-          "latency_s": 2.165994,
+          "input_tokens": 30,
+          "latency_s": 1.286212,
           "model": "claude-haiku-5-5",
-          "output_tokens": 204,
-          "prompt_tokens": 4035,
+          "output_tokens": 31,
+          "prompt_tokens": 4029,
           "refusal_category": null,
-          "slot": "判定語 + 一言",
+          "slot": "判定語 + 復唱",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3998,
+            "cache_creation_input_tokens": 3999,
             "cache_read_input_tokens": 0,
-            "input_tokens": 37,
-            "output_tokens": 204
+            "input_tokens": 30,
+            "output_tokens": 31
           }
         },
         "guard": null,
@@ -891,36 +583,35 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "スープを出したのは、その店のシェフ本人ですか？",
+      "text": "そのレストランは海辺にありますか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.090800739009865,
+      "haiku_s": 2.505927070043981,
       "jev_s": null,
-      "judge_s": 4.090800739009865,
+      "judge_s": 2.505927070043981,
       "luna_s": null,
-      "total_s": 6.257734872051515,
-      "writer_s": 2.16693413304165
+      "total_s": 3.7929299500538036,
+      "writer_s": 1.2870028800098225
     }
   },
   {
-    "case_id": "U28-e10",
+    "case_id": "U28-e07",
     "record": {
-      "comment_id": "U28-e10",
+      "comment_id": "U28-e07",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -937,25 +628,225 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 794,
+            "completion_tokens": 755,
             "effort": "high",
-            "input_tokens": 38,
-            "latency_s": 4.411838,
+            "input_tokens": 32,
+            "latency_s": 4.720852,
             "model": "claude-haiku-5-5",
-            "output_tokens": 794,
-            "prompt_tokens": 7007,
+            "output_tokens": 755,
+            "prompt_tokens": 7001,
             "refusal_category": null,
             "stop_reason": "end_turn",
             "usage": {
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
-              "input_tokens": 38,
-              "output_tokens": 794
+              "input_tokens": 32,
+              "output_tokens": 755
             }
           },
           "error": null,
           "kind": "q_yesno",
-          "reason": "ウミガメを飼っていたかは真相にも確定事実にも書かれていないため irrelevant"
+          "reason": "シェフと男の面識は問題文・確定事実のどちらからも判断できないため。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 3999,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 270,
+          "effort": "high",
+          "input_tokens": 32,
+          "latency_s": 1.946833,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 270,
+          "prompt_tokens": 4031,
+          "refusal_category": null,
+          "slot": "判定語 + 復唱",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 3999,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 32,
+            "output_tokens": 270
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。次はどんな質問をしようか？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "シェフは男のことを知っていたんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 4.721138141001575,
+      "jev_s": null,
+      "judge_s": 4.721138141001575,
+      "luna_s": null,
+      "total_s": 6.668535694945604,
+      "writer_s": 1.947397553944029
+    }
+  },
+  {
+    "case_id": "U28-e08",
+    "record": {
+      "comment_id": "U28-e08",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": "yes",
+        "decision": "haiku",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": "yes",
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6969,
+            "completion_tokens": 530,
+            "effort": "high",
+            "input_tokens": 40,
+            "latency_s": 3.135217,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 530,
+            "prompt_tokens": 7009,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6969,
+              "input_tokens": 40,
+              "output_tokens": 530
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "男が以前の味を思い出して今日の味と比べたことは、確定事実から言えるため yes。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3995,
+          "completion_tokens": 236,
+          "effort": "high",
+          "input_tokens": 40,
+          "latency_s": 1.801115,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 236,
+          "prompt_tokens": 4035,
+          "refusal_category": null,
+          "slot": "判定語 + 一言",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3995,
+            "input_tokens": 40,
+            "output_tokens": 236
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "はい！ふむふむ、次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "男はスープを飲んで、何か別のものを思い出したんですか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 3.1355233310023323,
+      "jev_s": null,
+      "judge_s": 3.1355233310023323,
+      "luna_s": null,
+      "total_s": 4.936968135996722,
+      "writer_s": 1.8014448049943894
+    }
+  },
+  {
+    "case_id": "U28-e09",
+    "record": {
+      "comment_id": "U28-e09",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "haiku",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6969,
+            "completion_tokens": 657,
+            "effort": "high",
+            "input_tokens": 37,
+            "latency_s": 4.441551,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 657,
+            "prompt_tokens": 7006,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6969,
+              "input_tokens": 37,
+              "output_tokens": 657
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "誰が給仕したかは資料に記載がなく、真相にも関係しないため irrelevant とした。"
         },
         "jev": null,
         "luna": null
@@ -967,47 +858,146 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3998,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 257,
+          "completion_tokens": 266,
           "effort": "high",
-          "input_tokens": 38,
-          "latency_s": 2.556715,
+          "input_tokens": 37,
+          "latency_s": 2.613226,
           "model": "claude-haiku-5-5",
-          "output_tokens": 257,
-          "prompt_tokens": 4036,
+          "output_tokens": 266,
+          "prompt_tokens": 4035,
           "refusal_category": null,
           "slot": "判定語 + 一言",
           "stop_reason": "end_turn",
           "usage": {
             "cache_creation_input_tokens": 3998,
             "cache_read_input_tokens": 0,
-            "input_tokens": 38,
-            "output_tokens": 257
+            "input_tokens": 37,
+            "output_tokens": 266
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "関係ないよ。次はどんな質問をしてみようか？"
+        "text": "関係ないよ。次はどんなことを聞いてみようか 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "男は昔、ウミガメを飼っていたんでしょか？",
+      "text": "スープを出したのは、その店のシェフ本人ですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.412667206954211,
+      "haiku_s": 4.441705017001368,
       "jev_s": null,
-      "judge_s": 4.412667206954211,
+      "judge_s": 4.441705017001368,
       "luna_s": null,
-      "total_s": 6.969874246860854,
-      "writer_s": 2.5572070399066433
+      "total_s": 7.055555874016136,
+      "writer_s": 2.613850857014768
+    }
+  },
+  {
+    "case_id": "U28-e10",
+    "record": {
+      "comment_id": "U28-e10",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": "irrelevant",
+        "decision": "haiku",
+        "kind": "q_yesno"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": "irrelevant",
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6969,
+            "completion_tokens": 810,
+            "effort": "high",
+            "input_tokens": 38,
+            "latency_s": 5.286474,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 810,
+            "prompt_tokens": 7007,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6969,
+              "input_tokens": 38,
+              "output_tokens": 810
+            }
+          },
+          "error": null,
+          "kind": "q_yesno",
+          "reason": "ウミガメを飼っていたかは真相にも確定事実にも書かれておらず、判断できないため関係なしとした。"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3998,
+          "completion_tokens": 247,
+          "effort": "high",
+          "input_tokens": 38,
+          "latency_s": 2.074361,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 247,
+          "prompt_tokens": 4036,
+          "refusal_category": null,
+          "slot": "判定語 + 一言",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3998,
+            "input_tokens": 38,
+            "output_tokens": 247
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "関係ないよ。ふむふむ、次はどうかな？"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "男は昔、ウミガメを飼っていたんでしょか？",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 5.286789435893297,
+      "jev_s": null,
+      "judge_s": 5.286789435893297,
+      "luna_s": null,
+      "total_s": 7.361789458896965,
+      "writer_s": 2.0750000230036676
     }
   },
   {
@@ -1016,12 +1006,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e11",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1038,12 +1028,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 283,
+            "completion_tokens": 278,
             "effort": "high",
             "input_tokens": 48,
-            "latency_s": 1.948325,
+            "latency_s": 2.353965,
             "model": "claude-haiku-5-5",
-            "output_tokens": 283,
+            "output_tokens": 278,
             "prompt_tokens": 7017,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1051,12 +1041,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 48,
-              "output_tokens": 283
+              "output_tokens": 278
             }
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "1コメントに質問が2つあり、まとめて答えると対応が分からなくなるため"
+          "reason": "1つのコメントに質問が2つあり、まとめて答えると対応が分からなくなるため"
         },
         "jev": null,
         "luna": null
@@ -1068,12 +1058,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3993,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 227,
+          "completion_tokens": 300,
           "effort": "high",
           "input_tokens": 48,
-          "latency_s": 1.798334,
+          "latency_s": 2.020825,
           "model": "claude-haiku-5-5",
-          "output_tokens": 227,
+          "output_tokens": 300,
           "prompt_tokens": 4041,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1082,33 +1072,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3993,
             "cache_read_input_tokens": 0,
             "input_tokens": 48,
-            "output_tokens": 227
+            "output_tokens": 300
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてみてね。ひとつずつ聞いてごらん。"
+        "text": "質問は1つずつコメントしてね。ひとつずつ聞いてごらん🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男は過去にウミガメを食べたことがあるの？その時の出来事を思い出したの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.9544272390194237,
+      "haiku_s": 2.354200704023242,
       "jev_s": null,
-      "judge_s": 1.9544272390194237,
+      "judge_s": 2.354200704023242,
       "luna_s": null,
-      "total_s": 3.7532292760442942,
-      "writer_s": 1.7988020370248705
+      "total_s": 4.375640627928078,
+      "writer_s": 2.021439923904836
     }
   },
   {
@@ -1117,12 +1106,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e12",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1139,12 +1128,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 330,
+            "completion_tokens": 286,
             "effort": "high",
             "input_tokens": 47,
-            "latency_s": 2.711868,
+            "latency_s": 2.342822,
             "model": "claude-haiku-5-5",
-            "output_tokens": 330,
+            "output_tokens": 286,
             "prompt_tokens": 7016,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1152,12 +1141,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 47,
-              "output_tokens": 330
+              "output_tokens": 286
             }
           },
           "error": null,
           "kind": "q_multi",
-          "reason": "一つのコメントに質問が二つあり、まとめて答えると対応が分からなくなるため。"
+          "reason": "1つのコメントに質問が2つあり、まとめて答えると対応が分からなくなるため"
         },
         "jev": null,
         "luna": null
@@ -1169,12 +1158,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3993,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 254,
+          "completion_tokens": 230,
           "effort": "high",
           "input_tokens": 47,
-          "latency_s": 2.051134,
+          "latency_s": 1.781121,
           "model": "claude-haiku-5-5",
-          "output_tokens": 254,
+          "output_tokens": 230,
           "prompt_tokens": 4040,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1183,33 +1172,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3993,
             "cache_read_input_tokens": 0,
             "input_tokens": 47,
-            "output_tokens": 254
+            "output_tokens": 230
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "質問は1つずつコメントしてみてね。順番に答えていくから、次はひとつだけ聞いてごらん。"
+        "text": "質問は1つずつコメントしてね。順番に聞いてごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "スープの味が記憶と違ったの？本物だと聞いて何かに気づいたの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.712244661990553,
+      "haiku_s": 2.3431569959502667,
       "jev_s": null,
-      "judge_s": 2.712244661990553,
+      "judge_s": 2.3431569959502667,
       "luna_s": null,
-      "total_s": 4.763971118954942,
-      "writer_s": 2.0517264569643885
+      "total_s": 4.124655613908544,
+      "writer_s": 1.7814986179582775
     }
   },
   {
@@ -1218,12 +1206,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e13",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1240,12 +1228,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 399,
+            "completion_tokens": 351,
             "effort": "high",
             "input_tokens": 41,
-            "latency_s": 2.579134,
+            "latency_s": 2.230773,
             "model": "claude-haiku-5-5",
-            "output_tokens": 399,
+            "output_tokens": 351,
             "prompt_tokens": 7010,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1253,12 +1241,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 41,
-              "output_tokens": 399
+              "output_tokens": 351
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「なぜ」で聞いており、はい／いいえで答えられない質問のため。"
+          "reason": "「なぜ」を問う質問で、はい／いいえで答えられないため聞き直しを促す。"
         },
         "jev": null,
         "luna": null
@@ -1270,12 +1258,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3992,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 305,
+          "completion_tokens": 415,
           "effort": "high",
           "input_tokens": 41,
-          "latency_s": 3.208908,
+          "latency_s": 2.904643,
           "model": "claude-haiku-5-5",
-          "output_tokens": 305,
+          "output_tokens": 415,
           "prompt_tokens": 4033,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1284,33 +1272,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3992,
             "cache_read_input_tokens": 0,
             "input_tokens": 41,
-            "output_tokens": 305
+            "output_tokens": 415
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "「なぜ」だと答えにくいから、はい／いいえで答えられる形で聞き直してごらん。"
+        "text": "はい／いいえで答えられる形で、もう一度聞き直してみてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男はなぜ本物のウミガメかどうか確かめたんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.579507021000609,
+      "haiku_s": 2.231029042042792,
       "jev_s": null,
-      "judge_s": 2.579507021000609,
+      "judge_s": 2.231029042042792,
       "luna_s": null,
-      "total_s": 5.789240860030986,
-      "writer_s": 3.2097338390303776
+      "total_s": 5.13646944204811,
+      "writer_s": 2.9054404000053182
     }
   },
   {
@@ -1319,12 +1306,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e14",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1341,12 +1328,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 399,
+            "completion_tokens": 431,
             "effort": "high",
             "input_tokens": 40,
-            "latency_s": 3.293527,
+            "latency_s": 3.190832,
             "model": "claude-haiku-5-5",
-            "output_tokens": 399,
+            "output_tokens": 431,
             "prompt_tokens": 7009,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1354,12 +1341,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 40,
-              "output_tokens": 399
+              "output_tokens": 431
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「何を思い出したか」を問う質問で、はい／いいえでは答えられないため聞き直しとする。"
+          "reason": "「何を思い出したか」を尋ねる疑問詞の質問で、はい／いいえで答えられない"
         },
         "jev": null,
         "luna": null
@@ -1371,12 +1358,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3992,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 368,
+          "completion_tokens": 335,
           "effort": "high",
           "input_tokens": 40,
-          "latency_s": 3.088154,
+          "latency_s": 2.967883,
           "model": "claude-haiku-5-5",
-          "output_tokens": 368,
+          "output_tokens": 335,
           "prompt_tokens": 4032,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1385,33 +1372,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3992,
             "cache_read_input_tokens": 0,
             "input_tokens": 40,
-            "output_tokens": 368
+            "output_tokens": 335
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい／いいえで答えられる形で聞き直してごらん。ひとつずつ絞っていこうね。"
+        "text": "はい／いいえで答えられる形で聞き直してごらんね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "スープを飲んだとき、男は何を思い出したんでしょう？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.2938350070035085,
+      "haiku_s": 3.1913294799160212,
       "jev_s": null,
-      "judge_s": 3.2938350070035085,
+      "judge_s": 3.1913294799160212,
       "luna_s": null,
-      "total_s": 6.382803484098986,
-      "writer_s": 3.0889684770954773
+      "total_s": 6.160275444970466,
+      "writer_s": 2.968945965054445
     }
   },
   {
@@ -1420,12 +1406,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e15",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1442,12 +1428,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 417,
+            "completion_tokens": 338,
             "effort": "high",
             "input_tokens": 40,
-            "latency_s": 2.937423,
+            "latency_s": 2.770011,
             "model": "claude-haiku-5-5",
-            "output_tokens": 417,
+            "output_tokens": 338,
             "prompt_tokens": 7009,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1455,12 +1441,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 40,
-              "output_tokens": 417
+              "output_tokens": 338
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "「どんな過去」は、はい/いいえで答えられない問いのため"
+          "reason": "「どんな過去」はてい はい／いいえで答えられない問いのためq_open"
         },
         "jev": null,
         "luna": null
@@ -1472,12 +1458,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3992,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 375,
+          "completion_tokens": 592,
           "effort": "high",
           "input_tokens": 40,
-          "latency_s": 3.079754,
+          "latency_s": 4.038835,
           "model": "claude-haiku-5-5",
-          "output_tokens": 375,
+          "output_tokens": 592,
           "prompt_tokens": 4032,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1486,33 +1472,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3992,
             "cache_read_input_tokens": 0,
             "input_tokens": 40,
-            "output_tokens": 375
+            "output_tokens": 592
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "その聞き方だと答えにくいから、はい／いいえで答えられる形で聞き直してごらん。"
+        "text": "はい／いいえで答えられる形で、聞き直してごらん。男の過去について知りたいんだね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男が泣き崩れるまでに、どんな過去があったんですか？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.9377896919613704,
+      "haiku_s": 2.77025365002919,
       "jev_s": null,
-      "judge_s": 2.9377896919613704,
+      "judge_s": 2.77025365002919,
       "luna_s": null,
-      "total_s": 6.028751682955772,
-      "writer_s": 3.0909619909944013
+      "total_s": 6.809616986080073,
+      "writer_s": 4.039363336050883
     }
   },
   {
@@ -1521,12 +1506,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e16",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1543,12 +1528,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 848,
+            "completion_tokens": 802,
             "effort": "high",
             "input_tokens": 50,
-            "latency_s": 3.964292,
+            "latency_s": 4.089053,
             "model": "claude-haiku-5-5",
-            "output_tokens": 848,
+            "output_tokens": 802,
             "prompt_tokens": 7019,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1556,12 +1541,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 50,
-              "output_tokens": 848
+              "output_tokens": 802
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "要点1・2をどちらも当てており、明らかな誤りもない。"
+          "reason": "要点1・2をどちらも当てており、明らかな誤りもない推理。"
         },
         "jev": null,
         "luna": null
@@ -1573,12 +1558,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3994,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 92,
+          "completion_tokens": 86,
           "effort": "high",
           "input_tokens": 50,
-          "latency_s": 1.332657,
+          "latency_s": 1.768966,
           "model": "claude-haiku-5-5",
-          "output_tokens": 92,
+          "output_tokens": 86,
           "prompt_tokens": 4044,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1587,33 +1572,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3994,
             "cache_read_input_tokens": 0,
             "input_tokens": 50,
-            "output_tokens": 92
+            "output_tokens": 86
           }
         },
         "guard": null,
-        "over_80": true,
+        "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！若いころ船が遭難して、ボートで漂っていたときに飲んだスープは、仲間の肉で作られたものだったんだ。仲間は男を生かすために、ウミガメのスープだと嘘をついたんだよ。"
+        "text": "正解！若いころ船が遭難して、ボートで漂っていたときに飲んだスープは、仲間の肉で作られていたんだ。男を生かすために、仲間がウミガメだと嘘をついたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "昔ウミガメのスープだと言われて飲んだものが、仲間の肉だったってこと？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.9704214819939807,
+      "haiku_s": 4.094716498977505,
       "jev_s": null,
-      "judge_s": 3.9704214819939807,
+      "judge_s": 4.094716498977505,
       "luna_s": null,
-      "total_s": 5.303804766037501,
-      "writer_s": 1.3333832840435207
+      "total_s": 5.870073216967285,
+      "writer_s": 1.77535671798978
     }
   },
   {
@@ -1622,12 +1606,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e17",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1644,12 +1628,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 1321,
+            "completion_tokens": 1047,
             "effort": "high",
             "input_tokens": 69,
-            "latency_s": 5.787776,
+            "latency_s": 5.331121,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1321,
+            "output_tokens": 1047,
             "prompt_tokens": 7038,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1657,12 +1641,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 69,
-              "output_tokens": 1321
+              "output_tokens": 1047
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "昔ウミガメと偽られて仲間の肉を飲んだと、要点1と2をどちらも当てており誤りもない。"
+          "reason": "要点1・2の両方を当てており、明らかな誤りもないため正解とする。"
         },
         "jev": null,
         "luna": null
@@ -1672,49 +1656,48 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 3994,
-          "cache_read_input_tokens": 0,
-          "completion_tokens": 928,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3994,
+          "completion_tokens": 566,
           "effort": "high",
           "input_tokens": 69,
-          "latency_s": 5.088287,
+          "latency_s": 3.742721,
           "model": "claude-haiku-5-5",
-          "output_tokens": 928,
+          "output_tokens": 566,
           "prompt_tokens": 4063,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 3994,
-            "cache_read_input_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3994,
             "input_tokens": 69,
-            "output_tokens": 928
+            "output_tokens": 566
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！若いころ漂流中に飲まされたのは、仲間の肉で作ったスープだったんだ。仲間は男を生かすため、ウミガメのスープだと嘘をついたんだよ。"
+        "text": "正解！昔飲んだのは、漂流中に亡くなった仲間の肉のスープだったんだ。仲間が生かすためについた嘘に、男は今日初めて気づいたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "昔、仲間の肉をウミガメのスープだと言われて飲んだんだね。本物の味が違って、あの時の嘘に気づいたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 5.788311669952236,
+      "haiku_s": 5.331307215965353,
       "jev_s": null,
-      "judge_s": 5.788311669952236,
+      "judge_s": 5.331307215965353,
       "luna_s": null,
-      "total_s": 10.87720305705443,
-      "writer_s": 5.088891387102194
+      "total_s": 9.074622641899623,
+      "writer_s": 3.74331542593427
     }
   },
   {
@@ -1723,12 +1706,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e18",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1745,12 +1728,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 514,
+            "completion_tokens": 637,
             "effort": "high",
             "input_tokens": 52,
-            "latency_s": 3.062855,
+            "latency_s": 3.35498,
             "model": "claude-haiku-5-5",
-            "output_tokens": 514,
+            "output_tokens": 637,
             "prompt_tokens": 7021,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1758,12 +1741,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 52,
-              "output_tokens": 514
+              "output_tokens": 637
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "要点1（昔ウミガメのスープと言われて飲んだ）は当てたが、要点2（それは仲間の肉だった）には触れていない。"
+          "reason": "漂流中にウミガメのスープと言われて飲んだ点は当てたが、飲んだものの中身には触れていない。"
         },
         "jev": null,
         "luna": null
@@ -1775,12 +1758,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3993,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 463,
+          "completion_tokens": 375,
           "effort": "high",
           "input_tokens": 52,
-          "latency_s": 2.822067,
+          "latency_s": 2.951462,
           "model": "claude-haiku-5-5",
-          "output_tokens": 463,
+          "output_tokens": 375,
           "prompt_tokens": 4045,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1789,33 +1772,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3993,
             "cache_read_input_tokens": 0,
             "input_tokens": 52,
-            "output_tokens": 463
+            "output_tokens": 375
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！推理を続けてごらんよ 🧐"
+        "text": "惜しい！もう一歩、推理を続けてみようか 🤔"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "漂流していたとき、仲間からウミガメのスープだと言われて飲んだことがあったんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.063430111971684,
+      "haiku_s": 3.355300005991012,
       "jev_s": null,
-      "judge_s": 3.063430111971684,
+      "judge_s": 3.355300005991012,
       "luna_s": null,
-      "total_s": 5.8861966650001705,
-      "writer_s": 2.8227665530284867
+      "total_s": 6.307302549015731,
+      "writer_s": 2.9520025430247188
     }
   },
   {
@@ -1824,12 +1806,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e19",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1846,12 +1828,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 911,
+            "completion_tokens": 647,
             "effort": "high",
             "input_tokens": 74,
-            "latency_s": 4.976426,
+            "latency_s": 4.223877,
             "model": "claude-haiku-5-5",
-            "output_tokens": 911,
+            "output_tokens": 647,
             "prompt_tokens": 7043,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1859,12 +1841,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 74,
-              "output_tokens": 911
+              "output_tokens": 647
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "要点1・2は当てたが、仲間が全員助かった・後で一緒に帰れたは確定事実と食い違う明らかな誤り"
+          "reason": "要点1・2は当てているが、仲間は全員助かったという明らかな誤りを含むため guess_close とした。"
         },
         "jev": null,
         "luna": null
@@ -1876,12 +1858,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3993,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 351,
+          "completion_tokens": 298,
           "effort": "high",
           "input_tokens": 74,
-          "latency_s": 3.023935,
+          "latency_s": 2.471491,
           "model": "claude-haiku-5-5",
-          "output_tokens": 351,
+          "output_tokens": 298,
           "prompt_tokens": 4067,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -1890,33 +1872,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3993,
             "cache_read_input_tokens": 0,
             "input_tokens": 74,
-            "output_tokens": 351
+            "output_tokens": 298
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらん 🧐"
+        "text": "惜しい！その調子で、もう少し推理を続けてごらんね 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "仲間の肉をウミガメのスープだと言われて飲んだんだね。でもそのとき仲間はみんな助かって、あとで一緒に帰れたのか。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.976888917037286,
+      "haiku_s": 4.224211268010549,
       "jev_s": null,
-      "judge_s": 4.976888917037286,
+      "judge_s": 4.224211268010549,
       "luna_s": null,
-      "total_s": 8.001193053089082,
-      "writer_s": 3.0243041360517964
+      "total_s": 6.696610504062846,
+      "writer_s": 2.472399236052297
     }
   },
   {
@@ -1925,12 +1906,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e20",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -1947,12 +1928,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 370,
+            "completion_tokens": 349,
             "effort": "high",
             "input_tokens": 51,
-            "latency_s": 2.049558,
+            "latency_s": 2.24531,
             "model": "claude-haiku-5-5",
-            "output_tokens": 370,
+            "output_tokens": 349,
             "prompt_tokens": 7020,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -1960,12 +1941,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 51,
-              "output_tokens": 370
+              "output_tokens": 349
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "要点に触れておらず、ウミガメを食べて悲しんだという説明は真相と食い違う"
+          "reason": "ウミガメが好きで食べて悲しんだという説明は、要点のどちらにも触れていない。"
         },
         "jev": null,
         "luna": null
@@ -1975,49 +1956,48 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "problem_schema_version": 3,
       "reply": {
         "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3995,
-          "completion_tokens": 192,
+          "cache_creation_input_tokens": 3995,
+          "cache_read_input_tokens": 0,
+          "completion_tokens": 255,
           "effort": "high",
           "input_tokens": 51,
-          "latency_s": 2.58976,
+          "latency_s": 2.349914,
           "model": "claude-haiku-5-5",
-          "output_tokens": 192,
+          "output_tokens": 255,
           "prompt_tokens": 4046,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
           "stop_reason": "end_turn",
           "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3995,
+            "cache_creation_input_tokens": 3995,
+            "cache_read_input_tokens": 0,
             "input_tokens": 51,
-            "output_tokens": 192
+            "output_tokens": 255
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。別の角度からもう一度推理してごらん 🧐"
+        "text": "残念、ちがうよ。もう一度よく考えてみてごらん🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男はウミガメが大好きで、食べてしまったことが悲しくて泣いたんでしょ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.0501688279910013,
+      "haiku_s": 2.2455962549429387,
       "jev_s": null,
-      "judge_s": 2.0501688279910013,
+      "judge_s": 2.2455962549429387,
       "luna_s": null,
-      "total_s": 4.645941206021234,
-      "writer_s": 2.595772378030233
+      "total_s": 4.5958284789230675,
+      "writer_s": 2.3502322239801288
     }
   },
   {
@@ -2026,12 +2006,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-e21",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -2048,12 +2028,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 591,
+            "completion_tokens": 480,
             "effort": "high",
             "input_tokens": 56,
-            "latency_s": 3.499993,
+            "latency_s": 3.861337,
             "model": "claude-haiku-5-5",
-            "output_tokens": 591,
+            "output_tokens": 480,
             "prompt_tokens": 7025,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2061,12 +2041,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 56,
-              "output_tokens": 591
+              "output_tokens": 480
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "今日のスープの話で、昔飲んだスープや仲間の肉という要点に触れていない"
+          "reason": "今日のスープは本物と確定しており、誤りの部分で要点に触れていない。"
         },
         "jev": null,
         "luna": null
@@ -2078,12 +2058,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 0,
           "cache_read_input_tokens": 3995,
-          "completion_tokens": 305,
+          "completion_tokens": 249,
           "effort": "high",
           "input_tokens": 56,
-          "latency_s": 2.105021,
+          "latency_s": 2.251388,
           "model": "claude-haiku-5-5",
-          "output_tokens": 305,
+          "output_tokens": 249,
           "prompt_tokens": 4051,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2092,33 +2072,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 3995,
             "input_tokens": 56,
-            "output_tokens": 305
+            "output_tokens": 249
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。もう一度よく考えてごらん。"
+        "text": "残念、ちがうよ。別の角度から考えてごらん 🤔"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "子どものころに飼っていたカメがこのスープに使われたと思い込んで、悲しくなったんだと思う。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.505944358999841,
+      "haiku_s": 3.861690881079994,
       "jev_s": null,
-      "judge_s": 3.505944358999841,
+      "judge_s": 3.861690881079994,
       "luna_s": null,
-      "total_s": 5.611311502987519,
-      "writer_s": 2.105367143987678
+      "total_s": 6.12447600311134,
+      "writer_s": 2.262785122031346
     }
   },
   {
@@ -2127,12 +2106,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-k01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -2149,12 +2128,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 740,
+            "completion_tokens": 954,
             "effort": "high",
             "input_tokens": 57,
-            "latency_s": 4.566704,
+            "latency_s": 4.446064,
             "model": "claude-haiku-5-5",
-            "output_tokens": 740,
+            "output_tokens": 954,
             "prompt_tokens": 7026,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2162,12 +2141,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 57,
-              "output_tokens": 740
+              "output_tokens": 954
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "要点1・2をどちらも当てており、明らかな誤りもない"
+          "reason": "要点1・2の両方を当てており、明らかな誤りもない"
         },
         "jev": null,
         "luna": null
@@ -2179,12 +2158,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 0,
           "cache_read_input_tokens": 3994,
-          "completion_tokens": 891,
+          "completion_tokens": 908,
           "effort": "high",
           "input_tokens": 57,
-          "latency_s": 5.166552,
+          "latency_s": 5.352271,
           "model": "claude-haiku-5-5",
-          "output_tokens": 891,
+          "output_tokens": 908,
           "prompt_tokens": 4051,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2193,33 +2172,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 3994,
             "input_tokens": 57,
-            "output_tokens": 891
+            "output_tokens": 908
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！若いころ船が遭難して漂流したとき、仲間が亀のスープだと言って飲ませてくれたんだ。実は仲間の肉のスープで、男を生かすための嘘だったんだよ。"
+        "text": "正解！漂流中に仲間が飲ませたのは、亡くなった仲間の肉のスープだった。男を生かすための嘘だったんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "漂流中に亀のスープと聞かされて口にした一杯は、実は仲間の肉から作られてたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 4.56703784794081,
+      "haiku_s": 4.446423308108933,
       "jev_s": null,
-      "judge_s": 4.56703784794081,
+      "judge_s": 4.446423308108933,
       "luna_s": null,
-      "total_s": 9.734622652991675,
-      "writer_s": 5.167584805050865
+      "total_s": 9.799073802074417,
+      "writer_s": 5.352650493965484
     }
   },
   {
@@ -2228,12 +2206,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-k02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -2250,12 +2228,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 1264,
+            "completion_tokens": 1131,
             "effort": "high",
             "input_tokens": 64,
-            "latency_s": 6.130489,
+            "latency_s": 6.152728,
             "model": "claude-haiku-5-5",
-            "output_tokens": 1264,
+            "output_tokens": 1131,
             "prompt_tokens": 7033,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2263,12 +2241,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 64,
-              "output_tokens": 1264
+              "output_tokens": 1131
             }
           },
           "error": null,
           "kind": "guess_correct",
-          "reason": "要点1・2の両方を当てており、明らかな誤りもないため。"
+          "reason": "要点1・2をともに当てており、明らかな誤りもない"
         },
         "jev": null,
         "luna": null
@@ -2280,12 +2258,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 0,
           "cache_read_input_tokens": 3994,
-          "completion_tokens": 787,
+          "completion_tokens": 766,
           "effort": "high",
           "input_tokens": 64,
-          "latency_s": 4.637103,
+          "latency_s": 4.145801,
           "model": "claude-haiku-5-5",
-          "output_tokens": 787,
+          "output_tokens": 766,
           "prompt_tokens": 4058,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2294,33 +2272,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 3994,
             "input_tokens": 64,
-            "output_tokens": 787
+            "output_tokens": 766
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "正解！若いころ漂流したボートで飲んだのは、仲間の肉のスープだったんだ。生かすための嘘に、男は今日やっと気づいたんだよ。"
+        "text": "正解！漂流中に仲間がくれたウミガメのスープは、亡くなった仲間の肉だったんだ。男は本物を飲んで、その違いに気づいたんだよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "漂流中に亀の汁だと渡されて飲んだ一杯は仲間の肉で、男は正体に後から気づいたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 6.1311201399657875,
+      "haiku_s": 6.152884897077456,
       "jev_s": null,
-      "judge_s": 6.1311201399657875,
+      "judge_s": 6.152884897077456,
       "luna_s": null,
-      "total_s": 10.768873592023738,
-      "writer_s": 4.63775345205795
+      "total_s": 10.299093513051048,
+      "writer_s": 4.146208615973592
     }
   },
   {
@@ -2329,12 +2306,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-k03",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -2351,12 +2328,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 751,
+            "completion_tokens": 728,
             "effort": "high",
             "input_tokens": 60,
-            "latency_s": 3.850192,
+            "latency_s": 4.430323,
             "model": "claude-haiku-5-5",
-            "output_tokens": 751,
+            "output_tokens": 728,
             "prompt_tokens": 7029,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2364,12 +2341,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 60,
-              "output_tokens": 751
+              "output_tokens": 728
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "漂流中にウミガメ汁と言われて飲んだ点は当たっている。材料の正体が仲間の肉だった点までは述べていない。"
+          "reason": "要点1は当てたが、要点2は口にしてはいけない物だったと触れただけで、仲間の肉とは言っていない。"
         },
         "jev": null,
         "luna": null
@@ -2381,12 +2358,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 0,
           "cache_read_input_tokens": 3993,
-          "completion_tokens": 423,
+          "completion_tokens": 479,
           "effort": "high",
           "input_tokens": 60,
-          "latency_s": 3.239615,
+          "latency_s": 3.102577,
           "model": "claude-haiku-5-5",
-          "output_tokens": 423,
+          "output_tokens": 479,
           "prompt_tokens": 4053,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2395,33 +2372,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 3993,
             "input_tokens": 60,
-            "output_tokens": 423
+            "output_tokens": 479
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "惜しい！もう少し考えを進めてごらん 🧐"
+        "text": "惜しい！もう少し推理を続けてごらんね 🧐"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "漂流中、ウミガメの汁だと説明されて飲んだけど、材料は口にしてはいけないものだったんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.8506150559987873,
+      "haiku_s": 4.4307329470757395,
       "jev_s": null,
-      "judge_s": 3.8506150559987873,
+      "judge_s": 4.4307329470757395,
       "luna_s": null,
-      "total_s": 7.090583625016734,
-      "writer_s": 3.2399685690179467
+      "total_s": 7.533728241105564,
+      "writer_s": 3.1029952940298244
     }
   },
   {
@@ -2430,12 +2406,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-k04",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -2452,12 +2428,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 594,
+            "completion_tokens": 546,
             "effort": "high",
             "input_tokens": 66,
-            "latency_s": 3.217266,
+            "latency_s": 3.448423,
             "model": "claude-haiku-5-5",
-            "output_tokens": 594,
+            "output_tokens": 546,
             "prompt_tokens": 7035,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2465,12 +2441,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 66,
-              "output_tokens": 594
+              "output_tokens": 546
             }
           },
           "error": null,
           "kind": "guess_close",
-          "reason": "要点1・2は当てているが、仲間は全員無事という明らかな誤りを含むため guess_close"
+          "reason": "要点1・2に当たるが、仲間が全員無事に帰れたという明らかな誤りを含むためguess_close。"
         },
         "jev": null,
         "luna": null
@@ -2482,12 +2458,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 0,
           "cache_read_input_tokens": 3993,
-          "completion_tokens": 277,
+          "completion_tokens": 327,
           "effort": "high",
           "input_tokens": 66,
-          "latency_s": 2.718871,
+          "latency_s": 2.3554,
           "model": "claude-haiku-5-5",
-          "output_tokens": 277,
+          "output_tokens": 327,
           "prompt_tokens": 4059,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2496,7 +2472,107 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 3993,
             "input_tokens": 66,
-            "output_tokens": 277
+            "output_tokens": 327
+          }
+        },
+        "guard": null,
+        "over_80": false,
+        "reply_id": null,
+        "source": "llm",
+        "text": "惜しい！もう少し考えて、次の推理を聞かせてごらんよ 🧐"
+      },
+      "schema_version": 1,
+      "set_code": "umigame-soup-1",
+      "text": "以前、亀のスープだと言われて飲んだのは仲間の肉だった。でも漂流仲間は全員無事に帰れたんだ。",
+      "times": {
+        "comment_created_at": null,
+        "judged_at": "2026-10-11T03:53:42Z",
+        "replied_at": null,
+        "webhook_received_at": "2026-10-11T03:53:42Z"
+      }
+    },
+    "timing": {
+      "haiku_s": 3.44861334702,
+      "jev_s": null,
+      "judge_s": 3.44861334702,
+      "luna_s": null,
+      "total_s": 5.804413883131929,
+      "writer_s": 2.3558005361119285
+    }
+  },
+  {
+    "case_id": "U28-k05",
+    "record": {
+      "comment_id": "U28-k05",
+      "commenter_id": "probe",
+      "config": {
+        "haiku_effort": "high",
+        "judge_mode": "haiku",
+        "luna_effort": "xhigh",
+        "luna_model": "gpt-6-luna",
+        "prompt_version": "9c2045d7fa0d",
+        "reply_variant": "1b-haiku"
+      },
+      "content_key": "016-umigame-soup",
+      "errors": [],
+      "fact_sheet_hash": "c81ff384e8a1",
+      "final": {
+        "answer": null,
+        "decision": "haiku",
+        "kind": "guess_close"
+      },
+      "judgements": {
+        "haiku": {
+          "answer": null,
+          "bare_term": null,
+          "debug": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 6969,
+            "completion_tokens": 1007,
+            "effort": "high",
+            "input_tokens": 50,
+            "latency_s": 5.744482,
+            "model": "claude-haiku-5-5",
+            "output_tokens": 1007,
+            "prompt_tokens": 7019,
+            "refusal_category": null,
+            "stop_reason": "end_turn",
+            "usage": {
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 6969,
+              "input_tokens": 50,
+              "output_tokens": 1007
+            }
+          },
+          "error": null,
+          "kind": "guess_close",
+          "reason": "以前にも飲んで味が違ったと触れているが、前のスープがウミガメだったとする明らかな誤りを含むため惜しい止まり"
+        },
+        "jev": null,
+        "luna": null
+      },
+      "media_id": "local-U28",
+      "parent_id": null,
+      "problem_schema_version": 3,
+      "reply": {
+        "debug": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 3993,
+          "completion_tokens": 346,
+          "effort": "high",
+          "input_tokens": 50,
+          "latency_s": 2.655145,
+          "model": "claude-haiku-5-5",
+          "output_tokens": 346,
+          "prompt_tokens": 4043,
+          "refusal_category": null,
+          "slot": "（この種別では使わない）",
+          "stop_reason": "end_turn",
+          "usage": {
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 3993,
+            "input_tokens": 50,
+            "output_tokens": 346
           }
         },
         "guard": null,
@@ -2507,123 +2583,21 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
-      "text": "以前、亀のスープだと言われて飲んだのは仲間の肉だった。でも漂流仲間は全員無事に帰れたんだ。",
-      "times": {
-        "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
-        "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
-      }
-    },
-    "timing": {
-      "haiku_s": 3.217568118008785,
-      "jev_s": null,
-      "judge_s": 3.217568118008785,
-      "luna_s": null,
-      "total_s": 5.946225007995963,
-      "writer_s": 2.728656889987178
-    }
-  },
-  {
-    "case_id": "U28-k05",
-    "record": {
-      "comment_id": "U28-k05",
-      "commenter_id": "probe",
-      "config": {
-        "consensus": false,
-        "judge_mode": "haiku",
-        "luna_model": "gpt-6-luna",
-        "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
-      },
-      "content_key": "016-umigame-soup",
-      "errors": [],
-      "fact_sheet_hash": "c81ff384e8a1",
-      "final": {
-        "answer": null,
-        "decision": "haiku",
-        "kind": "guess_close"
-      },
-      "judgements": {
-        "haiku": {
-          "answer": null,
-          "bare_term": null,
-          "debug": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 6969,
-            "completion_tokens": 1229,
-            "effort": "high",
-            "input_tokens": 50,
-            "latency_s": 6.281513,
-            "model": "claude-haiku-5-5",
-            "output_tokens": 1229,
-            "prompt_tokens": 7019,
-            "refusal_category": null,
-            "stop_reason": "end_turn",
-            "usage": {
-              "cache_creation_input_tokens": 0,
-              "cache_read_input_tokens": 6969,
-              "input_tokens": 50,
-              "output_tokens": 1229
-            }
-          },
-          "error": null,
-          "kind": "guess_close",
-          "reason": "昔飲んだ一杯と味の違いに触れるが、ウミガメだったとする点は確定事実と食い違う。"
-        },
-        "jev": null,
-        "luna": null
-      },
-      "media_id": "local-U28",
-      "parent_id": null,
-      "problem_schema_version": 3,
-      "reply": {
-        "debug": {
-          "cache_creation_input_tokens": 0,
-          "cache_read_input_tokens": 3993,
-          "completion_tokens": 311,
-          "effort": "high",
-          "input_tokens": 50,
-          "latency_s": 2.133106,
-          "model": "claude-haiku-5-5",
-          "output_tokens": 311,
-          "prompt_tokens": 4043,
-          "refusal_category": null,
-          "slot": "（この種別では使わない）",
-          "stop_reason": "end_turn",
-          "usage": {
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 3993,
-            "input_tokens": 50,
-            "output_tokens": 311
-          }
-        },
-        "guard": null,
-        "over_80": false,
-        "reply_id": null,
-        "source": "llm",
-        "text": "惜しい！もう少し推理を続けてごらんよ 🧐"
-      },
-      "schema_version": 1,
-      "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "男は昔もウミガメの汁を飲み、今のものとは味が違うと感じたんだね。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 6.287239206954837,
+      "haiku_s": 5.760740142897703,
       "jev_s": null,
-      "judge_s": 6.287239206954837,
+      "judge_s": 5.760740142897703,
       "luna_s": null,
-      "total_s": 8.420680472860113,
-      "writer_s": 2.133441265905276
+      "total_s": 8.421710378839634,
+      "writer_s": 2.6609702359419316
     }
   },
   {
@@ -2632,12 +2606,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-k06",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -2654,12 +2628,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 447,
+            "completion_tokens": 446,
             "effort": "high",
             "input_tokens": 55,
-            "latency_s": 3.284188,
+            "latency_s": 3.11829,
             "model": "claude-haiku-5-5",
-            "output_tokens": 447,
+            "output_tokens": 446,
             "prompt_tokens": 7024,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2667,12 +2641,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 55,
-              "output_tokens": 447
+              "output_tokens": 446
             }
           },
           "error": null,
           "kind": "guess_wrong",
-          "reason": "今日のスープは本物で店に嘘はなく、昔飲んだものを当てる要点にも触れていない。"
+          "reason": "今日のスープは本物で店に嘘はなく、誤りの例に当たる。昔飲んだものへの言及もなく要点に触れていない"
         },
         "jev": null,
         "luna": null
@@ -2684,12 +2658,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 0,
           "cache_read_input_tokens": 3995,
-          "completion_tokens": 259,
+          "completion_tokens": 56,
           "effort": "high",
           "input_tokens": 55,
-          "latency_s": 2.518705,
+          "latency_s": 1.609198,
           "model": "claude-haiku-5-5",
-          "output_tokens": 259,
+          "output_tokens": 56,
           "prompt_tokens": 4050,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2698,33 +2672,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 3995,
             "input_tokens": 55,
-            "output_tokens": 259
+            "output_tokens": 56
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "残念、ちがうよ。別の角度からもう一度考えてごらん。"
+        "text": "残念、ちがうよ。シェフは嘘をついていないし、今日のスープも本物だよ。もう一度推理してごらん。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "今日の椀は偽物で、シェフが男の昔話を信じ込ませるために嘘をついたんだ。",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 3.284711522050202,
+      "haiku_s": 3.1186575650935993,
       "jev_s": null,
-      "judge_s": 3.284711522050202,
+      "judge_s": 3.1186575650935993,
       "luna_s": null,
-      "total_s": 5.803801881032996,
-      "writer_s": 2.519090358982794
+      "total_s": 4.728612163104117,
+      "writer_s": 1.6099545980105177
     }
   },
   {
@@ -2733,12 +2706,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-t01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [
@@ -2757,12 +2730,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 399,
+            "completion_tokens": 318,
             "effort": "high",
             "input_tokens": 23,
-            "latency_s": 2.342387,
+            "latency_s": 2.551692,
             "model": "claude-haiku-5-5",
-            "output_tokens": 399,
+            "output_tokens": 318,
             "prompt_tokens": 6992,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2770,12 +2743,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 23,
-              "output_tokens": 399
+              "output_tokens": 318
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語がない名詞だけのコメントで、何を聞きたいのか決まらないため聞き直す。"
+          "reason": "述語のない語句だけのコメントのため、はい／いいえで答えられる形に聞き直してもらう。"
         },
         "jev": null,
         "luna": null
@@ -2787,12 +2760,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3998,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 370,
+          "completion_tokens": 347,
           "effort": "high",
           "input_tokens": 23,
-          "latency_s": 3.018018,
+          "latency_s": 2.862856,
           "model": "claude-haiku-5-5",
-          "output_tokens": 370,
+          "output_tokens": 347,
           "prompt_tokens": 4021,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2801,7 +2774,7 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3998,
             "cache_read_input_tokens": 0,
             "input_tokens": 23,
-            "output_tokens": 370
+            "output_tokens": 347
           }
         },
         "guard": null,
@@ -2812,22 +2785,21 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "仲間の肉？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.342632856918499,
+      "haiku_s": 2.552041132003069,
       "jev_s": null,
-      "judge_s": 2.342632856918499,
+      "judge_s": 2.552041132003069,
       "luna_s": null,
-      "total_s": 5.36118511587847,
-      "writer_s": 3.0185522589599714
+      "total_s": 5.415476822992787,
+      "writer_s": 2.863435690989718
     }
   },
   {
@@ -2836,15 +2808,17 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "U28-t02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
-      "errors": [],
+      "errors": [
+        "writer: writer did not ask what bare_term means"
+      ],
       "fact_sheet_hash": "c81ff384e8a1",
       "final": {
         "answer": null,
@@ -2858,12 +2832,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 300,
+            "completion_tokens": 239,
             "effort": "high",
             "input_tokens": 19,
-            "latency_s": 1.880459,
+            "latency_s": 1.802651,
             "model": "claude-haiku-5-5",
-            "output_tokens": 300,
+            "output_tokens": 239,
             "prompt_tokens": 6988,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2871,12 +2845,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 19,
-              "output_tokens": 300
+              "output_tokens": 239
             }
           },
           "error": null,
           "kind": "q_open",
-          "reason": "述語のない語だけのコメントで、何を聞きたいか決まらないため聞き直す"
+          "reason": "述語のない語だけのコメントのため、はい／いいえで答えられる形で聞き直してもらう。"
         },
         "jev": null,
         "luna": null
@@ -2888,12 +2862,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3994,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 423,
+          "completion_tokens": 58,
           "effort": "high",
           "input_tokens": 19,
-          "latency_s": 3.426588,
+          "latency_s": 1.576651,
           "model": "claude-haiku-5-5",
-          "output_tokens": 423,
+          "output_tokens": 58,
           "prompt_tokens": 4013,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -2902,33 +2876,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3994,
             "cache_read_input_tokens": 0,
             "input_tokens": 19,
-            "output_tokens": 423
+            "output_tokens": 58
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
-        "source": "llm",
-        "text": "レモンの何が知りたいのかな？はい／いいえで答えられる形で聞き直してごらん。"
+        "source": "fallback_template",
+        "text": "レモンがどうしたのか聞かせてね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "レモン",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.8811072970274836,
+      "haiku_s": 1.8029522070428357,
       "jev_s": null,
-      "judge_s": 1.8811072970274836,
+      "judge_s": 1.8029522070428357,
       "luna_s": null,
-      "total_s": 5.308086917037144,
-      "writer_s": 3.4269796200096607
+      "total_s": 3.3800949529977515,
+      "writer_s": 1.5771427459549159
     }
   },
   {
@@ -2937,12 +2910,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "c-ask_howto-04",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -2959,12 +2932,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 437,
+            "completion_tokens": 364,
             "effort": "high",
             "input_tokens": 28,
-            "latency_s": 2.527513,
+            "latency_s": 2.557738,
             "model": "claude-haiku-5-5",
-            "output_tokens": 437,
+            "output_tokens": 364,
             "prompt_tokens": 6997,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -2972,12 +2945,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 28,
-              "output_tokens": 437
+              "output_tokens": 364
             }
           },
           "error": null,
           "kind": "ask_howto",
-          "reason": "質問への返事の有無を尋ねており、遊び方の質問なので ask_howto と判定"
+          "reason": "質問への返答の仕組みを尋ねているので遊び方の質問として案内する。"
         },
         "jev": null,
         "luna": null
@@ -2989,12 +2962,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3994,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 47,
+          "completion_tokens": 44,
           "effort": "high",
           "input_tokens": 28,
-          "latency_s": 0.886713,
+          "latency_s": 1.632957,
           "model": "claude-haiku-5-5",
-          "output_tokens": 47,
+          "output_tokens": 44,
           "prompt_tokens": 4022,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -3003,33 +2976,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3994,
             "cache_read_input_tokens": 0,
             "input_tokens": 28,
-            "output_tokens": 47
+            "output_tokens": 44
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "はい！はい／いいえで答えられる質問をコメントしてごらん。私が答えるからね。🧐"
+        "text": "はい！はい / いいえで答えられる質問をコメントしてごらん。私が答えるよ。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "質問したら返事もらえるの？",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.527800334035419,
+      "haiku_s": 2.55802275496535,
       "jev_s": null,
-      "judge_s": 2.527800334035419,
+      "judge_s": 2.55802275496535,
       "luna_s": null,
-      "total_s": 3.4153946170117706,
-      "writer_s": 0.8875942829763517
+      "total_s": 4.191753629012965,
+      "writer_s": 1.6337308740476146
     }
   },
   {
@@ -3038,12 +3010,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "c-cheer-03",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -3060,12 +3032,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 337,
+            "completion_tokens": 242,
             "effort": "high",
             "input_tokens": 28,
-            "latency_s": 2.171943,
+            "latency_s": 1.666724,
             "model": "claude-haiku-5-5",
-            "output_tokens": 337,
+            "output_tokens": 242,
             "prompt_tokens": 6997,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -3073,12 +3045,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 28,
-              "output_tokens": 337
+              "output_tokens": 242
             }
           },
           "error": null,
           "kind": "cheer",
-          "reason": "続報を楽しみにする応援のコメントで、質問や推理は含まれない。"
+          "reason": "更新を楽しみにする応援のコメントで、質問や推理ではない。"
         },
         "jev": null,
         "luna": null
@@ -3090,12 +3062,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3992,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 35,
+          "completion_tokens": 30,
           "effort": "high",
           "input_tokens": 28,
-          "latency_s": 0.900572,
+          "latency_s": 1.364431,
           "model": "claude-haiku-5-5",
-          "output_tokens": 35,
+          "output_tokens": 30,
           "prompt_tokens": 4020,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -3104,33 +3076,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3992,
             "cache_read_input_tokens": 0,
             "input_tokens": 28,
-            "output_tokens": 35
+            "output_tokens": 30
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう、楽しみにしててね。次の問題も待っててね。"
+        "text": "ありがとう！次の問題も楽しみにしててね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "更新たのしみにしてる〜",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.17275779589545,
+      "haiku_s": 1.6671203650766984,
       "jev_s": null,
-      "judge_s": 2.17275779589545,
+      "judge_s": 1.6671203650766984,
       "luna_s": null,
-      "total_s": 3.073914439883083,
-      "writer_s": 0.9011566439876333
+      "total_s": 3.0320851331343874,
+      "writer_s": 1.364964768057689
     }
   },
   {
@@ -3139,12 +3110,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "c-complaint-02",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -3161,12 +3132,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 425,
+            "completion_tokens": 367,
             "effort": "high",
             "input_tokens": 32,
-            "latency_s": 2.72453,
+            "latency_s": 2.708423,
             "model": "claude-haiku-5-5",
-            "output_tokens": 425,
+            "output_tokens": 367,
             "prompt_tokens": 7001,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -3174,12 +3145,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 32,
-              "output_tokens": 425
+              "output_tokens": 367
             }
           },
           "error": null,
           "kind": "complaint",
-          "reason": "問題の設定が前の投稿と重なっているという指摘なので complaint と判定"
+          "reason": "前の投稿と設定が被っているという問題への指摘のため、お礼と確認の旨だけを返す。"
         },
         "jev": null,
         "luna": null
@@ -3191,12 +3162,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
         "debug": {
           "cache_creation_input_tokens": 3992,
           "cache_read_input_tokens": 0,
-          "completion_tokens": 21,
+          "completion_tokens": 26,
           "effort": "high",
           "input_tokens": 32,
-          "latency_s": 0.78439,
+          "latency_s": 1.384987,
           "model": "claude-haiku-5-5",
-          "output_tokens": 21,
+          "output_tokens": 26,
           "prompt_tokens": 4024,
           "refusal_category": null,
           "slot": "（この種別では使わない）",
@@ -3205,33 +3176,32 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "cache_creation_input_tokens": 3992,
             "cache_read_input_tokens": 0,
             "input_tokens": 32,
-            "output_tokens": 21
+            "output_tokens": 26
           }
         },
         "guard": null,
         "over_80": false,
         "reply_id": null,
         "source": "llm",
-        "text": "ありがとう！確認するね。"
+        "text": "ご指摘ありがとう、確認するね。"
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "前の投稿と設定が被ってる気がする",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 2.7400734371040016,
+      "haiku_s": 2.729630376910791,
       "jev_s": null,
-      "judge_s": 2.7400734371040016,
+      "judge_s": 2.729630376910791,
       "luna_s": null,
-      "total_s": 3.5251552080735564,
-      "writer_s": 0.7850817709695548
+      "total_s": 4.1160562228178605,
+      "writer_s": 1.3864258459070697
     }
   },
   {
@@ -3240,12 +3210,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "c-troll-01",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -3262,12 +3232,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
           "debug": {
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 6969,
-            "completion_tokens": 142,
+            "completion_tokens": 170,
             "effort": "high",
             "input_tokens": 28,
-            "latency_s": 1.784835,
+            "latency_s": 1.808662,
             "model": "claude-haiku-5-5",
-            "output_tokens": 142,
+            "output_tokens": 170,
             "prompt_tokens": 6997,
             "refusal_category": null,
             "stop_reason": "end_turn",
@@ -3275,12 +3245,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 6969,
               "input_tokens": 28,
-              "output_tokens": 142
+              "output_tokens": 170
             }
           },
           "error": null,
           "kind": "troll",
-          "reason": "意味の取れない文字列の連投のため"
+          "reason": "意味の取れない文字列の連投なので、返信は空にする。"
         },
         "jev": null,
         "luna": null
@@ -3297,22 +3267,21 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "ぬぬぬぬぬ",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 1.785292251035571,
+      "haiku_s": 1.8089363489998505,
       "jev_s": null,
-      "judge_s": 1.785292251035571,
+      "judge_s": 1.8089363489998505,
       "luna_s": null,
-      "total_s": 1.785372038022615,
-      "writer_s": 7.978698704391718e-05
+      "total_s": 1.8089613829506561,
+      "writer_s": 2.5033950805664062e-05
     }
   },
   {
@@ -3321,12 +3290,12 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       "comment_id": "c-spam-05",
       "commenter_id": "probe",
       "config": {
-        "consensus": false,
+        "haiku_effort": "high",
         "judge_mode": "haiku",
+        "luna_effort": "xhigh",
         "luna_model": "gpt-6-luna",
         "prompt_version": "9c2045d7fa0d",
-        "reply_variant": "1b-haiku",
-        "shadow": false
+        "reply_variant": "1b-haiku"
       },
       "content_key": "016-umigame-soup",
       "errors": [],
@@ -3346,7 +3315,7 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
             "completion_tokens": 50,
             "effort": "high",
             "input_tokens": 44,
-            "latency_s": 0.858811,
+            "latency_s": 1.519998,
             "model": "claude-haiku-5-5",
             "output_tokens": 50,
             "prompt_tokens": 7013,
@@ -3378,22 +3347,21 @@ window.PROBE_RAW["haiku-1b-high/U28"] = [
       },
       "schema_version": 1,
       "set_code": "umigame-soup-1",
-      "shadow_mismatch": null,
       "text": "無料プレゼント応募は固定リンクから→ https://example.invalid/gift",
       "times": {
         "comment_created_at": null,
-        "judged_at": "2026-10-08T18:25:22Z",
+        "judged_at": "2026-10-11T03:53:42Z",
         "replied_at": null,
-        "webhook_received_at": "2026-10-08T18:25:22Z"
+        "webhook_received_at": "2026-10-11T03:53:42Z"
       }
     },
     "timing": {
-      "haiku_s": 0.8595632560318336,
+      "haiku_s": 1.5202799119288102,
       "jev_s": null,
-      "judge_s": 0.8595632560318336,
+      "judge_s": 1.5202799119288102,
       "luna_s": null,
-      "total_s": 0.8595669231144711,
-      "writer_s": 3.6670826375484467e-06
+      "total_s": 1.5202812219504267,
+      "writer_s": 1.3100216165184975e-06
     }
   }
 ];
