@@ -15,6 +15,8 @@ from app.secrets import get_secrets, require_keys
 
 
 LOGGER = logging.getLogger(__name__)
+# Lambda の既定（WARNING）では INFO が出ないため、app 配下のロガーを INFO にする。
+logging.getLogger("app").setLevel(logging.INFO)
 
 
 def response(status: int, body: str) -> dict[str, Any]:

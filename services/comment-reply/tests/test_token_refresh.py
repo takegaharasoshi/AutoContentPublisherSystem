@@ -251,3 +251,12 @@ def test_lambda_handler_requires_secret_arn(monkeypatch: pytest.MonkeyPatch) -> 
 
     with pytest.raises(ValueError, match="SECRET_ARN is required"):
         token_refresh_handler.lambda_handler({}, None)
+
+
+def test_lambda_entrypoints_enable_info_logs_for_app_package() -> None:
+    import logging
+
+    from app import reply_handler, webhook_handler  # noqa: F401
+
+    for name in ("app.token_refresh_handler", "app.reply_handler", "app.webhook_handler"):
+        assert logging.getLogger(name).getEffectiveLevel() == logging.INFO

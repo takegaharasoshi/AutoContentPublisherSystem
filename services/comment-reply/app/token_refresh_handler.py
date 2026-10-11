@@ -13,6 +13,8 @@ from urllib import error, parse, request
 
 
 LOGGER = logging.getLogger(__name__)
+# Lambda の既定（WARNING）では INFO が出ないため、app 配下のロガーを INFO にする。
+logging.getLogger("app").setLevel(logging.INFO)
 DEFAULT_REFRESH_API_BASE = "https://graph.instagram.com"
 HTTP_TIMEOUT_SECONDS = 30
 HTTP_RETRIES = 2
