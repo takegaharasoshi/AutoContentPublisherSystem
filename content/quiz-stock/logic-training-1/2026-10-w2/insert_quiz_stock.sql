@@ -122,3 +122,23 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         '野球。走者がホームに戻り、捕手と審判が待つ',
         '{"hook":"夏の夜にぴったりの一問","hint":"「家」は1種類だけか?","question":"男は家を出て、左へ3回曲がって、また家に戻ってきた。家ではマスクをした男が2人待っていた。何が起きている?","answer":"野球。走者がホームに戻り、捕手と審判が待つ","explanation":"家は野球のホームベース。走者は一塁・二塁・三塁と左へ3回曲がって本塁へ戻る。そこでマスクをつけて待つのは捕手と球審だ。","coach_comment":"「家」を読み替えたな!","tags":["水平思考","夜の一問","言葉あそび"],"summary":"家を出て左へ3回曲がって戻るとマスクの男2人が待っていた状況を問う水平思考の定番。野球の走者が本塁へ戻り、捕手と球審が待つ。","illustration_scene":"夜、街灯に照らされた住宅街の一軒家。玄関から出た道が左へ3回曲がって玄関へ戻る白い矢印の道すじが、地面に描かれている。家の上に大きな「?」。野球場・ボール・マスク・人物・「?」以外の文字は描かない。"}',
         '類型: 左へ3回曲がって家へ戻るとマスクの男が待つ=野球の水平思考の定番(作者不詳・英語圏に流布)。流布例: https://boards.straightdope.com/t/solve-this-riddle/213508?page=3 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C68
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '国境の橋は渡りきるのに8分。国の側の見張りは5分ごとに橋を見て、国を出る者は連れ戻し、入ってくる者は外へ追い返す。通行証のない男は、どうやって国を出た?',
+        '5分近く歩いて向きを変え、入国者に見せて追い返させた',
+        '{"hook":"国境越えの頭脳戦だ","hint":"見張りの決まりをよく読め!","question":"国境の橋は渡りきるのに8分。国の側の見張りは5分ごとに橋を見て、国を出る者は連れ戻し、入ってくる者は外へ追い返す。通行証のない男は、どうやって国を出た?","answer":"5分近く歩いて向きを変え、入国者に見せて追い返させた","explanation":"見張りが目を離した直後に渡り始め、5分近く進んだら国の方へ向き直る。見張りには国へ入る者に見え、外へ追い返されて残りを渡りきる。","coach_comment":"決まりの裏をかいたな!","tags":["水平思考","夜の一問","逆転の発想"],"summary":"渡るのに8分、見張りが5分ごとに出国者を連れ戻し入国者を追い返す橋を、通行証なしで出国する方法を問う定番。5分近く歩いて向きを変え、追い返させる。","illustration_scene":"夜の川にかかる長い木の橋を遠くから見た絵。手前の門のそばに見張り小屋の窓明かり、橋の向こうは暗い森。橋の上に大きな「?」。人物・時計・数字・「?」以外の文字は描かない。"}',
+        '類型: 見張りの決まりを逆手に取って橋を渡る定番の水平思考(作者不詳・英語圏の面接パズル集に流布。best time to escape)。流布例: https://www.geeksforgeeks.org/?p=218086 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+
+-- C69
+INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
+VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
+        (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
+        'L1', 'deep',
+        '殿様に「褒美は何がよい?」と聞かれた家来は、「毎日、殿の耳のにおいをかがせてください」と願った。これで家来は大もうけした。なぜ?',
+        '耳元に顔を寄せる姿が告げ口に見え、家臣が贈り物をした',
+        '{"hook":"欲のない家来の話らしいぞ","hint":"殿様のまわりに目を向けてみろ!","question":"殿様に「褒美は何がよい?」と聞かれた家来は、「毎日、殿の耳のにおいをかがせてください」と願った。これで家来は大もうけした。なぜ?","answer":"耳元に顔を寄せる姿が告げ口に見え、家臣が贈り物をした","explanation":"毎日、皆の前で殿の耳元に顔を寄せる。家臣たちには告げ口をしているように見え、悪口を言われまいと贈り物を届けた。秀吉の家来・曽呂利の逸話だ。","coach_comment":"人の目まで読んだな!","tags":["とんち","夜の一問","思い込み"],"summary":"褒美に殿の耳のにおいを毎日かぎたいと願った家来が大もうけした理由を問うとんち話。耳打ちが告げ口に見え、家臣が贈り物をした。曽呂利新左衛門の逸話。","illustration_scene":"夜、ろうそくの明かりがゆれる城の広間。上座に殿様が1人座った後ろ姿。広間の床に、ふたをした漆塗りの箱がいくつも積まれ、その上に大きな「?」。顔・家来・「?」以外の文字は描かない。"}',
+        '類型: 曽呂利新左衛門が秀吉の耳をかいで福を得たとんち話(作者不詳の伝承。『絵本太閤記』にも描かれる)。流布例: https://www.osaka21.or.jp/web_magazine/osaka100/025.html 。問題文では人名を出さず書き下ろし(表現は書き直し済み)。', 1);
