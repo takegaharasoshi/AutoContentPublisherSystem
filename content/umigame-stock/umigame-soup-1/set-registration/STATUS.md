@@ -14,8 +14,8 @@
 | 3 | `audio_assets`（BGM 1 曲） | [03_audio_assets.sql](03_audio_assets.sql) | ローカル適用済み（21-5a）。Aurora は適用後の確認クエリで有無を見る |
 | 4 | `batch_sets` の有効化 | [04_activate.sql](04_activate.sql) | 未適用（**cdk deploy の後・1 本目の直前**） |
 | 5 | 正解基準の再適用 | [../batch-01/update_judge_criteria.sql](../batch-01/update_judge_criteria.sql) | 21-6d8 以降の修正分（U01・U27・U18・U22・U25 ほか）。両環境へ再適用が必要 |
-| 6 | Scheduler（画像生成 1 + インサイト 2）・スナップショット PUT 権限 | `infra/lib/{image,insights,sns-post}-batch-stack.ts` | 未 deploy |
-| 7 | プライバシーポリシー | `infra/assets/umigame-privacy-policy/index.html` + `CommentReplyStack`（本番面） | 未 deploy |
+| 6 | Scheduler（画像生成 1 + インサイト 2）・スナップショット PUT 権限 | `infra/lib/{image,insights,sns-post}-batch-stack.ts` | **deploy 済み（2026-10-12）**。Scheduler 3 件とも ENABLED（`is_active=0` の間は何もせず終わる） |
+| 7 | プライバシーポリシー | `infra/assets/umigame-privacy-policy/index.html` + `CommentReplyStack`（本番面） | **deploy 済み（2026-10-12）**。https://acps-prod-umigame-privacy-policy.s3.ap-northeast-1.amazonaws.com/index.html（200・`text/html; charset=utf-8` を確認） |
 | 8 | スナップショットの手動再出力 | [../tools/write_snapshot.py](../tools/write_snapshot.py) | 必要時のみ（下の「困ったとき」） |
 
 ローカルの dry-run（01・02・04 を 1 トランザクションで流して ROLLBACK）:
@@ -51,7 +51,7 @@ python3 dry_run.py
    done
    ```
    Aurora に BGM 行が無ければ `set-registration/03_audio_assets.sql` も同じく流す（下の確認クエリで判定）。
-5. **push → deploy**（`infra/` の変更はパイプラインを起動しない。イメージタグ 3 つの Context 指定が必須。
+5. **push → deploy**（**2026-10-12 に済み**。手順 1〜4 より先に行ったが、`is_active=0` のため投稿は始まらない。`infra/` の変更はパイプラインを起動しない。イメージタグ 3 つの Context 指定が必須。
    現行タグの確認方法は [cicd.html セクション 3.2](../../../../docs/infra/cicd.html)）:
    ```bash
    cd infra
