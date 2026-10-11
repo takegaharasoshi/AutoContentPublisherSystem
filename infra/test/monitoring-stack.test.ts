@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib/core';
 import { Match, Template } from 'aws-cdk-lib/assertions';
+import { CommentReplyStack } from '../lib/comment-reply-stack';
 import { FoundationStack } from '../lib/foundation-stack';
 import { ImageBatchStack } from '../lib/image-batch-stack';
 import { InsightsBatchStack } from '../lib/insights-batch-stack';
@@ -17,6 +18,11 @@ const createMonitoringStack = (): MonitoringStack => {
   });
   const foundationStack = new FoundationStack(app, 'FoundationStack', {
     envName: 'prod',
+  });
+  const commentReplyStack = new CommentReplyStack(app, 'CommentReplyStack', {
+    envName: 'prod',
+    face: 'prod',
+    assetsBucket: foundationStack.imagesBucket,
   });
   const snsPostBatchStack = new SnsPostBatchStack(app, 'SnsPostBatchStack', {
     envName: 'prod',
@@ -77,6 +83,7 @@ const createMonitoringStack = (): MonitoringStack => {
     imageScheduleGroup: imageBatchStack.scheduleGroup,
     insightsCollectionStateMachine: insightsBatchStack.stateMachine,
     insightsScheduleGroup: insightsBatchStack.scheduleGroup,
+    commentReplyDlq: commentReplyStack.replyDlq,
   });
 };
 
@@ -90,8 +97,32 @@ describe('MonitoringStack', () => {
     });
   });
 
-  test('CloudWatch Alarm を 18 個作成する', () => {
-    template.resourceCountIs('AWS::CloudWatch::Alarm', 18);
+  test('CloudWatch Alarm を 19 個作成する', () => {
+    template.resourceCountIs('AWS::CloudWatch::Alarm', 19);
+  });
+
+  test('本番面のコメント返信 DLQ の滞留を監視する', () => {
+    template.hasResourceProperties('AWS::CloudWatch::Alarm', {
+      AlarmName: 'acps-prod-comment-reply-dlq-messages',
+      Namespace: 'AWS/SQS',
+      MetricName: 'ApproximateNumberOfMessagesVisible',
+      Dimensions: [
+        {
+          Name: 'QueueName',
+          Value: {
+            'Fn::ImportValue': Match.stringLikeRegexp('^CommentReplyStack:.*ReplyDlq.*QueueName'),
+          },
+        },
+      ],
+      Threshold: 1,
+      ComparisonOperator: 'GreaterThanOrEqualToThreshold',
+      EvaluationPeriods: 1,
+      DatapointsToAlarm: 1,
+      Period: 300,
+      Statistic: 'Maximum',
+      TreatMissingData: 'notBreaching',
+      AlarmActions: [{ Ref: Match.stringLikeRegexp('AlarmTopic') }],
+    });
   });
 
   test('画像生成 Step Functions の失敗を監視する', () => {

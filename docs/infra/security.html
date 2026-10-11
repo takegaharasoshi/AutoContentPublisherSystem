@@ -120,6 +120,8 @@
   "ig_access_token": "...",
   "ig_user_id": "...",
   "openai_api_key": "...",
+  "typesafe_api_key": "...",
+  "anthropic_api_key": "...",
   "token_expires_at": "2026-11-02T00:00:00Z"
 }</code></pre>
 <div class="table-wrap">
@@ -130,7 +132,9 @@
     <tr><td><code>app_secret</code></td><td>YES</td><td>Webhook 署名（<code>X-Hub-Signature-256</code>）の HMAC 鍵。<strong>Instagram アプリシークレット</strong>（Facebook 側「アプリ設定 → ベーシック」の app secret ではない。PoC 2026-09-03 で実測）</td></tr>
     <tr><td><code>ig_access_token</code></td><td>YES</td><td>コメント返信用の長期アクセストークン（<strong>Instagram ログイン方式・スコープ <code>instagram_business_basic</code> + <code>instagram_business_manage_comments</code></strong>）。投稿用 Secret の <code>access_token</code>（Facebook ページ経由・既存 Meta アプリ）とは別のアプリ・別の方式のトークンで、同じアカウントに 2 本のトークンが存在する。60 日で失効</td></tr>
     <tr><td><code>ig_user_id</code></td><td>YES</td><td>自アカウントの Instagram user ID。<strong>自己返信ループ防止の照合キー</strong>（未設定のままコメントが来ると自分の返信に返信し続けるため、投入を最優先する）</td></tr>
-    <tr><td><code>openai_api_key</code></td><td>YES</td><td>OpenAI API キー（プロジェクト単位で月額予算上限を設定したもの。利用上限の 1 段目）。空なら固定文言で返信（疎通確認用）</td></tr>
+    <tr><td><code>openai_api_key</code></td><td>YES</td><td>OpenAI API キー（プロジェクト単位で月額予算上限を設定したもの。利用上限の 1 段目）。既定構成では haiku 判定が失敗したときのサブ判定（luna）に使う。Reply Lambda は空でも起動時に必須キーとして検査するため、必ず投入する</td></tr>
+    <tr><td><code>typesafe_api_key</code></td><td>YES</td><td>Jev 判定（<code>JUDGE_MODE=jev</code>）の API キー。既定構成では呼ばないが、Reply Lambda が起動時に必須キーとして検査する（21-6f 追加）</td></tr>
+    <tr><td><code>anthropic_api_key</code></td><td>YES（既定構成）</td><td>Anthropic API キー。既定の判定 <code>JUDGE_MODE=haiku</code> と書き手 <code>REPLY_VARIANT=1b-haiku</code>（Claude Haiku 5.5・effort <code>high</code>。21-6e 決定）に使う。Console のワークスペース単位で月額上限を設定したものを入れる（21-6f 追加）</td></tr>
     <tr><td><code>token_expires_at</code></td><td>NO</td><td>コメント返信用トークンの失効日時の運用メモ。<a href="../app/operation.html">app/operation.html セクション 5.4</a> のリマインド運用に載せる</td></tr>
   </tbody>
 </table>
@@ -278,7 +282,7 @@
   <thead><tr><th>ロール</th><th>許可</th><th>備考</th></tr></thead>
   <tbody>
     <tr><td>Webhook Lambda</td><td><code>secretsmanager:GetSecretValue</code>（当該面の Secret 1 件のみ）/ <code>sqs:SendMessage</code>（当該面のメインキューのみ）/ CloudWatch Logs（基本実行ロール）</td><td>S3・Graph API・OpenAI には触れない（署名検証と enqueue だけ）</td></tr>
-    <tr><td>Reply Lambda</td><td><code>secretsmanager:GetSecretValue</code>（当該面の Secret 1 件のみ）/ <code>sqs:ReceiveMessage</code> <code>DeleteMessage</code> <code>GetQueueAttributes</code>（メインキュー。イベントソースマッピング用）/ <code>s3:GetObject</code> を <strong><code>arn:aws:s3:::{bucket}/assets/umigame-soup-1/problems/*</code>（ステージング面は <code>.../staging/problems/*</code>）に限定</strong> / CloudWatch Logs</td><td><code>s3:PutObject</code>・<code>ListBucket</code>・他プレフィックスは付与しない（読み取り専用データストア）。OpenAI・Graph API は IAM ではなく Secret 内のキー・トークンで認証</td></tr>
+    <tr><td>Reply Lambda</td><td><code>secretsmanager:GetSecretValue</code>（当該面の Secret 1 件のみ）/ <code>sqs:ReceiveMessage</code> <code>DeleteMessage</code> <code>GetQueueAttributes</code>（メインキュー。イベントソースマッピング用）/ <code>s3:GetObject</code> を <strong><code>arn:aws:s3:::{bucket}/assets/umigame-soup-1/problems/*</code>（ステージング面は <code>.../staging/problems/*</code>）に限定</strong> / CloudWatch Logs</td><td><code>s3:PutObject</code> は <strong>コメント記録 <code>comment-log/{SET_CODE}/*</code> だけ</strong>（本番面 <code>comment-log/umigame-soup-1/*</code>・ステージング面 <code>comment-log/umigame-soup-1-staging/*</code>。21-6c2 のコメント記録用に 21-6f で追加。ステージングの記録が本番の記録に混ざらないよう IAM で分ける）。問題スナップショットへの PUT・<code>ListBucket</code>・<code>DeleteObject</code>・他プレフィックスは付与しない。バケットポリシーは変えずロール側のポリシーだけで付与する。Anthropic・OpenAI・Typesafe・Graph API は IAM ではなく Secret 内のキー・トークンで認証</td></tr>
   </tbody>
 </table>
 </div>
@@ -293,8 +297,8 @@
       <li>アウトバウンド: インターネットアクセス（外部 API、Secrets Manager、CloudWatch Logs）と VPC 内通信（Aurora）を許可</li>
     </ul>
   </li>
-  <li><strong>コメント自動返信 Lambda（21-3 追加）</strong>: VPC 外で実行し、Function URL を<strong>認証なし（<code>authType: NONE</code>）</strong>で公開する。インバウンドの正当性は Meta の <code>X-Hub-Signature-256</code> 署名検証（鍵は Instagram アプリシークレット）で担保し、署名不一致は 401 で捨てる。Reply Lambda はインバウンドを持たず SQS トリガーのみ。アウトバウンドは Secrets Manager・S3・OpenAI・Graph API（すべて TLS）。NAT Gateway・VPC Endpoint は使わない（<a href="architecture.html#comment-reply">architecture.html セクション 1.1</a>）</li>
-  <li><strong>プライバシーポリシー用 S3 バケット（21-3 追加）</strong>: Meta アプリの公開モードに必須の到達可能 URL を提供するため、<strong>専用の小バケットだけ</strong>を静的ウェブサイトホスティング + 公開読み取りにする。画像保存バケットの Block Public Access は維持する</li>
+  <li><strong>コメント自動返信 Lambda（21-3 追加）</strong>: VPC 外で実行し、Function URL を<strong>認証なし（<code>authType: NONE</code>）</strong>で公開する。インバウンドの正当性は Meta の <code>X-Hub-Signature-256</code> 署名検証（鍵は Instagram アプリシークレット）で担保し、署名不一致は 401 で捨てる。Reply Lambda はインバウンドを持たず SQS トリガーのみ。アウトバウンドは Secrets Manager・S3・Anthropic・OpenAI・Typesafe・Graph API（すべて TLS）。NAT Gateway・VPC Endpoint は使わない（<a href="architecture.html#comment-reply">architecture.html セクション 1.1</a>）</li>
+  <li><strong>プライバシーポリシー用 S3 バケット（21-3 設計・21-7 で構築予定）</strong>: Meta アプリの公開モードに必須の到達可能 URL を提供するため、<strong>専用の小バケットだけ</strong>を静的ウェブサイトホスティング + 公開読み取りにする。画像保存バケットの Block Public Access は維持する。21-6f ではポリシー本文が未作成のため作らず、本番用 Meta アプリを準備する 21-7 へ回した（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）</li>
   <li><strong>Secrets Manager</strong>: ECS Fargate のパブリック IP 経由でアクセス（通信は TLS で暗号化）
     <ul>
       <li>Interface VPC Endpoint は使用しない（コスト削減のため。より厳格なネットワーク分離が必要な場合は導入を検討）</li>

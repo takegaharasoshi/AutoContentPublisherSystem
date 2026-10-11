@@ -9,6 +9,7 @@ import * as rds from 'aws-cdk-lib/aws-rds';
 import * as scheduler from 'aws-cdk-lib/aws-scheduler';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as sns from 'aws-cdk-lib/aws-sns';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Construct } from 'constructs';
 
 export interface MonitoringStackProps extends cdk.StackProps {
@@ -28,6 +29,8 @@ export interface MonitoringStackProps extends cdk.StackProps {
   imageScheduleGroup: scheduler.ScheduleGroup;
   /** AWS/Scheduler メトリクスの Dimension に使用するインサイト収集 ScheduleGroup */
   insightsScheduleGroup: scheduler.ScheduleGroup;
+  /** 本番面のコメント返信失敗を監視する DLQ */
+  commentReplyDlq: sqs.IQueue;
 }
 
 /**
@@ -146,6 +149,20 @@ export class MonitoringStack extends cdk.Stack {
       1,
       1,
       'SNS 投稿ワークフローの起動失敗を検知。原因を確認し、手動で SNS 投稿 Step Functions を起動する',
+    );
+
+    createAlarm(
+      'CommentReplyDlqMessagesAlarm',
+      `acps-${props.envName}-comment-reply-dlq-messages`,
+      props.commentReplyDlq.metricApproximateNumberOfMessagesVisible({
+        statistic: 'Maximum',
+        period: cdk.Duration.seconds(300),
+      }),
+      1,
+      cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+      1,
+      1,
+      'コメント返信 DLQ への返信失敗メッセージの滞留を検知。DLQ のメッセージと CloudWatch Logs で原因を確認する',
     );
 
     createAlarm(

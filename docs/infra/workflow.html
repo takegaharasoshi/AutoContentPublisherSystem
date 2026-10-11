@@ -624,7 +624,7 @@
   <thead><tr><th>項目</th><th>値</th></tr></thead>
   <tbody>
     <tr><td>Queue 名</td><td><code>acps-prod-comment-reply-dlq.fifo</code>（ステージング面は <code>-staging</code> 接尾辞。アラーム対象外）</td></tr>
-    <tr><td>用途</td><td>OpenAI / Graph API の失敗が再試行 3 回で解消しなかったコメントイベントの退避（メッセージ本文 = Webhook の <code>value</code>: <code>comment_id</code> / <code>media_id</code> / コメント本文 / 送信者 id）</td></tr>
+    <tr><td>用途</td><td>判定・書き手の LLM API（既定 Anthropic、サブ判定は OpenAI）/ Graph API の失敗、または Reply Lambda のタイムアウト（120 秒）が再試行 3 回で解消しなかったコメントイベントの退避（メッセージ本文 = Webhook の <code>value</code>: <code>comment_id</code> / <code>media_id</code> / コメント本文 / 送信者 id）</td></tr>
     <tr><td>Message retention</td><td>14 日</td></tr>
     <tr><td>監視</td><td><code>AWS/SQS</code> の <code>ApproximateNumberOfMessagesVisible</code> &gt;= 1（セクション 8）を MonitoringStack で監視</td></tr>
   </tbody>
