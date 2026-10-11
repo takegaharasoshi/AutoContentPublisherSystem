@@ -5,7 +5,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from app.umigame_items import fetch_umigame_item
+from app.models import PreviousUmigameTruth
+from app.umigame_items import fetch_previous_umigame_truth, fetch_umigame_item
 
 
 CRITERIA = {"points": [{"hit": "当てた", "touch": "触れた"}], "errors": ["誤り"]}
@@ -103,3 +104,30 @@ def test_fetch_umigame_item_rejects_invalid_judge_criteria(criteria: object) -> 
     )
     with pytest.raises(RuntimeError, match="judge_criteria"):
         fetch_umigame_item(cursor, 17)
+
+
+def test_fetch_previous_umigame_truth_uses_latest_success_in_set() -> None:
+    cursor = Mock()
+    cursor.fetchone.return_value = ("前回の題", "前回の真相")
+    previous = fetch_previous_umigame_truth(cursor, 5, 17)
+    assert previous == PreviousUmigameTruth("前回の題", "前回の真相")
+    sql, params = cursor.execute.call_args.args
+    assert "p.status = 'success'" in sql
+    assert "p.set_id = %s" in sql
+    assert "p.generation_run_id <> %s" in sql
+    assert "ORDER BY p.posted_at DESC, p.id DESC LIMIT 1" in sql
+    assert params == (5, 17)
+
+
+def test_fetch_previous_umigame_truth_returns_none_on_first_post() -> None:
+    cursor = Mock()
+    cursor.fetchone.return_value = None
+    assert fetch_previous_umigame_truth(cursor, 5, 17) is None
+
+
+@pytest.mark.parametrize("row", [(None, "真相"), ("題", " "), ("題", None)])
+def test_fetch_previous_umigame_truth_rejects_missing_fields(row: tuple) -> None:
+    cursor = Mock()
+    cursor.fetchone.return_value = row
+    with pytest.raises(RuntimeError, match="previous post is missing"):
+        fetch_previous_umigame_truth(cursor, 5, 17)

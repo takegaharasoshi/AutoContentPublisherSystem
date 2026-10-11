@@ -17,6 +17,7 @@ def _stock_row(**updates: object) -> tuple[object, ...]:
     item: dict[str, object] = {
         "id": 91,
         "content_key": "001-lighthouse-letter",
+        "title": "灯台の手紙",
         "problem_text": "問題文",
         "truth": "真相",
         "fact_sheet": json.dumps(["確定事実", "別の事実"], ensure_ascii=False),
@@ -92,7 +93,7 @@ def test_generate_fetches_video_and_stages_stock_and_history(monkeypatch) -> Non
     )
     assert cursor.calls[1][1] == (used_at, 91)
     assert cursor.calls[2][1] == (
-        9, 123, 91, "001-lighthouse-letter", "問題文", "真相",
+        9, 123, 91, "001-lighthouse-letter", "灯台の手紙", "問題文", "真相",
         '["確定事実", "別の事実"]', '["要点", "別の要点"]',
         json.dumps({
             "points": [
@@ -146,7 +147,8 @@ def test_generate_fails_when_no_built_stock_exists() -> None:
 
 
 @pytest.mark.parametrize(
-    "field", ["problem_text", "truth", "rule_text", "hook", "caption", "content_key"]
+    "field",
+    ["title", "problem_text", "truth", "rule_text", "hook", "caption", "content_key"],
 )
 def test_generate_rejects_blank_required_field(field: str) -> None:
     with pytest.raises(RuntimeError, match=field):
@@ -211,7 +213,7 @@ def test_generate_accepts_decoded_fact_sheet(monkeypatch, value: object) -> None
     monkeypatch.setattr(umigame, "get_object", lambda *args, **kwargs: b"mp4")
     cursor = Cursor([_stock_row(fact_sheet=value)])
     umigame.generate(_context(cursor))
-    assert json.loads(cursor.calls[2][1][6]) == ["事実"]
+    assert json.loads(cursor.calls[2][1][7]) == ["事実"]
 
 
 @pytest.mark.parametrize("value", [["要点"], '["要点"]'.encode("utf-8")])
@@ -220,8 +222,8 @@ def test_generate_accepts_decoded_core_points(monkeypatch, value: object) -> Non
     criteria = {"points": [{"hit": "当てた", "touch": "触れた"}], "errors": []}
     cursor = Cursor([_stock_row(core_points=value, judge_criteria=criteria)])
     umigame.generate(_context(cursor))
-    assert json.loads(cursor.calls[2][1][7]) == ["要点"]
-    assert json.loads(cursor.calls[2][1][8]) == criteria
+    assert json.loads(cursor.calls[2][1][8]) == ["要点"]
+    assert json.loads(cursor.calls[2][1][9]) == criteria
 
 
 def test_generate_accepts_decoded_judge_criteria(monkeypatch) -> None:
@@ -229,7 +231,7 @@ def test_generate_accepts_decoded_judge_criteria(monkeypatch) -> None:
     criteria = {"points": [{"hit": "当てた", "touch": "触れた"}] * 2, "errors": []}
     cursor = Cursor([_stock_row(judge_criteria=criteria)])
     umigame.generate(_context(cursor))
-    assert json.loads(cursor.calls[2][1][8]) == criteria
+    assert json.loads(cursor.calls[2][1][9]) == criteria
 
 
 def test_generate_fails_when_s3_download_fails_without_staging_db(monkeypatch) -> None:

@@ -80,6 +80,14 @@ class UmigameItem:
 
 
 @dataclass(frozen=True)
+class PreviousUmigameTruth:
+    """Title and truth of the set's most recently posted umigame problem."""
+
+    title: str
+    truth: str
+
+
+@dataclass(frozen=True)
 class Post:
     """Current posting state for one generation run and SNS account."""
 

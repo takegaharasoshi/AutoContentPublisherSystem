@@ -241,7 +241,7 @@ def test_main_builds_caption_once_before_processing_accounts(monkeypatch) -> Non
     monkeypatch.setattr(main_module, "process_target_generation_run", processor)
 
     assert main_module.main(s3_client=Mock(), urlopen=Mock()) == 0
-    builder.assert_called_once_with(connection.cursor_value, 8, "caption")
+    builder.assert_called_once_with(connection.cursor_value, 8, "caption", set_id=1)
     assert processor.call_args.kwargs["caption_text"] == "展開後キャプション"
 
 

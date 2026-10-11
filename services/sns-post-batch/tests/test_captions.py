@@ -5,7 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 import app.captions as captions
-from app.models import QuizItem, RankingItem, UmigameItem
+from app.models import PreviousUmigameTruth, QuizItem, RankingItem, UmigameItem
 
 
 def _quiz_item(**field_updates: object) -> QuizItem:
@@ -212,3 +212,105 @@ def test_build_caption_rejects_unknown_umigame_like_token_without_fetch(
     with pytest.raises(RuntimeError, match="fact_sheet"):
         captions.build_caption(Mock(), 8, "{{fact_sheet}}")
     umigame_fetch.assert_not_called()
+
+
+TRUTH_TEMPLATE = "{{caption}}{{prev_truth_block}}"
+
+
+def _patch_umigame(monkeypatch, previous: object) -> Mock:
+    monkeypatch.setattr(captions, "fetch_quiz_item", lambda *args: None)
+    monkeypatch.setattr(captions, "fetch_ranking_item", lambda *args: None)
+    monkeypatch.setattr(captions, "fetch_umigame_item", lambda *args: _umigame_item())
+    fetch_previous = Mock(return_value=previous)
+    monkeypatch.setattr(captions, "fetch_previous_umigame_truth", fetch_previous)
+    return fetch_previous
+
+
+def test_build_caption_appends_previous_truth_block(monkeypatch) -> None:
+    fetch_previous = _patch_umigame(
+        monkeypatch, PreviousUmigameTruth("55年目の年賀状", "男は中学3年の春、\n2人は会っていない。")
+    )
+    cursor = Mock()
+    assert captions.build_caption(cursor, 8, TRUTH_TEMPLATE, set_id=5) == (
+        "本文 #AIart\n\n\n\n"
+        "――― 前回の問題「55年目の年賀状」の真相（ネタバレ注意）―――\n"
+        "・\n・\n・\n・\n"
+        "【真相】\n"
+        "男は中学3年の春、\n2人は会っていない。"
+    )
+    fetch_previous.assert_called_once_with(cursor, 5, 8)
+
+
+def test_build_caption_omits_block_on_first_post(monkeypatch) -> None:
+    _patch_umigame(monkeypatch, None)
+    assert captions.build_caption(Mock(), 8, TRUTH_TEMPLATE, set_id=5) == "本文 #AIart"
+
+
+def test_build_caption_does_not_read_previous_without_token(monkeypatch) -> None:
+    fetch_previous = _patch_umigame(monkeypatch, None)
+    assert captions.build_caption(Mock(), 8, "{{caption}}", set_id=5) == "本文 #AIart"
+    fetch_previous.assert_not_called()
+
+
+def test_build_caption_requires_set_id_for_previous_truth(monkeypatch) -> None:
+    _patch_umigame(monkeypatch, None)
+    with pytest.raises(RuntimeError, match="set_id is required"):
+        captions.build_caption(Mock(), 8, TRUTH_TEMPLATE)
+
+
+def test_build_caption_rejects_caption_over_limit(monkeypatch) -> None:
+    _patch_umigame(monkeypatch, PreviousUmigameTruth("題", "あ" * 2200))
+    with pytest.raises(RuntimeError, match="exceeds the limit"):
+        captions.build_caption(Mock(), 8, TRUTH_TEMPLATE, set_id=5)
+
+
+def test_build_caption_accepts_caption_at_limit(monkeypatch) -> None:
+    _patch_umigame(monkeypatch, PreviousUmigameTruth("題", "x"))
+    base = captions.build_caption(Mock(), 8, TRUTH_TEMPLATE, set_id=5)
+    filler = "あ" * (captions.MAX_CAPTION_LENGTH - len(base) + 1)
+    _patch_umigame(monkeypatch, PreviousUmigameTruth("題", filler))
+    caption = captions.build_caption(Mock(), 8, TRUTH_TEMPLATE, set_id=5)
+    assert len(caption) == captions.MAX_CAPTION_LENGTH
+
+
+@pytest.mark.parametrize("family", ["quiz", "ranking"])
+def test_build_caption_rejects_previous_truth_for_other_family(
+    monkeypatch, family: str
+) -> None:
+    monkeypatch.setattr(
+        captions, "fetch_quiz_item",
+        lambda *args: _quiz_item() if family == "quiz" else None,
+    )
+    monkeypatch.setattr(
+        captions, "fetch_ranking_item",
+        lambda *args: _ranking_item() if family == "ranking" else None,
+    )
+    fetch_previous = Mock()
+    monkeypatch.setattr(captions, "fetch_previous_umigame_truth", fetch_previous)
+    with pytest.raises(RuntimeError, match="prev_truth_block"):
+        captions.build_caption(Mock(), 8, "{{hook}}{{prev_truth_block}}", set_id=5)
+    fetch_previous.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "family, template, expected",
+    [
+        ("quiz", "{{hook}}\n" + "い" * 2300, "この問題、解ける？\n" + "い" * 2300),
+        ("ranking", "{{title}}", "住みたい都道府県ランキング"),
+    ],
+)
+def test_build_caption_leaves_other_sets_unchanged(
+    monkeypatch, family: str, template: str, expected: str
+) -> None:
+    monkeypatch.setattr(
+        captions, "fetch_quiz_item",
+        lambda *args: _quiz_item() if family == "quiz" else None,
+    )
+    monkeypatch.setattr(
+        captions, "fetch_ranking_item",
+        lambda *args: _ranking_item() if family == "ranking" else None,
+    )
+    fetch_previous = Mock()
+    monkeypatch.setattr(captions, "fetch_previous_umigame_truth", fetch_previous)
+    assert captions.build_caption(Mock(), 8, template, set_id=5) == expected
+    fetch_previous.assert_not_called()

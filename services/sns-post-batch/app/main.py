@@ -131,6 +131,7 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                         caption_template.template_text
                         if caption_template is not None
                         else "",
+                        set_id=batch_set.id,
                     )
                     sns_accounts = fetch_active_sns_accounts(cursor, batch_set.id)
                     generated_media = fetch_first_generated_media(

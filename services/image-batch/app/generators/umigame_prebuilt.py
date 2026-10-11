@@ -119,7 +119,8 @@ def _judge_criteria(value: Any, point_count: int) -> dict[str, Any]:
 def _fetch_stock_item(cursor: Any, set_id: int) -> dict[str, Any]:
     """Lock the next built stock item in the configured posting order."""
     cursor.execute(
-        "SELECT id, content_key, problem_text, truth, fact_sheet, core_points, judge_criteria, "
+        "SELECT id, content_key, title, problem_text, truth, fact_sheet, core_points, "
+        "judge_criteria, "
         "reveal_text, rule_text, "
         "caption, hook, video_s3_key, video_audio_asset_id, use_count "
         "FROM umigame_stock_items "
@@ -133,13 +134,13 @@ def _fetch_stock_item(cursor: Any, set_id: int) -> dict[str, Any]:
         raise RuntimeError(f"No built active umigame stock item for set_id={set_id}")
 
     names = (
-        "id", "content_key", "problem_text", "truth", "fact_sheet",
+        "id", "content_key", "title", "problem_text", "truth", "fact_sheet",
         "core_points", "judge_criteria", "reveal_text", "rule_text", "caption", "hook", "video_s3_key",
         "video_audio_asset_id", "use_count",
     )
     item = dict(zip(names, row))
     for name in (
-        "content_key", "problem_text", "truth", "rule_text", "hook",
+        "content_key", "title", "problem_text", "truth", "rule_text", "hook",
         "caption", "video_s3_key", "reveal_text",
     ):
         value = item[name]
@@ -173,14 +174,15 @@ def generate(context: GeneratorContext) -> GeneratorResult:
     )
     context.cursor.execute(
         "INSERT INTO umigame_items "
-        "(set_id, generation_run_id, stock_item_id, content_key, problem_text, "
+        "(set_id, generation_run_id, stock_item_id, content_key, title, problem_text, "
         "truth, fact_sheet, core_points, judge_criteria, reveal_text, rule_text, hook, caption) "
-        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (
             context.prompt_config.set_id,
             context.generation_run_id,
             item["id"],
             item["content_key"],
+            item["title"],
             item["problem_text"],
             item["truth"],
             json.dumps(item["fact_sheet"], ensure_ascii=False),

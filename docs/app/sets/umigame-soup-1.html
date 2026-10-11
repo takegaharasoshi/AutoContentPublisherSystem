@@ -32,7 +32,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
+  <span>最終更新: 2026-10-12（21-6h: セクション 6 の前回の真相ブロックを実装に合わせて確定し、テンプレート文面を <code>{{caption}}{{prev_truth_block}}</code> に決めた）。前回: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
 </div>
 
 <div class="note">
@@ -163,16 +163,16 @@ nav.toc ul { margin: .3rem 0 0; }
 </ul>
 
 <h2 id="caption">6. キャプションの作り方</h2>
-<div class="note"><span class="callout-title">要点</span>キャプションはストックの <code>caption</code> に問題ごとに書き、テンプレートは <code>{{caption}}</code> の 1 行だけ。構成は全問共通の 4 段（見出し = 問題タイトル）。ハッシュタグの後ろに、前回の問題の真相ブロックを投稿バッチが差し込む（21-6h）。</div>
-<p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}</code> の 1 行</strong>とする。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b）。</p>
+<div class="note"><span class="callout-title">要点</span>キャプションはストックの <code>caption</code> に問題ごとに書き、テンプレートは <code>{{caption}}{{prev_truth_block}}</code> の 1 行だけ。構成は全問共通の 4 段（見出し = 問題タイトル）。ハッシュタグの後ろに、前回の問題の真相ブロックを投稿バッチが差し込む（21-6h）。</div>
+<p>キャプションはストックの <code>caption</code> フィールド（本文 + ハッシュタグ。<code>#AIart</code> 必須）に問題ごとに書き、<code>caption_templates.template_text</code> は <strong><code>{{caption}}{{prev_truth_block}}</code> の 1 行</strong>（間に改行を入れない。ブロック側が先頭の改行を持ち、初回は空になるため）とする。21-7 のセット登録 SQL にはこの文面を入れる。SNS 投稿バッチは <code>umigame_items</code> から umigame 系プレースホルダ（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code> / <code>{{prev_truth_block}}</code>）を展開する（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.3 の decision</a>。実装 21-5b・<code>{{prev_truth_block}}</code> は 21-6h）。</p>
 <ul>
   <li><strong>構成</strong>: 見出し【<code>title</code>】→ 問題文 → 遊び方と真相公開の予告 → ハッシュタグ の 4 段で全問共通（<code>umigame_common.caption(title, problem_text)</code> が組み立てる。21-6d3e で見出しをセット名【探偵カメロックのウミガメのスープ】から問題タイトルへ変えた）</li>
   <li><strong>遊び方と予告の文</strong>（4 行。改行もこのとおり）: 「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者の探偵カメロックが全部返事するよ。／正解が出るまで何度でもどうぞ。／真相は明日のリールのキャプションにて公開するよ。／フォローして待っててね。</li>
-  <li><strong>前回の真相ブロック</strong>: ハッシュタグの後ろに「――― 前回の問題「<code>title</code>」の真相（ネタバレ注意）―――」→「・」の行 → 【真相】→ 前回の <code>truth</code> 全文を置く。投稿順が LRU で決まりストック作成時には「前回」が分からないため、ストックの <code>caption</code> には含めず <strong>SNS 投稿バッチが展開時に差し込む</strong>（前回 = 同じセットで最後に投稿が成功した回。初回はブロックごと出さない）。仕様・実装は 21-6h で決める。経緯は<a href="#d-20261004-truth-disclosure">付録</a></li>
+  <li><strong>前回の真相ブロック</strong>: ハッシュタグの後ろに「――― 前回の問題「<code>title</code>」の真相（ネタバレ注意）―――」→「・」の行 → 【真相】→ 前回の <code>truth</code> 全文を置く（ハッシュタグ行との間は空行 3 つ・「・」は 4 行）。投稿順が LRU で決まりストック作成時には「前回」が分からないため、ストックの <code>caption</code> には含めず <strong>SNS 投稿バッチが展開時に差し込む</strong>（前回 = 同じセットで最後に投稿が成功した回。失敗した回は飛ばす。初回はブロックごと出さない。展開後 2,200 字を超えたら投稿せず失敗させる。仕様の正は <a href="../batch-flow.html#prev-truth-block">batch-flow.html 3.3</a>）。title・truth は <code>umigame_items</code> のスナップショット（V015 で <code>title</code> を追加）から引く。第 1 バッチ 14 問では最長の組み合わせでも約 720 字で、上限に余裕がある。経緯は<a href="#d-20261004-truth-disclosure">付録</a></li>
   <li><strong>ハッシュタグ</strong>: <code>#ウミガメのスープ #水平思考 #推理クイズ #なぞなぞ #謎解き #クイズ #コメント即時返信 #AIart</code></li>
   <li><strong>書かないもの</strong>: 問題番号「第 N 問」（ストックは LRU で消費され、投稿順が確定しないため。PoC の表記は本番では使わない）。問題文の要約（すぐ下の問題文と同じ話が 2 回出るように見えるため。2026-09-24 ユーザー決定）</li>
   <li><strong>AI 開示</strong>: <code>#AIart</code> はストック側の必須項目として <code>validate.py</code> で検査する（テンプレートが <code>{{caption}}</code> だけのため、<a href="../operation.html">運用設計 3</a> の「テンプレートに含める」ルールの担保はストック検証に移る）。ナレーションは Irodori-TTS でクレジット表記は不要（セクション 8）</li>
-  <li><strong>テンプレートを <code>{{caption}}</code> だけにする理由</strong>: ハッシュタグの固定部を分けると、問題固有のタグを足したいときに 2 か所を見ることになり、素材項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）</li>
+  <li><strong>テンプレートを <code>{{caption}}</code> だけにする理由</strong>: ハッシュタグの固定部を分けると、問題固有のタグを足したいときに 2 か所を見ることになり、素材項目の表（セクション 4）とも食い違うため。固定尾部が必要になったらテンプレート側に足す（DDL 変更なし）。前回の真相ブロックはこの考え方でテンプレート側に足したもの（21-6h）</li>
 </ul>
 
 <h2 id="audio">7. 音源の構成</h2>

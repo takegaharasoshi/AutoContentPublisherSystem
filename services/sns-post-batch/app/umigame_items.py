@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from .models import UmigameItem
+from .models import PreviousUmigameTruth, UmigameItem
 
 
 def fetch_umigame_item(cursor: Any, generation_run_id: int) -> UmigameItem | None:
@@ -113,3 +113,39 @@ def fetch_umigame_item(cursor: Any, generation_run_id: int) -> UmigameItem | Non
         hook=row[9],
         caption=row[10],
     )
+
+
+def fetch_previous_umigame_truth(
+    cursor: Any, set_id: int, generation_run_id: int
+) -> PreviousUmigameTruth | None:
+    """Fetch the problem of the set's last successfully posted run.
+
+    The previous run is the one with the latest successful post in the same
+    set, excluding the current run. Failed or unconfirmed runs are skipped.
+
+    Args:
+        cursor: Database cursor.
+        set_id: Batch set ID.
+        generation_run_id: Current generation run ID to exclude.
+
+    Returns:
+        The previous problem's title and truth, or ``None`` on the first post.
+    """
+    cursor.execute(
+        "SELECT ui.title, ui.truth FROM posts p "
+        "JOIN umigame_items ui ON ui.generation_run_id = p.generation_run_id "
+        "WHERE p.set_id = %s AND p.status = 'success' "
+        "AND p.generation_run_id <> %s "
+        "ORDER BY p.posted_at DESC, p.id DESC LIMIT 1",
+        (set_id, generation_run_id),
+    )
+    row = cursor.fetchone()
+    if row is None:
+        return None
+    title, truth = row
+    for name, value in (("title", title), ("truth", truth)):
+        if not isinstance(value, str) or not value.strip():
+            raise RuntimeError(
+                f"umigame_items.{name} of the previous post is missing"
+            )
+    return PreviousUmigameTruth(title=title, truth=truth)
