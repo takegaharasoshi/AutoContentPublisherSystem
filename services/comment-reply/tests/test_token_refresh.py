@@ -186,8 +186,8 @@ def test_invalid_api_response_does_not_write_secret(
     assert client.put_calls == []
 
 
-@pytest.mark.parametrize("token", [None, ""])
-def test_missing_or_empty_old_token_fails_before_api_call(
+@pytest.mark.parametrize("token", [None, "", "  "])
+def test_missing_or_empty_old_token_skips_without_api_call(
     monkeypatch: pytest.MonkeyPatch, token: object,
 ) -> None:
     secret = make_secret()
@@ -202,7 +202,23 @@ def test_missing_or_empty_old_token_fails_before_api_call(
 
     monkeypatch.setattr(token_refresh_handler.request, "urlopen", unexpected_urlopen)
 
-    with pytest.raises(ValueError, match="ig_access_token is required"):
+    result = token_refresh_handler.refresh_token(SECRET_ARN, client=client)
+
+    assert result == {"skipped": "token_not_set"}
+    assert client.put_calls == []
+
+
+def test_non_string_old_token_fails_before_api_call(monkeypatch: pytest.MonkeyPatch) -> None:
+    secret = make_secret()
+    secret["ig_access_token"] = 123
+    client = FakeSecretsManager(secret)
+
+    def unexpected_urlopen(*_args, **_kwargs):
+        raise AssertionError("API must not be called with a malformed access token")
+
+    monkeypatch.setattr(token_refresh_handler.request, "urlopen", unexpected_urlopen)
+
+    with pytest.raises(ValueError, match="ig_access_token must be a string"):
         token_refresh_handler.refresh_token(SECRET_ARN, client=client)
 
     assert client.put_calls == []

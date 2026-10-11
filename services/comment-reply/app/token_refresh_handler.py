@@ -102,10 +102,11 @@ def refresh_token(
         opener: Optional urllib opener, primarily for tests.
 
     Returns:
-        The new expiration timestamp and the API-provided lifetime in seconds.
+        The new expiration timestamp and the API-provided lifetime in seconds,
+        or ``{"skipped": "token_not_set"}`` when no token has been stored yet.
 
     Raises:
-        ValueError: If the secret ARN or current access token is missing.
+        ValueError: If the secret ARN is missing or the token is not a string.
         RuntimeError: If the Graph API response or request is invalid.
     """
     if not secret_arn:
@@ -123,9 +124,13 @@ def refresh_token(
     if not isinstance(secret_data, dict):
         raise ValueError("SecretString must contain a JSON object")
 
-    token = secret_data.get("ig_access_token")
-    if not isinstance(token, str) or not token.strip():
-        raise ValueError("ig_access_token is required")
+    token = secret_data.get("ig_access_token", "")
+    if not isinstance(token, str):
+        raise ValueError("ig_access_token must be a string")
+    # 本番面は 21-7 で初回投入するまで空のため、失敗にせず更新を見送る。
+    if not token.strip():
+        LOGGER.info("Token refresh skipped: ig_access_token is not set")
+        return {"skipped": "token_not_set"}
 
     query = parse.urlencode({
         "grant_type": "ig_refresh_token",

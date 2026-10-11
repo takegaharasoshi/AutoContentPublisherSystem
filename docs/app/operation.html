@@ -715,7 +715,7 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
   <span class="callout-title">決定（2026-10-11、21-6g）: コメント返信用トークン（umigame-soup-1）は自動更新する。本節の手動更新・リマインドは投稿用トークンだけが対象</span>
   コメント返信用の長期トークン（Instagram ログイン方式・Secret <code>acps/{env}/umigame-soup-1/comment-reply{-staging}</code> の <code>ig_access_token</code>）は 60 日で失効するが、<strong>トークン更新 Lambda が毎週月曜 04:00 JST に <code>GET /refresh_access_token</code> で更新し、新しいトークンと <code>token_expires_at</code> を Secret に書き戻す</strong>（構成は <a href="../infra/stacks.html#comment-reply">infra/stacks.html セクション 3.6</a>）。リマインダーは登録しない。運用者が行うのは次の 3 つだけ。
   <ul style="margin:.3rem 0 0;">
-    <li><strong>初回投入</strong>: 面ごとに長期トークンを手動で取得して Secret に入れる（PoC README の手順）。更新 API は<strong>発行から 24 時間以上経ったトークン</strong>しか受け付けないため、投入直後の手動実行は失敗する。初回の自動更新は翌週の月曜で、それまでに失効することはない</li>
+    <li><strong>初回投入</strong>: 面ごとに長期トークンを手動で取得して Secret に入れる（PoC README の手順）。更新 API は<strong>発行から 24 時間以上経ったトークン</strong>しか受け付けないため、投入直後の手動実行は失敗する。初回の自動更新は翌週の月曜で、それまでに失効することはない。投入前（トークンが空）の週は、更新処理が「未投入のため更新しない」として正常終了する（アラームは鳴らない）</li>
     <li><strong>失敗通知が来たとき</strong>（<code>acps-prod-comment-reply-token-refresh-errors</code>）: 更新 Lambda <code>acps-prod-comment-reply-token-refresh</code> のログで原因を見る。Graph API の一時障害なら Lambda を手動実行するか翌週を待つ（失敗した週は Secret が書き換わらず、旧トークンで返信は続く）。トークン失効・権限取り消しなら長期トークンを取り直して Secret に入れる。<strong><code>token_expires_at</code> が 14 日以内に迫っていたら翌週を待たずに直す</strong></li>
     <li><strong>手動実行・確認</strong>（トークン値を出力しない形で実行する）
       <pre><code>aws lambda invoke --region ap-northeast-1 \
