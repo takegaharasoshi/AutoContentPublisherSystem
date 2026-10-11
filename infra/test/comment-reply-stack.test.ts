@@ -39,6 +39,7 @@ describe.each([
   const template = Template.fromStack(stack);
   const webhookName = `acps-prod-comment-reply-webhook${sfx}`;
   const replyName = `acps-prod-comment-reply-reply${sfx}`;
+  const tokenRefreshName = `acps-prod-comment-reply-token-refresh${sfx}`;
   const [secretId] = Object.keys(template.findResources('AWS::SecretsManager::Secret'));
   const [queueId] = Object.keys(template.findResources('AWS::SQS::Queue', {
     Properties: { QueueName: `acps-prod-comment-reply${sfx}.fifo` },
@@ -49,11 +50,17 @@ describe.each([
   const [replyId] = Object.keys(template.findResources('AWS::Lambda::Function', {
     Properties: { FunctionName: replyName },
   }));
+  const [tokenRefreshId] = Object.keys(template.findResources('AWS::Lambda::Function', {
+    Properties: { FunctionName: tokenRefreshName },
+  }));
   const [webhookLogGroupId] = Object.keys(template.findResources('AWS::Logs::LogGroup', {
     Properties: { LogGroupName: `/aws/lambda/${webhookName}` },
   }));
   const [replyLogGroupId] = Object.keys(template.findResources('AWS::Logs::LogGroup', {
     Properties: { LogGroupName: `/aws/lambda/${replyName}` },
+  }));
+  const [tokenRefreshLogGroupId] = Object.keys(template.findResources('AWS::Logs::LogGroup', {
+    Properties: { LogGroupName: `/aws/lambda/${tokenRefreshName}` },
   }));
 
   const roleStatements = (functionId: string): any[] => {
@@ -157,8 +164,29 @@ describe.each([
     });
   });
 
-  test('両 Lambda は VPC 外で実行する', () => {
-    template.resourceCountIs('AWS::Lambda::Function', 2);
+  test('Token refresh Lambda の設定と非同期再試行回数を設定する', () => {
+    template.hasResourceProperties('AWS::Lambda::Function', {
+      FunctionName: tokenRefreshName,
+      Runtime: 'python3.13',
+      Handler: 'app.token_refresh_handler.lambda_handler',
+      MemorySize: 128,
+      Timeout: 60,
+      Environment: {
+        Variables: Match.objectEquals({
+          SECRET_ARN: { Ref: secretId },
+          REFRESH_API_BASE: 'https://graph.instagram.com',
+        }),
+      },
+      LoggingConfig: { LogGroup: { Ref: tokenRefreshLogGroupId } },
+    });
+    template.hasResourceProperties('AWS::Lambda::EventInvokeConfig', {
+      FunctionName: { Ref: tokenRefreshId },
+      MaximumRetryAttempts: 0,
+    });
+  });
+
+  test('3 Lambda は VPC 外で実行する', () => {
+    template.resourceCountIs('AWS::Lambda::Function', 3);
     for (const fn of Object.values(template.findResources('AWS::Lambda::Function'))) {
       expect(fn.Properties).not.toHaveProperty('VpcConfig');
     }
@@ -182,6 +210,23 @@ describe.each([
     });
   });
 
+  test('週次 Scheduler は月曜 04:00 JST に Token refresh Lambda を呼び出す', () => {
+    template.resourceCountIs('AWS::Scheduler::Schedule', 1);
+    template.hasResourceProperties('AWS::Scheduler::Schedule', {
+      Name: tokenRefreshName,
+      ScheduleExpression: 'cron(0 4 ? * MON *)',
+      ScheduleExpressionTimezone: 'Asia/Tokyo',
+      FlexibleTimeWindow: { Mode: 'OFF' },
+      Target: {
+        Arn: { 'Fn::GetAtt': [tokenRefreshId, 'Arn'] },
+        RetryPolicy: {
+          MaximumRetryAttempts: 2,
+          MaximumEventAgeInSeconds: 3600,
+        },
+      },
+    });
+  });
+
   test('両 Lambda は Secret を読み取り、Webhook だけがキューに送信する', () => {
     for (const functionId of [webhookId, replyId]) {
       const actions = roleStatements(functionId).flatMap((statement) => statement.Action);
@@ -196,6 +241,21 @@ describe.each([
     expect(replyActions).toContain('sqs:ReceiveMessage');
     expect(replyActions).toContain('sqs:DeleteMessage');
     expect(replyActions).not.toContain('sqs:SendMessage');
+  });
+
+  test('Token refresh Lambda は対象 Secret だけを読み書きできる', () => {
+    const statements = roleStatements(tokenRefreshId);
+    const secretStatements = statements.filter((statement) =>
+      [statement.Action].flat().some((action: string) => action.startsWith('secretsmanager:')),
+    );
+    const actions = secretStatements.flatMap((statement) => statement.Action);
+    expect(actions).toContain('secretsmanager:GetSecretValue');
+    expect(actions).toContain('secretsmanager:PutSecretValue');
+    expect(secretStatements).toHaveLength(2);
+    for (const statement of secretStatements) {
+      expect(statement.Resource).toEqual({ Ref: secretId });
+    }
+    expect(actions.every((action: string) => action.startsWith('secretsmanager:'))).toBe(true);
   });
 
   test('Reply の S3 権限を面別の問題読み取りとコメント記録書き込みに限定する', () => {
@@ -224,8 +284,8 @@ describe.each([
   });
 
   test('ロググループを明示し、保持期間を 90 日にする', () => {
-    template.resourceCountIs('AWS::Logs::LogGroup', 2);
-    for (const name of [webhookName, replyName]) {
+    template.resourceCountIs('AWS::Logs::LogGroup', 3);
+    for (const name of [webhookName, replyName, tokenRefreshName]) {
       template.hasResource('AWS::Logs::LogGroup', {
         Properties: {
           LogGroupName: `/aws/lambda/${name}`,
@@ -255,6 +315,7 @@ describe.each([
       expect(fs.readdirSync(asset.absoluteStagedPath)).toEqual(['app']);
       expect(fs.existsSync(path.join(asset.absoluteStagedPath, 'app/webhook_handler.py'))).toBe(true);
       expect(fs.existsSync(path.join(asset.absoluteStagedPath, 'app/reply_handler.py'))).toBe(true);
+      expect(fs.existsSync(path.join(asset.absoluteStagedPath, 'app/token_refresh_handler.py'))).toBe(true);
       expect(fs.existsSync(path.join(asset.absoluteStagedPath, 'app/prompts/haiku_judge.txt'))).toBe(true);
       checkContents(asset.absoluteStagedPath);
     }
@@ -266,5 +327,8 @@ describe.each([
     template.hasOutput('SecretName', { Value: stack.resolve(secret.secretName) });
     template.hasOutput('DlqUrl', { Value: stack.resolve(stack.replyDlq.queueUrl) });
     template.hasOutput('QueueUrl', { Value: { Ref: queueId } });
+    template.hasOutput('TokenRefreshFunctionName', {
+      Value: { Ref: tokenRefreshId },
+    });
   });
 });

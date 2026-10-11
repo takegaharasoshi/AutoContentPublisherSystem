@@ -133,6 +133,7 @@ aws stepfunctions start-execution \
     <tr><td>ECS タスク異常終了</td><td>CloudWatch Logs でエラー内容を確認。アプリケーションのバグの場合は修正してデプロイ</td></tr>
     <tr><td>Aurora 異常</td><td>Aurora の状態を AWS Console で確認。ACU 設定の見直しを検討</td></tr>
     <tr><td>コメント自動返信 DLQ の滞留（<code>acps-prod-comment-reply-dlq-messages</code>。21-3 追加・21-6 実装）</td><td>DLQ のメッセージ本文（<code>comment_id</code> / <code>media_id</code> / コメント本文）と Reply Lambda のログで原因を分ける: ① OpenAI 障害・レート制限 → 復旧後に SQS コンソールの「DLQ 再処理」でメインキューへ戻す ② Graph API のトークン失効（401）→ Secret の <code>ig_access_token</code> を再生成して再処理 ③ スナップショット欠落（S3 404 は本来 DLQ に入らない。入っていれば Lambda のバグ）→ <code>umigame_items.snapshot_s3_key IS NULL</code> を確認し手動再出力。古すぎるコメント（数日前）は返信の鮮度を優先して破棄してよい。投稿バッチには影響しない</td></tr>
+    <tr><td>コメント返信トークンの自動更新失敗（<code>acps-prod-comment-reply-token-refresh-errors</code>。21-6g 追加）</td><td>トークン更新 Lambda（<code>acps-prod-comment-reply-token-refresh</code>）のログで原因を分ける: ① Graph API の一時障害（5xx・429）→ 次の週次実行を待つか、Lambda を手動実行する ② トークン失効・権限取り消し（400 / 190 系）→ 手動でトークンを再発行して Secret を更新する（<a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a>）。失敗した週は Secret を書き換えないため、旧トークンで返信は続く</td></tr>
   </tbody>
 </table>
 </div>

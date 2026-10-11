@@ -5,6 +5,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as eventsTargets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as scheduler from 'aws-cdk-lib/aws-scheduler';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
@@ -31,6 +32,8 @@ export interface MonitoringStackProps extends cdk.StackProps {
   insightsScheduleGroup: scheduler.ScheduleGroup;
   /** 本番面のコメント返信失敗を監視する DLQ */
   commentReplyDlq: sqs.IQueue;
+  /** 本番面のコメント返信トークン更新 Lambda */
+  commentReplyTokenRefreshFunction: lambda.IFunction;
 }
 
 /**
@@ -163,6 +166,20 @@ export class MonitoringStack extends cdk.Stack {
       1,
       1,
       'コメント返信 DLQ への返信失敗メッセージの滞留を検知。DLQ のメッセージと CloudWatch Logs で原因を確認する',
+    );
+
+    createAlarm(
+      'CommentReplyTokenRefreshErrorsAlarm',
+      `acps-${props.envName}-comment-reply-token-refresh-errors`,
+      props.commentReplyTokenRefreshFunction.metricErrors({
+        statistic: 'Sum',
+        period: cdk.Duration.hours(1),
+      }),
+      1,
+      cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+      1,
+      1,
+      'コメント返信用トークンの週次自動更新の失敗を検知。CloudWatch Logs で原因を確認し、失効前に手動で更新する（運用設計 5.4）',
     );
 
     createAlarm(

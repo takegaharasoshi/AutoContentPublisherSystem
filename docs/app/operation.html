@@ -712,6 +712,23 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
 <h3 id="token-refresh">5.4 Instagram アクセストークン更新の具体手順とリマインド運用</h3>
 
 <div class="decision">
+  <span class="callout-title">決定（2026-10-11、21-6g）: コメント返信用トークン（umigame-soup-1）は自動更新する。本節の手動更新・リマインドは投稿用トークンだけが対象</span>
+  コメント返信用の長期トークン（Instagram ログイン方式・Secret <code>acps/{env}/umigame-soup-1/comment-reply{-staging}</code> の <code>ig_access_token</code>）は 60 日で失効するが、<strong>トークン更新 Lambda が毎週月曜 04:00 JST に <code>GET /refresh_access_token</code> で更新し、新しいトークンと <code>token_expires_at</code> を Secret に書き戻す</strong>（構成は <a href="../infra/stacks.html#comment-reply">infra/stacks.html セクション 3.6</a>）。リマインダーは登録しない。運用者が行うのは次の 3 つだけ。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>初回投入</strong>: 面ごとに長期トークンを手動で取得して Secret に入れる（PoC README の手順）。更新 API は<strong>発行から 24 時間以上経ったトークン</strong>しか受け付けないため、投入直後の手動実行は失敗する。初回の自動更新は翌週の月曜で、それまでに失効することはない</li>
+    <li><strong>失敗通知が来たとき</strong>（<code>acps-prod-comment-reply-token-refresh-errors</code>）: 更新 Lambda <code>acps-prod-comment-reply-token-refresh</code> のログで原因を見る。Graph API の一時障害なら Lambda を手動実行するか翌週を待つ（失敗した週は Secret が書き換わらず、旧トークンで返信は続く）。トークン失効・権限取り消しなら長期トークンを取り直して Secret に入れる。<strong><code>token_expires_at</code> が 14 日以内に迫っていたら翌週を待たずに直す</strong></li>
+    <li><strong>手動実行・確認</strong>（トークン値を出力しない形で実行する）
+      <pre><code>aws lambda invoke --region ap-northeast-1 \
+  --function-name acps-prod-comment-reply-token-refresh-staging /dev/stdout
+aws secretsmanager get-secret-value --region ap-northeast-1 \
+  --secret-id acps/prod/umigame-soup-1/comment-reply-staging \
+  --query SecretString --output text | python3 -c "import sys, json; print(json.load(sys.stdin)['token_expires_at'])"</code></pre>
+      本番面は末尾の <code>-staging</code> を外す。応答の <code>token_expires_at</code> が実行時刻から約 60 日後になり、Secret の値と一致すれば成功</li>
+  </ul>
+  手動更新にしなかった理由: 投稿用と違い Live モードで 60 日失効が実際に起きる方式であり、失効すると返信が全件止まる（課題 <a href="../issues/index.html#I-031">I-031</a>。2026-09-26 のユーザー決定でリリース前の必須）。コメント受信のついでに更新する方式は、コメントが途絶えた期間に失効するため採らない。
+</div>
+
+<div class="decision">
   <span class="callout-title">決定: 期限は「60 日」ではなく <code>debug_token</code> の実測値で管理する（2026-07-27・15-7 の実測に基づく改訂）</span>
   15-7 で 2 アカウント分のトークンを <code>debug_token</code> で確認したところ、<strong>いずれも <code>expires_at = 0</code>（無期限）</strong>であり、当初記載の「60 日で失効」は現構成では発生していなかった。実際に効く期限は<strong><code>data_access_expires_at</code>（データアクセス期限。再認可から 90 日）</strong>で、これを過ぎると再認可までデータアクセスが失われる。
   <ul style="margin:.3rem 0 0;">

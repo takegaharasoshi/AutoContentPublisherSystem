@@ -1507,7 +1507,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </div>
 <p>WARNING のマーカーのメトリクスフィルタとアラームの配線は 21-6f。</p>
 <ul>
-  <li><strong>トークン</strong>: コメント返信用の長期トークン（Instagram ログイン方式）は 60 日で失効する。失効日は <code>token_expires_at</code> を Secret に持たせて <a href="../operation.html">運用設計 5.4</a> のリマインド運用に載せる。自動更新（<code>GET /refresh_access_token</code>）は 21-6g で入れる（課題 <a href="../../issues/index.html#I-031">I-031</a> の展開・リリース前に必須）</li>
+  <li><strong>トークン</strong>: コメント返信用の長期トークン（Instagram ログイン方式）は 60 日で失効する。<strong>21-6g で自動更新にした</strong>: トークン更新 Lambda が毎週月曜 04:00 JST に <code>GET /refresh_access_token</code> で更新し、Secret の <code>ig_access_token</code> と <code>token_expires_at</code> を書き戻す（コメント受信の処理とは独立。構成は <a href="../../infra/stacks.html#comment-reply">stacks.html 3.6</a>、失敗時の対応は <a href="../operation.html#token-refresh">運用設計 5.4</a>。課題 <a href="../../issues/index.html#I-031">I-031</a> の展開）</li>
   <li><strong>ステージング面</strong>: PoC 資材（Meta アプリ + <code>test_tkghr</code> + 同一コードのステージング面スタック）を恒久利用し、プロンプト改訂・Lambda 改修は必ずステージング面で実コメントを打ってから本番の Webhook 先を切り替える</li>
   <li><strong>コメント欄の目視</strong>: 稼働初期（2 週間）は毎日コメント欄を目視し、ネタバレ回答・矛盾回答・不適切な返信がないかを確認する。問題があればストックを <code>is_active=0</code> にし、プロンプト（10.5）を直して機械プローブとステージングで再検証する。週次補充スキル（21-8）にチェック項目として組み込む</li>
 </ul>

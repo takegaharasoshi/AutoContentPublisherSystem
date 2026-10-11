@@ -4,6 +4,8 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as scheduler from 'aws-cdk-lib/aws-scheduler';
+import * as schedulerTargets from 'aws-cdk-lib/aws-scheduler-targets';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
@@ -24,6 +26,8 @@ export class CommentReplyStack extends cdk.Stack {
   public readonly replyDlq: sqs.Queue;
   /** Meta Webhook の受信先 */
   public readonly functionUrl: lambda.FunctionUrl;
+  /** 週次でコメント返信用トークンを更新する Lambda */
+  public readonly tokenRefreshFunction: lambda.Function;
 
   constructor(scope: Construct, id: string, props: CommentReplyStackProps) {
     super(scope, id, props);
@@ -35,6 +39,7 @@ export class CommentReplyStack extends cdk.Stack {
     const setCode = `umigame-soup-1${sfx}`;
     const webhookFunctionName = `acps-${props.envName}-comment-reply-webhook${sfx}`;
     const replyFunctionName = `acps-${props.envName}-comment-reply-reply${sfx}`;
+    const tokenRefreshFunctionName = `acps-${props.envName}-comment-reply-token-refresh${sfx}`;
 
     // verify_token だけを自動生成し、認証情報は作成後に手動投入する。
     const credentialsSecret = new secretsmanager.Secret(this, 'CredentialsSecret', {
@@ -106,6 +111,11 @@ export class CommentReplyStack extends cdk.Stack {
       retention: logs.RetentionDays.THREE_MONTHS,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
+    const tokenRefreshLogGroup = new logs.LogGroup(this, 'TokenRefreshLogGroup', {
+      logGroupName: `/aws/lambda/${tokenRefreshFunctionName}`,
+      retention: logs.RetentionDays.THREE_MONTHS,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
 
     const webhookFunction = new lambda.Function(this, 'WebhookFunction', {
       functionName: webhookFunctionName,
@@ -157,6 +167,38 @@ export class CommentReplyStack extends cdk.Stack {
       reportBatchItemFailures: true,
     }));
 
+    // コメント受信に依存すると無投稿期間に失効するため、週次 Scheduler で独立実行する。
+    this.tokenRefreshFunction = new lambda.Function(this, 'TokenRefreshFunction', {
+      functionName: tokenRefreshFunctionName,
+      runtime: lambda.Runtime.PYTHON_3_13,
+      code,
+      handler: 'app.token_refresh_handler.lambda_handler',
+      memorySize: 128,
+      timeout: cdk.Duration.seconds(60),
+      retryAttempts: 0,
+      logGroup: tokenRefreshLogGroup,
+      environment: {
+        SECRET_ARN: credentialsSecret.secretArn,
+        REFRESH_API_BASE: 'https://graph.instagram.com',
+      },
+    });
+    credentialsSecret.grantRead(this.tokenRefreshFunction);
+    credentialsSecret.grantWrite(this.tokenRefreshFunction);
+
+    new scheduler.Schedule(this, 'TokenRefreshSchedule', {
+      scheduleName: tokenRefreshFunctionName,
+      schedule: scheduler.ScheduleExpression.cron({
+        minute: '0',
+        hour: '4',
+        weekDay: 'MON',
+        timeZone: cdk.TimeZone.ASIA_TOKYO,
+      }),
+      target: new schedulerTargets.LambdaInvoke(this.tokenRefreshFunction, {
+        retryAttempts: 2,
+        maxEventAge: cdk.Duration.hours(1),
+      }),
+    });
+
     // バケットポリシーを変更せず、FoundationStack への循環参照を避ける。
     // 共有バケットは SSE-S3 のため KMS 権限は不要。
     replyFunction.addToRolePolicy(new iam.PolicyStatement({
@@ -183,6 +225,10 @@ export class CommentReplyStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'QueueUrl', {
       value: replyQueue.queueUrl,
       description: 'コメント返信メッセージの送信先 FIFO キュー URL',
+    });
+    new cdk.CfnOutput(this, 'TokenRefreshFunctionName', {
+      value: this.tokenRefreshFunction.functionName,
+      description: 'コメント返信用トークン更新 Lambda の手動実行に使用する関数名',
     });
   }
 }

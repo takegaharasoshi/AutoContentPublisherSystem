@@ -113,7 +113,7 @@
 </div>
 
 <h4 id="comment-reply-secret">コメント自動返信（umigame-soup-1。Phase 21-3 設計・21-6 実装）</h4>
-<p>Secret 名: <code>acps/{env}/{set_code}/comment-reply</code>（ステージング面は <code>-staging</code> 接尾辞）。CDK（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）が空値テンプレートで作成し <code>verify_token</code> だけを自動生成する。他の値は手動投入（PoC と同じ運用）。</p>
+<p>Secret 名: <code>acps/{env}/{set_code}/comment-reply</code>（ステージング面は <code>-staging</code> 接尾辞）。CDK（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）が空値テンプレートで作成し <code>verify_token</code> だけを自動生成する。他の値は手動投入（PoC と同じ運用）。<strong><code>ig_access_token</code> と <code>token_expires_at</code> は初回投入後、トークン更新 Lambda が週 1 回自動で書き戻す</strong>（21-6g）。</p>
 <pre><code>{
   "verify_token": "（CDK が自動生成。Meta の Webhook 購読設定に貼る）",
   "app_secret": "...",
@@ -130,17 +130,18 @@
   <tbody>
     <tr><td><code>verify_token</code></td><td>YES</td><td>Webhook 購読時の GET 検証（<code>hub.verify_token</code>）に使う共有文字列。CDK が生成し変更しない</td></tr>
     <tr><td><code>app_secret</code></td><td>YES</td><td>Webhook 署名（<code>X-Hub-Signature-256</code>）の HMAC 鍵。<strong>Instagram アプリシークレット</strong>（Facebook 側「アプリ設定 → ベーシック」の app secret ではない。PoC 2026-09-03 で実測）</td></tr>
-    <tr><td><code>ig_access_token</code></td><td>YES</td><td>コメント返信用の長期アクセストークン（<strong>Instagram ログイン方式・スコープ <code>instagram_business_basic</code> + <code>instagram_business_manage_comments</code></strong>）。投稿用 Secret の <code>access_token</code>（Facebook ページ経由・既存 Meta アプリ）とは別のアプリ・別の方式のトークンで、同じアカウントに 2 本のトークンが存在する。60 日で失効</td></tr>
+    <tr><td><code>ig_access_token</code></td><td>YES</td><td>コメント返信用の長期アクセストークン（<strong>Instagram ログイン方式・スコープ <code>instagram_business_basic</code> + <code>instagram_business_manage_comments</code></strong>）。投稿用 Secret の <code>access_token</code>（Facebook ページ経由・既存 Meta アプリ）とは別のアプリ・別の方式のトークンで、同じアカウントに 2 本のトークンが存在する。60 日で失効するため、トークン更新 Lambda が毎週 <code>GET /refresh_access_token</code> で更新し、新しいトークンを書き戻す（21-6g）。初回の投入だけは手動</td></tr>
     <tr><td><code>ig_user_id</code></td><td>YES</td><td>自アカウントの Instagram user ID。<strong>自己返信ループ防止の照合キー</strong>（未設定のままコメントが来ると自分の返信に返信し続けるため、投入を最優先する）</td></tr>
     <tr><td><code>openai_api_key</code></td><td>YES</td><td>OpenAI API キー（プロジェクト単位で月額予算上限を設定したもの。利用上限の 1 段目）。既定構成では haiku 判定が失敗したときのサブ判定（luna）に使う。Reply Lambda は空でも起動時に必須キーとして検査するため、必ず投入する</td></tr>
     <tr><td><code>typesafe_api_key</code></td><td>YES</td><td>Jev 判定（<code>JUDGE_MODE=jev</code>）の API キー。既定構成では呼ばないが、Reply Lambda が起動時に必須キーとして検査する（21-6f 追加）</td></tr>
     <tr><td><code>anthropic_api_key</code></td><td>YES（既定構成）</td><td>Anthropic API キー。既定の判定 <code>JUDGE_MODE=haiku</code> と書き手 <code>REPLY_VARIANT=1b-haiku</code>（Claude Haiku 5.5・effort <code>high</code>。21-6e 決定）に使う。Console のワークスペース単位で月額上限を設定したものを入れる（21-6f 追加）</td></tr>
-    <tr><td><code>token_expires_at</code></td><td>NO</td><td>コメント返信用トークンの失効日時の運用メモ。<a href="../app/operation.html">app/operation.html セクション 5.4</a> のリマインド運用に載せる</td></tr>
+    <tr><td><code>token_expires_at</code></td><td>NO</td><td>コメント返信用トークンの失効日時（<code>YYYY-MM-DDTHH:MM:SSZ</code>）。トークン更新 Lambda が更新のたびに「実行時刻 + 応答の <code>expires_in</code>」で書き戻す。アプリケーションの認証には使わず、失効までの余裕を人が確かめるための値（<a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a>）</td></tr>
   </tbody>
 </table>
 </div>
 <ul>
   <li>PoC の Secret <code>umigame-poc/credentials</code> は <code>acps/{env}/</code> 規約の外にある（PoC のため）。21-6 でステージング面を <code>acps/prod/umigame-soup-1/comment-reply-staging</code> に作り直し、<code>UmigamePocStack</code> と一緒に削除する → <strong>2026-10-11 に削除した</strong>（21-6f の接続後・課題 I-032。値は新しいステージングの Secret へ写してから消した）</li>
+  <li><strong>書き込み権限</strong>: この Secret への書き込み（<code>secretsmanager:PutSecretValue</code> 等）はトークン更新 Lambda の実行ロールだけに、当該 Secret に限って付与する（Webhook / Reply Lambda は読み取りのみ。<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）。更新 Lambda はトークンと要求 URL（クエリにトークンを含む）をログ・例外に出さない</li>
   <li>投稿用 Secret（上記「SNS 認証情報」）は本セットでも既存どおり作る。コメント返信用 Secret と<strong>キーを混ぜない</strong>（読むサービスが違い、IAM の許可プレフィックスも違う）</li>
 </ul>
 

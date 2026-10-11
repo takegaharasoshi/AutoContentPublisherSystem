@@ -84,6 +84,7 @@ const createMonitoringStack = (): MonitoringStack => {
     insightsCollectionStateMachine: insightsBatchStack.stateMachine,
     insightsScheduleGroup: insightsBatchStack.scheduleGroup,
     commentReplyDlq: commentReplyStack.replyDlq,
+    commentReplyTokenRefreshFunction: commentReplyStack.tokenRefreshFunction,
   });
 };
 
@@ -97,8 +98,8 @@ describe('MonitoringStack', () => {
     });
   });
 
-  test('CloudWatch Alarm を 19 個作成する', () => {
-    template.resourceCountIs('AWS::CloudWatch::Alarm', 19);
+  test('CloudWatch Alarm を 20 個作成する', () => {
+    template.resourceCountIs('AWS::CloudWatch::Alarm', 20);
   });
 
   test('本番面のコメント返信 DLQ の滞留を監視する', () => {
@@ -121,6 +122,34 @@ describe('MonitoringStack', () => {
       Period: 300,
       Statistic: 'Maximum',
       TreatMissingData: 'notBreaching',
+      AlarmActions: [{ Ref: Match.stringLikeRegexp('AlarmTopic') }],
+    });
+  });
+
+  test('本番面のコメント返信トークン更新失敗を 1 時間単位で監視する', () => {
+    template.hasResourceProperties('AWS::CloudWatch::Alarm', {
+      AlarmName: 'acps-prod-comment-reply-token-refresh-errors',
+      Namespace: 'AWS/Lambda',
+      MetricName: 'Errors',
+      Dimensions: [
+        {
+          Name: 'FunctionName',
+          Value: {
+            'Fn::ImportValue': Match.stringLikeRegexp(
+              '^CommentReplyStack:ExportsOutputRefTokenRefreshFunction',
+            ),
+          },
+        },
+      ],
+      Threshold: 1,
+      ComparisonOperator: 'GreaterThanOrEqualToThreshold',
+      EvaluationPeriods: 1,
+      DatapointsToAlarm: 1,
+      Period: 3600,
+      Statistic: 'Sum',
+      TreatMissingData: 'notBreaching',
+      AlarmDescription:
+        'コメント返信用トークンの週次自動更新の失敗を検知。CloudWatch Logs で原因を確認し、失効前に手動で更新する（運用設計 5.4）',
       AlarmActions: [{ Ref: Match.stringLikeRegexp('AlarmTopic') }],
     });
   });

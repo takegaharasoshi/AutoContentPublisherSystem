@@ -117,6 +117,7 @@ new MonitoringStack(app, 'MonitoringStack', {
   insightsCollectionStateMachine: insightsBatchStack.stateMachine,
   insightsScheduleGroup: insightsBatchStack.scheduleGroup,
   commentReplyDlq: commentReplyStack.replyDlq,
+  commentReplyTokenRefreshFunction: commentReplyStack.tokenRefreshFunction,
   stackName: `${stackNamePrefix}-MonitoringStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
