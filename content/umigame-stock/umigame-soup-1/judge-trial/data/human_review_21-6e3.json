@@ -1,0 +1,261 @@
+{
+  "run_at": "2026-10-11T03:53:42Z",
+  "exported_at": "2026-10-11T05:07:26.922Z",
+  "pairs_total": 23,
+  "decisions": [
+    {
+      "key": "U16-e18|guess_wrong|",
+      "case_id": "U16-e18",
+      "no": "U16",
+      "kind": "guess_wrong",
+      "answer": null,
+      "expected_kind": "guess_close",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T04:59:35.592Z"
+    },
+    {
+      "key": "U21-k06|guess_close|",
+      "case_id": "U21-k06",
+      "no": "U21",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "guess_wrong",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T04:59:52.883Z"
+    },
+    {
+      "key": "c-foreign-01|impression|",
+      "case_id": "c-foreign-01",
+      "no": "U18",
+      "kind": "impression",
+      "answer": null,
+      "expected_kind": "foreign",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T04:59:57.918Z"
+    },
+    {
+      "key": "U12-e06|q_yesno|irrelevant",
+      "case_id": "U12-e06",
+      "no": "U12",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "expected_kind": "q_yesno",
+      "expected_answer": "yes",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:06:23.836Z"
+    },
+    {
+      "key": "U16-e03|q_multi|",
+      "case_id": "U16-e03",
+      "no": "U16",
+      "kind": "q_multi",
+      "answer": null,
+      "expected_kind": "q_yesno",
+      "expected_answer": "yes",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:01:17.154Z"
+    },
+    {
+      "key": "U22-e02|q_yesno|no",
+      "case_id": "U22-e02",
+      "no": "U22",
+      "kind": "q_yesno",
+      "answer": "no",
+      "expected_kind": "q_yesno",
+      "expected_answer": "yes",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:00:41.184Z"
+    },
+    {
+      "key": "U27-e05|q_yesno|irrelevant",
+      "case_id": "U27-e05",
+      "no": "U27",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "expected_kind": "q_yesno",
+      "expected_answer": "no",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:00:54.814Z"
+    },
+    {
+      "key": "U27-e17|guess_close|",
+      "case_id": "U27-e17",
+      "no": "U27",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "guess_correct",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:01:09.797Z"
+    },
+    {
+      "key": "U28-e07|q_open|",
+      "case_id": "U28-e07",
+      "no": "U28",
+      "kind": "q_open",
+      "answer": null,
+      "expected_kind": "q_yesno",
+      "expected_answer": "no",
+      "decision": "accept",
+      "decided_at": "2026-10-11T05:01:42.849Z"
+    },
+    {
+      "key": "U13-b25|q_yesno|no",
+      "case_id": "U13-b25",
+      "no": "U13",
+      "kind": "q_yesno",
+      "answer": "no",
+      "expected_kind": "q_yesno",
+      "expected_answer": "yes",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:02:34.810Z"
+    },
+    {
+      "key": "U14-e10|q_open|",
+      "case_id": "U14-e10",
+      "no": "U14",
+      "kind": "q_open",
+      "answer": null,
+      "expected_kind": "q_yesno",
+      "expected_answer": "irrelevant",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:03:21.704Z"
+    },
+    {
+      "key": "U16-e03|q_yesno|irrelevant",
+      "case_id": "U16-e03",
+      "no": "U16",
+      "kind": "q_yesno",
+      "answer": "irrelevant",
+      "expected_kind": "q_yesno",
+      "expected_answer": "yes",
+      "decision": "accept",
+      "decided_at": "2026-10-11T05:07:14.506Z"
+    },
+    {
+      "key": "U18-k02|guess_close|",
+      "case_id": "U18-k02",
+      "no": "U18",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "guess_correct",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:03:13.946Z"
+    },
+    {
+      "key": "U20-t01|guess_close|",
+      "case_id": "U20-t01",
+      "no": "U20",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "q_open",
+      "expected_answer": null,
+      "decision": "accept",
+      "decided_at": "2026-10-11T05:03:35.863Z"
+    },
+    {
+      "key": "U21-e20|guess_close|",
+      "case_id": "U21-e20",
+      "no": "U21",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "guess_wrong",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:03:43.352Z"
+    },
+    {
+      "key": "U21-e21|guess_close|",
+      "case_id": "U21-e21",
+      "no": "U21",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "guess_wrong",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:05:19.224Z"
+    },
+    {
+      "key": "U22-k04|guess_correct|",
+      "case_id": "U22-k04",
+      "no": "U22",
+      "kind": "guess_correct",
+      "answer": null,
+      "expected_kind": "guess_close",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:02:29.782Z"
+    },
+    {
+      "key": "U26-e10|q_open|",
+      "case_id": "U26-e10",
+      "no": "U26",
+      "kind": "q_open",
+      "answer": null,
+      "expected_kind": "q_yesno",
+      "expected_answer": "yes",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:03:50.058Z"
+    },
+    {
+      "key": "U27-e05|q_yesno|yes",
+      "case_id": "U27-e05",
+      "no": "U27",
+      "kind": "q_yesno",
+      "answer": "yes",
+      "expected_kind": "q_yesno",
+      "expected_answer": "no",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:03:05.509Z"
+    },
+    {
+      "key": "U28-e02|guess_close|",
+      "case_id": "U28-e02",
+      "no": "U28",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "q_yesno",
+      "expected_answer": "no",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:04:21.695Z"
+    },
+    {
+      "key": "U28-e04|guess_close|",
+      "case_id": "U28-e04",
+      "no": "U28",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "q_yesno",
+      "expected_answer": "yes",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:04:29.646Z"
+    },
+    {
+      "key": "U28-e06|q_open|",
+      "case_id": "U28-e06",
+      "no": "U28",
+      "kind": "q_open",
+      "answer": null,
+      "expected_kind": "q_yesno",
+      "expected_answer": "irrelevant",
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:04:35.740Z"
+    },
+    {
+      "key": "U28-e21|guess_close|",
+      "case_id": "U28-e21",
+      "no": "U28",
+      "kind": "guess_close",
+      "answer": null,
+      "expected_kind": "guess_wrong",
+      "expected_answer": null,
+      "decision": "reject",
+      "decided_at": "2026-10-11T05:04:42.051Z"
+    }
+  ],
+  "leak_decisions": []
+}
