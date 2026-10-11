@@ -65,6 +65,12 @@ describe('FoundationStack の画像保存用 S3 バケット', () => {
         Prefix: 'videos/',
         Status: 'Enabled',
       },
+      {
+        ExpirationInDays: 30,
+        Id: 'expire-comment-logs',
+        Prefix: 'comment-log/',
+        Status: 'Disabled',
+      },
     ]);
     expect(rules.map((rule: any) => rule.Prefix)).not.toContain('audio/');
   });

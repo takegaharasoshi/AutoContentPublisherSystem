@@ -12,6 +12,7 @@ from acps_shared.secrets import get_db_secret, parse_db_secret
 
 from .batch_sets import find_batch_set_by_code
 from .clock import now_utc, parse_scheduled_at
+from .comment_logs import import_comment_logs
 from .config import ConfigError, load_config
 from .execution_log import finalize_execution_log, start_or_resume_execution_log
 from .processing import process_accounts
@@ -30,7 +31,12 @@ def setup_logging() -> None:
     )
 
 
-def main(*, secrets_client: Any | None = None, urlopen: Any | None = None) -> int:
+def main(
+    *,
+    secrets_client: Any | None = None,
+    urlopen: Any | None = None,
+    s3_client: Any | None = None,
+) -> int:
     """Run the insights collection batch and return a process exit code."""
     setup_logging()
     try:
@@ -128,16 +134,51 @@ def main(*, secrets_client: Any | None = None, urlopen: Any | None = None) -> in
                         logger.exception("Execution log finalization failed")
                     return 1
 
-                if result.failure_count == 0:
-                    status = "succeeded"
-                    error_message = None
-                    return_code = 0
-                else:
-                    status = "failed"
-                    error_message = (
+                error_messages: list[str] = []
+                if result.failure_count > 0:
+                    error_messages.append(
                         f"insights collection failures: {result.failure_count}"
                     )
-                    return_code = 1
+
+                if config.comment_log_bucket:
+                    try:
+                        client = s3_client
+                        if client is None:
+                            import boto3
+
+                            client = boto3.client("s3")
+                        import_result = import_comment_logs(
+                            cursor,
+                            connection,
+                            set_id=batch_set.id,
+                            set_code=batch_set.set_code,
+                            bucket=config.comment_log_bucket,
+                            now=now_utc(),
+                            lookback_days=config.comment_log_lookback_days,
+                            retention_days=config.comment_log_retention_days,
+                            s3_client=client,
+                        )
+                        logger.info(
+                            "Comment log import completed: listed=%d fetched=%d "
+                            "inserted=%d skipped_invalid=%d deleted_expired=%d",
+                            import_result.listed,
+                            import_result.fetched,
+                            import_result.inserted,
+                            import_result.skipped_invalid,
+                            import_result.deleted_expired,
+                        )
+                    except Exception as exc:
+                        logger.exception(
+                            "Comment log import failed: error_type=%s",
+                            type(exc).__name__,
+                        )
+                        error_messages.append(
+                            f"comment log import failed: {type(exc).__name__}"
+                        )
+
+                error_message = "; ".join(error_messages) or None
+                status = "failed" if error_message else "succeeded"
+                return_code = 1 if error_message else 0
                 try:
                     finalize_execution_log(
                         cursor,

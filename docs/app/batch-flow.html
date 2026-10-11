@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集バッチ（セクション 4）を追加</span>
-  <span>最終更新: 2026-10-12（21-6h: 3.3 の decision に umigame 系 <code>{{prev_truth_block}}</code>〔前回の真相ブロック〕を追加し、umigame 系を 5 種・既知トークンを 10 種にした）。前回: 2026-09-26（21-5b: 3.3 手順 6 の問題スナップショット出力に実装のトランザクション順序を追記）。前回: 2026-09-04（21-3: 方式カタログに <code>umigame-prebuilt</code> を追加、3.3 手順 6 に問題スナップショット出力、キャプション展開に umigame 系プレースホルダを追加）</span>
+  <span>最終更新: 2026-10-12（21-7b: 4.2 にコメント記録の取り込みの手順を追加）。前回: 2026-10-12（21-6h: 3.3 の decision に umigame 系 <code>{{prev_truth_block}}</code>〔前回の真相ブロック〕を追加し、umigame 系を 5 種・既知トークンを 10 種にした）。前回: 2026-09-26（21-5b: 3.3 手順 6 の問題スナップショット出力に実装のトランザクション順序を追記）。前回: 2026-09-04（21-3: 方式カタログに <code>umigame-prebuilt</code> を追加、3.3 手順 6 に問題スナップショット出力、キャプション展開に umigame 系プレースホルダを追加）</span>
 </div>
 
 <div class="note">
@@ -379,6 +379,7 @@
       <li><strong>メディアレベルの収集</strong>: 対象 = 当該アカウントの <code>posts</code> のうち <code>status='success'</code> かつ <code>platform_post_id IS NOT NULL</code> で、<code>feed_image</code> / <code>reel</code> は <code>posted_at</code> が <code>MEDIA_LOOKBACK_DAYS</code> 以内、<code>story</code> は <code>posted_at</code> が 24 時間以内のもの（<code>posted_at</code> 昇順）。各行について全メトリクスを取得し、<code>post_insights</code> へ INSERT-or-skip（<code>UNIQUE (post_id, scheduled_at)</code>）で追記する。<strong>当該ラン（同一 <code>scheduled_at</code>）で収集済みの <code>post_id</code> は API 呼び出し自体を行わずスキップ</strong>する（再実行時のコール数削減。16-9 実装）</li>
     </ol>
   </li>
+  <li><strong>コメント記録の取り込み</strong>（21-7b。環境変数 <code>COMMENT_LOG_BUCKET</code> があるときだけ）: S3 の <code>comment-log/{set_code}/</code> の直近数日分を <code>umigame_comment_logs</code> へ <code>INSERT IGNORE</code> で取り込み、保持期限切れの行を消す。コメント返信経路は Aurora 停止中でも動くため直接書けず、本バッチの起動に相乗りして Aurora の起動回数を増やさない。記録の無いセットは一覧が空で終わる。仕様の正は <a href="sets/umigame-soup-1.html#comment-log-import">セット設計書 10.8.1</a>。例外はその回を <code>failed</code> にする（手順 2 の部分失敗とは別。インサイト収集が例外で中断した回は取り込まない）</li>
   <li>実行ログを <code>succeeded</code> / <code>failed</code> に更新して終了する（終了コードは 4.3）</li>
 </ol>
 

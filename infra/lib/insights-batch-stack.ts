@@ -10,6 +10,7 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as scheduler from 'aws-cdk-lib/aws-scheduler';
 import * as schedulerTargets from 'aws-cdk-lib/aws-scheduler-targets';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as fs from 'fs';
@@ -41,6 +42,8 @@ export interface InsightsBatchStackProps extends cdk.StackProps {
   dbReadinessCheckSecurityGroup: ec2.SecurityGroup;
   /** DB 準備確認タスク定義 */
   dbReadinessCheckTaskDefinition: ecs.FargateTaskDefinition;
+  /** コメント記録 JSON を保管する共有 S3 バケット */
+  assetsBucket: s3.IBucket;
 }
 
 /** インサイト収集バッチ実行基盤スタック。 */
@@ -81,6 +84,21 @@ export class InsightsBatchStack extends cdk.Stack {
                 `arn:aws:secretsmanager:${this.region}:${this.account}:secret:acps/${props.envName}/db/*`,
                 `arn:aws:secretsmanager:${this.region}:${this.account}:secret:acps/${props.envName}/*/sns/*`,
               ],
+            }),
+          ],
+        }),
+        ReadCommentLogs: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              actions: ['s3:ListBucket'],
+              resources: [props.assetsBucket.bucketArn],
+              conditions: {
+                StringLike: { 's3:prefix': 'comment-log/*' },
+              },
+            }),
+            new iam.PolicyStatement({
+              actions: ['s3:GetObject'],
+              resources: [props.assetsBucket.arnForObjects('comment-log/*')],
             }),
           ],
         }),
@@ -126,6 +144,7 @@ export class InsightsBatchStack extends cdk.Stack {
       environment: {
         DB_SECRET_ARN: dbSecretArn,
         ENV_NAME: props.envName,
+        COMMENT_LOG_BUCKET: props.assetsBucket.bucketName,
       },
       logging: ecs.LogDrivers.awsLogs({
         logGroup,

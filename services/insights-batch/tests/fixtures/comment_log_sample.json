@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "comment_id": "18102503330038872",
+  "parent_id": "18092935040666829",
+  "media_id": "18114604907104987",
+  "set_code": "umigame-soup-1",
+  "content_key": "016-umigame-soup",
+  "problem_schema_version": 3,
+  "fact_sheet_hash": "c81ff384e8a1",
+  "commenter_id": "2348976535875935",
+  "text": "主人公は、窓の外に何を見つけたのでしょうか？",
+  "times": {
+    "comment_created_at": "2026-10-11T19:19:28Z",
+    "webhook_received_at": "2026-10-11T19:19:29Z",
+    "judged_at": "2026-10-11T19:19:36Z",
+    "replied_at": "2026-10-11T19:19:43Z"
+  },
+  "config": {
+    "judge_mode": "haiku",
+    "reply_variant": "1b-haiku",
+    "luna_model": "gpt-6-luna",
+    "luna_effort": "xhigh",
+    "haiku_effort": "high",
+    "prompt_version": "9c2045d7fa0d"
+  },
+  "judgements": {
+    "luna": null,
+    "jev": null,
+    "haiku": {
+      "kind": "guess_correct",
+      "answer": null,
+      "reason": "手掛かりと回答が一致しています。",
+      "bare_term": null,
+      "error": null,
+      "debug": {"model": "claude-haiku-5-5", "latency_s": 7.27}
+    }
+  },
+  "final": {"kind": "guess_correct", "answer": null, "decision": "haiku"},
+  "reply": {
+    "text": "正解です！よく気づきましたね。",
+    "source": "llm",
+    "reply_id": "18081406364651154",
+    "over_80": false,
+    "guard": null,
+    "debug": {}
+  },
+  "errors": ["テスト用の架空エラー1", "テスト用の架空エラー2"]
+}

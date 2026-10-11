@@ -13,7 +13,7 @@
 <h1>セキュリティ設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-10-12（21-7: SNS 投稿バッチのタスクロールにスナップショットの <code>s3:PutObject</code>、プライバシーポリシーのバケットを https のオブジェクト URL で公開する形に更新）。前回: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
+  <span>最終更新: 2026-10-12（21-7b: インサイト収集バッチのタスクロールにコメント記録 <code>comment-log/*</code> の読み取りを追加）。前回: 2026-10-12（21-7: SNS 投稿バッチのタスクロールにスナップショットの <code>s3:PutObject</code>、プライバシーポリシーのバケットを https のオブジェクト URL で公開する形に更新）。前回: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
 </div>
 
 <h2 id="secrets">1. Secrets Manager 管理方針</h2>
@@ -169,7 +169,7 @@
     <tr><td>DB 準備確認タスクロール</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code>）</td></tr>
     <tr><td>画像生成バッチタスクロール</td><td>S3 読み書き、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/image/*</code>）</td></tr>
     <tr><td>SNS 投稿バッチタスクロール</td><td>S3 読み取り、S3 書き込みは <code>assets/umigame-soup-1/problems/*</code> の <code>s3:PutObject</code> のみ（問題スナップショット。21-7 追加）、Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>）</td></tr>
-    <tr><td>インサイト収集バッチタスクロール（16-7 設計・16-10 実装）</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>。SNS 投稿バッチと同じ Instagram トークンを読む）。<strong>S3 権限は付与しない</strong>（S3 不使用）</td></tr>
+    <tr><td>インサイト収集バッチタスクロール（16-7 設計・16-10 実装）</td><td>Secrets Manager 読み取り（<code>acps/{env}/db/*</code> + <code>acps/{env}/*/sns/*</code>。SNS 投稿バッチと同じ Instagram トークンを読む）。S3 はコメント記録の読み取りだけ（21-7b。<code>s3:ListBucket</code> を条件 <code>s3:prefix = comment-log/*</code> で、<code>s3:GetObject</code> を <code>comment-log/*</code> に。書き込み・削除は付与しない）</td></tr>
   </tbody>
 </table>
 </div>

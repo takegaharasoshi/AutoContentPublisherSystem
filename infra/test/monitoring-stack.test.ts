@@ -72,6 +72,7 @@ const createMonitoringStack = (): MonitoringStack => {
     batchSecurityGroup: foundationStack.batchSecurityGroup,
     dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
     dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
+    assetsBucket: foundationStack.imagesBucket,
   });
 
   return new MonitoringStack(app, 'MonitoringStack', {

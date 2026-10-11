@@ -103,6 +103,7 @@ const insightsBatchStack = new InsightsBatchStack(app, 'InsightsBatchStack', {
   batchSecurityGroup: foundationStack.batchSecurityGroup,
   dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
   dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
+  assetsBucket: foundationStack.imagesBucket,
   stackName: `${stackNamePrefix}-InsightsBatchStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });

@@ -22,6 +22,9 @@ class AppConfig:
     execution_arn: str
     scheduled_at: str
     media_lookback_days: int
+    comment_log_bucket: str | None = None
+    comment_log_lookback_days: int = 3
+    comment_log_retention_days: int = 365
 
 
 def load_config(environ: Mapping[str, str] | None = None) -> AppConfig:
@@ -61,6 +64,16 @@ def load_config(environ: Mapping[str, str] | None = None) -> AppConfig:
     if media_lookback_days < 1:
         raise ConfigError("MEDIA_LOOKBACK_DAYS must be an integer of at least 1")
 
+    comment_log_bucket = source.get("COMMENT_LOG_BUCKET") or None
+    comment_log_lookback_days = _positive_int(
+        source.get("COMMENT_LOG_LOOKBACK_DAYS", "3"),
+        "COMMENT_LOG_LOOKBACK_DAYS",
+    )
+    comment_log_retention_days = _positive_int(
+        source.get("COMMENT_LOG_RETENTION_DAYS", "365"),
+        "COMMENT_LOG_RETENTION_DAYS",
+    )
+
     return AppConfig(
         env_name=env_name,
         db_secret_arn=db_secret_arn,
@@ -69,4 +82,20 @@ def load_config(environ: Mapping[str, str] | None = None) -> AppConfig:
         execution_arn=required_values["EXECUTION_ARN"],
         scheduled_at=required_values["SCHEDULED_AT"],
         media_lookback_days=media_lookback_days,
+        comment_log_bucket=comment_log_bucket,
+        comment_log_lookback_days=comment_log_lookback_days,
+        comment_log_retention_days=comment_log_retention_days,
     )
+
+
+def _positive_int(raw_value: str, variable_name: str) -> int:
+    """Parse a positive integer environment variable."""
+    try:
+        value = int(raw_value)
+    except (TypeError, ValueError):
+        raise ConfigError(
+            f"{variable_name} must be an integer of at least 1"
+        ) from None
+    if value < 1:
+        raise ConfigError(f"{variable_name} must be an integer of at least 1")
+    return value

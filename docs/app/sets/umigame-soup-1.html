@@ -1519,7 +1519,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </ul>
 
 <h3 id="comment-log">10.8 コメント記録 JSON</h3>
-<div class="note"><span class="callout-title">要点</span>Reply Lambda は 1 コメントにつき 1 件、受信・判定・返信の全記録を S3 に書く（継続改善用。Aurora への取り込みは 21-7b）。書き込みの失敗は返信を止めない。</div>
+<div class="note"><span class="callout-title">要点</span>Reply Lambda は 1 コメントにつき 1 件、受信・判定・返信の全記録を S3 に書く（継続改善用）。書き込みの失敗は返信を止めない。S3 の記録はインサイト収集バッチが Aurora の <code>umigame_comment_logs</code> へ取り込み（<a href="#comment-log-import">10.8.1</a>）、S3 側は 30 日・Aurora 側は 365 日で消す。</div>
 <div class="table-wrap">
 <table>
 <tr><th>項目</th><th>中身</th></tr>
@@ -1548,6 +1548,22 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
   </tbody>
 </table>
 </div>
+
+<h4 id="comment-log-import">10.8.1 Aurora への取り込みと保持期限（21-7b）</h4>
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>中身</th></tr>
+<tr><td>取り込み役</td><td>インサイト収集バッチ（<code>services/insights-batch/app/comment_logs.py</code>）。セット単位の 06:00 / 18:00 JST の実行で、インサイト収集の後に動く。Aurora の起動回数は増えない</td></tr>
+<tr><td>対象</td><td>実行時刻の UTC 日付から <code>COMMENT_LOG_LOOKBACK_DAYS</code>（既定 3）日前までの <code>dt=</code> プレフィックス。DB に既にある <code>comment_id</code> は S3 から読まない</td></tr>
+<tr><td>冪等性</td><td><code>comment_id</code> 主キー + <code>INSERT IGNORE</code>。最初に取り込んだ版が残る（後から同じキーへ上書きされた版は取り込まない）</td></tr>
+<tr><td>保存する項目</td><td>JSON 全体（<code>record_json</code>）+ 振り返り用の抽出カラム（<a href="../data-model.html#detail-umigame-comment-logs">データモデル 4.16</a>）。コメント者は <code>commenter_id</code> だけで、username は持たない（取り込み時にも <code>username</code> キーを除去する）</td></tr>
+<tr><td>保持期限</td><td>S3: <code>comment-log/</code> を 30 日で自動削除（ライフサイクル規則。<strong>初回取り込みの成功を確かめてから有効化</strong>。<a href="../../infra/stacks.html">stacks.html</a> 3.1）。Aurora: Webhook 受信（= 取得）から 365 日（プライバシーポリシーの「取得から最長 1 年」と揃える）。取り込みのたびに期限切れ行を消す（<code>COMMENT_LOG_RETENTION_DAYS</code>）</td></tr>
+<tr><td>失敗時</td><td>S3・DB の例外はその回のインサイト収集の実行を failed にする（失敗アラームが鳴る）。不正な JSON（版違い・ファイル名と ID の不一致等）は WARNING を出して飛ばす</td></tr>
+<tr><td>振り返り</td><td>ビュー <code>v_umigame_comment_review</code>（1 コメント 1 行・JST・最終判定の理由・問題タイトル）。誤判定を拾う → 確定事実シート / プロンプトを直す → 回帰プローブに足す、の 1 段目に使う</td></tr>
+<tr><td>削除依頼</td><td>プライバシーポリシーの連絡先に届いた依頼は、本人の Instagram ID（<code>commenter_id</code>）で Aurora の行を削除する。S3 側は 30 日で消える（急ぐ場合は該当キーを手動削除）</td></tr>
+</table>
+</div>
+<div class="decision"><span class="callout-title">決定（21-7b）</span>相乗りは SFN にステートを足さず insights-batch の処理として入れた（DB 準備確認と同じ実行の中で済み、失敗アラーム・再試行も既存のものがそのまま効くため）。コメント者のアプリスコープ ID は Meta Platform Terms 上、プライバシーポリシーへの記載と削除依頼への対応を条件に保存できるため保存する（同一人物の連続質問を振り返るのに要る）。</div>
 
 <h2 id="failure">11. 失敗時ポリシー</h2>
 <ul>

@@ -27,6 +27,7 @@ const createInsightsBatchStack = (
     batchSecurityGroup: foundationStack.batchSecurityGroup,
     dbReadinessCheckSecurityGroup: foundationStack.dbReadinessCheckSecurityGroup,
     dbReadinessCheckTaskDefinition: foundationStack.dbReadinessCheckTaskDefinition,
+    assetsBucket: foundationStack.imagesBucket,
   });
 };
 
@@ -34,7 +35,7 @@ describe('InsightsBatchStack', () => {
   const stack = createInsightsBatchStack();
   const template = Template.fromStack(stack);
 
-  test('タスク定義は S3 環境変数を持たず、指定した family・CPU・メモリを持つ', () => {
+  test('タスク定義はコメント記録バケットと指定した family・CPU・メモリを持つ', () => {
     const taskDefinitions = Object.values(
       template.findResources('AWS::ECS::TaskDefinition'),
     ) as any[];
@@ -50,13 +51,35 @@ describe('InsightsBatchStack', () => {
             Environment: expect.arrayContaining([
               expect.objectContaining({ Name: 'DB_SECRET_ARN' }),
               { Name: 'ENV_NAME', Value: 'prod' },
+              expect.objectContaining({ Name: 'COMMENT_LOG_BUCKET' }),
             ]),
           }),
         ],
       }),
     );
-    expect(taskDefinitions[0].Properties.ContainerDefinitions[0].Environment).toHaveLength(2);
+    expect(taskDefinitions[0].Properties.ContainerDefinitions[0].Environment).toHaveLength(3);
     expect(JSON.stringify(taskDefinitions[0])).not.toContain('S3_BUCKET_NAME');
+  });
+
+  test('タスクロールはコメント記録の一覧・取得だけを許可する', () => {
+    const roles = Object.values(template.findResources('AWS::IAM::Role')) as any[];
+    const taskRole = roles.find((role) =>
+      JSON.stringify(role.Properties.Policies).includes('s3:GetObject'),
+    );
+    expect(taskRole).toBeDefined();
+    const statements = taskRole.Properties.Policies.flatMap(
+      (policy: any) => policy.PolicyDocument.Statement,
+    );
+    expect(statements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          Action: 's3:ListBucket',
+          Condition: { StringLike: { 's3:prefix': 'comment-log/*' } },
+        }),
+        expect.objectContaining({ Action: 's3:GetObject' }),
+      ]),
+    );
+    expect(JSON.stringify(statements)).not.toMatch(/s3:(PutObject|DeleteObject)/);
   });
 
   test('インサイト収集 State Machine と 4 変数のコンテナオーバーライドを作成する', () => {
