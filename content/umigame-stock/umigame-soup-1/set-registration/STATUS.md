@@ -9,11 +9,11 @@
 
 | # | 対象 | ファイル | 状態 |
 |---|---|---|---|
-| 1 | `prompt_configs` + `caption_templates` | [01_prompt_caption.sql](01_prompt_caption.sql) | 未適用（ローカル dry-run OK・2026-10-12） |
-| 2 | `sns_accounts` | [02_sns_account.sql](02_sns_account.sql) | 未適用（**投稿用 Secret を作ってから**） |
-| 3 | `audio_assets`（BGM 1 曲） | [03_audio_assets.sql](03_audio_assets.sql) | ローカル適用済み（21-5a）。Aurora は適用後の確認クエリで有無を見る |
+| 1 | `prompt_configs` + `caption_templates` | [01_prompt_caption.sql](01_prompt_caption.sql) | **両環境へ適用済み（2026-10-12）**。`prompt_text` の MD5 `1e3b738daf0dcaa40d13de1c2108d0b0` が両環境で一致 |
+| 2 | `sns_accounts` | [02_sns_account.sql](02_sns_account.sql) | **両環境へ適用済み（2026-10-12）**。Secret は作成・検証済み（`username=umigame.soup.jp`・`media_count=0`・`instagram_content_publish` / `instagram_manage_insights` あり・`token_expires_at` = `2027-01-09T16:35:01Z`） |
+| 3 | `audio_assets`（BGM 1 曲） | [03_audio_assets.sql](03_audio_assets.sql) | 両環境に適用済み（Aurora にも BGM 1 行あり・2026-10-12 確認） |
 | 4 | `batch_sets` の有効化 | [04_activate.sql](04_activate.sql) | 未適用（**cdk deploy の後・1 本目の直前**） |
-| 5 | 正解基準の再適用 | [../batch-01/update_judge_criteria.sql](../batch-01/update_judge_criteria.sql) | 21-6d8 以降の修正分（U01・U27・U18・U22・U25 ほか）。両環境へ再適用が必要 |
+| 5 | 正解基準の再適用 | [../batch-01/update_judge_criteria.sql](../batch-01/update_judge_criteria.sql) | **両環境へ再適用済み（2026-10-12）**。ストック 14 問の `judge_criteria`・`fact_sheet` の MD5 が両環境で一致 |
 | 6 | Scheduler（画像生成 1 + インサイト 2）・スナップショット PUT 権限 | `infra/lib/{image,insights,sns-post}-batch-stack.ts` | **deploy 済み（2026-10-12）**。Scheduler 3 件とも ENABLED（`is_active=0` の間は何もせず終わる） |
 | 7 | プライバシーポリシー | `infra/assets/umigame-privacy-policy/index.html` + `CommentReplyStack`（本番面） | **deploy 済み（2026-10-12）**。https://acps-prod-umigame-privacy-policy.s3.ap-northeast-1.amazonaws.com/index.html（200・`text/html; charset=utf-8` を確認） |
 | 8 | スナップショットの手動再出力 | [../tools/write_snapshot.py](../tools/write_snapshot.py) | 必要時のみ（下の「困ったとき」） |
@@ -30,11 +30,11 @@ python3 dry_run.py
 **Scheduler は CDK で有効のまま deploy する。`batch_sets.is_active=0` の間は画像生成・投稿・インサイト収集とも
 何もせず正常終了するので、稼働の切り替えは手順 9 の `04_activate.sql` で行う**（21-7 の決定）。
 
-1. **Instagram アカウント開設**: `umigame.soup.jp` を取得し、プロアカウント（クリエイター or ビジネス）へ切り替える。
+1. **Instagram アカウント開設**（2026-10-12 済み）: `umigame.soup.jp` を取得し、プロアカウント（クリエイター or ビジネス）へ切り替える。
    名前欄は「コメントで推理！探偵カメロックのウミガメのスープ」（14 日で 2 回までしか変えられない）。
 2. **投稿用の連携（既存 Meta アプリ）**: Facebook ページを新規作成して `umigame.soup.jp` と連携し、
    [operation.html セクション 5.1](../../../../docs/app/operation.html) の通常手順で長期トークンを取得する。
-3. **投稿用 Secret を作成して検証する**（operation.html 2.1 手順 1・5.1 手順 7。DB 登録より先）:
+3. **投稿用 Secret を作成して検証する**（2026-10-12 済み）（operation.html 2.1 手順 1・5.1 手順 7。DB 登録より先）:
    ```bash
    aws secretsmanager create-secret \
      --name acps/prod/umigame-soup-1/sns/instagram/main-account \
@@ -42,7 +42,7 @@ python3 dry_run.py
    ```
    `ig_user_id` が **umigame.soup.jp を指していること**（pref-ranking-1 の開設時に既存セットのアカウントを指していた事故あり）と、
    スコープに `instagram_manage_insights` があることを 5.1 手順 7 の方法で確かめる。
-4. **DB 登録（両環境）**: 01 → 02 → 正解基準の再適用（# 5）の順。
+4. **DB 登録（両環境）**（2026-10-12 済み）: 01 → 02 → 正解基準の再適用（# 5）の順。
    ```bash
    cd content/umigame-stock/umigame-soup-1
    for f in set-registration/01_prompt_caption.sql set-registration/02_sns_account.sql batch-01/update_judge_criteria.sql; do
