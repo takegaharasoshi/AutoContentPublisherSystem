@@ -49,7 +49,7 @@ def rotate_number(s: str) -> str | None:
 # ---------------------------------------------------------------
 if "A63" in BY_NO:
     scene = BY_NO["A63"]["illustration_scene"]
-    check("A63", "情景文にマッチ棒 4 本と「+」", "マッチ棒4本" in scene and "「+」" in scene, "黒板の十字を明示")
+    check("A63", "情景文にマッチ棒 4 本と「+」", "マッチ棒4本" in scene and "「+」" in scene and "平ら" in scene, "黒板の十字を明示")
 
 # ---------------------------------------------------------------
 # A65 NEW DOOR: NEW DOOR と ONE WORD は同じ 7 文字の並べ替え
@@ -93,7 +93,7 @@ if "C68" in BY_NO:
 # 答えの物を描かない指定の確認(想定解そのものは人間レビュー)
 # ---------------------------------------------------------------
 NO_DRAW = {"A64": "足あと", "C63": "数字", "C65": "顔",
-           "C67": "野球場", "C68": "人物", "C69": "家来"}
+           "C68": "人物", "C69": "家来"}
 for no, word in NO_DRAW.items():
     if no in BY_NO:
         scene = BY_NO[no]["illustration_scene"]
