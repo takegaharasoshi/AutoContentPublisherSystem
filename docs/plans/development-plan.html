@@ -2632,7 +2632,7 @@
 <div class="plan-meta"><strong>21-8d2</strong><span class="plan-status">未着手</span></div>
 <h3>核心語の DB 化を本番へ切り替え、投稿済みの投稿で無影響を確認する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-8d1">21-8d1</a> の完了（push 済み）後。</p>
-<p data-field="result"><strong>現況：</strong>着手前。<strong>2026-10-13 に前倒しで済んだもの</strong>: V017 と <code>update_core_words.sql</code> の Aurora 適用（ユーザー指示。ストック 14 / 14・投稿済み <code>umigame_items</code> 1 / 1 が設定済み、ローカルとの MD5 14 / 14 一致）と 21-8d1 の push（<code>c97ff7a</code>）。残りはパイプライン完走の確認・<code>CommentReplyStack</code> の deploy・スナップショットの書き直し・無影響確認。本ステップの完了で Phase 21 のステップがすべて終わる（課題 <a href="../issues/index.html#I-015">I-015</a> の再判断もここで行う）。</p>
+<p data-field="result"><strong>現況：</strong>着手前。<strong>2026-10-13 に前倒しで済んだもの</strong>: V017 と <code>update_core_words.sql</code> の Aurora 適用（ユーザー指示。ストック 14 / 14・投稿済み <code>umigame_items</code> 1 / 1 が設定済み、ローカルとの MD5 14 / 14 一致）と 21-8d1 の push（<code>c97ff7a</code>）、パイプライン完走（image-batch・sns-post-batch とも Succeeded、タスク定義 <code>acps-prod-image-batch:36</code>・<code>acps-prod-sns-post-batch:20</code> がイメージ <code>c97ff7a65650</code>）、<code>CommentReplyStack</code>・<code>CommentReplyStagingStack</code> の <code>cdk deploy</code>（差分は Lambda 3 本のコードだけ・<code>-e</code> で依存スタックは触らない）、投稿済み 1 件〔<code>18114604907104987</code>・016-umigame-soup〕のスナップショットの <code>write_snapshot.py --rewrite --apply</code>（v4・核心語 5 語。v3 との差は <code>core_words</code>・<code>schema_version</code> と <code>posted_at</code> の秒未満の丸めだけ）。<strong>残りは実コメントでの無影響確認（ユーザー）と記録・I-038 のクローズ。</strong>本ステップの完了で Phase 21 のステップがすべて終わる（課題 <a href="../issues/index.html#I-015">I-015</a> の再判断もここで行う）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
