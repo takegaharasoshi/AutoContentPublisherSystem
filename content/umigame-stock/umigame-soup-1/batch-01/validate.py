@@ -113,6 +113,31 @@ def check_judge_criteria(no: str, jc: object, cps: object) -> None:
         errors.append(f"{no}: judge_criteria.errors の要素は改行なし {CRITERIA_ERROR_MAX} 字以内の空でない文字列")
 
 
+def check_core_words(content_key: str, value: object) -> None:
+    """核心語の必須キー・件数・文字列・重複を検査して errors に追記する。
+
+    Args:
+        content_key: 問題の業務キー（メッセージ用）。
+        value: core_words の値。
+    """
+    if not isinstance(value, dict) or set(value) != {"words", "except"}:
+        errors.append(f"{content_key}: core_words は {{words, except}} の dict")
+        return
+    for key in ("words", "except"):
+        words = value[key]
+        if not isinstance(words, list) or (key == "words" and not words):
+            minimum = 1 if key == "words" else 0
+            errors.append(f"{content_key}: core_words.{key} は {minimum} 個以上のリスト")
+        elif any(
+            not isinstance(word, str) or not word.strip()
+            or "\n" in word or "\r" in word
+            for word in words
+        ):
+            errors.append(f"{content_key}: core_words.{key} の要素は改行なしの空でない文字列")
+        elif len(set(words)) != len(words):
+            errors.append(f"{content_key}: core_words.{key} に重複がある")
+
+
 def check_item(it: dict) -> None:
     """1 問の全項目を検査し、errors / warnings に追記する。
 
@@ -157,6 +182,7 @@ def check_item(it: dict) -> None:
         errors.append(f"{no}: reveal_text は改行なし {REVEAL_MAX} 字以内の空でない文字列（{len(rv) if isinstance(rv, str) else '-'} 字）")
 
     check_judge_criteria(no, it["judge_criteria"], cps)
+    check_core_words(it["content_key"], it["core_words"])
 
     p = it["problem_text"]
     if not PROBLEM_MIN <= len(p) <= PROBLEM_MAX:

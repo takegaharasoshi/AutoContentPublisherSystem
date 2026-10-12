@@ -15,7 +15,8 @@ import pytest
 
 from app.comment_log import new_record
 from app.config import Config
-from app.judge.contract import JudgeCriteria, KINDS, Judgement, Problem
+from app.judge.combiner import Combined
+from app.judge.contract import CoreWords, JudgeCriteria, KINDS, Judgement, Problem
 from app.reply import templates
 from app.reply.writer import Reply
 from tools import build_probe_page, contradiction_sweep, probe_metrics, probe_run
@@ -314,6 +315,21 @@ def test_probe_cache_key_changes_with_judge_criteria() -> None:
     ))
     case = {"text": "コメント"}
     assert probe_run._content_hash(case, problem) != probe_run._content_hash(case, changed)
+
+
+def test_core_words_change_writer_cache_but_keep_judge_cache() -> None:
+    problem = _offline_problem("U01")
+    changed = replace(problem, core_words=CoreWords(("新しい核心",), ("新しい例外",)))
+    case = {"id": "U01-cache", "text": "質問"}
+    judgement = Judgement("luna", "q_yesno", "yes")
+    combined = Combined(judgement, None, "q_yesno", "yes", None, "luna")
+    pattern = probe_run.PATTERNS[0]
+    assert probe_run._writer_cache_key(pattern, case, problem, combined, "model") != (
+        probe_run._writer_cache_key(pattern, case, changed, combined, "model")
+    )
+    assert probe_run._judge_cache_key(case, problem, "luna", "model") == (
+        probe_run._judge_cache_key(case, changed, "luna", "model")
+    )
 
 
 def test_contradiction_sweep_displays_old_and_new_point_probabilities() -> None:

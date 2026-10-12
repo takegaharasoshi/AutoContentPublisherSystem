@@ -73,6 +73,7 @@ class UmigameItem:
     fact_sheet: list[str]
     core_points: list[str] | None
     judge_criteria: dict[str, Any] | None
+    core_words: dict[str, list[str]] | None
     reveal_text: str | None
     rule_text: str
     hook: str

@@ -29,6 +29,7 @@ def _stock_row(**updates: object) -> tuple[object, ...]:
             ],
             "errors": ["明らかな誤り"],
         }, ensure_ascii=False),
+        "core_words": json.dumps({"words": ["秘密", "核心"], "except": ["秘密の遊び方"]}, ensure_ascii=False),
         "reveal_text": "開示する真相",
         "rule_text": "質問のルール",
         "caption": "本文 #AIart",
@@ -102,6 +103,7 @@ def test_generate_fetches_video_and_stages_stock_and_history(monkeypatch) -> Non
             ],
             "errors": ["明らかな誤り"],
         }, ensure_ascii=False),
+        json.dumps({"words": ["秘密", "核心"], "except": ["秘密の遊び方"]}, ensure_ascii=False),
         "開示する真相", "質問のルール", "なぜでしょう？", "本文 #AIart",
     )
 
@@ -120,7 +122,7 @@ def test_first_use_follows_id_order_before_any_reuse(monkeypatch) -> None:
     umigame.generate(_context(cursor))
 
     query = " ".join(cursor.calls[0][0].split())
-    assert "core_points, judge_criteria" in query
+    assert "core_points, judge_criteria, core_words" in query
     assert "WHERE set_id = %s AND is_active = 1 AND video_s3_key IS NOT NULL" in query
     assert "ORDER BY last_used_at IS NULL DESC, last_used_at ASC, id ASC" in query
     assert query.endswith("LIMIT 1 FOR UPDATE")
@@ -200,6 +202,41 @@ def test_generate_rejects_invalid_core_points(value: object) -> None:
 def test_generate_rejects_invalid_judge_criteria(value: object) -> None:
     with pytest.raises(RuntimeError, match="judge_criteria"):
         umigame.generate(_context(Cursor([_stock_row(judge_criteria=value)])))
+
+
+@pytest.mark.parametrize("value", [
+    None, "broken", b"\xff", "[]", "{}",
+    {"words": ["核心"]}, {"except": []},
+    {"words": [], "except": []}, {"words": "核心", "except": []},
+    {"words": ["核心"], "except": None}, {"words": ["核心"], "except": "例外"},
+    {"words": ["核心", "核心"], "except": []},
+    {"words": ["核心"], "except": ["例外", "例外"]},
+    {"words": ["核心"], "except": [], "extra": []},
+    *({"words": [word], "except": []} for word in ("", " ", "核\n心", "核\r心", 1, None, [])),
+    *({"words": ["核心"], "except": [word]} for word in ("", " ", "例\n外", "例\r外", 1, None, [])),
+])
+def test_generate_rejects_invalid_core_words(value: object) -> None:
+    cursor = Cursor([_stock_row(core_words=value)])
+    with pytest.raises(RuntimeError, match="core_words"):
+        umigame.generate(_context(cursor))
+    assert len(cursor.calls) == 1
+
+
+@pytest.mark.parametrize("encode", [
+    lambda value: value,
+    lambda value: json.dumps(value, ensure_ascii=False),
+    lambda value: json.dumps(value, ensure_ascii=False).encode("utf-8"),
+    lambda value: bytearray(json.dumps(value, ensure_ascii=False).encode("utf-8")),
+])
+@pytest.mark.parametrize("excepts", [[], ["核心の遊び方"]])
+def test_generate_copies_core_words_into_history(monkeypatch, encode, excepts) -> None:
+    monkeypatch.setattr(umigame, "get_object", lambda *args, **kwargs: b"mp4")
+    value = {"words": ["核心", "秘密"], "except": excepts}
+    cursor = Cursor([_stock_row(core_words=encode(value))])
+    umigame.generate(_context(cursor))
+    assert "judge_criteria, core_words, reveal_text" in cursor.calls[2][0]
+    assert json.loads(cursor.calls[2][1][10]) == value
+    assert cursor.calls[2][0].count("%s") == len(cursor.calls[2][1])
 
 
 @pytest.mark.parametrize("value", [None, "", " ", 123])

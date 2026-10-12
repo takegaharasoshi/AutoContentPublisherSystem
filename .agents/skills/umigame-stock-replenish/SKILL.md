@@ -8,11 +8,11 @@ description: umigame-soup-1（探偵カメロックのウミガメのスープ�
 
 umigame-soup-1 の問題ストック（`umigame_stock_items`）を補充するための運用スキル（21-8a〔2026-10-12〕で新設、同日の認識合わせで流れを全面改訂）。作り方は logic-training-1 の補充（`quiz-stock-replenish`）に倣い、**候補を目標の 2 倍まとめて出して人が一括で選ぶ**。作問の中身（コア宣言の型別の様式・工程 4〜9 の検査）は `/umigame-problem-writer` が正で、本スキルはゴールの切り方・資材の置き場・レビュー用ページ・投入と配置を持つ。
 
-正の所在: 素材 17 項目 + 核心語の仕様・補充とレビューのペース = `docs/app/sets/umigame-soup-1.html` セクション 4、作問の手順 = `.claude/skills/umigame-problem-writer/SKILL.md`（候補段階はセクション 1.5、型別の分冊 story.md / misdirection.md）、素材ツール = `content/umigame-stock/umigame-soup-1/README.md`、動画ビルド = `content/video-build/umigame-soup-1/README.md`、計画と記録 = `docs/plans/umigame-soup-1.html` / `umigame-soup-1-log.html`。矛盾したら設計書・ツール > 本スキル。
+正の所在: 素材 18 項目（#18 核心語 `core_words` を含む）の仕様・補充とレビューのペース = `docs/app/sets/umigame-soup-1.html` セクション 4、作問の手順 = `.claude/skills/umigame-problem-writer/SKILL.md`（候補段階はセクション 1.5、型別の分冊 story.md / misdirection.md）、素材ツール = `content/umigame-stock/umigame-soup-1/README.md`、動画ビルド = `content/video-build/umigame-soup-1/README.md`、計画と記録 = `docs/plans/umigame-soup-1.html` / `umigame-soup-1-log.html`。矛盾したら設計書・ツール > 本スキル。
 
 **前提**: 投稿は夜 20:00 JST の**週 4 回（日・火・木・土）**で消費は**週 4 問**。**型は両型同数**（4 問なら story 2 / misdirection 2）。**在庫水位の目安は未使用ビルド済み 8 問（2 週間分）以上**。
 
-**移行中の注意（2026-10-13 時点）**: プローブ用ツール（`probe_run.py`・`build_probe_page.py`・`local_trial.py` ほか）とそのテスト・実行環境・出力先は 21-8c・21-8c2 で `content/umigame-stock/umigame-soup-1/` へ寄せた（実行はセットのディレクトリの `.venv` から、出力の既定は `work/`〔git 管理外〕。手順はセットの `README.md`「ローカル試行・評価プローブの実行環境」「評価プローブ」）。核心語は 21-8d1・21-8d2 で `leak_words.json`（`services/`）から素材の項目（DB 列 → スナップショット）へ移す。**21-8d2 の完了前は G5 に進まない**（G1a〜G4 は先に進めてよい）。21-8d2 が完了したら本節を消し、パスの記載を確かめる。
+**移行中の注意（2026-10-13 時点）**: プローブ用ツール（`probe_run.py`・`build_probe_page.py`・`local_trial.py` ほか）とそのテスト・実行環境・出力先は 21-8c・21-8c2 で `content/umigame-stock/umigame-soup-1/` へ寄せた（実行はセットのディレクトリの `.venv` から、出力の既定は `work/`〔git 管理外〕。手順はセットの `README.md`「ローカル試行・評価プローブの実行環境」「評価プローブ」）。核心語は 21-8d1 で `services/` 同梱の辞書から素材 #18 `core_words`（`stock_items.py` → DB 列〔V017〕→ スナップショット v4）へ移した。本番の切り替え（V017 の Aurora 適用・deploy）は 21-8d2。**21-8d2 の完了前は G5 に進まない**（G1a〜G4 は先に進めてよい）。21-8d2 が完了したら本節を消し、パスの記載を確かめる。
 
 ## 資材の置き場
 
@@ -91,7 +91,7 @@ Aurora へは `python3 content/ranking-stock/pref-ranking-1/common/apply_aurora.
 ## G1b 素材の仕上げ → 素材のまとめレビュー
 
 - OK のうち**目標数だけ**を、`/umigame-problem-writer` の工程 4〜9（不思議にする・手がかりの棚卸し・動線・現実性・照合・素材化）で 1 問ずつ素材にする（候補の `state` を `drafting`・`stock_no` を記録）。**余剰 OK は仕上げない**（次回へ持ち越す）。自己検査 10 行は問題ごとに会話へ書く
-- 核心語も素材の 1 項目として書く（21-8d1 の完了前は、`leak_words.json` に足す行の案を `STATUS.md` に控える）
+- 核心語も素材の 1 項目（#18 `core_words`）として `JUDGE_POINTS` に書く（書き方は `/umigame-problem-writer` 工程 9。`validate.py` が検査し、投入 SQL に入る。`services/` の push は要らない）
 - `validate.py` → `review_sheet.py`（`work/review.html`。API キー不要）→ `generate.py --dry-run`
 - **Claude が先に一次スクリーニングしてから出す**: ①問題文と真相の語・時制の一致 ②`title` が真相の手がかりになっていないか ③`truth` が公開して自然な文か（次回のキャプションで全文公開）④既存問題とモチーフ・仕掛けが近接していないか（近い場合は投稿順を離す申し送り）
 - **素材レビュー**: ユーザーが素材シートでまとめて見る（ブラウザーで開くときは `/docs-mobile-view` の要領で HTTP 配信したものでもよい）。指摘は `stock_items.py`（全問共通なら `../common/umigame_common.py`）へ反映 → `validate.py` → `review_sheet.py` → 再提示。指摘のうち手順の穴は作問スキルへ反映する

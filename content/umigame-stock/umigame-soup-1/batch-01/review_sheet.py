@@ -241,7 +241,7 @@ def _counted(text: str, limit: int) -> str:
 
 
 def judge_html(it: dict) -> list[str]:
-    """判定用の項目（コアの要点ごとの正解基準・誤りの例・開示文）を HTML にする。
+    """判定用の項目（コアの要点ごとの正解基準・核心語・誤りの例・開示文）を HTML にする。
 
     正解基準は要点ごとのまとまり（要点 → 当てた → 触れた）で見せる（21-6d7b。セット別設計書 10.2
     「素材シートでのレビュー」）。真相・確定事実シートを読んだあとに説明テストで境目を確かめる。
@@ -249,7 +249,7 @@ def judge_html(it: dict) -> list[str]:
     cps = it["core_points"]
     jc = it["judge_criteria"]
     out = [
-        f"<details class='judge spoiler'><summary>判定用の項目（コアの要点 {len(cps)} 個・正解基準・開示文）</summary>",
+        f"<details class='judge spoiler'><summary>判定用の項目（コアの要点 {len(cps)} 個・正解基準・核心語・開示文）</summary>",
         "<p class='muted'>コアの要点は 1 個 20 字以内、当てた / 触れたは各 80 字以内、誤りの例は 0〜3 個・各 40 字以内。"
         "観点: ① 当てたの下限の言い方で問題文の不思議がすべて説明でき、触れたの言い方では説明が残る "
         "② 固有名を求めるなら、その名前でしか説明できない理由がある ③ 触れたが広すぎない（問題文どおりの読み方や周辺の事実だけで触れたにならない） "
@@ -266,6 +266,16 @@ def judge_html(it: dict) -> list[str]:
     out.append("<div class='fld'><span class='k'>正解にしない誤りの例 errors</span>")
     if errs:
         out.append("<ul>" + "".join(f"<li>{_counted(e, 40)}</li>" for e in errs) + "</ul>")
+    else:
+        out.append("<div class='v'>なし</div>")
+    out.append("</div>")
+    core_words = it["core_words"]
+    out.append("<div class='fld'><span class='k'>核心語 core_words.words</span><ul>")
+    out += [f"<li>{html.escape(word)}</li>" for word in core_words["words"]]
+    out.append("</ul></div>")
+    out.append("<div class='fld'><span class='k'>照合から除く語句 core_words.except</span>")
+    if core_words["except"]:
+        out.append("<ul>" + "".join(f"<li>{html.escape(word)}</li>" for word in core_words["except"]) + "</ul>")
     else:
         out.append("<div class='v'>なし</div>")
     out.append("</div>")

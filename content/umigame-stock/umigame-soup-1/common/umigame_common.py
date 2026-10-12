@@ -107,6 +107,7 @@ REQUIRED_KEYS = (
     "core_points",
     "reveal_text",
     "judge_criteria",
+    "core_words",
     "expected_questions",
     "hook",
     "rule_text",

@@ -26,6 +26,7 @@ from app.models import (
         UmigameItem(
             1, "001-problem", "問題", "真相", ["事実"], ["要点"],
             {"points": [{"hit": "当てた", "touch": "触れた"}], "errors": []},
+            {"words": ["核心"], "except": []},
             "開示する真相", "ルール", "フック", "本文"
         ),
         Post(5, "pending", None, None),

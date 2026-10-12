@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 import json
+from dataclasses import replace
 from unittest.mock import Mock
 
 import pytest
@@ -21,6 +22,7 @@ def _item() -> UmigameItem:
         ["要点１", "要点２"],
         {"points": [{"hit": "当てた１", "touch": "触れた１"},
                     {"hit": "当てた２", "touch": "触れた２"}], "errors": ["誤り"]},
+        {"words": ["核心", "秘密"], "except": ["秘密の遊び方"]},
         "開示する真相", "質問のルール", "フック",
         "本文 #AIart",
     )
@@ -70,7 +72,7 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
     assert isinstance(body, bytes)
     assert b"\\u" not in body
     assert json.loads(body.decode("utf-8")) == {
-        "schema_version": 3,
+        "schema_version": 4,
         "set_code": "umigame-soup-1",
         "media_id": "17912345678901234",
         "content_key": "001-lighthouse-letter",
@@ -82,6 +84,7 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
         "judge_criteria": {"points": [{"hit": "当てた１", "touch": "触れた１"},
                                       {"hit": "当てた２", "touch": "触れた２"}],
                            "errors": ["誤り"]},
+        "core_words": {"words": ["核心", "秘密"], "except": ["秘密の遊び方"]},
         "reveal_text": "開示する真相",
         "rule_text": "質問のルール",
         "master_rules": "固定プロンプト",
@@ -110,20 +113,10 @@ def test_write_problem_snapshot_skips_run_without_item(monkeypatch) -> None:
 @pytest.mark.parametrize(
     "item",
     [
-        UmigameItem(
-            42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実"],
-            None, {"points": [], "errors": []},
-            "開示する真相", "質問のルール", "フック", "本文",
-        ),
-        UmigameItem(
-            42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実"],
-            ["要点"], {"points": [{"hit": "当てた", "touch": "触れた"}], "errors": []},
-            None, "質問のルール", "フック", "本文",
-        ),
-        UmigameItem(
-            42, "001-lighthouse-letter", "なぜ？", "真相です", ["事実"],
-            ["要点"], None, "開示する真相", "質問のルール", "フック", "本文",
-        ),
+        replace(_item(), core_points=None),
+        replace(_item(), reveal_text=None),
+        replace(_item(), judge_criteria=None),
+        replace(_item(), core_words=None),
     ],
 )
 def test_write_problem_snapshot_requires_judge_points(monkeypatch, item) -> None:

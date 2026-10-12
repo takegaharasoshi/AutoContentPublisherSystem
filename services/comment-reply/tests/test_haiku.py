@@ -16,7 +16,7 @@ from app.config import Config
 from app.judge import haiku, luna
 from app.judge.combiner import Combined, combine
 from app.judge.contract import Judgement
-from app.reply import leak_guard, templates, writer
+from app.reply import templates, writer
 
 
 class _Response:
@@ -352,8 +352,7 @@ def test_writer_yesno_and_leak_guards_are_shared(monkeypatch, problem, variant) 
                              variant=variant, anthropic_api_key="fake-anthropic")
     assert bad.source == "fallback_template" and bad.debug["output_tokens"] == 200
     _mock_http(monkeypatch, _body({"reply": "はい！レントゲンだよ"}))
-    guarded_problem = replace(problem, content_key=leak_guard.load_leak_words()["U01"].content_key)
-    reply = writer.write_reply(_combined(), "c", "質問", guarded_problem,
+    reply = writer.write_reply(_combined(), "c", "質問", problem,
                                variant=variant, anthropic_api_key="fake-anthropic")
     assert reply.source == "leak_guard" and reply.text == "はい！"
     assert reply.guard["words"] == ["レントゲン"] and reply.debug["model"] == anthropic_util.MODEL

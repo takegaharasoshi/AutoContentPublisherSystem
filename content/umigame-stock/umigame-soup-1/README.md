@@ -1,7 +1,7 @@
 # umigame-soup-1 ストック資材（ウミガメのスープ参加型セット）
 
 `umigame_stock_items`（V012）へ投入する問題ストックのバッチ別ソースと整備ツーリング。仕様の正は
-[セット別設計書](../../../docs/app/sets/umigame-soup-1.html) セクション 4（素材 17 項目）、投入手順の正は
+[セット別設計書](../../../docs/app/sets/umigame-soup-1.html) セクション 4（素材 18 項目）、投入手順の正は
 [運用設計](../../../docs/app/operation.html)。**作問の手順（コア宣言・動線・現実性の自己検査）の正はスキル `.claude/skills/umigame-problem-writer/SKILL.md`**。
 
 ```
@@ -12,7 +12,7 @@ umigame-soup-1/
 ├── pyproject.toml           # tools/tests の pytest 設定（21-8c2）
 ├── .venv/ · work/           # 実行環境とツールの出力（gitignore。21-8c2）
 └── batch-01/                # 第 1 バッチ（全 14 問 = story 7 / misdirection 7）
-    ├── stock_items.py       #   単一ソース（素材 17 項目〔判定用の 3 項目は JUDGE_POINTS〕+ 管理項目）
+    ├── stock_items.py       #   単一ソース（素材 18 項目〔判定・出力ガード用の 4 項目は JUDGE_POINTS〕+ 管理項目）
     ├── validate.py          #   素材の機械検証
     ├── review_sheet.py      #   素材レビューシート生成（API キー不要）
     ├── generate.py          #   insert_umigame_stock.sql の生成 + ローカル MySQL でのドライラン

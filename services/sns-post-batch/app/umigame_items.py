@@ -11,7 +11,7 @@ from .models import PreviousUmigameTruth, UmigameItem
 def fetch_umigame_item(cursor: Any, generation_run_id: int) -> UmigameItem | None:
     """Fetch and JSON-decode the problem recorded for one generation run."""
     cursor.execute(
-        "SELECT id, content_key, problem_text, truth, fact_sheet, core_points, judge_criteria, "
+        "SELECT id, content_key, problem_text, truth, fact_sheet, core_points, judge_criteria, core_words, "
         "reveal_text, rule_text, "
         "hook, caption FROM umigame_items "
         "WHERE generation_run_id = %s LIMIT 1",
@@ -100,6 +100,36 @@ def fetch_umigame_item(cursor: Any, generation_run_id: int) -> UmigameItem | Non
             raise RuntimeError(
                 "umigame_items.judge_criteria must match core_points and contain valid points and errors"
             )
+    core_words = row[7]
+    if core_words is not None:
+        if isinstance(core_words, (bytes, bytearray)):
+            try:
+                core_words = core_words.decode("utf-8")
+            except UnicodeDecodeError as exc:
+                raise RuntimeError("umigame_items.core_words is invalid UTF-8") from exc
+        if isinstance(core_words, str):
+            try:
+                core_words = json.loads(core_words)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError("umigame_items.core_words is invalid JSON") from exc
+        if not isinstance(core_words, dict) or set(core_words) != {"words", "except"}:
+            raise RuntimeError("umigame_items.core_words must be an object with words and except")
+        for key in ("words", "except"):
+            words = core_words[key]
+            if (
+                not isinstance(words, list)
+                or (key == "words" and not words)
+                or any(
+                    not isinstance(word, str) or not word.strip()
+                    or "\n" in word or "\r" in word
+                    for word in words
+                )
+                or len(set(words)) != len(words)
+            ):
+                raise RuntimeError(
+                    f"umigame_items.core_words.{key} must be a unique string array "
+                    "without empty words or newlines"
+                )
     return UmigameItem(
         id=row[0],
         content_key=row[1],
@@ -108,10 +138,11 @@ def fetch_umigame_item(cursor: Any, generation_run_id: int) -> UmigameItem | Non
         fact_sheet=facts,
         core_points=core_points,
         judge_criteria=judge_criteria,
-        reveal_text=row[7],
-        rule_text=row[8],
-        hook=row[9],
-        caption=row[10],
+        core_words=core_words,
+        reveal_text=row[8],
+        rule_text=row[9],
+        hook=row[10],
+        caption=row[11],
     )
 
 

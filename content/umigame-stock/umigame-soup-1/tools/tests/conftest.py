@@ -22,7 +22,7 @@ def block_live_http(monkeypatch) -> None:
 
 @pytest.fixture
 def problem() -> Problem:
-    """Return a schema-v3 problem using U01's authored judge criteria."""
+    """Return a schema-v4 problem using U01's authored criteria and core words."""
     return replace(
         _load_stock_problem("U01"), media_id="media-1", content_key="001-test",
         problem_text="男はなぜ泣いた？", truth="男は回復を知った",

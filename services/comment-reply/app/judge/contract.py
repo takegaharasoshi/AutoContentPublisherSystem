@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import logging
 from typing import Any, Mapping
 import unicodedata
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 KINDS = (
@@ -39,6 +43,14 @@ class JudgeCriteria:
 
 
 @dataclass(frozen=True)
+class CoreWords:
+    """Immutable core words and phrases excluded from reply leak checks."""
+
+    words: tuple[str, ...]
+    excepts: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Problem:
     """One published snapshot, kept separate from the stock authoring format."""
 
@@ -51,16 +63,17 @@ class Problem:
     fact_sheet: tuple[str, ...]
     core_points: tuple[str, ...]
     judge_criteria: JudgeCriteria
+    core_words: CoreWords | None
     reveal_text: str
 
     @classmethod
     def from_snapshot(cls, raw: Mapping[str, Any]) -> Problem:
-        """Validate and build a problem from schema version 3 or later."""
+        """Validate and build a problem from schema version 3 or 4."""
         if not isinstance(raw, Mapping):
             raise ProblemInvalid("snapshot must be an object")
         version = raw.get("schema_version")
-        if not isinstance(version, int) or isinstance(version, bool) or version < 3:
-            raise ProblemInvalid("schema_version must be >= 3")
+        if not isinstance(version, int) or isinstance(version, bool) or version not in {3, 4}:
+            raise ProblemInvalid("schema_version must be 3 or 4")
         fields = ("set_code", "media_id", "content_key", "problem_text", "truth", "reveal_text")
         for key in fields:
             if not isinstance(raw.get(key), str) or not raw[key].strip():
@@ -92,6 +105,32 @@ class Problem:
             or any(not isinstance(error, str) or not error.strip() for error in errors)
         ):
             raise ProblemInvalid("judge_criteria.errors must be 0 to 3 nonempty strings")
+        core_words = None
+        if version == 4:
+            value = raw.get("core_words")
+            if not isinstance(value, Mapping) or set(value) != {"words", "except"}:
+                raise ProblemInvalid("core_words must be an object with words and except")
+            for key in ("words", "except"):
+                words = value[key]
+                if (
+                    not isinstance(words, list)
+                    or (key == "words" and not words)
+                    or any(
+                        not isinstance(word, str) or not word.strip()
+                        or "\n" in word or "\r" in word
+                        for word in words
+                    )
+                    or len(set(words)) != len(words)
+                ):
+                    raise ProblemInvalid(
+                        f"core_words.{key} must be a unique string array without empty words or newlines"
+                    )
+            core_words = CoreWords(tuple(value["words"]), tuple(value["except"]))
+        else:
+            LOGGER.warning(
+                "PROBLEM_NO_CORE_WORDS content_key=%s schema_version=%s",
+                raw["content_key"], version,
+            )
         return cls(
             schema_version=version,
             set_code=raw["set_code"], media_id=raw["media_id"],
@@ -99,6 +138,7 @@ class Problem:
             truth=raw["truth"], fact_sheet=tuple(raw["fact_sheet"]),
             core_points=tuple(raw["core_points"]),
             judge_criteria=JudgeCriteria(tuple(parsed_points), tuple(errors)),
+            core_words=core_words,
             reveal_text=raw["reveal_text"],
         )
 

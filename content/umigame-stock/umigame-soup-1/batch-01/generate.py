@@ -6,12 +6,12 @@
   ``problem_snapshot_enabled`` / ``stories_enabled`` の有効化は 21-7 の人間ゲートで行い、本 SQL では触らない。
 - INSERT は ``stock_items.POST_ORDER`` の順に並べる（id の順 = 投稿順。2026-09-26 の素材の全数レビューで決定）。
 - 既存行向けに core_points / reveal_text / title / truth / caption の UPDATE SQL と、
-  judge_criteria（全 14 問）・U12 / U18 / U22 / U25 / U27 の fact_sheet・U27 の core_points の UPDATE SQL を生成する。
+  judge_criteria・core_words（全 14 問）・U12 / U18 / U22 / U25 / U27 の fact_sheet・U27 の core_points の UPDATE SQL を生成する。
 - ``--dry-run`` はローカル MySQL（docker の acps-mysql）でトランザクション内に流し、件数と content_key の
   重複を確認して ROLLBACK する。セットに既存ストック行があれば UPDATE、なければ INSERT を試す。
 
 使い方:
-    python3 generate.py            # INSERT SQL と 2 本の UPDATE SQL を生成
+    python3 generate.py            # INSERT SQL と 3 本の UPDATE SQL を生成
     python3 generate.py --dry-run  # 生成 + ローカル MySQL でドライラン
 """
 
@@ -33,6 +33,7 @@ from umigame_common import SET_CODE  # noqa: E402
 SQL_PATH = HERE / "insert_umigame_stock.sql"
 UPDATE_SQL_PATH = HERE / "update_judge_points.sql"
 CRITERIA_SQL_PATH = HERE / "update_judge_criteria.sql"
+CORE_WORDS_SQL_PATH = HERE / "update_core_words.sql"
 SET_NAME = "探偵カメロックのウミガメのスープ"
 GENERATOR_NAME = "umigame-prebuilt"
 MYSQL_CMD = [
@@ -75,7 +76,7 @@ def build_sql() -> str:
         lines += [
             f"-- 投稿順 {order}: {it['no']} {it['title']}（{it['puzzle_type']}）",
             "INSERT INTO umigame_stock_items (set_id, content_key, title, difficulty, problem_text, truth, fact_sheet,",
-            "    core_points, judge_criteria, reveal_text,",
+            "    core_points, judge_criteria, core_words, reveal_text,",
             "    expected_questions, hook, rule_text, narration, play_example, character_lines, illustration_prompt,",
             "    caption, source_note, is_active)",
             f"VALUES ((SELECT id FROM batch_sets WHERE set_code = '{SET_CODE}'),",
@@ -83,7 +84,8 @@ def build_sql() -> str:
             f"        '{esc(it['problem_text'])}',",
             f"        '{esc(it['truth'])}',",
             f"        '{jsonlit(it['fact_sheet'])}',",
-            f"        '{jsonlit(it['core_points'])}', '{jsonlit(it['judge_criteria'])}', '{esc(it['reveal_text'])}',",
+            f"        '{jsonlit(it['core_points'])}', '{jsonlit(it['judge_criteria'])}',",
+            f"        '{jsonlit(it['core_words'])}', '{esc(it['reveal_text'])}',",
             f"        '{jsonlit(it['expected_questions'])}',",
             f"        '{esc(it['hook'])}', '{esc(it['rule_text'])}',",
             f"        '{jsonlit(it['narration'])}',",
@@ -152,6 +154,43 @@ def build_criteria_update_sql() -> str:
     return "\n".join(lines)
 
 
+def build_core_words_update_sql() -> str:
+    """全 14 問の核心語を設定し、出題済み行の未設定値をストックから補完する。"""
+    lines = [
+        "-- batch-01 既存 14 問の核心語の更新（V017 適用後、バッチと返信 Lambda のデプロイ前に実行）",
+        "-- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）",
+        "-- 適用先: ローカル MySQL / Aurora（acps）。set_code と content_key で対象を特定する。",
+        "-- 出題済み umigame_items は core_words が NULL の行だけ補完する。",
+        "",
+    ]
+    for it in ITEMS:
+        lines += [
+            f"-- {it['content_key']}: {it['title']}",
+            f"UPDATE umigame_stock_items SET core_words = '{jsonlit(it['core_words'])}'",
+            f"WHERE content_key = '{esc(it['content_key'])}'",
+            f"  AND set_id = (SELECT id FROM batch_sets WHERE set_code = '{SET_CODE}');",
+            "",
+        ]
+    lines += [
+        "UPDATE umigame_items ui",
+        "JOIN umigame_stock_items s ON s.set_id = ui.set_id AND s.content_key = ui.content_key",
+        "JOIN batch_sets b ON b.id = ui.set_id",
+        "SET ui.core_words = s.core_words",
+        f"WHERE ui.core_words IS NULL AND b.set_code = '{SET_CODE}';",
+        "",
+        "-- 両表の件数と設定済み件数を確認する。",
+    ]
+    for table in ("umigame_stock_items", "umigame_items"):
+        lines += [
+            f"SELECT '{table}' AS table_name, COUNT(*) AS item_rows,",
+            "       SUM(i.core_words IS NOT NULL) AS core_words_set",
+            f"FROM {table} i JOIN batch_sets b ON b.id = i.set_id",
+            f"WHERE b.set_code = '{SET_CODE}';",
+            "",
+        ]
+    return "\n".join(lines)
+
+
 def _run_mysql(script: str) -> tuple[int, str, str]:
     """ローカル MySQL に SQL を渡し、終了コード・標準出力・標準エラーを返す。"""
     proc = subprocess.run(MYSQL_CMD, input=script.encode("utf-8"), capture_output=True)
@@ -171,13 +210,14 @@ def _print_mysql_result(out: str, err: str) -> None:
         print(err.rstrip(), file=sys.stderr)
 
 
-def dry_run(sql: str, update_sql: str, criteria_sql: str) -> int:
+def dry_run(sql: str, update_sql: str, criteria_sql: str, core_words_sql: str) -> int:
     """既存行の有無に応じて UPDATE または INSERT を試し、確認後 ROLLBACK する。
 
     Args:
         sql: 生成した INSERT 文。
         update_sql: 既存行向け UPDATE 文。
         criteria_sql: 正解基準と U27 の変更を反映する UPDATE 文。
+        core_words_sql: 核心語の UPDATE 文と両表の確認クエリ。
 
     Returns:
         終了コード（0 = 成功）。
@@ -200,11 +240,11 @@ def dry_run(sql: str, update_sql: str, criteria_sql: str) -> int:
 
     if existing_rows:
         print(f"dry-run: 既存ストック {existing_rows} 件を検出。UPDATE SQL を実行します")
-        action_sql = update_sql + "\n" + criteria_sql
+        action_sql = update_sql + "\n" + criteria_sql + "\n" + core_words_sql
         action_name = "UPDATE"
     else:
         print("dry-run: セットのストック行なし。INSERT SQL を実行します")
-        action_sql = sql
+        action_sql = sql + "\n" + core_words_sql
         action_name = "INSERT"
     script = "\n".join(
         [
@@ -218,6 +258,7 @@ def dry_run(sql: str, update_sql: str, criteria_sql: str) -> int:
             "       SUM(JSON_LENGTH(s.play_example) = 6) AS play_example_ok,",
             "       SUM(core_points IS NOT NULL) AS core_points_set,",
             "       SUM(judge_criteria IS NOT NULL) AS judge_criteria_set,",
+            "       SUM(core_words IS NOT NULL) AS core_words_set,",
             "       SUM(reveal_text IS NOT NULL) AS reveal_text_set,",
             "       SUM(core_points IS NOT NULL AND reveal_text IS NOT NULL) AS judge_points_set,",
             "       SUM(JSON_LENGTH(core_points) BETWEEN 1 AND 3) AS core_points_ok,",
@@ -245,14 +286,18 @@ def main() -> int:
     sql = build_sql()
     update_sql = build_update_sql()
     criteria_sql = build_criteria_update_sql()
+    core_words_sql = build_core_words_update_sql()
     SQL_PATH.write_text(sql, encoding="utf-8")
     UPDATE_SQL_PATH.write_text(update_sql, encoding="utf-8")
     CRITERIA_SQL_PATH.write_text(criteria_sql, encoding="utf-8")
+    CORE_WORDS_SQL_PATH.write_text(core_words_sql, encoding="utf-8")
     print(f"generate: {SQL_PATH.name} に {len(ITEMS)} INSERT 文を生成")
     print(f"generate: {UPDATE_SQL_PATH.name} に {len(ITEMS)} UPDATE 文を生成")
     print(f"generate: {CRITERIA_SQL_PATH.name} に {len(ITEMS) * 2} UPDATE 文を生成")
+    print(f"generate: {CORE_WORDS_SQL_PATH.name} に {len(ITEMS) + 1} UPDATE 文と両表の core_words_set 確認クエリを生成")
     if args.dry_run:
-        return dry_run(sql, update_sql, criteria_sql)
+        print(core_words_sql)
+        return dry_run(sql, update_sql, criteria_sql, core_words_sql)
     return 0
 
 

@@ -28,6 +28,7 @@ def test_local_trial_stub_writes_three_mode_records_without_keys(tmp_path, monke
     assert {path.relative_to(tmp_path).parts[0] for path in files} == {"luna", "jev", "haiku"}
     for mode in ("luna", "jev", "haiku"):
         saved = json.loads(next((tmp_path / mode).rglob("local-u01-split.json")).read_text())
+        assert saved["problem_schema_version"] == 4
         assert saved["final"]["decision"] == mode
         assert "shadow_mismatch" not in saved
         assert saved["reply"]["source"] == "template"

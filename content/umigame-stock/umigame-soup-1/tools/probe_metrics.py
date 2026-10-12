@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import importlib.util
 import math
 import re
 import statistics
 from collections import Counter
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Mapping
 
 
-from app.judge.contract import KINDS, bare_term_text  # noqa: E402
+from app.judge.contract import CoreWords, KINDS, bare_term_text  # noqa: E402
 from app.reply import leak_guard, templates  # noqa: E402
 
 
@@ -65,9 +68,25 @@ TOKEN_FIELDS = (
 )
 
 
+@lru_cache(maxsize=1)
+def _stock_core_words() -> dict[str, CoreWords]:
+    """Read words and exclusions by problem number from the stock source."""
+    path = Path(__file__).resolve().parent.parent / "batch-01/stock_items.py"
+    spec = importlib.util.spec_from_file_location("probe_umigame_stock_items", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return {
+        item["no"]: CoreWords(tuple(item["core_words"]["words"]),
+                              tuple(item["core_words"]["except"]))
+        for item in module.ITEMS
+    }
+
+
 def load_core_words() -> dict[str, list[str]]:
-    """Keep the probe's old word-list API backed by the shared dictionary."""
-    return {no: list(entry.words) for no, entry in leak_guard.load_leak_words().items()}
+    """Keep the probe's word-list API backed by batch-01 stock items."""
+    return {no: list(value.words) for no, value in _stock_core_words().items()}
 
 
 def answer_matches(row: dict[str, Any]) -> bool:
@@ -155,13 +174,11 @@ def row_flags(row: dict[str, Any], case: dict[str, Any],
     if not reply or leak_guard.is_correct_reveal(kind, reply):
         leak_words = []
     elif core is not None:
-        leak_words = [
-            word for word in core.get(case["no"], [])
-            if word and word in reply and word not in case["text"]
-        ]
+        core_words = CoreWords(tuple(core.get(case["no"], [])), ())
+        leak_words = leak_guard.find_leaks(reply, case["text"], core_words)
     else:
-        entry = leak_guard.load_leak_words().get(case["no"])
-        leak_words = leak_guard.find_leaks(reply, case["text"], entry) if entry else []
+        core_words = _stock_core_words().get(case["no"])
+        leak_words = leak_guard.find_leaks(reply, case["text"], core_words) if core_words else []
     decision = final.get("decision")
     proximity = [] if decision == "consensus_split" or kind not in {"q_yesno", "guess_wrong"} else [
         word for word in PROXIMITY_WORDS if word in (reply or "")

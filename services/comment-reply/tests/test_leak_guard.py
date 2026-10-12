@@ -1,4 +1,4 @@
-"""Offline checks for the shared core-word dictionary and reply output guard."""
+"""Offline checks for snapshot core words and the reply output guard."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import pytest
 from app import comment_log
 from app.config import Config
 from app.judge.combiner import Combined
-from app.judge.contract import Judgement
+from app.judge.contract import CoreWords, Judgement
 from app.reply import leak_guard, templates, writer
 
 
@@ -21,24 +21,22 @@ def _combined(kind: str, answer: str | None = None,
 
 
 def _problem(problem, no: str = "U01"):
-    return replace(problem, content_key=leak_guard.load_leak_words()[no].content_key)
+    if no == "U16":
+        return replace(problem, core_words=CoreWords(
+            ("氷鬼", "鬼ごっこ", "鬼", "タッチ", "遊び", "遊ん", "ルール"),
+            ("遊び方",),
+        ))
+    return problem
 
 
-def test_dictionary_entries_and_lookup() -> None:
-    entries = leak_guard.load_leak_words()
-    assert entries
-    assert all(entry.no == no and entry.content_key and entry.words
-               for no, entry in entries.items())
-    assert len({entry.content_key for entry in entries.values()}) == len(entries)
-    assert all(leak_guard.entry_for_content_key(entry.content_key) == entry
-               for entry in entries.values())
-    assert leak_guard.entry_for_content_key("missing") is None
+def test_core_words_are_immutable(problem) -> None:
+    assert problem.core_words.words
     with pytest.raises(FrozenInstanceError):
-        entries["U01"].content_key = "changed"
+        problem.core_words.words = ("changed",)
 
 
-def test_find_leaks_excludes_comment_words_and_exception() -> None:
-    entry = leak_guard.load_leak_words()["U16"]
+def test_find_leaks_excludes_comment_words_and_exception(problem) -> None:
+    entry = _problem(problem, "U16").core_words
     assert leak_guard.find_leaks("遊び方を説明するよ", "", entry) == []
     assert leak_guard.find_leaks("鬼ごっこで遊んだ", "鬼ごっこ？", entry) == ["遊ん"]
     assert leak_guard.find_leaks("鬼と鬼", "", entry) == ["鬼"]
@@ -82,7 +80,7 @@ def test_writer_reveal_comment_and_exception_do_not_guard(monkeypatch, problem) 
     assert excepted.source == "llm" and excepted.guard is None
 
 
-def test_writer_non_yesno_template_and_missing_dict(monkeypatch, caplog, problem) -> None:
+def test_writer_non_yesno_template_and_missing_words(monkeypatch, caplog, problem) -> None:
     monkeypatch.setattr(writer, "_llm_reply", lambda *args, **kwargs: ("病院だよ", {}))
     reply = writer.write_reply(_combined("impression"), "1", "質問", _problem(problem),
                                variant="1b", openai_api_key="fake")
@@ -96,13 +94,14 @@ def test_writer_non_yesno_template_and_missing_dict(monkeypatch, caplog, problem
     assert template.guard["original_source"] == "template"
 
     with caplog.at_level(logging.WARNING):
-        missing = writer.write_reply(_combined("impression"), "1", "質問", problem,
+        missing = writer.write_reply(_combined("impression"), "1", "質問",
+                                     replace(problem, schema_version=3, core_words=None),
                                      variant="1b", openai_api_key="fake")
     assert missing.text == "病院だよ" and missing.source == "llm" and missing.guard is None
-    assert "REPLY_LEAK_GUARD_NO_DICT content_key=001-test" in caplog.text
+    assert "REPLY_LEAK_GUARD_NO_WORDS content_key=001-test" in caplog.text
 
 
-def test_all_fixed_reply_phrases_are_safe_for_every_problem() -> None:
+def test_fixed_reply_phrases_are_safe(problem) -> None:
     phrases = [text for options in templates.TEMPLATES.values() if options is not None
                for text in options]
     phrases.extend(templates.YESNO_OPENERS.values())
@@ -110,9 +109,20 @@ def test_all_fixed_reply_phrases_are_safe_for_every_problem() -> None:
     phrases.append(templates.LEAK_GUARD_TEXT)
     phrases.extend(opener + text for opener in templates.YESNO_OPENERS.values()
                    for text in templates.TEMPLATES["q_yesno"])
-    for entry in leak_guard.load_leak_words().values():
+    for entry in (problem.core_words, _problem(problem, "U16").core_words):
         for phrase in phrases:
-            assert leak_guard.find_leaks(phrase, "", entry) == [], (entry.no, phrase)
+            assert leak_guard.find_leaks(phrase, "", entry) == [], phrase
+
+
+def test_writer_uses_snapshot_words_for_an_unknown_content_key(monkeypatch, problem) -> None:
+    monkeypatch.setattr(writer, "_llm_reply", lambda *args, **kwargs: ("新しい核心だよ", {}))
+    custom_problem = replace(
+        problem, content_key="new-problem", core_words=CoreWords(("新しい核心",), ()),
+    )
+    reply = writer.write_reply(_combined("impression"), "1", "質問", custom_problem,
+                               variant="1b", openai_api_key="fake")
+    assert reply.source == "leak_guard"
+    assert reply.guard["words"] == ["新しい核心"]
 
 
 def test_comment_record_preserves_guard(monkeypatch, problem) -> None:

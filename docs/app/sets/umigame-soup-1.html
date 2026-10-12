@@ -32,7 +32,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>set_code: umigame-soup-1</span>
-  <span>最終更新: 2026-10-12（21-6i: 投稿を週 4 回〔日・火・木・土の 20:00〕に変え、1・3・4・6・10.7.1・11 と付録の決定を更新。予告文は「次のリール」へ）。前回: 2026-10-12（21-7: 2 に稼働開始の手順書への導線、3 に Scheduler の追加と <code>is_active</code> での切り替え、10.7.2 に <code>master_rules</code> の中身・再出力ツール・IAM 付与済みを反映）。前回: 2026-10-12（21-6h: セクション 6 の前回の真相ブロックを実装に合わせて確定し、テンプレート文面を <code>{{caption}}{{prev_truth_block}}</code> に決めた）。前回: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
+  <span>最終更新: 2026-10-13（21-8d1: 核心語を素材 #18 <code>core_words</code> にし、DB 列〔V017〕→ スナップショット v4 → Reply Lambda の経路へ移した。4・出力ガード・10.7.2・運用ログを更新）。前回: 2026-10-12（21-6i: 投稿を週 4 回〔日・火・木・土の 20:00〕に変え、1・3・4・6・10.7.1・11 と付録の決定を更新。予告文は「次のリール」へ）。前回: 2026-10-12（21-7: 2 に稼働開始の手順書への導線、3 に Scheduler の追加と <code>is_active</code> での切り替え、10.7.2 に <code>master_rules</code> の中身・再出力ツール・IAM 付与済みを反映）。前回: 2026-10-12（21-6h: セクション 6 の前回の真相ブロックを実装に合わせて確定し、テンプレート文面を <code>{{caption}}{{prev_truth_block}}</code> に決めた）。前回: 2026-10-08（21-6d7c: 正解基準を判定に組み込んだ〔V014・スナップショット <code>schema_version</code> 3・luna のプロンプト・Jev 段 B の 3 択化・段 B2 に誤りの例〕。10.3.1・10.3.4・10.5・10.7.2 を更新）。前回: 2026-10-04（21-6d3c: パターン 2 に段 B2〔誤りを含む推理の矛盾チェック・<code>T_CONTRADICT</code> 0.5〕を足し、10.3.4 の未実装の注記を外した）。前回: 2026-10-04（21-6d3b: 本文を「今の正」だけにして決定の経緯を付録へ集め、コメント返信を 10 章 1 つにまとめた。10.5 に現行プロンプトの全文を転記した。仕様は変えていない）。前回: 2026-09-30（21-6c1）</span>
 </div>
 
 <div class="note">
@@ -117,8 +117,8 @@ nav.toc ul { margin: .3rem 0 0; }
   <li><strong>Scheduler は 21-7 で CDK に追加した</strong>（画像生成 1 件 + インサイト収集 2 件。<a href="../../infra/workflow.html">workflow.html 1.5 / 1.6</a> の命名規約。Input にスロット・尺は持たせない）。<strong>Scheduler は有効のまま deploy し、稼働の切り替えは <code>batch_sets.is_active</code> で行う</strong>（<code>is_active=0</code> の間は 3 バッチとも何もせず正常終了する。workflow.html 1.5 の決定 21-7）。<code>is_active</code> を 1 にする直前に未投稿バックログ 0 件を確認する（<a href="../operation.html#set-add">運用設計 2.1</a> 手順 3）</li>
 </ul>
 
-<h2 id="stock-items">4. ストック 1 件の素材項目（17 項目）</h2>
-<div class="note"><span class="callout-title">要点</span>ストック 1 件は「リール 1 本と AI 出題者の判定に要る素材一式」。下の 17 項目の表が正で、<code>validate.py</code>・テーブル <code>umigame_stock_items</code> はこれに従う。#15〜#17 はコメント返信の判定用で、ほかの項目と同じく作問時に書き、素材シートでレビューする。#17 正解基準は 21-6d7a で設計し、素材・<code>validate.py</code>・素材シートへの導入は 21-6d7b、DB・判定への組み込みは 21-6d7c（それまでは未記入）。問題はすべて完全オリジナル。</div>
+<h2 id="stock-items">4. ストック 1 件の素材項目（18 項目）</h2>
+<div class="note"><span class="callout-title">要点</span>ストック 1 件は「リール 1 本と AI 出題者の判定に要る素材一式」。下の 18 項目の表が正で、<code>validate.py</code>・テーブル <code>umigame_stock_items</code> はこれに従う。#15〜#18 はコメント返信の判定・出力ガード用で、ほかの項目と同じく作問時に書き、素材シートでレビューする。#17 正解基準は 21-6d7a で設計し、素材・<code>validate.py</code>・素材シートへの導入は 21-6d7b、DB・判定への組み込みは 21-6d7c（それまでは未記入）。問題はすべて完全オリジナル。</div>
 <p>下表が正で、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。</p>
 <p>作問の手順（ランダム語のモチーフ → コア宣言 → 動線・現実性・既存問題との照合の自己検査）はスキル <code>.claude/skills/umigame-problem-writer/SKILL.md</code> が正。<code>stock_items.py</code> の管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）を <code>validate.py</code> が様式検査し、作問レビュー用の素材シート（<code>work/review.html</code>）は問題文の直前に表示する（レビューはコア宣言から見る）。</p>
 <div class="table-wrap">
@@ -141,6 +141,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>15</td><td><code>core_points</code> コアの要点</td><td>コメント返信の判定根拠（④ 正解 / ⑤ 惜しい / ⑥ 不正解を見分ける）。機械プローブの正解ラベルにも使う。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ（管理項目 <code>core</code> = コア宣言の 1 文とは別物）</td><td>1〜3 個・1 個 20 字以内（文字列の配列）。真相の説明に最低限必要な情報だけを書く（基準の正は <a href="#core-points">10.2「コアで見分ける」</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
 <tr><td>16</td><td><code>reveal_text</code> 開示文</td><td>正解時に返信で開示する真相の要約（<code>正解！</code> に続ける文。<a href="#reply-style">10.4</a>）。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ</td><td>70 字以内（<a href="#judge-contract">10.3.1</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
 <tr><td>17</td><td><code>judge_criteria</code> 正解基準</td><td>コアの要点ごとの ④⑤⑥ の境目（当てた / 触れた）と、正解から惜しいに落とす誤りの例。コメント返信の判定と評価データの正解ラベルの根拠。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ。素材シートでコアの要点と並べてレビューする</td><td>要点ごとに <code>hit</code>・<code>touch</code>（各 80 字以内）・誤りの例 0〜3 個（各 40 字以内）。書式・書き方・検査の正は <a href="#judge-criteria">10.2「正解基準」</a>。DB は <code>umigame_stock_items</code> の同名列（V014・21-6d7c）</td></tr>
+<tr><td>18</td><td><code>core_words</code> 核心語</td><td>返信の出力ガードと機械プローブの P1 漏れ候補に使う語（<a href="#leak-guard">10 章「出力ガード」</a>）。正解宣言以外の返信に、コメント本文にないこの語が入ったら固定文へ差し替える。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ（21-8d1 で <code>leak_words.json</code> から移した）</td><td><code>{"words": [...], "except": [...]}</code>。<code>words</code> は 1 個以上・重複なし・改行なしの空でない文字列、<code>except</code>（照合の前に返信から除く語句）は 0 個以上。1 文字の語は誤検知のもとなので活用・複合の形に具体化する。DB は <code>umigame_stock_items</code> の同名列（V017・21-8d1。出題時に <code>umigame_items</code>・スナップショット v4 へ写す）で、NULL だと出題時に異常終了する</td></tr>
 </table>
 </div>
 <ul>
@@ -448,7 +449,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <table>
 <tr><th>向き</th><th>項目</th><th>中身</th></tr>
 <tr><td rowspan="3">入力</td><td><code>comment_id</code>・本文</td><td>コメント</td></tr>
-<tr><td>問題</td><td>スナップショットの <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>core_points</code> / <code>reveal_text</code> / <code>judge_criteria</code>（<code>schema_version</code> 3 以上が必要。正解基準は要点と同数・<code>errors</code> 0〜3 個を検査 = <code>app/judge/contract.py</code>）</td></tr>
+<tr><td>問題</td><td>スナップショットの <code>problem_text</code> / <code>truth</code> / <code>fact_sheet</code> / <code>core_points</code> / <code>reveal_text</code> / <code>judge_criteria</code> / <code>core_words</code>（<code>schema_version</code> 3 または 4。正解基準は要点と同数・<code>errors</code> 0〜3 個を検査、v4 は <code>core_words</code> 必須・v3 は核心語なしとして警告 = <code>app/judge/contract.py</code>）</td></tr>
 <tr><td><code>core_points</code>・<code>reveal_text</code></td><td>コアの要点（1〜3 個・1 個 20 字以内。④⑤⑥ の判定に使う）と、正解時に開示する真相の要約（70 字以内）。文面の正は <code>batch-01/stock_items.py</code> の <code>JUDGE_POINTS</code>。どの方式でも機械プローブの正解ラベルに使うため残す</td></tr>
 <tr><td rowspan="5">出力<br>（<code>Judgement</code>）</td><td><code>kind</code></td><td>22 種のコード（10.2 の表）</td></tr>
 <tr><td><code>answer</code></td><td><code>q_yesno</code> のときだけ <code>yes</code> / <code>no</code> / <code>irrelevant</code> の 3 値（判断できないときは <code>irrelevant</code>。<a href="#d-20261004-three-answers">付録</a>）。ほかは null</td></tr>
@@ -1023,15 +1024,16 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 </ul>
 
 <h4 id="leak-guard">出力ガード（21-6d9）</h4>
-<p>モデルに依存せず漏洩を止める最後の関所。書き手の案・経路（定型文・LLM・割れたとき）を問わず、送る前の返信を核心語の辞書で照合する。</p>
+<p>モデルに依存せず漏洩を止める最後の関所。書き手の案・経路（定型文・LLM・割れたとき）を問わず、送る前の返信を核心語で照合する。</p>
 <ul>
-  <li><strong>辞書</strong>: <code>services/comment-reply/app/reply/leak_words.json</code>（問題番号ごとに <code>content_key</code>・<code>words</code>・照合の前に返信から除く語句 <code>except</code>）。本番は問題スナップショットの <code>content_key</code> で引き、評価ページの P1 漏れ候補も同じ辞書と同じ照合（<code>leak_guard.find_leaks</code>）を使う</li>
+  <li><strong>核心語の置き場</strong>（21-8d1 で変更）: 素材 #18 <code>core_words</code>（<code>words</code>・照合の前に返信から除く語句 <code>except</code>）。<code>stock_items.py</code> → <code>umigame_stock_items</code> → 出題時に <code>umigame_items</code> → 投稿バッチがスナップショット（<code>schema_version</code> 4）の <code>core_words</code> に載せ、Reply Lambda はスナップショットから読む（DB には接続しない）。評価ページの P1 漏れ候補は <code>stock_items.py</code> から同じ語を読み、同じ照合（<code>leak_guard.find_leaks</code>）を使う</li>
   <li><strong>当たる条件</strong>: 正解宣言（④・「正解」で始まる返信）ではなく、辞書の語が返信にあり、コメント本文にはない（コメントの語の復唱は漏洩と数えない）</li>
   <li><strong>差し替え</strong>: ① は判定語だけ（<code>はい！</code> / <code>いいえ。</code> / <code>関係ないよ。</code>。判定は変えない）、ほかの種別は「コメントありがとう！」。<code>source</code> を <code>leak_guard</code> にし、当たった語・差し替え前の文・元の <code>source</code> をコメント記録の <code>reply.guard</code> に残す</li>
-  <li><strong>辞書にない問題</strong>: 差し替えずに WARNING <code>REPLY_LEAK_GUARD_NO_DICT</code>。問題を足すときは辞書に 1 行足す（作問スキル工程 9）</li>
+  <li><strong>核心語のないスナップショット</strong>（<code>schema_version</code> 3 = 21-8d1 の切り替え前に投稿した分）: 読み込み時に WARNING <code>PROBLEM_NO_CORE_WORDS</code>、返信時に WARNING <code>REPLY_LEAK_GUARD_NO_WORDS</code> を出し、ガードなしで送る（黙って素通りさせない）。直すときは <code>write_snapshot.py --rewrite</code> で v4 に書き直す（<a href="#snapshot">10.7.2</a>）。v4 で <code>core_words</code> が無い・不正なら問題スナップショットの不正として扱う</li>
   <li><strong>定型文</strong>: どの問題の辞書にも当たらないことを pytest で保証する（21-6d9 で「遊びにおいで」「当てる遊び」を言い換えた）</li>
 </ul>
 <div class="decision"><span class="callout-title">決定（2026-10-08・21-6d9）</span>辞書はサービスに同梱し、問題スナップショットには載せない（DDL とスナップショットの版上げを避ける。旧来の正 <code>batch-01/leak_count.py</code> は退役）。そのため問題を足すと <code>services/</code> の push が要る。問題の追加が週次の運用になったら（21-8 以降）スナップショットへの載せ替えを判断する。1 文字の語は活用・複合の形に具体化した（序盤・終盤・熱心・種類・ピンチなどの誤検知を外し、漏洩の言い方は拾う。根拠は辞書の <code>review_note</code>）。</div>
+<div class="decision"><span class="callout-title">決定（2026-10-12 ユーザー・2026-10-13 実装 21-8d1）</span>週次補充のたびに <code>services/</code> の push が要る構造（<a href="../../issues/index.html#I-038">I-038</a>）をなくすため、核心語を素材 #18 にし、DB 列（V017）→ スナップショット v4 の経路へ移した。Reply Lambda はすでにコメントごとに S3 のスナップショットを読んでいるのでそこへ載せ、DB には接続させない。S3 に別ファイルで置く案は、問題と別の資材が増えて食い違いの元になるので採らない。核心語は投稿時点の値に固定され、投稿後の修正は <code>write_snapshot.py --rewrite</code> で反映する（<code>fact_sheet</code>・<code>judge_criteria</code> と同じ扱い）。21-6d9 の <code>review_note</code> は <code>stock_items.py</code> のコメントへ移した。</div>
 
 <h4 id="reply-templates">定型文（<code>2b</code> と、ほかの案の落とし先）</h4>
 <p>種別ごとの候補から <code>sha1(comment_id)</code> で 1 つ選ぶ（状態を持たずに言い回しを散らす）。</p>
@@ -1243,7 +1245,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <ul>
   <li><strong>実行器</strong>: <code>content/umigame-stock/umigame-soup-1/tools/probe_run.py</code>（評価・プローブ用ツールは 21-8c でセットの資材側へ移し、21-8c2 でテスト・実行環境〔<code>.venv</code>〕・出力先〔<code>work/</code>〕もセットのディレクトリへ寄せた。本番の判定コード <code>services/comment-reply/app</code> を読み込んで使う。以下この章の <code>tools/</code>・<code>work/</code> はセットのディレクトリ <code>content/umigame-stock/umigame-soup-1/</code> の下を指す〔21-8c2 より前の <code>work/</code> は <code>services/comment-reply/</code> の下にあったものを移した〕。実行手順はセットの <code>README.md</code>）。評価ケースを本番の判定の組み合わせ・書き手・コメント記録に通し、<code>results.json</code> と <code>metrics.json</code> を出す（集計は <code>probe_metrics.py</code>）。Instagram への送信はしない。キーは環境変数（<code>OPENAI_API_KEY</code>・<code>TYPESAFE_API_KEY</code>）</li>
   <li><strong>使い回しと再開</strong>: 判定 API はケースごとに各方式を 1 回呼んでパターン間で使い回し、書き手だけパターンごとに呼ぶ。<code>judge_cache.json</code> と <code>writer_cache.json</code> で中断後も再開できる</li>
-  <li><strong>合格基準</strong>: 10.2 の P1〜P7 とレベル 1・2 の機械プローブ基準をそのまま使い、集計項目は基準と 1 対 1 に対応させる。P1 は 2 段: 機械が核心語の辞書（<code>app/reply/leak_words.json</code>。出力ガードと共通）で漏れ候補を拾い、人が評価ページで「漏洩 / 漏洩でない」を付け、<strong>確定した漏洩だけを P1 に数える</strong>（21-6d9）。未確認の候補が残る間は「要確認」で合否を出さない。出力ガードの発動件数は参考指標に出す</li>
+  <li><strong>合格基準</strong>: 10.2 の P1〜P7 とレベル 1・2 の機械プローブ基準をそのまま使い、集計項目は基準と 1 対 1 に対応させる。P1 は 2 段: 機械が核心語（素材 #18 <code>core_words</code>。21-8d1 からは <code>stock_items.py</code> から読む。出力ガードと共通）で漏れ候補を拾い、人が評価ページで「漏洩 / 漏洩でない」を付け、<strong>確定した漏洩だけを P1 に数える</strong>（21-6d9）。未確認の候補が残る間は「要確認」で合否を出さない。出力ガードの発動件数は参考指標に出す</li>
 </ul>
 <div class="table-wrap">
 <table>
@@ -1434,19 +1436,20 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <div class="table-wrap">
 <table>
 <tr><th>キー</th><th>中身</th></tr>
-<tr><td><code>schema_version</code></td><td><code>3</code>（21-6c1 の 2 で <code>core_points</code>・<code>reveal_text</code>、21-6d7c の 3 で <code>judge_criteria</code> を追加。判定モジュールは 3 以上を前提にし、2 の読み替えは用意しない）</td></tr>
+<tr><td><code>schema_version</code></td><td><code>4</code>（21-6c1 の 2 で <code>core_points</code>・<code>reveal_text</code>、21-6d7c の 3 で <code>judge_criteria</code>、21-8d1 の 4 で <code>core_words</code> を追加。判定モジュールは 3 と 4 を受け付け、3 は核心語なし〔警告ログ + 出力ガードなし〕として読む。2 の読み替えは用意しない）</td></tr>
 <tr><td><code>set_code</code>・<code>media_id</code>・<code>content_key</code></td><td>セット・メディア ID・ストックのキー（例 <code>001-lighthouse-letter</code>）</td></tr>
 <tr><td><code>posted_at</code></td><td><code>posts.posted_at</code> に書いた値と同じ時刻（UTC・末尾 <code>Z</code>）</td></tr>
 <tr><td><code>problem_text</code>・<code>truth</code>・<code>fact_sheet</code></td><td>問題文・真相・確定事実シート（配列）</td></tr>
 <tr><td><code>core_points</code>・<code>reveal_text</code></td><td>コアの要点（配列）・正解時の開示文（70 字以内）。<code>umigame_items</code> の同名列（V013）から写し、NULL なら出力しない（V013 未適用・ストック未更新の検出）</td></tr>
 <tr><td><code>judge_criteria</code></td><td>正解基準（<code>points</code> = 要点ごとの <code>hit</code>・<code>touch</code>、<code>errors</code> = 誤りの例。<a href="#judge-criteria">10.2</a>）。<code>umigame_items.judge_criteria</code>（V014）から写し、NULL・要点との個数違いなら異常終了する</td></tr>
+<tr><td><code>core_words</code></td><td>核心語（<code>{"words": [...], "except": [...]}</code>。素材 #18・<a href="#leak-guard">出力ガード</a>）。<code>umigame_items.core_words</code>（V017）から写す。v4 では必須</td></tr>
 <tr><td><code>rule_text</code></td><td>ルール帯の文</td></tr>
 <tr><td><code>master_rules</code></td><td><code>prompt_configs.prompt_text</code> を写す既存のキー。<strong>判定には使わない</strong>（プロンプトは Lambda に同梱 = <a href="#judge-impl">10.3.2</a>）。<code>prompt_text</code> には<strong>「プロンプトは Lambda に同梱・この列は記録用」という固定の記録文</strong>を入れる（21-7 で決定。空にするとスナップショット出力が欠落扱いで WARNING になり、プロンプト全文を転記すると正が 2 か所になるため）</td></tr>
 </table>
 </div>
 <details class="fold"><summary>JSON の例</summary>
 <pre><code>{
-  "schema_version": 3,
+  "schema_version": 4,
   "set_code": "umigame-soup-1",
   "media_id": "17912345678901234",
   "content_key": "001-lighthouse-letter",
@@ -1456,6 +1459,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
   "fact_sheet": ["……", "……"],
   "core_points": ["……", "……"],
   "judge_criteria": {"points": [{"hit": "……", "touch": "……"}, {"hit": "……", "touch": "……"}], "errors": ["……"]},
+  "core_words": {"words": ["……", "……"], "except": []},
   "reveal_text": "……（70 字以内）",
   "rule_text": "「はい / いいえ / 関係ない」で答えられる質問をコメントしてね。出題者が全部返事します",
   "master_rules": "（prompt_configs.prompt_text。判定には使わない）"
@@ -1509,8 +1513,8 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <tr><th>見るもの</th><th>意味</th><th>対応</th></tr>
 <tr><td>DLQ アラーム <code>acps-prod-comment-reply-dlq-messages</code>（可視メッセージ ≥ 1）</td><td>再試行しても返信できなかった（初期版の能動監視）</td><td>DLQ の本文（コメント id・media_id）と Reply Lambda のログで原因を見る（OpenAI 障害 / トークン失効 / スナップショット欠落）。復旧後に DLQ → 元キューへ再駆動（<a href="../../infra/operation.html#monitoring">infra/operation.html 4.1</a>）</td></tr>
 <tr><td>WARNING <code>REPLY_WRITER_FALLBACK</code></td><td>書き手の出力を捨てて定型文に落とした</td><td>多ければ書き手のプロンプトを見直す</td></tr>
-<tr><td>WARNING <code>REPLY_LEAK_GUARD</code></td><td>書き手の返信に核心語が入り、固定文へ差し替えた（P1 の危険）</td><td>コメント記録の <code>reply.guard</code> を見て、漏洩か誤検知かを判断する。漏洩なら書き手のプロンプト、誤検知なら辞書を直す</td></tr>
-<tr><td>WARNING <code>REPLY_LEAK_GUARD_NO_DICT</code></td><td>核心語の辞書にない問題へのコメント（ガードが効いていない）</td><td>辞書に 1 行足して push する</td></tr>
+<tr><td>WARNING <code>REPLY_LEAK_GUARD</code></td><td>書き手の返信に核心語が入り、固定文へ差し替えた（P1 の危険）</td><td>コメント記録の <code>reply.guard</code> を見て、漏洩か誤検知かを判断する。漏洩なら書き手のプロンプト、誤検知なら素材 #18 <code>core_words</code> を直す（<code>stock_items.py</code> → ストック UPDATE。投稿済みの分は <code>umigame_items</code> を直して <code>write_snapshot.py --rewrite</code>）</td></tr>
+<tr><td>WARNING <code>PROBLEM_NO_CORE_WORDS</code> / <code>REPLY_LEAK_GUARD_NO_WORDS</code></td><td>核心語のないスナップショット（v3）の問題へのコメント（ガードが効いていない）</td><td><code>umigame_items.core_words</code> を埋めて <code>write_snapshot.py --rewrite --media-id …</code>（一覧で確かめてから <code>--apply</code>）で v4 に書き直す</td></tr>
 <tr><td>WARNING <code>REPLY_OVER_80</code></td><td>返信が 80 字を超えた（P7 違反）</td><td>多ければプロンプトを見直す</td></tr>
 </table>
 </div>

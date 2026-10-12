@@ -156,7 +156,8 @@ def _writer_cache_key(
     cache_model = anthropic_util.MODEL if pattern["reply_variant"] in HAIKU_VARIANTS else model
     parts = [pattern["id"], case["id"], PROMPT_VERSION,
              [combined.kind, combined.answer, combined.bare_term, combined.decision],
-             _content_hash(case, problem), cache_model]
+             _content_hash(case, problem), cache_model,
+             asdict(problem.core_words) if problem.core_words is not None else None]
     if pattern["reply_variant"] == "1b":
         parts.append(pattern.get("luna_effort", "xhigh"))
     elif pattern["reply_variant"] in HAIKU_VARIANTS:

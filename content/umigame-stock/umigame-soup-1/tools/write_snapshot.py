@@ -2,6 +2,8 @@
 
 By default this command only lists eligible posts. Pass ``--apply`` to upload
 the snapshots to S3 and record their keys in Aurora.
+With ``--rewrite``, list posts with a recorded snapshot key; ``--apply`` then
+overwrites those same S3 keys without updating Aurora.
 """
 
 from __future__ import annotations
@@ -34,6 +36,7 @@ SELECT p.platform_post_id AS media_id,
        ui.fact_sheet AS fact_sheet,
        ui.core_points AS core_points,
        ui.judge_criteria AS judge_criteria,
+       ui.core_words AS core_words,
        ui.reveal_text AS reveal_text,
        ui.rule_text AS rule_text,
        (SELECT pc.prompt_text
@@ -58,6 +61,11 @@ WHERE bs.set_code = :set_code
   AND LOWER(TRIM(gm.file_format)) = 'mp4'
 ORDER BY p.posted_at, p.id
 """.strip()
+
+SELECT_REWRITE_CANDIDATES_SQL = SELECT_CANDIDATES_SQL.replace(
+    "ui.content_key AS content_key,",
+    "ui.content_key AS content_key,\n       ui.snapshot_s3_key AS snapshot_s3_key,",
+).replace("ui.snapshot_s3_key IS NULL", "ui.snapshot_s3_key IS NOT NULL")
 
 
 class SnapshotToolError(RuntimeError):
@@ -241,19 +249,22 @@ def fetch_candidates(
     secret_arn: str,
     set_code: str,
     media_id: str | None,
+    *,
+    rewrite: bool = False,
 ) -> list[dict[str, Any]]:
-    """Fetch successful reel posts whose umigame snapshot is missing.
+    """Fetch successful reels with missing snapshots or recorded rewrite keys.
 
     Args:
         cluster_arn: Aurora cluster ARN.
         secret_arn: Credentials secret ARN.
         set_code: Batch set code to inspect.
         media_id: Optional platform media ID filter.
+        rewrite: Select posts with an existing snapshot key instead.
 
     Returns:
         Candidate rows from Aurora.
     """
-    sql = SELECT_CANDIDATES_SQL
+    sql = SELECT_REWRITE_CANDIDATES_SQL if rewrite else SELECT_CANDIDATES_SQL
     parameters = [_string_parameter("set_code", set_code)]
     if media_id is not None:
         sql = sql.replace(
@@ -392,18 +403,41 @@ def build_snapshot(row: dict[str, Any], set_code: str) -> dict[str, Any]:
                 "valid points and errors"
             )
 
+    core_words = row.get("core_words")
+    if core_words is not None:
+        core_words = _decode_json_column("core_words", core_words)
+        if not isinstance(core_words, dict) or set(core_words) != {"words", "except"}:
+            raise RuntimeError("umigame_items.core_words must be an object with words and except")
+        for key in ("words", "except"):
+            words = core_words[key]
+            if (
+                not isinstance(words, list)
+                or (key == "words" and not words)
+                or any(
+                    not isinstance(word, str) or not word.strip()
+                    or "\n" in word or "\r" in word
+                    for word in words
+                )
+                or len(set(words)) != len(words)
+            ):
+                raise RuntimeError(
+                    f"umigame_items.core_words.{key} must be a unique string array "
+                    "without empty words or newlines"
+                )
+
     reveal_text = row.get("reveal_text")
     if (
         not isinstance(core_points, list)
         or not core_points
         or not isinstance(judge_criteria, dict)
+        or not isinstance(core_words, dict)
         or not isinstance(reveal_text, str)
         or not reveal_text.strip()
     ):
         raise RuntimeError(
-            "umigame_items.core_points / judge_criteria / reveal_text is NULL or "
+            "umigame_items.core_points / judge_criteria / core_words / reveal_text is NULL or "
             "empty; "
-            "apply V013 and V014 and update the umigame_stock_items rows before "
+            "apply V013, V014 and V017 and update the umigame_stock_items rows before "
             "publishing snapshots"
         )
 
@@ -414,7 +448,7 @@ def build_snapshot(row: dict[str, Any], set_code: str) -> dict[str, Any]:
         )
 
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "set_code": set_code,
         "media_id": row["media_id"],
         "content_key": row["content_key"],
@@ -424,6 +458,7 @@ def build_snapshot(row: dict[str, Any], set_code: str) -> dict[str, Any]:
         "fact_sheet": fact_sheet,
         "core_points": core_points,
         "judge_criteria": judge_criteria,
+        "core_words": core_words,
         "reveal_text": reveal_text,
         "rule_text": row["rule_text"],
         "master_rules": master_rules,
@@ -538,7 +573,7 @@ def _display_posted_at(value: Any) -> str:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """List missing snapshots or write them when ``--apply`` is provided.
+    """List missing or recorded snapshots; upload only with ``--apply``.
 
     Args:
         argv: Optional command-line arguments, used by tests.
@@ -551,9 +586,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--media-id", help="only process this platform media ID")
     parser.add_argument("--bucket", help="S3 bucket; defaults to the prod image bucket")
     parser.add_argument(
+        "--rewrite", action="store_true",
+        help="select recorded snapshots and overwrite their S3 keys without DB updates",
+    )
+    parser.add_argument(
         "--apply",
         action="store_true",
-        help="upload snapshots and update Aurora; default is list-only",
+        help="upload snapshots (record keys in Aurora only without --rewrite); default is list-only",
     )
     args = parser.parse_args(argv)
 
@@ -564,16 +603,29 @@ def main(argv: Sequence[str] | None = None) -> int:
             secret_arn,
             args.set_code,
             args.media_id,
+            rewrite=args.rewrite,
         )
     except Exception as exc:
         print(f"ERROR: failed to load snapshot candidates: {exc}", file=sys.stderr)
         return 1
+
+    if args.rewrite and not args.apply:
+        print("media_id\tcontent_key\tsnapshot_s3_key")
+        for row in rows:
+            print("\t".join(str(row.get(key, "")) for key in
+                            ("media_id", "content_key", "snapshot_s3_key")))
+        return 0
 
     ready: list[tuple[dict[str, Any], dict[str, Any]]] = []
     failures = 0
     for row in rows:
         media_id = row.get("media_id", "<unknown>")
         try:
+            if args.rewrite and (
+                not isinstance(row.get("snapshot_s3_key"), str)
+                or not row["snapshot_s3_key"].strip()
+            ):
+                raise SnapshotToolError("recorded snapshot_s3_key is missing or empty")
             snapshot = build_snapshot(row, args.set_code)
             ready.append((row, snapshot))
         except Exception as exc:
@@ -607,21 +659,23 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     for row, snapshot in ready:
         media_id = row["media_id"]
-        key = f"assets/{args.set_code}/problems/{media_id}.json"
+        key = (row["snapshot_s3_key"] if args.rewrite else
+               f"assets/{args.set_code}/problems/{media_id}.json")
         try:
             body = json.dumps(snapshot, ensure_ascii=False).encode("utf-8")
             _put_object(bucket, key, body)
-            updated = _record_snapshot(
-                cluster_arn,
-                secret_arn,
-                int(row["item_id"]),
-                key,
-            )
-            if updated != 1:
-                raise SnapshotToolError(
-                    "snapshot_s3_key was no longer NULL; uploaded object was not "
-                    "recorded in Aurora"
+            if not args.rewrite:
+                updated = _record_snapshot(
+                    cluster_arn,
+                    secret_arn,
+                    int(row["item_id"]),
+                    key,
                 )
+                if updated != 1:
+                    raise SnapshotToolError(
+                        "snapshot_s3_key was no longer NULL; uploaded object was not "
+                        "recorded in Aurora"
+                    )
             print(f"Wrote media_id={media_id} key={key}")
         except Exception as exc:
             failures += 1

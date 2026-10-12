@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-3 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span>最終更新: 2026-10-12（21-7b: 4.16 <code>umigame_comment_logs</code>〔コメント記録の取り込み先・V016〕を新設し、5 章にコメント記録 JSON のキーを追加）。前回: 2026-10-12（21-6h: 4.14 に <code>title</code> を追加し、4.14 / 4.15 の <code>title</code>・<code>truth</code> を公開前提の説明に改めた〔V015〕）。前回: 2026-10-08（21-6d7c: 4.14 / 4.15 に <code>judge_criteria</code> を追加〔V014〕）。前回: 2026-09-30（21-6c1: 4.14 / 4.15 に <code>core_points</code>・<code>reveal_text</code> を追加〔V013〕）。前回: 2026-09-04（21-3: セクション 4.14 <code>umigame_items</code> / 4.15 <code>umigame_stock_items</code> の新設と <code>batch_sets.problem_snapshot_enabled</code>〔V012 草案〕、S3 キーに問題スナップショットを追加）。前回: 2026-09-03（16-12b: セクション 4.11 に指標セットのビュー昇格〔V011・ビュー 6 本〕の decision を追加。follows_and_unfollows は 100 フォロワー未満では API が返さないと確認）</span>
+  <span>最終更新: 2026-10-13（21-8d1: 4.14 <code>umigame_items</code>・4.15 <code>umigame_stock_items</code> に核心語 <code>core_words</code>〔V017〕を追加）。前回: 2026-10-12（21-7b: 4.16 <code>umigame_comment_logs</code>〔コメント記録の取り込み先・V016〕を新設し、5 章にコメント記録 JSON のキーを追加）。前回: 2026-10-12（21-6h: 4.14 に <code>title</code> を追加し、4.14 / 4.15 の <code>title</code>・<code>truth</code> を公開前提の説明に改めた〔V015〕）。前回: 2026-10-08（21-6d7c: 4.14 / 4.15 に <code>judge_criteria</code> を追加〔V014〕）。前回: 2026-09-30（21-6c1: 4.14 / 4.15 に <code>core_points</code>・<code>reveal_text</code> を追加〔V013〕）。前回: 2026-09-04（21-3: セクション 4.14 <code>umigame_items</code> / 4.15 <code>umigame_stock_items</code> の新設と <code>batch_sets.problem_snapshot_enabled</code>〔V012 草案〕、S3 キーに問題スナップショットを追加）。前回: 2026-09-03（16-12b: セクション 4.11 に指標セットのビュー昇格〔V011・ビュー 6 本〕の decision を追加。follows_and_unfollows は 100 フォロワー未満では API が返さないと確認）</span>
 </div>
 
 <div class="note">
@@ -225,7 +225,7 @@
     </tr>
     <tr>
       <td><code>umigame_stock_items</code><span class="badge badge-fixed" style="margin-left:.4rem">21-3 設計</span></td>
-      <td>ウミガメのスープの問題ストック（人間レビュー + プローブテスト済みの<strong>素材 17 項目</strong> + 事前動画参照）。セットの子で、ウミガメ方式が軸なしの LRU 順繰りで消費する</td>
+      <td>ウミガメのスープの問題ストック（人間レビュー + プローブテスト済みの<strong>素材 18 項目</strong> + 事前動画参照）。セットの子で、ウミガメ方式が軸なしの LRU 順繰りで消費する</td>
       <td><code>ranking_stock_items</code> のパターン（セット配下の有効レコード + LRU 順繰り + 証跡カラム + セット境界の複合 FK + 業務キー <code>content_key</code>）を踏襲し、単尺の事前動画参照（<code>video_s3_key</code>）と参加型固有の素材（真相・確定事実シート・想定質問・プレイ例・キャラのセリフ）を加えたもの（セクション 4.15）</td>
     </tr>
     <tr>
@@ -817,6 +817,7 @@ LIMIT 1;</code></pre>
       <tr><td><code>fact_sheet</code></td><td><code>JSON NOT NULL</code>。確定事実シート（文字列の配列）</td></tr>
       <tr><td><code>core_points</code> / <code>reveal_text</code></td><td><code>JSON NULL</code> / <code>VARCHAR(255) NULL</code>。コアの要点と正解時の開示文のスナップショット（21-6c1〔V013〕で追加。ストックから写す。NULL は V013 適用前の行のみ）</td></tr>
       <tr><td><code>judge_criteria</code></td><td><code>JSON NULL</code>。正解基準のスナップショット（21-6d7c〔V014〕で追加。ストックから写し、投稿後スナップショット <code>schema_version</code> 3 に載せる。NULL は V014 適用前の行のみで、更新 SQL <code>update_judge_criteria.sql</code> で埋める）</td></tr>
+      <tr><td><code>core_words</code></td><td><code>JSON NULL</code>。核心語のスナップショット（21-8d1〔V017〕で追加。ストックから写し、投稿後スナップショット <code>schema_version</code> 4 に載せる。返信の出力ガードに使う。NULL は V017 適用前の行のみで、更新 SQL <code>update_core_words.sql</code> がストックから <code>content_key</code> で補完する）</td></tr>
       <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（スナップショット JSON に載せる）</td></tr>
       <tr><td><code>hook</code> / <code>caption</code></td><td><code>VARCHAR(40) NOT NULL</code> / <code>TEXT NOT NULL</code>。umigame 系プレースホルダ（<code>{{hook}}</code> / <code>{{caption}}</code>）の展開元</td></tr>
       <tr><td><code>snapshot_s3_key</code></td><td><code>VARCHAR(512) NULL</code>。出力した問題スナップショットの S3 キー（<code>assets/{set_code}/problems/{media_id}.json</code>）。<strong>NULL = 未出力</strong>（出力失敗の検出クエリ <code>WHERE snapshot_s3_key IS NULL</code> と、<code>posts.status='success'</code> の突合で運用が拾う）。SNS 投稿バッチが更新する唯一のカラム</td></tr>
@@ -852,6 +853,7 @@ LIMIT 1;</code></pre>
       <tr><td><code>core_points</code></td><td><code>JSON NULL</code>。コアの要点（文字列の配列 1〜3 個・1 個 20 字以内。問題文の不思議の真相を説明するのに最低限必要な情報。コメント返信の ④ 正解 / ⑤ 惜しいの判定に使う。基準は<a href="sets/umigame-soup-1.html#judge-design">セット別設計書 10.2・10.3</a>）。21-6c1〔V013〕で追加。NULL = 未設定で、ウミガメ方式は出題しない（異常終了）</td></tr>
       <tr><td><code>reveal_text</code></td><td><code>VARCHAR(255) NULL</code>。正解時に開示する真相の要約（70 字以内）。21-6c1〔V013〕で追加。NULL の扱いは <code>core_points</code> と同じ</td></tr>
       <tr><td><code>judge_criteria</code></td><td><code>JSON NULL</code>。正解基準（<code>{"points": [{"hit", "touch"}…], "errors": […]}</code>。<code>points</code> は <code>core_points</code> と同じ順・同じ個数、<code>errors</code> は 0〜3 個。書式と ④⑤⑥ の決め方は<a href="sets/umigame-soup-1.html#judge-criteria">セット別設計書 10.2</a>）。21-6d7c〔V014〕で追加。NULL の扱いは <code>core_points</code> と同じ</td></tr>
+      <tr><td><code>core_words</code></td><td><code>JSON NULL</code>。核心語（<code>{"words": […], "except": […]}</code>。<code>words</code> は 1 個以上、<code>except</code> は照合の前に返信から除く語句 0 個以上。用途と書き方は<a href="sets/umigame-soup-1.html#leak-guard">セット別設計書の出力ガード</a>）。21-8d1〔V017〕で追加（それまでは <code>services/comment-reply/</code> に同梱の辞書）。NULL の扱いは <code>core_points</code> と同じ</td></tr>
       <tr><td><code>expected_questions</code></td><td><code>JSON NOT NULL</code>。想定質問と期待回答（<code>[{"q": …, "a": …}]</code>・15〜20 件。プローブテスト用。DB に入れるのは「レビュー済みの検証セット」を投入物と一緒に残すため）</td></tr>
       <tr><td><code>hook</code></td><td><code>VARCHAR(40) NOT NULL</code>。フック文（12 字前後）</td></tr>
       <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（45 字前後。セット既定文）</td></tr>

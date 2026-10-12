@@ -234,11 +234,10 @@ def write_reply(
             value, source = _template_reply(result, comment_id, problem), "fallback_template"
     guard = None
     if value is not None and not leak_guard.is_correct_reveal(kind, value):
-        entry = leak_guard.entry_for_content_key(problem.content_key)
-        if entry is None:
-            LOGGER.warning("REPLY_LEAK_GUARD_NO_DICT content_key=%s", problem.content_key)
+        if problem.core_words is None:
+            LOGGER.warning("REPLY_LEAK_GUARD_NO_WORDS content_key=%s", problem.content_key)
         else:
-            words = leak_guard.find_leaks(value, text, entry)
+            words = leak_guard.find_leaks(value, text, problem.core_words)
             if words:
                 guard = {"words": words, "original_text": value, "original_source": source}
                 value = (templates.YESNO_OPENERS[result.answer or "irrelevant"]

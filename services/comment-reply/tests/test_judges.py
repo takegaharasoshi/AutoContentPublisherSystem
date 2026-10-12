@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 from dataclasses import replace
 from unittest.mock import Mock
 from urllib.error import HTTPError
@@ -12,7 +13,7 @@ import pytest
 
 from app import http_util
 from app.judge import jev, luna
-from app.judge.contract import JudgeCriteria, Judgement, Problem, ProblemInvalid
+from app.judge.contract import CoreWords, JudgeCriteria, Judgement, Problem, ProblemInvalid
 
 
 class _Response:
@@ -39,10 +40,14 @@ def _snapshot(problem) -> dict:
                        for hit, touch in problem.judge_criteria.points],
             "errors": list(problem.judge_criteria.errors),
         },
+        "core_words": {
+            "words": list(problem.core_words.words),
+            "except": list(problem.core_words.excepts),
+        } if problem.core_words is not None else None,
     }
 
 
-def test_problem_requires_v3_and_judge_criteria(problem) -> None:
+def test_problem_requires_supported_version_and_judge_criteria(problem) -> None:
     raw = _snapshot(problem)
     assert Problem.from_snapshot(raw) == problem
     with pytest.raises(ProblemInvalid, match="schema_version"):
@@ -53,6 +58,54 @@ def test_problem_requires_v3_and_judge_criteria(problem) -> None:
         Problem.from_snapshot({**raw, "reveal_text": None})
     assert isinstance(problem.judge_criteria.points, tuple)
     assert isinstance(problem.judge_criteria.errors, tuple)
+    assert isinstance(problem.core_words, CoreWords)
+    assert isinstance(problem.core_words.words, tuple)
+    assert isinstance(problem.core_words.excepts, tuple)
+
+
+@pytest.mark.parametrize("version", [None, 0, 1, 2, 5, 100, True, 4.0, "4"])
+def test_problem_rejects_unsupported_schema_version(problem, version) -> None:
+    with pytest.raises(ProblemInvalid, match="schema_version"):
+        Problem.from_snapshot({**_snapshot(problem), "schema_version": version})
+
+
+def test_v3_problem_warns_and_ignores_core_words(problem, caplog) -> None:
+    raw = _snapshot(problem)
+    raw.pop("core_words")
+    with caplog.at_level(logging.WARNING):
+        parsed = Problem.from_snapshot({**raw, "schema_version": 3})
+        with_words = Problem.from_snapshot({**_snapshot(problem), "schema_version": 3})
+    assert parsed == with_words == replace(problem, schema_version=3, core_words=None)
+    assert "PROBLEM_NO_CORE_WORDS content_key=001-test schema_version=3" in caplog.text
+
+
+def test_v4_problem_requires_core_words(problem) -> None:
+    raw = _snapshot(problem)
+    raw.pop("core_words")
+    with pytest.raises(ProblemInvalid, match="core_words"):
+        Problem.from_snapshot(raw)
+
+
+@pytest.mark.parametrize("value", [
+    None, [], {}, {"words": ["核心"]}, {"except": []},
+    {"words": [], "except": []}, {"words": "核心", "except": []},
+    {"words": ["核心"], "except": None}, {"words": ["核心"], "except": "例外"},
+    {"words": ["核心", "核心"], "except": []},
+    {"words": ["核心"], "except": ["例外", "例外"]},
+    {"words": ["核心"], "except": [], "extra": []},
+    *({"words": [word], "except": []} for word in ("", " ", "核\n心", "核\r心", 1, None, [])),
+    *({"words": ["核心"], "except": [word]} for word in ("", " ", "例\n外", "例\r外", 1, None, [])),
+])
+def test_v4_problem_rejects_invalid_core_words(problem, value) -> None:
+    with pytest.raises(ProblemInvalid, match="core_words"):
+        Problem.from_snapshot({**_snapshot(problem), "core_words": value})
+
+
+def test_v4_problem_preserves_words_and_exclusions(problem) -> None:
+    raw = _snapshot(problem)
+    raw["core_words"] = {"words": ["遊び", "鬼"], "except": ["遊び方"]}
+    parsed = Problem.from_snapshot(raw)
+    assert parsed.core_words == CoreWords(("遊び", "鬼"), ("遊び方",))
 
 
 @pytest.mark.parametrize("criteria", [

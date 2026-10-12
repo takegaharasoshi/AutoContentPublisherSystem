@@ -116,11 +116,43 @@ def _judge_criteria(value: Any, point_count: int) -> dict[str, Any]:
     return value
 
 
+def _core_words(value: Any) -> dict[str, list[str]]:
+    """Decode and validate the core words needed by the reply leak guard."""
+    if isinstance(value, (bytes, bytearray)):
+        try:
+            value = value.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise RuntimeError("core_words must be valid UTF-8 JSON") from exc
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("core_words must be valid JSON") from exc
+    if not isinstance(value, dict) or set(value) != {"words", "except"}:
+        raise RuntimeError("core_words must be an object with words and except")
+    for key in ("words", "except"):
+        words = value[key]
+        if (
+            not isinstance(words, list)
+            or (key == "words" and not words)
+            or any(
+                not isinstance(word, str) or not word.strip()
+                or "\n" in word or "\r" in word
+                for word in words
+            )
+            or len(set(words)) != len(words)
+        ):
+            raise RuntimeError(
+                f"core_words.{key} must be a unique string array without empty words or newlines"
+            )
+    return value
+
+
 def _fetch_stock_item(cursor: Any, set_id: int) -> dict[str, Any]:
     """Lock the next built stock item in the configured posting order."""
     cursor.execute(
         "SELECT id, content_key, title, problem_text, truth, fact_sheet, core_points, "
-        "judge_criteria, "
+        "judge_criteria, core_words, "
         "reveal_text, rule_text, "
         "caption, hook, video_s3_key, video_audio_asset_id, use_count "
         "FROM umigame_stock_items "
@@ -135,7 +167,7 @@ def _fetch_stock_item(cursor: Any, set_id: int) -> dict[str, Any]:
 
     names = (
         "id", "content_key", "title", "problem_text", "truth", "fact_sheet",
-        "core_points", "judge_criteria", "reveal_text", "rule_text", "caption", "hook", "video_s3_key",
+        "core_points", "judge_criteria", "core_words", "reveal_text", "rule_text", "caption", "hook", "video_s3_key",
         "video_audio_asset_id", "use_count",
     )
     item = dict(zip(names, row))
@@ -151,6 +183,7 @@ def _fetch_stock_item(cursor: Any, set_id: int) -> dict[str, Any]:
     item["judge_criteria"] = _judge_criteria(
         item["judge_criteria"], len(item["core_points"])
     )
+    item["core_words"] = _core_words(item["core_words"])
     if item["video_audio_asset_id"] is None:
         raise RuntimeError("umigame_stock_items.video_audio_asset_id is required")
     if int(item["use_count"]) >= 1:
@@ -175,8 +208,8 @@ def generate(context: GeneratorContext) -> GeneratorResult:
     context.cursor.execute(
         "INSERT INTO umigame_items "
         "(set_id, generation_run_id, stock_item_id, content_key, title, problem_text, "
-        "truth, fact_sheet, core_points, judge_criteria, reveal_text, rule_text, hook, caption) "
-        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        "truth, fact_sheet, core_points, judge_criteria, core_words, reveal_text, rule_text, hook, caption) "
+        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (
             context.prompt_config.set_id,
             context.generation_run_id,
@@ -188,6 +221,7 @@ def generate(context: GeneratorContext) -> GeneratorResult:
             json.dumps(item["fact_sheet"], ensure_ascii=False),
             json.dumps(item["core_points"], ensure_ascii=False),
             json.dumps(item["judge_criteria"], ensure_ascii=False),
+            json.dumps(item["core_words"], ensure_ascii=False),
             item["reveal_text"],
             item["rule_text"],
             item["hook"],
