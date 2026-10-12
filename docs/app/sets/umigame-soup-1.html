@@ -231,7 +231,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <div class="note"><span class="callout-title">要点</span>
 <ul style="margin:.3rem 0 0;">
   <li>コメント 1 件ごとに<strong>判定</strong>（22 種の種別と、はい / いいえ質問なら答え）を決め、判定に合った<strong>返信文</strong>を書いて Instagram に返す。返信文は判定を変えない</li>
-  <li>判定は 3 方式（luna / Jev / Haiku）のどれをメインにするか（3 モード）、返信文は案を環境変数で選ぶ。既定は <code>haiku</code> + <code>1b-haiku</code>（effort <code>high</code>。21-6e で決定・21-6e2 で実装）</li>
+  <li>判定は 3 方式（luna / Jev / Haiku）のどれをメインにするか（3 モード）、返信文は案を環境変数で選ぶ。既定は <code>haiku</code> + <code>1b-haiku</code>（effort <code>max</code>。21-6e で決定・21-6e2 で実装・21-8e で effort を <code>high</code> から変更）</li>
   <li>投稿側（ECS + Aurora）とは完全に分離し、Aurora を一切使わない。問題は投稿時に S3 へ書いたスナップショットから読む</li>
 </ul>
 </div>
@@ -264,7 +264,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><th>環境変数</th><th>値（太字 = 既定・暫定）</th><th>決めること</th></tr>
 <tr><td><code>JUDGE_MODE</code></td><td><code>luna</code> / <code>jev</code> / <strong><code>haiku</code></strong></td><td>判定のメイン（失敗したらサブで判定し直す。<a href="#judge-policy">10.3.5</a>）</td></tr>
 <tr><td><code>REPLY_VARIANT</code></td><td><code>1b</code> / <code>1d-luna</code> / <code>2b</code> / <code>2c-luna</code> / <strong><code>1b-haiku</code></strong> / <code>1d-haiku</code></td><td>返信文の作り方（<a href="#reply-variants">10.4</a>）</td></tr>
-<tr><td><code>HAIKU_EFFORT</code></td><td><code>low</code> / <code>medium</code> / <strong><code>high</code></strong> / <code>xhigh</code> / <code>max</code></td><td>Haiku の判定（サブで呼ぶときも）と書き手 <code>1b-haiku</code> の effort</td></tr>
+<tr><td><code>HAIKU_EFFORT</code></td><td><code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code> / <strong><code>max</code></strong></td><td>Haiku の判定（サブで呼ぶときも）と書き手 <code>1b-haiku</code> の effort</td></tr>
 <tr><td><code>LUNA_EFFORT</code></td><td><code>low</code> / <code>medium</code> / <code>high</code> / <strong><code>xhigh</code></strong> / <code>max</code></td><td>luna の判定（サブで呼ぶときも）と書き手 <code>1b</code> の effort（<code>1d-luna</code> / <code>2c-luna</code> は <code>low</code> 固定）</td></tr>
 <tr><td><code>LUNA_MODEL</code></td><td><strong><code>gpt-6-luna</code></strong>（日付付き ID も可）</td><td>判定と書き手が共用する OpenAI のモデル</td></tr>
 </table>
@@ -553,11 +553,14 @@ nav.toc ul { margin: .3rem 0 0; }
 </ul>
 
 <h4 id="judge-policy">10.3.5 組み合わせの 3 モード</h4>
-<div class="decision"><span class="callout-title">決定（2026-10-11・21-6e・ユーザー。実装は 21-6e2）</span>
+<div class="decision"><span class="callout-title">決定（2026-10-12・21-8e・ユーザー）: effort を <code>high</code> → <code>max</code> に変える</span>
+<p>下の 21-6e の決定のうち方式（⑦ haiku + <code>1b-haiku</code>）はそのままに、<code>HAIKU_EFFORT</code> の既定を <code>max</code> にする（判定・サブ判定・書き手の全部に効く）。21-6d17 の合格数は max 16・high 15（人間チェック後）で、取りこぼす 1 ケースを拾う品質を優先した。応答が 1 ケースの中央値で 5.7 秒 → 35 秒に遅くなること、評価費用で約 6 倍（high $0.45・max $2.81）になることは承知のうえ（21-6e で high を選んだ理由を覆す判断）。max の裾に合わせて Reply Lambda のタイムアウトを 300 秒・SQS の可視性タイムアウトを 1,800 秒に延ばした（<a href="../../infra/stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-8e）。応答時間・費用の実運用での観察は開発計画の確認待ちリスト（21-8e の行）で追い、許容外なら <code>xhigh</code> / <code>high</code> へ戻すかを判断する。</p>
+</div>
+<div class="decision"><span class="callout-title">決定（2026-10-11・21-6e・ユーザー。実装は 21-6e2。effort の既定は 21-8e で <code>max</code> へ変更）</span>
 <ul>
   <li><strong>方式</strong>: <strong>⑦ haiku + <code>1b-haiku</code>・effort <code>high</code></strong> を本番の既定にする。21-6d17 の合格数は max 16・high 15（人間チェック後）と大差がなく、1 ケースの応答時間は中央値 max 35 秒・high 5.7 秒。返信まで 1〜2 分かかるとその間に離脱が起きうるので、早く返ってくる体験を優先する。</li>
   <li><strong>モード</strong>: <code>luna</code> / <code>jev</code> / <code>haiku</code> の 3 つにし、切り替えで「luna だけ・Jev だけ・Haiku だけ」を選べるようにする。<code>hybrid</code>（見張り役・合意制）と <code>decisions</code>（10.3.6）は廃止する。メインが失敗したらサブで判定し直す（haiku → luna、luna → haiku、jev → haiku）。</li>
-  <li><strong>effort</strong>: Haiku（<code>HAIKU_EFFORT</code>・既定 <code>high</code>）と luna（<code>LUNA_EFFORT</code> を新設・既定 <code>xhigh</code> = 今の固定値）をいつでも設定で変えられるようにする。</li>
+  <li><strong>effort</strong>: Haiku（<code>HAIKU_EFFORT</code>・既定 <code>high</code>。21-8e で <code>max</code>）と luna（<code>LUNA_EFFORT</code> を新設・既定 <code>xhigh</code> = 今の固定値）をいつでも設定で変えられるようにする。</li>
   <li><strong>正解宣言の合意</strong>: 必須にしない。⑦ 単独で P2 0 件で、合意を待つと遅くなり正解者の取りこぼし（P5）も増える。</li>
   <li><strong>Jev の閾値</strong>（21-6d11 の掃引から）: <code>T_POINT</code> 0.5 → <strong>0.6</strong>（誤った正解宣言 2 → 1 件・P5 89.3% → 82.1%。P5 80% 以上を保つ範囲で誤宣言が最少）、<code>T_CLOSE</code> 0.25 → <strong>0.40</strong>（21-6e3 の全件プローブで確かめる）、<code>T_CONTRADICT</code> 0.5 のまま。<strong>Jev 単独では P2 0 件と P5 80% 以上を両立する <code>T_POINT</code> がない</strong>（0 件は 0.9 で P5 48.2%）ため、Jev をメインにするのは Haiku・luna が使えないときの非常手段とする。</li>
 </ul>
@@ -1004,14 +1007,14 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 <div class="decision"><span class="callout-title">決定（2026-10-09・21-6d16）</span>否定形・限定つきの質問の答え方を判定（luna・Haiku が共用する <code>pattern1_rules.txt</code> の手順 2 と Jev の段 D）と書き手（<code>reply_style.txt</code>）に入れた。きっかけは 21-6d13 の U12-e02「男たちは自分の意思で音を出さないんですか？」で、正解は「いいえ」（人形には意思がない。2026-10-08 ユーザー確認）なのに、Haiku は「はい！…自分の意思で音を出さないんだよ」、luna は「いいえ。自分の意思で音を出さないんだね」（文の中で食い違う）と返した。プロンプトの例文は評価ケースと同じ文にならないよう、問題に依存しない文（鍵をかけなかった・わざと忘れた）にした。U18-b26「約束は延期になっただけなの？」は、21-6d13 の人間チェックで <code>irrelevant</code> を許容していたが、このルールと合わないため別解に取り込まなかった（<a href="#evaluation">10.6</a>）。</div>
 
 <h4 id="reply-variants">返信文の 4 案</h4>
-<p>環境変数 <code>REPLY_VARIANT</code> で選ぶ（既定 <strong><code>1b-haiku</code></strong>・effort は <code>HAIKU_EFFORT</code> = 既定 <code>high</code>。21-6e で決定・21-6e2 で既定を切り替えた）。判定のモードとは独立に切り替わる（Anthropic が落ちて書き手が失敗したら <code>2b</code> の定型文に落ちる）。</p>
+<p>環境変数 <code>REPLY_VARIANT</code> で選ぶ（既定 <strong><code>1b-haiku</code></strong>・effort は <code>HAIKU_EFFORT</code> = 既定 <code>max</code>。21-6e で決定・21-6e2 で既定を切り替え、21-8e で effort を <code>high</code> → <code>max</code>）。判定のモードとは独立に切り替わる（Anthropic が落ちて書き手が失敗したら <code>2b</code> の定型文に落ちる）。</p>
 <div class="table-wrap">
 <table>
 <tr><th>案</th><th>作り方</th><th>モデル</th><th>真相</th><th>④ 正解の返事</th></tr>
 <tr><td><code>1b</code></td><td>LLM の書き手（<code>reply_1b_with_truth.txt</code> + <code>reply_style.txt</code>）</td><td>luna・effort <code>LUNA_EFFORT</code>（既定 <code>xhigh</code>）・上限 2,400</td><td>渡す</td><td>書き手が「正解！」+ 開示を書く</td></tr>
 <tr><td><code>1d-luna</code> / <code>2c-luna</code></td><td>LLM の書き手（<code>reply_writer.txt</code> + <code>reply_style.txt</code>）。2 つは同じ書き手の別名</td><td>luna・effort <code>low</code>・上限 800</td><td>渡さない（問題文だけ）</td><td><code>正解！</code> + <code>reveal_text</code></td></tr>
 <tr><td><code>2b</code></td><td>定型文だけ（<code>app/reply/templates.py</code>）</td><td>なし</td><td>使わない</td><td><code>正解！</code> + <code>reveal_text</code></td></tr>
-<tr><td><strong><code>1b-haiku</code></strong> / <code>1d-haiku</code></td><td><code>1b</code> / <code>1d-luna</code> の Haiku 版（<code>haiku_reply_1b.txt</code> ほか。<a href="#pattern-haiku">10.3.7</a>）</td><td>Haiku 5.5・effort <code>1b-haiku</code> は <code>HAIKU_EFFORT</code>（既定 <code>high</code>）/ <code>1d-haiku</code> は <code>low</code></td><td><code>1b-haiku</code> は渡す / <code>1d-haiku</code> は渡さない</td><td><code>1b</code> / <code>1d-luna</code> と同じ</td></tr>
+<tr><td><strong><code>1b-haiku</code></strong> / <code>1d-haiku</code></td><td><code>1b</code> / <code>1d-luna</code> の Haiku 版（<code>haiku_reply_1b.txt</code> ほか。<a href="#pattern-haiku">10.3.7</a>）</td><td>Haiku 5.5・effort <code>1b-haiku</code> は <code>HAIKU_EFFORT</code>（既定 <code>max</code>。21-8e で <code>high</code> から変更）/ <code>1d-haiku</code> は <code>low</code></td><td><code>1b-haiku</code> は渡す / <code>1d-haiku</code> は渡さない</td><td><code>1b</code> / <code>1d-luna</code> と同じ</td></tr>
 </table>
 </div>
 <ul>

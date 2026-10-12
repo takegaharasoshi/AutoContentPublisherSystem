@@ -78,8 +78,8 @@ export class CommentReplyStack extends cdk.Stack {
       // 送信側が comment_id を MessageDeduplicationId に指定する。
       contentBasedDeduplication: false,
       retentionPeriod: cdk.Duration.days(4),
-      // AWS 推奨に従い Reply Lambda のタイムアウト 120 秒の 6 倍にする。
-      visibilityTimeout: cdk.Duration.seconds(720),
+      // AWS 推奨に従い Reply Lambda のタイムアウト 300 秒の 6 倍にする（21-8e）。
+      visibilityTimeout: cdk.Duration.seconds(1800),
       deadLetterQueue: { queue: this.replyDlq, maxReceiveCount: 3 },
       encryption: sqs.QueueEncryption.SQS_MANAGED,
     });
@@ -147,7 +147,8 @@ export class CommentReplyStack extends cdk.Stack {
       code,
       handler: 'app.reply_handler.lambda_handler',
       memorySize: 256,
-      timeout: cdk.Duration.seconds(120),
+      // effort max の応答時間（中央値 35 秒・裾は 100 秒超）を見込み 300 秒にする（21-8e）。
+      timeout: cdk.Duration.seconds(300),
       reservedConcurrentExecutions: 2,
       logGroup: replyLogGroup,
       environment: {
@@ -159,7 +160,7 @@ export class CommentReplyStack extends cdk.Stack {
         GRAPH_API_BASE: 'https://graph.instagram.com/v23.0',
         JUDGE_MODE: 'haiku',
         REPLY_VARIANT: '1b-haiku',
-        HAIKU_EFFORT: 'high',
+        HAIKU_EFFORT: 'max',
         LUNA_EFFORT: 'xhigh',
         LUNA_MODEL: 'gpt-6-luna',
       },

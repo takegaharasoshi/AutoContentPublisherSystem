@@ -110,7 +110,7 @@ describe.each([
       FifoQueue: true,
       ContentBasedDeduplication: false,
       MessageRetentionPeriod: 345600,
-      VisibilityTimeout: 720,
+      VisibilityTimeout: 1800,
       SqsManagedSseEnabled: true,
       RedrivePolicy: {
         deadLetterTargetArn: stack.resolve(stack.replyDlq.queueArn),
@@ -143,7 +143,7 @@ describe.each([
       Runtime: 'python3.13',
       Handler: 'app.reply_handler.lambda_handler',
       MemorySize: 256,
-      Timeout: 120,
+      Timeout: 300,
       ReservedConcurrentExecutions: 2,
       Environment: {
         Variables: Match.objectEquals({
@@ -155,7 +155,7 @@ describe.each([
           GRAPH_API_BASE: 'https://graph.instagram.com/v23.0',
           JUDGE_MODE: 'haiku',
           REPLY_VARIANT: '1b-haiku',
-          HAIKU_EFFORT: 'high',
+          HAIKU_EFFORT: 'max',
           LUNA_EFFORT: 'xhigh',
           LUNA_MODEL: 'gpt-6-luna',
         }),
