@@ -2570,7 +2570,7 @@
 <div class="plan-meta"><strong>21-8d1</strong><span class="plan-status">完了</span><span>2026-10-13</span></div>
 <h3>核心語を DB 化する（実装）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-8c">21-8c</a>・<a href="#step-21-8c2">21-8c2</a> の完了後（プローブ用ツールの読み込み先も核心語の新しい持ち方へ合わせるため）。</p>
-<p data-field="result"><strong>結果：</strong>核心語を素材 #18 <code>core_words</code> にし、<code>stock_items.py</code> → V017 の DB 列 → スナップショット v4 → 返信 Lambda の経路へ移した（14 問の値は旧辞書と一致・v3 は警告ログ + ガードなし）。同梱の核心語辞書（JSON） を削除し、<code>write_snapshot.py --rewrite</code> を追加した〔pytest 計 802 全パス・ローカル MySQL へ適用済み〕。push は差分確認後。本番の切り替えは <a href="#step-21-8d2">21-8d2</a>。課題 <a href="../issues/index.html#I-038">I-038</a> の展開（クローズは 21-8d2）。</p>
+<p data-field="result"><strong>結果：</strong>核心語を素材 #18 <code>core_words</code> にし、<code>stock_items.py</code> → V017 の DB 列 → スナップショット v4 → 返信 Lambda の経路へ移した（14 問の値は旧辞書と一致・v3 は警告ログ + ガードなし）。同梱の核心語辞書（JSON） を削除し、<code>write_snapshot.py --rewrite</code> を追加した〔pytest 計 802 全パス・ローカル MySQL へ適用済み〕。2026-10-13 にユーザー指示で Aurora へ V017・更新 SQL を適用し push 済み（<code>c97ff7a</code>）。残りの切り替えは <a href="#step-21-8d2">21-8d2</a>。課題 <a href="../issues/index.html#I-038">I-038</a> の展開（クローズは 21-8d2）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -2632,7 +2632,7 @@
 <div class="plan-meta"><strong>21-8d2</strong><span class="plan-status">未着手</span></div>
 <h3>核心語の DB 化を本番へ切り替え、投稿済みの投稿で無影響を確認する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong><a href="#step-21-8d1">21-8d1</a> の完了（push 済み）後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。本ステップの完了で Phase 21 のステップがすべて終わる（課題 <a href="../issues/index.html#I-015">I-015</a> の再判断もここで行う）。</p>
+<p data-field="result"><strong>現況：</strong>着手前。<strong>2026-10-13 に前倒しで済んだもの</strong>: V017 と <code>update_core_words.sql</code> の Aurora 適用（ユーザー指示。ストック 14 / 14・投稿済み <code>umigame_items</code> 1 / 1 が設定済み、ローカルとの MD5 14 / 14 一致）と 21-8d1 の push（<code>c97ff7a</code>）。残りはパイプライン完走の確認・<code>CommentReplyStack</code> の deploy・スナップショットの書き直し・無影響確認。本ステップの完了で Phase 21 のステップがすべて終わる（課題 <a href="../issues/index.html#I-015">I-015</a> の再判断もここで行う）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
