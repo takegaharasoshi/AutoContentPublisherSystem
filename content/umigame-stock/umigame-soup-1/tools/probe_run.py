@@ -520,7 +520,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--patterns", nargs="+", choices=PATTERN_IDS,
                         help="pattern ids; default: " + " ".join(DEFAULT_PATTERN_IDS))
     parser.add_argument("--out", type=Path,
-                        default=SERVICE_DIR / "work/probe" / utc_now().replace(":", "-"))
+                        default=SET_DIR / "work/probe" / utc_now().replace(":", "-"))
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--refresh-judge", action="store_true")
     parser.add_argument("--refresh-writer", action="store_true")

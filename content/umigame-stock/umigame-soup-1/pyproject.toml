@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+# プローブ用ツールのテスト（21-8c2）。tools.* と write_snapshot はセット側、app.* は comment-reply 本体から読む
+pythonpath = [".", "tools", "../../../services/comment-reply"]
+testpaths = ["tools/tests"]

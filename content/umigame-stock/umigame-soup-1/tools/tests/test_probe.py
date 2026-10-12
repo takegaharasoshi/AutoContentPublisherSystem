@@ -515,7 +515,7 @@ def test_review_core_matches_python_with_synthetic_results():
 
 
 def test_review_core_matches_full_20261004_results_when_available():
-    path = Path(__file__).resolve().parents[1] / "work/probe/full-20261004/results.json"
+    path = Path(__file__).resolve().parents[2] / "work/probe/full-20261004/results.json"
     if not path.is_file():
         pytest.skip("full-20261004 results.json is not present")
     results = json.loads(path.read_text(encoding="utf-8"))

@@ -478,7 +478,7 @@ def test_failed_judges_preserve_usage_in_records_and_cached_errors(tmp_path, mon
     assert replay["rows"]["haiku-1b-max"][0]["record"] == row["record"]
 
 
-LEGACY_HAIKU_RESULTS = probe_run.SERVICE_DIR / "work/probe/full-20261008-8p-merged/results.json"
+LEGACY_HAIKU_RESULTS = probe_run.SET_DIR / "work/probe/full-20261008-8p-merged/results.json"
 
 
 @pytest.mark.skipif(not LEGACY_HAIKU_RESULTS.is_file(), reason="local legacy Haiku results not present")

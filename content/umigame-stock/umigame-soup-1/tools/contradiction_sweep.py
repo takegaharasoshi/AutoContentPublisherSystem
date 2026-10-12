@@ -88,7 +88,7 @@ def sweep(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--probe", type=Path,
-                        default=SERVICE_DIR / "work/probe/full-20261003")
+                        default=SET_DIR / "work/probe/full-20261003")
     parser.add_argument("--workers", type=int, default=4)
     args = parser.parse_args(argv)
     if not 1 <= args.workers <= 4:

@@ -1,4 +1,3 @@
 [tool.pytest.ini_options]
-# プローブ用ツール（tools.*）は 21-8c でセットレーンの content/ へ移した
-pythonpath = [".", "../../content/umigame-stock/umigame-soup-1"]
+pythonpath = ["."]
 testpaths = ["tests"]

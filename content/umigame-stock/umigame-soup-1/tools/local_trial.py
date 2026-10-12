@@ -90,7 +90,7 @@ def _parser() -> argparse.ArgumentParser:
                         help="effort(s) for the Luna judge and 1b writer (default: LUNA_EFFORT)")
     parser.add_argument("--reply-variant", choices=sorted(REPLY_VARIANTS))
     parser.add_argument("--stub-judgements", type=Path, help="offline judge fixture JSON")
-    parser.add_argument("--out", type=Path, default=SERVICE_DIR / "work/local_trial")
+    parser.add_argument("--out", type=Path, default=SET_DIR / "work/local_trial")
     return parser
 
 
