@@ -28,5 +28,6 @@ python3 review_sheet.py       # work/review.html を生成。API キー不要
 python3 generate.py --dry-run # SQL を生成し、ローカル MySQL でトランザクション内に流して ROLLBACK
 ```
 
-本番経路の機械プローブは `services/comment-reply/tools/probe_run.py` を使う。評価ケースは
+本番経路の機械プローブは `tools/probe_run.py` を使う（21-8c で `services/comment-reply/tools/` から移した。
+実行は `services/comment-reply/` の `.venv` から。手順は `services/comment-reply/README.md`「評価プローブ」）。評価ケースは
 `judge-trial/data/eval_problems.json` に追加してから `--problems <no>` を指定する。

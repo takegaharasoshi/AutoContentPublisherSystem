@@ -23,7 +23,7 @@ umigame-soup-1 のコメント自動返信で、判定と返信文に使って�
 ## 前提条件・再検討トリガー
 
 - Anthropic の API キー（プローブはローカル実行。本番で使う場合は Secrets Manager への追加が別途要る）
-- 既存のプローブ基盤: `services/comment-reply/tools/probe_run.py` の `PATTERNS`、判定のキャッシュ、評価ページ。パターン ⑥ Decisions の追加（21-6d10b）が雛形になる
+- 既存のプローブ基盤: `content/umigame-stock/umigame-soup-1/tools/probe_run.py` の `PATTERNS`、判定のキャッシュ、評価ページ。パターン ⑥ Decisions の追加（21-6d10b）が雛形になる
 - 関連: [Decisions 案](umigame-reply-openai-decisions.md)（パターン ⑥）、[Jev 案](umigame-yesno-jev.md)、[luna の採用経緯](codex-model-gpt6-luna.md)
 
 ## 原文メモ

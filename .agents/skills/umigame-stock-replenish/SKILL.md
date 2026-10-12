@@ -12,7 +12,7 @@ umigame-soup-1 の問題ストック（`umigame_stock_items`）を補充する�
 
 **前提**: 投稿は夜 20:00 JST の**週 4 回（日・火・木・土）**で消費は**週 4 問**。**型は両型同数**（4 問なら story 2 / misdirection 2）。**在庫水位の目安は未使用ビルド済み 8 問（2 週間分）以上**。
 
-**移行中の注意（2026-10-12 時点）**: プローブ用ツールは開発レーン 21-8c で `services/comment-reply/tools/` から `content/umigame-stock/umigame-soup-1/tools/` へ移す。核心語は 21-8d1・21-8d2 で `leak_words.json`（`services/`）から素材の項目（DB 列 → スナップショット）へ移す。**21-8c の完了前は G2 以降に、21-8d2 の完了前は G5 に進まない**（G1a〜素材レビューは先に進めてよい）。完了したら本節を消し、パスの記載を確かめる。
+**移行中の注意（2026-10-12 時点）**: プローブ用ツール（`probe_run.py`・`build_probe_page.py`・`local_trial.py` ほか）は 21-8c（2026-10-12 完了）で `content/umigame-stock/umigame-soup-1/tools/` へ移した。実行は `services/comment-reply/` の `.venv` から行い、出力の既定は従来どおり `services/comment-reply/work/`（git 管理外）。使い方は `services/comment-reply/README.md`「評価プローブ」。核心語は 21-8d1・21-8d2 で `leak_words.json`（`services/`）から素材の項目（DB 列 → スナップショット）へ移す。**21-8d2 の完了前は G5 に進まない**（G1a〜G4 は先に進めてよい）。21-8d2 が完了したら本節を消し、パスの記載を確かめる。
 
 ## 資材の置き場
 

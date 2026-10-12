@@ -8,7 +8,7 @@ description: umigame-soup-1（探偵カメロックのウミガメのスープ�
 
 umigame-soup-1 の問題を作るための手順（週次補充では候補をまとめて出して一括選別し〔セクション 1.5〕、OK の案を 1 問ずつ素材にする）。21-4a（2026-09-04〜07）で「制約から逆算して書き、コア = 引っ掛けるポイントを決める工程を飛ばした結果、コアのない知識クイズを書いてしまう」失敗が出たため、note 記事 [ウミガメのスープ作問法](https://note.com/suekai0217/n/n35128e606a9b)（4 ステップ・良い問題の 3 条件・2 類型）を手順に固定し、**コア宣言を書けない案は問題にしない**ことを本スキルの一番のルールとする。
 
-本スキルは作問だけを担う。素材 17 項目（判定用の `core_points`・`reveal_text`・`judge_criteria` を含む）の仕様・字数・件数の正は `docs/app/sets/umigame-soup-1.html` セクション 4、機械検査は同バッチの `validate.py`、素材シートは `review_sheet.py`（本番経路の機械プローブは `services/comment-reply/tools/probe_run.py`）、投入 SQL は `generate.py`（使い方は `content/umigame-stock/umigame-soup-1/README.md`）。ここには重複記載しない。矛盾したら設計書・ツールが勝つ。
+本スキルは作問だけを担う。素材 17 項目（判定用の `core_points`・`reveal_text`・`judge_criteria` を含む）の仕様・字数・件数の正は `docs/app/sets/umigame-soup-1.html` セクション 4、機械検査は同バッチの `validate.py`、素材シートは `review_sheet.py`（本番経路の機械プローブは `content/umigame-stock/umigame-soup-1/tools/probe_run.py`）、投入 SQL は `generate.py`（使い方は `content/umigame-stock/umigame-soup-1/README.md`）。ここには重複記載しない。矛盾したら設計書・ツールが勝つ。
 
 **構成**（2026-09-20 に型別へ分冊）: 本ファイルは両型に共通の工程。型ごとの工程 3（コア宣言）と工程 4（不思議にする）・型固有のコア検査と失敗パターンは分冊に置く。
 

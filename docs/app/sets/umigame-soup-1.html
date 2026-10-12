@@ -467,7 +467,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>組み合わせ役</td><td><code>app/judge/combiner.py</code></td><td>2 実装を部品として呼び、モードに応じて判定を 1 つ選ぶ</td></tr>
 <tr><td>返信文</td><td><code>app/reply/writer.py</code> / <code>templates.py</code></td><td>判定と別の部品。LLM の書き手と定型文</td></tr>
 <tr><td>プロンプト</td><td><code>app/prompts/</code></td><td>Lambda に同梱してデプロイする（全文は <a href="#prompts">10.5</a>）。スナップショットの <code>master_rules</code> は使わない</td></tr>
-<tr><td>ローカル試行</td><td><code>tools/local_trial.py</code></td><td>本番と同じ経路で 3 モードの返信を並べる（下記）</td></tr>
+<tr><td>ローカル試行</td><td><code>content/umigame-stock/umigame-soup-1/tools/local_trial.py</code></td><td>本番と同じ経路で 3 モードの返信を並べる（下記）</td></tr>
 </table>
 </div>
 <ul>
@@ -1241,7 +1241,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
 
 <h4>機械プローブ</h4>
 <ul>
-  <li><strong>実行器</strong>: <code>services/comment-reply/tools/probe_run.py</code>。評価ケースを本番の判定の組み合わせ・書き手・コメント記録に通し、<code>results.json</code> と <code>metrics.json</code> を出す（集計は <code>probe_metrics.py</code>）。Instagram への送信はしない。キーは環境変数（<code>OPENAI_API_KEY</code>・<code>TYPESAFE_API_KEY</code>）</li>
+  <li><strong>実行器</strong>: <code>content/umigame-stock/umigame-soup-1/tools/probe_run.py</code>（評価・プローブ用ツールは 21-8c でセットの資材側へ移した。本番の判定コード <code>services/comment-reply/app</code> を読み込んで使う。以下この章の <code>tools/</code> はこの置き場所を指す）。評価ケースを本番の判定の組み合わせ・書き手・コメント記録に通し、<code>results.json</code> と <code>metrics.json</code> を出す（集計は <code>probe_metrics.py</code>）。Instagram への送信はしない。キーは環境変数（<code>OPENAI_API_KEY</code>・<code>TYPESAFE_API_KEY</code>）</li>
   <li><strong>使い回しと再開</strong>: 判定 API はケースごとに各方式を 1 回呼んでパターン間で使い回し、書き手だけパターンごとに呼ぶ。<code>judge_cache.json</code> と <code>writer_cache.json</code> で中断後も再開できる</li>
   <li><strong>合格基準</strong>: 10.2 の P1〜P7 とレベル 1・2 の機械プローブ基準をそのまま使い、集計項目は基準と 1 対 1 に対応させる。P1 は 2 段: 機械が核心語の辞書（<code>app/reply/leak_words.json</code>。出力ガードと共通）で漏れ候補を拾い、人が評価ページで「漏洩 / 漏洩でない」を付け、<strong>確定した漏洩だけを P1 に数える</strong>（21-6d9）。未確認の候補が残る間は「要確認」で合否を出さない。出力ガードの発動件数は参考指標に出す</li>
 </ul>

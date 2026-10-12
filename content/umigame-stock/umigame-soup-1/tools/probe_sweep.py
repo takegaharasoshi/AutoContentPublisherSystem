@@ -22,9 +22,12 @@ from pathlib import Path
 from typing import Any
 
 
-SERVICE_DIR = Path(__file__).resolve().parent.parent
-if str(SERVICE_DIR) not in sys.path:
-    sys.path.insert(0, str(SERVICE_DIR))
+SET_DIR = Path(__file__).resolve().parent.parent
+REPO_ROOT = SET_DIR.parents[2]
+SERVICE_DIR = REPO_ROOT / "services/comment-reply"
+for _path in (SERVICE_DIR, SET_DIR):
+    if str(_path) not in sys.path:
+        sys.path.insert(0, str(_path))
 
 METHOD_ROWS = {
     "luna": ("luna-1b", "luna-1d", "luna-1b-haiku"),

@@ -1,7 +1,7 @@
 """batch-01 の素材レビューシート work/review.html を生成する。
 
 実行方法: ``python3 review_sheet.py``（API キー不要）。
-21-6d3 で probe_test.py から改名。旧プローブは退役（本番経路の評価は services/comment-reply/tools/probe_run.py）。
+21-6d3 で probe_test.py から改名。旧プローブは退役（本番経路の評価は content/umigame-stock/umigame-soup-1/tools/probe_run.py）。
 """
 
 from __future__ import annotations
