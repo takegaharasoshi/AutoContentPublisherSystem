@@ -14,7 +14,7 @@
 <h1>セット計画書: 探偵カメロックのウミガメのスープ（umigame-soup-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-10-12（開発レーン <a href="development-plan.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。第 2 バッチの作問とレビューは開発レーンの <a href="development-plan.html#step-21-8b">21-8b</a>、投入・ビルド・配置は本書の W-2）</span>
+  <span>最終更新: 2026-10-12（W-2 を新しい補充の流れ・4 問で書き直し、開発レーンの 21-8b を本書へ統合した）。前回: 2026-10-12（開発レーン <a href="development-plan.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。）</span>
 </div>
 
 <div class="note">
@@ -28,8 +28,8 @@
 <tr><th>アカウント</th><td>umigame.soup.jp「探偵カメロック」（Instagram・クリエイター）。<strong>稼働開始 2026-10-12</strong>（1 本目は手動実行で投稿。手順と記録は <code>content/umigame-stock/umigame-soup-1/set-registration/STATUS.md</code>）</td></tr>
 <tr><th>投稿スロット</th><td>夜 20:00 JST の<strong>週 4 回（日・火・木・土）</strong>（<a href="development-plan.html#step-21-6i">21-6i</a>）。キャプション末尾に前回の真相ブロックが付く（<a href="development-plan.html#step-21-6h">21-6h</a>）</td></tr>
 <tr><th>生成方式</th><td>umigame-prebuilt（Remotion 事前ビルド・24 秒・ナレーションは Irodori-TTS の声 G4）。ビルド資材は <code>content/video-build/umigame-soup-1/</code></td></tr>
-<tr><th>コメント返信</th><td><code>CommentReplyStack</code>（本番面 + ステージング面）。判定は ⑦ haiku + 1b-haiku high（<a href="development-plan.html#step-21-6e">21-6e</a>）。核心語辞書は <code>services/comment-reply/app/reply/leak_words.json</code>（<strong>開発レーンのパス</strong>。補充のたびに追記が要る。<a href="../issues/index.html#I-038">I-038</a>）</td></tr>
-<tr><th>ストック運用</th><td>スキル <code>/umigame-stock-replenish</code> で<strong>週 4 問</strong>を補充し、<strong>レビューは週 1 回 × 4 問</strong>（<a href="../app/sets/umigame-soup-1.html">セット別設計書</a>セクション 4）。在庫水位の目安は<strong>未使用ビルド済み 8 問（2 週間分）以上</strong>。直近: 第 1 バッチ 14 問（story 7 / misdirection 7）が両環境にビルド済みで、2026-10-12 に 1 問を使用（残り 13 問 = <strong>2026-11-03〔火〕の投稿で使い切る</strong>見込み。補充が無いと 11-05 以降は LRU で再利用になる）。第 2 バッチ 8 問は <a href="development-plan.html#step-21-8b">21-8b</a>（作問・レビュー）→ 本書 <a href="#step-W-2">W-2</a>（投入・ビルド・配置）</td></tr>
+<tr><th>コメント返信</th><td><code>CommentReplyStack</code>（本番面 + ステージング面）。判定は ⑦ haiku + 1b-haiku high（<a href="development-plan.html#step-21-6e">21-6e</a>）。核心語は現状 <code>services/comment-reply/app/reply/leak_words.json</code>（開発レーンのパス）にあり、<a href="development-plan.html#step-21-8d1">21-8d1</a>・<a href="development-plan.html#step-21-8d2">21-8d2</a> で素材の項目（DB 列 → スナップショット）へ移す（<a href="../issues/index.html#I-038">I-038</a>）。effort は <a href="development-plan.html#step-21-8e">21-8e</a> で max に変える予定</td></tr>
+<tr><th>ストック運用</th><td>スキル <code>/umigame-stock-replenish</code> で<strong>週 4 問</strong>を補充し、<strong>レビューは週 1 回 × 4 問</strong>（<a href="../app/sets/umigame-soup-1.html">セット別設計書</a>セクション 4）。在庫水位の目安は<strong>未使用ビルド済み 8 問（2 週間分）以上</strong>。直近: 第 1 バッチ 14 問（story 7 / misdirection 7）が両環境にビルド済みで、2026-10-12 に 1 問を使用（残り 13 問 = <strong>2026-11-03〔火〕の投稿で使い切る</strong>見込み。補充が無いと 11-05 以降は LRU で再利用になる）。第 2 バッチ 4 問は本書 <a href="#step-W-2">W-2</a>（作問から本番アップロードまで）</td></tr>
 <tr><th>KPI</th><td>指標セット・転記の手順は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>（月初 4 日以降に前月分を追記）。夜 20:00 の 1 スロットのため 1 行で転記する。<strong>本セット固有の指標はコメント率</strong>（コメント数 / reach。<a href="#pending-checks">確認待ちリスト</a>の効果仮説）。<div class="table-wrap" style="margin:.4rem 0 0;"><table><thead><tr><th>年月</th><th>スロット</th><th>本数</th><th>views</th><th>スキップ率</th><th>平均視聴秒</th><th>コメント</th><th>保存</th><th>月末フォロワー</th><th>備考</th></tr></thead><tbody><tr><td>2026-10</td><td>夜</td><td colspan="7">2026-11-04 以降に転記</td><td>初の月次値（10-12 稼働開始・部分月）</td></tr></tbody></table></div></td></tr>
 </tbody>
 </table></div>
@@ -41,12 +41,12 @@
 <p>週次補充（W-n）と改修（R-x）を <code>section.plan-phase</code>、その下のステップを <code>article.plan-step</code> で書く（様式の正は<a href="index.html#step-layout">計画体系 5.0</a>、枠は<a href="_templates/step.html">ステップ記載テンプレート</a>）。2 回目以降の定常の週次補充はステップを起こさず、<a href="umigame-soup-1-log.html">セット記録</a>の表に 1 行で残す（工程の正はスキル）。<strong>進行中の改修は現在なし</strong>。</p>
 
 <section class="plan-phase" data-plan-phase="W" id="phase-W">
-<h2 id="w">週次補充: 第 2 バッチ（補充スキルの実地テストの後半）</h2>
-<p><strong>ゴール</strong>: 開発レーン <a href="development-plan.html#step-21-8b">21-8b</a> でレビューを通した第 2 バッチ 8 問を、補充スキルの工程どおりに投入・ビルド・配置し、在庫切れ（2026-11-05 以降の再利用）を防ぐ。</p>
+<h2 id="w">週次補充: 第 2 バッチ（補充スキルの実地テスト・4 問）</h2>
+<p><strong>ゴール</strong>: 新しい補充スキル <code>/umigame-stock-replenish</code> の流れ（候補 → 選別 → 素材 → コメント → 機械プローブ → 動画 → 本番アップロード）を 4 問で一巡させてスキルの穴を直し、在庫切れ（2026-11-05 以降の再利用）を防ぐ。</p>
 <details class="plan-fold">
-<summary>背景・分担 <span class="plan-hint">— 作問は開発レーン、配置はセットレーン</span></summary>
+<summary>背景・分担 <span class="plan-hint">— 21-8b を廃止してセットレーンへ統合・4 問で小さく試す</span></summary>
 <div class="plan-fold-inner">
-<blockquote>21-8（セットレーンへの移管と補充スキル化）を 2026-10-12 に 21-8a（整備）/ 21-8b（第 2 バッチで実地テスト）へ分けた。21-8b は核心語辞書（<code>services/comment-reply/</code>）の追記を含むため開発レーンに置き、作問・機械検証・プローブ・人間レビューまでを担う。「第 2 バッチの投入・ビルドはセットレーンの週次補充として行う」（21-8 の守る条件）ため、配置は本書の W-2 で行う。</blockquote>
+<blockquote>2026-10-12 の認識合わせ（ユーザー決定）で、補充の流れを logic-training-1 と同じ「候補を目標の 2 倍まとめて出す → 一括選別」に改め、プローブ用コメントのレビュー・機械プローブ・必要時の人間プローブを足した。核心語の DB 化（開発レーン <a href="development-plan.html#step-21-8d1">21-8d1</a>・<a href="development-plan.html#step-21-8d2">21-8d2</a>）とプローブ用ツールの <code>content/</code> への移動（<a href="development-plan.html#step-21-8c">21-8c</a>）で補充がセットレーンだけで閉じるため、開発レーンの 21-8b を廃止して本書へ統合した。第 2 バッチは<strong>まず 4 問</strong>で試す（8 問から縮小）。</blockquote>
 </div>
 </details>
 
@@ -54,33 +54,33 @@
 <article class="plan-step" id="step-W-2" data-step-id="W-2" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>W-2</strong><span class="plan-status">未着手</span></div>
-<h3>第 2 バッチ 8 問の投入・ビルド・配置</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>開発レーン <a href="development-plan.html#step-21-8b">21-8b</a> の完了後（8 問の素材が人間レビューを通り、核心語辞書の追記が push・<code>CommentReplyStack</code> の deploy まで済んでいること。<a href="../issues/index.html#I-038">I-038</a>）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<h3>第 2 バッチ 4 問を新しい補充スキルで一巡させる</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>候補の準備（G1a）から素材レビューまでは<strong>すぐ着手できる</strong>。プローブ用コメントの準備（G2）以降は開発レーン <a href="development-plan.html#step-21-8c">21-8c</a>（ツールの移動）の完了後、本番アップロード（G5）は <a href="development-plan.html#step-21-8d2">21-8d2</a>（核心語の DB 化の本番切替）の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。期限: 2026-11-03〔火〕の投稿で第 1 バッチを使い切るため、<strong>2026-11-04 までに本番アップロードを終える</strong>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>補充スキル <code>/umigame-stock-replenish</code> の工程 5〜7（投入 → 動画ビルド → 動画レビュー → 配置）を第 2 バッチ 8 問で回す。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>投入・配置は人間レビュー承認後のゴールで行う（スキルの G2・G3）。<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> には触らない（必要になったら手を止めて開発レーンへ課題を起票する）。</p></div>
+<div data-field="overview"><p>目標 <strong>4 問（story 2 / misdirection 2）</strong>。候補 8 案（各型 4 案）から選び、補充スキルのゴール G1a〜G5 を順に回す: G1a 候補の準備 → 選別 → G1b 素材の仕上げ → 素材レビュー → G2 プローブ用コメントの準備 → コメントレビュー → G3 機械プローブ → 結果確認・人間プローブ（必要時）・GO → G4 動画ビルド → 動画レビュー → G5 本番へ一括アップロード。資材は <code>content/umigame-stock/umigame-soup-1/batch-02/</code>。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>人の判断（選別・素材レビュー・コメントレビュー・GO・動画レビュー）はゴールに含めない。Aurora・S3 を更新するのは G5 だけ。<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> には触らない（必要になったら手を止めて課題を起票する）。スキルの穴は見つけた場でスキルへ反映する。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
-<li>8 問を両環境へ投入し、コンテンツの MD5 が両環境で一致する（出力を貼る）。</li>
-<li>動画ビルドと全数レビューの承認後に <code>publish.py</code> で配置し、在庫確認クエリで両環境の未ビルドが 0 件（出力を貼る）。</li>
-<li>セット記録の週次補充の表に 1 行を追記し、本書のステータス欄の在庫を更新する。<code>python3 tools/docs_check.py --plan-only</code> の出力を貼る。</li>
-<li>日本語メッセージでコミットし、<code>pull --rebase</code> → push まで行う。</li>
+<li>候補 8 案の選別と、OK のうち 4 問の素材について <code>validate.py</code> 全パス・素材シートの生成（出力を貼る）。</li>
+<li>4 問のプローブ用コメントがレビューを通り、機械プローブの結果ページ（バッチのサマリー + 問題別 + インデックス）を生成した（出力を貼る）。</li>
+<li>動画レビューの承認後、G5 で両環境へ投入（内容の MD5 が一致）・<code>publish.py</code> で配置し、在庫確認クエリで両環境の未ビルドが 0 件（出力を貼る）。</li>
+<li>セット記録の週次補充の表に 1 行を追記し、本書のステータス欄の在庫を更新する。<code>python3 tools/docs_check.py --plan-only</code> の出力を貼る。日本語メッセージでコミットし <code>pull --rebase</code> → push。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
 <div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>動画の全数レビュー（<code>work/review.html</code>）。Aurora への適用・S3 配置は許可プロンプトで確かめる。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>スキルのゴールごと（G2 = レビュー用動画の生成まで / G3 = 配置・記録・push まで）。各 stop after 20 turns。</p></div>
+<div data-field="gate"><strong>人が確認すること</strong><p>候補の選別（OK / NG / 保留）・素材レビュー（<code>work/review.html</code>）・プローブ用コメントのレビュー（バッチのプローブページ末尾）・機械プローブの結果確認と人間プローブの要否・GO 判定・動画レビュー（動画の <code>work/review.html</code>）。G5 の Aurora・S3 更新は許可プロンプトで確かめる。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>補充スキルのゴールごと（G1a・G1b・G2・G3・G4・G5。各 stop after 20 turns）。各ゴールは人の判断を始められる状態で止まる。</p></div>
 </div>
 </section>
 <details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 期限と資材の場所</span></summary>
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 新しく作るもの</span></summary>
 <div class="plan-fold-inner">
-<p>期限: 2026-11-03〔火〕の投稿で第 1 バッチを使い切るため、<strong>2026-11-04 までに配置を終える</strong>。資材は <code>content/umigame-stock/umigame-soup-1/batch-02/</code>（21-8b で作る）と <code>content/video-build/umigame-soup-1/</code>。</p>
+<p>初回のため、G1a で候補の置き場（<code>content/umigame-stock/umigame-soup-1/candidates/batch-02/</code>・雛形・集計スクリプト。logic-training-1 の <code>candidates/</code> に倣う）を、G2・G3 でバッチ別のプローブページ（<code>docs/app/sets/umigame-soup-1-probe-batch-02.html</code> + 問題別ディレクトリ）・インデックス（<code>umigame-soup-1-probe-index.html</code>。第 1 バッチ・6d17 のページも並べる）・コメントレビュー節を作る（21-8c で移したツールを直す）。形式はスキル側に書いた。</p>
 </div>
 </details>
 <details class="plan-fold" data-field="record">
