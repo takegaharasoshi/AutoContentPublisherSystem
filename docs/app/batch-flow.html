@@ -368,7 +368,7 @@
 </div>
 
 <h3 id="sns-acceptance">3.5 当回固定の受け入れケース（26-2 の必須検証。26-1 で確定）</h3>
-<p>26-2 の実装は以下をすべて満たすこと。DB を使うケースは <code>services/sns-post-batch/tests/test_e2e_local_mysql.py</code> で<strong>ローカル MySQL に対して実行し、skipped 0 件</strong>で通す（実行できない DB テストを skip 合格にしない）。外部投稿 API はテスト用の偽物を使い、「API 呼び出し 0 件」は偽物の呼び出し記録で確かめる。予定時刻の例は logic-training-1 の朝 7:30 JST = <code>前日 22:30:00Z</code>、夜 21:00 JST = <code>12:00:00Z</code>。</p>
+<p>26-2 の実装は以下をすべて満たすこと。DB を使うケースは <code>services/sns-post-batch/tests/test_e2e_local_mysql.py</code> で<strong>ローカル MySQL に対して実行し、skipped 0 件</strong>で通す（実行できない DB テストを skip 合格にしない。e2e は MySQL の無い CodeBuild では skip する作りのため、ローカルの受け入れ検証は <code>REQUIRE_LOCAL_MYSQL=1 uv run pytest -rs</code> で接続失敗を失敗扱いにして行う。26-3 で追加）。外部投稿 API はテスト用の偽物を使い、「API 呼び出し 0 件」は偽物の呼び出し記録で確かめる。予定時刻の例は logic-training-1 の朝 7:30 JST = <code>前日 22:30:00Z</code>、夜 21:00 JST = <code>12:00:00Z</code>。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>#</th><th>前提（DB の状態・入力）</th><th>期待する結果</th><th>検証</th></tr></thead>

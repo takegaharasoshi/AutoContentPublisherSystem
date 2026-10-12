@@ -88,8 +88,8 @@ aws stepfunctions start-execution \
 </div>
 
 <div class="warn">
-  <span class="callout-title">Scheduler の手動停止は ImageBatchStack の deploy で戻る</span>
-  Scheduler の State は CDK が単一の正（<a href="workflow.html">workflow.html セクション 1.5</a>・<a href="../issues/index.html#I-018">I-018</a>）で、手動で <code>DISABLED</code> にしても <code>cdk deploy ImageBatchStack</code> で <code>ENABLED</code> に戻る（昼スロットのように CDK 上 <code>DISABLED</code> のものは戻らない）。そのため<strong>親 ASL を載せる ImageBatchStack の deploy を最後に置き、その deploy を「再開」とみなす</strong>。窓は「Scheduler 停止 → ImageBatchStack の deploy 完了」までの間に<strong>どのスケジュール時刻（logic-training-1 7:30 / 21:00、pref-ranking-1 20:00、umigame-soup-1 日・火・木・土 20:00 JST）もまたがない</strong>時間帯を選ぶ（目安: 21:00 の夜投稿の完了後〜翌 7:00、または 8:00〜19:30）。窓を確保できない場合は停止状態を CDK 側にも持たせる変更（スケジュールの <code>enabled</code> をフラグ化。インサイトの <code>insightsCollectionSchedulesEnabled</code> と同型）を 26-2 に追加して設計し直す。
+  <span class="callout-title">Scheduler の手動停止は ImageBatchStack の deploy で戻るとは限らない（26-3 で確認）</span>
+  Scheduler の State は CDK が単一の正（<a href="workflow.html">workflow.html セクション 1.5</a>・<a href="../issues/index.html#I-018">I-018</a>）で、手動で <code>DISABLED</code> にしても <code>cdk deploy ImageBatchStack</code> で <code>ENABLED</code> に戻る（昼スロットのように CDK 上 <code>DISABLED</code> のものは戻らない）。ただし<strong>戻るのはスケジュールのリソース自体に差分があるときだけ</strong>で、26-3（2026-10-13）では差分がなく <code>DISABLED</code> のまま残った。そのため<strong>親 ASL を載せる ImageBatchStack の deploy を最後に置き、deploy 後の S-9 で状態を確かめ、<code>DISABLED</code> のままなら S-8 合格を確認してから手動で停止前の状態に戻す</strong>（戻った場合も、戻らなかった場合も S-9 が再開の確認点）。窓は「Scheduler 停止 → ImageBatchStack の deploy 完了」までの間に<strong>どのスケジュール時刻（logic-training-1 7:30 / 21:00、pref-ranking-1 20:00、umigame-soup-1 日・火・木・土 20:00 JST）もまたがない</strong>時間帯を選ぶ（目安: 21:00 の夜投稿の完了後〜翌 7:00、または 8:00〜19:30）。窓を確保できない場合は停止状態を CDK 側にも持たせる変更（スケジュールの <code>enabled</code> をフラグ化。インサイトの <code>insightsCollectionSchedulesEnabled</code> と同型）を 26-2 に追加して設計し直す。
 </div>
 
 <p><strong>切替チェック表</strong>（各行の証跡 = aws cli の出力を開発記録の 26-3 に貼る。<code>&lt;…ARN&gt;</code> は実値に置き換える）:</p>

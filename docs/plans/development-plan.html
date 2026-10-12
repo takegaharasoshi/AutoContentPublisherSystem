@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -76,7 +76,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 1 件（26-1／クリックで展開）</summary>
+<summary>完了済み 3 件（26-1〜26-3／クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-26-1" data-step-id="26-1" data-status="done" data-completed="2026-10-13">
@@ -133,17 +133,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-26-2" data-step-id="26-2" data-status="doing">
+<article class="plan-step" id="step-26-2" data-step-id="26-2" data-status="done" data-completed="2026-10-13">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>26-2</strong><span class="plan-status">進行中（差分レビュー・go / no-go 待ち）</span></div>
+<div class="plan-meta"><strong>26-2</strong><span class="plan-status">完了（2026-10-13）</span></div>
 <h3>親子 SFN の予定時刻受け渡しと当回選定の実装（26-1 の設計レビュー通過後）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>26-1 の人間ゲート（設計レビュー）通過後。</p>
-<p data-field="result"><strong>現況：</strong>2026-10-13 に実装・検証を終えてコミット済み（未 push）。sns-post-batch pytest 269 passed / skipped 0（AC-1〜9 の e2e 25 件を含む・ローカル MySQL 実行）、infra Jest 126 passed、cdk synth 成功、ASL の差分は意図した親子定義のみ。<strong>ユーザーの差分確認と 26-3 の go / no-go・停止窓の日時の決定待ち</strong>。</p>
+<p data-field="result"><strong>結果：</strong>当回固定の実装（アプリ 3 本・親子 ASL・テスト・README）を 2026-10-13 にコミットし、ユーザーの go で 26-3 へ。ローカル MySQL で pytest 269 passed / skipped 0、infra Jest 126 passed。CI で e2e の skip 外しが原因の失敗が出たため 26-3 の中でテストを修正（<code>a31bb70</code>）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -173,7 +168,7 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-10-13 実装・検証・コミット（未 push）</span></summary>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-13 実装・検証・コミット → go</span></summary>
 <div class="plan-fold-inner">
 <p><strong>2026-10-13（/step 26-2 のゴール）</strong>: 実装とテスト修正ループを Codex（gpt-6.1-sol / max）へ委譲し、差分レビューと実 DB での検証は Claude が行った（Codex のサンドボックスはローカル MySQL へ接続できず、e2e 34 件が接続エラーで未検証のまま返ったため）。</p>
 <ul>
@@ -183,18 +178,19 @@
 <li><strong>検証</strong>: <code>uv run pytest -rs -q</code> → <code>269 passed in 3.05s</code>（skipped 0。ローカル MySQL <code>acps-mysql</code> に接続して実行）。<code>npm run build</code> 成功・<code>npx jest</code> → <code>Tests: 126 passed, 126 total</code>。<code>cdk synth</code>（現行タグの context: sns-post-batch / image-batch <code>c97ff7a65650</code>・db-readiness-check <code>27d0ab20a77e</code>・insights-batch <code>8b1f92d48dc5</code>）成功。<code>cdk diff SnsPostBatchStack ImageBatchStack</code> → 各 StateMachine の DefinitionString と各 TaskDefinition。TaskDefinition の差分は CFN 上のイメージ <code>50472a0be6c5</code> → 現行稼働の <code>c97ff7a65650</code>（パイプラインが CFN の外で新リビジョンを登録する既存のずれで、本ステップの変更ではない。deploy すると現行と同じイメージで新リビジョンが登録される）。CFN が記録しているイメージ <code>50472a0be6c5</code> を両 stack の context に与えた再実行では、差分は <code>SnsPostingStateMachine</code>・<code>ImageGenerationStateMachine</code> の <code>DefinitionString</code> の 2 件だけ（TaskDefinition の差分は context のタグだけに由来することを確認）。ASL は本番の実定義と HEAD の ASL が差分 0 件、HEAD → 今回が意図した 5 点（子: <code>StartAt</code>・<code>CheckInput</code>・<code>RejectInput</code>・<code>SCHEDULED_AT</code>、親: <code>scheduled_at.$</code>）だけであることを構造比較で確認。</li>
 <li><strong>切替チェック表</strong>: infra/operation 1.4 の S-1〜S-9 が記入済みであることを確認（26-1 で記入）。</li>
 </ul>
-<p>次: ユーザーが差分と証跡を確認し、26-3 の go / no-go と停止窓の日時を決める。go なら 26-3 の S-6 で push する（push まではこのコミットを main の先頭に保つ）。</p>
+<p><strong>2026-10-13 go / no-go（ユーザー）</strong>: go。停止窓は「今から」（02:53 JST 着手）。ゴールの完了条件 (5)「現行イメージの context の diff に親子 ASL 以外の差分がない」は、CFN が記録するイメージと稼働中イメージのずれ（TaskDefinition の差分）により deploy なしでは満たせない書き方だったため、ゴールの判定は未達のまま 26-3 へ進んだ（教訓: CFN 外でリビジョンを登録する構成では、diff の条件は「CFN 記録のタグの context で ASL 以外の差分なし」と書く）。</p>
+<p><strong>CI での失敗と修正</strong>: Codex が受け入れケースの「skip 合格にしない」を受けて e2e の接続失敗時 skip を外していたため、MySQL の無い CodeBuild で 34 件が接続エラーになり、26-3 の S-6 でパイプラインが失敗した（<code>62d6b48</code>。本番への影響なし）。ユーザーの許可を得て、通常は skip・<code>REQUIRE_LOCAL_MYSQL=1</code> のときだけ失敗させる形に戻した（<code>a31bb70</code>。ローカル <code>REQUIRE_LOCAL_MYSQL=1</code> で 269 passed、接続拒否を再現した CI 相当で 235 passed / 34 skipped）。ローカルの受け入れ検証は今後 <code>REQUIRE_LOCAL_MYSQL=1 uv run pytest -rs</code> で行う（<a href="../app/batch-flow.html#sns-acceptance">batch-flow 3.5</a> に追記）。</p>
 </div>
 </details>
 </div>
 </article>
 
-<article class="plan-step" id="step-26-3" data-step-id="26-3" data-status="todo">
+<article class="plan-step" id="step-26-3" data-step-id="26-3" data-status="done" data-completed="2026-10-13">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>26-3</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<div class="plan-meta"><strong>26-3</strong><span class="plan-status">完了（2026-10-13）</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>定時実行を止めた窓での本番切替（ユーザー判断・ゴール対象外。26-2 の go 後）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>26-2 の人間ゲートで go。定時刻をまたがない停止窓が確保できていること。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>2026-10-13 02:53〜03:17 JST の窓で切替完了。ユーザーの明示の承認を受けて Claude が操作を実行した（Scheduler 停止 → push → パイプライン → SnsPostBatchStack → ImageBatchStack → 実定義確認 → Scheduler 再開）。親子 ASL とアプリ（イメージ <code>a31bb701d471</code>）がすべて新契約。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -221,11 +217,27 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。実施したら日時・証跡の所在をここに残す。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-13 切替チェック表 S-1〜S-9 の証跡</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-10-13 02:53〜03:17 JST</strong>（ユーザーが go と「今から」の窓を承認し、本番操作を Claude が実行することを明示的に許可。<a href="../infra/operation.html#sns-current-run-switch">切替チェック表</a>の順）:</p>
+<ul>
+<li><strong>S-1</strong> 反映対象: <code>62d6b48</code>（26-2）+ <code>a31bb70</code>（CI 修正）。<strong>S-2</strong> 切替前: <code>acps-prod-sns-post-batch</code> rev 20・<code>acps-prod-image-batch</code> rev 36（どちらも <code>c97ff7a65650</code>）。<strong>S-3</strong> 旧 ASL（親子）を作業端末に保存。</li>
+<li><strong>S-4</strong> ENABLED の 4 件（logic-training-1 morning / night・pref-ranking-1 evening・umigame-soup-1 evening。グループ <code>acps-prod-image-schedule-group</code>）を手動で DISABLED に。昼スロットは元から DISABLED。<strong>S-5</strong> 親子 SFN とも RUNNING 0 件。</li>
+<li><strong>S-6</strong> <code>62d6b48</code> の push でパイプラインが Build で失敗（pytest 235 passed / 34 errors。e2e の MySQL 接続拒否 → 26-2 の記録）。本番はすべて旧のまま。ユーザーの許可でテストを直し <code>a31bb70</code> を push → <code>acps-prod-sns-post-batch-pipeline</code> Succeeded・rev 21（<code>a31bb701d471</code>）。</li>
+<li><strong>S-7</strong> 同じ context の <code>cdk diff</code> は各 stack の TaskDefinition（イメージは現行どおり）と StateMachine の DefinitionString のみ。<code>cdk deploy --exclusively</code> で SnsPostBatchStack（<code>snsPostBatchImageTag=a31bb701d471</code>・37 秒・rev 22）→ 子の実定義に <code>CheckInput</code>・<code>SCHEDULED_AT</code> を確認 → ImageBatchStack（<code>imageBatchImageTag=c97ff7a65650</code>・37 秒・rev 37）。</li>
+<li><strong>S-8</strong> 親 <code>StartSnsPostBatch.Input</code> = <code>{'set_code.$': '$.set_code', 'scheduled_at.$': '$.scheduled_at'}</code>、子 = <code>StartAt: CheckInput</code>・<code>RejectInput</code>・<code>SCHEDULED_AT</code>、投稿バッチのイメージ <code>a31bb701d471</code>（rev 22）。3 つとも新契約。</li>
+<li><strong>S-9</strong> <strong>想定外</strong>: ImageBatchStack の deploy で Scheduler は ENABLED に戻らなかった（スケジュールのリソースに差分がなく、CFN が Scheduler を更新しないため。I-018 の「deploy で戻る」はスケジュールに差分があるときだけ）。S-8 合格を確認してから 4 件を手動で ENABLED に戻し、停止前と同じ状態（昼のみ DISABLED）を確認。<a href="../infra/operation.html#sns-current-run-switch">infra/operation 1.4</a> の注意書きを実態に合わせて修正。</li>
+</ul>
+<p>次: 26-4（実環境の読み取り確認・記録・確認待ちの起票）。最初の定時は 2026-10-13 07:30 JST（logic-training-1 朝）。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
 
 <article class="plan-step" id="step-26-4" data-step-id="26-4" data-status="todo">
 <header class="plan-step-head">
