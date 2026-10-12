@@ -12,7 +12,7 @@ umigame-soup-1 の問題ストック（`umigame_stock_items`）を補充する�
 
 **前提**: 投稿は夜 20:00 JST の**週 4 回（日・火・木・土）**で消費は**週 4 問**。**型は両型同数**（4 問なら story 2 / misdirection 2）。**在庫水位の目安は未使用ビルド済み 8 問（2 週間分）以上**。
 
-**移行中の注意（2026-10-13 時点）**: プローブ用ツール（`probe_run.py`・`build_probe_page.py`・`local_trial.py` ほか）とそのテスト・実行環境・出力先は 21-8c・21-8c2 で `content/umigame-stock/umigame-soup-1/` へ寄せた（実行はセットのディレクトリの `.venv` から、出力の既定は `work/`〔git 管理外〕。手順はセットの `README.md`「ローカル試行・評価プローブの実行環境」「評価プローブ」）。核心語は 21-8d1 で `services/` 同梱の辞書から素材 #18 `core_words`（`stock_items.py` → DB 列〔V017〕→ スナップショット v4）へ移した。本番の切り替え（V017 の Aurora 適用・deploy）は 21-8d2。**21-8d2 の完了前は G5 に進まない**（G1a〜G4 は先に進めてよい）。21-8d2 が完了したら本節を消し、パスの記載を確かめる。
+**ツールと核心語の置き場**: プローブ用ツール（`probe_run.py`・`build_probe_page.py`・`local_trial.py` ほか）とそのテスト・実行環境・出力先は `content/umigame-stock/umigame-soup-1/`（実行はセットのディレクトリの `.venv` から、出力の既定は `work/`〔git 管理外〕。手順はセットの `README.md`「ローカル試行・評価プローブの実行環境」「評価プローブ」）。核心語は素材 #18 `core_words`（`stock_items.py` → DB 列〔V017〕→ スナップショット v4 → 返信 Lambda）で、補充に `services/` の変更・deploy は要らない（21-8c〜21-8d2 で移行済み。2026-10-13 に本番切替）。
 
 ## 資材の置き場
 
