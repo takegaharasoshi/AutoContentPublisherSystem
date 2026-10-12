@@ -20,6 +20,7 @@ REGISTERED_PAGES: tuple[str, ...] = (
     "docs/plans/logic-training-1.html",
     "docs/plans/pref-ranking-1.html",
     "docs/plans/fantasy-animals-1.html",
+    "docs/plans/umigame-soup-1.html",
 )
 
 _VOID_TAGS = {

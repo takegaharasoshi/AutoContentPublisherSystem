@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セット計画書: 探偵カメロックのウミガメのスープ | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/plans.css?v=20260921">
+</head>
+<body data-plan-format="1">
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / umigame-soup-1</nav>
+<h1>セット計画書: 探偵カメロックのウミガメのスープ（umigame-soup-1）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">セットレーン</span>
+  <span>最終更新: 2026-10-12（開発レーン <a href="development-plan.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。第 2 バッチの作問とレビューは開発レーンの <a href="development-plan.html#step-21-8b">21-8b</a>、投入・ビルド・配置は本書の W-2）</span>
+</div>
+
+<div class="note">
+  <span class="callout-title">本書の位置づけ</span>
+  umigame-soup-1 の<strong>運用ステータス・週次補充と改修のステップ・確認待ちリスト</strong>を管理する（課題は<a href="../issues/index.html#lane-umigame-soup-1">課題体系</a>）（レーン運用ルールは <a href="index.html">index.html</a>）。実施の詳細は<a href="umigame-soup-1-log.html">セット記録</a>へ追記する。セットの仕様の正は<a href="../app/sets/umigame-soup-1.html">セット別設計書</a>、動画・ビルドの技術設計は<a href="../app/generators/umigame-prebuilt.html">方式設計書</a>、補充の手順はスキル <code>/umigame-stock-replenish</code>（作問はスキル <code>/umigame-problem-writer</code>）。<strong>セット構築（Phase 21・〜2026-10-12）の経緯は<a href="development-plan.html">開発計画</a>の Phase 21 と<a href="development-log.html">開発記録</a></strong>。
+</div>
+
+<h2>1. ステータス</h2>
+<div class="table-wrap"><table>
+<tbody>
+<tr><th>アカウント</th><td>umigame.soup.jp「探偵カメロック」（Instagram・クリエイター）。<strong>稼働開始 2026-10-12</strong>（1 本目は手動実行で投稿。手順と記録は <code>content/umigame-stock/umigame-soup-1/set-registration/STATUS.md</code>）</td></tr>
+<tr><th>投稿スロット</th><td>夜 20:00 JST の<strong>週 4 回（日・火・木・土）</strong>（<a href="development-plan.html#step-21-6i">21-6i</a>）。キャプション末尾に前回の真相ブロックが付く（<a href="development-plan.html#step-21-6h">21-6h</a>）</td></tr>
+<tr><th>生成方式</th><td>umigame-prebuilt（Remotion 事前ビルド・24 秒・ナレーションは Irodori-TTS の声 G4）。ビルド資材は <code>content/video-build/umigame-soup-1/</code></td></tr>
+<tr><th>コメント返信</th><td><code>CommentReplyStack</code>（本番面 + ステージング面）。判定は ⑦ haiku + 1b-haiku high（<a href="development-plan.html#step-21-6e">21-6e</a>）。核心語辞書は <code>services/comment-reply/app/reply/leak_words.json</code>（<strong>開発レーンのパス</strong>。補充のたびに追記が要る。<a href="../issues/index.html#I-038">I-038</a>）</td></tr>
+<tr><th>ストック運用</th><td>スキル <code>/umigame-stock-replenish</code> で<strong>週 4 問</strong>を補充し、<strong>レビューは週 1 回 × 4 問</strong>（<a href="../app/sets/umigame-soup-1.html">セット別設計書</a>セクション 4）。在庫水位の目安は<strong>未使用ビルド済み 8 問（2 週間分）以上</strong>。直近: 第 1 バッチ 14 問（story 7 / misdirection 7）が両環境にビルド済みで、2026-10-12 に 1 問を使用（残り 13 問 = <strong>2026-11-03〔火〕の投稿で使い切る</strong>見込み。補充が無いと 11-05 以降は LRU で再利用になる）。第 2 バッチ 8 問は <a href="development-plan.html#step-21-8b">21-8b</a>（作問・レビュー）→ 本書 <a href="#step-W-2">W-2</a>（投入・ビルド・配置）</td></tr>
+<tr><th>KPI</th><td>指標セット・転記の手順は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>（月初 4 日以降に前月分を追記）。夜 20:00 の 1 スロットのため 1 行で転記する。<strong>本セット固有の指標はコメント率</strong>（コメント数 / reach。<a href="#pending-checks">確認待ちリスト</a>の効果仮説）。<div class="table-wrap" style="margin:.4rem 0 0;"><table><thead><tr><th>年月</th><th>スロット</th><th>本数</th><th>views</th><th>スキップ率</th><th>平均視聴秒</th><th>コメント</th><th>保存</th><th>月末フォロワー</th><th>備考</th></tr></thead><tbody><tr><td>2026-10</td><td>夜</td><td colspan="7">2026-11-04 以降に転記</td><td>初の月次値（10-12 稼働開始・部分月）</td></tr></tbody></table></div></td></tr>
+</tbody>
+</table></div>
+
+<h2 id="backlog">2. 課題</h2>
+<p>バックログは置かない（22-2 の方針）。セットの課題は<a href="../issues/index.html#lane-umigame-soup-1">課題体系の umigame-soup-1 節</a>へ起票する。補充スキルが起動時にセット名で照合する。</p>
+
+<h2>3. 週次補充と改修のステップ</h2>
+<p>週次補充（W-n）と改修（R-x）を <code>section.plan-phase</code>、その下のステップを <code>article.plan-step</code> で書く（様式の正は<a href="index.html#step-layout">計画体系 5.0</a>、枠は<a href="_templates/step.html">ステップ記載テンプレート</a>）。2 回目以降の定常の週次補充はステップを起こさず、<a href="umigame-soup-1-log.html">セット記録</a>の表に 1 行で残す（工程の正はスキル）。<strong>進行中の改修は現在なし</strong>。</p>
+
+<section class="plan-phase" data-plan-phase="W" id="phase-W">
+<h2 id="w">週次補充: 第 2 バッチ（補充スキルの実地テストの後半）</h2>
+<p><strong>ゴール</strong>: 開発レーン <a href="development-plan.html#step-21-8b">21-8b</a> でレビューを通した第 2 バッチ 8 問を、補充スキルの工程どおりに投入・ビルド・配置し、在庫切れ（2026-11-05 以降の再利用）を防ぐ。</p>
+<details class="plan-fold">
+<summary>背景・分担 <span class="plan-hint">— 作問は開発レーン、配置はセットレーン</span></summary>
+<div class="plan-fold-inner">
+<blockquote>21-8（セットレーンへの移管と補充スキル化）を 2026-10-12 に 21-8a（整備）/ 21-8b（第 2 バッチで実地テスト）へ分けた。21-8b は核心語辞書（<code>services/comment-reply/</code>）の追記を含むため開発レーンに置き、作問・機械検証・プローブ・人間レビューまでを担う。「第 2 バッチの投入・ビルドはセットレーンの週次補充として行う」（21-8 の守る条件）ため、配置は本書の W-2 で行う。</blockquote>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+<article class="plan-step" id="step-W-2" data-step-id="W-2" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>W-2</strong><span class="plan-status">未着手</span></div>
+<h3>第 2 バッチ 8 問の投入・ビルド・配置</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>開発レーン <a href="development-plan.html#step-21-8b">21-8b</a> の完了後（8 問の素材が人間レビューを通り、核心語辞書の追記が push・<code>CommentReplyStack</code> の deploy まで済んでいること。<a href="../issues/index.html#I-038">I-038</a>）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>補充スキル <code>/umigame-stock-replenish</code> の工程 5〜7（投入 → 動画ビルド → 動画レビュー → 配置）を第 2 バッチ 8 問で回す。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>投入・配置は人間レビュー承認後のゴールで行う（スキルの G2・G3）。<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> には触らない（必要になったら手を止めて開発レーンへ課題を起票する）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>8 問を両環境へ投入し、コンテンツの MD5 が両環境で一致する（出力を貼る）。</li>
+<li>動画ビルドと全数レビューの承認後に <code>publish.py</code> で配置し、在庫確認クエリで両環境の未ビルドが 0 件（出力を貼る）。</li>
+<li>セット記録の週次補充の表に 1 行を追記し、本書のステータス欄の在庫を更新する。<code>python3 tools/docs_check.py --plan-only</code> の出力を貼る。</li>
+<li>日本語メッセージでコミットし、<code>pull --rebase</code> → push まで行う。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>動画の全数レビュー（<code>work/review.html</code>）。Aurora への適用・S3 配置は許可プロンプトで確かめる。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>スキルのゴールごと（G2 = レビュー用動画の生成まで / G3 = 配置・記録・push まで）。各 stop after 20 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 期限と資材の場所</span></summary>
+<div class="plan-fold-inner">
+<p>期限: 2026-11-03〔火〕の投稿で第 1 バッチを使い切るため、<strong>2026-11-04 までに配置を終える</strong>。資材は <code>content/umigame-stock/umigame-soup-1/batch-02/</code>（21-8b で作る）と <code>content/video-build/umigame-soup-1/</code>。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+</div>
+</section>
+
+<h2 id="pending-checks">4. 確認待ちリスト（トリガー付き）</h2>
+<p>初回試行・効果観察など「次の機会に確かめる」項目を、ステップにせずここで追う（ルールと列の意味は<a href="index.html#pending-checks">計画体系 5.2</a>）。補充スキルが起動時にこの表を照合する。確認したら結果を書き、OK なら<a href="umigame-soup-1-log.html">セット記録</a>へ移す。稼働直後の確認（2 本目の前回の真相ブロック・コメント記録の初回取り込み・S3 ライフサイクル）は開発レーン由来のため<a href="development-plan.html#pending-checks">開発計画の確認待ちリスト</a>で追う。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
+<tbody>
+<tr><td>2026-10-12 / 効果仮説: 参加型の問題はコメントを呼び、リーチの伸びにつながるか（21-8a で起票）</td><td>日付型: 稼働 2 週間後（2026-10-26 以降の最初の作業日）</td><td>① <strong>コメント率</strong>（コメント数 / reach。投稿ごとに 72 時間時点の値）の中央値が、同じ期間の logic-training-1 の夜スロットより高いか ② 高い場合、投稿を重ねるにつれて reach が伸びているか（1〜2 本目と直近 2 本の比較）。抽出は <code>content/insights-analysis/run_queries.py</code>（読み取り専用）。2 週間で 8 本程度のため、<strong>傾向の確認であって決定ではない</strong></td><td>① が低い → 問題の難易度・キャプションの呼びかけ・返信の質を改修候補として課題体系へ起票する。① は高いが ② が伸びない → 月次 KPI 転記で追い続け、2026-11 分の転記時に再判断する</td><td>—</td></tr>
+</tbody>
+</table></div>
+
+</div>
+</body>
+</html>
