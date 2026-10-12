@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import urllib.error
 import urllib.parse
 from contextlib import contextmanager
@@ -75,16 +76,26 @@ class FakeResponse:
 
 
 def _connect_local_mysql(secret: dict[str, Any]) -> pymysql.connections.Connection:
-    """Connect to local MySQL using the shared secret field naming."""
-    return pymysql.connect(
-        host=secret["host"],
-        port=secret["port"],
-        user=secret["username"],
-        password=secret["password"],
-        database=secret["dbname"],
-        connect_timeout=2,
-        charset="utf8mb4",
-    )
+    """Connect to local MySQL using the shared secret field naming.
+
+    Skips when MySQL is unreachable (CodeBuild has no MySQL), unless
+    ``REQUIRE_LOCAL_MYSQL=1`` is set; then the connection error fails the
+    test so local acceptance runs cannot pass by skipping.
+    """
+    try:
+        return pymysql.connect(
+            host=secret["host"],
+            port=secret["port"],
+            user=secret["username"],
+            password=secret["password"],
+            database=secret["dbname"],
+            connect_timeout=2,
+            charset="utf8mb4",
+        )
+    except pymysql.err.OperationalError:
+        if os.environ.get("REQUIRE_LOCAL_MYSQL") == "1":
+            raise
+        pytest.skip("Local MySQL not reachable; skipping E2E test")
 
 
 @contextmanager

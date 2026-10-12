@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any, Iterator
 from uuid import uuid4
 
@@ -24,9 +25,14 @@ TEMPLATE = "{{caption}}{{prev_truth_block}}"
 @pytest.fixture
 def umigame_set() -> Iterator[tuple[Any, int, int]]:
     """Create a temporary umigame set with one active account."""
-    connection = pymysql.connect(
-        **LOCAL_DB, connect_timeout=2, charset="utf8mb4"
-    )
+    try:
+        connection = pymysql.connect(
+            **LOCAL_DB, connect_timeout=2, charset="utf8mb4"
+        )
+    except pymysql.err.OperationalError:
+        if os.environ.get("REQUIRE_LOCAL_MYSQL") == "1":
+            raise
+        pytest.skip("Local MySQL not reachable; skipping E2E test")
     set_id: int | None = None
     try:
         with connection.cursor() as cursor:
