@@ -2609,7 +2609,7 @@
 <li>返信 Lambda: <code>contract.py</code> に <code>CoreWords</code> を足し、v3 / v4 を受け付ける（v4 は <code>core_words</code> 必須・v3 は WARNING <code>PROBLEM_NO_CORE_WORDS</code>）。<code>leak_guard.py</code> は辞書の読み込みをやめて <code>find_leaks(reply, comment_text, core_words)</code> に（照合は不変）。<code>writer.py</code> は核心語がなければ WARNING <code>REPLY_LEAK_GUARD_NO_WORDS</code> を出してガードなしで通す。DB には接続しない。</li>
 <li>素材・プローブ用ツール: <code>validate.py</code>（<code>check_core_words</code>）・<code>review_sheet.py</code>（核心語の表示）・<code>common/umigame_common.py</code>・<code>probe_metrics.py</code>・<code>probe_run.py</code>・<code>local_trial.py</code>・<code>judge-trial/run_trial.py</code> を <code>stock_items.py</code> から読む形に変えた。<code>write_snapshot.py</code> は v4 にし、書き直しモード <code>--rewrite</code>（<code>snapshot_s3_key</code> が記録済みの投稿が対象。既定は一覧のみ、<code>--apply</code> で同じキーへ上書き・DB は更新しない）を足した。</li>
 <li>実装は Codex（<code>gpt-6.1-sol</code> / <code>max</code>）に委譲し、Claude が差分をレビューした。pytest: image-batch 223 passed / 5 skipped・sns-post-batch 212 passed・comment-reply 213 passed・セット側 154 passed。<code>validate.py</code> は全 14 問 OK（既存の警告 2 件）。旧パスの参照（<code>leak_words.json</code>・<code>load_leak_words</code>・<code>entry_for_content_key</code>・<code>REPLY_LEAK_GUARD_NO_DICT</code>）はコード・スキル・README で 0 件（設計書には経緯の 1 件だけ）。</li>
-<li>設計書: セット別設計書（4 を 18 項目に・出力ガード・決定・10.7.2・運用ログ）・<code>umigame-prebuilt.html</code>・<code>data-model.html</code>（4.14・4.15）と、スキル 2 本（作問の工程 9・補充の G1b と移行中の注意）・セットの README を更新した。セット計画書の「核心語は現状 <code>leak_words.json</code> にあり」は本番の切り替えまで事実なので、21-8d2 で直す。</li>
+<li>設計書: セット別設計書（4 を 18 項目に・出力ガード・決定・10.7.2・運用ログ）・<code>umigame-prebuilt.html</code>・<code>data-model.html</code>（4.14・4.15）と、スキル 2 本（作問の工程 9・補充の G1b と移行中の注意）・セットの README を更新した。セット計画書の概要表と I-038 の対象パス列も新しい置き場に直した。</li>
 <li>課題表: I-038 は据え置き継続（クローズは 21-8d2）。I-011・I-014・I-015・I-017・I-020・I-022・I-024 は本ステップの出来事に当たらないため据え置き継続（Phase 26 は未着手のため本ステップが先行。26-1 の設計はスナップショット v4 と <code>core_words</code> を前提にする）。確認待ち: 該当なし。</li>
 </ul>
 </div>
@@ -2645,7 +2645,7 @@
 <li>パイプライン完走とタスク定義の新リビジョン（image-batch・sns-post-batch。CLAUDE.md の D 定型行の <code>/goal</code> で確認）。</li>
 <li>投稿済みの全投稿のスナップショットを書き直し、S3 から 1 件取得して <code>schema_version</code> 4・核心語が入っていることを貼る。</li>
 <li><strong>投稿済みの投稿での無影響確認</strong>: 投稿済みの投稿に実コメントを付け（ユーザー）、返信が従来どおり付くこと、Reply Lambda のログに核心語なしの警告・エラーが無いことを確認する（ログを貼る）。</li>
-<li>セット計画書 <a href="umigame-soup-1.html">umigame-soup-1.html</a> の「核心語は現状 <code>leak_words.json</code> にあり」と補充スキルの「移行中の注意」を、新しい置き場（素材 #18 <code>core_words</code>）に合わせて直す（21-8d1 の申し送り）。</li>
+<li>補充スキル <code>umigame-stock-replenish</code> の「移行中の注意」（G5 の待ち）を消し、セット計画書の概要表の「本番の切り替えは 21-8d2」を完了の形に直す（21-8d1 の申し送り）。</li>
 <li>課題表 <a href="../issues/index.html#I-038">I-038</a> を解消でクローズし、<a href="../issues/index.html#I-015">I-015</a>（Phase 21 完了時の再判断）を決めて表に反映する。Phase 21 を完了済みにして計画書・記録を更新し、コミット・push。</li>
 </ol>
 </section>
