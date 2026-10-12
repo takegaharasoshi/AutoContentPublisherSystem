@@ -73,9 +73,9 @@ export class FoundationStack extends cdk.Stack {
       ],
     });
 
-    // 21-7b: 初回取り込み（insights-batch → umigame_comment_logs）の成功を確認してから true にして deploy する。
-    // 先に有効化すると未取り込みのまま 30 日を超えた記録が消える。
-    const commentLogExpirationEnabled = false;
+    // 21-7b: 初回取り込み（insights-batch → umigame_comment_logs）の成功を確認してから true にして deploy した（2026-10-13）。
+    // 取り込みが止まったまま有効にしておくと、未取り込みのまま 30 日を超えた記録が消える。
+    const commentLogExpirationEnabled = true;
     this.imagesBucket = new s3.Bucket(this, 'ImagesBucket', {
       bucketName: `acps-${props.envName}-images-${this.account}`,
       // ライフサイクルは生成物プレフィックス（images/・videos/）限定にし、

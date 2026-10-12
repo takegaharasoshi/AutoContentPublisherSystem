@@ -69,7 +69,7 @@ describe('FoundationStack の画像保存用 S3 バケット', () => {
         ExpirationInDays: 30,
         Id: 'expire-comment-logs',
         Prefix: 'comment-log/',
-        Status: 'Disabled',
+        Status: 'Enabled',
       },
     ]);
     expect(rules.map((rule: any) => rule.Prefix)).not.toContain('audio/');
