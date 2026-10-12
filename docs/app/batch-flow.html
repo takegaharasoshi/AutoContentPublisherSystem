@@ -183,31 +183,65 @@
 <h2 id="flow-sns">3. SNS 投稿バッチ処理フロー</h2>
 <p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（メディア単位ではない）。フィード画像投稿とリール投稿の違いは手順内の分岐（<code>posts.media_type</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）に閉じ、投稿対象の決定・状態遷移・失敗方針は共通。ストーリーズ再掲（<code>batch_sets.stories_enabled</code> のセットのみ。V004・15-10）もこの単位の内側で「リール成功後の追加投稿行（<code>media_type='story'</code>）」として扱い、投稿対象の決定は変えない（3.3 手順 2 の 7）。</p>
 
-<h3 id="sns-target">3.1 投稿対象の決定</h3>
+<h3 id="sns-target">3.1 投稿対象の決定（当回固定。Phase 26-1 で改訂）</h3>
+<p>投稿バッチは<strong>当回 = 自分を起動した予定時刻の生成実行だけ</strong>を扱う。セット × 予定時刻（<code>SCHEDULED_AT</code>）で生成実行を特定し、<strong>過去分・別の回へは戻らない</strong>。生成に失敗した回・当回を投稿できなかった回は欠番を許容する（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a> の初期方針）。</p>
+<div class="warn">
+  <span class="callout-title">移行中（2026-10-13 時点）</span>
+  本節は 26-1 で確定した契約。実装は 26-2、本番切替は 26-3（<a href="../plans/development-plan.html#phase-26">開発計画 Phase 26</a>）で、<strong>切替までは本番は旧契約（<code>set_code</code> のみを受け取り、actionable な生成実行のうち最古の 1 件を選ぶ）で稼働している</strong>。旧契約の全文は git の履歴（26-1 より前の本書）を参照。
+</div>
 <ol>
-  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（画像生成バッチと同じ扱い）</li>
-  <li>投稿対象を決定する: <strong>「投稿試行が一度もない生成実行」のうち最も古い 1 件</strong>を対象とする
-    <ul>
-      <li>投稿済みかどうかは、生成実行に紐づく投稿レコード（<code>posts</code>）の有無から<strong>アカウントごとに導出</strong>する（生成実行テーブル自体に投稿済みフラグは持たない。将来の複数アカウントでアカウントごとに状態が異なるため）</li>
-      <li>一度でも試行（失敗含む）した生成実行は自動では再対象にしない = <strong>再試行なし・欠番許容</strong>（初期実装の方針）</li>
-      <li><code>SCHEDULED_AT</code> に依存しないため、インフラの連携契約（SNS 投稿 Step Functions への入力は <code>set_code</code> のみ）を変更せずに済み、手動での単独実行も同じロジックで動く</li>
-    </ul>
-  </li>
+  <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（画像生成バッチと同じ扱い。<code>is_active=0</code> のセットで何もせず正常終了する現行動作は変えない）</li>
+  <li><strong>入力契約</strong>: <code>SCHEDULED_AT</code> は<strong>必須</strong>。UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code> だけを受け付け、実在しない日時（2 月 30 日等）も拒否する。欠落・空・不正形式は<strong>DB 接続・外部 API 呼び出しの前に</strong>異常終了する。<strong>現在時刻の代入・最新の生成実行の検索・最古の生成実行へのフォールバックは行わず、旧選定へ戻す互換モードも設けない</strong>。値は画像生成バッチと同じ正規化（<a href="data-model.html#time">data-model.html セクション 6</a>）で <code>DATETIME</code> にして比較する</li>
+  <li><strong>当回の生成実行を段階ごとに判定する</strong>: ① 指定 run の取得（<code>set_id</code> × <code>scheduled_at</code> の完全一致）→ ② 素材（<code>generated_media</code>）の有無 → ③ 有効アカウントごとの投稿状態。単一の検索の「該当なし」だけで結論を出さず、<strong>どの段階で止まったかを結果型（理由）で返す</strong>（実装形は結果型で確定。SQL は <a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）</li>
+  <li>投稿処理（3.3）に入るのは結果が「選定」のときだけ。素材の存在は<strong>キャプション組み立て（3.3 手順 2 の 3）より前に</strong>確定している（素材 0 件の実行がキャプション生成・素材取得で例外になり後続を塞いだ I-014 の経路を断つ）</li>
 </ol>
 
-<div class="note">
-  <span class="callout-title">Phase 9-3 での厳密化: 「投稿試行が一度もない」の DB クエリ定義</span>
-  上記の判定条件は、Step Functions Retry によるタスク再起動時に同じ生成実行を再選択して 3.2 の復旧ロジックへつなげる必要があるため、
-  「<code>posts</code> 行が 1 つもない」ではなく「<strong>有効なアカウントのうち少なくとも 1 つが終端状態（<code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）に達していない</strong>」を正確な条件とする。
-  SQL・インデックス設計は <a href="data-model.html#target-selection">data-model.html セクション 4.4</a> を参照。
+<div class="table-wrap">
+<table>
+  <thead><tr><th>結果（理由）</th><th>条件</th><th>動作</th><th>終了コード</th></tr></thead>
+  <tbody>
+    <tr><td><code>INVALID_INPUT</code></td><td><code>SCHEDULED_AT</code> の欠落・空・不正形式・実在しない日時</td><td>子 SFN の入口（<a href="../infra/workflow.html#sns-asl">infra/workflow.html セクション 4</a>）で欠落を拒否。形式・実在の検査はアプリの設定読み込みで行い、DB に接続せず ERROR ログで終了</td><td>1</td></tr>
+    <tr><td><code>RUN_NOT_FOUND</code></td><td>① で当回の <code>generation_runs</code> がない</td><td>過去・別の回を探さず、<code>set_code</code>・<code>scheduled_at</code>・理由を ERROR ログに出して終了</td><td>1</td></tr>
+    <tr><td><code>NO_MEDIA</code></td><td>② で当回の run に <code>generated_media</code> が 0 件（空の生成実行）</td><td>同上（posts を作らず、他の run に移らない）</td><td>1</td></tr>
+    <tr><td><code>ALREADY_TERMINAL</code></td><td>③ で有効アカウントすべてが終端状態（<code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）</td><td>再投稿しない。投稿 0 件を INFO ログに出して正常終了（二重投稿防止の既存規約）</td><td>0</td></tr>
+    <tr><td><code>SELECTED</code></td><td>① run あり・② 素材あり・③ 非終端のアカウントが 1 つ以上</td><td>3.2 / 3.3 へ進む。<code>pending</code> / <code>container_created</code> は同じ run の復旧（3.2）。処理するのは非終端のアカウントだけ</td><td>3.4 に従う</td></tr>
+  </tbody>
+</table>
 </div>
 
 <div class="decision">
-  <span class="callout-title">決定: 未試行の生成実行が複数残っている場合の処理件数</span>
-  1 回の実行では<strong>常に最古の 1 件のみ</strong>処理し、<code>BATCH_SIZE_LIMIT</code> のような処理件数の上限設定は設けない。
-  通常運用では直前の画像生成バッチの当回分がそのまま対象になるため 1 件で足り、SNS 投稿が連続して失敗しバックログが積み上がった場合も、
-  「1 回の欠番は致命的でない」という初期方針（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）のもと、複数件をまとめて追いつかせる複雑な制御はあえて持たない。
-  未処理のまま残った古い生成実行は、将来のセット別失敗時ポリシー（<a href="#future-failure-policy">追いつくモード</a>）導入時に扱う。
+  <span class="callout-title">決定（2026-10-13、Phase 26-1）: 最古選定を廃止し、当回固定にする</span>
+  旧方式（actionable な生成実行のうち <code>scheduled_at</code> 最古の 1 件）は素材の有無を見ないため、生成途中で失敗した空の生成実行が選ばれ続け、後続の正常な回まで投稿できなくなった（<a href="../issues/index.html#I-014">I-014</a>。logic-training-1 の run 44・run 165 の事象）。素材の EXISTS だけを足す案は空の run を外せるが、素材のある未投稿の朝の run が夜に持ち越される（朝夜ずれ = <a href="../issues/index.html#I-017">I-017</a> の一部）のを防げないため採らない。生成実行 ID を投稿側に渡す案は ECS の結果から業務 ID を返す経路の新設が要り、既存の <code>UNIQUE (set_id, scheduled_at)</code> で同じ実行を特定できるため採らない。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong><code>RUN_NOT_FOUND</code> / <code>NO_MEDIA</code> を異常終了にする理由</strong>: 親の画像生成 SFN は生成成功時だけ子を起動するため、子から見て当回の run・素材がないのは契約上の不整合。「投稿済み」の 0 件成功とまとめると気づけない。終了コード 1 で Step Functions の Retry（最大 2 回）が働くが、同じ予定時刻で同じ判定を繰り返すだけで副作用はなく、Retry を使い切ると <code>ExecutionsFailed</code> で通知される（1 回目の ECS タスク異常終了通知も出る。<a href="#failure-policy">3.4</a>）</li>
+    <li><strong>失敗と再実行の区別</strong>: 生成が失敗 = 子は起動されず当回は欠番 / 当回の <code>pending</code>・<code>container_created</code> = 同じ予定時刻の Retry で同じ run を復旧 / 過去分の滞留 = 自動では選ばない（削除・架空の <code>failed</code> 登録・在庫の <code>last_used_at</code> の巻き戻しは行わず、補正は <a href="operation.html#failure-correction">operation.html セクション 4.2・4.3</a> の人間ゲート）/ 手動起動 = 対象 run の実際の <code>scheduled_at</code> を明示する（<a href="operation.html#failure-check">operation.html セクション 4.1</a>。現在時刻を便宜的に入れない）</li>
+    <li><strong>適用範囲</strong>: ASL・アプリは全セット共通のため、稼働中の 3 セット（logic-training-1 の朝・夜、pref-ranking-1 の 1 日 1 回、umigame-soup-1 の週 4 回）すべてに同時に適用する。1 日 1 回・週次のセットでも「当回だけを見る」動きは同じで、変わるのは過去の未投稿分を拾わなくなる点だけ。停止中の fantasy-animals-1 は <code>is_active=0</code> で選定前に終わる。前回の真相ブロック（<a href="#prev-truth-block">3.4 の decision</a>）は投稿成功の履歴から前回を選ぶため影響を受けない。ストーリーズ再掲・問題スナップショットの規約も変えない</li>
+  </ul>
+</div>
+
+<div class="decision" id="deadline-guard">
+  <span class="callout-title">設計判断（2026-10-13、Phase 26-1）: 期限ガード（大幅に遅延した旧実行の投稿を止める仕組み）は導入しない</span>
+  当回固定は「後続の回が過去分を拾う」ことを防ぐが、<strong>朝の実行そのものが夜まで遅延した場合</strong>や<strong>夜に朝の予定時刻を指定して手動実行した場合</strong>は、完全一致だけでは朝の素材が夜に出る。これを実時刻で止める期限ガード（<code>scheduled_at</code> から一定時間を過ぎたら投稿しない）は、次の理由で<strong>導入しない</strong>（26-2 の対象に <code>app/clock.py</code>・期限値の受け渡しは追加しない）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>自動経路の最大遅延が回の間隔より短い</strong>: Scheduler の再送上限 3600 秒（<code>MaximumEventAgeInSeconds</code>）+ 親の <code>WaitForDbReady</code> 900 秒 + <code>RunImageBatchTask</code> 3600 秒 × 3 回（Retry 2 回）+ 子の <code>WaitForDbReady</code> 900 秒 + <code>RunSnsPostBatchTask</code> 3600 秒 × 3 回 ≒ <strong>最大約 8.6 時間</strong>（すべてのタイムアウト・Retry を使い切る最悪値。<a href="../infra/workflow.html">infra/workflow.html セクション 1.2・1.4・6</a>）。現行の最短間隔は logic-training-1 の夜 21:00 → 朝 7:30 の 10.5 時間（朝 → 夜は 13.5 時間）、pref-ranking-1・umigame-soup-1 は 1 日以上で、自動経路では次の回の時刻に届かない</li>
+    <li><strong>手動実行は人間ゲート</strong>: 予定時刻を指定した手動起動は、運用者が対象 run の時間帯と素材の焼き込み表示（朝 / 夜のラベル）を確認してから行う手順にする（<a href="operation.html#failure-check">operation.html セクション 4.1</a>）。過去の回を意図的に出す復旧（例: 週 4 回の umigame-soup-1 の欠番を翌日に出す）を期限ガードで一律に止めると、正当な手動復旧の例外設計が要り複雑になる</li>
+    <li><strong>例外</strong>: 期限ガードを置かないため例外の規定はない。手動実行の可否は上記の確認で人間が判断する</li>
+    <li><strong>再判断の条件</strong>: 同一セットの回の間隔が自動経路の最大遅延（約 8.6 時間）を下回る構成を有効化するとき（例: logic-training-1 の昼スロット 12:30 の再開 = 朝 7:30 から 5 時間）、Task タイムアウト・Retry 回数を延ばすとき、または遅延した実行が次の回の時刻を越えて投稿した事象が 1 回でも起きたとき。その時点で許容遅延・判定のタイミング（選定時 / パブリッシュ直前）・手動復旧の例外を設計する</li>
+  </ul>
+</div>
+
+<div class="note">
+  <span class="callout-title">Phase 9-3 での厳密化（26-1 で当回に限定）: 「未完了」の判定</span>
+  ③ の判定は、Step Functions Retry によるタスク再起動時に同じ生成実行を再選択して 3.2 の復旧ロジックへつなげる必要があるため、
+  「<code>posts</code> 行が 1 つもない」ではなく「<strong>有効なアカウントのうち少なくとも 1 つが終端状態（<code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）に達していない</strong>」を条件とする（Phase 9-3 の定義を維持し、対象を当回の 1 件に限定した）。
+  一度でも試行して有効な全アカウントが終端状態に達した生成実行は、自動では再対象にしない = <strong>再試行なし・欠番許容</strong>。
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定: 1 回の実行で扱う生成実行は 1 件（26-1 で「最古の 1 件」から「当回の 1 件」へ）</span>
+  1 回の実行では<strong>当回の生成実行 1 件だけ</strong>を処理し、<code>BATCH_SIZE_LIMIT</code> のような処理件数の上限設定は設けない。
+  過去に投稿できなかった生成実行を複数まとめて追いつかせる制御は持たない（「1 回の欠番は致命的でない」初期方針）。過去分を扱う場合は人間が対象 run の予定時刻を指定して手動起動するか、将来のセット別失敗時ポリシー（<a href="#future-failure-policy">追いつくモード</a>）として別経路で設計する。
+  （履歴: 26-1 より前は「未試行の生成実行が複数残っている場合も最古の 1 件のみ処理し、残りは後続の実行が順に消化する」決定だった。）
 </div>
 
 <h3 id="posts-state">3.2 posts の状態遷移（冪等性・二重投稿防止）</h3>
@@ -305,7 +339,7 @@
   <li><strong>失敗の定義</strong>: 対象の生成実行に対し、有効な投稿先アカウントのうち<strong>1 つでも <code>success</code> にならなかった</strong>場合（<code>failed</code> または <code>published_unconfirmed</code> で終わったアカウントが 1 つでもある場合）を失敗とする。<strong>ストーリーズを有効化したセット（<code>stories_enabled=1</code>）では、リール行とストーリーズ行の両方が <code>success</code> であることを当該アカウントの成功条件とする</strong>（ストーリーズ失敗もリール行の <code>success</code> は保持したまま失敗として扱う。15-10）</li>
   <li><strong>終了コード</strong>: 全アカウントが成功条件を満たすなら 0。1 つでも満たさないなら 1</li>
   <li>終了コード 1 により Step Functions の既存 Retry（最大 2 回）が働くが、3.2 の状態遷移によって <code>success</code> / 終端状態のアカウントはスキップされるため、Retry によって無駄な API 呼び出しが増えることはない。Retry を使い切ってもなお非 <code>success</code> が残る場合は Catch → Fail 状態に遷移し、既存の CloudWatch Alarm（<code>ExecutionsFailed</code>）で通知される</li>
-  <li><strong>検知経路の正確化（2026-07-29、Phase 15-10 で確認）</strong>: 投稿が終端状態（<code>failed</code> / <code>published_unconfirmed</code>）で確定した失敗は、Retry の再実行時に投稿対象の決定（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）から外れて再実行が成功終了するため、<strong><code>ExecutionsFailed</code> アラームには現れない</strong>。この場合の検知は 1 回目の終了コード 1 を捕捉する <strong>ECS タスク異常終了通知（EventBridge Rule。<a href="../infra/workflow.html">infra/workflow.html セクション 9</a>）</strong>が担う。<code>ExecutionsFailed</code> が発報するのは、非終端状態のまま失敗が続く場合（stale・インフラ障害・タスク起動失敗等）である。ストーリーズ失敗の検知（3.3 の decision）もこの ECS タスク異常終了通知の経路に乗る</li>
+  <li><strong>検知経路の正確化（2026-07-29、Phase 15-10 で確認）</strong>: 投稿が終端状態（<code>failed</code> / <code>published_unconfirmed</code>）で確定した失敗は、Retry の再実行時に投稿対象の決定（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）で <code>ALREADY_TERMINAL</code> となり再実行が成功終了するため、<strong><code>ExecutionsFailed</code> アラームには現れない</strong>。この場合の検知は 1 回目の終了コード 1 を捕捉する <strong>ECS タスク異常終了通知（EventBridge Rule。<a href="../infra/workflow.html">infra/workflow.html セクション 9</a>）</strong>が担う。<code>ExecutionsFailed</code> が発報するのは、非終端状態のまま失敗が続く場合（stale・インフラ障害・タスク起動失敗等）である。ストーリーズ失敗の検知（3.3 の decision）もこの ECS タスク異常終了通知の経路に乗る</li>
   <li><strong>通知粒度</strong>: 初期スコープでは個別アカウント・個別失敗理由ごとのカスタムメトリクスは持たない。既存の Step Functions 失敗アラーム 1 本のみで通知し、詳細な原因（どのアカウント・どの段階で失敗したか）は CloudWatch Logs と <code>posts</code> テーブル（<code>status</code> / <code>api_response</code>）で確認する運用とする（確認手順は <a href="operation.html#failure-check">アプリ運用設計 セクション 4.1</a>）</li>
   <li><code>published_unconfirmed</code> も「対応が必要な状態」として終了コード 1 の対象に含める（<code>success</code> と明確に区別し、運用者に手動確認を促すため）</li>
 </ul>
@@ -328,9 +362,29 @@
 
 <div class="note" id="future-failure-policy">
   <span class="callout-title">将来のセット別失敗時ポリシー（追いつく / 捨てる）</span>
-  投稿対象の決定（3.1）の検索条件を切り替えることで、セット別の失敗時ポリシーを実現する想定:
+  投稿対象の決定（3.1）とは別の経路として、セット別の失敗時ポリシーを実現する想定（26-1 で 3.1 を当回固定にしたため、過去分を対象にするモードは当回固定の契約を崩さず「人間または設定で明示した範囲の過去分」を選ぶ別経路として設計する）:
   <strong>追いつくモード</strong> = 失敗した生成実行も再対象に含める / <strong>捨てるモード</strong> = 一定より古い未試行分を対象外にする。
   詳細は Phase 9 以降（処理単位を「生成実行」とした経緯は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。
+</div>
+
+<h3 id="sns-acceptance">3.5 当回固定の受け入れケース（26-2 の必須検証。26-1 で確定）</h3>
+<p>26-2 の実装は以下をすべて満たすこと。DB を使うケースは <code>services/sns-post-batch/tests/test_e2e_local_mysql.py</code> で<strong>ローカル MySQL に対して実行し、skipped 0 件</strong>で通す（実行できない DB テストを skip 合格にしない）。外部投稿 API はテスト用の偽物を使い、「API 呼び出し 0 件」は偽物の呼び出し記録で確かめる。予定時刻の例は logic-training-1 の朝 7:30 JST = <code>前日 22:30:00Z</code>、夜 21:00 JST = <code>12:00:00Z</code>。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>#</th><th>前提（DB の状態・入力）</th><th>期待する結果</th><th>検証</th></tr></thead>
+  <tbody>
+    <tr><td>AC-1</td><td>朝の run が素材 0 件（空）で残っている。夜の run は素材あり。夜の <code>SCHEDULED_AT</code> で実行し、続けて翌朝の run（素材あり）を作って翌朝の <code>SCHEDULED_AT</code> で実行</td><td>1 回目は夜の run だけを選び投稿。2 回目は翌朝の run だけを選ぶ。朝の空 run は一度も選ばれない</td><td>e2e</td></tr>
+    <tr><td>AC-2</td><td>朝の run が素材あり・posts なし / <code>pending</code> / <code>container_created</code> の 3 通り（各ケース別に用意）。夜の <code>SCHEDULED_AT</code> で実行</td><td>夜の run だけを選ぶ。朝の run・その posts 行・在庫（ストックの <code>last_used_at</code> 等）を書き換えない</td><td>e2e</td></tr>
+    <tr><td>AC-3</td><td>当回の run が存在しない（過去には素材ありの未投稿 run がある）</td><td><code>RUN_NOT_FOUND</code>・終了コード 1。過去の run を選ばず、posts の追加 0 行・API 呼び出し 0 件</td><td>e2e</td></tr>
+    <tr><td>AC-4</td><td>当回の run が素材 0 件（過去には素材ありの未投稿 run がある）</td><td><code>NO_MEDIA</code>・終了コード 1。AC-3 と同じく他の run へ移らない</td><td>e2e</td></tr>
+    <tr><td>AC-5</td><td>同じ予定時刻の別セットの run、前日の同じ朝スロットの run、当回より新しい run がある</td><td>いずれも選ばない（当回の run だけを選ぶ。当回がなければ AC-3）</td><td>e2e</td></tr>
+    <tr><td>AC-6</td><td>当回の run が <code>success</code> / <code>failed</code> / <code>published_unconfirmed</code> で終端（各ケース別）。複数アカウントのセットでは一部のアカウントだけ終端</td><td>全アカウント終端なら <code>ALREADY_TERMINAL</code>・終了コード 0・API 0 件。一部だけ終端なら当回の未完了アカウントだけを処理。ストーリーズ行の既存規約（3.3 手順 2 の 7）を維持</td><td>e2e</td></tr>
+    <tr><td>AC-7</td><td>当回の run が <code>pending</code> / <code>container_created</code> の状態で、同じ <code>SCHEDULED_AT</code> で再実行（SFN Retry 相当）。間に別の予定時刻の新しい run を作っておく</td><td>同じ run を再開する（<code>pending</code> は最初から、<code>container_created</code> はパブリッシュから。3.2）。新しい run に対象が変わらない</td><td>e2e</td></tr>
+    <tr><td>AC-8</td><td><code>SCHEDULED_AT</code> が欠落 / 空 / 不正形式（<code>2026-10-13 21:00:00</code>・<code>+09:00</code> 付き・ミリ秒付き・日付のみ）/ 実在しない日時（<code>2026-02-30T12:00:00Z</code>）</td><td><code>INVALID_INPUT</code>・終了コード 1。DB 接続 0 回・API 0 件。旧選定に戻らない</td><td>単体（config）+ e2e（main 経由）</td></tr>
+    <tr><td>AC-9</td><td>親 ASL の <code>StartSnsPostBatch.Input</code> → 子 ASL の入口検査 → <code>RunSnsPostBatchTask</code> の環境変数</td><td><code>scheduled_at</code> が同じ値のまま渡る。子の Retry でも同じ値。子の入口は <code>scheduled_at</code> 欠落・非文字列の入力を ECS 起動前に拒否する。朝（JST と UTC で日付が異なる <code>前日 22:30:00Z</code>）のケースで DB の <code>generation_runs.scheduled_at</code> と一致する</td><td>infra/test（ASL をパース）+ e2e</td></tr>
+    <tr><td>AC-10</td><td>既存の正常系（リール・ストーリーズ再掲・1 日 1 回のセット・前回の真相ブロック・問題スナップショット・選定後の不整合〔プレースホルダの展開元なし等〕の失敗検知）</td><td>既存テストが <code>SCHEDULED_AT</code> を設定した形で全通過する（fixture の予定時刻を全 main 呼び出しに設定）</td><td>既存 pytest</td></tr>
+  </tbody>
+</table>
 </div>
 
 <h2 id="flow-insights">4. インサイト収集バッチ処理フロー（Phase 16-7 設計 Fix）</h2>
@@ -413,9 +467,9 @@
 <p>環境変数の受け渡し契約（キー名）は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 5、業務上の意味付けの定義は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a> で確定済み。本書のフローでの使い方は以下のとおり。</p>
 <ul>
   <li><code>SET_CODE</code> — 全バッチが受け取り、<code>batch_sets</code> の解決に使用する（各フローの手順 1）</li>
-  <li><code>SCHEDULED_AT</code> — 画像生成バッチとインサイト収集バッチが受け取り、冪等性キーに使用する（セクション 2 の手順 2・セクション 4.3）。SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</li>
+  <li><code>SCHEDULED_AT</code> — 全バッチ（画像生成・SNS 投稿・インサイト収集）が受け取る。画像生成バッチとインサイト収集バッチは冪等性キーに使用する（セクション 2 の手順 2・セクション 4.3）。SNS 投稿バッチは必須入力として受け取り、当回の生成実行の特定に使用する（3.1。26-1 で追加。UTC 秒精度 <code>YYYY-MM-DDTHH:MM:SSZ</code>・現在時刻の代入や最古へのフォールバックなし）</li>
   <li><code>MEDIA_LOOKBACK_DAYS</code> — インサイト収集バッチのみが受け取る収集ウィンドウ日数（既定 14。セクション 4.1。手動実行時のバックフィルで大きな値を渡す）</li>
-  <li><strong><code>BATCH_SIZE_LIMIT</code> 等のバッチ件数制御用環境変数は追加しない</strong>（確定）。SNS 投稿バッチは常に生成実行 1 件のみを処理する方針（3.1）のため件数上限の概念が不要であり、画像生成バッチも有効プロンプト 1 件・1 枚生成の初期スコープでは総量制御が不要と判断した。将来、生成実行のバックログが恒常的に蓄積する場合や画像生成 API のクォータ制約が顕在化した場合に導入を再検討する</li>
+  <li><strong><code>BATCH_SIZE_LIMIT</code> 等のバッチ件数制御用環境変数は追加しない</strong>（確定）。SNS 投稿バッチは常に当回の生成実行 1 件のみを処理する方針（3.1）のため件数上限の概念が不要であり、画像生成バッチも有効プロンプト 1 件・1 枚生成の初期スコープでは総量制御が不要と判断した。将来、生成実行のバックログが恒常的に蓄積する場合や画像生成 API のクォータ制約が顕在化した場合に導入を再検討する</li>
 </ul>
 
 <p>参考資料: <a href="../_archive/batch.md">_archive/batch.md</a>（冪等性・再試行・投稿ステータス管理の旧設計。<code>post_records</code> の attempt 方式や <code>BATCH_SIZE_LIMIT</code> によるバックログ処理は、自動再試行なし・生成実行単位への簡素化に伴い初期スコープでは採用しない。現役の設計書ではない）</p>

@@ -364,14 +364,19 @@
 </ul>
 
 <div class="decision" id="target-selection">
-  <span class="callout-title">決定: SNS 投稿バッチの投稿対象決定クエリの正確な定義</span>
-  <p><a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a> の「投稿試行が一度もない生成実行」は、データモデルとしては以下のとおり厳密化する。
-  ある <code>generation_run</code> が投稿対象の候補（<strong>actionable</strong>）となるのは、
-  <strong>有効な（<code>is_active=1</code>）投稿先アカウントのうち少なくとも 1 つについて、<code>posts</code> 行が存在しないか、終端状態（<code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）に達していない</strong>場合である。
-  対象は actionable な <code>generation_run</code> のうち <code>scheduled_at</code> が最も古い 1 件。</p>
+  <span class="callout-title">決定: SNS 投稿バッチの投稿対象決定クエリの正確な定義（Phase 26-1〔2026-10-13〕で当回固定へ改訂）</span>
+  <p><a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a> の当回固定は、データモデルとしては以下のとおり定義する。
+  当回の <code>generation_run</code> が投稿対象（<code>SELECTED</code>）となるのは、
+  <strong>① <code>set_id</code> × <code>scheduled_at</code>（入力の <code>SCHEDULED_AT</code>）が完全一致し、② <code>generated_media</code> が 1 件以上あり、③ 有効な（<code>is_active=1</code>）投稿先アカウントのうち少なくとも 1 つについて <code>posts</code> 行が存在しないか終端状態（<code>success</code> / <code>failed</code> / <code>published_unconfirmed</code>）に達していない</strong>場合である。
+  <strong>最古順（<code>ORDER BY gr.scheduled_at ASC</code>）の選定は廃止した</strong>。成立条件を 1 文にすると次のとおり（手動確認でもこの形を使う）。</p>
   <pre><code>SELECT gr.id
 FROM generation_runs gr
 WHERE gr.set_id = :set_id
+  AND gr.scheduled_at = :scheduled_at
+  AND EXISTS (
+    SELECT 1 FROM generated_media gm
+    WHERE gm.generation_run_id = gr.id
+  )
   AND EXISTS (
     SELECT 1 FROM sns_accounts sa
     WHERE sa.set_id = gr.set_id AND sa.is_active = 1
@@ -381,13 +386,13 @@ WHERE gr.set_id = :set_id
           AND p.sns_account_id = sa.id
           AND p.status IN ('success','failed','published_unconfirmed')
       )
-  )
-ORDER BY gr.scheduled_at ASC, gr.id ASC
-LIMIT 1;</code></pre>
-  <p>この定義により: (1) 新規の <code>generation_run</code>（<code>posts</code> なし）は当然対象になる (2) Step Functions Retry による同一実行内のタスク再起動時も<strong>同じ生成実行が再選択</strong>され、<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2 の復旧ロジック</a>（<code>pending</code> / <code>container_created</code> からの再開）が機能する (3) 異常終了（Step Functions のリトライ上限到達等）で <code>pending</code> / <code>container_created</code> のまま残った <code>generation_run</code> は、後続の別実行でも自動的に再選択され続ける（stale データとして後続投稿をブロックし得る問題の検知・補正手順は <a href="operation.html#stale-data">operation.html セクション 4.3</a> で確定した）。
-  「一度でも試行（失敗含む）した生成実行は自動では再対象にしない」（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>）は、「有効な全アカウントが終端状態に達した」場合を指すと解釈する。</p>
-  <p>インデックスは <code>generation_runs.uq_generation_runs_set_id (set_id, id)</code>（<code>scheduled_at</code> 順スキャン）と <code>posts.uq_posts_generation_run_account_media (generation_run_id, sns_account_id, media_type)</code>（<code>NOT EXISTS</code> 部分検索。V004 拡張後も左端プレフィックスで使用できる）の左端プレフィックスで十分であり、追加インデックスは設けない。</p>
-  <p><strong>ストーリーズ行（<code>media_type='story'</code>。V004）は本クエリの判定に影響しない</strong>: ストーリーズ行はリール行が <code>success</code> に達した後にのみ作成される（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）ため、「終端状態の <code>posts</code> が存在するか」の判定は常に先行するリール（またはフィード画像）行で決まり、クエリ自体は V004 後も変更しない。この不変条件により、ストーリーズが未投稿・失敗のまま残っても後続の生成実行の投稿はブロックされない（リールの success を巻き戻さない 15-9 決定と整合）。</p>
+  );</code></pre>
+  <p><strong>アプリは上の 1 文をそのまま使わず、①〜③ を段階に分けて判定し理由を返す</strong>（0 行の理由が「当回の run がない（<code>RUN_NOT_FOUND</code>）」「素材がない（<code>NO_MEDIA</code>）」「全アカウント終端済み（<code>ALREADY_TERMINAL</code>）」のどれかを区別するため。前 2 つは異常終了、最後は 0 件の正常終了。結果の分類は batch-flow 3.1 の表）。① は <code>UNIQUE (set_id, scheduled_at)</code> により高々 1 行なので <code>LIMIT</code> は不要。</p>
+  <p>この定義により: (1) 新規の当回 <code>generation_run</code>（<code>posts</code> なし）は対象になる (2) Step Functions Retry による同一実行内のタスク再起動時も、入力の予定時刻が変わらないため<strong>同じ生成実行が再選択</strong>され、<a href="batch-flow.html#posts-state">batch-flow.html セクション 3.2 の復旧ロジック</a>（<code>pending</code> / <code>container_created</code> からの再開）が機能する (3) 異常終了で <code>pending</code> / <code>container_created</code> のまま残った過去の <code>generation_run</code> や空の <code>generation_run</code> は、<strong>後続の別の回からは選ばれず、後続投稿をブロックしない</strong>（記録の確定は <a href="operation.html#stale-data">operation.html セクション 4.3</a> の人間の補正）。
+  「一度でも試行（失敗含む）した生成実行は自動では再対象にしない」は、当回の「有効な全アカウントが終端状態に達した」場合を指す。</p>
+  <p>インデックスは ① が <code>generation_runs.uq_generation_runs_idempotency (set_id, scheduled_at)</code>、② が <code>generated_media</code> の冪等性キー（<code>generation_run_id</code> が左端）、③ が <code>posts.uq_posts_generation_run_account_media (generation_run_id, sns_account_id, media_type)</code> の左端プレフィックスで足り、追加インデックス・DDL の変更は不要。</p>
+  <p><strong>ストーリーズ行（<code>media_type='story'</code>。V004）は本クエリの判定に影響しない</strong>: ストーリーズ行はリール行が <code>success</code> に達した後にのみ作成される（<a href="batch-flow.html#sns-steps">batch-flow.html セクション 3.3</a>）ため、「終端状態の <code>posts</code> が存在するか」の判定は常に先行するリール（またはフィード画像）行で決まる。ストーリーズが未投稿・失敗のまま残っても、その回が再選択されることはない（リールの success を巻き戻さない 15-9 決定と整合）。</p>
+  <p style="margin:0;">（履歴: Phase 9-3〜26-1 の旧定義は「① の予定時刻条件と ② の素材条件を持たず、③ を満たす（actionable な）<code>generation_run</code> のうち <code>scheduled_at</code> が最も古い 1 件」。素材 0 件の run が選ばれ続けて後続を塞いだため（<a href="../issues/index.html#I-014">I-014</a>）廃止した。本番は 26-3 の切替まで旧定義で稼働。）</p>
 </div>
 
 <h3 id="detail-generated-images">4.5 generated_media（旧 generated_images）</h3>

@@ -130,7 +130,7 @@
   将来のセット別失敗時ポリシー（追いつく / 捨てる）は投稿対象の検索条件の切り替えで実現する想定（<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3</a>）。
 </div>
 
-<p>この不変条件のもとでの処理手順の骨子（画像生成: セット解決 → 生成実行の作成 = 冪等性のアンカー → 生成・S3 保存・DB 登録 / SNS 投稿: 最古の未試行生成実行を対象にアカウントごとに投稿）は、分冊 <a href="batch-flow.html">バッチ処理フロー設計</a> に定める。</p>
+<p>この不変条件のもとでの処理手順の骨子（画像生成: セット解決 → 生成実行の作成 = 冪等性のアンカー → 生成・S3 保存・DB 登録 / SNS 投稿: 当回の生成実行〔セット × <code>SCHEDULED_AT</code> で特定。26-1 で最古選定から変更〕を対象にアカウントごとに投稿）は、分冊 <a href="batch-flow.html">バッチ処理フロー設計</a> に定める。</p>
 
 <h2 id="data-model">3. データモデル概要</h2>
 
@@ -164,7 +164,7 @@ Instagram トークンの手動更新、効果測定（インサイト収集バ�
     </tr>
     <tr>
       <td><code>SCHEDULED_AT</code></td>
-      <td>スケジュール実行時刻（UTC、Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> 由来）。<strong>生成実行（<code>generation_runs</code>）の冪等性キー</strong>（セット × <code>SCHEDULED_AT</code> で一意）であり、1 日複数回実行は DATETIME 粒度で区別される。インサイト収集バッチ（16-7 追加）も受け取り、<code>post_insights</code> の冪等性キーに使用する。<strong>SNS 投稿バッチは受け取らず、投稿対象の決定にも使用しない</strong>（<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3</a> の検索方式のため。現行の連携契約の変更は不要）</td>
+      <td>スケジュール実行時刻（UTC、Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> 由来）。<strong>生成実行（<code>generation_runs</code>）の冪等性キー</strong>（セット × <code>SCHEDULED_AT</code> で一意）であり、1 日複数回実行は DATETIME 粒度で区別される。インサイト収集バッチ（16-7 追加）も受け取り、<code>post_insights</code> の冪等性キーに使用する。<strong>SNS 投稿バッチも必須で受け取り、投稿対象の生成実行をセット × <code>SCHEDULED_AT</code> の完全一致で特定する</strong>（Phase 26-1〔2026-10-13〕で変更。形式は UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code> に固定し、欠落・不正時に現在時刻を代入したり最古の生成実行へフォールバックしたりしない。親 → 子 SFN の受け渡しは <a href="../infra/workflow.html#sns-asl">infra/workflow.html セクション 3・4</a>、選定と結果の分類は <a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>。実装は 26-2・本番切替は 26-3 で、切替までは旧契約〔<code>set_code</code> のみ〕で稼働）</td>
     </tr>
     <tr>
       <td>SNS Secret 規約の構成要素</td>
@@ -172,7 +172,7 @@ Instagram トークンの手動更新、効果測定（インサイト収集バ�
     </tr>
     <tr>
       <td>アプリ用環境変数（<code>BATCH_SIZE_LIMIT</code> 等）</td>
-      <td><strong>件数の総量制御用は追加しない（Phase 9 で確定）</strong>。投稿対象が「最古の未試行生成実行 1 件」のため旧設計のような総量制御は不要（<a href="batch-flow.html#contract-usage">batch-flow.html セクション 5</a>）。16-7 でインサイト収集バッチの収集ウィンドウ <code>MEDIA_LOOKBACK_DAYS</code> を追加した（総量制御ではなく対象期間の指定。<a href="batch-flow.html#insights-schedule">batch-flow.html セクション 4.1</a>）</td>
+      <td><strong>件数の総量制御用は追加しない（Phase 9 で確定）</strong>。投稿対象が「当回の生成実行 1 件」のため旧設計のような総量制御は不要（<a href="batch-flow.html#contract-usage">batch-flow.html セクション 5</a>）。16-7 でインサイト収集バッチの収集ウィンドウ <code>MEDIA_LOOKBACK_DAYS</code> を追加した（総量制御ではなく対象期間の指定。<a href="batch-flow.html#insights-schedule">batch-flow.html セクション 4.1</a>）</td>
     </tr>
   </tbody>
 </table>
@@ -186,7 +186,7 @@ Instagram トークンの手動更新、効果測定（インサイト収集バ�
 
 <div class="warn">
   <span class="callout-title">A-3 で確認したこと（インフラ設計との突き合わせ）</span>
-  本書の帰結として、SNS 投稿 Step Functions への <code>scheduled_at</code> 追加は<strong>不要</strong>（現行の連携契約のままでよい）。
+  （履歴）A-3 時点の本書の帰結は「SNS 投稿 Step Functions への <code>scheduled_at</code> 追加は不要」だった。<strong>Phase 26-1（2026-10-13）でこの帰結を改め、SNS 投稿 Step Functions にも <code>scheduled_at</code> を渡す契約に変更した</strong>（空の生成実行が後続を塞ぐ <a href="../issues/index.html#I-014">I-014</a> への対応。現行の契約はセクション 5）。
   A-3 では、インフラ設計書 6 本と本書・A-1 記録を突き合わせ、矛盾・欠落（blocker）のみ修正した。
   <strong>2026-07-06 A-3 実施済み</strong>（修正内容は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の A-3 備考を参照）。
 </div>

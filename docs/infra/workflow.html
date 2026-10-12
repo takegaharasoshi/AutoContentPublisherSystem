@@ -34,7 +34,7 @@
   <li>sns-posting-sfn: <code>WaitForDbReady</code>（DB 準備確認）→ <code>RunSnsPostBatchTask</code>（SNS 投稿バッチ）</li>
 </ol>
 <ul>
-  <li>SNS 投稿 Step Functions（sns-posting-sfn）は独立したステートマシンのため、手動での単独実行も可能。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する</li>
+  <li>SNS 投稿 Step Functions（sns-posting-sfn）は独立したステートマシンのため、手動での単独実行も可能。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する。<strong>入力は <code>set_code</code> と <code>scheduled_at</code>（対象生成実行の予定時刻・UTC 秒精度）の 2 キーが必須</strong>（26-1 で確定・26-2 で実装。手動起動でも省略不可）</li>
   <li>EventBridge Scheduler は画像生成 Step Functions のみに設定し、SNS 投稿用のスケジューラは不要</li>
   <li><strong>インサイト収集ワークフロー（16-7 追加）</strong>: insights-collection-sfn は上記チェーンから独立し、専用の Scheduler（セクション 1.6）で 1 日 2 回起動される。構成は <code>WaitForDbReady</code> → <code>RunInsightsBatchTask</code> の同型 2 ステート（ASL はセクション 11）。手動での単独実行（疎通確認・バックフィル）も運用ユースケース（<a href="../app/operation.html#insights-ops">app/operation.html セクション 6</a>）</li>
 </ul>
@@ -284,7 +284,8 @@
         "StateMachineArn": "${SnsPostingSfnArn}",
         "Name.$": "$$.Execution.Name",
         "Input": {
-          "set_code.$": "$.set_code"
+          "set_code.$": "$.set_code",
+          "scheduled_at.$": "$.scheduled_at"
         }
       },
       "Retry": [
@@ -351,6 +352,7 @@
 
 <div class="note">
   <span class="callout-title">StartSnsPostBatch のエラーハンドリング</span>
+  子の Input には <code>set_code</code> に加えて親の <code>$.scheduled_at</code>（Scheduler の予定時刻。<code>WaitForDbReady</code> / <code>RunImageBatchTask</code> は <code>ResultPath: null</code> のため上書きされない）を渡す（26-1 で追加）。Retry・<code>ExecutionAlreadyExists</code> の場合も同じ値・同じ実行名で、子が扱う回は変わらない。
   <code>ExecutionAlreadyExists</code> は子実行作成済みとして成功扱いにする。それ以外のエラーで Retry 後も起動に失敗した場合は <code>NotifySnsPostStartFailure</code> でカスタムメトリクスを発行し、<code>ImageBatchSucceeded</code> で成功終了する。画像生成 ECS タスクは既に成功しているため、SNS 投稿の起動失敗のみでワークフロー全体を失敗にはしない。
 </div>
 
@@ -358,9 +360,28 @@
 
 <p>画像生成 Step Functions から <code>startExecution</code>（非同期）で起動される。画像生成 Step Functions は SNS 投稿の完了を待たずに終了する。手動での単独起動も可能。</p>
 
+<div class="warn">
+  <span class="callout-title">26-1 で確定した入力契約（実装は 26-2・本番切替は 26-3。それまで本番は旧定義）</span>
+  入口に Choice ステート <code>CheckInput</code> を置き、<code>$.scheduled_at</code> が<strong>存在しない・文字列でない・おおよその形（<code>*-*-*T*:*:*Z</code>）に合わない</strong>入力を DB 準備確認・ECS 起動より前に <code>RejectInput</code>（Fail）で拒否する。Choice の <code>StringMatches</code> はワイルドカード <code>*</code> しか使えないため、厳密な形式（<code>YYYY-MM-DDTHH:MM:SSZ</code>）と実在日時の検査はアプリ（<a href="../app/batch-flow.html#sns-target">app/batch-flow.html セクション 3.1</a> の <code>INVALID_INPUT</code>）が DB 接続前に行う。<code>SCHEDULED_AT</code> を ECS の環境変数として渡し、Retry は同じ状態入力で再実行されるため同じ値になる。<code>RejectInput</code> は <code>Fail</code> のため <code>ExecutionsFailed</code> アラーム（セクション 8）で通知される。
+</div>
+
 <pre><code>{
-  "StartAt": "WaitForDbReady",
+  "StartAt": "CheckInput",
   "States": {
+    "CheckInput": {
+      "Type": "Choice",
+      "Choices": [
+        { "Not": { "Variable": "$.scheduled_at", "IsPresent": true }, "Next": "RejectInput" },
+        { "Not": { "Variable": "$.scheduled_at", "IsString": true }, "Next": "RejectInput" },
+        { "Variable": "$.scheduled_at", "StringMatches": "*-*-*T*:*:*Z", "Next": "WaitForDbReady" }
+      ],
+      "Default": "RejectInput"
+    },
+    "RejectInput": {
+      "Type": "Fail",
+      "Error": "SnsPostInputInvalid",
+      "Cause": "scheduled_at is missing or malformed"
+    },
     "WaitForDbReady": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
@@ -407,6 +428,7 @@
               "Name": "sns-post-batch",
               "Environment": [
                 { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "SCHEDULED_AT", "Value.$": "$.scheduled_at" },
                 { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" }
               ]
             }
@@ -470,6 +492,7 @@
     <tr><td><code>S3_BUCKET_NAME</code></td><td>画像保存元 S3 バケット名</td><td>CDK で設定</td></tr>
     <tr><td><code>ENV_NAME</code></td><td>環境識別子（現時点では <code>prod</code>）</td><td>CDK で設定</td></tr>
     <tr><td><code>SET_CODE</code></td><td>バッチセット識別コード</td><td>Step Functions 入力パラメータ</td></tr>
+    <tr><td><code>SCHEDULED_AT</code></td><td>投稿する回の予定時刻（<strong>必須</strong>。UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code>。例: 2026-10-13T12:00:00Z）。当回の生成実行の特定に使う（<a href="../app/batch-flow.html#sns-target">app/batch-flow.html セクション 3.1</a>）。欠落・不正時に現在時刻を代入しない。26-1 で追加・26-2 で実装</td><td>Step Functions 入力パラメータ（親の画像生成 SFN が Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> を引き継いで渡す。手動起動時は対象生成実行の <code>scheduled_at</code>）</td></tr>
     <tr><td><code>EXECUTION_ARN</code></td><td>Step Functions 実行 ARN（手動 RunTask 時は空）</td><td>Step Functions コンテナオーバーライド（<code>$$.Execution.Id</code>）</td></tr>
   </tbody>
 </table>

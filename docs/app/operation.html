@@ -456,7 +456,19 @@ WHERE bs.set_code = 'fashion-set-1'
 ORDER BY p.updated_at DESC
 LIMIT 20;</code></pre>
   </li>
-  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する（<a href="../infra/operation.html">infra/operation.html</a> セクション 1.2）。<strong>再実行は必ず Step Functions 経由で行い、ECS RunTask の直接実行は使わない</strong>（バッチは DB 接続リトライを持たず、Aurora 自動一時停止中の直接起動は失敗するため。<a href="batch-flow.html#premise">batch-flow.html セクション 1</a> の前提）。投稿対象の決定ロジックは自動実行と同じため、<strong>その時点で最古の actionable な生成実行</strong>（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）が処理される。一度試行して失敗した分は自動では再対象にならない（意図的に再対象にしたい場合は 4.2 を参照）</li>
+  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する（<a href="../infra/operation.html">infra/operation.html</a> セクション 1.2）。<strong>再実行は必ず Step Functions 経由で行い、ECS RunTask の直接実行は使わない</strong>（バッチは DB 接続リトライを持たず、Aurora 自動一時停止中の直接起動は失敗するため。<a href="batch-flow.html#premise">batch-flow.html セクション 1</a> の前提）。手動起動では<strong>対象生成実行の実際の <code>scheduled_at</code> を入力に明示</strong>し、その回だけが処理される（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>。26-1 で当回固定に変更。<strong>現在時刻を便宜的に入れない</strong>。入力例は infra/operation.html セクション 1.2）。一度試行して有効な全アカウントが終端状態になった分は再実行しても投稿されない（<code>ALREADY_TERMINAL</code>。意図的に再対象にしたい場合は 4.2 を参照）。起動前に次のクエリで対象 run を確認する:
+    <pre><code>-- 手動起動する回の確認（scheduled_at は UTC。JST 列で時間帯を確かめる）
+SELECT gr.id AS generation_run_id, gr.scheduled_at,
+       CONVERT_TZ(gr.scheduled_at, '+00:00', '+09:00') AS scheduled_at_jst,
+       (SELECT COUNT(*) FROM generated_media gm WHERE gm.generation_run_id = gr.id) AS media_count,
+       sa.account_code, p.media_type, p.status
+FROM generation_runs gr
+JOIN batch_sets bs ON bs.id = gr.set_id
+JOIN sns_accounts sa ON sa.set_id = gr.set_id AND sa.is_active = 1
+LEFT JOIN posts p ON p.generation_run_id = gr.id AND p.sns_account_id = sa.id
+WHERE bs.set_code = :set_code
+  AND gr.scheduled_at = :scheduled_at;</code></pre>
+    判定: ① 行が返る（返らなければ <code>RUN_NOT_FOUND</code> になる）② <code>media_count</code> が 1 以上（0 なら <code>NO_MEDIA</code>。空の生成実行は投稿できない）③ リール（またはフィード画像）行が無いか <code>pending</code> / <code>container_created</code> ④ <strong>今その回の素材を出してよいか</strong>（朝 / 夜のラベルなど時間帯が焼き込まれた素材を別の時間帯に出さない。期限ガードを置かない代わりの人間の確認 = <a href="batch-flow.html#deadline-guard">batch-flow.html 3.1 の設計判断</a>）。公開済み・未確認（<code>published_unconfirmed</code>）が無いことも併せて確かめる</li>
 </ol>
 
 <h3 id="failure-correction">4.2 手動補正手順</h3>
@@ -491,34 +503,19 @@ WHERE id = :post_id
   AND status IN ('failed', 'published_unconfirmed');</code></pre>
 
 <div class="warn">
-  <span class="callout-title">注意: 補正しても即座には処理されない場合がある</span>
-  SNS 投稿バッチは<strong>常にその時点で最古の actionable な生成実行 1 件のみ</strong>を処理する（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>）。補正対象より古い actionable な生成実行が他に残っている場合、次回実行（自動 / 手動を問わず）はそちらが先に処理される。補正対象を優先させたい場合は、以下のクエリ（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>のクエリを転用）で、補正対象の <code>generation_run_id</code> がその時点で最古の actionable であることを確認してから手動実行する。
-  <pre><code>SELECT gr.id
-FROM generation_runs gr
-WHERE gr.set_id = :set_id
-  AND EXISTS (
-    SELECT 1 FROM sns_accounts sa
-    WHERE sa.set_id = gr.set_id AND sa.is_active = 1
-      AND NOT EXISTS (
-        SELECT 1 FROM posts p
-        WHERE p.generation_run_id = gr.id
-          AND p.sns_account_id = sa.id
-          AND p.status IN ('success','failed','published_unconfirmed')
-      )
-  )
-ORDER BY gr.scheduled_at ASC, gr.id ASC
-LIMIT 1;</code></pre>
-  古い actionable な生成実行が他にもある場合は、4.3 の stale データの扱いを先に検討する。
+  <span class="callout-title">注意: 補正しただけでは再投稿されない（26-1 で変更）</span>
+  SNS 投稿バッチは<strong>自分を起動した回（当回）の生成実行だけ</strong>を処理する（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>）。後続の定時実行は、補正して <code>pending</code> に戻した過去の生成実行を拾わない。補正した回を投稿したい場合は、4.1 の確認クエリで対象 run を確かめ、<strong>その run の <code>scheduled_at</code> を指定して sns-posting-sfn を手動起動する</strong>（時間帯の確認を含む。4.1 手順 4）。
+  （履歴: 26-1 より前は「その時点で最古の actionable な生成実行 1 件」を処理する方式で、補正対象より古い未完了の run が先に処理されるため、最古の actionable を確認するクエリを使っていた。26-3 の本番切替までは旧方式で稼働。）
 </div>
 
 <h3 id="stale-data">4.3 stale データ（未完了のまま残った生成実行）の扱い</h3>
 
-<p><a href="data-model.html#target-selection">data-model.html セクション 4.4</a> で確認したとおり、<code>pending</code> / <code>container_created</code> のまま終端状態に達しない <code>posts</code> 行が残ると、その生成実行は<strong>後続の実行でも自動的に再選択され続ける</strong>。これは主に、ECS タスクの異常終了（OOM Kill・Fargate 基盤障害等）でアプリケーションが例外を捕捉して <code>failed</code> に更新する前に強制終了した場合に起こる。投稿対象決定は「最古の actionable」を選ぶ方式のため、この状態の生成実行が残り続けると<strong>同一セットの後続投稿がブロックされる</strong>点が運用上の注意点である。</p>
+<p><a href="data-model.html#target-selection">data-model.html セクション 4.4</a> で確認したとおり、<code>pending</code> / <code>container_created</code> のまま終端状態に達しない <code>posts</code> 行が残ると、その生成実行は<strong>同じ回の Retry では復旧に使われるが、26-1 の当回固定以後は後続の回からは選ばれない</strong>（26-3 の切替までは旧方式で、後続の実行でも自動的に再選択され続ける）。これは主に、ECS タスクの異常終了（OOM Kill・Fargate 基盤障害等）でアプリケーションが例外を捕捉して <code>failed</code> に更新する前に強制終了した場合に起こる。当回固定以後は後続投稿をブロックしないが、放置すると<strong>投稿の有無が不確定な記録が残り、投稿漏れに気づきにくい</strong>点が運用上の注意点である（旧方式〔最古選定〕では同一セットの後続投稿をブロックした = I-014 の事象。投稿ゼロ・stale の可視化は <a href="../issues/index.html#I-006">I-006</a>・<a href="../issues/index.html#I-025">I-025</a> で別途扱う）。</p>
 
 <div class="note">
   <span class="callout-title">決定: 自動検知の仕組みは追加しない（既存アラーム 1 本に一本化する方針を維持）</span>
   stale 専用の CloudWatch アラームやカスタムメトリクスは追加しない（<a href="batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a> の「通知は既存の Step Functions 失敗アラーム 1 本に一本化」という決定と整合させる）。運用者は既存の失敗通知を起点に、以下のクエリで stale な行の有無を確認する運用とする。
-  <pre><code>-- 各セットの actionable な (generation_run, account) を一覧表示（古い順）
+  <pre><code>-- 各セットの未完了 (generation_run, account) を一覧表示（古い順。当回固定以後は後続をブロックしないが、記録の確定のため確認する）
 SELECT bs.set_code, gr.id AS generation_run_id, gr.scheduled_at,
        sa.account_code, p.media_type, p.status, p.updated_at
 FROM generation_runs gr
@@ -533,7 +530,7 @@ ORDER BY gr.scheduled_at ASC;</code></pre>
 <ul>
   <li><strong>判定の目安</strong>: 1 日複数回実行する運用のため、<code>status</code> が <code>pending</code> / <code>container_created</code> のまま <code>updated_at</code> から半日以上経過している行は stale の疑いが強い（対応する Step Functions 実行がすでに終了しているにもかかわらず DB が更新されていない状態）。行が存在しない（<code>p.id IS NULL</code>）だけの場合は、直近の生成実行がまだ処理待ちなだけの通常状態であり stale ではない</li>
   <li><strong>ストーリーズ行（<code>media_type='story'</code>。V004）の stale は後続投稿をブロックしない</strong>: 投稿対象の決定はリール行の終端状態で決まるため（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）、ストーリーズ行が途中状態のまま残っても次の生成実行の投稿は進む。補正は同じく 4.2 の手順で終端状態（実際の投稿有無に応じて <code>success</code> / <code>failed</code>）へ更新して記録を確定させるのみでよい（<code>pending</code> へ戻す補正は効かない — 4.2 の注意を参照）</li>
-  <li><strong>対応</strong>: 対象の Step Functions 実行履歴・CloudWatch Logs で実際の投稿有無を確認し、4.2 の手順で <code>success</code>（実際は投稿済みだった場合）または <code>failed</code>（実際は未投稿だった場合）の終端状態に補正する。終端状態に補正することで、後続の投稿対象決定が次の生成実行へ進めるようになる</li>
+  <li><strong>対応</strong>: 対象の Step Functions 実行履歴・CloudWatch Logs で実際の投稿有無を確認し、4.2 の手順で <code>success</code>（実際は投稿済みだった場合）または <code>failed</code>（実際は未投稿だった場合）の終端状態に補正する。終端状態に補正して記録を確定させる（当回固定以後は後続の投稿対象決定に影響しない。旧方式ではこの補正が後続のブロック解除を兼ねていた）。その回を改めて投稿したい場合は 4.2 の注意のとおり予定時刻を指定して手動起動する</li>
   <li>将来的にセット別失敗時ポリシー（追いつく / 捨てる。<a href="batch-flow.html#future-failure-policy">batch-flow.html</a>）を導入する際は、stale データの扱いも合わせて再設計する</li>
 </ul>
 

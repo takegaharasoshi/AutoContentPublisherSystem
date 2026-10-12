@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-13（<strong>26-1 設計</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビュー待ち〔<a href="#step-26-1">26-1</a>〕）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -77,12 +77,12 @@
 
 <div class="plan-group" data-plan-group="active">
 
-<article class="plan-step" id="step-26-1" data-step-id="26-1" data-status="todo">
+<article class="plan-step" id="step-26-1" data-step-id="26-1" data-status="doing">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>26-1</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>26-1</strong><span class="plan-status">進行中（設計レビュー待ち）</span></div>
 <h3>入力契約・当回選定・切替手順の設計（設計書 6 本の更新）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。他セッションが開発レーンで動いていないこと。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>現況：</strong>2026-10-13 に設計書 6 本を当回固定の契約へ更新して push 済み（結果の分類 5 種・期限ガードは導入しない判断・受け入れケース AC-1〜10・切替チェック表 S-1〜9 と切戻し）。<strong>ユーザーの設計レビュー待ち</strong>（通過で完了 → 26-2 へ）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -114,8 +114,19 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-13 設計の更新・レビュー待ち</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-10-13（/step 26-1 のゴール）</strong>: 設計書 6 本を更新した。確定した契約: <code>SCHEDULED_AT</code> 必須・UTC 秒精度 <code>YYYY-MM-DDTHH:MM:SSZ</code>・実在日時のみ・現在時刻の代入 / 最新・最古へのフォールバック / 互換モードなし。選定は ① <code>set_id</code> × <code>scheduled_at</code> 完全一致 → ② <code>generated_media</code> の EXISTS → ③ 有効アカウントの非終端、の段階判定で結果型（<code>INVALID_INPUT</code> / <code>RUN_NOT_FOUND</code> / <code>NO_MEDIA</code> = 終了コード 1、<code>ALREADY_TERMINAL</code> = 0、<code>SELECTED</code>）を返す。最古順の選定は廃止。子 ASL は入口に Choice <code>CheckInput</code>（欠落・非文字列・おおよその形を拒否 → <code>RejectInput</code>）を置き、厳密な形式はアプリが DB 接続前に検査する。</p>
+<ul>
+<li><strong>期限ガード</strong>: 導入しない（<a href="../app/batch-flow.html#deadline-guard">batch-flow 3.1 の設計判断</a>）。自動経路の最悪遅延 約 8.6 時間 &lt; 最短の回の間隔 10.5 時間（logic-training-1 夜 → 朝）。手動実行は運用手順で時間帯を人間が確認。再判断の条件 = 間隔が 8.6 時間を下回る構成（昼スロット再開等）・タイムアウト / Retry の延長・遅延投稿の事象。26-2 の対象に <code>app/clock.py</code> は追加しない。</li>
+<li><strong>適用範囲</strong>: 稼働中 3 セットに同時適用（umigame-soup-1 の前回の真相ブロック・ストーリーズ・スナップショットは影響なし）。</li>
+<li><strong>受け入れケース</strong>: <a href="../app/batch-flow.html#sns-acceptance">batch-flow 3.5</a> の AC-1〜AC-10（原案 9 件 + 既存正常系を分離）。</li>
+<li><strong>切替チェック表・切戻し</strong>: <a href="../infra/operation.html#sns-current-run-switch">infra/operation 1.4</a>。新旧の組み合わせ表、S-1〜S-9（反映コミット・現行イメージタグ・旧 ASL・Scheduler 状態・実行中 0 件・パイプライン・子 → 親の deploy・実定義・再開）。ImageBatchStack の deploy で Scheduler が ENABLED に戻る（I-018）ため、親の deploy を最後に置き「再開」とみなす。切戻しはアプリと子 ASL を組で戻し、旧方式の再開前に滞留 run を確認。</li>
+<li><strong>旧記述の照合</strong>: 「SNS 投稿バッチは受け取らない」「最古の actionable / 未試行」「最も古い 1 件」を現役設計書で grep し、残りは履歴注記・切替表の対比・無関係の LRU 選曲のみ。リンク検査（<code>docs_check.py --no-browser --baseline HEAD</code>）今回差分の不備 0 件、タグ対応検査 6 本 OK。</li>
+<li><strong>課題表</strong>: I-014 の対応方針に 26-1 の進捗を追記（行は残す・展開済みのまま）。I-017 は同梱のまま変更なし。</li>
+</ul>
+<p>次: ユーザーの設計レビュー 1 巡（結果の分類・遅延実行と期限ガード・全セットへの適用範囲・切替手順と切戻し）。blocker のみ修正し、通過で 26-1 を完了にして 26-2 へ。</p>
+</div>
 </details>
 </div>
 </article>

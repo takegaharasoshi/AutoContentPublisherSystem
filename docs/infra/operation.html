@@ -49,11 +49,12 @@
 </ol>
 
 <h4>手動での SNS 投稿実行</h4>
-<p>SNS 投稿の単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する（<code>set_code</code> を入力パラメータとして渡す）。<code>EXECUTION_ARN</code> は Step Functions が <code>$$.Execution.Id</code> から自動設定するため、手動指定は不要。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する。</p>
+<p>SNS 投稿の単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する。<strong>入力は <code>set_code</code> と、投稿する生成実行の実際の <code>scheduled_at</code>（UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code>。<code>generation_runs.scheduled_at</code> の値に <code>Z</code> を付けたもの）の 2 キーが必須</strong>（26-1 で確定・26-3 の切替以後に有効。それまでは <code>set_code</code> のみ）。指定した回だけが処理され、最古の未投稿分を自動で消化することはない。<strong>現在時刻を便宜的に入れない</strong>（該当 run がなく異常終了する）。起動前の対象 run・時間帯の確認は <a href="../app/operation.html#failure-check">app/operation.html セクション 4.1</a>。<code>EXECUTION_ARN</code> は Step Functions が <code>$$.Execution.Id</code> から自動設定するため、手動指定は不要。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する。</p>
 <pre><code># CLI での手動実行例
 aws stepfunctions start-execution \
   --state-machine-arn arn:aws:states:ap-northeast-1:123456789012:stateMachine:acps-prod-sns-posting-sfn \
-  --input '{"set_code": "fashion-set-1"}'</code></pre>
+  --input '{"set_code": "logic-training-1", "scheduled_at": "2026-10-13T12:00:00Z"}'
+# ↑ logic-training-1 の 2026-10-13 夜（21:00 JST）の回。朝 7:30 JST の回は前日付の 22:30:00Z になる点に注意</code></pre>
 
 <h4>手動での画像生成実行</h4>
 <p>Scheduler DLQ からの復旧や検証で画像生成 Step Functions を直接起動する場合は、<code>set_code</code> と <code>scheduled_at</code> を入力パラメータとして渡す。Scheduler DLQ からの復旧時は、DLQ のメッセージに含まれる <code>scheduled_at</code> の値を使用する。検証目的で新規実行する場合は UTC の ISO 8601 形式で明示する。</p>
@@ -69,6 +70,47 @@ aws stepfunctions start-execution \
   <li><strong>db-readiness-check を更新した場合</strong>: <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を使用し、latest ACTIVE revision が該当タグを参照していることを確認する</li>
   <li><strong>デプロイ結果の確認</strong>: AWS Console で各リソースの状態が正常であることを確認する</li>
 </ul>
+
+<h3 id="sns-current-run-switch">1.4 SNS 投稿の当回固定への切替（26-3 の切替チェック表・切戻し。26-1 で確定）</h3>
+<p>投稿アプリ（新しいイメージは <code>SCHEDULED_AT</code> 必須）・子 ASL（sns-posting。入口で <code>scheduled_at</code> を必須化）・親 ASL（image-generation。子へ <code>scheduled_at</code> を渡す）の 3 つは、<strong>どれか 1 つでも旧のまま動くと投稿されない組み合わせがある</strong>ため、Scheduler を止めた窓で 3 つをそろえて切り替える（作業はユーザー。エージェントは承認なしにデプロイしない）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>親 ASL</th><th>子 ASL</th><th>アプリ</th><th>結果</th></tr></thead>
+  <tbody>
+    <tr><td>旧</td><td>旧</td><td>旧</td><td>旧方式（最古選定）で投稿される（切替前）</td></tr>
+    <tr><td>新</td><td>旧</td><td>旧</td><td>子が余分なキーを無視するため旧方式のまま動く（無害）</td></tr>
+    <tr><td>旧 / 新</td><td>旧</td><td>新</td><td>アプリが <code>SCHEDULED_AT</code> なしで <code>INVALID_INPUT</code> 終了 = <strong>投稿されない</strong></td></tr>
+    <tr><td>旧</td><td>新</td><td>旧 / 新</td><td>子の入口で <code>RejectInput</code> = <strong>投稿されない</strong></td></tr>
+    <tr><td>新</td><td>新</td><td>旧</td><td>旧アプリが <code>SCHEDULED_AT</code> を無視して最古選定 = 当回固定にならない</td></tr>
+    <tr><td>新</td><td>新</td><td>新</td><td>当回固定（切替後）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="warn">
+  <span class="callout-title">Scheduler の手動停止は ImageBatchStack の deploy で戻る</span>
+  Scheduler の State は CDK が単一の正（<a href="workflow.html">workflow.html セクション 1.5</a>・<a href="../issues/index.html#I-018">I-018</a>）で、手動で <code>DISABLED</code> にしても <code>cdk deploy ImageBatchStack</code> で <code>ENABLED</code> に戻る（昼スロットのように CDK 上 <code>DISABLED</code> のものは戻らない）。そのため<strong>親 ASL を載せる ImageBatchStack の deploy を最後に置き、その deploy を「再開」とみなす</strong>。窓は「Scheduler 停止 → ImageBatchStack の deploy 完了」までの間に<strong>どのスケジュール時刻（logic-training-1 7:30 / 21:00、pref-ranking-1 20:00、umigame-soup-1 日・火・木・土 20:00 JST）もまたがない</strong>時間帯を選ぶ（目安: 21:00 の夜投稿の完了後〜翌 7:00、または 8:00〜19:30）。窓を確保できない場合は停止状態を CDK 側にも持たせる変更（スケジュールの <code>enabled</code> をフラグ化。インサイトの <code>insightsCollectionSchedulesEnabled</code> と同型）を 26-2 に追加して設計し直す。
+</div>
+
+<p><strong>切替チェック表</strong>（各行の証跡 = aws cli の出力を開発記録の 26-3 に貼る。<code>&lt;…ARN&gt;</code> は実値に置き換える）:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>#</th><th>確認・操作</th><th>取得するコマンド（証跡）</th><th>合格の基準</th></tr></thead>
+  <tbody>
+    <tr><td>S-1</td><td>反映対象コミットを控える</td><td><code>git log --oneline -3 origin/main -- services/sns-post-batch infra/lib/asl</code></td><td>26-2 のコミットが先頭にある</td></tr>
+    <tr><td>S-2</td><td>現行（切替前）のイメージタグ・タスク定義リビジョンを控える（切戻し先）</td><td><code>aws ecs describe-task-definition --task-definition acps-prod-sns-post-batch --query 'taskDefinition.{rev:revision,image:containerDefinitions[0].image}'</code><br>画像生成側も同様に <code>acps-prod-image-batch</code></td><td>値を記録した</td></tr>
+    <tr><td>S-3</td><td>旧 ASL（親子）を保存する（切戻し・差分確認用）</td><td><code>aws stepfunctions describe-state-machine --state-machine-arn &lt;sns-posting-sfn ARN&gt; --query definition --output text &gt; before-sns-posting.asl.json</code><br>親 <code>acps-prod-image-generation-sfn</code> も同様</td><td>2 ファイルを保存した</td></tr>
+    <tr><td>S-4</td><td>Scheduler の状態を控えてから、ENABLED のものを手動で停止する</td><td><code>aws scheduler list-schedules --name-prefix acps-prod-image-generation- --query 'Schedules[].{name:Name,state:State}' --output table</code>（停止前・停止後の 2 回）</td><td>停止後、全件 <code>DISABLED</code></td></tr>
+    <tr><td>S-5</td><td>実行中の処理がない</td><td><code>aws stepfunctions list-executions --state-machine-arn &lt;各 SFN ARN&gt; --status-filter RUNNING --query 'executions[].name'</code>（親・子とも）</td><td>どちらも空</td></tr>
+    <tr><td>S-6</td><td>26-2 を push し、投稿バッチのパイプライン完走と新リビジョンを確認する（CLAUDE.md の /goal 定型行）</td><td><code>aws codepipeline list-pipeline-executions --pipeline-name acps-prod-sns-post-batch-pipeline --max-items 1</code> と S-2 のコマンド</td><td>Succeeded・リビジョンが S-2 より新しく、イメージタグが S-1 のコミット</td></tr>
+    <tr><td>S-7</td><td>子 → 親の順に deploy（イメージは現行を維持）</td><td><code>cdk deploy -c env=prod -c snsPostBatchImageTag=&lt;S-6 のタグ&gt; SnsPostBatchStack</code> → <code>cdk deploy -c env=prod -c imageBatchImageTag=&lt;S-2 の画像生成のタグ&gt; ImageBatchStack</code>（deploy 前に同じ context で <code>cdk diff</code>。意図した ASL 以外の差分がないこと）</td><td>両 stack が成功</td></tr>
+    <tr><td>S-8</td><td>実定義の確認（再開前の確認）</td><td>S-3 のコマンドで新定義を取得し、子に <code>CheckInput</code> と <code>SCHEDULED_AT</code>、親の <code>StartSnsPostBatch.Input</code> に <code>scheduled_at.$</code> があることを <code>grep</code> で示す。S-2 のコマンドで投稿バッチのイメージが S-6 のまま</td><td>3 つがすべて新契約</td></tr>
+    <tr><td>S-9</td><td>Scheduler の状態（再開）</td><td>S-4 のコマンド</td><td>S-4 の停止前と同じ状態（ImageBatchStack の deploy で戻っている）。S-8 が合格でなければ直ちに手動で再停止し、切戻しへ</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>切戻し</strong>（S-6〜S-9 のどこかで失敗した、または切替後に当回固定の不具合が出た場合）: ① Scheduler を停止状態に保つ（再停止）② アプリと子 ASL を<strong>必ず組で</strong>旧へ戻す（26-2 のコミットを revert して push → パイプライン完走、または S-2 のタグを <code>snsPostBatchImageTag</code> に指定して SnsPostBatchStack を deploy）。親 ASL は新のままでも無害（上の組み合わせ表）③ <strong>旧方式は最古の未完了 run を拾うため、再開前に <a href="../app/operation.html#stale-data">app/operation.html 4.3</a> のクエリで当回固定の間に溜まった過去の未完了 run がないか確認し、あれば人間が補正してから再開する</strong>（そのまま再開すると古い回が夜に出る）。片側の deploy 失敗時も自動で旧方式へ戻す仕組みは持たない。</p>
 
 <h2 id="db-ops">2. データベース運用</h2>
 
@@ -129,7 +171,7 @@ aws stepfunctions start-execution \
   <tbody>
     <tr><td>Step Functions 失敗</td><td>CloudWatch Logs で失敗原因を確認。一時的なエラーであれば手動再実行</td></tr>
     <tr><td>Scheduler 起動失敗</td><td>Scheduler DLQ のメッセージを確認し、対象 <code>set_code</code> と <code>scheduled_at</code> で画像生成 Step Functions を手動実行する（セクション 1.2 の手順）</td></tr>
-    <tr><td>SNS 投稿起動失敗</td><td>カスタムメトリクス（<code>SnsPostStartFailureCount</code>）で検知。手動で sns-posting-sfn を起動する</td></tr>
+    <tr><td>SNS 投稿起動失敗</td><td>カスタムメトリクス（<code>SnsPostStartFailureCount</code>）で検知。親の画像生成 SFN の実行入力から <code>scheduled_at</code> を取り、同じ <code>set_code</code> と <code>scheduled_at</code> で sns-posting-sfn を手動起動する（セクション 1.2。時間帯の確認を含む）</td></tr>
     <tr><td>ECS タスク異常終了</td><td>CloudWatch Logs でエラー内容を確認。アプリケーションのバグの場合は修正してデプロイ</td></tr>
     <tr><td>Aurora 異常</td><td>Aurora の状態を AWS Console で確認。ACU 設定の見直しを検討</td></tr>
     <tr><td>コメント自動返信 DLQ の滞留（<code>acps-prod-comment-reply-dlq-messages</code>。21-3 追加・21-6 実装）</td><td>DLQ のメッセージ本文（<code>comment_id</code> / <code>media_id</code> / コメント本文）と Reply Lambda のログで原因を分ける: ① OpenAI 障害・レート制限 → 復旧後に SQS コンソールの「DLQ 再処理」でメインキューへ戻す ② Graph API のトークン失効（401）→ Secret の <code>ig_access_token</code> を再生成して再処理 ③ スナップショット欠落（S3 404 は本来 DLQ に入らない。入っていれば Lambda のバグ）→ <code>umigame_items.snapshot_s3_key IS NULL</code> を確認し手動再出力。古すぎるコメント（数日前）は返信の鮮度を優先して破棄してよい。投稿バッチには影響しない</td></tr>
