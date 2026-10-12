@@ -24,10 +24,9 @@ TEMPLATE = "{{caption}}{{prev_truth_block}}"
 @pytest.fixture
 def umigame_set() -> Iterator[tuple[Any, int, int]]:
     """Create a temporary umigame set with one active account."""
-    try:
-        connection = pymysql.connect(**LOCAL_DB, connect_timeout=2, charset="utf8mb4")
-    except Exception:
-        pytest.skip("Local MySQL not reachable; skipping E2E test")
+    connection = pymysql.connect(
+        **LOCAL_DB, connect_timeout=2, charset="utf8mb4"
+    )
     set_id: int | None = None
     try:
         with connection.cursor() as cursor:

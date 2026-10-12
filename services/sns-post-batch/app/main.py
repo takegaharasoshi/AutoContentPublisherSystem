@@ -21,7 +21,7 @@ from .execution_log import finalize_execution_log, start_or_resume_execution_log
 from .generated_media import fetch_first_generated_media
 from .processing import process_target_generation_run
 from .sns_accounts import fetch_active_sns_accounts
-from .target_selection import resolve_target_generation_run
+from .target_selection import TargetOutcome, select_current_generation_run
 
 
 logger = logging.getLogger(__name__)
@@ -55,10 +55,14 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
         return 1
 
     secret_source = "env-json" if config.db_secret_json else "secrets-manager"
+    scheduled_at_text = config.scheduled_at.isoformat(timespec="seconds") + "Z"
     logger.info(
-        "Starting SNS posting batch for env_name=%s secret_source=%s",
+        "Starting SNS posting batch for env_name=%s secret_source=%s "
+        "set_code=%s scheduled_at=%s",
         config.env_name,
         secret_source,
+        config.set_code,
+        scheduled_at_text,
     )
     try:
         if config.db_secret_json:
@@ -107,10 +111,39 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                         return 1
 
                 try:
-                    generation_run_id = resolve_target_generation_run(
-                        cursor, batch_set.id
+                    selection = select_current_generation_run(
+                        cursor, batch_set.id, config.scheduled_at
                     )
-                    if generation_run_id is None:
+                    if selection.outcome in (
+                        TargetOutcome.RUN_NOT_FOUND, TargetOutcome.NO_MEDIA
+                    ):
+                        error_message = (
+                            f"{selection.outcome.name}: "
+                            f"set_code={config.set_code} "
+                            f"scheduled_at={scheduled_at_text}"
+                        )
+                        logger.error(
+                            "SNS posting target selection failed: %s",
+                            error_message,
+                        )
+                        finalize_execution_log(
+                            cursor,
+                            log_id=log_id,
+                            status="failed",
+                            finished_at=now_utc(),
+                            records_processed=0,
+                            error_message=error_message,
+                        )
+                        connection.commit()
+                        return 1
+                    if selection.outcome == TargetOutcome.ALREADY_TERMINAL:
+                        logger.info(
+                            "No posts to process: set_code=%s scheduled_at=%s "
+                            "outcome=%s records_processed=0",
+                            config.set_code,
+                            scheduled_at_text,
+                            selection.outcome.name,
+                        )
                         finalize_execution_log(
                             cursor,
                             log_id=log_id,
@@ -122,6 +155,15 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                         connection.commit()
                         return 0
 
+                    generation_run_id = selection.generation_run_id
+                    generated_media = fetch_first_generated_media(
+                        cursor, generation_run_id
+                    )
+                    if generated_media is None:
+                        raise RuntimeError(
+                            "No generated media was found "
+                            "for the target generation run"
+                        )
                     caption_template = fetch_active_caption_template(
                         cursor, batch_set.id
                     )
@@ -134,13 +176,6 @@ def main(*, s3_client: Any | None = None, urlopen: Any | None = None) -> int:
                         set_id=batch_set.id,
                     )
                     sns_accounts = fetch_active_sns_accounts(cursor, batch_set.id)
-                    generated_media = fetch_first_generated_media(
-                        cursor, generation_run_id
-                    )
-                    if generated_media is None:
-                        raise RuntimeError(
-                            "No generated media was found for the target generation run"
-                        )
 
                     resolved_s3_client = (
                         s3_client if s3_client is not None else boto3.client("s3")

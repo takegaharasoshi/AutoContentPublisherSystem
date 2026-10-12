@@ -269,6 +269,40 @@ describe('SnsPostBatchStack の SNS 投稿ワークフロー', () => {
     template.findResources('AWS::StepFunctions::StateMachine'),
   ) as any[];
   const stateMachine = stateMachines[0];
+  const definition = JSON.parse(stateMachine.Properties.DefinitionString as string);
+
+  type InputRule = {
+    Not?: InputRule;
+    Variable?: string;
+    IsPresent?: boolean;
+    IsString?: boolean;
+    StringMatches?: string;
+  };
+
+  // Evaluate only the JSONPath predicates used by CheckInput. StringMatches
+  // treats '*' as the only wildcard and escapes all other regex characters.
+  const matchesInputRule = (
+    rule: InputRule, input: Record<string, unknown>,
+  ): boolean => {
+    if (rule.Not) {
+      return !matchesInputRule(rule.Not, input);
+    }
+    expect(rule.Variable).toBe('$.scheduled_at');
+    const value = input.scheduled_at;
+    if (rule.IsPresent !== undefined) {
+      return Object.prototype.hasOwnProperty.call(input, 'scheduled_at') === rule.IsPresent;
+    }
+    if (rule.IsString !== undefined) {
+      return (typeof value === 'string') === rule.IsString;
+    }
+    if (rule.StringMatches !== undefined && typeof value === 'string') {
+      const pattern = rule.StringMatches.split('*')
+        .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('.*');
+      return new RegExp('^' + pattern + '$').test(value);
+    }
+    throw new Error('Unsupported CheckInput predicate');
+  };
 
   test('明示した名前の Standard ステートマシンを作成する', () => {
     expect(stateMachines).toHaveLength(1);
@@ -304,7 +338,78 @@ describe('SnsPostBatchStack の SNS 投稿ワークフロー', () => {
     expect(definitionString).toContain('ecs:runTask.sync');
     expect(definitionString).toContain('ContainerOverrides');
     expect(definitionString).toContain('SET_CODE');
+    expect(definitionString).toContain('SCHEDULED_AT');
     expect(definitionString).toContain('EXECUTION_ARN');
+  });
+
+  test('DB 準備確認より前に予定時刻の欠落・型・形式を検査する', () => {
+    expect(definition.StartAt).toBe('CheckInput');
+    expect(definition.States.CheckInput).toEqual({
+      Type: 'Choice',
+      Choices: [
+        {
+          Not: { Variable: '$.scheduled_at', IsPresent: true },
+          Next: 'RejectInput',
+        },
+        {
+          Not: { Variable: '$.scheduled_at', IsString: true },
+          Next: 'RejectInput',
+        },
+        {
+          Variable: '$.scheduled_at',
+          StringMatches: '*-*-*T*:*:*Z',
+          Next: 'WaitForDbReady',
+        },
+      ],
+      Default: 'RejectInput',
+    });
+    expect(definition.States.RejectInput).toEqual({
+      Type: 'Fail',
+      Error: 'SnsPostInputInvalid',
+      Cause: 'scheduled_at is missing or malformed',
+    });
+  });
+
+  test.each([
+    [{}, 'RejectInput'],
+    [{ scheduled_at: 123 }, 'RejectInput'],
+    [{ scheduled_at: '2026-10-13 21:00:00' }, 'RejectInput'],
+    [{ scheduled_at: '2026-10-13T12:00:00Z' }, 'WaitForDbReady'],
+  ])('CheckInput が入力 %j を %s に送る', (input, expected) => {
+    const checkInput = definition.States.CheckInput;
+    const matched = checkInput.Choices.find(
+      (choice: InputRule) => matchesInputRule(choice, input as Record<string, unknown>),
+    );
+    expect(matched?.Next ?? checkInput.Default).toBe(expected);
+  });
+
+  test('予定時刻を ECS に渡し、Retry 中も同じ状態入力を保つ', () => {
+    const task = definition.States.RunSnsPostBatchTask;
+    expect(task.Parameters.Overrides.ContainerOverrides[0].Environment).toEqual([
+      { Name: 'SET_CODE', 'Value.$': '$.set_code' },
+      { Name: 'SCHEDULED_AT', 'Value.$': '$.scheduled_at' },
+      { Name: 'EXECUTION_ARN', 'Value.$': '$$.Execution.Id' },
+    ]);
+    expect(definition.States.WaitForDbReady.ResultPath).toBeNull();
+    expect(task.ResultPath).toBeNull();
+    expect(task.Retry).toEqual([
+      {
+        ErrorEquals: ['States.TaskFailed', 'States.Timeout'],
+        IntervalSeconds: 30,
+        MaxAttempts: 2,
+        BackoffRate: 2.0,
+      },
+    ]);
+    // These states use the complete original input and discard task results;
+    // there is no input transform or assignment to change it before Retry.
+    for (const state of [definition.States.WaitForDbReady, task]) {
+      for (const property of [
+        'InputPath', 'OutputPath', 'ResultSelector', 'Assign', 'Output',
+      ]) {
+        expect(state).not.toHaveProperty(property);
+      }
+    }
+    expect(definition).not.toHaveProperty('QueryLanguage');
   });
 
   test('ECS 同期実行に必要な最小権限をステートマシンロールに付与する', () => {

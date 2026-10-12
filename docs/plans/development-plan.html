@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -138,12 +138,12 @@
 
 <div class="plan-group" data-plan-group="active">
 
-<article class="plan-step" id="step-26-2" data-step-id="26-2" data-status="todo">
+<article class="plan-step" id="step-26-2" data-step-id="26-2" data-status="doing">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>26-2</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>26-2</strong><span class="plan-status">進行中（差分レビュー・go / no-go 待ち）</span></div>
 <h3>親子 SFN の予定時刻受け渡しと当回選定の実装（26-1 の設計レビュー通過後）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>26-1 の人間ゲート（設計レビュー）通過後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>現況：</strong>2026-10-13 に実装・検証を終えてコミット済み（未 push）。sns-post-batch pytest 269 passed / skipped 0（AC-1〜9 の e2e 25 件を含む・ローカル MySQL 実行）、infra Jest 126 passed、cdk synth 成功、ASL の差分は意図した親子定義のみ。<strong>ユーザーの差分確認と 26-3 の go / no-go・停止窓の日時の決定待ち</strong>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -173,8 +173,18 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-13 実装・検証・コミット（未 push）</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-10-13（/step 26-2 のゴール）</strong>: 実装とテスト修正ループを Codex（gpt-6.1-sol / max）へ委譲し、差分レビューと実 DB での検証は Claude が行った（Codex のサンドボックスはローカル MySQL へ接続できず、e2e 34 件が接続エラーで未検証のまま返ったため）。</p>
+<ul>
+<li><strong>アプリ</strong>: <code>config.py</code> = <code>SCHEDULED_AT</code> 必須（正規表現 <code>^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$</code> + <code>strptime</code> で実在日時を検査し、naive UTC の <code>datetime</code> にする）。<code>target_selection.py</code> = 旧 <code>resolve_target_generation_run</code>（最古選定）を削除し、<code>select_current_generation_run</code> が段階判定で <code>TargetSelection(outcome, generation_run_id)</code> を返す（<code>ORDER BY</code> / <code>LIMIT</code> なし）。<code>main.py</code> = <code>RUN_NOT_FOUND</code> / <code>NO_MEDIA</code> は ERROR ログ + 実行ログ failed で 1、<code>ALREADY_TERMINAL</code> は INFO + succeeded で 0、<code>SELECTED</code> はメディア取得をキャプション組み立てより前へ移した。起動ログに <code>set_code</code>・<code>scheduled_at</code> を出す。</li>
+<li><strong>ASL</strong>: 親 <code>StartSnsPostBatch.Input</code> に <code>scheduled_at.$</code>、子に <code>CheckInput</code>（Choice）/ <code>RejectInput</code>（Fail）と <code>SCHEDULED_AT</code> の環境変数（workflow 4 の掲載どおり）。</li>
+<li><strong>テスト</strong>: <code>test_config</code>・<code>test_target_selection</code>・<code>test_main</code> を新 API に更新。e2e に AC-1〜AC-9（<code>test_ac_1_…</code>〜<code>test_ac_9_…</code>。AC-8 は <code>open_connection</code> を呼ばれたら失敗する偽物に差し替えて DB 未接続を確認）を追加し、既存の全 main 呼び出しに予定時刻を設定（AC-10）。infra/test は DefinitionString をパースし、親 Input の転送・親子の <code>ResultPath: null</code>・子の入口の評価（<code>{}</code> / 数値 / スペース区切り → 拒否、<code>…T12:00:00Z</code> → 通過）・<code>SCHEDULED_AT</code> の環境変数・Retry を検証。README に必須変数とローカル実行例を追記。</li>
+<li><strong>検証</strong>: <code>uv run pytest -rs -q</code> → <code>269 passed in 3.05s</code>（skipped 0。ローカル MySQL <code>acps-mysql</code> に接続して実行）。<code>npm run build</code> 成功・<code>npx jest</code> → <code>Tests: 126 passed, 126 total</code>。<code>cdk synth</code>（現行タグの context: sns-post-batch / image-batch <code>c97ff7a65650</code>・db-readiness-check <code>27d0ab20a77e</code>・insights-batch <code>8b1f92d48dc5</code>）成功。<code>cdk diff SnsPostBatchStack ImageBatchStack</code> → 各 StateMachine の DefinitionString と各 TaskDefinition。TaskDefinition の差分は CFN 上のイメージ <code>50472a0be6c5</code> → 現行稼働の <code>c97ff7a65650</code>（パイプラインが CFN の外で新リビジョンを登録する既存のずれで、本ステップの変更ではない。deploy すると現行と同じイメージで新リビジョンが登録される）。CFN が記録しているイメージ <code>50472a0be6c5</code> を両 stack の context に与えた再実行では、差分は <code>SnsPostingStateMachine</code>・<code>ImageGenerationStateMachine</code> の <code>DefinitionString</code> の 2 件だけ（TaskDefinition の差分は context のタグだけに由来することを確認）。ASL は本番の実定義と HEAD の ASL が差分 0 件、HEAD → 今回が意図した 5 点（子: <code>StartAt</code>・<code>CheckInput</code>・<code>RejectInput</code>・<code>SCHEDULED_AT</code>、親: <code>scheduled_at.$</code>）だけであることを構造比較で確認。</li>
+<li><strong>切替チェック表</strong>: infra/operation 1.4 の S-1〜S-9 が記入済みであることを確認（26-1 で記入）。</li>
+</ul>
+<p>次: ユーザーが差分と証跡を確認し、26-3 の go / no-go と停止窓の日時を決める。go なら 26-3 の S-6 で push する（push まではこのコミットを main の先頭に保つ）。</p>
+</div>
 </details>
 </div>
 </article>

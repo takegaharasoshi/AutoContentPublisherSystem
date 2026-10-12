@@ -291,6 +291,7 @@ describe('ImageBatchStack の画像生成ワークフロー', () => {
     template.findResources('AWS::StepFunctions::StateMachine'),
   ) as any[];
   const stateMachine = stateMachines[0];
+  const definition = JSON.parse(stateMachine.Properties.DefinitionString as string);
 
   test('明示した名前の Standard ステートマシンを作成する', () => {
     expect(stateMachines).toHaveLength(1);
@@ -336,6 +337,21 @@ describe('ImageBatchStack の画像生成ワークフロー', () => {
     expect(definitionString).toContain('SCHEDULED_AT');
     expect(definitionString).toContain('states:startExecution');
     expect(definitionString).toContain('cloudwatch:putMetricData');
+  });
+
+  test('当回の scheduled_at を子 SFN に渡し、実行名を維持する', () => {
+    expect(definition.States.StartSnsPostBatch.Parameters.Input).toEqual({
+      'set_code.$': '$.set_code',
+      'scheduled_at.$': '$.scheduled_at',
+    });
+    expect(definition.States.StartSnsPostBatch.Parameters['Name.$']).toBe(
+      '$$.Execution.Name',
+    );
+  });
+
+  test('DB 準備確認と画像生成の結果で scheduled_at を上書きしない', () => {
+    expect(definition.States.WaitForDbReady.ResultPath).toBeNull();
+    expect(definition.States.RunImageBatchTask.ResultPath).toBeNull();
   });
 
   test('ECS 実行、SNS 投稿起動、カスタムメトリクス発行の最小権限をステートマシンロールに付与する', () => {

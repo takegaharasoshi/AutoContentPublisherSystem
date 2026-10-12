@@ -7,12 +7,16 @@ import json
 import urllib.error
 import urllib.parse
 from contextlib import contextmanager
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Iterator
+from unittest.mock import Mock
 from uuid import uuid4
 
 import pymysql
 import pytest
 
+import app.main as main_module
 import app.processing as processing_module
 from app.main import main
 
@@ -24,6 +28,10 @@ LOCAL_DB_SECRET = {
     "port": 3306,
     "dbname": "acps",
 }
+
+DEFAULT_SCHEDULED_AT = datetime(2026, 7, 19)
+CURRENT_SCHEDULED_AT = datetime(2026, 10, 13, 12)
+MORNING_SCHEDULED_AT = datetime(2026, 10, 12, 22, 30)
 
 
 class FakeS3Client:
@@ -89,17 +97,12 @@ def _local_batch_set(
     caption_text: str = "E2E caption",
     seed_quiz_item: bool = False,
 ) -> Iterator[tuple[dict[str, Any], str, int, int, int]]:
-    """Create local E2E rows and always remove them in FK-safe order."""
-    try:
-        connection = _connect_local_mysql(LOCAL_DB_SECRET)
-    except Exception:
-        pytest.skip("Local MySQL not reachable; skipping E2E test")
+    """Require local MySQL; create rows and remove them in FK-safe order."""
+    connection = _connect_local_mysql(LOCAL_DB_SECRET)
 
     set_code = f"e2e-sns-{uuid4().hex[:8]}"
     set_id: int | None = None
     generation_run_id: int | None = None
-    account_id: int | None = None
-    caption_template_id: int | None = None
     try:
         with connection.cursor() as cursor:
             cursor.execute(
@@ -126,7 +129,7 @@ def _local_batch_set(
             cursor.execute(
                 "INSERT INTO generation_runs (set_id, scheduled_at) "
                 "VALUES (%s, %s)",
-                (set_id, "2026-07-19 00:00:00"),
+                (set_id, DEFAULT_SCHEDULED_AT),
             )
             generation_run_id = cursor.lastrowid
             cursor.execute(
@@ -147,7 +150,7 @@ def _local_batch_set(
                     duration_seconds,
                     None,
                     10,
-                    "2026-07-19 00:00:00",
+                    DEFAULT_SCHEDULED_AT,
                 ),
             )
             generated_media_id = cursor.lastrowid
@@ -157,13 +160,11 @@ def _local_batch_set(
                 "VALUES (%s, %s, %s, %s, %s)",
                 (set_id, "instagram", "e2e-account", "E2E Account", 1),
             )
-            account_id = cursor.lastrowid
             cursor.execute(
                 "INSERT INTO caption_templates "
                 "(set_id, template_text, is_active) VALUES (%s, %s, %s)",
                 (set_id, caption_text, 1),
             )
-            caption_template_id = cursor.lastrowid
             if seed_quiz_item:
                 fields = {
                     "hook": "この問題、解ける？",
@@ -218,15 +219,12 @@ def _local_batch_set(
                 cursor.execute(
                     "DELETE FROM generation_runs WHERE set_id = %s", (set_id,)
                 )
-                if account_id is not None:
-                    cursor.execute(
-                        "DELETE FROM sns_accounts WHERE id = %s", (account_id,)
-                    )
-                if caption_template_id is not None:
-                    cursor.execute(
-                        "DELETE FROM caption_templates WHERE id = %s",
-                        (caption_template_id,),
-                    )
+                cursor.execute(
+                    "DELETE FROM sns_accounts WHERE set_id = %s", (set_id,)
+                )
+                cursor.execute(
+                    "DELETE FROM caption_templates WHERE set_id = %s", (set_id,)
+                )
                 cursor.execute(
                     "DELETE FROM prompt_configs WHERE set_id = %s", (set_id,)
                 )
@@ -292,6 +290,9 @@ def test_main_persists_successful_post_to_local_mysql(
     monkeypatch.setenv("ENV_NAME", "local")
     monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
     monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv(
+        "SCHEDULED_AT", DEFAULT_SCHEDULED_AT.isoformat(timespec="seconds") + "Z"
+    )
     monkeypatch.setenv("EXECUTION_ARN", execution_arn)
     monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
     monkeypatch.setattr(
@@ -355,6 +356,9 @@ def test_main_expands_quiz_caption_in_local_mysql(
     monkeypatch.setenv("ENV_NAME", "local")
     monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
     monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv(
+        "SCHEDULED_AT", DEFAULT_SCHEDULED_AT.isoformat(timespec="seconds") + "Z"
+    )
     monkeypatch.setenv("EXECUTION_ARN", f"arn:aws:states:local:e2e:{uuid4().hex}")
     monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
     monkeypatch.setattr(
@@ -401,6 +405,9 @@ def test_main_persists_successful_reel_post_to_local_mysql(
     monkeypatch.setenv("ENV_NAME", "local")
     monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
     monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv(
+        "SCHEDULED_AT", DEFAULT_SCHEDULED_AT.isoformat(timespec="seconds") + "Z"
+    )
     monkeypatch.setenv("EXECUTION_ARN", f"arn:aws:states:local:e2e:{uuid4().hex}")
     monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
     monkeypatch.setattr(
@@ -459,6 +466,9 @@ def test_main_persists_successful_reel_and_story_to_local_mysql(
     monkeypatch.setenv("ENV_NAME", "local")
     monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
     monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv(
+        "SCHEDULED_AT", DEFAULT_SCHEDULED_AT.isoformat(timespec="seconds") + "Z"
+    )
     monkeypatch.setenv("EXECUTION_ARN", f"arn:aws:states:local:e2e:{uuid4().hex}")
     monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
     monkeypatch.setattr(
@@ -533,6 +543,9 @@ def test_main_resumes_container_created_post_without_creating_a_duplicate(
     monkeypatch.setenv("ENV_NAME", "local")
     monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
     monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv(
+        "SCHEDULED_AT", DEFAULT_SCHEDULED_AT.isoformat(timespec="seconds") + "Z"
+    )
     monkeypatch.setenv("EXECUTION_ARN", execution_arn)
     monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
     monkeypatch.setattr(
@@ -623,6 +636,9 @@ def test_main_skips_published_unconfirmed_post_on_retry(
     monkeypatch.setenv("ENV_NAME", "local")
     monkeypatch.setenv("DB_SECRET_JSON", json.dumps(secret))
     monkeypatch.setenv("SET_CODE", set_code)
+    monkeypatch.setenv(
+        "SCHEDULED_AT", DEFAULT_SCHEDULED_AT.isoformat(timespec="seconds") + "Z"
+    )
     monkeypatch.setenv("EXECUTION_ARN", execution_arn)
     monkeypatch.setenv("S3_BUCKET_NAME", "local-test-bucket")
     monkeypatch.setattr(
@@ -677,10 +693,8 @@ def test_main_skips_published_unconfirmed_post_on_retry(
         """Fail if a terminal post retry reaches the Instagram API."""
         pytest.fail("Instagram API should not be called for a terminal post state")
 
-    # The only sns_account is now terminal, so resolve_target_generation_run
-    # (app/target_selection.py) excludes this generation run from selection
-    # entirely: main() exits via the "no target" path (0 accounts processed)
-    # without ever reaching process_target_generation_run/urlopen.
+    # The current run has only a terminal account, so selection reports
+    # ALREADY_TERMINAL and main exits with zero processed accounts.
     assert main(s3_client=FakeS3Client(), urlopen=terminal_fake_urlopen) == 0
 
     connection = _connect_local_mysql(secret)
@@ -696,3 +710,533 @@ def test_main_skips_published_unconfirmed_post_on_retry(
         connection.close()
 
     assert retry_post == (1, "published_unconfirmed", None)
+
+
+class RecordingUrlopen:
+    """Record Graph calls, return fake responses, and simulate task crashes."""
+
+    def __init__(self, payloads: list[dict[str, str] | Exception]) -> None:
+        self.payloads = iter(payloads)
+        self.requests: list[Any] = []
+
+    def __call__(self, request: Any, *, timeout: int) -> FakeResponse:
+        assert timeout == 30
+        self.requests.append(request)
+        try:
+            payload = next(self.payloads)
+        except StopIteration:
+            pytest.fail("Unexpected extra Instagram API call")
+        if isinstance(payload, Exception):
+            raise payload
+        return FakeResponse(payload)
+
+
+def _success_payloads() -> list[dict[str, str] | Exception]:
+    """Provide the existing create, poll, publish fake Graph flow."""
+    return [
+        {"id": "container-current"},
+        {"status_code": "FINISHED"},
+        {"id": "post-current"},
+    ]
+
+
+@dataclass(frozen=True)
+class ScheduledBatch:
+    """Committed local rows for current-run acceptance tests."""
+
+    connection: pymysql.connections.Connection
+    set_code: str
+    set_id: int
+    run_id: int
+    media_id: int
+    account_id: int
+    execution_arn: str
+
+
+@pytest.fixture
+def scheduled_batch(
+    local_batch_set: tuple[dict[str, Any], str, int, int, int],
+    monkeypatch: pytest.MonkeyPatch,
+) -> Iterator[ScheduledBatch]:
+    """Use real MySQL without stale snapshots between main calls."""
+    secret, set_code, set_id, run_id, media_id = local_batch_set
+    connection = _connect_local_mysql(secret)
+    try:
+        connection.autocommit(True)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE generation_runs SET scheduled_at = %s WHERE id = %s",
+                (CURRENT_SCHEDULED_AT, run_id),
+            )
+            cursor.execute(
+                "SELECT id FROM sns_accounts WHERE set_id = %s", (set_id,)
+            )
+            account_id = cursor.fetchone()[0]
+        execution_arn = f"arn:aws:states:local:e2e:{uuid4().hex}"
+        for name, value in {
+            "ENV_NAME": "local",
+            "DB_SECRET_JSON": json.dumps(secret),
+            "SET_CODE": set_code,
+            "SCHEDULED_AT": (
+                CURRENT_SCHEDULED_AT.isoformat(timespec="seconds") + "Z"
+            ),
+            "EXECUTION_ARN": execution_arn,
+            "S3_BUCKET_NAME": "local-test-bucket",
+        }.items():
+            monkeypatch.setenv(name, value)
+        monkeypatch.setattr(
+            processing_module, "get_secret_string",
+            lambda name: json.dumps({
+                "access_token": "test-token",
+                "ig_user_id": name.rsplit("/", 1)[-1],
+            }),
+        )
+        yield ScheduledBatch(
+            connection, set_code, set_id, run_id, media_id,
+            account_id, execution_arn,
+        )
+    finally:
+        connection.close()
+
+
+def _add_generation_run(
+    batch: ScheduledBatch, scheduled_at: datetime, *, with_media: bool = True
+) -> int:
+    """Add another run, optionally copying the fixture's local media."""
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO generation_runs (set_id, scheduled_at) VALUES (%s, %s)",
+            (batch.set_id, scheduled_at),
+        )
+        run_id = cursor.lastrowid
+        if with_media:
+            cursor.execute(
+                "INSERT INTO generated_media "
+                "(set_id, generation_run_id, prompt_config_id, output_index, "
+                "prompt_text_snapshot, s3_key, s3_bucket, file_format, generated_at) "
+                "SELECT set_id, %s, prompt_config_id, output_index, "
+                "prompt_text_snapshot, s3_key, s3_bucket, file_format, %s "
+                "FROM generated_media WHERE id = %s",
+                (run_id, scheduled_at, batch.media_id),
+            )
+            assert cursor.rowcount == 1
+    return run_id
+
+
+def _add_post(batch: ScheduledBatch, run_id: int, status: str) -> int:
+    """Seed a post and media relation with recognizable snapshot fields."""
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO posts "
+            "(set_id, generation_run_id, sns_account_id, status, media_type, "
+            "platform_container_id, caption_text_snapshot, created_at, updated_at) "
+            "VALUES (%s, %s, %s, %s, 'feed_image', %s, 'saved caption', %s, %s)",
+            (
+                batch.set_id, run_id, batch.account_id, status,
+                f"saved-container-{run_id}" if status == "container_created" else None,
+                datetime(2026, 1, 1), datetime(2026, 1, 1),
+            ),
+        )
+        post_id = cursor.lastrowid
+        cursor.execute(
+            "INSERT INTO post_media (post_id, generated_media_id) "
+            "SELECT %s, id FROM generated_media WHERE generation_run_id = %s",
+            (post_id, run_id),
+        )
+        assert cursor.rowcount == 1
+    return post_id
+
+
+def _run_posts(
+    batch: ScheduledBatch, run_id: int, *, account_id: int | None = None
+) -> tuple[tuple[Any, ...], ...]:
+    """Read complete post rows, including IDs, statuses, and updated_at."""
+    query = "SELECT * FROM posts WHERE generation_run_id = %s"
+    parameters = (run_id,)
+    if account_id is not None:
+        query += " AND sns_account_id = %s"
+        parameters += (account_id,)
+    with batch.connection.cursor() as cursor:
+        cursor.execute(query + " ORDER BY id", parameters)
+        return cursor.fetchall()
+
+
+def _assert_successful_runs(batch: ScheduledBatch, run_ids: list[int]) -> None:
+    """Verify that only the requested runs have successful posts."""
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT generation_run_id, status FROM posts "
+            "WHERE set_id = %s ORDER BY generation_run_id",
+            (batch.set_id,),
+        )
+        assert cursor.fetchall() == tuple(
+            (run_id, "success") for run_id in sorted(run_ids)
+        )
+
+
+def _assert_execution_log(
+    batch: ScheduledBatch, *, status: str, records: int,
+    reason: str | None = None,
+) -> None:
+    """Check the persisted result and current-run failure context."""
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT status, records_processed, error_message "
+            "FROM batch_execution_logs WHERE set_id = %s AND execution_arn = %s",
+            (batch.set_id, batch.execution_arn),
+        )
+        row = cursor.fetchone()
+    assert row is not None
+    assert row[:2] == (status, records)
+    if reason is not None:
+        for value in (
+            reason, batch.set_code,
+            CURRENT_SCHEDULED_AT.isoformat(timespec="seconds") + "Z",
+        ):
+            assert value in row[2]
+    elif status == "succeeded":
+        assert row[2] is None
+
+
+def test_ac_1_empty_morning_never_blocks_night_or_next_morning(
+    scheduled_batch: ScheduledBatch, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AC-1: An empty morning run never blocks night or the next morning's run."""
+    batch = scheduled_batch
+    empty_morning = _add_generation_run(batch, MORNING_SCHEDULED_AT, with_media=False)
+    night_api = RecordingUrlopen(_success_payloads())
+
+    assert main(s3_client=FakeS3Client(), urlopen=night_api) == 0
+    assert len(night_api.requests) == 3
+    _assert_successful_runs(batch, [batch.run_id])
+    assert _run_posts(batch, empty_morning) == ()
+
+    next_scheduled_at = datetime(2026, 10, 13, 22, 30)
+    next_morning = _add_generation_run(batch, next_scheduled_at)
+    monkeypatch.setenv(
+        "SCHEDULED_AT", next_scheduled_at.isoformat(timespec="seconds") + "Z"
+    )
+    monkeypatch.setenv("EXECUTION_ARN", f"arn:aws:states:local:e2e:{uuid4().hex}")
+    night_posts = _run_posts(batch, batch.run_id)
+    next_api = RecordingUrlopen(_success_payloads())
+
+    assert main(s3_client=FakeS3Client(), urlopen=next_api) == 0
+    assert len(next_api.requests) == 3
+    _assert_successful_runs(batch, [batch.run_id, next_morning])
+    assert _run_posts(batch, batch.run_id) == night_posts
+    assert _run_posts(batch, empty_morning) == ()
+
+
+@pytest.mark.parametrize("morning_status", [None, "pending", "container_created"])
+def test_ac_2_night_leaves_actionable_morning_posts_unchanged(
+    scheduled_batch: ScheduledBatch, morning_status: str | None
+) -> None:
+    """AC-2: Night posting leaves every actionable morning post intact."""
+    batch = scheduled_batch
+    morning = _add_generation_run(batch, MORNING_SCHEDULED_AT)
+    if morning_status is not None:
+        _add_post(batch, morning, morning_status)
+    before = _run_posts(batch, morning)
+    api = RecordingUrlopen(_success_payloads())
+
+    assert main(s3_client=FakeS3Client(), urlopen=api) == 0
+    assert len(api.requests) == 3
+    assert _run_posts(batch, morning) == before
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT generation_run_id, status FROM posts WHERE set_id = %s "
+            "AND generation_run_id != %s",
+            (batch.set_id, morning),
+        )
+        assert cursor.fetchall() == ((batch.run_id, "success"),)
+    _assert_execution_log(batch, status="succeeded", records=1)
+
+
+def test_ac_3_missing_current_run_fails_without_falling_back(
+    scheduled_batch: ScheduledBatch,
+) -> None:
+    """AC-3: A past unposted run cannot substitute for a missing current run."""
+    batch = scheduled_batch
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "UPDATE generation_runs SET scheduled_at = %s WHERE id = %s",
+            (MORNING_SCHEDULED_AT, batch.run_id),
+        )
+    api = RecordingUrlopen(_success_payloads())
+    s3 = FakeS3Client()
+
+    assert main(s3_client=s3, urlopen=api) == 1
+    assert api.requests == []
+    assert s3.calls == []
+    _assert_successful_runs(batch, [])
+    _assert_execution_log(batch, status="failed", records=0, reason="RUN_NOT_FOUND")
+
+
+def test_ac_4_current_run_without_media_fails_without_falling_back(
+    scheduled_batch: ScheduledBatch,
+) -> None:
+    """AC-4: A current empty run fails even when a past run has unposted media."""
+    batch = scheduled_batch
+    past_run = _add_generation_run(batch, MORNING_SCHEDULED_AT)
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "DELETE FROM generated_media WHERE generation_run_id = %s", (batch.run_id,)
+        )
+    api = RecordingUrlopen(_success_payloads())
+    s3 = FakeS3Client()
+
+    assert main(s3_client=s3, urlopen=api) == 1
+    assert api.requests == []
+    assert s3.calls == []
+    assert _run_posts(batch, past_run) == ()
+    _assert_successful_runs(batch, [])
+    _assert_execution_log(batch, status="failed", records=0, reason="NO_MEDIA")
+
+
+@pytest.mark.parametrize("has_current", [True, False], ids=["exact-match", "no-match"])
+def test_ac_5_selects_exact_set_and_time_among_neighboring_runs(
+    scheduled_batch: ScheduledBatch, has_current: bool
+) -> None:
+    """AC-5: Other sets, previous days, and newer runs never replace this run."""
+    batch = scheduled_batch
+    previous_day = _add_generation_run(batch, datetime(2026, 10, 12, 12))
+    newer_run = _add_generation_run(batch, datetime(2026, 10, 14, 12))
+    with _local_batch_set(file_format="jpg", s3_key="images/other-set.jpg") as other:
+        _, _, other_set_id, other_run_id, _ = other
+        with batch.connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE generation_runs SET scheduled_at = %s WHERE id = %s",
+                (CURRENT_SCHEDULED_AT, other_run_id),
+            )
+            if not has_current:
+                cursor.execute(
+                    "DELETE FROM generated_media WHERE generation_run_id = %s",
+                    (batch.run_id,),
+                )
+                cursor.execute(
+                    "DELETE FROM generation_runs WHERE id = %s", (batch.run_id,)
+                )
+        api = RecordingUrlopen(_success_payloads())
+
+        assert main(s3_client=FakeS3Client(), urlopen=api) == (0 if has_current else 1)
+        assert len(api.requests) == (3 if has_current else 0)
+        _assert_successful_runs(batch, [batch.run_id] if has_current else [])
+        for run_id in (other_run_id, previous_day, newer_run):
+            assert _run_posts(batch, run_id) == ()
+        with batch.connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT COUNT(*) FROM posts WHERE set_id = %s", (other_set_id,)
+            )
+            assert cursor.fetchone()[0] == 0
+        _assert_execution_log(
+            batch, status="succeeded" if has_current else "failed",
+            records=1 if has_current else 0,
+            reason=None if has_current else "RUN_NOT_FOUND",
+        )
+
+
+@pytest.mark.parametrize("status", ["success", "failed", "published_unconfirmed"])
+def test_ac_6_terminal_current_run_succeeds_without_api_calls(
+    scheduled_batch: ScheduledBatch, status: str
+) -> None:
+    """AC-6: Every terminal status finishes with zero posts and zero API calls."""
+    batch = scheduled_batch
+    _add_post(batch, batch.run_id, status)
+    before = _run_posts(batch, batch.run_id)
+    api = RecordingUrlopen(_success_payloads())
+    s3 = FakeS3Client()
+
+    assert main(s3_client=s3, urlopen=api) == 0
+    assert api.requests == []
+    assert s3.calls == []
+    assert _run_posts(batch, batch.run_id) == before
+    _assert_execution_log(batch, status="succeeded", records=0)
+
+
+@pytest.mark.parametrize(
+    "terminal_status", ["success", "failed", "published_unconfirmed"]
+)
+def test_ac_6_processes_only_unfinished_active_account(
+    scheduled_batch: ScheduledBatch, monkeypatch: pytest.MonkeyPatch,
+    terminal_status: str,
+) -> None:
+    """AC-6: Only the unfinished of two active accounts reaches the API."""
+    batch = scheduled_batch
+    _add_post(batch, batch.run_id, terminal_status)
+    terminal_before = _run_posts(
+        batch, batch.run_id, account_id=batch.account_id
+    )
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO sns_accounts "
+            "(set_id, platform, account_code, account_name, is_active) "
+            "VALUES (%s, 'instagram', 'unfinished-account', 'Unfinished', 1)",
+            (batch.set_id,),
+        )
+        unfinished_account_id = cursor.lastrowid
+    secret_reader = Mock(return_value=json.dumps({
+        "access_token": "test-token", "ig_user_id": "unfinished-account"
+    }))
+    monkeypatch.setattr(processing_module, "get_secret_string", secret_reader)
+    api = RecordingUrlopen(_success_payloads())
+
+    # The existing processor still marks the batch failed when a skipped
+    # account has failed/published_unconfirmed, while posting the unfinished one.
+    return_code = 0 if terminal_status == "success" else 1
+    assert main(s3_client=FakeS3Client(), urlopen=api) == return_code
+    assert len(api.requests) == 3
+    secret_reader.assert_called_once_with(
+        f"acps/local/{batch.set_code}/sns/instagram/unfinished-account"
+    )
+    assert urllib.parse.urlparse(api.requests[0].full_url).path.endswith(
+        "/unfinished-account/media"
+    )
+    assert urllib.parse.urlparse(api.requests[2].full_url).path.endswith(
+        "/unfinished-account/media_publish"
+    )
+    assert (
+        _run_posts(batch, batch.run_id, account_id=batch.account_id)
+        == terminal_before
+    )
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT sns_account_id, status FROM posts "
+            "WHERE generation_run_id = %s ORDER BY sns_account_id",
+            (batch.run_id,),
+        )
+        assert cursor.fetchall() == (
+            (batch.account_id, terminal_status), (unfinished_account_id, "success")
+        )
+    _assert_execution_log(
+        batch, status="succeeded" if return_code == 0 else "failed", records=1
+    )
+
+
+@pytest.mark.parametrize("resume_status", ["pending", "container_created"])
+def test_ac_7_retry_resumes_same_run_despite_newer_media(
+    scheduled_batch: ScheduledBatch, resume_status: str
+) -> None:
+    """AC-7: Retry keeps the scheduled run and resumes any saved container."""
+    batch = scheduled_batch
+    initial_payloads: list[dict[str, str] | Exception] = []
+    if resume_status == "container_created":
+        initial_payloads.append({"id": "container-current"})
+    initial_payloads.append(RuntimeError("simulated task crash"))
+    initial_api = RecordingUrlopen(initial_payloads)
+
+    assert main(s3_client=FakeS3Client(), urlopen=initial_api) == 1
+    assert len(initial_api.requests) == len(initial_payloads)
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT id, status, platform_container_id FROM posts "
+            "WHERE generation_run_id = %s", (batch.run_id,),
+        )
+        saved_post = cursor.fetchone()
+    assert saved_post is not None
+    assert saved_post[1:] == (
+        resume_status,
+        "container-current" if resume_status == "container_created" else None,
+    )
+    newer_run = _add_generation_run(batch, datetime(2026, 10, 13, 22, 30))
+    retry_payloads = _success_payloads()
+    if resume_status == "container_created":
+        retry_payloads = retry_payloads[1:]
+    retry_api = RecordingUrlopen(retry_payloads)
+    s3 = FakeS3Client()
+
+    assert main(s3_client=s3, urlopen=retry_api) == 0
+    assert len(retry_api.requests) == len(retry_payloads)
+    if resume_status == "container_created":
+        assert s3.calls == []
+        assert retry_api.requests[0].get_method() == "GET"
+        assert urllib.parse.urlparse(retry_api.requests[0].full_url).path.endswith(
+            "/container-current"
+        )
+        assert not any(
+            urllib.parse.urlparse(request.full_url).path.endswith("/media")
+            for request in retry_api.requests
+        )
+    else:
+        assert len(s3.calls) == 1
+        assert urllib.parse.urlparse(
+            retry_api.requests[0].full_url
+        ).path.endswith("/media")
+    _assert_successful_runs(batch, [batch.run_id])
+    assert _run_posts(batch, newer_run) == ()
+    with batch.connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT id, status, platform_container_id, platform_post_id "
+            "FROM posts WHERE generation_run_id = %s", (batch.run_id,),
+        )
+        assert cursor.fetchall() == (
+            (saved_post[0], "success", "container-current", "post-current"),
+        )
+        cursor.execute(
+            "SELECT status, attempt_count, records_processed FROM batch_execution_logs "
+            "WHERE execution_arn = %s", (batch.execution_arn,),
+        )
+        assert cursor.fetchall() == (("succeeded", 2, 1),)
+
+
+@pytest.mark.parametrize(
+    "scheduled_at",
+    [
+        None,
+        "",
+        "2026-10-13 21:00:00",
+        "2026-10-13T21:00:00+09:00",
+        "2026-10-13T12:00:00.000Z",
+        "2026-10-13",
+        "2026-1-13T12:00:00Z",
+        "2026-02-30T12:00:00Z",
+    ],
+)
+def test_ac_8_invalid_scheduled_at_never_connects_or_writes(
+    scheduled_batch: ScheduledBatch, monkeypatch: pytest.MonkeyPatch,
+    scheduled_at: str | None,
+) -> None:
+    """AC-8: Invalid scheduled times fail before DB access or row changes."""
+    batch = scheduled_batch
+
+    def counts() -> tuple[int, int]:
+        with batch.connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT (SELECT COUNT(*) FROM posts WHERE set_id = %s), "
+                "(SELECT COUNT(*) FROM batch_execution_logs WHERE set_id = %s)",
+                (batch.set_id, batch.set_id),
+            )
+            return cursor.fetchone()
+
+    before = counts()
+    if scheduled_at is None:
+        monkeypatch.delenv("SCHEDULED_AT", raising=False)
+    else:
+        monkeypatch.setenv("SCHEDULED_AT", scheduled_at)
+    forbidden_connection = Mock(
+        side_effect=AssertionError("DB must not be opened")
+    )
+    monkeypatch.setattr(main_module, "open_connection", forbidden_connection)
+    api = RecordingUrlopen(_success_payloads())
+
+    assert main(s3_client=FakeS3Client(), urlopen=api) == 1
+    assert api.requests == []
+    forbidden_connection.assert_not_called()
+    assert counts() == before == (0, 0)
+
+
+def test_ac_9_jst_morning_selects_previous_utc_date(
+    scheduled_batch: ScheduledBatch, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AC-9: JST Oct 13 at 07:30 selects UTC Oct 12 at 22:30 unchanged."""
+    batch = scheduled_batch
+    morning = _add_generation_run(batch, MORNING_SCHEDULED_AT)
+    wrong_jst_date = _add_generation_run(batch, datetime(2026, 10, 13, 22, 30))
+    monkeypatch.setenv("SCHEDULED_AT", "2026-10-12T22:30:00Z")
+    api = RecordingUrlopen(_success_payloads())
+
+    assert main(s3_client=FakeS3Client(), urlopen=api) == 0
+    assert len(api.requests) == 3
+    _assert_successful_runs(batch, [morning])
+    # Oct 13 at 12:00 UTC is JST night, not the requested morning.
+    assert _run_posts(batch, batch.run_id) == ()
+    assert _run_posts(batch, wrong_jst_date) == ()

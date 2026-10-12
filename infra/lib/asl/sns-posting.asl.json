@@ -1,6 +1,20 @@
 {
-  "StartAt": "WaitForDbReady",
+  "StartAt": "CheckInput",
   "States": {
+    "CheckInput": {
+      "Type": "Choice",
+      "Choices": [
+        { "Not": { "Variable": "$.scheduled_at", "IsPresent": true }, "Next": "RejectInput" },
+        { "Not": { "Variable": "$.scheduled_at", "IsString": true }, "Next": "RejectInput" },
+        { "Variable": "$.scheduled_at", "StringMatches": "*-*-*T*:*:*Z", "Next": "WaitForDbReady" }
+      ],
+      "Default": "RejectInput"
+    },
+    "RejectInput": {
+      "Type": "Fail",
+      "Error": "SnsPostInputInvalid",
+      "Cause": "scheduled_at is missing or malformed"
+    },
     "WaitForDbReady": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
@@ -47,6 +61,7 @@
               "Name": "sns-post-batch",
               "Environment": [
                 { "Name": "SET_CODE", "Value.$": "$.set_code" },
+                { "Name": "SCHEDULED_AT", "Value.$": "$.scheduled_at" },
                 { "Name": "EXECUTION_ARN", "Value.$": "$$.Execution.Id" }
               ]
             }

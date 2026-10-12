@@ -79,7 +79,8 @@
         "StateMachineArn": "${SnsPostingSfnArn}",
         "Name.$": "$$.Execution.Name",
         "Input": {
-          "set_code.$": "$.set_code"
+          "set_code.$": "$.set_code",
+          "scheduled_at.$": "$.scheduled_at"
         }
       },
       "Retry": [

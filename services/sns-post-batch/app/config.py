@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+import datetime
 import os
+import re
 
 
 class ConfigError(Exception):
@@ -19,6 +21,7 @@ class AppConfig:
     db_secret_arn: str | None
     db_secret_json: str | None
     set_code: str
+    scheduled_at: datetime.datetime
     execution_arn: str
     s3_bucket_name: str
 
@@ -33,7 +36,7 @@ def load_config(environ: Mapping[str, str] | None = None) -> AppConfig:
         Validated application configuration.
 
     Raises:
-        ConfigError: If a required environment variable is missing or empty.
+        ConfigError: If a required variable is missing, empty, or invalid.
     """
     source = os.environ if environ is None else environ
     env_name = source.get("ENV_NAME")
@@ -58,11 +61,32 @@ def load_config(environ: Mapping[str, str] | None = None) -> AppConfig:
         if value is None or value == "":
             raise ConfigError(f"Required environment variable is missing: {variable_name}")
 
+    raw_scheduled_at = source.get("SCHEDULED_AT")
+    if raw_scheduled_at is None or raw_scheduled_at == "":
+        raise ConfigError(
+            "Required environment variable is missing: SCHEDULED_AT"
+        )
+    if re.fullmatch(
+        r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$", raw_scheduled_at
+    ) is None:
+        raise ConfigError(
+            "Invalid SCHEDULED_AT: expected UTC YYYY-MM-DDTHH:MM:SSZ"
+        )
+    try:
+        scheduled_at = datetime.datetime.strptime(
+            raw_scheduled_at, "%Y-%m-%dT%H:%M:%SZ"
+        )
+    except ValueError as exc:
+        raise ConfigError(
+            "Invalid SCHEDULED_AT: datetime does not exist"
+        ) from exc
+
     return AppConfig(
         env_name=env_name,
         db_secret_arn=db_secret_arn,
         db_secret_json=db_secret_json,
         set_code=required_values["SET_CODE"],
+        scheduled_at=scheduled_at,
         execution_arn=required_values["EXECUTION_ARN"],
         s3_bucket_name=required_values["S3_BUCKET_NAME"],
     )
