@@ -9,7 +9,7 @@ condition: ""
 parent: ""
 children: []
 detail: ""
-disposition: "開発計画 21-6c / 21-6f / 21-7b へ展開（2026-09-26）: ../plans/development-plan.html#step-21-7b"
+disposition: "開発計画 21-6c / 21-6f / 21-7b へ展開（2026-09-26）: ../plans/development-log.html#step-21-7b"
 ---
 
 ## 要旨

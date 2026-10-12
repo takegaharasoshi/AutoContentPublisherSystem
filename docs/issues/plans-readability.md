@@ -10,7 +10,7 @@ detail: "plans-readability.html"
 
 ## 要旨（対応方針の現在形）
 
-**着地: 展開（2026-09-21）**。展開草案の A〜D をそのまま [開発計画 Phase 25](../plans/development-plan.html#phase-25)（25-1 表示・検査の基盤 / 25-2 開発計画の移行と構造検査の有効化 / 25-3 計画の更新入口の統一 / 25-4 本適用の受け入れ〔ユーザー判断〕）へ転記した。初回の適用対象は開発計画のみで、セット計画書の変換は 25-4 の後に別途判断する。
+**着地: 展開（2026-09-21）**。展開草案の A〜D をそのまま [開発計画 Phase 25](../plans/development-log.html#phase-25)（25-1 表示・検査の基盤 / 25-2 開発計画の移行と構造検査の有効化 / 25-3 計画の更新入口の統一 / 25-4 本適用の受け入れ〔ユーザー判断〕）へ転記した。初回の適用対象は開発計画のみで、セット計画書の変換は 25-4 の後に別途判断する。
 
 整理された表示方針は [plans-readability.html](plans-readability.html)、開発計画全体の PoC は [development-plan-poc.html](development-plan-poc.html)、変更ファイルと展開草案は [plans-readability-rollout.html](plans-readability-rollout.html) を参照。
 

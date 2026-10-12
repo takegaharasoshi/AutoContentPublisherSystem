@@ -134,14 +134,14 @@
 <tr>
   <td>ウミガメのスープの投稿頻度を毎日から週 4 回（日・火・木・土）に減らす</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>捕捉 → 壁打ち 1 回（2026-10-08）で決定し待機。転記が漏れたまま 21-7 で Scheduler を毎日の cron で deploy していたことに有効化の直前で気づき（未投稿）、<a href="../plans/development-plan.html#step-21-6i">開発計画 21-6i</a> として転記（CDK の cron 変更と再 deploy を含める）。有効化は 21-6i の後</td>
+  <td>捕捉 → 壁打ち 1 回（2026-10-08）で決定し待機。転記が漏れたまま 21-7 で Scheduler を毎日の cron で deploy していたことに有効化の直前で気づき（未投稿）、<a href="../plans/development-log.html#step-21-6i">開発計画 21-6i</a> として転記（CDK の cron 変更と再 deploy を含める）。有効化は 21-6i の後</td>
   <td><a href="umigame-post-frequency-4days.md">MD</a></td>
   <td>2026-10-12</td>
 </tr>
 <tr>
   <td>ウミガメのコメント返信の LLM として Claude Haiku 5.5 を luna の代替候補に加える</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>捕捉 → 壁打ち 2 回（2026-10-08）。単価は luna と同額で、決め手は品質と拒否の発生率。⑦ = 判定 + 1b 相当・⑧ = 判定 + 1d 相当をどちらも Haiku で（effort は最大・プロンプトは luna 用のまま）全件プローブに足し、21-6e は 8 パターンで選ぶ。<a href="../plans/development-plan.html#step-21-6d12a">開発計画 21-6d12a</a>（仕様確認と設計）→ 21-6d12b（実装と小試走）→ 21-6d13（全件プローブ）。本番での役割は今後検討</td>
+  <td>捕捉 → 壁打ち 2 回（2026-10-08）。単価は luna と同額で、決め手は品質と拒否の発生率。⑦ = 判定 + 1b 相当・⑧ = 判定 + 1d 相当をどちらも Haiku で（effort は最大・プロンプトは luna 用のまま）全件プローブに足し、21-6e は 8 パターンで選ぶ。<a href="../plans/development-log.html#step-21-6d12a">開発計画 21-6d12a</a>（仕様確認と設計）→ 21-6d12b（実装と小試走）→ 21-6d13（全件プローブ）。本番での役割は今後検討</td>
   <td><a href="umigame-reply-haiku55.md">MD</a></td>
   <td>2026-10-08</td>
 </tr>
@@ -155,49 +155,49 @@
 <tr>
   <td>ウミガメのスープのコメント判定に OpenAI の Decisions API（Jev 相当）を候補として加える</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>壁打ち 1 回（2026-10-03）で再醸成待ち → 一般公開（トリガー b）を受けて 2026-10-07 に採用。⑤ jev + 2c-luna と同じ形のパターン ⑥（判定 = Decisions・返信文 = 2c-luna）を評価に加える。<a href="../plans/development-plan.html#step-21-6d10a">開発計画 21-6d10a</a>（公開ドキュメントの確認と設計）→ 21-6d10b（実装と小試走）→ 21-6d11（全件プローブ）。luna と同じモデルである点（独立性）は 21-6d11 の結果で評価する</td>
+  <td>壁打ち 1 回（2026-10-03）で再醸成待ち → 一般公開（トリガー b）を受けて 2026-10-07 に採用。⑤ jev + 2c-luna と同じ形のパターン ⑥（判定 = Decisions・返信文 = 2c-luna）を評価に加える。<a href="../plans/development-log.html#step-21-6d10a">開発計画 21-6d10a</a>（公開ドキュメントの確認と設計）→ 21-6d10b（実装と小試走）→ 21-6d11（全件プローブ）。luna と同じモデルである点（独立性）は 21-6d11 の結果で評価する</td>
   <td><a href="umigame-reply-openai-decisions.md">MD</a></td>
   <td>2026-10-07</td>
 </tr>
 <tr>
   <td>ウミガメの真相全文（truth）をフォロワーが読める場所に公開する</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>捕捉 → 壁打ち 1 回（2026-10-04）で、前回の問題の truth 全文を翌日リールのキャプション末尾（ハッシュタグの後ろ）に載せる方針を決定（コメント欄には出さない・見出しを問題タイトルに変える・ユーザー提示のキャプション例を仕様化）。<a href="../plans/development-plan.html#step-21-6d3e">開発計画 21-6d3e</a>（truth・title・caption の書き直し）と <a href="../plans/development-plan.html#step-21-6h">21-6h</a>（投稿バッチで前回の真相ブロックを差し込む）として起票（21-7 より前）</td>
+  <td>捕捉 → 壁打ち 1 回（2026-10-04）で、前回の問題の truth 全文を翌日リールのキャプション末尾（ハッシュタグの後ろ）に載せる方針を決定（コメント欄には出さない・見出しを問題タイトルに変える・ユーザー提示のキャプション例を仕様化）。<a href="../plans/development-log.html#step-21-6d3e">開発計画 21-6d3e</a>（truth・title・caption の書き直し）と <a href="../plans/development-log.html#step-21-6h">21-6h</a>（投稿バッチで前回の真相ブロックを差し込む）として起票（21-7 より前）</td>
   <td><a href="umigame-truth-disclosure.md">MD</a></td>
   <td>2026-10-04</td>
 </tr>
 <tr>
   <td>umigame-soup-1 のナレーションに ElevenLabs V4 を使う</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>捕捉 → 壁打ち 1 回（2026-10-03）で、リリース前に聞き比べ PoC（Irodori / v4 + G4 クローン / v4 + Voice Design / v3 対照）を行う方針を決定。<a href="../plans/development-plan.html#step-21-5d">開発計画 21-5d</a>（21-7 より前）として起票。採否の基準は「月 6 ドルの固定費に見合うほど Irodori より大幅に良いか」（ユーザー）。<strong>21-5d の聞き比べの結果は見送り</strong>（2026-10-03。ナレーションは Irodori のまま）</td>
+  <td>捕捉 → 壁打ち 1 回（2026-10-03）で、リリース前に聞き比べ PoC（Irodori / v4 + G4 クローン / v4 + Voice Design / v3 対照）を行う方針を決定。<a href="../plans/development-log.html#step-21-5d">開発計画 21-5d</a>（21-7 より前）として起票。採否の基準は「月 6 ドルの固定費に見合うほど Irodori より大幅に良いか」（ユーザー）。<strong>21-5d の聞き比べの結果は見送り</strong>（2026-10-03。ナレーションは Irodori のまま）</td>
   <td><a href="umigame-tts-elevenlabs-v4.md">MD</a></td>
   <td>2026-10-03</td>
 </tr>
 <tr>
   <td>umigame-soup-1 の動画音声を Gemini 3.8 Flash TTS で作る</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>捕捉 → 壁打ち 1 回（2026-09-26。2 問 × 15 パターンの聞き比べ PoC）で切り替えと声 G4「kamerock-chubby」（ぽっちゃりの食いしん坊パパ探偵）を決定。<a href="../plans/development-plan.html#step-21-5c">開発計画 21-5c</a>（Gemini TTS をビルドへ組み込み 14 本を作り直す。21-7 より前）として起票。クレジット表記は不要と確認済み</td>
+  <td>捕捉 → 壁打ち 1 回（2026-09-26。2 問 × 15 パターンの聞き比べ PoC）で切り替えと声 G4「kamerock-chubby」（ぽっちゃりの食いしん坊パパ探偵）を決定。<a href="../plans/development-log.html#step-21-5c">開発計画 21-5c</a>（Gemini TTS をビルドへ組み込み 14 本を作り直す。21-7 より前）として起票。クレジット表記は不要と確認済み</td>
   <td><a href="umigame-tts-gemini-flash.md">MD</a></td>
   <td>2026-09-26</td>
 </tr>
 <tr>
   <td>Claude Code から委譲する Codex のモデルを GPT-6 Luna（エフォート MAX）へ更新する</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>捕捉 → 壁打ち 1 回（2026-09-26）で確定し直接反映: Codex CLI を 0.157.1 へ更新し、委譲の既定を <code>gpt-6-luna</code> / <code>max</code> に（<code>.mcp.json</code>・WSL の <code>~/.codex/config.toml</code>・CLAUDE.md「委譲時のパラメータ・運用」。大型は <code>gpt-6-sol</code> / <code>max</code> 以上。Windows の Codex アプリは対象外）。派生でウミガメ判定のパターン 1 も <code>gpt-6-luna</code> / <code>max</code> に確定し、<a href="../plans/development-plan.html#step-21-6b">開発計画 21-6b</a>・セット設計書・方式設計書へ転記（<code>max_completion_tokens</code> 400 の測り直しを 21-6b の試走に追加）</td>
+  <td>捕捉 → 壁打ち 1 回（2026-09-26）で確定し直接反映: Codex CLI を 0.157.1 へ更新し、委譲の既定を <code>gpt-6-luna</code> / <code>max</code> に（<code>.mcp.json</code>・WSL の <code>~/.codex/config.toml</code>・CLAUDE.md「委譲時のパラメータ・運用」。大型は <code>gpt-6-sol</code> / <code>max</code> 以上。Windows の Codex アプリは対象外）。派生でウミガメ判定のパターン 1 も <code>gpt-6-luna</code> / <code>max</code> に確定し、<a href="../plans/development-log.html#step-21-6b">開発計画 21-6b</a>・セット設計書・方式設計書へ転記（<code>max_completion_tokens</code> 400 の測り直しを 21-6b の試走に追加）</td>
   <td><a href="codex-model-gpt6-luna.md">MD</a></td>
   <td>2026-09-26</td>
 </tr>
 <tr>
   <td>ウミガメのコメント返信を継続改善するため、受信・判定・返信の全記録を残し夜間バッチで Aurora に蓄積する</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>捕捉 → 壁打ち 1 回（2026-09-26）で方針確定し、開発計画へ展開: <a href="../plans/development-plan.html#step-21-6c2">21-6c2</a>（Reply Lambda が 1 コメント 1 JSON を S3 へ記録・username は持たない）/ <a href="../plans/development-plan.html#step-21-6f">21-6f</a>（書き込み権限）/ 新ステップ <a href="../plans/development-plan.html#step-21-7b">21-7b</a>（06:00 の insights 実行に相乗りして Aurora へ取り込み・S3 は 30 日で自動削除）</td>
+  <td>捕捉 → 壁打ち 1 回（2026-09-26）で方針確定し、開発計画へ展開: <a href="../plans/development-log.html#step-21-6c2">21-6c2</a>（Reply Lambda が 1 コメント 1 JSON を S3 へ記録・username は持たない）/ <a href="../plans/development-log.html#step-21-6f">21-6f</a>（書き込み権限）/ 新ステップ <a href="../plans/development-log.html#step-21-7b">21-7b</a>（06:00 の insights 実行に相乗りして Aurora へ取り込み・S3 は 30 日で自動削除）</td>
   <td><a href="umigame-comment-reply-logging.md">MD</a></td>
   <td>2026-09-26</td>
 </tr>
 <tr>
   <td>ウミガメのスープのコメント返信（はい / いいえ判定）に AI サービス「Jev」を使う</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>捕捉 → 壁打ち 4 回（2026-09-26）で方針が確定し、<a href="../plans/development-plan.html#step-21-6a">開発計画 21-6a〜f</a>へ展開した（旧 21-6 を分割: 品質レベルの定義と承認 → 判定方式〔luna 一括 / Jev 段階判定 + 定型文〕の設計と試走 → 2 方式の実装とローカル試行ツール → 全件の機械プローブ → ローカルの人間プローブと方式選定〔ユーザー判断〕→ 本番スタックとステージング疎通）。Jev の商用利用は MCA で可と確認済み。コメント返信トークンの自動更新（I-031）はリリース前の必須として、判定と切り離した独立ステップ 21-6g へ展開。I-032 は 21-6f で扱う</td>
+  <td>捕捉 → 壁打ち 4 回（2026-09-26）で方針が確定し、<a href="../plans/development-log.html#step-21-6a">開発計画 21-6a〜f</a>へ展開した（旧 21-6 を分割: 品質レベルの定義と承認 → 判定方式〔luna 一括 / Jev 段階判定 + 定型文〕の設計と試走 → 2 方式の実装とローカル試行ツール → 全件の機械プローブ → ローカルの人間プローブと方式選定〔ユーザー判断〕→ 本番スタックとステージング疎通）。Jev の商用利用は MCA で可と確認済み。コメント返信トークンの自動更新（I-031）はリリース前の必須として、判定と切り離した独立ステップ 21-6g へ展開。I-032 は 21-6f で扱う</td>
   <td><a href="umigame-yesno-jev.md">MD</a></td>
   <td>2026-09-26</td>
 </tr>
@@ -246,7 +246,7 @@
 <tr>
   <td>ウミガメのスープ参加型アカウント</td>
   <td><span class="badge badge-fixed">採用</span></td>
-  <td>PoC（<code>poc/umigame-comment-webhook/</code> + <code>UmigamePocStack</code>）で 2026-09-03 に Meta コメント Webhook 受信 → OpenAI 出題者役の自動返信 → 自己返信ループ防止までを実測（公開モード必須・App Review 不要・役割なしの一般アカウントのコメントも届く）。採用条件を満たし、<a href="../plans/development-plan.html#phase-21">開発計画 Phase 21</a>（21-1〜21-8）と<a href="../strategy/business-strategy.html#portfolio">事業戦略書 6 セットポートフォリオ</a> / 3.1（返信 LLM API の費目）へ展開。PoC 資材はコメント経路のステージング面として恒久利用</td>
+  <td>PoC（<code>poc/umigame-comment-webhook/</code> + <code>UmigamePocStack</code>）で 2026-09-03 に Meta コメント Webhook 受信 → OpenAI 出題者役の自動返信 → 自己返信ループ防止までを実測（公開モード必須・App Review 不要・役割なしの一般アカウントのコメントも届く）。採用条件を満たし、<a href="../plans/development-log.html#phase-21">開発計画 Phase 21</a>（21-1〜21-8）と<a href="../strategy/business-strategy.html#portfolio">事業戦略書 6 セットポートフォリオ</a> / 3.1（返信 LLM API の費目）へ展開。PoC 資材はコメント経路のステージング面として恒久利用</td>
   <td><a href="umigame-soup-set.md">MD</a> / <a href="umigame-soup-set.html">詳細</a></td>
   <td>2026-09-03</td>
 </tr>

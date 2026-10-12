@@ -9,7 +9,7 @@ condition: ""
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: "../plans/development-plan.html#step-21-6d3e（21-6d3e・21-6h として起票。2026-10-04）"
+disposition: "../plans/development-log.html#step-21-6d3e（21-6d3e・21-6h として起票。2026-10-04）"
 ---
 
 ## 要旨

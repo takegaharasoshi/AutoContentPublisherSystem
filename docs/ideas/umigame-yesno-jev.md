@@ -9,7 +9,7 @@ condition: ""
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: "開発計画 21-6a〜g へ展開（../plans/development-plan.html#step-21-6a、2026-09-26）"  # クローズ時の昇格先リンク / 見送り理由
+disposition: "開発計画 21-6a〜g へ展開（../plans/development-log.html#step-21-6a、2026-09-26）"  # クローズ時の昇格先リンク / 見送り理由
 ---
 
 ## 要旨

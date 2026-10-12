@@ -9,7 +9,7 @@ condition: ""
 parent: ""
 children: []
 detail: umigame-soup-set.html
-disposition: "採用（2026-09-03）→ 開発計画 Phase 21（21-1〜21-8）・事業戦略書 6 セットポートフォリオ / 3.1 返信 LLM API の費目へ展開済み（../plans/development-plan.html#phase-21）"
+disposition: "採用（2026-09-03）→ 開発計画 Phase 21（21-1〜21-8）・事業戦略書 6 セットポートフォリオ / 3.1 返信 LLM API の費目へ展開済み（../plans/development-log.html#phase-21）"
 ---
 
 ## 要旨

@@ -9,7 +9,7 @@ condition: "開発レーンで Phase 21 に 21-6i として転記する（21-7 �
 parent: ""               # 構想の子の場合、親の slug
 children: []             # 構想の場合、子の slug のリスト
 detail: ""               # 詳細 HTML を作ったらファイル名（<slug>.html）
-disposition: "開発計画 21-6i（docs/plans/development-plan.html#step-21-6i）へ転記（2026-10-12）"          # クローズ時の昇格先リンク / 見送り理由
+disposition: "開発計画 21-6i（docs/plans/development-log.html#step-21-6i）へ転記（2026-10-12）"          # クローズ時の昇格先リンク / 見送り理由
 ---
 
 ## 要旨

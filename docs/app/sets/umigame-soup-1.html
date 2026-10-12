@@ -1784,14 +1784,14 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
   <p>21-4a の出題者プロンプト以来、想像で答えないための逃げ道として 4 値目「それは答えに関わらないんだ。」があったが、返事の上では「関係ないよ」と区別しにくく、正解ラベルも 3 値だったため 3 値に戻した。判断できないときは「関係ない」に寄せる（パターン 1 はプロンプトとスキーマ、パターン 2 は段 D の最大確率が <code>T_ANSWER</code> 0.55 未満のとき。閾値は据え置き）。21-6d3 では 5 パターン合計 52 件が「判断できない」で、P4 の NG の多くを占めていた。</p>
   <ul style="margin:.3rem 0 0;">
     <li><strong>Jev の寄せ先</strong>: 21-6d3 で Jev が <code>unknown</code> にした 8 件は、「関係ない」に寄せると 6 件が正解ラベルと合い取り違え 0、最大確率の答えを採ると はい / いいえの取り違えが 2 件出たため「関係ない」に寄せた</li>
-    <li><strong>全件プローブ</strong>（21-6d4・<code>prompt_version</code> <code>de7b20ee3a37</code>・truth は 21-6d3e の書き直し後）: P4 は luna 系 10.9% → 4.5%・Jev 系 4.5% → 1.8%。段 B2（<a href="#d-20261004-contradiction">上記</a>）と合わせて P2 は Jev 系 12 → 2 件・luna 系 3 → 1 件・hybrid 2 → 1 件、⑤ 惜しい推理の一致は Jev 系 11/28 → 21/28。悪化したはい / いいえ質問 3 件（U16-e03・U12-e02・U21-e01）はいずれも truth の書き直しで判定の材料が変わったもので、3 値化そのものによる悪化は見つからなかった（数値と内訳は<a href="umigame-soup-1-probe.html">評価ページ</a>と<a href="../../plans/development-plan.html#step-21-6d4">開発計画 21-6d4</a>）</li>
+    <li><strong>全件プローブ</strong>（21-6d4・<code>prompt_version</code> <code>de7b20ee3a37</code>・truth は 21-6d3e の書き直し後）: P4 は luna 系 10.9% → 4.5%・Jev 系 4.5% → 1.8%。段 B2（<a href="#d-20261004-contradiction">上記</a>）と合わせて P2 は Jev 系 12 → 2 件・luna 系 3 → 1 件・hybrid 2 → 1 件、⑤ 惜しい推理の一致は Jev 系 11/28 → 21/28。悪化したはい / いいえ質問 3 件（U16-e03・U12-e02・U21-e01）はいずれも truth の書き直しで判定の材料が変わったもので、3 値化そのものによる悪化は見つからなかった（数値と内訳は<a href="umigame-soup-1-probe.html">評価ページ</a>と<a href="../../plans/development-log.html#step-21-6d4">開発計画 21-6d4</a>）</li>
     <li><strong>評価データ</strong>: U26-b22 の別解 <code>unknown</code> を <code>irrelevant</code> に読み替えた（正解ラベルは <code>no</code> のまま）</li>
   </ul>
 </div>
 
 <div class="decision" id="d-20261003-restructure">
   <span class="callout-title">2026-10-03 21-6d3b・ユーザー: 本書を仕様と経緯に分け、コメント返信を 10 章にまとめ、現行プロンプトを転記する</span>
-  <p>本文に決定コールアウト・試行番号・失効した記述が混ざり、コメント返信が 5.1 系と 10 章に分かれて読みにくかったため組み直した（仕様は変えていない）。プロンプトの転記は「同じ情報を 2 か所に書かない」の例外として承認された。旧節 → 新節の対応は<a href="../../plans/development-plan.html#step-21-6d3b">計画書 21-6d3b の作業記録</a>。</p>
+  <p>本文に決定コールアウト・試行番号・失効した記述が混ざり、コメント返信が 5.1 系と 10 章に分かれて読みにくかったため組み直した（仕様は変えていない）。プロンプトの転記は「同じ情報を 2 か所に書かない」の例外として承認された。旧節 → 新節の対応は<a href="../../plans/development-log.html#step-21-6d3b">計画書 21-6d3b の作業記録</a>。</p>
 </div>
 
 <div class="decision" id="d-20261004-truth-disclosure">
