@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プラットフォーム展開 | アイデア詳細</title>
+<link rel="stylesheet" href="../assets/style.css?v=20260921">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アイデア体系</a> / プラットフォーム展開</nav>
+<h1>プラットフォーム展開（ウミガメのスープをコメント返信ごと他プラットフォームへ）</h1>
+<div class="page-meta">
+  <span class="badge badge-future">再醸成待ち</span>
+  <span>種別: 単発 / 作成 2026-09-03 / 更新 2026-10-13 / 記録層: <a href="platform-expansion-tiktok.md">platform-expansion-tiktok.md</a></span>
+  <span>再開条件: <a href="umigame-soup-set.md">umigame-soup-1</a> のフォロワーが 2,000 人に到達</span>
+</div>
+
+<div class="warn">
+  <span class="callout-title">本書の位置づけ（設計書に非ず）</span>
+  採用判断のための<strong>検討記録</strong>。2026-10-13 の Web 調査（公式ドキュメント優先）の結果を整理したもので、API 仕様・料金・審査要件は変わりうる。再開時に一次情報で再確認し、採用が決まったら <code>docs/app/</code> / <code>docs/infra/</code> の設計プロセスへインプットとして引き継ぐ。展開方針の正は<a href="../strategy/business-strategy.html#platform">事業戦略書セクション 5</a>（本書の結論は採用時に転記する。現時点では書き換えていない）。
+</div>
+
+<h2>1. 前提（2026-10-13 の壁打ちで確定）</h2>
+<ul>
+  <li><strong>展開対象は umigame-soup-1（探偵カメロックのウミガメのスープ）</strong>。logic-training-1（脳みそコーチ）ではない</li>
+  <li><strong>展開の形は「同じセット・同じ動画を複数プラットフォームへ」</strong>（セット : アカウント = 1 : N）。世界観違いの複数アカウント（<a href="umigame-multi-account-worldview.md">umigame-multi-account-worldview</a>）との組み合わせは本件では扱わない</li>
+  <li><strong>コメント自動返信は必須</strong>。ウミガメはコメント欄が企画の本体のため、返信できない面へ動画だけ転用しても成立しない</li>
+  <li><strong>返信の遅延は数分おきの巡回（ポーリング）でも可</strong>。Webhook の有無は除外理由にしない。判定軸は「コメントを読む API」と「特定コメントへ返信する API」が公式にあるか</li>
+</ul>
+
+<h2>2. 結論（実現しやすい順）</h2>
+<div class="table-wrap"><table data-cards>
+<thead><tr><th>順位</th><th>プラットフォーム</th><th>判定</th><th>決め手</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Facebook リール（ページ）</td><td><span class="badge badge-fixed">可能</span></td><td>Instagram と同じ Meta Graph API。Webhook あり。現行の返信基盤をほぼ流用できる</td></tr>
+<tr><td>2</td><td>YouTube Shorts</td><td><span class="badge badge-wip">条件付き</span></td><td>審査が軽く無料。ただしポーリングのみ・返信は 1 日約 200 件が上限（クォータ）</td></tr>
+<tr><td>3</td><td>Threads</td><td><span class="badge badge-fixed">可能</span></td><td>返信 API・Webhook あり（審査要）。テキスト中心の場で短尺動画との相性は未知数</td></tr>
+<tr><td>4</td><td>X</td><td><span class="badge badge-wip">可能（有料）</span></td><td>従量課金。自分の投稿への自動返信は規約上 OK。1 日 100 返信で月 50 ドル前後</td></tr>
+<tr><td>5</td><td>TikTok</td><td><span class="badge badge-wip">条件付き（関門 3 つ）</span></td><td>開発者登録が法人のみの可能性・コメント権限の審査・投稿 API の監査</td></tr>
+<tr><td>6</td><td>LINE VOOM / ニコニコ</td><td><span class="badge badge-future">不可</span></td><td>公式の投稿・コメント API がない</td></tr>
+</tbody>
+</table></div>
+
+<div class="decision">
+  <span class="callout-title">decision: ウミガメの展開では「TikTok 第一候補」の前提が崩れる（2026-10-13）</span>
+  事業戦略書 5 の「TikTok を第一候補」は<strong>動画資産をそのまま転用できる</strong>ことを根拠にしていた。ウミガメはコメント返信が企画の本体なので選定基準が変わり、<strong>Facebook リールと YouTube Shorts が現実的な第一候補群</strong>になる（Facebook = 既存基盤の流用、YouTube = 視聴者の多さ）。TikTok は「個人で開発者登録できるか」を実機で試せば白黒がつく。法人化が前提なら別の事業判断。戦略書への反映は採用時の転記で行う。
+</div>
+
+<h2>3. プラットフォーム別の詳細</h2>
+<p>【二次】は公式文書で確認できず、二次情報のみで確認した主張。</p>
+
+<h3>3.1 Facebook リール（ページ）</h3>
+<ul>
+  <li><strong>動画の自動投稿</strong>: <code>POST /{page_id}/video_reels</code>（3 段階アップロード）。24 時間で 30 件まで。権限 <code>pages_manage_posts</code> 等</li>
+  <li><strong>コメント取得</strong>: ページ Webhook の <code>feed</code> フィールド（item=comment）。<code>subscribed_apps</code> へのアプリ登録が必要。<strong>リールへのコメントで通知が飛ぶかは公式で未確認</strong></li>
+  <li><strong>返信</strong>: コメント ID に対して POST。権限 <code>pages_manage_engagement</code> / <code>pages_read_engagement</code> / <code>pages_read_user_engagement</code>、ページタスク MODERATE + CREATE_CONTENT。自分のページだけなら Standard Access で動く【二次】</li>
+  <li><strong>規約</strong>: Meta の自動化ルールで Instagram と同系統</li>
+  <li><strong>判定</strong>: 可能。現行の Instagram 実装（Meta Graph + Webhook）の流用度がいちばん高い</li>
+</ul>
+
+<h3>3.2 YouTube Shorts</h3>
+<ul>
+  <li><strong>動画の自動投稿</strong>: <code>videos.insert</code>（専用枠 1 日 100 回）。<strong>未検証プロジェクトの投稿が非公開に固定されるかは要確認</strong>（現行の videos.insert 頁は「制限なし」、改訂履歴には 2020-07-28 の「非公開に制限」告知のみで撤廃告知が見当たらない）</li>
+  <li><strong>コメント取得</strong>: <code>commentThreads.list</code>（1 単位）のポーリング。コメントの push 通知はない（PubSubHubbub は新規動画の通知のみ）</li>
+  <li><strong>返信</strong>: <code>comments.insert</code>（<code>parentId</code> 指定でスレッド返信）が 1 件 50 単位。既定枠 1 万単位/日なので<strong>返信は 1 日約 200 件が上限</strong>。増枠は申請制・無料</li>
+  <li><strong>規約</strong>: スパムポリシーは大量・反復コメントやボットによる操作を禁止。合成コンテンツの開示義務は写実的な内容のみ（アニメ調は対象外）</li>
+  <li><strong>判定</strong>: 条件付きで可能。弱点はポーリング（遅延とクォータ按分）と返信件数の上限</li>
+</ul>
+
+<h3>3.3 Threads</h3>
+<ul>
+  <li><strong>動画の自動投稿</strong>: VIDEO コンテナ作成 → <code>threads_publish</code>。5 分・1 GB まで、24 時間で 250 件</li>
+  <li><strong>コメント取得</strong>: Webhook の <code>replies</code> フィールド（<code>threads_read_replies</code>）。アプリ審査（Advanced Access）とビジネス認証が必要。非公開アカウントの投稿では通知されない</li>
+  <li><strong>返信</strong>: <code>reply_to_id</code> 付きでコンテナを作って公開（<code>threads_manage_replies</code>）。24 時間で 1,000 件・無料</li>
+  <li><strong>判定</strong>: 可能（Webhook は審査要）。ただしテキスト中心の場で短尺動画が伸びるかは未知数</li>
+</ul>
+
+<h3>3.4 X</h3>
+<ul>
+  <li><strong>料金</strong>: 2026-02 から従量課金が既定。投稿 1 件 0.015 ドル（URL 付き 0.20 ドル）。一般向け無料枠は事実上廃止、Basic（月 200 ドル）は新規受付停止【二次】。動画アップロードの料金は公式頁で未確認</li>
+  <li><strong>コメント取得</strong>: 自分宛てメンションの読み取り 1 件 0.001 ドル。ポーリング（push は Enterprise 系）</li>
+  <li><strong>返信</strong>: 投稿作成と同じ扱いと推定（1 件 0.015 ドル程度）</li>
+  <li><strong>規約</strong>: 自動化ルール（2026-04 更新）は「自分のコンテンツに反応した人への自動返信」を許容例に挙げる。スパム・未承諾メッセージは禁止</li>
+  <li><strong>判定</strong>: 可能（有料）。事業戦略書 5 の「X は当面見送り（API 有料化が予算方針と不整合）」は、従量課金化で前提が変わった可能性がある（月 50 ドル前後の規模）</li>
+</ul>
+
+<h3>3.5 TikTok</h3>
+<ul>
+  <li><strong>動画の自動投稿</strong>: Content Posting API の Direct Post（<code>/v2/post/publish/video/init/</code>、<code>video.publish</code>）。<strong>未監査クライアントは非公開投稿（SELF_ONLY）のみ</strong>で、公開投稿には監査が要る（2〜6 週・1 日約 15 件【二次】）</li>
+  <li><strong>コメント取得</strong>: Display API / Login Kit にはない。TikTok API for Business の Accounts API（オーガニック動画）で取得。Webhook <code>comment.update</code>（5 分以内に通知・本文は含まれず再取得が必要）【二次】</li>
+  <li><strong>返信</strong>: <code>/business/comment/reply/create/</code>【二次】。公式の「Reply to a comment」（<code>/comment/post/</code>）は広告コメント用で使えない。スコープ <code>comment.list</code> / <code>comment.list.manage</code>（TikTok Accounts 権限。2026-03 から別途申請フォーム）。<strong>開発者登録は法人のみ・会社ドメインのメールが必要</strong>【二次】</li>
+  <li><strong>規約</strong>: 写実的な AI 生成コンテンツには AIGC ラベル。ボットによるエンゲージメント操作は禁止。似た文面の返信の連投がスパムとして非表示にされた報告あり【二次】</li>
+  <li><strong>判定</strong>: 条件付き。関門は「法人として開発者登録」「Accounts 権限の審査」「投稿の監査」の 3 つ。個人運営では登録段階で不可の可能性</li>
+</ul>
+
+<h3>3.6 その他</h3>
+<ul>
+  <li><strong>LINE VOOM</strong>: 公開の投稿 API が見当たらない → 不可</li>
+  <li><strong>ニコニコ</strong>: 公式は検索 API のみ。コメント投稿は非公式 API しかない → 不可</li>
+</ul>
+
+<h2>4. 現行の返信基盤との関係（見積もりの材料）</h2>
+<p>現行のコメント返信（<code>services/comment-reply/</code>・<code>CommentReplyStack</code>）は「Webhook Lambda → SQS FIFO + DLQ → Reply Lambda」の構成。</p>
+<ul>
+  <li><strong>Webhook がある面（Facebook・Threads・TikTok）</strong>: 受け口の Lambda をプラットフォーム別に足せば、SQS から先は流用できる見込み</li>
+  <li><strong>ポーリングの面（YouTube・X）</strong>: Webhook Lambda の代わりに、定期起動でコメントを取得し SQS へ積む Lambda を置く。返信 Lambda と LLM の判定は流用できる見込み</li>
+  <li>いずれも 1 セット : N アカウントの実装（現状は Instagram 1 アカウント分のみ）と、投稿バッチのプラットフォーム別分冊が前提になる</li>
+</ul>
+
+<h2>5. 再開までに潰したい不明点（実機確認）</h2>
+<ol>
+  <li><strong>TikTok に個人で開発者登録できるか</strong>（法人要件・2026-03 の申請フォーム・日本からの利用可否）。無料・数十分で白黒がつく</li>
+  <li><strong>Facebook ページの Webhook（<code>feed</code>）がリールへのコメントで届くか</strong>（Standard Access のままで届くかも）</li>
+  <li><strong>YouTube の未検証プロジェクトから <code>videos.insert</code> した動画が公開のまま残るか</strong></li>
+</ol>
+
+<h2>6. 出典（2026-10-13 閲覧）</h2>
+<ul>
+  <li>TikTok Direct Post: <a href="https://developers.tiktok.com/doc/content-posting-api-reference-direct-post">Direct Post リファレンス</a></li>
+  <li>TikTok 所有アカウントへの公開投稿: <a href="https://business-api.tiktok.com/portal/docs/publish-a-public-video-post-to-an-owned-account/v1.3">publish-a-public-video-post-to-an-owned-account/v1.3</a></li>
+  <li>TikTok 返信一覧（オーガニック）: <a href="https://business-api.tiktok.com/portal/docs/get-all-replies-to-a-comment/v1.3">get-all-replies-to-a-comment/v1.3</a></li>
+  <li>TikTok 広告コメントへの返信: <a href="https://business-api.tiktok.com/portal/docs/reply-to-a-comment/v1.3">reply-to-a-comment/v1.3</a></li>
+  <li>【二次】TikTok 投稿の監査期間・上限: <a href="https://www.postpeer.dev/blog/how-to-post-on-tiktok-with-api">postpeer.dev</a> / Webhook・返信: <a href="https://fixmation.dev/blog/one-inbox-for-social-comments">fixmation.dev</a>、<a href="https://github.com/diwenne/openreply/pull/75">github.com/diwenne/openreply/pull/75</a> / AI ポリシー: <a href="https://www.cinerads.com/blog/tiktok-ai-content-policy">cinerads.com</a></li>
+  <li>YouTube クォータ: <a href="https://developers.google.com/youtube/v3/determine_quota_cost">Quota costs</a></li>
+  <li>YouTube videos.insert: <a href="https://developers.google.com/youtube/v3/docs/videos/insert">videos.insert</a> / 改訂履歴: <a href="https://developers.google.com/youtube/v3/revision_history">revision_history</a></li>
+  <li>YouTube スパムポリシー: <a href="https://support.google.com/youtube/answer/2801973">ヘルプ 2801973</a> / 合成コンテンツの開示: <a href="https://blog.google/intl/en-africa/company-news/outreach-and-initiatives/how-were-helping-creators-disclose-altered-or-synthetic-content/">blog.google</a></li>
+  <li>Facebook リール投稿: <a href="https://developers.facebook.com/docs/video-api/guides/reels-publishing">Reels Publishing</a> / ページ Webhook: <a href="https://developers.facebook.com/docs/pages-api/webhooks-for-pages">webhooks-for-pages</a> / コメント: <a href="https://developers.facebook.com/docs/pages-api/comments-mentions">comments-mentions</a></li>
+  <li>Threads: <a href="https://developers.facebook.com/documentation/threads/overview">overview</a> / <a href="https://developers.facebook.com/docs/threads/webhooks">webhooks</a> / <a href="https://developers.facebook.com/docs/threads/retrieve-and-manage-replies">retrieve-and-manage-replies</a></li>
+  <li>X 料金: <a href="https://docs.x.com/x-api/getting-started/pricing">Pricing</a> / 自動化ルール: <a href="https://help.x.com/en/rules-and-policies/x-automation">X Automation rules</a> / 【二次】無料枠廃止: <a href="https://roboin.io/article/en/2026/02/08/x-transitions-api-to-pay-per-use-model-ending-free-plan/">roboin.io</a></li>
+  <li>ニコニコ: <a href="https://qiita.com/tor4kichi/items/1d57e33b55c832f197e2">qiita.com/tor4kichi</a></li>
+</ul>
+
+</div>
+<script src="../assets/docs-cards.js" defer></script>
+</body>
+</html>
