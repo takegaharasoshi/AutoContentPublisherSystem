@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -335,17 +335,13 @@
 </div>
 </article>
 
-</div>
-</details>
 
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-26-6" data-step-id="26-6" data-status="todo">
+<article class="plan-step" id="step-26-6" data-step-id="26-6" data-status="done" data-completed="2026-10-13">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>26-6</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>26-6</strong><span class="plan-status">完了</span></div>
 <h3>コンテナ ERROR の理由をログと api_response に残す（I-024 ①。26-5 完了後）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>26-5 完了後（同じ <code>instagram_api.py</code> を触るため直列）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>2026-10-13 完了（コミットまで）。ポーリングで <code>status</code> も取り、コンテナ ERROR の理由文字列が <code>error_message</code>・<code>api_response</code>・ログに残るようにした。pytest は sns-post-batch <code>236 passed, 34 skipped</code>。I-024 は ② だけ据え置きで残した。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -372,11 +368,28 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-13 実装・検証・課題表</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-10-13</strong>（数行の変更のため Codex には委譲せず Claude が実装）:</p>
+<ul>
+<li><strong>実装</strong>: <code>app/instagram_api.py</code> の <code>poll_container_status</code> で、取得する項目を <code>fields=status_code,status</code> にした。<code>status_code=ERROR</code> のときは <code>status</code>（Meta の理由文字列）を例外メッセージの末尾に付ける（<code>Instagram container processing returned ERROR: &lt;理由&gt;</code>。理由が空なら従来の文言）。例外の <code>response</code> は応答 JSON のままなので、<code>processing.py</code> の既存経路で <code>posts.error_message</code>・<code>posts.api_response</code>・<code>logger.error</code> に理由が残る。<code>processing.py</code> は変えていない。ポーリングの間隔と回数、publish の挙動、アプリ内リトライなし（I-024 ②）はどれも従来どおり。</li>
+<li><strong>テスト</strong>: <code>test_instagram_api.py</code> に、理由が例外メッセージと <code>response</code> に残ることを確かめるテストを足した。既存テストの query の期待値も <code>status_code,status</code> に直した。<code>test_processing.py</code> には、偽の urlopen で ERROR 応答を返す結合テストを足した。<code>update_post_failed</code> の <code>api_response</code>・<code>error_message</code> とログ（caplog）に理由が出ることを確かめている。</li>
+<li><strong>設計書</strong>: <a href="../app/data-model.html#detail-posts">data-model 4.6</a> に <code>error_message</code> と <code>api_response</code> の記録内容（ERROR の理由文字列）を足した。<a href="../app/batch-flow.html#sns-steps">batch-flow 3.3</a> のポーリング項目と ERROR 時の記録も同じ内容に合わせた。</li>
+<li><strong>検証</strong>: sns-post-batch の pytest（<code>.venv</code>）は <code>236 passed, 34 skipped</code>（skip は MySQL の e2e）。</li>
+<li><strong>課題表</strong>: <a href="../issues/index.html#I-024">I-024</a> は ① の実装済みを記録し、ステータスを 展開済み から 据え置き に戻した（残りは ②。発生実績型のトリガーは維持）。I-015・I-017 は据え置き継続で、トリガーは更新していない。確認待ちは該当なし。</li>
+</ul>
+<p>次: 差分レビュー → push → CodePipeline 完走の <code>/goal</code>（ユーザー）。I-024 ② の要否は、コンテナ ERROR が再発したときに理由文字列を見て判断する。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
 
 </div>
 </section>

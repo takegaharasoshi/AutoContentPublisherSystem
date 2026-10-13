@@ -346,7 +346,7 @@ def test_poll_container_status_retries_until_finished(monkeypatch) -> None:
     assert request.get_method() == "GET"
     assert request.full_url.startswith("https://graph.facebook.com/v25.0/container?")
     query = urllib.parse.parse_qs(urllib.parse.urlsplit(request.full_url).query)
-    assert query == {"fields": ["status_code"], "access_token": ["token"]}
+    assert query == {"fields": ["status_code,status"], "access_token": ["token"]}
 
 
 def test_poll_container_status_uses_reel_interval(monkeypatch) -> None:
@@ -382,6 +382,28 @@ def test_poll_container_status_error_is_shared_failure() -> None:
 
     assert str(raised.value) == "Instagram container processing returned ERROR"
     assert raised.value.response == {"status_code": "ERROR"}
+    assert len(urlopen.calls) == 1
+
+
+def test_poll_container_status_error_includes_reason() -> None:
+    """The ERROR reason from the status field is kept in message and response."""
+    payload = {
+        "status_code": "ERROR",
+        "status": "Error: Media upload has failed with error code 2207026",
+        "id": "container",
+    }
+    urlopen = _recording_urlopen([FakeResponse(payload)])
+
+    with pytest.raises(InstagramRequestFailed) as raised:
+        instagram_api.poll_container_status(
+            "token", "container", urlopen=urlopen, max_attempts=10
+        )
+
+    assert str(raised.value) == (
+        "Instagram container processing returned ERROR: "
+        "Error: Media upload has failed with error code 2207026"
+    )
+    assert raised.value.response == payload
     assert len(urlopen.calls) == 1
 
 

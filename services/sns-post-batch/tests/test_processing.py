@@ -4,10 +4,34 @@ import datetime
 
 from unittest.mock import ANY, Mock
 
+import json
+
+import app.instagram_api as instagram_api
 import app.processing as processing
 from acps_shared import InstagramRequestFailed
 from app.instagram_api import InstagramResultUnknown
 from app.models import CaptionTemplate, GeneratedMediaRef, Post, SnsAccount
+
+
+class _FakeHttpResponse:
+    """Minimal urlopen response returning a JSON payload."""
+
+    status = 200
+
+    def __init__(self, payload: dict) -> None:
+        self._body = json.dumps(payload).encode()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args) -> None:
+        return None
+
+    def read(self) -> bytes:
+        return self._body
+
+    def close(self) -> None:
+        return None
 
 
 def _account(account_id: int = 1, platform: str = "instagram") -> SnsAccount:
@@ -223,6 +247,33 @@ def test_processing_marks_clear_failure_and_continues_to_next_account(monkeypatc
         "api_response": {"error": "bad"},
     }
     assert processing.update_post_success.call_count == 1
+
+
+def test_processing_records_container_error_reason(monkeypatch, caplog) -> None:
+    """A container ERROR reason reaches the log and posts.api_response."""
+    payload = {"status_code": "ERROR", "status": "Error: video too long (2207026)"}
+    urlopen = Mock(
+        return_value=_FakeHttpResponse(payload),
+    )
+    states = iter([None, Post(101, "failed", "container", None)])
+    caplog.set_level("ERROR", logger=processing.__name__)
+
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        lambda *args, **kwargs: next(states),
+        poll_container_status=lambda token, container_id, **kwargs: (
+            instagram_api.poll_container_status(
+                token, container_id, urlopen=urlopen, max_attempts=1
+            )
+        ),
+    )
+
+    assert result == processing.ProcessingResult(1, False)
+    kwargs = processing.update_post_failed.call_args.kwargs
+    assert kwargs["api_response"] == payload
+    assert "Error: video too long (2207026)" in kwargs["error_message"]
+    assert "Error: video too long (2207026)" in caplog.text
 
 
 def test_processing_marks_unknown_result_as_unconfirmed(monkeypatch) -> None:

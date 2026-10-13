@@ -136,7 +136,7 @@ def poll_container_status(
     for attempt in range(max_attempts):
         response = get_json(
             f"/{container_id}",
-            {"fields": "status_code", "access_token": access_token},
+            {"fields": "status_code,status", "access_token": access_token},
             urlopen=urlopen,
         ).payload
         last_response = response
@@ -144,10 +144,12 @@ def poll_container_status(
         if status_code == "FINISHED":
             return response
         if status_code == "ERROR":
-            raise InstagramRequestFailed(
-                "Instagram container processing returned ERROR",
-                response=response,
-            )
+            # status carries Meta's reason text (e.g. "Error: ... (2207026)").
+            reason = response.get("status")
+            message = "Instagram container processing returned ERROR"
+            if reason:
+                message = f"{message}: {reason}"
+            raise InstagramRequestFailed(message, response=response)
         if attempt + 1 < max_attempts:
             time.sleep(poll_interval_seconds)
 
