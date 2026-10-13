@@ -20,7 +20,7 @@ section{margin-top:2.2rem}li{margin-bottom:.5rem}pre{max-width:100%;overflow-x:a
 <div class="lead-box"><h2>承認された方針：当回だけを対象にし、過去分へ戻らない</h2>
 <p><strong>セット名と当回の予定時刻で生成実行を特定し、素材がある場合だけ投稿する。</strong>朝の空の実行も、素材はあるが未投稿の朝の実行も、夜の投稿候補には入れない。夜・翌朝それぞれの生成と投稿が成功すれば、その回の内容で投稿する。当回が失敗した回は欠番を許容する。</p>
 <p>2026-09-21 にユーザーが方針を承認。以下は実コードを照合した変更範囲と開発レーンへの展開案であり、実装・本番操作は未実施。I-014 と I-017 の時間帯ずれ防止をまとめ、I-022・I-024 は同じフェーズの後続へ分ける。</p>
-<p>管理状態・再判断条件・発生履歴の正は <a href="index.html#I-014">I-014</a> / <a href="index.html#I-017">I-017</a>。<strong>2026-09-22 に<a href="../plans/development-plan.html#phase-26">開発計画 Phase 26</a> として転記済み</strong>（A = 26-1 / B = 26-2 / C = 26-3 / D = 26-4。I-022 = 26-5・I-024 ① = 26-6）。以後の内容・完了条件の正は計画書で、本書は事象の説明・受け入れケース・切替の注意の参照先。</p></div>
+<p>管理状態・再判断条件・発生履歴の正は <a href="index.html#I-014">I-014</a> / <a href="index.html#I-017">I-017</a>。<strong>2026-09-22 に<a href="../plans/development-log.html#phase-26">開発計画 Phase 26</a> として転記済み</strong>（A = 26-1 / B = 26-2 / C = 26-3 / D = 26-4。I-022 = 26-5・I-024 ① = 26-6）。以後の内容・完了条件の正は計画書で、本書は事象の説明・受け入れケース・切替の注意の参照先。</p></div>
 <nav class="jump" aria-label="目次"><a href="#incident">1. 事象と原因</a><a href="#solution">2. 推奨する対応</a><a href="#options">3. 対応案の比較</a><a href="#files">4. 変更ファイル</a><a href="#rollout">5. ステップ展開案</a><a href="#sources">6. 根拠と確認範囲</a></nav>
 <section aria-labelledby="incident"><h2 id="incident">1. 事象と原因</h2>
 <div class="compare" aria-label="変更前と変更後の比較">
@@ -83,7 +83,7 @@ section{margin-top:2.2rem}li{margin-bottom:.5rem}pre{max-width:100%;overflow-x:a
 </section>
 <section aria-labelledby="rollout"><h2 id="rollout">5. ステップ展開案</h2>
 <p><strong>A：設計 → B：実装・機械検証 → C：本番切替（人間）→ D：反映確認</strong>の 4 工程を推奨する。すべて開発レーン。I-014 と I-017 の時間帯ずれ防止を先に完了させ、I-022・I-024 は同じフェーズ内の独立した後続ステップへ置く。</p>
-<p>各工程は計画体系 5 の 4 項目で示す。2026-09-21 の着地は<strong>承認方針を展開するための下書き完成</strong>。2026-09-22 に開発レーンで <a href="../plans/development-plan.html#phase-26">Phase 26</a> へ転記し、I-014 は展開済みとした。</p>
+<p>各工程は計画体系 5 の 4 項目で示す。2026-09-21 の着地は<strong>承認方針を展開するための下書き完成</strong>。2026-09-22 に開発レーンで <a href="../plans/development-log.html#phase-26">Phase 26</a> へ転記し、I-014 は展開済みとした。</p>
 <details open><summary>A. 入力契約・選定・切替手順を設計する</summary><div class="inner"><ul>
 <li><strong>内容：</strong>上表の設計書・運用書 6 本を更新。run / 素材欠落と終端済みの結果、UTC 形式、手動復旧、期限ガードの要否を確定する。全セット共通の変更として、1 日 1 回のセットも含め影響を照合する。新旧入力・アプリ・親子 ASL の組合せと切戻し手順を記す。</li>
 <li><strong>完了条件：</strong>設計・環境変数・SQL・手動入力例が同じ契約。現役設計書内の「SNS は scheduled_at 不要」「最古 actionable」の旧記述を全件照合し、履歴と現行説明を区別。リンク検査に新規不備なし。B の受け入れケース・切替チェック表が揃う。</li>

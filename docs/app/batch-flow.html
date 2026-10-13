@@ -187,7 +187,7 @@
 <p>投稿バッチは<strong>当回 = 自分を起動した予定時刻の生成実行だけ</strong>を扱う。セット × 予定時刻（<code>SCHEDULED_AT</code>）で生成実行を特定し、<strong>過去分・別の回へは戻らない</strong>。生成に失敗した回・当回を投稿できなかった回は欠番を許容する（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a> の初期方針）。</p>
 <div class="warn">
   <span class="callout-title">移行中（2026-10-13 時点）</span>
-  本節は 26-1 で確定した契約。実装は 26-2、本番切替は 26-3（<a href="../plans/development-plan.html#phase-26">開発計画 Phase 26</a>）で、<strong>切替までは本番は旧契約（<code>set_code</code> のみを受け取り、actionable な生成実行のうち最古の 1 件を選ぶ）で稼働している</strong>。旧契約の全文は git の履歴（26-1 より前の本書）を参照。
+  本節は 26-1 で確定した契約。実装は 26-2、本番切替は 26-3（<a href="../plans/development-log.html#phase-26">開発計画 Phase 26</a>）で、<strong>切替までは本番は旧契約（<code>set_code</code> のみを受け取り、actionable な生成実行のうち最古の 1 件を選ぶ）で稼働している</strong>。旧契約の全文は git の履歴（26-1 より前の本書）を参照。
 </div>
 <ol>
   <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（画像生成バッチと同じ扱い。<code>is_active=0</code> のセットで何もせず正常終了する現行動作は変えない）</li>

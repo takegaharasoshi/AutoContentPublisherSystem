@@ -11,7 +11,7 @@ detail: "sns-empty-generation-run.html"
 
 ## 要旨（対応方針の現在形）
 
-2026-09-22 に開発計画 Phase 26（26-1 設計 / 26-2 実装 / 26-3 本番切替〔ユーザー〕/ 26-4 反映確認。後続 26-5 = I-022・26-6 = I-024 ①）へ展開済み。以後の内容・完了条件の正は `docs/plans/development-plan.html#phase-26`。事象の説明・選択肢と判断・受け入れケース・切替の注意は [詳細 HTML](sns-empty-generation-run.html) を参照。
+2026-09-22 に開発計画 Phase 26（26-1 設計 / 26-2 実装 / 26-3 本番切替〔ユーザー〕/ 26-4 反映確認。後続 26-5 = I-022・26-6 = I-024 ①）へ展開済み。以後の内容・完了条件の正は `docs/plans/development-log.html#phase-26`。事象の説明・選択肢と判断・受け入れケース・切替の注意は [詳細 HTML](sns-empty-generation-run.html) を参照。
 
 ## 原文メモ
 
