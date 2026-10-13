@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>Phase 27 起票</strong>: <a href="../issues/index.html#I-039">I-039</a>〔<code>follows_and_unfollows</code> に数値が入らない〕を 27-1 切り分け・27-2 修正 or 受容に展開。I-040 より先に軽い課題を片付ける方針〔ユーザー判断〕。ステップができたので <code>data-plan-steps="none"</code> を外した）。前回: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-13（<strong>27-1 完了</strong>: <code>follows_and_unfollows</code> が空なのは API 側の集計遅延〔前日分は約 10 時間後でも未集計・2 日前より古い日は返る〕で、前日行を 1 回だけ書く収集と噛み合っていなかった。27-2 は対象日を 2 日以上前にずらして取り直す方針〔ユーザー確認待ち〕。<a href="#step-27-1">27-1</a>）。前回: 2026-10-13（<strong>Phase 27 起票</strong>: <a href="../issues/index.html#I-039">I-039</a>〔<code>follows_and_unfollows</code> に数値が入らない〕を 27-1 切り分け・27-2 修正 or 受容に展開。I-040 より先に軽い課題を片付ける方針〔ユーザー判断〕。ステップができたので <code>data-plan-steps="none"</code> を外した）。前回: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -74,14 +74,16 @@
 </div>
 </details>
 
-<div class="plan-group" data-plan-group="active">
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 1 件（クリックで展開）</summary>
+<div class="plan-group-inner">
 
-<article class="plan-step" id="step-27-1" data-step-id="27-1" data-status="todo">
+<article class="plan-step" id="step-27-1" data-step-id="27-1" data-status="done" data-completed="2026-10-13">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>27-1</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>27-1</strong><span class="plan-status">完了</span><span>2026-10-13</span></div>
 <h3>follows_and_unfollows に数値が入らない原因を切り分ける（I-039）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-10-13）</strong>。要求パラメータも保存（正規化）も正しく、<strong>原因は API 側の集計遅延</strong>。前日（UTC）の 1 日分は日付が締まって約 10 時間後でも <code>results</code> が無く、2 日前より古い日は同じ要求で <code>FOLLOWER</code> / <code>NON_FOLLOWER</code> の 2 件が返る。バッチは締まって 9 / 21 時間後に前日行を <code>INSERT IGNORE</code> で 1 回だけ書くため、毎回空のまま固定されていた。27-2 の直し方は<strong>要求パラメータ（対象日）の修正</strong> = <code>follows_and_unfollows</code> だけ 2 日以上前の日を取り直して既存行へ追記する（ユーザー確認待ち）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -108,11 +110,31 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— プローブ結果・根拠・27-2 の直し方</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-10-13（10:24 UTC）・読み取り専用 GET のプローブ</strong>（本番 Secret <code>acps/prod/logic-training-1/sns/instagram/main-account</code> の token を使う。読み取りはユーザー許可済み。スクリプトはスクラッチパッドに置き、コミットしていない）。Graph API v25.0・<code>/{ig_user_id}/insights</code>。<code>followers_count</code> は 259。</p>
+<ul>
+<li>A 本番と同じ要求（<code>metric_type=total_value</code>・<code>breakdown=follow_type</code>・<code>period=day</code>・前日 10-12 の 1 日）→ 200、<code>breakdowns[0]</code> は <code>dimension_keys</code> だけで <code>results</code> 無し（DB に入っている形と同じ）</li>
+<li>B breakdown なし（前日 1 日）→ 200、要素に <code>total_value</code> 自体が無い / F breakdown なし・7 日幅 → 同じく無し（内訳なしの合計値は返らない）</li>
+<li>C 本番と同じ・3 日前（10-10）の 1 日 → <code>results</code> 2 件（<code>FOLLOWER</code>=9・<code>NON_FOLLOWER</code>=2）</li>
+<li>D 本番と同じ・7 日幅（10-05〜10-11）→ <code>results</code> 2 件（34・11）</li>
+<li>E <code>since</code> / <code>until</code> なし（既定の直近 24 時間）→ <code>results</code> 無し</li>
+<li>G <code>metric_type</code> なし → 400「<code>follows_and_unfollows</code> should be specified with parameter metric_type=total_value」</li>
+<li>H 対照: <code>reach</code>（total_value・前日 1 日）→ <code>value</code>=3982（前日でも即時に返る）</li>
+<li>単日の連続確認（本番と同じ要求・1〜7 日前）: 10-12 だけ <code>results</code> 無し。10-11（3・2）・10-10（9・2）・10-09（4・1）・10-08（1・1）・10-07（2・1）・10-06（2・2）は 2 件ずつ返る</li>
+</ul>
+<p><strong>結論</strong>: 要求パラメータ（<code>metric_type=total_value</code> は必須・<code>breakdown=follow_type</code> も正しい）と正規化（<code>_normalize_metric</code> は <code>total_value.breakdowns</code> をそのまま保存する）は正しい。原因は <strong>API 側の集計遅延</strong>。前日の 1 日分は日付が締まって約 10 時間後でも <code>results</code> が無く、約 34 時間後（2 日前）には入っていた。収集バッチは 06:00 / 18:00 JST（= 締まって 21 / 9 時間後）に前日（UTC）の行を <code>INSERT IGNORE</code> で 1 回だけ書き、書き直さない（<code>account_insights.py</code>）。そのため、2026-09-17 以降の全日が「<code>dimension_keys</code> だけ」で固定されていた。16-12b〔2026-09-03〕の「100 フォロワー未満では返らない」も当時は正しかったが、閾値を超えた後も入らなかった理由はこの遅延。</p>
+<p><strong>根拠</strong>: Meta の <a href="https://developers.facebook.com/docs/instagram-platform/api-reference/instagram-user/insights">Instagram User Insights リファレンス</a>の「Data used to calculate metrics may be delayed up to 48 hours.」（遅延の記述）、<code>follows_and_unfollows</code> の行の「Not returned if the IG User has less than 100 followers.」（閾値）、および metric_type 節の「If you request <code>metric_type=total_value</code>, you can also specify one or more breakdowns」（breakdown は total_value のときだけ）。changelog で v25.0 までにこの指標の廃止・仕様変更の記載は見当たらない（26-5 の changelog 照合の範囲と同じ）。</p>
+<p><strong>27-2 の直し方（1 つに決定・ユーザー確認待ち）</strong>: <strong>要求パラメータ（対象日）の修正</strong>。<code>follows_and_unfollows</code> だけ、収集日の 2 日以上前（48 時間の遅延を見込んで <code>closed_date − 2</code> 以前）の日を取り直し、既存行の <code>metrics</code> に <code>results</code> が無ければその値だけを追記する（他の指標は前日のまま。行の <code>INSERT IGNORE</code> は変えない）。遡れる範囲は 7 日まで確認済みで、2026-09-17 以降の過去分の埋め戻しをどこまでやるかは 27-2 で決める。<strong>注意</strong>: <code>FOLLOWER</code> / <code>NON_FOLLOWER</code> の意味（どちらがフォロー、どちらがアンフォローか）はリファレンスに明記がない。27-2 で <code>followers_count</code> の日次の差分と突き合わせて解釈を決め、data-model 4.11 に書く。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
 
 <article class="plan-step" id="step-27-2" data-step-id="27-2" data-status="todo">
 <header class="plan-step-head">
@@ -141,8 +163,8 @@
 </div>
 </section>
 <details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 27-1 の結論で決まる</span></summary>
-<div class="plan-fold-inner"><p>直し方は 27-1 の結論で決まるため、着手時に 27-1 の作業記録を読む。</p></div>
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 27-1 の結論: 対象日を 2 日以上前にずらして追記</span></summary>
+<div class="plan-fold-inner"><p>直し方は 27-1 の作業記録の「27-2 の直し方」を正とする（<code>follows_and_unfollows</code> だけ <code>closed_date − 2</code> 以前の日を取り直し、既存行の <code>metrics</code> に <code>results</code> が無ければ追記。<code>FOLLOWER</code> / <code>NON_FOLLOWER</code> の意味は <code>followers_count</code> の差分と突き合わせて決める）。着手時に 27-1 の作業記録を読む。</p></div>
 </details>
 <details class="plan-fold" data-field="record">
 <summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
