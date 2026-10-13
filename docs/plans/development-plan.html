@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
 <link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body data-plan-format="1" data-plan-steps="none">
+<body data-plan-format="1">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / 開発計画</nav>
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-13（<strong>Phase 27 起票</strong>: <a href="../issues/index.html#I-039">I-039</a>〔<code>follows_and_unfollows</code> に数値が入らない〕を 27-1 切り分け・27-2 修正 or 受容に展開。I-040 より先に軽い課題を片付ける方針〔ユーザー判断〕。ステップができたので <code>data-plan-steps="none"</code> を外した）。前回: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -64,8 +64,96 @@
 
 <p><strong>次のフェーズを起こすときの入口</strong>: <a href="#pending-checks">確認待ちリスト</a>（トリガーが来た項目）/ <a href="../ideas/index.html">アイデア体系</a>セクション 2 の条件待ち / <a href="../issues/index.html#lane-dev">課題体系の開発レーン節</a>（トリガーが揃った据え置き課題。束ね方・同梱の要否は課題表の対応方針・トリガー列が正）/ 月次 KPI 転記は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>の定常作業でフェーズにしない。起票は<a href="index.html#step-checklist">計画体系 5.1</a> のチェックリストに従う。</p>
 
-<h2 id="current-phase">進行中のフェーズ</h2>
-<p><strong>なし</strong>（2026-10-13 に Phase 26 が完了）。次の候補は課題 <a href="../issues/index.html#I-040">I-040</a>（設計書を生産面と配信面の 2 面で描き直し、<code>docs/production/</code> を新設する。トリガー = Phase 26 の完了）を Phase 27 として起票すること。ステップが 0 件のあいだは構造検査のため <code>&lt;body data-plan-steps="none"&gt;</code> を宣言している。<strong>次のフェーズを起こすときにこの宣言を外す</strong>（<a href="index.html#step-layout">計画体系 5.0</a>）。</p>
+<section class="plan-phase" data-plan-phase="27" id="phase-27">
+<h2>Phase 27: アカウント日次インサイトの follows_and_unfollows を取れるようにする（I-039）</h2>
+<p><strong>ゴール</strong>: 100 フォロワーを超えた logic-training-1 でも <code>account_insights_daily.metrics</code> の <code>follows_and_unfollows</code>（<code>breakdown=follow_type</code>）に数値が入らない原因を切り分け、取れるなら取れるように直し、取れないならその理由を設計書に残して課題を閉じる。</p>
+<details class="plan-fold">
+<summary>フェーズの背景・起票の経緯 <span class="plan-hint">— I-039 の展開・対象外・課題照合・分割理由</span></summary>
+<div class="plan-fold-inner">
+<blockquote>経緯: 2026-10-13 の確認待ちの棚卸しで、16-12b の確認行「<code>follows_and_unfollows</code> は 100 フォロワー到達後に入るか」が NG と判明し、<a href="../issues/index.html#I-039">I-039</a> として起票（2026-09-17 以降の 25 日分すべてが <code>{"breakdowns": [{"dimension_keys": ["follow_type"]}]}</code> で <code>results</code> が無い）。I-040（設計書の全面改訂）が重いため、先に軽い課題を片付ける方針（ユーザー判断 2026-10-13）で同日に本フェーズを起票した。<strong>対象外</strong>: <code>v_account_kpi_daily</code> へのビュー昇格（取れることを確かめてから判断する。I-039 の対応方針どおり）、他のアカウント指標の見直し、投稿インサイト。<strong>課題表の照合</strong>（<a href="index.html#step-checklist">5.1-5</a>。触るパス: <code>services/insights-batch/</code>・<code>docs/app/data-model.html</code> 4.11）: I-039 を展開（本フェーズ）。ほかの live 行は該当なし（I-021・I-028 はクローズ済み）。<strong>分割</strong>（5.1-4）: 原因が分かるまで直し方が決まらないため、27-1〔切り分け〕と 27-2〔修正 or 受容〕に割る。<strong>確認待ちの分離</strong>（5.1-1）: 修正後の「次の日次収集で数値が入るか」は自セッションでは確かめられないので、27-2 の完了時に確認待ちリストへ起票する。</blockquote>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<article class="plan-step" id="step-27-1" data-step-id="27-1" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>27-1</strong><span class="plan-status">未着手</span></div>
+<h3>follows_and_unfollows に数値が入らない原因を切り分ける（I-039）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>本番の要求（<code>metrics_catalog.py</code> の <code>follows_and_unfollows</code>・<code>breakdown=follow_type</code>）と、パラメータを変えた数通りの要求を読み取り専用で Graph API に送り、応答に <code>results</code> が返るかを比べる。原因を「API が値を返さない（仕様・閾値・期間）」「要求パラメータの誤り」「応答の保存（<code>insights_api.py</code> の正規化）の誤り」のどれかに絞り、27-2 の直し方を決める。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>呼ぶのは読み取りの GET だけ（投稿・設定変更をしない）。token を会話・ファイル・ログに出さない。調査用のスクリプトはコミットしない（スクラッチパッドに置く）。本番のコード・DB は変えない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>試した要求ごとの応答の要約（token を伏せた要求パラメータ + <code>results</code> の有無と件数）を会話に貼る。</li>
+<li>原因の結論と根拠（Meta のドキュメント・changelog の該当箇所を含む）を作業記録に書き、27-2 で取る直し方（パラメータ修正 / 正規化の修正 / 取れないので受容）を 1 つに決める。</li>
+<li>課題表の <a href="../issues/index.html#I-039">I-039</a> の対応方針列に結論を書く。計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。docs のみなので日本語メッセージでコミットし、pull --rebase → push まで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>本番 token を Secrets Manager から読んで API を呼ぶ前に、ユーザーの許可を取る。結論と 27-2 の直し方をユーザーが確認する。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/plans/</code> <code>docs/issues/</code> のみ）。stop after 15 turns。やらないこと: <code>services/</code> の変更、Secrets の書き換え。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 現行の要求と保存・試す候補</span></summary>
+<div class="plan-fold-inner">
+<p>現行の要求は <code>services/insights-batch/app/metrics_catalog.py</code> の <code>MetricRequest(("follows_and_unfollows",), …, breakdown="follow_type")</code>。<code>insights_api.py</code> は <code>total_value</code> に <code>breakdowns</code> があればそれをそのまま保存するため、保存されている値は API の応答そのものと推定される（未確定）。試す候補: <code>metric_type=total_value</code> の有無、<code>period=day</code> のまま <code>since</code> / <code>until</code> を数日に広げる、<code>breakdown</code> を外した要求。投稿系と同じ Graph API v25.0 で呼ぶ（insights-batch の base URL を確認する）。経緯は data-model 4.11 の decision（16-12b）と <a href="development-log.html">開発記録</a>の確認待ち（確認済み）。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-27-2" data-step-id="27-2" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>27-2</strong><span class="plan-status">未着手</span></div>
+<h3>27-1 の結論に沿って直す、または受容して設計書に残す（I-039）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>27-1 の完了後（直し方がユーザー確認済みであること）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>直せる場合は <code>services/insights-batch/</code> の要求パラメータまたは応答の正規化を直し、テストを足す。取れない場合はコードを変えず、理由を設計書に残して I-039 を受容で閉じる。どちらの場合も <a href="../app/data-model.html">data-model 4.11</a> の <code>follows_and_unfollows</code> の記載を結論に合わせる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ほかの指標の要求・保存形式を変えない。<code>v_account_kpi_daily</code> へのビュー昇格（DDL）は本ステップでは行わない（取れることを確かめてから別途判断）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>直す場合: 27-1 で確かめた応答の形を再現する偽物を使ったテストを足し、insights-batch の <code>pytest</code> が全パス（要約行を貼る）。受容の場合: コードの差分がないこと。</li>
+<li>data-model 4.11 の記載を結論に合わせる。</li>
+<li>直した場合は「push 後の最初の日次収集で数値が入るか」を確認待ちリストに起票する。課題表の I-039 を、受容ならクローズ節へ移す。直した場合は確認待ちが OK になるまで行を残す。</li>
+<li>計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。日本語メッセージでコミットまで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → <code>/goal</code> 定型行で CodePipeline 完走とタスク定義の新リビジョンを確認（ユーザー）。受容の場合は docs のみのため push まで行い、ゲートは結論の確認だけ。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/insights-batch/</code> <code>docs/app/data-model.html</code> <code>docs/plans/</code> <code>docs/issues/</code>。<code>services/</code> を触った場合 push は差分確認後）。stop after 15 turns。やらないこと: DDL・ビューの変更、ほかの指標の見直し。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 27-1 の結論で決まる</span></summary>
+<div class="plan-fold-inner"><p>直し方は 27-1 の結論で決まるため、着手時に 27-1 の作業記録を読む。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</section>
+
 
 <hr>
 
