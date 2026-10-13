@@ -17,6 +17,7 @@ from .instagram import (
     RateLimitGuard,
     classify_graph_error,
     get_json,
+    post_form,
 )
 from .secrets import (
     DbSecret,
@@ -52,6 +53,7 @@ __all__ = [
     "RateLimitGuard",
     "classify_graph_error",
     "get_json",
+    "post_form",
     "SnsCredentials",
     "build_sns_secret_name",
     "parse_sns_secret",

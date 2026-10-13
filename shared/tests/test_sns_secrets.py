@@ -1,5 +1,7 @@
 """Tests for shared SNS credential helpers."""
 
+import json
+
 import pytest
 
 from acps_shared.sns_secrets import (
@@ -21,6 +23,19 @@ def test_parse_sns_secret() -> None:
     assert parse_sns_secret('{"access_token":"token","ig_user_id":"123"}') == (
         SnsCredentials("token", "123")
     )
+
+
+def test_parse_sns_secret_ignores_expiry_metadata() -> None:
+    """Only access_token and ig_user_id are used by posting callers."""
+    assert parse_sns_secret(
+        json.dumps(
+            {
+                "access_token": "token",
+                "ig_user_id": "123",
+                "token_expires_at": "2099-01-01T00:00:00Z",
+            }
+        )
+    ) == SnsCredentials("token", "123")
 
 
 @pytest.mark.parametrize(

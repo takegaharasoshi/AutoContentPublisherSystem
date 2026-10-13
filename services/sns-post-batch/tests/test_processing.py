@@ -5,7 +5,8 @@ import datetime
 from unittest.mock import ANY, Mock
 
 import app.processing as processing
-from app.instagram_api import InstagramRequestFailed, InstagramResultUnknown
+from acps_shared import InstagramRequestFailed
+from app.instagram_api import InstagramResultUnknown
 from app.models import CaptionTemplate, GeneratedMediaRef, Post, SnsAccount
 
 
@@ -204,7 +205,7 @@ def test_processing_marks_clear_failure_and_continues_to_next_account(monkeypatc
     )
     create_container = Mock(
         side_effect=[
-            InstagramRequestFailed("invalid image", {"error": "bad"}),
+            InstagramRequestFailed("invalid image", response={"error": "bad"}),
             ("container", {"id": "container"}),
         ]
     )
@@ -387,7 +388,7 @@ def test_processing_does_not_create_story_when_reel_fails(monkeypatch) -> None:
     """A failed reel leaves no pending story row behind."""
     states = iter([None, Post(101, "failed", None, None)])
     create_container = Mock(
-        side_effect=InstagramRequestFailed("invalid video", {"error": "bad"})
+        side_effect=InstagramRequestFailed("invalid video", response={"error": "bad"})
     )
 
     result, _, _ = _run(
@@ -417,7 +418,7 @@ def test_processing_keeps_reel_success_when_story_fails(monkeypatch) -> None:
     create_container = Mock(
         side_effect=[
             ("reel-container", {"id": "reel-container"}),
-            InstagramRequestFailed("invalid story", {"error": "bad"}),
+            InstagramRequestFailed("invalid story", response={"error": "bad"}),
         ]
     )
 
@@ -557,7 +558,7 @@ def test_processing_does_not_snapshot_failed_reel(monkeypatch) -> None:
         lambda *args, **kwargs: next(states),
         generated_media=_media("mp4"),
         problem_snapshot_enabled=True,
-        create_container=Mock(side_effect=InstagramRequestFailed("bad", None)),
+        create_container=Mock(side_effect=InstagramRequestFailed("bad", response=None)),
         write_problem_snapshot=write_snapshot,
     )
     assert result == processing.ProcessingResult(1, False)

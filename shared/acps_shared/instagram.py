@@ -246,6 +246,34 @@ def get_json(
         f"{GRAPH_API_BASE_URL}{path}?{query}",
         method="GET",
     )
+    return _send_request(request, access_token=access_token, urlopen=urlopen)
+
+
+def post_form(
+    path: str,
+    values: Mapping[str, str | None],
+    *,
+    urlopen: Any = urllib.request.urlopen,
+) -> GraphResponse:
+    """Send a form-encoded Graph API POST request."""
+    filtered_values = {key: value for key, value in values.items() if value is not None}
+    access_token = filtered_values.get("access_token")
+    request = urllib.request.Request(
+        f"{GRAPH_API_BASE_URL}{path}",
+        data=urllib.parse.urlencode(filtered_values).encode("utf-8"),
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        method="POST",
+    )
+    return _send_request(request, access_token=access_token, urlopen=urlopen)
+
+
+def _send_request(
+    request: urllib.request.Request,
+    *,
+    access_token: str | None,
+    urlopen: Any,
+) -> GraphResponse:
+    """Send one request and apply the shared response handling."""
     try:
         response = urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS)
     except urllib.error.HTTPError as exc:

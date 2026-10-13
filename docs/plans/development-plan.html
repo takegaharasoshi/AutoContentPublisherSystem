@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -285,17 +285,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-26-5" data-step-id="26-5" data-status="todo">
+<article class="plan-step" id="step-26-5" data-step-id="26-5" data-status="done" data-completed="2026-10-13">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>26-5</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>26-5</strong><span class="plan-status">完了</span></div>
 <h3>Instagram クライアントの shared 昇格版への載せ替えと Graph API v25.0 化（I-022。26-4 完了後）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>26-4 完了後（当回固定の本番反映と記録が済んでから）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>2026-10-13 完了（コミットまで）。投稿の HTTP 層を shared の <code>post_form</code> / <code>get_json</code> へ載せ替え、Graph API を v25.0 へ上げ、<code>app/secrets.py</code> の重複を削除した。pytest は sns-post-batch 234 passed / shared 36 passed / insights-batch 72 passed。push・パイプライン完走・次回の定時投稿の確認は差分レビューの後（<a href="#pending-checks">確認待ち</a>）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -323,11 +318,27 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-13 載せ替え・changelog の照合・挙動差</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-10-13</strong>（実装は Codex〔gpt-6-luna / max〕に委譲し、差分レビューは Claude）:</p>
+<ul>
+<li><strong>shared</strong>: <code>acps_shared/instagram.py</code> にフォーム POST の <code>post_form</code> を足した。送信・エラー分類・トークン秘匿は <code>get_json</code> と共通の <code>_send_request</code> に抜き出し、<code>get_json</code> の外部挙動は変えていない（insights-batch のテストは無修正で通る）。値が None のキーは送らない。</li>
+<li><strong>sns-post-batch</strong>: <code>app/instagram_api.py</code> からローカルの HTTP 層（<code>_request_json</code> 等）・v21.0 の base URL・ローカルの <code>InstagramRequestFailed</code> を削除した。コンテナ作成・ポーリング・publish・ストーリーズのパラメータ、ポーリングの回数と間隔は現行どおり。アプリ内リトライは足していない（<code>RateLimitGuard</code> は使わない）。結果不明の例外 <code>InstagramResultUnknown</code> は publish 固有の判定なので、ローカルに残した。<code>processing.py</code> は「結果不明」→「<code>InstagramApiError</code>（明確な失敗）」の順で捕捉する。<code>app/secrets.py</code> は shared の <code>sns_secrets.py</code> と全く同じ内容だったので削除した。</li>
+<li><strong>挙動差</strong>（<a href="../app/batch-flow.html#posts-state">batch-flow 3.2 の状態表</a>に反映）: ① publish の 2xx 応答で本文が読めないときは、明確な失敗から結果不明（<code>published_unconfirmed</code>）へ変わった。投稿済みの可能性を否定できないため、二重投稿を避ける側に寄せた ② エラー応答の <code>api_response</code> に token が出ていた場合は <code>***</code> に秘匿される ③ 通信失敗の <code>error_message</code> は shared の文言（<code>Instagram API transport failed: &lt;例外型&gt;</code>）になる ④ <code>urlopen</code> の <code>OSError</code> も通信失敗として分類される（以前は未分類の例外で、終端状態に記録されなかった）。</li>
+<li><strong>changelog の照合</strong>（2026-10-13）: Graph API の <a href="https://developers.facebook.com/docs/graph-api/changelog/version22.0">v22.0</a>・<a href="https://developers.facebook.com/docs/graph-api/changelog/version23.0">v23.0</a>・<a href="https://developers.facebook.com/docs/graph-api/changelog/version24.0">v24.0</a>・<a href="https://developers.facebook.com/docs/graph-api/changelog/version25.0">v25.0</a> の各 changelog と <a href="https://developers.facebook.com/docs/instagram-platform/changelog">Instagram Platform changelog</a> を見た。<code>POST /{ig-user-id}/media</code>（<code>image_url</code> / <code>video_url</code> / <code>media_type=REELS・STORIES</code> / <code>share_to_feed</code> / <code>caption</code>）、<code>GET /{container-id}?fields=status_code</code>、<code>POST /{ig-user-id}/media_publish</code> について、廃止・変更はなかった。該当する項目は任意パラメータの追加（<code>trial_params</code>・<code>is_ai_generated</code> 等）とインサイト指標の廃止（insights-batch 側で対応済み）だけ。v25.0 の提供期限は 2028-07-29。</li>
+<li><strong>検証</strong>: pytest（各サービスの <code>.venv</code>）は sns-post-batch <code>234 passed, 34 skipped</code>（skip は MySQL の e2e）、shared <code>36 passed</code>、insights-batch <code>72 passed, 2 skipped</code>。<code>grep -rnE</code> で、<code>services/sns-post-batch/app/</code> に HTTP 層・base URL・Secret 名規約の定義が残っていないことを確かめた（該当なし）。</li>
+<li><strong>課題表</strong>: <a href="../issues/index.html#I-022">I-022</a> を 解消 にしてクローズ節へ移した。I-009・I-015・I-017・I-024 は据え置き継続で、トリガーは更新していない（I-024 ① は 26-6）。確認待ちは着手時点で該当なし。push 後の定時投稿を新しく確認待ちに起票した。</li>
+</ul>
+<p>次: 差分レビュー → push → CodePipeline 完走の <code>/goal</code>（ユーザー）→ <a href="#step-26-6">26-6</a>（I-024 ①）。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
 
 <article class="plan-step" id="step-26-6" data-step-id="26-6" data-status="todo">
 <header class="plan-step-head">
@@ -381,6 +392,7 @@
 <tr><td>2026-10-12 / <a href="development-log.html#step-21-6h">21-6h</a> 前回の真相ブロック（初回稼働）</td><td>umigame-soup-1 の 2 本目の投稿後（21-6i で週 4 回〔日・火・木・土〕になるため翌日とは限らない）</td><td>2 本目の投稿のキャプション末尾に、1 本目の title・truth の真相ブロックが合意の形（空行 3 つ → 見出し → 「・」4 行 → 【真相】→ truth 全文）で入っている。1 本目には入っていない（<code>posts.caption_text_snapshot</code> と Instagram の表示で確認）</td><td>追補ステップを起こす（展開の誤りなら sns-post-batch の修正。前回の選び方の誤りなら <a href="../app/batch-flow.html#prev-truth-block">batch-flow 3.3</a> と合わせて直す）</td><td>—</td></tr>
 <tr><td>2026-10-12 / <a href="development-log.html#step-21-8e">21-8e</a> 返信の effort max（実運用の観察）</td><td>21-8e の deploy から 1 週間後（または本番のコメントが 10 件に達したとき）</td><td>① Reply Lambda の <code>Duration</code> の最大値が 300 秒を十分下回る（目安 200 秒以下）② <code>Task timed out</code>・DLQ のメッセージが 0 件 ③ Anthropic の費用が想定（high の約 6 倍）を大きく超えていない ④ 返信の遅さへの苦情・離脱が目立たない（ユーザーの目視）</td><td>タイムアウト・DLQ が出る → <a href="../issues/index.html#I-037">I-037</a> を再開して呼び出し単位のタイムアウトを入れる。遅さ・費用が許容外 → effort を <code>xhigh</code> / <code>high</code> に戻すかをユーザー判断（追補ステップ）</td><td>—</td></tr>
 <tr><td>2026-10-12 / <a href="development-log.html#step-21-8d2">21-8d2</a> 核心語の DB 化（初回の通常投稿）</td><td>21-8d2 の切り替え後、最初の umigame-soup-1 の通常投稿（日・火・木・土 20:00）</td><td>その投稿のスナップショットを S3 から取得し、<code>schema_version</code> 4・核心語が入っていること（投稿バッチが書いたもの）。その投稿へのコメントで Reply Lambda のログに核心語なしの警告が出ていない</td><td>核心語が無い → 投稿バッチの追補ステップ（当面は <code>write_snapshot.py</code> の書き直しモードで補う）</td><td>—</td></tr>
+<tr><td>2026-10-13 / <a href="#step-26-5">26-5</a> 投稿クライアントの載せ替え（v25.0）</td><td>26-5 の push 後、最初の定時投稿（パイプライン完走・タスク定義の新リビジョン登録の後）</td><td>投稿バッチが新リビジョンで動き、リール・ストーリーズとも <code>posts.status=success</code>。ログに <code>graph.facebook.com/v25.0</code> 宛ての失敗・結果不明が出ていない</td><td>失敗・結果不明 → <code>/incident</code>。原因が載せ替えなら追補ステップ（26-5 のコミットを revert して切り戻すかはユーザー判断）</td><td>—</td></tr>
 </tbody>
 </table></div>
 

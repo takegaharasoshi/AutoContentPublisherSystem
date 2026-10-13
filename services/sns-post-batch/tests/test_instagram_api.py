@@ -1,4 +1,4 @@
-"""Tests for the standard-library Instagram Graph API client."""
+"""Tests for the SNS posting Instagram Graph API operations."""
 
 from __future__ import annotations
 
@@ -9,6 +9,11 @@ import urllib.parse
 
 import pytest
 
+from acps_shared import (
+    InstagramApiError,
+    InstagramRequestFailed,
+    InstagramTransportError,
+)
 import app.instagram_api as instagram_api
 
 
@@ -44,8 +49,19 @@ def _recording_urlopen(responses: list[object]):
     return urlopen
 
 
+def _http_error(path: str, status: int, payload: dict) -> urllib.error.HTTPError:
+    """Build a Graph API HTTP error with a JSON body."""
+    return urllib.error.HTTPError(
+        f"https://graph.facebook.com/v25.0{path}",
+        status,
+        "bad request",
+        {},
+        BytesIO(json.dumps(payload).encode("utf-8")),
+    )
+
+
 def test_create_container_posts_expected_graph_parameters() -> None:
-    """Container creation uses the v21.0 media endpoint and timeout."""
+    """Feed image creation uses the shared v25 endpoint and form POST."""
     urlopen = _recording_urlopen([FakeResponse({"id": "container"})])
 
     assert instagram_api.create_container(
@@ -58,7 +74,9 @@ def test_create_container_posts_expected_graph_parameters() -> None:
 
     request, timeout = urlopen.calls[0]
     assert timeout == 30
-    assert request.full_url == "https://graph.facebook.com/v21.0/ig-user/media"
+    assert request.full_url == "https://graph.facebook.com/v25.0/ig-user/media"
+    assert request.get_method() == "POST"
+    assert request.get_header("Content-type") == "application/x-www-form-urlencoded"
     assert urllib.parse.parse_qs(request.data.decode()) == {
         "access_token": ["token"],
         "image_url": ["https://s3.example/image.jpg"],
@@ -130,6 +148,21 @@ def test_create_container_rejects_unknown_media_type() -> None:
         )
 
 
+def test_create_container_missing_id_is_shared_request_failure() -> None:
+    """A successful response without a container ID carries its payload."""
+    payload = {"unexpected": "value"}
+    with pytest.raises(InstagramRequestFailed) as caught:
+        instagram_api.create_container(
+            "token",
+            "ig-user",
+            "https://image",
+            urlopen=_recording_urlopen([FakeResponse(payload)]),
+        )
+
+    assert str(caught.value) == "Instagram container response did not include an id"
+    assert caught.value.response == payload
+
+
 def test_resolve_poll_settings_uses_reel_and_image_defaults() -> None:
     """Reels receive the longer processing polling window."""
     assert instagram_api.resolve_poll_settings("reel") == instagram_api.PollSettings(
@@ -154,44 +187,42 @@ def test_publish_container_posts_expected_graph_parameters() -> None:
     request, timeout = urlopen.calls[0]
     assert timeout == 30
     assert request.full_url == (
-        "https://graph.facebook.com/v21.0/ig-user/media_publish"
+        "https://graph.facebook.com/v25.0/ig-user/media_publish"
     )
+    assert request.get_method() == "POST"
     assert urllib.parse.parse_qs(request.data.decode()) == {
         "access_token": ["token"],
         "creation_id": ["container"],
     }
 
 
-def test_http_error_is_a_clear_request_failure_with_response_json() -> None:
-    """A normal Graph HTTP error is classified as failed."""
-    error = urllib.error.HTTPError(
-        "https://graph.facebook.com/v21.0/ig-user/media",
-        400,
-        "bad request",
-        {},
-        BytesIO(b'{"error":{"message":"invalid image"}}'),
+def test_create_container_http_error_is_shared_api_error() -> None:
+    """A normal Graph HTTP error propagates with its shared type and response."""
+    urlopen = _recording_urlopen(
+        [_http_error("/ig-user/media", 400, {"error": {"message": "invalid image"}})]
     )
-    urlopen = _recording_urlopen([error])
 
-    with pytest.raises(instagram_api.InstagramRequestFailed) as raised:
+    with pytest.raises(InstagramRequestFailed) as raised:
         instagram_api.create_container(
             "token", "ig-user", "https://image", "caption", urlopen=urlopen
         )
 
     assert str(raised.value) == "invalid image"
     assert raised.value.response == {"error": {"message": "invalid image"}}
+    assert len(urlopen.calls) == 1
 
 
 def test_duplicate_publish_http_error_is_result_unknown() -> None:
     """A duplicate publish response may mean that the post already exists."""
-    error = urllib.error.HTTPError(
-        "https://graph.facebook.com/v21.0/ig-user/media_publish",
-        400,
-        "bad request",
-        {},
-        BytesIO(b'{"error":{"message":"Media has already been published"}}'),
+    urlopen = _recording_urlopen(
+        [
+            _http_error(
+                "/ig-user/media_publish",
+                400,
+                {"error": {"message": "Media has already been published"}},
+            )
+        ]
     )
-    urlopen = _recording_urlopen([error])
 
     with pytest.raises(instagram_api.InstagramResultUnknown) as raised:
         instagram_api.publish_container(
@@ -201,28 +232,35 @@ def test_duplicate_publish_http_error_is_result_unknown() -> None:
     assert raised.value.response == {
         "error": {"message": "Media has already been published"}
     }
+    assert len(urlopen.calls) == 1
 
 
-@pytest.mark.parametrize("transport_error", [urllib.error.URLError("offline"), TimeoutError()])
-def test_create_container_transport_error_is_a_clear_failure(
-    transport_error: BaseException,
-) -> None:
-    """A network failure before any publish request is a clear failure."""
-    urlopen = _recording_urlopen([transport_error])
+def test_non_duplicate_publish_api_error_propagates_as_shared_error() -> None:
+    """A clear API rejection is not converted to an unknown result."""
+    urlopen = _recording_urlopen(
+        [
+            _http_error(
+                "/ig-user/media_publish",
+                400,
+                {"error": {"message": "invalid creation_id"}},
+            )
+        ]
+    )
 
-    with pytest.raises(instagram_api.InstagramRequestFailed) as raised:
-        instagram_api.create_container(
-            "token", "ig-user", "https://image", "caption", urlopen=urlopen
+    with pytest.raises(InstagramApiError, match="invalid creation_id"):
+        instagram_api.publish_container(
+            "token", "ig-user", "container", urlopen=urlopen
         )
+    assert len(urlopen.calls) == 1
 
-    assert raised.value.response is None
 
-
-@pytest.mark.parametrize("transport_error", [urllib.error.URLError("offline"), TimeoutError()])
+@pytest.mark.parametrize(
+    "transport_error", [urllib.error.URLError("offline"), TimeoutError()]
+)
 def test_publish_container_transport_error_is_result_unknown(
     transport_error: BaseException,
 ) -> None:
-    """No HTTP response after sending a publish request means the result is unknown."""
+    """A network failure after a publish request makes the result unknown."""
     urlopen = _recording_urlopen([transport_error])
 
     with pytest.raises(instagram_api.InstagramResultUnknown) as raised:
@@ -231,12 +269,65 @@ def test_publish_container_transport_error_is_result_unknown(
         )
 
     assert raised.value.response is None
+    assert len(urlopen.calls) == 1
+
+
+def test_publish_container_unreadable_response_is_result_unknown() -> None:
+    """A response read failure after publishing is also an unknown result."""
+    response = FakeResponse({})
+    response.read = lambda: (_ for _ in ()).throw(TimeoutError("read failed"))
+    urlopen = _recording_urlopen([response])
+
+    with pytest.raises(instagram_api.InstagramResultUnknown) as raised:
+        instagram_api.publish_container(
+            "token", "ig-user", "container", urlopen=urlopen
+        )
+
+    assert isinstance(raised.value.__cause__, InstagramTransportError)
+    assert raised.value.response is None
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"error": {"message": "This media is a duplicate"}},
+        {"message": "Media has already been published"},
+        {"error_description": "Already been published"},
+    ],
+)
+def test_duplicate_message_in_success_response_is_result_unknown(payload: dict) -> None:
+    """Duplicate messages in a 2xx body remain unconfirmed results."""
+    with pytest.raises(instagram_api.InstagramResultUnknown):
+        instagram_api.publish_container(
+            "token",
+            "ig-user",
+            "container",
+            urlopen=_recording_urlopen([FakeResponse(payload)]),
+        )
+
+
+def test_publish_container_missing_id_is_shared_request_failure() -> None:
+    """A 2xx publish response without an ID is a known request failure."""
+    payload = {"status": "ok"}
+    with pytest.raises(InstagramRequestFailed) as raised:
+        instagram_api.publish_container(
+            "token",
+            "ig-user",
+            "container",
+            urlopen=_recording_urlopen([FakeResponse(payload)]),
+        )
+
+    assert str(raised.value) == "Instagram publish response did not include an id"
+    assert raised.value.response == payload
 
 
 def test_poll_container_status_retries_until_finished(monkeypatch) -> None:
     """Polling waits through intermediate states and returns the final JSON."""
     urlopen = _recording_urlopen(
-        [FakeResponse({"status_code": "IN_PROGRESS"}), FakeResponse({"status_code": "FINISHED"})]
+        [
+            FakeResponse({"status_code": "IN_PROGRESS"}),
+            FakeResponse({"status_code": "FINISHED"}),
+        ]
     )
     sleep = []
     monkeypatch.setattr(instagram_api.time, "sleep", sleep.append)
@@ -252,6 +343,8 @@ def test_poll_container_status_retries_until_finished(monkeypatch) -> None:
     assert len(urlopen.calls) == 2
     request, timeout = urlopen.calls[0]
     assert timeout == 30
+    assert request.get_method() == "GET"
+    assert request.full_url.startswith("https://graph.facebook.com/v25.0/container?")
     query = urllib.parse.parse_qs(urllib.parse.urlsplit(request.full_url).query)
     assert query == {"fields": ["status_code"], "access_token": ["token"]}
 
@@ -259,7 +352,10 @@ def test_poll_container_status_retries_until_finished(monkeypatch) -> None:
 def test_poll_container_status_uses_reel_interval(monkeypatch) -> None:
     """The resolved reel settings wait ten seconds between checks."""
     urlopen = _recording_urlopen(
-        [FakeResponse({"status_code": "IN_PROGRESS"}), FakeResponse({"status_code": "FINISHED"})]
+        [
+            FakeResponse({"status_code": "IN_PROGRESS"}),
+            FakeResponse({"status_code": "FINISHED"}),
+        ]
     )
     sleep = []
     monkeypatch.setattr(instagram_api.time, "sleep", sleep.append)
@@ -275,46 +371,59 @@ def test_poll_container_status_uses_reel_interval(monkeypatch) -> None:
     assert sleep == [10.0]
 
 
-def test_poll_container_status_error_is_clear_failure() -> None:
-    """An explicit ERROR status stops polling and is failed."""
+def test_poll_container_status_error_is_shared_failure() -> None:
+    """An explicit ERROR status stops polling and carries its response."""
     urlopen = _recording_urlopen([FakeResponse({"status_code": "ERROR"})])
 
-    with pytest.raises(instagram_api.InstagramRequestFailed) as raised:
+    with pytest.raises(InstagramRequestFailed) as raised:
         instagram_api.poll_container_status(
             "token", "container", urlopen=urlopen, max_attempts=10
         )
 
+    assert str(raised.value) == "Instagram container processing returned ERROR"
     assert raised.value.response == {"status_code": "ERROR"}
     assert len(urlopen.calls) == 1
 
 
-def test_poll_container_status_limit_is_clear_failure(monkeypatch) -> None:
-    """Exhausting polling attempts is a known failure without publishing."""
+def test_poll_container_status_limit_preserves_attempt_and_sleep_counts(
+    monkeypatch,
+) -> None:
+    """Polling sleeps only between attempts and returns the last payload."""
     urlopen = _recording_urlopen(
         [FakeResponse({"status_code": "IN_PROGRESS"}) for _ in range(3)]
     )
-    monkeypatch.setattr(instagram_api.time, "sleep", lambda _: None)
+    sleeps: list[float] = []
+    monkeypatch.setattr(instagram_api.time, "sleep", sleeps.append)
 
-    with pytest.raises(instagram_api.InstagramRequestFailed) as raised:
+    with pytest.raises(InstagramRequestFailed) as raised:
         instagram_api.poll_container_status(
             "token",
             "container",
             urlopen=urlopen,
             max_attempts=3,
-            poll_interval_seconds=0,
+            poll_interval_seconds=2.5,
         )
 
+    assert str(raised.value) == (
+        "Instagram container did not reach FINISHED within the polling limit"
+    )
     assert raised.value.response == {"status_code": "IN_PROGRESS"}
     assert len(urlopen.calls) == 3
+    assert sleeps == [2.5, 2.5]
 
 
-def test_poll_container_status_transport_error_is_a_clear_failure() -> None:
-    """A network failure while polling is a clear failure, not unconfirmed."""
-    urlopen = _recording_urlopen([urllib.error.URLError("offline")])
+def test_poll_container_status_api_and_transport_errors_are_shared() -> None:
+    """Shared HTTP and transport failures propagate from a poll request."""
+    api_urlopen = _recording_urlopen(
+        [_http_error("/container", 400, {"error": {"message": "invalid container"}})]
+    )
+    with pytest.raises(InstagramRequestFailed, match="invalid container"):
+        instagram_api.poll_container_status("token", "container", urlopen=api_urlopen)
+    assert len(api_urlopen.calls) == 1
 
-    with pytest.raises(instagram_api.InstagramRequestFailed) as raised:
+    transport_urlopen = _recording_urlopen([urllib.error.URLError("offline")])
+    with pytest.raises(InstagramTransportError):
         instagram_api.poll_container_status(
-            "token", "container", urlopen=urlopen, max_attempts=3
+            "token", "container", urlopen=transport_urlopen
         )
-
-    assert raised.value.response is None
+    assert len(transport_urlopen.calls) == 1

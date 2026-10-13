@@ -6,10 +6,15 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from acps_shared import generate_presigned_url, get_secret_string
+from acps_shared import (
+    InstagramApiError,
+    build_sns_secret_name,
+    generate_presigned_url,
+    get_secret_string,
+    parse_sns_secret,
+)
 
 from .instagram_api import (
-    InstagramRequestFailed,
     InstagramResultUnknown,
     create_container,
     poll_container_status,
@@ -29,7 +34,6 @@ from .posts import (
     update_post_success,
     update_post_unconfirmed,
 )
-from .secrets import build_sns_secret_name, parse_sns_secret
 
 
 logger = logging.getLogger(__name__)
@@ -260,28 +264,6 @@ def _process_account_media(
                 )
                 _rollback_safely(connection)
         return True
-    except InstagramRequestFailed as exc:
-        logger.error(
-            "Instagram API が明確な失敗を返却: "
-            "sns_account_id=%s media_type=%s error=%s",
-            account.id,
-            media_type,
-            exc,
-        )
-        if post_id is not None:
-            try:
-                _record_request_failure(
-                    cursor,
-                    connection,
-                    post_id=post_id,
-                    error_message=str(exc),
-                    api_response=exc.response,
-                    unconfirmed=False,
-                )
-            except Exception:
-                logger.exception("failed 状態の保存に失敗: post_id=%s", post_id)
-                _rollback_safely(connection)
-        return False
     except InstagramResultUnknown as exc:
         logger.error(
             "Instagram API の結果が不明: sns_account_id=%s media_type=%s error=%s",
@@ -304,6 +286,28 @@ def _process_account_media(
                     "published_unconfirmed 状態の保存に失敗: post_id=%s",
                     post_id,
                 )
+                _rollback_safely(connection)
+        return False
+    except InstagramApiError as exc:
+        logger.error(
+            "Instagram API が明確な失敗を返却: "
+            "sns_account_id=%s media_type=%s error=%s",
+            account.id,
+            media_type,
+            exc,
+        )
+        if post_id is not None:
+            try:
+                _record_request_failure(
+                    cursor,
+                    connection,
+                    post_id=post_id,
+                    error_message=str(exc),
+                    api_response=exc.response,
+                    unconfirmed=False,
+                )
+            except Exception:
+                logger.exception("failed 状態の保存に失敗: post_id=%s", post_id)
                 _rollback_safely(connection)
         return False
     except Exception:

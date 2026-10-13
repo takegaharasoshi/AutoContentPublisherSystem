@@ -9,7 +9,7 @@ import urllib.error
 
 import pytest
 
-from acps_shared import instagram
+from acps_shared import instagram, post_form
 
 
 class FakeResponse:
@@ -123,6 +123,91 @@ def test_get_json_wraps_transport_and_invalid_json() -> None:
     bad_response.body = b"not-json"
     with pytest.raises(instagram.InstagramTransportError):
         instagram.get_json("/1", {}, urlopen=lambda *args, **kwargs: bad_response)
+
+
+def test_post_form_sends_form_encoded_post_and_omits_none_values() -> None:
+    """POST uses the shared v25 endpoint and excludes absent form values."""
+    calls: list[tuple[object, int]] = []
+
+    def urlopen(request, *, timeout: int):
+        calls.append((request, timeout))
+        return FakeResponse({"id": "123"}, {"X-App-Usage": '{"call_count":5}'})
+
+    response = post_form(
+        "/ig-user/media",
+        {
+            "image_url": "https://example.test/image.jpg",
+            "caption": None,
+            "access_token": "token",
+        },
+        urlopen=urlopen,
+    )
+
+    request, timeout = calls[0]
+    assert response.payload == {"id": "123"}
+    assert response.headers == {"x-app-usage": '{"call_count":5}'}
+    assert response.app_usage == {"call_count": 5}
+    assert timeout == instagram.REQUEST_TIMEOUT_SECONDS
+    assert request.full_url == (
+        f"{instagram.GRAPH_API_BASE_URL}/ig-user/media"
+    )
+    assert request.get_method() == "POST"
+    assert request.get_header("Content-type") == "application/x-www-form-urlencoded"
+    assert request.data.decode("utf-8") == (
+        "image_url=https%3A%2F%2Fexample.test%2Fimage.jpg&access_token=token"
+    )
+
+
+def test_post_form_classifies_http_errors_and_redacts_token() -> None:
+    """HTTP errors share Graph classification and token redaction with GET."""
+    payload = {
+        "access_token": "secret-token",
+        "error": {
+            "code": 190,
+            "message": "Rejected secret-token",
+            "echo": "secret-token",
+        },
+    }
+
+    with pytest.raises(instagram.InstagramRateLimited) as caught:
+        post_form(
+            "/ig-user/media_publish",
+            {"access_token": "secret-token"},
+            urlopen=lambda *args, **kwargs: (_ for _ in ()).throw(
+                _http_error(429, payload, {"X-Test": "value"})
+            ),
+        )
+
+    error = caught.value
+    assert error.status == 429
+    assert error.headers == {"x-test": "value"}
+    assert "secret-token" not in str(error)
+    assert "secret-token" not in repr(error.response)
+    assert error.response == {
+        "access_token": "***",
+        "error": {
+            "code": 190,
+            "message": "Rejected ***",
+            "echo": "***",
+        },
+    }
+
+
+def test_post_form_wraps_transport_and_invalid_json() -> None:
+    """Network and malformed response failures use InstagramTransportError."""
+    with pytest.raises(instagram.InstagramTransportError):
+        post_form(
+            "/1",
+            {},
+            urlopen=lambda *args, **kwargs: (_ for _ in ()).throw(
+                urllib.error.URLError("offline")
+            ),
+        )
+
+    bad_response = FakeResponse({})
+    bad_response.body = b"not-json"
+    with pytest.raises(instagram.InstagramTransportError):
+        post_form("/1", {}, urlopen=lambda *args, **kwargs: bad_response)
 
 
 def test_rate_limit_guard_retries_with_backoff(monkeypatch) -> None:
