@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -76,7 +76,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 3 件（26-1〜26-3／クリックで展開）</summary>
+<summary>完了済み 4 件（26-1〜26-4／クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-26-1" data-step-id="26-1" data-status="done" data-completed="2026-10-13">
@@ -234,17 +234,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-26-4" data-step-id="26-4" data-status="todo">
+<article class="plan-step" id="step-26-4" data-step-id="26-4" data-status="done" data-completed="2026-10-13">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>26-4</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>26-4</strong><span class="plan-status">完了（2026-10-13）</span></div>
 <h3>反映の確認と記録・課題表・確認待ちの整理（26-3 完了後）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>26-3（本番切替とスケジュール再開）完了後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>実定義（親子 ASL・投稿バッチ <code>a31bb701d471</code> rev 22・Scheduler 入力）がコードと一致し、予定時刻が Scheduler → 親 → 子 → ECS まで渡ることを読み取りで確認した。切替後最初の 10-13 07:30 朝も新契約で成功。<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認は <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -272,11 +267,28 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-13 実定義の読み取り確認・課題表・確認待ち</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-10-13 11:35 JST</strong>（読み取りのみ。本番の変更操作なし）:</p>
+<ul>
+<li><strong>コード</strong>: <code>62d6b48</code>・<code>a31bb70</code> は origin/main に含まれ、<code>a31bb70..HEAD</code> で <code>services/sns-post-batch/</code>・<code>shared/</code>・<code>infra/lib/asl/</code>・<code>infra/lib/*.ts</code> の差分なし。</li>
+<li><strong>タスク定義</strong>: <code>acps-prod-sns-post-batch</code> rev 22 = <code>sns-post-batch:a31bb701d471</code>、<code>acps-prod-image-batch</code> rev 37 = <code>image-batch:c97ff7a65650</code>（26-3 の S-7 と一致）。</li>
+<li><strong>親子 ASL</strong>: <code>describe-state-machine</code> の実定義をリポジトリの <code>infra/lib/asl/image-generation.asl.json</code>・<code>sns-posting.asl.json</code> と比較（置換変数部分のみワイルドカード）し、差分 0 件 / 0 件。</li>
+<li><strong>予定時刻の経路</strong>: Scheduler（ENABLED 4 件 + 昼 DISABLED。入力 <code>{"set_code":…,"scheduled_at":"&lt;aws.scheduler.scheduled-time&gt;"}</code>）→ 親 <code>RunImageBatchTask</code> の環境変数 <code>SCHEDULED_AT</code> = <code>$.scheduled_at</code>・<code>StartSnsPostBatch.Input</code> = <code>{set_code.$, scheduled_at.$}</code> → 子 <code>StartAt: CheckInput</code>（未指定・非文字列・<code>*-*-*T*:*:*Z</code> 不一致は <code>RejectInput</code>）→ <code>RunSnsPostBatchTask</code> の <code>SCHEDULED_AT</code> = <code>$.scheduled_at</code> → アプリ <code>app/config.py</code> が必須として読む。</li>
+<li><strong>切替後最初の定時</strong>（10-13 07:30 朝・<code>666acd5f</code>）: 親子とも入力 <code>{"set_code":"logic-training-1","scheduled_at":"2026-10-12T22:30:00Z"}</code>・SUCCEEDED。投稿バッチのログ先頭行 <code>Starting SNS posting batch … set_code=logic-training-1 scheduled_at=2026-10-12T22:30:00Z</code>、reel・story の投稿処理を開始。新旧混在なし。</li>
+<li><strong>課題表</strong>: <a href="../issues/index.html#I-014">I-014</a> を 解消 としてクローズ節へ（クローズ日 2026-10-13）。<a href="../issues/index.html#I-017">I-017</a> は対応方針を「朝夜ずれ防止は 26-2 で実装済み・残件の可視化は I-006・I-025 と統合設計」に更新（起票のまま・トリガー維持）。I-034 は据え置き継続・トリガー更新なし。</li>
+<li><strong>確認待ち</strong>: <a href="logic-training-1.html#pending-checks">logic-training-1 計画書</a>に「リリース後の最初の夜投稿（10-13 21:00）とその次の朝投稿（10-14 07:30）」の行を起票（判定: SFN 入力の予定時刻・<code>posts.generation_run_id</code>・動画の時間帯表示が一致 / NG: 自動実行の継続を人間が判断し <code>/incident</code>）。開発計画の確認待ちは該当なし。</li>
+</ul>
+<p>次: <a href="#step-26-5">26-5</a>（I-022）。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
 
 <article class="plan-step" id="step-26-5" data-step-id="26-5" data-status="todo">
 <header class="plan-step-head">
