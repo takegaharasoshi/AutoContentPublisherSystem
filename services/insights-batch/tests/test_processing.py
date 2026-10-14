@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 from unittest.mock import Mock
 
 from acps_shared.instagram import (
@@ -43,6 +44,7 @@ def _patch_base(monkeypatch, posts: list[Post], collected: set[int] | None = Non
     )
     monkeypatch.setattr(processing, "fetch_latest_metric_date", lambda *args: NOW.date())
     monkeypatch.setattr(processing, "resolve_target_dates", lambda *args, **kwargs: [])
+    monkeypatch.setattr(processing, "fetch_follows_backfill_dates", lambda *args: [])
     monkeypatch.setattr(processing, "fetch_collectible_posts", lambda *args, **kwargs: posts)
     monkeypatch.setattr(
         processing,
@@ -235,6 +237,196 @@ def test_account_daily_rows_commit_individually_and_latest_has_followers(monkeyp
     assert result.records_inserted == 2
 
 
+def test_daily_insert_keeps_delayed_follows_breakdown_shape(monkeypatch) -> None:
+    """The regular daily insert still stores a dimension-only follows value."""
+    _patch_base(monkeypatch, [])
+    closed_date = NOW.date() - datetime.timedelta(days=1)
+    monkeypatch.setattr(
+        processing,
+        "resolve_target_dates",
+        lambda *args, **kwargs: [closed_date],
+    )
+    metric_value = {"breakdowns": [{"dimension_keys": ["follow_type"]}]}
+    monkeypatch.setattr(
+        processing,
+        "fetch_account_insights",
+        lambda *args, **kwargs: {"follows_and_unfollows": metric_value},
+    )
+    inserted_metrics = []
+
+    def insert(*args, **kwargs):
+        inserted_metrics.append(kwargs["metrics"])
+        return True
+
+    monkeypatch.setattr(processing, "insert_account_insights", insert)
+
+    result = _run(Connection())
+
+    assert result.records_inserted == 1
+    assert inserted_metrics == [{"follows_and_unfollows": metric_value}]
+
+
+def test_backfill_requests_only_missing_dates_in_configured_window(monkeypatch) -> None:
+    """Ready and out-of-window rows are skipped; missing rows get updated."""
+    from app.account_insights import fetch_follows_backfill_dates
+
+    _patch_base(monkeypatch, [])
+    closed_date = NOW.date() - datetime.timedelta(days=1)
+    start = closed_date - datetime.timedelta(days=30)
+    end = closed_date - datetime.timedelta(days=2)
+    outside_old = start - datetime.timedelta(days=1)
+    outside_new = closed_date - datetime.timedelta(days=1)
+    ready_date = closed_date - datetime.timedelta(days=10)
+    rows = [
+        (outside_old, {"reach": 2}),
+        (start, {"follows_and_unfollows": {"breakdowns": []}}),
+        (
+            ready_date,
+            {
+                "follows_and_unfollows": {
+                    "breakdowns": [
+                        {"results": [{"dimension_values": ["FOLLOWER"]}]}
+                    ]
+                }
+            },
+        ),
+        (
+            end,
+            {
+                "follows_and_unfollows": {
+                    "breakdowns": [{"dimension_keys": ["follow_type"]}]
+                }
+            },
+        ),
+        (outside_new, {}),
+    ]
+
+    class BackfillCursor:
+        def __init__(self):
+            self.rows = []
+            self.select_args = None
+            self.updates = []
+
+        def execute(self, query, args):
+            if query.startswith("SELECT metric_date, metrics"):
+                self.select_args = args
+                _sns_account_id, query_start, query_end = args
+                self.rows = [
+                    (metric_date, metrics)
+                    for metric_date, metrics in rows
+                    if query_start <= metric_date <= query_end
+                ]
+                return len(self.rows)
+            self.updates.append((query, args))
+            return 1
+
+        def fetchall(self):
+            return self.rows
+
+    cursor = BackfillCursor()
+    requested = []
+    ready_value = {
+        "breakdowns": [
+            {
+                "dimension_keys": ["follow_type"],
+                "results": [
+                    {"dimension_values": ["FOLLOWER"], "value": 3},
+                    {"dimension_values": ["NON_FOLLOWER"], "value": 2},
+                ],
+            }
+        ]
+    }
+
+    def fetch_follows(_user_id, _token, metric_date, **kwargs):
+        requested.append(metric_date)
+        return ready_value
+
+    monkeypatch.setattr(
+        processing,
+        "fetch_follows_backfill_dates",
+        fetch_follows_backfill_dates,
+    )
+    monkeypatch.setattr(processing, "fetch_follows_and_unfollows", fetch_follows)
+
+    connection = Connection()
+    result = processing.process_accounts(
+        cursor,
+        connection,
+        set_id=1,
+        accounts=[ACCOUNT],
+        env_name="prod",
+        set_code="set-a",
+        scheduled_at=SCHEDULED,
+        media_lookback_days=14,
+        current_time=NOW,
+    )
+
+    assert cursor.select_args == (ACCOUNT.id, start, end)
+    assert requested == [start, end]
+    assert [args[2] for _query, args in cursor.updates] == [start, end]
+    assert all(json.loads(args[0]) == ready_value for _query, args in cursor.updates)
+    assert connection.commits == 2
+    assert result.records_inserted == 0
+    assert result.failure_count == 0
+
+
+def test_backfill_empty_response_does_not_update(monkeypatch) -> None:
+    """A dimension-only retry remains eligible for a later batch run."""
+    _patch_base(monkeypatch, [])
+    metric_date = NOW.date() - datetime.timedelta(days=3)
+    monkeypatch.setattr(
+        processing,
+        "fetch_follows_backfill_dates",
+        lambda *args: [metric_date],
+    )
+    monkeypatch.setattr(
+        processing,
+        "fetch_follows_and_unfollows",
+        lambda *args, **kwargs: {"breakdowns": [{"dimension_keys": ["follow_type"]}]},
+    )
+    update = Mock()
+    monkeypatch.setattr(processing, "update_follows_and_unfollows", update)
+    connection = Connection()
+
+    result = _run(connection)
+
+    update.assert_not_called()
+    assert connection.commits == 0
+    assert result.failure_count == 0
+
+
+def test_backfill_error_does_not_stop_media_or_count_failure(monkeypatch) -> None:
+    """Retry errors do not affect batch failure counts or stop media work."""
+    metric_dates = [
+        NOW.date() - datetime.timedelta(days=5),
+        NOW.date() - datetime.timedelta(days=4),
+    ]
+    _patch_base(monkeypatch, [Post(1, "reel", "media-1", NOW)])
+    monkeypatch.setattr(
+        processing, "fetch_follows_backfill_dates", lambda *args: metric_dates
+    )
+    requested = []
+
+    def fail_first_retry(_user_id, _token, metric_date, **kwargs):
+        requested.append(metric_date)
+        raise RuntimeError("temporary backfill failure")
+
+    monkeypatch.setattr(
+        processing, "fetch_follows_and_unfollows", fail_first_retry
+    )
+    monkeypatch.setattr(
+        processing, "fetch_media_insights", lambda *args, **kwargs: {"views": 1}
+    )
+    connection = Connection()
+
+    result = _run(connection)
+
+    assert requested == [metric_dates[0]]
+    assert connection.rollbacks == 1
+    assert result.records_inserted == 1
+    assert result.failure_count == 0
+
+
 def test_account_object_unavailable_is_failure(monkeypatch) -> None:
     """An unreadable account object fails loudly instead of being skipped."""
     _patch_base(monkeypatch, [])
@@ -267,3 +459,29 @@ def test_credential_failure_counts_one_account_failure(monkeypatch) -> None:
     )
     result = _run(Connection())
     assert result == processing.InsightsCollectionResult(0, 1, 1)
+
+
+def test_backfill_stops_when_metric_is_not_returned(monkeypatch) -> None:
+    """Accounts below the API threshold do not repeat requests for every day."""
+    _patch_base(monkeypatch, [])
+    metric_dates = [
+        NOW.date() - datetime.timedelta(days=offset) for offset in (5, 4, 3)
+    ]
+    monkeypatch.setattr(
+        processing, "fetch_follows_backfill_dates", lambda *args: metric_dates
+    )
+    requested = []
+
+    def fetch_follows(_user_id, _token, metric_date, **kwargs):
+        requested.append(metric_date)
+        return None
+
+    monkeypatch.setattr(processing, "fetch_follows_and_unfollows", fetch_follows)
+    update = Mock()
+    monkeypatch.setattr(processing, "update_follows_and_unfollows", update)
+
+    result = _run(Connection())
+
+    assert requested == metric_dates[:1]
+    update.assert_not_called()
+    assert result.failure_count == 0

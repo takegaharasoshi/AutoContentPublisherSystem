@@ -13,6 +13,7 @@ import pymysql
 import pytest
 
 from app.comment_logs import import_comment_logs
+from app.account_insights import insert_account_insights, update_follows_and_unfollows
 from app.models import SnsAccount
 from app.processing import process_accounts
 from app import processing as processing_module
@@ -171,6 +172,57 @@ def test_same_scheduled_run_is_idempotent(monkeypatch) -> None:
             account_count = cursor.fetchone()[0]
         assert post_count == 1
         assert account_count == 90
+
+
+def test_follows_json_set_update_preserves_existing_metric_values() -> None:
+    """JSON_SET appends the follows breakdown to an existing local MySQL row."""
+    metric_date = datetime.date(2026, 9, 20)
+    follows_value = {
+        "breakdowns": [
+            {
+                "dimension_keys": ["follow_type"],
+                "results": [
+                    {"dimension_values": ["FOLLOWER"], "value": 3},
+                    {"dimension_values": ["NON_FOLLOWER"], "value": 2},
+                ],
+            }
+        ]
+    }
+
+    with _seed() as (connection, set_id, account_id, _post_id, _set_code):
+        with connection.cursor() as cursor:
+            assert insert_account_insights(
+                cursor,
+                set_id=set_id,
+                sns_account_id=account_id,
+                metric_date=metric_date,
+                metrics={"reach": 9},
+                followers_count=12,
+                collected_at=datetime.datetime(2026, 9, 21, 1),
+                api_version="v25.0",
+            )
+            connection.commit()
+            assert update_follows_and_unfollows(
+                cursor,
+                sns_account_id=account_id,
+                metric_date=metric_date,
+                value=follows_value,
+            )
+            connection.commit()
+            cursor.execute(
+                "SELECT metrics, followers_count, collected_at "
+                "FROM account_insights_daily "
+                "WHERE sns_account_id = %s AND metric_date = %s",
+                (account_id, metric_date),
+            )
+            metrics_json, followers_count, collected_at = cursor.fetchone()
+
+        assert json.loads(metrics_json) == {
+            "reach": 9,
+            "follows_and_unfollows": follows_value,
+        }
+        assert followers_count == 12
+        assert collected_at == datetime.datetime(2026, 9, 21, 1)
 
 
 def test_comment_log_insert_is_idempotent_and_expired_rows_are_deleted() -> None:

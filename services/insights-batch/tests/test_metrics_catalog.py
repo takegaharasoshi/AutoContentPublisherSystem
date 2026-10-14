@@ -1,6 +1,12 @@
 """Tests for the fixed Instagram metric request catalog."""
 
-from app.metrics_catalog import ACCOUNT_METRIC_REQUESTS, MEDIA_METRIC_REQUESTS
+from app.metrics_catalog import (
+    ACCOUNT_METRIC_REQUESTS,
+    FOLLOWS_AND_UNFOLLOWS_REQUEST,
+    FOLLOWS_BACKFILL_LOOKBACK_DAYS,
+    FOLLOWS_BACKFILL_MIN_AGE_DAYS,
+    MEDIA_METRIC_REQUESTS,
+)
 
 
 def test_metric_groups_keep_request_wide_options_separate() -> None:
@@ -11,6 +17,9 @@ def test_metric_groups_keep_request_wide_options_separate() -> None:
     )
     assert ACCOUNT_METRIC_REQUESTS[0].metric_type == "total_value"
     assert ACCOUNT_METRIC_REQUESTS[1].breakdown == "follow_type"
+    assert ACCOUNT_METRIC_REQUESTS[1] is FOLLOWS_AND_UNFOLLOWS_REQUEST
+    assert FOLLOWS_BACKFILL_MIN_AGE_DAYS == 2
+    assert FOLLOWS_BACKFILL_LOOKBACK_DAYS == 30
 
 
 def test_removed_metric_names_are_absent() -> None:

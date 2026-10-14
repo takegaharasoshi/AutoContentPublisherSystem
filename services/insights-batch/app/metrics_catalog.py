@@ -5,6 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
+# follows_and_unfollows の集計は最大 48 時間遅れる（前日分は未集計のことがある）。
+FOLLOWS_BACKFILL_MIN_AGE_DAYS = 2
+# 2026-10-14 に 09-17（27 日前）まで取得できることを確認。要求数を抑えるため 30 日まで。
+FOLLOWS_BACKFILL_LOOKBACK_DAYS = 30
+
+
 @dataclass(frozen=True)
 class MetricRequest:
     """One Graph API insights request group."""
@@ -69,6 +75,13 @@ MEDIA_METRIC_REQUESTS: dict[str, tuple[MetricRequest, ...]] = {
     ),
 }
 
+FOLLOWS_AND_UNFOLLOWS_REQUEST = MetricRequest(
+    ("follows_and_unfollows",),
+    metric_type="total_value",
+    breakdown="follow_type",
+)
+
+
 ACCOUNT_METRIC_REQUESTS: tuple[MetricRequest, ...] = (
     MetricRequest(
         (
@@ -85,11 +98,7 @@ ACCOUNT_METRIC_REQUESTS: tuple[MetricRequest, ...] = (
         ),
         metric_type="total_value",
     ),
-    MetricRequest(
-        ("follows_and_unfollows",),
-        metric_type="total_value",
-        breakdown="follow_type",
-    ),
+    FOLLOWS_AND_UNFOLLOWS_REQUEST,
 )
 
 # Removed metric names must not be reintroduced: impressions, plays,

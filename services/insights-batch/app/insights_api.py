@@ -15,6 +15,7 @@ from acps_shared.instagram import (
 
 from .metrics_catalog import (
     ACCOUNT_METRIC_REQUESTS,
+    FOLLOWS_AND_UNFOLLOWS_REQUEST,
     MEDIA_METRIC_REQUESTS,
     MetricRequest,
 )
@@ -25,6 +26,34 @@ logger = logging.getLogger(__name__)
 
 class MetricsRequestUnsupported(Exception):
     """Raised when no metrics request can be executed successfully."""
+
+
+def has_breakdown_results(value: Any) -> bool:
+    """Return whether a normalized metric contains any breakdown results."""
+    if not isinstance(value, dict):
+        return False
+    breakdowns = value.get("breakdowns")
+    if not isinstance(breakdowns, list):
+        return False
+    return any(
+        isinstance(breakdown, dict)
+        and isinstance(breakdown.get("results"), list)
+        and bool(breakdown["results"])
+        for breakdown in breakdowns
+    )
+
+
+def _account_day_params(metric_date: datetime.date) -> dict[str, str]:
+    """Build the Graph API window for exactly one closed UTC day."""
+    day_start = datetime.datetime.combine(
+        metric_date, datetime.time.min, tzinfo=datetime.UTC
+    )
+    day_end = day_start + datetime.timedelta(days=1)
+    return {
+        "period": "day",
+        "since": str(int(day_start.timestamp())),
+        "until": str(int(day_end.timestamp())),
+    }
 
 
 def _normalize_metric(element: dict[str, Any]) -> Any:
@@ -217,15 +246,7 @@ def fetch_account_insights(
     urlopen: Any = urllib.request.urlopen,
 ) -> dict[str, Any]:
     """Collect account metrics for exactly one closed UTC day."""
-    day_start = datetime.datetime.combine(
-        metric_date, datetime.time.min, tzinfo=datetime.UTC
-    )
-    day_end = day_start + datetime.timedelta(days=1)
-    extra_params = {
-        "period": "day",
-        "since": str(int(day_start.timestamp())),
-        "until": str(int(day_end.timestamp())),
-    }
+    extra_params = _account_day_params(metric_date)
     metrics: dict[str, Any] = {}
     any_executed_ok = False
     for request in ACCOUNT_METRIC_REQUESTS:
@@ -244,6 +265,29 @@ def fetch_account_insights(
     if not any_executed_ok:
         raise _unsupported_error("account", unsupported.get("account", set()))
     return metrics
+
+
+def fetch_follows_and_unfollows(
+    ig_user_id: str,
+    access_token: str,
+    metric_date: datetime.date,
+    *,
+    guard: RateLimitGuard,
+    unsupported: dict[str, set[str]],
+    urlopen: Any = urllib.request.urlopen,
+) -> Any | None:
+    """Fetch the normalized follows breakdown for exactly one closed UTC day."""
+    collected, _executed_ok = _collect_with_fallback(
+        ig_user_id,
+        access_token,
+        FOLLOWS_AND_UNFOLLOWS_REQUEST,
+        cache_key="account",
+        guard=guard,
+        unsupported=unsupported,
+        urlopen=urlopen,
+        extra_params=_account_day_params(metric_date),
+    )
+    return collected.get("follows_and_unfollows")
 
 
 def fetch_followers_count(

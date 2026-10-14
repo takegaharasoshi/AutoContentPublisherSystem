@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-13（<strong>27-1 完了</strong>: <code>follows_and_unfollows</code> が空なのは API 側の集計遅延〔前日分は約 10 時間後でも未集計・2 日前より古い日は返る〕で、前日行を 1 回だけ書く収集と噛み合っていなかった。27-2 は対象日を 2 日以上前にずらして取り直す方針〔ユーザー確認済み 2026-10-13〕。<a href="#step-27-1">27-1</a>）。前回: 2026-10-13（<strong>Phase 27 起票</strong>: <a href="../issues/index.html#I-039">I-039</a>〔<code>follows_and_unfollows</code> に数値が入らない〕を 27-1 切り分け・27-2 修正 or 受容に展開。I-040 より先に軽い課題を片付ける方針〔ユーザー判断〕。ステップができたので <code>data-plan-steps="none"</code> を外した）。前回: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-14（<strong>27-2 完了</strong>〔コミットまで・push は差分確認後〕: <code>follows_and_unfollows</code> を集計遅延の後に取り直して追記するようにした。<code>FOLLOWER</code> = 新規フォローと確定。push 後の最初の日次収集の確認を<a href="#pending-checks">確認待ち</a>に起票。Phase 27 のステップはすべて完了〔I-039 は確認待ちが OK になるまで残す〕。<a href="#step-27-2">27-2</a>）。前回: 2026-10-13（<strong>27-1 完了</strong>: <code>follows_and_unfollows</code> が空なのは API 側の集計遅延〔前日分は約 10 時間後でも未集計・2 日前より古い日は返る〕で、前日行を 1 回だけ書く収集と噛み合っていなかった。27-2 は対象日を 2 日以上前にずらして取り直す方針〔ユーザー確認済み 2026-10-13〕。<a href="#step-27-1">27-1</a>）。前回: 2026-10-13（<strong>Phase 27 起票</strong>: <a href="../issues/index.html#I-039">I-039</a>〔<code>follows_and_unfollows</code> に数値が入らない〕を 27-1 切り分け・27-2 修正 or 受容に展開。I-040 より先に軽い課題を片付ける方針〔ユーザー判断〕。ステップができたので <code>data-plan-steps="none"</code> を外した）。前回: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -75,7 +75,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 1 件（クリックで展開）</summary>
+<summary>完了済み 2 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-27-1" data-step-id="27-1" data-status="done" data-completed="2026-10-13">
@@ -131,17 +131,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-27-2" data-step-id="27-2" data-status="todo">
+<article class="plan-step" id="step-27-2" data-step-id="27-2" data-status="done" data-completed="2026-10-14">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>27-2</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>27-2</strong><span class="plan-status">完了</span><span>2026-10-14</span></div>
 <h3>27-1 の結論に沿って直す、または受容して設計書に残す（I-039）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>27-1 の完了後（直し方がユーザー確認済みであること）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>完了（2026-10-14・コミットまで。push は差分確認後）</strong>。各実行の最後に <code>closed_date − 30</code>〜<code>− 2</code> 日の <code>results</code> の無い行だけ <code>follows_and_unfollows</code> を取り直し、<code>JSON_SET</code> で追記するようにした（過去分 09-17 以降もこの窓で自動的に埋まる）。<code>FOLLOWER</code> = 新規フォロー（<code>follower_count</code> と 9 日一致）・<code>NON_FOLLOWER</code> = アンフォローと <a href="../app/data-model.html">data-model 4.11</a> に記載。pytest 81 passed / 3 skipped。push 後の確認は<a href="#pending-checks">確認待ちリスト</a>（I-039 は OK まで残す）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -167,11 +162,28 @@
 <div class="plan-fold-inner"><p>直し方は 27-1 の作業記録の「27-2 の直し方」を正とする（<code>follows_and_unfollows</code> だけ <code>closed_date − 2</code> 以前の日を取り直し、既存行の <code>metrics</code> に <code>results</code> が無ければ追記。<code>FOLLOWER</code> / <code>NON_FOLLOWER</code> の意味は <code>followers_count</code> の差分と突き合わせて決める）。着手時に 27-1 の作業記録を読む。</p></div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 値の意味の照合・遡れる範囲・実装・テスト</span></summary>
+<div class="plan-fold-inner">
+<p><strong>2026-10-14（10:22 UTC）・読み取り専用 GET の追加プローブ</strong>（ユーザー許可済み。27-1 と同じく本番 Secret をプロセス内で読み、token は出力しない。スクリプトはスクラッチパッドに置いてコミットしない）。</p>
+<ul>
+<li><code>follower_count</code>（<code>period=day</code>・直近 30 日）の 09-17〜10-12 の日次値と、<code>follows_and_unfollows</code> 単日の <code>FOLLOWER</code> を 9 日分照合した。09-17: 3 / 3、09-20: 9 / 9、09-25: 6 / 6、09-30: 11 / 11、10-03: 12 / 12、10-05: 13 / 13、10-10: 9 / 9、10-11: 3 / 3、10-12: 2 / 2 で<strong>すべて一致</strong>。よって <code>FOLLOWER</code> = その日に新しくフォローした数。<code>NON_FOLLOWER</code>（同じ日に 1 / 1 / 1 / 3 / 0 / 2 / 2 / 2 / 2）はリファレンスの定義の残る側で「アンフォロー（退会を含む）」と解釈した（直接照合する手段はない）</li>
+<li>遡れる範囲: 09-17（27 日前）まで <code>results</code> 2 件が返る。前日扱いだった 10-12 も、日付が締まって約 34 時間後のこの時点では返った（27-1 の遅延の見立てと一致）</li>
+</ul>
+<p><strong>実装</strong>（Codex に委譲 → Claude がレビュー・2 点修正）: <code>metrics_catalog.py</code> に <code>FOLLOWS_AND_UNFOLLOWS_REQUEST</code>（<code>ACCOUNT_METRIC_REQUESTS</code> の要素を名前付きに切り出し。中身・順序は不変）と <code>FOLLOWS_BACKFILL_MIN_AGE_DAYS = 2</code>・<code>FOLLOWS_BACKFILL_LOOKBACK_DAYS = 30</code>。<code>insights_api.py</code> に <code>has_breakdown_results</code>・<code>fetch_follows_and_unfollows</code>（1 日の窓の組み立ては <code>fetch_account_insights</code> と共通化）。<code>account_insights.py</code> に <code>fetch_follows_backfill_dates</code>（窓内の行のうち <code>results</code> の無い日）・<code>update_follows_and_unfollows</code>（<code>JSON_SET(metrics, '$.follows_and_unfollows', CAST(%s AS JSON))</code>。他の列は変えない）。<code>processing.py</code> は日次行の後・メディア収集の前に取り直しを行い、<code>results</code> が返った日だけ UPDATE + commit。失敗はロールバックして WARNING を出し、そのアカウントの取り直しを打ち切る（<code>failure_count</code> に数えない）。日次行の INSERT IGNORE・他の指標の要求と保存形式は変えていない。</p>
+<p><strong>レビューでの修正</strong>: ① 定数 2 つのコメントが同文で根拠を取り違えていたのを直した。② 100 フォロワー未満のアカウント（pref-ranking-1・umigame-soup-1）は要素自体が返らないため、そのままでは毎回最大 29 回の無駄な要求になる。応答に要素が無い（<code>None</code>）ときはそのアカウントの取り直しをその回で打ち切るようにし、テストを 1 件足した。</p>
+<p><strong>遡る日数と埋め戻し</strong>: 窓は <code>closed_date − 30</code>〜<code>− 2</code> 日。2026-09-17 以降の空の行は、デプロイ後の最初の実行でこの窓によって自動的に埋まる見込み（09-17 は 10-14 時点で 27 日前。デプロイが 10-17 より後になると 09-17 側の数日が窓から外れて空のまま残るが、受容する）。別の埋め戻し作業は起こさない。</p>
+<p><strong>テスト</strong>: 27-1 の応答形（<code>since</code> が前日なら <code>dimension_keys</code> のみ、2 日以上前なら <code>results</code> 2 件）を返す偽物で、日次行は従来どおり・窓内の空の行だけ取り直す・まだ空なら UPDATE しない・例外で打ち切って <code>failure_count</code> が増えずメディア収集は続く・要素が返らなければ打ち切る、を確認。<code>services/insights-batch</code> の <code>pytest</code>: <strong>81 passed, 3 skipped</strong>（skip はローカル MySQL が無い環境の E2E。Codex が足した JSON_SET の E2E ケースも含む）。</p>
+<p><strong>設計書・課題・確認待ち</strong>: <a href="../app/data-model.html">data-model 4.11</a> の <code>metric_date</code>・<code>metrics</code> 行と 27-2 の decision を追加。課題表の <a href="../issues/index.html#I-039">I-039</a> は行を残し、対応方針とトリガー（確認待ちの結果）を更新。確認待ちリストに「push 後の最初の日次収集で数値が入るか」を起票した。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 
 </div>
 </section>
@@ -189,6 +201,7 @@
 <tr><td>2026-10-12 / <a href="development-log.html#step-21-8e">21-8e</a> 返信の effort max（実運用の観察）</td><td>21-8e の deploy から 1 週間後（または本番のコメントが 10 件に達したとき）</td><td>① Reply Lambda の <code>Duration</code> の最大値が 300 秒を十分下回る（目安 200 秒以下）② <code>Task timed out</code>・DLQ のメッセージが 0 件 ③ Anthropic の費用が想定（high の約 6 倍）を大きく超えていない ④ 返信の遅さへの苦情・離脱が目立たない（ユーザーの目視）</td><td>タイムアウト・DLQ が出る → <a href="../issues/index.html#I-037">I-037</a> を再開して呼び出し単位のタイムアウトを入れる。遅さ・費用が許容外 → effort を <code>xhigh</code> / <code>high</code> に戻すかをユーザー判断（追補ステップ）</td><td>—</td></tr>
 <tr><td>2026-10-12 / <a href="development-log.html#step-21-8d2">21-8d2</a> 核心語の DB 化（初回の通常投稿）</td><td>21-8d2 の切り替え後、最初の umigame-soup-1 の通常投稿（日・火・木・土 20:00）</td><td>その投稿のスナップショットを S3 から取得し、<code>schema_version</code> 4・核心語が入っていること（投稿バッチが書いたもの）。その投稿へのコメントで Reply Lambda のログに核心語なしの警告が出ていない</td><td>核心語が無い → 投稿バッチの追補ステップ（当面は <code>write_snapshot.py</code> の書き直しモードで補う）</td><td>—</td></tr>
 <tr><td>2026-10-13 / <a href="development-log.html#step-26-5">26-5</a> 投稿クライアントの載せ替え（v25.0）</td><td>26-5 の push 後、最初の定時投稿（パイプライン完走・タスク定義の新リビジョン登録の後）</td><td>投稿バッチが新リビジョンで動き、リール・ストーリーズとも <code>posts.status=success</code>。ログに <code>graph.facebook.com/v25.0</code> 宛ての失敗・結果不明が出ていない</td><td>失敗・結果不明 → <code>/incident</code>。原因が載せ替えなら追補ステップ（26-5 のコミットを revert して切り戻すかはユーザー判断）</td><td>—</td></tr>
+<tr><td>2026-10-14 / <a href="#step-27-2">27-2</a> follows_and_unfollows の取り直し（I-039）</td><td>27-2 の push 後、最初の日次収集（パイプライン完走・タスク定義の新リビジョン登録の後の 06:00 / 18:00 JST）</td><td>① logic-training-1 の <code>account_insights_daily</code> で、<code>metric_date</code> が 2026-09-17〜（収集日 − 3 日）の行の <code>metrics.follows_and_unfollows</code> に <code>results</code>（<code>FOLLOWER</code> / <code>NON_FOLLOWER</code>）が入っている ② ログに取り直しの INFO（対象日数・追記件数）が出て、取り直し失敗の WARNING が出ていない ③ 前日の行・他の指標のキーが変わっていない</td><td>入らない・失敗が出る → <code>/incident</code> で切り分け、追補ステップ（I-039 を残したまま）。OK なら I-039 を解消でクローズ</td><td>—</td></tr>
 </tbody>
 </table></div>
 

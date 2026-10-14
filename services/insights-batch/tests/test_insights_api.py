@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 import json
+from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
@@ -200,6 +201,104 @@ def test_account_insights_uses_exact_utc_day(monkeypatch) -> None:
         "since": str(int(start.timestamp())),
         "until": str(int((start + datetime.timedelta(days=1)).timestamp())),
     }
+
+
+def test_follows_api_preserves_delayed_and_ready_breakdown_shapes() -> None:
+    """The previous UTC day can be empty while older dates return both values."""
+    closed_date = datetime.date(2026, 10, 13)
+    ready_date = closed_date - datetime.timedelta(days=2)
+    captured: list[dict[str, list[str]]] = []
+
+    def urlopen(request, *, timeout):
+        params = parse_qs(urlsplit(request.full_url).query)
+        captured.append(params)
+        requested_date = datetime.datetime.fromtimestamp(
+            int(params["since"][0]), tz=datetime.UTC
+        ).date()
+        breakdown = {"dimension_keys": ["follow_type"]}
+        if requested_date == ready_date:
+            breakdown["results"] = [
+                {"dimension_values": ["FOLLOWER"], "value": 3},
+                {"dimension_values": ["NON_FOLLOWER"], "value": 2},
+            ]
+        return Response(
+            {
+                "data": [
+                    {
+                        "name": "follows_and_unfollows",
+                        "period": "day",
+                        "total_value": {"breakdowns": [breakdown]},
+                    }
+                ]
+            }
+        )
+
+    delayed = insights_api.fetch_follows_and_unfollows(
+        "user",
+        "token",
+        closed_date,
+        guard=Guard(),
+        unsupported={},
+        urlopen=urlopen,
+    )
+    ready = insights_api.fetch_follows_and_unfollows(
+        "user",
+        "token",
+        ready_date,
+        guard=Guard(),
+        unsupported={},
+        urlopen=urlopen,
+    )
+
+    assert delayed == {"breakdowns": [{"dimension_keys": ["follow_type"]}]}
+    assert not insights_api.has_breakdown_results(delayed)
+    assert ready == {
+        "breakdowns": [
+            {
+                "dimension_keys": ["follow_type"],
+                "results": [
+                    {"dimension_values": ["FOLLOWER"], "value": 3},
+                    {"dimension_values": ["NON_FOLLOWER"], "value": 2},
+                ],
+            }
+        ]
+    }
+    assert insights_api.has_breakdown_results(ready)
+    assert [params["period"] for params in captured] == [["day"], ["day"]]
+    assert [params["metric_type"] for params in captured] == [
+        ["total_value"],
+        ["total_value"],
+    ]
+    assert [params["breakdown"] for params in captured] == [
+        ["follow_type"],
+        ["follow_type"],
+    ]
+    assert [
+        datetime.datetime.fromtimestamp(int(params["since"][0]), tz=datetime.UTC).date()
+        for params in captured
+    ] == [closed_date, ready_date]
+    assert [
+        datetime.datetime.fromtimestamp(int(params["until"][0]), tz=datetime.UTC).date()
+        for params in captured
+    ] == [
+        closed_date + datetime.timedelta(days=1),
+        ready_date + datetime.timedelta(days=1),
+    ]
+
+
+def test_has_breakdown_results_requires_nonempty_results_list() -> None:
+    """Only a nonempty results array signals that Meta has finished aggregating."""
+    assert not insights_api.has_breakdown_results(None)
+    assert not insights_api.has_breakdown_results({"breakdowns": []})
+    assert not insights_api.has_breakdown_results(
+        {"breakdowns": [{"dimension_keys": ["follow_type"], "results": []}]}
+    )
+    assert not insights_api.has_breakdown_results(
+        {"breakdowns": [{"dimension_keys": ["follow_type"]}]}
+    )
+    assert insights_api.has_breakdown_results(
+        {"breakdowns": [{"results": [{"value": 0}]}]}
+    )
 
 
 def test_fetch_followers_count_is_best_effort(monkeypatch) -> None:

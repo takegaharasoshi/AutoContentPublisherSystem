@@ -20,15 +20,23 @@ from acps_shared.instagram import (
 from acps_shared.sns_secrets import build_sns_secret_name, parse_sns_secret
 
 from .account_insights import (
+    fetch_follows_backfill_dates,
     fetch_latest_metric_date,
     insert_account_insights,
     resolve_target_dates,
+    update_follows_and_unfollows,
 )
 from .clock import now_utc
 from .insights_api import (
     fetch_account_insights,
     fetch_followers_count,
+    fetch_follows_and_unfollows,
     fetch_media_insights,
+    has_breakdown_results,
+)
+from .metrics_catalog import (
+    FOLLOWS_BACKFILL_LOOKBACK_DAYS,
+    FOLLOWS_BACKFILL_MIN_AGE_DAYS,
 )
 from .models import SnsAccount
 from .post_insights import fetch_collected_post_ids, insert_post_insights
@@ -179,6 +187,66 @@ def process_accounts(
 
         if stop_account:
             continue
+
+        backfill_dates: list[datetime.date] = []
+        appended_follows = 0
+        try:
+            backfill_dates = fetch_follows_backfill_dates(
+                cursor,
+                account.id,
+                closed_date
+                - datetime.timedelta(days=FOLLOWS_BACKFILL_LOOKBACK_DAYS),
+                closed_date - datetime.timedelta(days=FOLLOWS_BACKFILL_MIN_AGE_DAYS),
+            )
+        except Exception as exc:
+            _rollback_safely(connection)
+            logger.warning(
+                "Account follows backfill date lookup failed: "
+                "sns_account_id=%s error_type=%s",
+                account.id,
+                type(exc).__name__,
+            )
+
+        for metric_date in backfill_dates:
+            try:
+                value = fetch_follows_and_unfollows(
+                    credentials.ig_user_id,
+                    credentials.access_token,
+                    metric_date,
+                    guard=guard,
+                    unsupported=unsupported,
+                    urlopen=urlopen,
+                )
+                if value is None:
+                    # 100 フォロワー未満などで要素自体が返らない。残りの日も
+                    # 同じなので、この実行では打ち切る。
+                    break
+                if has_breakdown_results(value):
+                    updated = update_follows_and_unfollows(
+                        cursor,
+                        sns_account_id=account.id,
+                        metric_date=metric_date,
+                        value=value,
+                    )
+                    connection.commit()
+                    appended_follows += int(updated)
+            except Exception as exc:
+                _rollback_safely(connection)
+                logger.warning(
+                    "Account follows backfill failed; stopping retries for this run: "
+                    "sns_account_id=%s metric_date=%s error_type=%s",
+                    account.id,
+                    metric_date,
+                    type(exc).__name__,
+                )
+                break
+        logger.info(
+            "Account follows backfill completed: sns_account_id=%s "
+            "target_days=%s appended=%s",
+            account.id,
+            len(backfill_dates),
+            appended_follows,
+        )
 
         try:
             posts = fetch_collectible_posts(

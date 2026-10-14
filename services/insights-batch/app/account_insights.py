@@ -6,6 +6,8 @@ import datetime
 import json
 from typing import Any
 
+from .insights_api import has_breakdown_results
+
 
 def fetch_latest_metric_date(
     cursor: Any, sns_account_id: int
@@ -69,6 +71,55 @@ def insert_account_insights(
             followers_count,
             collected_at,
             api_version,
+        ),
+    )
+    return affected == 1
+
+
+def fetch_follows_backfill_dates(
+    cursor: Any,
+    sns_account_id: int,
+    start: datetime.date,
+    end: datetime.date,
+) -> list[datetime.date]:
+    """Return dates whose stored follows metric still lacks breakdown data."""
+    cursor.execute(
+        "SELECT metric_date, metrics FROM account_insights_daily "
+        "WHERE sns_account_id = %s AND metric_date BETWEEN %s AND %s "
+        "ORDER BY metric_date ASC",
+        (sns_account_id, start, end),
+    )
+    dates: list[datetime.date] = []
+    for metric_date, raw_metrics in cursor.fetchall():
+        metrics = (
+            json.loads(raw_metrics) if isinstance(raw_metrics, str) else raw_metrics
+        )
+        follows_value = (
+            metrics.get("follows_and_unfollows")
+            if isinstance(metrics, dict)
+            else None
+        )
+        if not has_breakdown_results(follows_value):
+            dates.append(metric_date)
+    return dates
+
+
+def update_follows_and_unfollows(
+    cursor: Any,
+    *,
+    sns_account_id: int,
+    metric_date: datetime.date,
+    value: Any,
+) -> bool:
+    """Update only the stored follows breakdown, preserving other row fields."""
+    affected = cursor.execute(
+        "UPDATE account_insights_daily SET metrics = "
+        "JSON_SET(metrics, '$.follows_and_unfollows', CAST(%s AS JSON)) "
+        "WHERE sns_account_id = %s AND metric_date = %s",
+        (
+            json.dumps(value, ensure_ascii=False),
+            sns_account_id,
+            metric_date,
         ),
     )
     return affected == 1
