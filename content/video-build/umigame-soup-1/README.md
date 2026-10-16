@@ -2,7 +2,7 @@
 
 ## 本番の手順
 
-> **2026-10-17 セット改修 R-1-1（試作・第 4 稿）**: 先頭に導入シーン 4.5 秒を足し、ループの作り（継ぎ目の検証・
+> **2026-10-17 セット改修 R-1-1（試作・第 8 稿）**: 先頭に導入シーン 5.0 秒を足し、ループの作り（継ぎ目の検証・
 > 周期を尺の約数にする制約）をやめて **一本道・29 秒（870 フレーム）**にした。導入シーンの版面は R-1-2 で決定
 > （「新体験」スタンプ・黄色の 2 行見出し・部分強調の説明文・「今日の謎」カードの hook・キャラの自己紹介の吹き出し）。
 > 文言は `assets/design.json` の `opening`（全問共通）。見出しだけ読み上げる（`opening.narration`。全問共通の 1 文を
@@ -30,7 +30,7 @@ python3 background_sheet.py --stills   # 各コマの静止画も今の文言・
 python3 prepare_bgm.py --init-provisional
 python3 prepare_bgm.py
 
-# 3. ナレーション（Irodori-TTS・ローカル GPU）を合成して 29 秒動画（一本道・先頭 4.5 秒が導入シーン）をビルドする
+# 3. ナレーション（Irodori-TTS・ローカル GPU）を合成して 29 秒動画（一本道・先頭 5.0 秒が導入シーン）をビルドする
 python3 build.py
 python3 build.py --retake-tts --content-key <key>   # 予算超過・読み間違いの問を取り直す（1 問 3 回まで）
 python3 review_sheet.py

@@ -64,8 +64,8 @@ def test_fps_and_total_frames() -> None:
 
 
 def test_narration_constants() -> None:
-    assert _ts_const("OPENING_END") == "Math.round(4.5 * FPS)"
-    assert common.OPENING_END == round(4.5 * common.FPS)
+    assert _ts_const("OPENING_END") == "Math.round(5 * FPS)"
+    assert common.OPENING_END == round(5 * common.FPS)
     assert _ts_const("OPENING_FADE_FRAMES") == str(common.OPENING_FADE_FRAMES)
     assert _ts_const("OPENING_NARRATION_START") == str(common.OPENING_NARRATION_START)
     assert _ts_const("NARRATION_START") == "OPENING_END + Math.round(0.5 * FPS)"
@@ -93,6 +93,8 @@ def test_beats_are_ordered_contiguous_and_end_at_total() -> None:
     assert all(beat["to"] > beat["from"] for beat in beats)
     assert beats[-1]["to"] == common.TOTAL_FRAMES
     assert beats[-1]["kind"] == "jr_outro"
+    # Jr. の締めは 5.0 秒（導入を 5.0 秒に延ばした分をここから回した）
+    assert beats[-1]["to"] - beats[-1]["from"] == 5 * common.FPS
     assert all(beat["kind"] != "seam" for beat in beats)
     assert module["narrationStart"] + module["budget"] <= module["deadline"] <= module["total"]
     # 本編の吹き出しの SE・跳ねは出題（「質問してみて！」）から。導入シーンの分は別に持つ

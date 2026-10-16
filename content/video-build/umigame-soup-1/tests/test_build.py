@@ -158,11 +158,11 @@ def test_timeline_summary_places_narration_after_opening() -> None:
     summary = timeline_summary(_report(10.0, 5.0), 65)
     assert summary["narration_opening_start"] == 6
     assert summary["narration_opening_end"] == 71
-    assert summary["opening_end"] == 135
-    assert summary["main_fully_visible"] == 143
-    assert summary["narration_problem_start"] == 150
-    assert summary["narration_rule_start"] == 150 + 300 + 36
-    assert summary["narration_end"] == 150 + 300 + 36 + 150
+    assert summary["opening_end"] == 150
+    assert summary["main_fully_visible"] == 158
+    assert summary["narration_problem_start"] == 165
+    assert summary["narration_rule_start"] == 165 + 300 + 36
+    assert summary["narration_end"] == 165 + 300 + 36 + 150
     assert summary["narration_end"] <= summary["total_frames"]
 
 
@@ -192,5 +192,5 @@ def test_manifest_narration_keeps_engine_and_tempo(
     assert record["narration"]["problem_sec"] == 10.123
     assert record["narration"]["tempo"] == 1.146
     assert record["narration"]["engine_id"] == "gemini/gemini-3.8-flash-tts/voice-test"
-    assert record["timeline"]["narration_problem_start"] == 150
+    assert record["timeline"]["narration_problem_start"] == 165
     assert "seam_mean_diff" not in record
