@@ -34,6 +34,7 @@ SQL_PATH = HERE / "insert_umigame_stock.sql"
 UPDATE_SQL_PATH = HERE / "update_judge_points.sql"
 CRITERIA_SQL_PATH = HERE / "update_judge_criteria.sql"
 CORE_WORDS_SQL_PATH = HERE / "update_core_words.sql"
+HOOK_SQL_PATH = HERE / "update_hook.sql"
 SET_NAME = "探偵カメロックのウミガメのスープ"
 GENERATOR_NAME = "umigame-prebuilt"
 MYSQL_CMD = [
@@ -278,6 +279,32 @@ def dry_run(sql: str, update_sql: str, criteria_sql: str, core_words_sql: str) -
     return 0
 
 
+def build_hook_update_sql() -> str:
+    """全 14 問のフックをストックへ反映する（2026-10-17 のフック全件見直し。R-1-5 の本番差し替えで実行）。"""
+    lines = [
+        "-- batch-01 既存 14 問のフックの更新（セット改修 R-1-3。動画の差し替え〔R-1-5〕と同時に実行する）",
+        "-- 生成元: content/umigame-stock/umigame-soup-1/batch-01/stock_items.py（単一ソース）",
+        "-- 適用先: ローカル MySQL / Aurora（acps）。set_code と content_key で対象を特定する。",
+        "-- 出題済み umigame_items のスナップショットは投稿当時の記録のため更新しない。",
+        "",
+    ]
+    for it in ITEMS:
+        lines += [
+            f"-- {it['content_key']}",
+            f"UPDATE umigame_stock_items SET hook = '{esc(it['hook'])}'",
+            f"WHERE content_key = '{esc(it['content_key'])}'",
+            f"  AND set_id = (SELECT id FROM batch_sets WHERE set_code = '{SET_CODE}');",
+            "",
+        ]
+    lines += [
+        "-- 反映後のフックを確認する。",
+        "SELECT s.content_key, s.hook FROM umigame_stock_items s JOIN batch_sets b ON b.id = s.set_id",
+        f"WHERE b.set_code = '{SET_CODE}' ORDER BY s.content_key;",
+        "",
+    ]
+    return "\n".join(lines)
+
+
 def main() -> int:
     """SQL を生成し、指定があればドライランする。"""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -291,9 +318,11 @@ def main() -> int:
     UPDATE_SQL_PATH.write_text(update_sql, encoding="utf-8")
     CRITERIA_SQL_PATH.write_text(criteria_sql, encoding="utf-8")
     CORE_WORDS_SQL_PATH.write_text(core_words_sql, encoding="utf-8")
+    HOOK_SQL_PATH.write_text(build_hook_update_sql(), encoding="utf-8")
     print(f"generate: {SQL_PATH.name} に {len(ITEMS)} INSERT 文を生成")
     print(f"generate: {UPDATE_SQL_PATH.name} に {len(ITEMS)} UPDATE 文を生成")
     print(f"generate: {CRITERIA_SQL_PATH.name} に {len(ITEMS) * 2} UPDATE 文を生成")
+    print(f"generate: {HOOK_SQL_PATH.name} に {len(ITEMS)} UPDATE 文と確認クエリを生成")
     print(f"generate: {CORE_WORDS_SQL_PATH.name} に {len(ITEMS) + 1} UPDATE 文と両表の core_words_set 確認クエリを生成")
     if args.dry_run:
         print(core_words_sql)

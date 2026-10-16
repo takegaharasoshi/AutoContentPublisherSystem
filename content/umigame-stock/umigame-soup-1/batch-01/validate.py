@@ -31,7 +31,7 @@ from umigame_common import (  # noqa: E402
 PROBLEM_MIN, PROBLEM_MAX = 78, 85
 FACT_MIN, FACT_MAX = 8, 20  # 上限は 2026-09-26 に 12 → 20（PoC の目安がそのまま上限になっていたため。セット別設計書 4）
 QUESTION_MIN, QUESTION_MAX = 15, 20
-HOOK_MAX = 14  # 12 字前後（74px・1 行）
+HOOK_MAX = 20  # 導入シーンの「今日の謎」カードとつかみ帯に 1 行で出す（20 字で 40px まで縮む。2026-10-17 R-1-3 でフックを全件見直し）
 RULE_MAX = 50  # 45 字前後（34px・2 行）
 QUESTIONER_MAX, MASTER_MAX = 16, 17  # 吹き出し 1 行
 CHARACTER_LINE_MAX = 17
@@ -226,10 +226,10 @@ def check_item(it: dict) -> None:
 
     if not it["hook"] or len(it["hook"]) > HOOK_MAX:
         errors.append(f"{no}: hook が空または {HOOK_MAX} 字超（{len(it['hook'])} 字）")
-    elif not it["hook"].endswith("？"):
-        errors.append(f"{no}: hook は「？」で終える（2026-09-26 素材レビュー）: {it['hook']}")
     elif len(it["hook"]) < 8:
-        warnings.append(f"{no}: hook が {len(it['hook'])} 字（12 字前後が目安）")
+        warnings.append(f"{no}: hook が {len(it['hook'])} 字（12〜16 字前後が目安）")
+    elif "謎" not in it["hook"]:
+        warnings.append(f"{no}: hook に「謎」がない（2026-10-17 の見直しで全問が「〜の謎」「謎の〜」の形）: {it['hook']}")
     if not it["rule_text"] or len(it["rule_text"]) > RULE_MAX:
         errors.append(f"{no}: rule_text が空または {RULE_MAX} 字超")
 

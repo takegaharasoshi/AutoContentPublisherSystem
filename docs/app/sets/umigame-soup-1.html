@@ -100,7 +100,7 @@ nav.toc ul { margin: .3rem 0 0; }
 </ul>
 
 <h2 id="schedule">3. スケジュール（投稿頻度）</h2>
-<div class="note"><span class="callout-title">要点</span>日・火・木・土の 20:00 に 24 秒のリールを 1 本（週 4 回。<a href="#d-20261012-post-frequency">21-6i</a>）。投稿順はストックを INSERT した順で、story と misdirection を交互に出す。</div>
+<div class="note"><span class="callout-title">要点</span>日・火・木・土の 20:00 に 29 秒のリール（2026-10-17 のセット改修 R-1 までは 24 秒）を 1 本（週 4 回。<a href="#d-20261012-post-frequency">21-6i</a>）。投稿順はストックを INSERT した順で、story と misdirection を交互に出す。</div>
 <div class="table-wrap">
 <table>
 <tr><th>スロット</th><th>投稿時刻（JST）</th><th>Scheduler 名 / cron 式</th><th>尺</th></tr>
@@ -128,7 +128,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>2</td><td><code>truth</code> 真相</td><td>AI 出題者の判定根拠。<strong>次のリールのキャプション末尾で全文を公開する</strong>（前回の真相ブロック。差し込みは 21-6h。版面・コメント返信には出さない）</td><td>必須。問題文と矛盾しない。<strong>400 字以内（改行込み）</strong>。公開前提の書き方は表の下</td></tr>
 <tr><td>3</td><td><code>fact_sheet</code> 確定事実シート</td><td>「はい / いいえ / 関係ない」の判定根拠（場所・人物関係・時系列・「問題に関係ない事項」の明示）。真相の曖昧さ起因の矛盾回答・捏造回答をデータ側で防ぐ</td><td>8〜20 件（文字列の配列）</td></tr>
 <tr><td>4</td><td><code>expected_questions</code> 想定質問と期待回答</td><td>作問時の確認用。正解に向かう質問・引っかけ・無関係な質問を混ぜる</td><td>15〜20 件（<code>{q, a}</code> の配列。<code>a</code> は はい / いいえ / 関係ない / 正解 のいずれか + 任意の補足）</td></tr>
-<tr><td>5</td><td><code>hook</code> フック文</td><td>つかみ帯（74px・1 行）</td><td>12 字前後（上限 14 字）。<strong>「？」で終える</strong></td></tr>
+<tr><td>5</td><td><code>hook</code> フック文</td><td>導入シーンの「今日の謎」カード（最大 60px・1 行）と本編のつかみ帯（最大 74px・1 行）。どちらも字数で縮める</td><td>12〜16 字前後（上限 20 字。20 字で 40px）。<strong>「〜の謎」「謎の〜」の形で、何が謎なのかを一言で言い切る</strong>（2026-10-17 の R-1 でユーザーが全件見直し。旧ルール「？」で終える〔2026-09-26〕は廃止）</td></tr>
 <tr><td>6</td><td><code>rule_text</code> ルール帯</td><td>常時表示の遊び方（34px・2 行）</td><td>45 字前後。セット固定文の既定値あり（問題ごとに変えなくてよい）</td></tr>
 <tr><td>7</td><td><code>narration.problem</code> / <code>narration.rule</code> ナレーション cue</td><td>冒頭ナレーション。表示文とは別に、括弧・記号を落とし読点で間を整えた読み上げ用の文</td><td>2 cue の実測長合計 + 間 1.2 秒が <strong>21 秒以内</strong>（方式設計書 8.3 の予算検査。超過はビルドエラー）</td></tr>
 <tr><td>8</td><td><code>play_example</code> プレイ例</td><td>下部の吹き出し 3 往復（質問 → 質問を残したまま返答を追加）</td><td>6 要素（<code>{role: questioner|master, text}</code> の交互）。質問 16 字 / 返答 17 字以内（1 行）。<strong>3 往復のうち 1 つは「はい」</strong>（出題者が喜ぶポーズに切り替わる版面上の約束事）</td></tr>
@@ -183,25 +183,25 @@ nav.toc ul { margin: .3rem 0 0; }
 </ul>
 
 <h2 id="audio">7. 音源の構成</h2>
-<div class="note"><span class="callout-title">要点</span>BGM は 24 秒ちょうどのトラック（第 1 バッチは 1 曲）、SE は吹き出しのポップ音 1 種。どちらもビルド時に動画へ焼き込む。</div>
+<div class="note"><span class="callout-title">要点</span>BGM は尺ちょうど（29 秒。R-1 までは 24 秒）のトラック（第 1 バッチは 1 曲）、SE は吹き出しのポップ音 1 種。どちらもビルド時に動画へ焼き込む。</div>
 <div class="table-wrap">
 <table>
 <tr><th>種別</th><th>S3 キー / <code>audio_assets</code></th><th>仕様</th></tr>
-<tr><td>BGM（<code>asset_type='bgm'</code>・<code>time_slot=NULL</code>）</td><td><code>audio/umigame-soup-1/trackNN.m4a</code>（3〜5 曲）</td><td><strong>24 秒ちょうど</strong>のトラック（フェードイン 0.5 秒・フェードアウト 1.0 秒・AAC）。ループの継ぎ目を避けるため 24 秒版として前処理する（<code>prepare_bgm.py</code>）。調達・ライセンス証跡は <a href="../operation.html">運用設計 3</a>（Pixabay Content License / CC0。クレジット不要のもの）</td></tr>
+<tr><td>BGM（<code>asset_type='bgm'</code>・<code>time_slot=NULL</code>）</td><td><code>audio/umigame-soup-1/trackNN.m4a</code>（3〜5 曲）</td><td><strong>動画の尺ちょうど（29 秒）</strong>のトラック（フェードイン 0.5 秒・フェードアウト 1.0 秒・AAC）。<code>prepare_bgm.py</code> が <code>common.DURATION_SECONDS</code> で切り出して前処理する（R-1 で 24 → 29 秒。<code>audio_assets.duration_seconds</code> の登録値 24 は課題 <a href="../../issues/index.html#I-041">I-041</a> で扱う）。調達・ライセンス証跡は <a href="../operation.html">運用設計 3</a>（Pixabay Content License / CC0。クレジット不要のもの）</td></tr>
 <tr><td>SE（<code>asset_type='se'</code>）</td><td><code>audio/umigame-soup-1/se/bubble_pop.m4a</code>（1 種）</td><td>吹き出し出現のポップ音（0.14 秒）。ffmpeg の <code>sine</code> で合成（880 + 1320 Hz）したためライセンス問題なし</td></tr>
 </table>
 </div>
 <ul>
   <li><strong>選曲</strong>はビルド時（<code>build.py</code>）に行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）。ローカル台帳 <code>work/bgm/tracks.json</code> の使用回数最少で選び、ID は publish 時に S3 キーで解決する（<a href="../generators/umigame-prebuilt.html#build-steps">方式設計書 8.1 の決定</a>）</li>
-  <li><strong>第 1 バッチは 1 曲運用</strong>: track01 = Pixabay「Strange Detectives」/ HarumachiMusic の先頭 24 秒（2026-09-24 ユーザー選曲。配布ページに Content ID 登録の表示あり）</li>
+  <li><strong>第 1 バッチは 1 曲運用</strong>: track01 = Pixabay「Strange Detectives」/ HarumachiMusic の先頭 29 秒（2026-09-24 ユーザー選曲・R-1 で 24 → 29 秒。配布ページに Content ID 登録の表示あり）</li>
   <li><strong>SE</strong> は動画に焼き込むだけで実行時に使わないため、ファイルの正は <code>content/video-build/umigame-soup-1/assets/se/bubble_pop.wav</code>（git 管理）とし、S3 配置・<code>audio_assets</code> 登録は必要になるまで行わない</li>
   <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
 </ul>
 
 <h2 id="tts">8. ナレーション・TTS（Irodori-TTS v4.1-Small / 声 G4 のクローン）</h2>
-<div class="note"><span class="callout-title">要点</span>ナレーションはローカル GPU の Irodori-TTS（BF16）で、Gemini の声 G4 を参照音声からクローンして作る。読むのは問題文とルールの 2 cue だけで、合計 21 秒以内。クレジット表記は不要。</div>
+<div class="note"><span class="callout-title">要点</span>ナレーションはローカル GPU の Irodori-TTS（BF16）で、Gemini の声 G4 を参照音声からクローンして作る。読むのは導入シーンの見出し（全問共通）と、問題文・ルールの 2 cue（合計 21 秒以内）。クレジット表記は不要。</div>
 <ul>
-  <li><strong>読み上げる文</strong>: 冒頭に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code> の 2 cue だけ（吹き出しと同期させない。21-1 ②）。開始は 0.5 秒（15 フレーム）、2 cue + 間の合計は <strong>21 秒以内</strong>（継ぎ目 708 フレームに掛からない予算。方式設計書 8.3）</li>
+  <li><strong>読み上げる文</strong>: 導入シーンで全問共通の「新体験！！ コメントで紐解く！ 推理ゲーム！」（R-1 で追加。<code>assets/design.json</code> の <code>opening.narration</code>）→ 導入の後に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code>（吹き出しと同期させない。21-1 ②）。問題文の開始は 5.5 秒（165 フレーム。24 秒版では 0.5 秒）、2 cue + 間の合計は <strong>21 秒以内</strong>（尺の内側で終わる予算。方式設計書 8.3）</li>
   <li><strong>1 回で読ませる</strong>: 問題文とルール文を 1 回の合成で読ませ、無音で切り分ける（別々に作ると口調が変わる）</li>
   <li><strong>声</strong>: 参照音声 <code>content/video-build/umigame-soup-1/assets/voice/kamerock-g4/*.wav</code>（Gemini G4 で合成した 001・004・006 の problem / rule 6 本に息継ぎゲートをかけたもの。名前順にすべて渡す）のクローン。説明文（caption）・絵文字・後処理は使わない</li>
   <li><strong>設定の正</strong>: モデル・精度・seed・長さは <code>assets/design.json</code> の <code>narration</code> 節（Gemini の設定は <code>narration_gemini</code> 節に残す）。<strong>参照音声を差し替えたら声が変わるため全数を再試聴する</strong></li>
