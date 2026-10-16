@@ -248,7 +248,7 @@
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>R-1-4 で承認された動画を <code>publish.py</code> で両環境へ配置し、<code>video_built_at</code> を更新する。本書のステータス欄の「生成方式」の尺を直し、確認待ちリストの R-1 効果確認の行に差し替え日と絶対日付のトリガーを書き足す。</p></div>
+<div data-field="overview"><p>R-1-4 で承認された動画を <code>publish.py</code> で両環境へ配置し、<code>video_built_at</code> を更新する。本書のステータス欄の「生成方式」の尺を直し、確認待ちリストの R-1 効果確認の行に差し替え日と絶対日付のトリガーを書き足す。配置の後、<strong>ユーザーが Instagram 上で旧版面の投稿（それまでの全投稿）をアーカイブする</strong>（ユーザー作業・ゴール対象外。プロフィールを新しい版面だけにするため。アーカイブはいつでも戻せる）。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>R-1-4 で承認したものだけを配置する（承認後に再ビルドしない）。投稿時刻（20:00）の前後に配置しない。<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> には触らない。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
@@ -260,12 +260,16 @@
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
 <div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>本番配置（S3・Aurora の更新）の許可プロンプト。</p></div>
+<div data-field="gate"><strong>人が確認すること</strong><p>本番配置（S3・Aurora の更新）の許可プロンプト。push の後、ユーザーが旧版面の投稿をアーカイブする（ゴールに含めない。済んだら作業記録にアーカイブした件数と日付を書く）。</p></div>
 <div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（本書）。stop after 15 turns。効果の観察は確認待ちリストで行い、本ステップに含めない。</p></div>
 </div>
 </section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— アーカイブを R-1-5 に合わせる理由と影響</span></summary>
+<div class="plan-fold-inner"><p>2026-10-17 にユーザーと確認。今アーカイブしても R-1-5 までは旧版面の投稿が週 4 回増えるため、差し替えの時点でまとめて行う。影響: インサイト収集は取れない投稿をスキップするだけだが、<strong>収集対象の 14 日間の投稿がすべて取れないと権限の欠落として失敗扱い</strong>になる（<code>services/insights-batch/app/processing.py</code>）。差し替え後は新しい投稿が続けて入るため起きにくい。もし失敗通知が来たら、アーカイブ由来かを先に確かめる（<code>/incident</code>）。改修前のスキップ率などは DB に記録済みのため効果確認に影響しない。アーカイブした問題は在庫が尽きたときに LRU で新しい版面のまま再登場しうる（問題ない）。差し替え後 1 本目のキャプション末尾の「前回の真相」はアーカイブ済みの投稿を指すが、害はないため受け入れる。</p></div>
+</details>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
 <div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
 </details>
 </div>
