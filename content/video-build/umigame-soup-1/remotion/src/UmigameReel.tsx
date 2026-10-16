@@ -340,7 +340,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
         if (b.kind === "intro") {
           return (
             <Sequence key={key} name={`Bubble ${b.kind}`} from={b.from} durationInFrames={duration} layout="none">
-              <MasterBubble text={masterLines.intro} tag={master.name} tagDot={tagDot} pop={false} glow={false} lift={0} />
+              <MasterBubble text={masterLines.intro} tag={master.name} tagDot={tagDot} pop glow={false} lift={hop} />
             </Sequence>
           );
         }

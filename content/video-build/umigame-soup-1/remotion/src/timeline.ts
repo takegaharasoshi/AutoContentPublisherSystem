@@ -110,9 +110,9 @@ export const BEATS: readonly Beat[] = (() => {
   return beats;
 })();
 
-/** 吹き出しが新しく出るフレーム（SE と跳ねの位置。導入シーン・出題は鳴らさない） */
+/** 吹き出しが新しく出るフレーム（SE と跳ねの位置。導入シーンは別に持つ。出題の「質問してみて！」は R-1-2 の指摘で追加） */
 export const BUBBLE_SWITCH_FRAMES: readonly number[] = BEATS.filter(
-  (beat) => beat.kind !== "opening" && beat.kind !== "intro",
+  (beat) => beat.kind !== "opening",
 ).map((beat) => beat.from);
 
 /** キャラが小さく跳ねるフレーム（本編の吹き出しの切替 + 導入シーンの自己紹介の吹き出し） */

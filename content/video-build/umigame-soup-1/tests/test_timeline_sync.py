@@ -95,8 +95,8 @@ def test_beats_are_ordered_contiguous_and_end_at_total() -> None:
     assert beats[-1]["kind"] == "jr_outro"
     assert all(beat["kind"] != "seam" for beat in beats)
     assert module["narrationStart"] + module["budget"] <= module["deadline"] <= module["total"]
-    # 吹き出しの SE は導入シーン・出題では鳴らさない
-    assert min(module["switches"]) >= beats[1]["to"]
+    # 本編の吹き出しの SE・跳ねは出題（「質問してみて！」）から。導入シーンの分は別に持つ
+    assert min(module["switches"]) == beats[1]["from"] == common.OPENING_END
     # キャラの跳ねは導入シーンの自己紹介の吹き出しでも起き、昇順に並ぶ（hopLift は直近の 1 つを探す）
     assert module["hops"][:2] == [module["masterIn"], module["jrIn"]]
     assert module["hops"] == sorted(module["hops"])
