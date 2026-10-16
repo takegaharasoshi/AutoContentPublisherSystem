@@ -63,8 +63,8 @@ def test_fps_and_total_frames() -> None:
 
 
 def test_narration_constants() -> None:
-    assert _ts_const("OPENING_END") == "Math.round(2.5 * FPS)"
-    assert common.OPENING_END == round(2.5 * common.FPS)
+    assert _ts_const("OPENING_END") == "Math.round(4.5 * FPS)"
+    assert common.OPENING_END == round(4.5 * common.FPS)
     assert _ts_const("OPENING_FADE_FRAMES") == str(common.OPENING_FADE_FRAMES)
     assert _ts_const("OPENING_NARRATION_START") == str(common.OPENING_NARRATION_START)
     assert _ts_const("NARRATION_START") == "OPENING_END + Math.round(0.5 * FPS)"

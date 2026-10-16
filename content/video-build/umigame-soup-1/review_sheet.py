@@ -150,7 +150,7 @@ figure{{margin:0}}figure img{{width:100%;aspect-ratio:9/16;object-fit:cover}}fig
 .ok{{background:#edf7ed;padding:10px}}details{{border-top:1px solid #ccc;padding-top:10px}}code{{background:#eee;padding:2px 4px}}
 @media(max-width:600px){{body{{padding:10px}}section{{padding:14px}}.stills{{min-width:100%}}}}
 </style></head><body><main><h1>umigame-soup-1 動画レビュー</h1>
-<p>尺は {DURATION_SECONDS} 秒・一本道（先頭 2.5 秒が導入シーン）。レビュー観点: ①導入シーン（最初の 1 秒で「コメントで紐解く推理ゲーム」と伝わるか・hook が「今日の謎」のカードに 1 行で収まるか・自己紹介の吹き出し）
+<p>尺は {DURATION_SECONDS} 秒・一本道（先頭 4.5 秒が導入シーン）。レビュー観点: ①導入シーン（最初の 1 秒で「コメントで紐解く推理ゲーム」と伝わるか・hook が「今日の謎」のカードに 1 行で収まるか・自己紹介の吹き出し）
 ②導入 → 本編の切り替わり ③背景イラスト（文字混入、真相の手がかりを描いていないか、画風 C4、上部 55% が落ち着いているか）
 ④版面（見切れ、吹き出し 1 行） ⑤音（ナレーションと BGM のバランス、BGM の終わり方）。</p>
 <p>承認した動画は <code>work/approved.txt</code> に 1 行 1 content_key で記入する。<code>#</code> から始まる行はコメントとして無視される。</p>

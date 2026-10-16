@@ -444,7 +444,8 @@ def test_opening_narration_rejects_overlap_with_problem(tmp_path: Path, monkeypa
     monkeypatch.setattr(build, "OPENING_NARRATION_DIR", tmp_path)
     (tmp_path / "line.wav").write_bytes(b"wav")
     design = {"opening": {"narration": {"text": "みだし", "seconds": 2.2, "max_seconds": 2.5}}}
-    for frames, ok in ((78, True), (79, False)):
+    limit = build.NARRATION_START - 6 - build.OPENING_NARRATION_START
+    for frames, ok in ((limit, True), (limit + 1, False)):
         (tmp_path / "narration.json").write_text(
             json.dumps({"text": "みだし", "line": {"seconds": frames / 30, "frames": frames}}),
             encoding="utf-8",

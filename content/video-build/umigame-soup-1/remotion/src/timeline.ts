@@ -1,30 +1,30 @@
 /**
- * umigame-prebuilt のタイムライン（27 秒・810 フレーム・30fps・一本道）。
+ * umigame-prebuilt のタイムライン（29 秒・870 フレーム・30fps・一本道）。
  *
  * 2026-09-04 のレビュー（第 1 稿の人間ゲート）で 20 秒 → 24 秒へ変更。理由: Polly Takumi 125% で
  * 問題文・ルール読み上げを削らずに収め、末尾に Jr. の締め（いいね・フォロー）を足すため。
  * 2026-10-17（セット改修 R-1-1）: 先頭に導入シーン 2.5 秒（固定コピー + hook を大きく）を足し、
  * ループの作り（末尾 = フレーム 0・周期を尺の約数にする・継ぎ目のビート）をやめて一本道にした。
- * 尺は中身で決めて 30 秒未満（27 秒）。
+ * 尺は中身で決めて 30 秒未満（29 秒）。導入シーンは R-1-2 の指摘で 2.5 秒 → 4.5 秒に延ばした（切り替わりが早い）。
  *
  * 不変条件:
  * - ビートは順序どおり・隙間なし・末尾が TOTAL_FRAMES に一致する
  * - ナレーションは予算（21 秒）を使い切っても尺の内側で終わる
  * - 吹き出しの切替はスナップ（クロスフェードは二重露光に見える。logic-training-1 R-1 で実測）
  *
- * ビート: 導入シーン 2.5 秒 → 出題 3 秒 → 3 往復 × 4 秒（質問 2 秒 → 質問 + 返答を並べて 2 秒）
+ * ビート: 導入シーン 4.5 秒 → 出題 3 秒 → 3 往復 × 4 秒（質問 2 秒 → 質問 + 返答を並べて 2 秒）
  *       → 出題者の締め 4 秒 → Jr. の締め 5.5 秒。
  */
 
 export const FPS = 30;
-export const DURATION_SECONDS = 27;
-export const TOTAL_FRAMES = FPS * DURATION_SECONDS; // 810
+export const DURATION_SECONDS = 29;
+export const TOTAL_FRAMES = FPS * DURATION_SECONDS; // 870
 
 export const WIDTH = 1080;
 export const HEIGHT = 1920;
 
 /** 導入シーン（上に固定コピー・中央に hook を大きく・下にキャラ）の終わり */
-export const OPENING_END = Math.round(2.5 * FPS); // 75
+export const OPENING_END = Math.round(4.5 * FPS); // 135
 /** 導入シーンから本編へのクロスフェード */
 export const OPENING_FADE_FRAMES = 8;
 /** 導入シーンの見出しの読み上げの開始（スタンプが着地した後） */
@@ -78,12 +78,12 @@ export const LOOP_PERIODS = {
 } as const;
 
 /** ナレーションの開始フレーム（導入シーンの後 0.5 秒）と cue 間の間（1.2 秒。ユーザー指示） */
-export const NARRATION_START = OPENING_END + Math.round(0.5 * FPS); // 90
+export const NARRATION_START = OPENING_END + Math.round(0.5 * FPS); // 150
 export const NARRATION_GAP = Math.round(1.2 * FPS); // 36
 /** ナレーションの予算（問題文 + 間 + ルール文）。21 秒は 24 秒版から据え置き */
 export const NARRATION_BUDGET_FRAMES = 21 * FPS; // 630
 /** ナレーションはこのフレームまでに終わること（尺の内側） */
-export const NARRATION_DEADLINE = TOTAL_FRAMES; // 810
+export const NARRATION_DEADLINE = TOTAL_FRAMES; // 870
 
 export type Beat =
   | { kind: "opening"; from: number; to: number }

@@ -1,4 +1,4 @@
-"""umigame-soup-1 のストックから事前動画（27 秒・一本道）を一括ビルドする。"""
+"""umigame-soup-1 のストックから事前動画（29 秒・一本道）を一括ビルドする。"""
 
 from __future__ import annotations
 
@@ -55,16 +55,17 @@ FFMPEG_IMAGE = os.environ.get("FFMPEG_IMAGE", "image-batch:ffmpeg-check")
 # 各カットの確認点（R-1-1 で導入シーンを足し、継ぎ目の確認点を末尾の確認点に替えた）。
 STILL_FRAMES = {
     "opening": 0,
+    "opening_full": OPENING_END - 15,
     "switch": OPENING_END + OPENING_FADE_FRAMES // 2,
-    "intro": 120,
-    "q1": 195,
-    "a1": 255,
-    "q2": 315,
-    "a2": 375,
-    "q3": 435,
-    "a3": 495,
-    "master_outro": 580,
-    "jr_outro": 720,
+    "intro": OPENING_END + 45,
+    "q1": OPENING_END + 120,
+    "a1": OPENING_END + 180,
+    "q2": OPENING_END + 240,
+    "a2": OPENING_END + 300,
+    "q3": OPENING_END + 360,
+    "a3": OPENING_END + 420,
+    "master_outro": OPENING_END + 505,
+    "jr_outro": OPENING_END + 645,
     "end": TOTAL_FRAMES - 1,
 }
 

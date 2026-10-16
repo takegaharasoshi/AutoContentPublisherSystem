@@ -19,11 +19,11 @@ ASSETS_DIR = HERE / "assets"
 MANIFEST_PATH = WORK / "manifest.json"
 
 # remotion/src/timeline.ts と同期する（tests/test_timeline_sync.py）。2026-10-17 の R-1-1 で
-# 先頭に導入シーン 2.5 秒を足して一本道にし、24 秒 → 27 秒にした
+# 先頭に導入シーンを足して一本道にし、24 秒 → 29 秒にした（導入は R-1-2 の指摘で 2.5 → 4.5 秒）
 FPS = 30
-DURATION_SECONDS = 27
+DURATION_SECONDS = 29
 TOTAL_FRAMES = FPS * DURATION_SECONDS
-OPENING_END = 75
+OPENING_END = 135
 OPENING_FADE_FRAMES = 8
 OPENING_NARRATION_START = 6
 NARRATION_START = OPENING_END + 15

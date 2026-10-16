@@ -35,7 +35,7 @@ def test_provisional_track_is_numbered_but_excluded_from_sql() -> None:
 def test_fade_is_baked_by_prepare_bgm() -> None:
     value = _fade_filter()
     assert "afade=t=in:st=0:d=0.5" in value
-    # 動画の尺（R-1-1 で 27 秒）の末尾 1 秒でフェードアウトする
+    # 動画の尺（R-1 で 29 秒）の末尾 1 秒でフェードアウトする
     assert f"afade=t=out:st={prepare_bgm.DURATION_SECONDS - 1.0}:d=1.0" in value
 
 
