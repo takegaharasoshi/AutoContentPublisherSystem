@@ -7,7 +7,7 @@ from html import escape
 from pathlib import Path
 from typing import Any, Iterable
 
-from common import WORK, load_items, load_manifest, select_items
+from common import DURATION_SECONDS, WORK, load_items, load_manifest, select_items
 
 
 def _text(value: object) -> str:
@@ -34,8 +34,18 @@ def generate_review_html(
     items: Iterable[dict[str, Any]],
     *,
     content_keys: Iterable[str] | None = None,
+    copy_candidates: dict[str, str] | None = None,
+    variant_prefix: str | None = None,
 ) -> str:
-    """外部依存のないレビュー HTML を返す。"""
+    """外部依存のないレビュー HTML を返す。
+
+    Args:
+        manifest: build.py の manifest。
+        items: ストック。
+        content_keys: 対象のキー（省略時は manifest の全件）。
+        copy_candidates: 導入シーンの固定コピーの案（指定時は案ごとの導入コマを並べる）。
+        variant_prefix: 案ごとの導入コマの置き場（review.html からの相対パス）。
+    """
     item_by_key = {str(item["content_key"]): item for item in items}
     keys = list(content_keys) if content_keys is not None else sorted(manifest)
     missing = sorted(set(keys) - set(manifest))
@@ -89,6 +99,27 @@ def generate_review_html(
         facts_html = "".join(
             f"<li>{_text(fact)}</li>" for fact in item.get("fact_sheet", [])
         )
+        timeline = record.get("timeline") if isinstance(record.get("timeline"), dict) else {}
+        timeline_html = (
+            f"<p><b>タイムライン:</b> 導入 0–{_text(timeline.get('opening_end'))}f → 本編 "
+            f"{_text(timeline.get('main_fully_visible'))}f で切替完了 / ナレーション problem "
+            f"{_text(timeline.get('narration_problem_start'))}f・rule "
+            f"{_text(timeline.get('narration_rule_start'))}f・終了 "
+            f"{_text(timeline.get('narration_end'))}f / 総 {_text(timeline.get('total_frames'))}f</p>"
+            if timeline else ""
+        )
+        opening = record.get("opening_copy") if isinstance(record.get("opening_copy"), dict) else {}
+        opening_html = (
+            f"<p><b>導入の固定コピー:</b> 案 {_text(opening.get('id'))}「{_text(opening.get('text'))}」</p>"
+            if opening else ""
+        )
+        variant_html = ""
+        if copy_candidates and variant_prefix is not None:
+            variant_html = '<div class="variants">' + "".join(
+                f'<figure><img loading="lazy" src="{_asset(f"{variant_prefix}/{key}_{copy_id}_opening.jpg")}"'
+                f' alt="{_asset(copy_id)}"><figcaption>案 {_text(copy_id)}「{_text(text)}」</figcaption></figure>'
+                for copy_id, text in copy_candidates.items()
+            ) + "</div>"
         lines = item.get("character_lines", {})
         master = lines.get("master", {}) if isinstance(lines, dict) else {}
         jr = lines.get("jr", {}) if isinstance(lines, dict) else {}
@@ -97,7 +128,9 @@ def generate_review_html(
             '<div class="media">'
             f'<video controls loop preload="metadata" src="{_asset(record.get("video"))}"></video>'
             f'<div class="stills">{still_html}</div></div>'
+            f"{variant_html}"
             '<div class="copy">'
+            f"{opening_html}"
             f"<p><b>フック:</b> {_text(item.get('hook'))}</p>"
             f"<p><b>問題文:</b> {_text(item.get('problem_text'))}</p>"
             f"<p><b>ルール:</b> {_text(item.get('rule_text'))}</p>"
@@ -112,7 +145,7 @@ def generate_review_html(
             f"<b>{_text(narration.get('total_sec'))}s / 21.0s</b>"
             f"{tempo_html}{engine_html}</p>"
             f"<p><b>ffprobe:</b> {_text(_probe_text(record.get('probe')))}</p>"
-            f"<p><b>継ぎ目平均差分:</b> {_text(record.get('seam_mean_diff'))} / 3.0 以下</p>"
+            f"{timeline_html}"
             '<details><summary>真相・確定事実シート（レビュー時だけ開く）</summary>'
             f"<p>{_text(item.get('truth'))}</p><ul>{facts_html}</ul></details></section>"
         )
@@ -131,11 +164,13 @@ main{{max-width:1120px;margin:auto}}section{{background:white;padding:20px;margi
 .stills{{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;flex:1;min-width:280px}}
 figure{{margin:0}}figure img{{width:100%;aspect-ratio:9/16;object-fit:cover}}figcaption{{font-size:12px}}
 .copy{{white-space:pre-wrap}}.bgm{{padding:8px;background:#edf7ed}}.provisional,.warning{{background:#ffe3df;color:#8b1e16;padding:10px;border:2px solid #c43}}
+.variants{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}}
 .ok{{background:#edf7ed;padding:10px}}details{{border-top:1px solid #ccc;padding-top:10px}}code{{background:#eee;padding:2px 4px}}
 @media(max-width:600px){{body{{padding:10px}}section{{padding:14px}}.stills{{min-width:100%}}}}
 </style></head><body><main><h1>umigame-soup-1 動画レビュー</h1>
-<p>レビュー観点: ①背景イラスト（文字混入、真相の手がかりを描いていないか、画風 C4、上部 55% が落ち着いているか）
-②版面（見切れ、吹き出し 1 行） ③音（ナレーションと BGM のバランス、ループ継ぎ目）。</p>
+<p>尺は {DURATION_SECONDS} 秒・一本道（先頭 2.5 秒が導入シーン）。レビュー観点: ①導入シーン（最初の 1 秒で「コメントで解く推理ゲーム」と伝わるか・hook の大きさと改行位置・固定コピーの案）
+②導入 → 本編の切り替わり ③背景イラスト（文字混入、真相の手がかりを描いていないか、画風 C4、上部 55% が落ち着いているか）
+④版面（見切れ、吹き出し 1 行） ⑤音（ナレーションと BGM のバランス、BGM の終わり方）。</p>
 <p>承認した動画は <code>work/approved.txt</code> に 1 行 1 content_key で記入する。<code>#</code> から始まる行はコメントとして無視される。</p>
 {warning}{''.join(cards)}</main></body></html>
 """
@@ -147,6 +182,8 @@ def write_review(
     batch: str = "batch-01",
     content_keys: Iterable[str] | None = None,
     output: Path = WORK / "review.html",
+    copy_candidates: dict[str, str] | None = None,
+    variant_dir: Path | None = None,
 ) -> Path:
     """対象を読み込んで work/review.html を書く。"""
     data = load_manifest() if manifest is None else manifest
@@ -156,7 +193,14 @@ def write_review(
         select_items(items, selected_keys)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
-        generate_review_html(data, items, content_keys=selected_keys), encoding="utf-8"
+        generate_review_html(
+            data, items, content_keys=selected_keys, copy_candidates=copy_candidates,
+            variant_prefix=(
+                variant_dir.resolve().relative_to(output.parent.resolve()).as_posix()
+                if variant_dir is not None else None
+            ),
+        ),
+        encoding="utf-8",
     )
     print(f"レビューシートを書き出しました: {output}")
     return output

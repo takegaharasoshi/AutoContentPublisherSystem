@@ -6,6 +6,7 @@ import type { UmigameReelProps } from "./props";
  */
 export const mockProps: UmigameReelProps = {
   contentKey: "classic-umigame",
+  openingCopy: "コメントで解く推理ゲーム",
   hook: "この男はなぜ死んだ？",
   problemText:
     "ある男が海辺のレストランでウミガメのスープを注文した。ひと口飲んだ男は店員に本当にウミガメのスープかと確かめ、「はい」と聞くと店を出て自ら命を絶った。なぜ？",

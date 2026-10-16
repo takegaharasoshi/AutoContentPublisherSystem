@@ -301,12 +301,12 @@ def _build_inputs(tmp_path: Path, monkeypatch) -> None:
         }
         for key in ("001-first", "002-next")
     ])
-    monkeypatch.setattr(build, "load_manifest", lambda: {})
+    monkeypatch.setattr(build, "load_manifest", lambda *args: {})
     monkeypatch.setattr(build, "load_bgm_tracks", lambda: [{
         "output": "track.m4a", "s3_key": "track", "provisional": False,
     }])
     monkeypatch.setattr(build, "stage_assets", lambda *args: None)
-    monkeypatch.setattr(build, "build_props", lambda *args: {})
+    monkeypatch.setattr(build, "build_props", lambda *args, **kwargs: {})
     monkeypatch.setattr(build, "write_json", lambda *args: None)
     monkeypatch.setattr(review_sheet, "write_review", lambda *args, **kwargs: None)
 
@@ -360,8 +360,7 @@ def test_build_manifest_keeps_irodori_seed_and_seconds(
     monkeypatch.setattr(build, "normalize_loudness", lambda *args: None)
     monkeypatch.setattr(build, "extract_stills", lambda *args: {})
     monkeypatch.setattr(build, "probe_video", lambda *args: {})
-    monkeypatch.setattr(build, "inspect_seam", lambda *args: 0.1)
-    monkeypatch.setattr(build, "save_manifest", lambda manifest: saved.append(manifest.copy()))
+    monkeypatch.setattr(build, "save_manifest", lambda manifest, *args: saved.append(manifest.copy()))
 
     assert build.main(["--content-key", "001-first"]) == 0
     narration = saved[0]["001-first"]["narration"]

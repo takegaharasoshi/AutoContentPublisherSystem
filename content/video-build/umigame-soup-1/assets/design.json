@@ -16,6 +16,15 @@
     }
   },
   "background_prompt": "A stylized 1990s Japanese OVA anime background painting (hand-painted cel-era background art, poster-color textures, clean shapes): the interior of a seaside restaurant at night seen from inside. A lone man sits at a small table with a white tablecloth by a large arched window; on the table a single white bowl of soup steams, lit warmly by a candle. Through the window, a clearly visible moonlit sea with waves and a bright full moon. Mid-key lighting, NOT dark: warm amber light on the table and walls, cool blue moonlight outside, strong readable shapes and high contrast, colors stay readable even when darkened by 30 percent. No text, no letters, no logos. Do not depict any clue to the story's truth (no ships, no wreck, no other people except at most one waiter silhouette far in the background). Vertical 9:16 composition, output 1024x1536 portrait, keep the upper 55 percent relatively calm (sky, wall, window) so text can be overlaid.",
+  "opening_copy": {
+    "note": "導入シーン（先頭 2.5 秒）の上に小さく出す固定コピー。全問共通。R-1-2 で案を決めて selected を書き換える（2026-10-17 R-1-1 の試作）",
+    "selected": "A",
+    "candidates": {
+      "A": "コメントで解く推理ゲーム",
+      "B": "質問だけで真相を当てろ",
+      "C": "はい・いいえで解く謎解き"
+    }
+  },
   "narration": {
     "engine": "irodori",
     "model": "Aratako/Irodori-TTS-v4.1-Small",

@@ -33,7 +33,7 @@ def _manifest(base: Path, *, provisional: bool = False) -> dict:
                 "provisional": provisional,
             },
             "probe": {
-                "width": 1080, "height": 1920, "fps": 30.0, "duration": 24.05,
+                "width": 1080, "height": 1920, "fps": 30.0, "duration": 27.02,
                 "audio_codec": "aac", "valid": True,
             },
             "built_at": "2026-09-23T01:02:03Z",

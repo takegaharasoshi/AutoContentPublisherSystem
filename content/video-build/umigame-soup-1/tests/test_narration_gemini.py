@@ -277,12 +277,12 @@ def _build_inputs(tmp_path: Path, monkeypatch, keys: tuple[str, ...]) -> None:
         {"content_key": key, "narration": {"problem": key, "rule": "ルール"}}
         for key in keys
     ])
-    monkeypatch.setattr(build, "load_manifest", lambda: {})
+    monkeypatch.setattr(build, "load_manifest", lambda *args: {})
     monkeypatch.setattr(build, "load_bgm_tracks", lambda: [{
         "output": "track.m4a", "s3_key": "track", "provisional": False,
     }])
     monkeypatch.setattr(build, "stage_assets", lambda *args: None)
-    monkeypatch.setattr(build, "build_props", lambda *args: {})
+    monkeypatch.setattr(build, "build_props", lambda *args, **kwargs: {})
     monkeypatch.setattr(build, "write_json", lambda *args: None)
     monkeypatch.setattr(review_sheet, "write_review", lambda *args, **kwargs: None)
 

@@ -8,7 +8,7 @@ import path from "node:path";
 import { bundle } from "@remotion/bundler";
 import { renderStill, selectComposition } from "@remotion/renderer";
 
-const COMPOSITION_ID = "UmigameReel24s";
+const COMPOSITION_ID = "UmigameReel";
 
 const job = JSON.parse(readFileSync(process.argv[2], "utf-8"));
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");

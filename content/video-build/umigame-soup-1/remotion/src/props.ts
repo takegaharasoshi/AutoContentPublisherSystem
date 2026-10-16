@@ -6,7 +6,9 @@ import { z } from "zod";
  */
 export const umigameReelSchema = z.object({
   contentKey: z.string(),
-  /** つかみ帯（フック文） */
+  /** 導入シーンの上に小さく出す固定コピー（アカウントの趣旨。assets/design.json の opening_copy） */
+  openingCopy: z.string(),
+  /** つかみ帯（フック文）。導入シーンでは中央に大きく出す */
   hook: z.string(),
   /** 問題文（全文・段階表示しない） */
   problemText: z.string(),

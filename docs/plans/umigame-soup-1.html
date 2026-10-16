@@ -14,7 +14,7 @@
 <h1>セット計画書: 探偵カメロックのウミガメのスープ（umigame-soup-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-10-17（アイデア <a href="../ideas/umigame-opening-hook.md">umigame-opening-hook</a> を採用し、改修 <a href="#phase-R-1">R-1</a>〔冒頭の導入シーン・一本道化。本番配置の前に全件レビュー R-1-4 を置く〕と効果確認の確認待ちを起票した）。前回: 2026-10-13（開発レーン <a href="development-log.html#step-21-8d2">21-8d2</a> の完了を反映: 核心語の本番切替が済み、W-2 の G5 が解禁。概要表と着手条件を完了形に直した）。前回: 2026-10-12（W-2 を新しい補充の流れ・4 問で書き直し、開発レーンの 21-8b を本書へ統合した）。前回: 2026-10-12（開発レーン <a href="development-log.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。）</span>
+  <span>最終更新: 2026-10-17（<a href="#step-R-1-1">R-1-1</a> を完了: 導入シーン 2.5 秒 + 一本道 27 秒の版面を試作し、R-1-2 のレビューへ）。前回: 2026-10-17（アイデア <a href="../ideas/umigame-opening-hook.md">umigame-opening-hook</a> を採用し、改修 <a href="#phase-R-1">R-1</a>〔冒頭の導入シーン・一本道化。本番配置の前に全件レビュー R-1-4 を置く〕と効果確認の確認待ちを起票した）。前回: 2026-10-13（開発レーン <a href="development-log.html#step-21-8d2">21-8d2</a> の完了を反映: 核心語の本番切替が済み、W-2 の G5 が解禁。概要表と着手条件を完了形に直した）。前回: 2026-10-12（W-2 を新しい補充の流れ・4 問で書き直し、開発レーンの 21-8b を本書へ統合した）。前回: 2026-10-12（開発レーン <a href="development-log.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。）</span>
 </div>
 
 <div class="note">
@@ -99,17 +99,20 @@
 <summary>背景・決定 <span class="plan-hint">— アイデア umigame-opening-hook を採用・コピーは C 案・問題文は一括表示・一本道で 30 秒未満</span></summary>
 <div class="plan-fold-inner">
 <blockquote>アイデア <a href="../ideas/umigame-opening-hook.md">umigame-opening-hook</a>（2026-10-16 捕捉 → 同日〜10-17 壁打ち・採用）。仮説: logic-training-1 の版面（冒頭から問題文の全文 + ルール帯を出しっぱなし）を踏襲したため、最初の 1 秒が「文字の壁」になり、ウミガメのスープを知らない視聴者に何の動画か伝わらないままスキップされている。ユーザー決定: ① 導入のコピーは <strong>C 案</strong>（上に小さく趣旨の固定コピー・中央に大きくその問題の <code>hook</code>・下にカメロックと Jr.）② 導入後の問題文は<strong>今までどおり一括表示</strong> ③ <strong>ループの作りをやめて一本道</strong>にし、尺は中身で決めて <strong>30 秒未満</strong>（目安 27 秒）。尺の根拠: Instagram の評価の中心は再生回数ではなく視聴時間（% と秒数の両方）と反応で、ループで再生回数を稼ぐ必要はない（出典はアイデアの壁打ち記録）。課題表の照合: umigame-soup-1 節は該当なし。開発レーンの <a href="../issues/index.html#I-040">I-040</a>（設計書の描き直し・<code>docs/app/generators/</code> を含む）は本改修で 8.2〜8.4 の中身を実態へ直すだけのため同梱しない。画像バッチが尺を 24 秒固定で検査・記録している点は開発レーンの課題 <a href="../issues/index.html#I-041">I-041</a> として起票した（本改修は 24 秒の宣言のまま動く）。</blockquote>
-<blockquote>週次補充 <a href="#step-W-2">W-2</a> との順序: W-2 の G4（動画ビルド）より前に R-1-2 の承認まで終えれば、第 2 バッチは新しい版面でビルドできる。間に合わなければ W-2 は今の版面でビルドし、R-1-3 で一緒に再ビルドする（全件レビュー R-1-4 の対象にも含める）（W-2 の期限 2026-11-04 を R-1 のために遅らせない）。</blockquote>
+<blockquote>週次補充 <a href="#step-W-2">W-2</a> との順序: W-2 の G4（動画ビルド）より前に R-1-2 の承認まで終えれば、第 2 バッチは新しい版面でビルドできる。間に合わなければ W-2 は今の版面でビルドし（R-1-1 の後は main が新しい版面のため、旧版面のビルド資材は R-1-1 より前のコミット 975b616 を使う。<a href="#step-R-1-1">R-1-1 の作業記録</a>）、R-1-3 で一緒に再ビルドする（全件レビュー R-1-4 の対象にも含める）（W-2 の期限 2026-11-04 を R-1 のために遅らせない）。</blockquote>
 </div>
 </details>
 
-<div class="plan-group" data-plan-group="active">
-<article class="plan-step" id="step-R-1-1" data-step-id="R-1-1" data-status="todo">
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 1 件（クリックで展開）</summary>
+<div class="plan-group-inner">
+
+<article class="plan-step" id="step-R-1-1" data-step-id="R-1-1" data-status="done" data-completed="2026-10-17">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>R-1-1</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>R-1-1</strong><span class="plan-status">完了</span><span>2026-10-17</span></div>
 <h3>導入シーンと一本道化の版面を試作する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし（すぐ着手できる）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-17 完了</strong>。導入シーン 2.5 秒 + 一本道 27 秒（810 フレーム）の版面を作り、第 1 バッチの 2 問（012・015）で試作 MP4 と固定コピー 3 案を見比べる <code>work/review.html</code> を作った。見た目の判断は <a href="#step-R-1-2">R-1-2</a>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -137,11 +140,24 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17・タイムライン・試作の数値・W-2 への影響</span></summary>
+<div class="plan-fold-inner">
+<p><strong>タイムライン</strong>（<code>remotion/src/timeline.ts</code>・<code>common.py</code> と同期）: 導入シーン 0–75（2.5 秒）→ 本編へのクロスフェード 75–83（8 フレーム）→ 出題「質問してみて！」75–165 → 3 往復 165–525 → 出題者の締め 525–645 → Jr. の締め 645–810。継ぎ目のビート・周期を尺の約数にする制約・ビルド後の継ぎ目検証（<code>inspect_seam</code>）は削除し、モジュール読み込み時の検査を「順序どおり・隙間なし・末尾が尺に一致・ナレーションの予算が尺に収まる・30 秒未満」に置き換えた。ナレーションは導入の後 0.5 秒 = フレーム 90 から（予算 21 秒は据え置き。TTS の文・設定は変えていないためキャッシュがそのまま使える）。コンポジション ID は <code>UmigameReel24s</code> → <code>UmigameReel</code>。</p>
+<p><strong>導入シーン</strong>: 上に固定コピー（50px のピル）・中央に hook（黄色のカード・最大 120px・2 行まで）・下にキャラ 2 体（本編と同じ位置）。hook はブラウザの自動改行だと語の途中で割れる（「子どもたちの行 / 動の真相は？」）ため、助詞・読点・「い」の直後のうち長いほうの行が最短になる位置で割る <code>openingHook.ts</code> を足した。batch-01 の 14 問はすべて 2 行以内・93〜120px に収まる（pytest で検査）。固定コピーは <code>assets/design.json</code> の <code>opening_copy</code>（A「コメントで解く推理ゲーム」/ B「質問だけで真相を当てろ」/ C「はい・いいえで解く謎解き」。試作の動画は A）。</p>
+<p><strong>BGM</strong>: <code>prepare_bgm.py</code> の尺を <code>common.DURATION_SECONDS</code>（27）から取るようにし、<code>--no-sql</code>（登録 SQL を書き換えない）を足して track01 を 27 秒・フェードアウト 26〜27 秒で作り直した（ffprobe 27.000 秒）。登録 SQL・Aurora の <code>duration_seconds = 24</code> は <a href="../issues/index.html#I-041">I-041</a> のまま（据え置き継続・トリガー未到達）。24 秒版はローカルに <code>work/bgm/out/track01.24s-backup.m4a</code> として残した。</p>
+<p><strong>試作</strong>: <code>build.py --no-tts --content-key 012-early-morning-run --content-key 015-unlicensed-driver --out-dir work/r1-proto --copy-variants</code>（<code>--out-dir</code> と <code>--copy-variants</code> は本ステップで追加。承認済みの <code>work/videos/</code>・<code>work/manifest.json</code> は上書きしていない）。ffprobe は 2 本とも h264 1080x1920 30fps・810 フレーム・aac・27.1 秒。ナレーションは 012 が problem 90f・rule 525f・終了 706f、015 が problem 90f・rule 548f・終了 713f。pytest 60 件全パス。導入にナレーション（hook の読み上げ）は付けていない（R-1-2 の判断事項 ⑥）。</p>
+<p><strong>W-2 への影響</strong>: 版面の変更は main に入ったため、W-2 の G4 を R-1-2 の go より前に行う場合、今のコードでは新しい版面（27 秒）でビルドされる。旧版面（24 秒・ループ）でビルドしたいときは本ステップより前のコミット（975b616）のビルド資材を使い、BGM も 24 秒版に戻す。<code>publish.py</code> の尺検査も 27 秒になったため、24 秒の動画は配置できない。</p>
+<p>確認待ち: 該当なし。課題表: <a href="../issues/index.html#I-041">I-041</a> は据え置き継続（トリガー = R-1-2 の go）。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 
 <article class="plan-step" id="step-R-1-2" data-step-id="R-1-2" data-status="todo" data-kind="decision">
 <header class="plan-step-head">

@@ -2,6 +2,19 @@
 
 ## 本番の手順
 
+> **2026-10-17 セット改修 R-1-1（試作）**: 先頭に導入シーン 2.5 秒（上に固定コピー・中央に hook を大きく 2 行）を足し、
+> ループの作り（継ぎ目の検証・周期を尺の約数にする制約）をやめて **一本道・27 秒（810 フレーム）**にした。
+> ナレーションは導入の後 0.5 秒（フレーム 90）から・予算 21 秒は据え置き。固定コピーの案は `assets/design.json` の
+> `opening_copy`（R-1-2 で決める）。BGM は `prepare_bgm.py --no-sql` で 27 秒に作り直した（登録 SQL と Aurora の
+> `duration_seconds = 24` は課題 I-041 で扱う）。試作は次のコマンドで、承認済みの `work/videos/` を上書きしないよう
+> `work/r1-proto/` に書き出す。`--copy-variants` は導入のコマを固定コピーの全案で静止画にして `work/review.html` に並べる。
+> 下の 21-2 PoC の記録にある 24 秒・ループ前提の記述は当時のもの（設計書は R-1-3 で実態へ直す）。
+>
+> ```bash
+> python3 build.py --no-tts --content-key 012-early-morning-run --content-key 015-unlicensed-driver \
+>   --out-dir work/r1-proto --copy-variants
+> ```
+
 ```bash
 cd content/video-build/umigame-soup-1
 
@@ -16,7 +29,7 @@ python3 background_sheet.py --stills   # 各コマの静止画も今の文言・
 python3 prepare_bgm.py --init-provisional
 python3 prepare_bgm.py
 
-# 3. ナレーション（Irodori-TTS・ローカル GPU）を合成して 24 秒動画をビルドする
+# 3. ナレーション（Irodori-TTS・ローカル GPU）を合成して 27 秒動画（一本道・先頭 2.5 秒が導入シーン）をビルドする
 python3 build.py
 python3 build.py --retake-tts --content-key <key>   # 予算超過・読み間違いの問を取り直す（1 問 3 回まで）
 python3 review_sheet.py

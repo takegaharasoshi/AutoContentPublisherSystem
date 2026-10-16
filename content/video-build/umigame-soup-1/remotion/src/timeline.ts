@@ -1,35 +1,41 @@
 /**
- * umigame-prebuilt PoC のタイムライン（24 秒・720 フレーム・30fps・ループ前提）。
+ * umigame-prebuilt のタイムライン（27 秒・810 フレーム・30fps・一本道）。
  *
  * 2026-09-04 のレビュー（第 1 稿の人間ゲート）で 20 秒 → 24 秒へ変更。理由: Polly Takumi 125% で
  * 問題文・ルール読み上げを削らずに収め、末尾に Jr. の締め（いいね・フォロー）を足すため。
+ * 2026-10-17（セット改修 R-1-1）: 先頭に導入シーン 2.5 秒（固定コピー + hook を大きく）を足し、
+ * ループの作り（末尾 = フレーム 0・周期を尺の約数にする・継ぎ目のビート）をやめて一本道にした。
+ * 尺は中身で決めて 30 秒未満（27 秒）。
  *
- * 不変条件（logic-training-1 の timeline.ts を踏襲）:
- * - 末尾（SEAM_START 以降）は導入と同じ状態へ戻し、フレーム 720 とフレーム 0 が一致する
- * - 周期アニメーションの周期は TOTAL_FRAMES の約数
- * - 吹き出しの切替はスナップ（クロスフェードは二重露光に見える。R-1 で実測）
+ * 不変条件:
+ * - ビートは順序どおり・隙間なし・末尾が TOTAL_FRAMES に一致する
+ * - ナレーションは予算（21 秒）を使い切っても尺の内側で終わる
+ * - 吹き出しの切替はスナップ（クロスフェードは二重露光に見える。logic-training-1 R-1 で実測）
  *
- * ビート: 導入 3 秒 → 3 往復 × 4 秒（質問 2 秒 → 質問 + 返答を並べて 2 秒）→ 出題者の締め 4 秒
- *       → Jr. の締め 4.6 秒 → 継ぎ目 0.4 秒。
+ * ビート: 導入シーン 2.5 秒 → 出題 3 秒 → 3 往復 × 4 秒（質問 2 秒 → 質問 + 返答を並べて 2 秒）
+ *       → 出題者の締め 4 秒 → Jr. の締め 5.5 秒。
  */
 
 export const FPS = 30;
-export const DURATION_SECONDS = 24;
-export const TOTAL_FRAMES = FPS * DURATION_SECONDS; // 720
+export const DURATION_SECONDS = 27;
+export const TOTAL_FRAMES = FPS * DURATION_SECONDS; // 810
 
 export const WIDTH = 1080;
 export const HEIGHT = 1920;
 
-export const INTRO_END = 3 * FPS; // 90
+/** 導入シーン（上に固定コピー・中央に hook を大きく・下にキャラ）の終わり */
+export const OPENING_END = Math.round(2.5 * FPS); // 75
+/** 導入シーンから本編へのクロスフェード */
+export const OPENING_FADE_FRAMES = 8;
+/** 出題（「質問してみて！」の吹き出し）の終わり */
+export const INTRO_END = OPENING_END + 3 * FPS; // 165
 export const ROUND_FRAMES = 4 * FPS; // 120
 export const QUESTION_FRAMES = 2 * FPS; // 60
 export const ROUNDS = 3;
 /** 出題者の締め（「何度でも答えるよ」）の開始 */
-export const MASTER_OUTRO_START = INTRO_END + ROUND_FRAMES * ROUNDS; // 450
+export const MASTER_OUTRO_START = INTRO_END + ROUND_FRAMES * ROUNDS; // 525
 /** Jr. の締め（「いいね・フォロー」）の開始 */
-export const JR_OUTRO_START = MASTER_OUTRO_START + 4 * FPS; // 570
-/** 継ぎ目: ここから末尾までは導入と同じ状態（フレーム 0 と一致させる） */
-export const SEAM_START = TOTAL_FRAMES - Math.round(0.4 * FPS); // 708
+export const JR_OUTRO_START = MASTER_OUTRO_START + 4 * FPS; // 645
 
 /** 吹き出しのポップイン（スナップ表示後の軽い伸縮）に使うフレーム数 */
 export const BUBBLE_POP_FRAMES = 8;
@@ -40,7 +46,7 @@ export const HOP_FREQUENCY_HZ = 1.8;
 export const HOP_DECAY = 4.5;
 export const HOP_SECONDS = 0.8;
 
-/** 周期アニメーション（すべて TOTAL_FRAMES の約数であること） */
+/** 周期アニメーション（一本道化で「尺の約数」の制約は外した。周期は 24 秒版のまま） */
 export const LOOP_PERIODS = {
   /** つかみ帯の光沢スイープ */
   hookSheen: 120,
@@ -59,40 +65,44 @@ export const LOOP_PERIODS = {
   /** 名札のアクセント点の脈動 */
   tagDot: 80,
   /** 背景のゆっくりしたズーム呼吸 */
-  backgroundBreathe: 720,
+  backgroundBreathe: TOTAL_FRAMES,
 } as const;
 
-/** ナレーションの開始フレーム（0.5 秒）と cue 間の間（1.2 秒。ユーザー指示） */
-export const NARRATION_START = Math.round(0.5 * FPS); // 15
+/** ナレーションの開始フレーム（導入シーンの後 0.5 秒）と cue 間の間（1.2 秒。ユーザー指示） */
+export const NARRATION_START = OPENING_END + Math.round(0.5 * FPS); // 90
 export const NARRATION_GAP = Math.round(1.2 * FPS); // 36
-/** ナレーションはこのフレームまでに終わること（継ぎ目に掛からない範囲） */
-export const NARRATION_DEADLINE = SEAM_START; // 708
+/** ナレーションの予算（問題文 + 間 + ルール文）。21 秒は 24 秒版から据え置き */
+export const NARRATION_BUDGET_FRAMES = 21 * FPS; // 630
+/** ナレーションはこのフレームまでに終わること（尺の内側） */
+export const NARRATION_DEADLINE = TOTAL_FRAMES; // 810
 
 export type Beat =
+  | { kind: "opening"; from: number; to: number }
   | { kind: "intro"; from: number; to: number }
   | { kind: "question"; round: number; from: number; to: number }
   | { kind: "answer"; round: number; from: number; to: number }
   | { kind: "master_outro"; from: number; to: number }
-  | { kind: "jr_outro"; from: number; to: number }
-  | { kind: "seam"; from: number; to: number };
+  | { kind: "jr_outro"; from: number; to: number };
 
 /** ビートの一覧（順序どおり・隙間なし・末尾が TOTAL_FRAMES） */
 export const BEATS: readonly Beat[] = (() => {
-  const beats: Beat[] = [{ kind: "intro", from: 0, to: INTRO_END }];
+  const beats: Beat[] = [
+    { kind: "opening", from: 0, to: OPENING_END },
+    { kind: "intro", from: OPENING_END, to: INTRO_END },
+  ];
   for (let round = 0; round < ROUNDS; round += 1) {
     const start = INTRO_END + round * ROUND_FRAMES;
     beats.push({ kind: "question", round, from: start, to: start + QUESTION_FRAMES });
     beats.push({ kind: "answer", round, from: start + QUESTION_FRAMES, to: start + ROUND_FRAMES });
   }
   beats.push({ kind: "master_outro", from: MASTER_OUTRO_START, to: JR_OUTRO_START });
-  beats.push({ kind: "jr_outro", from: JR_OUTRO_START, to: SEAM_START });
-  beats.push({ kind: "seam", from: SEAM_START, to: TOTAL_FRAMES });
+  beats.push({ kind: "jr_outro", from: JR_OUTRO_START, to: TOTAL_FRAMES });
   return beats;
 })();
 
-/** 吹き出しが新しく出るフレーム（SE と跳ねの位置。導入・継ぎ目は鳴らさない） */
+/** 吹き出しが新しく出るフレーム（SE と跳ねの位置。導入シーン・出題は鳴らさない） */
 export const BUBBLE_SWITCH_FRAMES: readonly number[] = BEATS.filter(
-  (beat) => beat.kind !== "intro" && beat.kind !== "seam",
+  (beat) => beat.kind !== "opening" && beat.kind !== "intro",
 ).map((beat) => beat.from);
 
 export const beatAt = (frame: number): Beat => {
@@ -100,14 +110,14 @@ export const beatAt = (frame: number): Beat => {
   return found ?? BEATS[BEATS.length - 1];
 };
 
-/** 周期 period でフレーム 0 と TOTAL_FRAMES が一致する正弦（-1..1） */
+/** 周期 period の正弦（-1..1） */
 export const loopSin = (frame: number, period: number, phase = 0): number =>
   Math.sin(((frame / period) + phase) * Math.PI * 2);
 
 /** 周期 period の位相（0..1） */
 export const loopPhase = (frame: number, period: number): number => (frame % period) / period;
 
-/** 直近の吹き出し切替からの減衰する跳ね（px。上向きが正）。フレーム 0 と 720 では 0 */
+/** 直近の吹き出し切替からの減衰する跳ね（px。上向きが正） */
 export const hopLift = (frame: number): number => {
   let last = -1;
   for (const f of BUBBLE_SWITCH_FRAMES) {
@@ -120,20 +130,21 @@ export const hopLift = (frame: number): number => {
 };
 
 // モジュール読み込み時の不変条件チェック
-for (const [name, period] of Object.entries(LOOP_PERIODS)) {
-  if (TOTAL_FRAMES % period !== 0) {
-    throw new Error(`LOOP_PERIODS.${name}=${period} は TOTAL_FRAMES=${TOTAL_FRAMES} の約数ではありません`);
-  }
-}
 BEATS.forEach((beat, index) => {
   const expectedFrom = index === 0 ? 0 : BEATS[index - 1].to;
   if (beat.from !== expectedFrom) {
     throw new Error(`BEATS[${index}] の開始 ${beat.from} が前のビートの終端 ${expectedFrom} と一致しません`);
   }
+  if (beat.to <= beat.from) {
+    throw new Error(`BEATS[${index}] の長さが 0 以下です`);
+  }
 });
 if (BEATS[BEATS.length - 1].to !== TOTAL_FRAMES) {
   throw new Error("BEATS の終端が TOTAL_FRAMES と一致しません");
 }
-if (Math.round(HOP_SECONDS * FPS) > TOTAL_FRAMES - JR_OUTRO_START) {
-  throw new Error("跳ねが継ぎ目をまたぎます");
+if (NARRATION_START + NARRATION_BUDGET_FRAMES > NARRATION_DEADLINE) {
+  throw new Error("ナレーションの予算が尺に収まりません");
+}
+if (TOTAL_FRAMES >= 30 * FPS) {
+  throw new Error("尺は 30 秒未満にします");
 }

@@ -1,4 +1,4 @@
-"""24 秒 BGM を前処理し、正式トラックの audio_assets SQL を生成する。
+"""動画の尺（common.DURATION_SECONDS）の BGM を前処理し、正式トラックの audio_assets SQL を生成する。
 
 ``UmigameReel.tsx`` はナレーション中のダッキングだけを行うため、セット設計の
 フェードイン 0.5 秒・フェードアウト 1.0 秒は本スクリプトで素材へ焼き込む。
@@ -17,7 +17,7 @@ import subprocess
 import sys
 from typing import Any
 
-from common import HERE, ROOT, SET_CODE, WORK
+from common import DURATION_SECONDS, HERE, ROOT, SET_CODE, WORK
 
 
 BGM_DIR = WORK / "bgm"
@@ -28,7 +28,6 @@ SQL_PATH = (
     ROOT / "content" / "umigame-stock" / SET_CODE / "set-registration"
     / "03_audio_assets.sql"
 )
-DURATION_SECONDS = 24
 FADE_IN_SECONDS = 0.5
 FADE_OUT_SECONDS = 1.0
 TARGET_I = -14.0
@@ -202,7 +201,7 @@ def _source_path(track: dict[str, Any]) -> Path:
 
 
 def process_track(track: dict[str, Any], *, docker: bool = True) -> None:
-    """正式トラックを 24 秒化・フェード・2 パス正規化して書き出す。"""
+    """正式トラックを動画の尺に切り出し・フェード・2 パス正規化して書き出す。"""
     source = _source_path(track)
     if not source.is_file():
         raise FfmpegError(f"原曲がありません: {source}")
@@ -242,6 +241,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--init-provisional", action="store_true")
     parser.add_argument("--no-docker", action="store_true")
     parser.add_argument("--sql-only", action="store_true")
+    parser.add_argument(
+        "--no-sql", action="store_true",
+        help="登録 SQL を書き換えない（尺の試作中。Aurora の audio_assets は課題 I-041 で扱う）",
+    )
     return parser
 
 
@@ -267,13 +270,14 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"{track['output']}: 暫定ファイルを無加工でコピー")
                 else:
                     process_track(track, docker=not args.no_docker)
-                    print(f"{track['output']}: 24 秒・fade 0.5/1.0 秒・-14 LUFS")
-        SQL_PATH.parent.mkdir(parents=True, exist_ok=True)
-        SQL_PATH.write_text(generate_audio_assets_sql(tracks), encoding="utf-8")
+                    print(f"{track['output']}: {DURATION_SECONDS} 秒・fade 0.5/1.0 秒・-14 LUFS")
+        if not args.no_sql:
+            SQL_PATH.parent.mkdir(parents=True, exist_ok=True)
+            SQL_PATH.write_text(generate_audio_assets_sql(tracks), encoding="utf-8")
     except (OSError, ValueError, FfmpegError, json.JSONDecodeError) as exc:
         print(f"エラー: {exc}", file=sys.stderr)
         return 1
-    print(f"登録 SQL: {SQL_PATH}")
+    print("登録 SQL: 書き換えなし（--no-sql）" if args.no_sql else f"登録 SQL: {SQL_PATH}")
     for track in tracks:
         label = "暫定（publish 不可）" if track["provisional"] else "正式"
         print(f"{label}: {OUT_DIR / track['output']} -> s3://$S3_BUCKET_NAME/{track['s3_key']}")

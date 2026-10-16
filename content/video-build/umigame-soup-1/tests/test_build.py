@@ -1,18 +1,18 @@
-"""props・ナレーション予算・BGM 割当・継ぎ目差分のテスト。"""
+"""props・ナレーション予算・BGM 割当・導入シーンの固定コピーのテスト。"""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from PIL import Image
 import pytest
 
 import build
 from build import (
     NarrationBudgetError,
     build_props,
-    seam_mean_diff,
+    opening_copies,
+    timeline_summary,
     select_bgm_track,
     validate_narration_budget,
 )
@@ -55,13 +55,19 @@ def _tracks() -> list[dict]:
     ]
 
 
+def _design() -> dict:
+    return {
+        "master": {"name": "父"},
+        "jr": {"name": "子"},
+        "opening_copy": {"selected": "A", "candidates": {"A": "案A", "B": "案B"}},
+    }
+
+
 def test_build_props_matches_schema_shape() -> None:
-    props = build_props(
-        _item(), {"master": {"name": "父"}, "jr": {"name": "子"}},
-        _report(), _tracks()[0],
-    )
+    props = build_props(_item(), _design(), _report(), _tracks()[0])
 
     assert props["contentKey"] == "001-test"
+    assert props["openingCopy"] == "案A"
     assert props["master"] == {
         "name": "父", "base": "char/master_base.png", "happy": "char/master_happy.png"
     }
@@ -114,13 +120,41 @@ def test_no_tts_rejects_cached_gemini_over_tempo(tmp_path: Path) -> None:
         )
 
 
-def test_seam_mean_diff(tmp_path: Path) -> None:
-    first = tmp_path / "first.png"
-    last = tmp_path / "last.png"
-    Image.new("RGB", (4, 4), (10, 20, 30)).save(first)
-    Image.new("RGB", (4, 4), (13, 23, 33)).save(last)
+def test_build_props_switches_opening_copy() -> None:
+    props = build_props(_item(), _design(), _report(), _tracks()[0], copy_id="B")
+    assert props["openingCopy"] == "案B"
+    with pytest.raises(ValueError, match="固定コピーの案がありません"):
+        build_props(_item(), _design(), _report(), _tracks()[0], copy_id="Z")
 
-    assert seam_mean_diff(first, last) == pytest.approx(3.0)
+
+def test_opening_copies_rejects_unknown_selected() -> None:
+    design = _design()
+    design["opening_copy"]["selected"] = "Z"
+    with pytest.raises(ValueError, match="selected"):
+        opening_copies(design)
+
+
+def test_repo_design_has_two_or_three_opening_copies() -> None:
+    design = json.loads((build.ASSETS_DIR / "design.json").read_text(encoding="utf-8"))
+    selected, candidates = opening_copies(design)
+    assert selected in candidates
+    assert 2 <= len(candidates) <= 3
+
+
+def test_timeline_summary_places_narration_after_opening() -> None:
+    summary = timeline_summary(_report(10.0, 5.0))
+    assert summary["opening_end"] == 75
+    assert summary["main_fully_visible"] == 83
+    assert summary["narration_problem_start"] == 90
+    assert summary["narration_rule_start"] == 90 + 300 + 36
+    assert summary["narration_end"] == 90 + 300 + 36 + 150
+    assert summary["narration_end"] <= summary["total_frames"]
+
+
+def test_validate_probe_accepts_new_duration_and_rejects_old() -> None:
+    probe = {"width": 1080, "height": 1920, "fps": 30, "duration": 27.02, "audio_codec": "aac"}
+    assert build.validate_probe(probe) == []
+    assert any("尺が" in error for error in build.validate_probe({**probe, "duration": 24.0}))
 
 
 def test_manifest_narration_keeps_engine_and_tempo(
@@ -138,8 +172,11 @@ def test_manifest_narration_keeps_engine_and_tempo(
             "tempo": 1.146,
             "engine_id": "gemini/gemini-3.8-flash-tts/voice-test",
         },
-        {}, {}, 0.1,
+        {}, {}, timeline_summary(_report()), {"id": "A", "text": "案A"},
     )
     assert record["narration"]["problem_sec"] == 10.123
     assert record["narration"]["tempo"] == 1.146
     assert record["narration"]["engine_id"] == "gemini/gemini-3.8-flash-tts/voice-test"
+    assert record["timeline"]["narration_problem_start"] == 90
+    assert record["opening_copy"] == {"id": "A", "text": "案A"}
+    assert "seam_mean_diff" not in record

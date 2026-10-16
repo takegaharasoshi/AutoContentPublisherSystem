@@ -11,6 +11,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { FONT_DISPLAY, FONT_TEXT } from "./fonts";
+import { openingHookFontSize, splitOpeningHook } from "./openingHook";
 import type { UmigameReelProps } from "./props";
 import {
   BEATS,
@@ -19,6 +20,8 @@ import {
   LOOP_PERIODS,
   NARRATION_GAP,
   NARRATION_START,
+  OPENING_END,
+  OPENING_FADE_FRAMES,
   beatAt,
   hopLift,
   loopPhase,
@@ -27,11 +30,16 @@ import {
 
 const HOOK_MAX_FONT_SIZE = 74;
 const HOOK_INNER_WIDTH = 828;
+/** 導入シーンの hook（最大 14 字 = validate.py の HOOK_MAX を 2 行に収める。1 行 7 字 × 120px = 840px） */
+const OPENING_HOOK_MAX_FONT_SIZE = 120;
+const OPENING_HOOK_INNER_WIDTH = 844;
 
 /**
  * ウミガメのスープ参加型リール（PoC 第 2 稿。2026-09-04 の人間ゲートの指摘を反映）。
  *
  * 版面:
+ * - 導入シーン（先頭 2.5 秒。セット改修 R-1-1）: 上に小さく固定コピー（趣旨）・中央に大きく hook・下にキャラ。
+ *   終わりの 8 フレームで本編の版面へクロスフェードする
  * - 全面: 問題の情景イラスト（90 年代 OVA 塗り・中間調）+ 薄いオーバーレイ（ゆっくりズーム呼吸。周期 = 総フレーム）
  * - 常時表示: つかみ帯（光沢スイープ + 呼吸）/ 「問題」+ 問題文全文 / ルール帯
  * - 下部ゾーン（右 12% は Instagram UI に空ける）: 出題者カメロック（左）と Jr.（右）が常駐。
@@ -42,6 +50,7 @@ const HOOK_INNER_WIDTH = 828;
  * 画面効果は logic-training-1 の Quiz16s から移植（光沢・呼吸・浮遊・跳ね・グロー・名札の点・背景呼吸・見出しバー）。
  */
 export const UmigameReel: React.FC<UmigameReelProps> = ({
+  openingCopy,
   hook,
   problemText,
   ruleText,
@@ -62,7 +71,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
   const answerText = beat.kind === "answer" ? playExample[beat.round * 2 + 1].text : "";
   const masterIsHappy = beat.kind === "answer" && answerText.includes("はい");
 
-  // 周期アニメーション（周期は TOTAL_FRAMES の約数。フレーム 720 = フレーム 0）
+  // 周期アニメーション
   const masterFloat = loopSin(frame, LOOP_PERIODS.masterFloat) * 8;
   const masterBreathe = 1 + loopSin(frame, LOOP_PERIODS.masterBreathe) * 0.008;
   const jrFloat = loopSin(frame, LOOP_PERIODS.jrFloat, 0.25) * 7;
@@ -73,6 +82,18 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
   const hookFontSize = Math.min(HOOK_MAX_FONT_SIZE, Math.floor(HOOK_INNER_WIDTH / [...hook].length) - 1);
   const headingBar = 1 + loopSin(frame, LOOP_PERIODS.headingBar) * 0.09;
   const tagDot = (loopSin(frame, LOOP_PERIODS.tagDot) + 1) / 2;
+
+  // 導入シーン → 本編のクロスフェード（導入シーンは最初のフレームから完成した状態で見せる）
+  const mainOpacity = interpolate(frame, [OPENING_END, OPENING_END + OPENING_FADE_FRAMES], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const openingVisible = frame < OPENING_END + OPENING_FADE_FRAMES;
+  const openingHookLines = splitOpeningHook(
+    hook,
+    Math.floor(OPENING_HOOK_INNER_WIDTH / OPENING_HOOK_MAX_FONT_SIZE),
+  );
+  const openingFontSize = openingHookFontSize(openingHookLines, OPENING_HOOK_INNER_WIDTH, OPENING_HOOK_MAX_FONT_SIZE);
 
   const narrationRuleStart = NARRATION_START + narration.problem.frames + NARRATION_GAP;
   const narrationEnd = narrationRuleStart + narration.rule.frames;
@@ -111,120 +132,135 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
         }}
       />
 
-      {/* つかみ帯（フック文）: 常時表示 + 光沢スイープ + 呼吸 */}
-      <Interactive.Div
-        name="Hook band"
-        style={{
-          position: "absolute",
-          left: 90,
-          top: 100,
-          width: 900,
-          boxSizing: "border-box",
-          padding: "16px 36px",
-          borderRadius: 24,
-          backgroundColor: "#ffc42e",
-          color: "#14202a",
-          fontFamily: FONT_DISPLAY,
-          fontSize: hookFontSize,
-          lineHeight: 1.25,
-          whiteSpace: "nowrap",
-          textAlign: "center",
-          letterSpacing: 1,
-          boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
-          overflow: "hidden",
-          scale: `${hookBreathe}`,
-        }}
-      >
-        {hook}
+      {/* 本編の版面（導入シーンの後にクロスフェードで出る） */}
+      <Interactive.Div name="Main layer" style={{ position: "absolute", inset: 0, opacity: mainOpacity }}>
+        {/* つかみ帯（フック文）: 常時表示 + 光沢スイープ + 呼吸 */}
         <Interactive.Div
-          name="Hook sheen"
+          name="Hook band"
           style={{
             position: "absolute",
-            top: 0,
-            bottom: 0,
-            width: "45%",
-            left: `${-45 + sheenPhase * 145}%`,
-            background: "linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)",
-            pointerEvents: "none",
+            left: 90,
+            top: 100,
+            width: 900,
+            boxSizing: "border-box",
+            padding: "16px 36px",
+            borderRadius: 24,
+            backgroundColor: "#ffc42e",
+            color: "#14202a",
+            fontFamily: FONT_DISPLAY,
+            fontSize: hookFontSize,
+            lineHeight: 1.25,
+            whiteSpace: "nowrap",
+            textAlign: "center",
+            letterSpacing: 1,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
+            overflow: "hidden",
+            scale: `${hookBreathe}`,
           }}
-        />
-      </Interactive.Div>
-
-      {/* 問題カード: 見出し + 問題文全文 + ルール帯（常時表示） */}
-      <Interactive.Div
-        name="Problem card"
-        style={{
-          position: "absolute",
-          left: 90,
-          top: 250,
-          width: 900,
-          boxSizing: "border-box",
-          padding: "34px 40px 34px 40px",
-          borderRadius: 32,
-          backgroundColor: "rgba(9, 22, 30, 0.86)",
-          border: "2px solid rgba(255,196,46,0.35)",
-          boxShadow: "0 16px 40px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 28px rgba(255,196,46,0.12)",
-        }}
-      >
-        <Interactive.Div name="Problem heading" style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+        >
+          {hook}
           <Interactive.Div
-            name="Heading accent bar"
+            name="Hook sheen"
             style={{
-              width: 12,
-              height: 44,
-              borderRadius: 6,
-              backgroundColor: "#ffc42e",
-              transformOrigin: "50% 50%",
-              scale: `1 ${headingBar}`,
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              width: "45%",
+              left: `${-45 + sheenPhase * 145}%`,
+              background: "linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)",
+              pointerEvents: "none",
             }}
           />
+        </Interactive.Div>
+
+        {/* 問題カード: 見出し + 問題文全文 + ルール帯（常時表示） */}
+        <Interactive.Div
+          name="Problem card"
+          style={{
+            position: "absolute",
+            left: 90,
+            top: 250,
+            width: 900,
+            boxSizing: "border-box",
+            padding: "34px 40px 34px 40px",
+            borderRadius: 32,
+            backgroundColor: "rgba(9, 22, 30, 0.86)",
+            border: "2px solid rgba(255,196,46,0.35)",
+            boxShadow: "0 16px 40px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 28px rgba(255,196,46,0.12)",
+          }}
+        >
+          <Interactive.Div name="Problem heading" style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+            <Interactive.Div
+              name="Heading accent bar"
+              style={{
+                width: 12,
+                height: 44,
+                borderRadius: 6,
+                backgroundColor: "#ffc42e",
+                transformOrigin: "50% 50%",
+                scale: `1 ${headingBar}`,
+              }}
+            />
+            <Interactive.Div
+              name="Problem label"
+              style={{
+                display: "inline-block",
+                padding: "4px 20px",
+                borderRadius: 999,
+                backgroundColor: "rgba(255,196,46,0.18)",
+                color: "#ffc42e",
+                fontFamily: FONT_DISPLAY,
+                fontSize: 40,
+                lineHeight: 1.2,
+              }}
+            >
+              問題
+            </Interactive.Div>
+          </Interactive.Div>
           <Interactive.Div
-            name="Problem label"
+            name="Problem text"
             style={{
-              display: "inline-block",
-              padding: "4px 20px",
-              borderRadius: 999,
-              backgroundColor: "rgba(255,196,46,0.18)",
-              color: "#ffc42e",
-              fontFamily: FONT_DISPLAY,
-              fontSize: 40,
-              lineHeight: 1.2,
+              color: "#ffffff",
+              fontFamily: FONT_TEXT,
+              fontWeight: 700,
+              fontSize: 44,
+              lineHeight: 1.5,
+              textAlign: "left",
             }}
           >
-            問題
+            {problemText}
+          </Interactive.Div>
+          <Interactive.Div
+            name="Rule band"
+            style={{
+              marginTop: 22,
+              padding: "14px 22px",
+              borderRadius: 16,
+              borderLeft: "10px solid #ffc42e",
+              backgroundColor: "rgba(255,196,46,0.14)",
+              color: "#ffe9a8",
+              fontFamily: FONT_TEXT,
+              fontWeight: 700,
+              fontSize: 34,
+              lineHeight: 1.45,
+            }}
+          >
+            {ruleText}
           </Interactive.Div>
         </Interactive.Div>
-        <Interactive.Div
-          name="Problem text"
-          style={{
-            color: "#ffffff",
-            fontFamily: FONT_TEXT,
-            fontWeight: 700,
-            fontSize: 44,
-            lineHeight: 1.5,
-            textAlign: "left",
-          }}
-        >
-          {problemText}
-        </Interactive.Div>
-        <Interactive.Div
-          name="Rule band"
-          style={{
-            marginTop: 22,
-            padding: "14px 22px",
-            borderRadius: 16,
-            borderLeft: "10px solid #ffc42e",
-            backgroundColor: "rgba(255,196,46,0.14)",
-            color: "#ffe9a8",
-            fontFamily: FONT_TEXT,
-            fontWeight: 700,
-            fontSize: 34,
-            lineHeight: 1.45,
-          }}
-        >
-          {ruleText}
-        </Interactive.Div>
       </Interactive.Div>
+
+      {/* 導入シーン: 上に固定コピー・中央に hook を大きく（キャラは下部ゾーンに常駐） */}
+      {openingVisible ? (
+        <OpeningLayer
+          copy={openingCopy}
+          lines={openingHookLines}
+          fontSize={openingFontSize}
+          opacity={1 - mainOpacity}
+          breathe={hookBreathe}
+          sheenPhase={sheenPhase}
+        />
+      ) : null}
 
       {/* 下部ゾーン: キャラクター 2 体（常駐。浮遊 + 呼吸 + 切替時の小さな跳ね） */}
       <Img
@@ -259,7 +295,10 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
       {BEATS.map((b) => {
         const key = `${b.kind}-${"round" in b ? b.round : ""}-${b.from}`;
         const duration = b.to - b.from;
-        if (b.kind === "intro" || b.kind === "seam") {
+        if (b.kind === "opening") {
+          return null;
+        }
+        if (b.kind === "intro") {
           return (
             <Sequence key={key} name={`Bubble ${b.kind}`} from={b.from} durationInFrames={duration} layout="none">
               <MasterBubble text={masterLines.intro} tag={master.name} tagDot={tagDot} pop={false} glow={false} lift={0} />
@@ -324,6 +363,99 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
     </AbsoluteFill>
   );
 };
+
+/** 導入シーンの文字（固定コピー + hook）。背景を少し沈めて文字を読ませる */
+const OpeningLayer: React.FC<{
+  copy: string;
+  lines: string[];
+  fontSize: number;
+  opacity: number;
+  breathe: number;
+  sheenPhase: number;
+}> = ({ copy, lines, fontSize, opacity, breathe, sheenPhase }) => (
+  <Interactive.Div name="Opening layer" style={{ position: "absolute", inset: 0, opacity }}>
+    <Interactive.Div
+      name="Opening dim"
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: 1080,
+        height: 1920,
+        background: "linear-gradient(180deg, rgba(4,12,18,0.40) 0%, rgba(4,12,18,0.22) 55%, rgba(4,12,18,0) 75%)",
+      }}
+    />
+    <Interactive.Div
+      name="Opening copy"
+      style={{
+        position: "absolute",
+        left: 90,
+        top: 300,
+        width: 900,
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <Interactive.Div
+        name="Opening copy pill"
+        style={{
+          padding: "12px 34px",
+          borderRadius: 999,
+          backgroundColor: "rgba(9, 22, 30, 0.86)",
+          border: "3px solid #ffc42e",
+          color: "#ffc42e",
+          fontFamily: FONT_DISPLAY,
+          fontSize: 50,
+          lineHeight: 1.25,
+          letterSpacing: 2,
+          whiteSpace: "nowrap",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
+        }}
+      >
+        {copy}
+      </Interactive.Div>
+    </Interactive.Div>
+    <Interactive.Div
+      name="Opening hook"
+      style={{
+        position: "absolute",
+        left: 70,
+        top: 470,
+        width: 940,
+        boxSizing: "border-box",
+        padding: "40px 48px",
+        borderRadius: 36,
+        backgroundColor: "#ffc42e",
+        color: "#14202a",
+        fontFamily: FONT_DISPLAY,
+        fontSize,
+        lineHeight: 1.22,
+        textAlign: "center",
+        letterSpacing: 0,
+        whiteSpace: "nowrap",
+        boxShadow: "0 18px 44px rgba(0,0,0,0.55)",
+        overflow: "hidden",
+        scale: `${breathe}`,
+      }}
+    >
+      {lines.map((line) => (
+        <div key={line}>{line}</div>
+      ))}
+      <Interactive.Div
+        name="Opening hook sheen"
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          width: "45%",
+          left: `${-45 + sheenPhase * 145}%`,
+          background: "linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)",
+          pointerEvents: "none",
+        }}
+      />
+    </Interactive.Div>
+  </Interactive.Div>
+);
 
 type BubbleProps = {
   text: string;
