@@ -115,6 +115,13 @@ export const BUBBLE_SWITCH_FRAMES: readonly number[] = BEATS.filter(
   (beat) => beat.kind !== "opening" && beat.kind !== "intro",
 ).map((beat) => beat.from);
 
+/** キャラが小さく跳ねるフレーム（本編の吹き出しの切替 + 導入シーンの自己紹介の吹き出し） */
+export const HOP_FRAMES: readonly number[] = [
+  OPENING_MASTER_BUBBLE_IN,
+  OPENING_JR_BUBBLE_IN,
+  ...BUBBLE_SWITCH_FRAMES,
+];
+
 export const beatAt = (frame: number): Beat => {
   const found = BEATS.find((beat) => frame >= beat.from && frame < beat.to);
   return found ?? BEATS[BEATS.length - 1];
@@ -130,7 +137,7 @@ export const loopPhase = (frame: number, period: number): number => (frame % per
 /** 直近の吹き出し切替からの減衰する跳ね（px。上向きが正） */
 export const hopLift = (frame: number): number => {
   let last = -1;
-  for (const f of BUBBLE_SWITCH_FRAMES) {
+  for (const f of HOP_FRAMES) {
     if (f <= frame) last = f;
   }
   if (last < 0) return 0;

@@ -308,7 +308,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
               tagDot={tagDot}
               pop
               glow={false}
-              lift={0}
+              lift={hop}
             />
           </Sequence>
           <Sequence
@@ -324,7 +324,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
               tagDot={tagDot}
               pop
               glow={false}
-              lift={0}
+              lift={hop}
             />
           </Sequence>
         </Interactive.Div>

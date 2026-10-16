@@ -47,7 +47,8 @@ def _timeline_module() -> dict:
         "console.log(JSON.stringify({beats: t.BEATS, total: t.TOTAL_FRAMES, fps: t.FPS,"
         " openingEnd: t.OPENING_END, openingFade: t.OPENING_FADE_FRAMES,"
         " narrationStart: t.NARRATION_START, budget: t.NARRATION_BUDGET_FRAMES,"
-        " deadline: t.NARRATION_DEADLINE, switches: t.BUBBLE_SWITCH_FRAMES}));"
+        " deadline: t.NARRATION_DEADLINE, switches: t.BUBBLE_SWITCH_FRAMES,"
+        " hops: t.HOP_FRAMES, masterIn: t.OPENING_MASTER_BUBBLE_IN, jrIn: t.OPENING_JR_BUBBLE_IN}));"
     )
     completed = subprocess.run(
         ["node", "-e", script], capture_output=True, text=True, check=True
@@ -96,6 +97,10 @@ def test_beats_are_ordered_contiguous_and_end_at_total() -> None:
     assert module["narrationStart"] + module["budget"] <= module["deadline"] <= module["total"]
     # 吹き出しの SE は導入シーン・出題では鳴らさない
     assert min(module["switches"]) >= beats[1]["to"]
+    # キャラの跳ねは導入シーンの自己紹介の吹き出しでも起き、昇順に並ぶ（hopLift は直近の 1 つを探す）
+    assert module["hops"][:2] == [module["masterIn"], module["jrIn"]]
+    assert module["hops"] == sorted(module["hops"])
+    assert module["jrIn"] < module["openingEnd"]
 
 
 def test_still_frames_within_beats() -> None:
