@@ -6,8 +6,19 @@ import { z } from "zod";
  */
 export const umigameReelSchema = z.object({
   contentKey: z.string(),
-  /** 導入シーンの上に小さく出す固定コピー（アカウントの趣旨。assets/design.json の opening_copy） */
-  openingCopy: z.string(),
+  /** 導入シーンの固定の文言（全問共通。assets/design.json の opening。R-1-2 で決定） */
+  opening: z.object({
+    /** 傾けたスタンプ（「新体験」） */
+    badge: z.string(),
+    /** 見出し（1〜2 行） */
+    headline: z.array(z.string()).min(1).max(2),
+    /** 説明文（行ごとの文字片。em = accent は朱色の文字、tag は黄色のタグ） */
+    lead: z.array(z.array(z.object({ text: z.string(), em: z.enum(["accent", "tag"]).optional() }))).min(1).max(2),
+    /** hook のカードのラベル（「今日の謎」） */
+    hookLabel: z.string(),
+    /** キャラの自己紹介の吹き出し */
+    selfIntro: z.object({ master: z.string(), jr: z.string() }),
+  }),
   /** つかみ帯（フック文）。導入シーンでは中央に大きく出す */
   hook: z.string(),
   /** 問題文（全文・段階表示しない） */

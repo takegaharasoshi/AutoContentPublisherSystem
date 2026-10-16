@@ -11,7 +11,7 @@ import build
 from build import (
     NarrationBudgetError,
     build_props,
-    opening_copies,
+    opening_props,
     timeline_summary,
     select_bgm_track,
     validate_narration_budget,
@@ -59,7 +59,13 @@ def _design() -> dict:
     return {
         "master": {"name": "父"},
         "jr": {"name": "子"},
-        "opening_copy": {"selected": "A", "candidates": {"A": "案A", "B": "案B"}},
+        "opening": {
+            "badge": "新体験",
+            "headline": ["見出し"],
+            "lead": [[{"text": "謎の"}, {"text": "真相", "em": "accent"}], [{"text": "質問", "em": "tag"}]],
+            "hook_label": "今日の謎",
+            "self_intro": {"master": "父です", "jr": "子です"},
+        },
     }
 
 
@@ -67,7 +73,10 @@ def test_build_props_matches_schema_shape() -> None:
     props = build_props(_item(), _design(), _report(), _tracks()[0])
 
     assert props["contentKey"] == "001-test"
-    assert props["openingCopy"] == "案A"
+    assert props["opening"]["badge"] == "新体験"
+    assert props["opening"]["lead"][0][1] == {"text": "真相", "em": "accent"}
+    assert props["opening"]["selfIntro"] == {"master": "父です", "jr": "子です"}
+    assert props["opening"]["hookLabel"] == "今日の謎"
     assert props["master"] == {
         "name": "父", "base": "char/master_base.png", "happy": "char/master_happy.png"
     }
@@ -120,25 +129,25 @@ def test_no_tts_rejects_cached_gemini_over_tempo(tmp_path: Path) -> None:
         )
 
 
-def test_build_props_switches_opening_copy() -> None:
-    props = build_props(_item(), _design(), _report(), _tracks()[0], copy_id="B")
-    assert props["openingCopy"] == "案B"
-    with pytest.raises(ValueError, match="固定コピーの案がありません"):
-        build_props(_item(), _design(), _report(), _tracks()[0], copy_id="Z")
-
-
-def test_opening_copies_rejects_unknown_selected() -> None:
+def test_opening_props_rejects_unknown_emphasis() -> None:
     design = _design()
-    design["opening_copy"]["selected"] = "Z"
-    with pytest.raises(ValueError, match="selected"):
-        opening_copies(design)
+    design["opening"]["lead"][0][0]["em"] = "bold"
+    with pytest.raises(ValueError, match="accent / tag"):
+        opening_props(design)
 
 
-def test_repo_design_has_two_or_three_opening_copies() -> None:
+def test_opening_props_requires_self_intro() -> None:
+    design = _design()
+    del design["opening"]["self_intro"]
+    with pytest.raises(ValueError, match="self_intro"):
+        opening_props(design)
+
+
+def test_repo_design_opening_is_valid() -> None:
     design = json.loads((build.ASSETS_DIR / "design.json").read_text(encoding="utf-8"))
-    selected, candidates = opening_copies(design)
-    assert selected in candidates
-    assert 2 <= len(candidates) <= 3
+    opening = opening_props(design)
+    assert opening["badge"] == "新体験"
+    assert opening["headline"] == ["コメントで紐解く！", "推理ゲーム"]
 
 
 def test_timeline_summary_places_narration_after_opening() -> None:
@@ -172,11 +181,10 @@ def test_manifest_narration_keeps_engine_and_tempo(
             "tempo": 1.146,
             "engine_id": "gemini/gemini-3.8-flash-tts/voice-test",
         },
-        {}, {}, timeline_summary(_report()), {"id": "A", "text": "案A"},
+        {}, {}, timeline_summary(_report()),
     )
     assert record["narration"]["problem_sec"] == 10.123
     assert record["narration"]["tempo"] == 1.146
     assert record["narration"]["engine_id"] == "gemini/gemini-3.8-flash-tts/voice-test"
     assert record["timeline"]["narration_problem_start"] == 90
-    assert record["opening_copy"] == {"id": "A", "text": "案A"}
     assert "seam_mean_diff" not in record

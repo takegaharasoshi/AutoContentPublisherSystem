@@ -106,35 +106,3 @@ def test_still_frames_within_beats() -> None:
     assert build.STILL_FRAMES["end"] == common.TOTAL_FRAMES - 1
     assert "seam_tail" not in build.STILL_FRAMES
 
-
-OPENING_HOOK_TS = HERE / "remotion" / "src" / "openingHook.ts"
-
-
-def test_opening_hook_fits_two_lines_for_all_stock() -> None:
-    """batch-01 の全 hook が導入シーンで 2 行以内・語の途中で割れず・90px 以上に収まる。"""
-    if not ESBUILD.is_file() or shutil.which("node") is None:
-        pytest.skip("remotion/node_modules（esbuild）または node がありません")
-    hooks = [str(item["hook"]) for item in common.load_items("batch-01")]
-    bundled = subprocess.run(
-        [str(ESBUILD), str(OPENING_HOOK_TS), "--bundle", "--format=cjs", "--platform=node"],
-        capture_output=True, text=True, check=True,
-    ).stdout
-    script = (
-        "const m = {exports: {}};"
-        "(function (module, exports) {" + bundled + "})(m, m.exports);"
-        "const t = m.exports;"
-        f"const hooks = {json.dumps(hooks, ensure_ascii=False)};"
-        "console.log(JSON.stringify(hooks.map((h) => { const l = t.splitOpeningHook(h, 7);"
-        " return {hook: h, lines: l, size: t.openingHookFontSize(l, 844, 120)}; })));"
-    )
-    results = json.loads(
-        subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout
-    )
-    for result in results:
-        assert "".join(result["lines"]) == result["hook"]
-        assert 1 <= len(result["lines"]) <= 2, result
-        assert result["lines"][-1] != "？", result
-        assert result["size"] >= 90, result
-    by_hook = {result["hook"]: result["lines"] for result in results}
-    assert by_hook["子どもたちの行動の真相は？"] == ["子どもたちの", "行動の真相は？"]
-    assert by_hook["凍りつく男女？"] == ["凍りつく男女？"]

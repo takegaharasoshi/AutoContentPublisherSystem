@@ -6,7 +6,16 @@ import type { UmigameReelProps } from "./props";
  */
 export const mockProps: UmigameReelProps = {
   contentKey: "classic-umigame",
-  openingCopy: "コメントで解く推理ゲーム",
+  opening: {
+    badge: "新体験",
+    headline: ["コメントで紐解く！", "推理ゲーム"],
+    lead: [
+      [{ text: "謎の" }, { text: "真相", em: "accent" }, { text: "を、コメントの" }],
+      [{ text: "質問", em: "tag" }, { text: "だけで解き明かせ！" }],
+    ],
+    hookLabel: "今日の謎",
+    selfIntro: { master: "名探偵カメロックだ。謎を出すよ！", jr: "ボクは助手の Jr.！一緒に推理しよう" },
+  },
   hook: "この男はなぜ死んだ？",
   problemText:
     "ある男が海辺のレストランでウミガメのスープを注文した。ひと口飲んだ男は店員に本当にウミガメのスープかと確かめ、「はい」と聞くと店を出て自ら命を絶った。なぜ？",

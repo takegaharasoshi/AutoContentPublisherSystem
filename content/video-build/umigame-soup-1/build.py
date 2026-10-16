@@ -203,21 +203,51 @@ def select_bgm_track(
     return by_name[selected]
 
 
-def opening_copies(design: dict[str, Any]) -> tuple[str, dict[str, str]]:
-    """design.json の導入シーンの固定コピー（採用中の案 ID・案の一覧）を返す。"""
-    section = design.get("opening_copy")
+def opening_props(design: dict[str, Any]) -> dict[str, Any]:
+    """design.json の導入シーンの固定の文言を検査し、props の形で返す。"""
+    section = design.get("opening")
     if not isinstance(section, dict):
-        raise ValueError("design.json に opening_copy がありません")
-    candidates = section.get("candidates")
-    selected = section.get("selected")
-    if not isinstance(candidates, dict) or not candidates:
-        raise ValueError("opening_copy.candidates は 1 件以上の object にしてください")
-    if selected not in candidates:
-        raise ValueError(f"opening_copy.selected が候補にありません: {selected}")
-    for copy_id, text in candidates.items():
-        if not isinstance(text, str) or not text.strip():
-            raise ValueError(f"opening_copy.candidates.{copy_id} が空です")
-    return str(selected), {str(key): str(value) for key, value in candidates.items()}
+        raise ValueError("design.json に opening がありません")
+
+    def text(value: object, name: str) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"opening.{name} は空でない文字列にしてください")
+        return value
+
+    headline = section.get("headline")
+    if not isinstance(headline, list) or not 1 <= len(headline) <= 2:
+        raise ValueError("opening.headline は 1〜2 行の配列にしてください")
+    lead = section.get("lead")
+    if not isinstance(lead, list) or not 1 <= len(lead) <= 2:
+        raise ValueError("opening.lead は 1〜2 行の配列にしてください")
+    lead_props: list[list[dict[str, str]]] = []
+    for row, line in enumerate(lead):
+        if not isinstance(line, list) or not line:
+            raise ValueError(f"opening.lead[{row}] は文字片の配列にしてください")
+        pieces: list[dict[str, str]] = []
+        for index, piece in enumerate(line):
+            if not isinstance(piece, dict):
+                raise ValueError(f"opening.lead[{row}][{index}] は object にしてください")
+            value = {"text": text(piece.get("text"), f"lead[{row}][{index}].text")}
+            if piece.get("em") is not None:
+                if piece["em"] not in {"accent", "tag"}:
+                    raise ValueError(f"opening.lead[{row}][{index}].em は accent / tag のどちらかです")
+                value["em"] = piece["em"]
+            pieces.append(value)
+        lead_props.append(pieces)
+    intro = section.get("self_intro")
+    if not isinstance(intro, dict):
+        raise ValueError("opening.self_intro がありません")
+    return {
+        "badge": text(section.get("badge"), "badge"),
+        "headline": [text(line, "headline") for line in headline],
+        "lead": lead_props,
+        "hookLabel": text(section.get("hook_label"), "hook_label"),
+        "selfIntro": {
+            "master": text(intro.get("master"), "self_intro.master"),
+            "jr": text(intro.get("jr"), "self_intro.jr"),
+        },
+    }
 
 
 def timeline_summary(narration_report: dict[str, Any]) -> dict[str, int]:
@@ -258,8 +288,6 @@ def build_props(
     design: dict[str, Any],
     narration_report: dict[str, Any],
     bgm_track: dict[str, Any],
-    *,
-    copy_id: str | None = None,
 ) -> dict[str, Any]:
     """ストックと実測音声から Zod スキーマどおりの props を組み立てる。
 
@@ -268,7 +296,6 @@ def build_props(
         design: ``assets/design.json``。
         narration_report: ナレーションの実測（cue ごとの frames）。
         bgm_track: 割り当てた BGM。
-        copy_id: 導入シーンの固定コピーの案 ID。省略時は ``opening_copy.selected``。
     """
     play = item.get("play_example")
     if not isinstance(play, list) or len(play) != 6:
@@ -277,15 +304,11 @@ def build_props(
         if not isinstance(line, dict) or line.get("role") not in {"questioner", "master"}:
             raise ValueError(f"play_example[{index}] の role が不正です")
     validate_narration_budget(narration_report)
-    selected, candidates = opening_copies(design)
-    copy_key = selected if copy_id is None else copy_id
-    if copy_key not in candidates:
-        raise ValueError(f"導入シーンの固定コピーの案がありません: {copy_key}")
     key = str(item["content_key"])
     lines = item["character_lines"]
     return {
         "contentKey": key,
-        "openingCopy": candidates[copy_key],
+        "opening": opening_props(design),
         "hook": item["hook"],
         "problemText": item["problem_text"],
         "ruleText": item["rule_text"],
@@ -414,29 +437,10 @@ def validate_probe(probe: dict[str, Any]) -> list[str]:
     return errors
 
 
-def render_copy_variants(
-    props: dict[str, Any], candidates: dict[str, str], out_dir: Path
-) -> None:
-    """導入シーンのコマを固定コピーの全案で静止画にする（work/.../copy-variants/<key>_<案>_opening.jpg）。"""
-    output = out_dir / "copy-variants"
-    job_items: list[dict[str, str]] = []
-    for copy_id, text in candidates.items():
-        variant = {**props, "openingCopy": text}
-        path = output / "props" / f"{props['contentKey']}_{copy_id}.json"
-        write_json(path, variant)
-        job_items.append(
-            {"props": _container_path(path), "out": _container_path(output / f"{props['contentKey']}_{copy_id}")}
-        )
-    job = output / f"job_{props['contentKey']}.json"
-    write_json(job, {"frames": {"opening": STILL_FRAMES["opening"]}, "items": job_items})
-    _docker(REMOTION_IMAGE, REMOTION_DIR, ["node", "scripts/render_stills.mjs", _container_path(job)])
-
-
 def _record(
     item: dict[str, Any], props_path: Path, video_path: Path,
     track: dict[str, Any], narration: dict[str, float | str], probe: dict[str, Any],
     stills: dict[str, str], timeline: dict[str, int],
-    opening_copy: dict[str, str],
 ) -> dict[str, Any]:
     return {
         "content_key": item["content_key"],
@@ -458,7 +462,6 @@ def _record(
         },
         "probe": probe,
         "timeline": timeline,
-        "opening_copy": opening_copy,
         "built_at": dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
     }
 
@@ -471,14 +474,6 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--out-dir", type=Path, default=None,
         help="props・動画・静止画・probe・manifest の書き出し先（既定: work/。試作は work/ の下の別ディレクトリへ）",
-    )
-    parser.add_argument(
-        "--opening-copy", default=None,
-        help="導入シーンの固定コピーの案 ID（既定: design.json の opening_copy.selected）",
-    )
-    parser.add_argument(
-        "--copy-variants", action="store_true",
-        help="導入シーンを固定コピーの全案で静止画にし、review.html で見比べられるようにする",
     )
     parser.add_argument("--rebuild-bgm", action="store_true", help="既存割当を破棄して再選曲する")
     parser.add_argument(
@@ -529,10 +524,7 @@ def main(argv: list[str] | None = None) -> int:
         targets = select_items(load_items(args.batch), args.content_keys)
         manifest = load_manifest(manifest_path)
         design = json.loads((ASSETS_DIR / "design.json").read_text(encoding="utf-8"))
-        selected_copy, copy_candidates = opening_copies(design)
-        copy_id = args.opening_copy or selected_copy
-        if copy_id not in copy_candidates:
-            raise ValueError(f"導入シーンの固定コピーの案がありません: {copy_id}")
+        opening_props(design)
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"エラー: {exc}", file=sys.stderr)
         return 1
@@ -592,7 +584,7 @@ def main(argv: list[str] | None = None) -> int:
                 manifest, key, tracks, rebuild_bgm=args.rebuild_bgm
             )
             stage_assets(key, track, narration_dir)
-            props = build_props(item, design, report, track, copy_id=copy_id)
+            props = build_props(item, design, report, track)
             props_path = out_dir / "props" / f"{key}.json"
             write_json(props_path, props)
             if args.skip_render:
@@ -605,12 +597,9 @@ def main(argv: list[str] | None = None) -> int:
             stills = extract_stills(video_path, key, out_dir)
             probe = probe_video(video_path, key, out_dir)
             timeline = timeline_summary(report)
-            if args.copy_variants:
-                render_copy_variants(props, copy_candidates, out_dir)
             manifest[key] = _record(
                 item, props_path, video_path, track, narration_summary,
                 probe, stills, timeline,
-                {"id": copy_id, "text": copy_candidates[copy_id]},
             )
             save_manifest(manifest, manifest_path)
             print(
@@ -638,8 +627,6 @@ def main(argv: list[str] | None = None) -> int:
 
         write_review(
             load_manifest(manifest_path), batch=args.batch, content_keys=args.content_keys,
-            copy_candidates=copy_candidates if args.copy_variants else None,
-            variant_dir=out_dir / "copy-variants" if args.copy_variants else None,
         )
     except Exception as exc:
         failures.append(f"review_sheet: {exc}")

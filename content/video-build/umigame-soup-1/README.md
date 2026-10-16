@@ -2,17 +2,17 @@
 
 ## 本番の手順
 
-> **2026-10-17 セット改修 R-1-1（試作）**: 先頭に導入シーン 2.5 秒（上に固定コピー・中央に hook を大きく 2 行）を足し、
-> ループの作り（継ぎ目の検証・周期を尺の約数にする制約）をやめて **一本道・27 秒（810 フレーム）**にした。
-> ナレーションは導入の後 0.5 秒（フレーム 90）から・予算 21 秒は据え置き。固定コピーの案は `assets/design.json` の
-> `opening_copy`（R-1-2 で決める）。BGM は `prepare_bgm.py --no-sql` で 27 秒に作り直した（登録 SQL と Aurora の
-> `duration_seconds = 24` は課題 I-041 で扱う）。試作は次のコマンドで、承認済みの `work/videos/` を上書きしないよう
-> `work/r1-proto/` に書き出す。`--copy-variants` は導入のコマを固定コピーの全案で静止画にして `work/review.html` に並べる。
+> **2026-10-17 セット改修 R-1-1（試作・第 2 稿）**: 先頭に導入シーン 2.5 秒を足し、ループの作り（継ぎ目の検証・
+> 周期を尺の約数にする制約）をやめて **一本道・27 秒（810 フレーム）**にした。導入シーンの版面は R-1-2 で決定
+> （「新体験」スタンプ・黄色の 2 行見出し・部分強調の説明文・「今日の謎」カードの hook・キャラの自己紹介の吹き出し）。
+> 文言は `assets/design.json` の `opening`（全問共通）。ナレーションは導入の後 0.5 秒（フレーム 90）から・予算 21 秒は
+> 据え置き。BGM は `prepare_bgm.py --no-sql` で 27 秒に作り直した（登録 SQL と Aurora の `duration_seconds = 24` は
+> 課題 I-041 で扱う）。試作は次のコマンドで、承認済みの `work/videos/` を上書きしないよう `work/r1-proto/` に書き出す。
 > 下の 21-2 PoC の記録にある 24 秒・ループ前提の記述は当時のもの（設計書は R-1-3 で実態へ直す）。
 >
 > ```bash
 > python3 build.py --no-tts --content-key 012-early-morning-run --content-key 015-unlicensed-driver \
->   --out-dir work/r1-proto --copy-variants
+>   --out-dir work/r1-proto
 > ```
 
 ```bash

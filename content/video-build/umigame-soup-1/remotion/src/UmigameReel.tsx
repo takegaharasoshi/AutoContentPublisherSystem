@@ -11,7 +11,6 @@ import {
   useVideoConfig,
 } from "remotion";
 import { FONT_DISPLAY, FONT_TEXT } from "./fonts";
-import { openingHookFontSize, splitOpeningHook } from "./openingHook";
 import type { UmigameReelProps } from "./props";
 import {
   BEATS,
@@ -30,16 +29,20 @@ import {
 
 const HOOK_MAX_FONT_SIZE = 74;
 const HOOK_INNER_WIDTH = 828;
-/** 導入シーンの hook（最大 14 字 = validate.py の HOOK_MAX を 2 行に収める。1 行 7 字 × 120px = 840px） */
-const OPENING_HOOK_MAX_FONT_SIZE = 120;
-const OPENING_HOOK_INNER_WIDTH = 844;
+/** 導入シーンの hook（1 行。最大 14 字 = validate.py の HOOK_MAX で 57px） */
+const OPENING_HOOK_MAX_FONT_SIZE = 60;
+const OPENING_HOOK_INNER_WIDTH = 800;
+/** 導入シーンの自己紹介の吹き出しの上端（カメロックが上・Jr. が下。R-1-2 で決定） */
+const OPENING_MASTER_BUBBLE_TOP = 920;
+const OPENING_JR_BUBBLE_TOP = 1075;
 
 /**
  * ウミガメのスープ参加型リール（PoC 第 2 稿。2026-09-04 の人間ゲートの指摘を反映）。
  *
  * 版面:
- * - 導入シーン（先頭 2.5 秒。セット改修 R-1-1）: 上に小さく固定コピー（趣旨）・中央に大きく hook・下にキャラ。
- *   終わりの 8 フレームで本編の版面へクロスフェードする
+ * - 導入シーン（先頭 2.5 秒。セット改修 R-1-1・版面は R-1-2 で決定）: 「新体験」スタンプ → 黄色の 2 行見出し
+ *   → 説明文（「真相」を朱色・「質問」を黄色のタグで強調）→ 「今日の謎」の暗いカードに hook → キャラの自己紹介の
+ *   吹き出し（カメロックが上・Jr. が下）。終わりの 8 フレームで本編の版面へクロスフェードする
  * - 全面: 問題の情景イラスト（90 年代 OVA 塗り・中間調）+ 薄いオーバーレイ（ゆっくりズーム呼吸。周期 = 総フレーム）
  * - 常時表示: つかみ帯（光沢スイープ + 呼吸）/ 「問題」+ 問題文全文 / ルール帯
  * - 下部ゾーン（右 12% は Instagram UI に空ける）: 出題者カメロック（左）と Jr.（右）が常駐。
@@ -50,7 +53,7 @@ const OPENING_HOOK_INNER_WIDTH = 844;
  * 画面効果は logic-training-1 の Quiz16s から移植（光沢・呼吸・浮遊・跳ね・グロー・名札の点・背景呼吸・見出しバー）。
  */
 export const UmigameReel: React.FC<UmigameReelProps> = ({
-  openingCopy,
+  opening,
   hook,
   problemText,
   ruleText,
@@ -89,11 +92,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
     extrapolateRight: "clamp",
   });
   const openingVisible = frame < OPENING_END + OPENING_FADE_FRAMES;
-  const openingHookLines = splitOpeningHook(
-    hook,
-    Math.floor(OPENING_HOOK_INNER_WIDTH / OPENING_HOOK_MAX_FONT_SIZE),
-  );
-  const openingFontSize = openingHookFontSize(openingHookLines, OPENING_HOOK_INNER_WIDTH, OPENING_HOOK_MAX_FONT_SIZE);
+  const openingHookFontSize = Math.min(OPENING_HOOK_MAX_FONT_SIZE, Math.floor(OPENING_HOOK_INNER_WIDTH / [...hook].length));
 
   const narrationRuleStart = NARRATION_START + narration.problem.frames + NARRATION_GAP;
   const narrationEnd = narrationRuleStart + narration.rule.frames;
@@ -250,16 +249,9 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
         </Interactive.Div>
       </Interactive.Div>
 
-      {/* 導入シーン: 上に固定コピー・中央に hook を大きく（キャラは下部ゾーンに常駐） */}
+      {/* 導入シーン: 新体験スタンプ・見出し・説明文・今日の謎（キャラは下部ゾーンに常駐） */}
       {openingVisible ? (
-        <OpeningLayer
-          copy={openingCopy}
-          lines={openingHookLines}
-          fontSize={openingFontSize}
-          opacity={1 - mainOpacity}
-          breathe={hookBreathe}
-          sheenPhase={sheenPhase}
-        />
+        <OpeningLayer opening={opening} hook={hook} hookFontSize={openingHookFontSize} opacity={1 - mainOpacity} />
       ) : null}
 
       {/* 下部ゾーン: キャラクター 2 体（常駐。浮遊 + 呼吸 + 切替時の小さな跳ね） */}
@@ -290,6 +282,30 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
           translate: `0px ${jrFloat - hop * 0.7}px`,
         }}
       />
+
+      {/* 導入シーンの自己紹介の吹き出し（導入シーンと一緒にフェードアウトする） */}
+      {openingVisible ? (
+        <Interactive.Div name="Opening self intro" style={{ position: "absolute", inset: 0, opacity: 1 - mainOpacity }}>
+          <MasterBubble
+            top={OPENING_MASTER_BUBBLE_TOP}
+            text={opening.selfIntro.master}
+            tag={master.name}
+            tagDot={tagDot}
+            pop={false}
+            glow={false}
+            lift={0}
+          />
+          <JrBubble
+            top={OPENING_JR_BUBBLE_TOP}
+            text={opening.selfIntro.jr}
+            tag={jr.name}
+            tagDot={tagDot}
+            pop={false}
+            glow={false}
+            lift={0}
+          />
+        </Interactive.Div>
+      ) : null}
 
       {/* 吹き出し: ビートごとにスナップで切り替える。返答ビートでは質問を残したまま返答を追加表示 */}
       {BEATS.map((b) => {
@@ -364,15 +380,17 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
   );
 };
 
-/** 導入シーンの文字（固定コピー + hook）。背景を少し沈めて文字を読ませる */
+/** 導入シーンの文字の縁取り（背景の上でも読めるよう濃紺の影を四方に） */
+const OPENING_OUTLINE =
+  "0 4px 0 #0b1720, 0 -2px 0 #0b1720, 3px 0 0 #0b1720, -3px 0 0 #0b1720, 0 10px 26px rgba(0,0,0,0.6)";
+
+/** 導入シーンの文字（新体験スタンプ・見出し・説明文・今日の謎）。背景の上半分を沈めて文字を読ませる */
 const OpeningLayer: React.FC<{
-  copy: string;
-  lines: string[];
-  fontSize: number;
+  opening: UmigameReelProps["opening"];
+  hook: string;
+  hookFontSize: number;
   opacity: number;
-  breathe: number;
-  sheenPhase: number;
-}> = ({ copy, lines, fontSize, opacity, breathe, sheenPhase }) => (
+}> = ({ opening, hook, hookFontSize, opacity }) => (
   <Interactive.Div name="Opening layer" style={{ position: "absolute", inset: 0, opacity }}>
     <Interactive.Div
       name="Opening dim"
@@ -382,82 +400,138 @@ const OpeningLayer: React.FC<{
         top: 0,
         width: 1080,
         height: 1920,
-        background: "linear-gradient(180deg, rgba(4,12,18,0.40) 0%, rgba(4,12,18,0.22) 55%, rgba(4,12,18,0) 75%)",
+        background: "linear-gradient(180deg, rgba(4,12,18,0.62) 0%, rgba(4,12,18,0.40) 45%, rgba(4,12,18,0.05) 70%)",
       }}
     />
     <Interactive.Div
-      name="Opening copy"
-      style={{
-        position: "absolute",
-        left: 90,
-        top: 300,
-        width: 900,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <Interactive.Div
-        name="Opening copy pill"
-        style={{
-          padding: "12px 34px",
-          borderRadius: 999,
-          backgroundColor: "rgba(9, 22, 30, 0.86)",
-          border: "3px solid #ffc42e",
-          color: "#ffc42e",
-          fontFamily: FONT_DISPLAY,
-          fontSize: 50,
-          lineHeight: 1.25,
-          letterSpacing: 2,
-          whiteSpace: "nowrap",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
-        }}
-      >
-        {copy}
-      </Interactive.Div>
-    </Interactive.Div>
-    <Interactive.Div
-      name="Opening hook"
+      name="Opening badge"
       style={{
         position: "absolute",
         left: 70,
-        top: 470,
-        width: 940,
-        boxSizing: "border-box",
-        padding: "40px 48px",
-        borderRadius: 36,
-        backgroundColor: "#ffc42e",
-        color: "#14202a",
+        top: 100,
+        padding: "11px 37px",
+        borderRadius: 999,
+        backgroundColor: "#e8452c",
+        color: "#ffffff",
         fontFamily: FONT_DISPLAY,
-        fontSize,
-        lineHeight: 1.22,
-        textAlign: "center",
-        letterSpacing: 0,
-        whiteSpace: "nowrap",
-        boxShadow: "0 18px 44px rgba(0,0,0,0.55)",
-        overflow: "hidden",
-        scale: `${breathe}`,
+        fontSize: 88,
+        lineHeight: 1.15,
+        letterSpacing: 4,
+        boxShadow: "0 8px 22px rgba(0,0,0,0.45), inset 0 0 0 4px rgba(255,255,255,0.35)",
+        rotate: "-8deg",
       }}
     >
-      {lines.map((line) => (
+      {opening.badge}
+    </Interactive.Div>
+    <Interactive.Div
+      name="Opening headline"
+      style={{
+        position: "absolute",
+        left: 60,
+        top: 235,
+        width: 960,
+        textAlign: "center",
+        fontFamily: FONT_DISPLAY,
+        fontSize: 104,
+        lineHeight: 1.18,
+        color: "#ffc42e",
+        textShadow: OPENING_OUTLINE,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {opening.headline.map((line) => (
         <div key={line}>{line}</div>
       ))}
+    </Interactive.Div>
+    <Interactive.Div
+      name="Opening lead"
+      style={{
+        position: "absolute",
+        left: 60,
+        top: 500,
+        width: 960,
+        textAlign: "center",
+        fontFamily: FONT_DISPLAY,
+        fontSize: 48,
+        lineHeight: 1.5,
+        color: "#ffffff",
+        textShadow: OPENING_OUTLINE,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {opening.lead.map((line, index) => (
+        <div key={index}>
+          {line.map((piece, pieceIndex) => (
+            <LeadPiece key={pieceIndex} text={piece.text} em={piece.em} />
+          ))}
+        </div>
+      ))}
+    </Interactive.Div>
+    <Interactive.Div
+      name="Opening hook card"
+      style={{
+        position: "absolute",
+        left: 110,
+        top: 690,
+        width: 860,
+        boxSizing: "border-box",
+        padding: "18px 30px 20px",
+        borderRadius: 26,
+        backgroundColor: "rgba(9,22,30,0.88)",
+        border: "3px solid #ffc42e",
+        color: "#ffffff",
+        textAlign: "center",
+        boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
+      }}
+    >
       <Interactive.Div
-        name="Opening hook sheen"
-        style={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          width: "45%",
-          left: `${-45 + sheenPhase * 145}%`,
-          background: "linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)",
-          pointerEvents: "none",
-        }}
-      />
+        name="Opening hook label"
+        style={{ fontFamily: FONT_DISPLAY, fontSize: 32, lineHeight: 1.2, color: "#ffc42e", marginBottom: 6, letterSpacing: 2 }}
+      >
+        {opening.hookLabel}
+      </Interactive.Div>
+      <Interactive.Div
+        name="Opening hook"
+        style={{ fontFamily: FONT_DISPLAY, fontSize: hookFontSize, lineHeight: 1.25, whiteSpace: "nowrap" }}
+      >
+        {hook}
+      </Interactive.Div>
     </Interactive.Div>
   </Interactive.Div>
 );
 
+/** 説明文の文字片（accent = 朱色の文字・tag = 黄色の小さなタグ） */
+const LeadPiece: React.FC<{ text: string; em?: "accent" | "tag" }> = ({ text, em }) => {
+  if (em === "accent") {
+    return <span style={{ color: "#ff7a5c", fontSize: 54 }}>{text}</span>;
+  }
+  if (em === "tag") {
+    return (
+      <span
+        style={{
+          display: "inline-block",
+          padding: "0 18px 4px",
+          margin: "0 10px 0 0",
+          borderRadius: 12,
+          backgroundColor: "#ffc42e",
+          color: "#14202a",
+          textShadow: "none",
+          fontSize: 50,
+          lineHeight: 1.3,
+          rotate: "-3deg",
+          boxShadow: "0 6px 16px rgba(0,0,0,0.45)",
+        }}
+      >
+        {text}
+      </span>
+    );
+  }
+  return <span>{text}</span>;
+};
+
 type BubbleProps = {
+  /** 吹き出しの上端（省略時は本編の位置。導入シーンの自己紹介だけ指定する） */
+  top?: number;
   text: string;
   tag: string;
   tagDot: number;
@@ -497,7 +571,7 @@ const NameTag: React.FC<{ name: string; dot: number; color: string }> = ({ name,
 );
 
 /** 出題者の吹き出し（左下のキャラへ向くしっぽ付き。返答ビートでは質問の下に出る） */
-const MasterBubble: React.FC<BubbleProps> = ({ text, tag, tagDot, pop, glow, lift }) => {
+const MasterBubble: React.FC<BubbleProps> = ({ top = 1040, text, tag, tagDot, pop, glow, lift }) => {
   const frame = useCurrentFrame();
   const glowPulse = (loopSin(frame, LOOP_PERIODS.outroGlow) + 1) / 2;
   return (
@@ -506,7 +580,7 @@ const MasterBubble: React.FC<BubbleProps> = ({ text, tag, tagDot, pop, glow, lif
       style={{
         position: "absolute",
         left: 60,
-        top: 1040,
+        top,
         maxWidth: 800,
         boxSizing: "border-box",
         padding: "14px 30px 18px 30px",
@@ -553,7 +627,7 @@ const MasterBubble: React.FC<BubbleProps> = ({ text, tag, tagDot, pop, glow, lif
 };
 
 /** Jr. の吹き出し（右下のキャラへ向くしっぽ付き。右 12% は空ける。質問ビートと返答ビートで同じ位置） */
-const JrBubble: React.FC<BubbleProps> = ({ text, tag, tagDot, pop, glow, lift }) => {
+const JrBubble: React.FC<BubbleProps> = ({ top = 905, text, tag, tagDot, pop, glow, lift }) => {
   const frame = useCurrentFrame();
   const glowPulse = (loopSin(frame, LOOP_PERIODS.outroGlow) + 1) / 2;
   return (
@@ -562,7 +636,7 @@ const JrBubble: React.FC<BubbleProps> = ({ text, tag, tagDot, pop, glow, lift })
       style={{
         position: "absolute",
         right: 160,
-        top: 905,
+        top,
         maxWidth: 780,
         boxSizing: "border-box",
         padding: "14px 30px 18px 30px",
