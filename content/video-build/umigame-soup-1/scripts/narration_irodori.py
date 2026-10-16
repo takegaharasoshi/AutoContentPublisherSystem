@@ -245,6 +245,75 @@ def synthesize_cues(
     raise IrodoriBudgetError(total, budget, [entry["seconds"] for entry in takes])
 
 
+def synthesize_line(
+    text: str,
+    out_dir: Path,
+    *,
+    config: dict[str, Any],
+    seconds: float,
+    max_seconds: float,
+    force: bool = False,
+    runner: InferRunner | None = None,
+    ffmpeg_runner: narration_gemini.FfmpegRunner | None = None,
+) -> dict[str, Any]:
+    """全問共通の 1 文（導入シーンの見出しの読み上げ）を合成し、``line.wav`` に置く。
+
+    Args:
+        text: 読み上げる文（読み間違いを避けるため仮名で書く）。
+        out_dir: 出力先（``line.wav`` と ``narration.json``）。
+        config: design.json の ``narration`` 節（model・ref_dir・seed 等）。
+        seconds: Irodori に渡す長さ。
+        max_seconds: 前後の無音を削った後の上限。超えたら seed を進めて取り直す。
+        force: キャッシュを使わず取り直す。
+        runner: テスト用の infer 実行関数。
+        ffmpeg_runner: テスト用の ffmpeg 実行関数。
+
+    Returns:
+        ``{"text", "engine_id", "seed", "seconds", "line": {"seconds", "frames"}, ...}``。
+    """
+    out_dir = Path(out_dir).resolve()
+    model = str(config["model"])
+    ref_dir = SET_DIR / str(config.get("ref_dir", "assets/voice/kamerock-g4"))
+    refs, ref_fingerprints = _ref_wavs(ref_dir)
+    engine_id = f"irodori/{model}/{ref_dir.name}"
+    report_path = out_dir / "narration.json"
+    wav = out_dir / "line.wav"
+    previous = narration_gemini._previous_report(report_path)
+    if not force and previous is not None and wav.is_file() and all(
+        previous.get(key) == value for key, value in (
+            ("text", text), ("engine_id", engine_id), ("ref_wavs", ref_fingerprints),
+            ("base_seconds", seconds), ("max_seconds", max_seconds),
+        )
+    ):
+        return previous
+    out_dir.mkdir(parents=True, exist_ok=True)
+    infer_runner = runner or subprocess.run
+    audio_runner = ffmpeg_runner or narration_gemini._default_ffmpeg_runner
+    base_seed = int(config.get("seed", 1)) + _prior_attempt(previous)
+    max_takes = int(config.get("max_takes", 3))
+    takes: list[dict[str, float | int]] = []
+    for take in range(max_takes):
+        seed = base_seed + take
+        wav.unlink(missing_ok=True)
+        _infer(text, model, refs, seed, seconds, wav, infer_runner)
+        _ensure_pcm16_mono(wav, audio_runner)
+        duration = round(narration_gemini._fit(wav, 1.0, audio_runner), 3)
+        takes.append({"seed": seed, "seconds": duration})
+        if duration <= max_seconds:
+            report = {
+                "text": text, "engine_id": engine_id, "model": model,
+                "ref_wavs": ref_fingerprints, "base_seconds": seconds,
+                "max_seconds": max_seconds, "seed": seed,
+                "attempt": _prior_attempt(previous) + take + 1, "takes": takes,
+                "line": {"seconds": duration, "frames": round(duration * FPS)},
+            }
+            report_path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+            return report
+    raise IrodoriBudgetError(takes[-1]["seconds"], max_seconds, [seconds] * len(takes))
+
+
 def main(argv: list[str] | None = None) -> int:
     """問題 JSON と design.json の narration 節を使って合成する。"""
     parser = argparse.ArgumentParser(description=__doc__)

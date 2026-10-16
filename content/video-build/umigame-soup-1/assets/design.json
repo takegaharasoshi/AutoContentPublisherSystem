@@ -25,6 +25,12 @@
       [{"text": "質問", "em": "tag"}, {"text": "だけで解き明かせ！"}]
     ],
     "hook_label": "今日の謎",
+    "narration": {
+      "note": "見出しだけを読み上げる（全問共通・1 回だけ合成して work/narration/_opening にキャッシュ）。読み間違いを避けるため仮名で書く",
+      "text": "コメントでひもとく、すいりゲーム！",
+      "seconds": 2.2,
+      "max_seconds": 2.5
+    },
     "self_intro": {
       "master": "名探偵カメロックだ。謎を出すよ！",
       "jr": "ボクは助手の Jr.！一緒に推理しよう"

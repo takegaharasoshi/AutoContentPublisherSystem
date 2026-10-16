@@ -27,6 +27,15 @@ export const HEIGHT = 1920;
 export const OPENING_END = Math.round(2.5 * FPS); // 75
 /** 導入シーンから本編へのクロスフェード */
 export const OPENING_FADE_FRAMES = 8;
+/** 導入シーンの見出しの読み上げの開始（スタンプが着地した後） */
+export const OPENING_NARRATION_START = 6;
+/** 導入シーンの自己紹介の吹き出しが出るフレーム（カメロック → Jr. の順に後から入る） */
+export const OPENING_MASTER_BUBBLE_IN = 22;
+export const OPENING_JR_BUBBLE_IN = 38;
+/** 導入シーンの見出しと「質問」タグの光沢スイープの周期（導入中に 2 回通る） */
+export const OPENING_SHEEN_PERIOD = 36;
+/** 「真相」の小さな跳ねの周期 */
+export const OPENING_HOP_PERIOD = 24;
 /** 出題（「質問してみて！」の吹き出し）の終わり */
 export const INTRO_END = OPENING_END + 3 * FPS; // 165
 export const ROUND_FRAMES = 4 * FPS; // 120
@@ -144,6 +153,9 @@ if (BEATS[BEATS.length - 1].to !== TOTAL_FRAMES) {
 }
 if (NARRATION_START + NARRATION_BUDGET_FRAMES > NARRATION_DEADLINE) {
   throw new Error("ナレーションの予算が尺に収まりません");
+}
+if (OPENING_JR_BUBBLE_IN >= OPENING_END) {
+  throw new Error("導入シーンの吹き出しが導入の終わりより後に出ます");
 }
 if (TOTAL_FRAMES >= 30 * FPS) {
   throw new Error("尺は 30 秒未満にします");

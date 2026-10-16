@@ -52,6 +52,8 @@ export const umigameReelSchema = z.object({
     .array(z.object({ role: z.enum(["questioner", "master"]), text: z.string() }))
     .length(6),
   narration: z.object({
+    /** 導入シーンの見出しの読み上げ（全問共通） */
+    opening: z.object({ file: z.string(), frames: z.number().int() }),
     problem: z.object({ file: z.string(), frames: z.number().int() }),
     rule: z.object({ file: z.string(), frames: z.number().int() }),
   }),

@@ -24,6 +24,7 @@ from common import (
     NARRATION_START,
     OPENING_END,
     OPENING_FADE_FRAMES,
+    OPENING_NARRATION_START,
     REMOTION_DIR,
     ROOT,
     TOTAL_FRAMES,
@@ -66,6 +67,9 @@ STILL_FRAMES = {
     "jr_outro": 720,
     "end": TOTAL_FRAMES - 1,
 }
+
+
+OPENING_NARRATION_DIR = WORK / "narration" / "_opening"
 
 
 class NarrationBudgetError(ValueError):
@@ -118,6 +122,35 @@ def validate_narration_budget(report: dict[str, Any]) -> dict[str, float]:
             f"rule {rule:.3f}s = {total:.3f}s > {NARRATION_BUDGET_SECONDS:.1f}s"
         )
     return {"problem_sec": problem, "rule_sec": rule, "total_sec": total}
+
+
+def opening_narration(
+    design: dict[str, Any], *, no_tts: bool, force: bool = False
+) -> dict[str, Any]:
+    """導入シーンの見出しの読み上げ（全問共通）を合成するかキャッシュを読み、尺に収まるか検査する。"""
+    section = design["opening"]["narration"]
+    text = str(section["text"])
+    report_path = OPENING_NARRATION_DIR / "narration.json"
+    if no_tts:
+        if not (report_path.is_file() and (OPENING_NARRATION_DIR / "line.wav").is_file()):
+            raise RuntimeError(
+                f"導入シーンのナレーションが未合成です: {OPENING_NARRATION_DIR}（--no-tts を外して合成）"
+            )
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        if report.get("text") != text:
+            raise RuntimeError("導入シーンのナレーションの文が design.json と一致しません（--no-tts を外して合成）")
+    else:
+        report = narration_irodori.synthesize_line(
+            text, OPENING_NARRATION_DIR, config=design["narration"],
+            seconds=float(section["seconds"]), max_seconds=float(section["max_seconds"]),
+            force=force,
+        )
+    frames = int(report["line"]["frames"])
+    if OPENING_NARRATION_START + frames > NARRATION_START - 6:
+        raise NarrationBudgetError(
+            f"導入シーンのナレーションが問題文の読み上げに重なります: {frames} フレーム"
+        )
+    return report
 
 
 def _load_cached_narration(
@@ -250,7 +283,9 @@ def opening_props(design: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def timeline_summary(narration_report: dict[str, Any]) -> dict[str, int]:
+def timeline_summary(
+    narration_report: dict[str, Any], opening_frames: int = 0
+) -> dict[str, int]:
     """導入 → 本編の切替とナレーション開始・終了のフレームを返す（レビュー・記録用）。"""
     problem = int(narration_report["cues"]["problem"]["frames"])
     rule = int(narration_report["cues"]["rule"]["frames"])
@@ -258,6 +293,8 @@ def timeline_summary(narration_report: dict[str, Any]) -> dict[str, int]:
     return {
         "total_frames": TOTAL_FRAMES,
         "opening_end": OPENING_END,
+        "narration_opening_start": OPENING_NARRATION_START,
+        "narration_opening_end": OPENING_NARRATION_START + opening_frames,
         "main_fully_visible": OPENING_END + OPENING_FADE_FRAMES,
         "narration_problem_start": NARRATION_START,
         "narration_rule_start": rule_start,
@@ -270,6 +307,7 @@ def stage_assets(content_key: str, track: dict[str, Any], narration_dir: Path) -
     for directory in (
         PUBLIC_DIR / "fonts", PUBLIC_DIR / "bg", PUBLIC_DIR / "char",
         PUBLIC_DIR / "audio" / "bgm", PUBLIC_DIR / "narration" / content_key,
+        PUBLIC_DIR / "narration" / "_opening",
     ):
         directory.mkdir(parents=True, exist_ok=True)
     for name in FONT_FILES:
@@ -281,6 +319,7 @@ def stage_assets(content_key: str, track: dict[str, Any], narration_dir: Path) -
     shutil.copy2(ASSETS_DIR / "se" / "bubble_pop.wav", PUBLIC_DIR / "audio" / "se_pop.wav")
     for cue in ("problem", "rule"):
         shutil.copy2(narration_dir / f"{cue}.wav", PUBLIC_DIR / "narration" / content_key / f"{cue}.wav")
+    shutil.copy2(OPENING_NARRATION_DIR / "line.wav", PUBLIC_DIR / "narration" / "_opening" / "line.wav")
 
 
 def build_props(
@@ -288,6 +327,8 @@ def build_props(
     design: dict[str, Any],
     narration_report: dict[str, Any],
     bgm_track: dict[str, Any],
+    *,
+    opening_frames: int | None = None,
 ) -> dict[str, Any]:
     """ストックと実測音声から Zod スキーマどおりの props を組み立てる。
 
@@ -296,6 +337,8 @@ def build_props(
         design: ``assets/design.json``。
         narration_report: ナレーションの実測（cue ごとの frames）。
         bgm_track: 割り当てた BGM。
+        opening_frames: 導入シーンの見出しの読み上げのフレーム数。省略時は design.json の上限
+            （静止画だけを描くとき用）。
     """
     play = item.get("play_example")
     if not isinstance(play, list) or len(play) != 6:
@@ -325,11 +368,20 @@ def build_props(
             {"role": line["role"], "text": line["text"]} for line in play
         ],
         "narration": {
-            cue: {
-                "file": f"narration/{key}/{cue}.wav",
-                "frames": int(narration_report["cues"][cue]["frames"]),
-            }
-            for cue in ("problem", "rule")
+            "opening": {
+                "file": "narration/_opening/line.wav",
+                "frames": (
+                    round(float(design["opening"]["narration"]["max_seconds"]) * FPS)
+                    if opening_frames is None else int(opening_frames)
+                ),
+            },
+            **{
+                cue: {
+                    "file": f"narration/{key}/{cue}.wav",
+                    "frames": int(narration_report["cues"][cue]["frames"]),
+                }
+                for cue in ("problem", "rule")
+            },
         },
         "bgm": f"audio/bgm/{bgm_track['output']}",
         "bubbleSe": "audio/se_pop.wav",
@@ -525,6 +577,8 @@ def main(argv: list[str] | None = None) -> int:
         manifest = load_manifest(manifest_path)
         design = json.loads((ASSETS_DIR / "design.json").read_text(encoding="utf-8"))
         opening_props(design)
+        opening_report = opening_narration(design, no_tts=args.no_tts)
+        opening_frames = int(opening_report["line"]["frames"])
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"エラー: {exc}", file=sys.stderr)
         return 1
@@ -584,7 +638,7 @@ def main(argv: list[str] | None = None) -> int:
                 manifest, key, tracks, rebuild_bgm=args.rebuild_bgm
             )
             stage_assets(key, track, narration_dir)
-            props = build_props(item, design, report, track)
+            props = build_props(item, design, report, track, opening_frames=opening_frames)
             props_path = out_dir / "props" / f"{key}.json"
             write_json(props_path, props)
             if args.skip_render:
@@ -596,7 +650,7 @@ def main(argv: list[str] | None = None) -> int:
             normalize_loudness(raw_path, video_path)
             stills = extract_stills(video_path, key, out_dir)
             probe = probe_video(video_path, key, out_dir)
-            timeline = timeline_summary(report)
+            timeline = timeline_summary(report, opening_frames)
             manifest[key] = _record(
                 item, props_path, video_path, track, narration_summary,
                 probe, stills, timeline,
@@ -604,7 +658,8 @@ def main(argv: list[str] | None = None) -> int:
             save_manifest(manifest, manifest_path)
             print(
                 f"{key}: ビルド完了（尺 {float(probe.get('duration', 0)):.3f}s / 導入 0–{timeline['opening_end']}f"
-                f" → 本編 {timeline['main_fully_visible']}f で切替完了 / ナレーション problem "
+                f" → 本編 {timeline['main_fully_visible']}f で切替完了 / ナレーション 見出し "
+                f"{timeline['narration_opening_start']}–{timeline['narration_opening_end']}f・problem "
                 f"{timeline['narration_problem_start']}f・rule {timeline['narration_rule_start']}f"
                 f"・終了 {timeline['narration_end']}f / 総 {timeline['total_frames']}f）"
             )

@@ -71,7 +71,7 @@ def render_stills(items: list[dict[str, Any]]) -> list[str]:
         shutil.copy2(background, PUBLIC_DIR / "bg" / f"{key}.jpg")
         props = build_props(item, design, report, {"output": "unused"})
         props["bgm"] = "audio/se_pop.wav"
-        for cue in ("problem", "rule"):
+        for cue in ("opening", "problem", "rule"):
             props["narration"][cue]["file"] = "audio/se_pop.wav"
         props_path = STILLS_DIR / "props" / f"{key}.json"
         write_json(props_path, props)

@@ -302,6 +302,10 @@ def _build_inputs(tmp_path: Path, monkeypatch) -> None:
         for key in ("001-first", "002-next")
     ])
     monkeypatch.setattr(build, "load_manifest", lambda *args: {})
+    monkeypatch.setattr(
+        build, "opening_narration",
+        lambda *args, **kwargs: {"line": {"seconds": 2.0, "frames": 60}},
+    )
     monkeypatch.setattr(build, "load_bgm_tracks", lambda: [{
         "output": "track.m4a", "s3_key": "track", "provisional": False,
     }])
@@ -395,3 +399,63 @@ def test_build_irodori_budget_continues_but_infer_error_stops(
     monkeypatch.setattr(build.narration_irodori, "synthesize_cues", failed)
     assert build.main(["--skip-render"]) == 1
     assert calls == ["001-first"]
+
+
+def test_synthesize_line_trims_and_caches(tmp_path: Path, monkeypatch) -> None:
+    _refs(tmp_path, monkeypatch)
+    monkeypatch.setenv("IRODORI_DIR", str(tmp_path / "irodori"))
+    infer = FakeInfer([(2.0, 0.0)])
+    out_dir = tmp_path / "opening"
+
+    report = narration_irodori.synthesize_line(
+        "みだし", out_dir, config=_config(), seconds=2.2, max_seconds=2.5,
+        runner=infer, ffmpeg_runner=_fake_ffmpeg,
+    )
+
+    assert report["line"] == {"seconds": 2.0, "frames": 60}
+    assert report["seed"] == 1
+    command = infer.calls[0][0]
+    assert command[command.index("--seconds") + 1] == "2.2"
+    assert command[command.index("--text") + 1] == "みだし"
+    assert (out_dir / "line.wav").is_file()
+    again = narration_irodori.synthesize_line(
+        "みだし", out_dir, config=_config(), seconds=2.2, max_seconds=2.5,
+        runner=infer, ffmpeg_runner=_fake_ffmpeg,
+    )
+    assert again == report
+    assert len(infer.calls) == 1
+
+
+def test_synthesize_line_retakes_until_within_max(tmp_path: Path, monkeypatch) -> None:
+    _refs(tmp_path, monkeypatch)
+    monkeypatch.setenv("IRODORI_DIR", str(tmp_path / "irodori"))
+    infer = FakeInfer([(3.0, 0.0), (2.4, 0.0)])
+
+    report = narration_irodori.synthesize_line(
+        "みだし", tmp_path / "opening", config=_config(), seconds=2.2, max_seconds=2.5,
+        runner=infer, ffmpeg_runner=_fake_ffmpeg,
+    )
+
+    assert report["seed"] == 2
+    assert [take["seconds"] for take in report["takes"]] == [3.0, 2.4]
+
+
+def test_opening_narration_rejects_overlap_with_problem(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(build, "OPENING_NARRATION_DIR", tmp_path)
+    (tmp_path / "line.wav").write_bytes(b"wav")
+    design = {"opening": {"narration": {"text": "みだし", "seconds": 2.2, "max_seconds": 2.5}}}
+    for frames, ok in ((78, True), (79, False)):
+        (tmp_path / "narration.json").write_text(
+            json.dumps({"text": "みだし", "line": {"seconds": frames / 30, "frames": frames}}),
+            encoding="utf-8",
+        )
+        if ok:
+            assert build.opening_narration(design, no_tts=True)["line"]["frames"] == frames
+        else:
+            with pytest.raises(build.NarrationBudgetError, match="重なります"):
+                build.opening_narration(design, no_tts=True)
+    (tmp_path / "narration.json").write_text(
+        json.dumps({"text": "別の文", "line": {"seconds": 2.0, "frames": 60}}), encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="一致しません"):
+        build.opening_narration(design, no_tts=True)

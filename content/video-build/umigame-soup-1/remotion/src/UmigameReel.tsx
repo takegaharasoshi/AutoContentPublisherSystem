@@ -6,6 +6,7 @@ import {
   Interactive,
   Sequence,
   interpolate,
+  spring,
   staticFile,
   useCurrentFrame,
   useVideoConfig,
@@ -21,6 +22,11 @@ import {
   NARRATION_START,
   OPENING_END,
   OPENING_FADE_FRAMES,
+  OPENING_HOP_PERIOD,
+  OPENING_JR_BUBBLE_IN,
+  OPENING_MASTER_BUBBLE_IN,
+  OPENING_NARRATION_START,
+  OPENING_SHEEN_PERIOD,
   beatAt,
   hopLift,
   loopPhase,
@@ -42,7 +48,9 @@ const OPENING_JR_BUBBLE_TOP = 1075;
  * 版面:
  * - 導入シーン（先頭 2.5 秒。セット改修 R-1-1・版面は R-1-2 で決定）: 「新体験」スタンプ → 黄色の 2 行見出し
  *   → 説明文（「真相」を朱色・「質問」を黄色のタグで強調）→ 「今日の謎」の暗いカードに hook → キャラの自己紹介の
- *   吹き出し（カメロックが上・Jr. が下）。終わりの 8 フレームで本編の版面へクロスフェードする
+ *   吹き出し（カメロックが上・Jr. が下）。終わりの 8 フレームで本編の版面へクロスフェードする。
+ *   動き: スタンプが跳ねながらフェードイン / 見出しと「質問」タグに光沢スイープ / 「真相」が小さく跳ねる /
+ *   自己紹介の吹き出しはカメロック → Jr. の順に後から入る（SE 付き）。見出しだけナレーションで読み上げる
  * - 全面: 問題の情景イラスト（90 年代 OVA 塗り・中間調）+ 薄いオーバーレイ（ゆっくりズーム呼吸。周期 = 総フレーム）
  * - 常時表示: つかみ帯（光沢スイープ + 呼吸）/ 「問題」+ 問題文全文 / ルール帯
  * - 下部ゾーン（右 12% は Instagram UI に空ける）: 出題者カメロック（左）と Jr.（右）が常駐。
@@ -96,6 +104,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
 
   const narrationRuleStart = NARRATION_START + narration.problem.frames + NARRATION_GAP;
   const narrationEnd = narrationRuleStart + narration.rule.frames;
+  const openingNarrationEnd = OPENING_NARRATION_START + narration.opening.frames;
 
   return (
     <AbsoluteFill name="Reel" style={{ backgroundColor: "#07141b", fontFamily: FONT_TEXT }}>
@@ -251,7 +260,7 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
 
       {/* 導入シーン: 新体験スタンプ・見出し・説明文・今日の謎（キャラは下部ゾーンに常駐） */}
       {openingVisible ? (
-        <OpeningLayer opening={opening} hook={hook} hookFontSize={openingHookFontSize} opacity={1 - mainOpacity} />
+        <OpeningLayer opening={opening} hook={hook} hookFontSize={openingHookFontSize} opacity={1 - mainOpacity} frame={frame} fps={fps} />
       ) : null}
 
       {/* 下部ゾーン: キャラクター 2 体（常駐。浮遊 + 呼吸 + 切替時の小さな跳ね） */}
@@ -286,24 +295,38 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
       {/* 導入シーンの自己紹介の吹き出し（導入シーンと一緒にフェードアウトする） */}
       {openingVisible ? (
         <Interactive.Div name="Opening self intro" style={{ position: "absolute", inset: 0, opacity: 1 - mainOpacity }}>
-          <MasterBubble
-            top={OPENING_MASTER_BUBBLE_TOP}
-            text={opening.selfIntro.master}
-            tag={master.name}
-            tagDot={tagDot}
-            pop={false}
-            glow={false}
-            lift={0}
-          />
-          <JrBubble
-            top={OPENING_JR_BUBBLE_TOP}
-            text={opening.selfIntro.jr}
-            tag={jr.name}
-            tagDot={tagDot}
-            pop={false}
-            glow={false}
-            lift={0}
-          />
+          <Sequence
+            name="Opening master bubble"
+            from={OPENING_MASTER_BUBBLE_IN}
+            durationInFrames={OPENING_END + OPENING_FADE_FRAMES - OPENING_MASTER_BUBBLE_IN}
+            layout="none"
+          >
+            <MasterBubble
+              top={OPENING_MASTER_BUBBLE_TOP}
+              text={opening.selfIntro.master}
+              tag={master.name}
+              tagDot={tagDot}
+              pop
+              glow={false}
+              lift={0}
+            />
+          </Sequence>
+          <Sequence
+            name="Opening jr bubble"
+            from={OPENING_JR_BUBBLE_IN}
+            durationInFrames={OPENING_END + OPENING_FADE_FRAMES - OPENING_JR_BUBBLE_IN}
+            layout="none"
+          >
+            <JrBubble
+              top={OPENING_JR_BUBBLE_TOP}
+              text={opening.selfIntro.jr}
+              tag={jr.name}
+              tagDot={tagDot}
+              pop
+              glow={false}
+              lift={0}
+            />
+          </Sequence>
         </Interactive.Div>
       ) : null}
 
@@ -359,12 +382,25 @@ export const UmigameReel: React.FC<UmigameReelProps> = ({
         volume={(f) =>
           interpolate(
             f,
-            [NARRATION_START - 6, NARRATION_START, narrationEnd, narrationEnd + fps / 2],
-            [0.32, 0.14, 0.14, 0.32],
+            [0, openingNarrationEnd, openingNarrationEnd + 4, NARRATION_START - 6, NARRATION_START, narrationEnd, narrationEnd + fps / 2],
+            [0.14, 0.14, 0.24, 0.24, 0.14, 0.14, 0.32],
             { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
           )
         }
       />
+      <Sequence
+        name="Narration opening"
+        from={OPENING_NARRATION_START}
+        durationInFrames={narration.opening.frames}
+        layout="none"
+      >
+        <Audio src={staticFile(narration.opening.file)} volume={1} />
+      </Sequence>
+      {[OPENING_MASTER_BUBBLE_IN, OPENING_JR_BUBBLE_IN].map((seFrame) => (
+        <Sequence key={`opening-se-${seFrame}`} name={`Opening SE ${seFrame}`} from={seFrame} durationInFrames={8} layout="none">
+          <Audio src={staticFile(bubbleSe)} volume={0.6} />
+        </Sequence>
+      ))}
       <Sequence name="Narration problem" from={NARRATION_START} durationInFrames={narration.problem.frames} layout="none">
         <Audio src={staticFile(narration.problem.file)} volume={1} />
       </Sequence>
@@ -390,7 +426,15 @@ const OpeningLayer: React.FC<{
   hook: string;
   hookFontSize: number;
   opacity: number;
-}> = ({ opening, hook, hookFontSize, opacity }) => (
+  frame: number;
+  fps: number;
+}> = ({ opening, hook, hookFontSize, opacity, frame, fps }) => {
+  // スタンプ: 上から落ちて跳ねながらフェードイン（減衰の弱いばね）
+  const stampSpring = spring({ frame, fps, config: { damping: 7, mass: 0.6, stiffness: 140 } });
+  const stampOpacity = interpolate(frame, [0, 5], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // 見出しの光沢: 導入中に 2 回、左から右へ通す
+  const sheen = loopPhase(frame + OPENING_SHEEN_PERIOD / 2, OPENING_SHEEN_PERIOD);
+  return (
   <Interactive.Div name="Opening layer" style={{ position: "absolute", inset: 0, opacity }}>
     <Interactive.Div
       name="Opening dim"
@@ -419,6 +463,9 @@ const OpeningLayer: React.FC<{
         letterSpacing: 4,
         boxShadow: "0 8px 22px rgba(0,0,0,0.45), inset 0 0 0 4px rgba(255,255,255,0.35)",
         rotate: "-8deg",
+        opacity: stampOpacity,
+        translate: `0px ${(1 - stampSpring) * -120}px`,
+        scale: `${1 + (1 - stampSpring) * 0.35}`,
       }}
     >
       {opening.badge}
@@ -440,7 +487,28 @@ const OpeningLayer: React.FC<{
       }}
     >
       {opening.headline.map((line) => (
-        <div key={line}>{line}</div>
+        <div key={line} style={{ position: "relative" }}>
+          {line}
+          {/* 光沢: 同じ文字を白いグラデーションで切り抜いて重ね、位置を流す */}
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              color: "transparent",
+              textShadow: "none",
+              backgroundImage:
+                "linear-gradient(100deg, transparent 0%, transparent 38%, rgba(255,255,255,0.95) 50%, transparent 62%, transparent 100%)",
+              backgroundSize: "300% 100%",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: `${100 - sheen * 100}% 0%`,
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+            }}
+          >
+            {line}
+          </span>
+        </div>
       ))}
     </Interactive.Div>
     <Interactive.Div
@@ -462,7 +530,7 @@ const OpeningLayer: React.FC<{
       {opening.lead.map((line, index) => (
         <div key={index}>
           {line.map((piece, pieceIndex) => (
-            <LeadPiece key={pieceIndex} text={piece.text} em={piece.em} />
+            <LeadPiece key={pieceIndex} text={piece.text} em={piece.em} frame={frame} />
           ))}
         </div>
       ))}
@@ -498,12 +566,17 @@ const OpeningLayer: React.FC<{
       </Interactive.Div>
     </Interactive.Div>
   </Interactive.Div>
-);
+  );
+};
 
-/** 説明文の文字片（accent = 朱色の文字・tag = 黄色の小さなタグ） */
-const LeadPiece: React.FC<{ text: string; em?: "accent" | "tag" }> = ({ text, em }) => {
+/** 説明文の文字片（accent = 朱色の文字で小さく跳ねる・tag = 黄色の小さなタグで光沢が通る） */
+const LeadPiece: React.FC<{ text: string; em?: "accent" | "tag"; frame: number }> = ({ text, em, frame }) => {
   if (em === "accent") {
-    return <span style={{ color: "#ff7a5c", fontSize: 54 }}>{text}</span>;
+    const t = loopPhase(frame + OPENING_HOP_PERIOD - 10, OPENING_HOP_PERIOD);
+    const lift = t < 0.5 ? Math.sin(t * 2 * Math.PI) * 12 : 0;
+    return (
+      <span style={{ display: "inline-block", color: "#ff7a5c", fontSize: 54, translate: `0px ${-lift}px` }}>{text}</span>
+    );
   }
   if (em === "tag") {
     return (
@@ -520,9 +593,22 @@ const LeadPiece: React.FC<{ text: string; em?: "accent" | "tag" }> = ({ text, em
           lineHeight: 1.3,
           rotate: "-3deg",
           boxShadow: "0 6px 16px rgba(0,0,0,0.45)",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
         {text}
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            width: "60%",
+            left: `${-60 + loopPhase(frame, OPENING_SHEEN_PERIOD) * 180}%`,
+            background: "linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.75) 50%, transparent 100%)",
+          }}
+        />
       </span>
     );
   }

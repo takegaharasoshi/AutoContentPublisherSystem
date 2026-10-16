@@ -39,6 +39,7 @@ export const mockProps: UmigameReelProps = {
     { role: "master", text: "関係ありません。" },
   ],
   narration: {
+    opening: { file: "narration/_opening/line.wav", frames: 65 },
     problem: { file: "narration/classic-umigame/problem.wav", frames: 372 },
     rule: { file: "narration/classic-umigame/rule.wav", frames: 162 },
   },

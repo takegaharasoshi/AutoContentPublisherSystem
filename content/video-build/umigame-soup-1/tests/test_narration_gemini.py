@@ -278,6 +278,10 @@ def _build_inputs(tmp_path: Path, monkeypatch, keys: tuple[str, ...]) -> None:
         for key in keys
     ])
     monkeypatch.setattr(build, "load_manifest", lambda *args: {})
+    monkeypatch.setattr(
+        build, "opening_narration",
+        lambda *args, **kwargs: {"line": {"seconds": 2.0, "frames": 60}},
+    )
     monkeypatch.setattr(build, "load_bgm_tracks", lambda: [{
         "output": "track.m4a", "s3_key": "track", "provisional": False,
     }])

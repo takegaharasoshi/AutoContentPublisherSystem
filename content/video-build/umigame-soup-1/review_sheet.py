@@ -98,7 +98,8 @@ def generate_review_html(
         timeline = record.get("timeline") if isinstance(record.get("timeline"), dict) else {}
         timeline_html = (
             f"<p><b>タイムライン:</b> 導入 0–{_text(timeline.get('opening_end'))}f → 本編 "
-            f"{_text(timeline.get('main_fully_visible'))}f で切替完了 / ナレーション problem "
+            f"{_text(timeline.get('main_fully_visible'))}f で切替完了 / ナレーション 見出し "
+            f"{_text(timeline.get('narration_opening_start'))}–{_text(timeline.get('narration_opening_end'))}f・problem "
             f"{_text(timeline.get('narration_problem_start'))}f・rule "
             f"{_text(timeline.get('narration_rule_start'))}f・終了 "
             f"{_text(timeline.get('narration_end'))}f / 総 {_text(timeline.get('total_frames'))}f</p>"

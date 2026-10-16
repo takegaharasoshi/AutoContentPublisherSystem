@@ -14,7 +14,7 @@
 <h1>セット計画書: 探偵カメロックのウミガメのスープ（umigame-soup-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-10-17（<a href="#step-R-1-2">R-1-2</a> の第 1 稿が no-go → 静止画の比較で版面 V6c に決め、R-1-1 の第 2 稿を作った）。前回: 2026-10-17（<a href="#step-R-1-1">R-1-1</a> を完了: 導入シーン 2.5 秒 + 一本道 27 秒の版面を試作し、R-1-2 のレビューへ）。前回: 2026-10-17（アイデア <a href="../ideas/umigame-opening-hook.md">umigame-opening-hook</a> を採用し、改修 <a href="#phase-R-1">R-1</a>〔冒頭の導入シーン・一本道化。本番配置の前に全件レビュー R-1-4 を置く〕と効果確認の確認待ちを起票した）。前回: 2026-10-13（開発レーン <a href="development-log.html#step-21-8d2">21-8d2</a> の完了を反映: 核心語の本番切替が済み、W-2 の G5 が解禁。概要表と着手条件を完了形に直した）。前回: 2026-10-12（W-2 を新しい補充の流れ・4 問で書き直し、開発レーンの 21-8b を本書へ統合した）。前回: 2026-10-12（開発レーン <a href="development-log.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。）</span>
+  <span>最終更新: 2026-10-17（R-1-1 の第 3 稿: 見出しの読み上げと導入の動きを足した）。前回: 2026-10-17（<a href="#step-R-1-2">R-1-2</a> の第 1 稿が no-go → 静止画の比較で版面 V6c に決め、R-1-1 の第 2 稿を作った）。前回: 2026-10-17（<a href="#step-R-1-1">R-1-1</a> を完了: 導入シーン 2.5 秒 + 一本道 27 秒の版面を試作し、R-1-2 のレビューへ）。前回: 2026-10-17（アイデア <a href="../ideas/umigame-opening-hook.md">umigame-opening-hook</a> を採用し、改修 <a href="#phase-R-1">R-1</a>〔冒頭の導入シーン・一本道化。本番配置の前に全件レビュー R-1-4 を置く〕と効果確認の確認待ちを起票した）。前回: 2026-10-13（開発レーン <a href="development-log.html#step-21-8d2">21-8d2</a> の完了を反映: 核心語の本番切替が済み、W-2 の G5 が解禁。概要表と着手条件を完了形に直した）。前回: 2026-10-12（W-2 を新しい補充の流れ・4 問で書き直し、開発レーンの 21-8b を本書へ統合した）。前回: 2026-10-12（開発レーン <a href="development-log.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。）</span>
 </div>
 
 <div class="note">
@@ -112,7 +112,7 @@
 <div class="plan-meta"><strong>R-1-1</strong><span class="plan-status">完了</span><span>2026-10-17</span></div>
 <h3>導入シーンと一本道化の版面を試作する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし（すぐ着手できる）。</p>
-<p data-field="result"><strong>結果：</strong><strong>2026-10-17 完了</strong>。導入シーン 2.5 秒 + 一本道 27 秒（810 フレーム）の版面を作り、第 1 バッチの 2 問（012・015）で試作 MP4 と固定コピー 3 案を見比べる <code>work/review.html</code> を作った。同日の <a href="#step-R-1-2">R-1-2</a> で第 1 稿が no-go になり、静止画の比較で決めた版面（V6c）で<strong>第 2 稿</strong>を作り直した（再確認は R-1-2）。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-17 完了</strong>。導入シーン 2.5 秒 + 一本道 27 秒（810 フレーム）の版面を作り、第 1 バッチの 2 問（012・015）で試作 MP4 と固定コピー 3 案を見比べる <code>work/review.html</code> を作った。同日の <a href="#step-R-1-2">R-1-2</a> で第 1 稿が no-go になり、静止画の比較で決めた版面（V6c）で<strong>第 2 稿</strong>を作り直した（再確認は R-1-2）。続けて第 2 稿への指摘を受け、見出しの読み上げと導入の動きを足した<strong>第 3 稿</strong>を作った。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -148,6 +148,7 @@
 <p><strong>試作</strong>: <code>build.py --no-tts --content-key 012-early-morning-run --content-key 015-unlicensed-driver --out-dir work/r1-proto --copy-variants</code>（<code>--out-dir</code> と <code>--copy-variants</code> は本ステップで追加。承認済みの <code>work/videos/</code>・<code>work/manifest.json</code> は上書きしていない）。ffprobe は 2 本とも h264 1080x1920 30fps・810 フレーム・aac・27.1 秒。ナレーションは 012 が problem 90f・rule 525f・終了 706f、015 が problem 90f・rule 548f・終了 713f。pytest 60 件全パス。導入にナレーション（hook の読み上げ）は付けていない（R-1-2 の判断事項 ⑥）。</p>
 <p><strong>W-2 への影響</strong>: 版面の変更は main に入ったため、W-2 の G4 を R-1-2 の go より前に行う場合、今のコードでは新しい版面（27 秒）でビルドされる。旧版面（24 秒・ループ）でビルドしたいときは本ステップより前のコミット（975b616）のビルド資材を使い、BGM も 24 秒版に戻す。<code>publish.py</code> の尺検査も 27 秒になったため、24 秒の動画は配置できない。</p>
 <p><strong>第 2 稿（2026-10-17・R-1-2 の no-go を受けて）</strong>: 導入シーンを R-1-2 で決めた版面（V6c）に作り替えた。固定コピーの 3 案（<code>opening_copy</code>）と、案ごとの静止画を出す <code>build.py --opening-copy / --copy-variants</code>、hook を 2 行に割る <code>openingHook.ts</code> は使わなくなったため削除し、文言を <code>design.json</code> の <code>opening</code>（badge・headline・lead〔強調は accent / tag〕・hook_label・self_intro）にまとめて <code>build.py</code> の <code>opening_props</code> で検査する。自己紹介の吹き出しは本編の吹き出しの部品に上端の指定を足して流用し、導入シーンと一緒にフェードアウトする。タイムライン・尺・ナレーション・BGM は第 1 稿のまま。試作 2 問を作り直した（ffprobe は 2 本とも h264 1080x1920 30fps・810 フレーム・aac・27.1 秒。ナレーションの位置は第 1 稿と同じ）。pytest 59 件全パス。</p>
+<p><strong>第 3 稿（2026-10-17・R-1-2 の第 2 稿への指摘）</strong>: 見出しの読み上げを足した。全問共通の 1 文のため <code>narration_irodori.synthesize_line</code>（新設）で 1 回だけ合成して <code>work/narration/_opening/</code> にキャッシュし、全問で使い回す。文は読み間違いを避けて仮名書き「コメントでひもとく、すいりゲーム！」（<code>design.json</code> の <code>opening.narration</code>・seconds 2.2 / 上限 2.5 秒）。合成結果は 2.183 秒（65 フレーム・seed 1）で、フレーム 6〜71 に置く（問題文の読み上げ 90 の 6 フレーム前までに終わることを <code>build.py</code> で検査）。BGM は導入の読み上げ中も下げる。動き（定数は <code>timeline.ts</code>）: スタンプはばね（減衰弱め）で上から落ちて跳ねながらフェードイン / 見出しは文字を白いグラデーションで切り抜いて重ねた光沢を 36 フレーム周期で流す（導入中に 2 回）/ 「質問」タグにも同じ周期の光沢 / 「真相」は 24 フレーム周期で 12px 跳ねる / 自己紹介の吹き出しはカメロックがフレーム 22、Jr. が 38 にポップインし SE を鳴らす。試作 2 問を作り直した（ffprobe・尺・本編のナレーション位置は第 2 稿と同じ）。pytest 62 件全パス。</p>
 <p>確認待ち: 該当なし。課題表: <a href="../issues/index.html#I-041">I-041</a> は据え置き継続（トリガー = R-1-2 の go）。</p>
 </div>
 </details>
@@ -165,7 +166,7 @@
 <div class="plan-meta"><strong>R-1-2</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>導入シーンの版面とコピーを承認する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>R-1-1 の push 直後から確認できる。</p>
-<p data-field="result"><strong>現況：</strong>第 1 稿は <strong>no-go</strong>（2026-10-17。趣旨を大きく・hook を小さく・「新体験」・自己紹介の吹き出し）。静止画で 5 巡の比較を経て版面 V6c に決め、R-1-1 の第 2 稿として試作を作り直した。<strong>第 2 稿の動画の確認待ち</strong>。</p>
+<p data-field="result"><strong>現況：</strong>第 1 稿は <strong>no-go</strong>（2026-10-17。趣旨を大きく・hook を小さく・「新体験」・自己紹介の吹き出し）。静止画で 5 巡の比較を経て版面 V6c に決め、R-1-1 の第 2 稿として試作を作り直した。第 2 稿への指摘（見出しの読み上げ・導入の動き）を反映した<strong>第 3 稿の動画の確認待ち</strong>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -188,7 +189,8 @@
 <div class="plan-fold-inner">
 <p><strong>第 1 稿（2026-10-17・no-go）</strong>: ユーザーの指摘は「全体の情報量をもう少し上げる」「趣旨の部分をもっと大きく・謎の一行（hook）はもっと小さく」「趣旨に『新体験』を入れる」「キャラが浮いて見えるので自己紹介の吹き出しを入れる」。観点 ②（固定コピー）は第 1 稿の 3 案から選ばず、下の文言に置き換えた。</p>
 <p><strong>版面の決定（静止画で比較・<code>work/r1-poc-opening/compare.html</code>）</strong>: 第 1 巡 4 案（見出し主役 / 説明つき / スタンプ / 遊び方 3 ステップ）→ 説明つき（V2）をベースに、V3 のスタンプと V1 の 2 行見出しを組み合わせる（V5）→ 見出しと説明が同じ白なのを直す 3 案から V5a（見出し黄色・説明白）→ V5a に説明文の部分強調を足す 3 案から <strong>V6c に決定</strong>。決まった版面: 傾けた朱色の「新体験」スタンプ / 黄色の 2 行見出し「コメントで紐解く！ / 推理ゲーム」/ 白の説明「謎の真相を、コメントの / 質問だけで解き明かせ！」（「真相」は朱色の文字、「質問」は黄色の小さなタグ）/ 「今日の謎」ラベル付きの暗いカードに hook（1 行・最大 60px）/ 自己紹介の吹き出し（カメロック「名探偵カメロックだ。謎を出すよ！」が上・920px、Jr.「ボクは助手の Jr.！一緒に推理しよう」が下・1075px。間隔はユーザー指定で 2 回広げた）。文言は <code>assets/design.json</code> の <code>opening</code>（全問共通・ストックの素材は増やさない）。</p>
-<p>残る観点（第 2 稿の動画で見る）: ③ 導入の長さ（約 2.5 秒）④ 導入から本編への切り替わり ⑤ 尺（27 秒）⑥ 導入に hook の読み上げを付けるか。</p>
+<p><strong>第 2 稿への指摘（2026-10-17）</strong>: 観点 ⑥ は「hook ではなく見出し『コメントで紐解く推理ゲーム』だけを読み上げる」に決定。あわせて導入に動きを足す: 「新体験」のスタンプが跳ねながらフェードイン / 見出しに本編のつかみ帯と同じ光沢 / 「質問」のタグにも光沢 / 「真相」を小さく跳ねさせる / 自己紹介の吹き出しを後から入れる。R-1-1 の第 3 稿で反映した。</p>
+<p>残る観点（第 3 稿の動画で見る）: ③ 導入の長さ（約 2.5 秒）④ 導入から本編への切り替わり ⑤ 尺（27 秒）、見出しの読み上げの読み・間、導入の動きの量。</p>
 </div>
 </details>
 </div>

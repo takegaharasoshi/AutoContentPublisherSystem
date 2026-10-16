@@ -64,6 +64,7 @@ def _design() -> dict:
             "headline": ["見出し"],
             "lead": [[{"text": "謎の"}, {"text": "真相", "em": "accent"}], [{"text": "質問", "em": "tag"}]],
             "hook_label": "今日の謎",
+            "narration": {"text": "みだし", "seconds": 2.2, "max_seconds": 2.5},
             "self_intro": {"master": "父です", "jr": "子です"},
         },
     }
@@ -77,6 +78,9 @@ def test_build_props_matches_schema_shape() -> None:
     assert props["opening"]["lead"][0][1] == {"text": "真相", "em": "accent"}
     assert props["opening"]["selfIntro"] == {"master": "父です", "jr": "子です"}
     assert props["opening"]["hookLabel"] == "今日の謎"
+    assert props["narration"]["opening"] == {"file": "narration/_opening/line.wav", "frames": 75}
+    with_frames = build_props(_item(), _design(), _report(), _tracks()[0], opening_frames=65)
+    assert with_frames["narration"]["opening"]["frames"] == 65
     assert props["master"] == {
         "name": "父", "base": "char/master_base.png", "happy": "char/master_happy.png"
     }
@@ -151,7 +155,9 @@ def test_repo_design_opening_is_valid() -> None:
 
 
 def test_timeline_summary_places_narration_after_opening() -> None:
-    summary = timeline_summary(_report(10.0, 5.0))
+    summary = timeline_summary(_report(10.0, 5.0), 65)
+    assert summary["narration_opening_start"] == 6
+    assert summary["narration_opening_end"] == 71
     assert summary["opening_end"] == 75
     assert summary["main_fully_visible"] == 83
     assert summary["narration_problem_start"] == 90
