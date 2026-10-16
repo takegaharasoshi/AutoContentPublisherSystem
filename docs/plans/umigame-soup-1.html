@@ -14,7 +14,7 @@
 <h1>セット計画書: 探偵カメロックのウミガメのスープ（umigame-soup-1）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">セットレーン</span>
-  <span>最終更新: 2026-10-13（開発レーン <a href="development-log.html#step-21-8d2">21-8d2</a> の完了を反映: 核心語の本番切替が済み、W-2 の G5 が解禁。概要表と着手条件を完了形に直した）。前回: 2026-10-12（W-2 を新しい補充の流れ・4 問で書き直し、開発レーンの 21-8b を本書へ統合した）。前回: 2026-10-12（開発レーン <a href="development-log.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。）</span>
+  <span>最終更新: 2026-10-17（アイデア <a href="../ideas/umigame-opening-hook.md">umigame-opening-hook</a> を採用し、改修 <a href="#phase-R-1">R-1</a>〔冒頭の導入シーン・一本道化〕と効果確認の確認待ちを起票した）。前回: 2026-10-13（開発レーン <a href="development-log.html#step-21-8d2">21-8d2</a> の完了を反映: 核心語の本番切替が済み、W-2 の G5 が解禁。概要表と着手条件を完了形に直した）。前回: 2026-10-12（W-2 を新しい補充の流れ・4 問で書き直し、開発レーンの 21-8b を本書へ統合した）。前回: 2026-10-12（開発レーン <a href="development-log.html#step-21-8a">21-8a</a> で新設。最初から新様式で作り、構造検査に登録した。）</span>
 </div>
 
 <div class="note">
@@ -38,7 +38,7 @@
 <p>バックログは置かない（22-2 の方針）。セットの課題は<a href="../issues/index.html#lane-umigame-soup-1">課題体系の umigame-soup-1 節</a>へ起票する。補充スキルが起動時にセット名で照合する。</p>
 
 <h2>3. 週次補充と改修のステップ</h2>
-<p>週次補充（W-n）と改修（R-x）を <code>section.plan-phase</code>、その下のステップを <code>article.plan-step</code> で書く（様式の正は<a href="index.html#step-layout">計画体系 5.0</a>、枠は<a href="_templates/step.html">ステップ記載テンプレート</a>）。2 回目以降の定常の週次補充はステップを起こさず、<a href="umigame-soup-1-log.html">セット記録</a>の表に 1 行で残す（工程の正はスキル）。<strong>進行中の改修は現在なし</strong>。</p>
+<p>週次補充（W-n）と改修（R-x）を <code>section.plan-phase</code>、その下のステップを <code>article.plan-step</code> で書く（様式の正は<a href="index.html#step-layout">計画体系 5.0</a>、枠は<a href="_templates/step.html">ステップ記載テンプレート</a>）。2 回目以降の定常の週次補充はステップを起こさず、<a href="umigame-soup-1-log.html">セット記録</a>の表に 1 行で残す（工程の正はスキル）。<strong>進行中の改修は <a href="#phase-R-1">R-1（冒頭の導入シーン）</a></strong>。</p>
 
 <section class="plan-phase" data-plan-phase="W" id="phase-W">
 <h2 id="w">週次補充: 第 2 バッチ（補充スキルの実地テスト・4 問）</h2>
@@ -92,12 +92,132 @@
 </div>
 </section>
 
+<section class="plan-phase" data-plan-phase="R-1" id="phase-R-1">
+<h2 id="r-1">改修 R-1: 冒頭に導入シーンを足し、ループをやめて一本道にする（冒頭 3 秒の離脱対策）</h2>
+<p><strong>ゴール</strong>: 動画の先頭 約 2.5 秒で「コメントで解く推理ゲーム」というアカウントの趣旨と、その問題の謎の一行を見せてから本編へ入る。スキップ率（2026-10-12・10-13 の投稿で 83.9%・83.5%。同時期の logic-training-1 は 33〜54%）を下げる。</p>
+<details class="plan-fold">
+<summary>背景・決定 <span class="plan-hint">— アイデア umigame-opening-hook を採用・コピーは C 案・問題文は一括表示・一本道で 30 秒未満</span></summary>
+<div class="plan-fold-inner">
+<blockquote>アイデア <a href="../ideas/umigame-opening-hook.md">umigame-opening-hook</a>（2026-10-16 捕捉 → 同日〜10-17 壁打ち・採用）。仮説: logic-training-1 の版面（冒頭から問題文の全文 + ルール帯を出しっぱなし）を踏襲したため、最初の 1 秒が「文字の壁」になり、ウミガメのスープを知らない視聴者に何の動画か伝わらないままスキップされている。ユーザー決定: ① 導入のコピーは <strong>C 案</strong>（上に小さく趣旨の固定コピー・中央に大きくその問題の <code>hook</code>・下にカメロックと Jr.）② 導入後の問題文は<strong>今までどおり一括表示</strong> ③ <strong>ループの作りをやめて一本道</strong>にし、尺は中身で決めて <strong>30 秒未満</strong>（目安 27 秒）。尺の根拠: Instagram の評価の中心は再生回数ではなく視聴時間（% と秒数の両方）と反応で、ループで再生回数を稼ぐ必要はない（出典はアイデアの壁打ち記録）。課題表の照合: umigame-soup-1 節は該当なし。開発レーンの <a href="../issues/index.html#I-040">I-040</a>（設計書の描き直し・<code>docs/app/generators/</code> を含む）は本改修で 8.2〜8.4 の中身を実態へ直すだけのため同梱しない。画像バッチが尺を 24 秒固定で検査・記録している点は開発レーンの課題 <a href="../issues/index.html#I-041">I-041</a> として起票した（本改修は 24 秒の宣言のまま動く）。</blockquote>
+<blockquote>週次補充 <a href="#step-W-2">W-2</a> との順序: W-2 の G4（動画ビルド）より前に R-1-2 の承認まで終えれば、第 2 バッチは新しい版面でビルドできる。間に合わなければ W-2 は今の版面でビルドし、R-1-3 で一緒に再ビルドする（W-2 の期限 2026-11-04 を R-1 のために遅らせない）。</blockquote>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+<article class="plan-step" id="step-R-1-1" data-step-id="R-1-1" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-1</strong><span class="plan-status">未着手</span></div>
+<h3>導入シーンと一本道化の版面を試作する</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（すぐ着手できる）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>Remotion の版面（<code>content/video-build/umigame-soup-1/remotion/</code>）の先頭に<strong>導入ビート（約 2.5 秒）</strong>を足す。導入は C 案 = 上に小さく趣旨の固定コピー（<code>assets/design.json</code> に置く。案「コメントで解く推理ゲーム」ほか 2〜3 案）・中央に大きくその問題の <code>hook</code>・下にカメロックと Jr.。導入の後は今の本編（つかみ帯 + 問題カードの一括表示 + ルール帯 + 吹き出しのビート）。ループの作り（フレーム末尾 = フレーム 0・周期を尺の約数にする・継ぎ目のビート）をやめて一本道にし、尺は 30 秒未満（目安 27 秒）。ナレーションのアンカーを導入の分だけ後ろへずらし（予算 21 秒は維持）、BGM を新しい尺で前処理し直す。第 1 バッチの 2 問で試作 MP4 とレビューページを作る。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>本番の S3・Aurora は更新しない（再ビルドと配置は R-1-3）。素材のフィールドは増やさない（中央の一行は既存の <code>hook</code> を使う）。<code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> には触らない（画像バッチの尺 24 秒の宣言は <a href="../issues/index.html#I-041">I-041</a> で扱う）。<code>docs/app/</code> の設計書は R-1-3 で実態へ直す。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>ビルド資材のテスト（<code>content/video-build/umigame-soup-1/tests/</code>）が全パス（要約行を貼る）。ループの不変条件の検査は「ビートが順序どおり・隙間なし・末尾が尺に一致」へ置き換え、継ぎ目の検査（フレーム 0 と末尾の差分）は外す。</li>
+<li>試作 2 問の MP4 について、尺（30 秒未満）と導入 → 本編の切替フレーム、ナレーションの開始位置を貼る（ffprobe と build の出力）。</li>
+<li>導入の固定コピー 2〜3 案を見比べられるレビューページ（動画の <code>work/review.html</code>）を生成した。</li>
+<li>本書の R-1-1 を更新し、<code>python3 tools/docs_check.py --plan-only</code> の出力を貼る。日本語メッセージでコミットし <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>このステップではなし。試作の見た目は R-1-2 でユーザーが判断する。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/video-build/umigame-soup-1/</code>・本書）。stop after 30 turns。在庫の再ビルドと本番配置はしない。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— timeline.ts の不変条件・ナレーション・BGM・hook の表示</span></summary>
+<div class="plan-fold-inner">
+<p>今の作りは<a href="../app/generators/umigame-prebuilt.html#composition">方式設計書 8.2</a>（24 秒・720 フレーム・ループ前提）と <a href="../app/generators/umigame-prebuilt.html#tts-sync">8.3</a>（problem cue はフレーム 15 開始・予算 21 秒）。直すもの: <code>timeline.ts</code> の BEATS（先頭に導入・末尾の継ぎ目 0.4 秒を削る）とモジュール読み込み時の不変条件検査、周期アニメーションの「尺の約数」制約、ビルド後の継ぎ目検証、ナレーションのアンカー（導入の長さ + 0.5 秒）、BGM（今は 24 秒ちょうどのトラックを <code>prepare_bgm.py</code> で作っている。新しい尺で作り直す）。導入では <code>hook</code> を大きく出すため、今の字数上限（<code>validate.py</code> の HOOK_MAX）で 1〜2 行に収まる文字サイズを決める。導入にナレーション（hook の読み上げ）を付けるかは R-1-2 の判断事項とし、試作は BGM と SE だけでよい（付けるなら TTS の cue が 1 つ増える）。末尾の Jr. の締めの後はそのまま 2 周目の導入へ戻ってよい（ユーザー了承済み）。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-1-2" data-step-id="R-1-2" data-status="todo" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-2</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>導入シーンの版面とコピーを承認する</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-1-1 の push 直後から確認できる。</p>
+<p data-field="result"><strong>現況：</strong>未確認。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>R-1-1 のレビューページで試作 2 問を見て判断する。観点: ① 最初の 1 秒で「コメントで解く推理ゲーム」だと伝わるか ② 固定コピーはどの案か ③ 導入の長さ（約 2.5 秒）は長すぎ・短すぎないか ④ 導入から本編への切り替わりが自然か ⑤ 尺（30 秒未満）⑥ 導入に hook の読み上げを付けるか。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>なし。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ul data-field="acceptance">
+<li>—（ユーザー判断）。観点別の OK / NG と go / no-go が作業記録に残ること。</li>
+</ul>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>このステップ自体が人間ゲート。go で完了、no-go なら R-1-1 を直して再確認する。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>。<code>/step</code> は goal 対象外として断る）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>確認前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+<article class="plan-step" id="step-R-1-3" data-step-id="R-1-3" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>R-1-3</strong><span class="plan-status">未着手</span></div>
+<h3>在庫を全数再ビルドして本番を差し替え、設計書を実態へ直す</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>R-1-2 が go。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>R-1-2 で決まった版面で、未使用の在庫（第 1 バッチの残り + その時点でビルド済みなら第 2 バッチ）を全数再ビルドし、<code>publish.py</code> で両環境へ差し替える。<a href="../app/generators/umigame-prebuilt.html">方式設計書</a>の 8.2〜8.4（ループ前提・24 秒・継ぎ目の検証）と<a href="../app/sets/umigame-soup-1.html">セット別設計書</a>の尺・BGM の記述を実態へ直し、決定は <code>decision</code> コールアウトに残す。本書のステータス欄の「生成方式」の尺も直す。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p><code>services/</code> <code>shared/</code> <code>infra/</code> <code>database/</code> には触らない（投稿の宣言値 24 秒は <a href="../issues/index.html#I-041">I-041</a> のまま）。投稿時刻（20:00）の前後に配置しない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>対象の全数がビルド成功し、在庫確認クエリで両環境の <code>video_built_at</code> が今回の再ビルド以降になっている（出力を貼る）。</li>
+<li><code>publish.py</code> の配置結果（両環境・件数）を貼る。</li>
+<li>方式設計書・セット別設計書・本書のステータス欄を更新し、<code>python3 tools/docs_check.py --plan-only</code> の出力を貼る。日本語メッセージでコミットし <code>pull --rebase</code> → push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>再ビルド後の動画の抜き取り確認（動画の <code>work/review.html</code>・TTS を取り直した問は試聴）と、本番配置（S3・Aurora の更新）の許可プロンプト。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>content/video-build/umigame-soup-1/</code>・<code>docs/app/generators/umigame-prebuilt.html</code>・<code>docs/app/sets/umigame-soup-1.html</code>・本書）。stop after 30 turns。効果の観察は確認待ちリストで行い、本ステップに含めない。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 再ビルドの所要と TTS の取り直し</span></summary>
+<div class="plan-fold-inner"><p>全数再ビルドは 1 件 2〜3 分（TTS 約 45 秒 × テイク数 + レンダリング）で、背景を作り直さないため 1 時間以内の見込み（方式設計書 8.4）。ナレーションの文・設定を変えなければ TTS はキャッシュが効く（アンカーの位置だけが変わる）。R-1-2 で hook の読み上げを付けると決めた場合は全問で cue が増えるため、全数の試聴が要る。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+</div>
+</section>
+
 <h2 id="pending-checks">4. 確認待ちリスト（トリガー付き）</h2>
 <p>初回試行・効果観察など「次の機会に確かめる」項目を、ステップにせずここで追う（ルールと列の意味は<a href="index.html#pending-checks">計画体系 5.2</a>）。補充スキルが起動時にこの表を照合する。確認したら結果を書き、OK なら<a href="umigame-soup-1-log.html">セット記録</a>へ移す。稼働直後の確認（2 本目の前回の真相ブロック・コメント記録の初回取り込み・S3 ライフサイクル）は開発レーン由来のため<a href="development-plan.html#pending-checks">開発計画の確認待ちリスト</a>で追う。</p>
 <div class="table-wrap"><table>
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
-<tr><td>2026-10-12 / 効果仮説: 参加型の問題はコメントを呼び、リーチの伸びにつながるか（21-8a で起票）</td><td>日付型: 稼働 2 週間後（2026-10-26 以降の最初の作業日）</td><td>① <strong>コメント率</strong>（コメント数 / reach。投稿ごとに 72 時間時点の値）の中央値が、同じ期間の logic-training-1 の夜スロットより高いか ② 高い場合、投稿を重ねるにつれて reach が伸びているか（1〜2 本目と直近 2 本の比較）。抽出は <code>content/insights-analysis/run_queries.py</code>（読み取り専用）。2 週間で 8 本程度のため、<strong>傾向の確認であって決定ではない</strong></td><td>① が低い → 問題の難易度・キャプションの呼びかけ・返信の質を改修候補として課題体系へ起票する。① は高いが ② が伸びない → 月次 KPI 転記で追い続け、2026-11 分の転記時に再判断する</td><td>—</td></tr>
+<tr><td>2026-10-12 / 効果仮説: 参加型の問題はコメントを呼び、リーチの伸びにつながるか（21-8a で起票）</td><td>日付型: 稼働 2 週間後（2026-10-26 以降の最初の作業日）</td><td>① <strong>コメント率</strong>（コメント数 / reach。投稿ごとに 72 時間時点の値）の中央値が、同じ期間の logic-training-1 の夜スロットより高いか ② 高い場合、投稿を重ねるにつれて reach が伸びているか（1〜2 本目と直近 2 本の比較）。抽出は <code>content/insights-analysis/run_queries.py</code>（読み取り専用）。2 週間で 8 本程度のため、<strong>傾向の確認であって決定ではない</strong></td><td>① が低い → 問題の難易度・キャプションの呼びかけ・返信の質を改修候補として課題体系へ起票する。① は高いが ② が伸びない → 月次 KPI 転記で追い続け、2026-11 分の転記時に再判断する。<strong>注</strong>: 冒頭のスキップ率が 84% 前後と高く（<a href="#phase-R-1">R-1</a> の起票理由）、R-1 の差し替え前の期間はコメントの母数がほぼない。R-1 の差し替えより前にトリガーが来たら、判定は R-1 の効果確認と合わせて行ってよい</td><td>—</td></tr>
+<tr><td>2026-10-17 / 効果確認: <a href="#phase-R-1">R-1</a>（冒頭の導入シーン・一本道化）でスキップ率が下がるか</td><td>発生実績型: R-1-3 の差し替え後 4 本目の投稿から 72 時間後（差し替え日から絶対日付を書き足す）</td><td>差し替え後 4 本のスキップ率（72 時間時点）の中央値が <strong>65% 未満</strong>なら OK（改修前は 83.9%・83.5%）。あわせて平均視聴秒・コメント数を改修前と並べて記録する。抽出は <code>content/insights-analysis/run_queries.py per_post_latest</code>（読み取り専用）。reach が 1 本 100 前後と小さいため傾向の確認</td><td>65% 以上 → 冒頭の作り（導入の長さ・コピー・最初のフレーム）か、ネタ側（<code>hook</code> の引き）かを切り分ける課題を課題体系の umigame-soup-1 節へ起票する</td><td>—</td></tr>
 </tbody>
 </table></div>
 
