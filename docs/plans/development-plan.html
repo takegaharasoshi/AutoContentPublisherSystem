@@ -196,7 +196,7 @@
 <div class="table-wrap"><table>
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
-<tr><td>2026-09-19 / <a href="development-log.html#phase-22">22-3</a> <code>/incident</code>（初回試行）</td><td>22-3 完了後、次に本番・運用の異常が起きたとき</td><td>① 照合結果（予言されていた課題・前にも起きた事象）が原因究明の前に提示されるか ② 終了時に事象記録 + 課題の更新（発生履歴 / 起票 / 即 解消）が漏れなく行われるか</td><td>提示が後になる・更新が漏れる → SKILL.md の工程順を直す（Phase 22 の追補ステップ）</td><td>—</td></tr>
+<tr><td>2026-09-19 / <a href="development-log.html#phase-22">22-3</a> <code>/incident</code>（初回試行）</td><td>22-3 完了後、次に本番・運用の異常が起きたとき</td><td>① 照合結果（予言されていた課題・前にも起きた事象）が原因究明の前に提示されるか ② 終了時に事象記録 + 課題の更新（発生履歴 / 起票 / 即 解消）が漏れなく行われるか</td><td>提示が後になる・更新が漏れる → SKILL.md の工程順を直す（Phase 22 の追補ステップ）</td><td><strong>OK</strong>（2026-10-17・10-17 朝のストーリーズ一過性エラー〔<a href="logic-training-1-log.html">LT 記録</a> 2026-10-17〕で初回試行）: ① 照合結果〔予言されていた課題 = <a href="../issues/index.html#I-024">I-024</a>・I-014、前にも起きた事象 = 2026-08-23〕を aws コマンドより前に提示した ② 事象記録 1 件 + I-024 の発生履歴 +1・エスカレーション判定〔2 回目・展開〕を漏れなく行った。SKILL.md の修正なし（開発記録の確認済みへの移動は次の開発レーンの整理で行う）</td></tr>
 <tr><td>2026-10-14 / <a href="#step-27-2">27-2</a> follows_and_unfollows の取り直し（I-039）</td><td>27-2 の push 後、最初の日次収集（パイプライン完走・タスク定義の新リビジョン登録の後の 06:00 / 18:00 JST）</td><td>① logic-training-1 の <code>account_insights_daily</code> で、<code>metric_date</code> が 2026-09-17〜（収集日 − 3 日）の行の <code>metrics.follows_and_unfollows</code> に <code>results</code>（<code>FOLLOWER</code> / <code>NON_FOLLOWER</code>）が入っている ② ログに取り直しの INFO（対象日数・追記件数）が出て、取り直し失敗の WARNING が出ていない ③ 前日の行・他の指標のキーが変わっていない</td><td>入らない・失敗が出る → <code>/incident</code> で切り分け、追補ステップ（I-039 を残したまま）。OK なら I-039 を解消でクローズ</td><td>—</td></tr>
 </tbody>
 </table></div>
