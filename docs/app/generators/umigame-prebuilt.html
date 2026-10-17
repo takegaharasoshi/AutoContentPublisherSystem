@@ -71,7 +71,7 @@
 </div>
 <div class="decision">
   <span class="callout-title">決定（2026-09-04、21-3）: 単尺・単一スロット。尺の複数化は想定しない</span>
-  ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。理由: ① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低い。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<strong>2026-10-17 追記（R-1）</strong>: 単尺のまま 24 秒 → 29 秒へ変え、ループ前提（②の周期の制約）をやめた（8.2 の決定）。画像バッチ側は課題 <a href="../../issues/index.html#I-041">I-041</a> を <a href="../../plans/development-plan.html#phase-29">Phase 29</a> で合わせる（下の決定）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。
+  ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。理由: ① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低い。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<strong>2026-10-17 追記（R-1）</strong>: 単尺のまま 24 秒 → 29 秒へ変え、ループ前提（②の周期の制約）をやめた（8.2 の決定）。画像バッチ側は課題 <a href="../../issues/index.html#I-041">I-041</a> を <a href="../../plans/development-log.html#phase-29">Phase 29</a> で合わせる（下の決定）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。
 </div>
 
 <div class="decision">

@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
 <link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body data-plan-format="1">
+<body data-plan-format="1" data-plan-steps="none">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / 開発計画</nav>
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-17（<strong>29-3 完了 = Phase 29 のステップはすべて完了</strong>: umigame-prebuilt の許容値を 29 のみに戻し、<a href="../issues/index.html#I-041">I-041</a> を解消でクローズ。確認待ち「29-2 の尺の宣言値 29」を OK で開発記録へ〔push 後のパイプライン確認はユーザーの <code>/goal</code>〕。<a href="#step-29-3">29-3</a>）。前回: 2026-10-17（<strong>29-2 完了</strong>: Aurora・ローカルの宣言値と BGM の尺を 29 へ、新版面の生成結果 1 件を 29 に直した〔適用はユーザー〕。最初の定時生成の確認を<a href="#pending-checks">確認待ち</a>へ。次は 29-3。<a href="#step-29-2">29-2</a>）。前回: 2026-10-17（<strong>29-1 完了</strong>: umigame-prebuilt の許容値を {24, 29} に広げ、登録 SQL と方式設計書を 29 を正にした〔push 後のパイプライン確認はユーザーの <code>/goal</code>〕。次は 29-2〔Aurora の切替・ユーザー作業〕。<a href="#step-29-1">29-1</a>）。前回: 2026-10-17（<strong>Phase 29 起票</strong>: umigame の尺の宣言値を 29 秒へ揃える〔<a href="../issues/index.html#I-041">I-041</a> の展開。29-1 許容値を {24, 29} → 29-2 Aurora 切替〔ユーザー作業〕→ 29-3 許容値を 29 のみ〕。I-040 は Phase 30 以降）。前回: 2026-10-17（<strong>28-2 完了 = Phase 28 完了</strong>: 一過性エラーの段階別の扱いを実装・push〔パイプライン確認はユーザーの <code>/goal</code>〕。<a href="../issues/index.html#I-024">I-024</a> を解消でクローズ、本番での効果を<a href="#pending-checks">確認待ち</a>に起票。<a href="#step-28-2">28-2</a>）。前回: 2026-10-17（<strong>28-1 完了</strong>: 投稿の一過性エラーの段階別の扱い〔表・判定基準・記録の形〕を <a href="../app/batch-flow.html#transient-errors">batch-flow.html 3.3</a> に定め、ユーザーの go を得た。次は 28-2 の実装。<a href="#step-28-1">28-1</a>）。前回: 2026-10-17（<strong>Phase 28 起票</strong>: 投稿の一過性エラーを段階別に扱う〔<a href="../issues/index.html#I-024">I-024</a> ② の展開。28-1 設計 → 28-2 実装〕）。前回: 2026-10-17（確認待ち「27-2 follows_and_unfollows の取り直し」を OK と判定し、22-3 <code>/incident</code> 初回試行の行とともに開発記録の確認済みへ移した。<strong>Phase 27 完了</strong>〔I-039 解消〕・完了フェーズのサマリに追加）。前回: 2026-10-14（21-8e 返信の effort max を OK〔④ はユーザー判断でいったん OK〕で開発記録へ移した）。前回: 2026-10-14（<strong>確認待ちの照合 2</strong>: 21-8d2 核心語の DB 化を OK で開発記録へ移した〔485 へのコメント 7 件で v4 判定を確認〕。21-8e は ①〜③ OK・④ はユーザー判断待ち）。前回: 2026-10-14（<strong>確認待ちの照合</strong>: 21-6h 真相ブロック・26-5 載せ替えを OK で<a href="development-log.html">開発記録</a>の確認済みへ移した。21-8d2 は ① のみ OK〔コメント待ち〕・21-8e は途中経過を記入。22-3・27-2 はトリガー前）。前回: 2026-10-14（<strong>27-2 完了</strong>〔コミットまで・push は差分確認後〕: <code>follows_and_unfollows</code> を集計遅延の後に取り直して追記するようにした。<code>FOLLOWER</code> = 新規フォローと確定。push 後の最初の日次収集の確認を<a href="#pending-checks">確認待ち</a>に起票。Phase 27 のステップはすべて完了〔I-039 は確認待ちが OK になるまで残す〕。<a href="#step-27-2">27-2</a>）。前回: 2026-10-13（<strong>27-1 完了</strong>: <code>follows_and_unfollows</code> が空なのは API 側の集計遅延〔前日分は約 10 時間後でも未集計・2 日前より古い日は返る〕で、前日行を 1 回だけ書く収集と噛み合っていなかった。27-2 は対象日を 2 日以上前にずらして取り直す方針〔ユーザー確認済み 2026-10-13〕。<a href="#step-27-1">27-1</a>）。前回: 2026-10-13（<strong>Phase 27 起票</strong>: <a href="../issues/index.html#I-039">I-039</a>〔<code>follows_and_unfollows</code> に数値が入らない〕を 27-1 切り分け・27-2 修正 or 受容に展開。I-040 より先に軽い課題を片付ける方針〔ユーザー判断〕。ステップができたので <code>data-plan-steps="none"</code> を外した）。前回: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-17（<strong>計画整理</strong>: 完了した Phase 27・28・29 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-27">開発記録</a>へ移した。<code>#step-27-…</code>〜<code>#step-29-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a> の Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -23,8 +23,8 @@
 </div>
 
 <h2>完了フェーズのサマリ</h2>
-<p>設計（Phase D・A・9）・インフラ構築（Phase 0〜8）・アプリ実装と定常運用開始（Phase 10〜13）は 2026-07-06〜07-23 に、動画・リール対応（Phase 14）と勝負セットの投入（Phase 15）は 2026-07-23〜07-30 に、インサイト収集と KPI 運用（Phase 16）は 2026-08-01〜09-03 に、第 3 セット構築（Phase 17）は 2026-08-09〜08-28 に、プロジェクト管理の 2 レーン化（Phase 18）と <code>/goal</code> 組み込み（Phase 19）は 2026-08-28〜09-02 に、fantasy-animals-1 の停止（Phase 20）は 2026-09-03 に、課題体系の新設（Phase 22）は 2026-09-19 に、Codex 直接セッションの導入（Phase 23）は 2026-09-20〜09-21 に、設計書 HTML のスマホ閲覧対応（Phase 24）は 2026-09-21 に、計画書の記載様式の定着（Phase 25）は 2026-09-21〜09-22 に、第 4 セット umigame-soup-1 の構築（Phase 21）は 2026-09-03〜10-13 に、SNS 投稿バッチの当回固定（Phase 26）は 2026-09-22〜10-13 に、アカウント日次インサイトの follows_and_unfollows の取り直し（Phase 27）は 2026-10-13〜10-17 に完了済み。各ステップの実施記録（確認・備考の全文）と、完了時に計画書から移設したステップ一覧の原文は<a href="development-log.html">開発記録</a>を参照。</p>
-<details class="phase"><summary>完了フェーズ一覧（Phase D〜27・クリックで展開）</summary>
+<p>設計（Phase D・A・9）・インフラ構築（Phase 0〜8）・アプリ実装と定常運用開始（Phase 10〜13）は 2026-07-06〜07-23 に、動画・リール対応（Phase 14）と勝負セットの投入（Phase 15）は 2026-07-23〜07-30 に、インサイト収集と KPI 運用（Phase 16）は 2026-08-01〜09-03 に、第 3 セット構築（Phase 17）は 2026-08-09〜08-28 に、プロジェクト管理の 2 レーン化（Phase 18）と <code>/goal</code> 組み込み（Phase 19）は 2026-08-28〜09-02 に、fantasy-animals-1 の停止（Phase 20）は 2026-09-03 に、課題体系の新設（Phase 22）は 2026-09-19 に、Codex 直接セッションの導入（Phase 23）は 2026-09-20〜09-21 に、設計書 HTML のスマホ閲覧対応（Phase 24）は 2026-09-21 に、計画書の記載様式の定着（Phase 25）は 2026-09-21〜09-22 に、第 4 セット umigame-soup-1 の構築（Phase 21）は 2026-09-03〜10-13 に、SNS 投稿バッチの当回固定（Phase 26）は 2026-09-22〜10-13 に、アカウント日次インサイトの follows_and_unfollows の取り直し（Phase 27）は 2026-10-13〜10-17 に、投稿の一過性エラーの段階別の扱い（Phase 28）と umigame の尺の宣言値を 29 秒へ揃える作業（Phase 29）は 2026-10-17 に完了済み。各ステップの実施記録（確認・備考の全文）と、完了時に計画書から移設したステップ一覧の原文は<a href="development-log.html">開発記録</a>を参照。</p>
+<details class="phase"><summary>完了フェーズ一覧（Phase D〜29・クリックで展開）</summary>
 <div class="table-wrap"><table>
 <thead><tr><th>Phase</th><th>ゴール（達成済み）</th></tr></thead>
 <tbody>
@@ -58,417 +58,17 @@
 <tr><td>Phase 24: 設計書 HTML のスマホ閲覧対応</td><td>狭い画面（768 CSS px 未満）で <code>docs/assets/style.css</code> の一般表を <code>width: max-content</code> + セル上限 16rem にして列の潰れを解消し（収まらない分は表内の横スクロール）、課題・アイデア一覧は <code>table[data-cards]</code> + <code>docs/assets/docs-cards.js</code>〔外部依存なし〕で<strong>1 行 = 1 カード</strong>（常時表示 + 補足の折りたたみ）に切り替えた。表の DOM をそのまま使うため PC 幅は改修前と同一・文章の二重管理なし。検証ツール <code>tools/docs_check.py</code> を新設し、46 ページ・202 表の横はみ出し 0 件 / リンク整合 / カード表示を機械検証する。2026-09-21 に 3 ステップを同日完了（24-3 の実機確認で <strong>go</strong>）。一次確認は端末のキャッシュで旧 CSS が使われて判定不能となり、<code>tools/docs_server.py</code> の <code>Cache-Control: no-store</code>・<code>style.css?v=20260921</code>・カード未適用時の警告表示を追加して解消（<a href="development-log.html#step-24-3-cache">経緯</a>）。検討経緯は<a href="../ideas/docs-responsive-mobile.html">アイデア詳細</a></td></tr>
 <tr><td>Phase 25: 計画書の可読性改善と記載様式の定着</td><td>計画書のステップを「常時表示の要点（何をするか・守る条件・完了条件・人の確認・止まる場所）＋ 折りたたみの実装詳細・作業記録」で書く共通様式を定め、雛形 <a href="_templates/step.html">_templates/step.html</a>・専用 CSS <code>docs/assets/plans.css</code>・構造検査 <code>tools/docs_plan_check.py</code>（<code>docs_check.py --plan-only</code>）とともに開発計画へ適用した（25-1・25-2）。計画を作成・更新する入口（CLAUDE.md と 6 本のスキル）を新様式・構造検査につなぎ（25-3）、受け入れ go（25-4）を経てセット計画書 3 本も移行・検査登録した（25-5）。2026-09-21〜09-22 の 5 ステップで完了し、<a href="../issues/index.html#I-036">I-036</a> をクローズ（<a href="development-log.html#phase-25">記録</a>）</td></tr>
 <tr><td>Phase 26: SNS 投稿バッチの当回固定</td><td>投稿バッチが「当回のセット × <code>scheduled_at</code>」の生成実行だけを投稿対象にし、空の run や未投稿の滞留があっても後続を塞がず、朝夜の表記も入れ替わらない契約に改めた（26-1 設計 → 26-2 実装 → 26-3 本番切替〔2026-10-13 02:53〜03:17 JST〕→ 26-4 反映確認。<a href="../issues/index.html#I-014">I-014</a> 解消）。後続で Instagram クライアントを shared の汎用層へ載せ替えて Graph API を v25.0 に上げ（26-5・<a href="../issues/index.html#I-022">I-022</a> 解消）、コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした（26-6・<a href="../issues/index.html#I-024">I-024</a> ①。② のアプリ内リトライは据え置き）。2026-10-13 完了。リリース後の投稿確認は<a href="#pending-checks">確認待ちリスト</a>と <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>。ステップ一覧と作業記録の原文は<a href="development-log.html#phase-26">開発記録</a></td></tr>
-<tr><td>Phase 27: アカウント日次インサイトの follows_and_unfollows を取れるようにする</td><td>100 フォロワーを超えた logic-training-1 で <code>follows_and_unfollows</code>（<code>breakdown=follow_type</code>）に数値が入らない原因を API 側の集計遅延と切り分け（27-1）、収集日の 2 日以上前の日を取り直して既存行へ追記するようにした（27-2）。2026-10-17 に確認待ちが OK になり完了（<a href="../issues/index.html#I-039">I-039</a> 解消）。ステップ一覧と作業記録の原文は計画書の <a href="#phase-27">Phase 27</a> 節（次の計画整理で開発記録へ移す）</td></tr>
+<tr><td>Phase 27: アカウント日次インサイトの follows_and_unfollows を取れるようにする</td><td>100 フォロワーを超えた logic-training-1 で <code>follows_and_unfollows</code>（<code>breakdown=follow_type</code>）に数値が入らない原因を API 側の集計遅延と切り分け（27-1）、収集日の 2 日以上前の日を取り直して既存行へ追記するようにした（27-2）。2026-10-17 に確認待ちが OK になり完了（<a href="../issues/index.html#I-039">I-039</a> 解消）。ステップ一覧と作業記録の原文は<a href="development-log.html#phase-27">開発記録 Phase 27</a></td></tr>
+<tr><td>Phase 28: 投稿の一過性エラーを段階別に扱う</td><td>Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）を段階別に扱う契約を <a href="../app/batch-flow.html#transient-errors">batch-flow.html 3.3</a> に定め（28-1）、実装した（28-2）: 公開前の失敗は作成から 1 回やり直し、公開の失敗はコンテナを照会して <code>FINISHED</code> のときだけ同じコンテナで 1 回再送・<code>PUBLISHED</code> は確認済みの <code>published_unconfirmed</code> にし、二重投稿を避ける。2026-10-17 完了（<a href="../issues/index.html#I-024">I-024</a> 解消）。本番での効果は<a href="#pending-checks">確認待ちリスト</a>。原文は<a href="development-log.html#phase-28">開発記録 Phase 28</a></td></tr>
+<tr><td>Phase 29: umigame の尺の宣言値を 29 秒へ揃える</td><td>umigame-soup-1 の改修 R-1 で動画が 29 秒になったのに合わせ、画像バッチ <code>umigame-prebuilt</code> の許容値・Aurora とローカルの宣言値・BGM の尺の記録を 29 に揃えた。生成を止めないよう許容値を {24, 29} に広げて push（29-1）→ 宣言値を切り替えて新版面の 1 件を補正（29-2・適用はユーザー）→ 29 のみに戻す（29-3）の 3 段。2026-10-17 完了（<a href="../issues/index.html#I-041">I-041</a> 解消）。原文は<a href="development-log.html#phase-29">開発記録 Phase 29</a></td></tr>
 </tbody>
 </table></div>
 </details>
 
 <p><strong>次のフェーズを起こすときの入口</strong>: <a href="#pending-checks">確認待ちリスト</a>（トリガーが来た項目）/ <a href="../ideas/index.html">アイデア体系</a>セクション 2 の条件待ち / <a href="../issues/index.html#lane-dev">課題体系の開発レーン節</a>（トリガーが揃った据え置き課題。束ね方・同梱の要否は課題表の対応方針・トリガー列が正）/ 月次 KPI 転記は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>の定常作業でフェーズにしない。起票は<a href="index.html#step-checklist">計画体系 5.1</a> のチェックリストに従う。</p>
 
-<section class="plan-phase" data-plan-phase="27" id="phase-27">
-<h2>Phase 27: アカウント日次インサイトの follows_and_unfollows を取れるようにする（I-039）</h2>
-<p><strong>ゴール</strong>: 100 フォロワーを超えた logic-training-1 でも <code>account_insights_daily.metrics</code> の <code>follows_and_unfollows</code>（<code>breakdown=follow_type</code>）に数値が入らない原因を切り分け、取れるなら取れるように直し、取れないならその理由を設計書に残して課題を閉じる。</p>
-<details class="plan-fold">
-<summary>フェーズの背景・起票の経緯 <span class="plan-hint">— I-039 の展開・対象外・課題照合・分割理由</span></summary>
-<div class="plan-fold-inner">
-<blockquote>経緯: 2026-10-13 の確認待ちの棚卸しで、16-12b の確認行「<code>follows_and_unfollows</code> は 100 フォロワー到達後に入るか」が NG と判明し、<a href="../issues/index.html#I-039">I-039</a> として起票（2026-09-17 以降の 25 日分すべてが <code>{"breakdowns": [{"dimension_keys": ["follow_type"]}]}</code> で <code>results</code> が無い）。I-040（設計書の全面改訂）が重いため、先に軽い課題を片付ける方針（ユーザー判断 2026-10-13）で同日に本フェーズを起票した。<strong>対象外</strong>: <code>v_account_kpi_daily</code> へのビュー昇格（取れることを確かめてから判断する。I-039 の対応方針どおり）、他のアカウント指標の見直し、投稿インサイト。<strong>課題表の照合</strong>（<a href="index.html#step-checklist">5.1-5</a>。触るパス: <code>services/insights-batch/</code>・<code>docs/app/data-model.html</code> 4.11）: I-039 を展開（本フェーズ）。ほかの live 行は該当なし（I-021・I-028 はクローズ済み）。<strong>分割</strong>（5.1-4）: 原因が分かるまで直し方が決まらないため、27-1〔切り分け〕と 27-2〔修正 or 受容〕に割る。<strong>確認待ちの分離</strong>（5.1-1）: 修正後の「次の日次収集で数値が入るか」は自セッションでは確かめられないので、27-2 の完了時に確認待ちリストへ起票する。</blockquote>
-</div>
-</details>
-
-<details class="plan-group" data-plan-group="done">
-<summary>完了済み 2 件（クリックで展開）</summary>
-<div class="plan-group-inner">
-
-<article class="plan-step" id="step-27-1" data-step-id="27-1" data-status="done" data-completed="2026-10-13">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>27-1</strong><span class="plan-status">完了</span><span>2026-10-13</span></div>
-<h3>follows_and_unfollows に数値が入らない原因を切り分ける（I-039）</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>なし。</p>
-<p data-field="result"><strong>結果：</strong><strong>完了（2026-10-13）</strong>。要求パラメータも保存（正規化）も正しく、<strong>原因は API 側の集計遅延</strong>。前日（UTC）の 1 日分は日付が締まって約 10 時間後でも <code>results</code> が無く、2 日前より古い日は同じ要求で <code>FOLLOWER</code> / <code>NON_FOLLOWER</code> の 2 件が返る。バッチは締まって 9 / 21 時間後に前日行を <code>INSERT IGNORE</code> で 1 回だけ書くため、毎回空のまま固定されていた。27-2 の直し方は<strong>要求パラメータ（対象日）の修正</strong> = <code>follows_and_unfollows</code> だけ 2 日以上前の日を取り直して既存行へ追記する（ユーザー確認済み 2026-10-13）。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>本番の要求（<code>metrics_catalog.py</code> の <code>follows_and_unfollows</code>・<code>breakdown=follow_type</code>）と、パラメータを変えた数通りの要求を読み取り専用で Graph API に送り、応答に <code>results</code> が返るかを比べる。原因を「API が値を返さない（仕様・閾値・期間）」「要求パラメータの誤り」「応答の保存（<code>insights_api.py</code> の正規化）の誤り」のどれかに絞り、27-2 の直し方を決める。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>呼ぶのは読み取りの GET だけ（投稿・設定変更をしない）。token を会話・ファイル・ログに出さない。調査用のスクリプトはコミットしない（スクラッチパッドに置く）。本番のコード・DB は変えない。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>試した要求ごとの応答の要約（token を伏せた要求パラメータ + <code>results</code> の有無と件数）を会話に貼る。</li>
-<li>原因の結論と根拠（Meta のドキュメント・changelog の該当箇所を含む）を作業記録に書き、27-2 で取る直し方（パラメータ修正 / 正規化の修正 / 取れないので受容）を 1 つに決める。</li>
-<li>課題表の <a href="../issues/index.html#I-039">I-039</a> の対応方針列に結論を書く。計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。docs のみなので日本語メッセージでコミットし、pull --rebase → push まで。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>本番 token を Secrets Manager から読んで API を呼ぶ前に、ユーザーの許可を取る。結論と 27-2 の直し方をユーザーが確認する。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/plans/</code> <code>docs/issues/</code> のみ）。stop after 15 turns。やらないこと: <code>services/</code> の変更、Secrets の書き換え。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 現行の要求と保存・試す候補</span></summary>
-<div class="plan-fold-inner">
-<p>現行の要求は <code>services/insights-batch/app/metrics_catalog.py</code> の <code>MetricRequest(("follows_and_unfollows",), …, breakdown="follow_type")</code>。<code>insights_api.py</code> は <code>total_value</code> に <code>breakdowns</code> があればそれをそのまま保存するため、保存されている値は API の応答そのものと推定される（未確定）。試す候補: <code>metric_type=total_value</code> の有無、<code>period=day</code> のまま <code>since</code> / <code>until</code> を数日に広げる、<code>breakdown</code> を外した要求。投稿系と同じ Graph API v25.0 で呼ぶ（insights-batch の base URL を確認する）。経緯は data-model 4.11 の decision（16-12b）と <a href="development-log.html">開発記録</a>の確認待ち（確認済み）。</p>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— プローブ結果・根拠・27-2 の直し方</span></summary>
-<div class="plan-fold-inner">
-<p><strong>2026-10-13（10:24 UTC）・読み取り専用 GET のプローブ</strong>（本番 Secret <code>acps/prod/logic-training-1/sns/instagram/main-account</code> の token を使う。読み取りはユーザー許可済み。スクリプトはスクラッチパッドに置き、コミットしていない）。Graph API v25.0・<code>/{ig_user_id}/insights</code>。<code>followers_count</code> は 259。</p>
-<ul>
-<li>A 本番と同じ要求（<code>metric_type=total_value</code>・<code>breakdown=follow_type</code>・<code>period=day</code>・前日 10-12 の 1 日）→ 200、<code>breakdowns[0]</code> は <code>dimension_keys</code> だけで <code>results</code> 無し（DB に入っている形と同じ）</li>
-<li>B breakdown なし（前日 1 日）→ 200、要素に <code>total_value</code> 自体が無い / F breakdown なし・7 日幅 → 同じく無し（内訳なしの合計値は返らない）</li>
-<li>C 本番と同じ・3 日前（10-10）の 1 日 → <code>results</code> 2 件（<code>FOLLOWER</code>=9・<code>NON_FOLLOWER</code>=2）</li>
-<li>D 本番と同じ・7 日幅（10-05〜10-11）→ <code>results</code> 2 件（34・11）</li>
-<li>E <code>since</code> / <code>until</code> なし（既定の直近 24 時間）→ <code>results</code> 無し</li>
-<li>G <code>metric_type</code> なし → 400「<code>follows_and_unfollows</code> should be specified with parameter metric_type=total_value」</li>
-<li>H 対照: <code>reach</code>（total_value・前日 1 日）→ <code>value</code>=3982（前日でも即時に返る）</li>
-<li>単日の連続確認（本番と同じ要求・1〜7 日前）: 10-12 だけ <code>results</code> 無し。10-11（3・2）・10-10（9・2）・10-09（4・1）・10-08（1・1）・10-07（2・1）・10-06（2・2）は 2 件ずつ返る</li>
-</ul>
-<p><strong>結論</strong>: 要求パラメータ（<code>metric_type=total_value</code> は必須・<code>breakdown=follow_type</code> も正しい）と正規化（<code>_normalize_metric</code> は <code>total_value.breakdowns</code> をそのまま保存する）は正しい。原因は <strong>API 側の集計遅延</strong>。前日の 1 日分は日付が締まって約 10 時間後でも <code>results</code> が無く、約 34 時間後（2 日前）には入っていた。収集バッチは 06:00 / 18:00 JST（= 締まって 21 / 9 時間後）に前日（UTC）の行を <code>INSERT IGNORE</code> で 1 回だけ書き、書き直さない（<code>account_insights.py</code>）。そのため、2026-09-17 以降の全日が「<code>dimension_keys</code> だけ」で固定されていた。16-12b〔2026-09-03〕の「100 フォロワー未満では返らない」も当時は正しかったが、閾値を超えた後も入らなかった理由はこの遅延。</p>
-<p><strong>根拠</strong>: Meta の <a href="https://developers.facebook.com/docs/instagram-platform/api-reference/instagram-user/insights">Instagram User Insights リファレンス</a>の「Data used to calculate metrics may be delayed up to 48 hours.」（遅延の記述）、<code>follows_and_unfollows</code> の行の「Not returned if the IG User has less than 100 followers.」（閾値）、および metric_type 節の「If you request <code>metric_type=total_value</code>, you can also specify one or more breakdowns」（breakdown は total_value のときだけ）。<a href="https://developers.facebook.com/docs/instagram-platform/changelog">Instagram Platform changelog</a>（2018-02-08〜2026-06-22 の掲載分を 2026-10-13 に確認）には <code>follows_and_unfollows</code>・<code>follow_type</code>・データ遅延に触れたエントリーはない。関係するのは 2019-12-03 の「insights on IG Users are now only available on IG Users that have 100 or more followers」（閾値）と、アカウント指標の廃止（2023-09-12 の重複・旧指標、2024-10-02 の時系列 6 指標、2025-01-21 の <code>impressions</code>）だけで、いずれも本指標の対象外。つまり今回の空は仕様変更ではなく、リファレンスにある遅延の範囲の挙動。</p>
-<p><strong>27-2 の直し方（1 つに決定・2026-10-13 ユーザー確認済み）</strong>: <strong>要求パラメータ（対象日）の修正</strong>。<code>follows_and_unfollows</code> だけ、収集日の 2 日以上前（48 時間の遅延を見込んで <code>closed_date − 2</code> 以前）の日を取り直し、既存行の <code>metrics</code> に <code>results</code> が無ければその値だけを追記する（他の指標は前日のまま。行の <code>INSERT IGNORE</code> は変えない）。遡れる範囲は 7 日まで確認済みで、2026-09-17 以降の過去分の埋め戻しをどこまでやるかは 27-2 で決める。<strong>注意</strong>: <code>FOLLOWER</code> / <code>NON_FOLLOWER</code> の意味（どちらがフォロー、どちらがアンフォローか）はリファレンスに明記がない。27-2 で <code>followers_count</code> の日次の差分と突き合わせて解釈を決め、data-model 4.11 に書く。</p>
-</div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-27-2" data-step-id="27-2" data-status="done" data-completed="2026-10-14">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>27-2</strong><span class="plan-status">完了</span><span>2026-10-14</span></div>
-<h3>27-1 の結論に沿って直す、または受容して設計書に残す（I-039）</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>27-1 の完了後（直し方がユーザー確認済みであること）。</p>
-<p data-field="result"><strong>結果：</strong><strong>完了（2026-10-14・コミットまで。push は差分確認後）</strong>。各実行の最後に <code>closed_date − 30</code>〜<code>− 2</code> 日の <code>results</code> の無い行だけ <code>follows_and_unfollows</code> を取り直し、<code>JSON_SET</code> で追記するようにした（過去分 09-17 以降もこの窓で自動的に埋まる）。<code>FOLLOWER</code> = 新規フォロー（<code>follower_count</code> と 9 日一致）・<code>NON_FOLLOWER</code> = アンフォローと <a href="../app/data-model.html">data-model 4.11</a> に記載。pytest 81 passed / 3 skipped。push 後の確認は<a href="#pending-checks">確認待ちリスト</a>（I-039 は OK まで残す）。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>直せる場合は <code>services/insights-batch/</code> の要求パラメータまたは応答の正規化を直し、テストを足す。取れない場合はコードを変えず、理由を設計書に残して I-039 を受容で閉じる。どちらの場合も <a href="../app/data-model.html">data-model 4.11</a> の <code>follows_and_unfollows</code> の記載を結論に合わせる。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>ほかの指標の要求・保存形式を変えない。<code>v_account_kpi_daily</code> へのビュー昇格（DDL）は本ステップでは行わない（取れることを確かめてから別途判断）。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>直す場合: 27-1 で確かめた応答の形を再現する偽物を使ったテストを足し、insights-batch の <code>pytest</code> が全パス（要約行を貼る）。受容の場合: コードの差分がないこと。</li>
-<li>data-model 4.11 の記載を結論に合わせる。</li>
-<li>直した場合は「push 後の最初の日次収集で数値が入るか」を確認待ちリストに起票する。課題表の I-039 を、受容ならクローズ節へ移す。直した場合は確認待ちが OK になるまで行を残す。</li>
-<li>計画書の現況・作業記録を更新し、<code>python3 tools/docs_check.py --plan-only</code> が通る。日本語メッセージでコミットまで。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>差分確認 → push → <code>/goal</code> 定型行で CodePipeline 完走とタスク定義の新リビジョンを確認（ユーザー）。受容の場合は docs のみのため push まで行い、ゲートは結論の確認だけ。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>services/insights-batch/</code> <code>docs/app/data-model.html</code> <code>docs/plans/</code> <code>docs/issues/</code>。<code>services/</code> を触った場合 push は差分確認後）。stop after 15 turns。やらないこと: DDL・ビューの変更、ほかの指標の見直し。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 27-1 の結論: 対象日を 2 日以上前にずらして追記</span></summary>
-<div class="plan-fold-inner"><p>直し方は 27-1 の作業記録の「27-2 の直し方」を正とする（<code>follows_and_unfollows</code> だけ <code>closed_date − 2</code> 以前の日を取り直し、既存行の <code>metrics</code> に <code>results</code> が無ければ追記。<code>FOLLOWER</code> / <code>NON_FOLLOWER</code> の意味は <code>followers_count</code> の差分と突き合わせて決める）。着手時に 27-1 の作業記録を読む。</p></div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 値の意味の照合・遡れる範囲・実装・テスト</span></summary>
-<div class="plan-fold-inner">
-<p><strong>2026-10-14（10:22 UTC）・読み取り専用 GET の追加プローブ</strong>（ユーザー許可済み。27-1 と同じく本番 Secret をプロセス内で読み、token は出力しない。スクリプトはスクラッチパッドに置いてコミットしない）。</p>
-<ul>
-<li><code>follower_count</code>（<code>period=day</code>・直近 30 日）の 09-17〜10-12 の日次値と、<code>follows_and_unfollows</code> 単日の <code>FOLLOWER</code> を 9 日分照合した。09-17: 3 / 3、09-20: 9 / 9、09-25: 6 / 6、09-30: 11 / 11、10-03: 12 / 12、10-05: 13 / 13、10-10: 9 / 9、10-11: 3 / 3、10-12: 2 / 2 で<strong>すべて一致</strong>。よって <code>FOLLOWER</code> = その日に新しくフォローした数。<code>NON_FOLLOWER</code>（同じ日に 1 / 1 / 1 / 3 / 0 / 2 / 2 / 2 / 2）はリファレンスの定義の残る側で「アンフォロー（退会を含む）」と解釈した（直接照合する手段はない）</li>
-<li>遡れる範囲: 09-17（27 日前）まで <code>results</code> 2 件が返る。前日扱いだった 10-12 も、日付が締まって約 34 時間後のこの時点では返った（27-1 の遅延の見立てと一致）</li>
-</ul>
-<p><strong>実装</strong>（Codex に委譲 → Claude がレビュー・2 点修正）: <code>metrics_catalog.py</code> に <code>FOLLOWS_AND_UNFOLLOWS_REQUEST</code>（<code>ACCOUNT_METRIC_REQUESTS</code> の要素を名前付きに切り出し。中身・順序は不変）と <code>FOLLOWS_BACKFILL_MIN_AGE_DAYS = 2</code>・<code>FOLLOWS_BACKFILL_LOOKBACK_DAYS = 30</code>。<code>insights_api.py</code> に <code>has_breakdown_results</code>・<code>fetch_follows_and_unfollows</code>（1 日の窓の組み立ては <code>fetch_account_insights</code> と共通化）。<code>account_insights.py</code> に <code>fetch_follows_backfill_dates</code>（窓内の行のうち <code>results</code> の無い日）・<code>update_follows_and_unfollows</code>（<code>JSON_SET(metrics, '$.follows_and_unfollows', CAST(%s AS JSON))</code>。他の列は変えない）。<code>processing.py</code> は日次行の後・メディア収集の前に取り直しを行い、<code>results</code> が返った日だけ UPDATE + commit。失敗はロールバックして WARNING を出し、そのアカウントの取り直しを打ち切る（<code>failure_count</code> に数えない）。日次行の INSERT IGNORE・他の指標の要求と保存形式は変えていない。</p>
-<p><strong>レビューでの修正</strong>: ① 定数 2 つのコメントが同文で根拠を取り違えていたのを直した。② 100 フォロワー未満のアカウント（pref-ranking-1・umigame-soup-1）は要素自体が返らないため、そのままでは毎回最大 29 回の無駄な要求になる。応答に要素が無い（<code>None</code>）ときはそのアカウントの取り直しをその回で打ち切るようにし、テストを 1 件足した。</p>
-<p><strong>遡る日数と埋め戻し</strong>: 窓は <code>closed_date − 30</code>〜<code>− 2</code> 日。2026-09-17 以降の空の行は、デプロイ後の最初の実行でこの窓によって自動的に埋まる見込み（09-17 は 10-14 時点で 27 日前。デプロイが 10-17 より後になると 09-17 側の数日が窓から外れて空のまま残るが、受容する）。別の埋め戻し作業は起こさない。</p>
-<p><strong>テスト</strong>: 27-1 の応答形（<code>since</code> が前日なら <code>dimension_keys</code> のみ、2 日以上前なら <code>results</code> 2 件）を返す偽物で、日次行は従来どおり・窓内の空の行だけ取り直す・まだ空なら UPDATE しない・例外で打ち切って <code>failure_count</code> が増えずメディア収集は続く・要素が返らなければ打ち切る、を確認。<code>services/insights-batch</code> の <code>pytest</code>: <strong>81 passed, 3 skipped</strong>（skip はローカル MySQL が無い環境の E2E。Codex が足した JSON_SET の E2E ケースも含む）。</p>
-<p><strong>設計書・課題・確認待ち</strong>: <a href="../app/data-model.html">data-model 4.11</a> の <code>metric_date</code>・<code>metrics</code> 行と 27-2 の decision を追加。課題表の <a href="../issues/index.html#I-039">I-039</a> は行を残し、対応方針とトリガー（確認待ちの結果）を更新。確認待ちリストに「push 後の最初の日次収集で数値が入るか」を起票した。</p>
-</div>
-</details>
-</div>
-</article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-</div>
-</section>
-
-<section class="plan-phase" data-plan-phase="28" id="phase-28">
-<h2>Phase 28: 投稿の一過性エラーを段階別に扱う（I-024 ②）</h2>
-<p><strong>ゴール</strong>: Instagram の一過性エラー 1 回で投稿が欠番にならないよう、公開前（コンテナ作成・処理待ち）の失敗はアプリ内でコンテナ作成から 1 回やり直し、公開（<code>media_publish</code>）の一過性エラーはコンテナを照会して「未公開なら 1 回だけ再送・公開済みなら結果不明」に分ける。二重投稿は起こさない。</p>
-<details class="plan-fold">
-<summary>フェーズの背景・起票の経緯 <span class="plan-hint">— I-024 の 2 回目・ユーザー判断 3 点・対象外・課題照合</span></summary>
-<div class="plan-fold-inner">
-<blockquote>経緯: <a href="../issues/index.html#I-024">I-024</a> ②（一過性エラー 1 回でその生成実行が欠番になる・アプリ内リトライなし）は、2026-08-23 のリールのコンテナ <code>status_code=ERROR</code> に続き、2026-10-17 07:30 の朝スロットでストーリーズの <code>media_publish</code> が <code>{"code": 2, "is_transient": true}</code> を返して 2 回目の発生となった（<a href="logic-training-1-log.html">LT 記録</a> 2026-10-17）。このときは DB が <code>failed</code> なのに Instagram 上では公開済みで、<strong>公開段階の一過性エラーを単純に再送すると二重投稿になる</strong>ことが分かった。課題体系 4.6 により据え置き不可となり、ユーザーが展開を選んだ（2026-10-17・<code>/incident</code>）。</blockquote>
-<blockquote class="decision">ユーザー判断（2026-10-17）: ① 公開前の一過性エラーは<strong>コンテナ作成から 1 回</strong>だけやり直す（リールの処理待ちは最大 10 分のため回数を抑える）② 公開の一過性エラーは<strong>コンテナの <code>status_code</code> を照会して分岐</strong>する（<code>PUBLISHED</code> → <code>published_unconfirmed</code>〔理由に「PUBLISHED 確認済み」〕・<code>FINISHED</code> のまま → 公開を 1 回だけ再送・照会も失敗 → <code>published_unconfirmed</code>）③ フェーズ番号は本件を 28 とし、<a href="../issues/index.html#I-040">I-040</a>（設計書の 2 面化）は 29 以降へずらす。</blockquote>
-<blockquote>現状（2026-10-17 の調査）: Instagram の API エラーは段階を問わずすべて <code>failed</code>（<code>processing.py</code> の <code>InstagramApiError</code> 節）。<code>is_transient</code> は共通クライアント（<code>shared/acps_shared/instagram.py</code> の <code>_error_details</code>）が読んでおらず、<code>exc.response["error"]["is_transient"]</code> に残るだけ。コンテナの <code>PUBLISHED</code> 照会はどこにもない。設計書の方針は「自動再試行なし・通知のみ（欠番許容）」（<a href="../app/operation.html">operation.html</a> 4・<a href="../app/batch-flow.html">batch-flow.html</a> 3.2〜3.4）で、SFN の Retry は終端状態の posts を処理し直さない（<code>ALREADY_TERMINAL</code>）。</blockquote>
-<blockquote>対象外: SFN の Retry 設定・ASL（<code>infra/</code>）、DB スキーマ（posts の状態値は既存の 5 つのまま）、処理待ちの上限到達（タイムアウト）のやり直し、published_unconfirmed の自動 success 化（公開済みでもメディア ID が取れないため人が補正する）、欠番・滞留の検知。<br>課題表の照合（5.1）: 同じパス（<code>services/sns-post-batch/</code>・<code>operation.html</code> 4）に <a href="../issues/index.html#I-019">I-019</a>（当日復旧の手順）・<a href="../issues/index.html#I-025">I-025</a>（欠番の検知）・<a href="../issues/index.html#I-006">I-006</a>（滞留の検知）・<a href="../issues/index.html#I-015">I-015</a>（AI 開示タグの検証）が当たるが、いずれも検知・運用・キャプションの論点で本フェーズの処理分岐とは別のため同梱しない（各行のトリガーは変更なし）。I-024 は本フェーズへ展開済み。</blockquote>
-<blockquote>分割理由: 方針の変更（欠番許容 → 公開前は自動でやり直す）は設計書の契約を変えるため、実装の前に 28-1 で表に落として人が確認する。本番での効果（次に一過性エラーが起きたときの動き）は狙って起こせないため、ステップにせず確認待ちリストで追う。</blockquote>
-</div>
-</details>
-
-<details class="plan-group" data-plan-group="done">
-<summary>完了済み 2 件（クリックで展開）</summary>
-<div class="plan-group-inner">
-
-<article class="plan-step" id="step-28-1" data-step-id="28-1" data-status="done" data-completed="2026-10-17">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>28-1</strong><span class="plan-status">完了</span></div>
-<h3>段階別の扱いを設計書に定める</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。</p>
-<p data-field="result"><strong>結果：</strong>段階別の扱いの表・「一過性」の判定基準・記録の形を <a href="../app/batch-flow.html#transient-errors">batch-flow.html 3.3</a> に定め、3.2・3.4・<a href="../app/operation.html#failure">operation.html 4</a>・design-outline の要約を合わせた。ユーザーの go 済み（2026-10-17）。次は 28-2 の実装。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>投稿の 3 段階（コンテナ作成・処理待ち・公開）× 失敗の種類（一過性 / それ以外 / 結果不明）ごとに、やり直すか・どの状態で終えるかを 1 つの表にし、<a href="../app/batch-flow.html">batch-flow.html</a> 3.2〜3.4 と <a href="../app/operation.html">operation.html</a> 4 の「自動再試行なし・欠番許容」を書き換える。「一過性」の判定（<code>is_transient: true</code> とコンテナ <code>status_code=ERROR</code>。<code>code</code> 1 / 2 を含めるか）もここで決める。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>二重投稿を起こさない（公開要求を送った後は、未公開が確定したときだけ再送する）。SFN の Retry・ASL・DB スキーマは変えない。コードには触らない（<code>docs/</code> のみ）。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>batch-flow.html に段階別の扱いの表があり、上の決定（作成から 1 回・公開は照会で分岐）と一致している。変更理由を <code>decision</code> コールアウトに残す。</li>
-<li>operation.html 4 の方針文と手動補正の手順（<code>published_unconfirmed</code> の理由が「PUBLISHED 確認済み」のときの補正）が新しい扱いと矛盾しない。</li>
-<li><code>python3 tools/docs_check.py --plan-only</code> が OK。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push まで。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>段階別の扱いの表と「一過性」の判定基準をユーザーが確認し go を出す（go が出るまで 28-2 に着手しない）。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>設計書の push まで（<code>docs/app/</code>・<code>docs/plans/</code>）。stop after 20 turns。実装・テストは書かない。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 表の下書き</span></summary>
-<div class="plan-fold-inner">
-<ul>
-<li><strong>コンテナ作成</strong>: 一過性の API エラー → 新しいコンテナで作成からやり直す（投稿 1 件につき合計 1 回）。それ以外 → <code>failed</code>。</li>
-<li><strong>処理待ち</strong>: <code>status_code=ERROR</code>・照会の一過性 API エラー → 作成からやり直す（同じ 1 回を共有）。上限到達 → <code>failed</code>（やり直さない）。</li>
-<li><strong>公開</strong>: 一過性の API エラー → コンテナの <code>status_code</code> を照会。<code>PUBLISHED</code> → <code>published_unconfirmed</code>（理由に「PUBLISHED 確認済み」）・<code>FINISHED</code> → 公開を 1 回だけ再送・照会失敗やそれ以外 → <code>published_unconfirmed</code>。転送エラー・重複投稿の応答は今の扱い（<code>published_unconfirmed</code>）のまま。一過性でない API エラー → <code>failed</code>（今のまま）。</li>
-<li>やり直しで作り直したコンテナ ID は <code>platform_container_id</code> を上書きし、最初のエラーはログと <code>api_response</code> に残す（記録の形は 28-1 で決める）。</li>
-</ul>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17 完了・ユーザーの go 済み</span></summary>
-<div class="plan-fold-inner">
-<ul>
-<li><strong>2026-10-17</strong>: <a href="../app/batch-flow.html#transient-errors">batch-flow.html 3.3「一過性エラーの段階別の扱い」</a>を新設した（表 = ① 作成・② 処理待ち・③ 公開 × 一過性 / 一過性でない / 結果不明・上限到達。③ の照会分岐。判定基準。やり直し回数。記録の形。decision コールアウト）。3.2（行を増やさない・回数はメモリ内で数え Retry 再起動では数え直す）、3.3 の手順 4〜7、3.4（判定前にアプリ内で済ませる・終了コードは不変）に参照を足し、<a href="../app/operation.html#failure">operation.html</a> の方針表・4 の冒頭・4.2「PUBLISHED 確認済み」の補正（メディア ID の引き方）と design-outline.html の要約 1 行を新しい扱いに合わせた。</li>
-<li><strong>計画書の決定に足した判断</strong>（ユーザー確認・go 済み）: ① ② のタイムアウト・接続断は一過性と同じ扱い / Graph の <code>code</code> 1・2 は <code>is_transient</code> が無くても一過性 / レート制限は <code>is_transient: true</code> でない限り対象外 / 処理待ちの上限到達・<code>EXPIRED</code> はやり直さない / ③ の照会は 10 秒待ってから 1 回 / 再送は同じコンテナ ID（同じコンテナは 1 回しか公開できないため二重投稿にならない）/ やり直し・照会が起きた行の <code>api_response</code> は <code>{"final", "first_error", "container_check"}</code>、<code>error_message</code> は「PUBLISHED 確認済み:」の接頭辞と「（作成から 1 回やり直し済み）」等の接尾辞。</li>
-<li>確認待ち: 該当なし。課題表: I-006・I-012・I-015・I-017・I-019・I-025・I-040 は据え置き継続・トリガー更新なし。<a href="../issues/index.html#I-024">I-024</a> は 28-2 の完了で解消へ（対応方針に 28-1 の結果を追記）。</li>
-</ul>
-</div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-28-2" data-step-id="28-2" data-status="done" data-completed="2026-10-17">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>28-2</strong><span class="plan-status">完了</span></div>
-<h3>段階別の扱いを実装して本番へ反映する</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>28-1 の go の後。</p>
-<p data-field="result"><strong>結果：</strong>段階別の扱いを <code>processing.py</code>・<code>instagram_api.py</code> に実装（共通層は無変更）。pytest は sns-post-batch 343 件・shared 36 件が全パス、ユーザーの差分確認を経て push。パイプラインの完走はユーザーの <code>/goal</code> で確認する。本番での効果は<a href="#pending-checks">確認待ち</a>で追う。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>28-1 の表どおりに <code>services/sns-post-batch/app/</code>（<code>instagram_api.py</code>・<code>processing.py</code>）を直し、必要なら共通クライアントで <code>is_transient</code> を例外の属性として読めるようにする（<code>shared/acps_shared/instagram.py</code>）。テストを足して push し、パイプラインの完走まで確かめる。実装は Codex へ委譲する（<code>-m gpt-6.1-sol -e max</code>）。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>共通クライアントを触る場合、insights-batch・comment-reply の挙動を変えない（属性の追加のみ・既存の分類は変えない）。SFN・ASL・DB スキーマは変えない。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>表の各行に当たるテストがあり、sns-post-batch と shared の pytest が全パス（要約行を貼る）。少なくとも「作成の一過性エラー → 1 回で成功」「処理待ち ERROR × 2 → failed」「公開の一過性エラー → 照会 PUBLISHED → published_unconfirmed」「公開の一過性エラー → 照会 FINISHED → 再送で success」「再送も失敗 → 公開要求の後なので published_unconfirmed」を含む。</li>
-<li>Codex の差分を Claude がレビューし、二重投稿の経路がないことを作業記録に書く。設計書が実装と一致している（違えば直して <code>decision</code> を残す）。</li>
-<li>日本語メッセージでのコミット、<code>pull --rebase</code>、push。push 直後にパイプライン確認の <code>/goal</code> の定型行を提示し、触ったサービス（sns-post-batch。shared を触ったら 3 本とも）の Succeeded と新しいタスク定義リビジョンの登録をユーザーの <code>/goal</code> で確かめる。</li>
-<li>確認待ちリストに「次に一過性エラーが起きたときの動き」の行を足す。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>push 前に差分の要約（段階別の分岐とテストの対応）をユーザーが確認する。パイプライン確認はユーザーが打つ <code>/goal</code> に任せる。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>パイプラインの完走確認まで（<code>services/sns-post-batch/</code>・<code>shared/acps_shared/</code>・<code>docs/</code>）。stop after 30 turns。本番の DB・Scheduler・SFN の手動操作はしない。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 既存のテストの置き場</span></summary>
-<div class="plan-fold-inner">
-<p>失敗系のテストは <code>services/sns-post-batch/tests/test_instagram_api.py</code>（結果不明・コンテナ ERROR・上限到達）と <code>test_processing.py</code>（明確な失敗・unconfirmed・ストーリーズ）、共通層の分類は <code>shared/tests/test_instagram.py</code>。状態更新は <code>app/posts.py</code>（<code>update_post_container_created</code> / <code>update_post_success</code> / <code>update_post_failed</code> / <code>update_post_unconfirmed</code>）。pytest は各サービスの <code>.venv/bin/python -m pytest</code>。</p>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17 完了・二重投稿の経路なし</span></summary>
-<div class="plan-fold-inner">
-<ul>
-<li><strong>2026-10-17 実装</strong>（Codex 委譲 <code>gpt-6.1-sol</code> / <code>max</code>）: <code>instagram_api.py</code> に <code>is_transient_api_error</code>（<code>is_transient: true</code> または <code>code</code> 1・2。レート制限はフラグが無い限り除外。共通層の分類は使うだけで変えていない）と 1 回だけの照会 <code>get_container_status</code> を追加し、処理待ちの <code>EXPIRED</code> を ERROR と同じく即失敗にした。<code>processing.py</code> は作成〜処理待ちを 1 つのループにして、一過性（コンテナ ERROR・転送エラー・一過性 API エラー）なら作成から 1 回だけやり直す（上限到達・<code>EXPIRED</code> はやり直さない）。公開は <code>_publish_with_recovery</code> で、一過性 API エラーのときだけ 10 秒待って 1 回照会し、<code>FINISHED</code> なら同じコンテナで 1 回再送、<code>PUBLISHED</code> は「PUBLISHED 確認済み:」の <code>published_unconfirmed</code>、それ以外・照会失敗は <code>published_unconfirmed</code>。記録は <code>_RecoveryState</code> が <code>{"final", "first_error", "container_check"}</code> と <code>error_message</code> の接尾辞を組む。</li>
-<li><strong>テスト</strong>: 設計書の表の 13 ケースを <code>test_processing.py</code> に追加（作成の一過性 → 1 回で成功・code 2 はやり直し / レート制限はやり直さない・作成の転送エラー・処理待ち ERROR → 成功・ERROR × 2 → failed・上限到達 / EXPIRED → failed・公開の一過性 → PUBLISHED → unconfirmed〔publish 1 回〕・→ FINISHED → 再送で success〔同じ creation_id で 2 回・作成 1 回〕・再送も一過性 → unconfirmed〔照会 1 回〕・再送が恒久エラー → failed・照会失敗 / 照会 ERROR → unconfirmed・公開の恒久エラー → failed〔照会なし〕・公開の転送エラー → unconfirmed〔照会なし〕・ストーリーズとリールで回数を別に数える）。<code>test_instagram_api.py</code> に判定関数と EXPIRED を追加。<strong>sns-post-batch: <code>343 passed in 3.26s</code> / shared: <code>36 passed in 0.24s</code></strong>（Claude が再実行）。</li>
-<li><strong>Claude のレビュー（二重投稿の経路）</strong>: 作成からのやり直しは作成〜処理待ちのループの中だけにあり、<code>media_publish</code> はループを抜けた後でしか呼ばれない。公開の例外はループの <code>except</code> に届かないため、<strong>公開要求を送った後に新しいコンテナを作る経路はない</strong>。再送は照会で <code>FINISHED</code> を確認したときだけ、同じコンテナ ID で最大 1 回（同じコンテナは 1 回しか公開できないため、先の要求が後から公開まで進んでいても 2 件目にはならず重複応答 → <code>published_unconfirmed</code>）。公開の転送エラー・重複応答は従来どおり <code>InstagramResultUnknown</code> で照会も再送もしない。<code>update_post_container_created</code> は状態を問わない UPDATE なので、作り直したコンテナ ID の上書きはそのまま通る。設計書（<a href="../app/batch-flow.html#transient-errors">batch-flow.html 3.3</a>）との差異なし（照会自体が失敗した場合の <code>error_message</code> は照会のエラー = 設計書の「最後の失敗の内容」に当たり、公開の最初のエラーは <code>first_error</code> に残る）。</li>
-<li>課題表: <a href="../issues/index.html#I-024">I-024</a> を解消でクローズ節へ移した。I-006・I-009・I-012・I-015・I-017・I-019・I-025・I-040 は据え置き継続・トリガー更新なし。確認待ちに「次に一過性エラーが起きたときの動き」を起票。</li>
-</ul>
-</div>
-</details>
-</div>
-</article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-</div>
-</section>
-
-<section class="plan-phase" data-plan-phase="29" id="phase-29">
-<h2>Phase 29: umigame の尺の宣言値を 29 秒へ揃える（I-041）</h2>
-<p><strong>ゴール</strong>: umigame-soup-1 の動画は改修 R-1 で 29 秒（870 フレーム）になったが、画像バッチ（<code>umigame-prebuilt</code>）は宣言値 24 しか許さず、<code>generated_media.duration_seconds</code> に 24 を記録し続けている。宣言値・許容値・登録 SQL・BGM の記録を 29 に揃え、R-1-5 の差し替え後に 24 で記録された行も直す。</p>
-<details class="plan-fold">
-<summary>フェーズの背景・起票の経緯 <span class="plan-hint">— I-041・移行の順序・対象外・課題照合</span></summary>
-<div class="plan-fold-inner">
-<blockquote>経緯: <a href="../issues/index.html#I-041">I-041</a>（2026-10-17 起票）。R-1-2 の go で尺が 29 秒に確定し、R-1-5〔2026-10-17〕で新版面の在庫へ差し替え済み。画像バッチは事前動画をそのまま渡すため投稿は動くが、記録の尺が実物とずれる。トリガー「開発レーンで次のフェーズを起票するとき」が Phase 28 の完了で到達し、ユーザーが展開を選んだ（2026-10-17）。</blockquote>
-<blockquote class="decision">移行の順序（起票時の判断）: コードの許容値を先に 29 だけへ変えると、Aurora の宣言値 24 のままの回で生成が異常終了する。逆に Aurora を先に 29 へ変えると今のコードで異常終了する。そこで 29-1 で<strong>許容値を {24, 29} に広げて</strong> push → 29-2 で Aurora の宣言値を 29 へ切り替える → 29-3 で許容値を 29 だけに戻す、の 3 段にする（生成は日・火・木・土の 20:00 前の回だけなので、各段の間に生成が挟まっても止まらない）。</blockquote>
-<blockquote>現状（2026-10-17 の調査）: <code>services/image-batch/app/generators/umigame_prebuilt.py</code> の <code>DURATION_SECONDS = 24</code> で <code>parameters.duration_seconds</code> が 24 以外なら異常終了し、その値を <code>MediaOutput.duration_seconds</code> に入れる（実尺は見ない。quiz-prebuilt・ranking-prebuilt も宣言値を記録する同じ作り）。登録 SQL は <code>content/umigame-stock/umigame-soup-1/set-registration/01_prompt_caption.sql</code>（<code>{"duration_seconds": 24}</code>）と <code>03_audio_assets.sql</code>（BGM の <code>duration_seconds</code> 24。<code>content/video-build/umigame-soup-1/prepare_bgm.py</code> が <code>common.DURATION_SECONDS</code> から生成するが、R-1 では <code>--no-sql</code> で書き換えを止めた）。設計書は <a href="../app/generators/umigame-prebuilt.html">方式設計書</a> 3（「24 のみ許容」）と 6（異常系）が 24 のまま。</blockquote>
-<blockquote>対象外: 実尺（ffprobe）を生成時に測って記録する方式への変更（3 方式とも宣言値で揃っており、umigame だけ変える理由が弱い。次に尺を変えるときに改めて検討）、周期アニメーションの周期（方式設計書の既知の残件）、BGM の音源そのもの（29 秒版は R-1 で差し替え済み）。<br>課題表の照合（5.1）: <code>services/image-batch/app/generators/</code> に <a href="../issues/index.html#I-011">I-011</a>（OpenAI 以外のプロバイダの追加時）・<a href="../issues/index.html#I-020">I-020</a>（gpt-quiz-multicut の再開時）が当たるが、どちらもトリガーに当たらないため同梱しない（据え置き継続・トリガー更新なし）。umigame-soup-1 の節に live の課題はない。</blockquote>
-</div>
-</details>
-
-<details class="plan-group" data-plan-group="done">
-<summary>完了済み 3 件（クリックで展開）</summary>
-<div class="plan-group-inner">
-
-<article class="plan-step" id="step-29-1" data-step-id="29-1" data-status="done" data-completed="2026-10-17">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>29-1</strong><span class="plan-status">完了（2026-10-17）</span></div>
-<h3>許容値を {24, 29} に広げて push する</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。</p>
-<p data-field="result"><strong>結果：</strong>許容値を <code>ALLOWED_DURATIONS = frozenset({24, 29})</code> に広げ（宣言値 24・29 の記録と 30・文字列・bool の拒否をテスト）、登録 SQL 2 本と方式設計書を 29 を正にした。push 後のパイプライン完走はユーザーの <code>/goal</code> で確認する。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p><code>umigame_prebuilt.py</code> の許容値を 24 と 29 の 2 つにし（宣言値をそのまま記録する作りは変えない）、テストを足して push する。登録 SQL 2 本（<code>01_prompt_caption.sql</code> の宣言値・<code>03_audio_assets.sql</code> の BGM の尺）を 29 に直し、<a href="../app/generators/umigame-prebuilt.html">方式設計書</a> 3・6 を「移行中は 24 / 29、29-3 の後は 29 のみ」に書き換える。数行の修正なので Claude が直接書く。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>他の生成方式（quiz-prebuilt・ranking-prebuilt 等）の挙動を変えない。Aurora・ローカル DB には触らない（29-2）。<code>parameters</code> のキー検査（<code>duration_seconds</code> の 1 キーだけ）は変えない。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>宣言値 24・29 で生成が通り、その値が <code>MediaOutput.duration_seconds</code> に入るテストと、それ以外（例: 30・文字列・bool）で異常終了するテストがあり、image-batch の pytest が全パス（要約行を貼る）。</li>
-<li>登録 SQL 2 本と方式設計書が 29 を正としている（変更理由を <code>decision</code> に残す）。</li>
-<li>日本語メッセージでのコミット、<code>pull --rebase</code>、push。push 直後にパイプライン確認の <code>/goal</code> の定型行を提示し、image-batch の Succeeded と新しいタスク定義リビジョンの登録をユーザーの <code>/goal</code> で確かめる。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>push 前に差分をユーザーが確認する。パイプライン確認はユーザーが打つ <code>/goal</code> に任せる。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>パイプラインの完走確認まで（<code>services/image-batch/</code>・<code>content/umigame-stock/umigame-soup-1/set-registration/</code>・<code>docs/</code>）。stop after 20 turns。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 定数とテストの置き場</span></summary>
-<div class="plan-fold-inner">
-<p>定数は <code>DURATION_SECONDS = 24</code> を <code>ALLOWED_DURATIONS = frozenset({24, 29})</code> に置き換え、エラー文も合わせる（ranking-prebuilt の <code>ALLOWED_DURATIONS</code> と同じ形）。テストは <code>services/image-batch/tests/test_generators_umigame_prebuilt.py</code>。<code>03_audio_assets.sql</code> は <code>prepare_bgm.py</code>（<code>common.DURATION_SECONDS</code> = 29。確認済み）で生成し直すか手で直す。license_note の「先頭から 24 秒を使用」も実態（29 秒）に合わせる。</p>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17</span></summary>
-<div class="plan-fold-inner">
-<p>2026-10-17: <code>umigame_prebuilt.py</code> の <code>DURATION_SECONDS = 24</code> を <code>ALLOWED_DURATIONS = frozenset({24, 29})</code> に置き換え、エラー文を「one of 24, 29」に変更（キー検査・宣言値の記録はそのまま）。テストは宣言値 24・29 が <code>MediaOutput.duration_seconds</code> に入るパラメタライズを追加し、拒否側に 30・<code>"29"</code> を足した。image-batch の pytest は 227 passed, 5 skipped。<code>01_prompt_caption.sql</code> の宣言値と <code>03_audio_assets.sql</code> の BGM の尺・license_note を 29 に手で直した（BGM のマニフェストは追跡外のため <code>prepare_bgm.py</code> での再生成はしなかった）。<a href="../app/generators/umigame-prebuilt.html">方式設計書</a> の 2（戻り値）・3（許容値 + 決定 29-1）・7（エラーハンドリング。計画の「6」は実際は 7）を更新。課題表 <a href="../issues/index.html#I-041">I-041</a> は部分解消として行を残し対応方針に追記。</p>
-</div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-29-2" data-step-id="29-2" data-status="done" data-completed="2026-10-17">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>29-2</strong><span class="plan-status">完了（2026-10-17）</span></div>
-<h3>Aurora の宣言値を 29 へ切り替え、24 で記録された行を直す（ユーザー作業あり）</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>29-1 のパイプライン完走（新しいタスク定義で 29 を許容していること）の後。</p>
-<p data-field="result"><strong>結果：</strong>ユーザーが更新 SQL をローカル → Aurora の順に適用し、両環境で宣言値 29・BGM 29、Aurora の新版面の生成結果 1 件（016）を 29 に直した（旧版面の 3 件は 24 のまま）。最初の定時生成での 29 の記録は<a href="#pending-checks">確認待ち</a>で見る。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>Claude が更新 SQL と確認クエリを用意し、<strong>ユーザーが</strong>ローカル DB → Aurora の順に適用する: ① umigame-soup-1 の <code>prompt_configs.parameters</code> を <code>{"duration_seconds": 29}</code> に ② BGM の <code>audio_assets.duration_seconds</code> を 29 に ③ R-1-5 の差し替え後に生成され 24 で記録された <code>generated_media</code> の行を 29 に（対象は新版面の在庫を使った生成実行に限る。抽出クエリで件数を確かめてから更新）。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>Claude は本番 DB を更新しない（SQL とコマンド行の提示まで）。旧版面（24 秒）の動画で生成された行は直さない。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>更新 SQL と確認クエリがリポジトリにあり（<code>content/umigame-stock/umigame-soup-1/</code> 配下）、適用後の確認クエリの結果（宣言値 29・BGM 29・直した行の件数）を会話に貼る。</li>
-<li>確認待ちリストに「29-2 の後の最初の umigame の生成で <code>generated_media.duration_seconds</code> が 29」の行を足す。計画・記録の更新、コミット、push。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>③ の対象行の抽出結果（件数・生成日時）をユーザーが確かめてから更新する。適用はユーザーが行う。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>確認クエリの結果の記録まで。stop after 15 turns。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 適用の道具</span></summary>
-<div class="plan-fold-inner">
-<p>Aurora への適用は既存の <code>apply_aurora.py</code>（<code>content/ranking-stock/pref-ranking-1/common/</code>）を使う（<code>01_prompt_caption.sql</code> の冒頭コメントと同じ手順）。③ の対象は <code>umigame_items.stock_item_id</code> から新版面の在庫（R-1-5 で差し替えた 14 問）を引いて絞る。</p>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17・SQL の準備</span></summary>
-<div class="plan-fold-inner">
-<p>照合: 確認待ち = 該当なし（28-2 の一過性エラーの行はトリガー外）。課題表: 該当なし（展開元 <a href="../issues/index.html#I-041">I-041</a> は 29-3 まで据え置き）。</p>
-<p>2026-10-17（前半ゴール）: <code>content/umigame-stock/umigame-soup-1/set-registration/</code> に <code>29-2_select_targets.sql</code>（③ の抽出）・<code>29-2_update_duration.sql</code>（①〜③ の更新。再適用しても同じ結果）・<code>29-2_check.sql</code>（適用後の確認）を置いた。<strong>③ の絞り方</strong>: R-1-5 は在庫行をその場で更新し S3 キーも変えていないため <code>stock_item_id</code> だけでは旧版面と見分けられない。そこで <code>umigame_items.stock_item_id</code> → 在庫の <code>video_built_at</code> が R-1-3 の再ビルド以降（2026-10-16 17:27:41 UTC〜）、かつ <code>generated_at</code> が S3 上書きの後（2026-10-17 02:56:00 UTC = 11:56 JST〜）の両方で絞る。<code>parameters_snapshot</code> は生成時点の写しなので 24 のまま残す。</p>
-<p>抽出結果（読み取りのみ）: ローカル DB は 0 件（生成実行の記録がない）。Aurora は 1 件 = <code>generated_media</code> id 289・generation_run 298・<code>016-umigame-soup</code>・24・generated_at 2026-10-17 04:29:34（R-1-6 の手動投稿）。20:00 JST の定時（001）より後に適用した場合はその回も同じ条件で拾われる。</p>
-<p>2026-10-17（適用・ユーザー）: <code>29-2_update_duration.sql</code> をローカル → Aurora の順に適用（20:00 の定時より前）。確認（<code>29-2_check.sql</code>・読み取り）: ローカル = <code>prompt_configs</code> id 197 <code>{"duration_seconds": 29}</code>・<code>audio_assets</code> id 75 = 29（license_note も 29 秒）。Aurora = <code>prompt_configs</code> id 5 <code>{"duration_seconds":29}</code>・<code>audio_assets</code> id 11 = 29・<code>generated_media</code> は new / 29 = 1 件（id 289・run 298）、old / 24 = 3 件（2026-10-11〜10-15）で、旧版面の行は直していない。確認待ちリストに「29-2 の後の最初の umigame の生成で 29」の行を足した。</p>
-</div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-29-3" data-step-id="29-3" data-status="done" data-completed="2026-10-17">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>29-3</strong><span class="plan-status">完了（2026-10-17）</span></div>
-<h3>許容値を 29 だけに戻して push する</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>29-2 の適用（Aurora の宣言値が 29）の後。</p>
-<p data-field="result"><strong>結果：</strong>許容値を <code>ALLOWED_DURATIONS = frozenset({29})</code> に戻し（24 は拒否側のテストへ）、方式設計書を 29 のみに。<a href="../issues/index.html#I-041">I-041</a> を解消でクローズ。push 後のパイプライン完走はユーザーの <code>/goal</code> で確認する。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p><code>ALLOWED_DURATIONS</code> を 29 だけにし、24 を拒むテストに直して push する。方式設計書の「移行中」の記述を外す。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>29-2 の確認クエリで Aurora の宣言値が 29 になっていることを着手時に確かめる（24 のままなら着手しない）。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>image-batch の pytest が全パス（要約行を貼る）。方式設計書が 29 のみを正としている。</li>
-<li>計画・記録の更新、課題表 <a href="../issues/index.html#I-041">I-041</a> を解消でクローズ節へ移す、<code>python3 tools/docs_check.py --plan-only</code> が OK。</li>
-<li>日本語メッセージでのコミット、<code>pull --rebase</code>、push。push 直後にパイプライン確認の <code>/goal</code> の定型行を提示する。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>push 前に差分をユーザーが確認する。パイプライン確認はユーザーが打つ <code>/goal</code> に任せる。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>パイプラインの完走確認まで。stop after 15 turns。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 29-1 の逆</span></summary>
-<div class="plan-fold-inner">
-<p>29-1 で足した 24 のテストを「異常終了する」側へ移す。</p>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17</span></summary>
-<div class="plan-fold-inner">
-<p>照合: 確認待ち = 「29-2 umigame の尺の宣言値 29」の行（今夜 20:00 の定時で到達）を同梱。課題表: I-011・I-020 は据え置き継続・トリガー更新なし。展開元 <a href="../issues/index.html#I-041">I-041</a> をクローズ。</p>
-<p>2026-10-17 22:4x（着手時の確認・読み取り）: Aurora の <code>prompt_configs</code> id 5 = <code>{"duration_seconds":29}</code>。20:00 の定時の umigame 回（SFN 実行 626ad355… SUCCEEDED）の <code>generated_media</code> id 290（run 299・001）が <code>duration_seconds</code> 29・<code>parameters_snapshot</code> 29 → 確認待ちを OK とし<a href="development-log.html">開発記録</a>の確認済みへ移した。</p>
-<p>実装: <code>umigame_prebuilt.py</code> の <code>ALLOWED_DURATIONS</code> を <code>frozenset({29})</code>、エラー文を「must be 29」に。テストは記録側を 29 だけにし、24 を拒否側へ移した（既定の <code>_context</code> の宣言値も 29 に）。image-batch の pytest は 226 passed, 5 skipped。<a href="../app/generators/umigame-prebuilt.html">方式設計書</a> 2・3・7 から移行中の記述を外し、決定に 29-2・29-3 の結果を追記。</p>
-</div>
-</details>
-</div>
-</article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-
-
-</div>
-</section>
-
+<h2 id="current-phase">進行中のフェーズ</h2>
+<p><strong>なし</strong>（2026-10-17 に Phase 29 が完了）。次の候補は課題 <a href="../issues/index.html#I-040">I-040</a>（設計書を生産面と配信面の 2 面で描き直し、<code>docs/production/</code> を新設する）を Phase 30 として起票すること。ステップが 0 件のあいだは構造検査のため <code>&lt;body data-plan-steps="none"&gt;</code> を宣言している。<strong>次のフェーズを起こすときにこの宣言を外す</strong>（<a href="index.html#step-layout">計画体系 5.0</a>）。</p>
 
 <hr>
 
@@ -477,7 +77,7 @@
 <div class="table-wrap"><table>
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
-<tr><td>2026-10-17 / <a href="#step-28-2">28-2</a> 一過性エラーの段階別の扱い</td><td>本番で次に Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）が起きた投稿（WARNING ログ「投稿コンテナを作成からやり直す」、または <code>api_response</code> に <code>first_error</code> を持つ <code>posts</code> 行が出たとき。<code>/incident</code> の照合で拾う）</td><td>① 公開前の失敗なら作成から 1 回だけやり直し、<code>platform_container_id</code> が新しい ID になっている ② 公開の失敗なら照会が 1 回だけ行われ、<code>PUBLISHED</code> → 「PUBLISHED 確認済み」の <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで再送 になっている ③ Instagram 上で同じ回の投稿が 2 件になっていない ④ <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形</td><td>二重投稿（③）なら即 <code>/incident</code> で課題に起票し、再送を止める修正を開発レーンで最優先にする。① ② ④ の食い違いは課題に起票（I-024 を live へ戻すかは <code>/incident</code> で判断）</td><td></td></tr>
+<tr><td>2026-10-17 / <a href="development-log.html#step-28-2">28-2</a> 一過性エラーの段階別の扱い</td><td>本番で次に Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）が起きた投稿（WARNING ログ「投稿コンテナを作成からやり直す」、または <code>api_response</code> に <code>first_error</code> を持つ <code>posts</code> 行が出たとき。<code>/incident</code> の照合で拾う）</td><td>① 公開前の失敗なら作成から 1 回だけやり直し、<code>platform_container_id</code> が新しい ID になっている ② 公開の失敗なら照会が 1 回だけ行われ、<code>PUBLISHED</code> → 「PUBLISHED 確認済み」の <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで再送 になっている ③ Instagram 上で同じ回の投稿が 2 件になっていない ④ <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形</td><td>二重投稿（③）なら即 <code>/incident</code> で課題に起票し、再送を止める修正を開発レーンで最優先にする。① ② ④ の食い違いは課題に起票（I-024 を live へ戻すかは <code>/incident</code> で判断）</td><td></td></tr>
 </tbody>
 </table></div>
 
