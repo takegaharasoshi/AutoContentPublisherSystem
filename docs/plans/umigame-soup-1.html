@@ -84,8 +84,15 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17 の実施</span></summary>
+<div class="plan-fold-inner">
+<p><strong>照合</strong>: 確認待ち = R-1 効果確認の行（トリガーの書き換えは完了条件 5 に内包）。課題表: <a href="../issues/index.html#I-041">I-041</a> は据え置き継続・トリガー更新なし（手動起動もテンプレートの宣言値だけを見るため投稿は動く）。I-015・I-038 も該当なし扱い。</p>
+<p><strong>①</strong>（13:23 頃・ユーザー）: <code>r1-6_restart_order.sql</code> を Aurora とローカルへ。確認 SELECT で次の先頭 4 件 = 016（id 15）・001（16）・008（17）・003（18）、テンプレート = <code>{{caption}}</code>。ローカルも同じ。</p>
+<p><strong>②</strong>（ユーザー）: 画像生成 SFN を <code>scheduled_at = 2026-10-17T04:28:00Z</code> で手動起動 → 画像生成 SUCCEEDED（13:28〜13:30・generation_run 298 = 016）→ 投稿 SFN SUCCEEDED（13:30〜13:32）。<code>posts</code> id 510: <code>status = success</code>・<code>platform_post_id = 18113849738024678</code>・<code>posted_at = 2026-10-17 04:31:58</code>（UTC）・キャプションはハッシュタグで終わり前回の真相ブロックなし。</p>
+<p><strong>③</strong>（ユーザー）: Instagram 上で 016 の投稿を確認、問題なし。</p>
+<p><strong>④</strong>（13:39・ユーザー）: <code>r1-6_restore_caption.sql</code> を両環境へ。テンプレート = <code>{{caption}}{{prev_truth_block}}</code>（Aurora id 5・ローカル id 137）。次の順は 001 → 008 → 003。</p>
+<p><strong>確認の手段</strong>: Aurora の読み取りは RDS Data API の SELECT だけを投げるスクラッチのヘルパーで行った（<code>apply_aurora.py</code> は SELECT の結果を表示しないため）。画像生成 SFN の完了後に投稿 SFN が別実行で走るので、投稿の確認は投稿 SFN の完了を待ってから行う。</p>
+</div>
 </details>
 </div>
 </article>
@@ -320,12 +327,12 @@
 </details>
 
 <div class="plan-group" data-plan-group="active">
-<article class="plan-step" id="step-R-1-6" data-step-id="R-1-6" data-status="todo">
+<article class="plan-step" id="step-R-1-6" data-step-id="R-1-6" data-status="doing">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>R-1-6</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>R-1-6</strong><span class="plan-status">進行中</span></div>
 <h3>投稿順を 016 からやり直す（手動投稿 1 本 + 当日の定時投稿）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>R-1-5 が完了（2026-10-17）。<strong>2026-10-17 の 20:00 の定時投稿より前</strong>に手順 4 まで終える。</p>
-<p data-field="result"><strong>現況：</strong>未着手。SQL 2 本は用意済み。</p>
+<p data-field="result"><strong>現況：</strong>①〜④ 完了（016 を 10-17 13:31 に手動投稿・テンプレートは 13:39 に復元）。⑤ 20:00 の定時投稿（001）の確認待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -356,8 +363,15 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17 の実施</span></summary>
+<div class="plan-fold-inner">
+<p><strong>照合</strong>: 確認待ち = R-1 効果確認の行（トリガーの書き換えは完了条件 5 に内包）。課題表: <a href="../issues/index.html#I-041">I-041</a> は据え置き継続・トリガー更新なし（手動起動もテンプレートの宣言値だけを見るため投稿は動く）。I-015・I-038 も該当なし扱い。</p>
+<p><strong>①</strong>（13:23 頃・ユーザー）: <code>r1-6_restart_order.sql</code> を Aurora とローカルへ。確認 SELECT で次の先頭 4 件 = 016（id 15）・001（16）・008（17）・003（18）、テンプレート = <code>{{caption}}</code>。ローカルも同じ。</p>
+<p><strong>②</strong>（ユーザー）: 画像生成 SFN を <code>scheduled_at = 2026-10-17T04:28:00Z</code> で手動起動 → 画像生成 SUCCEEDED（13:28〜13:30・generation_run 298 = 016）→ 投稿 SFN SUCCEEDED（13:30〜13:32）。<code>posts</code> id 510: <code>status = success</code>・<code>platform_post_id = 18113849738024678</code>・<code>posted_at = 2026-10-17 04:31:58</code>（UTC）・キャプションはハッシュタグで終わり前回の真相ブロックなし。</p>
+<p><strong>③</strong>（ユーザー）: Instagram 上で 016 の投稿を確認、問題なし。</p>
+<p><strong>④</strong>（13:39・ユーザー）: <code>r1-6_restore_caption.sql</code> を両環境へ。テンプレート = <code>{{caption}}{{prev_truth_block}}</code>（Aurora id 5・ローカル id 137）。次の順は 001 → 008 → 003。</p>
+<p><strong>確認の手段</strong>: Aurora の読み取りは RDS Data API の SELECT だけを投げるスクラッチのヘルパーで行った（<code>apply_aurora.py</code> は SELECT の結果を表示しないため）。画像生成 SFN の完了後に投稿 SFN が別実行で走るので、投稿の確認は投稿 SFN の完了を待ってから行う。</p>
+</div>
 </details>
 </div>
 </article>
@@ -380,7 +394,7 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-10-12 / 効果仮説: 参加型の問題はコメントを呼び、リーチの伸びにつながるか（21-8a で起票）</td><td>日付型: 稼働 2 週間後（2026-10-26 以降の最初の作業日）</td><td>① <strong>コメント率</strong>（コメント数 / reach。投稿ごとに 72 時間時点の値）の中央値が、同じ期間の logic-training-1 の夜スロットより高いか ② 高い場合、投稿を重ねるにつれて reach が伸びているか（1〜2 本目と直近 2 本の比較）。抽出は <code>content/insights-analysis/run_queries.py</code>（読み取り専用）。2 週間で 8 本程度のため、<strong>傾向の確認であって決定ではない</strong></td><td>① が低い → 問題の難易度・キャプションの呼びかけ・返信の質を改修候補として課題体系へ起票する。① は高いが ② が伸びない → 月次 KPI 転記で追い続け、2026-11 分の転記時に再判断する。<strong>注</strong>: 冒頭のスキップ率が 84% 前後と高く（<a href="#phase-R-1">R-1</a> の起票理由）、R-1 の差し替え前の期間はコメントの母数がほぼない。R-1 の差し替えより前にトリガーが来たら、判定は R-1 の効果確認と合わせて行ってよい</td><td>—</td></tr>
-<tr><td>2026-10-17 / 効果確認: <a href="#phase-R-1">R-1</a>（冒頭の導入シーン・一本道化）でスキップ率が下がるか</td><td>発生実績型: R-1-5 の差し替え後 4 本目の投稿から 72 時間後。<strong>差し替え 2026-10-17（昼）→ 新版面の投稿は 10-17（土）・10-18（日）・10-20（火）・10-22（木）の 20:00 → 2026-10-25（日）20:00 以降の最初の作業日</strong></td><td>差し替え後 4 本のスキップ率（72 時間時点）の中央値が <strong>65% 未満</strong>なら OK（改修前は 83.9%・83.5%）。あわせて平均視聴秒・コメント数を改修前と並べて記録する。抽出は <code>content/insights-analysis/run_queries.py per_post_latest</code>（読み取り専用）。reach が 1 本 100 前後と小さいため傾向の確認</td><td>65% 以上 → 冒頭の作り（導入の長さ・コピー・最初のフレーム）か、ネタ側（<code>hook</code> の引き）かを切り分ける課題を課題体系の umigame-soup-1 節へ起票する</td><td>—</td></tr>
+<tr><td>2026-10-17 / 効果確認: <a href="#phase-R-1">R-1</a>（冒頭の導入シーン・一本道化）でスキップ率が下がるか</td><td>発生実績型: R-1-5 の差し替え後 4 本目の投稿から 72 時間後。<strong>差し替え 2026-10-17（昼）→ <a href="#step-R-1-6">R-1-6</a> で 016 から投稿し直したため、新版面の投稿は 016（10-17 午後・手動）・001（10-17 20:00）・008（10-18 20:00）・003（10-20 20:00）→ 2026-10-23（金）20:00 以降の最初の作業日</strong>（旧版面で投稿した 016・001・008 の記録は比較元として残す）</td><td>差し替え後 4 本のスキップ率（72 時間時点）の中央値が <strong>65% 未満</strong>なら OK（改修前は 83.9%・83.5%）。あわせて平均視聴秒・コメント数を改修前と並べて記録する。抽出は <code>content/insights-analysis/run_queries.py per_post_latest</code>（読み取り専用）。reach が 1 本 100 前後と小さいため傾向の確認</td><td>65% 以上 → 冒頭の作り（導入の長さ・コピー・最初のフレーム）か、ネタ側（<code>hook</code> の引き）かを切り分ける課題を課題体系の umigame-soup-1 節へ起票する</td><td>—</td></tr>
 </tbody>
 </table></div>
 
