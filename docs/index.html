@@ -39,7 +39,7 @@
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
-    B["基本設計&lt;br&gt;overview/（30-3 で作り直す）&lt;br&gt;2 面の構成・配信面の 4 系統・生産面の工程・受け渡しの契約"]
+    B["基本設計&lt;br&gt;overview/system-overview.html&lt;br&gt;2 面の構成・配信面の 4 系統・生産面の工程・受け渡しの契約"]
     B --> P["層の概要: 生産設計&lt;br&gt;production/（30-5 で新設）"]
     B --> A["層の概要: アプリ設計&lt;br&gt;app/index・design-outline"]
     B --> I["層の概要: インフラ設計&lt;br&gt;infra/architecture"]
@@ -53,7 +53,7 @@ flowchart TB
 <table>
   <thead><tr><th>段</th><th>置き場所</th><th>ここだけで分かること</th></tr></thead>
   <tbody>
-    <tr><td>基本設計</td><td><code>docs/overview/</code>（30-3 で作り直す）</td><td>2 面（生産面 / 配信面）の構成、配信面の 4 系統（投稿 / インサイト収集 / コメント自動返信 / トークン更新）、生産面の工程、2 面の受け渡しの契約、構成要素の一覧</td></tr>
+    <tr><td>基本設計</td><td><a href="overview/system-overview.html">docs/overview/system-overview.html</a>（30-3 で作り直し済み）</td><td>2 面（生産面 / 配信面）の構成、配信面の 4 系統（投稿 / インサイト収集 / コメント自動返信 / トークン更新）、生産面の工程、2 面の受け渡しの契約、構成要素の一覧</td></tr>
     <tr><td>層の概要</td><td>各層の入口ページ（<code>production/index.html</code>・<code>app/index.html</code> と <code>design-outline.html</code>・<code>infra/architecture.html</code>）</td><td>その層の全体像と、詳細ページの目次</td></tr>
     <tr><td>詳細設計</td><td>上記以外の <code>infra/</code> <code>app/</code> <code>production/</code> のページ</td><td>定義・設定値・手順・表の全件</td></tr>
   </tbody>
@@ -75,7 +75,7 @@ flowchart TB
 ├── strategy/
 │   └── business-strategy.html     # 事業戦略書（収益化戦略・予算・KPI・展開方針・セットポートフォリオ）
 ├── overview/
-│   └── system-overview.html       # システム概要（目的・技術選定・開発方針）。30-3 で基本設計として作り直す
+│   └── system-overview.html       # 基本設計（2 面の構成・配信面の 4 系統・生産面の工程・受け渡しの契約・構成要素。30-3）
 ├── production/                    # 生産設計（30-5 で新設。生産ラインの全体像・関所・受け渡しの契約・スキル一覧）
 ├── infra/                         # インフラ設計書（一時 Fix 対象）
 │   ├── architecture.html          # アーキテクチャ（ネットワーク・コンピューティング・データストア）
@@ -139,11 +139,11 @@ flowchart TB
   </div>
 </div>
 
-<h3>概要</h3>
+<h3>基本設計（docs/overview/）</h3>
 <div class="card-grid">
   <div class="card">
     <div class="card-title"><a href="overview/system-overview.html">system-overview.html</a></div>
-    <p>システムの目的・スコープ・技術選定・開発方針。全ドキュメントの前提知識。</p>
+    <p>基本設計。生産面 / 配信面の 2 面の構成、配信面の 4 系統、生産面の工程と関所、2 面の受け渡しの契約、データの流れ、構成要素の一覧、主な判断。まずここから読む（30-3 で旧システム概要を作り直し）。</p>
   </div>
 </div>
 

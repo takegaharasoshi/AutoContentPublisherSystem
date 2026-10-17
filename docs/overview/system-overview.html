@@ -3,157 +3,361 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>システム概要 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<title>基本設計 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / 概要 / システム概要</nav>
-<h1>システム概要</h1>
+<nav class="breadcrumb"><a href="../index.html">docs</a> / 基本設計</nav>
+<h1>基本設計（システムの全体像）</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Fix（Phase 10-1 で見直し済み・Phase 14 の動画対応を 2026-08-09 に反映）</span>
-  <span>最終更新: 2026-08-09</span>
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3 で旧「システム概要」を基本設計として作り直し、生産面と配信面の 2 面で描いた）</span>
+  <span>設計書の 3 段の構成（基本設計 → 層の概要 → 詳細設計）は<a href="../index.html#levels">設計書体系ガイド 2.1</a></span>
 </div>
 
-<h2 id="purpose">1. システムの目的</h2>
-<p>最終目標は<strong>収益化を狙った SNS 運用</strong>である。収益化経路・予算・KPI 等の事業方針は<a href="../strategy/business-strategy.html">事業戦略書</a>で管理する（2026-07-23 に事業戦略層を新設）。</p>
-<p>本システムはその手段として、AWS 上のマネージドサービスを活用し、コンテンツ生成（画像・動画）から SNS 投稿までを自動化するバッチシステムを提供する（Phase 14 で動画〔リール〕へ一般化）。セット（テーマ）の追加・廃止・入れ替えを低コストで繰り返し、試行錯誤で当たりコンテンツを探索するための基盤である。</p>
-
-<h2 id="overview">2. システム構成（概要）</h2>
-
+<section class="page-summary" id="summary">
+<h2>要約</h2>
 <figure class="diagram">
-<svg viewBox="0 0 880 410" role="img" aria-label="システム構成の概要図">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="var(--diag-line)"/>
-    </marker>
-  </defs>
+<pre class="mermaid">
+flowchart TB
+    subgraph PROD["生産面（ローカル PC・スキルで回す）"]
+        direction TB
+        P1["スキルで作る&lt;br&gt;候補 → 人の選別 → 執筆 → 機械検証"] --> P2["content/ のビルドツール&lt;br&gt;動画を作る（Remotion・ffmpeg・TTS）"]
+        P2 --> P3{"人のレビュー&lt;br&gt;全数"}
+    end
+    subgraph HAND["受け渡し（2 面の契約）"]
+        H1[("S3&lt;br&gt;assets/{set}/prebuilt/")]
+        H2[("Aurora の在庫テーブル&lt;br&gt;*_stock_items")]
+    end
+    subgraph DELI["配信面（AWS で自動で回る）"]
+        direction TB
+        D1["① 投稿&lt;br&gt;在庫から 1 本選んで Instagram へ"]
+        D2["② インサイト収集&lt;br&gt;数値とコメント記録を DB へ"]
+        D3["③ コメント自動返信&lt;br&gt;umigame の回答に返信"]
+        D4["④ トークン更新&lt;br&gt;返信用トークンを週 1 回"]
+    end
+    P3 -->|"OK → publish.py"| H1
+    P3 -->|"OK → publish.py"| H2
+    H1 --> D1
+    H2 --> D1
+    D1 --> IG(["Instagram"])
+    IG --> D2
+    IG -->|"Webhook"| D3
+    D4 -.-> D3
+</pre>
+<figcaption>図 1 2 面の全体構成: 生産面で作ってレビューした動画を S3 と在庫テーブルへ置き、配信面がそこから選んで投稿する</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>何をするシステムか</td><td>ショート動画（リール）を Instagram に定時投稿し、反応を集める。テーマ単位の「セット」を足し替えて運用する（稼働中は logic-training-1・pref-ranking-1・umigame-soup-1 の 3 セット）。事業の目的・KPI は<a href="../strategy/business-strategy.html">事業戦略書</a></td></tr>
+    <tr><td>生産面</td><td>スキル（Claude Code / Codex）と <code>content/</code> のツールで、問題・ランキングなどの素材と動画を<strong>事前に</strong>作る。人が全数を見てから配置する <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>受け渡し</td><td>ビルド済み動画を S3 の <code>assets/{set_code}/prebuilt/</code> に、素材の行を Aurora の在庫テーブル（<code>quiz_stock_items</code> / <code>ranking_stock_items</code> / <code>umigame_stock_items</code>）に置く。2 面はこの 2 つだけでつながる <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+    <tr><td>配信面</td><td>4 系統: ①投稿（Scheduler → SFN → ECS） ②インサイト収集（同）③コメント自動返信（Lambda）④トークン更新（Lambda）。動画は投稿時に生成しない（AI を呼ぶのはコメントの判定と返信文だけ）</td></tr>
+    <tr><td>主な技術</td><td>Python・AWS CDK（TypeScript）・ECS Fargate RunTask・Step Functions・EventBridge Scheduler・Aurora Serverless v2・S3・Lambda・SQS。ローカルは Docker（Remotion・ffmpeg）とローカル TTS</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
 
-  <!-- Scheduler -->
-  <rect x="30" y="20" width="250" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="155" y="49" text-anchor="middle" font-size="14" fill="var(--diag-text)">EventBridge Scheduler</text>
+<h2 id="faces">1. 2 面の全体構成</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>面</th><th>どこで動くか</th><th>誰が動かすか</th><th>周期</th><th>成果物</th></tr></thead>
+  <tbody>
+    <tr><td>生産面</td><td>ローカル PC（WSL2 + Docker）</td><td>人 + スキル（週次補充・作問）</td><td>セットごとに週 1 回の補充が目安（在庫水位はセット別設計書）</td><td>S3 の事前ビルド動画・在庫テーブルの行・BGM</td></tr>
+    <tr><td>配信面</td><td>AWS（ap-northeast-1・本番 1 環境）</td><td>EventBridge Scheduler・Instagram の Webhook</td><td>毎日の定時（セクション 3）</td><td>Instagram の投稿・返信、DB の投稿結果・インサイト</td></tr>
+  </tbody>
+</table>
+</div>
+<p>2 面は同期しない。配信面は在庫テーブルの「ビルド済み（動画キーあり）・有効」の行から選ぶだけで、生産面の作業中かどうかを知らない。在庫が尽きないよう、生産面が在庫水位を見て補充する。</p>
 
-  <!-- 画像生成バッチ -->
-  <rect x="30" y="118" width="250" height="70" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="155" y="147" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--diag-text)">画像生成バッチ</text>
-  <text x="155" y="170" text-anchor="middle" font-size="11" fill="var(--diag-text)">Step Functions + ECS Fargate</text>
+<h2 id="production">2. 生産面</h2>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    A["リサーチ・作問&lt;br&gt;（スキル）"] --> B["候補（目標の 2 倍）"]
+    B --> G1{"関所 1&lt;br&gt;人の選別"}
+    G1 -->|OK| C["完成稿の執筆&lt;br&gt;stock_items.py"]
+    G1 -->|NG / 保留| X["見送り・振り返り"]
+    C --> V["機械検証&lt;br&gt;validate.py ほか"]
+    V --> G2{"関所 2&lt;br&gt;素材のレビュー"}
+    G2 -->|OK| I["在庫の行を用意&lt;br&gt;generate.py の SQL&lt;br&gt;（投入の時期はセットにより異なる）"]
+    I --> M["挿絵・背景の画像&lt;br&gt;export_prompts.py → imagegen → 人の確認 → intake.py"]
+    M --> R["動画ビルド&lt;br&gt;build.py（Docker）"]
+    R --> G3{"関所 3&lt;br&gt;動画の全数レビュー&lt;br&gt;review_sheet.py"}
+    G3 -->|OK| P["配置&lt;br&gt;publish.py → S3・ローカル DB&lt;br&gt;apply_aurora.py → Aurora"]
+</pre>
+<figcaption>図 2 生産ラインの共通の工程と関所（人が止める場所）。工程の細部は各スキルの SKILL.md が正（umigame は関所 2 の後に機械プローブ〔コメント判定の試行〕が入り、在庫の投入は配置と一括で行う）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>セット</th><th>補充スキル</th><th>素材のソース</th><th>動画ビルド</th><th>ナレーション</th></tr></thead>
+  <tbody>
+    <tr><td>logic-training-1（なぞなぞ・とんち）</td><td><a href="../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a>（振り返りは <a href="../../.agents/skills/quiz-review-learn/SKILL.md">quiz-review-learn</a>）</td><td><code>content/quiz-stock/logic-training-1/&lt;バッチ&gt;/stock_items.py</code></td><td><code>content/video-build/logic-training-1/</code></td><td>なし（BGM・効果音のみ）</td></tr>
+    <tr><td>pref-ranking-1（都道府県ランキング）</td><td><a href="../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish</a></td><td><code>content/ranking-stock/pref-ranking-1/&lt;バッチ&gt;/stock_items.py</code>（一次データは政府統計をパース）</td><td><code>content/video-build/pref-ranking-1/</code></td><td>VOICEVOX Engine</td></tr>
+    <tr><td>umigame-soup-1（ウミガメのスープ）</td><td><a href="../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish</a>（作問は <a href="../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a>）</td><td><code>content/umigame-stock/umigame-soup-1/&lt;バッチ&gt;/stock_items.py</code></td><td><code>content/video-build/umigame-soup-1/</code></td><td>Irodori-TTS（ローカル）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>動画ビルドの段取りは 3 セット共通: <code>export_prompts.py</code>（挿絵・背景の画像生成プロンプトの書き出し）→ 画像の生成（Codex の imagegen）と人の確認 → <code>intake.py</code>（生成した画像の取り込み）→ <code>build.py</code>（Remotion・ffmpeg を Docker で実行）→ <code>review_sheet.py</code>（全数レビューのページ）→ <code>publish.py</code>（配置）。</p>
 
-  <!-- SNS 投稿バッチ -->
-  <rect x="30" y="300" width="250" height="70" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="155" y="329" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--diag-text)">SNS 投稿バッチ</text>
-  <text x="155" y="352" text-anchor="middle" font-size="11" fill="var(--diag-text)">Step Functions + ECS Fargate</text>
+<h2 id="delivery">3. 配信面の 4 系統</h2>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    subgraph POST["① 投稿"]
+        direction TB
+        s1@{ icon: "aws:scheduler", form: "square", label: "Scheduler（セット × 時刻）" }
+        f1@{ icon: "aws:step-functions", form: "square", label: "image-generation-sfn" }
+        t1@{ icon: "aws:fargate", form: "square", label: "image-batch（在庫から 1 本選ぶ）" }
+        f2@{ icon: "aws:step-functions", form: "square", label: "sns-posting-sfn" }
+        t2@{ icon: "aws:fargate", form: "square", label: "sns-post-batch（投稿）" }
+        s1 --> f1 --> t1
+        f1 -->|"成功後に起動"| f2 --> t2
+    end
+    subgraph INS["② インサイト収集"]
+        direction TB
+        s2@{ icon: "aws:scheduler", form: "square", label: "Scheduler（06:00 / 18:00）" }
+        f3@{ icon: "aws:step-functions", form: "square", label: "insights-collection-sfn" }
+        t3@{ icon: "aws:fargate", form: "square", label: "insights-batch" }
+        s2 --> f3 --> t3
+    end
+    subgraph CR["③ コメント自動返信（umigame）"]
+        direction TB
+        l1@{ icon: "aws:lambda", form: "square", label: "webhook（Function URL）" }
+        q1@{ icon: "aws:sqs", form: "square", label: "FIFO キュー" }
+        l2@{ icon: "aws:lambda", form: "square", label: "reply（判定・返信）" }
+        l1 --> q1 --> l2
+    end
+    subgraph TR["④ トークン更新"]
+        direction TB
+        s3@{ icon: "aws:scheduler", form: "square", label: "Scheduler（月曜 04:00）" }
+        l3@{ icon: "aws:lambda", form: "square", label: "token-refresh" }
+        s3 --> l3
+    end
+    db@{ icon: "aws:aurora", form: "square", label: "Aurora" }
+    s3b@{ icon: "aws:s3", form: "square", label: "S3" }
+    sm@{ icon: "aws:secrets-manager", form: "square", label: "Secrets Manager" }
+    t1 --> db
+    t1 --> s3b
+    t2 --> db
+    t2 --> s3b
+    t3 --> db
+    l2 --> s3b
+    l3 --> sm
+</pre>
+<figcaption>図 3 配信面の 4 系統（AWS 構成）。SFN の先頭では毎回 DB 準備確認（db-readiness-check）が走る（図では省略）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>系統</th><th>起動</th><th>実体</th><th>やること</th><th>読む / 書く</th></tr></thead>
+  <tbody>
+    <tr><td>① 投稿</td><td>EventBridge Scheduler（Asia/Tokyo）: logic-training-1 毎日 07:30・21:00（12:30 枠は停止中）/ pref-ranking-1 毎日 20:00 / umigame-soup-1 日・火・木・土の 20:00</td><td>SFN <code>acps-prod-image-generation-sfn</code> → ECS <code>image-batch</code>、成功後に SFN <code>acps-prod-sns-posting-sfn</code> → ECS <code>sns-post-batch</code> <a class="decision-ref" href="#d-03">→ 理由 D-03</a></td><td>セットの生成方式（事前ビルド 3 方式）で在庫から 1 本選び、当回の投稿として登録 → Instagram Graph API でリールを投稿（セットにより ストーリーズにも再掲）</td><td>読む: 在庫テーブル・S3 <code>assets/</code>。書く: <code>generation_runs</code>・<code>generated_media</code>・<code>posts</code>・S3 <code>videos/</code>。umigame は投稿後に問題スナップショットを S3 へ</td></tr>
+    <tr><td>② インサイト収集</td><td>Scheduler: 3 セットとも毎日 06:00・18:00</td><td>SFN <code>acps-prod-insights-collection-sfn</code> → ECS <code>insights-batch</code></td><td>直近 14 日の投稿のインサイトとアカウント日次インサイトを集め、コメント記録 JSON を DB に取り込む</td><td>書く: <code>post_insights</code>・<code>account_insights_daily</code>・<code>umigame_comment_logs</code>。読む: S3 <code>comment-log/</code></td></tr>
+    <tr><td>③ コメント自動返信</td><td>Instagram の Webhook（コメント）</td><td>Lambda <code>acps-prod-comment-reply-webhook</code> → SQS FIFO <code>acps-prod-comment-reply.fifo</code> → Lambda <code>acps-prod-comment-reply-reply</code>（<code>CommentReplyStack</code>）</td><td>署名を検証してキューへ入れ、問題スナップショットを基に回答を LLM（Anthropic・OpenAI の API）で判定し、返信文を作って返信する</td><td>読む: S3 <code>assets/umigame-soup-1/problems/</code>。書く: S3 <code>comment-log/</code>（Aurora には書かない <a class="decision-ref" href="#d-04">→ 理由 D-04</a>）</td></tr>
+    <tr><td>④ トークン更新</td><td>Scheduler: 毎週月曜 04:00</td><td>Lambda <code>acps-prod-comment-reply-token-refresh</code></td><td>コメント返信用の Instagram 長期トークンを更新する。投稿用トークンは手動更新 <a class="decision-ref" href="#d-05">→ 理由 D-05</a></td><td>書く: Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>3 つの SFN はすべて先頭で <code>db-readiness-check</code>（ECS）を走らせ、Aurora の起動を待ってからバッチを動かす <a class="decision-ref" href="#d-06">→ 理由 D-06</a>。失敗は CloudWatch アラーム・ECS 異常終了ルールから SNS トピック <code>acps-prod-alarm-topic</code> へ通知する（<code>MonitoringStack</code>）。</p>
 
-  <!-- ストレージ -->
-  <rect x="380" y="160" width="200" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="480" y="189" text-anchor="middle" font-size="13" fill="var(--diag-text)">S3（生成画像）</text>
+<h2 id="contract">4. 2 面の受け渡しの契約</h2>
+<p>生産面が書き、配信面が読む。配信面は在庫テーブルの選んだ行の <code>last_used_at</code>・<code>use_count</code> だけを更新し、素材の中身は書き換えない。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>受け渡すもの</th><th>置き場所</th><th>書く（生産面）</th><th>読む（配信面）</th></tr></thead>
+  <tbody>
+    <tr><td>ビルド済み動画</td><td>S3 <code>assets/logic-training-1/prebuilt/{content_key}.mp4</code><br><code>assets/pref-ranking-1/prebuilt/{content_key}_{20s|30s}.mp4</code><br><code>assets/umigame-soup-1/prebuilt/{content_key}.mp4</code>（ライフサイクルの失効対象外）</td><td><code>publish.py</code>（<code>aws s3 cp</code>）</td><td><code>image-batch</code> が取得して当回の <code>videos/{set_code}/{YYYYMMDD}/{run_id}/…</code> へ写す（30 日で失効）</td></tr>
+    <tr><td>素材の行</td><td>Aurora <code>quiz_stock_items</code> / <code>ranking_stock_items</code> / <code>umigame_stock_items</code></td><td><code>generate.py</code> の INSERT SQL・<code>publish.py</code> の UPDATE SQL を <code>apply_aurora.py</code>（RDS Data API）で適用</td><td><code>image-batch</code> が「有効かつ動画キーあり」の行から、未使用 → 最も古く使ったものの順で 1 件選ぶ</td></tr>
+    <tr><td>動画キーの紐づけ</td><td>在庫テーブルの <code>video_s3_key</code>（ranking は <code>video_s3_key_20s</code> / <code>_30s</code>）・<code>video_audio_asset_id</code></td><td><code>publish.py</code>（照合キーは環境に依存しない <code>content_key</code>）</td><td><code>image-batch</code>（キーが NULL の行は選ばない）</td></tr>
+    <tr><td>BGM</td><td>S3 <code>audio/{set_code}/…</code>・Aurora <code>audio_assets</code></td><td>セット登録・補充時の SQL</td><td>動画に焼き込み済み。行は投稿の記録に紐づける</td></tr>
+  </tbody>
+</table>
+</div>
+<p>列の定義・選び方の詳細は<a href="../app/data-model.html#entities">データモデル設計</a>と各方式設計書（<a href="../app/generators/quiz-prebuilt.html">quiz-prebuilt</a> / <a href="../app/generators/ranking-prebuilt.html">ranking-prebuilt</a> / <a href="../app/generators/umigame-prebuilt.html">umigame-prebuilt</a>）。</p>
 
-  <rect x="380" y="228" width="200" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="480" y="251" text-anchor="middle" font-size="13" fill="var(--diag-text)">Aurora Serverless v2</text>
-  <text x="480" y="268" text-anchor="middle" font-size="11" fill="var(--diag-text)">（メタ情報・投稿結果）</text>
-
-  <!-- 外部 API -->
-  <rect x="640" y="118" width="220" height="70" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="750" y="147" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">画像生成 API</text>
-  <text x="750" y="170" text-anchor="middle" font-size="11" fill="var(--diag-text)">（生成方式として差し替え可能）</text>
-
-  <rect x="640" y="300" width="220" height="70" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="750" y="329" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">SNS プラットフォーム API</text>
-  <text x="750" y="352" text-anchor="middle" font-size="11" fill="var(--diag-text)">（投稿先。複数プラットフォーム前提）</text>
-
-  <!-- 矢印 -->
-  <line x1="155" y1="68" x2="155" y2="114" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="168" y="97" font-size="11" fill="var(--diag-text)">定期起動</text>
-
-  <line x1="155" y1="188" x2="155" y2="296" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="168" y="245" font-size="11" fill="var(--diag-text)">成功後に自動起動</text>
-
-  <line x1="280" y1="140" x2="636" y2="145" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="440" y="132" font-size="11" fill="var(--diag-text)">画像生成 API 呼び出し</text>
-
-  <line x1="280" y1="172" x2="376" y2="180" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="280" y1="185" x2="376" y2="243" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <line x1="280" y1="320" x2="376" y2="200" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="280" y1="335" x2="376" y2="260" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <line x1="280" y1="352" x2="636" y2="343" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="450" y="368" font-size="11" fill="var(--diag-text)">Presigned URL で投稿</text>
-</svg>
-<figcaption>システム構成の概要。詳細なアーキテクチャは <a href="../infra/architecture.html">infra/architecture.html</a> を参照。</figcaption>
+<h2 id="dataflow">5. データの流れ</h2>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    ST[("在庫テーブル&lt;br&gt;*_stock_items")] -->|"1 件選ぶ"| GR["generation_runs&lt;br&gt;generated_media&lt;br&gt;*_items（出題の写し）"]
+    GR --> PO["posts・post_media&lt;br&gt;（投稿結果）"]
+    PO --> IGP(["Instagram の投稿"])
+    IGP -->|"② 06:00 / 18:00"| PI["post_insights&lt;br&gt;account_insights_daily"]
+    PI --> KPI["KPI ビュー v_*_kpi_*&lt;br&gt;→ 月次 KPI 転記"]
+    PO -->|"umigame のみ"| SN[("S3 problems/&lt;br&gt;{media_id}.json")]
+    IGP -->|"コメント"| RP["③ 返信"]
+    SN --> RP
+    RP --> CL[("S3 comment-log/")]
+    CL -->|"② に相乗りで取り込み"| UC["umigame_comment_logs"]
+</pre>
+<figcaption>図 4 データの流れ（配信面）。テーブルの全体と ER 図は<a href="../app/data-model.html#er">データモデル設計</a></figcaption>
+</figure>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    participant SP as sns-post-batch
+    participant S3 as S3
+    participant IG as Instagram
+    participant WH as webhook Lambda
+    participant RL as reply Lambda
+    participant IB as insights-batch
+    SP->>IG: リールを投稿
+    SP->>S3: 問題スナップショット problems/{media_id}.json
+    IG->>WH: コメントの Webhook
+    WH->>RL: SQS FIFO（media_id 単位で順番どおり）
+    RL->>S3: スナップショットを読む
+    RL->>IG: 判定結果に応じて返信
+    RL->>S3: コメント記録 comment-log/{set}/dt=日付/{comment_id}.json
+    IB->>S3: 06:00 / 18:00 に直近 3 日分を読む
+    IB->>IB: umigame_comment_logs へ取り込み（365 日で削除）
+</pre>
+<figcaption>図 5 umigame のコメントの流れ（投稿 → 返信 → 記録の取り込み）</figcaption>
 </figure>
 
-<h3>2.1 画像生成バッチ</h3>
-<ol>
-  <li>EventBridge Scheduler が定期的に画像生成ワークフロー（Step Functions）を起動する</li>
-  <li>DB 準備確認（Aurora の利用可能確認）の後、画像生成 ECS Fargate タスクがコンテンツ（画像または動画）を生成する。生成方式（利用する API・合成処理の有無・事前生成かの別）はセットごとに選択・差し替え可能とし、特定のサービス名に固定しない（方式カタログは <a href="../app/batch-flow.html#generator-catalog">app/batch-flow.html セクション 2.1</a> を参照）</li>
-  <li>生成したメディアを S3 に保存し、メタ情報を Aurora Serverless v2 に登録する</li>
-</ol>
-
-<h3>2.2 SNS 投稿バッチ</h3>
-<ol>
-  <li>画像生成ワークフローの成功後に SNS 投稿ワークフロー（Step Functions）が自動起動する（手動での単独実行も可能）</li>
-  <li>DB 準備確認の後、SNS 投稿 ECS Fargate タスクが DB から投稿対象を取得する</li>
-  <li>S3 のメディア（画像・動画）に対して Presigned URL を発行し、投稿先プラットフォームの API に渡して投稿する。将来的に複数種類の SNS 媒体へ投稿する前提とし、特定のプラットフォームに固定しない（対応プラットフォーム・投稿フローの詳細は <a href="../app/batch-flow.html#flow-sns">app/batch-flow.html セクション 3</a> を参照）</li>
-  <li>投稿結果を DB に記録する</li>
-</ol>
-
-<div class="note">
-  <span class="callout-title">アプリ仕様の定義場所</span>
-  投稿対象の決め方・冪等性・再試行などの処理ロジックはアプリ設計（<a href="../app/index.html">docs/app/</a>）で定義済み（Phase 9 で詳細化・Phase 10-1 で最終 Fix）。本ドキュメントおよびインフラ設計書では実行基盤のみを扱う。
-</div>
-
-<h2 id="tech">3. 技術選定</h2>
+<h2 id="components">6. 構成要素の一覧</h2>
+<h3 id="components-services">6.1 配信面のプログラム（<code>services/</code>）</h3>
 <div class="table-wrap">
 <table>
-  <thead><tr><th>要素</th><th>技術</th><th>選定理由</th></tr></thead>
+  <thead><tr><th>サービス</th><th>実行形態</th><th>役割</th></tr></thead>
   <tbody>
-    <tr><td>開発言語</td><td>Python</td><td>AI/ML ライブラリの充実、API 連携の容易さ</td></tr>
-    <tr><td>DB</td><td>Aurora Serverless v2（MySQL 互換）</td><td>自動一時停止によるコスト最適化、サーバーレス運用</td></tr>
-    <tr><td>バッチ実行</td><td>ECS Fargate RunTask</td><td>サーバー管理不要、タスク単位の課金</td></tr>
-    <tr><td>ワークフロー</td><td>Step Functions Standard</td><td>エラーハンドリング（Retry/Catch）、可視化</td></tr>
-    <tr><td>スケジューラ</td><td>EventBridge Scheduler</td><td>cron 式による柔軟なスケジュール設定</td></tr>
-    <tr><td>インフラ定義</td><td>AWS CDK</td><td>TypeScript による型安全なインフラ定義</td></tr>
-    <tr><td>CI/CD</td><td>CodePipeline + CodeBuild</td><td>AWS ネイティブ、ECR 連携の容易さ</td></tr>
+    <tr><td><code>db-readiness-check</code></td><td>ECS Fargate（3 SFN の先頭）</td><td>Aurora の起動を待ち、接続を確かめる</td></tr>
+    <tr><td><code>image-batch</code></td><td>ECS Fargate（<code>image-generation-sfn</code>）</td><td>セットの生成方式で当回の動画を用意し登録する。稼働 3 セットは事前ビルド方式（<code>quiz-prebuilt</code> / <code>ranking-prebuilt</code> / <code>umigame-prebuilt</code>）。実行時生成の方式（<code>gpt-*</code>）は登録だけ残り、使うセットはない</td></tr>
+    <tr><td><code>sns-post-batch</code></td><td>ECS Fargate（<code>sns-posting-sfn</code>）</td><td>当回の生成結果を Instagram へ投稿し結果を記録する。umigame は問題スナップショットを書く</td></tr>
+    <tr><td><code>insights-batch</code></td><td>ECS Fargate（<code>insights-collection-sfn</code>）</td><td>投稿・アカウントのインサイト収集とコメント記録の取り込み</td></tr>
+    <tr><td><code>comment-reply</code></td><td>Lambda 3 本（webhook / reply / token-refresh）</td><td>umigame のコメント自動返信と返信用トークンの更新</td></tr>
+    <tr><td><code>shared/acps_shared</code></td><td>ライブラリ</td><td>ECS バッチ共通（DB 接続・Secrets・S3・Instagram API・SNS Secret の名前規約）</td></tr>
   </tbody>
 </table>
 </div>
 
-<h2 id="env">4. 開発環境</h2>
+<h3 id="components-stacks">6.2 CDK スタック（<code>infra/lib/</code>）</h3>
 <div class="table-wrap">
 <table>
-  <thead><tr><th>項目</th><th>詳細</th></tr></thead>
+  <thead><tr><th>スタック</th><th>主なリソース</th><th>依存</th></tr></thead>
   <tbody>
-    <tr><td>開発端末</td><td>Windows</td></tr>
-    <tr><td>エディタ</td><td>VS Code ベースのエディタ</td></tr>
-    <tr><td>開発環境</td><td>WSL2（Ubuntu）</td></tr>
-    <tr><td>コンテナ</td><td>Docker Desktop</td></tr>
+    <tr><td><code>FoundationStack</code></td><td>VPC（NAT なし）・S3 バケット・Aurora Serverless v2・Secrets・ECS クラスター・ECR 4 個・db-readiness-check のタスク定義</td><td>—（起点）</td></tr>
+    <tr><td><code>SnsPostBatchStack</code></td><td>sns-post-batch のタスク定義・<code>sns-posting-sfn</code>・CodePipeline（スケジュールは持たない）</td><td>Foundation</td></tr>
+    <tr><td><code>ImageBatchStack</code></td><td>image-batch のタスク定義・<code>image-generation-sfn</code>・投稿のスケジュール・CodePipeline</td><td>Foundation・SnsPostBatch</td></tr>
+    <tr><td><code>InsightsBatchStack</code></td><td>insights-batch のタスク定義・<code>insights-collection-sfn</code>・収集のスケジュール・CodePipeline</td><td>Foundation</td></tr>
+    <tr><td><code>CommentReplyStack</code> / <code>CommentReplyStagingStack</code></td><td>Lambda 3 本・SQS FIFO と DLQ・返信用 Secret・トークン更新のスケジュール（本番面はプライバシーポリシーの公開バケットも）。同じクラスで本番面とステージング面を作る</td><td>Foundation</td></tr>
+    <tr><td><code>MonitoringStack</code></td><td>アラーム用 SNS トピック・SFN 失敗・Scheduler・DLQ・トークン更新・Aurora のアラーム・ECS 異常終了ルール</td><td>上記すべて（ステージング面を除く）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>ECS バッチの 3 サービスは、main への push で CodePipeline → CodeBuild → ECR → タスク定義の新リビジョン登録まで自動で進む。インフラと Lambda は手動の <code>cdk deploy</code>（<a href="../infra/cicd.html">CI/CD 設計</a>）。</p>
+
+<h3 id="components-skills">6.3 スキル（<code>.agents/skills/</code>）</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>分類</th><th>スキル</th><th>役割</th></tr></thead>
+  <tbody>
+    <tr><td>生産ライン</td><td><code>quiz-stock-replenish</code> / <code>quiz-review-learn</code></td><td>logic-training-1 の補充 / NG・保留候補の振り返りを作問基準へ反映</td></tr>
+    <tr><td>生産ライン</td><td><code>ranking-stock-replenish</code></td><td>pref-ranking-1 の補充</td></tr>
+    <tr><td>生産ライン</td><td><code>umigame-stock-replenish</code> / <code>umigame-problem-writer</code></td><td>umigame-soup-1 の補充（運用）/ 作問</td></tr>
+    <tr><td>生産ラインの道具</td><td><code>remotion-*</code>（6 本）</td><td>Remotion（動画の版面）の汎用知識</td></tr>
+    <tr><td>開発・運用の進め方</td><td><code>step</code> / <code>idea</code> / <code>issue</code> / <code>incident</code> / <code>docs-mobile-view</code></td><td>計画のステップ着手 / アイデア / 課題 / 障害対応 / 設計書のスマホ閲覧</td></tr>
   </tbody>
 </table>
 </div>
 
-<h2 id="policy">5. 開発方針</h2>
-<ul>
-  <li><strong>モノリポジトリ</strong>を採用し、全サービスを単一リポジトリで管理する</li>
-  <li><strong>機能単位（サービス単位）</strong>でコンテナイメージを分割する</li>
-  <li>CodePipeline / CodeBuild はサービスごとに分ける</li>
-  <li>CDK Deploy はサービスごとに分ける</li>
-  <li>共通インフラと各サービスは CDK スタックを分離する</li>
-  <li><strong>インフラを先に構築し、業務ロジック（アプリ）は後から設計・実装する</strong>（進め方は <a href="../plans/development-plan.html">docs/plans/development-plan.html</a> を参照）</li>
-</ul>
+<h3 id="components-stock">6.4 ストックとツール（<code>content/</code>）</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>場所</th><th>中身</th></tr></thead>
+  <tbody>
+    <tr><td><code>content/quiz-stock/</code> <code>ranking-stock/</code> <code>umigame-stock/</code></td><td>セット別の素材のソース（バッチ単位の <code>stock_items.py</code>）と <code>generate.py</code>・<code>validate.py</code> などの検証ツール、セット登録の SQL</td></tr>
+    <tr><td><code>content/video-build/&lt;set&gt;/</code></td><td>動画ビルドの段取り（<code>export_prompts.py</code> → 画像の生成と確認 → <code>intake.py</code> → <code>build.py</code> → <code>review_sheet.py</code> → <code>publish.py</code>）</td></tr>
+    <tr><td><code>content/insights-analysis/</code></td><td>インサイトの集計ランナー（読み取り専用。月次 KPI 転記に使う）</td></tr>
+  </tbody>
+</table>
+</div>
 
-<h2 id="future">6. 拡張計画</h2>
-<ul>
-  <li>画像生成バッチと SNS 投稿バッチを 1 セットとし、将来的に複数セットを運用する
-    <ul>
-      <li>複数セット運用時は、Step Functions ステートマシンを共有し、EventBridge Scheduler をセットごとに追加する方式を採る</li>
-      <li>スケジュール定義のマスタは IaC（CDK）とする</li>
-      <li>セット間の差分は DB のセット設定と生成方式 strategy モジュール（差し替え可能）で表現し、投稿先 SNS も複数プラットフォーム対応を前提とする（設計書は <a href="../app/design-outline.html#set-docs">app/design-outline.html セクション 1.1</a> の 3 層構造〔契約 / 方式 / セット〕で管理する）</li>
-    </ul>
-  </li>
-  <li>管理画面（オンラインシステム）を追加し、設定・履歴・バッチ管理を GUI で行えるようにする</li>
-</ul>
+<h2 id="entry">7. 詳細設計への入口</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>知りたいこと</th><th>入口</th></tr></thead>
+  <tbody>
+    <tr><td>生産ラインの全体像・関所・受け渡しの契約</td><td>生産設計 <code>docs/production/</code>（Phase 30-5 で新設）。それまでは各スキルの SKILL.md と<a href="../app/operation.html">アプリ運用設計</a></td></tr>
+    <tr><td>AWS の構成・ネットワーク・データストア</td><td><a href="../infra/architecture.html">アーキテクチャ</a></td></tr>
+    <tr><td>SFN・スケジュール・監視リソース</td><td><a href="../infra/workflow.html">ワークフロー</a></td></tr>
+    <tr><td>CDK スタックの実装仕様 / IAM・Secrets / CI/CD / インフラ運用</td><td><a href="../infra/stacks.html">stacks</a> / <a href="../infra/security.html">security</a> / <a href="../infra/cicd.html">cicd</a> / <a href="../infra/operation.html">operation</a></td></tr>
+    <tr><td>バッチの処理フロー・生成方式の契約</td><td><a href="../app/batch-flow.html">バッチ処理フロー</a>（方式カタログは<a href="../app/batch-flow.html#generator-catalog">2.1</a>）</td></tr>
+    <tr><td>テーブル・ER 図</td><td><a href="../app/data-model.html">データモデル</a></td></tr>
+    <tr><td>セット別の仕様（素材・投稿時刻・コメント返信）</td><td><a href="../app/index.html#set-docs">セット別設計書の一覧</a>（コメント自動返信は<a href="../app/sets/umigame-soup-1.html#comment-reply">umigame-soup-1 の 10 節</a>）</td></tr>
+    <tr><td>トークン更新の手順</td><td><a href="../app/operation.html#token-refresh">アプリ運用設計 5.4</a></td></tr>
+  </tbody>
+</table>
+</div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<article id="d-01">
+<h3>D-01 動画は事前にビルドし、人が全数を見てから置く</h3>
+<dl>
+  <dt>決めたこと</dt><dd>稼働セットの動画は生産面で事前に作り、人が全数レビューしてから S3 と在庫テーブルへ置く。配信面は投稿時に動画・画像を生成しない（実行時生成の方式は登録だけ残す）。配信面で AI を呼ぶのはコメント返信の判定と返信文だけ</dd>
+  <dt>理由</dt><dd>実行時に生成すると、人が見ないまま投稿される。画像生成 API の品質確認で、看板の文字やパネルの数字など崩れが出た（2026-08-07）。事前に作れば投稿前に全数を直せる</dd>
+  <dt>日付・出典</dt><dd>2026-08-08（logic-training-1 の quiz-prebuilt 転換・Phase 16-3b）。以後 pref-ranking-1・umigame-soup-1 も事前ビルド方式で開始。<a href="../app/batch-flow.html#generator-catalog">方式カタログ</a></dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 2 面は S3 のキーと在庫テーブルだけでつなぐ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>生産面から配信面へ渡すのは、S3 <code>assets/{set_code}/prebuilt/</code> の動画と在庫テーブルの行だけにする。照合は環境に依存しない <code>content_key</code> で行う</dd>
+  <dt>理由</dt><dd>配信面のバッチを変えずに、セットごとの素材と版面を生産面だけで作り直せる。ローカル DB と Aurora で行の ID が違っても同じ素材を指せる</dd>
+  <dt>日付・出典</dt><dd>Phase 16-3b〜17・21 の事前ビルド方式の設計（<a href="../app/generators/quiz-prebuilt.html">quiz-prebuilt</a> ほか）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 投稿は「選定 → 投稿」の 2 つの SFN を続けて動かす</h3>
+<dl>
+  <dt>決めたこと</dt><dd>投稿は生成（選定）の SFN が成功した後に、投稿の SFN を起動する。投稿の SFN は自分のスケジュールを持たず、手動で単独実行もできる</dd>
+  <dt>理由</dt><dd>生成と投稿を別のタスク・別の失敗単位にして、投稿だけをやり直せるようにする。1 回の起動で当回の分だけを投稿する（Phase 26 で当回固定）</dd>
+  <dt>日付・出典</dt><dd>当初設計（Phase D〜10）・Phase 26。<a href="../infra/workflow.html">ワークフロー</a></dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 コメント返信は Aurora に書かず、記録を S3 に置く</h3>
+<dl>
+  <dt>決めたこと</dt><dd>返信の Lambda は S3 の <code>comment-log/</code> にコメント記録を置くだけにし、DB への取り込みはインサイト収集（06:00 / 18:00）に相乗りする</dd>
+  <dt>理由</dt><dd>返信の経路を Aurora が停止中でも動かすため。取り込みを相乗りにして Aurora の起動回数を増やさない</dd>
+  <dt>日付・出典</dt><dd>2026-10（Phase 21-7b）。<code>database/V016__umigame_comment_logs.sql</code> の冒頭</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 返信用トークンだけ自動で更新する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>コメント返信用の Instagram 長期トークンは Lambda で毎週更新する。投稿用トークンは手動更新とリマインドのまま</dd>
+  <dt>理由</dt><dd>返信用は 60 日の失効が実際に起きる方式で、失効すると返信が全件止まる</dd>
+  <dt>日付・出典</dt><dd>2026-10-11（Phase 21-6g）・課題 I-031。<a href="../app/operation.html#token-refresh">アプリ運用設計 5.4</a></dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 Aurora は自動で一時停止させ、SFN の先頭で起動を待つ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Aurora Serverless v2 の自動一時停止（最小 0 ACU）を使い、どの SFN も先頭で DB 準備確認を走らせる</dd>
+  <dt>理由</dt><dd>バッチは 1 日数回しか動かないため、止めている時間のコストを払わない。バッチ側は DB が使える前提で書ける</dd>
+  <dt>日付・出典</dt><dd>当初設計（技術選定）。<a href="../infra/workflow.html#db-readiness">ワークフロー 2 節</a></dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 技術の選定</h3>
+<dl>
+  <dt>決めたこと</dt><dd>言語 Python・インフラ定義 AWS CDK（TypeScript）・実行は ECS Fargate RunTask（ECS Service は使わない）・ワークフロー Step Functions Standard・スケジューラ EventBridge Scheduler・DB Aurora Serverless v2（MySQL 互換）・CI/CD CodePipeline + CodeBuild。モノリポジトリで、サービスごとにコンテナイメージ・CDK スタック・パイプラインを分ける</dd>
+  <dt>理由</dt><dd>Python は API 連携と AI ライブラリが揃う。Fargate はサーバー管理が要らずタスク単位の課金。Step Functions は Retry / Catch と可視化。Scheduler は cron 式とタイムゾーン指定。CDK は型のある IaC。CodePipeline は ECR との連携が容易</dd>
+  <dt>日付・出典</dt><dd>当初設計（Phase D）。旧「システム概要」の技術選定表を移した</dd>
+</dl>
+</article>
+</section>
 
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>

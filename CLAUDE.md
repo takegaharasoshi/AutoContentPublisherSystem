@@ -14,7 +14,7 @@ AutoContentPublisherSystem/
 │   ├── assets/                      #   設計書共通スタイル（style.css）・図の初期化（docs-diagrams.js）・同梱ライブラリ（vendor/）
 │   ├── _templates/design-page.html  #   設計書ページの雛形（書式の見本。Phase 30-1）
 │   ├── strategy/                    #   事業戦略書（収益化戦略・予算・KPI・展開方針）
-│   ├── overview/                    #   システム概要（Phase 30-3 で基本設計として作り直す）
+│   ├── overview/                    #   基本設計（2 面の全体像。Phase 30-3 で旧システム概要を作り直し）
 │   ├── production/                  #   生産設計（Phase 30-5 で新設予定。生産ラインの全体像・関所・受け渡しの契約・スキル一覧）
 │   ├── infra/                       #   インフラ設計書（HTML）
 │   ├── app/                         #   アプリ設計書（共通設計書 + generators/ 方式別 + sets/ セット別の 3 層構造）
@@ -65,7 +65,7 @@ AutoContentPublisherSystem/
 | ディレクトリ | 目的 | ドキュメント |
 |---|---|---|
 | `docs/strategy/` | 事業戦略（収益化戦略・予算・KPI・展開方針・セットポートフォリオ） | `business-strategy.html` |
-| `docs/overview/` | システムの目的・スコープ・技術選定（Phase 30-3 で基本設計として作り直す） | `system-overview.html` |
+| `docs/overview/` | 基本設計（生産面 / 配信面の 2 面の構成・配信面の 4 系統・受け渡しの契約・構成要素の一覧・主な判断。Phase 30-3） | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
 | `docs/production/` | 生産設計（Phase 30-5 で新設予定。スキルで回す生産ラインの全体像・関所・受け渡しの契約・スキル一覧。工程の細部は SKILL.md が正） | `index.html`（入口）+ セット別の生産設計 |
 | `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
