@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-18（<strong>30-1 完了</strong>: 書き方と体系を定め、図のライブラリ〔Mermaid・svg-pan-zoom・AWS アイコン〕を同梱した。次は <a href="#step-30-2">30-2</a> 見た目の確認〔ユーザー判断〕）。前回: 2026-10-17（<strong>Phase 30 起票</strong>: 設計書を生産面と配信面の 2 面で描き直し、基本設計と詳細設計に段階化する〔<a href="../issues/index.html#I-040">I-040</a> の展開。30-1 書き方と土台 → 30-2 見た目の確認〔ユーザー判断〕→ 30-3 基本設計 → 30-4〜30-9 詳細設計を範囲ごとに〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-18（<strong>30-1 完了・30-2 go</strong>: 書き方と体系を定め、図のライブラリ〔Mermaid・svg-pan-zoom・AWS アイコン〕を同梱し、雛形の見た目をユーザーが OK とした。次は <a href="#step-30-3">30-3</a> 基本設計）。前回: 2026-10-17（<strong>Phase 30 起票</strong>: 設計書を生産面と配信面の 2 面で描き直し、基本設計と詳細設計に段階化する〔<a href="../issues/index.html#I-040">I-040</a> の展開。30-1 書き方と土台 → 30-2 見た目の確認〔ユーザー判断〕→ 30-3 基本設計 → 30-4〜30-9 詳細設計を範囲ごとに〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -82,7 +82,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 1 件（クリックで展開）</summary>
+<summary>完了済み 2 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
@@ -131,18 +131,12 @@
 </details>
 </div>
 </article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-2" data-step-id="30-2" data-status="todo" data-kind="decision">
+<article class="plan-step" id="step-30-2" data-step-id="30-2" data-status="done" data-completed="2026-10-18" data-kind="decision">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-2</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<div class="plan-meta"><strong>30-2</strong><span class="plan-status">完了</span><span>2026-10-18</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>雛形の見た目と書式ルールを確認する（ユーザー判断）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-1 の push 直後から確認できる。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 go</strong>。ユーザーが雛形 <a href="../_templates/design-page.html">design-page.html</a> をファイルから直接開いて確認し、OK（観点 ①〜④ を一括で OK・個別の指摘なし）。次は <a href="#step-30-3">30-3</a> 基本設計。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -161,13 +155,23 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 go</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li>確認方法: ユーザーが Windows のブラウザーで <code>file://wsl.localhost/…/docs/_templates/design-page.html</code> を直接開いた（観点 ④ のファイル直開きでの描画を兼ねる）</li>
+<li>判定: 観点 ①図の読みやすさ・拡大縮小 ②冒頭の要約の量と形 ③本文と判断の記録の分け方・リンクの飛び方 ④直接開いての描画 を<strong>一括で OK</strong>（観点別の NG・修正指示なし）→ <strong>go</strong></li>
+<li>30-1 の報告で挙げた構成図（<code>architecture-beta</code>）の線がラベルに少し重なる点は、指摘なしのため現状のまま。30-3 以降で読みにくければ <code>flowchart</code> のアイコン付きの形に切り替える</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-3" data-step-id="30-3" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-3</strong><span class="plan-status">未着手</span></div>
