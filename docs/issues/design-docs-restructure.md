@@ -46,6 +46,16 @@ detail: ""
 - 図の描き方
   - **採用: Mermaid を `docs/assets/vendor/` に同梱する**（1 ファイル版 `mermaid.min.js` を `<script>` で読む。`file://` で直接開いても、スマホ閲覧の HTTP 経由でも動く）
   - 不採用: インライン SVG / HTML の手描き。外部ライブラリは要らないが、直す手間が重く、図にできる範囲が狭まる
+- 同梱するライブラリ
+  - **採用（28-1 で入れる）**:
+    - Mermaid（構成図・処理フローに加え、ER 図・シーケンス図・状態遷移図も使い分ける）
+    - svg-pan-zoom（スマホで図を拡大・移動する）
+    - AWS Architecture Icons（構成図のアイコン）
+  - **必要になったら足す**: highlight.js（DDL・JSON・Python の色付け）、tocbot（長いページの追従目次）
+  - **見送り**:
+    - グラフのライブラリ（Chart.js 等）: KPI の数値を手で埋め込むことになり、設計書の用途ではない。必要ならアイデアとして検討する
+    - 表の並び替え・絞り込みのライブラリ: 既存の `docs-cards.js` に足す方が軽い
+    - Graphviz（viz.js）・Excalidraw: 重く、Mermaid でほぼ足りる
 
 ## 原文メモ
 
@@ -142,3 +152,4 @@ detail: ""
   - CLAUDE.md の決まりを「外部ライブラリは `docs/assets/vendor/` に同梱したものだけ使う」に改める
   - 図の書き方のルール: 縦向きの流れを基本にし、横に広い図は横スクロールの枠に入れる。配色は `style.css` に合わせた設定を 1 か所に置く
   - `tools/docs_check.py` が、Mermaid の描画完了を待ってからはみ出しを検査するようにする
+- 追記（同日・ライブラリの選定）: 同梱するのは Mermaid・svg-pan-zoom・AWS Architecture Icons の 3 つ（28-1）。highlight.js・tocbot は書き直しの中で必要になったら足す。グラフ・表操作のライブラリと Graphviz / Excalidraw は見送る。28-1 では、`docs/index.html` に「使ってよいライブラリの一覧」（名前・バージョン・用途・ライセンス）を置き、一覧にないものは使わないルールにする
