@@ -11,9 +11,11 @@ AutoContentPublisherSystem — AWS 上で動作するコンテンツ生成（画
 AutoContentPublisherSystem/
 ├── docs/                            # 設計書（下記「設計書体系」参照）
 │   ├── index.html                   #   設計書体系ガイド（エントリポイント）
-│   ├── assets/style.css             #   設計書共通スタイル
+│   ├── assets/                      #   設計書共通スタイル（style.css）・図の初期化（docs-diagrams.js）・同梱ライブラリ（vendor/）
+│   ├── _templates/design-page.html  #   設計書ページの雛形（書式の見本。Phase 30-1）
 │   ├── strategy/                    #   事業戦略書（収益化戦略・予算・KPI・展開方針）
-│   ├── overview/                    #   システム概要
+│   ├── overview/                    #   システム概要（Phase 30-3 で基本設計として作り直す）
+│   ├── production/                  #   生産設計（Phase 30-5 で新設予定。生産ラインの全体像・関所・受け渡しの契約・スキル一覧）
 │   ├── infra/                       #   インフラ設計書（HTML）
 │   ├── app/                         #   アプリ設計書（共通設計書 + generators/ 方式別 + sets/ セット別の 3 層構造）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
@@ -50,22 +52,27 @@ AutoContentPublisherSystem/
 
 ## 設計書体系
 
-設計書・計画書・記録はすべて **HTML** で記述する（Phase 18〔2026-08-28〕で計画・記録も Markdown から HTML 化）。体系の全体像・スコープ境界・設計 Fix 基準は `docs/index.html` を参照。
+設計書・計画書・記録はすべて **HTML** で記述する（Phase 18〔2026-08-28〕で計画・記録も Markdown から HTML 化）。体系の全体像・スコープ境界・設計 Fix 基準・**書式ルール**は `docs/index.html` を参照。
+
+- **2 面と 3 段で描く**（Phase 30・I-040）。システムを生産面（スキルで事前に作ってレビューし配置する）と配信面（AWS のバッチが選んで投稿する）の 2 面で描き、設計書は**基本設計（`docs/overview/`）→ 層の概要 → 詳細設計（`docs/infra/` `docs/app/` `docs/production/`）**の 3 段で読めるようにする。生産ラインの工程の細部は SKILL.md を正とし、設計書には全体像・関所・受け渡しの契約・スキル一覧だけを書く。正は `docs/index.html` セクション 2.1
+- **設計書の書式**（Phase 30-1。正は `docs/index.html` セクション 5、見本は `docs/_templates/design-page.html`）: 冒頭に図と表の要約（`section.page-summary`）、本文は事実だけ、理由はページ末尾の「判断の記録」（`section#decisions`・D-01 から採番）に書き、本文からは `a.decision-ref`「→ 理由 D-xx」で片方向にリンクする。図は Mermaid で文字で書く。既存ページは Phase 30 の各ステップで順に移す（移すまでは従来の書き方のまま）
 
 - **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（Phase 9 で詳細化・Phase 10-1 で最終 Fix 済み）
 - **事業とシステムを分離する**。事業の意思決定（収益化戦略・予算・KPI・プラットフォーム展開方針）は `docs/strategy/business-strategy.html` に書き、システム設計書には書かない
 - **インフラ設計書にアプリ仕様を書かない**。作業中にアプリの論点（処理ロジック・テーブル設計等）が出たら `docs/app/index.html` の検討メモに記録する
-- HTML 設計書は外部 CDN に依存せず、`docs/assets/style.css` を共通スタイルとして使用する。閲覧はローカルブラウザまたは VS Code の Live Preview で行う（GitHub 上ではソース表示になる）
+- HTML 設計書は外部 CDN・Web フォントに依存せず、**外部ライブラリは `docs/assets/vendor/` に版を固定して同梱したもの（`docs/index.html` セクション 5.4 の一覧）だけを使う**（ネットなしで `file://` で直接開いても読めること。Phase 30-1 で「外部 CDN に依存しない」から改めた）。共通スタイルは `docs/assets/style.css`。閲覧はローカルブラウザまたは VS Code の Live Preview で行う（GitHub 上ではソース表示になる）
 
 | ディレクトリ | 目的 | ドキュメント |
 |---|---|---|
 | `docs/strategy/` | 事業戦略（収益化戦略・予算・KPI・展開方針・セットポートフォリオ） | `business-strategy.html` |
-| `docs/overview/` | システムの目的・スコープ・技術選定 | `system-overview.html` |
+| `docs/overview/` | システムの目的・スコープ・技術選定（Phase 30-3 で基本設計として作り直す） | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
+| `docs/production/` | 生産設計（Phase 30-5 で新設予定。スキルで回す生産ラインの全体像・関所・受け渡しの契約・スキル一覧。工程の細部は SKILL.md が正） | `index.html`（入口）+ セット別の生産設計 |
 | `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
 | `docs/plans/` | 計画体系（開発レーン + セット別の計画・記録。並行作業ルール） | `index.html`（レーン振り分け・並行作業ルールの正）, `development-plan.html` / `development-log.html`（開発レーン）, `<set_code>.html` / `<set_code>-log.html`（セットレーン × 4 セット） |
 | `docs/ideas/` | アイデア体系（意思決定前の事業アイデアの捕捉・壁打ち・醸成。6 ステータス管理） | `index.html`（ダッシュボード・運用ルールの正）, `<slug>.md`（記録層・正）, `<slug>.html`（深化したアイデアの詳細） |
 | `docs/issues/` | 課題体系（開発・運用で見つかった課題を両レーン横断で追う。4 ステータス・据え置きはトリガー必須・2 回目の発生で据え置き不可。Phase 22〔2026-09-19〕で新設。旧設計課題リスト・セットバックログ・トラブルシューティングログの後継） | `index.html`（レーン別 live 表 + クローズ節 + 運用ルールの正。表が唯一の正）, `_template.md`（壁打ち雛形）, `<slug>.md`（壁打ちを始めた課題だけ） |
+| `docs/assets/` `docs/_templates/` | 共通スタイル・図の初期化・同梱ライブラリ / 設計書ページの雛形 | `style.css`, `docs-diagrams.js`, `vendor/`（Mermaid・svg-pan-zoom・AWS Architecture Icons）, `_templates/design-page.html` |
 | `docs/_archive/` | 旧 Markdown 設計書（アプリ設計の参考資料。現役ではない） | 過去の検討経緯の参照用 |
 
 ### ドキュメント参照ガイド（タスク別）
@@ -75,6 +82,7 @@ AutoContentPublisherSystem/
 | タスク | 読むべきドキュメント |
 |---|---|
 | プロジェクトの全体像を把握 | `docs/overview/system-overview.html` |
+| 設計書を新しく書く・新しい書式へ移す・図を描く | `docs/index.html` セクション 5（書式ルール・使ってよいライブラリ）+ 見本 `docs/_templates/design-page.html`。検査は `python3 tools/docs_check.py --widths 360,390,768,1280` |
 | 収益化戦略・予算・KPI・プラットフォーム展開方針を確認する | `docs/strategy/business-strategy.html` |
 | CDK コードを書く・修正する | `docs/infra/stacks.html`（前提知識が必要なら `docs/infra/architecture.html`） |
 | Step Functions 定義を書く・修正する | `docs/infra/workflow.html` |
@@ -126,7 +134,7 @@ AutoContentPublisherSystem/
 
 コードやインフラに変更を加えた際は、関連ドキュメントも同時に更新する。
 
-- 設計と異なる実装をした場合は、実装に合わせてドキュメントを修正する（実態の記録を優先）。変更理由はドキュメントの備考（`decision` コールアウト）に残す
+- 設計と異なる実装をした場合は、実装に合わせてドキュメントを修正する（実態の記録を優先）。変更理由はページ末尾の「判断の記録」（D-xx。`docs/index.html` セクション 5.2）に残す（新しい書式へ移す前のページは従来の `decision` コールアウト）
 - 同じ情報を複数ドキュメントに書かない。詳細は 1 箇所に書き、他からは参照リンクを張る
 - 将来の拡張予定として記載している項目は、実装開始時にドキュメントを具体化する
 

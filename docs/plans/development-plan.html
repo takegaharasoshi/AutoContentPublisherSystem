@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-17（<strong>Phase 30 起票</strong>: 設計書を生産面と配信面の 2 面で描き直し、基本設計と詳細設計に段階化する〔<a href="../issues/index.html#I-040">I-040</a> の展開。30-1 書き方と土台 → 30-2 見た目の確認〔ユーザー判断〕→ 30-3 基本設計 → 30-4〜30-9 詳細設計を範囲ごとに〕）。前回: 2026-10-17（<strong>計画整理</strong>: 完了した Phase 27・28・29 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-27">開発記録</a>へ移した。<code>#step-27-…</code>〜<code>#step-29-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a> の Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-18（<strong>30-1 完了</strong>: 書き方と体系を定め、図のライブラリ〔Mermaid・svg-pan-zoom・AWS アイコン〕を同梱した。次は <a href="#step-30-2">30-2</a> 見た目の確認〔ユーザー判断〕）。前回: 2026-10-17（<strong>Phase 30 起票</strong>: 設計書を生産面と配信面の 2 面で描き直し、基本設計と詳細設計に段階化する〔<a href="../issues/index.html#I-040">I-040</a> の展開。30-1 書き方と土台 → 30-2 見た目の確認〔ユーザー判断〕→ 30-3 基本設計 → 30-4〜30-9 詳細設計を範囲ごとに〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -81,14 +81,16 @@
 </div>
 </details>
 
-<div class="plan-group" data-plan-group="active">
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 1 件（クリックで展開）</summary>
+<div class="plan-group-inner">
 
-<article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="todo">
+<article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-1</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-1</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>書き方と体系を定め、図のライブラリを同梱する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<code>docs/assets/vendor/</code> に Mermaid 12.1.0・svg-pan-zoom 3.6.2・AWS Architecture Icons（2026-07-31 版から 17 枚）を同梱し、図の初期化 <code>docs-diagrams.js</code>・要約枠と判断の記録の CSS・雛形 <a href="../_templates/design-page.html">design-page.html</a> を作った。<a href="../index.html#format">設計書体系ガイド</a>に 3 段の構成・書式ルール・ライブラリの一覧を書き、CLAUDE.md を改め、<code>docs_check.py</code> が図の描画を待ち判断リンクを確かめるようにした。見た目の go は <a href="#step-30-2">30-2</a>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -113,13 +115,28 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>ライブラリ</strong>: Mermaid は npm の <code>mermaid@12.1.0</code>（2026-10-02 公開。最新 12.2.0 は公開から 2 週間未満のため見送り）の <code>dist/mermaid.min.js</code>（IIFE の 1 ファイル版・5.5 MB）と MIT の <code>LICENSE</code>。svg-pan-zoom は <code>svg-pan-zoom@3.6.2</code> の <code>dist/svg-pan-zoom.min.js</code> と BSD-2-Clause の <code>LICENSE</code>。AWS アイコンは公式の <code>Icon-package_07312026</code> から、<code>infra/lib</code> が使うサービス（ECS・Fargate・ECR・Step Functions・EventBridge・Scheduler・SNS・SQS・Aurora・S3・VPC・Secrets Manager・IAM・Lambda・CloudWatch・CodePipeline・CodeBuild）の 17 枚を複写し、<code>tools/docs_aws_icons.py</code>（新設）で Mermaid の <code>registerIconPacks</code> 用の Iconify パック <code>aws-icons.js</code> を生成した（<code>&lt;script&gt;</code> で読むためページの深さに依らず <code>aws:&lt;名前&gt;</code> で使える）。AWS アイコンはオープンソースではないため、利用条件の要約を <code>NOTICE.md</code> に書いた</li>
+<li><strong>図の初期化</strong>: <code>docs/assets/docs-diagrams.js</code> が <code>style.css</code> の変数から Mermaid の配色を作り（<code>theme: base</code>）、テーマの切り替えで描き直す。「拡大」ボタンで全画面の <code>dialog</code> を開き svg-pan-zoom を掛ける。描画の状態を <code>&lt;html data-diagrams="pending|ready|error"&gt;</code> に出す。<code>data-wide</code> の図は縮めずに横スクロール</li>
+<li><strong>CSS</strong>: <code>style.css</code> に Mermaid の図の枠・拡大表示、要約枠 <code>.page-summary</code>、判断リンク <code>a.decision-ref</code>、判断の記録 <code>section.decisions</code> を足した（既存クラスは変更なし）</li>
+<li><strong>雛形</strong>: <code>docs/_templates/design-page.html</code>。構成図（<code>architecture-beta</code>・AWS アイコン）・シーケンス図・ER 図・状態遷移図・横に広い図（<code>data-wide</code>）と、判断の記録 D-01・D-02 の見本。<code>docs/</code> 配下のため <code>docs_check.py</code> の対象（87 ページ目）に入る</li>
+<li><strong>確認</strong>: Windows の Chrome（headless）で <code>file://wsl.localhost/…</code> を直接開き、雛形の 5 図が <code>data-diagrams="ready"</code>・エラー 0 で描画されること、拡大の枠で svg-pan-zoom の操作枠が出て、拡大ボタンで倍率が 0.66 → 0.86 に変わることを確かめた。<code>docs_check.py --widths 360,390,768,1280</code> は 87 ページではみ出し 0 件・図 2 ページ 6 図の描画不備 0 件・判断リンク 2 件の不備 0 件で OK。<code>--plan-only</code> の出力は変更前と完全に一致</li>
+<li><strong>docs_check.py</strong>: 測定用の iframe の読み込み後、<code>pre.mermaid</code> があるページは <code>data-diagrams</code> が ready / error になるまで最大 20 秒待つ。図の描画状態（件数・エラー）をセクション 3 に出し、不備を NG に数える。セクション 6「判断の記録へのリンク」を新設（同じページの <code>section#decisions</code> 内の <code>d-NN</code> を指すか・表示に番号があるか・判断の記録が 1 ページ 1 つか）。<code>--plan-only</code> の経路は変更なし</li>
+<li><strong>規則</strong>: <a href="../index.html#levels">設計書体系ガイド 2.1</a>（3 段の構成・生産層）・<a href="../index.html#format">セクション 5</a>（ページの並び・判断の記録・図の描き方・使ってよいライブラリ）を新設し、旧 5・6 節を 6・7 節へ繰り下げた。CLAUDE.md は設計書体系（2 面と 3 段・書式・同梱ライブラリだけを使う）・リポジトリ構成・目次の表・ドキュメント参照ガイド・ドキュメント更新ルール（<code>decision</code> 囲み → 判断の記録）を改めた</li>
+<li><strong>課題</strong>: 展開元の <a href="../issues/index.html#I-040">I-040</a> は Phase 30 全体の課題のため、30-1 ではクローズせず据え置き継続（行は変更なし）。確認待ち・課題表の照合はどれも該当なし</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-2" data-step-id="30-2" data-status="todo" data-kind="decision">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-2</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>

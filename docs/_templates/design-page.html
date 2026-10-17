@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>設計書ページの雛形 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+<!--
+  設計書ページの雛形（Phase 30-1）。書式のルールの正は docs/index.html セクション 5。
+  新しいページはこのファイルをコピーし、パンくず・タイトル・本文を差し替える。
+  - 冒頭の要約（section.page-summary）: 図 1 枚 + 要点の表。そのページの全体がここだけで分かるようにする
+  - 本文: 事実だけ（何が・どう動く・どこに何がある）。理由は書かず「→ 理由 D-xx」のリンクを置く
+  - 判断の記録（section#decisions）: ページ末尾。D-01 から採番し、1 件 = 1 つの article#d-NN
+  - 図: <figure class="diagram"><pre class="mermaid">…</pre></figure>。横に広い図だけ data-wide を付ける
+  - 末尾の 4 本の script（vendor 3 本 + docs-diagrams.js）は図を使うページだけに置く。相対パスはページの深さに合わせる
+  ここに書いた「見本」の内容は書式を示すための例で、仕様の正ではない（実際の構成は各設計書を見る）。
+-->
+
+<nav class="breadcrumb"><a href="../index.html">docs</a> / 設計書ページの雛形</nav>
+<h1>設計書ページの雛形（見本: 投稿の流れ）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">雛形</span>
+  <span>最終更新: 2026-10-18（Phase 30-1 で新設）</span>
+  <span>書式のルールは<a href="../index.html#format">設計書体系ガイド セクション 5</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<figure class="diagram">
+<pre class="mermaid">
+architecture-beta
+    group aws(aws:vpc)[AWS 本番]
+    service sched(aws:scheduler)[EventBridge Scheduler] in aws
+    service sfn(aws:step-functions)[Step Functions] in aws
+    service task(aws:fargate)[ECS Fargate タスク] in aws
+    service db(aws:aurora)[Aurora] in aws
+    service s3(aws:s3)[S3] in aws
+    sched:B --> T:sfn
+    sfn:B --> T:task
+    task:L --> R:db
+    task:R --> L:s3
+</pre>
+<figcaption>図 1 構成図（AWS アイコン）の見本: Scheduler が SFN を起こし、SFN が ECS タスクを走らせる</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>何のページか</td><td>設計書の書式を示す雛形。冒頭の要約・事実だけの本文・末尾の判断の記録の並びを見本にする</td></tr>
+    <tr><td>図の種類</td><td>構成図（図 1）・シーケンス図（図 2）・ER 図（図 3）・状態遷移図（図 4）</td></tr>
+    <tr><td>主な判断</td><td>図は Mermaid で文字で書く <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="flow">1. 処理の流れ（シーケンス図の見本）</h2>
+<p>投稿バッチは、当回の生成結果を Aurora から読み、S3 の動画を Instagram へ渡して投稿する。投稿の可否は当回の生成実行だけで決まる <a class="decision-ref" href="#d-02">→ 理由 D-02</a>。</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant SFN as Step Functions
+    participant Batch as 投稿バッチ
+    participant DB as Aurora
+    participant IG as Instagram
+    SFN->>Batch: RunTask（当回の set_code・scheduled_at）
+    Batch->>DB: 当回の生成結果を読む
+    DB-->>Batch: 対象の 1 件
+    Batch->>IG: コンテナ作成 → 公開
+    IG-->>Batch: media_id
+    Batch->>DB: 投稿済みにする
+</pre>
+<figcaption>図 2 シーケンス図の見本</figcaption>
+</figure>
+
+<h2 id="data">2. データ（ER 図の見本）</h2>
+<figure class="diagram">
+<pre class="mermaid">
+erDiagram
+    content_sets ||--o{ generation_runs : "1 セット : n 実行"
+    generation_runs ||--o{ post_items : "1 実行 : n 投稿"
+    content_sets {
+        varchar set_code PK
+        varchar status
+    }
+    generation_runs {
+        bigint id PK
+        varchar set_code FK
+        datetime scheduled_at
+    }
+    post_items {
+        bigint id PK
+        bigint run_id FK
+        varchar post_status
+    }
+</pre>
+<figcaption>図 3 ER 図の見本</figcaption>
+</figure>
+
+<h2 id="states">3. 状態（状態遷移図の見本）</h2>
+<figure class="diagram">
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --> pending
+    pending --> posting: 投稿開始
+    posting --> posted: 公開できた
+    posting --> failed: 一過性でない失敗
+    posting --> published_unconfirmed: 公開済みを照会で確認
+    failed --> pending: 手動で戻す
+    posted --> [*]
+</pre>
+<figcaption>図 4 状態遷移図の見本</figcaption>
+</figure>
+
+<h2 id="wide">4. 横に広い図（data-wide の見本）</h2>
+<p>横に長い流れは縮めずに枠の中で横スクロールさせる。縦向きにできる図は縦にする。</p>
+<figure class="diagram" data-wide>
+<pre class="mermaid">
+flowchart LR
+    A[リサーチ] --> B[候補] --> C{人の選別} -->|OK| D[完成稿] --> E[機械検証] --> F{人のレビュー} -->|OK| G[投入] --> H[動画ビルド] --> I[S3 へ配置]
+    C -->|NG| X[見送り]
+</pre>
+<figcaption>図 5 横に広い図の見本（生産ラインの工程）</figcaption>
+</figure>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<article id="d-01">
+<h3>D-01 図は Mermaid で文字で書く</h3>
+<dl>
+  <dt>決めたこと</dt><dd>図は <code>docs/assets/vendor/</code> に同梱した Mermaid で書く</dd>
+  <dt>理由</dt><dd>差分で追え、文章と同じ手間で直せる。同梱すればネットなしでも読める</dd>
+  <dt>退けた案</dt><dd>インライン SVG の手描き（直す手間が重い）</dd>
+  <dt>日付・出典</dt><dd>2026-10-17・<a href="../issues/design-docs-restructure.md">I-040 の壁打ち</a></dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 投稿対象は当回の生成実行だけ（見本）</h3>
+<dl>
+  <dt>決めたこと</dt><dd>投稿バッチは当回の <code>set_code</code> × <code>scheduled_at</code> の生成実行だけを対象にする</dd>
+  <dt>理由</dt><dd>滞留した過去分が後続を塞がないようにするため（見本。正は各設計書）</dd>
+  <dt>日付・出典</dt><dd>2026-10-13・<a href="../plans/development-log.html#phase-26">Phase 26</a></dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>設計書体系ガイド | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="assets/style.css?v=20260921">
+<link rel="stylesheet" href="assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -13,7 +13,7 @@
 <h1>設計書体系ガイド</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-12（21-8a で plans/ のツリーを 4 セット × 2 ファイルに更新）。前回: 2026-09-19（Phase 22-1 で課題体系 docs/issues/ を追加・セクション 4 の課題の記録先を課題体系へ）</span>
+  <span>最終更新: 2026-10-18（Phase 30-1 で 3 段の構成〔基本設計 → 層の概要 → 詳細設計〕・生産層 docs/production/・書式ルールと使ってよいライブラリの一覧〔セクション 5〕を追加）。前回: 2026-10-12（21-8a で plans/ のツリーを 4 セット × 2 ファイルに更新）</span>
   <span>本ドキュメントは設計書体系のエントリポイント</span>
 </div>
 
@@ -26,20 +26,57 @@
 <ol>
   <li><strong>インフラとアプリの関心の分離</strong>: インフラ設計（<code>docs/infra/</code>）とアプリ設計（<code>docs/app/</code>）を明確に分ける。設計はインフラ → アプリの順に Fix し、インフラ構築はアプリ実装より先に行う。アプリ設計は 2 段階で行い、大枠（設計書構成・主要方針の骨子）は Phase A で、詳細は Phase 9 で作成する（2026-07-06 にインフラ構築より前へ前倒し。インフラ構築の知見反映は Phase 10 冒頭の最終 Fix で行う。経緯は <a href="plans/development-plan.html">plans/development-plan.html</a> を参照）</li>
   <li><strong>完璧より前進（一時 Fix 運用）</strong>: 設計書は「次フェーズの作業に着手できる」水準で一時 Fix とし、先に進む。詳細はセクション 4 の Fix 基準を参照</li>
-  <li><strong>実装を正とする</strong>: 設計と異なる実装をした場合は、実装に合わせて設計書を修正する（変更理由は備考に残す）</li>
+  <li><strong>実装を正とする</strong>: 設計と異なる実装をした場合は、実装に合わせて設計書を修正する（変更理由はページ末尾の<a href="#format-decisions">判断の記録</a>に残す。未移行のページは従来の <code>decision</code> 囲み）</li>
   <li><strong>同じ情報を 2 箇所に書かない</strong>: 詳細の「正」は 1 つのドキュメントに置き、他からは参照リンクで辿る</li>
+  <li><strong>2 面と 3 段で描く</strong>: システムを<strong>生産面</strong>（スキルで素材・動画を事前に作り、人がレビューして S3 / DB へ置く）と<strong>配信面</strong>（AWS 上のバッチが選んで投稿し、インサイト収集・コメント自動返信・トークン更新を回す）の 2 面で描き、設計書は<strong>基本設計 → 層の概要 → 詳細設計</strong>の 3 段で読めるようにする（セクション 2.1。Phase 30・<a href="issues/index.html#I-040">I-040</a>）</li>
   <li><strong>事業とシステムの分離</strong>: 事業の意思決定（収益化戦略・予算・KPI・プラットフォーム展開方針）は事業戦略（<code>docs/strategy/</code>）に書き、システム設計書（<code>docs/infra/</code>・<code>docs/app/</code>）には書かない（2026-07-23 に層を新設。Phase 14-1）</li>
 </ol>
 
 <h2 id="structure">2. ドキュメント構成</h2>
 
+<h3 id="levels">2.1 3 段の構成（基本設計 → 層の概要 → 詳細設計）</h3>
+<p>上の段だけ読めば全体が分かり、必要なときだけ下の段へ降りる。ディレクトリは再編せず、既存の <code>infra/</code> <code>app/</code> と新設の <code>production/</code> を詳細設計に位置づける（計画書・記録・課題表からのリンクを切らない）。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    B["基本設計&lt;br&gt;overview/（30-3 で作り直す）&lt;br&gt;2 面の構成・配信面の 4 系統・生産面の工程・受け渡しの契約"]
+    B --> P["層の概要: 生産設計&lt;br&gt;production/（30-5 で新設）"]
+    B --> A["層の概要: アプリ設計&lt;br&gt;app/index・design-outline"]
+    B --> I["層の概要: インフラ設計&lt;br&gt;infra/architecture"]
+    P --> PD["詳細: セット別の生産設計&lt;br&gt;工程の細部は SKILL.md が正"]
+    A --> AD["詳細: batch-flow・data-model・operation&lt;br&gt;generators/・sets/"]
+    I --> ID["詳細: stacks・workflow・security&lt;br&gt;cicd・operation"]
+</pre>
+<figcaption>図 1 設計書の 3 段の構成</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>段</th><th>置き場所</th><th>ここだけで分かること</th></tr></thead>
+  <tbody>
+    <tr><td>基本設計</td><td><code>docs/overview/</code>（30-3 で作り直す）</td><td>2 面（生産面 / 配信面）の構成、配信面の 4 系統（投稿 / インサイト収集 / コメント自動返信 / トークン更新）、生産面の工程、2 面の受け渡しの契約、構成要素の一覧</td></tr>
+    <tr><td>層の概要</td><td>各層の入口ページ（<code>production/index.html</code>・<code>app/index.html</code> と <code>design-outline.html</code>・<code>infra/architecture.html</code>）</td><td>その層の全体像と、詳細ページの目次</td></tr>
+    <tr><td>詳細設計</td><td>上記以外の <code>infra/</code> <code>app/</code> <code>production/</code> のページ</td><td>定義・設定値・手順・表の全件</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>生産層 <code>docs/production/</code></strong>（30-5 で新設）: スキルで回す生産ライン（リサーチ → 候補 → 人の選別 → 執筆 → 機械検証 → 人のレビュー → 投入 → 動画ビルド → 配置）を設計の層として表す。設計書に書くのは全体像・関所（人が止める場所）・受け渡しの契約・スキルの一覧だけで、<strong>工程の細部は各スキルの SKILL.md を正とする</strong>（二重に書かない）。AWS で動くプログラムの設計はアプリ設計（<code>app/</code>）に書く。</p>
+
+<h3 id="tree">2.2 ファイルの一覧</h3>
+
 <pre><code>docs/
 ├── index.html                     # 本ファイル（設計書体系ガイド）
-├── assets/style.css               # 設計書共通スタイル
+├── assets/
+│   ├── style.css                  # 設計書共通スタイル
+│   ├── docs-diagrams.js           # 図（Mermaid）の初期化。配色・拡大縮小を 1 か所にまとめる（30-1）
+│   ├── docs-cards.js / plans.css  # 課題・アイデア一覧のカード表示 / 計画書の様式
+│   └── vendor/                    # 同梱したライブラリ（セクション 5.4 の一覧にあるものだけ）
+├── _templates/
+│   └── design-page.html           # 設計書ページの雛形（書式の見本。構造検査の対象）
 ├── strategy/
 │   └── business-strategy.html     # 事業戦略書（収益化戦略・予算・KPI・展開方針・セットポートフォリオ）
 ├── overview/
-│   └── system-overview.html       # システム概要（目的・技術選定・開発方針）
+│   └── system-overview.html       # システム概要（目的・技術選定・開発方針）。30-3 で基本設計として作り直す
+├── production/                    # 生産設計（30-5 で新設。生産ラインの全体像・関所・受け渡しの契約・スキル一覧）
 ├── infra/                         # インフラ設計書（一時 Fix 対象）
 │   ├── architecture.html          # アーキテクチャ（ネットワーク・コンピューティング・データストア）
 │   ├── stacks.html                # CDK スタック実装仕様
@@ -239,18 +276,73 @@
   <li><strong>YAGNI</strong>: 将来拡張（AdminApiStack 等）は「拡張ポイントがある」ことの記載まで。詳細設計はしない</li>
 </ol>
 
-<h2 id="update-rules">5. 更新ルール</h2>
+<h2 id="format">5. 書式ルール（Phase 30-1）</h2>
+
+<p>設計書（<code>docs/overview/</code> <code>docs/infra/</code> <code>docs/app/</code> <code>docs/production/</code>）の書き方。<strong>見本は <a href="_templates/design-page.html">設計書ページの雛形</a></strong>で、新しいページはこれをコピーして作る。既存のページは Phase 30 の各ステップで順にこの書式へ移す（移すまでは従来の書き方のままでよい）。<code>docs/plans/</code> <code>docs/issues/</code> <code>docs/ideas/</code> <code>docs/strategy/</code>・壁打ち記録（<code>requirements-notes*.html</code>）・<code>docs/_archive/</code> は対象外で、それぞれの体系のルールに従う。</p>
+
+<h3 id="format-layout">5.1 ページの並び</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>位置</th><th>書くこと</th><th>書き方</th></tr></thead>
+  <tbody>
+    <tr><td>冒頭の要約</td><td>図 1 枚 + 要点の表。そのページの全体がここだけで分かるようにする</td><td>h1 とページ情報の直後に <code>&lt;section class="page-summary" id="summary"&gt;</code> を 1 つ置く</td></tr>
+    <tr><td>本文</td><td><strong>事実だけ</strong>（何がある・どう動く・どこに何を置く・設定値）。図と表を中心にする</td><td>理由・経緯・比較した案は書かず、判断した箇所に <code>&lt;a class="decision-ref" href="#d-01"&gt;→ 理由 D-01&lt;/a&gt;</code> を置く</td></tr>
+    <tr><td>判断の記録</td><td>本文の判断の理由。1 件 = 1 判断</td><td>ページ末尾に <code>&lt;section class="decisions" id="decisions"&gt;</code> を 1 つ置く（5.2）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="format-decisions">5.2 判断の記録</h3>
 <ul>
-  <li>コードやインフラに変更を加えた際は、対応する設計書も同時に更新する</li>
-  <li>設計と異なる実装をした場合は、実装に合わせて設計書を修正し、変更理由を備考（<code>decision</code> コールアウト）に残す</li>
-  <li>同じ情報を複数ドキュメントに書かない。詳細は 1 箇所に書き、他からは参照リンクを張る</li>
-  <li>設計書は HTML（本体系）で記述する。開発計画のみ Markdown</li>
-  <li>表は必ず <code>&lt;div class="table-wrap"&gt;</code> で包む（狭い画面で列幅を保ち、収まらない分を表内の横スクロールへ逃がすための共通規則。<a href="plans/development-log.html#phase-24">Phase 24-1</a>）。HTML の機械検証は <code>python3 tools/docs_check.py</code>（対象件数・リンク / アンカー整合・指定幅の横はみ出し）</li>
+  <li>判断は <strong>D-01 から</strong>ページごとに採番し、1 件を <code>&lt;article id="d-01"&gt;</code>（見出し <code>D-01 タイトル</code>）で書く。中身は「決めたこと / 理由 / 退けた案（あれば）/ 日付・出典」の定義リスト</li>
+  <li>本文からは同じページの判断の記録へ<strong>片方向</strong>にリンクする（判断の記録から本文へは戻りリンクを張らない）。リンクの表示に番号（D-01）を入れる</li>
+  <li>番号は振り直さない。判断が覆ったら新しい番号で書き、古い記録の決めたことに「D-07 で変更」と書き足す</li>
+  <li>従来の <code>decision</code> 囲み（本文中の判断の囲み）は新しい書式のページでは使わない</li>
+  <li><code>tools/docs_check.py</code> が、判断リンクが同じページの <code>section#decisions</code> の中の <code>d-NN</code> を指していること・表示に番号が入っていることを確かめる</li>
 </ul>
 
-<h2 id="archive">6. 旧設計書（_archive）について</h2>
+<h3 id="format-diagrams">5.3 図の描き方</h3>
+<ul>
+  <li>図は <strong>Mermaid で文字で書く</strong>（<code>&lt;figure class="diagram"&gt;&lt;pre class="mermaid"&gt;…&lt;/pre&gt;&lt;figcaption&gt;図 n …&lt;/figcaption&gt;&lt;/figure&gt;</code>）。構成・処理の流れ・データ・状態など、文章より図の方が早く分かるものは積極的に図にする。使い分け: 構成図 = <code>architecture-beta</code>（AWS アイコン）か <code>flowchart</code> / 処理の順序 = <code>sequenceDiagram</code> / テーブル = <code>erDiagram</code> / 状態 = <code>stateDiagram-v2</code></li>
+  <li><code>pre.mermaid</code> の中は HTML として読まれるため、<code>&lt;</code> <code>&gt;</code> <code>&amp;</code> は文字参照で書く（改行の <code>&lt;br&gt;</code> も <code>&amp;lt;br&amp;gt;</code>）。矢印の <code>--&gt;</code> はそのままでよい</li>
+  <li><strong>縦向きの流れを基本にする</strong>（<code>flowchart TB</code> 等。スマホで縮みすぎないため）。横に広くなる図だけ <code>&lt;figure class="diagram" data-wide&gt;</code> にして、縮めずに枠の中で横スクロールさせる</li>
+  <li>AWS のサービスは <code>aws:&lt;名前&gt;</code> のアイコンで描く（例: <code>service sfn(aws:step-functions)[Step Functions]</code>）。使える名前は <code>tools/docs_aws_icons.py</code> の <code>ICON_NAMES</code></li>
+  <li>配色・字体は <code>docs/assets/docs-diagrams.js</code> が <code>style.css</code> の変数から 1 か所で決める。<strong>図の中で色を指定しない</strong>（<code>style</code> / <code>classDef</code> で色を書かない。ライト / ダークで崩れるため）</li>
+  <li>図は「拡大」ボタンで全画面に開き、拡大・縮小・移動できる（svg-pan-zoom）。小さく読めない図は分けるか縦にする</li>
+  <li>図を使うページは本文の後（<code>&lt;/body&gt;</code> の直前）で次の 4 本を順に読む（相対パスはページの深さに合わせる）: <code>vendor/mermaid-12.1.0/mermaid.min.js</code> → <code>vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js</code> → <code>vendor/aws-icons-07312026/aws-icons.js</code> → <code>docs-diagrams.js</code></li>
+  <li><code>tools/docs_check.py</code> は図の描画完了を待ってから横はみ出しを測り、描けなかった図を不備として数える</li>
+</ul>
+
+<h3 id="libraries">5.4 使ってよいライブラリ</h3>
+<p>設計書は外部の CDN・Web フォントに依存しない（ネットにつながらなくても、ファイルを直接開いて〔<code>file://</code>〕読めること）。外部のライブラリは <code>docs/assets/vendor/</code> に<strong>版を固定して同梱したものだけ</strong>を使い、<strong>この一覧にないものは使わない</strong>。足すとき・版を上げるときは、フォルダ名に版を入れて置き、ライセンス文を同じフォルダに置き、この一覧を直す（ES モジュール版は <code>file://</code> で読めないため、<code>&lt;script&gt;</code> で読む 1 ファイル版を使う）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>名前</th><th>版</th><th>置き場所</th><th>用途</th><th>ライセンス</th></tr></thead>
+  <tbody>
+    <tr><td>Mermaid</td><td>12.1.0</td><td><code>vendor/mermaid-12.1.0/</code>（<code>mermaid.min.js</code>・<code>LICENSE</code>）</td><td>図（構成図・フロー・シーケンス・ER・状態遷移）</td><td>MIT</td></tr>
+    <tr><td>svg-pan-zoom</td><td>3.6.2</td><td><code>vendor/svg-pan-zoom-3.6.2/</code>（<code>svg-pan-zoom.min.js</code>・<code>LICENSE</code>）</td><td>図の拡大・縮小・移動</td><td>BSD-2-Clause</td></tr>
+    <tr><td>AWS Architecture Icons</td><td>2026-07-31 版（<code>Icon-package_07312026</code>）</td><td><code>vendor/aws-icons-07312026/</code>（<code>svg/</code> に使う 17 枚・生成した <code>aws-icons.js</code>・<code>NOTICE.md</code>）</td><td>構成図の AWS アイコン</td><td>AWS が認める構成図への利用（オープンソースではない。<code>NOTICE.md</code>）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>必要になったら一覧に足して入れるもの: highlight.js（DDL・JSON・Python の色付け）、tocbot（長いページの追従目次）。入れないもの: グラフのライブラリ（Chart.js 等）、表の並び替え・絞り込みのライブラリ（必要なら <code>docs-cards.js</code> に足す）、Graphviz（viz.js）・Excalidraw。選定の経緯は <a href="issues/design-docs-restructure.md">I-040 の壁打ち</a>。</p>
+
+<h2 id="update-rules">6. 更新ルール</h2>
+<ul>
+  <li>コードやインフラに変更を加えた際は、対応する設計書も同時に更新する</li>
+  <li>設計と異なる実装をした場合は、実装に合わせて設計書を修正し、変更理由をページ末尾の判断の記録（セクション 5.2）に残す（新しい書式へ移す前のページは従来の <code>decision</code> 囲み）</li>
+  <li>同じ情報を複数ドキュメントに書かない。詳細は 1 箇所に書き、他からは参照リンクを張る</li>
+  <li>設計書は HTML（本体系）で記述する（計画・記録も Phase 18 で HTML 化済み）。書式はセクション 5</li>
+  <li>表は必ず <code>&lt;div class="table-wrap"&gt;</code> で包む（狭い画面で列幅を保ち、収まらない分を表内の横スクロールへ逃がすための共通規則。<a href="plans/development-log.html#phase-24">Phase 24-1</a>）。HTML の機械検証は <code>python3 tools/docs_check.py</code>（対象件数・リンク / アンカー整合・図の描画完了を待った指定幅の横はみ出し・判断リンクの飛び先）</li>
+</ul>
+
+<h2 id="archive">7. 旧設計書（_archive）について</h2>
 <p><code>docs/_archive/</code> には旧 Markdown 設計書を保管している。これらは<strong>現役の設計書ではない</strong>。特にアプリ設計（バッチ処理フロー・DB スキーマ・冪等性設計）はよく検討された内容を含むため、Phase 9 のアプリ設計で参考資料として活用する。</p>
 
 </div>
+<script src="assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="assets/docs-diagrams.js"></script>
 </body>
 </html>

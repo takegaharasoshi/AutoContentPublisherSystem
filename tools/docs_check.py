@@ -2,12 +2,17 @@
 """設計書 HTML（docs/）の機械検証ツール。
 
 Phase 24-1 で新設。アーカイブ（``docs/_archive/``）を除く現役 HTML について、
-次の 4 つを確認する。
+次の項目を確認する。
 
 1. 対象ページと表の件数（実行時に再集計する。固定の期待件数は持たない）
 2. リンク / アンカーの整合（相対 href・src の参照先ファイルと ``#id`` の実在）
 3. 指定幅でのページ全体の横はみ出し（ヘッドレス Chrome で実測）
 4. ``table[data-cards]`` の表構造と、767 / 768 CSS px でのカード表示
+5. 登録済み計画書の構造（``tools/docs_plan_check.py``）
+6. 判断リンク（``a.decision-ref``）の飛び先が同じページの判断の記録にあるか（Phase 30-1）
+
+Mermaid の図があるページは、描画完了（``<html data-diagrams>``）を待ってから
+はみ出しを測り、図の描画エラーも不備として数える（Phase 30-1）。
 
 横はみ出し判定はヘッドレスブラウザーを使う。使えない環境ではその旨を出力し、
 静的チェックのみで終了する（未確認を合格扱いにしない）。
@@ -423,9 +428,33 @@ function load(src, w) {
     const f = document.createElement('iframe');
     f.style.cssText = 'width:' + w + 'px;height:2400px;border:0;';
     f.src = src;
-    f.onload = () => setTimeout(() => res(f), 30);
+    f.onload = () => setTimeout(() => waitDiagrams(f, res), 30);
     document.getElementById('host').appendChild(f);
   });
+}
+// Mermaid の図があるページは描画完了（docs-diagrams.js が付ける
+// <html data-diagrams="ready|error">）を待ってから測る（Phase 30-1）。上限 20 秒
+function waitDiagrams(f, res, waited) {
+  waited = waited || 0;
+  const d = f.contentDocument;
+  const has = d && d.querySelector('pre.mermaid');
+  const state = d ? d.documentElement.getAttribute('data-diagrams') : null;
+  if (!has || state === 'ready' || state === 'error' || waited >= 20000) {
+    res(f);
+    return;
+  }
+  setTimeout(() => waitDiagrams(f, res, waited + 100), 100);
+}
+function diagramState(d) {
+  const count = d.querySelectorAll('pre.mermaid').length;
+  if (!count) return null;
+  const el = d.documentElement;
+  return {
+    count: count,
+    state: el.getAttribute('data-diagrams') || 'missing',
+    errors: Number(el.getAttribute('data-diagrams-errors') || 0),
+    rendered: d.querySelectorAll('.diagram-canvas > svg').length
+  };
 }
 """
 
@@ -439,7 +468,8 @@ async function main() {
       const d = f.contentDocument;
       const vw = d.documentElement.clientWidth;
       const sw = Math.max(d.documentElement.scrollWidth, d.body.scrollWidth);
-      const rec = {page: p, width: w, vw: vw, over: sw - vw, offenders: []};
+      const rec = {page: p, width: w, vw: vw, over: sw - vw, offenders: [],
+                   diagrams: diagramState(d)};
       if (rec.over > 1) {
         const scrollable = el => {
           for (let n = el.parentElement; n && n !== d.body; n = n.parentElement) {
@@ -602,7 +632,8 @@ def measure_overflow(
     driver = (
         OVERFLOW_DRIVER_TEMPLATE % (json.dumps(urls), json.dumps(list(widths)))
     ).encode("utf-8")
-    budget = 20000 + 500 * len(urls) * len(widths)
+    diagram_pages = sum(1 for rel in pages if "mermaid" in (root / rel).read_text(encoding="utf-8"))
+    budget = 20000 + 500 * len(urls) * len(widths) + 20000 * diagram_pages * len(widths)
     return run_browser_driver(root, browser, driver, budget)
 
 
@@ -647,6 +678,111 @@ def measure_cards_with_retry(
             if attempt + 1 < attempts:
                 time.sleep(2.0)
     raise RuntimeError(str(last))
+
+
+DECISION_ID = re.compile(r"^d-(\d{2,})$")
+VOID_TAGS = {
+    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
+    "source", "track", "wbr",
+}
+
+
+class DecisionParser(HTMLParser):
+    """判断の記録（``section#decisions``）と判断リンク（``a.decision-ref``）を集める。
+
+    Phase 30-1 で新設。判断の記録の中にある ``id="d-NN"`` と、本文の
+    判断リンクの ``href``・表示文字列を拾う。
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.stack: list[tuple[str, bool]] = []
+        self.decision_ids: list[str] = []
+        self.sections = 0
+        self.refs: list[tuple[str, str]] = []
+        self._ref: list[str] | None = None
+        self._ref_href = ""
+
+    def _in_decisions(self) -> bool:
+        return any(flag for _, flag in self.stack)
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = {name: value or "" for name, value in attrs}
+        if self._in_decisions() and DECISION_ID.match(values.get("id", "")):
+            self.decision_ids.append(values["id"])
+        if tag == "a" and "decision-ref" in values.get("class", "").split():
+            self._ref = []
+            self._ref_href = values.get("href", "")
+        if tag in VOID_TAGS:
+            return
+        opens = tag == "section" and values.get("id") == "decisions"
+        if opens:
+            self.sections += 1
+        self.stack.append((tag, opens))
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self.handle_starttag(tag, attrs)
+        if tag not in VOID_TAGS and self.stack and self.stack[-1][0] == tag:
+            self.stack.pop()
+
+    def handle_data(self, data: str) -> None:
+        if self._ref is not None:
+            self._ref.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "a" and self._ref is not None:
+            self.refs.append((self._ref_href, normalize_text("".join(self._ref))))
+            self._ref = None
+        for index in range(len(self.stack) - 1, -1, -1):
+            if self.stack[index][0] == tag:
+                del self.stack[index:]
+                break
+
+
+def check_decision_refs(texts: dict[str, str]) -> tuple[int, int, list[Finding]]:
+    """判断リンク（``a.decision-ref``）の飛び先を確かめる（Phase 30-1）。
+
+    規則（正は ``docs/index.html`` セクション 5）:
+
+    - 判断リンクは同じページの ``#d-NN`` だけを指す（片方向・ページ内）
+    - 飛び先の ``id="d-NN"`` がページ末尾の ``section#decisions`` の中にある
+    - 表示文字列に ``D-NN``（飛び先の番号）が入っている
+    - ``section#decisions`` はページに 1 つまで
+
+    Args:
+        texts: ページの相対パス → HTML 本文。
+
+    Returns:
+        （判断の記録を持つページ数, 判断リンクの件数, 指摘の一覧）。
+    """
+    findings: list[Finding] = []
+    pages_with_record = 0
+    ref_count = 0
+    for page, text in texts.items():
+        parser = DecisionParser()
+        parser.feed(text)
+        parser.close()
+        if parser.sections:
+            pages_with_record += 1
+        if parser.sections > 1:
+            findings.append(Finding(page, "decision-section", "section#decisions が複数ある"))
+        targets = set(parser.decision_ids)
+        for href, label in parser.refs:
+            ref_count += 1
+            match = re.fullmatch(r"#(d-\d{2,})", href)
+            if not match:
+                findings.append(Finding(page, "decision-ref", f"同じページの #d-NN を指していない: {href}"))
+                continue
+            target = match.group(1)
+            if target not in targets:
+                findings.append(
+                    Finding(page, "decision-ref", f"判断の記録（section#decisions）に {target} がない: {href}")
+                )
+            if target.upper() not in label.upper():
+                findings.append(
+                    Finding(page, "decision-ref", f"表示文字列に {target.upper()} がない: {label}")
+                )
+    return pages_with_record, ref_count, findings
 
 
 def format_findings(findings: Iterable[Finding]) -> list[str]:
@@ -1050,6 +1186,29 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"  NG {rec['width']}px {rec['page']}: +{rec['over']}px")
                 for off in rec["offenders"]:
                     print(f"       {off['tag']}.{off['cls']} right={off['right']} :: {off['text']}")
+            diagram_recs = [r for r in results if r.get("diagrams")]
+            diagram_ng = [
+                r for r in diagram_recs
+                if r["diagrams"]["state"] != "ready"
+                or r["diagrams"]["errors"]
+                or r["diagrams"]["rendered"] != r["diagrams"]["count"]
+            ]
+            diagram_pages = {r["page"] for r in diagram_recs}
+            diagram_total = sum(
+                r["diagrams"]["count"] for r in diagram_recs if r["width"] == widths[0]
+            )
+            print(
+                f"  図（Mermaid）: {len(diagram_pages)} ページ / {diagram_total} 図、"
+                f"描画の不備 {len(diagram_ng)} 件（描画完了を待ってから測定）"
+            )
+            for rec in diagram_ng:
+                state = rec["diagrams"]
+                print(
+                    f"  NG {rec['width']}px {rec['page']}: 図の描画 state={state['state']} "
+                    f"描画 {state['rendered']}/{state['count']} エラー {state['errors']}"
+                )
+            if diagram_ng:
+                exit_code = 1
             if missing:
                 print(f"  未測定: {len(missing)} 件（未確認のため合格扱いにしない）")
                 for page, width in sorted(missing)[:10]:
@@ -1094,6 +1253,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     print()
     print("=== 5. 計画書の構造（25-2） ===")
     if report_plan_structure():
+        exit_code = 1
+
+    print()
+    print("=== 6. 判断の記録へのリンク（30-1） ===")
+    record_pages, ref_count, decision_findings = check_decision_refs(texts)
+    print(
+        f"対象: 判断の記録を持つ {record_pages} ページ / 判断リンク {ref_count} 件、"
+        f"不備 {len(decision_findings)} 件"
+    )
+    for line in format_findings(decision_findings):
+        print(f"  NG {line}")
+    if decision_findings:
         exit_code = 1
 
     print()

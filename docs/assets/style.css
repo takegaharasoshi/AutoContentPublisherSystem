@@ -1,6 +1,6 @@
 /* ============================================================
    AutoContentPublisherSystem 設計書 共通スタイル
-   - 外部依存なし（Web フォント・CDN 不使用）
+   - 外部依存なし（Web フォント・CDN 不使用。図のライブラリは assets/vendor/ に同梱）
    - ライト / ダークテーマ対応（prefers-color-scheme）
    ============================================================ */
 
@@ -188,6 +188,103 @@ figure.diagram {
 }
 figure.diagram svg { max-width: 100%; height: auto; font-family: inherit; }
 figure.diagram figcaption { font-size: .85rem; color: var(--text-muted); margin-top: .5rem; }
+
+/* ---- Mermaid の図（Phase 30-1。初期化は docs-diagrams.js） ----
+   図は縦向きの流れを基本にし、枠の幅に縮めて表示する。
+   data-wide を付けた図だけ元の幅で置き、枠の中で横スクロールさせる。 */
+figure.diagram { position: relative; }
+figure.diagram > pre.mermaid { text-align: left; }
+figure.diagram .diagram-canvas { overflow-x: auto; }
+figure.diagram .diagram-canvas svg { display: block; margin: 0 auto; }
+figure.diagram[data-wide] { text-align: left; }
+figure.diagram[data-wide] .diagram-canvas svg { max-width: none; }
+.diagram-toolbar { display: flex; justify-content: flex-end; margin: -.4rem -.4rem .3rem 0; }
+.diagram-zoom-open, .diagram-zoom-close {
+  font: inherit;
+  font-size: .8rem;
+  padding: .15rem .7rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.diagram-error {
+  text-align: left;
+  font-size: .85rem;
+  color: var(--warn-border);
+  white-space: pre-wrap;
+}
+dialog.diagram-zoom {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+dialog.diagram-zoom::backdrop { background: rgba(0, 0, 0, .5); }
+dialog.diagram-zoom[open] { display: flex; flex-direction: column; }
+.diagram-zoom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .5rem .9rem;
+  border-bottom: 1px solid var(--border);
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+.diagram-zoom-body { flex: 1; min-height: 0; background: var(--bg-subtle); }
+.diagram-zoom-body svg { display: block; width: 100%; height: 100%; max-width: none; }
+
+/* ---- 冒頭の要約（Phase 30-1）----
+   各設計書の h1 の直後に 1 つ置く。図 1 枚 + 要点の表で、そのページの全体が分かるようにする */
+.page-summary {
+  margin: 1.25rem 0 2rem;
+  padding: .9rem 1.1rem 1rem;
+  border: 1px solid var(--note-border);
+  border-radius: 10px;
+  background: var(--note-bg);
+}
+.page-summary > h2 { margin-top: 0; border-bottom: 0; padding-bottom: 0; font-size: 1.1rem; }
+.page-summary figure.diagram { background: var(--bg); }
+
+/* ---- 判断の記録（Phase 30-1）----
+   本文の判断箇所には「→ 理由 D-01」のリンクだけを置き（a.decision-ref）、
+   理由はページ末尾の section#decisions に D-xx 単位（id="d-01"）でまとめる */
+a.decision-ref {
+  display: inline-block;
+  font-size: .8rem;
+  padding: 0 .45rem;
+  border: 1px solid var(--decision-border);
+  border-radius: 999px;
+  background: var(--decision-bg);
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.decision-ref:hover { text-decoration: underline; }
+section.decisions > article {
+  margin: 1rem 0;
+  padding: .6rem 1rem .7rem;
+  border-left: 4px solid var(--decision-border);
+  border-radius: 0 8px 8px 0;
+  background: var(--decision-bg);
+  font-size: .92rem;
+}
+section.decisions > article:target { outline: 2px solid var(--decision-border); }
+section.decisions > article > h3 { margin: 0 0 .3rem; font-size: 1rem; }
+section.decisions dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .15rem .9rem; }
+section.decisions dt { font-weight: 700; color: var(--text-muted); }
+section.decisions dd { margin: 0; }
+@media (max-width: 767.98px) {
+  section.decisions dl { display: block; }
+  section.decisions dd { margin: 0 0 .3rem; }
+}
 
 /* ---- ドキュメントカード（index 用） ---- */
 .card-grid {
