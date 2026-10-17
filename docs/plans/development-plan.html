@@ -378,12 +378,12 @@
 
 
 
-<article class="plan-step" id="step-29-2" data-step-id="29-2" data-status="todo">
+<article class="plan-step" id="step-29-2" data-step-id="29-2" data-status="doing">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>29-2</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>29-2</strong><span class="plan-status">進行中</span></div>
 <h3>Aurora の宣言値を 29 へ切り替え、24 で記録された行を直す（ユーザー作業あり）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>29-1 のパイプライン完走（新しいタスク定義で 29 を許容していること）の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>現況：</strong>SQL 3 本を用意し push 済み。③ の対象は Aurora で 1 件（generation_run 298・016）。ユーザーの適用（ローカル → Aurora）待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -409,9 +409,11 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17・SQL の準備</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<p>照合: 確認待ち = 該当なし（28-2 の一過性エラーの行はトリガー外）。課題表: 該当なし（展開元 <a href="../issues/index.html#I-041">I-041</a> は 29-3 まで据え置き）。</p>
+<p>2026-10-17（前半ゴール）: <code>content/umigame-stock/umigame-soup-1/set-registration/</code> に <code>29-2_select_targets.sql</code>（③ の抽出）・<code>29-2_update_duration.sql</code>（①〜③ の更新。再適用しても同じ結果）・<code>29-2_check.sql</code>（適用後の確認）を置いた。<strong>③ の絞り方</strong>: R-1-5 は在庫行をその場で更新し S3 キーも変えていないため <code>stock_item_id</code> だけでは旧版面と見分けられない。そこで <code>umigame_items.stock_item_id</code> → 在庫の <code>video_built_at</code> が R-1-3 の再ビルド以降（2026-10-16 17:27:41 UTC〜）、かつ <code>generated_at</code> が S3 上書きの後（2026-10-17 02:56:00 UTC = 11:56 JST〜）の両方で絞る。<code>parameters_snapshot</code> は生成時点の写しなので 24 のまま残す。</p>
+<p>抽出結果（読み取りのみ）: ローカル DB は 0 件（生成実行の記録がない）。Aurora は 1 件 = <code>generated_media</code> id 289・generation_run 298・<code>016-umigame-soup</code>・24・generated_at 2026-10-17 04:29:34（R-1-6 の手動投稿）。20:00 JST の定時（001）より後に適用した場合はその回も同じ条件で拾われる。</p>
 </div>
 </details>
 </div>
