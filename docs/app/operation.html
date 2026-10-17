@@ -45,7 +45,7 @@
     </tr>
     <tr>
       <td>投稿失敗時</td>
-      <td>自動再試行なし・通知のみ（欠番許容）。確認・手動補正手順はセクション 4</td>
+      <td>公開前の一過性エラーだけアプリ内で 1 回やり直し、それ以外は通知のみ（欠番許容）。公開の一過性エラーはコンテナを照会して未公開のときだけ再送（Phase 28。<a href="batch-flow.html#transient-errors">batch-flow.html 3.3</a>）。確認・手動補正手順はセクション 4</td>
     </tr>
     <tr>
       <td>stale データ（未完了のまま残った生成実行）</td>
@@ -438,7 +438,7 @@ WHERE set_id = :set_id AND is_active = 1;</code></pre></li>
 </ul>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>
-<p>初期実装は<strong>自動再試行なし・通知のみ（欠番許容）</strong>。1 日複数回投稿するため、1 回の欠番は致命的でないという判断（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）。</p>
+<p>基本は<strong>通知のみ（欠番許容）</strong>。1 日複数回投稿するため、1 回の欠番は致命的でないという判断（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）。ただし Phase 28（28-1 設計・28-2 実装）から、<strong>一過性エラーはバッチが段階別に自動で処理する</strong>: 公開前（コンテナ作成・処理待ち）はコンテナ作成から 1 回だけやり直し、公開の一過性エラーはコンテナの <code>status_code</code> を照会して未公開（<code>FINISHED</code>）のときだけ同じコンテナで 1 回再送する（表と判定基準の正は <a href="batch-flow.html#transient-errors">batch-flow.html 3.3「一過性エラーの段階別の扱い」</a>）。通知が来るのはそれでも <code>success</code> にならなかった場合で、運用者の手順（4.1〜4.3）は変わらない。やり直しが起きた行は <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形になる。</p>
 <p><strong>障害対応の入口はスキル <code>/incident</code></strong>（22-3〔2026-09-19〕新設。手順の正は <code>.claude/skills/incident/SKILL.md</code>）。失敗通知・「投稿が出ていない」など本番・運用の異常を認識したら、本セクションの手順に入る前に <code>/incident</code> を起動し、<a href="../issues/index.html">課題体系</a>との照合（予言されていた課題・前にも起きた事象）→ 切り分け・復旧（本番操作は人間ゲート）→ 事象記録 → 課題の更新の順で進める（ルールは<a href="../issues/index.html#rule-incident">課題体系 4.7</a>）。本セクション 4.1〜4.4 はその中の「切り分け・復旧」で参照する手順。</p>
 
 <h3 id="failure-check">4.1 確認手順</h3>
@@ -475,7 +475,7 @@ WHERE bs.set_code = :set_code
 <p>DB を手動補正する前に、対象の <code>set_code</code>・<code>post_id</code>・現在の値をセット記録（<code>docs/plans/&lt;set_code&gt;-log.html</code> の「トラブル対応の記録」）に記録してから更新する。横断・基盤起因の事象は<a href="../plans/development-log.html#incidents">開発記録の「事象記録」</a>へ（記録先の二分は Phase 18 で導入、22-2 で開発記録側へ移設。恒久対策の課題は<a href="../issues/index.html">課題体系</a>に起票する）。</p>
 
 <h4>published_unconfirmed を投稿済みに補正する</h4>
-<p>Instagram 側で投稿済みを確認できた場合のみ実行する。</p>
+<p>Instagram 側で投稿済みを確認できた場合のみ実行する。<strong><code>error_message</code> が「<code>PUBLISHED 確認済み:</code>」で始まる行</strong>（Phase 28。公開の一過性エラー後にバッチがコンテナの <code>PUBLISHED</code> を確認済み）は投稿済みが確定しているので、メディア ID と投稿日時だけを調べて補正する。メディア ID は <code>GET /{ig-user-id}/media?fields=id,timestamp,media_product_type,permalink</code> の一覧から、その回の投稿時刻・種別（リール / ストーリーズ）で特定する（ストーリーズは <code>GET /{ig-user-id}/stories</code>。24 時間を過ぎると引けないため早めに補正する）。</p>
 <pre><code>UPDATE posts
 SET status = 'success',
     platform_post_id = '(確認できた Instagram media ID)',

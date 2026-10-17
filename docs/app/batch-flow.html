@@ -245,7 +245,7 @@
 </div>
 
 <h3 id="posts-state">3.2 posts の状態遷移（冪等性・二重投稿防止）</h3>
-<p><code>posts</code> は生成実行 × アカウント × メディア種別で一意（UNIQUE 制約 <code>(generation_run_id, sns_account_id, media_type)</code>。V004 で <code>media_type</code> を追加）とし、<strong><code>attempt_number</code> 相当のカラムは持たない</strong>。自動再試行を行わない初期方針のため、1 つの投稿対象・1 メディア種別について作られる行は常に 1 行であり、その行の状態遷移だけで進行状況を表現する（ストーリーズを有効化したセットではリール行 + ストーリーズ行の最大 2 行。ストーリーズ行も同じ 5 状態を使う）。</p>
+<p><code>posts</code> は生成実行 × アカウント × メディア種別で一意（UNIQUE 制約 <code>(generation_run_id, sns_account_id, media_type)</code>。V004 で <code>media_type</code> を追加）とし、<strong><code>attempt_number</code> 相当のカラムは持たない</strong>。1 つの投稿対象・1 メディア種別について作られる行は常に 1 行であり、その行の状態遷移だけで進行状況を表現する（Phase 28 で入れた一過性エラーのやり直し〔<a href="#transient-errors">3.3 の段階別の扱い</a>〕も同じ行の中で行い、行を増やさない）（ストーリーズを有効化したセットではリール行 + ストーリーズ行の最大 2 行。ストーリーズ行も同じ 5 状態を使う）。</p>
 
 <div class="table-wrap">
 <table>
@@ -254,8 +254,8 @@
     <tr><td><code>pending</code></td><td>投稿処理に着手した（予約）</td><td>投稿対象と決定した直後、API 呼び出し前に INSERT する</td></tr>
     <tr><td><code>container_created</code></td><td>コンテナ作成 API まで成功（<code>platform_container_id</code> 設定済み）</td><td>コンテナ作成 API 成功時に更新</td></tr>
     <tr><td><code>success</code></td><td>投稿完了（<code>platform_post_id</code> 設定済み）</td><td>パブリッシュ API が成功時に更新</td></tr>
-    <tr><td><code>failed</code></td><td>投稿未完了で終了。自動では再対象にしない終端状態</td><td>API が明確に失敗を返した場合に更新</td></tr>
-    <tr><td><code>published_unconfirmed</code></td><td>投稿済みの可能性を否定できない終端状態。要手動確認</td><td>重複 publish 応答、またはパブリッシュ要求送信後のタイムアウト・接続断・応答本文の読み取り失敗（26-5〔2026-10-13〕で共通部品へ載せ替えたとき、2xx で本文が読めない場合も投稿済みの可能性を否定できないため結果不明側に寄せた）</td></tr>
+    <tr><td><code>failed</code></td><td>投稿未完了で終了。自動では再対象にしない終端状態</td><td>API が明確に失敗を返した場合に更新（一過性エラーはやり直しを使い切った後。<a href="#transient-errors">3.3 の段階別の扱い</a>）</td></tr>
+    <tr><td><code>published_unconfirmed</code></td><td>投稿済みの可能性を否定できない終端状態。要手動確認</td><td>重複 publish 応答、パブリッシュ要求送信後のタイムアウト・接続断・応答本文の読み取り失敗、またはパブリッシュの一過性エラー後の照会で未公開を確定できなかった場合（照会で <code>PUBLISHED</code> を確認できた場合も、メディア ID が取れないためこの状態にする。<a href="#transient-errors">3.3 の段階別の扱い</a>）（26-5〔2026-10-13〕で共通部品へ載せ替えたとき、2xx で本文が読めない場合も投稿済みの可能性を否定できないため結果不明側に寄せた）</td></tr>
   </tbody>
 </table>
 </div>
@@ -265,6 +265,7 @@
   SNS 投稿 ECS タスクが異常終了し Step Functions の Retry（最大 2 回、30 秒間隔。<a href="../infra/workflow.html#error-handling">infra/workflow.html セクション 6</a>）でタスク全体が再起動された場合、対象生成実行に紐づく有効アカウントごとに <code>posts</code> の状態を確認し、以下のとおり分岐する。
   <ul style="margin:.3rem 0 0;">
     <li>行が存在しない、または <code>pending</code>（<code>platform_container_id</code> 未設定）→ 最初から実行（コンテナ作成 → パブリッシュ）</li>
+    <li>（Phase 28）一過性エラーのやり直し回数はタスクのメモリ内でだけ数え、DB に持たない。やり直しの途中でタスクが落ちて Retry で再起動された場合は、行の状態から上記どおり再開し、やり直しの回数も 0 から数え直す（タスクの異常終了は稀なため、合計回数が 1 回を超えうることは受け入れる）</li>
     <li><code>container_created</code>（<code>platform_container_id</code> 設定済み、<code>platform_post_id</code> 未設定）→ パブリッシュから再開（同じ <code>container_id</code> を使い、新しいコンテナは作らない）</li>
     <li><code>success</code> → スキップ（このアカウントへの投稿は完了済み）</li>
     <li><code>failed</code> / <code>published_unconfirmed</code> → スキップ（同一実行内の Step Functions Retry でも自動では再試行しない。終端状態の扱いは全実行を通じて一貫させる）</li>
@@ -286,21 +287,74 @@
           <li><code>feed_image</code> → <code>image_url</code>（presigned URL）を渡す（従来どおり）</li>
           <li><code>reel</code> → <code>media_type=REELS</code> + <code>video_url</code>（presigned URL）+ <code>share_to_feed=true</code>（プロフィールのフィード面にも表示する。<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #8</a>）を渡す。<strong>カバー画像は指定せずデフォルト（動画の先頭フレーム）とする</strong>（Phase 14-4 決定・14-8 の実機確認で妥当性を確認済み。<code>cover_url</code> / <code>thumb_offset</code> は指定しない）。この仕様を前提に、各生成方式は<strong>先頭フレームがカバー・サムネイルとして成立するように 1 カット目を設計</strong>する（kenburns = 元静止画とほぼ同じ絵 / gpt-quiz-multicut = 問題提示の版面をカバー兼用にする 16-1 テコ入れ設計）</li>
         </ul>
-        取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する</li>
-      <li>コンテナのステータス（<code>GET /{container-id}?fields=status_code,status</code>。<code>status</code> は ERROR の理由文字列を記録するために取る〔26-6〕）を <code>FINISHED</code> になるまで有限回数・タイムアウト付きでポーリングする（Meta 側のメディア処理が非同期のため。手順 5 のパブリッシュ API は <code>FINISHED</code> 到達前に呼び出すと失敗しうる）。<strong>リール（動画）はメディア処理が分オーダーになり得るため、ポーリング間隔・上限は画像より長くメディア種別ごとに設定する</strong>（14-9 で確定: 画像は現行の間隔 3 秒 × 最大 10 回を維持、動画は<strong>間隔 10 秒 × 最大 60 回 = 上限約 10 分</strong>。14-8 の実測〔10 秒動画で FINISHED まで 33.5 秒〕に対する十分なマージン。動画の最大待ち時間 10 分は Step Functions の <code>RunSnsPostBatchTask</code> タイムアウト 3600 秒〔<a href="../infra/workflow.html">infra/workflow.html セクション 4</a>〕に収まるため、インフラ側の変更は不要）。<code>ERROR</code> を受け取った場合（理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残す。<a href="data-model.html#detail-posts">data-model.html 4.6</a>）、またはポーリングが上限に達し <code>FINISHED</code> に到達しなかった場合は、パブリッシュ API を呼び出さずに <code>status='failed'</code> に更新する（パブリッシュ要求を送信していないため <code>published_unconfirmed</code> の対象外）</li>
+        取得した <code>platform_container_id</code> を即座に保存し、<code>posts.status</code> を <code>container_created</code> に更新する。<strong>一過性エラーは作成からやり直す</strong>（<a href="#transient-errors">段階別の扱い</a>）</li>
+      <li>コンテナのステータス（<code>GET /{container-id}?fields=status_code,status</code>。<code>status</code> は ERROR の理由文字列を記録するために取る〔26-6〕）を <code>FINISHED</code> になるまで有限回数・タイムアウト付きでポーリングする（Meta 側のメディア処理が非同期のため。手順 5 のパブリッシュ API は <code>FINISHED</code> 到達前に呼び出すと失敗しうる）。<strong>リール（動画）はメディア処理が分オーダーになり得るため、ポーリング間隔・上限は画像より長くメディア種別ごとに設定する</strong>（14-9 で確定: 画像は現行の間隔 3 秒 × 最大 10 回を維持、動画は<strong>間隔 10 秒 × 最大 60 回 = 上限約 10 分</strong>。14-8 の実測〔10 秒動画で FINISHED まで 33.5 秒〕に対する十分なマージン。動画の最大待ち時間 10 分は Step Functions の <code>RunSnsPostBatchTask</code> タイムアウト 3600 秒〔<a href="../infra/workflow.html">infra/workflow.html セクション 4</a>〕に収まるため、インフラ側の変更は不要）。<code>ERROR</code> を受け取った場合（理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残す。<a href="data-model.html#detail-posts">data-model.html 4.6</a>）、またはポーリングが上限に達し <code>FINISHED</code> に到達しなかった場合は、パブリッシュ API を呼び出さずに <code>status='failed'</code> に更新する（パブリッシュ要求を送信していないため <code>published_unconfirmed</code> の対象外）。<strong>ただし <code>ERROR</code> と照会の一過性エラーは、<code>failed</code> にする前にコンテナ作成から 1 回やり直す</strong>（上限到達はやり直さない。<a href="#transient-errors">段階別の扱い</a>）</li>
       <li>パブリッシュ API（<code>POST /{ig-user-id}/media_publish</code>）を呼び出す
         <ul>
           <li>成功 → <code>platform_post_id</code> を保存し <code>status='success'</code> に更新</li>
           <li>明確な失敗（投稿未完了と判定できる応答）→ <code>status='failed'</code> に更新</li>
+          <li>一過性エラー → コンテナの <code>status_code</code> を照会して分岐する（<code>PUBLISHED</code> → <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで公開を 1 回だけ再送 / それ以外・照会失敗 → <code>published_unconfirmed</code>。<a href="#transient-errors">段階別の扱い</a>）</li>
           <li>重複 publish 応答、またはタイムアウト・接続断で結果不明 → <code>status='published_unconfirmed'</code> に更新</li>
           <li id="problem-snapshot"><strong>成功直後の問題スナップショット出力（<code>batch_sets.problem_snapshot_enabled=1</code> のセットのみ。Phase 21-3 設計・21-5b 実装）</strong>: リール行が <code>success</code> に達した直後に、当該生成実行の <code>umigame_items</code>（問題文・真相・確定事実シート・ルール帯）と対象セットの <code>prompt_configs.prompt_text</code>（AI 出題者プロンプトのセット固定部分。<code>is_active=1</code> の <code>id</code> 昇順 1 件）から JSON を組み、S3 <code>assets/{set_code}/problems/{platform_post_id}.json</code> へ PUT する（<code>media_id</code> = <code>media_publish</code> の応答 id。スキーマは <a href="sets/umigame-soup-1.html#snapshot">セット別設計書 10.7.2</a>）。PUT 成功で <code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code> を更新する。<strong>出力失敗は投稿失敗にしない</strong>（WARNING ログ + <code>snapshot_s3_key</code> NULL のまま次へ。手動再出力は運用側。21-5b の実装では、リール行の <code>success</code> 更新を commit した後に別トランザクションで出力し、失敗時はスナップショット側だけをロールバックする = 投稿の成功記録を巻き戻さない）。フラグが 0 のセット・<code>umigame_items</code> 行のない実行では何もしない。コメント自動返信の Lambda はこの JSON だけを読み Aurora に触れない（<a href="../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>）</li>
         </ul>
       </li>
-      <li><strong>ストーリーズ再掲（<code>batch_sets.stories_enabled=1</code> のセットのみ。Phase 15-10 追加）</strong>: リール行が <code>success</code> に達した場合のみ、同一動画をストーリーズへ再掲する。<code>posts</code> へ <code>media_type='story'</code> の行を <code>pending</code> で INSERT-or-skip（既存ストーリーズ行があればその状態から 3.2 と同型の分岐で再開・終端ならスキップ。<code>post_media</code> は手順 2 と同様にストーリーズ行にも同一メディアを <code>display_order=0</code> で 1 行紐づける〔15-12 実装〕。キャプションは非対応のため <code>caption_template_id</code> / <code>caption_text_snapshot</code> は NULL のまま）→ 同一 MP4 の Presigned URL でコンテナ作成（<code>media_type=STORIES</code> + <code>video_url</code>。<strong>キャプション・<code>share_to_feed</code>・カバーは指定しない</strong>〔ストーリーズはキャプション非対応〕）→ ステータスポーリング（動画の間隔 10 秒 × 最大 60 回を流用）→ パブリッシュ（結果の反映は手順 6 と同じ）。リール行が <code>success</code> 以外で終わったアカウントではストーリーズ行を作成しない</li>
+      <li><strong>ストーリーズ再掲（<code>batch_sets.stories_enabled=1</code> のセットのみ。Phase 15-10 追加）</strong>: リール行が <code>success</code> に達した場合のみ、同一動画をストーリーズへ再掲する。<code>posts</code> へ <code>media_type='story'</code> の行を <code>pending</code> で INSERT-or-skip（既存ストーリーズ行があればその状態から 3.2 と同型の分岐で再開・終端ならスキップ。<code>post_media</code> は手順 2 と同様にストーリーズ行にも同一メディアを <code>display_order=0</code> で 1 行紐づける〔15-12 実装〕。キャプションは非対応のため <code>caption_template_id</code> / <code>caption_text_snapshot</code> は NULL のまま）→ 同一 MP4 の Presigned URL でコンテナ作成（<code>media_type=STORIES</code> + <code>video_url</code>。<strong>キャプション・<code>share_to_feed</code>・カバーは指定しない</strong>〔ストーリーズはキャプション非対応〕）→ ステータスポーリング（動画の間隔 10 秒 × 最大 60 回を流用）→ パブリッシュ（結果の反映は手順 6 と同じ。一過性エラーの扱いもリールと同じで、やり直しの回数はストーリーズ行で別に数える）。リール行が <code>success</code> 以外で終わったアカウントではストーリーズ行を作成しない</li>
     </ol>
   </li>
   <li>全アカウントの処理後、3.4 の方針に基づき終了コードを決定して終了する</li>
 </ol>
+
+<h4 id="transient-errors">一過性エラーの段階別の扱い（Phase 28-1 設計。実装は 28-2）</h4>
+<p>投稿 1 行（<code>posts</code> の 1 行 = リール行・ストーリーズ行それぞれ）について、段階 × 失敗の種類ごとに次のとおり扱う。<strong>公開前（作成・処理待ち）は二重投稿の心配がないので作成からやり直し、公開の後は未公開を確定できたときだけ再送する</strong>。28-2 の反映までは、一過性エラーも含め従来どおり 1 回で <code>failed</code>（公開の結果不明は <code>published_unconfirmed</code>）になる。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>段階</th><th>一過性</th><th>一過性でない</th><th>結果不明・上限到達</th></tr></thead>
+  <tbody>
+    <tr><td>① コンテナ作成（<code>POST /{ig-user-id}/media</code>）</td><td>新しいコンテナで<strong>作成からやり直す</strong>（作成・処理待ちで共有の 1 回）。やり直しも失敗したら <code>failed</code></td><td><code>failed</code></td><td>タイムアウト・接続断は一過性と同じ扱い（できたかもしれないコンテナは公開しないので放置してよい）</td></tr>
+    <tr><td>② 処理待ち（<code>GET /{container-id}?fields=status_code,status</code>）</td><td><code>status_code=ERROR</code>・照会の一過性エラー → <strong>作成からやり直す</strong>（① と同じ 1 回を共有）。やり直しも失敗したら <code>failed</code></td><td>照会の一過性でない API エラー・<code>status_code=EXPIRED</code> → <code>failed</code></td><td>照会のタイムアウト・接続断は一過性と同じ扱い。<strong>上限到達（<code>FINISHED</code> に届かない）→ <code>failed</code>（やり直さない）</strong>: リールの待ち上限は約 10 分あり、やり直すとタスクの時間が倍になるため</td></tr>
+    <tr><td>③ 公開（<code>POST /{ig-user-id}/media_publish</code>）</td><td><strong>コンテナの <code>status_code</code> を照会して分岐</strong>（下記）</td><td><code>failed</code>（今のまま）</td><td>重複 publish 応答・タイムアウト・接続断・応答本文の読み取り失敗 → <code>published_unconfirmed</code>（今のまま。照会はしない）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>③ 公開の一過性エラー後の照会</strong>（10 秒待ってから <code>GET /{container-id}?fields=status_code,status</code> を 1 回だけ呼ぶ。照会はやり直さない）:</p>
+<ul>
+  <li><code>PUBLISHED</code> → <code>published_unconfirmed</code>。<code>error_message</code> の先頭を「<code>PUBLISHED 確認済み:</code>」にする（公開済みだが <code>media_publish</code> の応答がないためメディア ID が取れない。人が ID を補って <code>success</code> に直す = <a href="operation.html#failure-correction">operation.html 4.2</a>）</li>
+  <li><code>FINISHED</code> → <strong>同じコンテナ ID で公開を 1 回だけ再送</strong>する。同じコンテナは 1 回しか公開できないため、照会の後で先の要求が公開まで進んでいても 2 件目の投稿にはならない（重複応答 → <code>published_unconfirmed</code>）。再送の結果: 成功 → <code>success</code> / 一過性でない API エラー → <code>failed</code> / 一過性エラー・重複応答・結果不明 → <code>published_unconfirmed</code>（再送は 1 回だけ。2 回目の照会はしない）</li>
+  <li>それ以外の <code>status_code</code>（<code>ERROR</code>・<code>EXPIRED</code>・<code>IN_PROGRESS</code> 等）・照会自体の失敗 → <code>published_unconfirmed</code>（未公開を確定できないため）</li>
+</ul>
+
+<p><strong>「一過性」の判定</strong>: 次のどれかに当たる失敗を一過性とする。</p>
+<ul>
+  <li>Graph API のエラー応答で <code>error.is_transient</code> が <code>true</code></li>
+  <li>Graph API のエラー応答で <code>error.code</code> が <code>1</code>（API Unknown）または <code>2</code>（API Service）。Meta のエラーコード表で「一時的な障害の可能性。待ってやり直す」とされるもので、<code>is_transient</code> が付かない応答でも一過性に含める</li>
+  <li>処理待ちでのコンテナ <code>status_code=ERROR</code>（理由文字列に関係なく 1 回はやり直す。形式不正など恒久的な ERROR はやり直しも ERROR になり <code>failed</code> で終わる）</li>
+  <li>① ② の段階でのタイムアウト・接続断・応答本文の読み取り失敗（<code>InstagramTransportError</code> 相当）。③ では結果不明として扱い、一過性には含めない</li>
+</ul>
+<p>レート制限（<code>code</code> 4 / 17 / 32 / 613 や HTTP 429）は、<code>is_transient: true</code> が付いていない限り一過性に含めない（すぐやり直しても解けない）。</p>
+
+<p><strong>やり直しの回数</strong>: 1 行につき「① ② の作成からのやり直し 1 回」と「③ の再送 1 回」を別々に持つ（両方使うことはありうる）。回数はタスクのメモリ内で数え、DB には持たない（<a href="#posts-state">3.2</a>）。やり直しの前に待ちは入れない（① ② の失敗はすでに数秒〜数分経っており、Step Functions の時間枠を延ばさないため）。</p>
+
+<p><strong>記録の形</strong>:</p>
+<ul>
+  <li>作り直したコンテナの ID は <code>platform_container_id</code> を<strong>上書き</strong>する（状態は <code>container_created</code> のまま）。最初のコンテナ ID と最初のエラーは WARNING ログに出す</li>
+  <li>やり直し・照会が起きた行の <code>api_response</code> は、次の形の JSON にする（起きなかった行は従来どおり、失敗した呼び出しの応答 JSON をそのまま保存する）:
+    <pre><code>{
+  "final": &lt;最後に失敗した呼び出しの応答。成功で終わった場合は null&gt;,
+  "first_error": {"stage": "create" | "poll" | "publish",
+                  "container_id": "&lt;そのときのコンテナ ID&gt;",
+                  "response": &lt;最初の失敗の応答 JSON。転送エラーなら {"transport_error": "&lt;例外の文字列&gt;"}&gt;},
+  "container_check": &lt;③ の照会の応答 JSON。照会しなかった・失敗した場合は null&gt;
+}</code></pre>
+    やり直しが成功して <code>success</code> になった行も、この JSON を <code>api_response</code> に残す（一過性エラーの発生頻度を後から数えるため）。<code>error_message</code> は <code>success</code> なら NULL のまま</li>
+  <li><code>error_message</code> は最後の失敗の内容にし、やり直しを使った場合は末尾に「（作成から 1 回やり直し済み）」「（公開を 1 回再送済み）」を付ける</li>
+</ul>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-10-17、Phase 28-1）: 一過性エラーは公開前だけ自動でやり直す（「自動再試行なし・欠番許容」の改訂）</span>
+  初期方針は「自動再試行なし・通知のみ（欠番許容）」（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）だったが、一過性エラー 1 回で欠番になる事象が 2 回起きた（2026-08-23 リールのコンテナ ERROR、2026-10-17 ストーリーズの <code>media_publish</code> が <code>{"code": 2, "is_transient": true}</code>。<a href="../issues/index.html#I-024">I-024</a> ②）。2 回目では <strong>DB は <code>failed</code> なのに Instagram 上は公開済み</strong>で、公開段階の失敗を一律 <code>failed</code> にすると記録が実体とずれ、単純に再送すると二重投稿になることが分かった。そこで段階で分け、① ② は公開要求を送っていないので作成から 1 回だけやり直し（リールの処理待ちが最大 10 分あるため回数は 1 回に抑える）、③ はコンテナの <code>status_code</code> を照会して<strong>未公開を確定できたとき（<code>FINISHED</code>）だけ同じコンテナで再送</strong>する（ユーザー判断 2026-10-17）。<code>PUBLISHED</code> でも <code>success</code> にしないのは、<code>media_publish</code> の応答が無いとメディア ID が取れず、問題スナップショット（<a href="#problem-snapshot">手順 6</a>）・インサイト収集が ID を前提にしているため。Step Functions の Retry・ASL・DB スキーマ（状態値 5 つ）・終了コードの方針（3.4）は変えない。
+</div>
 
 <div class="decision">
   <span class="callout-title">決定（2026-07-29、Phase 15-10）: ストーリーズ再掲の投稿フロー（15-9 ユーザー決定の具体化）</span>
@@ -341,6 +395,7 @@
   <li>終了コード 1 により Step Functions の既存 Retry（最大 2 回）が働くが、3.2 の状態遷移によって <code>success</code> / 終端状態のアカウントはスキップされるため、Retry によって無駄な API 呼び出しが増えることはない。Retry を使い切ってもなお非 <code>success</code> が残る場合は Catch → Fail 状態に遷移し、既存の CloudWatch Alarm（<code>ExecutionsFailed</code>）で通知される</li>
   <li><strong>検知経路の正確化（2026-07-29、Phase 15-10 で確認）</strong>: 投稿が終端状態（<code>failed</code> / <code>published_unconfirmed</code>）で確定した失敗は、Retry の再実行時に投稿対象の決定（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）で <code>ALREADY_TERMINAL</code> となり再実行が成功終了するため、<strong><code>ExecutionsFailed</code> アラームには現れない</strong>。この場合の検知は 1 回目の終了コード 1 を捕捉する <strong>ECS タスク異常終了通知（EventBridge Rule。<a href="../infra/workflow.html">infra/workflow.html セクション 9</a>）</strong>が担う。<code>ExecutionsFailed</code> が発報するのは、非終端状態のまま失敗が続く場合（stale・インフラ障害・タスク起動失敗等）である。ストーリーズ失敗の検知（3.3 の decision）もこの ECS タスク異常終了通知の経路に乗る</li>
   <li><strong>通知粒度</strong>: 初期スコープでは個別アカウント・個別失敗理由ごとのカスタムメトリクスは持たない。既存の Step Functions 失敗アラーム 1 本のみで通知し、詳細な原因（どのアカウント・どの段階で失敗したか）は CloudWatch Logs と <code>posts</code> テーブル（<code>status</code> / <code>api_response</code>）で確認する運用とする（確認手順は <a href="operation.html#failure-check">アプリ運用設計 セクション 4.1</a>）</li>
+  <li><strong>一過性エラーのやり直し（Phase 28）はこの判定の前にアプリ内で済ませる</strong>: やり直し・再送で <code>success</code> になった行は成功として数え、使い切って <code>failed</code> / <code>published_unconfirmed</code> で終わった行だけが失敗になる（<a href="#transient-errors">3.3 の段階別の扱い</a>）。終了コード・Retry・通知の経路は変えない</li>
   <li><code>published_unconfirmed</code> も「対応が必要な状態」として終了コード 1 の対象に含める（<code>success</code> と明確に区別し、運用者に手動確認を促すため）</li>
 </ul>
 
