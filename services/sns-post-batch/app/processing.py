@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass
 from typing import Any, Callable
 
 from acps_shared import (
     InstagramApiError,
+    InstagramTransportError,
     build_sns_secret_name,
     generate_presigned_url,
     get_secret_string,
@@ -17,6 +19,8 @@ from acps_shared import (
 from .instagram_api import (
     InstagramResultUnknown,
     create_container,
+    get_container_status,
+    is_transient_api_error,
     poll_container_status,
     publish_container,
     resolve_poll_settings,
@@ -39,6 +43,7 @@ from .posts import (
 logger = logging.getLogger(__name__)
 
 TERMINAL_POST_STATUSES = {"success", "failed", "published_unconfirmed"}
+PUBLISH_CHECK_DELAY_SECONDS = 10.0
 
 
 @dataclass(frozen=True)
@@ -47,6 +52,103 @@ class ProcessingResult:
 
     accounts_processed: int
     all_accounts_success: bool
+
+
+@dataclass
+class _RecoveryState:
+    """Keep bounded recovery history for one posts row in task memory."""
+
+    first_error: dict[str, Any] | None = None
+    container_check: dict[str, Any] | None = None
+    creation_retried: bool = False
+    publish_retried: bool = False
+
+    def remember_first_error(
+        self,
+        stage: str,
+        container_id: str | None,
+        exc: InstagramApiError,
+    ) -> None:
+        """Retain the first failure even when both recovery paths are used."""
+        if self.first_error is None:
+            response = exc.response
+            if response is None and isinstance(exc, InstagramTransportError):
+                response = {"transport_error": str(exc)}
+            self.first_error = {
+                "stage": stage,
+                "container_id": container_id,
+                "response": response,
+            }
+
+    def api_response(
+        self,
+        response: dict[str, Any] | None,
+        *,
+        success: bool = False,
+    ) -> dict[str, Any] | None:
+        """Wrap diagnostics only for rows that needed recovery."""
+        if self.first_error is None:
+            return response
+        return {
+            "final": None if success else response,
+            "first_error": self.first_error,
+            "container_check": self.container_check,
+        }
+
+    def error_message(self, message: str) -> str:
+        """Annotate the final failure with the recovery attempts used."""
+        if self.creation_retried:
+            message += "（作成から 1 回やり直し済み）"
+        if self.publish_retried:
+            message += "（公開を 1 回再送済み）"
+        return message
+
+
+def _publish_with_recovery(
+    access_token: str,
+    ig_user_id: str,
+    container_id: str,
+    *,
+    recovery: _RecoveryState,
+    urlopen: Any,
+    sleep: Callable[[float], None],
+) -> tuple[str, dict[str, Any]]:
+    """Check a transient publish failure once and resend only if FINISHED."""
+    try:
+        return publish_container(
+            access_token, ig_user_id, container_id, urlopen=urlopen
+        )
+    except InstagramApiError as exc:
+        if not is_transient_api_error(exc):
+            raise
+        recovery.remember_first_error("publish", container_id, exc)
+        sleep(PUBLISH_CHECK_DELAY_SECONDS)
+        try:
+            recovery.container_check = get_container_status(
+                access_token, container_id, urlopen=urlopen
+            )
+        except Exception as check_exc:
+            raise InstagramResultUnknown(
+                str(check_exc), response=getattr(check_exc, "response", None)
+            ) from check_exc
+
+        status_code = recovery.container_check.get("status_code")
+        if status_code != "FINISHED":
+            message = str(exc)
+            if status_code == "PUBLISHED":
+                message = f"PUBLISHED 確認済み: {message}"
+            raise InstagramResultUnknown(message, response=exc.response) from exc
+
+    # Publishing is outside the creation loop: never replace this container.
+    recovery.publish_retried = True
+    try:
+        return publish_container(
+            access_token, ig_user_id, container_id, urlopen=urlopen
+        )
+    except InstagramApiError as exc:
+        if is_transient_api_error(exc):
+            raise InstagramResultUnknown(str(exc), response=exc.response) from exc
+        raise
 
 
 def _rollback_safely(connection: Any) -> None:
@@ -104,6 +206,7 @@ def _process_account_media(
     s3_bucket: str,
     s3_client: Any,
     urlopen: Any,
+    sleep: Callable[[float], None],
     on_attempt: Callable[[], None] | None = None,
 ) -> bool:
     """Process one account and media type, returning whether it is successful."""
@@ -139,6 +242,7 @@ def _process_account_media(
         media_type,
     )
     post_id: int | None = post.id if post is not None else None
+    recovery = _RecoveryState()
     try:
         if post is None:
             post_id = create_pending_post(
@@ -183,62 +287,88 @@ def _process_account_media(
         )
         credentials = parse_sns_secret(get_secret_string(secret_name))
 
+        container_id = None
         if (
             post is not None
             and post.status == "container_created"
             and post.platform_container_id
         ):
             container_id = post.platform_container_id
-        else:
-            media_url = generate_presigned_url(
-                s3_bucket,
-                generated_media.s3_key,
-                expires_in=3600,
-                client=s3_client,
-            )
-            if save_caption_snapshot:
-                container_id, _ = create_container(
-                    credentials.access_token,
-                    credentials.ig_user_id,
-                    media_url,
-                    caption_text,
-                    media_type=media_type,
-                    urlopen=urlopen,
-                )
-            else:
-                container_id, _ = create_container(
-                    credentials.access_token,
-                    credentials.ig_user_id,
-                    media_url,
-                    media_type=media_type,
-                    urlopen=urlopen,
-                )
-            update_post_container_created(
-                cursor,
-                post_id,
-                platform_container_id=container_id,
-            )
-            connection.commit()
 
         poll_settings = resolve_poll_settings(media_type)
-        poll_container_status(
-            credentials.access_token,
-            container_id,
-            urlopen=urlopen,
-            max_attempts=poll_settings.max_attempts,
-            poll_interval_seconds=poll_settings.interval_seconds,
-        )
-        platform_post_id, api_response = publish_container(
+        while True:
+            stage = "create" if container_id is None else "poll"
+            try:
+                if container_id is None:
+                    media_url = generate_presigned_url(
+                        s3_bucket,
+                        generated_media.s3_key,
+                        expires_in=3600,
+                        client=s3_client,
+                    )
+                    caption_args = (caption_text,) if save_caption_snapshot else ()
+                    container_id, _ = create_container(
+                        credentials.access_token,
+                        credentials.ig_user_id,
+                        media_url,
+                        *caption_args,
+                        media_type=media_type,
+                        urlopen=urlopen,
+                    )
+                    update_post_container_created(
+                        cursor,
+                        post_id,
+                        platform_container_id=container_id,
+                    )
+                    connection.commit()
+
+                stage = "poll"
+                poll_container_status(
+                    credentials.access_token,
+                    container_id,
+                    urlopen=urlopen,
+                    max_attempts=poll_settings.max_attempts,
+                    poll_interval_seconds=poll_settings.interval_seconds,
+                )
+                break
+            except InstagramApiError as exc:
+                processing_error = (
+                    stage == "poll"
+                    and isinstance(exc.response, dict)
+                    and exc.response.get("status_code") == "ERROR"
+                )
+                transient = (
+                    processing_error
+                    or isinstance(exc, InstagramTransportError)
+                    or is_transient_api_error(exc)
+                )
+                if recovery.creation_retried or not transient:
+                    raise
+                recovery.remember_first_error(stage, container_id, exc)
+                recovery.creation_retried = True
+                logger.warning(
+                    "投稿コンテナを作成からやり直す: "
+                    "post_id=%s container_id=%s stage=%s error=%s",
+                    post_id,
+                    container_id,
+                    stage,
+                    exc,
+                )
+                container_id = None
+
+        platform_post_id, api_response = _publish_with_recovery(
             credentials.access_token,
             credentials.ig_user_id,
             container_id,
+            recovery=recovery,
             urlopen=urlopen,
+            sleep=sleep,
         )
         posted_at = update_post_success(
             cursor,
             post_id,
             platform_post_id=platform_post_id,
-            api_response=api_response,
+            api_response=recovery.api_response(api_response, success=True),
         )
         connection.commit()
         if problem_snapshot_enabled and media_type == MEDIA_TYPE_REEL:
@@ -277,8 +407,8 @@ def _process_account_media(
                     cursor,
                     connection,
                     post_id=post_id,
-                    error_message=str(exc),
-                    api_response=exc.response,
+                    error_message=recovery.error_message(str(exc)),
+                    api_response=recovery.api_response(exc.response),
                     unconfirmed=True,
                 )
             except Exception:
@@ -302,8 +432,8 @@ def _process_account_media(
                     cursor,
                     connection,
                     post_id=post_id,
-                    error_message=str(exc),
-                    api_response=exc.response,
+                    error_message=recovery.error_message(str(exc)),
+                    api_response=recovery.api_response(exc.response),
                     unconfirmed=False,
                 )
             except Exception:
@@ -338,6 +468,7 @@ def process_target_generation_run(
     s3_client: Any,
     urlopen: Any,
     caption_text: str | None = None,
+    sleep: Callable[[float], None] | None = None,
 ) -> ProcessingResult:
     """Process one generated media item for each active SNS account.
 
@@ -345,6 +476,8 @@ def process_target_generation_run(
     independently, and a final database recheck determines overall success.
     """
     attempted_account_ids: set[int] = set()
+    if sleep is None:
+        sleep = time.sleep
     if caption_text is None:
         caption_text = caption_template.template_text if caption_template else ""
     media_type = derive_media_type(generated_media.file_format)
@@ -367,6 +500,7 @@ def process_target_generation_run(
             s3_bucket=s3_bucket,
             s3_client=s3_client,
             urlopen=urlopen,
+            sleep=sleep,
             on_attempt=lambda account_id=account.id: attempted_account_ids.add(
                 account_id
             ),
@@ -389,6 +523,7 @@ def process_target_generation_run(
                 s3_bucket=s3_bucket,
                 s3_client=s3_client,
                 urlopen=urlopen,
+                sleep=sleep,
                 on_attempt=lambda account_id=account.id: attempted_account_ids.add(
                     account_id
                 ),

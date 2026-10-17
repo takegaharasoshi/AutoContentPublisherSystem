@@ -9,6 +9,7 @@ from typing import Any
 
 from acps_shared import (
     InstagramApiError,
+    InstagramRateLimited,
     InstagramRequestFailed,
     InstagramTransportError,
     get_json,
@@ -75,6 +76,20 @@ def _is_duplicate_publish_message(message: str | None) -> bool:
     )
 
 
+def is_transient_api_error(exc: InstagramApiError) -> bool:
+    """Identify transient Graph failures without changing shared classification."""
+    if isinstance(exc, InstagramTransportError):
+        return False
+    response = exc.response
+    error = response.get("error") if isinstance(response, dict) else None
+    if isinstance(error, dict) and error.get("is_transient") is True:
+        return True
+    if isinstance(exc, InstagramRateLimited):
+        return False
+    code = error.get("code") if isinstance(error, dict) else exc.code
+    return type(code) is int and code in {1, 2}
+
+
 def create_container(
     access_token: str,
     ig_user_id: str,
@@ -123,6 +138,20 @@ def create_container(
     return str(container_id), response
 
 
+def get_container_status(
+    access_token: str,
+    container_id: str,
+    *,
+    urlopen: Any = urllib.request.urlopen,
+) -> dict[str, Any]:
+    """Read a container status once, without polling or retrying."""
+    return get_json(
+        f"/{container_id}",
+        {"fields": "status_code,status", "access_token": access_token},
+        urlopen=urlopen,
+    ).payload
+
+
 def poll_container_status(
     access_token: str,
     container_id: str,
@@ -134,19 +163,19 @@ def poll_container_status(
     """Poll a media container until it is ready for publishing."""
     last_response: dict[str, Any] | None = None
     for attempt in range(max_attempts):
-        response = get_json(
-            f"/{container_id}",
-            {"fields": "status_code,status", "access_token": access_token},
+        response = get_container_status(
+            access_token,
+            container_id,
             urlopen=urlopen,
-        ).payload
+        )
         last_response = response
         status_code = response.get("status_code")
         if status_code == "FINISHED":
             return response
-        if status_code == "ERROR":
+        if status_code in {"ERROR", "EXPIRED"}:
             # status carries Meta's reason text (e.g. "Error: ... (2207026)").
             reason = response.get("status")
-            message = "Instagram container processing returned ERROR"
+            message = f"Instagram container processing returned {status_code}"
             if reason:
                 message = f"{message}: {reason}"
             raise InstagramRequestFailed(message, response=response)

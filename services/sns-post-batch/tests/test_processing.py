@@ -1,10 +1,14 @@
 """Tests for SNS posting processing behavior."""
 
 import datetime
-
+from io import BytesIO
+import json
+from typing import Any
+import urllib.error
+import urllib.parse
 from unittest.mock import ANY, Mock
 
-import json
+import pytest
 
 import app.instagram_api as instagram_api
 import app.processing as processing
@@ -53,6 +57,8 @@ def _run(monkeypatch, accounts, get_post, **overrides):
     stories_enabled = overrides.pop("stories_enabled", False)
     problem_snapshot_enabled = overrides.pop("problem_snapshot_enabled", False)
     caption_text = overrides.pop("caption_text", None)
+    urlopen = overrides.pop("urlopen", Mock())
+    sleep = overrides.pop("sleep", Mock())
     monkeypatch.setattr(processing, "get_post", get_post)
     monkeypatch.setattr(processing, "create_pending_post", Mock(return_value=101))
     monkeypatch.setattr(processing, "ensure_post_media", Mock())
@@ -83,8 +89,9 @@ def _run(monkeypatch, accounts, get_post, **overrides):
         set_code="set-a",
         s3_bucket="configured-bucket",
         s3_client=Mock(),
-        urlopen=Mock(),
+        urlopen=urlopen,
         caption_text=caption_text,
+        sleep=sleep,
     )
     return result, cursor, connection
 
@@ -271,7 +278,15 @@ def test_processing_records_container_error_reason(monkeypatch, caplog) -> None:
 
     assert result == processing.ProcessingResult(1, False)
     kwargs = processing.update_post_failed.call_args.kwargs
-    assert kwargs["api_response"] == payload
+    assert kwargs["api_response"] == {
+        "final": payload,
+        "first_error": {
+            "stage": "poll", "container_id": "container", "response": payload,
+        },
+        "container_check": None,
+    }
+    assert urlopen.call_count == 2
+    assert kwargs["error_message"].endswith("（作成から 1 回やり直し済み）")
     assert "Error: video too long (2207026)" in kwargs["error_message"]
     assert "Error: video too long (2207026)" in caplog.text
 
@@ -614,3 +629,622 @@ def test_processing_does_not_snapshot_failed_reel(monkeypatch) -> None:
     )
     assert result == processing.ProcessingResult(1, False)
     write_snapshot.assert_not_called()
+
+
+def _http_error(payload: dict, status: int = 400) -> urllib.error.HTTPError:
+    """Build a real Graph HTTP error for the recording urlopen mock."""
+    return urllib.error.HTTPError(
+        "https://graph.facebook.com/v25.0/ig/media",
+        status,
+        "bad request",
+        {},
+        BytesIO(json.dumps(payload).encode()),
+    )
+
+
+def _run_graph_flow(
+    monkeypatch: pytest.MonkeyPatch,
+    responses: list[Any],
+    **overrides: Any,
+) -> tuple[processing.ProcessingResult, Mock, Mock]:
+    """Exercise real SNS/shared HTTP handling with mocked DB persistence."""
+    final_status = overrides.pop("final_status", "success")
+    initial_post = overrides.pop("initial_post", None)
+    states = iter([initial_post, Post(101, final_status, None, None)])
+    get_post = overrides.pop("get_post", lambda *args, **kwargs: next(states))
+    urlopen = Mock(side_effect=[
+        _FakeHttpResponse(value) if isinstance(value, dict) else value
+        for value in responses
+    ])
+    sleep = Mock()
+    result, _, _ = _run(
+        monkeypatch,
+        [_account()],
+        get_post,
+        generated_media=_media("mp4"),
+        create_container=instagram_api.create_container,
+        poll_container_status=instagram_api.poll_container_status,
+        publish_container=instagram_api.publish_container,
+        resolve_poll_settings=lambda media_type: instagram_api.PollSettings(1, 0),
+        urlopen=urlopen,
+        sleep=sleep,
+        **overrides,
+    )
+    return result, urlopen, sleep
+
+
+def _request_paths(urlopen: Mock) -> list[str]:
+    """Return the last path component of every outgoing HTTP request."""
+    return [
+        urllib.parse.urlsplit(call.args[0].full_url).path.rsplit("/", 1)[-1]
+        for call in urlopen.call_args_list
+    ]
+
+
+def _publish_ids(urlopen: Mock) -> list[str]:
+    """Read actual creation_id form fields to detect container replacement."""
+    return [
+        urllib.parse.parse_qs(call.args[0].data.decode())["creation_id"][0]
+        for call in urlopen.call_args_list
+        if call.args[0].full_url.endswith("/media_publish")
+    ]
+
+
+def test_create_transient_error_recreates_and_succeeds(monkeypatch) -> None:
+    """A transient creation error gets one fresh container and keeps history."""
+    payload = {"error": {"message": "try again", "code": 100, "is_transient": True}}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        _http_error(payload), {"id": "new"},
+        {"status_code": "FINISHED"}, {"id": "post"},
+    ])
+
+    assert result == processing.ProcessingResult(1, True)
+    assert _request_paths(api) == ["media", "media", "new", "media_publish"]
+    assert _publish_ids(api) == ["new"]
+    processing.update_post_container_created.assert_called_once_with(
+        ANY, 101, platform_container_id="new",
+    )
+    assert processing.update_post_success.call_args.kwargs == {
+        "platform_post_id": "post",
+        "api_response": {
+            "final": None,
+            "first_error": {
+                "stage": "create", "container_id": None, "response": payload,
+            },
+            "container_check": None,
+        },
+    }
+    sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("code", [1, 2])
+def test_create_service_error_without_flag_retries(monkeypatch, code: int) -> None:
+    """Graph codes 1 and 2 qualify even without is_transient."""
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        _http_error({"error": {"code": code}}),
+        {"id": "new"}, {"status_code": "FINISHED"}, {"id": "post"},
+    ])
+    assert result.all_accounts_success
+    assert _request_paths(api).count("media") == 2
+    sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("stage", ["create", "poll", "publish"])
+@pytest.mark.parametrize(
+    "status,code", [(400, 4), (400, 17), (400, 32), (400, 613), (429, 2)],
+)
+def test_rate_limit_without_flag_never_retries(
+    monkeypatch, stage: str, status: int, code: int,
+) -> None:
+    """Rate limits stay failed at every stage without an explicit true flag."""
+    payload = {"error": {"message": "rate limited", "code": code}}
+    responses = []
+    if stage != "create":
+        responses.append({"id": "container"})
+    if stage == "publish":
+        responses.append({"status_code": "FINISHED"})
+    responses.append(_http_error(payload, status))
+    result, api, sleep = _run_graph_flow(monkeypatch, responses, final_status="failed")
+
+    assert not result.all_accounts_success
+    assert api.call_count == len(responses)
+    assert processing.update_post_failed.call_args.kwargs == {
+        "error_message": "rate limited", "api_response": payload,
+    }
+    processing.update_post_unconfirmed.assert_not_called()
+    sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("stage", ["create", "poll", "publish"])
+def test_explicitly_transient_rate_limit_uses_stage_recovery(
+    monkeypatch, stage: str,
+) -> None:
+    """is_transient true also allows recovery of a rate-limit exception."""
+    payload = {"error": {"code": 4, "is_transient": True}}
+    responses = []
+    if stage != "create":
+        responses.append({"id": "old"})
+    if stage == "publish":
+        responses.append({"status_code": "FINISHED"})
+    responses.append(_http_error(payload, 429))
+    if stage != "publish":
+        responses.append({"id": "new"})
+    responses.extend([{"status_code": "FINISHED"}, {"id": "post"}])
+    result, api, sleep = _run_graph_flow(monkeypatch, responses)
+
+    assert result.all_accounts_success
+    assert _publish_ids(api) == (["old", "old"] if stage == "publish" else ["new"])
+    saved = processing.update_post_success.call_args.kwargs["api_response"]
+    assert saved["first_error"]["stage"] == stage
+    if stage == "publish":
+        sleep.assert_called_once_with(10.0)
+    else:
+        sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("stage", ["create", "poll"])
+@pytest.mark.parametrize("failure", ["timeout", "connection", "body"])
+def test_pre_publish_transport_error_recreates(
+    monkeypatch, stage: str, failure: str,
+) -> None:
+    """Timeouts, connection failures, and read failures retry before publish."""
+    if failure == "body":
+        failure_response = _FakeHttpResponse({})
+        failure_response.read = Mock(side_effect=TimeoutError("body unreadable"))
+        message = "Instagram API returned an unreadable JSON response"
+    elif failure == "connection":
+        failure_response = urllib.error.URLError("offline")
+        message = "Instagram API transport failed: URLError"
+    else:
+        failure_response = TimeoutError("timeout")
+        message = "Instagram API transport failed: TimeoutError"
+    responses = [{"id": "old"}] if stage == "poll" else []
+    responses.extend([
+        failure_response, {"id": "new"}, {"status_code": "FINISHED"}, {"id": "post"},
+    ])
+    result, api, sleep = _run_graph_flow(monkeypatch, responses)
+
+    assert result.all_accounts_success
+    assert _request_paths(api).count("media") == 2
+    assert _publish_ids(api) == ["new"]
+    assert processing.update_post_success.call_args.kwargs["api_response"] == {
+        "final": None,
+        "first_error": {
+            "stage": stage,
+            "container_id": "old" if stage == "poll" else None,
+            "response": {"transport_error": message},
+        },
+        "container_check": None,
+    }
+    sleep.assert_not_called()
+
+
+def test_poll_error_recreates_and_succeeds(monkeypatch, caplog) -> None:
+    """An ERROR replaces the saved container and logs its original reason."""
+    payload = {"status_code": "ERROR", "status": "first processing error"}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "old"}, payload, {"id": "new"},
+        {"status_code": "FINISHED"}, {"id": "post"},
+    ])
+
+    assert result.all_accounts_success
+    assert _request_paths(api) == ["media", "old", "media", "new", "media_publish"]
+    assert [
+        call.kwargs["platform_container_id"]
+        for call in processing.update_post_container_created.call_args_list
+    ] == ["old", "new"]
+    assert processing.update_post_success.call_args.kwargs["api_response"] == {
+        "final": None,
+        "first_error": {
+            "stage": "poll", "container_id": "old", "response": payload,
+        },
+        "container_check": None,
+    }
+    assert any(
+        record.levelname == "WARNING"
+        and "container_id=old" in record.message
+        and "first processing error" in record.message
+        for record in caplog.records
+    )
+    sleep.assert_not_called()
+
+
+def test_poll_error_twice_fails_after_one_recreation(monkeypatch) -> None:
+    """The second ERROR is final, retaining the first and last error bodies."""
+    first = {"status_code": "ERROR", "status": "first error"}
+    final = {"status_code": "ERROR", "status": "last error"}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "old"}, first, {"id": "new"}, final,
+    ], final_status="failed")
+
+    assert not result.all_accounts_success
+    assert _request_paths(api) == ["media", "old", "media", "new"]
+    assert processing.update_post_failed.call_args.kwargs == {
+        "error_message": (
+            "Instagram container processing returned ERROR: last error"
+            "（作成から 1 回やり直し済み）"
+        ),
+        "api_response": {
+            "final": final,
+            "first_error": {
+                "stage": "poll", "container_id": "old", "response": first,
+            },
+            "container_check": None,
+        },
+    }
+    sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("status_code", ["IN_PROGRESS", "EXPIRED"])
+def test_poll_limit_or_expired_fails_without_recreation(
+    monkeypatch, status_code: str,
+) -> None:
+    """A polling limit or EXPIRED must not start a new processing window."""
+    payload = {"status_code": status_code}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, payload,
+    ], final_status="failed")
+
+    assert not result.all_accounts_success
+    assert _request_paths(api) == ["media", "container"]
+    assert processing.update_post_failed.call_args.kwargs["api_response"] == payload
+    saved = processing.update_post_failed.call_args.kwargs
+    assert "やり直し済み" not in saved["error_message"]
+    sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("first_stage", ["create", "poll"])
+def test_creation_and_polling_share_one_recovery_budget(
+    monkeypatch, first_stage: str,
+) -> None:
+    """A retry spent in either pre-publish stage cannot be spent in the other."""
+    create_error = {"error": {"code": 2}}
+    poll_error = {"status_code": "ERROR"}
+    if first_stage == "create":
+        responses = [_http_error(create_error), {"id": "new"}, poll_error]
+        first, final, container_id = create_error, poll_error, None
+    else:
+        responses = [{"id": "old"}, poll_error, _http_error(create_error)]
+        first, final, container_id = poll_error, create_error, "old"
+    result, api, _ = _run_graph_flow(monkeypatch, responses, final_status="failed")
+
+    assert not result.all_accounts_success
+    assert _request_paths(api).count("media") == 2
+    assert _publish_ids(api) == []
+    assert processing.update_post_failed.call_args.kwargs["api_response"] == {
+        "final": final,
+        "first_error": {
+            "stage": first_stage, "container_id": container_id, "response": first,
+        },
+        "container_check": None,
+    }
+
+
+def test_resumed_container_can_recreate_once_after_poll_error(monkeypatch) -> None:
+    """An SFN restart starts with a fresh in-memory retry allowance."""
+    payload = {"status_code": "ERROR"}
+    result, api, _ = _run_graph_flow(monkeypatch, [
+        payload, {"id": "new"}, {"status_code": "FINISHED"}, {"id": "post"},
+    ], initial_post=Post(101, "container_created", "saved", None))
+
+    assert result.all_accounts_success
+    assert _request_paths(api) == ["saved", "media", "new", "media_publish"]
+    processing.create_pending_post.assert_not_called()
+    saved = processing.update_post_success.call_args.kwargs["api_response"]
+    assert saved["first_error"] == {
+        "stage": "poll", "container_id": "saved", "response": payload,
+    }
+
+
+def test_publish_transient_error_checks_published_without_resending(
+    monkeypatch,
+) -> None:
+    """PUBLISHED confirms publication but leaves the missing media ID unresolved."""
+    first = {"error": {"code": 2, "message": "publish busy", "is_transient": True}}
+    check = {"status_code": "PUBLISHED", "status": "Published"}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, {"status_code": "FINISHED"}, _http_error(first), check,
+    ], final_status="published_unconfirmed")
+
+    assert not result.all_accounts_success
+    assert _request_paths(api) == ["media", "container", "media_publish", "container"]
+    assert _publish_ids(api) == ["container"]
+    sleep.assert_called_once_with(10.0)
+    assert processing.update_post_unconfirmed.call_args.kwargs == {
+        "error_message": "PUBLISHED 確認済み: publish busy",
+        "api_response": {
+            "final": first,
+            "first_error": {
+                "stage": "publish", "container_id": "container", "response": first,
+            },
+            "container_check": check,
+        },
+    }
+
+
+def test_publish_finished_resends_same_container_and_succeeds(monkeypatch) -> None:
+    """Only FINISHED allows one resend, always with the original creation_id."""
+    first = {"error": {"code": 2, "message": "publish busy"}}
+    check = {"status_code": "FINISHED"}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, {"status_code": "FINISHED"},
+        _http_error(first), check, {"id": "post"},
+    ])
+
+    assert result.all_accounts_success
+    assert _request_paths(api) == [
+        "media", "container", "media_publish", "container", "media_publish",
+    ]
+    assert _publish_ids(api) == ["container", "container"]
+    processing.update_post_container_created.assert_called_once()
+    assert processing.update_post_success.call_args.kwargs["api_response"] == {
+        "final": None,
+        "first_error": {
+            "stage": "publish", "container_id": "container", "response": first,
+        },
+        "container_check": check,
+    }
+    sleep.assert_called_once_with(10.0)
+
+
+@pytest.mark.parametrize("failure", ["transient", "duplicate", "transport", "body"])
+def test_publish_resend_unknown_result_stops_without_second_check(
+    monkeypatch, failure: str,
+) -> None:
+    """Transient, duplicate, and transport failures after resend stay unconfirmed."""
+    first = {"error": {"code": 2, "message": "first publish error"}}
+    check = {"status_code": "FINISHED"}
+    final = None
+    if failure == "transient":
+        final = {"error": {"code": 1, "message": "last publish error"}}
+        response = _http_error(final)
+        message = "last publish error"
+    elif failure == "duplicate":
+        final = {"error": {"code": 2, "message": "Media has already been published"}}
+        response = _http_error(final)
+        message = "Media has already been published"
+    elif failure == "body":
+        response = _FakeHttpResponse({})
+        response.read = Mock(side_effect=TimeoutError("body"))
+        message = "Instagram API returned an unreadable JSON response"
+    else:
+        response = TimeoutError("timeout")
+        message = "Instagram API transport failed: TimeoutError"
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, {"status_code": "FINISHED"},
+        _http_error(first), check, response,
+    ], final_status="published_unconfirmed")
+
+    assert not result.all_accounts_success
+    assert _request_paths(api) == [
+        "media", "container", "media_publish", "container", "media_publish",
+    ]
+    assert _publish_ids(api) == ["container", "container"]
+    assert processing.update_post_unconfirmed.call_args.kwargs == {
+        "error_message": message + "（公開を 1 回再送済み）",
+        "api_response": {
+            "final": final,
+            "first_error": {
+                "stage": "publish", "container_id": "container", "response": first,
+            },
+            "container_check": check,
+        },
+    }
+    processing.update_post_failed.assert_not_called()
+    sleep.assert_called_once_with(10.0)
+
+
+def test_publish_resend_permanent_error_fails(monkeypatch) -> None:
+    """A definite rejection of the resend is failed, with its final response."""
+    first = {"error": {"code": 2}}
+    final = {"error": {"code": 190, "message": "access denied"}}
+    check = {"status_code": "FINISHED"}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, {"status_code": "FINISHED"},
+        _http_error(first), check, _http_error(final),
+    ], final_status="failed")
+
+    assert not result.all_accounts_success
+    assert _publish_ids(api) == ["container", "container"]
+    assert _request_paths(api).count("media") == 1
+    assert processing.update_post_failed.call_args.kwargs == {
+        "error_message": "access denied（公開を 1 回再送済み）",
+        "api_response": {
+            "final": final,
+            "first_error": {
+                "stage": "publish", "container_id": "container", "response": first,
+            },
+            "container_check": check,
+        },
+    }
+    processing.update_post_unconfirmed.assert_not_called()
+    sleep.assert_called_once_with(10.0)
+
+
+@pytest.mark.parametrize(
+    "failure", ["api", "transient_api", "transport", "unexpected"],
+)
+def test_publish_check_failure_is_unconfirmed_without_retry(
+    monkeypatch, failure: str,
+) -> None:
+    """Every failed check stops recovery and records the last failure."""
+    first = {"error": {"code": 2, "message": "publish error"}}
+    final = None
+    if failure in {"api", "transient_api"}:
+        final = {"error": {
+            "code": 2 if failure == "transient_api" else 190,
+            "message": "check error",
+        }}
+        response = _http_error(final)
+        message = "check error"
+    elif failure == "transport":
+        response = TimeoutError("timeout")
+        message = "Instagram API transport failed: TimeoutError"
+    else:
+        response = RuntimeError("unexpected check error")
+        message = "unexpected check error"
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, {"status_code": "FINISHED"}, _http_error(first), response,
+    ], final_status="published_unconfirmed")
+
+    assert not result.all_accounts_success
+    assert _request_paths(api) == ["media", "container", "media_publish", "container"]
+    assert processing.update_post_unconfirmed.call_args.kwargs == {
+        "error_message": message,
+        "api_response": {
+            "final": final,
+            "first_error": {
+                "stage": "publish", "container_id": "container", "response": first,
+            },
+            "container_check": None,
+        },
+    }
+    sleep.assert_called_once_with(10.0)
+
+
+@pytest.mark.parametrize("status_code", ["ERROR", "EXPIRED", "IN_PROGRESS", None])
+def test_publish_check_other_status_is_unconfirmed(
+    monkeypatch, status_code: str | None,
+) -> None:
+    """A check that cannot establish FINISHED or PUBLISHED cannot be retried."""
+    first = {"error": {"code": 2, "message": "publish error"}}
+    check = {"status_code": status_code}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, {"status_code": "FINISHED"}, _http_error(first), check,
+    ], final_status="published_unconfirmed")
+
+    assert not result.all_accounts_success
+    assert _publish_ids(api) == ["container"]
+    assert api.call_count == 4
+    assert processing.update_post_unconfirmed.call_args.kwargs["api_response"] == {
+        "final": first,
+        "first_error": {
+            "stage": "publish", "container_id": "container", "response": first,
+        },
+        "container_check": check,
+    }
+    sleep.assert_called_once_with(10.0)
+
+
+def test_publish_permanent_error_fails_without_check(monkeypatch) -> None:
+    """A definite API error retains the legacy raw error JSON."""
+    payload = {"error": {"code": 190, "message": "access denied"}}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, {"status_code": "FINISHED"}, _http_error(payload),
+    ], final_status="failed")
+
+    assert not result.all_accounts_success
+    assert _request_paths(api) == ["media", "container", "media_publish"]
+    assert processing.update_post_failed.call_args.kwargs == {
+        "error_message": "access denied", "api_response": payload,
+    }
+    sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("failure", ["transport", "body", "duplicate"])
+def test_publish_unknown_result_never_checks_or_recreates(
+    monkeypatch, failure: str,
+) -> None:
+    """Transport and duplicate results keep their existing unconfirmed path."""
+    payload = None
+    if failure == "duplicate":
+        payload = {"error": {
+            "code": 2,
+            "is_transient": True,
+            "message": "Media has already been published",
+        }}
+        response = _http_error(payload)
+    elif failure == "body":
+        response = _FakeHttpResponse({})
+        response.read = Mock(side_effect=TimeoutError("body"))
+    else:
+        response = TimeoutError("timeout")
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "container"}, {"status_code": "FINISHED"}, response,
+    ], final_status="published_unconfirmed")
+
+    assert not result.all_accounts_success
+    assert _request_paths(api) == ["media", "container", "media_publish"]
+    saved = processing.update_post_unconfirmed.call_args.kwargs
+    assert saved["api_response"] == payload
+    processing.update_post_failed.assert_not_called()
+    sleep.assert_not_called()
+
+
+def test_story_and_reel_have_independent_recreation_budgets(monkeypatch) -> None:
+    """Each posts row can recreate once, even after the reel spent its retry."""
+    reel_error = {"status_code": "ERROR", "status": "reel error"}
+    story_error = {"status_code": "ERROR", "status": "story error"}
+    states = iter([
+        None, None,
+        Post(101, "success", "new-reel", "reel-post"),
+        Post(102, "success", "new-story", "story-post"),
+    ])
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "old-reel"}, reel_error, {"id": "new-reel"},
+        {"status_code": "FINISHED"}, {"id": "reel-post"},
+        {"id": "old-story"}, story_error, {"id": "new-story"},
+        {"status_code": "FINISHED"}, {"id": "story-post"},
+    ], stories_enabled=True, get_post=lambda *args, **kwargs: next(states),
+        create_pending_post=Mock(side_effect=[101, 102]))
+
+    assert result == processing.ProcessingResult(1, True)
+    assert _publish_ids(api) == ["new-reel", "new-story"]
+    creates = [
+        call.args[0] for call in api.call_args_list
+        if call.args[0].full_url.endswith("/media")
+    ]
+    values = [urllib.parse.parse_qs(request.data.decode()) for request in creates]
+    assert [value["media_type"] for value in values] == [
+        ["REELS"], ["REELS"], ["STORIES"], ["STORIES"],
+    ]
+    assert all("caption" not in value for value in values[2:])
+    assert [
+        call.args[1] for call in processing.update_post_success.call_args_list
+    ] == [101, 102]
+    for call, container_id, response in zip(
+        processing.update_post_success.call_args_list,
+        ["old-reel", "old-story"], [reel_error, story_error],
+    ):
+        assert call.kwargs["api_response"] == {
+            "final": None,
+            "first_error": {
+                "stage": "poll", "container_id": container_id, "response": response,
+            },
+            "container_check": None,
+        }
+    sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("succeeds", [True, False])
+def test_creation_and_publish_recovery_keep_first_error_and_both_budgets(
+    monkeypatch, succeeds: bool,
+) -> None:
+    """One row can use both independent budgets while retaining its first error."""
+    first = {"status_code": "ERROR", "status": "original processing error"}
+    publish_error = {"error": {"code": 2, "message": "publish busy"}}
+    final = {"error": {"code": 2, "message": "last publish error"}}
+    check = {"status_code": "FINISHED"}
+    result, api, sleep = _run_graph_flow(monkeypatch, [
+        {"id": "old"}, first, {"id": "new"}, {"status_code": "FINISHED"},
+        _http_error(publish_error), check,
+        {"id": "post"} if succeeds else _http_error(final),
+    ], final_status="success" if succeeds else "published_unconfirmed")
+
+    assert result.all_accounts_success is succeeds
+    assert _request_paths(api) == [
+        "media", "old", "media", "new", "media_publish", "new", "media_publish",
+    ]
+    assert _publish_ids(api) == ["new", "new"]
+    update = (processing.update_post_success if succeeds
+              else processing.update_post_unconfirmed)
+    assert update.call_args.kwargs["api_response"] == {
+        "final": None if succeeds else final,
+        "first_error": {"stage": "poll", "container_id": "old", "response": first},
+        "container_check": check,
+    }
+    if not succeeds:
+        assert update.call_args.kwargs["error_message"] == (
+            "last publish error（作成から 1 回やり直し済み）（公開を 1 回再送済み）"
+        )
+    sleep.assert_called_once_with(10.0)

@@ -304,8 +304,8 @@
   <li>全アカウントの処理後、3.4 の方針に基づき終了コードを決定して終了する</li>
 </ol>
 
-<h4 id="transient-errors">一過性エラーの段階別の扱い（Phase 28-1 設計。実装は 28-2）</h4>
-<p>投稿 1 行（<code>posts</code> の 1 行 = リール行・ストーリーズ行それぞれ）について、段階 × 失敗の種類ごとに次のとおり扱う。<strong>公開前（作成・処理待ち）は二重投稿の心配がないので作成からやり直し、公開の後は未公開を確定できたときだけ再送する</strong>。28-2 の反映までは、一過性エラーも含め従来どおり 1 回で <code>failed</code>（公開の結果不明は <code>published_unconfirmed</code>）になる。</p>
+<h4 id="transient-errors">一過性エラーの段階別の扱い（Phase 28-1 設計・28-2 実装）</h4>
+<p>投稿 1 行（<code>posts</code> の 1 行 = リール行・ストーリーズ行それぞれ）について、段階 × 失敗の種類ごとに次のとおり扱う。<strong>公開前（作成・処理待ち）は二重投稿の心配がないので作成からやり直し、公開の後は未公開を確定できたときだけ再送する</strong>。実装は <code>services/sns-post-batch/app/processing.py</code>（作成〜処理待ちのループと <code>_publish_with_recovery</code>）と <code>instagram_api.py</code> の <code>is_transient_api_error</code>（28-2〔2026-10-17〕）。</p>
 
 <div class="table-wrap">
 <table>

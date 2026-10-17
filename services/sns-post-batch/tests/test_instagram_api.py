@@ -407,6 +407,79 @@ def test_poll_container_status_error_includes_reason() -> None:
     assert len(urlopen.calls) == 1
 
 
+def test_poll_container_status_expired_stops_immediately(monkeypatch) -> None:
+    """EXPIRED is terminal and does not consume the rest of the poll window."""
+    payload = {"status_code": "EXPIRED", "status": "Container expired"}
+    urlopen = _recording_urlopen([FakeResponse(payload)])
+    sleeps: list[float] = []
+    monkeypatch.setattr(instagram_api.time, "sleep", sleeps.append)
+
+    with pytest.raises(InstagramRequestFailed, match="EXPIRED") as raised:
+        instagram_api.poll_container_status(
+            "token", "container", urlopen=urlopen, max_attempts=3
+        )
+
+    assert raised.value.response == payload
+    assert len(urlopen.calls) == 1
+    assert sleeps == []
+
+
+@pytest.mark.parametrize("status_code", ["FINISHED", "PUBLISHED", "ERROR"])
+def test_get_container_status_reads_once_without_interpreting_status(
+    status_code: str,
+) -> None:
+    """The publish recovery check returns one raw status response."""
+    payload = {"status_code": status_code, "status": "detail"}
+    urlopen = _recording_urlopen([FakeResponse(payload)])
+
+    assert instagram_api.get_container_status(
+        "token", "container", urlopen=urlopen
+    ) == payload
+
+    assert len(urlopen.calls) == 1
+    request, timeout = urlopen.calls[0]
+    assert timeout == 30
+    assert request.get_method() == "GET"
+    assert urllib.parse.urlsplit(request.full_url).path == "/v25.0/container"
+    assert urllib.parse.parse_qs(urllib.parse.urlsplit(request.full_url).query) == {
+        "fields": ["status_code,status"],
+        "access_token": ["token"],
+    }
+
+
+@pytest.mark.parametrize(
+    "status,error,expected",
+    [
+        (400, {"code": 1}, True),
+        (400, {"code": 2, "is_transient": False}, True),
+        (400, {"code": 100, "is_transient": True}, True),
+        (400, {"code": 100, "is_transient": 1}, False),
+        (400, {"code": 100, "is_transient": "true"}, False),
+        (400, {"code": True}, False),
+        (400, {"code": 4}, False),
+        (400, {"code": 17}, False),
+        (400, {"code": 32}, False),
+        (400, {"code": 613}, False),
+        (429, {"code": 2}, False),
+        (429, {"code": 4, "is_transient": True}, True),
+    ],
+)
+def test_transient_graph_error_detection_preserves_rate_limit_policy(
+    status: int, error: dict, expected: bool,
+) -> None:
+    """Only boolean true or codes 1/2 qualify; rate limits need true."""
+    urlopen = _recording_urlopen([_http_error("/ig/media", status, {"error": error})])
+    with pytest.raises(InstagramApiError) as raised:
+        instagram_api.create_container("token", "ig", "https://image", urlopen=urlopen)
+
+    assert instagram_api.is_transient_api_error(raised.value) is expected
+
+
+def test_transport_error_is_not_a_transient_publish_api_error() -> None:
+    """Transport handling belongs to each stage rather than Graph detection."""
+    assert not instagram_api.is_transient_api_error(InstagramTransportError("offline"))
+
+
 def test_poll_container_status_limit_preserves_attempt_and_sleep_counts(
     monkeypatch,
 ) -> None:
