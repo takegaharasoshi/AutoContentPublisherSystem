@@ -61,7 +61,7 @@ def _context(cursor: Cursor, parameters: str | None = None) -> GeneratorContext:
     return GeneratorContext(
         prompt_config=PromptConfig(
             5, 9, "unused", None,
-            '{"duration_seconds": 24}' if parameters is None else parameters,
+            '{"duration_seconds": 29}' if parameters is None else parameters,
         ),
         cursor=cursor,
         s3_client=Mock(),
@@ -85,7 +85,7 @@ def test_generate_fetches_video_and_stages_stock_and_history(monkeypatch) -> Non
     assert result.media[0].content == b"mp4 bytes"
     assert result.media[0].file_format == "mp4"
     assert (result.media[0].width, result.media[0].height) == (1080, 1920)
-    assert result.media[0].duration_seconds == 24
+    assert result.media[0].duration_seconds == 29
     assert result.media[0].audio_asset_id == 77
     assert result.intermediates == []
     fetch_video.assert_called_once_with(
@@ -130,24 +130,21 @@ def test_first_use_follows_id_order_before_any_reuse(monkeypatch) -> None:
     assert cursor.calls[2][1][3] == "012-second"
 
 
-@pytest.mark.parametrize("duration", [24, 29])
-def test_generate_records_declared_duration(monkeypatch, duration: int) -> None:
+def test_generate_records_declared_duration(monkeypatch) -> None:
     cursor = Cursor()
     monkeypatch.setattr(umigame, "get_object", lambda *args, **kwargs: b"mp4")
 
-    result = umigame.generate(
-        _context(cursor, json.dumps({"duration_seconds": duration}))
-    )
+    result = umigame.generate(_context(cursor, '{"duration_seconds": 29}'))
 
-    assert result.media[0].duration_seconds == duration
+    assert result.media[0].duration_seconds == 29
 
 
 @pytest.mark.parametrize(
     "parameters",
     ["{}", "", "null", "[]", "not json", '{"duration_seconds": 20}',
-     '{"duration_seconds": 30}', '{"duration_seconds": "24"}',
+     '{"duration_seconds": 24}', '{"duration_seconds": 30}',
      '{"duration_seconds": "29"}', '{"duration_seconds": true}',
-     '{"duration_seconds": 24, "slots": []}'],
+     '{"duration_seconds": 29, "slots": []}'],
 )
 def test_generate_rejects_invalid_parameters_before_query(parameters: str) -> None:
     cursor = Cursor()

@@ -16,8 +16,7 @@ logger = logging.getLogger(__name__)
 
 OUTPUT_WIDTH = 1080
 OUTPUT_HEIGHT = 1920
-# 24 は 29-2 で Aurora の宣言値を 29 へ切り替えるまでの移行用。29-3 で外す。
-ALLOWED_DURATIONS = frozenset({24, 29})
+ALLOWED_DURATIONS = frozenset({29})
 
 
 def _parse_parameters(raw: str | None) -> int:
@@ -36,7 +35,7 @@ def _parse_parameters(raw: str | None) -> int:
         or not isinstance(duration, int)
         or duration not in ALLOWED_DURATIONS
     ):
-        raise RuntimeError("duration_seconds must be one of 24, 29")
+        raise RuntimeError("duration_seconds must be 29")
     return duration
 
 

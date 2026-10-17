@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-17（<strong>29-2 完了</strong>: Aurora・ローカルの宣言値と BGM の尺を 29 へ、新版面の生成結果 1 件を 29 に直した〔適用はユーザー〕。最初の定時生成の確認を<a href="#pending-checks">確認待ち</a>へ。次は 29-3。<a href="#step-29-2">29-2</a>）。前回: 2026-10-17（<strong>29-1 完了</strong>: umigame-prebuilt の許容値を {24, 29} に広げ、登録 SQL と方式設計書を 29 を正にした〔push 後のパイプライン確認はユーザーの <code>/goal</code>〕。次は 29-2〔Aurora の切替・ユーザー作業〕。<a href="#step-29-1">29-1</a>）。前回: 2026-10-17（<strong>Phase 29 起票</strong>: umigame の尺の宣言値を 29 秒へ揃える〔<a href="../issues/index.html#I-041">I-041</a> の展開。29-1 許容値を {24, 29} → 29-2 Aurora 切替〔ユーザー作業〕→ 29-3 許容値を 29 のみ〕。I-040 は Phase 30 以降）。前回: 2026-10-17（<strong>28-2 完了 = Phase 28 完了</strong>: 一過性エラーの段階別の扱いを実装・push〔パイプライン確認はユーザーの <code>/goal</code>〕。<a href="../issues/index.html#I-024">I-024</a> を解消でクローズ、本番での効果を<a href="#pending-checks">確認待ち</a>に起票。<a href="#step-28-2">28-2</a>）。前回: 2026-10-17（<strong>28-1 完了</strong>: 投稿の一過性エラーの段階別の扱い〔表・判定基準・記録の形〕を <a href="../app/batch-flow.html#transient-errors">batch-flow.html 3.3</a> に定め、ユーザーの go を得た。次は 28-2 の実装。<a href="#step-28-1">28-1</a>）。前回: 2026-10-17（<strong>Phase 28 起票</strong>: 投稿の一過性エラーを段階別に扱う〔<a href="../issues/index.html#I-024">I-024</a> ② の展開。28-1 設計 → 28-2 実装〕）。前回: 2026-10-17（確認待ち「27-2 follows_and_unfollows の取り直し」を OK と判定し、22-3 <code>/incident</code> 初回試行の行とともに開発記録の確認済みへ移した。<strong>Phase 27 完了</strong>〔I-039 解消〕・完了フェーズのサマリに追加）。前回: 2026-10-14（21-8e 返信の effort max を OK〔④ はユーザー判断でいったん OK〕で開発記録へ移した）。前回: 2026-10-14（<strong>確認待ちの照合 2</strong>: 21-8d2 核心語の DB 化を OK で開発記録へ移した〔485 へのコメント 7 件で v4 判定を確認〕。21-8e は ①〜③ OK・④ はユーザー判断待ち）。前回: 2026-10-14（<strong>確認待ちの照合</strong>: 21-6h 真相ブロック・26-5 載せ替えを OK で<a href="development-log.html">開発記録</a>の確認済みへ移した。21-8d2 は ① のみ OK〔コメント待ち〕・21-8e は途中経過を記入。22-3・27-2 はトリガー前）。前回: 2026-10-14（<strong>27-2 完了</strong>〔コミットまで・push は差分確認後〕: <code>follows_and_unfollows</code> を集計遅延の後に取り直して追記するようにした。<code>FOLLOWER</code> = 新規フォローと確定。push 後の最初の日次収集の確認を<a href="#pending-checks">確認待ち</a>に起票。Phase 27 のステップはすべて完了〔I-039 は確認待ちが OK になるまで残す〕。<a href="#step-27-2">27-2</a>）。前回: 2026-10-13（<strong>27-1 完了</strong>: <code>follows_and_unfollows</code> が空なのは API 側の集計遅延〔前日分は約 10 時間後でも未集計・2 日前より古い日は返る〕で、前日行を 1 回だけ書く収集と噛み合っていなかった。27-2 は対象日を 2 日以上前にずらして取り直す方針〔ユーザー確認済み 2026-10-13〕。<a href="#step-27-1">27-1</a>）。前回: 2026-10-13（<strong>Phase 27 起票</strong>: <a href="../issues/index.html#I-039">I-039</a>〔<code>follows_and_unfollows</code> に数値が入らない〕を 27-1 切り分け・27-2 修正 or 受容に展開。I-040 より先に軽い課題を片付ける方針〔ユーザー判断〕。ステップができたので <code>data-plan-steps="none"</code> を外した）。前回: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-17（<strong>29-3 完了 = Phase 29 のステップはすべて完了</strong>: umigame-prebuilt の許容値を 29 のみに戻し、<a href="../issues/index.html#I-041">I-041</a> を解消でクローズ。確認待ち「29-2 の尺の宣言値 29」を OK で開発記録へ〔push 後のパイプライン確認はユーザーの <code>/goal</code>〕。<a href="#step-29-3">29-3</a>）。前回: 2026-10-17（<strong>29-2 完了</strong>: Aurora・ローカルの宣言値と BGM の尺を 29 へ、新版面の生成結果 1 件を 29 に直した〔適用はユーザー〕。最初の定時生成の確認を<a href="#pending-checks">確認待ち</a>へ。次は 29-3。<a href="#step-29-2">29-2</a>）。前回: 2026-10-17（<strong>29-1 完了</strong>: umigame-prebuilt の許容値を {24, 29} に広げ、登録 SQL と方式設計書を 29 を正にした〔push 後のパイプライン確認はユーザーの <code>/goal</code>〕。次は 29-2〔Aurora の切替・ユーザー作業〕。<a href="#step-29-1">29-1</a>）。前回: 2026-10-17（<strong>Phase 29 起票</strong>: umigame の尺の宣言値を 29 秒へ揃える〔<a href="../issues/index.html#I-041">I-041</a> の展開。29-1 許容値を {24, 29} → 29-2 Aurora 切替〔ユーザー作業〕→ 29-3 許容値を 29 のみ〕。I-040 は Phase 30 以降）。前回: 2026-10-17（<strong>28-2 完了 = Phase 28 完了</strong>: 一過性エラーの段階別の扱いを実装・push〔パイプライン確認はユーザーの <code>/goal</code>〕。<a href="../issues/index.html#I-024">I-024</a> を解消でクローズ、本番での効果を<a href="#pending-checks">確認待ち</a>に起票。<a href="#step-28-2">28-2</a>）。前回: 2026-10-17（<strong>28-1 完了</strong>: 投稿の一過性エラーの段階別の扱い〔表・判定基準・記録の形〕を <a href="../app/batch-flow.html#transient-errors">batch-flow.html 3.3</a> に定め、ユーザーの go を得た。次は 28-2 の実装。<a href="#step-28-1">28-1</a>）。前回: 2026-10-17（<strong>Phase 28 起票</strong>: 投稿の一過性エラーを段階別に扱う〔<a href="../issues/index.html#I-024">I-024</a> ② の展開。28-1 設計 → 28-2 実装〕）。前回: 2026-10-17（確認待ち「27-2 follows_and_unfollows の取り直し」を OK と判定し、22-3 <code>/incident</code> 初回試行の行とともに開発記録の確認済みへ移した。<strong>Phase 27 完了</strong>〔I-039 解消〕・完了フェーズのサマリに追加）。前回: 2026-10-14（21-8e 返信の effort max を OK〔④ はユーザー判断でいったん OK〕で開発記録へ移した）。前回: 2026-10-14（<strong>確認待ちの照合 2</strong>: 21-8d2 核心語の DB 化を OK で開発記録へ移した〔485 へのコメント 7 件で v4 判定を確認〕。21-8e は ①〜③ OK・④ はユーザー判断待ち）。前回: 2026-10-14（<strong>確認待ちの照合</strong>: 21-6h 真相ブロック・26-5 載せ替えを OK で<a href="development-log.html">開発記録</a>の確認済みへ移した。21-8d2 は ① のみ OK〔コメント待ち〕・21-8e は途中経過を記入。22-3・27-2 はトリガー前）。前回: 2026-10-14（<strong>27-2 完了</strong>〔コミットまで・push は差分確認後〕: <code>follows_and_unfollows</code> を集計遅延の後に取り直して追記するようにした。<code>FOLLOWER</code> = 新規フォローと確定。push 後の最初の日次収集の確認を<a href="#pending-checks">確認待ち</a>に起票。Phase 27 のステップはすべて完了〔I-039 は確認待ちが OK になるまで残す〕。<a href="#step-27-2">27-2</a>）。前回: 2026-10-13（<strong>27-1 完了</strong>: <code>follows_and_unfollows</code> が空なのは API 側の集計遅延〔前日分は約 10 時間後でも未集計・2 日前より古い日は返る〕で、前日行を 1 回だけ書く収集と噛み合っていなかった。27-2 は対象日を 2 日以上前にずらして取り直す方針〔ユーザー確認済み 2026-10-13〕。<a href="#step-27-1">27-1</a>）。前回: 2026-10-13（<strong>Phase 27 起票</strong>: <a href="../issues/index.html#I-039">I-039</a>〔<code>follows_and_unfollows</code> に数値が入らない〕を 27-1 切り分け・27-2 修正 or 受容に展開。I-040 より先に軽い課題を片付ける方針〔ユーザー判断〕。ステップができたので <code>data-plan-steps="none"</code> を外した）。前回: 2026-10-13（<strong>計画整理</strong>: 完了した Phase 26 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html#phase-26">開発記録</a>へ移した。<code>#step-26-…</code> へのリンクは開発記録へ張り替え済み。進行中の開発レーンのフェーズはなし。次の候補は <a href="../issues/index.html#I-040">I-040</a>〔トリガー = Phase 26 の完了〕の Phase 27 起票）。前回: 2026-10-13（<strong>26-6 完了</strong>: コンテナ ERROR の理由文字列を <code>error_message</code>・<code>api_response</code>・ログに残すようにした。<a href="../issues/index.html#I-024">I-024</a> は ② だけ据え置き〔<a href="development-log.html#step-26-6">26-6</a>。コミットまで・push は差分レビュー後〕。Phase 26 のステップはすべて完了）。前回: 2026-10-13（<strong>26-5 完了</strong>: 投稿クライアントを shared の汎用層へ載せ替え、Graph API を v25.0 に引き上げ、<a href="../issues/index.html#I-022">I-022</a> を解消した〔<a href="development-log.html#step-26-5">26-5</a>。コミットまで・push は差分レビュー後〕。次は 26-6）。前回: 2026-10-13（<strong>26-4 完了</strong>: 実定義がコードと一致し予定時刻が Scheduler → ECS まで渡ることを確認、<a href="../issues/index.html#I-014">I-014</a> を解消、夜 → 朝の投稿確認を <a href="logic-training-1.html#pending-checks">logic-training-1 の確認待ち</a>へ〔<a href="development-log.html#step-26-4">26-4</a>〕。次は 26-5）。前回: 2026-10-13（<strong>26-2・26-3 完了</strong>: 当回固定を本番へ切替〔02:53〜03:17 JST・<a href="development-log.html#step-26-3">26-3</a>〕。次は 26-4 の反映確認）。前回: 2026-10-13（<strong>26-2 実装</strong>: 当回固定の実装・検証をコミット〔未 push〕し、差分レビューと 26-3 の go / no-go 待ち〔<a href="development-log.html#step-26-2">26-2</a>〕）。前回: 2026-10-13（<strong>26-1 完了</strong>: SNS 投稿の当回固定の契約を設計書 6 本へ反映し、ユーザーの設計レビューを指摘なしで通過〔<a href="development-log.html#step-26-1">26-1</a>〕。次は 26-2 の実装）。前々回: 2026-10-13（<strong>確認待ちの棚卸し</strong>: 8 行中、OK の 3 行〔20-1 停止の効果・21-7b 初回取り込み・21-7b ライフサイクル有効化 = FoundationStack を deploy〕を<a href="development-log.html">開発記録</a>の確認済みへ移し、NG の 16-12b <code>follows_and_unfollows</code> は <a href="../issues/index.html#I-039">I-039</a> として起票した。残り 4 行はトリガー前）。前回: 2026-10-13（<strong>計画整理</strong>: 完了済みの Phase 21・25 を「完了フェーズのサマリ」へ畳み、ステップ一覧の原文〔作業記録の折りたたみを含む〕を<a href="development-log.html">開発記録</a>の各 Phase 末尾の移設ブロックへ移した。各所の <code>#step-21-…</code> / <code>#step-25-…</code> へのリンクは開発記録へ張り替え済み。開発レーンの残りは <a href="development-log.html#phase-26">Phase 26</a>〔未着手〕。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -328,7 +328,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 2 件（クリックで展開）</summary>
+<summary>完了済み 3 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-29-1" data-step-id="29-1" data-status="done" data-completed="2026-10-17">
@@ -413,21 +413,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-<article class="plan-step" id="step-29-3" data-step-id="29-3" data-status="todo">
+<article class="plan-step" id="step-29-3" data-step-id="29-3" data-status="done" data-completed="2026-10-17">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>29-3</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>29-3</strong><span class="plan-status">完了（2026-10-17）</span></div>
 <h3>許容値を 29 だけに戻して push する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>29-2 の適用（Aurora の宣言値が 29）の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>許容値を <code>ALLOWED_DURATIONS = frozenset({29})</code> に戻し（24 は拒否側のテストへ）、方式設計書を 29 のみに。<a href="../issues/index.html#I-041">I-041</a> を解消でクローズ。push 後のパイプライン完走はユーザーの <code>/goal</code> で確認する。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -454,13 +445,26 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-10-17</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<p>照合: 確認待ち = 「29-2 umigame の尺の宣言値 29」の行（今夜 20:00 の定時で到達）を同梱。課題表: I-011・I-020 は据え置き継続・トリガー更新なし。展開元 <a href="../issues/index.html#I-041">I-041</a> をクローズ。</p>
+<p>2026-10-17 22:4x（着手時の確認・読み取り）: Aurora の <code>prompt_configs</code> id 5 = <code>{"duration_seconds":29}</code>。20:00 の定時の umigame 回（SFN 実行 626ad355… SUCCEEDED）の <code>generated_media</code> id 290（run 299・001）が <code>duration_seconds</code> 29・<code>parameters_snapshot</code> 29 → 確認待ちを OK とし<a href="development-log.html">開発記録</a>の確認済みへ移した。</p>
+<p>実装: <code>umigame_prebuilt.py</code> の <code>ALLOWED_DURATIONS</code> を <code>frozenset({29})</code>、エラー文を「must be 29」に。テストは記録側を 29 だけにし、24 を拒否側へ移した（既定の <code>_context</code> の宣言値も 29 に）。image-batch の pytest は 226 passed, 5 skipped。<a href="../app/generators/umigame-prebuilt.html">方式設計書</a> 2・3・7 から移行中の記述を外し、決定に 29-2・29-3 の結果を追記。</p>
 </div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
+
+
 
 </div>
 </section>
@@ -474,7 +478,6 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-10-17 / <a href="#step-28-2">28-2</a> 一過性エラーの段階別の扱い</td><td>本番で次に Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）が起きた投稿（WARNING ログ「投稿コンテナを作成からやり直す」、または <code>api_response</code> に <code>first_error</code> を持つ <code>posts</code> 行が出たとき。<code>/incident</code> の照合で拾う）</td><td>① 公開前の失敗なら作成から 1 回だけやり直し、<code>platform_container_id</code> が新しい ID になっている ② 公開の失敗なら照会が 1 回だけ行われ、<code>PUBLISHED</code> → 「PUBLISHED 確認済み」の <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで再送 になっている ③ Instagram 上で同じ回の投稿が 2 件になっていない ④ <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形</td><td>二重投稿（③）なら即 <code>/incident</code> で課題に起票し、再送を止める修正を開発レーンで最優先にする。① ② ④ の食い違いは課題に起票（I-024 を live へ戻すかは <code>/incident</code> で判断）</td><td></td></tr>
-<tr><td>2026-10-17 / <a href="#step-29-2">29-2</a> umigame の尺の宣言値 29</td><td>29-2 の適用後、最初の umigame-soup-1 の定時生成（2026-10-17 20:00 JST の回・001）</td><td>その回の <code>generated_media.duration_seconds</code> が 29・<code>parameters_snapshot</code> が <code>{"duration_seconds": 29}</code> で、画像生成 SFN が SUCCEEDED</td><td>24 なら適用の取りこぼし（<code>29-2_check.sql</code> で再確認し、<code>29-2_update_duration.sql</code> を流し直す）。生成が異常終了したら <code>/incident</code>（29-1 のタスク定義が使われているかを先に見る）</td><td></td></tr>
 </tbody>
 </table></div>
 
