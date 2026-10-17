@@ -16,11 +16,12 @@ logger = logging.getLogger(__name__)
 
 OUTPUT_WIDTH = 1080
 OUTPUT_HEIGHT = 1920
-DURATION_SECONDS = 24
+# 24 は 29-2 で Aurora の宣言値を 29 へ切り替えるまでの移行用。29-3 で外す。
+ALLOWED_DURATIONS = frozenset({24, 29})
 
 
 def _parse_parameters(raw: str | None) -> int:
-    """Require the sole supported duration and no slot configuration."""
+    """Require a supported duration and no slot configuration."""
     try:
         parameters = json.loads(raw or "{}")
     except (TypeError, json.JSONDecodeError) as exc:
@@ -33,9 +34,9 @@ def _parse_parameters(raw: str | None) -> int:
     if (
         isinstance(duration, bool)
         or not isinstance(duration, int)
-        or duration != DURATION_SECONDS
+        or duration not in ALLOWED_DURATIONS
     ):
-        raise RuntimeError("duration_seconds must be 24")
+        raise RuntimeError("duration_seconds must be one of 24, 29")
     return duration
 
 

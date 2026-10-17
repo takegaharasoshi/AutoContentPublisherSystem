@@ -48,7 +48,7 @@
     <tr><td><code>context.generation_run_id</code></td><td><code>umigame_items</code> INSERT の紐づけ</td></tr>
     <tr><td><code>context.cursor</code></td><td><code>batch_sets</code>（set_code 解決）・<code>umigame_stock_items</code>（ストック取得・<code>last_used_at</code> / <code>use_count</code> 更新）・<code>umigame_items</code>（履歴 INSERT）</td></tr>
     <tr><td><code>context.s3_client</code> / <code>context.s3_bucket</code></td><td>事前動画の取得（<code>acps_shared.s3.get_object</code>。セクション 5）</td></tr>
-    <tr><td>戻り値 <code>GeneratorResult.media</code></td><td><code>MediaOutput</code> 1 件（MP4、<code>width</code>=1080 / <code>height</code>=1920 / <code>duration_seconds</code>=24 / <code>audio_asset_id</code>=ストック行の <code>video_audio_asset_id</code> を転記）</td></tr>
+    <tr><td>戻り値 <code>GeneratorResult.media</code></td><td><code>MediaOutput</code> 1 件（MP4、<code>width</code>=1080 / <code>height</code>=1920 / <code>duration_seconds</code>=<code>parameters.duration_seconds</code> の宣言値（29。移行中は 24 もありうる） / <code>audio_asset_id</code>=ストック行の <code>video_audio_asset_id</code> を転記）</td></tr>
     <tr><td>戻り値 <code>GeneratorResult.intermediates</code></td><td>0 件</td></tr>
   </tbody>
 </table>
@@ -65,13 +65,18 @@
 <table>
   <thead><tr><th>フィールド</th><th>必須</th><th>役割</th></tr></thead>
   <tbody>
-    <tr><td><code>duration_seconds</code></td><td>必須</td><td>投稿する尺。<strong>24 のみ許容</strong>（それ以外は parameters 不正として異常終了）。<code>MediaOutput.duration_seconds</code> に転記し、ストック行の <code>video_s3_key</code> が指す動画の尺と一致することの宣言でもある</td></tr>
+    <tr><td><code>duration_seconds</code></td><td>必須</td><td>投稿する尺。<strong>29 が正</strong>。Phase 29 の移行中（29-1〜29-3）は <strong>24 / 29 を許容</strong>し、29-3 の後は <strong>29 のみ許容</strong>（それ以外は parameters 不正として異常終了）。<code>MediaOutput.duration_seconds</code> に転記し、ストック行の <code>video_s3_key</code> が指す動画の尺と一致することの宣言でもある</td></tr>
   </tbody>
 </table>
 </div>
 <div class="decision">
   <span class="callout-title">決定（2026-09-04、21-3）: 単尺・単一スロット。尺の複数化は想定しない</span>
-  ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。理由: ① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低い。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<strong>2026-10-17 追記（R-1）</strong>: 単尺のまま 24 秒 → 29 秒へ変え、ループ前提（②の周期の制約）をやめた（8.2 の決定）。画像バッチの <code>parameters.duration_seconds</code> と定数は 24 のままで、合わせるのは開発レーンの課題 <a href="../../issues/index.html#I-041">I-041</a>。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。
+  ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。理由: ① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低い。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<strong>2026-10-17 追記（R-1）</strong>: 単尺のまま 24 秒 → 29 秒へ変え、ループ前提（②の周期の制約）をやめた（8.2 の決定）。画像バッチ側は課題 <a href="../../issues/index.html#I-041">I-041</a> を <a href="../../plans/development-plan.html#phase-29">Phase 29</a> で合わせる（下の決定）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。
+</div>
+
+<div class="decision">
+  <span class="callout-title">決定（2026-10-17、29-1）: 宣言値を 29 へ揃える。移行中だけ 24 / 29 の 2 値を許容する</span>
+  R-1 で動画は 29 秒になったが、画像バッチは 24 しか許さず <code>generated_media.duration_seconds</code> に 24 を記録していた（<a href="../../issues/index.html#I-041">I-041</a>）。許容値を先に 29 だけにすると Aurora の宣言値 24 の回で異常終了し、Aurora を先に 29 にすると旧コードで異常終了するため、29-1 で許容値を <code>ALLOWED_DURATIONS = frozenset({24, 29})</code> に広げ → 29-2 で Aurora の <code>prompt_configs.parameters</code> を 29 へ切り替え → 29-3 で 29 のみに戻す 3 段にした。宣言値をそのまま記録する作り（実尺は測らない）は quiz-prebuilt・ranking-prebuilt と揃えて変えない。登録 SQL（<code>01_prompt_caption.sql</code>・<code>03_audio_assets.sql</code>）は 29-1 で 29 を正にした。
 </div>
 
 <h2 id="stock">4. ストックの取得（ビルド済み限定の LRU 順繰り・軸なし）</h2>
@@ -108,7 +113,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
 <h2>7. エラーハンドリング</h2>
 <p>方式内リカバリループ（再生成・代替素材）は持たない。すべて異常終了させ、共通骨格が <code>generation_runs.status='failed'</code> にして Step Functions の失敗アラームで通知する。</p>
 <ul>
-  <li><code>parameters</code> 不正（<code>duration_seconds</code> ≠ 24・欠落）→ 異常終了</li>
+  <li><code>parameters</code> 不正（<code>duration_seconds</code> が許容値〔移行中は 24 / 29、29-3 の後は 29〕以外・欠落）→ 異常終了</li>
   <li>ストック 0 件（有効・ビルド済みなし）→ 異常終了（フェイルラウド）</li>
   <li>事前動画の取得失敗 → 異常終了</li>
   <li>ストック行のフィールド不正（JSON の型・必須空）→ 異常終了</li>

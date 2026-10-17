@@ -7,7 +7,7 @@
 -- 適用（Aurora）:   python3 ../../ranking-stock/pref-ranking-1/common/apply_aurora.py set-registration/01_prompt_caption.sql
 
 -- (1) prompt_configs
---     parameters は duration_seconds の 1 キーだけ（24 のみ許容。slots を持たない単一スロット）。
+--     parameters は duration_seconds の 1 キーだけ（29 が正。29-3 までは 24 も許容。slots を持たない単一スロット）。
 --     prompt_text は生成には使わず、SNS 投稿バッチが問題スナップショットの master_rules に写すだけ。
 --     判定・返信のプロンプトは comment-reply Lambda に同梱しているため、ここには転記せず
 --     その旨の記録文を入れる（空だとスナップショット出力が異常扱いになる。21-7 で決定）。
@@ -15,7 +15,7 @@ INSERT INTO prompt_configs (set_id, prompt_text, negative_prompt, parameters, is
 SELECT b.id,
        '判定・返信のプロンプトは comment-reply Lambda に同梱（services/comment-reply/app/）。この列は記録用で判定には使わない。',
        NULL,
-       '{"duration_seconds": 24}',
+       '{"duration_seconds": 29}',
        1
 FROM batch_sets b
 WHERE b.set_code = 'umigame-soup-1'

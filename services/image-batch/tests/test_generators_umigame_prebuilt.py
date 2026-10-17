@@ -130,10 +130,23 @@ def test_first_use_follows_id_order_before_any_reuse(monkeypatch) -> None:
     assert cursor.calls[2][1][3] == "012-second"
 
 
+@pytest.mark.parametrize("duration", [24, 29])
+def test_generate_records_declared_duration(monkeypatch, duration: int) -> None:
+    cursor = Cursor()
+    monkeypatch.setattr(umigame, "get_object", lambda *args, **kwargs: b"mp4")
+
+    result = umigame.generate(
+        _context(cursor, json.dumps({"duration_seconds": duration}))
+    )
+
+    assert result.media[0].duration_seconds == duration
+
+
 @pytest.mark.parametrize(
     "parameters",
     ["{}", "", "null", "[]", "not json", '{"duration_seconds": 20}',
-     '{"duration_seconds": "24"}', '{"duration_seconds": true}',
+     '{"duration_seconds": 30}', '{"duration_seconds": "24"}',
+     '{"duration_seconds": "29"}', '{"duration_seconds": true}',
      '{"duration_seconds": 24, "slots": []}'],
 )
 def test_generate_rejects_invalid_parameters_before_query(parameters: str) -> None:
