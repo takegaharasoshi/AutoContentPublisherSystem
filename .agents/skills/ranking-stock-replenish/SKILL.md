@@ -7,7 +7,7 @@ description: pref-ranking-1 のランキングストック(ranking_stock_items)�
 # ランキングストック補充スキル(ranking-stock-replenish)
 
 pref-ranking-1 セットのランキングストック(`ranking_stock_items`)を、17-3〜17-5c で確立した品質・手順で補充するためのスキル。
-正の所在: 運用手順 = `docs/app/operation.html` セクション 3(ランキングストックの節)、フィールド仕様・cue 体系 = `docs/app/generators/ranking-prebuilt.html` セクション 8.3 + `docs/app/data-model.html` セクション 4.13、**執筆・レビュー・投入の実務の勘所 = `content/ranking-stock/pref-ranking-1/WRITING-NOTES.md`(作業前に必読)**。本スキルはパイプラインの流れと迷いやすい分岐だけを持ち、矛盾したら設計書 > WRITING-NOTES > 本スキルの順で勝つ。
+正の所在: 運用手順 = `docs/production/pref-ranking-1.html`(生産の詳細設計)、フィールド仕様・cue 体系 = 同ページ 5 章 + `docs/app/data-model.html` セクション 4.13、**執筆・レビュー・投入の実務の勘所 = `content/ranking-stock/pref-ranking-1/WRITING-NOTES.md`(作業前に必読)**。本スキルはパイプラインの流れと迷いやすい分岐だけを持ち、矛盾したら設計書 > WRITING-NOTES > 本スキルの順で勝つ。
 
 **前提(2026-08-24 尺確定)**: 新規執筆は **30 秒版の cue のみ**(`narration` に `"20s"` キーを作らない)。投稿は夜 20:00 JST の 1 日 1 回で**消費は週 7 ネタ**。
 
@@ -19,7 +19,7 @@ pref-ranking-1 セットのランキングストック(`ranking_stock_items`)を
 
 **課題表の照合(セット名)**(Phase 22-4 で導入。ルールは `docs/issues/index.html` セクション 4.8): 同じく在庫確認の前に `grep -n "pref-ranking-1" docs/issues/index.html` で課題体系の live 表(pref-ranking-1 の節 + 開発レーンの節でセット名を含む行)を引き、トリガー列が**「pref-ranking-1 の次の週次補充」「第 N バッチ整備時」**(セット型)の行を拾う。該当行があれば、今回の補充で「同梱する(該当するゴールの完了条件に足す)/ トリガーを更新して据え置き継続 / 受容」を決めて表を更新する(黙って通り過ぎない)。該当なしなら「課題表: 該当なし」と一言宣言して進む。
 
-operation.html セクション 3 の在庫確認クエリで `unused_built_30s`(未使用かつ 30 秒版ビルド済み = 投稿可能在庫)を確認し、**14 件(2 週間分)を下回っていたら 7 ネタ(1 週間分)を目安に補充**する。`unbuilt_30s` が 0 以外なら投入済みのビルド漏れなので、補充より先にセクション 7 のビルドを終わらせる。`*_20s` 列は監視対象外(20 秒版はビルドしない)。再利用 WARNING がログに出ていたら補充遅延のサイン・優先対応。
+生産の詳細設計 7 章の在庫確認クエリで `unused_built_30s`(未使用かつ 30 秒版ビルド済み = 投稿可能在庫)を確認し、**14 件(2 週間分)を下回っていたら 7 ネタ(1 週間分)を目安に補充**する。`unbuilt_30s` が 0 以外なら投入済みのビルド漏れなので、補充より先にセクション 7 のビルドを終わらせる。`*_20s` 列は監視対象外(20 秒版はビルドしない)。再利用 WARNING がログに出ていたら補充遅延のサイン・優先対応。
 
 ## 1. ネタ選定・リサーチ
 
@@ -65,7 +65,7 @@ python3 validate.py && python3 generate.py
 
 - **`review.html` をブラウザ / Live Preview で見てもらう**(ファイル書き換え後は再読み込み。「直っていない」の大半はキャッシュ)
 - **Claude が先に一次スクリーニングして blocker 候補 + 申し送りを出す**。観点: ①単位・前提が画面に出るか ②同一出典・近テーマの近接(投稿日を離す材料)③順位の僅差・確定性 ④誇張が数字を超えていないか ⑤下位への言及ゼロ ⑥吹き出しの行またぎ
-- ユーザーのレビュー観点の正は operation.html セクション 3 手順 4(データの正しさ・表現・重複・フォーマット適合)。指摘反映 → validate/generate → 再提示。全件承認まで投入しない
+- ユーザーのレビュー観点の正は生産の詳細設計 2.5(データの正しさ・表現・重複・フォーマット適合)。指摘反映 → validate/generate → 再提示。全件承認まで投入しない
 
 ## 6. 投入(レビュー全件承認後)
 
@@ -73,7 +73,7 @@ python3 validate.py && python3 generate.py
 
 ## 7. 動画ビルド・レビュー・配置(ranking-prebuilt。投入後に必ず)
 
-投入しただけの行(`video_s3_key_30s IS NULL`)は投稿候補にならない。**実行コマンドの正は `content/video-build/pref-ranking-1/README.md`**(事前準備 = render/ffmpeg イメージ・フォント・五郎素材・VOICEVOX 起動、を含む)。工程: `build.py --list` → `export_prompts.py` → 背景生成 → `intake.py` → `build.py` → `review_sheet.py` → `publish.py`。運用ルール・レビュー観点の正は operation.html セクション 3 手順 6。スキル側の勘所:
+投入しただけの行(`video_s3_key_30s IS NULL`)は投稿候補にならない。**実行コマンドの正は `content/video-build/pref-ranking-1/README.md`**(事前準備 = render/ffmpeg イメージ・フォント・五郎素材・VOICEVOX 起動、を含む)。工程: `build.py --list` → `export_prompts.py` → 背景生成 → `intake.py` → `build.py` → `review_sheet.py` → `publish.py`。運用ルール・レビュー観点の正は生産の詳細設計 3.4・3.5。スキル側の勘所:
 
 1. **背景生成(Codex imagegen 委譲)**: `work/prompts/<content_key>.txt` の全文を渡す(画風固定・9:16・文字禁止の行はツーリングが付与済み)。指示に「**文字・数字・記号の混入を Codex 自身に確認させ、混入時は再生成**」「**941×1672(9:16)で保存し、サイズを確認させる**」を含める(17-5c 実績: 14 枚で自己確認による再生成 5 回)。保存先は `work/backgrounds_raw/<content_key>.png`。取り込み後も Claude が全数目視(文字混入・和モダン画風・中央の版面域が空いているか)
 2. **ビルド**: `build.py --dry-run` で全 cue 予算内を先に確認してから本ビルド(1 本約 90 秒)。予算超過はセリフ短縮で直す(話速の引き上げ余地なし)

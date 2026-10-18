@@ -1,6 +1,6 @@
 # pref-ranking-1 事前動画ビルド
 
-`ranking-prebuilt` 用のローカル運用ツールです。技術設計は `docs/app/generators/ranking-prebuilt.html` セクション 8、運用手順とレビュー基準は `docs/app/operation.html` セクション 3 手順 6 を正とします。生成物はすべて `work/` に置かれ、git 管理しません。
+`ranking-prebuilt` 用のローカル運用ツールです。技術設計・運用手順・レビュー基準は `docs/production/pref-ranking-1.html`（生産の詳細設計の 3〜6 章）を正とします。生成物はすべて `work/` に置かれ、git 管理しません。
 
 スクリプトは WSL ホストの Python 3.12 で実行します。ホストに必要な Python パッケージは `pymysql` / `boto3` / `pytest` です。画像処理に PIL が必要な `intake.py` だけは `image-batch:ffmpeg-check` 内で実行します。ローカル MySQL は既定で `127.0.0.1:3306 / app / password / acps` を使用し、必要なら `LOCAL_DB_HOST`、`LOCAL_DB_PORT`、`LOCAL_DB_USER`、`LOCAL_DB_PASSWORD`、`LOCAL_DB_NAME` で上書きします。
 

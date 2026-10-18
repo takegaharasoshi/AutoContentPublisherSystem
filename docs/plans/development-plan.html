@@ -374,32 +374,73 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-6" data-step-id="30-6" data-status="todo">
+<article class="plan-step" id="step-30-6a" data-step-id="30-6a" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-6</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-6a</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>umigame-soup-1 の生産の詳細を移し、生産まわりの参照を付け替える</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>30-5 の go の後。<strong>3 セットのセットレーン（週次補充など）が動いていないとき</strong>（参照の付け替えが 3 セットの SKILL.md に及ぶため）に着手する。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>30-5 の go の後。<strong>3 セットのセットレーン（週次補充など）が動いていないとき</strong>（参照の付け替えが 3 セットの SKILL.md に及ぶため）に着手する。2026-10-18 に 30-6 を 30-6a（生産の詳細と参照）と 30-6b（レビューの仕組み）に分けた（30-5 の 2 倍の作業量で 1 ゴールに収まらないため）。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<a href="../production/umigame-soup-1.html">生産の詳細設計 umigame-soup-1</a>（判断 D-01〜07）を新設し、方式設計書 8 節とセット別設計書 4 節の作り方・5 節を移した。3 セットの SKILL.md・CLAUDE.md・content/ の README から旧位置への参照を付け替えた。ユーザーの go 待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p><code>docs/production/umigame-soup-1.html</code> を作り、umigame-soup-1 の生産の詳細を移す: <code>docs/app/generators/umigame-prebuilt.html</code> の 8 節「事前ビルドパイプライン」、<code>docs/app/sets/umigame-soup-1.html</code> の補充まわり、<code>content/</code> の README の設計にあたる部分（README は手順として残す）。移した元はリンクに置き換える。続けて 3 セット分まとめて、SKILL.md・CLAUDE.md・<code>content/</code> の README から旧位置（30-5・30-6 で移した節）への参照を新しい位置へ付け替える。機能別の基本設計 <code>production-umigame-soup-1.html</code> に、30-5 の修正指示で logic-training-1・pref-ranking-1 に足した「3. レビューのやり方」と同じ形で、5 つの関所のやり方（AI が何を出し、ユーザーがどう返すか）を書く。あわせて、30-5 で logic-training-1・pref-ranking-1 に入れた「インデックス + バッチ別のシート」の形を umigame-soup-1 にもそろえる: 動画のレビューシート（<code>content/video-build/umigame-soup-1/review_sheet.py</code>）を、インデックス <code>work/review.html</code> とバッチ別のシート <code>work/review/&lt;バッチ&gt;.html</code> に分け、問題の中身は全バッチの <code>stock_items.py</code> から引く（今は 1 バッチ〔既定 <code>batch-01</code>〕しか読まないため、第 2 バッチで台帳の全件と食い違う）。素材のレビューシート（バッチのフォルダーごと）と判定の試行のページ（<code>docs/app/sets/umigame-soup-1-probe-&lt;バッチ&gt;.html</code>）にも、バッチの一覧の入口（試行のページはスキルにある <code>umigame-soup-1-probe-index.html</code>）を作る。補充スキル <code>umigame-stock-replenish</code> に「補充のたびにインデックスを更新する」を書く。第 2 バッチの補充はこのステップの後。</p></div>
+<div data-field="overview"><p><code>docs/production/umigame-soup-1.html</code> を作り、umigame-soup-1 の生産の詳細を移す: <code>docs/app/generators/umigame-prebuilt.html</code> の 8 節「事前ビルドパイプライン」、<code>docs/app/sets/umigame-soup-1.html</code> の補充まわり、<code>content/</code> の README の設計にあたる部分（README は手順として残す）。移した元はリンクに置き換える。続けて 3 セット分まとめて、SKILL.md・CLAUDE.md・<code>content/</code> の README から旧位置（30-5・30-6a で移した節）への参照を新しい位置へ付け替える。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>SKILL.md は参照先の付け替えだけで、工程は変えない。停止中の fantasy-animals-1 は対象外。セットの運用（補充ペース・在庫水位などセット計画書の内容）は動かさない。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
-<li>umigame-soup-1 のレビューシートがインデックス + バッチ別になり（動画のシートは <code>review_sheet.py</code> の pytest が全パス・実データで第 1 バッチのシートとインデックスが生成され参照の欠けが 0）、素材のシートと判定の試行のページにバッチの一覧の入口があり、補充スキルに更新の手順がある。</li><li>umigame-soup-1 の生産の詳細が、移した元の事実を欠かさず載っており、冒頭に機能ページ（<code>production-umigame-soup-1.html</code>）への戻りリンクがある。新しい書式（<a href="../index.html">設計書体系ガイド</a>の書式ルール〔30-1・30-3〕: 冒頭の要約〔リード文 + 図 + 要点の表〕・各図表の前のリード文・本文は事実だけ・章末の「さらに詳しく」・理由はページ末尾の「判断の記録」〔D-xx〕）になっている。</li><li>本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残し、事実の欠落がない（移設元のページも含む）。旧位置への参照が残っていない（旧節へのリンクの grep 件数を貼る）。</li><li><code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 移設で事実が欠けていないか / SKILL.md と食い違っていないか）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+<li>umigame-soup-1 の生産の詳細が、移した元の事実を欠かさず載っており、冒頭に機能ページ（<code>production-umigame-soup-1.html</code>）への戻りリンクがある。新しい書式（<a href="../index.html">設計書体系ガイド</a>の書式ルール〔30-1・30-3〕: 冒頭の要約〔リード文 + 図 + 要点の表〕・各図表の前のリード文・本文は事実だけ・章末の「さらに詳しく」・理由はページ末尾の「判断の記録」〔D-xx〕）になっている。</li><li>本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残し、事実の欠落がない（移設元のページも含む）。旧位置への参照が残っていない（旧節へのリンク・文字での参照の grep 件数を貼る）。</li><li><code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 移設で事実が欠けていないか / SKILL.md と食い違っていないか）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
 <div class="plan-gates">
 <div data-field="gate"><strong>人が確認すること</strong><p>push 後、ユーザーが umigame-soup-1 のページと付け替え結果を見て go / 修正指示を出す。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/production/</code>・<code>docs/app/generators/*-prebuilt.html</code>・<code>docs/app/operation.html</code>・<code>docs/app/sets/umigame-soup-1.html</code>・<code>.agents/skills/</code> の参照・<code>content/</code> の README・<code>content/video-build/umigame-soup-1/review_sheet.py</code> とテスト・<code>docs/app/sets/umigame-soup-1-probe-index.html</code>・CLAUDE.md・<code>docs/issues/index.html</code> の対象パス）。stop after 30 turns。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/production/</code>・<code>docs/app/generators/umigame-prebuilt.html</code>・<code>docs/app/sets/umigame-soup-1.html</code>・<code>docs/overview/functions/production-umigame-soup-1.html</code> のリンク・<code>.agents/skills/</code> の参照・<code>content/</code> の README・CLAUDE.md・<code>docs/issues/index.html</code> の対象パス）。stop after 30 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
+<div class="plan-fold-inner">
+<ul>
+<li><strong>分割</strong>: 30-6 を 30-6a（生産の詳細と参照）と 30-6b（レビューの仕組み）に分けた（30-5 の 2 倍の作業量で 1 ゴールに収まらないため。ユーザー了承）。着手時、logic-training-1 の 2026-10-w3 は選別待ちで停止中、ほかのセットレーンは動いていないことを前提に進めた</li>
+<li><strong>新設</strong>: <code>docs/production/umigame-soup-1.html</code>（1 資材の置き場 / 2 問題ストックの作り方〔オリジナル性・候補と選別・素材の仕上げ・本番経路のプローブ〕/ 3 事前ビルド〔工程・背景イラスト〕/ 4 動画の作り〔ゾーン・ビートと不変条件・TTS の同期〕/ 5 再ビルド / 6 在庫と補充）。目次 <code>production/index.html</code>・機能ページの「さらに詳しく」・<code>docs/index.html</code> を向けた</li>
+<li><strong>移す範囲</strong>: セット別設計書 4 節の素材 18 項目の表と truth の書き方などの素材仕様は、生産と配信の受け渡しの契約（DB の列と対応）なのでセット別設計書に残した。移したのは 4 節の作り方の段落・箇条（作問の手順・オリジナル性の基準・作問法・補充とレビューのペース・本番経路での確認）と 5 節（背景イラストの作り方）。移設元は見出しと移設先のリンクだけにした（方式設計書は旧アンカー <code>#build-steps</code> などを対応表の <code>li</code> に残した）</li>
+<li><strong>判断の移し替え（旧 <code>decision</code> 囲み → D-xx）</strong>: 21-5a 実装差分 → 3.1（読み元・BGM の台帳と ID・暫定 BGM）・4.1（つかみ帯の字数フィット）・3.1 工程 4（検査）+ D-01 / R-1 導入シーン・一本道 → D-02 / 21-2 第 3 稿・<code>Interactive.Div</code> → 4.2 + D-03。本文中の理由を D-04（1 回の合成）・D-05（完全オリジナル）・D-06（本番経路のプローブ）・D-07（中間調）に移した。8.4 の warn は 5 章へ。<code>class="decision"</code> の件数は production の 4 ページとも 0（方式設計書の 1〜7 節に残る囲みは対象外）</li>
+<li><strong>参照の付け替え（30-5・30-6a 分）</strong>: <code>quiz-stock-replenish</code>（9・43・231 行の 3 か所）・<code>ranking-stock-replenish</code>（4 か所）・<code>umigame-stock-replenish</code>（1 か所）の SKILL.md、CLAUDE.md（タスク別ガイドの 2 行・ディレクトリの説明 2 か所）、README 6 本（video-build 3 セット・remotion 2 本・umigame-stock）・WRITING-NOTES.md・LICENSES.md。工程は変えていない。旧い位置への文字・リンクでの参照は、対象のファイルで 0 件（残る 1 件は運用設計 3 節に残した音源の節を指す正しい参照）。docs/ の旧節へのリンクも 0 件（作業記録の中の grep パターンの文字列だけ）。過去のバッチの <code>review.md</code>・<code>STATUS.md</code>・<code>research.md</code> は当時の記録なので変えていない（旧アンカーは移設元に残るので切れない）</li>
+<li><strong>実態に合わせた点</strong>: ビルドの読み元・投入の時期（動画のレビューの後に配置と一緒）を SKILL.md の G4・G5 に合わせて書いた。ビルド README の「ナレーションはフレーム 90 から」を実装の 165 に直した（2 巡目の指摘）。<code>remotion/src/timeline.ts</code> の行末コメント（<code>INTRO_END // 165</code>・<code>// 525</code>・<code>// 645</code>）は式の値（240・600・720）と合わず古いが、設計書は式の値で正しく、コメントはこのステップの範囲外なので触っていない</li>
+<li><strong>レビュー</strong>（観点: 移設で事実が欠けていないか / SKILL.md と食い違っていないか。一次スクリーニング Codex・判断 Claude）。1 巡目: 指摘 4 件のうち 3 件を修正（実行時に LLM・画像生成を呼ばない条件・TTS アダプタのファイル名・セット別設計書のリンクを 2 章と 6 章に分ける）、ビートの値の指摘は timeline.ts の古いコメントを読んだ誤りとして退けた（2 巡目で Codex も同意）。2 巡目: 3 件を修正（README のフレーム番号・VOICEVOX 版は PoC 用で build.py から選べない・正解ラベルは人が確かめる）。ここで打ち切り</li>
+<li><strong>課題表</strong>: I-041 はセット別設計書 3 節を指し、節番号は変わっていないので付け替え不要。I-038・I-033・I-036・I-040 は据え置き継続でトリガーも変えない</li>
+<li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 99 ページはみ出し 0 件・図 16 ページ 32 図の描画不備 0 件・リンクの不備 0 件・判断リンク 91 件の不備 0 件で OK</li>
+</ul>
+</div>
+</details>
+</div>
+</article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<article class="plan-step" id="step-30-6b" data-step-id="30-6b" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>30-6b</strong><span class="plan-status">未着手</span></div>
+<h3>umigame-soup-1 のレビューの仕組みを logic-training-1・pref-ranking-1 にそろえる</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>30-6a の go の後。<strong>umigame-soup-1 のセットレーンが動いていないとき</strong>。第 2 バッチの補充はこのステップの後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>機能別の基本設計 <code>production-umigame-soup-1.html</code> に、30-5 の修正指示で logic-training-1・pref-ranking-1 に足した「3. レビューのやり方」と同じ形で、5 つの関所のやり方（AI が何を出し、ユーザーがどう返すか）を書く。30-5 で logic-training-1・pref-ranking-1 に入れた「インデックス + バッチ別のシート」の形を umigame-soup-1 にもそろえる: 動画のレビューシート（<code>content/video-build/umigame-soup-1/review_sheet.py</code>）を、インデックス <code>work/review.html</code> とバッチ別のシート <code>work/review/&lt;バッチ&gt;.html</code> に分け、問題の中身は全バッチの <code>stock_items.py</code> から引く（今は 1 バッチ〔既定 <code>batch-01</code>〕しか読まないため、第 2 バッチで台帳の全件と食い違う）。素材のレビューシート（バッチのフォルダーごと）と判定の試行のページ（<code>docs/app/sets/umigame-soup-1-probe-&lt;バッチ&gt;.html</code>）にも、バッチの一覧の入口（試行のページはスキルにある <code>umigame-soup-1-probe-index.html</code>）を作る。補充スキル <code>umigame-stock-replenish</code> に「補充のたびにインデックスを更新する」を書く。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>補充スキルはレビューシートの更新の手順を足すだけで、工程・関所は変えない。セットの運用（補充ペース・在庫水位）は動かさない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>umigame-soup-1 のレビューシートがインデックス + バッチ別になり（動画のシートは <code>review_sheet.py</code> の pytest が全パス・実データで第 1 バッチのシートとインデックスが生成され参照の欠けが 0）、素材のシートと判定の試行のページにバッチの一覧の入口があり、補充スキルに更新の手順がある。</li><li>機能ページに 5 つの関所のやり方の章があり、<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。</li><li>計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>push 後、ユーザーがレビューの章とシートを見て go / 修正指示を出す。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/overview/functions/production-umigame-soup-1.html</code>・<code>docs/production/umigame-soup-1.html</code>・<code>content/video-build/umigame-soup-1/review_sheet.py</code> とテスト・README・<code>content/umigame-stock/umigame-soup-1/</code> の素材シート・<code>docs/app/sets/umigame-soup-1-probe-index.html</code>・<code>.agents/skills/umigame-stock-replenish/SKILL.md</code>）。stop after 30 turns。</p></div>
 </div>
 </section>
 <details class="plan-fold" data-field="record">

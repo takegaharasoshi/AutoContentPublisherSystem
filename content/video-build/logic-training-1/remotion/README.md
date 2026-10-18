@@ -2,7 +2,7 @@
 
 `quiz-prebuilt` 方式の事前動画を Remotion でレンダリングするプロジェクトです。改修 R-1
 （動画レンダラーの Remotion 載せ替え）の成果物です。運用手順の正は
-[方式設計書 quiz-prebuilt.html](../../../../docs/app/generators/quiz-prebuilt.html) セクション 8、
+[生産の詳細設計 logic-training-1](../../../../docs/production/logic-training-1.html) の 3 章、
 改修の経緯は[セット計画書 logic-training-1.html](../../../../docs/plans/logic-training-1.html) の改修 R-1 です。
 
 ## 不変条件（R-1 起票時のユーザー決定）

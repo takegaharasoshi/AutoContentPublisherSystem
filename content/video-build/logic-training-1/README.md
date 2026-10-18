@@ -1,6 +1,6 @@
 # logic-training-1 事前動画ビルド
 
-`quiz-prebuilt` 用のローカル運用ツールです。運用ルールは `docs/app/operation.html` セクション 3 手順 5、技術仕様は `docs/app/generators/quiz-prebuilt.html` セクション 8 を正とします。生成物はすべて `work/` に置かれ、git 管理しません。
+`quiz-prebuilt` 用のローカル運用ツールです。運用ルールと技術仕様は `docs/production/logic-training-1.html`（生産の詳細設計の 3・4 章）を正とします。生成物はすべて `work/` に置かれ、git 管理しません。
 
 ローカル MySQL は既定で `127.0.0.1:3306 / app / password / acps` を使用します。必要なら `LOCAL_DB_HOST`、`LOCAL_DB_PORT`、`LOCAL_DB_USER`、`LOCAL_DB_PASSWORD`、`LOCAL_DB_NAME` を指定します。
 

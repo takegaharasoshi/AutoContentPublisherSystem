@@ -120,7 +120,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <h2 id="stock-items">4. ストック 1 件の素材項目（18 項目）</h2>
 <div class="note"><span class="callout-title">要点</span>ストック 1 件は「リール 1 本と AI 出題者の判定に要る素材一式」。下の 18 項目の表が正で、<code>validate.py</code>・テーブル <code>umigame_stock_items</code> はこれに従う。#15〜#18 はコメント返信の判定・出力ガード用で、ほかの項目と同じく作問時に書き、素材シートでレビューする。#17 正解基準は 21-6d7a で設計し、素材・<code>validate.py</code>・素材シートへの導入は 21-6d7b、DB・判定への組み込みは 21-6d7c（それまでは未記入）。問題はすべて完全オリジナル。</div>
 <p>下表が正で、21-4a の <code>stock_items.py</code> / <code>validate.py</code>、テーブル <code>umigame_stock_items</code>（<a href="../data-model.html#detail-umigame-stock-items">data-model.html 4.15</a>）はこの表に従う。字数制約は 21-2 第 2・3 稿の実測値。</p>
-<p>作問の手順（ランダム語のモチーフ → コア宣言 → 動線・現実性・既存問題との照合の自己検査）はスキル <code>.claude/skills/umigame-problem-writer/SKILL.md</code> が正。<code>stock_items.py</code> の管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）を <code>validate.py</code> が様式検査し、作問レビュー用の素材シート（<code>work/review.html</code>）は問題文の直前に表示する（レビューはコア宣言から見る）。</p>
+<p>作り方（作問の手順・オリジナル性の基準・素材シートとプローブ・補充のペース）は Phase 30-6a で生産の詳細設計 umigame-soup-1 の <a href="../../production/umigame-soup-1.html#stock">2 章</a>・<a href="../../production/umigame-soup-1.html#inventory">6 章</a>へ移した。この節は素材 18 項目の仕様（生産と配信の受け渡しの契約）を持つ。</p>
 <div class="table-wrap">
 <table>
 <tr><th>#</th><th>項目（カラム / JSON キー）</th><th>用途</th><th>制約（<code>validate.py</code> で検査）</th></tr>
@@ -130,13 +130,13 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>4</td><td><code>expected_questions</code> 想定質問と期待回答</td><td>作問時の確認用。正解に向かう質問・引っかけ・無関係な質問を混ぜる</td><td>15〜20 件（<code>{q, a}</code> の配列。<code>a</code> は はい / いいえ / 関係ない / 正解 のいずれか + 任意の補足）</td></tr>
 <tr><td>5</td><td><code>hook</code> フック文</td><td>導入シーンの「今日の謎」カード（最大 60px・1 行）と本編のつかみ帯（最大 74px・1 行）。どちらも字数で縮める</td><td>12〜16 字前後（上限 20 字。20 字で 40px）。<strong>「〜の謎」「謎の〜」の形で、何が謎なのかを一言で言い切る</strong>（2026-10-17 の R-1 でユーザーが全件見直し。旧ルール「？」で終える〔2026-09-26〕は廃止）</td></tr>
 <tr><td>6</td><td><code>rule_text</code> ルール帯</td><td>常時表示の遊び方（34px・2 行）</td><td>45 字前後。セット固定文の既定値あり（問題ごとに変えなくてよい）</td></tr>
-<tr><td>7</td><td><code>narration.problem</code> / <code>narration.rule</code> ナレーション cue</td><td>冒頭ナレーション。表示文とは別に、括弧・記号を落とし読点で間を整えた読み上げ用の文</td><td>2 cue の実測長合計 + 間 1.2 秒が <strong>21 秒以内</strong>（方式設計書 8.3 の予算検査。超過はビルドエラー）</td></tr>
+<tr><td>7</td><td><code>narration.problem</code> / <code>narration.rule</code> ナレーション cue</td><td>冒頭ナレーション。表示文とは別に、括弧・記号を落とし読点で間を整えた読み上げ用の文</td><td>2 cue の実測長合計 + 間 1.2 秒が <strong>21 秒以内</strong>（<a href="../../production/umigame-soup-1.html#tts-sync">生産の詳細設計 4.3</a> の予算検査。超過はビルドエラー）</td></tr>
 <tr><td>8</td><td><code>play_example</code> プレイ例</td><td>下部の吹き出し 3 往復（質問 → 質問を残したまま返答を追加）</td><td>6 要素（<code>{role: questioner|master, text}</code> の交互）。質問 16 字 / 返答 17 字以内（1 行）。<strong>3 往復のうち 1 つは「はい」</strong>（出題者が喜ぶポーズに切り替わる版面上の約束事）</td></tr>
 <tr><td>9</td><td><code>character_lines.master.intro</code> / <code>.outro</code> 出題者の導入・締め</td><td>導入「質問してみて！」・締め「何度でも答えるよ。コメントで質問！」の吹き出し</td><td>各 17 字以内。既定値あり</td></tr>
 <tr><td>10</td><td><code>character_lines.jr.outro</code> Jr. の締め</td><td>「面白かったら、いいね、フォローよろしくね！」（吹き出しのみ・ナレーションなし）</td><td>セット固定文の既定値でよい（2 行になるが単独表示のため許容）</td></tr>
 <tr><td>11</td><td><code>illustration_prompt</code> イラスト作成用プロンプト</td><td>背景 1 枚（imagegen）。情景のみ</td><td>画風固定行（セクション 5）+ 9:16 + 文字禁止 + <strong>真相の手がかりを描かない</strong>指示を含む（<code>validate.py</code> は固定行の存在を検査）</td></tr>
 <tr><td>12</td><td><code>caption</code> キャプション + ハッシュタグ</td><td>投稿本文（セクション 6）</td><td><code>#AIart</code> 必須。見出しは【<code>title</code>】、遊び方と真相公開の予告を含む。前回の真相ブロックの枠（560 字）と合わせて 2,200 字以内。TTS のクレジット行は不要（セクション 8）</td></tr>
-<tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>「完全オリジナル」宣言 + 型 + モチーフ → 連想 → 逆にした常識を書く（<code>validate.py</code> が宣言の有無を検査）。オリジナル性の基準は表の下</td></tr>
+<tr><td>13</td><td><code>source_note</code> 出典・オリジナル性メモ</td><td>証跡</td><td>「完全オリジナル」宣言 + 型 + モチーフ → 連想 → 逆にした常識を書く（<code>validate.py</code> が宣言の有無を検査）。オリジナル性の基準は<a href="../../production/umigame-soup-1.html#originality">生産の詳細設計 2.1</a></td></tr>
 <tr><td>14</td><td><code>difficulty</code> 難易度</td><td>運用の目安（在庫の偏り確認）</td><td>1〜5</td></tr>
 <tr><td>15</td><td><code>core_points</code> コアの要点</td><td>コメント返信の判定根拠（④ 正解 / ⑤ 惜しい / ⑥ 不正解を見分ける）。機械プローブの正解ラベルにも使う。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ（管理項目 <code>core</code> = コア宣言の 1 文とは別物）</td><td>1〜3 個・1 個 20 字以内（文字列の配列）。真相の説明に最低限必要な情報だけを書く（基準の正は <a href="#core-points">10.2「コアで見分ける」</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
 <tr><td>16</td><td><code>reveal_text</code> 開示文</td><td>正解時に返信で開示する真相の要約（<code>正解！</code> に続ける文。<a href="#reply-style">10.4</a>）。<code>stock_items.py</code> では <code>JUDGE_POINTS</code> に持つ</td><td>70 字以内（<a href="#judge-contract">10.3.1</a>）。DB は <code>umigame_stock_items</code> の同名列（V013。出題時に <code>umigame_items</code>・スナップショットへ写す）で、NULL だと出題時に異常終了する</td></tr>
@@ -145,11 +145,7 @@ nav.toc ul { margin: .3rem 0 0; }
 </table>
 </div>
 <ul>
-  <li><strong>オリジナル性の基準</strong>（21-4a）: 既存問題の問題文・真相を転載しない。語句・登場人物・舞台の置き換えだけの改変もしない。借りてよいのは「型（物語復元 / 意味誤誘導）」と「仕掛けの構造」までで、モチーフ・真相・問題文は新規に作る。台帳で本家級（classic）の題材は構造ごと避ける。PoC の古典題材だけは例外で、ストック本体には入れない</li>
-  <li><strong>作問法の正</strong>: <a href="https://note.com/suekai0217/n/n35128e606a9b">note 記事の 4 ステップ + 良い問題の 3 条件</a></li>
   <li><strong>確定事実シートの件数</strong>: 下限 8 件は答えの揺れを防ぐため。上限は 20 件（2026-09-26 に 12 → 20。<a href="#d-20260926-fact-limit">付録</a>）。<code>database/V012</code> のカラム COMMENT は「8〜12 件」のまま（適用済みの DDL のため次のスキーマ変更時に合わせる）</li>
-  <li><strong>補充とレビューのペース</strong>: 週 4 問（日・火・木・土の投稿 1 回 1 問）。レビューは<strong>週 1 回 × 4 問</strong>（21-6i で週 7 問・週 2 回 × 4 問から変更）。手順の詳細は 21-8 の補充スキル（<code>umigame-stock-replenish</code>）に書く</li>
-  <li><strong>作問時に本番経路で答えを確かめる</strong>: 評価データ <code>judge-trial/data/eval_problems.json</code> にケースを足し（正解ラベルは人が確認）、<code>probe_run.py --problems &lt;no&gt;</code> を回す（<a href="#evaluation">10.6</a>）</li>
   <li><strong>管理項目</strong>: <code>content_key</code>（<code>{3 桁連番}-{slug}</code>）と <code>title</code>（題名）はツーリングが付ける管理項目で、素材項目には数えない。ただし <code>title</code> は<strong>キャプションの見出しと翌日の前回の真相ブロックに出る公開文</strong>（21-6d3e）なので、真相の手がかりにしない（問題文にある言葉・状況だけで付ける。例: 「間違えたのは誰か」→「完璧な演奏に「あ、間違えた」」、「1年越しの判定」→「庭のすみに実ったすいか」に改めた）。キャラクター・BGM・SE・フォントは<strong>セット固定の共有資産</strong>で、ストック単位の項目ではない（セクション 7〜9）</li>
   <li><strong>truth の書き方（公開前提。21-6d3e）</strong>: 次のリールのキャプションで全文を公開するので、フォロワーが読んで自然な文にする。① 判定メモの言い回し（「〜のことではない」の羅列・「正解宣言のとき以外は言わない」等）を書かない。② <strong>はいと答える根拠の事実をすべて本文に書く</strong>（確定事実シートで「はい」になる事実が真相に書かれていないと、答え合わせで読者が「そんな話はない」と感じる）。③ 改行は<strong>読みやすい段落の区切り</strong>に入れる（場面・時間が変わるところ。<strong>機械的な 1 文 1 行にしない</strong>。段落の中では文を続ける。空行は入れない）。④ 数字と単位の間に空白を入れない（「3か月」）。筋・事実は <code>fact_sheet</code>・<code>core_points</code>・<code>reveal_text</code> と矛盾させない</li>
   <li><strong>truth の上限 400 字の根拠</strong>（21-6d3e）: 書き直した 14 問の実測は 207〜382 字（改行込み・最長は U26 の 382 字。物語復元型は 273〜382 字、意味誤誘導型は 207〜273 字）。最長に少しの余裕を足した 400 字を上限にした。キャプションの上限 2,200 字に対しては、上半分（実測最長 270 字）+ 前回の真相ブロックの枠（区切り行などの定型 60 字 + 前回の <code>title</code> 100 字 + <code>truth</code> 400 字 = 560 字）でも 830 字で十分に収まるので、上限は読みやすさ（「続きを読む」の先で読み切れる長さ）で決めている。行数は検査しない（改行は書き手が読みやすい位置に入れ、機械的に決めないため）</li>
@@ -158,16 +154,7 @@ nav.toc ul { margin: .3rem 0 0; }
 </ul>
 
 <h2 id="illustration-prompt">5. イラスト作成用プロンプト（ストック整備時・imagegen）</h2>
-<div class="note"><span class="callout-title">要点</span>1 問 1 枚の背景を、Codex CLI の画像生成で作る。プロンプトは「画風固定行 + 情景 + 禁止事項」の 3 部構成。人物は下半分の中央に小さく置く。</div>
-<p>本セットの生成方式 <code>umigame-prebuilt</code> は実行時に LLM・画像生成 API を呼ばない（事前ビルド方式）。背景イラストはストック整備時に、ストックの <code>illustration_prompt</code> から Codex CLI の <code>image_gen.imagegen</code>（<code>codex exec</code>）で生成する（21-2 で CLI からの自動化を実測。手作業不要）。画風固定行は全問共通の定数で、<code>validate.py</code> が存在を検査する。</p>
-<ul>
-  <li><strong>画風（C4）</strong>: 90 年代 OVA の手描きセル塗り（太い主線・エアブラシのハイライト・リムライト）。背景は<strong>中間調</strong>（月明かりと蝋燭で情景が見える明るさ）で生成し、版面のオーバーレイは薄くする（第 1 稿の暗めの単色トーンは暗すぎたため変更 = 21-2）</li>
-  <li><strong>固定の禁止事項</strong>: 文字・ロゴを入れない。<strong>真相の手がかりを描かない</strong>（問題文にある情景だけを描く。人物は問題文に出る人物 + 遠景のシルエット 1 人まで）</li>
-  <li><strong>人物の大きさと位置</strong>: 遠景の小さな全身像にし、<strong>下半分の中央（横幅の中央 20%・縦 55〜85%）にだけ置く</strong>。上半分には人物を置かず静か（空・壁・天井・窓）にし、下半分の左右 40% は景物だけにする。クローズアップ・半身は描かない（感情は表情でなく姿勢で出す）。理由は<a href="#d-20260926-figure">付録</a></li>
-  <li><strong>背景のレビュー</strong>: <code>background_sheet.py --stills</code>（今の文言と背景で動画の各コマを書き出す）で版面と重ねて見る</li>
-  <li>寸法は 9:16（1024x1536）で生成し、ビルド時に 1080x1920 へ正規化する（方式設計書 8.1）</li>
-  <li>キャラクター 2 体はストック単位では生成しない（セクション 9）</li>
-</ul>
+<p>背景イラストの作り方（画風 C4・禁止事項・人物の大きさと位置・寸法・背景のレビュー）は Phase 30-6a で<a href="../../production/umigame-soup-1.html#illustration">生産の詳細設計 umigame-soup-1 の 3.2</a>へ移した。プロンプトの組み立ては <code>common/umigame_common.py</code>、画風の固定行の存在は <code>validate.py</code> が検査する。</p>
 
 <h2 id="caption">6. キャプションの作り方</h2>
 <div class="note"><span class="callout-title">要点</span>キャプションはストックの <code>caption</code> に問題ごとに書き、テンプレートは <code>{{caption}}{{prev_truth_block}}</code> の 1 行だけ。構成は全問共通の 4 段（見出し = 問題タイトル）。ハッシュタグの後ろに、前回の問題の真相ブロックを投稿バッチが差し込む（21-6h）。</div>
@@ -192,16 +179,16 @@ nav.toc ul { margin: .3rem 0 0; }
 </table>
 </div>
 <ul>
-  <li><strong>選曲</strong>はビルド時（<code>build.py</code>）に行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）。ローカル台帳 <code>work/bgm/tracks.json</code> の使用回数最少で選び、ID は publish 時に S3 キーで解決する（<a href="../generators/umigame-prebuilt.html#build-steps">方式設計書 8.1 の決定</a>）</li>
+  <li><strong>選曲</strong>はビルド時（<code>build.py</code>）に行い、選んだ曲を <code>umigame_stock_items.video_audio_asset_id</code> にベイクする（quiz-prebuilt / ranking-prebuilt と同じ「ビルド時の移管」）。ローカル台帳 <code>work/bgm/tracks.json</code> の使用回数最少で選び、ID は publish 時に S3 キーで解決する（<a href="../../production/umigame-soup-1.html#build-steps">生産の詳細設計 3.1</a>）</li>
   <li><strong>第 1 バッチは 1 曲運用</strong>: track01 = Pixabay「Strange Detectives」/ HarumachiMusic の先頭 29 秒（2026-09-24 ユーザー選曲・R-1 で 24 → 29 秒。配布ページに Content ID 登録の表示あり）</li>
   <li><strong>SE</strong> は動画に焼き込むだけで実行時に使わないため、ファイルの正は <code>content/video-build/umigame-soup-1/assets/se/bubble_pop.wav</code>（git 管理）とし、S3 配置・<code>audio_assets</code> 登録は必要になるまで行わない</li>
-  <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。方式設計書 8.3）</li>
+  <li>ラウドネスは -14 LUFS / -2 dBTP に正規化（pref-ranking-1 の <code>normalize_loudness.py</code> を流用。<a href="../../production/umigame-soup-1.html#tts-sync">生産の詳細設計 4.3</a>）</li>
 </ul>
 
 <h2 id="tts">8. ナレーション・TTS（Irodori-TTS v4.1-Small / 声 G4 のクローン）</h2>
 <div class="note"><span class="callout-title">要点</span>ナレーションはローカル GPU の Irodori-TTS（BF16）で、Gemini の声 G4 を参照音声からクローンして作る。読むのは導入シーンの見出し（全問共通）と、問題文・ルールの 2 cue（合計 21 秒以内）。クレジット表記は不要。</div>
 <ul>
-  <li><strong>読み上げる文</strong>: 導入シーンで全問共通の「新体験！！ コメントで紐解く！ 推理ゲーム！」（R-1 で追加。<code>assets/design.json</code> の <code>opening.narration</code>）→ 導入の後に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code>（吹き出しと同期させない。21-1 ②）。問題文の開始は 5.5 秒（165 フレーム。24 秒版では 0.5 秒）、2 cue + 間の合計は <strong>21 秒以内</strong>（尺の内側で終わる予算。方式設計書 8.3）</li>
+  <li><strong>読み上げる文</strong>: 導入シーンで全問共通の「新体験！！ コメントで紐解く！ 推理ゲーム！」（R-1 で追加。<code>assets/design.json</code> の <code>opening.narration</code>）→ 導入の後に <code>narration.problem</code> → 1.2 秒 → <code>narration.rule</code>（吹き出しと同期させない。21-1 ②）。問題文の開始は 5.5 秒（165 フレーム。24 秒版では 0.5 秒）、2 cue + 間の合計は <strong>21 秒以内</strong>（尺の内側で終わる予算。<a href="../../production/umigame-soup-1.html#tts-sync">生産の詳細設計 4.3</a>）</li>
   <li><strong>1 回で読ませる</strong>: 問題文とルール文を 1 回の合成で読ませ、無音で切り分ける（別々に作ると口調が変わる）</li>
   <li><strong>声</strong>: 参照音声 <code>content/video-build/umigame-soup-1/assets/voice/kamerock-g4/*.wav</code>（Gemini G4 で合成した 001・004・006 の problem / rule 6 本に息継ぎゲートをかけたもの。名前順にすべて渡す）のクローン。説明文（caption）・絵文字・後処理は使わない</li>
   <li><strong>設定の正</strong>: モデル・精度・seed・長さは <code>assets/design.json</code> の <code>narration</code> 節（Gemini の設定は <code>narration_gemini</code> 節に残す）。<strong>参照音声を差し替えたら声が変わるため全数を再試聴する</strong></li>
@@ -221,7 +208,7 @@ nav.toc ul { margin: .3rem 0 0; }
 <tr><td>質問者「カメロック Jr.」（基本ポーズ）</td><td>同 <code>jr_base.png</code></td><td>視線は左上（父の方向）。喜びポーズは持たない</td></tr>
 <tr><td>画風固定行（キャラ / 背景）</td><td><code>design.json</code> の <code>style_line</code> / <code>background_prompt</code> の画風部分</td><td>C4: 90 年代 OVA 手描きセル塗り。セクション 5 の固定行と同一</td></tr>
 <tr><td>フォント</td><td>Zen Kaku Gothic New（Medium / Bold / Black。ビルド時に pref-ranking-1 の <code>remotion/public/fonts/</code> から配置）</td><td>pref-ranking-1 と同じ（SIL OFL）。<code>@remotion/fonts</code> の <code>loadFont</code> で読み込む</td></tr>
-<tr><td>版面の座標・ビート・効果</td><td><code>remotion/src/timeline.ts</code> / <code>UmigameReel.tsx</code></td><td>実装が正。設計書には構成と不変条件のみ（方式設計書 8.2）</td></tr>
+<tr><td>版面の座標・ビート・効果</td><td><code>remotion/src/timeline.ts</code> / <code>UmigameReel.tsx</code></td><td>実装が正。設計書には構成と不変条件のみ（<a href="../../production/umigame-soup-1.html#composition">生産の詳細設計 4 章</a>）</td></tr>
 </table>
 </div>
 <p>キャラ・フォントは S3 の固定アセット（<code>assets/{set_code}/</code>）には置かない（事前ビルド方式は実行時にアセットを使わないため。ranking-prebuilt の五郎と同じ扱い）。</p>

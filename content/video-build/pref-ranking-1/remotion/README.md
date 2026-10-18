@@ -1,7 +1,7 @@
 # pref-ranking-1 コンポジション（Remotion）
 
 `ranking-prebuilt` 方式の事前動画をレンダリングする Remotion プロジェクトです。版面・タイムラインの仕様は
-[方式設計書 ranking-prebuilt.html](../../../../docs/app/generators/ranking-prebuilt.html) セクション 8 と
+[生産の詳細設計 pref-ranking-1](../../../../docs/production/pref-ranking-1.html) の 4・5 章と
 [セット別設計書 pref-ranking-1.html](../../../../docs/app/sets/pref-ranking-1.html) セクション 7〜8 が正です。
 
 ## 構成

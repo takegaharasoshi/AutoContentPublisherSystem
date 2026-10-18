@@ -873,7 +873,7 @@ LIMIT 1;</code></pre>
       <tr><td><code>expected_questions</code></td><td><code>JSON NOT NULL</code>。想定質問と期待回答（<code>[{"q": …, "a": …}]</code>・15〜20 件。プローブテスト用。DB に入れるのは「レビュー済みの検証セット」を投入物と一緒に残すため）</td></tr>
       <tr><td><code>hook</code></td><td><code>VARCHAR(40) NOT NULL</code>。フック文（12 字前後）</td></tr>
       <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（45 字前後。セット既定文）</td></tr>
-      <tr><td><code>narration</code></td><td><code>JSON NOT NULL</code>。読み上げ用の cue <code>{"problem": …, "rule": …}</code>（cue の予算検査は <a href="generators/umigame-prebuilt.html#tts-sync">方式設計書 8.3</a>）</td></tr>
+      <tr><td><code>narration</code></td><td><code>JSON NOT NULL</code>。読み上げ用の cue <code>{"problem": …, "rule": …}</code>（cue の予算検査は <a href="../production/umigame-soup-1.html#tts-sync">生産の詳細設計 umigame-soup-1 の 4.3</a>）</td></tr>
       <tr><td><code>play_example</code></td><td><code>JSON NOT NULL</code>。プレイ例 3 往復 <code>[{"role": "questioner"|"master", "text": …} × 6]</code>（1 つは「はい」）</td></tr>
       <tr><td><code>character_lines</code></td><td><code>JSON NOT NULL</code>。<code>{"master": {"intro": …, "outro": …}, "jr": {"outro": …}}</code>（各 17 字以内。セット既定文あり）</td></tr>
       <tr><td><code>illustration_prompt</code></td><td><code>TEXT NOT NULL</code>。背景イラスト作成用プロンプト（画風固定行 + 情景 + 禁止事項）</td></tr>

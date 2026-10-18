@@ -6,7 +6,7 @@ description: logic-training-1 の問題ストック(quiz_stock_items)を補充�
 # 問題ストック補充スキル(quiz-stock-replenish)
 
 logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 初期整備(2026-08)で確立した品質・手順で補充するためのスキル。
-運用ルールの正は `docs/app/operation.html` セクション 3(在庫確認クエリ・補充閾値 = 未使用 7 問/組以上・著作権ガイドライン)、フィールド仕様の正は `docs/app/generators/gpt-quiz-multicut.html` セクション 5。本スキルはそれらに「同品質で量産するための勘所」を足すもので、矛盾したら設計書が勝つ。Claude Code(`/quiz-stock-replenish`)と Codex 直接セッション(`$quiz-stock-replenish`)の両方から同じ手順で使う(リサーチ・イラスト生成の手段と `/goal` 行の扱いはエージェント別に異なる。末尾の「エージェント別の差分」節)。
+運用ルールの正は `docs/production/logic-training-1.html`(生産の詳細設計。在庫確認クエリ・補充閾値 = 未使用 7 問/組以上 = 5 章・著作権ガイドライン = 2.1)、フィールド仕様の正は `docs/app/generators/gpt-quiz-multicut.html` セクション 5。本スキルはそれらに「同品質で量産するための勘所」を足すもので、矛盾したら設計書が勝つ。Claude Code(`/quiz-stock-replenish`)と Codex 直接セッション(`$quiz-stock-replenish`)の両方から同じ手順で使う(リサーチ・イラスト生成の手段と `/goal` 行の扱いはエージェント別に異なる。末尾の「エージェント別の差分」節)。
 
 **昼スロット(noon = L3 / standard・フェルミ推定)は 16-4d(2026-08-24)で当分停止中**(スキップ率の高止まりによるユーザー決定。経緯・凍結範囲は `docs/app/sets/logic-training-1.html` 冒頭の注記が正)。**補充対象は朝(L1 / light)と夜(L1 / deep)の 2 組のみ**で、L3 / standard は在庫確認で数字が小さくても補充しない(既存在庫は凍結・残置)。セクション 3 の昼の執筆勘所は再開時の参照用として残している。
 
@@ -40,7 +40,7 @@ logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 �
 
 ## 0. 在庫確認(入口)
 
-operation.html セクション 3 の在庫確認クエリ(16-3b 拡張版)で「型 × 難度」ごとの在庫を確認し、7 問を下回る組を補充対象にする。**ただし L3 / standard(昼)は 16-4d で停止中のため、数字にかかわらず補充対象にしない。**quiz-prebuilt 方式では**「未使用かつビルド済み」(`unused_built`)を在庫と数える**。`unbuilt` 列が 0 以外なら投入済みのビルド漏れなので、補充より先にセクション 7 のビルドを終わらせる。再利用 WARNING・未ビルト WARNING がログに出ていたら優先対応。
+生産の詳細設計 `docs/production/logic-training-1.html` 5 章の在庫確認クエリ(16-3b 拡張版)で「型 × 難度」ごとの在庫を確認し、7 問を下回る組を補充対象にする。**ただし L3 / standard(昼)は 16-4d で停止中のため、数字にかかわらず補充対象にしない。**quiz-prebuilt 方式では**「未使用かつビルド済み」(`unused_built`)を在庫と数える**。`unbuilt` 列が 0 以外なら投入済みのビルド漏れなので、補充より先にセクション 7 のビルドを終わらせる。再利用 WARNING・未ビルト WARNING がログに出ていたら優先対応。
 
 ## 1. リサーチ(Web 裏取り)
 
@@ -228,7 +228,7 @@ python3 content/quiz-stock/logic-training-1/<batch>/generate.py
 
 ## 7. 動画ビルド・レビュー・配置(quiz-prebuilt。投入後に必ず)
 
-投入しただけの行(`video_s3_key IS NULL`)は出題候補にならない。技術設計の正は `docs/app/generators/quiz-prebuilt.html` セクション 8、運用ルールの正は operation.html セクション 3 手順 5。ツーリングは `content/video-build/logic-training-1/`(使い方は同ディレクトリの README.md。生成物は `work/` で gitignore)。
+投入しただけの行(`video_s3_key IS NULL`)は出題候補にならない。技術設計・運用ルールの正は `docs/production/logic-training-1.html` の 3・4 章(生産の詳細設計)。ツーリングは `content/video-build/logic-training-1/`(使い方は同ディレクトリの README.md。生成物は `work/` で gitignore)。
 
 1. **プロンプト書き出し**: `export_prompts.py`(実行は `cd services/image-batch && uv run python ../../content/video-build/logic-training-1/export_prompts.py`。以下の Python 実行も同じ uv 環境)
 2. **イラスト生成(imagegen)**: `work/prompts/<id>.txt` の全文をプロンプトにして imagegen で生成し、`work/illustrations_raw/<id>.png` へ保存する。生成の手段はエージェント別(差分節): Claude Code は委譲ワーカーの Codex に生成させる(`codex exec` の image_gen も可)、Codex 直接セッションは組み込みの imagegen で自分で生成する。どちらでも **生成した側が「情景で指定されていない文字・数字・記号の混入」を確認し、混入時は再生成する**(1 問通し確認でも初回混入 → 再生成が実際に発生した)。提示物問題(情景文に文字を明示した問題)は逆に**指定した文字が字形どおり正確に描かれているか**を確認する。プロンプト末尾に **3:2(1536x1024)の明示行**が入っている(16-5 追加)。imagegen は指定しないと 16:9 前後で出力が揺れ、3:2 以外は次の intake で左右が捨てられるため、**保存されたファイルのサイズが 1536x1024 か(`python3 -c "from PIL import Image; print(Image.open('<path>').size)"` 等)を生成した側が確認し、違えば再生成する**

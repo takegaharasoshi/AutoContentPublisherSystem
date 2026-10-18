@@ -5,7 +5,7 @@
 
 設計の正は設計書（[方式](../../../docs/app/generators/ranking-prebuilt.html) /
 [セット別](../../../docs/app/sets/pref-ranking-1.html) /
-[運用](../../../docs/app/operation.html) セクション 3）。ここには**設計書に書くほどではないが、
+[生産の詳細設計](../../../docs/production/pref-ranking-1.html)）。ここには**設計書に書くほどではないが、
 知らないと必ず手戻りする実務の勘所**だけを書く。
 
 ---
@@ -71,7 +71,7 @@
 
 ## 4. ナレーション（cue 台本）
 
-cue 体系・予算の正は [方式設計書セクション 8.3](../../../docs/app/generators/ranking-prebuilt.html)。
+cue 体系・予算の正は [生産の詳細設計 5 章](../../../docs/production/pref-ranking-1.html#tts-sync)。
 執筆時の勘所:
 
 - **`teaser`（煽り）は全ネタ必須**。20 秒版「みんなはどこだと思う？」/ 30 秒版「1位はどこだと思う？」で統一している。冒頭で一度予想させてから結果を見せる

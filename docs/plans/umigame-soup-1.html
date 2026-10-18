@@ -143,7 +143,7 @@
 <details class="plan-fold" data-field="implementation">
 <summary>4. 実装の細部・背景 <span class="plan-hint">— timeline.ts の不変条件・ナレーション・BGM・hook の表示</span></summary>
 <div class="plan-fold-inner">
-<p>今の作りは<a href="../app/generators/umigame-prebuilt.html#composition">方式設計書 8.2</a>（24 秒・720 フレーム・ループ前提）と <a href="../app/generators/umigame-prebuilt.html#tts-sync">8.3</a>（problem cue はフレーム 15 開始・予算 21 秒）。直すもの: <code>timeline.ts</code> の BEATS（先頭に導入・末尾の継ぎ目 0.4 秒を削る）とモジュール読み込み時の不変条件検査、周期アニメーションの「尺の約数」制約、ビルド後の継ぎ目検証、ナレーションのアンカー（導入の長さ + 0.5 秒）、BGM（今は 24 秒ちょうどのトラックを <code>prepare_bgm.py</code> で作っている。新しい尺で作り直す）。導入では <code>hook</code> を大きく出すため、今の字数上限（<code>validate.py</code> の HOOK_MAX）で 1〜2 行に収まる文字サイズを決める。導入にナレーション（hook の読み上げ）を付けるかは R-1-2 の判断事項とし、試作は BGM と SE だけでよい（付けるなら TTS の cue が 1 つ増える）。末尾の Jr. の締めの後はそのまま 2 周目の導入へ戻ってよい（ユーザー了承済み）。</p>
+<p>今の作りは<a href="../production/umigame-soup-1.html#composition">方式設計書 8.2（現: 生産の詳細設計 4 章）</a>（24 秒・720 フレーム・ループ前提）と <a href="../production/umigame-soup-1.html#tts-sync">8.3（現: 4.3）</a>（problem cue はフレーム 15 開始・予算 21 秒）。直すもの: <code>timeline.ts</code> の BEATS（先頭に導入・末尾の継ぎ目 0.4 秒を削る）とモジュール読み込み時の不変条件検査、周期アニメーションの「尺の約数」制約、ビルド後の継ぎ目検証、ナレーションのアンカー（導入の長さ + 0.5 秒）、BGM（今は 24 秒ちょうどのトラックを <code>prepare_bgm.py</code> で作っている。新しい尺で作り直す）。導入では <code>hook</code> を大きく出すため、今の字数上限（<code>validate.py</code> の HOOK_MAX）で 1〜2 行に収まる文字サイズを決める。導入にナレーション（hook の読み上げ）を付けるかは R-1-2 の判断事項とし、試作は BGM と SE だけでよい（付けるなら TTS の cue が 1 つ増える）。末尾の Jr. の締めの後はそのまま 2 周目の導入へ戻ってよい（ユーザー了承済み）。</p>
 </div>
 </details>
 <details class="plan-fold" data-field="record">

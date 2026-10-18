@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生産の詳細設計: umigame-soup-1 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">docs</a> / <a href="index.html">生産の詳細設計</a> / umigame-soup-1</nav>
+<h1>umigame-soup-1 の生産の詳細（問題ストックと事前ビルド）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-6a で新設。<a href="../app/generators/umigame-prebuilt.html">umigame-prebuilt</a> 8 節と<a href="../app/sets/umigame-soup-1.html">セット別設計書</a> 4 節の作り方・5 節を移した）</span>
+  <span>1 段上: <a href="../overview/functions/production-umigame-soup-1.html">機能別の基本設計 umigame-soup-1 の生産</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、<a href="../overview/functions/production-umigame-soup-1.html">機能別の基本設計 umigame-soup-1 の生産</a>の 1 段下で、問題ストック（<code>umigame_stock_items</code>）の作り方と、事前動画（探偵カメロックのウミガメのスープ・29 秒）のビルドから配置までの詳細を書く。作問の手順は <a href="../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a>、ゴールの切り方とコマンドは補充スキル <a href="../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish</a> が正。素材 18 項目の仕様（生産と配信の受け渡しの契約）は<a href="../app/sets/umigame-soup-1.html#stock-items">セット別設計書 4 節</a>が持つ。</p>
+<p class="lead">図 1 は、資材がどのファイル・ツールを通って S3 と DB に届くかを表す。ひし形は人の関所。DB への投入は動画のレビューの後、配置と一緒に行う。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    C["候補（1 案 3 行）&lt;br&gt;candidates/&lt;バッチ&gt;/"] --> H1{"選別"}
+    H1 -->|OK| S["素材 18 項目&lt;br&gt;&lt;バッチ&gt;/stock_items.py"]
+    S --> V["validate.py → review_sheet.py&lt;br&gt;（素材シート）"]
+    V --> H2{"素材のまとめレビュー"}
+    H2 -->|承認| PC["プローブ用コメントと正解ラベル&lt;br&gt;プローブページ"]
+    PC --> H3{"コメントのレビュー"}
+    H3 --> PR["probe_run.py&lt;br&gt;本番と同じ判定・返信の経路"]
+    PR --> H4{"結果の確認・GO"}
+    H4 -->|GO| B["背景（imagegen）→ build.py&lt;br&gt;Irodori-TTS → 予算検査 → Remotion"]
+    B --> H5{"動画の全数レビュー"}
+    H5 -->|承認| U["投入（ローカル MySQL・Aurora）&lt;br&gt;+ publish.py（S3・両環境）"]
+</pre>
+<figcaption>図 1 資材の流れ（ファイルとツール）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>問題</td><td>すべて完全オリジナル。型（物語復元 / 意味誤誘導）と仕掛けの構造だけを借りる</td></tr>
+    <tr><td>関所</td><td>選別・素材のまとめレビュー・コメントのレビュー・プローブ結果の確認と GO・動画の全数レビューの 5 つ</td></tr>
+    <tr><td>動画</td><td>1080x1920・30fps・29 秒（870 フレーム）・一本道。先頭 5 秒が導入シーン <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+    <tr><td>音</td><td>Irodori-TTS（声 G4 のクローン・ローカル GPU）のナレーションを固定アンカーに置き、予算 21 秒を超えたらビルドを止める</td></tr>
+    <tr><td>ビルドの読み元</td><td>DB ではなくバッチの <code>stock_items.py</code>。そのため動画のビルドは DB への投入より前にできる <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>ペース</td><td>週 4 問（日・火・木・土の投稿 1 回 1 問）。レビューは週 1 回 × 4 問</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="materials">1. 資材の置き場</h2>
+<p class="lead">この章は、機能別の基本設計の「素材の置き場」を詳しくしたもの。表 1 は、どの資材がどこにあるかを表す。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 1 資材の置き場</caption>
+  <thead><tr><th>置き場</th><th>中身</th></tr></thead>
+  <tbody>
+    <tr><td><code>content/umigame-stock/umigame-soup-1/candidates/&lt;バッチ名&gt;/</code></td><td>候補（1 候補 1 ファイル。<code>s01.md …</code> = 物語復元型、<code>m01.md …</code> = 意味誤誘導型）・集計 <code>tally.py</code>・生成物 <code>INDEX.md</code>。状態の名前は logic-training-1 と同じ。第 2 バッチの最初に logic-training-1 の <code>candidates/</code> を雛形に作る</td></tr>
+    <tr><td><code>content/umigame-stock/umigame-soup-1/&lt;バッチ名&gt;/</code></td><td>1 バッチで完結する一式: 単一ソース <code>stock_items.py</code>（素材 18 項目。判定・出力ガード用の #15〜#18 は <code>JUDGE_POINTS</code>）・<code>validate.py</code>・素材シートの <code>review_sheet.py</code>（<code>work/review.html</code>。gitignore）・投入 SQL の <code>generate.py</code>・リサーチの台帳 <code>research.md</code>・<code>STATUS.md</code>。バッチ名は <code>batch-01</code> から連番。<code>content_key</code> の 3 桁連番は全バッチ通しで重ねない（第 1 バッチの欠番 002 は使わない）</td></tr>
+    <tr><td><code>content/umigame-stock/umigame-soup-1/common/</code>・<code>tools/</code>・<code>judge-trial/</code></td><td>セットの既定文と組み立て（<code>umigame_common.py</code>）・機械プローブとローカル試行のツール・評価データ（<code>judge-trial/data/eval_problems.json</code>）。使い方は <a href="../../content/umigame-stock/umigame-soup-1/README.md">README</a></td></tr>
+    <tr><td><code>content/video-build/umigame-soup-1/</code></td><td>ビルドツール（<code>export_prompts.py</code>・<code>intake.py</code>・<code>background_sheet.py</code>・<code>prepare_bgm.py</code>・<code>build.py</code>・<code>review_sheet.py</code>・<code>publish.py</code>）・Remotion（<code>remotion/</code>）・セット固定の資産（<code>assets/design.json</code>・参照音声 <code>assets/voice/kamerock-g4/</code>）。生成物は <code>work/</code> で gitignore。コマンドは <a href="../../content/video-build/umigame-soup-1/README.md">README</a></td></tr>
+    <tr><td><code>docs/app/sets/umigame-soup-1-probe-&lt;バッチ名&gt;.html</code></td><td>機械プローブの結果のページ（サマリー + 末尾にコメントレビューの節）と問題別のページ</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="stock">2. 問題ストックの作り方</h2>
+<p class="lead">この章は、図 1 の上半分（候補からプローブの GO まで）を詳しくしたもの。作問の工程（ランダム語のモチーフ → 連想 → コア宣言 → 不思議にする → 動線・現実性・既存問題との照合の自己検査 → 素材化）は <a href="../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a> が正。</p>
+
+<h3 id="originality">2.1 オリジナル性の基準</h3>
+<ul>
+  <li>既存の問題の問題文・真相を転載しない。語句・登場人物・舞台の置き換えだけの改変もしない <a class="decision-ref" href="#d-05">→ 理由 D-05</a></li>
+  <li>借りてよいのは型（物語復元 / 意味誤誘導）と仕掛けの構造まで。モチーフ・真相・問題文は新しく作る。台帳で本家級（classic）の題材は構造ごと避ける。PoC の古典題材だけは例外で、ストックには入れない</li>
+  <li>作問法の正は <a href="https://note.com/suekai0217/n/n35128e606a9b">note 記事の 4 ステップ + 良い問題の 3 条件</a></li>
+  <li><code>source_note</code> に「完全オリジナル」の宣言・型・モチーフ → 連想 → 逆にした常識を書く（<code>validate.py</code> が宣言を検査する）</li>
+</ul>
+
+<h3 id="candidates">2.2 候補と選別</h3>
+<ul>
+  <li>型別の目標（週 4 問なら物語復元 2 / 意味誤誘導 2）の 2 倍の候補を書く。前のバッチの余った OK を先に数える</li>
+  <li>候補は 1 案 3 行（コア宣言 1 文・問題文の案・何を言われたら「正解です！」か）。既存の全バッチの問題・台帳との照合（Web での類題の照合を含む）は候補の段階で済ませる。素材の項目は書かない</li>
+  <li>選別は OK / NG / 保留だけで、理由は任意。不足 = 目標 − OK、追加 = 不足 × 2 で、両方の型とも不足が 0 になるまで素材に進まない。NG・保留は消さない</li>
+</ul>
+
+<h3 id="materials-write">2.3 素材の仕上げと素材のまとめレビュー</h3>
+<ul>
+  <li>OK のうち目標数だけを 1 問ずつ素材にする（作問スキルの工程 4〜9）。余った OK は次回へ持ち越す。管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）は <code>validate.py</code> が様式を検査し、素材シートは問題文の直前に出す（レビューはコア宣言から見る）</li>
+  <li>機械検証は <code>validate.py</code>（字数・必須項目・<code>#AIart</code>・画風の固定行・プレイ例の「はい」1 つ・オリジナル宣言など）。素材シートは <code>review_sheet.py</code>（API キー不要）</li>
+  <li>素材のまとめレビューでは、人が素材シートで矛盾・ネタバレを一括で見る。素材で NG になった問題は候補へ差し戻す（<code>final_ng</code>）</li>
+</ul>
+
+<h3 id="probe">2.4 本番経路のプローブ</h3>
+<ul>
+  <li>作問時に、本番と同じ判定・返信文の経路で答えを確かめる: 問題ごとにプローブ用のコメントと正解ラベル（期待する判定の種類）を作り、コメントのレビュー（正解ラベルも人が確かめ、追加・削除・ラベルの修正を指示する）の後で評価データ <code>judge-trial/data/eval_problems.json</code> に足して、<code>tools/probe_run.py --problems &lt;no&gt;</code> を回す <a class="decision-ref" href="#d-06">→ 理由 D-06</a></li>
+  <li>結果は <code>build_probe_page.py</code> がバッチのプローブページにする。不一致は「確定事実シートの穴 / 正解ラベルの誤り / 判定の揺れ」に分けて出す。必要なら人が <code>local_trial.py</code> で自由にコメントを試す（人間プローブ）。GO が出た問題だけを動画のビルドへ進める</li>
+  <li>評価データ・機械プローブ・評価ページの仕組みは<a href="../app/sets/umigame-soup-1.html#evaluation">セット別設計書 10.6</a></li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>素材 18 項目の仕様と字数 → <a href="../app/sets/umigame-soup-1.html#stock-items">セット別設計書 4 節</a></li>
+  <li>作問の工程・型別の様式 → <a href="../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer の SKILL.md</a></li>
+  <li>ゴールの切り方・在庫確認のクエリ・投入のコマンド → <a href="../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish の SKILL.md</a></li>
+</ul></div>
+
+<h2 id="build">3. 事前ビルドパイプライン</h2>
+<p class="lead">この章は、図 1 の下半分（GO が出た問題を動画にして配置するまで）を詳しくしたもの。表 2 は工程の入力・出力とツールを表す。ツールは quiz / ranking のツール（<code>export_prompts.py</code> / <code>intake.py</code> / <code>build.py</code> / <code>review_sheet.py</code> / <code>publish.py</code>）を流用し、21-2 の PoC の資材を本組みしたもの（21-5a）。</p>
+
+<h3 id="build-steps">3.1 工程</h3>
+<div class="table-wrap">
+<table>
+  <caption>表 2 事前ビルドの工程</caption>
+  <thead><tr><th>#</th><th>工程</th><th>入力 → 出力</th><th>ツール</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>背景イラスト</td><td><code>illustration_prompt</code> → imagegen → <code>{content_key}_bg.png</code> → 1080x1920 へ正規化（3.2）</td><td><code>export_prompts.py</code> → <code>scripts/gen_backgrounds.sh</code>（<code>codex exec</code> の <code>image_gen.imagegen</code>）→ <code>intake.py</code> → <code>background_sheet.py</code></td></tr>
+    <tr><td>2</td><td>BGM の割り当て</td><td>前処理済みのトラックの台帳 <code>work/bgm/tracks.json</code> から、<code>work/manifest.json</code> 上で使用回数が最も少ない曲（同数は番号順）。再ビルドでは割り当てを保つ</td><td><code>build.py</code></td></tr>
+    <tr><td>3</td><td>ナレーション</td><td><code>narration.problem</code> / <code>.rule</code> → Irodori-TTS で 1 回に合成 → 2 cue に切り分け → 実測の長さで予算検査（4.3）</td><td><code>scripts/narration_irodori.py</code>（Gemini 版 <code>narration_gemini.py</code>・Polly 版 <code>narration_polly.py</code> は <code>--tts gemini</code> / <code>--tts polly</code> で選べる）</td></tr>
+    <tr><td>4</td><td>レンダリングと検査</td><td>props（素材 + 画像 + 音声 + 実測の長さ）→ Remotion → MP4 → ラウドネス正規化（-14 LUFS / -2 dBTP）→ ffprobe 検査（1080x1920・30fps・29.0±0.2 秒・30 秒未満・AAC）→ 静止フレーム。結果は <code>work/manifest.json</code></td><td><code>build.py</code>（Docker に委譲）</td></tr>
+    <tr><td>R</td><td>全数レビュー</td><td><code>work/review.html</code>（動画 + 静止フレーム + キャプション）→ 承認した <code>content_key</code> を <code>work/approved.txt</code> へ</td><td><code>review_sheet.py</code> + 人</td></tr>
+    <tr><td>5</td><td>投入と配置</td><td>投入: <code>insert_umigame_stock.sql</code> をローカル MySQL（<code>--default-character-set=utf8mb4</code>）と Aurora（<code>apply_aurora.py</code>）へ流し、両環境の内容の MD5 の一致を確かめる。配置: <code>publish.py</code> が S3 <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> + <code>_bg.png</code> を上げ、<code>update_prebuilt.sql</code>（<code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>）を両環境へ</td><td><code>generate.py</code>・<code>publish.py</code></td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li><strong>読み元</strong>: ビルドツールは DB ではなくバッチの <code>stock_items.py</code> を読む（<code>--batch &lt;バッチ名&gt;</code> で対象を絞る）。<code>content_key</code> は両環境と一致する <a class="decision-ref" href="#d-01">→ 理由 D-01</a></li>
+  <li><strong>BGM の ID</strong>: <code>video_audio_asset_id</code> は <code>publish.py</code> の <code>update_prebuilt.sql</code> が BGM の S3 キーで <code>audio_assets</code> を結合して決める（環境ごとに ID が違っても同じ SQL で済む）。フェードは <code>prepare_bgm.py</code> が素材に焼き込み、コンポジションはダッキングだけを掛ける</li>
+  <li><strong>暫定 BGM の仕組み</strong>: 台帳に <code>provisional</code> として暫定の曲を登録でき、<code>publish.py</code> は暫定 BGM の動画を検査エラーにする（正式なトラックの調達 → <code>prepare_bgm.py</code> → 再ビルドが配置の前提）。第 1 バッチは umigame 用の曲が未調達だったため、PoC の <code>bgm_24s.m4a</code>（logic-training-1 の night track01 の 20 秒版を 24 秒にループ。20 秒地点に継ぎ目あり）で一度ビルドし、2026-09-24 に正式なトラックへ差し替えて作り直した。仕組みは次の曲を足す前の検証用に残してある</li>
+  <li><strong>再現性</strong>: 背景の PNG・TTS の音声は <code>work/</code> に残り、版面だけの改訂は工程 4 からやり直せる。背景の原画は S3 の <code>_bg.png</code> にも置く（再ビルド用。DB には記録しない）</li>
+  <li>キャラ画像・フォント・SE はセット固定の資産（<a href="../app/sets/umigame-soup-1.html#assets">セット別設計書 9 節</a>）で、工程には入らない</li>
+</ul>
+
+<h3 id="illustration">3.2 背景イラスト</h3>
+<p>1 問 1 枚の背景を、ストックの <code>illustration_prompt</code> から Codex CLI の <code>image_gen.imagegen</code>（<code>codex exec</code>）で作る（生成方式 <code>umigame-prebuilt</code> は実行時に LLM・画像生成 API を呼ばない）。プロンプトは「画風の固定行 + 情景 + 禁止事項」の 3 部で、画風の固定行は全問共通の定数（<code>validate.py</code> が存在を検査する）。</p>
+<ul>
+  <li><strong>画風（C4）</strong>: 90 年代 OVA の手描きセル塗り（太い主線・エアブラシのハイライト・リムライト）。背景は中間調（月明かりと蝋燭で情景が見える明るさ）で、版面のオーバーレイは薄くする <a class="decision-ref" href="#d-07">→ 理由 D-07</a></li>
+  <li><strong>禁止事項</strong>: 文字・ロゴを入れない。真相の手がかりを描かない（問題文にある情景だけ。人物は問題文に出る人物 + 遠景のシルエット 1 人まで）</li>
+  <li><strong>人物の大きさと位置</strong>: 遠景の小さな全身像で、下半分の中央（横幅の中央 20%・縦 55〜85%）にだけ置く。上半分は人物なしで静か（空・壁・天井・窓）、下半分の左右 40% は景物だけ。クローズアップ・半身は描かない（感情は姿勢で出す）。理由は<a href="../app/sets/umigame-soup-1.html#d-20260926-figure">セット別設計書の付録</a></li>
+  <li>9:16 を指定して生成し（出力は 1024x1536）、<code>intake.py</code>（<code>prepare_assets.py</code>）が 1080x1920 へ正規化する</li>
+  <li>背景のレビューは <code>background_sheet.py</code>（背景を投稿順に並べた <code>work/backgrounds.html</code>）と <code>background_sheet.py --stills</code>（今の文言と背景で動画の各コマを書き出す）で、版面と重ねて見る。Claude が先に全数を見る（文字の混入・構図）</li>
+  <li>キャラクター 2 体はストックごとには作らない</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>コマンド・環境変数・TTS の環境 → <a href="../../content/video-build/umigame-soup-1/README.md">content/video-build/umigame-soup-1/README.md</a></li>
+  <li>投稿時の動画の選び方・取得 → <a href="../app/generators/umigame-prebuilt.html#stock">方式設計書 umigame-prebuilt 4・5 節</a></li>
+  <li>依存ライブラリの版 → <a href="../app/generators/umigame-prebuilt.html">方式設計書 umigame-prebuilt 9 節</a></li>
+</ul></div>
+
+<h2 id="composition">4. 動画の作り（29 秒・一本道）</h2>
+<p class="lead">この章は、3.1 の工程 4 で描く動画の中身を書く。1080x1920・30fps・870 フレーム。先頭 5 秒が導入シーンで、本編は logic-training-1 の骨格（常に出る上部 + 時間で切り替わる下部）に寄せ、イラストは背景に敷く。数値の正は <code>content/video-build/umigame-soup-1/remotion/src/timeline.ts</code>（<code>common.py</code> との同期をテストで検査）、版面の正は <code>UmigameReel.tsx</code>。</p>
+
+<h3 id="zones">4.1 版面のゾーン</h3>
+<div class="table-wrap">
+<table>
+  <caption>表 3 版面のゾーン</caption>
+  <thead><tr><th>ゾーン</th><th>要素</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>背景（全面）</td><td>問題の情景イラスト 1 枚 + 薄いオーバーレイ。ゆっくりしたズームの呼吸（尺全体で 1 往復）</td><td>中間調で生成し、暗くしすぎない</td></tr>
+    <tr><td>導入シーン（0〜5 秒）</td><td>背景の上半分を沈め、傾けた朱色の「新体験」スタンプ（ばねで跳ねながらフェードイン）→ 黄色の 2 行の見出し「コメントで紐解く！ / 推理ゲーム」（104px・光沢スイープ）→ 説明「謎の真相を、コメントの / 質問だけで解き明かせ！」（48px・「真相」は朱色で小さく跳ねる・「質問」は黄色のタグで光沢）→ 「今日の謎」ラベル付きの暗いカードに <code>hook</code>（1 行・最大 60px・字数で縮める）→ キャラの自己紹介の吹き出し（カメロックが上・Jr. が下。後からポップイン + SE + キャラの跳ね）</td><td>文言は全問共通で <code>assets/design.json</code> の <code>opening</code>（素材の項目は増やさない）。終わりの 8 フレームで本編へクロスフェード</td></tr>
+    <tr><td>上部（本編・常時）</td><td>つかみ帯（<code>hook</code>・最大 74px・1 行。光沢スイープ + 呼吸）→ 見出し「問題」（アクセントバーの伸縮）+ 問題カード（<code>problem_text</code> 全文・44px）→ ルール帯（<code>rule_text</code>・34px・2 行）</td><td>幅 900・左右の余白 90 で中央寄せ（第 3 稿）。導入シーンの後から末尾まで変わらない。つかみ帯の文字は <code>min(74, floor(828 / 字数) - 1)</code> px に縮め、折り返さない（74px の 1 行に収まるのは 11 字まで・内寸 828px）</td></tr>
+    <tr><td>下部（時間で切り替え）</td><td>出題者カメロック（左下に常駐。浮遊 + 呼吸。「はい」の返答のときだけ喜びのポーズ）+ 名札 / 質問者 Jr.（右寄り。浮遊）/ 吹き出し（スナップで切り替え + ポップイン + 小さな跳ね 30px + SE）</td><td>右 12% は Instagram の UI に空ける。吹き出し 42px・1 行の上限は出題者 17 字 / Jr. 16 字。キャラは導入シーンから常駐</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="beats">4.2 ビートと不変条件</h3>
+<p>表 4 は <code>timeline.ts</code> の <code>BEATS</code> を表す。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 4 ビート</caption>
+  <thead><tr><th>区間</th><th>フレーム</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>導入シーン</td><td>0〜150（5 秒）</td><td>見出しの読み上げ 6〜（約 3.6 秒）/ カメロックの自己紹介 52 / Jr. の自己紹介 78 / 150〜158 で本編へクロスフェード</td></tr>
+    <tr><td>出題</td><td>150〜240（3 秒）</td><td>出題者「質問してみて！」（ポップイン + SE + 跳ね）</td></tr>
+    <tr><td>3 往復</td><td>240〜600（4 秒 × 3）</td><td>各往復: Jr. の質問 60f → 質問を残したまま出題者の返答を足す 60f。返答が「はい」の往復で出題者が喜びのポーズになる</td></tr>
+    <tr><td>出題者の締め</td><td>600〜720（4 秒）</td><td>「何度でも答えるよ。コメントで質問！」（グローの脈動）</td></tr>
+    <tr><td>Jr. の締め</td><td>720〜870（5 秒）</td><td>「面白かったら、いいね、フォローよろしくね！」（吹き出しだけ・ナレーションなし）。そのまま 2 周目の導入へ戻ってよい（ユーザー了承済み）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>不変条件（モジュールの読み込み時に検査し、<code>tests/test_timeline_sync.py</code> が <code>timeline.ts</code> を実際に評価して確かめる）:</p>
+<ul>
+  <li>ビートは順序どおり・隙間なし・末尾が 870。尺は 30 秒未満</li>
+  <li>ナレーションの予算（21 秒）を使い切っても尺の内側で終わる。導入の読み上げは問題文の読み上げ（165）の 6 フレーム前までに終わる（<code>build.py</code> が検査する）</li>
+  <li>吹き出しの切り替えはスナップ（クロスフェードしない）。切り替えのフレームで SE を 1 回鳴らし、小さな跳ね（30px・減衰 0.8 秒）を付ける。跳ねは導入シーンの自己紹介の吹き出しでも起きる（<code>HOP_FRAMES</code>）</li>
+  <li>周期のある動きの周期は 24 秒版の値のまま（光沢 120 / 呼吸 144 など）。一本道なので「尺の約数」の制約はない</li>
+  <li>実装は <code>Interactive.Div</code> + inline style + inline <code>interpolate()</code> の構造を保つ（Remotion Studio で要素を選んで調整できる）。周期のある動き（sin のゆれ）は <code>interpolate()</code> で書けないので <code>translate</code> の文字列で書く <a class="decision-ref" href="#d-03">→ 理由 D-03</a></li>
+</ul>
+
+<h3 id="tts-sync">4.3 ナレーションと TTS の同期</h3>
+<p>表 5 は cue ごとの開始位置と予算を表す。cue は吹き出しとは同期しないので、cue の長短で版面は変わらない。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 5 cue と予算</caption>
+  <thead><tr><th>cue</th><th>開始</th><th>内容</th><th>予算</th></tr></thead>
+  <tbody>
+    <tr><td><code>opening</code>（全問共通）</td><td>フレーム 6（0.2 秒）</td><td>導入シーンの読み上げ「しんたいけん！！ コメントでひもとく！ すいりゲーム！」（<code>design.json</code> の <code>opening.narration</code>。読み間違いを避けて仮名書き）</td><td>上限 4.2 秒・問題文の 6 フレーム前までに終わる（実測 3.6 秒 = 6〜114）</td></tr>
+    <tr><td><code>problem</code></td><td>フレーム 165（導入シーンの後 0.5 秒）</td><td><code>narration.problem</code>（表示文と別の読み上げ用の文）</td><td rowspan="2"><code>problem</code> の実測 + 1.2 秒 + <code>rule</code> の実測 ≦ 21.0 秒（開始 5.5 秒 + 21 秒 = 26.5 秒 &lt; 29 秒）</td></tr>
+    <tr><td><code>rule</code></td><td><code>problem</code> の終わり + 36 フレーム（1.2 秒）</td><td><code>narration.rule</code></td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li>2 cue は 1 回の合成で読ませる（Irodori-TTS の <code>infer.py</code>・参照音声 6 本で声 G4 をクローン・cuda / BF16・<code>--seconds</code> で全体の長さを指定）。文字数の比に最も近い 0.3 秒以上の無音で 2 つに切り分け、前後の無音を 0.05 秒残して削る <a class="decision-ref" href="#d-04">→ 理由 D-04</a>。実測の長さを props に渡してアンカーへ置く</li>
+  <li><strong>長さの制御と取り直し</strong>: 話速の調整（atempo）はせず、<code>--seconds 20.0</code> で合成する。2 cue + 間の合計が 21 秒を超えたら、seed を 1 つ進めて <code>--seconds</code> を 0.5 秒縮めて取り直す（1 回のビルドで最大 3 テイク = 20.0 / 19.5 / 19.0 秒）。聞いて気になった問は <code>build.py --retake-tts --content-key &lt;key&gt;</code> で seed を進めて取り直す（1 問 3 回まで）</li>
+  <li><code>work/narration/&lt;key&gt;/narration.json</code> にモデル・参照音声（名前と sha256）・精度・seed・長さ・切断位置・試したテイク・通算の合成回数（<code>attempt</code>）を残し、文・モデル・参照音声・精度・長さの設定が一致して予算内ならキャッシュを使う</li>
+  <li><strong>導入の読み上げは全問共通の 1 文</strong>: <code>narration_irodori.synthesize_line</code> で 1 回だけ合成して <code>work/narration/_opening/</code> にキャッシュし、全問で使い回す（<code>--no-tts</code> ではそれを読む）。文・長さの設定が変わったら取り直す</li>
+  <li><strong>予算の超過はビルドエラー</strong>（3 テイクとも超えたら問題文か cue の句読点を削る）。<code>infer.py</code> の失敗（GPU・環境）はその場でビルドを止める</li>
+  <li><strong>BGM と音</strong>: BGM は <code>@remotion/media</code> の <code>&lt;Audio&gt;</code> で尺ちょうど（29 秒。<code>prepare_bgm.py</code> が <code>common.DURATION_SECONDS</code> で切り出してフェードを焼き込む）のトラックを敷く。導入と本編のナレーションの区間は BGM を -6dB 程度ダッキングし、SE は切り替えのフレームに置く。最終の MP4 を -14 LUFS / -2 dBTP へ正規化する</li>
+  <li><strong>TTS のアダプタ</strong>: Irodori が既定（ビルド時にローカル GPU で動かし、API キー・AWS の Secret は要らない）。Gemini 版（日次の上限のため本番では使わない）・Polly 版は <code>build.py --tts</code> で選べる形で残してある。VOICEVOX 版（<code>scripts/narration.py</code>）は PoC 用の CLI として残してあり、<code>build.py</code> からは選べない。声と設定の正はセットの資産 <code>assets/design.json</code> と参照音声 <code>assets/voice/kamerock-g4/</code>（<a href="../app/sets/umigame-soup-1.html#tts">セット別設計書 8 節</a>）</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>導入シーンの決め方（静止画の比較と動画の確認の経緯）→ <a href="../plans/umigame-soup-1.html#step-R-1-1">セット計画書 R-1-1・R-1-2</a></li>
+  <li>TTS の比較と決定の経緯 → <code>content/video-build/umigame-soup-1/poc/irodori-tts/README.md</code></li>
+</ul></div>
+
+<h2 id="rebuild">5. 再ビルドが必要になる変更</h2>
+<p class="lead">事前動画には版面・素材の表示部分・音が焼き込まれている。次を変えたら対象のストックを作り直し、<code>publish.py</code> で差し替えて <code>video_built_at</code> を更新する。</p>
+<ul>
+  <li>素材の表示部分（<code>problem_text</code> / <code>hook</code> / <code>rule_text</code> / <code>play_example</code> / <code>character_lines</code> / <code>narration</code> / 背景）。<code>truth</code> / <code>fact_sheet</code> / <code>expected_questions</code> / <code>caption</code> / <code>source_note</code> の修正は作り直さなくてよい（版面に出ない）。ただし <code>caption</code> は投稿時点で <code>umigame_items</code> に写されるので、直すと以後の投稿から効く</li>
+  <li>版面（<code>timeline.ts</code> / <code>UmigameReel.tsx</code>）・キャラ画像・フォント・SE・尺</li>
+  <li>TTS のモデル・参照音声・精度・長さ（<code>design.json</code> の <code>narration</code> 節と <code>assets/voice/kamerock-g4/</code>）・cue の間隔。拡散モデルなので seed・精度が変わると別のテイクになり尺と読みが揺れる。合成し直した問は全数を聞き直す</li>
+  <li>Remotion / <code>@remotion/media</code> の版（見た目が変わりうる）</li>
+</ul>
+<p>全数の作り直しは 1 件 2〜3 分（TTS 約 45 秒 × テイク数 + レンダリング）で、在庫 14〜30 件なら背景を作り直さない限り 1 時間以内。</p>
+
+<h2 id="inventory">6. 在庫と補充</h2>
+<p class="lead">この章は、補充の要否の判断を書く。補充の目安と直近の在庫は<a href="../plans/umigame-soup-1.html">セット計画書</a>が持つ。</p>
+<ul>
+  <li><strong>補充とレビューのペース</strong>: 週 4 問（日・火・木・土の投稿 1 回 1 問）。レビューは週 1 回 × 4 問（21-6i で週 7 問・週 2 回 × 4 問から変えた）</li>
+  <li><strong>在庫の数え方</strong>: Aurora の値が正。未使用かつビルド済み（<code>unused_built</code>）が 8 問を下回る、または下回る見込みなら、その週の 4 問を補充する。<code>unbuilt</code> が 0 以外なら投入済みのビルド漏れ。クエリは補充スキルの「起動時」</li>
+  <li>投稿時の選び方はビルド済みに限った LRU の順繰り（軸なし。<a href="../app/generators/umigame-prebuilt.html#stock">方式設計書 4 節</a>）</li>
+  <li>稼働の初期（2026-10-12 から 2 週間）は、ユーザーがコメント欄を毎日目で見る。問題があればストックを <code>is_active=0</code> にする</li>
+</ul>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 ビルドの読み元は DB ではなくバッチの stock_items.py にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>ビルドツールはバッチの単一ソースを読み、BGM はローカルの台帳で割り当て、<code>video_audio_asset_id</code> は配置の SQL で S3 キーから決める</dd>
+  <dt>理由</dt><dd>ホストの Python 3.8 に pymysql・boto3 がなく、ローカル MySQL・Aurora とも同じ単一ソースから投入しているので、単一ソースを読めば足りる。BGM の ID を S3 キーで決めれば、環境ごとに ID が違っても同じ SQL で済む</dd>
+  <dt>日付・出典</dt><dd>2026-09-23（21-5a のツールの本組み）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 導入シーンを足し、ループをやめて一本道の 29 秒にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>先頭に 5 秒の導入シーンを足し、継ぎ目の作り（末尾 = フレーム 0・周期を尺の約数にする・継ぎ目のビート・ビルド後の継ぎ目の差分検査）をやめた。ビルドの検査は 24.0±0.2 秒 + 継ぎ目の差分から、29.0±0.2 秒・30 秒未満に替えた</dd>
+  <dt>理由</dt><dd>スキップ率（2026-10-12・10-13 の投稿で 83.9%・83.5%）を下げるため。Instagram の評価の中心は再生回数ではなく視聴時間と反応で、ループで再生回数を稼ぐ必要はない。導入の長さは 2.5 秒で試して「切り替わりが早い」で 5.0 秒に延ばし、29 秒に収めるため Jr. の締めを 5.5 → 5.0 秒に縮めた。版面と文言は R-1-2 でユーザーが静止画の比較（5 巡）と動画の確認（第 2〜8 稿）で決め、第 1 バッチ 14 問の <code>hook</code> も全件見直した（「〜の謎」「謎の〜」の形）。吹き出しのスナップは、クロスフェードが二重露光に見えた R-1 の実測による</dd>
+  <dt>日付・出典</dt><dd>2026-10-17（セット改修 R-1）。<a href="../ideas/umigame-opening-hook.md">アイデア umigame-opening-hook</a>・<a href="../plans/umigame-soup-1.html#step-R-1-1">セット計画書 R-1-1・R-1-2</a></dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 版面の基準は第 3 稿、実装は Interactive.Div の構造を保つ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>第 3 稿の版面を基準にし、本組みでも <code>Interactive.Div</code> + inline style + inline <code>interpolate()</code> の構造を崩さない。ルール帯の 34px は許容する</dd>
+  <dt>理由</dt><dd>第 1 稿（20 秒・VOICEVOX・カートゥーン画風・質問者クマノミ）→ 第 2 稿（画風 C4・探偵カメロック + Jr.・24 秒・Polly・質問と返答の並列表示・効果 8 種）→ 第 3 稿（Jr. の視線を父へ・つかみ帯と問題カードを中央寄せ）で承認された。この構造は Studio で要素を選んで調整できる（Remotion Skills の指針）。ルール帯は <code>video-layout.md</code> の下限（重要なテキスト 44px）を下回るが、常に出る固定の要素で 2 行に収める必要があり、人間ゲートで許容した</dd>
+  <dt>日付・出典</dt><dd>2026-09-04（21-2 人間ゲート 2 巡）</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 問題文とルール文を 1 回の合成で読ませる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>2 cue を 1 回で合成して無音で切り分け、長さは話速ではなく <code>--seconds</code> で決める</dd>
+  <dt>理由</dt><dd>別々に作るとルール文で口調が変わった（21-5c の PoC）。<code>--seconds 20.0</code> の指定で、自然な長さ 23〜25 秒の問が 19.0〜20.8 秒に収まった</dd>
+  <dt>日付・出典</dt><dd>2026-09-27（21-5c で Irodori-TTS を既定に）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 問題は完全オリジナルにする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>型と仕掛けの構造だけを借り、モチーフ・真相・問題文は新しく作る</dd>
+  <dt>理由</dt><dd>セットの方針として、問題はすべて完全オリジナルにすると決めた（<a href="../app/sets/umigame-soup-1.html#stock-items">セット別設計書 4 節</a>の要点）。この基準はその方針を作問の線引きにしたもの</dd>
+  <dt>日付・出典</dt><dd>21-4a</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 作問時に本番の経路で答えを確かめる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>評価データにケースを足して <code>probe_run.py</code> で本番と同じ判定・返信の経路に通し、素材のレビューは動画のイメージと実際の答えを並べて見る</dd>
+  <dt>理由</dt><dd>素材の穴（確定事実シートの抜け）は、本番の判定に通して初めて見つかる。旧プローブテスト（<code>master_prompt.txt</code> の出題者に想定質問を答えさせる）は本番の経路ではなかったため 21-6d3 で退役した</dd>
+  <dt>日付・出典</dt><dd>21-2（進め方）・21-6d3（<a href="../app/sets/umigame-soup-1.html#d-20261003-probe-retire">セット別設計書 付録</a>）</dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 背景は中間調で生成する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>背景は情景が見える中間調で作り、版面のオーバーレイは薄くする</dd>
+  <dt>理由</dt><dd>第 1 稿の暗めの単色トーンは暗すぎた</dd>
+  <dt>日付・出典</dt><dd>21-2</dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
+</body>
+</html>

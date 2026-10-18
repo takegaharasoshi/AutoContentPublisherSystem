@@ -3,7 +3,7 @@
 表彰台五郎の都道府県ランキング（`set_code = pref-ranking-1`）の動画ビルドで使う外部資材について、
 確認日・参照 URL・許諾範囲を記録する。設計上の位置づけは
 [docs/app/sets/pref-ranking-1.html](../../../docs/app/sets/pref-ranking-1.html) セクション 7 と
-[docs/app/operation.html](../../../docs/app/operation.html) セクション 3（証跡ルール）。
+[docs/production/pref-ranking-1.html](../../../docs/production/pref-ranking-1.html) 1 章（証跡の置き場）。
 
 BGM・SE のライセンス証跡はこのファイルではなく `audio_assets` のカラムに記録する（証跡一元管理の原則。
 operation.html セクション 3「音源の調達・前処理・登録」）。本ファイルは **DB レコードにならない資材**
@@ -73,7 +73,7 @@ operation.html セクション 3「音源の調達・前処理・登録」）。
 版面に載せない離島（伊豆諸島・小笠原諸島・硫黄島・南鳥島・大東諸島）と、面積が約 12km² 未満の島は落としている
 （17-4a で Fix した版面の再現。地図ボックスの外に大きく外れる / 点にしかならないため）。素材要件
 （県単位パス分割・鹿児島離島の飛び地サブパス・南西諸島インセットの再現）は
-[docs/app/generators/ranking-prebuilt.html](../../../docs/app/generators/ranking-prebuilt.html) セクション 8.2 の warn が正。
+[docs/production/pref-ranking-1.html](../../../docs/production/pref-ranking-1.html) の 4.4 が正。
 
 ## 5. フォント（17-4b で確定）
 

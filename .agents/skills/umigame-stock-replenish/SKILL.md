@@ -8,7 +8,7 @@ description: umigame-soup-1（探偵カメロックのウミガメのスープ�
 
 umigame-soup-1 の問題ストック（`umigame_stock_items`）を補充するための運用スキル（21-8a〔2026-10-12〕で新設、同日の認識合わせで流れを全面改訂）。作り方は logic-training-1 の補充（`quiz-stock-replenish`）に倣い、**候補を目標の 2 倍まとめて出して人が一括で選ぶ**。作問の中身（コア宣言の型別の様式・工程 4〜9 の検査）は `/umigame-problem-writer` が正で、本スキルはゴールの切り方・資材の置き場・レビュー用ページ・投入と配置を持つ。
 
-正の所在: 素材 18 項目（#18 核心語 `core_words` を含む）の仕様・補充とレビューのペース = `docs/app/sets/umigame-soup-1.html` セクション 4、作問の手順 = `.claude/skills/umigame-problem-writer/SKILL.md`（候補段階はセクション 1.5、型別の分冊 story.md / misdirection.md）、素材ツール = `content/umigame-stock/umigame-soup-1/README.md`、動画ビルド = `content/video-build/umigame-soup-1/README.md`、計画と記録 = `docs/plans/umigame-soup-1.html` / `umigame-soup-1-log.html`。矛盾したら設計書・ツール > 本スキル。
+正の所在: 素材 18 項目（#18 核心語 `core_words` を含む）の仕様 = `docs/app/sets/umigame-soup-1.html` セクション 4、補充とレビューのペース・作り方の規定・事前ビルド = `docs/production/umigame-soup-1.html`(生産の詳細設計)、作問の手順 = `.claude/skills/umigame-problem-writer/SKILL.md`（候補段階はセクション 1.5、型別の分冊 story.md / misdirection.md）、素材ツール = `content/umigame-stock/umigame-soup-1/README.md`、動画ビルド = `content/video-build/umigame-soup-1/README.md`、計画と記録 = `docs/plans/umigame-soup-1.html` / `umigame-soup-1-log.html`。矛盾したら設計書・ツール > 本スキル。
 
 **前提**: 投稿は夜 20:00 JST の**週 4 回（日・火・木・土）**で消費は**週 4 問**。**型は両型同数**（4 問なら story 2 / misdirection 2）。**在庫水位の目安は未使用ビルド済み 8 問（2 週間分）以上**。
 

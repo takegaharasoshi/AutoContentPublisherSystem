@@ -15,7 +15,7 @@ AutoContentPublisherSystem/
 │   ├── _templates/design-page.html  #   設計書ページの雛形（書式の見本。Phase 30-1）
 │   ├── strategy/                    #   事業戦略書（収益化戦略・予算・KPI・展開方針）
 │   ├── overview/                    #   基本設計（全体 system-overview.html + 機能別の基本設計 functions/〔30-3b・30-3c で作成〕）
-│   ├── production/                  #   生産の詳細設計（Phase 30-5・30-6 で新設予定。セット別の生産の詳細。全体像は overview/functions/）
+│   ├── production/                  #   生産の詳細設計（Phase 30-5・30-6a で新設。セット別 3 ページ〔資材・作り方・事前ビルド・在庫〕。全体像は overview/functions/）
 │   ├── infra/                       #   インフラ設計書（HTML）
 │   ├── app/                         #   アプリ設計書（共通設計書 + generators/ 方式別 + sets/ セット別の 3 層構造）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
@@ -67,7 +67,7 @@ AutoContentPublisherSystem/
 | `docs/strategy/` | 事業戦略（収益化戦略・予算・KPI・展開方針・セットポートフォリオ） | `business-strategy.html` |
 | `docs/overview/` | 基本設計（生産面 / 配信面の 2 面の構成・配信面の 4 系統・受け渡しの契約・構成要素の一覧・主な判断。Phase 30-3） | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
-| `docs/production/` | 生産の詳細設計（Phase 30-5・30-6 で新設予定。セット別の生産の詳細〔事前ビルドの細部など〕。生産の全体像・関所・スキル一覧は機能別の基本設計 `docs/overview/functions/` が持つ。工程の細部は SKILL.md が正） | `index.html`（目次）+ セット別の生産の詳細 |
+| `docs/production/` | 生産の詳細設計（Phase 30-5・30-6a で新設。セット別の生産の詳細〔資材の置き場・作り方の規定・事前ビルド・在庫の数え方〕。生産の全体像・関所・スキル一覧は機能別の基本設計 `docs/overview/functions/` が持つ。工程の細部は SKILL.md が正） | `index.html`（目次）+ セット別の生産の詳細 |
 | `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
 | `docs/plans/` | 計画体系（開発レーン + セット別の計画・記録。並行作業ルール） | `index.html`（レーン振り分け・並行作業ルールの正）, `development-plan.html` / `development-log.html`（開発レーン）, `<set_code>.html` / `<set_code>-log.html`（セットレーン × 4 セット） |
 | `docs/ideas/` | アイデア体系（意思決定前の事業アイデアの捕捉・壁打ち・醸成。6 ステータス管理） | `index.html`（ダッシュボード・運用ルールの正）, `<slug>.md`（記録層・正）, `<slug>.html`（深化したアイデアの詳細） |
@@ -93,8 +93,8 @@ AutoContentPublisherSystem/
 | アプリ設計の大枠（全体方針・骨子）を確認する | `docs/app/design-outline.html`（親ページ）+ 分冊 `batch-flow.html` / `data-model.html` / `operation.html` |
 | セットを追加・廃止する | `docs/app/operation.html` セクション 2 + `docs/app/design-outline.html` セクション 1.1（セット別設計書ルール） |
 | 生成方式を追加・変更する | `docs/app/batch-flow.html` セクション 2.1（契約・方式カタログ）+ `docs/app/generators/` の該当方式設計書 |
-| ランキングストック（`pref-ranking-1`）を執筆・レビュー・投入する | `content/ranking-stock/pref-ranking-1/WRITING-NOTES.md`（実務の勘所）+ `docs/app/operation.html` セクション 3（手順の正） |
-| ウミガメのストック（`umigame-soup-1`）を補充する（作問・投入・ビルド・配置） | スキル `/umigame-stock-replenish`（運用の正。作問は `/umigame-problem-writer`）+ `docs/app/sets/umigame-soup-1.html` セクション 4（素材仕様・補充ペース）+ `docs/plans/umigame-soup-1.html`（セット計画書） |
+| ランキングストック（`pref-ranking-1`）を執筆・レビュー・投入する | `content/ranking-stock/pref-ranking-1/WRITING-NOTES.md`（実務の勘所）+ `docs/production/pref-ranking-1.html`（生産の詳細設計。手順の正） |
+| ウミガメのストック（`umigame-soup-1`）を補充する（作問・投入・ビルド・配置） | スキル `/umigame-stock-replenish`（運用の正。作問は `/umigame-problem-writer`）+ `docs/app/sets/umigame-soup-1.html` セクション 4（素材仕様）+ `docs/production/umigame-soup-1.html`（生産の詳細設計。補充ペース・事前ビルド）+ `docs/plans/umigame-soup-1.html`（セット計画書） |
 | 開発の次ステップを確認する（開発レーン） | `docs/plans/development-plan.html` |
 | セットの運用状況・バックログの確認、週次補充・セット内改修（セットレーン） | `docs/plans/<set_code>.html`（記録は `<set_code>-log.html`）+ レーン判定は `docs/plans/index.html` |
 | 過去の実施記録・経緯を確認する | `docs/plans/development-log.html`（完了ステップの確認・備考の全文）/ セット運用の記録は `docs/plans/<set_code>-log.html` |

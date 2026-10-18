@@ -1,8 +1,8 @@
 # umigame-soup-1 ストック資材（ウミガメのスープ参加型セット）
 
 `umigame_stock_items`（V012）へ投入する問題ストックのバッチ別ソースと整備ツーリング。仕様の正は
-[セット別設計書](../../../docs/app/sets/umigame-soup-1.html) セクション 4（素材 18 項目）、投入手順の正は
-[運用設計](../../../docs/app/operation.html)。**作問の手順（コア宣言・動線・現実性の自己検査）の正はスキル `.claude/skills/umigame-problem-writer/SKILL.md`**。
+[セット別設計書](../../../docs/app/sets/umigame-soup-1.html) セクション 4（素材 18 項目）、作り方・事前ビルド・投入の設計の正は
+[生産の詳細設計](../../../docs/production/umigame-soup-1.html)。**作問の手順（コア宣言・動線・現実性の自己検査）の正はスキル `.claude/skills/umigame-problem-writer/SKILL.md`**。
 
 ```
 umigame-soup-1/
