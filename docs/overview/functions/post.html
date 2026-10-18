@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: 投稿 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / 機能別の基本設計: 投稿</nav>
+<h1>投稿（配信面の機能 ①）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3b で新設）</span>
+  <span>1 段上: <a href="../system-overview.html#delivery">基本設計（全体）3 章 配信面の 4 系統</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">投稿は、配信面の 4 つの機能のうち中心となるもので、決まった時刻にセットの在庫からビルド済みの動画を 1 本選び、Instagram にリールとして投稿する。処理は「選定」と「投稿」の 2 段に分かれ、それぞれ別の Step Functions（SFN）と ECS タスクで動く。選定が成功すると、続けて投稿の SFN が起動する。</p>
+<p class="lead">図 1 はこの 2 段の流れを表す。上の枠が選定（image-batch）、下の枠が投稿（sns-post-batch）で、どちらの SFN も最初に Aurora の起動を待つ。続く表はこの機能の要点。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    S@{ icon: "aws:scheduler", form: "square", label: "Scheduler（セット × 時刻）" }
+    subgraph SEL["選定: acps-prod-image-generation-sfn"]
+        direction TB
+        W1["DB 準備確認"] --> IB@{ icon: "aws:fargate", form: "square", label: "image-batch: 在庫から 1 本選んで当回の投稿として登録" }
+    end
+    subgraph PUB["投稿: acps-prod-sns-posting-sfn"]
+        direction TB
+        W2["DB 準備確認"] --> SP@{ icon: "aws:fargate", form: "square", label: "sns-post-batch: Instagram へ投稿して結果を記録" }
+    end
+    S --> W1
+    IB -->|"成功後に起動"| W2
+    SP --> IG(["Instagram"])
+</pre>
+<figcaption>図 1 投稿の 2 段の流れ（選定 → 投稿）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>目的</td><td>セットごとに決まった時刻に、レビュー済みの動画を 1 本ずつ投稿する</td></tr>
+    <tr><td>きっかけ</td><td>EventBridge Scheduler（セット × 時刻ごとに 1 本）</td></tr>
+    <tr><td>入力</td><td>セットコードと予定時刻（Scheduler から渡る）、在庫テーブルと S3 のビルド済み動画</td></tr>
+    <tr><td>出力</td><td>Instagram のリール（セットによりストーリーズにも再掲）、DB の投稿結果</td></tr>
+    <tr><td>主な判断</td><td>選定と投稿を別の SFN に分ける <a class="decision-ref" href="#d-01">→ 理由 D-01</a> / 1 回の起動で当回の分だけを投稿する <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="trigger">1. きっかけ</h2>
+<p class="lead">投稿は時刻だけで動く。Scheduler にはセット × 時刻ごとに 1 本のスケジュールがあり、起動時にセットコードと予定時刻（<code>scheduled_at</code>）を SFN に渡す。次の表は、セットごとの投稿のタイミングの概要（Asia/Tokyo。スケジュールの名前・cron 式・停止中の枠の扱いは詳細設計）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>セット</th><th>時刻</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>logic-training-1</td><td>毎日 07:30・21:00</td><td>昼の枠は停止中</td></tr>
+    <tr><td>pref-ranking-1</td><td>毎日 20:00</td><td>—</td></tr>
+    <tr><td>umigame-soup-1</td><td>日・火・木・土の 20:00</td><td>週 4 回</td></tr>
+  </tbody>
+</table>
+</div>
+<p>投稿の SFN は自分のスケジュールを持たない。選定の SFN から起動されるほか、手動で単独実行もできる。</p>
+
+<h2 id="io">2. 入力と出力</h2>
+<p class="lead">この機能が何を読み、何を書くかをまとめる。読むものの大半は生産面が置いたもので（<a href="../system-overview.html#contract">基本設計（全体）4 章 受け渡しの契約</a>）、書くものは後でインサイト収集が使う。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>段</th><th>読む</th><th>書く</th></tr></thead>
+  <tbody>
+    <tr><td>選定（image-batch）</td><td><code>batch_sets</code>（セットの生成方式）・<code>prompt_configs</code>・在庫テーブル（<code>*_stock_items</code>）・S3 <code>assets/{set_code}/prebuilt/</code></td><td><code>generation_runs</code>（当回の実行）・<code>generated_media</code>・出題の写し（<code>quiz_items</code> / <code>ranking_items</code> / <code>umigame_items</code>）・在庫の <code>last_used_at</code> と <code>use_count</code>・S3 <code>videos/{set_code}/{YYYYMMDD}/{run_id}/</code>・<code>batch_execution_logs</code></td></tr>
+    <tr><td>投稿（sns-post-batch）</td><td><code>generation_runs</code>・<code>generated_media</code>・<code>sns_accounts</code>・<code>caption_templates</code>・出題の写し・SNS 認証の Secret <code>acps/prod/{set_code}/sns/{platform}/{account_code}</code></td><td><code>posts</code>・<code>post_media</code>・<code>batch_execution_logs</code>。umigame は S3 <code>assets/umigame-soup-1/problems/{media_id}.json</code>（問題スナップショット）と <code>umigame_items.snapshot_s3_key</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="flow">3. 流れ</h2>
+<p class="lead">この章は、要約の図 1 の 2 段それぞれの中で何が起きるかを詳しくしたもの。図 2 は、1 回の起動で選定から投稿までがどう進むかを時間の順に表す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    participant SC as Scheduler
+    participant SF1 as 選定の SFN
+    participant IB as image-batch
+    participant SF2 as 投稿の SFN
+    participant SP as sns-post-batch
+    participant IG as Instagram
+    SC->>SF1: set_code・scheduled_at
+    SF1->>SF1: DB 準備確認
+    SF1->>IB: RunTask
+    IB->>IB: 当回の generation_runs を作る（同じ回が既にあればそれを使う）
+    IB->>IB: 生成方式で在庫から 1 本選び、動画を videos/ へ写して登録
+    SF1->>SF2: 起動（実行名は同じ）
+    SF2->>SF2: 入力の確認・DB 準備確認
+    SF2->>SP: RunTask
+    SP->>SP: 当回の生成結果を選ぶ（set_code × scheduled_at）
+    SP->>IG: コンテナ作成 → 処理完了を待つ → 公開
+    IG-->>SP: media_id
+    SP->>SP: posts を確定（umigame は問題スナップショットを書く）
+</pre>
+<figcaption>図 2 1 回の起動の流れ</figcaption>
+</figure>
+<p>選定の段は、セットに設定された生成方式（<code>batch_sets.generator_name</code>）に処理を任せる。稼働 3 セットはすべて事前ビルド方式（<code>quiz-prebuilt</code> / <code>ranking-prebuilt</code> / <code>umigame-prebuilt</code>）で、在庫の「有効かつ動画キーあり」の行から未使用 → 最も古く使ったものの順に 1 件選び、動画を写すだけで、生成はしない。</p>
+<p>投稿の段は、当回の生成実行だけを投稿対象にする（過去の未投稿分は拾わない）。Instagram の一過性エラーは段階別に扱い、公開前の一過性エラーは作り直して 1 回、公開時の一過性エラーは状態を照会してから 1 回だけ再送する。公開の応答が読めないとき（タイムアウトなど）は照会も再送もせず、人が確かめる状態（<code>published_unconfirmed</code>）にする <a class="decision-ref" href="#d-03">→ 理由 D-03</a>。キャプションはセットの固定文と出題の写しから組み立て、umigame は前回の問題の真相を入れる。</p>
+<p>次の表は、投稿 1 件（<code>posts</code> の行）が取る状態。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>状態</th><th>意味</th></tr></thead>
+  <tbody>
+    <tr><td><code>pending</code></td><td>投稿の対象に決めた（Instagram を呼ぶ前に記録する）</td></tr>
+    <tr><td><code>container_created</code></td><td>Instagram にコンテナを作ったが、まだ公開していない</td></tr>
+    <tr><td><code>success</code></td><td>公開できた</td></tr>
+    <tr><td><code>published_unconfirmed</code></td><td>公開された可能性を否定できない（公開の応答が読めなかった・照会で公開済みと分かったなど）。二重投稿を避けるため自動では再送せず、人が確かめる</td></tr>
+    <tr><td><code>failed</code></td><td>投稿できなかった（自動では再対象にしない。手動補正の対象）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="parts">4. 関わる部品</h2>
+<p class="lead">この機能を構成するプログラムと AWS のリソースの一覧。どれも本番 1 環境だけにある。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>種類</th><th>選定</th><th>投稿</th></tr></thead>
+  <tbody>
+    <tr><td>プログラム</td><td><code>services/image-batch</code>（生成方式は <code>app/generators/</code>）</td><td><code>services/sns-post-batch</code></td></tr>
+    <tr><td>SFN</td><td><code>acps-prod-image-generation-sfn</code></td><td><code>acps-prod-sns-posting-sfn</code></td></tr>
+    <tr><td>ECS タスク定義</td><td><code>acps-prod-image-batch</code></td><td><code>acps-prod-sns-post-batch</code></td></tr>
+    <tr><td>スケジュール</td><td>スケジュールグループ <code>acps-prod-image-schedule-group</code></td><td>なし</td></tr>
+    <tr><td>CDK スタック</td><td><code>ImageBatchStack</code></td><td><code>SnsPostBatchStack</code></td></tr>
+    <tr><td>共通</td><td colspan="2"><code>db-readiness-check</code>（SFN の先頭）・<code>shared/acps_shared</code>・Aurora・S3 バケット <code>acps-prod-images-{account}</code>（<code>FoundationStack</code>）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="handoff">5. ほかの機能との受け渡し</h2>
+<p class="lead">投稿は、上流の生産面から素材を受け取り、下流の 2 つの機能へ材料を渡す。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>相手</th><th>向き</th><th>受け渡すもの</th></tr></thead>
+  <tbody>
+    <tr><td>生産（<a href="../system-overview.html#production">基本設計（全体）2 章</a>）</td><td>受け取る</td><td>在庫テーブルの行と S3 のビルド済み動画</td></tr>
+    <tr><td><a href="insights.html">インサイト収集</a></td><td>渡す</td><td><code>posts</code> の投稿（<code>media_id</code>）。収集はここから直近 14 日分を選ぶ</td></tr>
+    <tr><td><a href="comment-reply.html">コメント自動返信</a></td><td>渡す</td><td>umigame の問題スナップショット（S3 <code>problems/{media_id}.json</code>）。返信はこれを読んで判定する</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>処理の詳細（選定と投稿の手順・投稿対象の決め方・状態・一過性エラー）→ <a href="../../app/batch-flow.html#flow-image">バッチ処理フロー 2〜3 章</a></li>
+  <li>AWS の定義（SFN の ASL・スケジュール・Retry / Catch）→ <a href="../../infra/workflow.html#overview">ワークフロー 1 章（スケジュールは 1.5）と 3〜4 章</a></li>
+  <li>運用の手順（投稿に失敗したときの確認と手動補正）→ <a href="../../app/operation.html#failure">アプリ運用設計 4 章</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 選定と投稿を別の SFN・別のタスクに分ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>選定（image-batch）が成功した後に、投稿の SFN を非同期で起動する。投稿の SFN は自分のスケジュールを持たず、手動で単独実行もできる</dd>
+  <dt>理由</dt><dd>失敗の単位を分け、投稿だけをやり直せるようにする</dd>
+  <dt>日付・出典</dt><dd>当初設計（Phase D〜10）。<a href="../../infra/workflow.html#overview">ワークフロー 1 章</a></dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 1 回の起動で当回の分だけを投稿する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>投稿の対象は、起動で渡されたセット × 予定時刻の生成実行だけにする</dd>
+  <dt>理由</dt><dd>空の実行や未投稿の滞留があっても後続を塞がず、朝夕の表記も入れ替わらないようにするため</dd>
+  <dt>日付・出典</dt><dd>2026-10-13（Phase 26・課題 I-014）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 一過性エラーは段階別に 1 回だけやり直す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>公開前の一過性エラーは作成から 1 回やり直し、公開時の一過性エラーはコンテナを照会して処理済みのときだけ同じコンテナで 1 回再送する。公開されたかどうか分からないときは、再送せずに <code>published_unconfirmed</code>（人が確かめる状態）にする</dd>
+  <dt>理由</dt><dd>二重投稿を避けつつ、一時的な失敗で投稿を落とさないため</dd>
+  <dt>日付・出典</dt><dd>2026-10-17（Phase 28・課題 I-024）。<a href="../../app/batch-flow.html#transient-errors">バッチ処理フロー 3.3</a></dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>

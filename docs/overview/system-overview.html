@@ -13,7 +13,7 @@
 <h1>基本設計（システムの全体像）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-18（Phase 30-3 で旧「システム概要」を基本設計として作り直し、生産面と配信面の 2 面で描いた）</span>
+  <span>最終更新: 2026-10-18（30-3b で 3 章の「さらに詳しく」を機能別の基本設計へ向けた。Phase 30-3 で旧「システム概要」を基本設計として作り直し、生産面と配信面の 2 面で描いた）</span>
   <span>設計書の 3 段の構成（基本設計 → 層の概要 → 詳細設計）は<a href="../index.html#levels">設計書体系ガイド 2.1</a></span>
 </div>
 
@@ -63,7 +63,7 @@ flowchart TB
   </tbody>
 </table>
 </div>
-<p>このページは要約の内容を、<a href="#faces">1 章</a>（2 面の関係）→ <a href="#production">2 章</a>（生産面）・<a href="#delivery">3 章</a>（配信面）→ <a href="#contract">4 章</a>（2 面のつなぎ目）→ <a href="#dataflow">5 章</a>（データの流れ）→ <a href="#components">6 章</a>（構成要素の一覧）の順に詳しくしていく。各章の末尾の「さらに詳しく」から、1 段下の詳細設計へ進める（<a href="#entry">7 章</a>に一覧）。</p>
+<p>このページは要約の内容を、<a href="#faces">1 章</a>（2 面の関係）→ <a href="#production">2 章</a>（生産面）・<a href="#delivery">3 章</a>（配信面）→ <a href="#contract">4 章</a>（2 面のつなぎ目）→ <a href="#dataflow">5 章</a>（データの流れ）→ <a href="#components">6 章</a>（構成要素の一覧）の順に詳しくしていく。各章の末尾の「さらに詳しく」から、1 段下の機能別の基本設計（<code>functions/</code>）や詳細設計へ進める（<a href="#entry">7 章</a>に一覧）。</p>
 </section>
 
 <h2 id="faces">1. 2 面の全体構成</h2>
@@ -174,25 +174,25 @@ flowchart TB
 </pre>
 <figcaption>図 3 配信面の 4 系統（AWS 構成）。SFN の先頭では毎回 DB 準備確認（db-readiness-check）が走る（図では省略）</figcaption>
 </figure>
-<p class="lead">次の表は、4 系統それぞれについて「いつ起動するか・AWS 上の実体は何か・何をするか・どこを読み書きするか」をまとめたもの。</p>
+<p class="lead">次の表は、4 系統それぞれについて「いつ起動するか・AWS 上の実体は何か・何をするか・どこを読み書きするか」をまとめたもの。系統の名前から、その機能別の基本設計へ進める。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>系統</th><th>起動</th><th>実体</th><th>やること</th><th>読む / 書く</th></tr></thead>
   <tbody>
-    <tr><td>① 投稿</td><td>EventBridge Scheduler（Asia/Tokyo）: logic-training-1 毎日 07:30・21:00（12:30 枠は停止中）/ pref-ranking-1 毎日 20:00 / umigame-soup-1 日・火・木・土の 20:00</td><td>SFN <code>acps-prod-image-generation-sfn</code> → ECS <code>image-batch</code>、成功後に SFN <code>acps-prod-sns-posting-sfn</code> → ECS <code>sns-post-batch</code> <a class="decision-ref" href="#d-03">→ 理由 D-03</a></td><td>セットの生成方式（事前ビルド 3 方式）で在庫から 1 本選び、当回の投稿として登録 → Instagram Graph API でリールを投稿（セットにより ストーリーズにも再掲）</td><td>読む: 在庫テーブル・S3 <code>assets/</code>。書く: <code>generation_runs</code>・<code>generated_media</code>・<code>posts</code>・S3 <code>videos/</code>。umigame は投稿後に問題スナップショットを S3 へ</td></tr>
-    <tr><td>② インサイト収集</td><td>Scheduler: 3 セットとも毎日 06:00・18:00</td><td>SFN <code>acps-prod-insights-collection-sfn</code> → ECS <code>insights-batch</code></td><td>直近 14 日の投稿のインサイトとアカウント日次インサイトを集め、コメント記録 JSON を DB に取り込む</td><td>書く: <code>post_insights</code>・<code>account_insights_daily</code>・<code>umigame_comment_logs</code>。読む: S3 <code>comment-log/</code></td></tr>
-    <tr><td>③ コメント自動返信</td><td>Instagram の Webhook（コメント）</td><td>Lambda <code>acps-prod-comment-reply-webhook</code> → SQS FIFO <code>acps-prod-comment-reply.fifo</code> → Lambda <code>acps-prod-comment-reply-reply</code>（<code>CommentReplyStack</code>）</td><td>署名を検証してキューへ入れ、問題スナップショットを基に回答を LLM（Anthropic・OpenAI の API）で判定し、返信文を作って返信する</td><td>読む: S3 <code>assets/umigame-soup-1/problems/</code>。書く: S3 <code>comment-log/</code>（Aurora には書かない <a class="decision-ref" href="#d-04">→ 理由 D-04</a>）</td></tr>
-    <tr><td>④ トークン更新</td><td>Scheduler: 毎週月曜 04:00</td><td>Lambda <code>acps-prod-comment-reply-token-refresh</code></td><td>コメント返信用の Instagram 長期トークンを更新する。投稿用トークンは手動更新 <a class="decision-ref" href="#d-05">→ 理由 D-05</a></td><td>書く: Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code></td></tr>
+    <tr><td><a href="functions/post.html">① 投稿</a></td><td>EventBridge Scheduler（Asia/Tokyo）: logic-training-1 毎日 07:30・21:00（12:30 枠は停止中）/ pref-ranking-1 毎日 20:00 / umigame-soup-1 日・火・木・土の 20:00</td><td>SFN <code>acps-prod-image-generation-sfn</code> → ECS <code>image-batch</code>、成功後に SFN <code>acps-prod-sns-posting-sfn</code> → ECS <code>sns-post-batch</code> <a class="decision-ref" href="#d-03">→ 理由 D-03</a></td><td>セットの生成方式（事前ビルド 3 方式）で在庫から 1 本選び、当回の投稿として登録 → Instagram Graph API でリールを投稿（セットにより ストーリーズにも再掲）</td><td>読む: 在庫テーブル・S3 <code>assets/</code>。書く: <code>generation_runs</code>・<code>generated_media</code>・<code>posts</code>・S3 <code>videos/</code>。umigame は投稿後に問題スナップショットを S3 へ</td></tr>
+    <tr><td><a href="functions/insights.html">② インサイト収集</a></td><td>Scheduler: 3 セットとも毎日 06:00・18:00</td><td>SFN <code>acps-prod-insights-collection-sfn</code> → ECS <code>insights-batch</code></td><td>直近 14 日の投稿のインサイトとアカウント日次インサイトを集め、コメント記録 JSON を DB に取り込む</td><td>書く: <code>post_insights</code>・<code>account_insights_daily</code>・<code>umigame_comment_logs</code>。読む: S3 <code>comment-log/</code></td></tr>
+    <tr><td><a href="functions/comment-reply.html">③ コメント自動返信</a></td><td>Instagram の Webhook（コメント）</td><td>Lambda <code>acps-prod-comment-reply-webhook</code> → SQS FIFO <code>acps-prod-comment-reply.fifo</code> → Lambda <code>acps-prod-comment-reply-reply</code>（<code>CommentReplyStack</code>）</td><td>署名を検証してキューへ入れ、問題スナップショットを基に回答を LLM（Anthropic・OpenAI の API）で判定し、返信文を作って返信する</td><td>読む: S3 <code>assets/umigame-soup-1/problems/</code>。書く: S3 <code>comment-log/</code>（Aurora には書かない <a class="decision-ref" href="#d-04">→ 理由 D-04</a>）</td></tr>
+    <tr><td><a href="functions/token-refresh.html">④ トークン更新</a></td><td>Scheduler: 毎週月曜 04:00</td><td>Lambda <code>acps-prod-comment-reply-token-refresh</code></td><td>コメント返信用の Instagram 長期トークンを更新する。投稿用トークンは手動更新 <a class="decision-ref" href="#d-05">→ 理由 D-05</a></td><td>書く: Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code></td></tr>
   </tbody>
 </table>
 </div>
 <p>3 つの SFN はすべて先頭で <code>db-readiness-check</code>（ECS）を走らせ、Aurora の起動を待ってからバッチを動かす <a class="decision-ref" href="#d-06">→ 理由 D-06</a>。失敗は CloudWatch アラーム・ECS 異常終了ルールから SNS トピック <code>acps-prod-alarm-topic</code> へ通知する（<code>MonitoringStack</code>）。</p>
 <div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
-  <li>① 投稿を細かく見る → 処理の手順は <a href="../app/batch-flow.html#flow-image">バッチ処理フロー 2 章（生成）</a>・<a href="../app/batch-flow.html#flow-sns">3 章（投稿）</a>、SFN の定義は <a href="../infra/workflow.html#image-asl">ワークフロー（画像生成の SFN）</a>・<a href="../infra/workflow.html#sns-asl">（投稿の SFN）</a>、時刻は <a href="../infra/workflow.html#schedule">ワークフロー（スケジュール）</a></li>
-  <li>② インサイト収集を細かく見る → <a href="../app/batch-flow.html#flow-insights">バッチ処理フロー（インサイト収集）</a>・<a href="../infra/workflow.html#insights-asl">ワークフロー（収集の SFN）</a>・運用は <a href="../app/operation.html#insights-ops">アプリ運用設計 6 章</a></li>
-  <li>③ コメント自動返信を細かく見る → 判定と返信の仕様は <a href="../app/sets/umigame-soup-1.html#comment-reply">umigame-soup-1 の 10 節</a>、AWS 構成は <a href="../infra/architecture.html#comment-reply">アーキテクチャ（コメント返信）</a></li>
-  <li>④ トークン更新を細かく見る → <a href="../app/operation.html#token-refresh">アプリ運用設計 5.4</a></li>
-  <li>AWS 全体の構成・ネットワーク・監視 → <a href="../infra/architecture.html">アーキテクチャ</a>・<a href="../infra/workflow.html#alarms">ワークフロー（アラーム）</a></li>
+  <li>① 投稿 → 機能別の基本設計 <a href="functions/post.html">投稿</a></li>
+  <li>② インサイト収集 → 機能別の基本設計 <a href="functions/insights.html">インサイト収集</a></li>
+  <li>③ コメント自動返信 → 機能別の基本設計 <a href="functions/comment-reply.html">コメント自動返信</a></li>
+  <li>④ トークン更新 → 機能別の基本設計 <a href="functions/token-refresh.html">トークン更新</a></li>
+  <li>4 系統に共通の AWS 基盤（ネットワーク・データストア・監視）→ <a href="../infra/architecture.html">アーキテクチャ</a></li>
 </ul></div>
 
 <h2 id="contract">4. 2 面の受け渡しの契約</h2>
@@ -345,6 +345,7 @@ sequenceDiagram
   <tbody>
     <tr><td>生産ラインの全体像・関所・受け渡しの契約</td><td>機能別の基本設計「生産ライン（共通）」（30-3c で作成予定）。それまでは各スキルの SKILL.md と<a href="../app/operation.html">アプリ運用設計</a></td></tr>
     <tr><td>AWS の構成・ネットワーク・データストア</td><td><a href="../infra/architecture.html">アーキテクチャ</a></td></tr>
+    <tr><td>配信面の機能ごとの目的・流れ・部品（投稿・インサイト収集・コメント自動返信・トークン更新）</td><td>機能別の基本設計 <a href="functions/post.html">投稿</a> / <a href="functions/insights.html">インサイト収集</a> / <a href="functions/comment-reply.html">コメント自動返信</a> / <a href="functions/token-refresh.html">トークン更新</a></td></tr>
     <tr><td>SFN・スケジュール・監視リソース</td><td><a href="../infra/workflow.html">ワークフロー</a></td></tr>
     <tr><td>CDK スタックの実装仕様 / IAM・Secrets / CI/CD / インフラ運用</td><td><a href="../infra/stacks.html">stacks</a> / <a href="../infra/security.html">security</a> / <a href="../infra/cicd.html">cicd</a> / <a href="../infra/operation.html">operation</a></td></tr>
     <tr><td>バッチの処理フロー・生成方式の契約</td><td><a href="../app/batch-flow.html">バッチ処理フロー</a>（方式カタログは<a href="../app/batch-flow.html#generator-catalog">2.1</a>）</td></tr>

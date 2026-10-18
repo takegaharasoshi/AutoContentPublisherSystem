@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-18（<strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="#step-30-3b">30-3b</a>〔配信面〕・<a href="#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-18（<strong>30-3b 完了</strong>: 配信面の機能別の基本設計 4 ページを作った〔ユーザーの go 待ち〕。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="#step-30-3b">30-3b</a>〔配信面〕・<a href="#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -82,7 +82,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 3 件（クリックで展開）</summary>
+<summary>完了済み 4 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
@@ -212,18 +212,12 @@
 </details>
 </div>
 </article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-3b" data-step-id="30-3b" data-status="todo">
+<article class="plan-step" id="step-30-3b" data-step-id="30-3b" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-3b</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-3b</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>配信面の機能別の基本設計を作る（投稿・インサイト収集・コメント自動返信・トークン更新）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-3 の通読の指摘への対応（2026-10-18）の push の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<code>docs/overview/functions/</code> に配信面の機能別の基本設計 4 ページ（<a href="../overview/functions/post.html">投稿</a>・<a href="../overview/functions/insights.html">インサイト収集</a>・<a href="../overview/functions/comment-reply.html">コメント自動返信</a>・<a href="../overview/functions/token-refresh.html">トークン更新</a>）を作り、基本設計（全体）の 3 章から 1 機能 1 リンクでつないだ。ユーザーの go 待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -242,13 +236,25 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>各ページの構成</strong>: 要約（リード文 + 図 + 要点の表）→ 1. きっかけ → 2. 入力と出力 → 3. 流れ（シーケンス図）→ 4. 関わる部品 → 5. ほかの機能との受け渡し + さらに詳しく（処理の詳細 / AWS の定義 / 運用の手順の観点ごとに 1 リンク）→ 判断の記録（投稿 D-01〜03・インサイト D-01〜02・コメント返信 D-01〜03・トークン D-01）。パンくずと冒頭に 1 段上（基本設計〔全体〕3 章）への戻りリンク</li>
+<li><strong>実装との突き合わせ</strong>: SFN のステート（<code>infra/lib/asl/*.json</code>: 選定 = WaitForDbReady → RunImageBatchTask → StartSnsPostBatch / 投稿 = CheckInput → WaitForDbReady → RunSnsPostBatchTask / 収集 = WaitForDbReady → RunInsightsBatchTask）、スケジュール（<code>image-batch-stack.ts</code>・<code>insights-batch-stack.ts</code>・<code>comment-reply-stack.ts</code>）、投稿対象の選び方（<code>target_selection.py</code> の当回選択）、投稿の状態（<code>posts.py</code>・batch-flow 3.2）、<code>post_insights</code> の冪等性キー（V009 <code>uq_post_insights_post_scheduled</code>）、コメント返信のキュー・DLQ・Lambda 名・Secret 名（<code>comment-reply-stack.ts</code>）、Secret のキャッシュ（<code>comment-reply/app/secrets.py</code>）、トークン更新（<code>token_refresh_handler.py</code>）、判断の理由（architecture 1.1・operation 5.4・V016）</li>
+<li><strong>レビュー</strong>（観点: 機能ページだけで分かるか / 詳細設計と二重 / 実装との食い違い。一次スクリーニング Codex・判断 Claude）。1 巡目: blocker 3 件を修正（投稿の状態表に <code>pending</code> がなく <code>published_unconfirmed</code> の意味が誤り・コメント記録の読み込み範囲・トークン更新の図で Lambda の失敗が Scheduler へ返る誤り）。改善提案のうち二重記載の数値（5 分窓・200 字・DLQ の回数・90 日・365 日・24 時間など）は守る条件〔二重に書かない〕に当たるので機能ページから外し、トークン更新の AWS 定義リンクの行き先違い（→ stacks 3.6）も直した。インサイトの AWS 定義リンクが 2 節にまたがる件は課題 <a href="../issues/index.html#I-042">I-042</a> に追記。2 巡目: blocker 2 件を修正（公開の応答が読めないときは照会・再送せず <code>published_unconfirmed</code> にする点・コメントの重複排除はキュー投入時だけで再試行は別）。ここで打ち切り</li>
+<li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 91 ページはみ出し 0 件・図 7 ページ 19 図の描画不備 0 件・判断リンク 17 件の不備 0 件で OK。基本設計（全体）の 3 章の「さらに詳しく」を機能 4 + 横断の AWS 基盤 1 に置き換え、表の系統名から機能ページへリンクした（あわせて「時刻 → ワークフロー #schedule」がインサイト収集の節を指していた誤りも解消）。設計書体系ガイドのツリーと 2.1 の表に 4 ページを載せた</li>
+<li><strong>課題</strong>: I-040・I-042 は据え置き継続</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-3c" data-step-id="30-3c" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-3c</strong><span class="plan-status">未着手</span></div>

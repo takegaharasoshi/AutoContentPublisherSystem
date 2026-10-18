@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: トークン更新 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / 機能別の基本設計: トークン更新</nav>
+<h1>トークン更新（配信面の機能 ④）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3b で新設）</span>
+  <span>1 段上: <a href="../system-overview.html#delivery">基本設計（全体）3 章 配信面の 4 系統</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">トークン更新は、<a href="comment-reply.html">コメント自動返信</a>が Instagram に返信するときに使う長期アクセストークンを、失効する前に自動で延ばす機能である。このトークンは 60 日で失効するため、週に 1 回 Lambda が新しいトークンを取り直し、同じ Secret に書き戻す。投稿に使うトークンはこの機能の対象外で、手動で更新する <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。</p>
+<p class="lead">図 1 は、1 回の更新で何が起きるかを表す。Scheduler が Lambda を起こし、Lambda が Secret から今のトークンを読んで Instagram に更新を頼み、返ってきた新しいトークンを Secret に書き戻す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    S@{ icon: "aws:scheduler", form: "square", label: "Scheduler（毎週月曜 04:00）" }
+    L@{ icon: "aws:lambda", form: "square", label: "acps-prod-comment-reply-token-refresh" }
+    SM@{ icon: "aws:secrets-manager", form: "square", label: "acps/prod/umigame-soup-1/comment-reply" }
+    S --> L
+    SM -->|"今のトークン"| L
+    L -->|"更新を頼む"| IG(["Instagram（refresh_access_token）"])
+    IG -->|"新しいトークン・有効期限"| L
+    L -->|"書き戻す"| SM
+    L -.->|"失敗"| A["Errors アラーム"]
+</pre>
+<figcaption>図 1 トークン更新の流れ</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>目的</td><td>コメント返信用のトークンが失効して返信が全件止まるのを防ぐ</td></tr>
+    <tr><td>きっかけ</td><td>EventBridge Scheduler（毎週月曜 04:00 Asia/Tokyo）</td></tr>
+    <tr><td>入力</td><td>Secret の <code>ig_access_token</code></td></tr>
+    <tr><td>出力</td><td>同じ Secret の <code>ig_access_token</code> と <code>token_expires_at</code>（新しい値に書き換え）</td></tr>
+    <tr><td>対象外</td><td>投稿用のトークン（Secret <code>acps/prod/{set_code}/sns/{platform}/{account_code}</code>）は手動で更新する</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="trigger">1. きっかけ</h2>
+<p class="lead">更新は時刻だけで動く。本番面・ステージング面のそれぞれに、毎週月曜 04:00（Asia/Tokyo）のスケジュールが 1 本ずつある。Secret に手で入れた直後のトークンは Instagram の更新 API が受け付けないため、翌週の更新から延びる（条件は運用設計）。</p>
+
+<h2 id="io">2. 入力と出力</h2>
+<p class="lead">この機能が読み書きするのは Secret 1 つだけで、DB や S3 には触れない。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>区分</th><th>もの</th><th>置き場所</th></tr></thead>
+  <tbody>
+    <tr><td>読む</td><td>今の長期トークン（<code>ig_access_token</code>）</td><td>Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code>（ステージング面は末尾に <code>-staging</code>）</td></tr>
+    <tr><td>呼ぶ</td><td>トークンの更新（<code>grant_type=ig_refresh_token</code>）</td><td>Instagram（<code>graph.instagram.com/refresh_access_token</code>）</td></tr>
+    <tr><td>書く</td><td>新しいトークンと有効期限（<code>token_expires_at</code>。UTC）</td><td>同じ Secret（ほかのキーはそのまま）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="flow">3. 流れ</h2>
+<p class="lead">図 2 は、1 回の更新を時間の順に並べたもの。失敗した週は Secret を書き換えず、旧トークンがそのまま使われる（失効まで 60 日あるため、翌週の更新か手動実行で取り戻せる）。</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    participant SC as Scheduler
+    participant L as 更新の Lambda
+    participant SM as Secrets Manager
+    participant IG as Instagram
+    SC->>L: 起動（月曜 04:00）
+    L->>SM: Secret を読む
+    L->>IG: refresh_access_token
+    alt 成功
+        IG-->>L: 新しいトークン・残り秒数
+        L->>SM: トークンと token_expires_at を書き戻す
+    else 失敗
+        L->>L: エラーで終わる（Secret は書き換えない）
+        Note over L: Lambda の Errors アラームで人に知らせる
+    end
+</pre>
+<figcaption>図 2 1 回の更新の流れ</figcaption>
+</figure>
+
+<h2 id="parts">4. 関わる部品</h2>
+<p class="lead">この機能はコメント自動返信と同じスタック・同じプログラムの中にある。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>種類</th><th>部品</th></tr></thead>
+  <tbody>
+    <tr><td>プログラム</td><td><code>services/comment-reply</code> のトークン更新のハンドラー</td></tr>
+    <tr><td>Lambda</td><td><code>acps-prod-comment-reply-token-refresh</code>（ステージング面は末尾に <code>-staging</code>）</td></tr>
+    <tr><td>スケジュール</td><td>EventBridge Scheduler（月曜 04:00。Lambda を呼び出せなかったときだけ Scheduler が再試行し、Lambda の中の失敗は再試行しない）</td></tr>
+    <tr><td>Secret</td><td><code>acps/prod/umigame-soup-1/comment-reply</code>（ステージング面は <code>-staging</code>）</td></tr>
+    <tr><td>CDK スタック</td><td><code>CommentReplyStack</code> / <code>CommentReplyStagingStack</code></td></tr>
+    <tr><td>監視</td><td><code>MonitoringStack</code> のアラーム <code>acps-prod-comment-reply-token-refresh-errors</code>（本番面）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="handoff">5. ほかの機能との受け渡し</h2>
+<p class="lead">トークン更新は、コメント自動返信のためだけにある。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>相手</th><th>向き</th><th>受け渡すもの</th></tr></thead>
+  <tbody>
+    <tr><td><a href="comment-reply.html">コメント自動返信</a></td><td>渡す</td><td>Secret の新しいトークン（返信の Lambda は Secret を読んで、起動中のプロセスの間だけ値を使い回す。新しいプロセスから新しいトークンを使う）</td></tr>
+    <tr><td><a href="post.html">投稿</a></td><td>なし</td><td>投稿用のトークンは別の Secret で、この機能は触らない</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>運用の手順（初回の投入・失敗したとき・手動実行と確認、投稿用トークンの手動更新とリマインド）→ <a href="../../app/operation.html#token-refresh">アプリ運用設計 5.4</a></li>
+  <li>AWS の定義（Lambda・スケジュール・Secret の構成）→ <a href="../../infra/stacks.html#comment-reply">CDK スタック実装仕様 3.6</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 コメント返信用のトークンだけを自動で更新する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>コメント返信用（Instagram ログイン方式）の長期トークンは Lambda で毎週更新する。投稿用のトークンは手動更新とリマインドのまま</dd>
+  <dt>理由</dt><dd>返信用は 60 日の失効が実際に起きる方式で、失効すると返信が全件止まる。コメントの受信に合わせて更新する方式は、コメントが途絶えた期間に失効するため採らない</dd>
+  <dt>日付・出典</dt><dd>2026-10-11（Phase 21-6g）・課題 I-031。<a href="../../app/operation.html#token-refresh">アプリ運用設計 5.4</a></dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>

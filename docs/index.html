@@ -56,7 +56,7 @@ flowchart TB
   <thead><tr><th>段</th><th>置き場所</th><th>ここだけで分かること</th></tr></thead>
   <tbody>
     <tr><td>基本設計（全体）</td><td><a href="overview/system-overview.html">docs/overview/system-overview.html</a></td><td>2 面（生産面 / 配信面）の構成、機能の一覧、2 面の受け渡しの契約、データの流れ、構成要素の一覧</td></tr>
-    <tr><td>機能別の基本設計</td><td><code>docs/overview/functions/</code>（配信面: 投稿・インサイト収集・コメント自動返信・トークン更新 / 生産: 生産ライン共通・logic-training-1・pref-ranking-1・umigame-soup-1。30-3b・30-3c で作る）</td><td>その機能の目的・きっかけ・入力と出力・流れ・関わる部品・ほかの機能との受け渡し</td></tr>
+    <tr><td>機能別の基本設計</td><td><code>docs/overview/functions/</code>（配信面: <a href="overview/functions/post.html">投稿</a>・<a href="overview/functions/insights.html">インサイト収集</a>・<a href="overview/functions/comment-reply.html">コメント自動返信</a>・<a href="overview/functions/token-refresh.html">トークン更新</a>〔30-3b〕/ 生産: 生産ライン共通・logic-training-1・pref-ranking-1・umigame-soup-1〔30-3c で作る〕）</td><td>その機能の目的・きっかけ・入力と出力・流れ・関わる部品・ほかの機能との受け渡し</td></tr>
     <tr><td>詳細設計</td><td><code>infra/</code> <code>app/</code> <code>production/</code> のページ</td><td>定義・設定値・手順・表の全件</td></tr>
   </tbody>
 </table>
@@ -78,7 +78,10 @@ flowchart TB
 │   └── business-strategy.html     # 事業戦略書（収益化戦略・予算・KPI・展開方針・セットポートフォリオ）
 ├── overview/
 │   ├── system-overview.html       # 基本設計（全体）（2 面の構成・機能の一覧・受け渡しの契約・構成要素。30-3）
-│   └── functions/                 # 機能別の基本設計（配信面 4・生産 4 ページ。30-3b・30-3c）
+│   └── functions/                 # 機能別の基本設計（30-3b・30-3c）
+│       ├── post.html / insights.html          # 配信面: 投稿 / インサイト収集
+│       ├── comment-reply.html / token-refresh.html  # 配信面: コメント自動返信 / トークン更新
+│       └── production*.html                   # 生産: 共通 + セット別 3（30-3c で作る）
 ├── production/                    # 生産の詳細設計（30-5・30-6 で新設。セット別の生産の詳細。全体像は overview/functions/）
 ├── infra/                         # インフラ設計書（一時 Fix 対象）
 │   ├── architecture.html          # アーキテクチャ（ネットワーク・コンピューティング・データストア）

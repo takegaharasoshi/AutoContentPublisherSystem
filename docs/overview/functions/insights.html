@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: インサイト収集 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / 機能別の基本設計: インサイト収集</nav>
+<h1>インサイト収集（配信面の機能 ②）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3b で新設）</span>
+  <span>1 段上: <a href="../system-overview.html#delivery">基本設計（全体）3 章 配信面の 4 系統</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">インサイト収集は、投稿した動画がどれだけ見られ、反応されたかを Instagram から集めて DB に積み上げる機能である。1 日 2 回、セットごとに、直近の投稿の数値とアカウント全体の日次の数値を取り、あわせて umigame のコメント記録（コメント自動返信が S3 に置いたもの）を DB に取り込む。集めた数値は KPI のビューを通して月次の振り返りに使う。</p>
+<p class="lead">図 1 は 1 回の収集で何を読み、どこへ書くかを表す。上が起動の流れ、下の 3 本の矢印が取り込み先。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    S@{ icon: "aws:scheduler", form: "square", label: "Scheduler（06:00 / 18:00 × 3 セット）" }
+    F@{ icon: "aws:step-functions", form: "square", label: "acps-prod-insights-collection-sfn" }
+    T@{ icon: "aws:fargate", form: "square", label: "insights-batch" }
+    S --> F -->|"DB 準備確認の後"| T
+    IG(["Instagram の数値"]) --> T
+    CL[("S3 comment-log/")] --> T
+    T --> PI["post_insights&lt;br&gt;（投稿ごとの数値）"]
+    T --> AI["account_insights_daily&lt;br&gt;（アカウントの日次）"]
+    T --> UC["umigame_comment_logs&lt;br&gt;（コメント記録）"]
+    PI --> K["KPI ビュー → 月次の振り返り"]
+    AI --> K
+</pre>
+<figcaption>図 1 インサイト収集の流れと取り込み先</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>目的</td><td>投稿とアカウントの反応の数値を、あとで比べられる形で DB に残す</td></tr>
+    <tr><td>きっかけ</td><td>EventBridge Scheduler（毎日 06:00・18:00。セットごとに 1 本ずつ）</td></tr>
+    <tr><td>入力</td><td>Instagram Graph API のインサイト、DB の <code>posts</code>（直近 14 日）、S3 のコメント記録</td></tr>
+    <tr><td>出力</td><td><code>post_insights</code>・<code>account_insights_daily</code>・<code>umigame_comment_logs</code></td></tr>
+    <tr><td>主な判断</td><td>投稿の数値は上書きせず積み増す <a class="decision-ref" href="#d-01">→ 理由 D-01</a> / コメント記録の取り込みをこの機能に相乗りさせる <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="trigger">1. きっかけ</h2>
+<p class="lead">収集は時刻だけで動く。セットごとに朝と夕方の 2 本のスケジュール（<code>acps-prod-insights-collection-{set_code}-{morning|evening}</code>）があり、いずれも Asia/Tokyo の 06:00 と 18:00 に、セットコード・予定時刻・さかのぼる日数（14 日）を SFN に渡す。対象は稼働中の 3 セット（logic-training-1・pref-ranking-1・umigame-soup-1）。</p>
+
+<h2 id="io">2. 入力と出力</h2>
+<p class="lead">1 回の収集は 3 つの仕事からなる。次の表は、仕事ごとに何を読み、どこへ書くか。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>仕事</th><th>読む</th><th>書く</th></tr></thead>
+  <tbody>
+    <tr><td>投稿の数値</td><td><code>posts</code>（直近 14 日の投稿）・Instagram Graph API の投稿インサイト（再生数・リーチ・いいね・保存・シェア・視聴時間・スキップ率など）</td><td><code>post_insights</code>（収集のたびに 1 行ずつ追記）</td></tr>
+    <tr><td>アカウントの日次</td><td>Instagram Graph API のアカウントインサイト</td><td><code>account_insights_daily</code>（前日までの日ごとの値。欠けた日はさかのぼって埋め、遅れて確定する値は取り直す）</td></tr>
+    <tr><td>コメント記録の取り込み</td><td>S3 <code>comment-log/{set_code}/dt={UTC 日付}/</code>（直近数日分の日付フォルダ）</td><td><code>umigame_comment_logs</code>（同じコメントは 1 行だけ。保持期限を過ぎた行は削除）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>コメント記録の取り込みは 3 セットすべての実行で走るが、記録があるのは umigame-soup-1 だけ。</p>
+
+<h2 id="flow">3. 流れ</h2>
+<p class="lead">図 2 は、1 回の起動で 3 つの仕事がどの順で進むかを表す。どの仕事も、途中で 1 件失敗しても残りを続け、失敗の件数を実行ログに残す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    participant SF as 収集の SFN
+    participant IB as insights-batch
+    participant IG as Instagram
+    participant DB as Aurora
+    participant S3 as S3
+    SF->>SF: DB 準備確認
+    SF->>IB: RunTask（set_code・scheduled_at・14 日）
+    IB->>DB: 直近 14 日の投稿を読む
+    IB->>IG: 投稿ごとのインサイト
+    IB->>DB: post_insights に追記
+    IB->>IG: アカウントの日次インサイト
+    IB->>DB: account_insights_daily を埋める
+    IB->>S3: comment-log/ の直近数日分を一覧して読む
+    IB->>DB: umigame_comment_logs に取り込み・期限切れを削除
+</pre>
+<figcaption>図 2 1 回の収集の流れ</figcaption>
+</figure>
+
+<h2 id="parts">4. 関わる部品</h2>
+<p class="lead">この機能を構成するプログラムと AWS のリソースの一覧。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>種類</th><th>部品</th></tr></thead>
+  <tbody>
+    <tr><td>プログラム</td><td><code>services/insights-batch</code>（KPI の集計は <code>content/insights-analysis/</code>）</td></tr>
+    <tr><td>SFN</td><td><code>acps-prod-insights-collection-sfn</code></td></tr>
+    <tr><td>ECS タスク定義</td><td><code>acps-prod-insights-batch</code></td></tr>
+    <tr><td>スケジュール</td><td>スケジュールグループ <code>acps-prod-insights-schedule-group</code>（6 本）</td></tr>
+    <tr><td>CDK スタック</td><td><code>InsightsBatchStack</code></td></tr>
+    <tr><td>テーブル・ビュー</td><td><code>post_insights</code>・<code>account_insights_daily</code>・<code>umigame_comment_logs</code>、KPI ビュー（<code>v_post_kpi_*</code>・<code>v_account_kpi_*</code>）、振り返り用ビュー <code>v_umigame_comment_review</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="handoff">5. ほかの機能との受け渡し</h2>
+<p class="lead">インサイト収集は、ほかの 2 つの機能が残したものを読み、振り返りへ渡す終点にあたる。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>相手</th><th>向き</th><th>受け渡すもの</th></tr></thead>
+  <tbody>
+    <tr><td><a href="post.html">投稿</a></td><td>受け取る</td><td><code>posts</code> の投稿（<code>media_id</code>）</td></tr>
+    <tr><td><a href="comment-reply.html">コメント自動返信</a></td><td>受け取る</td><td>S3 <code>comment-log/</code> のコメント記録（1 コメント 1 ファイル）</td></tr>
+    <tr><td>月次の振り返り（事業）</td><td>渡す</td><td>KPI ビューの数値（集計ランナーで取り出して<a href="../../strategy/business-strategy.html">事業戦略書</a>の KPI に転記する）</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>処理の詳細（集める指標・投稿の選び方・失敗時の扱い・API の使い方）→ <a href="../../app/batch-flow.html#flow-insights">バッチ処理フロー（インサイト収集）</a></li>
+  <li>AWS の定義（SFN の ASL・スケジュール）→ <a href="../../infra/workflow.html#insights-asl">ワークフロー 11 章（スケジュールは 1.6）</a></li>
+  <li>運用の手順（稼働確認・欠測の考え方・月次 KPI 転記）→ <a href="../../app/operation.html#insights-ops">アプリ運用設計 6 章</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 投稿の数値は上書きせず、収集のたびに積み増す</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>post_insights</code> は収集のたびに 1 行ずつ追記し、同じ回の再実行では増えないようにする</dd>
+  <dt>理由</dt><dd>投稿からの経過時間ごとの伸びを、あとで比べられるようにするため（KPI ビューは投稿から 72 時間の値で比べる）</dd>
+  <dt>日付・出典</dt><dd>Phase 16（インサイト収集バッチ）。<a href="../../app/batch-flow.html#flow-insights">バッチ処理フロー</a></dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 コメント記録の取り込みをインサイト収集に相乗りさせる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>コメント自動返信が S3 に置いた記録を、06:00 / 18:00 の収集の最後に DB へ取り込む</dd>
+  <dt>理由</dt><dd>コメント返信を Aurora が止まっていても動くようにしつつ、Aurora を起こす回数を増やさないため</dd>
+  <dt>日付・出典</dt><dd>2026-10（Phase 21-7b）。<code>database/V016__umigame_comment_logs.sql</code></dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>

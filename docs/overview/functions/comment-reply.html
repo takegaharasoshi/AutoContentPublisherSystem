@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: コメント自動返信 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / 機能別の基本設計: コメント自動返信</nav>
+<h1>コメント自動返信（配信面の機能 ③）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3b で新設）</span>
+  <span>1 段上: <a href="../system-overview.html#delivery">基本設計（全体）3 章 配信面の 4 系統</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">コメント自動返信は、umigame-soup-1（ウミガメのスープ）の投稿に視聴者が書いた回答コメントを判定し、探偵カメロックとして自動で返信する機能である。ほかの配信面の機能と違い、時刻ではなく Instagram からの通知（Webhook）をきっかけに、コメント 1 件ごとに数十秒以内で動く。判定と返信文づくりには LLM を使い、正解は投稿時に S3 へ置いた問題スナップショットから読む。</p>
+<p class="lead">図 1 は、コメントが届いてから返信と記録が終わるまでの部品のつながりを表す。上が受け付け（署名の検証とキューへの投入）、下が返信（判定・返信・記録）。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    IG(["Instagram のコメント"]) -->|"Webhook"| W@{ icon: "aws:lambda", form: "square", label: "受け付け: acps-prod-comment-reply-webhook" }
+    W --> Q@{ icon: "aws:sqs", form: "square", label: "acps-prod-comment-reply.fifo" }
+    Q --> R@{ icon: "aws:lambda", form: "square", label: "返信: acps-prod-comment-reply-reply" }
+    SN[("S3 problems/{media_id}.json&lt;br&gt;問題スナップショット")] --> R
+    R -->|"判定・返信文"| LLM(["LLM の API&lt;br&gt;Anthropic・OpenAI"])
+    R -->|"返信"| IG2(["Instagram"])
+    R --> CL[("S3 comment-log/&lt;br&gt;コメント記録")]
+    Q -.->|"失敗が続いたら"| DLQ["DLQ"]
+</pre>
+<figcaption>図 1 コメント自動返信の部品のつながり</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>目的</td><td>参加型の問題で、視聴者の質問や回答に判定（はい / いいえ など）をすぐ返し、やり取りを続けてもらう</td></tr>
+    <tr><td>きっかけ</td><td>Instagram の Webhook（コメントの通知）</td></tr>
+    <tr><td>入力</td><td>コメント本文・投稿の <code>media_id</code>、問題スナップショット（真相・判定の基準・核心語）</td></tr>
+    <tr><td>出力</td><td>Instagram への返信、S3 のコメント記録（Aurora には書かない <a class="decision-ref" href="#d-01">→ 理由 D-01</a>）</td></tr>
+    <tr><td>主な判断</td><td>受け付けと返信をキューで分ける <a class="decision-ref" href="#d-02">→ 理由 D-02</a> / 本番面とステージング面を同じ定義で持つ <a class="decision-ref" href="#d-03">→ 理由 D-03</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="trigger">1. きっかけ</h2>
+<p class="lead">この機能は Instagram からの通知だけで動く。Meta の Webhook の設定で、umigame-soup-1 のアカウントのコメントを受け付け用 Lambda の関数 URL に送らせている。受け付けは、Webhook の登録確認（GET）には確認用の文字列を返し、通知（POST）は署名（<code>X-Hub-Signature-256</code>）を検証し、自分の返信を除いたコメントの通知だけをキューに入れて、すぐ応答を返す。</p>
+
+<h2 id="io">2. 入力と出力</h2>
+<p class="lead">次の表は、返信 1 件ごとに何を読み、何を書くか。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>区分</th><th>もの</th><th>置き場所</th></tr></thead>
+  <tbody>
+    <tr><td>読む</td><td>コメントの通知（コメント ID・本文・<code>media_id</code>）</td><td>SQS FIFO <code>acps-prod-comment-reply.fifo</code>（<code>media_id</code> ごとに順番どおり。Webhook が同じコメントを重ねて送ってきたときは、キューに入れる時点で重複として除く）</td></tr>
+    <tr><td>読む</td><td>問題スナップショット（真相・判定の基準・核心語など）</td><td>S3 <code>assets/umigame-soup-1/problems/{media_id}.json</code>（<a href="post.html">投稿</a>が書く）</td></tr>
+    <tr><td>読む</td><td>Instagram のトークン・アプリの秘密鍵・LLM の API キー</td><td>Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code></td></tr>
+    <tr><td>書く</td><td>返信</td><td>Instagram（Instagram ログイン方式の Graph API）</td></tr>
+    <tr><td>書く</td><td>コメント記録（判定の結果と理由を含む JSON。返信できなかったときも書く）</td><td>S3 <code>comment-log/umigame-soup-1/dt={UTC 日付}/{comment_id}.json</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="flow">3. 流れ</h2>
+<p class="lead">この章は、要約の図 1 の「返信」の Lambda の中で起きることを詳しくしたもの。図 2 は、キューから 1 件を受け取ってから記録を書くまでを時間の順に表す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    participant Q as SQS FIFO
+    participant R as 返信の Lambda
+    participant S3 as S3
+    participant L as LLM の API
+    participant IG as Instagram
+    Q->>R: コメント 1 件
+    R->>S3: 問題スナップショットを読む
+    alt スナップショットがない
+        R->>S3: 記録だけ書いて終わる
+    else ある
+        R->>L: 回答を判定する（主は Anthropic、使えないときは OpenAI）
+        R->>L: 判定に合う返信文を作る（定型文と併用）
+        R->>R: 核心語が漏れていないかを検査
+        R->>IG: 返信する
+        R->>S3: コメント記録を書く
+    end
+</pre>
+<figcaption>図 2 返信 1 件の流れ</figcaption>
+</figure>
+<p>返信の Lambda は同時に 2 件までしか動かない。処理に失敗したメッセージはキューに戻って再試行され、決まった回数失敗すると DLQ（<code>acps-prod-comment-reply-dlq.fifo</code>）へ移り、アラームが鳴る。</p>
+
+<h2 id="parts">4. 関わる部品</h2>
+<p class="lead">この機能を構成するプログラムと AWS のリソースの一覧。同じ定義から本番面とステージング面の 2 組を作る。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>種類</th><th>本番面</th><th>ステージング面</th></tr></thead>
+  <tbody>
+    <tr><td>プログラム</td><td colspan="2"><code>services/comment-reply</code>（Lambda 3 本分。ランタイム同梱の boto3 だけを使う）</td></tr>
+    <tr><td>Lambda</td><td><code>acps-prod-comment-reply-webhook</code>・<code>-reply</code>（・<code>-token-refresh</code> は<a href="token-refresh.html">トークン更新</a>）</td><td>同じ名前の末尾に <code>-staging</code></td></tr>
+    <tr><td>キュー</td><td><code>acps-prod-comment-reply.fifo</code>・DLQ <code>acps-prod-comment-reply-dlq.fifo</code></td><td>末尾に <code>-staging</code></td></tr>
+    <tr><td>Secret</td><td><code>acps/prod/umigame-soup-1/comment-reply</code></td><td>末尾に <code>-staging</code></td></tr>
+    <tr><td>問題スナップショット</td><td><code>assets/umigame-soup-1/problems/</code></td><td><code>assets/umigame-soup-1/staging/problems/</code></td></tr>
+    <tr><td>CDK スタック</td><td><code>CommentReplyStack</code>（プライバシーポリシーの公開バケットも持つ）</td><td><code>CommentReplyStagingStack</code></td></tr>
+    <tr><td>監視</td><td colspan="2"><code>MonitoringStack</code> の DLQ のアラーム（本番面）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="handoff">5. ほかの機能との受け渡し</h2>
+<p class="lead">コメント自動返信は、投稿から正解を受け取り、インサイト収集へ記録を渡す。トークンはトークン更新が保つ。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>相手</th><th>向き</th><th>受け渡すもの</th></tr></thead>
+  <tbody>
+    <tr><td><a href="post.html">投稿</a></td><td>受け取る</td><td>問題スナップショット（投稿の成功後に書かれる）</td></tr>
+    <tr><td><a href="insights.html">インサイト収集</a></td><td>渡す</td><td>S3 のコメント記録（06:00 / 18:00 に DB の <code>umigame_comment_logs</code> へ取り込まれる）</td></tr>
+    <tr><td><a href="token-refresh.html">トークン更新</a></td><td>受け取る</td><td>Secret の Instagram トークン（週 1 回更新される）</td></tr>
+    <tr><td>生産（umigame の補充）</td><td>受け取る</td><td>判定の基準・核心語（在庫の素材として作られ、スナップショットに載る）。補充のときに判定の試行（プローブ）でこの機能と同じ判定処理を使う</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>処理の詳細（判定方式・返信の書き方・核心語の漏れ検査・品質基準）→ <a href="../../app/sets/umigame-soup-1.html#comment-reply">umigame-soup-1 の 10 節</a></li>
+  <li>AWS の定義（受け付け・キュー・Lambda・Secret の構成）→ <a href="../../infra/architecture.html#comment-reply">アーキテクチャ 1.1</a></li>
+  <li>運用の手順（DLQ にたまったとき）→ <a href="../../infra/workflow.html#comment-reply-dlq">ワークフロー 10.1</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 Aurora には書かず、記録を S3 に置く</h3>
+<dl>
+  <dt>決めたこと</dt><dd>返信の Lambda は DB に接続せず、問題は S3 のスナップショットから読み、記録は S3 に置く。DB への取り込みはインサイト収集が行う</dd>
+  <dt>理由</dt><dd>Aurora が自動停止していても、起こさずに数十秒で返信できるようにするため</dd>
+  <dt>日付・出典</dt><dd>2026-10（Phase 21）。<code>database/V016__umigame_comment_logs.sql</code></dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 受け付けと返信を FIFO キューで分ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>受け付けの Lambda は検証とキューへの投入だけを 10 秒以内で行い、判定と返信は別の Lambda がキューから 1 件ずつ処理する</dd>
+  <dt>理由</dt><dd>Webhook にすぐ応答して再送を避けつつ、LLM の呼び出しに時間がかかっても取りこぼさないため。同じ投稿のコメントは順番どおりに処理し、Webhook の再送による二重の投入をコメント ID で抑える（返信に失敗したメッセージの再試行は別で、キューの再配信で行う）</dd>
+  <dt>日付・出典</dt><dd>Phase 21-3（設計）・21-6（実装）。<a href="../../infra/architecture.html#comment-reply">アーキテクチャ 1.1</a></dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 本番面とステージング面を同じ定義で持つ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>同じ CDK のクラスから、名前の末尾だけ違う本番面とステージング面を作る</dd>
+  <dt>理由</dt><dd>判定や返信の変更を、本番の投稿に触れずにテスト用アカウントで試せるようにするため（PoC の後継。フルのステージング環境は作らない）</dd>
+  <dt>日付・出典</dt><dd>2026-10-11（Phase 21）。<code>poc/umigame-comment-webhook/</code> の README</dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>
