@@ -25,7 +25,7 @@ logic-training-1 セットの問題ストック(`quiz_stock_items`)を、16-2 �
 ```
 
 ```
-/goal セットレーン logic-training-1・週次補充 G2。完了条件: レビューで承認された N 問を投入(セクション 6)→ export_prompts → イラスト生成(文字混入・1536x1024 の自己確認込み)→ intake → build → review_sheet で work/review.html を生成。配置(publish)は行わない。
+/goal セットレーン logic-training-1・週次補充 G2。完了条件: レビューで承認された N 問を投入(セクション 6)→ export_prompts → イラスト生成(文字混入・1536x1024 の自己確認込み)→ intake → build → review_sheet でインデックス work/review.html と今回のシート work/review/<バッチ名>.html を更新(出力を貼る)。配置(publish)は行わない。
 ```
 
 ```
@@ -236,6 +236,9 @@ python3 content/quiz-stock/logic-training-1/<batch>/generate.py
    - `intake.py` は 3:2 でない素材を **WARNING + 切り捨て率**で報告する。被写体が端にある問題(操作パネル等)は切り捨てで見切れるため、警告が出たら該当問題のイラストだけ再生成する
    - レンダラー変更を既ビルド分へ反映する場合は **`build.py --rebuild`**(ビルド済み行を対象・BGM は `video_audio_asset_id` を引き継ぎ LRU を消費しない)
 4. **全数人間レビュー**: `review_sheet.py` → `work/review.html`。観点はイラスト(文字混入・画風・情景適合)・版面・音。NG は imagegen 再試行または `illustration_scene` 修正(DB 更新)→ 再ビルド
+   - **レビューシートはインデックス + バッチ別**(30-5〔2026-10-18〕で変更): `review_sheet.py` は実行のたびに `work/build_manifest.json` を累積の台帳 `work/review_archive.json` へ足し、**インデックス `work/review.html`**(全バッチの一覧・今回の印)と**バッチ別のシート `work/review/<バッチ名>.html`**(14 本超は `-2.html` …)を書き直す。バッチは `stock_items.py` の問題文との一致で決まるので、**ビルド前に今回のバッチの `stock_items.py` が置いてあること**(無いと「未分類」に入る)
+   - **補充のたびにインデックスを更新する**: ビルド後(G2 の最後)に必ず `review_sheet.py` を回し、**レビューの指摘で作り直したときも、その都度回してから出し直す**。ユーザーにはインデックスと今回のシートのパス(`work/review/<バッチ名>.html`)を伝える。出力の「インデックス: … 件」「シート: <バッチ名>.html(N 件)」の行を会話に貼る
+   - **`work/review_archive.json` を消さない・`build_manifest.json` を退避・作り直すときも台帳はそのまま**(過去分のシートの元。消したら退避した manifest を古い順に `--seed-from` で取り込み直す)
 5. **配置**: 承認 id を `approved.txt` に列挙 → `publish.py --dry-run` で `upload_prebuilt.sh` / `update_prebuilt.sql` を確認 → 本実行(S3 アップロード + ローカル MySQL 反映)→ Aurora へ `work/update_prebuilt.sql` を Data API で適用。**Aurora SQL は安定キー(set_code + question_text・BGM は s3_key)で解決する形式・S3 ファイル名も id ではなく `content_key`**(ローカルと Aurora で AUTO_INCREMENT id が一致しないため。id 直指定の SQL・id 入りの S3 キーを作らない)。適用後は更新行数 = 承認件数を確認
 6. **締め**: 在庫確認クエリ拡張版で `unbuilt` = 0 を確認し、ツール・台帳の変更をコミット
 
@@ -246,7 +249,7 @@ python3 content/quiz-stock/logic-training-1/<batch>/generate.py
 - **起動**: Claude Code は `/quiz-stock-replenish`、Codex は `$quiz-stock-replenish`。どちらも起動 = セットレーン logic-training-1 の宣言。Codex 直接セッションが触ってよいのは `content/quiz-stock/logic-training-1/` `content/video-build/logic-training-1/` `docs/plans/logic-training-1.html` `docs/plans/logic-training-1-log.html` `docs/issues/`(課題表の照合結果の反映)のみ(AGENTS.md「直接セッションのルール」)。`services/` `shared/` `database/` や共通設計書に触る必要が出たら手を止めて報告する(Claude Code の開発レーン行き。Codex では `$issue` で起票して終える)
 - **`/goal` の要否(23-4〔2026-09-21〕で追加)**: **Claude Code は G1a〜G3 をゴールとして立てる**(評価役が会話ログから完了を判定し、`or stop after N turns` のターン上限が効くため)。**Codex 直接セッションではゴールを必須にしない** — 23-3 の試行では 3 セッションとも `/goal` を使わずに工程が回り、Codex 側は完了が自己申告でターン上限も効かないため、ゴールを立てる利得が小さい(立てたい場合は下の行を使ってよい)。ただし **G1a〜G3 の工程の区切りと停止点は維持する**(G1a の後の候補選別、G1b の後の完成稿レビュー、G2・G3 の前後の承認ゲートを飛ばさない)。ゴールを立てない代わりに、**進捗と再開地点をバッチディレクトリの `STATUS.md`(`content/quiz-stock/logic-training-1/<batch>/STATUS.md`)へ都度書く** — 最終更新日・いまどの工程か(G1a / 候補選別待ち / G1b / 完成稿レビュー中 / G2 / G3)・朝夜別の候補 OK 数と不足・次に何をするか(再開地点)・承認済み / 未承認の内訳。候補の状態は `candidates/<batch>/INDEX.md`(`tally.py --write-index` の生成物)と各候補ファイルの `state` が正。セッションが切れても、別のセッションがここだけ読んで再開できる状態に保つ(2026-09-w3 のバッチが実例)
 - **`/goal` 行(G1a〜G3。ゴールを立てる場合)**: 文面は上のコードブロックで共通。**Claude Code は行末に `or stop after N turns` を足して打つ**(N は G1a = 30・G1b = 30・G2 = 30・G3 = 15)。**Codex はその句を付けない**(Codex では無視される構文)。Codex にはターン上限がなく自動継続するため、代わりに行末へ「3 ターン進捗がなければ blocked を申告して止まる」を足す。停止は `/goal pause` / `/goal clear`(ユーザー操作)。ゴールが `complete` にならないまま利用枠に達したら `usage_limited` で止まるので、再開時はどこまで進んだかを `STATUS.md`(あれば正)・`git status`・`work/` の中身から復元する
-- **完了申告前の再確認(Codex)**: Codex の `/goal` は自己申告で完了になるため、各ゴールの完了を申告する前に実コマンドで状態を確かめ、出力を会話に貼る — G1a: `tally.py <batch dir>` の再実行(形式チェック OK・候補数が目標の 2 倍)・G1b: `tally.py` で朝夜とも不足 0 + `validate.py` / `verify_logic.py` の再実行(全問パスの出力)・G2: `ls work/review.html` と `ls work/illustrations_raw | wc -l`(承認件数と一致)・G3: 在庫確認クエリの再実行(`unbuilt = 0`)と `git log origin/main..HEAD --oneline`(push 済みなら空)。「〜したはず」で申告しない
+- **完了申告前の再確認(Codex)**: Codex の `/goal` は自己申告で完了になるため、各ゴールの完了を申告する前に実コマンドで状態を確かめ、出力を会話に貼る — G1a: `tally.py <batch dir>` の再実行(形式チェック OK・候補数が目標の 2 倍)・G1b: `tally.py` で朝夜とも不足 0 + `validate.py` / `verify_logic.py` の再実行(全問パスの出力)・G2: `ls work/review.html work/review/<バッチ名>.html` と `ls work/illustrations_raw | wc -l`(承認件数と一致)・G3: 在庫確認クエリの再実行(`unbuilt = 0`)と `git log origin/main..HEAD --oneline`(push 済みなら空)。「〜したはず」で申告しない
 - **リサーチ(工程 1)**: Claude Code は WebSearch / WebFetch(まとまった裏取りは委譲ワーカーの Codex に curl で行わせてもよい)。Codex 直接セッションは組み込みの web_search(デスクトップアプリでは既定で有効。CLI なら `codex --search` で起動)か curl で**自分で**行う(Claude との委譲の往復はしない)。採用判断の基準(folklore 級 = 安全側)は共通
 - **イラスト生成(工程 7-2)**: Claude Code は委譲ワーカーの Codex に imagegen で生成させる(手順・確認項目は 7-2 のとおり指示文に含める)。Codex 直接セッションは**組み込みの imagegen で自分で生成**し、文字混入・1536x1024 の確認も自分で行う
 - **承認モード**: G2・G3 は Aurora 更新・S3 配置を含むため、Claude Code は auto mode で走らせない、Codex は `--full-auto` / `--yolo` を使わず承認ポリシーを既定のままにする(サンドボックス外の実行やネットワーク到達の承認プロンプトがゲートを兼ねる)
