@@ -209,7 +209,7 @@ flowchart TB
   <li><strong>導入の読み上げは全問共通の 1 文</strong>: <code>narration_irodori.synthesize_line</code> で 1 回だけ合成して <code>work/narration/_opening/</code> にキャッシュし、全問で使い回す（<code>--no-tts</code> ではそれを読む）。文・長さの設定が変わったら取り直す</li>
   <li><strong>予算の超過はビルドエラー</strong>（3 テイクとも超えたら問題文か cue の句読点を削る）。<code>infer.py</code> の失敗（GPU・環境）はその場でビルドを止める</li>
   <li><strong>BGM と音</strong>: BGM は <code>@remotion/media</code> の <code>&lt;Audio&gt;</code> で尺ちょうど（29 秒。<code>prepare_bgm.py</code> が <code>common.DURATION_SECONDS</code> で切り出してフェードを焼き込む）のトラックを敷く。導入と本編のナレーションの区間は BGM を -6dB 程度ダッキングし、SE は切り替えのフレームに置く。最終の MP4 を -14 LUFS / -2 dBTP へ正規化する</li>
-  <li><strong>TTS のアダプタ</strong>: Irodori が既定（ビルド時にローカル GPU で動かし、API キー・AWS の Secret は要らない）。Gemini 版（日次の上限のため本番では使わない）・Polly 版は <code>build.py --tts</code> で選べる形で残してある。VOICEVOX 版（<code>scripts/narration.py</code>）は PoC 用の CLI として残してあり、<code>build.py</code> からは選べない。声と設定の正はセットの資産 <code>assets/design.json</code> と参照音声 <code>assets/voice/kamerock-g4/</code>（<a href="../app/sets/umigame-soup-1.html#tts">セット別設計書 8 節</a>）</li>
+  <li><strong>TTS のアダプタ</strong>: Irodori が既定（ビルド時にローカル GPU で動かし、API キー・AWS の Secret は要らない）。Gemini 版（日次の上限のため本番では使わない）・Polly 版（Takumi 125%。21-5a・21-5b の初版 14 本で使った）は <code>build.py --tts</code> で選べる形で残してある。VOICEVOX 版（<code>scripts/narration.py</code>）は PoC 用の CLI として残してあり、<code>build.py</code> からは選べない。声と設定の正はセットの資産 <code>assets/design.json</code> と参照音声 <code>assets/voice/kamerock-g4/</code>（<a href="../app/sets/umigame-soup-1.html#tts">セット別設計書 8 節</a>）</li>
 </ul>
 <div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
   <li>導入シーンの決め方（静止画の比較と動画の確認の経緯）→ <a href="../plans/umigame-soup-1.html#step-R-1-1">セット計画書 R-1-1・R-1-2</a></li>

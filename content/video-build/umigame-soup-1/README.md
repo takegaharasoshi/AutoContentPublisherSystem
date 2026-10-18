@@ -4,14 +4,11 @@
 
 ## 本番の手順
 
-> **2026-10-17 セット改修 R-1-1（試作・第 8 稿）**: 先頭に導入シーン 5.0 秒を足し、ループの作り（継ぎ目の検証・
-> 周期を尺の約数にする制約）をやめて **一本道・29 秒（870 フレーム）**にした。導入シーンの版面は R-1-2 で決定
-> （「新体験」スタンプ・黄色の 2 行見出し・部分強調の説明文・「今日の謎」カードの hook・キャラの自己紹介の吹き出し）。
-> 文言は `assets/design.json` の `opening`（全問共通）。見出しだけ読み上げる（`opening.narration`。全問共通の 1 文を
-> `work/narration/_opening/` に 1 回だけ合成してキャッシュし、`--no-tts` ではそれを使う）。ナレーションは導入の後 0.5 秒（フレーム 165）から・予算 21 秒は
-> 据え置き。BGM は `prepare_bgm.py --no-sql` で 29 秒に作り直した（登録 SQL と Aurora の `duration_seconds = 24` は
-> 課題 I-041 で扱う）。試作は次のコマンドで、承認済みの `work/videos/` を上書きしないよう `work/r1-proto/` に書き出す。
-> 下の 21-2 PoC の記録にある 24 秒・ループ前提の記述は当時のもの（設計書は R-1-3 で実態へ直す）。
+> **2026-10-17 セット改修 R-1**: 先頭に導入シーン 5.0 秒を足し、一本道・29 秒（870 フレーム）にした。版面・文言・
+> ナレーションの開始位置・予算などの設計は `docs/production/umigame-soup-1.html` の 4 章が正（30-6a で本 README から移した）。
+> BGM は `prepare_bgm.py --no-sql` で 29 秒に作り直した（登録 SQL と Aurora の `duration_seconds = 24` は課題 I-041 で扱う）。
+> 試作は次のコマンドで、承認済みの `work/videos/` を上書きしないよう `work/r1-proto/` に書き出す。
+> 下の 21-2 PoC の記録にある 24 秒・ループ前提の記述は当時のもの。
 >
 > ```bash
 > python3 build.py --no-tts --content-key 012-early-morning-run --content-key 015-unlicensed-driver \
@@ -48,21 +45,16 @@ python3 publish.py
 
 ### ナレーション（21-5c〔2026-09-27〕で Irodori-TTS・声 G4 のクローンへ切替）
 
-- **既定は Irodori**（`scripts/narration_irodori.py`・`build.py --tts irodori`）。ローカル GPU で
-  `~/tools/Irodori-TTS`（環境変数 `IRODORI_DIR` で変更可。環境構築と決定の経緯は `poc/irodori-tts/README.md`）を
-  subprocess で呼ぶ。モデル・精度（BF16 必須）・seed・長さ・参照音声の場所は `assets/design.json` の `narration` 節が正、
-  声は `assets/voice/kamerock-g4/*.wav`（6 本・名前順）のクローン。API キー・AWS の資格情報は不要。
-- 問題文とルール文を **1 回の合成**で読ませ（別々に作るとルール文で口調が変わる）、文字数比に最も近い
-  0.3 秒以上の無音で切り分けて前後の無音を削る。話速調整はせず `--seconds 20.0` で長さを指定する。
-  2 cue + 間 1.2 秒が 21 秒を超えたら seed を進めて `--seconds` を 0.5 秒ずつ縮めて取り直す（1 回のビルドで最大 3 テイク）。
-  聞いて気になった問は `--retake-tts` で取り直す（1 問 3 回まで）。1 テイク約 45 秒。
-- `work/narration/<key>/narration.json` に model・参照音声（sha256）・precision・seed・seconds・切断位置
-  （`split_at_seconds`）・試したテイク（`takes`）・通算の合成回数（`attempt`）が残る。設定が一致して予算内なら
-  キャッシュを使い合成しない。Irodori のログは同じディレクトリの `irodori.log`。
-- `infer.py` が失敗したら（GPU・環境の問題）ビルドはその場で中断する。
-- Gemini 版は `build.py --tts gemini`（`scripts/narration_gemini.py`・設定は design.json の `narration_gemini` 節。
-  日次上限 100 リクエストのため本番では使わない）、Polly 版は `--tts polly`（Takumi 125%。21-5a / 21-5b の初版 14 本）、
-  VOICEVOX 版は `scripts/narration.py`（PoC 用 CLI）として残す。声の比較 PoC は `poc/gemini-tts/`・`poc/irodori-tts/`。
+合成のしかた（1 回の合成と切り分け・`--seconds` による長さの指定・予算 21 秒と取り直し・`narration.json` のキャッシュ・
+導入の読み上げ・アダプタ）の設計は `docs/production/umigame-soup-1.html` の 4.3 が正（30-6a で本 README から移した）。
+ここには実行に要ることだけを書く。
+
+- 既定は Irodori（`scripts/narration_irodori.py`・`build.py --tts irodori`）。`~/tools/Irodori-TTS` を subprocess で呼ぶ
+  （環境変数 `IRODORI_DIR` で変更可。環境構築と決定の経緯は `poc/irodori-tts/README.md`）。設定は `assets/design.json` の
+  `narration` 節、声は `assets/voice/kamerock-g4/*.wav`。API キー・AWS の資格情報は不要。1 テイク約 45 秒
+- 取り直しは `build.py --retake-tts --content-key <key>`（1 問 3 回まで）。Irodori のログは `work/narration/<key>/irodori.log`
+- Gemini 版は `build.py --tts gemini`（設定は design.json の `narration_gemini` 節。本番では使わない）、Polly 版は
+  `--tts polly`、VOICEVOX 版は `scripts/narration.py`（PoC 用 CLI）。声の比較 PoC は `poc/gemini-tts/`・`poc/irodori-tts/`
 
 ## 21-2 PoC の記録
 
