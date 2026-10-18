@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CI/CD 設計 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -13,54 +13,86 @@
 <h1>CI/CD 設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-08-10</span>
+  <span>最終更新: 2026-10-19（30-9a: 新しい書式へ移した。判断の記録 D-01〜D-10）/ 2026-08-10</span>
   <span>開発計画 Phase 8 で構築</span>
+  <span>1 段上: <a href="../overview/system-overview.html">基本設計（全体）</a>（CI/CD は配信面の 4 系統を横断する土台。構成要素の一覧は <a href="../overview/system-overview.html#components-stacks">6.2 CDK スタック</a>）</span>
 </div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、配信面のバッチ（ECS Fargate）のコンテナイメージを本番へ届ける仕組み（CI/CD）の詳細設計である。<a href="../overview/system-overview.html">基本設計（全体）</a>の詳細にあたる。サービスのコードは GitHub の <code>main</code> へ push すると、サービスごとのパイプライン 3 本（image-batch / sns-post-batch / insights-batch）がイメージを作って ECR へ push し、ECS タスク定義の新リビジョンを登録する。インフラ（<code>infra/</code>）は自動のパイプラインを持たず、開発者が手で <code>cdk diff</code> → <code>cdk deploy</code> する。</p>
+<p class="lead">図 1 は、サービスのパイプラインとインフラの手動デプロイの 2 本の道筋を表したもの。続く表はこのページの要点。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    gh(["GitHub の main へ push"])
+    subgraph SVC["サービスのパイプライン（image-batch / sns-post-batch / insights-batch の 3 本）"]
+        direction TB
+        cp@{ icon: "aws:codepipeline", form: "square", label: "CodePipeline V2&lt;br&gt;パスのトリガーで起動" }
+        cb@{ icon: "aws:codebuild", form: "square", label: "CodeBuild&lt;br&gt;pytest → docker build" }
+        ecr@{ icon: "aws:ecr", form: "square", label: "ECR へ push" }
+        td@{ icon: "aws:ecs", form: "square", label: "タスク定義の新リビジョン&lt;br&gt;（image URI だけ差し替え）" }
+        cp --> cb --> ecr --> td
+    end
+    gh -->|"services/〈サービス〉/** か shared/** の変更"| cp
+    subgraph INFRA["インフラ（手動）"]
+        direction TB
+        dev(["開発者のローカル"])
+        cdk["cdk diff で差分を目視 → cdk deploy"]
+        dev --> cdk
+    end
+    cdk -->|"タスク定義の設定（ロール・環境変数など）を更新"| td
+    sfn@{ icon: "aws:step-functions", form: "square", label: "Step Functions&lt;br&gt;family 名で最新リビジョンを実行" }
+    td --> sfn
+</pre>
+<figcaption>図 1 CI/CD の全体像（サービスはパイプラインで自動、インフラは手動の cdk deploy）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>パイプライン</td><td>サービスごとに 3 本（<code>acps-{env}-image-batch-pipeline</code> / <code>-sns-post-batch-pipeline</code> / <code>-insights-batch-pipeline</code>）。<code>shared/**</code> の変更は 3 本すべてを起動する</td></tr>
+    <tr><td>GitHub 接続</td><td>CodePipeline V2 + CodeStar Connections（GitHub App）。起動はトリガー設定のファイルパスフィルタで判定する</td></tr>
+    <tr><td>ビルド</td><td>CodeBuild が pytest → Docker build（リポジトリルートがビルドコンテキスト）→ ECR push → タスク定義の新リビジョン登録</td></tr>
+    <tr><td>タスク定義の正</td><td>CDK。CodeBuild は最新 ACTIVE リビジョンの image URI だけを差し替える <a class="decision-ref" href="#d-06">→ 理由 D-06</a></td></tr>
+    <tr><td>インフラ</td><td>パイプラインなし。<code>cdk diff</code> → <code>cdk deploy</code> を手動で、イメージタグの Context は常に 4 つとも指定する <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>対象外</td><td><code>db-readiness-check</code> はパイプラインを持たず、手で ECR へ push して FoundationStack の deploy で反映する <a class="decision-ref" href="#d-04">→ 理由 D-04</a></td></tr>
+    <tr><td>失敗の監視</td><td>コンソールで手動確認（自動通知なし）</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
 
 <h2 id="overall">1. 全体フロー</h2>
 
+<p class="lead">サービスのパイプラインは、GitHub への push を受けて CodeBuild でテスト・ビルドし、ECR へ push してタスク定義の新リビジョンを登録するところまでを行う（図 2）。インフラの変更はパイプラインを通さず手動でデプロイする。</p>
+
 <figure class="diagram">
-<svg viewBox="0 0 880 300" role="img" aria-label="CI/CD 全体フロー図">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="var(--diag-line)"/>
-    </marker>
-  </defs>
-
-  <text x="30" y="34" font-size="13" font-weight="bold" fill="var(--diag-text)">サービスパイプライン（image-batch / sns-post-batch / insights-batch）</text>
-
-  <rect x="30" y="50" width="130" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="95" y="79" text-anchor="middle" font-size="13" fill="var(--diag-text)">GitHub（push）</text>
-
-  <rect x="200" y="50" width="160" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="280" y="72" text-anchor="middle" font-size="12" fill="var(--diag-text)">CodePipeline</text>
-  <text x="280" y="90" text-anchor="middle" font-size="11" fill="var(--diag-text)">Source → Build</text>
-
-  <rect x="400" y="50" width="170" height="48" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="485" y="72" text-anchor="middle" font-size="12" fill="var(--diag-text)">CodeBuild</text>
-  <text x="485" y="90" text-anchor="middle" font-size="11" fill="var(--diag-text)">pytest → Docker build</text>
-
-  <rect x="610" y="50" width="110" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="665" y="79" text-anchor="middle" font-size="13" fill="var(--diag-text)">ECR push</text>
-
-  <rect x="30" y="140" width="690" height="48" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="375" y="169" text-anchor="middle" font-size="12" fill="var(--diag-text)">ECS Task Definition: latest ACTIVE revision の image URI だけを差し替えて新リビジョン登録</text>
-
-  <line x1="160" y1="74" x2="196" y2="74" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="360" y1="74" x2="396" y2="74" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="570" y1="74" x2="606" y2="74" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="665" y1="98" x2="665" y2="136" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <text x="30" y="236" font-size="13" font-weight="bold" fill="var(--diag-text)">インフラデプロイ（手動）</text>
-  <rect x="30" y="248" width="690" height="40" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="375" y="273" text-anchor="middle" font-size="12" fill="var(--diag-text)">開発者がローカルから cdk diff で差分を目視確認 → cdk deploy でデプロイ</text>
-</svg>
+<pre class="mermaid">
+flowchart TB
+    gh(["GitHub（push）"])
+    subgraph PL["CodePipeline（サービスごと）"]
+        direction TB
+        src["Source ステージ&lt;br&gt;CodeStar Connections"]
+        subgraph BLD["Build ステージ（CodeBuild）"]
+            direction TB
+            t["pytest"]
+            b["Docker build"]
+            p["ECR へ push"]
+            d["最新 ACTIVE のタスク定義を取得"]
+            r["image URI だけ差し替えて新リビジョンを登録"]
+            t --> b --> p --> d --> r
+        end
+        src --> t
+    end
+    gh --> src
+    dev(["開発者のローカル"]) -->|"cdk diff で差分を目視 → cdk deploy"| cfn["CloudFormation（各スタック）"]
+</pre>
+<figcaption>図 2 サービスのパイプラインの段とインフラの手動デプロイ</figcaption>
 </figure>
 
-<div class="note">
-  <span class="callout-title">インフラパイプラインは構築しない</span>
-  FoundationStack に Aurora・VPC など破壊的変更のリスクが高いリソースが含まれるため、インフラ変更は <code>cdk diff -c env=prod</code> で差分を確認した上で手動デプロイとする。個人開発でインフラ変更頻度は低く、手動運用のコストも小さい。
-</div>
+<p>インフラのパイプラインは構築しない。インフラの変更は <code>cdk diff -c env=prod</code> で差分を確認した上で手動でデプロイする <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。</p>
+
 
 <h3>1.1 GitHub 接続方式</h3>
 <ul>
@@ -68,15 +100,9 @@
   <li>CodeStar Connections は AWS コンソールで事前に作成し、GitHub リポジトリとの接続を承認する</li>
   <li>パイプラインの Source Stage で CodeStar Connections をソースプロバイダーとして指定する</li>
   <li>トリガーフィルタ: CodePipeline V2 のトリガー設定でファイルパスフィルタ（<code>services/image-batch/**</code>、<code>shared/**</code> 等）を指定し、関連ファイルの変更時のみパイプラインを起動する</li>
+  <li>Source アクションの <code>DetectChanges</code> は <code>false</code>（CDK では <code>CodeStarConnectionsSourceAction</code> の <code>triggerOnPush: false</code>）。起動の判定はトリガー設定側が担う <a class="decision-ref" href="#d-02">→ 理由 D-02</a></li>
+  <li>Source アクションロールには、CDK が自動で付ける <code>codestar-connections:UseConnection</code> に加えて <code>codeconnections:UseConnection</code> を明示で付ける（<a href="security.html#iam">security.html セクション 2.5</a>） <a class="decision-ref" href="#d-03">→ 理由 D-03</a></li>
 </ul>
-
-<div class="decision">
-  <span class="callout-title">実装メモ（Phase 8-1）</span>
-  <ul>
-    <li>トリガーフィルタを使う構成では、Source アクションの <code>DetectChanges</code> は <code>false</code> が正しい設定（AWS 公式のトリガー設定表のとおり。パイプラインの起動判定はトリガー設定側が担う）。CDK では <code>CodeStarConnectionsSourceAction</code> の <code>triggerOnPush: false</code> で表現しており、バグではない</li>
-    <li>接続 ARN が新形式（サービス名 <code>codeconnections</code>）のため、CDK が自動付与する <code>codestar-connections:UseConnection</code> に加えて <code>codeconnections:UseConnection</code> を Source アクションロールに明示付与している（<a href="security.html#iam">security.html セクション 2.5</a>）</li>
-  </ul>
-</div>
 
 <h2 id="split">2. パイプライン分割</h2>
 <p>サービスごとにパイプラインを分割する。</p>
@@ -94,14 +120,14 @@
 
 <div class="note">
   <span class="callout-title">db-readiness-check について</span>
-  db-readiness-check は FoundationStack で管理する共通ユーティリティであり、CI/CD パイプラインの対象外とする。更新時は開発者が不変タグ（例: Git コミットハッシュ）で Docker イメージを ECR へ push し、<code>dbReadinessCheckImageTag</code> の CDK Context にそのタグを渡して <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を実行する。FoundationStack はこのタグを使って新しい ECS Task Definition revision を登録する。
+  db-readiness-check は FoundationStack で管理し、CI/CD パイプラインの対象外とする <a class="decision-ref" href="#d-04">→ 理由 D-04</a>。更新時は開発者が不変タグ（例: Git コミットハッシュ）で Docker イメージを ECR へ push し、<code>dbReadinessCheckImageTag</code> の CDK Context にそのタグを渡して <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を実行する。FoundationStack はこのタグを使って新しい ECS Task Definition revision を登録する。
 </div>
 
 <div class="note">
   <span class="callout-title">トリガー条件の補足</span>
   <ul>
-    <li><code>shared/**</code> の変更は全サービスパイプラインをトリガーする（共通ライブラリの変更が各サービスに影響するため）</li>
-    <li><code>infra/**</code> の変更に対する自動パイプラインは設けない。インフラ変更時は開発者が <code>cdk diff -c env=prod</code> → <code>cdk deploy -c env=prod</code> を手動で実行する。サービスパイプラインは最新 ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録するため、後続のイメージ更新時にも CDK 変更が引き継がれる</li>
+    <li><code>shared/**</code> の変更は全サービスパイプラインをトリガーする <a class="decision-ref" href="#d-05">→ 理由 D-05</a></li>
+    <li><code>infra/**</code> の変更に対する自動パイプラインは設けない <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。インフラ変更時は開発者が <code>cdk diff -c env=prod</code> → <code>cdk deploy -c env=prod</code> を手動で実行する。サービスパイプラインは最新 ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録するので、後続のイメージ更新時にも CDK 変更が引き継がれる <a class="decision-ref" href="#d-06">→ 理由 D-06</a></li>
   </ul>
 </div>
 
@@ -111,8 +137,8 @@
 <h3>3.1 バッチサービス用（image-batch / sns-post-batch / insights-batch）</h3>
 <ul>
   <li><strong>buildspec.yml の配置</strong>: サービスごとに <code>services/{service-name}/buildspec.yml</code> に配置する（例: <code>services/image-batch/buildspec.yml</code>）</li>
-  <li><strong>Docker ビルドコンテキスト</strong>: リポジトリルートをビルドコンテキストとし、サービスごとの Dockerfile を <code>-f</code> オプションで指定する（例: <code>docker build -f services/image-batch/Dockerfile .</code>）。これにより <code>shared/</code> ディレクトリを <code>COPY</code> でコンテナに含めることができる</li>
-  <li><strong>.dockerignore</strong>: リポジトリルートに <code>.dockerignore</code> を配置し、ビルドに不要なファイル（<code>docs/</code>, <code>.git/</code>, <code>infra/</code>, <code>plans/</code>, ルート直下の <code>*.md</code>）を除外する。ビルドコンテキストの肥大化を防ぎ、ビルド時間を短縮する</li>
+  <li><strong>Docker ビルドコンテキスト</strong>: リポジトリルートをビルドコンテキストとし、サービスごとの Dockerfile を <code>-f</code> オプションで指定する（例: <code>docker build -f services/image-batch/Dockerfile .</code>）。<code>shared/</code> ディレクトリは <code>COPY</code> でコンテナに含める <a class="decision-ref" href="#d-07">→ 理由 D-07</a></li>
+  <li><strong>.dockerignore</strong>: リポジトリルートに <code>.dockerignore</code> を配置し、ビルドに不要なファイル（<code>docs/</code>, <code>.git/</code>, <code>infra/</code>, <code>plans/</code>, ルート直下の <code>*.md</code>）を除外する <a class="decision-ref" href="#d-07">→ 理由 D-07</a></li>
   <li><strong>テスト実行</strong>: Docker イメージを push する前に対象サービスの <code>pytest</code> を実行し、失敗時はパイプラインを停止する</li>
 </ul>
 
@@ -158,13 +184,13 @@ cdk deploy -c env=prod \
   &lt;StackName&gt;                               # 確認後にデプロイ
 
 # 全スタックを依存順にデプロイする場合も同じ Context 指定で StackName だけ変える
-# （FoundationStack → SnsPostBatchStack → ImageBatchStack → InsightsBatchStack → MonitoringStack の順）</code></pre>
+# （FoundationStack → SnsPostBatchStack → ImageBatchStack → InsightsBatchStack → MonitoringStack の順。CommentReplyStack は FoundationStack の後・MonitoringStack の前〔MonitoringStack が DLQ とトークン更新 Lambda を参照する〕、CommentReplyStagingStack は FoundationStack の後）</code></pre>
 
 <div class="note">
   <span class="callout-title">イメージタグ Context の指定ルール（開発計画 Phase 8-3 で確認）</span>
   <ul>
     <li>各スタックは現行イメージの不変タグを CDK Context で受け取る。未指定のスタックは synth エラーとなる: <code>dbReadinessCheckImageTag</code>（FoundationStack、Phase 3-3 以降）/ <code>imageBatchImageTag</code>（ImageBatchStack、Phase 8-1 以降）/ <code>snsPostBatchImageTag</code>（SnsPostBatchStack、Phase 8-2 以降）/ <code>insightsBatchImageTag</code>（InsightsBatchStack、Phase 16-10 以降）</li>
-    <li>1 スタックだけを diff / deploy する場合でも、CDK は上流の依存スタック（例: ImageBatchStack なら FoundationStack と SnsPostBatchStack）を選択に含めて synth 検証するため、<strong>対象スタック以外のタグも必要になる。常に 4 つとも指定するのが確実</strong></li>
+    <li>1 スタックだけを diff / deploy する場合でも、CDK は上流の依存スタック（例: ImageBatchStack なら FoundationStack と SnsPostBatchStack）を選択に含めて synth 検証する。<strong>対象スタック以外のタグも必要になるので、常に 4 つとも指定する</strong> <a class="decision-ref" href="#d-08">→ 理由 D-08</a></li>
     <li>現行タグの確認方法: 各サービスの latest ACTIVE タスク定義のイメージ URI（<code>aws ecs describe-task-definition --task-definition acps-prod-&lt;service&gt; --query 'taskDefinition.containerDefinitions[0].image'</code>）。image-batch / sns-post-batch はパイプラインが push した Git コミットハッシュ先頭 12 文字が現行タグとなる</li>
     <li>サービスパイプラインの実行後は、CloudFormation 側のテンプレートが前回 CDK デプロイ時点のタグを保持しているため、<code>cdk diff</code> にタスク定義のイメージタグ変更（旧タグ → 指定した現行タグ）が現れる。これは設計どおりの挙動であり、現行タグを指定してデプロイすれば同一イメージの新 revision が登録されるだけでロールバックは起きない</li>
   </ul>
@@ -195,7 +221,7 @@ cdk deploy -c env=prod \
 <ul>
   <li><strong>保持ルール（サービス用）</strong>: <code>auto-content-publisher/image-batch</code> / <code>auto-content-publisher/sns-post-batch</code> / <code>auto-content-publisher/insights-batch</code> は通常ビルドタグ（Git コミットハッシュ等）を最新 10 個まで保持し、それ以前は自動削除する</li>
   <li><strong>保持ルール（ロールバック保護用）</strong>: 長めに残したいイメージには <code>release-*</code> などの保護用タグを追加し、通常ビルドタグとは別ルールで最新 30 個程度を保持する。保持対象外のタグは Task Definition が参照中でも Lifecycle Policy により削除され得るため、ロールバック前に ECR 上のイメージ存在を確認する</li>
-  <li><strong>保持ルール（db-readiness-check）</strong>: <code>auto-content-publisher/db-readiness-check</code> は CDK Context <code>dbReadinessCheckImageTag</code> で不変タグを参照する運用のため、ロールバック余地を確保するため保持数を多めに設定する（例: 30 個）。Task Definition が参照中のタグも Lifecycle Policy の保護対象にはならないため、保持数を超えた古いタグへロールバックする場合は、同等内容のイメージを新しい不変タグで再 push してから CDK Context を更新する</li>
+  <li><strong>保持ルール（db-readiness-check）</strong>: <code>auto-content-publisher/db-readiness-check</code> は保持数を 30 個にする <a class="decision-ref" href="#d-09">→ 理由 D-09</a>。Task Definition が参照中のタグも Lifecycle Policy の保護対象にはならないため、保持数を超えた古いタグへロールバックする場合は、同等内容のイメージを新しい不変タグで再 push してから CDK Context を更新する</li>
   <li><strong>設定箇所</strong>: FoundationStack の ECR リポジトリ定義に含める（リポジトリごとに <code>LifecyclePolicy</code> を個別指定する）</li>
 </ul>
 
@@ -205,7 +231,7 @@ cdk deploy -c env=prod \
   <li>ECS Service は使用しない</li>
   <li>Docker イメージを ECR に push し、新しい ECS タスク定義リビジョンを登録する</li>
   <li><strong>タスク定義の参照方式</strong>: Step Functions はタスク定義を family 名（例: <code>acps-prod-image-batch</code>）で参照し、ECS RunTask API が常に ACTIVE な最新リビジョンを使用する</li>
-  <li><strong>Task Definition の SSOT</strong>: Task Definition 全体（family、ロール、環境変数、ログ設定、CPU/メモリ）の正は CDK とする。CodeBuild は最新 ACTIVE revision を取得し、コンテナ image URI だけを差し替えて新 revision を登録する</li>
+  <li><strong>Task Definition の SSOT</strong>: Task Definition 全体（family、ロール、環境変数、ログ設定、CPU/メモリ）の正は CDK とする。CodeBuild は最新 ACTIVE revision を取得し、コンテナ image URI だけを差し替えて新 revision を登録する <a class="decision-ref" href="#d-06">→ 理由 D-06</a></li>
 </ul>
 
 <h3>Task Definition の管理責任</h3>
@@ -214,7 +240,7 @@ cdk deploy -c env=prod \
   <thead><tr><th>操作</th><th>担当</th><th>説明</th></tr></thead>
   <tbody>
     <tr><td>db-readiness-check の初期作成・更新</td><td>CDK（FoundationStack、手動）</td><td>開発者が Docker イメージを不変タグで ECR push し、<code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> でそのタグを参照する新 revision を登録する</td></tr>
-    <tr><td>初期作成・設定変更</td><td>CDK（ImageBatchStack / SnsPostBatchStack）</td><td>Task Definition、IAM Role、Log Group、環境変数等を一括作成し、Task Definition 全体の正とする</td></tr>
+    <tr><td>初期作成・設定変更</td><td>CDK（ImageBatchStack / SnsPostBatchStack / InsightsBatchStack）</td><td>Task Definition、IAM Role、Log Group、環境変数等を一括作成し、Task Definition 全体の正とする</td></tr>
     <tr><td>イメージ更新時の revision 登録</td><td>CodeBuild（post_build）</td><td><code>aws ecs describe-task-definition</code> で latest ACTIVE revision を取得し、コンテナ image URI だけを差し替えて <code>aws ecs register-task-definition</code> で新 revision を登録する</td></tr>
     <tr><td>インフラ変更後の確認</td><td>開発者</td><td><code>cdk deploy -c env=prod</code> 後に latest ACTIVE revision を確認し、ロール・環境変数・リソース参照が反映されていることを確認する</td></tr>
   </tbody>
@@ -231,14 +257,14 @@ cdk deploy -c env=prod \
 
 <h3>6.1 手順</h3>
 <ol>
-  <li><code>cdk diff -c env=prod &lt;StackName&gt;</code> で差分を確認する（イメージタグ Context 3 つの指定が必要。<a href="#manual-deploy">セクション 3.2</a> の指定ルールを参照）</li>
+  <li><code>cdk diff -c env=prod &lt;StackName&gt;</code> で差分を確認する（イメージタグ Context 4 つの指定が必要。<a href="#manual-deploy">セクション 3.2</a> の指定ルールを参照）</li>
   <li><strong>db-readiness-check のイメージ更新を伴う場合</strong>、手動で Docker イメージをビルドし、不変タグで ECR に push する</li>
   <li><code>cdk deploy -c env=prod &lt;StackName&gt;</code> でインフラを更新する
     <ul>
       <li>イメージに変更がない場合も、各タグ Context には現行の不変タグを指定する（db-readiness-check の更新時のみ <code>dbReadinessCheckImageTag</code> に新タグを指定する）</li>
     </ul>
   </li>
-  <li><strong>ImageBatchStack または SnsPostBatchStack に変更が含まれる場合</strong>、latest ACTIVE revision を確認する
+  <li><strong>ImageBatchStack・SnsPostBatchStack・InsightsBatchStack のどれかに変更が含まれる場合</strong>、latest ACTIVE revision を確認する
     <ul><li>期待するロール、環境変数、ログ設定、リソース参照が反映されていることを AWS Console または CLI で確認する</li></ul>
   </li>
   <li>Step Functions が次回実行時に latest ACTIVE revision を使用することを確認する</li>
@@ -253,6 +279,8 @@ cdk deploy -c env=prod \
     <tr><td>FoundationStack + db-readiness-check イメージ更新</td><td>サービスパイプライン不要。手動で Docker ビルド・ECR push 後、<code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を実行</td></tr>
     <tr><td>ImageBatchStack（ロール、環境変数等）</td><td>不要（CDK が latest ACTIVE revision を更新する）</td></tr>
     <tr><td>SnsPostBatchStack（ロール、環境変数等）</td><td>不要（同上）</td></tr>
+    <tr><td>InsightsBatchStack（ロール、環境変数等）</td><td>不要（同上）</td></tr>
+    <tr><td>CommentReplyStack / CommentReplyStagingStack（Lambda のコード・設定）</td><td>対象外（コメント返信は CodePipeline を持たず、Lambda のコードも <code>cdk deploy</code> で更新する。<a href="stacks.html#comment-reply">stacks.html 3.6</a>）</td></tr>
     <tr><td>MonitoringStack のみ</td><td>不要</td></tr>
   </tbody>
 </table>
@@ -288,7 +316,7 @@ cdk deploy -c env=prod \
 <p>現時点では本番環境（<code>main</code> ブランチ）のみを運用する。環境は 1 つだが、将来の複数環境対応に備えて環境名は <code>prod</code> として扱う。開発環境の分離は将来拡張とする。</p>
 
 <h3>9.2 命名規約（将来の複数環境対応に備えた方針）</h3>
-<p>将来的に開発環境を追加する際は、<strong>同一 AWS アカウント内</strong>で環境を分離する（アカウント分離は行わない）。以下の命名規約でリソースを区別する:</p>
+<p>将来的に開発環境を追加する際は、<strong>同一 AWS アカウント内</strong>で環境を分離する（アカウント分離は行わない）。以下の命名規約でリソースを区別する <a class="decision-ref" href="#d-10">→ 理由 D-10</a>:</p>
 
 <div class="table-wrap">
 <table>
@@ -307,14 +335,101 @@ cdk deploy -c env=prod \
   <li>CDK Context パラメータ（<code>-c env=prod</code>）で環境名を渡し、リソース名に反映する</li>
   <li>現時点の単一環境でも <code>env=prod</code> を付与して運用し、Secret 名・IAM スコープ・スタック名に反映する</li>
   <li>ECS Task Definition には <code>ENV_NAME</code> を環境変数として注入し、アプリケーションが Secret 名を導出できるようにする</li>
-  <li>S3 バケット名はグローバルに一意である必要がある。グローバル一意化のため CDK でアカウント ID をサフィックスとして明示指定しており、上表の例（<code>acps-prod-images</code>）は論理名で、実際のバケット名は <code>acps-{env}-images-{アカウント ID}</code>（例: <code>acps-prod-images-123456789012</code>）の形式になる</li>
+  <li>S3 バケット名には CDK でアカウント ID をサフィックスとして明示で付ける（バケット名はグローバルに一意である必要があるため）。上表の例（<code>acps-prod-images</code>）は論理名で、実際のバケット名は <code>acps-{env}-images-{アカウント ID}</code>（例: <code>acps-prod-images-123456789012</code>）の形式になる</li>
 </ul>
 
-<div class="note">
-  <span class="callout-title">注記</span>
-  初期開発では単一環境で運用するが、命名規約だけは <code>prod</code> を前提に先行導入しておく。
-</div>
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 インフラのパイプラインは作らず、手動の cdk deploy にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>infra/**</code> の変更に自動のパイプラインを設けない。開発者が <code>cdk diff -c env=prod</code> で差分を確認した上で <code>cdk deploy</code> する</dd>
+  <dt>理由</dt><dd>FoundationStack に Aurora・VPC など破壊的変更のリスクが高いリソースが含まれるため、差分を人が目で見てからデプロイする。個人開発でインフラ変更頻度は低く、手動運用のコストも小さい</dd>
+  <dt>退けた案</dt><dd>インフラ用のパイプライン（CDK Deploy ステージ）を置く案</dd>
+  <dt>日付・出典</dt><dd>当初設計（Phase 8 で構築）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 Source アクションの DetectChanges を false にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>トリガーフィルタを使うので、Source アクションの <code>DetectChanges</code> は <code>false</code>（CDK の <code>triggerOnPush: false</code>）にする</dd>
+  <dt>理由</dt><dd>トリガーフィルタを使う構成では <code>false</code> が正しい設定（AWS 公式のトリガー設定表のとおり。パイプラインの起動判定はトリガー設定側が担う）。バグではない</dd>
+  <dt>日付・出典</dt><dd>実装メモ（Phase 8-1）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 codeconnections:UseConnection を明示で付ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Source アクションロールに <code>codeconnections:UseConnection</code> を明示で付与する</dd>
+  <dt>理由</dt><dd>接続 ARN が新形式（サービス名 <code>codeconnections</code>）のため、CDK が自動付与する <code>codestar-connections:UseConnection</code> だけでは足りない</dd>
+  <dt>日付・出典</dt><dd>実装メモ（Phase 8-1）</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 db-readiness-check はパイプラインの対象外にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>db-readiness-check はパイプラインを持たず、不変タグで手動 push → <code>dbReadinessCheckImageTag</code> を渡した FoundationStack の deploy で新リビジョンを登録する</dd>
+  <dt>理由</dt><dd>db-readiness-check は FoundationStack で管理する共通ユーティリティであるため</dd>
+  <dt>日付・出典</dt><dd>（記録なし。Phase 3-3 で Context 化）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 shared/** の変更でサービスのパイプライン 3 本すべてを起動する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>各パイプラインのトリガーに <code>shared/**</code> を含める</dd>
+  <dt>理由</dt><dd>共通ライブラリの変更が各サービスに影響するため</dd>
+  <dt>日付・出典</dt><dd>当初設計（Phase 8）</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 タスク定義の正は CDK、CodeBuild は image URI だけを差し替える</h3>
+<dl>
+  <dt>決めたこと</dt><dd>CodeBuild は最新 ACTIVE リビジョンを取得し、コンテナ image URI だけを差し替えて新リビジョンを登録する。Step Functions はタスク定義を family 名で参照する</dd>
+  <dt>理由</dt><dd>最新 ACTIVE リビジョンをベースにするので、CDK で変えたロール・環境変数などが後続のイメージ更新にも引き継がれる。family 名で参照するので、イメージ更新のたびに Step Functions を更新しなくてよい</dd>
+  <dt>退けた案</dt><dd>パイプラインに Deploy ステージ（CDK Deploy）を含める案（インフラ変更は D-01 のとおり手動に限る）</dd>
+  <dt>日付・出典</dt><dd>当初設計（Phase 8）</dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 Docker のビルドコンテキストをリポジトリルートにする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>リポジトリルートをビルドコンテキストにし、Dockerfile は <code>-f</code> で指定する。ルートの <code>.dockerignore</code> で不要なファイルを除く</dd>
+  <dt>理由</dt><dd><code>shared/</code> を <code>COPY</code> でコンテナに含めるため。<code>.dockerignore</code> はビルドコンテキストの肥大化を防ぎ、ビルド時間を短縮するため</dd>
+  <dt>日付・出典</dt><dd>当初設計（Phase 8）</dd>
+</dl>
+</article>
+<article id="d-08">
+<h3>D-08 cdk diff / deploy ではイメージタグの Context を常に 4 つとも渡す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>1 スタックだけを diff / deploy するときも、<code>dbReadinessCheckImageTag</code> / <code>imageBatchImageTag</code> / <code>snsPostBatchImageTag</code> / <code>insightsBatchImageTag</code> をすべて指定する</dd>
+  <dt>理由</dt><dd>CDK は上流の依存スタック（例: ImageBatchStack なら FoundationStack と SnsPostBatchStack）を選択に含めて synth 検証するため、対象スタック以外のタグも必要になる</dd>
+  <dt>日付・出典</dt><dd>開発計画 Phase 8-3 で確認（insightsBatchImageTag は Phase 16-10 以降）</dd>
+</dl>
+</article>
+<article id="d-09">
+<h3>D-09 db-readiness-check の ECR は保持数を 30 個にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>auto-content-publisher/db-readiness-check</code> のライフサイクルポリシーは最新 30 個を保持する</dd>
+  <dt>理由</dt><dd>CDK Context <code>dbReadinessCheckImageTag</code> で不変タグを参照する運用のため、ロールバックの余地を確保する</dd>
+  <dt>日付・出典</dt><dd>（記録なし）</dd>
+</dl>
+</article>
+<article id="d-10">
+<h3>D-10 環境は同一アカウント内で命名で分け、prod の命名を先行導入する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>将来の開発環境は同一 AWS アカウント内に置き、命名規約（<code>{EnvName}-{StackName}</code>・<code>acps/{env}/...</code> など）で区別する。単一環境の今も <code>env=prod</code> を付けて運用する</dd>
+  <dt>理由</dt><dd>初期開発では単一環境で運用するが、命名規約だけは <code>prod</code> を前提に先行導入しておく</dd>
+  <dt>退けた案</dt><dd>アカウント分離</dd>
+  <dt>日付・出典</dt><dd>当初設計</dd>
+</dl>
+</article>
+</section>
 
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>

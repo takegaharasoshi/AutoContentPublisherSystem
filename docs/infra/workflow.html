@@ -13,7 +13,7 @@
 <h1>ワークフロー実装仕様</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-18（Phase 30-4 で新しい書式へ移し〔要約・リード文・SFN のフロー図・判断の記録〕、1.6 のインサイト収集のスケジュール一覧を実態〔3 セット × 朝夕〕に直した）</span>
+  <span>最終更新: 2026-10-19（30-9a: 本文に残っていた理由を判断の記録へ移した = I-043）・2026-10-18（Phase 30-4 で新しい書式へ移し〔要約・リード文・SFN のフロー図・判断の記録〕、1.6 のインサイト収集のスケジュール一覧を実態〔3 セット × 朝夕〕に直した）</span>
   <span>1 段上: 機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> の「AWS の定義」</span>
 </div>
 
@@ -90,7 +90,7 @@ flowchart TB
 <ul>
   <li><strong>TaskDefinition の指定方式</strong>: ASL 内の <code>${...TaskDefFamily}</code> プレースホルダには、CDK が ECS Task Definition の family 名（例: <code>acps-prod-image-batch</code>）を渡す。ECS RunTask API は family 名指定で常に ACTIVE な最新リビジョンを使用するため、デプロイ時に ASL の更新は不要</li>
   <li><strong>SecurityGroup の指定方式</strong>: <code>${BatchSgId}</code> は FoundationStack で定義される「ECS Fargate 用（バッチ共通）」Security Group を指す。画像生成バッチと SNS 投稿バッチは同一の Security Group を共有する。DB 準備確認タスクには専用の <code>${DbReadinessCheckSgId}</code> を使用する</li>
-  <li><strong>Task ステートのタイムアウト</strong>: ハング時にワークフローが長時間ぶら下がらないよう、<code>WaitForDbReady=900</code> 秒、<code>RunImageBatchTask=3600</code> 秒、<code>StartSnsPostBatch=60</code> 秒、<code>RunSnsPostBatchTask=3600</code> 秒の明示タイムアウトを設定する。<code>WaitForDbReady</code> の 900 秒は、ECS Fargate 起動（約 60 秒）+ DB 接続リトライ（最大約 510 秒）+ バッファ（約 330 秒）を考慮した値である</li>
+  <li><strong>Task ステートのタイムアウト</strong>: <code>WaitForDbReady=900</code> 秒、<code>RunImageBatchTask=3600</code> 秒、<code>StartSnsPostBatch=60</code> 秒、<code>RunSnsPostBatchTask=3600</code> 秒の明示タイムアウトを設定する <a class="decision-ref" href="#d-09">→ 理由 D-09</a></li>
   <li><strong>StartSnsPostBatch の呼び出し方式</strong>: <code>arn:aws:states:::states:startExecution</code>（<code>.sync</code> サフィックスなし）は非同期呼び出しであり、子実行（sns-posting-sfn）の完了を待たずに即座に成功を返す。画像生成ワークフローは SNS 投稿の起動のみを行い、投稿処理の完了は待機しない</li>
   <li><strong>StartSnsPostBatch の冪等性</strong>: <code>StartExecution.Name</code> には親ワークフローの <code>$$.Execution.Name</code> を渡す。Step Functions Standard の <code>StartExecution</code> は同一 <code>Name</code> / 同一 <code>Input</code> の実行が実行中であれば冪等に同じ応答を返す。一方、同名実行が既に終了済みの場合は <code>ExecutionAlreadyExists</code> となるため、このエラーは「子実行は既に作成済み」とみなし成功扱いにする</li>
   <li><strong>実行名の文字数制限</strong>: Step Functions の実行名（<code>Name</code>）は最大 80 文字に制限されている。本システムでは <code>$$.Execution.Name</code> を子実行の Name として使用する。EventBridge Scheduler がデフォルトで生成する実行名は UUID ベース（36 文字）のため通常は問題ないが、カスタム名を使用する場合は 80 文字制限に注意すること</li>
@@ -114,7 +114,7 @@ flowchart TB
 <ul>
   <li><strong>スロット非対応方式のセット</strong>: 1 セット 1 件。スロットサフィックスを付けない（例: <code>acps-prod-image-generation-fantasy-animals-1</code>）</li>
   <li><strong>スロット対応方式のセット</strong>（<code>prompt_configs.parameters.slots</code> を持つ方式。例: quiz-prebuilt）: <strong>スロットごとに 1 件</strong>で <code>slot_code</code> をサフィックスにする（例: <code>acps-prod-image-generation-logic-training-1-morning</code>）。スロットは方式側が <code>SCHEDULED_AT</code> の JST 時から決定的に解決するため、スケジュール時刻がそのままスロットの指定になる。名前にスロットを入れておくことで、実行時刻とスロットの対応が Scheduler 一覧だけで追える</li>
-  <li>1 セットで 1 日複数回投稿する場合も <strong>1 スケジュール 1 時刻</strong>を原則とする（cron 式は時・分を配列で持てるが分が異なる時刻を 1 本にまとめられず、まとめると Scheduler 名から時刻が読めなくなるため）</li>
+  <li>1 セットで 1 日複数回投稿する場合も <strong>1 スケジュール 1 時刻</strong>を原則とする <a class="decision-ref" href="#d-08">→ 理由 D-08</a></li>
   <li>Schedule 名の上限は 64 文字。<code>acps-prod-image-generation-</code>（27 文字）を差し引いた 37 文字が <code>{set_code}-{slot_code}</code> の予算になる</li>
 </ul>
 
@@ -160,7 +160,7 @@ flowchart TB
 
 <p>インサイト収集 Step Functions（insights-collection-sfn）用の Scheduler は InsightsBatchStack（<a href="stacks.html#insights-batch">stacks.html セクション 3.5</a>）に定義する。</p>
 <ul>
-  <li><strong>命名規約</strong>: <code>acps-{env}-insights-collection-{set_code}-{morning|evening}</code>（1 スケジュール 1 時刻の原則は 1.5 と同じ。プレフィックス <code>acps-prod-insights-collection-</code> は 29 文字で、64 文字上限に対する <code>{set_code}-{slot}</code> の予算は 35 文字）</li>
+  <li><strong>命名規約</strong>: <code>acps-{env}-insights-collection-{set_code}-{morning|evening}</code>（1 スケジュール 1 時刻の原則は 1.5 と同じ <a class="decision-ref" href="#d-08">→ 理由 D-08</a>。プレフィックス <code>acps-prod-insights-collection-</code> は 29 文字で、64 文字上限に対する <code>{set_code}-{slot}</code> の予算は 35 文字）</li>
   <li><strong>1 セットにつき 2 件（06:00・18:00 JST）</strong>。時刻はセット・スロットに依存しない全セット共通値（時刻の根拠 = ストーリーズの 24 時間取得期限・アカウント日次の UTC 日締めは <a href="../app/batch-flow.html#insights-schedule">app/batch-flow.html セクション 4.1</a>）</li>
   <li><strong>共通設定は 1.5 と同じ</strong>（タイムゾーン <code>Asia/Tokyo</code>・FlexibleTimeWindow <code>OFF</code>・State <code>ENABLED</code>・RetryPolicy / DLQ はセクション 1.4 と同値）。ただし ScheduleGroup は専用の <code>acps-{env}-insights-schedule-group</code>、DLQ は <code>acps-{env}-insights-scheduler-dlq</code>（セクション 10）</li>
 </ul>
@@ -188,7 +188,7 @@ flowchart TB
   </tbody>
 </table>
 </div>
-<p>同時刻の複数セット起動は 21:00 の画像生成と同じ整理（<code>set_code</code> で完全分離のため時刻をずらさない）。セット追加時はセットごとに 2 件を追加する（<a href="../app/operation.html#set-add">app/operation.html セクション 2.1</a> のセット追加手順に含める）。</p>
+<p>同時刻の複数セット起動は画像生成（1.5）と同じく時刻をずらさない <a class="decision-ref" href="#d-03">→ 理由 D-03</a>。セット追加時はセットごとに 2 件を追加する（<a href="../app/operation.html#set-add">app/operation.html セクション 2.1</a> のセット追加手順に含める）。</p>
 
 <h2 id="db-readiness">2. DB 準備確認タスク（db-readiness-check）仕様</h2>
 <p class="lead">この章は、すべての SFN の先頭で動く DB 準備確認の ECS タスクの仕様を示す。 <a class="decision-ref" href="#d-04">→ 理由 D-04</a> <a class="decision-ref" href="#d-05">→ 理由 D-05</a></p>
@@ -203,7 +203,7 @@ flowchart TB
     <pre><code>最大リトライ回数: 8
 リトライ間隔: 指数バックオフ（2, 4, 8, 16, 32, 64, 128, 256 秒）
 対象例外: OperationalError, InterfaceError</code></pre>
-    Aurora Serverless v2 のコールドスタート（自動一時停止からの再開）は通常 15〜30 秒程度だが、リージョン状況や負荷によっては数分かかる場合があるため、安全側に倒して最大約 510 秒の待機時間を確保する
+    総待機時間は最大約 510 秒 <a class="decision-ref" href="#d-10">→ 理由 D-10</a>
   </li>
   <li><strong>Step Functions との責務分担</strong>: <code>WaitForDbReady</code> ステートには Step Functions の Retry を設定しない。待機・再試行は db-readiness-check コンテナ内部で完結させ、総待機時間を上記の約 510 秒に固定する</li>
   <li><strong>認証情報</strong>: Secrets Manager（DB 認証情報）から取得</li>
@@ -642,10 +642,7 @@ stateDiagram-v2
 </table>
 </div>
 
-<div class="note">
-  <span class="callout-title">閾値の設計方針</span>
-  Aurora のアラームは <code>notBreaching</code>（データ欠損時はアラームを発報しない）を使用する。Aurora Serverless v2 の自動一時停止中はメトリクスが発行されないため、<code>missing</code> や <code>breaching</code> にすると一時停止のたびにアラームが発報される。Step Functions とカスタムメトリクスのアラームも同様に <code>notBreaching</code> とする。閾値は初期値であり、実運用の負荷状況に応じて調整する。
-</div>
+<p>すべてのアラームの <code>TreatMissingData</code> は <code>notBreaching</code>（データ欠損時はアラームを発報しない）とする <a class="decision-ref" href="#d-11">→ 理由 D-11</a>。閾値は初期値であり、実運用の負荷状況に応じて調整する。</p>
 
 <p><a class="decision-ref" href="#d-06">→ 理由 D-06</a></p>
 
@@ -678,10 +675,7 @@ stateDiagram-v2
   }
 }</code></pre>
 
-<div class="note">
-  <span class="callout-title">ECS タスク異常終了の監視</span>
-  ECS タスクの終了コードは CloudWatch の標準メトリクスとして提供されないため、CloudWatch Alarm では直接監視できない。代わりに EventBridge Rule で ECS Task State Change イベントを捕捉し、SNS Topic に通知する。コンテナ起動前に ECS API レベルで失敗したケースは Step Functions 側の <code>ExecutionsFailed</code> アラームで補完する。
-</div>
+<p>ECS タスクの異常終了は CloudWatch Alarm ではなく、この EventBridge Rule で ECS Task State Change イベントを捕捉して SNS Topic に通知する <a class="decision-ref" href="#d-12">→ 理由 D-12</a>。コンテナ起動前に ECS API レベルで失敗したケースは Step Functions 側の <code>ExecutionsFailed</code> アラーム（セクション 8）で補完する。</p>
 
 <h2 id="scheduler-dlq">10. Scheduler DLQ 定義</h2>
 <p class="lead">この章は、起動に失敗したイベントを退避するキュー（DLQ）を示す。下の表は画像生成用で、インサイト収集用の DLQ は同じ設定の別のキュー（1.6）。</p>
@@ -715,7 +709,12 @@ stateDiagram-v2
 </table>
 </div>
 <p>通知が来たらやることは <a href="operation.html#monitoring">operation.html セクション 4.1</a>。復旧後は SQS コンソールの「DLQ 再処理」でメインキューへ戻す（FIFO のため元の順序で再処理される）。</p>
-<p>同じ経路のトークン更新 Lambda（週 1 回・<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-6g）は DLQ を持たず、非同期起動の自動再試行も 0 回とし、失敗は Lambda の <code>Errors</code> アラーム（セクション 8）で通知する。失敗した週は Secret を書き換えないため旧トークンで返信は続き、失効まで 50 日以上の余裕の中で人が直す（<a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a>）。</p>
+<p>同じ経路のトークン更新 Lambda（週 1 回・<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）は DLQ を持たない。再試行の設定は次の 2 つで、層が違う <a class="decision-ref" href="#d-13">→ 理由 D-13</a>。</p>
+<ul>
+  <li><strong>Lambda の実行エラーの再試行: 0 回</strong>（関数の非同期起動の設定 <code>retryAttempts: 0</code>）。関数が実行されてエラーで終わったときは再実行せず、Lambda の <code>Errors</code> アラーム（セクション 8）で通知する</li>
+  <li><strong>Scheduler のターゲット呼び出しの再試行: 2 回</strong>（Schedule のターゲット設定 <code>retryAttempts: 2</code>・<code>maxEventAge</code> 1 時間）。Scheduler が Lambda の呼び出し自体に失敗したとき（スロットリング等）だけ再送する。DLQ は設定しない</li>
+</ul>
+<p>失敗した週は Secret を書き換えないため旧トークンで返信は続き、人が直す（<a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a>）。</p>
 
 <h2 id="insights-asl">11. インサイト収集 Step Functions ASL 定義</h2>
 <p class="lead">この章は、収集のワークフロー（<code>acps-prod-insights-collection-sfn</code>）の定義を示す。図 4 はステートの流れ。</p>
@@ -885,6 +884,57 @@ stateDiagram-v2
   <dt>決めたこと</dt><dd>DatapointsToAlarm を 2 から 3 に延ばし、15 分続いたときだけ鳴らす</dd>
   <dt>理由</dt><dd>0 ACU から再開した直後の低い容量で、バッチの起動のたびに数分だけ閾値を超える誤報が出ていた（1 日 3 回の通知ノイズ）。一時的な超過は 1〜6 分で収まり、持続する高負荷は引き続き検知できる（検知は最大 5〜10 分遅くなるが、バッチだけなので即時対応は要らない）</dd>
   <dt>日付・出典</dt><dd>2026-07-22（13-2）・課題 I-013（クローズ）</dd>
+</dl>
+</article>
+<article id="d-08">
+<h3>D-08 Scheduler は 1 スケジュール 1 時刻にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>1 セットで 1 日に複数回起動する場合も、時刻ごとに別のスケジュールを置く（画像生成・インサイト収集とも）</dd>
+  <dt>理由</dt><dd>cron 式は時・分を配列で持てるが、分が異なる時刻を 1 本にまとめられない。まとめると Scheduler 名から時刻が読めなくなる</dd>
+  <dt>退けた案</dt><dd>1 本の cron 式に複数の時刻をまとめる</dd>
+  <dt>日付・出典</dt><dd>2026-07-29（15-15。命名規約と同時に確定）</dd>
+</dl>
+</article>
+<article id="d-09">
+<h3>D-09 Task ステートに明示のタイムアウトを置き、WaitForDbReady は 900 秒にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>WaitForDbReady=900</code> 秒・<code>RunImageBatchTask=3600</code> 秒・<code>StartSnsPostBatch=60</code> 秒・<code>RunSnsPostBatchTask=3600</code> 秒（収集の SFN も同じ値）</dd>
+  <dt>理由</dt><dd>ハング時にワークフローが長時間ぶら下がらないようにするため。<code>WaitForDbReady</code> の 900 秒は、ECS Fargate 起動（約 60 秒）+ DB 接続リトライ（最大約 510 秒。D-10）+ バッファ（約 330 秒）を考慮した値</dd>
+  <dt>日付・出典</dt><dd>当初設計（記録なし）</dd>
+</dl>
+</article>
+<article id="d-10">
+<h3>D-10 DB 準備確認のコンテナ内リトライは最大約 510 秒待つ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>指数バックオフで最大 8 回（2〜256 秒）再試行し、総待機時間を最大約 510 秒に固定する。<code>WaitForDbReady</code> には SFN の Retry を置かない</dd>
+  <dt>理由</dt><dd>Aurora Serverless v2 のコールドスタート（自動一時停止からの再開）は通常 15〜30 秒程度だが、リージョン状況や負荷によっては数分かかる場合があるため、安全側に倒した。実測では初回の接続試行が再開完了までブロックされて成功し、リトライは接続が即時失敗するケースへの保険になっている（2 章の実測メモ）</dd>
+  <dt>日付・出典</dt><dd>当初設計（記録なし）。実測は 2026-07-14（Phase 6-5）</dd>
+</dl>
+</article>
+<article id="d-11">
+<h3>D-11 アラームの欠損データは notBreaching として扱う</h3>
+<dl>
+  <dt>決めたこと</dt><dd>すべてのアラームの <code>TreatMissingData</code> を <code>notBreaching</code>（データ欠損時はアラームを発報しない）にする</dd>
+  <dt>理由</dt><dd>Aurora Serverless v2 の自動一時停止中はメトリクスが発行されないため、<code>missing</code> や <code>breaching</code> にすると一時停止のたびにアラームが発報される。Step Functions とカスタムメトリクスのアラームも、実行が無い時間はデータが無いので同様に <code>notBreaching</code> とする</dd>
+  <dt>退けた案</dt><dd><code>missing</code>・<code>breaching</code></dd>
+  <dt>日付・出典</dt><dd>当初設計（記録なし）</dd>
+</dl>
+</article>
+<article id="d-12">
+<h3>D-12 ECS タスクの異常終了は EventBridge ルールで通知する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>ECS Task State Change イベント（<code>STOPPED</code> かつ終了コード 0 以外）を EventBridge ルールで捕捉し、SNS トピックへ通知する</dd>
+  <dt>理由</dt><dd>ECS タスクの終了コードは CloudWatch の標準メトリクスとして提供されないため、CloudWatch Alarm では直接監視できない</dd>
+  <dt>退けた案</dt><dd>CloudWatch Alarm で監視する（監視できるメトリクスが無い）</dd>
+  <dt>日付・出典</dt><dd>当初設計（記録なし）</dd>
+</dl>
+</article>
+<article id="d-13">
+<h3>D-13 トークン更新 Lambda は DLQ を持たず、実行エラーを再試行しない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>トークン更新 Lambda の非同期起動の再試行を 0 回にし、DLQ を置かず、失敗は Lambda の <code>Errors</code> アラームで即通知する。Scheduler のターゲット呼び出しの再試行（2 回・最大経過 1 時間）は呼び出しの失敗だけを対象とするので残す</dd>
+  <dt>理由</dt><dd>週 1 回の実行で、失敗した週は Secret を書き換えないため旧トークンのまま返信は続く。更新は失効（60 日）の 50 日以上前に行うので、数回続けて失敗しても人が直す余裕がある。自動で繰り返すより、すぐ人に知らせる方がよい</dd>
+  <dt>日付・出典</dt><dd>2026-10-11（21-6g）。<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-6g</dd>
 </dl>
 </article>
 </section>

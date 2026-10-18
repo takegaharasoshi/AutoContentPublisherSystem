@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>インフラ運用設計 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -13,20 +13,52 @@
 <h1>インフラ運用設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-09-04（21-3: 4.1 にコメント自動返信 DLQ の対応を追加）</span>
+  <span>最終更新: 2026-10-19（30-9a: 新しい書式へ移した。判断の記録 D-01〜D-06）/ 2026-09-04（21-3: 4.1 にコメント自動返信 DLQ の対応を追加）</span>
+  <span>1 段上: <a href="../overview/system-overview.html">基本設計（全体）</a>と、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a></span>
 </div>
 
-<div class="note">
-  <span class="callout-title">本ドキュメントの範囲</span>
-  インフラ（実行基盤）の運用のみを扱う。アプリ運用（プロンプト管理、投稿失敗時の手動補正、SNS アカウント追加手順、DDL マイグレーション方針等）はアプリ設計（<a href="../app/index.html">docs/app/</a>）で定義する。
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、配信面（AWS）の実行基盤をどう動かし続けるか ― スケジュールの変え方・手動での起動・デプロイ後の確認・DB・監視通知が来たときの対応・コスト ― をまとめたインフラの運用の詳細設計である。系統ごとの全体像は、1 段上の<a href="../overview/system-overview.html">基本設計（全体）</a>と、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a> にある。このページは実行基盤（インフラ）の運用だけを扱い、業務データに関わる運用（投稿失敗時の手動補正・プロンプト管理・SNS アカウントの追加・DDL のマイグレーション等）はアプリの運用設計 <a href="../app/operation.html">app/operation.html</a> が持つ。</p>
+<p class="lead">図 1 は、バッチ運用の流れ（スケジュール → 実行 → 通知 → 対応）。続く表はこのページの要点。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    sch@{ icon: "aws:scheduler", form: "square", label: "EventBridge Scheduler（cron。マスタは CDK）" }
+    sfn@{ icon: "aws:step-functions", form: "square", label: "Step Functions（先頭で DB 準備確認）" }
+    ecs@{ icon: "aws:fargate", form: "square", label: "ECS Fargate のバッチ（終わったら停止）" }
+    cw@{ icon: "aws:cloudwatch", form: "square", label: "CloudWatch アラーム・DLQ" }
+    sns@{ icon: "aws:sns", form: "square", label: "SNS トピック → メール" }
+    ope(["人の対応&lt;br&gt;ログ確認 → 手動再実行・DLQ 再処理・修正デプロイ"])
+    sch --> sfn --> ecs
+    sch -. "起動失敗" .-> cw
+    sfn -. "失敗・タイムアウト" .-> cw
+    ecs -. "異常終了" .-> cw
+    cw --> sns --> ope
+    ope -. "set_code と scheduled_at で手動起動" .-> sfn
+</pre>
+<figcaption>図 1 バッチ運用の流れ（スケジュール → 実行 → 通知 → 対応）。コメント自動返信とトークン更新の Lambda も同じ通知経路に乗る（4.1）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>スケジュール</td><td>EventBridge Scheduler の cron。定義のマスタは CDK で、変えるときは CDK を直して <code>cdk deploy</code>（1.1）。投稿は画像生成の成功後に連鎖して起動し、専用のスケジュールを持たない <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>手動起動</td><td>画像生成も投稿も <code>set_code</code> と <code>scheduled_at</code> の 2 キーで Step Functions を直接起動する（1.2）<a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+    <tr><td>デプロイ後</td><td>latest ACTIVE のタスク定義リビジョンにロール・環境変数・ログ設定・イメージタグが載ったかを確かめる（1.3）</td></tr>
+    <tr><td>DB</td><td>Aurora Serverless v2 は最小 ACU 0 で自動一時停止し、各 SFN の先頭の DB 準備確認で起こす（2 章）<a class="decision-ref" href="#d-05">→ 理由 D-05</a></td></tr>
+    <tr><td>監視・通知</td><td>失敗はすべて SNS トピックからメールで届く。通知ごとの対応は 3・4 章の表</td></tr>
+  </tbody>
+</table>
 </div>
+</section>
 
 <h2 id="batch-ops">1. バッチ運用</h2>
 
 <h3>1.1 スケジュール管理</h3>
 <ul>
-  <li>EventBridge Scheduler で cron 式により画像生成 Step Functions を定期実行する</li>
-  <li>SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動されるため、SNS 投稿用の EventBridge Scheduler は不要</li>
+  <li>EventBridge Scheduler で cron 式により画像生成 Step Functions・インサイト収集 Step Functions・コメント返信のトークン更新 Lambda を定期実行する（一覧は <a href="workflow.html">workflow.html 1.5・1.6・10.1</a>）</li>
+  <li>SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動し、SNS 投稿用の EventBridge Scheduler は持たない <a class="decision-ref" href="#d-01">→ 理由 D-01</a></li>
   <li>スケジュールはバッチセットごとに個別設定可能とする</li>
   <li>スケジュール定義のマスタは IaC（CDK）とする</li>
 </ul>
@@ -34,7 +66,7 @@
 <h4>スケジュール変更手順</h4>
 <ol>
   <li>CDK コードの EventBridge Scheduler の cron 式を変更する</li>
-  <li><code>cdk deploy -c env=prod ImageBatchStack</code> で EventBridge Scheduler を更新する（イメージタグ Context 3 つの指定が必要。<a href="cicd.html#manual-deploy">cicd.html セクション 3.2</a> の指定ルールを参照）</li>
+  <li>系統ごとのスタックを <code>cdk deploy</code> して EventBridge Scheduler を更新する: 画像生成（投稿）は <code>ImageBatchStack</code>、インサイト収集は <code>InsightsBatchStack</code>、コメント返信のトークン更新は <code>CommentReplyStack</code>（どのスタックでもイメージタグ Context 4 つの指定が必要。<a href="cicd.html#manual-deploy">cicd.html セクション 3.2</a> の指定ルールを参照）</li>
 </ol>
 
 <h3>1.2 バッチ実行時の動作</h3>
@@ -49,7 +81,7 @@
 </ol>
 
 <h4>手動での SNS 投稿実行</h4>
-<p>SNS 投稿の単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する。<strong>入力は <code>set_code</code> と、投稿する生成実行の実際の <code>scheduled_at</code>（UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code>。<code>generation_runs.scheduled_at</code> の値に <code>Z</code> を付けたもの）の 2 キーが必須</strong>（26-1 で確定・26-3 の切替以後に有効。それまでは <code>set_code</code> のみ）。指定した回だけが処理され、最古の未投稿分を自動で消化することはない。<strong>現在時刻を便宜的に入れない</strong>（該当 run がなく異常終了する）。起動前の対象 run・時間帯の確認は <a href="../app/operation.html#failure-check">app/operation.html セクション 4.1</a>。<code>EXECUTION_ARN</code> は Step Functions が <code>$$.Execution.Id</code> から自動設定するため、手動指定は不要。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する。</p>
+<p>SNS 投稿の単独実行が必要な場合は、AWS Console や CLI から sns-posting-sfn を直接起動する。<strong>入力は <code>set_code</code> と、投稿する生成実行の実際の <code>scheduled_at</code>（UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code>。<code>generation_runs.scheduled_at</code> の値に <code>Z</code> を付けたもの）の 2 キーが必須</strong>。指定した回だけが処理され、最古の未投稿分を自動で消化することはない <a class="decision-ref" href="#d-02">→ 理由 D-02</a>。<strong>現在時刻を便宜的に入れない</strong>（該当 run がなく異常終了する）。起動前の対象 run・時間帯の確認は <a href="../app/operation.html#failure-check">app/operation.html セクション 4.1</a>。<code>EXECUTION_ARN</code> は Step Functions が <code>$$.Execution.Id</code> から自動設定するため、手動指定は不要。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する。</p>
 <pre><code># CLI での手動実行例
 aws stepfunctions start-execution \
   --state-machine-arn arn:aws:states:ap-northeast-1:123456789012:stateMachine:acps-prod-sns-posting-sfn \
@@ -72,7 +104,8 @@ aws stepfunctions start-execution \
 </ul>
 
 <h3 id="sns-current-run-switch">1.4 SNS 投稿の当回固定への切替（26-3 の切替チェック表・切戻し。26-1 で確定）</h3>
-<p>投稿アプリ（新しいイメージは <code>SCHEDULED_AT</code> 必須）・子 ASL（sns-posting。入口で <code>scheduled_at</code> を必須化）・親 ASL（image-generation。子へ <code>scheduled_at</code> を渡す）の 3 つは、<strong>どれか 1 つでも旧のまま動くと投稿されない組み合わせがある</strong>ため、Scheduler を止めた窓で 3 つをそろえて切り替える（作業はユーザー。エージェントは承認なしにデプロイしない）。</p>
+<p class="lead">この節は 26-3（2026-10-13）で実施済みの、一度きりの切替手順の記録である。実施の証跡（各行の aws cli 出力）は <a href="../plans/development-log.html#step-26-3">開発記録の 26-3</a> にある。切戻しの手順と、同じ型の「アプリ・子 ASL・親 ASL を同時にそろえる切替」の手本として本文に残す <a class="decision-ref" href="#d-06">→ 理由 D-06</a>。</p>
+<p>投稿アプリ（新しいイメージは <code>SCHEDULED_AT</code> 必須）・子 ASL（sns-posting。入口で <code>scheduled_at</code> を必須化）・親 ASL（image-generation。子へ <code>scheduled_at</code> を渡す）の 3 つは、Scheduler を止めた窓で 3 つをそろえて切り替える（作業はユーザー。エージェントは承認なしにデプロイしない）<a class="decision-ref" href="#d-03">→ 理由 D-03</a>。3 つの新旧の組み合わせと結果は次の表のとおり。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>親 ASL</th><th>子 ASL</th><th>アプリ</th><th>結果</th></tr></thead>
@@ -88,8 +121,8 @@ aws stepfunctions start-execution \
 </div>
 
 <div class="warn">
-  <span class="callout-title">Scheduler の手動停止は ImageBatchStack の deploy で戻るとは限らない（26-3 で確認）</span>
-  Scheduler の State は CDK が単一の正（<a href="workflow.html">workflow.html セクション 1.5</a>・<a href="../issues/index.html#I-018">I-018</a>）で、手動で <code>DISABLED</code> にしても <code>cdk deploy ImageBatchStack</code> で <code>ENABLED</code> に戻る（昼スロットのように CDK 上 <code>DISABLED</code> のものは戻らない）。ただし<strong>戻るのはスケジュールのリソース自体に差分があるときだけ</strong>で、26-3（2026-10-13）では差分がなく <code>DISABLED</code> のまま残った。そのため<strong>親 ASL を載せる ImageBatchStack の deploy を最後に置き、deploy 後の S-9 で状態を確かめ、<code>DISABLED</code> のままなら S-8 合格を確認してから手動で停止前の状態に戻す</strong>（戻った場合も、戻らなかった場合も S-9 が再開の確認点）。窓は「Scheduler 停止 → ImageBatchStack の deploy 完了」までの間に<strong>どのスケジュール時刻（logic-training-1 7:30 / 21:00、pref-ranking-1 20:00、umigame-soup-1 日・火・木・土 20:00 JST）もまたがない</strong>時間帯を選ぶ（目安: 21:00 の夜投稿の完了後〜翌 7:00、または 8:00〜19:30）。窓を確保できない場合は停止状態を CDK 側にも持たせる変更（スケジュールの <code>enabled</code> をフラグ化。インサイトの <code>insightsCollectionSchedulesEnabled</code> と同型）を 26-2 に追加して設計し直す。
+  <span class="callout-title">Scheduler の手動停止は ImageBatchStack の deploy で戻るとは限らない</span>
+  Scheduler の State は CDK が単一の正（<a href="workflow.html">workflow.html セクション 1.5</a>・<a href="../issues/index.html#I-018">I-018</a>）で、手動で <code>DISABLED</code> にしても <code>cdk deploy ImageBatchStack</code> で <code>ENABLED</code> に戻る（昼スロットのように CDK 上 <code>DISABLED</code> のものは戻らない）。ただし<strong>戻るのはスケジュールのリソース自体に差分があるときだけ</strong>。<strong>親 ASL を載せる ImageBatchStack の deploy を最後に置き、deploy 後の S-9 で状態を確かめ、<code>DISABLED</code> のままなら S-8 合格を確認してから手動で停止前の状態に戻す</strong>（戻った場合も、戻らなかった場合も S-9 が再開の確認点）<a class="decision-ref" href="#d-04">→ 理由 D-04</a>。窓は「Scheduler 停止 → ImageBatchStack の deploy 完了」までの間に<strong>どのスケジュール時刻（logic-training-1 7:30 / 21:00、pref-ranking-1 20:00、umigame-soup-1 日・火・木・土 20:00 JST）もまたがない</strong>時間帯を選ぶ（目安: 21:00 の夜投稿の完了後〜翌 7:00、または 8:00〜19:30）。窓を確保できない場合は停止状態を CDK 側にも持たせる変更（スケジュールの <code>enabled</code> をフラグ化。インサイトの <code>insightsCollectionSchedulesEnabled</code> と同型）を加えて設計し直す。
 </div>
 
 <p><strong>切替チェック表</strong>（各行の証跡 = aws cli の出力を開発記録の 26-3 に貼る。<code>&lt;…ARN&gt;</code> は実値に置き換える）:</p>
@@ -116,7 +149,7 @@ aws stepfunctions start-execution \
 
 <h3>2.1 Aurora Serverless v2 の自動一時停止</h3>
 <ul>
-  <li>コスト最適化のため、自動一時停止を有効にする</li>
+  <li>自動一時停止を有効にする <a class="decision-ref" href="#d-05">→ 理由 D-05</a></li>
   <li>最小 ACU は 0 とし、0 ACU の自動一時停止をサポートする Aurora MySQL バージョンを採用する</li>
   <li>一時停止中にアクセスがあると自動的に再開する（再開には数十秒〜数分）</li>
 </ul>
@@ -130,13 +163,10 @@ aws stepfunctions start-execution \
 <h3>2.3 バックアップ</h3>
 <ul>
   <li>Aurora のスナップショットによるバックアップ（自動バックアップ有効）</li>
-  <li>保持期間: 7 日間（CDK で明示的に設定。運用状況に応じて調整する）</li>
+  <li>保持期間: CDK では指定していない（<code>foundation-stack.ts</code> の <code>DatabaseCluster</code> に <code>backup</code> の指定がなく、既定の 1 日）。運用状況に応じて調整する</li>
 </ul>
 
-<div class="note">
-  <span class="callout-title">DDL マイグレーション方針について</span>
-  テーブル設計・DDL のバージョン管理・マイグレーション方針はアプリ設計（Phase 9）で定義する。Phase 6 の疎通確認では接続テスト用の最小 DDL のみを使用した（実施記録は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の Phase 6 を参照）。
-</div>
+<p>テーブル設計・DDL のバージョン管理・マイグレーション方針はアプリ設計（<a href="../app/data-model.html">data-model.html</a>・<a href="../app/operation.html">app/operation.html</a>）が持つ。</p>
 
 <h2 id="error-ops">3. エラーハンドリング（運用対応）</h2>
 
@@ -155,10 +185,7 @@ aws stepfunctions start-execution \
 </table>
 </div>
 
-<div class="note">
-  <span class="callout-title">アプリレベルのエラー対応</span>
-  外部 API 失敗時の再試行・投稿結果の手動補正など、業務データに関わる運用対応はアプリ設計（Phase 9）で定義する。
-</div>
+<p>外部 API 失敗時の再試行・投稿結果の手動補正など、業務データに関わる運用対応はアプリの運用設計（<a href="../app/operation.html">app/operation.html</a>）が持つ。</p>
 
 <h2 id="monitoring">4. 監視・通知</h2>
 
@@ -213,7 +240,7 @@ aws stepfunctions start-execution \
     <tr><td>ECS Fargate</td><td>バッチ実行時のみ起動、タスク完了後に自動停止</td></tr>
     <tr><td>Aurora Serverless v2</td><td>自動一時停止を有効化、最小 ACU を低く設定</td></tr>
     <tr><td>ネットワーク</td><td>NAT Gateway は使用しない。ECS Fargate にパブリック IP を付与して直接インターネットアクセス</td></tr>
-    <tr><td>S3</td><td>Lifecycle Policy で全オブジェクトを 30 日で自動削除</td></tr>
+    <tr><td>S3</td><td>Lifecycle Policy で <code>images/</code>・<code>videos/</code>・<code>comment-log/</code> を 30 日で自動削除（<code>audio/</code>・<code>assets/</code> は対象外）</td></tr>
     <tr><td>CloudWatch Logs</td><td>リテンション期間を 90 日に設定し、不要なログの蓄積を防止する</td></tr>
   </tbody>
 </table>
@@ -222,6 +249,66 @@ aws stepfunctions start-execution \
 <h2 id="security">6. セキュリティ運用</h2>
 <p>セキュリティ設計の詳細は <a href="security.html">security.html</a> を参照。</p>
 
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 投稿用の Scheduler を持たず、画像生成の成功から連鎖して起動する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>EventBridge Scheduler が起動するのは画像生成 Step Functions だけ。SNS 投稿 Step Functions は画像生成の成功後に <code>StartExecution</code> で起動する</dd>
+  <dt>理由</dt><dd>SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動されるため、SNS 投稿用の EventBridge Scheduler は不要</dd>
+  <dt>日付・出典</dt><dd>当初設計（記録なし）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 手動の投稿起動に <code>scheduled_at</code> を必須にする（当回固定）</h3>
+<dl>
+  <dt>決めたこと</dt><dd>sns-posting-sfn の入力は <code>set_code</code> と、投稿する生成実行の実際の <code>scheduled_at</code> の 2 キーが必須。指定した回だけを処理し、最古の未投稿分を自動で消化しない</dd>
+  <dt>理由</dt><dd>投稿する回を起動側で固定し、古い未投稿の回が意図しない時間帯に出ないようにするため（SNS 投稿バッチの当回固定 = I-014 の展開）。26-1 で確定し、26-3 の切替以後に有効（それまでは <code>set_code</code> のみ）</dd>
+  <dt>退けた案</dt><dd>旧方式（<code>set_code</code> だけを受け取り、最古の未完了 run を選ぶ）</dd>
+  <dt>日付・出典</dt><dd>26-1 で確定・26-3（2026-10-13）で切替（Phase 26）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 当回固定への切替は、Scheduler を止めた窓でアプリ・子 ASL・親 ASL の 3 つをそろえて行う</h3>
+<dl>
+  <dt>決めたこと</dt><dd>投稿アプリ・子 ASL（sns-posting）・親 ASL（image-generation）を、Scheduler を停止した窓で同時に新へ切り替える。切戻しではアプリと子 ASL を必ず組で旧へ戻す</dd>
+  <dt>理由</dt><dd>3 つのうち<strong>どれか 1 つでも旧のまま動くと投稿されない組み合わせがある</strong>ため（1.4 の組み合わせ表。新アプリ + 旧子は <code>INVALID_INPUT</code>、旧親 + 新子は <code>RejectInput</code> で投稿されない）。親 ASL だけ新でも無害なので、切戻しでは親は新のままでよい</dd>
+  <dt>日付・出典</dt><dd>26-1 で確定・26-3（2026-10-13）で実施</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 ImageBatchStack の deploy を最後に置き、Scheduler の状態を S-9 で確かめる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>親 ASL を載せる ImageBatchStack の deploy を最後に置き、deploy 後の S-9 で Scheduler の状態を確かめ、<code>DISABLED</code> のままなら S-8 合格を確認してから手動で停止前の状態に戻す</dd>
+  <dt>理由</dt><dd>手動で <code>DISABLED</code> にした Scheduler が <code>cdk deploy ImageBatchStack</code> で <code>ENABLED</code> に戻るのはスケジュールのリソース自体に差分があるときだけで、26-3（2026-10-13）では差分がなく <code>DISABLED</code> のまま残った（26-3 で確認）。戻る・戻らないのどちらでも再開の確認点を 1 つにするため</dd>
+  <dt>退けた案</dt><dd>停止状態を CDK 側にも持たせる（スケジュールの <code>enabled</code> をフラグ化。インサイトの <code>insightsCollectionSchedulesEnabled</code> と同型）。スケジュール時刻をまたがない窓を確保できる限り不要とし、確保できない場合の代替として残した（その場合は 26-2 に追加して設計し直す想定だった）</dd>
+  <dt>日付・出典</dt><dd>26-3（2026-10-13）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 Aurora Serverless v2 を最小 ACU 0 で自動一時停止させる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>最小 ACU を 0 にし、0 ACU の自動一時停止をサポートする Aurora MySQL バージョンを採用する。起こすのは各 SFN の先頭の DB 準備確認</dd>
+  <dt>理由</dt><dd>コスト最適化のため（バッチは 1 日に数回しか DB を使わない）。再開に数十秒〜数分かかる点は、DB 準備確認を SFN の最初のステートに置くことで吸収する</dd>
+  <dt>日付・出典</dt><dd>当初設計（記録なし）</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 26-3 の切替チェック表を、実施後も本文に残す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>1.4 の組み合わせ表・切替チェック表（S-1〜S-9）・切戻しの手順を本文に残し、実施の証跡は開発記録 26-3 へリンクする</dd>
+  <dt>理由</dt><dd>切替は一度きりだが、切戻し（当回固定に不具合が出たとき）の手順はこの表を前提にしており、同じ型の 3 点同時切替の手本にもなるため。開発記録には証跡（cli の出力）があり、手順の正はこちらに置く</dd>
+  <dt>退けた案</dt><dd>本文を開発記録へのリンクだけに縮める（切戻し時に手順を探しにくくなる）</dd>
+  <dt>日付・出典</dt><dd>30-9a（2026-10-19）</dd>
+</dl>
+</article>
+</section>
+
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>

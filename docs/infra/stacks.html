@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CDK スタック実装仕様 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -14,8 +14,52 @@
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
   <span class="badge badge-fixed">Phase 16-7 で InsightsBatchStack（3.5）を追加</span>
-  <span>最終更新: 2026-10-12（21-7b: 3.1 に <code>comment-log/</code> の 30 日ライフサイクル〔初回取り込み確認後に有効化〕、3.5 に <code>COMMENT_LOG_BUCKET</code> と S3 読み取り権限、3.6 のプライバシーポリシーの保持期限を実装と揃えた）。前回: 2026-10-12（21-7: 3.6 にプライバシーポリシーのバケットと <code>PrivacyPolicyUrl</code> を追加〔https のオブジェクト URL〕、3.3 のタスクロールにスナップショットの <code>s3:PutObject</code> を追記）。前回: 2026-10-11（21-6f: セクション 3.6 CommentReplyStack を実装に合わせた〔Reply Lambda 120 秒・判定方式の環境変数・コメント記録の PUT 権限・プライバシーポリシーは 21-7 へ〕）。前回: 2026-09-04（21-3: セクション 3.6 CommentReplyStack を追加。AdminApi / AdminWeb を 3.7 / 3.8 へ繰り下げ）</span>
+  <span>最終更新: 2026-10-19（30-9a: 新しい書式へ移した。判断の記録 D-01〜D-18）。前回: 2026-10-12（21-7b: 3.1 に <code>comment-log/</code> の 30 日ライフサイクル〔初回取り込み確認後に有効化〕、3.5 に <code>COMMENT_LOG_BUCKET</code> と S3 読み取り権限、3.6 のプライバシーポリシーの保持期限を実装と揃えた）。前回: 2026-10-12（21-7: 3.6 にプライバシーポリシーのバケットと <code>PrivacyPolicyUrl</code> を追加〔https のオブジェクト URL〕、3.3 のタスクロールにスナップショットの <code>s3:PutObject</code> を追記）。前回: 2026-10-11（21-6f: セクション 3.6 CommentReplyStack を実装に合わせた〔Reply Lambda 120 秒・判定方式の環境変数・コメント記録の PUT 権限・プライバシーポリシーは 21-7 へ〕）。前回: 2026-09-04（21-3: セクション 3.6 CommentReplyStack を追加。AdminApi / AdminWeb を 3.7 / 3.8 へ繰り下げ）</span>
+  <span>1 段上: <a href="../overview/system-overview.html#delivery">基本設計（全体）3 章</a>と、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a> の「AWS の定義」</span>
 </div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、配信面（AWS）を CDK のスタックにどう分けて定義しているかを書く詳細設計である。<a href="../overview/system-overview.html#delivery">基本設計（全体）3 章</a>の配信面の 4 系統のうち、①投稿は SnsPostBatchStack と ImageBatchStack（<a href="../overview/functions/post.html">機能別の基本設計: 投稿</a>）、②インサイト収集は InsightsBatchStack（<a href="../overview/functions/insights.html">インサイト収集</a>）、③コメント自動返信と④トークン更新は CommentReplyStack（<a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a>）が持つ。共通の土台は FoundationStack、監視と通知は MonitoringStack にまとめる。AWS の構成の全体像は <a href="architecture.html">architecture.html</a>。</p>
+<p class="lead">図 1 は 7 つのスタックの依存とデプロイ順。矢印は「参照される側 → 参照する側」で、上から順にデプロイする。続く表はこのページの要点。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    F["① FoundationStack&lt;br&gt;VPC・S3・Aurora・Secrets・ECS クラスター・ECR"]
+    S["② SnsPostBatchStack&lt;br&gt;投稿 SFN・投稿バッチ"]
+    I["③ ImageBatchStack&lt;br&gt;生成 SFN・投稿の Scheduler"]
+    N["④ InsightsBatchStack&lt;br&gt;収集 SFN・収集の Scheduler"]
+    C["CommentReplyStack（本番面）&lt;br&gt;Webhook・SQS・返信・トークン更新"]
+    CS["CommentReplyStagingStack&lt;br&gt;同じ構成のステージング面"]
+    M["⑤ MonitoringStack&lt;br&gt;アラーム・通知"]
+    F --> S
+    S -->|"投稿 SFN の ARN"| I
+    F --> I
+    F --> N
+    F -->|"S3 バケット"| C
+    F -->|"S3 バケット"| CS
+    F --> M
+    S --> M
+    I --> M
+    N --> M
+    C -->|"DLQ・トークン更新 Lambda"| M
+</pre>
+<figcaption>図 1 スタックの依存とデプロイ順（① → ⑤。CommentReply の 2 面は ① の後・⑤ の前ならどこでもよい）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>スタックの分け方</td><td>共通基盤 1・業務機能ごと（投稿 2・インサイト収集 1・コメント自動返信 1 × 2 面）・監視 1 の計 7 スタック。管理画面の 2 スタックは将来拡張</td></tr>
+    <tr><td>共通基盤</td><td>FoundationStack が VPC・S3・Aurora・Secrets Manager・ECS クラスター・ECR・DB 準備確認タスクを持ち、各スタックへコンストラクタ引数で渡す</td></tr>
+    <tr><td>バッチ系</td><td>SnsPostBatch / ImageBatch / InsightsBatch は同じ型（ECS タスク定義・生 ASL の Step Functions・CodePipeline）。ASL は設計書の JSON をそのまま使う <a class="decision-ref" href="#d-09">→ 理由 D-09</a></td></tr>
+    <tr><td>コメント自動返信</td><td>CommentReplyStack は VPC・Aurora・CodePipeline を使わず、Lambda を CDK asset で配る。同じクラスから本番面とステージング面の 2 つを立てる <a class="decision-ref" href="#d-12">→ 理由 D-12</a></td></tr>
+    <tr><td>デプロイ</td><td>すべて手動の <code>cdk deploy</code>。ECS タスク定義を持つスタックはイメージタグの Context 指定が必須 <a class="decision-ref" href="#d-07">→ 理由 D-07</a></td></tr>
+    <tr><td>削除の方針</td><td>S3（画像）・ECR・ロググループは「壊して作り直せる」DESTROY、Aurora は SNAPSHOT、コメント返信の Secret とプライバシーポリシーのバケットは RETAIN <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
 
 <h2 id="policy">1. スタック分割方針</h2>
 <p>責務ごとに AWS CDK のスタックを分割する。</p>
@@ -54,43 +98,18 @@
   <tbody>
     <tr><td>VPC</td><td>2 AZ 構成。Public Subnet x2（ECS Fargate 用）、Isolated Subnet x2（Aurora 用）。NAT Gateway なし。CDK 引数指定: <code>maxAzs: 2</code>、<code>natGateways: 0</code>、<code>subnetConfiguration</code> に <code>PUBLIC</code> と <code>PRIVATE_ISOLATED</code> の 2 種類のみ定義する</td></tr>
     <tr><td>Security Group</td><td>サービスごとのアクセス制御（詳細は下表）</td></tr>
-    <tr><td>S3 Bucket</td><td>画像・動画・音源保存用（Lifecycle Policy: <code>images/</code>・<code>videos/</code> プレフィックス限定で 30 日自動削除。音源ストック <code>audio/</code> は長期保持資産のため対象外。Phase 14-4 で発見・14-6 で変更。21-7b でコメント記録 <code>comment-log/</code> の 30 日規則 <code>expire-comment-logs</code> を追加 — 初回取り込みの成功を確かめるまで無効で deploy し、確認後の 2026-10-13 に <code>foundation-stack.ts</code> の <code>commentLogExpirationEnabled</code> を <code>true</code> にして有効化した。先に有効化すると未取り込みのまま 30 日を超えた記録が消えるため）。バケット名は <code>acps-{env}-images-{アカウント ID}</code> を明示指定する（歴史的経緯で <code>images</code> 名のまま。命名規約は <a href="cicd.html">cicd.html セクション 5</a> を参照）。公開ブロック・暗号化・SSL 強制の設定は <a href="security.html">security.html セクション 3</a> を参照。CDK 引数指定: <code>removalPolicy: DESTROY</code>、<code>autoDeleteObjects: true</code>（下記の設計理由を参照）</td></tr>
-    <tr><td>Aurora Serverless v2</td><td>MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。エンジンは Aurora MySQL 3.08.2＝LTS 最新パッチを採用）。Isolated Subnet に配置し、インスタンスは Serverless v2 の writer 1 つのみ（リーダーなし）。CDK 引数指定: <code>serverlessV2MinCapacity: 0</code>、<code>serverlessV2MaxCapacity: 1.0</code>、<code>enableDataApi: true</code>（Query Editor / Data API 利用のため必須）、<code>defaultDatabaseName: 'acps'</code>（下記の設計理由を参照）、<code>storageEncrypted: true</code>（CDK デフォルトは false のため明示指定。デフォルト KMS キーで暗号化、追加コストなし）。自動一時停止までの時間は <code>serverlessV2AutoPauseDuration</code> 未指定＝デフォルト 5 分、バックアップ保持は未指定＝デフォルト 1 日。クラスター識別子は明示指定せず CFN 自動命名（命名規約表 <a href="cicd.html">cicd.html セクション 9.2</a> の対象外）。RemovalPolicy は未指定＝CDK デフォルトの SNAPSHOT（下記の設計理由を参照）</td></tr>
-    <tr><td>Secrets Manager</td><td>DB 認証情報（CDK の Aurora コンストラクトで自動生成。Secret 名は <code>acps/{env}/db/credentials</code> を明示指定する）、画像生成 API キー（CDK でシークレットの「箱」を作成し、値は AWS Console から手動設定）。SNS 認証情報は CDK 管理外で手動作成（Secret 名規約は <a href="security.html">security.html</a> を参照。作成手順はアプリ設計（Phase 9）で定義する）</td></tr>
+    <tr><td>S3 Bucket</td><td>画像・動画・音源保存用（Lifecycle Policy: <code>images/</code>・<code>videos/</code> プレフィックス限定で 30 日自動削除。音源ストック <code>audio/</code> は対象外。コメント記録 <code>comment-log/</code> も 30 日規則 <code>expire-comment-logs</code> で自動削除し、<code>foundation-stack.ts</code> の <code>commentLogExpirationEnabled</code> は <code>true</code>〔2026-10-13 から有効〕 <a class="decision-ref" href="#d-01">→ 理由 D-01</a>）。バケット名は <code>acps-{env}-images-{アカウント ID}</code> を明示指定する（歴史的経緯で <code>images</code> 名のまま。命名規約は <a href="cicd.html">cicd.html セクション 5</a> を参照）。公開ブロック・暗号化・SSL 強制の設定は <a href="security.html">security.html セクション 3</a> を参照。CDK 引数指定: <code>removalPolicy: DESTROY</code>、<code>autoDeleteObjects: true</code>（オブジェクト自動削除用の Lambda カスタムリソースが 1 つ加わる） <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+    <tr><td>Aurora Serverless v2</td><td>MySQL 互換 DB（自動一時停止有効、最小 ACU は 0、最大 ACU は 1.0。エンジンは Aurora MySQL 3.08.2＝LTS 最新パッチを採用）。Isolated Subnet に配置し、インスタンスは Serverless v2 の writer 1 つのみ（リーダーなし）。CDK 引数指定: <code>serverlessV2MinCapacity: 0</code>、<code>serverlessV2MaxCapacity: 1.0</code>、<code>enableDataApi: true</code>（Query Editor / Data API 利用のため必須）、<code>defaultDatabaseName: 'acps'</code> <a class="decision-ref" href="#d-03">→ 理由 D-03</a>、<code>storageEncrypted: true</code>（CDK デフォルトは false のため明示指定。デフォルト KMS キーで暗号化、追加コストなし）。自動一時停止までの時間は <code>serverlessV2AutoPauseDuration</code> 未指定＝デフォルト 5 分、バックアップ保持は未指定＝デフォルト 1 日。クラスター識別子は明示指定せず CFN 自動命名（命名規約表 <a href="cicd.html">cicd.html セクション 9.2</a> の対象外）。RemovalPolicy は未指定＝CDK デフォルトの SNAPSHOT（destroy 時にクラスターを削除し最終スナップショットを保持） <a class="decision-ref" href="#d-03">→ 理由 D-03</a></td></tr>
+    <tr><td>Secrets Manager</td><td>DB 認証情報（CDK の Aurora コンストラクトで自動生成。Secret 名は <code>acps/{env}/db/credentials</code> を明示指定する）、画像生成 API キー（CDK でシークレットの「箱」を初期値 <code>{"api_key": "&lt;ランダムプレースホルダ&gt;"}</code>〔<code>generateSecretString</code> の <code>secretStringTemplate: '{}'</code> + <code>generateStringKey: 'api_key'</code>〕で作成し、値は AWS Console から手動設定。RemovalPolicy は未指定＝CFN デフォルトの Delete で、destroy すると手動設定した値は失われる <a class="decision-ref" href="#d-04">→ 理由 D-04</a>）。SNS 認証情報は CDK 管理外で手動作成（Secret 名規約は <a href="security.html">security.html</a> を参照。作成手順はアプリ設計（Phase 9）で定義する）</td></tr>
     <tr><td>ECS Cluster</td><td>全バッチ共通の実行基盤。CDK 引数指定: <code>vpc</code> に FoundationStack の VPC を明示指定する（下記の注意を参照）。クラスター名は明示指定せず CFN 自動命名（命名規約表 <a href="cicd.html">cicd.html セクション 9.2</a> の対象外。後続スタックへは CDK オブジェクト参照で渡すため名前固定は不要）。Container Insights はデフォルト無効のまま（CloudWatch カスタムメトリクス課金を避ける。監視は MonitoringStack の方針に従う）。Capacity Provider の登録も不要（Step Functions の RunTask で <code>launchType: FARGATE</code> を直接指定する方式のため）</td></tr>
-    <tr><td>ECR Repository</td><td>サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、insights-batch、db-readiness-check の 4 つ。insights-batch は 16-10 で追加）。リポジトリ名は <code>auto-content-publisher/{サービス名}</code> を明示指定する（環境共通。命名・ライフサイクルポリシーの詳細は <a href="cicd.html#ecr">cicd.html セクション 4</a> を参照）。CDK 引数指定: <code>lifecycleRules</code>（cicd.html セクション 4 の保持ルール）、<code>removalPolicy: DESTROY</code>、<code>emptyOnDelete: true</code>（下記の設計理由を参照）。<code>imageTagMutability</code> / <code>imageScanOnPush</code> は指定せず CDK デフォルトのまま</td></tr>
+    <tr><td>ECR Repository</td><td>サービスごとのコンテナイメージリポジトリ（image-batch、sns-post-batch、insights-batch、db-readiness-check の 4 つ。insights-batch は 16-10 で追加）。リポジトリ名は <code>auto-content-publisher/{サービス名}</code> を明示指定する（環境共通。命名・ライフサイクルポリシーの詳細は <a href="cicd.html#ecr">cicd.html セクション 4</a> を参照）。CDK 引数指定: <code>lifecycleRules</code>（cicd.html セクション 4 の保持ルール）、<code>removalPolicy: DESTROY</code>、<code>emptyOnDelete: true</code>（destroy でイメージも消えるため、作り直した後はイメージの再 push が要る） <a class="decision-ref" href="#d-05">→ 理由 D-05</a>。<code>imageTagMutability</code> / <code>imageScanOnPush</code> は指定せず CDK デフォルトのまま</td></tr>
     <tr><td>VPC Endpoint</td><td>S3（Gateway）のみ。ECS Fargate から S3 への通信を AWS 網内に閉じる（Gateway 型は無料。<a href="architecture.html">architecture.html セクション 2.1</a>）。CDK 引数指定: <code>subnets</code> に Public Subnet のみを明示指定する（CDK デフォルトは Isolated 含む全サブネットのルートテーブルに関連付けるが、S3 にアクセスするのは Public 配置の ECS タスクのみで Isolated は Aurora 専用のため最小構成にする）。Endpoint ポリシーは指定せずデフォルトのまま（アクセス制御は IAM タスクロール側で行う。<a href="security.html">security.html</a> を参照）。ルーティングは透過的に効くため、後続スタック参照用のプロパティ公開は不要</td></tr>
     <tr><td>ECS Task Definition（DB 準備確認）</td><td>DB 準備確認用（db-readiness-check）。コンテナ名: <code>db-readiness-check</code>。最小構成（0.25 vCPU / 0.5 GB）。Public Subnet に配置し、両バッチスタックの Step Functions から共有される。コンテナイメージは CDK Context <code>dbReadinessCheckImageTag</code> で指定された不変タグを参照する。CDK 引数指定: <code>family</code> に <code>acps-{env}-db-readiness-check</code> を明示指定する（Step Functions の ASL と <code>aws ecs describe-task-definition</code> が family 名で参照するため固定必須。<a href="cicd.html#deploy">cicd.html セクション 5</a> の family 命名例に合わせる）、<code>cpu: 256</code> / <code>memoryLimitMiB: 512</code>。環境変数（<code>DB_SECRET_ARN</code> / <code>ENV_NAME</code>）は Task Definition に静的設定する（<a href="workflow.html#db-readiness">workflow.html セクション 5.3</a>）。タスク実行ロールは明示作成せず CDK 自動生成に任せる（ECR pull + awslogs 書き込みが自動で最小権限付与される）</td></tr>
     <tr><td>IAM Role（DB 準備確認タスク）</td><td>権限詳細は <a href="security.html">security.html</a> を参照。タスクロールのインラインポリシーは <code>secretsmanager:GetSecretValue</code> をプレフィックス <code>acps/{env}/db/*</code> に許可する（個別 ARN 指定ではなくプレフィックスベース制御。security.html セクション 2.1）</td></tr>
     <tr><td>Security Group（DB 準備確認）</td><td>DB 準備確認 ECS タスク用</td></tr>
-    <tr><td>CloudWatch Log Group（DB 準備確認）</td><td>DB 準備確認タスクのログ出力先（リテンション: 90 日）。CDK 引数指定: ロググループ名は明示指定せず CFN 自動命名、<code>removalPolicy: DESTROY</code>（下記の設計理由を参照）</td></tr>
+    <tr><td>CloudWatch Log Group（DB 準備確認）</td><td>DB 準備確認タスクのログ出力先（リテンション: 90 日）。CDK 引数指定: ロググループ名は明示指定せず CFN 自動命名、<code>removalPolicy: DESTROY</code> <a class="decision-ref" href="#d-06">→ 理由 D-06</a></td></tr>
   </tbody>
 </table>
-</div>
-
-<div class="decision">
-  <span class="callout-title">S3 バケットの RemovalPolicy（2026-07-13 決定）</span>
-  画像保存用バケットは <code>RemovalPolicy.DESTROY</code> + <code>autoDeleteObjects: true</code> とし、スタック削除時に中身ごと削除する。生成画像・生成動画は 30 日ライフサイクル（<code>images/</code>・<code>videos/</code> プレフィックス限定。21-7b でコメント記録 <code>comment-log/</code> を追加）で自動削除される使い捨てデータであり、正式な記録は DB レコードが担うため（<a href="../app/data-model.html#s3-key">app/data-model.html セクション 5</a>。音源ストック <code>audio/</code> は自動削除の対象外）、バケット保持による保護よりも「スタックを壊して作り直せる」性質を優先する。この設定によりオブジェクト自動削除用の Lambda カスタムリソースがスタックに 1 つ追加される。
-</div>
-
-<div class="decision">
-  <span class="callout-title">ECR リポジトリの RemovalPolicy（2026-07-13 決定）</span>
-  ECR リポジトリ 3 つは <code>RemovalPolicy.DESTROY</code> + <code>emptyOnDelete: true</code> とし、スタック削除時にイメージごと削除する。リポジトリ名を明示指定しているため、CDK デフォルトの RETAIN では destroy 後に同名リポジトリが残り再作成時に名前衝突する。コンテナイメージはソースから再ビルド・再 push できる複製可能データであり、「スタックを壊して作り直せる」性質を優先する。<code>emptyOnDelete</code> は CloudFormation ネイティブの <code>EmptyOnDelete</code> プロパティに対応するため、S3 の <code>autoDeleteObjects</code> と異なり Lambda カスタムリソースは追加されない。<strong>destroy でイメージは全て失われるため、スタック再作成後はイメージの再 push が必要</strong>（db-readiness-check は再 push した不変タグを CDK Context で渡して Task Definition を再登録する。<a href="cicd.html#ecr">cicd.html セクション 4・6</a> を参照）。
-</div>
-
-<div class="decision">
-  <span class="callout-title">Aurora クラスターの RemovalPolicy と DB 名（2026-07-13 決定）</span>
-  Aurora クラスターの RemovalPolicy は明示指定せず CDK デフォルトの <strong>SNAPSHOT</strong>（destroy 時にクラスターを削除し最終スナップショットを保持）とする。DB は正式な記録を担うデータストアであるため、S3 / ECR の DESTROY（壊して作り直せる優先）とは方針を変え、データ保護と再作成可能性の中間を取る。クラスター識別子は CFN 自動命名のため、destroy 後の再作成で名前衝突は発生しない（DB 認証情報 Secret <code>acps/{env}/db/credentials</code> は名前明示指定だが、クラスターと同時に削除されるため衝突しない）。空 DB のスナップショット保管コストはごく僅かで、不要なら手動削除できる。デフォルトデータベース名は <code>defaultDatabaseName: 'acps'</code> を指定する。Secret 値スキーマ（<a href="security.html">security.html セクション 1.3</a>）で <code>dbname</code> キーが必須であり、クラスター作成時に指定しないと自動生成 Secret に <code>dbname</code> が含まれないため。名前は Secret 名・S3 バケット名と同じ <code>acps</code> プレフィックス規約に合わせた。
-</div>
-
-<div class="decision">
-  <span class="callout-title">DB 準備確認タスクの CloudWatch Log Group（2026-07-13 決定）</span>
-  DB 準備確認タスクのロググループは自動命名 + <code>RemovalPolicy.DESTROY</code> とし、スタック削除時にログごと削除する。診断用の使い捨てログ（リテンション 90 日）であり、S3 / ECR と同じ「スタックを壊して作り直せる」方針を優先する（CDK デフォルトの RETAIN では destroy 後にロググループが残り、手動削除しない限りゴミが蓄積する）。ロググループ名は命名規約表（<a href="cicd.html">cicd.html セクション 9.2</a>）の対象外のため明示指定しない。ログは ECS コンソールのタスク詳細から辿れるため、明示名による発見性は不要。
-</div>
-
-<div class="decision">
-  <span class="callout-title">画像 API キー Secret の初期値と RemovalPolicy（2026-07-13 決定）</span>
-  画像生成 API キー用 Secret の「箱」は、初期値を <code>generateSecretString</code>（<code>secretStringTemplate: '{}'</code> + <code>generateStringKey: 'api_key'</code>）で <code>{"api_key": "&lt;ランダムプレースホルダ&gt;"}</code> の JSON 形状にする。値スキーマ（<a href="security.html">security.html セクション 1.3</a>）と同じ形になり、Console のキー・値エディタで <code>api_key</code> の値を差し替えるだけで手動設定が完了する。RemovalPolicy は明示指定せず CFN デフォルトの Delete（復旧期間なしの即時削除）とし、「スタックを壊して作り直せる」性質を優先する（RETAIN では destroy 後に同名 Secret が残り再作成時に名前衝突する）。<strong>手動設定した API キー値は destroy で失われるため、スタック再作成後は Console から再設定が必要</strong>。
 </div>
 
 <h4>Security Group ルール詳細</h4>
@@ -122,10 +141,7 @@
   </ul>
 </div>
 
-<div class="note">
-  <span class="callout-title">設計方針</span>
-  ネットワークセキュリティの方針は <a href="architecture.html#network">architecture.html セクション 2</a> および <a href="security.html#network">security.html セクション 3</a> を参照。
-</div>
+<p>ネットワークセキュリティの方針は <a href="architecture.html#network">architecture.html セクション 2</a> および <a href="security.html#network">security.html セクション 3</a> を参照。</p>
 
 <h4>出力値（他スタックへの共有）</h4>
 <ul>
@@ -144,7 +160,7 @@
 <ul>
   <li>DB 準備確認タスクの仕様詳細は <a href="workflow.html#db-readiness">workflow.html セクション 2</a> を参照</li>
   <li>db-readiness-check の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> で新しいイメージタグを明示的に渡す</li>
-  <li>DB 準備確認タスク定義を追加した以降（開発計画 Phase 3-3 以降）は、db-readiness-check に変更がないデプロイでも <code>dbReadinessCheckImageTag</code> の指定が必須である。CDK コードは Context 未指定時にデフォルト値へフォールバックせず、明確なエラーで失敗させる。ただし実装は throw ではなく <code>Annotations.of(stack).addError()</code> を用い、FoundationStack を対象に含むコマンドのみを失敗させること（CDK は選択外のスタックも synth するため、コンストラクタで throw すると他スタックの通常デプロイコマンドまで失敗する）。現行タグは <code>aws ecs describe-task-definition --task-definition &lt;family&gt;</code> の image URI で確認できる</li>
+  <li>DB 準備確認タスク定義を追加した以降（開発計画 Phase 3-3 以降）は、db-readiness-check に変更がないデプロイでも <code>dbReadinessCheckImageTag</code> の指定が必須である。CDK コードは Context 未指定時にデフォルト値へフォールバックせず、<code>Annotations.of(stack).addError()</code> で FoundationStack を対象に含むコマンドだけを失敗させる（throw はしない） <a class="decision-ref" href="#d-07">→ 理由 D-07</a>。現行タグは <code>aws ecs describe-task-definition --task-definition &lt;family&gt;</code> の image URI で確認できる</li>
   <li>将来の AdminApiStack、AdminWebStack からも参照される</li>
 </ul>
 
@@ -160,28 +176,23 @@
 <table>
   <thead><tr><th>リソース</th><th>説明</th></tr></thead>
   <tbody>
-    <tr><td>ECS Task Definition</td><td>画像生成バッチ用コンテナ定義（1 vCPU / 2 GB。動画方式の ffmpeg 合成に合わせて Phase 14-7 で 0.25 vCPU / 0.5 GB から引き上げ）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する（詳細は <a href="cicd.html">cicd.html</a> を参照）。コンテナイメージは CDK Context <code>imageBatchImageTag</code> で指定された不変タグを参照する。CDK 引数指定: <code>family</code> に <code>acps-{env}-image-batch</code> を明示指定する（Step Functions の ASL と <code>aws ecs describe-task-definition</code> が family 名で参照するため固定必須。<a href="cicd.html#deploy">cicd.html セクション 5</a> の family 命名例に合わせる）、<code>cpu: 1024</code> / <code>memoryLimitMiB: 2048</code>（エフェメラルストレージは Fargate デフォルトの 20 GiB のまま）。タスク実行ロールは明示作成せず CDK 自動生成に任せる（ECR pull + awslogs 書き込みが自動で最小権限付与される）</td></tr>
+    <tr><td>ECS Task Definition</td><td>画像生成バッチ用コンテナ定義（1 vCPU / 2 GB <a class="decision-ref" href="#d-08">→ 理由 D-08</a>）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する（詳細は <a href="cicd.html">cicd.html</a> を参照）。コンテナイメージは CDK Context <code>imageBatchImageTag</code> で指定された不変タグを参照する。CDK 引数指定: <code>family</code> に <code>acps-{env}-image-batch</code> を明示指定する（Step Functions の ASL と <code>aws ecs describe-task-definition</code> が family 名で参照するため固定必須。<a href="cicd.html#deploy">cicd.html セクション 5</a> の family 命名例に合わせる）、<code>cpu: 1024</code> / <code>memoryLimitMiB: 2048</code>（エフェメラルストレージは Fargate デフォルトの 20 GiB のまま）。タスク実行ロールは明示作成せず CDK 自動生成に任せる（ECR pull + awslogs 書き込みが自動で最小権限付与される）</td></tr>
     <tr><td>Container Definition</td><td>コンテナ名: <code>image-batch</code>。環境変数（<code>DB_SECRET_ARN</code> / <code>API_SECRET_ARN</code> / <code>S3_BUCKET_NAME</code> / <code>ENV_NAME</code>）は Task Definition に静的設定する（<a href="workflow.html#env-vars">workflow.html セクション 5.1</a>。<code>SET_CODE</code> / <code>EXECUTION_ARN</code> / <code>SCHEDULED_AT</code> は Step Functions のコンテナオーバーライドで渡すため静的設定しない）。ログは awslogs ドライバで下記 CloudWatch Log Group に出力する</td></tr>
-    <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html#image-asl">workflow.html セクション 3</a> を参照）。ASL は設計書の JSON をそのまま <code>infra/lib/asl/image-generation.asl.json</code> に保存し、実装方式（生 JSON + <code>definitionSubstitutions</code>）・type Standard・ロギング等未設定・実行ロールへの <code>addToRolePolicy</code> 方式は <a href="#sns-post-batch">セクション 3.3</a> の Step Functions 行と decision に従う。実行ロールの権限は <a href="security.html#iam">security.html セクション 2.3</a> の image-generation-sfn 行のとおり 6 ステートメント（sns-posting-sfn の 4 ステートメント + SNS 投稿 SFN の ARN に限定した <code>states:StartExecution</code> + <code>cloudwatch:PutMetricData</code>（<code>cloudwatch:namespace = ACPS</code> 条件付き））。CDK 引数指定: <code>stateMachineName</code> に <code>acps-{env}-image-generation-sfn</code> を明示指定する（セクション 3.3 の decision と同じ整理。加えて ASL の <code>${ImageGenerationSfnName}</code>（カスタムメトリクスの Dimension 値）に自ステートマシン名の文字列を生成前に渡す必要があるため、明示命名が実質必須）。SNS 投稿 SFN の ARN は SnsPostBatchStack の <code>stateMachine</code> プロパティを props で受け取り <code>${SnsPostingSfnArn}</code> に渡す。後続の EventBridge Scheduler（Phase 5-6）・MonitoringStack 用に <code>stateMachine</code> をプロパティ公開する</td></tr>
+    <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html#image-asl">workflow.html セクション 3</a> を参照）。ASL は設計書の JSON をそのまま <code>infra/lib/asl/image-generation.asl.json</code> に保存し、実装方式（生 JSON + <code>definitionSubstitutions</code> <a class="decision-ref" href="#d-09">→ 理由 D-09</a>）・type Standard・ロギング等未設定・実行ロールへの <code>addToRolePolicy</code> 方式は <a href="#sns-post-batch">セクション 3.3</a> の Step Functions 行に従う。実行ロールの権限は <a href="security.html#iam">security.html セクション 2.3</a> の image-generation-sfn 行のとおり 6 ステートメント（sns-posting-sfn の 4 ステートメント + SNS 投稿 SFN の ARN に限定した <code>states:StartExecution</code> + <code>cloudwatch:PutMetricData</code>（<code>cloudwatch:namespace = ACPS</code> 条件付き））。CDK 引数指定: <code>stateMachineName</code> に <code>acps-{env}-image-generation-sfn</code> を明示指定する（ASL の <code>${ImageGenerationSfnName}</code>〔カスタムメトリクスの Dimension 値〕にもこの名前を渡す） <a class="decision-ref" href="#d-10">→ 理由 D-10</a>。SNS 投稿 SFN の ARN は SnsPostBatchStack の <code>stateMachine</code> プロパティを props で受け取り <code>${SnsPostingSfnArn}</code> に渡す。後続の EventBridge Scheduler（Phase 5-6）・MonitoringStack 用に <code>stateMachine</code> をプロパティ公開する</td></tr>
     <tr><td>EventBridge Scheduler</td><td>セットごとの定期実行スケジュール。Schedule 名 <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code>、ScheduleGroup <code>acps-{env}-image-schedule-group</code> に所属させる。命名規約・Input テンプレート・RetryPolicy・cron 式・State は <a href="workflow.html#overview">workflow.html セクション 1.3〜1.5</a> を参照。ターゲット用 IAM ロール（<code>states:StartExecution</code> + DLQ への <code>sqs:SendMessage</code>）は CDK L2 の自動生成に任せる。MonitoringStack（Phase 7）のメトリクス Dimension 用に <code>scheduleGroup</code> をプロパティ公開する</td></tr>
     <tr><td>SQS Queue（Scheduler DLQ）</td><td>EventBridge Scheduler が画像生成 Step Functions を起動できなかったイベントの退避先。詳細は <a href="workflow.html#scheduler-dlq">workflow.html セクション 10</a> を参照。MonitoringStack（Phase 7）用に <code>schedulerDlq</code> をプロパティ公開する</td></tr>
     <tr><td>CodePipeline</td><td>image-batch 用 CI/CD パイプライン（詳細は <a href="cicd.html">cicd.html</a> を参照）</td></tr>
     <tr><td>CodeBuild</td><td>Docker ビルド・ECR push・タスク定義更新</td></tr>
     <tr><td>IAM Role</td><td>権限詳細は <a href="security.html">security.html</a> を参照。タスクロールのインラインポリシーは <code>secretsmanager:GetSecretValue</code> をプレフィックス <code>acps/{env}/db/*</code> と <code>acps/{env}/image/*</code> に許可し（プレフィックスベース制御。security.html セクション 2.1）、S3 バケット読み書きを付与する（<code>cloudwatch:PutMetricData</code> は付与しない。アプリは個別カスタムメトリクスを発行しない方針のため、タスクロールへの付与は Phase 10-1 で全廃。security.html セクション 2.1 の decision を参照）</td></tr>
-    <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）。CDK 引数指定: ロググループ名は明示指定せず CFN 自動命名、<code>removalPolicy: DESTROY</code>（<a href="#foundation">セクション 3.1</a> の設計理由「DB 準備確認タスクの CloudWatch Log Group」と同方針）</td></tr>
+    <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）。CDK 引数指定: ロググループ名は明示指定せず CFN 自動命名、<code>removalPolicy: DESTROY</code>（<a href="#foundation">セクション 3.1</a> の DB 準備確認のロググループと同じ） <a class="decision-ref" href="#d-06">→ 理由 D-06</a></td></tr>
   </tbody>
 </table>
-</div>
-
-<div class="decision">
-  <span class="callout-title">画像生成バッチのタスクサイズ（2026-07-25 決定・Phase 14-7）</span>
-  動画方式（<code>gpt-image-kenburns</code>）の追加により、コンテナ内で ffmpeg による H.264 エンコード（1080x1920・30fps・10 秒）を行うようになったため、タスクサイズを <code>cpu: 256</code> / <code>memoryLimitMiB: 512</code> から <strong><code>cpu: 1024</code> / <code>memoryLimitMiB: 2048</code></strong>（1 vCPU / 2 GB）へ引き上げた。エフェメラルストレージは扱うファイルが数 MB 規模のため Fargate デフォルト（20 GiB）のままとする。1 日 1〜3 回・各数分の実行のため、Fargate の秒課金における増分は軽微。画像生成 Step Functions のタスクタイムアウト（3600 秒。<a href="workflow.html#image-asl">workflow.html セクション 3</a>）は変更していない。
 </div>
 
 <h4>注意事項</h4>
 <ul>
   <li>image-batch の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; -c snsPostBatchImageTag=&lt;tag&gt; -c imageBatchImageTag=&lt;tag&gt; ImageBatchStack</code> で新しいイメージタグを明示的に渡す。ImageBatchStack は FoundationStack の cross-stack 参照（ECR リポジトリ・S3 バケット・Aurora Secret・画像生成 API キー Secret）と SnsPostBatchStack の cross-stack 参照（SNS 投稿 Step Functions の ARN。Phase 5-5 以降）に依存し、両スタックもデプロイ対象に含まれるため、<code>dbReadinessCheckImageTag</code> / <code>snsPostBatchImageTag</code>（いずれも現行タグのまま）の同時指定が必要</li>
-  <li>ECS Task Definition を追加した以降（開発計画 Phase 5-3 以降）は、image-batch に変更がないデプロイでも <code>imageBatchImageTag</code> の指定が必須である。Context 未指定時の扱い（<code>Annotations.of(stack).addError()</code> 方式とその理由）は <a href="#foundation">セクション 3.1</a> の注意事項と同じ。現行タグは <code>aws ecs describe-task-definition --task-definition acps-{env}-image-batch</code> の image URI で確認できる</li>
+  <li>ECS Task Definition を追加した以降（開発計画 Phase 5-3 以降）は、image-batch に変更がないデプロイでも <code>imageBatchImageTag</code> の指定が必須である。Context 未指定時の扱い（<code>Annotations.of(stack).addError()</code> 方式）は <a href="#foundation">セクション 3.1</a> の注意事項と同じ <a class="decision-ref" href="#d-07">→ 理由 D-07</a>。現行タグは <code>aws ecs describe-task-definition --task-definition acps-{env}-image-batch</code> の image URI で確認できる</li>
 </ul>
 
 <p><strong>依存スタック</strong>: FoundationStack、SnsPostBatchStack（SNS 投稿 Step Functions の ARN を参照するため。ARN 参照は Phase 5-5 の Step Functions 追加時に発生し、Phase 5-3 のタスク定義のみの時点では FoundationStack のみに依存する）</p>
@@ -200,34 +211,21 @@
   <tbody>
     <tr><td>ECS Task Definition</td><td>SNS 投稿バッチ用コンテナ定義（0.25 vCPU / 0.5 GB。実運用で調整）。Task Definition 全体の SSOT は CDK とし、CI/CD は latest ACTIVE revision をベースに image URI だけを差し替えて新 revision を登録する。コンテナイメージは CDK Context <code>snsPostBatchImageTag</code> で指定された不変タグを参照する。CDK 引数指定: <code>family</code> に <code>acps-{env}-sns-post-batch</code> を明示指定する（Step Functions の ASL と <code>aws ecs describe-task-definition</code> が family 名で参照するため固定必須。<a href="cicd.html#deploy">cicd.html セクション 5</a> の family 命名例に合わせる）、<code>cpu: 256</code> / <code>memoryLimitMiB: 512</code>。タスク実行ロールは明示作成せず CDK 自動生成に任せる（ECR pull + awslogs 書き込みが自動で最小権限付与される）</td></tr>
     <tr><td>Container Definition</td><td>コンテナ名: <code>sns-post-batch</code>。環境変数（<code>DB_SECRET_ARN</code> / <code>S3_BUCKET_NAME</code> / <code>ENV_NAME</code>）は Task Definition に静的設定する（<a href="workflow.html#env-vars">workflow.html セクション 5.2</a>。<code>SET_CODE</code> / <code>EXECUTION_ARN</code> は Step Functions のコンテナオーバーライドで渡すため静的設定しない）。ログは awslogs ドライバで下記 CloudWatch Log Group に出力する</td></tr>
-    <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html#sns-asl">workflow.html セクション 4</a> を参照）。ASL は設計書の JSON をそのまま <code>infra/lib/asl/sns-posting.asl.json</code> に保存し、<code>DefinitionBody.fromString</code>（<code>fs.readFileSync</code>）+ <code>definitionSubstitutions</code> でプレースホルダに実値を渡す（下記の設計理由を参照）。CDK 引数指定: <code>stateMachineName</code> に <code>acps-{env}-sns-posting-sfn</code> を明示指定する（下記の decision を参照）。type は Standard（デフォルト）、ロギング・トレーシング・ステートマシンレベルの timeout は未設定（設計書に規定なし。実行履歴は SFN コンソールで確認でき、失敗監視は MonitoringStack の <code>ExecutionsFailed</code> アラームで行う）。実行ロールは StateMachine コンストラクトの自動生成ロールに <code>addToRolePolicy</code> で <a href="security.html#iam">security.html セクション 2.3</a> の 4 ステートメント（<code>ecs:RunTask</code> は family 配下全 revision、<code>ecs:StopTask</code> / <code>ecs:DescribeTasks</code>、<code>events:*</code> は <code>StepFunctionsGetEventsForECSTaskRule</code> に限定、<code>iam:PassRole</code> はタスクロール・タスク実行ロール ×4 + <code>iam:PassedToService</code> 条件）を追加する。後続の ImageBatchStack（ARN 参照）・MonitoringStack 用に <code>stateMachine</code> をプロパティ公開する</td></tr>
+    <tr><td>Step Functions</td><td>ワークフロー定義（ASL は <a href="workflow.html#sns-asl">workflow.html セクション 4</a> を参照）。ASL は設計書の JSON をそのまま <code>infra/lib/asl/sns-posting.asl.json</code> に保存し、<code>DefinitionBody.fromString</code>（<code>fs.readFileSync</code>）+ <code>definitionSubstitutions</code> でプレースホルダ（ECS クラスター ARN・タスク定義 family 名・サブネット ID・SG ID）に実値を渡す <a class="decision-ref" href="#d-09">→ 理由 D-09</a>。CDK 引数指定: <code>stateMachineName</code> に <code>acps-{env}-sns-posting-sfn</code> を明示指定する <a class="decision-ref" href="#d-10">→ 理由 D-10</a>。type は Standard（デフォルト）、ロギング・トレーシング・ステートマシンレベルの timeout は未設定（設計書に規定なし。実行履歴は SFN コンソールで確認でき、失敗監視は MonitoringStack の <code>ExecutionsFailed</code> アラームで行う）。実行ロールは StateMachine コンストラクトの自動生成ロールに <code>addToRolePolicy</code> で <a href="security.html#iam">security.html セクション 2.3</a> の 4 ステートメント（<code>ecs:RunTask</code> は family 配下全 revision、<code>ecs:StopTask</code> / <code>ecs:DescribeTasks</code>、<code>events:*</code> は <code>StepFunctionsGetEventsForECSTaskRule</code> に限定、<code>iam:PassRole</code> はタスクロール・タスク実行ロール ×4 + <code>iam:PassedToService</code> 条件）を追加する。後続の ImageBatchStack（ARN 参照）・MonitoringStack 用に <code>stateMachine</code> をプロパティ公開する</td></tr>
     <tr><td>CodePipeline</td><td>sns-post-batch 用 CI/CD パイプライン（詳細は <a href="cicd.html">cicd.html</a> を参照）</td></tr>
     <tr><td>CodeBuild</td><td>Docker ビルド・ECR push・タスク定義更新</td></tr>
     <tr><td>IAM Role</td><td>権限詳細は <a href="security.html">security.html</a> を参照。タスクロールのインラインポリシーは <code>secretsmanager:GetSecretValue</code> をプレフィックス <code>acps/{env}/db/*</code> と <code>acps/{env}/*/sns/*</code> に許可し（プレフィックスベース制御。security.html セクション 2.1）、S3 バケット読み取りと、問題スナップショット用に <code>assets/umigame-soup-1/problems/*</code> 限定の <code>s3:PutObject</code>（21-7 追加。ロールのポリシーで付与しバケットポリシーは変えない）を付与する（当初先行付与していた <code>cloudwatch:PutMetricData</code> は Phase 10-1 で削除。security.html セクション 2.1 の decision を参照）</td></tr>
-    <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）。CDK 引数指定: ロググループ名は明示指定せず CFN 自動命名、<code>removalPolicy: DESTROY</code>（<a href="#foundation">セクション 3.1</a> の設計理由「DB 準備確認タスクの CloudWatch Log Group」と同方針）</td></tr>
+    <tr><td>CloudWatch Log Group</td><td>タスクログ出力先（リテンション: 90 日）。CDK 引数指定: ロググループ名は明示指定せず CFN 自動命名、<code>removalPolicy: DESTROY</code>（<a href="#foundation">セクション 3.1</a> の DB 準備確認のロググループと同じ） <a class="decision-ref" href="#d-06">→ 理由 D-06</a></td></tr>
   </tbody>
 </table>
 </div>
 
-<div class="decision">
-  <span class="callout-title">ステートマシン名の明示指定（2026-07-13 決定）</span>
-  SNS 投稿 Step Functions のステートマシン名は <code>acps-{env}-sns-posting-sfn</code> を明示指定する。ステートマシンは命名規約表（<a href="cicd.html#env-separation">cicd.html セクション 9.2</a>）の対象外だが、手動での単独実行が運用ユースケースとして定義されており（<a href="workflow.html#sns-asl">workflow.html セクション 4</a>）、運用者がコンソールから直接触るリソースのため発見性を優先した（Scheduler DLQ <code>acps-prod-image-scheduler-dlq</code> の明示命名と同じ整理。命名規約表にも追記済み）。ImageBatchStack からの参照は CDK オブジェクト参照（ARN）のため名前固定は必須ではない。
-</div>
-
-<div class="decision">
-  <span class="callout-title">ASL の実装方式: 生 JSON + definitionSubstitutions（2026-07-13 決定）</span>
-  ステートマシン定義は CDK の L2 コンストラクト（<code>tasks.EcsRunTask</code> 等）を使わず、<a href="workflow.html#sns-asl">workflow.html セクション 4</a> の ASL JSON をそのまま <code>infra/lib/asl/</code> 配下にファイルとして保持し、<code>definitionSubstitutions</code> で <code>${...}</code> プレースホルダに実値（ECS クラスター ARN・タスク定義 family 名・サブネット ID・SG ID）を渡す。理由: 本システムは Task Definition を family 名（revision なし）で指定し RunTask に最新 ACTIVE revision を解決させる方式（<a href="workflow.html#overview">workflow.html セクション 1.2</a>）だが、L2 の <code>EcsRunTask</code> は revision 固定 ARN を ASL に埋め込むためこの方式を表現できない。生 ASL 方式により設計書の ASL と実装が 1:1 で対応し、レビューも容易になる。<code>DefinitionBody.fromFile</code> は S3 アセット化されるため使わず、<code>fs.readFileSync</code> + <code>fromString</code> でテンプレートにインライン展開する（<code>cdk diff</code> で ASL の差分が見える）。
-</div>
-
-<div class="note">
-  <span class="callout-title">注記</span>
-  SnsPostBatchStack には EventBridge Scheduler を含めない。SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動される。
-</div>
+<p>SnsPostBatchStack には EventBridge Scheduler を含めない。SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動される。</p>
 
 <h4>注意事項</h4>
 <ul>
   <li>sns-post-batch の更新時は <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; -c snsPostBatchImageTag=&lt;tag&gt; SnsPostBatchStack</code> で新しいイメージタグを明示的に渡す。SnsPostBatchStack は FoundationStack の cross-stack 参照（ECR リポジトリ・S3 バケット・Aurora Secret）に依存し、FoundationStack もデプロイ対象に含まれるため、<code>dbReadinessCheckImageTag</code>（現行タグのまま）の同時指定が必要</li>
-  <li>ECS Task Definition を追加した以降（開発計画 Phase 4-3 以降）は、sns-post-batch に変更がないデプロイでも <code>snsPostBatchImageTag</code> の指定が必須である。Context 未指定時の扱い（<code>Annotations.of(stack).addError()</code> 方式とその理由）は <a href="#foundation">セクション 3.1</a> の注意事項と同じ。現行タグは <code>aws ecs describe-task-definition --task-definition acps-{env}-sns-post-batch</code> の image URI で確認できる</li>
+  <li>ECS Task Definition を追加した以降（開発計画 Phase 4-3 以降）は、sns-post-batch に変更がないデプロイでも <code>snsPostBatchImageTag</code> の指定が必須である。Context 未指定時の扱い（<code>Annotations.of(stack).addError()</code> 方式）は <a href="#foundation">セクション 3.1</a> の注意事項と同じ <a class="decision-ref" href="#d-07">→ 理由 D-07</a>。現行タグは <code>aws ecs describe-task-definition --task-definition acps-{env}-sns-post-batch</code> の image URI で確認できる</li>
 </ul>
 
 <p><strong>依存スタック</strong>: FoundationStack</p>
@@ -241,7 +239,7 @@
   <tbody>
     <tr><td>CloudWatch Alarm</td><td>監視リソースの詳細は <a href="workflow.html#alarms">workflow.html セクション 8</a> を参照。アラーム名は <code>acps-{env}-&lt;監視対象&gt;</code>（例: <code>acps-prod-image-generation-sfn-failed</code>）で明示命名する（通知メール・コンソールでの識別のため）</td></tr>
     <tr><td>EventBridge Rule</td><td>ECS Task State Change 検知。Rule 名 <code>acps-{env}-ecs-task-abnormal-exit</code>。詳細は <a href="workflow.html#eventbridge-rule">workflow.html セクション 9</a> を参照</td></tr>
-    <tr><td>SNS Topic</td><td>アラーム・イベント通知先。Topic 名 <code>acps-{env}-alarm-topic</code>。メールサブスクリプションは CDK 管理外とし、AWS Console から手動作成する（手順は <a href="operation.html">operation.html セクション 4.2</a>）。Topic ポリシーには <code>cloudwatch.amazonaws.com</code> の Publish 許可（<code>aws:SourceAccount</code> / <code>aws:SourceArn</code> 条件付き）を明示定義する — EventBridge Rule のターゲット設定で CDK が明示的 TopicPolicy を作成すると SNS デフォルトポリシー（同一アカウント許可）が置換され、CloudWatch Alarm からの発行が拒否されるため（Phase 7-3 の通知テストで検出）</td></tr>
+    <tr><td>SNS Topic</td><td>アラーム・イベント通知先。Topic 名 <code>acps-{env}-alarm-topic</code>。メールサブスクリプションは CDK 管理外とし、AWS Console から手動作成する（手順は <a href="operation.html">operation.html セクション 4.2</a>）。Topic ポリシーには <code>cloudwatch.amazonaws.com</code> の Publish 許可（<code>aws:SourceAccount</code> / <code>aws:SourceArn</code> 条件付き）を明示定義する <a class="decision-ref" href="#d-11">→ 理由 D-11</a></td></tr>
     <tr><td>CloudWatch Dashboard</td><td>運用可視化（必要に応じて。Phase 7-1 時点では未作成）</td></tr>
   </tbody>
 </table>
@@ -258,10 +256,7 @@
 <h3 id="insights-batch">3.5 InsightsBatchStack</h3>
 <p><strong>目的</strong>: インサイト収集バッチ（第 3 のバッチ。アプリ処理は <a href="../app/batch-flow.html#flow-insights">app/batch-flow.html セクション 4</a>）の実行基盤を構築する</p>
 
-<div class="note">
-  <span class="callout-title">設計方針: SnsPostBatchStack と同型とし、差分のみ記載する</span>
-  スタック構成は <a href="#sns-post-batch">SnsPostBatchStack（3.3）</a>のパターンをそのまま踏襲する（ECS Task Definition の SSOT・生 ASL + <code>definitionSubstitutions</code> 方式・実行ロールの構成・ロググループ方針・CI/CD 一式）。以下は差分と固有値のみ。
-</div>
+<p class="lead">SnsPostBatchStack と同型とし、差分のみ記載する。スタック構成は <a href="#sns-post-batch">SnsPostBatchStack（3.3）</a>のパターンをそのまま踏襲する（ECS Task Definition の SSOT・生 ASL + <code>definitionSubstitutions</code> 方式・実行ロールの構成・ロググループ方針・CI/CD 一式）。以下は差分と固有値のみ。</p>
 
 <div class="table-wrap">
 <table>
@@ -269,7 +264,7 @@
   <tbody>
     <tr><td>ECS Task Definition</td><td><code>family</code> は <code>acps-{env}-insights-batch</code>、<code>cpu: 256</code> / <code>memoryLimitMiB: 512</code>（API 呼び出し + DB 書き込みのみのため最小構成）。コンテナイメージは CDK Context <code>insightsBatchImageTag</code> で指定</td></tr>
     <tr><td>Container Definition</td><td>コンテナ名: <code>insights-batch</code>。静的環境変数は <code>DB_SECRET_ARN</code> / <code>ENV_NAME</code> / <code>COMMENT_LOG_BUCKET</code>（21-7b。コメント記録の取り込み元 = FoundationStack の画像バケット。<code>S3_BUCKET_NAME</code> は持たない）。<code>SET_CODE</code> / <code>SCHEDULED_AT</code> / <code>MEDIA_LOOKBACK_DAYS</code> / <code>EXECUTION_ARN</code> は Step Functions のコンテナオーバーライドで渡す（<a href="workflow.html#env-vars">workflow.html セクション 5.2</a>）</td></tr>
-    <tr><td>Step Functions</td><td><code>stateMachineName</code> は <code>acps-{env}-insights-collection-sfn</code>（手動実行が運用ユースケース〔バックフィル・疎通確認〕のため明示命名 — 3.3 の decision と同じ整理）。ASL は <code>infra/lib/asl/insights-collection.asl.json</code>（定義は <a href="workflow.html#insights-asl">workflow.html セクション 11</a>。<code>WaitForDbReady</code> → <code>RunInsightsBatchTask</code> の同型 2 ステート構成）。実行ロールは 3.3 と同じ 4 ステートメント構成（他 SFN の <code>states:StartExecution</code> は不要）。MonitoringStack 用に <code>stateMachine</code> をプロパティ公開する</td></tr>
+    <tr><td>Step Functions</td><td><code>stateMachineName</code> は <code>acps-{env}-insights-collection-sfn</code>（明示命名。手動実行〔バックフィル・疎通確認〕を運用で使う <a class="decision-ref" href="#d-10">→ 理由 D-10</a>）。ASL は <code>infra/lib/asl/insights-collection.asl.json</code>（定義は <a href="workflow.html#insights-asl">workflow.html セクション 11</a>。<code>WaitForDbReady</code> → <code>RunInsightsBatchTask</code> の同型 2 ステート構成）。実行ロールは 3.3 と同じ 4 ステートメント構成（他 SFN の <code>states:StartExecution</code> は不要）。MonitoringStack 用に <code>stateMachine</code> をプロパティ公開する</td></tr>
     <tr><td>EventBridge Scheduler</td><td><strong>セット × 2 件（06:00・18:00 JST）</strong>+ ScheduleGroup <code>acps-{env}-insights-schedule-group</code> + DLQ <code>acps-{env}-insights-scheduler-dlq</code>（ImageBatchStack の Scheduler 一式のパターン踏襲。命名規約・現行一覧は <a href="workflow.html#schedule">workflow.html セクション 1.6</a>）。SNS 投稿バッチと異なり<strong>連鎖起動ではなく独立したスケジュール起動</strong>のため本スタックが Scheduler を持つ</td></tr>
     <tr><td>IAM Role</td><td>タスクロールのインラインポリシーは <code>secretsmanager:GetSecretValue</code> をプレフィックス <code>acps/{env}/db/*</code> と <code>acps/{env}/*/sns/*</code> に許可（SNS 投稿バッチと同一。Instagram トークンを読むため）。S3 は 21-7b で<strong>コメント記録の読み取りだけ</strong>を付与する（<code>s3:ListBucket</code> は条件 <code>s3:prefix = comment-log/*</code>、<code>s3:GetObject</code> は <code>comment-log/*</code>。書き込み・削除は持たない。<a href="security.html">security.html セクション 2.1</a>）</td></tr>
     <tr><td>CodePipeline / CodeBuild</td><td>insights-batch 用 CI/CD パイプライン（パスフィルタ <code>services/insights-batch/**</code> + <code>shared/**</code>。詳細は <a href="cicd.html">cicd.html</a>）</td></tr>
@@ -289,66 +284,25 @@
 <h3 id="comment-reply">3.6 CommentReplyStack（Phase 21-3 設計・21-6 実装）</h3>
 <p><strong>目的</strong>: umigame-soup-1 のコメント自動返信経路（アプリの振る舞いは <a href="../app/sets/umigame-soup-1-comment-reply.html">umigame-soup-1 のコメント自動返信（分冊）</a>、全体像は <a href="architecture.html#comment-reply">architecture.html セクション 3.4</a>）を構築する。本システムで初めてイングレス（Meta Webhook）を持つスタックであり、既存のバッチ系スタックとは<strong>VPC・Aurora・CodePipeline を共有しない</strong>。</p>
 
-<div class="note">
-  <span class="callout-title">設計方針: 外部依存ゼロの Python を CDK asset でデプロイし、同一コードから本番面とステージング面を立てる</span>
-  Lambda コードは <code>services/comment-reply/</code>（pytest 付き。PoC の <code>poc/umigame-comment-webhook/lambda/handler.py</code> を Webhook / Reply の 2 ハンドラに分割して移植）。標準ライブラリ + boto3 のみでバンドル不要のため <code>lambda.Code.fromAsset</code> で直接デプロイし（asset は <code>app/</code> だけに絞る。<code>.venv</code>・<code>tests</code>・<code>tools</code>・<code>work</code> 等は exclude）、コンテナではないので CodePipeline は通さず手動 <code>cdk deploy</code> の既存ルールに乗せる（21-1 ⑥）。スタックは <code>face</code>（<code>prod</code> / <code>staging</code>）をコンストラクタ引数に取り、<code>bin/infra.ts</code> で 2 回インスタンス化する（<code>Prod-CommentReplyStack</code> / <code>Prod-CommentReplyStagingStack</code>）。面ごとに異なるのは<strong>リソース名の接尾辞・Secret 名・S3 プレフィックス・Webhook 先（Meta アプリ側の設定）</strong>だけで、コードと構成は同一。
-</div>
+<p class="lead">外部依存ゼロの Python を CDK asset でデプロイし、同一コードから本番面とステージング面を立てる <a class="decision-ref" href="#d-12">→ 理由 D-12</a>。Lambda コードは <code>services/comment-reply/</code>（pytest 付き。PoC の <code>poc/umigame-comment-webhook/lambda/handler.py</code> を Webhook / Reply の 2 ハンドラに分割して移植）。標準ライブラリ + boto3 のみでバンドル不要のため <code>lambda.Code.fromAsset</code> で直接デプロイし（asset は <code>app/</code> だけに絞る。<code>.venv</code>・<code>tests</code>・<code>tools</code>・<code>work</code> 等は exclude）、コンテナではないので CodePipeline は通さず手動 <code>cdk deploy</code> の既存ルールに乗せる（21-1 ⑥）。スタックは <code>face</code>（<code>prod</code> / <code>staging</code>）をコンストラクタ引数に取り、<code>bin/infra.ts</code> で 2 回インスタンス化する（<code>Prod-CommentReplyStack</code> / <code>Prod-CommentReplyStagingStack</code>）。面ごとに異なるのは<strong>リソース名の接尾辞・Secret 名・S3 プレフィックス・Webhook 先（Meta アプリ側の設定）</strong>だけで、コードと構成は同一。</p>
 
 <div class="table-wrap">
 <table>
   <thead><tr><th>リソース</th><th>説明</th></tr></thead>
   <tbody>
-    <tr><td>Webhook Lambda</td><td><code>acps-{env}-comment-reply-webhook{-staging}</code>。Python 3.13・<strong>512 MB</strong>（21-6f の接続時に 128 MB ではコールドスタートが約 5.7 秒かかり、Meta の購読検証がタイムアウトしたため引き上げた。512 MB で約 1.6 秒）・タイムアウト 10 秒。handler <code>app.webhook_handler.lambda_handler</code>。Function URL（<code>authType: NONE</code>）で Meta Webhook を受ける。GET は <code>hub.verify_token</code> の照合（購読時の検証）、POST は <code>X-Hub-Signature-256</code> の HMAC-SHA256 検証（鍵は Secret の <code>app_secret</code> = Instagram アプリシークレット）→ <code>comments</code> フィールドのイベントを 1 件ずつ SQS へ送信 → 200。自己返信（<code>from.id == ig_user_id</code>）はここで捨てる。署名不一致は 401。<strong>Function URL を認証なしにする根拠は署名検証</strong>（Meta 以外は正しい署名を作れない）。環境変数: <code>SECRET_ARN</code> / <code>QUEUE_URL</code></td></tr>
-    <tr><td>SQS（メインキュー）</td><td><code>acps-{env}-comment-reply{-staging}.fifo</code>。<strong>FIFO</strong>・<code>MessageDeduplicationId = comment_id</code>（Meta の再送による二重返信を 5 分窓で抑止）・<code>MessageGroupId = media_id</code>（同じ投稿への返信順を保つ）。可視性タイムアウト 1,800 秒（Reply Lambda のタイムアウト 300 秒 × 6。SQS イベントソースの AWS 推奨値。21-6f で 90 → 720 秒、21-8e で 1,800 秒へ変更）・保持 4 日・<code>maxReceiveCount: 3</code> で DLQ へ</td></tr>
+    <tr><td>Webhook Lambda</td><td><code>acps-{env}-comment-reply-webhook{-staging}</code>。Python 3.13・<strong>512 MB</strong> <a class="decision-ref" href="#d-13">→ 理由 D-13</a>・タイムアウト 10 秒。handler <code>app.webhook_handler.lambda_handler</code>。Function URL（<code>authType: NONE</code>）で Meta Webhook を受ける。GET は <code>hub.verify_token</code> の照合（購読時の検証）、POST は <code>X-Hub-Signature-256</code> の HMAC-SHA256 検証（鍵は Secret の <code>app_secret</code> = Instagram アプリシークレット）→ <code>comments</code> フィールドのイベントを 1 件ずつ SQS へ送信 → 200。自己返信（<code>from.id == ig_user_id</code>）はここで捨てる。署名不一致は 401。認証なしの Function URL は署名検証で守る <a class="decision-ref" href="#d-12">→ 理由 D-12</a>。環境変数: <code>SECRET_ARN</code> / <code>QUEUE_URL</code></td></tr>
+    <tr><td>SQS（メインキュー）</td><td><code>acps-{env}-comment-reply{-staging}.fifo</code>。<strong>FIFO</strong>・<code>MessageDeduplicationId = comment_id</code>（Meta の再送による二重返信を 5 分窓で抑止）・<code>MessageGroupId = media_id</code>（同じ投稿への返信順を保つ） <a class="decision-ref" href="#d-12">→ 理由 D-12</a>。可視性タイムアウト 1,800 秒（Reply Lambda のタイムアウト 300 秒 × 6。21-6f で 90 → 720 秒、21-8e で 1,800 秒へ変更） <a class="decision-ref" href="#d-14">→ 理由 D-14</a>・保持 4 日・<code>maxReceiveCount: 3</code> で DLQ へ</td></tr>
     <tr><td>SQS（DLQ）</td><td><code>acps-{env}-comment-reply-dlq{-staging}.fifo</code>。保持 14 日。MonitoringStack が <code>ApproximateNumberOfMessagesVisible</code> を監視（<a href="workflow.html#comment-reply-dlq">workflow.html セクション 10</a>）。本番面のみアラーム対象（ステージング面は目視）</td></tr>
-    <tr><td>Reply Lambda</td><td><code>acps-{env}-comment-reply-reply{-staging}</code>。Python 3.13・256 MB・<strong>タイムアウト 300 秒</strong>（根拠は下の決定 21-8e。当初の 120 秒は決定 21-6f）・<strong>予約同時実行数 2</strong>（利用上限の 2 段目 = セット別設計書 10.4）。handler <code>app.reply_handler.lambda_handler</code>。SQS イベントソース（バッチサイズ 1・<code>reportBatchItemFailures</code>）。処理の正はセット別設計書セクション 10 と <code>services/comment-reply/README.md</code>（S3 の問題スナップショット取得 → 判定〔メイン失敗時はサブ判定〕→ 返信文 → Graph API <code>POST /{comment_id}/replies</code> → コメント記録 JSON を S3 へ）。環境変数: <code>SECRET_ARN</code> / <code>ASSETS_BUCKET</code> / <code>COMMENT_LOG_BUCKET</code>（同じ画像バケット）/ <code>PROBLEMS_PREFIX</code>（本番面 <code>assets/umigame-soup-1/problems/</code>・ステージング面 <code>assets/umigame-soup-1/staging/problems/</code>）/ <code>SET_CODE</code>（本番面 <code>umigame-soup-1</code>・ステージング面 <code>umigame-soup-1-staging</code>）/ <code>GRAPH_API_BASE</code> / <code>JUDGE_MODE=haiku</code> / <code>REPLY_VARIANT=1b-haiku</code> / <code>HAIKU_EFFORT=max</code> / <code>LUNA_EFFORT=xhigh</code> / <code>LUNA_MODEL=gpt-6-luna</code>（判定方式の既定値は 21-6e の選定結果。effort は 21-8e で <code>high</code> → <code>max</code>）</td></tr>
-    <tr><td>トークン更新 Lambda</td><td><code>acps-{env}-comment-reply-token-refresh{-staging}</code>。Python 3.13・128 MB・タイムアウト 60 秒・非同期起動の自動再試行 0 回。handler <code>app.token_refresh_handler.lambda_handler</code>（21-6g 追加）。Secret の <code>ig_access_token</code> で <code>GET https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token</code> を呼び、応答のトークンと <code>expires_in</code> から算出した <code>token_expires_at</code> を同じ Secret へ書き戻す（他のキーは保持）。API 失敗・応答不正のときは Secret を書き換えずにエラー終了する。<strong><code>ig_access_token</code> が未投入（空）のときは API を呼ばずに正常終了する</strong>（本番面は 21-7 で初回投入するまで空のため、毎週アラームを鳴らさない）。トークンと要求 URL はログ・例外に出さない。根拠は下の決定 21-6g</td></tr>
+    <tr><td>Reply Lambda</td><td><code>acps-{env}-comment-reply-reply{-staging}</code>。Python 3.13・256 MB・<strong>タイムアウト 300 秒</strong>（決定 21-8e <a class="decision-ref" href="#d-14">→ 理由 D-14</a>。当初の 120 秒は決定 21-6f <a class="decision-ref" href="#d-15">→ 理由 D-15</a>）・<strong>予約同時実行数 2</strong>（利用上限の 2 段目 = セット別設計書 10.4）。handler <code>app.reply_handler.lambda_handler</code>。SQS イベントソース（バッチサイズ 1・<code>reportBatchItemFailures</code>）。処理の正はセット別設計書セクション 10 と <code>services/comment-reply/README.md</code>（S3 の問題スナップショット取得 → 判定〔メイン失敗時はサブ判定〕→ 返信文 → Graph API <code>POST /{comment_id}/replies</code> → コメント記録 JSON を S3 へ）。環境変数: <code>SECRET_ARN</code> / <code>ASSETS_BUCKET</code> / <code>COMMENT_LOG_BUCKET</code>（同じ画像バケット）/ <code>PROBLEMS_PREFIX</code>（本番面 <code>assets/umigame-soup-1/problems/</code>・ステージング面 <code>assets/umigame-soup-1/staging/problems/</code>）/ <code>SET_CODE</code>（本番面 <code>umigame-soup-1</code>・ステージング面 <code>umigame-soup-1-staging</code>）/ <code>GRAPH_API_BASE</code> / <code>JUDGE_MODE=haiku</code> / <code>REPLY_VARIANT=1b-haiku</code> / <code>HAIKU_EFFORT=max</code> / <code>LUNA_EFFORT=xhigh</code> / <code>LUNA_MODEL=gpt-6-luna</code>（判定方式の既定値は 21-6e の選定結果。effort は 21-8e で <code>high</code> → <code>max</code>。ステージング面の <code>SET_CODE</code> を分ける理由は <a class="decision-ref" href="#d-15">→ 理由 D-15</a>）</td></tr>
+    <tr><td>トークン更新 Lambda</td><td><code>acps-{env}-comment-reply-token-refresh{-staging}</code>。Python 3.13・128 MB・タイムアウト 60 秒・非同期起動の自動再試行 0 回。handler <code>app.token_refresh_handler.lambda_handler</code>（21-6g 追加）。Secret の <code>ig_access_token</code> で <code>GET https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token</code> を呼び、応答のトークンと <code>expires_in</code> から算出した <code>token_expires_at</code> を同じ Secret へ書き戻す（他のキーは保持）。API 失敗・応答不正のときは Secret を書き換えずにエラー終了する。<strong><code>ig_access_token</code> が未投入（空）のときは API を呼ばずに正常終了する</strong>（本番面は 21-7 で初回投入するまで空のため、毎週アラームを鳴らさない）。トークンと要求 URL はログ・例外に出さない。週 1 回の独立した定期実行とし、コメント受信の処理には組み込まない（決定 21-6g <a class="decision-ref" href="#d-16">→ 理由 D-16</a>）</td></tr>
     <tr><td>EventBridge Scheduler</td><td><code>acps-{env}-comment-reply-token-refresh{-staging}</code>（default グループ）。<strong>毎週月曜 04:00 JST</strong>（<code>cron(0 4 ? * MON *)</code>・Asia/Tokyo）にトークン更新 Lambda を起動する。ターゲットの再試行 2 回・イベントの最大経過 1 時間。両面に置く（ステージング面のトークンも 60 日で失効するため）</td></tr>
     <tr><td>Secrets Manager</td><td><code>acps/{env}/umigame-soup-1/comment-reply{-staging}</code>（<a href="security.html#comment-reply-secret">security.html セクション 1.3</a>）。CDK が空値テンプレート（<code>app_secret</code> / <code>ig_access_token</code> / <code>ig_user_id</code> / <code>token_expires_at</code> / <code>openai_api_key</code> / <code>typesafe_api_key</code> / <code>anthropic_api_key</code>）で作成し <code>verify_token</code> のみ自動生成、他の値は手動投入（PoC と同じ運用）。<code>removalPolicy: RETAIN</code>（PoC の DESTROY から変更。トークンの再投入を避ける）</td></tr>
-    <tr><td>IAM Role（Lambda 実行ロール × 3）</td><td>Webhook: Secret の <code>GetSecretValue</code>（当該 Secret のみ）+ メインキューへの <code>sqs:SendMessage</code>。Reply: Secret の <code>GetSecretValue</code> + メインキューの受信・削除 + 既存バケットの <code>s3:GetObject</code> を <strong><code>{PROBLEMS_PREFIX}*</code> に限定</strong> + <code>s3:PutObject</code> を <strong><code>comment-log/{SET_CODE}/*</code> に限定</strong>（コメント記録用。21-6f 追加。List・Delete は付与しない）。バケットポリシーは変えずロールのポリシーで付与する（FoundationStack との循環参照を避ける）。いずれも VPC 権限なし。<a href="security.html#iam-comment-reply">security.html セクション 2.6</a></td></tr>
+    <tr><td>IAM Role（Lambda 実行ロール × 3）</td><td>Webhook: Secret の <code>GetSecretValue</code>（当該 Secret のみ）+ メインキューへの <code>sqs:SendMessage</code>。Reply: Secret の <code>GetSecretValue</code> + メインキューの受信・削除 + 既存バケットの <code>s3:GetObject</code> を <strong><code>{PROBLEMS_PREFIX}*</code> に限定</strong> + <code>s3:PutObject</code> を <strong><code>comment-log/{SET_CODE}/*</code> に限定</strong>（コメント記録用。21-6f 追加。List・Delete は付与しない <a class="decision-ref" href="#d-15">→ 理由 D-15</a>）。トークン更新: Secret の読み取り + 書き込み（当該 Secret のみ。<code>grantRead</code> + <code>grantWrite</code>）。バケットポリシーは変えずロールのポリシーで付与する（FoundationStack との循環参照を避ける）。いずれも VPC 権限なし。<a href="security.html#iam-comment-reply">security.html セクション 2.6</a></td></tr>
     <tr><td>CloudWatch Log Group × 3</td><td>他スタックと同方針（リテンション 90 日・<code>removalPolicy: DESTROY</code>）。PoC の Lambda は未指定（無期限）だったため、本スタックでは明示する。返信本文・コメント本文はログに出してよいが、トークン・署名・Secret 値は出さない（security.html セクション 4）。Lambda の Python ランタイムは既定で WARNING 以上しか出さないため、3 つの入口（Webhook / Reply / トークン更新）で <code>app</code> 配下のロガーを INFO にしている（21-6g。ログ形式はテキストのまま。CDK の <code>applicationLogLevelV2</code> は JSON 形式が前提のため使わない）</td></tr>
-    <tr><td>S3（プライバシーポリシー）</td><td><code>acps-{env}-umigame-privacy-policy</code>（<strong>本番面のみ</strong>・21-7 追加）。専用の小バケットで、Block Public Access のうちポリシー系 2 項目だけを外し、<code>PublicReadGetObject</code>（<code>s3:GetObject</code>・Principal <code>*</code>）を当該バケットに限って付ける（ACL 系の 2 項目は維持。既存の画像バケットは Block Public Access を維持するため分ける）。SSE-S3・<code>removalPolicy: RETAIN</code>。本文 <code>infra/assets/umigame-privacy-policy/index.html</code> を <code>BucketDeployment</code>（<code>content-type: text/html; charset=utf-8</code>）で配置する。静的ウェブサイトホスティングは使わない（下の決定 21-7）。Meta アプリの公開モードに必須の URL（App Review は不要）。ステージング面は PoC の Meta アプリのため作らない</td></tr>
+    <tr><td>S3（プライバシーポリシー）</td><td><code>acps-{env}-umigame-privacy-policy</code>（<strong>本番面のみ</strong>・21-7 追加）。専用の小バケットで、Block Public Access のうちポリシー系 2 項目だけを外し、<code>PublicReadGetObject</code>（<code>s3:GetObject</code>・Principal <code>*</code>）を当該バケットに限って付ける（ACL 系の 2 項目は維持。既存の画像バケットは Block Public Access を維持するため分ける）。SSE-S3・<code>removalPolicy: RETAIN</code>。本文 <code>infra/assets/umigame-privacy-policy/index.html</code> を <code>BucketDeployment</code>（<code>content-type: text/html; charset=utf-8</code>）で配置する。静的ウェブサイトホスティングは使わず、CloudFront も置かない（決定 21-7 <a class="decision-ref" href="#d-17">→ 理由 D-17</a>）。Meta アプリの公開モードに必須の URL（App Review は不要）。ステージング面は PoC の Meta アプリのため作らない</td></tr>
     <tr><td>CfnOutput</td><td><code>FunctionUrl</code>（Meta 側の Webhook コールバック URL）・<code>SecretName</code>・<code>QueueUrl</code>・<code>DlqUrl</code>・<code>TokenRefreshFunctionName</code>（更新処理の手動実行用。21-6g 追加）・<code>PrivacyPolicyUrl</code>（本番面のみ・21-7 追加。<code>https://{bucketRegionalDomainName}/index.html</code>。Meta アプリの「プライバシーポリシーの URL」に設定する）</td></tr>
   </tbody>
 </table>
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-09-04、21-3）: Function URL 直結 + SQS FIFO。API Gateway・Aurora 接続・VPC 配置は採らない</span>
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>Function URL</strong>（21-1 ⑥ ユーザー決定）: API Gateway の WAF・スロットリング・使用量プランが要る規模になるまで不要。Function URL は無料で、署名検証を Lambda 内で行うため認証なしで公開しても Meta 以外の要求は 401 で落ちる。DDoS 級の呼び出しは Lambda の同時実行上限（アカウント既定）で頭打ちになり費用も僅少</li>
-    <li><strong>SQS FIFO</strong>: 標準キューの at-least-once では Meta の再送 + SQS の重複配信で同じコメントに二重返信しうる（ユーザーに見える不具合）。FIFO の重複排除 ID に <code>comment_id</code> を使えば追加実装なしで 5 分窓の重複を抑止できる。スループット上限（300 msg/秒）はコメント規模（1 日 200 件）に対して十分。窓外の再送による二重返信は許容（発生したら設計課題へ）</li>
-    <li><strong>VPC 外</strong>: Aurora に触れないため VPC に置く理由がなく、置くと NAT Gateway（月 4,000 円超）が要る。Secrets Manager・S3・OpenAI・Graph API はいずれもパブリックエンドポイント（TLS）</li>
-    <li><strong>ステージング面を同一コードで立てる</strong>: PoC ハンドラを別コードで残すと本番と乖離するため、21-6 で新スタックをステージング面としても立て、PoC の Meta アプリの Webhook 先を切り替えてから <code>UmigamePocStack</code>（と規約外の Secret <code>umigame-poc/credentials</code>）を削除する（21-1 ⑦。<strong>2026-10-11 に削除した</strong>。<code>infra/lib/umigame-poc-stack.ts</code> と <code>bin/infra.ts</code> の配線も外した。課題 I-032）。恒久利用するのは PoC の Meta アプリとテスト用アカウントで、スタックではない。2 面分の定常費はほぼゼロ（Lambda・SQS は従量、Secret は月 0.4 USD × 2）</li>
-  </ul>
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-10-12、21-8e）: effort を max にしたので Reply Lambda のタイムアウトを 300 秒、可視性タイムアウトを 1,800 秒に延ばす。I-037 は受容</span>
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>理由</strong>: <code>HAIKU_EFFORT</code> を <code>high</code> → <code>max</code> にした（ユーザー決定。セット別設計書 <a href="../app/sets/umigame-soup-1-comment-reply.html#judge-policy">コメント返信の分冊 3.5</a>）。21-6d17 の実測で max の 1 ケースの応答時間は中央値 35 秒（high は 5.7 秒）で、裾は 100 秒を超えうる。下の決定 21-6f の最悪の積み上げ（メイン判定 + 再試行の待ち 35 秒 + サブ判定 + 書き手）を max で見積もると 120 秒を超えるため 300 秒にした。可視性タイムアウトは AWS 推奨（関数タイムアウトの 6 倍）に合わせて 1,800 秒。本番面・ステージング面は同じ構成（<code>CommentReplyStack</code> クラスを共用）なので両面とも変わる</li>
-    <li><strong>I-037 は受容</strong>: Anthropic 呼び出しのソケットタイムアウト 420 秒（<code>app/anthropic_util.py</code>）は 300 秒より長いままにする。ストリーミングしない呼び出しでは応答の待ち時間 = 生成時間で、max では正常な応答も長くなるため、呼び出し単位で短く切ると正しい応答まで打ち切る危険のほうが大きい。接続が応答しないまま止まった場合は下の決定 21-6f の「受け入れること」と同じく SQS の再試行 → DLQ → アラームで拾う。実運用の <code>Duration</code>・タイムアウト・DLQ は開発計画の確認待ちリスト（21-8e の行）で観察し、タイムアウト・DLQ が出たら呼び出し単位のタイムアウトを入れる</li>
-  </ul>
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-10-11、21-6f）: Reply Lambda のタイムアウトは 120 秒（21-8e で 300 秒へ変更）。ステージングのコメント記録は別プレフィックスに分け、プライバシーポリシーのバケットは 21-7 へ回す</span>
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>タイムアウト 120 秒</strong>: 21-6e3 の全件プローブ（525 件）で既定構成 ⑦（haiku 判定 + 1b-haiku 書き手・effort <code>high</code>）の 1 件あたりの所要は中央値 5.5 秒・p95 9.3 秒・最大 15.3 秒（判定の最大 12.4 秒 + 書き手の最大 6.0 秒）。haiku 判定が失敗するとサブ判定の luna（xhigh）が続き、その最大は 16.2 秒、luna 判定時の書き手の最大は 9.1 秒。メインが HTTP 429 / 5xx で失敗する場合は再試行の待ち（5 + 10 + 20 秒）が加わるため、最悪の実測ベースで約 15 + 35 + 16 + 9 ≒ 75 秒。これに Graph API・S3 の分と余裕を見て 120 秒にした（設計時の 30 秒は OpenAI 1 回呼びの前提だった）。可視性タイムアウトはその 6 倍の 720 秒</li>
-    <li><strong>受け入れること</strong>: Anthropic 呼び出しのソケットタイムアウトは評価用の 420 秒のまま（<code>app/anthropic_util.py</code>）なので、接続が応答しないまま止まったときはサブ判定に移る前に Lambda のタイムアウトで打ち切られ、SQS の再試行（3 回で DLQ → アラーム）に回る。この場合その回のコメント記録は残らない。DLQ にタイムアウト起因の滞留が出たら、Lambda 用に呼び出し単位のタイムアウトを短くする</li>
-    <li><strong>ステージングのコメント記録を分ける</strong>: 記録のキーは <code>comment-log/{set_code}/...</code> で、問題スナップショットの <code>set_code</code>（無いときは <code>SET_CODE</code>）から決まる。ステージング面は <code>SET_CODE=umigame-soup-1-staging</code> とし、サンプルの <code>problems/{media_id}.json</code> も <code>set_code</code> を <code>umigame-soup-1-staging</code> にして置く。PUT 権限を面ごとのプレフィックスに限ったので、誤って本番の <code>set_code</code> で書こうとしても IAM で拒否される（記録は失敗ログだけ残り、返信は続く）</li>
-    <li><strong>プライバシーポリシーのバケットは 21-7 へ</strong>: 公開モードの URL が要るのは本番用 Meta アプリを用意する 21-7 で、ポリシー本文（保存する情報と保持期限。21-6c2 系の決定を反映）もまだ無い。空のバケットを先に作らず、本文と一緒に 21-7 で足す。ステージング面は PoC の Meta アプリ（開発モード）のままなので不要</li>
-  </ul>
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-10-11、21-6g）: コメント返信用トークンは週 1 回の定期実行で自動更新する。コメント受信の処理には組み込まない</span>
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>週 1 回の独立した定期実行</strong>: Instagram ログイン方式の長期トークンは 60 日で失効し、<code>GET /refresh_access_token</code> で更新できる（条件: 発行から 24 時間以上経過した有効なトークン）。コメント受信のついでに更新する方式は、コメントが途絶えた期間にそのまま失効するため採らない。週 1 回なら更新が数回続けて失敗しても失効まで余裕がある（課題 I-031 の展開。2026-09-26 のユーザー決定でリリース前の必須）</li>
-    <li><strong>失敗時は即通知・自動再試行しない</strong>: Lambda の非同期再試行は 0 回とし、MonitoringStack の <code>acps-{env}-comment-reply-token-refresh-errors</code>（本番面のみ。<a href="workflow.html#comment-reply-dlq">workflow.html セクション 10</a>）で人に知らせる。失敗した週は Secret が書き換わらないので、旧トークンのまま返信は続く。復旧手順は <a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a></li>
-    <li><strong>Webhook / Reply Lambda への反映</strong>: 両 Lambda は Secret をウォーム中のプロセスに保持するため、更新後もしばらく旧トークンを使う。旧トークンも元の失効日時までは有効で、更新は失効の 50 日以上前に行うため、コールドスタートで読み直されるまでの間に失効することはない</li>
-    <li><strong>置き場</strong>: Secret と同じ <code>CommentReplyStack</code> に同居させる（Secret の書き込み権限を当該 Secret だけに絞れ、面ごとに同じ構成で立つ）。コードは <code>services/comment-reply/</code> の別エントリポイント（判定・返信のモジュールは使わない）</li>
-  </ul>
 </div>
 
 <h4>注意事項</h4>
@@ -361,15 +315,6 @@
 
 <p><strong>依存スタック</strong>: FoundationStack（S3 バケットの参照のみ。VPC・Aurora・ECS は使わない）</p>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-10-12、21-7）: プライバシーポリシーは https のオブジェクト URL で公開し、静的ウェブサイトホスティングは使わない</span>
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>https のオブジェクト URL</strong>: 21-3 の設計は静的ウェブサイトホスティングだったが、S3 のウェブサイトエンドポイントは http しか使えず、Meta のアプリ設定で https 以外の URL が弾かれると公開モードに切り替えられない。公開読み取りのバケットポリシーがあれば REST エンドポイント（<code>https://{bucket}.s3.{region}.amazonaws.com/index.html</code>）で同じ HTML を https で返せるため、こちらを出力する。CloudFront は 1 ページのためには過剰なので置かない</li>
-    <li><strong>本文の置き場と中身</strong>: <code>infra/assets/umigame-privacy-policy/index.html</code>（外部依存なしの 1 枚・日本語 + 英語の要約）。保存する情報（コメント本文・ID・コメント者のアプリスコープ ID〔username は持たない〕・返信・判定）、AI 事業者（Anthropic・OpenAI）への送信、保存期間（最長 1 年）、削除依頼の窓口（Instagram の DM。アンカー <code>#data-deletion</code> を Meta の「データ削除の手順の URL」に使う）を書いた。保持期限の実装は 21-7b で行い、本文の 4 章に「原本〔S3〕は取得から 30 日・振り返り用データベース〔Aurora〕は取得から 1 年」を足して実装と揃えた（Aurora は <code>webhook_received_at</code> 起点で 365 日。<a href="../app/sets/umigame-soup-1-comment-reply.html#comment-log-import">コメント返信の分冊 8.1</a>）。判定方式に Jev（Typesafe）を本番で使うよう切り替えるときは、送信先の事業者を本文に足す</li>
-    <li><strong>削除しない</strong>: <code>RETAIN</code> にした（スタックを作り直しても公開中の URL が消えないように。Meta アプリに登録した URL が 404 になると公開モードの審査対象になりうる）</li>
-  </ul>
-</div>
-
 <h3 id="admin-api">3.7 AdminApiStack（将来拡張）</h3>
 <p><strong>目的</strong>: 管理画面から利用するバックエンド API を提供する</p>
 <p><strong>想定リソース</strong>: ECS Service または Lambda、ALB または API Gateway、IAM Role</p>
@@ -381,52 +326,24 @@
 <p><strong>連携先</strong>: AdminApiStack</p>
 
 <h2 id="deploy-order">4. デプロイ順序</h2>
-
+<p class="lead">この章は要約の図 1 の依存を、手動 <code>cdk deploy</code> の順番に並べたもの。図 2 は 7 スタックをデプロイする順番。</p>
 <figure class="diagram">
-<svg viewBox="0 0 860 300" role="img" aria-label="デプロイ順序図">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="var(--diag-line)"/>
-    </marker>
-  </defs>
-
-  <rect x="30" y="110" width="220" height="60" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="140" y="136" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">1. FoundationStack</text>
-  <text x="140" y="156" text-anchor="middle" font-size="11" fill="var(--diag-text)">共通基盤を先に作成</text>
-
-  <rect x="330" y="30" width="220" height="60" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="440" y="56" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">2. SnsPostBatchStack</text>
-  <text x="440" y="76" text-anchor="middle" font-size="11" fill="var(--diag-text)">ImageBatchStack より先</text>
-
-  <rect x="330" y="110" width="220" height="60" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="440" y="136" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">3. ImageBatchStack</text>
-  <text x="440" y="156" text-anchor="middle" font-size="11" fill="var(--diag-text)">SNS 投稿 SFN の ARN を参照</text>
-
-  <rect x="330" y="190" width="220" height="60" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="440" y="216" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">4. MonitoringStack</text>
-  <text x="440" y="236" text-anchor="middle" font-size="11" fill="var(--diag-text)">各スタックのメトリクスを監視</text>
-
-  <rect x="630" y="70" width="200" height="50" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)" stroke-dasharray="5 4"/>
-  <text x="730" y="91" text-anchor="middle" font-size="12" fill="var(--diag-text)">5. AdminApiStack</text>
-  <text x="730" y="108" text-anchor="middle" font-size="11" fill="var(--diag-text)">（将来）</text>
-
-  <rect x="630" y="160" width="200" height="50" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)" stroke-dasharray="5 4"/>
-  <text x="730" y="181" text-anchor="middle" font-size="12" fill="var(--diag-text)">6. AdminWebStack</text>
-  <text x="730" y="198" text-anchor="middle" font-size="11" fill="var(--diag-text)">（将来）</text>
-
-  <line x1="250" y1="125" x2="326" y2="66" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="250" y1="140" x2="326" y2="140" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="250" y1="155" x2="326" y2="214" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="550" y1="60" x2="626" y2="88" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
-  <line x1="730" y1="120" x2="730" y2="156" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
-</svg>
-<figcaption>デプロイ順序。SnsPostBatchStack → ImageBatchStack の順は、ImageBatchStack が SNS 投稿 Step Functions の ARN を参照するため。<strong>InsightsBatchStack（16-10 で追加）は FoundationStack のみに依存し、ImageBatchStack の後・MonitoringStack の前に置く</strong>（MonitoringStack がインサイト収集 SFN の失敗アラームを持つため。順序は 1. Foundation → 2. SnsPost → 3. Image → 4. Insights → 5. Monitoring）。</figcaption>
+<pre class="mermaid">
+flowchart TB
+    F["1. FoundationStack"] --> S["2. SnsPostBatchStack"]
+    S -->|"ImageBatchStack が投稿 SFN の ARN を参照する"| I["3. ImageBatchStack"]
+    I --> N["4. InsightsBatchStack（FoundationStack だけに依存）"]
+    N --> M["5. MonitoringStack（各 SFN・Scheduler・DLQ・トークン更新 Lambda のアラーム）"]
+    F --> C["CommentReplyStack（本番面）"]
+    C -->|"DLQ・トークン更新 Lambda"| M
+    F --> CS["CommentReplyStagingStack（ステージング面。ほかのスタックから参照されない）"]
+</pre>
+<figcaption>図 2 デプロイ順序（1 → 5。CommentReplyStack は FoundationStack の後・MonitoringStack の前、CommentReplyStagingStack は FoundationStack の後）</figcaption>
 </figure>
 
-<div class="note">
-  <span class="callout-title">デプロイ方法</span>
-  上記 1〜4 のスタックは開発者が <code>cdk diff</code> で差分確認後、<code>cdk deploy</code> で手動デプロイする。CommentReplyStack（3.6）は FoundationStack の後・MonitoringStack の前に入る（バッチ系 3 スタックとは独立。21-3 追加・図には未反映）。インフラパイプラインは構築しない（詳細は <a href="cicd.html">cicd.html</a> を参照）。
-</div>
+<p>将来拡張の AdminApiStack（3.7）・AdminWebStack（3.8）は MonitoringStack の後に、AdminApiStack → AdminWebStack の順で入れる。</p>
+
+<p>どのスタックも開発者が <code>cdk diff</code> で差分を確認してから <code>cdk deploy</code> で手動デプロイする。インフラのパイプラインはない（<a href="cicd.html">cicd.html</a>）。</p>
 
 <h2 id="data-passing">5. スタック間のデータ受け渡し</h2>
 <p>CDK の <code>CfnOutput</code> / <code>Fn.importValue</code> またはコンストラクタ引数を用いて、スタック間でリソース情報を受け渡す。</p>
@@ -434,7 +351,7 @@
 <pre><code>FoundationStack
   ├── vpc              → ImageBatchStack, SnsPostBatchStack, InsightsBatchStack
   ├── securityGroup    → ImageBatchStack, SnsPostBatchStack, InsightsBatchStack
-  ├── s3Bucket         → ImageBatchStack, SnsPostBatchStack（InsightsBatchStack は S3 不使用のため受け取らない）
+  ├── s3Bucket         → ImageBatchStack, SnsPostBatchStack, InsightsBatchStack（assetsBucket。コメント記録 comment-log/ の取り込み用 = 21-7b）, CommentReplyStack（両面）
   ├── auroraCluster    → ImageBatchStack, SnsPostBatchStack, InsightsBatchStack, MonitoringStack（Aurora アラームの Dimension）
   ├── secretsArn       → ImageBatchStack, SnsPostBatchStack, InsightsBatchStack
   ├── ecsCluster       → ImageBatchStack, SnsPostBatchStack, InsightsBatchStack, MonitoringStack（ECS タスク異常終了イベントの clusterArn フィルタ）
@@ -456,14 +373,215 @@ InsightsBatchStack（16-7 追加・16-10 実装）
 
 CommentReplyStack（21-3 設計・21-6 実装。face = prod / staging の 2 インスタンス）
   ├── replyDlq（本番面のみ）     → MonitoringStack（DLQ 滞留アラーム）
+  ├── tokenRefreshFunction（本番面のみ・21-6g）→ MonitoringStack（トークン更新の失敗アラーム）
   ├── functionUrl               → CfnOutput（Meta アプリの Webhook 先。CDK 管理外の手動設定）
   └── privacyPolicyUrl（本番面のみ・21-7 追加）→ CfnOutput（Meta アプリの公開モード設定）</code></pre>
 
-<div class="decision">
-  <span class="callout-title">MonitoringStack への入力と DB 準備確認 SG のエッジを追記（2026-07-23、Phase 13-2）</span>
-  当初のツリー図には MonitoringStack への入力（<code>auroraCluster</code>・<code>ecsCluster</code>・<code>snsPostingSfnArn</code>）と <code>dbReadinessCheckSg</code> のエッジが欠落していた（セクション 3.1 出力一覧・3.4 依存スタックには記載済み。設計課題リスト 2026-07-06）。実装（各スタックの props）に合わせて追記した。
-</div>
+<p>MonitoringStack への入力（<code>auroraCluster</code>・<code>ecsCluster</code>・<code>snsPostingSfnArn</code>）と <code>dbReadinessCheckSg</code> のエッジは、実装（各スタックの props）に合わせて描いている <a class="decision-ref" href="#d-18">→ 理由 D-18</a>。</p>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+
+<article id="d-01">
+<h3>D-01 S3 のライフサイクルは images/・videos/・comment-log/ だけに掛ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>画像バケットの 30 日自動削除を <code>images/</code>・<code>videos/</code> プレフィックスに限り、音源ストック <code>audio/</code> は対象外にする。コメント記録 <code>comment-log/</code> の 30 日規則 <code>expire-comment-logs</code> は、初回取り込みの成功を確かめるまで無効で deploy し、確認後に <code>commentLogExpirationEnabled</code> を <code>true</code> にして有効化した</dd>
+  <dt>理由</dt><dd>音源ストック <code>audio/</code> は長期保持資産のため。<code>comment-log/</code> は、先に有効化すると未取り込みのまま 30 日を超えた記録が消えるため</dd>
+  <dt>日付・出典</dt><dd>Phase 14-4 で発見・14-6 で変更（プレフィックス限定）。21-7b で <code>comment-log/</code> の規則を追加し、2026-10-13 に有効化</dd>
+</dl>
+</article>
+
+<article id="d-02">
+<h3>D-02 S3 バケットの RemovalPolicy は DESTROY + autoDeleteObjects</h3>
+<dl>
+  <dt>決めたこと</dt><dd>画像保存用バケットは <code>RemovalPolicy.DESTROY</code> + <code>autoDeleteObjects: true</code> とし、スタック削除時に中身ごと削除する</dd>
+  <dt>理由</dt><dd>生成画像・生成動画は 30 日ライフサイクル（<code>images/</code>・<code>videos/</code> プレフィックス限定。21-7b でコメント記録 <code>comment-log/</code> を追加）で自動削除される使い捨てデータであり、正式な記録は DB レコードが担うため（<a href="../app/data-model.html#s3-key">app/data-model.html セクション 5</a>。音源ストック <code>audio/</code> は自動削除の対象外）、バケット保持による保護よりも「スタックを壊して作り直せる」性質を優先する。この設定によりオブジェクト自動削除用の Lambda カスタムリソースがスタックに 1 つ追加される</dd>
+  <dt>退けた案</dt><dd>バケットを保持する（RETAIN）</dd>
+  <dt>日付・出典</dt><dd>2026-07-13 決定（旧「S3 バケットの RemovalPolicy」）</dd>
+</dl>
+</article>
+
+<article id="d-03">
+<h3>D-03 Aurora クラスターの RemovalPolicy は SNAPSHOT、DB 名は acps</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Aurora クラスターの RemovalPolicy は明示指定せず CDK デフォルトの <strong>SNAPSHOT</strong>（destroy 時にクラスターを削除し最終スナップショットを保持）とする。デフォルトデータベース名は <code>defaultDatabaseName: 'acps'</code> を指定する</dd>
+  <dt>理由</dt><dd>DB は正式な記録を担うデータストアであるため、S3 / ECR の DESTROY（壊して作り直せる優先）とは方針を変え、データ保護と再作成可能性の中間を取る。クラスター識別子は CFN 自動命名のため、destroy 後の再作成で名前衝突は発生しない（DB 認証情報 Secret <code>acps/{env}/db/credentials</code> は名前明示指定だが、クラスターと同時に削除されるため衝突しない）。空 DB のスナップショット保管コストはごく僅かで、不要なら手動削除できる。DB 名は、Secret 値スキーマ（<a href="security.html">security.html セクション 1.3</a>）で <code>dbname</code> キーが必須であり、クラスター作成時に指定しないと自動生成 Secret に <code>dbname</code> が含まれないため。名前は Secret 名・S3 バケット名と同じ <code>acps</code> プレフィックス規約に合わせた</dd>
+  <dt>日付・出典</dt><dd>2026-07-13 決定（旧「Aurora クラスターの RemovalPolicy と DB 名」）</dd>
+</dl>
+</article>
+
+<article id="d-04">
+<h3>D-04 画像 API キー Secret の初期値と RemovalPolicy</h3>
+<dl>
+  <dt>決めたこと</dt><dd>画像生成 API キー用 Secret の「箱」は、初期値を <code>generateSecretString</code>（<code>secretStringTemplate: '{}'</code> + <code>generateStringKey: 'api_key'</code>）で <code>{"api_key": "&lt;ランダムプレースホルダ&gt;"}</code> の JSON 形状にする。RemovalPolicy は明示指定せず CFN デフォルトの Delete（復旧期間なしの即時削除）とする</dd>
+  <dt>理由</dt><dd>値スキーマ（<a href="security.html">security.html セクション 1.3</a>）と同じ形になり、Console のキー・値エディタで <code>api_key</code> の値を差し替えるだけで手動設定が完了する。RemovalPolicy は「スタックを壊して作り直せる」性質を優先する（RETAIN では destroy 後に同名 Secret が残り再作成時に名前衝突する）。<strong>手動設定した API キー値は destroy で失われるため、スタック再作成後は Console から再設定が必要</strong></dd>
+  <dt>退けた案</dt><dd>RETAIN</dd>
+  <dt>日付・出典</dt><dd>2026-07-13 決定（旧「画像 API キー Secret の初期値と RemovalPolicy」）</dd>
+</dl>
+</article>
+
+<article id="d-05">
+<h3>D-05 ECR リポジトリの RemovalPolicy は DESTROY + emptyOnDelete</h3>
+<dl>
+  <dt>決めたこと</dt><dd>ECR リポジトリは <code>RemovalPolicy.DESTROY</code> + <code>emptyOnDelete: true</code> とし、スタック削除時にイメージごと削除する</dd>
+  <dt>理由</dt><dd>（決定時の記述は「ECR リポジトリ 3 つ」。現在は insights-batch を加えた 4 つ）リポジトリ名を明示指定しているため、CDK デフォルトの RETAIN では destroy 後に同名リポジトリが残り再作成時に名前衝突する。コンテナイメージはソースから再ビルド・再 push できる複製可能データであり、「スタックを壊して作り直せる」性質を優先する。<code>emptyOnDelete</code> は CloudFormation ネイティブの <code>EmptyOnDelete</code> プロパティに対応するため、S3 の <code>autoDeleteObjects</code> と異なり Lambda カスタムリソースは追加されない。<strong>destroy でイメージは全て失われるため、スタック再作成後はイメージの再 push が必要</strong>（db-readiness-check は再 push した不変タグを CDK Context で渡して Task Definition を再登録する。<a href="cicd.html#ecr">cicd.html セクション 4・6</a> を参照）</dd>
+  <dt>退けた案</dt><dd>CDK デフォルトの RETAIN</dd>
+  <dt>日付・出典</dt><dd>2026-07-13 決定（旧「ECR リポジトリの RemovalPolicy」）</dd>
+</dl>
+</article>
+
+<article id="d-06">
+<h3>D-06 ロググループは自動命名 + DESTROY</h3>
+<dl>
+  <dt>決めたこと</dt><dd>DB 準備確認タスクのロググループは自動命名 + <code>RemovalPolicy.DESTROY</code> とし、スタック削除時にログごと削除する（各バッチのロググループも同じ方針）</dd>
+  <dt>理由</dt><dd>診断用の使い捨てログ（リテンション 90 日）であり、S3 / ECR と同じ「スタックを壊して作り直せる」方針を優先する（CDK デフォルトの RETAIN では destroy 後にロググループが残り、手動削除しない限りゴミが蓄積する）。ロググループ名は命名規約表（<a href="cicd.html">cicd.html セクション 9.2</a>）の対象外のため明示指定しない。ログは ECS コンソールのタスク詳細から辿れるため、明示名による発見性は不要</dd>
+  <dt>退けた案</dt><dd>CDK デフォルトの RETAIN・明示命名</dd>
+  <dt>日付・出典</dt><dd>2026-07-13 決定（旧「DB 準備確認タスクの CloudWatch Log Group」）</dd>
+</dl>
+</article>
+
+<article id="d-07">
+<h3>D-07 イメージタグの Context 未指定は addError で落とす</h3>
+<dl>
+  <dt>決めたこと</dt><dd>ECS タスク定義を持つスタックは、イメージタグの CDK Context が未指定ならデフォルト値へフォールバックせず、<code>Annotations.of(stack).addError()</code> で失敗させる（throw はしない）</dd>
+  <dt>理由</dt><dd>フォールバックすると意図しないイメージでタスク定義が登録されうるため、明確なエラーで止める。throw にしないのは、CDK は選択外のスタックも synth するため、コンストラクタで throw すると他スタックの通常デプロイコマンドまで失敗するから。<code>addError()</code> なら対象に含むコマンドだけが失敗する</dd>
+  <dt>退けた案</dt><dd>デフォルト値へのフォールバック・コンストラクタでの throw</dd>
+  <dt>日付・出典</dt><dd>Phase 3-3（db-readiness-check）。以後 4-3・5-3・16-10 で各バッチに同じ方式を適用</dd>
+</dl>
+</article>
+
+<article id="d-08">
+<h3>D-08 画像生成バッチのタスクサイズは 1 vCPU / 2 GB</h3>
+<dl>
+  <dt>決めたこと</dt><dd>タスクサイズを <code>cpu: 256</code> / <code>memoryLimitMiB: 512</code> から <strong><code>cpu: 1024</code> / <code>memoryLimitMiB: 2048</code></strong>（1 vCPU / 2 GB）へ引き上げた。エフェメラルストレージは Fargate デフォルト（20 GiB）のまま</dd>
+  <dt>理由</dt><dd>動画方式（<code>gpt-image-kenburns</code>）の追加により、コンテナ内で ffmpeg による H.264 エンコード（1080x1920・30fps・10 秒）を行うようになったため。エフェメラルストレージは扱うファイルが数 MB 規模のため既定のままとする。1 日 1〜3 回・各数分の実行のため、Fargate の秒課金における増分は軽微。画像生成 Step Functions のタスクタイムアウト（3600 秒。<a href="workflow.html#image-asl">workflow.html セクション 3</a>）は変更していない</dd>
+  <dt>日付・出典</dt><dd>2026-07-25 決定・Phase 14-7</dd>
+</dl>
+</article>
+
+<article id="d-09">
+<h3>D-09 ASL の実装方式は生 JSON + definitionSubstitutions</h3>
+<dl>
+  <dt>決めたこと</dt><dd>ステートマシン定義は CDK の L2 コンストラクト（<code>tasks.EcsRunTask</code> 等）を使わず、<a href="workflow.html#sns-asl">workflow.html</a> の ASL JSON をそのまま <code>infra/lib/asl/</code> 配下にファイルとして保持し、<code>definitionSubstitutions</code> で <code>${...}</code> プレースホルダに実値（ECS クラスター ARN・タスク定義 family 名・サブネット ID・SG ID）を渡す。<code>fs.readFileSync</code> + <code>fromString</code> でテンプレートにインライン展開する</dd>
+  <dt>理由</dt><dd>本システムは Task Definition を family 名（revision なし）で指定し RunTask に最新 ACTIVE revision を解決させる方式（<a href="workflow.html#overview">workflow.html セクション 1.2</a>）だが、L2 の <code>EcsRunTask</code> は revision 固定 ARN を ASL に埋め込むためこの方式を表現できない。生 ASL 方式により設計書の ASL と実装が 1:1 で対応し、レビューも容易になる。インライン展開なので <code>cdk diff</code> で ASL の差分が見える</dd>
+  <dt>退けた案</dt><dd>L2 の <code>EcsRunTask</code>。<code>DefinitionBody.fromFile</code>（S3 アセット化されるため）</dd>
+  <dt>日付・出典</dt><dd>2026-07-13 決定（旧「ASL の実装方式: 生 JSON + definitionSubstitutions」）</dd>
+</dl>
+</article>
+
+<article id="d-10">
+<h3>D-10 ステートマシン名を明示指定する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>SNS 投稿 Step Functions のステートマシン名は <code>acps-{env}-sns-posting-sfn</code> を明示指定する。画像生成（<code>acps-{env}-image-generation-sfn</code>）・インサイト収集（<code>acps-{env}-insights-collection-sfn</code>）も同じ整理で明示指定する</dd>
+  <dt>理由</dt><dd>ステートマシンは命名規約表（<a href="cicd.html#env-separation">cicd.html セクション 9.2</a>）の対象外だが、手動での単独実行が運用ユースケースとして定義されており（<a href="workflow.html#sns-asl">workflow.html セクション 4</a>）、運用者がコンソールから直接触るリソースのため発見性を優先した（Scheduler DLQ <code>acps-prod-image-scheduler-dlq</code> の明示命名と同じ整理。命名規約表にも追記済み）。ImageBatchStack からの参照は CDK オブジェクト参照（ARN）のため名前固定は必須ではない。画像生成は、ASL の <code>${ImageGenerationSfnName}</code>（カスタムメトリクスの Dimension 値）に自ステートマシン名の文字列を生成前に渡す必要があるため、明示命名が実質必須。インサイト収集は手動実行（バックフィル・疎通確認）が運用ユースケースのため</dd>
+  <dt>日付・出典</dt><dd>2026-07-13 決定（旧「ステートマシン名の明示指定」）。画像生成は Phase 5-5、インサイト収集は 16-7</dd>
+</dl>
+</article>
+
+<article id="d-11">
+<h3>D-11 アラーム用 SNS トピックのポリシーを明示定義する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Topic ポリシーに <code>cloudwatch.amazonaws.com</code> の Publish 許可（<code>aws:SourceAccount</code> / <code>aws:SourceArn</code> 条件付き）を明示定義する</dd>
+  <dt>理由</dt><dd>EventBridge Rule のターゲット設定で CDK が明示的 TopicPolicy を作成すると SNS デフォルトポリシー（同一アカウント許可）が置換され、CloudWatch Alarm からの発行が拒否されるため</dd>
+  <dt>日付・出典</dt><dd>Phase 7-3 の通知テストで検出</dd>
+</dl>
+</article>
+
+<article id="d-12">
+<h3>D-12 決定 21-3: Function URL 直結 + SQS FIFO。API Gateway・Aurora 接続・VPC 配置は採らない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Webhook は Lambda の Function URL（認証なし・署名検証）で受け、SQS FIFO を挟んで Reply Lambda で返信する。VPC の外に置き、本番面とステージング面を同一コード（<code>CommentReplyStack</code> クラス）で立てる。Lambda コードは標準ライブラリ + boto3 のみのため <code>lambda.Code.fromAsset</code> で直接デプロイし、コンテナではないので CodePipeline は通さず手動 <code>cdk deploy</code> に乗せる（21-1 ⑥）</dd>
+  <dt>理由</dt><dd><ul>
+    <li><strong>Function URL</strong>（21-1 ⑥ ユーザー決定）: API Gateway の WAF・スロットリング・使用量プランが要る規模になるまで不要。Function URL は無料で、署名検証を Lambda 内で行うため認証なしで公開しても Meta 以外の要求は 401 で落ちる（Meta 以外は正しい署名を作れない）。DDoS 級の呼び出しは Lambda の同時実行上限（アカウント既定）で頭打ちになり費用も僅少</li>
+    <li><strong>SQS FIFO</strong>: 標準キューの at-least-once では Meta の再送 + SQS の重複配信で同じコメントに二重返信しうる（ユーザーに見える不具合）。FIFO の重複排除 ID に <code>comment_id</code> を使えば追加実装なしで 5 分窓の重複を抑止できる。スループット上限（300 msg/秒）はコメント規模（1 日 200 件）に対して十分。窓外の再送による二重返信は許容（発生したら設計課題へ）</li>
+    <li><strong>VPC 外</strong>: Aurora に触れないため VPC に置く理由がなく、置くと NAT Gateway（月 4,000 円超）が要る。Secrets Manager・S3・OpenAI・Graph API はいずれもパブリックエンドポイント（TLS）</li>
+    <li><strong>ステージング面を同一コードで立てる</strong>: PoC ハンドラを別コードで残すと本番と乖離するため、21-6 で新スタックをステージング面としても立て、PoC の Meta アプリの Webhook 先を切り替えてから <code>UmigamePocStack</code>（と規約外の Secret <code>umigame-poc/credentials</code>）を削除する（21-1 ⑦。<strong>2026-10-11 に削除した</strong>。<code>infra/lib/umigame-poc-stack.ts</code> と <code>bin/infra.ts</code> の配線も外した。課題 I-032）。恒久利用するのは PoC の Meta アプリとテスト用アカウントで、スタックではない。2 面分の定常費はほぼゼロ（Lambda・SQS は従量、Secret は月 0.4 USD × 2）</li>
+  </ul></dd>
+  <dt>退けた案</dt><dd>API Gateway・標準キュー・VPC 配置（Aurora 接続）・PoC ハンドラを別コードで残す</dd>
+  <dt>日付・出典</dt><dd>2026-09-04、決定 21-3（旧 3.6 の囲み「決定（2026-09-04、21-3）」）</dd>
+</dl>
+</article>
+
+<article id="d-13">
+<h3>D-13 Webhook Lambda のメモリを 512 MB にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Webhook Lambda のメモリを 128 MB から 512 MB へ引き上げた</dd>
+  <dt>理由</dt><dd>21-6f の接続時に 128 MB ではコールドスタートが約 5.7 秒かかり、Meta の購読検証がタイムアウトしたため。512 MB で約 1.6 秒</dd>
+  <dt>日付・出典</dt><dd>2026-10-11、21-6f</dd>
+</dl>
+</article>
+
+<article id="d-14">
+<h3>D-14 決定 21-8e: effort を max にしたので Reply Lambda のタイムアウトを 300 秒、可視性タイムアウトを 1,800 秒に延ばす。I-037 は受容</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Reply Lambda のタイムアウトを 120 秒 → 300 秒、SQS の可視性タイムアウトを 720 秒 → 1,800 秒にする（両面とも）。Anthropic 呼び出しのソケットタイムアウト 420 秒は 300 秒より長いまま残す（課題 I-037 は受容）</dd>
+  <dt>理由</dt><dd><ul>
+    <li><strong>理由</strong>: <code>HAIKU_EFFORT</code> を <code>high</code> → <code>max</code> にした（ユーザー決定。セット別設計書 <a href="../app/sets/umigame-soup-1-comment-reply.html#judge-policy">コメント返信の分冊 3.5</a>）。21-6d17 の実測で max の 1 ケースの応答時間は中央値 35 秒（high は 5.7 秒）で、裾は 100 秒を超えうる。D-15（決定 21-6f）の最悪の積み上げ（メイン判定 + 再試行の待ち 35 秒 + サブ判定 + 書き手）を max で見積もると 120 秒を超えるため 300 秒にした。可視性タイムアウトは AWS 推奨（関数タイムアウトの 6 倍）に合わせて 1,800 秒。本番面・ステージング面は同じ構成（<code>CommentReplyStack</code> クラスを共用）なので両面とも変わる</li>
+    <li><strong>I-037 は受容</strong>: Anthropic 呼び出しのソケットタイムアウト 420 秒（<code>app/anthropic_util.py</code>）は 300 秒より長いままにする。ストリーミングしない呼び出しでは応答の待ち時間 = 生成時間で、max では正常な応答も長くなるため、呼び出し単位で短く切ると正しい応答まで打ち切る危険のほうが大きい。接続が応答しないまま止まった場合は D-15（決定 21-6f）の「受け入れること」と同じく SQS の再試行 → DLQ → アラームで拾う。実運用の <code>Duration</code>・タイムアウト・DLQ は開発計画の確認待ちリスト（21-8e の行）で観察し、タイムアウト・DLQ が出たら呼び出し単位のタイムアウトを入れる</li>
+  </ul></dd>
+  <dt>退けた案</dt><dd>呼び出し単位のタイムアウトを短くする（正しい応答まで打ち切る危険のため、タイムアウト・DLQ が出るまで入れない）</dd>
+  <dt>日付・出典</dt><dd>2026-10-12、決定 21-8e（旧 3.6 の囲み「決定（2026-10-12、21-8e）」）</dd>
+</dl>
+</article>
+
+<article id="d-15">
+<h3>D-15 決定 21-6f: Reply Lambda のタイムアウトは 120 秒（21-8e で 300 秒へ変更）。ステージングのコメント記録は別プレフィックスに分け、プライバシーポリシーのバケットは 21-7 へ回す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Reply Lambda のタイムアウトを 120 秒・可視性タイムアウトを 720 秒にした（タイムアウトは D-14 で 300 秒へ変更済み）。コメント記録の PUT 権限を <code>comment-log/{SET_CODE}/*</code> に限り、ステージング面は <code>SET_CODE=umigame-soup-1-staging</code> とする。プライバシーポリシーのバケットは 21-7 で足す</dd>
+  <dt>理由</dt><dd><ul>
+    <li><strong>タイムアウト 120 秒</strong>: 21-6e3 の全件プローブ（525 件）で既定構成 ⑦（haiku 判定 + 1b-haiku 書き手・effort <code>high</code>）の 1 件あたりの所要は中央値 5.5 秒・p95 9.3 秒・最大 15.3 秒（判定の最大 12.4 秒 + 書き手の最大 6.0 秒）。haiku 判定が失敗するとサブ判定の luna（xhigh）が続き、その最大は 16.2 秒、luna 判定時の書き手の最大は 9.1 秒。メインが HTTP 429 / 5xx で失敗する場合は再試行の待ち（5 + 10 + 20 秒）が加わるため、最悪の実測ベースで約 15 + 35 + 16 + 9 ≒ 75 秒。これに Graph API・S3 の分と余裕を見て 120 秒にした（設計時の 30 秒は OpenAI 1 回呼びの前提だった）。可視性タイムアウトはその 6 倍の 720 秒</li>
+    <li><strong>受け入れること</strong>: Anthropic 呼び出しのソケットタイムアウトは評価用の 420 秒のまま（<code>app/anthropic_util.py</code>）なので、接続が応答しないまま止まったときはサブ判定に移る前に Lambda のタイムアウトで打ち切られ、SQS の再試行（3 回で DLQ → アラーム）に回る。この場合その回のコメント記録は残らない。DLQ にタイムアウト起因の滞留が出たら、Lambda 用に呼び出し単位のタイムアウトを短くする</li>
+    <li><strong>ステージングのコメント記録を分ける</strong>: 記録のキーは <code>comment-log/{set_code}/...</code> で、問題スナップショットの <code>set_code</code>（無いときは <code>SET_CODE</code>）から決まる。ステージング面は <code>SET_CODE=umigame-soup-1-staging</code> とし、サンプルの <code>problems/{media_id}.json</code> も <code>set_code</code> を <code>umigame-soup-1-staging</code> にして置く。PUT 権限を面ごとのプレフィックスに限ったので、誤って本番の <code>set_code</code> で書こうとしても IAM で拒否される（記録は失敗ログだけ残り、返信は続く）</li>
+    <li><strong>プライバシーポリシーのバケットは 21-7 へ</strong>: 公開モードの URL が要るのは本番用 Meta アプリを用意する 21-7 で、ポリシー本文（保存する情報と保持期限。21-6c2 系の決定を反映）もまだ無い。空のバケットを先に作らず、本文と一緒に 21-7 で足す。ステージング面は PoC の Meta アプリ（開発モード）のままなので不要</li>
+  </ul></dd>
+  <dt>日付・出典</dt><dd>2026-10-11、決定 21-6f（旧 3.6 の囲み「決定（2026-10-11、21-6f）」）</dd>
+</dl>
+</article>
+
+<article id="d-16">
+<h3>D-16 決定 21-6g: コメント返信用トークンは週 1 回の定期実行で自動更新する。コメント受信の処理には組み込まない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>トークン更新 Lambda を EventBridge Scheduler で毎週月曜 04:00 JST に起動する。非同期の自動再試行は 0 回とし、失敗は本番面のアラームで人に知らせる。置き場は Secret と同じ <code>CommentReplyStack</code></dd>
+  <dt>理由</dt><dd><ul>
+    <li><strong>週 1 回の独立した定期実行</strong>: Instagram ログイン方式の長期トークンは 60 日で失効し、<code>GET /refresh_access_token</code> で更新できる（条件: 発行から 24 時間以上経過した有効なトークン）。コメント受信のついでに更新する方式は、コメントが途絶えた期間にそのまま失効するため採らない。週 1 回なら更新が数回続けて失敗しても失効まで余裕がある（課題 I-031 の展開。2026-09-26 のユーザー決定でリリース前の必須）</li>
+    <li><strong>失敗時は即通知・自動再試行しない</strong>: Lambda の非同期再試行は 0 回とし、MonitoringStack の <code>acps-{env}-comment-reply-token-refresh-errors</code>（本番面のみ。<a href="workflow.html#comment-reply-dlq">workflow.html セクション 10</a>）で人に知らせる。失敗した週は Secret が書き換わらないので、旧トークンのまま返信は続く。復旧手順は <a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a></li>
+    <li><strong>Webhook / Reply Lambda への反映</strong>: 両 Lambda は Secret をウォーム中のプロセスに保持するため、更新後もしばらく旧トークンを使う。旧トークンも元の失効日時までは有効で、更新は失効の 50 日以上前に行うため、コールドスタートで読み直されるまでの間に失効することはない</li>
+    <li><strong>置き場</strong>: Secret と同じ <code>CommentReplyStack</code> に同居させる（Secret の書き込み権限を当該 Secret だけに絞れ、面ごとに同じ構成で立つ）。コードは <code>services/comment-reply/</code> の別エントリポイント（判定・返信のモジュールは使わない）</li>
+  </ul></dd>
+  <dt>退けた案</dt><dd>コメント受信のついでに更新する</dd>
+  <dt>日付・出典</dt><dd>2026-10-11、決定 21-6g（旧 3.6 の囲み「決定（2026-10-11、21-6g）」）</dd>
+</dl>
+</article>
+
+<article id="d-17">
+<h3>D-17 決定 21-7: プライバシーポリシーは https のオブジェクト URL で公開し、静的ウェブサイトホスティングは使わない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>専用バケットに公開読み取りのバケットポリシーを付け、REST エンドポイント（<code>https://{bucket}.s3.{region}.amazonaws.com/index.html</code>）の https URL を出力する。<code>RETAIN</code> にする</dd>
+  <dt>理由</dt><dd><ul>
+    <li><strong>https のオブジェクト URL</strong>: 21-3 の設計は静的ウェブサイトホスティングだったが、S3 のウェブサイトエンドポイントは http しか使えず、Meta のアプリ設定で https 以外の URL が弾かれると公開モードに切り替えられない。公開読み取りのバケットポリシーがあれば REST エンドポイントで同じ HTML を https で返せるため、こちらを出力する。CloudFront は 1 ページのためには過剰なので置かない</li>
+    <li><strong>本文の置き場と中身</strong>: <code>infra/assets/umigame-privacy-policy/index.html</code>（外部依存なしの 1 枚・日本語 + 英語の要約）。保存する情報（コメント本文・ID・コメント者のアプリスコープ ID〔username は持たない〕・返信・判定）、AI 事業者（Anthropic・OpenAI）への送信、保存期間（最長 1 年）、削除依頼の窓口（Instagram の DM。アンカー <code>#data-deletion</code> を Meta の「データ削除の手順の URL」に使う）を書いた。保持期限の実装は 21-7b で行い、本文の 4 章に「原本〔S3〕は取得から 30 日・振り返り用データベース〔Aurora〕は取得から 1 年」を足して実装と揃えた（Aurora は <code>webhook_received_at</code> 起点で 365 日。<a href="../app/sets/umigame-soup-1-comment-reply.html#comment-log-import">コメント返信の分冊 8.1</a>）。判定方式に Jev（Typesafe）を本番で使うよう切り替えるときは、送信先の事業者を本文に足す</li>
+    <li><strong>削除しない</strong>: <code>RETAIN</code> にした（スタックを作り直しても公開中の URL が消えないように。Meta アプリに登録した URL が 404 になると公開モードの審査対象になりうる）</li>
+  </ul></dd>
+  <dt>退けた案</dt><dd>静的ウェブサイトホスティング（http のみ）・CloudFront（1 ページには過剰）</dd>
+  <dt>日付・出典</dt><dd>2026-10-12、決定 21-7（旧 3.6 の囲み「決定（2026-10-12、21-7）」）</dd>
+</dl>
+</article>
+
+<article id="d-18">
+<h3>D-18 スタック間受け渡しの図に MonitoringStack への入力と DB 準備確認 SG のエッジを足す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>5 章のツリー図に MonitoringStack への入力（<code>auroraCluster</code>・<code>ecsCluster</code>・<code>snsPostingSfnArn</code>）と <code>dbReadinessCheckSg</code> のエッジを追記した</dd>
+  <dt>理由</dt><dd>当初のツリー図にはこれらのエッジが欠落していた（セクション 3.1 出力一覧・3.4 依存スタックには記載済み。設計課題リスト 2026-07-06）。実装（各スタックの props）に合わせて追記した</dd>
+  <dt>日付・出典</dt><dd>2026-07-23、Phase 13-2</dd>
+</dl>
+</article>
+</section>
 
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>

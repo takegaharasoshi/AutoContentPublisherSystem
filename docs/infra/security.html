@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>セキュリティ設計 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -13,8 +13,65 @@
 <h1>セキュリティ設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-10-12（21-7b: インサイト収集バッチのタスクロールにコメント記録 <code>comment-log/*</code> の読み取りを追加）。前回: 2026-10-12（21-7: SNS 投稿バッチのタスクロールにスナップショットの <code>s3:PutObject</code>、プライバシーポリシーのバケットを https のオブジェクト URL で公開する形に更新）。前回: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
+  <span>最終更新: 2026-10-19（30-9a: 新しい書式へ移した。判断の記録 D-01〜D-08）。前回: 2026-10-12（21-7b: インサイト収集バッチのタスクロールにコメント記録 <code>comment-log/*</code> の読み取りを追加）。前回: 2026-10-12（21-7: SNS 投稿バッチのタスクロールにスナップショットの <code>s3:PutObject</code>、プライバシーポリシーのバケットを https のオブジェクト URL で公開する形に更新）。前回: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
+  <span>1 段上: <a href="../overview/system-overview.html">基本設計（全体）</a>と、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a></span>
 </div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、配信面（AWS）の秘密情報の置き方（Secrets Manager）、IAM ロールの権限、ネットワークの守り方、セキュリティ運用を説明する詳細設計である。<a href="../overview/system-overview.html">基本設計（全体）</a>と、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a>・<a href="../overview/functions/insights.html">インサイト収集</a>・<a href="../overview/functions/comment-reply.html">コメント自動返信</a>・<a href="../overview/functions/token-refresh.html">トークン更新</a> のうち、認証と権限の部分を詳しくしたもの。</p>
+<p class="lead">図 1 は、Secret とそれを読む（書く）ロールの関係。ECS のバッチのタスクロールは <code>acps/{env}/</code> 配下を種別のプレフィックスで読み、Step Functions・Scheduler・CI/CD のロールは Secret を読まずに、タスクの起動とロールの受け渡し（<code>iam:PassRole</code>）だけを行う。コメント返信の Lambda は自分の面の Secret 1 件だけを読み、トークン更新 Lambda だけがその Secret に書き戻す。続く表はこのページの要点。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    subgraph START["起動する側（Secret は読まない）"]
+        direction TB
+        sch@{ icon: "aws:scheduler", form: "square", label: "Scheduler ロール" }
+        sfn@{ icon: "aws:step-functions", form: "square", label: "SFN 実行ロール" }
+        cicd@{ icon: "aws:codebuild", form: "square", label: "CI/CD（CodeBuild）ロール" }
+        sch -->|"StartExecution"| sfn
+    end
+    subgraph ECS["ECS のバッチ"]
+        direction TB
+        exe@{ icon: "aws:ecs", form: "square", label: "タスク実行ロール&lt;br&gt;（ECR の pull・ログ）" }
+        task@{ icon: "aws:fargate", form: "square", label: "タスクロール&lt;br&gt;（DB 準備確認・画像生成・SNS 投稿・インサイト収集）" }
+    end
+    subgraph LAMBDA["コメント返信の Lambda（面ごと）"]
+        direction TB
+        wr@{ icon: "aws:lambda", form: "square", label: "Webhook / Reply の実行ロール" }
+        tr@{ icon: "aws:lambda", form: "square", label: "トークン更新の実行ロール" }
+    end
+    subgraph SM["Secrets Manager（acps/{env}/…）"]
+        direction TB
+        dbs["db/credentials"]
+        img["image/api-key"]
+        sns["{set_code}/sns/{platform}/{account_code}"]
+        cr["{set_code}/comment-reply{-staging}"]
+    end
+    sfn -->|"RunTask・PassRole"| task
+    sfn -->|"PassRole"| exe
+    cicd -->|"新リビジョン登録・PassRole"| task
+    task -->|"読む（全バッチ）"| dbs
+    task -->|"読む（画像生成）"| img
+    task -->|"読む（SNS 投稿・インサイト収集）"| sns
+    wr -->|"読む"| cr
+    tr -->|"読む・書き戻す"| cr
+</pre>
+<figcaption>図 1 Secret と、それを読むロールの関係。起動する側のロールは Secret に触れない</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>Secret の名前</td><td>すべて <code>acps/{env}/</code> で始め、種別ごとの規約でアプリが名前を導出する（DB に ARN を持たない）<a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>Secret の権限</td><td>サービスごとに必要な種別のプレフィックスだけ読み取りを許可する。コメント返信用の Secret は投稿用と分け、書き込みはトークン更新 Lambda だけ <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+    <tr><td>IAM ロール</td><td>ECS のタスクロールとタスク実行ロールを分ける（ログはタスク実行ロール）。SFN・Scheduler・CI/CD・Lambda はそれぞれ専用ロールで対象リソースを絞る</td></tr>
+    <tr><td>ネットワーク</td><td>Aurora は隔離サブネット、Fargate はパブリックサブネットでインバウンド全拒否。コメント返信の Lambda は VPC の外で、関数 URL は署名検証で守る <a class="decision-ref" href="#d-06">→ 理由 D-06</a></td></tr>
+    <tr><td>運用</td><td>ログと DB にキー・トークン・Secret 値を出さない。コメント返信の変更はステージング面で確かめてから本番へ</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
 
 <h2 id="secrets">1. Secrets Manager 管理方針</h2>
 
@@ -57,13 +114,8 @@
 <ul>
   <li>Secret 名はアプリケーション側で上記規約に基づき導出する（DB に Secret 名・ARN は保持しない）</li>
   <li><code>account_code</code> は Secret 名の導出に使用するため、作成後に変更してはならない</li>
-  <li>環境分離は <code>env</code> 部分で行い、IAM ポリシーのプレフィックスベース制御と整合する</li>
+  <li>環境分離は <code>env</code> 部分で行い、IAM ポリシーのプレフィックスベース制御と整合する <a class="decision-ref" href="#d-01">→ 理由 D-01</a></li>
 </ul>
-
-<div class="decision">
-  <span class="callout-title">設計理由</span>
-  Secret の ARN を DB カラムで管理する方式では、アカウントを追加するたびに IAM ポリシーの個別 ARN 追加が必要になる。Secret 名規約に統一することで、プレフィックスベースの IAM ポリシーで最小権限と運用の簡便さを両立する。
-</div>
 
 <div class="note">
   <span class="callout-title">アプリ設計での最終確認</span>
@@ -134,7 +186,7 @@
     <tr><td><code>ig_user_id</code></td><td>YES</td><td>自アカウントの Instagram user ID。<strong>自己返信ループ防止の照合キー</strong>（未設定のままコメントが来ると自分の返信に返信し続けるため、投入を最優先する）</td></tr>
     <tr><td><code>openai_api_key</code></td><td>YES</td><td>OpenAI API キー（プロジェクト単位で月額予算上限を設定したもの。利用上限の 1 段目）。既定構成では haiku 判定が失敗したときのサブ判定（luna）に使う。Reply Lambda は空でも起動時に必須キーとして検査するため、必ず投入する</td></tr>
     <tr><td><code>typesafe_api_key</code></td><td>YES</td><td>Jev 判定（<code>JUDGE_MODE=jev</code>）の API キー。既定構成では呼ばないが、Reply Lambda が起動時に必須キーとして検査する（21-6f 追加）</td></tr>
-    <tr><td><code>anthropic_api_key</code></td><td>YES（既定構成）</td><td>Anthropic API キー。既定の判定 <code>JUDGE_MODE=haiku</code> と書き手 <code>REPLY_VARIANT=1b-haiku</code>（Claude Haiku 5.5・effort <code>high</code>。21-6e 決定）に使う。Console のワークスペース単位で月額上限を設定したものを入れる（21-6f 追加）</td></tr>
+    <tr><td><code>anthropic_api_key</code></td><td>YES（既定構成）</td><td>Anthropic API キー。既定の判定 <code>JUDGE_MODE=haiku</code> と書き手 <code>REPLY_VARIANT=1b-haiku</code>（Claude Haiku 5.5・effort <code>max</code>。21-6e 決定・21-8e で effort を変更）に使う。Console のワークスペース単位で月額上限を設定したものを入れる（21-6f 追加）</td></tr>
     <tr><td><code>token_expires_at</code></td><td>NO</td><td>コメント返信用トークンの失効日時（<code>YYYY-MM-DDTHH:MM:SSZ</code>）。トークン更新 Lambda が更新のたびに「実行時刻 + 応答の <code>expires_in</code>」で書き戻す。アプリケーションの認証には使わず、失効までの余裕を人が確かめるための値（<a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a>）</td></tr>
   </tbody>
 </table>
@@ -142,7 +194,7 @@
 <ul>
   <li>PoC の Secret <code>umigame-poc/credentials</code> は <code>acps/{env}/</code> 規約の外にある（PoC のため）。21-6 でステージング面を <code>acps/prod/umigame-soup-1/comment-reply-staging</code> に作り直し、<code>UmigamePocStack</code> と一緒に削除する → <strong>2026-10-11 に削除した</strong>（21-6f の接続後・課題 I-032。値は新しいステージングの Secret へ写してから消した）</li>
   <li><strong>書き込み権限</strong>: この Secret への書き込み（<code>secretsmanager:PutSecretValue</code> 等）はトークン更新 Lambda の実行ロールだけに、当該 Secret に限って付与する（Webhook / Reply Lambda は読み取りのみ。<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）。更新 Lambda はトークンと要求 URL（クエリにトークンを含む）をログ・例外に出さない</li>
-  <li>投稿用 Secret（上記「SNS 認証情報」）は本セットでも既存どおり作る。コメント返信用 Secret と<strong>キーを混ぜない</strong>（読むサービスが違い、IAM の許可プレフィックスも違う）</li>
+  <li>投稿用 Secret（上記「SNS 認証情報」）は本セットでも既存どおり作る。コメント返信用 Secret と<strong>キーを混ぜない</strong> <a class="decision-ref" href="#d-02">→ 理由 D-02</a></li>
 </ul>
 
 <h3>1.4 将来の複数環境対応</h3>
@@ -176,16 +228,8 @@
 <ul>
   <li>Secrets Manager 権限はサービスごとに必要最小限のプレフィックスで制限する。DB 認証情報（<code>acps/{env}/db/*</code>）は全サービス共通、それ以外は各サービスが必要とする種別のみ付与する</li>
   <li>DB にアカウントを追加するだけで、IAM ポリシーの変更なしに新しい Secret へのアクセスが可能になる</li>
+  <li>ECS のタスクロールには <code>cloudwatch:PutMetricData</code> を付与しない（アプリはカスタムメトリクスを発行しない）。付与しているのは Step Functions 実行ロール（image-generation-sfn）の <code>SnsPostStartFailureCount</code> 発行用だけ（セクション 2.3） <a class="decision-ref" href="#d-03">→ 理由 D-03</a></li>
 </ul>
-
-<div class="decision">
-  <span class="callout-title">SNS 投稿バッチタスクロールの cloudwatch:PutMetricData を削除（2026-07-15、Phase 10-1）</span>
-  当初はアプリ発行カスタムメトリクス用に <code>cloudwatch:PutMetricData</code>（Namespace を <code>ACPS</code> に制限）を先行付与していたが、
-  Phase 9-2 のアプリ設計で「アプリ側は個別カスタムメトリクスを持たず、通知は既存の Step Functions 失敗アラーム 1 本に一本化する」方針が確定し、使用しない権限として残っていたため、
-  最小権限の原則に従い Phase 10-1 で削除した（設計課題リスト 2026-07-07 の項目を解消）。
-  将来アプリ発行カスタムメトリクスを導入する際は、下記「cloudwatch:PutMetricData の IAM 条件」の Namespace 制限方式で再付与する。
-  なお、<strong>Step Functions 実行ロール（image-generation-sfn）の <code>PutMetricData</code> は <code>SnsPostStartFailureCount</code> の発行に使用中のため残している</strong>（セクション 2.3）。
-</div>
 
 <h3>2.2 ECS タスク実行ロール</h3>
 <ul>
@@ -211,7 +255,7 @@
 
 <div class="note">
   <span class="callout-title">ECS RunTask の Resource 指定</span>
-  Step Functions ASL は Task Definition を family 名（revision なし）で指定し、ECS RunTask が最新 ACTIVE revision を解決する。Step Functions 実行ロールの <code>ecs:RunTask</code> は <code>arn:aws:ecs:{region}:{account}:task-definition/{family}:*</code> のように family 配下の全 revision を許可する。revision 固定 ARN のみを許可すると、CodeBuild が新 revision を登録した後に実行できなくなる。
+  Step Functions ASL は Task Definition を family 名（revision なし）で指定し、ECS RunTask が最新 ACTIVE revision を解決する。Step Functions 実行ロールの <code>ecs:RunTask</code> は <code>arn:aws:ecs:{region}:{account}:task-definition/{family}:*</code> のように family 配下の全 revision を許可する <a class="decision-ref" href="#d-04">→ 理由 D-04</a>
 </div>
 
 <div class="note">
@@ -226,7 +270,7 @@
 
 <div class="note">
   <span class="callout-title">cloudwatch:PutMetricData の IAM 条件</span>
-  <code>PutMetricData</code> API はリソース ARN をサポートしていないため、ステートメントの <code>Resource</code> は <code>"*"</code> にせざるを得ない。過剰権限化を避けるため、条件キー <code>cloudwatch:namespace</code> で発行可能な Namespace を <code>ACPS</code>（本システムのカスタムメトリクス Namespace）に制限する。例:
+  <code>PutMetricData</code> のステートメントは <code>Resource</code> を <code>"*"</code> とし、条件キー <code>cloudwatch:namespace</code> で発行可能な Namespace を <code>ACPS</code>（本システムのカスタムメトリクス Namespace）に制限する <a class="decision-ref" href="#d-05">→ 理由 D-05</a>。例:
   <pre><code>{
   "Effect": "Allow",
   "Action": "cloudwatch:PutMetricData",
@@ -256,7 +300,7 @@
 </table>
 </div>
 <ul>
-  <li>各パイプラインの CodeBuild プロジェクトに対し、操作対象のリソース（ECR リポジトリ、ECS タスク定義 family、IAM ロール）を最小限にスコープする</li>
+  <li>各パイプラインの CodeBuild プロジェクトに対し、ECR リポジトリと <code>iam:PassRole</code> の対象ロールは当該サービスのものに絞る。<code>ecs:DescribeTaskDefinition</code>・<code>ecs:RegisterTaskDefinition</code> はリソース指定が効かないため <code>*</code> で許可している（各バッチスタックの CodeBuild のポリシー）</li>
   <li><code>iam:PassRole</code> は、CodeBuild が <code>ecs:RegisterTaskDefinition</code> で新リビジョンを登録する際にタスクロールとタスク実行ロールを指定するために必要</li>
 </ul>
 
@@ -277,13 +321,14 @@
 </ul>
 
 <h3 id="iam-comment-reply">2.6 コメント自動返信 Lambda 実行ロール（21-3 追加）</h3>
-<p>CommentReplyStack（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）の Lambda 2 本はそれぞれ専用の実行ロールを持ち、VPC 権限を持たない（VPC 外）。面（本番 / ステージング）ごとにロールも分かれる。</p>
+<p>CommentReplyStack（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）の Lambda 3 本（Webhook・Reply・トークン更新）はそれぞれ専用の実行ロールを持ち、VPC 権限を持たない（VPC 外）。面（本番 / ステージング）ごとにロールも分かれる。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>ロール</th><th>許可</th><th>備考</th></tr></thead>
   <tbody>
     <tr><td>Webhook Lambda</td><td><code>secretsmanager:GetSecretValue</code>（当該面の Secret 1 件のみ）/ <code>sqs:SendMessage</code>（当該面のメインキューのみ）/ CloudWatch Logs（基本実行ロール）</td><td>S3・Graph API・OpenAI には触れない（署名検証と enqueue だけ）</td></tr>
     <tr><td>Reply Lambda</td><td><code>secretsmanager:GetSecretValue</code>（当該面の Secret 1 件のみ）/ <code>sqs:ReceiveMessage</code> <code>DeleteMessage</code> <code>GetQueueAttributes</code>（メインキュー。イベントソースマッピング用）/ <code>s3:GetObject</code> を <strong><code>arn:aws:s3:::{bucket}/assets/umigame-soup-1/problems/*</code>（ステージング面は <code>.../staging/problems/*</code>）に限定</strong> / CloudWatch Logs</td><td><code>s3:PutObject</code> は <strong>コメント記録 <code>comment-log/{SET_CODE}/*</code> だけ</strong>（本番面 <code>comment-log/umigame-soup-1/*</code>・ステージング面 <code>comment-log/umigame-soup-1-staging/*</code>。21-6c2 のコメント記録用に 21-6f で追加。ステージングの記録が本番の記録に混ざらないよう IAM で分ける）。問題スナップショットへの PUT・<code>ListBucket</code>・<code>DeleteObject</code>・他プレフィックスは付与しない。バケットポリシーは変えずロール側のポリシーだけで付与する。Anthropic・OpenAI・Typesafe・Graph API は IAM ではなく Secret 内のキー・トークンで認証</td></tr>
+    <tr><td>トークン更新 Lambda</td><td><code>secretsmanager:GetSecretValue</code> と書き込み（<code>grantRead</code> + <code>grantWrite</code>。当該面の Secret 1 件のみ）/ CloudWatch Logs</td><td>Secret に書き込めるのはこの Lambda だけ（1.3。<code>ig_access_token</code>・<code>token_expires_at</code> を書き戻す）。起動は EventBridge Scheduler（<a href="workflow.html">workflow.html 10.1</a>）</td></tr>
   </tbody>
 </table>
 </div>
@@ -298,19 +343,14 @@
       <li>アウトバウンド: インターネットアクセス（外部 API、Secrets Manager、CloudWatch Logs）と VPC 内通信（Aurora）を許可</li>
     </ul>
   </li>
-  <li><strong>コメント自動返信 Lambda（21-3 追加）</strong>: VPC 外で実行し、Function URL を<strong>認証なし（<code>authType: NONE</code>）</strong>で公開する。インバウンドの正当性は Meta の <code>X-Hub-Signature-256</code> 署名検証（鍵は Instagram アプリシークレット）で担保し、署名不一致は 401 で捨てる。Reply Lambda はインバウンドを持たず SQS トリガーのみ。アウトバウンドは Secrets Manager・S3・Anthropic・OpenAI・Typesafe・Graph API（すべて TLS）。NAT Gateway・VPC Endpoint は使わない（<a href="architecture.html#comment-reply">architecture.html セクション 3.4</a>）</li>
-  <li><strong>プライバシーポリシー用 S3 バケット（21-3 設計・21-7 構築）</strong>: Meta アプリの公開モードに必須の到達可能 URL を提供するため、<strong>専用の小バケット <code>acps-{env}-umigame-privacy-policy</code> だけ</strong>を公開読み取り（当該バケット限定の <code>s3:GetObject</code>）にし、https のオブジェクト URL で公開する（ウェブサイトエンドポイントは http のみのため使わない）。画像保存バケットの Block Public Access は維持する（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-7）</li>
+  <li><strong>コメント自動返信 Lambda（21-3 追加）</strong>: VPC 外で実行し、Function URL を<strong>認証なし（<code>authType: NONE</code>）</strong>で公開する。インバウンドの正当性は Meta の <code>X-Hub-Signature-256</code> 署名検証（鍵は Instagram アプリシークレット）で確かめ、署名不一致は 401 で捨てる <a class="decision-ref" href="#d-06">→ 理由 D-06</a>。Reply Lambda はインバウンドを持たず SQS トリガーのみ。アウトバウンドは Secrets Manager・S3・Anthropic・OpenAI・Typesafe・Graph API（すべて TLS）。NAT Gateway・VPC Endpoint は使わない（<a href="architecture.html#comment-reply">architecture.html セクション 3.4</a>）</li>
+  <li><strong>プライバシーポリシー用 S3 バケット（21-3 設計・21-7 構築）</strong>: Meta アプリの公開モードに必須の到達可能 URL を提供する。<strong>専用の小バケット <code>acps-{env}-umigame-privacy-policy</code> だけ</strong>を公開読み取り（当該バケット限定の <code>s3:GetObject</code>）にし、https のオブジェクト URL で公開する。ウェブサイトエンドポイントは使わない。画像保存バケットの Block Public Access は維持する（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>） <a class="decision-ref" href="#d-07">→ 理由 D-07</a></li>
   <li><strong>Secrets Manager</strong>: ECS Fargate のパブリック IP 経由でアクセス（通信は TLS で暗号化）
     <ul>
-      <li>Interface VPC Endpoint は使用しない（コスト削減のため。より厳格なネットワーク分離が必要な場合は導入を検討）</li>
+      <li>Interface VPC Endpoint は使用しない <a class="decision-ref" href="#d-08">→ 理由 D-08</a></li>
     </ul>
   </li>
 </ul>
-
-<div class="note">
-  <span class="callout-title">NAT Gateway への移行パス</span>
-  セキュリティ要件の強化やトラフィック増加時には、ECS Fargate を Private Subnet に移動し NAT Gateway 経由の構成に変更可能。
-</div>
 
 <h2 id="operation">4. セキュリティ運用</h2>
 <ul>
@@ -322,6 +362,83 @@
   <li>CloudWatch Logs と DB の API レスポンス保存欄には、API キー、アクセストークン、Authorization ヘッダー、Presigned URL、Secret 値を出力・保存しない。外部 API レスポンスを保存する場合はマスキング済みの値のみを保存する（アプリ実装時のログ出力方針はアプリ設計で具体化する）</li>
 </ul>
 
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 Secret は名前の規約で導出し、IAM はプレフィックスで絞る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Secret 名を <code>acps/{env}/…</code> の規約に統一し、アプリが規約から名前を導出する。DB に Secret 名・ARN を持たず、IAM ポリシーはプレフィックスで許可する</dd>
+  <dt>理由</dt><dd>Secret の ARN を DB カラムで管理する方式では、アカウントを追加するたびに IAM ポリシーの個別 ARN 追加が必要になる。Secret 名規約に統一することで、プレフィックスベースの IAM ポリシーで最小権限と運用の簡便さを両立する（DB にアカウントを足すだけで、IAM を変えずに新しい Secret を読める）</dd>
+  <dt>退けた案</dt><dd>Secret の ARN を DB カラムで管理する</dd>
+  <dt>日付・出典</dt><dd>当初設計（インフラ設計 Fix 時）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 コメント返信用の Secret を投稿用と分ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>コメント自動返信のキー・トークンは <code>acps/{env}/{set_code}/comment-reply{-staging}</code> に置き、投稿用 Secret（<code>…/sns/instagram/…</code>）とキーを混ぜない。書き込みはトークン更新 Lambda の実行ロールだけに、当該 Secret に限って付与する</dd>
+  <dt>理由</dt><dd>読むサービスが違い、IAM の許可プレフィックスも違うため。コメント返信用のトークンは投稿用とは別のアプリ・別の方式（Instagram ログイン方式）のトークンでもある。書き込みを 1 つのロールに絞り、Webhook / Reply Lambda は読み取りだけにする</dd>
+  <dt>日付・出典</dt><dd>21-3（2026-09-04）設計、21-6g でトークン更新 Lambda の書き戻しを追加</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 SNS 投稿バッチのタスクロールから cloudwatch:PutMetricData を削除</h3>
+<dl>
+  <dt>決めたこと</dt><dd>SNS 投稿バッチタスクロールの <code>cloudwatch:PutMetricData</code> を削除した。Step Functions 実行ロール（image-generation-sfn）の <code>PutMetricData</code> は <code>SnsPostStartFailureCount</code> の発行に使用中のため残している（セクション 2.3）</dd>
+  <dt>理由</dt><dd>当初はアプリ発行カスタムメトリクス用に <code>cloudwatch:PutMetricData</code>（Namespace を <code>ACPS</code> に制限）を先行付与していたが、Phase 9-2 のアプリ設計で「アプリ側は個別カスタムメトリクスを持たず、通知は既存の Step Functions 失敗アラーム 1 本に一本化する」方針が確定し、使用しない権限として残っていたため、最小権限の原則に従い削除した（設計課題リスト 2026-07-07 の項目を解消）。将来アプリ発行カスタムメトリクスを導入する際は、セクション 2.3 の「cloudwatch:PutMetricData の IAM 条件」の Namespace 制限方式で再付与する</dd>
+  <dt>日付・出典</dt><dd>2026-07-15、Phase 10-1</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 ecs:RunTask は family 配下の全 revision を許可する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Step Functions 実行ロールの <code>ecs:RunTask</code> を <code>task-definition/{family}:*</code> で許可する</dd>
+  <dt>理由</dt><dd>ASL は Task Definition を family 名で指定し、最新 ACTIVE revision を実行時に解決する。revision 固定 ARN のみを許可すると、CodeBuild が新 revision を登録した後に実行できなくなる</dd>
+  <dt>退けた案</dt><dd>revision 固定の ARN だけを許可する</dd>
+  <dt>日付・出典</dt><dd>（記録なし）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 PutMetricData は Resource "*" + Namespace 条件で絞る</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>cloudwatch:PutMetricData</code> は <code>Resource: "*"</code> とし、条件キー <code>cloudwatch:namespace</code> を <code>ACPS</code> に限る</dd>
+  <dt>理由</dt><dd><code>PutMetricData</code> API はリソース ARN をサポートしていないため、<code>Resource</code> は <code>"*"</code> にせざるを得ない。過剰権限化を避けるため、Namespace の条件で発行先を制限する</dd>
+  <dt>日付・出典</dt><dd>（記録なし）</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 Webhook の関数 URL は認証なしで公開し、署名検証で守る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Webhook Lambda の Function URL を <code>authType: NONE</code> で公開し、Meta の <code>X-Hub-Signature-256</code> 署名（鍵は Instagram アプリシークレット）を検証して不一致は 401 で捨てる。Lambda は VPC の外で動かし、NAT Gateway・VPC Endpoint は使わない</dd>
+  <dt>理由</dt><dd>インバウンドの正当性は Meta の署名検証で担保する</dd>
+  <dt>日付・出典</dt><dd>21-3（2026-09-04）。構成の判断は <a href="architecture.html#comment-reply">architecture.html セクション 3.4</a></dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 プライバシーポリシーは専用バケットを https のオブジェクト URL で公開する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>専用の小バケット <code>acps-{env}-umigame-privacy-policy</code> だけを公開読み取りにし、https のオブジェクト URL で公開する。画像保存バケットの Block Public Access は維持する</dd>
+  <dt>理由</dt><dd>Meta アプリの公開モードには到達可能なプライバシーポリシーの URL が必須のため。公開範囲をこの小バケットに閉じ込め、画像保存バケットは公開しない</dd>
+  <dt>退けた案</dt><dd>S3 のウェブサイトエンドポイント（http のみのため使わない）</dd>
+  <dt>日付・出典</dt><dd>21-3 設計・21-7 構築（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-7）</dd>
+</dl>
+</article>
+<article id="d-08">
+<h3>D-08 Secrets Manager へは Interface VPC Endpoint を使わずパブリック IP 経由で届く</h3>
+<dl>
+  <dt>決めたこと</dt><dd>ECS Fargate はパブリック IP 経由（TLS）で Secrets Manager に届く。Interface VPC Endpoint は使わない</dd>
+  <dt>理由</dt><dd>コスト削減のため。より厳格なネットワーク分離が必要な場合は導入を検討する</dd>
+  <dt>退けた案</dt><dd>Interface VPC Endpoint。セキュリティ要件の強化やトラフィック増加時には、ECS Fargate を Private Subnet に移動し NAT Gateway 経由の構成に変更可能（移行パスとして残す）</dd>
+  <dt>日付・出典</dt><dd>当初設計</dd>
+</dl>
+</article>
+</section>
+
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>
