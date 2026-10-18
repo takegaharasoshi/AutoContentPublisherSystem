@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-18（<strong>30-3b 完了・go</strong>: 配信面の機能別の基本設計 4 ページを作った。次は <a href="#step-30-3c">30-3c</a>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="#step-30-3b">30-3b</a>〔配信面〕・<a href="#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-18（<strong>30-3c 完了</strong>: 生産の機能別の基本設計 4 ページを作った〔ユーザーの go 待ち。30-3 の go も合わせて判断〕。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="#step-30-3b">30-3b</a>〔配信面〕・<a href="#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -82,7 +82,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 4 件（クリックで展開）</summary>
+<summary>完了済み 5 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
@@ -249,18 +249,12 @@
 </details>
 </div>
 </article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-3c" data-step-id="30-3c" data-status="todo">
+<article class="plan-step" id="step-30-3c" data-step-id="30-3c" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-3c</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-3c</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>生産面の機能別の基本設計を作る（生産ライン共通・logic-training-1・pref-ranking-1・umigame-soup-1）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-3b の go の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<code>docs/overview/functions/</code> に生産の機能別の基本設計 4 ページ（<a href="../overview/functions/production.html">生産ライン（共通）</a>・<a href="../overview/functions/production-logic-training-1.html">logic-training-1</a>・<a href="../overview/functions/production-pref-ranking-1.html">pref-ranking-1</a>・<a href="../overview/functions/production-umigame-soup-1.html">umigame-soup-1</a>）を作り、基本設計（全体）の 2 章から共通 1 + セットごとに 1 リンクでつないだ。ユーザーの go 待ち（30-3 の go も合わせて判断）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -279,13 +273,26 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>中身</strong>: 共通ページ = 要約（骨組みの図）→ 1. 工程の骨組み → 2. 人の関所（関所の種類 × セットの表。数はセットにより 2〜5）→ 3. 受け渡しの契約（生産の側から見た入れ方）→ 4. スキル（役割・セット・起動できる場所・成果物）→ 5. レビューの仕方 → さらに詳しく（セット別 3 ページ）→ 判断 D-01〜03。セット別 = 要約（ゴール単位の工程図・要点の表）→ 1. 何を作り素材をどう集めるか → 2. 共通との違い → さらに詳しく（手順 = SKILL.md / 素材と動画の仕様 = セット別設計書 / 事前ビルドの詳細 = 方式設計書 8 節 / 運用の値 = セット計画書）→ 判断 D-01</li>
+<li><strong>照合</strong>: <code>.agents/skills/</code> の実体 16 本（生産ライン 5・remotion 6・進め方 5）とスキル表が一致。工程と関所を各 SKILL.md と照合（Explore サブエージェントで抽出、主要点は Claude が再確認）: logic = G1a〜G3・関所 3（選別 / 完成稿 1 問ずつ / 動画全数）・投入は G2 の最初で両環境・ナレーションなし / ranking = 工程 0〜7・候補段階なし・関所 2（素材 / 動画）・投入は工程 6 で両環境・publish がまとめて更新・VOICEVOX / umigame = G1a〜G5・関所 5（選別 / 素材 / コメント / 試行の GO / 動画）・ビルドが投入より前・G5 で一括・Irodori-TTS。作問は umigame-problem-writer（story は物語を先に書いて関門 → コア、misdirection は言い方を変えてコア）</li>
+<li><strong>レビュー</strong>（観点: 工程と関所が SKILL.md と食い違っていないか / SKILL.md・詳細設計と二重。一次スクリーニング Codex・判断 Claude）。1 巡目: blocker 2 件を修正（umigame の作問の順・関所の表で umigame のコメントのレビューと試行の GO を分ける）+ 基本設計（全体）2 章の「関所を 3 か所」は全セットに当てはまらない誤りとして修正。改善提案 3 件（スキル表の起動場所の列・G 番号と 2 倍の記載・候補の置き場の時点表現）は課題 <a href="../issues/index.html#I-042">I-042</a> に追記。2 巡目: blocker 1 件（画像を確かめる時期がセットにより取り込みの前後で違う）を修正して打ち切り</li>
+<li><strong>あわせて直したこと</strong>: 30-3 で書いた基本設計（全体）2 章の図 2 を「3 セット共通」から「代表例（logic-training-1 の形）」に改め、ranking に候補の段階がないこと・umigame は投入が最後になることを書いた。2 章の「さらに詳しく」を共通 1 + セット 3 + 4 章へ置き換え、7 章の入口表も機能ページへ向けた。設計書体系ガイドのツリーと 2.1 の表に 4 ページを載せた</li>
+<li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 95 ページはみ出し 0 件・図 11 ページ 23 図の描画不備 0 件・判断リンク 23 件の不備 0 件で OK</li>
+<li><strong>課題</strong>: I-040・I-042・I-033・I-035 は据え置き継続</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-4" data-step-id="30-4" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-4</strong><span class="plan-status">未着手</span></div>

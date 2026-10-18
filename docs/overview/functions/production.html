@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: 生産ライン（共通） | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / 機能別の基本設計: 生産ライン（共通）</nav>
+<h1>生産ライン（共通）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3c で新設）</span>
+  <span>1 段上: <a href="../system-overview.html#production">基本設計（全体）2 章 生産面</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">生産ラインは、投稿する動画をあらかじめ作って在庫に積む機能である。人が Claude Code や Codex の<strong>スキル</strong>（作業の手順書）を起動し、AI と一緒に、素材の企画 → 執筆 → 検証 → 動画のビルド → 配置までを進める。途中には人が中身を確かめて止める<strong>関所</strong>があり、OK になったものだけが先へ進む。最後に、全数を人が見た動画だけが S3 と在庫テーブルに置かれ、配信面の<a href="post.html">投稿</a>がそこから選ぶ。</p>
+<p class="lead">このページは 3 セットに共通する骨組みを書く。セットごとの違い（何を作るか・素材の集め方・工程の差）は、セット別の 3 ページ（<a href="production-logic-training-1.html">logic-training-1</a> / <a href="production-pref-ranking-1.html">pref-ranking-1</a> / <a href="production-umigame-soup-1.html">umigame-soup-1</a>）に書く。図 1 は共通の骨組みで、四角が AI と人が一緒に進める工程、ひし形が人だけが判断する関所。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    A["在庫の確認"] --> B["企画（ネタ・候補）"]
+    B --> G1{"関所: 候補の選別&lt;br&gt;（セットによる）"}
+    G1 -->|OK| C["素材の執筆&lt;br&gt;stock_items.py"]
+    C --> V["機械検証"]
+    V --> G2{"関所: 素材のレビュー"}
+    G2 -->|OK| D["画像の生成と動画のビルド&lt;br&gt;（ローカルの Docker）"]
+    D --> G3{"関所: 動画の全数レビュー"}
+    G3 -->|"承認したものだけ"| E["投入と配置&lt;br&gt;S3・ローカル DB・Aurora"]
+    E --> F[("在庫&lt;br&gt;→ 配信面の投稿が選ぶ")]
+</pre>
+<figcaption>図 1 生産ラインの共通の骨組み（DB への投入の時期はセットにより異なる）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>目的</td><td>配信面の在庫が尽きないよう、レビュー済みの動画を週単位で補充する</td></tr>
+    <tr><td>きっかけ</td><td>人がスキルを起動する（週次補充。在庫の水位が目安を下回ったら）</td></tr>
+    <tr><td>入力</td><td>ネタ（Web・官公庁統計・ランダムな語など。セットによる）、既存の在庫と過去の問題</td></tr>
+    <tr><td>出力</td><td>S3 のビルド済み動画、在庫テーブルの行（ローカル DB と Aurora の両方）、作業の記録</td></tr>
+    <tr><td>主な判断</td><td>投稿前に全数を人が見る <a class="decision-ref" href="#d-01">→ 理由 D-01</a> / 工程の細部はスキルの手順書を正にする <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="stages">1. 工程の骨組み</h2>
+<p class="lead">この章は、要約の図 1 の各工程で何をして何ができるかを表にしたもの。工程の名前・ゴールの切り方・順番の細かな違いはスキルごとにあり、ここでは共通する役割だけを書く。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>工程</th><th>すること</th><th>できるもの</th><th>主な道具</th></tr></thead>
+  <tbody>
+    <tr><td>在庫の確認</td><td>配信面の在庫（Aurora が正）を数え、今回作る数を決める。課題表・確認待ちも照合する</td><td>今回の目標数</td><td>件数のクエリ</td></tr>
+    <tr><td>企画</td><td>ネタを集め、候補を出す（候補を目標の 2 倍出して人が選ぶセットもある）</td><td>候補の一覧</td><td>Web 検索・統計の読み取り・作問スキル</td></tr>
+    <tr><td>素材の執筆</td><td>選ばれた候補を、動画とキャプションに必要な項目まで書き上げる</td><td><code>&lt;バッチ&gt;/stock_items.py</code>（素材の唯一のソース）</td><td>スキル</td></tr>
+    <tr><td>機械検証</td><td>文字数・必須項目・正解の整合などを機械で確かめ、投入用の SQL とレビュー用のページを作る</td><td>検証の結果・投入用 SQL・レビューページ</td><td><code>validate.py</code>・<code>generate.py</code> など</td></tr>
+    <tr><td>画像と動画</td><td>挿絵・背景の画像を生成して取り込み、動画をビルドする</td><td>MP4・全数レビューのページ</td><td><code>content/video-build/&lt;set&gt;/</code>（Remotion・ffmpeg を Docker で実行）</td></tr>
+    <tr><td>投入と配置</td><td>在庫の行をローカル DB と Aurora に入れ、承認した動画を S3 に置いて行に紐づける</td><td>在庫テーブルの行・S3 の動画</td><td><code>publish.py</code>・<code>apply_aurora.py</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="gates">2. 人の関所</h2>
+<p class="lead">関所は、人（ユーザー）が中身を見て先へ進めるかを決める場所で、AI は決めない。AI は関所の前で一次スクリーニングを済ませ、人が判断しやすい形（一覧・レビューページ）にして出す。次の表は関所の種類と、どのセットにあるか。関所の数はセットにより 2〜5 か所。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>関所</th><th>見るもの</th><th>判断</th><th>logic-training-1</th><th>pref-ranking-1</th><th>umigame-soup-1</th></tr></thead>
+  <tbody>
+    <tr><td>候補の選別</td><td>1 候補 3 行の一覧</td><td>OK / NG / 保留（理由は任意）</td><td>あり</td><td>なし</td><td>あり</td></tr>
+    <tr><td>素材のレビュー</td><td>完成稿・素材シート</td><td>承認 / 差し戻し</td><td>あり（1 問ずつ）</td><td>あり（全件を一覧で）</td><td>あり（まとめて）</td></tr>
+    <tr><td>試行用コメントのレビュー</td><td>判定の試行に使うコメントと期待する判定（プローブページ）</td><td>追加・削除・期待の修正</td><td>なし</td><td>なし</td><td>あり</td></tr>
+    <tr><td>判定の試行の確認</td><td>本番と同じ判定に通した結果（必要なら人が自分でコメントを試す）</td><td>GO / 素材に戻す</td><td>なし</td><td>なし</td><td>あり</td></tr>
+    <tr><td>動画の全数レビュー</td><td>動画のレビューページ（<code>work/review.html</code>）</td><td>承認した分を <code>approved.txt</code> に書く</td><td>あり</td><td>あり</td><td>あり</td></tr>
+  </tbody>
+</table>
+</div>
+<p>DB や S3 を書き換える工程（投入・配置）は auto mode で走らせず、許可のプロンプトを最後の関所として使う。</p>
+
+<h2 id="contract">3. 受け渡しの契約</h2>
+<p class="lead">生産ラインの出口は配信面への受け渡しで、置き場所と書き方が決まっている。全体の契約は<a href="../system-overview.html#contract">基本設計（全体）4 章</a>にあり、ここでは生産ラインの側から見た「どう入れるか」を書く。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>受け渡すもの</th><th>置き場所</th><th>入れ方</th></tr></thead>
+  <tbody>
+    <tr><td>素材の行</td><td>在庫テーブル <code>quiz_stock_items</code> / <code>ranking_stock_items</code> / <code>umigame_stock_items</code></td><td><code>generate.py</code> が作る INSERT の SQL を、ローカル DB と Aurora（RDS Data API）の両方に流す。両環境の中身が一致することを確かめる</td></tr>
+    <tr><td>ビルド済み動画</td><td>S3 <code>assets/{set_code}/prebuilt/</code></td><td><code>publish.py</code> が承認した分だけを上げ、在庫の行の動画キーを埋める（Aurora 側の更新は SQL を作って適用する）</td></tr>
+    <tr><td>BGM</td><td>S3 <code>audio/{set_code}/</code>・<code>audio_assets</code></td><td>補充やセット登録のときに SQL で登録する</td></tr>
+  </tbody>
+</table>
+</div>
+<p>行どうしの照合には、環境で変わる ID ではなく <code>content_key</code> を使う。動画キーが入っていない行は、配信面に選ばれない。</p>
+
+<h2 id="skills">4. スキル</h2>
+<p class="lead">生産ラインを進めるスキル（<code>.agents/skills/</code>）の一覧。Claude Code では <code>/名前</code>、Codex では <code>$名前</code> で起動する。補充スキルは 1 セットに 1 本で、作問や振り返りのように切り出したスキルを補充スキルの中から使う。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>スキル</th><th>役割</th><th>セット</th><th>起動できる場所</th><th>できるもの</th></tr></thead>
+  <tbody>
+    <tr><td><a href="../../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a></td><td>補充（候補 → 選別 → 執筆 → 検証 → レビュー → 投入 → ビルド → 配置）</td><td>logic-training-1</td><td>Claude Code・Codex</td><td>在庫の行・動画</td></tr>
+    <tr><td><a href="../../../.agents/skills/quiz-review-learn/SKILL.md">quiz-review-learn</a></td><td>NG・保留の候補を後日振り返り、合意した共通ルールを補充スキルの作問基準へ反映</td><td>logic-training-1</td><td>Claude Code</td><td>振り返りの記録・作問基準の更新</td></tr>
+    <tr><td><a href="../../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish</a></td><td>補充（ネタ選定 → データ検証 → 執筆 → 検証 → レビュー → 投入 → ビルド → 配置）</td><td>pref-ranking-1</td><td>Claude Code</td><td>在庫の行・動画</td></tr>
+    <tr><td><a href="../../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish</a></td><td>補充の運用（候補 → 選別 → 素材 → 判定の試行 → ビルド → 一括アップロード）</td><td>umigame-soup-1</td><td>Claude Code</td><td>在庫の行・動画</td></tr>
+    <tr><td><a href="../../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a></td><td>作問（型の宣言 → モチーフ → コア → 不思議にする → 自己検査 → 素材化）。補充スキルの中から使う</td><td>umigame-soup-1</td><td>Claude Code</td><td><code>stock_items.py</code> の 1 問</td></tr>
+    <tr><td><code>remotion-*</code>（6 本）</td><td>動画の版面に使う Remotion の汎用知識</td><td>共通</td><td>Claude Code</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="review">5. レビューの仕方</h2>
+<p class="lead">3 セットに共通するレビューの進め方。どの関所でも同じ考え方を使う。</p>
+<ul>
+  <li><strong>AI が先に一次スクリーニングし、人が判断する</strong>: AI は機械検証と目視の一次確認を済ませ、気になる点を添えて出す。採否は人が決める</li>
+  <li><strong>動画は全数を見る</strong>: 抜き取りにしない。承認したものだけを <code>approved.txt</code> に書き、配置はそのファイルに載った分だけ行う</li>
+  <li><strong>候補の選別は反射的に</strong>: 候補の段階は OK / NG / 保留だけを返し、理由は任意（AI は推測で理由を埋めない）<a class="decision-ref" href="#d-03">→ 理由 D-03</a></li>
+  <li><strong>指摘は手順書へ書き戻す</strong>: レビューで出た共通の指摘は、合意したものだけスキルの作問基準や執筆の勘所に反映する（logic-training-1 は <code>quiz-review-learn</code>、pref-ranking-1 は <code>WRITING-NOTES.md</code>）</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>logic-training-1 の生産 → <a href="production-logic-training-1.html">機能別の基本設計 logic-training-1</a></li>
+  <li>pref-ranking-1 の生産 → <a href="production-pref-ranking-1.html">機能別の基本設計 pref-ranking-1</a></li>
+  <li>umigame-soup-1 の生産 → <a href="production-umigame-soup-1.html">機能別の基本設計 umigame-soup-1</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 投稿前に全数を人が見る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>動画は生産ラインで事前に作り、人が全数をレビューして承認したものだけを配置する</dd>
+  <dt>理由</dt><dd>実行時に生成すると人が見ないまま投稿される。画像生成の品質確認で文字や数字の崩れが出たため、投稿前に全数を直せる形にした</dd>
+  <dt>日付・出典</dt><dd>2026-08-08（Phase 16-3b）。<a href="../system-overview.html#d-01">基本設計（全体）D-01</a></dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 工程の細部はスキルの手順書（SKILL.md）を正にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>設計書には全体像・関所・受け渡しの契約・スキルの一覧だけを書き、工程ごとの手順・コマンド・ゴールの切り方は SKILL.md に書く</dd>
+  <dt>理由</dt><dd>手順は補充のたびに改善され、設計書と二重に書くとすぐにずれるため</dd>
+  <dt>日付・出典</dt><dd>2026-10-17（I-040 の壁打ち・Phase 30 の方針 ⑤）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 候補の選別では理由を求めない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>候補を目標の 2 倍出し、人は OK / NG / 保留だけを返す。理由の整理は後日の振り返りへ分ける</dd>
+  <dt>理由</dt><dd>補充中の判断から理由の言語化を外して速く選べるようにし、振り返りの成果でスキルを育てるため</dd>
+  <dt>日付・出典</dt><dd>2026-09-22（logic-training-1 の改修 R-3）。umigame-soup-1 も同じ形を使う</dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>

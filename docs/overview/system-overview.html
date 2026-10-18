@@ -13,7 +13,7 @@
 <h1>基本設計（システムの全体像）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-18（30-3b で 3 章の「さらに詳しく」を機能別の基本設計へ向けた。Phase 30-3 で旧「システム概要」を基本設計として作り直し、生産面と配信面の 2 面で描いた）</span>
+  <span>最終更新: 2026-10-18（30-3c で 2 章の「さらに詳しく」を生産の機能別の基本設計へ向けた。30-3b で 3 章の「さらに詳しく」を機能別の基本設計へ向けた。Phase 30-3 で旧「システム概要」を基本設計として作り直し、生産面と配信面の 2 面で描いた）</span>
   <span>設計書の 3 段の構成（基本設計 → 層の概要 → 詳細設計）は<a href="../index.html#levels">設計書体系ガイド 2.1</a></span>
 </div>
 
@@ -86,8 +86,8 @@ flowchart TB
 </ul></div>
 
 <h2 id="production">2. 生産面</h2>
-<p class="lead">この章は、<a href="#faces">1 章</a>の生産面を「どんな工程を、どこで人が止めながら進むか」の単位まで詳しくしたもの。生産面は、Claude Code や Codex のスキル（作業手順書）に沿って、素材の企画から動画の配置までを進める。途中に人が中身を確かめて止める「関所」を 3 か所置き、OK になったものだけが次の工程へ進む。</p>
-<p class="lead">図 2 は 3 セットに共通する工程の流れを表す。四角が工程、ひし形が関所（人の判断）で、上から順に、候補づくり → 選別 → 完成稿 → 検証 → レビュー → 画像と動画のビルド → 全数レビュー → 配置と進む。</p>
+<p class="lead">この章は、<a href="#faces">1 章</a>の生産面を「どんな工程を、どこで人が止めながら進むか」の単位まで詳しくしたもの。生産面は、Claude Code や Codex のスキル（作業手順書）に沿って、素材の企画から動画の配置までを進める。途中に人が中身を確かめて止める「関所」を置き（数と中身はセットにより 2〜5 か所）、OK になったものだけが次の工程へ進む。</p>
+<p class="lead">図 2 は工程の流れの代表（logic-training-1 の形）を表す。四角が工程、ひし形が関所（人の判断）で、上から順に、候補づくり → 選別 → 完成稿 → 検証 → レビュー → 画像と動画のビルド → 全数レビュー → 配置と進む。セットにより、候補の選別がない（pref-ranking-1）・判定の試行が入り投入が最後になる（umigame-soup-1）などの違いがある。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -103,7 +103,7 @@ flowchart TB
     R --> G3{"関所 3&lt;br&gt;動画の全数レビュー&lt;br&gt;review_sheet.py"}
     G3 -->|OK| P["配置&lt;br&gt;publish.py → S3・ローカル DB&lt;br&gt;apply_aurora.py → Aurora"]
 </pre>
-<figcaption>図 2 生産ラインの共通の工程と関所（人が止める場所）。工程の細部は各スキルの SKILL.md が正（umigame は関所 2 の後に機械プローブ〔コメント判定の試行〕が入り、在庫の投入は配置と一括で行う）</figcaption>
+<figcaption>図 2 生産ラインの工程と関所（人が止める場所）の代表例。セットごとの違いは下の「さらに詳しく」の機能ページ、工程の細部は各スキルの SKILL.md が正</figcaption>
 </figure>
 <p class="lead">工程の骨組みは共通だが、何を作るか（なぞなぞ・ランキング・ウミガメのスープ）・素材の集め方・ナレーションの有無はセットごとに違う。次の表は、セットごとの違いと、それぞれの手順書・ソース・ビルドツールの置き場所を示す。</p>
 <div class="table-wrap">
@@ -116,12 +116,12 @@ flowchart TB
   </tbody>
 </table>
 </div>
-<p>動画ビルドの段取りは 3 セット共通: <code>export_prompts.py</code>（挿絵・背景の画像生成プロンプトの書き出し）→ 画像の生成（Codex の imagegen）と人の確認 → <code>intake.py</code>（生成した画像の取り込み）→ <code>build.py</code>（Remotion・ffmpeg を Docker で実行）→ <code>review_sheet.py</code>（全数レビューのページ）→ <code>publish.py</code>（配置）。</p>
+<p>動画ビルドの段取りは 3 セット共通: <code>export_prompts.py</code>（挿絵・背景の画像生成プロンプトの書き出し）→ 画像の生成（Codex の imagegen）→ <code>intake.py</code>（生成した画像の取り込み。画像を確かめる時期は取り込みの前後でセットにより異なる）→ <code>build.py</code>（Remotion・ffmpeg を Docker で実行）→ <code>review_sheet.py</code>（全数レビューのページ）→ <code>publish.py</code>（配置）。</p>
 <div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
-  <li><strong>logic-training-1</strong> の作り方を細かく見る → セット別設計書 <a href="../app/sets/logic-training-1.html">logic-training-1</a>・方式設計書 <a href="../app/generators/quiz-prebuilt.html#build">quiz-prebuilt 8 節（事前ビルドパイプライン）</a>・手順書 <a href="../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a>・運用 <a href="../app/operation.html#quiz-stock-mgmt">アプリ運用設計 3 節（問題ストック）</a></li>
-  <li><strong>pref-ranking-1</strong> の作り方を細かく見る → セット別設計書 <a href="../app/sets/pref-ranking-1.html">pref-ranking-1</a>・方式設計書 <a href="../app/generators/ranking-prebuilt.html#build">ranking-prebuilt 8 節</a>・手順書 <a href="../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish</a>・執筆の勘所 <a href="../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a>・運用 <a href="../app/operation.html#ranking-stock-mgmt">アプリ運用設計 3 節（ランキングストック）</a></li>
-  <li><strong>umigame-soup-1</strong> の作り方を細かく見る → セット別設計書 <a href="../app/sets/umigame-soup-1.html">umigame-soup-1</a>・方式設計書 <a href="../app/generators/umigame-prebuilt.html#build">umigame-prebuilt 8 節</a>・手順書 <a href="../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish</a>（作問は <a href="../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a>）</li>
-  <li>3 セットを横断した生産ラインの全体像・関所・受け渡しの契約 → 機能別の基本設計「生産ライン（共通）」（<a href="../plans/development-plan.html#step-30-3c">30-3c</a> で作成予定。できたら本節の「さらに詳しく」は機能ページへの 1 リンクずつに置き換える）</li>
+  <li>3 セットに共通する生産ラインの骨組み・人の関所・受け渡しの入れ方・スキルの一覧 → 機能別の基本設計 <a href="functions/production.html">生産ライン（共通）</a></li>
+  <li>logic-training-1 の生産 → 機能別の基本設計 <a href="functions/production-logic-training-1.html">logic-training-1</a></li>
+  <li>pref-ranking-1 の生産 → 機能別の基本設計 <a href="functions/production-pref-ranking-1.html">pref-ranking-1</a></li>
+  <li>umigame-soup-1 の生産 → 機能別の基本設計 <a href="functions/production-umigame-soup-1.html">umigame-soup-1</a></li>
   <li>作ったものを配信面へどう渡すか → <a href="#contract">4 章 受け渡しの契約</a></li>
 </ul></div>
 
@@ -327,7 +327,7 @@ sequenceDiagram
   <thead><tr><th>場所</th><th>中身</th></tr></thead>
   <tbody>
     <tr><td><code>content/quiz-stock/</code> <code>ranking-stock/</code> <code>umigame-stock/</code></td><td>セット別の素材のソース（バッチ単位の <code>stock_items.py</code>）と <code>generate.py</code>・<code>validate.py</code> などの検証ツール、セット登録の SQL</td></tr>
-    <tr><td><code>content/video-build/&lt;set&gt;/</code></td><td>動画ビルドの段取り（<code>export_prompts.py</code> → 画像の生成と確認 → <code>intake.py</code> → <code>build.py</code> → <code>review_sheet.py</code> → <code>publish.py</code>）</td></tr>
+    <tr><td><code>content/video-build/&lt;set&gt;/</code></td><td>動画ビルドの段取り（<code>export_prompts.py</code> → 画像の生成 → <code>intake.py</code> → <code>build.py</code> → <code>review_sheet.py</code> → <code>publish.py</code>）</td></tr>
     <tr><td><code>content/insights-analysis/</code></td><td>インサイトの集計ランナー（読み取り専用。月次 KPI 転記に使う）</td></tr>
   </tbody>
 </table>
@@ -343,7 +343,7 @@ sequenceDiagram
 <table>
   <thead><tr><th>知りたいこと</th><th>入口</th></tr></thead>
   <tbody>
-    <tr><td>生産ラインの全体像・関所・受け渡しの契約</td><td>機能別の基本設計「生産ライン（共通）」（30-3c で作成予定）。それまでは各スキルの SKILL.md と<a href="../app/operation.html">アプリ運用設計</a></td></tr>
+    <tr><td>生産ラインの全体像・関所・受け渡しの契約</td><td>機能別の基本設計 <a href="functions/production.html">生産ライン（共通）</a>（セット別は <a href="functions/production-logic-training-1.html">logic-training-1</a> / <a href="functions/production-pref-ranking-1.html">pref-ranking-1</a> / <a href="functions/production-umigame-soup-1.html">umigame-soup-1</a>）。手順の正は各スキルの SKILL.md と<a href="../app/operation.html">アプリ運用設計</a></td></tr>
     <tr><td>AWS の構成・ネットワーク・データストア</td><td><a href="../infra/architecture.html">アーキテクチャ</a></td></tr>
     <tr><td>配信面の機能ごとの目的・流れ・部品（投稿・インサイト収集・コメント自動返信・トークン更新）</td><td>機能別の基本設計 <a href="functions/post.html">投稿</a> / <a href="functions/insights.html">インサイト収集</a> / <a href="functions/comment-reply.html">コメント自動返信</a> / <a href="functions/token-refresh.html">トークン更新</a></td></tr>
     <tr><td>SFN・スケジュール・監視リソース</td><td><a href="../infra/workflow.html">ワークフロー</a></td></tr>

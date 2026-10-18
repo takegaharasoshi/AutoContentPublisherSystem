@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: logic-training-1 の生産 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / <a href="production.html">生産ライン（共通）</a> / logic-training-1</nav>
+<h1>logic-training-1 の生産（なぞなぞ・とんち）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3c で新設）</span>
+  <span>1 段上: <a href="production.html">生産ライン（共通）</a>。ここには共通との違いだけを書く</span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">logic-training-1 は、脳みそコーチが出題する頭の体操のリールを、朝と夜の 1 日 2 回投稿するセットである。生産では、問題（なぞなぞ・とんち・水平思考）を Web で裏を取りながら集め、候補を多めに出して人が直感で選び、完成稿・挿絵・動画まで作る。<a href="production.html">生産ライン（共通）</a>の骨組みに沿い、3 つの関所をすべて持つ。</p>
+<p class="lead">図 1 はこのセットの工程を、補充スキルのゴール（G1a〜G3）の単位で表す。共通との違いは、DB への投入が動画のビルドより前（G2 の最初）にあることと、人の判断から外した理由を後日の振り返りで扱うこと。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    G1a["G1a 候補の準備&lt;br&gt;朝・夜それぞれ目標の 2 倍"] --> H1{"選別&lt;br&gt;OK / NG / 保留"}
+    H1 -->|OK| G1b["G1b 完成稿と機械検証"]
+    H1 -.->|"NG・保留"| RL["後日の振り返り&lt;br&gt;quiz-review-learn"]
+    G1b --> H2{"完成稿を 1 問ずつレビュー"}
+    H2 -->|承認| G2["G2 投入（ローカル DB・Aurora）&lt;br&gt;→ 挿絵の生成 → 動画ビルド"]
+    G2 --> H3{"動画の全数レビュー"}
+    H3 -->|承認| G3["G3 配置（S3・ローカル DB・Aurora）"]
+    RL -.->|"共通ルールを反映"| G1a
+</pre>
+<figcaption>図 1 logic-training-1 の生産の工程（ゴール単位）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>このセットでは</th></tr></thead>
+  <tbody>
+    <tr><td>作るもの</td><td>朝 = なぞなぞ、夜 = とんち・水平思考の 1 問 1 本のリール（昼のフェルミ推定は停止中 <a class="decision-ref" href="#d-01">→ 理由 D-01</a>）</td></tr>
+    <tr><td>補充スキル</td><td><a href="../../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a>（Claude Code・Codex の両方で起動できる）+ 振り返り <a href="../../../.agents/skills/quiz-review-learn/SKILL.md">quiz-review-learn</a></td></tr>
+    <tr><td>在庫テーブル</td><td><code>quiz_stock_items</code></td></tr>
+    <tr><td>関所</td><td>候補の選別・完成稿のレビュー（1 問ずつ）・動画の全数レビューの 3 つ</td></tr>
+    <tr><td>音</td><td>ナレーションなし。BGM（時間帯に合わせて選ぶ）と効果音</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="material">1. 何を作り、素材をどう集めるか</h2>
+<p class="lead">このセットの素材は「誰が作ったか分からないほど広く出回った」問題で、問題文をそのまま写さずに書き直して使う。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>集め方</td><td>Web で探し、作者不詳で複数の独立したサイトに出回っている問題だけを採る（転載はしない）</td></tr>
+    <tr><td>候補の置き場</td><td><code>content/quiz-stock/logic-training-1/candidates/&lt;バッチ&gt;/</code>（1 候補 1 ファイル。集計は <code>tally.py</code>）</td></tr>
+    <tr><td>素材の置き場</td><td><code>content/quiz-stock/logic-training-1/&lt;バッチ&gt;/stock_items.py</code></td></tr>
+    <tr><td>機械検証</td><td><code>validate.py</code>（項目の仕様）・<code>verify_logic.py</code>（機械で検算できる答え）・<code>generate.py</code>（投入用 SQL とレビュー用の一覧）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="diff">2. 共通との違い</h2>
+<p class="lead"><a href="production.html#stages">生産ライン（共通）1 章</a>の骨組みと比べたときの、このセットの違い。</p>
+<ul>
+  <li><strong>投入がビルドより前</strong>: 完成稿を承認したら G2 の最初にローカル DB と Aurora の両方へ投入し、その後に挿絵を生成して動画をビルドする。配置（G3）では <code>publish.py</code> が S3 とローカル DB を更新し、Aurora には動画キーの更新 SQL を別に適用する</li>
+  <li><strong>振り返りのループ</strong>: 選別で NG・保留になった候補と完成稿で差し戻した候補は、週次補充とは別に <code>quiz-review-learn</code> で振り返る。人が理由を言葉にし、OK になれば候補へ戻し、合意した共通ルールだけを補充スキルの作問基準へ反映する</li>
+  <li><strong>挿絵</strong>: 問題ごとに挿絵を 1 枚生成する（Claude Code では Codex に生成を任せ、Codex の直接セッションでは自分で生成する）</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>手順（ゴールの切り方・コマンド・作問の勘所）→ <a href="../../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish の SKILL.md</a></li>
+  <li>素材と動画の仕様（スロット・キャプション・音源・固定アセット）→ <a href="../../app/sets/logic-training-1.html">セット別設計書 logic-training-1</a></li>
+  <li>事前ビルドの詳細（ビルドの段取り・在庫からの選び方）→ <a href="../../app/generators/quiz-prebuilt.html#build">方式設計書 quiz-prebuilt 8 節</a></li>
+  <li>運用の値（補充のしきい値・直近の補充）→ <a href="../../plans/logic-training-1.html">セット計画書 logic-training-1</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 昼（フェルミ推定）の補充を止める</h3>
+<dl>
+  <dt>決めたこと</dt><dd>昼の枠の投稿と補充を当分止め、朝と夜の 1 日 2 回にする（廃止ではない）</dd>
+  <dt>理由</dt><dd>昼のスキップ率が高止まりで改善せず、問題にも魅力を感じない。魅力を感じない投稿が定期的に混ざるとフォロワーが増えないため</dd>
+  <dt>日付・出典</dt><dd>2026-08-24（16-4d・ユーザー決定）。<a href="../../app/sets/logic-training-1.html#noon-suspended">セット別設計書</a></dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>

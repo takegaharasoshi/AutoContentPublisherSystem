@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: pref-ranking-1 の生産 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / <a href="production.html">生産ライン（共通）</a> / pref-ranking-1</nav>
+<h1>pref-ranking-1 の生産（都道府県ランキング）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3c で新設）</span>
+  <span>1 段上: <a href="production.html">生産ライン（共通）</a>。ここには共通との違いだけを書く</span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">pref-ranking-1 は、都道府県ランキングの TOP5 を地図のルーレットで発表するリールを、毎日 1 本投稿するセットである。生産では、官公庁の統計から順位の元になる数値を<strong>機械で読み取り</strong>、ナレーション付きの 30 秒の動画を作る。<a href="production.html">生産ライン（共通）</a>の骨組みのうち、候補を多めに出して選ぶ段階はなく、ネタ選びはリサーチの中で基準に沿って行う。</p>
+<p class="lead">図 1 はこのセットの工程を表す。共通との違いは、データの読み取りと県への換算が独立した工程としてあることと、関所が素材のレビューと動画の全数レビューの 2 つであること。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    A["在庫の確認"] --> B["ネタ選定・リサーチ&lt;br&gt;基準: 下位の県が笑って自虐できるか"]
+    B --> C["データの検証・県への換算&lt;br&gt;一次情報を機械で読み取る"]
+    C --> D["執筆（文言・ナレーション）&lt;br&gt;→ 機械検証"]
+    D --> H1{"素材のレビュー&lt;br&gt;全件承認まで投入しない"}
+    H1 -->|承認| E["投入（ローカル DB・Aurora）"]
+    E --> F["背景の生成 → 動画ビルド&lt;br&gt;（VOICEVOX のナレーション）"]
+    F --> H2{"動画の全数レビュー"}
+    H2 -->|承認| G["配置（S3・ローカル DB・Aurora をまとめて）"]
+</pre>
+<figcaption>図 1 pref-ranking-1 の生産の工程</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>このセットでは</th></tr></thead>
+  <tbody>
+    <tr><td>作るもの</td><td>都道府県ランキング TOP5 の 30 秒のリール（下位を晒さない TOP5 の版面）</td></tr>
+    <tr><td>補充スキル</td><td><a href="../../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish</a>（Claude Code）+ 執筆の勘所 <a href="../../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a></td></tr>
+    <tr><td>在庫テーブル</td><td><code>ranking_stock_items</code></td></tr>
+    <tr><td>関所</td><td>素材のレビュー・動画の全数レビューの 2 つ（候補の選別はない）</td></tr>
+    <tr><td>音</td><td>VOICEVOX のナレーションと BGM</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="material">1. 何を作り、素材をどう集めるか</h2>
+<p class="lead">このセットの素材は「順位の根拠になる数値」で、数値は必ず一次情報から機械で取り出す。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>ネタの出どころ</td><td>家計調査の品目別ランキングと官公庁の統計が中心（初期のネタ帳は使い切り済み）</td></tr>
+    <tr><td>ネタの基準</td><td>下位の県の人が笑って自虐できるか <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>数値の取り方</td><td>e-Stat や官公庁の xlsx・PDF を抽出スクリプトで読み取る。家計調査は 52 市の値を 47 都道府県へ換算する（<code>common/convert.py</code>）。まとめ記事・ランキングサイトの数値は使わない</td></tr>
+    <tr><td>素材の置き場</td><td><code>content/ranking-stock/pref-ranking-1/&lt;バッチ&gt;/stock_items.py</code>（リサーチの記録は同じ場所の <code>research.md</code>）</td></tr>
+    <tr><td>機械検証</td><td><code>validate.py</code>（同値・読み上げの長さなど）・<code>generate.py</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="diff">2. 共通との違い</h2>
+<p class="lead"><a href="production.html#stages">生産ライン（共通）1 章</a>の骨組みと比べたときの、このセットの違い。</p>
+<ul>
+  <li><strong>候補の選別がない</strong>: 候補を多めに出して人が選ぶ段階はなく、ネタの採否はリサーチの中で基準と採否のルールに沿って決め、不採用の理由を記録に残す</li>
+  <li><strong>データの検証が独立した工程</strong>: 一次情報の取得・読み取り・県への換算を、執筆の前に機械で行う</li>
+  <li><strong>投入はビルドより前・配置はまとめて</strong>: 素材を全件承認したらローカル DB と Aurora に投入し（両環境の中身の一致を確かめる）、動画を承認したら <code>publish.py</code> が S3・ローカル DB・Aurora をまとめて更新する</li>
+  <li><strong>背景とナレーション</strong>: 背景画像を生成して取り込み、VOICEVOX でナレーションを付けてビルドする</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>手順（工程ごとのコマンド・採否のルール）→ <a href="../../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish の SKILL.md</a></li>
+  <li>素材と動画の仕様（スロット・音源・ナレーション・デザイン）→ <a href="../../app/sets/pref-ranking-1.html">セット別設計書 pref-ranking-1</a></li>
+  <li>事前ビルドの詳細（ビルドの段取り・在庫からの選び方）→ <a href="../../app/generators/ranking-prebuilt.html#build">方式設計書 ranking-prebuilt 8 節</a></li>
+  <li>運用の値（補充の目安・在庫水位・直近の補充）→ <a href="../../plans/pref-ranking-1.html">セット計画書 pref-ranking-1</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 ネタは「下位の県の人が笑って自虐できるか」で選ぶ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>所得・学力・犯罪率のように下位の県が笑えないネタは採らず、下位を晒さない TOP5 の版面を標準にする</dd>
+  <dt>理由</dt><dd>事業戦略書でこのセットのテーマと判定基準として決めたため</dd>
+  <dt>日付・出典</dt><dd>Phase 17（第 3 セットの立ち上げ）。<a href="../../strategy/business-strategy.html">事業戦略書</a>・<a href="../../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a></dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>

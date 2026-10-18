@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: umigame-soup-1 の生産 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / <a href="production.html">生産ライン（共通）</a> / umigame-soup-1</nav>
+<h1>umigame-soup-1 の生産（ウミガメのスープ）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-3c で新設）</span>
+  <span>1 段上: <a href="production.html">生産ライン（共通）</a>。ここには共通との違いだけを書く</span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">umigame-soup-1 は、探偵カメロックが出すウミガメのスープ（不思議な状況から真相を推理する問題）のリールを週 4 回投稿し、視聴者のコメントに<a href="comment-reply.html">コメント自動返信</a>が答える参加型のセットである。生産では、問題をオリジナルで作問し、動画の素材に加えて、コメントを判定するための材料（判定の基準・核心語）まで作る。そのため、ほかのセットにはない「判定の試行（プローブ）」の工程と関所がある。</p>
+<p class="lead">図 1 はこのセットの工程を、補充スキルのゴール（G1a〜G5）の単位で表す。共通との違いは、判定の試行が入ることと、動画のビルドを DB への投入より前に行い、投入と配置を最後にまとめて行うこと。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    G1a["G1a 候補（コア宣言）&lt;br&gt;型ごとに目標の 2 倍"] --> H1{"選別&lt;br&gt;OK / NG / 保留"}
+    H1 -->|OK| G1b["G1b 素材の仕上げ&lt;br&gt;作問スキルで 1 問ずつ"]
+    G1b --> H2{"素材のまとめレビュー"}
+    H2 -->|OK| G2["G2 試行用コメントの準備"]
+    G2 --> H3{"コメントのレビュー"}
+    H3 --> G3["G3 機械プローブ&lt;br&gt;本番と同じ判定に通す"]
+    G3 --> H4{"結果の確認・人のプローブ&lt;br&gt;GO"}
+    H4 -->|GO| G4["G4 背景の生成 → 動画ビルド&lt;br&gt;（Irodori-TTS）"]
+    G4 --> H5{"動画の全数レビュー"}
+    H5 -->|承認| G5["G5 本番へ一括アップロード&lt;br&gt;投入 + 配置 + 記録"]
+</pre>
+<figcaption>図 1 umigame-soup-1 の生産の工程（ゴール単位）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>このセットでは</th></tr></thead>
+  <tbody>
+    <tr><td>作るもの</td><td>ウミガメのスープの問題 1 問 1 本のリール。物語復元型と意味誤誘導型の 2 つの型を同数ずつ作る</td></tr>
+    <tr><td>補充スキル</td><td><a href="../../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish</a>（運用）+ <a href="../../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a>（作問）。どちらも Claude Code</td></tr>
+    <tr><td>在庫テーブル</td><td><code>umigame_stock_items</code>（動画の素材に加え、真相・判定の基準・核心語を持つ）</td></tr>
+    <tr><td>関所</td><td>候補の選別・素材のレビュー・コメントのレビュー・判定の試行の GO・動画の全数レビューの 5 つ</td></tr>
+    <tr><td>音</td><td>Irodori-TTS（ローカル）のナレーションと BGM</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="material">1. 何を作り、素材をどう集めるか</h2>
+<p class="lead">このセットの問題はすべてオリジナルで、作問スキルが決まった工程で作る。既存の問題と似すぎていないかも作問の中で確かめる。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>作り方</td><td>型を宣言 → ランダムに引いた語（モチーフ）から連想 → 型ごとの工程でコア（真相の核）を宣言（物語復元型は、先に完結した物語を書いて面白さの関門を通し、どこを隠すかを決める。意味誤誘導型は、言い方を変えて誤解を生む）→ 不思議にする → 動線・現実性・既存問題との照合で自己検査 → 素材化</td></tr>
+    <tr><td>型</td><td>物語復元型（story）と意味誤誘導型（misdirection）。1 バッチの中で同数</td></tr>
+    <tr><td>候補の置き場</td><td><code>content/umigame-stock/umigame-soup-1/candidates/&lt;バッチ&gt;/</code>（第 2 バッチで新設する）</td></tr>
+    <tr><td>素材の置き場</td><td><code>content/umigame-stock/umigame-soup-1/batch-NN/stock_items.py</code></td></tr>
+    <tr><td>機械検証と試行</td><td><code>validate.py</code>・<code>generate.py</code>、判定の試行は <code>probe_run.py</code>（本番と同じ判定と返信文の経路）・<code>build_probe_page.py</code>・<code>local_trial.py</code>（人のプローブ）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="diff">2. 共通との違い</h2>
+<p class="lead"><a href="production.html#stages">生産ライン（共通）1 章</a>の骨組みと比べたときの、このセットの違い。</p>
+<ul>
+  <li><strong>判定の試行（プローブ）</strong>: 動画を作る前に、問題ごとに試行用のコメントと期待する判定を用意し（人がレビュー）、本番と同じ判定に通して結果を人が確かめる。食い違いは素材の穴かラベルの誤りかを切り分けて直し、GO が出た問題だけを動画へ進める <a class="decision-ref" href="#d-01">→ 理由 D-01</a></li>
+  <li><strong>ビルドが投入より前</strong>: 動画のビルドは <code>stock_items.py</code> を読むので DB への投入を待たない。投入（ローカル DB と Aurora）と配置（S3）は最後の G5 で一括して行う</li>
+  <li><strong>作問を別のスキルに分ける</strong>: 作問は <code>umigame-problem-writer</code> が受け持ち、G1a で候補（コア宣言）までをまとめて、G1b で OK になった案を 1 問ずつ素材にする</li>
+  <li><strong>背景とナレーション</strong>: 背景画像を生成して全数を目視で確かめ、Irodori-TTS でナレーションを付けてビルドする</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>手順（ゴールの切り方・コマンド・作問の工程）→ <a href="../../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish の SKILL.md</a>（作問は <a href="../../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a>）</li>
+  <li>素材と動画の仕様（素材の項目・補充とレビューのペース）→ <a href="../../app/sets/umigame-soup-1.html#stock-items">セット別設計書 umigame-soup-1 4 節</a></li>
+  <li>事前ビルドの詳細（ビルドの段取り・在庫からの選び方）→ <a href="../../app/generators/umigame-prebuilt.html#build">方式設計書 umigame-prebuilt 8 節</a></li>
+  <li>運用の値（在庫水位・直近の補充・次のバッチ）→ <a href="../../plans/umigame-soup-1.html">セット計画書 umigame-soup-1</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 動画を作る前に判定の試行を通す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>問題ごとに試行用のコメントで本番と同じ判定を走らせ、人が GO を出した問題だけを動画にする</dd>
+  <dt>理由</dt><dd>投稿後のコメントには自動で返信するため、素材（真相・判定の基準・核心語）に穴があると誤った返信が出る。動画にする前に見つければ、素材の手直しだけで済む</dd>
+  <dt>日付・出典</dt><dd>Phase 21（第 1 バッチのプローブ）〜 21-8a（補充スキル）。<a href="../../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish の SKILL.md</a></dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>
