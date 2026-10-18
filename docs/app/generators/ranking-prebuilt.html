@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>方式設計書: ranking-prebuilt | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -14,30 +14,45 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（17-2 で作成）</span>
   <span>方式名（レジストリキー）: ranking-prebuilt</span>
-  <span>最終更新: 2026-10-18（Phase 30-5: セクション 8 の本体を生産の詳細設計 pref-ranking-1 へ移した）</span>
+  <span>最終更新: 2026-10-18（30-8a: 冒頭の要約と判断の記録〔D-01〜D-04〕を足し、囲みの判断を末尾へ移した。「目標設計・稼働は 17-5 以降」の古い注記を要約の状態に改めた）。2026-10-18（30-5: セクション 8 の本体を生産の詳細設計 pref-ranking-1 へ移した）</span>
 </div>
 
-<div class="note">
-  <span class="callout-title">本書の位置づけ</span>
-  生成方式 <code>ranking-prebuilt</code>（都道府県ランキング動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプライン（セクション 8。本体は Phase 30-5 で<a href="../../production/pref-ranking-1.html#build">生産の詳細設計 pref-ranking-1</a>へ移した。Remotion コンポジション・TTS 同期を含む）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、ストックの作り方・ビルドの運用も同じページ、採用セット固有の設定（アカウント・スケジュール・キャプション・デザイントークン・TTS 話者設定）は <a href="../sets/pref-ranking-1.html">sets/pref-ranking-1.html</a> を参照。分冊ルール上は「本採用時に作成」だが、<code>quiz-prebuilt</code>（16-3b）と同様に実装（17-4）の正とするため設計 Fix 時点で作成した。壁打ちの経緯は <a href="../requirements-notes-set3.html">requirements-notes-set3.html</a>。
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは生成方式 <code>ranking-prebuilt</code>（都道府県ランキング動画の事前ビルド方式）の実行時の仕様（2〜7 章）を定める。機能別の基本設計 <a href="../../overview/functions/post.html">投稿</a>の「選定」の段で、pref-ranking-1 の在庫から 1 本を選ぶ部分の詳細にあたる。動画の作り方・ビルド（Remotion コンポジション・TTS 同期）は<a href="../../production/pref-ranking-1.html#build">生産の詳細設計 pref-ranking-1</a>、セット固有の設定は <a href="../sets/pref-ranking-1.html">sets/pref-ranking-1.html</a>。図 1 は実行時の流れ。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    SFN["画像生成 SFN（当回の set_code・scheduled_at）"] --> CORE["共通骨格（image-batch）"]
+    CORE --> GEN["方式モジュール"]
+    GEN -->|ビルド済みの行を LRU で 1 件| DB[("ranking_stock_items（スロットの尺がビルド済みの行）")]
+    GEN -->|事前動画を取得| S3["S3 assets/…/prebuilt/"]
+    GEN -->|最終メディアを返す| CORE
+    CORE -->|S3 保存・generated_media 登録・出題履歴を同じトランザクションで commit| OUT["SNS 投稿へ"]
+</pre>
+<figcaption>図 1 実行時の流れ（外部 API・レンダリングは使わない）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>状態</td><td>採用中（pref-ranking-1。17-5c〔2026-08-26〕から。1 日 1 回 20:00・30 秒）</td></tr>
+    <tr><td>実行時にすること</td><td>スロットの尺（<code>duration_seconds</code>）がビルド済みの行を LRU 順繰りで 1 件選び、その尺の事前動画を S3 から取って返す（3〜5 章）</td></tr>
+    <tr><td>2 尺</td><td>20 秒 / 30 秒の 2 尺に対応する。LRU の状態は 2 尺共通で、投稿した尺は <code>ranking_items.duration_seconds</code> に残す</td></tr>
+    <tr><td>記録</td><td><code>ranking_items</code> にネタの内容と尺、<code>generated_media.audio_asset_id</code> にビルド時の BGM を写す（6 章）</td></tr>
+  </tbody>
+</table>
 </div>
-
-<div class="warn">
-  <span class="callout-title">適用状態</span>
-  17-2（2026-08-10）で設計 Fix。実装は 17-4（ビルドツーリング + Remotion 本組み + 方式モジュール）、初期ビルド・S3 配置と稼働開始は 17-5 以降を予定（ステップ分割は <a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 17）。本書は目標設計であり、実装時の差分は decision コールアウトで追記する。
-</div>
+</section>
 
 <h2>1. 方式概要</h2>
 <p><strong>背景イラスト〜ナレーション付きランキング動画を事前にローカルでビルドし、全数人間レビューのうえ S3 に作り置き</strong>しておき、実行時はランキングストック（<code>ranking_stock_items</code>）の LRU 順繰り選定と<strong>事前動画の取得・返却だけを行う</strong>軽量な方式。実行時に外部 API（画像生成・LLM・TTS）を一切呼ばない。「作り置き + 全数レビュー + 実行時は取得のみ」の構造は <code>quiz-prebuilt</code> と同型で、差分は以下の 3 点。</p>
 <ul>
   <li><strong>レンダラーが Remotion</strong>（React ベースのプログラム動画生成。Pillow + ffmpeg の組版ではなくコンポーネントとフレーム補間で版面・アニメーションを記述する）。フォーマットは <strong>TOP5 地図ルーレット型</strong>（<a href="../../production/pref-ranking-1.html#composition">生産の詳細設計 4 章</a>）</li>
   <li><strong>フルナレーション</strong>: セリフ単位の TTS（VOICEVOX）をタイムライン定数へフレーム同期させてベイクする（<a href="../../production/pref-ranking-1.html#tts-sync">生産の詳細設計 5 章</a>）</li>
-  <li><strong>2 尺対応・運用は 30 秒のみ</strong>: 方式・コンポジションは 20 秒版・30 秒版の 2 尺に対応し、スロット（<code>parameters.slots[].duration_seconds</code>）が投稿する尺を決める。ただし<strong>運用の尺は 30 秒で確定</strong>（2026-08-24 ユーザー判断 = <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a> の decision）。ビルド・投稿とも 30 秒版のみで、20 秒版は実装のまま休眠</li>
+  <li><strong>2 尺対応・運用は 30 秒のみ</strong>: 方式・コンポジションは 20 秒版・30 秒版の 2 尺に対応し、スロット（<code>parameters.slots[].duration_seconds</code>）が投稿する尺を決める。ただし<strong>運用の尺は 30 秒で確定</strong>（2026-08-24 ユーザー判断 = <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>・D-03）。ビルド・投稿とも 30 秒版のみで、20 秒版は実装のまま休眠</li>
 </ul>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-10、17-2 巡 2）: Remotion ローカル事前ビルド方式の採用と方式名</span>
-  Phase 17 の決定方針（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 17 冒頭の 9 点 = 17-1 で Fix）のうち「生成方式 = Remotion ローカル事前ビルド（quiz-prebuilt 同型の作り置き + 全数人間レビュー）」を方式として具体化する。狙いは <code>quiz-prebuilt</code> と同じ 3 点（生成 API 定常費ゼロ〔Remotion・VOICEVOX とも無料。<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>〕・投稿される完成形の全数人間レビュー・実行時の失敗面の縮小）。方式名は <code>quiz-prebuilt</code> の「コンテンツ種別 + prebuilt」の命名慣例に倣い <strong><code>ranking-prebuilt</code></strong> とした（代替案 <code>pref-ranking-prebuilt</code> はセットコードに寄り過ぎ〔方式は他セットでも再利用しうる〕、<code>remotion-prebuilt</code> は技術基盤名で既存カタログと命名粒度が揃わないため不採用）。
-</div>
+<p>方式名（レジストリキー）は <code>ranking-prebuilt</code> <a class="decision-ref" href="#d-01">→ 理由 D-01</a></p>
 <div class="table-wrap">
 <table>
 <tr><th>項目</th><th>値</th></tr>
@@ -52,7 +67,7 @@
 </div>
 
 <h2>2. 契約の実装</h2>
-<p>共通の契約（<a href="../batch-flow.html#generator-contract">batch-flow.html「生成方式の契約」</a>）を <code>generate(context: GeneratorContext) -&gt; GeneratorResult</code> で実装する。冪等性（完了判定）・S3 保存・DB 登録・トランザクション制御は共通骨格（<code>processing.py</code>）の責務であり、本方式は関与しない。<strong>共通骨格・SNS 投稿バッチの変更は、キャプション展開へのランキング系プレースホルダ追加（<a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>。実装 17-4）のみ</strong>。</p>
+<p>共通の契約（<a href="../batch-flow.html#generator-contract">batch-flow.html「生成方式の契約」</a>）を <code>generate(context: GeneratorContext) -&gt; GeneratorResult</code> で実装する。冪等性（完了判定）・S3 保存・DB 登録・トランザクション制御は共通骨格（<code>processing.py</code>）の責務であり、本方式は関与しない。<strong>共通骨格・SNS 投稿バッチの変更は、キャプション展開へのランキング系プレースホルダ追加（<a href="../batch-flow.html#caption-extension">batch-flow.html 3.4「キャプションの作り方」</a>。実装 17-4）のみ</strong>。</p>
 <div class="table-wrap">
 <table>
 <tr><th>要素</th><th>使い方</th></tr>
@@ -77,10 +92,7 @@
 <tr><td><code>duration_seconds</code></td><td>必須</td><td><strong>このスロットが投稿する尺（20 または 30 のみ許容。それ以外は parameters 不正として異常終了）</strong>。ストック取得の絞り込み（当該尺の事前動画がビルド済みの行のみ候補）と、S3 から取得するカラム（<code>video_s3_key_20s</code> / <code>_30s</code>）の選択に使う</td></tr>
 </table>
 </div>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-10、17-2 巡 2・巡 3）: 尺はスロット単位の固定値とする</span>
-  2 尺（20 秒 / 30 秒）のどちらを投稿するかは<strong>スロットの設定値 <code>duration_seconds</code> で固定</strong>する。日付・乱数による実行時の出し分けロジックは持たない（決定的解決の維持。同じスロットの再実行は必ず同じ尺になり、冪等性と検証の解釈が単純になる）。尺比較の検証（17-6）は「昼 = 20 秒 / 夜 = 30 秒」のスロット分離で行い、時間帯交絡の打ち消し（検証後半のスワップ）や尺確定後の一本化は <strong><code>parameters</code> の UPDATE だけで行える</strong>（両尺ビルド済みのため設定変更と資産が食い違わない。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>）。クイズ方式の <code>slot_label</code>（時間帯ラベル帯）・<code>quiz_type</code> / <code>difficulty</code>（型・難度絞り込み）に相当するフィールドは本方式にはない — ランキングのネタはスロット非依存で、版面にも時間帯要素を持たないため。<br><strong>2026-08-24 追記</strong>: 尺は 30 秒で確定し（2 尺検証は中止 = セット別設計書セクション 3 の decision）、運用スロットは <code>evening</code>（30 秒）の 1 本になった。仕組みとしての 2 尺対応（20 / 30 の許容・スロット別 <code>duration_seconds</code>）は変更しない。
-</div>
+<p>どちらの尺を投稿するかはスロットの設定値 <code>duration_seconds</code>（20 / 30）で固定し、日付・乱数による出し分けはしない。本方式にはクイズ方式の <code>slot_label</code>・<code>quiz_type</code> / <code>difficulty</code> に相当するフィールドはない。pref-ranking-1 の運用スロットは <code>evening</code>（30 秒）の 1 本で、仕組みとしての 2 尺対応はそのまま残す <a class="decision-ref" href="#d-02">→ 理由 D-02</a></p>
 
 <h2 id="stock">4. ランキングストックの取得（当該尺ビルド済み限定の LRU 順繰り）</h2>
 <p>ネタは <code>ranking_stock_items</code>（<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）から LRU 順繰りで取得する。<code>quiz-prebuilt</code> の選定（<a href="quiz-prebuilt.html#stock">同セクション 4</a>）との差分は、絞り込みが型・難度ではなく<strong>「スロットの尺に対応する事前動画がビルド済み」</strong>である点のみ（<code>{尺カラム}</code> は <code>duration_seconds</code> から <code>video_s3_key_20s</code> / <code>video_s3_key_30s</code> のどちらかに解決する。20 / 30 以外は事前に検証済みのため SQL 組み立ては安全）。</p>
@@ -96,14 +108,8 @@
   <li><strong>防御的フィールド検査</strong>: <code>title</code> 非空、<code>content_fields</code> の必須キー（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>result_list</code>）の存在・非空、<code>ranking_data.entries</code> が 5 件で <code>rank</code> 1〜5 が一意であること、<code>video_audio_asset_id</code> 非 NULL。動画には使わないが<strong>キャプションのプレースホルダ展開（<code>ranking_items</code> 経由）の入力になる</strong>ため検査する。不備は異常終了（投入ミスの検知）</li>
   <li><code>last_used_at</code> / <code>use_count</code> の UPDATE は事前動画の取得成功後に行い、commit は共通骨格に委ねる（失敗時はストック消費の副作用ごとロールバック）</li>
 </ul>
-<div class="decision">
-  <span class="callout-title">決定（17-2 巡 2）: <code>last_used_at</code> は 2 尺共通（尺別に持たない）</span>
-  同一ネタの 20 秒版と 30 秒版は<strong>同じ内容の別尺</strong>であり、片方を投稿した直後にもう片方が別スロットで選ばれると同一アカウントに実質同じ内容が近接して並ぶ。これを防ぐため LRU の状態（<code>last_used_at</code> / <code>use_count</code>）は尺別に分けず 1 組だけ持ち、<strong>どちらの尺で使ってもネタ全体が LRU キューの末尾に回る</strong>。どの尺で投稿したかの記録は履歴側（<code>ranking_items.duration_seconds</code>）が持ち、尺別の効果検証はそちらで行う（<a href="../data-model.html#detail-ranking-items">data-model.html セクション 4.12</a>）。
-</div>
-<div class="decision">
-  <span class="callout-title">決定（17-2 巡 2）: 未ビルト行・片尺のみビルド済みの行は「選ばれない」のであって「エラーにしない」</span>
-  <code>quiz-prebuilt</code> セクション 4 の decision を踏襲する。当該尺が未ビルトの行は絞り込みで候補から除外され、他のビルド済み在庫で投稿は止まらない（週次補充の「投入 → ビルド」の間に実行が走っても安全）。<strong>片尺のみビルド済みの行はその尺のスロットの候補にだけ入る</strong>（尺確定後は勝ち尺のみビルドする運用〔<a href="../../production/pref-ranking-1.html#inventory">生産の詳細設計 pref-ranking-1 の 7 章</a>〕になるため、これは正常な状態でもある）。未ビルトの滞留は WARNING と在庫確認クエリで検知する。
-</div>
+<p>LRU の状態（<code>last_used_at</code> / <code>use_count</code>）は 2 尺共通の 1 組で、どちらの尺で使ってもネタ全体がキューの末尾に回る。どの尺で投稿したかは <code>ranking_items.duration_seconds</code> が持つ（<a href="../data-model.html#detail-ranking-items">data-model.html 4.12</a>） <a class="decision-ref" href="#d-03">→ 理由 D-03</a></p>
+<p>当該尺が未ビルトの行は候補から外し、エラーにしない。片尺のみビルド済みの行はその尺のスロットの候補にだけ入る。未ビルトの滞留は WARNING と在庫確認クエリで検知する <a class="decision-ref" href="#d-04">→ 理由 D-04</a></p>
 
 <h2 id="fetch">5. 事前動画の取得</h2>
 <p>選定したストック行の当該尺カラム（<code>video_s3_key_20s</code> / <code>_30s</code>）から MP4 を取得する（<code>acps_shared.s3.get_object</code>）。キーの値はビルドツーリングが登録した <code>assets/{set_code}/prebuilt/{content_key}_20s.mp4</code> / <code>_30s.mp4</code>（命名規約は <a href="../data-model.html#s3-key">data-model.html セクション 5</a>。環境非依存の業務キー <code>content_key</code> で組む — <code>quiz-prebuilt</code> の 16-3d 決定を最初から適用。<strong>参照は常に DB カラム経由で行い、方式がキーを組み立てることはしない</strong>）。</p>
@@ -120,7 +126,7 @@
 <tr><td>投稿履歴</td><td>—</td><td><code>ranking_items</code> に 1 行（<code>format</code> / <code>title</code> / <code>content_fields</code> / <code>ranking_data</code> のスナップショット + <code>duration_seconds</code> + <code>stock_item_id</code>。<strong>キャプション展開の入力と尺別効果検証の記録のため必須</strong>。共通骨格の同一トランザクションで確定）</td></tr>
 </table>
 </div>
-<p><code>file_format='mp4'</code> → <code>posts.media_type='reel'</code> の導出、キャプションのプレースホルダ展開（ランキング系 5 種 = <a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>）、ストーリーズ再掲（<code>stories_enabled=1</code>）はいずれも共通側の既存機構で行われる。<code>generated_media.audio_asset_id</code> への転記は <code>quiz-prebuilt</code> セクション 6 の decision と同じ理由（ミュート検知運用の特定クエリを無変更で成立させる）で、BGM は 1 ネタ 1 曲を 2 尺共通でベイクする（<a href="../../production/pref-ranking-1.html#build-steps">生産の詳細設計 3.1 工程 3</a>）。NULL（転記元の未記録）は許容しない（ビルドツーリングの登録漏れ検知として異常終了）。</p>
+<p><code>file_format='mp4'</code> → <code>posts.media_type='reel'</code> の導出、キャプションのプレースホルダ展開（ランキング系 5 種 = <a href="../batch-flow.html#caption-extension">batch-flow.html 3.4「キャプションの作り方」</a>）、ストーリーズ再掲（<code>stories_enabled=1</code>）はいずれも共通側の既存機構で行われる。<code>generated_media.audio_asset_id</code> への転記は <code>quiz-prebuilt</code> の D-04 と同じ理由（ミュート検知運用の特定クエリを無変更で成立させる）で、BGM は 1 ネタ 1 曲を 2 尺共通でベイクする（<a href="../../production/pref-ranking-1.html#build-steps">生産の詳細設計 3.1 工程 3</a>）。NULL（転記元の未記録）は許容しない（ビルドツーリングの登録漏れ検知として異常終了）。</p>
 
 <h2>7. エラーハンドリング</h2>
 <p>方式内のリカバリループはない。異常（<code>parameters</code> 不正〔<code>duration_seconds</code> が 20 / 30 以外を含む〕・当該尺のビルド済みストック 0 件・ストック行のフィールド不備・<code>video_audio_asset_id</code> 未記録・事前動画の取得失敗）はすべて例外を送出し、共通骨格が捕捉 → ロールバック → Step Functions Retry → 失敗アラーム通知につながる（<code>quiz-prebuilt</code> セクション 7 と同型）。実行時の主な失敗面は SNS 投稿側（Graph API）になる。</p>
@@ -157,6 +163,47 @@
   <li><strong>ナレーション</strong>: 全県読み上げは尺に収まらないため、地方ブロック単位のコメント + 上位・特徴県のピックアップ実況を想定（cue 体系の拡張が必要）</li>
 </ul>
 
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 Remotion のローカル事前ビルドを採り、方式名を ranking-prebuilt にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>生成方式を Remotion ローカル事前ビルド（quiz-prebuilt 同型の作り置き + 全数人間レビュー）とし、方式名を <code>ranking-prebuilt</code> にした</dd>
+  <dt>理由</dt><dd>Phase 17 の決定方針（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 17 冒頭の 9 点 = 17-1 で Fix）のうち「生成方式 = Remotion ローカル事前ビルド（quiz-prebuilt 同型の作り置き + 全数人間レビュー）」を方式として具体化する。狙いは <code>quiz-prebuilt</code> と同じ 3 点（生成 API 定常費ゼロ〔Remotion・VOICEVOX とも無料。<a href="../../strategy/business-strategy.html#cost-model">事業戦略書セクション 3.1</a>〕・投稿される完成形の全数人間レビュー・実行時の失敗面の縮小）。方式名は <code>quiz-prebuilt</code> の「コンテンツ種別 + prebuilt」の命名慣例に倣い <strong><code>ranking-prebuilt</code></strong> とした（代替案 <code>pref-ranking-prebuilt</code> はセットコードに寄り過ぎ〔方式は他セットでも再利用しうる〕、<code>remotion-prebuilt</code> は技術基盤名で既存カタログと命名粒度が揃わないため不採用）。</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（17-2 巡 2）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 尺はスロット単位の固定値にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>どちらの尺を投稿するかをスロットの設定値 <code>duration_seconds</code> で固定し、実行時の出し分けロジックを持たない</dd>
+  <dt>理由</dt><dd>2 尺（20 秒 / 30 秒）のどちらを投稿するかは<strong>スロットの設定値 <code>duration_seconds</code> で固定</strong>する。日付・乱数による実行時の出し分けロジックは持たない（決定的解決の維持。同じスロットの再実行は必ず同じ尺になり、冪等性と検証の解釈が単純になる）。尺比較の検証（17-6）は「昼 = 20 秒 / 夜 = 30 秒」のスロット分離で行い、時間帯交絡の打ち消し（検証後半のスワップ）や尺確定後の一本化は <strong><code>parameters</code> の UPDATE だけで行える</strong>（両尺ビルド済みのため設定変更と資産が食い違わない。検証の回し方は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a>）。クイズ方式の <code>slot_label</code>（時間帯ラベル帯）・<code>quiz_type</code> / <code>difficulty</code>（型・難度絞り込み）に相当するフィールドは本方式にはない — ランキングのネタはスロット非依存で、版面にも時間帯要素を持たないため。<br><strong>2026-08-24 追記</strong>: 尺は 30 秒で確定し（2 尺検証は中止 = セット別設計書 pref-ranking-1 の D-03）、運用スロットは <code>evening</code>（30 秒）の 1 本になった。仕組みとしての 2 尺対応（20 / 30 の許容・スロット別 <code>duration_seconds</code>）は変更しない。</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（17-2 巡 2・巡 3）・2026-08-24 追記</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 last_used_at は 2 尺で共通にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>LRU の状態（<code>last_used_at</code> / <code>use_count</code>）を尺別に持たず 1 組だけにする</dd>
+  <dt>理由</dt><dd>同一ネタの 20 秒版と 30 秒版は<strong>同じ内容の別尺</strong>であり、片方を投稿した直後にもう片方が別スロットで選ばれると同一アカウントに実質同じ内容が近接して並ぶ。これを防ぐため LRU の状態（<code>last_used_at</code> / <code>use_count</code>）は尺別に分けず 1 組だけ持ち、<strong>どちらの尺で使ってもネタ全体が LRU キューの末尾に回る</strong>。どの尺で投稿したかの記録は履歴側（<code>ranking_items.duration_seconds</code>）が持ち、尺別の効果検証はそちらで行う（<a href="../data-model.html#detail-ranking-items">data-model.html セクション 4.12</a>）。</dd>
+  <dt>日付・出典</dt><dd>17-2 巡 2</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 未ビルト・片尺だけの行は選ばないだけで、エラーにしない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>当該尺が未ビルトの行は絞り込みで候補から外し、片尺だけビルド済みの行はその尺のスロットにだけ入れる</dd>
+  <dt>理由</dt><dd><code>quiz-prebuilt</code> の D-02 を踏襲する。当該尺が未ビルトの行は絞り込みで候補から除外され、他のビルド済み在庫で投稿は止まらない（週次補充の「投入 → ビルド」の間に実行が走っても安全）。<strong>片尺のみビルド済みの行はその尺のスロットの候補にだけ入る</strong>（尺確定後は勝ち尺のみビルドする運用〔<a href="../../production/pref-ranking-1.html#inventory">生産の詳細設計 pref-ranking-1 の 7 章</a>〕になるため、これは正常な状態でもある）。未ビルトの滞留は WARNING と在庫確認クエリで検知する。</dd>
+  <dt>日付・出典</dt><dd>17-2 巡 2</dd>
+</dl>
+</article>
+</section>
+
 </div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
 </body>
 </html>

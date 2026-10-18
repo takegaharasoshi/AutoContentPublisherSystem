@@ -12,9 +12,15 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / gpt-image-single</nav>
 <h1>方式設計書: gpt-image-single</h1>
 <div class="page-meta">
+  <span class="badge badge-future">退役（2026-10-18・30-8a）</span>
   <span class="badge badge-fixed">Fix（13-2 で作成）</span>
   <span>方式名（レジストリキー）: gpt-image-single</span>
-  <span>最終更新: 2026-07-23</span>
+  <span>最終更新: 2026-10-18（30-8a: 退役の表示を足した。本文は退役時点の記録で、新しい書式へは移していない）。以前: 2026-07-23</span>
+</div>
+
+<div class="warn" id="retired">
+  <span class="callout-title">この方式は退役している</span>
+  実行時生成方式で、採用セットはなく実行時には使われない（13-1〜14-10 は fantasy-animals-1 が採用。14-10 の動画切替以後は採用セットなし）。コード（<code>services/image-batch/app/generators/</code>）とレジストリ登録・本書は残してあり、どれかのセットの <code>batch_sets.generator_name</code> に設定すれば再開できる。使い直すときは画像生成 API キーの設定（<a href="../operation.html#image-api-key">operation.html 5.5</a>）が要る。状態の一覧は<a href="../batch-flow.html#generator-catalog">方式カタログ</a>、退役の判断は <a href="../batch-flow.html#d-21">batch-flow.html D-21</a>。
 </div>
 
 <div class="note">

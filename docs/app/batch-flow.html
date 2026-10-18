@@ -139,7 +139,7 @@ flowchart TB
 <p>実行コンテキスト（実装上は <code>GeneratorContext</code>）には、共通骨格が確定済みの生成実行の <code>scheduled_at</code>（UTC）と <code>generation_run_id</code> が入る。方式は環境変数 <code>SCHEDULED_AT</code> を直接読まない <a class="decision-ref" href="#d-04">→ 理由 D-04</a></p>
 
 <h4 id="generator-catalog">方式カタログ</h4>
-<p>生成方式の設計は本書に書き足さず、<code>docs/app/generators/&lt;方式名&gt;.html</code> に 1 方式 1 本で分冊する（<strong>セットが本採用した時点で作成</strong>。試行段階では書かない。ルールは <a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。本書には以下のカタログのみを置き、方式の追加・退役・廃止はこの表の行の追加・更新で管理する。行は削除しない。ステータスは 3 つ: <strong>採用中</strong> = 稼働中のセットが使う / <strong>退役</strong> = 採用セットがなく実行時に使われないが、コード・レジストリ登録・方式設計書を残し再開できる / <strong>廃止</strong> = コードからも外した。稼働中の 3 セットはすべて事前ビルド方式（<code>*-prebuilt</code>）で、実行時に生成 API・組版・動画合成を使わない。</p>
+<p>生成方式の設計は本書に書き足さず、<code>docs/app/generators/&lt;方式名&gt;.html</code> に 1 方式 1 本で分冊する（<strong>セットが本採用した時点で作成</strong>。試行段階では書かない。ルールは <a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。本書には以下のカタログのみを置き、方式の追加・退役・廃止はこの表の行の追加・更新で管理する。行は削除しない <a class="decision-ref" href="#d-21">→ 理由 D-21</a>。ステータスは 3 つ: <strong>採用中</strong> = 稼働中のセットが使う / <strong>退役</strong> = 採用セットがなく実行時に使われないが、コード・レジストリ登録・方式設計書を残し再開できる / <strong>廃止</strong> = コードからも外した。稼働中の 3 セットはすべて事前ビルド方式（<code>*-prebuilt</code>）で、実行時に生成 API・組版・動画合成を使わない。</p>
 
 <div class="table-wrap">
 <table>
@@ -160,12 +160,12 @@ flowchart TB
     <tr>
       <td><code>gpt-quiz-multicut</code></td>
       <td>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>）から LRU 順繰りで 1 問を取得 → 情景イラスト生成（ストックの <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔4 表情〕+ 日本語フォントを時間帯スロット別パレットで<strong>全カット共通の固定版面</strong>に合成。カット間の差分は吹き出し・カウントダウンのみ）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、16 秒・3 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式（16-4c で 4 カット → 3 カット）。答え・解説は動画に載せずキャプション側で開示する。出題の型・難度（ストック絞り込み）・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える。実行時の LLM 問題生成・検証チェーンは 16-1 で休止（方式設計書セクション 5）</td>
-      <td><strong>退役</strong>（15-14〜2026-08-08 は logic-training-1 が採用。16-3b の事前生成転換で実行時方式としては採用セットなし。組版・ffmpeg 合成は <code>quiz-prebuilt</code> の事前ビルドのレンダラーとして使い続けている）</td>
+      <td><strong>退役</strong>（15-14〜2026-08-08 は logic-training-1 が採用。16-3b の事前生成転換で実行時方式としては採用セットなし。組版・ffmpeg 合成は <code>quiz-prebuilt</code> の事前ビルドのレンダラーとして改修 R-1〔2026-09-03〕まで使った。現行のレンダラーは Remotion）</td>
       <td><a href="generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>（15-16 で作成・16-1 で全面改訂）</td>
     </tr>
     <tr>
       <td><code>quiz-prebuilt</code></td>
-      <td>クイズ動画の<strong>事前生成方式</strong>。イラスト（imagegen）〜動画（gpt-quiz-multicut のレンダラー流用）を事前にローカルでビルドし、全数人間レビューのうえ S3（ライフサイクル対象外の <code>assets/.../prebuilt/</code>）に作り置く。実行時は問題ストック（<code>quiz_stock_items</code>）のビルド済み行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・組版・動画合成を実行時に使わない</strong>）。<code>quiz_items</code> 記録・キャプション展開・ストーリーズ再掲は gpt-quiz-multicut と同一。<code>parameters</code> 互換のため切替は <code>batch_sets.generator_name</code> の UPDATE のみ</td>
+      <td>クイズ動画の<strong>事前生成方式</strong>。イラスト（imagegen）〜動画（Remotion。改修 R-1〔2026-09-03〕までは gpt-quiz-multicut のレンダラーを流用）を事前にローカルでビルドし、全数人間レビューのうえ S3（ライフサイクル対象外の <code>assets/.../prebuilt/</code>）に作り置く。実行時は問題ストック（<code>quiz_stock_items</code>）のビルド済み行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・組版・動画合成を実行時に使わない</strong>）。<code>quiz_items</code> 記録・キャプション展開・ストーリーズ再掲は gpt-quiz-multicut と同一。<code>parameters</code> 互換のため切替は <code>batch_sets.generator_name</code> の UPDATE のみ</td>
       <td><strong>採用中</strong>（logic-training-1。16-4〔2026-08-08〕から。朝・夜の 1 日 2 回。昼は 16-4d〔2026-08-24〕から当分停止 = <a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</td>
       <td><a href="generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>（16-3b で作成）</td>
     </tr>
@@ -177,7 +177,7 @@ flowchart TB
     </tr>
     <tr>
       <td><code>umigame-prebuilt</code></td>
-      <td>ウミガメのスープ（水平思考クイズ）リール動画の<strong>事前生成方式</strong>。<code>ranking-prebuilt</code> と同型（背景イラスト〔imagegen〕+ ナレーション〔ビルド時の TTS。現行は Irodori-TTS〕+ Remotion レンダリング）で、<strong>単尺（現行 29 秒）・ループ前提</strong>の動画を事前にローカルでビルドし、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はストック（<code>umigame_stock_items</code>）のビルド済み行を軸なしの LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>umigame_items</code> に問題固有部分（問題文・真相・確定事実シート・キャプション）をスナップショットし、SNS 投稿バッチの umigame 系プレースホルダ展開（<a href="#caption-extension">3.4「キャプションの作り方」</a>）と <strong>publish 成功直後の問題スナップショット出力</strong>（<a href="#problem-snapshot">3.3 手順 6</a>。コメント自動返信経路の読み取り元）の展開元にする</td>
+      <td>ウミガメのスープ（水平思考クイズ）リール動画の<strong>事前生成方式</strong>。<code>ranking-prebuilt</code> と同型（背景イラスト〔imagegen〕+ ナレーション〔ビルド時の TTS。現行は Irodori-TTS〕+ Remotion レンダリング）で、<strong>単尺（現行 29 秒）</strong>の動画を事前にローカルでビルドし、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はストック（<code>umigame_stock_items</code>）のビルド済み行を軸なしの LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>umigame_items</code> に問題固有部分（問題文・真相・確定事実シート・キャプション）をスナップショットし、SNS 投稿バッチの umigame 系プレースホルダ展開（<a href="#caption-extension">3.4「キャプションの作り方」</a>）と <strong>publish 成功直後の問題スナップショット出力</strong>（<a href="#problem-snapshot">3.3 手順 6</a>。コメント自動返信経路の読み取り元）の展開元にする</td>
       <td><strong>採用中</strong>（umigame-soup-1。21-7〔2026-10-12〕から。週 4 回〔日・火・木・土の 20:00〕。尺はセット改修 R-1〔2026-10-17〕で 24 秒から 29 秒へ）</td>
       <td><a href="generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>（21-3 で作成）</td>
     </tr>
@@ -710,6 +710,15 @@ flowchart TB
   <dt>決めたこと</dt><dd>レート制限は一過性に含めない。① ② のやり直しの前に待ちを入れない。処理待ちの上限到達はやり直さない</dd>
   <dt>理由</dt><dd>レート制限はすぐやり直しても解けない。① ② の失敗はすでに数秒〜数分経っており、Step Functions の時間枠を延ばさないため待たない。リールの待ち上限は約 10 分あり、上限到達をやり直すとタスクの時間が倍になる</dd>
   <dt>日付・出典</dt><dd>2026-10-17（Phase 28-1）</dd>
+</dl>
+</article>
+<article id="d-21">
+<h3>D-21 実行時生成の 3 方式は退役とし、設計書はその場に残す</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>gpt-image-single</code>・<code>gpt-image-kenburns</code>・<code>gpt-quiz-multicut</code> を方式カタログで「退役」にし、方式設計書は <code>docs/_archive/</code> へ移さず <code>generators/</code> に退役の表示を付けて残す。本文は退役時点の記録として新しい書式へは移さない</dd>
+  <dt>理由</dt><dd>コードとレジストリ登録が残っており、<code>generator_name</code> の UPDATE だけで再開できる。<code>gpt-quiz-multicut.html</code> のストックのフィールド仕様・イラスト・組版の記述は <code>quiz-prebuilt</code>・生産の詳細設計・データモデル設計など 28 ファイルから今も参照されており、移すとリンクが大量に切れる。<code>docs/_archive/</code> は旧 Markdown 設計書の置き場で、HTML の方式設計書の置き場ではない</dd>
+  <dt>退けた案</dt><dd><code>docs/_archive/</code> へ移す案（上記の理由）</dd>
+  <dt>日付・出典</dt><dd>2026-10-18（30-8a。課題 <a href="../issues/index.html#I-040">I-040</a> の掃除リスト）</dd>
 </dl>
 </article>
 </section>

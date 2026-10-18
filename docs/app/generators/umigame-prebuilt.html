@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>方式設計書: umigame-prebuilt | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -14,18 +14,36 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（21-3 で作成）</span>
   <span>方式名（レジストリキー）: umigame-prebuilt</span>
-  <span>最終更新: 2026-10-13（21-8d1: ストックの取得と出題履歴へ写す項目に <code>core_words</code>〔V017〕を足した）。前回: 2026-10-12（21-6i: 投稿頻度を週 4 回〔日・火・木・土〕にしたのに合わせ、4 の在庫の目安を 8 件に・スロットの説明を直した）。前回: 2026-10-12（21-6h: 出題履歴へ写す項目に <code>title</code> を追加〔V015。前回の真相ブロックの見出し用〕）。前回: 2026-10-08（21-6d7c: ストックから出題履歴へ写す項目に <code>judge_criteria</code> を追加〔V014〕）。前回: 2026-09-30（21-6c1: ストックから出題履歴へ写す項目に <code>core_points</code>・<code>reveal_text</code> を追加〔V013〕）。前回: 2026-09-26（21-5b: 実行時モジュール <code>umigame_prebuilt.py</code> を実装し、セクション 2 に実装の差分を追記）。前回: 2026-09-23（21-5a の実装差分を 8.1 に追記）</span>
+  <span>最終更新: 2026-10-18（30-8a: 冒頭の要約と判断の記録〔D-01〜D-03〕を足し、囲みの判断を末尾へ移した。「目標設計・稼働は 21-7 予定」の古い注記を要約の状態に改めた）。2026-10-13（21-8d1: <code>core_words</code>〔V017〕を写す項目に足した）。以前の更新履歴は git の履歴を参照</span>
 </div>
 
-<div class="note">
-  <span class="callout-title">本書の位置づけ</span>
-  生成方式 <code>umigame-prebuilt</code>（ウミガメのスープ リール動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプライン（セクション 8。本体は Phase 30-6a で<a href="../../production/umigame-soup-1.html#build">生産の詳細設計 umigame-soup-1</a>へ移した）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、採用セット固有の設定（アカウント・スケジュール・素材項目・キャプション・音源・TTS 話者・固定アセット・コメント返信の運用）は <a href="../sets/umigame-soup-1.html">sets/umigame-soup-1.html</a> を参照。<strong><code>ranking-prebuilt</code>（<a href="ranking-prebuilt.html">方式設計書</a>）と同型</strong>で、差分は「単尺（24 秒）・LRU の軸なし・投稿後スナップショットの対象（スナップショット出力自体は SNS 投稿バッチの責務）」の 3 点。21-2 の PoC（<code>content/video-build/umigame-soup-1/</code>）で完成版リールを 1 本作り、人間ゲートで「この版面を本方式の基準とする」と決めたうえで本書を Fix した。
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは生成方式 <code>umigame-prebuilt</code>（ウミガメのスープのリール動画の事前ビルド方式）の実行時の仕様（2〜7 章）を定める。機能別の基本設計 <a href="../../overview/functions/post.html">投稿</a>の「選定」の段で、umigame-soup-1 の在庫から 1 本を選ぶ部分の詳細にあたる。動画の作り方・ビルドは<a href="../../production/umigame-soup-1.html#build">生産の詳細設計 umigame-soup-1</a>、セット固有の設定は <a href="../sets/umigame-soup-1.html">sets/umigame-soup-1.html</a>。版面の座標・ビート・効果の実装の正は <code>remotion/src/timeline.ts</code> と <code>UmigameReel.tsx</code>。図 1 は実行時の流れ。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    SFN["画像生成 SFN（当回の set_code・scheduled_at）"] --> CORE["共通骨格（image-batch）"]
+    CORE --> GEN["方式モジュール"]
+    GEN -->|ビルド済みの行を LRU で 1 件| DB[("umigame_stock_items（軸なし・ビルド済みの行）")]
+    GEN -->|事前動画を取得| S3["S3 assets/…/prebuilt/"]
+    GEN -->|最終メディアを返す| CORE
+    CORE -->|S3 保存・generated_media 登録・出題履歴を同じトランザクションで commit| OUT["SNS 投稿へ"]
+</pre>
+<figcaption>図 1 実行時の流れ（外部 API・レンダリングは使わない）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>状態</td><td>採用中（umigame-soup-1。21-7〔2026-10-12〕から。週 4 回〔日・火・木・土の 20:00〕）</td></tr>
+    <tr><td>実行時にすること</td><td>ビルド済みの行を軸なしの LRU 順繰り（未使用は id の小さい順 = 投入順）で 1 件選び、事前動画を S3 から取って返す（4・5 章）</td></tr>
+    <tr><td>尺</td><td>単尺・単一スロット（現行 29 秒。2026-10-17 のセット改修 R-1 までは 24 秒）</td></tr>
+    <tr><td>記録</td><td><code>umigame_items</code> に問題固有部分をスナップショットし、SNS 投稿バッチのキャプション展開と問題スナップショット出力の展開元にする（6 章）</td></tr>
+  </tbody>
+</table>
 </div>
-
-<div class="warn">
-  <span class="callout-title">適用状態</span>
-  21-3（2026-09-04）で設計 Fix。ビルドツーリングと第 1 バッチの全数ビルドは 21-5a、方式モジュール（<code>services/image-batch/app/generators/umigame_prebuilt.py</code> + <code>REGISTRY</code> 登録）は 21-5b、稼働開始は 21-7 を予定（<a href="../../plans/development-plan.html">docs/plans/development-plan.html</a> Phase 21）。本書は目標設計であり、実装時の差分は decision コールアウトで追記する。版面の座標・ビート・効果の<strong>実装の正は <code>remotion/src/timeline.ts</code> と <code>UmigameReel.tsx</code></strong>であり、本書には構成と不変条件だけを書く（21-2 申し送り）。
-</div>
+</section>
 
 <h2>1. 方式概要</h2>
 <p><strong>ウミガメのスープ 1 問につきリール動画（1080x1920・30fps・29 秒・AAC。2026-10-17 のセット改修 R-1 までは 24 秒）をローカルで事前にビルドし、全数人間レビューのうえ S3 に作り置く</strong>。実行時（画像生成バッチ）はストック <code>umigame_stock_items</code> のうちビルド済みの行を LRU 順繰りで 1 件選び、事前動画を S3 から取得して <code>GeneratorResult</code> として返すだけで、<strong>外部 API・レンダリングを実行時に使わない</strong>（定常費ゼロ路線。<code>quiz-prebuilt</code> / <code>ranking-prebuilt</code> と同じ思想）。</p>
@@ -43,7 +61,7 @@
 <table>
   <thead><tr><th>要素</th><th>使い方</th></tr></thead>
   <tbody>
-    <tr><td><code>context.prompt_config</code></td><td><code>parameters</code>（尺。セクション 3）・<code>set_id</code>。<code>prompt_text</code> は<strong>本方式では未使用</strong>（セット別設計書 5.1 の decision により AI 出題者プロンプトのセット固定部分に充てる。読むのは SNS 投稿バッチのスナップショット出力）</td></tr>
+    <tr><td><code>context.prompt_config</code></td><td><code>parameters</code>（尺。セクション 3）・<code>set_id</code>。<code>prompt_text</code> は<strong>本方式では未使用</strong>（セット別設計書 5.1 の決定により AI 出題者プロンプトのセット固定部分に充てる。読むのは SNS 投稿バッチのスナップショット出力）</td></tr>
     <tr><td><code>context.scheduled_at</code></td><td>スロット解決には使わない（単一スロット）。ログ出力のみ</td></tr>
     <tr><td><code>context.generation_run_id</code></td><td><code>umigame_items</code> INSERT の紐づけ</td></tr>
     <tr><td><code>context.cursor</code></td><td><code>batch_sets</code>（set_code 解決）・<code>umigame_stock_items</code>（ストック取得・<code>last_used_at</code> / <code>use_count</code> 更新）・<code>umigame_items</code>（履歴 INSERT）</td></tr>
@@ -54,9 +72,9 @@
 </table>
 </div>
 <p>処理順序: ① <code>parameters</code> 検証 → ② <strong>ストック取得（ビルド済み限定の LRU。セクション 4）</strong> → ③ <strong>S3 から事前動画を取得</strong>（欠落はフェイルラウド。セクション 5）→ ④ <code>umigame_items</code> INSERT + ストックの <code>last_used_at</code> / <code>use_count</code> 更新 → ⑤ <code>GeneratorResult</code> を返す。フォント・キャラアセット・BGM の事前検査、API キー取得はいずれも<strong>不要</strong>（実行時に使わないため）。</p>
-<div class="decision">
-  <span class="callout-title">実装（2026-09-26、21-5b）: <code>services/image-batch/app/generators/umigame_prebuilt.py</code>・REGISTRY 名 <code>umigame-prebuilt</code></span>
-  設計どおりに実装した。設計より厳しくした点が 2 つある: ① <code>parameters</code> は <code>duration_seconds</code> の 1 キーだけを許し、<code>slots</code> など他のキーがあれば不正として異常終了する（単一スロットの宣言を設定ミスから守るため） ② ストック行の <code>video_audio_asset_id</code> が NULL の行も異常終了にする（ビルド済みの行は BGM を焼き込んでいるので、NULL は publish 手順の不備）。ストックは取得 SQL（セクション 4）により<strong>未使用の行を id の小さい順</strong>に消費するため、投入時の INSERT 順がそのまま投稿順になる（21-5a の <code>POST_ORDER</code>。単体テストで ORDER BY 句と選ばれる行を押さえている）。
+<div>
+<p><strong>実装（<code>services/image-batch/app/generators/umigame_prebuilt.py</code>・REGISTRY 名 <code>umigame-prebuilt</code>）</strong> <a class="decision-ref" href="#d-01">→ 理由 D-01</a></p>
+設計どおりに実装した。設計より厳しくした点が 2 つある: ① <code>parameters</code> は <code>duration_seconds</code> の 1 キーだけを許し、<code>slots</code> など他のキーがあれば不正として異常終了する ② ストック行の <code>video_audio_asset_id</code> が NULL の行も異常終了にする。ストックは取得 SQL（セクション 4）により<strong>未使用の行を id の小さい順</strong>に消費するため、投入時の INSERT 順がそのまま投稿順になる（21-5a の <code>POST_ORDER</code>。単体テストで ORDER BY 句と選ばれる行を押さえている）。
 </div>
 
 <h2 id="parameters">3. 入力（parameters。単一スロット・単尺）</h2>
@@ -69,15 +87,9 @@
   </tbody>
 </table>
 </div>
-<div class="decision">
-  <span class="callout-title">決定（2026-09-04、21-3）: 単尺・単一スロット。尺の複数化は想定しない</span>
-  ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。理由: ① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低い。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<strong>2026-10-17 追記（R-1）</strong>: 単尺のまま 24 秒 → 29 秒へ変え、ループ前提（②の周期の制約）をやめた（8.2 の決定）。画像バッチ側は課題 <a href="../../issues/index.html#I-041">I-041</a> を <a href="../../plans/development-log.html#phase-29">Phase 29</a> で合わせる（下の決定）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。
-</div>
+<p>単尺・単一スロット（現行 29 秒。<code>parameters</code> は <code>duration_seconds</code> の 1 キーだけ）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。尺を変えるときは <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4） <a class="decision-ref" href="#d-02">→ 理由 D-02</a></p>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-10-17、29-1〜29-3）: 宣言値を 29 へ揃える（移行中だけ 24 / 29 を許容し、29-3 で 29 のみに戻した）</span>
-  R-1 で動画は 29 秒になったが、画像バッチは 24 しか許さず <code>generated_media.duration_seconds</code> に 24 を記録していた（<a href="../../issues/index.html#I-041">I-041</a>）。許容値を先に 29 だけにすると Aurora の宣言値 24 の回で異常終了し、Aurora を先に 29 にすると旧コードで異常終了するため、29-1 で許容値を <code>ALLOWED_DURATIONS = frozenset({24, 29})</code> に広げ → 29-2 で Aurora の <code>prompt_configs.parameters</code> を 29 へ切り替え → 29-3 で 29 のみに戻す 3 段にした。宣言値をそのまま記録する作り（実尺は測らない）は quiz-prebuilt・ranking-prebuilt と揃えて変えない。登録 SQL（<code>01_prompt_caption.sql</code>・<code>03_audio_assets.sql</code>）は 29-1 で 29 を正にした。29-2（2026-10-17）で Aurora・ローカルの宣言値と BGM の尺を 29 にし、R-1-5 の後に 24 で記録された生成結果 1 件を補正。同日 20:00 の定時で 29 の記録を確認したうえで、29-3 で <code>ALLOWED_DURATIONS = frozenset({29})</code> に戻した。
-</div>
+<p>許容する尺は <code>ALLOWED_DURATIONS = frozenset({29})</code>。宣言値をそのまま <code>generated_media.duration_seconds</code> に記録し、実尺は測らない（quiz-prebuilt・ranking-prebuilt と同じ） <a class="decision-ref" href="#d-03">→ 理由 D-03</a></p>
 
 <h2 id="stock">4. ストックの取得（ビルド済み限定の LRU 順繰り・軸なし）</h2>
 <pre><code>SELECT id, content_key, problem_text, truth, fact_sheet, core_points, judge_criteria, core_words, reveal_text, rule_text, caption, hook,
@@ -144,6 +156,39 @@ LIMIT 1 FOR UPDATE;</code></pre>
 </table>
 </div>
 
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 実装で設計より厳しくした 2 点（parameters のキー・BGM の NULL）</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>parameters</code> は <code>duration_seconds</code> の 1 キーだけを許し、ストック行の <code>video_audio_asset_id</code> が NULL の行も異常終了にする</dd>
+  <dt>理由</dt><dd>（単一スロットの宣言を設定ミスから守るため） （ビルド済みの行は BGM を焼き込んでいるので、NULL は publish 手順の不備）</dd>
+  <dt>日付・出典</dt><dd>2026-09-26（21-5b）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 単尺・単一スロットにし、尺の複数化は想定しない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>本方式は 1 尺だけを持ち、<code>slots</code> を持たない（2026-10-17 の R-1 で 24 秒 → 29 秒に変え、ループ前提をやめた）</dd>
+  <dt>理由</dt><dd>ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。理由: ① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低い。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<strong>2026-10-17 追記（R-1）</strong>: 単尺のまま 24 秒 → 29 秒へ変え、ループ前提（②の周期の制約）をやめた（8.2 の決定）。画像バッチ側は課題 <a href="../../issues/index.html#I-041">I-041</a> を <a href="../../plans/development-log.html#phase-29">Phase 29</a> で合わせる（下の決定）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。</dd>
+  <dt>日付・出典</dt><dd>2026-09-04（21-3）・2026-10-17 追記（R-1）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 尺の宣言値を 29 へそろえる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>許容値を <code>ALLOWED_DURATIONS = frozenset({29})</code> にし、宣言値をそのまま <code>generated_media.duration_seconds</code> に記録する（実尺は測らない）</dd>
+  <dt>理由</dt><dd>R-1 で動画は 29 秒になったが、画像バッチは 24 しか許さず <code>generated_media.duration_seconds</code> に 24 を記録していた（<a href="../../issues/index.html#I-041">I-041</a>）。許容値を先に 29 だけにすると Aurora の宣言値 24 の回で異常終了し、Aurora を先に 29 にすると旧コードで異常終了するため、29-1 で許容値を <code>ALLOWED_DURATIONS = frozenset({24, 29})</code> に広げ → 29-2 で Aurora の <code>prompt_configs.parameters</code> を 29 へ切り替え → 29-3 で 29 のみに戻す 3 段にした。宣言値をそのまま記録する作り（実尺は測らない）は quiz-prebuilt・ranking-prebuilt と揃えて変えない。登録 SQL（<code>01_prompt_caption.sql</code>・<code>03_audio_assets.sql</code>）は 29-1 で 29 を正にした。29-2（2026-10-17）で Aurora・ローカルの宣言値と BGM の尺を 29 にし、R-1-5 の後に 24 で記録された生成結果 1 件を補正。同日 20:00 の定時で 29 の記録を確認したうえで、29-3 で <code>ALLOWED_DURATIONS = frozenset({29})</code> に戻した。</dd>
+  <dt>日付・出典</dt><dd>2026-10-17（Phase 29。課題 I-041）</dd>
+</dl>
+</article>
+</section>
+
 </div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
 </body>
 </html>

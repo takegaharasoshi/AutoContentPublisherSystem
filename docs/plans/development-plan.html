@@ -82,7 +82,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 10 件（クリックで展開）</summary>
+<summary>完了済み 11 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
@@ -496,17 +496,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-8a" data-step-id="30-8a" data-status="todo">
+<article class="plan-step" id="step-30-8a" data-step-id="30-8a" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-8a</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-8a</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>方式別の設計書と、umigame 以外のセット別設計書を整理する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-7 の go の後。3 セットのセットレーンが動いていないとき。</p>
-<p data-field="result"><strong>現況：</strong>未着手。2026-10-18 に 30-8 を 2 つに分けた（ユーザー判断。囲みが <code>generators/</code> 24・<code>sets/</code> 59 あり 1 ゴールに収まらないため）。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。実行時生成の 3 方式を退役にし（<code>_archive/</code> へ移さず退役の表示を付けて残す = <a href="../app/batch-flow.html#d-21">batch-flow D-21</a>）、事前ビルド 3 方式と umigame 以外のセット別設計書 3 本を新しい書式へ移した（判断の記録 計 25 件・<code>class="decision"</code> 0 件）。ユーザーの go 待ち。2026-10-18 に 30-8 を 30-8a / 30-8b に分けた（ユーザー判断）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -526,13 +521,26 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>退役の扱い</strong>: <code>gpt-image-single</code>・<code>gpt-image-kenburns</code>・<code>gpt-quiz-multicut</code> は <code>docs/_archive/</code> へ移さず、<code>generators/</code> に置いたまま冒頭に退役の表示（<code>div#retired</code>・バッジ）を足した。本文は退役時点の記録として新しい書式へは移していない（囲みは 1 / 1 / 11 件のまま）。理由は <a href="../app/batch-flow.html#d-21">batch-flow D-21</a>（コードとレジストリ登録が残り再開できる・<code>gpt-quiz-multicut.html</code> は 28 ファイルから参照される・<code>_archive/</code> は旧 Markdown の置き場）。ページを移していないので旧位置への参照は 0 件で変わらない</li>
+<li><strong>書式の移行</strong>: 6 ページの冒頭の「本書の位置づけ」「適用状態」の注記を要約（図 + 表。状態・開始日・投稿頻度・尺）にまとめ、ranking-prebuilt・umigame-prebuilt・pref-ranking-1 に残っていた「目標設計・稼働は予定」の古い注記を実態に改めた。logic-training-1 の昼停止の注記（<code>#noon-suspended</code>）は外から参照されるため残した。節番号・アンカーは変えていない</li>
+<li><strong>判断の移し替え（移す前 → D-xx）</strong>: <strong>quiz-prebuilt</strong> 事前生成への転換 → D-01／未ビルトはエラーにしない → D-02／再利用時の同一動画 → D-03／BGM をストック行から転記 → D-04。<strong>ranking-prebuilt</strong> 方式名 → D-01／尺はスロットの固定値 → D-02／<code>last_used_at</code> は 2 尺共通 → D-03／未ビルト・片尺 → D-04。<strong>umigame-prebuilt</strong> 21-5b の実装差分 → D-01／単尺・単一スロット → D-02／宣言値 29 → D-03。<strong>logic-training-1</strong> ストーリーズ再掲の継続 → D-01／15-13 の試し打ち 4 点 → D-02／アセット制作と品質検査 → D-03。<strong>pref-ranking-1</strong> プロフィール文 → D-01／プロフィール画像 → D-02／30 秒・1 日 1 回 → D-03／SE なし → D-04／ミキシング → D-05／BGM の前処理 → D-06／BGM 1 曲 → D-07／淡墨茶（<code>callout decision</code>）→ D-08。<strong>fantasy-animals-1</strong> 停止 → D-01／1 日 1 回へ → D-02／14-11 のプロンプト改訂（見出しが decision の注記）→ D-03。囲みを丸ごと移した箇所は本文に事実の一文を残した。本文中の「〜の decision」の参照文言は D 番号・節名へ置き換えた。<code>class="decision"</code> の grep 件数は 6 ページとも 0</li>
+<li><strong>戻りリンク</strong>: 方式別 3 本の要約に機能別の基本設計 投稿（選定の段）と生産の詳細設計を、セット別 3 本に 投稿 と 生産（logic-training-1 / pref-ranking-1）を書いた。機能ページ・基本設計からのリンク（<code>#stock</code>・<code>#fetch</code>・<code>#noon-suspended</code>・ページ単位）はアンカーを保ったので直す必要はなかった</li>
+<li><strong>レビュー</strong>（観点: 移設で事実が欠けていないか / 実装との食い違い。一次スクリーニング Codex・判断 Claude）。1 巡目: blocker 2 件を修正（batch-flow の方式カタログが gpt-quiz-multicut のレンダラーを今も使うと読める〔R-1 で Remotion へ移行済み。<code>content/video-build/logic-training-1/build.py</code>〕・umigame の「ループ前提」〔R-1 でやめた。<code>timeline.ts</code>〕）。改善提案 1 件（判断の記録の括弧書き）は課題 <a href="../issues/index.html#I-044">I-044</a> の ⑤ に足した。2 巡目: blocker なし。ここで打ち切り</li>
+<li><strong>課題表</strong>: ページの移動・節番号の変更がないため、対象パスの付け替えは不要（I-011 = <code>services/image-batch/app/generators/</code>・I-020 = <code>gpt_quiz_multicut.py</code>〔退役後もトリガー「実行時生成を再開する改修の起票時」はそのまま有効〕・I-023 = <code>ranking-prebuilt.html</code>・I-026 = <code>sets/logic-training-1.html</code>）。I-040 は据え置き継続。I-044 の対象パスに <code>docs/app/sets/</code>・<code>generators/</code> を足した</li>
+<li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 100 ページはみ出し 0 件・図 26 ページ 43 図の描画不備 0 件・判断リンク 194 件の不備 0 件・リンク切れ 0 件で OK（1 回目はブラウザーの測定結果が取れず未確認、再実行で OK）</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-8b" data-step-id="30-8b" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-8b</strong><span class="plan-status">未着手</span></div>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>セット別設計書: 架空のかわいい動物図鑑 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -14,20 +14,38 @@
 <div class="page-meta">
   <span class="badge badge-future">停止（2026-09-03 / Phase 20-1）</span>
   <span>set_code: fantasy-animals-1</span>
-  <span>最終更新: 2026-09-03（Phase 20-1 で停止。以下の記載は停止時点の実態の記録）</span>
+  <span>最終更新: 2026-10-18（30-8a: 冒頭の要約と判断の記録〔D-01〜D-02〕を足し、囲みの判断を末尾へ移した）。2026-09-03（Phase 20-1 で停止。以下の記載は停止時点の実態の記録）</span>
 </div>
 
-<div class="decision">
-  <span class="callout-title">decision: 2026-09-03（Phase 20-1）にセットを停止した</span>
-  <p><strong>停止日</strong>: 2026-09-03（最終投稿は 2026-09-02 の 21:00 枠）。<strong>理由</strong>: 16-5 の効果検証（2026-09-02）で、切替後 26 本のスキップ率中央値 92.3%・views 中央値 75・フォロワー 1 と改善傾向が見られず、ユーザーが停止を決定した。検証用セット（<a href="../../strategy/business-strategy.html#portfolio">事業戦略書セクション 6</a>）としての役目（パイプラインの定常稼働確認・リール投稿の実験台）は Phase 14 で果たし終えている。</p>
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは fantasy-animals-1（架空のかわいい動物図鑑）に固有の設定を、<strong>停止した時点の実態の記録</strong>として残す。共通の処理・データ・運用は <a href="../batch-flow.html">batch-flow</a> / <a href="../data-model.html">data-model</a> / <a href="../operation.html">operation</a> を参照。機能別の基本設計 <a href="../../overview/functions/post.html">投稿</a>のセット別の詳細にあたる（停止中）。図 1 は停止前の投稿の流れ。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    S["21:00 実行時生成&lt;br&gt;gpt-image-kenburns（退役）"] --> P["リール投稿（10 秒）"]
+</pre>
+<figcaption>図 1 停止前の投稿の流れ（2026-09-03 に停止）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>状態</td><td>停止（2026-09-03・Phase 20-1）。<code>is_active = 0</code>・Scheduler は削除済み。データ・音源・Secrets は残す</td></tr>
+    <tr><td>方式</td><td><code>gpt-image-kenburns</code>（実行時生成。退役）</td></tr>
+    <tr><td>投稿</td><td>停止まで 1 日 1 回 21:00 JST</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<div>
+<p><strong>セットの停止（2026-09-03・Phase 20-1）</strong> <a class="decision-ref" href="#d-01">→ 理由 D-01</a></p>
+<p><strong>停止日</strong>: 2026-09-03（最終投稿は 2026-09-02 の 21:00 枠）。</p>
   <p><strong>停止の内容</strong>（<a href="../operation.html#set-retire">運用設計 2.2</a> の手順どおり）: ① <code>batch_sets.is_active = 0</code>（両バッチが当セットをスキップして正常終了する）② CDK から Scheduler 3 件（画像生成 21:00 × 1・インサイト収集 06:00 / 18:00 × 2）を削除して deploy。<strong>①②とも 2026-09-03 に本番へ適用済み</strong>（Aurora の <code>is_active = 0</code>・本番 Scheduler 一覧から 3 件が消えたことを実測）。<strong>残すもの</strong>: DB レコード（メタ情報・投稿履歴・インサイト）・音源ストック（<code>audio/fantasy-animals-1/</code>）・Secrets・本設計書。Instagram アカウント <code>dokonimo_inai_zukan</code> と過去投稿もそのまま残す（削除しない）。</p>
   <p><strong>復活する場合</strong>: <code>is_active = 1</code> に戻し、CDK に Scheduler 定義を再追加して deploy すれば足りる（定義はコード内のコメントに復活用の記載を残した）。</p>
 </div>
 
-<div class="note">
-  <span class="callout-title">本書の位置づけ</span>
-  本セット固有の設定・運用情報を記録する（11-1 で作成）。共通の処理フロー・データモデル・運用ルールは <a href="../batch-flow.html">batch-flow.html</a> / <a href="../data-model.html">data-model.html</a> / <a href="../operation.html">operation.html</a> を参照し、本書には差分のみ書く（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）。
-</div>
 
 <h2>1. テーマ</h2>
 <p>現実に存在していそうで実在しない、架空のかわいい動物を紹介する画像を生成する。野生の姿を偶然写真に収めたかのような自然な写真風の構図とし、画像内に架空の動物の名前とその特徴（外見・生態など）の説明文を記載する。</p>
@@ -48,13 +66,10 @@
 
 <h2>3. スケジュール（投稿頻度）</h2>
 <p><strong>1 日 1 回（21:00 JST）</strong>。cron 式 <code>cron(0 21 * * ? *)</code>（Asia/Tokyo）+ ENABLED（Scheduler <code>acps-prod-image-generation-fantasy-animals-1</code>。15-15 で機能名 <code>acps-prod-image-generation-schedule</code> から命名規約に沿ってリネーム。現行値は <a href="../../infra/workflow.html">infra/workflow.html セクション 1.5</a>）。コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
-<div class="decision">
-  <span class="callout-title">decision: 14-12 で 1 日 3 回 → 1 日 1 回に削減（2026-07-26）</span>
-  13-1（2026-07-22）では静止画方式で 1 日 3 回（7:00 / 12:00 / 21:00 JST）としていたが、14-2 の壁打ちで決めた動画運用の初期パラメータ（1 日 1 本・10 秒前後）に合わせて 1 日 1 回へ削減した。時刻はユーザー決定で <strong>21:00 JST</strong>（夜のリーチが期待できる枠）。cron の変更は CDK（<code>ImageBatchStack</code>）で行い、14-10 で手動 DISABLED にしていた State も同デプロイで <code>ENABLED</code> に戻している。
-</div>
+<p>投稿は 1 日 1 回・21:00 JST（停止まで） <a class="decision-ref" href="#d-02">→ 理由 D-02</a></p>
 
 <h2>4. プロンプトの作り方</h2>
-<p>固定文言方式。<code>prompt_configs.prompt_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>prompt_config</code>。1 枚だけ生成されるよう文言で制御する。<a href="../batch-flow.html">batch-flow.html</a> の decision）。14-11 時点の登録文言は以下（ユーザー決定）。</p>
+<p>固定文言方式。<code>prompt_configs.prompt_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>prompt_config</code>。1 枚だけ生成されるよう文言で制御する。<a href="../batch-flow.html">batch-flow.html</a> 2 章）。14-11 時点の登録文言は以下（ユーザー決定）。</p>
 <pre><code>実在しそうで実在しない架空の小動物を紹介する、図鑑風の縦長画像を1枚だけ作ってください。
 
 【全体のスタイル】
@@ -90,11 +105,7 @@
 <p>生成パラメータ（<code>parameters</code> カラム）は 11-2（画像生成 API の疎通確認）の実プロンプト検証で確定し、14-10 の動画方式への切替で <code>size</code> を 2:3 の縦長へ変更した（キー仕様は <a href="../generators/gpt-image-kenburns.html">方式設計書</a> セクション 3）。</p>
 <pre><code>{"model": "gpt-image-2", "size": "1024x1536", "quality": "high", "n": 1}</code></pre>
 
-<div class="note">
-  <span class="callout-title">decision: 14-11 でプロンプトを全面改訂（2026-07-26）</span>
-  11-1 の登録文言は 1:1 時代のもので、構成・文字量・トーンの指定が無く品質が安定しなかった。加えて 14-10 のリール実投稿で画像内の文字が左右で見切れていたため、以下を明示した文言へ差し替えた。①<strong>構成の固定</strong>（リード文 2 行 / 名前カタカナ 4〜7 字 / ローマ字 / 基本情報 4 項目 / 特徴 3 項目）②<strong>写真トーン</strong>（実写風ネイチャー・浅い被写界深度・自然光・白い細身の明朝体）③<strong>Instagram UI セーフエリア</strong>（右端 12%・下端 15% には文字を置かない）④<strong>毎回変える要素</strong>（生息環境・名前・リード文）。<br>
-  セーフエリアの数値は、合成後の前景がフレームの x∈[44,1036] / y∈[216,1704] を占めることから換算した実効値（上下の帯が Instagram の上部バーをほぼ吸収するため、上側の制約は不要）。合成方式は <a href="../../plans/development-log.html">docs/plans/development-log.html</a> の 14-11 を参照。実 API での試し打ちを 3 巡（6 枚）行って確定している。
-</div>
+<p><strong>プロンプトの構成（14-11 で全面改訂）</strong> <a class="decision-ref" href="#d-03">→ 理由 D-03</a>: ①<strong>構成の固定</strong>（リード文 2 行 / 名前カタカナ 4〜7 字 / ローマ字 / 基本情報 4 項目 / 特徴 3 項目）②<strong>写真トーン</strong>（実写風ネイチャー・浅い被写界深度・自然光・白い細身の明朝体）③<strong>Instagram UI セーフエリア</strong>（右端 12%・下端 15% には文字を置かない）④<strong>毎回変える要素</strong>（生息環境・名前・リード文）。セーフエリアの数値は、合成後の前景がフレームの x∈[44,1036] / y∈[216,1704] を占めることから換算した実効値（上側の制約はなし）。合成方式は <a href="../../plans/development-log.html">docs/plans/development-log.html</a> の 14-11。</p>
 
 <h2>5. キャプションの作り方</h2>
 <p>固定文言方式。<code>caption_templates.template_text</code> への直接 INSERT で管理する（初期運用は 1 セット 1 <code>caption_template</code>）。画像内に動物名・特徴の説明を焼き込む仕様のため、キャプション本文は補足的な固定文 + ハッシュタグとした。現行の登録文言は以下（ユーザー決定。ローカル・Aurora とも <code>id=1</code>）。</p>
@@ -124,6 +135,39 @@
 <p>共通フロー（<a href="../batch-flow.html">batch-flow.html</a>）どおりで差分なし。名前・特徴のテキストを画像に合成する処理はプロンプト側で完結させ、共通骨格・DB スキーマの変更は不要。</p>
 <p><strong>使用方式は <code>gpt-image-kenburns</code>（動画 / リール）</strong>。11-4〜14-10 は <code>gpt-image-single</code>（静止画）を使用していたが、14-10 で <code>batch_sets.generator_name</code> を切り替え、14-12 で定常運用に入った。方式別設計書は「セットが本採用した時点で作成」ルール（<a href="../design-outline.html#set-docs">design-outline.html セクション 1.1</a>）に従い作成済み: <a href="../generators/gpt-image-kenburns.html">generators/gpt-image-kenburns.html</a>（14-12）/ <a href="../generators/gpt-image-single.html">generators/gpt-image-single.html</a>（13-2、本セットでは現在未使用）。投稿は <code>posts.media_type='reel'</code> として <code>share_to_feed=true</code> で公開され、リールタブとプロフィールのフィード両方に表示される（14-8 実機確認）。</p>
 
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 セットを停止した</h3>
+<dl>
+  <dt>決めたこと</dt><dd>2026-09-03 にセットを停止した（最終投稿は 2026-09-02 の 21:00 枠）。<code>is_active = 0</code> と Scheduler 3 件の削除を本番へ適用済み</dd>
+  <dt>理由</dt><dd><strong>理由</strong>: 16-5 の効果検証（2026-09-02）で、切替後 26 本のスキップ率中央値 92.3%・views 中央値 75・フォロワー 1 と改善傾向が見られず、ユーザーが停止を決定した。検証用セット（<a href="../../strategy/business-strategy.html#portfolio">事業戦略書セクション 6</a>）としての役目（パイプラインの定常稼働確認・リール投稿の実験台）は Phase 14 で果たし終えている。</dd>
+  <dt>日付・出典</dt><dd>2026-09-03（Phase 20-1・ユーザー決定）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 1 日 3 回から 1 日 1 回へ減らした</h3>
+<dl>
+  <dt>決めたこと</dt><dd>動画運用の初期パラメータ（1 日 1 本）に合わせて 1 日 3 回 → 1 日 1 回（21:00 JST）にした</dd>
+  <dt>理由</dt><dd>13-1（2026-07-22）では静止画方式で 1 日 3 回（7:00 / 12:00 / 21:00 JST）としていたが、14-2 の壁打ちで決めた動画運用の初期パラメータ（1 日 1 本・10 秒前後）に合わせて 1 日 1 回へ削減した。時刻はユーザー決定で <strong>21:00 JST</strong>（夜のリーチが期待できる枠）。cron の変更は CDK（<code>ImageBatchStack</code>）で行い、14-10 で手動 DISABLED にしていた State も同デプロイで <code>ENABLED</code> に戻している。</dd>
+  <dt>日付・出典</dt><dd>2026-07-26（14-12）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 14-11 でプロンプトを全面改訂した</h3>
+<dl>
+  <dt>決めたこと</dt><dd>構成・写真トーン・UI セーフエリア・毎回変える要素の 4 点を明示した文言へ差し替えた</dd>
+  <dt>理由</dt><dd>11-1 の登録文言は 1:1 時代のもので、構成・文字量・トーンの指定が無く品質が安定しなかった。加えて 14-10 のリール実投稿で画像内の文字が左右で見切れていた。上側の制約を置かないのは、上下の帯が Instagram の上部バーをほぼ吸収するため。実 API での試し打ちを 3 巡（6 枚）行って確定した</dd>
+  <dt>日付・出典</dt><dd>2026-07-26（14-11）</dd>
+</dl>
+</article>
+</section>
+
 </div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
 </body>
 </html>
