@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-18（<strong>30-3c 完了・go</strong>: 生産の機能別の基本設計 4 ページを作り、30-3 とあわせてユーザー go。次は <a href="#step-30-4">30-4</a>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="#step-30-3b">30-3b</a>〔配信面〕・<a href="#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-18（<strong>30-4 完了</strong>: アーキテクチャとワークフローの詳細設計を描き直した〔ユーザーの go 待ち〕。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="#step-30-3b">30-3b</a>〔配信面〕・<a href="#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -82,7 +82,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 5 件（クリックで展開）</summary>
+<summary>完了済み 6 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
@@ -287,18 +287,12 @@
 </details>
 </div>
 </article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-4" data-step-id="30-4" data-status="todo">
+<article class="plan-step" id="step-30-4" data-step-id="30-4" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-4</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-4</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>インフラ構成とワークフローの詳細設計を描き直す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-3c の go の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<a href="../infra/architecture.html">アーキテクチャ</a>を配信面 4 系統の構成で描き直し（旧 1.1 のコメント返信を 3.4 に統合・インサイト収集とトークン更新を本体へ・タスク定義 / SFN / Scheduler / S3 の表を実態に）、<a href="../infra/workflow.html">ワークフロー</a>を新しい書式へ移した（要約・SFN 3 つのフロー図・判断 D-01〜07・1.6 の一覧を 3 セット × 朝夕に）。ユーザーの go 待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -318,13 +312,28 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>architecture.html</strong>: 全面的に書き直し（外から参照される <code>#overall</code>・<code>#network</code>・<code>#comment-reply</code> は残した）。要約（4 系統と共通の土台の AWS アイコン図）→ 1. 全体構成（系統 × きっかけ・実行基盤・データストア・スタック）→ 2. ネットワーク（VPC・通信の経路）→ 3. コンピューティング（3.1 タスク定義 4 つ・3.2 SFN 3 つ・3.3 Scheduler のグループ 3 つ・3.4 コメント自動返信とトークン更新〔旧 1.1 を統合・図 2〕）→ 4. データストア（Aurora・S3 のプレフィックス別の用途と保持・Secrets）→ 5〜7 → さらに詳しく → 判断 D-01〜11。実態に合わせた主な点: S3 の自動削除は「全オブジェクト 30 日」ではなく <code>images/</code>・<code>videos/</code>・<code>comment-log/</code> だけ・タスク定義にインサイト収集を追加・SFN にインサイト収集を追加・Scheduler のグループと DLQ を 2 系統に</li>
+<li><strong>workflow.html</strong>: 節番号とアンカーは保ったまま書式を移した（外からのリンク 13 種と課題表の節参照を切らないため）。要約（全体の流れ図）・各章のリード文・3・4・11 章に SFN のステート図・末尾に判断の記録・さらに詳しくを追加。1.3 の入力例を稼働セットへ、1.6 のスケジュール一覧を fantasy-animals-1 + logic-training-1 の 4 本から logic-training-1・pref-ranking-1・umigame-soup-1 × 朝夕の 6 本へ直した</li>
+<li><strong>判断の移し替え（旧 <code>class="decision"</code> 10 か所 → D-xx）</strong>: 21-7 Scheduler 有効のまま deploy → D-01 / 当面 DISABLED → 13-1 本番化・14-12 1 日 1 回・logic-training-1 の 3 本停止 → 再有効化・インサイト収集の停止 / 再開は CDK のフラグ → D-02（経緯にまとめた）/ 15-15 命名規約とリネーム・同時刻起動 → D-03 / DB 接続の再試行を SFN の責務に → D-04 / ECS Fargate 採用理由 → D-05 / Scheduler アラームの追加 → D-06 / Aurora の DatapointsToAlarm 3/3 → D-07。本文には事実（停止中のセットは正常終了・CDK が唯一の正・同時刻はセットで分離・CDK のフラグ名）を 1 文ずつ残した。architecture は囲みがなく、本文中の理由（NAT なし・DB 準備確認を ECS に・関数 URL・非同期化・VPC の外・2 面構成・Gateway 型エンドポイント・RunTask・同時実行・自動一時停止・自動削除の範囲）を D-01〜11 に移した。<code>class="decision"</code> の grep 件数は architecture 0 / workflow 0</li>
+<li><strong>実装との突き合わせ</strong>: <code>infra/bin/infra.ts</code>（スタック 7）、<code>foundation-stack.ts</code>（S3 のライフサイクル 3 ルール・Gateway 型エンドポイント・Aurora の SG の接続元 2 つ・タスク定義 family）、<code>image-batch-stack.ts</code>（スケジュール 5 本・うち noon 停止）、<code>insights-batch-stack.ts</code>（6 本・フラグ）、<code>comment-reply-stack.ts</code>（Lambda 3 本のタイムアウト 10 / 300 / 60 秒・予約同時実行 2・Scheduler は既定グループ・Secret のキー）、各スタックの CPU / メモリとログ保持 3 か月、<code>asl/*.json</code>（3 SFN のステートと Catch の振り分け・CheckInput の条件）</li>
+<li><strong>レビュー</strong>（観点: 実装との食い違い / 本文に理由が混ざっていないか / 移設で事実が欠けていないか。一次スクリーニング Codex・判断 Claude）。1 巡目: blocker 7 件を修正（共通の土台の使い方を系統で分ける・Aurora の SG の接続元・Scheduler の DLQ が 2 つ・DLQ 時の手動実行の対象・Reply Lambda のタイムアウト 120 → 300 秒〔旧版からの誤り〕・問題スナップショットのキーと書く時点・署名検証の方式と鍵）+ D-03 に変更前の名前。改善提案（本文に残る理由 6 か所・10.1 の再試行の書き分け）は課題 <a href="../issues/index.html#I-043">I-043</a> を起票（30-9 の着手時）。2 巡目: blocker 2 件を修正（DB 準備確認の SG は 3 つの SFN で共有・Lambda から外部 API はインターネット経由）。ここで打ち切り</li>
+<li><strong>戻りリンク</strong>: 両ページの冒頭に 1 段上（基本設計〔全体〕3 章・機能別の基本設計 4 ページ）を書いた。機能ページの「さらに詳しく」の行き先を確認: 投稿 → workflow #overview（1.5）と 3〜4 章・インサイト → workflow #insights-asl・コメント返信 → architecture #comment-reply（文言を「1.1」から「3.4」へ直した。security.html・stacks.html のリンク文言も同様に 3.4 へ）</li>
+<li><strong>課題表</strong>: 節番号の変更による付け替えは不要（workflow は節番号を保持、architecture の 1・2 章は同じ番号。I-019・I-025 は workflow、I-027 は architecture をページ単位で指す）。I-040 は据え置き継続</li>
+<li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 95 ページはみ出し 0 件・図 13 ページ 29 図の描画不備 0 件・判断リンク 53 件の不備 0 件で OK</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-5" data-step-id="30-5" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-5</strong><span class="plan-status">未着手</span></div>

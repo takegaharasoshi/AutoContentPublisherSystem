@@ -4,290 +4,376 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>アーキテクチャ設計 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / インフラ設計 / アーキテクチャ設計</nav>
+<nav class="breadcrumb"><a href="../index.html">docs</a> / インフラ設計 / アーキテクチャ</nav>
 <h1>アーキテクチャ設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-09-04（21-3: セクション 1.1 にコメント自動返信経路〔イングレス・VPC 外・2 面構成〕を追加）</span>
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-4 で配信面 4 系統の構成に描き直し、新しい書式へ移した。前の版の 1.1 節〔コメント自動返信〕は 3.4 節に統合）</span>
+  <span>1 段上: <a href="../overview/system-overview.html#delivery">基本設計（全体）3 章</a>と、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a> の「AWS の定義」</span>
 </div>
 
-<p>本システムは AWS マネージドサービスを中心に構成し、バッチ実行時のみリソースを起動するコスト効率の高い設計とする。</p>
-
-<h2 id="overall">1. 全体アーキテクチャ</h2>
-
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、配信面（AWS）で使っているサービスと、その組み合わせ方を説明する詳細設計である。配信面は 4 つの系統（①投稿 ②インサイト収集 ③コメント自動返信 ④トークン更新）からなり、①②は Step Functions が ECS Fargate のバッチを動かし、③④は Lambda で動く。共通の土台（VPC・Aurora・S3・Secrets Manager・ECS クラスター）のうち、①②のバッチは VPC の中で全部を使い、③④の Lambda は VPC の外から S3・SQS・Secrets Manager だけを使う。生産面（ローカル PC）はこの土台の S3 と Aurora に素材を置くだけで、AWS 上には生産面の部品はない。</p>
+<p class="lead">図 1 は、4 系統と共通の土台を AWS のアイコンで表したもの。上段が時刻で動く系統（①②④）、中段が Instagram の通知で動く系統（③）、下段が共通の土台。続く表はこのページの要点。</p>
 <figure class="diagram">
-<svg viewBox="0 0 900 700" role="img" aria-label="全体アーキテクチャ図">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="var(--diag-line)"/>
-    </marker>
-  </defs>
-
-  <!-- CI/CD 行 -->
-  <rect x="30" y="18" width="110" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="85" y="45" text-anchor="middle" font-size="13" fill="var(--diag-text)">GitHub</text>
-
-  <rect x="180" y="18" width="140" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="250" y="45" text-anchor="middle" font-size="13" fill="var(--diag-text)">CodePipeline</text>
-
-  <rect x="360" y="18" width="130" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="425" y="45" text-anchor="middle" font-size="13" fill="var(--diag-text)">CodeBuild</text>
-
-  <rect x="530" y="18" width="100" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="580" y="45" text-anchor="middle" font-size="13" fill="var(--diag-text)">ECR</text>
-
-  <rect x="670" y="18" width="200" height="52" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="770" y="40" text-anchor="middle" font-size="12" fill="var(--diag-text)">ECS Task Definition</text>
-  <text x="770" y="58" text-anchor="middle" font-size="11" fill="var(--diag-text)">（新リビジョン登録）</text>
-
-  <line x1="140" y1="40" x2="176" y2="40" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="320" y1="40" x2="356" y2="40" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="490" y1="40" x2="526" y2="40" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="630" y1="40" x2="666" y2="40" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="770" y1="70" x2="770" y2="110" stroke="var(--diag-line)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
-  <text x="782" y="95" font-size="11" fill="var(--diag-text)">RunTask は最新リビジョンを参照</text>
-
-  <!-- Scheduler -->
-  <rect x="30" y="110" width="250" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="155" y="137" text-anchor="middle" font-size="13" fill="var(--diag-text)">EventBridge Scheduler</text>
-  <line x1="155" y1="154" x2="155" y2="192" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <!-- image-generation-sfn -->
-  <rect x="30" y="196" width="320" height="184" rx="10" fill="none" stroke="var(--diag-box-border)" stroke-width="1.5"/>
-  <text x="190" y="222" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">image-generation-sfn（Step Functions）</text>
-
-  <rect x="60" y="240" width="260" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="190" y="267" text-anchor="middle" font-size="12" fill="var(--diag-text)">ECS RunTask: DB 準備確認</text>
-
-  <line x1="190" y1="284" x2="190" y2="316" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <rect x="60" y="320" width="260" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="190" y="347" text-anchor="middle" font-size="12" fill="var(--diag-text)">ECS RunTask: 画像生成バッチ</text>
-
-  <!-- StartExecution -->
-  <line x1="190" y1="380" x2="190" y2="428" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="202" y="408" font-size="11" fill="var(--diag-text)">成功時 StartExecution（非同期）</text>
-
-  <!-- sns-posting-sfn -->
-  <rect x="30" y="432" width="320" height="184" rx="10" fill="none" stroke="var(--diag-box-border)" stroke-width="1.5"/>
-  <text x="190" y="458" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">sns-posting-sfn（Step Functions）</text>
-
-  <rect x="60" y="476" width="260" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="190" y="503" text-anchor="middle" font-size="12" fill="var(--diag-text)">ECS RunTask: DB 準備確認</text>
-
-  <line x1="190" y1="520" x2="190" y2="552" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <rect x="60" y="556" width="260" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="190" y="583" text-anchor="middle" font-size="12" fill="var(--diag-text)">ECS RunTask: SNS 投稿バッチ</text>
-
-  <!-- リソース列 -->
-  <rect x="590" y="196" width="280" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="730" y="223" text-anchor="middle" font-size="13" fill="var(--diag-text)">Secrets Manager</text>
-
-  <rect x="590" y="260" width="280" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="730" y="287" text-anchor="middle" font-size="13" fill="var(--diag-text)">Aurora Serverless v2（MySQL）</text>
-
-  <rect x="590" y="324" width="280" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="730" y="351" text-anchor="middle" font-size="13" fill="var(--diag-text)">S3 バケット（画像保存）</text>
-
-  <rect x="590" y="388" width="280" height="56" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="730" y="411" text-anchor="middle" font-size="13" fill="var(--diag-text)">外部 API</text>
-  <text x="730" y="430" text-anchor="middle" font-size="11" fill="var(--diag-text)">（画像生成 API / SNS プラットフォーム API）</text>
-
-  <rect x="590" y="500" width="280" height="70" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="730" y="528" text-anchor="middle" font-size="13" fill="var(--diag-text)">CloudWatch Logs / Alarm</text>
-  <text x="730" y="550" text-anchor="middle" font-size="12" fill="var(--diag-text)">→ SNS Topic（メール通知）</text>
-
-  <!-- 画像生成 SFN → リソース -->
-  <line x1="350" y1="250" x2="586" y2="222" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <line x1="350" y1="280" x2="586" y2="282" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <line x1="350" y1="310" x2="586" y2="342" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <line x1="350" y1="340" x2="586" y2="406" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow)"/>
-
-  <!-- SNS 投稿 SFN → リソース -->
-  <line x1="350" y1="490" x2="586" y2="300" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <line x1="350" y1="520" x2="586" y2="360" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <line x1="350" y1="550" x2="586" y2="424" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow)"/>
-
-  <!-- ログ -->
-  <line x1="350" y1="600" x2="586" y2="540" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
-  <text x="430" y="620" font-size="11" fill="var(--diag-text)">ログ出力・実行失敗の監視</text>
-</svg>
-<figcaption>全体アーキテクチャ。ワークフローの詳細は <a href="workflow.html">workflow.html</a>、CI/CD の詳細は <a href="cicd.html">cicd.html</a> を参照。</figcaption>
+<pre class="mermaid">
+flowchart TB
+    subgraph TIME["時刻で動く系統"]
+        direction TB
+        sch@{ icon: "aws:scheduler", form: "square", label: "EventBridge Scheduler" }
+        sfn1@{ icon: "aws:step-functions", form: "square", label: "① 選定 → 投稿の SFN" }
+        sfn2@{ icon: "aws:step-functions", form: "square", label: "② 収集の SFN" }
+        ecs@{ icon: "aws:fargate", form: "square", label: "ECS Fargate のバッチ" }
+        tr@{ icon: "aws:lambda", form: "square", label: "④ トークン更新" }
+        sch --> sfn1 --> ecs
+        sch --> sfn2 --> ecs
+        sch --> tr
+    end
+    subgraph EVENT["通知で動く系統"]
+        direction TB
+        wh@{ icon: "aws:lambda", form: "square", label: "③ 受け付け（関数 URL）" }
+        q@{ icon: "aws:sqs", form: "square", label: "SQS FIFO" }
+        rp@{ icon: "aws:lambda", form: "square", label: "③ 返信" }
+        wh --> q --> rp
+    end
+    subgraph BASE["共通の土台"]
+        direction TB
+        db@{ icon: "aws:aurora", form: "square", label: "Aurora Serverless v2" }
+        s3@{ icon: "aws:s3", form: "square", label: "S3" }
+        sm@{ icon: "aws:secrets-manager", form: "square", label: "Secrets Manager" }
+    end
+    ecs --> db
+    ecs --> s3
+    rp --> s3
+    tr --> sm
+    LOCAL(["生産面（ローカル PC）"]) -.->|"素材を置く"| s3
+    LOCAL -.-> db
+</pre>
+<figcaption>図 1 配信面の AWS 構成（4 系統と共通の土台）。監視と CI/CD は 6・7 章</figcaption>
 </figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>リージョン・環境</td><td>ap-northeast-1。本番 1 環境（コメント自動返信だけ、確認用のステージング面を持つ <a class="decision-ref" href="#d-06">→ 理由 D-06</a>）</td></tr>
+    <tr><td>実行基盤</td><td>バッチは ECS Fargate の RunTask（ECS Service は使わない）、①②は Step Functions Standard が動かす。③④は Lambda</td></tr>
+    <tr><td>ネットワーク</td><td>VPC 1 つ・NAT Gateway なし。Fargate はパブリックサブネットでパブリック IP を持ち、Aurora は隔離サブネット <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。Lambda は VPC の外</td></tr>
+    <tr><td>データストア</td><td>Aurora Serverless v2（MySQL 互換・自動一時停止）・S3 バケット 1 つ・Secrets Manager</td></tr>
+    <tr><td>監視・配備</td><td>CloudWatch のアラームと EventBridge ルールから SNS トピックへ通知。ECS のバッチは CodePipeline でイメージを更新し、インフラと Lambda は手動の <code>cdk deploy</code></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
 
-<h3 id="comment-reply">1.1 コメント自動返信経路（イングレスを持つ初の機能。Phase 21-3 設計・21-6 実装）</h3>
-<p>第 4 セット umigame-soup-1（<a href="../app/sets/umigame-soup-1.html">セット別設計書</a>）のコメント自動返信は、本システムで初めて<strong>外部からの要求（Meta Webhook）を受け、ユーザーに向けて自動で発信する</strong>経路である。投稿時（上図の既存バッチ + Aurora）と<strong>完全に分離</strong>し、コメント時は Aurora を使わず S3 の問題スナップショットだけを読む。VPC の外で動き、NAT Gateway を使わない。</p>
-<figure class="diagram">
-<svg viewBox="0 0 900 330" role="img" aria-label="コメント自動返信経路">
-  <defs>
-    <marker id="arrow-cr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="var(--diag-line)"/>
-    </marker>
-  </defs>
-  <!-- 投稿時（既存） -->
-  <rect x="20" y="20" width="400" height="120" rx="10" fill="none" stroke="var(--diag-box-border)" stroke-width="1.5"/>
-  <text x="220" y="42" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">投稿時（既存: 20:00 の日次バッチ。Aurora 使用）</text>
-  <rect x="40" y="60" width="120" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="100" y="78" text-anchor="middle" font-size="12" fill="var(--diag-text)">sns-post-batch</text>
-  <text x="100" y="94" text-anchor="middle" font-size="10" fill="var(--diag-text)">ECS + Aurora</text>
-  <rect x="200" y="60" width="90" height="44" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="245" y="86" text-anchor="middle" font-size="12" fill="var(--diag-text)">Instagram</text>
-  <line x1="160" y1="82" x2="196" y2="82" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow-cr)"/>
-  <text x="178" y="72" text-anchor="middle" font-size="9" fill="var(--diag-text)">publish</text>
-  <rect x="310" y="60" width="96" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="358" y="78" text-anchor="middle" font-size="11" fill="var(--diag-text)">S3</text>
-  <text x="358" y="94" text-anchor="middle" font-size="9" fill="var(--diag-text)">problems/{media_id}.json</text>
-  <line x1="160" y1="96" x2="308" y2="110" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow-cr)"/>
-  <text x="240" y="128" text-anchor="middle" font-size="9" fill="var(--diag-text)">成功直後にスナップショット PUT</text>
-  <!-- コメント時（新規） -->
-  <rect x="20" y="160" width="860" height="150" rx="10" fill="none" stroke="var(--diag-box-border)" stroke-width="1.5"/>
-  <text x="450" y="182" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--diag-text)">コメント時（CommentReplyStack。VPC 外・Aurora 不使用）</text>
-  <rect x="40" y="210" width="90" height="44" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="85" y="228" text-anchor="middle" font-size="11" fill="var(--diag-text)">Meta</text>
-  <text x="85" y="244" text-anchor="middle" font-size="10" fill="var(--diag-text)">Webhook</text>
-  <rect x="170" y="210" width="130" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="235" y="228" text-anchor="middle" font-size="11" fill="var(--diag-text)">Webhook Lambda</text>
-  <text x="235" y="244" text-anchor="middle" font-size="9" fill="var(--diag-text)">Function URL・署名検証</text>
-  <line x1="130" y1="232" x2="166" y2="232" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow-cr)"/>
-  <rect x="340" y="210" width="110" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="395" y="228" text-anchor="middle" font-size="11" fill="var(--diag-text)">SQS FIFO</text>
-  <text x="395" y="244" text-anchor="middle" font-size="9" fill="var(--diag-text)">+ DLQ（アラーム）</text>
-  <line x1="300" y1="232" x2="336" y2="232" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow-cr)"/>
-  <rect x="490" y="210" width="120" height="44" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="550" y="228" text-anchor="middle" font-size="11" fill="var(--diag-text)">Reply Lambda</text>
-  <text x="550" y="244" text-anchor="middle" font-size="9" fill="var(--diag-text)">予約同時実行 2</text>
-  <line x1="450" y1="232" x2="486" y2="232" stroke="var(--diag-line)" stroke-width="1.5" marker-end="url(#arrow-cr)"/>
-  <rect x="660" y="196" width="100" height="32" rx="8" fill="var(--diag-box)" stroke="var(--diag-box-border)"/>
-  <text x="710" y="216" text-anchor="middle" font-size="10" fill="var(--diag-text)">S3 GET（問題）</text>
-  <rect x="660" y="238" width="100" height="32" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="710" y="258" text-anchor="middle" font-size="10" fill="var(--diag-text)">LLM API</text>
-  <rect x="660" y="280" width="100" height="26" rx="8" fill="var(--diag-emph)" stroke="var(--diag-emph-border)"/>
-  <text x="710" y="297" text-anchor="middle" font-size="10" fill="var(--diag-text)">Graph API 返信</text>
-  <line x1="610" y1="224" x2="656" y2="212" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow-cr)"/>
-  <line x1="610" y1="232" x2="656" y2="254" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow-cr)"/>
-  <line x1="610" y1="240" x2="656" y2="292" stroke="var(--diag-line)" stroke-width="1.2" marker-end="url(#arrow-cr)"/>
-  <rect x="780" y="210" width="90" height="44" rx="8" fill="var(--diag-box-alt)" stroke="var(--diag-box-alt-border)"/>
-  <text x="825" y="228" text-anchor="middle" font-size="10" fill="var(--diag-text)">Secrets</text>
-  <text x="825" y="244" text-anchor="middle" font-size="9" fill="var(--diag-text)">comment-reply</text>
-  <!-- 投稿時 → コメント時（S3 経由） -->
-  <line x1="358" y1="104" x2="700" y2="192" stroke="var(--diag-line)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arrow-cr)"/>
-</svg>
-<figcaption>コメント自動返信経路。上段は既存の投稿バッチが publish 成功直後に問題スナップショットを S3 へ置くところまで、下段はコメントごとの処理（Aurora に触れない）。スタックの構成は <a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>、Secret は <a href="security.html#comment-reply-secret">security.html セクション 1.3</a>、アプリの振る舞いは <a href="../app/sets/umigame-soup-1.html#comment-reply">セット別設計書セクション 10</a> を参照。</figcaption>
-</figure>
-<ul>
-  <li><strong>受信</strong>: Lambda Function URL（<code>authType: NONE</code>）で Meta Webhook を直接受ける。認証は Meta の <code>X-Hub-Signature-256</code>（HMAC-SHA256・鍵は Instagram アプリシークレット）を Lambda 内で検証することで担保する。API Gateway は採らない（WAF・スロットリングが要るまで不要。Function URL は無料。21-1 ⑥ の決定）</li>
-  <li><strong>非同期化</strong>: Webhook Lambda は署名検証と自己返信スキップだけを行い、SQS FIFO へ enqueue して即時 200 を返す（Meta の再送を招かない）。AI 処理は Reply Lambda が SQS トリガーで行う。再試行 3 回で DLQ へ退避し、DLQ の滞留を MonitoringStack のアラームで通知する</li>
-  <li><strong>データ</strong>: Reply Lambda は既存 S3 バケットの <code>assets/{set_code}/problems/{media_id}.json</code> を GET するだけ（読み取り専用・当該プレフィックス限定の IAM）。Aurora・VPC・NAT Gateway に依存しないため、コメントが何件来ても Aurora は起動しない</li>
-  <li><strong>2 面構成</strong>: 同一コードから本番面とステージング面（PoC の Meta アプリ + テスト用アカウント <code>test_tkghr</code>）を立てる。フルのステージング環境は作らない方針（課題体系 <a href="../issues/index.html#I-027">I-027</a>）の唯一の例外で、外向き発信を持つ本経路だけに限る。PoC の <code>UmigamePocStack</code> は 21-6 でステージング面へ置き換えた後に削除する</li>
-</ul>
+<h2 id="overall">1. 全体構成</h2>
+<p class="lead">この章は、要約の図 1 を系統ごとの部品の対応表にしたもの。どの系統が何をきっかけに、どの実行基盤で動き、どのデータストアを使うかを示す。系統の目的や処理の流れは、1 段上の機能別の基本設計にある。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>系統</th><th>きっかけ</th><th>実行基盤</th><th>使うデータストア</th><th>CDK スタック</th></tr></thead>
+  <tbody>
+    <tr><td><a href="../overview/functions/post.html">① 投稿</a></td><td>EventBridge Scheduler（セット × 時刻）</td><td>SFN <code>acps-prod-image-generation-sfn</code> → ECS <code>image-batch</code>、成功後に SFN <code>acps-prod-sns-posting-sfn</code> → ECS <code>sns-post-batch</code></td><td>Aurora・S3・Secrets Manager（DB・SNS 認証）</td><td><code>ImageBatchStack</code>・<code>SnsPostBatchStack</code></td></tr>
+    <tr><td><a href="../overview/functions/insights.html">② インサイト収集</a></td><td>EventBridge Scheduler（セット × 06:00 / 18:00）</td><td>SFN <code>acps-prod-insights-collection-sfn</code> → ECS <code>insights-batch</code></td><td>Aurora・S3（コメント記録の読み取り）・Secrets Manager</td><td><code>InsightsBatchStack</code></td></tr>
+    <tr><td><a href="../overview/functions/comment-reply.html">③ コメント自動返信</a></td><td>Instagram の Webhook</td><td>Lambda（受け付け）→ SQS FIFO → Lambda（返信）</td><td>S3（問題スナップショットの読み取り・コメント記録の書き込み）・Secrets Manager（Aurora は使わない）</td><td><code>CommentReplyStack</code>（ステージング面は <code>CommentReplyStagingStack</code>）</td></tr>
+    <tr><td><a href="../overview/functions/token-refresh.html">④ トークン更新</a></td><td>EventBridge Scheduler（毎週月曜 04:00）</td><td>Lambda</td><td>Secrets Manager（返信用）</td><td><code>CommentReplyStack</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>①②の SFN は、どれも先頭で DB 準備確認のタスク（<code>db-readiness-check</code>）を動かして Aurora の起動を待つ <a class="decision-ref" href="#d-02">→ 理由 D-02</a>。共通の土台（VPC・Aurora・S3・Secrets・ECS クラスター・ECR）は <code>FoundationStack</code> にある。</p>
 
 <h2 id="network">2. ネットワーク構成</h2>
-
-<h3>2.1 VPC 設計</h3>
-<ul>
-  <li><strong>VPC</strong>: 1 つの VPC を全サービスで共有（CDK デフォルトの 2 AZ 構成）</li>
-  <li><strong>Public Subnet（各 AZ に 1 つ、計 2 つ）</strong>: ECS Fargate タスクを配置（<code>assignPublicIp=ENABLED</code> でパブリック IP を自動付与し、Internet Gateway 経由で外部 API にアクセス）</li>
-  <li><strong>Isolated Subnet（各 AZ に 1 つ、計 2 つ）</strong>: Aurora Serverless v2 を配置（インターネットアクセス不要）</li>
-  <li><strong>NAT Gateway</strong>: 使用しない（コスト削減のため。ECS Fargate はパブリック IP で直接インターネットにアクセスする）</li>
-</ul>
-
-<div class="note">
-  <span class="callout-title">NAT Gateway への移行パス</span>
-  将来的にセキュリティ要件の強化やトラフィック増加に伴い、ECS Fargate を Private Subnet に移動し NAT Gateway 経由の構成に変更可能。現時点ではコスト優先でパブリック IP 方式を採用する。
+<p class="lead">この章は、VPC の分け方と、各部品がどの経路で外部や他の部品とつながるかを示す。ECS のバッチは VPC の中、Lambda は VPC の外で動く。</p>
+<h3 id="vpc">2.1 VPC</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>要素</th><th>構成</th></tr></thead>
+  <tbody>
+    <tr><td>VPC</td><td>1 つを全バッチで共有（2 AZ）</td></tr>
+    <tr><td>パブリックサブネット</td><td>各 AZ に 1 つ。ECS Fargate のタスクを置き、パブリック IP（<code>assignPublicIp=ENABLED</code>）で Internet Gateway から外へ出る</td></tr>
+    <tr><td>隔離サブネット</td><td>各 AZ に 1 つ。Aurora を置く（インターネットへの経路なし）</td></tr>
+    <tr><td>NAT Gateway</td><td>使わない <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>VPC エンドポイント</td><td>S3 の Gateway 型だけ <a class="decision-ref" href="#d-07">→ 理由 D-07</a></td></tr>
+    <tr><td>Security Group</td><td>バッチ共通の Security Group はインバウンドをすべて拒否する。Aurora の Security Group は、バッチ共通の Security Group と DB 準備確認専用の Security Group からの接続だけを受ける（規則の詳細は<a href="security.html">セキュリティ設計</a>）</td></tr>
+  </tbody>
+</table>
 </div>
-
-<div class="warn">
-  <span class="callout-title">Security Group 運用上の注意</span>
-  ECS Fargate タスクが Public Subnet でパブリック IP を持つため、Security Group のインバウンドルールを全ポート拒否に維持することが不可欠である。Security Group の変更時は、意図しないインバウンド許可が追加されていないことを必ず確認すること。CDK でのリソース追加時にも、バッチ共通 Security Group のインバウンドルールが変更されないよう注意する。
+<p>ECS Fargate のタスクはパブリック IP を持つため、バッチ共通の Security Group にインバウンドの許可を足してはならない。リソースを足すときも同じ Security Group を流用しない。</p>
+<h3 id="flows">2.2 通信の経路</h3>
+<p class="lead">次の表は、配信面の部品から各接続先への経路。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>接続元</th><th>接続先</th><th>経路</th></tr></thead>
+  <tbody>
+    <tr><td>ECS Fargate</td><td>外部 API（Instagram Graph API）</td><td>パブリック IP → Internet Gateway</td></tr>
+    <tr><td>ECS Fargate</td><td>Aurora</td><td>VPC の中（Security Group で制御）</td></tr>
+    <tr><td>ECS Fargate</td><td>S3</td><td>Gateway 型の VPC エンドポイント</td></tr>
+    <tr><td>ECS Fargate</td><td>Secrets Manager・CloudWatch Logs</td><td>パブリック IP → Internet Gateway（TLS）</td></tr>
+    <tr><td>Instagram</td><td>動画（投稿時）</td><td>S3 の署名付き URL（標準エンドポイント）をインターネットから取得する</td></tr>
+    <tr><td>Instagram（Webhook）</td><td>Lambda（受け付け）</td><td>Lambda の関数 URL（認証タイプ NONE。署名は Lambda の中で検証する <a class="decision-ref" href="#d-03">→ 理由 D-03</a>）</td></tr>
+    <tr><td>Lambda</td><td>S3・SQS・Secrets Manager</td><td>AWS の公開エンドポイント（VPC の外）</td></tr>
+    <tr><td>Lambda</td><td>外部 API（Instagram・LLM）</td><td>インターネット経由（VPC の外）</td></tr>
+  </tbody>
+</table>
 </div>
-
-<h3>2.2 通信フロー</h3>
-<ul>
-  <li>ECS Fargate → 外部 API: パブリック IP + Internet Gateway 経由でインターネットアクセス</li>
-  <li>ECS Fargate → Aurora: VPC 内部ルーティングによる通信（Security Group で制御）</li>
-  <li>ECS Fargate → S3: VPC Endpoint（Gateway 型）を利用（無料のため維持）
-    <ul><li>Presigned URL は S3 の標準エンドポイント URL で生成されるため、投稿先 SNS プラットフォーム側からインターネット経由でアクセス可能</li></ul>
-  </li>
-  <li>ECS Fargate → Secrets Manager: パブリック IP 経由（TLS 暗号化。詳細は <a href="security.html">security.html</a> を参照）</li>
-  <li>ECS Fargate → CloudWatch Logs: パブリック IP 経由でインターネットアクセス</li>
-</ul>
 
 <h2 id="compute">3. コンピューティング</h2>
-
-<h3>3.1 ECS Fargate</h3>
-<ul>
-  <li><strong>ECS Cluster</strong>: 1 つ作成し全バッチで共有</li>
-  <li><strong>ECS Service</strong>: 使用しない（バッチ用途のため RunTask のみ）</li>
-  <li><strong>Task Definition</strong>: サービスごとに作成（<code>db-readiness-check-task</code>, <code>image-batch-task</code>, <code>sns-post-batch-task</code>）</li>
-  <li><strong>DB 準備確認</strong>: Aurora Serverless v2 の自動一時停止からの再開に対応するため、ECS タスクで実装する（Lambda は VPC 内からパブリック IP が付与されず、NAT Gateway または VPC Endpoint（Interface 型）なしでは Secrets Manager にアクセスできないため）。仕様の詳細は <a href="workflow.html#db-readiness">workflow.html セクション 2</a> を参照</li>
-</ul>
-
-<h3>3.2 Step Functions</h3>
-<ul>
-  <li><strong>ステートマシン</strong>: バッチ種別ごとに 1 つ（image-generation-sfn, sns-posting-sfn）</li>
-  <li><strong>DB 準備確認</strong>: 各ワークフローの最初のステートとして実行</li>
-  <li><strong>順次実行</strong>: 画像生成 Step Functions の成功後に SNS 投稿 Step Functions を <code>StartExecution</code>（非同期）で起動</li>
-  <li><strong>子実行名の冪等化</strong>: image-generation-sfn から sns-posting-sfn を起動する際は、親の <code>$$.Execution.Name</code> を子実行の <code>Name</code> に渡し、同一要求の retry を冪等化する。既に同名の子実行が作成済みの場合は二重起動せず成功扱いとする（詳細は <a href="workflow.html">workflow.html</a> を参照）</li>
-  <li><strong>入力パラメータ</strong>: <code>set_code</code>, <code>scheduled_at</code> をスケジューラから受け取り、ECS タスクの環境変数として渡す（環境変数一覧は <a href="workflow.html#env-vars">workflow.html セクション 5</a> を参照）</li>
-  <li><strong>実行コンテキスト</strong>: <code>$$.Execution.Id</code> を <code>EXECUTION_ARN</code> として ECS タスクへ渡す</li>
-  <li><strong>実行モード</strong>: Standard（長時間実行に対応）</li>
-  <li><strong>タイムアウト</strong>: 各 Task ステートに明示タイムアウトを設定し、ハング時にワークフローが長時間ぶら下がらないようにする（具体値は <a href="workflow.html">workflow.html</a> を参照）</li>
-  <li><strong>同時実行に関する制約</strong>: Step Functions Standard にはステートマシンの同時実行数を制限するネイティブ機能がないため、EventBridge Scheduler の実行間隔をバッチの想定実行時間より十分長く設定して回避する。同時実行時のデータ整合性の担保（DB レベルの排他制御）はアプリ設計（<a href="../app/index.html">docs/app/</a>）で扱う</li>
-  <li><strong>エラーハンドリング</strong>: Retry / Catch を設定（ASL 定義は <a href="workflow.html">workflow.html</a> を参照）</li>
-  <li><strong>SNS 投稿の単独実行</strong>: sns-posting-sfn は独立したステートマシンのため、手動での単独実行も可能。起動時に何が投稿されるか（投稿対象の決定）はアプリ設計（<a href="../app/batch-flow.html#flow-sns">バッチ処理フロー設計 セクション 3</a>）で定義する</li>
-</ul>
-
-<h3>3.3 EventBridge Scheduler</h3>
-<ul>
-  <li><strong>スケジュール</strong>: セットごとに cron 式で定義（画像生成 Step Functions のみをターゲット）</li>
-  <li><strong>ターゲット</strong>: 画像生成 Step Functions ステートマシン（<code>set_code</code> と <code>scheduled_at</code> を入力に含める）</li>
-  <li><strong>スケジュール管理</strong>: マスタは IaC（CDK）とする</li>
-  <li><strong>起動失敗対策</strong>: Scheduler RetryPolicy と SQS DLQ を設定し、起動失敗は <code>AWS/Scheduler</code> メトリクスで監視する（詳細は <a href="workflow.html#scheduler-dlq">workflow.html セクション 10</a> を参照）</li>
-</ul>
+<p class="lead">この章は、処理を実際に動かす部品（ECS のタスク定義・Step Functions・EventBridge Scheduler・Lambda）を種類ごとに一覧にする。ステートの並びや Retry の値など、ワークフローの定義は<a href="workflow.html">ワークフロー</a>にある。</p>
+<h3 id="ecs">3.1 ECS Fargate</h3>
+<p class="lead">ECS クラスターは 1 つで全バッチが共有し、ECS Service は使わず RunTask だけで動かす <a class="decision-ref" href="#d-08">→ 理由 D-08</a>。次の表は 4 つのタスク定義。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>タスク定義（family）</th><th>中身</th><th>CPU / メモリ</th><th>起動元</th></tr></thead>
+  <tbody>
+    <tr><td><code>acps-prod-db-readiness-check</code></td><td>Aurora の起動を待って接続を確かめる</td><td>256 / 512 MiB</td><td>3 つの SFN の先頭</td></tr>
+    <tr><td><code>acps-prod-image-batch</code></td><td>当回の動画を在庫から選んで登録する</td><td>1024 / 2048 MiB</td><td><code>image-generation-sfn</code></td></tr>
+    <tr><td><code>acps-prod-sns-post-batch</code></td><td>Instagram へ投稿する</td><td>256 / 512 MiB</td><td><code>sns-posting-sfn</code></td></tr>
+    <tr><td><code>acps-prod-insights-batch</code></td><td>インサイトとコメント記録を集める</td><td>256 / 512 MiB</td><td><code>insights-collection-sfn</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>SFN はタスク定義を family 名で指定し、常に最新の ACTIVE なリビジョンを動かす。イメージは ECR の 4 リポジトリ（<code>auto-content-publisher/{image-batch, sns-post-batch, insights-batch, db-readiness-check}</code>）に置く。</p>
+<h3 id="sfn">3.2 Step Functions</h3>
+<p class="lead">ステートマシンは 3 つで、すべて Standard。次の表はその構成（ステートの定義と Retry / Catch は<a href="workflow.html">ワークフロー</a> 3・4・11 章）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ステートマシン</th><th>ステートの並び</th><th>起動元</th></tr></thead>
+  <tbody>
+    <tr><td><code>acps-prod-image-generation-sfn</code></td><td>DB 準備確認 → 選定のバッチ → 投稿の SFN を非同期で起動</td><td>EventBridge Scheduler</td></tr>
+    <tr><td><code>acps-prod-sns-posting-sfn</code></td><td>入力の確認 → DB 準備確認 → 投稿のバッチ</td><td>選定の SFN（手動の単独実行もできる）</td></tr>
+    <tr><td><code>acps-prod-insights-collection-sfn</code></td><td>DB 準備確認 → 収集のバッチ</td><td>EventBridge Scheduler</td></tr>
+  </tbody>
+</table>
+</div>
+<p>入力のセットコードと予定時刻を ECS タスクの環境変数として渡し、実行 ID を <code>EXECUTION_ARN</code> として渡す。各 Task ステートには明示のタイムアウトがある。Standard には同時実行数を制限する機能がなく、同じセットのバッチが重ならないようにスケジュールの間隔を空けている <a class="decision-ref" href="#d-09">→ 理由 D-09</a>。</p>
+<h3 id="scheduler">3.3 EventBridge Scheduler</h3>
+<p class="lead">スケジュールは CDK を唯一の正として定義し、3 つのグループに分かれる。次の表は各グループの役割（個々のスケジュールの一覧は<a href="workflow.html#overview">ワークフロー 1 章</a>）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>グループ</th><th>ターゲット</th><th>本数</th><th>起動に失敗したとき</th></tr></thead>
+  <tbody>
+    <tr><td><code>acps-prod-image-schedule-group</code></td><td><code>image-generation-sfn</code></td><td>セット × 時刻（5 本。うち 1 本は停止中）</td><td>再試行 → SQS DLQ <code>acps-prod-image-scheduler-dlq</code></td></tr>
+    <tr><td><code>acps-prod-insights-schedule-group</code></td><td><code>insights-collection-sfn</code></td><td>セット × 朝夕（6 本）</td><td>再試行 → SQS DLQ <code>acps-prod-insights-scheduler-dlq</code></td></tr>
+    <tr><td>既定のグループ（<code>CommentReplyStack</code>）</td><td>トークン更新の Lambda</td><td>面ごとに 1 本（月曜 04:00）</td><td>再試行（Lambda の中の失敗は Errors アラーム）</td></tr>
+  </tbody>
+</table>
+</div>
+<h3 id="comment-reply">3.4 コメント自動返信とトークン更新（Lambda）</h3>
+<p class="lead">コメント自動返信は、外部（Meta の Webhook）からの要求を受け、ユーザーに向けて自動で発信する唯一の経路である。投稿のバッチとは独立し、VPC の外で Aurora を使わずに動く <a class="decision-ref" href="#d-05">→ 理由 D-05</a>。図 2 はこの経路の AWS 構成で、トークン更新の Lambda も同じスタックにある。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    META(["Meta の Webhook"]) -->|"HTTPS"| W@{ icon: "aws:lambda", form: "square", label: "受け付け Lambda（関数 URL・10 秒）" }
+    W --> Q@{ icon: "aws:sqs", form: "square", label: "SQS FIFO（DLQ 付き）" }
+    Q --> R@{ icon: "aws:lambda", form: "square", label: "返信 Lambda（予約同時実行 2・300 秒）" }
+    R --> S3@{ icon: "aws:s3", form: "square", label: "S3: problems/ を読む・comment-log/ に書く" }
+    R --> EXT(["Instagram・LLM の API"])
+    SCH@{ icon: "aws:scheduler", form: "square", label: "Scheduler（月曜 04:00）" } --> T@{ icon: "aws:lambda", form: "square", label: "トークン更新 Lambda（60 秒）" }
+    T --> SM@{ icon: "aws:secrets-manager", form: "square", label: "Secret（返信用）" }
+    R --> SM
+    Q -.->|"DLQ の滞留"| AL["アラーム"]
+</pre>
+<figcaption>図 2 コメント自動返信とトークン更新の AWS 構成（本番面。ステージング面は名前の末尾に -staging が付く同じ構成）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>要素</th><th>構成</th></tr></thead>
+  <tbody>
+    <tr><td>受け付け</td><td>Lambda <code>acps-prod-comment-reply-webhook</code> の関数 URL（認証タイプ NONE）。署名（<code>X-Hub-Signature-256</code>。HMAC-SHA256・鍵は Instagram アプリの秘密鍵）を検証し、自分の返信を除いて SQS に入れ、すぐ応答を返す <a class="decision-ref" href="#d-04">→ 理由 D-04</a></td></tr>
+    <tr><td>キュー</td><td>SQS FIFO <code>acps-prod-comment-reply.fifo</code>。再配信の上限を超えたメッセージは DLQ <code>acps-prod-comment-reply-dlq.fifo</code> へ移る</td></tr>
+    <tr><td>返信</td><td>Lambda <code>acps-prod-comment-reply-reply</code>（SQS をイベントソースに 1 件ずつ処理）</td></tr>
+    <tr><td>トークン更新</td><td>Lambda <code>acps-prod-comment-reply-token-refresh</code>（Scheduler から週 1 回）</td></tr>
+    <tr><td>データ</td><td>S3 の問題スナップショット <code>assets/umigame-soup-1/problems/{media_id}.json</code>（投稿のバッチが公開に成功した直後に PUT する。ステージング面は <code>assets/umigame-soup-1/staging/problems/</code>）を読み（該当プレフィックスだけを許可）、<code>comment-log/</code> に書く。Aurora・VPC・NAT には依存しない</td></tr>
+    <tr><td>秘密情報</td><td>Secret <code>acps/prod/umigame-soup-1/comment-reply</code>（Webhook の検証用トークン・アプリの秘密鍵・Instagram のトークン・LLM の API キー）</td></tr>
+    <tr><td>面</td><td>同じ定義から本番面（<code>CommentReplyStack</code>）とステージング面（<code>CommentReplyStagingStack</code>。テスト用の Meta アプリとアカウント）を作る <a class="decision-ref" href="#d-06">→ 理由 D-06</a>。本番面はプライバシーポリシーの公開バケット <code>acps-prod-umigame-privacy-policy</code> も持つ</td></tr>
+  </tbody>
+</table>
+</div>
 
 <h2 id="datastore">4. データストア</h2>
-
-<h3>4.1 Aurora Serverless v2（MySQL 互換）</h3>
-<ul>
-  <li><strong>自動一時停止</strong>: コスト最適化のため有効化</li>
-  <li><strong>最小 ACU</strong>: 0（自動一時停止対応バージョンを前提とする）</li>
-  <li><strong>エンジン要件</strong>: Aurora MySQL 3.08.0 以降など、0 ACU の自動一時停止をサポートするバージョンを採用する</li>
-  <li><strong>接続</strong>: Isolated Subnet に配置。VPC 内部ルーティングにより同一 VPC 内の ECS Fargate からアクセス可能</li>
-  <li><strong>認証情報</strong>: Secrets Manager で管理（詳細は <a href="security.html">security.html</a> を参照）</li>
-</ul>
-
-<h3>4.2 S3</h3>
-<ul>
-  <li><strong>バケット</strong>: 画像保存用に 1 つ作成</li>
-  <li><strong>ライフサイクル</strong>: 全オブジェクトを作成から 30 日で自動削除（詳細は <a href="stacks.html">stacks.html</a> を参照）</li>
-  <li><strong>アクセス</strong>: VPC Endpoint（Gateway 型）経由</li>
-</ul>
+<p class="lead">この章は、配信面と生産面が共有するデータの置き場所を示す。中身（テーブル定義・キーの意味）はアプリ設計の<a href="../app/data-model.html">データモデル</a>にある。</p>
+<h3 id="aurora">4.1 Aurora Serverless v2（MySQL 互換）</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>構成</th></tr></thead>
+  <tbody>
+    <tr><td>エンジン</td><td>Aurora MySQL 3.08 系（0 ACU の自動一時停止に対応する版）</td></tr>
+    <tr><td>容量</td><td>最小 0 ACU（自動一時停止）〜 最大 1 ACU <a class="decision-ref" href="#d-10">→ 理由 D-10</a></td></tr>
+    <tr><td>配置</td><td>隔離サブネット。VPC の中の ECS からだけ接続する</td></tr>
+    <tr><td>Data API</td><td>有効（生産面の <code>apply_aurora.py</code> と集計ランナーが使う）</td></tr>
+    <tr><td>認証情報</td><td>Secret <code>acps/prod/db/credentials</code></td></tr>
+  </tbody>
+</table>
+</div>
+<h3 id="s3">4.2 S3</h3>
+<p class="lead">バケットは <code>acps-prod-images-{アカウント ID}</code> の 1 つで、プレフィックスで用途を分ける。次の表は用途と保持期間（自動削除は生成物のプレフィックスだけ <a class="decision-ref" href="#d-11">→ 理由 D-11</a>）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>プレフィックス</th><th>用途</th><th>書く</th><th>保持</th></tr></thead>
+  <tbody>
+    <tr><td><code>assets/{set_code}/prebuilt/</code></td><td>ビルド済み動画・背景・挿絵</td><td>生産面（<code>publish.py</code>）</td><td>無期限</td></tr>
+    <tr><td><code>assets/umigame-soup-1/problems/</code></td><td>問題スナップショット（ステージング面は <code>staging/problems/</code>）</td><td>投稿のバッチ</td><td>無期限</td></tr>
+    <tr><td><code>audio/{set_code}/</code></td><td>BGM のストック</td><td>生産面</td><td>無期限</td></tr>
+    <tr><td><code>videos/</code>・<code>images/</code></td><td>当回の投稿用に写した動画・画像</td><td>選定のバッチ</td><td>30 日で自動削除</td></tr>
+    <tr><td><code>comment-log/</code></td><td>コメント記録（インサイト収集が DB に取り込む）</td><td>返信 Lambda</td><td>30 日で自動削除</td></tr>
+  </tbody>
+</table>
+</div>
+<p>パブリックアクセスはすべて遮断し、SSE-S3 で暗号化し、TLS 以外の接続を拒否する。</p>
+<h3 id="secrets">4.3 Secrets Manager</h3>
+<p class="lead">秘密情報は Secrets Manager に置く。名前の規約と権限は<a href="security.html">セキュリティ設計</a>にある。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Secret</th><th>使う部品</th></tr></thead>
+  <tbody>
+    <tr><td><code>acps/prod/db/credentials</code></td><td>ECS のバッチ</td></tr>
+    <tr><td><code>acps/prod/{set_code}/sns/{platform}/{account_code}</code></td><td>投稿・インサイト収集のバッチ（Instagram のトークン）</td></tr>
+    <tr><td><code>acps/prod/image/api-key</code></td><td>実行時生成の方式（稼働セットでは使っていない）</td></tr>
+    <tr><td><code>acps/prod/umigame-soup-1/comment-reply</code></td><td>コメント自動返信・トークン更新の Lambda</td></tr>
+  </tbody>
+</table>
+</div>
 
 <h2 id="security">5. セキュリティ</h2>
-<p>認証・認可・秘密情報管理の方針は <a href="security.html">security.html</a> を参照。</p>
+<p>IAM ロール・Secret の名前の規約・ネットワークの規則は<a href="security.html">セキュリティ設計</a>にある。</p>
 
 <h2 id="monitoring">6. ログ・監視</h2>
-<ul>
-  <li>ECS タスクのログを CloudWatch Logs に出力（ロググループはサービスごとに分離）</li>
-  <li>Step Functions 失敗、EventBridge Scheduler 起動失敗、ECS タスク異常終了、Aurora 異常を監視し SNS Topic で通知</li>
-  <li>監視リソースの具体的なメトリクス名・しきい値は <a href="workflow.html#alarms">workflow.html セクション 7〜10</a> を参照</li>
-  <li>コメント自動返信経路（セクション 1.1）は Lambda のログを CloudWatch Logs に出力（リテンション 90 日）し、SQS DLQ の滞留を監視して SNS Topic で通知（<a href="workflow.html#comment-reply-dlq">workflow.html セクション 10</a>。21-3 追加）</li>
-</ul>
+<p class="lead">この章は、ログの出し先と、異常を人に知らせる仕組みの全体を示す。個々のアラームの名前・しきい値は<a href="workflow.html#alarms">ワークフロー 8 章</a>にある。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>対象</th><th>ログ</th><th>知らせる異常</th></tr></thead>
+  <tbody>
+    <tr><td>ECS のバッチ</td><td>CloudWatch Logs（サービスごとのロググループ・保持 3 か月）</td><td>タスクの異常終了（EventBridge ルール）</td></tr>
+    <tr><td>Step Functions</td><td>実行履歴</td><td>実行の失敗・投稿の SFN の起動失敗</td></tr>
+    <tr><td>EventBridge Scheduler</td><td>—</td><td>起動の失敗・DLQ への退避</td></tr>
+    <tr><td>Lambda</td><td>CloudWatch Logs（関数ごと・保持 3 か月）</td><td>返信の DLQ の滞留・トークン更新の失敗</td></tr>
+    <tr><td>Aurora</td><td>—</td><td>CPU の高止まり・空きメモリの不足</td></tr>
+  </tbody>
+</table>
+</div>
+<p>通知はすべて SNS トピック <code>acps-prod-alarm-topic</code> へ送る（<code>MonitoringStack</code>。ステージング面は監視の対象外）。</p>
 
 <h2 id="deploy">7. デプロイ方式</h2>
-<p>デプロイ方式の詳細は <a href="cicd.html">cicd.html</a> を参照。</p>
-<ul>
-  <li>Blue/Green デプロイは採用しない</li>
-  <li>ECS Service は使用しない</li>
-  <li>Docker イメージを ECR に push し、新しい ECS タスク定義リビジョンを登録する方式</li>
-</ul>
+<p class="lead">この章は、変更が本番に届く経路を示す。経路は「ECS のバッチのイメージ」と「それ以外（インフラと Lambda）」の 2 つに分かれる。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>変更するもの</th><th>経路</th></tr></thead>
+  <tbody>
+    <tr><td>ECS のバッチ（<code>image-batch</code>・<code>sns-post-batch</code>・<code>insights-batch</code>）</td><td>main への push → CodePipeline → CodeBuild → ECR へ push → タスク定義の新しいリビジョンを登録。Blue/Green・ECS Service は使わない <a class="decision-ref" href="#d-08">→ 理由 D-08</a></td></tr>
+    <tr><td>インフラ・Lambda（<code>comment-reply</code>）・<code>db-readiness-check</code></td><td>手動の <code>cdk deploy</code></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>スタックごとのリソースの定義・デプロイの順番・スタック間の受け渡し → <a href="stacks.html">CDK スタック実装仕様</a></li>
+  <li>SFN の定義・スケジュールの一覧・環境変数・アラーム → <a href="workflow.html">ワークフロー</a></li>
+  <li>IAM・Secret・ネットワークの規則 → <a href="security.html">セキュリティ設計</a></li>
+  <li>パイプラインの動き → <a href="cicd.html">CI/CD 設計</a></li>
+  <li>デプロイ後の確認・コスト・運用 → <a href="operation.html">インフラ運用</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 NAT Gateway を使わず、Fargate にパブリック IP を持たせる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>ECS Fargate のタスクをパブリックサブネットに置き、パブリック IP で外へ出る。Aurora だけを隔離サブネットに置く</dd>
+  <dt>理由</dt><dd>NAT Gateway の費用を払わないため。インバウンドはバッチ共通の Security Group で全拒否にする</dd>
+  <dt>退けた案</dt><dd>プライベートサブネット + NAT Gateway（セキュリティ要件が強まったときの移行先として残す）</dd>
+  <dt>日付・出典</dt><dd>当初設計（Phase D〜1）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 DB 準備確認を ECS タスクにし、SFN の先頭に置く</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Aurora の起動待ちと接続確認を独立した ECS タスクにし、すべての SFN の最初のステートで動かす</dd>
+  <dt>理由</dt><dd>DB の再試行をバッチのコードから外し、バッチは DB が使える前提で書けるようにするため。Lambda にしなかったのは、VPC の中の Lambda はパブリック IP を持てず、NAT Gateway か Interface 型のエンドポイントなしでは Secrets Manager に届かないため（Fargate の起動の遅さ 30〜60 秒はバッチでは許容でき、費用も月 $0.01 未満）</dd>
+  <dt>日付・出典</dt><dd>当初設計。<a href="workflow.html#db-readiness">ワークフロー 2 章</a></dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 Webhook は API Gateway を使わず Lambda の関数 URL で受ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>関数 URL（認証タイプ NONE）で受け、Meta の署名を Lambda の中で検証する</dd>
+  <dt>理由</dt><dd>WAF やスロットリングが要るまで API Gateway は不要で、関数 URL は無料のため</dd>
+  <dt>日付・出典</dt><dd>Phase 21-1（⑥ の決定）・21-3</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 受け付けはキューに入れてすぐ応答する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>受け付けの Lambda は署名の検証と自分の返信の除外だけを行い、SQS FIFO に入れて即座に 200 を返す。判定と返信は別の Lambda が行う</dd>
+  <dt>理由</dt><dd>応答が遅れると Meta が Webhook を再送するため</dd>
+  <dt>日付・出典</dt><dd>Phase 21-3（設計）・21-6（実装）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 コメントの経路は VPC の外で、Aurora を使わない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>返信の Lambda は S3 の問題スナップショットだけを読み、記録も S3 に書く</dd>
+  <dt>理由</dt><dd>コメントが何件来ても Aurora を起こさず、VPC・NAT にも依存しないため</dd>
+  <dt>日付・出典</dt><dd>Phase 21-3</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 ステージング面はコメント自動返信の経路だけに持つ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>フルのステージング環境は作らず、外部へ発信するコメント自動返信の経路だけを本番面とステージング面の 2 面で持つ</dd>
+  <dt>理由</dt><dd>日次バッチは影響の範囲が小さく、ソロ運用の維持費と月 2 万円の予算に見合わない。外部へ発信する経路だけは本番の投稿に触れずに試す必要がある</dd>
+  <dt>日付・出典</dt><dd>2026-08-28（課題 <a href="../issues/index.html#I-027">I-027</a>）・Phase 21</dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 S3 には Gateway 型の VPC エンドポイントを使う</h3>
+<dl>
+  <dt>決めたこと</dt><dd>ECS から S3 への通信は Gateway 型のエンドポイントを通す</dd>
+  <dt>理由</dt><dd>無料のため（Interface 型のエンドポイントは費用がかかるので使わない）</dd>
+  <dt>日付・出典</dt><dd>当初設計</dd>
+</dl>
+</article>
+<article id="d-08">
+<h3>D-08 ECS Service と Blue/Green を使わず、RunTask とリビジョン登録で配備する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>バッチは RunTask だけで動かし、イメージを更新したらタスク定義の新しいリビジョンを登録する。SFN は family 名で最新を動かす</dd>
+  <dt>理由</dt><dd>常駐しないバッチ用途で、切り替えの仕組みが要らないため</dd>
+  <dt>日付・出典</dt><dd>当初設計。<a href="cicd.html">CI/CD 設計</a></dd>
+</dl>
+</article>
+<article id="d-09">
+<h3>D-09 同時実行はスケジュールの間隔で避ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Step Functions には同時実行数の上限を設けず、同じセットのバッチの起動間隔を実行時間より十分長くとる。データの整合（DB の排他）はアプリ側で扱う</dd>
+  <dt>理由</dt><dd>Step Functions Standard にはステートマシンの同時実行数を制限する機能がないため</dd>
+  <dt>日付・出典</dt><dd>当初設計</dd>
+</dl>
+</article>
+<article id="d-10">
+<h3>D-10 Aurora は最小 0 ACU で自動一時停止させる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>0 ACU の自動一時停止に対応する版を使い、使わない時間は止める</dd>
+  <dt>理由</dt><dd>バッチは 1 日数回しか動かず、止めている時間の費用を払わないため</dd>
+  <dt>日付・出典</dt><dd>当初設計。<a href="../overview/system-overview.html#d-06">基本設計（全体）D-06</a></dd>
+</dl>
+</article>
+<article id="d-11">
+<h3>D-11 S3 の自動削除は生成物のプレフィックスだけにする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>30 日の自動削除は <code>images/</code>・<code>videos/</code>・<code>comment-log/</code> だけに掛け、ビルド済み動画・問題スナップショット・BGM は残す</dd>
+  <dt>理由</dt><dd>長く使う素材（BGM のストックなど）が自動で消えないようにするため。コメント記録は DB への取り込みが動いていることを確かめてから自動削除を有効にした</dd>
+  <dt>日付・出典</dt><dd>Phase 14-4（生成物に限定）・2026-10-13（21-7b でコメント記録を追加）</dd>
+</dl>
+</article>
+</section>
 
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>

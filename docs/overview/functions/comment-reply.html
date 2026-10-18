@@ -125,7 +125,7 @@ sequenceDiagram
 </div>
 <div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
   <li>処理の詳細（判定方式・返信の書き方・核心語の漏れ検査・品質基準）→ <a href="../../app/sets/umigame-soup-1.html#comment-reply">umigame-soup-1 の 10 節</a></li>
-  <li>AWS の定義（受け付け・キュー・Lambda・Secret の構成）→ <a href="../../infra/architecture.html#comment-reply">アーキテクチャ 1.1</a></li>
+  <li>AWS の定義（受け付け・キュー・Lambda・Secret の構成）→ <a href="../../infra/architecture.html#comment-reply">アーキテクチャ 3.4</a></li>
   <li>運用の手順（DLQ にたまったとき）→ <a href="../../infra/workflow.html#comment-reply-dlq">ワークフロー 10.1</a></li>
 </ul></div>
 
@@ -145,7 +145,7 @@ sequenceDiagram
 <dl>
   <dt>決めたこと</dt><dd>受け付けの Lambda は検証とキューへの投入だけを 10 秒以内で行い、判定と返信は別の Lambda がキューから 1 件ずつ処理する</dd>
   <dt>理由</dt><dd>Webhook にすぐ応答して再送を避けつつ、LLM の呼び出しに時間がかかっても取りこぼさないため。同じ投稿のコメントは順番どおりに処理し、Webhook の再送による二重の投入をコメント ID で抑える（返信に失敗したメッセージの再試行は別で、キューの再配信で行う）</dd>
-  <dt>日付・出典</dt><dd>Phase 21-3（設計）・21-6（実装）。<a href="../../infra/architecture.html#comment-reply">アーキテクチャ 1.1</a></dd>
+  <dt>日付・出典</dt><dd>Phase 21-3（設計）・21-6（実装）。<a href="../../infra/architecture.html#comment-reply">アーキテクチャ 3.4</a></dd>
 </dl>
 </article>
 <article id="d-03">

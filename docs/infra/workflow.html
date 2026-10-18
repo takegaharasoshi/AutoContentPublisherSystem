@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ワークフロー実装仕様 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
 
-<nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / インフラ設計 / ワークフロー実装仕様</nav>
+<nav class="breadcrumb"><a href="../index.html">docs</a> / インフラ設計 / ワークフロー実装仕様</nav>
 <h1>ワークフロー実装仕様</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">一時 Fix</span>
-  <span class="badge badge-fixed">Phase 16-7 でインサイト収集ワークフロー（1.6・5.4・11）を追加</span>
-  <span>最終更新: 2026-10-12（21-6i: 1.5 の umigame-soup-1 の cron を週 4 回〔日・火・木・土〕に更新）。前回: 2026-10-12（21-7: 1.5 の現行一覧を実値に揃え〔fantasy-animals-1 の削除・pref-ranking-1 / umigame-soup-1 の追加〕、セット追加時の Scheduler の有効化方針を決定として追記）。前回: 2026-09-04（21-3: セクション 8 にコメント自動返信 DLQ のアラーム、10.1 に DLQ 定義を追加）</span>
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-4 で新しい書式へ移し〔要約・リード文・SFN のフロー図・判断の記録〕、1.6 のインサイト収集のスケジュール一覧を実態〔3 セット × 朝夕〕に直した）</span>
+  <span>1 段上: 機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> の「AWS の定義」</span>
 </div>
 
 <p>Step Functions・EventBridge Scheduler・DB 準備確認タスク・監視リソースの実装仕様を定義する。アーキテクチャ上の位置付けは <a href="architecture.html">architecture.html</a>、CDK リソース定義は <a href="stacks.html">stacks.html</a>、運用時の対応手順は <a href="operation.html">operation.html</a> を参照。</p>
@@ -24,7 +24,54 @@
   本ドキュメントの ASL・環境変数はワークフローの「器」の定義であり、業務ロジックに依存しない。ECS タスク内部の処理内容（画像生成・SNS 投稿のロジック）はアプリ設計（<a href="../app/index.html">docs/app/</a>）で定義する。
 </div>
 
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、配信面のうち時刻で動く 2 つの系統（①投稿・②インサイト収集）を動かすワークフローの実装仕様である。Step Functions（SFN）の定義、EventBridge Scheduler のスケジュール、ECS タスクへ渡す環境変数、失敗を知らせる監視リソースを定める。ECS タスクの中で何をするか（業務の処理）は書かず、アプリ設計に任せる。</p>
+<p class="lead">図 1 は、ワークフローの全体を表す。Scheduler が選定の SFN と収集の SFN を起こし、選定の SFN が成功すると投稿の SFN を起こす。どの SFN も最初に DB 準備確認を動かす。起動や実行の失敗は監視リソースから通知される。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    S1@{ icon: "aws:scheduler", form: "square", label: "画像生成のスケジュール（セット × 時刻）" }
+    S2@{ icon: "aws:scheduler", form: "square", label: "インサイト収集のスケジュール（セット × 朝夕）" }
+    subgraph IMG["image-generation-sfn（3 章）"]
+        direction TB
+        a1["DB 準備確認"] --> a2["選定のバッチ"] --> a3["投稿の SFN を起動"]
+    end
+    subgraph SNS["sns-posting-sfn（4 章）"]
+        direction TB
+        b0["入力の確認"] --> b1["DB 準備確認"] --> b2["投稿のバッチ"]
+    end
+    subgraph INS["insights-collection-sfn（11 章）"]
+        direction TB
+        c1["DB 準備確認"] --> c2["収集のバッチ"]
+    end
+    S1 --> a1
+    a3 -.->|"非同期"| b0
+    S2 --> c1
+    S1 -.->|"起動失敗"| DLQ1["画像生成の Scheduler DLQ（10 章）"]
+    S2 -.->|"起動失敗"| DLQ2["インサイト収集の Scheduler DLQ（1.6）"]
+    IMG -.->|"失敗"| AL["アラーム → SNS トピック（7〜9 章）"]
+    SNS -.-> AL
+    INS -.-> AL
+</pre>
+<figcaption>図 1 ワークフローの全体（コメント自動返信の DLQ は 10.1）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>ステートマシン</td><td><code>image-generation-sfn</code>（選定）・<code>sns-posting-sfn</code>（投稿）・<code>insights-collection-sfn</code>（収集）の 3 つ。すべて Standard</td></tr>
+    <tr><td>起動</td><td>Scheduler が選定と収集を起こす。投稿は選定の成功後に非同期で起動される（スケジュールを持たない）</td></tr>
+    <tr><td>先頭の処理</td><td>すべての SFN が最初に DB 準備確認の ECS タスクを動かす <a class="decision-ref" href="#d-04">→ 理由 D-04</a></td></tr>
+    <tr><td>スケジュールの正</td><td>CDK（<code>image-batch-stack.ts</code>・<code>insights-batch-stack.ts</code>）。停止・再開も CDK で行う <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+    <tr><td>監視</td><td>SFN の失敗・投稿の SFN の起動失敗・Scheduler の起動失敗・ECS の異常終了・Aurora の負荷・コメント返信の DLQ を SNS トピックへ通知する</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
 <h2 id="overview">1. ワークフロー構成</h2>
+<p class="lead">この章は、要約の図 1 の起動の仕方を詳しくしたもの。SFN どうしのつながり（1.1）、全 SFN に共通する実装の決まり（1.2）、Scheduler の入力・再試行・スケジュールの一覧（1.3〜1.6）を示す。</p>
 
 <h3>1.1 順次実行</h3>
 <p>画像生成バッチと SNS 投稿バッチは順次実行される（全体像は <a href="architecture.html#overall">architecture.html セクション 1</a> の図を参照）。</p>
@@ -53,7 +100,7 @@
 <h3>1.3 EventBridge Scheduler の Input テンプレート</h3>
 <p>Scheduler は以下の形式で画像生成 Step Functions を起動する。<code>&lt;aws.scheduler.scheduled-time&gt;</code> は EventBridge Scheduler が実行時刻（UTC、ISO 8601）に自動置換する。</p>
 <pre><code>{
-  "set_code": "fantasy-animals-1",
+  "set_code": "logic-training-1",
   "scheduled_at": "&lt;aws.scheduler.scheduled-time&gt;"
 }</code></pre>
 <p><code>set_code</code> はスケジュールごとの固定値（セクション 1.5 の一覧）。スロット対応方式のセットでも Input にスロットは持たせず、方式側が <code>scheduled_at</code> の JST 時から決定的に解決する。インサイト収集 Step Functions の Input テンプレートはセクション 1.6 を参照。</p>
@@ -79,7 +126,7 @@
     <tr><td>ScheduleGroup 名</td><td><code>acps-prod-image-schedule-group</code>（MonitoringStack の <code>AWS/Scheduler</code> メトリクス Dimension で使用。全スケジュールを 1 グループに所属させる）</td></tr>
     <tr><td>タイムゾーン</td><td><code>Asia/Tokyo</code></td></tr>
     <tr><td>FlexibleTimeWindow</td><td><code>OFF</code>（時刻どおりに起動する）</td></tr>
-    <tr><td>State</td><td><code>ENABLED</code>（Phase 13-1 で本番化、14-12 で動画運用として再開。下記 decision を参照）</td></tr>
+    <tr><td>State</td><td><code>ENABLED</code>（停止中の枠を除く）。新しいセットのスケジュールも有効のまま追加し、稼働の切り替えは <code>batch_sets.is_active</code> で行う <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。設定・停止・再開は CDK を唯一の正とする <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
     <tr><td>RetryPolicy / DLQ</td><td>セクション 1.4 のとおり（全スケジュール共通）</td></tr>
   </tbody>
 </table>
@@ -101,34 +148,13 @@
 <p>コンテンツ生成に数分かかるため、実投稿はスケジュール時刻の数分後になる。</p>
 <p><code>fantasy-animals-1</code> の 21:00 枠は Phase 20-1（2026-09-03）のセット停止で削除した（復活時の再追加の仕方は <code>image-batch-stack.ts</code> のコメント）。</p>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-10-12、21-7）: 新セットの Scheduler は有効のまま deploy し、稼働の切り替えは <code>batch_sets.is_active</code> で行う</span>
-  画像生成・SNS 投稿・インサイト収集の 3 バッチは、いずれも <code>is_active=0</code> のセットでは実行ログだけ残して何もせず正常終了する（<code>generation_runs</code> も作らない）。そのため Scheduler を先に有効で deploy しておけば、稼働開始は DB の UPDATE 1 文（<code>umigame-soup-1</code> では <code>content/umigame-stock/umigame-soup-1/set-registration/04_activate.sql</code>）で済み、有効化のためだけの 2 回目の <code>cdk deploy</code> が要らない。セット追加手順の「Scheduler 有効化前のバックログ 0 件確認」（<a href="../app/operation.html#set-add">app/operation.html セクション 2.1</a>）は、<code>is_active</code> を 1 にする直前に行う。停止中の定時起動で増えるのは Step Functions の空実行と DB 準備確認だけで、同時刻に他セットが Aurora を起こしているため追加の費用はほぼない。長期停止は従来どおり CDK 側で外す（下の「Scheduler は CDK を単一の正とする」）。
-</div>
+<p>停止中のセット（<code>is_active=0</code>）では、3 つのバッチとも実行ログだけを残して正常終了する（<code>generation_runs</code> も作らない）。稼働開始は DB の UPDATE で行い、2 回目の <code>cdk deploy</code> は要らない。 <a class="decision-ref" href="#d-01">→ 理由 D-01</a></p>
 
-<div class="decision">
-  <span class="callout-title">当面は DISABLED で運用（2026-07-14）→ Phase 13-1 で本番化（2026-07-22）</span>
-  Phase 5-6 でスケジュール時刻の自動起動（Scheduler → 画像生成 SFN → SNS 投稿 SFN の連鎖）を確認済み。有効のままだとアプリ実装期間中も毎日チェーン全体が空回しし、Aurora の起動コストと実行履歴のノイズが発生するため、検証後に <code>DISABLED</code> へ変更していた。アプリ実装完了後の Phase 13-1（2026-07-22）で本番化: cron 式を 1 日 3 回（7:00 / 12:00 / 21:00 JST、投稿時刻・回数はユーザー決定）に書き換え、Input の <code>set_code</code> を初セット <code>fantasy-animals-1</code> に変更して <code>ENABLED</code> 化した。
-</div>
+<p>スケジュールの設定は CDK を唯一の正とし、コンソール・CLI での変更は一時的な検証にだけ使う（State も <code>cdk deploy</code> で CDK の値に戻る）。 <a class="decision-ref" href="#d-02">→ 理由 D-02</a></p>
 
-<div class="decision">
-  <span class="callout-title">Phase 14-12 で 1 日 1 回（21:00 JST）へ変更（2026-07-26）</span>
-  動画（リール）運用への切替に伴い、cron 式を <code>cron(0 21 * * ? *)</code>（1 日 1 回・時刻はユーザー決定）に変更した。14-10 の AWS E2E 中は投稿内容のレビューのため Scheduler を<strong>手動で <code>DISABLED</code></strong> にしていたが、CDK テンプレートは <code>enabled: true</code> を保持しているため、本ステップの cron 変更を含む <code>cdk deploy</code> によって State も <code>ENABLED</code> に戻る（Scheduler の更新 API が全プロパティを送るため）。<strong>Scheduler の設定は CDK を単一の正とし、コンソール・CLI での手動変更は一時的な検証時のみとする</strong>。</div>
 
-<div class="decision">
-  <span class="callout-title">logic-training-1 の 3 スケジュールを Phase 16 リリースまで DISABLED（2026-08-06）</span>
-  2026-08-04 朝の生成失敗（クイズ検証の再生成上限到達）を起点に、メディア 0 件の generation_run が投稿対象選定をブロックし、logic-training-1 の投稿が停止・失敗アラームが定時実行のたびに発報する障害が発生した（復旧記録は <a href="../plans/logic-training-1-log.html">logic-training-1 記録</a> 2026-08-06。Phase 18 で開発レーンのトラブルシューティングログから移設）。16-1 で生成チェーン休止（ストックのみ方式への転換）が決定済みであることを踏まえ、復旧時に前倒しで 3 スケジュールを停止した。CLI での即時 DISABLE に加え、上記ルール（CDK が単一の正）に従い CDK 側も <code>enabled: false</code> へ変更していた。<strong>16-4（2026-08-08）の事前生成方式（quiz-prebuilt）への切替と同時に、CDK の <code>enabled</code> 指定を外して 3 本とも再有効化済み</strong>（時刻・cron 式は変更なし）。
-</div>
 
-<div class="decision">
-  <span class="callout-title">Phase 15-15 でセット別命名規約を確定し、既存 1 件をリネーム（2026-07-29）</span>
-  2 セット目（<code>logic-training-1</code>）の追加にあたり、上記の命名規約 <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code> を確定した。
-  <strong>既存の機能名 <code>acps-prod-image-generation-schedule</code> はリネームする</strong>（<code>acps-prod-image-generation-fantasy-animals-1</code>）。Schedule 名の変更は CloudFormation では置換（新規作成 → 旧削除）になるが、
-  ①MonitoringStack のアラームは Dimension に <strong>ScheduleGroup 名のみ</strong>を使っており Schedule 名に依存しない、②Scheduler はステートを持たず、置換で失われる実行履歴・キューもない、
-  ③2 セット目以降だけが規約に沿った名前になると「機能名 = 初セット」という暗黙知が残り続ける、の 3 点からリネームを選択した。
-  <strong>21:00 の同時起動について</strong>: <code>fantasy-animals-1</code>（21:00）と <code>logic-training-1</code> の night スロット（21:00）は同時刻に起動する。両チェーンは <code>set_code</code> で完全に分離されており（投稿対象の決定・アカウント・Secret・音源のいずれも <code>set_id</code> スコープ）、ECS / Aurora の同時実行にも余裕があるため時刻はずらさない。
-  投稿時刻はユーザー決定（15-4 で 1 日 3 回・朝昼夜の目安を決定し、15-15 で 7:30 / 12:30 / 21:00 に最終確定）。
-</div>
+<p>同じ時刻に複数セットのスケジュールが起動しても、各チェーンはセットコードで分離される。投稿時刻はユーザーが決める。 <a class="decision-ref" href="#d-03">→ 理由 D-03</a></p>
 
 <h3 id="schedule">1.6 インサイト収集の Scheduler</h3>
 
@@ -148,30 +174,29 @@
 
 <p>スケジュール一覧（実値。CDK <a href="../../infra/lib/insights-batch-stack.ts">insights-batch-stack.ts</a> が単一の正）:</p>
 
-<div class="decision">
-  <span class="callout-title">停止・再開は CDK のフラグで行う（2026-08-10）</span>
-  16-10 のデプロイ直後、16-11 の <code>instagram_manage_insights</code> 再認可が当日中に間に合わないことが確定したため、全 4 件を一時停止した（未再認可のまま定時実行を迎えると権限エラーで失敗アラームが鳴り続けるため）。同日中に再認可・両セットの疎通確認・バックフィルが完了し <strong>4 件とも <code>ENABLED</code> へ復帰済み</strong>。
-  停止・再開はいずれもコンソール・CLI の手動操作ではなく <strong>CDK の <code>insightsCollectionSchedulesEnabled</code> フラグ</strong>（<a href="../../infra/lib/insights-batch-stack.ts">insights-batch-stack.ts</a>）で行う。セクション 1.5 の「Scheduler は CDK を単一の正とする」decision に従うもので、手動 DISABLE は次の <code>cdk deploy</code> で無言のうちに解除されるため。フラグを切り替える際は <code>infra/test/insights-batch-stack.test.ts</code> の State 期待値も揃える。
-</div>
+<p>停止・再開は CDK のフラグ <code>insightsCollectionSchedulesEnabled</code>（<code>insights-batch-stack.ts</code>）で行う（手動で止めても次の <code>cdk deploy</code> で戻るため）。 <a class="decision-ref" href="#d-02">→ 理由 D-02</a></p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>Schedule 名</th><th>cron 式</th><th>JST 時刻</th><th>Input の <code>set_code</code></th></tr></thead>
   <tbody>
-    <tr><td><code>acps-prod-insights-collection-fantasy-animals-1-morning</code></td><td><code>cron(0 6 * * ? *)</code></td><td>6:00</td><td><code>fantasy-animals-1</code></td></tr>
-    <tr><td><code>acps-prod-insights-collection-fantasy-animals-1-evening</code></td><td><code>cron(0 18 * * ? *)</code></td><td>18:00</td><td><code>fantasy-animals-1</code></td></tr>
     <tr><td><code>acps-prod-insights-collection-logic-training-1-morning</code></td><td><code>cron(0 6 * * ? *)</code></td><td>6:00</td><td><code>logic-training-1</code></td></tr>
     <tr><td><code>acps-prod-insights-collection-logic-training-1-evening</code></td><td><code>cron(0 18 * * ? *)</code></td><td>18:00</td><td><code>logic-training-1</code></td></tr>
+    <tr><td><code>acps-prod-insights-collection-pref-ranking-1-morning</code></td><td><code>cron(0 6 * * ? *)</code></td><td>6:00</td><td><code>pref-ranking-1</code></td></tr>
+    <tr><td><code>acps-prod-insights-collection-pref-ranking-1-evening</code></td><td><code>cron(0 18 * * ? *)</code></td><td>18:00</td><td><code>pref-ranking-1</code></td></tr>
+    <tr><td><code>acps-prod-insights-collection-umigame-soup-1-morning</code></td><td><code>cron(0 6 * * ? *)</code></td><td>6:00</td><td><code>umigame-soup-1</code></td></tr>
+    <tr><td><code>acps-prod-insights-collection-umigame-soup-1-evening</code></td><td><code>cron(0 18 * * ? *)</code></td><td>18:00</td><td><code>umigame-soup-1</code></td></tr>
   </tbody>
 </table>
 </div>
 <p>同時刻の複数セット起動は 21:00 の画像生成と同じ整理（<code>set_code</code> で完全分離のため時刻をずらさない）。セット追加時はセットごとに 2 件を追加する（<a href="../app/operation.html#set-add">app/operation.html セクション 2.1</a> のセット追加手順に含める）。</p>
 
 <h2 id="db-readiness">2. DB 準備確認タスク（db-readiness-check）仕様</h2>
+<p class="lead">この章は、すべての SFN の先頭で動く DB 準備確認の ECS タスクの仕様を示す。 <a class="decision-ref" href="#d-04">→ 理由 D-04</a> <a class="decision-ref" href="#d-05">→ 理由 D-05</a></p>
 
 <p>Aurora Serverless v2 の自動一時停止からの再開に対応するため、各 Step Functions ワークフローの最初のステートとして DB 準備確認 ECS タスクを実行する。バッチアプリケーション（後続の ECS タスク）は DB が利用可能な状態を前提とする。</p>
 
 <ul>
-  <li><strong>ECS Task Definition</strong>: FoundationStack で定義（db-readiness-check）。両ワークフローで共有する</li>
+  <li><strong>ECS Task Definition</strong>: FoundationStack で定義（db-readiness-check）。3 つのワークフロー（選定・投稿・収集）で共有する</li>
   <li><strong>リソース</strong>: 最小構成（0.25 vCPU / 0.5 GB）</li>
   <li><strong>配置</strong>: Public Subnet（<code>assignPublicIp=ENABLED</code>）。Aurora（Isolated Subnet）へ VPC 内部ルーティングで接続する</li>
   <li><strong>リトライ設計</strong>:
@@ -191,17 +216,30 @@
   一時停止状態（0 ACU が約 90 分継続）からの手動 RunTask 検証（2026-07-14、Phase 6-5）では、初回の接続試行が Aurora の再開完了までブロックされ約 12 秒で成功し、コンテナ内リトライは発動しなかった（Phase 4-6 の SFN 経由実行でも同様に試行 1/9 で成功）。一時停止からの再開は通常、初回試行の接続待ちで吸収される。指数バックオフのリトライは、接続がエラーで即時失敗するケース（再開の長期化や一時的な障害など）に対する保険として機能する。
 </div>
 
-<div class="decision">
-  <span class="callout-title">設計変更理由</span>
-  DB 接続リトライをバッチアプリケーションコードから分離し、Step Functions ワークフローの責務とした。これにより、バッチアプリケーションは DB が利用可能な状態を前提として実装できる。
-</div>
+<p><a class="decision-ref" href="#d-04">→ 理由 D-04</a></p>
 
-<div class="decision">
-  <span class="callout-title">ECS Fargate 採用理由</span>
-  VPC 内の Lambda はパブリック IP が付与されないため、NAT Gateway または VPC Endpoint（Interface 型）なしでは Secrets Manager にアクセスできない。ECS Fargate は <code>assignPublicIp=ENABLED</code> でパブリック IP を取得可能なため、追加のネットワークリソースなしで Secrets Manager にアクセスできる。起動レイテンシ（30〜60 秒）の増加はバッチ用途では許容範囲内であり、月額コストも $0.01 未満と無視できる水準。
-</div>
+<p><a class="decision-ref" href="#d-05">→ 理由 D-05</a></p>
 
 <h2 id="image-asl">3. 画像生成 Step Functions ASL 定義</h2>
+<p class="lead">この章は、選定のワークフロー（<code>acps-prod-image-generation-sfn</code>）の定義を示す。図 2 はステートの流れで、続く JSON が CDK に渡す ASL の全文（<code>infra/lib/asl/image-generation.asl.json</code>）。</p>
+<figure class="diagram">
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --> WaitForDbReady
+    WaitForDbReady --> RunImageBatchTask
+    WaitForDbReady --> HandleError: 失敗
+    RunImageBatchTask --> StartSnsPostBatch: 成功（失敗とタイムアウトは 2 回まで再試行）
+    RunImageBatchTask --> HandleError: 失敗
+    StartSnsPostBatch --> [*]: 投稿の SFN を起動できた
+    StartSnsPostBatch --> SnsPostAlreadyStarted: 同じ名前の実行が既にある
+    StartSnsPostBatch --> NotifySnsPostStartFailure: そのほかの失敗
+    NotifySnsPostStartFailure --> ImageBatchSucceeded: 起動失敗のメトリクスを出す
+    SnsPostAlreadyStarted --> [*]
+    ImageBatchSucceeded --> [*]
+    HandleError --> [*]: Fail
+</pre>
+<figcaption>図 2 選定のワークフローのステート（投稿の起動に失敗しても選定は成功として終わる）</figcaption>
+</figure>
 
 <pre><code>{
   "StartAt": "WaitForDbReady",
@@ -357,6 +395,22 @@
 </div>
 
 <h2 id="sns-asl">4. SNS 投稿 Step Functions ASL 定義</h2>
+<p class="lead">この章は、投稿のワークフロー（<code>acps-prod-sns-posting-sfn</code>）の定義を示す。図 3 はステートの流れで、最初に入力の予定時刻が正しい形かを確かめる。</p>
+<figure class="diagram">
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --> CheckInput
+    CheckInput --> WaitForDbReady: scheduled_at が ISO 8601（UTC）の文字列
+    CheckInput --> RejectInput: ない・形が違う
+    RejectInput --> [*]: Fail
+    WaitForDbReady --> RunSnsPostBatchTask
+    WaitForDbReady --> HandleError: 失敗
+    RunSnsPostBatchTask --> [*]: 成功（Retry あり）
+    RunSnsPostBatchTask --> HandleError: 失敗
+    HandleError --> [*]: Fail
+</pre>
+<figcaption>図 3 投稿のワークフローのステート</figcaption>
+</figure>
 
 <p>画像生成 Step Functions から <code>startExecution</code>（非同期）で起動される。画像生成 Step Functions は SNS 投稿の完了を待たずに終了する。手動での単独起動も可能。</p>
 
@@ -461,6 +515,7 @@
 }</code></pre>
 
 <h2 id="env-vars">5. 環境変数一覧</h2>
+<p class="lead">この章は、SFN が ECS タスクへ渡す環境変数の一覧（タスクごと）を示す。キーの名前と値の出どころだけを決め、値の業務上の意味はアプリ設計に任せる。</p>
 
 <div class="note">
   <span class="callout-title">環境変数は「受け渡し契約」として定義</span>
@@ -536,6 +591,7 @@
 <p>S3 を使用しないため <code>S3_BUCKET_NAME</code> は持たない。SNS 認証情報は 5.2 の注記と同じく Secrets Manager からアカウントごとに取得する。</p>
 
 <h2 id="error-handling">6. Step Functions エラーハンドリング</h2>
+<p class="lead">次の表は、ステートごとの Retry と Catch の扱い。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>エラー種別</th><th>対応</th></tr></thead>
@@ -550,6 +606,7 @@
 </div>
 
 <h2 id="custom-metrics">7. カスタムメトリクス定義</h2>
+<p class="lead">次の表は、SFN が自分で出すメトリクス（投稿の SFN を起動できなかったことを数える）。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>メトリクス名</th><th>Namespace</th><th>Dimensions</th><th>発行元</th><th>用途</th></tr></thead>
@@ -566,6 +623,7 @@
 </div>
 
 <h2 id="alarms">8. CloudWatch Alarm 定義</h2>
+<p class="lead">次の表は、SNS トピックへ通知するアラームの一覧（<code>MonitoringStack</code>）。 <a class="decision-ref" href="#d-06">→ 理由 D-06</a> <a class="decision-ref" href="#d-07">→ 理由 D-07</a></p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>監視対象</th><th>Namespace</th><th>メトリクス</th><th>Dimensions</th><th>条件</th><th>Period</th><th>EvaluationPeriods</th><th>DatapointsToAlarm</th><th>TreatMissingData</th><th>通知先</th></tr></thead>
@@ -589,18 +647,12 @@
   Aurora のアラームは <code>notBreaching</code>（データ欠損時はアラームを発報しない）を使用する。Aurora Serverless v2 の自動一時停止中はメトリクスが発行されないため、<code>missing</code> や <code>breaching</code> にすると一時停止のたびにアラームが発報される。Step Functions とカスタムメトリクスのアラームも同様に <code>notBreaching</code> とする。閾値は初期値であり、実運用の負荷状況に応じて調整する。
 </div>
 
-<div class="decision">
-  <span class="callout-title">Scheduler アラーム行の追加（Phase 7-1 実装時）</span>
-  当初の本表には AWS/Scheduler のアラームが未記載だったが、<a href="stacks.html#monitoring">stacks.html セクション 3.4</a>（必須監視対象）とセクション 10（Scheduler DLQ の監視）の要求に合わせて、実装時に 6 メトリクスの個別アラームとして追加した。設定値は Step Functions 失敗アラームと同一とする。
-</div>
+<p><a class="decision-ref" href="#d-06">→ 理由 D-06</a></p>
 
-<div class="decision">
-  <span class="callout-title">Aurora アラームの DatapointsToAlarm を 2 → 3 に延長（2026-07-22、Phase 13-2）</span>
-  Aurora の CPU / メモリアラームは当初 3 データポイント中 2 で発報としていたが、min ACU 0 からの再開直後の低容量状態（0.5〜1 ACU）で構造的に閾値を超え、バッチ起動のたびに ALARM → 数分で OK 復帰する誤報が発生した（10-4 の DDL 適用時に初観測。定常運用初日の 2026-07-22 12:00 JST の定時実行でもメモリアラームが発報し、1 日 3 回の通知ノイズになることを確認）。
-  実績上の一時的発報は 1〜6 分で収束するため、3/3（15 分継続）でのみ発報するよう変更した。持続的な高負荷は引き続き検知できる（検知は最大 5〜10 分遅くなるが、本システムはバッチのみで即時対応を要しない）。経緯は課題体系 <a href="../issues/index.html#I-013">I-013</a>（クローズ節）を参照。
-</div>
+<p><a class="decision-ref" href="#d-07">→ 理由 D-07</a></p>
 
 <h2 id="eventbridge-rule">9. EventBridge Rule 定義</h2>
+<p class="lead">次の表は、ECS タスクの異常終了を通知する EventBridge ルール。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>ルール</th><th>イベントソース</th><th>フィルタ条件</th><th>アクション</th></tr></thead>
@@ -632,6 +684,7 @@
 </div>
 
 <h2 id="scheduler-dlq">10. Scheduler DLQ 定義</h2>
+<p class="lead">この章は、起動に失敗したイベントを退避するキュー（DLQ）を示す。下の表は画像生成用で、インサイト収集用の DLQ は同じ設定の別のキュー（1.6）。</p>
 <p>ImageBatchStack で EventBridge Scheduler 専用の SQS DLQ を作成し、画像生成スケジュールの DeadLetterConfig に設定する。インサイト収集用には InsightsBatchStack が同型の DLQ <code>acps-{env}-insights-scheduler-dlq</code> を持つ（16-10 追加。下表の Queue 名・退避対象以外は同じ設定。監視 Dimension は <code>ScheduleGroup=${InsightsScheduleGroupName}</code>）。</p>
 
 <div class="table-wrap">
@@ -646,7 +699,7 @@
 </table>
 </div>
 
-<p>DLQ にメッセージが入った場合は、対象 <code>set_code</code> と <code>scheduled_at</code> を確認し、必要に応じて画像生成 Step Functions を手動実行する（手順は <a href="operation.html">operation.html</a> を参照）。</p>
+<p>DLQ にメッセージが入った場合は、対象 <code>set_code</code> と <code>scheduled_at</code> を確認し、必要に応じて対応する Step Functions を手動実行する（画像生成用の DLQ <code>acps-prod-image-scheduler-dlq</code> なら画像生成 Step Functions、インサイト収集用の DLQ <code>acps-prod-insights-scheduler-dlq</code> ならインサイト収集 Step Functions に <code>media_lookback_days</code> も渡す。手順は <a href="operation.html">operation.html</a> を参照）。</p>
 
 <h3 id="comment-reply-dlq">10.1 コメント自動返信 DLQ（CommentReplyStack。21-3 設計・21-6 実装）</h3>
 <p>Scheduler DLQ とは別に、コメント自動返信経路（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a>）の Reply Lambda が 3 回失敗したメッセージを退避する SQS DLQ を持つ。</p>
@@ -655,7 +708,7 @@
   <thead><tr><th>項目</th><th>値</th></tr></thead>
   <tbody>
     <tr><td>Queue 名</td><td><code>acps-prod-comment-reply-dlq.fifo</code>（ステージング面は <code>-staging</code> 接尾辞。アラーム対象外）</td></tr>
-    <tr><td>用途</td><td>判定・書き手の LLM API（既定 Anthropic、サブ判定は OpenAI）/ Graph API の失敗、または Reply Lambda のタイムアウト（120 秒）が再試行 3 回で解消しなかったコメントイベントの退避（メッセージ本文 = Webhook の <code>value</code>: <code>comment_id</code> / <code>media_id</code> / コメント本文 / 送信者 id）</td></tr>
+    <tr><td>用途</td><td>判定・書き手の LLM API（既定 Anthropic、サブ判定は OpenAI）/ Graph API の失敗、または Reply Lambda のタイムアウト（300 秒）が再試行 3 回で解消しなかったコメントイベントの退避（メッセージ本文 = Webhook の <code>value</code>: <code>comment_id</code> / <code>media_id</code> / コメント本文 / 送信者 id）</td></tr>
     <tr><td>Message retention</td><td>14 日</td></tr>
     <tr><td>監視</td><td><code>AWS/SQS</code> の <code>ApproximateNumberOfMessagesVisible</code> &gt;= 1（セクション 8）を MonitoringStack で監視</td></tr>
   </tbody>
@@ -665,6 +718,19 @@
 <p>同じ経路のトークン更新 Lambda（週 1 回・<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-6g）は DLQ を持たず、非同期起動の自動再試行も 0 回とし、失敗は Lambda の <code>Errors</code> アラーム（セクション 8）で通知する。失敗した週は Secret を書き換えないため旧トークンで返信は続き、失効まで 50 日以上の余裕の中で人が直す（<a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a>）。</p>
 
 <h2 id="insights-asl">11. インサイト収集 Step Functions ASL 定義</h2>
+<p class="lead">この章は、収集のワークフロー（<code>acps-prod-insights-collection-sfn</code>）の定義を示す。図 4 はステートの流れ。</p>
+<figure class="diagram">
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --> WaitForDbReady
+    WaitForDbReady --> RunInsightsBatchTask
+    WaitForDbReady --> HandleError: 失敗
+    RunInsightsBatchTask --> [*]: 成功（Retry あり）
+    RunInsightsBatchTask --> HandleError: 失敗
+    HandleError --> [*]: Fail
+</pre>
+<figcaption>図 4 収集のワークフローのステート</figcaption>
+</figure>
 
 <p>EventBridge Scheduler（セクション 1.6）から起動される。SNS 投稿 ASL（セクション 4）と同型の 2 ステート構成で、差分はタスク定義 family・コンテナ名・コンテナオーバーライド（<code>SCHEDULED_AT</code> / <code>MEDIA_LOOKBACK_DAYS</code> を追加）のみ。実装方式（生 JSON + <code>definitionSubstitutions</code>、ファイルは <code>infra/lib/asl/insights-collection.asl.json</code>）は <a href="stacks.html#insights-batch">stacks.html セクション 3.5</a> を参照。</p>
 
@@ -755,6 +821,78 @@
   ASL が <code>$.scheduled_at</code> / <code>$.media_lookback_days</code> を無条件でマップするため、<strong>手動実行時も 3 キーすべてを Input に含める必要がある</strong>（例は <a href="../app/operation.html#insights-ops">app/operation.html セクション 6.1</a>）。<code>scheduled_at</code> は <code>post_insights</code> の冪等性キーであり、同一 Input での Retry・再実行は欠測分のみを埋める（<a href="../app/batch-flow.html#insights-failure">app/batch-flow.html セクション 4.3</a>）。
 </div>
 
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>SFN・Scheduler・アラームを作る CDK の実装 → <a href="stacks.html">CDK スタック実装仕様</a></li>
+  <li>ECS タスクの中の処理（選定・投稿・収集の業務の手順）→ <a href="../app/batch-flow.html">バッチ処理フロー</a></li>
+  <li>失敗の通知を受けたときの対応 → <a href="operation.html">インフラ運用</a>・<a href="../app/operation.html#failure">アプリ運用設計 4 章</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 新しいセットのスケジュールは有効のまま追加し、稼働は is_active で切り替える</h3>
+<dl>
+  <dt>決めたこと</dt><dd>新しいセットのスケジュールは有効のままデプロイし、稼働の開始は <code>batch_sets.is_active</code> の UPDATE 1 文で行う（umigame-soup-1 では <code>set-registration/04_activate.sql</code>）。セット追加手順の「バックログ 0 件確認」（<a href="../app/operation.html">アプリ運用設計 2.1</a>）は is_active を 1 にする直前に行う。長期の停止は CDK でスケジュールを外す</dd>
+  <dt>理由</dt><dd>3 つのバッチとも停止中のセットでは何もせず正常終了するため、有効化のためだけの 2 回目の <code>cdk deploy</code> が要らない。停止中に増えるのは SFN の空実行と DB 準備確認だけで、同じ時刻に他のセットが Aurora を起こしているので追加の費用はほぼない</dd>
+  <dt>日付・出典</dt><dd>2026-10-12（21-7）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 スケジュールの設定・停止・再開は CDK を唯一の正とする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>cron 式・State を含むスケジュールの設定は CDK で行い、コンソール・CLI での変更は一時的な検証にだけ使う。止めるときも CDK のフラグ（<code>enabled</code>・<code>insightsCollectionSchedulesEnabled</code>）で止め、<code>infra/test/</code> の期待値も揃える</dd>
+  <dt>理由</dt><dd>Scheduler の更新 API は全プロパティを送るため、手動で止めても次の <code>cdk deploy</code> で黙って CDK の値に戻る</dd>
+  <dt>経緯</dt><dd>2026-07-14 検証後に DISABLED → 2026-07-22（13-1）1 日 3 回で本番化 → 2026-07-26（14-12）動画運用で 1 日 1 回。E2E 中の手動 DISABLE が 14-12 の deploy で ENABLED に戻ったことからこの規則にした。2026-08-06 に logic-training-1 の 3 本を障害対応で CDK ごと停止し、16-4（2026-08-08）の事前ビルド方式への切替で再開。2026-08-10 にインサイト収集の 4 本を再認可待ちで CDK のフラグで一時停止し、同日に復帰</dd>
+  <dt>日付・出典</dt><dd>2026-07-26（14-12）・2026-08-10（16-10）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 スケジュールの名前はセットとスロットで付け、同時刻の起動はずらさない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>名前を <code>acps-{env}-image-generation-{set_code}[-{slot_code}]</code> にし、2 セット目の追加時に初セットのスケジュールを規約どおりの名前へ付け替えた（<code>acps-prod-image-generation-schedule</code> → <code>acps-prod-image-generation-fantasy-animals-1</code>。このセットは 2026-09-03 に停止・削除済み）。同じ時刻に複数セットが起動しても時刻をずらさない</dd>
+  <dt>理由</dt><dd>アラームは ScheduleGroup の名前だけを使い、Scheduler は状態を持たないので、付け替えで失うものがない。規約外の名前が残ると「機能名 = 初セット」という暗黙知が続く。各チェーンはセットコードで完全に分かれる（投稿対象・アカウント・Secret が別）</dd>
+  <dt>日付・出典</dt><dd>2026-07-29（15-15）。投稿時刻はユーザー決定（15-4・15-15）</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 DB への接続の再試行をバッチから外し、SFN の責務にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Aurora の起動待ちと接続確認を DB 準備確認のタスクにまとめ、すべての SFN の最初のステートで動かす</dd>
+  <dt>理由</dt><dd>バッチのコードが、DB が使える前提で書けるようにするため</dd>
+  <dt>日付・出典</dt><dd>当初設計</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 DB 準備確認は Lambda ではなく ECS Fargate で動かす</h3>
+<dl>
+  <dt>決めたこと</dt><dd>DB 準備確認を ECS Fargate のタスク（パブリック IP あり）にする</dd>
+  <dt>理由</dt><dd>VPC の中の Lambda はパブリック IP を持てず、NAT Gateway か Interface 型のエンドポイントなしでは Secrets Manager に届かない。Fargate の起動の遅さ（30〜60 秒）はバッチでは許容でき、費用も月 $0.01 未満</dd>
+  <dt>日付・出典</dt><dd>当初設計。<a href="architecture.html#d-02">アーキテクチャ D-02</a></dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 Scheduler の 6 つのメトリクスに個別のアラームを置く</h3>
+<dl>
+  <dt>決めたこと</dt><dd>AWS/Scheduler の 6 つのメトリクスにアラームを置き、設定値は SFN の失敗アラームと同じにする</dd>
+  <dt>理由</dt><dd>スタック仕様の必須監視対象（<a href="stacks.html">stacks.html 3.4</a>）と Scheduler DLQ の監視（10 章）の要求に合わせるため（当初の表に漏れていた）</dd>
+  <dt>日付・出典</dt><dd>Phase 7-1（実装時）</dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 Aurora の CPU・メモリのアラームは 3 データポイント中 3 で鳴らす</h3>
+<dl>
+  <dt>決めたこと</dt><dd>DatapointsToAlarm を 2 から 3 に延ばし、15 分続いたときだけ鳴らす</dd>
+  <dt>理由</dt><dd>0 ACU から再開した直後の低い容量で、バッチの起動のたびに数分だけ閾値を超える誤報が出ていた（1 日 3 回の通知ノイズ）。一時的な超過は 1〜6 分で収まり、持続する高負荷は引き続き検知できる（検知は最大 5〜10 分遅くなるが、バッチだけなので即時対応は要らない）</dd>
+  <dt>日付・出典</dt><dd>2026-07-22（13-2）・課題 I-013（クローズ）</dd>
+</dl>
+</article>
+</section>
+
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>

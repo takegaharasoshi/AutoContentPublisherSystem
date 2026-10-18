@@ -287,7 +287,7 @@
 <p><strong>依存スタック</strong>: FoundationStack</p>
 
 <h3 id="comment-reply">3.6 CommentReplyStack（Phase 21-3 設計・21-6 実装）</h3>
-<p><strong>目的</strong>: umigame-soup-1 のコメント自動返信経路（アプリの振る舞いは <a href="../app/sets/umigame-soup-1.html#comment-reply">セット別設計書セクション 10</a>、全体像は <a href="architecture.html#comment-reply">architecture.html セクション 1.1</a>）を構築する。本システムで初めてイングレス（Meta Webhook）を持つスタックであり、既存のバッチ系スタックとは<strong>VPC・Aurora・CodePipeline を共有しない</strong>。</p>
+<p><strong>目的</strong>: umigame-soup-1 のコメント自動返信経路（アプリの振る舞いは <a href="../app/sets/umigame-soup-1.html#comment-reply">セット別設計書セクション 10</a>、全体像は <a href="architecture.html#comment-reply">architecture.html セクション 3.4</a>）を構築する。本システムで初めてイングレス（Meta Webhook）を持つスタックであり、既存のバッチ系スタックとは<strong>VPC・Aurora・CodePipeline を共有しない</strong>。</p>
 
 <div class="note">
   <span class="callout-title">設計方針: 外部依存ゼロの Python を CDK asset でデプロイし、同一コードから本番面とステージング面を立てる</span>

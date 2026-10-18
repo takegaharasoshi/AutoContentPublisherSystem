@@ -298,7 +298,7 @@
       <li>アウトバウンド: インターネットアクセス（外部 API、Secrets Manager、CloudWatch Logs）と VPC 内通信（Aurora）を許可</li>
     </ul>
   </li>
-  <li><strong>コメント自動返信 Lambda（21-3 追加）</strong>: VPC 外で実行し、Function URL を<strong>認証なし（<code>authType: NONE</code>）</strong>で公開する。インバウンドの正当性は Meta の <code>X-Hub-Signature-256</code> 署名検証（鍵は Instagram アプリシークレット）で担保し、署名不一致は 401 で捨てる。Reply Lambda はインバウンドを持たず SQS トリガーのみ。アウトバウンドは Secrets Manager・S3・Anthropic・OpenAI・Typesafe・Graph API（すべて TLS）。NAT Gateway・VPC Endpoint は使わない（<a href="architecture.html#comment-reply">architecture.html セクション 1.1</a>）</li>
+  <li><strong>コメント自動返信 Lambda（21-3 追加）</strong>: VPC 外で実行し、Function URL を<strong>認証なし（<code>authType: NONE</code>）</strong>で公開する。インバウンドの正当性は Meta の <code>X-Hub-Signature-256</code> 署名検証（鍵は Instagram アプリシークレット）で担保し、署名不一致は 401 で捨てる。Reply Lambda はインバウンドを持たず SQS トリガーのみ。アウトバウンドは Secrets Manager・S3・Anthropic・OpenAI・Typesafe・Graph API（すべて TLS）。NAT Gateway・VPC Endpoint は使わない（<a href="architecture.html#comment-reply">architecture.html セクション 3.4</a>）</li>
   <li><strong>プライバシーポリシー用 S3 バケット（21-3 設計・21-7 構築）</strong>: Meta アプリの公開モードに必須の到達可能 URL を提供するため、<strong>専用の小バケット <code>acps-{env}-umigame-privacy-policy</code> だけ</strong>を公開読み取り（当該バケット限定の <code>s3:GetObject</code>）にし、https のオブジェクト URL で公開する（ウェブサイトエンドポイントは http のみのため使わない）。画像保存バケットの Block Public Access は維持する（<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-7）</li>
   <li><strong>Secrets Manager</strong>: ECS Fargate のパブリック IP 経由でアクセス（通信は TLS で暗号化）
     <ul>
