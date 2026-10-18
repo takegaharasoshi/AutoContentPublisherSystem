@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>アプリ運用設計 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -12,20 +12,39 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / アプリ運用設計</nav>
 <h1>アプリ運用設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
-  <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
-  <span>最終更新: 2026-10-18（30-5: セクション 3 の問題ストック・ランキングストックの節を生産の詳細設計へ移した）。2026-10-12（21-7: 2.1 手順 3 に「Scheduler は有効で deploy し is_active で稼働を切り替える」、チェックリストに問題スナップショットの権限を追記）。前回: 2026-09-19（22-4: セクション 4 冒頭に「障害対応の入口は <code>/incident</code>」、6.3 に月次転記を課題の棚卸しの節目とする 1 行を追加）。前回: 2026-09-03（20-1: セクション 2.2 にセット廃止の初回実地の気づき〔追跡ウィンドウの打ち切り・Scheduler は 2 スタックにまたがる〕を追記し、2.1 のセット追加時の増分を現行に合わせて訂正。16-12b: セクション 6.3 を月次 KPI 転記の手順・セット計画書 KPI 欄の様式で確定）</span>
+  <span class="badge badge-fixed">Phase 9-4 で詳細化・Phase 10-1 で最終 Fix・Phase 30-7 で新しい書式へ移行</span>
+  <span>最終更新: 2026-10-18（30-7: 冒頭の要約と判断の記録〔D-01〜D-16〕を足し、囲みの判断を末尾へ移した。3 章に umigame-soup-1 の生産への導線を足し、5.5 を実行時生成の退役に合わせた。旧方式〔最古選定〕の移行中の注記を外した）。2026-10-18（30-5: 3 章の問題ストック・ランキングストックの節を生産の詳細設計へ移した）。以前の更新履歴は git の履歴と<a href="../plans/development-log.html">開発記録</a>を参照</span>
 </div>
 
-<div class="note">
-  <span class="callout-title">本書の位置づけ</span>
-  セット追加・廃止、プロンプト / キャプション管理、投稿失敗時対応、SNS Secret 規約の運用など<strong>アプリ（業務）の運用</strong>を定める設計書。Phase A-4 の骨子版を Phase 9-4 で詳細化した（具体手順・SQL 例・チェックリストを確定）。
-  インフラの運用（デプロイ、Aurora 一時停止、監視・通知の仕組み、コスト）は <a href="../infra/operation.html">infra/operation.html</a> を参照。
-  全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a> を参照。
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページはアプリ（業務）の運用の手順を定める。機能別の基本設計 <a href="../overview/functions/post.html">投稿</a>（2・4 章）・<a href="../overview/functions/token-refresh.html">トークン更新</a>（5 章）・<a href="../overview/functions/insights.html">インサイト収集</a>（6 章）の「運用の手順」にあたる。インフラの運用（デプロイ・Aurora の一時停止・監視の仕組み・コスト）は <a href="../infra/operation.html">infra/operation.html</a>、在庫の動画の作り方は<a href="../production/index.html">生産の詳細設計</a>が持つ。図 1 は、運用者が手を動かす場面と、このページの章の対応を表す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    A["セットを足す・止める"] --> C2["2 章 セット追加・廃止"]
+    B["プロンプト・キャプション・音源を変える"] --> C3["3 章 管理"]
+    D["失敗通知が来た・投稿が出ていない"] --> INC["/incident で照合"] --> C4["4 章 投稿失敗時の対応"]
+    E["トークンの期限・再認可"] --> C5["5 章 Secret 運用・トークン更新"]
+    F["月初の KPI 転記・インサイトの欠け"] --> C6["6 章 インサイト収集の運用"]
+</pre>
+<figcaption>図 1 運用の場面と章の対応</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>セットの追加</td><td>セット別設計書 → Secret 作成・検証 → DB 登録 → Scheduler 追加 deploy（有効のまま）→ <code>is_active</code> で稼働開始（<a href="#set-add">2.1</a>）</td></tr>
+    <tr><td>投稿の失敗</td><td>通知のみ（欠番許容）。手動の再投稿は対象 run の <code>scheduled_at</code> を指定して SFN から起動する（<a href="#failure">4 章</a>）</td></tr>
+    <tr><td>トークン</td><td>投稿用は手動の再認可 + リマインダー 1 件、コメント返信用は Lambda が毎週自動更新（<a href="#token-refresh">5.4</a>）</td></tr>
+    <tr><td>KPI</td><td>月初 4 日以降に集計ランナーでビューを引き、セット計画書と事業戦略書へ転記（<a href="#insights-analysis">6.3</a>）</td></tr>
+  </tbody>
+</table>
 </div>
+</section>
 
-<h2 id="policies">1. 運用方針一覧（初期実装）</h2>
+<h2 id="policies">1. 運用方針一覧</h2>
+<p class="lead">運用の場面ごとの方針を一覧にする。手順は 2 章以降。</p>
 
 <div class="table-wrap">
 <table>
@@ -65,21 +84,22 @@
     </tr>
     <tr>
       <td>SNS アカウント追加・Instagram トークン更新</td>
-      <td>Secret 作成 → DB 登録の順で追加。トークンはデータアクセス期限（<code>debug_token</code> の実測値）前に手動リフレッシュ（セクション 5）</td>
+      <td>Secret 作成 → DB 登録の順で追加。投稿用トークンはデータアクセス期限（<code>debug_token</code> の実測値）前に手動で再認可。コメント返信用トークンは自動更新（セクション 5）</td>
     </tr>
     <tr>
       <td>効果測定（16-7 更新）</td>
-      <td>インサイト収集バッチ（第 3 のバッチ。<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）が生メトリクスを自動収集する（16-7 設計 Fix・16-8 以降で実装）。API で取れない指標（視聴維持カーブ・View Rate）のみ Instagram アプリのインサイト画面で手動確認。運用手順はセクション 6</td>
+      <td>インサイト収集バッチ（第 3 のバッチ。<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）が生メトリクスを自動収集する。API で取れない指標（視聴維持カーブ・View Rate）のみ Instagram アプリのインサイト画面で手動確認。運用手順はセクション 6</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 <h2 id="set-lifecycle">2. セット追加・廃止</h2>
+<p class="lead">セットを足す・止めるときの手順。セットの表し方（Scheduler・Secret・DB レコード）は<a href="design-outline.html#set-docs">アプリ設計大枠 1.1</a>。</p>
 
 <h3 id="set-add">2.1 セット追加手順</h3>
 
-<p>新しいセット（テーマ）を追加する手順を以下の順序で行う。順序を守る理由: Secret を先に作らないと DB に <code>sns_accounts</code> を登録しても投稿バッチが認証情報を取得できず即失敗するため（セクション 5.3 と同じ理由）。</p>
+<p class="lead">この節は、機能別の基本設計 <a href="../overview/functions/production.html">生産ライン（共通）</a>で作った在庫を配信面に載せる「セットの追加」を、運用者の手順まで詳しくしたもの。以下の順序で行う <a class="decision-ref" href="#d-09">→ 理由 D-09</a>。</p>
 
 <h4>手順 0: セット別設計書を作成する</h4>
 <p><code>docs/app/sets/&lt;set_code&gt;.html</code> に、標準記載項目（テーマ、投稿先アカウント構成、スケジュール、プロンプト / キャプションの方式選択、失敗時ポリシー、共通フローからの差分）を記録する（ルールは<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。雛形は以下を複製して使う。</p>
@@ -202,13 +222,13 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
   スタック（FoundationStack / ImageBatchStack / SnsPostBatchStack / MonitoringStack）は<strong>機能単位</strong>であり、セット単位ではない。
   セットを追加しても新しいスタックは作られず、増えるのは<strong>Scheduler 定義（ImageBatchStack の画像生成 1 件〔スロット対応方式ならスロット数分〕 + InsightsBatchStack のインサイト収集 2 件〔06:00 / 18:00。16-10 で追加〕） + Secrets Manager の Secret + DB レコード</strong>のみ。
   Step Functions・ECS タスク定義・コンテナイメージは全セット共有で、Scheduler が渡す <code>set_code</code> によってどのセットの処理を行うかが決まる。
-  したがって、インフラ設計書もセット追加では変更不要（2026-07-06 ユーザー質問を受けて明記）。
+  セットが新しい機能を持ち込む場合（umigame-soup-1 のコメント自動返信 = CommentReplyStack）だけは、その機能のスタックが増える（<a href="design-outline.html#set-docs">アプリ設計大枠 1.1</a>） <a class="decision-ref" href="#d-10">→ 理由 D-10</a>
 </div>
 
 <h3 id="set-retire">2.2 セット廃止・入れ替え（スクラップ&amp;ビルド）</h3>
 <ol>
   <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）。この時点でスケジュールが残っていても実害はないため、順序を厳密に守る必要はないが、次のステップより先に行うことを推奨する</li>
-  <li>CDK から該当セットの Scheduler 定義を<strong>すべて</strong>削除して deploy する（イメージタグの Context 指定が必須。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>削除対象は 2 スタックにまたがる</strong>: <code>image-batch-stack.ts</code> の画像生成（スロット非対応なら 1 件・対応ならスロット数分）と <code>insights-batch-stack.ts</code> のインサイト収集 2 件（06:00 / 18:00。16-10 で追加）。DISABLED 化ではなく削除する（復活時は定義の再追加で足りるため。定義の中身はコード内のコメントに残す）</li>
+  <li>CDK から該当セットの Scheduler 定義を<strong>すべて</strong>削除して deploy する（イメージタグの Context 指定が必須。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>削除対象は 2 スタックにまたがる</strong>: <code>image-batch-stack.ts</code> の画像生成（スロット非対応なら 1 件・対応ならスロット数分）と <code>insights-batch-stack.ts</code> のインサイト収集 2 件（06:00 / 18:00。16-10 で追加）。DISABLED 化ではなく削除する（定義の中身はコード内のコメントに残す） <a class="decision-ref" href="#d-11">→ 理由 D-11</a></li>
   <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体（画像・動画ファイル）はインフラの 30 日ライフサイクルで自動削除される対象であり「残す」対象に含まない（Phase 9-3 で確定。<a href="data-model.html#s3-key">データモデル設計 セクション 5</a>）。<strong>音源ストック（<code>audio/{set_code}/</code>）はライフサイクル対象外のため自動削除されない</strong>が、廃止時もレコード・ファイルとも削除せず残す（容量は僅少で、セット復活・類似セットでの再利用可能性があるため。Phase 14-4 で確定）</li>
   <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す。あわせてセット計画書のステータス・事業戦略書（予算・セットポートフォリオ）も停止に合わせて更新する</li>
 </ol>
@@ -222,7 +242,8 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
   </ul>
 </div>
 
-<h2 id="content-mgmt">3. プロンプト・キャプション・音源・問題/ランキングストック管理</h2>
+<h2 id="content-mgmt">3. プロンプト・キャプション・音源・ストック管理</h2>
+<p class="lead">DB に置く設定（プロンプト・キャプションテンプレート・音源）の変え方。在庫（ストック）の作り方・投入・ビルドはセットごとの生産の詳細設計へ移してあり、ここには導線だけを置く。</p>
 
 <p><code>prompt_configs</code>・<code>caption_templates</code>・<code>audio_assets</code>・<code>quiz_stock_items</code>（16-1 新設）は DB 直接操作（Query Editor 等）で登録・変更する。管理画面は将来拡張。生成時にはプロンプトのスナップショットが <code>generated_media</code> に、出題のスナップショットが <code>quiz_items</code> に、キャプションのスナップショット（プレースホルダ展開後の最終文）が <code>posts</code> に記録されるため、変更しても過去の生成・投稿記録は影響を受けない。</p>
 
@@ -240,16 +261,13 @@ UPDATE prompt_configs SET is_active = 0 WHERE id = :old_prompt_config_id;
 COMMIT;</code></pre>
 <p><code>caption_templates</code> は <code>is_active=1</code> が 0 件でも投稿処理は継続する（キャプションなしで投稿。<a href="data-model.html#detail-caption-templates">data-model.html セクション 4.3</a>）ため、トランザクションは必須ではないが同様の手順で問題ない。</p>
 
-<div class="decision">
-  <span class="callout-title">セット別拡張ポイント（再掲。16-1 更新）</span>
-  キャプションは 16-1 で<strong>プレースホルダ展開方式</strong>（テンプレート + <code>quiz_items</code> の動的組み立て。<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3.3 の decision</a>）を導入した。プレースホルダを含むテンプレートの文言修正・差し替えも本セクションの手順（UPDATE / INSERT + 無効化）のままでよいが、<strong>プレースホルダの綴り（<code>{{answer}}</code> 等 5 種）を崩さないこと</strong>と、<strong>プレースホルダ入りテンプレートは <code>quiz_items</code> を持つセット（クイズ方式）でのみ使うこと</strong>（行がないと投稿が異常終了する）に注意する。AI によるプロンプト生成・AI キャプション生成は引き続き将来のセット別拡張ポイント。どのセットがどの方式かはセット別設計書に記録する。
-</div>
+<p>プレースホルダ入りのテンプレート（展開規則は <a href="batch-flow.html#caption-extension">batch-flow.html 3.4「キャプションの作り方」</a>）も上の手順（UPDATE / INSERT + 無効化）で直してよい。<strong>プレースホルダの綴り（既知の 10 種）を崩さないこと</strong>と、<strong>テンプレートの系（クイズ系 / ランキング系 / umigame 系）をセットの方式に合わせること</strong>（展開元の行がないと投稿が異常終了する）に注意する <a class="decision-ref" href="#d-01">→ 理由 D-01</a></p>
 
 <h3 id="ai-disclosure">AI 利用の開示（ハッシュタグ）の運用ルール</h3>
-<div class="decision">
-  <span class="callout-title">決定（2026-07-24、Phase 14-4）: AI 開示ハッシュタグは #AIart とする</span>
-  事業戦略書の必須要件「AI 利用の開示」（<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #7</a>: ハッシュタグ方式）の具体タグを <strong><code>#AIart</code></strong> に確定する。
-  AI 生成コンテンツの開示タグとして最も一般的で、海外リーチ前提のセット・国内向けセットのどちらでも通用するため 1 タグに絞る（タグ枠の節約）。
+<div>
+<p><strong>AI 開示ハッシュタグは #AIart</strong> <a class="decision-ref" href="#d-02">→ 理由 D-02</a></p>
+事業戦略書の必須要件「AI 利用の開示」（<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #7</a>: ハッシュタグ方式）の具体タグを <strong><code>#AIart</code></strong> に確定する。
+  
   <ul style="margin:.3rem 0 0;">
     <li><strong>全セットのキャプションテンプレート（<code>caption_templates.template_text</code>）に <code>#AIart</code> を必ず含める</strong>。テンプレートの新規登録・差し替え時のチェック項目とする（セクション 2.1 のチェックリスト・INSERT 例にも反映済み）</li>
     <li>テンプレート経由で全投稿に確実に付与される（投稿処理側の実装は不要。キャプション 0 件時の投稿は従来どおり継続されるため、テンプレート登録漏れは週次のミュート確認〔セクション 4.4〕等の目視で拾う）</li>
@@ -258,7 +276,7 @@ COMMIT;</code></pre>
 </div>
 
 <h3 id="audio-mgmt">音源の調達・前処理・登録（動画方式のセットのみ）</h3>
-<p>リール用 BGM は<strong>権利クリア済み音源をセットごとに 3〜5 曲、前処理済みの完成形で S3 にストック</strong>し、投稿ごとに順繰りローテーションする（<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。前処理は<strong>事前手動</strong>（S3 登録前に 1 回だけ）で行い、バッチは合成時にそのまま多重化する（Phase 14-4 決定。バッチ内前処理を持たないことで動画方式の処理・失敗パターンを増やさない）。</p>
+<p>リール用 BGM は<strong>権利クリア済み音源をセットごとに 3〜5 曲、前処理済みの完成形で S3 にストック</strong>し、投稿ごとに順繰りローテーションする（<a href="data-model.html#detail-audio-assets">data-model.html セクション 4.8</a>）。前処理は<strong>事前手動</strong>（S3 登録前に 1 回だけ）で行い、合成時はそのまま多重化する <a class="decision-ref" href="#d-12">→ 理由 D-12</a>。事前ビルド方式のセットの BGM は動画のビルド時に焼き込む（セットごとの作り方は<a href="../production/index.html">生産の詳細設計</a>）。</p>
 
 <h4>手順 1: 調達（ライセンス確認と証跡の控え）</h4>
 <ul>
@@ -279,20 +297,19 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li>書き出し後に必ず試聴確認する（頭切れ・フェードの不自然さ・ノイズ）</li>
 </ul>
 
-<div class="decision">
-  <span class="callout-title">決定: ラウドネス正規化は 2 パス方式を用いる（Phase 14-6 の実作業で確定）</span>
-  上記の 1 コマンド版（単一パス <code>loudnorm</code>）は動的正規化のため精度が粗く、14-6 で 4 曲を処理したところ実測 Integrated が -12.5〜-15.3 LUFS と<strong>約 2.8 dB ばらついた</strong>（曲間の音量差をなくすという目的に対して不十分）。
-  そこで<strong>パス 1 で対象 10 秒区間を解析（<code>print_format=json</code>）し、得た <code>measured_*</code> 値と <code>linear=true</code> を指定してパス 2 で線形適用する</strong>方式に変更した。同じ 4 曲でばらつきは <strong>1.1 dB（-13.8〜-14.9 LUFS）</strong>に収まった。
-  <ul style="margin:.3rem 0 0;">
-    <li>解析は<strong>切り出し後の 10 秒区間に対して行う</strong>（原曲全体ではない。実際に使う区間の音量に合わせるため）</li>
-    <li>フェードは正規化の<strong>後段</strong>に置く（フェード込みで解析すると測定値が下振れするため）。フェードアウトの分だけ最終実測値は目標 -14 をわずかに下回るが、全曲一律のため曲間差は生じない</li>
-    <li>実装スクリプトは 14-6 で使用した 2 パス処理（<code>process()</code> 関数で 1 曲ずつ解析 → 適用）を踏襲する</li>
-  </ul>
+<div>
+<p><strong>ラウドネス正規化は 2 パス方式</strong> <a class="decision-ref" href="#d-03">→ 理由 D-03</a></p>
+<p>上の 1 コマンド版（単一パス <code>loudnorm</code>）は形の例で、実際は<strong>パス 1 で対象区間を解析（<code>print_format=json</code>）し、得た <code>measured_*</code> 値と <code>linear=true</code> を指定してパス 2 で線形適用する</strong>。</p>
+<ul style="margin:.3rem 0 0;">
+  <li>解析は<strong>切り出し後の区間に対して行う</strong>（原曲全体ではない）</li>
+  <li>フェードは正規化の<strong>後段</strong>に置く。フェードアウトの分だけ最終実測値は目標 -14 をわずかに下回るが、全曲一律のため曲間差は生じない</li>
+  <li>実装スクリプトは 14-6 で使用した 2 パス処理（<code>process()</code> 関数で 1 曲ずつ解析 → 適用）を踏襲する</li>
+</ul>
 </div>
 
 <div class="note">
   <span class="callout-title">ランキング方式（<code>ranking-prebuilt</code> / <code>pref-ranking-1</code>）の前処理は上記と 2 点違う（17-5b）</span>
-  ①<strong>尺は 30 秒ちょうど</strong>（動画と同尺。コンポジションは曲が短いとループするため、30 秒未満だと動画内でループの継ぎ目が鳴る）②<strong>フェードは焼き込まない</strong>（頭 0.5 秒 / 尻 1.5 秒のフェードはコンポジション側が掛けるため、素材にも焼くと二重に掛かる）。さらに<strong>曲数も 3〜5 曲ではなく 1 曲</strong>（世界観をそろえるためのユーザー判断。ミュート検知時の影響範囲と併せて<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6 の decision（17-5b）</a>に記録）。ラウドネスの 2 パス方式（I = -14 LUFS）と AAC 化は共通ルールどおり。手順 2〜4（切り出し・正規化・S3 キーの決定・<code>audio_assets</code> 登録 SQL の生成）は専用ツール <code>content/video-build/pref-ranking-1/prepare_bgm.py</code> がまとめて行う（証跡 3 点は <code>work/bgm/tracks.json</code> に書けば SQL に転記される）。理由の詳細は<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6</a>。
+  ①<strong>尺は 30 秒ちょうど</strong>（動画と同尺。コンポジションは曲が短いとループするため、30 秒未満だと動画内でループの継ぎ目が鳴る）②<strong>フェードは焼き込まない</strong>（頭 0.5 秒 / 尻 1.5 秒のフェードはコンポジション側が掛けるため、素材にも焼くと二重に掛かる）。さらに<strong>曲数も 3〜5 曲ではなく 1 曲</strong>（世界観をそろえるためのユーザー判断。ミュート検知時の影響範囲と併せて<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6（17-5b）</a>に記録）。ラウドネスの 2 パス方式（I = -14 LUFS）と AAC 化は共通ルールどおり。手順 2〜4（切り出し・正規化・S3 キーの決定・<code>audio_assets</code> 登録 SQL の生成）は専用ツール <code>content/video-build/pref-ranking-1/prepare_bgm.py</code> がまとめて行う（証跡 3 点は <code>work/bgm/tracks.json</code> に書けば SQL に転記される）。理由の詳細は<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6</a>。
 </div>
 
 <h4>手順 3: S3 への配置</h4>
@@ -325,8 +342,12 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 <h3 id="ranking-stock-mgmt">ランキングストックの調達・検証・投入・動画ビルド（ランキング方式のセットのみ）</h3>
 <p>Phase 30-5 で<a href="../production/pref-ranking-1.html">生産の詳細設計 pref-ranking-1</a>へ移した（資材の置き場 = 1 章・作り方と人間レビューの観点 = 2 章・事前ビルド = 3 章・動画の作り = 4 章・TTS 同期 = 5 章・再ビルド = 6 章・在庫確認クエリと取り下げ = 7 章）。</p>
 
+<h3 id="umigame-stock-mgmt">ウミガメの問題ストックの作問・投入・動画ビルド・配置（ウミガメ方式のセットのみ）</h3>
+<p>Phase 30-6a で<a href="../production/umigame-soup-1.html">生産の詳細設計 umigame-soup-1</a>へ置いた（資材・作り方・事前ビルド・在庫）。補充の運用の正はスキル <code>/umigame-stock-replenish</code>。</p>
+
 <h2 id="failure">4. 投稿失敗時の対応</h2>
-<p>基本は<strong>通知のみ（欠番許容）</strong>。1 日複数回投稿するため、1 回の欠番は致命的でないという判断（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）。ただし Phase 28（28-1 設計・28-2 実装）から、<strong>一過性エラーはバッチが段階別に自動で処理する</strong>: 公開前（コンテナ作成・処理待ち）はコンテナ作成から 1 回だけやり直し、公開の一過性エラーはコンテナの <code>status_code</code> を照会して未公開（<code>FINISHED</code>）のときだけ同じコンテナで 1 回再送する（表と判定基準の正は <a href="batch-flow.html#transient-errors">batch-flow.html 3.3「一過性エラーの段階別の扱い」</a>）。通知が来るのはそれでも <code>success</code> にならなかった場合で、運用者の手順（4.1〜4.3）は変わらない。やり直しが起きた行は <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形になる。</p>
+<p class="lead">この章は、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a>で失敗したときの運用者の手順を詳しくしたもの。</p>
+<p>基本は<strong>通知のみ（欠番許容）</strong> <a class="decision-ref" href="#d-13">→ 理由 D-13</a>。ただし Phase 28（28-1 設計・28-2 実装）から、<strong>一過性エラーはバッチが段階別に自動で処理する</strong>: 公開前（コンテナ作成・処理待ち）はコンテナ作成から 1 回だけやり直し、公開の一過性エラーはコンテナの <code>status_code</code> を照会して未公開（<code>FINISHED</code>）のときだけ同じコンテナで 1 回再送する（表と判定基準の正は <a href="batch-flow.html#transient-errors">batch-flow.html 3.3「一過性エラーの段階別の扱い」</a>）。通知が来るのはそれでも <code>success</code> にならなかった場合で、運用者の手順（4.1〜4.3）は変わらない。やり直しが起きた行は <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形になる。</p>
 <p><strong>障害対応の入口はスキル <code>/incident</code></strong>（22-3〔2026-09-19〕新設。手順の正は <code>.claude/skills/incident/SKILL.md</code>）。失敗通知・「投稿が出ていない」など本番・運用の異常を認識したら、本セクションの手順に入る前に <code>/incident</code> を起動し、<a href="../issues/index.html">課題体系</a>との照合（予言されていた課題・前にも起きた事象）→ 切り分け・復旧（本番操作は人間ゲート）→ 事象記録 → 課題の更新の順で進める（ルールは<a href="../issues/index.html#rule-incident">課題体系 4.7</a>）。本セクション 4.1〜4.4 はその中の「切り分け・復旧」で参照する手順。</p>
 
 <h3 id="failure-check">4.1 確認手順</h3>
@@ -344,7 +365,7 @@ WHERE bs.set_code = 'fashion-set-1'
 ORDER BY p.updated_at DESC
 LIMIT 20;</code></pre>
   </li>
-  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する（<a href="../infra/operation.html">infra/operation.html</a> セクション 1.2）。<strong>再実行は必ず Step Functions 経由で行い、ECS RunTask の直接実行は使わない</strong>（バッチは DB 接続リトライを持たず、Aurora 自動一時停止中の直接起動は失敗するため。<a href="batch-flow.html#premise">batch-flow.html セクション 1</a> の前提）。手動起動では<strong>対象生成実行の実際の <code>scheduled_at</code> を入力に明示</strong>し、その回だけが処理される（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>。26-1 で当回固定に変更。<strong>現在時刻を便宜的に入れない</strong>。入力例は infra/operation.html セクション 1.2）。一度試行して有効な全アカウントが終端状態になった分は再実行しても投稿されない（<code>ALREADY_TERMINAL</code>。意図的に再対象にしたい場合は 4.2 を参照）。起動前に次のクエリで対象 run を確認する:
+  <li>必要な場合のみ、SNS 投稿ワークフロー（sns-posting-sfn）を手動で単独起動する（<a href="../infra/operation.html">infra/operation.html</a> セクション 1.2）。<strong>再実行は必ず Step Functions 経由で行い、ECS RunTask の直接実行は使わない</strong>（<a href="batch-flow.html#premise">batch-flow.html セクション 1</a> の前提。理由は <a href="batch-flow.html#d-18">batch-flow.html D-18</a>）。手動起動では<strong>対象生成実行の実際の <code>scheduled_at</code> を入力に明示</strong>し、その回だけが処理される（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>。26-1 で当回固定に変更。<strong>現在時刻を便宜的に入れない</strong>。入力例は infra/operation.html セクション 1.2）。一度試行して有効な全アカウントが終端状態になった分は再実行しても投稿されない（<code>ALREADY_TERMINAL</code>。意図的に再対象にしたい場合は 4.2 を参照）。起動前に次のクエリで対象 run を確認する:
     <pre><code>-- 手動起動する回の確認（scheduled_at は UTC。JST 列で時間帯を確かめる）
 SELECT gr.id AS generation_run_id, gr.scheduled_at,
        CONVERT_TZ(gr.scheduled_at, '+00:00', '+09:00') AS scheduled_at_jst,
@@ -356,7 +377,7 @@ JOIN sns_accounts sa ON sa.set_id = gr.set_id AND sa.is_active = 1
 LEFT JOIN posts p ON p.generation_run_id = gr.id AND p.sns_account_id = sa.id
 WHERE bs.set_code = :set_code
   AND gr.scheduled_at = :scheduled_at;</code></pre>
-    判定: ① 行が返る（返らなければ <code>RUN_NOT_FOUND</code> になる）② <code>media_count</code> が 1 以上（0 なら <code>NO_MEDIA</code>。空の生成実行は投稿できない）③ リール（またはフィード画像）行が無いか <code>pending</code> / <code>container_created</code> ④ <strong>今その回の素材を出してよいか</strong>（朝 / 夜のラベルなど時間帯が焼き込まれた素材を別の時間帯に出さない。期限ガードを置かない代わりの人間の確認 = <a href="batch-flow.html#deadline-guard">batch-flow.html 3.1 の設計判断</a>）。公開済み・未確認（<code>published_unconfirmed</code>）が無いことも併せて確かめる</li>
+    判定: ① 行が返る（返らなければ <code>RUN_NOT_FOUND</code> になる）② <code>media_count</code> が 1 以上（0 なら <code>NO_MEDIA</code>。空の生成実行は投稿できない）③ リール（またはフィード画像）行が無いか <code>pending</code> / <code>container_created</code> ④ <strong>今その回の素材を出してよいか</strong>（朝 / 夜のラベルなど時間帯が焼き込まれた素材を別の時間帯に出さない。期限ガードを置かない代わりの人間の確認 = <a href="batch-flow.html#deadline-guard">batch-flow.html 3.1</a>・<a href="batch-flow.html#d-07">D-07</a>）。公開済み・未確認（<code>published_unconfirmed</code>）が無いことも併せて確かめる</li>
 </ol>
 
 <h3 id="failure-correction">4.2 手動補正手順</h3>
@@ -393,16 +414,14 @@ WHERE id = :post_id
 <div class="warn">
   <span class="callout-title">注意: 補正しただけでは再投稿されない（26-1 で変更）</span>
   SNS 投稿バッチは<strong>自分を起動した回（当回）の生成実行だけ</strong>を処理する（<a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>）。後続の定時実行は、補正して <code>pending</code> に戻した過去の生成実行を拾わない。補正した回を投稿したい場合は、4.1 の確認クエリで対象 run を確かめ、<strong>その run の <code>scheduled_at</code> を指定して sns-posting-sfn を手動起動する</strong>（時間帯の確認を含む。4.1 手順 4）。
-  （履歴: 26-1 より前は「その時点で最古の actionable な生成実行 1 件」を処理する方式で、補正対象より古い未完了の run が先に処理されるため、最古の actionable を確認するクエリを使っていた。26-3 の本番切替までは旧方式で稼働。）
 </div>
 
 <h3 id="stale-data">4.3 stale データ（未完了のまま残った生成実行）の扱い</h3>
 
-<p><a href="data-model.html#target-selection">data-model.html セクション 4.4</a> で確認したとおり、<code>pending</code> / <code>container_created</code> のまま終端状態に達しない <code>posts</code> 行が残ると、その生成実行は<strong>同じ回の Retry では復旧に使われるが、26-1 の当回固定以後は後続の回からは選ばれない</strong>（26-3 の切替までは旧方式で、後続の実行でも自動的に再選択され続ける）。これは主に、ECS タスクの異常終了（OOM Kill・Fargate 基盤障害等）でアプリケーションが例外を捕捉して <code>failed</code> に更新する前に強制終了した場合に起こる。当回固定以後は後続投稿をブロックしないが、放置すると<strong>投稿の有無が不確定な記録が残り、投稿漏れに気づきにくい</strong>点が運用上の注意点である（旧方式〔最古選定〕では同一セットの後続投稿をブロックした = I-014 の事象。投稿ゼロ・stale の可視化は <a href="../issues/index.html#I-006">I-006</a>・<a href="../issues/index.html#I-025">I-025</a> で別途扱う）。</p>
+<p><a href="data-model.html#target-selection">data-model.html セクション 4.4</a> で確認したとおり、<code>pending</code> / <code>container_created</code> のまま終端状態に達しない <code>posts</code> 行が残ると、その生成実行は<strong>同じ回の Retry では復旧に使われるが、後続の回からは選ばれない</strong>（当回固定。<a href="batch-flow.html#sns-target">batch-flow.html 3.1</a>）。これは主に、ECS タスクの異常終了（OOM Kill・Fargate 基盤障害等）でアプリケーションが例外を捕捉して <code>failed</code> に更新する前に強制終了した場合に起こる。後続投稿はブロックしないが、放置すると<strong>投稿の有無が不確定な記録が残り、投稿漏れに気づきにくい</strong>（投稿ゼロ・stale の可視化は <a href="../issues/index.html#I-006">I-006</a>・<a href="../issues/index.html#I-025">I-025</a> で別途扱う）。</p>
 
-<div class="note">
-  <span class="callout-title">決定: 自動検知の仕組みは追加しない（既存アラーム 1 本に一本化する方針を維持）</span>
-  stale 専用の CloudWatch アラームやカスタムメトリクスは追加しない（<a href="batch-flow.html#failure-policy">batch-flow.html セクション 3.4</a> の「通知は既存の Step Functions 失敗アラーム 1 本に一本化」という決定と整合させる）。運用者は既存の失敗通知を起点に、以下のクエリで stale な行の有無を確認する運用とする。
+<div>
+  <p>stale 専用のアラーム・カスタムメトリクスはない。運用者は既存の失敗通知を起点に、以下のクエリで stale な行の有無を確認する <a class="decision-ref" href="#d-14">→ 理由 D-14</a>。</p>
   <pre><code>-- 各セットの未完了 (generation_run, account) を一覧表示（古い順。当回固定以後は後続をブロックしないが、記録の確定のため確認する）
 SELECT bs.set_code, gr.id AS generation_run_id, gr.scheduled_at,
        sa.account_code, p.media_type, p.status, p.updated_at
@@ -418,13 +437,13 @@ ORDER BY gr.scheduled_at ASC;</code></pre>
 <ul>
   <li><strong>判定の目安</strong>: 1 日複数回実行する運用のため、<code>status</code> が <code>pending</code> / <code>container_created</code> のまま <code>updated_at</code> から半日以上経過している行は stale の疑いが強い（対応する Step Functions 実行がすでに終了しているにもかかわらず DB が更新されていない状態）。行が存在しない（<code>p.id IS NULL</code>）だけの場合は、直近の生成実行がまだ処理待ちなだけの通常状態であり stale ではない</li>
   <li><strong>ストーリーズ行（<code>media_type='story'</code>。V004）の stale は後続投稿をブロックしない</strong>: 投稿対象の決定はリール行の終端状態で決まるため（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）、ストーリーズ行が途中状態のまま残っても次の生成実行の投稿は進む。補正は同じく 4.2 の手順で終端状態（実際の投稿有無に応じて <code>success</code> / <code>failed</code>）へ更新して記録を確定させるのみでよい（<code>pending</code> へ戻す補正は効かない — 4.2 の注意を参照）</li>
-  <li><strong>対応</strong>: 対象の Step Functions 実行履歴・CloudWatch Logs で実際の投稿有無を確認し、4.2 の手順で <code>success</code>（実際は投稿済みだった場合）または <code>failed</code>（実際は未投稿だった場合）の終端状態に補正する。終端状態に補正して記録を確定させる（当回固定以後は後続の投稿対象決定に影響しない。旧方式ではこの補正が後続のブロック解除を兼ねていた）。その回を改めて投稿したい場合は 4.2 の注意のとおり予定時刻を指定して手動起動する</li>
+  <li><strong>対応</strong>: 対象の Step Functions 実行履歴・CloudWatch Logs で実際の投稿有無を確認し、4.2 の手順で <code>success</code>（実際は投稿済みだった場合）または <code>failed</code>（実際は未投稿だった場合）の終端状態に補正する。終端状態に補正して記録を確定させる（後続の投稿対象決定には影響しない）。その回を改めて投稿したい場合は 4.2 の注意のとおり予定時刻を指定して手動起動する</li>
   <li>将来的にセット別失敗時ポリシー（追いつく / 捨てる。<a href="batch-flow.html#future-failure-policy">batch-flow.html</a>）を導入する際は、stale データの扱いも合わせて再設計する</li>
 </ul>
 
 <h3 id="mute-check">4.4 リール音源のミュート検知（著作権誤検知）の週次確認</h3>
 
-<p>権利クリア済みのフリー音源でも、プラットフォームの著作権検知（Content ID 型の照合）が<strong>誤検知して公開後に自動ミュート</strong>する可能性がある（<a href="requirements-notes-video.html#carryover">14-2 壁打ち記録 セクション 7</a>）。ミュートは投稿失敗ではないため既存のアラームでは検知できず、当面は手動確認の運用とする（Phase 14-4 決定。stale データ確認〔4.3〕と同様、専用の自動検知は追加しない方針と整合）。</p>
+<p>権利クリア済みのフリー音源でも、プラットフォームの著作権検知（Content ID 型の照合）が<strong>誤検知して公開後に自動ミュート</strong>する可能性がある（<a href="requirements-notes-video.html#carryover">14-2 壁打ち記録 セクション 7</a>）。ミュートは投稿失敗ではないため既存のアラームでは検知できず、手動で確認する <a class="decision-ref" href="#d-15">→ 理由 D-15</a>。</p>
 
 <ol>
   <li><strong>週 1 回</strong>、Instagram アプリで直近 1 週間のリール投稿（1 日 1 本運用で 7 件目安）を再生し、音が出ること・ミュート警告が表示されていないことを確認する</li>
@@ -439,17 +458,18 @@ JOIN audio_assets aa ON aa.id = gm.audio_asset_id
 WHERE p.platform_post_id = '(Instagram media ID)';</code></pre>
       </li>
       <li>先に代替曲を登録してから、該当 <code>audio_assets</code> を <code>is_active=0</code> に更新する（0 件になる瞬間を作らない。セクション 3）</li>
-      <li><strong>動画事前生成方式（<code>quiz-prebuilt</code>）のセットでは無効化だけでは止まらない</strong>（BGM は事前動画にベイク済みのため、既ビルド動画が該当曲のまま投稿され続ける）。該当曲を使う事前動画を以下で特定し、代替曲で<strong>再ビルド・差し替え</strong>する（手順はセクション 3 の手順 5）:
+      <li><strong>動画事前生成方式（<code>quiz-prebuilt</code>）のセットでは無効化だけでは止まらない</strong>（BGM は事前動画にベイク済みのため、既ビルド動画が該当曲のまま投稿され続ける）。該当曲を使う事前動画を以下で特定し、代替曲で<strong>再ビルド・差し替え</strong>する（再ビルドの手順は<a href="../production/logic-training-1.html">生産の詳細設計 logic-training-1</a> の 4 章。ほかの事前ビルド方式のセットも同じ考え方で、BGM を焼き込んだ動画を作り直す）:
         <pre><code>SELECT id FROM quiz_stock_items
 WHERE video_audio_asset_id = :audio_asset_id AND is_active = 1;</code></pre>
       </li>
-      <li><strong>投稿自体は削除しない</strong>（表示・再生数・フォロワー接点は残す。ミュートのままでも Ken Burns の映像は成立する）</li>
+      <li><strong>投稿自体は削除しない</strong>（表示・再生数・フォロワー接点は残す。ミュートのままでも映像は成立する）</li>
       <li>セット記録（<code>docs/plans/&lt;set_code&gt;-log.html</code> の「トラブル対応の記録」）に、対象投稿・曲・検知日を記録する（同一曲の再発防止。記録先は Phase 18 で開発計画書から変更）</li>
     </ol>
   </li>
 </ol>
 
 <h2 id="secret-ops">5. Secret 運用（SNS 認証・画像生成 API キー）・トークン更新</h2>
+<p class="lead">SNS の認証情報を Secrets Manager に置く手順と、トークンの期限の管理。5.4 は機能別の基本設計 <a href="../overview/functions/token-refresh.html">トークン更新</a>の運用の手順にあたる。</p>
 
 <h3 id="instagram-account-setup">5.1 Instagram アカウント準備（プロアカウント化 〜 長期アクセストークン取得）</h3>
 <p>新しいセットで Instagram 投稿を行う場合、Secret 作成（<a href="#set-add">2.1 手順 1</a>・<a href="#account-add">5.3 手順 1</a>）の前提として毎回必要になる外部準備。Meta 側の UI・仕様は変更されうるため、詰まった場合は Meta 公式ドキュメント（<a href="https://developers.facebook.com/docs/instagram-platform/">Instagram Platform documentation</a>）を最新の一次情報として確認する。12-1（<code>fantasy-animals-1</code>・<code>main-account</code>）で実際に踏んだ手順を元に記載し、15-7（<code>logic-training-1</code>・<code>main-account</code>）の 2 セット目で判明した論点を追記した。</p>
@@ -487,11 +507,7 @@ WHERE video_audio_asset_id = :audio_asset_id AND is_active = 1;</code></pre>
 
 <h4>手順 3: Meta Developer アカウント + アプリ作成</h4>
 <p><a href="https://developers.facebook.com/">developers.facebook.com</a> で Meta Developer アカウントを作成（要 Facebook アカウント）→ 新規アプリ作成 → ユースケースは「Business」を選択する。App ID / App Secret が発行される（App Secret はトークン交換〔手順 5〕で使用する）。</p>
-<div class="decision">
-  <span class="callout-title">決定: 2 セット目以降は既存 Meta アプリを流用する（2026-07-27・15-7 のユーザー決定）</span>
-  1 つの Meta アプリで複数の Facebook ページ・複数の Instagram アカウントを扱えるため、<strong>セットごとに新規アプリを作らず既存アプリを流用する</strong>。本手順 3 をスキップでき、App ID / App Secret も再利用できる。手順 4 の Instagram テスター招待のみセットごとに実施する。
-  セットごとにアプリを分ければ障害・凍結の影響を切り離せるが、手順 3〜4 を一から実施する手間とレビュー基準の再確認が必要になるため、初期スコープでは流用を採る。
-</div>
+<p>2 セット目以降は既存の Meta アプリを流用する。本手順 3 は省略でき、App ID / App Secret も再利用する。手順 4 の Instagram テスター招待だけセットごとに行う <a class="decision-ref" href="#d-04">→ 理由 D-04</a></p>
 
 <h4>手順 4: アプリへの権限付与（App Review を回避する 2 つのロール）</h4>
 <p>本システムはユーザー自身のアカウントにのみ投稿するため、Meta の<strong>アプリレビューは不要</strong>（他者のアカウントに投稿する場合のみ必須）。代わりに以下 2 つのロールを設定する。</p>
@@ -531,7 +547,7 @@ WHERE video_audio_asset_id = :audio_asset_id AND is_active = 1;</code></pre>
 </ol>
 <div class="note">
   <span class="callout-title">実値をこの手順の外に出さない</span>
-  App Secret・アクセストークン・<code>ig_user_id</code> はすべてブラウザ操作で完結させ、会話ログ・コマンド履歴・チャットには残さない。取得した 3 値（<code>access_token</code> / <code>ig_user_id</code> / <code>token_expires_at</code>）はメモに控え、Secret 作成（<a href="#set-add">2.1 手順 1</a>・<a href="#account-add">5.3 手順 1</a>）ではマネジメントコンソールから直接入力する（<a href="#image-api-key">5.5</a> の画像生成 API キーと同じ理由。実 API キー・トークンはコンソール手動設定とし CLI・会話に残さない方針）。
+  App Secret・アクセストークン・<code>ig_user_id</code> はすべてブラウザ操作で完結させ、会話ログ・コマンド履歴・チャットには残さない。取得した 3 値（<code>access_token</code> / <code>ig_user_id</code> / <code>token_expires_at</code>）はメモに控え、Secret 作成（<a href="#set-add">2.1 手順 1</a>・<a href="#account-add">5.3 手順 1</a>）ではマネジメントコンソールから直接入力する（<a href="#image-api-key">5.5</a> の画像生成 API キーと同じく、実 API キー・トークンはコンソールで手で設定し CLI・会話に残さない）。
 </div>
 
 <h4>手順 6: Secret を作成する（コンソールで入力できない場合の CloudShell 方式）</h4>
@@ -565,7 +581,7 @@ a = json.load(urllib.request.urlopen('https://graph.facebook.com/v21.0/%s?fields
 print('ig_user_id -&gt; username=%s media_count=%s' % (a.get('username'), a.get('media_count')))"</code></pre>
 <ul>
   <li><code>username</code> が<strong>新セットのアカウント</strong>であること（新規開設直後なら <code>media_count=0</code>）。既存セットのユーザーネームが返ったら <code>ig_user_id</code> の取り違え</li>
-  <li><code>scopes</code> に <code>instagram_content_publish</code> と <code>instagram_manage_insights</code> の両方があること（後者が無いとインサイト収集が失敗する = セクション 5.4 の decision）</li>
+  <li><code>scopes</code> に <code>instagram_content_publish</code> と <code>instagram_manage_insights</code> の両方があること（後者が無いとインサイト収集が失敗する = セクション 5.4）</li>
   <li><code>data_access</code> の値を <code>token_expires_at</code> に記録し、その 7 日前へリマインダーを更新する（セクション 5.4）</li>
 </ul>
 <div class="warn">
@@ -598,9 +614,9 @@ VALUES (:set_id, 'instagram', 'sub-account', 'サブアカウント表示名', 1
 
 <h3 id="token-refresh">5.4 Instagram アクセストークン更新の具体手順とリマインド運用</h3>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-10-11、21-6g）: コメント返信用トークン（umigame-soup-1）は自動更新する。本節の手動更新・リマインドは投稿用トークンだけが対象</span>
-  コメント返信用の長期トークン（Instagram ログイン方式・Secret <code>acps/{env}/umigame-soup-1/comment-reply{-staging}</code> の <code>ig_access_token</code>）は 60 日で失効するが、<strong>トークン更新 Lambda が毎週月曜 04:00 JST に <code>GET /refresh_access_token</code> で更新し、新しいトークンと <code>token_expires_at</code> を Secret に書き戻す</strong>（構成は <a href="../infra/stacks.html#comment-reply">infra/stacks.html セクション 3.6</a>）。リマインダーは登録しない。運用者が行うのは次の 3 つだけ。
+<div>
+<p><strong>コメント返信用トークン（umigame-soup-1）は自動更新。本節の手動更新・リマインドは投稿用トークンだけが対象</strong> <a class="decision-ref" href="#d-05">→ 理由 D-05</a></p>
+コメント返信用の長期トークン（Instagram ログイン方式・Secret <code>acps/{env}/umigame-soup-1/comment-reply{-staging}</code> の <code>ig_access_token</code>）は 60 日で失効するが、<strong>トークン更新 Lambda が毎週月曜 04:00 JST に <code>GET /refresh_access_token</code> で更新し、新しいトークンと <code>token_expires_at</code> を Secret に書き戻す</strong>（構成は <a href="../infra/stacks.html#comment-reply">infra/stacks.html セクション 3.6</a>）。リマインダーは登録しない。運用者が行うのは次の 3 つだけ。
   <ul style="margin:.3rem 0 0;">
     <li><strong>初回投入</strong>: 面ごとに長期トークンを手動で取得して Secret に入れる（PoC README の手順）。更新 API は<strong>発行から 24 時間以上経ったトークン</strong>しか受け付けないため、投入直後の手動実行は失敗する。初回の自動更新は翌週の月曜で、それまでに失効することはない。投入前（トークンが空）の週は、更新処理が「未投入のため更新しない」として正常終了する（アラームは鳴らない）</li>
     <li><strong>失敗通知が来たとき</strong>（<code>acps-prod-comment-reply-token-refresh-errors</code>）: 更新 Lambda <code>acps-prod-comment-reply-token-refresh</code> のログで原因を見る。Graph API の一時障害なら Lambda を手動実行するか翌週を待つ（失敗した週は Secret が書き換わらず、旧トークンで返信は続く）。トークン失効・権限取り消しなら長期トークンを取り直して Secret に入れる。<strong><code>token_expires_at</code> が 14 日以内に迫っていたら翌週を待たずに直す</strong></li>
@@ -612,12 +628,12 @@ aws secretsmanager get-secret-value --region ap-northeast-1 \
   --query SecretString --output text | python3 -c "import sys, json; print(json.load(sys.stdin)['token_expires_at'])"</code></pre>
       本番面は末尾の <code>-staging</code> を外す。応答の <code>token_expires_at</code> が実行時刻から約 60 日後になり、Secret の値と一致すれば成功</li>
   </ul>
-  手動更新にしなかった理由: 投稿用と違い Live モードで 60 日失効が実際に起きる方式であり、失効すると返信が全件止まる（課題 <a href="../issues/index.html#I-031">I-031</a>。2026-09-26 のユーザー決定でリリース前の必須）。コメント受信のついでに更新する方式は、コメントが途絶えた期間に失効するため採らない。
+  
 </div>
 
-<div class="decision">
-  <span class="callout-title">決定: 期限は「60 日」ではなく <code>debug_token</code> の実測値で管理する（2026-07-27・15-7 の実測に基づく改訂）</span>
-  15-7 で 2 アカウント分のトークンを <code>debug_token</code> で確認したところ、<strong>いずれも <code>expires_at = 0</code>（無期限）</strong>であり、当初記載の「60 日で失効」は現構成では発生していなかった。実際に効く期限は<strong><code>data_access_expires_at</code>（データアクセス期限。再認可から 90 日）</strong>で、これを過ぎると再認可までデータアクセスが失われる。
+<div>
+<p><strong>期限は debug_token の実測値（data_access_expires_at）で管理する</strong> <a class="decision-ref" href="#d-06">→ 理由 D-06</a></p>
+実際に効く期限は<strong><code>data_access_expires_at</code>（データアクセス期限。再認可から 90 日）</strong>で、これを過ぎると再認可までデータアクセスが失われる。
   <ul style="margin:.3rem 0 0;">
     <li>無期限トークンが発行されるのは<strong>アプリが開発モードかつ当該ユーザーがアプリの管理者/開発者である</strong>現在の構成に依存する挙動。将来アプリを Live モードへ移行した場合は 60 日失効に戻る可能性があるため、移行時に本節を再確認する</li>
     <li>複数セットのトークンが<strong>同一アプリ・同一 Facebook ユーザー</strong>で発行されている場合、<code>data_access_expires_at</code> はセットごとではなくユーザー×アプリの組で 1 つ。<strong>いずれか 1 セットの再認可で全セット分が同時に延長される</strong>（15-7 の再認可で既存 <code>fantasy-animals-1</code> の期限も 2026-10-25 へ延びたことを実測で確認）。したがってリマインダーは<strong>アカウントごとではなく 1 件に集約する</strong></li>
@@ -635,15 +651,15 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   </ul>
 </div>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-08-10、Phase 16-7）: インサイト収集の導入で再認可スコープに instagram_manage_insights を追加する</span>
-  インサイト収集バッチは既存の投稿用権限に加えて <strong><code>instagram_manage_insights</code></strong> スコープを必要とする（16-6 調査 (5)）。既存の長期トークンに新スコープは自動付与されないため、<strong>16-11（稼働確認）の冒頭で 5.1 手順 5 を <code>instagram_manage_insights</code> を含めて再実行し、新トークンで Secret を更新する</strong>。以後の定期更新（下記手順）でも同スコープを含めて再認可する。
+<div>
+<p><strong>再認可スコープに instagram_manage_insights を含める（16-7）</strong> <a class="decision-ref" href="#d-07">→ 理由 D-07</a></p>
+インサイト収集バッチは既存の投稿用権限に加えて <strong><code>instagram_manage_insights</code></strong> スコープを必要とする（16-6 調査 (5)）。既存の長期トークンに新スコープは自動付与されないため、<strong>16-11（稼働確認）の冒頭で 5.1 手順 5 を <code>instagram_manage_insights</code> を含めて再実行し、新トークンで Secret を更新する</strong>。以後の定期更新（下記手順）でも同スコープを含めて再認可する。
   <br><strong>2026-08-10 に実施済み</strong>。実施時の追加知見: <strong>Graph API Explorer の権限ドロップダウンに <code>instagram_manage_insights</code> が最初は出てこない</strong>。Explorer はアプリのユースケースに追加済みの権限しか列挙しないため、先に<strong>アプリダッシュボード →「ユースケース」→ Instagram ユースケースの「カスタマイズ」→ 権限一覧で <code>instagram_manage_insights</code> を追加</strong>する必要がある（PC ブラウザ推奨）。この際、Instagram の API セットアップ種別は<strong>「Facebook ログインを使用した Instagram API」のまま変更しない</strong> — 「Instagram ログインを使用した Instagram API」に切り替えるとスコープ体系（<code>instagram_business_*</code>）とエンドポイント（<code>graph.instagram.com</code>）が変わり、稼働中の投稿バッチ・インサイトバッチがいずれも動かなくなる。
   この再認可により <code>data_access_expires_at</code> も延長されるため、実施後は下記リマインダーの日付を新期限の 7 日前へ更新する。自社管理アカウントのみの利用のため Standard Access の範囲でアプリレビューは不要の見込み。
 </div>
 
 <ol>
-  <li>上記の実測値（<code>data_access_expires_at</code>）の<strong>7 日前を目安</strong>に、Meta の長期トークン更新フロー（<a href="#instagram-account-setup">5.1 手順 5</a> の再実行。スコープに <code>instagram_manage_insights</code> を含める — 上記 decision）でトークンを再発行し、新しい期限を取得する</li>
+  <li>上記の実測値（<code>data_access_expires_at</code>）の<strong>7 日前を目安</strong>に、Meta の長期トークン更新フロー（<a href="#instagram-account-setup">5.1 手順 5</a> の再実行。スコープに <code>instagram_manage_insights</code> を含める — 上記「再認可スコープ」）でトークンを再発行し、新しい期限を取得する</li>
   <li>取得した新トークンで Secrets Manager の値を更新する（<code>access_token</code> と <code>token_expires_at</code> の両方を更新する）
     <pre><code>aws secretsmanager put-secret-value \
   --secret-id acps/prod/fashion-set-1/sns/instagram/main-account \
@@ -652,21 +668,22 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   <li>更新後、SNS 投稿ワークフローを手動実行するか次回の自動実行を待って、新トークンで認証が成功することを確認する</li>
 </ol>
 
-<div class="decision">
-  <span class="callout-title">決定: リマインドは手動管理・全セットで 1 件に集約する（自動リマインドは導入しない）</span>
-  <code>token_expires_at</code> は Secret 内の運用メモであり、アプリケーションはこの値を認証には使用しない（<a href="../infra/security.html">infra/security.html セクション 1.3</a>）。管理画面（将来拡張）がない現時点では、Secrets Manager から失効日時を横断的に一覧する仕組みも持たない。
-  そのため初期運用では、<strong>期限の 7 日前を目安に運用者自身がカレンダー等の外部ツールにリマインダーを設定する</strong>運用とする（セット数が少ない初期スコープでは許容範囲と判断）。
-  当初は「アカウントごとに登録」としていたが、上記のとおり <code>data_access_expires_at</code> がユーザー×アプリの組で共通であり 1 回の再認可で全セットが延長されるため、<strong>2026-07-27 以降はリマインダーを 1 件に集約する</strong>（セットごとにアプリを分けた場合はアプリごとに 1 件）。
+<div>
+<p><strong>リマインドの運用（手動・全セットで 1 件）</strong> <a class="decision-ref" href="#d-08">→ 理由 D-08</a></p>
+<code>token_expires_at</code> は Secret 内の運用メモであり、アプリケーションはこの値を認証には使用しない（<a href="../infra/security.html">infra/security.html セクション 1.3</a>）。管理画面（将来拡張）がない現時点では、Secrets Manager から失効日時を横断的に一覧する仕組みも持たない。
+  そのため初期運用では、<strong>期限の 7 日前を目安に運用者自身がカレンダー等の外部ツールにリマインダーを設定する</strong>運用とする。
+  <strong>2026-07-27 以降はリマインダーを 1 件に集約する</strong>（セットごとにアプリを分けた場合はアプリごとに 1 件）。
   <br><strong>現在の登録内容: 2026-11-16</strong>（期限 2026-11-23 の 7 日前。<code>fantasy-animals-1</code> / <code>logic-training-1</code> / <code>pref-ranking-1</code> の 3 セットをカバー。2026-08-26 の 17-5b（<code>pref-ranking-1</code> のアカウント開設に伴う再認可）で <code>data_access_expires_at</code> が 2026-11-08T10:58:20Z → <strong>2026-11-23T16:39:43Z</strong> へ延長されたことに伴う更新。既存セットのトークンを <code>debug_token</code> で実測して確認した〔<code>expires_at</code> は引き続き無期限〕）
   <br>セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（課題体系 <a href="../issues/index.html#I-003">I-003</a>。再検討トリガー 3 点付きで解消クローズ済み）。
-  <br><strong>15-16（2026-07-29）の要否判断で本方針を確定</strong>: 自動化は導入しない。リマインダーがセット数に比例しない構造（Meta アプリ 1 つにつき 1 件）になったため、2026-07-07 の設計課題「セット数増で手運用が破綻」の前提が崩れた。再検討トリガーは ①Meta アプリを複数に分けた場合 ②Live モード移行で 60 日失効に戻った場合 ③管理画面（将来拡張）の導入時、の 3 点。
+  
 </div>
 
-<h3 id="image-api-key">5.5 画像生成 API キーの設定（Phase 10 開始時に必須）</h3>
-<p>画像生成 API キー用 Secret <code>acps/prod/image/api-key</code> は、インフラ構築（Phase 5-3）で「箱」のみ作成済みで、<strong>値はランダムなプレースホルダのまま</strong>である（<a href="../infra/stacks.html">infra/stacks.html セクション 3.1</a> の decision）。アプリ実装（Phase 10）で画像生成 API を呼び出す前に、実際の API キーへ差し替える。</p>
+<h3 id="image-api-key">5.5 画像生成 API キー（実行時生成方式でだけ使う）</h3>
+<p>画像生成 API キー用 Secret <code>acps/prod/image/api-key</code>（値スキーマ <code>{"api_key": "..."}</code>。<a href="../infra/security.html">infra/security.html セクション 1.3</a>）は FoundationStack が作り、画像生成バッチのタスク定義に <code>API_SECRET_ARN</code> として渡る（設定の読み込みで必須）。<strong>値を読むのは実行時生成方式（<code>gpt-image-single</code> / <code>gpt-image-kenburns</code> / <code>gpt-quiz-multicut</code>）だけ</strong>で、3 方式とも退役している（<a href="batch-flow.html#generator-catalog">方式カタログ</a>）。稼働中のセットが使う事前ビルド方式は実行時に生成 API を呼ばないため、今はこの値を使う処理がない。</p>
+<p>退役した方式をどれかのセットで使い直すときだけ、次を行う。</p>
 <ol>
-  <li>マネジメントコンソールの Secrets Manager で <code>acps/prod/image/api-key</code> を開き、「シークレットの値を取得」→「編集」で <code>api_key</code> キーの値を、利用する画像生成 API（初期方式が使う API。方式カタログは <a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a>）の API キーに差し替える。値スキーマ <code>{"api_key": "..."}</code> は <a href="../infra/security.html">infra/security.html セクション 1.3</a> を参照</li>
-  <li>差し替え後、画像生成ワークフローの実行で認証が成功することを確認する</li>
+  <li>マネジメントコンソールの Secrets Manager で <code>acps/prod/image/api-key</code> を開き、「シークレットの値を取得」→「編集」で <code>api_key</code> の値を、その方式が使う画像生成 API のキーに差し替える（方式の API は方式別設計書）</li>
+  <li>画像生成ワークフローの手動実行で認証が成功することを確かめる</li>
 </ol>
 <div class="warn">
   <span class="callout-title">注意: スタック再作成で値が失われる</span>
@@ -674,12 +691,13 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
 </div>
 
 <h2 id="insights-ops">6. インサイト収集の運用（Phase 16-7 設計 Fix）</h2>
+<p class="lead">この章は、機能別の基本設計 <a href="../overview/functions/insights.html">インサイト収集</a>の運用の手順を詳しくしたもの。</p>
 
 <p>インサイト収集バッチ（処理フローは <a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>、実行基盤は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 1.6・11）の運用手順。</p>
 
 <h3 id="insights-onboarding">6.1 稼働開始チェックリスト（16-11 で実施）</h3>
 <ol>
-  <li><strong>再認可・トークン更新</strong>: 5.1 手順 5 を <code>instagram_manage_insights</code> スコープ込みで再実行し、全アカウントの Secret を新トークンで更新する（5.4 の decision。リマインダー日付の更新まで）</li>
+  <li><strong>再認可・トークン更新</strong>: 5.1 手順 5 を <code>instagram_manage_insights</code> スコープ込みで再実行し、全アカウントの Secret を新トークンで更新する（5.4。リマインダー日付の更新まで）</li>
   <li><strong>手動実行で疎通確認</strong>: セットごとに Step Functions を手動実行し、<code>post_insights</code> / <code>account_insights_daily</code> に行が入ることを確認する
     <pre><code>aws stepfunctions start-execution \
   --state-machine-arn arn:aws:states:ap-northeast-1:&lt;アカウント ID&gt;:stateMachine:acps-prod-insights-collection-sfn \
@@ -714,7 +732,7 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   <li><strong>課題の棚卸し（節目）</strong>: 月次転記は<a href="../issues/index.html">課題体系</a>の棚卸しの節目を兼ねる（22-4〔2026-09-19〕で追加。ルールは<a href="../issues/index.html#rule-lane">課題体系 4.8</a>）。転記の後にスキル <code>/issue</code> の棚卸しモードで live 表のトリガー列（日付型・節目型）と各計画書の確認待ちリストを上から確認し、起票 のまま残っている行の対応方針を決める。課題レーンのため転記と同じセッションで続けてよい</li>
 </ul>
 
-<p><strong>月次転記の手順</strong>（前月分。<strong>月初 4 日以降</strong>に行う — 月末の投稿が 72 時間水準に達するのを待つため。停止したセットは転記しない）:</p>
+<p><strong>月次転記の手順</strong>（前月分。<strong>月初 4 日以降</strong>に行う。停止したセットは転記しない） <a class="decision-ref" href="#d-16">→ 理由 D-16</a>:</p>
 <ol>
   <li><code>python3 content/insights-analysis/run_queries.py kpi_post_monthly kpi_account_monthly</code> を実行し、前月の行を取る（出力は <code>results/</code> に JSON。残す集計は <code>results/YYYY-MM-DD.txt</code> として明示的にコミット）</li>
   <li><strong>セット計画書の KPI 欄</strong>: <code>v_post_kpi_monthly</code> の前月行を、スロットが分かれるセットはスロット別 + <code>all</code>、1 スロットのセットは 1 行で転記する。月末フォロワーは <code>v_account_kpi_monthly.month_end_followers</code>。様式は下表。備考には KPI 欄のベースライン行（改修前の 72 時間中央値）と比べて悪化していないかを一言添える（改修の効果判定は 16-12a の「ベースライン比較」）</li>
@@ -734,11 +752,156 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
 
 <div class="note">
   <span class="callout-title">2 段階 Fix の完了（16-12b・2026-09-03）</span>
-  16-7 で「JSON 全量 + 後から昇格」とした 2 段階 Fix は、16-12a（指標セット確定）と 16-12b（V011 のビュー昇格・本節の転記運用・セット計画書 KPI 欄の様式統一）で完了した。<code>follows_and_unfollows</code> が入っていない理由（100 フォロワー未満では API が返さない）と扱いは data-model.html 4.11 の decision を参照。
+  16-7 で「JSON 全量 + 後から昇格」とした 2 段階 Fix は、16-12a（指標セット確定）と 16-12b（V011 のビュー昇格・本節の転記運用・セット計画書 KPI 欄の様式統一）で完了した。<code>follows_and_unfollows</code> が入っていない理由（100 フォロワー未満では API が返さない）と扱いは <a href="data-model.html#detail-insights">data-model.html 4.11</a> を参照。
 </div>
+
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>収集の処理（束ね方・窓・失敗の扱い） → <a href="batch-flow.html#flow-insights">バッチ処理フロー設計 4 章</a></li>
+  <li>KPI のビューの定義 → <a href="data-model.html#detail-insights">データモデル設計 4.11</a></li>
+  <li>集計ランナーの使い方 → <code>content/insights-analysis/README.md</code></li>
+</ul></div>
 
 <p>参考資料: <a href="../_archive/operation.md">_archive/operation.md</a>（旧運用設計。<code>post_records.attempt_number</code> / <code>max_post_retries</code> に基づく再試行上限確認は、自動再試行を行わない方針への変更に伴い不採用。SNS アカウント追加手順・手動補正の記録ルール・トークン更新の考え方は本書に引き継いだ。現役の設計書ではない）</p>
 
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 キャプション・プロンプトの作り方の拡張はセット別に選ぶ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>プレースホルダ入りテンプレートも 3 章の手順（UPDATE / INSERT + 無効化）で扱う。AI によるプロンプト生成・AI キャプション生成は将来のセット別拡張ポイントとし、どのセットがどの方式かはセット別設計書に記録する</dd>
+  <dt>理由</dt><dd>プレースホルダはテンプレート文言の規約でスキーマ変更を伴わないため、通常の差し替え手順のままでよい。方式の選択をセット別設計書に書くのは、共通の手順を変えずにセットごとに選べるようにするため（<a href="design-outline.html#set-docs">アプリ設計大枠 1.1</a>）</dd>
+  <dt>日付・出典</dt><dd>2026-08-01（16-1）・2026-08-10（17-2）・2026-09-04（21-3）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 AI 開示ハッシュタグは #AIart の 1 つにする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>事業戦略書の必須要件「AI 利用の開示」の具体タグを <code>#AIart</code> にし、全セットのキャプションテンプレートに必ず含める</dd>
+  <dt>理由</dt><dd>AI 生成コンテンツの開示タグとして最も一般的で、海外リーチ前提のセット・国内向けセットのどちらでも通用するため 1 タグに絞る（タグ枠の節約）。</dd>
+  <dt>日付・出典</dt><dd>2026-07-24（Phase 14-4。<a href="requirements-notes-video.html#decisions">14-2 壁打ち決定事項 #7</a>）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 ラウドネス正規化は 2 パス方式にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>パス 1 で切り出し後の区間を解析し、得た <code>measured_*</code> と <code>linear=true</code> でパス 2 を線形に適用する。フェードは正規化の後段に置く</dd>
+  <dt>理由</dt><dd>単一パスの <code>loudnorm</code> は動的正規化のため精度が粗く、14-6 で 4 曲を処理したところ実測 Integrated が -12.5〜-15.3 LUFS と約 2.8 dB ばらついた（曲間の音量差をなくす目的に足りない）。2 パスにすると同じ 4 曲で 1.1 dB（-13.8〜-14.9 LUFS）に収まった。切り出し後に解析するのは実際に使う区間の音量に合わせるため、フェードを後段に置くのはフェード込みで解析すると測定値が下振れするため</dd>
+  <dt>日付・出典</dt><dd>Phase 14-6 の実作業</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 2 セット目以降は既存の Meta アプリを流用する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>セットごとに新しい Meta アプリを作らず既存アプリを流用する。手順 3 は省略でき、App ID / App Secret も再利用する。手順 4 の Instagram テスター招待だけセットごとに行う</dd>
+  <dt>理由</dt><dd>1 つの Meta アプリで複数の Facebook ページ・複数の Instagram アカウントを扱える。セットごとにアプリを分ければ障害・凍結の影響を切り離せるが、手順 3〜4 を一から行う手間とレビュー基準の再確認が要る</dd>
+  <dt>退けた案</dt><dd>セットごとに新しいアプリを作る案</dd>
+  <dt>日付・出典</dt><dd>2026-07-27（15-7 のユーザー決定）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 コメント返信用トークンは Lambda で毎週自動更新する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>コメント返信用の長期トークンはトークン更新 Lambda が毎週月曜 04:00 JST に更新して Secret に書き戻す。リマインダーは登録しない</dd>
+  <dt>理由</dt><dd>手動更新にしなかった理由: 投稿用と違い Live モードで 60 日失効が実際に起きる方式であり、失効すると返信が全件止まる（課題 <a href="../issues/index.html#I-031">I-031</a>。2026-09-26 のユーザー決定でリリース前の必須）。コメント受信のついでに更新する方式は、コメントが途絶えた期間に失効するため採らない。</dd>
+  <dt>退けた案</dt><dd>手動更新 + リマインダー、コメント受信のついでに更新する方式（上記の理由）</dd>
+  <dt>日付・出典</dt><dd>2026-10-11（21-6g）</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 トークンの期限は「60 日」ではなく debug_token の実測値で管理する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>投稿用トークンの期限は <code>debug_token</code> の <code>data_access_expires_at</code>（再認可から 90 日）の実測値で管理し、<code>token_expires_at</code> にその値を書く</dd>
+  <dt>理由</dt><dd>15-7 で 2 アカウント分のトークンを <code>debug_token</code> で確認したところ、<strong>いずれも <code>expires_at = 0</code>（無期限）</strong>であり、当初記載の「60 日で失効」は現構成では発生していなかった。</dd>
+  <dt>日付・出典</dt><dd>2026-07-27（15-7 の実測に基づく改訂）</dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 再認可のスコープに instagram_manage_insights を足す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>16-11 の冒頭で 5.1 手順 5 を <code>instagram_manage_insights</code> 込みで再実行して Secret を更新し、以後の定期更新でも同スコープを含める</dd>
+  <dt>理由</dt><dd>インサイト収集バッチは既存の投稿用権限に加えて <code>instagram_manage_insights</code> を必要とし（16-6 調査 (5)）、既存の長期トークンには新スコープが自動付与されないため</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（Phase 16-7。同日に実施済み）</dd>
+</dl>
+</article>
+<article id="d-08">
+<h3>D-08 期限のリマインドは手動で、全セットで 1 件に集約する（自動化しない）</h3>
+<dl>
+  <dt>決めたこと</dt><dd>期限の 7 日前を目安に運用者がカレンダー等へリマインダーを 1 件だけ登録する（Meta アプリを分けた場合はアプリごとに 1 件）。自動リマインドは導入しない</dd>
+  <dt>理由</dt><dd>（セット数が少ない初期スコープでは許容範囲と判断） 当初は「アカウントごとに登録」としていたが、上記のとおり <code>data_access_expires_at</code> がユーザー×アプリの組で共通であり 1 回の再認可で全セットが延長されるため、 <br><strong>15-16（2026-07-29）の要否判断で本方針を確定</strong>: 自動化は導入しない。リマインダーがセット数に比例しない構造（Meta アプリ 1 つにつき 1 件）になったため、2026-07-07 の設計課題「セット数増で手運用が破綻」の前提が崩れた。再検討トリガーは ①Meta アプリを複数に分けた場合 ②Live モード移行で 60 日失効に戻った場合 ③管理画面（将来拡張）の導入時、の 3 点。</dd>
+  <dt>日付・出典</dt><dd>2026-07-27（1 件に集約）・2026-07-29（15-16 で自動化しないと確定）</dd>
+</dl>
+</article>
+<article id="d-09">
+<h3>D-09 セット追加は Secret を DB 登録より先に作る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Secret の作成・検証（手順 1）を DB 登録（手順 2）より先に行う</dd>
+  <dt>理由</dt><dd>Secret を先に作らないと、DB に <code>sns_accounts</code> を登録しても投稿バッチが認証情報を取得できず即失敗するため（5.3 も同じ）</dd>
+  <dt>日付・出典</dt><dd>Phase 9-4</dd>
+</dl>
+</article>
+<article id="d-10">
+<h3>D-10 セット追加では CDK スタックを増やさない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>スタックは機能単位とし、セットの追加では Scheduler・Secret・DB レコードだけが増える</dd>
+  <dt>理由</dt><dd>Step Functions・タスク定義・コンテナイメージを全セットで共有し、Scheduler が渡す <code>set_code</code> でセットを切り替えるため。インフラ設計書もセットの追加だけでは変わらない（2026-07-06 のユーザー質問を受けて明記）。詳しくは <a href="design-outline.html#d-04">アプリ設計大枠 D-04</a></dd>
+  <dt>日付・出典</dt><dd>2026-07-06・2026-10-18 改め（30-7）</dd>
+</dl>
+</article>
+<article id="d-11">
+<h3>D-11 廃止時は Scheduler を削除し、データと音源は残す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>セット廃止では Scheduler 定義を DISABLED にせず削除し、DB レコード・音源ストック（<code>audio/{set_code}/</code>）は削除しない</dd>
+  <dt>理由</dt><dd>復活時は定義の再追加で足りる。音源は容量が僅少で、セット復活・類似セットでの再利用の可能性がある（Phase 14-4）。残すデータの範囲は <a href="data-model.html#d-32">データモデル設計 D-32</a></dd>
+  <dt>日付・出典</dt><dd>Phase 9-4・14-4</dd>
+</dl>
+</article>
+<article id="d-12">
+<h3>D-12 音源の前処理は事前に手で行い、AAC にそろえる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>切り出し・音量正規化・フェードは S3 登録前に手で 1 回だけ行い、AAC（<code>.m4a</code>）で書き出す</dd>
+  <dt>理由</dt><dd>バッチ内に前処理を持たないことで動画方式の処理・失敗パターンを増やさない。AAC にそろえるのは、合成時に MP4 コンテナへ再エンコードなしで多重化できるため</dd>
+  <dt>日付・出典</dt><dd>Phase 14-4</dd>
+</dl>
+</article>
+<article id="d-13">
+<h3>D-13 投稿の失敗は通知のみとし、欠番を許容する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>投稿に失敗した回は自動で取り戻さず、通知を受けた運用者が必要なときだけ手動で起動する</dd>
+  <dt>理由</dt><dd>投稿の回数が多く、1 回の欠番は致命的でない（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）。一過性エラーだけはバッチ内で段階別にやり直す（<a href="batch-flow.html#d-09">batch-flow.html D-09</a>）</dd>
+  <dt>日付・出典</dt><dd>2026-07-06（A-1）・2026-10-17 改め（Phase 28）</dd>
+</dl>
+</article>
+<article id="d-14">
+<h3>D-14 stale データの自動検知は置かない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>stale 専用の CloudWatch アラームやカスタムメトリクスを足さず、失敗通知を起点に確認クエリを流す運用にする</dd>
+  <dt>理由</dt><dd>通知を既存の Step Functions 失敗アラーム 1 本に一本化する方針（<a href="batch-flow.html#failure-policy">batch-flow.html 3.4</a>）と整合させるため。可視化は課題 <a href="../issues/index.html#I-006">I-006</a>・<a href="../issues/index.html#I-025">I-025</a> で別途扱う</dd>
+  <dt>日付・出典</dt><dd>Phase 9-4</dd>
+</dl>
+</article>
+<article id="d-15">
+<h3>D-15 ミュート検知は週次の手動確認にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>リール音源のミュート（著作権誤検知）は週 1 回、Instagram アプリで手動確認する</dd>
+  <dt>理由</dt><dd>ミュートは投稿失敗ではなく既存のアラームでは拾えない。stale データ確認（4.3）と同じく、専用の自動検知は足さない方針に合わせた</dd>
+  <dt>日付・出典</dt><dd>Phase 14-4</dd>
+</dl>
+</article>
+<article id="d-16">
+<h3>D-16 月次の転記は月初 4 日以降に行う</h3>
+<dl>
+  <dt>決めたこと</dt><dd>前月分の KPI 転記は月初 4 日以降に行う</dd>
+  <dt>理由</dt><dd>月末の投稿が 72 時間水準（<a href="data-model.html#detail-insights">データモデル設計 4.11</a>）に達するのを待つため</dd>
+  <dt>日付・出典</dt><dd>2026-09-03（16-12b）</dd>
+</dl>
+</article>
+</section>
+
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>

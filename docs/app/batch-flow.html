@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>バッチ処理フロー設計 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -12,32 +12,57 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / バッチ処理フロー設計</nav>
 <h1>バッチ処理フロー設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix</span>
-  <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span class="badge badge-fixed">Phase 16-7 でインサイト収集バッチ（セクション 4）を追加</span>
-  <span>最終更新: 2026-10-12（21-7b: 4.2 にコメント記録の取り込みの手順を追加）。前回: 2026-10-12（21-6h: 3.3 の decision に umigame 系 <code>{{prev_truth_block}}</code>〔前回の真相ブロック〕を追加し、umigame 系を 5 種・既知トークンを 10 種にした）。前回: 2026-09-26（21-5b: 3.3 手順 6 の問題スナップショット出力に実装のトランザクション順序を追記）。前回: 2026-09-04（21-3: 方式カタログに <code>umigame-prebuilt</code> を追加、3.3 手順 6 に問題スナップショット出力、キャプション展開に umigame 系プレースホルダを追加）</span>
+  <span class="badge badge-fixed">Phase 9-2 で詳細化・Phase 10-1 で最終 Fix・Phase 30-7 で新しい書式へ移行</span>
+  <span>最終更新: 2026-10-18（30-7: 冒頭の要約と判断の記録〔D-01〜D-20〕を足し、囲みの判断を末尾へ移した。方式カタログの状態を実態に合わせ、実行時生成の 3 方式を退役にした）。以前の更新履歴は git の履歴と<a href="../plans/development-log.html">開発記録</a>を参照</span>
 </div>
 
-<div class="note">
-  <span class="callout-title">本書の位置づけ</span>
-  画像生成・SNS 投稿・インサイト収集バッチの<strong>アプリケーション内部の処理手順</strong>を定める設計書。Phase A-4 の骨子版を Phase 9-2 で詳細化した（冪等性・二重投稿防止・投稿ステータス管理・失敗時の終了コード方針を確定）。Phase 16-7 で第 3 のバッチ（インサイト収集）を追加した。
-  全体方針・分冊間の整合は親ページ <a href="design-outline.html">アプリ設計大枠</a>、データモデルは <a href="data-model.html">データモデル設計</a> を参照。
-  実行基盤（EventBridge Scheduler → 画像生成 Step Functions → 成功時に SNS 投稿 Step Functions を自動起動。インサイト収集は独立したスケジュール起動）は
-  インフラ設計（<a href="../infra/workflow.html">infra/workflow.html</a>）のとおりで、本書はその器の中で動くアプリの処理を扱う。
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは配信面のバッチ 3 本（画像生成〔選定〕・SNS 投稿・インサイト収集）が、ECS タスクの中で何をどの順に行うかを定める。機能別の基本設計 <a href="../overview/functions/post.html">投稿</a>（2・3 章）と <a href="../overview/functions/insights.html">インサイト収集</a>（4 章）の処理の詳細にあたる。実行基盤（Scheduler・Step Functions・タスク定義）は <a href="../infra/workflow.html">infra/workflow.html</a> が持ち、このページはその器の中のアプリの処理だけを書く。図 1 は 3 本のバッチの起動のつながりと、読み書きするデータを表す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    SCH1["Scheduler（セット × 投稿時刻）"] --> IMG["画像生成バッチ&lt;br&gt;（image-batch）&lt;br&gt;在庫から 1 本を選んで登録"]
+    IMG -->|成功したときだけ子の SFN を起動| SNS["SNS 投稿バッチ&lt;br&gt;（sns-post-batch）&lt;br&gt;当回の生成実行を投稿"]
+    SNS --> IG["Instagram（リール + ストーリーズ）"]
+    SNS -->|problem_snapshot_enabled のセット| SNAP["S3 問題スナップショット"]
+    SCH2["Scheduler（セット × 06:00 / 18:00）"] --> INS["インサイト収集バッチ&lt;br&gt;（insights-batch）"]
+    INS -->|Insights API| IG
+    INS -->|comment-log の取り込み| CL["S3 コメント記録"]
+    IMG --> DB[("Aurora")]
+    SNS --> DB
+    INS --> DB
+</pre>
+<figcaption>図 1 配信面のバッチ 3 本のつながり（コメント自動返信は Lambda で、このページの対象外）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>処理の単位</td><td>1 回の画像生成バッチ起動 = 1 生成実行（<code>generation_runs</code>）= アカウントごとに 1 投稿（<a href="#premise">1 章</a>）</td></tr>
+    <tr><td>画像生成バッチ</td><td>セットに割り当てた生成方式（<a href="#generator-catalog">方式カタログ</a>）を呼び、返った最終メディアを S3 と <code>generated_media</code> に登録する。稼働中の 3 セットはすべて事前ビルド方式で、実行時は在庫から動画を 1 本選ぶだけ（<a href="#flow-image">2 章</a>）</td></tr>
+    <tr><td>SNS 投稿バッチ</td><td>セット × <code>SCHEDULED_AT</code> で当回の生成実行だけを選び、<code>posts</code> の 5 状態で二重投稿を防ぎながら投稿する。一過性エラーは公開前だけやり直す（<a href="#flow-sns">3 章</a>）</td></tr>
+    <tr><td>インサイト収集バッチ</td><td>1 日 2 回、投稿後 14 日（ストーリーズは 24 時間）のメディアとアカウント日次の生メトリクスを JSON 全量で保存し、コメント記録を取り込む（<a href="#flow-insights">4 章</a>）</td></tr>
+    <tr><td>失敗の扱い</td><td>失敗はバッチの終了コード 1 → Step Functions の Retry → 通知。欠番は許容する（<a href="#failure-policy">3.4</a>）</td></tr>
+    <tr><td>コメント自動返信</td><td>Lambda で動き、このページの対象外。仕様は<a href="sets/umigame-soup-1.html">セット別設計書 umigame-soup-1</a> の 10 章（入口は機能別の基本設計 <a href="../overview/functions/comment-reply.html">コメント自動返信</a>）</td></tr>
+  </tbody>
+</table>
 </div>
+</section>
 
 <h2 id="premise">1. 前提・不変条件</h2>
+<p class="lead">3 本のバッチに共通する前提をまとめる。要約の「処理の単位」と、起動・DB 接続・実行ログの決まりを詳しくしたもの。</p>
 <ul>
   <li><strong>1 回の画像生成バッチ起動 = 1 投稿（アカウントごと）</strong>を不変条件とする（定義の正は<a href="design-outline.html#invariant">アプリ設計大枠 セクション 2</a>）。1 回の生成実行を <code>generation_runs</code> エンティティとして永続化し、SNS 投稿バッチは生成実行を処理対象の単位とする</li>
   <li>本書の処理手順（骨格）は<strong>全セット共通</strong>とする。セットごとに変わりうる箇所は本文中に<strong>「セット別拡張ポイント」</strong>と明示し、各セットでどの方式を使うかはセット別設計書に記録する（<a href="design-outline.html#set-docs">セット別設計書のルール</a>）</li>
-  <li><strong>実行ログ記録（共通）</strong>: 両バッチとも、<code>SET_CODE</code> から <code>batch_sets</code> を解決した直後（<code>set_id</code> が確定した時点。生成実行の解決や投稿対象の決定より前）に <code>batch_execution_logs</code> へ実行ログを記録する（記録手順は<a href="#exec-log">下記</a>を参照）。<code>SET_CODE</code> の解決に失敗した場合（<code>batch_sets</code> が存在しない）は <code>set_id</code> が確定できないため記録は行わず、既存の Step Functions 失敗アラームで検知する。正常終了時は <code>status='succeeded'</code>、異常終了時は <code>status='failed'</code> に更新する。このログ記録自体の INSERT/UPDATE が失敗した場合はバッチ全体を終了コード 1 とする（記録なしでの続行は運用上のリスクが高いため）</li>
-  <li><strong>起動経路は Step Functions 経由に限る</strong>（Phase 10-1 でインフラ構築の知見を反映）: 手動での再実行を含め、バッチは必ず Step Functions（先頭ステートの DB 準備確認 <code>WaitForDbReady</code> 経由）で起動する。バッチアプリ自身は DB 接続リトライを持たない設計（<a href="../infra/workflow.html">infra/workflow.html</a> セクション 2）のため、ECS RunTask の直接実行は Aurora 自動一時停止中に失敗しうる。この前提により <code>EXECUTION_ARN</code> は常に設定される（手動 RunTask 時の空値は考慮しない）</li>
+  <li><strong>実行ログ記録（共通）</strong>: 両バッチとも、<code>SET_CODE</code> から <code>batch_sets</code> を解決した直後（<code>set_id</code> が確定した時点。生成実行の解決や投稿対象の決定より前）に <code>batch_execution_logs</code> へ実行ログを記録する（記録手順は<a href="#exec-log">下記</a>を参照）。<code>SET_CODE</code> の解決に失敗した場合（<code>batch_sets</code> が存在しない）は <code>set_id</code> が確定できないため記録は行わず、既存の Step Functions 失敗アラームで検知する。正常終了時は <code>status='succeeded'</code>、異常終了時は <code>status='failed'</code> に更新する。このログ記録自体の INSERT/UPDATE が失敗した場合はバッチ全体を終了コード 1 とする <a class="decision-ref" href="#d-17">→ 理由 D-17</a></li>
+  <li><strong>起動経路は Step Functions 経由に限る</strong>（Phase 10-1 でインフラ構築の知見を反映）: 手動での再実行を含め、バッチは必ず Step Functions（先頭ステートの DB 準備確認 <code>WaitForDbReady</code> 経由）で起動する。バッチアプリ自身は DB 接続リトライを持たない（<a href="../infra/workflow.html">infra/workflow.html</a> セクション 2）。<code>EXECUTION_ARN</code> は常に設定される（手動 RunTask 時の空値は考慮しない） <a class="decision-ref" href="#d-18">→ 理由 D-18</a></li>
   <li><strong>DB アクセスの共通部品</strong>: DB 接続には共通ライブラリ <code>shared/acps_shared</code> を使用する（<code>connect()</code> はリトライなし・autocommit OFF。<strong>commit は呼び出し側の責務</strong>）。本書の INSERT-or-fetch 等の手順は明示的な commit を前提とする</li>
 </ul>
 
-<div class="decision" id="exec-log">
-  <span class="callout-title">Phase 9-5 レビューでの確定: batch_execution_logs の INSERT/UPDATE 手順（Step Functions Retry 対応）</span>
-  <code>batch_execution_logs</code> は <code>UNIQUE (execution_arn, batch_type)</code> を持つため、Step Functions Retry で同一実行内に ECS タスクが再起動された場合、素朴な INSERT は一意制約違反になる。<code>generation_runs</code>（セクション 2 手順 2）と同じ INSERT-or-fetch パターンを適用する。
+<div id="exec-log">
+<p><strong>batch_execution_logs の INSERT/UPDATE 手順（Step Functions Retry 対応）</strong> <a class="decision-ref" href="#d-01">→ 理由 D-01</a></p>
+<code>generation_runs</code>（セクション 2 手順 2）と同じ INSERT-or-fetch パターンを適用する。
   <ul style="margin:.3rem 0 0;">
     <li>INSERT 成功 → 新規の実行ログ（<code>attempt_count=1</code>、<code>status='running'</code>）</li>
     <li>UNIQUE 制約違反 → 既存行を <code>(execution_arn, batch_type)</code> で取得し、<code>attempt_count</code> をインクリメントして <code>status='running'</code> に UPDATE する（前回試行時点の <code>error_message</code> 等は上書きされる。試行ごとの履歴は保持せず、直近の試行状態のみを保持する設計とする）</li>
@@ -45,6 +70,7 @@
 </div>
 
 <h2 id="flow-image">2. 画像生成バッチ処理フロー</h2>
+<p class="lead">この章は、機能別の基本設計 <a href="../overview/functions/post.html#flow">投稿 3 章</a>の「選定」の段を、アプリの処理手順まで詳しくしたもの。手順 1〜5 の骨格は全方式で共通で、方式ごとの違いは 2.1 の方式モジュールの中に閉じる。</p>
 
 <div class="note">
   <span class="callout-title">名称と対象範囲（Phase 14-4 の動画対応を反映）</span>
@@ -82,31 +108,26 @@
 
 <div class="note">
   <span class="callout-title">再開処理の簡略化に関する既知の割り切り</span>
-  完了判定は「<code>(generation_run_id, prompt_config_id)</code> に 1 件でも <code>generated_media</code> が存在するか」で行う。生成が複数メディアのうち一部だけ DB 登録できず失敗した場合でも、再実行時は「1 件存在する = このプロンプトは完了済み」としてスキップし、残りのメディアは生成し直さない。厳密な過不足チェックより再開処理の単純さを優先した割り切りであり、問題が顕在化した場合に見直す。
+  完了判定は「<code>(generation_run_id, prompt_config_id)</code> に 1 件でも <code>generated_media</code> が存在するか」で行う。生成が複数メディアのうち一部だけ DB 登録できず失敗した場合でも、再実行時は「1 件存在する = このプロンプトは完了済み」としてスキップし、残りのメディアは生成し直さない <a class="decision-ref" href="#d-19">→ 理由 D-19</a>
 </div>
 
 <h3 id="generator-strategy">2.1 セット別拡張ポイント: 生成方式（strategy モジュール構造）</h3>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-07-12 合意・Phase 10-1 反映）: 生成ロジックの隔離方針</span>
-  将来の多段生成 AI チェーン（プロンプト生成 AI → 画像生成 AI → 品質向上 AI 等）でセットごとに生成ロジックが複雑化しても、
-  アプリ資材（コンテナ・CI/CD パイプライン）はサービス単位の共有を維持する。そのために image-batch 内部を次の 3 要素で構成する。
+<div>
+<p><strong>生成ロジックの構成</strong> <a class="decision-ref" href="#d-02">→ 理由 D-02</a></p>
+<p>アプリ資材（コンテナ・CI/CD パイプライン）はサービス単位で全セットが共有し、image-batch の内部を次の 3 要素で構成する。</p>
   <ul style="margin:.3rem 0 0;">
     <li><strong>共通骨格</strong>: セクション 2 の手順 1〜3・5 と手順 4 の枠組み（完了判定 = 冪等性のアンカー、S3 保存、DB 登録）。方式によらず共通</li>
     <li><strong>生成方式 strategy モジュール</strong>: <code>generators/&lt;方式名&gt;.py</code>（1 方式 1 ファイル）</li>
     <li><strong>方式名レジストリ</strong>: 方式名 → モジュールの対応表。新方式の追加は<strong>「新規ファイル + レジストリ 1 行」に閉じ</strong>、既存方式のファイルには触れない</li>
   </ul>
-  方式の割当は DB のセット設定（<code>batch_sets.generator_name</code>。<a href="data-model.html#detail-batch-sets">data-model.html セクション 4.1</a>）で行い、<strong>コードに <code>set_code</code> の分岐は書かない</strong>。
-  共有部品（共通骨格・API クライアント）の変更は CI/CD パイプラインの pytest ゲート（<a href="../infra/cicd.html">infra/cicd.html</a>）で守る。
+  <p>方式の割当は DB のセット設定（<code>batch_sets.generator_name</code>。<a href="data-model.html#detail-batch-sets">data-model.html セクション 4.1</a>）で行い、<strong>コードに <code>set_code</code> の分岐は書かない</strong>。
+  共有部品（共通骨格・API クライアント）の変更は CI/CD パイプラインの pytest ゲート（<a href="../infra/cicd.html">infra/cicd.html</a>）で守る。</p>
 </div>
 
 <h4 id="generator-contract">生成方式の契約（方式インターフェース）</h4>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-07-24、Phase 14-4）: 契約を「最終メディアを返す」に一般化</span>
-  動画（リール）対応に伴い、契約の成果物を「生成画像」から<strong>「投稿可能な最終形式の最終メディア（画像・動画）」</strong>に一般化する。
-  gpt-image-single（画像方式）は従来どおり JPEG を返せばよく、既存方式の変更は戻り値へのメタ情報付与のみ（共通骨格・レジストリ型の変更を含む実装は 14-7）。
-</div>
+<p>方式は投稿可能な最終形式の最終メディア（画像・動画）を返す <a class="decision-ref" href="#d-03">→ 理由 D-03</a></p>
 
 <ul>
   <li>方式は<strong>セット設定（プロンプト設定等）と実行コンテキスト（生成実行の <code>scheduled_at</code> 等）を受け取り、投稿可能な最終形式の最終メディア（1 件以上。本体 + メタ情報〔<code>file_format</code>・寸法・尺・使用音源等〕）を返す</strong>。投稿要件に合わせた形式変換（例: PNG → JPEG 変換、ffmpeg 合成）は方式側の責務</li>
@@ -115,18 +136,10 @@
   <li>特定の生成 API・変換ツールに固有のリクエスト・レスポンス処理やパラメータは方式側（<code>generators/&lt;方式名&gt;.py</code> と方式別設計書）に閉じる。<strong>共通設計書・共通骨格には特定 API 名を書かない</strong></li>
 </ul>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-07-27、Phase 15-5）: 実行コンテキストに生成実行の scheduled_at を追加</span>
-  方式が受け取る実行コンテキスト（実装上は <code>GeneratorContext</code>）に、生成実行の <code>scheduled_at</code>（UTC）を追加する（実装は 15-6）。
-  時間帯によって出題の型を切り替えるクイズ方式（<code>gpt-quiz-multicut</code> / <code>quiz-prebuilt</code>: 朝 = 軽い L1、昼 = L3、夜 = じっくり。15-4 決定）が実行予定時刻を必要とするため。
-  値は共通骨格が確定済みの <code>generation_runs.scheduled_at</code> を渡す（方式が環境変数 <code>SCHEDULED_AT</code> を直接読むことはしない。正規化の一元化を維持）。
-  既存方式は使用しないだけで影響はない（後方互換の追加）。
-  15-6 の実装時追記: 方式責務の <code>quiz_items</code> INSERT（<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）に必要な
-  <code>generation_run_id</code> も同時に実行コンテキストへ追加した（同じく共通骨格が確定済みの値を渡す後方互換の追加）。
-</div>
+<p>実行コンテキスト（実装上は <code>GeneratorContext</code>）には、共通骨格が確定済みの生成実行の <code>scheduled_at</code>（UTC）と <code>generation_run_id</code> が入る。方式は環境変数 <code>SCHEDULED_AT</code> を直接読まない <a class="decision-ref" href="#d-04">→ 理由 D-04</a></p>
 
 <h4 id="generator-catalog">方式カタログ</h4>
-<p>生成方式の設計は本書に書き足さず、<code>docs/app/generators/&lt;方式名&gt;.html</code> に 1 方式 1 本で分冊する（<strong>セットが本採用した時点で作成</strong>。試行段階では書かない。ルールは <a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。本書には以下のカタログのみを置き、方式の追加・廃止はこの表の行の追加・更新で管理する。廃止した方式は行を削除せず、ステータスを「廃止」にして履歴として残す。</p>
+<p>生成方式の設計は本書に書き足さず、<code>docs/app/generators/&lt;方式名&gt;.html</code> に 1 方式 1 本で分冊する（<strong>セットが本採用した時点で作成</strong>。試行段階では書かない。ルールは <a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。本書には以下のカタログのみを置き、方式の追加・退役・廃止はこの表の行の追加・更新で管理する。行は削除しない。ステータスは 3 つ: <strong>採用中</strong> = 稼働中のセットが使う / <strong>退役</strong> = 採用セットがなく実行時に使われないが、コード・レジストリ登録・方式設計書を残し再開できる / <strong>廃止</strong> = コードからも外した。稼働中の 3 セットはすべて事前ビルド方式（<code>*-prebuilt</code>）で、実行時に生成 API・組版・動画合成を使わない。</p>
 
 <div class="table-wrap">
 <table>
@@ -135,60 +148,63 @@
     <tr>
       <td><code>gpt-image-single</code></td>
       <td>固定プロンプトを ChatGPT Images 2.0（OpenAI、API モデル名 <code>gpt-image-2</code>）に渡す単発生成。初期スコープの方式</td>
-      <td>実装済み・稼働セットなし（Phase 11-4 で実装、13-1〜14-10 は fantasy-animals-1 が採用。14-10 の動画切替で現在は採用セットなし。廃止はしない）</td>
+      <td><strong>退役</strong>（実行時生成方式。11-4 で実装、13-1〜14-10 は fantasy-animals-1 が採用。14-10 の動画切替以後は採用セットなし）</td>
       <td><a href="generators/gpt-image-single.html">generators/gpt-image-single.html</a>（13-2 で作成）</td>
     </tr>
     <tr>
       <td><code>gpt-image-kenburns</code></td>
-      <td>縦長静止画 1 枚を生成し、ぼかし背景付きの 9:16 キャンバスへ合成したうえで ffmpeg の中央ズーム（Ken Burns 効果）+ 音源ストック（<code>audio_assets</code>）を重ね、10 秒・1080x1920 の MP4（リール用動画）を返す簡易動画方式。プラットフォーム非依存の命名（TikTok 展開でも同一方式を使う想定）</td>
-      <td>採用中（Phase 14-7 で実装、14-10 で fantasy-animals-1 が切替、14-12 で定常運用開始）</td>
+      <td>縦長静止画 1 枚を生成し、ぼかし背景付きの 9:16 キャンバスへ合成したうえで ffmpeg の中央ズーム（Ken Burns 効果）+ 音源ストック（<code>audio_assets</code>）を重ね、10 秒・1080x1920 の MP4（リール用動画）を返す簡易動画方式（実行時生成）</td>
+      <td><strong>退役</strong>（14-7 で実装、14-10〜2026-09-03 は fantasy-animals-1 が採用。セットの停止〔Phase 20-1〕で採用セットなし）</td>
       <td><a href="generators/gpt-image-kenburns.html">generators/gpt-image-kenburns.html</a>（14-12 で作成）</td>
     </tr>
     <tr>
       <td><code>gpt-quiz-multicut</code></td>
-      <td>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>）から LRU 順繰りで 1 問を取得 → 情景イラスト生成（ストックの <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔4 表情〕+ 日本語フォントを時間帯スロット別パレットで<strong>全カット共通の固定版面</strong>に合成。カット間の差分は吹き出し・カウントダウンのみ）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、16 秒・3 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式（16-4c で 4 カット → 3 カット）。答え・解説は動画に載せずキャプション側で開示する。出題の型・難度（ストック絞り込み）・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える。実行時の LLM 問題生成・検証チェーンは 16-1 で休止（方式設計書セクション 5 の decision）</td>
-      <td>休止（Phase 15-3 で選定、15-5 で設計 Fix、15-6 で実装、15-11 で生活溶け込み拡張〔イラスト常駐・スロットだし分け〕、15-14 で logic-training-1 が実投稿成功 = 本採用、15-15 で 1 日 3 回の Scheduler ENABLED、16-1 でテコ入れ設計 Fix〔ストック方式転換・カット構成刷新〕、16-3 で実装追随。<strong>16-3b（2026-08-08 の事前生成転換）で実行時方式としては休止 = 採用セットなし</strong>。組版・ffmpeg 合成は <code>quiz-prebuilt</code> の事前ビルドのレンダラーとして継続使用。レジストリ登録は残置・廃止はしない）</td>
+      <td>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>）から LRU 順繰りで 1 問を取得 → 情景イラスト生成（ストックの <code>illustration_scene</code> を画像生成 API へ渡す 1 実行 1 枚）→ Pillow プログラム組版（イラスト + 固定キャラアセット〔4 表情〕+ 日本語フォントを時間帯スロット別パレットで<strong>全カット共通の固定版面</strong>に合成。カット間の差分は吹き出し・カウントダウンのみ）→ ffmpeg 多カット連結（BGM + 効果音 SE）のチェーンで、16 秒・3 カット・1080x1920 の MP4（リール用動画）を返すクイズ方式（16-4c で 4 カット → 3 カット）。答え・解説は動画に載せずキャプション側で開示する。出題の型・難度（ストック絞り込み）・BGM・配色は <code>parameters</code> の時間帯スロット（<code>slot_code</code>）で切り替える。実行時の LLM 問題生成・検証チェーンは 16-1 で休止（方式設計書セクション 5）</td>
+      <td><strong>退役</strong>（15-14〜2026-08-08 は logic-training-1 が採用。16-3b の事前生成転換で実行時方式としては採用セットなし。組版・ffmpeg 合成は <code>quiz-prebuilt</code> の事前ビルドのレンダラーとして使い続けている）</td>
       <td><a href="generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>（15-16 で作成・16-1 で全面改訂）</td>
     </tr>
     <tr>
       <td><code>quiz-prebuilt</code></td>
       <td>クイズ動画の<strong>事前生成方式</strong>。イラスト（imagegen）〜動画（gpt-quiz-multicut のレンダラー流用）を事前にローカルでビルドし、全数人間レビューのうえ S3（ライフサイクル対象外の <code>assets/.../prebuilt/</code>）に作り置く。実行時は問題ストック（<code>quiz_stock_items</code>）のビルド済み行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・組版・動画合成を実行時に使わない</strong>）。<code>quiz_items</code> 記録・キャプション展開・ストーリーズ再掲は gpt-quiz-multicut と同一。<code>parameters</code> 互換のため切替は <code>batch_sets.generator_name</code> の UPDATE のみ</td>
-      <td>採用中（<strong>16-3b で設計 Fix</strong>〔2026-08-08 の仕様変更 = docs/plans/development-plan.html Phase 16 冒頭〕→ 16-3c 実装 → 16-3d 初期 42 問ビルド → <strong>16-4（2026-08-08）で logic-training-1 が切替・定常運用中</strong>。16-4b でバウンド演出・見切れ解消を反映し 42 本を再ビルド。16-4d〔2026-08-24〕で昼スロットを当分停止 = 朝・夜の 1 日 2 回で運用中〔<a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>〕）</td>
+      <td><strong>採用中</strong>（logic-training-1。16-4〔2026-08-08〕から。朝・夜の 1 日 2 回。昼は 16-4d〔2026-08-24〕から当分停止 = <a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</td>
       <td><a href="generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>（16-3b で作成）</td>
     </tr>
     <tr>
       <td><code>ranking-prebuilt</code></td>
-      <td>都道府県ランキング動画の<strong>事前生成方式</strong>。背景イラスト（imagegen）+ ナレーション（VOICEVOX のセリフ単位 TTS をタイムライン定数へフレーム同期）+ Remotion レンダリングで TOP5 地図ルーレット型の動画を<strong>20 秒 / 30 秒の 2 尺</strong>事前にローカルでビルドし、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はランキングストック（<code>ranking_stock_items</code>）のうちスロットの尺（<code>parameters.slots[].duration_seconds</code>）がビルド済みの行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>ranking_items</code> 記録・キャプション展開（ランキング系プレースホルダ = 3.3 の decision）・ストーリーズ再掲は quiz 系と同じ構造</td>
-      <td>採用予定（<strong>17-2（2026-08-10）で設計 Fix</strong>。pref-ranking-1 が採用予定 = 実装 17-4・稼働開始 17-5 以降。docs/plans/development-plan.html Phase 17）</td>
+      <td>都道府県ランキング動画の<strong>事前生成方式</strong>。背景イラスト（imagegen）+ ナレーション（VOICEVOX のセリフ単位 TTS をタイムライン定数へフレーム同期）+ Remotion レンダリングで TOP5 地図ルーレット型の動画を事前にローカルでビルドし（20 秒 / 30 秒の 2 尺に対応。pref-ranking-1 は 30 秒だけをビルドする）、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はランキングストック（<code>ranking_stock_items</code>）のうちスロットの尺（<code>parameters.slots[].duration_seconds</code>）がビルド済みの行を LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>ranking_items</code> 記録・キャプション展開（ランキング系プレースホルダ = <a href="#caption-extension">3.4「キャプションの作り方」</a>）・ストーリーズ再掲は quiz 系と同じ構造</td>
+      <td><strong>採用中</strong>（pref-ranking-1。17-5c〔2026-08-26〕から。1 日 1 回 20:00）</td>
       <td><a href="generators/ranking-prebuilt.html">generators/ranking-prebuilt.html</a>（17-2 で作成）</td>
     </tr>
     <tr>
       <td><code>umigame-prebuilt</code></td>
-      <td>ウミガメのスープ（水平思考クイズ）リール動画の<strong>事前生成方式</strong>。<code>ranking-prebuilt</code> と同型（背景イラスト〔imagegen〕+ ナレーション〔<strong>Amazon Polly Neural</strong> の cue 単位 TTS をタイムライン定数へフレーム同期〕+ Remotion レンダリング〔Remotion Skills 2.0 の指針で作ったコンポジション〕）で、<strong>24 秒の単尺・ループ前提</strong>の動画を事前にローカルでビルドし、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はストック（<code>umigame_stock_items</code>）のビルド済み行を軸なしの LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>umigame_items</code> に問題固有部分（問題文・真相・確定事実シート・キャプション）をスナップショットし、SNS 投稿バッチの umigame 系プレースホルダ展開（3.3 の decision）と <strong>publish 成功直後の問題スナップショット出力</strong>（<a href="#problem-snapshot">3.3 手順 6</a>。コメント自動返信経路の読み取り元）の展開元にする</td>
-      <td>採用予定（<strong>21-3（2026-09-04）で設計 Fix</strong>。umigame-soup-1 が採用予定 = ツーリング 21-5a・方式実装 21-5b・稼働開始 21-7。docs/plans/development-plan.html Phase 21）</td>
+      <td>ウミガメのスープ（水平思考クイズ）リール動画の<strong>事前生成方式</strong>。<code>ranking-prebuilt</code> と同型（背景イラスト〔imagegen〕+ ナレーション〔ビルド時の TTS。現行は Irodori-TTS〕+ Remotion レンダリング）で、<strong>単尺（現行 29 秒）・ループ前提</strong>の動画を事前にローカルでビルドし、全数人間レビューのうえ S3（<code>assets/.../prebuilt/</code>）に作り置く。実行時はストック（<code>umigame_stock_items</code>）のビルド済み行を軸なしの LRU 順繰りで選定し、事前動画を取得して返すだけ（<strong>外部 API・レンダリングを実行時に使わない</strong>）。<code>umigame_items</code> に問題固有部分（問題文・真相・確定事実シート・キャプション）をスナップショットし、SNS 投稿バッチの umigame 系プレースホルダ展開（<a href="#caption-extension">3.4「キャプションの作り方」</a>）と <strong>publish 成功直後の問題スナップショット出力</strong>（<a href="#problem-snapshot">3.3 手順 6</a>。コメント自動返信経路の読み取り元）の展開元にする</td>
+      <td><strong>採用中</strong>（umigame-soup-1。21-7〔2026-10-12〕から。週 4 回〔日・火・木・土の 20:00〕。尺はセット改修 R-1〔2026-10-17〕で 24 秒から 29 秒へ）</td>
       <td><a href="generators/umigame-prebuilt.html">generators/umigame-prebuilt.html</a>（21-3 で作成）</td>
     </tr>
   </tbody>
 </table>
 </div>
 
-<div class="decision">
-  <span class="callout-title">セット別拡張ポイント: プロンプトの決め方</span>
-  初期運用は 1 セット 1 <code>prompt_config</code>（固定プロンプト、1 枚生成となるようプロンプト文言で制御）とする。将来の
-  <strong>生成 AI にプロンプト自体を考えさせてから画像を生成する方式</strong>などは、新しい生成方式（<code>generators/</code> の strategy モジュール）として追加し方式カタログに登録する（2026-07-06 ユーザー要望を 2026-07-12 の strategy 構造合意で整理）。
+<div>
+<p><strong>セット別拡張ポイント: プロンプトの決め方</strong> <a class="decision-ref" href="#d-05">→ 理由 D-05</a></p>
+初期運用は 1 セット 1 <code>prompt_config</code>（固定プロンプト、1 枚生成となるようプロンプト文言で制御）とする。将来の
+  <strong>生成 AI にプロンプト自体を考えさせてから画像を生成する方式</strong>などは、新しい生成方式（<code>generators/</code> の strategy モジュール）として追加し方式カタログに登録する。
   1 セットに複数 <code>prompt_config</code> を有効化してのローテーション選択・カルーセル素材化などは、運用ルールの変更（有効化する <code>prompt_config</code> 件数・プロンプト文言）で実現できる。
   いずれの場合も手順 2 の生成実行の枠組み（1 起動 = 1 生成実行 = 1 投稿分のコンテンツ）は変えない。どのセットがどの方式を使うかはセット別設計書に記録する。
 </div>
 
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>方式ごとの選び方・在庫の取り方 → 方式設計書（<a href="generators/quiz-prebuilt.html">quiz-prebuilt</a> / <a href="generators/ranking-prebuilt.html">ranking-prebuilt</a> / <a href="generators/umigame-prebuilt.html">umigame-prebuilt</a>）</li>
+  <li>在庫の動画をどう作って置くか → 生産の詳細設計（<a href="../production/index.html">目次</a>）</li>
+  <li>テーブルの列 → <a href="data-model.html#detail">データモデル設計 4 章</a></li>
+</ul></div>
+
 <h2 id="flow-sns">3. SNS 投稿バッチ処理フロー</h2>
+<p class="lead">この章は、機能別の基本設計 <a href="../overview/functions/post.html#flow">投稿 3 章</a>の「投稿」の段を詳しくしたもの。3.1 で当回の生成実行を選び、3.2 の状態で二重投稿を防ぎ、3.3 の手順で投稿し、3.4 で成否を決める。</p>
 <p>処理対象の単位は「投稿」= <strong>生成実行 × 投稿先アカウント</strong>とする（メディア単位ではない）。フィード画像投稿とリール投稿の違いは手順内の分岐（<code>posts.media_type</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）に閉じ、投稿対象の決定・状態遷移・失敗方針は共通。ストーリーズ再掲（<code>batch_sets.stories_enabled</code> のセットのみ。V004・15-10）もこの単位の内側で「リール成功後の追加投稿行（<code>media_type='story'</code>）」として扱い、投稿対象の決定は変えない（3.3 手順 2 の 7）。</p>
 
 <h3 id="sns-target">3.1 投稿対象の決定（当回固定。Phase 26-1 で改訂）</h3>
 <p>投稿バッチは<strong>当回 = 自分を起動した予定時刻の生成実行だけ</strong>を扱う。セット × 予定時刻（<code>SCHEDULED_AT</code>）で生成実行を特定し、<strong>過去分・別の回へは戻らない</strong>。生成に失敗した回・当回を投稿できなかった回は欠番を許容する（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a> の初期方針）。</p>
-<div class="warn">
-  <span class="callout-title">移行中（2026-10-13 時点）</span>
-  本節は 26-1 で確定した契約。実装は 26-2、本番切替は 26-3（<a href="../plans/development-log.html#phase-26">開発計画 Phase 26</a>）で、<strong>切替までは本番は旧契約（<code>set_code</code> のみを受け取り、actionable な生成実行のうち最古の 1 件を選ぶ）で稼働している</strong>。旧契約の全文は git の履歴（26-1 より前の本書）を参照。
-</div>
 <ol>
   <li><code>SET_CODE</code> から <code>batch_sets</code> を解決する（画像生成バッチと同じ扱い。<code>is_active=0</code> のセットで何もせず正常終了する現行動作は変えない）</li>
   <li><strong>入力契約</strong>: <code>SCHEDULED_AT</code> は<strong>必須</strong>。UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code> だけを受け付け、実在しない日時（2 月 30 日等）も拒否する。欠落・空・不正形式は<strong>DB 接続・外部 API 呼び出しの前に</strong>異常終了する。<strong>現在時刻の代入・最新の生成実行の検索・最古の生成実行へのフォールバックは行わず、旧選定へ戻す互換モードも設けない</strong>。値は画像生成バッチと同じ正規化（<a href="data-model.html#time">data-model.html セクション 6</a>）で <code>DATETIME</code> にして比較する</li>
@@ -209,25 +225,14 @@
 </table>
 </div>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-10-13、Phase 26-1）: 最古選定を廃止し、当回固定にする</span>
-  旧方式（actionable な生成実行のうち <code>scheduled_at</code> 最古の 1 件）は素材の有無を見ないため、生成途中で失敗した空の生成実行が選ばれ続け、後続の正常な回まで投稿できなくなった（<a href="../issues/index.html#I-014">I-014</a>。logic-training-1 の run 44・run 165 の事象）。素材の EXISTS だけを足す案は空の run を外せるが、素材のある未投稿の朝の run が夜に持ち越される（朝夜ずれ = <a href="../issues/index.html#I-017">I-017</a> の一部）のを防げないため採らない。生成実行 ID を投稿側に渡す案は ECS の結果から業務 ID を返す経路の新設が要り、既存の <code>UNIQUE (set_id, scheduled_at)</code> で同じ実行を特定できるため採らない。
-  <ul style="margin:.3rem 0 0;">
-    <li><strong><code>RUN_NOT_FOUND</code> / <code>NO_MEDIA</code> を異常終了にする理由</strong>: 親の画像生成 SFN は生成成功時だけ子を起動するため、子から見て当回の run・素材がないのは契約上の不整合。「投稿済み」の 0 件成功とまとめると気づけない。終了コード 1 で Step Functions の Retry（最大 2 回）が働くが、同じ予定時刻で同じ判定を繰り返すだけで副作用はなく、Retry を使い切ると <code>ExecutionsFailed</code> で通知される（1 回目の ECS タスク異常終了通知も出る。<a href="#failure-policy">3.4</a>）</li>
-    <li><strong>失敗と再実行の区別</strong>: 生成が失敗 = 子は起動されず当回は欠番 / 当回の <code>pending</code>・<code>container_created</code> = 同じ予定時刻の Retry で同じ run を復旧 / 過去分の滞留 = 自動では選ばない（削除・架空の <code>failed</code> 登録・在庫の <code>last_used_at</code> の巻き戻しは行わず、補正は <a href="operation.html#failure-correction">operation.html セクション 4.2・4.3</a> の人間ゲート）/ 手動起動 = 対象 run の実際の <code>scheduled_at</code> を明示する（<a href="operation.html#failure-check">operation.html セクション 4.1</a>。現在時刻を便宜的に入れない）</li>
-    <li><strong>適用範囲</strong>: ASL・アプリは全セット共通のため、稼働中の 3 セット（logic-training-1 の朝・夜、pref-ranking-1 の 1 日 1 回、umigame-soup-1 の週 4 回）すべてに同時に適用する。1 日 1 回・週次のセットでも「当回だけを見る」動きは同じで、変わるのは過去の未投稿分を拾わなくなる点だけ。停止中の fantasy-animals-1 は <code>is_active=0</code> で選定前に終わる。前回の真相ブロック（<a href="#prev-truth-block">3.4 の decision</a>）は投稿成功の履歴から前回を選ぶため影響を受けない。ストーリーズ再掲・問題スナップショットの規約も変えない</li>
-  </ul>
-</div>
+<ul>
+  <li><strong>失敗と再実行の区別</strong>: 生成が失敗 = 子は起動されず当回は欠番 / 当回の <code>pending</code>・<code>container_created</code> = 同じ予定時刻の Retry で同じ run を復旧 / 過去分の滞留 = 自動では選ばない（削除・架空の <code>failed</code> 登録・在庫の <code>last_used_at</code> の巻き戻しは行わず、補正は <a href="operation.html#failure-correction">operation.html セクション 4.2・4.3</a> の人間ゲート）/ 手動起動 = 対象 run の実際の <code>scheduled_at</code> を明示する（<a href="operation.html#failure-check">operation.html セクション 4.1</a>。現在時刻を便宜的に入れない）</li>
+  <li><strong>適用範囲</strong>: ASL・アプリは全セット共通で、稼働中の 3 セット（logic-training-1 の朝・夜、pref-ranking-1 の 1 日 1 回、umigame-soup-1 の週 4 回）すべてに適用している。停止中の fantasy-animals-1 は <code>is_active=0</code> で選定前に終わる。前回の真相ブロック（<a href="#prev-truth-block">3.4「キャプションの作り方」</a>）は投稿成功の履歴から前回を選ぶため、当回の選び方の影響を受けない。ストーリーズ再掲・問題スナップショットの規約も同じ</li>
+</ul>
+<p><code>RUN_NOT_FOUND</code> / <code>NO_MEDIA</code> の終了コード 1 では Step Functions の Retry（最大 2 回）が働くが、同じ予定時刻で同じ判定を繰り返すだけで副作用はない。Retry を使い切ると <code>ExecutionsFailed</code> で通知される（1 回目の ECS タスク異常終了通知も出る。<a href="#failure-policy">3.4</a>） <a class="decision-ref" href="#d-06">→ 理由 D-06</a></p>
 
-<div class="decision" id="deadline-guard">
-  <span class="callout-title">設計判断（2026-10-13、Phase 26-1）: 期限ガード（大幅に遅延した旧実行の投稿を止める仕組み）は導入しない</span>
-  当回固定は「後続の回が過去分を拾う」ことを防ぐが、<strong>朝の実行そのものが夜まで遅延した場合</strong>や<strong>夜に朝の予定時刻を指定して手動実行した場合</strong>は、完全一致だけでは朝の素材が夜に出る。これを実時刻で止める期限ガード（<code>scheduled_at</code> から一定時間を過ぎたら投稿しない）は、次の理由で<strong>導入しない</strong>（26-2 の対象に <code>app/clock.py</code>・期限値の受け渡しは追加しない）。
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>自動経路の最大遅延が回の間隔より短い</strong>: Scheduler の再送上限 3600 秒（<code>MaximumEventAgeInSeconds</code>）+ 親の <code>WaitForDbReady</code> 900 秒 + <code>RunImageBatchTask</code> 3600 秒 × 3 回（Retry 2 回）+ 子の <code>WaitForDbReady</code> 900 秒 + <code>RunSnsPostBatchTask</code> 3600 秒 × 3 回 ≒ <strong>最大約 8.6 時間</strong>（すべてのタイムアウト・Retry を使い切る最悪値。<a href="../infra/workflow.html">infra/workflow.html セクション 1.2・1.4・6</a>）。現行の最短間隔は logic-training-1 の夜 21:00 → 朝 7:30 の 10.5 時間（朝 → 夜は 13.5 時間）、pref-ranking-1・umigame-soup-1 は 1 日以上で、自動経路では次の回の時刻に届かない</li>
-    <li><strong>手動実行は人間ゲート</strong>: 予定時刻を指定した手動起動は、運用者が対象 run の時間帯と素材の焼き込み表示（朝 / 夜のラベル）を確認してから行う手順にする（<a href="operation.html#failure-check">operation.html セクション 4.1</a>）。過去の回を意図的に出す復旧（例: 週 4 回の umigame-soup-1 の欠番を翌日に出す）を期限ガードで一律に止めると、正当な手動復旧の例外設計が要り複雑になる</li>
-    <li><strong>例外</strong>: 期限ガードを置かないため例外の規定はない。手動実行の可否は上記の確認で人間が判断する</li>
-    <li><strong>再判断の条件</strong>: 同一セットの回の間隔が自動経路の最大遅延（約 8.6 時間）を下回る構成を有効化するとき（例: logic-training-1 の昼スロット 12:30 の再開 = 朝 7:30 から 5 時間）、Task タイムアウト・Retry 回数を延ばすとき、または遅延した実行が次の回の時刻を越えて投稿した事象が 1 回でも起きたとき。その時点で許容遅延・判定のタイミング（選定時 / パブリッシュ直前）・手動復旧の例外を設計する</li>
-  </ul>
+<div id="deadline-guard">
+<p>期限ガード（<code>scheduled_at</code> から一定時間を過ぎた実行の投稿を止める仕組み）は置かない。自動経路の最大遅延は約 8.6 時間で、予定時刻を指定した手動実行は運用者が素材の時間帯を確かめてから行う（<a href="operation.html#failure-check">operation.html セクション 4.1</a>） <a class="decision-ref" href="#d-07">→ 理由 D-07</a></p>
 </div>
 
 <div class="note">
@@ -237,12 +242,7 @@
   一度でも試行して有効な全アカウントが終端状態に達した生成実行は、自動では再対象にしない = <strong>再試行なし・欠番許容</strong>。
 </div>
 
-<div class="decision">
-  <span class="callout-title">決定: 1 回の実行で扱う生成実行は 1 件（26-1 で「最古の 1 件」から「当回の 1 件」へ）</span>
-  1 回の実行では<strong>当回の生成実行 1 件だけ</strong>を処理し、<code>BATCH_SIZE_LIMIT</code> のような処理件数の上限設定は設けない。
-  過去に投稿できなかった生成実行を複数まとめて追いつかせる制御は持たない（「1 回の欠番は致命的でない」初期方針）。過去分を扱う場合は人間が対象 run の予定時刻を指定して手動起動するか、将来のセット別失敗時ポリシー（<a href="#future-failure-policy">追いつくモード</a>）として別経路で設計する。
-  （履歴: 26-1 より前は「未試行の生成実行が複数残っている場合も最古の 1 件のみ処理し、残りは後続の実行が順に消化する」決定だった。）
-</div>
+<p>1 回の実行で扱う生成実行は<strong>当回の 1 件だけ</strong>で、処理件数の上限設定（<code>BATCH_SIZE_LIMIT</code> 等）はない。過去に投稿できなかった生成実行をまとめて追いつかせる制御は持たず、過去分は人間が対象 run の予定時刻を指定して手動起動する（将来の<a href="#future-failure-policy">追いつくモード</a>は別経路） <a class="decision-ref" href="#d-08">→ 理由 D-08</a></p>
 
 <h3 id="posts-state">3.2 posts の状態遷移（冪等性・二重投稿防止）</h3>
 <p><code>posts</code> は生成実行 × アカウント × メディア種別で一意（UNIQUE 制約 <code>(generation_run_id, sns_account_id, media_type)</code>。V004 で <code>media_type</code> を追加）とし、<strong><code>attempt_number</code> 相当のカラムは持たない</strong>。1 つの投稿対象・1 メディア種別について作られる行は常に 1 行であり、その行の状態遷移だけで進行状況を表現する（Phase 28 で入れた一過性エラーのやり直し〔<a href="#transient-errors">3.3 の段階別の扱い</a>〕も同じ行の中で行い、行を増やさない）（ストーリーズを有効化したセットではリール行 + ストーリーズ行の最大 2 行。ストーリーズ行も同じ 5 状態を使う）。</p>
@@ -271,7 +271,7 @@
     <li><code>failed</code> / <code>published_unconfirmed</code> → スキップ（同一実行内の Step Functions Retry でも自動では再試行しない。終端状態の扱いは全実行を通じて一貫させる）</li>
   </ul>
   この分岐により、Step Functions Retry が働いても既に成功・終端状態のアカウントへの無駄な API 呼び出しは発生しない。
-  なお<strong>ストーリーズ行（<code>media_type='story'</code>）はこの復旧分岐の対象外</strong>: 投稿対象の決定が先行するリール行で決まるため、リール行が終端状態に達した実行は Retry で再選択されない（ストーリーズ行が途中状態のまま残った場合の扱いは 3.3 の decision を参照）。
+  なお<strong>ストーリーズ行（<code>media_type='story'</code>）はこの復旧分岐の対象外</strong>: 投稿対象の決定が先行するリール行で決まるため、リール行が終端状態に達した実行は Retry で再選択されない（ストーリーズ行が途中状態のまま残った場合の扱いは 3.3「ストーリーズ再掲の投稿フロー」を参照）。
 </div>
 
 <h3 id="sns-steps">3.3 処理手順</h3>
@@ -281,7 +281,7 @@
     <ol>
       <li><code>posts</code> レコードが<strong>存在しなければ</strong> <code>pending</code> で作成する（INSERT-or-skip。3.2 の復旧分岐により、既存行がある場合は作成せずその状態から再開する。投稿前の事前記録により二重投稿を防止する）。作成時に <code>media_type</code> を投稿対象の先頭メディアの <code>file_format</code> から導出して設定する（<code>'mp4'</code> → <code>'reel'</code>、それ以外 → <code>'feed_image'</code>。<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a>）</li>
       <li><strong>初期構築の仕様: 生成実行に紐づくメディアのうち最初の 1 件のみ</strong>を <code>post_media</code> で紐づける（選択順序は <code>generated_media.id</code> 昇順 = 最も早く生成された 1 件。1 セット複数 <code>prompt_config</code> や 1 プロンプト複数メディアにより生成実行が複数のメディアを保存していても、投稿するのは常に 1 件とする）。将来のカルーセル対応では、生成実行内の複数メディアを並び順付きで束ねる処理に拡張する</li>
-      <li>キャプションテンプレートを適用して投稿本文を組み立てる（テンプレートには AI 開示ハッシュタグを必ず含める運用ルール。<a href="operation.html#ai-disclosure">operation.html セクション 3</a>）。テンプレートに<strong>プレースホルダ</strong>が含まれる場合は、当該生成実行の出題・投稿履歴（<code>quiz_items</code> / <code>ranking_items</code>）から動的に展開する（16-1 決定・17-2 でランキング系を追加。展開規則は下記「セット別拡張ポイント: キャプションの作り方」の decision）。展開後の最終文が <code>posts.caption_text_snapshot</code> に保存される点は従来どおり</li>
+      <li>キャプションテンプレートを適用して投稿本文を組み立てる（テンプレートには AI 開示ハッシュタグを必ず含める運用ルール。<a href="operation.html#ai-disclosure">operation.html セクション 3</a>）。テンプレートに<strong>プレースホルダ</strong>が含まれる場合は、当該生成実行の出題・投稿履歴（<code>quiz_items</code> / <code>ranking_items</code>）から動的に展開する（16-1 決定・17-2 でランキング系を追加。展開規則は <a href="#caption-extension">3.4「セット別拡張ポイント: キャプションの作り方」</a>）。展開後の最終文が <code>posts.caption_text_snapshot</code> に保存される点は従来どおり</li>
       <li>S3 Presigned URL を発行し（有効期限 1 時間）、Instagram Graph API のコンテナ作成 API（<code>POST /{ig-user-id}/media</code>）を呼び出す。パラメータは <code>media_type</code> で分岐する:
         <ul>
           <li><code>feed_image</code> → <code>image_url</code>（presigned URL）を渡す（従来どおり）</li>
@@ -311,8 +311,8 @@
 <table>
   <thead><tr><th>段階</th><th>一過性</th><th>一過性でない</th><th>結果不明・上限到達</th></tr></thead>
   <tbody>
-    <tr><td>① コンテナ作成（<code>POST /{ig-user-id}/media</code>）</td><td>新しいコンテナで<strong>作成からやり直す</strong>（作成・処理待ちで共有の 1 回）。やり直しも失敗したら <code>failed</code></td><td><code>failed</code></td><td>タイムアウト・接続断は一過性と同じ扱い（できたかもしれないコンテナは公開しないので放置してよい）</td></tr>
-    <tr><td>② 処理待ち（<code>GET /{container-id}?fields=status_code,status</code>）</td><td><code>status_code=ERROR</code>・照会の一過性エラー → <strong>作成からやり直す</strong>（① と同じ 1 回を共有）。やり直しも失敗したら <code>failed</code></td><td>照会の一過性でない API エラー・<code>status_code=EXPIRED</code> → <code>failed</code></td><td>照会のタイムアウト・接続断は一過性と同じ扱い。<strong>上限到達（<code>FINISHED</code> に届かない）→ <code>failed</code>（やり直さない）</strong>: リールの待ち上限は約 10 分あり、やり直すとタスクの時間が倍になるため</td></tr>
+    <tr><td>① コンテナ作成（<code>POST /{ig-user-id}/media</code>）</td><td>新しいコンテナで<strong>作成からやり直す</strong>（作成・処理待ちで共有の 1 回）。やり直しも失敗したら <code>failed</code></td><td><code>failed</code></td><td>タイムアウト・接続断は一過性と同じ扱い（できたかもしれないコンテナは公開しないので放置する）</td></tr>
+    <tr><td>② 処理待ち（<code>GET /{container-id}?fields=status_code,status</code>）</td><td><code>status_code=ERROR</code>・照会の一過性エラー → <strong>作成からやり直す</strong>（① と同じ 1 回を共有）。やり直しも失敗したら <code>failed</code></td><td>照会の一過性でない API エラー・<code>status_code=EXPIRED</code> → <code>failed</code></td><td>照会のタイムアウト・接続断は一過性と同じ扱い。<strong>上限到達（<code>FINISHED</code> に届かない）→ <code>failed</code>（やり直さない）</strong></td></tr>
     <tr><td>③ 公開（<code>POST /{ig-user-id}/media_publish</code>）</td><td><strong>コンテナの <code>status_code</code> を照会して分岐</strong>（下記）</td><td><code>failed</code>（今のまま）</td><td>重複 publish 応答・タイムアウト・接続断・応答本文の読み取り失敗 → <code>published_unconfirmed</code>（今のまま。照会はしない）</td></tr>
   </tbody>
 </table>
@@ -332,9 +332,9 @@
   <li>処理待ちでのコンテナ <code>status_code=ERROR</code>（理由文字列に関係なく 1 回はやり直す。形式不正など恒久的な ERROR はやり直しも ERROR になり <code>failed</code> で終わる）</li>
   <li>① ② の段階でのタイムアウト・接続断・応答本文の読み取り失敗（<code>InstagramTransportError</code> 相当）。③ では結果不明として扱い、一過性には含めない</li>
 </ul>
-<p>レート制限（<code>code</code> 4 / 17 / 32 / 613 や HTTP 429）は、<code>is_transient: true</code> が付いていない限り一過性に含めない（すぐやり直しても解けない）。</p>
+<p>レート制限（<code>code</code> 4 / 17 / 32 / 613 や HTTP 429）は、<code>is_transient: true</code> が付いていない限り一過性に含めない。やり直しの前に待ちは入れない。処理待ちの上限到達はやり直さない <a class="decision-ref" href="#d-20">→ 理由 D-20</a></p>
 
-<p><strong>やり直しの回数</strong>: 1 行につき「① ② の作成からのやり直し 1 回」と「③ の再送 1 回」を別々に持つ（両方使うことはありうる）。回数はタスクのメモリ内で数え、DB には持たない（<a href="#posts-state">3.2</a>）。やり直しの前に待ちは入れない（① ② の失敗はすでに数秒〜数分経っており、Step Functions の時間枠を延ばさないため）。</p>
+<p><strong>やり直しの回数</strong>: 1 行につき「① ② の作成からのやり直し 1 回」と「③ の再送 1 回」を別々に持つ（両方使うことはありうる）。回数はタスクのメモリ内で数え、DB には持たない（<a href="#posts-state">3.2</a>）。</p>
 
 <p><strong>記録の形</strong>:</p>
 <ul>
@@ -351,36 +351,21 @@
   <li><code>error_message</code> は最後の失敗の内容にし、やり直しを使った場合は末尾に「（作成から 1 回やり直し済み）」「（公開を 1 回再送済み）」を付ける</li>
 </ul>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-10-17、Phase 28-1）: 一過性エラーは公開前だけ自動でやり直す（「自動再試行なし・欠番許容」の改訂）</span>
-  初期方針は「自動再試行なし・通知のみ（欠番許容）」（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）だったが、一過性エラー 1 回で欠番になる事象が 2 回起きた（2026-08-23 リールのコンテナ ERROR、2026-10-17 ストーリーズの <code>media_publish</code> が <code>{"code": 2, "is_transient": true}</code>。<a href="../issues/index.html#I-024">I-024</a> ②）。2 回目では <strong>DB は <code>failed</code> なのに Instagram 上は公開済み</strong>で、公開段階の失敗を一律 <code>failed</code> にすると記録が実体とずれ、単純に再送すると二重投稿になることが分かった。そこで段階で分け、① ② は公開要求を送っていないので作成から 1 回だけやり直し（リールの処理待ちが最大 10 分あるため回数は 1 回に抑える）、③ はコンテナの <code>status_code</code> を照会して<strong>未公開を確定できたとき（<code>FINISHED</code>）だけ同じコンテナで再送</strong>する（ユーザー判断 2026-10-17）。<code>PUBLISHED</code> でも <code>success</code> にしないのは、<code>media_publish</code> の応答が無いとメディア ID が取れず、問題スナップショット（<a href="#problem-snapshot">手順 6</a>）・インサイト収集が ID を前提にしているため。Step Functions の Retry・ASL・DB スキーマ（状態値 5 つ）・終了コードの方針（3.4）は変えない。
-</div>
+<p>この扱いの導入後も、Step Functions の Retry・ASL・DB スキーマ（状態値 5 つ）・終了コードの方針（3.4）は変わらない <a class="decision-ref" href="#d-09">→ 理由 D-09</a></p>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-07-29、Phase 15-10）: ストーリーズ再掲の投稿フロー（15-9 ユーザー決定の具体化）</span>
-  リールと同一 MP4 を同一実行内で連続投稿する（<a href="requirements-notes-set2.html#tokekomi-stories">15-9 壁打ち記録 11.2</a>。Scheduler・SFN 定義・投稿対象の決定は変更しない）。<code>posts</code> の記録は media_type 別 2 行（<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a> の V004）。
+<div>
+<p><strong>ストーリーズ再掲の投稿フロー</strong> <a class="decision-ref" href="#d-10">→ 理由 D-10</a></p>
+リールと同一 MP4 を同一実行内で連続投稿する（<a href="requirements-notes-set2.html#tokekomi-stories">15-9 壁打ち記録 11.2</a>。Scheduler・SFN 定義・投稿対象の決定は変更しない）。<code>posts</code> の記録は media_type 別 2 行（<a href="data-model.html#detail-posts">data-model.html セクション 4.6</a> の V004）。
   <ul style="margin:.3rem 0 0;">
     <li><strong>ストーリーズ失敗はリール行の <code>success</code> を巻き戻さない</strong>。終了コードは 1 とし（3.4）、検知は ECS タスク異常終了通知（<a href="../infra/workflow.html">infra/workflow.html セクション 9</a>）。ストーリーズ行の <code>failed</code> / <code>published_unconfirmed</code> は終端状態のため、Step Functions Retry の再実行では投稿対象の決定（リール行基準。<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）により同じ生成実行は再選択されず、自動では再試行しない（現行方針の踏襲）</li>
-    <li><strong>タスク中断でストーリーズ行が <code>pending</code> / <code>container_created</code> のまま残った場合、同一実行内の Retry では再開されない</strong>（対象選定が終端状態のリール行で決まるため）。この stale 行は後続の投稿をブロックしないため（セクション 4.4 の不変条件）、検知（タスク異常終了通知）後に stale データ運用（<a href="operation.html#stale-data">operation.html セクション 4.3</a>）で手動補正する（発生はタスク中断時のみで稀という割り切り）</li>
-    <li>時差型（ストーリーズで出題 → 後でリールで答え）は SFN 分割かスケジュール倍増が必要なため初期は見送り（15-9）</li>
+    <li><strong>タスク中断でストーリーズ行が <code>pending</code> / <code>container_created</code> のまま残った場合、同一実行内の Retry では再開されない</strong>（対象選定が終端状態のリール行で決まるため）。この stale 行は後続の投稿をブロックしないため（セクション 4.4 の不変条件）、検知（タスク異常終了通知）後に stale データ運用（<a href="operation.html#stale-data">operation.html セクション 4.3</a>）で手動補正する</li>
+    
   </ul>
 </div>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-07-19、12-3 実装時に反映）: コンテナステータスのポーリングを手順に追加</span>
-  12-2 の疎通確認で、コンテナ作成 API 成功後にステータスが <code>FINISHED</code> になるまで待たずにパブリッシュ API を呼ぶと失敗しうる実際の Graph API の挙動を確認した。本書の初版手順にはこのポーリングが明記されていなかったため、上記手順 4 として追加した。<code>posts</code> の状態遷移（3.2）は変更しない — ポーリングは <code>container_created</code> 到達後・パブリッシュ呼び出し前のアプリ内処理として扱う。Step Functions Retry でタスクが再起動された場合も、<code>container_created</code> からの再開（3.2）でこのポーリングからやり直す。
-</div>
+<p>手順 4 のポーリングは <code>container_created</code> 到達後・パブリッシュ呼び出し前のアプリ内処理で、<code>posts</code> の状態遷移（3.2）には現れない。Step Functions Retry でタスクが再起動された場合も、<code>container_created</code> からの再開（3.2）でポーリングからやり直す <a class="decision-ref" href="#d-11">→ 理由 D-11</a></p>
 
-<div class="decision">
-  <span class="callout-title">実機確認の結果（2026-07-25、14-8 リール投稿の疎通確認）</span>
-  14-7 で生成した実 MP4（1080x1920 / 30fps / 10.0 秒 / H.264 + AAC 128kbps / 4.2 MB）で、上記手順 4〜5 のリール経路を実 API に対して通した結果は以下。<strong>設計の変更は不要</strong>だった。
-  <ul>
-    <li><strong>所要時間</strong>: コンテナ作成の応答 1.2 秒 → <code>status_code=FINISHED</code> 到達まで <strong>33.5 秒</strong>（<code>IN_PROGRESS</code> が 6 回続いた後 7 回目で FINISHED。間隔 5 秒で計測）→ パブリッシュの応答 <strong>10.2 秒</strong>。分オーダーは想定に留めつつ、実測は 1 分未満。ポーリング上限 10 分は十分なマージンで、既存の HTTP タイムアウト 30 秒もパブリッシュの 10 秒応答に対して足りている</li>
-    <li><strong>カバー画像</strong>: <code>cover_url</code> / <code>thumb_offset</code> を指定しない場合のカバーは、公開後の <code>thumbnail_url</code> を実際に取得して確認したところ<strong>動画の先頭フレーム（= Ken Burns 元の静止画を 9:16 中央クロップした絵）</strong>であり、14-4 の想定どおりだった</li>
-    <li><strong><code>share_to_feed=true</code></strong>: リールタブとプロフィールのフィード（グリッド）の<strong>両方に表示</strong>されることを目視で確認した（Graph API に読み取り用フィールドがないため目視確認）</li>
-    <li><strong>公開後のメディア属性</strong>: <code>media_type=VIDEO</code> / <code>media_product_type=REELS</code>。<code>permalink</code> は <code>/reel/{shortcode}/</code> 形式で払い出される</li>
-  </ul>
-</div>
+<p>リール経路の実測（14-8。10 秒・4.2 MB の MP4）: コンテナ作成の応答 1.2 秒 → <code>FINISHED</code> まで 33.5 秒 → パブリッシュの応答 10.2 秒。カバーは動画の先頭フレーム、<code>share_to_feed=true</code> でリールタブとフィードの両方に表示される。公開後は <code>media_type=VIDEO</code> / <code>media_product_type=REELS</code>、<code>permalink</code> は <code>/reel/{shortcode}/</code> 形式 <a class="decision-ref" href="#d-12">→ 理由 D-12</a></p>
 
 <div class="note">
   <span class="callout-title">送信元 IP に関する制約（Phase 10-1 でインフラ構築の知見を反映）</span>
@@ -393,23 +378,23 @@
   <li><strong>失敗の定義</strong>: 対象の生成実行に対し、有効な投稿先アカウントのうち<strong>1 つでも <code>success</code> にならなかった</strong>場合（<code>failed</code> または <code>published_unconfirmed</code> で終わったアカウントが 1 つでもある場合）を失敗とする。<strong>ストーリーズを有効化したセット（<code>stories_enabled=1</code>）では、リール行とストーリーズ行の両方が <code>success</code> であることを当該アカウントの成功条件とする</strong>（ストーリーズ失敗もリール行の <code>success</code> は保持したまま失敗として扱う。15-10）</li>
   <li><strong>終了コード</strong>: 全アカウントが成功条件を満たすなら 0。1 つでも満たさないなら 1</li>
   <li>終了コード 1 により Step Functions の既存 Retry（最大 2 回）が働くが、3.2 の状態遷移によって <code>success</code> / 終端状態のアカウントはスキップされるため、Retry によって無駄な API 呼び出しが増えることはない。Retry を使い切ってもなお非 <code>success</code> が残る場合は Catch → Fail 状態に遷移し、既存の CloudWatch Alarm（<code>ExecutionsFailed</code>）で通知される</li>
-  <li><strong>検知経路の正確化（2026-07-29、Phase 15-10 で確認）</strong>: 投稿が終端状態（<code>failed</code> / <code>published_unconfirmed</code>）で確定した失敗は、Retry の再実行時に投稿対象の決定（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）で <code>ALREADY_TERMINAL</code> となり再実行が成功終了するため、<strong><code>ExecutionsFailed</code> アラームには現れない</strong>。この場合の検知は 1 回目の終了コード 1 を捕捉する <strong>ECS タスク異常終了通知（EventBridge Rule。<a href="../infra/workflow.html">infra/workflow.html セクション 9</a>）</strong>が担う。<code>ExecutionsFailed</code> が発報するのは、非終端状態のまま失敗が続く場合（stale・インフラ障害・タスク起動失敗等）である。ストーリーズ失敗の検知（3.3 の decision）もこの ECS タスク異常終了通知の経路に乗る</li>
+  <li><strong>検知経路の正確化（2026-07-29、Phase 15-10 で確認）</strong>: 投稿が終端状態（<code>failed</code> / <code>published_unconfirmed</code>）で確定した失敗は、Retry の再実行時に投稿対象の決定（<a href="data-model.html#target-selection">data-model.html セクション 4.4</a>）で <code>ALREADY_TERMINAL</code> となり再実行が成功終了するため、<strong><code>ExecutionsFailed</code> アラームには現れない</strong>。この場合の検知は 1 回目の終了コード 1 を捕捉する <strong>ECS タスク異常終了通知（EventBridge Rule。<a href="../infra/workflow.html">infra/workflow.html セクション 9</a>）</strong>が担う。<code>ExecutionsFailed</code> が発報するのは、非終端状態のまま失敗が続く場合（stale・インフラ障害・タスク起動失敗等）である。ストーリーズ失敗の検知（3.3「ストーリーズ再掲の投稿フロー」）もこの ECS タスク異常終了通知の経路に乗る</li>
   <li><strong>通知粒度</strong>: 初期スコープでは個別アカウント・個別失敗理由ごとのカスタムメトリクスは持たない。既存の Step Functions 失敗アラーム 1 本のみで通知し、詳細な原因（どのアカウント・どの段階で失敗したか）は CloudWatch Logs と <code>posts</code> テーブル（<code>status</code> / <code>api_response</code>）で確認する運用とする（確認手順は <a href="operation.html#failure-check">アプリ運用設計 セクション 4.1</a>）</li>
   <li><strong>一過性エラーのやり直し（Phase 28）はこの判定の前にアプリ内で済ませる</strong>: やり直し・再送で <code>success</code> になった行は成功として数え、使い切って <code>failed</code> / <code>published_unconfirmed</code> で終わった行だけが失敗になる（<a href="#transient-errors">3.3 の段階別の扱い</a>）。終了コード・Retry・通知の経路は変えない</li>
   <li><code>published_unconfirmed</code> も「対応が必要な状態」として終了コード 1 の対象に含める（<code>success</code> と明確に区別し、運用者に手動確認を促すため）</li>
 </ul>
 
-<div class="decision" id="caption-extension">
-  <span class="callout-title">セット別拡張ポイント: キャプションの作り方（16-1 でプレースホルダ展開方式を導入・17-2 でランキング系・21-3 で umigame 系を追加）</span>
-  初期実装は <code>caption_templates</code> の固定文テンプレートの素通し適用（3.3 の手順 3）。<strong>16-1 で「テンプレート + 出題データの動的組み立て」へ拡張</strong>した（答え・解説を動画からキャプションへ移すテコ入れ方針の実現方式。設計 16-1・実装 16-3）。<strong>17-2 でランキングセット用のプレースホルダ系統を追加</strong>した（設計 17-2・実装 17-4）。展開規則:
+<div id="caption-extension">
+<p><strong>セット別拡張ポイント: キャプションの作り方</strong> <a class="decision-ref" href="#d-13">→ 理由 D-13</a></p>
+初期実装は <code>caption_templates</code> の固定文テンプレートの素通し適用（3.3 の手順 3）。<strong>16-1 で「テンプレート + 出題データの動的組み立て」へ拡張</strong>した。<strong>17-2 でランキングセット用のプレースホルダ系統を追加</strong>した（設計 17-2・実装 17-4）。展開規則:
   <ul style="margin:.3rem 0 0;">
-    <li>プレースホルダは 2 系統。<strong>クイズ系 5 種</strong>（<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>。16-1）は当該生成実行の <code>quiz_items</code> 1 行（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>。<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）から、<strong>ランキング系 5 種</strong>（<code>{{hook}}</code> / <code>{{title}}</code> / <code>{{result_list}}</code> / <code>{{trivia}}</code> / <code>{{source_display}}</code>。17-2）は当該生成実行の <code>ranking_items</code> 1 行（<code>title</code> カラム + <code>content_fields</code> の各キー。<a href="data-model.html#detail-ranking-items">data-model.html セクション 4.12</a>）から展開する。いずれも<strong>文字列の単純参照</strong>であり、展開時の整形ロジックは持たない（<code>{{result_list}}</code> は整形済みテキストをストック側が持つ = <a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）</li>
+    <li>プレースホルダは 2 系統。<strong>クイズ系 5 種</strong>（<code>{{hook}}</code> / <code>{{question}}</code> / <code>{{answer}}</code> / <code>{{explanation}}</code> / <code>{{coach_comment}}</code>。16-1）は当該生成実行の <code>quiz_items</code> 1 行（<code>question_text</code> / <code>answer_text</code> / <code>content_fields</code>。<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）から、<strong>ランキング系 5 種</strong>（<code>{{hook}}</code> / <code>{{title}}</code> / <code>{{result_list}}</code> / <code>{{trivia}}</code> / <code>{{source_display}}</code>。17-2）は当該生成実行の <code>ranking_items</code> 1 行（<code>title</code> カラム + <code>content_fields</code> の各キー。<a href="data-model.html#detail-ranking-items">data-model.html セクション 4.12</a>）から展開する。いずれも<strong>文字列の単純参照</strong>であり、展開時の整形ロジックは持たない（<code>{{result_list}}</code> は整形済みテキストをストック側が持つ = <a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）</li>
     <li><strong>umigame 系 5 種</strong>（<code>{{caption}}</code> / <code>{{problem_text}}</code> / <code>{{hook}}</code> / <code>{{rule_text}}</code>。21-3 設計・21-5b 実装。<code>{{prev_truth_block}}</code> は 21-6h で追加）は当該生成実行の <code>umigame_items</code> 1 行から展開する。umigame-soup-1 のテンプレートは <code>{{caption}}{{prev_truth_block}}</code> の 1 行（ストック側の <code>caption</code> が本文 + ハッシュタグ〔<code>#AIart</code> 含む〕を持つ。<a href="sets/umigame-soup-1.html#caption">セット別設計書 6</a>）</li>
     <li id="prev-truth-block"><strong><code>{{prev_truth_block}}</code>（前回の真相ブロック。21-6h）</strong>だけは当該実行ではなく<strong>前回</strong>の <code>umigame_items</code> から組み立てる。前回 = <strong>同じセットで <code>posts.status = 'success'</code> の行のうち <code>posted_at</code> が最も新しいもの</strong>（当該実行自身は除く。<code>failed</code> / <code>published_unconfirmed</code> で終わった回は飛ばしてその前の成功回を使う。どのアカウント・メディア種別の行でもよい）。形は「改行 4 つ〔ハッシュタグ行の後ろに空行 3 つ〕→ <code>――― 前回の問題「{title}」の真相（ネタバレ注意）―――</code> → <code>・</code> 4 行 → <code>【真相】</code> → <code>truth</code> 全文」で、<strong>前回がない（初回）ときは空文字</strong>に展開する（ブロックも空行も出さない。このトークンだけは空の展開を許す）。前回の <code>title</code> / <code>truth</code> が空なら異常終了する。展開後のキャプションが <strong>2,200 字（Instagram の上限）を超えたら投稿せず異常終了</strong>する（黙って切り詰めない。上限検査はこのトークンを含むテンプレートに限る = 他セットの動きは変えない）。前回の選定は投稿対象の決定（3.1）とは独立で、当回の選び方を変えても影響しない。前日の投稿が失敗した日は、前回の予告「真相は明日」が 1 日ずれる（受け入れ済みの仕様）</li>
     <li><strong>どちらの系として展開するかは、当該実行に存在する行（<code>quiz_items</code> / <code>ranking_items</code> / <code>umigame_items</code>）で決まる</strong>（方式は 1 実行につきどちらか一方しか記録しないため、両方存在することはない）。<code>{{hook}}</code> は両系共通のトークンで、存在する行の <code>content_fields.hook</code> から展開する</li>
-    <li><strong>プレースホルダを含むテンプレートは展開元の行を必須</strong>とし、行がなければ異常終了する（フェイルラウド。テンプレートとセットの設定ミス検知。クイズ系トークンをランキングセットのテンプレートに書いた等の系の取り違えもこれで検知される）</li>
+    <li><strong>プレースホルダを含むテンプレートは展開元の行を必須</strong>とし、行がなければ異常終了する</li>
     <li><strong>プレースホルダを含まないテンプレートは従来どおり素通し</strong>（fantasy-animals-1 は無変更で共存。どちらの動きになるかはテンプレート文言そのもので決まり、セット別のフラグは持たない）</li>
-    <li>既知トークン集合（<strong>3 系の和集合 10 種</strong>。21-6h 時点）以外の <code>{{英小文字とアンダースコア}}</code> 形式トークンがテンプレートにある場合も異常終了する（タイポで壊れたキャプションがそのまま公開されるのを防ぐ。16-3 実装時の決定を 17-2 で和集合へ拡張）</li>
+    <li>既知トークン集合（<strong>3 系の和集合 10 種</strong>。21-6h 時点）以外の <code>{{英小文字とアンダースコア}}</code> 形式トークンがテンプレートにある場合も異常終了する</li>
     <li>ストーリーズ行がキャプション非対応である点は変更なし（3.3 手順 2 の 7）</li>
   </ul>
   将来の<strong>画像内容に合わせて生成 AI がキャプションを作る方式</strong>など（2026-07-06 ユーザー要望）は引き続き拡張余地として残す。どのセットがどんなテンプレートを使うかはセット別設計書に記録する（logic-training-1 は <a href="sets/logic-training-1.html">セット別設計書セクション 5</a>、pref-ranking-1 は <a href="sets/pref-ranking-1.html">同セクション 5</a>）。
@@ -442,24 +427,31 @@
 </table>
 </div>
 
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>投稿に失敗したときの確認と手動補正 → <a href="operation.html#failure">アプリ運用設計 4 章</a></li>
+  <li>投稿の SFN（親 → 子の受け渡し・Retry・Catch） → <a href="../infra/workflow.html#sns-asl">infra/workflow.html 3・4 章</a></li>
+  <li><code>posts</code> の列 → <a href="data-model.html#detail-posts">データモデル設計 4.6</a></li>
+</ul></div>
+
 <h2 id="flow-insights">4. インサイト収集バッチ処理フロー（Phase 16-7 設計 Fix）</h2>
+<p class="lead">この章は、機能別の基本設計 <a href="../overview/functions/insights.html#flow">インサイト収集 3 章</a>の流れを、取得の束ね方・収集の窓・失敗の扱いまで詳しくしたもの。</p>
 
 <p>第 3 のバッチ。Instagram Graph API の Insights から投稿別・アカウント別の生メトリクスを自動収集し、<a href="data-model.html#detail-insights">post_insights / account_insights_daily</a>（data-model.html セクション 4.11）へ蓄積する。
 16-6 の API 調査（docs/plans/development-log.html 16-6。調査基準 v25.0）を入力として 2026-08-10 の 16-7 壁打ちで設計 Fix した。
 実行基盤（スタック・Step Functions・Scheduler）は <a href="../infra/stacks.html#insights-batch">infra/stacks.html セクション 3.5</a> と <a href="../infra/workflow.html">infra/workflow.html</a> セクション 1.6・11 を参照。</p>
 
-<div class="decision">
-  <span class="callout-title">決定（2026-08-10、Phase 16-7）: 生メトリクスの全量収集とし、指標選定を収集側から切り離す</span>
-  <ul style="margin:.3rem 0 0;">
+<div>
+<p><strong>生メトリクスの全量収集とし、指標選定を収集側から切り離す</strong> <a class="decision-ref" href="#d-14">→ 理由 D-14</a></p>
+<ul style="margin:.3rem 0 0;">
     <li>API で取得可能な<strong>全メトリクスを毎回取得し、JSON 全量で保存</strong>する（格納方式は <a href="data-model.html#detail-insights">data-model.html セクション 4.11</a>）。「継続的に見る指標セット」（可視化・KPI 転記の対象）の確定は 16-5 完了後に行い、収集の実装・スキーマには影響させない（<strong>2 段階 Fix</strong>）</li>
     <li>取得メトリクスのリストは <code>media_type</code> ごとにアプリ内の定数で管理する（リール = 16-6 調査 (2) の全メトリクス、ストーリーズ = 同 (3)、フィード画像 = リール固有の視聴時間・スキップ率系を除いた集合、アカウント日次 = 同 (4)）。<strong>メトリクス名の最終確定は実装時（16-9）に現行 API リファレンスで再ピン留めする</strong>（16-6 (7) の廃止名 <code>impressions</code> / <code>plays</code> / <code>video_views</code> 等は使わない）</li>
-    <li>1 メディアの全メトリクスは <strong>1 リクエストに束ねて取得</strong>する（レート制限対策の既定。下記 4.4。実装では下記 decision のとおり「メトリクスグループ単位で束ねる」に具体化した）</li>
+    <li>1 メディアの全メトリクスは <strong>1 リクエストに束ねて取得</strong>する</li>
   </ul>
 </div>
 
-<div class="decision">
-  <span class="callout-title">決定・実装済み（2026-08-10、Phase 16-9）: メトリクスは「リクエストグループ」単位で束ね、未対応メトリクスは自動縮退する</span>
-  <p style="margin:.3rem 0 0;">16-9 の実装直前に現行 API リファレンスでメトリクス名を再ピン留めした結果、次の 2 点が判明したため、収集の実装形を具体化した（実装は <code>services/insights-batch/app/metrics_catalog.py</code> / <code>insights_api.py</code>）。</p>
+<div>
+<p><strong>メトリクスの束ね方と自動縮退（16-9 実装）</strong> <a class="decision-ref" href="#d-15">→ 理由 D-15</a></p>
+
   <ul style="margin:.3rem 0 0;">
     <li><code>metric_type</code>（<code>total_value</code> の要否）と <code>breakdown</code> は<strong>リクエスト全体に掛かる単一パラメータ</strong>であり、要件の異なるメトリクスを 1 リクエストに混在させられない。したがって「1 メディア = 1 リクエスト」ではなく <strong><code>MetricRequest</code>（メトリクス群 + <code>metric_type</code> + <code>breakdown</code>）単位で束ねる</strong>。実際のリクエスト数は リール = 1 回、フィード画像 / ストーリーズ = 2 回（通常値 + breakdown 付き 1 本）、アカウント日次 = 1 日あたり 2 回</li>
     <li>対象 <code>media_type</code> で未対応のメトリクス名を 1 つでも含めると<strong>リクエスト全体が HTTP 400（<code>code: 100</code>）になる</strong>（部分成功しない）。2025-12 追加分（<code>reels_skip_rate</code> / <code>reposts</code> 等）は一次リファレンス本文が取得制限で読めず対応表を完全確定できなかったため、実装側に<strong>縮退</strong>を持たせた: グループが 400 になったらメトリクスを 1 個ずつ呼び直して成功分だけ採用し、無効なメトリクス名を<strong>ラン内のキャッシュ</strong>に記録して以降は最初から除外する（縮退のコストは 1 ラン × 1 <code>media_type</code> につき 1 回のみ）。除外したメトリクス名は WARNING ログに出るため、<strong>運用者はログから「現行 API で無効な名前」を確認して定数を更新できる</strong></li>
@@ -468,12 +460,12 @@
 </div>
 
 <h3 id="insights-schedule">4.1 実行スケジュールと収集ウィンドウ</h3>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-10、Phase 16-7 壁打ち）: 1 日 2 回（06:00・18:00 JST）・メディア追跡は投稿後 14 日</span>
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>1 日 2 回、06:00・18:00 JST にセットごとに実行</strong>する（Scheduler 定義は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 1.6）。時刻の根拠はストーリーズの 24 時間取得期限: 現行の投稿時刻（7:35 / 12:35 / 21:05 JST 頃）に対し、各ストーリーズを寿命の 17〜22 時間時点（朝 22.4h・昼 17.4h・夜 20.9h）で最終計測でき、片方の実行が失敗しても期限内にもう 1 回の機会が残る。1 日 1 回 06:00 案は夜ストーリーズが 9 時間時点の値で打ち切りになるため不採用</li>
+<div>
+<p><strong>実行スケジュールと収集ウィンドウ</strong> <a class="decision-ref" href="#d-16">→ 理由 D-16</a></p>
+<ul style="margin:.3rem 0 0;">
+    <li><strong>1 日 2 回、06:00・18:00 JST にセットごとに実行</strong>する（Scheduler 定義は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 1.6）。</li>
     <li><strong>アカウント日次指標は UTC 日締め</strong>（09:00 JST）のため、18:00 JST の回で前日 UTC 日の確定値を約 9 時間遅れで取得できる</li>
-    <li><strong>収集ウィンドウ</strong>: <code>feed_image</code> / <code>reel</code> は<strong>投稿後 14 日間</strong>（環境変数 <code>MEDIA_LOOKBACK_DAYS</code>、既定 14。後から変更可能だが過去分の欠測は埋まらない）、<code>story</code> は<strong>投稿後 24 時間</strong>（API 期限そのもの）。スキップ率・保存率などの分析値は初週でほぼ安定するため 14 日で十分と判断し、30 日案（コール数約 2 倍）は不採用</li>
+    <li><strong>収集ウィンドウ</strong>: <code>feed_image</code> / <code>reel</code> は<strong>投稿後 14 日間</strong>（環境変数 <code>MEDIA_LOOKBACK_DAYS</code>、既定 14。後から変更可能だが過去分の欠測は埋まらない）、<code>story</code> は<strong>投稿後 24 時間</strong>（API 期限そのもの）。</li>
     <li><strong>呼び出し量の概算</strong>（現行規模: リール 4 + ストーリーズ 3/日）: 1 ランあたり最大でも約 50 コール/アカウントで、200 コール/時（app-user あたり）の制限に大きな余裕がある。セット・スロット増にも耐える</li>
   </ul>
 </div>
@@ -484,7 +476,7 @@
   <li>セット配下の有効な投稿先アカウント（<code>sns_accounts.is_active=1</code>、<code>platform='instagram'</code>）ごとに順次処理する:
     <ol>
       <li><strong>認証情報の取得</strong>: Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（SNS 投稿バッチと同一規約）で <code>access_token</code> / <code>ig_user_id</code> を取得する</li>
-      <li><strong>アカウント日次の収集</strong>: DB の <code>MAX(metric_date) + 1 日</code>から直近の閉じた UTC 日までを 1 日ずつ取得し（日単位ループの理由は上記 16-9 の decision）、<code>account_insights_daily</code> へ INSERT IGNORE（upsert-once）する。範囲は API 保持上限の <strong>90 日でキャップ</strong>する。<strong>テーブルが空の初回実行は自動的に 90 日分のバックフィルになる</strong>。直近の閉じた UTC 日の行には IG User の <code>followers_count</code>（ユーザーフィールド）も記録する</li>
+      <li><strong>アカウント日次の収集</strong>: DB の <code>MAX(metric_date) + 1 日</code>から直近の閉じた UTC 日までを 1 日ずつ取得し（日単位で取る理由は <a href="#d-15">D-15</a>）、<code>account_insights_daily</code> へ INSERT IGNORE（upsert-once）する。範囲は API 保持上限の <strong>90 日でキャップ</strong>する。<strong>テーブルが空の初回実行は自動的に 90 日分のバックフィルになる</strong>。直近の閉じた UTC 日の行には IG User の <code>followers_count</code>（ユーザーフィールド）も記録する</li>
       <li><strong>メディアレベルの収集</strong>: 対象 = 当該アカウントの <code>posts</code> のうち <code>status='success'</code> かつ <code>platform_post_id IS NOT NULL</code> で、<code>feed_image</code> / <code>reel</code> は <code>posted_at</code> が <code>MEDIA_LOOKBACK_DAYS</code> 以内、<code>story</code> は <code>posted_at</code> が 24 時間以内のもの（<code>posted_at</code> 昇順）。各行について全メトリクスを取得し、<code>post_insights</code> へ INSERT-or-skip（<code>UNIQUE (post_id, scheduled_at)</code>）で追記する。<strong>当該ラン（同一 <code>scheduled_at</code>）で収集済みの <code>post_id</code> は API 呼び出し自体を行わずスキップ</strong>する（再実行時のコール数削減。16-9 実装）</li>
     </ol>
   </li>
@@ -518,17 +510,214 @@
   これにより 2026-08-08 のフォーマット切替（quiz-prebuilt 転換）前後のリールを <code>reels_skip_rate</code> 等の自動収集データでも比較できる（16-5 の手動比較の裏付け）。失効済みストーリーズは取得不可のため対象外。手順は <a href="operation.html#insights-ops">operation.html セクション 6.1</a>。
 </div>
 
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>稼働確認・欠測の考え方・月次 KPI 転記 → <a href="operation.html#insights-ops">アプリ運用設計 6 章</a></li>
+  <li>保存先のテーブルとビュー → <a href="data-model.html#detail-insights">データモデル設計 4.11</a></li>
+  <li>コメント記録の取り込みの仕様 → <a href="sets/umigame-soup-1.html#comment-log-import">セット別設計書 umigame-soup-1 10.8.1</a></li>
+</ul></div>
+
 <h2 id="contract-usage">5. ワークフロー連携（環境変数の使い方）</h2>
+<p class="lead">Scheduler・Step Functions からバッチへ渡る環境変数を、各バッチがどう使うかをまとめる。</p>
 <p>環境変数の受け渡し契約（キー名）は <a href="../infra/workflow.html">infra/workflow.html</a> セクション 5、業務上の意味付けの定義は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a> で確定済み。本書のフローでの使い方は以下のとおり。</p>
 <ul>
   <li><code>SET_CODE</code> — 全バッチが受け取り、<code>batch_sets</code> の解決に使用する（各フローの手順 1）</li>
   <li><code>SCHEDULED_AT</code> — 全バッチ（画像生成・SNS 投稿・インサイト収集）が受け取る。画像生成バッチとインサイト収集バッチは冪等性キーに使用する（セクション 2 の手順 2・セクション 4.3）。SNS 投稿バッチは必須入力として受け取り、当回の生成実行の特定に使用する（3.1。26-1 で追加。UTC 秒精度 <code>YYYY-MM-DDTHH:MM:SSZ</code>・現在時刻の代入や最古へのフォールバックなし）</li>
   <li><code>MEDIA_LOOKBACK_DAYS</code> — インサイト収集バッチのみが受け取る収集ウィンドウ日数（既定 14。セクション 4.1。手動実行時のバックフィルで大きな値を渡す）</li>
-  <li><strong><code>BATCH_SIZE_LIMIT</code> 等のバッチ件数制御用環境変数は追加しない</strong>（確定）。SNS 投稿バッチは常に当回の生成実行 1 件のみを処理する方針（3.1）のため件数上限の概念が不要であり、画像生成バッチも有効プロンプト 1 件・1 枚生成の初期スコープでは総量制御が不要と判断した。将来、生成実行のバックログが恒常的に蓄積する場合や画像生成 API のクォータ制約が顕在化した場合に導入を再検討する</li>
+  <li><strong><code>BATCH_SIZE_LIMIT</code> 等のバッチ件数制御用環境変数は追加しない</strong>（確定）。SNS 投稿バッチは常に当回の生成実行 1 件のみを処理する（3.1。<a class="decision-ref" href="#d-08">→ 理由 D-08</a>）</li>
 </ul>
 
 <p>参考資料: <a href="../_archive/batch.md">_archive/batch.md</a>（冪等性・再試行・投稿ステータス管理の旧設計。<code>post_records</code> の attempt 方式や <code>BATCH_SIZE_LIMIT</code> によるバックログ処理は、自動再試行なし・生成実行単位への簡素化に伴い初期スコープでは採用しない。現役の設計書ではない）</p>
 
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 実行ログは INSERT-or-fetch で記録し、直近の試行だけを持つ</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>batch_execution_logs</code> は <code>generation_runs</code> と同じ INSERT-or-fetch で記録し、再試行時は <code>attempt_count</code> を増やして直近の試行状態だけを保持する</dd>
+  <dt>理由</dt><dd><code>batch_execution_logs</code> は <code>UNIQUE (execution_arn, batch_type)</code> を持つため、Step Functions Retry で同一実行内に ECS タスクが再起動された場合、素朴な INSERT は一意制約違反になる。</dd>
+  <dt>日付・出典</dt><dd>2026-07-07（Phase 9-5 レビュー）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 生成ロジックは image-batch 内の方式モジュールに隔離し、アプリ資材はサービス単位で共有する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>image-batch の内部を共通骨格・方式モジュール・方式名レジストリの 3 要素で構成し、方式の割当は DB のセット設定で行う</dd>
+  <dt>理由</dt><dd>将来の多段生成 AI チェーン（プロンプト生成 AI → 画像生成 AI → 品質向上 AI 等）でセットごとに生成ロジックが複雑化しても、アプリ資材をセットごとに分けずに済むようにするため</dd>
+  <dt>退けた案</dt><dd>セットをサービスとして切り出す・セットごとにタスク定義リビジョンを固定する案（<a href="design-outline.html#d-02">アプリ設計大枠 D-02</a>）</dd>
+  <dt>日付・出典</dt><dd>2026-07-12 合意・2026-07-15 反映（Phase 10-1）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 方式の契約を「投稿可能な最終メディアを返す」に一般化する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>契約の成果物を「生成画像」から「投稿可能な最終形式の最終メディア（画像・動画）」に一般化した</dd>
+  <dt>理由</dt><dd>動画（リール）対応に伴い、契約の成果物を「生成画像」から<strong>「投稿可能な最終形式の最終メディア（画像・動画）」</strong>に一般化する。
+  gpt-image-single（画像方式）は従来どおり JPEG を返せばよく、既存方式の変更は戻り値へのメタ情報付与のみ（共通骨格・レジストリ型の変更を含む実装は 14-7）。</dd>
+  <dt>日付・出典</dt><dd>2026-07-24（Phase 14-4）</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 実行コンテキストに生成実行の scheduled_at と generation_run_id を渡す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>方式が受け取る実行コンテキスト（<code>GeneratorContext</code>）に、共通骨格が確定済みの <code>generation_runs.scheduled_at</code>（UTC）と <code>generation_run_id</code> を入れる。方式は環境変数 <code>SCHEDULED_AT</code> を直接読まない</dd>
+  <dt>理由</dt><dd>方式が受け取る実行コンテキスト（実装上は <code>GeneratorContext</code>）に、生成実行の <code>scheduled_at</code>（UTC）を追加する（実装は 15-6）。
+  時間帯によって出題の型を切り替えるクイズ方式（<code>gpt-quiz-multicut</code> / <code>quiz-prebuilt</code>: 朝 = 軽い L1、昼 = L3、夜 = じっくり。15-4 決定）が実行予定時刻を必要とするため。
+  値は共通骨格が確定済みの <code>generation_runs.scheduled_at</code> を渡す（方式が環境変数 <code>SCHEDULED_AT</code> を直接読むことはしない。正規化の一元化を維持）。
+  既存方式は使用しないだけで影響はない（後方互換の追加）。
+  15-6 の実装時追記: 方式責務の <code>quiz_items</code> INSERT（<a href="data-model.html#detail-quiz-items">data-model.html セクション 4.9</a>）に必要な
+  <code>generation_run_id</code> も同時に実行コンテキストへ追加した（同じく共通骨格が確定済みの値を渡す後方互換の追加）。</dd>
+  <dt>日付・出典</dt><dd>2026-07-27（Phase 15-5。<code>generation_run_id</code> は 15-6 の実装時に追加）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 プロンプトの決め方の拡張は新しい方式として足す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>生成 AI にプロンプトを考えさせる方式などは新しい方式（<code>generators/</code>）として追加し方式カタログに登録する。複数 <code>prompt_config</code> のローテーション・カルーセル素材化は運用ルールの変更で行う</dd>
+  <dt>理由</dt><dd>方式の追加を「新規ファイル + レジストリ 1 行」に閉じる構成（D-02）に合わせるため。 （2026-07-06 ユーザー要望を 2026-07-12 の strategy 構造合意で整理）</dd>
+  <dt>日付・出典</dt><dd>2026-07-06 ユーザー要望・2026-07-12 整理</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 最古選定をやめ、当回の生成実行だけを投稿する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>投稿バッチはセット × <code>SCHEDULED_AT</code> の完全一致で当回の生成実行だけを扱い、当回の run・素材がなければ異常終了する</dd>
+  <dt>理由</dt><dd>旧方式（actionable な生成実行のうち <code>scheduled_at</code> 最古の 1 件）は素材の有無を見ないため、生成途中で失敗した空の生成実行が選ばれ続け、後続の正常な回まで投稿できなくなった（<a href="../issues/index.html#I-014">I-014</a>。logic-training-1 の run 44・run 165 の事象）。<code>RUN_NOT_FOUND</code> / <code>NO_MEDIA</code> を異常終了にするのは、親の画像生成 SFN は生成成功時だけ子を起動するため、子から見て当回の run・素材がないのは契約上の不整合であり、「投稿済み」の 0 件成功とまとめると気づけないため</dd>
+  <dt>退けた案</dt><dd>素材の EXISTS だけを足す案（空の run は外せるが、素材のある未投稿の朝の run が夜に持ち越される朝夜ずれ = <a href="../issues/index.html#I-017">I-017</a> の一部を防げない）。生成実行 ID を投稿側に渡す案（ECS の結果から業務 ID を返す経路の新設が要り、既存の <code>UNIQUE (set_id, scheduled_at)</code> で同じ実行を特定できる）</dd>
+  <dt>日付・出典</dt><dd>2026-10-13（Phase 26-1。本番切替は 26-3）</dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 期限ガード（大幅に遅延した旧実行の投稿を止める仕組み）は置かない</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>scheduled_at</code> から一定時間を過ぎたら投稿しない期限ガードは置かず、予定時刻を指定した手動実行の可否は運用者が確認して決める（<a href="operation.html#failure-check">operation.html 4.1</a>）</dd>
+  <dt>理由</dt><dd>当回固定は「後続の回が過去分を拾う」ことを防ぐが、<strong>朝の実行そのものが夜まで遅延した場合</strong>や<strong>夜に朝の予定時刻を指定して手動実行した場合</strong>は、完全一致だけでは朝の素材が夜に出る。これを実時刻で止める期限ガード（<code>scheduled_at</code> から一定時間を過ぎたら投稿しない）は、次の理由で<strong>導入しない</strong>（26-2 の対象に <code>app/clock.py</code>・期限値の受け渡しは追加しない）。
+  <ul style="margin:.3rem 0 0;">
+    <li><strong>自動経路の最大遅延が回の間隔より短い</strong>: Scheduler の再送上限 3600 秒（<code>MaximumEventAgeInSeconds</code>）+ 親の <code>WaitForDbReady</code> 900 秒 + <code>RunImageBatchTask</code> 3600 秒 × 3 回（Retry 2 回）+ 子の <code>WaitForDbReady</code> 900 秒 + <code>RunSnsPostBatchTask</code> 3600 秒 × 3 回 ≒ <strong>最大約 8.6 時間</strong>（すべてのタイムアウト・Retry を使い切る最悪値。<a href="../infra/workflow.html">infra/workflow.html セクション 1.2・1.4・6</a>）。現行の最短間隔は logic-training-1 の夜 21:00 → 朝 7:30 の 10.5 時間（朝 → 夜は 13.5 時間）、pref-ranking-1・umigame-soup-1 は 1 日以上で、自動経路では次の回の時刻に届かない</li>
+    <li><strong>手動実行は人間ゲート</strong>: 予定時刻を指定した手動起動は、運用者が対象 run の時間帯と素材の焼き込み表示（朝 / 夜のラベル）を確認してから行う手順にする（<a href="operation.html#failure-check">operation.html セクション 4.1</a>）。過去の回を意図的に出す復旧（例: 週 4 回の umigame-soup-1 の欠番を翌日に出す）を期限ガードで一律に止めると、正当な手動復旧の例外設計が要り複雑になる</li>
+    <li><strong>例外</strong>: 期限ガードを置かないため例外の規定はない。手動実行の可否は上記の確認で人間が判断する</li>
+    <li><strong>再判断の条件</strong>: 同一セットの回の間隔が自動経路の最大遅延（約 8.6 時間）を下回る構成を有効化するとき（例: logic-training-1 の昼スロット 12:30 の再開 = 朝 7:30 から 5 時間）、Task タイムアウト・Retry 回数を延ばすとき、または遅延した実行が次の回の時刻を越えて投稿した事象が 1 回でも起きたとき。その時点で許容遅延・判定のタイミング（選定時 / パブリッシュ直前）・手動復旧の例外を設計する</li>
+  </ul></dd>
+  <dt>日付・出典</dt><dd>2026-10-13（Phase 26-1）</dd>
+</dl>
+</article>
+<article id="d-08">
+<h3>D-08 1 回の実行で扱う生成実行は当回の 1 件</h3>
+<dl>
+  <dt>決めたこと</dt><dd>1 回の実行では当回の生成実行 1 件だけを処理し、<code>BATCH_SIZE_LIMIT</code> のような件数の上限設定は設けない。過去分は予定時刻を指定した手動起動か、将来の追いつくモードで扱う</dd>
+  <dt>理由</dt><dd>件数上限の概念が要らない。画像生成バッチも有効プロンプト 1 件・1 枚生成の運用では総量制御が要らない（生成実行のバックログが恒常的に溜まる・生成 API のクォータ制約が出たときに再検討する）。過去分をまとめて追いつかせないのは「1 回の欠番は致命的でない」初期方針（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）のため。26-1 より前は「未試行の生成実行が複数残っている場合も最古の 1 件のみ処理し、残りは後続の実行が順に消化する」決定だった</dd>
+  <dt>日付・出典</dt><dd>Phase 9-2・2026-10-13 改訂（Phase 26-1）</dd>
+</dl>
+</article>
+<article id="d-09">
+<h3>D-09 一過性エラーは公開前だけ作成からやり直し、公開後は未公開を確かめたときだけ再送する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>① ② は作成から 1 回だけやり直し、③ はコンテナの <code>status_code</code> を照会して <code>FINISHED</code> のときだけ同じコンテナで 1 回再送する。<code>PUBLISHED</code> でも <code>success</code> にせず <code>published_unconfirmed</code> にする。Step Functions の Retry・ASL・DB スキーマ（状態値 5 つ）・終了コードの方針（3.4）は変えない（「自動再試行なし・欠番許容」の初期方針の改訂）</dd>
+  <dt>理由</dt><dd>初期方針は「自動再試行なし・通知のみ（欠番許容）」（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）だったが、一過性エラー 1 回で欠番になる事象が 2 回起きた（2026-08-23 リールのコンテナ ERROR、2026-10-17 ストーリーズの <code>media_publish</code> が <code>{"code": 2, "is_transient": true}</code>。<a href="../issues/index.html#I-024">I-024</a> ②）。2 回目では <strong>DB は <code>failed</code> なのに Instagram 上は公開済み</strong>で、公開段階の失敗を一律 <code>failed</code> にすると記録が実体とずれ、単純に再送すると二重投稿になることが分かった。そこで段階で分け、① ② は公開要求を送っていないので作成から 1 回だけやり直し（リールの処理待ちが最大 10 分あるため回数は 1 回に抑える）、③ はコンテナの <code>status_code</code> を照会して<strong>未公開を確定できたとき（<code>FINISHED</code>）だけ同じコンテナで再送</strong>する（ユーザー判断 2026-10-17）。<code>PUBLISHED</code> でも <code>success</code> にしないのは、<code>media_publish</code> の応答が無いとメディア ID が取れず、問題スナップショット（<a href="#problem-snapshot">手順 6</a>）・インサイト収集が ID を前提にしているため。Step Functions の Retry・ASL・DB スキーマ（状態値 5 つ）・終了コードの方針（3.4）は変えない。</dd>
+  <dt>日付・出典</dt><dd>2026-10-17（Phase 28-1・ユーザー判断）</dd>
+</dl>
+</article>
+<article id="d-10">
+<h3>D-10 ストーリーズはリールと同じ実行内で続けて再掲し、失敗してもリールを巻き戻さない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>リールと同一 MP4 を同一実行内で連続投稿し、<code>posts</code> は media_type 別の 2 行で記録する。時差型（ストーリーズで出題 → 後でリールで答え）は採らない</dd>
+  <dt>理由</dt><dd>Scheduler・SFN 定義・投稿対象の決定を変えずに済むため（<a href="requirements-notes-set2.html#tokekomi-stories">15-9 壁打ち記録 11.2</a>）。stale のストーリーズ行を手動補正に任せるのは、発生がタスク中断時だけで稀なため。時差型（ストーリーズで出題 → 後でリールで答え）は SFN 分割かスケジュール倍増が必要なため初期は見送った（15-9）</dd>
+  <dt>日付・出典</dt><dd>2026-07-29（Phase 15-10。15-9 ユーザー決定の具体化）</dd>
+</dl>
+</article>
+<article id="d-11">
+<h3>D-11 コンテナのステータスを FINISHED までポーリングしてから公開する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>コンテナ作成の後、パブリッシュの前に <code>status_code</code> のポーリングを入れた（手順 4）。<code>posts</code> の状態遷移は変えず、<code>container_created</code> 到達後のアプリ内処理として扱う</dd>
+  <dt>理由</dt><dd>12-2 の疎通確認で、コンテナ作成 API 成功後にステータスが <code>FINISHED</code> になるまで待たずにパブリッシュ API を呼ぶと失敗しうる実際の Graph API の挙動を確認した。本書の初版手順にはこのポーリングが明記されていなかったため、上記手順 4 として追加した。<code>posts</code> の状態遷移（3.2）は変更しない — ポーリングは <code>container_created</code> 到達後・パブリッシュ呼び出し前のアプリ内処理として扱う。Step Functions Retry でタスクが再起動された場合も、<code>container_created</code> からの再開（3.2）でこのポーリングからやり直す。</dd>
+  <dt>日付・出典</dt><dd>2026-07-19（12-2 の疎通確認・12-3 の実装時に反映）</dd>
+</dl>
+</article>
+<article id="d-12">
+<h3>D-12 リール経路の実機確認の結果、設計は変えない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>14-8 の実機確認でリール経路（手順 4〜5）の設計変更は不要と確かめた（ポーリング上限 10 分・HTTP タイムアウト 30 秒・カバーは先頭フレーム・<code>share_to_feed=true</code>）</dd>
+  <dt>理由</dt><dd>14-7 で生成した実 MP4（1080x1920 / 30fps / 10.0 秒 / H.264 + AAC 128kbps / 4.2 MB）で、上記手順 4〜5 のリール経路を実 API に対して通した結果は以下。<strong>設計の変更は不要</strong>だった。
+  <ul>
+    <li><strong>所要時間</strong>: コンテナ作成の応答 1.2 秒 → <code>status_code=FINISHED</code> 到達まで <strong>33.5 秒</strong>（<code>IN_PROGRESS</code> が 6 回続いた後 7 回目で FINISHED。間隔 5 秒で計測）→ パブリッシュの応答 <strong>10.2 秒</strong>。分オーダーは想定に留めつつ、実測は 1 分未満。ポーリング上限 10 分は十分なマージンで、既存の HTTP タイムアウト 30 秒もパブリッシュの 10 秒応答に対して足りている</li>
+    <li><strong>カバー画像</strong>: <code>cover_url</code> / <code>thumb_offset</code> を指定しない場合のカバーは、公開後の <code>thumbnail_url</code> を実際に取得して確認したところ<strong>動画の先頭フレーム（= Ken Burns 元の静止画を 9:16 中央クロップした絵）</strong>であり、14-4 の想定どおりだった</li>
+    <li><strong><code>share_to_feed=true</code></strong>: リールタブとプロフィールのフィード（グリッド）の<strong>両方に表示</strong>されることを目視で確認した（Graph API に読み取り用フィールドがないため目視確認）</li>
+    <li><strong>公開後のメディア属性</strong>: <code>media_type=VIDEO</code> / <code>media_product_type=REELS</code>。<code>permalink</code> は <code>/reel/{shortcode}/</code> 形式で払い出される</li>
+  </ul></dd>
+  <dt>日付・出典</dt><dd>2026-07-25（14-8 リール投稿の疎通確認）</dd>
+</dl>
+</article>
+<article id="d-13">
+<h3>D-13 キャプションはテンプレート + 出題データのプレースホルダ展開で組み立てる</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>caption_templates</code> のテンプレートに書いたプレースホルダを、当該生成実行の出題履歴（<code>quiz_items</code> / <code>ranking_items</code> / <code>umigame_items</code>）から文字列の単純参照で展開する</dd>
+  <dt>理由</dt><dd>答え・解説を動画からキャプションへ移すテコ入れ（16-1）の実現方式として導入した。展開元の行がないときに異常終了するのは、テンプレートとセットの設定ミス（系の取り違えを含む）を投稿前に検知するため。未知のトークンで異常終了するのは、タイポで壊れたキャプションがそのまま公開されるのを防ぐため（16-3 実装時の決定を 17-2 で和集合へ拡張）。</dd>
+  <dt>日付・出典</dt><dd>2026-08-01（16-1）・2026-08-10（17-2 ランキング系）・2026-09-04（21-3 umigame 系）・2026-10-12（21-6h 前回の真相ブロック）</dd>
+</dl>
+</article>
+<article id="d-14">
+<h3>D-14 生メトリクスを全量収集し、指標選定を収集側から切り離す（2 段階 Fix）</h3>
+<dl>
+  <dt>決めたこと</dt><dd>API で取得できる全メトリクスを毎回取得して JSON 全量で保存し、継続的に見る指標の確定は後段（16-5 → 16-12a・16-12b）で行う。メトリクス名は実装時（16-9）に現行 API リファレンスで再ピン留めする</dd>
+  <dt>理由</dt><dd>指標選定の議論を収集の実装・スキーマに影響させないため。1 メディアの全メトリクスを束ねるのはレート制限対策の既定（4.4）。実装では次の D-15 のとおり「メトリクスグループ単位で束ねる」に具体化した</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（Phase 16-7）</dd>
+</dl>
+</article>
+<article id="d-15">
+<h3>D-15 メトリクスは「リクエストグループ」単位で束ね、未対応メトリクスは自動で縮退する</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>MetricRequest</code>（メトリクス群 + <code>metric_type</code> + <code>breakdown</code>）単位で束ね、400 になったグループは 1 個ずつ呼び直して成功分だけ採用する。アカウント日次は 1 リクエスト = UTC 1 日</dd>
+  <dt>理由</dt><dd>16-9 の実装直前に現行 API リファレンスでメトリクス名を再ピン留めした結果、<code>metric_type</code>・<code>breakdown</code> がリクエスト全体に掛かること、未対応のメトリクス名を 1 つでも含むとリクエスト全体が 400 になること、<code>total_value</code> は範囲を渡すと範囲全体の 1 値しか返らないことが分かったため（実装は <code>services/insights-batch/app/metrics_catalog.py</code> / <code>insights_api.py</code>）。</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（Phase 16-9）</dd>
+</dl>
+</article>
+<article id="d-16">
+<h3>D-16 収集は 1 日 2 回（06:00・18:00 JST）、メディアの追跡は投稿後 14 日</h3>
+<dl>
+  <dt>決めたこと</dt><dd>セットごとに 1 日 2 回（06:00・18:00 JST）実行し、<code>feed_image</code> / <code>reel</code> は投稿後 14 日、<code>story</code> は 24 時間追跡する</dd>
+  <dt>理由</dt><dd>時刻の根拠はストーリーズの 24 時間取得期限: 現行の投稿時刻（7:35 / 12:35 / 21:05 JST 頃）に対し、各ストーリーズを寿命の 17〜22 時間時点（朝 22.4h・昼 17.4h・夜 20.9h）で最終計測でき、片方の実行が失敗しても期限内にもう 1 回の機会が残る。1 日 1 回 06:00 案は夜ストーリーズが 9 時間時点の値で打ち切りになるため不採用 スキップ率・保存率などの分析値は初週でほぼ安定するため 14 日で十分と判断し、30 日案（コール数約 2 倍）は不採用</dd>
+  <dt>退けた案</dt><dd>1 日 1 回 06:00 案・30 日追跡案（上記の理由）</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（Phase 16-7 壁打ち）</dd>
+</dl>
+</article>
+<article id="d-17">
+<h3>D-17 実行ログの記録に失敗したらバッチ全体を失敗にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>batch_execution_logs</code> の INSERT/UPDATE が失敗したらバッチ全体を終了コード 1 にする</dd>
+  <dt>理由</dt><dd>記録なしでの続行は運用上のリスクが高いため</dd>
+  <dt>日付・出典</dt><dd>Phase 9-2</dd>
+</dl>
+</article>
+<article id="d-18">
+<h3>D-18 バッチの起動は Step Functions 経由に限る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>手動の再実行を含め、バッチは必ず Step Functions（先頭の <code>WaitForDbReady</code>）経由で起動する</dd>
+  <dt>理由</dt><dd>バッチアプリが DB 接続リトライを持たないため、ECS RunTask の直接実行は Aurora 自動一時停止中に失敗しうる</dd>
+  <dt>日付・出典</dt><dd>2026-07-15（Phase 10-1）</dd>
+</dl>
+</article>
+<article id="d-19">
+<h3>D-19 完了判定は 1 件の存在で行う（過不足は見ない）</h3>
+<dl>
+  <dt>決めたこと</dt><dd>再開時の完了判定は <code>(generation_run_id, prompt_config_id)</code> の <code>generated_media</code> が 1 件でもあるかで行う</dd>
+  <dt>理由</dt><dd>厳密な過不足チェックより再開処理の単純さを優先した割り切り。問題が顕在化した場合に見直す</dd>
+  <dt>日付・出典</dt><dd>Phase 9-2</dd>
+</dl>
+</article>
+<article id="d-20">
+<h3>D-20 レート制限はやり直さず、やり直しの前に待たない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>レート制限は一過性に含めない。① ② のやり直しの前に待ちを入れない。処理待ちの上限到達はやり直さない</dd>
+  <dt>理由</dt><dd>レート制限はすぐやり直しても解けない。① ② の失敗はすでに数秒〜数分経っており、Step Functions の時間枠を延ばさないため待たない。リールの待ち上限は約 10 分あり、上限到達をやり直すとタスクの時間が倍になる</dd>
+  <dt>日付・出典</dt><dd>2026-10-17（Phase 28-1）</dd>
+</dl>
+</article>
+</section>
+
 </div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>

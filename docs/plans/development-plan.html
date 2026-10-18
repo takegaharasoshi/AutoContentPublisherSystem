@@ -82,7 +82,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 6 件（クリックで展開）</summary>
+<summary>完了済み 10 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
@@ -455,17 +455,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-7" data-step-id="30-7" data-status="todo">
+<article class="plan-step" id="step-30-7" data-step-id="30-7" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-7</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-7</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>アプリの共通設計書を掃除し、新しい書式へ移す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-6 の go の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。アプリの共通設計書 5 本（<a href="../app/index.html">index</a> / <a href="../app/design-outline.html">design-outline</a> / <a href="../app/batch-flow.html">batch-flow</a> / <a href="../app/data-model.html">data-model</a> / <a href="../app/operation.html">operation</a>）を新しい書式へ移し（要約・判断の記録 計 75 件・<code>class="decision"</code> 0 件）、掃除リストのアプリ共通分（方式カタログの状態・gpt-* の退役・design-outline の矛盾・umigame の投稿頻度・5.5・ER 図の Mermaid 化）を直した。ユーザーの go 待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -485,13 +480,27 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>進め方</strong>: 節番号とアンカーは保ったまま（外からのリンク・課題表の節参照を切らないため）、囲みを「本文の小見出し + 末尾の D-xx」へ移した。理由の文の振り分けは Claude が囲みごとに決め、移す・残すの適用はスクラッチの変換スクリプトで機械的に行った（移す文が元の囲みに 1 回だけあることを検査）。index・design-outline は全体を書き直した</li>
+<li><strong>掃除リスト（<a href="../issues/design-docs-restructure.md">I-040 の壁打ち</a> 2026-10-13）のアプリ共通分</strong>: ①方式カタログ → ステータスを 採用中 / 退役 / 廃止 の 3 つと定義し、<code>quiz-prebuilt</code>・<code>ranking-prebuilt</code>・<code>umigame-prebuilt</code> を採用中（セット・開始日・頻度付き）、<code>gpt-image-single</code>・<code>gpt-image-kenburns</code>・<code>gpt-quiz-multicut</code> を退役にした（ranking の 2 尺は「pref-ranking-1 は 30 秒のみ」、umigame は 29 秒・TTS は Irodori-TTS に）。comment-reply の処理フローは batch-flow の要約で対象外と明記し、仕様の正（sets/umigame-soup-1 10 章）を指した（切り出しは 30-8）②design-outline 1.1 の「インフラはセット追加で増えない」→「スタックは機能単位でセットの追加だけでは増えない。機能を持ち込むセット〔umigame のコメント返信 = CommentReplyStack〕ではその機能のスタックが増える」に改め D-04 に経緯（operation 2.1 の同じ注記も D-10 で揃えた）③app/index の umigame「1 日 1 回」→ 週 4 回（日・火・木・土 20:00）・29 秒。セット一覧に方式・状態の列を足し、稼働開始予定の古い記述を直した ④operation 5.5 → 「Secret は残りタスク定義に渡るが、値を読むのは退役した実行時生成 3 方式だけ。使い直すときの差し替え手順」に書き直した（照合: <code>infra/lib/foundation-stack.ts</code>・<code>image-batch-stack.ts</code> の <code>API_SECRET_ARN</code>・<code>services/image-batch/app/config.py</code>）。あわせて operation 3 章に umigame-soup-1 の生産への導線を足した ⑤data-model の ER 図 → SVG を Mermaid の erDiagram（要約の中心図 + 1 章の全体図）にし、umigame の 3 テーブル・コメント記録・運用ログ・焼き込み BGM の参照を図に入れた</li>
+<li><strong>古い記述の掃除</strong>: batch-flow 3.1 の「移行中（26-3 まで旧契約）」の注記、operation 4.2・4.3 の旧方式（最古選定）の履歴、design-outline の A-3 の注記を外した（経緯は D-xx へ）。本文中の「〜の decision」の参照文言は節名・D 番号へ置き換えた</li>
+<li><strong>判断の移し替え（移す前の囲み → D-xx）</strong>: <strong>batch-flow</strong>（囲み 16 → D-01〜16）実行ログの INSERT-or-fetch → D-01／生成ロジックの隔離 → D-02／契約の一般化 → D-03／実行コンテキストの scheduled_at → D-04／プロンプトの決め方 → D-05／当回固定 → D-06／期限ガードを置かない → D-07／1 回 1 件 → D-08／一過性エラー → D-09／ストーリーズ再掲 → D-10／ポーリング → D-11／14-8 実機確認 → D-12／キャプションの作り方 → D-13／生メトリクス全量 → D-14／リクエストグループ → D-15／1 日 2 回・14 日 → D-16、本文中の理由 → D-17〜20（ログ記録失敗・SFN 経由に限る・完了判定の割り切り・レート制限と待ち）。<strong>data-model</strong>（囲み 32 → D-01〜32）複合 FK → D-01／generator_name → D-02／stories_enabled → D-03／problem_snapshot_enabled → D-04／キャプションの紐づけ → D-05／プレースホルダ → D-06／投稿対象クエリ → D-07／generated_media → D-08／media_type → D-09／ストーリーズの行 → D-10／運用ログと独立 → D-11／audio_assets → D-12／SE → D-13／time_slot → D-14／quiz_items → D-15／quiz_stock_items → D-16／V006 → D-17／content_key → D-18／インサイト 2 テーブル → D-19／V011 ビュー → D-20／follows_and_unfollows 取り直し → D-21／ranking_items → D-22／ranking_stock_items → D-23／2 尺 → D-24／result_list → D-25／umigame_items → D-26／umigame_stock_items → D-27／V012 → D-28／umigame_comment_logs → D-29／S3 キー → D-30／ライフサイクル → D-31／廃止時に残すデータ → D-32、本文中 → D-33（batch_type の ENUM）。<strong>operation</strong>（囲み 8 → D-01〜08）キャプション拡張（古い再掲を書き直し）→ D-01／#AIart → D-02／2 パス loudnorm → D-03／Meta アプリ流用 → D-04／返信用トークン自動更新 → D-05／debug_token の実測 → D-06／manage_insights スコープ → D-07／リマインド 1 件 → D-08、本文中 → D-09〜16（Secret を先に・スタックを増やさない・廃止時に Scheduler 削除・音源の事前処理・欠番許容・stale 検知なし・ミュート手動確認・月初 4 日以降）。<strong>design-outline</strong>（囲み 3 + 注記 2 → D-01〜05）3 層構造 → D-01／分離しない（旧「採用しない選択肢」）→ D-02／処理単位を生成実行に（不変条件と経緯の 2 囲み）→ D-03／スタックは機能単位 → D-04／SCHEDULED_AT を投稿にも（旧 A-3 の注記）→ D-05。<strong>index</strong>（注記 2 → D-01 2 段階の設計）。囲みの中の事実は本文に残し、丸ごと D-xx へ移した囲み（期限ガード・実機確認・2 尺・ライフサイクル等）は本文に事実の一文を置いた。<code>class="decision"</code> の grep 件数は 5 ページとも 0</li>
+<li><strong>戻りリンク</strong>: 各ページの要約のリード文に 1 段上を書いた（batch-flow → 機能別の基本設計 投稿・インサイト収集、operation → 投稿・トークン更新・インサイト収集、data-model → 基本設計（全体）5 章〔データは横断のため直接〕、design-outline・index → 基本設計（全体））。機能ページの「さらに詳しく」の行き先（post → batch-flow #flow-image・operation #failure、insights → batch-flow #flow-insights・operation #insights-ops、token-refresh → operation #token-refresh、system-overview → data-model #er / #entities、batch-flow #generator-contract / #posts-state / #problem-snapshot / #generator-catalog）はアンカーを保ったので直す必要はなかった</li>
+<li><strong>レビュー</strong>（観点: 実装との食い違い / 本文に理由が混ざっていないか / 移設で事実が欠けていないか。一次スクリーニング Codex・判断 Claude）。1 巡目: blocker 1 件を修正（ER 図に <code>batch_execution_logs</code> → <code>batch_sets</code> の FK が欠けていた。V001）。改善提案 4 件（design-outline の図と要約の粗さ・1.1 と operation 5.4 の本文に残る理由）は課題 <a href="../issues/index.html#I-044">I-044</a> に起票（30-9 の着手時）。2 巡目: blocker 1 件を修正（ER 図に在庫 3 テーブル → <code>audio_assets</code> の <code>video_audio_asset_id</code> が欠けていた。V006・V010・V012）。data-model 4 章・operation 5 章の事実の欠落は無し。ここで打ち切り</li>
+<li><strong>課題表</strong>: 節番号は変えていないため、対象パスの付け替えは不要（I-006・I-019・I-025 = operation 4 章、I-012 = batch-flow 3 章、I-015 = operation 3 章、I-017 = batch-flow 3.1、I-020 = data-model 4.9、I-023 = data-model 4.13、I-040 = ページ単位。いずれも同じ節に同じ内容がある）。I-040 は据え置き継続（30-8・30-9 が残る）。新規に I-044 を起票</li>
+<li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 100 ページはみ出し 0 件・図 20 ページ 37 図の描画不備 0 件・判断リンク 168 件の不備 0 件・リンク切れ 0 件で OK</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-8" data-step-id="30-8" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-8</strong><span class="plan-status">未着手</span></div>

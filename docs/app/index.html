@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>アプリ設計 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -12,43 +12,46 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / アプリ設計</nav>
 <h1>アプリ設計</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">大枠: Phase A / 詳細: Phase 9 / 最終 Fix: Phase 10-1 完了</span>
-  <span>最終更新: 2026-09-04（21-3: セット一覧に umigame-soup-1 を追加。壁打ち記録カードの入れ子を修正）</span>
+  <span class="badge badge-fixed">大枠: Phase A / 詳細: Phase 9 / 最終 Fix: Phase 10-1 / 新しい書式: Phase 30-7</span>
+  <span>最終更新: 2026-10-18（30-7: 冒頭の要約と判断の記録を足し、セット一覧の投稿頻度・尺・稼働状況を実態に合わせた）</span>
 </div>
 
-<div class="warn">
-  <span class="callout-title">アプリ設計は 2 段階（大枠 → 詳細）で行う</span>
-  アプリ設計は、<strong>大枠（Phase A）</strong>と<strong>詳細（Phase 9）</strong>の 2 段階で行う。Phase A では仕様の壁打ち・設計書構成の決定・主要方針の骨子を固め、大枠設計書（骨子版）を作成した。
-  テーブル定義・処理フローの詳細・DDL などの詳細設計は Phase 9 で行った（2026-07-06、上流工程に適した生成 AI モデルの利用期限を機に、インフラ構築＝開発計画 Phase 0〜8 より前へ前倒し。インフラ構築で得た知見の反映は Phase 10 冒頭の最終 Fix（10-1）で行う）。
-  Phase 9-5（生成 AI レビュー）まで完了し、Phase 9 の成果物は一時 Fix とした。
-  その後、インフラ構築（Phase 0〜8）完了を受けた <strong>Phase 10-1（2026-07-15）で知見の反映と検討メモの棚卸しを行い、最終 Fix</strong> とした（詳細は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の 10-1 備考を参照）。
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページはアプリ設計（<code>docs/app/</code>）の目次。アプリ設計は、配信面のバッチがアプリとして何をするか（処理・データ・運用）と、セット・生成方式ごとの仕様を持つ。基本設計（全体）<a href="../overview/system-overview.html#entry">7 章 詳細設計への入口</a>から来るページで、各機能の入口は機能別の基本設計（<a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a>）にある。下の表は、何を見たいときにどのページを開くかをまとめたもの。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>見たいこと</th><th>ページ</th></tr></thead>
+  <tbody>
+    <tr><td>アプリ設計書の分け方・全体方針</td><td><a href="design-outline.html">アプリ設計大枠</a></td></tr>
+    <tr><td>バッチの処理手順・生成方式の一覧</td><td><a href="batch-flow.html">バッチ処理フロー設計</a>（方式カタログは <a href="batch-flow.html#generator-catalog">2.1</a>）</td></tr>
+    <tr><td>テーブル・ER 図・S3 キー</td><td><a href="data-model.html">データモデル設計</a></td></tr>
+    <tr><td>セット追加・失敗時の対応・トークン・KPI 転記</td><td><a href="operation.html">アプリ運用設計</a></td></tr>
+    <tr><td>セットごとの仕様</td><td><a href="#set-docs">セット別設計書の一覧</a></td></tr>
+  </tbody>
+</table>
 </div>
-
-<div class="note">
-  <span class="callout-title">設計の経緯</span>
-  大枠（Phase A: 2026-07-06）→ 詳細（Phase 9: 2026-07-06〜07）→ 最終 Fix（Phase 10-1: 2026-07-15）の各ステップの成果物・実施記録は <a href="../plans/development-log.html">docs/plans/development-log.html</a> を参照。以後の改訂（動画対応 = Phase 14・勝負セット投入 = Phase 15・テコ入れと事前生成方式への転換 = Phase 16）は各設計書の decision コールアウトと docs/plans/development-log.html に記録している。
-</div>
+</section>
 
 <h2 id="toc">1. ドキュメント構成（目次）</h2>
-
-<p>全体方針と分冊間の整合は「アプリ設計大枠」（親ページ）が担い、ドメイン別の詳細は 3 分冊が正（Phase 9 で詳細化済み）。</p>
+<p class="lead">共通設計書 4 本と壁打ち記録の一覧。全体方針と分冊間の整合は「アプリ設計大枠」（親ページ）が担い、ドメイン別の詳細は 3 分冊が正 <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。</p>
 
 <div class="card-grid">
   <div class="card">
     <div class="card-title"><a href="design-outline.html">design-outline.html</a></div>
-    <p>アプリ設計大枠（親ページ）。設計書構成とセット別設計書ルール、処理単位の不変条件、ワークフロー連携・Secret 規約の意味付け、Phase 9 への線引き。</p>
+    <p>アプリ設計大枠（親ページ）。設計書の 3 層構造とセット別設計書のルール、処理単位の不変条件、ワークフロー連携・Secret 規約の意味付け。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="batch-flow.html">batch-flow.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
-    <p>バッチ処理フロー設計。画像生成・SNS 投稿の処理手順、投稿対象の決定、セット別拡張ポイント、環境変数の使い方。</p>
+    <div class="card-title"><a href="batch-flow.html">batch-flow.html</a></div>
+    <p>バッチ処理フロー設計。画像生成（選定）・SNS 投稿・インサイト収集の処理手順、投稿対象の決定、生成方式の契約と方式カタログ、セット別拡張ポイント、環境変数の使い方。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="data-model.html">data-model.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
-    <p>データモデル設計。ER 図・エンティティ一覧、主キーと冪等性キーの分離、S3 キー・時刻・DDL（<a href="../../database/V001__initial_schema.sql">database/V001__initial_schema.sql</a>）。</p>
+    <div class="card-title"><a href="data-model.html">data-model.html</a></div>
+    <p>データモデル設計。ER 図・エンティティ一覧、主キーと冪等性キーの分離、テーブル定義の意図、S3 キー・時刻・DDL（<code>database/</code>）。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="operation.html">operation.html</a> <span class="badge badge-fixed">10-1 最終 Fix</span></div>
-    <p>アプリ運用設計。セット追加・廃止手順、プロンプト / キャプション / 音源管理、投稿失敗時対応（ミュート検知の週次確認を含む）、Secret 運用・トークン更新。</p>
+    <div class="card-title"><a href="operation.html">operation.html</a></div>
+    <p>アプリ運用設計。セット追加・廃止、プロンプト / キャプション / 音源の管理、投稿失敗時の対応、Secret 運用・トークン更新、インサイト収集の運用と月次 KPI 転記。</p>
   </div>
   <div class="card">
     <div class="card-title"><a href="requirements-notes.html">requirements-notes.html</a></div>
@@ -56,59 +59,76 @@
   </div>
   <div class="card">
     <div class="card-title"><a href="requirements-notes-video.html">requirements-notes-video.html</a></div>
-    <p>動画（リール）対応 要件メモ（14-2 壁打ち記録）。音源ライセンス調査・初期スコープ（簡易動画方式）・データモデル影響の整理。設計書ではない。</p>
+    <p>動画（リール）対応 要件メモ（14-2 壁打ち記録）。音源ライセンス調査・初期スコープ・データモデル影響の整理。設計書ではない。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="requirements-notes-set2.html">requirements-notes-set2.html</a> <span class="badge badge-wip">15-4 まで段階更新</span></div>
-    <p>勝負セット（セット 2）壁打ち記録（Phase 15 意思決定ブロック 15-1〜15-4）。評価軸 7 軸・テーマ発散と絞り込み（社会人向けロジカルトレーニング）・持ち越し論点。設計書ではない。</p>
+    <div class="card-title"><a href="requirements-notes-set2.html">requirements-notes-set2.html</a></div>
+    <p>勝負セット（セット 2）壁打ち記録（Phase 15 意思決定ブロック 15-1〜15-4）。評価軸・テーマの発散と絞り込み・持ち越し論点。設計書ではない。</p>
   </div>
   <div class="card">
     <div class="card-title"><a href="requirements-notes-set3.html">requirements-notes-set3.html</a></div>
-    <p>都道府県ランキングセット（セット 3）壁打ち記録（17-1 テーマ Fix・17-2 設計 Fix）。フォーマット・尺・キャラ「表彰台五郎」・和モダンパレット・VOICEVOX 白上虎太郎・pref-ranking-1 の決定経緯と、17-2 の設計壁打ち（動画設計・データモデル・運用設計）の記録。設計書ではない。</p>
+    <p>都道府県ランキングセット（セット 3）壁打ち記録（17-1 テーマ Fix・17-2 設計 Fix）。設計書ではない。</p>
   </div>
   <div class="card">
-    <div class="card-title"><a href="requirements-notes-set4.html">requirements-notes-set4.html</a> <span class="badge badge-fixed">21-3 で設計書へ反映済み</span></div>
-    <p>ウミガメのスープ参加型セット（セット 4）壁打ち記録（21-1 テーマ・企画 Fix）。set_code umigame-soup-1・版面の叩き台（20 秒・探偵風ウミガメ + 助手）・umigame-prebuilt と Remotion Skills の導入先・投稿 20:00・gpt-5.6-luna・コメント経路と Meta アプリの使い分けの決定と後続への引き継ぎ。設計書ではない。</p>
+    <div class="card-title"><a href="requirements-notes-set4.html">requirements-notes-set4.html</a></div>
+    <p>ウミガメのスープ参加型セット（セット 4）壁打ち記録（21-1 テーマ・企画 Fix）。設計書ではない。</p>
   </div>
 </div>
 
 <h3 id="set-docs">セット別・生成方式別設計書（sets/ / generators/）</h3>
-<p>セット（テーマ）が増えるたびに <code>docs/app/sets/&lt;set_code&gt;.html</code> が、生成方式が本採用されるたびに <code>docs/app/generators/&lt;方式名&gt;.html</code> が 1 本ずつ増える（<strong>3 層構造: 契約 / 方式 / セット</strong>。Phase 10-1 で 2 層から拡張）。<strong>共通設計書（上記の親ページ + 3 分冊）はセット追加・方式追加では変更しない</strong>（方式カタログへの 1 行追加を除く）。
-ルール・標準記載項目は<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a> を参照。生成方式の一覧・設計書へのリンクは<a href="batch-flow.html#generator-catalog">方式カタログ（batch-flow.html セクション 2.1）</a>で管理する（ここには重複掲載しない）。セットの一覧は以下。</p>
+<p class="lead">セット（テーマ）が増えるたびに <code>docs/app/sets/&lt;set_code&gt;.html</code> が、生成方式が本採用されるたびに <code>docs/app/generators/&lt;方式名&gt;.html</code> が 1 本ずつ増える（ルールは<a href="design-outline.html#set-docs">アプリ設計大枠 セクション 1.1</a>）。生成方式の一覧と状態は<a href="batch-flow.html#generator-catalog">方式カタログ</a>で管理し、ここには重複して載せない。下の表はセットの一覧。</p>
 
 <div class="table-wrap">
 <table>
-  <thead><tr><th>set_code</th><th>テーマ</th><th>設計書</th></tr></thead>
+  <thead><tr><th>set_code</th><th>テーマ・投稿</th><th>状態</th><th>設計書</th></tr></thead>
   <tbody>
     <tr>
-      <td>fantasy-animals-1</td>
-      <td>架空のかわいい動物図鑑（<strong>2026-09-03 に停止</strong>。Phase 20-1 → <a href="sets/fantasy-animals-1.html">セット別設計書</a>の decision）</td>
-      <td><a href="sets/fantasy-animals-1.html">sets/fantasy-animals-1.html</a></td>
-    </tr>
-    <tr>
       <td>logic-training-1</td>
-      <td>社会人向けロジカルトレーニング（朝 / 昼 / 夜の脳みそトレ。昼スロットは 16-4d〔2026-08-24〕で当分停止中 → <a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</td>
+      <td>社会人向けロジカルトレーニング（脳みそトレ）。朝 7:30・夜 21:00 の 1 日 2 回（昼は 16-4d〔2026-08-24〕から当分停止 → <a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>）。方式 <code>quiz-prebuilt</code></td>
+      <td>稼働中</td>
       <td><a href="sets/logic-training-1.html">sets/logic-training-1.html</a></td>
     </tr>
     <tr>
       <td>pref-ranking-1</td>
-      <td>都道府県ランキング（表彰台五郎の都道府県ランキング。17-2 設計 Fix・17-5c〔2026-08-26〕で稼働開始。30 秒単尺・1 日 1 回 20:00 JST）</td>
+      <td>表彰台五郎の都道府県ランキング。30 秒・1 日 1 回 20:00。方式 <code>ranking-prebuilt</code></td>
+      <td>稼働中（17-5c〔2026-08-26〕から）</td>
       <td><a href="sets/pref-ranking-1.html">sets/pref-ranking-1.html</a></td>
     </tr>
     <tr>
       <td>umigame-soup-1</td>
-      <td>ウミガメのスープ参加型セット（探偵カメロックのウミガメのスープ。21-3 設計 Fix。24 秒単尺・1 日 1 回 20:00 JST・コメント自動返信は <a href="../infra/stacks.html#comment-reply">CommentReplyStack</a>。稼働開始は 21-7 予定）</td>
+      <td>探偵カメロックのウミガメのスープ（参加型）。29 秒・週 4 回（日・火・木・土の 20:00）。方式 <code>umigame-prebuilt</code>。コメント自動返信は <a href="../infra/stacks.html#comment-reply">CommentReplyStack</a></td>
+      <td>稼働中（21-7〔2026-10-12〕から）</td>
       <td><a href="sets/umigame-soup-1.html">sets/umigame-soup-1.html</a></td>
+    </tr>
+    <tr>
+      <td>fantasy-animals-1</td>
+      <td>架空のかわいい動物図鑑。方式 <code>gpt-image-kenburns</code>（退役）</td>
+      <td>停止（2026-09-03。Phase 20-1）</td>
+      <td><a href="sets/fantasy-animals-1.html">sets/fantasy-animals-1.html</a></td>
     </tr>
   </tbody>
 </table>
 </div>
 
 <h2 id="memo">2. 検討メモ</h2>
-<p>インフラ設計・構築中に出てきたアプリ関連の論点はここに記録する（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。<strong>現在、未消化の論点はない</strong>（Phase 10-1 の棚卸し〔2026-07-15〕で全件反映済み。反映済みの過去分の内容は <a href="design-outline.html#set-docs">design-outline.html セクション 1.1</a>・<a href="batch-flow.html#generator-catalog">batch-flow.html セクション 2.1</a> の decision と <a href="../plans/development-log.html">docs/plans/development-log.html</a> を参照）。</p>
+<p class="lead">インフラ設計・構築中に出てきたアプリ関連の論点を書き留める場所（設計書体系ガイドの<a href="../index.html#scope">スコープガード</a>）。</p>
+<p><strong>現在、未消化の論点はない</strong>。課題として追う論点は<a href="../issues/index.html">課題体系</a>に起票する。</p>
 
 <h2 id="references">3. 参考資料</h2>
-<p><a href="../_archive/">docs/_archive/</a> の旧 Markdown 設計書には、過去に検討したアプリ設計（冪等性設計・テーブル定義・運用手順等）が含まれている。<strong>現役の設計書ではない</strong>。過去の検討経緯の参照用に残している。</p>
+<p><a href="../_archive/">docs/_archive/</a> の旧 Markdown 設計書には、過去に検討したアプリ設計（冪等性設計・テーブル定義・運用手順等）が含まれている。<strong>現役の設計書ではない</strong>。</p>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。</p>
+<article id="d-01">
+<h3>D-01 アプリ設計は大枠 → 詳細の 2 段階で行った</h3>
+<dl>
+  <dt>決めたこと</dt><dd>大枠（Phase A: 仕様の壁打ち・設計書構成・主要方針の骨子）と詳細（Phase 9: テーブル定義・処理フローの詳細・DDL）の 2 段階で設計し、インフラ構築の知見を Phase 10-1 で反映して最終 Fix とした。以後の改訂は各設計書の判断の記録と開発記録に残す</dd>
+  <dt>理由</dt><dd>上流工程に適した生成 AI モデルの利用期限を機に、詳細設計をインフラ構築（Phase 0〜8）より前へ前倒ししたため、インフラの知見を後から反映する段を設けた</dd>
+  <dt>日付・出典</dt><dd>Phase A（2026-07-06）→ Phase 9（2026-07-06〜07）→ Phase 10-1（2026-07-15）。経緯は<a href="../plans/development-log.html">開発記録</a></dd>
+</dl>
+</article>
+</section>
 
 </div>
 </body>

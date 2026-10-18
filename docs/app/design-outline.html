@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>アプリ設計大枠 | AutoContentPublisherSystem</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260921">
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
 </head>
 <body>
 <div class="container">
@@ -12,147 +12,110 @@
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">アプリ設計</a> / アプリ設計大枠</nav>
 <h1>アプリ設計大枠</h1>
 <div class="page-meta">
-  <span class="badge badge-fixed">Phase A 成果物（Phase 10-1 で最終 Fix）</span>
-  <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
-  <span class="badge badge-fixed">Phase 16-7 でインサイト収集バッチを反映</span>
-  <span>最終更新: 2026-08-10</span>
+  <span class="badge badge-fixed">Phase A 成果物・Phase 10-1 で最終 Fix・Phase 30-7 で新しい書式へ移行</span>
+  <span>最終更新: 2026-10-18（30-7: 冒頭の要約と判断の記録〔D-01〜D-05〕を足し、囲みの判断を末尾へ移した。1.1 の「インフラはセット追加で増えない」を、機能を持ち込むセットでは機能のスタックが増える形に改めた）。以前の更新履歴は git の履歴と<a href="../plans/development-log.html">開発記録</a>を参照</span>
 </div>
 
-<div class="note">
-  <span class="callout-title">本書の位置づけ</span>
-  Phase A-2「アプリ設計の大枠決め」で決定した大枠方針の全体像（<a href="requirements-notes.html">A-1 壁打ち記録</a>が入力）。
-  A-4 で本書の構成に従い分冊（<a href="batch-flow.html">batch-flow</a> / <a href="data-model.html">data-model</a> / <a href="operation.html">operation</a>）を作成済みであり、
-  分冊作成後の本書は<strong>全体方針と、分冊間・インフラ設計との整合</strong>を担う親ページとする。
-  ドメイン別の骨子（処理手順・エンティティ定義・運用方針の中身）は<strong>各分冊が正</strong>。
-  詳細設計（テーブル定義・処理フローの詳細・DDL 等）には踏み込まない（詳細は Phase 9 で各分冊に定め済み）。
-</div>
-
-<h2 id="doc-structure">1. 設計書構成（docs/app/ のドキュメント一覧とスコープ)</h2>
-
-<p>アプリ設計書は以下の構成とする。分冊は開発計画 Phase 9 のステップ（9-2 / 9-3 / 9-4）で詳細化済み。</p>
-
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページはアプリ設計（<code>docs/app/</code>）の親ページで、設計書の分け方、全セットに共通の処理の単位、分冊とインフラ設計の受け渡しを定める。基本設計（全体）<a href="../overview/system-overview.html#delivery">3 章 配信面の 4 系統</a>のうち、アプリの処理にあたる部分の詳細設計の入口にあたる。図 1 は、アプリ設計書が「共通 → 方式別 → セット別」の 3 層に分かれ、どの層が何を持つかを表す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    subgraph COMMON["共通設計書（セット・方式の追加では変えない）"]
+        DO["design-outline&lt;br&gt;全体方針（このページ）"]
+        BF["batch-flow&lt;br&gt;処理フロー・方式の契約・方式カタログ"]
+        DM["data-model&lt;br&gt;テーブル・S3 キー"]
+        OP["operation&lt;br&gt;運用の手順"]
+    end
+    GEN["generators/&lt;方式名&gt;&lt;br&gt;方式別設計書（1 方式 1 本）"]
+    SETS["sets/&lt;set_code&gt;&lt;br&gt;セット別設計書（1 セット 1 本）"]
+    BF -->|契約に従う| GEN
+    GEN -->|セットが方式を選ぶ| SETS
+    DO --> BF
+    DO --> DM
+    DO --> OP
+</pre>
+<figcaption>図 1 アプリ設計書の 3 層（契約 / 方式 / セット）</figcaption>
+</figure>
 <div class="table-wrap">
 <table>
-  <thead><tr><th>ドキュメント</th><th>スコープ</th><th>状態</th></tr></thead>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
   <tbody>
-    <tr>
-      <td><code>index.html</code></td>
-      <td>アプリ設計の目次・検討メモ</td>
-      <td>A-4 で目次ページ化済み</td>
-    </tr>
-    <tr>
-      <td><code>requirements-notes.html</code></td>
-      <td>要件・運用イメージの記録（A-1 壁打ち記録。要件の参照元として維持）</td>
-      <td>作成済み（A-1）</td>
-    </tr>
-    <tr>
-      <td><code>design-outline.html</code>（本書）</td>
-      <td>全体方針・分冊間の整合を担う親ページ</td>
-      <td>作成済み（A-2、A-4 で親ページ化）</td>
-    </tr>
-    <tr>
-      <td><code>batch-flow.html</code></td>
-      <td>バッチ処理フロー設計 — 画像生成・SNS 投稿・インサイト収集（16-7 追加）の処理手順、冪等性・二重投稿防止、投稿ステータス管理、ワークフロー連携（環境変数の使い方）、セット別拡張ポイント</td>
-      <td><strong>Phase 9-2 で詳細化済み・Phase 10-1 で最終 Fix・Phase 16-7 でインサイト収集を追加</strong></td>
-    </tr>
-    <tr>
-      <td><code>data-model.html</code></td>
-      <td>データモデル / DB スキーマ設計 — ER 図・エンティティ一覧・キー方針、DDL、S3 キー設計、時刻の取り扱い、マイグレーション方針</td>
-      <td><strong>Phase 9-3 で詳細化済み・Phase 10-1 で最終 Fix</strong></td>
-    </tr>
-    <tr>
-      <td><code>operation.html</code></td>
-      <td>アプリ運用設計 — セット追加・廃止、プロンプト / キャプション管理、失敗時対応、トークン更新、SNS Secret 規約の運用</td>
-      <td><strong>Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</strong></td>
-    </tr>
-    <tr>
-      <td><code>generators/&lt;方式名&gt;.html</code></td>
-      <td>生成方式別設計書（1 方式 1 本。ルールはセクション 1.1、契約・カタログは <a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）</td>
-      <td>方式の本採用時に作成（試行段階では書かない）。現行の方式一覧は<a href="batch-flow.html#generator-catalog">方式カタログ</a>を参照</td>
-    </tr>
-    <tr>
-      <td><code>sets/&lt;set_code&gt;.html</code></td>
-      <td>セット別設計書（1 セット 1 本。ルールはセクション 1.1）</td>
-      <td>セット追加のたびに 1 本増える。現行のセット一覧は <a href="index.html#set-docs">index.html のセット一覧</a>を参照</td>
-    </tr>
+    <tr><td>設計書の分け方</td><td>共通設計書 4 本 + 方式別（<code>generators/</code>）+ セット別（<code>sets/</code>）。セット追加で <code>sets/</code> が 1 本、方式の本採用で <code>generators/</code> が 1 本増える（<a href="#doc-structure">1 章</a>）</td></tr>
+    <tr><td>処理の単位</td><td>1 回の画像生成バッチ起動 = 1 生成実行 = アカウントごとに 1 投稿（<a href="#invariant">2 章</a>）</td></tr>
+    <tr><td>セットの表し方</td><td>セットは DB のレコード・設定カラムと Scheduler・Secret で表し、スタックは機能単位（<a href="#set-docs">1.1</a>）</td></tr>
+    <tr><td>受け渡しの契約</td><td><code>SET_CODE</code>・<code>SCHEDULED_AT</code>・Secret 名規約の意味（<a href="#contract">5 章</a>）</td></tr>
   </tbody>
 </table>
 </div>
+</section>
+
+<h2 id="doc-structure">1. 設計書構成（docs/app/ のドキュメント一覧とスコープ）</h2>
+<p class="lead">アプリ設計書の一覧と、それぞれが何を持つかを表にする。全体方針と分冊間の整合はこのページ、ドメイン別の中身は各分冊が正。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ドキュメント</th><th>スコープ</th></tr></thead>
+  <tbody>
+    <tr><td><a href="index.html"><code>index.html</code></a></td><td>アプリ設計の目次・セット一覧・検討メモ</td></tr>
+    <tr><td><code>design-outline.html</code>（本書）</td><td>全体方針・分冊間とインフラ設計との整合</td></tr>
+    <tr><td><a href="batch-flow.html"><code>batch-flow.html</code></a></td><td>バッチ処理フロー — 画像生成（選定）・SNS 投稿・インサイト収集の処理手順、冪等性・二重投稿防止、投稿の状態、環境変数の使い方、生成方式の契約と方式カタログ、セット別拡張ポイント</td></tr>
+    <tr><td><a href="data-model.html"><code>data-model.html</code></a></td><td>データモデル — ER 図・エンティティ一覧・キー方針・テーブル定義の意図・S3 キー・時刻・DDL とマイグレーション</td></tr>
+    <tr><td><a href="operation.html"><code>operation.html</code></a></td><td>アプリ運用 — セット追加・廃止、プロンプト / キャプション / 音源の管理、投稿失敗時の対応、Secret とトークン、インサイト収集の運用</td></tr>
+    <tr><td><code>generators/&lt;方式名&gt;.html</code></td><td>方式別設計書（1 方式 1 本。ルールはセクション 1.1、契約・カタログは <a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）。方式の本採用時に作る</td></tr>
+    <tr><td><code>sets/&lt;set_code&gt;.html</code></td><td>セット別設計書（1 セット 1 本。ルールはセクション 1.1）。セットの一覧は <a href="index.html#set-docs">index.html</a></td></tr>
+    <tr><td><code>requirements-notes*.html</code></td><td>壁打ち記録（要件・テーマ決定の経緯）。設計書ではない</td></tr>
+  </tbody>
+</table>
+</div>
+<p>生産面（在庫の動画をどう作って置くか）の詳細はアプリ設計ではなく<a href="../production/index.html">生産の詳細設計</a>（<code>docs/production/</code>）が持つ。</p>
 
 <h3 id="set-docs">1.1 セット別設計書のルール（複数セット前提の 3 層構造）</h3>
-
-<div class="decision">
-  <span class="callout-title">経緯（2026-07-06 / 2026-07-12）</span>
-  A-4 計画レビューで「スクラップ&amp;ビルドでセットが増えていく前提で、共通・上位の設計は変更せず、
-  セットが増えるたびに設計書が 1 本増えるような管理しやすい体系にしたい」というユーザー要望を受け、
-  <strong>共通設計書とセット別設計書の 2 層構造</strong>を定めた（要望の記録は <a href="requirements-notes.html">A-1 壁打ち記録</a>の追記を参照）。
-  その後 2026-07-12 の D-3 通読時の議論で、生成方式もスクラップ&amp;ビルドで多数試作する想定であることから
-  <strong>方式層を加えた 3 層構造（契約 / 方式 / セット）</strong>への拡張を合意し、Phase 10-1 で反映した（2026-07-15。
-  経緯の記録は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の 10-1 を参照）。
-</div>
+<p class="lead">セットと生成方式が増えても共通設計書を変えずに済むよう、設計書を 3 層に分ける決まり <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。</p>
 
 <ul>
-  <li><strong>3 層構造</strong>: 共通設計書（本書 + 3 分冊）は全セット共通の骨格と<strong>生成方式の契約・方式カタログ</strong>を定め、<strong>セット追加・方式追加では変更しない</strong>（方式カタログへの 1 行追加を除く）。増える設計書は、生成方式の本採用で <code>docs/app/generators/&lt;方式名&gt;.html</code> が 1 本、セット追加で <code>docs/app/sets/&lt;set_code&gt;.html</code> が 1 本</li>
-  <li><strong>方式層のルール</strong>: 生成方式の設計は <code>batch-flow.html</code> に直接書き足さず、1 方式 1 本で分冊する（肥大化防止）。<code>batch-flow.html</code> に置くのは<strong>契約（方式インターフェース）と方式カタログ（1 方式 1 行の表）のみ</strong>（<a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）。試行段階では設計書を書かず、<strong>セットが本採用した時点で作成</strong>する</li>
-  <li><strong>セット別設計書の標準記載項目</strong>: テーマ、投稿先アカウント構成、スケジュール（投稿頻度）、プロンプトの作り方（固定 / AI 生成等）、キャプションの作り方（テンプレート / AI 生成等）、失敗時ポリシー、音源の構成（動画方式のセットのみ。Phase 14-4 で追加）、共通フローからの差分・特記事項</li>
+  <li><strong>3 層構造</strong>: 共通設計書（本書 + 3 分冊）は全セット共通の骨格と<strong>生成方式の契約・方式カタログ</strong>を定め、<strong>セット追加・方式追加では変更しない</strong>（方式カタログへの 1 行追加・状態の更新を除く）。増える設計書は、生成方式の本採用で <code>docs/app/generators/&lt;方式名&gt;.html</code> が 1 本、セット追加で <code>docs/app/sets/&lt;set_code&gt;.html</code> が 1 本</li>
+  <li><strong>方式層のルール</strong>: 生成方式の設計は <code>batch-flow.html</code> に直接書き足さず、1 方式 1 本で分冊する。<code>batch-flow.html</code> に置くのは<strong>契約（方式インターフェース）と方式カタログ（1 方式 1 行の表）のみ</strong>（<a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）。試行段階では設計書を書かず、<strong>セットが本採用した時点で作成</strong>する</li>
+  <li><strong>セット別設計書の標準記載項目</strong>: テーマ、投稿先アカウント構成、スケジュール（投稿頻度）、プロンプトの作り方（固定 / AI 生成等）、キャプションの作り方（テンプレート / AI 生成等）、失敗時ポリシー、音源の構成（動画方式のセットのみ）、共通フローからの差分・特記事項</li>
   <li><strong>拡張ポイント方式</strong>: セットごとに変わりうる箇所は、共通分冊側に「セット別拡張ポイント」として明示する（<a href="batch-flow.html">batch-flow.html</a> セクション 2・3）。新しい方式が共通の骨格に影響する場合は、共通分冊に拡張ポイントを追記した上で、セット別設計書には<strong>選択と差分のみ</strong>を書く（同じ情報を 2 箇所に書かない）</li>
   <li><strong>実データとの役割分担</strong>: プロンプト文言・スケジュール時刻等の実データの正は DB / CDK コード。セット別設計書には意図・方針・方式の選択を書く</li>
-  <li><strong>廃止時の扱い</strong>: セット廃止（スクラップ&amp;ビルド）では設計書を削除せず、廃止の旨を付けて履歴として残す（手順は <a href="operation.html#set-retire">operation.html セクション 2.2</a>）。<strong>廃止した生成方式も同じ扱い</strong>とする（設計書を残し、方式カタログのステータスを「廃止」にする）</li>
-  <li><strong>インフラは増えない</strong>: インフラ設計書・CDK スタックはセット追加で増えない・変わらない。スタックは機能単位であり、セットは「既存 ImageBatchStack 内の Scheduler 1 件 + Secrets Manager の Secret + DB レコード」として表現される（<a href="operation.html#set-add">operation.html セクション 2.1</a>）</li>
-  <li><strong>作成タイミング</strong>: 実ファイル・雛形は必要になった時点で作成する（<code>sets/</code> はセット追加時、<code>generators/</code> は方式の本採用時。両ルールとも適用済みで運用中）</li>
+  <li><strong>廃止・退役時の扱い</strong>: セット廃止（スクラップ&amp;ビルド）では設計書を削除せず、廃止の旨を付けて履歴として残す（手順は <a href="operation.html#set-retire">operation.html セクション 2.2</a>）。採用セットがなくなった生成方式も設計書を残し、方式カタログのステータスを「退役」（コードを残す）か「廃止」（コードからも外す）にする</li>
+  <li><strong>セットとインフラ</strong>: スタックは<strong>機能単位</strong>で、セットの追加だけでは増えない。セットは「Scheduler（ImageBatchStack の画像生成 + InsightsBatchStack のインサイト収集 2 件）+ Secrets Manager の Secret + DB レコード」として表される（<a href="operation.html#set-add">operation.html セクション 2.1</a>）。<strong>セットが新しい機能を持ち込む場合は、その機能のスタックが増える</strong>（umigame-soup-1 のコメント自動返信 = <a href="../infra/stacks.html#comment-reply">CommentReplyStack</a>）。このときインフラ設計書にもその機能の節が増える <a class="decision-ref" href="#d-04">→ 理由 D-04</a></li>
+  <li><strong>資材の共有</strong>: アプリ資材（コンテナ・CI/CD パイプライン）はサービス単位で全セットが共有し、セット差分は DB のセット設定と生成方式の strategy モジュール（<a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）で表す <a class="decision-ref" href="#d-02">→ 理由 D-02</a></li>
+  <li><strong>作成タイミング</strong>: 実ファイル・雛形は必要になった時点で作成する（<code>sets/</code> はセット追加時、<code>generators/</code> は方式の本採用時）</li>
 </ul>
 
-<div class="note">
-  <span class="callout-title">採用しない選択肢（2026-07-12 整理）</span>
-  セット間の独立性をさらに高める段階的エスカレーション、①<strong>デプロイ分離</strong>（Scheduler payload でセットごとに使うタスク定義リビジョンを固定）→
-  ②<strong>資材分離</strong>（セットをサービスとして切り出す）は、<strong>現時点では採用しない</strong>。
-  アプリ資材（コンテナ・CI/CD パイプライン）はサービス単位の共有を維持し、セット差分は DB のセット設定と
-  生成方式 strategy モジュール（<a href="batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>）で表現する。
-  なお、将来デプロイ分離を導入する場合はセット間の結合点が DB スキーマの後方互換性に移る点に留意する
-  （関連論点は<a href="../issues/index.html">課題体系</a>を参照）。
-</div>
-
 <h2 id="invariant">2. 全体方針: 処理単位の不変条件</h2>
+<p class="lead">全セット・全方式に共通する処理の単位を定める。<a href="batch-flow.html">バッチ処理フロー設計</a>の手順はすべてこの単位の上に立つ。</p>
 
-<div class="decision">
-  <span class="callout-title">不変条件: 1 回の画像生成バッチ起動 = 1 投稿（アカウントごと）</span>
-  1 回の生成実行が「1 投稿分のコンテンツ」を作る。この単位を <code>generation_runs</code>（生成実行）エンティティとして永続化し、
-  投稿バッチは生成実行を処理対象の単位とする。将来のカルーセル投稿でも「1 実行で生成された複数メディア = 1 投稿に束ねるメディア群」となり、この不変条件は変わらない。
-  動画（リール）対応（Phase 14）でも不変（1 実行 = 動画 1 本 = 1 投稿）。
-  将来の多プラットフォーム展開時は、同一の生成実行がアカウント数分の投稿レコードになる（内容は 1 つ）。
-</div>
-
-<div class="decision">
-  <span class="callout-title">処理単位を「生成実行」とした経緯（旧設計・A-2 初版からの変更）</span>
-  旧設計および A-2 初版は「画像」単位で投稿対象を検索していたが、A-2 レビューでのユーザー指摘
-  （投稿バッチの処理単位は「投稿」であるべき。画像単位では将来のカルーセルで画像の束ね方が定まらない）を受け、
-  「1 生成実行 = 1 投稿（アカウントごと）」を不変条件とし、投稿対象の単位を生成実行に変更した（2026-07-06）。
-  将来のセット別失敗時ポリシー（追いつく / 捨てる）は投稿対象の検索条件の切り替えで実現する想定（<a href="batch-flow.html#flow-sns">batch-flow.html セクション 3</a>）。
-</div>
-
-<p>この不変条件のもとでの処理手順の骨子（画像生成: セット解決 → 生成実行の作成 = 冪等性のアンカー → 生成・S3 保存・DB 登録 / SNS 投稿: 当回の生成実行〔セット × <code>SCHEDULED_AT</code> で特定。26-1 で最古選定から変更〕を対象にアカウントごとに投稿）は、分冊 <a href="batch-flow.html">バッチ処理フロー設計</a> に定める。</p>
+<p><strong>不変条件: 1 回の画像生成バッチ起動 = 1 投稿（アカウントごと）</strong>。1 回の生成実行が「1 投稿分のコンテンツ」を作り、この単位を <code>generation_runs</code>（生成実行）エンティティとして永続化する。投稿バッチは生成実行を処理対象の単位とする <a class="decision-ref" href="#d-03">→ 理由 D-03</a>。</p>
+<ul>
+  <li>カルーセル投稿でも「1 実行で生成された複数メディア = 1 投稿に束ねるメディア群」となり、この不変条件は変わらない</li>
+  <li>動画（リール）でも不変（1 実行 = 動画 1 本 = 1 投稿）。ストーリーズ再掲はリール成功後の追加の投稿行として同じ実行の内側で扱う</li>
+  <li>多プラットフォーム展開時は、同一の生成実行がアカウント数分の投稿レコードになる（内容は 1 つ）</li>
+</ul>
+<p>この不変条件のもとでの処理手順の骨子（画像生成: セット解決 → 生成実行の作成 = 冪等性のアンカー → 方式の実行・S3 保存・DB 登録 / SNS 投稿: 当回の生成実行〔セット × <code>SCHEDULED_AT</code> で特定〕を対象にアカウントごとに投稿）は、分冊 <a href="batch-flow.html">バッチ処理フロー設計</a> に定める。</p>
 
 <h2 id="data-model">3. データモデル概要</h2>
+<p class="lead">2 章の単位をテーブルの構造で保証する考え方の要約。テーブルの全体と ER 図は<a href="data-model.html">データモデル設計</a>が正。</p>
 
-<p>「1 生成実行 = 1 投稿」を構造で保証するため、<code>generation_runs</code>（生成実行）を中心に、
-<code>posts</code>（投稿 = 生成実行 × アカウント）・<code>post_media</code>（1 投稿 : N メディアの中間テーブル）・<code>caption_templates</code>（キャプションテンプレート）を新設し、
-<code>batch_sets</code> / <code>prompt_configs</code> / <code>generated_media</code>（生成メディア）/ <code>sns_accounts</code> / <code>batch_execution_logs</code> は旧設計の構造を踏襲・再編する。
-動画（リール）対応（Phase 14-4）で、生成物の一般化に伴い <code>generated_images</code> / <code>post_images</code> を <code>generated_media</code> / <code>post_media</code> にリネームし、
-音源ストックの <code>audio_assets</code> を新設した（<code>posts</code> にはメディア種別 <code>media_type</code> を追加）。
-効果測定はインサイト収集バッチ（第 3 のバッチ。Phase 16-7 設計 Fix）が <code>post_insights</code>（投稿別スナップショット）・<code>account_insights_daily</code>（アカウント日次）へ蓄積する。
-ER 図・エンティティ一覧・主キーと冪等性キーの分離方針は、分冊 <a href="data-model.html">データモデル設計</a> に定める。
-データモデルは全セット共通であり、セット間の違いはレコード・設定カラムで表現する。</p>
+<p><code>generation_runs</code>（生成実行）を中心に、<code>posts</code>（投稿 = 生成実行 × アカウント × メディア種別）・<code>post_media</code>（1 投稿 : N メディアの中間テーブル）・<code>generated_media</code>（生成メディア: 画像・動画）を置き、セット配下の設定として <code>batch_sets</code> / <code>prompt_configs</code> / <code>caption_templates</code> / <code>sns_accounts</code> / <code>audio_assets</code>（音源）を持つ。事前ビルド方式は方式ごとに在庫テーブル（<code>quiz_stock_items</code> / <code>ranking_stock_items</code> / <code>umigame_stock_items</code>）と出題履歴テーブル（<code>quiz_items</code> / <code>ranking_items</code> / <code>umigame_items</code>）の組を持つ。効果測定はインサイト収集バッチが <code>post_insights</code>（投稿別スナップショット）・<code>account_insights_daily</code>（アカウント日次）へ、コメント記録は <code>umigame_comment_logs</code> へ蓄積する。運用ログは <code>batch_execution_logs</code>。</p>
+<p>データモデルは全セット共通であり、セット間の違いはレコード・設定カラムで表現する。</p>
 
 <h2 id="operation">4. 運用方針の骨子</h2>
+<p class="lead">アプリの運用の方針を一覧にする。手順の正は<a href="operation.html">アプリ運用設計</a>。</p>
+<ul>
+  <li>セット追加: セット別設計書の作成 → Secret 作成・検証 → DB 登録 → Scheduler 追加 deploy → <code>is_active</code> で稼働開始</li>
+  <li>セット廃止: <code>is_active=0</code> + Scheduler 削除。データと設計書は残す</li>
+  <li>プロンプト / キャプション / 音源: DB 直接運用（管理画面は将来拡張）</li>
+  <li>投稿失敗時: 通知のみ・必要時のみ手動起動。一過性エラーは公開前だけアプリ内で 1 回やり直す（Phase 28）</li>
+  <li>トークン: 投稿用の Instagram トークンは手動で再認可し、リマインダー 1 件で期限を管理する。コメント返信用（umigame-soup-1）はトークン更新 Lambda が毎週自動で更新する</li>
+  <li>効果測定: インサイト収集バッチによる自動収集 + API 外指標の手動確認・月次 KPI 転記</li>
+</ul>
 
-<p>セット追加（セット別設計書の作成 → Secret 作成 → DB 登録 → Scheduler 追加 deploy）、セット廃止（<code>is_active=0</code> + Scheduler 削除。データと設計書は残す）、
-プロンプト / キャプションの DB 直接運用、投稿失敗時の対応（通知のみ・必要時のみ手動起動。一過性エラーは公開前だけアプリ内で 1 回やり直す〔Phase 28〕）、
-Instagram トークンの手動更新、効果測定（インサイト収集バッチによる自動収集 + API 外指標の手動確認。16-7 更新）の各方針は、分冊 <a href="operation.html">アプリ運用設計</a> に定める。</p>
-
-<h2 id="contract">5. ワークフロー連携・Secret 規約の意味付け（Phase A スコープ分の確定）</h2>
-
-<p>インフラ設計で「アプリ設計で確定する」とされていた項目のうち、大枠レベルで確定できるものを以下に定める。
-フロー上の使い方は <a href="batch-flow.html#contract-usage">batch-flow.html セクション 5</a>、Secret の運用は <a href="operation.html#secret-ops">operation.html セクション 5</a> を参照。</p>
+<h2 id="contract">5. ワークフロー連携・Secret 規約の意味付け</h2>
+<p class="lead">インフラ設計とアプリ設計の受け渡しに使う識別子の意味を定める。フロー上の使い方は <a href="batch-flow.html#contract-usage">batch-flow.html セクション 5</a>、Secret の運用は <a href="operation.html#secret-ops">operation.html セクション 5</a>。</p>
 
 <div class="table-wrap">
 <table>
@@ -164,33 +127,82 @@ Instagram トークンの手動更新、効果測定（インサイト収集バ�
     </tr>
     <tr>
       <td><code>SCHEDULED_AT</code></td>
-      <td>スケジュール実行時刻（UTC、Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> 由来）。<strong>生成実行（<code>generation_runs</code>）の冪等性キー</strong>（セット × <code>SCHEDULED_AT</code> で一意）であり、1 日複数回実行は DATETIME 粒度で区別される。インサイト収集バッチ（16-7 追加）も受け取り、<code>post_insights</code> の冪等性キーに使用する。<strong>SNS 投稿バッチも必須で受け取り、投稿対象の生成実行をセット × <code>SCHEDULED_AT</code> の完全一致で特定する</strong>（Phase 26-1〔2026-10-13〕で変更。形式は UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code> に固定し、欠落・不正時に現在時刻を代入したり最古の生成実行へフォールバックしたりしない。親 → 子 SFN の受け渡しは <a href="../infra/workflow.html#sns-asl">infra/workflow.html セクション 3・4</a>、選定と結果の分類は <a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>。実装は 26-2・本番切替は 26-3 で、切替までは旧契約〔<code>set_code</code> のみ〕で稼働）</td>
+      <td>スケジュール実行時刻（UTC、Scheduler の <code>&lt;aws.scheduler.scheduled-time&gt;</code> 由来）。<strong>生成実行（<code>generation_runs</code>）の冪等性キー</strong>（セット × <code>SCHEDULED_AT</code> で一意）であり、1 日複数回実行は DATETIME 粒度で区別される。インサイト収集バッチも受け取り、<code>post_insights</code> の冪等性キーに使用する。<strong>SNS 投稿バッチも必須で受け取り、投稿対象の生成実行をセット × <code>SCHEDULED_AT</code> の完全一致で特定する</strong>。形式は UTC・秒精度の <code>YYYY-MM-DDTHH:MM:SSZ</code> に固定し、欠落・不正時に現在時刻を代入したり最古の生成実行へフォールバックしたりしない（親 → 子 SFN の受け渡しは <a href="../infra/workflow.html#sns-asl">infra/workflow.html セクション 3・4</a>、選定と結果の分類は <a href="batch-flow.html#sns-target">batch-flow.html セクション 3.1</a>） <a class="decision-ref" href="#d-05">→ 理由 D-05</a></td>
     </tr>
     <tr>
       <td>SNS Secret 規約の構成要素</td>
-      <td><code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> のうち、<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>（作成後変更不可、Secret 名導出専用）。将来の 1 セット多プラットフォーム展開とも <code>{platform}</code> の分岐で整合する</td>
+      <td><code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> のうち、<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>（作成後変更不可、Secret 名導出専用）。1 セット多プラットフォーム展開とも <code>{platform}</code> の分岐で整合する</td>
     </tr>
     <tr>
       <td>アプリ用環境変数（<code>BATCH_SIZE_LIMIT</code> 等）</td>
-      <td><strong>件数の総量制御用は追加しない（Phase 9 で確定）</strong>。投稿対象が「当回の生成実行 1 件」のため旧設計のような総量制御は不要（<a href="batch-flow.html#contract-usage">batch-flow.html セクション 5</a>）。16-7 でインサイト収集バッチの収集ウィンドウ <code>MEDIA_LOOKBACK_DAYS</code> を追加した（総量制御ではなく対象期間の指定。<a href="batch-flow.html#insights-schedule">batch-flow.html セクション 4.1</a>）</td>
+      <td><strong>件数の総量制御用は追加しない</strong>（<a href="batch-flow.html#contract-usage">batch-flow.html セクション 5</a>）。インサイト収集バッチの収集ウィンドウ <code>MEDIA_LOOKBACK_DAYS</code> は総量制御ではなく対象期間の指定（<a href="batch-flow.html#insights-schedule">batch-flow.html セクション 4.1</a>）</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 <h2 id="phase9">6. 将来拡張（実装時期は未定）</h2>
+<p class="lead">分冊をまたぐ将来拡張の一覧。どれも未着手で、実装を始めるときに該当の分冊を具体化する。</p>
+<p>失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（AI によるプロンプト生成・カルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、生成 AI 動画方式、承認フロー、管理画面。</p>
 
-<p><strong>分冊横断の将来拡張</strong>: 失敗時ポリシーのセット別モード（追いつく / 捨てる）、生成枚数・プロンプト選択のセット別設定（AI によるプロンプト生成・カルーセル素材化・ローテーション等）、AI キャプション生成、カルーセル投稿処理、生成 AI 動画方式（簡易動画方式〔静止画 + 音楽のリール〕は Phase 14 で対応済み）、承認フロー、管理画面。インサイト収集バッチは Phase 16-7 で設計 Fix し将来拡張から外れた（<a href="batch-flow.html#flow-insights">batch-flow.html セクション 4</a>）。</p>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>バッチの処理手順・方式の契約と方式カタログ → <a href="batch-flow.html">バッチ処理フロー設計</a></li>
+  <li>テーブル・ER 図・S3 キー → <a href="data-model.html">データモデル設計</a></li>
+  <li>運用の手順 → <a href="operation.html">アプリ運用設計</a></li>
+  <li>セットごとの仕様 → <a href="index.html#set-docs">セット別設計書の一覧</a></li>
+</ul></div>
 
-<p class="note" style="margin-top:.5rem;">大枠 → 詳細（Phase 9）→ 最終 Fix（Phase 10-1）の線引き・持ち越しの経緯は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の 9-1〜9-5・10-1 を参照。</p>
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。なぜそうしたかをここにまとめる。番号は振り直さず、判断が覆ったら新しい番号で書き足す。</p>
+<article id="d-01">
+<h3>D-01 設計書を共通 / 方式別 / セット別の 3 層に分ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>共通設計書はセット・方式の追加で変えず、方式の本採用で <code>generators/</code> が 1 本、セット追加で <code>sets/</code> が 1 本増える体系にする</dd>
+  <dt>理由</dt><dd>A-4 計画レビューで「スクラップ&amp;ビルドでセットが増えていく前提で、共通・上位の設計は変更せず、セットが増えるたびに設計書が 1 本増えるような管理しやすい体系にしたい」というユーザー要望を受け、まず共通 / セット別の 2 層にした（要望の記録は <a href="requirements-notes.html">A-1 壁打ち記録</a>の追記）。その後、生成方式もスクラップ&amp;ビルドで多数試作する想定から、方式層を加えた 3 層（契約 / 方式 / セット）へ広げた。方式の設計を <code>batch-flow.html</code> に書き足さないのは肥大化を防ぐため</dd>
+  <dt>日付・出典</dt><dd>2026-07-06（2 層）・2026-07-12 合意 → 2026-07-15 反映（3 層。<a href="../plans/development-log.html">開発記録</a> の 10-1）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 セット間のデプロイ分離・資材分離はしない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>アプリ資材（コンテナ・CI/CD パイプライン）はサービス単位の共有を続け、セット差分は DB のセット設定と生成方式 strategy モジュールで表す</dd>
+  <dt>理由</dt><dd>現時点のセット数・変更頻度では、分離の手間に見合う独立性の利得がない</dd>
+  <dt>退けた案</dt><dd>①<strong>デプロイ分離</strong>（Scheduler の payload でセットごとに使うタスク定義リビジョンを固定）②<strong>資材分離</strong>（セットをサービスとして切り出す）の段階的エスカレーション。将来デプロイ分離を入れる場合は、セット間の結合点が DB スキーマの後方互換性に移る点に留意する（関連論点は<a href="../issues/index.html">課題体系</a>）</dd>
+  <dt>日付・出典</dt><dd>2026-07-12 整理</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 処理の単位を「画像」ではなく「生成実行」にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>「1 生成実行 = 1 投稿（アカウントごと）」を不変条件とし、投稿対象の単位を生成実行にする</dd>
+  <dt>理由</dt><dd>旧設計と A-2 初版は「画像」単位で投稿対象を検索していたが、A-2 レビューでのユーザー指摘（投稿バッチの処理単位は「投稿」であるべき。画像単位では将来のカルーセルで画像の束ね方が定まらない）を受けて変えた。将来のセット別失敗時ポリシー（追いつく / 捨てる）は、投稿対象の検索とは別の経路として設計する（<a href="batch-flow.html#future-failure-policy">batch-flow.html 3.4</a>）</dd>
+  <dt>退けた案</dt><dd>画像単位の投稿対象検索（旧設計）</dd>
+  <dt>日付・出典</dt><dd>2026-07-06（A-2 レビュー）</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 スタックは機能単位とし、セットの追加では増やさない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>CDK スタックは機能単位とし、セットは既存スタック内の Scheduler + Secret + DB レコードで表す。セットが新しい機能を持ち込むときだけ、その機能のスタックを足す</dd>
+  <dt>理由</dt><dd>Step Functions・ECS タスク定義・コンテナイメージを全セットで共有し、Scheduler が渡す <code>set_code</code> でセットを切り替える構成のため、セットごとのスタックは要らない（2026-07-06 のユーザー質問を受けて明記）。当初は「インフラ設計書・CDK スタックはセット追加で増えない・変わらない」と書いていたが、umigame-soup-1 はコメント自動返信という新しい機能を持ち込み CommentReplyStack が増えたため、「増えるのは機能の追加のとき」と改めた（課題 <a href="../issues/index.html#I-040">I-040</a> の掃除リスト）</dd>
+  <dt>日付・出典</dt><dd>2026-07-06・2026-10-18 改め（30-7）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 SNS 投稿バッチにも SCHEDULED_AT を渡す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>SNS 投稿の Step Functions にも <code>scheduled_at</code> を渡し、投稿バッチは当回の生成実行をセット × <code>SCHEDULED_AT</code> の完全一致で特定する</dd>
+  <dt>理由</dt><dd>A-3（インフラ設計との突き合わせ）の帰結は「SNS 投稿 Step Functions への <code>scheduled_at</code> 追加は不要」（最古の actionable な生成実行を選ぶ方式）だったが、空の生成実行が後続を塞ぐ事象（<a href="../issues/index.html#I-014">I-014</a>）が起きたため改めた（理由の詳細は <a href="batch-flow.html#d-06">batch-flow.html D-06</a>）</dd>
+  <dt>日付・出典</dt><dd>2026-07-06（A-3）→ 2026-10-13 改め（Phase 26-1。実装 26-2・本番切替 26-3）</dd>
+</dl>
+</article>
+</section>
 
-<div class="warn">
-  <span class="callout-title">A-3 で確認したこと（インフラ設計との突き合わせ）</span>
-  （履歴）A-3 時点の本書の帰結は「SNS 投稿 Step Functions への <code>scheduled_at</code> 追加は不要」だった。<strong>Phase 26-1（2026-10-13）でこの帰結を改め、SNS 投稿 Step Functions にも <code>scheduled_at</code> を渡す契約に変更した</strong>（空の生成実行が後続を塞ぐ <a href="../issues/index.html#I-014">I-014</a> への対応。現行の契約はセクション 5）。
-  A-3 では、インフラ設計書 6 本と本書・A-1 記録を突き合わせ、矛盾・欠落（blocker）のみ修正した。
-  <strong>2026-07-06 A-3 実施済み</strong>（修正内容は <a href="../plans/development-log.html">docs/plans/development-log.html</a> の A-3 備考を参照）。
 </div>
-
-</div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
 </body>
 </html>
