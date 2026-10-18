@@ -57,7 +57,7 @@ flowchart TB
 
 <h3>1.1 スケジュール管理</h3>
 <ul>
-  <li>EventBridge Scheduler で cron 式により画像生成 Step Functions・インサイト収集 Step Functions・コメント返信のトークン更新 Lambda を定期実行する（一覧は <a href="workflow.html">workflow.html 1.5・1.6・10.1</a>）</li>
+  <li>EventBridge Scheduler で cron 式により画像生成 Step Functions・インサイト収集 Step Functions・コメント返信のトークン更新 Lambda を定期実行する（一覧は <a href="workflow.html">workflow.html 1.5・1.6</a>、トークン更新の cron は <a href="stacks.html#comment-reply">stacks.html 3.6</a>）</li>
   <li>SNS 投稿バッチは画像生成 Step Functions の成功後に自動起動し、SNS 投稿用の EventBridge Scheduler は持たない <a class="decision-ref" href="#d-01">→ 理由 D-01</a></li>
   <li>スケジュールはバッチセットごとに個別設定可能とする</li>
   <li>スケジュール定義のマスタは IaC（CDK）とする</li>
