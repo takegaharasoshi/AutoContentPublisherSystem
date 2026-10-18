@@ -31,7 +31,11 @@ props 生成まで、`--skip-assets` はコーチ立ち絵の再取得を省略�
 
 ビルドツールのテストは `python -m pytest` で実行します（DB・Docker・ネットワークは不要）。
 
-`work/review.html` で動画、ループ継ぎ目を含む 5 枚のスチル、イラストを全数確認します。
+`python review_sheet.py` は過去の manifest を `work/review_archive.json` に累積し、
+`work/review.html` にバッチ一覧、`work/review/<バッチ名>.html` にレビューシートを出力します。
+各シートで動画、ループ継ぎ目を含む 5 枚のスチル、イラストを全数確認します。
+`--slot morning` のように対象を絞り、`--per-page 14` で 1 ページあたりの件数を指定できます。
+退避済みの manifest を初回取り込みする場合は `python review_sheet.py --seed-from work/build_manifest_pre-2026-09-w1.bak.json work/build_manifest_full_2026-09-w1.json …`（古い順。後が勝つ。2026-10-18 に取り込み済み） のように指定します。
 承認済み ID を 1 行ずつ `work/approved.txt` に記載してから、まず dry run を行います。
 
 ```bash

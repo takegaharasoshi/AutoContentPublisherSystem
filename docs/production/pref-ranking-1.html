@@ -173,6 +173,7 @@ flowchart TB
 
 <h3 id="build-review">3.4 全数レビュー</h3>
 <ul>
+  <li><code>review_sheet.py</code> は、ビルドのたびに <code>work/build_manifest.json</code> を累積の台帳 <code>work/review_archive.json</code> に足し、インデックス <code>work/review.html</code>（全バッチの一覧）とバッチごとのシート <code>work/review/&lt;バッチ名&gt;.html</code> を書く。バッチは <code>content_key</code> の番号と <code>stock_items.py</code> の <code>no</code> の一致で決める</li>
   <li>観点: ①背景の品質（文字・数字・記号が混じっていないか / 和モダンの画風か / 版面の読みやすさを邪魔しないか）②版面（県名・数値が正しく出るか / 金が沈んだりにじんだりしていないか / 文字の欠け・見切れ / 地図の点灯と順位の行が合っているか）③音（ナレーションが合っているか〔県名が停止のフラッシュに合うか〕・語尾が切れていないか・BGM とのバランス）</li>
   <li>NG は背景の作り直し・<code>bg_motif</code> / セリフ / 文言の修正（DB の更新）→ 再ビルドで直し、直るまで S3 へ置かない</li>
   <li><strong>承認はネタ単位</strong>（20 秒版もビルドしたときは 2 尺まとめて）。承認した <code>content_key</code> を <code>work/approved.txt</code> に 1 行ずつ書く <a class="decision-ref" href="#d-05">→ 理由 D-05</a></li>

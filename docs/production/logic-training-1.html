@@ -170,7 +170,7 @@ flowchart TB
 
 <h3 id="build-review">3.5 全数レビュー</h3>
 <ul>
-  <li><code>review_sheet.py</code> が動画・イラスト・完成 MP4 から抜いたスチル 5 枚（先頭 0f・各カット・末尾 479f）を一覧にする。先頭と末尾を隣に並べ、ループの継ぎ目を全数で目で見る。<code>--slot</code> で対象スロットを絞り、<code>--per-page</code>（既定 14）でページを分ける（スマホで見るため）</li>
+  <li><code>review_sheet.py</code> は、ビルドのたびに <code>work/build_manifest.json</code> を累積の台帳 <code>work/review_archive.json</code> に足し、インデックス <code>work/review.html</code>（全バッチの一覧）とバッチごとのシート <code>work/review/&lt;バッチ名&gt;.html</code> を書く。バッチは <code>stock_items.py</code> の問題文との一致で決める。シートは動画・イラスト・完成 MP4 から抜いたスチル 5 枚（先頭 0f・各カット・末尾 479f）を一覧にする。先頭と末尾を隣に並べ、ループの継ぎ目を全数で目で見る。<code>--slot</code> で対象スロットを絞り、<code>--per-page</code>（既定 14）でページを分ける（スマホで見るため）</li>
   <li>観点: ①イラストの品質（指定していない文字・数字・記号が混じっていないか / フラットイラストの画風か / 情景が問題と合っているか）②版面（文字の欠け・重なり・吹き出しとヒントの整合）③音（BGM・効果音のタイミングと音量）</li>
   <li>NG はイラストの作り直し（imagegen の再試行）か、<code>illustration_scene</code> の書き直し（DB の更新）→ 再ビルドで直し、直るまで S3 へ置かない</li>
 </ul>

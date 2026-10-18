@@ -121,7 +121,11 @@ python build.py --no-bgm --content-key 001-gyoza-spend
 python review_sheet.py
 ```
 
-`work/review.html` をブラウザで開き、ネタごとに 20 秒版・30 秒版、背景、版面文言、TOP5、cue 台本、BGM、実測ラウドネスを確認します。観点は ①背景イラストの品質（文字・数字・記号の混入、和モダン調、可読性）②版面（県名・数値・地図・見切れ）③音（同期・語尾切れ・BGM バランス）です。NG は背景・DB の文言・ナレーションを修正して再ビルドし、解消するまで承認しません。
+過去の manifest は `work/review_archive.json` に累積され、`work/review.html` がバッチ一覧、
+`work/review/<バッチ名>.html`（必要に応じて `-2.html` 以降）がシートです。
+ページ件数は `python review_sheet.py --per-page 14` で変更できます。
+ネタごとに 20 秒版・30 秒版、背景、版面文言、TOP5、cue 台本、BGM、実測ラウドネスを確認します。観点は ①背景イラストの品質（文字・数字・記号の混入、和モダン調、可読性）②版面（県名・数値・地図・見切れ）③音（同期・語尾切れ・BGM バランス）です。NG は背景・DB の文言・ナレーションを修正して再ビルドし、解消するまで承認しません。
+退避した manifest があるときは `python review_sheet.py --seed-from <古い manifest> <新しい manifest> …` で台帳へ取り込む（古い順。後が勝つ。現状の `work/build_manifest.json` は全 30 件を持つため取り込みは不要だった）
 
 承認したネタの `content_key` を 1 行ずつ `work/approved.txt` に書きます。空行と `#` から始まる行は無視されます。**承認はネタ単位（2 尺まとめて）** です（ユーザー Fix 2026-08-12。片方の尺だけ NG なら両尺とも保留し、直して再ビルドする）。
 

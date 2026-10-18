@@ -87,7 +87,7 @@ flowchart TB
   <tbody>
     <tr><td>① 候補の選別</td><td>G1a（候補の準備）の後</td><td>チャット</td><td>1 候補 3 行の一覧（朝・夜それぞれ目標の 2 倍）</td><td>候補 ID ごとに OK / NG / 保留。理由は任意</td></tr>
     <tr><td>② 完成稿のレビュー</td><td>G1b（完成稿の準備）の後</td><td>チャット（1 問ずつ）</td><td>1 問の全項目と表示場所・AI が気づいた懸念と代案</td><td>承認 / 修正の指示 / NG（差し替え）</td></tr>
-    <tr><td>③ 動画の全数レビュー</td><td>G2（投入〜ビルド）の後</td><td><a href="../../../content/video-build/logic-training-1/work/review.html">レビューシート <code>work/review.html</code></a>（ブラウザー）</td><td>1 問 1 カード（動画・スチル 5 枚・イラスト・問題文とヒント）</td><td>チャットで番号ごとに指摘、または「全件 OK」</td></tr>
+    <tr><td>③ 動画の全数レビュー</td><td>G2（投入〜ビルド）の後</td><td><a href="../../../content/video-build/logic-training-1/work/review.html">レビューシート</a>（インデックス <code>work/review.html</code> → バッチのシート。ブラウザー）</td><td>1 問 1 カード（動画・スチル 5 枚・イラスト・問題文とヒント）</td><td>チャットで番号ごとに指摘、または「全件 OK」</td></tr>
   </tbody>
 </table>
 </div>
@@ -141,7 +141,7 @@ m02 問題文: …
 
 <h3 id="review-video">3.3 ③ 動画の全数レビュー（レビューシート）</h3>
 <p class="lead">ビルドした動画を全部見て、S3 に置くものを決める関所。レビューシートを開いて見て、結果をチャットで返す。</p>
-<p><strong>AI が出すもの</strong>: <a href="../../../content/video-build/logic-training-1/work/review.html">レビューシート <code>content/video-build/logic-training-1/work/review.html</code></a>（<code>review_sheet.py</code> が作る。2 ページ目以降へはシート上部のページ送りから移れる）。1 ページ 14 本で、それより多いと <code>review-2.html</code>・<code>review-3.html</code> … に分かれる（今回分がどのページかは AI が伝える）。AI はイラストに指定外の文字が混じっていないか・サイズが 3:2 かを先に確かめ、気づいた点をチャットに添える。シートの 1 カードは次の 5 つ。</p>
+<p><strong>AI が出すもの</strong>: レビューシート（<code>review_sheet.py</code> が作る）。入口は<a href="../../../content/video-build/logic-training-1/work/review.html">インデックス <code>content/video-build/logic-training-1/work/review.html</code></a>で、過去のビルド分も含めたバッチの一覧（件数・最終ビルド日時・今回の印）から、バッチごとのシート <code>work/review/&lt;バッチ名&gt;.html</code> を開く。シートは 1 ページ 14 本で、それより多いと <code>&lt;バッチ名&gt;-2.html</code> … に分かれる。AI はイラストに指定外の文字が混じっていないか・サイズが 3:2 かを先に確かめ、気づいた点をチャットに添える。シートの 1 カードは次の 5 つ。</p>
 <ol>
   <li>① 動画（再生できる）</li>
   <li>② スチル 5 枚（先頭 0f・各カット・末尾 479f。先頭と末尾が隣に並ぶので、ループの継ぎ目が自然かを見る）</li>
