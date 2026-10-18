@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生産の詳細設計: pref-ranking-1 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">docs</a> / <a href="index.html">生産の詳細設計</a> / pref-ranking-1</nav>
+<h1>pref-ranking-1 の生産の詳細（ランキングストックと事前ビルド）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-5 で新設。<a href="../app/operation.html">運用設計</a> 3 節のランキングストック・<a href="../app/generators/ranking-prebuilt.html">ranking-prebuilt</a> 8 節・<code>common/README.md</code> の換算ルールを移した）</span>
+  <span>1 段上: <a href="../overview/functions/production-pref-ranking-1.html">機能別の基本設計 pref-ranking-1 の生産</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、<a href="../overview/functions/production-pref-ranking-1.html">機能別の基本設計 pref-ranking-1 の生産</a>の 1 段下で、ランキングストック（<code>ranking_stock_items</code>）の作り方と、事前動画（TOP5 地図ルーレット型・30 秒）のビルドから配置までの詳細を書く。手順の細部は補充スキル <a href="../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish</a>、執筆・レビュー・投入の実務の勘所は <a href="../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a>、実行コマンドは <a href="../../content/video-build/pref-ranking-1/README.md">ビルドツールの README</a> が正。矛盾したら本書 &gt; WRITING-NOTES &gt; スキルの順に勝つ。</p>
+<p class="lead">図 1 は、資材がどのファイル・ツールを通って S3 と DB に届くかを表す。ひし形は人の関所。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    R["一次情報（e-Stat・官公庁の xlsx / PDF）"] --> X["extract_*.py・common/convert.py&lt;br&gt;→ data/*.json（数値の単一ソース）"]
+    X --> S["文言とナレーション&lt;br&gt;&lt;バッチ&gt;/stock_items.py"]
+    S --> V["validate.py → generate.py"]
+    V --> H1{"素材のレビュー&lt;br&gt;全件承認まで投入しない"}
+    H1 -->|承認| I["insert_ranking_stock.sql&lt;br&gt;→ ローカル MySQL・Aurora"]
+    I --> P["export_prompts.py → imagegen&lt;br&gt;→ intake.py（背景）"]
+    P --> B["build.py&lt;br&gt;VOICEVOX → 予算検査 → Remotion → ラウドネス正規化"]
+    B --> H2{"動画の全数レビュー&lt;br&gt;review_sheet.py"}
+    H2 -->|承認| U["publish.py&lt;br&gt;S3・ローカル MySQL・Aurora"]
+</pre>
+<figcaption>図 1 資材の流れ（ファイルとツール）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>投稿の元</td><td>人のレビューを通ったランキングストックだけ</td></tr>
+    <tr><td>数値</td><td>一次情報のファイルを機械で読み取って得る。まとめ記事は使わず、<code>stock_items.py</code> に数値を手で書かない <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>動画</td><td>1080x1920・30fps・30 秒版だけ（2026-08-24 に尺を確定）。地図のルーレットで 5 位から 1 位まで発表し、VOICEVOX のナレーションと BGM を付ける</td></tr>
+    <tr><td>同期</td><td>ナレーションはタイムラインに固定したアンカーに置き、合成した長さが予算を超えたらビルドを止める <a class="decision-ref" href="#d-08">→ 理由 D-08</a></td></tr>
+    <tr><td>在庫</td><td>未使用かつ 30 秒版ビルド済みを 14 件（2 週間分）以上に保ち、週 1 回 7 ネタを目安に補充する</td></tr>
+    <tr><td>両環境の一致</td><td>投入・配置とも <code>content_key</code> で解決し、配置では Aurora まで既定で自動適用する <a class="decision-ref" href="#d-05">→ 理由 D-05</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="materials">1. 資材の置き場</h2>
+<p class="lead">この章は、機能別の基本設計 1 章の「素材の置き場」を詳しくしたもの。表 1 は、どの資材がどこにあるかを表す。置き方の決まり（バッチで完結・投入が済んだらコミット・派生物はコミットしない）は <a href="logic-training-1.html#materials">logic-training-1 の 1 章</a>と同じ。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 1 資材の置き場</caption>
+  <thead><tr><th>置き場</th><th>中身</th></tr></thead>
+  <tbody>
+    <tr><td><code>content/ranking-stock/pref-ranking-1/&lt;バッチ名&gt;/</code></td><td>1 バッチで完結する一式: 単一ソース <code>stock_items.py</code>（表示文言とナレーションだけ）・抽出 <code>extract_*.py</code> と出力 <code>data/*.json</code>（検証済みデータの単一ソースとしてコミットする）・検証 <code>validate.py</code>・生成 <code>generate.py</code>（<code>review.html</code> と投入 SQL）・リサーチの証跡 <code>research.md</code>・状態 <code>STATUS.md</code>。<code>review.md</code> / <code>review.html</code> は gitignore 済み</td></tr>
+    <tr><td><code>content/ranking-stock/pref-ranking-1/common/</code></td><td>バッチをまたぐ共通の道具: 家計調査の県換算（<code>convert.py</code>・世帯数の静的テーブル <code>households.csv</code>。2.2）と Aurora への適用（<code>apply_aurora.py</code>。Data API・自動一時停止からの復帰の再試行つき）。使い方は <a href="../../content/ranking-stock/pref-ranking-1/common/README.md">common/README.md</a></td></tr>
+    <tr><td><code>content/ranking-stock/pref-ranking-1/set-registration/</code></td><td>セット登録の SQL（音源の登録 <code>03_audio_assets.sql</code> など）</td></tr>
+    <tr><td><code>content/video-build/pref-ranking-1/</code></td><td>ビルドツール（3 章）と Remotion のコンポジション（<code>remotion/</code>）。VOICEVOX（白上虎太郎）の規約の証跡と地図・フォントのライセンスの証跡（<code>LICENSES.md</code>）も置く。生成物は <code>work/</code> で gitignore</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="stock">2. ランキングストックの作り方</h2>
+<p class="lead">この章は、図 1 の上半分（一次情報から投入まで）を詳しくしたもの。工程の順番とコマンドは <a href="../../.agents/skills/ranking-stock-replenish/SKILL.md">SKILL.md</a> のセクション 0〜6、フィールドごとの書き方は WRITING-NOTES.md が正。</p>
+
+<h3 id="research">2.1 ネタ選定とリサーチ</h3>
+<ul>
+  <li>ネタの基準は「下位の県の人が笑って自虐できるか」（<a href="../strategy/business-strategy.html">事業戦略書 6 節</a>。下位を晒さない TOP5 の版面が前提）</li>
+  <li>都道府県別の統計・調査を一次情報（官公庁の統計・業界団体の調査など）から集める。成果物は出典 URL・データ年・TOP5 の生の値まで。Codex に任せるときは検索を使う <code>codex --search exec</code> で行い、採否と数値は 2.2 の機械読み取りで取り直す</li>
+  <li>主な供給源は、家計調査の品目別ランキング（rank01〜14。<code>common/convert.py</code> で TOP6 の同値をすぐ判定できる）と社会生活基本調査の公表ランキングの系列。17-1 のネタ帳（<code>plans/ranking-set-research/neta-30.md</code>。git 管理外）は 17-7 で使い切った</li>
+</ul>
+
+<h3 id="data">2.2 データの検証と県への換算</h3>
+<ul>
+  <li>一次データとの突き合わせ・順位と値の再計算・市区町村の統計の県への換算を機械検証のスクリプトで行い、<code>ranking_data</code>（数値と都道府県コードだけ）を作る。出典と換算の計算過程は <code>source_note</code> に書く</li>
+  <li>投入ツールは <code>data/*.json</code> を読む。<code>value_prefix</code> / <code>value_suffix</code> は JSON の <code>meta</code> から転記する</li>
+</ul>
+<p>家計調査（県庁所在市・政令指定都市の 52 市）の品目別の値は、<code>common/convert.py</code> が次の規則で 47 都道府県の値にする（Phase 17 の決定。<a href="../app/sets/pref-ranking-1.html">セット別設計書 1 節</a>）。</p>
+<ol>
+  <li>公表の対象は 52 市 = 47 の県庁所在市（東京は「東京都区部」）+ 県庁所在市でない政令市 5（川崎・相模原・浜松・堺・北九州）</li>
+  <li>同じ県に複数の市がある 4 県は<strong>世帯数による加重平均</strong>で合わせる（神奈川県 = 横浜 + 川崎 + 相模原 / 静岡県 = 静岡 + 浜松 / 大阪府 = 大阪 + 堺 / 福岡県 = 福岡 + 北九州）<a class="decision-ref" href="#d-02">→ 理由 D-02</a></li>
+  <li>残りの 43 県は県庁所在市の値をそのまま県の値にする</li>
+  <li>合わせた後も母集団は県庁所在市・政令市の世帯だけなので、動画の出典行とキャプションに「※家計調査（県庁所在市・政令市の世帯数加重平均）」の類の注記を必ず入れる（<code>content_fields.source_display</code>）</li>
+</ol>
+<ul>
+  <li>世帯数のウェイトは<strong>二人以上の一般世帯数</strong>（一般世帯数の総数 − 世帯人員 1 人の一般世帯数）。出典は令和 2 年国勢調査の人口等基本集計 第 6-3 表で、52 市すべてを持つ（出典の詳細と取得日は <a href="../../content/ranking-stock/pref-ranking-1/common/README.md">common/README.md</a>）</li>
+  <li>国勢調査は 5 年ごと。令和 7 年の人口等基本集計が公表されたら <code>households.csv</code> を差し替え、<code>data_year</code> / <code>source_name</code> / <code>source_url</code> も替える。差し替えても既存のストックの <code>ranking_data</code> は計算し直さない（投入時点の出典・データ年を <code>source_note</code> が持つ。計算し直すなら動画の再ビルドを伴う）</li>
+  <li><code>convert.py</code> は家計調査専用。人口動態統計・社会生活基本調査など都道府県単位で公表される統計は換算せず、ネタの資材の側で直接 <code>ranking_data</code> を作る</li>
+</ul>
+
+<h3 id="adoption">2.3 ネタの採否のルール</h3>
+<ul>
+  <li><strong>TOP6 に同値があるネタは採らない</strong>。5 位と 6 位が同値のときも採らない（例: 睡眠時間 = 4 位が同率 2 県 / カレールウ = 5 位と 6 位が同額）。<code>validate.py</code> とビルド前の検査（3.2）も 1〜5 位の一意性を確かめる <a class="decision-ref" href="#d-03">→ 理由 D-03</a></li>
+  <li><strong>時刻・時分の指標は今のデータモデルに載らない</strong>。表示は <code>value</code> + <code>value_suffix</code> の組み立てなので、平均就寝時刻（23:39）のような表記は表せない（課題 <a href="../issues/index.html#I-023">I-023</a>）</li>
+  <li>TOP5 全体が団子のネタ（例: バナナ = 1〜5 位が 35 円幅）は、同値でなくても採らない（「1 位を当てる」演出の前提が崩れる。17-7・WRITING-NOTES.md）</li>
+  <li>データ年の古い統計を使うときはデータ年を明記する。僅差は同値でなければ採ってよく、<code>research.md</code> に順位の確定性の注記を残す。不採用とその理由も記録する</li>
+</ul>
+
+<h3 id="drafting">2.4 文言とナレーションの執筆</h3>
+<ul>
+  <li><code>title</code> / <code>content_fields</code>（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>value_suffix</code> / <code>subtitle</code> / <code>bg_motif</code>）/ <code>narration</code> を書く。<code>narration</code> は 30 秒版の cue 台本だけを書く（5.1 の cue 体系。既存の行の 20 秒版の台本は残してよい）</li>
+  <li><code>result_list</code> は手で書かず、ツールが <code>ranking_data</code> + <code>value_suffix</code> から整形して入れる（<a href="../app/data-model.html#detail-ranking-stock-items">データモデル設計 4.13</a>）</li>
+  <li>ナレーションは cue ごとの時間の予算（5.2）を意識して短く書く。長さは文字数ではなくモーラ数で見積もる（<code>12899円</code> は 6 文字だが読みは 19 モーラ相当）。金額・件数などの数値は読み上げず、版面の表示に任せる。<code>validate.py</code> がモーラの推定で予算を検査する</li>
+  <li>吹き出しで熟語の途中で改行しないかを目で見る（禁則処理で直らない語中の改行は文言で直す。4.2）</li>
+</ul>
+
+<h3 id="review">2.5 素材のレビュー</h3>
+<p>投入の前に、ユーザーが <code>review.html</code> で全件をレビューする（Claude が先に一次スクリーニングする）。観点は次の 4 つ。</p>
+<ol>
+  <li><strong>データの正しさ</strong>（出典が実在するか・データ年・県換算の再計算・TOP5 の順位）。誤ったデータを防ぐ唯一の関所</li>
+  <li>表現（下位を晒していないか・煽りすぎていないか・出典表記とキャプションの注記が妥当か）</li>
+  <li>既存のストックとの重複（同じテーマ・同じ出典が近くに並ばないか）</li>
+  <li>書式への適合（文字数・cue 台本の長さ・<code>bg_motif</code> が妥当か）</li>
+</ol>
+
+<h3 id="insert">2.6 投入</h3>
+<ul>
+  <li>レビュー済みのネタを両環境へ入れる。<code>content_key</code>（<code>{3 桁連番}-{slug}</code>。例: <code>001-gyoza-spend</code>）は、SQL が既存の最大連番 + 1 を適用時に解決し、両環境に同じ値で入る。<code>content_key</code> は NOT NULL なので、採番が漏れると投入時に必ずエラーになる</li>
+  <li>投入後に両環境の中身の一致（全行の MD5・<code>CHAR_LENGTH</code>）を確かめる（コマンドは WRITING-NOTES.md セクション 6）</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>工程ごとのコマンドと落とし穴 → <a href="../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish の SKILL.md</a></li>
+  <li>フィールドの出る場所・文体・モーラ推定の癖・投入のコマンド → <a href="../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a></li>
+  <li><code>ranking_stock_items</code> の列 → <a href="../app/data-model.html#detail-ranking-stock-items">データモデル設計 4.13</a></li>
+</ul></div>
+
+<h2 id="build">3. 事前ビルドパイプライン</h2>
+<p class="lead">この章は、図 1 の下半分（投入した行を動画にして配置するまで）を詳しくしたもの。投入しただけの行（<code>video_s3_key_30s IS NULL</code>）は投稿されない。表 2 は 5 つの工程と、それを受け持つツールを表す。</p>
+
+<h3 id="build-steps">3.1 5 つの工程</h3>
+<div class="table-wrap">
+<table>
+  <caption>表 2 事前ビルドの 5 工程</caption>
+  <thead><tr><th>工程</th><th>ツール</th><th>やること</th></tr></thead>
+  <tbody>
+    <tr><td>1. 対象の抽出</td><td><code>build.py --list</code></td><td>ビルドする尺の列（尺の確定により <code>video_s3_key_30s</code> だけ）が NULL の有効な行を挙げる（初回の 17-5 は 14 ネタ、17-7 で残り 16 ネタ、以後は補充分）</td></tr>
+    <tr><td>2. 背景の生成</td><td><code>export_prompts.py</code> → imagegen → <code>intake.py</code></td><td><code>content_fields.bg_motif</code> から 9:16 の背景を 1 ネタ 1 枚作る（尺をまたいで共用）。プロンプトにはセットの画風を固定する行（文言の正は <code>export_prompts.py</code>。<a href="../app/sets/pref-ranking-1.html">セット別設計書 4 節</a>の 5 要件）・サイズの明示行・「文字・数字・記号を描かない」を必ず入れる。原本は S3 の <code>assets/{set_code}/prebuilt/{content_key}_bg.png</code>（再ビルド用。DB には記録しない）</td></tr>
+    <tr><td>3. TTS とレンダリング</td><td><code>build.py</code></td><td><code>narration</code> を VOICEVOX（ローカルの Docker）で cue ごとに合成 → 実測の長さの予算検査（5 章。超えたらビルドエラー）→ 音声・<code>ranking_data</code>・版面の文言・背景を props にして Remotion でレンダリング → 配信のラウドネスにそろえる（5.4）。BGM は <code>audio_assets</code> の <code>time_slot IS NULL</code> の有効な曲から LRU で選び、<code>last_used_at</code> をビルド時に更新して <code>video_audio_asset_id</code> に記録する（尺をまたいで 1 曲）</td></tr>
+    <tr><td>4. 全数レビュー</td><td><code>review_sheet.py</code></td><td>動画・背景・版面の文言・TOP5・cue 台本・BGM・実測のラウドネスを一覧にし、ユーザーが全数を見る（3.4）</td></tr>
+    <tr><td>5. 配置</td><td><code>publish.py</code></td><td>承認した動画を <code>assets/{set_code}/prebuilt/{content_key}_30s.mp4</code> へ上げ、<code>video_s3_key_30s</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> をローカル MySQL と Aurora の両方へ更新する（3.5）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>ツールは 20 秒版にも対応したまま残してある（<code>build.py --durations 20s</code>。S3 は <code>{content_key}_20s.mp4</code>、列は <code>video_s3_key_20s</code>）。運用ではビルドしない。</p>
+
+<h3 id="tooling">3.2 ツールの構成と実行の境界</h3>
+<p>5 つの工程は <code>content/video-build/pref-ranking-1/</code> 直下のスクリプトで、logic-training-1 と同じ構成・同じ名前にしてある。<code>remotion/</code> 側のスクリプト（<code>build_narration.py</code> / <code>normalize_loudness.py</code> / <code>build_timeline.py</code>）は呼ばれる側で、ツールは薄い取りまとめに徹する。</p>
+<ul>
+  <li><strong>実行の境界</strong>: ツール本体は WSL ホストの Python で動かし、Docker が要る処理だけを外に出す（レンダリング = <code>remotion-render</code> イメージ、ラウドネスの正規化と背景の画像処理 = <code>image-batch</code> イメージ、TTS = VOICEVOX Engine の HTTP）。ホストに要る依存は <code>pymysql</code> / <code>boto3</code> だけで、PIL を使う <code>intake.py</code> だけはコンテナの中で動かす</li>
+  <li><strong>ナレーションの合成</strong>は <code>build_narration.build_narration()</code> をライブラリとして直接呼ぶ。予算検査の失敗を戻り値で受け、レンダリングへ進ませない</li>
+  <li><strong>props はツールが組み立てる</strong>（<code>build_props()</code>。ストックの行 → <code>PrefRankingProps</code>）。組み立ての前に、1〜5 位の一意性・<code>pref_code</code> の範囲・必須の <code>content_fields</code>・当該尺の cue ID の集合がタイムラインの定数と過不足なく一致すること・背景の JPEG があることを確かめる。1 件の不備で止めず、全件を処理してから失敗の一覧を出して終了コード 1 にする</li>
+  <li><strong>BGM は行に記録があれば必ず引き継ぐ</strong>: LRU で選ぶのは <code>video_audio_asset_id</code> が NULL の行だけで、記録がある行は <code>--rebuild</code> でなくても引き継ぎ、<code>last_used_at</code> も更新しない <a class="decision-ref" href="#d-04">→ 理由 D-04</a></li>
+  <li><strong>背景は 2 つの形で持つ</strong>: S3 に上げる原本 <code>{content_key}_bg.png</code>（1080x1920）と、レンダリング用の JPEG（<code>remotion/public/bg/</code>）。2MB 級の PNG のままだとフォントの読み込みが <code>delayRender</code> でタイムアウトする（17-3 の知見）</li>
+  <li><strong>検証用の <code>--no-bgm</code></strong>: BGM なしでツールを通しで確かめられる。この動画は <code>audio_asset_id</code> が null で記録され、<code>publish.py</code> が拒否する（本番へ出ない）</li>
+</ul>
+
+<h3 id="reuse">3.3 言語をまたいで再利用するための要件</h3>
+<p>ネタ・素材・コンポジションを英語のセットで使い回せるよう、次の 4 点を守る <a class="decision-ref" href="#d-06">→ 理由 D-06</a>。</p>
+<ol>
+  <li>背景に文字を焼き込まない（imagegen のプロンプトで「文字・数字・記号を描かない」を必ず指定する）</li>
+  <li>Remotion の画面の文言はすべて props から渡す（コンポーネント内に直書きしない。文言の正はストックの行の <code>content_fields</code> / <code>narration</code>）</li>
+  <li>TTS はアダプタ層で分ける（5.3。VOICEVOX 固有の呼び出しはアダプタの中だけ）</li>
+  <li>ネタの元データと県換算のテーブルは言語を含まない形で持つ（<code>ranking_data</code> は数値と都道府県コードだけ）</li>
+</ol>
+<p>ツールの共通部分の切り出しは英語のセットを足すときに行い、今は <code>pref-ranking-1</code> 専用の構成のまま。</p>
+
+<h3 id="build-review">3.4 全数レビュー</h3>
+<ul>
+  <li>観点: ①背景の品質（文字・数字・記号が混じっていないか / 和モダンの画風か / 版面の読みやすさを邪魔しないか）②版面（県名・数値が正しく出るか / 金が沈んだりにじんだりしていないか / 文字の欠け・見切れ / 地図の点灯と順位の行が合っているか）③音（ナレーションが合っているか〔県名が停止のフラッシュに合うか〕・語尾が切れていないか・BGM とのバランス）</li>
+  <li>NG は背景の作り直し・<code>bg_motif</code> / セリフ / 文言の修正（DB の更新）→ 再ビルドで直し、直るまで S3 へ置かない</li>
+  <li><strong>承認はネタ単位</strong>（20 秒版もビルドしたときは 2 尺まとめて）。承認した <code>content_key</code> を <code>work/approved.txt</code> に 1 行ずつ書く <a class="decision-ref" href="#d-05">→ 理由 D-05</a></li>
+</ul>
+
+<h3 id="publish">3.5 配置</h3>
+<ul>
+  <li><code>publish.py</code> は S3・DB に触れる前に、承認の対象を全件検査する（manifest があるか・MP4 と背景の PNG があるか・<code>audio_asset_id</code> が記録されているか）。1 件でも欠ければ中断し、一部だけの配置を作らない</li>
+  <li>ローカル MySQL はビルドした尺の列だけを 1 トランザクションで更新し、Aurora へは既定で Data API（<code>common/apply_aurora.py</code>）で自動適用する <a class="decision-ref" href="#d-05">→ 理由 D-05</a>。SQL を作るだけにしたいときは <code>--no-aurora</code>（生成した SQL は常に <code>work/update_prebuilt.sql</code> に残る）</li>
+  <li>S3 のキー・ローカルの UPDATE・Aurora の SQL のどれも環境ごとの <code>id</code> を使わず、<code>content_key</code> で解決する。Aurora 側の <code>video_audio_asset_id</code> は <code>audio_assets.s3_key</code> からのサブクエリで解決し、WHERE に同じ音源の <code>EXISTS</code> を置く（Aurora に該当の音源がないとき、NULL で黙って上書きせず更新行数 0 で気づける。<code>video_audio_asset_id</code> が NULL だと実行時に異常終了する）</li>
+  <li><code>publish.py</code> は承認ファイルに載っている全部の <code>content_key</code> を対象にする。既定の累積の <code>approved.txt</code> のままだと、配置済みのネタも上げ直して <code>video_built_at</code> を書き換えるので、補充のたびにそのバッチ分だけを並べたファイルを作って <code>--approved-file</code> で渡す（累積の <code>approved.txt</code> は承認の台帳として残す。17-7 で判明）</li>
+  <li>未ビルドの行が残っても投稿は止まらない（その尺の候補から外れるだけ）。実行時の WARNING と在庫確認（7 章）で見つかるので、投入したらビルドまで続けて終える</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>事前準備（イメージ・フォント・五郎の素材・VOICEVOX の起動）と工程ごとのコマンド → <a href="../../content/video-build/pref-ranking-1/README.md">content/video-build/pref-ranking-1/README.md</a></li>
+  <li>投稿時の動画の選び方・取得 → <a href="../app/generators/ranking-prebuilt.html#stock">方式設計書 ranking-prebuilt 4・5 節</a></li>
+  <li>話者・デザイントークン・キャラの配置値などセットの設定 → <a href="../app/sets/pref-ranking-1.html">セット別設計書 pref-ranking-1</a></li>
+</ul></div>
+
+<h2 id="composition">4. 動画の作り（TOP5 地図ルーレット型）</h2>
+<p class="lead">この章は、3.1 の工程 3 で描く動画の中身を書く。版面は 1080x1920 / 30fps で、上からタイトル帯・日本地図（ルーレットの主役）・順位の行の積み上げ・キャラの常駐枠と吹き出し・出典行の帯。配色はパレットのトークン（<code>Palette</code> 型）で動かし、値は<a href="../app/sets/pref-ranking-1.html">セット別設計書 8 節</a>のデザイントークンが正。実装の正は <code>content/video-build/pref-ranking-1/remotion/</code>（<code>layout.ts</code> = 寸法 / <code>theme.ts</code> = トークン / <code>scripts/build_timeline.py</code> = タイムラインの定数〔<code>src/timeline.json</code> は生成物〕 / <code>PrefRankingVideo.tsx</code> = 版面）。</p>
+<p>各順位の発表は「地図の上で候補の県が速く光る（スピン）→ 停止のフラッシュで確定 → 確定した県が順位の色に塗られ、順位の行に県名と数値が足される」の繰り返し。確定した県は塗りが残るので、進むほど地図が塗り上がる。表 3 はシーンの配分を表す（17-4d の値。正は <code>build_timeline.py</code> の <code>DURATION_SPECS</code>）。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 3 タイムライン（フレーム。30fps）</caption>
+  <thead><tr><th>尺</th><th>シーンの配分</th></tr></thead>
+  <tbody>
+    <tr><td><strong>30 秒版</strong>（900f。運用中）</td><td>導入 89 → 煽り 61 → 5 位〜2 位 各 123（スピン 30 + 発表 39 + 順位のコメント 54）→ 1 位 タメ 87 + 発表 54 → 結果総覧 72（TOP5 の一覧の画面 = スクリーンショット保存の受け皿）→ 締め 45。結果総覧と締めは <code>closing</code> 1 本の cue でまたぐ</td></tr>
+    <tr><td>20 秒版（600f。ビルドしない）</td><td>導入 70 → 煽り 64 → 5 位〜2 位 各 72（スピン 30 + 発表 42）→ 1 位 タメ 72 + 発表 48 → 締め 58</td></tr>
+  </tbody>
+</table>
+</div>
+<p>2 尺を作ったのは「20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い」の仮説を確かめるためだったが、検証せずに 30 秒で確定した（<a href="../app/sets/pref-ranking-1.html">セット別設計書 3 節</a>）。</p>
+
+<h3 id="layout">4.1 版面の構成</h3>
+<ul>
+  <li><strong>タイトル帯は 2 段</strong>: 上段に金でセット固定のラベル（「都道府県ランキング TOP5」= <code>labels.setLabel</code>）、下段にネタのタイトル 56px・1 行。縁は下辺だけ 2px・不透明度 50%</li>
+  <li><strong>タイトル帯・地図・全国平均のプレートは登場アニメなしで 0 秒から出す</strong> <a class="decision-ref" href="#d-07">→ 理由 D-07</a></li>
+  <li><strong>順位の行</strong>は下端に固定し、5 位から上へ 1 行ずつ足す。未発表の「？？？」枠は置かない。空いている序盤は <code>content_fields.subtitle</code> の全国平均のプレートが受ける（固定のラベル「全国平均」は付けず、<code>subtitle</code> を 1 行でそのまま出し、最初の数字の位置で分けて前半を小さく・後半の数値を大きく描く）</li>
+  <li>順位の行は順位のバッジ + 県名 + 数値だけ（バーなし）。数値の前に <code>content_fields.value_prefix</code>（「年間」など）を置く。数値の小数の桁数は、その動画の 5 件の実値から 1 本の中でそろえる（全部整数の円額ネタは 0 桁）</li>
+  <li><strong>1 位の強調</strong>: 1 位の行は行高 104px（2〜5 位は 82px）+ 明るい金のグラデーション + 強いグロー。1 位の県名は発表時に 148px + 二重のグローのバーストで出し、余韻の後で順位の行へ落とす</li>
+  <li><strong>確定した県は「地図 → 順位の行へ県名が飛ぶ」</strong>動きで結ぶ。地図の上に順位のラベル（ピン）は置かず、確定した県は塗り + 縁 1.8px + <code>drop-shadow</code> で強める。2〜5 位のラベルは県の重心の真上から飛ばし、1 位だけ地図の中央下に大きく置く</li>
+  <li><strong>地図</strong>は viewBox の全域（0 0 1000 1000）で描く（陸地の外接矩形は x 3.9〜996.7 / y 0.0〜1000.0 で、切り詰めると九州南部と南西諸島のインセットが欠ける）。地図の箱は 890×866 で、拡大率は 1.04 倍が上限（行が増えるほど縮める。これ以上拡大すると九州南部が順位の行のゾーンへ押し出される）</li>
+  <li><strong>キャラ</strong>: 煽り・実況はキャラの吹き出しに出す（ナレーションの cue と同じテキスト = 音と字幕の二重化）。ポーズは 3 種（基本 → タメ〔1 位のスピン中〕→ 軍配〔1 位の発表後〕）。アセット・配置の値は<a href="../app/sets/pref-ranking-1.html">セット別設計書 7 節</a></li>
+  <li><strong>吹き出しの表示</strong>: スピン中は <code>labels.searching</code>（「第{rank}位は…？」）を点滅で出す。5〜2 位の cue は県名を含むので、吹き出しに出すのは停止のフラッシュから後だけ（スピン中に出すと結果が先に分かる）。冒頭だけは音と字幕を合わせず、ナレーションが <code>intro</code>（タイトルの読み上げ）を話す 0〜2.5 秒の間、吹き出しには <code>teaser</code> の問いかけを出す <a class="decision-ref" href="#d-07">→ 理由 D-07</a>。吹き出しは文字数で 48 → 44 → 40px に下げ、<code>line-break: strict</code> を指定する</li>
+  <li><strong>出典行</strong>は生成り 86% の角丸の帯で常に出し、必ず 1 行に収める（文字数から字送りを自動で決める。下限 20px。<code>source_display</code> は全角 36 文字以内が推奨）。家計調査のネタは換算の注記を帯に含める（文言の正は <code>content_fields.source_display</code>）</li>
+  <li><strong>下位を晒さない</strong>: TOP5 だけを扱い、下位（ワースト）の表示を版面に持たない（<a href="../strategy/business-strategy.html">事業戦略書 6 節</a>のネタの判定基準に合わせた構造上の歯止め）</li>
+  <li>結果総覧と締めは版面の上でひと続きの区間（<code>recapAt === closingAt</code>）で、シーンの境で版面を切り替えない。1 位の行だけ緩やかに明滅させる</li>
+  <li>props の <code>duration</code>（尺）は必須で、Composition は <code>calculateMetadata</code> で <code>props.duration</code> から <code>durationInFrames</code> を出す。cue には合成音声の実測の長さ <code>frames</code> を持たせ、音声の Sequence の長さに使う</li>
+</ul>
+
+<h3 id="readability">4.2 明るい背景での読みやすさの規定</h3>
+<p>生成り系の明るいパレットでは金（アクセント）が沈むので、次の規定を守る <a class="decision-ref" href="#d-09">→ 理由 D-09</a>。トークンの実値は<a href="../app/sets/pref-ranking-1.html">セット別設計書 8 節</a>。</p>
+<ul>
+  <li>生成りの地の上に金を単独で使わない。文字の金は淡墨茶（<code>sumiDeep</code>）の 8 方向の縁取り（outlineShadow）+ グローを必ず付ける</li>
+  <li>面の金（1 位の行の帯）は深金 → 金 → 明金のグラデーション + 内側の輪郭で作る（単色の金の面は使わない）</li>
+  <li>背景の上の減光は 3 層（全面のベース + 上帯 + 下帯）。中央の減光は 30% で、和紙のノイズとヴィネットを重ねる</li>
+  <li>禁則処理で直らない行またぎ（「マイホームの地図は、日 / 本海側にずらりだ！」のような語中の改行）は文言の側で直す（<code>content_fields.trivia</code> の書き直し → 再ビルド。WRITING-NOTES.md にも記載）</li>
+</ul>
+
+<h3 id="opening">4.3 冒頭 5 秒の動き</h3>
+<p>冒頭（30 秒版の 0.00〜5.00 秒 = <code>intro</code> 89f + <code>teaser</code> 61f）に、既存の区間へ動きを足してある。タイムラインの定数 <code>DURATION_SPECS</code> は変えていない <a class="decision-ref" href="#d-10">→ 理由 D-10</a>。パラメータの正は <code>src/PrefRankingVideo.tsx</code>（<code>PREHEAT_TICK</code> / <code>PREHEAT_LIT_INTENSITY</code> / <code>TEASER_POP_FROM</code> / <code>TEASER_NUDGE_AT</code> / <code>TEASER_NUDGE_DUR</code>）。</p>
+<ul>
+  <li><strong>予熱のスピン</strong>: 本番のスピンの前（<code>frame &lt; rounds[5].start</code>）も、フレーム 0 から県を点滅させる。速さは本番のスピンの最高速と同じ（<code>spinTicks</code> の初期間隔 = 2 フレーム固定・減速なし）。予熱の区間は <code>spinningRank</code> を <code>null</code> のままにする（吹き出しの点滅は本番のスピン中だけ）</li>
+  <li><strong>速さと眩しさを分ける</strong>: <code>JapanMap</code> の <code>litIntensity</code>（既定 1）で塗りの不透明度と <code>drop-shadow</code> のにじみだけを比例させ、縁取りは残す。予熱 0.42 → 本番のスピン 1.0 → 停止のフラッシュ最大の 2 段で 5.00 秒の変わり目を作る</li>
+  <li><strong>煽りの吹き出しの動き</strong>: 尻尾の付け根（<code>transformOrigin: 78px 100%</code>）を基点に、拡大 0.62 → 1.0 のポップイン（spring・約 0.4 秒）+ 減衰する 2 度の揺れ（0.43〜1.1 秒）。動きは 0〜1 秒に集める。不透明度は変えないのでフレーム 0 から読める。変形はレイアウトの後に効くので、改行の位置・フォントサイズの段階・尻尾の相対位置は変わらない。teaser の区間の外は恒等変換</li>
+</ul>
+
+<h3 id="map">4.4 地図と素材</h3>
+<p>地図は Natural Earth 10m admin-1（パブリックドメイン）から作る。生成は <code>remotion/scripts/build_japan_paths.py</code>（取得・投影・インセットの移設・出力）で、<code>src/japanPaths.ts</code> / <code>src/prefCentroids.ts</code> は自動生成物。差し替えるときも次を満たす <a class="decision-ref" href="#d-11">→ 理由 D-11</a>。</p>
+<ul>
+  <li><strong>県単位にパスを分ける</strong>（47 都道府県を個別に塗り分け・点灯できる）。鹿児島の離島（奄美・トカラ）は飛び地として分け、鹿児島が 1 位のとき本土と奄美が一緒に金になるようにする</li>
+  <li><strong>奄美の割り当てを補正する</strong>: Natural Earth は奄美群島を沖縄県に割り当てているので、生成スクリプトが北緯 27.0 度以北かつ東経 128.3 度以東のリングを鹿児島県へ付け替える。目印の島 21 件の県の割り当てを毎回検査し、合わなければビルドを失敗させる</li>
+  <li><strong>南西諸島のインセット</strong>: 沖縄と奄美・トカラを、本土と同じ投影のまま群ごと縮小 + 平行移動して関東沖へ置く（実際の相対配置が保たれる）。縮尺は 0.68。点線の L 字の囲み（<code>M686,960 L686,680 L1000,680</code>。角が房総半島のすぐ東）の見た目を正として縮尺を決めた。素材の viewBox が変わっても、この見た目（相対配置・L 字の角の位置・インセットが占める領域）を再現する</li>
+  <li><strong>版面に載せない離島</strong>: 伊豆諸島・小笠原諸島・硫黄島・南鳥島・大東諸島と、面積が約 12km² 未満の島</li>
+  <li><strong>1 位が沖縄のときだけ</strong>、発表に合わせてインセットの島々を 1.84 倍までバネ補間で拡大する。基点は群の右下（viewBox <code>995,950</code>）で、左上へ育つので viewBox からはみ出さない。その間、点線の L 字は消え、枠やパネルは出さない。1 位の県名のラベルとバーストの中心は拡大後の島の外接矩形を基準にする。鹿児島が 1 位のときは拡大しない（条件は <code>INSET_ONLY_PREF_CODES</code> = 沖縄）</li>
+  <li><strong>確定した県のラベルの起点</strong>は、鹿児島だけ本土の部分から取る（全リングの外接矩形の中心だとインセットに引かれて太平洋の上になる）。沖縄はインセットの位置</li>
+  <li><strong>キャラ</strong>: 表彰台五郎のポーズ 3 種は 1160x1220 の共通キャンバス・共通倍率にそろえてある（基準はボディ前面の「1」の高さと足元。<code>scripts/normalize_character.py</code>）。S3 は <code>assets/pref-ranking-1/goro_{base,suspense,gunbai}.png</code>（元のポーズは同じ場所の <code>source/</code>）</li>
+  <li><strong>フォント</strong>: Zen Kaku Gothic New（SIL OFL 1.1）。見出し（タイトル帯・順位の行の県名・吹き出し）= Black、本文（数値・出典行）= Medium・Bold。見出しは 1 ファイルを専用の family 名で weight 400 として読み込み、常に 400 で描く（同じ family に複数のウェイトを登録すると、太い字面のつもりが細い方で描かれたため）</li>
+  <li>ライセンスの証跡は <code>content/video-build/pref-ranking-1/LICENSES.md</code> の 4 節（地図）・5 節（フォント）</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>トークンの実値・キャラの配置値・話者の設定 → <a href="../app/sets/pref-ranking-1.html">セット別設計書 pref-ranking-1</a></li>
+  <li>冒頭の動きの経緯と退けた案 → <a href="../ideas/ranking-opening-hook.md">アイデア記録 ranking-opening-hook.md</a></li>
+</ul></div>
+
+<h2 id="tts-sync">5. ナレーションと TTS の同期</h2>
+<p class="lead">この章は、3.1 の工程 3 のうち、ナレーションを合成して動画のタイミングに合わせる部分を書く。ナレーションは cue（セリフ）ごとに合成し、タイムラインの定数に固定したアンカーのフレームへ置く。</p>
+
+<h3 id="cues">5.1 cue の体系</h3>
+<p>表 4 は <code>narration</code> JSON のキー（cue ID）と、置く位置を表す（<a href="../app/data-model.html#detail-ranking-stock-items">データモデル設計 4.13</a>）。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 4 cue の体系</caption>
+  <thead><tr><th>cue ID</th><th>内容</th><th>尺</th><th>置く位置</th></tr></thead>
+  <tbody>
+    <tr><td><code>intro</code></td><td>導入（タイトルの読み上げ。30 秒版も「〜、トップ5！」まででサブタイトルは読まない）</td><td>両方（テキストは尺別）</td><td>導入シーンの先頭</td></tr>
+    <tr><td><code>teaser</code></td><td>煽り（「みんなはどこだと思う？」の類。視聴者に 1 位を予想させる）。全ネタ必須 <a class="decision-ref" href="#d-12">→ 理由 D-12</a></td><td>両方</td><td>煽りシーンの先頭</td></tr>
+    <tr><td><code>r5</code>〜<code>r2</code></td><td>各順位の呼び込み + 県名を 1 本で（「まずは5位、埼玉県！」）</td><td>両方</td><td>県名の部分が停止のフラッシュに重なるように詰める（後ろ合わせ）</td></tr>
+    <tr><td><code>r1_call</code></td><td>1 位のタメの煽り</td><td>両方</td><td>1 位シーンのスピンの開始</td></tr>
+    <tr><td><code>r1_name</code></td><td>1 位の県名の読み上げ</td><td>両方</td><td>停止のフラッシュ</td></tr>
+    <tr><td><code>r5_comment</code>〜<code>r2_comment</code></td><td>順位ごとのひとこと</td><td>30 秒版だけ</td><td>各順位シーンのコメントの区間</td></tr>
+    <tr><td><code>closing</code></td><td>締めくくり（ネタの含意を口語で言い切る。<code>content_fields.trivia</code> の核を 1 文に）</td><td>30 秒版だけ</td><td>結果総覧の先頭（結果総覧と締めをまたぐ 1 本）</td></tr>
+    <tr><td><code>outro</code></td><td>締め（「みんなはわかったかな？」で全ネタ共通）</td><td>20 秒版だけ</td><td>締めシーン</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="anchors">5.2 固定アンカーと予算検査</h3>
+<p>アンカーの表と解決の処理の正は <code>remotion/scripts/build_timeline.py</code>（<code>cue_anchors()</code> / <code>resolve_cue_frames()</code>）。cue ごとに揃え方（<code>head</code> = 頭合わせ / <code>name</code> = 後ろ合わせ）と予算の区間 <code>[budget_start, budget_end)</code> を持ち、TTS の実測値（<code>frames</code> と、後ろ合わせの cue は県名の発話の開始位置 <code>name_offset_frames</code>）を渡すと、配置のフレームと違反の一覧を返す純関数 <a class="decision-ref" href="#d-08">→ 理由 D-08</a>。</p>
+<ul>
+  <li><code>head</code>: <code>start_frame = anchor</code>。<code>name</code>（<code>r5</code>〜<code>r2</code>）: <code>start_frame = anchor（停止のフラッシュ）- name_offset_frames</code></li>
+  <li>cue の間には <code>MIN_GAP_FRAMES = 2</code>（0.07 秒）の無音を必ず空ける</li>
+  <li>後ろ合わせの cue は、直前の cue と重なるときだけ後ろへずらす。ずらせる上限は <code>NAME_LAG_MAX_FRAMES = 8</code>（0.27 秒。県名の発話が停止のフラッシュより遅れる量）で、ここまで詰めても重なれば <code>head_overrun</code></li>
+  <li>頭合わせの cue はアンカーに固定したまま（ずらさず <code>head_overrun</code>）。<code>tail_overrun</code> は「次の cue の開始 − 最小の間」（最後の cue は総尺）で判定する。ほかに <code>missing</code>（実測なし）・<code>unknown</code>（尺にない cue ID）・<code>missing_name_offset</code></li>
+  <li>例外は投げず全件を返し、ツールがまとめて出す。予算内の余りは無音で吸収する。超過の対処はセリフを短くすることだけ（既定の話速 <code>speedScale</code> は上限の 1.2。これより速いと聞き取りにくい）</li>
+  <li>予算の区間は参考値として残してある（順位の cue は呼び込み 30f・県名 30f。20 秒版 <code>intro</code> 75f / <code>teaser</code> 60f / <code>r1_call</code> 75f / <code>r1_name</code> 60f / <code>outro</code> 90f、30 秒版 <code>intro</code> 105f / <code>teaser</code> 60f / 各 <code>*_comment</code> 45f / <code>r1_call</code> 90f / <code>r1_name</code> 75f / <code>closing</code> 150f）。頭の側の判定は区間ではなく直前の cue との重なりで行う <a class="decision-ref" href="#d-13">→ 理由 D-13</a></li>
+</ul>
+
+<h3 id="tts-adapter">5.3 TTS のアダプタと県名の位置の実測</h3>
+<ul>
+  <li>TTS はアダプタ層 <code>remotion/scripts/tts.py</code> に閉じてある。<code>CueRequest</code>（cue ID・テキスト・県名）→ <code>CueAudio</code>（WAV のパス・実測の秒・フレーム・<code>name_offset_frames</code>・話速・エンジンの識別子）が固定のインターフェースで、VOICEVOX の HTTP 呼び出しはこの中だけ。合成・検査・props の解決を通す CLI は <code>remotion/scripts/build_narration.py</code>（違反があれば props を書かずに終了コード 1）</li>
+  <li><code>name_offset_frames</code> は cue の <code>audio_query</code> のモーラの長さを積み上げて出す。県名は単体の <code>audio_query</code> でモーラの列を得て、cue のモーラの列の右端から一致を探す（読点のポーズも要素として積むので、ポーズを挟んだ県名でも一致する）</li>
+  <li>cue 全体の長さは WAV の実測から取り、モーラの積み上げの予測との差が 0.08 秒を超えたら異常終了する（エンジンの更新で長さのモデルが変わったことを見つけるため）</li>
+  <li>疑問形の語尾上げ（<code>enable_interrogative_upspeak</code>。既定で有効）は <code>audio_query</code> に出ず、合成時に末尾のモーラの母音が 1 つ足されるので、予測の側で補う（補わないと疑問形の cue が 0.15 秒ずれる）</li>
+  <li>話者・既定の合成パラメータは<a href="../app/sets/pref-ranking-1.html">セット別設計書 7 節</a></li>
+</ul>
+
+<h3 id="loudness">5.4 音のミックスとラウドネス</h3>
+<ul>
+  <li>相対のバランスだけをコンポジションで決め、配信のレベルはレンダリングの後にそろえる。<code>remotion/src/audio.ts</code> が BGM をナレーションの 18 LU 下に置き、<code>remotion/scripts/normalize_loudness.py</code>（ffmpeg <code>loudnorm</code> の 2 パス・映像は再エンコードしない）が I = -14 LUFS / TP = -1.5 dBTP を目標にそろえる（linear モードでピークの制約が効き、実測は -15.0 / -14.8 LUFS）</li>
+  <li>ダッキングはしない（ナレーションがほぼ全編を占め、常に効いて一定の減衰と変わらないため）</li>
+  <li>BGM は頭 0.5 秒のフェードイン / 尻 1.5 秒のフェードアウトで、曲が尺より短いときはループする。BGM の前処理（30 秒ちょうど・フェードは焼かない・I = -14 LUFS）は <code>prepare_bgm.py</code></li>
+</ul>
+
+<h2 id="rebuild">6. 再ビルドが必要になる変更</h2>
+<p class="lead">事前動画には版面・パレット・背景・ナレーション・BGM が焼き込まれている。次の変更は、該当する事前動画をすべて作り直して差し替える必要がある。</p>
+<ul>
+  <li>版面・タイムライン・尺の構成（コンポジションの改修 → 全量）。実例は 17-5c（版面 2 件の修正で初期 14 本を同じ版で作り直し）と R-1（冒頭の動き。2026-08-29 に使用済みを含む在庫 30 件を同じ版で作り直した）。どちらもコンポジションの版が混ざらないよう全量を作り直した <a class="decision-ref" href="#d-14">→ 理由 D-14</a></li>
+  <li>パレット（デザイントークン）・キャラのアセット・地図の SVG（17-4 の地図の差し替えは初期ビルドの前で影響なし）</li>
+  <li>BGM の差し替え（ミュート検知のときを含む。対象は <code>video_audio_asset_id</code> で特定する）・VOICEVOX の話者やセリフ</li>
+</ul>
+<p>一括の作り直しは <code>build.py --rebuild</code>。ビルド済みの行を対象に、BGM を <code>video_audio_asset_id</code> から引き継ぐので選曲の LRU を消費せず、<code>last_used_at</code>（投稿の順番）も変えない。作り直した後も全数レビュー → S3 の上書き → 両環境の DB 反映は新規と同じ。</p>
+
+<h2 id="inventory">7. 在庫と補充</h2>
+<p class="lead">この章は、補充の要否の判断に使う数え方と取り下げの扱いを書く。補充の目安と直近の在庫は<a href="../plans/pref-ranking-1.html">セット計画書</a>が持つ。共通する考え方（取り下げは <code>is_active=0</code>・在庫専用のアラームなし・再利用の WARNING は補充が遅れているしるし）は <a href="logic-training-1.html#inventory">logic-training-1 の 5 章</a>と同じ。</p>
+<ul>
+  <li><strong>投稿の順番</strong>: 当該尺がビルド済みの行だけの LRU の順繰り（<a href="../app/generators/ranking-prebuilt.html#stock">ranking-prebuilt 4 節</a>）</li>
+  <li><strong>稼働開始の条件</strong>（2026-08-24 のユーザー判断）: 14 ネタ（約 2 週間分）の 30 秒版がビルド・全数レビュー済みであること。消費は 1 日 1 投稿 × 7 日 = 週 7 ネタ。17-7 で残り 16 件を入れ、計 30 件がそろった</li>
+  <li><strong>補充</strong>: 週 1 回、7 ネタ（1 週間分）を目安に回し、未使用かつ 30 秒版ビルド済みを 14 件（2 週間分）以上に保つ</li>
+  <li><strong>在庫確認のクエリ</strong>（週次の補充の判断・投入の確認・ビルド漏れの検出に使う。尺は 30 秒で確定したので <code>*_30s</code> の列だけを見る。20 秒版はビルドしないので <code>unbuilt_20s</code> は在庫の全数と一致するのが正常で、<code>*_20s</code> の列は見ない）:
+<pre><code>SELECT
+       SUM(last_used_at IS NULL AND video_s3_key_20s IS NOT NULL) AS unused_built_20s, -- 20 秒スロットで投稿可能な未使用在庫
+       SUM(last_used_at IS NULL AND video_s3_key_30s IS NOT NULL) AS unused_built_30s, -- 30 秒スロットで投稿可能な未使用在庫
+       SUM(video_s3_key_20s IS NULL) AS unbuilt_20s,
+       SUM(video_s3_key_30s IS NULL) AS unbuilt_30s,
+       SUM(last_used_at IS NOT NULL) AS used,     -- 使用済み（再利用候補）
+       SUM(use_count)                AS total_uses
+FROM ranking_stock_items
+WHERE set_id = :set_id AND is_active = 1;</code></pre></li>
+  <li><strong>取り下げ</strong>: 誤ったデータや出典の問題が見つかったネタは <code>is_active=0</code>（行も S3 の動画も消さない）。有効在庫が 0 件になるとそのスロットの実行が異常終了するので、0 件になるなら先に代わりを入れる</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>補充の目安・直近の在庫・確認待ち → <a href="../plans/pref-ranking-1.html">セット計画書 pref-ranking-1</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 数値は一次情報を機械で読み取って得る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>一次情報のファイルを抽出スクリプトで読み、検証済みのデータ（<code>data/*.json</code>）を投入ツールが読む。<code>stock_items.py</code> に数値を書かない</dd>
+  <dt>理由</dt><dd>実行時に数値を確かめる仕組みはなく、投入前のレビュー（2.5 の①）が誤ったデータを防ぐ唯一の関所になる。機械で取り出して <code>data/*.json</code> を単一ソースにすると、出典からの再計算で確かめられる</dd>
+  <dt>退けた案</dt><dd>まとめ記事・ランキングサイトの値を使う</dd>
+  <dt>日付・出典</dt><dd>Phase 17-2・17-3</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 家計調査の市の値は世帯数の加重平均で県の値にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>同じ県の複数の市は、二人以上の一般世帯数で重みを付けて合わせる</dd>
+  <dt>理由</dt><dd>家計調査の支出額は「1 世帯あたりの平均」なので、単純な平均や合計は誤り。調査対象が二人以上の世帯なので、重みも二人以上の一般世帯数にする（総世帯数は施設等の世帯を含み、単独世帯を含む一般世帯数は大都市ほど大きく出る）。実際に効くのは 4 県の 9 市だけだが、透明性のため 52 市すべてを持つ</dd>
+  <dt>日付・出典</dt><dd>Phase 17 の決定（<a href="../plans/development-plan.html">開発計画</a> Phase 17 冒頭②）・2026-08-10 にウェイトを取得</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 TOP6 に同値があるネタは採らない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>1〜5 位の一意な順位が取れないネタと、5 位と 6 位が同値のネタを採らない</dd>
+  <dt>理由</dt><dd>TOP5 地図ルーレット型は 1〜5 位の一意な順位が前提。5 位と 6 位が同値だと、5 位だけを載せる根拠がなく順位付けが恣意的になる</dd>
+  <dt>日付・出典</dt><dd>17-3</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 BGM は行に記録があれば必ず引き継ぐ</h3>
+<dl>
+  <dt>決めたこと</dt><dd>LRU で選ぶのは <code>video_audio_asset_id</code> が NULL の行だけにする</dd>
+  <dt>理由</dt><dd>2 尺を別々のときにビルドすると、2 尺で別の曲が焼き込まれ、DB の記録が後にビルドした尺の曲で上書きされる。BGM は 2 尺共通の 1 曲という設計で、ミュート検知の運用が <code>video_audio_asset_id</code> を頼りにしている</dd>
+  <dt>日付・出典</dt><dd>2026-08-12（17-4e）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 承認はネタ単位、Aurora への反映は既定で自動にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>承認は 2 尺まとめてネタ単位で行い、<code>publish.py</code> は Aurora まで既定で適用する</dd>
+  <dt>理由</dt><dd>片方の尺だけ NG になる原因（背景・文言・セリフ）は両方の尺に共通するので、尺別に承認しても在庫の食い違いを増やすだけ。Aurora を自動にするのは、S3 とローカル MySQL だけが更新されて Aurora が取り残される片肺の状態を作らないため</dd>
+  <dt>日付・出典</dt><dd>2026-08-12（17-4e・ユーザー Fix）</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 英語のセットを見据えた再利用の要件 4 点</h3>
+<dl>
+  <dt>決めたこと</dt><dd>文字なしの背景・props 経由の文言・TTS のアダプタ層・言語を含まないデータの 4 点を必須にする。ツールの共通部分の切り出しは英語のセットを足すときまで行わない</dd>
+  <dt>理由</dt><dd>同じ内容を英語で出す海外向けのセットが計画にある（時期は未定）。ネタ・素材・コンポジションを言語違いで使い回せるようにする。切り出しを先にしないのは YAGNI</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（17-2 巡 2・巡 3・ユーザー Fix）</dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 冒頭から版面を出し、冒頭だけは吹き出しに問いかけを先に出す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>タイトル帯・地図・全国平均のプレートを 0 秒から出し、<code>intro</code> の間も吹き出しには <code>teaser</code> を出す。あわせて 17-4a で版面を作り込んだ（「？？？」枠とバーの廃止・県名が飛ぶ動き・タイトル帯 2 段・背景の減光を戻す・出典行を 1 行に）</dd>
+  <dt>理由</dt><dd>冒頭が空の版面はスキップされる。<code>intro</code> はタイトル帯と重なって情報が増えない一方、問いかけを早く出すほど「予想させてから見届けさせる」時間が延びる。版面の作り込みは、17-3 のプレビュー動画（実データ + 実背景）が「品位が低い」と評価されたため、モック比較 3 巡で決めた。地図のピンを置かないのはユーザー判断（代わりに塗りと縁で強める）。バーは長さと数値の二重表現になっていた。タイトル帯の上段がないと何のランキングか伝わらない。17-2 の中央の減光 46〜50% では背景がほぼ無地に見えた</dd>
+  <dt>退けた案</dt><dd>順位のバッジ・パルスリング・「第1位」の朱のバッジ（1 位の強調の比較モックで過剰な装飾として不採用）・地図上の順位のピン</dd>
+  <dt>日付・出典</dt><dd>2026-08-11（17-4a 版面デザイン工程）・17-4c（全国平均の固定ラベルの廃止: <code>subtitle</code> が自己完結した表示文字列で二重になり、平均でない指標〔009 温泉〕では内容の誤りになるため）</dd>
+</dl>
+</article>
+<article id="d-08">
+<h3>D-08 ナレーションは固定アンカー + 予算検査で合わせる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>各 cue の開始を尺別のアンカーに固定し、実測の長さが予算を超えたらビルドエラーにする（次の cue へ黙って食い込ませない）</dd>
+  <dt>理由</dt><dd>音声の長さに合わせてアンカーや尺を動かす方式では、セリフを直すたびに版面の演出（スピン・フラッシュ・行の追加）との同期が崩れ、タイムラインを決めた意味がなくなる。タイムラインの定数の単一ソースを Python 側（<code>build_timeline.py</code>）にしたのは、アンカーの解決と予算検査をするツールが Python で、TypeScript と同じ数値を二重に持つと尺の調整で必ずずれるため（<code>japanPaths.ts</code> と同じ生成物方式。20 秒版の値が 17-4a / 17-4b の値と一致することは pytest で固定）</dd>
+  <dt>退けた案</dt><dd>可変尺方式</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（17-2 巡 1）・17-4c（アンカーの表・後ろ合わせの実装）</dd>
+</dl>
+</article>
+<article id="d-09">
+<h3>D-09 明るい背景では金を単独で使わない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>4.2 の規定（縁取り・グラデーション・3 層の減光・出典行の帯）を恒久の規定にする</dd>
+  <dt>理由</dt><dd>生成り系の明るいパレットでは金が沈む。モック比較で決めた。縁取りの色は 17-4a でもう一色を藍から淡墨茶へ替えたのに合わせて読み替えた。中央の減光は 17-2 の 46〜50% を 17-4a で 30% に戻した</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（17-2 巡 1）・2026-08-11（17-4a）</dd>
+</dl>
+</article>
+<article id="d-10">
+<h3>D-10 冒頭 5 秒に予熱のスピンと煽りの吹き出しの動きを足す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>4.3 の動きを足し、タイムラインの定数は変えない</dd>
+  <dt>理由</dt><dd>視聴維持のカーブ 2 本の目視（2026-08-28）で離脱の崖は 0〜2 秒、0:05 を越えた人はほぼ完走すると分かった。一方 30 秒版の 0〜5 秒は、地図の拡大率が 1.04 固定・背景の ken-burns も 900f で 1.0→1.07 と気づけず、実質的に止まっていた。ミュートでも「予想しろ」という参加の要求が届くようにする（17-3 で <code>teaser</code> を必須にした意図をミュートの視聴者にも通す）。定数を変えないのは総尺・シーンの配分・予算検査に影響を出さないため</dd>
+  <dt>日付・出典</dt><dd>2026-08-29（R-1）。<a href="../ideas/ranking-opening-hook.md">アイデア記録</a>・<a href="../plans/pref-ranking-1-log.html">セット記録 3 節</a></dd>
+</dl>
+</article>
+<article id="d-11">
+<h3>D-11 地図をパブリックドメインの素材に差し替え、内容の誤りを補正する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>GFDL 由来の試作の素材をやめ、Natural Earth から作る。奄美の割り当てを補正し、インセットは群ごとに相似変換する</dd>
+  <dt>理由</dt><dd>素材のライセンスを PD にする（Phase 17 決定方針⑨）。奄美を補正しないと「鹿児島が 1 位で奄美が塗られない / 沖縄が 1 位で奄美まで塗られる」という内容の誤りになる。実際のジオメトリでは群ごとの変換で相対配置が自動的に保たれ、0.75 倍では L 字の枠に収まらなかったので、見た目を正として縮尺を 0.68 に決め直した。沖縄が 1 位のときの拡大は、インセットの島が小さく「1 位が金に光る」見せ場にならないため（17-4b のレンダリング確認でのユーザー判断。パネル方式も試作したが不採用）。五郎のポーズは試作で 1 枚ごとに寸法が最大 29% 違い、切り替えで伸縮していた。フォントは 4 案を実データで比べたユーザー判断</dd>
+  <dt>退けた案</dt><dd>拡大時のパネル方式・群ごとの個別の <code>translate</code></dd>
+  <dt>日付・出典</dt><dd>2026-08-11（17-4b）</dd>
+</dl>
+</article>
+<article id="d-12">
+<h3>D-12 煽りの cue を足し、5〜2 位の cue を 1 本にまとめる</h3>
+<dl>
+  <dt>決めたこと</dt><dd><code>teaser</code> を全ネタ必須にし、5〜2 位の呼び込みと県名を 1 本の cue にまとめる（1 位はタメと発表を分けたまま）。締めは 20 秒版を共通の問いかけに、30 秒版は <code>recap</code> + <code>outro</code> を <code>closing</code> 1 本にまとめた</dd>
+  <dt>理由</dt><dd>冒頭で一度参加させると完走率とコメントの両方に効くという想定。まとめて生まれた尺が <code>teaser</code> の原資で、総尺と 1 位・結果総覧・締めの配分は変えていない。1 位はタメ → 発表の間が演出の核なので分けたまま。30 秒版で県名を並べる <code>recap</code> は、結果総覧の画面とキャプションの <code>result_list</code> と重なり価値が低い。保存の呼びかけはナレーションから外れたが、キャプションの TOP5 の再掲が保存の動機を担う。まとめた cue は県名を含むので、後ろ合わせと吹き出しの表示を停止のフラッシュ以降にする制約が生まれた</dd>
+  <dt>日付・出典</dt><dd>2026-08-11（17-3 のストックレビュー）。<code>intro</code> の「30 秒版はサブタイトルまで読む」は 17-4c で撤回（<code>subtitle</code> は両尺とも 0 秒から画面に出るため）</dd>
+</dl>
+</article>
+<article id="d-13">
+<h3>D-13 頭の側の判定を直前の cue との重なりにし、話速を上限に上げて間を作る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>5.2 の判定基準（最小の間 2f・後ろ合わせのずれ上限 8f）にし、既定の話速を 1.1 → 1.2 に上げて、総尺を変えずにシーンの配分を組み直した（表 3 の値）</dd>
+  <dt>理由</dt><dd>実測すると 5〜2 位の cue の呼び込みは 29〜38f あり、17-4c の予算 30f を第 1 バッチの全件が超えた。一方、後ろ合わせに置いた実音声どうしの重なりは最悪 3f で、頭が 0.2 秒ほど前のシーンへ食い込んでも視聴上は問題ない（吹き出しは停止のフラッシュ以降のままで先に出ない）。第 1 バッチ 10 件 × 2 尺（cue 220 本）を話速 1.1 で合成して違反 0 件、県名の遅れは 80 本中 65 本が 0f・最大 6f。ユーザーの実物確認で「順位間の間がなさすぎでメリハリがない」となり、実測の最小の間が 2f しかなく発話の密度が 79% と高かったため、話速を上限まで上げ（ユーザー判断）、最悪のケースの最小の間が最大になる配分を選んだ。結果、最小の間は 15f（20 秒版）/ 13f（30 秒版）、典型は 0.5〜0.7 秒。補正後のモーラの予測と実測の差は中央値 0.01 秒・最大 0.06 秒</dd>
+  <dt>日付・出典</dt><dd>2026-08-11（17-4d）</dd>
+</dl>
+</article>
+<article id="d-14">
+<h3>D-14 コンポジションを直したら在庫を同じ版で全部作り直す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>版面を直したときは、使用済みを含めて在庫全部を同じ版で作り直して差し替える</dd>
+  <dt>理由</dt><dd>LRU の順繰りは在庫が尽きると使用済みの行を再投稿するので、旧版を残すと再び表に出る。17-5c では初期 14 本を通しで組んで初めて出た不具合（小数の桁がそろわない〔013-myhome-rate〕・小書き仮名の前での改行〔003-bread-spend〕）を直して 14 本すべてを作り直した</dd>
+  <dt>日付・出典</dt><dd>2026-08-26（17-5c）・2026-08-29（R-1）</dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
+</body>
+</html>

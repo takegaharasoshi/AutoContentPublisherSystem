@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生産の詳細設計: logic-training-1 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">docs</a> / <a href="index.html">生産の詳細設計</a> / logic-training-1</nav>
+<h1>logic-training-1 の生産の詳細（問題ストックと事前ビルド）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-5 で新設。<a href="../app/operation.html">運用設計</a> 3 節の問題ストックと <a href="../app/generators/quiz-prebuilt.html">quiz-prebuilt</a> 8 節を移した）</span>
+  <span>1 段上: <a href="../overview/functions/production-logic-training-1.html">機能別の基本設計 logic-training-1 の生産</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、<a href="../overview/functions/production-logic-training-1.html">機能別の基本設計 logic-training-1 の生産</a>の 1 段下で、問題ストック（<code>quiz_stock_items</code>）の作り方と、事前動画のビルドから配置までの詳細を書く。手順の細部（ゴールの切り方・コマンド・作問の勘所）は補充スキル <a href="../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a> が正で、ここには資材の置き場・工程ごとの入出力・守る規定・在庫の数え方を書く。</p>
+<p class="lead">図 1 は、資材がどのファイル・ツールを通って S3 と DB に届くかを表す。ひし形は人の関所。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    C["候補&lt;br&gt;candidates/&lt;バッチ&gt;/m01.md …"] --> H1{"候補の選別"}
+    H1 -->|OK| S["完成稿&lt;br&gt;&lt;バッチ&gt;/stock_items.py"]
+    S --> V["validate.py・verify_logic.py&lt;br&gt;→ generate.py"]
+    V --> H2{"完成稿のレビュー&lt;br&gt;1 問ずつ"}
+    H2 -->|承認| I["insert_quiz_stock.sql&lt;br&gt;→ ローカル MySQL・Aurora"]
+    I --> P["export_prompts.py → imagegen&lt;br&gt;→ intake.py（3:2 に整える）"]
+    P --> B["build.py&lt;br&gt;Remotion（Docker）+ ffmpeg の音"]
+    B --> H3{"動画の全数レビュー&lt;br&gt;review_sheet.py"}
+    H3 -->|承認| U["publish.py&lt;br&gt;S3・ローカル MySQL → Aurora に SQL"]
+</pre>
+<figcaption>図 1 資材の流れ（ファイルとツール）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>出題の元</td><td>人のレビューを通った問題ストックだけ。実行時に LLM で問題を作らない <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>資材の置き場</td><td>問題は <code>content/quiz-stock/logic-training-1/</code>、ビルドツールは <code>content/video-build/logic-training-1/</code>（どちらも git 管理）</td></tr>
+    <tr><td>動画</td><td>16 秒・3 カット・ナレーションなし。Remotion で映像を描き、ffmpeg で BGM と効果音を載せる <a class="decision-ref" href="#d-06">→ 理由 D-06</a></td></tr>
+    <tr><td>出題の条件</td><td>投入に加え、動画のビルド・レビュー・配置まで済んだ行（<code>video_s3_key IS NOT NULL</code>）だけが出題の候補になる</td></tr>
+    <tr><td>在庫の数え方</td><td>「型 × 難度」ごとの未使用かつビルド済み。7 問（1 週間分）を下回った組を補充する</td></tr>
+    <tr><td>両環境の一致</td><td>投入も配置もローカル MySQL と Aurora の両方へ同じ値で反映し、識別には環境ごとの <code>id</code> を使わない <a class="decision-ref" href="#d-08">→ 理由 D-08</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="materials">1. 資材の置き場</h2>
+<p class="lead">この章は、機能別の基本設計 1 章の「素材の置き場」を詳しくしたもの。表 1 は、どの資材がどこにあり、何をコミットするかを表す。資材をリポジトリで管理する <a class="decision-ref" href="#d-03">→ 理由 D-03</a>。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 1 資材の置き場</caption>
+  <thead><tr><th>置き場</th><th>中身</th><th>コミットの扱い</th></tr></thead>
+  <tbody>
+    <tr><td><code>content/quiz-stock/logic-training-1/&lt;バッチ名&gt;/</code></td><td>1 バッチで完結する一式: 単一ソース <code>stock_items.py</code>・機械検証 <code>validate.py</code> / <code>verify_logic.py</code>・生成 <code>generate.py</code>・リサーチの証跡 <code>research*.md</code>（<code>source_note</code> が指す出典の台帳）・投入した <code>insert_quiz_stock.sql</code>・再開地点の <code>STATUS.md</code>。補充では最新バッチの一式を新しいバッチ名（<code>2026-08-w3</code> など）へコピーして使う。参照実装は 16-2 の <code>2026-08-initial/</code></td><td>投入が済んだらディレクトリごとコミットする。<code>review.md</code> は <code>generate.py</code> の派生物で、<code>content/**/review.md</code> として gitignore 済み</td></tr>
+    <tr><td><code>content/quiz-stock/logic-training-1/candidates/</code></td><td>候補（1 候補 1 ファイル）・集計 <code>tally.py</code>・雛形・検証例・振り返りの記録 <code>reviews/</code>。形式・状態・集計規則の正は <a href="../../content/quiz-stock/logic-training-1/candidates/README.md">candidates/README.md</a></td><td>コミットする。<code>INDEX.md</code> は <code>tally.py</code> の生成物で、手で直さない</td></tr>
+    <tr><td><code>content/video-build/logic-training-1/</code></td><td>ビルドツール（<code>export_prompts.py</code>・<code>intake.py</code>・<code>build.py</code>・<code>review_sheet.py</code>・<code>publish.py</code>）と Remotion のコンポジション（<code>remotion/</code>）。実行コマンドの正は <a href="../../content/video-build/logic-training-1/README.md">同ディレクトリの README.md</a></td><td>ツール・プロンプト・ビルド台帳の変更は、ビルドが済んだときにコミットする。生成物（イラスト・MP4・レビューシート）は <code>work/</code> に置いて gitignore する（S3 と DB が正）</td></tr>
+    <tr><td><code>plans/</code></td><td>使い捨ての作業場。ストック資材は置かない</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="stock">2. 問題ストックの作り方</h2>
+<p class="lead">この章は、図 1 の上半分（候補から投入まで）を詳しくしたもの。手順の順番と各工程のコマンドは <a href="../../.agents/skills/quiz-stock-replenish/SKILL.md">SKILL.md</a> のセクション 0〜6 が正で、ここには工程ごとの規定を書く。</p>
+
+<h3 id="copyright">2.1 著作権の規定</h3>
+<p>出回っている問題のアイデアと解き方の構造は題材にしてよいが、問題文の文面は写さない <a class="decision-ref" href="#d-02">→ 理由 D-02</a>。</p>
+<ul>
+  <li><strong>書き直し</strong>: 問題文・答え・解説はすべて自分の言葉と、このセットの書式（世界観・文体・文字数の上限）で書く。登場人物・場面・数値は元から変え、解き方の構造だけを残す</li>
+  <li><strong>証跡</strong>: <code>source_note</code> に「元ネタの類型・参照元（URL 等）・表現は書き直した旨」を書く。別の台帳は持たない（音源のライセンスの証跡 3 点と同じ扱い）</li>
+  <li><strong>使わないもの</strong>: 特定の書籍・サイトに固有の独創的な問題（アイデア自体に強い独自性があり、出どころが特定できるもの）、実在の企業名を冠した出題（「○○社の入社試験」のように確かめられない断定）、問題集から数値・配役までそのまま流用したもの、解釈が割れて炎上しうる問題</li>
+</ul>
+
+<h3 id="research">2.2 リサーチ</h3>
+<ul>
+  <li>Web で類型の候補を出し、流布を裏取りする。採ってよいのは<strong>作者不詳で、複数の独立したサイトに出回っている問題</strong>だけで、出回っている例の URL を 1 件以上直接確かめて <code>research*.md</code> と候補の <code>source</code> に残す</li>
+  <li>成果物は「類型・解き方の構造の要約・出典 URL」まで。問題文を転載しない</li>
+  <li>裏取りの手段（Claude Code は WebSearch か委譲した Codex、Codex 直接セッションは組み込みの検索）はエージェントで違う。どちらでも採否はスキルを回しているエージェントが決める</li>
+</ul>
+
+<h3 id="candidates">2.3 候補と選別</h3>
+<p>完成稿を書く前に、問題文・答え・必要な図の内容・出典メモだけの「候補」を、朝と夜それぞれ目標の 2 倍用意し、人が OK / NG / 保留だけを返す <a class="decision-ref" href="#d-09">→ 理由 D-09</a>。</p>
+<ul>
+  <li><strong>集計</strong>: 不足 = 目標 − OK、追加 = 不足 × 2。朝と夜の両方で不足が 0 になるまで完成稿へ進まない。余った OK は候補のまま次のバッチへ持ち越す</li>
+  <li><strong>候補 OK は投入の承認ではない</strong>: 「仕上げてよい」の意味で、投入の承認は完成稿の 1 問ずつのレビュー（2.5）で行う。完成稿で NG になった問題は候補へ差し戻す（<code>final_ng</code>）</li>
+  <li><strong>NG と保留は消さない</strong>: 理由は任意で、後日の振り返り（<a href="../../.agents/skills/quiz-review-learn/SKILL.md">quiz-review-learn</a>）で言葉にし、合意した共通ルールだけを補充スキルの作問基準へ足す</li>
+  <li>状態（8 種）・必須項目・集計の検査は <a href="../../content/quiz-stock/logic-training-1/candidates/README.md">candidates/README.md</a> と <code>tally.py</code> が正</li>
+</ul>
+
+<h3 id="drafting">2.4 完成稿の執筆</h3>
+<ul>
+  <li>文体・題材の条件は <code>prompt_configs.prompt_text</code> の執筆ガイド（<a href="../app/sets/logic-training-1.html">セット別設計書 4 節</a>）に従い、文字数の上限は方式のフィールド仕様（<a href="../app/generators/gpt-quiz-multicut.html#stock">gpt-quiz-multicut 5 節</a>）を守る。問題文の上限は全角 80 字（版面が受けられる長さ。3.4）</li>
+  <li><code>hook</code> はキャプション冒頭のつかみとして問題ごとに書く。動画のカット 1 の吹き出しは固定文で、動画上部の「つかみ帯」はスロット別の <code>slot_hook</code>（<code>prompt_configs.parameters</code>）が受け持つ（16-4c から）</li>
+  <li>昼（L3 / フェルミ推定）は捻った分解型・解説は 5 ステップ・<code>explanation</code> は 240 字上限で書く（<a href="../app/generators/gpt-quiz-multicut.html#stock">gpt-quiz-multicut 5 節</a>）。昼は停止中で補充しない（<a href="../app/sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</li>
+  <li>機械検証は <code>validate.py</code>（文字数・tags 数・出典・実行時と同じ検証。image-batch の uv 環境で動かす）・<code>verify_logic.py</code>（算数・全列挙で答えを確かめる）・<code>generate.py</code>（レビュー用の <code>review.md</code> と投入 SQL）の 3 つ。なぞなぞ・とんちの想定解は機械で確かめられない</li>
+</ul>
+
+<h3 id="review">2.5 完成稿のレビュー</h3>
+<p>投入の前に、ユーザーが 1 問ずつレビューする。観点は次の 4 つ。</p>
+<ol>
+  <li><strong>誤答チェック</strong>（答え・解説が正しいか）。実行時に答えを検証する仕組みはなく、ここが誤答を防ぐ唯一の関所</li>
+  <li>表現の独自性（書き直しが十分か。2.1 の規定）</li>
+  <li>既存のストック・出題履歴との重複（同じ解き方の構造の問題が近くに並ばないか）</li>
+  <li>書式への適合（文字数・L3 の幅の表現「約〇〇（目安）」・トーン）</li>
+</ol>
+
+<h3 id="insert">2.6 投入</h3>
+<ul>
+  <li>レビュー済みの問題を、<code>generate.py</code> が出す <code>insert_quiz_stock.sql</code> でローカル MySQL と Aurora の両方へ入れる（<a href="../app/operation.html#set-add">運用設計 2.1 手順 2</a> の (6) の INSERT の形）。<code>quiz_type</code> / <code>difficulty</code> は <code>parameters.slots</code> の値と一致させ、<code>source_note</code> は必須</li>
+  <li><code>content_key</code>（<code>{slot_code}-{3 桁連番}</code>。V007）は、SQL がスロット内の既存の最大連番 + 1 を適用時に解決し、両環境に同じ値で入る。手で採番しない。<code>content_key</code> は NOT NULL なので、採番が漏れると投入時に必ずエラーになる</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>工程ごとのコマンド・作問の勘所・スロット別の書き方 → <a href="../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish の SKILL.md</a></li>
+  <li>候補ファイルの形式・状態・集計 → <a href="../../content/quiz-stock/logic-training-1/candidates/README.md">candidates/README.md</a></li>
+  <li><code>quiz_stock_items</code> の列 → <a href="../app/data-model.html#detail-quiz-stock-items">データモデル設計 4.10</a></li>
+</ul></div>
+
+<h2 id="build">3. 事前ビルドパイプライン</h2>
+<p class="lead">この章は、図 1 の下半分（投入した行を動画にして配置するまで）を詳しくしたもの。投入しただけの行（<code>video_s3_key IS NULL</code>）は出題されない。表 2 は 5 つの工程の入力・処理・出力を表す。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 2 事前ビルドの 5 工程</caption>
+  <thead><tr><th>工程</th><th>ツール</th><th>やること</th></tr></thead>
+  <tbody>
+    <tr><td>1. 対象の抽出</td><td><code>build.py --list</code></td><td><code>video_s3_key IS NULL</code> の有効なストック行を挙げる（初回の 16-3d は 42 問全部、以後は補充分）</td></tr>
+    <tr><td>2. イラストの生成</td><td><code>export_prompts.py</code> → imagegen → <code>intake.py</code></td><td>行の <code>illustration_scene</code> からプロンプトを作り、imagegen で生成し、3:2・1536x1024 に整える（3.1）</td></tr>
+    <tr><td>3. レンダリングと音</td><td><code>build.py</code></td><td>Remotion で映像を描き、ffmpeg で BGM と効果音を載せる（3.2〜3.4）</td></tr>
+    <tr><td>4. 全数レビュー</td><td><code>review_sheet.py</code></td><td>動画・イラスト・スチル 5 枚の一覧を作り、ユーザーが全数を見る（3.5）</td></tr>
+    <tr><td>5. 配置</td><td><code>publish.py</code></td><td>承認した動画を S3 へ上げ、ローカル MySQL と Aurora に反映する（3.6）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="illustration">3.1 イラスト</h3>
+<ul>
+  <li>プロンプトは <code>gpt-quiz-multicut</code> のコード側の固定プロンプト（情景 + スロット別のムード + ブランドの配色 + 禁止事項 = <a href="../app/generators/gpt-quiz-multicut.html#illustration">gpt-quiz-multicut 6 節</a>）を使い、<strong>画風の 1 行</strong>（フラットデザイン・ベクター調・写実の禁止・全枚の統一）を常に足す。組み立ては <code>export_prompts.py</code> だけが <code>gpt_quiz_multicut</code> の <code>_build_illustration_prompt</code> を使う <a class="decision-ref" href="#d-04">→ 理由 D-04</a></li>
+  <li>生成は Codex の組み込みの画像生成（imagegen）で行い、OpenAI Images API は使わない</li>
+  <li>プロンプトの末尾に<strong>サイズの明示行</strong>（<code>export_prompts.py</code> の <code>SIZE_LINE</code>。3:2・1536x1024）を付ける <a class="decision-ref" href="#d-05">→ 理由 D-05</a>。生成した側が保存ファイルのサイズを確かめ、違えば作り直す</li>
+  <li><code>intake.py</code> は 3:2 の中央切り抜き → 1536x1024 へ縮小し、3:2 でなかった素材は WARNING と切り捨て率を出す。見切れた問題だけイラストを作り直す。3:2 で来た素材は何も捨てない</li>
+</ul>
+
+<h3 id="render">3.2 レンダリングと音</h3>
+<ul>
+  <li><strong>実行の場所</strong>: <code>build.py</code> は WSL のホストで、対象の抽出・スロットの解決・props の生成（ローカル DB。依存は pymysql だけ）を行う。Remotion のコンポジション <code>Quiz16s</code>（Remotion 4 + React 19。版面・動き・タイムラインは <code>remotion/src/</code>、構成の一覧は <code>remotion/README.md</code>）は Docker（<code>remotion/Dockerfile.render</code>。WSL に Chrome の共有ライブラリがないため）で<strong>映像だけ</strong>を描き、<code>remotion/scripts/mix_audio.py</code> が image-batch イメージの ffmpeg で BGM と効果音を載せる（pref-ranking-1 の <code>build.py</code> と同じ方式）</li>
+  <li><strong>変えない条件</strong>: 尺 16 秒・3 カット・効果音 8.0 / 13.0 秒・音量・CRF 20・書体 Noto Sans JP。Python 側の単一ソースは <code>remotion/scripts/spec.py</code> で、<code>tests/test_timeline_sync.py</code> が <code>remotion/src/timeline.ts</code> と突き合わせる（TypeScript 側で壊すと pytest が落ちる）。答えはキャプションで明かし、TTS は入れない</li>
+  <li><strong>ループ</strong>: 周期のある動きは、すべて周期を 480 フレームの約数にする（<code>timeline.ts</code> の <code>LOOP_PERIODS</code>。外れるとモジュールの読み込み時に例外）。16 秒の末尾（frame 480 = 次の周回の 0f）の状態を先頭 0f に一致させ（479f の次に 0f が自然につながる）、継ぎ目は 15.8 秒で導入カットの状態へ切り替える（クロスフェードしない）。問題文はフレーム 0 から全文を出し、冒頭 0 秒にもコーチの跳ねを置く <a class="decision-ref" href="#d-06">→ 理由 D-06</a></li>
+  <li><strong>BGM</strong>: スロット別の LRU で選曲し、<code>last_used_at</code> をビルド時に更新する（<a href="../app/generators/quiz-prebuilt.html">quiz-prebuilt</a> 6 節）。<code>--rebuild</code> では既存の <code>video_audio_asset_id</code> を引き継ぎ、LRU を消費しない</li>
+  <li><code>services/image-batch</code> の <code>gpt_quiz_multicut.py</code> へのレンダリングの import 依存はない。<code>services/</code> 側の方式は休止方式として残してある</li>
+  <li>フォントは pref-ranking-1 の <code>remotion/public/fonts/</code> から <code>build.py</code> が複製する</li>
+</ul>
+
+<h3 id="layout">3.3 版面のセーフエリア</h3>
+<p>セーフエリアは高さで 2 つのゾーンに分ける。上部（時間帯のピル・つかみ帯・見出し・問題文）は左右対称の余白でカードの幅を使い切り、Instagram の UI のための右 12% は下部（イラスト・コーチ・吹き出し）にだけ空ける。本文の実効幅は 902px。</p>
+
+<h3 id="layout-derive">3.4 版面の導出（イラストを先に取る）</h3>
+<p>版面の定数は <code>remotion/src/layout.ts</code>、導出は <code>remotion/src/design.ts</code> が正。<strong>イラストの箱を先に確保してから、残りの高さに問題文を <code>fitText</code> で収める</strong>順に固定してある <a class="decision-ref" href="#d-07">→ 理由 D-07</a>。</p>
+<ul>
+  <li>イラストの保証高 <code>ILLUSTRATION_GUARANTEED_HEIGHT</code> = 500px と間隔 48px を、イラストの下端（コーチの真上 = y 1293）から引いた残り 294px が問題文に使える高さ</li>
+  <li>問題文は上限 68px・下限 44px・行間 1.4 で長さに応じて変わる（実測: 18 字 = 68px・2 行 / 50 字 = 54px・3 行 / 76 字 = 50px・4 行）。下限でも収まらなければ例外で落とす。これで受けられる問題文は全角 80 字まで（補充側の <code>question</code> の上限 80 字。<a href="../issues/index.html#I-035">I-035</a>）</li>
+  <li>つかみ帯 52px 上限・見出し「問題」72px・見出しから問題文まで 115px</li>
+  <li><code>containRect</code> は箱の<strong>上端寄せ</strong>（余りが出ても問題文の直下に置く。左右は中央）。イラストの実寸は 797×531px（最も長い問題でも 771×514px）</li>
+  <li>導出値は <code>tests/test_layout_design.py</code> が最短・中央・最長の 3 問で固定する（検査用の入口 <code>remotion/src/deriveDesignCli.ts</code> を esbuild で束ねて node で動かす。コンポジションからは参照しない）</li>
+</ul>
+
+<h3 id="build-review">3.5 全数レビュー</h3>
+<ul>
+  <li><code>review_sheet.py</code> が動画・イラスト・完成 MP4 から抜いたスチル 5 枚（先頭 0f・各カット・末尾 479f）を一覧にする。先頭と末尾を隣に並べ、ループの継ぎ目を全数で目で見る。<code>--slot</code> で対象スロットを絞り、<code>--per-page</code>（既定 14）でページを分ける（スマホで見るため）</li>
+  <li>観点: ①イラストの品質（指定していない文字・数字・記号が混じっていないか / フラットイラストの画風か / 情景が問題と合っているか）②版面（文字の欠け・重なり・吹き出しとヒントの整合）③音（BGM・効果音のタイミングと音量）</li>
+  <li>NG はイラストの作り直し（imagegen の再試行）か、<code>illustration_scene</code> の書き直し（DB の更新）→ 再ビルドで直し、直るまで S3 へ置かない</li>
+</ul>
+
+<h3 id="publish">3.6 配置</h3>
+<ul>
+  <li>承認した ID を <code>work/approved.txt</code> に書き、<code>publish.py</code> が動画を <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> へ上げる。イラストの原画 <code>{content_key}_illustration.png</code> も再ビルド用に一緒に置く（DB には記録しない）</li>
+  <li><code>quiz_stock_items</code> の <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>（V006）の 3 列を同時に更新する。<code>publish.py</code> はローカル MySQL を更新し、Aurora 用の <code>work/update_prebuilt.sql</code> を残す。運用者がこれを Data API で Aurora に適用し、更新行数が承認件数と一致することを確かめる</li>
+  <li>Aurora の SQL も S3 のファイル名も環境ごとの <code>id</code> を使わず、<code>set_code</code> + <code>question_text</code>（BGM は <code>s3_key</code>）と <code>content_key</code> で解決する（<a href="../app/data-model.html#detail-quiz-stock-items">データモデル設計 4.10</a>）。<code>work/</code> の中間生成物だけがローカルの id をファイル名に使う</li>
+  <li>未ビルドの行が残っても投稿は止まらない（出題の候補から外れ、ビルド済みの在庫で回る）。実行時の WARNING と在庫確認（5 章）で見つかるので、投入したらビルドまで続けて終える</li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>実行コマンド・環境変数・Docker イメージ → <a href="../../content/video-build/logic-training-1/README.md">content/video-build/logic-training-1/README.md</a></li>
+  <li>出題時の動画の選び方・取得 → <a href="../app/generators/quiz-prebuilt.html#stock">方式設計書 quiz-prebuilt 4・5 節</a></li>
+  <li>スロット・パレット・音源などセットの設定 → <a href="../app/sets/logic-training-1.html">セット別設計書 logic-training-1</a></li>
+</ul></div>
+
+<h2 id="rebuild">4. 再ビルドが必要になる変更</h2>
+<p class="lead">事前動画にはスロット別のパレット・<code>slot_label</code>・<code>slot_hook</code>・BGM・効果音・版面が焼き込まれている。表 3 の変更は、該当する事前動画をすべて作り直して差し替える必要がある。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 3 再ビルドが要る変更</caption>
+  <thead><tr><th>変更</th><th>範囲</th></tr></thead>
+  <tbody>
+    <tr><td>版面・カット構成・尺</td><td>全量。実例は 16-4c（3 カット化・つかみ帯・ズーム廃止。全 63 本）・改修 R-1（Remotion へ載せ替え。2026-09-03。朝・夜 56 本）・改修 R-2（イラスト優先の配分。2026-09-19。朝・夜 70 本）。R-1・R-2 では停止中の昼 21 本を <code>--slot</code> で外し、旧版のまま残した（再開を決めたときにまとめて作り直す）</td></tr>
+    <tr><td><code>parameters.slots</code> の型・難度とスロットの対応、パレット・<code>slot_label</code> / <code>slot_hook</code></td><td>該当スロット（動画は行の型・難度で決まるスロット向けに作るため、対応を変えると版面とスロットが食い違う）</td></tr>
+    <tr><td>BGM の差し替え（ミュート検知のときを含む）</td><td><code>video_audio_asset_id</code> で特定した動画。<code>is_active=0</code> にするだけではビルド済みの動画に古い曲が残る（<a href="../app/operation.html#mute-check">運用設計 4.4</a>）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>一括の作り直しは <code>build.py --rebuild</code>（<code>--slot &lt;slot_code&gt;</code> を複数指定して対象を絞れる）。ビルド済み（<code>video_s3_key IS NOT NULL</code>）の行を対象に、BGM を <code>video_audio_asset_id</code> から引き継ぐので選曲の LRU を消費せず、<code>last_used_at</code>（出題の順番）も変えない。そのため差し替えで同じ問題が再投稿されることはない。作り直した後も全数レビュー → S3 の上書き → 両環境の DB 反映は新規と同じ。R-1・R-2 は補充分だけ新しい版面にする段階的なビルドをせず、稼働中の在庫をまとめて作り直して全数をレビューしてから差し替えた。効果は差し替えの 2 週間後に<a href="../plans/logic-training-1.html#pending-checks">セット計画書の確認待ち</a>で判定する。</p>
+
+<h2 id="inventory">5. 在庫と補充</h2>
+<p class="lead">この章は、補充の要否の判断に使う数え方と、取り下げの扱いを書く。補充の目安の値と直近の在庫は<a href="../plans/logic-training-1.html">セット計画書</a>が持つ。</p>
+<ul>
+  <li><strong>出題の順番</strong>: 型・難度で絞った LRU の順繰り。未使用を使い切ると最も古く使った問題を自動で再利用するので、在庫切れで投稿は止まらない。再利用すると WARNING がログに出る（補充が遅れているしるし）</li>
+  <li><strong>初期在庫</strong>（16-2 で投入）: 42 問 = 2 週間分（当時の消費は週 21 問。L1/light 14・L3/standard 14・L1/deep 14）</li>
+  <li><strong>補充</strong>: 週 1 回、各「型 × 難度」の未使用かつビルド済みが 7 問（1 週間分）以上を目安に回す。再利用の WARNING が出たら優先して補充する。停止中の昼（L3 / standard）は補充せず、既存の在庫を凍結扱いにする（下のクエリの L3 / standard 行は判断に使わない）</li>
+  <li><strong>在庫確認のクエリ</strong>（週次の補充の判断・投入の確認・ビルド漏れの検出に使う。<code>unbuilt</code> が 0 以外ならビルド漏れなので、補充より先にビルドする）:
+<pre><code>SELECT quiz_type, difficulty,
+       SUM(last_used_at IS NULL AND video_s3_key IS NOT NULL) AS unused_built, -- 出題可能な未使用在庫
+       SUM(video_s3_key IS NULL)     AS unbuilt,  -- 動画未ビルト（出題対象外。0 が正常）
+       SUM(last_used_at IS NOT NULL) AS used,     -- 使用済み（再利用候補）
+       SUM(use_count)                AS total_uses
+FROM quiz_stock_items
+WHERE set_id = :set_id AND is_active = 1
+GROUP BY quiz_type, difficulty;</code></pre></li>
+  <li><strong>取り下げ</strong>: 誤答や表現の問題が見つかった問題は <code>is_active=0</code> にする（行は消さない。証跡と使用履歴を残す）。ある「型 × 難度」の有効在庫が 0 件になると、そのスロットの実行が異常終了するので、0 件になるなら先に代わりを入れる。S3 の事前動画は消さない <a class="decision-ref" href="#d-10">→ 理由 D-10</a></li>
+  <li>在庫専用のアラームは持たない。再利用の WARNING と週次の在庫確認で回す <a class="decision-ref" href="#d-11">→ 理由 D-11</a></li>
+</ul>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>補充の目安・直近の在庫・確認待ち → <a href="../plans/logic-training-1.html">セット計画書 logic-training-1</a></li>
+  <li>昼の停止の範囲 → <a href="../app/sets/logic-training-1.html#noon-suspended">セット別設計書</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 出題は人がレビューした問題ストックからだけ行う</h3>
+<dl>
+  <dt>決めたこと</dt><dd>クイズの出題は <code>quiz_stock_items</code> から取るだけにし、実行時の LLM による問題の生成は休止する。ストックは音源と同じ「調達 → 書き直し → 投入 → 順繰り」の型で回す</dd>
+  <dt>理由</dt><dd>スキップ率 95% を受けたテコ入れの一つ。誤答のリスクを投入時の人のレビューで担保し、実行時の LLM の生成・検証チェーンを休止する</dd>
+  <dt>日付・出典</dt><dd>2026-08-01（Phase 16-1・ユーザー決定）。<a href="../app/generators/gpt-quiz-multicut.html">gpt-quiz-multicut</a> 冒頭・<a href="../app/sets/logic-training-1.html">セット別設計書</a></dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 定番の問題は「アイデアを借りて表現を書き直す」</h3>
+<dl>
+  <dt>決めたこと</dt><dd>アイデア・解き方の構造は題材にしてよく、問題文の文面は転載しない（2.1 の規定）</dd>
+  <dt>理由</dt><dd>著作権が守るのはアイデアではなく表現で、問題文の文面は創作的な表現として守られうるため。既存の問題の文面を転載する案はこの理由で採らなかった</dd>
+  <dt>退けた案</dt><dd>既存問題の文面の転載</dd>
+  <dt>日付・出典</dt><dd>2026-08-01（Phase 16 展開時の壁打ち）。リサーチの基準（作者不詳 + 複数サイトに流布）は、16-2 で「Wikipedia 級のページで古典と明記」に偏ってなぞなぞをほぼ未確認にした反省から補充スキルで改めた</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 ストック資材を content/ に置いて git で管理する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>資材はバッチ単位で完結させて <code>content/</code> に置き、投入が済んだらコミットする。<code>plans/</code> には置かない</dd>
+  <dt>理由</dt><dd>16-2 では作業場 <code>plans/16-2-stock/</code> に置いていたが、<code>plans/</code> は使い捨てで、出典の台帳や投入 SQL を残せない。ユーザーの指示で <code>content/</code> へ移して恒久化した</dd>
+  <dt>日付・出典</dt><dd>16-2 完了時（2026-08）・16-2b で明文化</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 イラストは imagegen + 画風の 1 行で作る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>事前ビルドのイラストは Codex の imagegen で作り、画風の 1 行をプロンプトに常に入れる。OpenAI Images API は使わない</dd>
+  <dt>理由</dt><dd>16-3 (8) の比較（gpt-image-1 の実 API / imagegen / imagegen + 画風行）で、imagegen + 画風行が禁止事項を全部守り、画風もそろって品質が最もよかった。イラストの API 費もゼロになる。imagegen は自動のバッチに組み込めないが、事前ビルドは人のレビューを挟むローカルの運用なので成り立つ</dd>
+  <dt>退けた案</dt><dd>gpt-image-1 の実 API</dd>
+  <dt>日付・出典</dt><dd>16-3b（2026-08-08）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 プロンプトで 3:2（1536x1024）を明示する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>プロンプトの末尾にサイズの明示行を常に入れ、守られなかったときに備えてスキル側のサイズ確認と <code>intake.py</code> の WARNING の二重で見つける</dd>
+  <dt>理由</dt><dd>16-3c では「imagegen は 3:2 を直接指定できない」と記録していたが、16-4b の見切れ調査で誤りと分かった。初期 42 問の出力の比率は同じセッションの中でも 1672x941 / 1693x929 / 1774x887 …とばらつき、3 問はちょうど 1536x1024 だった。指定しないと 16:9 前後に揺れるだけだった。組版側の枠埋めの廃止（<a href="../app/generators/gpt-quiz-multicut.html#composition">gpt-quiz-multicut 8.2</a>）と合わせ、3:2 で来た素材は何も捨てずに動画に載る</dd>
+  <dt>退けた案</dt><dd>プロンプトでセーフエリア（主要素を中央 3:2 に収める）を指示する（情景の構図に影響するため見送り。必要になれば検討する）</dd>
+  <dt>日付・出典</dt><dd>2026-08-09（16-4b・ユーザー決定）</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 レンダラーを Pillow の組版から Remotion へ載せ替える</h3>
+<dl>
+  <dt>決めたこと</dt><dd>どのフレームも動いている動画にするため、レンダラーを pref-ranking-1 で使っている Remotion へ替え、ループの継ぎ目を作り込む。尺・カット・効果音のタイミング・ミックス・答えの開示・イラストの再利用・書体は変えない。<code>build.py</code> はコンテナの中からホストでの実行に変え、Remotion と ffmpeg だけを Docker に任せる</dd>
+  <dt>理由</dt><dd>16-5 の評価で 3 カット化の後もスキップ率 50.6%・平均視聴 12.4 秒だった。R-1-1 で平均再生時間が尺の 16 秒を超える動画が多く、ループして見られるのが普通だと分かった一方、旧レンダラー（Pillow の 7 枚の版面 + ffmpeg の連結）は 7 枚中 5 枚が完全に止まっていて、ループの頭 0〜7 秒が止まって見えた。変えない条件を守るのは前後で比べられるようにするため。問題文の行ごとの段階表示は、2 周目以降に「読み始めた文がまだ出ていない」状態を作るので R-1-3 でやめた。継ぎ目のクロスフェードは二重露光に見え、不具合と区別がつかないので採らなかった</dd>
+  <dt>退けた案</dt><dd>補充分だけを新しい版面にする段階的なビルド（新旧が混ざる）・継ぎ目のクロスフェード</dd>
+  <dt>日付・出典</dt><dd>改修 R-1（2026-09-02〜03・セットレーン）。<a href="../ideas/logic-training-remotion-rebuild.md">アイデア記録</a>・<a href="../plans/logic-training-1-log.html">セット記録</a>。当時、方式カタログと gpt-quiz-multicut 冒頭の転用の注記の書き換えは開発レーンへ起票した</dd>
+</dl>
+</article>
+<article id="d-07">
+<h3>D-07 版面の配分を「イラスト優先」にし、問題文の大きさが変わるのを受け入れる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>イラストの箱（保証高 500px）を先に取り、残りに問題文を収める。原資は文字の縮小（つかみ帯 64 → 52px・見出し 92 → 72px・見出しから問題文 150 → 115px・行送り 1.5 → 1.4）で作る。問題文の下限を 32 → 44px に上げ、補充側の <code>question</code> の上限を 90 → 80 字に下げた</dd>
+  <dt>理由</dt><dd>R-1 の版面は問題文の最大高 430px（<code>QUESTION_MAX_HEIGHT</code>）を先に取ってから残りをイラストに回したので、4 行の問題（当時 56 問中 37 問）ではイラストが 504×336px と幅の約 6 割まで痩せた。3 カット中 2 カットの主役がイラストなのに、問題の長さで主役が小さくなっていた</dd>
+  <dt>退けた案</dt><dd>見出し「問題」をなくす案（静止画 PoC で比べて採らなかった）</dd>
+  <dt>日付・出典</dt><dd>改修 R-2（2026-09-19・セットレーン）。採用値は<a href="../plans/logic-training-1.html">セット計画書</a>の改修 R-2・<a href="../issues/index.html#I-035">I-035</a></dd>
+</dl>
+</article>
+<article id="d-08">
+<h3>D-08 両環境の反映を content_key などの安定したキーで行う</h3>
+<dl>
+  <dt>決めたこと</dt><dd>S3 のファイル名は <code>content_key</code>、Aurora の SQL は <code>set_code</code> + <code>question_text</code>（BGM は <code>s3_key</code>）で解決し、環境ごとの <code>id</code> を使わない</dd>
+  <dt>理由</dt><dd><code>quiz_stock_items.id</code> は環境ごとの AUTO_INCREMENT で、ローカルと Aurora で一致しない</dd>
+  <dt>日付・出典</dt><dd>16-3d（V007）。<a href="../app/data-model.html#detail-quiz-stock-items">データモデル設計 4.10</a></dd>
+</dl>
+</article>
+<article id="d-09">
+<h3>D-09 作問を候補と完成稿の 2 段階にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>問題文・答え・図だけの候補を目標の 2 倍出して人が反射的に選び、OK だけを完成稿に仕上げる。NG・保留は消さずに後日振り返る</dd>
+  <dt>理由</dt><dd>14 問を全項目まで作ってからレビューすると、補充のたびに人が「何が微妙で、どう直せばよいか」を考えて言葉にする負担が大きかった。選別は OK / NG / 保留だけにし、理由を考える作業を後日に分けて負担を減らす（レビューの工程の数を減らすのが目的ではない）。理由のない NG からジャンル全体の禁止を作らないよう、理由は人が言葉にしたものだけを残す</dd>
+  <dt>日付・出典</dt><dd>2026-09-21 方針確定（ユーザー提案）・改修 R-3（2026-09-22）。<a href="../ideas/quiz-authoring-efficiency.html">アイデア詳細</a></dd>
+</dl>
+</article>
+<article id="d-10">
+<h3>D-10 取り下げは is_active=0 にし、S3 の動画を消さない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>取り下げた問題の行も事前動画も消さない</dd>
+  <dt>理由</dt><dd>行を残すと証跡と使用履歴が残る（音源と同じ）。<code>is_active=0</code> で出題の候補から外れるので動画を消す必要はなく、戻すときに作り直さずに済む</dd>
+  <dt>日付・出典</dt><dd>Phase 16-1・16-3b</dd>
+</dl>
+</article>
+<article id="d-11">
+<h3>D-11 在庫専用のアラームを持たない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>在庫の不足は再利用の WARNING と週次の在庫確認で見つける</dd>
+  <dt>理由</dt><dd>在庫が切れても再利用で投稿は止まらない。失敗の通知を起点にする運用方針（<a href="../app/operation.html#failure">運用設計 4 章</a>）と合わせる</dd>
+  <dt>日付・出典</dt><dd>Phase 16-1</dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../assets/docs-diagrams.js"></script>
+</body>
+</html>

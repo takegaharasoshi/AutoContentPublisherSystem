@@ -14,12 +14,12 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（17-2 で作成）</span>
   <span>方式名（レジストリキー）: ranking-prebuilt</span>
-  <span>最終更新: 2026-08-29（R-1 冒頭フック改善を追記）</span>
+  <span>最終更新: 2026-10-18（Phase 30-5: セクション 8 の本体を生産の詳細設計 pref-ranking-1 へ移した）</span>
 </div>
 
 <div class="note">
   <span class="callout-title">本書の位置づけ</span>
-  生成方式 <code>ranking-prebuilt</code>（都道府県ランキング動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプラインの技術設計（セクション 8。Remotion コンポジション・TTS 同期を含む）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、ビルドの運用手順（いつ・どう回すか）は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>、採用セット固有の設定（アカウント・スケジュール・キャプション・デザイントークン・TTS 話者設定）は <a href="../sets/pref-ranking-1.html">sets/pref-ranking-1.html</a> を参照。分冊ルール上は「本採用時に作成」だが、<code>quiz-prebuilt</code>（16-3b）と同様に実装（17-4）の正とするため設計 Fix 時点で作成した。壁打ちの経緯は <a href="../requirements-notes-set3.html">requirements-notes-set3.html</a>。
+  生成方式 <code>ranking-prebuilt</code>（都道府県ランキング動画の事前生成方式）の方式固有仕様を記録する。実行時仕様（セクション 2〜7）と、事前ビルドパイプライン（セクション 8。本体は Phase 30-5 で<a href="../../production/pref-ranking-1.html#build">生産の詳細設計 pref-ranking-1</a>へ移した。Remotion コンポジション・TTS 同期を含む）の 2 部構成。全方式共通の契約と方式カタログは <a href="../batch-flow.html#generator-strategy">batch-flow.html セクション 2.1</a>、ストックの作り方・ビルドの運用も同じページ、採用セット固有の設定（アカウント・スケジュール・キャプション・デザイントークン・TTS 話者設定）は <a href="../sets/pref-ranking-1.html">sets/pref-ranking-1.html</a> を参照。分冊ルール上は「本採用時に作成」だが、<code>quiz-prebuilt</code>（16-3b）と同様に実装（17-4）の正とするため設計 Fix 時点で作成した。壁打ちの経緯は <a href="../requirements-notes-set3.html">requirements-notes-set3.html</a>。
 </div>
 
 <div class="warn">
@@ -30,8 +30,8 @@
 <h2>1. 方式概要</h2>
 <p><strong>背景イラスト〜ナレーション付きランキング動画を事前にローカルでビルドし、全数人間レビューのうえ S3 に作り置き</strong>しておき、実行時はランキングストック（<code>ranking_stock_items</code>）の LRU 順繰り選定と<strong>事前動画の取得・返却だけを行う</strong>軽量な方式。実行時に外部 API（画像生成・LLM・TTS）を一切呼ばない。「作り置き + 全数レビュー + 実行時は取得のみ」の構造は <code>quiz-prebuilt</code> と同型で、差分は以下の 3 点。</p>
 <ul>
-  <li><strong>レンダラーが Remotion</strong>（React ベースのプログラム動画生成。Pillow + ffmpeg の組版ではなくコンポーネントとフレーム補間で版面・アニメーションを記述する）。フォーマットは <strong>TOP5 地図ルーレット型</strong>（セクション 8.2）</li>
-  <li><strong>フルナレーション</strong>: セリフ単位の TTS（VOICEVOX）をタイムライン定数へフレーム同期させてベイクする（セクション 8.3）</li>
+  <li><strong>レンダラーが Remotion</strong>（React ベースのプログラム動画生成。Pillow + ffmpeg の組版ではなくコンポーネントとフレーム補間で版面・アニメーションを記述する）。フォーマットは <strong>TOP5 地図ルーレット型</strong>（<a href="../../production/pref-ranking-1.html#composition">生産の詳細設計 4 章</a>）</li>
+  <li><strong>フルナレーション</strong>: セリフ単位の TTS（VOICEVOX）をタイムライン定数へフレーム同期させてベイクする（<a href="../../production/pref-ranking-1.html#tts-sync">生産の詳細設計 5 章</a>）</li>
   <li><strong>2 尺対応・運用は 30 秒のみ</strong>: 方式・コンポジションは 20 秒版・30 秒版の 2 尺に対応し、スロット（<code>parameters.slots[].duration_seconds</code>）が投稿する尺を決める。ただし<strong>運用の尺は 30 秒で確定</strong>（2026-08-24 ユーザー判断 = <a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a> の decision）。ビルド・投稿とも 30 秒版のみで、20 秒版は実装のまま休眠</li>
 </ul>
 <div class="decision">
@@ -44,7 +44,7 @@
 <tr><td>方式名（レジストリキー = <code>batch_sets.generator_name</code> の値）</td><td><code>ranking-prebuilt</code></td></tr>
 <tr><td>実装ファイル</td><td><code>services/image-batch/app/generators/ranking_prebuilt.py</code>（1 ファイルに完結）</td></tr>
 <tr><td>レジストリ登録</td><td><code>services/image-batch/app/generators/__init__.py</code> の <code>REGISTRY</code></td></tr>
-<tr><td>使用 API・ツール</td><td><strong>実行時は外部 API・組版・動画合成を一切使わない</strong>（S3 GetObject と DB のみ）。ビルド時のツールはセクション 8・9</td></tr>
+<tr><td>使用 API・ツール</td><td><strong>実行時は外部 API・組版・動画合成を一切使わない</strong>（S3 GetObject と DB のみ）。ビルド時のツールは<a href="../../production/pref-ranking-1.html#build">生産の詳細設計 3 章</a>とセクション 9</td></tr>
 <tr><td>最終メディア</td><td>MP4 1 本（<code>file_format='mp4'</code>。1080x1920 / 30fps / <strong>20 秒または 30 秒（スロットの尺）</strong> / H.264 + AAC = ビルド時に Remotion レンダラーが保証する仕様）</td></tr>
 <tr><td>中間生成物</td><td><strong>なし</strong>（動画は事前レビュー済みのため、投稿前レビュー用の中間画像を実行時に作らない）</td></tr>
 <tr><td>補助テーブル</td><td><code>ranking_stock_items</code>（ストック LRU 取得 + 事前動画参照 <code>video_s3_key_20s</code> / <code>_30s</code>。<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）・<code>ranking_items</code>（投稿履歴の INSERT。<a href="../data-model.html#detail-ranking-items">同セクション 4.12</a>）。<strong><code>audio_assets</code> は実行時には使わない</strong>（BGM・ナレーションはベイク済み。セクション 6）</td></tr>
@@ -92,7 +92,7 @@
 <ul>
   <li><strong>0 件は <code>RuntimeError</code> で異常終了</strong>（ストック未投入・全行無効化に加え「投入済みだが当該尺が全行未ビルド」も検知するフェイルラウド）</li>
   <li><strong>再利用（<code>last_used_at IS NOT NULL</code> の行を選んだ場合）は WARNING ログ</strong>（補充遅延のサイン）</li>
-  <li><strong>当該尺が未ビルトの有効在庫が存在する場合も WARNING ログ</strong>を出す（COUNT 1 本。投入後のビルド漏れ・ビルド待ちのサイン。週次の在庫確認クエリ〔<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>〕でも拾える）</li>
+  <li><strong>当該尺が未ビルトの有効在庫が存在する場合も WARNING ログ</strong>を出す（COUNT 1 本。投入後のビルド漏れ・ビルド待ちのサイン。週次の在庫確認クエリ〔<a href="../../production/pref-ranking-1.html#inventory">生産の詳細設計 pref-ranking-1 の 7 章</a>〕でも拾える）</li>
   <li><strong>防御的フィールド検査</strong>: <code>title</code> 非空、<code>content_fields</code> の必須キー（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>result_list</code>）の存在・非空、<code>ranking_data.entries</code> が 5 件で <code>rank</code> 1〜5 が一意であること、<code>video_audio_asset_id</code> 非 NULL。動画には使わないが<strong>キャプションのプレースホルダ展開（<code>ranking_items</code> 経由）の入力になる</strong>ため検査する。不備は異常終了（投入ミスの検知）</li>
   <li><code>last_used_at</code> / <code>use_count</code> の UPDATE は事前動画の取得成功後に行い、commit は共通骨格に委ねる（失敗時はストック消費の副作用ごとロールバック）</li>
 </ul>
@@ -102,7 +102,7 @@
 </div>
 <div class="decision">
   <span class="callout-title">決定（17-2 巡 2）: 未ビルト行・片尺のみビルド済みの行は「選ばれない」のであって「エラーにしない」</span>
-  <code>quiz-prebuilt</code> セクション 4 の decision を踏襲する。当該尺が未ビルトの行は絞り込みで候補から除外され、他のビルド済み在庫で投稿は止まらない（週次補充の「投入 → ビルド」の間に実行が走っても安全）。<strong>片尺のみビルド済みの行はその尺のスロットの候補にだけ入る</strong>（尺確定後は勝ち尺のみビルドする運用〔<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>〕になるため、これは正常な状態でもある）。未ビルトの滞留は WARNING と在庫確認クエリで検知する。
+  <code>quiz-prebuilt</code> セクション 4 の decision を踏襲する。当該尺が未ビルトの行は絞り込みで候補から除外され、他のビルド済み在庫で投稿は止まらない（週次補充の「投入 → ビルド」の間に実行が走っても安全）。<strong>片尺のみビルド済みの行はその尺のスロットの候補にだけ入る</strong>（尺確定後は勝ち尺のみビルドする運用〔<a href="../../production/pref-ranking-1.html#inventory">生産の詳細設計 pref-ranking-1 の 7 章</a>〕になるため、これは正常な状態でもある）。未ビルトの滞留は WARNING と在庫確認クエリで検知する。
 </div>
 
 <h2 id="fetch">5. 事前動画の取得</h2>
@@ -120,230 +120,19 @@
 <tr><td>投稿履歴</td><td>—</td><td><code>ranking_items</code> に 1 行（<code>format</code> / <code>title</code> / <code>content_fields</code> / <code>ranking_data</code> のスナップショット + <code>duration_seconds</code> + <code>stock_item_id</code>。<strong>キャプション展開の入力と尺別効果検証の記録のため必須</strong>。共通骨格の同一トランザクションで確定）</td></tr>
 </table>
 </div>
-<p><code>file_format='mp4'</code> → <code>posts.media_type='reel'</code> の導出、キャプションのプレースホルダ展開（ランキング系 5 種 = <a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>）、ストーリーズ再掲（<code>stories_enabled=1</code>）はいずれも共通側の既存機構で行われる。<code>generated_media.audio_asset_id</code> への転記は <code>quiz-prebuilt</code> セクション 6 の decision と同じ理由（ミュート検知運用の特定クエリを無変更で成立させる）で、BGM は 1 ネタ 1 曲を 2 尺共通でベイクする（セクション 8.1 工程 3）。NULL（転記元の未記録）は許容しない（ビルドツーリングの登録漏れ検知として異常終了）。</p>
+<p><code>file_format='mp4'</code> → <code>posts.media_type='reel'</code> の導出、キャプションのプレースホルダ展開（ランキング系 5 種 = <a href="../batch-flow.html#caption-extension">batch-flow.html セクション 3.3 の decision</a>）、ストーリーズ再掲（<code>stories_enabled=1</code>）はいずれも共通側の既存機構で行われる。<code>generated_media.audio_asset_id</code> への転記は <code>quiz-prebuilt</code> セクション 6 の decision と同じ理由（ミュート検知運用の特定クエリを無変更で成立させる）で、BGM は 1 ネタ 1 曲を 2 尺共通でベイクする（<a href="../../production/pref-ranking-1.html#build-steps">生産の詳細設計 3.1 工程 3</a>）。NULL（転記元の未記録）は許容しない（ビルドツーリングの登録漏れ検知として異常終了）。</p>
 
 <h2>7. エラーハンドリング</h2>
 <p>方式内のリカバリループはない。異常（<code>parameters</code> 不正〔<code>duration_seconds</code> が 20 / 30 以外を含む〕・当該尺のビルド済みストック 0 件・ストック行のフィールド不備・<code>video_audio_asset_id</code> 未記録・事前動画の取得失敗）はすべて例外を送出し、共通骨格が捕捉 → ロールバック → Step Functions Retry → 失敗アラーム通知につながる（<code>quiz-prebuilt</code> セクション 7 と同型）。実行時の主な失敗面は SNS 投稿側（Graph API）になる。</p>
 
 <h2 id="build">8. 事前ビルドパイプライン（供給側の設計）</h2>
-
-<h3 id="build-steps">8.1 工程（5 段）</h3>
-<p>事前動画の供給はローカルの<strong>事前ビルドツーリング</strong>が担う。ツーリングは <code>content/video-build/&lt;set_code&gt;/</code> に置いて git 管理し（置き場・運用ルールは <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）、週次補充（ストック投入）とセットで回す。工程は 5 段:</p>
-<ol>
-  <li><strong>対象抽出</strong>: ビルド対象尺のカラム（尺確定〔2026-08-24〕により <code>video_s3_key_30s</code> のみ）が NULL の有効ストック行を列挙する（初回 = 17-5 は 14 ネタ、17-7 で残り 16 ネタ、以後は補充分のみ）</li>
-  <li><strong>背景イラスト生成（imagegen 委譲）</strong>: 行の <code>content_fields.bg_motif</code>（ネタのテーマに合わせた背景モチーフの指示文）からプロンプトを組み立て、Codex 組み込み画像生成（imagegen）で 9:16 の背景を 1 ネタ 1 枚生成する（<strong>2 尺で共用</strong>）。プロンプトには<strong>セットの画風固定行</strong>（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 4</a>）と<strong>サイズ明示行</strong>（<code>quiz-prebuilt</code> の 16-4b 決定と同じ手法）を付け、<strong>「文字・数字・記号を描かない」を必須指定</strong>とする（下記 decision の再利用要件①）。生成物は <code>assets/{set_code}/prebuilt/{content_key}_bg.png</code> として S3 に併置する（再ビルド資産。DB 記録なし）</li>
-  <li><strong>TTS 合成 + Remotion レンダリング（2 本）</strong>: 行の <code>narration</code>（尺別 cue 台本）を VOICEVOX（ローカル Docker）でセリフ単位に合成 → <strong>実測長の予算検査（セクション 8.3。超過はビルドエラー）</strong> → 音声ファイル群 + <code>ranking_data</code> + 版面文言 + 背景をコンポジションの props に渡し、Remotion で必要尺（現運用は 30 秒版のみ = 2026-08-24 尺確定）をレンダリングし、<strong>配信ラウドネスへ正規化する</strong>（下記 17-4d の decision）。BGM は <code>audio_assets</code> の <code>time_slot IS NULL</code> の有効曲から LRU 選曲 + <code>last_used_at</code> 更新をビルド時に行い（<code>quiz-prebuilt</code> セクション 6 の decision と同じ移管）、<strong>2 尺共通の 1 曲</strong>を <code>video_audio_asset_id</code> に記録する</li>
-  <li><strong>レビューシート生成 → 全数人間レビュー</strong>: ビルドした動画（必要尺）+ 背景イラストを一覧できるレビューシートを生成し、ユーザーが全数レビューする。NG は<strong>背景再生成（imagegen 再試行・<code>bg_motif</code> 書き直し）またはセリフ・版面文言の修正（DB 更新）→ 再ビルド</strong>で解消する（レビュー観点は <a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）</li>
-  <li><strong>S3 アップロード + DB 反映</strong>: 承認された動画を <code>assets/{set_code}/prebuilt/{content_key}_20s.mp4</code> / <code>_30s.mp4</code> へアップロードし、<code>ranking_stock_items</code> の <code>video_s3_key_20s</code> / <code>video_s3_key_30s</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> を<strong>ローカル MySQL と Aurora の両方</strong>へ UPDATE する。Aurora 反映 SQL と S3 ファイル名のどちらも環境ローカルな <code>id</code> を使わない（<code>content_key</code> で解決。<code>quiz-prebuilt</code> の 16-3d 決定を最初から適用）</li>
-</ol>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-10、17-2 巡 2・巡 3）: 英語圏展開セットを見据えた再利用要件 4 点</span>
-  次セット候補として<strong>同内容を英語で発信する海外向けセット</strong>が計画されている（ユーザー方針。時期未定）。ネタ・素材・コンポジションを言語違いで再利用できるよう、本方式の実装は以下を必須要件とする:
-  <ol style="margin:.3rem 0 0;">
-    <li><strong>背景イラストに文字を焼き込まない</strong>（imagegen プロンプトで「文字・数字・記号を描かない」を必須指定。背景は言語非依存の共用素材になる）</li>
-    <li><strong>Remotion コンポジションの画面文言はすべて props 経由</strong>（コンポーネント内のハードコード禁止。文言の正はストック行の <code>content_fields</code> / <code>narration</code>）</li>
-    <li><strong>TTS はアダプタ層で分離</strong>（cue テキスト → 音声ファイル + 実測長のインターフェースを固定し、VOICEVOX 固有の呼び出しはアダプタ内に閉じる。英語セットでは別エンジンのアダプタに差し替える）</li>
-    <li><strong>ネタソース・県換算テーブルは言語非依存の形式で保持</strong>（<code>ranking_data</code> は数値・都道府県コードのみで言語を含まない。表示文言は <code>content_fields</code> / <code>narration</code> に分離済み = データモデル側の対応。<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）</li>
-  </ol>
-  ツーリングの共通 core 化（言語共通部の抽出）は英語セット追加時に行い、17-2 時点は <code>pref-ranking-1</code> 専用構成のままとする（YAGNI。ユーザー Fix）。
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-08-12、17-4e）: ビルドツーリングの構成と実行境界</span>
-  <p style="margin:.3rem 0;">5 段工程を <code>content/video-build/pref-ranking-1/</code> 直下のスクリプト群として実装した（<code>quiz-prebuilt</code> の <code>content/video-build/logic-training-1/</code> と同じ構成・同じ名前。手順の実行例は同ディレクトリの <strong><code>README.md</code> が正</strong>）。工程との対応は <code>build.py --list</code>（工程 1）→ <code>export_prompts.py</code> / <code>intake.py</code>（工程 2）→ <code>build.py</code>（工程 3）→ <code>review_sheet.py</code>（工程 4）→ <code>publish.py</code>（工程 5）。<code>remotion/</code> 側の既存スクリプト（<code>build_narration.py</code> / <code>normalize_loudness.py</code> / <code>build_timeline.py</code>）は<strong>呼ばれる側</strong>で、ツーリングは薄いオーケストレーションに徹する。</p>
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>実行境界</strong>: ツーリング本体は WSL ホストの Python で動かし、<strong>Docker が要る処理だけを外に出す</strong>（Remotion レンダリング = <code>remotion-render</code> イメージ、ラウドネス正規化と背景の画像処理 = <code>image-batch</code> イメージ、TTS = VOICEVOX Engine の HTTP）。ホストに要る依存は <code>pymysql</code> / <code>boto3</code> のみ（<strong>PIL を使う <code>intake.py</code> だけはコンテナ内で実行する</strong>）。ナレーション合成は <code>build_narration.build_narration()</code> を<strong>ライブラリとして直接呼ぶ</strong>（サブプロセスにせず、予算検査の失敗を戻り値で受けてレンダリングへ進ませない）</li>
-    <li><strong>props はツーリングが組み立てる</strong>（<code>build_props()</code>。ストック行 → <code>PrefRankingProps</code>）。組み立て前に防御的検査を行い、<strong>rank 1〜5 の一意性・<code>pref_code</code> の範囲・必須 <code>content_fields</code>・当該尺の cue ID 集合がタイムライン定数と過不足なく一致すること・背景 JPEG の存在</strong>を確認する。1 件の不備で全体を止めず、<strong>全件処理してから失敗一覧を出して終了コード 1</strong> とする（quiz と同じ「まとめて提示する」方針）</li>
-    <li><strong>BGM は「行に記録があれば必ず引き継ぐ」</strong>: LRU 選曲を行うのは <code>video_audio_asset_id</code> が NULL の行に限り、記録がある行は <code>--rebuild</code> でなくても引き継ぐ（<code>last_used_at</code> も更新しない）。<strong>2 尺を別のタイミングでビルドしたときに 2 尺で別の曲がベイクされ、DB の記録が後からビルドした尺の曲で上書きされるのを防ぐ</strong>（BGM は 2 尺共通の 1 曲という設計 = セクション 6 / 8.1 工程 3。ミュート検知の運用が <code>video_audio_asset_id</code> を頼りにしている）</li>
-    <li><strong>両環境反映は <code>content_key</code> 一本</strong>: S3 キー・ローカル MySQL の UPDATE・Aurora 反映 SQL のいずれにも環境ローカルな <code>id</code> を使わない。Aurora 側の <code>video_audio_asset_id</code> は <code>audio_assets.s3_key</code> からのサブセレクトで解決し、<strong>WHERE に同じ音源の <code>EXISTS</code> を置く</strong>（Aurora に該当音源が無いときに NULL で静かに上書きせず、更新行数 0 として気づけるようにする。<code>video_audio_asset_id</code> の NULL は実行時に異常終了する = セクション 7）</li>
-    <li><strong>承認は <code>work/approved.txt</code> に <code>content_key</code> を 1 行ずつ</strong>。<code>publish.py</code> は S3・DB に触れる前に承認対象を全件検査する（manifest の存在・MP4 と背景 PNG の実在・<code>audio_asset_id</code> の記録）。1 件でも欠ければ中断し、部分 publish を作らない。<strong>承認の粒度はネタ単位（2 尺まとめて）</strong>とする（ユーザー Fix 2026-08-12。片方の尺だけ NG になる原因〔背景・文言・セリフ〕は両尺に共通するため、尺別承認は在庫の食い違いを増やすだけになる）</li>
-    <li><strong>Aurora 反映は既定で自動適用</strong>（<code>common/apply_aurora.py</code> の Data API 経由。ユーザー Fix 2026-08-12）。<strong>S3 とローカル MySQL だけが更新されて Aurora が取り残される片肺状態を作らない</strong>ためで、SQL の生成だけにしたいときは <code>--no-aurora</code> を使う（生成 SQL は常に <code>work/update_prebuilt.sql</code> に残る）</li>
-    <li><strong>背景は 2 形式で持つ</strong>: S3 へ上げる再ビルド資産の原本 <code>{content_key}_bg.png</code>（1080x1920）と、レンダリング用の JPEG（<code>remotion/public/bg/</code>）。2MB 級 PNG のままだとフォント読み込みが <code>delayRender</code> タイムアウトするため（17-3 の知見）。背景プロンプトの<strong>画風固定行の文言は <code>export_prompts.py</code> が正</strong>（セット別設計書セクション 4 の 5 要件を満たす）</li>
-    <li><strong>検証用の <code>--no-bgm</code></strong>: BGM 未調達（17-5 で調達）の段階でもツーリングを通しで確認できるよう、BGM なしでビルドできる。この動画は <code>audio_asset_id</code> が null で記録され、<code>publish.py</code> が拒否する（本番へ出ない構造にしてある）</li>
-  </ul>
-</div>
-
-<h3 id="composition">8.2 動画の作り（TOP5 地図ルーレット型コンポジション）</h3>
-<p>版面は 1080x1920 / 30fps。構成要素は上から <strong>タイトル帯</strong>（ネタの <code>title</code>）・<strong>日本地図</strong>（ルーレット演出の主役）・<strong>順位行スタック</strong>（確定した順位を 5 位から積み上げ）・<strong>キャラ常駐枠 + 吹き出し</strong>（実況）・最下部の<strong>出典行帯</strong>。配色はパレットトークン（<code>Palette</code> 型）で駆動し、値はセットのデザイントークン（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 8</a>）を正とする。検証プロトタイプは <code>plans/ranking-set-research/remotion-proto/</code>（git 管理外。本組み実装 = 17-4 でコンポジションをリポジトリへ移した時点でコードが正となる）。</p>
-<p><strong>ルーレット演出</strong>: 各順位の発表は「地図上で候補県が高速に光る（スピン）→ 停止フラッシュで確定 → 確定県が順位色に塗られ、順位行に県名・数値が追記される」の繰り返し。確定済みの県は塗りが残るため、動画の進行とともに地図が塗り上がっていく。</p>
-<div class="table-wrap">
-<table>
-<caption style="text-align:left;font-weight:bold;margin-bottom:.3rem;">タイムライン（17-2 巡 1 で Fix、17-3 で煽りシーンを追加。20 秒 = 600f / 30 秒 = 900f）</caption>
-<tr><th>尺</th><th>シーン構成（秒）</th></tr>
-<tr><td><strong>20 秒版</strong>（600f）</td><td>オープニング 2.2s → <strong>煽り 2.2s</strong>（視聴者に 1 位を予想させる）→ 5 位〜2 位 各 2.4s（スピン 1.0s + 停止フラッシュ・行追記 1.4s）→ 1 位 3.9s（タメ 2.4s + 発表 1.5s）→ 締め 2.0s<br><span class="muted">※ 配分は 17-4d で見直した（順位間の間を作るため）。定数の正は <code>scripts/build_timeline.py</code></span></td></tr>
-<tr><td><strong>30 秒版</strong>（900f）</td><td>導入 3.0s → <strong>煽り 2.0s</strong> → 5 位〜2 位 各 4.0s（スピン 1.0s + 停止フラッシュ・行追記 1.1s + 順位コメント 1.9s）→ 1 位 5.0s（タメ 3.0s + 発表 2.0s）→ <strong>結果総覧 2.5s</strong>（TOP5 一覧の静止画面 = スクリーンショット保存の受け皿）→ 締め 1.4s（結果総覧と締めの 3.9s は <code>closing</code> 1 本の cue でまたぐ）<br><span class="muted">※ 配分は 17-4d で見直した（順位間の間を作るため）。定数の正は <code>scripts/build_timeline.py</code></span></td></tr>
-</table>
-</div>
-<p>2 尺の検証仮説（17-2 巡 1 で Fix）: 20 秒 = 完走率・リプレイに強い / 30 秒 = 保存・コメントに強い。<strong>2026-08-24: 検証は実施せず中止し、尺は 30 秒で確定した</strong>（仮説は記録として残す。<a href="../sets/pref-ranking-1.html">セット別設計書セクション 3</a> の decision）。</p>
+<p>事前動画を作る側の設計は、Phase 30-5 で<a href="../../production/pref-ranking-1.html">生産の詳細設計 pref-ranking-1</a>へ移した。旧節との対応は次のとおり。</p>
 <ul>
-  <li><strong>1 位の強調（17-2 巡 1 Fix・17-4a で寸法更新）</strong>: 1 位行は行高 104px（2〜5 位は 82px）+ 明るい金グラデ + グロー強化。1 位県名は発表時に 148px + 二重グローのバーストを表示し、余韻ののち順位行へ落とす（17-4a）。順位バッジ・パルスリング・「第1位」朱バッジは比較モックの結果<strong>不採用</strong>（過剰装飾）</li>
-  <li><strong>キャラ演出</strong>: 煽り・実況はキャラの吹き出しに表示する（<strong>ナレーション cue と同一テキスト</strong> = 音と字幕の二重化。スピン中は点滅。<strong>冒頭のみ例外</strong> = 下記 17-4a の decision）。ポーズは 3 種を切り替える（基本 → タメ〔1 位スピン中〕→ 軍配〔1 位発表後〕）。アセット・配置値はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a>。<strong>ただし 5〜2 位の順位 cue は県名を含む</strong>ため（下記 decision）、吹き出しへの表示は<strong>停止フラッシュ以降に限る</strong>（スピン中に表示すると結果が先にばれる）</li>
-  <li><strong>下位を晒さない</strong>: TOP5 のみを扱い、下位順位（ワースト表示）は版面に持たない（<a href="../../strategy/business-strategy.html">事業戦略書セクション 6</a> のネタ判定基準に対応する構造的ガード）</li>
+  <li id="build-steps">8.1 工程（5 段）・ツールの構成と実行境界・再利用要件 → <a href="../../production/pref-ranking-1.html#build">3 章 事前ビルドパイプライン</a></li>
+  <li id="composition">8.2 動画の作り（TOP5 地図ルーレット型コンポジション）・地図素材の要件 → <a href="../../production/pref-ranking-1.html#composition">4 章 動画の作り</a></li>
+  <li id="tts-sync">8.3 ナレーションと TTS のフレーム同期（cue 体系・アンカー・予算検査） → <a href="../../production/pref-ranking-1.html#tts-sync">5 章 ナレーションと TTS の同期</a></li>
+  <li id="rebuild">8.4 再ビルドが必要になる変更 → <a href="../../production/pref-ranking-1.html#rebuild">6 章 再ビルドが必要になる変更</a></li>
 </ul>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-10、17-2 巡 1）: 明色背景での可読性規定（金の沈み対策・減光 3 層・出典行帯）</span>
-  生成り系の明色パレットでは金色（アクセント）が沈む。モック比較で確定した規定:
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>生成り地の上に金を単独で使うことを禁止</strong>する（規定として恒久化）。文字の金は<strong>藍（<code>ink</code>）の 8 方向縁取り（outlineShadow）+ グローを必須</strong>とする</li>
-    <li>面の金（1 位行の帯）は<strong>深金 → 金 → 明金のグラデーション + 藍の内側輪郭</strong>で構成する（単色の金面は使わない）</li>
-    <li>背景イラストの上の減光オーバーレイは<strong>3 層構造（全面ベース + 上帯 + 下帯）</strong>とし、中央部の減光は 46〜50% を目安とする（文字域の上下帯を濃くし、地図域の背景は活かす）</li>
-    <li>出典行は<strong>生成り 86% の角丸帯 + 28px</strong> で常設する。注記義務のあるネタ（家計調査系）は「※家計調査（県庁所在市・政令市の世帯数加重平均）」の類の注記を<strong>固定要素</strong>として帯に含める（文言はストック行の <code>content_fields.source_display</code> が正）</li>
-  </ul>
-  トークンの実値（<code>goldDeep</code> / <code>ink</code> / 帯色ほか）は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 8</a>。
-</div>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-11、17-4a 版面デザイン工程）: 実データで組んだ版面の作り込み</span>
-  17-3 のプレビュー動画（実データ + 実背景）が「品位が低い」と評価されたため、実装着手の前に版面デザインを独立工程として置き、モック比較 3 巡で以下を Fix した。17-2 巡 1 の規定と食い違う箇所は<strong>本項が優先</strong>する。
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>もう一色を藍 → 淡墨茶へ差し替え</strong>（トークン実値は <a href="../sets/pref-ranking-1.html">セット別設計書セクション 8</a>）。金の単独使用禁止・縁取り / グラデ必須の規定は維持し、縁取り色を藍 → 淡墨茶（<code>sumiDeep</code>）に読み替える</li>
-    <li><strong>未発表の「？？？」枠を廃止</strong>。順位行スタックは<strong>下端固定</strong>とし、5 位から上へ 1 行ずつ生やす。空く序盤は <code>content_fields.subtitle</code> の<strong>全国平均プレート</strong>が受ける（20 秒版でも画面には出す。読み上げは 30 秒版のみで不変）</li>
-    <li><strong>順位行のバーを廃止</strong>し、順位バッジ + 県名 + 数値だけにする（バーの長さと数値の二重表現の解消）。数値は <code>content_fields.value_prefix</code>（「年間」等）を数字の前に置き、何の値かを行ごとに示す</li>
-    <li><strong>確定県は「地図 → 順位行へ県名が飛ぶ」</strong>モーションで対応づける（地図と順位行の視線の分断の解消）。<strong>地図上に順位ラベル（ピン）は置かない</strong>（ユーザー判断。代わりに確定県は塗り + 縁 1.8px + <code>drop-shadow</code> で強調する）。2〜5 位のラベルは<strong>県の重心の真上</strong>から飛ばす（重心に重ねると確定した県自体を隠す）。1 位のみ地図中央下に大きく据える</li>
-    <li><strong>地図は viewBox 全域（0 0 1000 1000）で描く</strong>。陸地の実バウンディングボックスは x 3.9〜996.7 / y 0.0〜1000.0 で余白がほぼ無く、切り詰めると<strong>九州南部（鹿児島の南端が y=1000）と南西諸島インセットが欠ける</strong>。地図ボックスは 890×866 でこの正方形が順位行スタックの上に収まる寸法とし、<strong>拡大率は 1.04 倍を上限</strong>とする（行が増えるほど縮めて序盤の空白を埋める演出。これ以上拡大すると九州南部が順位行のゾーンへ押し出される）</li>
-    <li><strong>タイトル帯は 2 段</strong>にする。上段に金でセット固定のラベル（「都道府県ランキング TOP5」= <code>labels.setLabel</code>）、下段にネタタイトル 56px・1 行。上段が無いと「何のランキングか」が伝わらない。上下 4px の金縁は浮くため<strong>下辺のみ 2px / 不透明度 50%</strong> に改める</li>
-    <li><strong>タイトル帯・地図・全国平均プレートは登場アニメを持たず 0 秒から出す</strong>。冒頭が空の版面はスキップされる</li>
-    <li><strong>冒頭だけは音と字幕を対応させない</strong>。ナレーションが <code>intro</code>（タイトル読み）を話している 0〜2.5 秒の間、吹き出しには <code>teaser</code> の問いかけを出しておく（<code>intro</code> はタイトル帯と重複して情報量が増えない一方、問いかけを早く出すほど「予想させてから見届けさせる」時間が伸びる）</li>
-    <li><strong>背景の中央減光を 46〜50% → 30% へ戻す</strong>（17-2 の値では背景イラストがほぼ無地に見えた）。あわせて和紙ノイズとヴィネットを重ねる</li>
-    <li><strong>出典行は必ず 1 行</strong>に収める。文字数から字送りを自動算出する（下限 20px。<code>source_display</code> は全角 36 文字以内が推奨）</li>
-    <li><strong>スピン中の吹き出し</strong>は <code>labels.searching</code>（「第{rank}位は…？」）を出す。結果を含まないため点滅表示と両立する</li>
-  </ul>
-  コンポジションの実装は <code>content/video-build/pref-ranking-1/remotion/</code>（<code>layout.ts</code> = ジオメトリ / <code>theme.ts</code> = トークン / <code>scripts/build_timeline.py</code> = タイムライン定数〔<code>src/timeline.json</code> は生成物〕 / <code>PrefRankingVideo.tsx</code> = 版面）が正。
-</div>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-26、17-5c）: 初期 14 本の全数レビュー前スクリーニングで見つけた版面 2 件</span>
-  実データ 14 本を通しで組んで初めて出た不具合。いずれも <code>PrefRankingVideo.tsx</code> で修正し、<strong>コンポジション版の混在を避けるため 14 本すべてを同一版で再ビルド</strong>した。
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>順位行の数値は 1 本の中で小数桁数を揃える</strong>。<code>toLocaleString</code> は末尾 0 を落とすため、<code>ranking_data</code> が <code>75.0</code> でも版面は「75%」になり、同じ画面の「77.1%」と精度が食い違って見えた（013-myhome-rate で実際に発生）。桁数は<strong>当該動画の 5 件の実値から決める</strong>（全件整数の円額ネタは 0 桁のままで表示は変わらない）。率のネタが増えるほど再発しやすいため、行単位ではなく動画単位で決める形にしてある</li>
-    <li><strong>吹き出しに <code>line-break: strict</code> を指定</strong>する。既定の <code>auto</code> は小書き仮名の前で改行し、「パン食は西日本の文化、し / っかり数字に出たな！」が出た（003-bread-spend）。禁則処理をかけると改行位置は前へ動くだけなので、行が伸びて 3 行になる方向の副作用はない</li>
-  </ul>
-  <strong>禁則処理では解消しない行またぎは文言側で直す</strong>（「マイホームの地図は、日 / 本海側にずらりだ！」のような語中改行。<code>content_fields.trivia</code> の書き直し → 再ビルド）。執筆時の観点として <code>WRITING-NOTES.md</code> にも記載がある。
-</div>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-29、R-1）: 冒頭 5 秒の予熱スピンと煽り吹き出しのモーション（ミュート離脱対策）</span>
-  視聴維持カーブ 2 本の目視（2026-08-28）で<strong>離脱の崖は 0〜2 秒</strong>、0:05 を越えた視聴者はほぼ完走すると分かった。一方 30 秒版の 0.00〜5.00 秒（<code>intro</code> 89f + <code>teaser</code> 61f）は、地図の拡大率が 1.04 固定・背景の ken-burns も 900f で 1.0→1.07 と知覚できず、<strong>実質静止画</strong>だった。既存区間に動きを足す形で解消した（<strong>タイムライン定数 <code>DURATION_SPECS</code> は変更していない</strong> — 総尺・シーン配分・ナレーション予算検査に影響を出さないため）。
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>予熱スピン</strong>: 本番スピン開始前（<code>frame &lt; rounds[5].start</code>）も<strong>フレーム 0 から県を点滅させる</strong>。速さは本番スピンの最高速と同じ（<code>spinTicks</code> の初期間隔 = 2 フレーム固定・減速なし）</li>
-    <li><strong>速さと眩しさの分離</strong>: 5.00 秒の変化点は速さではなく<strong>発光強度</strong>で作る。<code>JapanMap</code> に <code>litIntensity</code>（既定 1 = 本番スピンの現行値）を持たせ、塗りの不透明度と <code>drop-shadow</code> の滲みだけを比例させる（縁取りは残して「どの県が光ったか」の可読性を確保）。<strong>予熱 0.42 → 本番スピン 1.0 → 停止フラッシュ最大</strong>の 2 段階で変化点が残る</li>
-    <li><strong>煽り吹き出しのモーション</strong>: 尻尾の付け根（<code>transformOrigin: 78px 100%</code>）を基点に、拡大 0.62 → 1.0 のポップイン（spring・約 0.4 秒）+ 減衰する 2 度の揺れ（0.43〜1.1 秒）。<strong>モーションは 0〜1 秒に集中させ</strong>、崖より後には置かない。ミュートでも「予想しろ」という参加要求が届くようにする狙い（17-3 で <code>teaser</code> を全ネタ必須にした意図をミュート視聴者へ通す）</li>
-    <li><strong>17-4a の「登場アニメを持たず 0 秒から出す」規定は維持</strong>する。吹き出しは不透明度をいじらず拡大 0.62 から始めるため、フレーム 0 でも読める状態で出ている。<strong>変形はレイアウト後に効く</strong>ので、改行位置・フォントサイズ段階（48/44/40）・尻尾の相対位置は不変。teaser 区間外（順位コメント・締め）は恒等変換で従来どおり</li>
-    <li><strong>予熱区間は <code>spinningRank</code> を <code>null</code> のままにする</strong>（吹き出しの点滅表示は本番スピン中だけ。煽り文は 0 秒から点滅させずに読ませ続ける）</li>
-    <li><strong>コンポジション版の混在を避けるため、使用済みを含む在庫全 30 件を同一版で再ビルドして差し替えた</strong>（2026-08-29。セクション 4 の LRU 順繰りは在庫枯渇時に使用済み行を再投稿するため、旧版が再び表に出る）</li>
-  </ul>
-  パラメータの正は <code>src/PrefRankingVideo.tsx</code>（<code>PREHEAT_TICK</code> / <code>PREHEAT_LIT_INTENSITY</code> / <code>TEASER_POP_FROM</code> / <code>TEASER_NUDGE_AT</code> / <code>TEASER_NUDGE_DUR</code>）。経緯・棄却案は <a href="../../ideas/ranking-opening-hook.md">アイデア記録 ranking-opening-hook.md</a>、実施記録は <a href="../../plans/pref-ranking-1-log.html">セット記録セクション 3</a>。
-</div>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-11、17-4b）: 地図の PD 差し替え・素材の正式化</span>
-  下記の素材要件を満たす形で、<strong>地図を Natural Earth 10m admin-1（Public Domain）由来へ差し替えた</strong>（GFDL 由来のプロト素材を廃止。Phase 17 決定方針⑨を完了）。生成は <code>content/video-build/pref-ranking-1/remotion/scripts/build_japan_paths.py</code>（素材の取得・投影・インセット移設・出力）で、<code>src/japanPaths.ts</code> / <code>src/prefCentroids.ts</code> は<strong>自動生成物</strong>になった。素材要件との差分・追加決定は以下:
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>素材側の誤りを補正している</strong>: Natural Earth は<strong>奄美群島を沖縄県に割り当てている</strong>（実際は鹿児島県）。生成スクリプトが緯度 27.0N 以北かつ経度 128.3E 以東のリングを鹿児島県へ付け替える。補正しないと「鹿児島 1 位で奄美が塗られない / 沖縄 1 位で奄美まで塗られる」という<strong>内容の誤り</strong>になる。退行検出のため<strong>目印の島 21 件の県割当を毎回検査</strong>し、不一致ならビルドを失敗させる</li>
-    <li><strong>インセットは 2 群を個別に置かず、南西諸島をひとまとまりで相似変換する</strong>（本土と同一投影のまま group 全体を縮小 + 平行移動）。実ジオメトリでは「実際の相対配置」が自動的に保たれるため、群ごとの <code>translate</code> は不要になった</li>
-    <li><strong>インセットの縮尺は 0.75 → 0.68</strong>。実ジオメトリの南西諸島は 0.75 倍では点線 L 字の枠（角 686,680）に収まらないため、<strong>見た目（L 字の角の位置・インセットが占める領域）を正として縮尺の方を実測で決め直した</strong>。点線 L 字の座標は 17-4a の Fix 値を維持</li>
-    <li><strong>版面に載せない離島</strong>: 伊豆諸島・小笠原諸島・硫黄島・南鳥島・大東諸島と、面積が約 12km² 未満の島（地図ボックスの外へ大きく外れる / 点にしかならないため。17-4a で Fix した版面の再現）</li>
-    <li><strong>1 位が沖縄のときだけ、発表に合わせてインセットの島々をその場で拡大する</strong>（17-4b のレンダリング確認でのユーザー判断）。インセットの島は小さく、そのままでは「1 位が金に光る」見せ場が成立しないため。島の群だけを <strong>1.84 倍</strong>までバネ補間で拡大し（基点は群の右下 = viewBox <code>995,950</code> に固定して<strong>左上へ育つ</strong>ため、拡大しても viewBox から食み出さず太平洋の空きへ広がる）、点線 L 字はその間フェードアウトする。<strong>枠・パネルの類は出さない</strong>（17-4b で一度パネル方式を試作したがユーザー判断で不採用。島だけが大きくなる形にした）。<strong>1 位の県名ラベルとバーストの中心は拡大後の島の外接矩形を基準にする</strong>（既定位置の地図中央下だと、大きくなった島をラベルが覆う）。<strong>鹿児島が 1 位のときは拡大しない</strong> — 本土側が主役のため。条件は「本土側の実体が無く、確定がインセットの中だけで起きる県」（<code>INSET_ONLY_PREF_CODES</code> = 沖縄）で判定する</li>
-    <li><strong>確定県ラベルの起点は鹿児島だけ本土部分から取る</strong>（全リングの外接矩形中心だと、インセットの島に引かれて太平洋上が起点になる）。沖縄はインセットの位置が起点</li>
-    <li><strong>表彰台五郎のポーズ 3 種を正式アセット化</strong>: 1160x1220 の共通キャンバス・共通倍率へ正規化（基準はボディ前面の「1」の高さと足元。<code>scripts/normalize_character.py</code>）。元の試作は 1 枚ごとに寸法が最大 29% 違い、そのままではポーズ切替でキャラが伸縮していた。S3 <code>assets/pref-ranking-1/goro_{base,suspense,gunbai}.png</code>（元ポーズは同 <code>source/</code>）。<code>layout.ts</code> の <code>CHARACTER</code> は 17-4a の見た目（画面上の大きさ・立ち位置）を維持する値へ更新</li>
-    <li><strong>フォントは Zen Kaku Gothic New（SIL OFL 1.1）に決定</strong>（4 案の実データ比較 → ユーザー判断）。見出し（タイトル帯・順位行の県名・吹き出し）= Black / 本文（数値・出典行）= Medium・Bold の 2 役。<strong>見出しは 1 ファイルを専用 family 名で weight 400 として読み込み、常に 400 で描く</strong>（同一 family へ複数ウェイトを登録すると、太い字面を指定したつもりが細い方で描かれる事象が実際に起きたため）</li>
-    <li>ライセンス証跡は <code>content/video-build/pref-ranking-1/LICENSES.md</code> セクション 4（地図）・5（フォント）</li>
-  </ul>
-</div>
-<div class="warn">
-  <span class="callout-title">地図 SVG の素材要件（差し替え時に必ず満たすこと。17-4b で適用済み）</span>
-  地図素材は<strong>パブリックドメイン素材（Natural Earth 等）</strong>を使う（Phase 17 決定方針⑨）。素材は以下を満たすこと（17-2 巡 1 でモック確定した配置の再現要件。<strong>実際の適用結果と差分は直上の decision が正</strong>）:
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>県単位のパス分割</strong>（47 都道府県を個別に塗り分け・点灯できること）。<strong>鹿児島の離島（奄美・トカラ）は飛び地サブパスとして分離</strong>されていること（インセット移設と「鹿児島 1 位時に本土 + 奄美が同時に金になる」挙動の両立に必要）</li>
-    <li><strong>南西諸島インセット</strong>: 沖縄と奄美・トカラを<strong>実際の相対配置・同一縮尺（0.75 倍）を維持したまま関東沖へ移設</strong>する。点線の L 字囲みは角が房総半島のすぐ東に来る配置。プロト実装値（viewBox 基準）: 沖縄 <code>translate(695,822) scale(0.75)</code> / 奄美・トカラ <code>translate(632,673) scale(0.75)</code> / 点線 <code>M686,960 L686,680 L1000,680</code>。素材の viewBox が変わる場合も<strong>この見た目（相対配置・縮尺・L 字の角の位置）を再現</strong>する</li>
-    <li>ライセンス証跡（出典・PD であることの確認記録）をツーリング内に残す（<a href="../operation.html#ranking-stock-mgmt">operation.html セクション 3</a> の証跡ルール）</li>
-  </ul>
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-08-11、17-4c）: コンポジション本組み（2 尺・タイムライン定数の単一ソース化）</span>
-  20 秒版だけだったコンポジションを 2 尺へ本組みした。
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>30 秒版タイムラインの導出値</strong>（17-4c 時点。<strong>17-4d で順位間の間を作るため配分を見直した</strong>ので、現行値は <code>scripts/build_timeline.py</code> の <code>DURATION_SPECS</code> が正）: 導入 0–105</li>
-    <li><strong>タイムライン定数の単一ソースは Python 側</strong>（<code>remotion/scripts/build_timeline.py</code> の <code>DURATION_SPECS</code> = 尺ごとのシーン長のみを持つコンパクトな仕様）で、<code>src/timeline.json</code> は生成物・<code>src/timeline.ts</code> はそれを読んで型を付けるだけにした。理由: <strong>アンカー解決と予算検査を行うビルドツーリング（17-4d / 17-4e）が Python</strong> で、TS と同じ数値を二重に持つと尺の調整で必ずずれるため（<code>japanPaths.ts</code> と同じ生成物方式）。20 秒版の導出値が 17-4a / 17-4b の Fix 値と一致することは pytest で固定してある</li>
-    <li><strong>結果総覧と締めは版面上ひとつながりの区間として扱う</strong>（<code>recapAt === closingAt</code>）。TOP5 が出そろった画面をそのまま見せるのが結果総覧の役割で、シーン境界で版面を切り替えない。5.0s が単調にならないよう、17-4a の順送りの持ち上げに加えて<strong>1 位行だけ緩やかな明滅</strong>を重ねる</li>
-    <li><strong>props の最終形</strong>: <code>duration</code>（尺 = タイムラインの選択）を必須にし、コンポジション側の尺ハードコードを廃止した。Composition は <code>calculateMetadata</code> で <code>props.duration</code> から <code>durationInFrames</code> を導出するため、<strong>props と尺が食い違わない</strong>。cue には <code>frames</code>（合成音声の実測長）を追加し、音声 Sequence の長さに使う（従来は 180f 固定）</li>
-    <li><strong>全国平均プレートの固定ラベル「全国平均」を廃止</strong>し、<code>content_fields.subtitle</code> を 1 行でそのまま出す（最初の数字の位置で分け、前半を小さく・後半〔数値〕を大きく描く）。理由: <code>subtitle</code> は「全国平均は1,984円」のように<strong>自己完結した表示文字列</strong>で固定ラベルと二重になるうえ、平均でない指標（009 温泉 =「全国の源泉は27,899本」）では<strong>固定ラベルが内容の誤りになる</strong></li>
-    <li>吹き出しは文字数でフォントサイズを 48 → 44 → 40 に落とす（30 秒版の <code>closing</code> は予算上 30 文字程度まで伸びうる。3 行になると吹き出しの尻尾がキャラの頭に重なる）</li>
-  </ul>
-</div>
-
-<h3 id="tts-sync">8.3 ナレーションと TTS のフレーム同期（尺別固定アンカー + 予算検査）</h3>
-<p>ナレーションはセリフ（cue）単位で TTS 合成し、<strong>タイムライン定数に固定したアンカーフレーム</strong>へ配置する（Phase 17 決定方針⑦の具体化）。cue ID の体系（<code>narration</code> JSON のキー。<a href="../data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）:</p>
-<div class="table-wrap">
-<table>
-<tr><th>cue ID</th><th>内容</th><th>尺</th><th>同期先</th></tr>
-<tr><td><code>intro</code></td><td>導入（タイトル読み。30 秒版は「〜、トップ5！」まで）</td><td>両尺（テキストは尺別）</td><td>オープニング / 導入シーンの先頭</td></tr>
-<tr><td><code>teaser</code></td><td><strong>煽り</strong>（「みんなはどこだと思う？」の類。視聴者に 1 位を予想させ、離脱前に一度考えさせる）。<strong>全ネタ必須</strong></td><td>両尺（テキストは尺別にしてよい）</td><td>煽りシーンの先頭</td></tr>
-<tr><td><code>r5</code>〜<code>r2</code></td><td>各順位の呼び込み + 県名（「まずは5位、埼玉県！」の形。<strong>1 本に統合</strong>）</td><td>両尺（テキストは尺別にしてよい）</td><td>各順位シーンの先頭（<strong>県名部分が停止フラッシュに重なる</strong>ようアンカーを詰める。下記 decision）</td></tr>
-<tr><td><code>r1_call</code></td><td>1 位のタメの煽り</td><td>両尺（テキストは尺別にしてよい）</td><td>1 位シーンのスピン開始</td></tr>
-<tr><td><code>r1_name</code></td><td>1 位の県名の読み上げ</td><td>両尺</td><td><strong>停止フラッシュに同期</strong>（発表の瞬間と一致させる）</td></tr>
-<tr><td><code>r5_comment</code>〜<code>r2_comment</code></td><td>順位ごとのひとことコメント</td><td><strong>30 秒版のみ</strong></td><td>各順位シーンのコメント区間（1.5s）</td></tr>
-<tr><td><code>outro</code></td><td>締め（予想の答え合わせ。「みんなはわかったかな？」）</td><td><strong>20 秒版のみ</strong></td><td>締めシーン</td></tr>
-<tr><td><code>closing</code></td><td><strong>締めくくりの語り</strong>（ネタの含意を口語で言い切る。<code>content_fields.trivia</code> の核を 1 文に凝縮したもの）</td><td><strong>30 秒版のみ</strong></td><td>結果総覧シーンの先頭（<strong>結果総覧 3.0s + 締め 2.0s の 2 シーンをまたぐ 1 本の cue</strong>）</td></tr>
-</table>
-</div>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-10、17-2 巡 1）: 固定アンカー + 予算検査方式（可変尺方式は不採用）</span>
-  音声の実測長に合わせてアンカー・尺を動かす「可変尺方式」は、セリフを直すたびに版面演出（スピン・フラッシュ・行追記）との同期が崩れ、2 尺のタイムライン Fix が意味を失うため<strong>不採用</strong>。採用方式:
-  <ul style="margin:.3rem 0 0;">
-    <li>各 cue の開始フレームは<strong>尺別のタイムライン定数（アンカー表）に固定</strong>する。アンカー間隔から各 cue の<strong>時間予算</strong>が決まる</li>
-    <li>ビルド時、VOICEVOX の合成結果の<strong>実測長が予算を超過したらビルドエラー</strong>にする（静かに次の cue へ食い込ませない）。<strong>第一の対処はセリフの修正</strong>（短く書き直す）、第二の手段として話速 <code>speedScale</code> の引き上げ（上限 1.2。それ以上は聞き取りにくくなるため禁止）</li>
-    <li>予算内の余りは無音で吸収する（cue の頭をアンカーに揃える）</li>
-  </ul>
-  話者・既定の合成パラメータ（速度・抑揚）はセット固有のため <a href="../sets/pref-ranking-1.html">セット別設計書セクション 7</a>。
-</div>
-<div class="decision">
-  <span class="callout-title">決定（2026-08-11、17-3 のストックレビュー）: 煽り cue の新設と 5〜2 位 cue の統合</span>
-  <p style="margin:.3rem 0;"><strong>変更 1: <code>teaser</code>（煽り）を <code>intro</code> の直後に必須で置く。</strong>導入でタイトルを言った直後に視聴者へ 1 位を予想させ、結果を見届ける動機を作る。冒頭で一度参加させることが完走率・コメントの両方に効くという想定で、<strong>全ネタ必須</strong>とする（<code>validate</code> 相当のフィールド検査で欠落を落とす）。</p>
-  <p style="margin:.3rem 0;"><strong>変更 2: 5〜2 位の <code>r*_call</code>（呼び込み）と <code>r*_name</code>（県名）を 1 本の cue <code>r5</code>〜<code>r2</code> に統合する。</strong>「まずは5位、埼玉県！」のように 1 息で言い切る形にする。<strong>1 位だけは <code>r1_call</code>（タメ）と <code>r1_name</code>（発表）を分けたまま</strong>にする（タメ → 発表の間が演出の核であり、ここを統合すると 1 位の見せ場が消えるため）。</p>
-  <p style="margin:.3rem 0;">この 2 点で捻出した尺が <code>teaser</code> の原資であり、<strong>20 秒 = 600f / 30 秒 = 900f の総尺と、1 位シーン・結果総覧・締めの配分は変えていない</strong>（20 秒版は順位シーンが 2.5s → 2.0s、30 秒版は順位コメントが 2.0s → 1.5s に縮む）。</p>
-  <p style="margin:.3rem 0;"><strong>変更 3: 締めのセリフを「呼びかけ」から「中身のある一言」に変える。</strong>20 秒版の <code>outro</code> は <strong>「みんなはわかったかな？」で全ネタ共通</strong>とし、冒頭の <code>teaser</code> で促した予想の答え合わせで閉じる。30 秒版は<strong>県名を並べるだけの <code>recap</code> を廃止</strong>し、<code>recap</code> + <code>outro</code> を <strong><code>closing</code> 1 本に統合</strong>して、そのネタの含意（<code>content_fields.trivia</code> の核）を口語で言い切る（例: 「納豆好きの地図は、きれいに北へ寄ってるな！」）。結果の一覧は結果総覧シーンの画面とキャプションの <code>result_list</code> で担保されており、読み上げで重ねる価値が低いという判断。<strong>保存の呼びかけはナレーションから外れる</strong>が、キャプションの TOP5 再掲（<a href="../sets/pref-ranking-1.html">セット別設計書セクション 5</a>）が保存の動機を担う。</p>
-  <p style="margin:.3rem 0;">統合に伴う実装上の制約が 2 つある。<strong>①アンカーの後ろ合わせ</strong>: 統合 cue は「◯位は」の呼び込みで始まり県名で終わるため、頭合わせのままだと県名の発話が停止フラッシュより早く終わる。順位シーンに限り、<strong>県名部分の発話開始が停止フラッシュに重なるようアンカーを詰める</strong>（実測長からの逆算。17-4 で調整）。<strong>②吹き出しの表示開始</strong>: 統合 cue のテキストは県名を含むため、キャラの吹き出しに<strong>スピン中から出すと結果が先にばれる</strong>。順位シーンの吹き出しは<strong>停止フラッシュ以降に限る</strong>（セクション 8.2）。</p>
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-08-11、17-4c）: アンカー表・後ろ合わせ・予算検査の実装</span>
-  <p style="margin:.3rem 0;">アンカー表と解決ロジックの正は <code>remotion/scripts/build_timeline.py</code>（<code>cue_anchors()</code> / <code>resolve_cue_frames()</code>）。cue ごとに <strong>align</strong>（<code>head</code> = 頭合わせ / <code>name</code> = 後ろ合わせ）と<strong>予算区間 <code>[budget_start, budget_end)</code></strong> を持ち、TTS の実測値（<code>frames</code> と、後ろ合わせ cue は<strong>県名の発話開始オフセット</strong> <code>name_offset_frames</code>）を渡すと配置フレームと違反一覧を返す純関数にした。</p>
-  <ul style="margin:.3rem 0 0;">
-    <li><code>head</code>: <code>start_frame = anchor</code> / <code>name</code>（<code>r5</code>〜<code>r2</code>）: <code>start_frame = anchor（= 停止フラッシュ） - name_offset_frames</code></li>
-    <li>違反は <strong>2 方向</strong>で検出する。<code>head_overrun</code> = 呼び込み部分が長すぎて前のシーンへ食い込む / <code>tail_overrun</code> = cue の尻が次の cue のアンカーへ食い込む。ほかに <code>missing</code>（実測なし）・<code>unknown</code>（尺に無い cue ID）・<code>missing_name_offset</code>。<strong>例外は投げず全件返す</strong>（ビルドツーリングがまとめて提示する。対処は 17-4c 時点では「セリフの短縮 → 話速 ≤ 1.2」の順だったが、<strong>17-4d で既定話速が上限の 1.2 になったためセリフの短縮のみ</strong>）</li>
-    <li><strong>順位 cue の予算（両尺共通）: 呼び込み部分 30f（1.0s）・県名部分 30f（1.0s）</strong>。ほかの cue の予算は 20 秒版が <code>intro</code> 75f / <code>teaser</code> 60f / <code>r1_call</code> 75f / <code>r1_name</code> 60f / <code>outro</code> 90f、30 秒版が <code>intro</code> 105f / <code>teaser</code> 60f / 各 <code>*_comment</code> 45f / <code>r1_call</code> 90f / <code>r1_name</code> 75f / <code>closing</code> 150f</li>
-    <li><code>name_offset_frames</code>（県名の発話開始）の実測方法は 17-4d で確定する（VOICEVOX の <code>audio_query</code> が返すモーラ長の積み上げで算出する見込み）<strong>→ 確定した（下記 17-4d の decision）。予算区間による頭側の判定も 17-4d で置き換えた</strong></li>
-    <li><strong><code>intro</code> の「30 秒版はサブタイトルまで読む」は撤回する</strong>（実態に合わせた修正）。第 1 バッチ 10 件の 30 秒版 <code>intro</code> はタイトル + 「トップ5！」までで、<code>content_fields.subtitle</code> は 17-4a の決定により<strong>両尺とも 0 秒から全国平均プレートとして画面に出る</strong>。読み上げでの重複は不要と判断し、必須にしない</li>
-  </ul>
-</div>
-
-<div class="decision">
-  <span class="callout-title">決定（2026-08-11、17-4d）: TTS アダプタ・県名開始位置の実測・予算検査の判定基準</span>
-  <p style="margin:.3rem 0;">TTS はアダプタ層 <code>remotion/scripts/tts.py</code> に閉じた（再利用要件③）。<code>CueRequest</code>（cue ID・テキスト・県名）→ <code>CueAudio</code>（WAV パス・実測秒・フレーム・<code>name_offset_frames</code>・話速・エンジン識別子）が固定のインターフェースで、VOICEVOX 固有の HTTP 呼び出しはこの中だけにある。合成・検査・props 解決を通す CLI は <code>remotion/scripts/build_narration.py</code>（違反があるときは props を書かずに終了コード 1）。</p>
-  <ul style="margin:.3rem 0 0;">
-    <li><strong><code>name_offset_frames</code> の実測方法</strong>: cue の <code>audio_query</code> のモーラ長を積み上げる。県名は<strong>単体の <code>audio_query</code> でモーラ列を得て、cue のモーラ列に対し右端から一致検索</strong>する（「まずは5位、埼玉県！」の <code>サイタマケン</code>）。読点のポーズもモーラ列の要素として積むため、ポーズを挟んだ県名でも一致する。cue 全体の長さは <strong>WAV の実測</strong>から取り、モーラ積み上げの予測との差が 0.08 秒を超えたら異常終了する（エンジン更新で長さモデルが変わったことの検知）</li>
-    <li><strong>疑問形の語尾上げ（<code>enable_interrogative_upspeak</code> の既定 = 有効）は <code>audio_query</code> に現れない</strong>。合成時に末尾モーラの母音がもう 1 つ足されるため、モデル側で補う（補わないと <code>teaser</code> のような疑問形 cue が全件 0.15 秒ずれる）。第 1 バッチ 10 件 × 2 尺 × 話速 1.1 / 1.2 の全 cue で、補正後の予測と実測の差は中央値 0.01 秒・最大 0.06 秒</li>
-    <li><strong>頭側の判定を「シーン境界の予算」から「直前 cue との重なり」へ変える</strong>（17-4c の予算区間は<strong>参考値</strong>として残す）。実測すると 5〜2 位の統合 cue の呼び込み部分は 29〜38f あり、17-4c の予算 30f を<strong>第 1 バッチ全件が超過</strong>する。一方で後ろ合わせに配置した実音声どうしの重なりは最悪 3f しかなく、頭が 0.2 秒ほど前のシーンへ食い込むこと自体は視聴上の問題にならない（吹き出しの字幕は停止フラッシュ以降のままで、先出しにもならない）。判定基準:
-      <ul>
-        <li>cue 間には <code>MIN_GAP_FRAMES = 2</code>（0.07 秒）の無音を必ず空ける</li>
-        <li>後ろ合わせ cue は直前 cue と重なるときだけ後ろへずらす。ずらせる上限は <code>NAME_LAG_MAX_FRAMES = 8</code>（0.27 秒。県名の発話開始が停止フラッシュより遅れる量）。ここまで詰めても重なるなら <code>head_overrun</code></li>
-        <li>頭合わせ cue はアンカー固定のまま（ずらさず <code>head_overrun</code>）。<code>tail_overrun</code> は「次 cue の開始 - 最小ギャップ」（最後の cue は総尺）で判定する</li>
-      </ul>
-      第 1 バッチ 10 件 × 2 尺（cue 220 本）を話速 1.1 で合成して<strong>違反 0 件</strong>。県名の遅れは 80 本中 65 本が 0f、最大 6f（上限 8f に対して余裕あり）</li>
-    <li><strong>順位間に「間」を作るため、既定話速の引き上げと尺配分の見直しを行った</strong>（2026-08-11、ユーザーの実物確認: 「順位間の間がなさすぎでメリハリがない」）。cue の配置は隣接検査に通っていても、<strong>実測の最小間隔が 2f（0.07 秒）</strong>しかなく発話が途切れずに続いていた。発話密度が 79%（20 秒版の発話合計 451〜474f / 600f）と高く尺配分だけでは足りないため、<strong>既定話速を 1.1 → 1.2（設計上の上限）へ引き上げ</strong>（ユーザー判断）、そのうえで総尺を変えずにシーン配分を組み直した（20 秒版: 導入 70 / 煽り 64 / 順位 72〔スピン 30 + 発表 42〕/ 1 位 タメ 72 + 発表 48 / 締め 58、30 秒版: 導入 89 / 煽り 61 / 順位 123〔スピン 30 + 発表 39 + コメント 54〕/ 1 位 タメ 87 + 発表 54 / 結果総覧 72 / 締め 45）。配分は第 1 バッチ 10 件 × 2 尺の実測長で全候補を評価し、最悪ケースの最小間隔が最大になる案を選んだ。結果、<strong>最小間隔は 2f → 15f（20 秒版）/ 13f（30 秒版）</strong>、典型値は 0.5〜0.7 秒になった。これ以上の間はセリフを短くしない限り作れない（話速は上限に達しており、尺配分の余地も使い切っている）</li>
-    <li><strong>音のミキシングは相対バランスだけをコンポジションで決め、配信レベルはレンダリング後に揃える</strong>。ナレーションのみの 20 秒版は -23.9 LUFS と静かで、Remotion にはラウドネス正規化の機能がないため。<code>remotion/src/audio.ts</code> が BGM をナレーションの <strong>18 LU 下</strong>（実測で無音区間の BGM ≒ -42 LUFS）に置き、<code>remotion/scripts/normalize_loudness.py</code>（ffmpeg <code>loudnorm</code> 2 パス・<strong>映像は再エンコードしない</strong>）が <strong>I = -14 LUFS / TP = -1.5 dBTP</strong> を目標に揃える（linear モードのためピーク制約が効き、実測は -15.0 / -14.8 LUFS に着地）。<strong>ダッキングは行わない</strong>（ナレーションがほぼ全編を占め、常時作動して定常減衰と変わらないため）。BGM は頭 0.5 秒フェードイン / 尻 1.5 秒フェードアウトで、曲が尺より短い場合に備えてループさせる</li>
-  </ul>
-</div>
-
-<h3 id="rebuild">8.4 再ビルドが必要になる変更</h3>
-<div class="warn">
-  <span class="callout-title">版面・タイムライン・素材の変更は事前動画の再ビルドを伴う</span>
-  事前動画には版面・パレット・背景・ナレーション・BGM がベイクされている。以下の変更は<strong>該当する事前動画の全再ビルド + 差し替え</strong>が必要になる:
-  <ul style="margin:.3rem 0 0;">
-    <li>版面・タイムライン・尺構成の変更（コンポジション改修 → 全量再ビルド）</li>
-    <li>パレット（デザイントークン）・キャラアセット・地図 SVG の変更（<strong>17-4 の PD 地図差し替えは全量再ビルドの契機</strong>。ただし 17-4 は初期ビルド前のため実質影響なし）</li>
-    <li>BGM の差し替え（ミュート検知時を含む。対象は <code>video_audio_asset_id</code> で特定できる）・VOICEVOX 話者やセリフの変更</li>
-  </ul>
-  一括再ビルドはツーリングの <code>--rebuild</code>（ビルド済み行を対象に、BGM を <code>video_audio_asset_id</code> から引き継いで再ビルド = 選曲 LRU を消費せず、<code>last_used_at</code>〔投稿キュー〕も変えない。<code>quiz-prebuilt</code> の 16-4b と同型）で行う。再ビルド後の全数レビュー → S3 上書き → 両環境 DB 反映は新規ビルドと同じ。
-</div>
 
 <h2>9. 依存ライブラリ・実行環境</h2>
 <div class="table-wrap">

@@ -83,7 +83,7 @@
 <p>環境変数 <code>API_SECRET_ARN</code> から <code>openai_image.load_api_key()</code> で取得する（他方式と同一の Secret <code>acps/{env}/image/api-key</code>）。生成チェーン休止後に OpenAI API を呼ぶのは<strong>情景イラスト生成（Images API）のみ</strong>（クライアントのタイムアウト 300 秒）。</p>
 
 <h2 id="stock">5. 問題ストックの取得（LRU 順繰り）</h2>
-<p>出題は<strong>人間レビュー済みの問題ストック <code>quiz_stock_items</code></strong>（<a href="../data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）から取得する。ストックの調達（リサーチ → 表現書き直し → レビュー → 投入）と補充サイクルは <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>。</p>
+<p>出題は<strong>人間レビュー済みの問題ストック <code>quiz_stock_items</code></strong>（<a href="../data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）から取得する。ストックの調達（リサーチ → 表現書き直し → レビュー → 投入）と補充サイクルは <a href="../../production/logic-training-1.html">生産の詳細設計 logic-training-1</a>。</p>
 <p><strong>選定クエリ</strong>（<code>audio_assets</code> のスロット別 LRU 選曲と同型）: スロットの <code>quiz_type</code> / <code>difficulty</code> に一致する有効ストックから、最も長く使っていない 1 問を選ぶ。MySQL の ASC ソートは NULL が先頭のため、<strong>未使用（<code>last_used_at IS NULL</code>）を優先し、未使用が尽きたら最古使用分を再利用する</strong>挙動がクエリ 1 本で成立する。</p>
 <pre><code>SELECT id, question_text, answer_text, content_fields FROM quiz_stock_items
  WHERE set_id = %s AND quiz_type = %s AND difficulty = %s AND is_active = 1
@@ -115,13 +115,13 @@
 </div>
 <div class="decision">
   <span class="callout-title">決定（16-2b = 2026-08-07 のユーザー決定）: L3 の次回補充方針と <code>explanation</code> 上限の L3 拡張</span>
-  16-2 の人間レビューで確定した次回補充からの L3（フェルミ推定）方針: <strong>捻った分解型（非直接的な仮定を最低 1 つ経由する問題）を標準</strong>とし、解説は <strong>5 ステップ構造（前提 → ベース → 分解 → 計算 → 実勢チェック）</strong>で書く（執筆の勘所はスキル <code>/quiz-stock-replenish</code> の昼 L3 節が詳しい。運用は <a href="../operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）。5 ステップは 80 字に収まらないため、<code>explanation</code> の上限を <strong>L3 のみ 240 字へ拡張</strong>する（DDL は JSON のため変更不要。動画に載らないキャプション専用フィールドのため版面への影響もない）。16-2 の初期 42 問（直接換算型・80 字解説が多い）は<strong>承認済みのため置き換えない</strong>。16-3 の防御的フィールド検査は本上限（L3 = 240 字 / それ以外 = 80 字）で実装し、補充資材の <code>validate.py</code> も次回補充時に同じ上限へ追随させる。<strong>16-4d（2026-08-24）で昼スロットを当分停止したため L3 の補充自体を行わない</strong>（本方針は再開時の執筆基準として残す。経緯は <a href="../sets/logic-training-1.html#noon-suspended">セット別設計書</a>）。
+  16-2 の人間レビューで確定した次回補充からの L3（フェルミ推定）方針: <strong>捻った分解型（非直接的な仮定を最低 1 つ経由する問題）を標準</strong>とし、解説は <strong>5 ステップ構造（前提 → ベース → 分解 → 計算 → 実勢チェック）</strong>で書く（執筆の勘所はスキル <code>/quiz-stock-replenish</code> の昼 L3 節が詳しい。運用は <a href="../../production/logic-training-1.html">生産の詳細設計 logic-training-1</a>）。5 ステップは 80 字に収まらないため、<code>explanation</code> の上限を <strong>L3 のみ 240 字へ拡張</strong>する（DDL は JSON のため変更不要。動画に載らないキャプション専用フィールドのため版面への影響もない）。16-2 の初期 42 問（直接換算型・80 字解説が多い）は<strong>承認済みのため置き換えない</strong>。16-3 の防御的フィールド検査は本上限（L3 = 240 字 / それ以外 = 80 字）で実装し、補充資材の <code>validate.py</code> も次回補充時に同じ上限へ追随させる。<strong>16-4d（2026-08-24）で昼スロットを当分停止したため L3 の補充自体を行わない</strong>（本方針は再開時の執筆基準として残す。経緯は <a href="../sets/logic-training-1.html#noon-suspended">セット別設計書</a>）。
 </div>
 
 <h2 id="illustration">6. 情景イラスト生成</h2>
 <div class="note">
   <span class="callout-title">事前生成側での扱い（16-3b）</span>
-  事前ビルドツーリングは本節の固定プロンプト（情景 + スロット別ムード + ブランド配色 + 禁止事項）の組み立てを移植し、<strong>画風 1 行を恒久追加して imagegen（Codex サブスク内）で生成する</strong>（OpenAI Images API は使わない。<a href="quiz-prebuilt.html#build">quiz-prebuilt セクション 8</a>）。本節の記述は実行時生成（休止中）の仕様として維持する。
+  事前ビルドツーリングは本節の固定プロンプト（情景 + スロット別ムード + ブランド配色 + 禁止事項）の組み立てを移植し、<strong>画風 1 行を恒久追加して imagegen（Codex サブスク内）で生成する</strong>（OpenAI Images API は使わない。<a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a>）。本節の記述は実行時生成（休止中）の仕様として維持する。
 </div>
 <p>取得したストック問題の <code>illustration_scene</code> をコード側固定のイラストプロンプト（情景 + スロット別の時間帯ムード + パレット由来のブランド配色 + 禁止事項）に組み込み、<strong>gpt-image-1 / 1536x1024（横長）/ medium / 1 枚</strong>で生成する。禁止事項は 16-3 の実 API 確認（イラスト内の「ZOO」看板文字・操作パネルの数字・額縁風の左右帯）を受けて調整済み: <strong>大きな「?」マークのみ可</strong>（情景の指定にある場合。16-2 の「主役 + 大きな ?」構図と固定プロンプトの記号禁止の矛盾を解消）・<strong>情景で明示的に指定された文字・数字は指定どおりの字形で正確に描く</strong>（16-4e で緩和。提示物そのものを絵に出す問題への対応）・<strong>情景で指定されていない文字・数字・記号は不可（看板・標識・ロゴ・ボタンや操作パネルの文字数字を含む）</strong>・答えを示唆する構図不可・<strong>額縁や左右の帯で画面を区切らず横長全体を情景で満たす</strong>。旧プロンプトの「背景用 / 情報カードを重ねる / 中央回避」の文言は全面背景時代（15-14 以前）の名残のためカード内ブロックの実態に合わせて廃止した。1 実行 1 枚で、全 3 カットのカード内ブロックに常駐させる（15-9 決定 → 15-14 で全面背景からカード内ブロックへ変更・横長化）。<strong>再利用時も毎回新規生成する</strong>ため、同じ問題の再出題でも見た目は変わる。</p>
 <div class="decision">
@@ -166,7 +166,7 @@
 </div>
 <div class="decision">
   <span class="callout-title">決定（16-4c = 2026-08-23 のユーザー指示）: 3 カット化・つかみ帯の新設・全体ズームの廃止</span>
-  16-2b 構成（4 カット）を実運用の動画で見直し、以下 3 点をユーザーが決定した。<strong>版面変更のため既存の事前ビルド動画 42 本を含む全 63 本を再ビルド・再配置した</strong>（<a href="quiz-prebuilt.html#build">quiz-prebuilt セクション 8</a> の warn どおり）。
+  16-2b 構成（4 カット）を実運用の動画で見直し、以下 3 点をユーザーが決定した。<strong>版面変更のため既存の事前ビルド動画 42 本を含む全 63 本を再ビルド・再配置した</strong>（<a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a> の warn どおり）。
   <ul>
     <li><strong>カット 1「つかみ」とカット 2「考える」を 1 つの導入カット（8 秒）へ統合</strong>し、4 カット → 3 カットにした。吹き出しは<strong>コメント誘発の固定文「わかったらコメントしてくれ！」</strong>。統合しても尺の合計 16 秒・SE のタイミング（tick 8 秒 / chime 13 秒）は変わらない</li>
     <li><strong>つかみを最も目立つ位置（時間帯ラベルピルの下・見出し「問題」の上）のアクセント色の帯へ移した</strong>。文言は問題ごとの <code>hook</code> ではなく <strong>スロット別の可変値 <code>slot_hook</code></strong>（<code>prompt_configs.parameters</code>）とし、全カットで常時表示する。<code>hook</code> フィールドはキャプション専用として存続する（フィールド自体は廃止しない）</li>
@@ -219,7 +219,7 @@
   <ul>
     <li><strong>②を廃止する</strong>（本 decision）。①の 3:2 正規化は維持する方式をユーザーが選択（2026-08-09。両案のサンプル動画比較で「ブロックが大きく余白も自然」）。①も廃止する案は喪失ゼロになる一方、超横長（2.05）の素材でブロックが薄くなり上下の余白が目立つため不採用</li>
     <li>指摘の起点（night-001 の操作パネル）は②で切られていたため、本修正だけで解消する</li>
-    <li><strong>①を無害化する運用</strong>: imagegen の出力比率は同一セッション内でもばらつく（42 問中 3 問はちょうど 1536x1024 = 3:2 で出力された）ため「3:2 で生成できない」わけではない。プロンプト側の 3:2 指定と<strong>中央 3:2 の範囲に主要素を収める指示</strong>で、①の切り捨てが起きても被写体を失わないようにする（<a href="quiz-prebuilt.html#build">quiz-prebuilt セクション 8</a> の工程 2）</li>
+    <li><strong>①を無害化する運用</strong>: imagegen の出力比率は同一セッション内でもばらつく（42 問中 3 問はちょうど 1536x1024 = 3:2 で出力された）ため「3:2 で生成できない」わけではない。プロンプト側の 3:2 指定と<strong>中央 3:2 の範囲に主要素を収める指示</strong>で、①の切り捨てが起きても被写体を失わないようにする（<a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a> の工程 2）</li>
   </ul>
 </div>
 

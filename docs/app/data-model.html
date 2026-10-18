@@ -587,7 +587,7 @@ LIMIT 1;</code></pre>
       <tr><td><code>difficulty</code></td><td>難度ラベル（<code>light</code> / <code>standard</code> / <code>deep</code> 等 = <code>parameters.slots</code> の <code>difficulty</code> と同一の文字列）。<code>VARCHAR(20) NOT NULL</code>。<strong>取得絞り込みキー</strong>（<code>quiz_items.difficulty</code> は NULL 可のスナップショットだが、本テーブルでは絞り込みに使うため必須）</td></tr>
       <tr><td><code>question_text</code> / <code>answer_text</code></td><td>問題文・答え（書き直し済みの表現）。文字数上限は方式のフィールド仕様（<a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）に従う</td></tr>
       <tr><td><code>content_fields</code></td><td>JSON。出題の構造化フィールド全体（<code>hook</code>・<code>hint</code>〔16-2b 追加〕・<code>explanation</code>・<code>coach_comment</code>・<code>tags</code>・<code>summary</code>・<code>illustration_scene</code>。<code>quiz_items.content_fields</code> と同スキーマ）。16-2 の書き直し・レビュー時に全フィールドを執筆する。フィールド仕様・文字数上限の正は <a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a></td></tr>
-      <tr><td><code>source_note</code></td><td><code>TEXT NOT NULL</code>。出典と書き直しの証跡（元ネタの類型・参照 URL・「表現は書き直し済み」の旨。著作権ガイドライン = <a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a>。<code>audio_assets</code> のライセンス証跡と同じ位置づけ）</td></tr>
+      <tr><td><code>source_note</code></td><td><code>TEXT NOT NULL</code>。出典と書き直しの証跡（元ネタの類型・参照 URL・「表現は書き直し済み」の旨。著作権ガイドライン = <a href="../production/logic-training-1.html">生産の詳細設計 logic-training-1</a>。<code>audio_assets</code> のライセンス証跡と同じ位置づけ）</td></tr>
       <tr><td><code>is_active</code></td><td>有効フラグ。品質問題が見つかった問題の取り下げ（<code>retire</code>）に使う</td></tr>
       <tr><td><code>use_count</code></td><td><code>INT UNSIGNED NOT NULL DEFAULT 0</code>。出題回数（再利用の観測用）</td></tr>
       <tr><td><code>last_used_at</code></td><td>NULL 可。最後に出題へ使用された日時（UTC）。<strong>NULL = 未使用</strong>。LRU 順繰りの状態</td></tr>
@@ -604,8 +604,8 @@ LIMIT 1;</code></pre>
     <li>取得した行の <code>last_used_at</code> を現在時刻（UTC）へ、<code>use_count</code> を +1 に UPDATE する。<strong>commit は共通骨格の生成メディア DB 登録と同一トランザクション</strong>（<code>audio_assets.last_used_at</code> と同じ契約）。生成が失敗した場合は消費も進まない</li>
     <li><strong>0 件（型・難度に一致する有効行なし）は設定ミス・未投入として異常終了</strong>（BGM 0 件と同じフェイルラウド方針）。<strong>再利用（<code>last_used_at IS NOT NULL</code> の行を選んだ場合）は WARNING ログ</strong>（補充遅延のサイン。専用アラームは持たない）</li>
     <li>取得直後の<strong>防御的フィールド検査</strong>（必須・非空・文字数上限）で不備は異常終了（投入ミスの検知。<a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）</li>
-    <li>インデックスは取得絞り込み用に <code>KEY (set_id, quiz_type, difficulty, is_active, last_used_at)</code> を持つ（在庫確認クエリ〔<a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a>〕も同じ絞り込みで走る）</li>
-    <li>初期ストック量・補充サイクル・投入手順（リサーチ → 表現書き直し → レビュー → INSERT）と著作権ガイドラインは <a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a> を正とする</li>
+    <li>インデックスは取得絞り込み用に <code>KEY (set_id, quiz_type, difficulty, is_active, last_used_at)</code> を持つ（在庫確認クエリ〔<a href="../production/logic-training-1.html">生産の詳細設計 logic-training-1</a>〕も同じ絞り込みで走る）</li>
+    <li>初期ストック量・補充サイクル・投入手順（リサーチ → 表現書き直し → レビュー → INSERT）と著作権ガイドラインは <a href="../production/logic-training-1.html">生産の詳細設計 logic-training-1</a> を正とする</li>
   </ul>
 </div>
 
@@ -624,8 +624,8 @@ LIMIT 1;</code></pre>
   </div>
   <ul style="margin:.3rem 0 0;">
     <li><strong>「S3 命名規約のみ（カラム追加なし）」案は不採用</strong>: 在庫確認クエリの「動画未ビルト」検出（16-3d の確認条件）が SQL 1 本で行えず S3 LIST との突合が要ること、キー規約への暗黙依存をロジックに持ち込むことが理由</li>
-    <li>3 カラムはビルドツーリングの DB 反映（<a href="generators/quiz-prebuilt.html#build">quiz-prebuilt セクション 8</a> 工程 5）で同時に設定する。<code>video_s3_key</code> が非 NULL で他 2 カラムが NULL の中途半端な行は作らない（実行時は <code>video_audio_asset_id</code> の欠落を異常終了で検知）</li>
-    <li><code>quiz-prebuilt</code> の LRU 取得は上記クエリに <code>AND video_s3_key IS NOT NULL</code> を加えたもの（<a href="generators/quiz-prebuilt.html#stock">方式設計書セクション 4</a>）。在庫確認クエリの拡張版（未ビルト内訳）は <a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a></li>
+    <li>3 カラムはビルドツーリングの DB 反映（<a href="../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a> 工程 5）で同時に設定する。<code>video_s3_key</code> が非 NULL で他 2 カラムが NULL の中途半端な行は作らない（実行時は <code>video_audio_asset_id</code> の欠落を異常終了で検知）</li>
+    <li><code>quiz-prebuilt</code> の LRU 取得は上記クエリに <code>AND video_s3_key IS NOT NULL</code> を加えたもの（<a href="generators/quiz-prebuilt.html#stock">方式設計書セクション 4</a>）。在庫確認クエリの拡張版（未ビルト内訳）は <a href="../production/logic-training-1.html">生産の詳細設計 logic-training-1</a></li>
     <li>DDL（<code>V006__prebuilt_video.sql</code>）の作成は 16-3c、適用は 16-3d 冒頭にローカル MySQL と Aurora の両方へ行う</li>
   </ul>
 </div>
@@ -773,7 +773,7 @@ LIMIT 1;</code></pre>
 
 <div class="decision">
   <span class="callout-title">決定（2026-08-10、Phase 17-2 巡 2）: ランキングストックテーブル ranking_stock_items の新設（V010）</span>
-  <strong>人間レビュー済みのランキングネタのプール</strong>を表すテーブルを新設する。<code>quiz_stock_items</code>（セクション 4.10）の「セット配下の有効レコード + LRU 順繰り + 証跡カラム一元管理 + セット境界の複合 FK + 環境非依存の業務キー <code>content_key</code>」パターンを踏襲し（V007 の教訓を最初から適用）、ランキング固有の差分として <strong>2 尺の事前動画参照・構造化ランキングデータ・ナレーション台本</strong>を持つ。調達・県換算・検証・投入の運用は <a href="operation.html#ranking-stock-mgmt">operation.html セクション 3</a>、取得アルゴリズムは <a href="generators/ranking-prebuilt.html#stock">方式設計書セクション 4</a> を正とする。
+  <strong>人間レビュー済みのランキングネタのプール</strong>を表すテーブルを新設する。<code>quiz_stock_items</code>（セクション 4.10）の「セット配下の有効レコード + LRU 順繰り + 証跡カラム一元管理 + セット境界の複合 FK + 環境非依存の業務キー <code>content_key</code>」パターンを踏襲し（V007 の教訓を最初から適用）、ランキング固有の差分として <strong>2 尺の事前動画参照・構造化ランキングデータ・ナレーション台本</strong>を持つ。調達・県換算・検証・投入の運用は <a href="../production/pref-ranking-1.html">生産の詳細設計 pref-ranking-1</a>、取得アルゴリズムは <a href="generators/ranking-prebuilt.html#stock">方式設計書セクション 4</a> を正とする。
   <div class="table-wrap" style="margin:.4rem 0 0;">
   <table>
     <thead><tr><th>カラム</th><th>役割</th></tr></thead>
@@ -784,8 +784,8 @@ LIMIT 1;</code></pre>
       <tr><td><code>format</code></td><td><code>VARCHAR(20) NOT NULL</code>。動画フォーマット（初期は <code>'top5-map'</code> のみ。全県塗り型の採用時に新値を追加 = DDL 変更なし）</td></tr>
       <tr><td><code>title</code></td><td><code>VARCHAR(100) NOT NULL</code>。ランキングタイトル（版面のタイトル帯・キャプション <code>{{title}}</code>）</td></tr>
       <tr><td><code>content_fields</code></td><td><code>JSON NOT NULL</code>。表示文言の構造化フィールド: <code>hook</code>（つかみコピー。キャプション冒頭）・<code>trivia</code>（豆知識。キャプション）・<code>source_display</code>（出典表記。県換算したネタは換算注記を含む文字列）・<code>result_list</code>（TOP5 の整形済みテキスト。下記 decision）・<code>value_prefix</code>（数値の前置き。例「年間」。何の値なのかを行ごとに示す。不要なネタは <code>null</code> = <strong>17-4a 追加</strong>）・<code>value_suffix</code>（数値の単位表示。例「円」「歳」。版面の順位行と <code>result_list</code> 整形に使う — <code>ranking_data</code> は言語文字列を持たないため、言語依存の単位は本フィールド側で持つ）・<code>subtitle</code>（30 秒版の導入で読むサブタイトル）・<code>bg_motif</code>（背景イラストのモチーフ指示文）。フィールドごとの文字数上限は方式のフィールド仕様（17-4 の実装で確定し方式設計書に記録）</td></tr>
-      <tr><td><code>ranking_data</code></td><td><code>JSON NOT NULL</code>。換算済み TOP5 の構造化データ: <code>{"entries": [{"rank": 1, "pref_code": 30, "value": 12345}, …5 件]}</code>。<strong>数値と都道府県コード（JIS X 0401）のみで言語文字列を含めない</strong>（英語圏展開の再利用要件④ = <a href="generators/ranking-prebuilt.html#build-steps">方式設計書セクション 8.1 の decision</a>。県名・単位の表示はコンポジションの言語リソースと <code>content_fields</code> 側が担う）</td></tr>
-      <tr><td><code>narration</code></td><td><code>JSON NOT NULL</code>。<strong>尺別の cue 台本</strong>: <code>{"20s": {"intro": …, "teaser": …, "r5": …, …, "outro": …}, "30s": {…, "closing": …}}</code>（cue ID 体系は <a href="generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3</a>。ビルド時の TTS 予算検査の対象）</td></tr>
+      <tr><td><code>ranking_data</code></td><td><code>JSON NOT NULL</code>。換算済み TOP5 の構造化データ: <code>{"entries": [{"rank": 1, "pref_code": 30, "value": 12345}, …5 件]}</code>。<strong>数値と都道府県コード（JIS X 0401）のみで言語文字列を含めない</strong>（英語圏展開の再利用要件④ = <a href="../production/pref-ranking-1.html#reuse">生産の詳細設計 pref-ranking-1 の 3.3</a>。県名・単位の表示はコンポジションの言語リソースと <code>content_fields</code> 側が担う）</td></tr>
+      <tr><td><code>narration</code></td><td><code>JSON NOT NULL</code>。<strong>尺別の cue 台本</strong>: <code>{"20s": {"intro": …, "teaser": …, "r5": …, …, "outro": …}, "30s": {…, "closing": …}}</code>（cue ID 体系は <a href="../production/pref-ranking-1.html#tts-sync">生産の詳細設計 pref-ranking-1 の 5 章</a>。ビルド時の TTS 予算検査の対象）</td></tr>
       <tr><td><code>source_note</code></td><td><code>TEXT NOT NULL</code>。出典と県換算の証跡（出典 URL・データ年・取得日・換算方式〔世帯数加重平均〕と使用した世帯数データの出典）。<code>quiz_stock_items.source_note</code>・<code>audio_assets</code> のライセンス証跡と同じ位置づけ</td></tr>
       <tr><td><code>video_s3_key_20s</code> / <code>video_s3_key_30s</code></td><td><code>VARCHAR(512) NULL</code>。尺別の事前動画マスターの S3 キー（<code>assets/{set_code}/prebuilt/{content_key}_20s.mp4</code> / <code>_30s.mp4</code>。セクション 5）。<strong>NULL = 当該尺未ビルト（当該尺のスロットの投稿候補から除外）</strong>。方式はキーを組み立てず常にカラム経由で参照する</td></tr>
       <tr><td><code>video_audio_asset_id</code></td><td><code>BIGINT UNSIGNED NULL</code>。ビルド時に選曲しベイクした BGM（<code>audio_assets</code>）への参照。<strong>2 尺共通の 1 曲</strong>。<code>(set_id, video_audio_asset_id) → audio_assets(set_id, id)</code> の複合 FK。実行時に <code>generated_media.audio_asset_id</code> へ転記（<code>quiz_stock_items</code> の V006 と同じ設計）</td></tr>
@@ -797,7 +797,7 @@ LIMIT 1;</code></pre>
   </table>
   </div>
   <ul style="margin:.3rem 0 0;">
-    <li>インデックスは取得絞り込み用に <code>KEY (set_id, is_active, last_used_at)</code> を持つ（クイズと違い型・難度の軸がないため 3 カラム。在庫確認クエリ〔<a href="operation.html#ranking-stock-mgmt">operation.html セクション 3</a>〕も同じ絞り込みで走る）</li>
+    <li>インデックスは取得絞り込み用に <code>KEY (set_id, is_active, last_used_at)</code> を持つ（クイズと違い型・難度の軸がないため 3 カラム。在庫確認クエリ〔<a href="../production/pref-ranking-1.html">生産の詳細設計 pref-ranking-1</a>〕も同じ絞り込みで走る）</li>
     <li>0 件フェイルラウド・再利用 WARNING・防御的フィールド検査は <code>quiz_stock_items</code> と同方針（<a href="generators/ranking-prebuilt.html#stock">方式設計書セクション 4</a>）</li>
   </ul>
 </div>
@@ -809,7 +809,7 @@ LIMIT 1;</code></pre>
 
 <div class="decision">
   <span class="callout-title">決定（2026-08-10、Phase 17-2 巡 3）: result_list は ranking_data からツーリングが機械整形して格納する（手書き禁止）</span>
-  キャプションの <code>{{result_list}}</code>（順位・県名・数値 + 単位の 5 行テキスト）は <code>ranking_data</code> + 単位（<code>content_fields.value_suffix</code>）+ 県名の言語リソース（都道府県コード → 県名の静的対応表。ツーリング内）から導出できる派生値だが、<strong>SNS 投稿バッチのプレースホルダ展開を「文字列の単純参照」のまま保つ</strong>（展開時に JSON 整形ロジックを持ち込まない = 既存 5 種と同じ機構で済ませる）ため、<code>content_fields.result_list</code> に整形済みテキストとして持つ。二重管理の整合は<strong>ストック投入ツーリングが自動整形で生成し、検証スクリプトが <code>ranking_data</code> との一致を機械検証する</strong>ことで担保する（手書き・手修正は禁止。<a href="operation.html#ranking-stock-mgmt">operation.html セクション 3</a>）。
+  キャプションの <code>{{result_list}}</code>（順位・県名・数値 + 単位の 5 行テキスト）は <code>ranking_data</code> + 単位（<code>content_fields.value_suffix</code>）+ 県名の言語リソース（都道府県コード → 県名の静的対応表。ツーリング内）から導出できる派生値だが、<strong>SNS 投稿バッチのプレースホルダ展開を「文字列の単純参照」のまま保つ</strong>（展開時に JSON 整形ロジックを持ち込まない = 既存 5 種と同じ機構で済ませる）ため、<code>content_fields.result_list</code> に整形済みテキストとして持つ。二重管理の整合は<strong>ストック投入ツーリングが自動整形で生成し、検証スクリプトが <code>ranking_data</code> との一致を機械検証する</strong>ことで担保する（手書き・手修正は禁止。<a href="../production/pref-ranking-1.html">生産の詳細設計 pref-ranking-1</a>）。
   <br>V010 の適用順序: 全変更が追加的（新テーブル 2 本のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。FK の向きにより <code>ranking_stock_items</code> の CREATE を <code>ranking_items</code> の CREATE より先に行う。DDL は 17-2 で作成済み（<code>database/V010__pref_ranking_stock.sql</code>）、<strong>適用は 17-3 でローカル MySQL と Aurora の両環境へ行う</strong>。初期ストックの INSERT は DDL に含めない（17-5 の投入作業）。
 </div>
 
@@ -1035,7 +1035,7 @@ comment-log/{set_code}/dt={YYYY-MM-DD}/{comment_id}.json                        
     <ul style="margin:.2rem 0 0;">
       <li><code>quiz_stock_items</code> の新設（セクション 4.10。<code>UNIQUE (set_id, id)</code>・<code>KEY (set_id, quiz_type, difficulty, is_active, last_used_at)</code> を含む）</li>
       <li><code>quiz_items</code> へ <code>stock_item_id BIGINT UNSIGNED NULL</code> を追加し、<code>(set_id, stock_item_id) → quiz_stock_items(set_id, id)</code> の複合 FK を張る（セクション 4.9）</li>
-      <li><strong>適用順序</strong>: 全変更が追加的（新テーブル・NULL 可カラム追加のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。ただし<strong>新テーブルへの FK の向きにより <code>quiz_stock_items</code> の CREATE を <code>quiz_items</code> の ALTER より先に行う</strong>。初期ストックの INSERT は DDL に含めず、16-2 の投入作業（<a href="operation.html#quiz-stock-mgmt">operation.html セクション 3</a>）として実施する</li>
+      <li><strong>適用順序</strong>: 全変更が追加的（新テーブル・NULL 可カラム追加のみ）で既存アプリの参照・INSERT と互換のため、アプリのデプロイとの順序調整は不要（V003 と同じ扱い）。ただし<strong>新テーブルへの FK の向きにより <code>quiz_stock_items</code> の CREATE を <code>quiz_items</code> の ALTER より先に行う</strong>。初期ストックの INSERT は DDL に含めず、16-2 の投入作業（<a href="../production/logic-training-1.html">生産の詳細設計 logic-training-1</a>）として実施する</li>
     </ul>
   </li>
 </ul>

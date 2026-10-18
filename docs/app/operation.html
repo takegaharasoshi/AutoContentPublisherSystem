@@ -15,7 +15,7 @@
   <span class="badge badge-fixed">Phase 9-4 で詳細化済み・Phase 10-1 で最終 Fix</span>
   <span class="badge badge-fixed">Phase 14-4 で動画（リール）対応を反映</span>
   <span class="badge badge-fixed">Phase 16-7 でインサイト収集の運用（セクション 6）を追加</span>
-  <span>最終更新: 2026-10-12（21-7: 2.1 手順 3 に「Scheduler は有効で deploy し is_active で稼働を切り替える」、チェックリストに問題スナップショットの権限を追記）。前回: 2026-09-19（22-4: セクション 4 冒頭に「障害対応の入口は <code>/incident</code>」、6.3 に月次転記を課題の棚卸しの節目とする 1 行を追加）。前回: 2026-09-03（20-1: セクション 2.2 にセット廃止の初回実地の気づき〔追跡ウィンドウの打ち切り・Scheduler は 2 スタックにまたがる〕を追記し、2.1 のセット追加時の増分を現行に合わせて訂正。16-12b: セクション 6.3 を月次 KPI 転記の手順・セット計画書 KPI 欄の様式で確定）</span>
+  <span>最終更新: 2026-10-18（30-5: セクション 3 の問題ストック・ランキングストックの節を生産の詳細設計へ移した）。2026-10-12（21-7: 2.1 手順 3 に「Scheduler は有効で deploy し is_active で稼働を切り替える」、チェックリストに問題スナップショットの権限を追記）。前回: 2026-09-19（22-4: セクション 4 冒頭に「障害対応の入口は <code>/incident</code>」、6.3 に月次転記を課題の棚卸しの節目とする 1 行を追加）。前回: 2026-09-03（20-1: セクション 2.2 にセット廃止の初回実地の気づき〔追跡ウィンドウの打ち切り・Scheduler は 2 スタックにまたがる〕を追記し、2.1 のセット追加時の増分を現行に合わせて訂正。16-12b: セクション 6.3 を月次 KPI 転記の手順・セット計画書 KPI 欄の様式で確定）</span>
 </div>
 
 <div class="note">
@@ -319,123 +319,11 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
   <li><strong>時間帯スロット対応のセット（クイズ方式）の 0 件判定はスロットごと</strong>: あるスロットで「<code>time_slot</code> 一致 + NULL（共通曲）」の有効 BGM が 0 件になると、当該スロットの処理（<code>quiz-prebuilt</code> では動画ビルド、実行時合成方式では当該スロットの実行）だけが異常終了する（他スロットは動き続けるため気づきにくい）。スロット別曲の差し替え時も「先に代替を登録してから無効化」を守り、スロット単位で 0 件の瞬間を作らない（15-10。順繰り〔<code>last_used_at</code> 最古〕はスロット絞り込み内で維持される）</li>
 </ul>
 
-<h3 id="quiz-stock-mgmt">問題ストックの調達・書き直し・投入・動画ビルド（クイズ方式のセットのみ。Phase 16-1 新設・16-3b で動画ビルドを追加）</h3>
-<p>クイズの出題は<strong>人間レビュー済みの問題ストック（<code>quiz_stock_items</code>。<a href="data-model.html#detail-quiz-stock-items">data-model.html セクション 4.10</a>）からの取得のみ</strong>で行う（16-1 のユーザー決定。実行時の LLM 問題生成は休止）。ストックは音源と同じ「調達 → 前処理（書き直し）→ 投入 → ローテーション」の型で運用する。16-2 の初期整備で確立した執筆・レビューの勘所（スロット別の題材選定・つかみ / イラストの NG 集・検証スクリプトの使い方）は Claude Code スキル <code>/quiz-stock-replenish</code>（<code>.claude/skills/quiz-stock-replenish/</code>）に集約済みで、週次補充はこのスキルを起点に下記手順 1〜5 を回す。取得は型・難度で絞った LRU 順繰りで、<strong>未使用を使い切ったら最古使用分を自動で再利用する</strong>ため在庫切れで投稿は止まらないが、再利用は WARNING ログが出る（補充遅延のサイン）。<strong>動画事前生成方式（<code>quiz-prebuilt</code>。16-3b 転換）のセットでは、投入（手順 4）に加えて動画ビルド・レビュー・配置（手順 5）まで済んだ行（<code>video_s3_key IS NOT NULL</code>）だけが出題候補になる</strong>。</p>
+<h3 id="quiz-stock-mgmt">問題ストックの調達・書き直し・投入・動画ビルド（クイズ方式のセットのみ）</h3>
+<p>Phase 30-5 で<a href="../production/logic-training-1.html">生産の詳細設計 logic-training-1</a>へ移した（資材の置き場 = 1 章・作り方と人間レビューの観点 = 2 章・事前ビルド = 3 章・再ビルド = 4 章・在庫確認クエリと取り下げ = 5 章）。</p>
 
-<div class="decision">
-  <span class="callout-title">著作権ガイドライン（2026-08-01、Phase 16-1）: 定番・古典問題は「アイデアを借りて表現を書き直す」</span>
-  著作権はアイデアではなく<strong>表現</strong>を保護する。定番・古典問題（面接パズル・論理パズル・フェルミ推定の良問）の<strong>アイデア・解法構造を題材として使うことは可</strong>だが、<strong>問題文の文面は創作的表現として保護され得るため転載は不可</strong>（Phase 16 展開時の壁打ちで確定。既存問題の文面転載案はこの理由で不採用）。運用ルール:
-  <ul style="margin:.3rem 0 0;">
-    <li><strong>書き直しの基準</strong>: 問題文・答え・解説のすべてを自分の言葉とセットのフォーマット（世界観・文体・文字数制限）で書き下ろす。登場人物・シチュエーション・数値は原型から変える（解法構造だけを残す）</li>
-    <li><strong>証跡</strong>: <code>source_note</code> に「元ネタの類型・参照元（URL 等）・表現は書き直し済みの旨」を記録する（音源のライセンス証跡 3 点と同じ位置づけ。別ドキュメントは持たない）</li>
-    <li><strong>避けるもの</strong>: 特定の書籍・サイト固有の独創的な問題（アイデア自体に強い独自性があり出所が特定できるもの）、実在の企業名を冠した出題（「○○社の入社試験」等の断定は事実確認できないため使わない）、パズル集からの数値・配役までそのままの流用</li>
-  </ul>
-</div>
-
-<h4>資材置き場: <code>content/quiz-stock/</code>（git 管理。16-2b で明文化）</h4>
-<p>執筆・検証・投入の資材は<strong>リポジトリの <code>content/quiz-stock/&lt;set_code&gt;/&lt;バッチ名&gt;/</code></strong>（例: <code>content/quiz-stock/logic-training-1/2026-08-initial/</code> = 16-2 初期整備の参照実装）に置き、git 管理する。ルール:</p>
-<ul>
-  <li><strong>バッチ単位に自己完結</strong>: 単一ソース <code>stock_items.py</code>・機械検証 <code>validate.py</code> / <code>verify_logic.py</code>・生成 <code>generate.py</code>・リサーチ証跡 <code>research*.md</code>（<code>source_note</code> が参照する出典台帳）・投入した <code>insert_quiz_stock.sql</code> の一式を 1 バッチディレクトリに収める。補充時は最新バッチの一式を新しいバッチディレクトリ（<code>2026-08-w3</code> 等）へコピーして同じ流れを回す</li>
-  <li><strong>投入完了時にディレクトリごとコミット</strong>する（手順 4 の完了とセット）</li>
-  <li><code>review.md</code> は <code>generate.py</code> の派生物のため <strong>gitignore 済み・コミットしない</strong>（<code>content/**/review.md</code>）</li>
-  <li><code>plans/</code> は使い捨てスクラッチ用であり、ストック資材は置かない（16-2 完了時のユーザー指示。作業ディレクトリ <code>plans/16-2-stock/</code> を <code>content/</code> へ移設して恒久化した経緯）</li>
-</ul>
-
-<h4>手順 1: リサーチ（Codex 委譲）</h4>
-<p>Web 検索で定番・古典問題（面接パズル・論理パズル・フェルミ推定）を収集する。<strong>Codex に委譲</strong>し（16-1 のユーザー決定。CLAUDE.md の Codex 連携ルール）、成果物は<strong>「出典 URL・問題の類型・解法構造の要約」まで</strong>とする — 文面の転載はさせない（上記ガイドライン）。収集時にセットのスロット構成（型 × 難度）に合わせた内訳を指定する。</p>
-
-<h4>手順 2: 表現書き直し・content_fields 案の作成（Claude Code）</h4>
-<p>リサーチ結果を元に、Claude Code が著作権ガイドラインに沿って全フィールドを執筆する。文体・題材の条件は <code>prompt_configs.prompt_text</code> の執筆ガイド（<a href="sets/logic-training-1.html">セット別設計書セクション 4</a>。生成チェーン休止後もストック執筆ガイドとして有効）に従い、文字数上限は方式のフィールド仕様（<a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a>）を守る。<code>hook</code> は<strong>キャプション冒頭のつかみコピー</strong>として執筆する（固定文にしない）。16-4c で動画のカット 1 の吹き出しは固定文になり、動画上部の「つかみ帯」はスロット別の <code>slot_hook</code>（<code>prompt_configs.parameters</code>）が担う。L3（フェルミ推定）は<strong>捻った分解型を標準・解説は 5 ステップ構造・<code>explanation</code> は 240 字上限</strong>で書く（2026-08-07 決定 = <a href="generators/gpt-quiz-multicut.html#stock">方式設計書セクション 5</a> の decision。執筆の勘所はスキル <code>/quiz-stock-replenish</code> の昼 L3 節）。</p>
-
-<h4>手順 3: 人間レビュー</h4>
-<p>投入前にユーザーがレビューする。観点: <strong>①誤答チェック（答え・解説の正しさ。実行時の検証チェーンはないため、ここが誤答リスク対策の唯一の砦）</strong> ②表現の独自性（書き直しが十分か・上記ガイドライン準拠）③既存ストック・出題履歴との重複（同じ解法構造の問題が近接しないか）④フォーマット適合（文字数・L3 の幅表現「約〇〇（目安）」・トーン）。</p>
-
-<h4>手順 4: INSERT 投入（Claude Code。ローカル MySQL + Aurora）</h4>
-<p>セクション 2.1 手順 2 の (6) の INSERT を使い、レビュー済みの問題をローカル MySQL と Aurora の両方へ投入する（<code>quiz_type</code> / <code>difficulty</code> は <code>parameters.slots</code> の値と一致させる。<code>source_note</code> 必須）。<strong><code>content_key</code>（<code>{slot_code}-{3 桁連番}</code>。V007 = 16-3d 決定）を採番し、両環境へ同じ値で投入する</strong> — 投入 SQL はスロット内の既存最大連番 + 1 を適用時に解決する形式にする（<code>generate.py</code> が生成する。手動採番の写し間違いを防ぐ）。<code>content_key</code> は NOT NULL のため採番漏れは投入時に必ずエラーになる。</p>
-
-<h4>手順 5: 動画ビルド・レビュー・配置（quiz-prebuilt 方式のセットのみ。16-3b 新設）</h4>
-<p>投入した行（<code>video_s3_key IS NULL</code>）に対して事前動画をビルドし、<strong>全数人間レビュー</strong>のうえ S3 へ配置して DB へ反映する。工程の技術設計（imagegen 委譲 + 画風行 → 3:2 センタークロップ → gpt-quiz-multicut のレンダラーによる組版 + ffmpeg ビルド〔image-batch の Docker イメージで実行〕→ レビューシート → S3 アップロード + <code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> の UPDATE）は <a href="generators/quiz-prebuilt.html#build">方式設計書 quiz-prebuilt セクション 8</a> を正とする。運用上のルール:</p>
-<ul>
-  <li><strong>ツーリング置き場は <code>content/video-build/&lt;set_code&gt;/</code></strong>（git 管理）。ビルド生成物（イラスト・MP4・レビューシート）は配下の <code>work/</code> に置き gitignore する（S3 と DB が正。<code>content/quiz-stock/</code> の「派生物はコミットしない」ルールと同型）。ツール・プロンプト・ビルド台帳の変更はビルド完了時にコミットする</li>
-  <li><strong>レビュー観点（全数）</strong>: ①イラストの品質（文字・数字・記号の混入がないか / フラットイラスト調が保たれているか / 情景が問題と合っているか）②版面（文字の欠け・重なり・吹き出しとヒントの整合）③音（BGM・SE のタイミングと音量）。NG は<strong>イラスト再生成（imagegen 再試行）または <code>illustration_scene</code> の書き直し（DB 更新）→ 再ビルド</strong>で解消し、解消するまで S3 へ配置しない</li>
-  <li><strong>DB 反映はローカル MySQL と Aurora の両方</strong>へ行う（手順 4 と同じ両環境ルール。3 カラムを同時に UPDATE し、中途半端な行を作らない）</li>
-  <li>未ビルトのまま残っても投稿は止まらない（未ビルト行は出題候補から除外され、既存のビルド済み在庫で回る。ただし実行時 WARNING と下記の在庫確認で検知されるため、投入したら速やかにビルドまで終える）</li>
-  <li><strong>ビルド済み行の一括再ビルド（フォーマット改善時）</strong>: 版面・演出・素材の変更を既存の事前動画へ波及させる場合は <code>build.py --rebuild</code> を使う（<code>video_s3_key IS NOT NULL</code> の行を対象に、BGM を <code>video_audio_asset_id</code> から引き継いで再ビルドする = 選曲の LRU を消費しない）。再ビルド後も全数レビュー → S3 上書き → 両環境 DB 反映の流れは新規ビルドと同じ。<code>last_used_at</code>（出題キュー）と選曲は変わらないため、同一問題の再投稿は発生しない（16-4b で初適用）</li>
-</ul>
-
-<h4>初期ストック量・補充サイクル・在庫確認</h4>
-<ul>
-  <li><strong>初期ストック（16-2 で投入）: 42 問 = 2 週間分</strong>（消費は週 21 問。内訳はスロット構成に合わせ L1/light 14・L3/standard 14・L1/deep 14）</li>
-  <li><strong>補充: 週 1 回、各「型 × 難度」の未使用在庫が 7 問（1 週間分）以上</strong>を目安に手順 1〜5 を回す（quiz-prebuilt 方式のセットでは<strong>「未使用かつビルド済み」を在庫と数える</strong>）。再利用 WARNING が出た場合は補充が遅れているサインなので優先して補充する。<strong>停止中のスロットは補充対象外</strong>: 昼（L3 / standard）は 16-4d（2026-08-24）で当分停止中のため、<strong>補充せず既存在庫を凍結扱いにする</strong>（在庫確認クエリの L3 / standard 行は補充判断に使わない。経緯・凍結範囲は <a href="sets/logic-training-1.html#noon-suspended">セット別設計書</a>）</li>
-  <li><strong>在庫確認クエリ（16-3b 拡張版）</strong>（週次の補充判断・投入確認・ビルド漏れ検出に使う。<code>unbuilt</code> 列は V006 適用後）:
-<pre><code>SELECT quiz_type, difficulty,
-       SUM(last_used_at IS NULL AND video_s3_key IS NOT NULL) AS unused_built, -- 出題可能な未使用在庫
-       SUM(video_s3_key IS NULL)     AS unbuilt,  -- 動画未ビルト（出題対象外。0 が正常）
-       SUM(last_used_at IS NOT NULL) AS used,     -- 使用済み（再利用候補）
-       SUM(use_count)                AS total_uses
-FROM quiz_stock_items
-WHERE set_id = :set_id AND is_active = 1
-GROUP BY quiz_type, difficulty;</code></pre></li>
-  <li><strong>取り下げ</strong>: 品質問題（誤答の発覚・表現の問題）が見つかった問題は <code>is_active=0</code> に更新する（レコードは削除しない。証跡・使用履歴を残す — 音源と同じ）。<strong>ある「型 × 難度」の有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、取り下げで 0 件になる場合は先に代替を投入する。<strong>S3 の事前動画は削除しない</strong>（<code>is_active=0</code> で出題候補から外れるため。復帰時の再ビルドを不要にする）</li>
-  <li>専用の在庫アラームは持たない（再利用 WARNING + 週次の在庫確認で運用。失敗通知起点の運用方針〔セクション 4〕と整合）</li>
-</ul>
-
-<h3 id="ranking-stock-mgmt">ランキングストックの調達・検証・投入・動画ビルド（ランキング方式のセットのみ。Phase 17-2 新設）</h3>
-<p>ランキングの投稿は<strong>人間レビュー済みのランキングストック（<code>ranking_stock_items</code>。<a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13</a>）からの取得のみ</strong>で行う。運用の型は問題ストック（<code>#quiz-stock-mgmt</code>）と同じ「調達 → 検証・執筆 → 人間レビュー → 投入 → 動画ビルド → ローテーション」で、本節は<strong>ランキング固有の差分</strong>を書く（共通する考え方 = 取り下げは <code>is_active=0</code>・専用アラームなし・再利用 WARNING は補充遅延のサイン・派生物はコミットしない、は quiz の節を正とし重複記載しない）。取得は当該尺ビルド済み限定の LRU 順繰り（<a href="generators/ranking-prebuilt.html#stock">方式設計書 ranking-prebuilt セクション 4</a>）。</p>
-
-<h4>資材置き場: <code>content/ranking-stock/</code> と <code>content/video-build/</code>（git 管理）</h4>
-<ul>
-  <li><strong>ネタ資材は <code>content/ranking-stock/&lt;set_code&gt;/&lt;バッチ名&gt;/</code></strong>（<code>content/quiz-stock/</code> と同型。単一ソース・機械検証スクリプト・リサーチ証跡・投入 SQL の一式をバッチ単位に自己完結させ、投入完了時にコミットする）</li>
-  <li><strong>県換算ツールは <code>content/ranking-stock/&lt;set_code&gt;/common/</code></strong>: 都道府県別世帯数の静的テーブル（出典・データ年付き）+ 換算スクリプト。市区町村単位の統計（家計調査の県庁所在市・政令市データ等）を<strong>世帯数加重平均</strong>で県値へ換算する（Phase 17 決定方針。静的テーブルの出典検証は 17-3）。バッチをまたいで使う共通資材のため <code>common/</code> に置く</li>
-  <li><strong>ビルドツーリングは <code>content/video-build/&lt;set_code&gt;/</code></strong>（quiz と同じ場所ルール。ビルド生成物は <code>work/</code> で gitignore）。<strong>VOICEVOX 本体 + 白上虎太郎の規約証跡ファイル・地図 PD 素材のライセンス証跡</strong>もツーリング内に git 管理で置く（<a href="sets/pref-ranking-1.html">セット別設計書セクション 7</a>。整備は 17-3 / 17-4）</li>
-  <li>初期 30 ネタのリサーチ結果は 17-1 検証の成果物（<code>plans/ranking-set-research/neta-30.md</code>。git 管理外）にあり、初期投入バッチとして <code>content/ranking-stock/pref-ranking-1/</code> へ整備・移設する（初期投入ステップで実施）</li>
-</ul>
-
-<h4>手順 1〜4: リサーチ → データ検証・県換算 → 文言執筆 → 人間レビュー</h4>
-<ul>
-  <li><strong>手順 1（リサーチ）</strong>: 都道府県別の統計・調査データを一次情報（官公庁統計・業界団体調査等）から収集する（Codex 委譲可）。成果物は<strong>出典 URL・データ年・TOP5 の生値</strong>まで。ネタ選定基準は「下位の県の人が笑って自虐できるか」（<a href="../strategy/business-strategy.html">事業戦略書セクション 6</a>。下位を晒さない TOP5 版面が前提）</li>
-  <li><strong>手順 2（データ検証・県換算）</strong>: 一次データとの突合・順位と値の再計算・市区町村統計の県換算（<code>common/</code> のツール）を機械検証スクリプトで行い、<code>ranking_data</code>（数値 + 都道府県コードのみ）を生成する。出典・換算の計算過程は <code>source_note</code> へ記録する。<strong>数値は必ず一次情報のファイルを機械パースして得る</strong>（まとめ記事等の二次情報は使わない）。ネタ資材の <code>stock_items.py</code> に数値を手書きせず、検証済みデータ（<code>data/*.json</code>）を投入ツールが読む構成にする</li>
-  <li><strong>ネタの採否ルール（17-3 で確立）</strong>
-    <ul>
-      <li><strong>TOP6 に同値があるネタは不採用</strong>: TOP5 地図ルーレット型は 1〜5 位の一意な順位を前提とする（方式設計書 セクション 4 の防御的検査も rank 1〜5 の一意性を要求する）。5 位と 6 位が同値の場合も、5 位だけを載せると順位付けが恣意的になるため 6 位まで検査する（例: 睡眠時間 = 4 位が同率 2 県 / カレールウ = 5 位と 6 位が同額のため不採用）</li>
-      <li><strong>時刻・時分の指標は現行のデータモデルに載らない</strong>: 表示は <code>value</code> + <code>value_suffix</code> の組み立てのため、平均就寝時刻（23:39）のような時刻表記は表現できない。分へ換算すれば数値化できるが、表示と読み上げの自然さは別途の設計判断が必要（課題体系 <a href="../issues/index.html#I-023">I-023</a>）</li>
-    </ul>
-  </li>
-  <li><strong>手順 3（文言執筆）</strong>: <code>title</code> / <code>content_fields</code>（<code>hook</code> / <code>trivia</code> / <code>source_display</code> / <code>value_suffix</code>〔数値の単位表示〕/ <code>subtitle</code> / <code>bg_motif</code>）/ <code>narration</code>（30 秒版の cue 台本 = <a href="generators/ranking-prebuilt.html#tts-sync">方式設計書セクション 8.3</a> の cue 体系。<strong>尺確定〔2026-08-24〕後の新規執筆は 30 秒版のみ書く</strong>。既存行の 20 秒版台本は残置してよい）を執筆する。<strong><code>result_list</code> は手書きせず、ツーリングが <code>ranking_data</code> + <code>value_suffix</code> から機械整形して格納する</strong>（<a href="data-model.html#detail-ranking-stock-items">data-model.html セクション 4.13 の decision</a>）。ナレーションは cue ごとの時間予算（アンカー表由来）を意識して短く書く（超過はビルド時に検出される）。<strong>長さは文字数ではなくモーラ数で見積もる</strong>（<code>12899円</code> は 6 文字だが読みは 19 モーラ相当。文字数では数値の読み上げを過小評価する）。<strong>金額・件数などの数値はナレーションで読み上げず版面表示に任せる</strong>（2 秒の cue に 5 桁の金額は入らない。17-3 でネタ資材の投入前検証スクリプトにモーラ推定の検査を実装した）</li>
-  <li><strong>手順 4（人間レビュー）</strong>: 投入前にユーザーがレビューする。観点: <strong>①データの正しさ（出典の実在・データ年・県換算の再計算・TOP5 の順位。誤データ対策の唯一の砦）</strong>②表現（下位を晒していないか・煽りすぎていないか・出典表記とキャプション注記の妥当性）③既存ストックとの重複（同一テーマ・同一出典の近接）④フォーマット適合（文字数・cue 台本の長さ・<code>bg_motif</code> の妥当性）</li>
-</ul>
-
-<h4>手順 5: INSERT 投入（ローカル MySQL + Aurora）</h4>
-<p>レビュー済みのネタを両環境へ投入する。<strong><code>content_key</code>（<code>{3 桁連番}-{slug}</code>。例: <code>001-gyoza-spend</code>）を採番し、両環境へ同じ値で投入する</strong> — 投入 SQL は既存最大連番 + 1 を適用時に解決する形式にする（quiz の <code>generate.py</code> と同じ手法。<code>content_key</code> は NOT NULL のため採番漏れは投入時に必ずエラーになる）。</p>
-
-<h4>手順 6: 動画ビルド・レビュー・配置（30 秒版）</h4>
-<p>投入した行に対して必要尺（<strong>30 秒版のみ。尺は 2026-08-24 に 30 秒で確定</strong>）の事前動画をビルドし、<strong>全数人間レビュー</strong>のうえ S3 へ配置して DB へ反映する。工程の技術設計（背景 imagegen → VOICEVOX TTS + 予算検査 → Remotion レンダリング → レビューシート → S3 + <code>video_s3_key_20s</code> / <code>_30s</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code> の両環境 UPDATE）は <a href="generators/ranking-prebuilt.html#build">方式設計書 ranking-prebuilt セクション 8</a> を正とする。<strong>実行コマンドの正は <code>content/video-build/pref-ranking-1/README.md</code></strong>（17-4e 実装。工程 1 = <code>build.py --list</code> → 工程 2 = <code>export_prompts.py</code> / <code>intake.py</code> → 工程 3 = <code>build.py</code> → 工程 4 = <code>review_sheet.py</code> → 工程 5 = <code>publish.py</code>）。運用上のルール:</p>
-<ul>
-  <li><strong>レビュー観点（全数）</strong>: ①背景イラストの品質（文字・数字・記号の混入がないか / 和モダン調が保たれているか / 版面の可読性を妨げないか）②版面（県名・数値の正確な表示 / 金の可読性〔沈み・にじみ〕/ 文字の欠け・見切れ / 地図の点灯と順位行の整合）③音（ナレーションの同期〔県名が停止フラッシュに合うか〕・語尾切れ・BGM とのバランス）。NG は<strong>背景再生成・<code>bg_motif</code> / セリフ / 文言の修正（DB 更新）→ 再ビルド</strong>で解消し、解消するまで S3 へ配置しない</li>
-  <li>DB 反映は<strong>ローカル MySQL と Aurora の両方</strong>へ行う（カラムを同時に UPDATE し、中途半端な行を作らない = quiz と同じルール）</li>
-  <li>未ビルトのまま残っても投稿は止まらない（当該尺の候補から除外されるだけ。ただし実行時 WARNING と在庫確認で検知されるため、投入したら速やかにビルドまで終える）</li>
-  <li>一括再ビルド（フォーマット改善・地図素材差し替え時）はツーリングの <code>--rebuild</code> で行う（<a href="generators/ranking-prebuilt.html#rebuild">方式設計書セクション 8.4</a>）</li>
-</ul>
-
-<h4>初期ストック量・補充サイクル・在庫確認</h4>
-<ul>
-  <li><strong>稼働開始条件: 14 ネタ（約 2 週間分）の 30 秒版がビルド・全数レビュー済みであること</strong>（ユーザー判断 2026-08-24。消費は 1 日 1 投稿 × 7 日 = 週 7 ネタ。供給元は 17-1 検証のネタ帳 30 件で、残り 16 件は稼働開始から 2 週間以内に 17-7〔補充スキルの実地テスト〕で投入し、計 30 件 ≒ 約 1 か月分とする）</li>
-  <li><strong>補充: 週 1 回、7 ネタ（1 週間分）を目安</strong>に手順 1〜6 を回し、<strong>未使用かつ 30 秒版ビルド済みの在庫 14 件（2 週間分）以上</strong>を保つ（quiz の「在庫 2 週間分 + 週次で 1 週間分補充」の型を 1 日 1 投稿へ換算。再利用 WARNING が出た場合は補充が遅れているサイン）</li>
-  <li><strong>在庫確認クエリ（2 尺対応）</strong>（週次の補充判断・投入確認・ビルド漏れ検出に使う。尺は 30 秒で確定〔2026-08-24〕のため <code>*_30s</code> の列のみ見る。20 秒版はビルドしないため <code>unbuilt_20s</code> は在庫全数と一致するのが正常で、<code>*_20s</code> の列は監視対象外）:
-<pre><code>SELECT
-       SUM(last_used_at IS NULL AND video_s3_key_20s IS NOT NULL) AS unused_built_20s, -- 20 秒スロットで投稿可能な未使用在庫
-       SUM(last_used_at IS NULL AND video_s3_key_30s IS NOT NULL) AS unused_built_30s, -- 30 秒スロットで投稿可能な未使用在庫
-       SUM(video_s3_key_20s IS NULL) AS unbuilt_20s,
-       SUM(video_s3_key_30s IS NULL) AS unbuilt_30s,
-       SUM(last_used_at IS NOT NULL) AS used,     -- 使用済み（再利用候補）
-       SUM(use_count)                AS total_uses
-FROM ranking_stock_items
-WHERE set_id = :set_id AND is_active = 1;</code></pre></li>
-  <li><strong>取り下げ</strong>: 誤データ・出典問題が見つかったネタは <code>is_active=0</code>（削除しない。S3 の事前動画も削除しない）。<strong>有効在庫が 0 件になると当該スロットの実行が異常終了する</strong>ため、0 件になる場合は先に代替を投入する（quiz と同じ）</li>
-  <li><strong>補充手順はスキル <code>/ranking-stock-replenish</code> に集約済み</strong>（17-7 で新設・2026-08-28。実地テストとして第 3 バッチ 16 件〔015〜030〕の投入・ビルド・配置を同スキルで実施し、ストック 30 件が両環境に揃った）。以後の週次補充はスキルを起点に回す。<strong>正の所在は本節（手順）+ <code>content/ranking-stock/pref-ranking-1/WRITING-NOTES.md</code>（執筆・レビュー・投入の実務の勘所。作業前に必読）</strong>で、スキルはその導線と迷いやすい分岐を持つ（矛盾したら設計書 &gt; WRITING-NOTES &gt; スキルの順）</li>
-  <li><strong>ネタの供給源（17-7 で更新）</strong>: 17-1 検証のネタ帳（<code>plans/ranking-set-research/neta-30.md</code>）は 17-7 で使い切った。以後は<strong>家計調査の品目別ランキング（rank01〜14 の約 240 品目。<code>common/convert.py</code> で TOP6 同値を即判定できる）</strong>と<strong>社会生活基本調査の公表ランキング系列</strong>が主軸になる</li>
-  <li><strong>配置時の注意（17-7 で判明）</strong>: <code>publish.py</code> は承認ファイル（<code>work/approved.txt</code>）に載っている全 <code>content_key</code> を対象にするため、既定のままだと<strong>過去に配置済みのネタも再アップロードし <code>video_built_at</code> を書き換える</strong>。補充のたびに<strong>そのバッチ分だけを列挙したファイルを作り <code>--approved-file</code> で渡す</strong>（累積の <code>approved.txt</code> は承認台帳として残す）</li>
-</ul>
+<h3 id="ranking-stock-mgmt">ランキングストックの調達・検証・投入・動画ビルド（ランキング方式のセットのみ）</h3>
+<p>Phase 30-5 で<a href="../production/pref-ranking-1.html">生産の詳細設計 pref-ranking-1</a>へ移した（資材の置き場 = 1 章・作り方と人間レビューの観点 = 2 章・事前ビルド = 3 章・動画の作り = 4 章・TTS 同期 = 5 章・再ビルド = 6 章・在庫確認クエリと取り下げ = 7 章）。</p>
 
 <h2 id="failure">4. 投稿失敗時の対応</h2>
 <p>基本は<strong>通知のみ（欠番許容）</strong>。1 日複数回投稿するため、1 回の欠番は致命的でないという判断（<a href="requirements-notes.html#failure">A-1 壁打ち記録 セクション 4</a>）。ただし Phase 28（28-1 設計・28-2 実装）から、<strong>一過性エラーはバッチが段階別に自動で処理する</strong>: 公開前（コンテナ作成・処理待ち）はコンテナ作成から 1 回だけやり直し、公開の一過性エラーはコンテナの <code>status_code</code> を照会して未公開（<code>FINISHED</code>）のときだけ同じコンテナで 1 回再送する（表と判定基準の正は <a href="batch-flow.html#transient-errors">batch-flow.html 3.3「一過性エラーの段階別の扱い」</a>）。通知が来るのはそれでも <code>success</code> にならなかった場合で、運用者の手順（4.1〜4.3）は変わらない。やり直しが起きた行は <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形になる。</p>

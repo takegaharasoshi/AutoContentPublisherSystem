@@ -4,6 +4,8 @@
 
 スクリプトは WSL ホストの Python 3.12 で実行します。ホストに必要な Python パッケージは `pymysql` / `boto3` / `pytest` です。画像処理に PIL が必要な `intake.py` だけは `image-batch:ffmpeg-check` 内で実行します。ローカル MySQL は既定で `127.0.0.1:3306 / app / password / acps` を使用し、必要なら `LOCAL_DB_HOST`、`LOCAL_DB_PORT`、`LOCAL_DB_USER`、`LOCAL_DB_PASSWORD`、`LOCAL_DB_NAME` で上書きします。
 
+**尺は 30 秒で確定済み（2026-08-24）**。`build.py` の既定は 30 秒版だけで、20 秒版は `--durations 20s` を明示したときだけ作られる（運用ではビルドしない）。以下の工程の「20 秒版・30 秒版」「2 尺」の記述は、20 秒版もビルドした場合の説明。設計の正は `docs/production/pref-ranking-1.html`。
+
 ## 事前準備
 
 リポジトリルートでレンダリング用と ffmpeg 用のイメージを作ります。

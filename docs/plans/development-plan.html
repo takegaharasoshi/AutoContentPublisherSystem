@@ -329,17 +329,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-5" data-step-id="30-5" data-status="todo">
+<article class="plan-step" id="step-30-5" data-step-id="30-5" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-5</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-5</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>生産の詳細設計の層を新設し、logic-training-1 と pref-ranking-1 の詳細を移す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-4 の go の後。<strong>logic-training-1・pref-ranking-1 のセットレーン（週次補充など）が動いていないとき</strong>に着手する。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<a href="../production/index.html">生産の詳細設計</a>を新設し、<a href="../production/logic-training-1.html">logic-training-1</a>（判断 D-01〜11）と <a href="../production/pref-ranking-1.html">pref-ranking-1</a>（D-01〜14）へ、方式設計書 2 本の 8 節・運用設計 3 節のストック運用・<code>common/README.md</code> の換算ルールを移した。移設元は旧アンカーを残したリンクに置き換えた。ユーザーの go 待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -358,13 +353,29 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>着手の確認</strong>: logic-training-1 の週次補充 2026-10-w3 が G1a の選別待ちのまま止まっていた（未追跡ファイル）。動いているセッションはなかったので着手し、w3 のファイルには触れずコミットからも外した</li>
+<li><strong>新設</strong>: <code>docs/production/index.html</code>（目次）・<code>logic-training-1.html</code>（1 資材の置き場 / 2 問題ストックの作り方〔著作権・リサーチ・候補と選別・完成稿・レビュー・投入〕/ 3 事前ビルド〔5 工程・イラスト・レンダリング・セーフエリア・版面の導出・レビュー・配置〕/ 4 再ビルド / 5 在庫と補充）・<code>pref-ranking-1.html</code>（1 資材 / 2 作り方〔リサーチ・データ検証と県換算・採否・執筆・レビュー・投入〕/ 3 事前ビルド〔5 工程・ツールの構成・再利用要件・レビュー・配置〕/ 4 動画の作り〔版面・読みやすさ・冒頭の動き・地図と素材〕/ 5 TTS 同期〔cue・アンカー・アダプタ・ラウドネス〕/ 6 再ビルド / 7 在庫）。どちらも冒頭に要約（資材の流れの図 + 要点の表）と機能ページへの戻りリンク、章末に「さらに詳しく」、末尾に判断の記録</li>
+<li><strong>移設元の置き換え</strong>: quiz-prebuilt 8 節・ranking-prebuilt 8 節（<code>#build-steps</code>・<code>#composition</code>・<code>#tts-sync</code>・<code>#rebuild</code> を対応表の <code>li</code> に残した）・operation 3 節の <code>#quiz-stock-mgmt</code>・<code>#ranking-stock-mgmt</code> は見出しと移設先のリンクだけにした（SKILL.md・README が旧位置を文字で指しているため。その付け替えは 30-6）。operation 3 節のうち、プロンプト・キャプション・音源・AI 開示の節は残した</li>
+<li><strong>判断の移し替え（旧 <code>decision</code> 囲み → D-xx）</strong>: logic-training-1 = 著作権ガイドライン → D-02 / 16-3b imagegen + 画風行 → D-04 / 16-4b 3:2 の明示 → D-05 / R-1 Remotion → D-06（版面・ループの事実は 3.2・3.3 へ）/ R-2 イラスト優先 → D-07（値は 3.4 へ）。ほかに本文中の理由を D-01（ストックだけで出題）・D-03（content/ で管理）・D-08（安定キー）・D-09（候補の 2 段階）・D-10（取り下げ）・D-11（アラームなし）に移した。pref-ranking-1 = 再利用要件 → D-06（要件は 3.3）/ 17-4e ツールの構成 → 3.2・3.5 + D-04（BGM の引き継ぎ）・D-05（ネタ単位の承認・Aurora の自動適用）/ 17-2 可読性 → 4.2 + D-09 / 17-4a 版面 → 4.1 + D-07 / 17-5c 版面 2 件 → 4.1・4.2 + D-14 / R-1 冒頭 → 4.3 + D-10 / 17-4b 地図 + 素材要件の warn → 4.4 + D-11 / 17-4c 本組み → 4.1 + D-08 / 17-2 固定アンカー → 5.2 + D-08 / 17-3 cue の統合 → 5.1 + D-12 / 17-4c アンカーの実装 → 5.2 / 17-4d TTS → 5.2〜5.4 + D-13。ほかに D-01（機械読み取り）・D-02（世帯数加重平均）・D-03（TOP6 の同値）。<code>class="decision"</code> の件数は production の 3 ページとも 0（方式設計書 2 本の 1〜7 節に残る囲みは移設の対象外）</li>
+<li><strong>実態に合わせた点</strong>: 運用設計 3 節のリサーチ（「定番・古典問題を Codex に委譲」）を SKILL.md の現行の基準（作者不詳 + 複数サイトに流布・エージェント別の手段）に、手順 5 のレンダラー（gpt-quiz-multicut の組版）を Remotion に、ranking のタイムラインの秒の表を 17-4d のフレーム値（<code>DURATION_SPECS</code> と一致を確認）に、cue の表の古い区間長を外した。候補の段（R-3）と 2026-10 時点の Aurora 適用の分担（logic-training-1 は SQL を手で適用・pref-ranking-1 は自動）を書き足した</li>
+<li><strong>content/ の README</strong>: <code>common/README.md</code> の換算ルールとウェイトの理由・再計算しない方針を production 2.2 / D-02 へ移し、README は出典の表と使い方を残した。<code>video-build/pref-ranking-1/README.md</code> に「尺は 30 秒で確定・20 秒版は明示指定のときだけ」の注記を足した（2 巡目の指摘）。<code>candidates/README.md</code> は tally.py が検査する形式の定義なので README のまま残し、production 2.3 から参照する。<code>video-build/logic-training-1/README.md</code> は手順だけなので変えていない（冒頭の参照先の付け替えは 30-6）</li>
+<li><strong>旧位置への参照</strong>: docs/ の 9 ページ（data-model・gpt-quiz-multicut・sets 2 本・requirements-notes-set3・機能ページ 2 本・logic-training-1-log・quiz/ranking-prebuilt 自身）のリンク 45 件を新しいページへ付け替えた。旧節へのリンク（<code>quiz/ranking-prebuilt.html#build*|#composition|#tts-sync|#rebuild</code>・<code>operation.html#quiz-stock-mgmt|#ranking-stock-mgmt</code>）の grep 件数は docs/ で 0。機能ページ 2 本の「さらに詳しく」を production へ向け、在庫からの選び方は方式設計書 4 節に分けた。<code>docs/index.html</code> のファイル一覧とカードに production を足した</li>
+<li><strong>レビュー</strong>（観点: 移設で事実が欠けていないか / SKILL.md・機能ページと食い違っていないか。一次スクリーニング Codex・判断 Claude）。1 巡目: blocker 3 件を修正（20 秒版と 30 秒版の記述の混在・ループの継ぎ目のフレーム〔frame 480 = 次の周回の 0f〕・ウェイト更新で差し替える列名）。2 巡目: blocker 1 件（ビルド README の 2 尺前提の記述）を README の注記で修正。ここで打ち切り。改善提案なし</li>
+<li><strong>課題表</strong>: I-023 の対象パスに <code>docs/production/pref-ranking-1.html</code>（2.3・4.1）を足した（据え置き継続・トリガーは変えない）。I-015 は 3 節に残した AI 開示の節を指すため付け替え不要。I-006・I-019・I-025 は 4 節、I-042 は機能ページのリンクの差し替えだけで、どれも据え置きのまま。I-040 は Phase 30 全体の課題のため据え置き継続</li>
+<li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 98 ページはみ出し 0 件・図 15 ページ 31 図の描画不備 0 件・判断リンク 83 件の不備 0 件で OK</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-6" data-step-id="30-6" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-6</strong><span class="plan-status">未着手</span></div>

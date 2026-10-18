@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生産の詳細設計 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../index.html">docs</a> / 生産の詳細設計</nav>
+<h1>生産の詳細設計（目次）</h1>
+<div class="page-meta">
+  <span class="badge badge-fixed">現行版</span>
+  <span>最終更新: 2026-10-18（Phase 30-5 で新設）</span>
+  <span>1 段上: <a href="../overview/functions/production.html">機能別の基本設計 生産ライン（共通）</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このディレクトリは、生産（スキルで事前に作ってレビューし、S3 と DB に配置する面）の詳細設計を、セットごとに 1 ページずつ置く。生産の全体像・関所・受け渡しの契約・スキルの一覧は<a href="../overview/functions/production.html">機能別の基本設計 生産ライン（共通）</a>が持ち、工程の細部（ゴールの切り方・コマンド・作問の勘所）は各補充スキルの SKILL.md が正。ここには資材の置き場・工程ごとの入出力・守る規定・在庫の数え方を書く。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>セット</th><th>詳細設計</th><th>1 段上（機能別の基本設計）</th><th>補充スキル</th></tr></thead>
+  <tbody>
+    <tr><td>logic-training-1</td><td><a href="logic-training-1.html">問題ストックと事前ビルド</a></td><td><a href="../overview/functions/production-logic-training-1.html">logic-training-1 の生産</a></td><td><a href="../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a></td></tr>
+    <tr><td>pref-ranking-1</td><td><a href="pref-ranking-1.html">ランキングストックと事前ビルド</a></td><td><a href="../overview/functions/production-pref-ranking-1.html">pref-ranking-1 の生産</a></td><td><a href="../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish</a></td></tr>
+    <tr><td>umigame-soup-1</td><td>（30-6 で移す。それまでは<a href="../app/generators/umigame-prebuilt.html">方式設計書 umigame-prebuilt</a> 8 節と<a href="../app/sets/umigame-soup-1.html">セット別設計書</a>）</td><td><a href="../overview/functions/production-umigame-soup-1.html">umigame-soup-1 の生産</a></td><td><a href="../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+</div>
+</body>
+</html>

@@ -83,7 +83,9 @@ flowchart TB
 │       ├── comment-reply.html / token-refresh.html  # 配信面: コメント自動返信 / トークン更新
 │       ├── production.html                    # 生産: 生産ライン（共通）
 │       └── production-&lt;set_code&gt;.html          # 生産: セット別 3（30-3c）
-├── production/                    # 生産の詳細設計（30-5・30-6 で新設。セット別の生産の詳細。全体像は overview/functions/）
+├── production/                    # 生産の詳細設計（30-5 で新設。セット別の生産の詳細。全体像は overview/functions/）
+│   ├── index.html                 # 目次
+│   └── &lt;set_code&gt;.html            # セット別（30-5 で logic-training-1・pref-ranking-1。umigame-soup-1 は 30-6）
 ├── infra/                         # インフラ設計書（一時 Fix 対象）
 │   ├── architecture.html          # アーキテクチャ（ネットワーク・コンピューティング・データストア）
 │   ├── stacks.html                # CDK スタック実装仕様
@@ -151,6 +153,14 @@ flowchart TB
   <div class="card">
     <div class="card-title"><a href="overview/system-overview.html">system-overview.html</a></div>
     <p>基本設計。生産面 / 配信面の 2 面の構成、配信面の 4 系統、生産面の工程と関所、2 面の受け渡しの契約、データの流れ、構成要素の一覧、主な判断。まずここから読む（30-3 で旧システム概要を作り直し）。</p>
+  </div>
+</div>
+
+<h3>生産の詳細設計（docs/production/）</h3>
+<div class="card-grid">
+  <div class="card">
+    <div class="card-title"><a href="production/index.html">index.html</a></div>
+    <p>セット別の生産の詳細の目次。資材の置き場・工程ごとの規定・事前ビルド・在庫の数え方をセットごとに 1 ページで書く（30-5 で新設。工程の細部は SKILL.md が正）。</p>
   </div>
 </div>
 
