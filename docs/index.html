@@ -13,7 +13,7 @@
 <h1>設計書体系ガイド</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-18（Phase 30-1 で 3 段の構成〔基本設計 → 層の概要 → 詳細設計〕・生産層 docs/production/・書式ルールと使ってよいライブラリの一覧〔セクション 5〕を追加）。前回: 2026-10-12（21-8a で plans/ のツリーを 4 セット × 2 ファイルに更新）</span>
+  <span>最終更新: 2026-10-18（30-3 の指摘で書式ルール 5.1 にリード文と「さらに詳しく」〔段階的詳細化のつながり〕を追加。同日 Phase 30-1 で 3 段の構成〔基本設計 → 層の概要 → 詳細設計〕・生産層 docs/production/・書式ルールと使ってよいライブラリの一覧〔セクション 5〕を追加）。前回: 2026-10-12（21-8a で plans/ のツリーを 4 セット × 2 ファイルに更新）</span>
   <span>本ドキュメントは設計書体系のエントリポイント</span>
 </div>
 
@@ -286,7 +286,9 @@ flowchart TB
   <thead><tr><th>位置</th><th>書くこと</th><th>書き方</th></tr></thead>
   <tbody>
     <tr><td>冒頭の要約</td><td>図 1 枚 + 要点の表。そのページの全体がここだけで分かるようにする</td><td>h1 とページ情報の直後に <code>&lt;section class="page-summary" id="summary"&gt;</code> を 1 つ置く</td></tr>
+    <tr><td>リード文</td><td>各章・各図表の<strong>前</strong>に、「この章で何を説明するか」「この図・表は何を表すか」を日本語の文章で書く。章のリード文では、その章がどの上位の章・ページを詳しくしたものかも書く（例:「この章は 1 章の生産面を工程の単位まで詳しくしたもの」）</td><td><code>&lt;p class="lead"&gt;</code>。図・表をリード文なしで始めない（要約の図も同じ）</td></tr>
     <tr><td>本文</td><td><strong>事実だけ</strong>（何がある・どう動く・どこに何を置く・設定値）。図と表を中心にする</td><td>理由・経緯・比較した案は書かず、判断した箇所に <code>&lt;a class="decision-ref" href="#d-01"&gt;→ 理由 D-01&lt;/a&gt;</code> を置く</td></tr>
+    <tr><td>さらに詳しく</td><td>章の末尾に、その章の内容を 1 段下で詳しく書いた資料（同じページの後の章・詳細設計・セット別設計書・SKILL.md）へのリンクを並べる。「何を見たいならどこ」の形で書く（段階的詳細化のつながり）</td><td><code>&lt;div class="drilldown"&gt;&lt;span class="drilldown-title"&gt;さらに詳しく&lt;/span&gt;&lt;ul&gt;…&lt;/ul&gt;&lt;/div&gt;</code>。詳しくする先がない章は置かない</td></tr>
     <tr><td>判断の記録</td><td>本文の判断の理由。1 件 = 1 判断</td><td>ページ末尾に <code>&lt;section class="decisions" id="decisions"&gt;</code> を 1 つ置く（5.2）</td></tr>
   </tbody>
 </table>

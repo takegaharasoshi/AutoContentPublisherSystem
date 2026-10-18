@@ -205,6 +205,7 @@
 <li><strong>レビュー</strong>（観点: 基本設計だけで全体が分かるか / 実装との食い違い。一次スクリーニングは Codex〔読み取り専用〕、判断は Claude）。1 巡目: blocker 4 件を修正（動画ビルドの段取りに画像生成の工程がない・ranking の S3 キー末尾は <code>_20s</code> / <code>_30s</code>・Lambda の実名に <code>acps-prod-</code>・「実行時に AI 生成はしない」がコメント返信の LLM 判定と矛盾）。改善提案 2 件（環境数の表記・コメント記録の保持期間）は課題 <a href="../issues/index.html#I-042">I-042</a>（30-9 の着手時がトリガー）に起票。2 巡目: blocker 1 件（画像生成の工程を図 2 と 6.4 にも反映）を修正して打ち切り</li>
 <li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 87 ページはみ出し 0 件・図 3 ページ 11 図の描画不備 0 件・判断リンク 8 件の不備 0 件で OK。ガイド（<code>docs/index.html</code>）の基本設計のカード・3 段の図と表・ツリー、CLAUDE.md の構成と目次の表の「30-3 で作り直す」を実態に合わせた</li>
 <li><strong>課題</strong>: 展開元の <a href="../issues/index.html#I-040">I-040</a> は据え置き継続（Phase 30 全体で解消）</li>
+<li><strong>通読の指摘（2026-10-18・ユーザー）</strong>: ①図・表がいきなり始まる → 全章・全図表の前にリード文（何を説明する章か・図が何を表すか。章ではどの上位を詳しくしたものかも）を置いた ②段階的詳細化のつながりが分かりにくい → 要約の末尾に章の読み順、各章の末尾に「さらに詳しく」（1 段下の章・詳細設計・セット別設計書・SKILL.md へのリンク）を置いた（例: 2 章はセットごとに設計書・方式設計書の 8 節・手順書へ）。どちらも今後の全ページの書き方として、<a href="../index.html#format-layout">設計書体系ガイド 5.1</a> の表（<code>p.lead</code>・<code>div.drilldown</code>）・<code>style.css</code>・雛形に反映した。再通読の go 待ち</li>
 </ul>
 </div>
 </details>

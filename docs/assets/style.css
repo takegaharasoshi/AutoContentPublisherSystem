@@ -253,6 +253,21 @@ dialog.diagram-zoom[open] { display: flex; flex-direction: column; }
 .page-summary > h2 { margin-top: 0; border-bottom: 0; padding-bottom: 0; font-size: 1.1rem; }
 .page-summary figure.diagram { background: var(--bg); }
 
+/* ---- 段階的詳細化のつながり（Phase 30-3）----
+   p.lead: 章・図表の前に置くリード文（この章で何を説明するか・この図は何を表すか）
+   .drilldown: 章の末尾に置く「さらに詳しく」の枠。下の段（詳細設計・別の章）へのリンクを並べる */
+p.lead { margin: .6rem 0 .9rem; }
+.drilldown {
+  margin: 1rem 0 1.5rem;
+  padding: .55rem .9rem .6rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: 8px;
+  font-size: .9rem;
+}
+.drilldown > .drilldown-title { display: block; font-weight: 700; font-size: .82rem; color: var(--text-muted); margin-bottom: .1rem; }
+.drilldown ul { margin: .1rem 0 0; padding-left: 1.2rem; }
+.drilldown li { margin: .1rem 0; }
+
 /* ---- 判断の記録（Phase 30-1）----
    本文の判断箇所には「→ 理由 D-01」のリンクだけを置き（a.decision-ref）、
    理由はページ末尾の section#decisions に D-xx 単位（id="d-01"）でまとめる */

@@ -19,6 +19,8 @@
 
 <section class="page-summary" id="summary">
 <h2>要約</h2>
+<p class="lead">このシステムは、Instagram にショート動画（リール）を毎日決まった時刻に投稿し、その反応を集めて次の企画に生かすための仕組みである。全体は<strong>生産面</strong>と<strong>配信面</strong>の 2 つに分かれる。生産面では、人が AI のスキルと手元のツールを使って動画を<strong>あらかじめ作り</strong>、全部を目で確かめてから置き場所へ置く。配信面では、AWS 上のプログラムが決まった時刻にその置き場所から 1 本を選んで投稿し、反応の数値やコメントを集める。2 つの面をつなぐのは、<strong>S3 の動画の置き場所</strong>と <strong>Aurora の在庫テーブル</strong>の 2 つだけである。</p>
+<p class="lead">下の図 1 はこの全体像を 1 枚で表したもの。上から、生産面で作ってレビューする流れ → 受け渡しの置き場所 → 配信面の 4 つの仕事（投稿・インサイト収集・コメント自動返信・トークン更新）→ Instagram の順に並ぶ。続く表は、このページ全体の要点をまとめたもの。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -61,9 +63,12 @@ flowchart TB
   </tbody>
 </table>
 </div>
+<p>このページは要約の内容を、<a href="#faces">1 章</a>（2 面の関係）→ <a href="#production">2 章</a>（生産面）・<a href="#delivery">3 章</a>（配信面）→ <a href="#contract">4 章</a>（2 面のつなぎ目）→ <a href="#dataflow">5 章</a>（データの流れ）→ <a href="#components">6 章</a>（構成要素の一覧）の順に詳しくしていく。各章の末尾の「さらに詳しく」から、1 段下の詳細設計へ進める（<a href="#entry">7 章</a>に一覧）。</p>
 </section>
 
 <h2 id="faces">1. 2 面の全体構成</h2>
+<p class="lead">このシステムは大きく<strong>生産面</strong>と<strong>配信面</strong>の 2 面で構成されている。生産面は「投稿する動画を作って在庫に積む」側で、人の手元の PC で、人の判断を挟みながら週単位で進む。配信面は「在庫から取り出して投稿し、反応を集める」側で、AWS 上で人の手を介さずに毎日自動で動く。2 面は動く場所・動かす人・周期がまったく違うため、互いに直接呼び合わず、在庫（S3 の動画と在庫テーブル）を介してだけつながる。</p>
+<p class="lead">次の表は、2 面を「どこで動くか・誰が動かすか・どの周期か・何を生み出すか」で比べたもの。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>面</th><th>どこで動くか</th><th>誰が動かすか</th><th>周期</th><th>成果物</th></tr></thead>
@@ -74,8 +79,15 @@ flowchart TB
 </table>
 </div>
 <p>2 面は同期しない。配信面は在庫テーブルの「ビルド済み（動画キーあり）・有効」の行から選ぶだけで、生産面の作業中かどうかを知らない。在庫が尽きないよう、生産面が在庫水位を見て補充する。</p>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>生産面をもう 1 段詳しく（工程・関所・セット別の作り方）→ <a href="#production">2 章 生産面</a></li>
+  <li>配信面をもう 1 段詳しく（4 系統の起動・実体・読み書き）→ <a href="#delivery">3 章 配信面の 4 系統</a></li>
+  <li>2 面のつなぎ目（何をどこに置き、誰が書き誰が読むか）→ <a href="#contract">4 章 受け渡しの契約</a></li>
+</ul></div>
 
 <h2 id="production">2. 生産面</h2>
+<p class="lead">この章は、<a href="#faces">1 章</a>の生産面を「どんな工程を、どこで人が止めながら進むか」の単位まで詳しくしたもの。生産面は、Claude Code や Codex のスキル（作業手順書）に沿って、素材の企画から動画の配置までを進める。途中に人が中身を確かめて止める「関所」を 3 か所置き、OK になったものだけが次の工程へ進む。</p>
+<p class="lead">図 2 は 3 セットに共通する工程の流れを表す。四角が工程、ひし形が関所（人の判断）で、上から順に、候補づくり → 選別 → 完成稿 → 検証 → レビュー → 画像と動画のビルド → 全数レビュー → 配置と進む。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -93,6 +105,7 @@ flowchart TB
 </pre>
 <figcaption>図 2 生産ラインの共通の工程と関所（人が止める場所）。工程の細部は各スキルの SKILL.md が正（umigame は関所 2 の後に機械プローブ〔コメント判定の試行〕が入り、在庫の投入は配置と一括で行う）</figcaption>
 </figure>
+<p class="lead">工程の骨組みは共通だが、何を作るか（なぞなぞ・ランキング・ウミガメのスープ）・素材の集め方・ナレーションの有無はセットごとに違う。次の表は、セットごとの違いと、それぞれの手順書・ソース・ビルドツールの置き場所を示す。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>セット</th><th>補充スキル</th><th>素材のソース</th><th>動画ビルド</th><th>ナレーション</th></tr></thead>
@@ -104,8 +117,17 @@ flowchart TB
 </table>
 </div>
 <p>動画ビルドの段取りは 3 セット共通: <code>export_prompts.py</code>（挿絵・背景の画像生成プロンプトの書き出し）→ 画像の生成（Codex の imagegen）と人の確認 → <code>intake.py</code>（生成した画像の取り込み）→ <code>build.py</code>（Remotion・ffmpeg を Docker で実行）→ <code>review_sheet.py</code>（全数レビューのページ）→ <code>publish.py</code>（配置）。</p>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li><strong>logic-training-1</strong> の作り方を細かく見る → セット別設計書 <a href="../app/sets/logic-training-1.html">logic-training-1</a>・方式設計書 <a href="../app/generators/quiz-prebuilt.html#build">quiz-prebuilt 8 節（事前ビルドパイプライン）</a>・手順書 <a href="../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a>・運用 <a href="../app/operation.html#quiz-stock-mgmt">アプリ運用設計 3 節（問題ストック）</a></li>
+  <li><strong>pref-ranking-1</strong> の作り方を細かく見る → セット別設計書 <a href="../app/sets/pref-ranking-1.html">pref-ranking-1</a>・方式設計書 <a href="../app/generators/ranking-prebuilt.html#build">ranking-prebuilt 8 節</a>・手順書 <a href="../../.agents/skills/ranking-stock-replenish/SKILL.md">ranking-stock-replenish</a>・執筆の勘所 <a href="../../content/ranking-stock/pref-ranking-1/WRITING-NOTES.md">WRITING-NOTES.md</a>・運用 <a href="../app/operation.html#ranking-stock-mgmt">アプリ運用設計 3 節（ランキングストック）</a></li>
+  <li><strong>umigame-soup-1</strong> の作り方を細かく見る → セット別設計書 <a href="../app/sets/umigame-soup-1.html">umigame-soup-1</a>・方式設計書 <a href="../app/generators/umigame-prebuilt.html#build">umigame-prebuilt 8 節</a>・手順書 <a href="../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish</a>（作問は <a href="../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a>）</li>
+  <li>3 セットを横断した生産ラインの全体像・関所・受け渡しの契約 → 生産設計 <code>docs/production/</code>（<a href="../plans/development-plan.html#step-30-5">30-5</a> で新設予定）</li>
+  <li>作ったものを配信面へどう渡すか → <a href="#contract">4 章 受け渡しの契約</a></li>
+</ul></div>
 
 <h2 id="delivery">3. 配信面の 4 系統</h2>
+<p class="lead">この章は、<a href="#faces">1 章</a>の配信面を「AWS のどのサービスが、いつ、何をするか」の単位まで詳しくしたもの。配信面の仕事は 4 つの系統に分かれ、それぞれが別々のきっかけで動く。①投稿と②インサイト収集は時刻（EventBridge Scheduler）で動くバッチ、③コメント自動返信は Instagram からの通知（Webhook）で動く Lambda、④トークン更新は週 1 回の時刻で動く Lambda である。</p>
+<p class="lead">図 3 は 4 系統を AWS の構成として描いたもの。枠 1 つが 1 系統で、矢印は起動の順番を表す。下に並ぶ Aurora・S3・Secrets Manager は、各系統が読み書きする共通の置き場所。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -152,6 +174,7 @@ flowchart TB
 </pre>
 <figcaption>図 3 配信面の 4 系統（AWS 構成）。SFN の先頭では毎回 DB 準備確認（db-readiness-check）が走る（図では省略）</figcaption>
 </figure>
+<p class="lead">次の表は、4 系統それぞれについて「いつ起動するか・AWS 上の実体は何か・何をするか・どこを読み書きするか」をまとめたもの。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>系統</th><th>起動</th><th>実体</th><th>やること</th><th>読む / 書く</th></tr></thead>
@@ -164,9 +187,17 @@ flowchart TB
 </table>
 </div>
 <p>3 つの SFN はすべて先頭で <code>db-readiness-check</code>（ECS）を走らせ、Aurora の起動を待ってからバッチを動かす <a class="decision-ref" href="#d-06">→ 理由 D-06</a>。失敗は CloudWatch アラーム・ECS 異常終了ルールから SNS トピック <code>acps-prod-alarm-topic</code> へ通知する（<code>MonitoringStack</code>）。</p>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>① 投稿を細かく見る → 処理の手順は <a href="../app/batch-flow.html#flow-image">バッチ処理フロー 2 章（生成）</a>・<a href="../app/batch-flow.html#flow-sns">3 章（投稿）</a>、SFN の定義は <a href="../infra/workflow.html#image-asl">ワークフロー（画像生成の SFN）</a>・<a href="../infra/workflow.html#sns-asl">（投稿の SFN）</a>、時刻は <a href="../infra/workflow.html#schedule">ワークフロー（スケジュール）</a></li>
+  <li>② インサイト収集を細かく見る → <a href="../app/batch-flow.html#flow-insights">バッチ処理フロー（インサイト収集）</a>・<a href="../infra/workflow.html#insights-asl">ワークフロー（収集の SFN）</a>・運用は <a href="../app/operation.html#insights-ops">アプリ運用設計 6 章</a></li>
+  <li>③ コメント自動返信を細かく見る → 判定と返信の仕様は <a href="../app/sets/umigame-soup-1.html#comment-reply">umigame-soup-1 の 10 節</a>、AWS 構成は <a href="../infra/architecture.html#comment-reply">アーキテクチャ（コメント返信）</a></li>
+  <li>④ トークン更新を細かく見る → <a href="../app/operation.html#token-refresh">アプリ運用設計 5.4</a></li>
+  <li>AWS 全体の構成・ネットワーク・監視 → <a href="../infra/architecture.html">アーキテクチャ</a>・<a href="../infra/workflow.html#alarms">ワークフロー（アラーム）</a></li>
+</ul></div>
 
 <h2 id="contract">4. 2 面の受け渡しの契約</h2>
-<p>生産面が書き、配信面が読む。配信面は在庫テーブルの選んだ行の <code>last_used_at</code>・<code>use_count</code> だけを更新し、素材の中身は書き換えない。</p>
+<p class="lead">この章は、<a href="#production">2 章</a>の最後（配置）と <a href="#delivery">3 章</a>の最初（素材の選定）をつなぐ部分を詳しくしたもの。2 面は互いを直接呼ばないため、「どこに・どんな形で置くか」という約束（契約）さえ守れば、片方を変えてももう片方に影響しない。ここではその約束の中身を示す。</p>
+<p class="lead">次の表は、受け渡すもの 1 つごとに「置き場所」「書く側（生産面のツール）」「読む側（配信面のプログラム）」を並べたもの。生産面が書き、配信面が読む。配信面は在庫テーブルの選んだ行の <code>last_used_at</code>・<code>use_count</code> だけを更新し、素材の中身は書き換えない。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>受け渡すもの</th><th>置き場所</th><th>書く（生産面）</th><th>読む（配信面）</th></tr></thead>
@@ -178,9 +209,17 @@ flowchart TB
   </tbody>
 </table>
 </div>
-<p>列の定義・選び方の詳細は<a href="../app/data-model.html#entities">データモデル設計</a>と各方式設計書（<a href="../app/generators/quiz-prebuilt.html">quiz-prebuilt</a> / <a href="../app/generators/ranking-prebuilt.html">ranking-prebuilt</a> / <a href="../app/generators/umigame-prebuilt.html">umigame-prebuilt</a>）。</p>
+<p>列の定義・選び方の詳細は下の「さらに詳しく」のとおり（データモデル設計と各方式設計書。<a href="../app/generators/quiz-prebuilt.html">quiz-prebuilt</a> / <a href="../app/generators/ranking-prebuilt.html">ranking-prebuilt</a> / <a href="../app/generators/umigame-prebuilt.html">umigame-prebuilt</a>）。</p>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>在庫テーブルの列の定義 → <a href="../app/data-model.html#entities">データモデル設計</a></li>
+  <li>在庫から 1 件を選ぶ規則 → 方式設計書の 4 節（<a href="../app/generators/quiz-prebuilt.html#stock">quiz-prebuilt</a> / <a href="../app/generators/ranking-prebuilt.html#stock">ranking-prebuilt</a> / <a href="../app/generators/umigame-prebuilt.html#stock">umigame-prebuilt</a>）</li>
+  <li>動画の取得と当回の登録 → 方式設計書の 5 節（<a href="../app/generators/quiz-prebuilt.html#fetch">quiz-prebuilt</a> / <a href="../app/generators/ranking-prebuilt.html#fetch">ranking-prebuilt</a> / <a href="../app/generators/umigame-prebuilt.html#fetch">umigame-prebuilt</a>）</li>
+  <li>生成方式そのものの契約 → <a href="../app/batch-flow.html#generator-contract">バッチ処理フロー 2.1（方式の契約）</a></li>
+</ul></div>
 
 <h2 id="dataflow">5. データの流れ</h2>
+<p class="lead">この章は、<a href="#delivery">3 章</a>の 4 系統が、どのデータを受け取ってどこへ書き残すかを、データの側から追い直したもの。3 章が「誰が動くか」の視点なのに対し、ここでは「1 本の動画の情報が、在庫から投稿・反応の記録へとどう移っていくか」の視点で見る。</p>
+<p class="lead">図 4 は、在庫テーブルから始まり、投稿の記録 → Instagram → 反応の数値 → KPI の集計へと進む主な流れを表す。「umigame のみ」から分かれる枝は、umigame-soup-1 だけにあるコメントの返信と記録の流れ。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -197,6 +236,7 @@ flowchart TB
 </pre>
 <figcaption>図 4 データの流れ（配信面）。テーブルの全体と ER 図は<a href="../app/data-model.html#er">データモデル設計</a></figcaption>
 </figure>
+<p class="lead">図 5 は、図 4 の umigame の枝（コメント）を時間の順に並べ直したもの。投稿したときに問題の答えを S3 に置いておき、コメントが来たらそれを読んで判定・返信し、記録を残し、後でインサイト収集が DB に取り込む、という順番になる。</p>
 <figure class="diagram">
 <pre class="mermaid">
 sequenceDiagram
@@ -218,9 +258,17 @@ sequenceDiagram
 </pre>
 <figcaption>図 5 umigame のコメントの流れ（投稿 → 返信 → 記録の取り込み）</figcaption>
 </figure>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>すべてのテーブルと ER 図 → <a href="../app/data-model.html#er">データモデル設計</a></li>
+  <li>投稿の状態（成功・失敗・確認待ち）の移り方 → <a href="../app/batch-flow.html#posts-state">バッチ処理フロー（投稿の状態）</a></li>
+  <li>問題スナップショットの中身 → <a href="../app/batch-flow.html#problem-snapshot">バッチ処理フロー（問題スナップショット）</a></li>
+  <li>KPI の集計と月次の転記 → <a href="../app/operation.html#insights-ops">アプリ運用設計 6 章</a></li>
+</ul></div>
 
 <h2 id="components">6. 構成要素の一覧</h2>
+<p class="lead">この章は、ここまでの図に出てきた部品を、リポジトリの置き場所ごとに一覧にしたもの。配信面のプログラム（<code>services/</code>）→ それを AWS に載せる定義（<code>infra/</code>）→ 生産面の手順書（スキル）→ 生産面の素材とツール（<code>content/</code>）の順に並べる。どの部品がどの章の何にあたるかを引くための索引として使う。</p>
 <h3 id="components-services">6.1 配信面のプログラム（<code>services/</code>）</h3>
+<p class="lead"><a href="#delivery">3 章</a>の 4 系統を実際に動かすプログラムの一覧。ECS で動くバッチが 4 つ、Lambda が 1 つ（中に 3 つの関数）と、バッチ共通のライブラリがある。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>サービス</th><th>実行形態</th><th>役割</th></tr></thead>
@@ -236,6 +284,7 @@ sequenceDiagram
 </div>
 
 <h3 id="components-stacks">6.2 CDK スタック（<code>infra/lib/</code>）</h3>
+<p class="lead">6.1 のプログラムを AWS 上に置くための定義の一覧。AWS CDK のスタック単位に分かれ、共通の土台（<code>FoundationStack</code>）の上に、系統ごとのスタックが載る。「依存」の列は、先に作っておく必要があるスタック。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>スタック</th><th>主なリソース</th><th>依存</th></tr></thead>
@@ -250,8 +299,14 @@ sequenceDiagram
 </table>
 </div>
 <p>ECS バッチの 3 サービスは、main への push で CodePipeline → CodeBuild → ECR → タスク定義の新リビジョン登録まで自動で進む。インフラと Lambda は手動の <code>cdk deploy</code>（<a href="../infra/cicd.html">CI/CD 設計</a>）。</p>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>スタックごとのリソースの定義・デプロイの順番・スタック間の受け渡し → <a href="../infra/stacks.html">CDK スタック実装仕様</a></li>
+  <li>IAM・Secrets の名前の規約 → <a href="../infra/security.html">セキュリティ設計</a></li>
+  <li>パイプラインの動き → <a href="../infra/cicd.html">CI/CD 設計</a></li>
+</ul></div>
 
 <h3 id="components-skills">6.3 スキル（<code>.agents/skills/</code>）</h3>
+<p class="lead"><a href="#production">2 章</a>の生産面を進めるための手順書（スキル）の一覧。Claude Code では <code>/名前</code>、Codex では <code>$名前</code> で呼び出す。生産ラインのスキルのほか、開発や運用の進め方のスキルもここにある。工程の細部はそれぞれの SKILL.md が正。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>分類</th><th>スキル</th><th>役割</th></tr></thead>
@@ -266,6 +321,7 @@ sequenceDiagram
 </div>
 
 <h3 id="components-stock">6.4 ストックとツール（<code>content/</code>）</h3>
+<p class="lead"><a href="#production">2 章</a>の生産面で、スキルが読み書きする素材のソースとツールの置き場所。素材はセットごと・補充のバッチ（週）ごとにフォルダが分かれる。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>場所</th><th>中身</th></tr></thead>
@@ -276,8 +332,13 @@ sequenceDiagram
   </tbody>
 </table>
 </div>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>動画ビルドの使い方 → 各セットの README（<a href="../../content/video-build/logic-training-1/README.md">logic-training-1</a> / <a href="../../content/video-build/pref-ranking-1/README.md">pref-ranking-1</a> / <a href="../../content/video-build/umigame-soup-1/README.md">umigame-soup-1</a>）</li>
+  <li>umigame のプローブ（コメント判定の試行）ツール → <a href="../../content/umigame-stock/umigame-soup-1/README.md">umigame-soup-1 の README</a></li>
+</ul></div>
 
 <h2 id="entry">7. 詳細設計への入口</h2>
+<p class="lead">この章は、各章の末尾の「さらに詳しく」を 1 か所に集めた目次。基本設計（このページ）の次の段にあたる詳細設計を、知りたいことから引けるようにしている。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>知りたいこと</th><th>入口</th></tr></thead>
@@ -296,6 +357,7 @@ sequenceDiagram
 
 <section class="decisions" id="decisions">
 <h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。本文には事実だけを書き、「なぜそうしたか」はここにまとめている。1 件ごとに、決めたこと・理由・いつどこで決めたかを書く。</p>
 <article id="d-01">
 <h3>D-01 動画は事前にビルドし、人が全数を見てから置く</h3>
 <dl>
