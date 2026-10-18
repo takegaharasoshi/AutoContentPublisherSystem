@@ -13,7 +13,7 @@
 <h1>logic-training-1 の生産（なぞなぞ・とんち）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-18（Phase 30-3c で新設。30-5 で「さらに詳しく」を生産の詳細設計へ向けた）</span>
+  <span>最終更新: 2026-10-18（Phase 30-3c で新設。30-5 で「さらに詳しく」を生産の詳細設計へ向け、3 章 レビューのやり方を追加）</span>
   <span>1 段上: <a href="production.html">生産ライン（共通）</a>。ここには共通との違いだけを書く</span>
 </div>
 
@@ -42,7 +42,7 @@ flowchart TB
     <tr><td>作るもの</td><td>朝 = なぞなぞ、夜 = とんち・水平思考の 1 問 1 本のリール（昼のフェルミ推定は停止中 <a class="decision-ref" href="#d-01">→ 理由 D-01</a>）</td></tr>
     <tr><td>補充スキル</td><td><a href="../../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish</a>（Claude Code・Codex の両方で起動できる）+ 振り返り <a href="../../../.agents/skills/quiz-review-learn/SKILL.md">quiz-review-learn</a></td></tr>
     <tr><td>在庫テーブル</td><td><code>quiz_stock_items</code></td></tr>
-    <tr><td>関所</td><td>候補の選別・完成稿のレビュー（1 問ずつ）・動画の全数レビューの 3 つ</td></tr>
+    <tr><td>関所</td><td>候補の選別・完成稿のレビュー（1 問ずつ）・動画の全数レビューの 3 つ（やり方は <a href="#reviews">3 章</a>）</td></tr>
     <tr><td>音</td><td>ナレーションなし。BGM（時間帯に合わせて選ぶ）と効果音</td></tr>
   </tbody>
 </table>
@@ -76,6 +76,91 @@ flowchart TB
   <li>生産の詳細（資材の置き場・工程ごとの規定・事前ビルド・在庫の数え方）→ <a href="../../production/logic-training-1.html">生産の詳細設計 logic-training-1</a></li>
   <li>投稿時に在庫から 1 件を選ぶ規則 → <a href="../../app/generators/quiz-prebuilt.html#stock">方式設計書 quiz-prebuilt 4 節</a></li>
   <li>運用の値（補充のしきい値・直近の補充）→ <a href="../../plans/logic-training-1.html">セット計画書 logic-training-1</a></li>
+</ul></div>
+
+<h2 id="reviews">3. レビューのやり方（3 つの関所）</h2>
+<p class="lead">このセットの人の関所は 3 つで、どれもユーザーが判断し、AI は判断しない。表 1 は、3 つの関所がどのゴールの後に来て、どこで何を見て、どう返すかを表す。関所の考え方（AI が先に一次スクリーニングする・動画は全数を見る）は<a href="production.html#review">生産ライン（共通）5 章</a>。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 1 logic-training-1 の 3 つの関所</caption>
+  <thead><tr><th>関所</th><th>いつ</th><th>場所</th><th>見るもの</th><th>返し方</th></tr></thead>
+  <tbody>
+    <tr><td>① 候補の選別</td><td>G1a（候補の準備）の後</td><td>チャット</td><td>1 候補 3 行の一覧（朝・夜それぞれ目標の 2 倍）</td><td>候補 ID ごとに OK / NG / 保留。理由は任意</td></tr>
+    <tr><td>② 完成稿のレビュー</td><td>G1b（完成稿の準備）の後</td><td>チャット（1 問ずつ）</td><td>1 問の全項目と表示場所・AI が気づいた懸念と代案</td><td>承認 / 修正の指示 / NG（差し替え）</td></tr>
+    <tr><td>③ 動画の全数レビュー</td><td>G2（投入〜ビルド）の後</td><td>レビューシート <code>work/review.html</code>（ブラウザー）</td><td>1 問 1 カード（動画・スチル 5 枚・イラスト・問題文とヒント）</td><td>チャットで番号ごとに指摘、または「全件 OK」</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="review-select">3.1 ① 候補の選別（チャット）</h3>
+<p class="lead">完成稿を書く前に、問題の筋だけを見て反射的に選ぶ関所。ここでの OK は「仕上げてよい」の意味で、投入の承認ではない。</p>
+<p><strong>AI が出すもの</strong>: スロット（朝・夜）ごとに、1 候補を 3 行（候補 ID と問題文 / 答え / 図の内容）で並べた一覧を 1 通で出す。出典の確認・既出との照合・答えの成立は AI が済ませてあり、一覧には載せない（候補ファイルの記録で開ける）。</p>
+<p class="muted">例:</p>
+<pre><code>【朝・候補選別 14 件】各候補に OK / NG / 保留 を返してください(理由は不要。未判定はそのまま残ります)
+m01 問題文: 黒板の式に線を 1 本足して正しい式にする
+    答え: + に斜線で 4(545+5=550)  図: 黒板の式
+m02 問題文: …
+    答え: …  図: なし
+…</code></pre>
+<p><strong>ユーザーの返し方</strong>: 候補 ID を OK / NG / 保留に振り分けて返す。1 行でよい。</p>
+<p class="muted">例:</p>
+<pre><code>OK: m01 m03 m05 m07 m10 / NG: m02 m06 m08 m09 m12 m13 / 保留: m04 m11 m14</code></pre>
+<ul>
+  <li>理由は書かなくてよい。書いた理由はそのまま記録され、書かなかった理由を AI が推測で埋めることはない</li>
+  <li>迷ったら保留でよい。返さなかった候補は「未レビュー」のまま残る（NG にはならない）</li>
+  <li>AI はその場で NG の理由を尋ねたり、直し方を議論したりしない（理由は後日の振り返り <code>quiz-review-learn</code> で扱う）</li>
+</ul>
+<p><strong>返した後</strong>: AI が判定を候補ファイルに記録し、集計（<code>tally.py</code>）の出力を貼って「G1b へ進める」か「追加 朝 x / 夜 y」を宣言する。OK が朝・夜どちらかでも目標に足りなければ、足りない数の 2 倍の候補を追加で作り、同じ形でもう一度選別する。目標を超えた OK は候補のまま次回へ持ち越す。</p>
+
+<h3 id="review-draft">3.2 ② 完成稿のレビュー（チャット・1 問ずつ）</h3>
+<p class="lead">選んだ候補を全項目まで仕上げた完成稿を、1 問ずつ確かめる関所。ここでの承認が投入の承認で、誤答を止める唯一の関所でもある。</p>
+<p><strong>AI が出すもの</strong>: 1 通に 1 問。機械検証（文字数・答えの検算・投入 SQL の生成）を通した後で出す。</p>
+<ul>
+  <li>項目は日本語の名前で、表示される場所を添える: つかみ（キャプション 1 行目）・ヒント（カット 3 の吹き出し）・問題文（全カット）・答え（キャプション）・解説（キャプション）・コーチの一言（キャプションの末尾）・タグ（記録用）・出題要旨（記録用・重複の管理）・イラストの情景（問題文の下の絵の生成指示）・出典メモ</li>
+  <li>AI が気づいた懸念（答えが見えてしまう・既存の問題と重なる・別の答えが成り立つ）は、聞かれる前に書いて代案を添える</li>
+  <li>なぞなぞ・とんちの想定の答えは機械で確かめられないので、人の目が唯一の確認だと明記する</li>
+</ul>
+<p class="muted">例:</p>
+<pre><code>【朝 3/7】A47（候補 m05）
+つかみ（キャプション 1 行目）: …
+ヒント（カット 3 の吹き出し）: …
+問題文（全カット）: …
+答え（キャプション）: … / 解説（キャプション）: …
+コーチの一言（キャプション末尾）: …
+タグ（記録用）: … / 出題要旨（記録用）: …
+イラストの情景（問題文の下の絵）: …
+出典メモ: …
+気になる点: 「…」は答えの一部が問題文に見えます。代案: …</code></pre>
+<p><strong>ユーザーの返し方</strong>: 次のどれかを返す。</p>
+<ul>
+  <li><strong>承認</strong>（「OK」）: その問題を確定し、次の問題へ進む</li>
+  <li><strong>修正の指示</strong>: 直す項目と直し方を書く（AI の代案を選ぶだけでもよい）。「他の問題も同じように」と書けば、AI が当てはまる問題を挙げて一括で直し、直した先を示す</li>
+  <li><strong>NG</strong>（差し替え）: その問題をやめる。完成稿を粘って書き直さず、候補に戻す</li>
+</ul>
+<p><strong>返した後</strong>: 修正は単一ソース（<code>stock_items.py</code>）に反映し、機械検証を回し直してから同じ問題を出し直す。承認済みの問題を AI が勝手に変えることはない。NG の問題は候補へ差し戻し（完成稿 NG）、余っている候補 OK があれば代わりに仕上げ、なければ ① の追加に戻る。全問を承認したら G2（投入〜ビルド）へ進む。見る観点は誤答・表現の独自性・既存との重複・書式の 4 つ（<a href="../../production/logic-training-1.html#review">生産の詳細設計 2.5</a>）。</p>
+
+<h3 id="review-video">3.3 ③ 動画の全数レビュー（レビューシート）</h3>
+<p class="lead">ビルドした動画を全部見て、S3 に置くものを決める関所。レビューシートを開いて見て、結果をチャットで返す。</p>
+<p><strong>AI が出すもの</strong>: レビューシート <code>content/video-build/logic-training-1/work/review.html</code>（<code>review_sheet.py</code> が作る）。1 ページ 14 本で、それより多いと <code>review-2.html</code>・<code>review-3.html</code> … に分かれる（今回分がどのページかは AI が伝える）。AI はイラストに指定外の文字が混じっていないか・サイズが 3:2 かを先に確かめ、気づいた点をチャットに添える。シートの 1 カードは次の 5 つ。</p>
+<ol>
+  <li>① 動画（再生できる）</li>
+  <li>② スチル 5 枚（先頭 0f・各カット・末尾 479f。先頭と末尾が隣に並ぶので、ループの継ぎ目が自然かを見る）</li>
+  <li>③ イラスト（原画）</li>
+  <li>④ 問題文とヒント</li>
+  <li>⑤ <code>slot_code</code> と <code>content_key</code>（カードの見出しは <code>stock_item_id</code> の番号）</li>
+</ol>
+<p><strong>見るところ</strong>: イラスト（指定外の文字・数字・記号がないか / 画風がそろっているか / 情景が問題と合っているか）・版面（文字の欠け・重なり・吹き出しとヒント）・音（BGM と効果音のタイミングと音量）・ループの継ぎ目。</p>
+<p><strong>ユーザーの返し方</strong>: カードの見出しの番号ごとに、直してほしい点をチャットに書く。問題がなければ「全件 OK」。</p>
+<p class="muted">例:</p>
+<pre><code>326 グレーの後の矢印と「?」が「次の色」を問うように見える
+329 文字を大きく
+336 黒背景に黒いカラスで見えにくい
+ほかは OK</code></pre>
+<p><strong>返した後</strong>: AI がイラストの情景文を直し（ローカル DB と Aurora の両方）、イラストを作り直して、その問題だけビルドし直し、シートを作り直して出し直す。全件が OK になるまで繰り返す（何巡になってもよい）。問題そのものが動画にすると微妙なら、完成稿 NG として候補へ差し戻す。全件 OK になったら、AI が承認した番号を <code>work/approved.txt</code> に書き、G3（配置）のゴールを出す。</p>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>候補ファイルの形式・状態・集計の規則 → <a href="../../../content/quiz-stock/logic-training-1/candidates/README.md">candidates/README.md</a></li>
+  <li>各関所で見る観点・レビューシートの作りの詳細 → <a href="../../production/logic-training-1.html#review">生産の詳細設計 logic-training-1 の 2.5・3.5</a></li>
+  <li>ゴールの切り方とコマンド → <a href="../../../.agents/skills/quiz-stock-replenish/SKILL.md">quiz-stock-replenish の SKILL.md</a>（セクション 1.5・5・7）</li>
 </ul></div>
 
 <section class="decisions" id="decisions">

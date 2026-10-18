@@ -366,6 +366,7 @@
 <li><strong>レビュー</strong>（観点: 移設で事実が欠けていないか / SKILL.md・機能ページと食い違っていないか。一次スクリーニング Codex・判断 Claude）。1 巡目: blocker 3 件を修正（20 秒版と 30 秒版の記述の混在・ループの継ぎ目のフレーム〔frame 480 = 次の周回の 0f〕・ウェイト更新で差し替える列名）。2 巡目: blocker 1 件（ビルド README の 2 尺前提の記述）を README の注記で修正。ここで打ち切り。改善提案なし</li>
 <li><strong>課題表</strong>: I-023 の対象パスに <code>docs/production/pref-ranking-1.html</code>（2.3・4.1）を足した（据え置き継続・トリガーは変えない）。I-015 は 3 節に残した AI 開示の節を指すため付け替え不要。I-006・I-019・I-025 は 4 節、I-042 は機能ページのリンクの差し替えだけで、どれも据え置きのまま。I-040 は Phase 30 全体の課題のため据え置き継続</li>
 <li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 98 ページはみ出し 0 件・図 15 ページ 31 図の描画不備 0 件・判断リンク 83 件の不備 0 件で OK</li>
+<li><strong>ユーザーの修正指示（2026-10-18）</strong>: 「レビューをどこでどうやるか」を機能別の基本設計に書く。<a href="../overview/functions/production-logic-training-1.html#reviews">logic-training-1</a> に 3 章（① 候補の選別〔チャット・1 候補 3 行 → OK / NG / 保留を 1 行で〕② 完成稿〔チャット・1 問ずつ・項目と表示場所・懸念と代案 → 承認 / 修正 / NG〕③ 動画〔レビューシートの 5 要素 → 番号ごとに指摘か「全件 OK」〕）、<a href="../overview/functions/production-pref-ranking-1.html#reviews">pref-ranking-1</a> に 3 章（① 素材のレビューページ + 一次スクリーニング ② 動画のレビューシート + スチルの事前確認）を足し、共通ページ 5 章から指した。表示の例は SKILL.md・candidates/README.md・セット記録の実例から取った。umigame-soup-1 の関所（5 か所）は 30-6 で同じ形に足す。docs_check は OK</li>
 </ul>
 </div>
 </details>
@@ -385,7 +386,7 @@
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p><code>docs/production/umigame-soup-1.html</code> を作り、umigame-soup-1 の生産の詳細を移す: <code>docs/app/generators/umigame-prebuilt.html</code> の 8 節「事前ビルドパイプライン」、<code>docs/app/sets/umigame-soup-1.html</code> の補充まわり、<code>content/</code> の README の設計にあたる部分（README は手順として残す）。移した元はリンクに置き換える。続けて 3 セット分まとめて、SKILL.md・CLAUDE.md・<code>content/</code> の README から旧位置（30-5・30-6 で移した節）への参照を新しい位置へ付け替える。</p></div>
+<div data-field="overview"><p><code>docs/production/umigame-soup-1.html</code> を作り、umigame-soup-1 の生産の詳細を移す: <code>docs/app/generators/umigame-prebuilt.html</code> の 8 節「事前ビルドパイプライン」、<code>docs/app/sets/umigame-soup-1.html</code> の補充まわり、<code>content/</code> の README の設計にあたる部分（README は手順として残す）。移した元はリンクに置き換える。続けて 3 セット分まとめて、SKILL.md・CLAUDE.md・<code>content/</code> の README から旧位置（30-5・30-6 で移した節）への参照を新しい位置へ付け替える。機能別の基本設計 <code>production-umigame-soup-1.html</code> に、30-5 の修正指示で logic-training-1・pref-ranking-1 に足した「3. レビューのやり方」と同じ形で、5 つの関所のやり方（AI が何を出し、ユーザーがどう返すか）を書く。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>SKILL.md は参照先の付け替えだけで、工程は変えない。停止中の fantasy-animals-1 は対象外。セットの運用（補充ペース・在庫水位などセット計画書の内容）は動かさない。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
