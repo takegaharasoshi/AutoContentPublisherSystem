@@ -18,7 +18,7 @@ umigame-soup-1 の問題ストック（`umigame_stock_items`）を補充する�
 
 - **候補**: `content/umigame-stock/umigame-soup-1/candidates/<バッチ名>/`。1 候補 1 ファイル（`s01.md …` = story、`m01.md …` = misdirection）。形式・状態・集計は同ディレクトリの `README.md`・`_template.md`・`tally.py`（**初回〔第 2 バッチの G1a〕で logic-training-1 の `candidates/` を雛形に作る**。状態の名前は logic-training-1 と同じ: `unreviewed` / `ok` / `ng` / `hold` / `drafting` / `approved` / `final_ng` / `withdrawn`）。`INDEX.md` は `tally.py` の生成物
 - **素材**: `content/umigame-stock/umigame-soup-1/<バッチ名>/`（`batch-02` から連番）。直前のバッチから `stock_items.py`（問題は空にする）・`validate.py`・`review_sheet.py`・`generate.py` をコピーし、`batch-01` 固定の参照を直す。`research.md`・`STATUS.md` は新しく書く。**`content_key` の 3 桁連番は全バッチ通しで重ねない**（先頭は既存の最大 + 1。第 1 バッチの欠番 002 は再利用しない）
-- **プローブのページ**: バッチごとに `docs/app/sets/umigame-soup-1-probe-<バッチ名>.html`（サマリー + 末尾にコメントレビュー節）と `docs/app/sets/umigame-soup-1-probe-<バッチ名>/UXX.html`（問題別）。入口は `docs/app/sets/umigame-soup-1-probe-index.html`（全バッチと第 1 バッチ・6d17 のページへのリンク。**初回に作る**）
+- **プローブのページ**: バッチごとに `docs/app/sets/umigame-soup-1-probe-<バッチ名>.html`（サマリー + 末尾にコメントレビュー節）と `docs/app/sets/umigame-soup-1-probe-<バッチ名>/UXX.html`（問題別）。入口は `docs/app/sets/umigame-soup-1-probe-index.html`（全バッチと第 1 バッチ・6d17 のページへのリンク。30-6b〔2026-10-18〕で作成済み。**バッチのページを作ったら表の一番上に 1 行足す**）
 - **再開地点**: バッチの `STATUS.md` に「いまどのゴールか・人の判断待ちか・型別の OK 数と不足・次に何をするか」を書く。候補側は `INDEX.md` と各ファイルの `state` が正
 
 ## 起動時（工程に入る前に必ず）
@@ -46,7 +46,7 @@ Aurora へは `python3 content/ranking-stock/pref-ranking-1/common/apply_aurora.
 2. **G1b 素材の仕上げ** → 【人】**素材のまとめレビュー**（素材シート `work/review.html`）
 3. **G2 プローブ用コメントの準備** → 【人】**コメントのレビュー**（バッチのプローブページ末尾）
 4. **G3 機械プローブ** → 【人】**結果の確認・人間プローブ（必要時）・GO 判定**
-5. **G4 動画ビルド** → 【人】**動画レビュー**（動画の `work/review.html`）
+5. **G4 動画ビルド** → 【人】**動画レビュー**（動画のレビューシート。インデックス `work/review.html` → 今回のシート `work/review/<バッチ名>.html`）
 6. **G5 本番へ一括アップロード**（投入 + 配置 + 記録）
 
 ゴール行の例（`<バッチ名>`・数を埋めて提示する。各 `or stop after 20 turns`）:
@@ -68,7 +68,7 @@ Aurora へは `python3 content/ranking-stock/pref-ranking-1/common/apply_aurora.
 ```
 
 ```
-/goal セットレーン umigame-soup-1・週次補充 G4（動画ビルド）<バッチ名>。完了条件: GO の N 問について export_prompts → 背景生成 → intake → background_sheet（背景を全数目視して所見を書く）→ build.py --batch <バッチ名>（予算超過・読み間違いの取り直し込み）→ review_sheet.py で動画の work/review.html を生成した状態。DB 投入・S3 配置は行わない。or stop after 20 turns
+/goal セットレーン umigame-soup-1・週次補充 G4（動画ビルド）<バッチ名>。完了条件: GO の N 問について export_prompts → 背景生成 → intake → background_sheet（背景を全数目視して所見を書く）→ build.py --batch <バッチ名>（予算超過・読み間違いの取り直し込み）→ review_sheet.py --batch <バッチ名> で動画のインデックス work/review.html と今回のシート work/review/<バッチ名>.html を更新した状態（出力を貼る）。DB 投入・S3 配置は行わない。or stop after 20 turns
 ```
 
 ```
@@ -93,6 +93,7 @@ Aurora へは `python3 content/ranking-stock/pref-ranking-1/common/apply_aurora.
 - OK のうち**目標数だけ**を、`/umigame-problem-writer` の工程 4〜9（不思議にする・手がかりの棚卸し・動線・現実性・照合・素材化）で 1 問ずつ素材にする（候補の `state` を `drafting`・`stock_no` を記録）。**余剰 OK は仕上げない**（次回へ持ち越す）。自己検査 10 行は問題ごとに会話へ書く
 - 核心語も素材の 1 項目（#18 `core_words`）として `JUDGE_POINTS` に書く（書き方は `/umigame-problem-writer` 工程 9。`validate.py` が検査し、投入 SQL に入る。`services/` の push は要らない）
 - `validate.py` → `review_sheet.py`（`work/review.html`。API キー不要）→ `generate.py --dry-run`
+- **素材シートのインデックス**（30-6b で追加）: バッチの `review_sheet.py` は素材シートを書くたびに、セット直下のインデックス `content/umigame-stock/umigame-soup-1/work/review.html`（全バッチの一覧）も更新する（`tools/review_index.py`。単独でも回せる）。新しいバッチの `review_sheet.py` は直前のバッチからコピーするので、末尾のインデックス更新の呼び出しを消さない。ユーザーにはインデックスと今回の素材シートのパスを伝える
 - **Claude が先に一次スクリーニングしてから出す**: ①問題文と真相の語・時制の一致 ②`title` が真相の手がかりになっていないか ③`truth` が公開して自然な文か（次回のキャプションで全文公開）④既存問題とモチーフ・仕掛けが近接していないか（近い場合は投稿順を離す申し送り）
 - **素材レビュー**: ユーザーが素材シートでまとめて見る（ブラウザーで開くときは `/docs-mobile-view` の要領で HTTP 配信したものでもよい）。指摘は `stock_items.py`（全問共通なら `../common/umigame_common.py`）へ反映 → `validate.py` → `review_sheet.py` → 再提示。指摘のうち手順の穴は作問スキルへ反映する
 - 素材で NG になった問題は `stock_items.py` から外し、候補ファイルに「段階: 素材 / 判定: NG」を追記して `state: final_ng`。目標に足りなくなったら余剰 OK を先に使い、それでも足りなければ G1a に戻る
@@ -115,8 +116,10 @@ Aurora へは `python3 content/ranking-stock/pref-ranking-1/common/apply_aurora.
 コマンドの正は `content/video-build/umigame-soup-1/README.md`。**`--batch <バッチ名>` を付けて、そのバッチの問題だけを対象にする**。動画ビルドは `stock_items.py` を読むので、DB 投入より前にできる。
 
 1. `export_prompts.py --batch <バッチ名>` → `scripts/gen_backgrounds.sh`（背景生成）→ `intake.py` → `background_sheet.py`（Claude が背景を全数目視: 文字の混入・構図）
-2. `build.py --batch <バッチ名>`（Irodori-TTS・ローカル GPU。読み間違い・予算超過は `--retake-tts --content-key <key>`、1 問 3 回まで）→ `review_sheet.py`
-3. **動画レビュー**: ユーザーが動画の `work/review.html` で全数を見る。承認した `content_key` を `work/approved.txt` に追記する
+2. `build.py --batch <バッチ名>`（Irodori-TTS・ローカル GPU。読み間違い・予算超過は `--retake-tts --content-key <key>`、1 問 3 回まで）→ `review_sheet.py --batch <バッチ名>`
+   - **レビューシートはインデックス + バッチ別**（30-6b〔2026-10-18〕で変更）: `review_sheet.py` は実行のたびに `work/manifest.json` を累積の台帳 `work/review_archive.json` へ足し、**インデックス `work/review.html`**（全バッチの一覧・`--batch` のバッチに今回の印）と**バッチ別のシート `work/review/<バッチ名>.html`**（14 本超は `-2.html` …）を書き直す。問題の中身は全バッチの `stock_items.py` から引き、どれにも無い問題は「未分類」に入る（`build.py` の最後にも自動で回る）
+   - **補充のたびにインデックスを更新する**: ビルド後に必ず `review_sheet.py --batch <バッチ名>` を回し、**レビューの指摘で作り直したときも、その都度回してから出し直す**。出力の「インデックス: … 件」「シート: <バッチ名>.html（N 件）」の行を会話に貼り、ユーザーにはインデックスと今回のシートのパスを伝える。`work/review_archive.json` は消さない（過去分のシートの元）
+3. **動画レビュー**: ユーザーがインデックスから今回のシート（`work/review/<バッチ名>.html`）を開いて全数を見る。承認した `content_key` を `work/approved.txt` に追記する
 
 ## G5 本番へ一括アップロード
 

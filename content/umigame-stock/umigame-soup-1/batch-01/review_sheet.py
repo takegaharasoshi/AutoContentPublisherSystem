@@ -347,6 +347,15 @@ def write_review() -> None:
     out.append("</body></html>")
     WORK_DIR.mkdir(parents=True, exist_ok=True)
     REVIEW_PATH.write_text("\n".join(out), encoding="utf-8")
+    tools_dir = HERE.parent / "tools"
+    if str(tools_dir) not in sys.path:
+        sys.path.insert(0, str(tools_dir))
+    try:
+        from review_index import write_index
+
+        write_index()
+    except Exception as exc:
+        print(f"警告: 素材レビューインデックスを更新できません: {exc}", file=sys.stderr)
 
 
 def main() -> int:

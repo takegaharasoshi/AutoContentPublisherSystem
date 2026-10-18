@@ -681,8 +681,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         from review_sheet import write_review
 
+        # 試作（--out-dir）の台帳を本番の work/review_archive.json に混ぜないよう、出力先にそろえる
         write_review(
-            load_manifest(manifest_path), batch=args.batch, content_keys=args.content_keys,
+            load_manifest(manifest_path),
+            batch=args.batch,
+            content_keys=args.content_keys,
+            output=out_dir / "review.html",
         )
     except Exception as exc:
         failures.append(f"review_sheet: {exc}")

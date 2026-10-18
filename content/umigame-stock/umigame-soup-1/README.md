@@ -30,6 +30,8 @@ python3 review_sheet.py       # work/review.html を生成。API キー不要
 python3 generate.py --dry-run # SQL を生成し、ローカル MySQL でトランザクション内に流して ROLLBACK
 ```
 
+各バッチの素材シート生成時に、セット直下の `work/review.html` も全バッチのインデックスへ更新します。
+
 本番経路の機械プローブは `tools/probe_run.py` を使う（21-8c で `services/comment-reply/tools/` から移し、21-8c2 でテスト・実行環境・出力先もこのディレクトリへ寄せた）。評価ケースは
 `judge-trial/data/eval_problems.json` に追加してから `--problems <no>` を指定する。手順は下の「評価プローブ」。
 

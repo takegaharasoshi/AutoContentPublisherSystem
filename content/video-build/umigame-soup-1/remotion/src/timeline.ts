@@ -39,14 +39,14 @@ export const OPENING_SHEEN_PERIOD = 36;
 /** 「真相」の小さな跳ねの周期 */
 export const OPENING_HOP_PERIOD = 24;
 /** 出題（「質問してみて！」の吹き出し）の終わり */
-export const INTRO_END = OPENING_END + 3 * FPS; // 165
+export const INTRO_END = OPENING_END + 3 * FPS; // 240
 export const ROUND_FRAMES = 4 * FPS; // 120
 export const QUESTION_FRAMES = 2 * FPS; // 60
 export const ROUNDS = 3;
 /** 出題者の締め（「何度でも答えるよ」）の開始 */
-export const MASTER_OUTRO_START = INTRO_END + ROUND_FRAMES * ROUNDS; // 525
+export const MASTER_OUTRO_START = INTRO_END + ROUND_FRAMES * ROUNDS; // 600
 /** Jr. の締め（「いいね・フォロー」）の開始 */
-export const JR_OUTRO_START = MASTER_OUTRO_START + 4 * FPS; // 645
+export const JR_OUTRO_START = MASTER_OUTRO_START + 4 * FPS; // 720
 
 /** 吹き出しのポップイン（スナップ表示後の軽い伸縮）に使うフレーム数 */
 export const BUBBLE_POP_FRAMES = 8;

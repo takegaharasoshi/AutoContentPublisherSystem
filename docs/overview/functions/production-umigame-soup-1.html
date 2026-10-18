@@ -13,7 +13,7 @@
 <h1>umigame-soup-1 の生産（ウミガメのスープ）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-18（Phase 30-3c で新設。30-6a で「さらに詳しく」を生産の詳細設計へ向けた）</span>
+  <span>最終更新: 2026-10-18（Phase 30-3c で新設。30-6a で「さらに詳しく」を生産の詳細設計へ向け、30-6b で 3 章 レビューのやり方を追加）</span>
   <span>1 段上: <a href="production.html">生産ライン（共通）</a>。ここには共通との違いだけを書く</span>
 </div>
 
@@ -44,7 +44,7 @@ flowchart TB
     <tr><td>作るもの</td><td>ウミガメのスープの問題 1 問 1 本のリール。物語復元型と意味誤誘導型の 2 つの型を同数ずつ作る</td></tr>
     <tr><td>補充スキル</td><td><a href="../../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish</a>（運用）+ <a href="../../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer</a>（作問）。どちらも Claude Code</td></tr>
     <tr><td>在庫テーブル</td><td><code>umigame_stock_items</code>（動画の素材に加え、真相・判定の基準・核心語を持つ）</td></tr>
-    <tr><td>関所</td><td>候補の選別・素材のレビュー・コメントのレビュー・判定の試行の GO・動画の全数レビューの 5 つ</td></tr>
+    <tr><td>関所</td><td>候補の選別・素材のレビュー・コメントのレビュー・判定の試行の GO・動画の全数レビューの 5 つ（やり方は <a href="#reviews">3 章</a>）</td></tr>
     <tr><td>音</td><td>Irodori-TTS（ローカル）のナレーションと BGM</td></tr>
   </tbody>
 </table>
@@ -80,6 +80,82 @@ flowchart TB
   <li>生産の詳細（資材の置き場・作り方・事前ビルド・動画の作り・在庫）→ <a href="../../production/umigame-soup-1.html">生産の詳細設計 umigame-soup-1</a></li>
   <li>投稿時に在庫から 1 件を選ぶ規則 → <a href="../../app/generators/umigame-prebuilt.html#stock">方式設計書 umigame-prebuilt 4 節</a></li>
   <li>運用の値（在庫水位・直近の補充・次のバッチ）→ <a href="../../plans/umigame-soup-1.html">セット計画書 umigame-soup-1</a></li>
+</ul></div>
+
+<h2 id="reviews">3. レビューのやり方（5 つの関所）</h2>
+<p class="lead">このセットの人の関所は 5 つで、どれもユーザーが判断し、AI は判断しない。表 1 は、5 つの関所がどのゴールの後に来て、どこで何を見て、どう返すかを表す。関所の考え方（AI が先に一次スクリーニングする・動画は全数を見る）は<a href="production.html#review">生産ライン（共通）5 章</a>。</p>
+<div class="table-wrap">
+<table>
+  <caption>表 1 umigame-soup-1 の 5 つの関所</caption>
+  <thead><tr><th>関所</th><th>いつ</th><th>場所</th><th>見るもの</th><th>返し方</th></tr></thead>
+  <tbody>
+    <tr><td>① 候補の選別</td><td>G1a（候補の準備）の後</td><td>チャット</td><td>型ごとに 1 案 3 行の一覧（型別の目標の 2 倍）</td><td>候補 ID ごとに OK / NG / 保留。理由は任意</td></tr>
+    <tr><td>② 素材のまとめレビュー</td><td>G1b（素材の仕上げ）の後</td><td><a href="../../../content/umigame-stock/umigame-soup-1/work/review.html">素材シート</a>（インデックス → バッチの <code>work/review.html</code>）+ チャット</td><td>問題ごとの素材 18 項目（コア宣言から）と AI の一次スクリーニング</td><td>問題番号ごとに指摘、または「全件 OK」</td></tr>
+    <tr><td>③ コメントのレビュー</td><td>G2（プローブ用コメントの準備）の後</td><td><a href="../../app/sets/umigame-soup-1-probe-index.html">判定の試行のページ</a>（バッチのページの末尾の節）+ チャット</td><td>問題ごとのプローブ用コメントと正解ラベル</td><td>追加・削除・ラベルの修正を指示、または「OK」</td></tr>
+    <tr><td>④ 結果の確認と GO</td><td>G3（機械プローブ）の後</td><td>判定の試行のページ（バッチのサマリーと問題別のページ）+ チャット</td><td>判定の結果と、不一致の一次分析</td><td>問題ごとに GO / 素材に戻す。必要なら自分でコメントを試す</td></tr>
+    <tr><td>⑤ 動画の全数レビュー</td><td>G4（動画ビルド）の後</td><td><a href="../../../content/video-build/umigame-soup-1/work/review.html">レビューシート</a>（インデックス → バッチのシート）+ チャット</td><td>問題ごとの動画・静止フレーム・キャプション</td><td><code>content_key</code> ごとに指摘、または「全件 OK」</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="review-select">3.1 ① 候補の選別（チャット）</h3>
+<p class="lead">素材を書く前に、問題の芯だけを見て反射的に選ぶ関所。ここでの OK は「素材にしてよい」の意味で、投入の承認ではない。</p>
+<p><strong>AI が出すもの</strong>: 型（物語復元 = <code>s</code>・意味誤誘導 = <code>m</code>）ごとに、1 案を 3 行（コア宣言 / 問題文の案 / 何を言われたら「正解です！」か）で並べた一覧を 1 通で出す。既存の問題・台帳・Web との照合は AI が済ませてあり、引いた語や連想、物語の下書きは候補ファイルに残すだけで一覧には載せない。</p>
+<p class="muted">例:</p>
+<pre><code>【物語復元型・候補選別 4 件】各候補に OK / NG / 保留 を返してください(理由は不要)
+s01 コア: …(型の様式どおりの 1 文)
+    問題文の案: …
+    正解判定: 「…」と言われたら正解
+s02 …</code></pre>
+<p><strong>ユーザーの返し方</strong>: 候補 ID を OK / NG / 保留に振り分けて 1 行で返す（例: <code>OK: s01 s03 m02 m04 / NG: s02 m01 / 保留: s04 m03</code>）。理由は書かなくてよく、書かなかった理由を AI が推測で埋めることはない。迷ったら保留でよい。</p>
+<p><strong>返した後</strong>: AI が判定を候補ファイルに記録し、集計（<code>tally.py</code>）の出力を貼る。型ごとに「不足 = 目標 − OK」を出し、どちらかの型が足りなければ不足の 2 倍の候補を追加して同じ形で選び直す。両方の型で足りたら G1b へ進む。NG・保留は消さずに残す。</p>
+
+<h3 id="review-material">3.2 ② 素材のまとめレビュー（素材シート + チャット）</h3>
+<p class="lead">選んだ候補を素材 18 項目まで仕上げたものを、まとめて確かめる関所。矛盾とネタバレを止める。</p>
+<p><strong>AI が出すもの</strong>:</p>
+<ul>
+  <li><strong>素材シート</strong>: 入口は<a href="../../../content/umigame-stock/umigame-soup-1/work/review.html">素材シートのインデックス <code>content/umigame-stock/umigame-soup-1/work/review.html</code></a>で、バッチを選ぶとそのバッチの <code>&lt;バッチ&gt;/work/review.html</code>（<code>review_sheet.py</code> が作る）が開く。目次の下に問題ごとに、コア宣言（問題文の直前）・版面に出る文言・ナレーション（読み上げ用の文）・キャプション・背景イラストのプロンプト・出典とオリジナル性のメモ・真相と確定事実（ネタバレ）が並ぶ。ブラウザーで開く（スマホなら <code>/docs-mobile-view</code> の要領で HTTP 配信したものでもよい）</li>
+  <li><strong>チャットに自己検査と一次スクリーニングの結果</strong>: 問題ごとの自己検査 10 行と、先に見た 4 点（問題文と真相の語・時制が合っているか / <code>title</code> が真相の手がかりになっていないか / <code>truth</code> が公開して自然な文か〔次回のキャプションで全文を公開する〕/ 既存の問題とモチーフ・仕掛けが近すぎないか〔近ければ投稿の順を離す申し送り〕）</li>
+</ul>
+<p><strong>ユーザーの返し方</strong>: シートを見て、問題番号ごとに直してほしい点をチャットに書く。問題がなければ「全件 OK」。問題そのものをやめるなら「U.. は NG」。</p>
+<p class="muted">例:</p>
+<pre><code>U31 真相の 2 段落目が問題文の「夕方」と合わない
+U33 title が答えに近すぎる
+ほかは OK</code></pre>
+<p><strong>返した後</strong>: AI が <code>stock_items.py</code>（全問共通なら <code>common/umigame_common.py</code>）に反映し、<code>validate.py</code> → <code>review_sheet.py</code> を回してシートを作り直して出し直す。指摘のうち作り方の穴は作問スキルへ反映する。NG の問題は候補へ差し戻し（<code>final_ng</code>）、余っている OK を先に使う。</p>
+
+<h3 id="review-comments">3.3 ③ コメントのレビュー（判定の試行のページ + チャット）</h3>
+<p class="lead">機械プローブに流すコメントと、期待する判定（正解ラベル）が妥当かを確かめる関所。ラベルが誤っていると、プローブの結果が意味を持たない。</p>
+<p><strong>AI が出すもの</strong>: バッチの判定の試行のページ <code>docs/app/sets/umigame-soup-1-probe-&lt;バッチ名&gt;.html</code> の末尾の「コメントレビュー」の節に、問題ごとのコメント（質問・回答の試み）と正解ラベル（期待する判定の種類）を載せる。入口は<a href="../../app/sets/umigame-soup-1-probe-index.html">判定の試行の一覧</a>。コメントは、確定事実シートの「はい / いいえ」の境目・正解と惜しいの境目・否定形や限定つきの質問・ネタバレを誘う質問・関係ない質問を混ぜて作る。</p>
+<p><strong>ユーザーの返し方</strong>: 問題ごとに、コメントの追加・削除・ラベルの修正をチャットで指示する。問題がなければ「OK」。</p>
+<p class="muted">例:</p>
+<pre><code>U31 「夜だった？」のラベルは いいえ ではなく 関係ない
+U33 「犯人は家族？」を足して（期待: 惜しい）
+ほかは OK</code></pre>
+<p><strong>返した後</strong>: AI がページとコメントを直し、承認されたものを評価データ <code>content/umigame-stock/umigame-soup-1/judge-trial/data/eval_problems.json</code> に入れる（G3 の最初でもよい）。</p>
+
+<h3 id="review-probe">3.4 ④ 結果の確認と GO（判定の試行のページ + チャット）</h3>
+<p class="lead">本番と同じ判定・返信文の経路に通した結果を見て、動画にしてよいかを決める関所。</p>
+<p><strong>AI が出すもの</strong>: <code>probe_run.py</code> の結果から作ったバッチのサマリーページと問題別のページ（一覧に 1 行足す）と、チャットに不一致の一次分析（確定事実シートの穴 → 素材を直す / 正解ラベルの誤り → ラベルを直す / 判定の揺れ → 実行し直して確かめる）。</p>
+<p><strong>ユーザーの返し方</strong>: 問題ごとに GO か「素材に戻す」を返す。気になる問題は、自分で <code>local_trial.py --problem &lt;no&gt; --comment …</code> を使って自由にコメントを試してから決めてよい（人間プローブ）。</p>
+<p class="muted">例:</p>
+<pre><code>GO: U31 U32 U34 / 素材に戻す: U33（「家族」の扱いが確定事実シートに無い）</code></pre>
+<p><strong>返した後</strong>: 素材に戻した問題は ② の検証からやり直し、必要なら ③・④ に戻る。GO が出た問題だけを G4（動画ビルド）へ進める。</p>
+
+<h3 id="review-video">3.5 ⑤ 動画の全数レビュー（レビューシート + チャット）</h3>
+<p class="lead">ビルドした動画を全部見て、本番へ上げるものを決める関所。</p>
+<p><strong>AI が出すもの</strong>: レビューシート（<code>review_sheet.py</code> が作る）。入口は<a href="../../../content/video-build/umigame-soup-1/work/review.html">インデックス <code>content/video-build/umigame-soup-1/work/review.html</code></a>で、過去のビルド分も含めたバッチの一覧（件数・最終ビルド日時・今回の印）から、バッチごとのシート <code>work/review/&lt;バッチ名&gt;.html</code> を開く。シートは問題ごとに動画・静止フレーム・ffprobe の結果・キャプションが並ぶ。背景は先に <code>background_sheet.py</code> で AI が全数を見て（文字の混入・構図）、気づいた点をチャットに添える。</p>
+<p><strong>見るところ</strong>: 導入シーンと本編の版面（文字の欠け・はみ出し）・背景（文字の混入・真相の手がかりを描いていないか）・ナレーション（読み間違い・切れ・BGM とのバランス）・キャプション。</p>
+<p><strong>ユーザーの返し方</strong>: <code>content_key</code> ごとに直してほしい点をチャットに書く。問題がなければ「全件 OK」。</p>
+<p class="muted">例:</p>
+<pre><code>031-xxx 「真相」の読みが「しんそう」になっていない
+033-xxx 背景の窓に文字のような模様がある
+ほかは OK</code></pre>
+<p><strong>返した後</strong>: AI がナレーションを取り直し（<code>build.py --retake-tts</code>。1 問 3 回まで）、背景を作り直すか素材を直してビルドし直し、<code>review_sheet.py</code> でシートを作り直して出し直す。全件 OK になったら、AI が承認した <code>content_key</code> を <code>work/approved.txt</code> に足し、G5（本番へ一括アップロード）のゴールを出す。</p>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>候補・素材・プローブの規定 → <a href="../../production/umigame-soup-1.html#stock">生産の詳細設計 umigame-soup-1 の 2 章</a></li>
+  <li>動画のビルドとシート → <a href="../../production/umigame-soup-1.html#build">生産の詳細設計 3 章</a></li>
+  <li>ゴールの切り方とコマンド → <a href="../../../.agents/skills/umigame-stock-replenish/SKILL.md">umigame-stock-replenish の SKILL.md</a>・作問 → <a href="../../../.agents/skills/umigame-problem-writer/SKILL.md">umigame-problem-writer の SKILL.md</a></li>
 </ul></div>
 
 <section class="decisions" id="decisions">

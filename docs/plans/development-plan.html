@@ -416,17 +416,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-6b" data-step-id="30-6b" data-status="todo">
+<article class="plan-step" id="step-30-6b" data-step-id="30-6b" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-6b</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-6b</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>umigame-soup-1 のレビューの仕組みを logic-training-1・pref-ranking-1 にそろえる</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-6a の go の後。<strong>umigame-soup-1 のセットレーンが動いていないとき</strong>。第 2 バッチの補充はこのステップの後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<a href="../overview/functions/production-umigame-soup-1.html#reviews">機能ページ</a>に 5 つの関所のやり方を足し、動画のレビューシートをインデックス + バッチ別に分け（全バッチの <code>stock_items.py</code> から中身を引く）、素材シートと<a href="../app/sets/umigame-soup-1-probe-index.html">判定の試行</a>に一覧の入口を作り、補充スキルに更新の手順を書いた。ユーザーの go 待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -445,13 +440,26 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>機能ページ</strong>: <code>production-umigame-soup-1.html</code> に「3. レビューのやり方（5 つの関所）」を足した（表 1 + ① 候補の選別〔型ごとに 1 案 3 行 → OK / NG / 保留を 1 行〕② 素材のまとめレビュー〔素材シート + 自己検査 10 行と一次スクリーニング 4 点 → 問題番号ごとに指摘〕③ コメントのレビュー〔判定の試行のページ末尾 → 追加・削除・ラベルの修正〕④ 結果の確認と GO〔不一致の一次分析 → GO / 素材に戻す・人間プローブ〕⑤ 動画の全数レビュー〔インデックス → バッチのシート → content_key ごとに指摘〕。各関所にシート・ページへのリンクと例）。共通ページ 5 章から指した。例の文面は SKILL.md の工程から組んだもので、umigame の週次補充の実例はまだない</li>
+<li><strong>動画のレビューシート</strong>（改修は Codex・レビューは Claude）: <code>content/video-build/umigame-soup-1/review_sheet.py</code> が累積の台帳 <code>work/review_archive.json</code> を持ち、インデックス <code>work/review.html</code> とバッチ別のシート <code>work/review/&lt;バッチ&gt;.html</code>（<code>--per-page</code> 既定 14・インデックスへ戻るリンク）を書く。問題の中身は全バッチの <code>stock_items.py</code> から引き、どれにも無い問題は「未分類」（中身なしでも動画・静止フレームで表示）。レビューで 1 点直した: <code>build.py --out-dir</code>（試作）の最後の <code>write_review</code> が本番の <code>work/</code> の台帳に試作の動画を混ぜるため、出力先を <code>out_dir</code> にそろえた。pytest は動画側 69 passed。実データ: 台帳 16 件 = batch-01 14 件（今回）+ 未分類 2 件（002-mirror-letters・011-grandpas-change = ビルドの後で第 1 バッチから外した問題）、3 ページの参照 224 件の欠け 0</li>
+<li><strong>素材シートのインデックス</strong>: 新設 <code>content/umigame-stock/umigame-soup-1/tools/review_index.py</code> がセット直下の <code>work/review.html</code> にバッチの一覧（問題数・更新日時・素材シートへのリンク）を書き、<code>batch-01/review_sheet.py</code> の最後で呼ぶ（失敗しても素材シートの生成は止めない）。pytest は素材側 156 passed。実データで batch-01（14 問）の行が出て、参照の欠け 0</li>
+<li><strong>判定の試行の入口</strong>: <code>docs/app/sets/umigame-soup-1-probe-index.html</code> を新設（既存の <code>umigame-soup-1-probe.html</code>・<code>-6d17.html</code> へのリンク。週次補充で 1 行ずつ足す）</li>
+<li><strong>補充スキル</strong>: <code>umigame-stock-replenish</code> の資材の置き場（試行の入口は作成済み・1 行足す）・G1b（素材シートのインデックス）・G4（動画のインデックス + バッチ別・作り直しのたびに回す・出力を貼る・台帳を消さない）とゴール文 G4 を直した。工程・関所は変えていない</li>
+<li><strong>そのほか</strong>: 生産の詳細設計 umigame-soup-1 の 2.3・3.1 にシートの形を書き足した。README 2 本は Codex が新しい出力に合わせた（21-2 の PoC の記録の行まで書き換えていたので、そこだけ元に戻した）。30-6a で見つけた <code>remotion/src/timeline.ts</code> の古い行末コメントを式の値（INTRO_END 240・MASTER_OUTRO_START 600・JR_OUTRO_START 720）に直した</li>
+<li><strong>課題表</strong>: I-038 は据え置き継続でトリガーも変えない。<strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 100 ページはみ出し 0 件・図 32 図の描画不備 0 件・リンクの不備 0 件・判断リンク 91 件の不備 0 件で OK</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-7" data-step-id="30-7" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-7</strong><span class="plan-status">未着手</span></div>

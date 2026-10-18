@@ -32,7 +32,7 @@ python3 prepare_bgm.py
 # 3. ナレーション（Irodori-TTS・ローカル GPU）を合成して 29 秒動画（一本道・先頭 5.0 秒が導入シーン）をビルドする
 python3 build.py
 python3 build.py --retake-tts --content-key <key>   # 予算超過・読み間違いの問を取り直す（1 問 3 回まで）
-python3 review_sheet.py
+python3 review_sheet.py --batch batch-01  # work/review.html のインデックスと work/review/batch-01.html を生成
 
 # 4. 全数レビュー後、承認した content_key を work/approved.txt に 1 行ずつ記入する
 python3 publish.py --dry-run
@@ -79,7 +79,7 @@ umigame-soup-1/
 ├── tests/test_timeline_sync.py  # build.py と timeline.ts の定数同期
 ├── poc/<content_key>/        # 1 問 = 1 ディレクトリの素材一式（下記）
 ├── remotion/                 # Remotion プロジェクト（Remotion Skills 2.0 の指針で作成）
-└── work/                     # ビルド出力（git 管理外）: props/ out/ videos/ stills/ probe/ review.html
+└── work/                     # ビルド出力（git 管理外）: props/ out/ videos/ stills/ probe/ review.html（インデックス）/ review/<batch>.html
 ```
 
 ## 0. 第 2 稿の決定事項（2026-09-04 人間ゲート・ユーザー決定）

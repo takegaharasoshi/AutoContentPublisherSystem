@@ -13,7 +13,7 @@
 <h1>umigame-soup-1 の生産の詳細（問題ストックと事前ビルド）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-18（Phase 30-6a で新設。<a href="../app/generators/umigame-prebuilt.html">umigame-prebuilt</a> 8 節と<a href="../app/sets/umigame-soup-1.html">セット別設計書</a> 4 節の作り方・5 節を移した）</span>
+  <span>最終更新: 2026-10-18（Phase 30-6a で新設。30-6b でレビューシートのインデックスを追記。<a href="../app/generators/umigame-prebuilt.html">umigame-prebuilt</a> 8 節と<a href="../app/sets/umigame-soup-1.html">セット別設計書</a> 4 節の作り方・5 節を移した）</span>
   <span>1 段上: <a href="../overview/functions/production-umigame-soup-1.html">機能別の基本設計 umigame-soup-1 の生産</a></span>
 </div>
 
@@ -90,7 +90,7 @@ flowchart TB
 <h3 id="materials-write">2.3 素材の仕上げと素材のまとめレビュー</h3>
 <ul>
   <li>OK のうち目標数だけを 1 問ずつ素材にする（作問スキルの工程 4〜9）。余った OK は次回へ持ち越す。管理項目 <code>core</code>（コア宣言の 1 文。DB には入れない）は <code>validate.py</code> が様式を検査し、素材シートは問題文の直前に出す（レビューはコア宣言から見る）</li>
-  <li>機械検証は <code>validate.py</code>（字数・必須項目・<code>#AIart</code>・画風の固定行・プレイ例の「はい」1 つ・オリジナル宣言など）。素材シートは <code>review_sheet.py</code>（API キー不要）</li>
+  <li>機械検証は <code>validate.py</code>（字数・必須項目・<code>#AIart</code>・画風の固定行・プレイ例の「はい」1 つ・オリジナル宣言など）。素材シートは <code>review_sheet.py</code>（API キー不要。<code>&lt;バッチ&gt;/work/review.html</code>）で、書くたびにセット直下の素材シートのインデックス <code>work/review.html</code>（全バッチの一覧。<code>tools/review_index.py</code>）も更新する</li>
   <li>素材のまとめレビューでは、人が素材シートで矛盾・ネタバレを一括で見る。素材で NG になった問題は候補へ差し戻す（<code>final_ng</code>）</li>
 </ul>
 
@@ -119,7 +119,7 @@ flowchart TB
     <tr><td>2</td><td>BGM の割り当て</td><td>前処理済みのトラックの台帳 <code>work/bgm/tracks.json</code> から、<code>work/manifest.json</code> 上で使用回数が最も少ない曲（同数は番号順）。再ビルドでは割り当てを保つ</td><td><code>build.py</code></td></tr>
     <tr><td>3</td><td>ナレーション</td><td><code>narration.problem</code> / <code>.rule</code> → Irodori-TTS で 1 回に合成 → 2 cue に切り分け → 実測の長さで予算検査（4.3）</td><td><code>scripts/narration_irodori.py</code>（Gemini 版 <code>narration_gemini.py</code>・Polly 版 <code>narration_polly.py</code> は <code>--tts gemini</code> / <code>--tts polly</code> で選べる）</td></tr>
     <tr><td>4</td><td>レンダリングと検査</td><td>props（素材 + 画像 + 音声 + 実測の長さ）→ Remotion → MP4 → ラウドネス正規化（-14 LUFS / -2 dBTP）→ ffprobe 検査（1080x1920・30fps・29.0±0.2 秒・30 秒未満・AAC）→ 静止フレーム。結果は <code>work/manifest.json</code></td><td><code>build.py</code>（Docker に委譲）</td></tr>
-    <tr><td>R</td><td>全数レビュー</td><td><code>work/review.html</code>（動画 + 静止フレーム + キャプション）→ 承認した <code>content_key</code> を <code>work/approved.txt</code> へ</td><td><code>review_sheet.py</code> + 人</td></tr>
+    <tr><td>R</td><td>全数レビュー</td><td>レビューシート（インデックス <code>work/review.html</code> → バッチ別のシート <code>work/review/&lt;バッチ名&gt;.html</code>。動画 + 静止フレーム + ffprobe の結果 + キャプション）→ 承認した <code>content_key</code> を <code>work/approved.txt</code> へ</td><td><code>review_sheet.py</code> + 人</td></tr>
     <tr><td>5</td><td>投入と配置</td><td>投入: <code>insert_umigame_stock.sql</code> をローカル MySQL（<code>--default-character-set=utf8mb4</code>）と Aurora（<code>apply_aurora.py</code>）へ流し、両環境の内容の MD5 の一致を確かめる。配置: <code>publish.py</code> が S3 <code>assets/{set_code}/prebuilt/{content_key}.mp4</code> + <code>_bg.png</code> を上げ、<code>update_prebuilt.sql</code>（<code>video_s3_key</code> / <code>video_audio_asset_id</code> / <code>video_built_at</code>）を両環境へ</td><td><code>generate.py</code>・<code>publish.py</code></td></tr>
   </tbody>
 </table>
@@ -128,6 +128,7 @@ flowchart TB
   <li><strong>読み元</strong>: ビルドツールは DB ではなくバッチの <code>stock_items.py</code> を読む（<code>--batch &lt;バッチ名&gt;</code> で対象を絞る）。<code>content_key</code> は両環境と一致する <a class="decision-ref" href="#d-01">→ 理由 D-01</a></li>
   <li><strong>BGM の ID</strong>: <code>video_audio_asset_id</code> は <code>publish.py</code> の <code>update_prebuilt.sql</code> が BGM の S3 キーで <code>audio_assets</code> を結合して決める（環境ごとに ID が違っても同じ SQL で済む）。フェードは <code>prepare_bgm.py</code> が素材に焼き込み、コンポジションはダッキングだけを掛ける</li>
   <li><strong>暫定 BGM の仕組み</strong>: 台帳に <code>provisional</code> として暫定の曲を登録でき、<code>publish.py</code> は暫定 BGM の動画を検査エラーにする（正式なトラックの調達 → <code>prepare_bgm.py</code> → 再ビルドが配置の前提）。第 1 バッチは umigame 用の曲が未調達だったため、PoC の <code>bgm_24s.m4a</code>（logic-training-1 の night track01 の 20 秒版を 24 秒にループ。20 秒地点に継ぎ目あり）で一度ビルドし、2026-09-24 に正式なトラックへ差し替えて作り直した。仕組みは次の曲を足す前の検証用に残してある</li>
+  <li><strong>レビューシート</strong>: <code>review_sheet.py</code> は実行のたびに <code>work/manifest.json</code> を累積の台帳 <code>work/review_archive.json</code> に足し、インデックスとバッチ別のシートを書き直す（<code>build.py</code> の最後にも回り、そのときは <code>--out-dir</code> の下に書く）。問題の中身は全バッチの <code>stock_items.py</code> から引き、どれにも無い問題（ビルドの後で外した問題など）は「未分類」に入る</li>
   <li><strong>再現性</strong>: 背景の PNG・TTS の音声は <code>work/</code> に残り、版面だけの改訂は工程 4 からやり直せる。背景の原画は S3 の <code>_bg.png</code> にも置く（再ビルド用。DB には記録しない）</li>
   <li>キャラ画像・フォント・SE はセット固定の資産（<a href="../app/sets/umigame-soup-1.html#assets">セット別設計書 9 節</a>）で、工程には入らない</li>
 </ul>
