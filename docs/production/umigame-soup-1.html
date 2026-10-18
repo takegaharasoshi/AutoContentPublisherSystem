@@ -98,7 +98,7 @@ flowchart TB
 <ul>
   <li>作問時に、本番と同じ判定・返信文の経路で答えを確かめる: 問題ごとにプローブ用のコメントと正解ラベル（期待する判定の種類）を作り、コメントのレビュー（正解ラベルも人が確かめ、追加・削除・ラベルの修正を指示する）の後で評価データ <code>judge-trial/data/eval_problems.json</code> に足して、<code>tools/probe_run.py --problems &lt;no&gt;</code> を回す <a class="decision-ref" href="#d-06">→ 理由 D-06</a></li>
   <li>結果は <code>build_probe_page.py</code> がバッチのプローブページにする。不一致は「確定事実シートの穴 / 正解ラベルの誤り / 判定の揺れ」に分けて出す。必要なら人が <code>local_trial.py</code> で自由にコメントを試す（人間プローブ）。GO が出た問題だけを動画のビルドへ進める</li>
-  <li>評価データ・機械プローブ・評価ページの仕組みは<a href="../app/sets/umigame-soup-1.html#evaluation">セット別設計書 10.6</a></li>
+  <li>評価データ・機械プローブ・評価ページの仕組みは<a href="../app/sets/umigame-soup-1-comment-reply.html#evaluation">コメント返信の分冊 6 章</a></li>
 </ul>
 <div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
   <li>素材 18 項目の仕様と字数 → <a href="../app/sets/umigame-soup-1.html#stock-items">セット別設計書 4 節</a></li>
@@ -138,7 +138,7 @@ flowchart TB
 <ul>
   <li><strong>画風（C4）</strong>: 90 年代 OVA の手描きセル塗り（太い主線・エアブラシのハイライト・リムライト）。背景は中間調（月明かりと蝋燭で情景が見える明るさ）で、版面のオーバーレイは薄くする <a class="decision-ref" href="#d-07">→ 理由 D-07</a></li>
   <li><strong>禁止事項</strong>: 文字・ロゴを入れない。真相の手がかりを描かない（問題文にある情景だけ。人物は問題文に出る人物 + 遠景のシルエット 1 人まで）</li>
-  <li><strong>人物の大きさと位置</strong>: 遠景の小さな全身像で、下半分の中央（横幅の中央 20%・縦 55〜85%）にだけ置く。上半分は人物なしで静か（空・壁・天井・窓）、下半分の左右 40% は景物だけ。クローズアップ・半身は描かない（感情は姿勢で出す）。理由は<a href="../app/sets/umigame-soup-1.html#d-20260926-figure">セット別設計書の付録</a></li>
+  <li><strong>人物の大きさと位置</strong>: 遠景の小さな全身像で、下半分の中央（横幅の中央 20%・縦 55〜85%）にだけ置く。上半分は人物なしで静か（空・壁・天井・窓）、下半分の左右 40% は景物だけ。クローズアップ・半身は描かない（感情は姿勢で出す）。理由は<a href="../app/sets/umigame-soup-1.html#d-06">セット別設計書 D-06</a></li>
   <li>9:16 を指定して生成し（出力は 1024x1536）、<code>intake.py</code>（<code>prepare_assets.py</code>）が 1080x1920 へ正規化する</li>
   <li>背景のレビューは <code>background_sheet.py</code>（背景を投稿順に並べた <code>work/backgrounds.html</code>）と <code>background_sheet.py --stills</code>（今の文言と背景で動画の各コマを書き出す）で、版面と重ねて見る。Claude が先に全数を見る（文字の混入・構図）</li>
   <li>キャラクター 2 体はストックごとには作らない</li>
@@ -284,7 +284,7 @@ flowchart TB
 <dl>
   <dt>決めたこと</dt><dd>評価データにケースを足して <code>probe_run.py</code> で本番と同じ判定・返信の経路に通し、素材のレビューは動画のイメージと実際の答えを並べて見る</dd>
   <dt>理由</dt><dd>素材の穴（確定事実シートの抜け）は、本番の判定に通して初めて見つかる。旧プローブテスト（<code>master_prompt.txt</code> の出題者に想定質問を答えさせる）は本番の経路ではなかったため 21-6d3 で退役した</dd>
-  <dt>日付・出典</dt><dd>21-2（進め方）・21-6d3（<a href="../app/sets/umigame-soup-1.html#d-20261003-probe-retire">セット別設計書 付録</a>）</dd>
+  <dt>日付・出典</dt><dd>21-2（進め方）・21-6d3（<a href="../app/sets/umigame-soup-1-comment-reply.html#d-12">コメント返信の分冊 D-12</a>）</dd>
 </dl>
 </article>
 <article id="d-07">

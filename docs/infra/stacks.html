@@ -287,7 +287,7 @@
 <p><strong>依存スタック</strong>: FoundationStack</p>
 
 <h3 id="comment-reply">3.6 CommentReplyStack（Phase 21-3 設計・21-6 実装）</h3>
-<p><strong>目的</strong>: umigame-soup-1 のコメント自動返信経路（アプリの振る舞いは <a href="../app/sets/umigame-soup-1.html#comment-reply">セット別設計書セクション 10</a>、全体像は <a href="architecture.html#comment-reply">architecture.html セクション 3.4</a>）を構築する。本システムで初めてイングレス（Meta Webhook）を持つスタックであり、既存のバッチ系スタックとは<strong>VPC・Aurora・CodePipeline を共有しない</strong>。</p>
+<p><strong>目的</strong>: umigame-soup-1 のコメント自動返信経路（アプリの振る舞いは <a href="../app/sets/umigame-soup-1-comment-reply.html">umigame-soup-1 のコメント自動返信（分冊）</a>、全体像は <a href="architecture.html#comment-reply">architecture.html セクション 3.4</a>）を構築する。本システムで初めてイングレス（Meta Webhook）を持つスタックであり、既存のバッチ系スタックとは<strong>VPC・Aurora・CodePipeline を共有しない</strong>。</p>
 
 <div class="note">
   <span class="callout-title">設計方針: 外部依存ゼロの Python を CDK asset でデプロイし、同一コードから本番面とステージング面を立てる</span>
@@ -326,7 +326,7 @@
 <div class="decision">
   <span class="callout-title">決定（2026-10-12、21-8e）: effort を max にしたので Reply Lambda のタイムアウトを 300 秒、可視性タイムアウトを 1,800 秒に延ばす。I-037 は受容</span>
   <ul style="margin:.3rem 0 0;">
-    <li><strong>理由</strong>: <code>HAIKU_EFFORT</code> を <code>high</code> → <code>max</code> にした（ユーザー決定。セット別設計書 <a href="../app/sets/umigame-soup-1.html#judge-policy">10.3.5</a>）。21-6d17 の実測で max の 1 ケースの応答時間は中央値 35 秒（high は 5.7 秒）で、裾は 100 秒を超えうる。下の決定 21-6f の最悪の積み上げ（メイン判定 + 再試行の待ち 35 秒 + サブ判定 + 書き手）を max で見積もると 120 秒を超えるため 300 秒にした。可視性タイムアウトは AWS 推奨（関数タイムアウトの 6 倍）に合わせて 1,800 秒。本番面・ステージング面は同じ構成（<code>CommentReplyStack</code> クラスを共用）なので両面とも変わる</li>
+    <li><strong>理由</strong>: <code>HAIKU_EFFORT</code> を <code>high</code> → <code>max</code> にした（ユーザー決定。セット別設計書 <a href="../app/sets/umigame-soup-1-comment-reply.html#judge-policy">コメント返信の分冊 3.5</a>）。21-6d17 の実測で max の 1 ケースの応答時間は中央値 35 秒（high は 5.7 秒）で、裾は 100 秒を超えうる。下の決定 21-6f の最悪の積み上げ（メイン判定 + 再試行の待ち 35 秒 + サブ判定 + 書き手）を max で見積もると 120 秒を超えるため 300 秒にした。可視性タイムアウトは AWS 推奨（関数タイムアウトの 6 倍）に合わせて 1,800 秒。本番面・ステージング面は同じ構成（<code>CommentReplyStack</code> クラスを共用）なので両面とも変わる</li>
     <li><strong>I-037 は受容</strong>: Anthropic 呼び出しのソケットタイムアウト 420 秒（<code>app/anthropic_util.py</code>）は 300 秒より長いままにする。ストリーミングしない呼び出しでは応答の待ち時間 = 生成時間で、max では正常な応答も長くなるため、呼び出し単位で短く切ると正しい応答まで打ち切る危険のほうが大きい。接続が応答しないまま止まった場合は下の決定 21-6f の「受け入れること」と同じく SQS の再試行 → DLQ → アラームで拾う。実運用の <code>Duration</code>・タイムアウト・DLQ は開発計画の確認待ちリスト（21-8e の行）で観察し、タイムアウト・DLQ が出たら呼び出し単位のタイムアウトを入れる</li>
   </ul>
 </div>
@@ -365,7 +365,7 @@
   <span class="callout-title">決定（2026-10-12、21-7）: プライバシーポリシーは https のオブジェクト URL で公開し、静的ウェブサイトホスティングは使わない</span>
   <ul style="margin:.3rem 0 0;">
     <li><strong>https のオブジェクト URL</strong>: 21-3 の設計は静的ウェブサイトホスティングだったが、S3 のウェブサイトエンドポイントは http しか使えず、Meta のアプリ設定で https 以外の URL が弾かれると公開モードに切り替えられない。公開読み取りのバケットポリシーがあれば REST エンドポイント（<code>https://{bucket}.s3.{region}.amazonaws.com/index.html</code>）で同じ HTML を https で返せるため、こちらを出力する。CloudFront は 1 ページのためには過剰なので置かない</li>
-    <li><strong>本文の置き場と中身</strong>: <code>infra/assets/umigame-privacy-policy/index.html</code>（外部依存なしの 1 枚・日本語 + 英語の要約）。保存する情報（コメント本文・ID・コメント者のアプリスコープ ID〔username は持たない〕・返信・判定）、AI 事業者（Anthropic・OpenAI）への送信、保存期間（最長 1 年）、削除依頼の窓口（Instagram の DM。アンカー <code>#data-deletion</code> を Meta の「データ削除の手順の URL」に使う）を書いた。保持期限の実装は 21-7b で行い、本文の 4 章に「原本〔S3〕は取得から 30 日・振り返り用データベース〔Aurora〕は取得から 1 年」を足して実装と揃えた（Aurora は <code>webhook_received_at</code> 起点で 365 日。<a href="../app/sets/umigame-soup-1.html#comment-log-import">セット設計書 10.8.1</a>）。判定方式に Jev（Typesafe）を本番で使うよう切り替えるときは、送信先の事業者を本文に足す</li>
+    <li><strong>本文の置き場と中身</strong>: <code>infra/assets/umigame-privacy-policy/index.html</code>（外部依存なしの 1 枚・日本語 + 英語の要約）。保存する情報（コメント本文・ID・コメント者のアプリスコープ ID〔username は持たない〕・返信・判定）、AI 事業者（Anthropic・OpenAI）への送信、保存期間（最長 1 年）、削除依頼の窓口（Instagram の DM。アンカー <code>#data-deletion</code> を Meta の「データ削除の手順の URL」に使う）を書いた。保持期限の実装は 21-7b で行い、本文の 4 章に「原本〔S3〕は取得から 30 日・振り返り用データベース〔Aurora〕は取得から 1 年」を足して実装と揃えた（Aurora は <code>webhook_received_at</code> 起点で 365 日。<a href="../app/sets/umigame-soup-1-comment-reply.html#comment-log-import">コメント返信の分冊 8.1</a>）。判定方式に Jev（Typesafe）を本番で使うよう切り替えるときは、送信先の事業者を本文に足す</li>
     <li><strong>削除しない</strong>: <code>RETAIN</code> にした（スタックを作り直しても公開中の URL が消えないように。Meta アプリに登録した URL が 404 になると公開モードの審査対象になりうる）</li>
   </ul>
 </div>

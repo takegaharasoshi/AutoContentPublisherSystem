@@ -44,7 +44,7 @@ flowchart TB
     <tr><td>SNS 投稿バッチ</td><td>セット × <code>SCHEDULED_AT</code> で当回の生成実行だけを選び、<code>posts</code> の 5 状態で二重投稿を防ぎながら投稿する。一過性エラーは公開前だけやり直す（<a href="#flow-sns">3 章</a>）</td></tr>
     <tr><td>インサイト収集バッチ</td><td>1 日 2 回、投稿後 14 日（ストーリーズは 24 時間）のメディアとアカウント日次の生メトリクスを JSON 全量で保存し、コメント記録を取り込む（<a href="#flow-insights">4 章</a>）</td></tr>
     <tr><td>失敗の扱い</td><td>失敗はバッチの終了コード 1 → Step Functions の Retry → 通知。欠番は許容する（<a href="#failure-policy">3.4</a>）</td></tr>
-    <tr><td>コメント自動返信</td><td>Lambda で動き、このページの対象外。仕様は<a href="sets/umigame-soup-1.html">セット別設計書 umigame-soup-1</a> の 10 章（入口は機能別の基本設計 <a href="../overview/functions/comment-reply.html">コメント自動返信</a>）</td></tr>
+    <tr><td>コメント自動返信</td><td>Lambda で動き、このページの対象外。仕様は<a href="sets/umigame-soup-1-comment-reply.html">umigame-soup-1 のコメント自動返信（セット別設計書の分冊）</a>（入口は機能別の基本設計 <a href="../overview/functions/comment-reply.html">コメント自動返信</a>）</td></tr>
   </tbody>
 </table>
 </div>
@@ -295,7 +295,7 @@ flowchart TB
           <li>明確な失敗（投稿未完了と判定できる応答）→ <code>status='failed'</code> に更新</li>
           <li>一過性エラー → コンテナの <code>status_code</code> を照会して分岐する（<code>PUBLISHED</code> → <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで公開を 1 回だけ再送 / それ以外・照会失敗 → <code>published_unconfirmed</code>。<a href="#transient-errors">段階別の扱い</a>）</li>
           <li>重複 publish 応答、またはタイムアウト・接続断で結果不明 → <code>status='published_unconfirmed'</code> に更新</li>
-          <li id="problem-snapshot"><strong>成功直後の問題スナップショット出力（<code>batch_sets.problem_snapshot_enabled=1</code> のセットのみ。Phase 21-3 設計・21-5b 実装）</strong>: リール行が <code>success</code> に達した直後に、当該生成実行の <code>umigame_items</code>（問題文・真相・確定事実シート・ルール帯）と対象セットの <code>prompt_configs.prompt_text</code>（AI 出題者プロンプトのセット固定部分。<code>is_active=1</code> の <code>id</code> 昇順 1 件）から JSON を組み、S3 <code>assets/{set_code}/problems/{platform_post_id}.json</code> へ PUT する（<code>media_id</code> = <code>media_publish</code> の応答 id。スキーマは <a href="sets/umigame-soup-1.html#snapshot">セット別設計書 10.7.2</a>）。PUT 成功で <code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code> を更新する。<strong>出力失敗は投稿失敗にしない</strong>（WARNING ログ + <code>snapshot_s3_key</code> NULL のまま次へ。手動再出力は運用側。21-5b の実装では、リール行の <code>success</code> 更新を commit した後に別トランザクションで出力し、失敗時はスナップショット側だけをロールバックする = 投稿の成功記録を巻き戻さない）。フラグが 0 のセット・<code>umigame_items</code> 行のない実行では何もしない。コメント自動返信の Lambda はこの JSON だけを読み Aurora に触れない（<a href="../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>）</li>
+          <li id="problem-snapshot"><strong>成功直後の問題スナップショット出力（<code>batch_sets.problem_snapshot_enabled=1</code> のセットのみ。Phase 21-3 設計・21-5b 実装）</strong>: リール行が <code>success</code> に達した直後に、当該生成実行の <code>umigame_items</code>（問題文・真相・確定事実シート・ルール帯）と対象セットの <code>prompt_configs.prompt_text</code>（AI 出題者プロンプトのセット固定部分。<code>is_active=1</code> の <code>id</code> 昇順 1 件）から JSON を組み、S3 <code>assets/{set_code}/problems/{platform_post_id}.json</code> へ PUT する（<code>media_id</code> = <code>media_publish</code> の応答 id。スキーマは <a href="sets/umigame-soup-1-comment-reply.html#snapshot">コメント返信の分冊 7.2</a>）。PUT 成功で <code>umigame_items.snapshot_s3_key</code> / <code>snapshot_written_at</code> を更新する。<strong>出力失敗は投稿失敗にしない</strong>（WARNING ログ + <code>snapshot_s3_key</code> NULL のまま次へ。手動再出力は運用側。21-5b の実装では、リール行の <code>success</code> 更新を commit した後に別トランザクションで出力し、失敗時はスナップショット側だけをロールバックする = 投稿の成功記録を巻き戻さない）。フラグが 0 のセット・<code>umigame_items</code> 行のない実行では何もしない。コメント自動返信の Lambda はこの JSON だけを読み Aurora に触れない（<a href="../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>）</li>
         </ul>
       </li>
       <li><strong>ストーリーズ再掲（<code>batch_sets.stories_enabled=1</code> のセットのみ。Phase 15-10 追加）</strong>: リール行が <code>success</code> に達した場合のみ、同一動画をストーリーズへ再掲する。<code>posts</code> へ <code>media_type='story'</code> の行を <code>pending</code> で INSERT-or-skip（既存ストーリーズ行があればその状態から 3.2 と同型の分岐で再開・終端ならスキップ。<code>post_media</code> は手順 2 と同様にストーリーズ行にも同一メディアを <code>display_order=0</code> で 1 行紐づける〔15-12 実装〕。キャプションは非対応のため <code>caption_template_id</code> / <code>caption_text_snapshot</code> は NULL のまま）→ 同一 MP4 の Presigned URL でコンテナ作成（<code>media_type=STORIES</code> + <code>video_url</code>。<strong>キャプション・<code>share_to_feed</code>・カバーは指定しない</strong>〔ストーリーズはキャプション非対応〕）→ ステータスポーリング（動画の間隔 10 秒 × 最大 60 回を流用）→ パブリッシュ（結果の反映は手順 6 と同じ。一過性エラーの扱いもリールと同じで、やり直しの回数はストーリーズ行で別に数える）。リール行が <code>success</code> 以外で終わったアカウントではストーリーズ行を作成しない</li>
@@ -480,7 +480,7 @@ flowchart TB
       <li><strong>メディアレベルの収集</strong>: 対象 = 当該アカウントの <code>posts</code> のうち <code>status='success'</code> かつ <code>platform_post_id IS NOT NULL</code> で、<code>feed_image</code> / <code>reel</code> は <code>posted_at</code> が <code>MEDIA_LOOKBACK_DAYS</code> 以内、<code>story</code> は <code>posted_at</code> が 24 時間以内のもの（<code>posted_at</code> 昇順）。各行について全メトリクスを取得し、<code>post_insights</code> へ INSERT-or-skip（<code>UNIQUE (post_id, scheduled_at)</code>）で追記する。<strong>当該ラン（同一 <code>scheduled_at</code>）で収集済みの <code>post_id</code> は API 呼び出し自体を行わずスキップ</strong>する（再実行時のコール数削減。16-9 実装）</li>
     </ol>
   </li>
-  <li><strong>コメント記録の取り込み</strong>（21-7b。環境変数 <code>COMMENT_LOG_BUCKET</code> があるときだけ）: S3 の <code>comment-log/{set_code}/</code> の直近数日分を <code>umigame_comment_logs</code> へ <code>INSERT IGNORE</code> で取り込み、保持期限切れの行を消す。コメント返信経路は Aurora 停止中でも動くため直接書けず、本バッチの起動に相乗りして Aurora の起動回数を増やさない。記録の無いセットは一覧が空で終わる。仕様の正は <a href="sets/umigame-soup-1.html#comment-log-import">セット設計書 10.8.1</a>。例外はその回を <code>failed</code> にする（手順 2 の部分失敗とは別。インサイト収集が例外で中断した回は取り込まない）</li>
+  <li><strong>コメント記録の取り込み</strong>（21-7b。環境変数 <code>COMMENT_LOG_BUCKET</code> があるときだけ）: S3 の <code>comment-log/{set_code}/</code> の直近数日分を <code>umigame_comment_logs</code> へ <code>INSERT IGNORE</code> で取り込み、保持期限切れの行を消す。コメント返信経路は Aurora 停止中でも動くため直接書けず、本バッチの起動に相乗りして Aurora の起動回数を増やさない。記録の無いセットは一覧が空で終わる。仕様の正は <a href="sets/umigame-soup-1-comment-reply.html#comment-log-import">コメント返信の分冊 8.1</a>。例外はその回を <code>failed</code> にする（手順 2 の部分失敗とは別。インサイト収集が例外で中断した回は取り込まない）</li>
   <li>実行ログを <code>succeeded</code> / <code>failed</code> に更新して終了する（終了コードは 4.3）</li>
 </ol>
 
@@ -513,7 +513,7 @@ flowchart TB
 <div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
   <li>稼働確認・欠測の考え方・月次 KPI 転記 → <a href="operation.html#insights-ops">アプリ運用設計 6 章</a></li>
   <li>保存先のテーブルとビュー → <a href="data-model.html#detail-insights">データモデル設計 4.11</a></li>
-  <li>コメント記録の取り込みの仕様 → <a href="sets/umigame-soup-1.html#comment-log-import">セット別設計書 umigame-soup-1 10.8.1</a></li>
+  <li>コメント記録の取り込みの仕様 → <a href="sets/umigame-soup-1-comment-reply.html#comment-log-import">コメント返信の分冊 8.1</a></li>
 </ul></div>
 
 <h2 id="contract-usage">5. ワークフロー連携（環境変数の使い方）</h2>

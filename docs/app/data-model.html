@@ -784,10 +784,10 @@ LIMIT 1;</code></pre>
       <tr><td><code>problem_text</code></td><td><code>VARCHAR(255) NOT NULL</code>。問題文（78〜85 字。版面の問題カード）</td></tr>
       <tr><td><code>truth</code></td><td><code>TEXT NOT NULL</code>。真相（版面には出さず、次回投稿の前回の真相ブロックで全文を公開する。書き方は<a href="sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>）</td></tr>
       <tr><td><code>fact_sheet</code></td><td><code>JSON NOT NULL</code>。確定事実シート（文字列の配列・8〜20 件。上限は 2026-09-26 に 12 → 20。<a href="sets/umigame-soup-1.html#stock-items">セット別設計書 4</a>）</td></tr>
-      <tr><td><code>core_points</code></td><td><code>JSON NULL</code>。コアの要点（文字列の配列 1〜3 個・1 個 20 字以内。問題文の不思議の真相を説明するのに最低限必要な情報。コメント返信の ④ 正解 / ⑤ 惜しいの判定に使う。基準は<a href="sets/umigame-soup-1.html#judge-design">セット別設計書 10.2・10.3</a>）。21-6c1〔V013〕で追加。NULL = 未設定で、ウミガメ方式は出題しない（異常終了）</td></tr>
+      <tr><td><code>core_points</code></td><td><code>JSON NULL</code>。コアの要点（文字列の配列 1〜3 個・1 個 20 字以内。問題文の不思議の真相を説明するのに最低限必要な情報。コメント返信の ④ 正解 / ⑤ 惜しいの判定に使う。基準は<a href="sets/umigame-soup-1-comment-reply.html#judge-design">コメント返信の分冊 2・3 章</a>）。21-6c1〔V013〕で追加。NULL = 未設定で、ウミガメ方式は出題しない（異常終了）</td></tr>
       <tr><td><code>reveal_text</code></td><td><code>VARCHAR(255) NULL</code>。正解時に開示する真相の要約（70 字以内）。21-6c1〔V013〕で追加。NULL の扱いは <code>core_points</code> と同じ</td></tr>
-      <tr><td><code>judge_criteria</code></td><td><code>JSON NULL</code>。正解基準（<code>{"points": [{"hit", "touch"}…], "errors": […]}</code>。<code>points</code> は <code>core_points</code> と同じ順・同じ個数、<code>errors</code> は 0〜3 個。書式と ④⑤⑥ の決め方は<a href="sets/umigame-soup-1.html#judge-criteria">セット別設計書 10.2</a>）。21-6d7c〔V014〕で追加。NULL の扱いは <code>core_points</code> と同じ</td></tr>
-      <tr><td><code>core_words</code></td><td><code>JSON NULL</code>。核心語（<code>{"words": […], "except": […]}</code>。<code>words</code> は 1 個以上、<code>except</code> は照合の前に返信から除く語句 0 個以上。用途と書き方は<a href="sets/umigame-soup-1.html#leak-guard">セット別設計書の出力ガード</a>）。21-8d1〔V017〕で追加（それまでは <code>services/comment-reply/</code> に同梱の辞書）。NULL の扱いは <code>core_points</code> と同じ</td></tr>
+      <tr><td><code>judge_criteria</code></td><td><code>JSON NULL</code>。正解基準（<code>{"points": [{"hit", "touch"}…], "errors": […]}</code>。<code>points</code> は <code>core_points</code> と同じ順・同じ個数、<code>errors</code> は 0〜3 個。書式と ④⑤⑥ の決め方は<a href="sets/umigame-soup-1-comment-reply.html#judge-criteria">コメント返信の分冊 2 章「正解基準」</a>）。21-6d7c〔V014〕で追加。NULL の扱いは <code>core_points</code> と同じ</td></tr>
+      <tr><td><code>core_words</code></td><td><code>JSON NULL</code>。核心語（<code>{"words": […], "except": […]}</code>。<code>words</code> は 1 個以上、<code>except</code> は照合の前に返信から除く語句 0 個以上。用途と書き方は<a href="sets/umigame-soup-1-comment-reply.html#leak-guard">コメント返信の分冊の出力ガード</a>）。21-8d1〔V017〕で追加（それまでは <code>services/comment-reply/</code> に同梱の辞書）。NULL の扱いは <code>core_points</code> と同じ</td></tr>
       <tr><td><code>expected_questions</code></td><td><code>JSON NOT NULL</code>。想定質問と期待回答（<code>[{"q": …, "a": …}]</code>・15〜20 件。プローブテスト用。DB に入れるのは「レビュー済みの検証セット」を投入物と一緒に残すため）</td></tr>
       <tr><td><code>hook</code></td><td><code>VARCHAR(40) NOT NULL</code>。フック文（12 字前後）</td></tr>
       <tr><td><code>rule_text</code></td><td><code>VARCHAR(100) NOT NULL</code>。ルール帯（45 字前後。セット既定文）</td></tr>
@@ -827,7 +827,7 @@ LIMIT 1;</code></pre>
 <h3 id="detail-umigame-comment-logs">4.16 umigame_comment_logs（ウミガメのコメント記録。Phase 21-7b 設計・テーブル作成は V016）</h3>
 <div>
 <p><strong>umigame_comment_logs のカラムとビュー（V016）</strong> <a class="decision-ref" href="#d-29">→ 理由 D-29</a></p>
-コメント返信経路は 1 コメント 1 件の JSON を S3 の <code>comment-log/{set_code}/dt=YYYY-MM-DD/{comment_id}.json</code> に書く（書式の正は <a href="sets/umigame-soup-1.html#comment-log">セット設計書 10.8</a>）。インサイト収集バッチが 06:00 / 18:00 JST の実行に相乗りして本テーブルへ取り込む（取り込みの仕様は <a href="sets/umigame-soup-1.html#comment-log-import">10.8.1</a>）。
+コメント返信経路は 1 コメント 1 件の JSON を S3 の <code>comment-log/{set_code}/dt=YYYY-MM-DD/{comment_id}.json</code> に書く（書式の正は <a href="sets/umigame-soup-1-comment-reply.html#comment-log">コメント返信の分冊 8 章</a>）。インサイト収集バッチが 06:00 / 18:00 JST の実行に相乗りして本テーブルへ取り込む（取り込みの仕様は <a href="sets/umigame-soup-1-comment-reply.html#comment-log-import">分冊 8.1</a>）。
   <div class="table-wrap">
   <table>
     <thead><tr><th>カラム</th><th>定義・意図</th></tr></thead>

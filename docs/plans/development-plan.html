@@ -82,7 +82,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 11 件（クリックで展開）</summary>
+<summary>完了済み 12 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
@@ -536,17 +536,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-8b" data-step-id="30-8b" data-status="todo">
+<article class="plan-step" id="step-30-8b" data-step-id="30-8b" data-status="done" data-completed="2026-10-18">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-8b</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-8b</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>umigame-soup-1 のセット別設計書を整理し、コメント自動返信の仕様を切り出す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-8a の go の後。umigame-soup-1 のセットレーンが動いていないとき。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。10 節（コメント自動返信）は共通の詳細設計へは上げず、umigame 専用の分冊 <a href="../app/sets/umigame-soup-1-comment-reply.html"><code>sets/umigame-soup-1-comment-reply.html</code></a> に切り出し（<a href="../app/sets/umigame-soup-1-comment-reply.html#d-01">分冊 D-01</a>）、セット本体と分冊を新しい書式へ移した（判断の記録 計 51 件〔本体 D-01〜D-13・分冊 D-01〜D-38〕・<code>class="decision"</code> 0 件）。ユーザーの go 待ち。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -566,13 +561,27 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-18 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>切り出しの判断</strong>: 10 章はアプリの共通設計書へは上げず、umigame-soup-1 専用の分冊 <a href="../app/sets/umigame-soup-1-comment-reply.html"><code>sets/umigame-soup-1-comment-reply.html</code></a> にした（判定の中身がこのセットの素材 #15〜#18 と一体・使うセットが 1 つ・共通設計書は 3 層構造で変えない・インフラの共通部分は stacks 3.6 等にある。2 つ目のセットで使うときにセットに依存しない骨格を共通の詳細設計へ上げる = <a href="../app/sets/umigame-soup-1-comment-reply.html#d-01">分冊 D-01</a>）。旧 10.1〜10.8 → 分冊 1〜8 章、旧 11 章のコメント側 3 項目 → 分冊 9 章「失敗時の扱い」（<code>#reply-failure</code>）。節のアンカー（<code>#judge-design</code> 等 37 個）は分冊でも同じ名前にし、セット本体の 10 章は分冊への案内だけ（<code>#comment-reply</code>）を残した。セット本体は 1815 → 約 350 行</li>
+<li><strong>書式の移行</strong>: 2 ページとも冒頭に要約（Mermaid の図 + 表）を置き、「本書の位置づけ」「適用状態」の囲みは要約と関連資料のリード文へまとめた（適用状態の「21-6e〜21-8 は予定」は古いので落とした）。「要点」の囲みはリード文へ。分冊の図 3 枚（旧図 10-1・10-2・10-4）は HTML の flow から Mermaid に描き直した。調査・試験の記録ページ（judge-study・reply-study・probe*）は移行の対象外とし、分冊の冒頭からリンクした</li>
+<li><strong>判断の移し替え（移す前 → D-xx）</strong>: <strong>セット本体</strong> 付録 <code>d-20260828-original</code> → D-01／<code>d-20260903-meta-app</code> → D-02／<code>d-20260904-name</code> → D-03／<code>d-20260926-post-order</code> → D-04／<code>d-20260926-fact-limit</code> → D-05／<code>d-20260926-figure</code> → D-06／<code>d-20260927-tts</code> → D-07／<code>d-20261003-restructure</code> → D-08／<code>d-20261004-truth-disclosure</code> → D-09／<code>d-20261012-post-frequency</code> → D-10、本文の理由: 2 章のコメント設定の理由 → D-11／6 章「テンプレートを <code>{{caption}}</code> だけにする理由」→ D-12／4 章「truth の上限 400 字の根拠」→ D-13。<strong>分冊</strong> 切り出し → D-01、付録 <code>d-20260904-prompt-configs</code> → D-02／<code>master-prompt</code> → D-03／<code>d-20260907-no-supplement</code> → D-04／<code>d-20260927-quality</code> → D-05／<code>d-20260927-contract</code> → D-06／<code>d-20260928-policy</code> → D-07／<code>d-20260928-reply-style</code> → D-08／<code>d-20260930-core</code> → D-09／<code>d-20260930-impl</code> → D-10／<code>d-20260930-bundle</code> → D-11／<code>d-20261003-probe-retire</code> → D-12／<code>d-20261003-thresholds</code> → D-13／<code>d-20261004-contradiction</code> → D-14／<code>d-20261004-three-answers</code> → D-15／<code>d-20261006-human-review-import</code> → D-16／<code>d-20261008-judge-criteria-impl</code> → D-17、本文の囲み: 旧 10.2 21-6d15（⑤ / ⑥ の境目）→ D-18／10.3.5 21-8e（effort max）→ D-19・21-6e（方式・モード）→ D-20・21-6e2（combiner）→ D-21／10.3.6 Decisions 不採用 → D-22・21-6d10b → D-23／10.3.7 1d-haiku 不採用 → D-24・21-6d12b → D-25・21-6d17 Haiku 専用プロンプト（<code>#haiku-prompt-6d17</code>）→ D-26／10.4 21-6d14（長さ）→ D-27・21-6d16（否定形）→ D-28・21-6d9（辞書同梱）→ D-29・21-8d1（核心語を素材へ）→ D-30／10.6 21-6d8 → D-31・max_tokens 32,000 → D-32・⑥⑧ を外す → D-33・21-6d14 の作り直し → D-34・21-6d17 矛盾語 → D-35・21-6e3 <code>T_CLOSE</code> → D-36・21-6d5 → D-37／10.8.1 21-7b → D-38。囲みの全文は各 D の「理由」へ移し、本文には事実の 1 行と「→ 理由 D-xx」を残した（事実を含む 21-6e2・21-6d12b・21-6d17・21-7b の囲みは、実装の事実を本文の段落として残した）</li>
+<li><strong>旧アンカーへの参照</strong>: <code>docs/</code> 配下（現役の設計書・計画 / 記録・検討ページ・評価ページ）の 10 章のアンカーと付録の <code>#d-2026…</code> へのリンクを、分冊の同名アンカー / 各ページの <code>#d-NN</code> へ付け替えた（9 ファイル。現役の設計書はリンクの文言も「コメント返信の分冊 n 章」に直し、記録は文言を当時のまま残した）。付け替え後の grep（下）で <code>umigame-soup-1.html#</code> + 旧 10 章のアンカーは 0 件。機能ページ <a href="../overview/functions/comment-reply.html">コメント自動返信</a> の「さらに詳しく」（処理の詳細）・基本設計（全体）の表・<code>batch-flow.html</code> の入口・<code>app/index.html</code> のセット一覧を分冊へ向けた</li>
+<li><strong>実装に合わせて直した古い記載</strong>: セット本体 3 章の尺「24 秒固定（720 フレーム）」→ 29 秒（870 フレーム。Phase 29 の反映漏れ）。分冊: 1 章の図（判定は「luna と Jev を呼ぶ」「luna 失敗 → DLQ」→ メイン / サブの判定し直し）・応答時間（PoC の約 4 秒 → 本番の既定では数十秒）・4 章の要点（既定の書き手 <code>1d-luna</code> → <code>1b-haiku</code>）</li>
+<li><strong>レビュー</strong>（観点: 移設で事実が欠けていないか / 実装との食い違い。一次スクリーニングはサブエージェント 2 本・判断 Claude）。1 巡目で blocker 8 件を直した: 章番号 10.x の置き換えで評価の表の p95 の値 10.3・10.4 秒が 3・4 に化けた（ほかに巻き込まれた数値なしを確認）／図 3 で段 B の数え方・確率の定義・段 B2 の線引きが落ちた（図の下の箇条へ）／「合意制で割れたとき」の定型文・公平さの例外・出力ガードの経路（hybrid 廃止で実装にない）／判定は 2 実装 → 3 実装、<code>haiku</code> は評価用 → 本番の既定、<code>decisions.py</code> は削除済み／ローカル試行のキーに <code>ANTHROPIC_API_KEY</code>／7.4 の費用の「Jev（見張り役）」→ Haiku の評価実績と Jev の非常手段／セット本体 7 章の BGM 登録値 24（29-2 で 29 に更新済み）。<code>HAIKU_EFFORT</code> の既定の持ち方（スタックが <code>max</code>・コードは <code>high</code>）は表に注記した。改善提案 4 件は課題 <a href="../issues/index.html#I-046">I-046</a> に起票。2 巡目は行わない（直したあとは検査で確認）</li>
+<li><strong>課題表</strong>: 対象パスに <code>docs/app/sets/umigame-soup-1.html</code> を持つ行は I-041（クローズ済み・セクション 3 は移設後も同じ）だけで、付け替えは不要。I-044（<code>docs/app/sets/</code>）はトリガーが 30-9 の着手時のため据え置き継続。セットレーンの資材（検討ページの生成スクリプト 2 本・<code>stock_items.py</code>・<code>01_prompt_caption.sql</code>）に残る旧位置への参照は、自分で直さず <a href="../issues/index.html#I-045">I-045</a>（umigame-soup-1 の節）に起票</li>
+<li><strong>検査（証跡）</strong>: <code>grep -c 'class="decision"'</code> は <code>sets/umigame-soup-1.html</code> 0・<code>sets/umigame-soup-1-comment-reply.html</code> 0。<code>docs/</code> 配下（<code>_archive</code> を除く）で <code>umigame-soup-1.html#</code> + 旧 10 章のアンカー 36 個への参照 0 件、付録の旧 ID（<code>#d-2026…</code>・<code>#master-prompt</code>・<code>#history</code>）への参照 0 件。<code>docs_check.py --widths 360,390,768,1280</code> は 101 ページはみ出し 0 件・図 28 ページ 48 図の描画不備 0 件・判断リンク 233 件の不備 0 件・リンク切れ 0 件で OK。<code>--plan-only</code> も OK</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-30-9" data-step-id="30-9" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-9</strong><span class="plan-status">未着手</span></div>
