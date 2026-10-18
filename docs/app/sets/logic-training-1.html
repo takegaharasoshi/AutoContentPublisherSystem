@@ -44,7 +44,7 @@ flowchart TB
 
 <div class="warn" id="noon-suspended">
   <span class="callout-title">昼スロット（noon = L3 フェルミ推定）は 16-4d（2026-08-24）で当分停止中</span>
-  ユーザー決定。理由: ①昼のスキップ率が高止まりで改善しない ②改めて問題を見ても魅力を感じない ③魅力を感じない投稿が定期的に混ざるとフォロワーが増えない。現在の投稿は<strong>朝・夜の 1 日 2 回</strong>。<strong>廃止ではなく当分停止</strong>で、止めたのは Scheduler <code>acps-prod-image-generation-logic-training-1-noon</code>（DISABLED。CDK の <code>enabled: false</code> も反映済みで deploy では戻らない）のみ。以下は<strong>残置・凍結</strong>する: noon のスロット定義（<code>prompt_configs.parameters.slots</code>）・問題ストック（L3 / standard の未使用在庫・ビルド済み動画・S3 実体）・BGM（<code>audio/logic-training-1/noon/track01.m4a</code>）・コード側の <code>SLOT_PALETTES</code> 等。<strong>停止中は補充も行わない</strong>（<a href="../../production/logic-training-1.html">生産の詳細設計 logic-training-1</a> / スキル <code>/quiz-stock-replenish</code> に反映済み）。再開時は Scheduler を ENABLED（CDK の <code>enabled</code> を戻して deploy）へ戻し、補充対象に復帰させる。
+  ユーザー決定 <a class="decision-ref" href="#d-04">→ 理由 D-04</a>。現在の投稿は<strong>朝・夜の 1 日 2 回</strong>。<strong>廃止ではなく当分停止</strong>で、止めたのは Scheduler <code>acps-prod-image-generation-logic-training-1-noon</code>（DISABLED。CDK の <code>enabled: false</code> も反映済みで deploy では戻らない）のみ。以下は<strong>残置・凍結</strong>する: noon のスロット定義（<code>prompt_configs.parameters.slots</code>）・問題ストック（L3 / standard の未使用在庫・ビルド済み動画・S3 実体）・BGM（<code>audio/logic-training-1/noon/track01.m4a</code>）・コード側の <code>SLOT_PALETTES</code> 等。<strong>停止中は補充も行わない</strong>（<a href="../../production/logic-training-1.html">生産の詳細設計 logic-training-1</a> / スキル <code>/quiz-stock-replenish</code> に反映済み）。再開時は Scheduler を ENABLED（CDK の <code>enabled</code> を戻して deploy）へ戻し、補充対象に復帰させる。
 </div>
 
 <h2>1. テーマ</h2>
@@ -57,7 +57,7 @@ flowchart TB
 <tr><td><code>L3</code></td><td>フェルミ推定（答えは「約〇〇（目安）」の幅で示す）。<strong>16-4d で昼スロットごと当分停止中</strong>（現在は出題されない。ストックは凍結・残置）</td><td>投入時の人間レビュー（16-1〜。旧: 独立 LLM 推定とのオーダー一致検証 = 休止）。断定表現の禁止は執筆ガイドとして維持</td></tr>
 </table>
 </div>
-<p>動画構成は <strong>16 秒・3 カット</strong>（導入 8 秒〔固定吹き出し「わかったらコメントしてくれ！」〕→ カウントダウン 5 秒〔1 秒 × 5 枚・吹き出しは動的ヒント <code>hint</code>〕→ 誘導 3 秒。16-4c でカット 1「つかみ」とカット 2「考える」を導入 8 秒へ統合し、全体ズームを廃止）。<strong>版面は全カット固定</strong>で問題文と<strong>つかみ帯</strong>（スロット別の <code>slot_hook</code>）が 1 フレーム目から表示され、<strong>答え・解説は動画に載せずキャプションで開示</strong>する（16-1 テコ入れ）。動画の作りは方式設計書（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>）を参照。<strong>16-3b の転換により動画は実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く</strong>（実行時方式は <a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>。ビルド運用は <a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3 章</a>）。16-4b（2026-08-09）で<strong>コーチ + 吹き出しのバウンド演出</strong>（ヒント登場・答え誘導の 2 箇所で大きく弾ませ既存 SE と同期。視線誘導の改善）と<strong>イラスト見切れの解消</strong>（比率を保った内接 + 3:2 生成のプロンプト明示）を追加し、既存 42 本を再ビルドで差し替えた（<a href="../generators/gpt-quiz-multicut.html#bounce">方式設計書セクション 9.1</a> と同 8.2 の 16-4b の決定）。<strong>改修 R-1（セットレーン。2026-09-03 差し替え）でレンダラーを Pillow 組版から Remotion へ載せ替え</strong>、全フレームにモーションを持たせた（コーチの常時浮遊・つかみ帯の光沢・カウントダウンのリング進行・ループ継ぎ目の連続性）。尺・カット構成・SE・「答えはキャプション」は不変。<strong>改修 R-2（セットレーン。2026-09-19 差し替え）で版面の配分をイラスト優先へ反転</strong>し、文字サイズの縮小で作った原資をイラストへ回した（イラストの箱に保証高 500px を先に確保し、残りの高さに問題文を68 → 44px の可変で収める）。尺・カット構成・SE・「答えはキャプション」はここでも不変。以後の版面・動きの正は <a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a> と <code>content/video-build/logic-training-1/remotion/</code>（<code>gpt-quiz-multicut.html</code> の組版仕様は旧版の記録）。</p>
+<p>動画構成は <strong>16 秒・3 カット</strong>（導入 8 秒〔固定吹き出し「わかったらコメントしてくれ！」〕→ カウントダウン 5 秒〔1 秒 × 5 枚・吹き出しは動的ヒント <code>hint</code>〕→ 誘導 3 秒。全体ズームはない）。<strong>版面は全カット固定</strong>で問題文と<strong>つかみ帯</strong>（スロット別の <code>slot_hook</code>）が 1 フレーム目から表示され、<strong>答え・解説は動画に載せずキャプションで開示</strong>する。<strong>動画は実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く</strong>（実行時方式は <a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>。ビルド運用は <a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3 章</a>）。レンダラーは <strong>Remotion</strong> で、全フレームにモーションを持つ（コーチの常時浮遊・つかみ帯の光沢・カウントダウンのリング進行・ループ継ぎ目の連続性）。ヒント登場・答え誘導の 2 箇所で<strong>コーチ + 吹き出しが大きく弾み</strong>、SE と同期する。版面の配分は<strong>イラスト優先</strong>で、イラストの箱に保証高 500px を先に確保し、残りの高さに問題文を 68 → 44px の可変で収める。イラストは比率を保って内接させる。版面・動きの正は <a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a> と <code>content/video-build/logic-training-1/remotion/</code>（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a> の組版仕様は旧版の記録） <a class="decision-ref" href="#d-05">→ 理由 D-05</a></p>
 
 <h2>2. 投稿先アカウント構成</h2>
 <p>Instagram プロアカウント 1 件（1 セット 1 アカウント）。<strong>15-7</strong> で新規開設し、Secret 登録とトークン実働確認まで済んでいる。</p>
@@ -150,8 +150,8 @@ flowchart TB
 <p>L3（フェルミ推定）の問題は「規模を推し量る問題にし、公式・定数を与えて計算させない」。この出題方向はストック執筆でも有効（15-13 の試し打ちで決めた 4 点の記録 → <a class="decision-ref" href="#d-02">→ 理由 D-02</a>）</p>
 
 <div class="note">
-  <span class="callout-title">14-11 の知見の流用</span>
-  fantasy-animals-1 のプロンプト設計で効いた「①構成の明示 ②毎回変える要素の明示 ③Instagram UI セーフエリア」のうち、①②は上記の題材・question 条件として文言に取り込んだ。③は<strong>本方式ではプロンプト側の指定が不要</strong>で、レンダラーがセーフエリアを計算して文字とコーチを配置する（旧 Pillow 組版は右 12% / 下 15%。改修 R-1 の Remotion 版は高さ依存の 2 ゾーンで、上部は左右対称・右 12% の予約は下部のイラスト・コーチ・吹き出しだけに掛ける）。イラストは<strong>カード内の専用ブロック</strong>に敷かれる（15-14 で全面背景から変更）ため、文字の見切れは構造的に発生しない。
+  <span class="callout-title">構成の明示・セーフエリア・イラストの置き場</span>
+  プロンプトの文言には、上記の題材・question 条件として<strong>構成</strong>と<strong>毎回変える要素</strong>を明示している。Instagram UI のセーフエリアは<strong>プロンプト側では指定せず</strong>、レンダラーが計算して文字とコーチを配置する（Remotion 版は高さ依存の 2 ゾーンで、上部は左右対称・右 12% の予約は下部のイラスト・コーチ・吹き出しだけに掛ける。旧 Pillow 組版は右 12% / 下 15%）。イラストは<strong>カード内の専用ブロック</strong>に敷かれるため、文字の見切れは構造的に発生しない <a class="decision-ref" href="#d-06">→ 理由 D-06</a>
 </div>
 
 <h2>5. キャプションの作り方</h2>
@@ -229,7 +229,7 @@ flowchart TB
 </ul>
 
 <h2>9. 共通フローからの差分・特記事項</h2>
-<p><strong>使用方式は <code>quiz-prebuilt</code></strong>（16-3b の転換。<code>batch_sets.generator_name</code> は 16-4〔2026-08-08〕で切替済み）: ストック LRU 選定 → S3 の事前動画取得 → 返却のみの軽量実行（<a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>）。動画の作り・組版は当初 <code>gpt-quiz-multicut</code>（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>。実行時方式としては休止）のレンダラーを事前ビルドへ転用していたが、<strong>改修 R-1（2026-09-03）で Remotion へ載せ替え</strong>、以後は <a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a> を正とする。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）で、いずれも 16-3b の転換による変更はない。</p>
+<p><strong>使用方式は <code>quiz-prebuilt</code></strong>（16-3b の転換。<code>batch_sets.generator_name</code> は 16-4〔2026-08-08〕で切替済み）: ストック LRU 選定 → S3 の事前動画取得 → 返却のみの軽量実行（<a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>）。動画の作り・組版は Remotion の事前ビルドで、<a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a> を正とする（<code>gpt-quiz-multicut</code> は実行時方式としては休止 <a class="decision-ref" href="#d-05">→ 理由 D-05</a>）。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）で、いずれも 16-3b の転換による変更はない。</p>
 <p>本セットは共通テーブルのうち <code>quiz_stock_items</code>（問題ストック）と <code>quiz_items</code>（出題履歴。16-1 で <code>stock_item_id</code> による突合を追加）を使う唯一のセットである（<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4.9 / 4.10</a>）。</p>
 
 <section class="decisions" id="decisions">
@@ -260,8 +260,39 @@ flowchart TB
 <h3>D-03 脳みそコーチの 4 表情はリファレンスシート + 検査で作る</h3>
 <dl>
   <dt>決めたこと</dt><dd>確定済みの 1 枚をリファレンスとして毎回渡し、姿勢の指示だけ差し替えて生成し、プログラム検査 3 点 + 目視で受け入れる</dd>
-  <dt>理由</dt><dd>細部の揺れを抑えるため、 （明るいカットでは背景が透けて白く見えるため気づけず、夜のダークパレットで初めて破綻する）</dd>
+  <dt>理由</dt><dd>脳の形・線の太さ・ヘッドバンド・ホイッスル・3 色構成をプロンプトで固定するのは、4 枚の間で細部が揺れないようにするため。プログラム検査の ③（オフホワイトの不透明画素が一定数以上）を 15-13 で足したのは、ヘッドバンドの白面まで透過に抜ける事故が、明るいカットでは背景が透けて白く見えるため目視で気づけず、夜のダークパレットで初めて破綻するため</dd>
   <dt>日付・出典</dt><dd>15-13</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 昼スロット（L3 フェルミ推定）を当分停止する</h3>
+<dl>
+  <dt>決めたこと</dt><dd>昼 12:30 の Scheduler だけを止め（廃止ではなく当分停止）、スロット定義・ストック・BGM・コードは残置・凍結し、停止中は補充しない</dd>
+  <dt>理由</dt><dd>①昼のスキップ率が高止まりで改善しない ②改めて問題を見ても魅力を感じない ③魅力を感じない投稿が定期的に混ざるとフォロワーが増えない</dd>
+  <dt>日付・出典</dt><dd>2026-08-24（16-4d・ユーザー決定）</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 動画は事前ビルドにし、レンダラーを Pillow 組版から Remotion へ載せ替える</h3>
+<dl>
+  <dt>決めたこと</dt><dd>動画を実行時に生成せず事前ビルド + 全数人間レビューで S3 に作り置き（方式 <code>quiz-prebuilt</code>）、そのレンダラーを Remotion にする。版面はイラスト優先の配分にする</dd>
+  <dt>理由</dt><dd><ol style="margin:.3rem 0 0;">
+    <li><strong>16-1 テコ入れ</strong>: 答え・解説を動画に載せずキャプションで開示する方針へ。版面を全カット固定にし、問題文とつかみ帯を 1 フレーム目から表示する</li>
+    <li><strong>16-3b の転換</strong>: 動画を実行時に生成せず、事前にビルドして全数人間レビューのうえ S3 に作り置く。当初は <code>gpt-quiz-multicut</code>（<a href="../generators/gpt-quiz-multicut.html">generators/gpt-quiz-multicut.html</a>。実行時方式としては休止）のレンダラーを事前ビルドへ転用した</li>
+    <li><strong>16-4b（2026-08-09）</strong>: コーチ + 吹き出しのバウンド演出（ヒント登場・答え誘導の 2 箇所で大きく弾ませ既存 SE と同期。視線誘導の改善）とイラスト見切れの解消（比率を保った内接 + 3:2 生成のプロンプト明示）を追加し、既存 42 本を再ビルドで差し替えた（<a href="../generators/gpt-quiz-multicut.html#bounce">方式設計書セクション 9.1</a> と同 8.2 の 16-4b の決定）</li>
+    <li><strong>16-4c</strong>: カット 1「つかみ」とカット 2「考える」を導入 8 秒へ統合し、全体ズームを廃止した</li>
+    <li><strong>改修 R-1（セットレーン。2026-09-03 差し替え）</strong>: レンダラーを Pillow 組版から Remotion へ載せ替え、全フレームにモーションを持たせた。尺・カット構成・SE・「答えはキャプション」は不変</li>
+    <li><strong>改修 R-2（セットレーン。2026-09-19 差し替え）</strong>: 版面の配分をイラスト優先へ反転し、文字サイズの縮小で作った原資をイラストへ回した。尺・カット構成・SE・「答えはキャプション」はここでも不変</li>
+  </ol></dd>
+  <dt>日付・出典</dt><dd>16-1・16-3b・16-4b（2026-08-09）・16-4c・改修 R-1（2026-09-03）・改修 R-2（2026-09-19）</dd>
+</dl>
+</article>
+<article id="d-06">
+<h3>D-06 セーフエリアはレンダラーで扱い、イラストはカード内の専用ブロックに置く</h3>
+<dl>
+  <dt>決めたこと</dt><dd>プロンプトに構成と毎回変える要素を明示し、セーフエリアはプロンプトで指定せずレンダラーが計算する。イラストはカード内の専用ブロックに敷く</dd>
+  <dt>理由</dt><dd>14-11 の知見の流用: fantasy-animals-1 のプロンプト設計で効いた「①構成の明示 ②毎回変える要素の明示 ③Instagram UI セーフエリア」のうち、①②は題材・question 条件として文言に取り込んだ。③は本方式ではレンダラーが文字とコーチを配置するためプロンプト側の指定が不要。イラストは 15-14 で全面背景からカード内の専用ブロックへ変更したため、文字の見切れが構造的に起きない</dd>
+  <dt>日付・出典</dt><dd>14-11（知見）・15-14（イラストの置き場の変更）</dd>
 </dl>
 </article>
 </section>

@@ -82,7 +82,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 13 件（クリックで展開）</summary>
+<summary>完了済み 14 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-30-1" data-step-id="30-1" data-status="done" data-completed="2026-10-18">
@@ -619,17 +619,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-30-9b" data-step-id="30-9b" data-status="todo">
+<article class="plan-step" id="step-30-9b" data-step-id="30-9b" data-status="done" data-completed="2026-10-19">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>30-9b</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>30-9b</strong><span class="plan-status">完了</span><span>2026-10-19</span></div>
 <h3>体系全体の整合を取る</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-9a の go の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-19 完了</strong>。CLAUDE.md・<code>docs/index.html</code>・スキルの参照を今の構成に合わせ、「さらに詳しく」の段の飛ばし・指し違いを直し、本文に残っていた理由 13 件を判断の記録へ移した。課題 I-042・I-044・I-047 を解消、<a href="../issues/index.html#I-040">I-040</a> を解消でクローズ。ユーザーの go で Phase 30 完了。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -651,13 +646,25 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-19 実施</span></summary>
 <div class="plan-fold-inner">
-<p>着手前のため記録なし。</p>
+<ul>
+<li><strong>参照の整合</strong>: スキル・CLAUDE.md・AGENTS.md から設計書へのパスとアンカーは全件実在（スクリプトで照合）。古い節番号は <code>umigame-problem-writer</code> の SKILL.md の「10.2」1 か所 → 分冊 2 章に直した。CLAUDE.md: <code>docs/overview/</code> の行に機能別の基本設計 8 本、<code>docs/app/</code> の行に分冊と記録ページ、参照ガイドに「機能ごとの全体像」「コメント自動返信を修正する」「クイズストックを補充する」の 3 行、Phase 30 の進行の記述を更新。<code>docs/index.html</code>: 2.2 の構成図に分冊・<code>plans/_templates/step.html</code>・課題の詳細 HTML、カードに機能別の基本設計と分冊を足した</li>
+<li><strong>「さらに詳しく」の洗い出し</strong>（drilldown を持つページ 19 本・枠 37 個・リンク 127 本）: 段の飛ばし 2 件を直した（基本設計〔全体〕5 章の KPI 転記 → 機能ページ インサイト収集へ、6 章の content の README 4 本 → 生産の詳細設計の目次へ）。指し違い 5 件を直した（機能ページ コメント自動返信の AWS の定義 → stacks 3.6・運用の手順 → 分冊 7 章、トークン更新の処理の詳細の観点を明記、probe-index の「10.6」、production の「umigame-prebuilt 9 節」〔アンカー <code>#runtime</code> を新設〕、batch-flow の「workflow 3・4 章」）。許容と判断したもの: 生産の機能ページ → セット計画書（体系外の運用の値への参照）、<code>functions/production.html</code> → セット別の機能ページ（共通からセット別への入口）、詳細設計どうしの横リンク。戻りリンクが無かった <code>infra/architecture.html</code>・<code>workflow.html</code> のリード文に基本設計への戻りを足した。退役方式 3 本・調査記録・壁打ち記録は書式移行の対象外のまま</li>
+<li><strong>課題</strong>: I-042（基本設計の改善 4 件）・I-044（アプリ共通設計書の改善 5 件）・I-047（インフラ設計書の改善 4 件）をサブエージェントで直して解消、I-040 を解消でクローズ（4 行ともクローズ節へ。I-040 の結果欄に Phase 30 の各ステップの成果をまとめた = 完了フェーズのサマリへ畳むときの材料）。I-046・I-045・ほかの据え置き行はトリガーに当たらず据え置き継続</li>
+<li><strong>レビュー</strong>（観点: 基本設計 → 詳細設計の順にたどれるか / 本文に理由が混ざっていないか。一次スクリーニングはサブエージェント・判断 Claude）。1 巡目: たどり方の blocker 2 件（基本設計〔全体〕7 章の生産の入口が旧アプリ運用設計を指していた → 生産の詳細設計へ、CLAUDE.md の <code>docs/overview/</code> の行に機能ページが無い）を直し、改善提案のうち 3 件（logic-training-1 の補充の行・構成図・退役ページへのリンク文言）も小さいので直した。本文に段落規模で残っていた理由・経緯 13 件を判断の記録へ移した（分冊 3.6 の不採用パターンの設計記録 → D-22・既定の理由 → D-20・段 B の理由 → D-39 新設、app/operation → D-17〜D-19 新設、data-model → D-21、sets/logic-training-1 → D-04〜D-06 新設、sets/pref-ranking-1 → D-09 新設、infra/workflow の実測メモ → D-10）。2 巡目: 移した箇所で今の事実（手順・設定値）は本文に残っており、入口の指し先も全件実在 = blocker なし</li>
+<li><strong>検査（証跡）</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 101 ページはみ出し 0 件・図 32 ページ 54 図の描画不備 0 件・判断リンク 325 件の不備 0 件・リンク切れ 0 件で OK。<code>--plan-only</code> も OK</li>
+<li><strong>Phase 30 を畳む準備</strong>: go の後に、Phase 30 を「完了フェーズのサマリ」の表へ 1 行で畳み、ステップの作業記録を <code>development-log.html</code> へ移す（計画整理のタイミング。本ステップでは行わない）</li>
+</ul>
 </div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 
 </div>
 </section>

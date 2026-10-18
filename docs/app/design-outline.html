@@ -22,7 +22,7 @@
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
-    subgraph COMMON["共通設計書（セット・方式の追加では変えない）"]
+    subgraph COMMON["共通設計書（セット・方式の追加では変えない。例外は batch-flow の方式カタログ）"]
         DO["design-outline&lt;br&gt;全体方針（このページ）"]
         BF["batch-flow&lt;br&gt;処理フロー・方式の契約・方式カタログ"]
         DM["data-model&lt;br&gt;テーブル・S3 キー"]
@@ -31,19 +31,20 @@ flowchart TB
     GEN["generators/&lt;方式名&gt;&lt;br&gt;方式別設計書（1 方式 1 本）"]
     SETS["sets/&lt;set_code&gt;&lt;br&gt;セット別設計書（1 セット 1 本）"]
     BF -->|契約に従う| GEN
+    GEN -.->|本採用・退役で方式カタログの 1 行を追加・更新| BF
     GEN -->|セットが方式を選ぶ| SETS
     DO --> BF
     DO --> DM
     DO --> OP
 </pre>
-<figcaption>図 1 アプリ設計書の 3 層（契約 / 方式 / セット）</figcaption>
+<figcaption>図 1 アプリ設計書の 3 層（契約 / 方式 / セット）。方式の本採用・退役のときだけ、batch-flow の方式カタログに 1 行を足すか状態を更新する（点線）。それ以外の共通設計書は変わらない</figcaption>
 </figure>
 <div class="table-wrap">
 <table>
   <thead><tr><th>項目</th><th>要点</th></tr></thead>
   <tbody>
     <tr><td>設計書の分け方</td><td>共通設計書 4 本 + 方式別（<code>generators/</code>）+ セット別（<code>sets/</code>）。セット追加で <code>sets/</code> が 1 本、方式の本採用で <code>generators/</code> が 1 本増える（<a href="#doc-structure">1 章</a>）</td></tr>
-    <tr><td>処理の単位</td><td>1 回の画像生成バッチ起動 = 1 生成実行 = アカウントごとに 1 投稿（<a href="#invariant">2 章</a>）</td></tr>
+    <tr><td>処理の単位</td><td>1 回の画像生成バッチ起動 = 1 生成実行 = アカウントごとに 1 投稿。リール成功後のストーリーズ再掲は、同じ生成実行の追加の投稿行になる（<a href="#invariant">2 章</a>）</td></tr>
     <tr><td>セットの表し方</td><td>セットは DB のレコード・設定カラムと Scheduler・Secret で表し、スタックは機能単位（<a href="#set-docs">1.1</a>）</td></tr>
     <tr><td>受け渡しの契約</td><td><code>SET_CODE</code>・<code>SCHEDULED_AT</code>・Secret 名規約の意味（<a href="#contract">5 章</a>）</td></tr>
   </tbody>
@@ -72,7 +73,7 @@ flowchart TB
 <p>生産面（在庫の動画をどう作って置くか）の詳細はアプリ設計ではなく<a href="../production/index.html">生産の詳細設計</a>（<code>docs/production/</code>）が持つ。</p>
 
 <h3 id="set-docs">1.1 セット別設計書のルール（複数セット前提の 3 層構造）</h3>
-<p class="lead">セットと生成方式が増えても共通設計書を変えずに済むよう、設計書を 3 層に分ける決まり <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。</p>
+<p class="lead">アプリ設計書を共通 / 方式別 / セット別の 3 層に分ける決まり <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。</p>
 
 <ul>
   <li><strong>3 層構造</strong>: 共通設計書（本書 + 3 分冊）は全セット共通の骨格と<strong>生成方式の契約・方式カタログ</strong>を定め、<strong>セット追加・方式追加では変更しない</strong>（方式カタログへの 1 行追加・状態の更新を除く）。増える設計書は、生成方式の本採用で <code>docs/app/generators/&lt;方式名&gt;.html</code> が 1 本、セット追加で <code>docs/app/sets/&lt;set_code&gt;.html</code> が 1 本</li>
@@ -159,7 +160,7 @@ flowchart TB
 <h3>D-01 設計書を共通 / 方式別 / セット別の 3 層に分ける</h3>
 <dl>
   <dt>決めたこと</dt><dd>共通設計書はセット・方式の追加で変えず、方式の本採用で <code>generators/</code> が 1 本、セット追加で <code>sets/</code> が 1 本増える体系にする</dd>
-  <dt>理由</dt><dd>A-4 計画レビューで「スクラップ&amp;ビルドでセットが増えていく前提で、共通・上位の設計は変更せず、セットが増えるたびに設計書が 1 本増えるような管理しやすい体系にしたい」というユーザー要望を受け、まず共通 / セット別の 2 層にした（要望の記録は <a href="requirements-notes.html">A-1 壁打ち記録</a>の追記）。その後、生成方式もスクラップ&amp;ビルドで多数試作する想定から、方式層を加えた 3 層（契約 / 方式 / セット）へ広げた。方式の設計を <code>batch-flow.html</code> に書き足さないのは肥大化を防ぐため</dd>
+  <dt>理由</dt><dd>セットと生成方式が増えても共通設計書を変えずに済むようにするため。A-4 計画レビューで「スクラップ&amp;ビルドでセットが増えていく前提で、共通・上位の設計は変更せず、セットが増えるたびに設計書が 1 本増えるような管理しやすい体系にしたい」というユーザー要望を受け、まず共通 / セット別の 2 層にした（要望の記録は <a href="requirements-notes.html">A-1 壁打ち記録</a>の追記）。その後、生成方式もスクラップ&amp;ビルドで多数試作する想定から、方式層を加えた 3 層（契約 / 方式 / セット）へ広げた。方式の設計を <code>batch-flow.html</code> に書き足さないのは肥大化を防ぐため</dd>
   <dt>日付・出典</dt><dd>2026-07-06（2 層）・2026-07-12 合意 → 2026-07-15 反映（3 層。<a href="../plans/development-log.html">開発記録</a> の 10-1）</dd>
 </dl>
 </article>

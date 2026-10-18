@@ -26,7 +26,7 @@
 
 <section class="page-summary" id="summary">
 <h2>要約</h2>
-<p class="lead">このページは、配信面のうち時刻で動く 2 つの系統（①投稿・②インサイト収集）を動かすワークフローの実装仕様である。Step Functions（SFN）の定義、EventBridge Scheduler のスケジュール、ECS タスクへ渡す環境変数、失敗を知らせる監視リソースを定める。ECS タスクの中で何をするか（業務の処理）は書かず、アプリ設計に任せる。</p>
+<p class="lead">このページは、配信面のうち時刻で動く 2 つの系統（①投稿・②インサイト収集）を動かすワークフローの実装仕様で、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a>・<a href="../overview/functions/insights.html">インサイト収集</a>（上は<a href="../overview/system-overview.html">基本設計（全体）</a>）の AWS の定義にあたる。Step Functions（SFN）の定義、EventBridge Scheduler のスケジュール、ECS タスクへ渡す環境変数、失敗を知らせる監視リソースを定める。ECS タスクの中で何をするか（業務の処理）は書かず、アプリ設計に任せる。</p>
 <p class="lead">図 1 は、ワークフローの全体を表す。Scheduler が選定の SFN と収集の SFN を起こし、選定の SFN が成功すると投稿の SFN を起こす。どの SFN も最初に DB 準備確認を動かす。起動や実行の失敗は監視リソースから通知される。</p>
 <figure class="diagram">
 <pre class="mermaid">
@@ -210,11 +210,6 @@ flowchart TB
   <li><strong>成功時</strong>: 終了コード 0 で終了し、Step Functions が次のステートへ遷移する</li>
   <li><strong>失敗時</strong>: 終了コード 1 で終了し、Step Functions の Catch でハンドリングする</li>
 </ul>
-
-<div class="note">
-  <span class="callout-title">実測メモ（Phase 6-5: 一時停止からの再開挙動）</span>
-  一時停止状態（0 ACU が約 90 分継続）からの手動 RunTask 検証（2026-07-14、Phase 6-5）では、初回の接続試行が Aurora の再開完了までブロックされ約 12 秒で成功し、コンテナ内リトライは発動しなかった（Phase 4-6 の SFN 経由実行でも同様に試行 1/9 で成功）。一時停止からの再開は通常、初回試行の接続待ちで吸収される。指数バックオフのリトライは、接続がエラーで即時失敗するケース（再開の長期化や一時的な障害など）に対する保険として機能する。
-</div>
 
 <p><a class="decision-ref" href="#d-04">→ 理由 D-04</a></p>
 
@@ -907,7 +902,7 @@ stateDiagram-v2
 <h3>D-10 DB 準備確認のコンテナ内リトライは最大約 510 秒待つ</h3>
 <dl>
   <dt>決めたこと</dt><dd>指数バックオフで最大 8 回（2〜256 秒）再試行し、総待機時間を最大約 510 秒に固定する。<code>WaitForDbReady</code> には SFN の Retry を置かない</dd>
-  <dt>理由</dt><dd>Aurora Serverless v2 のコールドスタート（自動一時停止からの再開）は通常 15〜30 秒程度だが、リージョン状況や負荷によっては数分かかる場合があるため、安全側に倒した。実測では初回の接続試行が再開完了までブロックされて成功し、リトライは接続が即時失敗するケースへの保険になっている（2 章の実測メモ）</dd>
+  <dt>理由</dt><dd>Aurora Serverless v2 のコールドスタート（自動一時停止からの再開）は通常 15〜30 秒程度だが、リージョン状況や負荷によっては数分かかる場合があるため、安全側に倒した。実測（Phase 6-5）: 一時停止状態（0 ACU が約 90 分継続）からの手動 RunTask 検証（2026-07-14）では、初回の接続試行が Aurora の再開完了までブロックされ約 12 秒で成功し、コンテナ内リトライは発動しなかった（Phase 4-6 の SFN 経由実行でも同様に試行 1/9 で成功）。一時停止からの再開は通常、初回試行の接続待ちで吸収される。指数バックオフのリトライは、接続がエラーで即時失敗するケース（再開の長期化や一時的な障害など）に対する保険として機能する</dd>
   <dt>日付・出典</dt><dd>当初設計（記録なし）。実測は 2026-07-14（Phase 6-5）</dd>
 </dl>
 </article>

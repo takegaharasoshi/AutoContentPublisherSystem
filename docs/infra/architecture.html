@@ -19,7 +19,7 @@
 
 <section class="page-summary" id="summary">
 <h2>要約</h2>
-<p class="lead">このページは、配信面（AWS）で使っているサービスと、その組み合わせ方を説明する詳細設計である。配信面は 4 つの系統（①投稿 ②インサイト収集 ③コメント自動返信 ④トークン更新）からなり、①②は Step Functions が ECS Fargate のバッチを動かし、③④は Lambda で動く。共通の土台（VPC・Aurora・S3・Secrets Manager・ECS クラスター）のうち、①②のバッチは VPC の中で全部を使い、③④の Lambda は VPC の外から S3・SQS・Secrets Manager だけを使う。生産面（ローカル PC）はこの土台の S3 と Aurora に素材を置くだけで、AWS 上には生産面の部品はない。</p>
+<p class="lead">このページは、配信面（AWS）で使っているサービスと、その組み合わせ方を説明する詳細設計で、<a href="../overview/system-overview.html">基本設計（全体）</a>の配信面と、機能別の基本設計（<a href="../overview/functions/post.html">投稿</a>・<a href="../overview/functions/insights.html">インサイト収集</a>・<a href="../overview/functions/comment-reply.html">コメント自動返信</a>・<a href="../overview/functions/token-refresh.html">トークン更新</a>）の AWS の構成を詳しくしたものである。配信面は 4 つの系統（①投稿 ②インサイト収集 ③コメント自動返信 ④トークン更新）からなり、①②は Step Functions が ECS Fargate のバッチを動かし、③④は Lambda で動く。共通の土台（VPC・Aurora・S3・Secrets Manager・ECS クラスター）のうち、①②のバッチは VPC の中で全部を使い、③④の Lambda は VPC の外から S3・SQS・Secrets Manager だけを使う。生産面（ローカル PC）はこの土台の S3 と Aurora に素材を置くだけで、AWS 上には生産面の部品はない。</p>
 <p class="lead">図 1 は、4 系統と共通の土台を AWS のアイコンで表したもの。上段が時刻で動く系統（①②④）、中段が Instagram の通知で動く系統（③）、下段が共通の土台。続く表はこのページの要点。</p>
 <figure class="diagram">
 <pre class="mermaid">

@@ -20,20 +20,20 @@
 <section class="page-summary" id="summary">
 <h2>要約</h2>
 <p class="lead">logic-training-1 は、脳みそコーチが出題する頭の体操のリールを、朝と夜の 1 日 2 回投稿するセットである。生産では、問題（なぞなぞ・とんち・水平思考）を Web で裏を取りながら集め、候補を多めに出して人が直感で選び、完成稿・挿絵・動画まで作る。<a href="production.html">生産ライン（共通）</a>の骨組みに沿い、3 つの関所をすべて持つ。</p>
-<p class="lead">図 1 はこのセットの工程を、補充スキルのゴール（G1a〜G3）の単位で表す。共通との違いは、DB への投入が動画のビルドより前（G2 の最初）にあることと、人の判断から外した理由を後日の振り返りで扱うこと。</p>
+<p class="lead">図 1 はこのセットの工程の名前と関所の並びを表す。工程の細部（ゴールの区切り・候補の数など）は補充スキルの <a href="../../../.agents/skills/quiz-stock-replenish/SKILL.md">SKILL.md</a> が正。共通との違いは、DB への投入が動画のビルドより前にあることと、人の判断から外した理由を後日の振り返りで扱うこと。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
-    G1a["G1a 候補の準備&lt;br&gt;朝・夜それぞれ目標の 2 倍"] --> H1{"選別&lt;br&gt;OK / NG / 保留"}
-    H1 -->|OK| G1b["G1b 完成稿と機械検証"]
+    G1a["候補の準備&lt;br&gt;朝・夜それぞれ"] --> H1{"選別&lt;br&gt;OK / NG / 保留"}
+    H1 -->|OK| G1b["完成稿と機械検証"]
     H1 -.->|"NG・保留"| RL["後日の振り返り&lt;br&gt;quiz-review-learn"]
     G1b --> H2{"完成稿を 1 問ずつレビュー"}
-    H2 -->|承認| G2["G2 投入（ローカル DB・Aurora）&lt;br&gt;→ 挿絵の生成 → 動画ビルド"]
+    H2 -->|承認| G2["投入（ローカル DB・Aurora）&lt;br&gt;→ 挿絵の生成 → 動画ビルド"]
     G2 --> H3{"動画の全数レビュー"}
-    H3 -->|承認| G3["G3 配置（S3・ローカル DB・Aurora）"]
+    H3 -->|承認| G3["配置（S3・ローカル DB・Aurora）"]
     RL -.->|"共通ルールを反映"| G1a
 </pre>
-<figcaption>図 1 logic-training-1 の生産の工程（ゴール単位）</figcaption>
+<figcaption>図 1 logic-training-1 の生産の工程と関所</figcaption>
 </figure>
 <div class="table-wrap">
 <table>

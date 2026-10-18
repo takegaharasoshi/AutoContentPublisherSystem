@@ -227,20 +227,11 @@ VALUES (:set_id, 'L1', 'light', '(問題文)', '(答え)', '(content_fields JSON
 
 <h3 id="set-retire">2.2 セット廃止・入れ替え（スクラップ&amp;ビルド）</h3>
 <ol>
-  <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）。この時点でスケジュールが残っていても実害はないため、順序を厳密に守る必要はないが、次のステップより先に行うことを推奨する</li>
-  <li>CDK から該当セットの Scheduler 定義を<strong>すべて</strong>削除して deploy する（イメージタグの Context 指定が必須。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>削除対象は 2 スタックにまたがる</strong>: <code>image-batch-stack.ts</code> の画像生成（スロット非対応なら 1 件・対応ならスロット数分）と <code>insights-batch-stack.ts</code> のインサイト収集 2 件（06:00 / 18:00。16-10 で追加）。DISABLED 化ではなく削除する（定義の中身はコード内のコメントに残す） <a class="decision-ref" href="#d-11">→ 理由 D-11</a></li>
+  <li><code>batch_sets.is_active=0</code> に更新する（両バッチは <code>is_active=0</code> のセットをスキップして正常終了する）。この時点でスケジュールが残っていても実害はないため、順序を厳密に守る必要はないが、次のステップより先に行うことを推奨する。<strong>インサイト収集バッチも <code>is_active=0</code> のセットをスキップする</strong>（<code>services/insights-batch/app/main.py</code>）ため、この UPDATE の時点で「最終投稿から 14 日」の追跡が止まる。最終投稿分の 14 日データまで採りたい場合は、<strong>この UPDATE だけを 14 日遅らせる</strong>（次の Scheduler の削除は先に行ってよい。新規投稿が止まるだけで収集は動く） <a class="decision-ref" href="#d-17">→ 理由 D-17</a></li>
+  <li>CDK から該当セットの Scheduler 定義を<strong>すべて</strong>削除して deploy する（イメージタグの Context 指定が必須。<a href="../infra/cicd.html">infra/cicd.html セクション 3.2</a>）。<strong>削除対象は 2 スタックにまたがる</strong>: <code>image-batch-stack.ts</code> の画像生成（スロット非対応なら 1 件・対応ならスロット数分）と <code>insights-batch-stack.ts</code> のインサイト収集 2 件（06:00 / 18:00。16-10 で追加）。DISABLED 化ではなく削除する（定義の中身はコード内のコメントに残す） <a class="decision-ref" href="#d-11">→ 理由 D-11</a>。deploy の前に、<code>cdk diff</code> の削除リソースが想定件数（画像生成分 + インサイト収集 2 件）と一致することを確認する <a class="decision-ref" href="#d-17">→ 理由 D-17</a></li>
   <li>データ（DB レコード = メタ情報・投稿履歴）は削除せず残す。S3 実体（画像・動画ファイル）はインフラの 30 日ライフサイクルで自動削除される対象であり「残す」対象に含まない（Phase 9-3 で確定。<a href="data-model.html#s3-key">データモデル設計 セクション 5</a>）。<strong>音源ストック（<code>audio/{set_code}/</code>）はライフサイクル対象外のため自動削除されない</strong>が、廃止時もレコード・ファイルとも削除せず残す（容量は僅少で、セット復活・類似セットでの再利用可能性があるため。Phase 14-4 で確定）</li>
   <li>セット別設計書は削除せず、廃止の旨（バッジ・廃止日）を付けて履歴として残す。あわせてセット計画書のステータス・事業戦略書（予算・セットポートフォリオ）も停止に合わせて更新する</li>
 </ol>
-
-<div class="note">
-  <span class="callout-title">初回実地の気づき（2026-09-03、Phase 20-1 で fantasy-animals-1 を停止）</span>
-  <p>上記手順どおりで完了し、手順の変更は不要だった。実地で分かった注意点は次の 2 つ。</p>
-  <ul>
-    <li><strong>インサイト追跡ウィンドウが打ち切られる</strong>: インサイト収集バッチも <code>is_active=0</code> のセットをスキップして正常終了する（<code>services/insights-batch/app/main.py</code>）ため、手順 1 を適用した時点で「最終投稿から 14 日」の追跡が止まる。最終投稿分の 14 日データまで採りたい場合は、<strong>手順 1 の UPDATE だけを 14 日遅らせる</strong>（Scheduler の削除は先に行ってよい。新規投稿が止まるだけで収集は動く）。20-1 では打ち切りを許容した</li>
-    <li><strong>Scheduler は 2 スタックにまたがる</strong>: 2.1 の「セット追加で増えるのは Scheduler 定義 1 件」は 16-10 のインサイト収集 Scheduler 追加以前の記述であり、現在は 1 セットあたり画像生成 + インサイト収集 2 件が増える。廃止時の削除漏れを防ぐため、<code>cdk diff</code> の削除リソースが想定件数と一致することを deploy 前に確認する</li>
-  </ul>
-</div>
 
 <h2 id="content-mgmt">3. プロンプト・キャプション・音源・ストック管理</h2>
 <p class="lead">DB に置く設定（プロンプト・キャプションテンプレート・音源）の変え方。在庫（ストック）の作り方・投入・ビルドはセットごとの生産の詳細設計へ移してあり、ここには導線だけを置く。</p>
@@ -309,7 +300,7 @@ ffmpeg -ss 12 -i source.mp3 -t 10 \
 
 <div class="note">
   <span class="callout-title">ランキング方式（<code>ranking-prebuilt</code> / <code>pref-ranking-1</code>）の前処理は上記と 2 点違う（17-5b）</span>
-  ①<strong>尺は 30 秒ちょうど</strong>（動画と同尺。コンポジションは曲が短いとループするため、30 秒未満だと動画内でループの継ぎ目が鳴る）②<strong>フェードは焼き込まない</strong>（頭 0.5 秒 / 尻 1.5 秒のフェードはコンポジション側が掛けるため、素材にも焼くと二重に掛かる）。さらに<strong>曲数も 3〜5 曲ではなく 1 曲</strong>（世界観をそろえるためのユーザー判断。ミュート検知時の影響範囲と併せて<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6（17-5b）</a>に記録）。ラウドネスの 2 パス方式（I = -14 LUFS）と AAC 化は共通ルールどおり。手順 2〜4（切り出し・正規化・S3 キーの決定・<code>audio_assets</code> 登録 SQL の生成）は専用ツール <code>content/video-build/pref-ranking-1/prepare_bgm.py</code> がまとめて行う（証跡 3 点は <code>work/bgm/tracks.json</code> に書けば SQL に転記される）。理由の詳細は<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6</a>。
+  ①<strong>尺は 30 秒ちょうど</strong>（動画と同尺。コンポジションは曲が短いとループするため、30 秒未満だと動画内でループの継ぎ目が鳴る）②<strong>フェードは焼き込まない</strong>（頭 0.5 秒 / 尻 1.5 秒のフェードはコンポジション側が掛けるため、素材にも焼くと二重に掛かる）。さらに<strong>曲数も 3〜5 曲ではなく 1 曲</strong>（世界観をそろえるため。ミュート検知時の影響範囲は<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6（17-5b）</a>）。ラウドネスの 2 パス方式（I = -14 LUFS）と AAC 化は共通ルールどおり。手順 2〜4（切り出し・正規化・S3 キーの決定・<code>audio_assets</code> 登録 SQL の生成）は専用ツール <code>content/video-build/pref-ranking-1/prepare_bgm.py</code> がまとめて行う（証跡 3 点は <code>work/bgm/tracks.json</code> に書けば SQL に転記される）。理由の詳細は<a href="sets/pref-ranking-1.html#audio">セット別設計書セクション 6</a>。
 </div>
 
 <h4>手順 3: S3 への配置</h4>
@@ -590,12 +581,7 @@ print('ig_user_id -&gt; username=%s media_count=%s' % (a.get('username'), a.get(
 </div>
 
 <h3 id="secret-final">5.2 Secret 名規約の最終確認</h3>
-<p>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2</a>）と、構成要素の意味付け（<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>）は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a>で確定済みであり、本規約に変更はない。<code>account_code</code> は Secret 名導出専用のため<strong>作成後変更不可</strong>。変更が必要な場合は新アカウント（新しい <code>account_code</code>）として追加し、旧アカウントは <code>is_active=0</code> にする。</p>
-<div class="note">
-  <span class="callout-title">Phase 10-1 での再確認（2026-07-15 実施済み）</span>
-  本規約は Phase 0〜8（インフラ構築）を経ずに Phase 9 として前倒しで確定したものであるため、Phase 10-1（アプリ設計の最終 Fix）でインフラ実態と突き合わせて再確認した。
-  IAM ポリシー（プレフィックスベースの Secret 読み取り権限。<a href="../infra/security.html">infra/security.html セクション 2.1</a>）・Secret 運用の実態と矛盾はなく、<strong>規約は変更なしで最終確認</strong>とする。
-</div>
+<p>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code>（<a href="../infra/security.html#secret-naming">infra/security.html セクション 1.2</a>）と、構成要素の意味付け（<code>set_code</code> = <code>batch_sets.set_code</code>、<code>account_code</code> = <code>sns_accounts.account_code</code>）は<a href="design-outline.html#contract">アプリ設計大枠 セクション 5</a>で確定済みであり、本規約に変更はない <a class="decision-ref" href="#d-18">→ 理由 D-18</a>。<code>account_code</code> は Secret 名導出専用のため<strong>作成後変更不可</strong>。変更が必要な場合は新アカウント（新しい <code>account_code</code>）として追加し、旧アカウントは <code>is_active=0</code> にする。</p>
 
 <h3 id="account-add">5.3 既存セットへの SNS アカウント追加手順</h3>
 <p>新規セット追加（セクション 2.1）とは異なり、既存セットに投稿先アカウントを追加する場合（将来の多プラットフォーム展開等）の手順。</p>
@@ -670,12 +656,12 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
 
 <div>
 <p><strong>リマインドの運用（手動・全セットで 1 件）</strong> <a class="decision-ref" href="#d-08">→ 理由 D-08</a></p>
-<code>token_expires_at</code> は Secret 内の運用メモであり、アプリケーションはこの値を認証には使用しない（<a href="../infra/security.html">infra/security.html セクション 1.3</a>）。管理画面（将来拡張）がない現時点では、Secrets Manager から失効日時を横断的に一覧する仕組みも持たない。
-  そのため初期運用では、<strong>期限の 7 日前を目安に運用者自身がカレンダー等の外部ツールにリマインダーを設定する</strong>運用とする。
-  <strong>2026-07-27 以降はリマインダーを 1 件に集約する</strong>（セットごとにアプリを分けた場合はアプリごとに 1 件）。
-  <br><strong>現在の登録内容: 2026-11-16</strong>（期限 2026-11-23 の 7 日前。<code>fantasy-animals-1</code> / <code>logic-training-1</code> / <code>pref-ranking-1</code> の 3 セットをカバー。2026-08-26 の 17-5b（<code>pref-ranking-1</code> のアカウント開設に伴う再認可）で <code>data_access_expires_at</code> が 2026-11-08T10:58:20Z → <strong>2026-11-23T16:39:43Z</strong> へ延長されたことに伴う更新。既存セットのトークンを <code>debug_token</code> で実測して確認した〔<code>expires_at</code> は引き続き無期限〕）
-  <br>セット数が増えて手運用が破綻する場合は、Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等）の導入を将来検討する（課題体系 <a href="../issues/index.html#I-003">I-003</a>。再検討トリガー 3 点付きで解消クローズ済み）。
-  
+<code>token_expires_at</code> は Secret 内の運用メモで、アプリケーションは認証に使わない（<a href="../infra/security.html">infra/security.html セクション 1.3</a>）。Secrets Manager から失効日時を横断的に一覧・通知する仕組みは持たない。
+  <ul style="margin:.3rem 0 0;">
+    <li>期限の<strong>7 日前を目安</strong>に、運用者がカレンダー等の外部ツールにリマインダーを<strong>全セットで 1 件</strong>登録する（Meta アプリを分けた場合はアプリごとに 1 件）</li>
+    <li><strong>現在の登録内容: 2026-11-16</strong>（期限 <strong>2026-11-23T16:39:43Z</strong> の 7 日前。<code>fantasy-animals-1</code> / <code>logic-training-1</code> / <code>pref-ranking-1</code> の 3 セットをカバー）。期限は 2026-08-26 の 17-5b（<code>pref-ranking-1</code> のアカウント開設に伴う再認可）の後に既存セットのトークンを <code>debug_token</code> で実測した値（延長前は 2026-11-08T10:58:20Z。<code>expires_at</code> は引き続き無期限）</li>
+    <li>再認可で期限が延びたら、リマインダーの日付を新しい期限の 7 日前へ更新する</li>
+  </ul>
 </div>
 
 <h3 id="image-api-key">5.5 画像生成 API キー（実行時生成方式でだけ使う）</h3>
@@ -704,10 +690,7 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   --input '{"set_code": "logic-training-1", "scheduled_at": "&lt;現在時刻の ISO 8601 UTC&gt;", "media_lookback_days": "14"}'</code></pre>
     <code>scheduled_at</code> は冪等性キーになるため、手動実行では現在時刻など既存スナップショットと重複しない値を渡す</li>
   <li><strong>初回バックフィル（2026-08-10 ユーザー決定: やる）</strong>: <code>media_lookback_days</code> を大きくした手動実行を各セット 1 回行い、既存全投稿の現在累計値を取り込む（例: <code>"media_lookback_days": "90"</code>）。アカウント日次はテーブルが空のため通常ロジックで自動的に API 保持上限の 90 日分が入る。収集開始前から公開されている投稿の現在値を拾うのが目的。失効済みストーリーズは取得不可のため対象外（「対象不存在」の WARNING スキップとして流れる）
-    <div class="note" style="margin:.4rem 0 0;">
-      <span class="callout-title">16-11（2026-08-10）の実施結果</span>
-      当初は「2026-08-08 のフォーマット切替前後のリール比較に使う」目的も兼ねていたが、<strong>切替前の投稿がアーカイブ済みで Graph API から読めず</strong>（アーカイブ = 削除と同じ扱い。6.2 を参照）バックフィルでは取得できなかった。これを受けてユーザー決定で<strong>前後比較そのものを取りやめ、切替後の投稿のみを母集団とする水準評価へ方針変更</strong>している（16-5）。バックフィルの効果は「収集開始時点で公開中の投稿を初回スナップショットに含められる」ことに限られる。
-    </div>
+    <p style="margin:.4rem 0 0;">2026-08-08 のフォーマット切替より前の投稿はアーカイブ済みで Graph API から読めない（6.2）ため、バックフィルでは取れない。バックフィルの効果は「収集開始時点で公開中の投稿を初回スナップショットに含められる」ことに限られる。KPI は切替後の投稿だけを母集団とする水準評価で見る <a class="decision-ref" href="#d-19">→ 理由 D-19</a></p>
     <ul>
       <li><strong>1 回で終わらない場合がある</strong>（16-9 実装の注記）: バックフィルは通常ランよりコール数が桁違いに多く（アカウント日次 90 日 × 2 コール + 既存全投稿分）、200 コール/時の制限に当たって待機・失敗（終了コード 1）で終わることがある。その場合は<strong>同じ <code>scheduled_at</code> で手動実行を繰り返す</strong>: メディア指標は収集済み <code>post_id</code> を API 呼び出し前にスキップし、アカウント日次は <code>MAX(metric_date) + 1 日</code>から再開するため、実行のたびに未収集分だけが埋まって収束する</li>
     </ul>
@@ -750,10 +733,7 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
 </table>
 </div>
 
-<div class="note">
-  <span class="callout-title">2 段階 Fix の完了（16-12b・2026-09-03）</span>
-  16-7 で「JSON 全量 + 後から昇格」とした 2 段階 Fix は、16-12a（指標セット確定）と 16-12b（V011 のビュー昇格・本節の転記運用・セット計画書 KPI 欄の様式統一）で完了した。<code>follows_and_unfollows</code> が入っていない理由（100 フォロワー未満では API が返さない）と扱いは <a href="data-model.html#detail-insights">data-model.html 4.11</a> を参照。
-</div>
+<p><code>follows_and_unfollows</code> の扱い（100 フォロワー未満では API が返さない・集計遅延の取り直し）は <a href="data-model.html#detail-insights">data-model.html 4.11</a>、指標セットをビューで昇格した判断は <a href="data-model.html#d-20">data-model の D-20</a> を参照。</p>
 
 <div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
   <li>収集の処理（束ね方・窓・失敗の扱い） → <a href="batch-flow.html#flow-insights">バッチ処理フロー設計 4 章</a></li>
@@ -828,7 +808,8 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
 <h3>D-08 期限のリマインドは手動で、全セットで 1 件に集約する（自動化しない）</h3>
 <dl>
   <dt>決めたこと</dt><dd>期限の 7 日前を目安に運用者がカレンダー等へリマインダーを 1 件だけ登録する（Meta アプリを分けた場合はアプリごとに 1 件）。自動リマインドは導入しない</dd>
-  <dt>理由</dt><dd>（セット数が少ない初期スコープでは許容範囲と判断） 当初は「アカウントごとに登録」としていたが、上記のとおり <code>data_access_expires_at</code> がユーザー×アプリの組で共通であり 1 回の再認可で全セットが延長されるため、 <br><strong>15-16（2026-07-29）の要否判断で本方針を確定</strong>: 自動化は導入しない。リマインダーがセット数に比例しない構造（Meta アプリ 1 つにつき 1 件）になったため、2026-07-07 の設計課題「セット数増で手運用が破綻」の前提が崩れた。再検討トリガーは ①Meta アプリを複数に分けた場合 ②Live モード移行で 60 日失効に戻った場合 ③管理画面（将来拡張）の導入時、の 3 点。</dd>
+  <dt>理由</dt><dd>当初は「アカウントごとに登録」としていたが、<code>data_access_expires_at</code> はユーザー×アプリの組で共通で、1 回の再認可で全セットが延長されるため、2026-07-27 から 1 件に集約した。自動化は <strong>15-16（2026-07-29）の要否判断で導入しないと確定</strong>した。リマインダーがセット数に比例しない構造（Meta アプリ 1 つにつき 1 件）になり、2026-07-07 の設計課題「セット数増で手運用が破綻」の前提が崩れたうえ、セット数が少ない初期スコープでは手動で足りるため。管理画面（将来拡張）がなく、Secrets Manager から失効日時を横断的に一覧する仕組みもない現時点では、外部ツールのリマインダーで期限を追う</dd>
+  <dt>退けた案</dt><dd>Secrets Manager を横断的に読み取り <code>token_expires_at</code> が近いものを通知する仕組み（Lambda + EventBridge 等。課題体系 <a href="../issues/index.html#I-003">I-003</a>。解消クローズ済み）。再検討トリガーは ①Meta アプリを複数に分けた場合 ②Live モード移行で 60 日失効に戻った場合 ③管理画面（将来拡張）の導入時、の 3 点</dd>
   <dt>日付・出典</dt><dd>2026-07-27（1 件に集約）・2026-07-29（15-16 で自動化しないと確定）</dd>
 </dl>
 </article>
@@ -894,6 +875,31 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
   <dt>決めたこと</dt><dd>前月分の KPI 転記は月初 4 日以降に行う</dd>
   <dt>理由</dt><dd>月末の投稿が 72 時間水準（<a href="data-model.html#detail-insights">データモデル設計 4.11</a>）に達するのを待つため</dd>
   <dt>日付・出典</dt><dd>2026-09-03（16-12b）</dd>
+</dl>
+</article>
+<article id="d-17">
+<h3>D-17 セット廃止ではインサイトの打ち切りを選べるようにし、Scheduler の削除件数を cdk diff で確かめる</h3>
+<dl>
+  <dt>決めたこと</dt><dd>2.2 の手順 1 の UPDATE は最終投稿分の 14 日データが要るときだけ 14 日遅らせてよい。手順 2 では deploy の前に <code>cdk diff</code> の削除リソースの件数を確かめる</dd>
+  <dt>理由</dt><dd>2026-09-03 の初回実地（Phase 20-1 で fantasy-animals-1 を停止）は手順どおりで完了したが、2 点が分かった。①インサイト収集も <code>is_active=0</code> のセットをスキップするため、UPDATE の時点で 14 日の追跡が打ち切られる（20-1 では打ち切りを許容した）。②2.1 の「セット追加で増えるのは Scheduler 定義 1 件」は 16-10 のインサイト収集 Scheduler 追加以前の記述で、実際は 1 セットあたり画像生成 + インサイト収集 2 件が 2 スタックにまたがる。削除漏れを防ぐため件数の確認を手順に入れた（2.1 の記述はその後に訂正済み）</dd>
+  <dt>日付・出典</dt><dd>2026-09-03（Phase 20-1）</dd>
+</dl>
+</article>
+<article id="d-18">
+<h3>D-18 Secret 名規約は Phase 10-1 で変更なしと最終確認した</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Secret 名規約 <code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code> を変更なしで確定する</dd>
+  <dt>理由</dt><dd>本規約は Phase 0〜8（インフラ構築）を経ずに Phase 9 として前倒しで確定したものであるため、Phase 10-1（アプリ設計の最終 Fix）でインフラ実態と突き合わせて再確認した。IAM ポリシー（プレフィックスベースの Secret 読み取り権限。<a href="../infra/security.html">infra/security.html セクション 2.1</a>）・Secret 運用の実態と矛盾はなかった</dd>
+  <dt>日付・出典</dt><dd>2026-07-15（Phase 10-1）</dd>
+</dl>
+</article>
+<article id="d-19">
+<h3>D-19 フォーマット切替の前後比較をやめ、切替後の投稿の水準評価にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>KPI は切替後の投稿だけを母集団とする水準評価で見る。初回バックフィルは収集開始時点で公開中の投稿を拾う目的だけで行う</dd>
+  <dt>理由</dt><dd>初回バックフィルは当初「2026-08-08 のフォーマット切替前後のリール比較に使う」目的も兼ねていたが、16-11 の実施で<strong>切替前の投稿がアーカイブ済みで Graph API から読めず</strong>（アーカイブ = 削除と同じ扱い。6.2）取得できなかった。これを受けてユーザー決定で前後比較そのものを取りやめた（16-5）</dd>
+  <dt>退けた案</dt><dd>切替前後のリール比較</dd>
+  <dt>日付・出典</dt><dd>2026-08-10（Phase 16-11・16-5）</dd>
 </dl>
 </article>
 </section>

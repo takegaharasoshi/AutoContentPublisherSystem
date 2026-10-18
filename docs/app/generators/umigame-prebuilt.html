@@ -141,7 +141,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
   <li id="rebuild">8.4 再ビルドが必要になる変更 → <a href="../../production/umigame-soup-1.html#rebuild">5 章</a></li>
 </ul>
 
-<h2>9. 依存ライブラリ・実行環境</h2>
+<h2 id="runtime">9. 依存ライブラリ・実行環境</h2>
 <div class="table-wrap">
 <table>
   <thead><tr><th>依存</th><th>版 / 実行形態</th><th>備考</th></tr></thead>
@@ -163,7 +163,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
 <h3>D-01 実装で設計より厳しくした 2 点（parameters のキー・BGM の NULL）</h3>
 <dl>
   <dt>決めたこと</dt><dd><code>parameters</code> は <code>duration_seconds</code> の 1 キーだけを許し、ストック行の <code>video_audio_asset_id</code> が NULL の行も異常終了にする</dd>
-  <dt>理由</dt><dd>（単一スロットの宣言を設定ミスから守るため） （ビルド済みの行は BGM を焼き込んでいるので、NULL は publish 手順の不備）</dd>
+  <dt>理由</dt><dd><code>parameters</code> を 1 キーに絞り、<code>slots</code> など他のキーがあれば不正として異常終了するのは、単一スロットの宣言を設定ミスから守るため。<code>video_audio_asset_id</code> が NULL の行を異常終了にするのは、ビルド済みの行は BGM を焼き込んでいるので、NULL は publish 手順の不備にあたるため</dd>
   <dt>日付・出典</dt><dd>2026-09-26（21-5b）</dd>
 </dl>
 </article>
@@ -171,7 +171,7 @@ LIMIT 1 FOR UPDATE;</code></pre>
 <h3>D-02 単尺・単一スロットにし、尺の複数化は想定しない</h3>
 <dl>
   <dt>決めたこと</dt><dd>本方式は 1 尺だけを持ち、<code>slots</code> を持たない（2026-10-17 の R-1 で 24 秒 → 29 秒に変え、ループ前提をやめた）</dd>
-  <dt>理由</dt><dd>ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。理由: ① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低い。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<strong>2026-10-17 追記（R-1）</strong>: 単尺のまま 24 秒 → 29 秒へ変え、ループ前提（②の周期の制約）をやめた（8.2 の決定）。画像バッチ側は課題 <a href="../../issues/index.html#I-041">I-041</a> を <a href="../../plans/development-log.html#phase-29">Phase 29</a> で合わせる（下の決定）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。</dd>
+  <dt>理由</dt><dd>ranking-prebuilt の 2 尺（スロット別の固定値）と違い、本方式は 24 秒の 1 尺だけを持つ。1 尺にしたのは、① 21-2 の人間ゲートで「24 秒・ループ前提」をフォーマットの基準として承認済み ② 尺は問題文 + ルールのナレーション予算（8.3）とビート（8.2）から決まり、尺を変えると版面の不変条件（周期は 720 の約数）ごと作り直しになる ③ 参加型の効果はコメント欄で出るため尺比較の検証価値が低いため。将来尺を変える場合は <code>parameters.duration_seconds</code> と <code>timeline.ts</code> の定数を同時に変え、全数再ビルドする（8.4）。<strong>2026-10-17 追記（R-1）</strong>: 単尺のまま 24 秒 → 29 秒へ変え、ループ前提（②の周期の制約）をやめた（8.2 の決定）。画像バッチ側は課題 <a href="../../issues/index.html#I-041">I-041</a> を <a href="../../plans/development-log.html#phase-29">Phase 29</a> で合わせる（下の決定）。<code>slots</code> を持たないため、<code>SCHEDULED_AT</code> による決定的解決のロジックは本方式に含めない。</dd>
   <dt>日付・出典</dt><dd>2026-09-04（21-3）・2026-10-17 追記（R-1）</dd>
 </dl>
 </article>

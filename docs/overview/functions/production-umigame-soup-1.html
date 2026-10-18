@@ -20,22 +20,22 @@
 <section class="page-summary" id="summary">
 <h2>要約</h2>
 <p class="lead">umigame-soup-1 は、探偵カメロックが出すウミガメのスープ（不思議な状況から真相を推理する問題）のリールを週 4 回投稿し、視聴者のコメントに<a href="comment-reply.html">コメント自動返信</a>が答える参加型のセットである。生産では、問題をオリジナルで作問し、動画の素材に加えて、コメントを判定するための材料（判定の基準・核心語）まで作る。そのため、ほかのセットにはない「判定の試行（プローブ）」の工程と関所がある。</p>
-<p class="lead">図 1 はこのセットの工程を、補充スキルのゴール（G1a〜G5）の単位で表す。共通との違いは、判定の試行が入ることと、動画のビルドを DB への投入より前に行い、投入と配置を最後にまとめて行うこと。</p>
+<p class="lead">図 1 はこのセットの工程の名前と関所の並びを表す。工程の細部（ゴールの区切り・候補の数など）は補充スキルの <a href="../../../.agents/skills/umigame-stock-replenish/SKILL.md">SKILL.md</a> が正。共通との違いは、判定の試行が入ることと、動画のビルドを DB への投入より前に行い、投入と配置を最後にまとめて行うこと。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
-    G1a["G1a 候補（コア宣言）&lt;br&gt;型ごとに目標の 2 倍"] --> H1{"選別&lt;br&gt;OK / NG / 保留"}
-    H1 -->|OK| G1b["G1b 素材の仕上げ&lt;br&gt;作問スキルで 1 問ずつ"]
+    G1a["候補（コア宣言）&lt;br&gt;型ごと"] --> H1{"選別&lt;br&gt;OK / NG / 保留"}
+    H1 -->|OK| G1b["素材の仕上げ&lt;br&gt;作問スキルで 1 問ずつ"]
     G1b --> H2{"素材のまとめレビュー"}
-    H2 -->|OK| G2["G2 試行用コメントの準備"]
+    H2 -->|OK| G2["試行用コメントの準備"]
     G2 --> H3{"コメントのレビュー"}
-    H3 --> G3["G3 機械プローブ&lt;br&gt;本番と同じ判定に通す"]
+    H3 --> G3["機械プローブ&lt;br&gt;本番と同じ判定に通す"]
     G3 --> H4{"結果の確認・人のプローブ&lt;br&gt;GO"}
-    H4 -->|GO| G4["G4 背景の生成 → 動画ビルド&lt;br&gt;（Irodori-TTS）"]
+    H4 -->|GO| G4["背景の生成 → 動画ビルド&lt;br&gt;（Irodori-TTS）"]
     G4 --> H5{"動画の全数レビュー"}
-    H5 -->|承認| G5["G5 本番へ一括アップロード&lt;br&gt;投入 + 配置 + 記録"]
+    H5 -->|承認| G5["本番へ一括アップロード&lt;br&gt;投入 + 配置 + 記録"]
 </pre>
-<figcaption>図 1 umigame-soup-1 の生産の工程（ゴール単位）</figcaption>
+<figcaption>図 1 umigame-soup-1 の生産の工程と関所</figcaption>
 </figure>
 <div class="table-wrap">
 <table>
@@ -59,7 +59,7 @@ flowchart TB
   <tbody>
     <tr><td>作り方</td><td>型を宣言 → ランダムに引いた語（モチーフ）から連想 → 型ごとの工程でコア（真相の核）を宣言（物語復元型は、先に完結した物語を書いて面白さの関門を通し、どこを隠すかを決める。意味誤誘導型は、言い方を変えて誤解を生む）→ 不思議にする → 動線・現実性・既存問題との照合で自己検査 → 素材化</td></tr>
     <tr><td>型</td><td>物語復元型（story）と意味誤誘導型（misdirection）。1 バッチの中で同数</td></tr>
-    <tr><td>候補の置き場</td><td><code>content/umigame-stock/umigame-soup-1/candidates/&lt;バッチ&gt;/</code>（第 2 バッチで新設する）</td></tr>
+    <tr><td>候補の置き場</td><td><code>content/umigame-stock/umigame-soup-1/candidates/&lt;バッチ&gt;/</code>（2026-10-19 時点で未作成。最初に候補を準備するときに logic-training-1 の <code>candidates/</code> を雛形に作る。手順は <a href="../../../.agents/skills/umigame-stock-replenish/SKILL.md">SKILL.md</a>）</td></tr>
     <tr><td>素材の置き場</td><td><code>content/umigame-stock/umigame-soup-1/batch-NN/stock_items.py</code></td></tr>
     <tr><td>機械検証と試行</td><td><code>validate.py</code>・<code>generate.py</code>、判定の試行は <code>probe_run.py</code>（本番と同じ判定と返信文の経路）・<code>build_probe_page.py</code>・<code>local_trial.py</code>（人のプローブ）</td></tr>
   </tbody>

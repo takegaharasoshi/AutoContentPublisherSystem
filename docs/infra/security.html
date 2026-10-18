@@ -51,6 +51,7 @@ flowchart TB
     sfn -->|"RunTask・PassRole"| task
     sfn -->|"PassRole"| exe
     cicd -->|"新リビジョン登録・PassRole"| task
+    cicd -->|"PassRole"| exe
     task -->|"読む（全バッチ）"| dbs
     task -->|"読む（画像生成）"| img
     task -->|"読む（SNS 投稿・インサイト収集）"| sns

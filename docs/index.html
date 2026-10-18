@@ -101,7 +101,8 @@ flowchart TB
 │   ├── data-model.html            #   データモデル設計
 │   ├── operation.html             #   アプリ運用設計
 │   ├── generators/                #   生成方式別設計書（1 方式 1 本。本採用時に作成）
-│   └── sets/                      #   セット別設計書（1 セット 1 本。セット追加時に作成）
+│   └── sets/                      #   セット別設計書（1 セット 1 本。セット追加時に作成。umigame-soup-1 はコメント自動返信の分冊
+│                                  #   umigame-soup-1-comment-reply.html〔30-8b〕と調査・試験の記録ページ〔書式移行の対象外〕を持つ）
 ├── _archive/                      # 旧 Markdown 設計書（参考資料。現役の設計書ではない）
 ├── ideas/                         # アイデア体系（意思決定前のアイデアの捕捉・壁打ち。運用ルールの正は ideas/index.html）
 │   ├── index.html                 #   ダッシュボード（今動ける / 条件待ち / クローズ）+ 運用ルール
@@ -109,11 +110,12 @@ flowchart TB
 ├── issues/                        # 課題体系（両レーンの課題をトリガー付きで追う。運用ルールの正は issues/index.html。Phase 22-1 新設）
 │   ├── index.html                 #   ダッシュボード（レーン別 live / クローズ）+ 運用ルール。表が唯一の正
 │   ├── _template.md               #   壁打ちファイルの雛形
-│   └── &lt;slug&gt;.md                  #   壁打ちを始めた課題だけが持つ記録（起票時には作らない）
+│   └── &lt;slug&gt;.md / .html          #   壁打ちを始めた課題だけが持つ記録（起票時には作らない。深化したら詳細 HTML）
 └── plans/                         # 計画体系（Phase 18 で 2 レーン化。運用ルールの正は plans/index.html）
     ├── index.html                 #   計画体系の目次・レーン振り分け・並行作業ルール
     ├── development-plan.html      #   開発レーン計画（フェーズもの・確認待ちリスト。設計課題リストは Phase 22-2 で issues/ へ移設）
     ├── development-log.html       #   開発レーン記録（完了ステップの実施記録）
+    ├── _templates/step.html       #   ステップの雛形（新様式。構造検査の対象）
     └── &lt;set_code&gt;(-log).html      #   セット別計画・記録（4 セット × 2 ファイル）</code></pre>
 
 <h3>計画体系（docs/plans/）</h3>
@@ -153,6 +155,10 @@ flowchart TB
   <div class="card">
     <div class="card-title"><a href="overview/system-overview.html">system-overview.html</a></div>
     <p>基本設計。生産面 / 配信面の 2 面の構成、配信面の 4 系統、生産面の工程と関所、2 面の受け渡しの契約、データの流れ、構成要素の一覧、主な判断。まずここから読む（30-3 で旧システム概要を作り直し）。</p>
+  </div>
+  <div class="card">
+    <div class="card-title">functions/（機能別の基本設計）</div>
+    <p>配信面 4 = <a href="overview/functions/post.html">投稿</a>・<a href="overview/functions/insights.html">インサイト収集</a>・<a href="overview/functions/comment-reply.html">コメント自動返信</a>・<a href="overview/functions/token-refresh.html">トークン更新</a>、生産 = <a href="overview/functions/production.html">生産ライン（共通）</a> + セット別 3。章末の「さらに詳しく」から詳細設計へ下りる（30-3b・30-3c）。</p>
   </div>
 </div>
 
@@ -216,7 +222,7 @@ flowchart TB
   </div>
   <div class="card">
     <div class="card-title"><a href="app/index.html#set-docs">generators/ ・ sets/</a></div>
-    <p>生成方式別設計書（1 方式 1 本。一覧は <a href="app/batch-flow.html#generator-catalog">方式カタログ</a>）とセット別設計書（1 セット 1 本。一覧は <a href="app/index.html#set-docs">app/index.html</a>）。</p>
+    <p>生成方式別設計書（1 方式 1 本。一覧は <a href="app/batch-flow.html#generator-catalog">方式カタログ</a>）とセット別設計書（1 セット 1 本。一覧は <a href="app/index.html#set-docs">app/index.html</a>。コメント自動返信はセット別設計書の分冊 <a href="app/sets/umigame-soup-1-comment-reply.html">umigame-soup-1-comment-reply.html</a>）。</p>
   </div>
 </div>
 

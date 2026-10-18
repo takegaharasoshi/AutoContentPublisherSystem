@@ -367,7 +367,7 @@ flowchart TB
   <li><strong>段 0 の位置づけ</strong>: 禁止ワード DB ではなく<strong>文字種だけを見る最小の規則</strong>で、語の一覧でモデレーションしない方針（<a href="#reply-behavior">7.3</a>）には当たらない。1 語だけの英字の羅列は荒らしのことがあるので段 A1 に任せる</li>
   <li><strong>段の意図</strong>: A1 で語だけを大分類「質問・推理」に限るのは、一語の感想・挨拶を ③ にしないため。段 D の安全側は、P3 の取り違えを P4 の揺れへ逃がすため</li>
   <li><strong>段 B2 の役割</strong>: 2 の「コアは合っているが明らかな誤りを含む推理 → ⑤」を確かめる。段 B は要点ごとに「同じ内容を述べているか」しか聞かないため、誤りを含む推理でも要点の確率が高く出る。呼び出しを増やすのは ④ の候補のときだけ（パターン 1 はプロンプトの文章でこの条件を判定している。追加の経緯は<a class="decision-ref" href="#d-14">→ 理由 D-14</a>）</li>
-  <li><strong>段 B に真相を渡す理由</strong>（21-6d16）: 2 の「誤りでない部分だけで数える」を段 B で効かせるには、どこが誤りかを判断する材料が要る。21-6d15 までは <code>state</code> がコメントだけで、確定事実と食い違う推理でも言葉が <code>touch</code> に似ていれば触れたになっていた（U21-k06 など）。呼び出し回数は変わらない</li>
+  <li><strong>段 B の入力</strong>: 段 B には問題文・真相・確定事実を渡す（21-6d16。呼び出し回数は変わらない） <a class="decision-ref" href="#d-39">→ 理由 D-39</a></li>
   <li><strong>失敗</strong>: 429・5xx は指数バックオフで 3 回再試行し、それでも失敗したら例外にする（扱いは <a href="#judge-policy">3.5</a>）</li>
   <li><strong>閾値</strong>は 21-6d3 の全件プローブで掃引し、すべて据え置いた（<a class="decision-ref" href="#d-13">→ 理由 D-13</a>）。21-6e で <code>T_POINT</code> を 0.5 → 0.6、<code>T_CLOSE</code> を 0.25 → 0.40 に変えた（21-6d11 の掃引から。理由は <a href="#judge-policy">3.5</a> の決定。<code>T_CLOSE</code> は段 A1b の推理扱いの条件にも効くため、推理扱いになるコメントが減る。L1 の種別一致は 21-6e3 で確かめる）。<code>T_CONTRADICT</code> は 21-6d3c で、Jev が ④ とした 39 件の掃引から決めた（<a class="decision-ref" href="#d-14">→ 理由 D-14</a>）。各段・閾値を決めた試行の経緯は<a href="umigame-soup-1-judge-study.html#p2">検討ページ 6</a></li>
 </ul>
@@ -389,48 +389,7 @@ flowchart TB
 </ul>
 
 <h3 id="pattern3-decisions">3.6 パターン 3（OpenAI Decisions API の段階判定。評価用・設計 21-6d10a〔2026-10-08〕）</h3>
-<p>パターン 3 は<strong>不採用</strong>（実装は 21-6e2 で削除済み）。以下は設計時の記録 <a class="decision-ref" href="#d-22">→ 理由 D-22</a></p>
-<p class="lead">パターン 2 の段の流れ（図 3）・各段の入力・リクエストの分け方をそのまま OpenAI の Decisions API（<code>POST https://api.openai.com/v1/decisions</code>・<code>model: gpt-6-luna</code>）に載せ替える。Jev の <code>noul</code> は <code>predicate</code>、<code>choice</code> は <code>choice</code> に対応し、<strong>変えるのは API の呼び方だけ</strong>にする（判定エンジン以外の差を入れず、⑤ と ⑥ の差をモデルの差として読めるようにする）。評価パターン ⑥（判定 = Decisions・返信文 = <code>2c-luna</code>。⑤ jev + 2c-luna と同じ形）としてだけ使い、本番の 3 モードと既定の <code>hybrid</code> は変えない（採否は 21-6e）。実装は 21-6d10b（<code>app/judge/decisions.py</code>）。</p>
-
-<div class="warn"><span class="callout-title">独立性がない</span>Decisions API の中身は、パターン 1 と同じ <strong>GPT-6 Luna</strong> である。<code>hybrid</code> の見張り役・正解開示前の二重確認（3.5）は「luna とは別のモデルの意見」であることが前提で、Decisions を Jev の代わりに置くと、luna の読み違い・劣化と誤りが連動しやすく、誤った開示を止められないおそれがある。見張り役・二重確認に使えるかは、21-6d11 の全件プローブで <strong>luna と Decisions の誤りがどれだけ同じケースに重なるか</strong>（Jev と luna の重なりとの比較）を見て評価する。経緯は<a href="../../ideas/umigame-reply-openai-decisions.md">アイデア記録</a>。</div>
-
-<div class="table-wrap">
-<table>
-<tr><th>項目</th><th>公開ドキュメントの記載（2026-10-08 確認）</th><th>設計での扱い</th></tr>
-<tr><td>提供状況</td><td>パブリックベータ（2026-10-06）。GA は「数週間以内」の見込み。モデルは <code>gpt-6-luna</code> だけ</td><td>SLA・スキーマの変更があり得る前提で評価用に留める。日付付きのモデル ID はなく固定できない（3.5「そのほかの守り」を満たせない点は 21-6e の判断材料）</td></tr>
-<tr><td>確率</td><td><code>predicate</code> は <code>probability</code>（0〜1）、<code>choice</code> は選択肢ごとの <code>probabilities</code>（和は約 1）+ <code>choice</code> + <code>confidence</code></td><td>閾値の判定には <code>probabilities</code> だけを使い、<code>confidence</code> は記録にだけ残す</td></tr>
-<tr><td>1 リクエストの問い</td><td><code>questions</code> に独立した問いを複数入れられる（入力は共通）。前の答えに依存する問いは別リクエストにする。問いの数・選択肢の数・文字数の上限はリファレンスに記載なし（各文字列の <code>maxLength</code> は 1,048,576）</td><td>リクエストの分け方は Jev と同じにする（まとめるのは Jev も 1 回で聞いている段 A1 の 2 問だけ）。必要な選択肢は最大 7 個（反応 ⑩〜⑯）。疎通確認で 2 問の同梱と選択肢 9 個が通ることを確かめた</td></tr>
-<tr><td>拒否</td><td>問いごとに <code>type: refusal</code> が返りうる（ほかの問いは答えが返る）</td><td>拒否は判定の失敗として扱う（下記「失敗」）。件数を記録して 21-6d11 で数える</td></tr>
-<tr><td>言語</td><td>対応言語の記載なし</td><td>Jev と同じく指示文は英語・コメントと問題は日本語のまま <code>input</code> に入れる（<code>jev.py</code> の指示文を流用）。疎通確認で、日本語の指示・入力でも確率が返ることを確かめた</td></tr>
-<tr><td>応答時間</td><td>「Responses API の約 10 倍速い」とだけあり、数値の記載なし</td><td>疎通確認では 1 リクエスト 0.21〜0.27 秒（日本からのネットワーク込み・入力 230〜350 トークン）。1 コメントの処理時間は 21-6d10b の小試走で実測する（Jev は中央値 0.82 秒・平均 4.1 回の呼び出し。21-6d3c の全件プローブ）</td></tr>
-<tr><td>料金</td><td>入力 <strong>100 万トークンあたり $0.10</strong>。出力・キャッシュの読み書きは課金しない。リージョン処理の割増（+10%）と長文脈（27.2 万トークン超）の倍率がある</td><td>割増・倍率はどちらも使わない（グローバル処理・短い入力）。見積もりは 21-6d10a の作業記録</td></tr>
-<tr><td>データの扱い</td><td><code>/v1/decisions</code> は学習に使わない・不正利用監視ログは 30 日保持・ZDR 対象（適格な顧客）。chat completions と同じ扱い</td><td>luna と同じ OpenAI の契約・キー（<code>OPENAI_API_KEY</code>）で足り、契約先は増えない</td></tr>
-</table>
-</div>
-
-<div class="table-wrap">
-<table>
-<tr><th>段</th><th>問い（Jev → Decisions の型）</th><th>入力（Jev の <code>state</code> と同じ中身）</th><th>呼ぶ条件</th></tr>
-<tr><td>段 0</td><td>文字種の規則（API を呼ばない）</td><td>—</td><td>常に先に通す</td></tr>
-<tr><td>A1</td><td>大分類（<code>choice</code> 5 択）+ 語だけか（<code>noul</code> → <code>predicate</code>）を 1 リクエスト</td><td>段 A の文脈・コメント</td><td>段 0 で決まらないとき</td></tr>
-<tr><td>A1b</td><td>質問か推理か（<code>choice</code> 2 択）</td><td>問題文・コメント</td><td>大分類が質問・推理のとき。推理の条件に使う段 B はここで先に呼ぶ</td></tr>
-<tr><td>B</td><td>要点ごとの当てた / 触れた / 触れていない（<code>choice</code> 3 択 × 要点数を 1 リクエスト）</td><td>コメント</td><td>A1b か ①・推理の判定で初めて要るとき 1 回だけ（結果は使い回す）</td></tr>
-<tr><td>A2</td><td>細分類（<code>choice</code>。質問 3・依頼 3・反応 7・不適切 4 択）</td><td>段 A の文脈・コメント</td><td>推理でも「その他」でもないとき</td></tr>
-<tr><td>A3</td><td>確かめ直し（<code>noul</code> → <code>predicate</code>）</td><td>問題文・コメント</td><td>③、または指示語を含む ① のとき</td></tr>
-<tr><td>B2</td><td>矛盾チェック（<code>noul</code> → <code>predicate</code>）</td><td>Jev と同じ <code>contradiction_state</code>（問題文・真相・確定事実・誤りの例・コメント）</td><td>④ の候補のとき</td></tr>
-<tr><td>C</td><td>質問の品質（<code>noul</code> → <code>predicate</code>）</td><td>コメント・問題文</td><td>① で ④ でないとき</td></tr>
-<tr><td>D</td><td>答え（<code>choice</code> 3 択）</td><td>問題文・真相・確定事実・コメント</td><td>段 C が <code>T_QUALITY</code> 以上のとき</td></tr>
-</table>
-</div>
-<ul>
-  <li><strong>変えるのは呼び方だけ</strong>: 指示文・選択肢の説明・各段の入力・分岐・確率の計算（当てたの確率 = P(当てた)、触れたの確率 = P(当てた) + P(触れた)）・呼び出し回数（0〜7 回）はパターン 2 と同じにする。変換は機械的に行う: Jev の <code>state</code>（辞書）は同じキー・値の JSON 文字列（<code>ensure_ascii=False</code>）を <code>input</code> に入れ、<code>questions</code> の辞書は名前を <code>name</code> にした配列に、<code>criteria</code> の辞書は <code>choices</code> の <code>{value, description}</code> 配列にする。<code>noul</code> の <code>criteria</code>（true / false の基準）は <code>predicate</code> に欄がないので、指示文の末尾に <code>True: …</code> / <code>False: …</code> の 2 行として付ける（21-6d10b で追加。下の決定）。指示文は <code>jev.py</code> と共有し、二重に持たない</li>
-  <li><strong>まとめない理由</strong>: Decisions は入力にしか課金しないので、入力が同じ段を 1 回にまとめれば安く速くなる。しかし入力やリクエストの分け方を変えると、⑤ との差がモデルによるものか組み方によるものか切り分けられなくなる。評価の費用は小さい（21-6d10a の見積もりで約 $0.45）ので、そろえるほうを取る。まとめる最適化は、21-6e で ⑥ が本番の候補に残ったときに応答時間を測ってから検討する</li>
-  <li><strong>閾値</strong>: 初期値はパターン 2 の 8 つ（<code>T_BARE_TERM</code>〜<code>T_ANSWER</code>）と同じ値を Decisions 専用の設定として別に持つ（確率の出方が Jev と違うため共有しない）。21-6d11 で段 B を中心に掃引する。コミュニティでは <code>choice</code> の確率の較正に癖があるとの報告がある（公式の記載ではない）ので、掃引の結果を見て決める</li>
-  <li><strong>失敗</strong>: 429・5xx は指数バックオフで 3 回再試行する。再試行後も失敗した場合と、必要な問いに <code>refusal</code> が返った場合は例外にする。評価用の <code>decisions</code> モードは <code>jev</code> モードと同じく、同じコメントを luna で判定し直す（記録の <code>decision</code> は <code>decisions_fallback_luna</code>）</li>
-  <li><strong>記録</strong>: <code>debug</code> に段ごとの確率・<code>confidence</code>・拒否の有無・リクエスト数・<code>usage.input_tokens</code>・応答時間を残す（パターン 2 と同じ形 + <code>confidence</code>・<code>refusals</code>）</li>
-  <li><strong>プローブ</strong>: 判定キャッシュの方式名は <code>decisions</code>、パターン名は <code>dec-2c</code>（評価ページの ⑥）。既存の 5 パターンのキャッシュ・結果は変えない</li>
-</ul>
-<p>実装（21-6d10b・削除済み）は段の流れを Jev と共有し、送り方・閾値・方式名だけを差し込む形だった <a class="decision-ref" href="#d-23">→ 理由 D-23</a></p>
+<p>パターン 3 は<strong>不採用</strong>（実装 <code>app/judge/decisions.py</code> は 21-6e2 で削除済み）。段の流れ（図 3）・各段の入力・リクエストの分け方はパターン 2 と同じで、判定の API を OpenAI の Decisions API（<code>POST https://api.openai.com/v1/decisions</code>・<code>model: gpt-6-luna</code>）に替えたもの。評価パターン ⑥（判定 = Decisions・返信文 = <code>2c-luna</code>）としてだけ使った <a class="decision-ref" href="#d-22">→ 理由 D-22</a> <a class="decision-ref" href="#d-23">→ 理由 D-23</a></p>
 
 <h3 id="pattern-haiku">3.7 パターン 4（Claude Haiku 5.5 の一括判定と書き手。本番の既定。設計 21-6d12a〔2026-10-08〕・21-6e で既定に）</h3>
 <p>書き手 <code>1d-haiku</code> は<strong>使わない</strong> <a class="decision-ref" href="#d-24">→ 理由 D-24</a></p>
@@ -822,7 +781,7 @@ flowchart TB
 </table>
 </div>
 <ul>
-  <li><strong>既定を <code>1b-haiku</code> にした理由</strong>（21-6e）: 判定と同じ Haiku で返信が速く、21-6d17 の全件プローブで ⑦ が最多の合格数だった。真相を渡す書き手の漏れは核心語の出力ガード（下）と P1 の人の確認で抑える。21-6e までの既定は <code>1d-luna</code>（真相を渡さないので構造的に漏れにくく、費用も低い）</li>
+  <li><strong>既定</strong>: <code>1b-haiku</code>（21-6e までの既定は <code>1d-luna</code>） <a class="decision-ref" href="#d-20">→ 理由 D-20</a></li>
   <li><strong>書き手の呼び出し</strong>: system = 書き手のプロンプトに判定（種別・答え・語）・① の形・<code>reply_style.txt</code>・問題を埋めたもの、user = コメント本文。出力は JSON スキーマ（strict）の <code>{reply}</code>。429・5xx は指数バックオフで 5 回再試行</li>
 </ul>
 
@@ -1648,6 +1607,7 @@ q_yesno の今回の形: {slot}（q_yesno 以外では無視する）
   <li><strong>effort</strong>: Haiku（<code>HAIKU_EFFORT</code>・既定 <code>high</code>。21-8e で <code>max</code>）と luna（<code>LUNA_EFFORT</code> を新設・既定 <code>xhigh</code> = 今の固定値）をいつでも設定で変えられるようにする。</li>
   <li><strong>正解宣言の合意</strong>: 必須にしない。⑦ 単独で P2 0 件で、合意を待つと遅くなり正解者の取りこぼし（P5）も増える。</li>
   <li><strong>Jev の閾値</strong>（21-6d11 の掃引から）: <code>T_POINT</code> 0.5 → <strong>0.6</strong>（誤った正解宣言 2 → 1 件・P5 89.3% → 82.1%。P5 80% 以上を保つ範囲で誤宣言が最少）、<code>T_CLOSE</code> 0.25 → <strong>0.40</strong>（21-6e3 の全件プローブで確かめる）、<code>T_CONTRADICT</code> 0.5 のまま。<strong>Jev 単独では P2 0 件と P5 80% 以上を両立する <code>T_POINT</code> がない</strong>（0 件は 0.9 で P5 48.2%）ため、Jev をメインにするのは Haiku・luna が使えないときの非常手段とする。</li>
+  <li><strong>返信文の既定を <code>1b-haiku</code> にした理由</strong>（21-6e）: 判定と同じ Haiku で返信が速く、21-6d17 の全件プローブで ⑦ が最多の合格数だった。真相を渡す書き手の漏れは核心語の出力ガード（<a href="#leak-guard">4 章</a>）と P1 の人の確認で抑える。21-6e までの既定は <code>1d-luna</code>（真相を渡さないので構造的に漏れにくく、費用も低い）</li>
 </ul>
 NG の事例は <a href="#probe-6e">6 の人間プローブ</a>、経緯は計画書 21-6e。</dd>
   <dt>日付・出典</dt><dd>2026-10-11・21-6e・ユーザー。実装は 21-6e2。effort の既定は 21-8e で <code>max</code> へ変更</dd>
@@ -1665,7 +1625,47 @@ NG の事例は <a href="#probe-6e">6 の人間プローブ</a>、経緯は計�
 <h3>D-22 パターン 3（Decisions）は使わない</h3>
 <dl>
   <dt>決めたこと</dt><dd>パターン 3（Decisions）は不採用にし、評価ページから外す。実装 <code>app/judge/decisions.py</code> は 21-6e2 で削除</dd>
-  <dt>理由</dt><dd>パターン 3（Decisions）は使わない。21-6d11・21-6d13 の全件プローブで、P3（はい / いいえの取り違え）が 13 件と突出し（Jev 4・luna 2）、正解「いいえ」や「関係ない」の質問を「はい」と答える偏りが強かった。L1 の種別一致も 85.7% で最下位だった。中身が luna と同じで見張り役として独立しない弱点（下の「独立性がない」）とあわせて不採用にし、評価ページから外した（<a href="#probe-6d13">6</a>）。プローブ結果は記録として残す。実装（<code>app/judge/decisions.py</code>）は 21-6e2（2026-10-11）で削除した（git 履歴に残る。過去のプローブ結果は評価ツールで引き続き読める）。以下は設計時の記録。</dd>
+  <dt>理由</dt><dd><p>パターン 3（Decisions）は使わない。21-6d11・21-6d13 の全件プローブで、P3（はい / いいえの取り違え）が 13 件と突出し（Jev 4・luna 2）、正解「いいえ」や「関係ない」の質問を「はい」と答える偏りが強かった。L1 の種別一致も 85.7% で最下位だった。中身が luna と同じで見張り役として独立しない弱点（下の「独立性がない」）とあわせて不採用にし、評価ページから外した（<a href="#probe-6d13">6</a>）。プローブ結果は記録として残す。実装（<code>app/judge/decisions.py</code>）は 21-6e2（2026-10-11）で削除した（git 履歴に残る。過去のプローブ結果は評価ツールで引き続き読める）。以下は設計時の記録（21-6d10a）。</p>
+<p>パターン 2 の段の流れ（図 3）・各段の入力・リクエストの分け方をそのまま OpenAI の Decisions API（<code>POST https://api.openai.com/v1/decisions</code>・<code>model: gpt-6-luna</code>）に載せ替える。Jev の <code>noul</code> は <code>predicate</code>、<code>choice</code> は <code>choice</code> に対応し、<strong>変えるのは API の呼び方だけ</strong>にする（判定エンジン以外の差を入れず、⑤ と ⑥ の差をモデルの差として読めるようにする）。評価パターン ⑥（判定 = Decisions・返信文 = <code>2c-luna</code>。⑤ jev + 2c-luna と同じ形）としてだけ使い、本番の 3 モードと既定の <code>hybrid</code> は変えない（採否は 21-6e）。実装は 21-6d10b（<code>app/judge/decisions.py</code>）。</p>
+<p><strong>独立性がない</strong>: Decisions API の中身は、パターン 1 と同じ <strong>GPT-6 Luna</strong> である。<code>hybrid</code> の見張り役・正解開示前の二重確認（3.5）は「luna とは別のモデルの意見」であることが前提で、Decisions を Jev の代わりに置くと、luna の読み違い・劣化と誤りが連動しやすく、誤った開示を止められないおそれがある。見張り役・二重確認に使えるかは、21-6d11 の全件プローブで <strong>luna と Decisions の誤りがどれだけ同じケースに重なるか</strong>（Jev と luna の重なりとの比較）を見て評価する。経緯は<a href="../../ideas/umigame-reply-openai-decisions.md">アイデア記録</a>。</p>
+
+<div class="table-wrap">
+<table>
+<tr><th>項目</th><th>公開ドキュメントの記載（2026-10-08 確認）</th><th>設計での扱い</th></tr>
+<tr><td>提供状況</td><td>パブリックベータ（2026-10-06）。GA は「数週間以内」の見込み。モデルは <code>gpt-6-luna</code> だけ</td><td>SLA・スキーマの変更があり得る前提で評価用に留める。日付付きのモデル ID はなく固定できない（3.5「そのほかの守り」を満たせない点は 21-6e の判断材料）</td></tr>
+<tr><td>確率</td><td><code>predicate</code> は <code>probability</code>（0〜1）、<code>choice</code> は選択肢ごとの <code>probabilities</code>（和は約 1）+ <code>choice</code> + <code>confidence</code></td><td>閾値の判定には <code>probabilities</code> だけを使い、<code>confidence</code> は記録にだけ残す</td></tr>
+<tr><td>1 リクエストの問い</td><td><code>questions</code> に独立した問いを複数入れられる（入力は共通）。前の答えに依存する問いは別リクエストにする。問いの数・選択肢の数・文字数の上限はリファレンスに記載なし（各文字列の <code>maxLength</code> は 1,048,576）</td><td>リクエストの分け方は Jev と同じにする（まとめるのは Jev も 1 回で聞いている段 A1 の 2 問だけ）。必要な選択肢は最大 7 個（反応 ⑩〜⑯）。疎通確認で 2 問の同梱と選択肢 9 個が通ることを確かめた</td></tr>
+<tr><td>拒否</td><td>問いごとに <code>type: refusal</code> が返りうる（ほかの問いは答えが返る）</td><td>拒否は判定の失敗として扱う（下記「失敗」）。件数を記録して 21-6d11 で数える</td></tr>
+<tr><td>言語</td><td>対応言語の記載なし</td><td>Jev と同じく指示文は英語・コメントと問題は日本語のまま <code>input</code> に入れる（<code>jev.py</code> の指示文を流用）。疎通確認で、日本語の指示・入力でも確率が返ることを確かめた</td></tr>
+<tr><td>応答時間</td><td>「Responses API の約 10 倍速い」とだけあり、数値の記載なし</td><td>疎通確認では 1 リクエスト 0.21〜0.27 秒（日本からのネットワーク込み・入力 230〜350 トークン）。1 コメントの処理時間は 21-6d10b の小試走で実測する（Jev は中央値 0.82 秒・平均 4.1 回の呼び出し。21-6d3c の全件プローブ）</td></tr>
+<tr><td>料金</td><td>入力 <strong>100 万トークンあたり $0.10</strong>。出力・キャッシュの読み書きは課金しない。リージョン処理の割増（+10%）と長文脈（27.2 万トークン超）の倍率がある</td><td>割増・倍率はどちらも使わない（グローバル処理・短い入力）。見積もりは 21-6d10a の作業記録</td></tr>
+<tr><td>データの扱い</td><td><code>/v1/decisions</code> は学習に使わない・不正利用監視ログは 30 日保持・ZDR 対象（適格な顧客）。chat completions と同じ扱い</td><td>luna と同じ OpenAI の契約・キー（<code>OPENAI_API_KEY</code>）で足り、契約先は増えない</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<tr><th>段</th><th>問い（Jev → Decisions の型）</th><th>入力（Jev の <code>state</code> と同じ中身）</th><th>呼ぶ条件</th></tr>
+<tr><td>段 0</td><td>文字種の規則（API を呼ばない）</td><td>—</td><td>常に先に通す</td></tr>
+<tr><td>A1</td><td>大分類（<code>choice</code> 5 択）+ 語だけか（<code>noul</code> → <code>predicate</code>）を 1 リクエスト</td><td>段 A の文脈・コメント</td><td>段 0 で決まらないとき</td></tr>
+<tr><td>A1b</td><td>質問か推理か（<code>choice</code> 2 択）</td><td>問題文・コメント</td><td>大分類が質問・推理のとき。推理の条件に使う段 B はここで先に呼ぶ</td></tr>
+<tr><td>B</td><td>要点ごとの当てた / 触れた / 触れていない（<code>choice</code> 3 択 × 要点数を 1 リクエスト）</td><td>コメント</td><td>A1b か ①・推理の判定で初めて要るとき 1 回だけ（結果は使い回す）</td></tr>
+<tr><td>A2</td><td>細分類（<code>choice</code>。質問 3・依頼 3・反応 7・不適切 4 択）</td><td>段 A の文脈・コメント</td><td>推理でも「その他」でもないとき</td></tr>
+<tr><td>A3</td><td>確かめ直し（<code>noul</code> → <code>predicate</code>）</td><td>問題文・コメント</td><td>③、または指示語を含む ① のとき</td></tr>
+<tr><td>B2</td><td>矛盾チェック（<code>noul</code> → <code>predicate</code>）</td><td>Jev と同じ <code>contradiction_state</code>（問題文・真相・確定事実・誤りの例・コメント）</td><td>④ の候補のとき</td></tr>
+<tr><td>C</td><td>質問の品質（<code>noul</code> → <code>predicate</code>）</td><td>コメント・問題文</td><td>① で ④ でないとき</td></tr>
+<tr><td>D</td><td>答え（<code>choice</code> 3 択）</td><td>問題文・真相・確定事実・コメント</td><td>段 C が <code>T_QUALITY</code> 以上のとき</td></tr>
+</table>
+</div>
+<ul>
+  <li><strong>変えるのは呼び方だけ</strong>: 指示文・選択肢の説明・各段の入力・分岐・確率の計算（当てたの確率 = P(当てた)、触れたの確率 = P(当てた) + P(触れた)）・呼び出し回数（0〜7 回）はパターン 2 と同じにする。変換は機械的に行う: Jev の <code>state</code>（辞書）は同じキー・値の JSON 文字列（<code>ensure_ascii=False</code>）を <code>input</code> に入れ、<code>questions</code> の辞書は名前を <code>name</code> にした配列に、<code>criteria</code> の辞書は <code>choices</code> の <code>{value, description}</code> 配列にする。<code>noul</code> の <code>criteria</code>（true / false の基準）は <code>predicate</code> に欄がないので、指示文の末尾に <code>True: …</code> / <code>False: …</code> の 2 行として付ける（21-6d10b で追加。<a href="#d-23">D-23</a>）。指示文は <code>jev.py</code> と共有し、二重に持たない</li>
+  <li><strong>まとめない理由</strong>: Decisions は入力にしか課金しないので、入力が同じ段を 1 回にまとめれば安く速くなる。しかし入力やリクエストの分け方を変えると、⑤ との差がモデルによるものか組み方によるものか切り分けられなくなる。評価の費用は小さい（21-6d10a の見積もりで約 $0.45）ので、そろえるほうを取る。まとめる最適化は、21-6e で ⑥ が本番の候補に残ったときに応答時間を測ってから検討する</li>
+  <li><strong>閾値</strong>: 初期値はパターン 2 の 8 つ（<code>T_BARE_TERM</code>〜<code>T_ANSWER</code>）と同じ値を Decisions 専用の設定として別に持つ（確率の出方が Jev と違うため共有しない）。21-6d11 で段 B を中心に掃引する。コミュニティでは <code>choice</code> の確率の較正に癖があるとの報告がある（公式の記載ではない）ので、掃引の結果を見て決める</li>
+  <li><strong>失敗</strong>: 429・5xx は指数バックオフで 3 回再試行する。再試行後も失敗した場合と、必要な問いに <code>refusal</code> が返った場合は例外にする。評価用の <code>decisions</code> モードは <code>jev</code> モードと同じく、同じコメントを luna で判定し直す（記録の <code>decision</code> は <code>decisions_fallback_luna</code>）</li>
+  <li><strong>記録</strong>: <code>debug</code> に段ごとの確率・<code>confidence</code>・拒否の有無・リクエスト数・<code>usage.input_tokens</code>・応答時間を残す（パターン 2 と同じ形 + <code>confidence</code>・<code>refusals</code>）</li>
+  <li><strong>プローブ</strong>: 判定キャッシュの方式名は <code>decisions</code>、パターン名は <code>dec-2c</code>（評価ページの ⑥）。既存の 5 パターンのキャッシュ・結果は変えない</li>
+</ul>
+</dd>
   <dt>日付・出典</dt><dd>2026-10-08・ユーザー</dd>
 </dl>
 </article>
@@ -1803,6 +1803,14 @@ NG の事例は <a href="#probe-6e">6 の人間プローブ</a>、経緯は計�
   <dt>決めたこと</dt><dd>取り込みは SFN にステートを足さず insights-batch の処理として入れ、コメント者のアプリスコープ ID を保存する</dd>
   <dt>理由</dt><dd>相乗りは SFN にステートを足さず insights-batch の処理として入れた（DB 準備確認と同じ実行の中で済み、失敗アラーム・再試行も既存のものがそのまま効くため）。コメント者のアプリスコープ ID は Meta Platform Terms 上、プライバシーポリシーへの記載と削除依頼への対応を条件に保存できるため保存する（同一人物の連続質問を振り返るのに要る）。</dd>
   <dt>日付・出典</dt><dd>21-7b</dd>
+</dl>
+</article>
+<article id="d-39">
+<h3>D-39 Jev の段 B に真相を渡す</h3>
+<dl>
+  <dt>決めたこと</dt><dd>段 B の入力をコメントだけから、問題文・真相・確定事実・コメントにする（呼び出し回数は変えない）</dd>
+  <dt>理由</dt><dd>2 の「誤りでない部分だけで数える」（段 B の数え方）を段 B で効かせるには、どこが誤りかを判断する材料が要る。21-6d15 までは <code>state</code> がコメントだけで、確定事実と食い違う推理でも言葉が <code>touch</code> に似ていれば触れたになっていた（U21-k06 など）。呼び出し回数は変わらない</dd>
+  <dt>日付・出典</dt><dd>21-6d16</dd>
 </dl>
 </article>
 </section>

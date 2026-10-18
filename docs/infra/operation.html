@@ -99,6 +99,8 @@ aws stepfunctions start-execution \
 <ul>
   <li><strong>ImageBatchStack に変更があった場合</strong>: latest ACTIVE revision に期待するロール、環境変数、ログ設定が反映されていることを確認する</li>
   <li><strong>SnsPostBatchStack に変更があった場合</strong>: latest ACTIVE revision に期待するロール、環境変数、ログ設定が反映されていることを確認する</li>
+  <li><strong>InsightsBatchStack に変更があった場合</strong>: latest ACTIVE revision に期待するロール、環境変数、ログ設定が反映されていること、インサイト収集の EventBridge Scheduler が期待する設定になっていることを確認する</li>
+  <li><strong>CommentReplyStack / CommentReplyStagingStack に変更があった場合</strong>: Webhook / Reply / トークン更新の各 Lambda に期待する環境変数・タイムアウトが反映されていること、トークン更新の EventBridge Scheduler が有効なことを確認する（ECS タスク定義は持たない）</li>
   <li><strong>db-readiness-check を更新した場合</strong>: <code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=&lt;tag&gt; FoundationStack</code> を使用し、latest ACTIVE revision が該当タグを参照していることを確認する</li>
   <li><strong>デプロイ結果の確認</strong>: AWS Console で各リソースの状態が正常であることを確認する</li>
 </ul>
@@ -201,7 +203,7 @@ aws stepfunctions start-execution \
     <tr><td>SNS 投稿起動失敗</td><td>カスタムメトリクス（<code>SnsPostStartFailureCount</code>）で検知。親の画像生成 SFN の実行入力から <code>scheduled_at</code> を取り、同じ <code>set_code</code> と <code>scheduled_at</code> で sns-posting-sfn を手動起動する（セクション 1.2。時間帯の確認を含む）</td></tr>
     <tr><td>ECS タスク異常終了</td><td>CloudWatch Logs でエラー内容を確認。アプリケーションのバグの場合は修正してデプロイ</td></tr>
     <tr><td>Aurora 異常</td><td>Aurora の状態を AWS Console で確認。ACU 設定の見直しを検討</td></tr>
-    <tr><td>コメント自動返信 DLQ の滞留（<code>acps-prod-comment-reply-dlq-messages</code>。21-3 追加・21-6 実装）</td><td>DLQ のメッセージ本文（<code>comment_id</code> / <code>media_id</code> / コメント本文）と Reply Lambda のログで原因を分ける: ① OpenAI 障害・レート制限 → 復旧後に SQS コンソールの「DLQ 再処理」でメインキューへ戻す ② Graph API のトークン失効（401）→ Secret の <code>ig_access_token</code> を再生成して再処理 ③ スナップショット欠落（S3 404 は本来 DLQ に入らない。入っていれば Lambda のバグ）→ <code>umigame_items.snapshot_s3_key IS NULL</code> を確認し手動再出力。古すぎるコメント（数日前）は返信の鮮度を優先して破棄してよい。投稿バッチには影響しない</td></tr>
+    <tr><td>コメント自動返信 DLQ の滞留（<code>acps-prod-comment-reply-dlq-messages</code>。21-3 追加・21-6 実装）</td><td>DLQ のメッセージ本文（<code>comment_id</code> / <code>media_id</code> / コメント本文）と Reply Lambda のログで原因を分ける: ① 判定・返信に使う LLM の API（既定の判定は Anthropic。OpenAI も使いうる）の障害・レート制限 → 復旧後に SQS コンソールの「DLQ 再処理」でメインキューへ戻す ② Graph API のトークン失効（401）→ Secret の <code>ig_access_token</code> を再生成して再処理 ③ スナップショット欠落（S3 404 は本来 DLQ に入らない。入っていれば Lambda のバグ）→ <code>umigame_items.snapshot_s3_key IS NULL</code> を確認し手動再出力。古すぎるコメント（数日前）は返信の鮮度を優先して破棄してよい。投稿バッチには影響しない</td></tr>
     <tr><td>コメント返信トークンの自動更新失敗（<code>acps-prod-comment-reply-token-refresh-errors</code>。21-6g 追加）</td><td>トークン更新 Lambda（<code>acps-prod-comment-reply-token-refresh</code>）のログで原因を分ける: ① Graph API の一時障害（5xx・429）→ 次の週次実行を待つか、Lambda を手動実行する ② トークン失効・権限取り消し（400 / 190 系）→ 手動でトークンを再発行して Secret を更新する（<a href="../app/operation.html#token-refresh">app/operation.html セクション 5.4</a>）。失敗した週は Secret を書き換えないため、旧トークンで返信は続く</td></tr>
   </tbody>
 </table>

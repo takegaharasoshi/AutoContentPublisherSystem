@@ -646,7 +646,7 @@ LIMIT 1;</code></pre>
     <li><strong>スロット境界</strong>: JST の時で <code>&lt; 11</code> = morning、<code>&lt; 16</code> = noon、それ以外 = evening（logic-training-1 の 07:00 / 12:00 / 21:00、pref-ranking-1 の 20:00 がそれぞれ morning / noon / evening / evening に入る）。年月は投稿は JST、アカウント日次は <code>metric_date</code>（UTC 日）のまま切る（アカウント日次の UTC 定義はこのセクションの前段どおり）</li>
     <li><strong>中央値</strong>: MySQL に中央値の集約関数がないため、内部ビューで指標ごとに <code>ROW_NUMBER()</code> を振り、非 NULL の値の中央（偶数件は中央 2 件の平均）を取る。キー欠落（NULL）の投稿は当該指標の分母に入れない。</li>
     <li><strong>月末フォロワー</strong>: その月の行のうち <code>followers_count</code> が非 NULL で最も遅い日の値（バックフィルで作られた過去日行は NULL のため除外。<code>month_end_followers_date</code> で実際の日を確認する）。<code>reach_total</code> は収集できた日の合計で、<code>days_collected</code> が月の日数に満たない月は部分合計（欠測日は補完しない）</li>
-    <li><strong>follows_and_unfollows が入っていない理由と扱い</strong>（設計課題リスト 2026-09-02 の解消）: CloudWatch Logs（2026-08-10 の稼働開始以降）にアカウント収集の要求失敗・<code>Unsupported Instagram insights metric</code> の警告は一切なく、応答に当該要素が含まれていないだけと確認した。Meta の IG User Insights リファレンスは <code>follows_and_unfollows</code> に「Not returned if the IG User has less than 100 followers」と明記しており（2026-09-03 確認）、現行 3 アカウント（最大 19 フォロワー）が閾値未満のため返らない。<strong><code>metrics_catalog.py</code> の要求定数は外さない</strong>。到達までのフォロー増減は <code>v_account_kpi_daily.followers_delta</code> で見る。いずれかのアカウントが 100 フォロワーに達した後にキーが入り始めるかは、開発計画の確認待ちリストで追う（→ 入り始めたが <code>results</code> が空のままだった。原因と対処は次の「follows_and_unfollows の取り直し」）</li>
+    <li><strong>follows_and_unfollows の扱い</strong>: Meta は 100 フォロワー未満のアカウントにはこの指標を返さない（リファレンス「Not returned if the IG User has less than 100 followers」）。<strong><code>metrics_catalog.py</code> の要求定数は外さない</strong>。100 フォロワー未満のアカウントのフォロー増減は <code>v_account_kpi_daily.followers_delta</code> で見る。100 フォロワーを超えた後も集計遅延で <code>results</code> が空になる行は、次の「follows_and_unfollows の取り直し」で埋める <a class="decision-ref" href="#d-21">→ 理由 D-21</a></li>
     <li><strong>適用状況</strong>: ローカル MySQL へ 2026-09-03 適用済み（フィクスチャで中央値・月末フォロワー・NULL 除外の挙動を検証）。Aurora への適用は 16-12b の人間ゲート（差分確認 → push → 適用）で行い、結果は<a href="../plans/development-log.html">開発記録</a>の 16-12b に追記する</li>
   </ul>
 </div>
@@ -1130,6 +1130,7 @@ comment-log/{set_code}/dt={YYYY-MM-DD}/{comment_id}.json                        
 <dl>
   <dt>決めたこと</dt><dd>各実行の最後に <code>closed_date − 30 日</code>〜<code>− 2 日</code> の行のうち <code>results</code> の無い行だけを取り直し、<code>metrics.follows_and_unfollows</code> だけを書き換える（upsert-once の唯一の例外）</dd>
   <dt>理由</dt><dd>最新側の 2 日は 48 時間の遅延の上限から。最古側の 30 日は、2026-10-14 の確認で 09-17（27 日前）まで取れたことと、1 実行あたりの追加要求を最大 29 回に抑えるため。 （次回に再試行されるため）</dd>
+  <dt>経緯</dt><dd>2026-09-02 に設計課題リストで「follows_and_unfollows が入っていない」と挙がった。CloudWatch Logs（2026-08-10 の稼働開始以降）にアカウント収集の要求失敗・<code>Unsupported Instagram insights metric</code> の警告は一切なく、応答に当該要素が含まれていないだけと確認した。Meta の IG User Insights リファレンスの 100 フォロワー未満では返らないという明記（2026-09-03 確認）と、当時の 3 アカウント（最大 19 フォロワー）が閾値未満だったことから、閾値未満が原因と判断した。いずれかのアカウントが 100 フォロワーに達した後にキーが入り始めるかを開発計画の確認待ちリストで追ったところ、キーは入り始めたが <code>results</code> が空のままだったため、27-1 で原因を調べてこの取り直しを入れた</dd>
   <dt>日付・出典</dt><dd>2026-10-14（Phase 27-2・課題 I-039）</dd>
 </dl>
 </article>

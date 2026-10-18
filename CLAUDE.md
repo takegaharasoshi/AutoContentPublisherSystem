@@ -65,10 +65,10 @@ AutoContentPublisherSystem/
 | ディレクトリ | 目的 | ドキュメント |
 |---|---|---|
 | `docs/strategy/` | 事業戦略（収益化戦略・予算・KPI・展開方針・セットポートフォリオ） | `business-strategy.html` |
-| `docs/overview/` | 基本設計（生産面 / 配信面の 2 面の構成・配信面の 4 系統・受け渡しの契約・構成要素の一覧・主な判断。Phase 30-3） | `system-overview.html` |
+| `docs/overview/` | 基本設計（生産面 / 配信面の 2 面の構成・配信面の 4 系統・受け渡しの契約・構成要素の一覧・主な判断。Phase 30-3） | `system-overview.html`（全体）+ `functions/*.html`（機能別の基本設計 8 本 = 配信面 4〔投稿・インサイト収集・コメント自動返信・トークン更新〕+ 生産 4〔共通 + セット別 3〕） |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
 | `docs/production/` | 生産の詳細設計（Phase 30-5・30-6a で新設。セット別の生産の詳細〔資材の置き場・作り方の規定・事前ビルド・在庫の数え方〕。生産の全体像・関所・スキル一覧は機能別の基本設計 `docs/overview/functions/` が持つ。工程の細部は SKILL.md が正） | `index.html`（目次）+ セット別の生産の詳細 |
-| `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
+| `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`（umigame-soup-1 はコメント自動返信の分冊 `sets/umigame-soup-1-comment-reply.html` と調査・試験の記録ページを持つ）, `requirements-notes*.html`（壁打ち記録） |
 | `docs/plans/` | 計画体系（開発レーン + セット別の計画・記録。並行作業ルール） | `index.html`（レーン振り分け・並行作業ルールの正）, `development-plan.html` / `development-log.html`（開発レーン）, `<set_code>.html` / `<set_code>-log.html`（セットレーン × 4 セット） |
 | `docs/ideas/` | アイデア体系（意思決定前の事業アイデアの捕捉・壁打ち・醸成。6 ステータス管理） | `index.html`（ダッシュボード・運用ルールの正）, `<slug>.md`（記録層・正）, `<slug>.html`（深化したアイデアの詳細） |
 | `docs/issues/` | 課題体系（開発・運用で見つかった課題を両レーン横断で追う。4 ステータス・据え置きはトリガー必須・2 回目の発生で据え置き不可。Phase 22〔2026-09-19〕で新設。旧設計課題リスト・セットバックログ・トラブルシューティングログの後継） | `index.html`（レーン別 live 表 + クローズ節 + 運用ルールの正。表が唯一の正）, `_template.md`（壁打ち雛形）, `<slug>.md`（壁打ちを始めた課題だけ） |
@@ -82,6 +82,7 @@ AutoContentPublisherSystem/
 | タスク | 読むべきドキュメント |
 |---|---|
 | プロジェクトの全体像を把握 | `docs/overview/system-overview.html` |
+| 機能（投稿・インサイト収集・コメント自動返信・トークン更新・生産）ごとの全体像を把握 | `docs/overview/functions/` の該当ページ（章末の「さらに詳しく」から詳細設計へ下りる） |
 | 設計書を新しく書く・新しい書式へ移す・図を描く | `docs/index.html` セクション 5（書式ルール・使ってよいライブラリ）+ 見本 `docs/_templates/design-page.html`。検査は `python3 tools/docs_check.py --widths 360,390,768,1280` |
 | 収益化戦略・予算・KPI・プラットフォーム展開方針を確認する | `docs/strategy/business-strategy.html` |
 | CDK コードを書く・修正する | `docs/infra/stacks.html`（前提知識が必要なら `docs/infra/architecture.html`） |
@@ -90,11 +91,13 @@ AutoContentPublisherSystem/
 | CI/CD パイプラインを構築する | `docs/infra/cicd.html` |
 | 監視・通知を設定する | `docs/infra/workflow.html` セクション 7〜10 + `docs/infra/operation.html` |
 | 認証・秘密情報の設定を変更する | `docs/infra/security.html` |
+| コメント自動返信（判定・返信文・評価・運用）を修正する | `docs/overview/functions/comment-reply.html`（全体像）+ `docs/app/sets/umigame-soup-1-comment-reply.html`（アプリの詳細）+ `docs/infra/stacks.html` セクション 3.6（AWS の定義） |
 | アプリ設計の大枠（全体方針・骨子）を確認する | `docs/app/design-outline.html`（親ページ）+ 分冊 `batch-flow.html` / `data-model.html` / `operation.html` |
 | セットを追加・廃止する | `docs/app/operation.html` セクション 2 + `docs/app/design-outline.html` セクション 1.1（セット別設計書ルール） |
 | 生成方式を追加・変更する | `docs/app/batch-flow.html` セクション 2.1（契約・方式カタログ）+ `docs/app/generators/` の該当方式設計書 |
+| クイズストック（`logic-training-1`）を補充する | スキル `/quiz-stock-replenish`（運用の正）+ `docs/production/logic-training-1.html`（生産の詳細設計）+ `docs/app/sets/logic-training-1.html`（セット別設計書） |
 | ランキングストック（`pref-ranking-1`）を執筆・レビュー・投入する | `content/ranking-stock/pref-ranking-1/WRITING-NOTES.md`（実務の勘所）+ `docs/production/pref-ranking-1.html`（生産の詳細設計。手順の正） |
-| ウミガメのストック（`umigame-soup-1`）を補充する（作問・投入・ビルド・配置） | スキル `/umigame-stock-replenish`（運用の正。作問は `/umigame-problem-writer`）+ `docs/app/sets/umigame-soup-1.html` セクション 4（素材仕様）+ `docs/production/umigame-soup-1.html`（生産の詳細設計。補充ペース・事前ビルド）+ `docs/plans/umigame-soup-1.html`（セット計画書） |
+| ウミガメのストック（`umigame-soup-1`）を補充する（作問・投入・ビルド・配置） | スキル `/umigame-stock-replenish`（運用の正。作問は `/umigame-problem-writer`）+ `docs/app/sets/umigame-soup-1.html` セクション 4（素材仕様。判定用の項目の基準はコメント返信の分冊 2 章）+ `docs/production/umigame-soup-1.html`（生産の詳細設計。補充ペース・事前ビルド）+ `docs/plans/umigame-soup-1.html`（セット計画書） |
 | 開発の次ステップを確認する（開発レーン） | `docs/plans/development-plan.html` |
 | セットの運用状況・バックログの確認、週次補充・セット内改修（セットレーン） | `docs/plans/<set_code>.html`（記録は `<set_code>-log.html`）+ レーン判定は `docs/plans/index.html` |
 | 過去の実施記録・経緯を確認する | `docs/plans/development-log.html`（完了ステップの確認・備考の全文）/ セット運用の記録は `docs/plans/<set_code>-log.html` |
@@ -115,7 +118,7 @@ AutoContentPublisherSystem/
 - ステップ・作業の完了時は、**計画書の状態・完了日・要点・作業記録の更新を最優先**で行う（記録ファイルへの詳細転記が済んでいなくても遅らせない）。計画整理のタイミングで作業記録の本文を記録ファイル（`development-log.html` / `<set_code>-log.html`）へ移し、**計画書側はリンクに置き換える**（移した本文を計画書に残さない。計画書の肥大化防止）。**記録の分担・移管の時期・完了済みの配置・ステップの記載様式の正は `docs/plans/index.html` セクション 4・5**（ここに重複して書かない）
 - **計画書を更新したら構造検査を行う**（Phase 25 で導入。25-5〔2026-09-22〕で**開発計画とセット計画書 3 本すべてが移行済み**になった）: 新様式の雛形は `docs/plans/_templates/step.html` をコピーし、更新後に `python3 tools/docs_check.py --plan-only`（構造 + 参照のみ・ブラウザー不要）を実行する。CSS・テンプレートを変えたとき、または新しい計画書を移行・新設したときは `python3 tools/docs_check.py --widths 360,390,768,1280` も回す。**新しいセット計画書（umigame-soup-1 等）は最初から新様式で作り、`REGISTERED_PAGES` に登録する**（`docs/plans/index.html` セクション 5.0）
 - **完了済みフェーズ**: Phase D〜29（設計 → インフラ構築 → アプリ実装 → 動画対応 → 勝負セット → インサイト収集と KPI 運用 → 第 3 セット pref-ranking-1 → 2 レーン化 → `/goal` 組み込み → fantasy-animals-1 の停止 → 課題体系の新設 → Codex 直接セッションの導入 → 設計書 HTML のスマホ閲覧対応〔2026-09-21。一般表の列幅対策・課題 / アイデア一覧のカード化・検証ツール `tools/docs_check.py`〕→ 計画書の記載様式の定着〔2026-09-22。開発計画 + セット計画書 3 本を新様式へ移行し構造検査を有効化〕→ 第 4 セット umigame-soup-1〔Phase 21・2026-10-13。コメント自動返信・核心語の DB 化まで。以後の運用はセット計画書〕→ SNS 投稿バッチの当回固定〔Phase 26・2026-10-13。I-014 の展開 + Instagram クライアントの shared 載せ替え・Graph API v25.0 化・コンテナ ERROR の理由記録〕→ follows_and_unfollows の取り直し〔Phase 27・2026-10-17。I-039〕→ 投稿の一過性エラーの段階別の扱い〔Phase 28・2026-10-17。I-024〕→ umigame の尺の宣言値を 29 秒へ〔Phase 29・2026-10-17。I-041〕）。要点は `docs/plans/development-plan.html` の「完了フェーズのサマリ」、経緯の全文は `development-log.html`。稼働中のセットは logic-training-1・pref-ranking-1・umigame-soup-1（2026-10-12 稼働開始・セット計画書は 21-8a で新設）の 3 本。月次 KPI 転記の手順は `docs/app/operation.html` セクション 6.3
-- **進行中の開発レーンは Phase 30**（設計書を生産面と配信面の 2 面で描き直し、基本設計と詳細設計に段階化する = 課題 I-040 の展開。2026-10-17 起票・未着手。30-1 書き方と土台〔Mermaid 等の同梱〕→ 30-2 見た目の確認〔ユーザー〕→ 30-3 基本設計 → 30-4〜30-9 詳細設計を範囲ごとに。`docs/production/` を新設）。Phase 29〔umigame の尺の宣言値を 29 秒へ揃える = I-041〕は 2026-10-17 に完了。Phase 21（ウミガメのスープ参加型セット・探偵カメロック）は 2026-10-13 に完了し、設計書は `docs/app/sets/umigame-soup-1.html`・`docs/app/generators/umigame-prebuilt.html`、コメント返信は `services/comment-reply/`（`CommentReplyStack`）、運用はセット計画書 `docs/plans/umigame-soup-1.html`。ステップ単位の進捗・次の着手は `docs/plans/development-plan.html` を見る（ここには重複して書かない）
+- **進行中の開発レーンは Phase 30**（設計書を生産面と配信面の 2 面で描き直し、基本設計と詳細設計に段階化する = 課題 I-040 の展開。2026-10-17 起票。30-1 書き方と土台〔Mermaid 等の同梱〕→ 30-2 見た目の確認〔ユーザー〕→ 30-3 基本設計 → 30-4〜30-9a 詳細設計を範囲ごとに → 30-9b 体系全体の整合。`docs/production/` とコメント返信の分冊 `docs/app/sets/umigame-soup-1-comment-reply.html` を新設）。Phase 29〔umigame の尺の宣言値を 29 秒へ揃える = I-041〕は 2026-10-17 に完了。Phase 21（ウミガメのスープ参加型セット・探偵カメロック）は 2026-10-13 に完了し、設計書は `docs/app/sets/umigame-soup-1.html`（コメント返信は分冊 `sets/umigame-soup-1-comment-reply.html`）・`docs/app/generators/umigame-prebuilt.html`、コメント返信のコードは `services/comment-reply/`（`CommentReplyStack`）、運用はセット計画書 `docs/plans/umigame-soup-1.html`。ステップ単位の進捗・次の着手は `docs/plans/development-plan.html` を見る（ここには重複して書かない）
 - プラットフォーム展開（旧 Phase XX）はアイデア体系 `docs/ideas/platform-expansion-tiktok.md` へ移管し再醸成待ち（条件: 勝負セットで KPI M2 到達の目安）
 - 各ステップは「Claude Code でコード作成 → ユーザーが AWS 上で稼働確認 → 次へ」の流れで進める
 - 作業開始時はレーンを確認し、開発レーンなら `docs/plans/development-plan.html`、セットレーンなら該当セット計画書を読んでから着手する

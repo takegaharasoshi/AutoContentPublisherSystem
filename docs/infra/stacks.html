@@ -21,7 +21,7 @@
 <section class="page-summary" id="summary">
 <h2>要約</h2>
 <p class="lead">このページは、配信面（AWS）を CDK のスタックにどう分けて定義しているかを書く詳細設計である。<a href="../overview/system-overview.html#delivery">基本設計（全体）3 章</a>の配信面の 4 系統のうち、①投稿は SnsPostBatchStack と ImageBatchStack（<a href="../overview/functions/post.html">機能別の基本設計: 投稿</a>）、②インサイト収集は InsightsBatchStack（<a href="../overview/functions/insights.html">インサイト収集</a>）、③コメント自動返信と④トークン更新は CommentReplyStack（<a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a>）が持つ。共通の土台は FoundationStack、監視と通知は MonitoringStack にまとめる。AWS の構成の全体像は <a href="architecture.html">architecture.html</a>。</p>
-<p class="lead">図 1 は 7 つのスタックの依存とデプロイ順。矢印は「参照される側 → 参照する側」で、上から順にデプロイする。続く表はこのページの要点。</p>
+<p class="lead">図 1 は 7 つのスタックの依存。矢印は「参照される側 → 参照する側」で、矢印のラベルは受け取るもの。丸数字はデプロイ順（順番だけを並べた図は <a href="#deploy-order">4 章</a>の図 2）。続く表はこのページの要点。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -44,7 +44,7 @@ flowchart TB
     N --> M
     C -->|"DLQ・トークン更新 Lambda"| M
 </pre>
-<figcaption>図 1 スタックの依存とデプロイ順（① → ⑤。CommentReply の 2 面は ① の後・⑤ の前ならどこでもよい）</figcaption>
+<figcaption>図 1 スタックの依存（丸数字はデプロイ順）</figcaption>
 </figure>
 <div class="table-wrap">
 <table>
@@ -245,7 +245,7 @@ flowchart TB
 </table>
 </div>
 
-<p><strong>依存スタック</strong>: FoundationStack、ImageBatchStack、SnsPostBatchStack、InsightsBatchStack（インサイト収集 SFN の失敗アラーム・Scheduler メトリクスの Dimension を受け取る）、CommentReplyStack（本番面の DLQ を受け取る。21-3 追加・21-6 実装）</p>
+<p><strong>依存スタック</strong>: FoundationStack、ImageBatchStack、SnsPostBatchStack、InsightsBatchStack（インサイト収集 SFN の失敗アラーム・Scheduler メトリクスの Dimension を受け取る）、CommentReplyStack（本番面の DLQ とトークン更新 Lambda を受け取る。DLQ は 21-3 追加・21-6 実装）</p>
 
 <h4>注意事項</h4>
 <ul>
@@ -307,7 +307,7 @@ flowchart TB
 
 <h4>注意事項</h4>
 <ul>
-  <li>デプロイは <code>cdk deploy -c env=prod CommentReplyStack CommentReplyStagingStack</code>（イメージタグの指定は不要。ECS Task Definition を持たないため）。MonitoringStack は本スタックの DLQ を受け取るため、MonitoringStack のデプロイには 5 スタックすべての依存が解決されている必要がある</li>
+  <li>デプロイは <code>cdk deploy -c env=prod CommentReplyStack CommentReplyStagingStack</code>（イメージタグの指定は不要。ECS Task Definition を持たないため）。MonitoringStack は本スタック（本番面）の DLQ とトークン更新 Lambda を受け取るため、MonitoringStack のデプロイには 5 スタックすべての依存が解決されている必要がある</li>
   <li>Meta 側の設定（本番用 Meta アプリの作成・公開モード・<code>comments</code> 購読・アカウント単位の Webhook トグル・コールバック URL に <code>FunctionUrl</code>・<code>verify_token</code>）は CDK 管理外。手順は PoC README（<code>poc/umigame-comment-webhook/README.md</code>）を本番向けに転記して 21-7 で手順書化する</li>
   <li>Secret の値を変えたら Lambda はコールドスタート時にしか読み直さないため、環境変数を touch するか十数分待つ（PoC の運用と同じ）</li>
   <li>本スタックは Lambda コードのデプロイも <code>cdk deploy</code> で行う（<code>services/</code> だが CodePipeline の対象外）。CLAUDE.md「Git 運用ルール」の CodePipeline 完走確認は本サービスには適用しない</li>
@@ -326,19 +326,18 @@ flowchart TB
 <p><strong>連携先</strong>: AdminApiStack</p>
 
 <h2 id="deploy-order">4. デプロイ順序</h2>
-<p class="lead">この章は要約の図 1 の依存を、手動 <code>cdk deploy</code> の順番に並べたもの。図 2 は 7 スタックをデプロイする順番。</p>
+<p class="lead">図 2 は 7 スタックをデプロイする順番だけを並べる。何を受け取るかの依存は要約の図 1 と 3 章の各スタックの「依存スタック」。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
     F["1. FoundationStack"] --> S["2. SnsPostBatchStack"]
-    S -->|"ImageBatchStack が投稿 SFN の ARN を参照する"| I["3. ImageBatchStack"]
-    I --> N["4. InsightsBatchStack（FoundationStack だけに依存）"]
-    N --> M["5. MonitoringStack（各 SFN・Scheduler・DLQ・トークン更新 Lambda のアラーム）"]
-    F --> C["CommentReplyStack（本番面）"]
-    C -->|"DLQ・トークン更新 Lambda"| M
-    F --> CS["CommentReplyStagingStack（ステージング面。ほかのスタックから参照されない）"]
+    S --> I["3. ImageBatchStack"]
+    I --> N["4. InsightsBatchStack"]
+    N --> M["5. MonitoringStack"]
+    F -.->|"1 の後"| C["CommentReplyStack（本番面）&lt;br&gt;CommentReplyStagingStack（ステージング面）"]
+    C -.->|"本番面は 5 の前"| M
 </pre>
-<figcaption>図 2 デプロイ順序（1 → 5。CommentReplyStack は FoundationStack の後・MonitoringStack の前、CommentReplyStagingStack は FoundationStack の後）</figcaption>
+<figcaption>図 2 デプロイ順序（1 → 5 の一本道。CommentReply の 2 面は 1 の後ならどこでもよく、本番面だけは 5 の前に済ませる）</figcaption>
 </figure>
 
 <p>将来拡張の AdminApiStack（3.7）・AdminWebStack（3.8）は MonitoringStack の後に、AdminApiStack → AdminWebStack の順で入れる。</p>
