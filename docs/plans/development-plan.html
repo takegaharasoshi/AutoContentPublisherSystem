@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-18（<strong>30-3 完了</strong>: 基本設計を作り直した〔ユーザーの通読 go 待ち〕。同日に 30-1 完了・30-2 go。次は go の後に <a href="#step-30-4">30-4</a>）。前回: 2026-10-17（<strong>Phase 30 起票</strong>: 設計書を生産面と配信面の 2 面で描き直し、基本設計と詳細設計に段階化する〔<a href="../issues/index.html#I-040">I-040</a> の展開。30-1 書き方と土台 → 30-2 見た目の確認〔ユーザー判断〕→ 30-3 基本設計 → 30-4〜30-9 詳細設計を範囲ごとに〕。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-18（<strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="#step-30-3b">30-3b</a>〔配信面〕・<a href="#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -75,8 +75,8 @@
 <summary>フェーズの背景・起票の経緯 <span class="plan-hint">— I-040・決めた方針・対象外・課題照合</span></summary>
 <div class="plan-fold-inner">
 <blockquote>経緯: <a href="../issues/index.html#I-040">I-040</a>（2026-10-13 起票）。壁打ち（2026-10-13・10-17。<a href="../issues/design-docs-restructure.md">記録</a>）で方針を決め、トリガー「Phase 26 の完了」の後に Phase 27〜29 を先に片付けた。2026-10-17 にユーザーが展開を指示した。</blockquote>
-<blockquote class="decision">決めた方針（壁打ちの着地）: ①2 面（生産面 / 配信面）で描く ②基本設計を新設し、既存の infra / app と新設の production を詳細設計に位置づける（ディレクトリは再編せず、計画書・記録・課題表からのリンクを切らない）③各ページは冒頭に図と表の要約を置き、本文は事実だけ、理由はページ末尾の「判断の記録」にまとめる ④図は Mermaid を <code>docs/assets/vendor/</code> に同梱して書く（ネットなしで手元だけで読める、という「外部 CDN に依存しない」の趣旨は守る）。同梱するのは Mermaid・svg-pan-zoom・AWS Architecture Icons ⑤生産ラインの工程の細部は SKILL.md を正とし、設計書には全体像・関所・受け渡しの契約・スキル一覧だけを書く。</blockquote>
-<blockquote>ステップの割り方: 書式と土台（30-1）→ 見た目の go（30-2・ユーザー判断）→ 基本設計（30-3）→ 詳細設計を範囲ごとに（30-4 インフラ構成 / 30-5・30-6 生産設計 / 30-7・30-8 アプリ / 30-9 インフラ残りと全体の整合）。判断の背景を書いた箇所は既存の設計書に約 460 件あり、末尾への移し替えが作業の大半を占めるため、範囲ごとに分けた。判断の振り分けは Claude が行い、機械的な移動だけを Codex に委ねてよい（対象ファイルを名指しする）。</blockquote>
+<blockquote class="decision">決めた方針（壁打ちの着地）: ①2 面（生産面 / 配信面）で描く ②基本設計を新設し、既存の infra / app と新設の production を詳細設計に位置づける（ディレクトリは再編せず、計画書・記録・課題表からのリンクを切らない）③各ページは冒頭に図と表の要約を置き、本文は事実だけ、理由はページ末尾の「判断の記録」にまとめる ④図は Mermaid を <code>docs/assets/vendor/</code> に同梱して書く（ネットなしで手元だけで読める、という「外部 CDN に依存しない」の趣旨は守る）。同梱するのは Mermaid・svg-pan-zoom・AWS Architecture Icons ⑤生産ラインの工程の細部は SKILL.md を正とし、設計書には全体像・関所・受け渡しの契約・スキル一覧だけを書く。<br>追加（2026-10-18・30-3 の通読でユーザーが決定）: ⑥3 段を<strong>基本設計（全体）→ 機能別の基本設計 → 詳細設計</strong>にする。機能 = 配信面の 4 系統（投稿・インサイト収集・コメント自動返信・トークン更新）と生産（共通 + セット別 3）の計 8 ページを <code>docs/overview/functions/</code> に置き、基本設計（全体）の「さらに詳しく」は機能ページだけを指す（段を飛ばさない）。基盤・データなど機能に属さない横断の内容は層のページ（<code>infra/</code> <code>app/data-model</code>）へ直接つなぐ。<code>docs/production/</code> は生産の詳細設計の層にする ⑦各章・各図表の前にリード文、章末に「さらに詳しく」を置く（設計書体系ガイド 5.1）。</blockquote>
+<blockquote>ステップの割り方（2026-10-18 に ⑥ を受けて改訂）: 書式と土台（30-1）→ 見た目の go（30-2・ユーザー判断）→ 基本設計（全体）（30-3）→ 機能別の基本設計（30-3b 配信面 4 ページ / 30-3c 生産面 4 ページ）→ 詳細設計を範囲ごとに（30-4 インフラ構成 / 30-5・30-6 生産の詳細 / 30-7・30-8 アプリ / 30-9 インフラ残りと全体の整合）。判断の背景を書いた箇所は既存の設計書に約 460 件あり、末尾への移し替えが作業の大半を占めるため、範囲ごとに分けた。判断の振り分けは Claude が行い、機械的な移動だけを Codex に委ねてよい（対象ファイルを名指しする）。</blockquote>
 <blockquote>対象外: ディレクトリの再編（<code>basic/</code> <code>detail/</code> 化）、文体の整形（アイデア「読みやす」は 2026-10-17 に再醸成待ち）、<code>docs/plans/</code> <code>docs/issues/</code> <code>docs/ideas/</code> <code>docs/strategy/</code>・壁打ち記録（<code>requirements-notes*.html</code>）・<code>docs/_archive/</code> の書式、システムの仕様そのものの変更（記述を実態へ合わせるだけ）。<br>課題表の照合（5.1）: 触るパスに <a href="../issues/index.html#I-006">I-006</a>・<a href="../issues/index.html#I-011">I-011</a>・<a href="../issues/index.html#I-012">I-012</a>・<a href="../issues/index.html#I-015">I-015</a>・<a href="../issues/index.html#I-017">I-017</a>・<a href="../issues/index.html#I-019">I-019</a>・<a href="../issues/index.html#I-020">I-020</a>・<a href="../issues/index.html#I-023">I-023</a>・<a href="../issues/index.html#I-025">I-025</a> が当たるが、どれもトリガーに当たらず中身は同梱しない（据え置き継続）。ただし移設で節番号が変わったら、各ステップで対象パスを付け替える。<code>sets/</code>・<code>generators/</code>・SKILL.md はセットレーンのパスも含むため、30-6・30-8 はセットレーンが動いていないときに行う。</blockquote>
 </div>
 </details>
@@ -171,7 +171,7 @@
 <div class="plan-meta"><strong>30-3</strong><span class="plan-status">完了</span><span>2026-10-18</span></div>
 <h3>基本設計を新設する（docs/overview/ の作り直し）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>30-2 の go の後。</p>
-<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<a href="../overview/system-overview.html">基本設計</a>を 1 ページで作り直した（2 面の全体図・生産ラインの工程と関所・配信面 4 系統の AWS 構成図・受け渡しの契約・データの流れ・構成要素の一覧・判断の記録 D-01〜D-07）。<strong>ユーザーの通読 go 待ち</strong>（go まで <a href="#step-30-4">30-4</a> に進まない）。</p>
+<p data-field="result"><strong>結果：</strong><strong>2026-10-18 完了</strong>。<a href="../overview/system-overview.html">基本設計</a>を 1 ページで作り直した（2 面の全体図・生産ラインの工程と関所・配信面 4 系統の AWS 構成図・受け渡しの契約・データの流れ・構成要素の一覧・判断の記録 D-01〜D-07）。<strong>ユーザーの通読 go 待ち</strong>（2026-10-18 の通読の指摘で、リード文・「さらに詳しく」を足し、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」に組み直すことを決めた。全体ページの go は <a href="#step-30-3c">30-3c</a> の確認と合わせて判断する）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -205,7 +205,8 @@
 <li><strong>レビュー</strong>（観点: 基本設計だけで全体が分かるか / 実装との食い違い。一次スクリーニングは Codex〔読み取り専用〕、判断は Claude）。1 巡目: blocker 4 件を修正（動画ビルドの段取りに画像生成の工程がない・ranking の S3 キー末尾は <code>_20s</code> / <code>_30s</code>・Lambda の実名に <code>acps-prod-</code>・「実行時に AI 生成はしない」がコメント返信の LLM 判定と矛盾）。改善提案 2 件（環境数の表記・コメント記録の保持期間）は課題 <a href="../issues/index.html#I-042">I-042</a>（30-9 の着手時がトリガー）に起票。2 巡目: blocker 1 件（画像生成の工程を図 2 と 6.4 にも反映）を修正して打ち切り</li>
 <li><strong>検査</strong>: <code>docs_check.py --widths 360,390,768,1280</code> は 87 ページはみ出し 0 件・図 3 ページ 11 図の描画不備 0 件・判断リンク 8 件の不備 0 件で OK。ガイド（<code>docs/index.html</code>）の基本設計のカード・3 段の図と表・ツリー、CLAUDE.md の構成と目次の表の「30-3 で作り直す」を実態に合わせた</li>
 <li><strong>課題</strong>: 展開元の <a href="../issues/index.html#I-040">I-040</a> は据え置き継続（Phase 30 全体で解消）</li>
-<li><strong>通読の指摘（2026-10-18・ユーザー）</strong>: ①図・表がいきなり始まる → 全章・全図表の前にリード文（何を説明する章か・図が何を表すか。章ではどの上位を詳しくしたものかも）を置いた ②段階的詳細化のつながりが分かりにくい → 要約の末尾に章の読み順、各章の末尾に「さらに詳しく」（1 段下の章・詳細設計・セット別設計書・SKILL.md へのリンク）を置いた（例: 2 章はセットごとに設計書・方式設計書の 8 節・手順書へ）。どちらも今後の全ページの書き方として、<a href="../index.html#format-layout">設計書体系ガイド 5.1</a> の表（<code>p.lead</code>・<code>div.drilldown</code>）・<code>style.css</code>・雛形に反映した。再通読の go 待ち</li>
+<li><strong>通読の指摘（2026-10-18・ユーザー）</strong>: ①図・表がいきなり始まる → 全章・全図表の前にリード文（何を説明する章か・図が何を表すか。章ではどの上位を詳しくしたものかも）を置いた ②段階的詳細化のつながりが分かりにくい → 要約の末尾に章の読み順、各章の末尾に「さらに詳しく」（1 段下の章・詳細設計・セット別設計書・SKILL.md へのリンク）を置いた（例: 2 章はセットごとに設計書・方式設計書の 8 節・手順書へ）。どちらも今後の全ページの書き方として、<a href="../index.html#format-layout">設計書体系ガイド 5.1</a> の表（<code>p.lead</code>・<code>div.drilldown</code>）・<code>style.css</code>・雛形に反映した</li>
+<li><strong>通読の指摘 2 回目（2026-10-18・ユーザー）</strong>: 「さらに詳しく」の行き先が複数ページに点在して分かりにくい → 系統ごとに入口を決める案（Claude）ではなく、<strong>基本設計の配下に機能ごとのページ（機能別の基本設計）を作って 1 段下にする</strong>ことに決めた（配信面 4・生産面 共通 + セット別 3。トークン更新は単独の 1 ページ）。<a href="#step-30-3b">30-3b</a>・<a href="#step-30-3c">30-3c</a> を新設し、30-5・30-6 を生産の詳細の移設に組み直し、30-4・30-7・30-8 に機能ページへの戻りリンク、30-9 に段の飛ばしの確認を足した。設計書体系ガイド 2.1 と 5.1 も改めた</li>
 </ul>
 </div>
 </details>
@@ -217,11 +218,73 @@
 
 <div class="plan-group" data-plan-group="active">
 
+<article class="plan-step" id="step-30-3b" data-step-id="30-3b" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>30-3b</strong><span class="plan-status">未着手</span></div>
+<h3>配信面の機能別の基本設計を作る（投稿・インサイト収集・コメント自動返信・トークン更新）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>30-3 の通読の指摘への対応（2026-10-18）の push の後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>基本設計（全体）の 1 段下として、配信面の機能ごとに 1 ページの基本設計を <code>docs/overview/functions/</code> に作る: <code>post.html</code>（投稿）・<code>insights.html</code>（インサイト収集）・<code>comment-reply.html</code>（コメント自動返信）・<code>token-refresh.html</code>（トークン更新）。各ページに書くのは ①目的 ②きっかけ（スケジュール・Webhook）③入力と出力 ④流れの図（SFN・Lambda の連なり）⑤関わる部品（サービス・スタック・テーブル・S3 キー）⑥ほかの機能との受け渡し ⑦判断の記録。設定値・手順・表の全件は書かず、章末の「さらに詳しく」から詳細設計へ<strong>観点ごとに 1 リンク</strong>（処理の詳細 = <code>app/</code> / AWS の定義 = <code>infra/</code> / 運用の手順 = 運用設計）でつなぐ。基本設計（全体）の 3 章の「さらに詳しく」を、機能ごとに 1 リンク（機能ページ）へ置き換える。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>詳細設計のページ（<code>docs/infra/</code> <code>docs/app/</code>）は書き換えない（戻りリンクは 30-4・30-7・30-8 で張る）。機能ページと詳細設計で同じ内容を二重に書かない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>4 ページで、それぞれの機能の目的・きっかけ・入力と出力・流れ・関わる部品・受け渡しが図と表で読める。部品と時刻が実装（<code>services/</code>・<code>infra/lib/</code>）と一致する（突き合わせた項目を貼る）。</li><li>新しい書式（<a href="../index.html">設計書体系ガイド</a>の書式ルール〔30-1・30-3〕: 冒頭の要約〔リード文 + 図 + 要点の表〕・各図表の前のリード文・本文は事実だけ・章末の「さらに詳しく」・理由はページ末尾の「判断の記録」〔D-xx〕）になっている。<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 機能ページだけで機能が分かるか / 詳細設計と二重に書いていないか / 実装との食い違い）。</li><li>基本設計（全体）の 3 章の「さらに詳しく」が機能ごとに 1 リンクになっている。設計書体系ガイドのツリー（2.2）に <code>docs/overview/functions/</code> を載せる。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>push 後、ユーザーが 4 ページを見て go / 修正指示を出す。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/overview/</code>・<code>docs/index.html</code>）。stop after 30 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<div class="plan-fold-inner">
+<p>着手前のため記録なし。</p>
+</div>
+</details>
+</div>
+</article>
+<article class="plan-step" id="step-30-3c" data-step-id="30-3c" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>30-3c</strong><span class="plan-status">未着手</span></div>
+<h3>生産面の機能別の基本設計を作る（生産ライン共通・logic-training-1・pref-ranking-1・umigame-soup-1）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>30-3b の go の後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>基本設計（全体）の 1 段下として、生産面を 1 つの機能（生産）とみなし、<code>docs/overview/functions/</code> に 4 ページの基本設計を作る: <code>production.html</code>（生産ライン共通: ①工程図 ②人の関所の一覧〔どの工程で誰が何を見て go を出すか〕③受け渡しの契約〔S3 キー・在庫テーブル・投入の仕方〕④生産系スキルの一覧〔役割・起動・成果物・どのセットで使うか〕⑤レビューの仕方）と、セット別の <code>production-logic-training-1.html</code>・<code>production-pref-ranking-1.html</code>・<code>production-umigame-soup-1.html</code>（共通との違いだけ: 何を作るか・素材の集め方・工程の差〔umigame の機械プローブなど〕・使うスキルとツール・ナレーション）。工程の細部は SKILL.md を正とし、設計書には書かない（リンクする）。基本設計（全体）の 2 章の「さらに詳しく」を、共通 1 リンク + セットごとに 1 リンクへ置き換える。旧 30-5 の「共通の生産ライン」はこのステップで書く。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>SKILL.md の本文は変えない。詳細設計のページ（<code>docs/app/generators/</code> <code>docs/app/sets/</code> <code>docs/app/operation.html</code>）は書き換えない（詳細の移設は 30-5・30-6）。セットの運用値（補充ペース・在庫水位）はセット計画書へのリンクにとどめる。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>共通ページから生産ラインの全体像・関所・受け渡しの契約・スキル一覧が、セット別ページから共通との違いが図と表で読める。スキル一覧が <code>.agents/skills/</code> の実体と、工程と関所が各 SKILL.md と一致する（照合結果を貼る）。</li><li>新しい書式（<a href="../index.html">設計書体系ガイド</a>の書式ルール〔30-1・30-3〕: 冒頭の要約〔リード文 + 図 + 要点の表〕・各図表の前のリード文・本文は事実だけ・章末の「さらに詳しく」・理由はページ末尾の「判断の記録」〔D-xx〕）になっている。<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 工程と関所が SKILL.md と食い違っていないか / SKILL.md・詳細設計と二重に書いていないか）。</li><li>基本設計（全体）の 2 章の「さらに詳しく」が共通 1 + セットごとに 1 リンクになっている。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>push 後、ユーザーが 4 ページを見て go / 修正指示を出す。30-3（全体ページ）の go もここで合わせて判断する。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/overview/</code>・<code>docs/index.html</code>）。stop after 30 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未着手</span></summary>
+<div class="plan-fold-inner">
+<p>着手前のため記録なし。</p>
+</div>
+</details>
+</div>
+</article>
 <article class="plan-step" id="step-30-4" data-step-id="30-4" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-4</strong><span class="plan-status">未着手</span></div>
 <h3>インフラ構成とワークフローの詳細設計を描き直す</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>30-3 の go の後。</p>
+<p data-field="prerequisites"><strong>着手条件：</strong>30-3c の go の後。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
@@ -232,6 +295,7 @@
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li>図と表が実装（<code>infra/lib/*.ts</code>・<code>infra/lib/asl/*.json</code>）と一致する（突き合わせた項目を貼る）。</li><li>本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残し、事実の欠落がない。</li><li><code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 実装との食い違い / 本文に理由が混ざっていないか / 移設で事実が欠けていないか）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+<li>書き直したページの冒頭（リード文）に、どの機能別の基本設計（<code>docs/overview/functions/</code>）の詳細かを書いて戻るリンクを張り、機能ページの「さらに詳しく」が書き直した節を指していることを確かめる（ずれていれば機能ページのリンクを直す）。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
@@ -251,24 +315,24 @@
 <article class="plan-step" id="step-30-5" data-step-id="30-5" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-5</strong><span class="plan-status">未着手</span></div>
-<h3>生産設計の層を新設し、共通の生産ラインを書く</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>30-4 の go の後。</p>
+<h3>生産の詳細設計の層を新設し、logic-training-1 と pref-ranking-1 の詳細を移す</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>30-4 の go の後。<strong>logic-training-1・pref-ranking-1 のセットレーン（週次補充など）が動いていないとき</strong>に着手する。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p><code>docs/production/</code> を新設し、入口ページに共通の生産ラインを書く: ①工程図（ネタ・候補 → 人間の選別 → 素材の執筆 → 機械検証 → 人間レビュー → 投入 → 動画ビルド → 動画レビュー → S3 配置）②人間の関所の一覧（どの工程で誰が何を見て go を出すか）③受け渡しの契約（S3 キー・在庫テーブル・投入の仕方）④生産系スキルの一覧（役割・起動・成果物・どのセットで使うか。<code>quiz-stock-replenish</code> / <code>quiz-review-learn</code> / <code>ranking-stock-replenish</code> / <code>umigame-stock-replenish</code> / <code>umigame-problem-writer</code> / <code>remotion-*</code>）⑤レビューの仕方。工程の細部は SKILL.md を正とし、設計書には書かない（リンクする）。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>SKILL.md の本文は変えない。セット別の内容は 30-6 で書く（ここでは共通部分だけ）。</p></div>
+<div data-field="overview"><p>機能別の基本設計（30-3c）の 1 段下として、生産の詳細設計の層 <code>docs/production/</code> を新設する（入口 <code>index.html</code> は詳細ページの目次だけ。全体像は機能別の基本設計 <code>docs/overview/functions/production.html</code> が持つ）。<code>production/logic-training-1.html</code>・<code>production/pref-ranking-1.html</code> を作り、散らばった生産の詳細を移す: 方式設計書 <code>docs/app/generators/quiz-prebuilt.html</code>・<code>ranking-prebuilt.html</code> の 8 節「事前ビルドパイプライン」、<a href="../app/operation.html">運用設計</a> 3 節のストック運用（問題ストック・ランキングストック）、<code>content/</code> の README の設計にあたる部分（README は手順として残す）。移した元はリンクに置き換える。機能別の基本設計のセット別ページの「さらに詳しく」を移した先へ向ける。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>SKILL.md の本文は変えない（参照の付け替えは 30-6 でまとめて行う）。umigame-soup-1 は 30-6。セットの運用（補充ペース・在庫水位などセット計画書の内容）は動かさない。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
-<li>入口ページから、生産ラインの全体像・関所・受け渡しの契約・スキル一覧が図と表で読める。スキル一覧が <code>.agents/skills/</code> の実体と一致する（照合結果を貼る）。</li><li>新しい書式（<a href="../index.html">設計書体系ガイド</a>の書式ルール〔30-1〕: 冒頭の要約〔図 + 要点の表〕・本文は事実だけ・理由はページ末尾の「判断の記録」〔D-xx〕）になっている。<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 工程と関所が SKILL.md と食い違っていないか / SKILL.md と二重に書いていないか）。</li><li>基本設計（30-3）と設計書体系ガイドから入口ページへリンクがある。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+<li>2 セットの生産の詳細が、移した元の事実を欠かさず載っている。本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残す。旧位置への参照が <code>docs/</code> に残っていない（旧節へのリンクの grep 件数を貼る）。</li><li>新しい書式（<a href="../index.html">設計書体系ガイド</a>の書式ルール〔30-1・30-3〕: 冒頭の要約〔リード文 + 図 + 要点の表〕・各図表の前のリード文・本文は事実だけ・章末の「さらに詳しく」・理由はページ末尾の「判断の記録」〔D-xx〕）になっている。冒頭に機能ページへの戻りリンクがある。<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker だけを直す（観点: 移設で事実が欠けていないか / SKILL.md・機能ページと食い違っていないか）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
 <div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>push 後、ユーザーが入口ページを見て go / 修正指示を出す。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/production/</code>・<code>docs/overview/</code> と <code>docs/index.html</code> のリンク）。stop after 30 turns。</p></div>
+<div data-field="gate"><strong>人が確認すること</strong><p>push 後、ユーザーが 2 ページを見て go / 修正指示を出す。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/production/</code>・<code>docs/app/generators/quiz-prebuilt.html</code>・<code>ranking-prebuilt.html</code>・<code>docs/app/operation.html</code>・<code>docs/overview/functions/</code> のリンク・<code>content/</code> の README・<code>docs/issues/index.html</code> の対象パス）。stop after 30 turns。</p></div>
 </div>
 </section>
 <details class="plan-fold" data-field="record">
@@ -282,24 +346,24 @@
 <article class="plan-step" id="step-30-6" data-step-id="30-6" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>30-6</strong><span class="plan-status">未着手</span></div>
-<h3>セット別の生産設計を書き、散らばった説明を移す</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>30-5 の go の後。<strong>3 セットのセットレーン（週次補充など）が動いていないとき</strong>に着手する。</p>
+<h3>umigame-soup-1 の生産の詳細を移し、生産まわりの参照を付け替える</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>30-5 の go の後。<strong>3 セットのセットレーン（週次補充など）が動いていないとき</strong>（参照の付け替えが 3 セットの SKILL.md に及ぶため）に着手する。</p>
 <p data-field="result"><strong>現況：</strong>未着手。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
-<div data-field="overview"><p><code>docs/production/</code> に logic-training-1・pref-ranking-1・umigame-soup-1 のセット別の生産設計を作る。移す元: 各事前ビルド方式の設計書（<code>docs/app/generators/*-prebuilt.html</code>）の 8 節「事前ビルドパイプライン」、<a href="../app/operation.html">運用設計</a> 3 節のストック運用、<code>docs/app/sets/umigame-soup-1.html</code> の補充まわり、<code>content/</code> の README の設計にあたる部分（README は手順として残す）。移した元はリンクに置き換える。SKILL.md・CLAUDE.md・<code>content/</code> の README から旧位置への参照を付け替える。</p></div>
+<div data-field="overview"><p><code>docs/production/umigame-soup-1.html</code> を作り、umigame-soup-1 の生産の詳細を移す: <code>docs/app/generators/umigame-prebuilt.html</code> の 8 節「事前ビルドパイプライン」、<code>docs/app/sets/umigame-soup-1.html</code> の補充まわり、<code>content/</code> の README の設計にあたる部分（README は手順として残す）。移した元はリンクに置き換える。続けて 3 セット分まとめて、SKILL.md・CLAUDE.md・<code>content/</code> の README から旧位置（30-5・30-6 で移した節）への参照を新しい位置へ付け替える。</p></div>
 <div data-field="constraints"><strong>守る条件</strong><p>SKILL.md は参照先の付け替えだけで、工程は変えない。停止中の fantasy-animals-1 は対象外。セットの運用（補充ペース・在庫水位などセット計画書の内容）は動かさない。</p></div>
 </section>
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
-<li>3 セットの生産設計が、工程・関所・成果物・使うスキル・ビルドツールを図と表で示している。</li><li>本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残し、事実の欠落がない（移設元のページも含む）。旧位置への参照が残っていない（旧節へのリンクの grep 件数を貼る）。</li><li><code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 移設で事実が欠けていないか / SKILL.md と食い違っていないか）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+<li>umigame-soup-1 の生産の詳細が、移した元の事実を欠かさず載っており、冒頭に機能ページ（<code>production-umigame-soup-1.html</code>）への戻りリンクがある。新しい書式（<a href="../index.html">設計書体系ガイド</a>の書式ルール〔30-1・30-3〕: 冒頭の要約〔リード文 + 図 + 要点の表〕・各図表の前のリード文・本文は事実だけ・章末の「さらに詳しく」・理由はページ末尾の「判断の記録」〔D-xx〕）になっている。</li><li>本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残し、事実の欠落がない（移設元のページも含む）。旧位置への参照が残っていない（旧節へのリンクの grep 件数を貼る）。</li><li><code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 移設で事実が欠けていないか / SKILL.md と食い違っていないか）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
 <div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>push 後、ユーザーがセット別の 3 ページを見て go / 修正指示を出す。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/production/</code>・<code>docs/app/generators/*-prebuilt.html</code>・<code>docs/app/operation.html</code>・<code>docs/app/sets/umigame-soup-1.html</code>・<code>.agents/skills/</code> の参照・<code>content/</code> の README・CLAUDE.md・<code>docs/issues/index.html</code> の対象パス）。stop after 30 turns。30 ターンを超えそうなら着手時にセット別に割る。</p></div>
+<div data-field="gate"><strong>人が確認すること</strong><p>push 後、ユーザーが umigame-soup-1 のページと付け替え結果を見て go / 修正指示を出す。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>docs/production/</code>・<code>docs/app/generators/*-prebuilt.html</code>・<code>docs/app/operation.html</code>・<code>docs/app/sets/umigame-soup-1.html</code>・<code>.agents/skills/</code> の参照・<code>content/</code> の README・CLAUDE.md・<code>docs/issues/index.html</code> の対象パス）。stop after 30 turns。</p></div>
 </div>
 </section>
 <details class="plan-fold" data-field="record">
@@ -325,6 +389,7 @@
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li>掃除リスト（<a href="../issues/design-docs-restructure.md">I-040 の壁打ち</a> 2026-10-13）のアプリ共通分がすべて直っている（項目ごとの対応を作業記録に）。</li><li>本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残し、事実の欠落がない。</li><li><code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 実装との食い違い / 本文に理由が混ざっていないか / 移設で事実が欠けていないか）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+<li>書き直したページの冒頭（リード文）に、どの機能別の基本設計（<code>docs/overview/functions/</code>）の詳細かを書いて戻るリンクを張り、機能ページの「さらに詳しく」が書き直した節を指していることを確かめる（ずれていれば機能ページのリンクを直す）。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
@@ -356,6 +421,7 @@
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li>退役・切り出しの判断と理由が、該当ページ末尾の判断の記録にある。</li><li>本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残し、事実の欠落がない（<code>generators/</code> と <code>sets/</code> の全ページ）。旧位置への参照が残っていない（grep 件数を貼る）。</li><li><code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 移設で事実が欠けていないか / 実装との食い違い）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+<li>書き直したページの冒頭（リード文）に、どの機能別の基本設計（<code>docs/overview/functions/</code>）の詳細かを書いて戻るリンクを張り、機能ページの「さらに詳しく」が書き直した節を指していることを確かめる（ずれていれば機能ページのリンクを直す）。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>
@@ -387,6 +453,7 @@
 <section><h4>2. 完了条件</h4>
 <ol data-field="acceptance">
 <li>本文から外した <code>decision</code> 囲みが残っていない（対象ページで <code>class="decision"</code> の grep 件数 0 を貼る）。移す前の判断記述と移した後の D-xx の対応を作業記録に残し、事実の欠落がない（<code>docs/infra/</code> の全ページ）。</li><li>設計書（<code>docs/overview/</code> <code>docs/infra/</code> <code>docs/app/</code> <code>docs/production/</code>）の全ページで <code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が通る（出力の要約を貼る）。リンク切れがない。</li><li>観点を限定したレビューを最大 2 巡行い、blocker（誤り・矛盾・欠落）だけを直す（観点: 基本設計 → 詳細設計の順にたどれるか / 本文に理由が混ざっていないか）。</li><li>移設・節番号の変更で課題表の「対象パス」がずれた行があれば付け替える（照合結果を作業記録に残す）。<a href="../issues/index.html#I-040">I-040</a> を解消でクローズし、完了フェーズのサマリへ畳む準備をする。計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push。</li>
+<li>基本設計（全体）→ 機能別の基本設計 → 詳細設計の 3 段で、各ページの「さらに詳しく」が 1 段下だけを指している（段を飛ばしたリンクを洗い出した結果を作業記録に残す）。課題 <a href="../issues/index.html#I-042">I-042</a> の扱いを決めて表に反映する。</li>
 </ol>
 </section>
 <section><h4>3. 人が確認すること・止まる場所</h4>

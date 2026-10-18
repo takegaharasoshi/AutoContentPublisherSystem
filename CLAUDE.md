@@ -14,8 +14,8 @@ AutoContentPublisherSystem/
 │   ├── assets/                      #   設計書共通スタイル（style.css）・図の初期化（docs-diagrams.js）・同梱ライブラリ（vendor/）
 │   ├── _templates/design-page.html  #   設計書ページの雛形（書式の見本。Phase 30-1）
 │   ├── strategy/                    #   事業戦略書（収益化戦略・予算・KPI・展開方針）
-│   ├── overview/                    #   基本設計（2 面の全体像。Phase 30-3 で旧システム概要を作り直し）
-│   ├── production/                  #   生産設計（Phase 30-5 で新設予定。生産ラインの全体像・関所・受け渡しの契約・スキル一覧）
+│   ├── overview/                    #   基本設計（全体 system-overview.html + 機能別の基本設計 functions/〔30-3b・30-3c で作成〕）
+│   ├── production/                  #   生産の詳細設計（Phase 30-5・30-6 で新設予定。セット別の生産の詳細。全体像は overview/functions/）
 │   ├── infra/                       #   インフラ設計書（HTML）
 │   ├── app/                         #   アプリ設計書（共通設計書 + generators/ 方式別 + sets/ セット別の 3 層構造）
 │   ├── _archive/                    #   旧 Markdown 設計書（参考資料。現役ではない）
@@ -54,7 +54,7 @@ AutoContentPublisherSystem/
 
 設計書・計画書・記録はすべて **HTML** で記述する（Phase 18〔2026-08-28〕で計画・記録も Markdown から HTML 化）。体系の全体像・スコープ境界・設計 Fix 基準・**書式ルール**は `docs/index.html` を参照。
 
-- **2 面と 3 段で描く**（Phase 30・I-040）。システムを生産面（スキルで事前に作ってレビューし配置する）と配信面（AWS のバッチが選んで投稿する）の 2 面で描き、設計書は**基本設計（`docs/overview/`）→ 層の概要 → 詳細設計（`docs/infra/` `docs/app/` `docs/production/`）**の 3 段で読めるようにする。生産ラインの工程の細部は SKILL.md を正とし、設計書には全体像・関所・受け渡しの契約・スキル一覧だけを書く。正は `docs/index.html` セクション 2.1
+- **2 面と 3 段で描く**（Phase 30・I-040）。システムを生産面（スキルで事前に作ってレビューし配置する）と配信面（AWS のバッチが選んで投稿する）の 2 面で描き、設計書は**基本設計（全体。`docs/overview/system-overview.html`）→ 機能別の基本設計（`docs/overview/functions/`。配信面 4 = 投稿・インサイト収集・コメント自動返信・トークン更新 / 生産 = 共通 + セット別 3）→ 詳細設計（`docs/infra/` `docs/app/` `docs/production/`）**の 3 段で読めるようにする。章末の「さらに詳しく」は 1 段下だけを指す。生産ラインの工程の細部は SKILL.md を正とし、設計書には全体像・関所・受け渡しの契約・スキル一覧だけを書く。正は `docs/index.html` セクション 2.1
 - **設計書の書式**（Phase 30-1。正は `docs/index.html` セクション 5、見本は `docs/_templates/design-page.html`）: 冒頭に図と表の要約（`section.page-summary`）、本文は事実だけ、理由はページ末尾の「判断の記録」（`section#decisions`・D-01 から採番）に書き、本文からは `a.decision-ref`「→ 理由 D-xx」で片方向にリンクする。図は Mermaid で文字で書く。既存ページは Phase 30 の各ステップで順に移す（移すまでは従来の書き方のまま）
 
 - **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（Phase 9 で詳細化・Phase 10-1 で最終 Fix 済み）
@@ -67,7 +67,7 @@ AutoContentPublisherSystem/
 | `docs/strategy/` | 事業戦略（収益化戦略・予算・KPI・展開方針・セットポートフォリオ） | `business-strategy.html` |
 | `docs/overview/` | 基本設計（生産面 / 配信面の 2 面の構成・配信面の 4 系統・受け渡しの契約・構成要素の一覧・主な判断。Phase 30-3） | `system-overview.html` |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
-| `docs/production/` | 生産設計（Phase 30-5 で新設予定。スキルで回す生産ラインの全体像・関所・受け渡しの契約・スキル一覧。工程の細部は SKILL.md が正） | `index.html`（入口）+ セット別の生産設計 |
+| `docs/production/` | 生産の詳細設計（Phase 30-5・30-6 で新設予定。セット別の生産の詳細〔事前ビルドの細部など〕。生産の全体像・関所・スキル一覧は機能別の基本設計 `docs/overview/functions/` が持つ。工程の細部は SKILL.md が正） | `index.html`（目次）+ セット別の生産の詳細 |
 | `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`, `requirements-notes*.html`（壁打ち記録） |
 | `docs/plans/` | 計画体系（開発レーン + セット別の計画・記録。並行作業ルール） | `index.html`（レーン振り分け・並行作業ルールの正）, `development-plan.html` / `development-log.html`（開発レーン）, `<set_code>.html` / `<set_code>-log.html`（セットレーン × 4 セット） |
 | `docs/ideas/` | アイデア体系（意思決定前の事業アイデアの捕捉・壁打ち・醸成。6 ステータス管理） | `index.html`（ダッシュボード・運用ルールの正）, `<slug>.md`（記録層・正）, `<slug>.html`（深化したアイデアの詳細） |

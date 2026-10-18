@@ -34,32 +34,34 @@
 
 <h2 id="structure">2. ドキュメント構成</h2>
 
-<h3 id="levels">2.1 3 段の構成（基本設計 → 層の概要 → 詳細設計）</h3>
-<p>上の段だけ読めば全体が分かり、必要なときだけ下の段へ降りる。ディレクトリは再編せず、既存の <code>infra/</code> <code>app/</code> と新設の <code>production/</code> を詳細設計に位置づける（計画書・記録・課題表からのリンクを切らない）。</p>
+<h3 id="levels">2.1 3 段の構成（基本設計（全体）→ 機能別の基本設計 → 詳細設計）</h3>
+<p class="lead">設計書は、上の段だけ読めば全体が分かり、必要なときだけ 1 段ずつ下へ降りられるように 3 段で組む。1 段目は全体を 1 ページで見る<strong>基本設計（全体）</strong>、2 段目はシステムの機能ごとに 1 ページずつの<strong>機能別の基本設計</strong>、3 段目は設定値・手順・表の全件を持つ<strong>詳細設計</strong>。ディレクトリは再編せず、既存の <code>infra/</code> <code>app/</code> と新設の <code>production/</code> を詳細設計に位置づける（計画書・記録・課題表からのリンクを切らない）。</p>
+<p class="lead">図 1 は 3 段のつながりを表す。実線は「機能の詳細をたどる」道筋で、基本設計（全体）から機能ページへ、機能ページから詳細設計へと 1 段ずつ降りる。点線は、基盤やデータ全体のようにどの機能にも属さない横断の内容で、基本設計（全体）から詳細設計の層のページへ直接つなぐ。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
-    B["基本設計&lt;br&gt;overview/system-overview.html&lt;br&gt;2 面の構成・配信面の 4 系統・生産面の工程・受け渡しの契約"]
-    B --> P["層の概要: 生産設計&lt;br&gt;production/（30-5 で新設）"]
-    B --> A["層の概要: アプリ設計&lt;br&gt;app/index・design-outline"]
-    B --> I["層の概要: インフラ設計&lt;br&gt;infra/architecture"]
-    P --> PD["詳細: セット別の生産設計&lt;br&gt;工程の細部は SKILL.md が正"]
-    A --> AD["詳細: batch-flow・data-model・operation&lt;br&gt;generators/・sets/"]
-    I --> ID["詳細: stacks・workflow・security&lt;br&gt;cicd・operation"]
+    B["基本設計（全体）&lt;br&gt;overview/system-overview.html&lt;br&gt;2 面の構成・機能の一覧・受け渡しの契約"]
+    B --> FD["機能別の基本設計: 配信面&lt;br&gt;overview/functions/&lt;br&gt;投稿・インサイト収集・コメント自動返信・トークン更新"]
+    B --> FP["機能別の基本設計: 生産&lt;br&gt;overview/functions/&lt;br&gt;生産ライン共通・セット別 3"]
+    FD --> AD["詳細: アプリ app/&lt;br&gt;batch-flow・operation・sets/・generators/"]
+    FD --> ID["詳細: インフラ infra/&lt;br&gt;architecture・workflow・stacks"]
+    FP --> PD["詳細: 生産 production/&lt;br&gt;セット別の生産の詳細&lt;br&gt;工程の細部は SKILL.md"]
+    B -.->|"横断: 基盤・データ"| X["詳細: infra/architecture・security・cicd&lt;br&gt;app/data-model"]
 </pre>
-<figcaption>図 1 設計書の 3 段の構成</figcaption>
+<figcaption>図 1 設計書の 3 段の構成（Phase 30 で整備中。機能ページは 30-3b・30-3c で作る）</figcaption>
 </figure>
+<p class="lead">次の表は、段ごとの置き場所と、その段だけで分かることをまとめたもの。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>段</th><th>置き場所</th><th>ここだけで分かること</th></tr></thead>
   <tbody>
-    <tr><td>基本設計</td><td><a href="overview/system-overview.html">docs/overview/system-overview.html</a>（30-3 で作り直し済み）</td><td>2 面（生産面 / 配信面）の構成、配信面の 4 系統（投稿 / インサイト収集 / コメント自動返信 / トークン更新）、生産面の工程、2 面の受け渡しの契約、構成要素の一覧</td></tr>
-    <tr><td>層の概要</td><td>各層の入口ページ（<code>production/index.html</code>・<code>app/index.html</code> と <code>design-outline.html</code>・<code>infra/architecture.html</code>）</td><td>その層の全体像と、詳細ページの目次</td></tr>
-    <tr><td>詳細設計</td><td>上記以外の <code>infra/</code> <code>app/</code> <code>production/</code> のページ</td><td>定義・設定値・手順・表の全件</td></tr>
+    <tr><td>基本設計（全体）</td><td><a href="overview/system-overview.html">docs/overview/system-overview.html</a></td><td>2 面（生産面 / 配信面）の構成、機能の一覧、2 面の受け渡しの契約、データの流れ、構成要素の一覧</td></tr>
+    <tr><td>機能別の基本設計</td><td><code>docs/overview/functions/</code>（配信面: 投稿・インサイト収集・コメント自動返信・トークン更新 / 生産: 生産ライン共通・logic-training-1・pref-ranking-1・umigame-soup-1。30-3b・30-3c で作る）</td><td>その機能の目的・きっかけ・入力と出力・流れ・関わる部品・ほかの機能との受け渡し</td></tr>
+    <tr><td>詳細設計</td><td><code>infra/</code> <code>app/</code> <code>production/</code> のページ</td><td>定義・設定値・手順・表の全件</td></tr>
   </tbody>
 </table>
 </div>
-<p><strong>生産層 <code>docs/production/</code></strong>（30-5 で新設）: スキルで回す生産ライン（リサーチ → 候補 → 人の選別 → 執筆 → 機械検証 → 人のレビュー → 投入 → 動画ビルド → 配置）を設計の層として表す。設計書に書くのは全体像・関所（人が止める場所）・受け渡しの契約・スキルの一覧だけで、<strong>工程の細部は各スキルの SKILL.md を正とする</strong>（二重に書かない）。AWS で動くプログラムの設計はアプリ設計（<code>app/</code>）に書く。</p>
+<p><strong>生産の扱い</strong>: スキルで回す生産ライン（リサーチ → 候補 → 人の選別 → 執筆 → 機械検証 → 人のレビュー → 投入 → 動画ビルド → 配置）も 1 つの機能として、機能別の基本設計に共通 1 ページとセット別のページを置く。セット別の生産の詳細（事前ビルドの細部など）は詳細設計の層 <code>docs/production/</code>（30-5・30-6 で新設）に置く。<strong>工程の細部は各スキルの SKILL.md を正とする</strong>（設計書に二重に書かない）。AWS で動くプログラムの設計はアプリ設計（<code>app/</code>）に書く。</p>
 
 <h3 id="tree">2.2 ファイルの一覧</h3>
 
@@ -75,8 +77,9 @@ flowchart TB
 ├── strategy/
 │   └── business-strategy.html     # 事業戦略書（収益化戦略・予算・KPI・展開方針・セットポートフォリオ）
 ├── overview/
-│   └── system-overview.html       # 基本設計（2 面の構成・配信面の 4 系統・生産面の工程・受け渡しの契約・構成要素。30-3）
-├── production/                    # 生産設計（30-5 で新設。生産ラインの全体像・関所・受け渡しの契約・スキル一覧）
+│   ├── system-overview.html       # 基本設計（全体）（2 面の構成・機能の一覧・受け渡しの契約・構成要素。30-3）
+│   └── functions/                 # 機能別の基本設計（配信面 4・生産 4 ページ。30-3b・30-3c）
+├── production/                    # 生産の詳細設計（30-5・30-6 で新設。セット別の生産の詳細。全体像は overview/functions/）
 ├── infra/                         # インフラ設計書（一時 Fix 対象）
 │   ├── architecture.html          # アーキテクチャ（ネットワーク・コンピューティング・データストア）
 │   ├── stacks.html                # CDK スタック実装仕様
@@ -288,7 +291,7 @@ flowchart TB
     <tr><td>冒頭の要約</td><td>図 1 枚 + 要点の表。そのページの全体がここだけで分かるようにする</td><td>h1 とページ情報の直後に <code>&lt;section class="page-summary" id="summary"&gt;</code> を 1 つ置く</td></tr>
     <tr><td>リード文</td><td>各章・各図表の<strong>前</strong>に、「この章で何を説明するか」「この図・表は何を表すか」を日本語の文章で書く。章のリード文では、その章がどの上位の章・ページを詳しくしたものかも書く（例:「この章は 1 章の生産面を工程の単位まで詳しくしたもの」）</td><td><code>&lt;p class="lead"&gt;</code>。図・表をリード文なしで始めない（要約の図も同じ）</td></tr>
     <tr><td>本文</td><td><strong>事実だけ</strong>（何がある・どう動く・どこに何を置く・設定値）。図と表を中心にする</td><td>理由・経緯・比較した案は書かず、判断した箇所に <code>&lt;a class="decision-ref" href="#d-01"&gt;→ 理由 D-01&lt;/a&gt;</code> を置く</td></tr>
-    <tr><td>さらに詳しく</td><td>章の末尾に、その章の内容を 1 段下で詳しく書いた資料（同じページの後の章・詳細設計・セット別設計書・SKILL.md）へのリンクを並べる。「何を見たいならどこ」の形で書く（段階的詳細化のつながり）</td><td><code>&lt;div class="drilldown"&gt;&lt;span class="drilldown-title"&gt;さらに詳しく&lt;/span&gt;&lt;ul&gt;…&lt;/ul&gt;&lt;/div&gt;</code>。詳しくする先がない章は置かない</td></tr>
+    <tr><td>さらに詳しく</td><td>章の末尾に、その章の内容を 1 段下で詳しく書いた資料（同じページの後の章・詳細設計・セット別設計書・SKILL.md）へのリンクを並べる。「何を見たいならどこ」の形で書く（段階的詳細化のつながり）</td><td><code>&lt;div class="drilldown"&gt;&lt;span class="drilldown-title"&gt;さらに詳しく&lt;/span&gt;&lt;ul&gt;…&lt;/ul&gt;&lt;/div&gt;</code>。<strong>1 段下だけを指す</strong>（基本設計〔全体〕からは機能ページか同じページの章へ、機能ページからは詳細設計へ。段を飛ばさない。基盤・データなど横断の内容だけは基本設計〔全体〕から層のページへ直接つなぐ）。機能ページから詳細設計へは観点ごとに 1 リンク（処理の詳細 / AWS の定義 / 運用の手順）。詳しくする先がない章は置かない</td></tr>
     <tr><td>判断の記録</td><td>本文の判断の理由。1 件 = 1 判断</td><td>ページ末尾に <code>&lt;section class="decisions" id="decisions"&gt;</code> を 1 つ置く（5.2）</td></tr>
   </tbody>
 </table>
