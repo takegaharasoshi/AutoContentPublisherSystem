@@ -87,8 +87,8 @@ flowchart TB
   <caption>表 1 pref-ranking-1 の 2 つの関所</caption>
   <thead><tr><th>関所</th><th>いつ</th><th>場所</th><th>見るもの</th><th>返し方</th></tr></thead>
   <tbody>
-    <tr><td>① 素材のレビュー</td><td>執筆と機械検証の後・投入の前</td><td>素材のレビューページ <code>&lt;バッチ&gt;/review.html</code> + チャット</td><td>ネタごとの TOP5・出典・表示文言・ナレーション。AI の一次スクリーニングの結果</td><td>ネタ番号ごとに指摘、または「全件 OK」。全件承認まで投入しない</td></tr>
-    <tr><td>② 動画の全数レビュー</td><td>ビルドの後・配置の前</td><td>レビューシート <code>work/review.html</code> + チャット</td><td>ネタごとの動画（30 秒版）・背景・版面の文言・TOP5・cue 台本・BGM・ラウドネス</td><td><code>content_key</code> ごとに指摘、または「全件 OK」。承認はネタ単位</td></tr>
+    <tr><td>① 素材のレビュー</td><td>執筆と機械検証の後・投入の前</td><td>素材のレビューページ <code>&lt;バッチ&gt;/review.html</code>（<a href="../../../content/ranking-stock/pref-ranking-1/">バッチの一覧</a>から今回のバッチを開く）+ チャット</td><td>ネタごとの TOP5・出典・表示文言・ナレーション。AI の一次スクリーニングの結果</td><td>ネタ番号ごとに指摘、または「全件 OK」。全件承認まで投入しない</td></tr>
+    <tr><td>② 動画の全数レビュー</td><td>ビルドの後・配置の前</td><td><a href="../../../content/video-build/pref-ranking-1/work/review.html">レビューシート <code>work/review.html</code></a> + チャット</td><td>ネタごとの動画（30 秒版）・背景・版面の文言・TOP5・cue 台本・BGM・ラウドネス</td><td><code>content_key</code> ごとに指摘、または「全件 OK」。承認はネタ単位</td></tr>
   </tbody>
 </table>
 </div>
@@ -97,7 +97,7 @@ flowchart TB
 <p class="lead">数値・出典・文言が正しいかを、投入の前に確かめる関所。誤ったデータを止める唯一の関所。</p>
 <p><strong>AI が出すもの</strong>: </p>
 <ul>
-  <li><strong>素材のレビューページ</strong> <code>content/ranking-stock/pref-ranking-1/&lt;バッチ&gt;/review.html</code>（<code>generate.py</code> が作る）。冒頭にレビューの観点と「表示文言のフィールドがどこに出るか」の表と目次があり、その下にネタごとの TOP5（順位・都道府県・値）・出典・表示文言・ナレーション（cue 台本）が並ぶ。ブラウザーか VS Code の Live Preview で開く。AI がページを書き直したら再読み込みする（「直っていない」の多くは古い表示のまま）</li>
+  <li><strong>素材のレビューページ</strong> <code>content/ranking-stock/pref-ranking-1/&lt;バッチ&gt;/review.html</code>（<code>generate.py</code> が作る。バッチごとに場所が変わるので、<a href="../../../content/ranking-stock/pref-ranking-1/">バッチの一覧</a>から今回のバッチのフォルダーを開く。AI もチャットに今回のパスを書く）。冒頭にレビューの観点と「表示文言のフィールドがどこに出るか」の表と目次があり、その下にネタごとの TOP5（順位・都道府県・値）・出典・表示文言・ナレーション（cue 台本）が並ぶ。ブラウザーか VS Code の Live Preview で開く。AI がページを書き直したら再読み込みする（「直っていない」の多くは古い表示のまま）</li>
   <li><strong>チャットに一次スクリーニングの結果</strong>: blocker の候補と申し送りを先に書く。見る点は、単位・前提が画面に出るか / 同じ出典・近いテーマが並んでいないか（投稿日を離す材料）/ 3 位と 4 位のような僅差で順位が確かか / 誇張が数字を超えていないか / 下位に触れていないか / 吹き出しで熟語の途中で改行しないか</li>
 </ul>
 <p class="muted">例:</p>
@@ -111,7 +111,7 @@ blocker 候補: 033 の hook「…」は 12.2% を「8 人に 1 人」と丸め�
 <p class="lead">ビルドした動画を全部見て、S3 に置くものを決める関所。</p>
 <p><strong>AI が出すもの</strong>: </p>
 <ul>
-  <li><strong>レビューシート</strong> <code>content/video-build/pref-ranking-1/work/review.html</code>（<code>review_sheet.py</code> が作る）。ネタごとに 1 枠で、動画（30 秒版）・背景・版面の文言・TOP5（値と版面での表示）・cue 台本・BGM・実測のラウドネスが並ぶ</li>
+  <li><strong><a href="../../../content/video-build/pref-ranking-1/work/review.html">レビューシート <code>content/video-build/pref-ranking-1/work/review.html</code></a></strong>（<code>review_sheet.py</code> が作る）。ネタごとに 1 枠で、動画（30 秒版）・背景・版面の文言・TOP5（値と版面での表示）・cue 台本・BGM・実測のラウドネスが並ぶ</li>
   <li><strong>チャットに一次スクリーニングの結果</strong>: AI は出す前に、ビルドした動画から 14 秒（3 位）・22 秒（1 位の発表）・27 秒（結果総覧）のスチルを切り出して見る。背景は素材単体では良くても、合成すると地図を横切って読みにくくなることがあるので、合成後の画で確かめる</li>
 </ul>
 <p><strong>見るところ</strong>: 背景（文字・数字・記号が混じっていないか / 和モダンの画風か / 版面の読みやすさを邪魔しないか）・版面（県名と数値が正しいか / 金が沈んだりにじんだりしていないか / 文字の欠け・見切れ / 地図の点灯と順位の行が合っているか）・音（県名が停止のフラッシュに合うか・語尾が切れていないか・BGM とのバランス）。</p>
