@@ -31,6 +31,8 @@ props 生成まで、`--skip-assets` はコーチ立ち絵の再取得を省略�
 
 ビルドツールのテストは `python -m pytest` で実行します（DB・Docker・ネットワークは不要）。
 
+**バッチの最初の `build.py` の前に、`work/build_manifest.json` を `work/build_manifest_pre-<バッチ名>.bak.json` へ移して空にする**（review.html の「今回」の印は `build_manifest.json` に入っているバッチに付くため。移し忘れると前回のバッチにも「今回」が付く。2026-10-w3 で発生）。
+
 `python review_sheet.py` は過去の manifest を `work/review_archive.json` に累積し、
 `work/review.html` にバッチ一覧、`work/review/<バッチ名>.html` にレビューシートを出力します。
 各シートで動画、ループ継ぎ目を含む 5 枚のスチル、イラストを全数確認します。
