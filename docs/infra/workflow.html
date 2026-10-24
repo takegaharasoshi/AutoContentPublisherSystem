@@ -633,6 +633,8 @@ stateDiagram-v2
     <tr><td>インサイト Scheduler 起動失敗</td><td><code>AWS/Scheduler</code></td><td>上と同じ 6 メトリクス（個別アラーム、計 6 個）</td><td><code>ScheduleGroup=${InsightsScheduleGroupName}</code></td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>コメント自動返信 DLQ の滞留（<code>acps-{env}-comment-reply-dlq-messages</code>。21-3 追加・21-6 実装）</td><td><code>AWS/SQS</code></td><td><code>ApproximateNumberOfMessagesVisible</code></td><td><code>QueueName=${CommentReplyDlqName}</code>（本番面のみ）</td><td>&gt;= 1</td><td>300 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
     <tr><td>コメント返信トークンの自動更新失敗（<code>acps-{env}-comment-reply-token-refresh-errors</code>。21-6g 追加）</td><td><code>AWS/Lambda</code></td><td><code>Errors</code>（Sum）</td><td><code>FunctionName=acps-{env}-comment-reply-token-refresh</code>（本番面のみ）</td><td>&gt;= 1</td><td>3600 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>脳みそコーチの正解返信の失敗（<code>acps-{env}-coach-reply-run-errors</code>。31-4 追加）</td><td><code>AWS/Lambda</code></td><td><code>Errors</code>（Sum）</td><td><code>FunctionName=acps-{env}-coach-reply-run</code>（本番面のみ）</td><td>&gt;= 1</td><td>3600 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
+    <tr><td>脳みそコーチの返信用トークンの自動更新失敗（<code>acps-{env}-coach-reply-token-refresh-errors</code>。31-4 追加）</td><td><code>AWS/Lambda</code></td><td><code>Errors</code>（Sum）</td><td><code>FunctionName=acps-{env}-coach-reply-token-refresh</code>（本番面のみ）</td><td>&gt;= 1</td><td>3600 秒</td><td>1</td><td>1</td><td>notBreaching</td><td>SNS Topic</td></tr>
   </tbody>
 </table>
 </div>

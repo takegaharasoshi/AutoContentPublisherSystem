@@ -20,8 +20,8 @@
 
 <section class="page-summary" id="summary">
 <h2>要約</h2>
-<p class="lead">このページは、配信面（AWS）を CDK のスタックにどう分けて定義しているかを書く詳細設計である。<a href="../overview/system-overview.html#delivery">基本設計（全体）3 章</a>の配信面の 5 系統のうち、①投稿は SnsPostBatchStack と ImageBatchStack（<a href="../overview/functions/post.html">機能別の基本設計: 投稿</a>）、②インサイト収集は InsightsBatchStack（<a href="../overview/functions/insights.html">インサイト収集</a>）、③コメント自動返信と④トークン更新は CommentReplyStack（<a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a>）、⑤脳みそコーチの正解返信とその返信用トークンの更新は CoachReplyStack（<a href="../overview/functions/coach-reply.html">脳みそコーチの正解返信</a>。31-4 で実装）が持つ。共通の土台は FoundationStack、監視と通知は MonitoringStack にまとめる。AWS の構成の全体像は <a href="architecture.html">architecture.html</a>。</p>
-<p class="lead">図 1 は 7 つのスタック（31-4 で CoachReply の 2 面が加わり 9 つ）の依存。矢印は「参照される側 → 参照する側」で、矢印のラベルは受け取るもの。丸数字はデプロイ順（順番だけを並べた図は <a href="#deploy-order">4 章</a>の図 2）。続く表はこのページの要点。</p>
+<p class="lead">このページは、配信面（AWS）を CDK のスタックにどう分けて定義しているかを書く詳細設計である。<a href="../overview/system-overview.html#delivery">基本設計（全体）3 章</a>の配信面の 5 系統のうち、①投稿は SnsPostBatchStack と ImageBatchStack（<a href="../overview/functions/post.html">機能別の基本設計: 投稿</a>）、②インサイト収集は InsightsBatchStack（<a href="../overview/functions/insights.html">インサイト収集</a>）、③コメント自動返信と④トークン更新は CommentReplyStack（<a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a>）、⑤脳みそコーチの正解返信とその返信用トークンの更新は CoachReplyStack（<a href="../overview/functions/coach-reply.html">脳みそコーチの正解返信</a>）が持つ。共通の土台は FoundationStack、監視と通知は MonitoringStack にまとめる。AWS の構成の全体像は <a href="architecture.html">architecture.html</a>。</p>
+<p class="lead">図 1 は 9 つのスタック（31-4 で CoachReply の 2 面が加わった）の依存。矢印は「参照される側 → 参照する側」で、矢印のラベルは受け取るもの。丸数字はデプロイ順（順番だけを並べた図は <a href="#deploy-order">4 章</a>の図 2）。続く表はこのページの要点。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -83,7 +83,7 @@ flowchart TB
     <tr><td>SnsPostBatchStack</td><td>初期</td><td>SNS 投稿バッチ実行基盤</td></tr>
     <tr><td>InsightsBatchStack</td><td>Phase 16（16-7 設計・16-10 実装）</td><td>インサイト収集バッチ実行基盤</td></tr>
     <tr><td>CommentReplyStack（本番面 / ステージング面の 2 インスタンス）</td><td>Phase 21（21-3 設計・21-6 実装）</td><td>ウミガメのスープのコメント自動返信経路（Webhook 受信 → SQS → Reply Lambda。VPC 外）+ プライバシーポリシーの静的ホスティング</td></tr>
-    <tr><td>CoachReplyStack（本番面 / ステージング面の 2 インスタンス）</td><td>Phase 31（31-2 設計・31-4 実装予定）</td><td>脳みそコーチの正解コメントへの定時の自動返信（Scheduler → Lambda 1 本。VPC 外）+ 返信専用アプリのプライバシーポリシーの静的ホスティング</td></tr>
+    <tr><td>CoachReplyStack（本番面 / ステージング面の 2 インスタンス）</td><td>Phase 31（31-2 設計・31-4 実装）</td><td>脳みそコーチの正解コメントへの定時の自動返信（Scheduler → Lambda 1 本。VPC 外）+ 返信専用アプリのプライバシーポリシーの静的ホスティング</td></tr>
     <tr><td>MonitoringStack</td><td>初期</td><td>監視・通知</td></tr>
     <tr><td>AdminApiStack</td><td>将来</td><td>管理画面バックエンド API</td></tr>
     <tr><td>AdminWebStack</td><td>将来</td><td>管理画面フロントエンド</td></tr>
@@ -320,7 +320,7 @@ flowchart TB
 
 <p><strong>依存スタック</strong>: FoundationStack（S3 バケットの参照のみ。VPC・Aurora・ECS は使わない）</p>
 
-<h3 id="coach-reply">3.7 CoachReplyStack（Phase 31-2 設計・31-4 実装予定）</h3>
+<h3 id="coach-reply">3.7 CoachReplyStack（Phase 31-2 設計・31-4 実装〔2026-10-24 deploy〕）</h3>
 <p><strong>目的</strong>: logic-training-1（脳みそコーチ）の正解コメントへの定時の自動返信（アプリの振る舞いは <a href="../app/sets/logic-training-1-coach-reply.html">logic-training-1 の正解返信（分冊）</a>、全体像は<a href="../overview/functions/coach-reply.html">機能別の基本設計 脳みそコーチの正解返信</a>）を構築する。CommentReplyStack と同じく <strong>VPC・Aurora・CodePipeline を使わない</strong>が、Webhook・SQS は持たず、Scheduler が起動する Lambda 1 本で動く。CommentReplyStack のクラス・リソース・Secret には触れない <a class="decision-ref" href="#d-19">→ 理由 D-19</a>。</p>
 
 <p class="lead">Lambda コードは <code>services/coach-reply/</code>（pytest 付き。Graph API 呼び出しとトークン更新は <code>services/comment-reply/</code> から複製して削る）。標準ライブラリ + boto3 のみで <code>lambda.Code.fromAsset</code> で直接デプロイし（asset は <code>app/</code> だけ）、CodePipeline は通さない。スタックは <code>face</code>（<code>prod</code> / <code>staging</code>）をコンストラクタ引数に取り、<code>bin/infra.ts</code> で 2 回インスタンス化する（<code>Prod-CoachReplyStack</code> / <code>Prod-CoachReplyStagingStack</code>）。面ごとに異なるのは<strong>リソース名の接尾辞・Secret 名・SSM パラメータの階層・S3 プレフィックス・定時の Scheduler の有無</strong>だけ。</p>
@@ -415,7 +415,7 @@ CommentReplyStack（21-3 設計・21-6 実装。face = prod / staging の 2 イ�
   ├── functionUrl               → CfnOutput（Meta アプリの Webhook 先。CDK 管理外の手動設定）
   └── privacyPolicyUrl（本番面のみ・21-7 追加）→ CfnOutput（Meta アプリの公開モード設定）
 
-CoachReplyStack（31-2 設計・31-4 実装予定。face = prod / staging の 2 インスタンス）
+CoachReplyStack（31-2 設計・31-4 実装。face = prod / staging の 2 インスタンス）
   ├── runFunction（本番面のみ）          → MonitoringStack（Lambda エラーのアラーム）
   ├── tokenRefreshFunction（本番面のみ） → MonitoringStack（トークン更新の失敗アラーム）
   └── privacyPolicyUrl（本番面のみ）     → CfnOutput（返信専用 Meta アプリの公開モード設定）</code></pre>

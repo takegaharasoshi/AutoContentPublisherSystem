@@ -34,6 +34,10 @@ export interface MonitoringStackProps extends cdk.StackProps {
   commentReplyDlq: sqs.IQueue;
   /** 本番面のコメント返信トークン更新 Lambda */
   commentReplyTokenRefreshFunction: lambda.IFunction;
+  /** 本番面の正解返信 Lambda */
+  coachReplyRunFunction: lambda.IFunction;
+  /** 本番面の正解返信トークン更新 Lambda */
+  coachReplyTokenRefreshFunction: lambda.IFunction;
 }
 
 /**
@@ -180,6 +184,34 @@ export class MonitoringStack extends cdk.Stack {
       1,
       1,
       'コメント返信用トークンの週次自動更新の失敗を検知。CloudWatch Logs で原因を確認し、失効前に手動で更新する（運用設計 5.4）',
+    );
+
+    createAlarm(
+      'CoachReplyRunErrorsAlarm',
+      `acps-${props.envName}-coach-reply-run-errors`,
+      props.coachReplyRunFunction.metricErrors({
+        statistic: 'Sum',
+        period: cdk.Duration.hours(1),
+      }),
+      1,
+      cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+      1,
+      1,
+      '脳みそコーチの正解返信の失敗を検知。CloudWatch Logs で原因を確認する',
+    );
+
+    createAlarm(
+      'CoachReplyTokenRefreshErrorsAlarm',
+      `acps-${props.envName}-coach-reply-token-refresh-errors`,
+      props.coachReplyTokenRefreshFunction.metricErrors({
+        statistic: 'Sum',
+        period: cdk.Duration.hours(1),
+      }),
+      1,
+      cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+      1,
+      1,
+      '脳みそコーチの正解返信用トークンの週次自動更新の失敗を検知。CloudWatch Logs で原因を確認し、失効前に手動で更新する',
     );
 
     createAlarm(

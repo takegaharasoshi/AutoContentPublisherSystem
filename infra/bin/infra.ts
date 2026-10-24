@@ -6,6 +6,7 @@ import { ImageBatchStack } from '../lib/image-batch-stack';
 import { InsightsBatchStack } from '../lib/insights-batch-stack';
 import { MonitoringStack } from '../lib/monitoring-stack';
 import { CommentReplyStack } from '../lib/comment-reply-stack';
+import { CoachReplyStack } from '../lib/coach-reply-stack';
 
 // 環境識別子は現時点で prod のみ（docs/infra/security.html を参照）
 const SUPPORTED_ENVS = ['prod'];
@@ -49,6 +50,22 @@ new CommentReplyStack(app, 'CommentReplyStagingStack', {
   face: 'staging',
   assetsBucket: foundationStack.imagesBucket,
   stackName: `${stackNamePrefix}-CommentReplyStagingStack`,
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
+});
+
+const coachReplyStack = new CoachReplyStack(app, 'CoachReplyStack', {
+  envName,
+  face: 'prod',
+  assetsBucket: foundationStack.imagesBucket,
+  stackName: `${stackNamePrefix}-CoachReplyStack`,
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
+});
+
+new CoachReplyStack(app, 'CoachReplyStagingStack', {
+  envName,
+  face: 'staging',
+  assetsBucket: foundationStack.imagesBucket,
+  stackName: `${stackNamePrefix}-CoachReplyStagingStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });
 
@@ -119,6 +136,8 @@ new MonitoringStack(app, 'MonitoringStack', {
   insightsScheduleGroup: insightsBatchStack.scheduleGroup,
   commentReplyDlq: commentReplyStack.replyDlq,
   commentReplyTokenRefreshFunction: commentReplyStack.tokenRefreshFunction,
+  coachReplyRunFunction: coachReplyStack.runFunction,
+  coachReplyTokenRefreshFunction: coachReplyStack.tokenRefreshFunction,
   stackName: `${stackNamePrefix}-MonitoringStack`,
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'ap-northeast-1' },
 });

@@ -12,8 +12,8 @@
 <nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / <a href="logic-training-1.html">脳みそコーチ</a> / 正解返信</nav>
 <h1>logic-training-1 の正解返信</h1>
 <div class="page-meta">
-  <span class="badge badge-wip">設計（未実装）</span>
-  <span>最終更新: 2026-10-24（31-3: 3.1 に判定のモデル・プロンプト・閾値と評価の結果、3.3 に返信文の候補を書き戻した。Phase 31-2 で新設。実装は 31-3、AWS は 31-4、本番開始は 31-5・31-6）</span>
+  <span class="badge badge-wip">実装済み・本番開始前</span>
+  <span>最終更新: 2026-10-24（31-4: 1 章にコメントの <code>from</code> を足し、7.5 にウミガメのステージング面との共用の注意を書いた）。前回: 2026-10-24（31-3: 3.1 に判定のモデル・プロンプト・閾値と評価の結果、3.3 に返信文の候補を書き戻した。Phase 31-2 で新設。実装は 31-3、AWS は 31-4、本番開始は 31-5・31-6）</span>
   <span>1 段上: <a href="../../overview/functions/coach-reply.html">機能別の基本設計 脳みそコーチの正解返信</a></span>
 </div>
 
@@ -63,7 +63,7 @@ flowchart TB
   <li><code>GET /me/media?fields=id,timestamp,comments_count&amp;limit=100</code> をページ送りで最後まで読む（2026-10 時点で約 150 本 = 2 ページ）</li>
   <li>状態ファイル <code>state/media-counts.json</code> を読み、<code>comments_count</code> が前回値と<strong>違う</strong>投稿（増えた・減った・初めて見た）だけを選ぶ。前回値のない投稿は初回として扱う</li>
   <li>選んだ投稿ごとに: 問題スナップショット <code>{PROBLEMS_PREFIX}{media_id}.json</code> を読む。なければ「スナップショットなし」としてコメント数だけ更新して次へ（停止中の昼のフェルミ推定・ストーリーズなど）</li>
-  <li>コメントを <code>GET /{media_id}/comments?fields=id,text,username,timestamp,replies{id}&amp;limit=50</code> でページ送りで最後まで読み、<a href="#exclude">2 章</a>の除外を当てる</li>
+  <li>コメントを <code>GET /{media_id}/comments?fields=id,text,username,from{id,username},timestamp,replies{id}&amp;limit=50</code> でページ送りで最後まで読み（トップレベルの <code>username</code> は自分のコメントにしか返らないため、ほかの人の名前は <code>from.username</code> で埋める。31-4 の実測）、<a href="#exclude">2 章</a>の除外を当てる</li>
   <li>残ったコメントを投稿ごとにまとめて LLM で判定する（<a href="#judge">3 章</a>。1 回の呼び出しで最大 20 件。それを超えたら分ける）</li>
   <li>返す対象のコメントに、時刻の古い順に 1 件ずつ返信する（<code>POST /{comment_id}/replies?message=…</code>。スイッチが <code>off</code> なら呼ばない）。1 件返すごとに状態ファイル <code>state/judged/{media_id}.json</code> を書き直す</li>
   <li>投稿の処理が最後まで終わったら、その投稿のコメント数の前回値を更新する。判定に失敗したコメントが残る投稿は前回値を更新せず、次の起動で読み直す</li>
@@ -197,7 +197,8 @@ aws ssm put-parameter --name /acps/prod/coach-reply/reply-enabled --value on --o
   <li>返信専用アプリのプライバシーポリシーの URL は、31-1 ではウミガメの URL を暫定で借りている。31-4 で <code>CoachReplyStack</code> の専用バケットを作ったら、Meta アプリの設定の URL を差し替える（ユーザー作業）</li>
 </ul>
 <h3 id="ops-staging">7.5 ステージング面での試験（31-4）</h3>
-<p>テスト用アカウント（<code>test_tkghr</code>）の投稿に、ステージング用のスナップショット <code>assets/logic-training-1/staging/problems/{media_id}.json</code> を手で置き、別のアカウントから正解・外れのコメントを書いてから <code>aws lambda invoke --function-name acps-prod-coach-reply-run-staging</code> で起動する。正解に返信が付き、外れに付かず、2 回目の起動で同じコメントを判定し直さず、スイッチを <code>off</code> にすると返信が止まることを確かめる。</p>
+<p>テスト用アカウント（<code>test_tkghr</code>）の投稿に、ステージング用のスナップショット <code>assets/logic-training-1/staging/problems/{media_id}.json</code> を手で置き、ステージング面の開始日時を今にしてスイッチを <code>on</code> にする。別のアカウントから正解・外れのコメントを書いてから <code>aws lambda invoke --function-name acps-prod-coach-reply-run-staging</code> で起動する。正解に返信が付き、外れに付かず、2 回目の起動で同じコメントを判定し直さず、スイッチを <code>off</code> にすると返信が止まる（記録だけ書かれる）ことを確かめる。</p>
+<p><strong>注意（ウミガメのステージング面と共用）</strong>: <code>test_tkghr</code> はウミガメのコメント返信のステージング面（<code>CommentReplyStagingStack</code>）のテスト用アカウントでもあり、そちらの Webhook がすべてのコメントに 20〜25 秒で返信する。返信が付いたコメントは「返信済み」として飛ばされるため、試験の間はウミガメのステージング用 Meta アプリで <code>test_tkghr</code> の Webhook サブスクリプションのトグルをオフにし、終わったらオンに戻す（ユーザー作業。ウミガメのコード・AWS は触らない）。2026-10-24 の試験の記録は<a href="../../plans/development-plan.html#step-31-4">計画書 31-4 の作業記録</a>。</p>
 
 <section class="decisions" id="decisions">
 <h2>判断の記録</h2>
@@ -214,7 +215,7 @@ aws ssm put-parameter --name /acps/prod/coach-reply/reply-enabled --value on --o
 <h3>D-02 返信の行と返信済みは ID の突き合わせで見分ける</h3>
 <dl>
   <dt>決めたこと</dt><dd>トップレベルの一覧に重ねて出る返信の行は、どれかの <code>replies</code> に同じ ID があるかで見分ける。返信済みかどうかは、<code>replies</code> の中に自分のトップレベルの行と同じ ID があるかで見分ける</dd>
-  <dt>理由</dt><dd>31-1 の実測で、<code>replies{}</code> の各行には <code>username</code> が返らなかった（902 件すべて）。一方、運用者の返信 841 件はすべてトップレベルの一覧にも <code>username</code> 付きで出ていたため、ID で結べば書き手がわかる。<code>replies{from}</code> で書き手が取れるかは 31-3 で試し、取れればそちらに替えてよい</dd>
+  <dt>理由</dt><dd>31-1 の実測で、<code>replies{}</code> の各行には <code>username</code> が返らなかった（902 件すべて）。一方、運用者の返信 841 件はすべてトップレベルの一覧にも <code>username</code> 付きで出ていたため、ID で結べば書き手がわかる。31-4 の実測で、トップレベルの <code>username</code> は自分のコメントにしか返らず（31-1 のデータでも 1,912 件中 841 件 = 運用者の分だけ）、ほかの人の名前は <code>from{username}</code> で取れることがわかった。自分の行の見分けは今の形（<code>username</code> の一致）のままで足りる</dd>
   <dt>日付・出典</dt><dd>2026-10-24（31-1 の実測・31-2）</dd>
 </dl>
 </article>

@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib/core';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { CommentReplyStack } from '../lib/comment-reply-stack';
+import { CoachReplyStack } from '../lib/coach-reply-stack';
 import { FoundationStack } from '../lib/foundation-stack';
 import { ImageBatchStack } from '../lib/image-batch-stack';
 import { InsightsBatchStack } from '../lib/insights-batch-stack';
@@ -20,6 +21,11 @@ const createMonitoringStack = (): MonitoringStack => {
     envName: 'prod',
   });
   const commentReplyStack = new CommentReplyStack(app, 'CommentReplyStack', {
+    envName: 'prod',
+    face: 'prod',
+    assetsBucket: foundationStack.imagesBucket,
+  });
+  const coachReplyStack = new CoachReplyStack(app, 'CoachReplyStack', {
     envName: 'prod',
     face: 'prod',
     assetsBucket: foundationStack.imagesBucket,
@@ -86,6 +92,8 @@ const createMonitoringStack = (): MonitoringStack => {
     insightsScheduleGroup: insightsBatchStack.scheduleGroup,
     commentReplyDlq: commentReplyStack.replyDlq,
     commentReplyTokenRefreshFunction: commentReplyStack.tokenRefreshFunction,
+    coachReplyRunFunction: coachReplyStack.runFunction,
+    coachReplyTokenRefreshFunction: coachReplyStack.tokenRefreshFunction,
   });
 };
 
@@ -99,8 +107,8 @@ describe('MonitoringStack', () => {
     });
   });
 
-  test('CloudWatch Alarm を 20 個作成する', () => {
-    template.resourceCountIs('AWS::CloudWatch::Alarm', 20);
+  test('CloudWatch Alarm を 22 個作成する', () => {
+    template.resourceCountIs('AWS::CloudWatch::Alarm', 22);
   });
 
   test('本番面のコメント返信 DLQ の滞留を監視する', () => {
@@ -151,6 +159,31 @@ describe('MonitoringStack', () => {
       TreatMissingData: 'notBreaching',
       AlarmDescription:
         'コメント返信用トークンの週次自動更新の失敗を検知。CloudWatch Logs で原因を確認し、失効前に手動で更新する（運用設計 5.4）',
+      AlarmActions: [{ Ref: Match.stringLikeRegexp('AlarmTopic') }],
+    });
+  });
+
+  test.each([
+    ['run', 'RunFunction'],
+    ['token-refresh', 'TokenRefreshFunction'],
+  ])('本番面の正解返信 %s Lambda の失敗を 1 時間単位で監視する', (suffix, functionId) => {
+    template.hasResourceProperties('AWS::CloudWatch::Alarm', {
+      AlarmName: `acps-prod-coach-reply-${suffix}-errors`,
+      Namespace: 'AWS/Lambda',
+      MetricName: 'Errors',
+      Dimensions: [{
+        Name: 'FunctionName',
+        Value: {
+          'Fn::ImportValue': Match.stringLikeRegexp(`^CoachReplyStack:ExportsOutputRef${functionId}`),
+        },
+      }],
+      Threshold: 1,
+      ComparisonOperator: 'GreaterThanOrEqualToThreshold',
+      EvaluationPeriods: 1,
+      DatapointsToAlarm: 1,
+      Period: 3600,
+      Statistic: 'Sum',
+      TreatMissingData: 'notBreaching',
       AlarmActions: [{ Ref: Match.stringLikeRegexp('AlarmTopic') }],
     });
   });

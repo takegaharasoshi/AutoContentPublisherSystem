@@ -87,11 +87,14 @@ export class SnsPostBatchStack extends cdk.Stack {
     });
 
     props.imagesBucket.grantRead(taskRole);
-    // umigame-soup-1 の問題スナップショット出力（problem_snapshot_enabled=1 のセット。21-5b の実装・21-7 で付与）。
+    // umigame-soup-1 と logic-training-1 の問題スナップショット出力（21-7・31-4 で付与）。
     // バケットポリシーは変えずロールのポリシーで付与し、プレフィックスを限る（List・Delete は付けない）
     taskRole.addToPolicy(new iam.PolicyStatement({
       actions: ['s3:PutObject'],
-      resources: [`${props.imagesBucket.bucketArn}/assets/umigame-soup-1/problems/*`],
+      resources: [
+        `${props.imagesBucket.bucketArn}/assets/umigame-soup-1/problems/*`,
+        `${props.imagesBucket.bucketArn}/assets/logic-training-1/problems/*`,
+      ],
     }));
 
     const logGroup = new logs.LogGroup(this, 'SnsPostBatchLogGroup', {

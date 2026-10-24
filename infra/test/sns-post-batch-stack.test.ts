@@ -145,7 +145,7 @@ describe('SnsPostBatchStack のタスクロール', () => {
       ]),
     );
 
-    // umigame-soup-1 の問題スナップショット出力用（21-7）。PutObject はこのプレフィックスだけに付与する
+    // umigame-soup-1 と logic-training-1 の問題スナップショット出力用（21-7・31-4）。
     const putStatements = policies
       .flatMap((policy) => policy.Properties.PolicyDocument.Statement)
       .filter((statement: any) => JSON.stringify(statement.Resource).includes('ImagesBucket'))
@@ -154,9 +154,21 @@ describe('SnsPostBatchStack のタスクロール', () => {
       ));
     expect(putStatements).toHaveLength(1);
     expect(putStatements[0].Action).toBe('s3:PutObject');
-    expect(JSON.stringify(putStatements[0].Resource)).toContain(
-      '/assets/umigame-soup-1/problems/*',
-    );
+    expect(putStatements[0].Resource).toHaveLength(2);
+    expect(putStatements[0].Resource).toEqual([
+      {
+        'Fn::Join': ['', [
+          { 'Fn::ImportValue': expect.stringMatching(/^FoundationStack:.*ImagesBucket.*Arn/) },
+          '/assets/umigame-soup-1/problems/*',
+        ]],
+      },
+      {
+        'Fn::Join': ['', [
+          { 'Fn::ImportValue': expect.stringMatching(/^FoundationStack:.*ImagesBucket.*Arn/) },
+          '/assets/logic-training-1/problems/*',
+        ]],
+      },
+    ]);
   });
 });
 

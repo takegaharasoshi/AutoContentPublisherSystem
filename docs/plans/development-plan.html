@@ -85,7 +85,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 3 件（クリックで展開）</summary>
+<summary>完了済み 4 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-31-1" data-step-id="31-1" data-status="done" data-completed="2026-10-24">
@@ -204,17 +204,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-31-4" data-step-id="31-4" data-status="todo">
+<article class="plan-step" id="step-31-4" data-step-id="31-4" data-status="done" data-completed="2026-10-24">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>31-4</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>31-4</strong><span class="plan-status">完了</span><span>2026-10-24</span></div>
 <h3>CDK とステージング試験</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>31-3 の完了後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>2026-10-24 完了。CoachReplyStack（本番面・ステージング面）を deploy し、ステージングで正解に返信・外れに返信なし・2 回目は判定し直さない・スイッチ off で記録だけ、の 4 点を確かめた。本番面のスイッチは off のまま。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -233,11 +228,23 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-24 完了</span></summary>
+<div class="plan-fold-inner">
+<p><strong>CDK（Codex 委譲・gpt-6.1-sol / max、Claude がレビュー）</strong>: 新設 <code>infra/lib/coach-reply-stack.ts</code>・<code>infra/assets/coach-reply-privacy-policy/index.html</code>・<code>infra/test/coach-reply-stack.test.ts</code>。変更 <code>infra/bin/infra.ts</code>（両面を登録・本番面の 2 Lambda を MonitoringStack へ）・<code>sns-post-batch-stack.ts</code>（<code>assets/logic-training-1/problems/*</code> への PutObject）・<code>monitoring-stack.ts</code>（<code>acps-prod-coach-reply-run-errors</code> / <code>-token-refresh-errors</code>）。<code>comment-reply-stack.ts</code> は不変。<code>npx jest</code>: <code>Tests: 160 passed, 160 total</code>、<code>cdk synth --all</code> exit 0。</p>
+<p><strong>cdk diff</strong>（イメージタグは稼働中の CloudFormation テンプレートの値 = db 27d0ab20a77e・sns a31bb701d471・image c97ff7a65650・insights 8b1f92d48dc5）: CommentReplyStack / CommentReplyStagingStack / Foundation / ImageBatch / InsightsBatch は <code>There were no differences</code>。SnsPostBatchStack はタスクロールの PutObject に <code>assets/logic-training-1/problems/*</code> を足しただけ、MonitoringStack はアラーム 2 本の追加だけ。</p>
+<p><strong>deploy</strong>: ユーザーの依頼で Claude が <code>cdk deploy CoachReplyStack CoachReplyStagingStack SnsPostBatchStack MonitoringStack</code> を実行（exit 0。依存スタックは no changes）。出力: <code>PrivacyPolicyUrl = https://acps-prod-coach-reply-privacy-policy.s3.ap-northeast-1.amazonaws.com/index.html</code>・<code>RunFunctionName = acps-prod-coach-reply-run</code>（ステージング面 <code>-staging</code>）。ステージング面の Secret はユーザーが投入。</p>
+<p><strong>ステージング試験</strong>（<code>test_tkghr</code> のリール <code>18620605753027433</code> に「パンはパンでも食べられないパンは？ = フライパン」のスナップショットを置き、開始日時 2026-10-24T10:46:56Z・スイッチ on）: ①1 回目の起動は <code>ValueError: reply recipient username is required</code> で失敗（返信は未送信）。<strong>トップレベルの <code>username</code> は自分のコメントにしか返らない</strong>ことがわかり（31-1 のデータでも 1,912 件中 841 件 = 運用者の分だけ）、<code>list_comments</code> に <code>from{id,username}</code> を足して名前を埋めるよう直した（<code>services/coach-reply</code> pytest <code>136 passed</code>・CoachReply 2 面だけ再 deploy）。②再実行: <code>{"judged":2,"replied":1}</code>、「フライパン」= correct/high・<code>replied: true</code>（Instagram に「@… 正解！！お見事🔥」）、「食パン」= wrong/high・返信なし。一番乗りは前に返信済み・開始前のコメントがあるため付かない（分冊 3.2 どおり）。③2 回目の起動: <code>{"judged":0,"replied":0}</code>（コメント数が自分の返信で増えたため投稿は読み直したが、判定し直さない）。④スイッチ off で「フライパンとか？」に起動: <code>{"judged":1,"replied":0}</code>、記録は correct/high・<code>replied: false</code>・<code>switch: "off"</code>、Instagram に返信なし。</p>
+<p><strong>見つかったこと</strong>: <code>test_tkghr</code> はウミガメのステージング面と共用で、そちらの Webhook がすべてのコメントに 20〜25 秒で返信するため、こちらからは「返信済み」に見える。試験の間だけユーザーがウミガメのステージング用 Meta アプリで <code>test_tkghr</code> の Webhook のトグルをオフにして回避し、試験後にオンへ戻すよう依頼した。分冊 7.5 に注意として書いた。本番は脳みそコーチとウミガメでアカウントが別なので起きない。</p>
+<p><strong>状態</strong>: 本番面 <code>/acps/prod/coach-reply/reply-enabled = off</code>・<code>reply-not-before = 2099-01-01T00:00:00Z</code>、本番面の Secret は空（31-5 で投入）。本番面の定時の Scheduler は動くが、Secret が空のため起動はエラーになる → 31-5 で Secret を入れるまでは <code>acps-prod-coach-reply-run-errors</code> のアラームが鳴りうる（31-5 の最初に Secret を入れる）。返信専用 Meta アプリのプライバシーポリシー URL の差し替え（ウミガメ → 上の URL）は 31-5 でユーザーが行う。設計書: stacks.html 3.7・workflow.html 8（アラーム 2 本）・architecture.html 図 1（⑤）・分冊 1 章と 7.5・D-02 を更新。</p>
+</div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-31-5" data-step-id="31-5" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>31-5</strong><span class="plan-status">未着手</span></div>

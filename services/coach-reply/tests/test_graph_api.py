@@ -59,8 +59,19 @@ def test_comment_pages_and_nested_reply_pages_are_complete(monkeypatch) -> None:
     assert comments[0]["replies"]["data"] == [{"id": "r1"}, {"id": "r2"}]
     assert comments[1]["replies"]["data"] == []
     query = parse.parse_qs(parse.urlsplit(seen[0].full_url).query)
-    assert query == {"fields": ["id,text,username,timestamp,replies{id}"], "limit": ["50"]}
+    assert query == {"fields": ["id,text,username,from{id,username},timestamp,replies{id}"], "limit": ["50"]}
     assert len(seen) == 3
+
+
+def test_commenter_username_falls_back_to_from(monkeypatch) -> None:
+    pages = iter([{"data": [
+        {"id": "c1", "text": "a", "from": {"id": "u1", "username": "viewer"}},
+        {"id": "c2", "text": "b", "username": "owner", "from": {"id": "u2", "username": "owner"}},
+        {"id": "c3", "text": "c"},
+    ]}])
+    monkeypatch.setattr(request, "urlopen", lambda req, **kwargs: Response(next(pages)))
+    comments = graph_api.list_comments("m", "token")
+    assert [c.get("username") for c in comments] == ["viewer", "owner", None]
 
 
 @pytest.mark.parametrize("payload", [

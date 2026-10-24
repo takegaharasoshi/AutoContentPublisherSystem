@@ -80,11 +80,17 @@ def list_comments(
 ) -> list[dict]:
     """Read all comments and embedded reply IDs, including their next pages."""
     rows = _pages(_url(base_url, f"{parse.quote(media_id, safe='')}/comments",
-                       fields="id,text,username,timestamp,replies{id}", limit="50"),
+                       fields="id,text,username,from{id,username},timestamp,replies{id}",
+                       limit="50"),
                   access_token, base_url)
     for row in rows:
         if not isinstance(row.get("id"), str) or not row["id"]:
             raise ValueError("Graph API comment has no id")
+        # Top-level username is returned only for the account's own comments
+        # (31-4 measurement); other commenters are available through from{}.
+        author = row.get("from")
+        if not row.get("username") and isinstance(author, dict) and author.get("username"):
+            row["username"] = author["username"]
         replies = row.get("replies", {"data": []})
         if not isinstance(replies, dict) or not isinstance(replies.get("data"), list):
             raise ValueError("Graph API comment replies must contain a data list")
