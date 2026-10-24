@@ -109,14 +109,6 @@
 <thead><tr><th>タイトル</th><th>種別</th><th>ステータス</th><th>条件（満たされたら何をするか）</th><th>リンク</th><th>更新日</th></tr></thead>
 <tbody>
 <tr>
-  <td>脳みそコーチ（logic-training-1）の正解コメントに「正解！」を自動で返信する</td>
-  <td>単発</td>
-  <td><span class="badge badge-future">待機</span></td>
-  <td>開発レーンで次のフェーズを起こすとき（2026-10-24 時点で進行中の開発フェーズはなし）に、MD の転記下書き（N-1 返信専用 Meta アプリとオフライン評価の材料 → N-2 設計 → N-3 実装・オフライン評価 → N-4 CDK・ステージング → N-5 スイッチ付きで本番開始、確認待ち 1 件）を開発計画へ転記して採用にする。正解だけを確信が高いときに返し（一番乗りを添える）、別解・外れは人間に残す。返信は 8 時から 2 時間おきに 26 時まで（1 日 10 回）まとめて行い（全投稿が対象・コメント数が変わった投稿だけ読む・本番開始より後のコメントだけ返す・過去の投稿のスナップショットは一度だけバックフィル）、Scheduler → Lambda 1 本で Aurora は起こさない（正解は投稿バッチが S3 に書くスナップショットから読む）。ウミガメには手を入れず専用に別に作る</td>
-  <td><a href="logic-training-coach-persona.md">MD</a></td>
-  <td>2026-10-24</td>
-</tr>
-<tr>
   <td>プラットフォーム展開（ウミガメのスープをコメント返信ごと他プラットフォームへ展開する）</td>
   <td>単発</td>
   <td><span class="badge badge-future">再醸成待ち</span></td>
@@ -147,6 +139,13 @@
 <div class="table-wrap"><table data-cards data-card-extra="5">
 <thead><tr><th>タイトル</th><th>結果</th><th>昇格先 / 見送り理由</th><th>リンク</th><th>完了日</th></tr></thead>
 <tbody>
+<tr>
+  <td>脳みそコーチ（logic-training-1）の正解コメントに「正解！」を自動で返信する</td>
+  <td><span class="badge badge-fixed">採用</span></td>
+  <td>捕捉（2026-10-05）→ 壁打ち 1 回（10-24）→ 同日採用。正解だけを確信が高いときに返し（一番乗りを添える）、8 時から 2 時間おきに 26 時まで（1 日 10 回）まとめて返信する。Scheduler → Lambda 1 本で Aurora は起こさず（正解は投稿バッチが S3 に書くスナップショット）、ウミガメのコメント返信には手を入れず別系統で作る。<a href="../plans/development-plan.html#phase-31">開発計画 Phase 31</a>（31-1〜31-6）と確認待ちへ展開。ペルソナ全体は <a href="logic-training-coach-persona-design.md">別アイデア</a>へ切り出し</td>
+  <td><a href="logic-training-coach-persona.md">MD</a></td>
+  <td>2026-10-24</td>
+</tr>
 <tr>
   <td>umigame-soup-1 の動画冒頭に「アカウントの趣旨が一目で伝わる」フックシーンを足す</td>
   <td><span class="badge badge-fixed">採用</span></td>

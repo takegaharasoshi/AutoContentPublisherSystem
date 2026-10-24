@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
 <link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body data-plan-format="1" data-plan-steps="none">
+<body data-plan-format="1">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / 開発計画</nav>
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -69,7 +69,208 @@
 <p><strong>次のフェーズを起こすときの入口</strong>: <a href="#pending-checks">確認待ちリスト</a>（トリガーが来た項目）/ <a href="../ideas/index.html">アイデア体系</a>セクション 2 の条件待ち / <a href="../issues/index.html#lane-dev">課題体系の開発レーン節</a>（トリガーが揃った据え置き課題。束ね方・同梱の要否は課題表の対応方針・トリガー列が正）/ 月次 KPI 転記は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>の定常作業でフェーズにしない。起票は<a href="index.html#step-checklist">計画体系 5.1</a> のチェックリストに従う。</p>
 
 <h2 id="current-phase">進行中のフェーズ</h2>
-<p><strong>なし</strong>（2026-10-19 に Phase 30 が完了）。ステップが 0 件のあいだは構造検査のため <code>&lt;body data-plan-steps="none"&gt;</code> を宣言している。<strong>次のフェーズを起こすときにこの宣言を外す</strong>（<a href="index.html#step-layout">計画体系 5.0</a>）。</p>
+<section class="plan-phase" data-plan-phase="31" id="phase-31">
+<h2 id="phase-31-title">Phase 31: 脳みそコーチ（logic-training-1）の正解コメントに定時で自動返信する</h2>
+<p><strong>ゴール</strong>: logic-training-1 の投稿に付いた正解のコメントに、8 時から 2 時間おきに 26 時まで（1 日 10 回）まとめて「正解！」系の返信を自動で返す（最初の正解には「一番乗りだな」を添える）。Aurora を起こさず、ウミガメのコメント返信には手を入れない。</p>
+<details class="plan-fold">
+<summary>フェーズの背景・決定の経緯 <span class="plan-hint">— 採用元のアイデア・別系統で作る理由・課題照合</span></summary>
+<div class="plan-fold-inner">
+<blockquote>採用元: <a href="../ideas/logic-training-coach-persona.md">アイデア logic-training-coach-persona</a>（2026-10-24 の壁打ちで決定・同日採用。経緯の全文はアイデアの壁打ち記録）。動機は、手での返信が会話とファン化を生んでいる体感と、コメントの増加（2026-09 第 3 週以降は週 230〜250 件前後）で手が回らなくなったこと。<strong>正解だけを確信が高いときに返し、迷ったら黙る</strong>（外れに「正解」と返すのは致命的、返し漏らしは運用者が後で返せば無害）。別解・外れへの返信は運用者に残す（次の段階の候補）。<br>
+即返信ではなく<strong>定時まとめ返信</strong>にした理由: 手での運用（1 日 3〜4 回まとめて）からの急な変化を避けるため。Webhook・キュー・受け付けが不要になり、一番乗りも全件を見て判定できる。Aurora を起こさないため回数のコストはほぼない。<br>
+<strong>ウミガメとは別系統で作る</strong>: 既存機能へ影響するリスクを減らすため（凍結そのものが目的ではない）。返信専用の Meta アプリ・新しいサービス（コードは複製）・新しいスタック。共通経路は投稿バッチのスナップショット出力だけで、セット単位のフラグで切り替える。<br>
+進め方: オフライン評価（運用者の過去の返信をラベルにする）→ ステージング → 止めるスイッチ付きで本番開始。本番のシャドー運用は置かない（ユーザー判断）。<br>
+対象外: ペルソナ全体（台詞・出題の口調）は別アイデア <a href="../ideas/logic-training-coach-persona-design.md">logic-training-coach-persona-design</a>。<br>
+課題表: <a href="../issues/index.html#I-046">I-046</a>（<code>services/comment-reply/</code> を触るステップの起票時）は該当しない（ウミガメのコードを触らないため据え置きのまま）。<a href="../issues/index.html#I-015">I-015</a>・<a href="../issues/index.html#I-017">I-017</a> は対象パスに <code>services/sns-post-batch/</code> を含むが、トリガーが節目型・発生実績型で今回は引かれず、内容も無関係のため同梱しない。ほか該当なし。</blockquote>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<article class="plan-step" id="step-31-1" data-step-id="31-1" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>31-1</strong><span class="plan-status">未着手</span></div>
+<h3>返信専用の Meta アプリの準備とオフライン評価の材料集め</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>脳みそコーチ専用の返信用 Meta アプリ（Instagram ログイン方式・<code>instagram_business_basic</code> + <code>instagram_business_manage_comments</code>）を作り、テスト用アカウントと脳みそコーチのアカウントのトークンを取る。そのトークンで過去の投稿のコメントと運用者の返信を読み出し、DB の問題・正解と突き合わせて評価用データ（正解 / 別解 / 外れのラベル = 運用者の返信）にまとめる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ウミガメのコメント返信（<code>services/comment-reply/</code>・<code>CommentReplyStack</code>・その Meta アプリ）には手を入れない。投稿用の Meta アプリ・トークン（全セット共用）の権限は変えない。読み出しは読み取りだけで、コメントへの返信・削除をしない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>返信用アプリのトークンでテスト用アカウントと脳みそコーチのアカウントのコメントを読めたことを示す aws cli / Graph API の出力（トークンは伏せる）が記録にある。</li><li>評価用データのファイルがあり、件数とラベルの内訳（正解 / 別解 / 外れ / 未返信）が記録にある。読み出せなかった場合は理由と代替の取り出し方が書かれている。</li><li>計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push まで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>Meta 側のアプリ作成・公開モード化・アカウント接続はユーザー作業。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>評価用データのまとめと push まで。公開モードにできない・権限が取れない場合は方針の判断で停止（ユーザー判断）。stop after 20 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— アプリが要る理由・評価用データの置き場</span></summary>
+<div class="plan-fold-inner"><p>投稿用トークン（<code>instagram_basic</code> / <code>instagram_content_publish</code> / <code>pages_read_engagement</code> 等）にはコメント返信の権限がない。全セット共用の投稿用アプリを触らずに済むよう返信専用のアプリを分ける。Webhook は使わないため購読の設定は不要。公開モードにはプライバシーポリシーの到達可能な URL が必須（置き場は 31-2 で決める。ウミガメのバケットを読むだけなら影響はないが、新しいスタック側に持つ方が影響を減らせる）。評価用データは個人の名前を含むため、置き場（リポジトリに入れるか・<code>.gitignore</code> か）も 31-1 で決める。</p></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+<article class="plan-step" id="step-31-2" data-step-id="31-2" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>31-2</strong><span class="plan-status">未着手</span></div>
+<h3>設計（定時返信の Lambda・正解のスナップショット・判定）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>31-1 の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>新しいサービス・スタックの構成、正解の判定、投稿バッチのスナップショット出力を <code>quiz_items</code> へ広げる仕様、誤った返信を消す運用手順を設計書に書く。機能別の基本設計に新しいページ（配信面の機能の追加）を足し、詳細設計（<code>docs/app/sets/logic-training-1.html</code> の分冊、<code>docs/infra/stacks.html</code>）を書く。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ウミガメのコメント返信（<code>services/comment-reply/</code>・<code>CommentReplyStack</code>・その Meta アプリ）には手を入れない。設計書は新しい書式（<code>docs/index.html</code> セクション 5）で書く。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>基本設計（全体）・機能別の基本設計・詳細設計が更新され、<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> の判定行が OK。</li><li>計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push まで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>設計レビューはユーザー（最大 2 巡・blocker のみ修正。改善提案は課題体系へ据え置きで起票）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>設計書の push まで（<code>docs/</code> のみ）。コードは書かない。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— 設計で決めること</span></summary>
+<div class="plan-fold-inner"><ul><li>構成: EventBridge Scheduler（Asia/Tokyo・8, 10, 12, 14, 16, 18, 20, 22, 0, 2 時）→ Lambda 1 本（DB に接続しない・Step Functions も DB 準備確認も不要）。Secret・トークン更新も新しいスタックに持つ</li><li>1 回の処理: 全投稿を <code>/{ig-user-id}/media</code> で一覧（<code>comments_count</code> を同時に取る）→ 前回のコメント数（S3）から変わった投稿だけコメントを読む → S3 のスナップショットで正解を読む → 未判定のコメントだけ判定 → 正解に返信 → S3 に記録（判定済みのコメント ID・コメント数の前回値）</li><li>対象外: 判定済み・返信済み（運用者の手での返信を含む）・<strong>本番開始の日時より前のコメント</strong>・スナップショットのない投稿（停止中の昼のフェルミ推定など）</li><li>判定: 正解だけを確信が高いときに返し、迷ったら黙る。一番乗りは開始前を含めた時刻順の最初の正解で判定し、過去に正解が付いている投稿では付けない。返信文は「正解！お見事！」系の定型文の候補からランダム選択。判定の材料が正解の文言だけで足りるか（ストック側に受けてよい表現の幅を持たせるならセットレーンへ起票）</li><li><strong>返信の有効 / 無効のスイッチ</strong>（再デプロイなしで 1 コマンドで切り替える。無効時は記録だけ書く）</li><li>過去の投稿（約 150 本）のスナップショットのバックフィル手順（DB を読み取りだけで読み S3 へ書く。Aurora を起こすのは 1 回だけ）</li><li>投稿バッチ: スナップショット出力を <code>quiz_items</code> に広げ、セット単位のフラグ <code>batch_sets.problem_snapshot_enabled</code> で切り替える（ウミガメの分岐は変えない）</li></ul></div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+<article class="plan-step" id="step-31-3" data-step-id="31-3" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>31-3</strong><span class="plan-status">未着手</span></div>
+<h3>実装とオフライン評価</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>31-2 の go の後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>新しいサービス（例: <code>services/logic-training-reply/</code>。判定・Graph API 呼び出しは今のコメント返信のコードを複製して削る）、投稿バッチのスナップショット出力の拡張、過去の投稿のバックフィルのスクリプトを作る（Codex 委譲）。31-1 の評価用データで判定を流し、運用者の返信と突き合わせる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ウミガメのコメント返信（<code>services/comment-reply/</code>・<code>CommentReplyStack</code>・その Meta アプリ）には手を入れない。投稿バッチはフラグが立っていないセットの動作を変えない（ウミガメ・ランキングの回帰テストで押さえる）。共通化のために <code>shared/</code> へ切り出さない（ウミガメのコードを書き換えないため）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>新しいサービスと <code>services/sns-post-batch/</code> の pytest 全パス（要約行を貼る。投稿バッチは既存セットの回帰を含む）。</li><li>オフライン評価で<strong>外れを「正解」と判定した件数が 0 件</strong>、正解の拾えた割合が記録にある。</li><li>計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push まで。 <code>services/sns-post-batch/</code> の push 後はパイプライン完走の <code>/goal</code> 行を提示する。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>なし（パイプライン完走は <code>/goal</code> で確認）。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>services/</code>）。外れへの「正解」が出たら閾値・プロンプトを直して 2 回まで再評価、それでも出たら停止。20〜30 ターンを超えそうなら投稿バッチと新サービスで割る。stop after 30 turns。CDK は書かない。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+<article class="plan-step" id="step-31-4" data-step-id="31-4" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>31-4</strong><span class="plan-status">未着手</span></div>
+<h3>CDK とステージング試験</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>31-3 の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>新しいスタック（本番面・ステージング面）を CDK に足す。ステージング面でテスト用アカウントに実コメントを打ち、手動起動で一覧 → 判定 → 返信 → 記録、2 回目の起動で判定し直さないこと、返信スイッチの切り替えを確かめる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>ウミガメのコメント返信（<code>services/comment-reply/</code>・<code>CommentReplyStack</code>・その Meta アプリ）には手を入れない。<code>CommentReplyStack</code> のクラスを変えない（<code>cdk diff</code> で既存スタックに差分がないことを確かめる）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li><code>cdk diff</code> で既存スタックに差分がない出力（tail）が記録にある。</li><li>ステージングで、正解に返信が付き、外れには付かず、2 回目の起動で同じコメントを判定し直さず、スイッチを切ると返信が止まる（記録だけ書かれる）ことを確かめた出力が記録にある。</li><li>計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push まで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><code>cdk deploy</code> とテスト用アカウントへのコメント投稿はユーザー作業。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>ステージングの試験結果の記録まで。本番面のスイッチは「切」のまま置く。試験が通らなければ原因を記録して停止。stop after 25 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+<article class="plan-step" id="step-31-5" data-step-id="31-5" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>31-5</strong><span class="plan-status">未着手</span></div>
+<h3>本番開始の準備（過去の投稿のバックフィル・フラグ）</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>31-4 の完了後。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>過去の投稿のバックフィルを本番で 1 回流し、投稿バッチのフラグを脳みそコーチで立てる。次の投稿で新しいスナップショットが S3 に書かれたことを確かめる。本番面の返信スイッチは「切」のまま、手動起動で記録だけが書かれることを確かめる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>本番面の返信スイッチは「切」のまま（返信は 31-6 の go の後）。DB は読み取りだけ（フラグの更新を除く）。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>S3 のスナップショット件数（バックフィル分 + フラグ後の新規投稿分）の出力が記録にある。</li><li>本番面の手動起動で、返信が付かず判定の記録だけが書かれた出力が記録にある。</li><li>計画・記録の更新、日本語メッセージでのコミット、<code>pull --rebase</code>、push まで。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>バックフィルの本番実行とフラグの更新の前にユーザーの go を取る。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>記録の確認まで。stop after 15 turns。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+<article class="plan-step" id="step-31-6" data-step-id="31-6" data-status="todo" data-kind="decision">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>31-6</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<h3>本番返信の開始</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>31-5 の完了直後から判断できる。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p>ユーザーが 31-3 のオフライン評価・31-4 のステージング試験・31-5 の記録を見て go / no-go を出し、go なら本番面の返信スイッチを「入」にする（朝・夜の両方）。止める手順と誤った返信を消す手順を確かめる。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>なし。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>—（ユーザー判断）。go / no-go と、最初の定時起動で正解コメントに返信が付いたことの確認が記録に残ること。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p>このステップ自体が人間ゲート。誤った返信を見つけたら即スイッチを切って課題を起票する。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>。<code>/step</code> は goal 対象外として断る）。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="record">
+<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</section>
 
 <hr>
 
@@ -79,6 +280,7 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-10-17 / <a href="development-log.html#step-28-2">28-2</a> 一過性エラーの段階別の扱い</td><td>本番で次に Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）が起きた投稿（WARNING ログ「投稿コンテナを作成からやり直す」、または <code>api_response</code> に <code>first_error</code> を持つ <code>posts</code> 行が出たとき。<code>/incident</code> の照合で拾う）</td><td>① 公開前の失敗なら作成から 1 回だけやり直し、<code>platform_container_id</code> が新しい ID になっている ② 公開の失敗なら照会が 1 回だけ行われ、<code>PUBLISHED</code> → 「PUBLISHED 確認済み」の <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで再送 になっている ③ Instagram 上で同じ回の投稿が 2 件になっていない ④ <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形</td><td>二重投稿（③）なら即 <code>/incident</code> で課題に起票し、再送を止める修正を開発レーンで最優先にする。① ② ④ の食い違いは課題に起票（I-024 を live へ戻すかは <code>/incident</code> で判断）</td><td></td></tr>
+<tr><td>2026-10-24 / <a href="#step-31-6">31-6</a> 脳みそコーチの正解コメントへの定時返信</td><td>日付型: 31-6 の本番返信の開始から 2 週間後（絶対日付は開始時にここへ書く）</td><td>① 返信の記録で、外れのコメントに「正解」と返したものが 0 件 ② logic-training-1 の 1 投稿あたりのコメント数の中央値が、手で返していた時期（2026-10 第 1〜2 週・12.5〜16 件）の水準に戻っているか（<code>content/insights-analysis</code> の <code>per_post_latest</code>）</td><td>① が 1 件でもあれば返信スイッチを切り、課題として起票する。② は効果の観察で、戻っていなくても返信は止めない（課題として起票し、別解・外れへの返信の再検討と合わせて判断）</td><td></td></tr>
 </tbody>
 </table></div>
 
