@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -240,17 +240,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-31-5" data-step-id="31-5" data-status="todo">
+<article class="plan-step" id="step-31-5" data-step-id="31-5" data-status="done" data-completed="2026-10-25">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>31-5</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>31-5</strong><span class="plan-status">完了（2026-10-25）</span></div>
 <h3>本番開始の準備（過去の投稿のバックフィル・フラグ）</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>31-4 の完了後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>本番のスナップショットはバックフィル 369 件 + フラグ後の朝の投稿 1 件 = 370 件。本番面をスイッチ off で手動起動し、23 件を判定・返信 0 件（記録はすべて <code>replied: false</code>・<code>switch: "off"</code>）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -269,11 +264,23 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-25 完了</span></summary>
+<div class="plan-fold-inner">
+<p><strong>前段（ユーザー作業・2026-10-24）</strong>: 本番面の Secret <code>acps/prod/logic-training-1/coach-reply</code> に 4 キー（<code>ig_access_token</code>〔返信専用 Meta アプリで脳みそコーチのアカウントに発行した長期トークン〕・<code>ig_user_id</code>・<code>token_expires_at = 2026-12-23T00:00:00Z</code>・<code>anthropic_api_key</code>）を投入し、値を出さずに 4 つとも空でないことを確認。WSL に <code>jq</code> がないため JSON は <code>python3</code> で組んだ。返信専用 Meta アプリのプライバシーポリシー URL を <code>https://acps-prod-coach-reply-privacy-policy.s3.ap-northeast-1.amazonaws.com/index.html</code> に差し替え。</p>
+<p><strong>バックフィル</strong>（<code>services/coach-reply/tools/backfill_snapshots.py</code>。boto3 のある <code>services/comment-reply/.venv</code> の python で実行、<code>--bucket acps-prod-images-516964473143</code>）: 実行前の S3 は 0 件。<code>--dry-run</code> → <code>{"mode": "dry-run", "posts": 369, "existing": 0, "missing": 369, "written": 0}</code>、ユーザーの go の後 <code>--apply</code> → <code>{"mode": "apply", "posts": 369, "existing": 0, "missing": 369, "written": 369}</code>（S3 369 件・中身は <code>source: "backfill"</code> で問題・答え・解説・ヒントが入っていることを 1 件確認）。</p>
+<p><strong>フラグ</strong>: Data API で <code>UPDATE batch_sets SET problem_snapshot_enabled = 1 WHERE set_code = 'logic-training-1'</code>（更新 1 行。前後の SELECT で <code>false</code> → <code>true</code>）。</p>
+<p><strong>手動起動</strong>: 開始日時が 2099 のままでは全コメントが「開始日時より前」で記録されて判定し直されないため、スイッチ off のままユーザーが <code>reply-not-before = 2026-10-23T00:00:00Z</code> に変更（分冊 7.1 の手順を「今」から「1〜2 日前」に直した）。<code>aws lambda invoke --function-name acps-prod-coach-reply-run</code> → <code>{"media": 153, "selected": 153, "read": 153, "no_snapshot": 0, "judged": 23, "replied": 0, "judge_failures": 0, "failures": 0, "deferred": 0}</code>。状態ファイルの記録: correct/high 11・unsure/high 7・unsure/low 4・wrong/high 1（計 23）、operator_replied 804・before_start 185。<strong>すべて <code>replied: false</code>・<code>switch: "off"</code>・<code>reply_id: null</code></strong>。</p>
+<p><strong>フラグ後の新規投稿</strong>: 2026-10-25 07:33 JST の朝の投稿（<code>18057735290802823</code>・L1「どんな人に聞いても『はい』と答えてもらうことが絶対にできない質問」）のスナップショットが投稿バッチから書かれ（<code>source: "post"</code>）、S3 は 370 件。</p>
+<p><strong>状態（31-6 へ）</strong>: 本番面 <code>reply-enabled = off</code>・<code>reply-not-before = 2026-10-23T00:00:00Z</code>。off の間に判定した 23 件には on にしても返さない。31-6 の go の後、開始日時を今に進めてからスイッチを on にする（分冊 7.1）。確認待ち: 該当なし。課題表: I-015・I-017 は据え置き継続（投稿バッチのコードに触れず、トリガー未到来）。</p>
+</div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-31-6" data-step-id="31-6" data-status="todo" data-kind="decision">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>31-6</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>

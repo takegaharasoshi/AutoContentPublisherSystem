@@ -175,7 +175,7 @@ flowchart TB
 <ol>
   <li>バックフィルを <code>--dry-run</code> で流して件数を確かめ、<code>--apply</code> で書く</li>
   <li>投稿バッチのフラグを立てる: <code>UPDATE batch_sets SET problem_snapshot_enabled = 1 WHERE set_code = 'logic-training-1';</code>（データの更新で DDL ではない）。次の投稿の後に <code>assets/logic-training-1/problems/{media_id}.json</code> ができたことを確かめる</li>
-  <li>スイッチを <code>off</code> のまま、開始日時を今にして 1 回手で起動し、ログの要約と状態ファイルを確かめる（返信は呼ばれない）</li>
+  <li>スイッチを <code>off</code> のまま、開始日時を 1〜2 日前（31-5 では <code>2026-10-23T00:00:00Z</code>）にして 1 回手で起動し、ログの要約と状態ファイルを確かめる（返信は呼ばれない。今にすると判定するコメントがなく、記録が書かれない）</li>
   <li>go の後、開始日時をあらためて今にしてからスイッチを <code>on</code> にする（<code>off</code> の間に判定したコメントには返さないため、試しの起動の後に開始日時を進める）</li>
 </ol>
 <pre>aws ssm put-parameter --name /acps/prod/coach-reply/reply-not-before --value "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --overwrite
