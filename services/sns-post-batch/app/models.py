@@ -55,6 +55,17 @@ class QuizItem:
 
 
 @dataclass(frozen=True)
+class QuizSnapshotItem:
+    """Problem content written to a published quiz snapshot."""
+
+    quiz_type: str
+    difficulty: str | None
+    question_text: str
+    answer_text: str
+    content_fields: dict[str, Any]
+
+
+@dataclass(frozen=True)
 class RankingItem:
     """Caption expansion source for one ranking generation run."""
 

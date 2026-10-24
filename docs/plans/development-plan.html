@@ -85,7 +85,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 2 件（クリックで展開）</summary>
+<summary>完了済み 3 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-31-1" data-step-id="31-1" data-status="done" data-completed="2026-10-24">
@@ -170,17 +170,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-31-3" data-step-id="31-3" data-status="todo">
+<article class="plan-step" id="step-31-3" data-step-id="31-3" data-status="done" data-completed="2026-10-24">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>31-3</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>31-3</strong><span class="plan-status">完了</span><span>2026-10-24</span></div>
 <h3>実装とオフライン評価</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>31-2 の go の後。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>2026-10-24 完了。<code>services/coach-reply/</code> を新設し（pytest 135 passed）、投稿バッチに quiz 用スナップショットの出力を足した（pytest 346 passed）。オフライン評価で外れ・判定なしへの「返す」は 0 件、正解の拾えた割合は 337/517（65.2%）。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -199,11 +194,21 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-24 完了</span></summary>
+<div class="plan-fold-inner">
+<p><strong>実装（Codex 委譲 2 本・並行）</strong>: ①<code>services/coach-reply/</code>（gpt-6.1-sol / max）: <code>app/</code> に run / token-refresh のハンドラー・graph_api・state_store・snapshot_store・switch（SSM）・selection（分冊 2 章の除外）・judge（構造化出力・20 件ずつ）・first_correct（分冊 3.2）・reply_text、<code>tools/backfill_snapshots.py</code>（既定 dry-run・<code>--apply</code> で未作成キーだけ書く）・<code>tools/offline_eval.py</code>。comment-reply のコードは複製で import しない。②<code>services/sns-post-batch/</code>（gpt-6-luna / max）: <code>problem_snapshot.py</code> で umigame_items 行がなく quiz_items 行がある実行に quiz 用 JSON（<code>kind: "quiz"</code>）を書く。DB は更新しない。ウミガメの分岐は不変。Claude がレビューし、除外・一番乗り・判定失敗の再判定・スイッチ off の記録が分冊どおりであることを確かめた。</p>
+<p><strong>pytest</strong>: <code>services/coach-reply</code> <code>135 passed in 0.24s</code>（comment-reply の .venv を流用して実行）/ <code>services/sns-post-batch</code> <code>346 passed in 3.16s</code>（既存のウミガメ・ランキング・quiz の回帰を含む）。</p>
+<p><strong>オフライン評価</strong>（31-1 の評価用データ 1,009 件・Claude Haiku 5.5 effort high・返す条件 = correct かつ high）: <strong>1 回目</strong> 誤返信 1 件（答えは合っているが「30 秒もかからない」と問題への不満を書いたコメント。運用者は「次はもっと難問作る」と中身に合わせて返していた）、正解の拾えた割合 351/517（67.9%）。→ プロンプトに「答えが合っていても、問題への不満・指摘・反論や難しさへの言及を含むコメントは unsure」を足して<strong>再評価 1 回目</strong>: 外れ 0/24・判定なし 0/198 で<strong>誤返信 0 件</strong>、正解の拾えた割合 <strong>337/517（65.2%）</strong>、判定の失敗 0 件。別解ラベルで「返す」になった 2 件（「足跡」「三つ子」）は運用者も正解と返していたもの（ラベルの揺れ）。結果の明細は <code>poc/logic-training-reply-eval/data/eval_result_r1.jsonl</code> / <code>_r2.jsonl</code>（git 管理外）。</p>
+<p><strong>書き戻し</strong>: 分冊 3.1（モデル・プロンプト・閾値・評価の結果）・3.3（返信文の候補 8 + 3 本）、stacks.html 3.7（<code>JUDGE_MODEL</code> / <code>JUDGE_EFFORT</code> の既定値）、CLAUDE.md（機能別の基本設計 9 本・配信面 5、参照ガイドに正解返信の行）。課題表: I-015・I-017 はトリガー未到来で据え置き継続。投稿バッチの push はフラグが 0 の logic-training-1 の動作を変えない（フラグは 31-5）。</p>
+</div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 <article class="plan-step" id="step-31-4" data-step-id="31-4" data-status="todo">
 <header class="plan-step-head">
 <div class="plan-meta"><strong>31-4</strong><span class="plan-status">未着手</span></div>

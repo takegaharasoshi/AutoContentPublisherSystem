@@ -49,6 +49,8 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
     events: list[str] = []
     item_fetch = Mock(return_value=_item())
     monkeypatch.setattr(snapshot, "fetch_umigame_item", item_fetch)
+    quiz_fetch = Mock()
+    monkeypatch.setattr(snapshot, "fetch_quiz_snapshot_item", quiz_fetch)
     put = Mock(side_effect=lambda *args, **kwargs: events.append("put"))
     monkeypatch.setattr(snapshot, "put_object", put)
     saved_at = datetime.datetime(2026, 9, 26, 11, 0, 13)
@@ -59,6 +61,7 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
     assert _write(cursor, connection)
 
     item_fetch.assert_called_once_with(cursor, 123)
+    quiz_fetch.assert_not_called()
     assert "WHERE set_id = %s AND is_active = 1 ORDER BY id LIMIT 1" in (
         cursor.execute.call_args_list[0].args[0]
     )
@@ -97,10 +100,103 @@ def test_write_problem_snapshot_puts_schema_then_updates_db(monkeypatch) -> None
     )
 
 
+@pytest.mark.parametrize(
+    ("content_fields", "expected_hint"),
+    [
+        ('{"explanation":"理由","hint":"ヒント"}', "ヒント"),
+        ({"explanation": "理由"}, None),
+    ],
+)
+def test_write_quiz_problem_snapshot_puts_json_without_db_update(
+    monkeypatch, content_fields, expected_hint
+) -> None:
+    cursor = Mock()
+    cursor.fetchone.return_value = (
+        "L1", "light", "問題文", "答え", content_fields
+    )
+    connection = Mock()
+    monkeypatch.setattr(
+        snapshot, "fetch_umigame_item", Mock(return_value=None)
+    )
+    put = Mock()
+    monkeypatch.setattr(snapshot, "put_object", put)
+
+    assert snapshot.write_problem_snapshot(
+        cursor,
+        connection,
+        set_id=9,
+        set_code="logic-training-1",
+        generation_run_id=123,
+        media_id="18108280241184087",
+        posted_at=POSTED_AT,
+        s3_bucket="bucket",
+        s3_client=Mock(),
+    )
+
+    assert cursor.execute.call_args.args[0] == (
+        "SELECT quiz_type, difficulty, question_text, answer_text, content_fields "
+        "FROM quiz_items WHERE generation_run_id = %s"
+    )
+    assert cursor.execute.call_args.args[1] == (123,)
+    assert put.call_args.args[0:2] == (
+        "bucket", "assets/logic-training-1/problems/18108280241184087.json"
+    )
+    assert put.call_args.kwargs["content_type"] == (
+        "application/json; charset=utf-8"
+    )
+    assert json.loads(put.call_args.args[2].decode("utf-8")) == {
+        "schema_version": 1,
+        "kind": "quiz",
+        "set_code": "logic-training-1",
+        "media_id": "18108280241184087",
+        "posted_at": "2026-09-26T11:00:12Z",
+        "quiz_type": "L1",
+        "difficulty": "light",
+        "question_text": "問題文",
+        "answer_text": "答え",
+        "explanation": "理由",
+        "hint": expected_hint,
+        "source": "post",
+    }
+    connection.commit.assert_not_called()
+
+
+def test_write_quiz_problem_snapshot_rejects_empty_answer(monkeypatch) -> None:
+    cursor = Mock()
+    cursor.fetchone.return_value = (
+        "L1", "light", "問題文", "", {"explanation": "理由"}
+    )
+    connection = Mock()
+    monkeypatch.setattr(
+        snapshot, "fetch_umigame_item", Mock(return_value=None)
+    )
+    put = Mock()
+    monkeypatch.setattr(snapshot, "put_object", put)
+
+    with pytest.raises(RuntimeError, match="quiz_items.answer_text"):
+        snapshot.write_problem_snapshot(
+            cursor,
+            connection,
+            set_id=9,
+            set_code="logic-training-1",
+            generation_run_id=123,
+            media_id="18108280241184087",
+            posted_at=POSTED_AT,
+            s3_bucket="bucket",
+            s3_client=Mock(),
+        )
+
+    put.assert_not_called()
+    connection.commit.assert_not_called()
+
+
 def test_write_problem_snapshot_skips_run_without_item(monkeypatch) -> None:
     cursor = Mock()
     connection = Mock()
     monkeypatch.setattr(snapshot, "fetch_umigame_item", Mock(return_value=None))
+    monkeypatch.setattr(
+        snapshot, "fetch_quiz_snapshot_item", Mock(return_value=None)
+    )
     put = Mock()
     monkeypatch.setattr(snapshot, "put_object", put)
 

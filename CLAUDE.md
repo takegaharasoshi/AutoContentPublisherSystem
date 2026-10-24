@@ -54,7 +54,7 @@ AutoContentPublisherSystem/
 
 設計書・計画書・記録はすべて **HTML** で記述する（Phase 18〔2026-08-28〕で計画・記録も Markdown から HTML 化）。体系の全体像・スコープ境界・設計 Fix 基準・**書式ルール**は `docs/index.html` を参照。
 
-- **2 面と 3 段で描く**（Phase 30・I-040）。システムを生産面（スキルで事前に作ってレビューし配置する）と配信面（AWS のバッチが選んで投稿する）の 2 面で描き、設計書は**基本設計（全体。`docs/overview/system-overview.html`）→ 機能別の基本設計（`docs/overview/functions/`。配信面 4 = 投稿・インサイト収集・コメント自動返信・トークン更新 / 生産 = 共通 + セット別 3）→ 詳細設計（`docs/infra/` `docs/app/` `docs/production/`）**の 3 段で読めるようにする。章末の「さらに詳しく」は 1 段下だけを指す。生産ラインの工程の細部は SKILL.md を正とし、設計書には全体像・関所・受け渡しの契約・スキル一覧だけを書く。正は `docs/index.html` セクション 2.1
+- **2 面と 3 段で描く**（Phase 30・I-040）。システムを生産面（スキルで事前に作ってレビューし配置する）と配信面（AWS のバッチが選んで投稿する）の 2 面で描き、設計書は**基本設計（全体。`docs/overview/system-overview.html`）→ 機能別の基本設計（`docs/overview/functions/`。配信面 5 = 投稿・インサイト収集・コメント自動返信・トークン更新・脳みそコーチの正解返信〔Phase 31〕 / 生産 = 共通 + セット別 3）→ 詳細設計（`docs/infra/` `docs/app/` `docs/production/`）**の 3 段で読めるようにする。章末の「さらに詳しく」は 1 段下だけを指す。生産ラインの工程の細部は SKILL.md を正とし、設計書には全体像・関所・受け渡しの契約・スキル一覧だけを書く。正は `docs/index.html` セクション 2.1
 - **設計書の書式**（Phase 30-1。正は `docs/index.html` セクション 5、見本は `docs/_templates/design-page.html`）: 冒頭に図と表の要約（`section.page-summary`）、本文は事実だけ、理由はページ末尾の「判断の記録」（`section#decisions`・D-01 から採番）に書き、本文からは `a.decision-ref`「→ 理由 D-xx」で片方向にリンクする。図は Mermaid で文字で書く。既存ページは Phase 30 の各ステップで順に移す（移すまでは従来の書き方のまま）
 
 - **インフラ設計とアプリ設計を明確に分離する**。インフラ設計は `docs/infra/`、アプリ設計は `docs/app/`（Phase 9 で詳細化・Phase 10-1 で最終 Fix 済み）
@@ -65,7 +65,7 @@ AutoContentPublisherSystem/
 | ディレクトリ | 目的 | ドキュメント |
 |---|---|---|
 | `docs/strategy/` | 事業戦略（収益化戦略・予算・KPI・展開方針・セットポートフォリオ） | `business-strategy.html` |
-| `docs/overview/` | 基本設計（生産面 / 配信面の 2 面の構成・配信面の 4 系統・受け渡しの契約・構成要素の一覧・主な判断。Phase 30-3） | `system-overview.html`（全体）+ `functions/*.html`（機能別の基本設計 8 本 = 配信面 4〔投稿・インサイト収集・コメント自動返信・トークン更新〕+ 生産 4〔共通 + セット別 3〕） |
+| `docs/overview/` | 基本設計（生産面 / 配信面の 2 面の構成・配信面の 5 系統・受け渡しの契約・構成要素の一覧・主な判断。Phase 30-3） | `system-overview.html`（全体）+ `functions/*.html`（機能別の基本設計 9 本 = 配信面 5〔投稿・インサイト収集・コメント自動返信・トークン更新・脳みそコーチの正解返信〕+ 生産 4〔共通 + セット別 3〕） |
 | `docs/infra/` | インフラ設計（現役の設計書） | `architecture.html`, `stacks.html`, `workflow.html`, `security.html`, `cicd.html`, `operation.html` |
 | `docs/production/` | 生産の詳細設計（Phase 30-5・30-6a で新設。セット別の生産の詳細〔資材の置き場・作り方の規定・事前ビルド・在庫の数え方〕。生産の全体像・関所・スキル一覧は機能別の基本設計 `docs/overview/functions/` が持つ。工程の細部は SKILL.md が正） | `index.html`（目次）+ セット別の生産の詳細 |
 | `docs/app/` | アプリ設計（3 層構造。共通設計書は変更せず、セット追加で `sets/` に 1 本・生成方式の本採用で `generators/` に 1 本増える） | `index.html`（目次・検討メモ・セット一覧）, `design-outline.html`（全体方針・親ページ）, `batch-flow.html`（方式の契約・方式カタログ含む）, `data-model.html`, `operation.html`, `generators/*.html`, `sets/*.html`（umigame-soup-1 はコメント自動返信の分冊 `sets/umigame-soup-1-comment-reply.html` と調査・試験の記録ページを持つ）, `requirements-notes*.html`（壁打ち記録） |
@@ -82,7 +82,7 @@ AutoContentPublisherSystem/
 | タスク | 読むべきドキュメント |
 |---|---|
 | プロジェクトの全体像を把握 | `docs/overview/system-overview.html` |
-| 機能（投稿・インサイト収集・コメント自動返信・トークン更新・生産）ごとの全体像を把握 | `docs/overview/functions/` の該当ページ（章末の「さらに詳しく」から詳細設計へ下りる） |
+| 機能（投稿・インサイト収集・コメント自動返信・トークン更新・脳みそコーチの正解返信・生産）ごとの全体像を把握 | `docs/overview/functions/` の該当ページ（章末の「さらに詳しく」から詳細設計へ下りる） |
 | 設計書を新しく書く・新しい書式へ移す・図を描く | `docs/index.html` セクション 5（書式ルール・使ってよいライブラリ）+ 見本 `docs/_templates/design-page.html`。検査は `python3 tools/docs_check.py --widths 360,390,768,1280` |
 | 収益化戦略・予算・KPI・プラットフォーム展開方針を確認する | `docs/strategy/business-strategy.html` |
 | CDK コードを書く・修正する | `docs/infra/stacks.html`（前提知識が必要なら `docs/infra/architecture.html`） |
@@ -92,6 +92,7 @@ AutoContentPublisherSystem/
 | 監視・通知を設定する | `docs/infra/workflow.html` セクション 7〜10 + `docs/infra/operation.html` |
 | 認証・秘密情報の設定を変更する | `docs/infra/security.html` |
 | コメント自動返信（判定・返信文・評価・運用）を修正する | `docs/overview/functions/comment-reply.html`（全体像）+ `docs/app/sets/umigame-soup-1-comment-reply.html`（アプリの詳細）+ `docs/infra/stacks.html` セクション 3.6（AWS の定義） |
+| 脳みそコーチの正解返信（定時の判定・返信・スイッチ・運用）を修正する | `docs/overview/functions/coach-reply.html`（全体像）+ `docs/app/sets/logic-training-1-coach-reply.html`（アプリの詳細）+ `docs/infra/stacks.html` セクション 3.7（AWS の定義。Phase 31 で構築中） |
 | アプリ設計の大枠（全体方針・骨子）を確認する | `docs/app/design-outline.html`（親ページ）+ 分冊 `batch-flow.html` / `data-model.html` / `operation.html` |
 | セットを追加・廃止する | `docs/app/operation.html` セクション 2 + `docs/app/design-outline.html` セクション 1.1（セット別設計書ルール） |
 | 生成方式を追加・変更する | `docs/app/batch-flow.html` セクション 2.1（契約・方式カタログ）+ `docs/app/generators/` の該当方式設計書 |

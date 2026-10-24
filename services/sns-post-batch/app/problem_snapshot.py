@@ -9,6 +9,7 @@ from typing import Any
 from acps_shared.s3 import put_object
 
 from .clock import now_utc
+from .quiz_items import fetch_quiz_snapshot_item
 from .umigame_items import fetch_umigame_item
 
 
@@ -34,14 +35,52 @@ def write_problem_snapshot(
     s3_bucket: str,
     s3_client: Any,
 ) -> bool:
-    """Upload one snapshot and commit its key, if this run has an umigame item.
+    """Upload one snapshot for this run's umigame or quiz item.
 
     The caller commits the successful post before invoking this function and
-    rolls back this function's transaction if it raises.
+    rolls back this function's transaction if it raises. Quiz snapshots do not
+    write to the database.
     """
     item = fetch_umigame_item(cursor, generation_run_id)
     if item is None:
-        return False
+        quiz_item = fetch_quiz_snapshot_item(cursor, generation_run_id)
+        if quiz_item is None:
+            return False
+        if (
+            not isinstance(quiz_item.question_text, str)
+            or not quiz_item.question_text.strip()
+        ):
+            raise RuntimeError("quiz_items.question_text is NULL or empty")
+        if (
+            not isinstance(quiz_item.answer_text, str)
+            or not quiz_item.answer_text.strip()
+        ):
+            raise RuntimeError("quiz_items.answer_text is NULL or empty")
+
+        key = f"assets/{set_code}/problems/{media_id}.json"
+        snapshot = {
+            "schema_version": 1,
+            "kind": "quiz",
+            "set_code": set_code,
+            "media_id": media_id,
+            "posted_at": _posted_at_utc(posted_at),
+            "quiz_type": quiz_item.quiz_type,
+            "difficulty": quiz_item.difficulty,
+            "question_text": quiz_item.question_text,
+            "answer_text": quiz_item.answer_text,
+            "explanation": quiz_item.content_fields.get("explanation"),
+            "hint": quiz_item.content_fields.get("hint"),
+            "source": "post",
+        }
+        put_object(
+            s3_bucket,
+            key,
+            json.dumps(snapshot, ensure_ascii=False).encode("utf-8"),
+            content_type=CONTENT_TYPE,
+            client=s3_client,
+        )
+        return True
+
     if (
         not isinstance(item.core_points, list)
         or not item.core_points

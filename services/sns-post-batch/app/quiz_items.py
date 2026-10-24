@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from .models import QuizItem
+from .models import QuizItem, QuizSnapshotItem
 
 
 def fetch_quiz_item(cursor: Any, generation_run_id: int) -> QuizItem | None:
@@ -30,3 +30,32 @@ def fetch_quiz_item(cursor: Any, generation_run_id: int) -> QuizItem | None:
     if not isinstance(raw_fields, dict):
         raise RuntimeError("quiz_items.content_fields must be a JSON object")
     return QuizItem(row[0], row[1], raw_fields)
+
+
+def fetch_quiz_snapshot_item(
+    cursor: Any, generation_run_id: int
+) -> QuizSnapshotItem | None:
+    """Fetch quiz fields needed for a published problem snapshot."""
+    cursor.execute(
+        "SELECT quiz_type, difficulty, question_text, answer_text, content_fields "
+        "FROM quiz_items WHERE generation_run_id = %s",
+        (generation_run_id,),
+    )
+    row = cursor.fetchone()
+    if row is None:
+        return None
+
+    raw_fields = row[4]
+    if isinstance(raw_fields, (bytes, bytearray)):
+        try:
+            raw_fields = raw_fields.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise RuntimeError("quiz_items.content_fields is invalid UTF-8") from exc
+    if isinstance(raw_fields, str):
+        try:
+            raw_fields = json.loads(raw_fields)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("quiz_items.content_fields is invalid JSON") from exc
+    if not isinstance(raw_fields, dict):
+        raise RuntimeError("quiz_items.content_fields must be a JSON object")
+    return QuizSnapshotItem(row[0], row[1], row[2], row[3], raw_fields)
