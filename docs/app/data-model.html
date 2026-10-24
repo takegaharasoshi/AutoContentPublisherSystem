@@ -245,7 +245,7 @@ erDiagram
 
 <div>
 <p><strong>problem_snapshot_enabled（問題スナップショットの出力。V012）</strong> <a class="decision-ref" href="#d-04">→ 理由 D-04</a></p>
-<code>problem_snapshot_enabled TINYINT(1) NOT NULL DEFAULT 0</code> を追加する。<code>1</code> のセットは SNS 投稿バッチがリール投稿成功直後に、当該実行の <code>umigame_items</code> と <code>prompt_configs.prompt_text</code> から問題スナップショット JSON を S3 <code>assets/{set_code}/problems/{media_id}.json</code> へ出力する（<a href="batch-flow.html#problem-snapshot">batch-flow.html セクション 3.3 手順 6</a>。コメント自動返信経路〔<a href="../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>〕の読み取り元）。
+<code>problem_snapshot_enabled TINYINT(1) NOT NULL DEFAULT 0</code> を追加する。<code>1</code> のセットは SNS 投稿バッチがリール投稿成功直後に、当該実行の <code>umigame_items</code> と <code>prompt_configs.prompt_text</code> から問題スナップショット JSON を S3 <code>assets/{set_code}/problems/{media_id}.json</code> へ出力する（<a href="batch-flow.html#problem-snapshot">batch-flow.html セクション 3.3 手順 6</a>。コメント自動返信経路〔<a href="../infra/stacks.html#comment-reply">infra/stacks.html 3.6</a>〕の読み取り元）。Phase 31（31-2 設計）で <code>quiz_items</code> の実行にも広げ、logic-training-1 は 31-5 で <code>1</code> にする（quiz 用 JSON の読み手は脳みそコーチの正解返信 Lambda〔<a href="../infra/stacks.html#coach-reply">infra/stacks.html 3.7</a>〕。quiz 側は出力の記録列を持たない）。
   <ul style="margin:.3rem 0 0;">
     
     <li><code>DEFAULT 0</code> により既存 3 セットの挙動は不変。umigame-soup-1 の有効化は 21-7 のセット登録で行う</li>
@@ -872,6 +872,8 @@ assets/{set_code}/prebuilt/{content_key}_bg.png                                 
 assets/{set_code}/prebuilt/{content_key}.mp4 / _bg.png                                           … ウミガメ事前動画マスターと背景原画（umigame_stock_items.video_s3_key が参照。quiz / ranking と同じ規約。21-3 追加）
 assets/{set_code}/problems/{media_id}.json                                                       … 投稿後の問題スナップショット（umigame_items.snapshot_s3_key が参照。コメント自動返信 Lambda の読み取り元。ライフサイクル対象外。21-3 追加）
 assets/{set_code}/staging/problems/{media_id}.json                                               … 同・ステージング面用（手動配置。DB 記録なし。21-3 追加）
+assets/logic-training-1/problems/{media_id}.json                                                 … quiz 用の問題スナップショット（kind: quiz。DB 記録なし。脳みそコーチの正解返信 Lambda の読み取り元。31-2 追加）
+coach-reply/{set_code}{-staging}/state/media-counts.json / judged/{media_id}.json                … 脳みそコーチの正解返信の状態ファイル（コメント数の前回値・判定済みのコメント。ライフサイクルなし。31-2 追加）
 comment-log/{set_code}/dt={YYYY-MM-DD}/{comment_id}.json                                         … コメント記録 JSON（日付は Webhook 受信の UTC 日付。umigame_comment_logs.s3_key が参照。30 日ライフサイクル。21-7b 追加）</code></pre>
 <p>事前動画のファイル名に <code>quiz_stock_items.id</code> は使わない。ランキング方式（17-2 追加）の事前動画は<strong>尺サフィックス（<code>_20s</code> / <code>_30s</code>）付き</strong>で、<code>content_key</code> の形式は <code>{3 桁連番}-{slug}</code>（セクション 4.13。同じ「環境非依存の業務キーでファイル名を組む」原則）。背景原画 <code>_bg.png</code> はイラスト原画 <code>_illustration.png</code> と同じ再ビルド資産の扱い（DB 記録なし・ライフサイクル対象外）。</p>
   <ul style="margin:.3rem 0 0;">

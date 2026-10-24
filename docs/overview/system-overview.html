@@ -13,14 +13,14 @@
 <h1>基本設計（システムの全体像）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-19（30-9b: 課題 I-042 の ①②④ を直した〔1 章にコメント返信のステージング面と D-08、図 5 に記録の保持期限、2 章・6.3 のスキルの表に起動できる場所〕）。前回: 2026-10-18（30-3c で 2 章の「さらに詳しく」を生産の機能別の基本設計へ向けた。30-3b で 3 章の「さらに詳しく」を機能別の基本設計へ向けた。Phase 30-3 で旧「システム概要」を基本設計として作り直し、生産面と配信面の 2 面で描いた）</span>
+  <span>最終更新: 2026-10-24（31-2: 配信面に ⑤ 脳みそコーチの正解返信を足して 5 系統にした）。前回: 2026-10-19（30-9b: 課題 I-042 の ①②④ を直した〔1 章にコメント返信のステージング面と D-08、図 5 に記録の保持期限、2 章・6.3 のスキルの表に起動できる場所〕）。前回: 2026-10-18（30-3c で 2 章の「さらに詳しく」を生産の機能別の基本設計へ向けた。30-3b で 3 章の「さらに詳しく」を機能別の基本設計へ向けた。Phase 30-3 で旧「システム概要」を基本設計として作り直し、生産面と配信面の 2 面で描いた）</span>
   <span>設計書の 3 段の構成（基本設計 → 層の概要 → 詳細設計）は<a href="../index.html#levels">設計書体系ガイド 2.1</a></span>
 </div>
 
 <section class="page-summary" id="summary">
 <h2>要約</h2>
 <p class="lead">このシステムは、Instagram にショート動画（リール）を毎日決まった時刻に投稿し、その反応を集めて次の企画に生かすための仕組みである。全体は<strong>生産面</strong>と<strong>配信面</strong>の 2 つに分かれる。生産面では、人が AI のスキルと手元のツールを使って動画を<strong>あらかじめ作り</strong>、全部を目で確かめてから置き場所へ置く。配信面では、AWS 上のプログラムが決まった時刻にその置き場所から 1 本を選んで投稿し、反応の数値やコメントを集める。2 つの面をつなぐのは、<strong>S3 の動画の置き場所</strong>と <strong>Aurora の在庫テーブル</strong>の 2 つだけである。</p>
-<p class="lead">下の図 1 はこの全体像を 1 枚で表したもの。上から、生産面で作ってレビューする流れ → 受け渡しの置き場所 → 配信面の 4 つの仕事（投稿・インサイト収集・コメント自動返信・トークン更新）→ Instagram の順に並ぶ。続く表は、このページ全体の要点をまとめたもの。</p>
+<p class="lead">下の図 1 はこの全体像を 1 枚で表したもの。上から、生産面で作ってレビューする流れ → 受け渡しの置き場所 → 配信面の 5 つの仕事（投稿・インサイト収集・コメント自動返信・トークン更新・脳みそコーチの正解返信）→ Instagram の順に並ぶ。続く表は、このページ全体の要点をまとめたもの。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -39,6 +39,7 @@ flowchart TB
         D2["② インサイト収集&lt;br&gt;数値とコメント記録を DB へ"]
         D3["③ コメント自動返信&lt;br&gt;umigame の回答に返信"]
         D4["④ トークン更新&lt;br&gt;返信用トークンを週 1 回"]
+        D5["⑤ 脳みそコーチの正解返信&lt;br&gt;定時に正解へ返信（31-4 で構築）"]
     end
     P3 -->|"OK → publish.py"| H1
     P3 -->|"OK → publish.py"| H2
@@ -48,6 +49,7 @@ flowchart TB
     IG --> D2
     IG -->|"Webhook"| D3
     D4 -.-> D3
+    IG -->|"1 日 10 回読む"| D5
 </pre>
 <figcaption>図 1 2 面の全体構成: 生産面で作ってレビューした動画を S3 と在庫テーブルへ置き、配信面がそこから選んで投稿する</figcaption>
 </figure>
@@ -58,7 +60,7 @@ flowchart TB
     <tr><td>何をするシステムか</td><td>ショート動画（リール）を Instagram に定時投稿し、反応を集める。テーマ単位の「セット」を足し替えて運用する（稼働中は logic-training-1・pref-ranking-1・umigame-soup-1 の 3 セット）。事業の目的・KPI は<a href="../strategy/business-strategy.html">事業戦略書</a></td></tr>
     <tr><td>生産面</td><td>スキル（Claude Code / Codex）と <code>content/</code> のツールで、問題・ランキングなどの素材と動画を<strong>事前に</strong>作る。人が全数を見てから配置する <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
     <tr><td>受け渡し</td><td>ビルド済み動画を S3 の <code>assets/{set_code}/prebuilt/</code> に、素材の行を Aurora の在庫テーブル（<code>quiz_stock_items</code> / <code>ranking_stock_items</code> / <code>umigame_stock_items</code>）に置く。2 面はこの 2 つだけでつながる <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
-    <tr><td>配信面</td><td>4 系統: ①投稿（Scheduler → SFN → ECS） ②インサイト収集（同）③コメント自動返信（Lambda）④トークン更新（Lambda）。動画は投稿時に生成しない（AI を呼ぶのはコメントの判定と返信文だけ）</td></tr>
+    <tr><td>配信面</td><td>5 系統: ①投稿（Scheduler → SFN → ECS） ②インサイト収集（同）③コメント自動返信（Lambda）④トークン更新（Lambda）⑤脳みそコーチの正解返信（Scheduler → Lambda。Phase 31 で構築中）。動画は投稿時に生成しない（AI を呼ぶのはコメントの判定と返信文だけ）</td></tr>
     <tr><td>主な技術</td><td>Python・AWS CDK（TypeScript）・ECS Fargate RunTask・Step Functions・EventBridge Scheduler・Aurora Serverless v2・S3・Lambda・SQS。ローカルは Docker（Remotion・ffmpeg）とローカル TTS</td></tr>
   </tbody>
 </table>
@@ -81,7 +83,7 @@ flowchart TB
 <p>2 面は同期しない。配信面は在庫テーブルの「ビルド済み（動画キーあり）・有効」の行から選ぶだけで、生産面の作業中かどうかを知らない。在庫が尽きないよう、生産面が在庫水位を見て補充する。</p>
 <div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
   <li>生産面をもう 1 段詳しく（工程・関所・セット別の作り方）→ <a href="#production">2 章 生産面</a></li>
-  <li>配信面をもう 1 段詳しく（4 系統の起動・実体・読み書き）→ <a href="#delivery">3 章 配信面の 4 系統</a></li>
+  <li>配信面をもう 1 段詳しく（5 系統の起動・実体・読み書き）→ <a href="#delivery">3 章 配信面の 4 系統</a></li>
   <li>2 面のつなぎ目（何をどこに置き、誰が書き誰が読むか）→ <a href="#contract">4 章 受け渡しの契約</a></li>
 </ul></div>
 
@@ -125,9 +127,9 @@ flowchart TB
   <li>作ったものを配信面へどう渡すか → <a href="#contract">4 章 受け渡しの契約</a></li>
 </ul></div>
 
-<h2 id="delivery">3. 配信面の 4 系統</h2>
-<p class="lead">この章は、<a href="#faces">1 章</a>の配信面を「AWS のどのサービスが、いつ、何をするか」の単位まで詳しくしたもの。配信面の仕事は 4 つの系統に分かれ、それぞれが別々のきっかけで動く。①投稿と②インサイト収集は時刻（EventBridge Scheduler）で動くバッチ、③コメント自動返信は Instagram からの通知（Webhook）で動く Lambda、④トークン更新は週 1 回の時刻で動く Lambda である。</p>
-<p class="lead">図 3 は 4 系統を AWS の構成として描いたもの。枠 1 つが 1 系統で、矢印は起動の順番を表す。下に並ぶ Aurora・S3・Secrets Manager は、各系統が読み書きする共通の置き場所。</p>
+<h2 id="delivery">3. 配信面の 5 系統</h2>
+<p class="lead">この章は、<a href="#faces">1 章</a>の配信面を「AWS のどのサービスが、いつ、何をするか」の単位まで詳しくしたもの。配信面の仕事は 5 つの系統に分かれ、それぞれが別々のきっかけで動く。①投稿と②インサイト収集は時刻（EventBridge Scheduler）で動くバッチ、③コメント自動返信は Instagram からの通知（Webhook）で動く Lambda、④トークン更新は週 1 回の時刻で動く Lambda、⑤脳みそコーチの正解返信は 1 日 10 回の時刻で動く Lambda である（⑤は Phase 31 で構築中。31-4 で AWS に載る）。</p>
+<p class="lead">図 3 は 5 系統を AWS の構成として描いたもの。枠 1 つが 1 系統で、矢印は起動の順番を表す。下に並ぶ Aurora・S3・Secrets Manager は、各系統が読み書きする共通の置き場所。</p>
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
@@ -161,6 +163,12 @@ flowchart TB
         l3@{ icon: "aws:lambda", form: "square", label: "token-refresh" }
         s3 --> l3
     end
+    subgraph CO["⑤ 脳みそコーチの正解返信"]
+        direction TB
+        s4@{ icon: "aws:scheduler", form: "square", label: "Scheduler（8〜26 時・2 時間おき）" }
+        l4@{ icon: "aws:lambda", form: "square", label: "coach-reply-run（判定・返信）" }
+        s4 --> l4
+    end
     db@{ icon: "aws:aurora", form: "square", label: "Aurora" }
     s3b@{ icon: "aws:s3", form: "square", label: "S3" }
     sm@{ icon: "aws:secrets-manager", form: "square", label: "Secrets Manager" }
@@ -171,18 +179,20 @@ flowchart TB
     t3 --> db
     l2 --> s3b
     l3 --> sm
+    l4 --> s3b
 </pre>
-<figcaption>図 3 配信面の 4 系統（AWS 構成）。SFN の先頭では毎回 DB 準備確認（db-readiness-check）が走る（図では省略）</figcaption>
+<figcaption>図 3 配信面の 5 系統（AWS 構成）。SFN の先頭では毎回 DB 準備確認（db-readiness-check）が走る（図では省略）</figcaption>
 </figure>
-<p class="lead">次の表は、4 系統それぞれについて「いつ起動するか・AWS 上の実体は何か・何をするか・どこを読み書きするか」をまとめたもの。系統の名前から、その機能別の基本設計へ進める。</p>
+<p class="lead">次の表は、5 系統それぞれについて「いつ起動するか・AWS 上の実体は何か・何をするか・どこを読み書きするか」をまとめたもの。系統の名前から、その機能別の基本設計へ進める。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>系統</th><th>起動</th><th>実体</th><th>やること</th><th>読む / 書く</th></tr></thead>
   <tbody>
-    <tr><td><a href="functions/post.html">① 投稿</a></td><td>EventBridge Scheduler（Asia/Tokyo）: logic-training-1 毎日 07:30・21:00（12:30 枠は停止中）/ pref-ranking-1 毎日 20:00 / umigame-soup-1 日・火・木・土の 20:00</td><td>SFN <code>acps-prod-image-generation-sfn</code> → ECS <code>image-batch</code>、成功後に SFN <code>acps-prod-sns-posting-sfn</code> → ECS <code>sns-post-batch</code> <a class="decision-ref" href="#d-03">→ 理由 D-03</a></td><td>セットの生成方式（事前ビルド 3 方式）で在庫から 1 本選び、当回の投稿として登録 → Instagram Graph API でリールを投稿（セットにより ストーリーズにも再掲）</td><td>読む: 在庫テーブル・S3 <code>assets/</code>。書く: <code>generation_runs</code>・<code>generated_media</code>・<code>posts</code>・S3 <code>videos/</code>。umigame は投稿後に問題スナップショットを S3 へ</td></tr>
+    <tr><td><a href="functions/post.html">① 投稿</a></td><td>EventBridge Scheduler（Asia/Tokyo）: logic-training-1 毎日 07:30・21:00（12:30 枠は停止中）/ pref-ranking-1 毎日 20:00 / umigame-soup-1 日・火・木・土の 20:00</td><td>SFN <code>acps-prod-image-generation-sfn</code> → ECS <code>image-batch</code>、成功後に SFN <code>acps-prod-sns-posting-sfn</code> → ECS <code>sns-post-batch</code> <a class="decision-ref" href="#d-03">→ 理由 D-03</a></td><td>セットの生成方式（事前ビルド 3 方式）で在庫から 1 本選び、当回の投稿として登録 → Instagram Graph API でリールを投稿（セットにより ストーリーズにも再掲）</td><td>読む: 在庫テーブル・S3 <code>assets/</code>。書く: <code>generation_runs</code>・<code>generated_media</code>・<code>posts</code>・S3 <code>videos/</code>。umigame は投稿後に問題スナップショットを S3 へ（31-5 から logic-training-1 も）</td></tr>
     <tr><td><a href="functions/insights.html">② インサイト収集</a></td><td>Scheduler: 3 セットとも毎日 06:00・18:00</td><td>SFN <code>acps-prod-insights-collection-sfn</code> → ECS <code>insights-batch</code></td><td>直近 14 日の投稿のインサイトとアカウント日次インサイトを集め、コメント記録 JSON を DB に取り込む</td><td>書く: <code>post_insights</code>・<code>account_insights_daily</code>・<code>umigame_comment_logs</code>。読む: S3 <code>comment-log/</code></td></tr>
     <tr><td><a href="functions/comment-reply.html">③ コメント自動返信</a></td><td>Instagram の Webhook（コメント）</td><td>Lambda <code>acps-prod-comment-reply-webhook</code> → SQS FIFO <code>acps-prod-comment-reply.fifo</code> → Lambda <code>acps-prod-comment-reply-reply</code>（<code>CommentReplyStack</code>）</td><td>署名を検証してキューへ入れ、問題スナップショットを基に回答を LLM（Anthropic・OpenAI の API）で判定し、返信文を作って返信する</td><td>読む: S3 <code>assets/umigame-soup-1/problems/</code>。書く: S3 <code>comment-log/</code>（Aurora には書かない <a class="decision-ref" href="#d-04">→ 理由 D-04</a>）</td></tr>
     <tr><td><a href="functions/token-refresh.html">④ トークン更新</a></td><td>Scheduler: 毎週月曜 04:00</td><td>Lambda <code>acps-prod-comment-reply-token-refresh</code></td><td>コメント返信用の Instagram 長期トークンを更新する。投稿用トークンは手動更新 <a class="decision-ref" href="#d-05">→ 理由 D-05</a></td><td>書く: Secrets Manager <code>acps/prod/umigame-soup-1/comment-reply</code></td></tr>
+    <tr><td><a href="functions/coach-reply.html">⑤ 脳みそコーチの正解返信</a></td><td>Scheduler: 毎日 8, 10, 12, 14, 16, 18, 20, 22, 0, 2 時</td><td>Lambda <code>acps-prod-coach-reply-run</code>（<code>CoachReplyStack</code>。返信用トークンの更新 <code>acps-prod-coach-reply-token-refresh</code> も持つ）。31-4 で構築</td><td>logic-training-1 の全投稿のコメント数を見て、増えた投稿のコメントを LLM（Anthropic の API）で判定し、確信が高い正解にだけ定型文で返信する</td><td>読む: S3 <code>assets/logic-training-1/problems/</code>・SSM の返信スイッチ。読み書き: S3 <code>coach-reply/</code> の状態ファイル（Aurora には接続しない）</td></tr>
   </tbody>
 </table>
 </div>
@@ -192,7 +202,8 @@ flowchart TB
   <li>② インサイト収集 → 機能別の基本設計 <a href="functions/insights.html">インサイト収集</a></li>
   <li>③ コメント自動返信 → 機能別の基本設計 <a href="functions/comment-reply.html">コメント自動返信</a></li>
   <li>④ トークン更新 → 機能別の基本設計 <a href="functions/token-refresh.html">トークン更新</a></li>
-  <li>4 系統に共通の AWS 基盤（ネットワーク・データストア・監視）→ <a href="../infra/architecture.html">アーキテクチャ</a></li>
+  <li>⑤ 脳みそコーチの正解返信 → 機能別の基本設計 <a href="functions/coach-reply.html">脳みそコーチの正解返信</a></li>
+  <li>5 系統に共通の AWS 基盤（ネットワーク・データストア・監視）→ <a href="../infra/architecture.html">アーキテクチャ</a></li>
 </ul></div>
 
 <h2 id="contract">4. 2 面の受け渡しの契約</h2>
@@ -218,7 +229,7 @@ flowchart TB
 </ul></div>
 
 <h2 id="dataflow">5. データの流れ</h2>
-<p class="lead">この章は、<a href="#delivery">3 章</a>の 4 系統が、どのデータを受け取ってどこへ書き残すかを、データの側から追い直したもの。3 章が「誰が動くか」の視点なのに対し、ここでは「1 本の動画の情報が、在庫から投稿・反応の記録へとどう移っていくか」の視点で見る。</p>
+<p class="lead">この章は、<a href="#delivery">3 章</a>の 5 系統が、どのデータを受け取ってどこへ書き残すかを、データの側から追い直したもの。3 章が「誰が動くか」の視点なのに対し、ここでは「1 本の動画の情報が、在庫から投稿・反応の記録へとどう移っていくか」の視点で見る。</p>
 <p class="lead">図 4 は、在庫テーブルから始まり、投稿の記録 → Instagram → 反応の数値 → KPI の集計へと進む主な流れを表す。「umigame のみ」から分かれる枝は、umigame-soup-1 だけにあるコメントの返信と記録の流れ。</p>
 <figure class="diagram">
 <pre class="mermaid">
@@ -268,16 +279,17 @@ sequenceDiagram
 <h2 id="components">6. 構成要素の一覧</h2>
 <p class="lead">この章は、ここまでの図に出てきた部品を、リポジトリの置き場所ごとに一覧にしたもの。配信面のプログラム（<code>services/</code>）→ それを AWS に載せる定義（<code>infra/</code>）→ 生産面の手順書（スキル）→ 生産面の素材とツール（<code>content/</code>）の順に並べる。どの部品がどの章の何にあたるかを引くための索引として使う。</p>
 <h3 id="components-services">6.1 配信面のプログラム（<code>services/</code>）</h3>
-<p class="lead"><a href="#delivery">3 章</a>の 4 系統を実際に動かすプログラムの一覧。ECS で動くバッチが 4 つ、Lambda が 1 つ（中に 3 つの関数）と、バッチ共通のライブラリがある。</p>
+<p class="lead"><a href="#delivery">3 章</a>の 5 系統を実際に動かすプログラムの一覧。ECS で動くバッチが 4 つ、Lambda が 2 つ（中に 3 つと 2 つの関数。後者は Phase 31 で作る）と、バッチ共通のライブラリがある。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>サービス</th><th>実行形態</th><th>役割</th></tr></thead>
   <tbody>
     <tr><td><code>db-readiness-check</code></td><td>ECS Fargate（3 SFN の先頭）</td><td>Aurora の起動を待ち、接続を確かめる</td></tr>
     <tr><td><code>image-batch</code></td><td>ECS Fargate（<code>image-generation-sfn</code>）</td><td>セットの生成方式で当回の動画を用意し登録する。稼働 3 セットは事前ビルド方式（<code>quiz-prebuilt</code> / <code>ranking-prebuilt</code> / <code>umigame-prebuilt</code>）。実行時生成の方式（<code>gpt-*</code>）は登録だけ残り、使うセットはない</td></tr>
-    <tr><td><code>sns-post-batch</code></td><td>ECS Fargate（<code>sns-posting-sfn</code>）</td><td>当回の生成結果を Instagram へ投稿し結果を記録する。umigame は問題スナップショットを書く</td></tr>
+    <tr><td><code>sns-post-batch</code></td><td>ECS Fargate（<code>sns-posting-sfn</code>）</td><td>当回の生成結果を Instagram へ投稿し結果を記録する。umigame は問題スナップショットを書く（31-5 から logic-training-1 も）</td></tr>
     <tr><td><code>insights-batch</code></td><td>ECS Fargate（<code>insights-collection-sfn</code>）</td><td>投稿・アカウントのインサイト収集とコメント記録の取り込み</td></tr>
     <tr><td><code>comment-reply</code></td><td>Lambda 3 本（webhook / reply / token-refresh）</td><td>umigame のコメント自動返信と返信用トークンの更新</td></tr>
+    <tr><td><code>coach-reply</code></td><td>Lambda 2 本（run / token-refresh。31-3 で作る）</td><td>脳みそコーチの正解コメントへの定時の返信と返信用トークンの更新（<code>comment-reply</code> とコードを共有しない）</td></tr>
     <tr><td><code>shared/acps_shared</code></td><td>ライブラリ</td><td>ECS バッチ共通（DB 接続・Secrets・S3・Instagram API・SNS Secret の名前規約）</td></tr>
   </tbody>
 </table>
@@ -344,12 +356,12 @@ sequenceDiagram
   <tbody>
     <tr><td>生産ラインの全体像・関所・受け渡しの契約</td><td>機能別の基本設計 <a href="functions/production.html">生産ライン（共通）</a>（セット別は <a href="functions/production-logic-training-1.html">logic-training-1</a> / <a href="functions/production-pref-ranking-1.html">pref-ranking-1</a> / <a href="functions/production-umigame-soup-1.html">umigame-soup-1</a>）。セット別の生産の詳細は<a href="../production/index.html">生産の詳細設計</a>、工程の細部の正は各スキルの SKILL.md</td></tr>
     <tr><td>AWS の構成・ネットワーク・データストア</td><td><a href="../infra/architecture.html">アーキテクチャ</a></td></tr>
-    <tr><td>配信面の機能ごとの目的・流れ・部品（投稿・インサイト収集・コメント自動返信・トークン更新）</td><td>機能別の基本設計 <a href="functions/post.html">投稿</a> / <a href="functions/insights.html">インサイト収集</a> / <a href="functions/comment-reply.html">コメント自動返信</a> / <a href="functions/token-refresh.html">トークン更新</a></td></tr>
+    <tr><td>配信面の機能ごとの目的・流れ・部品（投稿・インサイト収集・コメント自動返信・トークン更新・脳みそコーチの正解返信）</td><td>機能別の基本設計 <a href="functions/post.html">投稿</a> / <a href="functions/insights.html">インサイト収集</a> / <a href="functions/comment-reply.html">コメント自動返信</a> / <a href="functions/token-refresh.html">トークン更新</a> / <a href="functions/coach-reply.html">脳みそコーチの正解返信</a></td></tr>
     <tr><td>SFN・スケジュール・監視リソース</td><td><a href="../infra/workflow.html">ワークフロー</a></td></tr>
     <tr><td>CDK スタックの実装仕様 / IAM・Secrets / CI/CD / インフラ運用</td><td><a href="../infra/stacks.html">stacks</a> / <a href="../infra/security.html">security</a> / <a href="../infra/cicd.html">cicd</a> / <a href="../infra/operation.html">operation</a></td></tr>
     <tr><td>バッチの処理フロー・生成方式の契約</td><td><a href="../app/batch-flow.html">バッチ処理フロー</a>（方式カタログは<a href="../app/batch-flow.html#generator-catalog">2.1</a>）</td></tr>
     <tr><td>テーブル・ER 図</td><td><a href="../app/data-model.html">データモデル</a></td></tr>
-    <tr><td>セット別の仕様（素材・投稿時刻・コメント返信）</td><td><a href="../app/index.html#set-docs">セット別設計書の一覧</a>（コメント自動返信は<a href="../app/sets/umigame-soup-1-comment-reply.html">umigame-soup-1 のコメント自動返信（分冊）</a>）</td></tr>
+    <tr><td>セット別の仕様（素材・投稿時刻・コメント返信）</td><td><a href="../app/index.html#set-docs">セット別設計書の一覧</a>（コメント自動返信は<a href="../app/sets/umigame-soup-1-comment-reply.html">umigame-soup-1 のコメント自動返信（分冊）</a>、正解返信は<a href="../app/sets/logic-training-1-coach-reply.html">logic-training-1 の正解返信（分冊）</a>）</td></tr>
     <tr><td>トークン更新の手順</td><td><a href="../app/operation.html#token-refresh">アプリ運用設計 5.4</a></td></tr>
   </tbody>
 </table>

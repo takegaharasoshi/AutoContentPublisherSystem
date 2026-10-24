@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機能別の基本設計: 脳みそコーチの正解返信 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">docs</a> / <a href="../system-overview.html">基本設計（全体）</a> / 機能別の基本設計: 脳みそコーチの正解返信</nav>
+<h1>脳みそコーチの正解返信（配信面の機能 ⑤）</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">設計（未実装）</span>
+  <span>最終更新: 2026-10-24（Phase 31-2 で新設。実装は 31-3・31-4、本番開始は 31-6）</span>
+  <span>1 段上: <a href="../system-overview.html#delivery">基本設計（全体）3 章 配信面の 5 系統</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">脳みそコーチの正解返信は、logic-training-1（脳みそコーチ）の投稿に付いた<strong>正解のコメントにだけ</strong>、「正解！お見事！」系の返信を<strong>決まった時刻にまとめて</strong>自動で返す機能である。8 時から 2 時間おきに 26 時まで（1 日 10 回）、Scheduler が起動する Lambda 1 本が全投稿のコメント数を見て、増えた投稿だけコメントを読み、LLM で判定して返す。確信が高い正解だけに返し、迷ったら黙る。Aurora には接続しない。ウミガメの<a href="comment-reply.html">コメント自動返信</a>とは別の系統で、コード・Meta アプリ・CDK スタックを共有しない <a class="decision-ref" href="#d-01">→ 理由 D-01</a>。</p>
+<p class="lead">図 1 は、定時の 1 回の起動で部品がどうつながるかを表す。正解は、投稿バッチが投稿時に S3 へ書く問題スナップショットから読み、判定済みのコメントとコメント数の前回値は S3 の状態ファイルに残す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    SCH@{ icon: "aws:scheduler", form: "square", label: "Scheduler（8〜26 時・2 時間おき）" }
+    SCH --> L@{ icon: "aws:lambda", form: "square", label: "acps-prod-coach-reply-run" }
+    SW[("SSM パラメータ&lt;br&gt;返信スイッチ・開始日時")] --> L
+    SN[("S3 assets/logic-training-1/problems/&lt;br&gt;問題スナップショット")] --> L
+    ST[("S3 coach-reply/logic-training-1/&lt;br&gt;コメント数の前回値・判定済み")] <--> L
+    L -->|"一覧・コメントを読む"| IG(["Instagram Graph API&lt;br&gt;返信専用アプリ"])
+    L -->|"判定"| LLM(["LLM の API&lt;br&gt;Anthropic"])
+    L -->|"正解にだけ返信"| IG
+</pre>
+<figcaption>図 1 脳みそコーチの正解返信の部品のつながり（1 回の起動）</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>目的</td><td>手で返していた「正解！お見事！」の返信を、コメントが増えても続ける（会話とファン化を保つ）。別解・外れへの返信は運用者に残す</td></tr>
+    <tr><td>きっかけ</td><td>EventBridge Scheduler（Asia/Tokyo の 8, 10, 12, 14, 16, 18, 20, 22, 0, 2 時）<a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
+    <tr><td>入力</td><td>全投稿のコメント数とコメント（Graph API）、問題スナップショット（問題文・答え・解説）、返信スイッチと開始日時（SSM）</td></tr>
+    <tr><td>出力</td><td>正解のコメントへの返信（最初の正解には「一番乗り」を添える）、S3 の状態ファイル（判定の結果と返信の ID）</td></tr>
+    <tr><td>主な判断</td><td>ウミガメと別系統で作る <a class="decision-ref" href="#d-01">→ 理由 D-01</a> / 定時まとめ返信にする <a class="decision-ref" href="#d-02">→ 理由 D-02</a> / Aurora を起こさない <a class="decision-ref" href="#d-03">→ 理由 D-03</a> / 確信が高い正解だけに返す <a class="decision-ref" href="#d-04">→ 理由 D-04</a> / 止めるスイッチを再デプロイなしで切り替える <a class="decision-ref" href="#d-05">→ 理由 D-05</a></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="trigger">1. きっかけ</h2>
+<p class="lead">この機能は時刻だけで動く。EventBridge Scheduler が 1 日 10 回、Lambda <code>acps-prod-coach-reply-run</code> を起動する。Webhook は使わないため、Meta アプリにコメントの購読の設定はない。1 回の起動は前回の起動から増えたコメントをまとめて扱うので、起動が 1 回失敗しても次の起動で拾い直せる（Scheduler の再試行は付けない）。</p>
+
+<h2 id="io">2. 入力と出力</h2>
+<p class="lead">次の表は、1 回の起動で何を読み、何を書くか。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>区分</th><th>もの</th><th>置き場所</th></tr></thead>
+  <tbody>
+    <tr><td>読む</td><td>全投稿の一覧とコメント数（<code>comments_count</code>）、コメント数が変わった投稿のコメントと返信</td><td>Instagram（Instagram ログイン方式の Graph API。返信専用の Meta アプリのトークン）</td></tr>
+    <tr><td>読む</td><td>問題スナップショット（問題文・答え・解説）</td><td>S3 <code>assets/logic-training-1/problems/{media_id}.json</code>（<a href="post.html">投稿</a>が書く。過去の投稿は一度だけバックフィル）</td></tr>
+    <tr><td>読む</td><td>返信スイッチ（<code>on</code> / <code>off</code>）と返信の開始日時</td><td>SSM パラメータストア <code>/acps/prod/coach-reply/reply-enabled</code>・<code>/acps/prod/coach-reply/reply-not-before</code></td></tr>
+    <tr><td>読む</td><td>Instagram のトークン・LLM の API キー</td><td>Secrets Manager <code>acps/prod/logic-training-1/coach-reply</code></td></tr>
+    <tr><td>読み書き</td><td>コメント数の前回値・投稿ごとの判定済みのコメント（判定の結果・返信の ID）</td><td>S3 <code>coach-reply/logic-training-1/state/</code></td></tr>
+    <tr><td>書く</td><td>返信</td><td>Instagram（<code>POST /{comment_id}/replies</code>。スイッチが <code>off</code> のときは書かない）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="flow">3. 流れ</h2>
+<p class="lead">図 2 は、1 回の起動の中で起きることを時間の順に表す。コメント数が前回と同じ投稿は読まないので、コメントの少ない時間帯は一覧を読むだけで終わる。</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    participant L as 正解返信の Lambda
+    participant IG as Instagram
+    participant S3 as S3
+    participant M as LLM の API
+    L->>IG: 全投稿の一覧（コメント数つき）
+    L->>S3: コメント数の前回値を読む
+    loop コメント数が変わった投稿ごと
+        L->>S3: 問題スナップショットを読む
+        alt スナップショットがない
+            L->>L: 対象外として飛ばす
+        else ある
+            L->>IG: コメントと返信を読む
+            L->>L: 判定済み・返信済み・開始前・運用者のコメントを除く
+            L->>M: 残りをまとめて判定する
+            L->>IG: 確信が高い正解にだけ返信する
+            L->>S3: 判定済みのコメントを書く
+        end
+    end
+    L->>S3: コメント数の前回値を書く
+</pre>
+<figcaption>図 2 1 回の起動の流れ</figcaption>
+</figure>
+<p>判定に失敗したコメントは判定済みにしないので、次の起動で判定し直す。返信を書いた後に状態ファイルの書き込みが失敗しても、次の起動では自分の返信が付いたコメントとして除かれるため、二重には返さない。</p>
+
+<h2 id="parts">4. 関わる部品</h2>
+<p class="lead">この機能を構成するプログラムと AWS のリソースの一覧。同じ定義から本番面とステージング面の 2 組を作る（ステージング面はテスト用アカウントを相手にし、Scheduler を持たず手で起動する）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>種類</th><th>本番面</th><th>ステージング面</th></tr></thead>
+  <tbody>
+    <tr><td>プログラム</td><td colspan="2"><code>services/coach-reply</code>（Lambda 2 本分。ウミガメの <code>services/comment-reply</code> から Graph API 呼び出し・トークン更新を複製して削る。ランタイム同梱の boto3 だけを使う）</td></tr>
+    <tr><td>Lambda</td><td><code>acps-prod-coach-reply-run</code>・<code>acps-prod-coach-reply-token-refresh</code>（トークン更新は<a href="token-refresh.html">トークン更新</a>）</td><td>同じ名前の末尾に <code>-staging</code></td></tr>
+    <tr><td>Scheduler</td><td><code>acps-prod-coach-reply-run</code>（1 日 10 回）・<code>acps-prod-coach-reply-token-refresh</code>（週 1 回）</td><td>トークン更新だけ（返信は手で起動）</td></tr>
+    <tr><td>Secret</td><td><code>acps/prod/logic-training-1/coach-reply</code></td><td>末尾に <code>-staging</code></td></tr>
+    <tr><td>SSM パラメータ</td><td><code>/acps/prod/coach-reply/reply-enabled</code>・<code>reply-not-before</code></td><td><code>/acps/prod/coach-reply-staging/…</code></td></tr>
+    <tr><td>S3（画像バケットの中）</td><td>スナップショット <code>assets/logic-training-1/problems/</code>・状態 <code>coach-reply/logic-training-1/state/</code></td><td><code>assets/logic-training-1/staging/problems/</code>・<code>coach-reply/logic-training-1-staging/state/</code></td></tr>
+    <tr><td>CDK スタック</td><td><code>CoachReplyStack</code>（プライバシーポリシーの公開バケットも持つ）</td><td><code>CoachReplyStagingStack</code></td></tr>
+    <tr><td>Meta アプリ</td><td colspan="2">返信専用の Meta アプリ（Instagram ログイン方式・<code>instagram_business_basic</code> + <code>instagram_business_manage_comments</code>・公開モード。31-1 で作成）。投稿用・ウミガメのアプリとは別</td></tr>
+    <tr><td>監視</td><td colspan="2"><code>MonitoringStack</code> の Lambda エラーのアラーム（本番面の 2 本）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="handoff">5. ほかの機能との受け渡し</h2>
+<p class="lead">脳みそコーチの正解返信は、投稿から正解を受け取り、トークンはトークン更新が保つ。インサイト収集とは受け渡しがない（返信も Instagram のコメント数に含まれて集まる）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>相手</th><th>向き</th><th>受け渡すもの</th></tr></thead>
+  <tbody>
+    <tr><td><a href="post.html">投稿</a></td><td>受け取る</td><td>問題スナップショット（<code>batch_sets.problem_snapshot_enabled = 1</code> のセットで、リールの投稿の成功後に書かれる。logic-training-1 は 31-5 で立てる）</td></tr>
+    <tr><td><a href="token-refresh.html">トークン更新</a></td><td>受け取る</td><td>Secret の Instagram トークン（週 1 回更新される）</td></tr>
+    <tr><td><a href="insights.html">インサイト収集</a></td><td>—</td><td>受け渡しなし。自動の返信もコメント数に入るので、KPI のコメント数を手での返信の時期と比べるときは注意する</td></tr>
+    <tr><td><a href="comment-reply.html">コメント自動返信（umigame）</a></td><td>—</td><td>受け渡しなし（コード・アプリ・スタック・Secret を共有しない）</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="drilldown"><span class="drilldown-title">さらに詳しく</span><ul>
+  <li>処理の詳細（対象外の決め方・判定・一番乗り・返信文・状態ファイルの形・スナップショットの形・バックフィル）と運用（始め方・止め方・誤った返信の消し方）→ <a href="../../app/sets/logic-training-1-coach-reply.html">logic-training-1 の正解返信（セット別設計書の分冊）</a></li>
+  <li>AWS の定義（Lambda・Scheduler・Secret・SSM・IAM・プライバシーポリシーのバケット）→ <a href="../../infra/stacks.html#coach-reply">CDK スタック実装仕様 3.7</a></li>
+  <li>投稿バッチのスナップショット出力 → <a href="../../app/batch-flow.html#problem-snapshot">バッチ処理フロー（投稿の成功直後の問題スナップショット）</a></li>
+</ul></div>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 ウミガメのコメント自動返信とは別系統で作る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>返信専用の Meta アプリ・新しいサービス（コードは複製）・新しいスタック・Secret で作る。共通の経路は投稿バッチのスナップショット出力だけで、セット単位のフラグで切り替える</dd>
+  <dt>理由</dt><dd>稼働中のウミガメの返信へ影響するリスクを減らすため（凍結そのものが目的ではない）。今の返信機能をセット切り替え式に改修する案と、<code>shared/</code> へ共通化する案は、ウミガメのコードを書き換えるため取らない。投稿用トークンにはコメント返信の権限がなく、全セット共用の投稿用アプリの権限も変えたくないため、アプリも分ける</dd>
+  <dt>日付・出典</dt><dd>2026-10-24 アイデア <a href="../../ideas/logic-training-coach-persona.md">logic-training-coach-persona</a> の壁打ち・<a href="../../plans/development-plan.html#phase-31">Phase 31</a></dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 即返信ではなく定時まとめ返信にする</h3>
+<dl>
+  <dt>決めたこと</dt><dd>8 時から 2 時間おきに 26 時まで、1 日 10 回の定時起動でまとめて返す。Webhook・キュー・受け付けは置かない</dd>
+  <dt>理由</dt><dd>手での運用（1 日 3〜4 回まとめて返す）からの急な変化と、即返信の bot 感を避けるため。全件を見てから一番乗りを決められる。Aurora を起こさないため回数のコストはほぼない（空振りは一覧だけ）。コメントごとに 30 分あける案は、1 件ごとの待ち（Step Functions の Wait か 1 回限りの予約）が要り、構成が重くなるため取らない</dd>
+  <dt>日付・出典</dt><dd>2026-10-24 アイデアの壁打ち（返信のタイミング・頻度）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 Aurora に接続せず、正解は S3 のスナップショットから読む</h3>
+<dl>
+  <dt>決めたこと</dt><dd>Lambda は VPC に置かず DB にも接続しない。正解は投稿バッチが書く問題スナップショットから読み、過去の投稿の分は DB から一度だけバックフィルする</dd>
+  <dt>理由</dt><dd>1 日 10 回の起動のたびに Aurora を自動停止から起こすと、待ち時間と費用がかかるため。投稿バッチはもともと DB を使うので、スナップショットを書いても Aurora を起こす回数は増えない</dd>
+  <dt>日付・出典</dt><dd>2026-10-24 アイデアの壁打ち（Aurora を起こさない）。ウミガメの<a href="comment-reply.html#d-01">コメント自動返信 D-01</a> と同じ考え方</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 確信が高い正解だけに返し、迷ったら黙る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>LLM の判定が「正解」かつ確信が高いときだけ返信する。別解・外れ・迷いには返さず、未返信のまま運用者に残す</dd>
+  <dt>理由</dt><dd>外れに「正解」と返すのは視聴者に見える致命的な誤りだが、返し漏らしは運用者が後で返せば無害なため。別解・外れへの返信は手での運用でも中身に応じた文面を書いており、自動化は次の段階の候補にする</dd>
+  <dt>日付・出典</dt><dd>2026-10-24 アイデアの壁打ち。判定の基準は 31-3 のオフライン評価（31-1 の評価用データ 1,009 件）で決める</dd>
+</dl>
+</article>
+<article id="d-05">
+<h3>D-05 返信スイッチを SSM パラメータに置き、再デプロイなしで切り替える</h3>
+<dl>
+  <dt>決めたこと</dt><dd>起動のたびに SSM パラメータ <code>reply-enabled</code> を読み、<code>on</code> のときだけ返信する。<code>off</code> では判定と状態ファイルの記録だけを行う。切り替えは <code>aws ssm put-parameter</code> の 1 コマンド</dd>
+  <dt>理由</dt><dd>誤った返信を見つけたときに、すぐ止められるようにするため。環境変数だと Lambda の設定変更（実質の再デプロイ）が要り、Secret だとトークンと同じ場所を触ることになる。SSM の標準パラメータは無料</dd>
+  <dt>日付・出典</dt><dd>2026-10-24（31-2）</dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>

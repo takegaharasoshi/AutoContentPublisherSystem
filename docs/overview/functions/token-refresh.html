@@ -13,8 +13,8 @@
 <h1>トークン更新（配信面の機能 ④）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-18（Phase 30-3b で新設）</span>
-  <span>1 段上: <a href="../system-overview.html#delivery">基本設計（全体）3 章 配信面の 4 系統</a></span>
+  <span>最終更新: 2026-10-24（31-2: 脳みそコーチの正解返信の返信用トークンも同じ方式で更新することを足した）。前回: 2026-10-18（Phase 30-3b で新設）</span>
+  <span>1 段上: <a href="../system-overview.html#delivery">基本設計（全体）3 章 配信面の 5 系統</a></span>
 </div>
 
 <section class="page-summary" id="summary">
@@ -104,6 +104,8 @@ sequenceDiagram
   </tbody>
 </table>
 </div>
+
+<p><strong>脳みそコーチの正解返信（⑤）の返信用トークン</strong>: 返信専用の Meta アプリのトークンも 60 日で失効するため、同じ方式の Lambda <code>acps-prod-coach-reply-token-refresh</code>（<code>CoachReplyStack</code>・毎週月曜 04:30・Secret <code>acps/prod/logic-training-1/coach-reply</code>）が更新する。コードはこの機能から複製し、Secret とスタックを共有しない（31-4 で構築。<a href="../../infra/stacks.html#coach-reply">CDK スタック実装仕様 3.7</a>）。</p>
 
 <h2 id="handoff">5. ほかの機能との受け渡し</h2>
 <p class="lead">トークン更新は、コメント自動返信のためだけにある。</p>

@@ -14,7 +14,7 @@
 <div class="page-meta">
   <span class="badge badge-fixed">Fix（15-13 で作成・16-1 / 16-2b / 16-3b / 16-4b / 16-4d で改訂）</span>
   <span>set_code: logic-training-1</span>
-  <span>最終更新: 2026-10-18（30-8a: 冒頭の要約と判断の記録〔D-01〜D-03〕を足し、囲みの判断を末尾へ移した。16-1 / 16-3b の適用状態の注記を要約へまとめた）。2026-09-03（改修 R-1: 動画レンダラーを Remotion へ。仕様の正は <a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a>）</span>
+  <span>最終更新: 2026-10-24（31-2: 正解返信の分冊へのリンクを足した）。前回: 2026-10-18（30-8a: 冒頭の要約と判断の記録〔D-01〜D-03〕を足し、囲みの判断を末尾へ移した。16-1 / 16-3b の適用状態の注記を要約へまとめた）。2026-09-03（改修 R-1: 動画レンダラーを Remotion へ。仕様の正は <a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a>）</span>
 </div>
 
 <section class="page-summary" id="summary">
@@ -37,6 +37,7 @@ flowchart TB
     <tr><td>投稿</td><td>朝 7:30・夜 21:00 の 1 日 2 回（昼 12:30 は 16-4d〔2026-08-24〕から当分停止）。リール + ストーリーズ再掲（3 章）</td></tr>
     <tr><td>動画</td><td>16 秒・3 カット。答え・解説はキャプションへ（4・5 章）</td></tr>
     <tr><td>素材</td><td>問題ストック <code>quiz_stock_items</code>（スロットの型・難度で選ぶ）。作り方は生産の詳細設計</td></tr>
+    <tr><td>コメント返信</td><td>正解コメントへの定時の自動返信（Phase 31 で構築中）。アプリの振る舞いは分冊 <a href="logic-training-1-coach-reply.html">logic-training-1 の正解返信</a>、全体像は<a href="../../overview/functions/coach-reply.html">機能別の基本設計</a></td></tr>
   </tbody>
 </table>
 </div>
@@ -231,6 +232,8 @@ flowchart TB
 <h2>9. 共通フローからの差分・特記事項</h2>
 <p><strong>使用方式は <code>quiz-prebuilt</code></strong>（16-3b の転換。<code>batch_sets.generator_name</code> は 16-4〔2026-08-08〕で切替済み）: ストック LRU 選定 → S3 の事前動画取得 → 返却のみの軽量実行（<a href="../generators/quiz-prebuilt.html">generators/quiz-prebuilt.html</a>）。動画の作り・組版は Remotion の事前ビルドで、<a href="../../production/logic-training-1.html#build">生産の詳細設計 logic-training-1 の 3・4 章</a> を正とする（<code>gpt-quiz-multicut</code> は実行時方式としては休止 <a class="decision-ref" href="#d-05">→ 理由 D-05</a>）。既存セット（<code>gpt-image-kenburns</code>）とは生成方式が異なるが、出力がリール用 MP4 である点は共通。SNS 投稿バッチ側の差分は<strong>ストーリーズ連続投稿</strong>（15-12 で実装）と<strong>キャプションの動的組み立て</strong>（16-1 設計・16-3 実装。プレースホルダを含むテンプレートを登録する唯一のセット）で、いずれも 16-3b の転換による変更はない。</p>
 <p>本セットは共通テーブルのうち <code>quiz_stock_items</code>（問題ストック）と <code>quiz_items</code>（出題履歴。16-1 で <code>stock_item_id</code> による突合を追加）を使う唯一のセットである（<a href="../data-model.html#detail-quiz-items">data-model.html セクション 4.9 / 4.10</a>）。</p>
+
+<p><strong>正解コメントへの自動返信（Phase 31-2 設計）</strong>: 本セットは <code>batch_sets.problem_snapshot_enabled = 1</code>（31-5 で立てる）により、リールの投稿の成功後に quiz 用の問題スナップショットを S3 へ書く。それを読む定時の返信 Lambda の仕様は分冊 <a href="logic-training-1-coach-reply.html">logic-training-1 の正解返信</a> にまとめ、このページには書かない。</p>
 
 <section class="decisions" id="decisions">
 <h2>判断の記録</h2>

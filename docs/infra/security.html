@@ -198,6 +198,21 @@ flowchart TB
   <li>投稿用 Secret（上記「SNS 認証情報」）は本セットでも既存どおり作る。コメント返信用 Secret と<strong>キーを混ぜない</strong> <a class="decision-ref" href="#d-02">→ 理由 D-02</a></li>
 </ul>
 
+<h4 id="coach-reply-secret">脳みそコーチの正解返信（logic-training-1。Phase 31-2 設計・31-4 実装予定）</h4>
+<p>Secret 名: <code>acps/{env}/logic-training-1/coach-reply</code>（ステージング面は <code>-staging</code> 接尾辞）。CDK（<a href="stacks.html#coach-reply">stacks.html セクション 3.7</a>）が空値テンプレートで作り、値は手動投入する。<code>removalPolicy: RETAIN</code>。ウミガメのコメント返信の Secret とは<strong>キーも値も共有しない</strong>（返信専用 Meta アプリのトークンは別物。<code>anthropic_api_key</code> は同じキーの値を入れてもよいが、月額上限の管理を分けたいときは別のキーにする）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>キー</th><th>必須</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td><code>ig_access_token</code></td><td>YES</td><td>返信専用 Meta アプリ（Instagram ログイン方式・<code>instagram_business_basic</code> + <code>instagram_business_manage_comments</code>・31-1 で作成）の長期トークン。本番面は脳みそコーチ、ステージング面はテスト用アカウントのもの</td></tr>
+    <tr><td><code>ig_user_id</code></td><td>YES</td><td>自アカウントの Instagram user ID（<code>/me</code> の <code>user_id</code>）。自分の行の見分けはユーザー名で行い（分冊 2 章）、この値は照合の補助に使う</td></tr>
+    <tr><td><code>anthropic_api_key</code></td><td>YES</td><td>判定に使う Anthropic API キー（モデルは 31-3 で決める）</td></tr>
+    <tr><td><code>token_expires_at</code></td><td>NO</td><td>トークンの失効日時。トークン更新 Lambda が書き戻す（ウミガメと同じ）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>31-1 では Secret を使わず、トークンをリポジトリ外のローカルファイル（<code>~/.config/acps/lt-reply-tokens.json</code>・chmod 600）に置いて読み出しに使った。31-4 の Secret 作成後に同じ値を投入し、ローカルファイルは消す。</p>
+
 <h3>1.4 将来の複数環境対応</h3>
 <div class="table-wrap">
 <table>
@@ -333,6 +348,19 @@ flowchart TB
   </tbody>
 </table>
 </div>
+
+<h3 id="iam-coach-reply">2.7 脳みそコーチの正解返信 Lambda 実行ロール（31-2 追加）</h3>
+<p>CoachReplyStack（<a href="stacks.html#coach-reply">stacks.html セクション 3.7</a>）の Lambda 2 本（正解返信・トークン更新）はそれぞれ専用の実行ロールを持ち、VPC 権限を持たない。面ごとにロールも分かれる。CommentReplyStack のロールとは共有しない。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ロール</th><th>許可</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>正解返信 Lambda</td><td><code>secretsmanager:GetSecretValue</code>（当該面の Secret 1 件のみ）/ <code>ssm:GetParameter</code>（<code>/acps/{env}/coach-reply{-staging}/*</code> のみ）/ <code>s3:GetObject</code>（<code>assets/logic-training-1/problems/*</code> または <code>.../staging/problems/*</code> と <code>coach-reply/{SET_CODE}/state/*</code>）/ <code>s3:PutObject</code>（<code>coach-reply/{SET_CODE}/state/*</code> のみ）/ <code>s3:ListBucket</code>（<code>s3:prefix</code> 条件で同じプレフィックスに限定）/ CloudWatch Logs</td><td>SSM への書き込み・S3 の削除は付けない（スイッチの切り替えは人が CLI で行う）</td></tr>
+    <tr><td>トークン更新 Lambda</td><td><code>secretsmanager:GetSecretValue</code> と書き込み（当該面の Secret 1 件のみ）/ CloudWatch Logs</td><td>2.6 のトークン更新と同じ形</td></tr>
+  </tbody>
+</table>
+</div>
+<p>SnsPostBatchStack のタスクロールには、quiz 用の問題スナップショットの出力のために <code>s3:PutObject</code>（<code>assets/logic-training-1/problems/*</code>）を 31-4 で足す。</p>
 
 <h2 id="network">3. ネットワークセキュリティ</h2>
 <ul>

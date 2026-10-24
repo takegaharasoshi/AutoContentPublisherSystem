@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>logic-training-1 の正解返信 | AutoContentPublisherSystem</title>
+<link rel="stylesheet" href="../../assets/style.css?v=20261018">
+</head>
+<body>
+<div class="container">
+
+<nav class="breadcrumb"><a href="../../index.html">設計書体系ガイド</a> / <a href="../index.html">アプリ設計</a> / <a href="logic-training-1.html">脳みそコーチ</a> / 正解返信</nav>
+<h1>logic-training-1 の正解返信</h1>
+<div class="page-meta">
+  <span class="badge badge-wip">設計（未実装）</span>
+  <span>最終更新: 2026-10-24（Phase 31-2 で新設。実装は 31-3、AWS は 31-4、本番開始は 31-5・31-6）</span>
+  <span>1 段上: <a href="../../overview/functions/coach-reply.html">機能別の基本設計 脳みそコーチの正解返信</a></span>
+</div>
+
+<section class="page-summary" id="summary">
+<h2>要約</h2>
+<p class="lead">このページは、脳みそコーチ（logic-training-1）の正解コメントへの定時の自動返信について、アプリの振る舞いを書く詳細設計である。1 回の起動の手順、返信の対象から外すもの、判定と一番乗り、返信文、問題スナップショットと状態ファイルの形、過去の投稿のバックフィル、運用（始め方・止め方・誤った返信の消し方）を扱う。AWS の定義は <a href="../../infra/stacks.html#coach-reply">CDK スタック実装仕様 3.7</a> にある。</p>
+<p class="lead">図 1 は、1 件のコメントが返信されるかどうかの分かれ道を表す。上から順に除外の条件を当て、最後まで残ったものだけを判定し、確信が高い正解だけに返す。</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart TB
+    C["トップレベルのコメント 1 件"] --> X1{"返信の行・運用者の行・本文なし？"}
+    X1 -->|"はい"| N1["数えない"]
+    X1 -->|"いいえ"| X2{"判定済み？"}
+    X2 -->|"はい"| N2["飛ばす"]
+    X2 -->|"いいえ"| X3{"運用者か自分の返信が付いている？"}
+    X3 -->|"はい"| N3["返信済みとして記録"]
+    X3 -->|"いいえ"| X4{"開始日時より前？"}
+    X4 -->|"はい"| N4["開始前として記録"]
+    X4 -->|"いいえ"| J["LLM で判定"]
+    J --> X5{"正解かつ確信が高い？"}
+    X5 -->|"いいえ"| N5["黙る（判定だけ記録）"]
+    X5 -->|"はい"| X6{"スイッチ on？"}
+    X6 -->|"off"| N6["返したはずとして記録"]
+    X6 -->|"on"| R["定型文で返信 → 記録"]
+</pre>
+<figcaption>図 1 コメント 1 件の扱い</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>要点</th></tr></thead>
+  <tbody>
+    <tr><td>対象</td><td><code>/me/media</code> の一覧に出る投稿のうち、問題スナップショットがある投稿の、返信の開始日時より後のトップレベルのコメント <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
+    <tr><td>判定</td><td>LLM（Anthropic の API）が、問題文・答え・解説を基にコメントを <code>correct</code> / <code>alt</code> / <code>wrong</code> / <code>unsure</code> と確信の高さに分ける。返すのは <code>correct</code> かつ確信 <code>high</code> だけ</td></tr>
+    <tr><td>一番乗り</td><td>その投稿のそれより前のコメントがすべて <code>wrong</code> と判定済みで、運用者の返信がまだない投稿の最初の正解にだけ添える <a class="decision-ref" href="#d-03">→ 理由 D-03</a></td></tr>
+    <tr><td>状態</td><td>S3 の状態ファイル（コメント数の前回値・投稿ごとの判定済み）。DB には書かない</td></tr>
+    <tr><td>止め方</td><td>SSM パラメータ <code>reply-enabled</code> を <code>off</code> にする 1 コマンド（次の起動から返信が止まる）</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2 id="run">1. 1 回の起動の手順</h2>
+<p class="lead">Lambda <code>acps-{env}-coach-reply-run</code> の 1 回の起動で、次の順に処理する。Graph API は Instagram ログイン方式（<code>graph.instagram.com</code>）で、Secret の返信専用アプリのトークンを使う。</p>
+<ol>
+  <li>SSM パラメータ <code>reply-enabled</code>（<code>on</code> / <code>off</code>）と <code>reply-not-before</code>（ISO 8601 の UTC 日時）を読む。どちらかが読めない・形が不正なら、返信せずにエラー終了する（アラームで知らせる）</li>
+  <li>Secret からトークンと自分のユーザー名を読む（ユーザー名は <code>GET /me?fields=user_id,username</code> で取り、起動の中だけ使う）</li>
+  <li><code>GET /me/media?fields=id,timestamp,comments_count&amp;limit=100</code> をページ送りで最後まで読む（2026-10 時点で約 150 本 = 2 ページ）</li>
+  <li>状態ファイル <code>state/media-counts.json</code> を読み、<code>comments_count</code> が前回値と<strong>違う</strong>投稿（増えた・減った・初めて見た）だけを選ぶ。前回値のない投稿は初回として扱う</li>
+  <li>選んだ投稿ごとに: 問題スナップショット <code>{PROBLEMS_PREFIX}{media_id}.json</code> を読む。なければ「スナップショットなし」としてコメント数だけ更新して次へ（停止中の昼のフェルミ推定・ストーリーズなど）</li>
+  <li>コメントを <code>GET /{media_id}/comments?fields=id,text,username,timestamp,replies{id}&amp;limit=50</code> でページ送りで最後まで読み、<a href="#exclude">2 章</a>の除外を当てる</li>
+  <li>残ったコメントを投稿ごとにまとめて LLM で判定する（<a href="#judge">3 章</a>。1 回の呼び出しで最大 20 件。それを超えたら分ける）</li>
+  <li>返す対象のコメントに、時刻の古い順に 1 件ずつ返信する（<code>POST /{comment_id}/replies?message=…</code>。スイッチが <code>off</code> なら呼ばない）。1 件返すごとに状態ファイル <code>state/judged/{media_id}.json</code> を書き直す</li>
+  <li>投稿の処理が最後まで終わったら、その投稿のコメント数の前回値を更新する。判定に失敗したコメントが残る投稿は前回値を更新せず、次の起動で読み直す</li>
+  <li>最後に <code>state/media-counts.json</code> を書き、起動の要約（投稿数・読んだ投稿・判定した件数・返信した件数・失敗）を INFO ログに 1 行で出す</li>
+</ol>
+<p>Lambda の予約同時実行数は 1 にして、起動が重ならないようにする。1 回の起動が上限時間（300 秒）を超えそうなときは、処理できた投稿までで状態を書いて終わり、残りは次の起動に回す（コメント数の前回値を更新しないので取りこぼさない）。</p>
+
+<h2 id="exclude">2. 返信の対象から外すもの</h2>
+<p class="lead">次の表は、読み出したコメントのうち判定に回さないものと、その見分け方。見分け方は 31-1 の実測（<a href="../../plans/development-plan.html#step-31-1">31-1 作業記録</a>）に基づく。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>外すもの</th><th>見分け方</th><th>記録</th></tr></thead>
+  <tbody>
+    <tr><td>返信の行（コメントへの返信）</td><td>トップレベルの一覧には返信も重ねて出る。どれかのコメントの <code>replies</code> に同じ ID があれば返信の行とみなす <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td><td>しない（数えない）</td></tr>
+    <tr><td>運用者（自分のアカウント）の行</td><td>トップレベルの行の <code>username</code> が自分のユーザー名</td><td>しない</td></tr>
+    <tr><td>本文のない行</td><td><code>text</code> がない（削除・制限済みと見られる。31-1 で 1,912 件中 1 件）</td><td>しない</td></tr>
+    <tr><td>判定済み</td><td>状態ファイル <code>judged/{media_id}.json</code> にコメント ID がある</td><td>—</td></tr>
+    <tr><td>返信済み（運用者の手での返信・この機能の返信）</td><td><code>replies</code> の中に、自分のトップレベルの行と同じ ID がある。<code>replies</code> の各行には <code>username</code> が返らないため、この突き合わせで見分ける <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td><td><code>verdict: "operator_replied"</code></td></tr>
+    <tr><td>返信の開始日時より前のコメント</td><td><code>timestamp</code> &lt; <code>reply-not-before</code></td><td><code>verdict: "before_start"</code>（判定はしない）</td></tr>
+    <tr><td>一覧に出ない投稿・スナップショットのない投稿</td><td><code>/me/media</code> に出ない投稿は読まない。出てもスナップショットがなければ読まない <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td><td>起動の要約ログの件数だけ</td></tr>
+  </tbody>
+</table>
+</div>
+<p>運用者は自動の返信が付いていないコメントに、これまでどおり手で返してよい。手での返信は次の起動で「返信済み」として拾われ、自動では返さない。</p>
+
+<h2 id="judge">3. 判定・一番乗り・返信文</h2>
+<h3 id="judge-model">3.1 判定</h3>
+<p class="lead">判定は LLM の 1 回の呼び出しで、1 つの投稿の未判定のコメントをまとめて扱う。モデル・プロンプト・確信の閾値は 31-3 のオフライン評価で決め、決めた値をこの節に書き戻す。</p>
+<ul>
+  <li><strong>渡すもの</strong>: スナップショットの問題文（<code>question_text</code>）・答え（<code>answer_text</code>）・解説（<code>explanation</code>）・ヒント（<code>hint</code>。あれば）と、コメントの ID・本文の一覧。コメント主の名前は渡さない</li>
+  <li><strong>返させるもの</strong>: コメントごとに <code>verdict</code>（<code>correct</code> = 用意した答えと同じ / <code>alt</code> = 答えとは違うが正解と言える / <code>wrong</code> = 外れ / <code>unsure</code> = 答えになっていない・判断できない）と <code>confidence</code>（<code>high</code> / <code>low</code>）と短い理由。JSON で受け、形が不正なら判定の失敗として扱う</li>
+  <li><strong>返す条件</strong>: <code>verdict = correct</code> かつ <code>confidence = high</code> だけ。<code>alt</code> は手での運用で「〇〇でも正解だぞ」と中身に合わせて返しているため、自動では返さない</li>
+  <li><strong>失敗</strong>: API エラー・タイムアウト・応答の形の不正はその投稿の未判定のコメントを判定済みにせず、次の起動で判定し直す。同じコメントが 3 回続けて失敗したら <code>verdict: "judge_failed"</code> として以後は判定しない</li>
+  <li><strong>オフライン評価の合格線</strong>（31-3）: 31-1 の評価用データで、運用者が外れ・判定なしとしたコメントを「返す」と判定した件数が 0 件。正解（517 件）のうち返せた割合を記録する</li>
+</ul>
+<h3 id="first">3.2 一番乗り</h3>
+<p class="lead">「一番乗りだな」は、その投稿で最初に正解したコメントにだけ添える。次の 3 つをすべて満たすときに限る <a class="decision-ref" href="#d-03">→ 理由 D-03</a>。</p>
+<ol>
+  <li>その投稿に、運用者の返信（手での返信）がまだない</li>
+  <li>そのコメントより時刻が前のトップレベルのコメント（運用者の行・返信の行を除く）が、すべて <code>wrong</code> と判定済み（または 1 件もない）。開始日時より前のコメントは判定しないので、開始前のコメントがある投稿では付かない</li>
+  <li>状態ファイルのその投稿の <code>first_correct_replied</code> が <code>false</code></li>
+</ol>
+<h3 id="reply-text">3.3 返信文</h3>
+<p class="lead">返信文は定型文の候補からランダムに選ぶ（LLM で作らない）。候補は手での運用の文面（31-1 の運用者の返信）から作り、コードの定数に持つ。返信の先頭には <code>@{username}</code> を付ける（手での返信と同じ見た目）。</p>
+<ul>
+  <li>正解: 例「正解！！お見事👏」「正解💪💪 お見事👏」「正解！お見事👏👏」（候補は 31-3 で 8 本程度に増やす）</li>
+  <li>正解 + 一番乗り: 例「正解！！お見事👏 一番乗りだな💪💪」</li>
+</ul>
+
+<h2 id="snapshot">4. 問題スナップショット（quiz 用）</h2>
+<p class="lead">投稿バッチは、<code>batch_sets.problem_snapshot_enabled = 1</code> のセットで、<code>quiz_items</code> 行のある実行のリールの投稿に成功した直後、次の JSON を S3 <code>assets/{set_code}/problems/{media_id}.json</code> に書く（<a href="../batch-flow.html#problem-snapshot">バッチ処理フロー</a>）。ウミガメのスナップショット（<code>schema_version</code> 4）とは <code>kind</code> で見分ける。</p>
+<pre>{
+  "schema_version": 1,
+  "kind": "quiz",
+  "set_code": "logic-training-1",
+  "media_id": "18108280241184087",
+  "posted_at": "2026-10-23T22:33:47Z",
+  "quiz_type": "L1",
+  "difficulty": "light",
+  "question_text": "…",
+  "answer_text": "…",
+  "explanation": "…",          // content_fields.explanation
+  "hint": "…",                 // content_fields.hint（ないときは null）
+  "source": "post"             // 投稿バッチ = post / バックフィル = backfill
+}</pre>
+<h3 id="backfill">4.1 過去の投稿のバックフィル</h3>
+<p class="lead">フラグを立てる前の投稿にはスナップショットがないため、本番開始の前に一度だけ DB から書き出す。スクリプトは <code>services/coach-reply/tools/backfill_snapshots.py</code>（31-3 で作る）。</p>
+<ol>
+  <li>RDS Data API で <code>posts</code>（<code>status = 'success'</code>・<code>platform_post_id</code> あり・セットが logic-training-1）と <code>quiz_items</code> を <code>generation_run_id</code> で結んで読む（SELECT だけ。Aurora を起こすのはこの 1 回。31-1 の <code>poc/logic-training-reply-eval/collect.py answers</code> と同じ問い合わせ）</li>
+  <li>S3 に同じキーがまだない投稿だけ、上の形（<code>source: "backfill"</code>）で書く。既にあるキーは上書きしない</li>
+  <li>既定は書かずに件数だけ出す（<code>--dry-run</code> が既定、書くときは <code>--apply</code>）。実行は 31-5 でユーザーが行う</li>
+</ol>
+<p>投稿バッチの出力が失敗した投稿も、同じスクリプトを流し直せば埋まる（既にあるキーは飛ばすため、何度流してもよい）。</p>
+
+<h2 id="state">5. 状態ファイル</h2>
+<p class="lead">状態は画像バケットの <code>coach-reply/{SET_CODE}/state/</code> に置く（本番面 <code>logic-training-1</code>・ステージング面 <code>logic-training-1-staging</code>）。ライフサイクルは掛けない（判定済みを消すと再判定してしまうため）。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>ファイル</th><th>中身</th></tr></thead>
+  <tbody>
+    <tr><td><code>media-counts.json</code></td><td><code>{"updated_at": "…", "media": {"&lt;media_id&gt;": {"comments_count": 12, "checked_at": "…"}}}</code></td></tr>
+    <tr><td><code>judged/{media_id}.json</code></td><td><code>{"media_id": "…", "first_correct_replied": false, "comments": {"&lt;comment_id&gt;": {"verdict": "correct", "confidence": "high", "reason": "…", "replied": true, "reply_id": "…", "first": false, "switch": "on", "judged_at": "…", "fail_count": 0}}}</code>。<code>verdict</code> は判定の 4 値のほか <code>operator_replied</code> / <code>before_start</code> / <code>judge_failed</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>コメント本文とコメント主の名前は状態ファイルに残さない（判定の理由は短い文だけ）。調べるときはコメント ID で Instagram から引く。</p>
+
+<h2 id="switch">6. 返信スイッチと開始日時</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>パラメータ</th><th>値</th><th>意味</th></tr></thead>
+  <tbody>
+    <tr><td><code>/acps/{env}/coach-reply{-staging}/reply-enabled</code></td><td><code>on</code> / <code>off</code>（CDK の初期値は <code>off</code>）</td><td><code>off</code> では判定と記録だけを行い、返信を呼ばない。記録には <code>switch: "off"</code> と <code>replied: false</code> を書き、そのコメントは後で <code>on</code> にしても返さない（判定済みのため）</td></tr>
+    <tr><td><code>/acps/{env}/coach-reply{-staging}/reply-not-before</code></td><td>ISO 8601 の UTC 日時（CDK の初期値は遠い未来 <code>2099-01-01T00:00:00Z</code>）</td><td>これより前のコメントには返さない。本番開始の go のとき（31-6）に開始の日時を入れる <a class="decision-ref" href="#d-04">→ 理由 D-04</a></td></tr>
+  </tbody>
+</table>
+</div>
+<p>CDK はパラメータを作るだけで、値の変更は CLI で行う（再デプロイで値が初期値へ戻らないよう、CDK 側は値の変更を無視する設定にする。31-4）。</p>
+
+<h2 id="ops">7. 運用</h2>
+<h3 id="ops-start">7.1 始め方（31-5・31-6）</h3>
+<ol>
+  <li>バックフィルを <code>--dry-run</code> で流して件数を確かめ、<code>--apply</code> で書く</li>
+  <li>投稿バッチのフラグを立てる: <code>UPDATE batch_sets SET problem_snapshot_enabled = 1 WHERE set_code = 'logic-training-1';</code>（データの更新で DDL ではない）。次の投稿の後に <code>assets/logic-training-1/problems/{media_id}.json</code> ができたことを確かめる</li>
+  <li>スイッチを <code>off</code> のまま、開始日時を今にして 1 回手で起動し、ログの要約と状態ファイルを確かめる（返信は呼ばれない）</li>
+  <li>go の後、開始日時をあらためて今にしてからスイッチを <code>on</code> にする（<code>off</code> の間に判定したコメントには返さないため、試しの起動の後に開始日時を進める）</li>
+</ol>
+<pre>aws ssm put-parameter --name /acps/prod/coach-reply/reply-not-before --value "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --overwrite
+aws ssm put-parameter --name /acps/prod/coach-reply/reply-enabled --value on --overwrite</pre>
+<h3 id="ops-stop">7.2 止め方</h3>
+<pre>aws ssm put-parameter --name /acps/prod/coach-reply/reply-enabled --value off --overwrite</pre>
+<p>次の起動から返信が止まる（判定と記録は続く）。起動そのものを止めたいときは Scheduler <code>acps-prod-coach-reply-run</code> を無効にする（<code>aws scheduler update-schedule … --state DISABLED</code>。再デプロイで有効に戻るため、長く止めるなら CDK 側も直す）。</p>
+<h3 id="ops-wrong">7.3 誤った返信を見つけたとき</h3>
+<ol>
+  <li>すぐスイッチを <code>off</code> にする（7.2）</li>
+  <li>誤った返信を消す: Instagram アプリでその返信を長押し → 削除する（運用者のアカウントで消せる。API で消す場合は返信専用アプリのトークンで <code>DELETE /{reply_id}</code>。<code>reply_id</code> は状態ファイルにある）</li>
+  <li>状態ファイルのそのコメントはそのまま残す（判定済みのままなので、<code>on</code> に戻しても返し直さない）。必要なら運用者が手で返し直す</li>
+  <li><code>/incident</code> で事象を記録し、判定の誤りを課題として起票する。直すまでスイッチは <code>off</code> のまま</li>
+</ol>
+<h3 id="ops-watch">7.4 監視・トークン</h3>
+<ul>
+  <li>Lambda のエラー（SSM・Secret が読めない・Graph API の一覧の失敗・状態ファイルの書き込みの失敗）は MonitoringStack のアラームで SNS へ通知する。判定の失敗はエラーにせず、ログの要約に件数を出す</li>
+  <li>トークンは週 1 回の Lambda <code>acps-prod-coach-reply-token-refresh</code> が更新する（ウミガメと同じ方式。<a href="../../overview/functions/token-refresh.html">トークン更新</a>）。トークンが失効すると一覧の失敗でアラームが鳴る</li>
+  <li>返信専用アプリのプライバシーポリシーの URL は、31-1 ではウミガメの URL を暫定で借りている。31-4 で <code>CoachReplyStack</code> の専用バケットを作ったら、Meta アプリの設定の URL を差し替える（ユーザー作業）</li>
+</ul>
+<h3 id="ops-staging">7.5 ステージング面での試験（31-4）</h3>
+<p>テスト用アカウント（<code>test_tkghr</code>）の投稿に、ステージング用のスナップショット <code>assets/logic-training-1/staging/problems/{media_id}.json</code> を手で置き、別のアカウントから正解・外れのコメントを書いてから <code>aws lambda invoke --function-name acps-prod-coach-reply-run-staging</code> で起動する。正解に返信が付き、外れに付かず、2 回目の起動で同じコメントを判定し直さず、スイッチを <code>off</code> にすると返信が止まることを確かめる。</p>
+
+<section class="decisions" id="decisions">
+<h2>判断の記録</h2>
+<p class="lead">本文の「→ 理由 D-xx」から飛んでくる先。</p>
+<article id="d-01">
+<h3>D-01 対象は一覧に出る投稿で、スナップショットのあるものに限る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>コメントを読むのは <code>/me/media</code> の一覧に出る投稿だけで、問題スナップショットのない投稿は読まない。DB にある投稿でも一覧に出ないものは扱わない</dd>
+  <dt>理由</dt><dd>31-1 の実測で、DB の投稿 367 件のうち 215 件が一覧（<code>media_count</code> 152）に出ず、そのうち 213 件はメディア ID を直接指定しても「存在しない・権限がない」で読めなかった（アーカイブ・削除などが考えられるが未確認）。視聴者がコメントできるのは表示されている投稿なので、一覧を正とする。正解がわからない投稿で返すことは D-04（確信が高いときだけ返す）に反する</dd>
+  <dt>日付・出典</dt><dd>2026-10-24（31-1 の実測・31-2）</dd>
+</dl>
+</article>
+<article id="d-02">
+<h3>D-02 返信の行と返信済みは ID の突き合わせで見分ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>トップレベルの一覧に重ねて出る返信の行は、どれかの <code>replies</code> に同じ ID があるかで見分ける。返信済みかどうかは、<code>replies</code> の中に自分のトップレベルの行と同じ ID があるかで見分ける</dd>
+  <dt>理由</dt><dd>31-1 の実測で、<code>replies{}</code> の各行には <code>username</code> が返らなかった（902 件すべて）。一方、運用者の返信 841 件はすべてトップレベルの一覧にも <code>username</code> 付きで出ていたため、ID で結べば書き手がわかる。<code>replies{from}</code> で書き手が取れるかは 31-3 で試し、取れればそちらに替えてよい</dd>
+  <dt>日付・出典</dt><dd>2026-10-24（31-1 の実測・31-2）</dd>
+</dl>
+</article>
+<article id="d-03">
+<h3>D-03 一番乗りは、前のコメントがすべて外れと判定済みのときだけ添える</h3>
+<dl>
+  <dt>決めたこと</dt><dd>運用者の返信がまだなく、そのコメントより前のコメントがすべて <code>wrong</code> と判定済みの投稿の、最初の正解にだけ「一番乗り」を添える</dd>
+  <dt>理由</dt><dd>一番乗りの誤り（本当は先に正解した人がいる）も視聴者に見える誤りになるため、判定していない・迷ったコメントが前にあるときは付けない。開始前のコメントは判定しないので、開始前からコメントのある投稿では付かない（取りこぼしは無害）。運用者がすでに返している投稿は、運用者が一番乗りを付けた可能性があるため付けない</dd>
+  <dt>日付・出典</dt><dd>2026-10-24 アイデアの壁打ち（一番乗りは開始前を含めた時刻順で判定し、過去に正解が付いている投稿では付けない）を、判定しないコメントがある場合まで含めて具体化（31-2）</dd>
+</dl>
+</article>
+<article id="d-04">
+<h3>D-04 開始日時より前のコメントには返さない</h3>
+<dl>
+  <dt>決めたこと</dt><dd>SSM パラメータ <code>reply-not-before</code> より前のコメントは判定せず、返信もしない</dd>
+  <dt>理由</dt><dd>全投稿を対象にするため、開始の時点で過去の未返信のコメント（31-1 で 205 件）に一斉に返信してしまうのを避けるため。数日前のコメントへの返信は手での運用にもない見え方になる</dd>
+  <dt>日付・出典</dt><dd>2026-10-24 アイデアの壁打ち（対象の投稿の範囲）</dd>
+</dl>
+</article>
+</section>
+
+</div>
+<script src="../../assets/vendor/mermaid-12.1.0/mermaid.min.js"></script>
+<script src="../../assets/vendor/svg-pan-zoom-3.6.2/svg-pan-zoom.min.js"></script>
+<script src="../../assets/vendor/aws-icons-07312026/aws-icons.js"></script>
+<script src="../../assets/docs-diagrams.js"></script>
+</body>
+</html>
