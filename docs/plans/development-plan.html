@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -276,17 +276,12 @@
 </details>
 </div>
 </article>
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-<article class="plan-step" id="step-31-6" data-step-id="31-6" data-status="todo" data-kind="decision">
+<article class="plan-step" id="step-31-6" data-step-id="31-6" data-status="done" data-completed="2026-10-25" data-kind="decision">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>31-6</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<div class="plan-meta"><strong>31-6</strong><span class="plan-status">完了（2026-10-25）</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>本番返信の開始</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>31-5 の完了直後から判断できる。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>2026-10-25 にユーザーが go。本番面の返信スイッチを on・開始日時を 10/24 21:00 JST にし、手動起動で正解 6 件に返信（外れ・判断不能・別解には返さず）。定型文は改行入りの 22 本に差し替えた。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -305,11 +300,22 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— 2026-10-25 完了</span></summary>
+<div class="plan-fold-inner">
+<p><strong>go</strong>（2026-10-25 13:18 JST）: 分冊 7.1 どおり <code>reply-not-before</code> を今（<code>2026-10-25T04:18:41Z</code>）に進めてから <code>reply-enabled = on</code>。止める手順（7.2）と誤った返信を消す手順（7.3）が分冊にあることを確認。</p>
+<p><strong>定型文の差し替え</strong>: ユーザーのレビューで 11 本 → 改行入りの 22 本（正解 16・一番乗り 6）。先にステージング面の <code>test_tkghr</code> で改行入りの返信を API から 1 件付け、読み返しで <code>\n</code> が残り、スマホのアプリで 2 行に表示されることをユーザーが確認。<code>reply_text.py</code>・テストの本数・分冊 3.3 を直し（pytest <code>136 passed</code>）、<code>cdk deploy --exclusively CoachReplyStack CoachReplyStagingStack</code>（差分は Lambda の <code>S3Key</code> だけ・13:47 JST に両面 UPDATE_COMPLETE）。コミット <code>94c1824</code>。</p>
+<p><strong>開始日時を 10/24 21:00 JST へ戻す</strong>（ユーザーの希望。数日後の返信は手運用でもしていた）: off の間に判定済みの記録は on にしても返し直さないため、10/24 12:00Z 以降のコメントの記録（operator_replied と返信済みを除く 19 件: 正解 5・別解 2・判断不能 6・外れ 5・開始前 1）を状態ファイルから消し、該当 6 投稿を <code>media-counts.json</code> から外してから <code>reply-not-before = 2026-10-24T12:00:00Z</code>。14:00 JST の定時起動（<code>judged 0</code>）の後に実施。手動起動: <code>{"media": 154, "selected": 6, "read": 6, "no_snapshot": 0, "judged": 19, "replied": 6, "judge_failures": 0, "failures": 0, "deferred": 0}</code>。返信 6 件はすべて correct/high（10/24 夜 3・10/25 朝 1・前の投稿への遅いコメント 2。一番乗りなし）。off の間に unsure だった「内側拭いてたんですね」が判定し直しで correct になった。</p>
+<p><strong>確認待ち</strong>: 「31-6 脳みそコーチの正解コメントへの定時返信」の行に絶対日付 2026-11-08 を記入。</p>
+</div>
 </details>
 </div>
 </article>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
 
 </div>
 </section>
@@ -322,7 +328,7 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-10-17 / <a href="development-log.html#step-28-2">28-2</a> 一過性エラーの段階別の扱い</td><td>本番で次に Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）が起きた投稿（WARNING ログ「投稿コンテナを作成からやり直す」、または <code>api_response</code> に <code>first_error</code> を持つ <code>posts</code> 行が出たとき。<code>/incident</code> の照合で拾う）</td><td>① 公開前の失敗なら作成から 1 回だけやり直し、<code>platform_container_id</code> が新しい ID になっている ② 公開の失敗なら照会が 1 回だけ行われ、<code>PUBLISHED</code> → 「PUBLISHED 確認済み」の <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで再送 になっている ③ Instagram 上で同じ回の投稿が 2 件になっていない ④ <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形</td><td>二重投稿（③）なら即 <code>/incident</code> で課題に起票し、再送を止める修正を開発レーンで最優先にする。① ② ④ の食い違いは課題に起票（I-024 を live へ戻すかは <code>/incident</code> で判断）</td><td></td></tr>
-<tr><td>2026-10-24 / <a href="#step-31-6">31-6</a> 脳みそコーチの正解コメントへの定時返信</td><td>日付型: 31-6 の本番返信の開始から 2 週間後（絶対日付は開始時にここへ書く）</td><td>① 返信の記録で、外れのコメントに「正解」と返したものが 0 件 ② logic-training-1 の 1 投稿あたりのコメント数の中央値が、手で返していた時期（2026-10 第 1〜2 週・12.5〜16 件）の水準に戻っているか（<code>content/insights-analysis</code> の <code>per_post_latest</code>）</td><td>① が 1 件でもあれば返信スイッチを切り、課題として起票する。② は効果の観察で、戻っていなくても返信は止めない（課題として起票し、別解・外れへの返信の再検討と合わせて判断）</td><td></td></tr>
+<tr><td>2026-10-24 / <a href="#step-31-6">31-6</a> 脳みそコーチの正解コメントへの定時返信</td><td>日付型: 31-6 の本番返信の開始から 2 週間後 = <strong>2026-11-08</strong>（開始 2026-10-25）</td><td>① 返信の記録で、外れのコメントに「正解」と返したものが 0 件 ② logic-training-1 の 1 投稿あたりのコメント数の中央値が、手で返していた時期（2026-10 第 1〜2 週・12.5〜16 件）の水準に戻っているか（<code>content/insights-analysis</code> の <code>per_post_latest</code>）</td><td>① が 1 件でもあれば返信スイッチを切り、課題として起票する。② は効果の観察で、戻っていなくても返信は止めない（課題として起票し、別解・外れへの返信の再検討と合わせて判断）</td><td></td></tr>
 </tbody>
 </table></div>
 
