@@ -118,8 +118,8 @@ def test_fixed_reply_candidates_and_injectable_random(first, pool) -> None:
 
     assert make_reply("reader", first=first, chooser=choose) == f"@reader {pool[-1]}"
     assert seen == [pool]
-    assert len(CORRECT) == 8
-    assert len(FIRST_CORRECT) == 3
+    assert len(CORRECT) == 16
+    assert len(FIRST_CORRECT) == 6
 
 
 def test_reply_requires_recipient() -> None:
