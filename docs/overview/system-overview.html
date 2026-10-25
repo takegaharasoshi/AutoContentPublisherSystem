@@ -60,7 +60,7 @@ flowchart TB
     <tr><td>何をするシステムか</td><td>ショート動画（リール）を Instagram に定時投稿し、反応を集める。テーマ単位の「セット」を足し替えて運用する（稼働中は logic-training-1・pref-ranking-1・umigame-soup-1 の 3 セット）。事業の目的・KPI は<a href="../strategy/business-strategy.html">事業戦略書</a></td></tr>
     <tr><td>生産面</td><td>スキル（Claude Code / Codex）と <code>content/</code> のツールで、問題・ランキングなどの素材と動画を<strong>事前に</strong>作る。人が全数を見てから配置する <a class="decision-ref" href="#d-01">→ 理由 D-01</a></td></tr>
     <tr><td>受け渡し</td><td>ビルド済み動画を S3 の <code>assets/{set_code}/prebuilt/</code> に、素材の行を Aurora の在庫テーブル（<code>quiz_stock_items</code> / <code>ranking_stock_items</code> / <code>umigame_stock_items</code>）に置く。2 面はこの 2 つだけでつながる <a class="decision-ref" href="#d-02">→ 理由 D-02</a></td></tr>
-    <tr><td>配信面</td><td>5 系統: ①投稿（Scheduler → SFN → ECS） ②インサイト収集（同）③コメント自動返信（Lambda）④トークン更新（Lambda）⑤脳みそコーチの正解返信（Scheduler → Lambda。Phase 31 で構築中）。動画は投稿時に生成しない（AI を呼ぶのはコメントの判定と返信文だけ）</td></tr>
+    <tr><td>配信面</td><td>5 系統: ①投稿（Scheduler → SFN → ECS） ②インサイト収集（同）③コメント自動返信（Lambda）④トークン更新（Lambda）⑤脳みそコーチの正解返信（Scheduler → Lambda。2026-10-25 稼働開始）。動画は投稿時に生成しない（AI を呼ぶのはコメントの判定と返信文だけ）</td></tr>
     <tr><td>主な技術</td><td>Python・AWS CDK（TypeScript）・ECS Fargate RunTask・Step Functions・EventBridge Scheduler・Aurora Serverless v2・S3・Lambda・SQS。ローカルは Docker（Remotion・ffmpeg）とローカル TTS</td></tr>
   </tbody>
 </table>
@@ -128,7 +128,7 @@ flowchart TB
 </ul></div>
 
 <h2 id="delivery">3. 配信面の 5 系統</h2>
-<p class="lead">この章は、<a href="#faces">1 章</a>の配信面を「AWS のどのサービスが、いつ、何をするか」の単位まで詳しくしたもの。配信面の仕事は 5 つの系統に分かれ、それぞれが別々のきっかけで動く。①投稿と②インサイト収集は時刻（EventBridge Scheduler）で動くバッチ、③コメント自動返信は Instagram からの通知（Webhook）で動く Lambda、④トークン更新は週 1 回の時刻で動く Lambda、⑤脳みそコーチの正解返信は 1 日 10 回の時刻で動く Lambda である（⑤は Phase 31 で構築中。31-4 で AWS に載る）。</p>
+<p class="lead">この章は、<a href="#faces">1 章</a>の配信面を「AWS のどのサービスが、いつ、何をするか」の単位まで詳しくしたもの。配信面の仕事は 5 つの系統に分かれ、それぞれが別々のきっかけで動く。①投稿と②インサイト収集は時刻（EventBridge Scheduler）で動くバッチ、③コメント自動返信は Instagram からの通知（Webhook）で動く Lambda、④トークン更新は週 1 回の時刻で動く Lambda、⑤脳みそコーチの正解返信は 1 日 10 回の時刻で動く Lambda である（⑤は 2026-10-25 に稼働開始）。</p>
 <p class="lead">図 3 は 5 系統を AWS の構成として描いたもの。枠 1 つが 1 系統で、矢印は起動の順番を表す。下に並ぶ Aurora・S3・Secrets Manager は、各系統が読み書きする共通の置き場所。</p>
 <figure class="diagram">
 <pre class="mermaid">
@@ -279,7 +279,7 @@ sequenceDiagram
 <h2 id="components">6. 構成要素の一覧</h2>
 <p class="lead">この章は、ここまでの図に出てきた部品を、リポジトリの置き場所ごとに一覧にしたもの。配信面のプログラム（<code>services/</code>）→ それを AWS に載せる定義（<code>infra/</code>）→ 生産面の手順書（スキル）→ 生産面の素材とツール（<code>content/</code>）の順に並べる。どの部品がどの章の何にあたるかを引くための索引として使う。</p>
 <h3 id="components-services">6.1 配信面のプログラム（<code>services/</code>）</h3>
-<p class="lead"><a href="#delivery">3 章</a>の 5 系統を実際に動かすプログラムの一覧。ECS で動くバッチが 4 つ、Lambda が 2 つ（中に 3 つと 2 つの関数。後者は Phase 31 で作る）と、バッチ共通のライブラリがある。</p>
+<p class="lead"><a href="#delivery">3 章</a>の 5 系統を実際に動かすプログラムの一覧。ECS で動くバッチが 4 つ、Lambda が 2 つ（中に 3 つと 2 つの関数。後者は Phase 31 で作った）と、バッチ共通のライブラリがある。</p>
 <div class="table-wrap">
 <table>
   <thead><tr><th>サービス</th><th>実行形態</th><th>役割</th></tr></thead>
