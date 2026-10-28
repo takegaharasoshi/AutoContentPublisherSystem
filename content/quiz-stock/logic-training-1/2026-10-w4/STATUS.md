@@ -1,6 +1,6 @@
 # 2026-10-w4 問題ストック補充: 進行状況(引き継ぎメモ)
 
-最終更新: 2026-10-28(**A76・C77 を配置済み。残り 12 問のイラスト生成から再開**)。改修 R-3 後の 5 回目。Claude Code で実施。
+最終更新: 2026-10-28(**完了。G3 の配置まで到達**)。改修 R-3 後の 5 回目。Claude Code で実施。
 
 ## 再開地点(ここだけ読めば再開できる)
 
@@ -22,7 +22,9 @@
 14. ~~完成稿の 1 問ずつレビュー~~(2026-10-27〜28): 14 問すべて承認(候補 14 件 state: approved)。主な修正: A76 情景を一つ目小僧に・A77 問題文から式を外し解説に鏡の別解・A78 名人の基準を 15 個に・A79 情景からマグカップと角砂糖を外す・A80 一人称視点の手のひら・A81 「動かすのは OK」・C77 「後ろへ逃げずに」と橋のたもと・C78 作り直してもらえなかった文面に・C79/C82/C83 別解を答えに取り込む・C81 ゲリラ豪雨を「雲ひとつない」「乾いた道」で塞ぐ
 15. ~~G2(急ぎ 2 問先行)~~(2026-10-28): 在庫確認で朝夜とも unused_built 0。既出 summary 141 件と突合(重複なし)→ ローカル dry-run → Aurora 投入 14 行(morning-072〜078・night-071〜077)・ローカルにも本適用 → build_manifest.json を build_manifest_pre-2026-10-w4.bak.json へ退避 → export_prompts 14 件 → A76(ローカル id 382)・C77(389)だけイラスト生成・intake・build(`uv run --project ../../../services/image-batch python build.py --item 382 --item 389`。素の python3 は pymysql がない)→ review_sheet(work/review/2026-10-w4.html 2 件)
 16. ~~A76・C77 の動画レビュー → G3(2 問先行)~~(2026-10-28): 承認 → publish(approved.txt = 382・389。前回分は approved_2026-10-w3_last.txt.bak へ退避)→ S3 に morning-072・night-071 の動画とイラスト → Aurora 更新 2 行 → 在庫 朝夜とも unused_built 1・unbuilt 6 → コミット a38b0a0
-17. **次は残り 12 問**(ローカル id 383〜388・390〜395): イラスト生成 → intake → build(`--item` で指定)→ review_sheet → 動画レビュー → G3(publish → Aurora → unbuilt 0 → セット記録・計画書の更新 → docs_check --plan-only → コミット・push)
+17. ~~G2(残り 12 問)~~(2026-10-28): イラスト 12 枚を 1 枚ずつ生成(全数 1536x1024・md5 重複なし・字形と答えバレを目視確認・再生成なし)→ intake → build 12 件(朝 BGM 13・夜 BGM 15)→ review_sheet(work/review/2026-10-w4.html 14 件)
+18. ~~動画レビュー → G3(残り 12 問)~~(2026-10-28): 指摘 3 件(A79 ヒント・A80 構図〔見下ろし → 右下から右手 → 親指の向きを明記し 5 回目に OK〕・C79 窓の外を見えなく)を両環境 DB へ反映して再ビルド → 承認 → publish(approved.txt = 383〜388・390〜395)→ Aurora 12 行 → 在庫 朝夜とも unused_built 6・unbuilt 0(A76・C77 は先行配置後に出題済み)→ セット記録・計画書を更新 → docs_check --plan-only OK → コミット・push
+19. **次回への持ち越し**: 余剰 OK の m22・m23(木に一画・二画)は state: ok のまま次回の G1b に混ぜる(同シリーズの重なりに注意)
 
 ## 在庫と目標
 
