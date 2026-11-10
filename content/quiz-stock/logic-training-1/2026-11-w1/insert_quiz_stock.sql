@@ -58,9 +58,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '木の上に立って、子どもをじっと見ている人がいる。だれだ? ヒントは漢字1文字だ。',
+        '木の上に立って、朝から晩までじっと見ている人がいる。だれだ?',
         '親(立 + 木 + 見)',
-        '{"hook":"いつも見守ってくれる人!","hint":"3つの字を組み立てろ!","question":"木の上に立って、子どもをじっと見ている人がいる。だれだ? ヒントは漢字1文字だ。","answer":"親(立 + 木 + 見)","explanation":"「親」の字は、立・木・見でできている。木の上に立って子どもを見守る人、と覚えると忘れない。本当の成り立ちは別だが、昔からの覚え方だ。","coach_comment":"たまには親に連絡しろよ!","tags":["なぞなぞ","朝の一問","漢字なぞ"],"summary":"木の上に立って子どもを見ている人を問う漢字なぞ。答えは親(立+木+見)。漢字の覚え方として流布する俗解をなぞなぞにした。","illustration_scene":"朝日が差す丘の上に、枝を大きく広げた1本の大きな木。木の下の原っぱで、小さな子どもたちが後ろ姿で遊んでいる。木の枝の上は葉がしげって何も見えず、そこに大きな「?」。顔は描かない。「?」以外の文字は描かない。"}',
+        '{"hook":"木登りの名人か!?","hint":"漢字で考えてみろ!","question":"木の上に立って、朝から晩までじっと見ている人がいる。だれだ?","answer":"親(立 + 木 + 見)","explanation":"「親」の字は、立・木・見でできている。木の上に立って子どもを見守る人、と覚えると忘れない。本当の成り立ちは別だが、昔からの覚え方だ。","coach_comment":"たまには親に連絡しろよ!","tags":["なぞなぞ","朝の一問","漢字なぞ"],"summary":"木の上に立ってじっと見ている人を問う漢字なぞ(問題文では漢字とも子どもとも言わない)。答えは親(立+木+見)。漢字の覚え方として流布する俗解をなぞなぞにした。","illustration_scene":"朝日が差す丘の上に、枝を大きく広げた1本の大きな木。幹には長いはしごが立てかけてある。木の枝の上は葉がしげって何も見えず、そこに大きな「?」。丘の下には朝の町並み。人物・「?」以外の文字は描かない。"}',
         '類型: 「親」=木の上に立って見る、の覚え方(作者不詳の俗解)。流布例: https://www.kanji-trainer.org/Phrase_mnemo/Mnemonique_親.html ・ https://jpdb.io/kanji/親 。要注意: 漢字の覚え方としての流布で、なぞなぞとしての流布例は未確認。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A89
