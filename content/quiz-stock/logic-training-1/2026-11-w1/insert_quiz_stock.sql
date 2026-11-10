@@ -68,10 +68,10 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        'いつも屋根の下にいて、雨にあたったことは一度もない。それなのに、いつもぬれている。なんだ?',
-        '舌',
-        '{"hook":"雨の日も晴れの日もだ!","hint":"その屋根は家にはないぞ!","question":"いつも屋根の下にいて、雨にあたったことは一度もない。それなのに、いつもぬれている。なんだ?","answer":"舌","explanation":"舌は、口の中の天井の下にいつもいる。雨にはあたらないが、つばでいつもぬれている。屋根とは、口の中の上あごのことだ。","coach_comment":"舌を巻く名推理だ!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"いつも屋根の下にいて雨にあたらないのに、いつもぬれているものを問うなぞ。答えは舌(屋根=上あご)。英語圏の伝承 riddle を日本語に書き下ろした。","illustration_scene":"雨の朝、雲のすき間から朝日がのぞく。大きなかわら屋根の家を外から見た絵。屋根に雨がざあざあ降り、軒下には乾いた長靴とたたんだ傘が並んでいる。屋根の上に大きな「?」。人物・動物・「?」以外の文字は描かない。"}',
-        '類型: いつも屋根の下にいるのにいつもぬれているもの=舌(作者不詳の伝承 riddle。デトロイト大学の民俗資料に採集)。流布例: https://libraries.udmercy.edu/find/special_collections/digital/cfa/index.php?fl_id=9206 ・ https://www.bladeforums.com/threads/riddle-me-this-part-b.332251/ 。要注意: 候補段階の確認は検索結果まで(本文は未読)。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
+        '水の中で生まれたのに、水にふれると消えてしまう。なんだ?',
+        '塩(氷も正解)',
+        '{"hook":"生まれ故郷が苦手だと!?","hint":"毎日口にしているぞ!","question":"水の中で生まれたのに、水にふれると消えてしまう。なんだ?","answer":"塩(氷も正解)","explanation":"塩は、海の水を煮つめたり干したりして作る。水から生まれたのに、水に入れるととけて見えなくなる。氷と答えた人も正解だ。","coach_comment":"しょっぱい謎を解いたな!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"水の中で生まれたのに水にふれると消えるものを問うなぞ。答えは塩(海水から作り、水にとける)。氷の別解も取り込む。中世のアルドヘルムの謎以来の伝承 riddle を日本語に書き下ろした。","illustration_scene":"朝日がのぼる海。きらきら光る波の間から、色とりどりの魚たちが元気にはねている。遠くに小さな島とカモメ。海の上の空に大きな「?」。人物・「?」以外の文字は描かない。"}',
+        '類型: 水の中で生まれ水にふれると消えるもの=塩(作者不詳の伝承 riddle。中世ラテン語のアルドヘルムの謎 Salis 以来)。流布例: https://theriddleages.com/riddles/post/aldhelm-riddle-19-salis/ ・ https://riddles.com/post/98/water-riddles 。要注意: 候補段階の確認は検索結果まで(本文は未読)。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C84
 INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, question_text, answer_text, content_fields, source_note, is_active)
