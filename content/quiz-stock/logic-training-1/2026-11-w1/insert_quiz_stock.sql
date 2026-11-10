@@ -89,8 +89,8 @@ VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
         '王さまが黒板に1本の線を引いた。「この線に触れず、消しもせず、黒板も動かさずに、この線を短くしてみよ」。賢い家来はどうした?',
-        'となりに、もっと長い線を引いた',
-        '{"hook":"王さまの無理難題だ!","hint":"線そのものは放っておけ!","question":"王さまが黒板に1本の線を引いた。「この線に触れず、消しもせず、黒板も動かさずに、この線を短くしてみよ」。賢い家来はどうした?","answer":"となりに、もっと長い線を引いた","explanation":"家来は、王さまの線のとなりに、もっと長い線を引いた。比べれば、元の線は「短いほう」になる。長い短いは、比べる相手で決まる。インドに伝わるとんち話だ。","coach_comment":"比べ方ひとつで変わるぞ!","tags":["とんち","夜の一問","発想転換"],"summary":"引かれた線に触れず消さずに短くせよという難題を、となりにもっと長い線を引いて解くとんち。インドのアクバルとビルバルの民話。長さは比べる相手で決まる。","illustration_scene":"夜の宮殿の広間。ろうそくの明かりに照らされた大きな黒板に、白いチョークの横線が1本だけ引いてある。黒板の前に玉座と赤いじゅうたん。黒板の右上に大きな「?」。人物・「?」以外の文字は描かない。"}',
+        '下に、もっと長い線を引いた',
+        '{"hook":"王さまの無理難題だ!","hint":"黒板は広いぞ!","question":"王さまが黒板に1本の線を引いた。「この線に触れず、消しもせず、黒板も動かさずに、この線を短くしてみよ」。賢い家来はどうした?","answer":"下に、もっと長い線を引いた","explanation":"家来は、王さまの線の下に、もっと長い線を引いた。比べれば、元の線は「短いほう」になる。長い短いは、比べる相手で決まる。インドに伝わるとんち話だ。","coach_comment":"比べ方ひとつで変わるぞ!","tags":["とんち","夜の一問","発想転換"],"summary":"引かれた線に触れず消さずに短くせよという難題を、下にもっと長い線を引いて解くとんち。インドのアクバルとビルバルの民話。長さは比べる相手で決まる。","illustration_scene":"夜の宮殿の広間。ろうそくの明かりに照らされた大きな黒板に、白いチョークの横線が1本だけ引いてある。黒板の前に玉座と赤いじゅうたん。黒板の右上に大きな「?」。人物・「?」以外の文字は描かない。"}',
         '類型: 線に触れずに短くする=となりに長い線を引く(アクバルとビルバルの民話のとんち。インドの教科書にも収録)。流布例: https://puzzles-world.com/2015/12/how-did-birbal-make-line-shorter.html ・ https://www.orchidsinternationalschool.com/class2-english-ncert-solutions-chapter-14-make-it-shorter 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C86
