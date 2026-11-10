@@ -48,9 +48,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '白いまま空へ上がっていって、落ちてきたときには黄色と白になっている。なんだ?',
+        '白いまま空へ上がっていって、地面に落ちたあとは黄色と白になっている。なんだ?',
         '卵(投げ上げて、受けそこねた)',
-        '{"hook":"朝ごはんの前に解けるか?","hint":"落ちたらどうなるか考えろ!","question":"白いまま空へ上がっていって、落ちてきたときには黄色と白になっている。なんだ?","answer":"卵(投げ上げて、受けそこねた)","explanation":"白い殻の卵を投げ上げて受けそこねると、割れて黄身と白身が出てくる。上がるときは白、落ちたあとは黄色と白。食べ物は投げずに解こう。","coach_comment":"答えは落とさず受け取れ!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"白いまま上がり、落ちてくると黄色と白になるものを問うなぞ。答えは卵(投げ上げて割れる)。英語圏の定番 riddle を日本語に書き下ろした。A14(使う前に壊す)とは仕掛けが別。","illustration_scene":"朝の青空の下、公園の芝生で、後ろ姿の子どもが両手を上にのばして空を見上げている。空には白い雲がいくつか浮かび、空の高いところに大きな「?」。顔は描かない。「?」以外の文字は描かない。"}',
+        '{"hook":"朝ごはんの前に解けるか?","hint":"落ちたらどうなるか考えろ!","question":"白いまま空へ上がっていって、地面に落ちたあとは黄色と白になっている。なんだ?","answer":"卵(投げ上げて、受けそこねた)","explanation":"白い殻の卵を投げ上げて受けそこねると、割れて黄身と白身が出てくる。上がるときは白、落ちたあとは黄色と白。食べ物は投げずに解こう。","coach_comment":"答えは落とさず受け取れ!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"白いまま上がり、地面に落ちたあとは黄色と白になるものを問うなぞ。答えは卵(投げ上げて割れる)。英語圏の定番 riddle を日本語に書き下ろした。A14(使う前に壊す)とは仕掛けが別。","illustration_scene":"朝の青空の下、公園の芝生で、後ろ姿の子どもが両手を上にのばして空を見上げている。空には白い雲がいくつか浮かび、空の高いところに大きな「?」。顔は描かない。「?」以外の文字は描かない。"}',
         '類型: 白いまま上がり黄色と白で落ちてくるもの=卵(作者不詳・英語圏の定番 riddle。なぞなぞ本の書名にもなっている)。流布例: https://nflibrary.ca/catalogue/what-goes-up-white-comes-down-yellow-262455 ・ https://www.penguin.co.uk/books/446097/what-goes-up-white-and-comes-down-yellow-by-brandreth-gyles/9780241544488 。要注意: 候補段階の確認は検索結果まで(本文は未読)。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A88
