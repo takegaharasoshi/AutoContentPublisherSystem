@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
 <link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body data-plan-format="1" data-plan-steps="none">
+<body data-plan-format="1">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / 開発計画</nav>
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -70,7 +70,64 @@
 <p><strong>次のフェーズを起こすときの入口</strong>: <a href="#pending-checks">確認待ちリスト</a>（トリガーが来た項目）/ <a href="../ideas/index.html">アイデア体系</a>セクション 2 の条件待ち / <a href="../issues/index.html#lane-dev">課題体系の開発レーン節</a>（トリガーが揃った据え置き課題。束ね方・同梱の要否は課題表の対応方針・トリガー列が正）/ 月次 KPI 転記は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>の定常作業でフェーズにしない。起票は<a href="index.html#step-checklist">計画体系 5.1</a> のチェックリストに従う。</p>
 
 <h2 id="current-phase">進行中のフェーズ</h2>
-<p><strong>なし</strong>（2026-10-25 に Phase 31 が完了）。ステップが 0 件のあいだは構造検査のため <code>&lt;body data-plan-steps="none"&gt;</code> を宣言している。<strong>次のフェーズを起こすときにこの宣言を外す</strong>（<a href="index.html#step-format">計画体系 5</a>）。</p>
+<section class="plan-phase" data-plan-phase="32" id="phase-32">
+<h2 id="phase-32-title">Phase 32: DB 準備確認の起動失敗を SFN でやり直す（I-049）</h2>
+<p><strong>ゴール</strong>: 投稿・画像生成・インサイト収集の 3 本の SFN で、最初のステート <code>WaitForDbReady</code> のタスクが一時的な理由で起動できなかったとき、実行全体を落とさずにやり直す。失敗したときの cause から、どのステートで落ちたかが分かる。</p>
+<details class="plan-fold">
+<summary>フェーズの背景・決定の経緯 <span class="plan-hint">— I-049 が 2 回発生し据え置き不可になった</span></summary>
+<div class="plan-fold-inner">
+<blockquote>課題 <a href="../issues/index.html#I-049">I-049</a> の展開（2026-11-10・ユーザー判断）。<code>WaitForDbReady</code> に Retry がなく、DB 準備確認の ECS タスクの起動失敗 1 回で実行全体が失敗する。発生は 2 回: 2026-11-03（SNS 投稿 SFN・ECR 取得のタイムアウト <code>CannotPullContainerError</code>）と 2026-11-10（インサイト収集 SFN 2 件・<code>Task provisioning failed.</code>）。どちらも手動の再実行で復旧した（<a href="development-log.html#incidents">開発記録 事象記録</a>）。課題体系 4.6 により 2 回目で据え置き不可。<br>
+課題表の照合（計画体系 5.1）: 触るパス <code>infra/lib/asl/</code>・<code>docs/infra/workflow.html</code> で照合し、同梱は I-049 のみ。<a href="../issues/index.html#I-019">I-019</a>（当日リカバリの手順。トリガーは 1 日 1 回運用のセットの投稿失敗アラームで、今回は引かれていない）と <a href="../issues/index.html#I-025">I-025</a>（0 件処理の可視化。壁打ち待ち）は同梱しない。</blockquote>
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+<article class="plan-step" id="step-32-1" data-step-id="32-1" data-status="todo">
+<header class="plan-step-head">
+<div class="plan-meta"><strong>32-1</strong><span class="plan-status">未着手</span></div>
+<h3>3 本の ASL の WaitForDbReady に Retry を足し、cause を直す</h3>
+<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭）。</p>
+<p data-field="result"><strong>現況：</strong>未着手。</p>
+</header>
+<div class="plan-step-body">
+<section><h4>1. 何をするか</h4>
+<div data-field="overview"><p><code>infra/lib/asl/</code> の <code>sns-posting</code>・<code>image-generation</code>・<code>insights-collection</code> の 3 本で、<code>WaitForDbReady</code> に起動失敗をやり直す Retry を足す。失敗時の cause を、落ちたステートが分かる文言にする。インフラ設計書 <code>docs/infra/workflow.html</code> の「<code>WaitForDbReady</code> には Retry を設定しない」という記述と ASL の掲載を実装に合わせて直し、理由を判断の記録に残す。承認のあと 3 スタックを deploy する。</p></div>
+<div data-field="constraints"><strong>守る条件</strong><p>バッチ本体のステート（<code>RunSnsPostBatchTask</code> 等）の Retry・Catch は変えない。DB 準備確認のコンテナ（<code>services/db-readiness-check/</code>）は変えない。SFN・アラームの論理 ID と名前を変えない（置換を起こさない）。<code>services/</code> <code>shared/</code> <code>database/</code> は触らない。</p></div>
+</section>
+<section><h4>2. 完了条件</h4>
+<ol data-field="acceptance">
+<li>3 本の ASL の <code>WaitForDbReady</code> に Retry があり、<code>infra/test/</code> のテストがそれを検証している。<code>cd infra &amp;&amp; npm test</code> の要約行を貼る（全パス）。</li>
+<li>失敗時の cause が、DB 準備確認で落ちた場合とバッチ本体で落ちた場合とで区別できる。その定義をテストで検証している。</li>
+<li><code>cdk diff -c env=prod</code> で、差分が ImageBatchStack・SnsPostBatchStack・InsightsBatchStack の SFN 定義だけで、リソースの置換がないことを出力の要点で示す。</li>
+<li><code>docs/infra/workflow.html</code> を実装に合わせて直し、<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が OK。</li>
+<li>承認のあと 3 スタックを deploy し、<code>aws stepfunctions describe-state-machine</code> で 3 本とも <code>WaitForDbReady</code> の Retry が入っていることを出力で示す。</li>
+<li>課題 I-049 を 解消 へ移し、本書と開発記録を更新して <code>python3 tools/docs_check.py --plan-only</code> が OK。日本語メッセージでコミットし、<code>pull --rebase</code> のうえ push 済み。</li>
+</ol>
+</section>
+<section><h4>3. 人が確認すること・止まる場所</h4>
+<div class="plan-gates">
+<div data-field="gate"><strong>人が確認すること</strong><p><code>cdk diff</code> の要点を見て、3 スタックの deploy を承認する（push の直後）。やり直しの効果は本番で起動失敗が起きないと見られないため、<a href="#pending-checks">確認待ちリスト</a>で追う。</p></div>
+<div data-field="stop"><strong>止まる場所・上限</strong><p>deploy の前で止まり、承認を待つ。承認後は deploy と定義の確認・記録の push まで（<code>infra/</code>・<code>docs/</code>）。stop after 25 turns。<strong>やらないこと</strong>: 本番の SFN の手動実行・Scheduler の変更。</p></div>
+</div>
+</section>
+<details class="plan-fold" data-field="implementation">
+<summary>4. 実装の細部・背景 <span class="plan-hint">— Retry の対象の絞り方が着手時の判断点</span></summary>
+<div class="plan-fold-inner">
+<p>現状（2026-11-10 時点）: 3 本とも <code>WaitForDbReady</code> は Retry なし・Catch は <code>States.ALL</code> → <code>HandleError</code>。バッチ本体は <code>States.TaskFailed</code> / <code>States.Timeout</code> を 30 秒間隔・2 回・BackoffRate 2.0 でやり直している。<code>HandleError</code> の cause は 3 本とも「〜 batch task failed after retries」の固定文言。</p>
+<p>着手時に決めること: ① Retry の対象。起動失敗（<code>TaskFailedToStart</code>）もコンテナが待ち切れずに終了コード 1 で終わった場合も、SFN では同じ <code>States.TaskFailed</code> になる。DB 準備確認はコンテナの中で待機と再試行を済ませる設計（workflow.html セクション 2 の責務分担。タイムアウト 900 秒）なので、後者までやり直すと失敗の確定が遅れる。課題の案は「30 秒間隔・2 回・BackoffRate 2.0」。対象を絞れるか、絞れないなら回数と所要時間の上限をどう置くかを決める ② cause の出し分け方（<code>HandleError</code> をステートごとに分ける等）。アラームは <code>ExecutionsFailed</code> を見ているため、どの方法でも検知は変わらない。</p>
+<p>DB 準備確認は冪等で投稿をしないため、やり直しても二重投稿にはならない。</p>
+</div>
+</details>
+<details class="plan-fold" data-field="record">
+<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
+<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+</details>
+</div>
+</article>
+
+</div>
+</section>
 
 <hr>
 
@@ -80,6 +137,7 @@
 <thead><tr><th>日付 / 対象</th><th>トリガー</th><th>確認内容・判定基準</th><th>NG 時の扱い</th><th>結果</th></tr></thead>
 <tbody>
 <tr><td>2026-10-17 / <a href="development-log.html#step-28-2">28-2</a> 一過性エラーの段階別の扱い</td><td>本番で次に Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）が起きた投稿（WARNING ログ「投稿コンテナを作成からやり直す」、または <code>api_response</code> に <code>first_error</code> を持つ <code>posts</code> 行が出たとき。<code>/incident</code> の照合で拾う）</td><td>① 公開前の失敗なら作成から 1 回だけやり直し、<code>platform_container_id</code> が新しい ID になっている ② 公開の失敗なら照会が 1 回だけ行われ、<code>PUBLISHED</code> → 「PUBLISHED 確認済み」の <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで再送 になっている ③ Instagram 上で同じ回の投稿が 2 件になっていない ④ <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形</td><td>二重投稿（③）なら即 <code>/incident</code> で課題に起票し、再送を止める修正を開発レーンで最優先にする。① ② ④ の食い違いは課題に起票（I-024 を live へ戻すかは <code>/incident</code> で判断）</td><td></td></tr>
+<tr><td>2026-11-10 / <a href="#step-32-1">32-1</a> DB 準備確認の起動失敗のやり直し</td><td>発生実績型: 32-1 の deploy 後、本番で次に <code>WaitForDbReady</code> のタスクが起動に失敗したとき（SFN の実行履歴に <code>TaskFailed</code> の後の再試行が出る。SFN 失敗アラームが鳴った場合は <code>/incident</code> の照合で拾う）</td><td>① やり直しで DB 準備確認が成功し、実行全体が SUCCEEDED で終わっている（失敗アラームが鳴っていない）② やり直しても失敗した場合は、cause から DB 準備確認で落ちたと分かる</td><td>やり直しが効いていない → I-049 を live へ戻し（解消済みの再発）、<code>/incident</code> で切り分ける</td><td>—</td></tr>
 <tr><td>2026-10-24 / <a href="development-log.html#step-31-6">31-6</a> 脳みそコーチの正解コメントへの定時返信</td><td>日付型: 31-6 の本番返信の開始から 2 週間後 = <strong>2026-11-08</strong>（開始 2026-10-25）</td><td>① 返信の記録で、外れのコメントに「正解」と返したものが 0 件 ② logic-training-1 の 1 投稿あたりのコメント数の中央値が、手で返していた時期（2026-10 第 1〜2 週・12.5〜16 件）の水準に戻っているか（<code>content/insights-analysis</code> の <code>per_post_latest</code>）</td><td>① が 1 件でもあれば返信スイッチを切り、課題として起票する。② は効果の観察で、戻っていなくても返信は止めない（課題として起票し、別解・外れへの返信の再検討と合わせて判断）</td><td></td></tr>
 </tbody>
 </table></div>
