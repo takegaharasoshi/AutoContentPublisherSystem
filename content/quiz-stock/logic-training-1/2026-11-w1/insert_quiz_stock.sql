@@ -98,9 +98,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('night-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'night-%') t),
         'L1', 'deep',
-        '夜の倉庫の警備員が、朝、社長に言った。「ゆうべ、出張先が大雪になる夢を見ました」。本当に大雪になり、社長は礼を言ったあと、彼をクビにした。なぜ?',
+        '夜の倉庫の警備員が、朝、社長に言った。「ゆうべ、社長の出張先が大雪になる夢を見ました」。本当に大雪になり、社長は礼を言ったあと、彼をクビにした。なぜ?',
         '夜の勤務中に眠って、夢を見ていたから',
-        '{"hook":"当てたのにクビだと!?","hint":"彼の仕事は何だった?","question":"夜の倉庫の警備員が、朝、社長に言った。「ゆうべ、出張先が大雪になる夢を見ました」。本当に大雪になり、社長は礼を言ったあと、彼をクビにした。なぜ?","answer":"夜の勤務中に眠って、夢を見ていたから","explanation":"夢を見たということは、眠っていたということ。夜の倉庫を見張るのが仕事の警備員が、勤務中に居眠りしたと自分で白状してしまった。","coach_comment":"口は災いのもとだな!","tags":["水平思考","夜の一問","状況パズル"],"summary":"夢で大雪を言い当てた夜の警備員が、礼を言われたのにクビになった理由を問う水平思考の定番。夜の勤務中に眠っていたと自白したから。原典の飛行機事故の夢は大雪に置き換えた。","illustration_scene":"夜の大きな倉庫の入り口。壁のフックに懐中電灯と鍵の束がかかり、外には雪がしんしんと降り積もっている。入り口の明かりが雪を照らす。倉庫の屋根の上に大きな「?」。人物・「?」以外の文字は描かない。"}',
+        '{"hook":"社長の判断、わかるか?","hint":"当たったことは関係ないぞ!","question":"夜の倉庫の警備員が、朝、社長に言った。「ゆうべ、社長の出張先が大雪になる夢を見ました」。本当に大雪になり、社長は礼を言ったあと、彼をクビにした。なぜ?","answer":"夜の勤務中に眠って、夢を見ていたから","explanation":"夢を見たということは、眠っていたということ。夜の倉庫を見張るのが仕事の警備員が、勤務中に居眠りしたと自分で白状してしまった。","coach_comment":"口は災いのもとだな!","tags":["水平思考","夜の一問","状況パズル"],"summary":"夢で大雪を言い当てた夜の警備員が、礼を言われたのにクビになった理由を問う水平思考の定番。夜の勤務中に眠っていたと自白したから。原典の飛行機事故の夢は大雪に置き換えた。","illustration_scene":"夜の大きな倉庫の中。積み上げた段ボール箱の間に、制帽をかぶった警備員が後ろ姿でまっすぐ立ち、懐中電灯で通路を照らしている。頭の上の雲の形の吹き出しの中に、大雪にうもれた町と立ち往生する電車。吹き出しの横に大きな「?」。顔は描かない。「?」以外の文字は描かない。"}',
         '類型: 夢で危険を言い当てた夜警がクビになる=勤務中に眠っていた(作者不詳・英語圏の situation puzzle の定番)。流布例: https://www.kith.org/jed/situation-puzzles/answers-to-jeds-list-of-situation-puzzles/ ・ https://www.puzzleprime.com/puzzles/brain-teasers/lateral/rewarded-and-fired/ 。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- C87
