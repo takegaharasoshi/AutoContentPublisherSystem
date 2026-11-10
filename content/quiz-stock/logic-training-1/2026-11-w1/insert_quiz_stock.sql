@@ -8,9 +8,9 @@ INSERT INTO quiz_stock_items (set_id, content_key, quiz_type, difficulty, questi
 VALUES ((SELECT id FROM batch_sets WHERE set_code = 'logic-training-1'),
         (SELECT CONCAT('morning-', LPAD(COALESCE(MAX(CAST(SUBSTRING_INDEX(t.content_key, '-', -1) AS UNSIGNED)), 0) + 1, 3, '0')) FROM (SELECT q.content_key FROM quiz_stock_items q JOIN batch_sets b ON b.id = q.set_id WHERE b.set_code = 'logic-training-1' AND q.content_key LIKE 'morning-%') t),
         'L1', 'light',
-        '山から掘り出され、細い木の箱に閉じこめられて、二度と出してもらえない。それなのに、ほとんどの人が毎日のように使っている。なんだ?',
+        '山から掘り出され、細い木の中に閉じこめられて、二度と出してもらえない。それなのに、だれもが必ず使ったことがある。なんだ?',
         '鉛筆の芯',
-        '{"hook":"毎日さわっているはずだ!","hint":"木の箱は細長いぞ!","question":"山から掘り出され、細い木の箱に閉じこめられて、二度と出してもらえない。それなのに、ほとんどの人が毎日のように使っている。なんだ?","answer":"鉛筆の芯","explanation":"鉛筆の芯は、山で掘った黒鉛と粘土から作る。細い木の軸にはさまれたまま、出されることなく、すり減って役目を終える。木の箱の正体は鉛筆の軸だ。","coach_comment":"芯のある答えだったぞ!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"山から掘り出され、細い木の箱に閉じこめられたまま毎日使われるものを問うなぞ。答えは鉛筆の芯(黒鉛)。英語圏の伝承 riddle を日本語だけで成り立つ形に書き下ろした。","illustration_scene":"朝日が差す山のふもと。岩山に開いた坑道の入り口から線路がのび、空っぽのトロッコが1台止まっている。入り口の横につるはしとランタン。坑道の入り口の上に大きな「?」。人物・「?」以外の文字は描かない。"}',
+        '{"hook":"毎日さわっているはずだ!","hint":"その木は細長いぞ!","question":"山から掘り出され、細い木の中に閉じこめられて、二度と出してもらえない。それなのに、だれもが必ず使ったことがある。なんだ?","answer":"鉛筆の芯","explanation":"鉛筆の芯は、山で掘った黒鉛と粘土から作る。細い木の軸にはさまれたまま、出されることなく、すり減って役目を終える。","coach_comment":"芯のある答えだったぞ!","tags":["なぞなぞ","朝の一問","言葉あそび"],"summary":"山から掘り出され、細い木の中に閉じこめられ、だれもが使ったことがあるものを問うなぞ。答えは鉛筆の芯(黒鉛)。英語圏の伝承 riddle を日本語だけで成り立つ形に書き下ろした。","illustration_scene":"朝日が差す山の中の森。1本の木の幹に細長い穴があいていて、後ろ姿の人が、両手で抱えた大きな「?」をその穴に押し込んでいる。足もとにつるはしと、掘ったばかりの土。顔は描かない。「?」以外の文字は描かない。"}',
         '類型: 鉱山から掘り出され木のケースに閉じこめられるもの=鉛筆の芯(作者不詳・英語圏の伝承 riddle)。流布例: https://waywordradio.org/pencil-riddle ・ https://riddlepedia.com/?p=81110 。要注意: 候補段階の確認は検索結果まで(本文は未読)。文面はオリジナルに書き下ろし(表現は書き直し済み)。', 1);
 
 -- A84
