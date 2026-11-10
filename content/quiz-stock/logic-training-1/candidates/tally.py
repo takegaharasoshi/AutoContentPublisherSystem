@@ -2,7 +2,7 @@
 """候補ディレクトリの集計ツール(logic-training-1・改修 R-3-1)。
 
 「1 候補 1 ファイル」(フロントマター付き Markdown)を読み、朝夜別に
-候補数・未レビュー・OK・NG・保留・完成稿 NG・余剰 OK・不足・追加数(不足 × 2)を出し、
+候補数・未レビュー・OK・NG・保留・完成稿 NG・余剰 OK・不足・追加数(不足 × 4)を出し、
 仕上げ(G1b)へ進めるかを判定する。依存は標準ライブラリのみ。
 
 使い方(リポジトリルートから):
@@ -14,7 +14,7 @@
 - 1 ファイル = 1 候補。版(修正版)は同じファイルに追記するので、版の数だけ重複加算されない
 - 別ファイルへ切り出した修正版は ``supersedes: <元 id>`` を持ち、元の候補は集計から外す
 - OK として数えるのは state が ok / drafting / approved(候補 OK・完成稿へ進行中・完成稿承認)
-- 不足 = max(0, 目標 - OK)。追加 = 不足 × 2。余剰 OK = max(0, OK - 目標)
+- 不足 = max(0, 目標 - OK)。追加 = 不足 × 4(2026-11-11 に 2 倍から変更)。余剰 OK = max(0, OK - 目標)
 - 朝夜の両方で不足 0 のときだけ G1b(完成稿)へ進める。未レビューが残る間は追加数を確定しない
 - 完成稿 NG(final_ng)は OK に数えない(再選別待ち。修正版を版として追記し unreviewed に戻す)
 """
@@ -26,6 +26,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 SLOTS = ("morning", "night")
+MULTIPLIER = 4  # 候補の倍率(初回 = 目標 × 4・追加 = 不足 × 4。2026-11-11 に 2 から変更)
 SLOT_LABEL = {"morning": "朝", "night": "夜"}
 STATES = ("unreviewed", "ok", "ng", "hold", "drafting", "approved", "final_ng", "withdrawn")
 STATE_LABEL = {
@@ -145,14 +146,14 @@ def tally(cands: list[Candidate], targets: dict[str, int]) -> tuple[dict, list[s
         t = targets[s]
         row["target"] = t
         row["shortfall"] = max(0, t - row["ok"])
-        row["add"] = row["shortfall"] * 2
+        row["add"] = row["shortfall"] * MULTIPLIER
         row["surplus"] = max(0, row["ok"] - t)
     return rows, errors
 
 
 def render(rows: dict, title: str) -> str:
     head = f"候補集計: {title}(目標 朝 {rows['morning']['target']} / 夜 {rows['night']['target']})"
-    cols = ["スロット", "候補", "未レビュー", "OK", "NG", "保留", "完成稿NG", "余剰OK", "不足", "追加(不足×2)"]
+    cols = ["スロット", "候補", "未レビュー", "OK", "NG", "保留", "完成稿NG", "余剰OK", "不足", "追加(不足×4)"]
     lines = [head, "  ".join(cols)]
     for s in SLOTS:
         r = rows[s]
@@ -209,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
     targets = {"morning": args.target[0], "night": args.target[1]}
 
     if args.target_dir == "plan":
-        print(f"候補計画: 目標 朝 {targets['morning']} / 夜 {targets['night']} → 用意する候補 朝 {targets['morning'] * 2} / 夜 {targets['night'] * 2}(目標の 2 倍)")
+        print(f"候補計画: 目標 朝 {targets['morning']} / 夜 {targets['night']} → 用意する候補 朝 {targets['morning'] * MULTIPLIER} / 夜 {targets['night'] * MULTIPLIER}(目標の {MULTIPLIER} 倍)")
         return 0
 
     directory = Path(args.target_dir)
