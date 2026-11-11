@@ -150,6 +150,41 @@ SELECT set_code, metric_month, days_collected, first_date, last_date,
        month_end_followers, month_end_followers_date, reach_total
 FROM v_account_kpi_monthly
 ORDER BY set_code, metric_month""",
+
+        # 成長ダッシュボード用（アイデア account-growth-visualization の叩き台。全期間・週単位。--since / --split は使わない）
+        # 週は月曜はじまり。followers_end はその週で最後に取れた日のフォロワー数、days は収集できた日数
+        "growth_account_weekly": """
+SELECT d.set_code, DATE_FORMAT(d.week_from, '%Y-%m-%d') AS week_from, COUNT(*) AS days,
+       SUM(d.reach) AS reach, DATE_FORMAT(MAX(d.metric_date), '%Y-%m-%d') AS last_date,
+       CAST(SUBSTRING_INDEX(GROUP_CONCAT(d.followers_count ORDER BY d.metric_date DESC), ',', 1) AS SIGNED) AS followers_end
+FROM (
+    SELECT set_code, metric_date, followers_count, reach,
+           DATE_SUB(metric_date, INTERVAL WEEKDAY(metric_date) DAY) AS week_from
+    FROM v_account_kpi_daily
+    WHERE followers_count IS NOT NULL OR reach > 0
+) d
+GROUP BY d.set_code, d.week_from
+ORDER BY d.set_code, d.week_from""",
+
+        # 投稿週（JST・月曜はじまり）ごとの 72 時間水準。中央値は v_post_kpi_monthly と同じ求め方
+        "growth_post_weekly": """
+SELECT t.set_code, DATE_FORMAT(t.week_from, '%Y-%m-%d') AS week_from, COUNT(*) AS posts,
+       ROUND(AVG(CASE WHEN t.rn IN (FLOOR((t.n + 1) / 2), CEIL((t.n + 1) / 2)) THEN t.views END), 1) AS median_views_72h,
+       ROUND(AVG(t.views)) AS avg_views_72h, MAX(t.views) AS max_views_72h
+FROM (
+    SELECT w.set_code, w.week_from, w.views,
+           ROW_NUMBER() OVER (PARTITION BY w.set_code, w.week_from ORDER BY w.views) AS rn,
+           COUNT(*)     OVER (PARTITION BY w.set_code, w.week_from) AS n
+    FROM (
+        SELECT k.set_code, k.views,
+               DATE_SUB(DATE(k.posted_at + INTERVAL 9 HOUR),
+                        INTERVAL WEEKDAY(k.posted_at + INTERVAL 9 HOUR) DAY) AS week_from
+        FROM v_post_kpi_72h k
+        WHERE k.views IS NOT NULL
+    ) w
+) t
+GROUP BY t.set_code, t.week_from
+ORDER BY t.set_code, t.week_from""",
     }
 
 
