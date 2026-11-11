@@ -29,6 +29,8 @@ python3 run_queries.py kpi_post_monthly kpi_account_monthly   # 月次 KPI 転�
 | `account_daily` | アカウント日次（直近 30 日）: フォロワー数・views・reach・engaged・comments・saves |
 | `kpi_post_monthly` | **月次 KPI 転記用**（16-12b）。ビュー `v_post_kpi_monthly`（セット × 年月 × スロットの 72 時間水準の中央値。`slot='all'` は全スロット合算）をそのまま出す |
 | `kpi_account_monthly` | **月次 KPI 転記用**（16-12b）。ビュー `v_account_kpi_monthly`（月末フォロワー・月間 reach 合計・収集日数）をそのまま出す |
+| `growth_account_weekly` | 成長ダッシュボード用。セット × 週（月曜はじまり）の収集日数・週間 reach・週末時点のフォロワー（全期間） |
+| `growth_post_weekly` | 成長ダッシュボード用。セット × 投稿週の本数と 72 時間再生の中央値・平均・最大（全期間） |
 
 `kpi_*` の転記先・手順は `docs/app/operation.html` セクション 6.3、ビューの定義は `docs/app/data-model.html` セクション 4.11（`database/V011__insights_kpi_views.sql`）。
 
