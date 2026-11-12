@@ -8,7 +8,7 @@
 - `build.py`: 集計結果を埋め込んで `out/growth.html` を書き出す（`out/` は git 管理外）
 - `report.py`: 週 1 回の届くレポート（LINE 用の数行の文面）を集計結果から組み立てて標準出力に出す。`--send` を付けたときだけ LINE へ送る（環境変数 `LINE_CHANNEL_ACCESS_TOKEN`・`LINE_USER_ID`。送信は未試行）
 
-## 更新の手順（週 1 回）
+## 更新の手順（週 1 回。火曜の朝 8 時 — 日曜の分は月曜 18 時の収集で入るため）
 
 ```bash
 cd content/insights-analysis && python3 run_queries.py growth_account_weekly growth_post_weekly
@@ -20,3 +20,9 @@ python3 poc/account-growth-dashboard/build.py
 
 そのあと Claude Code で `out/growth.html` を上の公開先へ公開し直す
 （Artifact の publish に `url` として公開先を渡す。渡さないと別のページができる）。
+
+レポートの文面は次で確認できる（`--send` を付けると LINE へ送る）。
+
+```bash
+python3 poc/account-growth-dashboard/report.py
+```
