@@ -6,7 +6,7 @@
 - 公開先（非公開のアーティファクト）: https://claude.ai/artifact/NMPNxbEYTwtC8AVQDSFwBk
 - `template.html`: ページ本体。`/*DATA*/` に集計結果が入る。節目の人数・表示名・色は冒頭の `SETS` にある
 - `build.py`: 集計結果を埋め込んで `out/growth.html` を書き出す（`out/` は git 管理外）
-- `report.py`: 週 1 回の届くレポート（LINE 用の数行の文面）を集計結果から組み立てて標準出力に出す。`--send` を付けたときだけ LINE へ送る（環境変数 `LINE_CHANNEL_ACCESS_TOKEN`・`LINE_USER_ID`。送信は未試行）
+- `report.py`: 週 1 回の届くレポート（LINE 用の数行の文面）を集計結果から組み立てて標準出力に出す。`--send` を付けたときだけ LINE へ送る（`LINE_CHANNEL_ACCESS_TOKEN`・`LINE_USER_ID`。環境変数に無ければ `~/.bashrc` の `export` 行から読む。値はリポジトリに置かない。2026-11-12 に送信を確認）
 
 ## 更新の手順（週 1 回。火曜の朝 8 時 — 日曜の分は月曜 18 時の収集で入るため）
 

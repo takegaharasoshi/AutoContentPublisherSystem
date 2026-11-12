@@ -1,7 +1,8 @@
 """週 1 回の届くレポート（LINE 用の数行の文面）を集計結果から組み立てる。
 
 既定では文面を標準出力に出すだけ。``--send`` を付けたときだけ LINE の Messaging API で
-プッシュ送信する（環境変数 ``LINE_CHANNEL_ACCESS_TOKEN`` と ``LINE_USER_ID`` が必要）。
+プッシュ送信する（``LINE_CHANNEL_ACCESS_TOKEN`` と ``LINE_USER_ID`` が必要。環境変数に
+無ければ ``~/.bashrc`` の ``export`` 行から読む — 無人の実行では ``~/.bashrc`` が読み込まれないため）。
 """
 
 from __future__ import annotations
@@ -9,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import urllib.request
 from datetime import date, timedelta
 from pathlib import Path
@@ -101,6 +103,30 @@ def build_report() -> str:
     return "\n".join([*head, *lines, *tail]).replace("\n\n\n", "\n\n")
 
 
+def setting(name: str) -> str | None:
+    """送信の設定値を、環境変数 → ``~/.bashrc`` の ``export`` 行の順に探す。
+
+    Args:
+        name: 変数名。
+
+    Returns:
+        値。どちらにも無ければ None。
+    """
+    value = os.environ.get(name)
+    if value:
+        return value
+    bashrc = Path.home() / ".bashrc"
+    if not bashrc.exists():
+        return None
+    found = None
+    for line in bashrc.read_text(encoding="utf-8", errors="replace").splitlines():
+        if line.startswith(f"export {name}="):
+            parts = shlex.split(line[len("export "):])
+            if parts:
+                found = parts[0].split("=", 1)[1]
+    return found
+
+
 def send(text: str) -> None:
     """LINE の Messaging API でプッシュ送信する。
 
@@ -108,12 +134,12 @@ def send(text: str) -> None:
         text: 送る文面。
 
     Raises:
-        SystemExit: 環境変数が足りないとき。
+        SystemExit: 設定値が足りないとき。
     """
-    token = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN")
-    user_id = os.environ.get("LINE_USER_ID")
+    token = setting("LINE_CHANNEL_ACCESS_TOKEN")
+    user_id = setting("LINE_USER_ID")
     if not token or not user_id:
-        raise SystemExit("LINE_CHANNEL_ACCESS_TOKEN と LINE_USER_ID を環境変数に入れてください。")
+        raise SystemExit("LINE_CHANNEL_ACCESS_TOKEN と LINE_USER_ID を環境変数か ~/.bashrc に入れてください。")
     body = json.dumps({"to": user_id, "messages": [{"type": "text", "text": text}]}).encode("utf-8")
     request = urllib.request.Request(
         "https://api.line.me/v2/bot/message/push",
