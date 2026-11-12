@@ -153,6 +153,6 @@ disposition: ""
 **LINE の実送信の試行（同日・続き）**
 
 - ユーザーが公式アカウントの Messaging API チャネルを用意し、長期のチャネルアクセストークンと自分の userId を WSL の `~/.bashrc` に書き込んだ（`LINE_CHANNEL_ACCESS_TOKEN`・`LINE_USER_ID`。値はチャットに貼らず、SSH の画面で `read -s` を使って入力）
-- `python3 poc/account-growth-dashboard/report.py --send` で 1 通送り、**HTTP 200 で通った**（11/2〜11/8 の週の文面。手元のセッションから実行）
+- `python3 poc/account-growth-dashboard/report.py --send` で 1 通送り、**HTTP 200 で通った**（11/2〜11/8 の週の文面。手元のセッションから実行）。スマホに届いたことをユーザーが確認した
 - 無人の実行では `~/.bashrc` が読み込まれないため、`report.py` は環境変数に無ければ `~/.bashrc` の `export` 行から読むようにした（スケジュールタスクの指示文を 1 コマンドで書ける）
 - 残り: スケジュールタスクからの無人の実行で、公開し直しと送信が通るか
