@@ -17,11 +17,19 @@
           }
         }
       },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
       "ResultPath": null,
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "HandleError"
+          "Next": "HandleDbReadyError"
         }
       ],
       "Next": "RunImageBatchTask"
@@ -136,6 +144,11 @@
     "ImageBatchSucceeded": {
       "Type": "Succeed",
       "Comment": "画像生成は成功済みのため、SNS 投稿 SFN の起動失敗時もワークフローは成功終了とする。SNS 投稿が起動されなかったことはカスタムメトリクスのアラームで検知し、手動で sns-posting-sfn を起動する"
+    },
+    "HandleDbReadyError": {
+      "Type": "Fail",
+      "Error": "DbReadinessCheckFailed",
+      "Cause": "DB readiness check task failed after retries"
     },
     "HandleError": {
       "Type": "Fail",

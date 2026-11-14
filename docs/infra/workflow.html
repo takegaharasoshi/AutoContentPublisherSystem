@@ -13,7 +13,7 @@
 <h1>ワークフロー実装仕様</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">現行版</span>
-  <span>最終更新: 2026-10-19（30-9a: 本文に残っていた理由を判断の記録へ移した = I-043）・2026-10-18（Phase 30-4 で新しい書式へ移し〔要約・リード文・SFN のフロー図・判断の記録〕、1.6 のインサイト収集のスケジュール一覧を実態〔3 セット × 朝夕〕に直した）</span>
+  <span>最終更新: 2026-11-14（32-1: <code>WaitForDbReady</code> に起動失敗のための Retry を足し、失敗の行き先を <code>HandleDbReadyError</code> に分けた = I-049。2 章・3・4・11 章の図と ASL・6 章・判断の記録 D-14）・2026-10-19（30-9a: 本文に残っていた理由を判断の記録へ移した = I-043）・2026-10-18（Phase 30-4 で新しい書式へ移し〔要約・リード文・SFN のフロー図・判断の記録〕、1.6 のインサイト収集のスケジュール一覧を実態〔3 セット × 朝夕〕に直した）</span>
   <span>1 段上: 機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> の「AWS の定義」</span>
 </div>
 
@@ -205,10 +205,10 @@ flowchart TB
 対象例外: OperationalError, InterfaceError</code></pre>
     総待機時間は最大約 510 秒 <a class="decision-ref" href="#d-10">→ 理由 D-10</a>
   </li>
-  <li><strong>Step Functions との責務分担</strong>: <code>WaitForDbReady</code> ステートには Step Functions の Retry を設定しない。待機・再試行は db-readiness-check コンテナ内部で完結させ、総待機時間を上記の約 510 秒に固定する</li>
+  <li><strong>Step Functions との責務分担</strong>: DB への接続の待機と再試行は db-readiness-check コンテナ内部で行う（上記の約 510 秒）。<code>WaitForDbReady</code> ステートの Retry は、タスクが起動できなかった場合のやり直しのために置く（<code>States.TaskFailed</code> を 30 秒間隔・最大 2 回・BackoffRate 2.0。<code>States.Timeout</code> はやり直さない）。Step Functions は起動の失敗とコンテナの終了コード 1 を区別できないため、コンテナが待ち切れずに終わった場合も同じ回数だけやり直す <a class="decision-ref" href="#d-14">→ 理由 D-14</a></li>
   <li><strong>認証情報</strong>: Secrets Manager（DB 認証情報）から取得</li>
   <li><strong>成功時</strong>: 終了コード 0 で終了し、Step Functions が次のステートへ遷移する</li>
-  <li><strong>失敗時</strong>: 終了コード 1 で終了し、Step Functions の Catch でハンドリングする</li>
+  <li><strong>失敗時</strong>: 終了コード 1 で終了する。Step Functions は Retry を使い切ったあと Catch で <code>HandleDbReadyError</code>（Error <code>DbReadinessCheckFailed</code>）へ進み、実行を失敗にする</li>
 </ul>
 
 <p><a class="decision-ref" href="#d-04">→ 理由 D-04</a></p>
@@ -222,7 +222,7 @@ flowchart TB
 stateDiagram-v2
     [*] --> WaitForDbReady
     WaitForDbReady --> RunImageBatchTask
-    WaitForDbReady --> HandleError: 失敗
+    WaitForDbReady --> HandleDbReadyError: 失敗（起動や終了の失敗は 2 回まで再試行）
     RunImageBatchTask --> StartSnsPostBatch: 成功（失敗とタイムアウトは 2 回まで再試行）
     RunImageBatchTask --> HandleError: 失敗
     StartSnsPostBatch --> [*]: 投稿の SFN を起動できた
@@ -231,6 +231,7 @@ stateDiagram-v2
     NotifySnsPostStartFailure --> ImageBatchSucceeded: 起動失敗のメトリクスを出す
     SnsPostAlreadyStarted --> [*]
     ImageBatchSucceeded --> [*]
+    HandleDbReadyError --> [*]: Fail
     HandleError --> [*]: Fail
 </pre>
 <figcaption>図 2 選定のワークフローのステート（投稿の起動に失敗しても選定は成功として終わる）</figcaption>
@@ -255,11 +256,19 @@ stateDiagram-v2
           }
         }
       },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
       "ResultPath": null,
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "HandleError"
+          "Next": "HandleDbReadyError"
         }
       ],
       "Next": "RunImageBatchTask"
@@ -375,6 +384,11 @@ stateDiagram-v2
       "Type": "Succeed",
       "Comment": "画像生成は成功済みのため、SNS 投稿 SFN の起動失敗時もワークフローは成功終了とする。SNS 投稿が起動されなかったことはカスタムメトリクスのアラームで検知し、手動で sns-posting-sfn を起動する"
     },
+    "HandleDbReadyError": {
+      "Type": "Fail",
+      "Error": "DbReadinessCheckFailed",
+      "Cause": "DB readiness check task failed after retries"
+    },
     "HandleError": {
       "Type": "Fail",
       "Error": "ImageBatchFailed",
@@ -399,9 +413,10 @@ stateDiagram-v2
     CheckInput --> RejectInput: ない・形が違う
     RejectInput --> [*]: Fail
     WaitForDbReady --> RunSnsPostBatchTask
-    WaitForDbReady --> HandleError: 失敗
+    WaitForDbReady --> HandleDbReadyError: 失敗（起動や終了の失敗は 2 回まで再試行）
     RunSnsPostBatchTask --> [*]: 成功（Retry あり）
     RunSnsPostBatchTask --> HandleError: 失敗
+    HandleDbReadyError --> [*]: Fail
     HandleError --> [*]: Fail
 </pre>
 <figcaption>図 3 投稿のワークフローのステート</figcaption>
@@ -447,11 +462,19 @@ stateDiagram-v2
           }
         }
       },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
       "ResultPath": null,
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "HandleError"
+          "Next": "HandleDbReadyError"
         }
       ],
       "Next": "RunSnsPostBatchTask"
@@ -500,6 +523,11 @@ stateDiagram-v2
         }
       ],
       "End": true
+    },
+    "HandleDbReadyError": {
+      "Type": "Fail",
+      "Error": "DbReadinessCheckFailed",
+      "Cause": "DB readiness check task failed after retries"
     },
     "HandleError": {
       "Type": "Fail",
@@ -591,10 +619,12 @@ stateDiagram-v2
 <table>
   <thead><tr><th>エラー種別</th><th>対応</th></tr></thead>
   <tbody>
-    <tr><td>DB 準備確認失敗</td><td>db-readiness-check コンテナ内部で最大 8 回 retry 後、Catch → Fail ステートへ遷移</td></tr>
+    <tr><td>DB 準備確認タスクの起動失敗（ECR からの取得の失敗・Fargate の割り当て失敗など）</td><td>Retry（<code>States.TaskFailed</code>、最大 2 回、30 秒間隔）→ Catch → Fail ステート <code>HandleDbReadyError</code>（cause「DB readiness check task failed after retries」）へ遷移</td></tr>
+    <tr><td>DB 準備確認失敗（DB に接続できない）</td><td>db-readiness-check コンテナ内部で最大 8 回 retry 後に終了コード 1。起動失敗と同じ Retry でタスクごとやり直し（最大 2 回）→ Catch → <code>HandleDbReadyError</code> へ遷移</td></tr>
+    <tr><td>DB 準備確認のタイムアウト（900 秒）</td><td>Retry しない → Catch → <code>HandleDbReadyError</code> へ遷移</td></tr>
     <tr><td>画像生成 / SNS 投稿 / インサイト収集 ECS タスク起動失敗</td><td>Retry（最大 2 回、30 秒間隔）</td></tr>
-    <tr><td>画像生成 / SNS 投稿 / インサイト収集 ECS タスク異常終了</td><td>Retry → Catch → Fail ステートへ遷移</td></tr>
-    <tr><td>タイムアウト</td><td>Retry（<code>States.Timeout</code> を Retry 対象に含む。一時的なネットワーク遅延等を考慮）→ Catch → Fail ステートへ遷移</td></tr>
+    <tr><td>画像生成 / SNS 投稿 / インサイト収集 ECS タスク異常終了</td><td>Retry → Catch → Fail ステート <code>HandleError</code>（cause「〜 batch task failed after retries」）へ遷移</td></tr>
+    <tr><td>バッチ本体のタイムアウト</td><td>Retry（<code>States.Timeout</code> を Retry 対象に含む。一時的なネットワーク遅延等を考慮）→ Catch → Fail ステートへ遷移</td></tr>
     <tr><td>SNS 投稿 SFN 起動失敗</td><td><code>Name=$$.Execution.Name</code> で冪等化した上で Retry（<code>States.ALL</code>、最大 2 回、10 秒間隔）→ Catch → カスタムメトリクス発行 → 画像生成ワークフローは成功終了</td></tr>
   </tbody>
 </table>
@@ -720,9 +750,10 @@ stateDiagram-v2
 stateDiagram-v2
     [*] --> WaitForDbReady
     WaitForDbReady --> RunInsightsBatchTask
-    WaitForDbReady --> HandleError: 失敗
+    WaitForDbReady --> HandleDbReadyError: 失敗（起動や終了の失敗は 2 回まで再試行）
     RunInsightsBatchTask --> [*]: 成功（Retry あり）
     RunInsightsBatchTask --> HandleError: 失敗
+    HandleDbReadyError --> [*]: Fail
     HandleError --> [*]: Fail
 </pre>
 <figcaption>図 4 収集のワークフローのステート</figcaption>
@@ -749,11 +780,19 @@ stateDiagram-v2
           }
         }
       },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
       "ResultPath": null,
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "HandleError"
+          "Next": "HandleDbReadyError"
         }
       ],
       "Next": "RunInsightsBatchTask"
@@ -803,6 +842,11 @@ stateDiagram-v2
         }
       ],
       "End": true
+    },
+    "HandleDbReadyError": {
+      "Type": "Fail",
+      "Error": "DbReadinessCheckFailed",
+      "Cause": "DB readiness check task failed after retries"
     },
     "HandleError": {
       "Type": "Fail",
@@ -903,7 +947,7 @@ stateDiagram-v2
 <article id="d-10">
 <h3>D-10 DB 準備確認のコンテナ内リトライは最大約 510 秒待つ</h3>
 <dl>
-  <dt>決めたこと</dt><dd>指数バックオフで最大 8 回（2〜256 秒）再試行し、総待機時間を最大約 510 秒に固定する。<code>WaitForDbReady</code> には SFN の Retry を置かない</dd>
+  <dt>決めたこと</dt><dd>指数バックオフで最大 8 回（2〜256 秒）再試行し、1 回のタスクの総待機時間を最大約 510 秒に固定する。当初は <code>WaitForDbReady</code> に SFN の Retry を置かなかったが、32-1 で起動失敗のやり直しのために足した（D-14）</dd>
   <dt>理由</dt><dd>Aurora Serverless v2 のコールドスタート（自動一時停止からの再開）は通常 15〜30 秒程度だが、リージョン状況や負荷によっては数分かかる場合があるため、安全側に倒した。実測（Phase 6-5）: 一時停止状態（0 ACU が約 90 分継続）からの手動 RunTask 検証（2026-07-14）では、初回の接続試行が Aurora の再開完了までブロックされ約 12 秒で成功し、コンテナ内リトライは発動しなかった（Phase 4-6 の SFN 経由実行でも同様に試行 1/9 で成功）。一時停止からの再開は通常、初回試行の接続待ちで吸収される。指数バックオフのリトライは、接続がエラーで即時失敗するケース（再開の長期化や一時的な障害など）に対する保険として機能する</dd>
   <dt>日付・出典</dt><dd>当初設計（記録なし）。実測は 2026-07-14（Phase 6-5）</dd>
 </dl>
@@ -932,6 +976,16 @@ stateDiagram-v2
   <dt>決めたこと</dt><dd>トークン更新 Lambda の非同期起動の再試行を 0 回にし、DLQ を置かず、失敗は Lambda の <code>Errors</code> アラームで即通知する。Scheduler のターゲット呼び出しの再試行（2 回・最大経過 1 時間）は呼び出しの失敗だけを対象とするので残す</dd>
   <dt>理由</dt><dd>週 1 回の実行で、失敗した週は Secret を書き換えないため旧トークンのまま返信は続く。更新は失効（60 日）の 50 日以上前に行うので、数回続けて失敗しても人が直す余裕がある。自動で繰り返すより、すぐ人に知らせる方がよい</dd>
   <dt>日付・出典</dt><dd>2026-10-11（21-6g）。<a href="stacks.html#comment-reply">stacks.html セクション 3.6</a> の決定 21-6g</dd>
+</dl>
+</article>
+<article id="d-14">
+<h3>D-14 WaitForDbReady に起動失敗のための Retry を置き、失敗の cause をバッチ本体と分ける</h3>
+<dl>
+  <dt>決めたこと</dt><dd>3 本の SFN の <code>WaitForDbReady</code> に Retry（<code>States.TaskFailed</code>・30 秒間隔・最大 2 回・BackoffRate 2.0）を置く。<code>States.Timeout</code>（900 秒）はやり直さない。<code>WaitForDbReady</code> の Catch の行き先を専用の Fail ステート <code>HandleDbReadyError</code>（Error <code>DbReadinessCheckFailed</code>）にし、バッチ本体の <code>HandleError</code> と分ける</dd>
+  <dt>理由</dt><dd>DB 準備確認のタスクが起動できない一時的な失敗（2026-11-03 の ECR 取得のタイムアウト・2026-11-10 の Fargate の割り当て失敗）は、コンテナ内部の再試行では拾えず、1 回で実行全体が失敗していた。どちらも手動の再実行で通っており、やり直せば済む失敗だった。DB 準備確認は冪等で投稿をしないため、やり直しても二重投稿にはならない。回数と間隔はバッチ本体と同じにした。<br>
+  対象を起動失敗だけに絞らなかったのは、Step Functions では起動失敗もコンテナの終了コード 1 も同じ <code>States.TaskFailed</code> になり、Retry の条件では区別できないため。その結果、DB に本当に接続できないときは、失敗の確定が 1 回分（起動 約 60 秒 + 待機 約 510 秒 = 約 10 分）から最大 3 回分 + 待ち時間（約 30 分）に延びる。この失敗は本番でまだ起きておらず（D-10 の実測）、自動で復旧する手段もないため、通知が遅れる不利益より起動失敗を拾う利益を取った。ハングは待っても直る見込みが薄いので、タイムアウトはやり直さない。<br>
+  cause を分けたのは、DB 準備確認で落ちても「〜 batch task failed after retries」と出て、切り分けを誤らせたため。アラームは <code>ExecutionsFailed</code> を見ているので、検知は変わらない</dd>
+  <dt>日付・出典</dt><dd>2026-11-14（32-1）。課題 <a href="../issues/index.html#I-049">I-049</a>・<a href="../plans/development-log.html#incidents">開発記録 事象記録</a> 2026-11-03・2026-11-10</dd>
 </dl>
 </article>
 </section>

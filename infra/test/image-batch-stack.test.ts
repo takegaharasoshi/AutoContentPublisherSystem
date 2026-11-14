@@ -339,6 +339,44 @@ describe('ImageBatchStack の画像生成ワークフロー', () => {
     expect(definitionString).toContain('cloudwatch:putMetricData');
   });
 
+  test('DB 準備確認の起動失敗をやり直し、失敗の cause をバッチ本体と区別する', () => {
+    const waitForDbReady = definition.States.WaitForDbReady;
+    expect(waitForDbReady.Retry).toEqual([
+      {
+        ErrorEquals: ['States.TaskFailed'],
+        IntervalSeconds: 30,
+        MaxAttempts: 2,
+        BackoffRate: 2.0,
+      },
+    ]);
+    expect(waitForDbReady.Catch).toEqual([
+      { ErrorEquals: ['States.ALL'], Next: 'HandleDbReadyError' },
+    ]);
+    expect(definition.States.HandleDbReadyError).toEqual({
+      Type: 'Fail',
+      Error: 'DbReadinessCheckFailed',
+      Cause: 'DB readiness check task failed after retries',
+    });
+    // バッチ本体の Retry・Catch・cause は変えない。
+    const batchTask = definition.States.RunImageBatchTask;
+    expect(batchTask.Retry).toEqual([
+      {
+        ErrorEquals: ['States.TaskFailed', 'States.Timeout'],
+        IntervalSeconds: 30,
+        MaxAttempts: 2,
+        BackoffRate: 2.0,
+      },
+    ]);
+    expect(batchTask.Catch).toEqual([
+      { ErrorEquals: ['States.ALL'], Next: 'HandleError' },
+    ]);
+    expect(definition.States.HandleError).toEqual({
+      Type: 'Fail',
+      Error: 'ImageBatchFailed',
+      Cause: 'Image batch task failed after retries',
+    });
+  });
+
   test('当回の scheduled_at を子 SFN に渡し、実行名を維持する', () => {
     expect(definition.States.StartSnsPostBatch.Parameters.Input).toEqual({
       'set_code.$': '$.set_code',
