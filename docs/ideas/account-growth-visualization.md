@@ -4,7 +4,7 @@ slug: account-growth-visualization
 status: 醸成中           # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
 kind: 単発               # 単発 | 構想
 created: 2026-11-08
-updated: 2026-11-12
+updated: 2026-11-14
 condition: ""
 parent: ""
 children: []
@@ -156,3 +156,10 @@ disposition: ""
 - `python3 poc/account-growth-dashboard/report.py --send` で 1 通送り、**HTTP 200 で通った**（11/2〜11/8 の週の文面。手元のセッションから実行）。スマホに届いたことをユーザーが確認した
 - 無人の実行では `~/.bashrc` が読み込まれないため、`report.py` は環境変数に無ければ `~/.bashrc` の `export` 行から読むようにした（スケジュールタスクの指示文を 1 コマンドで書ける）
 - 残り: スケジュールタスクからの無人の実行で、公開し直しと送信が通るか
+
+### 2026-11-14（3 回目・スケジュールタスクの試行・継続中）
+
+- デスクトップアプリのスケジュールタスクの作業フォルダに WSL のリポジトリを選ぶと「This folder can't be added（protected location or the path is invalid）」で登録できなかった（ユーザー）
+- 回避の案: Windows 側のフォルダ（`C:\Users\TakegahraWork\growth-note`）を作業フォルダにし、そこから `wsl.exe -d Ubuntu-20.04 -- bash -c "python3 ~/projects/…"` で集計・組み立て・送信を呼ぶ。ページは `build.py --out` で作業フォルダへ書き出し、そこから公開し直す
+- WSL 側から同じ形（`wsl.exe` 経由）で集計・組み立て・文面の出力が通ることは確認した。Windows 側のセッションからの実行と、無人での許可（作業フォルダの `.claude/settings.json`）は未確認
+- 許可設定のファイルはユーザーが作る（エージェントが自分の実行の許可を書くことは自動判定で止められた）

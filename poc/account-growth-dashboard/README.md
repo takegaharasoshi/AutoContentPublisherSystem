@@ -26,3 +26,14 @@ python3 poc/account-growth-dashboard/build.py
 ```bash
 python3 poc/account-growth-dashboard/report.py
 ```
+
+## 無人で動かすとき（デスクトップアプリのスケジュールタスク）
+
+スケジュールタスクの作業フォルダに WSL のフォルダは選べない（2026-11-14 に確認。「This folder can't be added」）。
+Windows 側のフォルダ（`C:\Users\TakegahraWork\growth-note`）を作業フォルダにし、そこから `wsl.exe` で上のスクリプトを呼ぶ。
+ページは `build.py --out` で作業フォルダへ直接書き出す。パスを `~` から書くのは、Windows 側の Bash が `/` で始まる引数を
+Windows のパスに書き換えるのを避けるため。
+
+```bash
+wsl.exe -d Ubuntu-20.04 -- bash -c "python3 ~/projects/AutoContentPublisherSystem/poc/account-growth-dashboard/build.py --out ~/../../mnt/c/Users/TakegahraWork/growth-note/growth.html"
+```

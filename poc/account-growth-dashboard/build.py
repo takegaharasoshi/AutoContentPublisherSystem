@@ -7,6 +7,7 @@ template.html の ``/*DATA*/`` に埋め込み、out/growth.html を書き出す
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -42,7 +43,10 @@ def main() -> None:
     page = template.replace(
         "/*DATA*/", json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     )
-    out = HERE / "out" / "growth.html"
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out", type=Path, help="書き出し先（既定は out/growth.html）")
+    args = parser.parse_args()
+    out = args.out.expanduser().resolve() if args.out else HERE / "out" / "growth.html"
     out.parent.mkdir(exist_ok=True)
     out.write_text(page, encoding="utf-8")
     latest = max(r["last_date"] for r in data["account"])
