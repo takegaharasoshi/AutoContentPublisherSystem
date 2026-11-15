@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-11-15（<strong><a href="#step-34-2">34-2</a> 完了</strong>: 読み取り専用のシークレットで集計が管理者のときと同じ結果になり、書き込みは拒否された。クラウドの定期実行の手順を README にそろえた。次は 34-3〔ユーザー作業〕）。前回: 2026-11-15（<strong><a href="#step-34-1">34-1</a> 完了</strong>: 読み取り専用 DB ユーザー用のシークレットを FoundationStack に足し、DB ユーザーを作る手順を <code>database/users/</code> に置いた。push・deploy・DB への適用の承認待ち。次は 34-2）。前回: 2026-11-15（<strong>Phase 34 を起票</strong>: <a href="#step-34-1">34-1</a>〜<a href="#step-34-3">34-3</a> アカウント成長ノートをクラウドの定期実行で届ける = アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記。確認待ちに 1 行追加）。前回: 2026-11-15（<strong><a href="#step-33-3">33-3</a> 前半</strong>: 返す条件を「correct なら確信の高低を問わず返す」にそろえ、設計書を直した。deploy の承認待ち）。前回: 2026-11-15（<strong><a href="#step-33-2">33-2</a> 完了・go</strong>: 推論レベル high・返信の条件は「correct なら自信低も返す」= ユーザー決定。次は 33-3）。前回: 2026-11-15（<strong><a href="#step-33-1">33-1</a> 完了</strong>: 新しい判定プロンプトで正解を拾えた割合が 80.0%〔high〕/ 79.3%〔xhigh〕に上がり、外れ・その他への返す 0 件〔自信高だけ〕。確認待ちの 31-6 の結果を記入。次は 33-2〔ユーザー判断〕）。前回: 2026-11-15（<strong>Phase 33 の比べる対象を変更</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ。費用を抑えるためモデルは変えない = ユーザー決定）。前回: 2026-11-14（<strong>Phase 32 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-32">開発記録</a>へ移した。進行中は Phase 33）。前回: 2026-11-14（<strong><a href="development-log.html#step-32-1">32-1</a> 完了</strong>: 3 本の SFN の DB 準備確認に起動失敗の Retry を足して本番へ deploy・<a href="../issues/index.html#I-049">I-049</a> を解消。Phase 32 のステップはすべて完了し、記録の移設は次の計画整理で行う）。前回: 2026-11-13（<strong>Phase 33 を起票</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める = <a href="../issues/index.html#I-050">I-050</a> の展開。確認待ちに 1 行追加。Phase 32 は未着手のまま並ぶ）。前回: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-11-15（<strong><a href="#step-33-3">33-3</a> 完了・Phase 33 のステップがすべて完了</strong>: 返す条件を「correct なら自信の高低を問わず返す」にして 2 スタックを deploy・最初の定時の起動は正常・<a href="../issues/index.html#I-050">I-050</a> を解消。確認待ちは 2026-11-22）。前回: 2026-11-15（<strong><a href="#step-34-2">34-2</a> 完了</strong>: 読み取り専用のシークレットで集計が管理者のときと同じ結果になり、書き込みは拒否された。クラウドの定期実行の手順を README にそろえた。次は 34-3〔ユーザー作業〕）。前回: 2026-11-15（<strong><a href="#step-34-1">34-1</a> 完了</strong>: 読み取り専用 DB ユーザー用のシークレットを FoundationStack に足し、DB ユーザーを作る手順を <code>database/users/</code> に置いた。push・deploy・DB への適用の承認待ち。次は 34-2）。前回: 2026-11-15（<strong>Phase 34 を起票</strong>: <a href="#step-34-1">34-1</a>〜<a href="#step-34-3">34-3</a> アカウント成長ノートをクラウドの定期実行で届ける = アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記。確認待ちに 1 行追加）。前回: 2026-11-15（<strong><a href="#step-33-3">33-3</a> 前半</strong>: 返す条件を「correct なら確信の高低を問わず返す」にそろえ、設計書を直した。deploy の承認待ち）。前回: 2026-11-15（<strong><a href="#step-33-2">33-2</a> 完了・go</strong>: 推論レベル high・返信の条件は「correct なら自信低も返す」= ユーザー決定。次は 33-3）。前回: 2026-11-15（<strong><a href="#step-33-1">33-1</a> 完了</strong>: 新しい判定プロンプトで正解を拾えた割合が 80.0%〔high〕/ 79.3%〔xhigh〕に上がり、外れ・その他への返す 0 件〔自信高だけ〕。確認待ちの 31-6 の結果を記入。次は 33-2〔ユーザー判断〕）。前回: 2026-11-15（<strong>Phase 33 の比べる対象を変更</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ。費用を抑えるためモデルは変えない = ユーザー決定）。前回: 2026-11-14（<strong>Phase 32 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-32">開発記録</a>へ移した。進行中は Phase 33）。前回: 2026-11-14（<strong><a href="development-log.html#step-32-1">32-1</a> 完了</strong>: 3 本の SFN の DB 準備確認に起動失敗の Retry を足して本番へ deploy・<a href="../issues/index.html#I-049">I-049</a> を解消。Phase 32 のステップはすべて完了し、記録の移設は次の計画整理で行う）。前回: 2026-11-13（<strong>Phase 33 を起票</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める = <a href="../issues/index.html#I-050">I-050</a> の展開。確認待ちに 1 行追加。Phase 32 は未着手のまま並ぶ）。前回: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -86,7 +86,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 2 件（クリックで展開）</summary>
+<summary>完了済み 3 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-33-1" data-step-id="33-1" data-status="done" data-completed="2026-11-15">
@@ -188,19 +188,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-<article class="plan-step" id="step-33-3" data-step-id="33-3" data-status="doing">
+<article class="plan-step" id="step-33-3" data-step-id="33-3" data-status="done" data-completed="2026-11-15">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>33-3</strong><span class="plan-status">進行中</span></div>
+<div class="plan-meta"><strong>33-3</strong><span class="plan-status">完了</span><span>2026-11-15</span></div>
 <h3>決めた判定を本番へ入れ、設計書を直す</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>33-2 が go。</p>
-<p data-field="result"><strong>現況：</strong>2026-11-15 前半を完了（コード・テスト・設計書・<code>cdk diff</code>）。deploy の承認待ち。差分は CoachReplyStack・CoachReplyStagingStack の Lambda 2 本のコードだけで置換なし。</p>
+<p data-field="result"><strong>結果：</strong>2026-11-15 完了。返す条件を「correct なら自信の高低を問わず返す」（推論レベル high・Haiku 5.5 のまま）にして、CoachReplyStack と CoachReplyStagingStack を deploy した（16:05 JST）。deploy 後の最初の定時の起動（18:00 JST）は正常終了。<a href="../issues/index.html#I-050">I-050</a> を解消。本番で外れに返していないかは<a href="#pending-checks">確認待ち</a>（期日 2026-11-22）で見る。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -232,7 +225,7 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 前半（deploy の手前まで）</span></summary>
+<summary>5. 作業記録 <span class="plan-hint">— 前半（deploy の手前まで）・後半（deploy と確認）</span></summary>
 <div class="plan-fold-inner">
 <p><strong>前半（2026-11-15）</strong>: ゴールを deploy の承認の前後で 2 本に分けた（承認待ちで止まれないため）。</p>
 <p><strong>(1) コード</strong>: 返す条件を <code>app/reply_rule.py</code> の <code>should_reply</code>（<code>correct</code> なら確信 <code>high</code> / <code>low</code> とも）の 1 か所にまとめ、<code>run_handler.py</code> と <code>tools/offline_eval.py</code> の <code>would_reply</code> の既定（引数なし）がこれを使うようにした。比べるための <code>"high"</code> / <code>"any"</code> の指定は評価ツールに残した。一番乗り（<code>first_correct.py</code>）は確信 <code>high</code> が前提のまま変えていない。テストは、評価ツールの既定が本番の式と全 8 通り（verdict 4 × confidence 2）で一致すること、確信 <code>low</code> の正解には返信するが一番乗りは付かず <code>first_correct_replied</code> も立たないこと、別解・外れ・判断できないには返さないことを足した。<code>services/coach-reply</code> の pytest は <code>152 passed</code>。</p>
@@ -240,11 +233,24 @@
 <p><strong>(3) cdk diff</strong>（<code>-c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e</code>。タグは本番のタスク定義の現行値）: CoachReply は本番とステージングの 2 スタックに分かれていた（本書の「同じスタック」の記載は誤り）。両スタックとも差分は <code>RunFunction</code>・<code>TokenRefreshFunction</code> の <code>Code.S3Key</code>（同じ資材のハッシュ）だけで、置換・環境変数・スケジュール・権限の差分はない。FoundationStack は差分なし。</p>
 <p><strong>(4) 設計書</strong>: <code>docs/app/sets/logic-training-1-coach-reply.html</code>（要約・図 1・3.1 の閾値・プロンプトの要点・評価の結果・評価の見方・3.2 の一番乗りの条件 4 つ目・判断の記録 D-05 を新設・D-01 の D-04 への誤った参照を直した）、<code>docs/overview/functions/coach-reply.html</code>（冒頭・主な判断・図・D-04 を改めた）、<code>docs/overview/system-overview.html</code>（⑤ の行）。<code>docs/infra/stacks.html</code> 3.7 は返す条件を書いていないため変えていない。<code>docs_check.py --widths 360,390,768,1280</code> は OK。</p>
 <p><strong>(5) 照合</strong>: 課題表 I-048 は据え置き継続・トリガー更新なし（ステージングの Lambda も更新するが、実コメントでの試験はしない）。</p>
-<p><strong>後半</strong>: 承認のあと CoachReplyStack と CoachReplyStagingStack を deploy し、完了条件 4〜6 を行う。</p>
+<p><strong>後半（2026-11-15）</strong>: ユーザーの承認（「2 スタックを deploy してよい」）のあと、<code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e --exclusively</code> で CoachReplyStack と CoachReplyStagingStack の 2 本だけを deploy し、両方とも成功した（16:05 JST ごろ）。</p>
+<p><strong>(6) 反映の確認</strong>: <code>aws lambda get-function-configuration</code> で、<code>acps-prod-coach-reply-run</code> は LastModified <code>2026-11-15T07:05:09Z</code>、<code>acps-prod-coach-reply-run-staging</code> は <code>2026-11-15T07:05:40Z</code>。どちらも <code>JUDGE_MODEL=claude-haiku-5-5</code>・<code>JUDGE_EFFORT=high</code>。</p>
+<p><strong>(7) 最初の定時の起動</strong>: 18:00 JST（09:00Z）の起動のログの要約行は <code>coach_reply_summary {"media":196,"selected":1,"read":1,"no_snapshot":0,"judged":2,"replied":1,"judge_failures":0,"failures":0,"deferred":0}</code>（実行 10.3 秒・ERROR / Traceback / タイムアウトなし）。deploy 前の 16:00 JST の起動も正常だった。</p>
+<p><strong>(8) 課題と確認待ち</strong>: <a href="../issues/index.html#I-050">I-050</a> をクローズ節へ移して 解消 にした。確認待ちの 33-3 の行に deploy 日（2026-11-15 16:05 JST）と期日（2026-11-22）を書いた。I-048 は据え置き継続・トリガー更新なし。返信スイッチ・開始日時・状態ファイルは触っていない。</p>
+<p><strong>Phase 33 のステップはすべて完了した</strong>（33-1〜33-3）。完了フェーズのサマリへ畳むのと、記録の開発記録への移設は次の計画整理で行う。</p>
 </div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
+
+
 
 </div>
 </section>
@@ -413,7 +419,7 @@
 <tr><td>2026-10-17 / <a href="development-log.html#step-28-2">28-2</a> 一過性エラーの段階別の扱い</td><td>本番で次に Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）が起きた投稿（WARNING ログ「投稿コンテナを作成からやり直す」、または <code>api_response</code> に <code>first_error</code> を持つ <code>posts</code> 行が出たとき。<code>/incident</code> の照合で拾う）</td><td>① 公開前の失敗なら作成から 1 回だけやり直し、<code>platform_container_id</code> が新しい ID になっている ② 公開の失敗なら照会が 1 回だけ行われ、<code>PUBLISHED</code> → 「PUBLISHED 確認済み」の <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで再送 になっている ③ Instagram 上で同じ回の投稿が 2 件になっていない ④ <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形</td><td>二重投稿（③）なら即 <code>/incident</code> で課題に起票し、再送を止める修正を開発レーンで最優先にする。① ② ④ の食い違いは課題に起票（I-024 を live へ戻すかは <code>/incident</code> で判断）</td><td></td></tr>
 <tr><td>2026-11-10 / <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗のやり直し</td><td>発生実績型: 32-1 の deploy（<strong>2026-11-14 19:20 JST</strong>）後、本番で次に <code>WaitForDbReady</code> のタスクが起動に失敗したとき（SFN の実行履歴に <code>TaskFailed</code> の後の再試行が出る。SFN 失敗アラームが鳴った場合は <code>/incident</code> の照合で拾う）</td><td>① やり直しで DB 準備確認が成功し、実行全体が SUCCEEDED で終わっている（失敗アラームが鳴っていない）② やり直しても失敗した場合は、cause から DB 準備確認で落ちたと分かる</td><td>やり直しが効いていない → I-049 を live へ戻し（解消済みの再発）、<code>/incident</code> で切り分ける</td><td>—</td></tr>
 <tr><td>2026-10-24 / <a href="development-log.html#step-31-6">31-6</a> 脳みそコーチの正解コメントへの定時返信</td><td>日付型: 31-6 の本番返信の開始から 2 週間後 = <strong>2026-11-08</strong>（開始 2026-10-25）</td><td>① 返信の記録で、外れのコメントに「正解」と返したものが 0 件 ② logic-training-1 の 1 投稿あたりのコメント数の中央値が、手で返していた時期（2026-10 第 1〜2 週・12.5〜16 件）の水準に戻っているか（<code>content/insights-analysis</code> の <code>per_post_latest</code>）</td><td>① が 1 件でもあれば返信スイッチを切り、課題として起票する。② は効果の観察で、戻っていなくても返信は止めない（課題として起票し、別解・外れへの返信の再検討と合わせて判断）</td><td>2026-11-15 確認（<a href="#step-33-1">33-1</a> の照合で拾った）。① OK: 本番の判定の記録（S3 の <code>judged/</code> 196 投稿）で返信 121 件はすべて correct・自信高の判定（うち一番乗り 20 件）。外れ・別解・判断できないへの返信は 0 件（判定の記録で確認。コメント本文の目視はしていない）。② 未達: 1 投稿あたりのコメント数の中央値は、手で返していた 10/1〜10/14 の 13.5 件（28 本）に対し、返信開始後の 10/25〜11/08 は 10.0 件（30 本）。週別では 10 月 3〜4 週の 7.5〜8.5 件から 10.0・11.0 件へ戻りつつある。返信は止めない。別解・外れへの返信の再検討は Phase 33（<a href="../issues/index.html#I-050">I-050</a>）が当たるため新たに起票せず、33-3 の deploy 後の観察で合わせて見る</td></tr>
-<tr><td>2026-11-13 / <a href="#step-33-3">33-3</a> 脳みそコーチの正解判定の緩和</td><td>日付型: 33-3 の deploy から 1 週間後（deploy 日と期日の絶対日付は 33-3 の完了時にこの欄へ記入する）</td><td>① 本番の判定の記録（S3 の <code>coach-reply/logic-training-1/state/judged/</code>）で、deploy 後に判定したコメントのうち返信した割合が、deploy 前（約 330 件中 112 件）より上がっている ② deploy 後に返信したコメントを Instagram 上で見て、明らかな外れ・答えになっていないコメントへの「正解」が 0 件（ユーザーの目視）③ 視点の読み替え・省略した言い方・正解に別の語を添えた回答に返信が付いている例がある</td><td>② が 1 件でもあれば、内容を見て返信スイッチを切るかをユーザーが決め、課題として起票する（I-050 を live へ戻す）。① ③ が満たされない場合は課題として起票し、問題ごとに正解の答えを持たせる案を検討する</td><td>—</td></tr>
+<tr><td>2026-11-13 / <a href="#step-33-3">33-3</a> 脳みそコーチの正解判定の緩和</td><td>日付型: 33-3 の deploy（<strong>2026-11-15 16:05 JST</strong>・CoachReplyStack と CoachReplyStagingStack）から 1 週間後 = <strong>2026-11-22</strong></td><td>① 本番の判定の記録（S3 の <code>coach-reply/logic-training-1/state/judged/</code>）で、deploy 後に判定したコメントのうち返信した割合が、deploy 前（約 330 件中 112 件）より上がっている ② deploy 後に返信したコメントを Instagram 上で見て、明らかな外れ・答えになっていないコメントへの「正解」が 0 件（ユーザーの目視）③ 視点の読み替え・省略した言い方・正解に別の語を添えた回答に返信が付いている例がある</td><td>② が 1 件でもあれば、内容を見て返信スイッチを切るかをユーザーが決め、課題として起票する（I-050 を live へ戻す）。① ③ が満たされない場合は課題として起票し、問題ごとに正解の答えを持たせる案を検討する</td><td>—</td></tr>
 <tr><td>2026-11-15 / <a href="#step-34-3">34-3</a> アカウント成長ノートのクラウドの定期実行</td><td>日付型: 34-3 で定期実行を登録したあとの最初の火曜（登録日と絶対日付は 34-3 の完了時にこの欄へ記入する）</td><td>朝 8 時に LINE にレポートが届き、ページが前週（月〜日の 7 日分）まで入っている</td><td>課題として起票する（届かない・古いままの原因を切り分ける）</td><td>—</td></tr>
 </tbody>
 </table></div>
