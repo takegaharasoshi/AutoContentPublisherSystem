@@ -4,7 +4,7 @@ slug: account-growth-visualization
 status: 醸成中           # inbox | 醸成中 | 再醸成待ち | 待機 | 採用 | 見送り
 kind: 単発               # 単発 | 構想
 created: 2026-11-08
-updated: 2026-11-14
+updated: 2026-11-15
 condition: ""
 parent: ""
 children: []
@@ -163,3 +163,6 @@ disposition: ""
 - 回避の案: Windows 側のフォルダ（`C:\Users\TakegahraWork\growth-note`）を作業フォルダにし、そこから `wsl.exe -d Ubuntu-20.04 -- bash -c "python3 ~/projects/…"` で集計・組み立て・送信を呼ぶ。ページは `build.py --out` で作業フォルダへ書き出し、そこから公開し直す
 - WSL 側から同じ形（`wsl.exe` 経由）で集計・組み立て・文面の出力が通ることは確認した。Windows 側のセッションからの実行と、無人での許可（作業フォルダの `.claude/settings.json`）は未確認
 - 許可設定のファイルはユーザーが作る（エージェントが自分の実行の許可を書くことは自動判定で止められた）
+- （2026-11-15）Windows 側のフォルダから `wsl.exe` を呼ぶ案も通らなかった: スケジュールタスクを登録しようとしたデスクトップ側のセッションによると、実行のシェルは Windows ではなく（クラウドの Linux か、接続したフォルダだけが見える手元の仮想環境）、`wsl.exe` も WSL の中のファイルも使えない（ユーザーが貼った先方の回答による。こちらでは未検証）
+- 役割を分ける案に変更: 集計・組み立て・LINE 送信は Claude を使わず、Windows のタスクスケジューラから `wsl.exe` で `poc/account-growth-dashboard/weekly.sh` を呼ぶ（火曜 7:40 に build、8:00 に send）。Claude のスケジュールタスク（火曜 7:50）は Windows 側の `growth-note` フォルダの `growth.html` を公開し直すだけにする
+- `weekly.sh build` が `wsl.exe` 経由で通ることは WSL 側から確認した（Aurora の起き上がり待ちを含めて約 1 分）。タスクスケジューラからの実行と、Claude 側の公開し直しは未確認

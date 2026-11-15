@@ -27,13 +27,14 @@ python3 poc/account-growth-dashboard/build.py
 python3 poc/account-growth-dashboard/report.py
 ```
 
-## 無人で動かすとき（デスクトップアプリのスケジュールタスク）
+## 無人で動かすとき（2026-11-15 時点の案。試行中）
 
-スケジュールタスクの作業フォルダに WSL のフォルダは選べない（2026-11-14 に確認。「This folder can't be added」）。
-Windows 側のフォルダ（`C:\Users\TakegahraWork\growth-note`）を作業フォルダにし、そこから `wsl.exe` で上のスクリプトを呼ぶ。
-ページは `build.py --out` で作業フォルダへ直接書き出す。パスを `~` から書くのは、Windows 側の Bash が `/` で始まる引数を
-Windows のパスに書き換えるのを避けるため。
+デスクトップアプリのスケジュールタスクからは WSL のフォルダを作業フォルダに選べず、`wsl.exe` も呼べない
+（実行のシェルが Windows ではないため）。そこで役割を分ける。
 
-```bash
-wsl.exe -d Ubuntu-20.04 -- bash -c "python3 ~/projects/AutoContentPublisherSystem/poc/account-growth-dashboard/build.py --out ~/../../mnt/c/Users/TakegahraWork/growth-note/growth.html"
-```
+- 集計・組み立て・LINE 送信: Windows のタスクスケジューラから `wsl.exe` で `weekly.sh` を呼ぶ（Claude を使わない）
+  - 火曜 7:40 `weekly.sh build` — 集計し、ページを `C:\Users\TakegahraWork\growth-note\growth.html` へ書き出す
+  - 火曜 8:00 `weekly.sh send` — レポートを LINE へ送る
+- ページの公開し直し: デスクトップアプリのスケジュールタスク（火曜 7:50）が `growth-note` の `growth.html` を公開先へ公開し直す
+
+実行の記録は `out/weekly.log` に残る。
