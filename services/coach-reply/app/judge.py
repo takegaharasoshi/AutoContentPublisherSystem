@@ -57,6 +57,7 @@ def _validated_results(raw: dict, ids: set[str]) -> dict[str, dict]:
 def judge_comments(
     snapshot: dict, comments: list[dict], *, config: Config | None = None,
     api_key: str | None = None, timeout: float = anthropic_util.TIMEOUT_S,
+    usage: list[dict] | None = None,
 ) -> dict[str, dict]:
     """Judge at most twenty comments per request, omitting failed judgments.
 
@@ -66,6 +67,8 @@ def judge_comments(
         config: Optional runtime settings for tests and the scheduled handler.
         api_key: Explicit key (Lambda Secret or offline environment variable).
         timeout: Optional per-request socket timeout from the runner.
+        usage: Optional list that receives each request's token usage
+            (offline evaluation only; the scheduled handler leaves it unset).
 
     Returns:
         Only validated id -> verdict/confidence/reason records. Missing IDs are
@@ -85,13 +88,17 @@ def judge_comments(
         batch = [{"id": c["id"], "text": c["text"]}
                  for c in comments[offset:offset + MAX_BATCH_SIZE]]
         try:
-            raw, _debug = anthropic_util.request_json(
+            raw, debug = anthropic_util.request_json(
                 PROMPT, json.dumps({"snapshot": problem, "comments": batch}, ensure_ascii=False),
                 SCHEMA, api_key=api_key, model=config.judge_model,
                 effort=config.judge_effort, max_tokens=16000, timeout=timeout,
             )
+            if usage is not None:
+                usage.append(dict(debug.get("usage") or {}))
             results.update(_validated_results(raw, {c["id"] for c in batch}))
         except Exception as exc:
+            if usage is not None and getattr(exc, "debug", {}).get("usage"):
+                usage.append(dict(exc.debug["usage"]))
             # API errors can include sensitive request information: log only type.
             LOGGER.warning("judge batch failed: comments=%d error=%s", len(batch), type(exc).__name__)
     return results

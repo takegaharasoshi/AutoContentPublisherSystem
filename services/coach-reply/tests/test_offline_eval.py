@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from tools.offline_eval import aggregate_results, print_summary
+import json
+
+from tools.offline_eval import (
+    aggregate_results, main, print_summary, total_usage, would_reply, write_review,
+)
 
 
 def row(label, verdict="correct", confidence="high", **overrides):
@@ -34,7 +38,7 @@ def test_table_false_replies_recall_and_failures(capsys):
     assert summary["judge_failures"] == 1
     print_summary(summary)
     output = capsys.readouterr().out
-    assert "誤返信: 2" in output and "1/3 (33.3%)" in output and "判定の失敗件数: 1" in output
+    assert "誤返信(wrong・other への返す): 2" in output and "1/3 (33.3%)" in output and "判定の失敗件数: 1" in output
 
 
 def test_no_correct_labels_uses_undefined_recall_instead_of_dividing_by_zero():
@@ -46,3 +50,45 @@ def test_no_correct_labels_uses_undefined_recall_instead_of_dividing_by_zero():
 def test_unknown_label_is_an_input_error():
     with pytest.raises(ValueError):
         aggregate_results([row("unexpected")])
+
+
+def test_reply_rules_high_is_online_gate_and_any_adds_low_confidence():
+    assert would_reply({"verdict": "correct", "confidence": "high"})
+    assert not would_reply({"verdict": "correct", "confidence": "low"})
+    assert would_reply({"verdict": "correct", "confidence": "low"}, "any")
+    assert not would_reply({"verdict": "alt", "confidence": "high"}, "any")
+    assert not would_reply(None, "any")
+    with pytest.raises(ValueError):
+        would_reply({"verdict": "correct", "confidence": "high"}, "loose")
+
+
+def test_any_rule_counts_low_confidence_and_review_list_includes_unanswered():
+    rows = [row("correct", confidence="low"), row("unanswered", confidence="low"), row("wrong")]
+    high, any_ = aggregate_results(rows), aggregate_results(rows, "any")
+    assert high["correct_replied"] == 0 and any_["correct_replied"] == 1
+    assert [r["label"] for r in high["review_replies"]] == ["wrong"]
+    assert [r["label"] for r in any_["review_replies"]] == ["unanswered", "wrong"]
+    assert any_["false_reply_count"] == 1
+
+
+def test_total_usage_sums_tokens_and_prices_haiku():
+    totals = total_usage([{"input_tokens": 1_000_000, "output_tokens": 0},
+                          {"output_tokens": 1_000_000, "cache_read_input_tokens": 1_000_000}])
+    assert totals["requests"] == 2 and totals["output_tokens"] == 1_000_000
+    assert totals["cost_usd"] == pytest.approx(0.10 + 0.50 + 0.01)
+
+
+def test_review_file_and_summary_from_saved_results(tmp_path, capsys):
+    rows = [row("other", confidence="low", question_text="問題"), row("correct"), row("alt")]
+    out = tmp_path / "review.md"
+    assert write_review(out, rows, "xhigh") == 1
+    text = out.read_text(encoding="utf-8")
+    assert "effort xhigh" in text and "ラベル other（1 件）" in text and "自信低も返すときだけ" in text
+    assert "コメント: コメント本文" in text and "用意した答え: 答え" in text
+    saved = tmp_path / "result.jsonl"
+    saved.write_text("\n".join(json.dumps(dict(r, effort="high"), ensure_ascii=False) for r in rows),
+                     encoding="utf-8")
+    main(["--summary-from", str(saved), "--review-out", str(tmp_path / "again.md")])
+    output = capsys.readouterr().out
+    assert "返信の条件: high" in output and "返信の条件: any" in output
+    assert (tmp_path / "again.md").exists()

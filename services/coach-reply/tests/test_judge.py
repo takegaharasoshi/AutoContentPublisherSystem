@@ -35,7 +35,32 @@ def test_judge_batches_at_twenty_and_never_sends_usernames(monkeypatch, snapshot
         assert "private-name" not in json.dumps(data)
         assert kwargs["model"] == "custom" and kwargs["effort"] == "max"
         assert kwargs["api_key"] == "key" and schema == judge.SCHEMA
-        assert "最悪の失敗" in system and "複数の候補" in system
+        assert "答えにたどり着いている" in system and "視点の読み替え" in system
+        assert "不満・指摘・反論" in system and "unsure" in system
+
+
+def test_judge_collects_usage_only_when_asked(monkeypatch, snapshot) -> None:
+    def request_json(system, text, schema, **kwargs):
+        data = json.loads(text)
+        return ({"results": [result(c["id"]) for c in data["comments"]]},
+                {"usage": {"input_tokens": 10, "output_tokens": 3}})
+
+    monkeypatch.setattr(judge.anthropic_util, "request_json", request_json)
+    comments = [{"id": str(i), "text": "答え"} for i in range(25)]
+    usage: list = []
+    assert len(judge.judge_comments(snapshot, comments, api_key="key", usage=usage)) == 25
+    assert usage == [{"input_tokens": 10, "output_tokens": 3}] * 2
+    assert len(judge.judge_comments(snapshot, comments, api_key="key")) == 25
+
+
+def test_judge_records_usage_of_failed_requests(monkeypatch, snapshot) -> None:
+    def request_json(*args, **kwargs):
+        raise judge.anthropic_util.AnthropicError("max", debug={"usage": {"output_tokens": 16000}})
+
+    monkeypatch.setattr(judge.anthropic_util, "request_json", request_json)
+    usage: list = []
+    assert judge.judge_comments(snapshot, [{"id": "c", "text": "x"}], api_key="key", usage=usage) == {}
+    assert usage == [{"output_tokens": 16000}]
 
 
 @pytest.mark.parametrize("raw", [{}, {"results": {}}, [], {"results": [], "extra": True}])
