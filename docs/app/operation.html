@@ -13,7 +13,7 @@
 <h1>アプリ運用設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">Phase 9-4 で詳細化・Phase 10-1 で最終 Fix・Phase 30-7 で新しい書式へ移行</span>
-  <span>最終更新: 2026-10-18（30-7: 冒頭の要約と判断の記録〔D-01〜D-16〕を足し、囲みの判断を末尾へ移した。3 章に umigame-soup-1 の生産への導線を足し、5.5 を実行時生成の退役に合わせた。旧方式〔最古選定〕の移行中の注記を外した）。2026-10-18（30-5: 3 章の問題ストック・ランキングストックの節を生産の詳細設計へ移した）。以前の更新履歴は git の履歴と<a href="../plans/development-log.html">開発記録</a>を参照</span>
+  <span>最終更新: 2026-11-15（34-2: 6.3 に週次の成長ノートの入口を 1 行追加）。前回: 2026-10-18（30-7: 冒頭の要約と判断の記録〔D-01〜D-16〕を足し、囲みの判断を末尾へ移した。3 章に umigame-soup-1 の生産への導線を足し、5.5 を実行時生成の退役に合わせた。旧方式〔最古選定〕の移行中の注記を外した）。2026-10-18（30-5: 3 章の問題ストック・ランキングストックの節を生産の詳細設計へ移した）。以前の更新履歴は git の履歴と<a href="../plans/development-log.html">開発記録</a>を参照</span>
 </div>
 
 <section class="page-summary" id="summary">
@@ -711,6 +711,7 @@ print('expires_at =', f(b.get('expires_at')), '| data_access =', f(b.get('data_a
 <ul>
   <li><strong>指標セット</strong>: 16-12a で確定（投稿単位 = views / reels_skip_rate / ig_reels_avg_watch_time / comments / saved の 72 時間水準、アカウント単位 = followers_count / reach）。名称・算出式・参照元キーの一覧は<a href="../plans/development-log.html">開発記録</a>の 16-12a。<strong>ビュー定義（V011）</strong>は <a href="data-model.html#detail-insights">data-model.html セクション 4.11</a>: 転記元は <code>v_post_kpi_monthly</code>（セット × 年月 × スロットの中央値。<code>slot='all'</code> が全スロット合算）と <code>v_account_kpi_monthly</code>（月末フォロワー・月間 reach 合計）。目標水準は置かない（事業戦略書の KPI はマイルストーン制）</li>
   <li><strong>集計ランナー</strong>: <code>content/insights-analysis/run_queries.py</code>（読み取り専用。RDS Data API で本番 Aurora に <code>SELECT</code> のみ発行）。転記用の <code>kpi_post_monthly</code> / <code>kpi_account_monthly</code> はビューをそのまま引く。補助指標（reach・likes・shares 等）・成長カーブ・期間比較（<code>--split</code>）は従来の 6 クエリ。使い方・読み方の注意は同ディレクトリの README</li>
+  <li><strong>週次の成長ノート</strong>（34-2 追加）: 毎週火曜の朝に、クラウドの定期実行が集計ランナーの <code>growth_account_weekly</code> / <code>growth_post_weekly</code> を読み取り専用の DB ユーザーで実行し、ページ「アカウント成長ノート」の更新と LINE へのレポート送信を行う（AWS 側にバッチは持たない）。手順・クラウドに置く値の一覧・うまく届かないときの見方は <code>poc/account-growth-dashboard/README.md</code>、権限は<a href="../infra/security.html#iam-growth-note-reader">セキュリティ設計 2.8</a></li>
   <li><strong>レーン</strong>: セット計画書の KPI 欄の転記はセットレーン（以後の日常の KPI 観察はセットレーンで行う）。事業戦略書 KPI 実績表は共通ドキュメントのため開発レーンで更新する（<a href="../plans/index.html">計画体系</a>の並行作業ルール）</li>
   <li><strong>課題の棚卸し（節目）</strong>: 月次転記は<a href="../issues/index.html">課題体系</a>の棚卸しの節目を兼ねる（22-4〔2026-09-19〕で追加。ルールは<a href="../issues/index.html#rule-lane">課題体系 4.8</a>）。転記の後にスキル <code>/issue</code> の棚卸しモードで live 表のトリガー列（日付型・節目型）と各計画書の確認待ちリストを上から確認し、起票 のまま残っている行の対応方針を決める。課題レーンのため転記と同じセッションで続けてよい</li>
 </ul>
