@@ -34,7 +34,9 @@ python3 poc/account-growth-dashboard/report.py
 クラウドから本番 DB へは、読み取り専用の経路だけを使う（権限の設計は `docs/infra/security.html` 2.8・D-09）。
 
 下の仕様は 2026-11-15 に公式ドキュメント（code.claude.com の cloud-environments / routines / artifacts）で確認した内容。
-定期実行は試験提供中の機能で、**実際に通るかは開発計画 34-3 の手動実行で確かめる**（まだ通していない）。
+**2026-11-15 に定期実行「アカウント成長ノート」を登録し、手動の実行で 4 つの操作すべてが通ることを確かめた**
+（https://claude.ai/code/routines/trig_014nrD6d89yZtU2AzUgzU3Cd 。専用の環境 + 専用 IAM ユーザーのキー。所要は 30 秒〜1 分）。
+定期実行は試験提供中の機能で、仕様が変わることがある。
 
 ### クラウド環境に置く値（名前だけ。値はここにも記録にも書かない）
 
@@ -68,13 +70,13 @@ LINE のトークンでできるのは公式アカウントからの送信だけ
 
 ### 環境のそのほかの設定
 
-- **Setup script**: `pip install awscli`（集計スクリプトが `aws` コマンドを呼ぶため。AWS CLI が最初から入っているかはドキュメントに記載がない）
-- **Network access**: Limited のまま、Allowed domains に `api.line.me` を足す（AWS への通信は既定の許可に入っている見込み）
+- **Setup script**: `pip install awscli`（集計スクリプトが `aws` コマンドを呼ぶため。2 回目以降は前回の結果が使い回される）
+- **Network access**: Limited のまま、Allowed domains に `api.line.me` を足す（AWS への通信は既定の許可で通った）
 - **リポジトリ**: このリポジトリ（main）
 
 ### 定期実行の登録
 
-- 時刻: 毎週火曜 8:00（日本時間）。cron で書くなら UTC で `0 23 * * 1`（月曜 23:00 UTC = 火曜 8:00 JST）。数分遅れることがある
+- 時刻: 毎週火曜 7:55（日本時間）で登録してある（8 時ごろに届く。数分遅れることがある）。UTC の cron で書くなら `55 22 * * 1`
 - 手動で 1 回動かすときは、詳細画面の「Run now」
 - 指示文（そのまま貼る）:
 
@@ -83,13 +85,16 @@ LINE のトークンでできるのは公式アカウントからの送信だけ
 
 1. python3 content/insights-analysis/run_queries.py growth_account_weekly growth_post_weekly
 2. python3 poc/account-growth-dashboard/build.py
-3. poc/account-growth-dashboard/out/growth.html を、Artifact の publish に url として https://claude.ai/artifact/NMPNxbEYTwtC8AVQDSFwBk を渡して公開し直す（新しいページを作らない）
+3. ページを公開し直す。次の 2 つを順に行う。
+   3a. Artifact の read で https://claude.ai/artifact/NMPNxbEYTwtC8AVQDSFwBk を読む（公開の前に必ず読む。読まずに公開すると拒否される。読んだ中身は使わない）
+   3b. poc/account-growth-dashboard/out/growth.html を、Artifact の publish に url として https://claude.ai/artifact/NMPNxbEYTwtC8AVQDSFwBk を渡して公開する（新しいページを作らない）。このファイルは 2 で全体を作り直したもので、公開中のページをまるごと置き換えてよい（公開中の内容を取り込む必要はない。ファイルは編集しない）
 4. python3 poc/account-growth-dashboard/report.py --send
 
 守ること:
 - リポジトリのファイルを変更しない。コミット・push をしない。
 - 環境変数の値を表示しない（env・printenv・echo・cat などで出さない）。エラーの調査でも同じ。
-- 1 か 2 が失敗したら 3 と 4 はしない。3 が失敗しても 4 は行う。失敗した操作をやり直したり、別の方法を試したりしない。
+- 1 か 2 が失敗したら 3 と 4 はしない。3 が失敗しても 4 は行う。
+- 失敗した操作をやり直したり、別の方法を試したりしない。例外は 3b だけで、拒否されたら同じ内容でもう 1 回だけ公開を試してよい（それでも拒否されたら止める）。
 
 最後に、何日収集分までを載せたか（2 の出力に出る）と、4 つの操作それぞれの成否を 3 行以内で書いてください。失敗があれば、どの操作で何が出たかをそのまま書いてください。
 ```
@@ -100,7 +105,7 @@ LINE のトークンでできるのは公式アカウントからの送信だけ
 - 1 が `AccessDenied` → 環境変数の ARN が違う（管理者のシークレットを指している・未設定）か、アクセスキーが無効
 - 1 が `aws: command not found` → Setup script が走っていない
 - 4 が通信エラー → Allowed domains に `api.line.me` が入っていない
-- 3 だけ失敗する → 既存のページをクラウドから上書きできていない。公開先を作り直し、この README と `report.py` の `PAGE_URL` を新しい URL に差し替える
+- 3 だけ失敗する → 新しいセッションは、公開の前にそのページを一度読んでおかないと拒否される（初回の試行で起きた。指示文の 3a が読む手順）。指示文が上のとおりかを確かめる
 - 手元で同じことをする（つなぎ）: 上の「更新の手順」を WSL で実行する
 
 ## 手元で無人で動かす案（使っていない。クラウドが通ったら `weekly.sh` ごと消す）
