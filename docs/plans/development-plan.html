@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-11-15（<strong><a href="#step-33-1">33-1</a> 完了</strong>: 新しい判定プロンプトで正解を拾えた割合が 80.0%〔high〕/ 79.3%〔xhigh〕に上がり、外れ・その他への返す 0 件〔自信高だけ〕。確認待ちの 31-6 の結果を記入。次は 33-2〔ユーザー判断〕）。前回: 2026-11-15（<strong>Phase 33 の比べる対象を変更</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ。費用を抑えるためモデルは変えない = ユーザー決定）。前回: 2026-11-14（<strong>Phase 32 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-32">開発記録</a>へ移した。進行中は Phase 33）。前回: 2026-11-14（<strong><a href="development-log.html#step-32-1">32-1</a> 完了</strong>: 3 本の SFN の DB 準備確認に起動失敗の Retry を足して本番へ deploy・<a href="../issues/index.html#I-049">I-049</a> を解消。Phase 32 のステップはすべて完了し、記録の移設は次の計画整理で行う）。前回: 2026-11-13（<strong>Phase 33 を起票</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める = <a href="../issues/index.html#I-050">I-050</a> の展開。確認待ちに 1 行追加。Phase 32 は未着手のまま並ぶ）。前回: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-11-15（<strong><a href="#step-33-2">33-2</a> 完了・go</strong>: 推論レベル high・返信の条件は「correct なら自信低も返す」= ユーザー決定。次は 33-3）。前回: 2026-11-15（<strong><a href="#step-33-1">33-1</a> 完了</strong>: 新しい判定プロンプトで正解を拾えた割合が 80.0%〔high〕/ 79.3%〔xhigh〕に上がり、外れ・その他への返す 0 件〔自信高だけ〕。確認待ちの 31-6 の結果を記入。次は 33-2〔ユーザー判断〕）。前回: 2026-11-15（<strong>Phase 33 の比べる対象を変更</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ。費用を抑えるためモデルは変えない = ユーザー決定）。前回: 2026-11-14（<strong>Phase 32 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-32">開発記録</a>へ移した。進行中は Phase 33）。前回: 2026-11-14（<strong><a href="development-log.html#step-32-1">32-1</a> 完了</strong>: 3 本の SFN の DB 準備確認に起動失敗の Retry を足して本番へ deploy・<a href="../issues/index.html#I-049">I-049</a> を解消。Phase 32 のステップはすべて完了し、記録の移設は次の計画整理で行う）。前回: 2026-11-13（<strong>Phase 33 を起票</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める = <a href="../issues/index.html#I-050">I-050</a> の展開。確認待ちに 1 行追加。Phase 32 は未着手のまま並ぶ）。前回: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -86,7 +86,7 @@
 </details>
 
 <details class="plan-group" data-plan-group="done">
-<summary>完了済み 1 件（クリックで展開）</summary>
+<summary>完了済み 2 件（クリックで展開）</summary>
 <div class="plan-group-inner">
 
 <article class="plan-step" id="step-33-1" data-step-id="33-1" data-status="done" data-completed="2026-11-15">
@@ -126,6 +126,7 @@
 <p>ラベルの読み方: 新しい方針では、ラベルが other / unanswered でも「わかっているコメント」なら返してよい（運用者が当時たまたま返していないだけのものを含む）。そのため「外れ・その他への返す = 0 件」を機械的な合格線にせず、一覧を 33-2 でユーザーが見て決める。ラベル wrong への「返す」は、プロンプトの直しで減らす対象として扱う。</p>
 <p>コードの変更は小さい（評価ツールの引数追加・テスト）ので、委譲するかは着手時に決める。評価は Anthropic の API を実際に呼ぶ（キーは <code>~/.bashrc</code> の <code>ANTHROPIC_API_KEY</code>）。</p>
 <p>push 後の扱い: <code>services/coach-reply/</code> は CodePipeline を持たず、反映は <code>cdk deploy</code> で行う。このステップの push では本番は変わらないため、パイプライン完走確認の <code>/goal</code> は出さない。</p>
+
 </div>
 </details>
 <details class="plan-fold" data-field="record">
@@ -153,19 +154,12 @@
 </div>
 </article>
 
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-<article class="plan-step" id="step-33-2" data-step-id="33-2" data-status="todo" data-kind="decision">
+<article class="plan-step" id="step-33-2" data-step-id="33-2" data-status="done" data-completed="2026-11-15" data-kind="decision">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>33-2</strong><span class="plan-status">未着手</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
+<div class="plan-meta"><strong>33-2</strong><span class="plan-status">完了</span><span>2026-11-15</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
 <h3>評価の結果を見て、推論レベル・返信の条件・本番へ入れるかを決める</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>33-1 の push 直後から確認できる。</p>
-<p data-field="result"><strong>現況：</strong>未確認。</p>
+<p data-field="result"><strong>結果：</strong>2026-11-15 完了・<strong>go</strong>。推論レベルは <strong>high</strong>（現行のまま）、返信の条件は <strong>correct なら自信低も返す</strong>。一覧で返してはいけないものの指摘はなし。次は 33-3。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -184,11 +178,22 @@
 </div>
 </section>
 <details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>確認前のため記録なし。</p></div>
+<summary>4. 作業記録 <span class="plan-hint">— ユーザーの決定（2026-11-15）</span></summary>
+<div class="plan-fold-inner">
+<p><strong>示した材料</strong>: <a href="#step-33-1">33-1</a> の最終評価（r4）の 4 通りの要約と、確認用の一覧 <code>poc/logic-training-reply-eval/data/review_r4_high.md</code>（git 管理外）。Claude の推奨は「high・自信高だけ」だった（自信低も返すと拾える割合が 80.0% → 83.5% に上がる一方、答えになっていないコメントへの「正解」が混ざり始めるため）。気になる型として、答えに考察を添えたもの（「『トランプ』がおそらく模範解答でしょう。しかし…」）と 1 字だけの答え（答え「笑み」に「笑」）を示した。</p>
+<p><strong>ユーザーの決定</strong>: ① 返してはいけないものの指摘: なし ② 推論レベル: <strong>high</strong>（xhigh は費用が約 1.6 倍で拾える割合が上がらないため不採用。モデルは Haiku 5.5 のまま）③ 返信の条件: <strong>correct なら自信低も返す</strong> ④ <strong>go</strong>（33-3 へ進む）。</p>
+<p><strong>この組み合わせの評価値</strong>（r4・high・自信低も返す）: 正解 435/521（83.5%）・外れへの返す 0 / 24・その他への返す 1 / 198（自信低。答え「パイプに水を注いで玉を浮かせる」に、水の代わりに別の液体を入れるという冗談）・未返信への返す 96 / 205・別解への返す 5 / 65（自信低の correct 判定）・判定の失敗 0。33-3 では、返信の条件を <code>run_handler.py</code>・<code>offline_eval.py</code>（<code>would_reply</code> の既定）にそろえ、一番乗りの条件（correct・自信高）は変えない（実装の細部は 33-3 の折りたたみ）。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
+
 
 <article class="plan-step" id="step-33-3" data-step-id="33-3" data-status="todo">
 <header class="plan-step-head">
