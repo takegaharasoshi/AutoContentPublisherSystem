@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="../assets/style.css?v=20260921">
 <link rel="stylesheet" href="../assets/plans.css?v=20260921">
 </head>
-<body data-plan-format="1">
+<body data-plan-format="1" data-plan-steps="none">
 <div class="container">
 
 <nav class="breadcrumb"><a href="../index.html">設計書体系ガイド</a> / <a href="index.html">計画体系</a> / 開発計画</nav>
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-11-15（<strong><a href="#step-34-3">34-3</a> 完了・go</strong>: クラウドの定期実行を登録し、手動の実行でページの更新と LINE の着信を確認。Phase 34 のステップはすべて完了し、記録の移設は次の計画整理で行う。確認待ちは 2026-11-17）。前回: 2026-11-15（<strong><a href="#step-33-3">33-3</a> 完了・Phase 33 のステップがすべて完了</strong>: 返す条件を「correct なら自信の高低を問わず返す」にして 2 スタックを deploy・最初の定時の起動は正常・<a href="../issues/index.html#I-050">I-050</a> を解消。確認待ちは 2026-11-22）。前回: 2026-11-15（<strong><a href="#step-34-2">34-2</a> 完了</strong>: 読み取り専用のシークレットで集計が管理者のときと同じ結果になり、書き込みは拒否された。クラウドの定期実行の手順を README にそろえた。次は 34-3〔ユーザー作業〕）。前回: 2026-11-15（<strong><a href="#step-34-1">34-1</a> 完了</strong>: 読み取り専用 DB ユーザー用のシークレットを FoundationStack に足し、DB ユーザーを作る手順を <code>database/users/</code> に置いた。push・deploy・DB への適用の承認待ち。次は 34-2）。前回: 2026-11-15（<strong>Phase 34 を起票</strong>: <a href="#step-34-1">34-1</a>〜<a href="#step-34-3">34-3</a> アカウント成長ノートをクラウドの定期実行で届ける = アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記。確認待ちに 1 行追加）。前回: 2026-11-15（<strong><a href="#step-33-3">33-3</a> 前半</strong>: 返す条件を「correct なら確信の高低を問わず返す」にそろえ、設計書を直した。deploy の承認待ち）。前回: 2026-11-15（<strong><a href="#step-33-2">33-2</a> 完了・go</strong>: 推論レベル high・返信の条件は「correct なら自信低も返す」= ユーザー決定。次は 33-3）。前回: 2026-11-15（<strong><a href="#step-33-1">33-1</a> 完了</strong>: 新しい判定プロンプトで正解を拾えた割合が 80.0%〔high〕/ 79.3%〔xhigh〕に上がり、外れ・その他への返す 0 件〔自信高だけ〕。確認待ちの 31-6 の結果を記入。次は 33-2〔ユーザー判断〕）。前回: 2026-11-15（<strong>Phase 33 の比べる対象を変更</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ。費用を抑えるためモデルは変えない = ユーザー決定）。前回: 2026-11-14（<strong>Phase 32 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-32">開発記録</a>へ移した。進行中は Phase 33）。前回: 2026-11-14（<strong><a href="development-log.html#step-32-1">32-1</a> 完了</strong>: 3 本の SFN の DB 準備確認に起動失敗の Retry を足して本番へ deploy・<a href="../issues/index.html#I-049">I-049</a> を解消。Phase 32 のステップはすべて完了し、記録の移設は次の計画整理で行う）。前回: 2026-11-13（<strong>Phase 33 を起票</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める = <a href="../issues/index.html#I-050">I-050</a> の展開。確認待ちに 1 行追加。Phase 32 は未着手のまま並ぶ）。前回: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-11-15（<strong>計画整理</strong>: 完了した Phase 33・34 を完了フェーズのサマリへ畳み、ステップ一覧の原文を<a href="development-log.html#phase-33">開発記録</a>へ移した。確認待ちの 31-6 の行を開発記録へ移した。進行中のフェーズはなし）。前回: 2026-11-15（<strong><a href="development-log.html#step-34-3">34-3</a> 完了・go</strong>: クラウドの定期実行を登録し、手動の実行でページの更新と LINE の着信を確認。Phase 34 のステップはすべて完了し、記録の移設は次の計画整理で行う。確認待ちは 2026-11-17）。前回: 2026-11-15（<strong><a href="development-log.html#step-33-3">33-3</a> 完了・Phase 33 のステップがすべて完了</strong>: 返す条件を「correct なら自信の高低を問わず返す」にして 2 スタックを deploy・最初の定時の起動は正常・<a href="../issues/index.html#I-050">I-050</a> を解消。確認待ちは 2026-11-22）。前回: 2026-11-15（<strong><a href="development-log.html#step-34-2">34-2</a> 完了</strong>: 読み取り専用のシークレットで集計が管理者のときと同じ結果になり、書き込みは拒否された。クラウドの定期実行の手順を README にそろえた。次は 34-3〔ユーザー作業〕）。前回: 2026-11-15（<strong><a href="development-log.html#step-34-1">34-1</a> 完了</strong>: 読み取り専用 DB ユーザー用のシークレットを FoundationStack に足し、DB ユーザーを作る手順を <code>database/users/</code> に置いた。push・deploy・DB への適用の承認待ち。次は 34-2）。前回: 2026-11-15（<strong>Phase 34 を起票</strong>: <a href="development-log.html#step-34-1">34-1</a>〜<a href="development-log.html#step-34-3">34-3</a> アカウント成長ノートをクラウドの定期実行で届ける = アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記。確認待ちに 1 行追加）。前回: 2026-11-15（<strong><a href="development-log.html#step-33-3">33-3</a> 前半</strong>: 返す条件を「correct なら確信の高低を問わず返す」にそろえ、設計書を直した。deploy の承認待ち）。前回: 2026-11-15（<strong><a href="development-log.html#step-33-2">33-2</a> 完了・go</strong>: 推論レベル high・返信の条件は「correct なら自信低も返す」= ユーザー決定。次は 33-3）。前回: 2026-11-15（<strong><a href="development-log.html#step-33-1">33-1</a> 完了</strong>: 新しい判定プロンプトで正解を拾えた割合が 80.0%〔high〕/ 79.3%〔xhigh〕に上がり、外れ・その他への返す 0 件〔自信高だけ〕。確認待ちの 31-6 の結果を記入。次は 33-2〔ユーザー判断〕）。前回: 2026-11-15（<strong>Phase 33 の比べる対象を変更</strong>: <a href="development-log.html#step-33-1">33-1</a>〜<a href="development-log.html#step-33-3">33-3</a> を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ。費用を抑えるためモデルは変えない = ユーザー決定）。前回: 2026-11-14（<strong>Phase 32 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-32">開発記録</a>へ移した。進行中は Phase 33）。前回: 2026-11-14（<strong><a href="development-log.html#step-32-1">32-1</a> 完了</strong>: 3 本の SFN の DB 準備確認に起動失敗の Retry を足して本番へ deploy・<a href="../issues/index.html#I-049">I-049</a> を解消。Phase 32 のステップはすべて完了し、記録の移設は次の計画整理で行う）。前回: 2026-11-13（<strong>Phase 33 を起票</strong>: <a href="development-log.html#step-33-1">33-1</a>〜<a href="development-log.html#step-33-3">33-3</a> 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める = <a href="../issues/index.html#I-050">I-050</a> の展開。確認待ちに 1 行追加。Phase 32 は未着手のまま並ぶ）。前回: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -24,7 +24,7 @@
 
 <h2>完了フェーズのサマリ</h2>
 <p>設計（Phase D・A・9）・インフラ構築（Phase 0〜8）・アプリ実装と定常運用開始（Phase 10〜13）は 2026-07-06〜07-23 に、動画・リール対応（Phase 14）と勝負セットの投入（Phase 15）は 2026-07-23〜07-30 に、インサイト収集と KPI 運用（Phase 16）は 2026-08-01〜09-03 に、第 3 セット構築（Phase 17）は 2026-08-09〜08-28 に、プロジェクト管理の 2 レーン化（Phase 18）と <code>/goal</code> 組み込み（Phase 19）は 2026-08-28〜09-02 に、fantasy-animals-1 の停止（Phase 20）は 2026-09-03 に、課題体系の新設（Phase 22）は 2026-09-19 に、Codex 直接セッションの導入（Phase 23）は 2026-09-20〜09-21 に、設計書 HTML のスマホ閲覧対応（Phase 24）は 2026-09-21 に、計画書の記載様式の定着（Phase 25）は 2026-09-21〜09-22 に、第 4 セット umigame-soup-1 の構築（Phase 21）は 2026-09-03〜10-13 に、SNS 投稿バッチの当回固定（Phase 26）は 2026-09-22〜10-13 に、アカウント日次インサイトの follows_and_unfollows の取り直し（Phase 27）は 2026-10-13〜10-17 に、投稿の一過性エラーの段階別の扱い（Phase 28）と umigame の尺の宣言値を 29 秒へ揃える作業（Phase 29）は 2026-10-17 に完了済み。各ステップの実施記録（確認・備考の全文）と、完了時に計画書から移設したステップ一覧の原文は<a href="development-log.html">開発記録</a>を参照。</p>
-<details class="phase"><summary>完了フェーズ一覧（Phase D〜32・クリックで展開）</summary>
+<details class="phase"><summary>完了フェーズ一覧（Phase D〜34・クリックで展開）</summary>
 <div class="table-wrap"><table>
 <thead><tr><th>Phase</th><th>ゴール（達成済み）</th></tr></thead>
 <tbody>
@@ -64,6 +64,8 @@
 <tr><td>Phase 30: 設計書を生産面と配信面の 2 面で描き直し、基本設計と詳細設計に段階化する</td><td>設計書を生産面（スキルで事前に作ってレビュー・配置）と配信面（AWS のバッチ・Lambda）の 2 面、基本設計（全体）→ 機能別の基本設計 → 詳細設計の 3 段に描き直した。書式（冒頭の要約・本文は事実だけ・理由は末尾の判断の記録 D-xx・図は同梱の Mermaid）を定め（30-1）、基本設計と機能別 8 ページを作り（30-3〜30-3c）、<code>docs/production/</code> を新設し（30-5・30-6a）、インフラ・アプリの全設計書を新しい書式へ移した（30-4・30-7・30-8a・30-8b〔コメント返信を分冊へ〕・30-9a）。体系全体の参照を整え（30-9b）、2026-10-19 完了（<a href="../issues/index.html#I-040">I-040</a> 解消）。原文は<a href="development-log.html#phase-30">開発記録 Phase 30</a></td></tr>
 <tr><td>Phase 31: 脳みそコーチ（logic-training-1）の正解コメントに定時で自動返信する</td><td>返信専用の Meta アプリを用意し、運用者の過去の返信をラベルにオフライン評価（31-1・31-3）→ 設計（31-2・機能別の基本設計 <a href="../overview/functions/coach-reply.html">coach-reply</a>・分冊 <a href="../app/sets/logic-training-1-coach-reply.html">logic-training-1-coach-reply</a>）→ 実装（<code>services/coach-reply/</code>・投稿バッチの quiz 用スナップショット出力）→ <code>CoachReplyStack</code> とステージング試験（31-4）→ 本番のバックフィル 369 件とフラグ（31-5）→ 2026-10-25 に本番返信を開始（31-6。8 時から 2 時間おきに 1 日 10 回・Aurora を起こさない・定型文は改行入りの 22 本）。ウミガメのコメント返信とは別系統。返信開始 2 週間後の観察は<a href="#pending-checks">確認待ちリスト</a>（2026-11-08）。原文は<a href="development-log.html#phase-31">開発記録 Phase 31</a></td></tr>
 <tr><td>Phase 32: DB 準備確認の起動失敗を SFN でやり直す（I-049）</td><td>投稿・画像生成・インサイト収集の 3 本の SFN で、最初のステート <code>WaitForDbReady</code> に <code>States.TaskFailed</code> の Retry（30 秒間隔・2 回。タイムアウトは対象外）を足し、DB 準備確認の失敗を専用の Fail ステート <code>HandleDbReadyError</code> に分けた（32-1。2026-11-14 に本番へ deploy）。発端は 2026-11-03 と 2026-11-10 の起動失敗（<a href="../issues/index.html#I-049">I-049</a> の 2 回の発生）。設計は <a href="../infra/workflow.html#d-14">workflow.html D-14</a>。本番でのやり直しの効果は<a href="#pending-checks">確認待ちリスト</a>。原文は<a href="development-log.html#phase-32">開発記録 Phase 32</a></td></tr>
+<tr><td>Phase 33: 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める（I-050）</td><td>判定プロンプトを「答えにたどり着いていると読めれば correct」へ書き換えてオフライン評価（33-1。正解を拾えた割合が 31-3 の 65.2% から 80.0%〔high〕へ・外れへの「返す」0 件）→ ユーザー判断（33-2。推論レベルは high のまま・correct なら自信低も返す）→ CoachReplyStack と CoachReplyStagingStack へ deploy（33-3・2026-11-15 16:05 JST）。2026-11-15 完了（<a href="../issues/index.html#I-050">I-050</a> 解消）。設計は <a href="../app/sets/logic-training-1-coach-reply.html">logic-training-1-coach-reply</a>。本番で外れに返していないかは<a href="#pending-checks">確認待ちリスト</a>（2026-11-22）。原文は<a href="development-log.html#phase-33">開発記録 Phase 33</a></td></tr>
+<tr><td>Phase 34: アカウント成長ノートをクラウドの定期実行で届ける</td><td>アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記。読み取り専用の DB ユーザー <code>report_ro</code>（<code>acps</code> への <code>SELECT</code> だけ）とシークレット <code>acps/{env}/db/readonly-report</code> を FoundationStack と <code>database/users/</code> に足し（34-1）、手で作った IAM ユーザー <code>acps-prod-growth-note-reader</code>（設計は <a href="../infra/security.html#d-09">security.html D-09</a>）のキーをクラウド環境に置いて、Claude Code のクラウドの定期実行「アカウント成長ノート」（毎週火曜 7:55 JST）が集計・ページの更新・LINE 送信を行う（34-2・34-3）。AWS 側にバッチは持たない。2026-11-15 完了。手順は <code>poc/account-growth-dashboard/README.md</code>、最初の自動実行は<a href="#pending-checks">確認待ちリスト</a>（2026-11-17）。原文は<a href="development-log.html#phase-34">開発記録 Phase 34</a></td></tr>
 </tbody>
 </table></div>
 </details>
@@ -71,349 +73,7 @@
 <p><strong>次のフェーズを起こすときの入口</strong>: <a href="#pending-checks">確認待ちリスト</a>（トリガーが来た項目）/ <a href="../ideas/index.html">アイデア体系</a>セクション 2 の条件待ち / <a href="../issues/index.html#lane-dev">課題体系の開発レーン節</a>（トリガーが揃った据え置き課題。束ね方・同梱の要否は課題表の対応方針・トリガー列が正）/ 月次 KPI 転記は<a href="../app/operation.html#insights-analysis">運用設計 6.3</a>の定常作業でフェーズにしない。起票は<a href="index.html#step-checklist">計画体系 5.1</a> のチェックリストに従う。</p>
 
 <h2 id="current-phase">進行中のフェーズ</h2>
-<section class="plan-phase" data-plan-phase="33" id="phase-33">
-<h2 id="phase-33-title">Phase 33: 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める（I-050）</h2>
-<p><strong>ゴール</strong>: 脳みそコーチの正解返信で、答えにたどり着いていると読めるコメント（視点の読み替え・省略した言い方・正解に別の語を添えた回答）に「正解！」の返信が付く。明らかな外れ・答えになっていないコメントには引き続き返さない。</p>
-<details class="plan-fold">
-<summary>フェーズの背景・決定の経緯 <span class="plan-hint">— 31-3 の「誤返信 0 件」の合格線を改める（ユーザー決定 2026-11-13）</span></summary>
-<div class="plan-fold-inner">
-<blockquote>課題 <a href="../issues/index.html#I-050">I-050</a> の展開（2026-11-13・ユーザー判断）。本番の判定結果で 3 つの取りこぼしの型を確認した: ① 答え「あなたの誕生日」に「私の誕生日」が 別解・自信低（11/06 夜の投稿）② 答え「自分の影」に「自分の影。虹」が 判断できない（11/06 朝の投稿）③ 答え「鉛筆の芯」に「芯」が 判断できない・「えんぴつ」が 外れ（11/11 朝の投稿）。31-3 は「誤って正解と返すのは最悪・誤返信 0 件」を合格線にし、正解を拾えた割合は 65.2%（337/517）だった。<br>
-ユーザー決定: このアカウントは厳密な正解判定をせず、<strong>「わかっているコメント」と読めれば正解として返す</strong>。別解（alt）は当面、手での返信のまま（「〇〇でも正解だぞ」の自動化はアイデア <a href="../ideas/coach-reply-alt-answer-auto.md">coach-reply-alt-answer-auto</a>）。問題ごとに正解の答えを持たせる案は、33-1 の評価で部分一致が拾えなかったときだけ検討する。<br>
-対象外: 一番乗りの判定・返信文・スイッチ・起動の間隔・ウミガメのコメント返信（<code>services/comment-reply/</code>）。判定済みのコメントへのさかのぼっての返信はしない。<br>
-課題表の照合（計画体系 5.1）: 触るパス <code>services/coach-reply/</code>・<code>infra/lib/coach-reply-stack.ts</code>・<code>docs/app/sets/logic-training-1-coach-reply.html</code> で照合し、同梱は I-050 のみ。<a href="../issues/index.html#I-048">I-048</a>（ウミガメのステージング用 Meta アプリの Webhook のトグル。トリガーはステージング面で実コメントを打つ試験）は、本フェーズがオフライン評価だけで本番へ入れるため引かれず、同梱しない。<br>
-確認待ちの <a href="#pending-checks">31-6 の 2 週間後の観察</a>（期日 2026-11-08）は未記入のまま残っている。33-1 の <code>/step</code> の照合で拾い、結果を書く。</blockquote>
-</div>
-</details>
-
-<details class="plan-group" data-plan-group="done">
-<summary>完了済み 3 件（クリックで展開）</summary>
-<div class="plan-group-inner">
-
-<article class="plan-step" id="step-33-1" data-step-id="33-1" data-status="done" data-completed="2026-11-15">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>33-1</strong><span class="plan-status">完了</span><span>2026-11-15</span></div>
-<h3>判定プロンプトを書き換え、オフライン評価で Haiku 5.5 の推論レベル high と xhigh を比べる</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭。Phase 32 とは触るパスが重ならない）。</p>
-<p data-field="result"><strong>結果：</strong>2026-11-15 完了。判定プロンプトを「答えにたどり着いていると読めれば correct」へ書き換え、Haiku 5.5 で評価した。最終（2 巡目）で、正解を拾えた割合は 31-3 の 65.2% から 80.0%（high）/ 79.3%（xhigh）に上がり（返信の条件 = 自信高だけ）、外れ・その他への「返す」は 0 件。自信低も返すと 83.5% / 83.7% だが、その他への「返す」が 1 / 5 件出る（すべて自信低）。xhigh は出力トークンが high の約 1.6 倍で、拾える割合は上がらなかった。本番の 4 件は high・xhigh とも 4 件とも correct・自信高（自信高だけの条件でも返す）。判断は 33-2 で行う。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>判定プロンプト <code>services/coach-reply/app/prompts/judge.md</code> の軸を「答えにたどり着いていると読めれば correct」へ書き換える。オフライン評価ツールを、推論レベル（effort）と返信の条件（correct・自信高だけ / correct なら自信低も返す）を切り替えて回せるようにする。31-1 の評価用データ 1,009 件に本番で見つけた 3 つの型を足し、モデルは Haiku 5.5 のまま、推論レベル high（現行）と xhigh で評価して、33-2 の判断材料（拾えた割合・運用者が返していないコメントへ「返す」と判定した一覧・推論レベルごとのトークン数と費用の目安）を出す。本番へは入れない。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>本番・ステージングの Lambda と設定は変えない（deploy しない）。返信の条件の既定値は変えない（correct・自信高だけ。切り替えは評価ツールの引数で行う）。判定の出力の形（verdict 4 種・confidence 2 種・reason）は変えない。別解（alt）は返さないまま。問題への不満・反論を含むコメントは unsure のまま。<code>services/comment-reply/</code>・<code>shared/</code>・<code>database/</code> は触らない。評価用データのコメント本文を計画書・記録・コミットメッセージに貼るときは、コメント主の名前を入れない。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>書き換えた <code>judge.md</code> が、視点の読み替え・省略や部分的な言い方・正解に別の語を添えた回答・自信なさげな言い方を correct とし、外れ・答えになっていないもの・不満や反論は従来どおりとしている。差分を貼る。</li>
-<li>本番で見つけた 3 つの型（「私の誕生日」「自分の影。虹」「芯」「えんぴつ」）が評価用データに入っており、新しいプロンプトで 4 件とも「返す」になる。該当行の判定を貼る。</li>
-<li>Haiku 5.5 の推論レベル high と xhigh のそれぞれについて、返信の条件 2 通りの評価の要約（ラベル別の 返す / 返さない の件数・正解を拾えた割合・判定の失敗の件数）を貼る。31-3 の結果（337/517 = 65.2%）と並べる。推論レベルごとの入出力トークン数の合計と費用の目安も貼る。</li>
-<li>運用者のラベルが 外れ・その他・未返信 のコメントへ「返す」と判定した全件を、コメント本文・用意した答え・判定理由つきの一覧にし、33-2 でユーザーが 1 件ずつ見られる形でファイルに保存する（置き場は <code>poc/logic-training-reply-eval/data/</code>）。</li>
-<li><code>cd services/coach-reply &amp;&amp; pytest</code> の要約行を貼る（全パス）。</li>
-<li>本書の 33-1 に結果を記録し、<code>python3 tools/docs_check.py --plan-only</code> が OK。日本語メッセージでコミットし、<code>pull --rebase</code> のうえ push 済み。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>このステップではなし。評価の結果は次の 33-2 でユーザーが見て判断する。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>評価の結果と一覧の push まで（<code>services/coach-reply/</code>・<code>poc/logic-training-reply-eval/</code>・本書）。stop after 30 turns。<strong>やらないこと</strong>: <code>cdk deploy</code>・本番の設定変更・設計書の更新（33-3 で行う）・推論レベルと返信の条件の最終決定（33-2）。モデルは Haiku 5.5 から変えない。評価で外れへの「返す」が多く、プロンプトの直しが 3 巡で収まらないときは、その時点の結果を記録して止まる。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 評価ツールの現状・ラベルの読み方・push 後の扱い</span></summary>
-<div class="plan-fold-inner">
-<p>現状（2026-11-13 時点）: 判定は <code>app/judge.py</code>、プロンプトは <code>app/prompts/judge.md</code>（冒頭が「誤って正解と言うのは最悪の失敗・迷ったら correct にしない」）。返信の条件は <code>app/run_handler.py</code> と <code>tools/offline_eval.py</code> の <code>would_reply</code> に同じ式（correct かつ high）がある。モデルは環境変数 <code>JUDGE_MODEL</code>・推論レベルは <code>JUDGE_EFFORT</code>（本番は <code>claude-haiku-5-5</code>・effort high。<code>config.py</code> は low〜max の 5 段を受け付ける）。比べるのは同じモデルの effort <code>high</code> と <code>xhigh</code>。</p>
-<p>計画の変更（2026-11-15・ユーザー決定）: 当初は Haiku 5.5 と Sonnet 5.5 を比べる計画だったが、Sonnet 5.5 は単価が Haiku 5.5 の 20 倍（入力 $2 / 出力 $10 に対し $0.10 / $0.50。100 万トークンあたり）で費用への影響が大きいため、モデルは Haiku 5.5 のままとし、推論レベルを上げる方向で比べる。</p>
-<p>評価用データ: <code>poc/logic-training-reply-eval/data/eval.jsonl</code>（1,009 件。ラベルは correct / alt / wrong / other / unanswered で、運用者が手で返していた時期の実際の返信から付けた）。過去の結果は <code>eval_result_r1.jsonl</code> / <code>r2</code> と要約 <code>eval_summary_r1.txt</code> / <code>r2</code>。今回の結果は r3 以降として、推論レベル・返信の条件ごとに分けて保存する。</p>
-<p>ラベルの読み方: 新しい方針では、ラベルが other / unanswered でも「わかっているコメント」なら返してよい（運用者が当時たまたま返していないだけのものを含む）。そのため「外れ・その他への返す = 0 件」を機械的な合格線にせず、一覧を 33-2 でユーザーが見て決める。ラベル wrong への「返す」は、プロンプトの直しで減らす対象として扱う。</p>
-<p>コードの変更は小さい（評価ツールの引数追加・テスト）ので、委譲するかは着手時に決める。評価は Anthropic の API を実際に呼ぶ（キーは <code>~/.bashrc</code> の <code>ANTHROPIC_API_KEY</code>）。</p>
-<p>push 後の扱い: <code>services/coach-reply/</code> は CodePipeline を持たず、反映は <code>cdk deploy</code> で行う。このステップの push では本番は変わらないため、パイプライン完走確認の <code>/goal</code> は出さない。</p>
-
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 評価の要約・本番の 4 件・31-6 の確認待ち</span></summary>
-<div class="plan-fold-inner">
-<p><strong>計画の変更（着手前・2026-11-15）</strong>: 比べる対象を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ変えた（Sonnet 5.5 は単価が 20 倍のため。ユーザー決定）。</p>
-<p><strong>(1) プロンプト</strong>（<code>app/prompts/judge.md</code>）: 冒頭の「誤って正解と言うのは最悪の失敗・迷ったら correct にしない」を、「厳密な採点をしない・答えにたどり着いていると読めれば正解・外れや答えになっていないものは correct にしない」に替えた。correct に含めるものとして、視点の読み替え・省略や部分的な言い方（答えの一部や、答えを含むもの全体の名前）・正解に別の語を添えた回答（2〜3 個並べたものを含む）・自信なさげな言い方を足した。例は評価用データと重ならない別の問題で書いた（評価で答えを教えないため）。wrong に「問題に出てくる語や周りの語だけで答えのものを指していない」を、unsure に「当てずっぽうに 4 個以上並べている」を置いた。不満・反論は unsure のまま、別解（alt）・出力の形は変えていない。プロンプトの直しは 2 巡。1 巡目（r3）は「えんぴつ」が correct・自信低で、自信高だけの条件では返らなかったため、2 巡目（r4）で「correct の型にはっきり当てはまるものは、型に当てはまるという理由だけで low にせず high にする。答えのものを指しているか読み取れないときだけ low」を足した。ラベル wrong への「返す」は両巡・全条件で 0 件。</p>
-<p><strong>(2) コード</strong>: <code>judge.judge_comments</code> に任意の引数 <code>usage</code>（評価ツールだけがリクエストごとのトークン数を受け取る。本番の処理は渡さないので変わらない）。<code>tools/offline_eval.py</code> に <code>--effort</code>（その評価だけ <code>JUDGE_EFFORT</code> を上書き）・返信の条件 2 通りの集計（<code>would_reply(prediction, rule)</code>。既定の <code>high</code> は本番と同じ式）・トークン数と費用の目安・確認用の一覧（<code>--review-out</code>）・保存した結果からの再集計（<code>--summary-from</code>）を足した。<code>services/coach-reply</code> の pytest は <code>142 passed</code>（comment-reply の .venv で実行）。</p>
-<p><strong>(3) 評価用データ</strong>: <code>eval.jsonl</code> に本番の 4 件（「私の誕生日」「自分の影。虹」「芯」「えんぴつ」。ラベル correct・<code>source: "prod-2026-11"</code>・当時の本番の判定を <code>prod_judgment</code> に残した）を足して 1,013 件、<code>answers.json</code> に 3 問の答えを足した（問題の情報は本番の S3 のスナップショットから読み取り）。1 巡目は 4 件とも correct だが「えんぴつ」だけ自信低。2 巡目（最終）は high・xhigh とも 4 件とも correct・自信高（理由の例: 「えんぴつ」= 答えを含む鉛筆全体の名前を挙げている）。</p>
-<p><strong>(4) 評価の要約</strong>（1,013 件。正解 = ラベル correct 521 件のうち返した件数）:</p>
-<ul>
-<li>31-3（旧プロンプト・high・自信高だけ）: 正解 337/517（65.2%）・外れ / その他への返す 0 / 0・未返信への返す 72・判定の失敗 0</li>
-<li><strong>最終（r4）</strong> high・自信高だけ: 正解 417/521（80.0%）・外れ 0 / 24・その他 0 / 198・未返信 94 / 205・別解 3 / 65・判定の失敗 0</li>
-<li>r4 high・自信低も返す: 正解 435/521（83.5%）・外れ 0・その他 1・未返信 96・別解 5・判定の失敗 0</li>
-<li>r4 xhigh・自信高だけ: 正解 413/521（79.3%）・外れ 0・その他 0・未返信 93・別解 6・判定の失敗 0</li>
-<li>r4 xhigh・自信低も返す: 正解 436/521（83.7%）・外れ 0・その他 5・未返信 102・別解 6・判定の失敗 0</li>
-<li>r4 のトークン数（150 リクエスト・入力 69,728・キャッシュ書込 6,532・キャッシュ読込 238,418 は両者同じ）: 出力 high 161,901・xhigh 264,128（約 1.63 倍）。費用の目安は high $0.091・xhigh $0.142（1,013 件あたり。Haiku 5.5 の単価で概算）</li>
-<li>参考（1 巡目 r3）: high・自信高だけ 395/521（75.8%）・その他 0・判定の失敗 1 / 自信低も 427（82.0%）・その他 5。xhigh・自信高だけ 401/521（77.0%）・その他 0 / 自信低も 436（83.7%）・その他 4。出力 high 155,414・xhigh 256,916</li>
-</ul>
-<p>その他への「返す」はすべて自信低で、答えになっていないもの（偉人の名前だけ・答えの一部の 1 字だけ・「答えは知っている」と言うだけ など）だった。r3 の判定の失敗 1 件は high の 1 投稿の 1 リクエスト（r4 は 0 件）。</p>
-<p><strong>(5) 確認用の一覧</strong>: 最終は <code>poc/logic-training-reply-eval/data/review_r4_high.md</code>（97 件）・<code>review_r4_xhigh.md</code>（107 件）（1 巡目の <code>review_r3_*.md</code> も残した）。返信の条件「自信低も返す」で外れ・その他・未返信へ返す全件を、問題・用意した答え・コメント・判定理由つきでラベル別に並べた（各項目に「自信高だけでも返す / 自信低も返すときだけ」を付けた）。結果は <code>eval_result_r4_high.jsonl</code> / <code>eval_result_r4_xhigh.jsonl</code>、要約は <code>eval_summary_r4_*.txt</code>（r3 も同じ名前の付け方で残した）。<code>data/</code> はコメント本文を含むため git 管理外（<code>.gitignore</code>）で、ローカルにだけある。</p>
-<p><strong>(6) 確認待ちの照合</strong>: 31-6 の 2 週間後の観察を読み取りだけで確認し、確認待ちリストの結果列に書いた。課題表は I-050 を live のまま（解消は 33-3）、I-048 は据え置き継続・トリガー更新なし。</p>
-</div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-33-2" data-step-id="33-2" data-status="done" data-completed="2026-11-15" data-kind="decision">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>33-2</strong><span class="plan-status">完了</span><span>2026-11-15</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
-<h3>評価の結果を見て、推論レベル・返信の条件・本番へ入れるかを決める</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>33-1 の push 直後から確認できる。</p>
-<p data-field="result"><strong>結果：</strong>2026-11-15 完了・<strong>go</strong>。推論レベルは <strong>high</strong>（現行のまま）、返信の条件は <strong>correct なら自信低も返す</strong>。一覧で返してはいけないものの指摘はなし。次は 33-3。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>ユーザーが 33-1 の評価の要約と一覧を見て、次を決める。① 運用者が返していないコメントへ「返す」と判定した一覧に、返してはいけないものがないか（あればどれか）② 判定の推論レベル（Haiku 5.5 の high / xhigh。モデルは変えない）③ 返信の条件（correct・自信高だけ / 自信低も返す）④ 本番へ入れるか（go / no-go）。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>なし。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ul data-field="acceptance">
-<li>—（ユーザー判断）。① の指摘の有無・② ③ の採用値・④ の go / no-go が記録に残ること。</li>
-</ul>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>このステップ自体が人間ゲート。go で完了し 33-3 へ進む。no-go（返してはいけないものがある・拾える割合が足りない）なら 33-1 のプロンプトを直して再評価する。部分一致が拾えない場合は、問題ごとに正解の答えを持たせる案を別のステップとして起こすかをここで決める。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>。<code>/step</code> は goal 対象外として断る）。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— ユーザーの決定（2026-11-15）</span></summary>
-<div class="plan-fold-inner">
-<p><strong>示した材料</strong>: <a href="#step-33-1">33-1</a> の最終評価（r4）の 4 通りの要約と、確認用の一覧 <code>poc/logic-training-reply-eval/data/review_r4_high.md</code>（git 管理外）。Claude の推奨は「high・自信高だけ」だった（自信低も返すと拾える割合が 80.0% → 83.5% に上がる一方、答えになっていないコメントへの「正解」が混ざり始めるため）。気になる型として、答えに考察を添えたもの（「『トランプ』がおそらく模範解答でしょう。しかし…」）と 1 字だけの答え（答え「笑み」に「笑」）を示した。</p>
-<p><strong>ユーザーの決定</strong>: ① 返してはいけないものの指摘: なし ② 推論レベル: <strong>high</strong>（xhigh は費用が約 1.6 倍で拾える割合が上がらないため不採用。モデルは Haiku 5.5 のまま）③ 返信の条件: <strong>correct なら自信低も返す</strong> ④ <strong>go</strong>（33-3 へ進む）。</p>
-<p><strong>この組み合わせの評価値</strong>（r4・high・自信低も返す）: 正解 435/521（83.5%）・外れへの返す 0 / 24・その他への返す 1 / 198（自信低。答え「パイプに水を注いで玉を浮かせる」に、水の代わりに別の液体を入れるという冗談）・未返信への返す 96 / 205・別解への返す 5 / 65（自信低の correct 判定）・判定の失敗 0。33-3 では、返信の条件を <code>run_handler.py</code>・<code>offline_eval.py</code>（<code>would_reply</code> の既定）にそろえ、一番乗りの条件（correct・自信高）は変えない（実装の細部は 33-3 の折りたたみ）。</p>
-</div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-33-3" data-step-id="33-3" data-status="done" data-completed="2026-11-15">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>33-3</strong><span class="plan-status">完了</span><span>2026-11-15</span></div>
-<h3>決めた判定を本番へ入れ、設計書を直す</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>33-2 が go。</p>
-<p data-field="result"><strong>結果：</strong>2026-11-15 完了。返す条件を「correct なら自信の高低を問わず返す」（推論レベル high・Haiku 5.5 のまま）にして、CoachReplyStack と CoachReplyStagingStack を deploy した（16:05 JST）。deploy 後の最初の定時の起動（18:00 JST）は正常終了。<a href="../issues/index.html#I-050">I-050</a> を解消。本番で外れに返していないかは<a href="#pending-checks">確認待ち</a>（期日 2026-11-22）で見る。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>33-2 で決めた推論レベルと返信の条件をコードと <code>CoachReplyStack</code> の設定に入れ、設計書（<code>docs/app/sets/logic-training-1-coach-reply.html</code> セクション 3.1 と判断の記録、必要なら <code>docs/overview/functions/coach-reply.html</code>・<code>docs/infra/stacks.html</code> セクション 3.7）を実装に合わせて直す。承認のあと <code>CoachReplyStack</code> を deploy し、課題 I-050 を解消へ移す。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>返信スイッチ・開始日時・起動の間隔・状態の保存先は変えない。Lambda・スケジュールの論理 ID と名前を変えない（置換を起こさない）。判定済みのコメントは判定し直さない（さかのぼっての返信をしない）。別解（alt）は返さないまま。<code>services/comment-reply/</code>・<code>shared/</code>・<code>database/</code> は触らない。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>返信の条件と推論レベルが 33-2 の採用値になっており、本番の処理（<code>run_handler.py</code>）と評価ツール（<code>would_reply</code>）で同じ条件になっていることをテストで検証している。<code>cd services/coach-reply &amp;&amp; pytest</code> の要約行を貼る（全パス）。</li>
-<li><code>cdk diff -c env=prod</code> で、差分が CoachReplyStack の Lambda のコードと環境変数だけで、リソースの置換がないことを出力の要点で示す。</li>
-<li>設計書を実装に合わせて直し（合格線・評価の結果・判定の考え方の変更理由を判断の記録に残す）、<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が OK。</li>
-<li>承認のあと deploy し、<code>aws lambda get-function-configuration</code> で本番の正解返信 Lambda の <code>JUDGE_MODEL</code> と最終更新時刻が新しくなっていることを出力で示す。</li>
-<li>deploy 後の最初の定時の起動が正常に終わっていることを、Lambda のログの要約行で示す（エラーなし）。次の起動まで 2 時間を超えて待つ場合は待たずに、確認待ちリストの確認内容に含める。</li>
-<li>課題 I-050 を 解消 へ移し、確認待ちリストの 33-3 の行に deploy 日と期日を記入する。本書と開発記録を更新して <code>python3 tools/docs_check.py --plan-only</code> が OK。日本語メッセージでコミットし、<code>pull --rebase</code> のうえ push 済み。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p><code>cdk diff</code> の要点を見て、CoachReplyStack の deploy を承認する（push の直後）。本番で返信が増えたか・外れに返していないかは、<a href="#pending-checks">確認待ちリスト</a>で追う。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>deploy の前で止まり、承認を待つ。承認後は deploy と確認・記録の push まで（<code>services/coach-reply/</code>・<code>infra/</code>・<code>docs/</code>）。stop after 25 turns。<strong>やらないこと</strong>: 返信スイッチの切り替え・状態ファイルの書き換え・過去のコメントへの返信。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— 設定の置き場と push 後の扱い</span></summary>
-<div class="plan-fold-inner">
-<p>設定の置き場: 推論レベルは <code>infra/lib/coach-reply-stack.ts</code> の環境変数 <code>JUDGE_EFFORT</code>（モデルは <code>JUDGE_MODEL</code> で、Haiku 5.5 のまま変えない）（既定値は <code>services/coach-reply/app/config.py</code>）。本番とステージングの Lambda は同じスタックにあり、同じ値にそろえる。返信の条件を「自信低も返す」に変える場合は、<code>run_handler.py</code>・<code>first_correct.py</code>（一番乗りは correct・自信高が前提）・<code>offline_eval.py</code> の 3 か所をそろえ、一番乗りの条件は変えない。</p>
-<p>設計書: セクション 3.1 の「閾値」「評価の結果」「オフライン評価の合格線」と、プロンプトの要点の記述が変わる。31-3 の「誤返信 0 件」を改めた理由（ユーザー決定 2026-11-13）は判断の記録に書く。</p>
-<p>push 後の扱い: <code>services/coach-reply/</code> は CodePipeline を持たないため、パイプライン完走確認の <code>/goal</code> は出さない。反映の確認は完了条件 4・5 で行う。</p>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 前半（deploy の手前まで）・後半（deploy と確認）</span></summary>
-<div class="plan-fold-inner">
-<p><strong>前半（2026-11-15）</strong>: ゴールを deploy の承認の前後で 2 本に分けた（承認待ちで止まれないため）。</p>
-<p><strong>(1) コード</strong>: 返す条件を <code>app/reply_rule.py</code> の <code>should_reply</code>（<code>correct</code> なら確信 <code>high</code> / <code>low</code> とも）の 1 か所にまとめ、<code>run_handler.py</code> と <code>tools/offline_eval.py</code> の <code>would_reply</code> の既定（引数なし）がこれを使うようにした。比べるための <code>"high"</code> / <code>"any"</code> の指定は評価ツールに残した。一番乗り（<code>first_correct.py</code>）は確信 <code>high</code> が前提のまま変えていない。テストは、評価ツールの既定が本番の式と全 8 通り（verdict 4 × confidence 2）で一致すること、確信 <code>low</code> の正解には返信するが一番乗りは付かず <code>first_correct_replied</code> も立たないこと、別解・外れ・判断できないには返さないことを足した。<code>services/coach-reply</code> の pytest は <code>152 passed</code>。</p>
-<p><strong>(2) 設定</strong>: <code>infra/lib/coach-reply-stack.ts</code> の <code>JUDGE_MODEL: 'claude-haiku-5-5'</code>・<code>JUDGE_EFFORT: 'high'</code>、<code>app/config.py</code> の既定も同じ値のままで、<code>infra/</code> は触っていない。</p>
-<p><strong>(3) cdk diff</strong>（<code>-c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e</code>。タグは本番のタスク定義の現行値）: CoachReply は本番とステージングの 2 スタックに分かれていた（本書の「同じスタック」の記載は誤り）。両スタックとも差分は <code>RunFunction</code>・<code>TokenRefreshFunction</code> の <code>Code.S3Key</code>（同じ資材のハッシュ）だけで、置換・環境変数・スケジュール・権限の差分はない。FoundationStack は差分なし。</p>
-<p><strong>(4) 設計書</strong>: <code>docs/app/sets/logic-training-1-coach-reply.html</code>（要約・図 1・3.1 の閾値・プロンプトの要点・評価の結果・評価の見方・3.2 の一番乗りの条件 4 つ目・判断の記録 D-05 を新設・D-01 の D-04 への誤った参照を直した）、<code>docs/overview/functions/coach-reply.html</code>（冒頭・主な判断・図・D-04 を改めた）、<code>docs/overview/system-overview.html</code>（⑤ の行）。<code>docs/infra/stacks.html</code> 3.7 は返す条件を書いていないため変えていない。<code>docs_check.py --widths 360,390,768,1280</code> は OK。</p>
-<p><strong>(5) 照合</strong>: 課題表 I-048 は据え置き継続・トリガー更新なし（ステージングの Lambda も更新するが、実コメントでの試験はしない）。</p>
-<p><strong>後半（2026-11-15）</strong>: ユーザーの承認（「2 スタックを deploy してよい」）のあと、<code>cdk deploy -c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e --exclusively</code> で CoachReplyStack と CoachReplyStagingStack の 2 本だけを deploy し、両方とも成功した（16:05 JST ごろ）。</p>
-<p><strong>(6) 反映の確認</strong>: <code>aws lambda get-function-configuration</code> で、<code>acps-prod-coach-reply-run</code> は LastModified <code>2026-11-15T07:05:09Z</code>、<code>acps-prod-coach-reply-run-staging</code> は <code>2026-11-15T07:05:40Z</code>。どちらも <code>JUDGE_MODEL=claude-haiku-5-5</code>・<code>JUDGE_EFFORT=high</code>。</p>
-<p><strong>(7) 最初の定時の起動</strong>: 18:00 JST（09:00Z）の起動のログの要約行は <code>coach_reply_summary {"media":196,"selected":1,"read":1,"no_snapshot":0,"judged":2,"replied":1,"judge_failures":0,"failures":0,"deferred":0}</code>（実行 10.3 秒・ERROR / Traceback / タイムアウトなし）。deploy 前の 16:00 JST の起動も正常だった。</p>
-<p><strong>(8) 課題と確認待ち</strong>: <a href="../issues/index.html#I-050">I-050</a> をクローズ節へ移して 解消 にした。確認待ちの 33-3 の行に deploy 日（2026-11-15 16:05 JST）と期日（2026-11-22）を書いた。I-048 は据え置き継続・トリガー更新なし。返信スイッチ・開始日時・状態ファイルは触っていない。</p>
-<p><strong>Phase 33 のステップはすべて完了した</strong>（33-1〜33-3）。完了フェーズのサマリへ畳むのと、記録の開発記録への移設は次の計画整理で行う。</p>
-</div>
-</details>
-</div>
-</article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-
-</div>
-</section>
-
-<section class="plan-phase" data-plan-phase="34" id="phase-34">
-<h2 id="phase-34-title">Phase 34: アカウント成長ノートをクラウドの定期実行で届ける</h2>
-<p><strong>ゴール</strong>: 毎週火曜の朝 8 時に、3 アカウントの成長のレポートが LINE に届き、ページ「アカウント成長ノート」が前週分まで更新される。PC の起動に左右されず、クラウドに置く AWS のキーでは本番 DB を読むことしかできない。</p>
-<details class="plan-fold">
-<summary>フェーズの背景・決定の経緯 <span class="plan-hint">— アイデアの採用転記（2026-11-15）。読み取り専用の DB ユーザーを足す理由・対象外・課題照合</span></summary>
-<div class="plan-fold-inner">
-<blockquote>アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記（2026-11-15・ユーザー判断）。ページ（HTML のアーティファクト）・レポートの文面・LINE への送信は、アイデアレーンの試作（<code>poc/account-growth-dashboard/</code>）で確認済み。残りは「無人で毎週動かす」こと。<br>
-実行場所: デスクトップアプリのスケジュールタスクは WSL のフォルダも <code>wsl.exe</code> も使えず、Windows のタスクスケジューラは火曜の朝に PC が起動していることが前提になる。<strong>クラウドの定期実行にする</strong>（ユーザー決定）。<br>
-読み取り専用にする理由: 集計（<code>content/insights-analysis/run_queries.py</code>）が使うシークレット <code>acps/prod/db/credentials</code> は DB の管理者のもので、ほかに DB ユーザーはない。Data API の実行権限は IAM では読み取りだけに絞れないため、このままキーを外に置くと、漏れたときに本番 DB を書き換えられる。<strong>読み取り専用の DB ユーザーとそのシークレットを作ってから載せる</strong>（ユーザー決定）。<br>
-すでに済んだもの: 専用の IAM ユーザー <code>acps-prod-growth-note-reader</code> を 2026-11-15 にユーザーが手で作成した（インラインポリシー <code>growth-note-read</code> = 本番クラスターへの <code>rds-data:ExecuteStatement</code> と、シークレット <code>acps/prod/db/readonly-report-??????</code> の <code>secretsmanager:GetSecretValue</code> だけ。アクセスキーは未発行）。<strong>シークレットの名前はこのポリシーに合わせて <code>acps/prod/db/readonly-report</code> とする</strong>。<br>
-対象外: AWS 側にバッチ・定期実行・通知の仕組みは足さない（足すのは読み取り専用の DB ユーザー・シークレットの 2 点と、作成済みの IAM ユーザーだけ）。ページの見た目・レポートの文面・節目の人数は変えない。<br>
-課題表の照合（計画体系 5.1）: 触るパス <code>infra/</code>・<code>database/</code>・<code>docs/infra/security.html</code>・<code>content/insights-analysis/</code>・<code>poc/account-growth-dashboard/</code> と、語「DB ユーザー・読み取り専用・admin・Data API・db/credentials・IAM ユーザー・アクセスキー」で照合し、<strong>該当なし</strong>。</blockquote>
-</div>
-</details>
-
-<details class="plan-group" data-plan-group="done">
-<summary>完了済み 3 件（クリックで展開）</summary>
-<div class="plan-group-inner">
-
-<article class="plan-step" id="step-34-1" data-step-id="34-1" data-status="done" data-completed="2026-11-15">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>34-1</strong><span class="plan-status">完了</span><span>2026-11-15</span></div>
-<h3>読み取り専用の DB ユーザー用のシークレットと、DB ユーザーを作る手順を用意する</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭。Phase 33 とは触るパスが重ならない）。</p>
-<p data-field="result"><strong>結果：</strong>2026-11-15 完了（コミットまで）。FoundationStack の差分は新しいシークレット 1 件だけ。DB ユーザー <code>report_ro</code> を作る SQL と適用スクリプトを <code>database/users/</code> に置いた。<strong>人間ゲート（push → deploy → DB ユーザーの作成）待ち</strong>。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>FoundationStack に、読み取り専用 DB ユーザー用のシークレット <code>acps/prod/db/readonly-report</code>（パスワードは自動生成）を足す。DB ユーザーを作る SQL（<code>CREATE USER</code> と、アプリのスキーマへの <code>GRANT SELECT</code> だけ）と、パスワードを画面に出さずに適用する手順を <code>database/</code> に置く。セキュリティ設計とスタック設計に、新しいシークレット・DB ユーザー・手で作った IAM ユーザーを書き、理由を「判断の記録」に残す。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>既存のシークレット <code>acps/prod/db/credentials</code>・既存のタスクロール・Aurora の設定は変えない。集計スクリプトの自動解決（名前に <code>db/credentials</code> を含むシークレットを探す）が新しいシークレットを拾わないこと。IAM ユーザーは CDK に取り込まない（手で作ったものを設計書に記録する）。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li><code>cdk synth</code> が通り、<code>cdk diff -c env=prod</code> の FoundationStack の差分が新しいシークレット（と、その出力があればそれ）だけである。差分の要点を貼る。</li>
-<li>DB ユーザーを作る SQL と適用の手順が <code>database/</code> にあり、付ける権限が <code>SELECT</code> だけであることを差分で示す。</li>
-<li><code>docs/infra/security.html</code> と <code>docs/infra/stacks.html</code> を更新し、<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が OK。</li>
-<li>本書を更新して <code>python3 tools/docs_check.py --plan-only</code> が OK。日本語メッセージでコミット済み。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p><code>cdk diff</code> の要点を見て push と FoundationStack の deploy を承認し、続けて DB ユーザーを作る手順を適用する（push の直後）。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>コミットまで（<code>infra/</code>・<code>database/</code> を触るため、push は差分確認後）。stop after 20 turns。deploy と DB への適用はしない。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— シークレットの形・DB ユーザーの作り方の案</span></summary>
-<div class="plan-fold-inner">
-<p>シークレットは Data API がそのまま使える形（<code>username</code>・<code>password</code> を持つ JSON）にする。DB ユーザーの作成は、管理者のシークレットで Data API から SQL を流し、パスワードは新しいシークレットから読んで渡す（画面・履歴・リポジトリに残さない）。DB ユーザー名・付与する対象（スキーマ全体か、集計が読むテーブルだけか）・シークレットの命名規約との整合は、このステップで <code>docs/infra/security.html</code> を読んで決める。</p>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-11-15。シークレット・SQL・適用スクリプト・設計書。deploy と適用は人間ゲート</span></summary>
-<div class="plan-fold-inner">
-<p><strong>(1) CDK</strong>: <code>infra/lib/foundation-stack.ts</code> に <code>DbReadonlyReportSecret</code>（<code>acps/{env}/db/readonly-report</code>・<code>{"username": "report_ro"}</code> + 自動生成の <code>password</code>・英数字 32 文字）を足した。既存のシークレット・タスクロール・Aurora の定義は変えていない。<code>infra/test/foundation-stack.test.ts</code> は 37 件すべて通過（シークレットの数を 3 に、新しいシークレットの形の検査を 1 件追加）。</p>
-<p><strong>(2) cdk synth / diff</strong>（<code>-c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e</code>。タグは本番のタスク定義の現行値。スタックの指定名は <code>FoundationStack</code>）: synth は成功。diff は <code>[+] AWS::SecretsManager::Secret DbReadonlyReportSecret</code> の 1 件だけ（IAM・出力の差分なし）。</p>
-<p><strong>(3) DB ユーザーの手順</strong>: <code>database/users/readonly_report.sql</code>（<code>CREATE USER IF NOT EXISTS</code>・<code>ALTER USER</code>・<code>GRANT SELECT ON `acps`.*</code> の 3 文）と <code>database/users/apply_readonly_report.py</code>。スクリプトは GRANT が SELECT の 1 文だけであることを確かめてから、管理者のシークレットで Data API に 1 文ずつ流す。パスワードは新しいシークレットから読み、画面・引数に出さない（入力は権限 600 の一時ファイルで渡して消す）。<code>--dry-run</code>（AWS に触らず、伏せ字で文を表示）だけ実行した。本番には適用していない。</p>
-<p><strong>(4) 設計書</strong>: <code>docs/infra/security.html</code>（図 1・1.1〜1.3・2.8 を新設・判断の記録 D-09）、<code>docs/infra/stacks.html</code>（3.1 の Secrets Manager・判断の記録 D-20）。<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> は OK。</p>
-<p><strong>(5) 決めたこと</strong>: DB ユーザー名は <code>report_ro</code>、付与の対象はスキーマ <code>acps</code> 全体の <code>SELECT</code>（集計が読むテーブル・ビューが増えても付け直さずに済む）。シークレットは <code>db/</code> の下のため既存のタスクロールからも読めるが、それらは管理者のシークレットをすでに読める。</p>
-<p><strong>(6) 照合</strong>: 確認待ちは該当なし。課題表 I-011 は据え置き継続・トリガー更新なし。クローズ移動は該当なし。</p>
-<p><strong>人間ゲートの手順</strong>: ① push ② <code>cd infra &amp;&amp; cdk deploy -c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e FoundationStack</code> ③ <code>python3 database/users/apply_readonly_report.py</code>（最後に付いた権限が表示される）。</p>
-</div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-34-2" data-step-id="34-2" data-status="done" data-completed="2026-11-15">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>34-2</strong><span class="plan-status">完了</span><span>2026-11-15</span></div>
-<h3>読み取り専用で集計が通ることを確かめ、クラウドの定期実行の手順をそろえる</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>34-1 の人間ゲート（deploy と DB ユーザーの作成）の完了後。</p>
-<p data-field="result"><strong>結果：</strong>2026-11-15 完了。読み取り専用のシークレットで集計 2 本が管理者のときと同じ結果（41 行・38 行）になり、書き込みは権限エラーで拒否された。クラウドの定期実行の指示文と、置く値の一覧を README にそろえた。次は 34-3（ユーザー作業）。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>新しいシークレットを指定して成長ノートの集計 2 本を実行し、管理者のシークレットのときと同じ結果になることを確かめる。同じシークレットで書き込みが拒否されることを確かめる。クラウドの定期実行に登録する指示文（AWS CLI の用意 → 集計 → ページの組み立て → 公開し直し → LINE 送信）と、クラウド環境に置く値の一覧（名前だけ。値は書かない）を <code>poc/account-growth-dashboard/README.md</code> に書く。運用設計に入口を 1 行足す。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>アクセスキー・LINE のトークン・シークレットの中身を、リポジトリ・記録・会話に書かない。集計の SQL とページ・文面は変えない。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ol data-field="acceptance">
-<li>新しいシークレットで <code>growth_account_weekly</code>・<code>growth_post_weekly</code> が通り、行数が管理者のシークレットでの実行と一致する出力を貼る。</li>
-<li>同じシークレットでの <code>INSERT</code>（または <code>CREATE TABLE</code>）が権限エラーになる出力を貼る。</li>
-<li>指示文と値の一覧が README にあり、運用設計を更新して <code>python3 tools/docs_check.py --widths 360,390,768,1280</code> が OK。</li>
-<li>本書を更新して <code>python3 tools/docs_check.py --plan-only</code> が OK。日本語メッセージでコミットし、<code>pull --rebase</code> のうえ push 済み。</li>
-</ol>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>このステップではなし。クラウドへの登録と手動の実行は 34-3 で行う。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>push まで（<code>poc/</code>・<code>content/insights-analysis/</code>・<code>docs/</code>。<code>services/</code> <code>shared/</code> は触らないため、パイプライン確認の <code>/goal</code> は不要）。stop after 20 turns。アクセスキーの発行とクラウドへの登録はしない。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="implementation">
-<summary>4. 実装の細部・背景 <span class="plan-hint">— クラウドで要るもの・未検証の点</span></summary>
-<div class="plan-fold-inner">
-<p>クラウドで要るもの: AWS のアクセスキー（<code>acps-prod-growth-note-reader</code>）・リージョン・<code>AURORA_CLUSTER_ARN</code>・<code>AURORA_SECRET_ARN</code>（自動解決は一覧の権限が要るため使わない）・<code>LINE_CHANNEL_ACCESS_TOKEN</code>・<code>LINE_USER_ID</code>・AWS と <code>api.line.me</code> への外向きの通信・AWS CLI。<code>report.py</code> は環境変数から読める。</p>
-<p>未検証: 既存のページ（<code>https://claude.ai/artifact/NMPNxbEYTwtC8AVQDSFwBk</code>）をクラウドのセッションから上書きできるか。通らなければ公開先を作り直し、<code>report.py</code> と README の URL を差し替える。資材を <code>poc/</code> に置いたままにするかも、このステップで決める。Windows 側の <code>weekly.sh</code> は、クラウドが通ったら消す。</p>
-</div>
-</details>
-<details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 2026-11-15。読み取り専用の確認・クラウドの仕様の確認・README。クラウドでの実行は 34-3</span></summary>
-<div class="plan-fold-inner">
-<p><strong>(1) 読み取り専用での集計</strong>: <code>AURORA_CLUSTER_ARN</code> と <code>AURORA_SECRET_ARN</code>（<code>acps/prod/db/readonly-report</code>）を指定して <code>growth_account_weekly</code>・<code>growth_post_weekly</code> を実行し、41 行・38 行。管理者のシークレットでの実行と行数・中身（結果の JSON のハッシュ）とも一致した。接続しているユーザーは <code>report_ro@%</code>。SQL は変えていない。</p>
-<p><strong>(2) 書き込みの拒否</strong>: 同じシークレットで <code>CREATE TABLE</code> は「CREATE command denied to user 'report_ro'」、<code>INSERT INTO batch_sets</code> は「INSERT command denied to user 'report_ro'」（どちらも Error code 1142）。</p>
-<p><strong>(3) 確かめた範囲</strong>: 実行は手元の管理者の IAM で、シークレットだけを読み取り専用に替えて行った。IAM ユーザー <code>acps-prod-growth-note-reader</code> 本人として通るかは、アクセスキーを発行する 34-3 で初めて確かめる（ポリシーの文面は 2026-11-15 に用意した内容と一致を確認済み）。</p>
-<p><strong>(4) クラウドの仕様</strong>（公式ドキュメントで確認。定期実行は試験提供中）: 値は環境の「Environment variables」に置く（ドキュメントは「その環境を使える人なら誰でも読める」と注意している。運用者 1 人の環境に限り、置くキーの権限を読み取りと LINE 送信に絞ることで受け入れる）。外向きの通信は既定で AWS を含む許可リストで、<code>api.line.me</code> は Allowed domains に足す。AWS CLI は Setup script の <code>pip install awscli</code> で入れる。時刻は UTC の cron で <code>0 23 * * 1</code>。無人の実行は自動判定で進み、止められる操作もある。既存のアーティファクトは URL を渡して更新できる、と書かれている。</p>
-<p><strong>(5) 成果物</strong>: <code>poc/account-growth-dashboard/README.md</code> に「クラウドの定期実行」の節（置く値の一覧〔名前だけ〕・環境の設定・登録する指示文・届かないときの見方）を書いた。<a href="../app/operation.html#insights-analysis">運用設計 6.3</a> に入口を 1 行足した。<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> は OK。</p>
-<p><strong>(6) 決めたこと・残り</strong>: 資材は当面 <code>poc/account-growth-dashboard/</code> のままにする（クラウドで通ってから置き場を見直す）。Windows 側の <code>weekly.sh</code> は 34-3 が go になったら消す。<code>content/insights-analysis/</code> は触っていない。</p>
-<p><strong>(7) 照合</strong>: 確認待ちは該当なし。課題表 I-006・I-015・I-017・I-019・I-025 は据え置き継続・トリガー更新なし（運用設計のセクション 3・4 が対象で、触ったのは 6.3 だけ）。クローズ移動は該当なし。</p>
-</div>
-</details>
-</div>
-</article>
-
-<article class="plan-step" id="step-34-3" data-step-id="34-3" data-status="done" data-completed="2026-11-15" data-kind="decision">
-<header class="plan-step-head">
-<div class="plan-meta"><strong>34-3</strong><span class="plan-status">完了</span><span>2026-11-15</span><span class="plan-kind">ユーザー判断・ゴール対象外</span></div>
-<h3>クラウドに値と定期実行を登録し、手動で 1 回動かして続けるかを決める</h3>
-<p data-field="prerequisites"><strong>着手条件：</strong>34-2 の push 直後から行える。</p>
-<p data-field="result"><strong>結果：</strong>2026-11-15 完了・<strong>go</strong>。クラウドの定期実行「アカウント成長ノート」を登録し、手動の実行でページの更新（11/13 収集分まで）と LINE の着信をユーザーが確認した。次の自動実行は 2026-11-17（火）7:55。</p>
-</header>
-<div class="plan-step-body">
-<section><h4>1. 何をするか</h4>
-<div data-field="overview"><p>ユーザーが ① IAM ユーザーのアクセスキーを発行し、34-2 の一覧の値をクラウド環境に登録する ② 34-2 の指示文で定期実行（火曜 8 時）を登録する ③ 手動で 1 回実行し、ページが更新されたか・LINE に届いたかを見る ④ 続ける（go）/ 直す（no-go）を決める。</p></div>
-<div data-field="constraints"><strong>守る条件</strong><p>なし。</p></div>
-</section>
-<section><h4>2. 完了条件</h4>
-<ul data-field="acceptance">
-<li>—（ユーザー判断）。③ の 2 点の OK / NG と ④ の go / no-go が記録に残ること。</li>
-</ul>
-</section>
-<section><h4>3. 人が確認すること・止まる場所</h4>
-<div class="plan-gates">
-<div data-field="gate"><strong>人が確認すること</strong><p>このステップ自体が人間ゲート。go で完了し、<a href="#pending-checks">確認待ちリスト</a>の行に登録日と最初の火曜の日付を記入する。no-go なら通らなかった点を 34-2 の手順に戻して直すか、課題として起票する。</p></div>
-<div data-field="stop"><strong>止まる場所・上限</strong><p>—（<strong>ゴールにしない</strong>。<code>/step</code> は goal 対象外として断る）。</p></div>
-</div>
-</section>
-<details class="plan-fold" data-field="record">
-<summary>4. 作業記録 <span class="plan-hint">— 2026-11-15。登録・手動実行 2 回・go</span></summary>
-<div class="plan-fold-inner">
-<p><strong>① 値の登録</strong>: ユーザーが専用の環境を作り、Setup script（<code>pip install awscli</code>）・Allowed domains（<code>api.line.me</code>）・環境変数 7 つ（アクセスキーは同日に発行）を設定した。値は会話・記録・リポジトリに出していない。</p>
-<p><strong>② 定期実行の登録</strong>: ユーザーが「アカウント成長ノート」を登録（<a href="https://claude.ai/code/routines/trig_014nrD6d89yZtU2AzUgzU3Cd">定期実行のページ</a>。毎週火曜 7:55 JST・モデルは Opus 5.5 のまま = ユーザー決定）。</p>
-<p><strong>③ 手動の実行</strong>: 1 回目は集計・組み立て・LINE 送信が成功し、ページの公開し直しだけ拒否された（新しいセッションは、公開の前にそのページを一度読んでおく必要がある）。指示文に「先に読む」手順（3a）を足して 2 回目を実行し、4 つの操作すべてが成功した（所要 27 秒・ページは同じ URL のまま Version 2）。専用 IAM ユーザーのキーと読み取り専用の DB ユーザーで本番 DB を読めること、<code>api.line.me</code> へ届くことも、この実行で確かめられた。直した指示文は README に反映済み。</p>
-<p><strong>④ 判断</strong>: ページが 11/13 収集分までに変わったこと・LINE に 2 通（試行 2 回分）届いたことをユーザーが確認 = <strong>go</strong>。Windows 側の <code>weekly.sh</code> は使わないため削除した。最初の自動実行の確認は<a href="#pending-checks">確認待ちリスト</a>（2026-11-17）。</p>
-</div>
-</details>
-</div>
-</article>
-
-</div>
-</details>
-
-<div class="plan-group" data-plan-group="active">
-
-
-
-
-</div>
-</section>
+<p><strong>なし</strong>（2026-11-15 に Phase 33・34 が完了）。ステップが 0 件のあいだは構造検査のため <code>&lt;body data-plan-steps="none"&gt;</code> を宣言している。<strong>次のフェーズを起こすときにこの宣言を外す</strong>（<a href="index.html#step-format">計画体系 5</a>）。</p>
 
 <hr>
 
@@ -424,9 +84,8 @@
 <tbody>
 <tr><td>2026-10-17 / <a href="development-log.html#step-28-2">28-2</a> 一過性エラーの段階別の扱い</td><td>本番で次に Instagram の一過性エラー（<code>is_transient</code>・<code>code</code> 1 / 2・コンテナ ERROR）が起きた投稿（WARNING ログ「投稿コンテナを作成からやり直す」、または <code>api_response</code> に <code>first_error</code> を持つ <code>posts</code> 行が出たとき。<code>/incident</code> の照合で拾う）</td><td>① 公開前の失敗なら作成から 1 回だけやり直し、<code>platform_container_id</code> が新しい ID になっている ② 公開の失敗なら照会が 1 回だけ行われ、<code>PUBLISHED</code> → 「PUBLISHED 確認済み」の <code>published_unconfirmed</code> / <code>FINISHED</code> → 同じコンテナで再送 になっている ③ Instagram 上で同じ回の投稿が 2 件になっていない ④ <code>api_response</code> が <code>{"final", "first_error", "container_check"}</code> の形</td><td>二重投稿（③）なら即 <code>/incident</code> で課題に起票し、再送を止める修正を開発レーンで最優先にする。① ② ④ の食い違いは課題に起票（I-024 を live へ戻すかは <code>/incident</code> で判断）</td><td></td></tr>
 <tr><td>2026-11-10 / <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗のやり直し</td><td>発生実績型: 32-1 の deploy（<strong>2026-11-14 19:20 JST</strong>）後、本番で次に <code>WaitForDbReady</code> のタスクが起動に失敗したとき（SFN の実行履歴に <code>TaskFailed</code> の後の再試行が出る。SFN 失敗アラームが鳴った場合は <code>/incident</code> の照合で拾う）</td><td>① やり直しで DB 準備確認が成功し、実行全体が SUCCEEDED で終わっている（失敗アラームが鳴っていない）② やり直しても失敗した場合は、cause から DB 準備確認で落ちたと分かる</td><td>やり直しが効いていない → I-049 を live へ戻し（解消済みの再発）、<code>/incident</code> で切り分ける</td><td>—</td></tr>
-<tr><td>2026-10-24 / <a href="development-log.html#step-31-6">31-6</a> 脳みそコーチの正解コメントへの定時返信</td><td>日付型: 31-6 の本番返信の開始から 2 週間後 = <strong>2026-11-08</strong>（開始 2026-10-25）</td><td>① 返信の記録で、外れのコメントに「正解」と返したものが 0 件 ② logic-training-1 の 1 投稿あたりのコメント数の中央値が、手で返していた時期（2026-10 第 1〜2 週・12.5〜16 件）の水準に戻っているか（<code>content/insights-analysis</code> の <code>per_post_latest</code>）</td><td>① が 1 件でもあれば返信スイッチを切り、課題として起票する。② は効果の観察で、戻っていなくても返信は止めない（課題として起票し、別解・外れへの返信の再検討と合わせて判断）</td><td>2026-11-15 確認（<a href="#step-33-1">33-1</a> の照合で拾った）。① OK: 本番の判定の記録（S3 の <code>judged/</code> 196 投稿）で返信 121 件はすべて correct・自信高の判定（うち一番乗り 20 件）。外れ・別解・判断できないへの返信は 0 件（判定の記録で確認。コメント本文の目視はしていない）。② 未達: 1 投稿あたりのコメント数の中央値は、手で返していた 10/1〜10/14 の 13.5 件（28 本）に対し、返信開始後の 10/25〜11/08 は 10.0 件（30 本）。週別では 10 月 3〜4 週の 7.5〜8.5 件から 10.0・11.0 件へ戻りつつある。返信は止めない。別解・外れへの返信の再検討は Phase 33（<a href="../issues/index.html#I-050">I-050</a>）が当たるため新たに起票せず、33-3 の deploy 後の観察で合わせて見る</td></tr>
-<tr><td>2026-11-13 / <a href="#step-33-3">33-3</a> 脳みそコーチの正解判定の緩和</td><td>日付型: 33-3 の deploy（<strong>2026-11-15 16:05 JST</strong>・CoachReplyStack と CoachReplyStagingStack）から 1 週間後 = <strong>2026-11-22</strong></td><td>① 本番の判定の記録（S3 の <code>coach-reply/logic-training-1/state/judged/</code>）で、deploy 後に判定したコメントのうち返信した割合が、deploy 前（約 330 件中 112 件）より上がっている ② deploy 後に返信したコメントを Instagram 上で見て、明らかな外れ・答えになっていないコメントへの「正解」が 0 件（ユーザーの目視）③ 視点の読み替え・省略した言い方・正解に別の語を添えた回答に返信が付いている例がある</td><td>② が 1 件でもあれば、内容を見て返信スイッチを切るかをユーザーが決め、課題として起票する（I-050 を live へ戻す）。① ③ が満たされない場合は課題として起票し、問題ごとに正解の答えを持たせる案を検討する</td><td>—</td></tr>
-<tr><td>2026-11-15 / <a href="#step-34-3">34-3</a> アカウント成長ノートのクラウドの定期実行</td><td>日付型: 34-3 で定期実行を登録（<strong>2026-11-15</strong>）したあとの最初の火曜 = <strong>2026-11-17</strong>（7:55 JST の自動実行）</td><td>朝 8 時に LINE にレポートが届き、ページが前週（月〜日の 7 日分）まで入っている</td><td>課題として起票する（届かない・古いままの原因を切り分ける）</td><td>—</td></tr>
+<tr><td>2026-11-13 / <a href="development-log.html#step-33-3">33-3</a> 脳みそコーチの正解判定の緩和</td><td>日付型: 33-3 の deploy（<strong>2026-11-15 16:05 JST</strong>・CoachReplyStack と CoachReplyStagingStack）から 1 週間後 = <strong>2026-11-22</strong></td><td>① 本番の判定の記録（S3 の <code>coach-reply/logic-training-1/state/judged/</code>）で、deploy 後に判定したコメントのうち返信した割合が、deploy 前（約 330 件中 112 件）より上がっている ② deploy 後に返信したコメントを Instagram 上で見て、明らかな外れ・答えになっていないコメントへの「正解」が 0 件（ユーザーの目視）③ 視点の読み替え・省略した言い方・正解に別の語を添えた回答に返信が付いている例がある</td><td>② が 1 件でもあれば、内容を見て返信スイッチを切るかをユーザーが決め、課題として起票する（I-050 を live へ戻す）。① ③ が満たされない場合は課題として起票し、問題ごとに正解の答えを持たせる案を検討する</td><td>—</td></tr>
+<tr><td>2026-11-15 / <a href="development-log.html#step-34-3">34-3</a> アカウント成長ノートのクラウドの定期実行</td><td>日付型: 34-3 で定期実行を登録（<strong>2026-11-15</strong>）したあとの最初の火曜 = <strong>2026-11-17</strong>（7:55 JST の自動実行）</td><td>朝 8 時に LINE にレポートが届き、ページが前週（月〜日の 7 日分）まで入っている</td><td>課題として起票する（届かない・古いままの原因を切り分ける）</td><td>—</td></tr>
 </tbody>
 </table></div>
 
