@@ -7,7 +7,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-from app import first_correct, graph_api, judge, reply_text, secrets, selection
+from app import first_correct, graph_api, judge, reply_rule, reply_text, secrets, selection
 from app import snapshot_store, state_store, switch
 from app.config import Config
 
@@ -106,8 +106,7 @@ def _process_media(
                 result["verdict"], controls.value,
                 confidence=result["confidence"], reason=result["reason"],
             )
-            if (result["verdict"] == "correct"
-                    and result["confidence"] == "high"):
+            if reply_rule.should_reply(result):
                 first = first_correct.is_first_correct(
                     comment, selected.top_level, chronology,
                     first_correct_replied=state["first_correct_replied"],

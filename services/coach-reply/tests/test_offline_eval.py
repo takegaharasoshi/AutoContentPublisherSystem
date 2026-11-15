@@ -6,6 +6,7 @@ import pytest
 
 import json
 
+from app import reply_rule
 from tools.offline_eval import (
     aggregate_results, main, print_summary, total_usage, would_reply, write_review,
 )
@@ -25,7 +26,7 @@ def test_table_false_replies_recall_and_failures(capsys):
         row("alt"), row("wrong"), row("wrong", "wrong"), row("other"),
         row("other", "unsure"), row("unanswered"),
     ]
-    summary = aggregate_results(rows)
+    summary = aggregate_results(rows, "high")
     assert summary["table"]["correct"] == {"reply": 1, "no_reply": 2}
     assert summary["table"]["wrong"] == {"reply": 1, "no_reply": 1}
     assert summary["table"]["alt"]["reply"] == 1
@@ -52,9 +53,19 @@ def test_unknown_label_is_an_input_error():
         aggregate_results([row("unexpected")])
 
 
-def test_reply_rules_high_is_online_gate_and_any_adds_low_confidence():
-    assert would_reply({"verdict": "correct", "confidence": "high"})
-    assert not would_reply({"verdict": "correct", "confidence": "low"})
+@pytest.mark.parametrize("verdict", ["correct", "alt", "wrong", "unsure"])
+@pytest.mark.parametrize("confidence", ["high", "low"])
+def test_default_would_reply_is_the_online_gate(verdict, confidence):
+    prediction = {"verdict": verdict, "confidence": confidence, "reason": "r"}
+    assert would_reply(prediction) is reply_rule.should_reply(prediction)
+    assert would_reply(prediction) is (verdict == "correct")
+    assert would_reply(prediction) is would_reply(prediction, "any")
+    assert not would_reply(None)
+
+
+def test_reply_rules_high_and_any_for_comparison():
+    assert would_reply({"verdict": "correct", "confidence": "high"}, "high")
+    assert not would_reply({"verdict": "correct", "confidence": "low"}, "high")
     assert would_reply({"verdict": "correct", "confidence": "low"}, "any")
     assert not would_reply({"verdict": "alt", "confidence": "high"}, "any")
     assert not would_reply(None, "any")
@@ -64,7 +75,7 @@ def test_reply_rules_high_is_online_gate_and_any_adds_low_confidence():
 
 def test_any_rule_counts_low_confidence_and_review_list_includes_unanswered():
     rows = [row("correct", confidence="low"), row("unanswered", confidence="low"), row("wrong")]
-    high, any_ = aggregate_results(rows), aggregate_results(rows, "any")
+    high, any_ = aggregate_results(rows, "high"), aggregate_results(rows)
     assert high["correct_replied"] == 0 and any_["correct_replied"] == 1
     assert [r["label"] for r in high["review_replies"]] == ["wrong"]
     assert [r["label"] for r in any_["review_replies"]] == ["unanswered", "wrong"]

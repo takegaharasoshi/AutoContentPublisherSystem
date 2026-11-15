@@ -182,10 +182,21 @@ def test_off_records_would_reply_and_switching_on_does_not_replay(system):
     assert aws.secret_reads == 2
 
 
+def test_correct_low_is_replied_to_but_never_first(system):
+    aws, apis, context = system
+    apis.results["c1"] = verdict("correct", "low")
+    summary = run_handler.lambda_handler({}, context)
+    assert len(apis.reply_calls) == 1 and summary["replied"] == 1
+    assert "一番乗り" not in apis.reply_calls[0][1]
+    state = aws.load(f"{STATE}judged/m1.json")
+    assert state["comments"]["c1"]["replied"] is True and state["comments"]["c1"]["first"] is False
+    assert state["first_correct_replied"] is False
+
+
 @pytest.mark.parametrize("value,confidence", [
-    ("correct", "low"), ("alt", "high"), ("wrong", "high"), ("unsure", "high"),
+    ("alt", "high"), ("alt", "low"), ("wrong", "high"), ("unsure", "high"), ("unsure", "low"),
 ])
-def test_only_correct_high_is_replied_to(system, value, confidence):
+def test_only_correct_is_replied_to(system, value, confidence):
     aws, apis, context = system
     apis.results["c1"] = verdict(value, confidence)
     run_handler.lambda_handler({}, context)

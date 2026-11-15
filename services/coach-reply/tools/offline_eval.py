@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app import judge  # noqa: E402
+from app import judge, reply_rule  # noqa: E402
 from app.config import JUDGE_EFFORTS, Config  # noqa: E402
 from app.snapshot_store import snapshot_from_answer  # noqa: E402
 
@@ -32,8 +32,16 @@ PRICE_PER_MTOK = {"input_tokens": 0.10, "cache_creation_input_tokens": 0.125,
                   "cache_read_input_tokens": 0.01, "output_tokens": 0.50}
 
 
-def would_reply(prediction: dict | None, rule: str = "high") -> bool:
-    """Apply a reply gate: "high" is the online gate, "any" also replies at low confidence."""
+def would_reply(prediction: dict | None, rule: str | None = None) -> bool:
+    """Apply a reply gate.
+
+    Args:
+        prediction: One validated judgment, or None for a failed one.
+        rule: None applies the online gate (app.reply_rule.should_reply). "high"
+            replies only at high confidence; "any" also replies at low confidence.
+    """
+    if rule is None:
+        return reply_rule.should_reply(prediction)
     if rule not in REPLY_RULES:
         raise ValueError(f"unknown reply rule: {rule}")
     if not prediction or prediction.get("verdict") != "correct":
@@ -41,7 +49,7 @@ def would_reply(prediction: dict | None, rule: str = "high") -> bool:
     return rule == "any" or prediction.get("confidence") == "high"
 
 
-def aggregate_results(rows: list[dict], rule: str = "high") -> dict:
+def aggregate_results(rows: list[dict], rule: str | None = None) -> dict:
     """Summarize labels, false replies, recall and failures without any API call."""
     table = {label: {"reply": 0, "no_reply": 0} for label in LABELS}
     false_replies = []
@@ -68,7 +76,7 @@ def aggregate_results(rows: list[dict], rule: str = "high") -> dict:
                 false_replies.append(item)
     total_correct = sum(table["correct"].values())
     return {
-        "rule": rule, "table": table,
+        "rule": rule or "online", "table": table,
         "false_reply_count": len(false_replies), "false_replies": false_replies,
         "review_replies": review_replies,
         "correct_replied": table["correct"]["reply"], "correct_total": total_correct,
@@ -79,7 +87,7 @@ def aggregate_results(rows: list[dict], rule: str = "high") -> dict:
 
 def print_summary(summary: dict) -> None:
     """Print the evaluation table and each false reply with its short rationale."""
-    print(f"返信の条件: {summary.get('rule', 'high')}")
+    print(f"返信の条件: {summary.get('rule', 'online')}")
     print("label        返す  返さない")
     for label, counts in summary["table"].items():
         print(f"{label:12} {counts['reply']:5} {counts['no_reply']:9}")
@@ -164,6 +172,7 @@ def evaluate_media(
     return [{
         **row, "prediction": results.get(row["comment_id"]), "effort": config.judge_effort,
         "would_reply": would_reply(results.get(row["comment_id"])),
+        "would_reply_high": would_reply(results.get(row["comment_id"]), "high"),
         "would_reply_any": would_reply(results.get(row["comment_id"]), "any"),
     } for row in rows]
 
