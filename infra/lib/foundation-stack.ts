@@ -180,6 +180,21 @@ export class FoundationStack extends cdk.Stack {
       },
     });
 
+    // 読み取り専用 DB ユーザー（成長ノートの集計用）の認証情報。Data API がそのまま使える形
+    // （username / password）で持つ。DB 側のユーザーは database/users/ の手順で作る（CDK 管理外）。
+    // 記号を除くのは、CREATE USER の文に埋め込むときの引用符の取り違えを避けるため。
+    new secretsmanager.Secret(this, 'DbReadonlyReportSecret', {
+      secretName: `acps/${props.envName}/db/readonly-report`,
+      description:
+        'Read-only DB user for reporting via the Data API (the DB user is created by database/users/)',
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ username: 'report_ro' }),
+        generateStringKey: 'password',
+        excludePunctuation: true,
+        passwordLength: 32,
+      },
+    });
+
     // 既存 VPC を使用し、Cluster 作成時の VPC 自動作成を防ぐ
     this.ecsCluster = new ecs.Cluster(this, 'EcsCluster', {
       vpc: this.vpc,

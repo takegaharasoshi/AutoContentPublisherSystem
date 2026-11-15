@@ -14,7 +14,7 @@
 <h1>開発計画・進捗管理（開発レーン）</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">開発レーン</span>
-  <span>最終更新: 2026-11-15（<strong>Phase 34 を起票</strong>: <a href="#step-34-1">34-1</a>〜<a href="#step-34-3">34-3</a> アカウント成長ノートをクラウドの定期実行で届ける = アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記。確認待ちに 1 行追加）。前回: 2026-11-15（<strong><a href="#step-33-3">33-3</a> 前半</strong>: 返す条件を「correct なら確信の高低を問わず返す」にそろえ、設計書を直した。deploy の承認待ち）。前回: 2026-11-15（<strong><a href="#step-33-2">33-2</a> 完了・go</strong>: 推論レベル high・返信の条件は「correct なら自信低も返す」= ユーザー決定。次は 33-3）。前回: 2026-11-15（<strong><a href="#step-33-1">33-1</a> 完了</strong>: 新しい判定プロンプトで正解を拾えた割合が 80.0%〔high〕/ 79.3%〔xhigh〕に上がり、外れ・その他への返す 0 件〔自信高だけ〕。確認待ちの 31-6 の結果を記入。次は 33-2〔ユーザー判断〕）。前回: 2026-11-15（<strong>Phase 33 の比べる対象を変更</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ。費用を抑えるためモデルは変えない = ユーザー決定）。前回: 2026-11-14（<strong>Phase 32 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-32">開発記録</a>へ移した。進行中は Phase 33）。前回: 2026-11-14（<strong><a href="development-log.html#step-32-1">32-1</a> 完了</strong>: 3 本の SFN の DB 準備確認に起動失敗の Retry を足して本番へ deploy・<a href="../issues/index.html#I-049">I-049</a> を解消。Phase 32 のステップはすべて完了し、記録の移設は次の計画整理で行う）。前回: 2026-11-13（<strong>Phase 33 を起票</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める = <a href="../issues/index.html#I-050">I-050</a> の展開。確認待ちに 1 行追加。Phase 32 は未着手のまま並ぶ）。前回: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
+  <span>最終更新: 2026-11-15（<strong><a href="#step-34-1">34-1</a> 完了</strong>: 読み取り専用 DB ユーザー用のシークレットを FoundationStack に足し、DB ユーザーを作る手順を <code>database/users/</code> に置いた。push・deploy・DB への適用の承認待ち。次は 34-2）。前回: 2026-11-15（<strong>Phase 34 を起票</strong>: <a href="#step-34-1">34-1</a>〜<a href="#step-34-3">34-3</a> アカウント成長ノートをクラウドの定期実行で届ける = アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記。確認待ちに 1 行追加）。前回: 2026-11-15（<strong><a href="#step-33-3">33-3</a> 前半</strong>: 返す条件を「correct なら確信の高低を問わず返す」にそろえ、設計書を直した。deploy の承認待ち）。前回: 2026-11-15（<strong><a href="#step-33-2">33-2</a> 完了・go</strong>: 推論レベル high・返信の条件は「correct なら自信低も返す」= ユーザー決定。次は 33-3）。前回: 2026-11-15（<strong><a href="#step-33-1">33-1</a> 完了</strong>: 新しい判定プロンプトで正解を拾えた割合が 80.0%〔high〕/ 79.3%〔xhigh〕に上がり、外れ・その他への返す 0 件〔自信高だけ〕。確認待ちの 31-6 の結果を記入。次は 33-2〔ユーザー判断〕）。前回: 2026-11-15（<strong>Phase 33 の比べる対象を変更</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> を「Haiku 5.5 と Sonnet 5.5」から「Haiku 5.5 の推論レベル high と xhigh」へ。費用を抑えるためモデルは変えない = ユーザー決定）。前回: 2026-11-14（<strong>Phase 32 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-32">開発記録</a>へ移した。進行中は Phase 33）。前回: 2026-11-14（<strong><a href="development-log.html#step-32-1">32-1</a> 完了</strong>: 3 本の SFN の DB 準備確認に起動失敗の Retry を足して本番へ deploy・<a href="../issues/index.html#I-049">I-049</a> を解消。Phase 32 のステップはすべて完了し、記録の移設は次の計画整理で行う）。前回: 2026-11-13（<strong>Phase 33 を起票</strong>: <a href="#step-33-1">33-1</a>〜<a href="#step-33-3">33-3</a> 脳みそコーチの正解判定を「わかっているコメントなら正解」へ緩める = <a href="../issues/index.html#I-050">I-050</a> の展開。確認待ちに 1 行追加。Phase 32 は未着手のまま並ぶ）。前回: 2026-11-10（<strong>Phase 32 を起票</strong>: <a href="development-log.html#step-32-1">32-1</a> DB 準備確認の起動失敗を SFN でやり直す = <a href="../issues/index.html#I-049">I-049</a> の展開。確認待ちに 1 行追加）。前回: 2026-10-25（<strong>Phase 31 完了</strong>: 完了フェーズのサマリへ 1 行で畳み、ステップ一覧の原文を<a href="development-log.html#phase-31">開発記録</a>へ移した。進行中のフェーズはなし）。前回: 2026-10-25（<strong>31-6 完了</strong>: 本番返信を開始〔開始日時 10/24 21:00 JST・初回の手動起動で正解 6 件に返信〕・定型文を改行入りの 22 本に差し替え。確認待ちは 2026-11-08）。前回: 2026-10-25（<strong>31-5 完了</strong>: 本番のスナップショット 370 件〔バックフィル 369 + フラグ後 1〕・フラグを立てた・スイッチ off の手動起動で判定 23 件 / 返信 0 件。次は 31-6〔ユーザー判断〕）。前回: 2026-10-24（<strong>Phase 31 起票</strong>: <a href="../ideas/logic-training-coach-persona.md">アイデア</a>の採用転記。脳みそコーチの正解コメントへの定時の自動返信）。前回: 2026-10-18（<strong>30-4 完了・go</strong>: アーキテクチャとワークフローの詳細設計を描き直した。次は <a href="development-log.html#step-30-5">30-5</a>。同日 <strong>30-3c 完了・go</strong>。同日 <strong>30-3b 完了・go</strong>。同日の <strong>Phase 30 の組み直し</strong>: 30-3 の通読で、3 段を「基本設計（全体）→ 機能別の基本設計 → 詳細設計」にすると決め、<a href="development-log.html#step-30-3b">30-3b</a>〔配信面〕・<a href="development-log.html#step-30-3c">30-3c</a>〔生産面〕を新設、30-4〜30-9 を改めた。同日に 30-1 完了・30-2 go・30-3 完了〔全体ページの go は 30-3c で判断〕。前回: 2026-10-17（Phase 30 起票。更新履歴の旧エントリは git の履歴を参照）</span>
 </div>
 
 <div class="note">
@@ -264,14 +264,16 @@
 </div>
 </details>
 
-<div class="plan-group" data-plan-group="active">
+<details class="plan-group" data-plan-group="done">
+<summary>完了済み 1 件（クリックで展開）</summary>
+<div class="plan-group-inner">
 
-<article class="plan-step" id="step-34-1" data-step-id="34-1" data-status="todo">
+<article class="plan-step" id="step-34-1" data-step-id="34-1" data-status="done" data-completed="2026-11-15">
 <header class="plan-step-head">
-<div class="plan-meta"><strong>34-1</strong><span class="plan-status">未着手</span></div>
+<div class="plan-meta"><strong>34-1</strong><span class="plan-status">完了</span><span>2026-11-15</span></div>
 <h3>読み取り専用の DB ユーザー用のシークレットと、DB ユーザーを作る手順を用意する</h3>
 <p data-field="prerequisites"><strong>着手条件：</strong>なし（フェーズの先頭。Phase 33 とは触るパスが重ならない）。</p>
-<p data-field="result"><strong>現況：</strong>未着手。</p>
+<p data-field="result"><strong>結果：</strong>2026-11-15 完了（コミットまで）。FoundationStack の差分は新しいシークレット 1 件だけ。DB ユーザー <code>report_ro</code> を作る SQL と適用スクリプトを <code>database/users/</code> に置いた。<strong>人間ゲート（push → deploy → DB ユーザーの作成）待ち</strong>。</p>
 </header>
 <div class="plan-step-body">
 <section><h4>1. 何をするか</h4>
@@ -299,11 +301,25 @@
 </div>
 </details>
 <details class="plan-fold" data-field="record">
-<summary>5. 作業記録 <span class="plan-hint">— 未作成</span></summary>
-<div class="plan-fold-inner"><p>着手前のため記録なし。作業を始めたらここに追記する。</p></div>
+<summary>5. 作業記録 <span class="plan-hint">— 2026-11-15。シークレット・SQL・適用スクリプト・設計書。deploy と適用は人間ゲート</span></summary>
+<div class="plan-fold-inner">
+<p><strong>(1) CDK</strong>: <code>infra/lib/foundation-stack.ts</code> に <code>DbReadonlyReportSecret</code>（<code>acps/{env}/db/readonly-report</code>・<code>{"username": "report_ro"}</code> + 自動生成の <code>password</code>・英数字 32 文字）を足した。既存のシークレット・タスクロール・Aurora の定義は変えていない。<code>infra/test/foundation-stack.test.ts</code> は 37 件すべて通過（シークレットの数を 3 に、新しいシークレットの形の検査を 1 件追加）。</p>
+<p><strong>(2) cdk synth / diff</strong>（<code>-c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e</code>。タグは本番のタスク定義の現行値。スタックの指定名は <code>FoundationStack</code>）: synth は成功。diff は <code>[+] AWS::SecretsManager::Secret DbReadonlyReportSecret</code> の 1 件だけ（IAM・出力の差分なし）。</p>
+<p><strong>(3) DB ユーザーの手順</strong>: <code>database/users/readonly_report.sql</code>（<code>CREATE USER IF NOT EXISTS</code>・<code>ALTER USER</code>・<code>GRANT SELECT ON `acps`.*</code> の 3 文）と <code>database/users/apply_readonly_report.py</code>。スクリプトは GRANT が SELECT の 1 文だけであることを確かめてから、管理者のシークレットで Data API に 1 文ずつ流す。パスワードは新しいシークレットから読み、画面・引数に出さない（入力は権限 600 の一時ファイルで渡して消す）。<code>--dry-run</code>（AWS に触らず、伏せ字で文を表示）だけ実行した。本番には適用していない。</p>
+<p><strong>(4) 設計書</strong>: <code>docs/infra/security.html</code>（図 1・1.1〜1.3・2.8 を新設・判断の記録 D-09）、<code>docs/infra/stacks.html</code>（3.1 の Secrets Manager・判断の記録 D-20）。<code>python3 tools/docs_check.py --widths 360,390,768,1280</code> は OK。</p>
+<p><strong>(5) 決めたこと</strong>: DB ユーザー名は <code>report_ro</code>、付与の対象はスキーマ <code>acps</code> 全体の <code>SELECT</code>（集計が読むテーブル・ビューが増えても付け直さずに済む）。シークレットは <code>db/</code> の下のため既存のタスクロールからも読めるが、それらは管理者のシークレットをすでに読める。</p>
+<p><strong>(6) 照合</strong>: 確認待ちは該当なし。課題表 I-011 は据え置き継続・トリガー更新なし。クローズ移動は該当なし。</p>
+<p><strong>人間ゲートの手順</strong>: ① push ② <code>cd infra &amp;&amp; cdk deploy -c env=prod -c dbReadinessCheckImageTag=27d0ab20a77e FoundationStack</code> ③ <code>python3 database/users/apply_readonly_report.py</code>（最後に付いた権限が表示される）。</p>
+</div>
 </details>
 </div>
 </article>
+
+</div>
+</details>
+
+<div class="plan-group" data-plan-group="active">
+
 
 <article class="plan-step" id="step-34-2" data-step-id="34-2" data-status="todo">
 <header class="plan-step-head">

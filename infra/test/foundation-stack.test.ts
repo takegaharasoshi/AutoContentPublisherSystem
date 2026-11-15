@@ -262,8 +262,20 @@ describe('FoundationStack の画像生成 API キー用 Secret', () => {
   const stack = createFoundationStack();
   const template = Template.fromStack(stack);
 
-  test('Secrets Manager Secret が 2 つ作成される', () => {
-    template.resourceCountIs('AWS::SecretsManager::Secret', 2);
+  test('Secrets Manager Secret が 3 つ作成される', () => {
+    template.resourceCountIs('AWS::SecretsManager::Secret', 3);
+  });
+
+  test('読み取り専用 DB ユーザー用の Secret が username 付きで作成される', () => {
+    template.hasResourceProperties('AWS::SecretsManager::Secret', {
+      Name: 'acps/prod/db/readonly-report',
+      GenerateSecretString: {
+        SecretStringTemplate: '{"username":"report_ro"}',
+        GenerateStringKey: 'password',
+        ExcludePunctuation: true,
+        PasswordLength: 32,
+      },
+    });
   });
 
   test('Secret 名が設定される', () => {

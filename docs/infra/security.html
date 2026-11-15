@@ -13,7 +13,7 @@
 <h1>セキュリティ設計</h1>
 <div class="page-meta">
   <span class="badge badge-fixed">一時 Fix</span>
-  <span>最終更新: 2026-10-19（30-9a: 新しい書式へ移した。判断の記録 D-01〜D-08）。前回: 2026-10-12（21-7b: インサイト収集バッチのタスクロールにコメント記録 <code>comment-log/*</code> の読み取りを追加）。前回: 2026-10-12（21-7: SNS 投稿バッチのタスクロールにスナップショットの <code>s3:PutObject</code>、プライバシーポリシーのバケットを https のオブジェクト URL で公開する形に更新）。前回: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
+  <span>最終更新: 2026-11-15（34-1: 読み取り専用 DB ユーザー用の Secret <code>acps/{env}/db/readonly-report</code> と、手で作った IAM ユーザー <code>acps-prod-growth-note-reader</code> を 1.1〜1.3・2.8 に追加。判断の記録 D-09）。前回: 2026-10-19（30-9a: 新しい書式へ移した。判断の記録 D-01〜D-08）。前回: 2026-10-12（21-7b: インサイト収集バッチのタスクロールにコメント記録 <code>comment-log/*</code> の読み取りを追加）。前回: 2026-10-12（21-7: SNS 投稿バッチのタスクロールにスナップショットの <code>s3:PutObject</code>、プライバシーポリシーのバケットを https のオブジェクト URL で公開する形に更新）。前回: 2026-09-04（21-3: コメント自動返信の Secret〔1.2 / 1.3〕・Lambda 実行ロール〔2.6〕・ネットワーク〔3〕・運用〔4〕を追加）</span>
   <span>1 段上: <a href="../overview/system-overview.html">基本設計（全体）</a>と、機能別の基本設計 <a href="../overview/functions/post.html">投稿</a> / <a href="../overview/functions/insights.html">インサイト収集</a> / <a href="../overview/functions/comment-reply.html">コメント自動返信</a> / <a href="../overview/functions/token-refresh.html">トークン更新</a></span>
 </div>
 
@@ -44,6 +44,7 @@ flowchart TB
     subgraph SM["Secrets Manager（acps/{env}/…）"]
         direction TB
         dbs["db/credentials"]
+        ro["db/readonly-report"]
         img["image/api-key"]
         sns["{set_code}/sns/{platform}/{account_code}"]
         cr["{set_code}/comment-reply{-staging}"]
@@ -80,6 +81,7 @@ flowchart TB
 <p>以下の秘密情報を Secrets Manager で管理する:</p>
 <ul>
   <li>Aurora DB の認証情報（ホスト、ポート、ユーザー名、パスワード、DB 名）</li>
+  <li>読み取り専用 DB ユーザーの認証情報（ユーザー名、パスワード。34-1 追加）</li>
   <li>画像生成 API のキー</li>
   <li>SNS 認証情報（プラットフォームごとの API 認証情報）</li>
 </ul>
@@ -92,6 +94,7 @@ flowchart TB
   <thead><tr><th>種別</th><th>Secret 名パターン</th><th>例</th></tr></thead>
   <tbody>
     <tr><td>DB 認証情報</td><td><code>acps/{env}/db/credentials</code></td><td><code>acps/prod/db/credentials</code></td></tr>
+    <tr><td>読み取り専用 DB ユーザーの認証情報（34-1 追加）</td><td><code>acps/{env}/db/readonly-report</code></td><td><code>acps/prod/db/readonly-report</code></td></tr>
     <tr><td>画像生成 API キー</td><td><code>acps/{env}/image/api-key</code></td><td><code>acps/prod/image/api-key</code></td></tr>
     <tr><td>SNS 認証情報</td><td><code>acps/{env}/{set_code}/sns/{platform}/{account_code}</code></td><td><code>acps/prod/fashion-set-1/sns/instagram/main-account</code></td></tr>
     <tr><td>コメント自動返信（Webhook + OpenAI + 返信用トークン。21-3 追加）</td><td><code>acps/{env}/{set_code}/comment-reply{-staging}</code></td><td><code>acps/prod/umigame-soup-1/comment-reply</code> / <code>acps/prod/umigame-soup-1/comment-reply-staging</code></td></tr>
@@ -140,6 +143,22 @@ flowchart TB
   </tbody>
 </table>
 </div>
+
+<h4 id="secret-readonly-report">読み取り専用 DB ユーザーの認証情報（34-1 追加）</h4>
+<p>FoundationStack が作る Secret <code>acps/{env}/db/readonly-report</code>。RDS Data API の <code>secretArn</code> にそのまま渡せる形で持つ。DB 側のユーザー <code>report_ro</code> は CDK では作らず、<code>database/users/apply_readonly_report.py</code> で作る（付ける権限はスキーマ <code>acps</code> への <code>SELECT</code> だけ。パスワードはこの Secret から読み、画面に出さない） <a class="decision-ref" href="#d-09">→ 理由 D-09</a></p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>キー</th><th>必須</th><th>説明</th></tr></thead>
+  <tbody>
+    <tr><td><code>username</code></td><td>YES</td><td><code>report_ro</code>（固定）</td></tr>
+    <tr><td><code>password</code></td><td>YES</td><td>CDK が生成する英数字 32 文字（記号なし）</td></tr>
+  </tbody>
+</table>
+</div>
+<ul>
+  <li>名前が <code>acps/{env}/db/</code> で始まるため、既存のタスクロール（<code>acps/{env}/db/*</code> を読める）からも読める。これらのロールは管理者の Secret をすでに読めるため、読める範囲は広がらない</li>
+  <li>パスワードを替えるときは、Secret の値を替えたあと <code>apply_readonly_report.py</code> をもう一度流す（DB 側のパスワードを Secret にそろえる）</li>
+</ul>
 
 <h4>画像生成 API キー</h4>
 <p>Secret 名: <code>acps/{env}/image/api-key</code></p>
@@ -362,6 +381,20 @@ flowchart TB
 </div>
 <p>SnsPostBatchStack のタスクロールには、quiz 用の問題スナップショットの出力のために <code>s3:PutObject</code>（<code>assets/logic-training-1/problems/*</code>）を 31-4 で足す。</p>
 
+<h3 id="iam-growth-note-reader">2.8 成長ノート用の IAM ユーザー（34-1 追加・CDK 管理外）</h3>
+<p>AWS の外（クラウドの定期実行）から本番 DB を読むための IAM ユーザー。このシステムで長期のアクセスキーを持つ唯一の利用者で、CDK では管理しない（2026-11-15 に手で作成） <a class="decision-ref" href="#d-09">→ 理由 D-09</a></p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>ユーザー名</td><td><code>acps-prod-growth-note-reader</code></td></tr>
+    <tr><td>権限（インラインポリシー <code>growth-note-read</code>）</td><td><code>rds-data:ExecuteStatement</code>（本番の Aurora クラスターだけ）と <code>secretsmanager:GetSecretValue</code>（<code>acps/prod/db/readonly-report</code> だけ）</td></tr>
+    <tr><td>読めないもの</td><td>管理者の Secret <code>acps/prod/db/credentials</code>・ほかの Secret・S3・ほかの AWS の操作すべて</td></tr>
+    <tr><td>アクセスキー</td><td>クラウド環境に登録する直前に発行する（開発計画 34-3）。リポジトリ・設計書・記録に値を書かない</td></tr>
+  </tbody>
+</table>
+</div>
+
 <h2 id="network">3. ネットワークセキュリティ</h2>
 <ul>
   <li><strong>Aurora</strong>: Isolated Subnet に配置し、インターネットからの直接アクセスを遮断する。Security Group はアウトバウンド通信を完全に遮断する（CDK で <code>allowAllOutbound: false</code> を明示指定）</li>
@@ -460,6 +493,15 @@ flowchart TB
   <dt>理由</dt><dd>コスト削減のため。より厳格なネットワーク分離が必要な場合は導入を検討する</dd>
   <dt>退けた案</dt><dd>Interface VPC Endpoint。セキュリティ要件の強化やトラフィック増加時には、ECS Fargate を Private Subnet に移動し NAT Gateway 経由の構成に変更可能（移行パスとして残す）</dd>
   <dt>日付・出典</dt><dd>当初設計</dd>
+</dl>
+</article>
+<article id="d-09">
+<h3>D-09 AWS の外から DB を読む経路は、読み取り専用の DB ユーザーと専用の IAM ユーザーで絞る</h3>
+<dl>
+  <dt>決めたこと</dt><dd>成長ノート（週 1 回の集計とレポート）をクラウドの定期実行で動かすために、読み取り専用の DB ユーザー <code>report_ro</code>（スキーマ <code>acps</code> への <code>SELECT</code> だけ）とその Secret <code>acps/{env}/db/readonly-report</code>、専用の IAM ユーザー <code>acps-prod-growth-note-reader</code> を足す。IAM ユーザーが読める Secret は読み取り専用の 1 本だけにする</dd>
+  <dt>理由</dt><dd>RDS Data API の実行権限は IAM では読み取りだけに絞れない（何ができるかは、渡す Secret の DB ユーザーで決まる）。管理者の Secret を読めるキーを AWS の外に置くと、漏れたときに本番 DB を書き換えられる。DB ユーザーを分ければ、漏れても読まれるだけで済む。Secret を <code>db/</code> の下に置いたのは DB 認証情報の規約に合わせるためで、既存のタスクロールから読めるようになるが、それらは管理者の Secret をすでに読める</dd>
+  <dt>退けた案</dt><dd>管理者の Secret のまま専用 IAM ユーザーのキーを外に置く（早いが、漏れたときの被害が本番 DB 全体に及ぶ）。Windows のタスクスケジューラで手元から動かす（キーを外に出さないが、火曜の朝に PC が起動していないと届かない）。IAM ユーザーを CDK で管理する（すでに手で作成済みで、権限が 2 行のため取り込まない）</dd>
+  <dt>日付・出典</dt><dd>2026-11-15（Phase 34-1。アイデア <a href="../ideas/account-growth-visualization.md">account-growth-visualization</a> の採用転記）</dd>
 </dl>
 </article>
 </section>
