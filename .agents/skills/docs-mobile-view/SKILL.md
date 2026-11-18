@@ -36,10 +36,10 @@ WSL の再起動でサーバーが落ちる事象(10/29・11/7・11/11)への対
 常駐中は wsl.exe のセッションが残るので WSL がアイドルで自動停止しない。WSL が再起動しても、最長 10 分で戻る。
 (`/etc/wsl.conf` の `[boot] command` は sudo にパスワードが要るため使っていない)
 
-- 「配信されてる?」と聞かれたら、まず `cat /tmp/acps-docs-autostart.log` と `pgrep -af serve-docs-autostart` で見張り役が動いているかを見る
+- 「配信されてる?」と聞かれたら、まず `tail /tmp/acps-docs-autostart.log`(開始・終了・起動し直しを記録)と `pgrep -af '^/bin/bash .*/tools/serve-docs-autostart.sh$'` で見張り役が動いているかを見る。見張り役が居ないのにタスクの結果が 0 のままなら、ロックを握ったままのプロセスを疑う(2026-11-19 にサーバーがロックの fd を受け継いでいて再起動できなかった。修正済み)
 - すぐ戻したいときは `schtasks.exe /Run /TN "ACPS docs autostart"`(`/mnt/c` で実行)。手で `start` しても競合しない
 - **ポートを増減したら `tools/serve-docs-autostart.sh` の `INSTANCES` も直す**。直さないと、`stop` したポートが見張り役に起動し直される
-- 自動起動をやめるときは `schtasks.exe /Delete /TN "ACPS docs autostart" /F` → `pkill -f serve-docs-autostart`
+- 自動起動をやめるときは `schtasks.exe /Delete /TN "ACPS docs autostart" /F` → `pkill -f '^/bin/bash .*/tools/serve-docs-autostart.sh$'`(パターンを先頭一致にしないと、コマンドを包むシェル自身も止めてしまう)
 
 ## 2. 仕組み(トラブル時の切り分けに必要)
 

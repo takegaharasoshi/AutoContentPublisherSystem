@@ -43,7 +43,9 @@ ensure_all() {
     is_listening "$port" && continue
     # WSL の再起動をまたいだ古い pid ファイルが別プロセスに当たらないよう消してから起動する
     rm -f "/tmp/acps-docs-server-${port}.pid"
-    if DOCS_PORT="$port" DOCS_ROOT="$root" "${REPO_ROOT}/tools/serve-docs.sh" start >/dev/null 2>&1; then
+    # 9>&- でロックの fd を子に渡さない（渡すと、起動したサーバーがロックを握り続け、
+    # 見張り役が終わったあとに次の見張り役が起動できなくなる。2026-11-19 に発生）
+    if DOCS_PORT="$port" DOCS_ROOT="$root" "${REPO_ROOT}/tools/serve-docs.sh" start >/dev/null 2>&1 9>&-; then
       log "port ${port} を起動しました (root=${root})"
     else
       log "port ${port} の起動に失敗しました。/tmp/acps-docs-server-${port}.log を参照"
@@ -51,8 +53,12 @@ ensure_all() {
   done
 }
 
+trap 'log "見張りを終了しました (pid=$$)"' EXIT
+trap 'exit 143' TERM HUP INT
 log "見張りを開始しました (pid=$$)"
 while true; do
   ensure_all
-  sleep "$CHECK_INTERVAL_SEC"
+  # sleep を背景で待つ（前景の sleep だと、終了の合図が待ち時間明けまで届かない）
+  sleep "$CHECK_INTERVAL_SEC" 9>&- &
+  wait $!
 done
